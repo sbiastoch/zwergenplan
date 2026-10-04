@@ -57,7 +57,10 @@ Jede Ansicht besteht in Playwright auf 360 px, Pixel 7, iPhone 15 (WebKit), quer
 - kein horizontales Scrollen, auch bei 320 px und 200 % Textgröße
 - Touch-Ziele ≥ 44 px (Links im Fließtext ≥ 24 px)
 - Eingabefelder ≥ 16 px (sonst zoomt iOS)
-- axe WCAG 2.2 AA ohne Verstöße, hell und dunkel
+- axe WCAG 2.2 AA ohne Verstöße, hell und dunkel (dunkel über die System-Einstellung und über die gewählte Darstellung `data-theme="dark"`)
+- Text passt in seinen Kasten (`expectTextFits`, Plan 0007): kein Bruch mitten in kurzen Wörtern, nichts ragt heraus oder wird abgeschnitten, kein Text in sichtbaren Rundungen, keine Überlappung in Leisten; bei 100 % zusätzlich einzeilige kurze Knopf-Beschriftungen (nur mit Fixture-Daten). Läuft in jedem `expectMobileUx` und bei 320 px/200 %. Ausnahmen nur als begründete Regel im Gate, nie per Selektor.
+- Dunkelmodus ohne helle Inseln (`expectNoBrightIslands`): keine deckende Fläche (auch `::before`/`::after`) mit Luminanz > 0,75 auf mehr als 1 000 px². Gewählte Zustände und Toast nutzen die Tokens `--sel`/`--on-sel` und `--toast`/`--on-toast`, die in **beiden** Dunkel-Blöcken von `tokens.css` stehen.
+- Große Schrift: Umschaltungen dafür laufen über intrinsische Layouts (`flex-wrap`, `grid auto-fit` mit `rem`-Mindestbreiten) oder Container-Queries in `rem`, nie über Viewport-Media-Queries (die reagieren nicht auf die Schriftgröße). Kurze Wörter in Bedienelementen brechen nie mitten im Wort, `overflow-wrap: anywhere` ist nur der Notausgang für lange Komposita und URLs; Titel trennen mit `hyphens: auto`.
 - sichtbarer Fokus bei Tastaturbedienung
 - keine Konsolen- oder Seitenfehler (automatisch in jedem Test)
 - reduzierte Bewegung funktioniert: keine Animation oder Transition länger als 1 ms, Verzögerung eingerechnet (`expectReducedMotion`)

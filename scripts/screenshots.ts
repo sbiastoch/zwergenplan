@@ -1,7 +1,8 @@
 /**
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
- *   node scripts/screenshots.ts [URL] [--views=start,kalender,…]   Standard: lokale Preview mit Fixture-Daten
+ *   node scripts/screenshots.ts [URL] [--views=start,kalender,…] [--text=200]   Standard: lokale Preview mit Fixtures
  * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003).
+ * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
 import { mkdirSync } from "node:fs";
 import { chromium, type Page } from "@playwright/test";
@@ -9,12 +10,18 @@ import { chromium, type Page } from "@playwright/test";
 const args = process.argv.slice(2);
 const url = args.find((a) => !a.startsWith("--")) ?? "http://localhost:4173/";
 const viewsArg = args.find((a) => a.startsWith("--views="))?.slice("--views=".length);
+const textArg = args.find((a) => a.startsWith("--text="))?.slice("--text=".length);
+const textPercent = textArg ? Number.parseInt(textArg, 10) : 100;
+if (!Number.isFinite(textPercent) || textPercent < 50 || textPercent > 400)
+  throw new Error(`--text=${textArg} ungültig`);
 const isLocal = url.includes("localhost");
 const outDir = "e2e/.artifacts/screens";
 mkdirSync(outDir, { recursive: true });
 
 const viewports = [
   { name: "320", width: 320, height: 640 },
+  { name: "360", width: 360, height: 740 },
+  { name: "365", width: 365, height: 740 },
   { name: "iphone", width: 390, height: 844 },
   { name: "pixel", width: 412, height: 915 },
   { name: "quer", width: 915, height: 412 },
@@ -72,8 +79,13 @@ for (const vp of viewports) {
       await page.goto(url);
       await ready(page);
       await go(page);
+      if (textPercent !== 100)
+        await page.evaluate((p) => {
+          document.documentElement.style.fontSize = `${p}%`;
+        }, textPercent);
       await page.waitForTimeout(150);
-      const file = `${outDir}/${view}-${vp.name}-${scheme}.png`;
+      const suffix = textPercent === 100 ? "" : `-${textPercent}`;
+      const file = `${outDir}/${view}-${vp.name}-${scheme}${suffix}.png`;
       await page.screenshot({ path: file, fullPage: false });
       console.log(file);
       await context.close();
