@@ -59,7 +59,7 @@ describe("useOrigin (Plan 0004, E3)", () => {
     expect(api.problem).toBeUndefined();
   });
 
-  it("stellt einen gespeicherten Stadtteil wieder her, eine unbekannte ID nicht", () => {
+  it("stellt einen gespeicherten Stadtteil wieder her", () => {
     storage.data.set(KEY, "gostenhof");
     expect(renderOrigin().origin).toEqual({
       source: "stadtteil",
@@ -67,8 +67,13 @@ describe("useOrigin (Plan 0004, E3)", () => {
       label: "Gostenhof",
       districtId: "gostenhof",
     });
-    storage.data.set(KEY, "49.452,11.077");
-    expect(renderOrigin().origin).toBeUndefined();
+  });
+
+  it("wertet unbekannte oder beschädigte gespeicherte IDs als „kein Startpunkt“", () => {
+    for (const raw of ["unbekannt", "", "49.452,11.077", "Gostenhof"]) {
+      storage.data.set(KEY, raw);
+      expect(renderOrigin().origin).toBeUndefined();
+    }
   });
 
   it("bietet den Standort nur im sicheren Kontext mit Geolocation-API an", () => {

@@ -4,8 +4,6 @@
  * (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die Einstellung
  * nur für die Sitzung.
  */
-import { districtById } from "../domain/districts.ts";
-
 const KEYS = {
   birthDate: "zwergenplan.geburtsdatum",
   saved: "zwergenplan.merkliste",
@@ -76,12 +74,11 @@ export function saveAgeOnly(on: boolean): void {
 }
 
 /**
- * Gespeicherter Startpunkt: nur die ID eines Stadtteils, nie ein Standort (Plan 0004, E3).
- * Eine unbekannte ID zählt als „kein Startpunkt“.
+ * Gespeicherter Startpunkt: nur die ID eines Stadtteils, nie ein Standort (Plan 0004, E3). Geliefert wird der
+ * rohe Wert; ob es den Stadtteil gibt, prüft `useOrigin` (eine unbekannte ID zählt dort als „kein Startpunkt“).
  */
 export function loadOriginDistrict(): string | undefined {
-  const id = read(KEYS.originDistrict);
-  return id && districtById(id) ? id : undefined;
+  return read(KEYS.originDistrict) || undefined;
 }
 
 export function saveOriginDistrict(id: string | undefined): void {

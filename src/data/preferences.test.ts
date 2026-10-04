@@ -43,11 +43,11 @@ describe("Startpunkt-Stadtteil", () => {
     expect(loadOriginDistrict()).toBeUndefined();
   });
 
-  it("wertet unbekannte oder beschädigte IDs als „kein Startpunkt“", () => {
-    for (const raw of ["unbekannt", "", "49.452,11.077", "Gostenhof"]) {
-      storage.data.set(KEY, raw);
-      expect(loadOriginDistrict()).toBeUndefined();
-    }
+  it("liefert den rohen Wert, ein leerer zählt als „kein Startpunkt“ (die ID prüft useOrigin)", () => {
+    storage.data.set(KEY, "unbekannt");
+    expect(loadOriginDistrict()).toBe("unbekannt");
+    storage.data.set(KEY, "");
+    expect(loadOriginDistrict()).toBeUndefined();
   });
 
   it("übersteht einen gesperrten Speicher (privater Modus)", () => {
