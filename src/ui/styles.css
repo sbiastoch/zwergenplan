@@ -1,6 +1,68 @@
 @import "tailwindcss";
 
 /*
+ * Fallback-Schriften mit Bricolage-Maßen (Plan 0003, E6): bis die Webfont da ist (font-display: swap),
+ * läuft der Text so breit wie später, Kopfzeile und Karten brechen gleich um, der Swap verschiebt nichts (CLS).
+ * size-adjust = Breite Bricolage / Breite Fallback, gemessen in Chromium an Kartentiteln (23 px/800) und Fakten (14 px/600),
+ * also bei echter Größe: die optische Größe (opsz) macht Bricolage klein deutlich breiter als groß;
+ * ascent/descent = Bricolage (0,93/0,27 em) geteilt durch size-adjust. Fett getrennt, DejaVu Bold ist viel breiter.
+ */
+@font-face {
+  font-family: "Bricolage Fallback Arial";
+  font-weight: 200 549;
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans");
+  size-adjust: 100.4%;
+  ascent-override: 92.6%;
+  descent-override: 26.9%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Arial";
+  font-weight: 550 800;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  size-adjust: 102.5%;
+  ascent-override: 90.7%;
+  descent-override: 26.3%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Noto";
+  font-weight: 200 549;
+  src: local("Noto Sans"), local("NotoSans-Regular");
+  size-adjust: 98.4%;
+  ascent-override: 94.5%;
+  descent-override: 27.4%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Noto";
+  font-weight: 550 800;
+  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  size-adjust: 96.5%;
+  ascent-override: 96.4%;
+  descent-override: 28%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback DejaVu";
+  font-weight: 200 549;
+  src: local("DejaVu Sans"), local("DejaVuSans");
+  size-adjust: 84.2%;
+  ascent-override: 110.5%;
+  descent-override: 32.1%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback DejaVu";
+  font-weight: 550 800;
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  size-adjust: 86.6%;
+  ascent-override: 107.4%;
+  descent-override: 31.2%;
+  line-gap-override: 0%;
+}
+
+/*
  * Design „Stickerheft mit Knete-Kacheln“ (Plan 0003, Mockup DMix):
  * Punktraster-Papier, Kategorie-Sticker, harte Versatz-Schatten mit dunkler Kontur.
  * Tokens hell auf :root, dunkel per System oder data-theme (gesetzt vom Inline-Skript in index.html).
@@ -73,7 +135,9 @@
 }
 
 @theme {
-  --font-sans: "Bricolage Grotesque Variable", system-ui, sans-serif;
+  --font-sans:
+    "Bricolage Grotesque Variable", "Bricolage Fallback Arial", "Bricolage Fallback Noto", "Bricolage Fallback DejaVu",
+    system-ui, sans-serif;
   --color-muted: var(--muted);
   --color-ink: var(--ink);
 }
