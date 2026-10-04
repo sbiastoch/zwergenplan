@@ -48,6 +48,23 @@ module.exports = {
       },
     },
     {
+      name: "maplibre-only-in-map",
+      severity: "error",
+      comment:
+        "MapLibre (ca. 420 kB gzip) gehört nur in den lazy geladenen Karten-Chunk src/ui/map/ (Plan 0005, E3; ADR 0008).",
+      from: { pathNot: "^src/ui/map/" },
+      // zweites Muster: falls die Auflösung je scheitert, steht im Graphen nur der Paketname
+      to: { path: ["(^|/)node_modules/maplibre-gl/", "^maplibre-gl($|/)"] },
+    },
+    {
+      name: "map-only-lazy",
+      severity: "error",
+      comment:
+        "src/ui/map/ erreicht man von außen nur per import(), auch Typen nicht statisch: sonst landet die Karte im Startbundle. Props-Typen: src/ui/map-types.ts (Plan 0005, E3).",
+      from: { path: "^src/", pathNot: "^src/ui/map/" },
+      to: { path: "^src/ui/map/", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",
@@ -113,6 +130,11 @@ module.exports = {
     parser: "swc",
     tsPreCompilationDeps: true,
     tsConfig: { fileName: "tsconfig.json" },
-    enhancedResolveOptions: { extensions: [".ts", ".tsx", ".js", ".mjs", ".cjs", ".json"] },
+    enhancedResolveOptions: {
+      extensions: [".ts", ".tsx", ".js", ".mjs", ".cjs", ".json"],
+      // maplibre-gl exportiert nur die Bedingung „import“; ohne exports-Auflösung bliebe es unaufgelöst (Plan 0005).
+      exportsFields: ["exports"],
+      conditionNames: ["import", "require", "default"],
+    },
   },
 };

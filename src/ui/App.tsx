@@ -13,6 +13,7 @@ import { Dialog } from "./Dialog.tsx";
 import { ageChipLabel, distanceNote, plural, reachLimitLabel, standDate } from "./format.ts";
 import { KidSheet } from "./KidSheet.tsx";
 import { ListView } from "./ListView.tsx";
+import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { SavedView } from "./SavedView.tsx";
 import { FilterSheet } from "./Sheets.tsx";
@@ -194,6 +195,7 @@ export function App() {
             <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>
           </>
         )}
+        {load.kind === "ready" && route.tab === "karte" && <MapPanel dark={theme.dark} />}
         {load.kind === "ready" && route.tab === "kalender" && (
           <CalendarView
             index={calendar.index}
