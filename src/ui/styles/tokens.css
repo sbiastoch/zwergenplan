@@ -1,64 +1,232 @@
 /* Tokens: Fallback-Schriften, Farben hell/dunkel, Tailwind-Theme, Kategorie-Farben. */
 
 /*
- * Fallback-Schriften mit Bricolage-Maßen (Plan 0003, E6): bis die Webfont da ist (font-display: swap),
- * läuft der Text so breit wie später, Kopfzeile und Karten brechen gleich um, der Swap verschiebt nichts (CLS).
- * size-adjust = Breite Bricolage / Breite Fallback, gemessen in Chromium an Kartentiteln (23 px/800) und Fakten (14 px/600),
- * also bei echter Größe: die optische Größe (opsz) macht Bricolage klein deutlich breiter als groß;
- * ascent/descent = Bricolage (0,93/0,27 em) geteilt durch size-adjust. Fett getrennt, DejaVu Bold ist viel breiter.
+ * Fallback-Schriften mit Bricolage-Maßen (Plan 0003, E6; Plan 0007, E11, B6): bis die Webfont da ist
+ * (font-display: swap), läuft der Text so breit wie später, Zeilen brechen gleich um, der Swap verschiebt nichts (CLS).
+ * size-adjust = Breite Bricolage / Breite Fallback, je Textklasse gemessen mit `node scripts/font-fallback.ts`
+ * (2026-10-05, Chromium, echte Daten, zehnfach gerendert gegen Pixel-Rundung); ascent/descent = Bricolage (0,93/0,27 em) geteilt durch size-adjust.
+ * - Vier Fallbacks in der Reihenfolge des Stacks: Arial/Liberation, Roboto (Android, ab 12 variabel: Chromium stellt
+ *   das Gewicht über die wght-Achse ein), Noto, DejaVu.
+ * - Drei Gewichtsbereiche: normal (Meta, Fließtext), 550–749 (Fakten, Chips, Tabs), 750–800 (Zeit, Pillen, Titel).
+ * - Zwei Stacks: Die optische Größe macht Bricolage klein breiter als groß, ein Wert passt nicht für 13 und 22 px.
+ *   Überschriften nutzen „… Display“ (--font-display, Zuordnung unten in :where(…)), ihre Bereiche bis 749 sind
+ *   gleich dem Text-Stack (z. B. `small` in .daylabel).
+ * Restfehler je Klasse und Fallback stehen in Plan 0007, „Umsetzung Paket C“.
  */
 @font-face {
   font-family: "Bricolage Fallback Arial";
   font-weight: 200 549;
   src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans");
-  size-adjust: 100.4%;
-  ascent-override: 92.6%;
-  descent-override: 26.9%;
+  size-adjust: 104.2%;
+  ascent-override: 89.3%;
+  descent-override: 25.9%;
   line-gap-override: 0%;
 }
 @font-face {
   font-family: "Bricolage Fallback Arial";
-  font-weight: 550 800;
+  font-weight: 550 749;
   src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
-  size-adjust: 102.5%;
-  ascent-override: 90.7%;
-  descent-override: 26.3%;
+  size-adjust: 102.3%;
+  ascent-override: 90.9%;
+  descent-override: 26.4%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Arial";
+  font-weight: 750 800;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  size-adjust: 100.8%;
+  ascent-override: 92.3%;
+  descent-override: 26.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Arial Display";
+  font-weight: 200 549;
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans");
+  size-adjust: 104.2%;
+  ascent-override: 89.3%;
+  descent-override: 25.9%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Arial Display";
+  font-weight: 550 749;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  size-adjust: 102.3%;
+  ascent-override: 90.9%;
+  descent-override: 26.4%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Arial Display";
+  font-weight: 750 800;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  size-adjust: 101.4%;
+  ascent-override: 91.7%;
+  descent-override: 26.6%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Roboto";
+  font-weight: 200 549;
+  src: local("Roboto"), local("Roboto-Regular"), local("Roboto Regular");
+  size-adjust: 104.7%;
+  ascent-override: 88.8%;
+  descent-override: 25.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Roboto";
+  font-weight: 550 749;
+  src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto");
+  size-adjust: 107.6%;
+  ascent-override: 86.4%;
+  descent-override: 25.1%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Roboto";
+  font-weight: 750 800;
+  src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto");
+  size-adjust: 103.8%;
+  ascent-override: 89.6%;
+  descent-override: 26%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Roboto Display";
+  font-weight: 200 549;
+  src: local("Roboto"), local("Roboto-Regular"), local("Roboto Regular");
+  size-adjust: 104.7%;
+  ascent-override: 88.8%;
+  descent-override: 25.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Roboto Display";
+  font-weight: 550 749;
+  src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto");
+  size-adjust: 107.6%;
+  ascent-override: 86.4%;
+  descent-override: 25.1%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Roboto Display";
+  font-weight: 750 800;
+  src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto");
+  size-adjust: 105.4%;
+  ascent-override: 88.2%;
+  descent-override: 25.6%;
   line-gap-override: 0%;
 }
 @font-face {
   font-family: "Bricolage Fallback Noto";
   font-weight: 200 549;
   src: local("Noto Sans"), local("NotoSans-Regular");
-  size-adjust: 98.4%;
-  ascent-override: 94.5%;
-  descent-override: 27.4%;
+  size-adjust: 99.2%;
+  ascent-override: 93.8%;
+  descent-override: 27.2%;
   line-gap-override: 0%;
 }
 @font-face {
   font-family: "Bricolage Fallback Noto";
-  font-weight: 550 800;
+  font-weight: 550 749;
   src: local("Noto Sans Bold"), local("NotoSans-Bold");
-  size-adjust: 96.5%;
-  ascent-override: 96.4%;
-  descent-override: 28%;
+  size-adjust: 98.1%;
+  ascent-override: 94.8%;
+  descent-override: 27.5%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Noto";
+  font-weight: 750 800;
+  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  size-adjust: 98.1%;
+  ascent-override: 94.8%;
+  descent-override: 27.5%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Noto Display";
+  font-weight: 200 549;
+  src: local("Noto Sans"), local("NotoSans-Regular");
+  size-adjust: 99.2%;
+  ascent-override: 93.8%;
+  descent-override: 27.2%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Noto Display";
+  font-weight: 550 749;
+  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  size-adjust: 98.1%;
+  ascent-override: 94.8%;
+  descent-override: 27.5%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback Noto Display";
+  font-weight: 750 800;
+  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  size-adjust: 98.1%;
+  ascent-override: 94.8%;
+  descent-override: 27.5%;
   line-gap-override: 0%;
 }
 @font-face {
   font-family: "Bricolage Fallback DejaVu";
   font-weight: 200 549;
   src: local("DejaVu Sans"), local("DejaVuSans");
-  size-adjust: 84.2%;
-  ascent-override: 110.5%;
-  descent-override: 32.1%;
+  size-adjust: 92.9%;
+  ascent-override: 100.1%;
+  descent-override: 29.1%;
   line-gap-override: 0%;
 }
 @font-face {
   font-family: "Bricolage Fallback DejaVu";
-  font-weight: 550 800;
+  font-weight: 550 749;
   src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
   size-adjust: 86.6%;
   ascent-override: 107.4%;
   descent-override: 31.2%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback DejaVu";
+  font-weight: 750 800;
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  size-adjust: 84.3%;
+  ascent-override: 110.3%;
+  descent-override: 32%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback DejaVu Display";
+  font-weight: 200 549;
+  src: local("DejaVu Sans"), local("DejaVuSans");
+  size-adjust: 92.9%;
+  ascent-override: 100.1%;
+  descent-override: 29.1%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback DejaVu Display";
+  font-weight: 550 749;
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  size-adjust: 86.6%;
+  ascent-override: 107.4%;
+  descent-override: 31.2%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Bricolage Fallback DejaVu Display";
+  font-weight: 750 800;
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  size-adjust: 85.6%;
+  ascent-override: 108.6%;
+  descent-override: 31.5%;
   line-gap-override: 0%;
 }
 
@@ -87,6 +255,10 @@
   --scrim: rgba(19, 33, 46, 0.45);
   /* Text auf Kategorie-, Status- und Akzentfarben ist in beiden Themes dunkel */
   --on-color: #13212e;
+  /* Überschriften: eigene Fallback-Faces (Plan 0007, E11), sonst wie --font-sans */
+  --font-display:
+    "Bricolage Grotesque Variable", "Bricolage Fallback Arial Display", "Bricolage Fallback Roboto Display",
+    "Bricolage Fallback Noto Display", "Bricolage Fallback DejaVu Display", system-ui, sans-serif;
   /* Gewählte Zustände und Toast (Plan 0007, E15): hell dunkle Inversfläche, dunkel keine helle Insel */
   --sel: #13212e;
   --on-sel: #e8f1ff;
@@ -166,10 +338,15 @@
 
 @theme {
   --font-sans:
-    "Bricolage Grotesque Variable", "Bricolage Fallback Arial", "Bricolage Fallback Noto", "Bricolage Fallback DejaVu",
-    system-ui, sans-serif;
+    "Bricolage Grotesque Variable", "Bricolage Fallback Arial", "Bricolage Fallback Roboto", "Bricolage Fallback Noto",
+    "Bricolage Fallback DejaVu", system-ui, sans-serif;
   --color-muted: var(--muted);
   --color-ink: var(--ink);
+}
+
+/* Überschriften-Klassen auf den Display-Stack; Spezifität 0, damit keine Komponenten-Datei angefasst werden muss. */
+:where(.brand, .ctitle, .dtitle, .daylabel, .ptitle, .sheet h2, .h3, .empty b, .cal-nav b, .label b) {
+  font-family: var(--font-display);
 }
 
 .k-babykurse {
