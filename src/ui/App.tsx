@@ -110,7 +110,13 @@ export function App() {
       />
       {route.tab === "entdecken" && <Stickers filter={route.filter} onChange={setFilter} />}
       {route.tab !== "merkliste" && (
-        <QuickFilters filter={route.filter} onChange={setFilter} onOpenSheet={() => setSheet("filter")} />
+        <QuickFilters
+          filter={route.filter}
+          // Plan 0004: bis useOrigin verdrahtet ist, gibt es keinen Startpunkt.
+          hasOrigin={false}
+          onChange={setFilter}
+          onOpenSheet={() => setSheet("filter")}
+        />
       )}
       <main className="body">
         {load.kind === "loading" && (
