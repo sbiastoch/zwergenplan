@@ -3,6 +3,7 @@
  * JSON Schema unter schema/ wird hieraus exportiert – nie von Hand ändern.
  */
 import { z } from "zod";
+import { NUERNBERG_BBOX } from "./geo.ts";
 import { OFFER_ID_PATTERN } from "./ids.ts";
 import { categoriesOf, TOPICS } from "./topics.ts";
 
@@ -17,9 +18,7 @@ export const Registration = z.enum(["mit-anmeldung", "ohne-anmeldung"]);
 export const Cost = z.enum(["kostenlos", "kostenpflichtig"]);
 const AvailabilityStatus = z.enum(["frei", "wenige", "ausgebucht", "warteliste", "ohne-anmeldung", "unbekannt"]);
 
-/** Großraum Nürnberg/Fürth/Erlangen – alles außerhalb ist ein Geocoding-Fehler. */
-const NUERNBERG_BBOX = { minLat: 49.3, maxLat: 49.65, minLon: 10.85, maxLon: 11.3 } as const;
-
+/** Koordinate im Großraum Nürnberg (`NUERNBERG_BBOX`, geo.ts) – alles außerhalb ist ein Geocoding-Fehler. */
 const Geo = z.object({
   lat: z.number().min(NUERNBERG_BBOX.minLat).max(NUERNBERG_BBOX.maxLat),
   lon: z.number().min(NUERNBERG_BBOX.minLon).max(NUERNBERG_BBOX.maxLon),
