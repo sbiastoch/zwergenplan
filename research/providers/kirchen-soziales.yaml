@@ -1,0 +1,561 @@
+# Kirchengemeinden, Freikirchen, Sozialträger – Eltern-Kind-Angebote 0–3 in Nürnberg
+# Recherche 2026-10-04. Kernquelle für ALLE evangelischen Gemeinden: evangelische-termine.de (ET),
+# zentrale Termin-DB der ELKB mit offener JSON/XML/iCal-API (siehe Eintrag et-dekanat-nuernberg).
+# Pro Gemeinde: vid = Veranstalter-ID in ET. Feeds: https://www.evangelische-termine.de/ical?vid=<vid>
+# bzw. .../json?vid=<vid>&itemsPerPage=500 (optional &q=<Suchwort>, durchsucht auch Beschreibungen).
+
+- id: et-dekanat-nuernberg
+  name: "Evangelische Termine – Dekanat Nürnberg (alle ev. Gemeinden, Aggregator)"
+  address: "eckstein, Burgstraße 1-3, 90403 Nürnberg"
+  district: Altstadt
+  ring: innen
+  age: "0-6"
+  topics: [krabbelgruppe, eltern-kind-gruppe, musik, singen, elterncafe, krabbelgottesdienst]
+  format: [regelmaessig, offener-treff, einzeltermin]
+  cost: [teils-kostenlos]
+  registration: [ohne-anmeldung, mit-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/json?region=507&highlight=all&itemsPerPage=2500&q=krabbel"
+      kind: json-api
+      note: "region=507 = Dekanat Nürnberg (enthält auch Röthenbach/Schwaig/Heroldsberg – nach _place_CITY filtern). highlight=all ist Pflicht, sonst nur Highlights. Max. ~2500-3000 Einträge pro Seite, pageID=2.. für mehr. q= ist ODER-Suche über Wörter (mehrwortige Suchen liefern zu viel) und durchsucht Titel+Beschreibung. Sinnvolle Einzel-Suchwörter: krabbel, miniclub, mini-club, mutter-kind, eltern-kind, musikzwerge, minigottesdienst, minikirche, familiencafé. Felder: START, END, _event_TITLE, SUBTITLE, _event_LONG_DESCRIPTION, _place_NAME/_place_STREET_NR/_place_ZIP/_place_CITY, _user_ID (=vid), _user_REALNAME, _user_URL, _event_LINK"
+    - url: "https://www.evangelische-termine.de/ical?region=507&highlight=all&q=krabbel"
+      kind: ical
+      note: "gleicher Filter als iCal; per vid: https://www.evangelische-termine.de/ical?vid=<vid>"
+    - url: "https://www.feb-nuernberg.de/service/veranstaltungskalender/eltern-kind-gruppen"
+      kind: html
+      note: "Übersicht aller Eltern-Kind-Gruppen ev. Gemeinden (Forum Erwachsenenbildung, speist sich aus ET), 2 Seiten (Pagination-Link 'nächste'), Wochentag/Uhrzeit/Ort/Kontakt"
+  availability:
+    shown: teilweise
+    how: "Kein Platz-Feld; Gemeinden schreiben gelegentlich '(Warteliste)' bzw. 'voll' in den Titel/Untertitel – Titel parsen"
+    system: "evangelische-termine.de (ELKB)"
+  verified: 2026-10-04
+  notes: "Aggregator, kein Einzelanbieter. Für den Skill die effizienteste Quelle: ein JSON-Abruf deckt alle ev. Krabbel-/Miniclub-Gruppen der Stadt ab. Wöchentliche Gruppen sind als Einzeltermine je Woche eingetragen (inkl. Ferienpausen). Neues Tag 'krabbelgottesdienst' vorgeschlagen: Mini-/Krabbel-/Kleinkindergottesdienste (0-6 J. mit Eltern) sind ein typisches kirchliches Format, das in keine bestehende Kategorie passt."
+
+- id: ev-st-johannis
+  name: "Ev.-Luth. Kirchengemeinde St. Johannis – Krabbelgruppen & Kirche Kunterbunt Mini"
+  address: "TabeaHaus, Kölner Straße 33, 90419 Nürnberg"
+  district: St. Johannis
+  ring: aussen
+  venues:
+    - {name: "TabeaHaus", address: "Kölner Straße 33, 90419 Nürnberg", ring: aussen}
+    - {name: "Evang. Familienzentrum Julienstraße (Turnhalle)", address: "Julienstraße 6, 90419 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [krabbelgruppe, eltern-kind-gruppe, mehrsprachig, krabbelgottesdienst, singen]
+  format: [regelmaessig, offener-treff]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung, mit-anmeldung]
+  programme:
+    - url: "https://www.st-johannis-nuernberg.de/gemeindeleben/fuer-kinder"
+      kind: html
+      note: "Liste Krabbelgruppen: Mo 9:30-11 Familienzentrum Julienstr.; Di 10:30-12:30 TabeaHaus (einfach vorbeikommen); Mi 13:30-16 TabeaHaus; Do 9:30-11:30 TabeaHaus; Spanische Eltern-Kind-Gruppe (voll belegt). Kirche Kunterbunt Mini (0-6 J.) meist 3. So im Monat 10:30 TabeaHaus"
+    - url: "https://www.evangelische-termine.de/ical?vid=583"
+      kind: ical
+      note: "ET vid=583; Titel 'Mutter-Kind-Gruppe für Kinder von 1-3 Jahren' (Mi 14:30), 'Eltern-Kind-Gruppe für Säuglinge und Kleinkinder' (Do 9:30), 'Gottesdienst Kirche Kunterbunt Mini'"
+  availability:
+    shown: teilweise
+    how: "Gemeindeseite vermerkt '(Gruppe ist voll belegt)' bzw. 'Neue Mamis willkommen'; ET ohne Platzangabe"
+    system: "Gemeinde-CMS + evangelische-termine.de"
+  verified: 2026-10-04
+  notes: "Familienzentrum Julienstraße (www.evang-familienzentrum-julienstr.de/angebote/) bietet zusätzlich Elterncafé nur für eigene Kita-Familien. Kirche Kunterbunt (ohne 'Mini') ist für ältere Kinder."
+
+- id: cvjm-gostenhof-miniclub
+  name: "CVJM Nürnberg-Gostenhof – Mini-Club"
+  address: "Glockendonstraße 10, 90429 Nürnberg"
+  district: Gostenhof
+  ring: aussen
+  age: "1-3"
+  topics: [eltern-kind-gruppe, singen, spielgruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club"
+      kind: html
+      note: "Di 10-11:30 (nicht in den Ferien), 18 Monate bis 3 Jahre mit Mama/Papa"
+    - url: "https://www.evangelische-termine.de/ical?vid=1496"
+      kind: ical
+      note: "ET vid=1496, Titel 'Mini-Club' (Musikzwerge dort = 4-7 J., nicht relevant)"
+  availability:
+    shown: nein
+    how: "keine Platzanzeige"
+    system: "CVJM-CMS + evangelische-termine.de"
+  verified: 2026-10-04
+  notes: "Ca. 1,1 km vom Spittlertorgraben. Kosten nicht angegeben (cost=kostenlos ist Annahme, unbestätigt)."
+
+- id: ev-st-markus-gibitzenhof
+  name: "Ev. Kirchengemeinde St. Markus – Offene Tür für Groß und Klein & Café für Alle"
+  address: "Markuskirche / FreiRaum, Frankenstraße 29, 90443 Nürnberg"
+  district: Gibitzenhof
+  ring: aussen
+  age: "0-6"
+  topics: [elterncafe, elterntreff, spielgruppe]
+  format: [offener-treff, regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=586"
+      kind: ical
+      note: "ET vid=586, Titel 'Offene Tür für Groß und Klein' (Mo 9-11, Spielzeit mit Kleinkind + Kaffee)"
+    - url: "https://www.sanktmarkus-nuernberg.de/familiencafe/"
+      kind: js
+      note: "Café für Alle / Familiencafé Di nachmittags (Seite nennt 14-17 bzw. 15-18 Uhr), Familien mit Kindern jeden Alters, Spende; Seite teils JS-gerendert"
+    - url: "https://www.sanktmarkus-nuernberg.de/familien-kinder/"
+      kind: js
+      note: "Übersicht Familienangebote (u. a. 'Mäusebande')"
+  availability:
+    shown: nein
+    how: "offener Treff, keine Plätze"
+    system: "WordPress + evangelische-termine.de"
+  verified: 2026-10-04
+  notes: "Café für Alle ist generationenübergreifend, nicht nur 0-3."
+
+- id: ev-suedstadt-krabbelgruppen
+  name: "Ev.-Luth. Pfarrei Nürnberg-Südstadt – Mutter/Vater-Kind-Gruppen (Gustav-Adolf-Gedächtniskirche, Christuskirche)"
+  address: "Allersberger Straße 116, 90461 Nürnberg"
+  district: Lichtenhof / Steinbühl
+  ring: aussen
+  venues:
+    - {name: "Gustav-Adolf-Gedächtniskirche Lichtenhof", address: "Allersberger Straße 116, 90461 Nürnberg", ring: aussen}
+    - {name: "Christuskirche Steinbühl", address: "Siemensplatz 2, 90443 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [krabbelgruppe, eltern-kind-gruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen"
+      kind: html
+      note: "GAG: Di 9:30-11:30 (Kontakt B. Schäfer); Christuskirche: Di 9:00-11:00, Tagesmütter willkommen (Kontakt über Pfarramt 0911-446200). Nicht in ET eingetragen!"
+    - url: "https://www.evangelische-termine.de/ical?vid=590"
+      kind: ical
+      note: "ET vid=590 (St. Peter, gleiche Pfarrei): nur 'Gottesdienst für Familien – Kirche Kunterbunt' (eher ältere Kinder)"
+  availability:
+    shown: nein
+    how: "nur Wochentag/Uhrzeit + Kontakt"
+    system: "Drupal-Gemeindeseite"
+  verified: 2026-10-04
+  notes: "Christuskirche ca. 800 m vom Frauentorgraben (knapp über der knapp-aussen-Grenze). Kosten nicht angegeben, vermutlich kostenlos. Anmeldung = Kontakt vorher empfohlen."
+
+- id: ev-lutherkirche-hasenbuck
+  name: "Ev.-Luth. Lutherkirche Hasenbuck – Krabbelgruppe"
+  address: "Pfarramt Lutherkirche (Keller, Zugang vom Garten), Nerzstraße 34, 90461 Nürnberg"
+  district: Hasenbuck
+  ring: aussen
+  age: "0-3"
+  topics: [krabbelgruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=571"
+      kind: ical
+      note: "ET vid=571, 'Krabbelgruppe' Di 10:30"
+    - url: "https://www.lutherkirche-nuernberg.de/"
+      kind: html
+      note: "Gemeindeseite"
+  availability: {shown: nein, how: "keine Angabe", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+  notes: "Kaum Beschreibung in ET; Kosten/Anmeldung nicht angegeben."
+
+- id: ev-zerzabelshof-musikzwerge
+  name: "Ev. Auferstehungskirche Zerzabelshof – Musikzwerge (Eltern mit Baby/Kleinkind)"
+  address: "Julius-Schieder-Platz 2, 90480 Nürnberg"
+  district: Zerzabelshof
+  ring: aussen
+  age: "0-3"
+  topics: [musik, singen, eltern-kind-gruppe]
+  format: [kursreihe, regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=124"
+      kind: ical
+      note: "ET vid=124: Musikzwerge ab ca. 3 Monaten (Mo 10:30), ab 1 J. (Di 9:15), ab 18 Mon. (Di 10:30), ab 2 J. (Mo 9:15), Miniclubraum im gr. Saal"
+  availability: {shown: nein, how: "keine Platzangabe", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+  notes: "Leitung Monika Fischer. Kosten/Anmeldung nicht in ET – Musikgruppen dieser Art sind üblicherweise kostenpflichtig mit Anmeldung (unbestätigt). Gemeindeseite zabo-evangelisch.de war am Prüftag nicht erreichbar."
+
+- id: ev-fischbach
+  name: "Ev. Auferstehungskirche Fischbach – Mutter-Kind-Gruppen & Minigottesdienst"
+  address: "Haus der Begegnung, Fischbacher Hauptstraße 213, 90475 Nürnberg"
+  district: Fischbach
+  ring: aussen
+  age: "0-6"
+  topics: [eltern-kind-gruppe, krabbelgruppe, singen, krabbelgottesdienst]
+  format: [regelmaessig, einzeltermin]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=556"
+      kind: ical
+      note: "ET vid=556: 'Mutter-Kind-Gruppe' Mo 14:30-16:30, Di 9:30-11:30, Do 9:30-10:30; 'Minigottesdienst' monatlich Do 15:00 (0-6 J. mit Eltern/Großeltern)"
+    - url: "https://fischbach-evangelisch.de/"
+      kind: html
+      note: "Gemeindeseite"
+  availability: {shown: nein, how: "keine Angabe", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-altenfurt-minigottesdienst
+  name: "Ev. Christuskirche Altenfurt – Minigottesdienst"
+  address: "Evang. Gemeindehaus Altenfurt, Schornbaumstraße 14, 90475 Nürnberg"
+  district: Altenfurt
+  ring: aussen
+  age: "0-6"
+  topics: [krabbelgottesdienst]
+  format: [einzeltermin]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=558"
+      kind: ical
+      note: "ET vid=558, 'Minigottesdienst' ca. monatlich So 16:00"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-langwasser-miniclubs
+  name: "Evangelisch in Langwasser – MiniClub Dietrich-Bonhoeffer-Kirche & Mini-Club Passionskirche"
+  address: "Zugspitzstraße 201, 90471 Nürnberg"
+  district: Langwasser
+  ring: aussen
+  venues:
+    - {name: "Dietrich-Bonhoeffer-Kirche, Gemeindezentrum/Blaues Sofa", address: "Zugspitzstraße 201, 90471 Nürnberg", ring: aussen}
+    - {name: "Gemeindehaus Passionskirche, Bühnenraum", address: "Dr.-Linnert-Ring 28, 90473 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgruppe, singen]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=560"
+      kind: ical
+      note: "ET vid=560 Dietrich-Bonhoeffer: 'MiniClub' Mo 15-17"
+    - url: "https://www.evangelische-termine.de/ical?vid=555"
+      kind: ical
+      note: "ET vid=555 Passionskirche: 'Mini-Club' Do 9-10:30 (mehrere Gruppen) und Do 15:30-17"
+    - url: "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html"
+      kind: html
+      note: "Gruppenseite Passionskirche (Mini-Club für Kinder bis Kindergartenalter); Bonhoeffer: http://www.evangelisch-in-langwasser.de/bonhoeffer-gruppen.html"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-emmaus-gartenstadt
+  name: "Ev. Emmauskirche Gartenstadt – Miniclub / Flitzefüchse"
+  address: "Gemeindezentrum, Schulze-Delitzsch-Weg 28, 90469 Nürnberg"
+  district: Gartenstadt
+  ring: aussen
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=562"
+      kind: ical
+      note: "ET vid=562, 'Miniclub' Do 9:30-11; laut feb-Übersicht zusätzlich 'Flitzefüchse' Do 15:30-16:30"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-laufamholz-miniclub
+  name: "Ev. Heilig-Geist-Kirche Laufamholz – Miniclub"
+  address: "Gemeindehaus Laufamholz, Am Doktorsfeld 13, 90482 Nürnberg"
+  district: Laufamholz
+  ring: aussen
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=566"
+      kind: ical
+      note: "ET vid=566, 'Miniclub' Do 15-16:30 und Fr 9-10:30"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-buchenbuehl-miniclub
+  name: "Ev. Himmelfahrtskirche Buchenbühl – Miniclub"
+  address: "Gemeindesaal, Baiersdorfer Straße 8, 90411 Nürnberg"
+  district: Buchenbühl
+  ring: aussen
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=568"
+      kind: ical
+      note: "ET vid=568, 'Miniclub Himmelfahrtskirche' Mi 15-16:30"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-eibach
+  name: "Ev. Johanneskirche Eibach – Waldkrabbelgruppe & Rhythmik mit Eltern und Kindern"
+  address: "Gemeindehaus Eibach, Eibacher Hauptstraße 61, 90451 Nürnberg"
+  district: Eibach
+  ring: aussen
+  venues:
+    - {name: "Gemeindehaus Eibach, Kleiner Saal", address: "Eibacher Hauptstraße 61, 90451 Nürnberg", ring: aussen}
+    - {name: "Waldkrabbelgruppe: Bogen an der Weiherbrücke im Faberpark/-wald", address: "Faberpark, Rednitzstraße/Castellstraße, 90451 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [waldgruppe, krabbelgruppe, musik, bewegung, tiere-natur]
+  format: [regelmaessig, kursreihe]
+  cost: [teils-kostenlos]
+  registration: [ohne-anmeldung, mit-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=569"
+      kind: ical
+      note: "ET vid=569: 'Waldkrabbelgruppe' Do 10-11 (außer Schulferien, fast jedes Wetter); 'Rhythmik mit Eltern und Kindern (1-3 Jahre)' Fr 9:30-10:30, 10 Einheiten 70 €, Anmeldung übers Pfarramt"
+    - url: "https://pfar-rer.de/"
+      kind: html
+      note: "Gemeindeseite (Eibach/Reichelsdorf/Röthenbach)"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+  notes: "Zusätzlich 'Familienarbeit Eibach' (Motterstraße 1) als städtischer Familientreffpunkt gelistet."
+
+- id: ev-melanchthon-ziegelstein
+  name: "Ev. Melanchthonkirche Ziegelstein – Eltern-Kind-Gruppe 0-3"
+  address: "Gemeindehaus, Gumbinner Straße 12, 90411 Nürnberg"
+  district: Ziegelstein
+  ring: aussen
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgruppe, singen]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=574"
+      kind: ical
+      note: "ET vid=574, Di 9:30-11"
+    - url: "https://www.melanchthonkirche-ziegelstein.de/angebote/kinder-und-familie/"
+      kind: js
+      note: "Familienseite (JS-gerendert, wenig Text)"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-nikodemus-roethenbach
+  name: "Ev. Nikodemuskirche (Nürnberg-Röthenbach) – Krabbelgruppen & Café Niko Familiencafé"
+  address: "Gemeindezentrum Nikodemuskirche, Stuttgarter Straße 33, 90449 Nürnberg"
+  district: Röthenbach bei Schweinau
+  ring: aussen
+  age: "0-3"
+  topics: [krabbelgruppe, elterncafe]
+  format: [regelmaessig, offener-treff]
+  cost: [kostenlos]
+  registration: [mit-anmeldung, ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=575"
+      kind: ical
+      note: "ET vid=575: 'Krabbelgruppe bis 3 Jahre' Mi 9-10:30 und Do 9:30-11 (Kontakt Diakonin Marion Hanek); 'Café Niko – Das Familiencafé' ca. monatlich Fr 14:30-16:30"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+  notes: "Krabbelgruppe: vorher bei Diakonin melden; Familiencafé offen für Jung und Alt."
+
+- id: ev-st-andreas-thon
+  name: "Ev. St. Andreas Thon – Miniclubs (nach Geburtsjahrgang)"
+  address: "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG), Cuxhavener Straße 54, 90425 Nürnberg"
+  district: Thon
+  ring: aussen
+  age: "0-2"
+  topics: [eltern-kind-gruppe, krabbelgruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=126"
+      kind: ical
+      note: "ET vid=126: Miniclubs Di 15-16:30 (geb. 07/2024-02/2025), Mi 9:30-11 (geb. 03-07/2026), Do 15:30-17 (geb. 04-09/2025), Fr 10-11:30 (geb. 09/2025-01/2026)"
+  availability:
+    shown: teilweise
+    how: "'(Warteliste)' steht im Titel voller Gruppen"
+    system: "evangelische-termine.de"
+  verified: 2026-10-04
+  notes: "Kontakt über Pfarrbüro; offen für alle Konfessionen."
+
+- id: ev-kraftshof-boxdorf
+  name: "Ev. St. Georg Kraftshof / Zum guten Hirten Boxdorf – Miniclub & Minikirche"
+  address: "Gemeindesaal Boxdorf, Kronacher Straße 1, 90427 Nürnberg"
+  district: Boxdorf / Kraftshof
+  ring: aussen
+  venues:
+    - {name: "Gemeindesaal Boxdorf", address: "Kronacher Straße 1, 90427 Nürnberg", ring: aussen}
+    - {name: "St. Georgskirche Kraftshof", address: "Kraftshofer Hauptstraße 170, 90427 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgottesdienst, singen]
+  format: [regelmaessig, einzeltermin]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=581"
+      kind: ical
+      note: "ET vid=581: 'Miniclub' Di 10-11 Boxdorf (ca. 3 Monate bis 3 Jahre); 'Minikirche' monatlich Fr 17:00 St. Georgskirche"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-st-jobst
+  name: "Ev. St. Jobst Erlenstegen – Miniclub Eltern-Kind-Gruppe"
+  address: "Miniclubraum, Äußere Sulzbacher Straße 144, 90491 Nürnberg"
+  district: Erlenstegen
+  ring: aussen
+  age: "1-2"
+  topics: [eltern-kind-gruppe, krabbelgruppe]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=582"
+      kind: ical
+      note: "ET vid=582, Di 15-16:30, Kinder 1-2 Jahre"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-stephanus-gebersdorf
+  name: "Ev. Stephanuskirche Gebersdorf – Eltern-Kind-Gruppe"
+  address: "Gemeindehaus Stephanuskirche, Neumühlweg 20a, 90449 Nürnberg"
+  district: Gebersdorf
+  ring: aussen
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgruppe, singen]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=579"
+      kind: ical
+      note: "ET vid=579, Do 9:30-11:30"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+
+- id: ev-thomaskirche-grossreuth
+  name: "Ev. Thomaskirche Großreuth – Krabbelgruppe, Musikalische Früherziehung, Eltern-Kind-Yoga"
+  address: "Gemeindehaus der Thomaskirche, Winterstraße 22, 90431 Nürnberg"
+  district: Großreuth hinter der Veste
+  ring: aussen
+  age: "0-3"
+  topics: [krabbelgruppe, musik, yoga-mit-baby]
+  format: [regelmaessig, kursreihe]
+  cost: [teils-kostenlos]
+  registration: [ohne-anmeldung, mit-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=591"
+      kind: ical
+      note: "ET vid=591: 'Krabbelgruppe' Mo 15:30-17:30; 'Musikalische Früherziehung für Familien mit Kindern von 6-12 Monaten / 1-3 Jahren' Do nachmittags (Kursblöcke); 'Eltern-Kind Yoga Kurs' Di 15:15 ab 10.11."
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+  notes: "Musik/Yoga-Kurse z. T. in Kooperation mit der Ev. Familienbildungsstätte (vid 1858, fbs-nuernberg.de) – vermutlich kostenpflichtig mit Anmeldung; Krabbelgruppe offen. Stadtteil: Winterstraße liegt in Großreuth/Schniegling-Nähe, deutlich außerhalb."
+
+- id: ev-moegeldorf-minigottesdienst
+  name: "Ev. St. Nikolaus und St. Ulrich Mögeldorf – Mini-Gottesdienst"
+  address: "Kirchenberg 15, 90482 Nürnberg"
+  district: Mögeldorf
+  ring: aussen
+  age: "0-6"
+  topics: [krabbelgottesdienst]
+  format: [einzeltermin]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.evangelische-termine.de/ical?vid=192"
+      kind: ical
+      note: "ET vid=192, Titel enthält 'Mini Gottesdienst' (unregelmäßig, z. B. Erntedank)"
+  availability: {shown: nein, how: "-", system: "evangelische-termine.de"}
+  verified: 2026-10-04
+  notes: "Nur sporadisch; niedrige Priorität."
+
+- id: eckstein-treff-alleinerziehende
+  name: "Evang. Fachstelle Alleinerziehende – eckstein-Treff (mit Kindern)"
+  address: "eckstein – haus der kirche, Burgstraße 1-3, 90403 Nürnberg"
+  district: Altstadt (Sebald)
+  ring: innen
+  age: "0-12"
+  topics: [elterntreff]
+  format: [offener-treff, regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.alleinerziehende-nuernberg.de/"
+      kind: html
+      note: "Startseite listet 'Unsere nächsten Termine' (eckstein-Treff letzter Fr im Monat 17-19:30; weitere Veranstaltungen meist MIT paralleler Kinderbetreuung, also ohne Kind)"
+    - url: "https://www.evangelische-termine.de/ical?vid=925"
+      kind: ical
+      note: "ET vid=925"
+  availability: {shown: nein, how: "-", system: "Gemeinde-CMS + evangelische-termine.de"}
+  verified: 2026-10-04
+  notes: "Einziger Treff in diesem Bereich innerhalb des Rings. Nur für Alleinerziehende; Kinder kommen mit ('ohne Kinderbetreuung organisieren zu müssen'), aber nicht speziell 0-3. Andere Angebote der Fachstelle haben Kinderbetreuung im Nebenraum – für den Skill nur eckstein-Treff/Trauercafé relevant."
+
+- id: kath-st-martin-nordstadt
+  name: "Kath. Pfarrei St. Martin – Eltern-Kind-Gruppen (Miniclubs) & Kleinkindergottesdienst"
+  address: "Pfarrsaal St. Martin, Grolandstraße 71, 90408 Nürnberg"
+  district: Nordstadt
+  ring: aussen
+  age: "0-4"
+  topics: [eltern-kind-gruppe, krabbelgruppe, krabbelgottesdienst, singen]
+  format: [regelmaessig, einzeltermin]
+  cost: [kostenlos]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://st-martin-nuernberg.de/gemeinde/kinderjugend/miniclubs"
+      kind: html
+      note: "Miniclubs: Eltern mit Kindern ca. 6 Monate bis 4 Jahre, 1x wöchentlich, selbstorganisiert; keine Zeiten online – Kontakt Pfarrbüro"
+    - url: "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste"
+      kind: html
+      note: "Kleinkindergottesdienst So 10:30-11:00 im Pfarrsaal (Termine: So 13.9., 11.10.2026 laut Stadtkirche-Übersicht)"
+    - url: "https://st-martin-nuernberg.de/aktuelles/termine"
+      kind: html
+      note: "Terminliste der Pfarrei (am Prüftag zeitweise HTTP 503 bei curl, mit fetch_page.py erreichbar)"
+  availability: {shown: nein, how: "-", system: "Pfarrei-CMS (kath. Stadtkirche)"}
+  verified: 2026-10-04
+  notes: "Ca. 750 m vom Vestnertor-/Maxtorgraben – Grenzfall, als aussen eingestuft. Kleinkindergottesdienst-Termine auch in der Stadtkirche-Übersicht (kath-stadtkirche-familiengottesdienste)."
+
+- id: kath-st-georg-ziegelstein
+  name: "Kath. Pfarrei St. Georg Ziegelstein – Kleinkindergottesdienst"
+  address: "Pfarrsaal St. Georg, Bierweg 33, 90411 Nürnberg"
+  district: Ziegelstein
+  ring: aussen
+  age: "0-6"
+  topics: [krabbelgottesdienst]
+  format: [einzeltermin]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien"
+      kind: html
+      note: "Abschnitt 'St. Georg': Kleinkindergottesdienst So 10:30 im Pfarrsaal (27.9., 15.11., 20.12.2026)"
+  availability: {shown: nein, how: "-", system: "kath. Stadtkirche CMS"}
+  verified: 2026-10-04
+
+- id: kath-stadtkirche-familiengottesdienste
+  name: "Katholische Stadtkirche Nürnberg – Übersicht Gottesdienste für Familien (alle Pfarreien)"
+  address: "Vordere Sterngasse 1, 90402 Nürnberg"
+  district: Altstadt
+  ring: innen
+  age: "0-12"
+  topics: [krabbelgottesdienst]
+  format: [einzeltermin]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien"
+      kind: html
+      note: "Eine Seite mit allen kath. Pfarreien: je Pfarrei Name, Adresse, 'Termine:' mit Datum/Uhrzeit/Art. Für 0-3 relevant nur 'Kleinkindergottesdienst' (St. Georg, St. Martin) und ggf. 'Kinderkirche'; Familiengottesdienste/Kindermetten eher ältere Kinder"
+  availability: {shown: nein, how: "-", system: "kath. Stadtkirche CMS"}
+  verified: 2026-10-04
+  notes: "Aggregator (Halbjahresliste bis ca. Jan 2027). Adresse = Sitz Stadtkirche/Zoff+Harmonie, nicht Veranstaltungsort. Zoff + Harmonie (kath. Familienbildung) gehört in den Familienbildungs-Bereich, hier nicht doppelt erfasst."
+
+- id: feg-nuernberg-eltern-kind-kreis
+  name: "Freie evangelische Gemeinde (FeG) Nürnberg – Eltern-Kind-Kreis 'Zwergenaufstand'"
+  address: "Gemeindezentrum, Holbeinstraße 21, 90441 Nürnberg"
+  district: Schweinau
+  ring: aussen
+  age: "0-3"
+  topics: [eltern-kind-gruppe, krabbelgruppe, singen, kreativ]
+  format: [regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/"
+      kind: html
+      note: "Jeden Di 9:30-11:00 (außer Schulferien), 1. Stock; Schnuppern erlaubt; kostenlos (Spenden für Bastelmaterial)"
+  availability: {shown: nein, how: "-", system: "WordPress"}
+  verified: 2026-10-04
+  notes: "Zufahrt derzeit nur über Hans-Schmidt-Straße (Baustelle). Keine Einzeltermine online – Skill muss Termine aus Regel (Di, ohne bayerische Schulferien) generieren."

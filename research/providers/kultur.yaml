@@ -1,0 +1,293 @@
+# Bereich "kultur": Bibliothek, Museen, Kino, Konzerte, Theater, Kultur-Aggregatoren
+# Live geprueft am 2026-10-04
+- id: stadtbibliothek-nuernberg
+  name: "Stadtbibliothek Nürnberg (Bildungscampus) – Bücherzwerge, Lesestart"
+  address: "Gewerbemuseumsplatz 4, 90403 Nürnberg"
+  district: Altstadt-Ost / Marienvorstadt
+  ring: knapp-aussen
+  venues:
+    - {name: "Stadtbibliothek Langwasser (Bücherzwerge 12–36 Monate, Lesestart für Dreijährige)", address: "Glogauer Straße 50 (Gemeinschaftshaus), 90473 Nürnberg", ring: aussen}
+    - {name: "Stadtbibliothek Maxfeld (Lesestart für Dreijährige)", address: "Maxfeldstraße 27, 90409 Nürnberg", ring: knapp-aussen}
+    - {name: "Stadtbibliothek Südstadt im südpunkt (Lesestart für Dreijährige)", address: "Pillenreuther Straße 147, 90459 Nürnberg", ring: aussen}
+    - {name: "Stadtbibliothek Zentrum, Kinderbibliothek L3 (Lesestart-Sets 1-2-3 zum Abholen, keine Babytermine im Halbjahr 2/2026)", address: "Gewerbemuseumsplatz 4, 90403 Nürnberg", ring: knapp-aussen}
+  age: "1-3"
+  topics: [bibliothek, vorlesen, singen]
+  format: [regelmaessig, einzeltermin]
+  cost: [kostenlos]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf"
+      kind: pdf
+      note: "Halbjahresprogramm Kinder/Jugend/Familie Juli–Dez 2026 (alle Zweigstellen, nach Bibliothek gegliedert). Dateiname wechselt je Halbjahr (…_2027_1.pdf erwartet) – aktuellen Link immer über die Seite darunter holen. Grep nach 'Bücherzwerge', 'Lesestart', '12 bis 36 Monaten'."
+    - url: "https://www.nuernberg.de/internet/stadtbibliothek/veranstaltungenkinder.html"
+      kind: html
+      note: "Einstiegsseite Kinderveranstaltungen; enthält nur den PDF-Download-Link (aktuelles Halbjahresheft) und Verweise, keine Terminliste"
+  availability:
+    shown: nein
+    how: "Keine Platzanzeige; Anmeldung per Telefon/E-Mail bei der jeweiligen Zweigstelle (Langwasser 0911/231-4157, Maxfeld 0911/231-2460)"
+    system: keins
+  verified: 2026-10-04
+  notes: "Bücherzwerge (Langwasser, 1x/Monat do/mo 10–11 Uhr; 2026: 24.9., 22.10., 19.11., 17.12.) = Fingerspiele, Lieder, Geschichten für 12–36 Monate mit Begleitperson. Lesestart 'Vorlesen & Mehr für Dreijährige' in Langwasser, Maxfeld (Mi 7.10., 4.11.2026, Anmeldung ab ca. 4 Wochen vorher) und Südstadt (Do 24.9., 29.10., 26.11.2026, 16 Uhr). Bilderbuchkinos sind ab 4 Jahren, also nicht 0–3. Eltern-Kind-Yoga Südstadt ab 3 Jahren läuft über Kursnummern des Bildungszentrums (6 € pro Paar)."
+
+- id: neues-museum-baby-museum
+  name: "Neues Museum Nürnberg – Baby & Museum"
+  address: "Luitpoldstraße 5 (Klarissenplatz), 90402 Nürnberg"
+  district: Altstadt (Lorenz)
+  ring: innen
+  age: "0-1"
+  topics: [museum]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm"
+      kind: html
+      note: "Detailseite mit allen kommenden Terminen (Freitags 10.30 Uhr, ca. 2x/Monat; 2026: 9.10., 23.10., 13.11., 27.11., 4.12., 11.12.)"
+    - url: "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/"
+      kind: html
+      note: "Übersicht Kinder/Familien – dort auch 'Lesestunde für Klein und Groß' (Kinder ab 2 Jahren, z. B. Fr 27.11.2026 14 Uhr)"
+  availability:
+    shown: teilweise
+    how: "Ticket-Button je Termin öffnet go~mus-Shop (https://nmn-tickets.de/#/product/event/161?date_id=…); Kontingent/ausverkauft nur im JS-Shop sichtbar, nicht auf der Programmseite"
+    system: "go~mus (nmn-tickets.de, JS-SPA)"
+  verified: 2026-10-04
+  notes: "Kurzführung für Erwachsene mit Babys (Kinderwagen/Trage), Pausen zum Füttern/Wickeln, danach Kaffee. 3 € plus Eintritt. Achtung: Ab 24.10.2026 sind wegen Sanierung Teile der Ausstellung geschlossen; Termine stehen trotzdem im Programm."
+
+- id: theater-mummpitz
+  name: "Theater Mummpitz im Kachelbau – Jazz für Kinder / Klassik für Kinder"
+  address: "Michael-Ende-Straße 17, 90439 Nürnberg"
+  district: Gostenhof / Kachelbau
+  ring: aussen
+  age: "0-3"
+  topics: [theater, konzert, musik]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.theater-mummpitz.de/spielplan/"
+      kind: html
+      note: "Kompletter Spielplan als Liste; Altersangabe im Titel in Klammern, z. B. '(o.A.)' = ohne Altersgrenze, '(3+)', '(4+)'. Für 0–3 nach '(o.A.)' und '(2+)'/'(3+)' filtern; einen Altersfilter gibt es nicht."
+    - url: "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/"
+      kind: html
+      note: "Jazz für Kinder (o.A.), 1x/Monat So 11 Uhr, mit Termin- und Statusliste"
+    - url: "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/"
+      kind: html
+      note: "Klassik für Kinder (o.A.), So 11 Uhr"
+  availability:
+    shown: ja
+    how: "Spielplan zeigt je Termin 'Karten verfügbar' / 'Restkarten' / 'Ausverkauft' plus Ticket-Link (Legende oben auf der Seite)"
+    system: "Reservix (mummpitz.reservix.de)"
+  verified: 2026-10-04
+  notes: "Jazz/Klassik für Kinder sind ohne Altersbeschränkung, Kinder unter 3 Jahren haben freien Eintritt (6 €). Die Termine sind oft lange vorher ausverkauft (Okt–Dez 2026 Jazz: ausverkauft). Die übrigen Stücke sind ab 3+/4+. Mummpitz veranstaltet auch das Festival panoptikum (alle 2 Jahre, ab 3, zuletzt 2026)."
+
+- id: babykonzert-nuernberg
+  name: "Babykonzert – Klassik auf der Krabbeldecke (Presseclub Nürnberg)"
+  address: "Marmorsaal des Presseclubs, Gewerbemuseumsplatz 2, 90403 Nürnberg"
+  district: Marienvorstadt
+  ring: knapp-aussen
+  age: "0-3"
+  topics: [konzert, musik]
+  format: [einzeltermin]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://babykonzert.de/home/nuernberg/"
+      kind: html
+      note: "Nürnberg-Seite mit dem nächsten Termin (nächster: So 08.11.2026, 11 Uhr). Kartenverkauf über ein eingebettetes Widget (JS). Ca. 3–4 Termine pro Jahr (Frühling/Muttertag, Herbst, Advent)."
+  availability:
+    shown: teilweise
+    how: "Die Seite selbst zeigt keine Restplätze; der Ticketkauf läuft über Eventim (Künstlerseite 'Babykonzert – Klassik auf der Krabbeldecke'), dort ist sichtbar, ob verfügbar oder ausverkauft"
+    system: "Eventim"
+  verified: 2026-10-04
+  notes: "Live-Klassik auf der Krabbeldecke, Decke mitbringen. Erwachsene ca. 21 € (Doppelticket ca. 39 €), Babys und Kinder frei. Häufig schnell ausverkauft. Veranstalter: babykonzert.de (Saskia Dürr). Das Format heißt auch 'Herbst-Babykonzert' (gleicher Veranstalter)."
+
+- id: sternenhaus-kuf
+  name: "Sternenhaus – Kinderkultur in der Vorweihnachtszeit (KUF)"
+  address: "Hans-Sachs-Platz 2, 90403 Nürnberg"
+  district: Altstadt (Sebald)
+  ring: innen
+  age: "2-3"
+  topics: [theater, konzert, musik, vorlesen]
+  format: [einzeltermin]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html"
+      kind: html
+      note: "Saison 28.11.–23.12.2026; Familienprogramm mit Ticketlinks ab 13.10.2026 auf dieser Seite"
+    - url: "https://kukuq.eventim-inhouse.de/webshop/webticket/shop?production=97"
+      kind: js
+      note: "Eventim-Inhouse-Webshop der Kulturinformation (Produktion Sternenhaus)"
+    - url: "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus_kinder_familien.html"
+      kind: html
+      note: "Besuchsinfos (Kinderwagenparkplätze, Wickelplatz, Ticketpreise)"
+  availability:
+    shown: ja
+    how: "Im Eventim-Inhouse-Webshop sind freie Plätze bzw. 'ausverkauft' je Vorstellung sichtbar (JS)"
+    system: "Eventim Inhouse (kukuq)"
+  verified: 2026-10-04
+  notes: "Theater, Musik, Geschichten, Ballett, Märchenstunde mit dem Christkind. Ein Ticket brauchen Kinder ab 3 Jahren; bei Veranstaltungen, die sich ausdrücklich an Kinder ab 2 richten, schon ab 2. Ein Teil des Programms ist also für 2–3-Jährige. Die Altersangabe steht je Veranstaltung."
+
+- id: kindertheaterreihe-kuf
+  name: "Kindertheaterreihe 'Kurze Beine, kurze Wege' (KUF, Kulturläden)"
+  address: "Amt für Kultur und Freizeit, Gewerbemuseumsplatz 1, 90403 Nürnberg"
+  district: stadtweit
+  ring: aussen
+  venues:
+    - {name: "Kulturladen Loni-Übler-Haus", address: "Marthastraße 60, 90482 Nürnberg", ring: aussen}
+    - {name: "Vischers Kulturladen", address: "Hufelandstraße 4, 90419 Nürnberg", ring: aussen}
+    - {name: "Kulturladen Röthenbach", address: "Röthenbacher Hauptstraße 74, 90449 Nürnberg", ring: aussen}
+    - {name: "Kulturladen Gartenstadt", address: "Frauenlobstraße 7, 90469 Nürnberg", ring: aussen}
+    - {name: "Kulturladen Zeltnerschloss", address: "Gleißhammerstraße 6, 90408 Nürnberg", ring: aussen}
+    - {name: "Villa Leon", address: "Philipp-Körber-Weg 1, 90439 Nürnberg", ring: aussen}
+    - {name: "Kulturladen Ziegelstein (im ev. Gemeindesaal)", address: "Gumbinner Str. 12, 90411 Nürnberg", ring: aussen}
+    - {name: "Kulturbüro Muggenhof / Kulturwerkstatt Auf AEG", address: "Fürther Straße 244d, 90429 Nürnberg", ring: aussen}
+    - {name: "Gemeinschaftshaus Langwasser", address: "Glogauer Straße 50, 90473 Nürnberg", ring: aussen}
+    - {name: "KUF im südpunkt", address: "Pillenreuther Straße 147, 90459 Nürnberg", ring: aussen}
+  age: "3"
+  topics: [theater]
+  format: [einzeltermin]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe.html"
+      kind: html
+      note: "Übersicht Saison Okt–Apr mit Links zu den Monatsseiten und zum Flyer"
+    - url: "https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_oktober.html"
+      kind: html
+      note: "Monatsseiten nach dem Schema kindertheaterreihe_<monat>.html (oktober, november, januar, februar, maerz, april; kein Dezember). Pro Stück: Altersangabe ('ab 3 Jahren'), Termine und Spielort"
+    - url: "https://www.nuernberg.de/imperia/md/kuf_kultur/bilder/kinderuni/aktuelles/flyer_kitheaterreihe_2026_27.pdf"
+      kind: pdf
+      note: "Saisonflyer 2026/27"
+  availability:
+    shown: nein
+    how: "Keine Platzanzeige; Reservierung per Telefon/Kontaktformular beim jeweiligen Kulturladen"
+    system: keins
+  verified: 2026-10-04
+  notes: "Aggregator plus Veranstalter. Puppen- und Erzähltheater für Familien und Kitas, Familienvorstellung 5 € pro Kopf. Die jüngsten Stücke sind ab 3 Jahren (z. B. Dornerei 'Was macht die Maus im Wichtelhaus', So 11.10.2026 15 Uhr im Loni-Übler-Haus), viele erst ab 4. Vormittagstermine (10 Uhr) sind meist für Kitas, Familien eher So/Nachmittag."
+
+- id: theater-salz-pfeffer
+  name: "Theater Salz+Pfeffer (Figurentheater)"
+  address: "Frauentorgraben 73, 90443 Nürnberg"
+  district: Plärrer / Steinbühl
+  ring: knapp-aussen
+  age: "3"
+  topics: [theater]
+  format: [einzeltermin]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://kinder-salzundpfeffer.reservix.de/events"
+      kind: html
+      note: "Reservix-Shop Kinderprogramm = faktischer Spielplan; Alter als 'N Jahre ± 2' (z. B. Heidi '5 Jahre ± 2' = ab ca. 3). Gruppenvorstellungen (vormittags) sind nur telefonisch buchbar."
+    - url: "https://salzundpfeffer-theater.de/"
+      kind: html
+      note: "Website mit Stückinfos; Link 'Spielplan' führt auf den Reservix-Shop"
+  availability:
+    shown: teilweise
+    how: "Reservix-Liste zeigt 'Tickets' (buchbar) oder 'Buchungen über das Theater'; ausverkauft/Restplätze erst in der Reservix-Eventseite"
+    system: "Reservix"
+  verified: 2026-10-04
+  notes: "Kein Angebot unter 3 Jahren. Aufgenommen, weil die jüngste Stufe (5 ± 2) Dreijährige einschließt. Familienvorstellungen Sa/So 15 Uhr, ab 9 €."
+
+- id: staatstheater-nuernberg-familie
+  name: "Staatstheater Nürnberg – Vorschul- und Familienformate (Staatsphilharmonie, Oper)"
+  address: "Richard-Wagner-Platz 2–10, 90443 Nürnberg"
+  district: Südstadt / Opernhaus
+  ring: knapp-aussen
+  age: "3"
+  topics: [konzert, theater, musik]
+  format: [einzeltermin]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://staatstheater-nuernberg.de/spielplan-26-27"
+      kind: html
+      note: "Gesamtspielplan (statisches HTML, alle Termine der Spielzeit). Es gibt einen Filter nach Sparte/Veranstaltungsart, aber keinen Altersfilter. Suchbegriffe: 'Vorschulkinder', 'Familientee', 'Kinderkonzert', 'Familienführung'. Die Spielplan-URL wechselt jede Spielzeit (spielplan-27-28)."
+    - url: "https://staatstheater-nuernberg.de/spielplan-26-27/kinder-im-gluck-opa-otti-eierkuchen/14-04-2027/0930"
+      kind: html
+      note: "Beispiel: 'Kinder im Gluck' (musikalische Geschichte für Vorschulkinder, 40 Min., Gluck-Saal, 14.–16.04.2027)"
+  availability:
+    shown: ja
+    how: "Ticket-Link je Termin in den Eventim-Inhouse-Webshop (event=ID) mit Saalplan/Verfügbarkeit; bei Ausverkauf Hinweis auf eine Warteliste"
+    system: "Eventim Inhouse (staatstheater-nuernberg.eventim-inhouse.de)"
+  verified: 2026-10-04
+  notes: "Grenzfall: In der Spielzeit 26/27 gibt es kein Krabbel- oder Babykonzert. Die jüngsten Formate richten sich an Vorschulkinder (ca. 3–6): 'Kinder im Gluck' (Apr 2027) und 'Musikalischer Familientee' (17./18.04.2027, Gluck-Saal, Damenclub). Die Kinderkonzerte sind eher ab 5. Spielplan zu jeder Spielzeit neu auf Krabbel-/Babyformate prüfen."
+
+- id: musikschule-nuernberg-eltern-kind
+  name: "Musikschule Nürnberg – Eltern-Kind-Kurse (Elementarbereich)"
+  address: "Kulturwerkstatt Auf AEG, Fürther Straße 244d, 90429 Nürnberg"
+  district: Muggenhof
+  ring: aussen
+  venues:
+    - {name: "Kulturwerkstatt Auf AEG (Di 15.45 / 16.45 Uhr)", address: "Fürther Straße 244d, 90429 Nürnberg", ring: aussen}
+    - {name: "Musikschule Ziegenstraße (Mo 15 / 16 Uhr)", address: "Ziegenstraße, Nürnberg (Hausnummer nicht geprüft)", ring: aussen}
+  age: "0-3"
+  topics: [musik, singen, bewegung]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.nuernberg.de/internet/musikschule/elementarbereich.html"
+      kind: html
+      note: "Abschnitt 'Eltern-Kind-Kurse 26/27' (6 Monate bis 3½ Jahre, wöchentlich 45 Min., nicht in den Ferien, 4–6 Eltern-Kind-Paare)"
+    - url: "https://www.nuernberg.de/internet/musikschule/veranstaltungen.html"
+      kind: js
+      note: "Veranstaltungskalender der Musikschule (vk.nuernberg.de-Widget, JS). Nur Schülerkonzerte, keine Babykonzerte"
+  availability:
+    shown: nein
+    how: "Keine Platzanzeige; Anmeldung über die Musikschule (Schuljahreskurs)"
+    system: keins
+  verified: 2026-10-04
+  notes: "Ist ein Kurs, kein Kulturtermin. Kann sich mit der Datei zu Musik-/Babykursen überschneiden, dort ggf. deduplizieren. Auf den Konzertseiten der Musikschule gibt es keine Krabbelkonzerte."
+
+- id: kuf-kinderkultur-aggregator
+  name: "KUF Kultur – Veranstaltungen für Kinder & Kurse Kinder und Familie (Kulturläden)"
+  address: "Amt für Kultur und Freizeit, Gewerbemuseumsplatz 1, 90403 Nürnberg"
+  district: stadtweit
+  ring: aussen
+  age: "0-3"
+  topics: [theater, musik, kreativ, eltern-kind-gruppe, spielgruppe]
+  format: [einzeltermin, kursreihe, regelmaessig]
+  cost: [teils-kostenlos]
+  registration: [mit-anmeldung, ohne-anmeldung]
+  programme:
+    - url: "https://www.nuernberg.de/internet/kuf_kultur/kinder_veranstaltungen.html"
+      kind: js
+      note: "Alle Kinderveranstaltungen aller Kulturläden (vk.nuernberg.de-Widget, data-config='kuf_kategorien_kinder'). Ohne JS leer, Browser nötig"
+    - url: "https://www.nuernberg.de/internet/kuf_kultur/kinder_familie_kurse.html"
+      kind: js
+      note: "Gruppen und Kurse 'Kinder und Familie' (Eltern-Kind-Gruppen, Krabbelgruppen in Kulturläden), ebenfalls vk-Widget (JS)"
+    - url: "https://www.nuernberg.de/internet/kuf_kultur/kinderangebote.html"
+      kind: html
+      note: "Linkhub Kinderkultur (Sternenhaus, Kindertheaterreihe, KinderKunstRaum, Erfahrungsfeld Mai–Sep)"
+  availability:
+    shown: nein
+    how: "Keine Platzanzeige; Anmeldung je Kulturladen"
+    system: "vk.nuernberg.de (städtischer Veranstaltungskalender)"
+  verified: 2026-10-04
+  notes: "Aggregator. Zusatzquelle für Kinderangebote der Kulturläden, die oft nicht einzeln gelistet sind. Daten kommen aus vk.nuernberg.de (gleiche Datenbank wie der Stadtkalender und die App zoom:in). Alter steht im Einzeltermin."
+
+- id: nuernberg-stadtportal-kinderkultur-aggregator
+  name: "Stadtportal Nürnberg – Theater für Kinder & Veranstaltungskalender"
+  address: "Stadt Nürnberg, Rathausplatz 2, 90403 Nürnberg"
+  district: stadtweit
+  ring: innen
+  age: "0-3"
+  topics: [theater, konzert, museum, kino]
+  format: [einzeltermin]
+  cost: [teils-kostenlos]
+  registration: [ohne-anmeldung, mit-anmeldung]
+  programme:
+    - url: "https://www.nuernberg.de/internet/stadtportal/kultur_fuer_kinder.html"
+      kind: html
+      note: "Linkhub Kindertheater (Mummpitz, Pfütze, Rootslöffel, Salz+Pfeffer, Kindertheaterreihe, panoptikum, Figurentheaterfestival), keine Termine"
+    - url: "https://www.nuernberg.de/internet/stadtportal/nbg_komfortsuche.html"
+      kind: js
+      note: "Zentraler Veranstaltungskalender Nürnberg/Fürth/Erlangen/Schwabach (vk.nuernberg.de, JS) mit Kategorie- und Datumsfilter. Gut für Stichwortsuche 'Baby', 'Krabbel', 'ab 2'"
+  availability:
+    shown: nein
+    how: "Nur Ticketlinks der Veranstalter"
+    system: "vk.nuernberg.de"
+  verified: 2026-10-04
+  notes: "Aggregator. Dieselbe Datenbank wird in der App 'zoom:in' ausgespielt."

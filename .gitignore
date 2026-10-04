@@ -15,3 +15,5 @@ e2e/.artifacts/
 # Skill-Läufe / Altlasten
 runs/
 __pycache__/
+# Agenten-Worktrees (eigene Checkouts mit eigener Konfiguration)
+.claude/worktrees/

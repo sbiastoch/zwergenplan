@@ -1,0 +1,527 @@
+# Bereich "sport": Babyschwimmen, Kleinkindschwimmen, Mama-Baby-Fitness, Yoga mit Baby,
+# Eltern-Kind-Turnen, Babytanz. Live geprüft am 2026-10-04.
+
+- id: nuebad-flipper
+  name: "NÜBAD-FLIPPER e.V. – Schwimmkurse in den NürnbergBad-Hallenbädern (Kooperationspartner NürnbergBad)"
+  address: "Langwasserbad, Breslauer Straße 251, 90471 Nürnberg"
+  district: Langwasser
+  ring: aussen
+  venues:
+    - {name: "Langwasserbad (Baby- und Kleinkindkurse)", address: "Breslauer Straße 251, 90471 Nürnberg", ring: aussen}
+    - {name: "Südstadtbad", address: "Allersberger Straße 120, 90461 Nürnberg", ring: aussen}
+    - {name: "Katzwangbad", address: "Helmut-Bloß-Straße 6, 90453 Nürnberg", ring: aussen}
+    - {name: "Nordostbad", address: "Elbinger Straße 85, 90491 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [babyschwimmen, kleinkindschwimmen]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.xn--nbad-flipper-dlb.de/kurskategorie/eltern-kind-schwimmkurse/"
+      kind: html
+      note: "Übersicht Eltern-Kind-Kurse (Mutter/Vater-Baby 3-12 Mon., Mutter/Vater-Kind 12-24 Mon., Kleinkind ab 2 / ab 3 J.); je Kurs Detailseite /kurs/<slug>/ mit Kursorganizer-iFrame"
+    - url: "https://www.xn--nbad-flipper-dlb.de/kurs/mutter-vater-baby-schwimmen/"
+      kind: js
+      note: "Detailseite; Termine nur im iFrame app.nuebad-flipper.kursorganizer.com (courseTypeIds=0ed81fb6-56cc-42e8-b95a-30bbe188e192)"
+    - url: "https://api.kursorganizer.com/graphql"
+      kind: json-api
+      note: "Kursorganizer-GraphQL, POST mit Headern Origin: https://app.nuebad-flipper.kursorganizer.com, x-application-type: end-user-app; Query coursesWithPaginationPublic(filters:{courseTypeIds:[...]}, options:{limit,offset}) liefert startDateTime (UTC), location.name, freePlaces, maxAttendees, waitListCount. courseTypeIds: Baby 0ed81fb6-56cc-42e8-b95a-30bbe188e192, Kind 12-24 Mon. 35c6f0c1-fb50-40f4-b773-69aeaa674806, Kleinkind ab 2 f43e193d-e1f5-41de-a752-8eb1a240b7e8, ab 3 7acf112a-29a6-453c-b5c6-4387864556fa"
+    - url: "https://nuernbergbad.nuernberg.de/service/kurse/schwimmkurse-kinder-mit-eltern/"
+      kind: html
+      note: "Infoseite der NürnbergBad (keine Termine), verlinkt zur Flipper-Buchung"
+  availability:
+    shown: ja
+    how: "Kursorganizer zeigt pro Kurs Status (frei/ausgebucht -> Warteliste); API-Feld freePlaces (0 = voll) und waitListCount"
+    system: "Kursorganizer"
+  verified: 2026-10-04
+  notes: "Alle NürnbergBad-Schwimmkurse laufen über Nübad-Flipper. Baby-/Kleinkindkurse finden laut API nur im Langwasserbad statt (Sept-Dez-2026-Block: alle 6 Babykurse belegt, Warteliste). Neue Blöcke werden im Kalender-Tertial freigeschaltet (Anmeldephase Sept-Dez läuft). Büro Mo-Fr 9-13 Uhr, 0911 5808330. Südstadt/Katzwang/Nordost nur Kurse ab 4 J. mit Elternteil."
+
+- id: schwimmschule-wassermaeuse-nuernberg
+  name: "Schwimmschule Wassermäuse – Standorte Nürnberg"
+  address: "Nürnberg Langwasser Bad, Breslauer Straße 251, 90471 Nürnberg"
+  district: Langwasser
+  ring: aussen
+  venues:
+    - {name: "Nürnberg Langwasser (NürnbergBad-Gelände; Babyschwimmen, Kleinkinder, Eltern-Kind)", address: "Breslauer Straße 251, 90471 Nürnberg", ring: aussen}
+    - {name: "Boxdorfer Werkstatt (Eltern-Kind-Schwimmen 2 ab 3,5 J.)", address: "Würzburger Str. 13, 90427 Nürnberg", ring: aussen}
+    - {name: "Nürnberg West, Tagesstätte Zentrum für Körper- und Sprachbehinderte (derzeit wegen Renovierung geschlossen)", address: "Bertha-von-Suttner-Straße 29, 90439 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [babyschwimmen, kleinkindschwimmen]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.schwimmschule-wassermaeuse.de/kurssuche-3/"
+      kind: js
+      note: "Kurssuche als Kursorganizer-iFrame (app.wassermaeuse.kursorganizer.com), Filter Standort"
+    - url: "https://api.kursorganizer.com/graphql"
+      kind: json-api
+      note: "Wie Nübad-Flipper, aber Origin: https://app.wassermaeuse.kursorganizer.com; bundesweite Kurse (>1000) -> nach location.name filtern ('Nürnberg Langwasser Bad', 'Boxdorfer Werkstatt'); Kursnamen 'Babyschwimmen ( 3 - 12 Mon. )', 'Babyschwimmen 1 (ab 3 Mon.)', 'Eltern-Kind-Schwimmen 1 (ab 2,5 Jahren)'"
+    - url: "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/"
+      kind: html
+      note: "Standortübersicht mit Kursarten je Bad"
+  availability:
+    shown: ja
+    how: "Kursorganizer: freie Plätze bzw. Warteliste je Kurs (API freePlaces/waitListCount)"
+    system: "Kursorganizer"
+  verified: 2026-10-04
+  notes: "Altersstufen: Babyschwimmen 1 ab 3 Mon., Babyschwimmen 2 ab 8 Mon., Kleinkinderschwimmen ab 15 Mon., Eltern-Kind-Schwimmen 1 ab 2,5 J. Monatliche Kursgebühr. Babykurse Langwasser im Sept-Block ausgebucht (Warteliste). Fürth-Standort (Schwimmwelt) ist nicht Nürnberg."
+
+- id: schwimmschule-ohana-nuernberg
+  name: "Schwimmschule Ohana – Nürnberg (Kliniken Dr. Erler)"
+  address: "Kliniken Dr. Erler, Kontumazgarten 4-19, 90429 Nürnberg"
+  district: "St. Johannis / Gostenhof (Kontumazgarten)"
+  ring: knapp-aussen
+  age: "0-3"
+  topics: [babyschwimmen, kleinkindschwimmen]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3"
+      kind: html
+      note: "Kursolino-Liste aller Kursarten (Babys ab 3 Mon., Minis ab 1 J., Maxis ab 2 J.), je 189 EUR Blockkurs"
+    - url: "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290"
+      kind: html
+      note: "Babys ab 3 Monate: Terminliste per JS, ABER JSON-LD (@type Course -> hasCourseInstance) im HTML enthält alle Termine aller Standorte mit startDate und offers.availability; Nürnberg = Präfix 'NDE' / 'Kliniken Dr. Erler'. Minis id=20291, Maxis id=20292"
+    - url: "https://www.schwimmschule-ohana.de/kurse/standorte-n%C3%BCrnberg-f%C3%BCrth-erlangen/n%C3%BCrnberg/"
+      kind: html
+      note: "Standortseite Nürnberg (bindet Kursolino-iFrame ein)"
+  availability:
+    shown: ja
+    how: "JSON-LD offers.availability = schema.org/SoldOut bzw. InStock je Kursinstanz; im Browser Spalte 'Plätze' und Filter 'Nur Kurse mit freien Plätzen'"
+    system: "Kursolino"
+  verified: 2026-10-04
+  notes: "Becken 4x8 m, 32 °C, keine Wickeltische. Nur ein Elternteil im Wasser. Stand heute: NDE-Babykurs ab 14.11. ausgebucht, ab 23.01.2027 frei. fetch_page.py listet Course/CourseInstance-JSON-LD nicht als Events -> selbst parsen."
+
+- id: schwimmschule-baer-ritterbad
+  name: "Schwimmschule Bär – Babyschwimmen im Ritterbad"
+  address: "Ritterbad, Findelwiesenstraße 21, 90478 Nürnberg"
+  district: "Galgenhof/Glockenhof"
+  ring: aussen
+  age: "0-2"
+  topics: [babyschwimmen]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.schwimmschule-baer.de/kurse/kurszeiten/kurssuche"
+      kind: html
+      note: "Statische Liste aller Kurszeiten (Kurs, Bad, Wochentag, Trainer, Uhrzeit); aktuell Babyschwimmen Ritterbad Mo 11:10-11:40"
+    - url: "https://www.schwimmschule-baer.de/kurse/babys-und-kleinkinder/babyschwimmen-2"
+      kind: html
+      note: "Kursbeschreibung 3-24 Monate, 10 Stunden 135 EUR"
+  availability:
+    shown: nein
+    how: "Nur 'Anfragen'-Button (Kontaktformular mit vorbelegtem Termin), keine Platzanzeige; lange Wartelisten laut Website"
+    system: "keins (Anfrageformular)"
+  verified: 2026-10-04
+  notes: "Ritterbad ca. 10 Gehminuten vom Hbf (knapp 1 km außerhalb des Rings). Weitere Bär-Kurse in Langwasser nur für Ältere/Erwachsene."
+
+- id: post-sv-nuernberg
+  name: "Post SV Nürnberg – Babyschwimmen, Kleinkindschwimmen, Krabbelturnen/Turnzwerge, Babydance"
+  address: "Hallenbad Ebensee, Ziegenstraße 110, 90482 Nürnberg"
+  district: "Nordost / Mögeldorf"
+  ring: aussen
+  venues:
+    - {name: "Hallenbad Ebensee (Babyschwimmen 3-12 Mon., Kleinkindschwimmen 2-4 J.)", address: "Ziegenstraße 110, 90482 Nürnberg", ring: aussen}
+    - {name: "Sportzentrum Nordost (Krabbelturner 0-1, Turnzwerge 1-2 / 2-3)", address: "Neumeyerstraße 80, 90411 Nürnberg", ring: aussen}
+    - {name: "Vereinshalle Hasenbuck (Turnzwerge 1-3)", address: "Ingolstädter Str. 255, 90461 Nürnberg", ring: aussen}
+    - {name: "Theodor-Billroth-Schule (Turnzwerge 1-3)", address: "Billrothstraße 16, Nürnberg", ring: aussen}
+    - {name: "Sportpark Schweinau (Turnzwerge 1-3)", address: "Daimlerstraße 71, 90441 Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [babyschwimmen, kleinkindschwimmen, eltern-kind-turnen, bewegung]
+  format: [kursreihe, regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://post-sv.de/sport/schwimmen/kursangebot/babyschwimmen/"
+      kind: html
+      note: "Tabelle Kurszeiten (Kurs, Sportstätte, Alter, Wochentag, Startdatum, Uhrzeit, Belegung) + Detailseiten /detailansicht/?kursid=<uuid>"
+    - url: "https://post-sv.de/sport/schwimmen/kursangebot/kleinkindschwimmen/"
+      kind: html
+      note: "Kleinkindschwimmen 2-3 und 3-4 J., gleiche Tabelle"
+    - url: "https://post-sv.de/sport/schwimmen/kursangebot/baby-kleinkindschwimmen/"
+      kind: html
+      note: "Baby-Kleinkindschwimmen, aktuell ohne Termine"
+    - url: "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/"
+      kind: html
+      note: "Dauerangebote 'Turnzwerge (mit Eltern)': Krabbelturner 0-1 Mi 9:30, Turnzwerge 1-3 an mehreren Hallen; Eltern-Kind-Turnen 2-6 J. (u. a. Grundschule Paniersplatz – innen, aber erst ab 3 J.)"
+    - url: "https://post-sv.de/abteilungen/tanz/baby-dance/"
+      kind: html
+      note: "Babydance (Eltern-Kleinkind-Tanz ab 1 J.), Trainingszeiten-Tabelle aktuell leer"
+  availability:
+    shown: ja
+    how: "Kurstabellen Spalte 'Belegung' = 'Platz frei' / 'ausgebucht'; Detailseite 'Freie Plätze: ...' + Warteliste. Dauerangebote (Turnzwerge) ohne Platzanzeige"
+    system: "eigenes WordPress-Kursplugin (wpmp_kurse)"
+  verified: 2026-10-04
+  notes: "Schwimmkurse 10 Einheiten, Nichtmitglieder 180 EUR / Mitglieder 95 EUR; aktuell Baby 3-6 Mon. (Fr 10:45) Platz frei, 6-12 Mon. ausgebucht. Turnzwerge/Krabbelturner nur mit Vereinsmitgliedschaft + Zusatzbeitrag 'Fit und Gesund – Kinder', Probestunde möglich (dann ohne Anmeldung)."
+
+- id: tsv-1846-nuernberg
+  name: "TSV 1846 Nürnberg – Eltern-und-Kind-Turnen"
+  address: "Sporthalle Fuggerstraße, Fuggerstr. 9, 90439 Nürnberg"
+  district: "St. Leonhard / Sündersbühl"
+  ring: aussen
+  age: "1-3"
+  topics: [eltern-kind-turnen]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.tsv1846nuernberg.de/turnen/"
+      kind: html
+      note: "Tabelle Turngruppen; Eltern-und-Kind-Turnen 1,5-3 J. Mo 15:00-16:00"
+    - url: "https://tsv1846nuernberg.kurabu.com/de/events/club"
+      kind: js
+      note: "Kurabu-Kursportal/Kalender des Vereins (JS), v. a. Präventionskurse"
+  availability:
+    shown: teilweise
+    how: "Turnseite schreibt pro Gruppe 'Kurs komplett ausgebucht!' bzw. 'Anmeldung per Mail'"
+    system: "keins (Vereinswebsite), Kurse über Kurabu"
+  verified: 2026-10-04
+  notes: "Eltern-Kind-Turnen derzeit komplett ausgebucht. Vereinsmitgliedschaft nötig. Events-iCal https://www.tsv1846nuernberg.de/events/?ical=1 enthält Vereinsevents, keine Turnstunden."
+
+- id: atv-1873-frankonia
+  name: "ATV 1873 Frankonia Nürnberg – 'Riesen & Zwerge' (Eltern-Kind-Turnen)"
+  address: "ATV Kampfsportraum, Willstätterstr. 30, 90449 Nürnberg"
+  district: "Röthenbach / Eibach"
+  ring: aussen
+  age: "2-3"
+  topics: [eltern-kind-turnen]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/"
+      kind: html
+      note: "Trainingszeiten-Liste; Riesen & Zwerge 2-3 J. Mo 10:00-11:00 (Kontakt fsj@atv1873frankonia.de)"
+  availability:
+    shown: teilweise
+    how: "Pauschaler Hinweis 'Unsere Kurse sind aktuell ausgebucht … Warteliste'"
+    system: "keins"
+  verified: 2026-10-04
+  notes: "Laut städtischer Bewegungsbroschüre ist der Mo-10-Uhr-Termin das Eltern-Kind-Turnen (ab 1 J.). Schwimmkurse 'Bobby mit Eltern' erst ab 3-4 J."
+
+- id: sv-johannis-07
+  name: "SV Johannis 07 – Eltern-Kind-Turnen"
+  address: "Zeisigweg 70, 90425 Nürnberg"
+  district: "St. Johannis / Thon"
+  ring: aussen
+  age: "2-3"
+  topics: [eltern-kind-turnen]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.sv-johannis07.de/eltern-kind-turnen"
+      kind: html
+      note: "Zeiten: 2-3 J. Mo 16:00-16:45, 2-4 J. Do 16:30-17:15; nächste Blöcke ab Januar 2027 (Termine noch offen)"
+    - url: "https://shop.sv-johannis07.de/de/courses/"
+      kind: html
+      note: "Kursshop; Blocktermine je Kurs unter /de/bookings/block_list/course_id/<id>/ (2-3 J. = 2); derzeit 0 Einträge"
+  availability:
+    shown: unbekannt
+    how: "Nur Online-Buchung über Kursshop, keine Warteliste; Blockliste derzeit leer, Platzanzeige nicht prüfbar"
+    system: "eigener Kursshop (shop.sv-johannis07.de)"
+  verified: 2026-10-04
+  notes: "Bestandsfamilien werden automatisch in Folgekurs übernommen, Restplätze dann online."
+
+- id: tb-johannis-1888
+  name: "Turnerbund St. Johannis 1888 – Eltern-Kind-Turnen"
+  address: "Schnepfenreuther Hauptstraße 19, 90425 Nürnberg"
+  district: "St. Johannis / Thon"
+  ring: aussen
+  age: "1-3"
+  topics: [eltern-kind-turnen]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.tbj1888.de/abteilungen/turnen-und-gymnastik"
+      kind: html
+      note: "Trainingszeiten: Eltern-Kind-Turnen Mo 15:00-16:00 und 16:00-17:00"
+  availability:
+    shown: nein
+    how: "Keine Platzanzeige; Kontaktformular"
+    system: "keins"
+  verified: 2026-10-04
+  notes: "Altersangabe auf der Seite fehlt (Eltern-Kind-Turnen üblicherweise ab Laufalter); Vereinsmitgliedschaft."
+
+- id: djk-eibach
+  name: "DJK Nürnberg-Eibach – Eltern-Kind-Turnen und Mini-Club"
+  address: "Turnhalle Volksschule Fürreuthweg, 90451 Nürnberg"
+  district: Eibach
+  ring: aussen
+  age: "0-3"
+  topics: [eltern-kind-turnen, bewegung]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.djk-eibach.de/abteilungen/turnen/"
+      kind: html
+      note: "Eltern-Kind-Turnen 1-2,5 J. Mi 14:45-15:30, 2,5-4 J. Mi 15:30-16:15; Mini-Club 6 Mon.-1,5 J. (Zeit nicht angegeben, Terminwidget defekt)"
+  availability:
+    shown: nein
+    how: "Keine Platzanzeige"
+    system: "keins"
+  verified: 2026-10-04
+  notes: "Vereinsmitgliedschaft; Terminkalender-Shortcode [MEC] auf der Seite nicht gerendert."
+
+- id: vfl-nuernberg
+  name: "VfL Nürnberg – Mutter-Kind-Turnen"
+  address: "VfL-Sporthalle, Salzbrunner Straße 38, 90473 Nürnberg"
+  district: Langwasser
+  ring: aussen
+  age: "1-3"
+  topics: [eltern-kind-turnen]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://vfl-nuernberg.de/turnen/trainingszeiten/"
+      kind: html
+      note: "Mutter-Kind-Turnen Mo 15:30-16:30 VfL-Sporthalle"
+    - url: "https://vfl-nuernberg.de/turnen/kinderturnen/"
+      kind: html
+      note: "Beschreibung; Aufnahmestopp-Hinweise gelten für Kinderturnen 3-6 / ab 7"
+  availability:
+    shown: teilweise
+    how: "Textvermerk 'aktuell Aufnahmestopp' pro Gruppe"
+    system: "keins"
+  verified: 2026-10-04
+  notes: "Für Mutter-Kind-Turnen derzeit kein Aufnahmestopp vermerkt."
+
+- id: tsv-buch
+  name: "TSV Nürnberg-Buch 1921 – Eltern-Kind-Turnen"
+  address: "Am Wegfeld 41, 90427 Nürnberg"
+  district: Buch
+  ring: aussen
+  age: "1-3"
+  topics: [eltern-kind-turnen]
+  format: [regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.tsv-buch.de/kinder-turnen/"
+      kind: html
+      note: "Eltern-Kind-Turnen 1-4 J. Di 15:30-16:15 (außer Schulferien)"
+  availability:
+    shown: nein
+    how: "Keine Platzanzeige; Schnuppern nach Absprache"
+    system: "keins"
+  verified: 2026-10-04
+  notes: "Mitgliedschaft von Kind und Begleitperson nötig; ehrenamtlich von Müttern geleitet."
+
+- id: cvjm-nuernberg-wuselwelt
+  name: "CVJM Nürnberg – Wuselwelt (offene Bewegungsstunde 0-3 J.)"
+  address: "CVJM-Haus, Kornmarkt 6, 90402 Nürnberg"
+  district: Altstadt
+  ring: innen
+  age: "0-3"
+  topics: [bewegung, eltern-kind-turnen, elterntreff]
+  format: [offener-treff, regelmaessig]
+  cost: [kostenlos]
+  registration: [ohne-anmeldung]
+  programme:
+    - url: "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote"
+      kind: html
+      note: "Wuselwelt Fr 9:30-10:15 (außer Ferien), Turnhalle 2. UG; Seite listet 'Nächste Termine' mit Datum"
+    - url: "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;"
+      kind: html
+      note: "Terminübersicht Kinder/Familien (Einzeltermine inkl. Wuselwelt)"
+  availability:
+    shown: nein
+    how: "Offenes Angebot ohne Anmeldung"
+    system: "eigenes CMS"
+  verified: 2026-10-04
+  notes: "Freispiel in vorbereiteter Turnhalle, anschließend Café 'Kostbar'. Hallenschuhe/ABS-Socken. Kinderturnen 3-6 J. 14-täglich Mi 16 Uhr ebenfalls kostenlos."
+
+- id: dance-maxx-nuernberg
+  name: "Tanzstudio dance maxX Nürnberg – fitdankbaby® und Eltern-Kind-Tanz"
+  address: "Kornmarkt 8, 90402 Nürnberg"
+  district: Altstadt
+  ring: innen
+  age: "0-3"
+  topics: [fitness-mit-baby, musik, bewegung]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/"
+      kind: html
+      note: "Wochen-Kursplan Nürnberg: fitdankbaby MAXI/MINI (Mi 9:30 / 10:45), Eltern-Kind-Tanz Do 15:40-16:25"
+    - url: "https://www.dance-maxx.de/kursplan/fit-dank-baby-mini/"
+      kind: html
+      note: "fitdankbaby MINI (Babys 3-7 Mon.), 4-Wochen-Kurse; MAXI (ab 8 Mon.) unter /kursplan/fit-dank-baby-maxi/"
+    - url: "https://www.dance-maxx.de/kursplan/eltern-kind-tanz/"
+      kind: html
+      note: "Eltern-Kind-Tanz, Kinder ab 2 J."
+    - url: "https://calendly.com/dance-maxx-info/kostenlose-probestunde-fitdankbaby-in-nurnberg"
+      kind: js
+      note: "Kostenlose Probestunde fitdankbaby buchen (Calendly zeigt freie Slots)"
+  availability:
+    shown: nein
+    how: "Anmeldung über Nimbuscloud-Login (dancemaxx.nimbuscloud.at) bzw. Kontakt; keine öffentliche Platzanzeige, nur Calendly-Probestunden-Slots"
+    system: "Nimbuscloud (Login), Calendly"
+  verified: 2026-10-04
+  notes: "fitdankbaby: Baby im Tragegurt, ab ca. 3 Mon. nach Rückbildung. 2 Folgekurse à 4 Wochen 119 EUR. Das iCal der Website enthält nur Partys/Events, keine Kurse."
+
+- id: studio-herzschlag
+  name: "Studio HERZSCHLAG – Yoga, Pilates & Outdoor-Fitness mit Baby, BewegungsRaum, Eltern-Kind-Turnen"
+  address: "Äußere Sulzbacher Straße 16, 90489 Nürnberg"
+  district: "St. Sebald Ost / Veilhof"
+  ring: aussen
+  venues:
+    - {name: "Outdoor-Fitness mit Baby, Treffpunkt Wöhrder See 'Tante Noris'", address: "Wöhrder See, Nürnberg", ring: aussen}
+  age: "0-3"
+  topics: [yoga-mit-baby, fitness-mit-baby, rueckbildung, eltern-kind-turnen, bewegung]
+  format: [kursreihe, einzeltermin]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://studioherzschlag.de/unsere-kurse/kalender/"
+      kind: html
+      note: "Kurskalender-Seite, bettet Eversports-Kalender ein"
+    - url: "https://www.eversports.de/org/widget/97017cfe-3f59-45a3-a040-35d1fbcd3aec?venueId=64b8caca-3439-453b-8ee5-c287efa66ef5"
+      kind: js
+      note: "Eversports-Kalender (alle Termine, Drop-ins mit 🔷); Cloudflare blockt Skript-/WebFetch-Zugriff (403) -> nur im Browser"
+    - url: "https://www.eversports.de/org/widget/f9abdcd5-4aec-4af7-93af-9aff5537ce11?venueId=64b8caca-3439-453b-8ee5-c287efa66ef5"
+      kind: js
+      note: "Eversports-Kursreihen-Widget (Buchung Kursreihen)"
+    - url: "https://studioherzschlag.de/angebot/yoga-mit-baby/"
+      kind: html
+      note: "Yoga & Aerial Yoga mit Baby (Di/Do), Baby bis 1,5 J.; weitere Angebote: /angebot/pilates-fitness-mit-baby/, /angebot/outdoor-fitness-mit-baby/ (Di 10:00 + 15:00, Wöhrder See), /angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/ (8-36 Mon.), /angebot/eltern-kind-turnen/ (ab 1,5 J.)"
+  availability:
+    shown: ja
+    how: "Eversports zeigt freie Plätze / 'ausgebucht' / Warteliste je Termin (nur im Browser prüfbar)"
+    system: "Eversports"
+  verified: 2026-10-04
+  notes: "Breites Familienstudio (auch PEKiP, Babymassage, Krabbel-Café – evtl. Überschneidung mit anderen Bereichen). Wellpass/Wellhub-Drop-ins möglich. Ca. 1 km östlich des Laufertors."
+
+- id: wolf-pack-yoga
+  name: "Wolf Pack Yoga – Yoga mit Baby (in den Räumen der Hebammen in Johannis)"
+  address: "Hebammen in Johannis, Burgschmietstraße 25, 90419 Nürnberg"
+  district: "St. Johannis"
+  ring: knapp-aussen
+  venues:
+    - {name: "Wolf Pack Yoga Studio (Familien-/Kinderyoga)", address: "Waechterstraße 25, 90489 Nürnberg", ring: aussen}
+  age: "0-1"
+  topics: [yoga-mit-baby, rueckbildung]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.wolfpack.yoga/yoga-mit-baby"
+      kind: html
+      note: "Kursblöcke mit Startdaten (22.10.26, 10.12.26, 11.02.27, 01.04.27, 03.06.27), Do 9:30-10:30, 6 Termine 102 EUR; je Block 'hier buchen'-Link zu Eversports-Activity"
+    - url: "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe"
+      kind: js
+      note: "Eversports-Buchungsseite Block 22.10.26 (Cloudflare 403 für Skripte)"
+  availability:
+    shown: ja
+    how: "Eversports-Activity-Seite zeigt Restplätze/ausgebucht (nur im Browser)"
+    system: "Eversports"
+  verified: 2026-10-04
+  notes: "Babys ca. 3-12 Monate, im Anschluss an Rückbildung. Burgschmietstraße liegt grob 600-800 m nördlich des Rings (Einordnung knapp-aussen geschätzt). Familienyoga im Studio erst ab 3 J."
+
+- id: happy-bellies
+  name: "Happy Bellies (Physio Tine) – Kinderwagenkurs Outdoor & Rückbildung mit Baby"
+  address: "Freiligrathstraße 1, 90482 Nürnberg"
+  district: Mögeldorf
+  ring: aussen
+  venues:
+    - {name: "Kinderwagenkurs, Treffpunkt Spielplatz Mögeldorfer Park", address: "Ziegenstraße 12, 90480 Nürnberg", ring: aussen}
+  age: "0-1"
+  topics: [fitness-mit-baby, rueckbildung]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.happy-bellies.de/kinderwagenkurs"
+      kind: html
+      note: "Termine als Text (aktueller Kurs 18.9.-23.10.2026, Fr 9:15-10:15), 6x60 Min. 75 EUR oder Flexi 14 EUR/Stunde"
+    - url: "https://www.happy-bellies.de/kurse"
+      kind: html
+      note: "Kursübersicht: Rückbildung Basis/Aufbau (Babys willkommen), Mamas Mitte – Detailseiten mit 'wo/wann/termine'"
+  availability:
+    shown: nein
+    how: "Anmeldung per E-Mail, keine Platzanzeige"
+    system: "keins (Wix-Seite, E-Mail)"
+  verified: 2026-10-04
+  notes: "Folgetermine des Kinderwagenkurses nach 23.10. noch nicht veröffentlicht."
+
+- id: mutherstudio
+  name: "MUTHERSTUDIO – Mom & Baby Yoga, 'Mama, Mini & Mental Health'"
+  address: "Kraftshofer Hauptstraße 181, 90427 Nürnberg"
+  district: Kraftshof
+  ring: aussen
+  age: "0-3"
+  topics: [yoga-mit-baby, fitness-mit-baby, muetter]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://mutherstudio.com/mamababyyoga"
+      kind: html
+      note: "Mom & Baby Yoga (0-12 Mon.) Mi 11.11.-30.12.2026, 10:45-11:45, 8 Einheiten 129 EUR, KK-zertifiziert"
+    - url: "https://mutherstudio.com/body-mind-and-kids"
+      kind: html
+      note: "'Mama, Mini & Mental Health' (4 Mon.-3 J.), 'TERMIN WÄHLEN' -> Thrivecart-Checkout"
+    - url: "https://mutherstudio.com/kursplan-mutherstudio"
+      kind: html
+      note: "Verweist nur auf Canva-Kursplan (Bild)"
+  availability:
+    shown: nein
+    how: "Checkout über Thrivecart (mutherstudio.thrivecart.com) bzw. Fyndery; 'Sobald Kapazitäten voll, schließt Anmeldung' – keine Platzanzeige"
+    system: "Thrivecart / Fyndery"
+  verified: 2026-10-04
+  notes: "Auch Waldspielracker (ab 16 Mon.) und Musikzwerge (ab 6 Mon.) – evtl. anderer Bereich. Studio liegt im Nürnberger Norden (Kraftshof)."
+
+- id: die-familienbox
+  name: "Die FamilienBox – Yoga mit Baby, Babyturnen, Kleinkindturnen, Zumbini"
+  address: "Rosenaustraße 7 (Rückgebäude), 90429 Nürnberg"
+  district: Gostenhof
+  ring: knapp-aussen
+  age: "0-3"
+  topics: [yoga-mit-baby, eltern-kind-turnen, bewegung, rueckbildung, musik]
+  format: [kursreihe]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/"
+      kind: html
+      note: "Wochenstundenplan Kinderkurse (Babyturnen 8-15 Mon., Kleinkindturnen 12-36 Mon., Babygymnastik, Zumbini)"
+    - url: "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan-1/"
+      kind: html
+      note: "Wochenstundenplan inkl. Erwachsenenkurse (Yoga mit Baby, Bauch-Beine-Beckenboden, Postnatales Pilates)"
+    - url: "https://www.eversports.de/widget/w/vX25EB?list=course&group=84326"
+      kind: js
+      note: "Eversports-Widget 'Yoga mit Baby' (3-12 Mon.); Turnkurse über https://www.eversports.de/org/widget/0455f70c-bfb9-40da-b2ca-d4a77077dae2?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5"
+  availability:
+    shown: ja
+    how: "Eversports zeigt Restplätze/ausgebucht (nur im Browser, Cloudflare blockt Skripte)"
+    system: "Eversports"
+  verified: 2026-10-04
+  notes: "Familienzentrum mit sehr breitem Programm (PEKiP, Babymassage, Spielgruppen, Café) – hier nur der Bewegungsteil; vermutlich auch im Familienbildungs-Bereich erfasst (Duplikat zusammenführen). Rosenaustraße ca. 500 m westlich des Spittlertors."
+
+- id: fryday-nuernberg
+  name: "FRYDAY Fitnessstudio – Mama Plus Baby Fitness"
+  address: "Fürther Straße 248b, 90429 Nürnberg"
+  district: "Muggenhof / Eberhardshof"
+  ring: aussen
+  age: "0-1"
+  topics: [fitness-mit-baby, yoga-mit-baby, rueckbildung]
+  format: [kursreihe, regelmaessig]
+  cost: [kostenpflichtig]
+  registration: [mit-anmeldung]
+  programme:
+    - url: "https://fryday-nbg.com/"
+      kind: html
+      note: "One-Pager; Abschnitt 'Mama Fitness' (Mama Plus Baby Fitness, Bodybalance/Yoga für Mamas, Rückbildung), KEIN Kursplan online"
+  availability:
+    shown: nein
+    how: "Keine Termine/Plätze online; 10er-Kurs oder MamaFLAT, Kontakt hello@fryday-nbg.com"
+    system: "keins"
+  verified: 2026-10-04
+  notes: "Niedrige Priorität: Angebot beschrieben, aber keine Termine prüfbar – für Zeitraumsuche nur als Hinweis nutzbar."
