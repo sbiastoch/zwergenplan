@@ -126,7 +126,9 @@ export async function expectReducedMotion(page: Page) {
       Math.max(
         ...value.split(",").map((part) => {
           const v = part.trim();
-          return v.endsWith("ms") ? Number.parseFloat(v) : Number.parseFloat(v) * 1000;
+          const parsed = v.endsWith("ms") ? Number.parseFloat(v) : Number.parseFloat(v) * 1000;
+          // Unbekannte Werte (z. B. `auto` aus CSS Animations 2) zählen als Verstoß, statt als NaN still durchzugehen.
+          return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
         }),
       );
     const label = (el: Element, pseudo = "") =>

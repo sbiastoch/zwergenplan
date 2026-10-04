@@ -1,3 +1,4 @@
+import { nextSession } from "./agenda.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
 import { CATEGORIES, type Category, categoriesOf } from "./topics.ts";
 
@@ -84,10 +85,8 @@ export function toggleIn<D extends Dimension>(state: FilterState, dim: D, value:
  * markiert an (`splitByAge` in age.ts).
  */
 export function applyFilters<T extends Offer>(offers: readonly T[], state: FilterState, ctx: FilterContext): T[] {
-  const nowMs = ctx.now.getTime();
   return offers.filter((o) => {
-    const last = o.sessions.at(-1);
-    if (!last || Date.parse(last.end) < nowMs) return false;
+    if (!nextSession(o, ctx.now)) return false;
     if (!matches(state.formats, o.format)) return false;
     if (!matches(state.registration, o.registration)) return false;
     if (!matches(state.cost, o.cost)) return false;

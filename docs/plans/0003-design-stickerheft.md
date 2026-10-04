@@ -89,7 +89,7 @@ Detail, Filter-Sheet und Kind-Sheet sind `<dialog>` mit `showModal()`. Das bring
 
 - Bricolage Grotesque über `@fontsource-variable/bricolage-grotesque` (OFL-1.1, neue Laufzeit-Abhängigkeit ohne JS). Eingebunden per `import "@fontsource-variable/bricolage-grotesque/opsz.css"` in `src/main.tsx`; so erkennt knip die Abhängigkeit und Vite schreibt die `url()`s um. Der Familienname ist **`"Bricolage Grotesque Variable"`** (Fontsource), nicht der Name aus dem Mockup.
 - `opsz.css` hat die Achsen Gewicht 200–800 und optische Größe; Titel wirken nur damit wie im Mockup. `wght.css` (41 statt 77 kB) wäre kleiner, verliert aber die optische Größe. Der Browser lädt per `unicode-range` nur die Latin-Datei. Vite legt die Dateien unter `dist/assets/` ab, kein Drittanbieter-Request. Der Browser-Review prüft in den Netzwerk-Requests, dass genau diese eine Schriftdatei geladen wird.
-- `font-display: swap`. Fallback `system-ui, sans-serif`. Der Perf-Test misst CLS mit echtem Font-Swap. Liegt er über 0,05, kommt ein Fallback-`@font-face` mit `size-adjust` auf `local("Arial")`, gemessen unter Linux (CI).
+- `font-display: swap`. Der Perf-Test misst CLS mit echtem Font-Swap. Weil CI (Linux, `system-ui` = DejaVu Sans) damit 0,38 maß, gibt es in `src/ui/styles/tokens.css` Fallback-`@font-face`s mit `size-adjust` und Ascent/Descent-Override für Arial/Liberation, Noto und DejaVu, je normal und fett getrennt, gemessen bei echter Schriftgröße (die optische Größe macht Bricolage klein breiter). Danach `system-ui, sans-serif`. CLS mit jeder dieser Schriften ≤ 0,004. Roboto (Android) ist nicht angepasst, weil hier nicht messbar; im Browser-Review live beobachten.
 - Animationen ausschließlich in CSS: `stick` (Karte erscheint), `plop` (Chip), `slap` (Herz), `stamp` (Kalendertag), `peel` (Logo, 2× nach 1 s), `up` (Sheet), `slide` (Detail), `toast`, `wiggle` (Leerzustand).
 - `prefers-reduced-motion: reduce` schaltet Animationen und Transitionen ab (bestehende Regel, ergänzt um `animation-iteration-count: 1`, sonst flackert `wiggle`).
 - Die Karten-Animation `stick` beginnt mit `opacity: 0`. Damit sie LCP nicht verzögert, bekommen Karten des **ersten** Renderings nach dem Laden keine Animation. Nur später eingefügte Karten (Filterwechsel, „Weitere“) kleben sich ein. Der Zustand „animieren“ wird beim Mounten der Karte festgehalten, ein Re-Render startet die Animation nicht neu.
@@ -233,10 +233,12 @@ Inhalt wie im Mockup:
 
 ```
 src/domain/
-  agenda.ts (+test)     groupByNextSession, takeGroups, sessionsByDay, weekDays, monthDays, lastSessionDay, courseProgress, rhythm, uniformTimes
-  age.ts (+test)        + splitByAge, ageCheck
+  agenda.ts (+test)     upcomingSessions, nextSession, referenceSession, sessionOnDay, groupByNextSession, takeGroups, sessionsByDay, weekDays, monthDays, lastSessionDay, courseProgress, rhythm, uniformTimes
+  age.ts (+test)        + splitByAge, ageCheck, ageVisibility, DEFAULT_AGE
+  calendar.ts (+test)   calendarNav, clampDay (Kalender-Grenzen)
+  ids.ts (+test)        + OFFER_ID_PATTERN (eine Quelle für schema.ts und route.ts)
   saved.ts (+test)      toggleId, savedOffers, collectionSessions
-  ics.ts (+test)        + icsForCollection
+  ics.ts (+test)        + icsForCollection, icsContextFor (Einzel- und Sammel-ICS gleich, ADR 0007)
   route.ts (+test)      parseRoute / routeToSearch (ansicht, angebot, Filter)
   time.ts (+test)       + berlinIsoDate, parseGermanDate, formatGermanDate
   filter.ts (+test)     applyFilters ohne Alter, + activeFilterCount, toggleIn
@@ -254,6 +256,7 @@ src/ui/
   categories.ts         Kategorie → Kurzlabel, Form (SVG-Pfad)
   format.ts (+test)     Datums-/Zeit-/Fakten-Texte (Test läuft in America/Los_Angeles)
   use-app-state.ts      Hooks: URL-Route, Präferenzen, Toast
+  use-offer-views.ts (+test)  abgeleitete Ansichten: Sichtbarkeit nach Alter, Seiten, Kalendertag, Merkliste, Detail
   styles.css            Einstieg: Tailwind und @imports, Reihenfolge = Kaskade (E5)
   styles/               tokens (Fallback-Schriften, Farben, @theme, Kategorien), base, chrome, list, card,
                         tabs, calendar, dialog (Hülle, Detail), sheet (Sheets, Toast), motion (reduzierte Bewegung, zuletzt)
@@ -374,7 +377,7 @@ Hinweise für die nächste Session:
 - Preview-Server belegen die Ports 4173/4174; vor `playwright test` ggf. `fuser -k 4173/tcp 4174/tcp`.
 - Den Smoke-Test einzeln mit `--project=smoke-echte-daten --no-deps` starten (er hängt sonst an allen anderen Projekten).
 
-## Arch-Review (Subagent `arch-reviewer`, 2026-10-04) – Verdict: „Nacharbeit nötig“, keine Blocker → offen, für die nächste Session
+## Arch-Review (Subagent `arch-reviewer`, 2026-10-04) – Verdict: „Nacharbeit nötig“, keine Blocker → Befunde 1–7 erledigt
 
 Bestätigt: Schichtregeln, „jetzt“ nur in `App.tsx`, kein Zod im Client, gleiche UIDs. Die drei Gate-Änderungen (smoke seriell, biome-Ausnahme, `settle()`) sind legitim, keine Schwelle gesenkt.
 
@@ -397,3 +400,11 @@ Hinweise (nach Aufwand):
 - 14 Doku: architecture.md-Privatsphäre-Invariante um Merkliste/Darstellung und den `thirdPartyGuard` ergänzen; CLAUDE.md: `--no-deps` für den Smoke-Test, veralteter BOOTSTRAP-Abschnitt; Plan E10 (Sticker-Name „Kurz: Voll“); visuelle Regression (ADR 0004, ideas.md) jetzt bewusst entscheiden.
 - 15 ADR 0001: Font-Abhängigkeit in die Stack-Liste.
 - 16 E2E: Fehler-/Ladezustand („Nochmal versuchen“ per `page.route` 500) mit `expectMobileUx`; Smoke 320 px/200 % auch für Detail und Kalender mit echten Daten.
+
+### Nacharbeit (2026-10-04, zweite Session)
+
+- **CI-CLS behoben** (`3c69c47`): Fallback-Schriften mit Bricolage-Maßen (siehe E6). Lokal nachgestellt mit DejaVu als Fallback (CLS 0,379, Quelle: Kopfzeile bricht um), danach mit Arial/Noto/DejaVu ≤ 0,0032. CI-Lauf 37212117010 grün.
+- **Befunde 1–7 erledigt**, parallel in drei Worktrees, test-first: 1/4/5 Domäne (`652ccdb`), 2/3/7b Kalender/Alter/`useOfferViews` (`11bef82`), 6/7a CSS-Split und `expectReducedMotion` (`45d0357`, Gate vorher in allen 60 Fällen rot: `peel` 1 s, `peelin` 100 ms Delay). Hinweis 11 (`DEFAULT_AGE`) gleich mit.
+- **Zweiter Arch-Review** über `729b3c8..HEAD`: Verdict OK, keine Blocker, nichts Wichtiges. Umgesetzt: `applyFilters` nutzt `nextSession` statt eigenem Prädikat, `expectReducedMotion` wertet unbekannte Dauern (`auto`) als Verstoß, Doku-Drift (E6, Struktur). Offen, optional: eine Quelle für die Formate (`schema.ts`, `ids.ts`, `filter.ts`), Roboto-Fallback, Hinweise 8–10, 12–16 von oben, unbegründete `as never` in `ics.test.ts`.
+- `pnpm check` grün: 229 Unit-Tests (Coverage 98,3/91,6 %), 239 E2E inkl. WebKit, JS 81,9/90 kB, CSS 8,5/15 kB.
+- Offen aus der Übergabe: Punkte 3 (Fast-Forward nach `main` durch den Nutzer), 4 (`/browser-review` live, besonders Kalender nach dem Refactor) und 5 (Plan 0004).
