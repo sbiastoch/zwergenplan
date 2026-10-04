@@ -5,8 +5,14 @@
 import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts";
 import { OFFER_ID_PATTERN } from "./ids.ts";
 
-const TABS = ["entdecken", "kalender", "merkliste"] as const;
+/** „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5), kein eigener Tab in der Leiste. */
+const TABS = ["entdecken", "karte", "kalender", "merkliste"] as const;
 export type Tab = (typeof TABS)[number];
+
+/** Welcher Eintrag der Tab-Leiste aktiv ist: Liste und Karte gehören beide zu „Entdecken“. */
+export function tabSection(tab: Tab): Exclude<Tab, "karte"> {
+  return tab === "karte" ? "entdecken" : tab;
+}
 
 export interface Route {
   tab: Tab;
