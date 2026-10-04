@@ -4,6 +4,7 @@ import { assetUrl } from "../data/site.ts";
 import { ageCheck } from "../domain/age.ts";
 import { referenceSession, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
 import { seriesIcsPath, sessionIcsPath } from "../domain/ics.ts";
+import type { Origin, Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
@@ -13,6 +14,7 @@ import {
   availabilityLabel,
   costLabel,
   dayDots,
+  distanceLong,
   longDate,
   plural,
   registrationLabel,
@@ -31,13 +33,27 @@ interface DetailProps {
   /** gewählter Kalendertag, falls aus der Kalender-Agenda geöffnet */
   day: string | undefined;
   birthDate: string | undefined;
+  /** Startpunkt und Entfernung zum Ort; beides nur mit Startpunkt (Plan 0004, E6) */
+  origin: Origin | undefined;
+  reach: Reach | undefined;
   saved: boolean;
   onToggleSave: (offer: SiteOffer) => void;
   onClose: () => void;
   onIcs: (message: string) => void;
 }
 
-export function DetailContent({ offer, now, day, birthDate, saved, onToggleSave, onClose, onIcs }: DetailProps) {
+export function DetailContent({
+  offer,
+  now,
+  day,
+  birthDate,
+  origin,
+  reach,
+  saved,
+  onToggleSave,
+  onClose,
+  onIcs,
+}: DetailProps) {
   const [allDates, setAllDates] = useState(false);
   const category = primaryCategory(offer.topics);
   const fromCalendar = day ? sessionOnDay(offer, day) : undefined;
@@ -80,6 +96,7 @@ export function DetailContent({ offer, now, day, birthDate, saved, onToggleSave,
               <span className="cap">Wo</span>
               <b>{offer.venue.name}</b>
               <span>{[offer.venue.address, offer.venue.district].filter(Boolean).join(" · ")}</span>
+              {origin && reach && <span>{distanceLong(reach, origin)}</span>}
             </div>
             <div className="label">
               <span className="cap">Alter</span>

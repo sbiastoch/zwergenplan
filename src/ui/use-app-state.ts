@@ -1,16 +1,21 @@
-/** Zustand, der den Browser berührt: URL/History, Präferenzen (über src/data), Toast, Farbschema, Uhr. */
+/** Zustand, der den Browser berührt: URL/History, Präferenzen (über src/data), Toast, Farbschema, Uhr, Startpunkt. */
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { canLocate, type PositionProblem, requestPosition } from "../data/geolocation.ts";
 import {
   loadAgeOnly,
   loadBirthDate,
+  loadOriginDistrict,
   loadSaved,
   loadTheme,
   saveAgeOnly,
   saveBirthDate,
+  saveOriginDistrict,
   saveSaved,
   saveTheme,
   type ThemeChoice,
 } from "../data/preferences.ts";
+import { districtById } from "../domain/districts.ts";
+import type { Origin } from "../domain/reach.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
@@ -181,4 +186,75 @@ export function useNow(): Date {
     };
   }, []);
   return now;
+}
+
+export interface OriginApi {
+  /** gewählter Startpunkt; ein Standort lebt nur im Speicher */
+  origin: Origin | undefined;
+  /** Standortabfrage läuft */
+  locating: boolean;
+  /** letzter Fehlergrund der Standortabfrage; weg bei neuer Abfrage und sobald ein Startpunkt gesetzt wird */
+  problem: PositionProblem | undefined;
+  /** ob „Meinen Standort nutzen“ überhaupt angeboten wird */
+  canLocate: boolean;
+  useMyLocation: () => void;
+  setDistrict: (id: string) => void;
+  /** „Startpunkt entfernen“: Standort und gespeicherten Stadtteil */
+  clear: () => void;
+}
+
+function districtOrigin(id: string | undefined): Origin | undefined {
+  const district = id ? districtById(id) : undefined;
+  return district && { source: "stadtteil", point: district.point, label: district.name, districtId: district.id };
+}
+
+/**
+ * Startpunkt der Entfernung (Plan 0004, E3). Gespeichert wird nur die ID eines Stadtteils, nie ein
+ * Standort; der Standort wird nur auf Tipp abgefragt und ist nach dem Neuladen weg. Wählt man den
+ * Standort, bleibt ein gespeicherter Stadtteil liegen und gilt nach dem Neuladen wieder.
+ */
+export function useOrigin(): OriginApi {
+  const [origin, setOrigin] = useState(() => districtOrigin(loadOriginDistrict()));
+  const [locating, setLocating] = useState(false);
+  const [problem, setProblem] = useState<PositionProblem>();
+  const [locatable] = useState(() => canLocate());
+  // Eine spät eintreffende Standort-Antwort darf eine neuere Wahl (Stadtteil, Entfernen) nicht überschreiben.
+  const request = useRef(0);
+
+  const useMyLocation = useCallback(() => {
+    const id = ++request.current;
+    setLocating(true);
+    // alten Fehler leeren, damit die Live-Region einen erneuten Fehlschlag wieder ansagt
+    setProblem(undefined);
+    void requestPosition().then((result) => {
+      if (id !== request.current) return;
+      setLocating(false);
+      if (result.ok) {
+        setOrigin({ source: "standort", point: result.point, label: "Mein Standort" });
+        setProblem(undefined);
+      } else {
+        setProblem(result.reason);
+      }
+    });
+  }, []);
+
+  const setDistrict = useCallback((id: string) => {
+    const next = districtOrigin(id);
+    if (!next) return;
+    request.current++;
+    setLocating(false);
+    setOrigin(next);
+    setProblem(undefined);
+    saveOriginDistrict(id);
+  }, []);
+
+  const clear = useCallback(() => {
+    request.current++;
+    setLocating(false);
+    setOrigin(undefined);
+    setProblem(undefined);
+    saveOriginDistrict(undefined);
+  }, []);
+
+  return { origin, locating, problem, canLocate: locatable, useMyLocation, setDistrict, clear };
 }

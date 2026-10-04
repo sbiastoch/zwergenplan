@@ -1,7 +1,8 @@
 /**
  * Abgeleitete Ansichten der Angebote (Plan 0003, Arch-Review 7): Filter, Alters-Sichtbarkeit,
  * Liste in Schritten, Kalender, Merkliste, offenes Detail – plus der Ansichts-Zustand dazu.
- * „Jetzt“ kommt von außen (entsteht nur in `useNow`, use-app-state.ts).
+ * „Jetzt“ kommt von außen (entsteht nur in `useNow`, use-app-state.ts), ebenso der Startpunkt
+ * (`useOrigin`). Die Entfernung entsteht hier einmal je Koordinate, nicht je Render (Plan 0004, E6).
  */
 import { useCallback, useMemo, useState } from "react";
 import { ageVisibility } from "../domain/age.ts";
@@ -16,6 +17,7 @@ import {
 } from "../domain/agenda.ts";
 import { clampDay } from "../domain/calendar.ts";
 import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
+import { type Origin, type Reach, reachTo } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import { savedOffers } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -32,6 +34,8 @@ export interface OfferViewsInput {
   ageOnly: boolean;
   savedIds: readonly string[];
   now: Date;
+  /** Startpunkt für Entfernung und Umkreis; nur im Speicher (Plan 0004, E3) */
+  origin?: Origin | undefined;
 }
 
 export interface OfferViews {
@@ -63,16 +67,46 @@ export interface OfferViews {
   saved: SiteOffer[];
   /** Angebot aus der URL, falls es im Datenstand existiert */
   detailOffer: SiteOffer | undefined;
+  /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
+  reachOf: (offer: SiteOffer) => Reach | undefined;
 }
 
-export function useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now }: OfferViewsInput): OfferViews {
+const NO_REACH = (): undefined => undefined;
+
+/** Entfernung je Koordinate zwischengespeichert: Viele Angebote teilen sich einen Ort. */
+function reachCache(origin: Origin | undefined): (offer: SiteOffer) => Reach | undefined {
+  if (!origin) return NO_REACH;
+  const cache = new Map<string, Reach>();
+  return ({ venue }) => {
+    const key = `${venue.geo.lat},${venue.geo.lon}`;
+    let reach = cache.get(key);
+    if (!reach) {
+      reach = reachTo(origin, venue);
+      cache.set(key, reach);
+    }
+    return reach;
+  };
+}
+
+export function useOfferViews({
+  offers,
+  route,
+  birthDate,
+  ageOnly,
+  savedIds,
+  now,
+  origin,
+}: OfferViewsInput): OfferViews {
   const [showUnfit, setShowUnfit] = useState(false);
   const [limit, setLimit] = useState(PAGE);
   const [calendarDay, setCalendarDay] = useState(() => berlinIsoDate(now));
   const [monthOpen, setMonthOpen] = useState(false);
 
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
-  const filtered = useMemo(() => applyFilters(offers, route.filter, { now }), [offers, route.filter, now]);
+  const filtered = useMemo(
+    () => applyFilters(offers, route.filter, { now, ...(origin ? { origin } : {}) }),
+    [offers, route.filter, now, origin],
+  );
   const { visible, hiddenCount, unfitIds } = useMemo(
     () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, showUnfit }),
     [filtered, upcoming, birthDate, now, ageOnly, showUnfit],
@@ -86,13 +120,14 @@ export function useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now
     () =>
       route.tab === "kalender"
         ? endedOnDay(
-            offers.filter((o) => matchesFilter(o, route.filter)),
+            offers.filter((o) => matchesFilter(o, route.filter, origin)),
             today,
             now,
           )
         : 0,
-    [offers, route.filter, route.tab, today, now],
+    [offers, route.filter, route.tab, today, now, origin],
   );
+  const reachOf = useMemo(() => reachCache(origin), [origin]);
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
@@ -118,5 +153,6 @@ export function useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now
     },
     saved,
     detailOffer: route.offerId ? offers.find((o) => o.id === route.offerId) : undefined,
+    reachOf,
   };
 }

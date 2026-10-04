@@ -1,0 +1,60 @@
+/* Entfernung (Plan 0004): Kind-Sheet „Entfernung ab“ (OriginPicker.tsx), gesperrte Umkreis-Chips, Kachel-Meta. */
+
+@layer components {
+  .origin-now {
+    margin: 0 0 12px;
+  }
+  .origin-now b {
+    font-weight: 800;
+  }
+  .origin .field {
+    margin: 14px 0 6px;
+  }
+  .select {
+    position: relative;
+    display: block;
+  }
+  .select select.input {
+    appearance: none;
+    cursor: pointer;
+    /* lesbar statt Ziffern-Look des Geburtsdatums; ≥ 16 px, sonst zoomt iOS */
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: normal;
+    padding-right: 44px;
+  }
+  .select .ic {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .origin .linkbtn {
+    margin-top: 6px;
+  }
+  .btn:disabled {
+    cursor: progress;
+    box-shadow: none;
+  }
+
+  /* Filter-Sheet: Umkreis ohne Startpunkt */
+  .chip:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    box-shadow: none;
+  }
+  .origin-need {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 6px;
+    margin-top: 6px;
+  }
+
+  /* Kachel: „1,4 km“ bricht nie zwischen Zahl und Einheit */
+  .meta .dist {
+    white-space: nowrap;
+    font-weight: 700;
+  }
+}

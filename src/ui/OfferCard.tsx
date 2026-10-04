@@ -1,6 +1,7 @@
 /** Angebots-Kachel (Plan 0003, E9): Kopfzeile mit Kategorie-Pille und Zeit, Titel, Meta, Fakten, Herz. */
 import { useState } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
+import type { Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
 import { primaryCategory } from "./categories.ts";
@@ -9,6 +10,7 @@ import {
   availabilityLabel,
   clock,
   costLabel,
+  distanceShort,
   formatFact,
   registrationLabel,
   sessionDay,
@@ -27,6 +29,8 @@ export interface CardContext {
   onOpen: (offer: SiteOffer, day?: string) => void;
   /** neu eingefügte Kacheln dürfen sich einkleben (nicht beim ersten Rendern, wegen LCP) */
   animate: boolean;
+  /** Entfernung zum Ort, nur mit Startpunkt (Plan 0004, E6); je Koordinate zwischengespeichert */
+  reachOf: (offer: SiteOffer) => Reach | undefined;
 }
 
 interface OfferCardProps {
@@ -45,6 +49,7 @@ export function OfferCard({ item, ctx, dated = false, calendarDay }: OfferCardPr
   const unfit = ctx.isUnfit(offer.id);
   const saved = ctx.isSaved(offer.id);
   const availability = availabilityLabel(offer);
+  const reach = ctx.reachOf(offer);
   const when = dated ? `${shortDate(sessionDay(session))} · ${clock(session.start)} Uhr` : `${timeRange(session)} Uhr`;
 
   return (
@@ -64,6 +69,12 @@ export function OfferCard({ item, ctx, dated = false, calendarDay }: OfferCardPr
         </h3>
         <p className="meta">
           {offer.providerName} · {offer.venue.district ?? offer.venue.name}
+          {reach && (
+            <>
+              {" · "}
+              <span className="dist">{distanceShort(reach)}</span>
+            </>
+          )}
         </p>
         <div className="facts">
           <span className="fact">{formatFact(offer, ctx.now)}</span>
