@@ -272,8 +272,10 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
         const parent = text.parentElement as Element;
         // Ausnahme: `hyphens: auto` (Titel, Zusammenfassung) – dort trennt das Wörterbuch, nicht der Zufall.
         if (getComputedStyle(parent).hyphens === "auto") continue;
-        // Wörter ohne Leerraum und ohne Bindestrich, Gedankenstrich oder Schrägstrich (dort ist Umbruch legitim).
-        for (const m of text.data.matchAll(/[^\s\-‐–/]+/g)) {
+        // Wörter ohne Leerraum, Bindestrich und Gedankenstrich (dort ist Umbruch legitim). Der Schrägstrich ist
+        // keine Umbruchstelle (UAX 14, Chromium und WebKit brechen dort nicht): „Gostenhof/Himpfelshof“ ist ein
+        // langes Wort und darf bei 200 % brechen, nicht „Himpfelshof“ allein (echte Daten, Smoke).
+        for (const m of text.data.matchAll(/[^\s\-‐–]+/g)) {
           const rects = rectsOf(text, m.index, m.index + m[0].length);
           if (lineCount(rects) < 2) continue;
           const width = rects.reduce((sum, r) => sum + r.width, 0);
