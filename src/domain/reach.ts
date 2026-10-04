@@ -5,8 +5,8 @@
  */
 import { type GeoPoint, haversineMeters } from "./geo.ts";
 
-/** Herkunft des Startpunkts. Plan 0005 ergänzt „karte“ (Kartenmitte). */
-export type OriginSource = "standort" | "stadtteil";
+/** Herkunft des Startpunkts. Plan 0005 ergänzt „karte“ (Kartenmitte). Export erst, wenn ihn jemand braucht (knip). */
+type OriginSource = "standort" | "stadtteil";
 
 /** Startpunkt. Steht nie in URL, Logs oder Requests (docs/architecture.md). */
 export interface Origin {
@@ -36,7 +36,7 @@ export function compareReach(a: Reach, b: Reach): number {
 
 /** Umkreis-Stufen im Filter (Nutzerentscheidung 3) */
 export const RADII_KM = [2, 5, 10] as const;
-export type RadiusKm = (typeof RADII_KM)[number];
+type RadiusKm = (typeof RADII_KM)[number];
 
 /** Grenze für den Filter „Entfernung“. Mit ADR 0005 kommt { kind: "minuten"; value } dazu. */
 export type ReachLimit = { kind: "km"; value: RadiusKm };

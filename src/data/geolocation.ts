@@ -5,7 +5,7 @@
  */
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 
-export type PositionProblem = "denied" | "unavailable" | "timeout" | "outside" | "unsupported";
+type PositionProblem = "denied" | "unavailable" | "timeout" | "outside" | "unsupported";
 export type PositionResult = { ok: true; point: GeoPoint } | { ok: false; reason: PositionProblem };
 
 /**
