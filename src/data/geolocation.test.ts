@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { canLocate, type LocationEnv, type PositionApi, requestPosition } from "./geolocation.ts";
 
 /** Gerät, das sofort mit einer Position antwortet */
@@ -60,6 +60,46 @@ describe("requestPosition", () => {
       reason: "unsupported",
     });
     expect(getCurrentPosition).not.toHaveBeenCalled();
+  });
+
+  describe("eigenes Gesamt-Zeitlimit von 15 s", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("gibt nach 15 s „timeout“, wenn das Gerät nie antwortet (z. B. offener Berechtigungsdialog)", async () => {
+      vi.useFakeTimers();
+      let settled = false;
+      const result = requestPosition(secure({ getCurrentPosition: () => undefined })).then((r) => {
+        settled = true;
+        return r;
+      });
+      await vi.advanceTimersByTimeAsync(14_999);
+      expect(settled).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      expect(await result).toEqual({ ok: false, reason: "timeout" });
+    });
+
+    it("eine Antwort nach dem Zeitlimit ändert nichts mehr, eine rechtzeitige räumt den Timer ab", async () => {
+      vi.useFakeTimers();
+      let answer: ((position: { coords: { latitude: number; longitude: number } }) => void) | undefined;
+      const late = requestPosition(
+        secure({
+          getCurrentPosition: (success) => {
+            answer = success;
+          },
+        }),
+      );
+      await vi.advanceTimersByTimeAsync(15_000);
+      answer?.({ coords: { latitude: 49.45213, longitude: 11.07672 } });
+      expect(await late).toEqual({ ok: false, reason: "timeout" });
+
+      expect(await requestPosition(secure(at(49.45213, 11.07672)))).toEqual({
+        ok: true,
+        point: { lat: 49.452, lon: 11.077 },
+      });
+      expect(vi.getTimerCount()).toBe(0);
+    });
   });
 
   it("nutzt ohne Parameter den Browser – in Node gibt es keine Geolocation", async () => {

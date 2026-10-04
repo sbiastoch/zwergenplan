@@ -47,17 +47,29 @@ export function canLocate(env: LocationEnv = browserEnv()): boolean {
   return env.isSecureContext && env.geolocation !== undefined;
 }
 
+/**
+ * Eigenes Gesamt-Zeitlimit. `OPTIONS.timeout` zählt erst ab der Freigabe: Bleibt der Berechtigungsdialog offen
+ * oder antwortet das Gerät nie, hinge „Suche Standort …“ sonst für immer (Arch-Review 0004, m2).
+ */
+const OVERALL_TIMEOUT_MS = 15_000;
+
 /** Fragt den Standort einmal ab. Liefert nur den gerundeten Punkt oder einen Fehlergrund. */
 export function requestPosition(env: LocationEnv = browserEnv()): Promise<PositionResult> {
   const { geolocation } = env;
   if (!geolocation || !env.isSecureContext) return Promise.resolve({ ok: false, reason: "unsupported" });
   return new Promise((resolve) => {
+    // Was zuerst kommt, gilt; eine spätere Antwort ändert ein erfülltes Promise nicht mehr.
+    const timer = setTimeout(() => resolve({ ok: false, reason: "timeout" }), OVERALL_TIMEOUT_MS);
+    const settle = (result: PositionResult) => {
+      clearTimeout(timer);
+      resolve(result);
+    };
     geolocation.getCurrentPosition(
       ({ coords }) => {
         const point = coarsen({ lat: coords.latitude, lon: coords.longitude });
-        resolve(inBounds(point) ? { ok: true, point } : { ok: false, reason: "outside" });
+        settle(inBounds(point) ? { ok: true, point } : { ok: false, reason: "outside" });
       },
-      ({ code }) => resolve({ ok: false, reason: reasonFor(code) }),
+      ({ code }) => settle({ ok: false, reason: reasonFor(code) }),
       OPTIONS,
     );
   });
