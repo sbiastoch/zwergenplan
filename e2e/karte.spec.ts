@@ -134,6 +134,22 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(mapBox(page)).toHaveCount(0);
   });
 
+  test("Attribution genau einmal sichtbar und enthält OpenStreetMap (Lizenzpflicht, Browser-Review W1)", async ({
+    page,
+  }) => {
+    await openMap(page);
+    const attribution = page.locator(".map-box .maplibregl-ctrl-attrib");
+    await expect(attribution).toHaveCount(1);
+    await expect(attribution).toBeVisible();
+    const osm = attribution.getByRole("link", { name: "OpenStreetMap" });
+    await expect(osm).toHaveCount(1);
+    await expect(osm).toBeVisible();
+    await expect(osm).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
+    await expect(attribution.getByRole("link", { name: "OpenFreeMap" })).toHaveCount(1);
+    await expect(attribution.getByRole("link", { name: /OpenMapTiles/ })).toHaveCount(1);
+    expect((await attribution.innerText()).match(/OpenStreetMap/g)).toHaveLength(1);
+  });
+
   test("Schnellfilter „Kurse“ wirkt auf Orte und Statuszeile", async ({ page }) => {
     await openMap(page);
     await page.getByRole("button", { name: "Kurse", exact: true }).click();

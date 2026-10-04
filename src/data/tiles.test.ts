@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ATTRIBUTION, guardTileRequest, styleUrl } from "./tiles.ts";
+import { guardTileRequest, styleUrl } from "./tiles.ts";
 
 describe("styleUrl", () => {
   it("nimmt hell „positron“ und dunkel „dark“ von OpenFreeMap", () => {
@@ -9,14 +9,6 @@ describe("styleUrl", () => {
 
   it("liefert URLs, die der eigene Wächter durchlässt", () => {
     for (const dark of [false, true]) expect(guardTileRequest(styleUrl(dark))).toEqual({ url: styleUrl(dark) });
-  });
-});
-
-describe("ATTRIBUTION", () => {
-  it("nennt OpenFreeMap, OpenMapTiles und OpenStreetMap mit Links (ADR 0008)", () => {
-    expect(ATTRIBUTION).toBe(
-      '<a href="https://openfreemap.org">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    );
   });
 });
 

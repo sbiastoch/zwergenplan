@@ -37,16 +37,18 @@
 }
 
 /* Die Symbole sind dunkle SVG-Hintergründe; im dunklen Theme invertiert. */
-:root[data-theme="dark"] .map-box .maplibregl-ctrl-icon {
+:root[data-theme="dark"] .map-box .maplibregl-ctrl-icon,
+:root[data-theme="dark"] .map-box .maplibregl-ctrl-attrib-button {
   filter: invert(1);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .map-box .maplibregl-ctrl-icon {
+  :root:not([data-theme="light"]) .map-box .maplibregl-ctrl-icon,
+  :root:not([data-theme="light"]) .map-box .maplibregl-ctrl-attrib-button {
     filter: invert(1);
   }
 }
 
-/* Attribution: nicht eingeklappt, Links inline mit ≥ 24 px Höhe (WCAG 2.5.8) */
+/* Attribution aus der TileJSON, Links inline mit ≥ 24 px Höhe (WCAG 2.5.8). Auf Karten ≤ 640 px compact (unten). */
 .map-box .maplibregl-ctrl.maplibregl-ctrl-attrib {
   background: var(--surface);
   color: var(--ink);
@@ -63,6 +65,33 @@
 .map-box .maplibregl-ctrl-attrib a:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 0;
+}
+
+/*
+ * Compact (MapLibre auf Karten ≤ 640 px): beim Öffnen ausgeschrieben, nach dem ersten Verschieben nur der
+ * Info-Knopf, per Tipp wieder offen. Der Knopf ist ein Touch-Ziel (44 × 44 px), der Text macht ihm Platz.
+ */
+.map-box .maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-compact {
+  min-height: 44px;
+  padding: 0 44px 0 0;
+  border-radius: 22px;
+  box-sizing: border-box;
+}
+.map-box .maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-compact-show {
+  padding: 10px 48px 10px 12px;
+}
+.map-box .maplibregl-ctrl-attrib-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 24px;
+}
+.map-box .maplibregl-ctrl-attrib-button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+  box-shadow: none;
 }
 
 /* Zwei-Finger-Hinweis (cooperativeGestures) */

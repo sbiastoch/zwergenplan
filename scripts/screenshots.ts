@@ -50,7 +50,9 @@ async function mockTiles(context: BrowserContext) {
     }
     const file = path.startsWith("/styles/")
       ? `tests/fixtures/karte/${path.slice("/styles/".length)}.json`
-      : `tests/fixtures/karte${path}`;
+      : path === "/planet"
+        ? "tests/fixtures/karte/planet.json"
+        : `tests/fixtures/karte${path}`;
     return existsSync(file) ? route.fulfill({ path: file }) : route.fulfill({ status: 404 });
   });
 }

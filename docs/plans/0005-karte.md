@@ -490,6 +490,7 @@ Abweichungen und Befunde:
 - **Kartenmitte im `originReducer`** (Aktion `mapCenter`, Plan 0004 Arch-Review m1), mit Test.
 - `App.tsx`: Overlays nach `src/ui/Overlays.tsx`, 296 Zeilen (vor Plan 0005: 280).
 - **Querformat:** Mit der Seitenleiste aus Plan 0007 liegt die Karte nicht mehr unter einer Tab-Leiste.
+- **Hotfix Attribution (Browser-Review live, W1; weicht von E4 ab):** Die Pflicht-Attribution kommt jetzt nur noch aus der TileJSON von OpenFreeMap (`/planet`: OpenFreeMap, © OpenMapTiles, OpenStreetMap, je verlinkt). Die eigene `customAttribution` stand zeichenverschieden daneben und damit doppelt, `ATTRIBUTION` in `tiles.ts` entfällt. Statt `compact: false` gilt MapLibres Standard: Auf Karten ≤ 640 px steht die Attribution beim Öffnen ausgeschrieben, klappt nach dem ersten Verschieben zum Info-Knopf (44 × 44 px) ein und lässt sich per Tipp wieder öffnen. Bei 320 px / 200 % belegt sie anfangs 152 statt 216 px, danach 44 px. Die Fixtures liefern die TileJSON mit der echten Attribution (`tests/fixtures/karte/planet.json`), E2E prüft „genau einmal, mit OpenStreetMap-Link“.
 - E2E: `MAP_READY` (20 s bis `bereit`, Software-WebGL unter Parallellast), Wächter und Kachel-Protokoll in einer Fixture, zusätzlicher Test „Wächter: Querystring/fremder Host verlassen den Browser nicht, auch nicht aus dem Worker“. Worker-Kacheln belegt über das Resource-Timing des Workers (Test 2).
 
 ## Arch-Review (2026-10-04) – Verdict: Nacharbeit nötig → eingearbeitet
