@@ -170,3 +170,26 @@ export function TabBar({ tab, savedCount, onTab }: { tab: Tab; savedCount: numbe
     </nav>
   );
 }
+
+/** Umschalter Liste | Karte (Plan 0005, E5): beide Darstellungen gehören zu „Entdecken“. */
+export function ViewToggle({ map, onMap }: { map: boolean; onMap: (map: boolean) => void }) {
+  return (
+    <fieldset className="plain view-toggle">
+      <legend className="sr-only">Darstellung der Angebote</legend>
+      <div className="seg seg2">
+        <span className="seg-thumb" style={{ transform: `translateX(${map ? 100 : 0}%)` }} />
+        {["Liste", "Karte"].map((label, i) => (
+          <button
+            key={label}
+            type="button"
+            className="seg-btn"
+            aria-pressed={map === (i === 1)}
+            onClick={() => onMap(i === 1)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+}

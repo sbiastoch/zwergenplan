@@ -3,11 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { loadSiteData } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
-import type { Tab } from "../domain/route.ts";
+import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CalendarView } from "./CalendarView.tsx";
-import { Header, QuickFilters, Stickers, TabBar } from "./Chrome.tsx";
+import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
 import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
 import { ageChipLabel, distanceNote, plural, reachLimitLabel, standDate } from "./format.ts";
@@ -114,6 +114,8 @@ export function App() {
     },
   };
   const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
+  // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5)
+  const section = tabSection(route.tab);
   const dialogOpen = sheet !== null || detailOffer !== undefined;
 
   return (
@@ -124,13 +126,19 @@ export function App() {
         onKid={() => setSheet("kid")}
         onToggleTheme={() => theme.setChoice(theme.dark ? "hell" : "dunkel")}
       />
-      {route.tab === "entdecken" && <Stickers filter={route.filter} onChange={setFilter} />}
+      {section === "entdecken" && <Stickers filter={route.filter} onChange={setFilter} />}
       {route.tab !== "merkliste" && (
         <QuickFilters
           filter={route.filter}
           hasOrigin={origin !== undefined}
           onChange={setFilter}
           onOpenSheet={() => setSheet("filter")}
+        />
+      )}
+      {section === "entdecken" && (
+        <ViewToggle
+          map={route.tab === "karte"}
+          onMap={(map) => replace({ ...route, tab: map ? "karte" : "entdecken" })}
         />
       )}
       <main className="body">
@@ -221,7 +229,7 @@ export function App() {
           />
         )}
       </main>
-      <TabBar tab={route.tab} savedCount={saved.length} onTab={onTab} />
+      <TabBar tab={section} savedCount={saved.length} onTab={onTab} />
       <Toast message={dialogOpen ? "" : toast} />
 
       <Dialog
