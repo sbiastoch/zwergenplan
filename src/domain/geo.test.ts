@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coarsen, haversineMeters, inBounds, NUERNBERG_BBOX } from "./geo.ts";
+import { coarsen, geoKey, haversineMeters, inBounds, NUERNBERG_BBOX } from "./geo.ts";
 
 describe("haversineMeters", () => {
   const a = { lat: 49.45, lon: 11.07 };
@@ -46,5 +46,12 @@ describe("coarsen", () => {
     const { lat, lon } = coarsen({ lat: -0.0001, lon: -0.0001 });
     expect(Object.is(lat, 0)).toBe(true);
     expect(Object.is(lon, 0)).toBe(true);
+  });
+});
+
+describe("geoKey", () => {
+  it("ist die Koordinate als Text, gleiche Punkte gleicher Schlüssel", () => {
+    expect(geoKey({ lat: 49.4495, lon: 11.0601 })).toBe("49.4495,11.0601");
+    expect(geoKey({ lat: 49.4495, lon: 11.0601 })).toBe(geoKey({ lon: 11.0601, lat: 49.4495 }));
   });
 });

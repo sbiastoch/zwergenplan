@@ -1,0 +1,27 @@
+/**
+ * Orte und Startausschnitt der Karte (Plan 0005, E6/E9), im Karten-Oberflächen-Chunk gerechnet.
+ * `cameraOffers` ist die Datenbasis des Ausschnitts **ohne Umkreis-Filter** (`useOfferViews().map`):
+ * Der Umkreis hängt am Startpunkt und darf den Ausschnitt nie bestimmen (ADR 0008, Arch-Review B1).
+ */
+import { initialCamera, type StartCamera } from "../../domain/camera.ts";
+import type { GeoPoint } from "../../domain/geo.ts";
+import { type Place, placesOf, sortPlaces } from "../../domain/places.ts";
+import type { Origin } from "../../domain/reach.ts";
+
+interface MapOffer {
+  venue: { name: string; address: string; district?: string | undefined; geo: GeoPoint };
+}
+
+export function mapData<T extends MapOffer>(
+  visible: readonly T[],
+  cameraOffers: readonly T[],
+  origin: Origin | undefined,
+): { places: Place<T>[]; start: StartCamera } {
+  return {
+    places: sortPlaces(placesOf(visible), origin),
+    start: initialCamera(
+      placesOf(cameraOffers).map((p) => p.geo),
+      origin,
+    ),
+  };
+}

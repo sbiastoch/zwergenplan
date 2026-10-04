@@ -4,10 +4,37 @@
  */
 
 @layer components {
-  /* Umschalter Liste | Karte (Chrome.tsx), unter den Schnellfiltern */
-  /* fieldset.plain (base.css) setzt padding: 0 */
+  /*
+   * Statuszeile mit Umschalter Liste | Karte (Chrome.tsx) rechts daneben (Plan 0005, E5): spart im Querformat
+   * eine Zeile über der ersten Kachel. Bei wenig Platz oder großer Schrift bricht der Umschalter darunter;
+   * das regelt flex-wrap, keine Media-Query.
+   */
+  .status-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 12px;
+  }
+  .status-row > .status {
+    flex: 1 1 10rem;
+    margin: 0;
+  }
   fieldset.view-toggle {
-    padding: 0 16px 8px;
+    flex: 0 1 12rem;
+    min-width: min(100%, 9rem);
+  }
+  /* kompakt: Zeilenhöhe = Knopfhöhe (44 px), der Rahmen als Inset-Schatten statt Border und Innenabstand */
+  .view-toggle .seg {
+    padding: 0;
+    border: 0;
+    box-shadow: inset 0 0 0 2px var(--line);
+  }
+  .view-toggle .seg-thumb {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 50%;
   }
 
   /* px und dvh statt rem: Bei 200 % Textgröße füllte eine rem-Karte sonst den Bildschirm (E7). Auch Platzhalter (CLS). */

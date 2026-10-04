@@ -16,9 +16,8 @@ import {
   takeGroups,
 } from "../domain/agenda.ts";
 import { clampDay } from "../domain/calendar.ts";
-import { initialCamera, type StartCamera } from "../domain/camera.ts";
 import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
-import { type Place, placesOf, sortPlaces } from "../domain/places.ts";
+import { geoKey } from "../domain/geo.ts";
 import { type Origin, type Reach, reachTo } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import { savedOffers } from "../domain/saved.ts";
@@ -28,7 +27,6 @@ import { berlinIsoDate } from "../domain/time.ts";
 /** Angebote je Schritt in der Liste (Plan 0003, E8) */
 const PAGE = 40;
 const NO_INDEX: Map<string, Occurrence<SiteOffer>[]> = new Map();
-const NO_PLACES: Place<SiteOffer>[] = [];
 
 export interface OfferViewsInput {
   offers: readonly SiteOffer[];
@@ -70,13 +68,12 @@ export interface OfferViews {
   saved: SiteOffer[];
   /** Angebot aus der URL, falls es im Datenstand existiert */
   detailOffer: SiteOffer | undefined;
-  /** Orte der sichtbaren Angebote, nur in der Kartenansicht; mit Startpunkt nach Entfernung (Plan 0005, E6) */
-  places: Place<SiteOffer>[];
   /**
-   * Startausschnitt der Karte, nur in der Kartenansicht: über die Orte **ohne Umkreis-Filter**, damit die
-   * Kachel-Requests nie verraten, wo ein Standort liegt (Kamera-Regel, ADR 0008; Arch-Review B1).
+   * Nur in der Kartenansicht (Plan 0005): Zahl der Orte für die Statuszeile und die Datenbasis des
+   * Startausschnitts **ohne Umkreis-Filter**, damit die Kachel-Requests nie verraten, wo ein Standort
+   * liegt (Kamera-Regel, ADR 0008; Arch-Review B1). Orte und Ausschnitt rechnet karte/map-data.ts.
    */
-  startCamera: StartCamera | undefined;
+  map: { placeCount: number; cameraOffers: readonly SiteOffer[] } | undefined;
   /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
   reachOf: (offer: SiteOffer) => Reach | undefined;
 }
@@ -88,7 +85,7 @@ function reachCache(origin: Origin | undefined): (offer: SiteOffer) => Reach | u
   if (!origin) return NO_REACH;
   const cache = new Map<string, Reach>();
   return ({ venue }) => {
-    const key = `${venue.geo.lat},${venue.geo.lon}`;
+    const key = geoKey(venue.geo);
     let reach = cache.get(key);
     if (!reach) {
       reach = reachTo(origin, venue);
@@ -139,19 +136,14 @@ export function useOfferViews({
   );
   const reachOf = useMemo(() => reachCache(origin), [origin]);
   // Ohne Startpunkt gefiltert: Der Umkreis wirkt nur mit Startpunkt, Alter und übrige Filter gelten wie auf der Karte.
-  const startCamera = useMemo(() => {
+  const map = useMemo(() => {
     if (route.tab !== "karte") return undefined;
     const withoutReach = applyFilters(offers, route.filter, { now });
-    const shown = ageVisibility(withoutReach, upcoming, birthDate, now, { ageOnly, showUnfit }).visible;
-    return initialCamera(
-      placesOf(shown).map((p) => p.geo),
-      origin,
-    );
-  }, [route.tab, route.filter, offers, now, upcoming, birthDate, ageOnly, showUnfit, origin]);
-  const places = useMemo(
-    () => (route.tab === "karte" ? sortPlaces(placesOf(visible), origin) : NO_PLACES),
-    [visible, route.tab, origin],
-  );
+    return {
+      placeCount: new Set(visible.map((o) => geoKey(o.venue.geo))).size,
+      cameraOffers: ageVisibility(withoutReach, upcoming, birthDate, now, { ageOnly, showUnfit }).visible,
+    };
+  }, [route.tab, route.filter, offers, now, visible, upcoming, birthDate, ageOnly, showUnfit]);
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
@@ -177,8 +169,7 @@ export function useOfferViews({
     },
     saved,
     detailOffer: route.offerId ? offers.find((o) => o.id === route.offerId) : undefined,
-    places,
-    startCamera,
+    map,
     reachOf,
   };
 }

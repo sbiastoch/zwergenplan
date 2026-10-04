@@ -15,7 +15,6 @@ import {
   formatFact,
   mapStatusParts,
   originPhrase,
-  placeLine,
   plural,
   reachLimitLabel,
   registrationNote,
@@ -299,13 +298,5 @@ describe("Karte und Orte (Plan 0005, E7)", () => {
     expect(mapStatusParts(8, 5)).toEqual([8, " Angebote an ", 5, " Orten"]);
     expect(mapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort");
     expect(mapStatusParts(0, 0).join("")).toBe("0 Angebote an 0 Orten");
-  });
-
-  it("Zeile der Orts-Liste: Stadtteil bzw. Adresse, Zahl, Entfernung", () => {
-    const place = { district: "Gostenhof", address: "Beispielweg 1, 90429 Nürnberg", offers: [1, 2, 3] };
-    expect(placeLine(place, undefined)).toBe("Gostenhof · 3 Angebote");
-    expect(placeLine({ address: "Beispielweg 1", offers: [1] }, { kind: "luftlinie", meters: 1427 })).toBe(
-      "Beispielweg 1 · 1 Angebot · 1,4 km",
-    );
   });
 });

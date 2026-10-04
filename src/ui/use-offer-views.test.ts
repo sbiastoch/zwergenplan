@@ -177,46 +177,41 @@ describe("useOfferViews", () => {
       expect(kalender.calendar.dataEnd).toBe("2026-10-12");
     });
 
-    it("Orte für die Karte folgen den sichtbaren Angeboten, mit Startpunkt nach Entfernung (Plan 0005, E6)", () => {
+    it("Kartenansicht: Zahl der Orte folgt den sichtbaren Angeboten (Plan 0005, E7)", () => {
       const karte: Route = { tab: "karte", filter: EMPTY_FILTER };
-      const keys = (v: OfferViews) => v.places.map((p) => [p.key, p.offers.map((o) => o.title)]);
       // nur in der Kartenansicht
-      expect(render({ offers: [nah, nahZwei, fern] }).places).toEqual([]);
-      // gleicher Ort → ein Ort; ohne Startpunkt nach Name (beide „Ort“), also in Reihenfolge des Auftretens
-      expect(keys(render({ offers: [fern, nah, nahZwei], route: karte }))).toEqual([
-        ["49.4301,11.0892", ["fern"]],
-        ["49.4495,11.0601", ["nah", "nah-zwei"]],
-      ]);
-      // mit Startpunkt nach Entfernung
-      expect(keys(render({ offers: [fern, nah, nahZwei], route: karte, origin }))[0]?.[0]).toBe("49.4495,11.0601");
+      expect(render({ offers: [nah, nahZwei, fern] }).map).toBeUndefined();
+      // gleicher Ort → ein Ort
+      expect(render({ offers: [fern, nah, nahZwei], route: karte }).map?.placeCount).toBe(2);
       // Umkreis und Alter wirken wie in der Liste
-      expect(keys(render({ offers: [nah, fern], route: { ...within2km, tab: "karte" }, origin }))).toEqual([
-        ["49.4495,11.0601", ["nah"]],
-      ]);
+      expect(render({ offers: [nah, fern], route: { ...within2km, tab: "karte" }, origin }).map?.placeCount).toBe(1);
       const gross = at(GROSS, 49.4301, 11.0892);
-      expect(keys(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }))).toEqual([
-        ["49.4495,11.0601", ["nah"]],
-      ]);
+      expect(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }).map?.placeCount).toBe(1);
     });
 
-    it("Startausschnitt der Karte hängt nie am Umkreis um einen Standort (Arch-Review B1)", () => {
+    it("Datenbasis des Startausschnitts hängt nie am Umkreis um einen Standort (Arch-Review B1)", () => {
       const standort: Origin = { source: "standort", point: { lat: 49.4495, lon: 11.0601 }, label: "Mein Standort" };
       const kartenmitte: Origin = { ...standort, source: "karte", label: "Kartenmitte" };
-      const karte: Route = { tab: "karte", filter: EMPTY_FILTER };
       const umkreis: Route = { ...within2km, tab: "karte" };
-      const plain = render({ offers: [nah, fern], route: karte }).startCamera;
-      expect(plain).toEqual({ bounds: { minLat: 49.4301, minLon: 11.0601, maxLat: 49.4495, maxLon: 11.0892 } });
-      // Der Umkreis blendet „fern“ aus der Liste aus, der Ausschnitt bleibt trotzdem bei allen Orten.
+      const plain = render({ offers: [nah, fern], route: { tab: "karte", filter: EMPTY_FILTER } }).map;
+      expect(ids(plain?.cameraOffers ?? [])).toEqual(["nah", "fern"]);
+      // Der Umkreis blendet „fern“ aus der Liste aus, die Datenbasis des Ausschnitts bleibt.
       const mitStandort = render({ offers: [nah, fern], route: umkreis, origin: standort });
-      expect(mitStandort.places.map((p) => p.key)).toEqual(["49.4495,11.0601"]);
-      expect(mitStandort.startCamera).toEqual(plain);
-      expect(render({ offers: [nah, fern], route: umkreis, origin: kartenmitte }).startCamera).toEqual(plain);
-      // Andere Filter wirken wie auf der Karte
+      expect(ids(mitStandort.visible)).toEqual(["nah"]);
+      expect(mitStandort.map?.cameraOffers).toEqual(plain?.cameraOffers);
+      expect(render({ offers: [nah, fern], route: umkreis, origin: kartenmitte }).map?.cameraOffers).toEqual(
+        plain?.cameraOffers,
+      );
+      // Andere Filter und das Alter wirken wie auf der Karte
+      const kurse: Route = { tab: "karte", filter: { ...EMPTY_FILTER, formats: ["kurs"] } };
+      expect(render({ offers: [nah, fern], route: kurse }).map?.cameraOffers).toEqual([]);
+      const gross = at(GROSS, 49.4301, 11.0892);
       expect(
-        render({ offers: [nah, fern], route: { tab: "karte", filter: { ...EMPTY_FILTER, formats: ["kurs"] } } })
-          .startCamera,
-      ).toEqual({ center: { lat: 49.454, lon: 11.077 }, zoom: 11 });
-      expect(render({ offers: [nah, fern] }).startCamera).toBeUndefined();
+        ids(
+          render({ offers: [nah, gross], route: umkreis, origin: standort, birthDate: "2026-05-01" }).map
+            ?.cameraOffers ?? [],
+        ),
+      ).toEqual(["nah"]);
     });
 
     it("zählt heute beendete Termine nur im Umkreis (B2)", () => {

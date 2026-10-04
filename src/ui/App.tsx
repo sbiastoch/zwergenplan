@@ -3,22 +3,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { loadSiteData } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
-import type { Place } from "../domain/places.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
-import { DetailContent } from "./DetailDialog.tsx";
-import { Dialog } from "./Dialog.tsx";
 import { ageChipLabel, distanceNote, mapStatusParts, plural, reachLimitLabel, standDate } from "./format.ts";
-import { KidSheet } from "./KidSheet.tsx";
 import { ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
-import { PlaceSheet } from "./PlaceSheet.tsx";
+import { Overlays, type SheetKind } from "./Overlays.tsx";
 import { SavedView } from "./SavedView.tsx";
-import { FilterSheet } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
 import {
   useAgeOnly,
@@ -52,11 +47,10 @@ export function App() {
   const originApi = useOrigin();
   const { origin } = originApi;
 
-  // „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl)
-  const [sheet, setSheet] = useState<"filter" | "kid" | "origin" | null>(null);
+  const [sheet, setSheet] = useState<SheetKind>(null);
   const [detailDay, setDetailDay] = useState<string>();
-  // Orts-Sheet: Sitzungszustand, nie in der URL (Plan 0005, E5)
-  const [placeKey, setPlaceKey] = useState<string>();
+  // Orts-Sheet offen (karte/MapScreen.tsx): Der Seiten-Toast schweigt dann wie bei jedem Modal.
+  const [placeSheet, setPlaceSheet] = useState(false);
   const [animate, setAnimate] = useState(false);
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Umkreis-Hinweis verschwindet mit der Wahl.
   const filterButton = useRef<HTMLButtonElement>(null);
@@ -119,18 +113,15 @@ export function App() {
       openDetail(offer.id);
     },
   };
-  const place = views.places.find((p) => p.key === placeKey);
-  // Ort mit einem Angebot: gleich das Detail (Plan 0005, E6)
-  const openPlace = (p: Place<SiteOffer>) => {
-    const [only, ...more] = p.offers;
-    if (only && more.length === 0) ctx.onOpen(only);
-    else setPlaceKey(p.key);
-  };
-  const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.places.length);
+  const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.map?.placeCount ?? 0);
   const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
   // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5)
   const section = tabSection(route.tab);
-  const dialogOpen = sheet !== null || detailOffer !== undefined || place !== undefined;
+  // Liste | Karte steht rechts neben der Statuszeile und bricht bei wenig Platz darunter (Plan 0005, E5).
+  const toggle = section === "entdecken" && (
+    <ViewToggle map={route.tab === "karte"} onMap={(map) => replace({ ...route, tab: map ? "karte" : "entdecken" })} />
+  );
+  const dialogOpen = sheet !== null || detailOffer !== undefined || placeSheet;
 
   return (
     <div className="app">
@@ -150,18 +141,15 @@ export function App() {
           sheetButton={filterButton}
         />
       )}
-      {section === "entdecken" && (
-        <ViewToggle
-          map={route.tab === "karte"}
-          onMap={(map) => replace({ ...route, tab: map ? "karte" : "entdecken" })}
-        />
-      )}
       <main className="body">
         {load.kind === "loading" && (
           <>
-            <p className="status" role="status">
-              Lade Angebote …
-            </p>
+            <div className="status-row">
+              <p className="status" role="status">
+                Lade Angebote …
+              </p>
+              {toggle}
+            </div>
             {[0, 1, 2].map((i) => (
               <div key={i} className="card placeholder" aria-hidden="true" />
             ))}
@@ -179,28 +167,31 @@ export function App() {
         )}
         {load.kind === "ready" && route.tab !== "merkliste" && (
           <>
-            <p className="status" role="status">
-              {route.tab === "karte" ? (
-                <span>
-                  <b>{mapOffers}</b>
-                  {offersWord}
-                  <b>{mapPlaces}</b>
-                  {placesWord}
-                </span>
-              ) : (
-                <span>
-                  <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
-                </span>
-              )}
-              {origin && (
-                // eigene Zeile ohne „·“: Sie brach bei 320–390 px ohnehin um, und der Punkt stand dann verwaist
-                // vorn. Der Punkt nur für Screenreader trennt die beiden Sätze in der Ansage.
-                <span className="status-note">
-                  <span className="sr-only">. </span>
-                  {distanceNote(origin)}
-                </span>
-              )}
-            </p>
+            <div className="status-row">
+              <p className="status" role="status">
+                {route.tab === "karte" ? (
+                  <span>
+                    <b>{mapOffers}</b>
+                    {offersWord}
+                    <b>{mapPlaces}</b>
+                    {placesWord}
+                  </span>
+                ) : (
+                  <span>
+                    <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
+                  </span>
+                )}
+                {origin && (
+                  // eigene Zeile ohne „·“: Sie brach bei 320–390 px ohnehin um, und der Punkt stand dann verwaist
+                  // vorn. Der Punkt nur für Screenreader trennt die beiden Sätze in der Ansage.
+                  <span className="status-note">
+                    <span className="sr-only">. </span>
+                    {distanceNote(origin)}
+                  </span>
+                )}
+              </p>
+              {toggle}
+            </div>
             {route.filter.reachLimit && !origin && (
               // Geteilter Link mit ?umkreis= ohne Startpunkt: Der Filter wirkt nicht (Plan 0004, E7).
               <p className="status">
@@ -234,15 +225,16 @@ export function App() {
             <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>
           </>
         )}
-        {load.kind === "ready" && views.startCamera && (
+        {load.kind === "ready" && views.map && (
           <MapPanel
-            places={views.places}
-            start={views.startCamera}
+            offers={visible}
+            cameraOffers={views.map.cameraOffers}
             origin={origin}
             dark={theme.dark}
-            reachOf={views.reachOf}
             hasData={offers.length > 0}
-            onPlace={openPlace}
+            ctx={ctx}
+            toast={toast}
+            onSheetOpen={setPlaceSheet}
             onPickOrigin={() => setSheet("origin")}
             onMapCenter={(center) => {
               if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb von Nürnberg.");
@@ -278,69 +270,27 @@ export function App() {
       <TabBar tab={section} savedCount={saved.length} onTab={onTab} />
       <Toast message={dialogOpen ? "" : toast} />
 
-      <Dialog
-        open={detailOffer !== undefined}
-        onClose={closeDetail}
-        label={detailOffer?.title ?? "Angebot"}
-        className="detail"
+      <Overlays
         toast={toast}
-      >
-        {detailOffer && (
-          <DetailContent
-            key={detailOffer.id}
-            offer={detailOffer}
-            now={now}
-            day={detailDay}
-            birthDate={birthDate}
-            origin={origin}
-            reach={views.reachOf(detailOffer)}
-            saved={savedIds.includes(detailOffer.id)}
-            onToggleSave={onToggleSave}
-            onClose={closeDetail}
-            onIcs={say}
-          />
-        )}
-      </Dialog>
-      <Dialog
-        open={place !== undefined}
-        onClose={() => setPlaceKey(undefined)}
-        label={place?.names.join(" / ") ?? "Ort"}
-        className="sheet"
-        toast={toast}
-      >
-        {place && <PlaceSheet place={place} origin={origin} ctx={ctx} onClose={() => setPlaceKey(undefined)} />}
-      </Dialog>
-      <Dialog open={sheet === "filter"} onClose={() => setSheet(null)} label="Filter" className="sheet" toast={toast}>
-        <FilterSheet
-          filter={route.filter}
-          onChange={setFilter}
-          resultCount={visible.length}
-          hasOrigin={origin !== undefined}
-          onPickOrigin={() => setSheet("origin")}
-          onClose={() => setSheet(null)}
-        />
-      </Dialog>
-      <Dialog
-        open={sheet === "kid" || sheet === "origin"}
-        onClose={() => setSheet(null)}
-        label="Kind und Einstellungen"
-        className="sheet"
-        toast={toast}
-        fallbackFocus={filterButton}
-      >
-        <KidSheet
-          birthDate={birthDate}
-          onBirthDate={setBirthDate}
-          ageOnly={ageOnly}
-          onAgeOnly={setAgeOnly}
-          theme={theme.choice}
-          onTheme={theme.setChoice}
-          today={today}
-          origin={originApi}
-          focusOrigin={sheet === "origin"}
-          onClose={() => setSheet(null)}
-        />
-      </Dialog>
+        sheet={sheet}
+        setSheet={setSheet}
+        detailOffer={detailOffer}
+        detailDay={detailDay}
+        closeDetail={closeDetail}
+        ctx={ctx}
+        say={say}
+        filter={route.filter}
+        setFilter={setFilter}
+        resultCount={visible.length}
+        birthDate={birthDate}
+        setBirthDate={setBirthDate}
+        ageOnly={ageOnly}
+        setAgeOnly={setAgeOnly}
+        theme={theme}
+        today={today}
+        originApi={originApi}
+        filterButton={filterButton}
+      />
     </div>
   );
 }

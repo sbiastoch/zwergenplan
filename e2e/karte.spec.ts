@@ -3,7 +3,7 @@
  * Fehler. Offline: OpenFreeMap kommt aus tests/fixtures/karte/ (fixtures.ts, `tiles: "mock"`).
  * `window.__zpMap` gibt es nur im E2E-Build (E13, begründete Ausnahme von „E2E ist Black-Box“).
  */
-import type { Page } from "@playwright/test";
+import type { BrowserContext, Page } from "@playwright/test";
 import { expect, MAP_READY, test } from "./fixtures.ts";
 
 /** Nur das, was die Tests von MapLibre brauchen (ohne Abhängigkeit von src/). */
@@ -182,11 +182,15 @@ test.describe("mit gemockten Kacheln", () => {
   test("Stilwechsel hell ↔ dunkel behält Marker, Farben und Tippen", async ({ page }) => {
     await openMap(page);
     for (const [button, style, background] of [
-      ["Dunkle Darstellung", "/styles/dark", "bg-dunkel"],
-      ["Helle Darstellung", "/styles/positron", "bg-hell"],
+      ["Dunkel", "/styles/dark", "bg-dunkel"],
+      ["Hell", "/styles/positron", "bg-hell"],
     ] as const) {
       const request = page.waitForRequest((req) => req.url().endsWith(style));
-      await page.getByRole("button", { name: button }).click();
+      // über das Kind-Sheet: Der Theme-Knopf im Kopf entfällt auf schmalen Geräten (Plan 0007, B5)
+      await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+      const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+      await kid.getByRole("button", { name: button, exact: true }).click();
+      await kid.getByRole("button", { name: "Fertig" }).click();
       await request;
       await expect
         .poll(() =>
@@ -372,14 +376,8 @@ test.describe("Karten-Code nicht ladbar", () => {
     ],
   });
 
-  test("Karten-Code nicht ladbar: Meldung, erneuter Versuch bzw. Neuladen", async ({ page, context, browserName }) => {
-    await context.route("**/assets/karte/**", (route) => route.abort());
-    await page.goto("./?ansicht=karte");
-    await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
-    await expect(mapBox(page)).toContainText("Die Karte konnte nicht geladen werden.");
-    await expect(places(page)).toHaveCount(5);
-
-    await context.unroute("**/assets/karte/**");
+  /** „Nochmal versuchen“, ggf. „Seite neu laden“; endet mit bereiter Karte und ansicht=karte (E2). */
+  async function recover(page: Page, context: BrowserContext, browserName: string) {
     await mapBox(page).getByRole("button", { name: "Nochmal versuchen" }).click();
     const reload = mapBox(page).getByRole("button", { name: "Seite neu laden" });
     await expect
@@ -399,5 +397,44 @@ test.describe("Karten-Code nicht ladbar", () => {
       await target.goto("./?ansicht=karte");
     }
     await expect(mapBox(target)).toHaveAttribute("data-state", "bereit", MAP_READY);
+  }
+
+  test("Karten-Oberfläche nicht ladbar: Hinweis auf die Liste, erneuter Versuch bzw. Neuladen", async ({
+    page,
+    context,
+    browserName,
+  }) => {
+    await context.route("**/assets/karte/**", (route) => route.abort());
+    await page.goto("./?ansicht=karte");
+    await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
+    await expect(mapBox(page)).toContainText(
+      "Die Karte konnte nicht geladen werden. Alle Angebote stehen in der Liste.",
+    );
+    // Der Weg ohne Karte ist der Umschalter
+    await expect(page.getByRole("button", { name: "Liste", exact: true })).toBeVisible();
+
+    await context.unroute("**/assets/karte/**");
+    await recover(page, context, browserName);
+  });
+
+  test("nur MapLibre nicht ladbar: Orts-Liste bleibt bedienbar, erneuter Versuch bzw. Neuladen", async ({
+    page,
+    context,
+    browserName,
+  }) => {
+    await context.route("**/assets/karte/MapView-*", (route) => route.abort());
+    await page.goto("./?ansicht=karte");
+    await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
+    await expect(mapBox(page)).toContainText(
+      "Die Karte konnte nicht geladen werden. Die Orte stehen unten in der Liste.",
+    );
+    await expect(places(page)).toHaveCount(5);
+    await expect(page.getByRole("button", { name: "Kartenmitte als Startpunkt" })).toHaveCount(0);
+    await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
+    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "Schließen" }).click();
+
+    await context.unroute("**/assets/karte/MapView-*");
+    await recover(page, context, browserName);
   });
 });

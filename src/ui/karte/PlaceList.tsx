@@ -2,10 +2,10 @@
  * Orts-Liste unter der Karte (Plan 0005, E7): die zugängliche Entsprechung der Marker, auch ohne
  * Karte (offline, ohne WebGL, ohne Karten-Chunk). Sortiert kommt sie aus `sortPlaces`.
  */
-import type { Place } from "../domain/places.ts";
-import type { Reach } from "../domain/reach.ts";
-import type { SiteOffer } from "../domain/site-data.ts";
-import { placeLine } from "./format.ts";
+import type { Place } from "../../domain/places.ts";
+import type { Reach } from "../../domain/reach.ts";
+import type { SiteOffer } from "../../domain/site-data.ts";
+import { placeLine } from "./place-format.ts";
 
 export function PlaceList({
   places,

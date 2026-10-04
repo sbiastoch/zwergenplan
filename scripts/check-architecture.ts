@@ -3,6 +3,7 @@
  * Prüfung stumm kaputt (z. B. Parser-Inkompatibilität) – das ist dann selbst ein Fehler.
  */
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const MIN_MODULES = 15;
 const DIRS = ["src", "scripts", "e2e", ".claude/hooks"];
@@ -45,4 +46,20 @@ if (violations.length > 0) {
   console.error("Regeln und Begründungen: .dependency-cruiser.cjs, docs/architecture.md");
   process.exit(1);
 }
+/**
+ * Lazy-Lader der Karte (Plan 0005): Ihr Ziel darf nur per import() kommen. dependency-cruiser fasst einen
+ * zusätzlichen statischen Import mit dem dynamischen zu einer Kante zusammen und sähe ihn nicht.
+ */
+const LAZY_LOADERS: Array<[file: string, target: string]> = [
+  ["src/ui/MapPanel.tsx", "./karte/"],
+  ["src/ui/karte/MapScreen.tsx", "../map/"],
+];
+for (const [file, target] of LAZY_LOADERS) {
+  const staticImport = new RegExp(`^\\s*(import|export)\\b[^;(]*?from\\s*["']${target.replaceAll(".", "\\.")}`, "m");
+  if (staticImport.test(readFileSync(file, "utf8"))) {
+    console.error(`✗ lazy-loader-static: ${file} importiert ${target} statisch (nur import() ist erlaubt)`);
+    process.exit(1);
+  }
+}
+
 console.log(`✓ Architektur: ${totalCruised} Module, keine Verstöße`);

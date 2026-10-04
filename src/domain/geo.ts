@@ -17,6 +17,11 @@ export function inBounds({ lat, lon }: GeoPoint): boolean {
   return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
 }
 
+/** Schlüssel einer Koordinate: Ort der Karte (Plan 0005) und Cache der Entfernung (Plan 0004). */
+export function geoKey({ lat, lon }: GeoPoint): string {
+  return `${lat},${lon}`;
+}
+
 /** mittlerer Erdradius (IUGG) */
 const EARTH_RADIUS_M = 6_371_008.8;
 const rad = (deg: number) => (deg * Math.PI) / 180;

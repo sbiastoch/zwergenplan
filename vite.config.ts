@@ -12,6 +12,13 @@ const E2E = process.env["ZWERGENPLAN_DATA"] === "fixture";
  */
 const KARTE = "assets/karte/[name]-[hash]";
 
+/**
+ * Lazy-Chunks der Karte: Karten-Oberfläche (src/ui/karte/, ohne MapLibre) und Karte (src/ui/map/ samt
+ * maplibre-gl). Ein Chunk mit einem dieser Module ist nie Teil des Starts (`karte-ui-only-lazy`,
+ * `map-only-lazy`); landet doch etwas Gemeinsames im Startordner, zeigt das Startbudget es an.
+ */
+const isMapModule = (id: string) => /\/src\/ui\/(karte|map)\/|\/node_modules\/.*maplibre-gl\//.test(id);
+
 export default defineConfig({
   base: BASE,
   plugins: [react(), tailwindcss()],
@@ -30,11 +37,16 @@ export default defineConfig({
     outDir: E2E ? "dist-e2e" : "dist",
     // Der Karten-Chunk (MapLibre, ca. 1 MB roh) ist absichtlich groß und lazy; das Gate sind die Budgets in .size-limit.json.
     chunkSizeWarningLimit: 1100,
+    // Ziel es2023: Ohne natives modulepreload lädt ein Browser die Chunks nur nicht vorab. Spart ca. 0,25 kB Start-JS (Plan 0005).
+    modulePreload: { polyfill: false },
     rolldownOptions: {
       output: {
-        chunkFileNames: (chunk) => (chunk.name === "MapView" ? `${KARTE}.js` : "assets/[name]-[hash].js"),
+        chunkFileNames: (chunk) =>
+          !chunk.isEntry && chunk.moduleIds.some(isMapModule) ? `${KARTE}.js` : "assets/[name]-[hash].js",
         assetFileNames: (asset) =>
-          asset.names.some((n) => n.startsWith("MapView")) ? `${KARTE}[extname]` : "assets/[name]-[hash][extname]",
+          asset.names.some((n) => /^Map(View|Screen)\b/.test(n))
+            ? `${KARTE}[extname]`
+            : "assets/[name]-[hash][extname]",
       },
     },
   },

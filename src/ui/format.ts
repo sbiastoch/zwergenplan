@@ -238,13 +238,3 @@ export function reachLimitLabel(limit: ReachLimit): string {
 export function mapStatusParts(offers: number, places: number): [number, string, number, string] {
   return [offers, offers === 1 ? " Angebot an " : " Angebote an ", places, places === 1 ? " Ort" : " Orten"];
 }
-
-/** Zeile der Orts-Liste: „Gostenhof · 3 Angebote · 1,4 km“ (ohne Stadtteil die Adresse). */
-export function placeLine(
-  place: { district?: string; address: string; offers: readonly unknown[] },
-  reach: Reach | undefined,
-): string {
-  const parts = [place.district ?? place.address, plural(place.offers.length, "Angebot", "Angebote")];
-  if (reach) parts.push(distanceShort(reach));
-  return parts.join(" · ");
-}

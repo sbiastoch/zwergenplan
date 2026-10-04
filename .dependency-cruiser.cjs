@@ -65,6 +65,30 @@ module.exports = {
       to: { path: "^src/ui/map/", dependencyTypesNot: ["dynamic-import"] },
     },
     {
+      name: "karte-ui-only-lazy",
+      severity: "error",
+      comment:
+        "Die Karten-Oberfläche src/ui/karte/ (Orts-Liste, Orts-Sheet, Zustände) ist ein eigener Lazy-Chunk: von außen nur per import(), auch Typen nicht statisch – sonst wächst das Startbundle. Props-Typen: src/ui/map-types.ts (Plan 0005, E3).",
+      from: { path: "^src/", pathNot: "^src/ui/karte/" },
+      to: { path: "^src/ui/karte/", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
+      name: "karte-ui-entry-only",
+      severity: "error",
+      comment:
+        "Nur der Lader src/ui/MapPanel.tsx greift auf src/ui/karte/ zu (Plan 0005). Grund: dependency-cruiser fasst statischen und dynamischen Import desselben Moduls zu einer Kante zusammen; den Lader selbst prüft scripts/check-architecture.ts.",
+      from: { path: "^src/", pathNot: ["^src/ui/karte/", "^src/ui/MapPanel\\.tsx$"] },
+      to: { path: "^src/ui/karte/" },
+    },
+    {
+      name: "map-entry-only",
+      severity: "error",
+      comment:
+        "Nur der Lader src/ui/karte/MapScreen.tsx greift auf src/ui/map/ zu (Plan 0005), aus demselben Grund wie karte-ui-entry-only.",
+      from: { path: "^src/", pathNot: ["^src/ui/map/", "^src/ui/karte/MapScreen\\.tsx$"] },
+      to: { path: "^src/ui/map/" },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",
