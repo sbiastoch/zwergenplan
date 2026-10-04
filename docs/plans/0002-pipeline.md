@@ -1,6 +1,6 @@
 # Plan 0002 – Recherche-Pipeline in TypeScript und erster echter Datenstand
 
-Status: freigegeben nach Review 2 (mit Änderungen, eingearbeitet) → Umsetzung
+Status: umgesetzt
 Datum: 2026-10-04
 
 ## Ziel

@@ -1,6 +1,6 @@
 # Plan 0001 – Repo-Fundament „Zwergenplan“
 
-Status: Entwurf → Review → Umsetzung
+Status: umgesetzt
 Datum: 2026-10-04
 
 ## Ziel

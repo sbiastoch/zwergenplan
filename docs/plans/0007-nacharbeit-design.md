@@ -1,6 +1,6 @@
 # Plan 0007 – Nacharbeit zum Browser-Review von Plan 0003
 
-Status: freigegeben nach zwei Reviews (Änderungen eingearbeitet) → Umsetzung
+Status: Pakete A und B umgesetzt und zusammengeführt (Schritt 5, siehe „Umsetzung“); Paket C offen
 Datum: 2026-10-04
 Bezug: Plan 0003, Abschnitt „Browser-Review live (2026-10-04)“, Befunde B1–B8 und H1–H8. Dieser Plan ist die Voraussetzung, die Plan 0004 in „Ausgangslage und Voraussetzungen“ nennt. Plan 0006 (eigene Domain) ist schon auf `main` (`e6ea878`).
 
@@ -239,6 +239,8 @@ Die Seitenzoom-Variante (Chrome Android „Seitenzoom“, also ein 206-px-Viewpo
 
 Alle Korrekturen sind CSS, bis auf das `tab-label`-Span in `Chrome.tsx`. Weitere Stellen findet das Gate (E10). Was es meldet, wird nach demselben Muster behoben, nicht ausgenommen.
 
+> **Umgesetzt mit Abweichungen** (siehe „Umsetzung“): `.two` ohne `nowrap`, Sheet-Fuß als Flex-Zeile mit `flex: 1 1 auto`, zusätzlich `.wrap .chip` schrumpfbar, Kachel-Pille per Container-Query `card`, Wochen-Navigation per Container-Query, Knopffarbe `var(--ink)`.
+
 ### E9 – B3: Kalendertage bei 320 px ≥ 44 px
 
 Eine Media-Query in px ist hier richtig, denn es geht um Pixel, nicht um Text. Bei 200 % greift für die Woche ohnehin `auto-fit` (E8). Beide Raster werden unter 360 px breiter, gerechnet für 320 px (Inhalt der Spalte 288 px, `.body` hat 16 px Rand):
@@ -290,6 +292,8 @@ Neu in `e2e/mobile-ux.ts`, exportiert und in `expectMobileUx` aufgerufen, gilt a
    - Geprüft werden Bedienelemente (`button`, `a[href]` mit `display` ≠ `inline`, `[role=button]`), die *nicht* in einer Überschrift liegen. Der Kachel-Titel ist ein Knopf in einem `h3` und darf als Titel umbrechen.
    - Die Beschriftung (`textContent`, getrimmt) muss höchstens **32 Zeichen** lang sein. Längere Beschriftungen kommen aus den Daten („Website von Ev. Kirchengemeinde St. Markus – …“) und dürfen umbrechen.
    - Jeder Textknoten im Element muss auf einer Zeile liegen (alle Rects mit demselben `top`, Toleranz 2 px). Ein Tag-Knopf mit „Mo“ und „5“ in zwei Spans ist also erlaubt, „Alle gemerkten in den / Kalender“ nicht.
+
+> **Umgesetzt mit präzisierten Regeln** (siehe „Umsetzung“): `/` ist keine Trennstelle in Prüfung 1, Toleranz > 1 px in Prüfung 4, „versteckt“ nur bei ≤ 1 px **und** Abschneiden, Prüfung 5 je Elternelement.
 
 Ohne Fehlalarme heißt hier: Die Toleranzen sind oben festgelegt. Die Ausnahmen (`hyphens: auto`, `sr-only`, Scroll-Container, positionierte Vorfahren) sind im Code mit Grund kommentiert. Eine Ausnahme per Selektor oder per `data-`Attribut gibt es nicht. Meldet das Gate etwas, wird das Layout korrigiert.
 
@@ -365,6 +369,8 @@ Ablauf in `smoke.spec.ts` (Projekt `smoke-echte-daten`, seriell, echte Daten), n
   - `.sheetfoot { position: sticky; bottom: 0; margin-inline: -16px; padding: 12px 16px calc(18px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 2px solid var(--edge2) }`. Der Fuß trägt den Abstand zum unteren Rand und zur Home-Leiste also selbst.
   - Damit stehen „N Angebote zeigen“ und „Fertig“ immer sichtbar unten, auch wenn das Sheet scrollt. Ein negatives `bottom` hätte je nach Browser unterschiedlich mit dem Innenabstand des Scroll-Containers gerechnet.
   - Auf dem iPhone (Home-Leiste, `env(safe-area-inset-bottom)`) prüft das der Browser-Review (Schritt 8).
+
+> **Umgesetzt ohne `sticky`** (siehe „Umsetzung“): Das Sheet ist eine Flex-Spalte, `.sheet-scroll` scrollt, der Fuß steht als Geschwister darunter.
 
 ### E14 – H1: Querformat, Tab-Leiste als Seitenleiste
 
@@ -486,6 +492,8 @@ A und B arbeiten parallel in getrennten Worktrees, **keine Datei gehört beiden*
 | H6 Ort doppelt | umsetzen | A | Eine Funktion in `toSiteData` korrigiert Detail und ICS; die Daten selbst bereinigt ein späterer Pipeline-Lauf (`docs/ideas.md`). |
 | H7 Filter-Fuß | umsetzen | B | `position: sticky`, wenige Zeilen. |
 | H8 Kurs „noch X von N“ | umsetzen | A | `courseProgress` gibt es schon, gleiche Formulierung wie die Kachel. |
+
+Abweichungen in der Umsetzung stehen im Abschnitt „Umsetzung“ am Ende.
 
 Neue Einträge in `docs/ideas.md` (Paket A schreibt sie):
 - **Kompakter Kopfbereich im Querformat**: Sticker und Chips nehmen quer ≈ 150 px Höhe ein. Mit der Seitenleiste (E14) ist das tragbar, ein kompakterer Kopf wäre ein eigenes Designthema (H1).
@@ -627,7 +635,7 @@ Keine Schwelle wird gesenkt, kein Gate gelockert. Neu, und rot, wenn der jeweili
 | Helle Inseln im Dunkelmodus (H4, Nachtrag 5) | `expectNoBrightIslands` in allen Dunkel-Gates, über System-Dunkel und `data-theme="dark"`; Toast-Test mit angehaltener Uhr; `.hint.ok`-Erwartung im Kind-Sheet |
 | H6 Ort doppelt | `site-data.test.ts` inkl. ICS-`LOCATION` |
 
-- Budgets bleiben (JS 90 kB, CSS 15 kB). Erwartet sind CSS +≈ 0,5–1 kB in B (Container-Queries, Tokens) und +< 1 kB in C (Faces), JS +< 0,5 kB in A. Gemessen wird in den Schritten 5 und 9, das Ergebnis kommt hier hinein.
+- Budgets bleiben (JS 90 kB, CSS 15 kB). Erwartet sind CSS +≈ 0,5–1 kB in B (Container-Queries, Tokens) und +< 1 kB in C (Faces), JS +< 0,5 kB in A. Gemessen wird in den Schritten 5 und 9, das Ergebnis steht in „Umsetzung“.
 - `@fontsource-variable/roboto` ist eine devDependency, sie wird nur von `e2e/vitals.ts` und `scripts/font-fallback.ts` per `createRequire(import.meta.url).resolve(…)` gelesen. Sie landet nie in `dist/`: `src/` importiert sie nicht, und die Route liefert sie nur im Test aus. Erkennt knip die Nutzung nicht, kommt sie mit Kommentar-Begründung in `ignoreDependencies` (ADR 0004 verlangt eine Begründung im Code und im Commit).
 - `docs/architecture.md`, Mobile-UX-Gates, bekommt vier Zeilen: das Text-Gate (E10), das Gate gegen helle Inseln im Dunkelmodus (E15) und die Layoutregel für große Schrift (E7) von Paket B, den Swap-Test je Fallback (E12) von Paket C.
 
@@ -773,4 +781,46 @@ Der zweite Review lief auf `82d0e68`. Die Abweichung zu Blocker 1 aus Review 1 (
 14. **Das einspaltige `.seg3`** bekommt in der Container-Query `border-radius: 22px` (E8).
 15. **H6 abgeschwächt:** Ohne `SEQUENCE` und mit gleichem `DTSTAMP` übernehmen viele Kalender den korrigierten Ort beim erneuten Import nicht. Der Browser-Review prüft das (E4, Risiken, Schritt 8).
 16. **Paket C und `--font-display`:** Die Zuordnung der Überschriften steht als eine `:where(…)`-Regel in `tokens.css`, damit C Bs Komponenten-Dateien nicht anfassen muss. Falls doch einzelne `font-family`-Zeilen nötig sind, sind die Dateien in Cs Liste benannt. B und C ändern sie nacheinander, mit klar zugeordneten Teilen (E11, E16).
+
+## Umsetzung (Schritt 5, 2026-10-04)
+
+Pakete A (`nacharbeit-0007-a`) und B (`nacharbeit-0007-b`) sind in `nacharbeit-0007` zusammengeführt. Paket C (B6) ist offen. Die Einzelheiten stehen in den Commit-Messages, hier die Abweichungen vom Plan mit je einem Satz Begründung.
+
+**Abweichungen Paket B**
+- **H7 ohne `sticky` (E13):** Das Sheet ist eine Flex-Spalte, `.sheet-scroll` scrollt, und `.sheetfoot` steht als Geschwister darunter; ein klebender Fuß verdeckte gescrollte Chips, und axe meldete sie als zu kleine Ziele (`target-size`, Filter-Sheet bei 320 px/200 %). Dafür bekam `Sheets.tsx` die Hülle `.sheet-scroll`, der Inhalt ist unverändert.
+- **Container `sheet` auf `.sheet-scroll` statt `.sheet-body` (E8):** Der scrollende Teil hat die Breite, an der das Darstellungs-Segment umschaltet; `.sheet-body` ist jetzt nur noch die Flex-Spalte.
+- **`.sheetfoot`-Knöpfe `flex: 1 1 auto`, `.sheetfoot.single` entfällt (E8):** Mit der Basis 7 rem wäre „8 Angebote zeigen“ bei 320 px zweizeilig; jetzt stehen beide Knöpfe einzeilig nebeneinander (ab ≈ 390 px) oder untereinander.
+- **`.two` ohne `nowrap` (E8):** Sonst ragt „Alle 5 Termine“ bei 200 % heraus; mit `flex-wrap` und Basis = Textbreite stehen die Knöpfe einzeilig nebeneinander oder untereinander.
+- **Prüfung 1 ohne `/` als Trennstelle (E10):** Chromium und WebKit brechen nicht am Schrägstrich, „Gostenhof/Himpfelshof“ ist ein langes Wort, und echte Daten meldeten sonst „Himpfelshof“ fälschlich.
+- **Prüfung 4 mit Toleranz > 1 px (E10):** `offset*` ist ganzzahlig gerundet; mit 0,5 px meldeten `.tabs` und `.mgrid` schon bei 100 % Rundungsfehler.
+- **„Versteckt“ nur bei ≤ 1 px *und* Abschneiden (E10):** Die 0 px hohe `aria-live`-Hülle des Toasts hätte den sichtbaren festen Toast sonst aus allen Prüfungen genommen.
+- **Prüfung 5 je Elternelement (E10):** React teilt „Nur {Tag}“ in zwei Textknoten; Knoten mit demselben Elternteil müssen zusammen einzeilig sein.
+- **Zusätzliche Ansicht `kalender-woche` (Tests):** Bei offenem Monat blendet Paket A die Woche aus (E5), B3 misst aber beide Raster.
+- **`.card` als Container, `@container card (width < 12rem)` blendet `.pill .mini` aus (E8):** Neben dem Herz fehlt bei 200 % der Platz für Form plus „Spielgruppen“; bei 100 % sind Kacheln ≥ 283 px, die Regel greift dort nie.
+- **Wochen-Navigation (`.cal-nav`) als Container (E8, gefunden in Schritt 5):** Unter 14 rem steht der Titel über den Pfeilen, sonst brach „Dezember“ bei 320 px/200 % mitten im Wort; der B8-Test prüft das jetzt bei 320 px/200 %.
+- **Knopffarbe `var(--ink)` statt `inherit` (`base.css`), `.card` mit eigener Textfarbe:** WebKit behielt bei hellem System und gewählter dunkler Darstellung für geerbte Farben bis zur nächsten Stil-Neuberechnung Schwarz (axe: 40–47 Kontrastfehler, schon auf dem alten Stand nachgestellt).
+- **Kopfzeile stärker gestrafft als in E6:** Logo 34 → 30 px, Kopf-`gap` 8 → 6, `.brand`-`gap` 8 → 6, Kind-Chip rechts 14 → `max(10px, 0.5em)` und `gap` 6 → 4, Gesicht 30 → 26 px, Marke `5.4vw + 0.1rem` statt `5.6vw` und Laufweite −0,05 em; die Schwelle bleibt 21,75 rem (380 px).
+- **layout.spec hält die Webfont zurück statt `abort()`:** Ein Abbruch ist ein Konsolenfehler und macht jeden Test rot; der Schriftzustand wird über `FontFace.status` geprüft, weil WebKits `fonts.check()` bei ladender Schrift `true` meldet.
+
+**Abweichung Paket A:** Der Leerzustand „Weiter reicht der Plan noch nicht“ nutzt das Symbol `search`; ein Kalender-Symbol hätte `EmptyState` in `ListView.tsx` geändert, das keinem Paket zugeordnet war.
+
+**Messwerte Kopfzeile (B5)**, natürliche Breiten mit sichtbarem Theme-Knopf:
+
+| | vorher: einzeilig ab | nachher: Reserve bei 380 px |
+|---|---|---|
+| Chromium, Webfont, „23 Mon.“ | ≈ 400 px | 14 px |
+| Chromium, Fallback, „23 Mon.“ | ≈ 392 px | 18 px |
+| WebKit, Webfont, „23 Mon.“ | ≈ 372 px | 35 px |
+| WebKit, Fallback, „23 Mon.“ | ≈ 412 px | 22 px |
+| alle, „Alter?“ | 350–388 px | ≥ 31 px |
+
+Abgeleitet: c ≈ 6,0 statt 5,5, K(„23 Mon.“) = 63 px. Die Kopfzeile ist überall 64 px hoch.
+
+**Budgets** (gzip, `pnpm size`, kombinierter Stand): JS 82,67 / 90 kB (Paket A allein 82,66 kB, vorher 81,82 kB), CSS 9,40 / 15 kB (Paket B allein 9,36 kB, vorher 8,5 kB), Daten 80,1 / 250 kB.
+
+**Ergebnis Schritt 5:** `pnpm check` grün, auch E2E in allen sechs Projekten lokal (WebKit mit `libavif16`).
+- Unit-Tests: 268 grün, Coverage 98,4 % der Anweisungen.
+- E2E: 451 Tests, 404 bestanden, 47 gewollt übersprungen, 0 rot. Je Projekt 89 Tests: android-klein 74 bestanden / 15 übersprungen, pixel-7 87 / 2, iphone-15 86 / 3, pixel-7-quer 75 / 14, desktop 76 / 13; smoke-echte-daten 6 / 0.
+- As bis dahin ungetestete Specs (`calendar.spec.ts`, `detail.spec.ts`) waren beim ersten Lauf grün, auch fünffach wiederholt in allen fünf Fixture-Projekten (575/575).
+- In den Screenshots gefunden und behoben: „Dezember“ in der Wochen-Navigation bei 320 px/200 % (siehe oben).
 

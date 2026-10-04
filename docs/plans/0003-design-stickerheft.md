@@ -1,6 +1,6 @@
 # Plan 0003 – Design „Stickerheft mit Knete-Kacheln“: Liste, Kalender, Merkliste, Detail
 
-Status: freigegeben nach Review (mit Änderungen, eingearbeitet) → Umsetzung
+Status: umgesetzt; Nacharbeit in Plan 0007
 Datum: 2026-10-04
 
 ## Ziel
@@ -96,7 +96,7 @@ Detail, Filter-Sheet und Kind-Sheet sind `<dialog>` mit `showModal()`. Das bring
 - `prefers-reduced-motion: reduce` schaltet Animationen und Transitionen ab (bestehende Regel, ergänzt um `animation-iteration-count: 1`, sonst flackert `wiggle`).
 - Die Karten-Animation `stick` beginnt mit `opacity: 0`. Damit sie LCP nicht verzögert, bekommen Karten des **ersten** Renderings nach dem Laden keine Animation. Nur später eingefügte Karten (Filterwechsel, „Weitere“) kleben sich ein. Der Zustand „animieren“ wird beim Mounten der Karte festgehalten, ein Re-Render startet die Animation nicht neu.
 
-> **Geändert durch Plan 0007** (E11, E12, Befund B6): Roboto (Android) bekommt ein eigenes Fallback-Face, die Gewichts-Buckets werden nach Messung (`scripts/font-fallback.ts`) gesetzt, und ein Swap-Test hält die Webfont zurück (`e2e/vitals.ts`).
+> **Wird geändert durch Plan 0007, Paket C (offen)** (E11, E12, Befund B6): Geplant sind ein eigenes Fallback-Face für Roboto (Android), Gewichts-Buckets nach Messung (`scripts/font-fallback.ts`) und ein Swap-Test, der die Webfont zurückhält (`e2e/vitals.ts`). Schon umgesetzt (Paket B) ist nur das Kachel-Layout aus E11.
 
 ### E7 – Liste „Entdecken“: jedes Angebot einmal, am nächsten Termin
 
