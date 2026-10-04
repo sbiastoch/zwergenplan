@@ -10,13 +10,23 @@ import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar } from "./Chrome.tsx";
 import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
-import { ageChipLabel, plural, standDate } from "./format.ts";
+import { ageChipLabel, distanceNote, plural, reachLimitLabel, standDate } from "./format.ts";
+import { KidSheet } from "./KidSheet.tsx";
 import { ListView } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { SavedView } from "./SavedView.tsx";
-import { FilterSheet, KidSheet } from "./Sheets.tsx";
+import { FilterSheet } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
-import { useAgeOnly, useBirthDate, useNow, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
+import {
+  useAgeOnly,
+  useBirthDate,
+  useNow,
+  useOrigin,
+  useRoute,
+  useSaved,
+  useTheme,
+  useToast,
+} from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 
 type LoadState = { kind: "loading" } | { kind: "error"; message: string } | { kind: "ready"; data: SiteData };
@@ -35,8 +45,12 @@ export function App() {
   // erneuert sich im offenen Tab, höchstens einmal pro Minute (Plan 0007, E2)
   const now = useNow();
   const today = berlinIsoDate(now);
+  // Startpunkt der Entfernung: Standort nur im Speicher, gespeichert höchstens die Stadtteil-ID (Plan 0004, E3)
+  const originApi = useOrigin();
+  const { origin } = originApi;
 
-  const [sheet, setSheet] = useState<"filter" | "kid" | null>(null);
+  // „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl)
+  const [sheet, setSheet] = useState<"filter" | "kid" | "origin" | null>(null);
   const [detailDay, setDetailDay] = useState<string>();
   const [animate, setAnimate] = useState(false);
 
@@ -56,7 +70,7 @@ export function App() {
   }, [load.kind]);
 
   const offers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
-  const views = useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now });
+  const views = useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now, origin });
   const { visible, hiddenCount, showUnfit, page, calendar, saved, detailOffer } = views;
 
   // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler): Parameter entfernen.
@@ -91,6 +105,7 @@ export function App() {
     animate,
     isSaved: (id) => savedIds.includes(id),
     isUnfit: (id) => views.unfitIds.has(id),
+    reachOf: views.reachOf,
     onToggleSave,
     onOpen: (offer, day) => {
       setDetailDay(day);
@@ -112,8 +127,7 @@ export function App() {
       {route.tab !== "merkliste" && (
         <QuickFilters
           filter={route.filter}
-          // Plan 0004: bis useOrigin verdrahtet ist, gibt es keinen Startpunkt.
-          hasOrigin={false}
+          hasOrigin={origin !== undefined}
           onChange={setFilter}
           onOpenSheet={() => setSheet("filter")}
         />
@@ -145,7 +159,17 @@ export function App() {
               <span>
                 <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
               </span>
+              {origin && <span>· {distanceNote(origin)}</span>}
             </p>
+            {route.filter.reachLimit && !origin && (
+              // Geteilter Link mit ?umkreis= ohne Startpunkt: Der Filter wirkt nicht (Plan 0004, E7).
+              <p className="status">
+                „{reachLimitLabel(route.filter.reachLimit)}“ braucht einen Startpunkt.
+                <button type="button" className="linkbtn" onClick={() => setSheet("origin")}>
+                  Startpunkt wählen
+                </button>
+              </p>
+            )}
             {hiddenCount > 0 && (
               <p className="status">
                 {plural(hiddenCount, "passt", "passen")} nicht zu {ageLabel}
@@ -212,6 +236,8 @@ export function App() {
             now={now}
             day={detailDay}
             birthDate={birthDate}
+            origin={origin}
+            reach={views.reachOf(detailOffer)}
             saved={savedIds.includes(detailOffer.id)}
             onToggleSave={onToggleSave}
             onClose={closeDetail}
@@ -224,11 +250,13 @@ export function App() {
           filter={route.filter}
           onChange={setFilter}
           resultCount={visible.length}
+          hasOrigin={origin !== undefined}
+          onPickOrigin={() => setSheet("origin")}
           onClose={() => setSheet(null)}
         />
       </Dialog>
       <Dialog
-        open={sheet === "kid"}
+        open={sheet === "kid" || sheet === "origin"}
         onClose={() => setSheet(null)}
         label="Kind und Einstellungen"
         className="sheet"
@@ -242,6 +270,8 @@ export function App() {
           theme={theme.choice}
           onTheme={theme.setChoice}
           today={today}
+          origin={originApi}
+          focusOrigin={sheet === "origin"}
           onClose={() => setSheet(null)}
         />
       </Dialog>

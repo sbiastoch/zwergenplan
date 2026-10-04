@@ -2,6 +2,7 @@ import { createElement, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EMPTY_FILTER } from "../domain/filter.ts";
+import type { Origin } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { fromBerlinLocal } from "../domain/time.ts";
@@ -138,6 +139,50 @@ describe("useOfferViews", () => {
     }
     renderToStaticMarkup(createElement(Probe));
     expect(result?.calendar.day).toBe("2026-10-06");
+  });
+
+  describe("Entfernung (Plan 0004, E6/E7)", () => {
+    // Gostenhof; „nah“ liegt beim Theater (226 m), „fern“ bei der Gemeinde (3 008 m)
+    const origin: Origin = { source: "stadtteil", point: { lat: 49.448, lon: 11.058 }, label: "Gostenhof" };
+    const at = (o: SiteOffer, lat: number, lon: number): SiteOffer => ({
+      ...o,
+      venue: { ...o.venue, geo: { lat, lon } },
+    });
+    const nah = at(offer("nah", "2026-10-10"), 49.4495, 11.0601);
+    const nahZwei = at(offer("nah-zwei", "2026-10-11"), 49.4495, 11.0601);
+    const fern = at(offer("fern", "2026-10-12"), 49.4301, 11.0892);
+    const within2km: Route = { tab: "entdecken", filter: { ...EMPTY_FILTER, reachLimit: { kind: "km", value: 2 } } };
+
+    it("kennt ohne Startpunkt keine Entfernung", () => {
+      expect(render({ offers: [nah] }).reachOf(nah)).toBeUndefined();
+    });
+
+    it("rechnet je Koordinate einmal", () => {
+      const v = render({ offers: [nah, nahZwei, fern], origin });
+      const reach = v.reachOf(nah);
+      expect(reach?.kind).toBe("luftlinie");
+      expect(Math.round(reach?.meters ?? 0)).toBe(226);
+      // gleicher Ort, gleiches (zwischengespeichertes) Ergebnis
+      expect(v.reachOf(nahZwei)).toBe(reach);
+      expect(Math.round(v.reachOf(fern)?.meters ?? 0)).toBe(3008);
+    });
+
+    it("wendet den Umkreis nur mit Startpunkt an, auch im Kalender", () => {
+      expect(ids(render({ offers: [nah, fern], route: within2km }).visible)).toEqual(["nah", "fern"]);
+      expect(ids(render({ offers: [nah, fern], route: within2km, origin }).visible)).toEqual(["nah"]);
+      const kalender = render({ offers: [nah, fern], route: { ...within2km, tab: "kalender" }, origin });
+      expect([...kalender.calendar.index.keys()]).toEqual(["2026-10-10"]);
+      expect(kalender.calendar.lastDay).toBe("2026-10-10");
+      // Der Datenhorizont bleibt ungefiltert
+      expect(kalender.calendar.dataEnd).toBe("2026-10-12");
+    });
+
+    it("zählt heute beendete Termine nur im Umkreis (B2)", () => {
+      const heuteFern = at(offer("heute-fern", "2026-10-05"), 49.4301, 11.0892);
+      const route: Route = { ...within2km, tab: "kalender" };
+      expect(render({ offers: [nah, heuteFern], route }).calendar.endedToday).toBe(1);
+      expect(render({ offers: [nah, heuteFern], route, origin }).calendar.endedToday).toBe(0);
+    });
   });
 
   it("liefert Merkliste und offenes Angebot aus den Daten", () => {
