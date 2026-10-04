@@ -1,6 +1,6 @@
 # Plan 0006 – Umzug auf zwergenplan.app
 
-Status: freigegeben nach Review (mit Änderungen, eingearbeitet) → Umsetzung
+Status: umgesetzt, live seit 2026-10-04 (e6ea878)
 Datum: 2026-10-04
 
 (Plan 0004 Entfernung, Plan 0005 Karte, ADR 0008 Karte.)
@@ -66,3 +66,19 @@ Ergebnis: Freigabe mit Änderungen, kein Blocker. Eingearbeitet:
 - W4 Porkbun-Wildcard und CAA: Wildcard `*` → `pixie.porkbun.com` existiert und wird gelöscht. Es gibt keinen CAA-Record.
 - W5 `robots.txt` + `noindex`: keine `robots.txt`, Begründung in ADR 0009.
 - H1 keine User-Site `sbiastoch.github.io` vorhanden, Fallback nimmt Query mit. H2 im ADR. H4 Formulierung in Schritt 5. H5 Verifizierung ist Schritt 6.
+
+## Ergebnis (2026-10-04)
+
+- **DNS** über die Porkbun-API gesetzt: Parking-`ALIAS` und Wildcard `*` gelöscht, 4 × `A`, 4 × `AAAA`, `www` `CNAME`. Sichtbar über 1.1.1.1, 8.8.8.8 und den Porkbun-Nameserver. Es gibt keinen CAA-Record.
+- **Pages**: `cname: zwergenplan.app`. Zertifikat `approved` für `zwergenplan.app` und `www.zwergenplan.app`, `https_enforced: true`.
+- **CI auf `main`** grün inklusive Deploy. Die Plausibilität lief schon gegen die neue Domain („deployt: 333“).
+- **Umleitungen**: `http://zwergenplan.app/` und `https://www.zwergenplan.app/` → 301 `https://zwergenplan.app/`. `https://sbiastoch.github.io/zwergenplan/…` → 301 `http://zwergenplan.app/…` ohne Präfix und mit Query, danach 301 auf HTTPS (zwei Sprünge, das macht GitHub so; Browser nehmen wegen HSTS-Preload direkt HTTPS). Der Stub `public/zwergenplan/index.html` ist nicht nötig.
+- **Browser-Review live** (`node scripts/screenshots.ts https://zwergenplan.app/`, 48 Screens, plus Playwright-Probe auf Pixel 7):
+  - Daten (333 Angebote), Schrift, Icons und ICS (`/ics/…`, `text/calendar`) laden. Zurück und Neuladen funktionieren. Alle Requests gehen nur an `zwergenplan.app`, es gibt keine Konsolenfehler und keine fehlgeschlagenen Requests.
+  - Lesbarkeit, Daumen-Erreichbarkeit, Zustände, Dark Mode, Micro-Interactions und Konsistenz: Der Umzug ändert nichts.
+  - Schon vorher vorhandene Befunde gehen an die Session für Plan 0007 (Layout/CSS):
+    - Querformat: Die Tab-Bar verdeckt viel Inhalt (`*-quer-*`).
+    - 320 px: Die aktive Pille „Automatisch“ wirkt beschnitten (`kind-320-*`), Buttons brechen zweizeilig (`detail-320-*`, `merkliste-320-*`).
+    - Dark Mode: helle Inseln bei Toast, ausgewähltem Kalendertag und Altersbox.
+    - Detail-Kachel „Wann“ ohne Uhrzeit bei regelmäßigen Angeboten.
+- **Offen beim Nutzer**: Domain im GitHub-Konto verifizieren (Schritt 6, nur im Web-UI).
