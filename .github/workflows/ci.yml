@@ -1,0 +1,91 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Statische Gates & Unit-Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: check:fast (Typen, Lint, Architektur, Daten, Unit)
+        run: pnpm check:fast
+      - name: Tote Pfade (knip)
+        run: pnpm knip
+      - name: Schema-Drift
+        run: pnpm schema:check
+      - name: Coverage (src/domain)
+        run: pnpm test:coverage
+      - name: Plausibilität gegen deployten Stand
+        if: github.ref == 'refs/heads/main'
+        run: pnpm data:validate --against-deployed
+
+  e2e:
+    name: Build, E2E & Budgets
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Playwright-Browser
+        run: pnpm exec playwright install --with-deps chromium webkit
+      - name: E2E (Fixture-Build + Smoke gegen Deploy-Build)
+        run: pnpm e2e
+        env:
+          CI: "true"
+      - name: Bundle-Budgets
+        run: pnpm size
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+      - name: Pages-Artefakt
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy (GitHub Pages)
+    needs: e2e
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

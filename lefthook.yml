@@ -1,0 +1,5 @@
+# Git-Hooks: gelten für Menschen, Agenten und den Pipeline-Commit gleichermaßen.
+pre-commit:
+  commands:
+    check-fast:
+      run: pnpm -s check:fast

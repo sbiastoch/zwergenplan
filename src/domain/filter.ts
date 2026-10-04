@@ -1,0 +1,90 @@
+import { offerFitsAge } from "./age.ts";
+import type { Cost, Format, Offer, Registration } from "./schema.ts";
+import { CATEGORIES, type Category, categoriesOf } from "./topics.ts";
+
+export const FORMATS = ["kurs", "regelmaessig", "einmalig"] as const satisfies readonly Format[];
+const REGISTRATIONS = ["mit-anmeldung", "ohne-anmeldung"] as const satisfies readonly Registration[];
+const COSTS = ["kostenlos", "kostenpflichtig"] as const satisfies readonly Cost[];
+
+/**
+ * Filterzustand. Innerhalb einer Dimension ODER, zwischen Dimensionen UND.
+ * Eine leere Liste heißt „egal“. Das Geburtsdatum ist bewusst NICHT Teil der URL
+ * (Links werden geteilt – das Geburtsdatum des Kindes gehört nicht hinein).
+ */
+export interface FilterState {
+  categories: Category[];
+  formats: Format[];
+  registration: Registration[];
+  cost: Cost[];
+}
+
+export const EMPTY_FILTER: FilterState = { categories: [], formats: [], registration: [], cost: [] };
+
+const PARAMS = {
+  categories: { key: "kat", values: CATEGORIES },
+  formats: { key: "format", values: FORMATS },
+  registration: { key: "anmeldung", values: REGISTRATIONS },
+  cost: { key: "kosten", values: COSTS },
+} as const;
+
+function parseList<T extends string>(raw: string | null, allowed: readonly T[]): T[] {
+  if (!raw) return [];
+  const wanted = new Set(raw.split(","));
+  // Reihenfolge kanonisch nach `allowed`, Unbekanntes wird verworfen.
+  return allowed.filter((v) => wanted.has(v));
+}
+
+export function filterFromSearch(search: string): FilterState {
+  const p = new URLSearchParams(search);
+  return {
+    categories: parseList(p.get(PARAMS.categories.key), PARAMS.categories.values),
+    formats: parseList(p.get(PARAMS.formats.key), PARAMS.formats.values),
+    registration: parseList(p.get(PARAMS.registration.key), PARAMS.registration.values),
+    cost: parseList(p.get(PARAMS.cost.key), PARAMS.cost.values),
+  };
+}
+
+/** Kanonischer Querystring ohne führendes „?“; leer, wenn kein Filter aktiv ist. */
+export function filterToSearch(state: FilterState): string {
+  const p = new URLSearchParams();
+  for (const dim of ["categories", "formats", "registration", "cost"] as const) {
+    const { key, values } = PARAMS[dim];
+    const selected = new Set<string>(state[dim]);
+    const list = values.filter((v) => selected.has(v));
+    if (list.length > 0) p.set(key, list.join(","));
+  }
+  return p.toString().replaceAll("%2C", ",");
+}
+
+function matches<T>(selected: readonly T[], value: T): boolean {
+  return selected.length === 0 || selected.includes(value);
+}
+
+export interface FilterContext {
+  /** „Jetzt“ – injiziert, damit Tests und E2E deterministisch sind. */
+  now: Date;
+  birthDate?: string | undefined;
+}
+
+/** Angebote, deren letzter Termin vorbei ist, fallen immer heraus. */
+export function applyFilters(offers: readonly Offer[], state: FilterState, ctx: FilterContext): Offer[] {
+  const nowMs = ctx.now.getTime();
+  return offers.filter((o) => {
+    const last = o.sessions.at(-1);
+    if (!last || Date.parse(last.end) < nowMs) return false;
+    if (!matches(state.formats, o.format)) return false;
+    if (!matches(state.registration, o.registration)) return false;
+    if (!matches(state.cost, o.cost)) return false;
+    if (state.categories.length > 0) {
+      const cats = categoriesOf(o.topics);
+      if (!cats.some((c) => state.categories.includes(c))) return false;
+    }
+    if (ctx.birthDate && !offerFitsAge(o, ctx.birthDate)) return false;
+    return true;
+  });
+}
+
+/** Nächster noch nicht beendeter Termin. */
+export function nextSession(offer: Offer, now: Date): Offer["sessions"][number] | undefined {
+  return offer.sessions.find((s) => Date.parse(s.end) >= now.getTime());
+}

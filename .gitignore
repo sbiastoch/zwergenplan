@@ -1,0 +1,17 @@
+node_modules/
+dist/
+dist-e2e/
+coverage/
+# generiert von scripts/build-data.ts
+public/data/
+public/ics/
+# Playwright
+test-results/
+playwright-report/
+e2e/.artifacts/
+# Hook-Zustand (lokal)
+.claude/state/
+.claude/settings.local.json
+# Skill-Läufe / Altlasten
+runs/
+__pycache__/

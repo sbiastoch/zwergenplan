@@ -1,0 +1,173 @@
+{
+  "generatedAt": "2026-10-05T06:00:00+02:00",
+  "horizon": { "from": "2026-10-05", "to": "2027-02-05" },
+  "offers": [
+    {
+      "id": "familientreff-beispiel--pekip-herbst--familientreff-beispiel-haus",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)",
+      "summary": "Spiel- und Bewegungsanregungen für Babys im ersten Lebensjahr in einer festen Kleingruppe; Eltern tauschen sich aus.",
+      "topics": ["pekip"],
+      "format": "kurs",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "price": "120 € (8 Termine)",
+      "age": { "minMonths": 1, "maxMonths": 5 },
+      "sessions": [
+        { "start": "2026-10-13T09:30:00+02:00", "end": "2026-10-13T11:00:00+02:00" },
+        { "start": "2026-10-20T09:30:00+02:00", "end": "2026-10-20T11:00:00+02:00" },
+        { "start": "2026-10-27T09:30:00+01:00", "end": "2026-10-27T11:00:00+01:00" },
+        { "start": "2026-11-03T09:30:00+01:00", "end": "2026-11-03T11:00:00+01:00" },
+        { "start": "2026-11-10T09:30:00+01:00", "end": "2026-11-10T11:00:00+01:00" },
+        { "start": "2026-11-17T09:30:00+01:00", "end": "2026-11-17T11:00:00+01:00" },
+        { "start": "2026-11-24T09:30:00+01:00", "end": "2026-11-24T11:00:00+01:00" },
+        { "start": "2026-12-01T09:30:00+01:00", "end": "2026-12-01T11:00:00+01:00" }
+      ],
+      "registrationWindow": { "deadline": "2026-10-09T23:59:00+02:00" },
+      "availability": { "status": "wenige", "note": "2 Plätze frei", "checkedAt": "2026-10-05T05:40:00+02:00" },
+      "url": "https://example.org/familientreff/pekip-herbst",
+      "sourceUrl": "https://example.org/familientreff/programm"
+    },
+    {
+      "id": "familientreff-beispiel--krabbeltreff--familientreff-beispiel-haus",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "Offener Krabbeltreff",
+      "summary": "Jeden Mittwoch einfach vorbeikommen: Krabbeln, Spielen und Kaffee für die Großen.",
+      "topics": ["krabbelgruppe", "elterncafe"],
+      "format": "regelmaessig",
+      "registration": "ohne-anmeldung",
+      "cost": "kostenlos",
+      "age": { "minMonths": 6, "maxMonths": 24 },
+      "sessions": [
+        { "start": "2026-10-07T10:00:00+02:00", "end": "2026-10-07T11:30:00+02:00" },
+        { "start": "2026-10-14T10:00:00+02:00", "end": "2026-10-14T11:30:00+02:00" },
+        { "start": "2026-10-21T10:00:00+02:00", "end": "2026-10-21T11:30:00+02:00" },
+        { "start": "2026-10-28T10:00:00+01:00", "end": "2026-10-28T11:30:00+01:00" },
+        { "start": "2026-11-04T10:00:00+01:00", "end": "2026-11-04T11:30:00+01:00" }
+      ],
+      "availability": { "status": "ohne-anmeldung", "checkedAt": "2026-10-05T05:40:00+02:00" },
+      "url": "https://example.org/familientreff/krabbeltreff",
+      "sourceUrl": "https://example.org/familientreff/programm"
+    },
+    {
+      "id": "familientreff-beispiel--babymassage-workshop--familientreff-beispiel-haus",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "Babymassage – Schnupper-Workshop",
+      "summary": "Einmaliger Workshop mit Grundgriffen der Babymassage; bitte Handtuch mitbringen.",
+      "topics": ["babymassage"],
+      "format": "einmalig",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "price": "15 €",
+      "age": { "minMonths": 0, "maxMonths": 6 },
+      "sessions": [{ "start": "2026-10-17T10:00:00+02:00", "end": "2026-10-17T11:30:00+02:00" }],
+      "availability": {
+        "status": "ausgebucht",
+        "note": "Warteliste per Mail",
+        "checkedAt": "2026-10-05T05:40:00+02:00"
+      },
+      "url": "https://example.org/familientreff/babymassage",
+      "sourceUrl": "https://example.org/familientreff/programm"
+    },
+    {
+      "id": "musikschule-beispiel--musikgarten-1--musikschule-beispiel-sued",
+      "providerId": "musikschule-beispiel",
+      "venueId": "musikschule-beispiel-sued",
+      "title": "Musikgarten 1 (1–2 Jahre)",
+      "summary": "Singen, Klatschen und erste Instrumente für Kleinkinder mit einer Begleitperson.",
+      "topics": ["musik", "singen"],
+      "format": "kurs",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "price": "96 € (6 Termine)",
+      "age": { "minMonths": 12, "maxMonths": 24 },
+      "sessions": [
+        { "start": "2026-11-05T16:00:00+01:00", "end": "2026-11-05T16:45:00+01:00" },
+        { "start": "2026-11-12T16:00:00+01:00", "end": "2026-11-12T16:45:00+01:00" },
+        { "start": "2026-11-19T16:00:00+01:00", "end": "2026-11-19T16:45:00+01:00" },
+        { "start": "2026-11-26T16:00:00+01:00", "end": "2026-11-26T16:45:00+01:00" },
+        { "start": "2026-12-03T16:00:00+01:00", "end": "2026-12-03T16:45:00+01:00" },
+        { "start": "2026-12-10T16:00:00+01:00", "end": "2026-12-10T16:45:00+01:00" }
+      ],
+      "registrationWindow": { "opens": "2026-10-15T08:00:00+02:00", "deadline": "2026-10-31T23:59:00+01:00" },
+      "availability": {
+        "status": "unbekannt",
+        "note": "Anmeldung ab 15.10. online",
+        "checkedAt": "2026-10-05T05:41:00+02:00"
+      },
+      "url": "https://example.org/musikschule/musikgarten-1",
+      "sourceUrl": "https://example.org/musikschule/kurse"
+    },
+    {
+      "id": "stadtbibliothek-beispiel--krabbelreime--stadtbibliothek-beispiel-zentrum",
+      "providerId": "stadtbibliothek-beispiel",
+      "venueId": "stadtbibliothek-beispiel-zentrum",
+      "title": "Krabbelreime & Fingerspiele",
+      "summary": "Kurze Reime, Lieder und Bilderbücher für die Allerkleinsten in der Kinderbibliothek.",
+      "topics": ["vorlesen", "singen"],
+      "format": "regelmaessig",
+      "registration": "ohne-anmeldung",
+      "cost": "kostenlos",
+      "age": { "minMonths": 0, "maxMonths": 36 },
+      "sessions": [
+        { "start": "2026-10-09T10:30:00+02:00", "end": "2026-10-09T11:00:00+02:00" },
+        { "start": "2026-10-23T10:30:00+02:00", "end": "2026-10-23T11:00:00+02:00" },
+        { "start": "2026-11-06T10:30:00+01:00", "end": "2026-11-06T11:00:00+01:00" },
+        { "start": "2026-11-20T10:30:00+01:00", "end": "2026-11-20T11:00:00+01:00" }
+      ],
+      "availability": { "status": "ohne-anmeldung", "checkedAt": "2026-10-05T05:42:00+02:00" },
+      "url": "https://example.org/bibliothek/krabbelreime",
+      "sourceUrl": "https://example.org/bibliothek/termine"
+    },
+    {
+      "id": "theater-beispiel--kuckuck-im-nest--theater-beispiel-buehne",
+      "providerId": "theater-beispiel",
+      "venueId": "theater-beispiel-buehne",
+      "title": "„Kuckuck im Nest“ – Theater ab 18 Monaten",
+      "summary": "Musikalisches Mitmachtheater mit Licht, Klang und Stoff; 35 Minuten, Kinder sitzen auf Kissen.",
+      "topics": ["theater"],
+      "format": "einmalig",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "price": "8 € / Kind, Erw. 10 €",
+      "age": { "minMonths": 18, "maxMonths": 36 },
+      "sessions": [{ "start": "2026-11-15T11:00:00+01:00", "end": "2026-11-15T11:35:00+01:00" }],
+      "availability": { "status": "frei", "checkedAt": "2026-10-05T05:43:00+02:00" },
+      "url": "https://example.org/theater/kuckuck",
+      "sourceUrl": "https://example.org/theater/spielplan"
+    },
+    {
+      "id": "theater-beispiel--babykonzert-advent--theater-beispiel-buehne",
+      "providerId": "theater-beispiel",
+      "venueId": "theater-beispiel-buehne",
+      "title": "Babykonzert im Advent",
+      "summary": "Kammermusik zum Liegen und Krabbeln; Decken liegen bereit, Kinderwagenparkplatz vorhanden.",
+      "topics": ["konzert", "musik"],
+      "format": "einmalig",
+      "registration": "ohne-anmeldung",
+      "cost": "kostenlos",
+      "sessions": [{ "start": "2026-12-06T10:00:00+01:00", "end": "2026-12-06T10:45:00+01:00" }],
+      "availability": { "status": "ohne-anmeldung", "checkedAt": "2026-10-05T05:43:00+02:00" },
+      "url": "https://example.org/theater/babykonzert",
+      "sourceUrl": "https://example.org/theater/spielplan"
+    },
+    {
+      "id": "familientreff-beispiel--vergangen--familientreff-beispiel-haus",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "Elterncafé am Montag",
+      "summary": "Endet in der Fixture-Woche – testet das Ausblenden vergangener Angebote.",
+      "topics": ["elterncafe"],
+      "format": "einmalig",
+      "registration": "ohne-anmeldung",
+      "cost": "kostenlos",
+      "sessions": [{ "start": "2026-10-05T09:00:00+02:00", "end": "2026-10-05T10:00:00+02:00" }],
+      "availability": { "status": "ohne-anmeldung", "checkedAt": "2026-10-05T05:40:00+02:00" },
+      "url": "https://example.org/familientreff/elterncafe",
+      "sourceUrl": "https://example.org/familientreff/programm"
+    }
+  ]
+}

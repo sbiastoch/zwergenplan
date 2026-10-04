@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Platzhalter-Tokens – das echte (verspielte) Design kommt aus der Mockup-Session. */
+@theme {
+  --color-bg: #fffaf3;
+  --color-surface: #ffffff;
+  --color-ink: #2b2118;
+  --color-muted: #6b5d50;
+  --color-accent: #b4451f;
+  --color-accent-ink: #ffffff;
+  --color-line: #ead9c6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1b1612;
+    --color-surface: #261f19;
+    --color-ink: #f6ece2;
+    --color-muted: #c9b8a6;
+    --color-accent: #ff9a6b;
+    --color-accent-ink: #1b1612;
+    --color-line: #3d3229;
+  }
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* Eingabefelder immer: bei input[type=date] greift :focus-visible in Chromium nicht (Shadow-DOM). */
+:focus-visible,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore-start lint/complexity/noImportantStyles: reduced-motion muss alles übersteuern */
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    /* biome-ignore-end lint/complexity/noImportantStyles: - */
+  }
+}

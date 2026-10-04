@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["scripts/*.ts", ".claude/hooks/*.ts", "e2e/**/*.spec.ts", "src/**/*.test.ts"],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts", "e2e/**/*.ts", ".claude/hooks/**/*.ts", "*.ts"],
+  "ignoreDependencies": ["tailwindcss", "@swc/core"]
+}
