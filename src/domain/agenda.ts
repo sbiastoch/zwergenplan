@@ -105,6 +105,49 @@ export function sessionsByDay<T extends Offer>(offers: readonly T[]): Map<string
   return index;
 }
 
+/** Agenda eines Kalendertags (Plan 0007, E2): was noch kommt, und warum der Tag sonst leer ist. */
+export interface DayAgenda<T extends Offer> {
+  /** nicht beendete Termine des Tages, nach Beginn */
+  items: Occurrence<T>[];
+  /** wie viele passende Termine dieses Tages schon beendet sind (nur heute > 0) */
+  ended: number;
+  /** Tag liegt nach dem letzten Termin des gesamten Datenstands */
+  afterData: boolean;
+}
+
+/**
+ * Agenda des Berliner Tages `day` aus dem Index von `sessionsByDay`. Beendete Termine fallen weg
+ * (gleiche Regel wie überall: ein Termin zählt, bis er beendet ist).
+ * `endedToday` zählt der Aufrufer mit `endedOnDay` über alle filterpassenden Angebote – auch
+ * solche ohne kommenden Termin, die gar nicht im Index stehen. `dataEnd` ist der letzte Tag des
+ * ungefilterten Datenstands.
+ */
+export function dayAgenda<T extends Offer>(
+  index: ReadonlyMap<string, Occurrence<T>[]>,
+  day: string,
+  now: Date,
+  context: { dataEnd: string | undefined; endedToday: number },
+): DayAgenda<T> {
+  const isNotEnded = notEnded(now);
+  return {
+    items: (index.get(day) ?? []).filter((o) => isNotEnded(o.session)),
+    ended: day === berlinIsoDate(now) ? context.endedToday : 0,
+    afterData: context.dataEnd !== undefined && day > context.dataEnd,
+  };
+}
+
+/** Termine, die am Berliner Tag `day` beginnen und vor `now` beendet sind. */
+export function endedOnDay(offers: readonly Offer[], day: string, now: Date): number {
+  const isNotEnded = notEnded(now);
+  let count = 0;
+  for (const offer of offers) {
+    for (const session of offer.sessions) {
+      if (!isNotEnded(session) && berlinIsoDate(session.start) === day) count += 1;
+    }
+  }
+  return count;
+}
+
 /** Die 7 Tage (Mo–So) der Woche, in der `day` liegt. */
 export function weekDays(day: string): string[] {
   const monday = addDays(day, 1 - isoWeekday(day));

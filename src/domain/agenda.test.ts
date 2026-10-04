@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   courseProgress,
+  dayAgenda,
+  endedOnDay,
   groupByNextSession,
   lastSessionDay,
   monthDays,
@@ -232,5 +234,81 @@ describe("referenceSession", () => {
     ]);
     expect(referenceSession(late, FIXTURE_NOW, "2026-10-12")?.start).toBe("2026-10-12T23:30:00+02:00");
     expect(referenceSession(late, FIXTURE_NOW, "2026-10-13")?.start).toBe("2026-10-13T00:30:00+02:00");
+  });
+});
+
+describe("endedOnDay", () => {
+  const treff = fixtureOffer("krabbeltreff"); // Mi 7.10. 10:00–11:30, dann wöchentlich
+
+  it("zählt nur Termine des Tages, die vor jetzt beendet sind", () => {
+    expect(endedOnDay([treff], "2026-10-07", new Date("2026-10-07T20:00:00+02:00"))).toBe(1);
+    expect(endedOnDay([treff], "2026-10-07", new Date("2026-10-07T11:00:00+02:00"))).toBe(0);
+    expect(endedOnDay([treff], "2026-10-14", new Date("2026-10-07T20:00:00+02:00"))).toBe(0);
+  });
+
+  it("zählt einen Termin, der genau jetzt endet, noch nicht (er läuft noch)", () => {
+    expect(endedOnDay([treff], "2026-10-07", new Date("2026-10-07T11:30:00+02:00"))).toBe(0);
+    expect(endedOnDay([treff], "2026-10-07", new Date("2026-10-07T11:30:00.001+02:00"))).toBe(1);
+  });
+
+  it("findet Einzeltermine, die heute schon vorbei sind (Fixtures: Elterncafé am Mo 5.10.)", () => {
+    expect(endedOnDay(file.offers, "2026-10-05", FIXTURE_NOW)).toBe(1);
+  });
+
+  it("ordnet einen Termin um 00:30 Berlin dem Berliner Tag zu (Test läuft in LA)", () => {
+    const night = withSessions("Nachts", [s("2026-10-08T00:30:00+02:00", "2026-10-08T01:00:00+02:00")]);
+    const now = new Date("2026-10-08T09:00:00+02:00");
+    expect(endedOnDay([night], "2026-10-08", now)).toBe(1);
+    expect(endedOnDay([night], "2026-10-07", now)).toBe(0);
+  });
+});
+
+describe("dayAgenda", () => {
+  const treff = fixtureOffer("krabbeltreff");
+  const index = sessionsByDay([treff]);
+  const at = (iso: string) => new Date(iso);
+  const context = (endedToday = 0, dataEnd: string | undefined = "2026-11-04") => ({ dataEnd, endedToday });
+  const noDataEnd = { dataEnd: undefined, endedToday: 0 };
+
+  it("lässt abends beendete Termine von heute weg und zählt sie", () => {
+    const now = at("2026-10-07T20:00:00+02:00");
+    const agenda = dayAgenda(index, "2026-10-07", now, context(endedOnDay([treff], "2026-10-07", now)));
+    expect(agenda).toEqual({ items: [], ended: 1, afterData: false });
+  });
+
+  it("behält einen laufenden Termin", () => {
+    const agenda = dayAgenda(index, "2026-10-07", at("2026-10-07T11:00:00+02:00"), context());
+    expect(agenda.items.map((o) => o.session.start)).toEqual(["2026-10-07T10:00:00+02:00"]);
+    expect(agenda.ended).toBe(0);
+  });
+
+  it("behält einen Termin, der genau jetzt endet", () => {
+    expect(dayAgenda(index, "2026-10-07", at("2026-10-07T11:30:00+02:00"), context()).items).toHaveLength(1);
+  });
+
+  it("nennt Beendetes nur für heute, nie für künftige Tage", () => {
+    const now = at("2026-10-07T20:00:00+02:00");
+    expect(dayAgenda(index, "2026-10-07", now, context(3)).ended).toBe(3);
+    const future = dayAgenda(index, "2026-10-14", now, context(3));
+    expect(future.ended).toBe(0);
+    expect(future.items).toHaveLength(1);
+  });
+
+  it("erkennt Tage nach dem letzten Termin des Datenstands", () => {
+    const now = at("2026-10-07T12:00:00+02:00");
+    expect(dayAgenda(index, "2026-11-05", now, context(0, "2026-11-04")).afterData).toBe(true);
+    expect(dayAgenda(index, "2026-11-04", now, context(0, "2026-11-04")).afterData).toBe(false);
+    expect(dayAgenda(index, "2026-11-05", now, noDataEnd).afterData).toBe(false);
+    expect(dayAgenda(new Map(), "2026-11-05", now, context(0, "2026-11-04")).items).toEqual([]);
+  });
+
+  it("ordnet einen Termin um 00:30 Berlin dem Berliner Tag zu (Test läuft in LA)", () => {
+    const night = withSessions("Nachts", [s("2026-10-08T00:30:00+02:00", "2026-10-08T01:00:00+02:00")]);
+    const nightIndex = sessionsByDay([night]);
+    // 7.10. 20:00 Berlin = 7.10. 11:00 in LA; „heute“ ist trotzdem der Berliner 7.10.
+    const now = at("2026-10-07T20:00:00+02:00");
+    expect(dayAgenda(nightIndex, "2026-10-08", now, context(5)).items).toHaveLength(1);
+    expect(dayAgenda(nightIndex, "2026-10-08", now, context(5)).ended).toBe(0);
+    expect(dayAgenda(nightIndex, "2026-10-07", now, context(5))).toEqual({ items: [], ended: 5, afterData: false });
   });
 });

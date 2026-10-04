@@ -153,3 +153,13 @@ export function toBerlinIso(date: Date): string {
   const offset = Math.round((Date.parse(`${local}Z`) - ms) / 60_000);
   return `${local}${offsetString(offset)}`;
 }
+
+const MINUTE_MS = 60_000;
+
+/**
+ * Liegen zwei Zeitpunkte in derselben Minute? Verglichen wird der Zeitpunkt, nicht die Ortszeit:
+ * Berliner Offsets sind ganze Stunden, die Minutengrenze ist also überall dieselbe (Plan 0007, E2).
+ */
+export function sameMinute(a: Date, b: Date): boolean {
+  return Math.floor(a.getTime() / MINUTE_MS) === Math.floor(b.getTime() / MINUTE_MS);
+}

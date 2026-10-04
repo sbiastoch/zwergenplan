@@ -7,6 +7,7 @@ import {
   fromBerlinLocal,
   isoWeekday,
   parseGermanDate,
+  sameMinute,
   toBerlinIso,
 } from "./time.ts";
 
@@ -101,5 +102,28 @@ describe("parseGermanDate", () => {
 describe("formatGermanDate", () => {
   it("schreibt TT.MM.JJJJ", () => {
     expect(formatGermanDate("2025-11-02")).toBe("02.11.2025");
+  });
+});
+
+describe("sameMinute", () => {
+  const at = (iso: string) => new Date(iso);
+
+  it("ist wahr innerhalb derselben Minute", () => {
+    expect(sameMinute(at("2026-10-07T11:30:10+02:00"), at("2026-10-07T11:30:50+02:00"))).toBe(true);
+    expect(sameMinute(at("2026-10-07T11:30:00.000+02:00"), at("2026-10-07T11:30:59.999+02:00"))).toBe(true);
+  });
+
+  it("ist falsch bei Minuten-, Stunden- und Tageswechsel", () => {
+    expect(sameMinute(at("2026-10-07T11:30:59+02:00"), at("2026-10-07T11:31:00+02:00"))).toBe(false);
+    expect(sameMinute(at("2026-10-07T11:59:50+02:00"), at("2026-10-07T12:00:10+02:00"))).toBe(false);
+    expect(sameMinute(at("2026-10-07T23:59:40+02:00"), at("2026-10-08T00:00:10+02:00"))).toBe(false);
+  });
+
+  it("vergleicht Zeitpunkte, nicht die Ortszeit – auch über die Zeitumstellung", () => {
+    // 2:30 Uhr gibt es am 25.10. zweimal (erst +02:00, dann +01:00): eine Stunde Abstand.
+    expect(sameMinute(at("2026-10-25T02:30:00+02:00"), at("2026-10-25T02:30:00+01:00"))).toBe(false);
+    // derselbe Zeitpunkt in zwei Schreibweisen
+    expect(sameMinute(at("2026-10-25T02:59:30+02:00"), at("2026-10-25T00:59:45Z"))).toBe(true);
+    expect(sameMinute(at("2026-10-25T02:59:30+02:00"), at("2026-10-25T02:00:30+01:00"))).toBe(false);
   });
 });
