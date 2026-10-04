@@ -17,6 +17,13 @@ describe("reachTo", () => {
     expect(reach).toEqual({ kind: "luftlinie", meters: haversineMeters(gostenhof.point, theater.geo) });
     expect(Math.round(reach.meters)).toBe(226);
   });
+
+  it("rechnet für jede Herkunft gleich, auch für die Kartenmitte (Plan 0005, E8)", () => {
+    const kartenmitte: Origin = { source: "karte", point: gostenhof.point, label: "Kartenmitte" };
+    const standort: Origin = { source: "standort", point: gostenhof.point, label: "Standort" };
+    expect(reachTo(kartenmitte, theater)).toEqual(reachTo(gostenhof, theater));
+    expect(reachTo(standort, theater)).toEqual(reachTo(gostenhof, theater));
+  });
 });
 
 describe("compareReach", () => {
