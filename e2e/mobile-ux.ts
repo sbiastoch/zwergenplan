@@ -11,8 +11,22 @@ const MIN_TOUCH = 44;
 const MIN_INLINE = 24;
 
 export async function expectNoHorizontalScroll(page: Page) {
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(overflow, "kein horizontales Scrollen").toBeLessThanOrEqual(0);
+  const result = await page.evaluate(() => {
+    const overflow = document.documentElement.scrollWidth - window.innerWidth;
+    // Verursacher benennen, damit der Fehler ohne Debugging behebbar ist.
+    const culprits = [...document.querySelectorAll<HTMLElement>("body *")]
+      .filter((el) => el.getBoundingClientRect().right > window.innerWidth + 0.5)
+      .map(
+        (el) =>
+          `${el.tagName.toLowerCase()}${el.className ? `.${String(el.className).split(" ")[0]}` : ""} (rechts ${Math.round(el.getBoundingClientRect().right)} > ${window.innerWidth})`,
+      )
+      .slice(0, 5);
+    return { overflow, culprits };
+  });
+  expect(
+    result.overflow,
+    `kein horizontales Scrollen – Verursacher: ${result.culprits.join(", ")}`,
+  ).toBeLessThanOrEqual(0);
 }
 
 async function expectTouchTargets(page: Page) {

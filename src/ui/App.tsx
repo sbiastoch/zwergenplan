@@ -88,7 +88,7 @@ export function App() {
               setBirthDate(value);
               saveBirthDate(value);
             }}
-            className="min-h-11 rounded-lg border border-(--color-line) bg-(--color-surface) px-3 text-base"
+            className="min-h-11 w-full min-w-0 max-w-full rounded-lg border border-(--color-line) bg-(--color-surface) px-3 text-base"
           />
           <span className="text-(--color-muted) text-sm">Bleibt nur auf diesem Gerät.</span>
         </label>
@@ -118,7 +118,7 @@ function OfferCard({ offer, now }: { offer: SiteOffer; now: Date }) {
     offer.format === "einmalig" ? "In den Kalender" : `Alle ${offer.sessions.length} Termine in den Kalender`;
   return (
     <li className="rounded-2xl border border-(--color-line) bg-(--color-surface) p-4" data-testid="offer">
-      <h2 className="font-semibold text-lg">{offer.title}</h2>
+      <h2 className="break-words font-semibold text-lg">{offer.title}</h2>
       <p className="text-(--color-muted)">
         {offer.providerName} · {offer.venue.district ?? offer.venue.name}
       </p>
