@@ -1,7 +1,13 @@
 /** Mobile-UX-Gates für jede Ansicht und jedes Overlay, hell und dunkel (Plan 0003, docs/architecture.md). */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
-import { expectAccessible, expectMobileUx, expectNoHorizontalScroll, expectVisibleFocus } from "./mobile-ux.ts";
+import {
+  expectAccessible,
+  expectMobileUx,
+  expectNoHorizontalScroll,
+  expectReducedMotion,
+  expectVisibleFocus,
+} from "./mobile-ux.ts";
 
 async function ready(page: Page) {
   await page.goto("./");
@@ -43,6 +49,8 @@ for (const [name, go] of Object.entries(VIEWS)) {
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
       await ready(page);
       await go(page);
+      // vor expectMobileUx: dessen settle() wartet Animationen ab, die hier gar nicht erst laufen dürfen
+      await expectReducedMotion(page);
       await expectMobileUx(page);
     });
   }

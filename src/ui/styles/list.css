@@ -1,0 +1,83 @@
+/* Liste: Inhaltsrahmen, Statuszeile, Tagesüberschriften, Datenstand (ListView.tsx). */
+
+@layer components {
+  /* Inhalt */
+  .body {
+    padding: 0 16px 20px;
+  }
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 6px;
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin: 2px 0 0;
+  }
+  .status b {
+    color: var(--ink);
+  }
+  .linkbtn {
+    min-height: 44px;
+    border: 0;
+    background: none;
+    padding: 0 4px;
+    font-weight: 800;
+    color: var(--ink);
+    text-decoration: underline wavy;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 5px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .daylabel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 8px;
+    margin: 16px 0 10px;
+    font-weight: 800;
+    font-size: 1.4375rem;
+    letter-spacing: -0.04em;
+  }
+  .daylabel small {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+  .daylabel.is-today > span:first-child {
+    display: inline-block;
+    background-color: var(--tape);
+    background-image: repeating-linear-gradient(-45deg, var(--tape-stripe) 0 5px, transparent 5px 11px);
+    color: var(--on-tape);
+    padding: 0 14px;
+    transform: rotate(-2deg);
+    clip-path: polygon(
+      4% 0,
+      96% 0,
+      100% 20%,
+      96% 40%,
+      100% 60%,
+      96% 80%,
+      100% 100%,
+      4% 100%,
+      0 80%,
+      4% 60%,
+      0 40%,
+      4% 20%,
+      0 0
+    );
+  }
+  .more {
+    display: flex;
+    justify-content: center;
+    margin: 6px 0 0;
+  }
+  .stand {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin: 18px 0 0;
+  }
+}

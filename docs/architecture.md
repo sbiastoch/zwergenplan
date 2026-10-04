@@ -60,7 +60,7 @@ Jede Ansicht besteht in Playwright auf 360 px, Pixel 7, iPhone 15 (WebKit), quer
 - axe WCAG 2.2 AA ohne Verstöße, hell und dunkel
 - sichtbarer Fokus bei Tastaturbedienung
 - keine Konsolen- oder Seitenfehler (automatisch in jedem Test)
-- reduzierte Bewegung funktioniert
+- reduzierte Bewegung funktioniert: keine Animation oder Transition länger als 1 ms, Verzögerung eingerechnet (`expectReducedMotion`)
 - LCP < 2,5 s und CLS < 0,05 bei gedrosselter Mobile-CPU bzw. gedrosseltem Netz
 - Bundle-Budgets (`.size-limit.json`)
 

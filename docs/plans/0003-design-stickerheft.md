@@ -245,14 +245,18 @@ src/data/
   preferences.ts        Geburtsdatum, Merkliste, Darstellung, nur-passende (localStorage, try/catch)
 src/ui/
   App.tsx               Laden, URL-Zustand, Tabs, Overlays
-  Header.tsx  Stickers.tsx  QuickFilters.tsx  OfferCard.tsx
-  ListView.tsx  CalendarView.tsx  SavedView.tsx  DetailDialog.tsx
-  FilterSheet.tsx  KidSheet.tsx  TabBar.tsx  Toast.tsx  Sheet.tsx (Dialog-Hülle)
+  Chrome.tsx            Header, Stickers, QuickFilters, TabBar
+  OfferCard.tsx  ListView.tsx  CalendarView.tsx  SavedView.tsx  DetailDialog.tsx
+  Sheets.tsx            FilterSheet, KidSheet (Inhalte der Dialoge)
+  Dialog.tsx            Hülle um das native <dialog> (E3)
+  Toast.tsx
   icons.tsx             SVG-Icons (Mockup-Pfade)
   categories.ts         Kategorie → Kurzlabel, Form (SVG-Pfad)
   format.ts (+test)     Datums-/Zeit-/Fakten-Texte (Test läuft in America/Los_Angeles)
   use-app-state.ts      Hooks: URL-Route, Präferenzen, Toast
-  styles.css            Tokens, Komponenten-Klassen (E5)
+  styles.css            Einstieg: Tailwind und @imports, Reihenfolge = Kaskade (E5)
+  styles/               tokens (Fallback-Schriften, Farben, @theme, Kategorien), base, chrome, list, card,
+                        tabs, calendar, dialog (Hülle, Detail), sheet (Sheets, Toast), motion (reduzierte Bewegung, zuletzt)
 index.html              Theme-Inline-Skript, theme-color
 ```
 

@@ -1,0 +1,323 @@
+/* Kopf, Darstellungs-Umschalter, Kategorie-Sticker, Chips, Zähler-Badge (Chrome.tsx, Sheets.tsx). */
+
+@layer components {
+  /* Kopf */
+  .hdr {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 16px 6px;
+  }
+  .brand {
+    flex: 1 0 auto;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-weight: 800;
+    /* wird es eng (320 px, große Schrift), rutschen Kind-Chip und Theme-Knopf in eine zweite Zeile */
+    font-size: clamp(1.25rem, 5.6vw + 0.1rem, 1.6875rem);
+    letter-spacing: -0.04em;
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+  .mark {
+    flex: none;
+    transform: rotate(-8deg);
+    filter: drop-shadow(0 2px 3px var(--edge));
+    animation: peel 3s ease-in-out 1s 2;
+  }
+  .mark .base {
+    fill: #ffd93b;
+    stroke: var(--rim);
+    stroke-width: 3;
+  }
+  .mark .hat {
+    fill: #ff7070;
+  }
+  .mark .pom {
+    fill: #fff;
+  }
+  @keyframes peel {
+    0%,
+    100% {
+      transform: rotate(-8deg);
+    }
+    30% {
+      transform: rotate(8deg) scale(1.08);
+    }
+    60% {
+      transform: rotate(-14deg);
+    }
+  }
+  .iconbtn {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    box-shadow: 2px 2px 0 var(--shadow);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    box-sizing: border-box;
+    transition: transform 0.15s;
+  }
+  .iconbtn:disabled {
+    opacity: 0.35;
+    cursor: default;
+    box-shadow: none;
+  }
+  .kid {
+    min-height: 44px;
+    padding: 0 14px 0 5px;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    box-shadow: 2px 2px 0 var(--shadow);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transform: rotate(1.5deg);
+    transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+    white-space: nowrap;
+  }
+  .kid .face {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ffb13b;
+    color: var(--on-color);
+    display: grid;
+    place-items: center;
+  }
+
+  /* Segment-Umschalter (Darstellung) */
+  .seg {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr));
+    padding: 4px;
+    background: var(--soft);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+  }
+  .seg-thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc((100% - 8px) / var(--n, 2));
+    background: var(--surface);
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    box-sizing: border-box;
+    box-shadow: 2px 2px 0 var(--shadow);
+    transition: transform 0.34s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .seg-btn {
+    position: relative;
+    z-index: 1;
+    min-height: 44px;
+    border: 0;
+    background: none;
+    padding: 0 6px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .seg-btn[aria-pressed="true"] {
+    font-weight: 800;
+  }
+
+  /* Kategorie-Sticker */
+  .stickers {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    padding: 6px 10px 0;
+    scrollbar-width: none;
+  }
+  .stickers::-webkit-scrollbar {
+    display: none;
+  }
+  .stk {
+    flex: none;
+    width: 70px;
+    min-height: 82px;
+    border: 0;
+    background: none;
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    overflow-wrap: normal;
+  }
+  .stk .disc {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--k);
+    border: 4px solid var(--rim);
+    box-shadow:
+      0 0 0 2px var(--line),
+      3px 3px 0 2px var(--shadow);
+    display: grid;
+    place-items: center;
+    transform: rotate(-6deg);
+    transition:
+      transform 0.32s cubic-bezier(0.3, 1.6, 0.5, 1),
+      opacity 0.2s;
+  }
+  .stk:nth-child(even) .disc {
+    transform: rotate(7deg);
+  }
+  .stk:active .disc {
+    transform: scale(0.88);
+  }
+  .stk[aria-pressed="true"] .disc {
+    transform: translateY(-3px) rotate(10deg) scale(1.08);
+    box-shadow:
+      0 0 0 3px var(--ink),
+      4px 4px 0 3px var(--shadow);
+  }
+  .stickers.has-on .stk[aria-pressed="false"] .disc {
+    opacity: 0.4;
+  }
+  .stk .tick {
+    position: absolute;
+    right: -7px;
+    top: -7px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    display: grid;
+    place-items: center;
+    animation: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 6px 16px 10px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+  .chip {
+    flex: none;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    box-shadow: 2px 2px 0 var(--shadow);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: transform 0.15s;
+  }
+  .chip[aria-pressed="true"],
+  .chip.on {
+    background: var(--ink);
+    color: var(--bg);
+    animation: plop 0.38s cubic-bezier(0.3, 1.7, 0.5, 1);
+  }
+  .chip.cat[aria-pressed="true"] {
+    background: var(--k);
+    color: var(--on-color);
+  }
+  .chip.cat[aria-pressed="true"] .shape {
+    fill: var(--on-color);
+  }
+  .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .wrap .chip {
+    white-space: normal;
+    text-align: left;
+  }
+  .chip .mini {
+    width: 16px;
+    height: 16px;
+  }
+  @keyframes plop {
+    0% {
+      transform: scale(0.82);
+    }
+    60% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(0.4);
+    }
+    60% {
+      transform: scale(1.25);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .badge {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border-radius: 11px;
+    background: #ff7070;
+    color: var(--on-color);
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: inline-grid;
+    place-items: center;
+  }
+
+  /* Ergänzungen gegenüber dem Mockup (echte Seite statt fester 390×844-Rahmen) */
+  /* Sehr schmal: Der Theme-Knopf im Kopf entfällt, die Darstellung bleibt im Kind-Sheet erreichbar. */
+  @media (max-width: 359px) {
+    .hdr .iconbtn {
+      display: none;
+    }
+  }
+  .hdr .kid {
+    margin-left: auto;
+  }
+  .seg3 .seg-btn {
+    font-size: 0.875rem;
+    padding: 0 2px;
+    overflow-wrap: break-word;
+  }
+  .seg3 {
+    --n: 3;
+  }
+  .stk .disc svg {
+    width: 24px;
+    height: 24px;
+  }
+}

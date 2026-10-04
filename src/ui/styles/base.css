@@ -1,0 +1,131 @@
+/* Grundstil der Elemente und allgemeine Bausteine (Icons, Seitenrahmen, Knöpfe). */
+
+@layer base {
+  html {
+    background-color: var(--bg);
+    background-image: radial-gradient(var(--dotc) 1.3px, transparent 1.6px);
+    background-size: 18px 18px;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+    /* lange deutsche Komposita („Eltern-Kind-Turnen…“) dürfen bei großer Schrift umbrechen */
+    overflow-wrap: anywhere;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Eingabefelder immer: bei manchen Feldern greift :focus-visible nicht zuverlässig. */
+  :focus-visible,
+  input:focus,
+  select:focus {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .ic {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex: none;
+  }
+  .mini {
+    width: 11px;
+    height: 11px;
+    flex: none;
+  }
+  .monthbtn .ic {
+    transition: transform 0.3s;
+  }
+  .shape {
+    fill: var(--k);
+  }
+  .shape-ink {
+    fill: var(--on-color);
+  }
+
+  .app {
+    max-width: 40rem;
+    margin: 0 auto;
+    /* Platz für die feste Tab-Leiste */
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+  }
+
+  /* gemeinsames Eindrücken (Knete) */
+  .chip:active,
+  .btn:active,
+  .iconbtn:active,
+  .kid:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--shadow);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+
+  /* Seitentitel, Knöpfe, Kleintext */
+  .ptitle {
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: -0.05em;
+    margin: 6px 0;
+  }
+  .btn {
+    min-height: 52px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 0 16px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--ink);
+    transition: transform 0.15s;
+  }
+  .btn.primary {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+  .btn.wide {
+    width: 100%;
+  }
+  .small {
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin: 8px 0 14px;
+  }
+
+  /* Ergänzung gegenüber dem Mockup */
+  fieldset.plain {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+}
