@@ -19,3 +19,4 @@ Bei der Pflege nicht erneut aufnehmen, außer die Lage hat sich geändert.
 | SOS-Mehrgenerationenhaus Schweinau, Familientreffpunkt Burgkmairstr., Familientreff St. Johannis (Palmplatz), TREFF-FA | keine Termine online – bei Bedarf telefonisch |
 | Innenstadtgemeinden St. Sebald, St. Lorenz, St. Egidien, St. Jakob, Frauenkirche, St. Anton, Herz Jesu | keine Eltern-Kind-Gruppen |
 | PEKiP e.V. Gruppensuche | nur per Browser; mit claude-in-chrome bei Gelegenheit auswerten |
+| Evang. Fachstelle Alleinerziehende – eckstein-Treff | Kinder werden separat betreut (4. Stock), kein Eltern-Kind-Angebot (Lauf 2026-10-04) |

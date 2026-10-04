@@ -66,6 +66,7 @@ Ist ein Anbieter nicht prüfbar (Fehler, Login, Seite leer, nur Telefon), trägs
 
 Regeln:
 - **Ein Event je Angebot**: eine Kursreihe, eine regelmäßige Gruppe, ein Stück mit all seinen Vorstellungen. Die Pipeline zerlegt Einzeltermine selbst.
+- Ein Angebot gehört zum **tatsächlichen Veranstalter**. Bietet ein anderer Katalog-Anbieter es in fremden Räumen an (z. B. eine Hebamme in einem Familienzentrum), erfasst es nur das Paket dieses Anbieters.
 - `venueId` ist eine `id` aus `venues` des Anbieters. Nennt die Quelle einen anderen festen Treffpunkt, nimmst du den Hauptort und meldest den Treffpunkt als `drift` („neuer Ort: Name, Adresse“).
 - `title` macht das Angebot unterscheidbar, zum Beispiel durch Altersgruppe oder Wochentag, wenn ein Anbieter mehrere gleichnamige Gruppen hat. Höchstens 140 Zeichen.
 - `summary` sind **eigene Worte**: 1–2 Sätze, was passiert und was man wissen muss. Höchstens 320 Zeichen.

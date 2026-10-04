@@ -103,6 +103,18 @@ describe("validateRaw", () => {
     expect(r.warnings.at(-1)).toContain("schon vorbei");
   });
 
+  it("findet regelmäßige Angebote, deren Titel erst nach der Kürzung abweichen", () => {
+    const lang = "Eltern-Kind-Kurs Musikschule (Kulturwerkstatt Auf AEG, dienstags";
+    const r = validateRaw(
+      batch([
+        { ...treff, title: `${lang} 15:45 Uhr)` },
+        { ...treff, title: `${lang} 16:45 Uhr)` },
+      ]),
+      ctx,
+    );
+    expect(errors(r).join("\n")).toContain("erst nach 60 Zeichen");
+  });
+
   it("lehnt Nicht-Anbieter ab", () => {
     const withAggregator: RawContext = {
       ...ctx,

@@ -263,6 +263,17 @@ describe("buildOffers", () => {
     expect(merged.file?.offers[0]?.sessions).toHaveLength(2);
     expect(merged.file?.offers[0]?.topics).toEqual(["krabbelgruppe", "elterncafe"]);
 
+    const lang = "Eltern-Kind-Kurs Musikschule (Kulturwerkstatt Auf AEG, dienstags";
+    const gekuerzt = buildOffers(
+      base({
+        batches: [
+          batch("batch-1", [ev({ title: `${lang} 15:45 Uhr)` })]),
+          batch("batch-2", [ev({ title: `${lang} 16:45 Uhr)` })]),
+        ],
+      }),
+    );
+    expect(gekuerzt.report.errors[0]).toContain("erst nach der Kürzung");
+
     const conflict = buildOffers(
       base({ batches: [batch("batch-1", [mo, ev({ ...doZusatz, cost: "kostenpflichtig" })])] }),
     );
@@ -295,6 +306,34 @@ describe("buildOffers", () => {
       base({ batches: [batch("aggregatoren", [konzert("frankenkids"), konzert("stadt-vk")])] }),
     );
     expect(ohneAnbieter.file?.offers).toHaveLength(1);
+  });
+
+  it("meldet mögliche Dubletten über Anbietergrenzen (gleicher Ort, Beginn, ähnlicher Titel)", () => {
+    const shared = providers.map((p) =>
+      p.id === "musikschule-beispiel"
+        ? { ...p, venues: p.venues.map((v) => ({ ...v, geo: { lat: 49.4521, lon: 11.0767 } })) }
+        : p,
+    );
+    const zweimal = (providerId: string, venueId: string) =>
+      ev({
+        providerId,
+        venueId,
+        title: "Babymassage mit Hebamme",
+        format: "einmalig",
+        schedule: { kind: "dates", dates: [{ start: "2026-10-20T11:00" }] },
+      });
+    const { report } = buildOffers(
+      base({
+        providers: shared,
+        batches: [
+          batch("batch-1", [
+            zweimal("familientreff-beispiel", "familientreff-beispiel-haus"),
+            zweimal("musikschule-beispiel", "musikschule-beispiel-sued"),
+          ]),
+        ],
+      }),
+    );
+    expect(report.notes.join("\n")).toContain("Mögliche Dublette über Anbieter");
   });
 
   it("übernimmt Altangebote bei Fehlern, ausgefallenem Sammelkalender und ungeprüften Anbietern", () => {

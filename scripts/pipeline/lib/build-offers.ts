@@ -176,6 +176,26 @@ function fromRaw(
   return e.format === "einmalig" ? kept.map((s) => ({ ...base, sessions: [s] })) : [{ ...base, sessions: kept }];
 }
 
+/** Gleicher Ort (≤ 50 m), gleicher Beginn, ähnlicher Titel, aber verschiedene Anbieter – meist derselbe Kurs zweimal erfasst. */
+function crossProviderDuplicates(offers: readonly Offer[], providers: readonly Provider[]): string[] {
+  const geo = new Map(providers.flatMap((p) => p.venues.map((v) => [v.id, v.geo] as const)));
+  const near = (a: string, b: string) => {
+    const ga = geo.get(a);
+    const gb = geo.get(b);
+    return !!ga && !!gb && Math.hypot((ga.lat - gb.lat) * 110_540, (ga.lon - gb.lon) * 72_000) <= 50;
+  };
+  const out: string[] = [];
+  offers.forEach((a, i) => {
+    for (const b of offers.slice(i + 1)) {
+      if (a.providerId === b.providerId || !near(a.venueId, b.venueId) || !similarTitle(a.title, b.title)) continue;
+      const starts = new Set(a.sessions.map((s) => Date.parse(s.start)));
+      if (b.sessions.some((s) => starts.has(Date.parse(s.start))))
+        out.push(`Mögliche Dublette über Anbieter: ${a.id} und ${b.id} – nur beim tatsächlichen Veranstalter erfassen`);
+    }
+  });
+  return out;
+}
+
 export function buildOffers(input: BuildInput): { file?: OffersFile; report: BuildReport } {
   const report: BuildReport = {
     offers: 0,
@@ -248,6 +268,10 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
       } else if (offer.format !== "regelmaessig") {
         offer = { ...offer, sessions: unionSessions(offer.sessions, other.offer.sessions) };
         notes.push(`${other.label}: gleiche ID wie ${best.label} – Termine zusammengeführt`);
+      } else if (offer.title !== other.offer.title) {
+        report.errors.push(
+          `ID ${id}: „${offer.title}“ und „${other.offer.title}“ unterscheiden sich erst nach der Kürzung auf 60 Zeichen – Titel vorne unterscheidbar machen`,
+        );
       } else if (sameAttributes(offer, other.offer)) {
         offer = { ...offer, sessions: unionSessions(offer.sessions, other.offer.sessions) };
         notes.push(`${other.label}: Termine mit ${best.label} vereinigt`);
@@ -277,6 +301,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     return false;
   });
   const offers = kept.map((c) => withId(c.offer));
+  notes.push(...crossProviderDuplicates(offers, input.providers));
 
   // 5. Übernahme aus dem Altbestand (E8): Fehler, ausgefallener Sammelkalender, nicht geprüft
   const providerById = new Map(input.providers.map((p) => [p.id, p] as const));

@@ -4,6 +4,7 @@
  * data/offers.json. Exportiert nach schema/raw-batch.schema.json als Vorlage für die Agenten.
  */
 import { z } from "zod";
+import { slug } from "../../../src/domain/ids.ts";
 import { OfferFields, type Provider, ProviderAge } from "../../../src/domain/schema.ts";
 import { fromBerlinLocal } from "../../../src/domain/time.ts";
 import { LocalDateTime, SOURCES } from "./candidate.ts";
@@ -98,6 +99,19 @@ export function validateRaw(input: unknown, ctx: RawContext): RawValidation {
     if (!byId.has(id)) errors.push(`providers.${id}: unbekannter Anbieter`);
     if (check.status === "fehler" && !check.reason) errors.push(`providers.${id}: status fehler braucht einen reason`);
   }
+
+  // Regelmäßige Angebote: Die ID hängt nur am gekürzten Titel – verschiedene Titel dürfen nicht kollidieren (ADR 0006).
+  const regularIds = new Map<string, string>();
+  batch.events.forEach((e, i) => {
+    if (e.format !== "regelmaessig") return;
+    const key = `${e.providerId}--${slug(e.title)}--${e.venueId}`;
+    const other = regularIds.get(key);
+    if (other !== undefined && other !== e.title)
+      errors.push(
+        `${where(i, e)}: gleiche ID wie „${other}“ – die Titel unterscheiden sich erst nach 60 Zeichen. Titel vorne unterscheidbar machen`,
+      );
+    regularIds.set(key, e.title);
+  });
 
   batch.events.forEach((e, i) => {
     const w = where(i, e);
