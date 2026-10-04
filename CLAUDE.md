@@ -30,6 +30,6 @@ Die Hooks erzwingen einen Teil davon. Bei Rot meldet das Stop-Gate kein „ferti
 - TypeScript 7 (nativer Compiler): dependency-cruiser parst deshalb mit **swc**. `pnpm arch` meldet es, wenn der Parser stumm wird (zu wenige Module).
 - Zeiten haben immer einen Offset (`2026-10-25T10:00:00+01:00`). Kalenderlogik läuft in Europe/Berlin über `src/domain/time.ts`. Die Unit-Tests laufen absichtlich in `America/Los_Angeles`.
 - E2E nutzt Fixture-Daten (`tests/fixtures/`, fiktiv) mit eingefrorener Uhr (`e2e/fixtures.ts`). Der Deploy-Build (`dist/`) enthält nie Fixtures, der E2E-Build liegt in `dist-e2e/`.
-- **Datenübergang**: Solange `data/BOOTSTRAP` existiert, gibt es noch keine Angebote und die Seite ist leer. `data/providers.yaml` steht aber schon im Zod-Vertrag (ADR 0006) und wird von allen Gates geprüft. Der erste Pipeline-Lauf (Plan 0002) löscht `data/BOOTSTRAP`.
+- **Daten**: `data/providers.yaml` (Katalog) und `data/offers.json` entstehen über den Skill `babyevents-nuernberg` und `pnpm pipeline` (ADR 0006). `data/offers.json` wird nie von Hand bearbeitet, Korrekturen laufen über die Rohdaten eines Laufs und `pipeline build`.
 - Hooks brauchen `node_modules`. In einem frischen Checkout zuerst `pnpm install` ausführen, das installiert auch den lefthook-pre-commit. Ohne `node_modules` melden sich die Claude-Hooks nur mit einem Hinweis und blockieren nichts.
 - WebKit lokal braucht die Systembibliothek `libavif16`. Fehlt sie, `pnpm exec playwright test --project=pixel-7 …` ohne `iphone-15` ausführen. CI testet WebKit immer.

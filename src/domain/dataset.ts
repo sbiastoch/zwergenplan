@@ -81,21 +81,21 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
 
 /**
  * Schutz vor kaputten Pipeline-Läufen (ADR 0002): Vergleich mit dem zuletzt DEPLOYTEN Stand.
- * Leerer Bestand ist nur während des Bootstraps erlaubt.
+ * Ein leerer Bestand ist ein Fehler (außer bei Fixtures, die keinen echten Datenstand darstellen).
  */
 export function checkPlausibility(
   current: DatasetSummary,
   deployed: DatasetSummary | undefined,
-  opts: { bootstrap: boolean; now: Date },
+  opts: { fixture: boolean; now: Date },
 ): { errors: string[]; warnings: string[] } {
   const errors: string[] = [];
   const warnings: string[] = [];
-  if (current.offers === 0 && !opts.bootstrap)
-    errors.push("Keine Angebote – leerer Bestand ist nur mit data/BOOTSTRAP erlaubt");
+  if (current.offers === 0 && !opts.fixture)
+    errors.push("Keine Angebote – ein leerer Datenstand wird nie veröffentlicht");
   if (deployed && deployed.offers > 0 && current.offers < deployed.offers * 0.5) {
     errors.push(`Angebote eingebrochen: ${deployed.offers} → ${current.offers} (> 50 %)`);
   }
   const ageDays = (opts.now.getTime() - Date.parse(current.generatedAt)) / DAY_MS;
-  if (!opts.bootstrap && ageDays > 14) warnings.push(`Datenstand ist ${Math.floor(ageDays)} Tage alt`);
+  if (!opts.fixture && ageDays > 14) warnings.push(`Datenstand ist ${Math.floor(ageDays)} Tage alt`);
   return { errors, warnings };
 }

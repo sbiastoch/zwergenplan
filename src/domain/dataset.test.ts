@@ -174,24 +174,24 @@ describe("checkPlausibility", () => {
   const summary = { offers: 40, providers: 10, generatedAt: "2026-10-05T06:00:00+02:00" };
 
   it("lässt normale Schwankung durch", () => {
-    expect(checkPlausibility(summary, { ...summary, offers: 60 }, { bootstrap: false, now })).toEqual({
+    expect(checkPlausibility(summary, { ...summary, offers: 60 }, { fixture: false, now })).toEqual({
       errors: [],
       warnings: [],
     });
   });
   it("stoppt Einbrüche über 50 % gegenüber dem deployten Stand", () => {
-    expect(checkPlausibility({ ...summary, offers: 10 }, summary, { bootstrap: false, now }).errors[0]).toContain(
+    expect(checkPlausibility({ ...summary, offers: 10 }, summary, { fixture: false, now }).errors[0]).toContain(
       "eingebrochen",
     );
   });
-  it("erlaubt leeren Bestand nur im Bootstrap", () => {
+  it("erlaubt leeren Bestand nur bei Fixtures", () => {
     const empty = { ...summary, offers: 0 };
-    expect(checkPlausibility(empty, undefined, { bootstrap: true, now }).errors).toEqual([]);
-    expect(checkPlausibility(empty, undefined, { bootstrap: false, now }).errors).toHaveLength(1);
+    expect(checkPlausibility(empty, undefined, { fixture: true, now }).errors).toEqual([]);
+    expect(checkPlausibility(empty, undefined, { fixture: false, now }).errors).toHaveLength(1);
   });
   it("warnt bei altem Datenstand", () => {
     const later = new Date("2026-11-01T12:00:00+01:00");
-    expect(checkPlausibility(summary, undefined, { bootstrap: false, now: later }).warnings[0]).toContain("Tage alt");
+    expect(checkPlausibility(summary, undefined, { fixture: false, now: later }).warnings[0]).toContain("Tage alt");
   });
 });
 

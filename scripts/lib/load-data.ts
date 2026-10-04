@@ -11,31 +11,11 @@ export function dataSource(): DataSource {
   return process.env["ZWERGENPLAN_DATA"] === "fixture" ? "fixture" : "real";
 }
 
-export function isBootstrap(source: DataSource): boolean {
-  return source === "real" && existsSync(new URL("data/BOOTSTRAP", ROOT));
-}
-
 function readOptional(url: URL): string | undefined {
   return existsSync(url) ? readFileSync(url, "utf8") : undefined;
 }
 
-export function loadDataset(source: DataSource = dataSource(), now = new Date()): ValidationResult {
-  if (isBootstrap(source)) {
-    // Bootstrap: Noch keine Angebote (die Seite bleibt leer), aber der Katalog ist schon im
-    // Zod-Vertrag und wird mit allen Invarianten geprüft (Plan 0002).
-    const iso = now.toISOString().replace(/\.\d{3}Z$/, "Z");
-    const catalog = readOptional(new URL("data/providers.yaml", ROOT));
-    try {
-      return validateDataset(catalog === undefined ? [] : parse(catalog), {
-        generatedAt: iso,
-        horizon: { from: iso.slice(0, 10), to: iso.slice(0, 10) },
-        offers: [],
-      });
-    } catch (e) {
-      return { ok: false, errors: [`Lesefehler: ${(e as Error).message}`] };
-    }
-  }
-
+export function loadDataset(source: DataSource = dataSource()): ValidationResult {
   const dir = new URL(source === "fixture" ? "tests/fixtures/" : "data/", ROOT);
   const providersText = readOptional(new URL("providers.yaml", dir));
   const offersText = readOptional(new URL("offers.json", dir));

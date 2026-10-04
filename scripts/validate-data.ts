@@ -4,7 +4,7 @@
  */
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
-import { dataSource, isBootstrap, loadDataset } from "./lib/load-data.ts";
+import { dataSource, loadDataset } from "./lib/load-data.ts";
 
 const source = dataSource();
 const result = loadDataset(source);
@@ -26,7 +26,7 @@ if (process.argv.includes("--against-deployed")) {
 }
 
 const { errors, warnings } = checkPlausibility(result.summary, deployed, {
-  bootstrap: isBootstrap(source) || source === "fixture",
+  fixture: source === "fixture",
   now: new Date(),
 });
 for (const w of warnings) console.log(`::warning::${w}`);
