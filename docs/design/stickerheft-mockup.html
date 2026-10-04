@@ -1,0 +1,936 @@
+<!doctype html>
+<!--
+  Referenz-Mockup für Plan 0003 („Stickerheft mit Knete-Kacheln“, Variante C + A). Nur fiktive Daten.
+  Läuft nicht für sich allein (die Design-Canvas-Laufzeit support.js fehlt) und wird nicht ausgeliefert.
+  Maßgeblich sind das CSS (Tokens, Komponenten-Klassen), das Markup und die Konstanten SHAPES/CATS am Ende.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Zwergenplan · Stickerheft mit Knete-Kacheln</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.zp{width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.th-light{--bg:#E8F1FF;--dotc:rgba(19,33,46,.13);--surface:#FFFFFF;--rim:#FFFFFF;--ink:#13212E;--muted:#475563;--soft:#EEF3FA;--edge:rgba(19,33,46,.12);--edge2:rgba(19,33,46,.28);--sh:0 1px 0 rgba(19,33,46,.10),0 6px 14px -2px rgba(19,33,46,.22);--sh-s:0 1px 0 rgba(19,33,46,.10),0 3px 8px -2px rgba(19,33,46,.20);--line:#13212E;--shadow:#13212E;--primary:#13212E;--on-primary:#FFFFFF;--tape:#FFE38A;--tape-stripe:rgba(255,255,255,.5);--on-tape:#13212E;--map:#E1EBF8;--road:#FFFFFF;--scrim:rgba(19,33,46,.45)}
+.th-dark{--bg:#0E1620;--dotc:rgba(238,243,248,.08);--surface:#1B2733;--rim:#2B3A49;--ink:#EEF3F8;--muted:#A9B8C6;--soft:#243241;--edge:rgba(0,0,0,.4);--edge2:rgba(238,243,248,.28);--sh:0 1px 0 rgba(0,0,0,.5),0 8px 18px -4px rgba(0,0,0,.65);--sh-s:0 1px 0 rgba(0,0,0,.5),0 4px 10px -3px rgba(0,0,0,.6);--line:#8FA4BA;--shadow:#34495E;--primary:#FFD93B;--on-primary:#13212E;--tape:#3B3420;--tape-stripe:rgba(255,217,59,.10);--on-tape:#F5E7B5;--map:#15202B;--road:#263443;--scrim:rgba(0,0,0,.62)}
+.k-babykurse{--k:#FF8CC0}.k-krabbel-spielgruppen{--k:#FFB13B}.k-treffs-cafes{--k:#B99CFF}.k-bewegung{--k:#2EC4B6}.k-wasser{--k:#5CB8FF}.k-musik{--k:#FF7070}.k-kreativ{--k:#FFD93B}.k-buecher{--k:#7BD389}.k-museum{--k:#E3A872}.k-buehne{--k:#EE8BFA}.k-natur{--k:#A6DB5E}.k-beratung{--k:#A3BDD0}
+:where(.zp) button,:where(.zp) select,:where(.zp) input{font:inherit;color:inherit}
+.zp button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.zp :focus-visible,.zp input:focus,.zp select:focus{outline:3px solid var(--ink);outline-offset:2px}
+.zp .chip:active,.zp .btn:active,.zp .iconbtn:active,.zp .kid:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--shadow)!important;transition:transform .12s ease,box-shadow .12s ease}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.shape{fill:var(--k)}
+.shape.ink{fill:#13212E}
+
+.hdr{display:flex;align-items:center;gap:8px;padding:14px 16px 6px}
+.brand{flex:1;display:flex;align-items:center;gap:8px;margin:0;font-weight:800;font-size:27px;letter-spacing:-.04em}
+.mark{transform:rotate(-8deg);filter:drop-shadow(0 2px 3px var(--edge));animation:peel 3s ease-in-out 1s 2}
+.mark .base{fill:#FFD93B;stroke:var(--rim);stroke-width:3}
+.mark .hat{fill:#FF7070}
+.mark .pom{fill:#FFFFFF}
+@keyframes peel{0%,100%{transform:rotate(-8deg)}30%{transform:rotate(8deg) scale(1.08)}60%{transform:rotate(-14deg)}}
+.iconbtn{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid var(--line);background:var(--surface);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;padding:0;box-sizing:border-box;transition:transform .15s}
+.iconbtn:disabled{opacity:.35;cursor:default}
+.kid{min-height:44px;padding:0 14px 0 5px;border-radius:999px;border:2px solid var(--line);background:var(--surface);box-shadow:2px 2px 0 var(--shadow);font-weight:800;display:flex;align-items:center;gap:6px;transform:rotate(1.5deg);transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.kid .face{width:30px;height:30px;border-radius:50%;background:#FFB13B;color:#13212E;display:grid;place-items:center}
+
+.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;margin:2px 16px 2px;padding:4px;background:var(--soft);border:2px solid var(--line);border-radius:999px}
+.seg3{grid-template-columns:1fr 1fr 1fr}
+.seg-thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--surface);border-radius:999px;border:2px solid var(--line);box-sizing:border-box;box-shadow:2px 2px 0 var(--shadow);transition:transform .34s cubic-bezier(.3,1.5,.5,1)}
+.seg3 .seg-thumb{width:calc((100% - 8px)/3)}
+.seg-btn{position:relative;z-index:1;min-height:44px;border:0;background:none;padding:0 6px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.seg-btn[aria-pressed=true]{font-weight:800}
+
+.stickers{display:flex;gap:2px;overflow-x:auto;padding:6px 10px 0;scrollbar-width:none;flex:none}
+.stickers::-webkit-scrollbar{display:none}
+.stk{flex:none;width:70px;min-height:82px;border:0;background:none;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:700}
+.stk .disc{position:relative;width:50px;height:50px;box-sizing:border-box;border-radius:50%;background:var(--k);border:4px solid var(--rim);box-shadow:0 0 0 2px var(--line),3px 3px 0 2px var(--shadow);display:grid;place-items:center;transform:rotate(-6deg);transition:transform .32s cubic-bezier(.3,1.6,.5,1),opacity .2s}
+.stk.alt .disc{transform:rotate(7deg)}
+.stk:active .disc{transform:scale(.88)}
+.stk.on .disc{transform:translateY(-3px) rotate(10deg) scale(1.08);box-shadow:0 0 0 3px var(--ink),4px 4px 0 3px var(--shadow)}
+.stk.dim .disc{opacity:.4}
+.stk .tick{position:absolute;right:-7px;top:-7px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;animation:pop .35s cubic-bezier(.3,1.6,.5,1)}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:6px 16px 10px;scrollbar-width:none;flex:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:44px;box-sizing:border-box;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);box-shadow:2px 2px 0 var(--shadow);font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform .15s}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--line);animation:plop .38s cubic-bezier(.3,1.7,.5,1)}
+.chip.cat.on{background:var(--k);color:#13212E;border-color:var(--line)}
+.chip.cat.on .shape{fill:#13212E}
+.chip .mini{width:16px;height:16px}
+@keyframes plop{0%{transform:scale(.82)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.badge{min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px;background:#FF7070;color:#13212E;font-size:12px;font-weight:800;display:inline-grid;place-items:center}
+
+.body{flex:1;min-height:0;overflow-y:auto;padding:0 16px 20px;scrollbar-width:none}
+.body::-webkit-scrollbar{display:none}
+.status{display:flex;flex-wrap:wrap;align-items:center;column-gap:6px;color:var(--muted);font-size:14px;margin:2px 0 0}
+.status b{color:var(--ink)}
+.linkbtn{min-height:44px;border:0;background:none;padding:0 4px;font-weight:800;text-decoration:underline wavy;text-decoration-thickness:1.5px;text-underline-offset:5px}
+.daylabel{display:flex;align-items:baseline;gap:8px;margin:16px 0 10px;font-weight:800;font-size:23px;letter-spacing:-.04em}
+.daylabel small{font-weight:600;font-size:14px;color:var(--muted);letter-spacing:0}
+.daylabel.is-today span:first-child{display:inline-block;background-color:var(--tape);background-image:repeating-linear-gradient(-45deg,var(--tape-stripe) 0 5px,transparent 5px 11px);color:var(--on-tape);padding:0 14px;transform:rotate(-2deg);clip-path:polygon(4% 0,96% 0,100% 20%,96% 40%,100% 60%,96% 80%,100% 100%,4% 100%,0 80%,4% 60%,0 40%,4% 20%,0 0)}
+
+.card{position:relative;background:var(--surface);border:2.5px solid var(--line);border-radius:22px;box-shadow:5px 5px 0 var(--shadow);margin:0 0 14px;transition:transform .22s cubic-bezier(.3,1.5,.5,1);animation:stick .45s cubic-bezier(.2,1.3,.4,1) both}
+.card.tl{transform:rotate(-.6deg)}
+.card.tr{transform:rotate(.6deg)}
+.card:has(.card-main:active){transform:translate(3px,3px);box-shadow:2px 2px 0 var(--shadow)}
+.card.unfit{opacity:.85;border-style:dashed;box-shadow:none}
+@keyframes stick{from{opacity:0;transform:translateY(14px) rotate(-3deg) scale(.96)}}
+.card-main{display:block;width:100%;text-align:left;background:none;border:0;padding:14px 62px 15px 15px;border-radius:19px}
+.card-top{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 10px 2px 5px;border-radius:999px;border:1.5px solid var(--line);background:var(--k);color:#13212E;font-size:13px;font-weight:800;transform:rotate(-1.5deg)}
+.pill .mini{width:15px;height:15px}
+.cbody{display:flex;flex-direction:column;gap:3px;min-width:0}
+.when{font-weight:800;font-size:15px;letter-spacing:-.01em}
+.ctitle{font-weight:800;font-size:22px;line-height:1.08;letter-spacing:-.04em;color:var(--ink)}
+.meta{color:var(--muted);font-size:14px;font-weight:450}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.fact{font-size:13px;font-weight:700;padding:3px 9px;border-radius:8px;background:var(--soft)}
+.fact.cat{background:var(--k);color:#13212E}
+.fact.reg{background:none;box-shadow:inset 0 0 0 1.5px var(--line)}
+.fact.avail-few{background:#FFD93B;color:#13212E}
+.fact.avail-full{background:#FF9A9A;color:#13212E}
+.fact.avail-ok{background:#A6DB5E;color:#13212E}
+.fact.warn{background:none;border:1.5px dashed var(--muted)}
+.heart{position:absolute;top:10px;right:10px;width:44px;height:44px;border:0;background:none;padding:0;display:grid;place-items:center}
+.heart .hs{width:40px;height:40px;box-sizing:border-box;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:2px solid var(--line);box-shadow:2px 2px 0 var(--shadow);transition:background .2s,transform .12s,box-shadow .12s}
+.heart:active .hs{transform:translate(2px,2px);box-shadow:0 0 0 var(--shadow)}
+.heart.on .hs{background:#FF7070;color:#13212E;box-shadow:2px 2px 0 var(--shadow);transform:rotate(-10deg);animation:slap .5s cubic-bezier(.2,1.5,.4,1)}
+.heart.on .ic{fill:currentColor}
+.heart.inline{position:static}
+@keyframes slap{0%{transform:rotate(-45deg) scale(1.9);opacity:0}60%{transform:rotate(-4deg) scale(.9);opacity:1}100%{transform:rotate(-10deg) scale(1)}}
+
+.empty{text-align:center;padding:28px 12px;color:var(--muted)}
+.empty b{display:block;font-size:24px;font-weight:800;letter-spacing:-.04em;color:var(--ink);margin:14px 0 4px}
+.slot{width:104px;height:104px;margin:0 auto;box-sizing:border-box;border-radius:50%;border:3px dashed var(--muted);display:grid;place-items:center;color:var(--muted);transform:rotate(-6deg);animation:wiggle 3.2s ease-in-out infinite}
+@keyframes wiggle{50%{transform:rotate(6deg)}}
+
+.map{position:relative;flex:1;min-height:0;margin:0 21px 15px 16px;border:2.5px solid var(--line);border-radius:24px;overflow:hidden;background:var(--map);box-shadow:5px 5px 0 var(--shadow)}
+.map svg.art{position:absolute;inset:0;width:100%;height:100%}
+.m-park{fill:#A6DB5E;opacity:.45}
+.m-water{fill:#5CB8FF;opacity:.55}
+.m-river{fill:none;stroke:#5CB8FF;stroke-opacity:.6;stroke-width:16;stroke-linecap:round}
+.m-road{fill:none;stroke:var(--road);stroke-width:8;stroke-linecap:round}
+.m-ring{fill:none;stroke:var(--ink);stroke-width:2;stroke-dasharray:4 7;stroke-linecap:round;opacity:.45}
+.mlabel{position:absolute;transform:translate(-50%,-50%);font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;pointer-events:none}
+.pin{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;box-sizing:border-box;border-radius:50%;background:var(--k);border:3px solid var(--rim);box-shadow:0 0 0 2px var(--line),2px 3px 0 2px var(--shadow);padding:0;display:grid;place-items:center;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.pin:active{transform:scale(.9)}
+.pin.sel{transform:scale(1.25) rotate(-10deg);z-index:2;box-shadow:0 0 0 3px var(--ink),3px 4px 0 3px var(--shadow)}
+.me{position:absolute;width:14px;height:14px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--ink);border:3px solid var(--rim)}
+.me::after{content:'';position:absolute;inset:-12px;border-radius:50%;border:2px solid var(--ink);animation:ping 2s ease-out infinite}
+@keyframes ping{from{transform:scale(.4);opacity:1}to{transform:scale(1.4);opacity:0}}
+.mapcard{position:absolute;left:6px;right:6px;bottom:6px;margin:0;animation:up .35s cubic-bezier(.2,1.2,.4,1)}
+
+.tabs{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin:0 8px 14px;padding:6px 10px;background-color:var(--tape);background-image:repeating-linear-gradient(-45deg,var(--tape-stripe) 0 6px,transparent 6px 14px);color:var(--on-tape);transform:rotate(-.6deg);clip-path:polygon(0 0,100% 0,98.6% 12.5%,100% 25%,98.6% 37.5%,100% 50%,98.6% 62.5%,100% 75%,98.6% 87.5%,100% 100%,0 100%,1.4% 87.5%,0 75%,1.4% 62.5%,0 50%,1.4% 37.5%,0 25%,1.4% 12.5%);flex:none}
+.tab-thumb{position:absolute;top:6px;bottom:6px;left:10px;width:calc((100% - 20px)/3);transition:transform .42s cubic-bezier(.3,1.45,.5,1)}
+.tab-thumb::before{content:'';position:absolute;inset:0 14px;border-radius:20px;background:var(--surface);border:2px solid var(--line);box-shadow:2px 2px 0 var(--shadow);transform:rotate(-3deg)}
+.tab{position:relative;z-index:1;min-height:56px;border:0;background:none;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.tab[aria-current=page]{color:var(--ink);font-weight:800}
+.tab[aria-current=page] .ic{animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+.zp .tab:focus-visible{outline-offset:-4px}
+.tab .badge{position:absolute;top:2px;left:calc(50% + 8px)}
+
+.cal-nav{display:flex;align-items:center;gap:8px;margin:4px 0 8px}
+.cal-nav b{flex:1;text-align:center;font-weight:800;font-size:20px;letter-spacing:-.03em}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.day{min-height:72px;border:2px dashed var(--edge2);border-radius:16px;background:var(--surface);padding:4px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.day .wd{font-size:12px;font-weight:700;color:var(--muted)}
+.day .num{font-weight:800;font-size:21px;line-height:1}
+.day.today .num{text-decoration:underline wavy #FF7070;text-decoration-thickness:2px;text-underline-offset:5px}
+.day.past{opacity:.45}
+.day.sel{background:var(--ink);color:var(--bg);border:2px solid var(--ink);transform:rotate(-4deg);animation:stamp .38s cubic-bezier(.2,1.4,.4,1)}
+.day.sel .wd{color:var(--bg)}
+@keyframes stamp{0%{transform:scale(1.35) rotate(-4deg);opacity:.3}55%{transform:scale(.88) rotate(-4deg);opacity:1}100%{transform:scale(1) rotate(-4deg)}}
+.dots{display:flex;gap:1px;height:11px}
+.mini{width:11px;height:11px;flex:none}
+.monthbtn{width:100%;min-height:44px;margin:10px 0 2px;border:2px dashed var(--edge2);border-radius:999px;background:none;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.monthbtn .ic{transition:transform .3s}
+.monthbtn[aria-expanded=true] .ic{transform:rotate(180deg)}
+.month{margin:8px 5px 4px 0;padding:10px;background:var(--surface);border:2.5px solid var(--line);border-radius:22px;box-shadow:5px 5px 0 var(--shadow);animation:drop .3s cubic-bezier(.2,1.2,.4,1)}
+@keyframes drop{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+.mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+.mgrid .h{font-size:12px;font-weight:800;color:var(--muted);padding:2px 0}
+.mday{min-height:44px;border:0;border-radius:50%;background:none;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-weight:700}
+.mday.sel{background:var(--ink);color:var(--bg)}
+.mday.past{opacity:.4}
+.mday .mini{width:9px;height:9px}
+
+.ptitle{font-weight:800;font-size:32px;letter-spacing:-.05em;margin:6px 0 6px}
+.btn{min-height:52px;box-sizing:border-box;border-radius:999px;border:2px solid var(--line);background:var(--surface);box-shadow:3px 3px 0 var(--shadow);padding:0 16px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center;transition:transform .15s}
+.btn.primary{background:var(--primary);color:var(--on-primary)}
+.btn.wide{width:100%}
+.small{font-size:14px;color:var(--muted);margin:8px 0 14px}
+
+.detail{position:absolute;inset:0;z-index:5;background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;display:flex;flex-direction:column;animation:slide .34s cubic-bezier(.2,1.1,.4,1)}
+@keyframes slide{from{transform:translateX(100%)}to{transform:none}}
+.dhead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 4px}
+.dscroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 20px;scrollbar-width:none}
+.hero{display:flex;align-items:center;gap:14px;margin:2px 0 4px}
+.bigsticker{width:92px;height:92px;flex:none;box-sizing:border-box;border-radius:50%;background:var(--k);border:4px solid var(--rim);box-shadow:0 0 0 2.5px var(--line),5px 5px 0 2.5px var(--shadow);display:grid;place-items:center;transform:rotate(-8deg);animation:peelin .6s cubic-bezier(.2,1.4,.4,1) .1s both}
+@keyframes peelin{from{transform:rotate(-50deg) scale(.4);opacity:0}}
+.catname{display:inline-block;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.06em;background:var(--k);color:#13212E;padding:3px 10px;border-radius:999px;border:1.5px solid var(--line)}
+.hero .meta{margin:6px 0 0}
+.dtitle{font-weight:800;font-size:30px;line-height:1.04;letter-spacing:-.045em;margin:12px 0 4px}
+.summary{margin:8px 0 14px}
+.labels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin:0 0 16px}
+.label{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px 14px 14px 4px;box-shadow:3px 3px 0 var(--shadow);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.label.full{grid-column:1 / -1}
+.label.tl{transform:rotate(-.5deg)}
+.label.tr{transform:rotate(.5deg)}
+.label::before{content:'';position:absolute;top:9px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--bg);box-shadow:inset 0 1px 2px var(--edge)}
+.label .cap{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.label b{font-weight:800;font-size:17px;line-height:1.2;letter-spacing:-.02em}
+.label span{font-size:14px;font-weight:450;color:var(--muted)}
+.label span.ok{color:var(--ink);font-weight:700}
+.stamp{box-shadow:3px 3px 0 var(--shadow);border:3px solid #13212E;border-radius:12px;padding:8px 12px 0;margin:0 0 18px;transform:rotate(-1.5deg);background:var(--sb);color:#13212E}
+.stamp b{text-transform:uppercase;letter-spacing:.05em;font-weight:800}
+.stamp span{display:block;font-size:14px}
+.stamp-few{--sb:#FFD93B}.stamp-full{--sb:#FF9A9A}.stamp-ok{--sb:#A6DB5E}
+.zp .stamp .linkbtn{color:#13212E;padding:0}
+.h3{font-weight:800;font-size:21px;letter-spacing:-.03em;margin:6px 0 8px}
+.dates{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.dates li{display:flex;justify-content:space-between;gap:8px;padding:10px 14px;border-radius:12px;background:var(--surface);border:2px solid var(--line);box-shadow:2px 2px 0 var(--shadow);font-weight:700}
+.dates li.sel{background:var(--ink);color:var(--bg)}
+.dates li span{font-weight:500}
+.dfoot{padding:12px 16px 16px;background:var(--surface);border-top:2.5px solid var(--line);display:flex;flex-direction:column;gap:8px;border-radius:24px 24px 0 0}
+.dfoot .lbl{font-size:13px;font-weight:700;color:var(--muted);text-align:center}
+.dfoot .btn:not(.primary){background:var(--soft)}
+.two{display:grid;grid-template-columns:1fr 1.3fr;gap:10px}
+
+.backdrop{position:absolute;inset:0;z-index:8;border:0;padding:0;background:var(--scrim);animation:fade .2s ease;cursor:default}
+@keyframes fade{from{opacity:0}}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;max-height:90%;overflow-y:auto;box-sizing:border-box;border-top:2.5px solid var(--line);background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;border-radius:28px 28px 0 0;padding:6px 16px 18px;box-shadow:0 -10px 30px -10px rgba(0,0,0,.4);animation:up .38s cubic-bezier(.2,1.25,.4,1);scrollbar-width:none}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.grab{width:46px;height:5px;border-radius:3px;background:var(--muted);opacity:.5;margin:6px auto 10px}
+.sheet h2{font-weight:800;font-size:28px;letter-spacing:-.045em;margin:0 0 10px}
+.sheet h3{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 8px}
+.wrap{display:flex;flex-wrap:wrap;gap:8px}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:800}
+.input{min-height:56px;box-sizing:border-box;width:100%;border:2px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:3px 3px 0 var(--shadow);padding:0 14px;font-size:22px;font-weight:800;letter-spacing:.08em;color:var(--ink)}
+select.input{font-size:17px;font-weight:600;letter-spacing:0}
+.hint{font-size:15px;margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--surface);border:2px solid var(--line)}
+.hint.ok{background:#A6DB5E;color:#13212E}
+.hint.bad{background:#FF9A9A;color:#13212E}
+.swrow{display:flex;align-items:center;gap:12px;margin-top:12px}
+.swrow div{flex:1;display:flex;flex-direction:column}
+.swrow small{color:var(--muted);font-size:14px}
+.switch{width:64px;height:44px;border:0;background:none;padding:0;display:grid;place-items:center}
+.track{width:56px;height:32px;border-radius:16px;background:var(--soft);box-shadow:inset 0 1px 3px var(--edge),0 0 0 2px var(--edge2);position:relative;transition:background .2s}
+.knob{position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;box-sizing:border-box;background:var(--surface);border:2px solid var(--line);transition:transform .32s cubic-bezier(.3,1.6,.5,1)}
+.switch[aria-checked=true] .track{background:#2EC4B6}
+.switch[aria-checked=true] .knob{transform:translateX(24px) rotate(180deg);background:#FFFFFF}
+.sheetfoot{display:grid;grid-template-columns:auto 1fr;gap:10px;margin-top:20px}
+
+.toast{position:absolute;left:16px;right:16px;bottom:100px;z-index:20;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 10px;border-radius:999px;background:var(--ink);color:var(--bg);font-weight:700;border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);transform:rotate(-1deg);animation:toast .45s cubic-bezier(.3,1.5,.5,1)}
+.toast .tk{width:32px;height:32px;flex:none;border-radius:50%;background:#A6DB5E;color:#13212E;display:grid;place-items:center}
+@keyframes toast{from{transform:translateY(30px) rotate(-6deg) scale(.9);opacity:0}to{transform:rotate(-1deg);opacity:1}}
+@media (prefers-reduced-motion: reduce){.zp *,.zp *::before,.zp *::after{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="zp {{ themeClass }}">
+
+  <header class="hdr">
+    <h1 class="brand">
+      <svg class="mark" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle class="base" cx="17" cy="17" r="14.5"></circle><path class="hat" d="M9 24 17 7l8 17z"></path><circle class="pom" cx="17" cy="7.5" r="2.6"></circle></svg>
+      <span>Zwergenplan</span>
+    </h1>
+    <button class="kid" onClick="{{ openKid }}" aria-label="Kind und Einstellungen, Alter {{ ageLabel }}">
+      <span class="face"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M9 15.5c1.6 1.4 4.4 1.4 6 0M9.5 11.5h.01M14.5 11.5h.01M12 5c-.8-1.6.6-2.8 2-2"></path></svg></span>
+      <span>{{ ageLabel }}</span>
+    </button>
+    <button class="iconbtn" onClick="{{ toggleTheme }}" aria-label="{{ themeLabel }}">
+      <sc-if value="{{ dark }}" hint-placeholder-val="{{ false }}"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+      <sc-if value="{{ light }}" hint-placeholder-val="{{ true }}"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+    </button>
+  </header>
+
+  <sc-if value="{{ isEntdecken }}" hint-placeholder-val="{{ true }}">
+    <div class="seg" role="group" aria-label="Ansicht">
+      <span class="seg-thumb" style="transform: translateX({{ segX }})"></span>
+      <button class="seg-btn" aria-pressed="{{ listPressed }}" onClick="{{ showList }}">
+        <svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"></path></svg>Liste
+      </button>
+      <button class="seg-btn" aria-pressed="{{ mapPressed }}" onClick="{{ showMap }}">
+        <svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"></path></svg>Karte
+      </button>
+    </div>
+    <div class="stickers" role="group" aria-label="Kategorien">
+      <sc-for list="{{ catStickers }}" as="k" hint-placeholder-count="6">
+        <button class="{{ k.cls }}" aria-pressed="{{ k.pressed }}" aria-label="{{ k.label }}" onClick="{{ k.act }}">
+          <span class="disc"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path class="shape ink" d="{{ k.shape }}"></path></svg><sc-if value="{{ k.on }}" hint-placeholder-val="{{ false }}"><span class="tick"><svg class="ic" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span></sc-if></span>
+          <span aria-hidden="true">{{ k.short }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showChips }}" hint-placeholder-val="{{ true }}">
+    <div class="chips" role="group" aria-label="Schnellfilter">
+      <button class="{{ filterBtnCls }}" onClick="{{ openFilter }}" aria-label="Alle Filter, {{ filterCount }} aktiv">
+        <svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M18 7h2M4 17h3M12 17h8"></path><circle cx="15.5" cy="7" r="2.5"></circle><circle cx="9.5" cy="17" r="2.5"></circle></svg>
+        Filter
+        <sc-if value="{{ hasFilterCount }}" hint-placeholder-val="{{ false }}"><span class="badge">{{ filterCount }}</span></sc-if>
+      </button>
+      <sc-for list="{{ quick }}" as="q" hint-placeholder-count="4">
+        <button class="{{ q.cls }}" aria-pressed="{{ q.pressed }}" onClick="{{ q.act }}">
+          <sc-if value="{{ q.on }}" hint-placeholder-val="{{ false }}"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></sc-if>
+          {{ q.label }}
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isListe }}" hint-placeholder-val="{{ true }}">
+    <main class="body">
+      <p class="status" role="status"><span><b>{{ visibleCount }}</b> Angebote ab heute</span>
+        <sc-if value="{{ hasHidden }}" hint-placeholder-val="{{ false }}"><span>· {{ hiddenText }}</span><button class="linkbtn" onClick="{{ toggleShowAll }}">{{ showAllLabel }}</button></sc-if>
+      </p>
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+        <h2 class="{{ g.cls }}"><span>{{ g.title }}</span><small>{{ g.sub }}</small></h2>
+        <sc-for list="{{ g.items }}" as="c" hint-placeholder-count="2">
+          <article class="{{ c.cardCls }}">
+            <button class="card-main" onClick="{{ c.open }}">
+              <span class="cbody">
+                <span class="card-top"><span class="pill"><svg class="mini" viewBox="0 0 24 24" aria-hidden="true"><path class="shape ink" d="{{ c.shape }}"></path></svg>{{ c.cat }}</span><span class="when">{{ c.when }}</span></span>
+                <span class="ctitle">{{ c.title }}</span>
+                <span class="meta">{{ c.provider }} · {{ c.district }} · {{ c.km }}</span>
+                <span class="facts"><span class="fact">{{ c.format }}</span><span class="fact">{{ c.cost }}</span><span class="{{ c.regCls }}">{{ c.reg }}</span><sc-if value="{{ c.hasAvail }}" hint-placeholder-val="{{ false }}"><span class="{{ c.availCls }}">{{ c.avail }}</span></sc-if><sc-if value="{{ c.unfit }}" hint-placeholder-val="{{ false }}"><span class="fact warn">{{ c.ageText }}</span></sc-if></span>
+              </span>
+            </button>
+            <button class="{{ c.heartCls }}" aria-pressed="{{ c.savedStr }}" aria-label="{{ c.heartLabel }}" onClick="{{ c.toggleSave }}"><span class="hs"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path></svg></span></button>
+          </article>
+        </sc-for>
+      </sc-for>
+      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+        <div class="empty"><div class="slot"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.5-4.5"></path></svg></div><b>Diese Seite ist noch leer</b>Mit diesen Filtern gibt es keine Angebote.<br><button class="linkbtn" onClick="{{ resetFilters }}">Filter zurücksetzen</button></div>
+      </sc-if>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{ isKarte }}" hint-placeholder-val="{{ false }}">
+    <div class="map" role="region" aria-label="Karte der Angebote">
+      <svg class="art" viewBox="0 0 358 560" preserveAspectRatio="none" aria-hidden="true">
+        <path class="m-park" d="M205 70c34-24 92-14 104 20s-14 66-58 60-74-54-46-80z"></path>
+        <path class="m-park" d="M14 330c22-16 66-10 76 16s-22 48-54 42-38-42-22-58z"></path>
+        <ellipse class="m-water" cx="292" cy="430" rx="42" ry="24"></ellipse>
+        <path class="m-road" d="M0 175 358 205M118 0l34 560M0 430l358-46M252 0l-40 560M0 70l130 120"></path>
+        <path class="m-river" d="M-10 252c70-22 116 26 176 4s100-30 204 14"></path>
+        <rect class="m-ring" x="118" y="168" width="118" height="118" rx="44"></rect>
+      </svg>
+      <span class="mlabel" style="left: 50%; top: 26%">Altstadt</span>
+      <span class="mlabel" style="left: 16%; top: 40%">Gostenhof</span>
+      <span class="mlabel" style="left: 18%; top: 12%">Johannis</span>
+      <span class="mlabel" style="left: 70%; top: 7%">Maxfeld</span>
+      <span class="mlabel" style="left: 48%; top: 74%">Südstadt</span>
+      <span class="mlabel" style="left: 82%; top: 74%">Langwasser</span>
+      <span class="me" style="left: 40%; top: 53%" aria-label="Dein Standort" role="img"></span>
+      <sc-for list="{{ pins }}" as="p" hint-placeholder-count="6">
+        <button class="{{ p.cls }}" style="left: {{ p.x }}%; top: {{ p.y }}%" aria-label="{{ p.label }}" aria-pressed="{{ p.pressed }}" onClick="{{ p.select }}"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path class="shape ink" d="{{ p.shape }}"></path></svg></button>
+      </sc-for>
+      <sc-if value="{{ hasMapSel }}" hint-placeholder-val="{{ true }}">
+        <article class="{{ mapSel.mapCls }}">
+          <button class="card-main" onClick="{{ mapSel.open }}">
+            <span class="cbody">
+              <span class="card-top"><span class="pill"><svg class="mini" viewBox="0 0 24 24" aria-hidden="true"><path class="shape ink" d="{{ mapSel.shape }}"></path></svg>{{ mapSel.cat }}</span><span class="when">{{ mapSel.when }}</span></span>
+              <span class="ctitle">{{ mapSel.title }}</span>
+              <span class="meta">{{ mapSel.provider }} · {{ mapSel.km }} Luftlinie</span>
+              <span class="facts"><span class="fact">{{ mapSel.format }}</span><span class="fact">{{ mapSel.cost }}</span><span class="{{ mapSel.regCls }}">{{ mapSel.reg }}</span></span>
+            </span>
+          </button>
+          <button class="{{ mapSel.heartCls }}" aria-pressed="{{ mapSel.savedStr }}" aria-label="{{ mapSel.heartLabel }}" onClick="{{ mapSel.toggleSave }}"><span class="hs"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path></svg></span></button>
+        </article>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isKalender }}" hint-placeholder-val="{{ false }}">
+    <main class="body">
+      <div class="cal-nav">
+        <button class="iconbtn" onClick="{{ prevWeek }}" disabled="{{ prevDisabled }}" aria-label="Vorherige Woche"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"></path></svg></button>
+        <b>{{ weekTitle }}</b>
+        <button class="iconbtn" onClick="{{ nextWeek }}" aria-label="Nächste Woche"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"></path></svg></button>
+      </div>
+      <div class="week" role="group" aria-label="Woche">
+        <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+          <button class="{{ d.cls }}" aria-pressed="{{ d.pressed }}" aria-label="{{ d.label }}" onClick="{{ d.pick }}">
+            <span class="wd">{{ d.wd }}</span><span class="num">{{ d.num }}</span>
+            <span class="dots"><sc-for list="{{ d.dots }}" as="dt" hint-placeholder-count="2"><svg class="mini" viewBox="0 0 24 24" aria-hidden="true"><path class="{{ dt.cls }}" d="{{ dt.shape }}"></path></svg></sc-for></span>
+          </button>
+        </sc-for>
+      </div>
+      <button class="monthbtn" aria-expanded="{{ monthOpenStr }}" onClick="{{ toggleMonth }}">{{ monthBtnLabel }}<svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+      <sc-if value="{{ monthOpen }}" hint-placeholder-val="{{ false }}">
+        <div class="month">
+          <div class="cal-nav">
+            <button class="iconbtn" onClick="{{ prevMonth }}" disabled="{{ prevMonthDisabled }}" aria-label="Vorheriger Monat"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"></path></svg></button>
+            <b>{{ monthTitle }}</b>
+            <button class="iconbtn" onClick="{{ nextMonth }}" aria-label="Nächster Monat"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"></path></svg></button>
+          </div>
+          <div class="mgrid">
+            <span class="h">Mo</span><span class="h">Di</span><span class="h">Mi</span><span class="h">Do</span><span class="h">Fr</span><span class="h">Sa</span><span class="h">So</span>
+            <sc-for list="{{ monthCells }}" as="m" hint-placeholder-count="31">
+              <sc-if value="{{ m.blank }}" hint-placeholder-val="{{ false }}"><span></span></sc-if>
+              <sc-if value="{{ m.real }}" hint-placeholder-val="{{ true }}"><button class="{{ m.cls }}" aria-label="{{ m.label }}" onClick="{{ m.pick }}">{{ m.num }}<sc-if value="{{ m.hasDot }}" hint-placeholder-val="{{ false }}"><svg class="mini" viewBox="0 0 24 24" aria-hidden="true"><path class="{{ m.dotCls }}" d="{{ m.dotShape }}"></path></svg></sc-if></button></sc-if>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <h2 class="daylabel"><span>{{ agendaTitle }}</span><small>{{ agendaCount }}</small></h2>
+      <sc-for list="{{ agenda }}" as="c" hint-placeholder-count="2">
+        <article class="{{ c.cardCls }}">
+          <button class="card-main" onClick="{{ c.open }}">
+            <span class="cbody">
+              <span class="card-top"><span class="pill"><svg class="mini" viewBox="0 0 24 24" aria-hidden="true"><path class="shape ink" d="{{ c.shape }}"></path></svg>{{ c.cat }}</span><span class="when">{{ c.when }}</span></span>
+              <span class="ctitle">{{ c.title }}</span>
+              <span class="meta">{{ c.provider }} · {{ c.district }} · {{ c.km }}</span>
+              <span class="facts"><span class="fact">{{ c.cost }}</span><span class="{{ c.regCls }}">{{ c.reg }}</span></span>
+            </span>
+          </button>
+          <button class="{{ c.heartCls }}" aria-pressed="{{ c.savedStr }}" aria-label="{{ c.heartLabel }}" onClick="{{ c.toggleSave }}"><span class="hs"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path></svg></span></button>
+        </article>
+      </sc-for>
+      <sc-if value="{{ agendaEmpty }}" hint-placeholder-val="{{ false }}">
+        <div class="empty"><div class="slot"><svg class="ic" width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18c3-6 13-6 16 0M7 10a5 5 0 0 1 10 0"></path></svg></div><b>Freier Tag</b>Kein Sticker für heute – Zeit für den Spielplatz.</div>
+      </sc-if>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{ isMerkliste }}" hint-placeholder-val="{{ false }}">
+    <main class="body">
+      <h2 class="ptitle">Mein Stickerheft</h2>
+      <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ true }}">
+        <button class="btn primary wide" onClick="{{ exportSaved }}">
+          <svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"></path></svg>
+          Alle gemerkten in den Kalender
+        </button>
+        <p class="small">{{ savedSummary }}</p>
+        <sc-for list="{{ savedCards }}" as="c" hint-placeholder-count="2">
+          <article class="{{ c.cardCls }}">
+            <button class="card-main" onClick="{{ c.open }}">
+              <span class="cbody">
+                <span class="card-top"><span class="pill"><svg class="mini" viewBox="0 0 24 24" aria-hidden="true"><path class="shape ink" d="{{ c.shape }}"></path></svg>{{ c.cat }}</span><span class="when">{{ c.when }}</span></span>
+                <span class="ctitle">{{ c.title }}</span>
+                <span class="meta">{{ c.provider }} · {{ c.district }} · {{ c.km }}</span>
+                <span class="facts"><span class="fact">{{ c.format }}</span><span class="fact">{{ c.cost }}</span><sc-if value="{{ c.hasAvail }}" hint-placeholder-val="{{ false }}"><span class="{{ c.availCls }}">{{ c.avail }}</span></sc-if></span>
+              </span>
+            </button>
+            <button class="{{ c.heartCls }}" aria-pressed="{{ c.savedStr }}" aria-label="{{ c.heartLabel }}" onClick="{{ c.toggleSave }}"><span class="hs"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path></svg></span></button>
+          </article>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ noSaved }}" hint-placeholder-val="{{ false }}">
+        <div class="empty"><div class="slot"><svg class="ic" width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path></svg></div><b>Hier klebt noch nichts</b>Tipp auf das Herz bei einem Angebot. Hier sammelst du deine Favoriten und holst sie mit einem Tipp in deinen Kalender.<br><button class="linkbtn" onClick="{{ goEntdecken }}">Angebote entdecken</button></div>
+      </sc-if>
+    </main>
+  </sc-if>
+
+  <nav class="tabs" aria-label="Hauptnavigation">
+    <span class="tab-thumb" style="transform: translateX({{ tabX }})"></span>
+    <button class="tab" aria-current="{{ tabCur.entdecken }}" onClick="{{ goEntdecken }}">
+      <svg class="ic" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5z"></path></svg>Entdecken
+    </button>
+    <button class="tab" aria-current="{{ tabCur.kalender }}" onClick="{{ goKalender }}">
+      <svg class="ic" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Kalender
+    </button>
+    <button class="tab" aria-current="{{ tabCur.merkliste }}" onClick="{{ goMerkliste }}">
+      <svg class="ic" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path></svg>Merkliste
+      <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ true }}"><span class="badge">{{ savedCount }}</span></sc-if>
+    </button>
+  </nav>
+
+  <sc-if value="{{ hasDetail }}" hint-placeholder-val="{{ false }}">
+    <section class="detail" aria-label="Angebot im Detail">
+      <div class="dhead">
+        <button class="iconbtn" onClick="{{ detail.close }}" aria-label="Zurück"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"></path></svg></button>
+        <button class="{{ detail.heartCls }} inline" aria-pressed="{{ detail.savedStr }}" aria-label="{{ detail.heartLabel }}" onClick="{{ detail.toggleSave }}"><span class="hs"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"></path></svg></span></button>
+      </div>
+      <div class="dscroll">
+        <div class="{{ detail.heroCls }}">
+          <span class="bigsticker"><svg width="46" height="46" viewBox="0 0 24 24" aria-hidden="true"><path class="shape ink" d="{{ detail.shape }}"></path></svg></span>
+          <div><span class="catname">{{ detail.cat }}</span><p class="meta">{{ detail.provider }}</p></div>
+        </div>
+        <h2 class="dtitle">{{ detail.title }}</h2>
+        <p class="summary">{{ detail.summary }}</p>
+        <div class="labels">
+          <div class="label full tl"><span class="cap">Wann</span><b>{{ detail.formatLong }}</b><span>{{ detail.range }}</span></div>
+          <div class="label full tr"><span class="cap">Wo</span><b>{{ detail.venue }}</b><span>{{ detail.district }} · {{ detail.km }} Luftlinie</span></div>
+          <div class="label tl"><span class="cap">Alter</span><b>{{ detail.ageRange }}</b><span class="{{ detail.fitCls }}">{{ detail.fitText }}</span></div>
+          <div class="label tr"><span class="cap">Kosten</span><b>{{ detail.cost }}</b><span>{{ detail.costNote }}</span></div>
+          <div class="label full tl"><span class="cap">Anmeldung</span><b>{{ detail.reg }}</b><span>{{ detail.regNote }}</span></div>
+        </div>
+        <sc-if value="{{ detail.hasAvail }}" hint-placeholder-val="{{ false }}">
+          <div class="{{ detail.availBoxCls }}"><b>{{ detail.avail }}</b><span>Momentaufnahme vom {{ stand }} – kann sich geändert haben.</span><button class="linkbtn" onClick="{{ detail.openProvider }}">Beim Anbieter prüfen</button></div>
+        </sc-if>
+        <h3 class="h3">Termine</h3>
+        <ol class="dates">
+          <sc-for list="{{ detail.dates }}" as="t" hint-placeholder-count="4"><li class="{{ t.cls }}">{{ t.label }}<span>{{ t.time }}</span></li></sc-for>
+        </ol>
+        <sc-if value="{{ detail.moreDates }}" hint-placeholder-val="{{ false }}"><button class="linkbtn" onClick="{{ showAllDates }}">{{ detail.moreLabel }}</button></sc-if>
+        <div style="margin-top: 16px"><button class="btn wide" onClick="{{ detail.openProvider }}"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg>Website von {{ detail.provider }}</button></div>
+      </div>
+      <div class="dfoot">
+        <span class="lbl">In den Kalender holen (.ics)</span>
+        <sc-if value="{{ detail.isRegular }}" hint-placeholder-val="{{ false }}">
+          <div class="two">
+            <button class="btn" onClick="{{ detail.exportOne }}">Nur {{ detail.oneDate }}</button>
+            <button class="btn primary" onClick="{{ detail.exportAll }}"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"></path></svg>Alle {{ detail.upCount }} Termine</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ detail.notRegular }}" hint-placeholder-val="{{ true }}">
+          <button class="btn primary wide" onClick="{{ detail.exportAll }}"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"></rect><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"></path></svg>{{ detail.icsLabel }}</button>
+        </sc-if>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ sheetFilter }}" hint-placeholder-val="{{ false }}">
+    <button class="backdrop" aria-label="Filter schließen" onClick="{{ closeSheet }}"></button>
+    <section class="sheet" role="dialog" aria-modal="true" aria-label="Filter">
+      <div class="grab"></div>
+      <h2>Filter</h2>
+      <h3>Art</h3>
+      <div class="wrap"><sc-for list="{{ catChips }}" as="q" hint-placeholder-count="12"><button class="{{ q.cls }}" aria-pressed="{{ q.pressed }}" onClick="{{ q.act }}"><svg class="mini" viewBox="0 0 24 24" aria-hidden="true"><path class="shape" d="{{ q.shape }}"></path></svg>{{ q.label }}</button></sc-for></div>
+      <h3>Format</h3>
+      <div class="wrap"><sc-for list="{{ formatChips }}" as="q" hint-placeholder-count="3"><button class="{{ q.cls }}" aria-pressed="{{ q.pressed }}" onClick="{{ q.act }}">{{ q.label }}</button></sc-for></div>
+      <h3>Anmeldung</h3>
+      <div class="wrap"><sc-for list="{{ regChips }}" as="q" hint-placeholder-count="3"><button class="{{ q.cls }}" aria-pressed="{{ q.pressed }}" onClick="{{ q.act }}">{{ q.label }}</button></sc-for></div>
+      <h3>Kosten</h3>
+      <div class="wrap"><sc-for list="{{ costChips }}" as="q" hint-placeholder-count="3"><button class="{{ q.cls }}" aria-pressed="{{ q.pressed }}" onClick="{{ q.act }}">{{ q.label }}</button></sc-for></div>
+      <div class="sheetfoot">
+        <button class="btn" onClick="{{ resetFilters }}">Zurücksetzen</button>
+        <button class="btn primary" onClick="{{ closeSheet }}">{{ resultLabel }}</button>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ sheetKid }}" hint-placeholder-val="{{ false }}">
+    <button class="backdrop" aria-label="Einstellungen schließen" onClick="{{ closeSheet }}"></button>
+    <section class="sheet" role="dialog" aria-modal="true" aria-label="Kind und Einstellungen">
+      <div class="grab"></div>
+      <h2>Dein Zwerg</h2>
+      <label class="field">Geburtsdatum
+        <input class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="TT.MM.JJJJ" value="{{ birthText }}" onChange="{{ setBirth }}">
+      </label>
+      <p class="{{ ageHintCls }}" role="status">{{ ageSentence }}</p>
+      <div class="swrow">
+        <div><b>Nur passende Angebote</b><small>geprüft zum Kursstart · bleibt auf diesem Gerät</small></div>
+        <button class="switch" role="switch" aria-checked="{{ ageOnlyStr }}" aria-label="Nur passende Angebote zeigen" onClick="{{ toggleAgeOnly }}"><span class="track"><span class="knob"></span></span></button>
+      </div>
+      <h3>Entfernung ab</h3>
+      <div class="seg" style="margin: 0" role="group" aria-label="Entfernung ab">
+        <span class="seg-thumb" style="transform: translateX({{ originX }})"></span>
+        <button class="seg-btn" aria-pressed="{{ originGpsStr }}" onClick="{{ setGps }}"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="12" r="7.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22"></path></svg>Standort</button>
+        <button class="seg-btn" aria-pressed="{{ originDistStr }}" onClick="{{ setDist }}">Stadtteil</button>
+      </div>
+      <sc-if value="{{ originDist }}" hint-placeholder-val="{{ false }}">
+        <label class="field" style="margin-top: 10px">Stadtteil
+          <select class="input" value="{{ district }}" onChange="{{ setDistrict }}"><sc-for list="{{ districts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select>
+        </label>
+      </sc-if>
+      <sc-if value="{{ originGps }}" hint-placeholder-val="{{ true }}"><p class="hint">Luftlinie ab deinem Standort. Der Standort wird nirgends gespeichert.</p></sc-if>
+      <h3>Darstellung</h3>
+      <div class="seg seg3" style="margin: 0" role="group" aria-label="Darstellung">
+        <span class="seg-thumb" style="transform: translateX({{ themeX }})"></span>
+        <sc-for list="{{ themeOpts }}" as="t" hint-placeholder-count="3"><button class="seg-btn" aria-pressed="{{ t.pressed }}" onClick="{{ t.act }}">{{ t.label }}</button></sc-for>
+      </div>
+      <div style="margin-top: 20px"><button class="btn primary wide" onClick="{{ closeSheet }}">Fertig</button></div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div class="toast" role="status"><span class="tk"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span><span>{{ toast }}</span></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dunkel":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+const TODAY = '2026-10-05';
+const STAND = 'Sa 3.10.';
+const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const WDL = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+const MON = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+// Jede Kategorie: eigene Farbe (CSS .k-<id>) + eigene Form, überall gleich.
+const SHAPES = {
+  circle: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z',
+  square: 'M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z',
+  flower: 'M12 2a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 14a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM2 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0zM14 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0zM12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10z',
+  triangle: 'M12 3l10 17H2z',
+  drop: 'M12 2c4 5 7 8.5 7 12a7 7 0 0 1-14 0c0-3.5 3-7 7-12z',
+  star: 'M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z',
+  hexagon: 'M12 2l8.7 5v10L12 22l-8.7-5V7z',
+  diamond: 'M12 2l10 10-10 10L2 12z',
+  arch: 'M4 21V11a8 8 0 0 1 16 0v10z',
+  sparkle: 'M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z',
+  leaf: 'M4 20C4 9 10 4 21 3c-1 11-6 17-17 17z',
+  plus: 'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',
+};
+const CATS = [
+  ['babykurse', 'Babykurse', 'Babykurse', 'circle'],
+  ['krabbel-spielgruppen', 'Krabbel- & Spielgruppen', 'Krabbeln', 'square'],
+  ['treffs-cafes', 'Treffs & Cafés', 'Treffs', 'flower'],
+  ['bewegung', 'Bewegung & Turnen', 'Bewegung', 'triangle'],
+  ['wasser', 'Wasser', 'Wasser', 'drop'],
+  ['musik', 'Musik & Singen', 'Musik', 'star'],
+  ['kreativ', 'Kreativ & Basteln', 'Kreativ', 'hexagon'],
+  ['buecher', 'Bücher & Vorlesen', 'Bücher', 'diamond'],
+  ['museum', 'Museum & Ausstellung', 'Museum', 'arch'],
+  ['buehne', 'Bühne & Konzert', 'Bühne', 'sparkle'],
+  ['natur', 'Natur & Draußen', 'Natur', 'leaf'],
+  ['beratung', 'Beratung & Gesundheit', 'Beratung', 'plus'],
+];
+const CAT = {};
+CATS.forEach(function (c) { CAT[c[0]] = { label: c[1], short: c[2], shape: SHAPES[c[3]] }; });
+const DISTRICTS = ['Altstadt', 'Gostenhof', 'Johannis', 'Maxfeld', 'Schoppershof', 'St. Leonhard', 'Südstadt', 'Zerzabelshof', 'Langwasser'];
+
+// Fiktive Beispieldaten (wie tests/fixtures): Heute = Mo 5.10.2026, Kind geboren 2.11.2025.
+const RAW = [
+  { id: 'o1', title: 'Babymassage für Einsteiger', provider: 'Familienzentrum Gostenhof', venue: 'Familienzentrum, Raum Wolke', district: 'Gostenhof', cat: 'babykurse', format: 'kurs', start: '2026-10-12', every: 7, count: 5, from: '10:00', to: '11:00', age: [1, 6], cost: 45, costShort: '45 €', costNote: '45 € für alle 5 Termine', reg: true, regNote: 'Per Telefon oder E-Mail', avail: 'Noch 3 Plätze', availKind: 'few', km: 1.4, x: 22, y: 50, summary: 'Sanfte Massagegriffe lernen, mit warmem Öl und viel Ruhe. Für Babys ab vier Wochen.' },
+  { id: 'o2', title: 'Krabbelgruppe „Zwergenzimmer“', provider: 'Kinderhaus Sonnenblume', venue: 'Kinderhaus Sonnenblume, Gruppenraum', district: 'Johannis', cat: 'krabbel-spielgruppen', format: 'regelmaessig', start: '2026-10-06', every: 7, count: 9, from: '9:30', to: '11:00', age: [6, 18], cost: 0, costShort: 'Kostenlos', costNote: 'Kostenlos', reg: false, regNote: 'Einfach vorbeikommen', avail: null, availKind: '', km: 2.1, x: 24, y: 20, summary: 'Offene Krabbelgruppe mit Bällebad, Fingerspielen und Tee für die Großen. Zum Schluss ein gemeinsames Lied.' },
+  { id: 'o3', title: 'Eltern-Café „Kaffee & Krümel“', provider: 'Mütter- und Väterzentrum West', venue: 'MVZ West, Café', district: 'Gostenhof', cat: 'treffs-cafes', format: 'regelmaessig', start: '2026-10-08', every: 7, count: 9, from: '15:00', to: '17:00', age: [0, 36], cost: 0, costShort: 'Kostenlos', costNote: 'Kostenlos, Spende willkommen', reg: false, regNote: 'Einfach vorbeikommen', avail: null, availKind: '', km: 0.9, x: 31, y: 41, summary: 'Austausch bei Kaffee und Kuchen, Spielecke für die Kleinen, ab und zu kommt eine Hebamme vorbei.' },
+  { id: 'o4', title: 'Babyschwimmen „Wasserflöhe“', provider: 'Schwimmschule Wellenreiter', venue: 'Lehrschwimmbecken Süd', district: 'Langwasser', cat: 'wasser', format: 'kurs', start: '2026-10-10', every: 7, count: 8, from: '9:15', to: '9:45', age: [4, 12], cost: 120, costShort: '120 €', costNote: '120 € für alle 8 Termine', reg: true, regNote: 'Online · Kurse sind oft schnell voll', avail: 'Ausgebucht · Warteliste', availKind: 'full', km: 6.8, x: 82, y: 62, summary: 'Spielerische Wassergewöhnung im 32 Grad warmen Becken. Ein Elternteil kommt mit ins Wasser.' },
+  { id: 'o5', title: 'Musikgarten „Klangzwerge“', provider: 'Musikschule Nordstadt', venue: 'Musikschule, Saal 2', district: 'Maxfeld', cat: 'musik', format: 'kurs', start: '2026-10-14', every: 7, count: 10, from: '10:30', to: '11:15', age: [12, 36], cost: 85, costShort: '85 €', costNote: '85 € für alle 10 Termine', reg: true, regNote: 'Anmeldung bis 12.10.', avail: 'Plätze frei', availKind: 'ok', km: 2.6, x: 60, y: 13, summary: 'Singen, Klatschen, Rasseln: erste Musikerfahrungen in kleiner Runde.' },
+  { id: 'o6', title: 'Bilderbuchkino „Der kleine Igel“', provider: 'Stadtteilbibliothek Südstadt', venue: 'Bibliothek, Kinderecke', district: 'Südstadt', cat: 'buecher', format: 'einmalig', start: '2026-10-09', every: 0, count: 1, from: '10:00', to: '10:45', age: [18, 36], cost: 0, costShort: 'Kostenlos', costNote: 'Kostenlos', reg: false, regNote: 'Einfach vorbeikommen', avail: null, availKind: '', km: 3.2, x: 52, y: 63, summary: 'Ein Bilderbuch groß auf der Leinwand, vorgelesen und mitgemacht.' },
+  { id: 'o7', title: 'Krabbelkonzert „Klang & Kissen“', provider: 'Konzertverein am Ring', venue: 'Kleiner Saal am Ring', district: 'Altstadt', cat: 'buehne', format: 'einmalig', start: '2026-10-11', every: 0, count: 1, from: '11:00', to: '11:40', age: [0, 36], cost: 8, costShort: '8 €', costNote: '8 € pro Erwachsenem, Babys frei', reg: true, regNote: 'Tickets online', avail: 'Wenige Tickets', availKind: 'few', km: 1.8, x: 51, y: 37, summary: 'Streichquartett zum Liegen und Krabbeln: kurze Stücke, gedimmtes Licht, Kissen statt Stühle.' },
+  { id: 'o8', title: 'Eltern-Kind-Turnen', provider: 'Turnverein Zabo', venue: 'Turnhalle Zabo', district: 'Zerzabelshof', cat: 'bewegung', format: 'regelmaessig', start: '2026-10-07', every: 7, count: 9, from: '16:00', to: '17:00', age: [18, 36], cost: 3, costShort: '3 € / Termin', costNote: '3 € pro Termin, bar vor Ort', reg: false, regNote: 'Einfach vorbeikommen', avail: null, availKind: '', km: 4.1, x: 87, y: 44, summary: 'Klettern, Rollen, Balancieren in der Turnhalle. Bitte Stoppersocken mitbringen.' },
+  { id: 'o9', title: 'Matschwerkstatt im Stadtpark', provider: 'Naturkinder Nürnberg', venue: 'Stadtpark, Treffpunkt Brunnen', district: 'Maxfeld', cat: 'natur', format: 'einmalig', start: '2026-10-10', every: 0, count: 1, from: '10:00', to: '12:00', age: [9, 36], cost: 0, costShort: 'Kostenlos', costNote: 'Kostenlos', reg: true, regNote: 'Per E-Mail, höchstens 12 Familien', avail: 'Plätze frei', availKind: 'ok', km: 2.4, x: 70, y: 25, summary: 'Erde, Wasser, Laub: Sinneserfahrungen draußen. Wechselkleidung einpacken.' },
+  { id: 'o10', title: 'Offene Stillberatung', provider: 'Hebammenpraxis Nordost', venue: 'Praxis, Erdgeschoss', district: 'Schoppershof', cat: 'beratung', format: 'regelmaessig', start: '2026-10-05', every: 7, count: 9, from: '14:00', to: '16:00', age: [0, 12], cost: 0, costShort: 'Kostenlos', costNote: 'Kostenlos', reg: false, regNote: 'Einfach vorbeikommen', avail: null, availKind: '', km: 3.0, x: 84, y: 26, summary: 'Hebammen beantworten Fragen rund um Stillen, Beikost und Schlaf.' },
+  { id: 'o11', title: 'Fingerfarben & Fühlkiste', provider: 'Kreativwerkstatt Kunterbunt', venue: 'Werkstatt im Hinterhof', district: 'St. Leonhard', cat: 'kreativ', format: 'kurs', start: '2026-10-09', every: 7, count: 4, from: '15:30', to: '16:15', age: [10, 24], cost: 40, costShort: '40 €', costNote: '40 € für 4 Termine, Material inklusive', reg: true, regNote: 'Telefonisch', avail: 'Noch 2 Plätze', availKind: 'few', km: 2.9, x: 14, y: 60, summary: 'Matschen mit essbaren Fingerfarben und Fühlkisten. Alte Kleidung anziehen.' },
+  { id: 'o12', title: 'Krabbelführung „Kleine Entdecker“', provider: 'Museum für Alltagsdinge', venue: 'Museum, Foyer', district: 'Altstadt', cat: 'museum', format: 'einmalig', start: '2026-10-13', every: 0, count: 1, from: '10:30', to: '11:15', age: [0, 18], cost: 4, costShort: '4 €', costNote: '4 € pro Erwachsenem', reg: true, regNote: 'An der Kasse oder telefonisch', avail: 'Plätze frei', availKind: 'ok', km: 1.5, x: 39, y: 30, summary: 'Kurze Führung auf Augenhöhe der Kleinsten, mit Fühlstationen und Kinderwagen-Parkplatz.' },
+];
+
+function D(s) { return new Date(s + 'T12:00:00Z'); }
+function isoOf(d) { return d.toISOString().slice(0, 10); }
+function add(s, n) { const d = D(s); d.setUTCDate(d.getUTCDate() + n); return isoOf(d); }
+function wd(s) { return D(s).getUTCDay(); }
+function dnum(s) { return D(s).getUTCDate(); }
+function short(s) { const d = D(s); return WD[d.getUTCDay()] + ' ' + d.getUTCDate() + '.' + (d.getUTCMonth() + 1) + '.'; }
+function long(s) { const d = D(s); return WDL[d.getUTCDay()] + ', ' + d.getUTCDate() + '. ' + MON[d.getUTCMonth()]; }
+function monthsAt(birth, at) {
+  const b = D(birth), a = D(at);
+  let m = (a.getUTCFullYear() - b.getUTCFullYear()) * 12 + (a.getUTCMonth() - b.getUTCMonth());
+  if (a.getUTCDate() < b.getUTCDate()) m -= 1;
+  return m;
+}
+function parseBirth(t) {
+  const m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*$/.exec(t || '');
+  if (!m) return null;
+  const s = m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
+  if (isNaN(D(s).getTime()) || isoOf(D(s)) !== s || s > TODAY) return null;
+  return s;
+}
+function km(n) { return String(n).replace('.', ',') + ' km'; }
+const OFFERS = RAW.map(function (o) {
+  const dates = [];
+  for (let i = 0; i < o.count; i++) dates.push(add(o.start, i * o.every));
+  return Object.assign({}, o, { dates: dates });
+});
+function upcoming(o) { return o.dates.filter(function (d) { return d >= TODAY; }); }
+function fits(o, birth) {
+  if (!birth) return true;
+  const up = upcoming(o);
+  const check = o.format === 'regelmaessig' ? up : [o.dates[0]];
+  return check.some(function (d) { const m = monthsAt(birth, d); return m >= o.age[0] && m <= o.age[1]; });
+}
+function relDay(d) { return d === TODAY ? 'Heute' : d === add(TODAY, 1) ? 'Morgen' : WDL[wd(d)]; }
+function formatLine(o) {
+  if (o.format === 'kurs') return 'Kurs · ' + o.count + ' Termine';
+  if (o.format === 'regelmaessig') return 'Jeden ' + WDL[wd(o.start)];
+  return 'Einmalig';
+}
+function byTime(a, b) { return a.from.padStart(5, '0').localeCompare(b.from.padStart(5, '0')); }
+
+class Component extends DCLogic {
+  state = {
+    tab: 'entdecken', view: 'liste', sheet: null, detail: null, detailDate: null, allDates: false,
+    saved: ['o4', 'o7'], formats: [], cats: [], cost: null, reg: null, showAll: false,
+    selDay: TODAY, monthOpen: false, mapSel: 'o3', theme: null,
+    birthText: '02.11.2025', ageOnly: true, origin: 'gps', district: 'Gostenhof', toast: null,
+  };
+
+  componentWillUnmount() { clearTimeout(this.timer); }
+
+  say(msg) {
+    clearTimeout(this.timer);
+    this.setState({ toast: msg });
+    this.timer = setTimeout(() => this.setState({ toast: null }), 2800);
+  }
+
+  toggleIn(key, v) {
+    const arr = this.state[key];
+    this.setState({ [key]: arr.includes(v) ? arr.filter((x) => x !== v) : arr.concat(v) });
+  }
+
+  toggleSave(o) {
+    const on = this.state.saved.includes(o.id);
+    this.setState({ saved: on ? this.state.saved.filter((x) => x !== o.id) : this.state.saved.concat(o.id) });
+    this.say(on ? 'Sticker abgelöst – nicht mehr gemerkt' : 'Eingeklebt – liegt jetzt in deinem Stickerheft');
+  }
+
+  matches(o) {
+    const s = this.state;
+    if (s.formats.length && !s.formats.includes(o.format)) return false;
+    if (s.cats.length && !s.cats.includes(o.cat)) return false;
+    if (s.cost === 'frei' && o.cost > 0) return false;
+    if (s.cost === 'bezahlt' && o.cost === 0) return false;
+    if (s.reg === 'ohne' && o.reg) return false;
+    if (s.reg === 'mit' && !o.reg) return false;
+    return true;
+  }
+
+  card(o, date, birth, mode, idx) {
+    const saved = this.state.saved.includes(o.id);
+    const fit = fits(o, birth);
+    const c = CAT[o.cat];
+    const k = 'k-' + o.cat;
+    return {
+      id: o.id, title: o.title, provider: o.provider, district: o.district, venue: o.venue, km: km(o.km),
+      cat: c.label, shape: c.shape, kcls: k,
+      when: mode === 'day' ? o.from + '–' + o.to + ' Uhr' : short(date) + ' · ' + o.from + ' Uhr',
+      format: formatLine(o), cost: o.cost === 0 ? 'Kostenlos' : o.costShort,
+      reg: o.reg ? 'Anmeldung nötig' : 'Ohne Anmeldung', regCls: o.reg ? 'fact reg' : 'fact',
+      avail: o.avail, hasAvail: !!o.avail, availCls: 'fact avail-' + o.availKind,
+      unfit: !fit, ageText: o.age[0] + '–' + o.age[1] + ' Monate',
+      cardCls: 'card ' + k + (idx % 2 ? ' tr' : ' tl') + (fit ? '' : ' unfit'),
+      mapCls: 'card mapcard ' + k,
+      saved: saved, savedStr: saved ? 'true' : 'false',
+      heartCls: saved ? 'heart on' : 'heart',
+      heartLabel: saved ? o.title + ' nicht mehr merken' : o.title + ' merken',
+      toggleSave: () => this.toggleSave(o),
+      open: () => this.setState({ detail: o.id, detailDate: date, allDates: false }),
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const dark = s.theme ? s.theme === 'dunkel' : !!this.props.dunkel;
+    const birth = parseBirth(s.birthText);
+    const ageNow = birth ? monthsAt(birth, TODAY) : null;
+    const ageLabel = ageNow === null ? 'Alter?' : ageNow < 24 ? ageNow + ' Mon.' : Math.floor(ageNow / 12) + ' J.';
+    const useAge = !!(s.ageOnly && birth);
+    const ageBirth = useAge ? birth : null;
+    const base = OFFERS.filter((o) => upcoming(o).length && this.matches(o));
+    const fitting = base.filter((o) => fits(o, ageBirth));
+    const visible = useAge && !s.showAll ? fitting : base;
+    const hidden = base.length - fitting.length;
+
+    // Liste: jedes Angebot einmal, am nächsten Termin
+    const sorted = visible.map((o) => ({ o: o, d: upcoming(o)[0] }))
+      .sort((a, b) => (a.d + a.o.from.padStart(5, '0')).localeCompare(b.d + b.o.from.padStart(5, '0')));
+    const groups = [];
+    let n = 0;
+    sorted.forEach(({ o, d }) => {
+      let g = groups[groups.length - 1];
+      if (!g || g.d !== d) {
+        g = { d: d, title: relDay(d), sub: d === TODAY || d === add(TODAY, 1) ? long(d) : dnum(d) + '. ' + MON[D(d).getUTCMonth()], cls: d === TODAY ? 'daylabel is-today' : 'daylabel', items: [] };
+        groups.push(g);
+      }
+      g.items.push(this.card(o, d, ageBirth, 'day', n++));
+    });
+
+    const chip = (label, on, act) => ({ label: label, on: on, act: act, cls: on ? 'chip on' : 'chip', pressed: on ? 'true' : 'false' });
+    const quick = [
+      chip('Kostenlos', s.cost === 'frei', () => this.setState({ cost: s.cost === 'frei' ? null : 'frei' })),
+      chip('Ohne Anmeldung', s.reg === 'ohne', () => this.setState({ reg: s.reg === 'ohne' ? null : 'ohne' })),
+      chip('Kurse', s.formats.includes('kurs'), () => this.toggleIn('formats', 'kurs')),
+      chip('Regelmäßig', s.formats.includes('regelmaessig'), () => this.toggleIn('formats', 'regelmaessig')),
+      chip('Einmalig', s.formats.includes('einmalig'), () => this.toggleIn('formats', 'einmalig')),
+    ];
+    const filterCount = s.formats.length + s.cats.length + (s.cost ? 1 : 0) + (s.reg ? 1 : 0);
+
+    // Kategorie-Sticker-Leiste (Antippen = Kategorie filtern)
+    const catStickers = CATS.map((c, i) => {
+      const on = s.cats.includes(c[0]);
+      return {
+        short: c[2], shape: SHAPES[c[3]], on: on, pressed: on ? 'true' : 'false',
+        label: c[1] + (on ? ', Filter aktiv' : ''),
+        cls: 'stk k-' + c[0] + (i % 2 ? ' alt' : '') + (on ? ' on' : '') + (s.cats.length && !on ? ' dim' : ''),
+        act: () => this.toggleIn('cats', c[0]),
+      };
+    });
+
+    // Karte
+    const pins = visible.map((o) => ({
+      x: o.x, y: o.y, shape: CAT[o.cat].shape, label: o.title + ', ' + o.district,
+      pressed: s.mapSel === o.id ? 'true' : 'false',
+      cls: 'pin k-' + o.cat + (s.mapSel === o.id ? ' sel' : ''),
+      select: () => this.setState({ mapSel: o.id }),
+    }));
+    const selOffer = visible.find((o) => o.id === s.mapSel);
+    const mapSel = selOffer ? this.card(selOffer, upcoming(selOffer)[0], ageBirth, 'date', 0) : {};
+
+    // Kalender
+    const sel = s.selDay;
+    const weekStart = add(sel, -((wd(sel) + 6) % 7));
+    const thisWeek = add(TODAY, -((wd(TODAY) + 6) % 7));
+    const on = (d) => visible.filter((o) => o.dates.includes(d));
+    const weekDays = [0, 1, 2, 3, 4, 5, 6].map((i) => {
+      const d = add(weekStart, i);
+      const evs = on(d);
+      return {
+        wd: WD[wd(d)], num: dnum(d),
+        cls: 'day' + (d === sel ? ' sel' : '') + (d === TODAY ? ' today' : '') + (d < TODAY ? ' past' : ''),
+        pressed: d === sel ? 'true' : 'false',
+        label: long(d) + ', ' + (evs.length === 1 ? '1 Angebot' : evs.length + ' Angebote'),
+        dots: evs.slice(0, 3).map((o) => ({ cls: 'shape k-' + o.cat, shape: CAT[o.cat].shape })),
+        pick: () => this.setState({ selDay: d }),
+      };
+    });
+    const we = add(weekStart, 6);
+    const weekTitle = D(weekStart).getUTCMonth() === D(we).getUTCMonth()
+      ? dnum(weekStart) + '.–' + dnum(we) + '. ' + MON[D(we).getUTCMonth()]
+      : dnum(weekStart) + '. ' + MON[D(weekStart).getUTCMonth()].slice(0, 3) + '. – ' + dnum(we) + '. ' + MON[D(we).getUTCMonth()].slice(0, 3) + '.';
+    const agenda = on(sel).sort(byTime).map((o, i) => this.card(o, sel, ageBirth, 'day', i));
+    const first = sel.slice(0, 8) + '01';
+    const lead = (wd(first) + 6) % 7;
+    const monthCells = [];
+    for (let i = 0; i < lead; i++) monthCells.push({ blank: true, real: false });
+    for (let d = first; d.slice(0, 7) === first.slice(0, 7); d = add(d, 1)) {
+      const day = d;
+      const evs = on(day).sort(byTime);
+      monthCells.push({
+        blank: false, real: true, num: dnum(day),
+        cls: 'mday' + (day === sel ? ' sel' : '') + (day < TODAY ? ' past' : ''),
+        hasDot: evs.length > 0,
+        dotCls: evs.length ? 'shape k-' + evs[0].cat : 'shape',
+        dotShape: evs.length ? CAT[evs[0].cat].shape : '',
+        label: long(day) + ', ' + evs.length + ' Angebote',
+        pick: () => this.setState({ selDay: day < TODAY ? TODAY : day, monthOpen: false }),
+      });
+    }
+    const shiftMonth = (k) => {
+      const d = D(first); d.setUTCMonth(d.getUTCMonth() + k);
+      const target = isoOf(d);
+      this.setState({ selDay: target < TODAY ? TODAY : target });
+    };
+
+    // Merkliste
+    const savedOffers = OFFERS.filter((o) => s.saved.includes(o.id) && upcoming(o).length)
+      .sort((a, b) => upcoming(a)[0].localeCompare(upcoming(b)[0]));
+    const savedSessions = savedOffers.reduce((sum, o) => sum + (o.format === 'kurs' ? o.count : upcoming(o).length), 0);
+
+    // Detail
+    let detail = { dates: [] };
+    const o = OFFERS.find((x) => x.id === s.detail);
+    if (o) {
+      const up = upcoming(o);
+      const dd = s.detailDate && up.includes(s.detailDate) ? s.detailDate : up[0];
+      const c = this.card(o, dd, ageBirth, 'date', 0);
+      const ref = o.format === 'regelmaessig' ? dd : o.dates[0];
+      const fit = birth ? fits(o, birth) : true;
+      const shown = s.allDates ? up : up.slice(0, 4);
+      detail = Object.assign(c, {
+        heroCls: 'hero ' + c.kcls,
+        summary: o.summary, costNote: o.costNote, regNote: o.regNote,
+        formatLong: o.format === 'kurs' ? 'Kurs mit ' + o.count + ' Terminen' : o.format === 'regelmaessig' ? 'Jeden ' + WDL[wd(o.start)] + ', ' + o.from + '–' + o.to : long(o.start),
+        range: o.format === 'kurs' ? short(o.dates[0]) + ' bis ' + short(o.dates[o.dates.length - 1]) + ', jeweils ' + o.from + '–' + o.to : o.format === 'regelmaessig' ? 'Laufend, auch einzeln besuchbar' : o.from + '–' + o.to + ' Uhr',
+        ageRange: o.age[0] + '–' + o.age[1] + ' Monate',
+        fitText: !birth ? 'Geburtsdatum eintragen, dann prüfen wir das' : fit ? 'Passt: am ' + short(ref) + ' ' + monthsAt(birth, ref) + ' Monate alt' : 'Passt nicht: am ' + short(ref) + ' ' + monthsAt(birth, ref) + ' Monate alt',
+        fitCls: birth && fit ? 'ok' : '',
+        availBoxCls: 'stamp stamp-' + (o.availKind || 'ok'),
+        dates: shown.map((d) => ({ label: long(d), time: o.from + '–' + o.to, cls: d === dd && o.format === 'regelmaessig' ? 'sel' : '' })),
+        moreDates: !s.allDates && up.length > 4, moreLabel: 'Alle ' + up.length + ' Termine zeigen',
+        isRegular: o.format === 'regelmaessig', notRegular: o.format !== 'regelmaessig',
+        upCount: up.length, oneDate: short(dd),
+        icsLabel: o.format === 'kurs' ? 'Alle ' + o.count + ' Kurstermine in den Kalender' : 'In den Kalender',
+        close: () => this.setState({ detail: null }),
+        exportAll: () => this.say('Kalenderdatei mit ' + (o.format === 'kurs' ? o.count : up.length) + (o.format === 'einmalig' ? ' Termin' : ' Terminen') + ' geladen'),
+        exportOne: () => this.say('Kalenderdatei für ' + long(dd) + ' geladen'),
+        openProvider: () => this.say('Öffnet die Website von ' + o.provider),
+      });
+    }
+
+    const tabIdx = { entdecken: 0, kalender: 1, merkliste: 2 }[s.tab];
+
+    return {
+      themeClass: dark ? 'th-dark' : 'th-light', dark: dark, light: !dark,
+      themeLabel: dark ? 'Helle Darstellung' : 'Dunkle Darstellung',
+      toggleTheme: () => this.setState({ theme: dark ? 'hell' : 'dunkel' }),
+      ageLabel: ageLabel, stand: STAND,
+      openKid: () => this.setState({ sheet: 'kid' }),
+      openFilter: () => this.setState({ sheet: 'filter' }),
+      closeSheet: () => this.setState({ sheet: null }),
+
+      isEntdecken: s.tab === 'entdecken', isKalender: s.tab === 'kalender', isMerkliste: s.tab === 'merkliste',
+      isListe: s.tab === 'entdecken' && s.view === 'liste', isKarte: s.tab === 'entdecken' && s.view === 'karte',
+      showChips: s.tab !== 'merkliste',
+      segX: s.view === 'liste' ? '0%' : '100%',
+      listPressed: s.view === 'liste' ? 'true' : 'false', mapPressed: s.view === 'karte' ? 'true' : 'false',
+      showList: () => this.setState({ view: 'liste' }), showMap: () => this.setState({ view: 'karte' }),
+      tabX: tabIdx * 100 + '%',
+      tabCur: { entdecken: tabIdx === 0 ? 'page' : 'false', kalender: tabIdx === 1 ? 'page' : 'false', merkliste: tabIdx === 2 ? 'page' : 'false' },
+      goEntdecken: () => this.setState({ tab: 'entdecken' }),
+      goKalender: () => this.setState({ tab: 'kalender' }),
+      goMerkliste: () => this.setState({ tab: 'merkliste' }),
+
+      catStickers: catStickers,
+      quick: quick, filterCount: filterCount, hasFilterCount: filterCount > 0,
+      filterBtnCls: filterCount ? 'chip on' : 'chip',
+      visibleCount: visible.length, hasHidden: useAge && hidden > 0,
+      hiddenText: hidden + (hidden === 1 ? ' passt' : ' passen') + ' nicht zu ' + ageLabel,
+      showAllLabel: s.showAll ? 'ausblenden' : 'trotzdem zeigen',
+      toggleShowAll: () => this.setState({ showAll: !s.showAll }),
+      groups: groups, noResults: visible.length === 0,
+      resetFilters: () => this.setState({ formats: [], cats: [], cost: null, reg: null }),
+
+      pins: pins, hasMapSel: !!selOffer, mapSel: mapSel,
+
+      weekTitle: weekTitle, weekDays: weekDays, prevDisabled: weekStart <= thisWeek,
+      prevWeek: () => { const t = add(sel, -7); this.setState({ selDay: t < TODAY ? TODAY : t }); },
+      nextWeek: () => this.setState({ selDay: add(sel, 7) }),
+      monthOpen: s.monthOpen, monthOpenStr: s.monthOpen ? 'true' : 'false',
+      monthBtnLabel: s.monthOpen ? 'Monat zuklappen' : 'Ganzen Monat zeigen',
+      toggleMonth: () => this.setState({ monthOpen: !s.monthOpen }),
+      monthTitle: MON[D(first).getUTCMonth()] + ' ' + D(first).getUTCFullYear(), monthCells: monthCells,
+      prevMonthDisabled: first <= TODAY.slice(0, 8) + '01',
+      prevMonth: () => shiftMonth(-1), nextMonth: () => shiftMonth(1),
+      agendaTitle: relDay(sel) === WDL[wd(sel)] ? long(sel) : relDay(sel) + ', ' + dnum(sel) + '. ' + MON[D(sel).getUTCMonth()],
+      agendaCount: agenda.length === 1 ? '1 Angebot' : agenda.length + ' Angebote',
+      agenda: agenda, agendaEmpty: agenda.length === 0,
+
+      savedCards: savedOffers.map((x, i) => this.card(x, upcoming(x)[0], ageBirth, 'date', i)),
+      savedCount: savedOffers.length, hasSaved: savedOffers.length > 0, noSaved: savedOffers.length === 0,
+      savedSummary: savedOffers.length + (savedOffers.length === 1 ? ' Sticker · ' : ' Sticker · ') + savedSessions + ' Termine in einer .ics-Datei · Kurse immer komplett',
+      exportSaved: () => this.say('Kalenderdatei mit ' + savedSessions + ' Terminen geladen'),
+
+      hasDetail: !!o, detail: detail,
+      showAllDates: () => this.setState({ allDates: true }),
+
+      sheetFilter: s.sheet === 'filter', sheetKid: s.sheet === 'kid',
+      catChips: CATS.map((c) => {
+        const onC = s.cats.includes(c[0]);
+        return { label: c[1], shape: SHAPES[c[3]], pressed: onC ? 'true' : 'false', cls: 'chip cat k-' + c[0] + (onC ? ' on' : ''), act: () => this.toggleIn('cats', c[0]) };
+      }),
+      formatChips: [['kurs', 'Kurs'], ['regelmaessig', 'Regelmäßig'], ['einmalig', 'Einmalig']].map((f) => chip(f[1], s.formats.includes(f[0]), () => this.toggleIn('formats', f[0]))),
+      regChips: [[null, 'Egal'], ['ohne', 'Ohne Anmeldung'], ['mit', 'Mit Anmeldung']].map((r) => chip(r[1], s.reg === r[0], () => this.setState({ reg: r[0] }))),
+      costChips: [[null, 'Egal'], ['frei', 'Kostenlos'], ['bezahlt', 'Kostenpflichtig']].map((r) => chip(r[1], s.cost === r[0], () => this.setState({ cost: r[0] }))),
+      resultLabel: visible.length + (visible.length === 1 ? ' Angebot zeigen' : ' Angebote zeigen'),
+
+      birthText: s.birthText,
+      setBirth: (e) => this.setState({ birthText: e.target.value }),
+      ageSentence: birth ? 'Dein Kind ist heute ' + ageNow + ' Monate alt.' : s.birthText ? 'Bitte als TT.MM.JJJJ eingeben, z. B. 02.11.2025.' : 'Ohne Geburtsdatum zeigen wir alle Angebote.',
+      ageHintCls: birth ? 'hint ok' : s.birthText ? 'hint bad' : 'hint',
+      ageOnlyStr: s.ageOnly ? 'true' : 'false',
+      toggleAgeOnly: () => this.setState({ ageOnly: !s.ageOnly }),
+      originX: s.origin === 'gps' ? '0%' : '100%',
+      originGps: s.origin === 'gps', originDist: s.origin === 'stadtteil',
+      originGpsStr: s.origin === 'gps' ? 'true' : 'false', originDistStr: s.origin === 'stadtteil' ? 'true' : 'false',
+      setGps: () => this.setState({ origin: 'gps' }), setDist: () => this.setState({ origin: 'stadtteil' }),
+      district: s.district, districts: DISTRICTS.map((v) => ({ v: v })),
+      setDistrict: (e) => this.setState({ district: e.target.value }),
+      themeX: (s.theme === null ? 0 : s.theme === 'hell' ? 1 : 2) * 100 + '%',
+      themeOpts: [[null, 'Automatisch'], ['hell', 'Hell'], ['dunkel', 'Dunkel']].map((t) => ({ label: t[1], pressed: s.theme === t[0] ? 'true' : 'false', act: () => this.setState({ theme: t[0] }) })),
+
+      hasToast: !!s.toast, toast: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
