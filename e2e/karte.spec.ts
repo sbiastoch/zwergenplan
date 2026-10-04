@@ -249,7 +249,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expect.poll(async () => (await camera(page)).lat).toBeLessThan(start.lat - 0.005);
   });
 
-  test("Startausschnitt verrät den Standort nicht: Standort + „bis 2 km“ in der Liste, dann Karte (Arch-Review B1)", async ({
+  test("Startausschnitt verrät weder Standort noch Alter: Standort, Geburtsdatum, „Kurse“ und „bis 2 km“ in der Liste, dann Karte (Arch-Review B1, m1)", async ({
     page,
     context,
     tileLog,
@@ -277,14 +277,17 @@ test.describe("mit gemockten Kacheln", () => {
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
+    await kid.getByLabel("Geburtsdatum").fill("01.09.2026");
+    await expect(kid.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
     await kid.getByRole("button", { name: "Fertig" }).click();
+    await page.getByRole("button", { name: "Kurse", exact: true }).click();
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const filter = page.getByRole("dialog", { name: "Filter" });
     await filter.getByRole("button", { name: "bis 2 km" }).click();
     await filter.getByRole("button", { name: /Angebote? zeigen$/ }).click();
     const before = tileLog.length;
     const withOrigin = await openFromList();
-    // Der Umkreis wirkt auf die Orte, aber nicht auf den Ausschnitt
+    // Filter, Alter und Umkreis wirken auf die Orte, aber nicht auf den Ausschnitt
     await expect(page.getByRole("status")).not.toContainText("an 5 Orten");
     expect(withOrigin).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);

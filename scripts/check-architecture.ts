@@ -55,7 +55,8 @@ const LAZY_LOADERS: Array<[file: string, target: string]> = [
   ["src/ui/karte/MapScreen.tsx", "../map/"],
 ];
 for (const [file, target] of LAZY_LOADERS) {
-  const staticImport = new RegExp(`^\\s*(import|export)\\b[^;(]*?from\\s*["']${target.replaceAll(".", "\\.")}`, "m");
+  // auch Seiteneffekt-Importe ohne `from` (import "./karte/MapScreen.tsx")
+  const staticImport = new RegExp(`^\\s*(import|export)\\b[^;(]*?(from\\s*)?["']${target.replaceAll(".", "\\.")}`, "m");
   if (staticImport.test(readFileSync(file, "utf8"))) {
     console.error(`✗ lazy-loader-static: ${file} importiert ${target} statisch (nur import() ist erlaubt)`);
     process.exit(1);

@@ -102,9 +102,20 @@ export const test = base.extend<
       const violations: string[] = [];
       const checks: Promise<void>[] = [];
       const route: TileMock["route"] = async (pattern, handler) => {
+        // Jeder bediente Request – aus dem Standard-Mock oder aus routeTiles im Test – durchläuft dieselben
+        // Prüfungen: kein Querystring oder Fragment, Karte im DOM. „verboten“ bricht ab und zählt nicht als bedient.
         const wrapped: TileHandler = (r) => {
-          // „verboten“ bricht ab, das zählt nicht als bedient
-          if (tiles === "mock") served.add(r.request().url());
+          if (tiles === "mock") {
+            const request = r.request();
+            const url = request.url();
+            served.add(url);
+            if (url.includes("?") || url.includes("#")) violations.push(`mit Querystring oder Fragment: ${url}`);
+            checks.push(
+              mapInDom(request, page).then((inDom) => {
+                if (inDom !== true) violations.push(`ohne Karte im DOM (${inDom}): ${url}`);
+              }),
+            );
+          }
           return handler(r);
         };
         await context.route(pattern, wrapped);
@@ -117,12 +128,6 @@ export const test = base.extend<
           violations.push(`verboten (Test ohne tiles: "mock"): ${url}`);
           return route.abort();
         }
-        if (url.includes("?") || url.includes("#")) violations.push(`mit Querystring oder Fragment: ${url}`);
-        checks.push(
-          mapInDom(request, page).then((inDom) => {
-            if (inDom !== true) violations.push(`ohne Karte im DOM (${inDom}): ${url}`);
-          }),
-        );
         const path = decodeURIComponent(new URL(url).pathname);
         if (/^\/planet\/test\/\d+\/\d+\/\d+\.pbf$/.test(path)) {
           tileLog.push({ path, at: Date.now() });

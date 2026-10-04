@@ -47,7 +47,7 @@ async function openMap(page: Page) {
 }
 
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
-const MAP_VIEWS = new Set(["karte", "orts-sheet"]);
+const MAP_VIEWS = new Set(["karte", "orts-sheet", "karte-fehler"]);
 
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
@@ -116,6 +116,24 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByRole("dialog").getByText("ca. 1,4 km Luftlinie ab Gostenhof")).toBeVisible();
   },
   karte: openMap,
+  // Fehlerzustand (E12): Meldung im Kartenrahmen, Orts-Liste und „Startpunkt …“ bleiben, keine Kartenmitte
+  "karte-fehler": async (page) => {
+    await page.addInitScript(() => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+        value(this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+          if (type === "webgl" || type === "webgl2") return null;
+          return Reflect.apply(original, this, [type, ...rest]);
+        },
+      });
+    });
+    await page.reload();
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    await withGostenhof(page);
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "fehler", MAP_READY);
+    await expect(page.locator(".map-box")).toContainText("Dein Browser kann die Karte nicht zeigen.");
+  },
   "orts-sheet": async (page) => {
     await openMap(page);
     await page
