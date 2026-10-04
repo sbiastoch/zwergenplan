@@ -824,3 +824,221 @@ Abgeleitet: c ≈ 6,0 statt 5,5, K(„23 Mon.“) = 63 px. Die Kopfzeile ist üb
 - As bis dahin ungetestete Specs (`calendar.spec.ts`, `detail.spec.ts`) waren beim ersten Lauf grün, auch fünffach wiederholt in allen fünf Fixture-Projekten (575/575).
 - In den Screenshots gefunden und behoben: „Dezember“ in der Wochen-Navigation bei 320 px/200 % (siehe oben).
 
+
+## Browser-Review live (2026-10-04, Pakete A+B)
+
+**Ziel:** https://zwergenplan.app/, Stand `2d9b925` laut `data/meta.json`. Echte Daten: 333 Angebote, 83 Anbieter, Datenstand 4.10. 14:05. Geprüft am 4.10. zwischen 23:05 und 23:40 durch einen Subagenten, ohne lokalen Server.
+
+**Methode:**
+- **Screenshot-Matrix:** `node scripts/screenshots.ts https://zwergenplan.app/`, dazu ein zweiter Lauf mit `--text=200`.
+  - 144 Bilder: 320/360/365/390/412/915 quer × hell/dunkel × start, kalender, merkliste, detail, filter, kind, je bei 100 % und 200 %.
+  - Jedes Bild wurde angesehen, je vier Bilder auf einem Kontaktbogen.
+- **Interaktiv** mit Playwright gegen die Live-URL, in Chromium mobil und WebKit, mit `Europe/Berlin` und `de-DE`. Die Skripte liegen unter `$CLAUDE_JOB_DIR/tmp`.
+  - Die **Gates des Projekts liefen auf echten Daten.** Je Engine waren es 48 Kombinationen: 320/412 px × hell/dunkel/dunkel per Darstellungswahl × 8 Ansichten (start, woche, monat, merkliste, detail regelmäßig, detail kurs, filter, kind). Die Gates kommen aus `e2e/mobile-ux.ts`:
+    - `expectNoHorizontalScroll`,
+    - `expectTouchTargets`,
+    - `expectAccessible`,
+    - `expectTextFits` mit und ohne Knopf-Prüfung,
+    - `expectNoBrightIslands`,
+    - bei 320 px zusätzlich 200 %.
+  - **Kalender** mit `page.clock.setFixedTime`.
+  - **Detail** per Deep-Link.
+  - **Kopfzeilen-Matrix** über 9 Breiten × 2 Kind-Labels × Webfont/Fallback.
+  - **Querformat:** 915×412, 863×360 (auch bei 200 %), 852×393 und 568×320.
+  - **Sheets:** Kind- und Filter-Sheet.
+  - **Dunkelmodus** über beide Wege, dazu Umschalten ohne Neuladen.
+  - **Zustände:** Laden (Daten verzögert), Fehler (Abbruch), leer.
+  - **Navigation:** Zurück, Esc, Deep-Link, Neuladen.
+  - **Vitals** nur in Chromium per CDP:
+    - CLS beim Font-Swap mit zurückgehaltener Webfont,
+    - LCP mit CPU 4× und 1,6 Mbit/s bei 150 ms.
+
+### Checkliste
+- **Lesbarkeit:** ok.
+  - Karten erfassbar (Kategorie, Zeit, Titel, Ort, Fakten).
+  - Detail: „Wann“ nennt jetzt die Uhrzeit (B1), „Wo“ ohne doppelten Ort (H6, Reste siehe Hinweis 6).
+  - Bei 200 % stehen die Monatszahlen dicht an dicht (Hinweis 4).
+- **Daumen-Erreichbarkeit:** ok.
+  - Tab-Leiste und ICS-Fuß liegen unten.
+  - Kalendertage bei 320 px: Woche 44,6 px, Monat 45,1 × 44 px (B3).
+  - Filter-Fuß ohne Scrollen sichtbar (H7).
+  - Touch-Gate in beiden Engines grün.
+- **Zustände:** ok, ein Hinweis.
+  - Laden zeigt drei Platzhalter und „Lade Angebote …“.
+  - Fehler zeigt „Das hat nicht geklappt“ und „Nochmal versuchen“. Danach laden 40 Karten.
+  - Leer: Filter ohne Treffer „Diese Seite ist noch leer“ samt „Filter zurücksetzen“. Leere Merkliste „Hier klebt noch nichts“.
+  - Abends „Für heute ist alles vorbei“ (B2), nach dem Datenende „Weiter reicht der Plan noch nicht“ (B8).
+  - Lange Titel brechen sauber.
+  - Die Fehlermeldung zeigt den technischen Browsertext (Hinweis 7).
+- **Dark Mode:** keine hellen Inseln, Insel-Gate über beide Wege und beide Engines grün. Aber: **WebKit mit „Bewegung reduzieren“ zeigt nach dem Umschalten 1–5 s lang Text ohne Kontrast** (Wichtig 1).
+- **Micro-Interactions/reduzierte Bewegung:** ok.
+  - `expectReducedMotion` ist grün.
+  - Ohne Reduce laufen `peel` (3 s) und `pop` (400 ms).
+  - Zurück und Esc schließen das Detail, Deep-Link-Schließen landet auf `/`.
+  - Neuladen behält Ansicht und Filter.
+- **Design-System:** ok, einheitlich. Gelb als Auswahlfarbe im Dunkeln (E15) wirkt stimmig.
+- **Netzwerk:** ok.
+  - Chromium: 5 Requests, nur `zwergenplan.app`, genau eine Schriftdatei, keine Konsolenfehler.
+  - WebKit: 6 Requests, `site.json` doppelt, mit Konsolen-Warnung (Hinweis 2).
+- **Gates auf echten Daten:**
+  - 96 Kombinationen, davon 90 grün.
+  - Rot ist nur `expectTextFits`, Prüfung 2 in der Ansicht „woche“ bei 320 px (beide Engines, alle drei Schemata): „Text ragt aus fieldset.plain: „28““. Das ist ein Fehlalarm des Gates (Hinweis 1).
+  - 200 % bei 320 px ist in allen Ansichten grün.
+- **Vitals:** LCP gedrosselt 1,82–1,84 s (Budget 2,5 s), FCP ≈ 1,52 s. CLS siehe B6.
+
+### Befunde B1–B8
+- **B1 ok.** Die Uhrzeit steht jetzt bei jeder Reihe mit einheitlicher Uhrzeit:
+  - „Montags, 9:00–11:00“ (Offene Tür, Lücke von 4 Wochen),
+  - „Donnerstags, 10:45–11:40“ (Barre, 14-täglich),
+  - „Regelmäßig, 9:30–10:30“ (Pikler Mo/Di/Fr).
+- **B2 ok.**
+  - So 4.10. um 9:20: Der Termin 8:45–9:15 ist weg, der laufende 9:15–9:45 steht noch da (5 Angebote).
+  - Um 20:00 sowie live um 23:10: „Für heute ist alles vorbei“.
+  - Mo 5.10. um 16:40: nur noch laufende und kommende Termine (13). Um 20:00 ebenfalls „alles vorbei“.
+  - **Ohne Neuladen:** Uhr bei offenem Tab von 9:20 auf 9:50 gestellt. Nach ≤ 32 s verschwindet 9:15–9:45, es bleiben 4.
+  - Screenshot `b2-2026-10-05-20uhr-chromium.png`.
+- **B3 ok.** 320 px in Chromium und WebKit: Woche 44,6 × 72 px, der gewählte Tag 49,5 px (Drehung), Monat 45,1 × 44 px.
+- **B4 ok.** Waldspielgruppe „Die Eulenbande“ (Frist 2.10.): „Anmeldeschluss war am 2.10.“. Es ist der einzige Fall in den echten Daten.
+- **B5 ok.**
+  - Einzeilig und 64 px hoch bei 320, 360, 365, 370, 375, 380, 384, 390 und 412 px.
+  - Geprüft in Chromium und WebKit, je mit „Alter?“ und „23 Mon.“, mit geladener und mit dauerhaft zurückgehaltener Webfont.
+  - Der Theme-Knopf erscheint genau ab 380 px.
+- **B6 offen, wie geplant (Paket C).** Nur notiert:
+  - CLS beim Swap mit zurückgehaltener Webfont und Fallback Liberation Sans („Bricolage Fallback Arial“): **0,052 bei 412 px** (Quelle `.card .facts`) und **0,012 bei 360 px**, reproduzierbar.
+  - Vorher waren es 0,070 mit Arial, jetzt knapp über dem Ziel von 0,05.
+  - Roboto ist hier nicht gemessen.
+- **B7 ok.**
+  - **Bei 320 px und 200 %:**
+    - Sticker überlappen nicht (in Breite gewachsen, scrollen).
+    - Tabs zeigen nur Icons (alle `tab-label` ausgeblendet).
+    - ICS-Knöpfe stehen untereinander und sind jeweils einzeilig.
+    - Die Wochenleiste bricht in drei Zeilen (104 × 105 px je Tag).
+    - Filter-Chips sind mehrzeilig als abgerundetes Rechteck (`r=22px`), ohne Abschneiden.
+    - Die Kategorie-Pille ist zweizeilig mit `r≈22,7px`, nicht oval, und steht unter dem Sticker.
+  - Die Wochen-Navigation zeigt „28. Sep. – 4. Okt.“ ohne Wortbruch.
+  - **Bei 320 px und 100 %:** keine zweizeiligen Knöpfe. „Alle in den Kalender“, „Nur Mo 5.10.“ und „Alle Termine“ sind einzeilig, die Knopf-Prüfung ist mit echten Daten grün.
+  - Text-Gate bei 200 % in beiden Engines grün. Screenshots `*-320-*-200.png`.
+- **B8 ok.**
+  - Nach 23 Wochenklicks steht die Woche bei 8.–14. März. „Weiter“ ist gesperrt, der Monat endet im März 2027.
+  - Sa 13.3. zeigt 3 Angebote, So 14.3. „Weiter reicht der Plan noch nicht“ mit dem Text „Termine sind bis Samstag, 13. März eingetragen.“
+  - Screenshot `b8-chromium.png`.
+
+### Befunde H1–H8 und E5
+- **E5 (H2) / m13 ok.**
+  - Bei offenem Monat ist die Wochenleiste ausgeblendet.
+  - Der Fokus bleibt auf dem Monatsknopf (`aria-expanded` wechselt), in beiden Engines, auch per Tastatur.
+  - Ist die Seite gescrollt, steht der Knopf beim Öffnen und beim Schließen pixelgenau an derselben Stelle (100 → 100 px, `scrollY` 184 → 56 → 184).
+  - Ganz oben rückt er beim Öffnen um 128 px nach oben (284 → 156) und bleibt sichtbar. Das ist laut Plan so gewollt.
+- **H1 ok.**
+  - **915×412:** Seitenleiste links (`tabs` 7–113 px, `main` ab 198 px). Die erste Karte steht bei y = 289 und ist sichtbar.
+  - **863×360 und 852×393:** ebenso.
+  - **Toast:** Er liegt mittig über der Spalte (Mitte 517 bzw. 491 px, die Spaltenmitte bei 518 bzw. 492 px) und überlappt die Leiste nicht. Das gilt in beiden Engines und auch bei 863×360 mit 200 %.
+  - **568×320:** Die kompakte Leiste ist 56 px hoch.
+  - **Bei 863×360 und 200 %** liegt die erste Karte unter dem Falz (y = 380–385). Der Plan verlangt das nur für 100 %.
+  - **iPhone quer mit Notch: nicht prüfbar.** Playwright setzt `env(safe-area-inset-*)` auf 0, das braucht ein echtes Gerät.
+- **H3 ok.** Kind-Sheet bei 320 px: Das Segment ist einspaltig (1 Spalte, 3 Zeilen), „Automatisch“ hat rundum Luft. Bei 360 px ist es dreispaltig mit 7,7 px (Chromium) bzw. 12,5 px (WebKit) Innenrand um „Automatisch“, knapp, aber sauber.
+- **H4 ok.** Luminanz der Hintergründe im Dunkeln:
+  - Toast 0,03,
+  - Alters-Hinweis 0,068 (Chromium) bzw. 0,019 (WebKit), unter der Schwelle von 0,2.
+  - Gewählter Tag, Monatstag und Chip 0,712 (Gelb, unter der Schwelle von 0,75).
+
+  Das gilt über System und über die Darstellungswahl, in beiden Engines. Insel-Gate mit stehendem Toast grün. Zum WebKit-Umschalten siehe Wichtig 1.
+- **H5 ok.** Regelmäßige Reihen zeigen „Alle Termine“, Kurse „Alle 4/6/8/10 Kurstermine“, einmalige „In den Kalender“.
+- **H6 ok mit Rest.**
+  - Detail und ICS-`LOCATION` sind korrigiert („Markuskirche / FreiRaum“ + „Frankenstraße 29, 90443 Nürnberg“, ICS `LOCATION:Markuskirche / FreiRaum\, Frankenstraße 29\, 90443 Nürnberg`).
+  - Rest: 3 Orte in 9 Angeboten (Hinweis 6).
+  - **Erneuter Import in Google/Apple Kalender: nicht prüfbar.** Das braucht echte Konten bzw. Geräte, muss also der Nutzer testen.
+- **H7 ok.**
+  - **Fuß sichtbar:** Er steht ohne Scrollen sichtbar bei 320×568, 320×640, 360, 365, 375×667, 380, 390 und 412.
+  - **Zweizeilig:** Chromium bis 380 px, WebKit bis 360 px. Der Fuß ist dann 146 statt 84 px hoch, bei 320×568 bleiben 363 px Scrollfläche.
+  - **Bewertung:** vertretbar. Beide Knöpfe sind einzeilig, groß und immer sichtbar, und die Zahl im Hauptknopf bleibt lesbar. Ein Gewinn wäre ein schmaler Textknopf „Zurücksetzen“ (Hinweis 5), nötig ist er nicht.
+  - **iPhone mit Home-Leiste: nicht prüfbar** (siehe H1).
+- **H8 ok.**
+  - „Kurs · noch 1 von 6 Terminen“ und „Kurs · noch 5 von 10 Terminen“ (laufend).
+  - „Kurs mit 4 Terminen“ (noch nicht begonnen).
+
+### Neue Befunde
+
+**Blocker:** keine.
+
+**Wichtig**
+1. **WebKit mit „Bewegung reduzieren“: Nach dem Theme-Umschalten bleibt Text 1–5 s in der alten Farbe**, also dunkel auf dunkel bzw. hell auf hell. Die WebKit-Korrektur aus Paket B (Knopffarbe `var(--ink)`, Kartenfarbe) reicht nicht.
+   - **Betroffen:**
+     - Marke „Zwergenplan“, „Alter?“,
+     - Sticker-Labels,
+     - Tagesüberschrift „Morgen“,
+     - Zeit und Titel der Karten,
+     - Theme- und Filter-Icon.
+   - **Gemessen in Playwright-WebKit**, helles System, 412 px, Klick auf den Theme-Knopf: 18 Textknoten ohne Kontrast, axe rot.
+     - Die Farben springen gestaffelt nach 340, 990, 3 900 und 4 650 ms um.
+     - Zurück nach Hell: 9 Knoten, fertig nach 2,9 s.
+     - Ein Ansichtswechsel behebt es sofort.
+   - **Ohne Reduce** wechselt WebKit in ≈ 90–140 ms sauber, Chromium in beiden Fällen in ≈ 50–250 ms.
+   - **Ursache (sehr wahrscheinlich):**
+     - `src/ui/styles/motion.css` setzt unter `prefers-reduced-motion: reduce` `transition-duration: 0.01ms !important` auf `*`.
+     - Die Vorgabe für `transition-property` ist `all`. Damit wird **jede** Stiländerung zu einer echten 0,01-ms-Transition (`body` meldet `transition: 0.00001s`), die WebKit erst verspätet abschließt.
+     - Dasselbe zeigt sich beim Laden: Im hellen Modus sind Marke und Tagesüberschrift die ersten ≈ 0,5–1 s `rgb(0,0,0)` statt `#13212E`.
+   - **Vorschlag:** unter Reduce `transition: none !important` bzw. `transition-duration: 0s` statt 0,01 ms, dazu ein E2E in WebKit, das 300 ms nach dem Umschalten axe bzw. `__darkText` prüft. Auf einem echten iPhone mit „Bewegung reduzieren“ gegenprüfen, weil headless WebKit Timer anders taktet.
+   - Screenshots `wk-412-a-sofort.png` (300 ms nach dem Klick) und `wk-412-b-spaeter.png` (nach 3 s), zusammen in `review-0007-webkit-umschalten.png`.
+
+**Hinweis**
+1. **Fehlalarm im Text-Gate (Prüfung 2) bei der verbreiterten Woche.**
+   - Bei 320 px ragt die Tageszahl „28“ (Mo 28.9.) 3,2 px in Chromium bzw. 1,9 px in WebKit links aus `fieldset.plain` heraus.
+   - Grund ist `.week { margin-inline: -12px }` aus E9, das ist so gewollt und sichtbar unkritisch.
+   - Die Fixtures treffen das nie, denn ihre Woche beginnt mit „5“. Die Smoke-Tests mit echten Daten prüfen bei 320 px nur 200 %.
+   - **Latentes Risiko:** Der Test wird rot, sobald eine Fixture- oder Smoke-Woche bei 320 px/100 % mit einem zweistelligen Montag läuft.
+   - **Abhilfe:** Prüfung 2 ignoriert Vorfahren ohne sichtbare Kante (wie Prüfung 3), oder die Woche bekommt `padding` statt negativem Rand.
+2. **WebKit lädt `data/site.json` doppelt.** Der `<link rel=preload as=fetch crossorigin=anonymous>` wird nicht wiederverwendet, die Konsole warnt („preloaded … but not used“). Das kostet auf iPhone-Safari bis zu 84 kB zusätzlich, sofern nicht aus dem HTTP-Cache. Chromium lädt die Datei einmal.
+3. **Detail bei 320 px und 200 %:** Der ICS-Fuß nimmt 35 % der Höhe ein (Chromium, Knöpfe untereinander, bei 100 % 26 %). Im Querformat bei 200 % sind es ≈ 40 %. Bedienbar, aber viel. Screenshots `detail-320-light-200.png` und `detail-quer-light-200.png`.
+4. **Monatsraster bei 200 %:** Die zweistelligen Tage laufen optisch zusammen („12131415161718“, `letter-spacing: -0.03em` und Spalten ohne Abstand). Lesbar ist es nur über das Raster. Screenshots `kalender-360-light-200.png` und `kalender-iphone-light-200.png`.
+5. **Filter-Fuß bis 380 px zweizeilig** (H7, siehe oben). Ein Textknopf „Zurücksetzen“ statt eines vollbreiten Knopfs spart ≈ 60 px. Screenshots `filter-320-light.png` und `filter-365-light.png`.
+6. **H6, Rest:** 9 Angebote an 3 Orten wiederholen den Ort weiter, weil die Form „Name (Zusatz), …“ bzw. ein längerer Name nicht unter die Regel fällt:
+   - „Pfarramt Lutherkirche (Keller, Zugang vom Garten), Nerzstraße 34 …“,
+   - „Ökumenisches Gemeindezentrum Thon (evang. Teil, UG), …“,
+   - „Nürnberg Langwasser“ → „Nürnberg Langwasser Bad, …“.
+
+   Passt zum Eintrag „Katalog-Adressen“ in `docs/ideas.md`. Die Bereinigung läuft über die Pipeline, nicht über die UI-Regel.
+7. **Fehlerzustand zeigt den Browsertext** „Failed to fetch“ bzw. „Load failed“ unter „Das hat nicht geklappt“. Für Eltern ist das unverständlich, besser wäre ein fester deutscher Satz. Screenshot `zustand-fehler-webkit.png`.
+8. **Zähler-Badge der Merkliste** verdeckt in der kompakten Querleiste (568×320) einen Buchstaben von „Merkliste“. In der Seitenleiste bei 200 % sitzt er auf dem Herz und stößt an das Label. Screenshots `quer-568x320-100-chromium.png` und `quer-863x360-200-chromium.png`.
+9. **Toast bei 200 % auf schmalen Telefonen** ist drei- bis vierzeilig und verdeckt kurz den Hauptknopf der Merkliste (2,8 s, flüchtig). Screenshot `merkliste-320-light-200.png`.
+
+**Nicht prüfbar (braucht echtes Gerät bzw. Konto):**
+- iPhone quer mit Notch-Einzug (H1),
+- Filter-Fuß über der Home-Leiste (H7),
+- erneuter ICS-Import in Google/Apple Kalender (H6),
+- Gegenprobe zu Wichtig 1 auf einem iPhone mit „Bewegung reduzieren“.
+
+Verdict: **keine Blocker.**
+- B1, B2, B3, B4, B5, B7 und B8 sowie H1, H3, H4, H5, H6, H7, H8 und E5 sind live bestätigt. B6 bleibt wie geplant für Paket C offen (CLS 0,052 bei 412 px).
+- **Wichtig 1** (WebKit + reduzierte Bewegung beim Umschalten) gehört vor Plan 0004 behoben oder zumindest auf einem iPhone bestätigt.
+- Hinweis 1 (Gate-Fehlalarm) sollte mit Paket C mitgehen, damit das Gate nicht an einem Datum rot wird.
+
+## Offen für die Feinschliff-Runde (Stand 2026-10-05, nach Plan 0005)
+
+Bewusst zurückgestellt, damit die Karte mit Entfernung zuerst live geht. Wird nach Plan 0005 als eigener kleiner Plan umgesetzt.
+
+- **Paket C (B6):** Roboto-Fallback und Swap-Matrix, wie in diesem Plan beschrieben. Live gemessen: CLS 0,052 bei 412 px, 0,012 bei 360 px.
+- **WebKit mit „Bewegung reduzieren“:** Nach dem Theme-Wechsel bleibt Text 1–5 s in der alten Farbe. Vermutete Ursache: `transition-duration: 0.01ms` auf `*` in `motion.css`, dazu `transition-property: all`. Fix mit `transition: none` und einem E2E in WebKit, dann am iPhone gegenprüfen.
+- **Text-Gate:**
+  - Fehlalarm Prüfung 2 an der Woche mit −12 px Rand bei 320 px („28“ ragt aus `fieldset.plain`).
+  - Halb hinausgescrollte Überschriften in Sheets (Review 0004, H1).
+- **WebKit** lädt `site.json` doppelt, weil der Preload nicht genutzt wird.
+- **Platz bei 200 %:**
+  - Der ICS-Fuß im Detail nimmt bei 200 % 35–40 % der Höhe ein.
+  - Im Monatsraster laufen bei 200 % die Zahlen zusammen.
+- **Fehlerzustand** zeigt den Browsertext („Failed to fetch“) statt eines eigenen Texts.
+- **Badge und Toast:**
+  - Das Merklisten-Badge verdeckt in der kompakten Querleiste einen Buchstaben bzw. stößt bei 200 % ans Label.
+  - Der Toast verdeckt bei 200 % den Hauptknopf der Merkliste.
+- **Filter-Fuß:** „Zurücksetzen“ als Textknopf spart ≈ 60 px.
+- **Fokus-Rückweg** im Detail-Dialog, wenn die Kachel nach dem Ablösen aus der Merkliste verschwindet (`fallbackFocus`).
+- **„Freier Tag“** sagt nicht, dass ein Filter oder der Umkreis Termine ausblendet (Review 0004, H2).
+- **„Startpunkt entfernen“** steht bei 200 % zentriert statt linksbündig (Review 0004, H3).
+- **Daten:**
+  - 9 Angebote an 3 Orten wiederholen den Ort in der Adresse (Form „Name (Zusatz), …“). Das läuft über die Pipeline, siehe `docs/ideas.md`.
+- **Nur am Gerät prüfbar:**
+  - iPhone mit Notch im Querformat
+  - Filter-Fuß über der Home-Leiste
+  - erneuter ICS-Import (Google/Apple)
+  - echter Geolocation-Dialog auf iPhone und Android
+  - Merklisten-ICS auf dem iPhone

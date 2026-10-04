@@ -423,3 +423,152 @@ Branch `entfernung-0004`, zuerst auf „Plan 0007 Paket A“, danach auf `nachar
 - **m6** `PW_PORT` ist undokumentiert. → ein Satz in CLAUDE.md unter „Stolperfallen“. Der Standard von `scripts/screenshots.ts` bleibt.
 - **m7** In `docs/architecture.md` fehlt Geometrie/Entfernung in der Domänen-Zeile, und „UI fasst `navigator.geolocation` nicht an“ ist ungeprüft. → Schichten-Tabelle ergänzt. Biome `noRestrictedGlobals` für `src/ui` und `main.tsx` verbietet `navigator`, `localStorage` und `fetch`, mit Kanarienvögeln belegt. Der Umweg über `window.navigator` ist als „prüft der Review“ gekennzeichnet.
 - **Zusatz** (Screenshot-Befund): verwaister „·“ in der Statuszeile → eigene Zeile ohne Punkt (siehe „Umsetzung“).
+
+## Browser-Review live (2026-10-04)
+
+**Ziel:** https://zwergenplan.app/ mit echten Daten (`site.json` vom 2026-10-04 14:05, 333 Angebote, 82 Orte).
+**Stand:** `bca0bd7`. Der CI-Lauf „CI & Deploy“ 37236933123 auf `main` ist grün. Das Live-Bundle `index-C6rMczj7.js` enthält `aria-busy`, das Gesamt-Zeitlimit `15e3`, „ca. 100 m“ und den Schlüssel `zwergenplan.entfernung-ab`.
+**Methode:**
+- Playwright gegen die Live-URL, in Chromium und WebKit, mit `de-DE`, `Europe/Berlin` und `reducedMotion: reduce`. Die Skripte liegen in `/home/suus/.claude/jobs/1aadb80d/tmp/`: `geo4.mjs`, `district4.mjs`, `radius4.mjs`, `layout4.mjs` und `plaus4.mjs`.
+- `node scripts/screenshots.ts https://zwergenplan.app/ --views=kind,filter-entfernung,start-startpunkt` lief bei 100 % und mit `--text=200`. Das ergab 72 Bilder für 6 Viewports, jeweils hell und dunkel.
+- Dazu kamen gezielte Bilder in `shots4/` (gescrollte Sheets, Meta-Zeile, Detail) und die Gates aus `e2e/mobile-ux.ts` auf der Live-Seite: `expectTextFits` mit `buttons: false`, `expectNoHorizontalScroll`, `expectTouchTargets` und `expectNoBrightIslands`.
+- Lokal lief kein Server, es gab keine Code-Änderung.
+- **Nicht geprüft:** echte Geräte (iPhone, Android) mit echtem Berechtigungsdialog. Die Abfrage-Logik ist per Spy belegt, den Dialog selbst sieht man nur auf dem Gerät.
+
+### Checkliste
+- **Lesbarkeit:**
+  - Die Kachel liest sich als „Anbieter · Stadtteil · **2,1 km**“. Die Entfernung ist fett und steht immer als letzte Angabe.
+  - Die Statuszeile hat zwei Zeilen: „333 Angebote ab heute“ und darunter „Entfernung als Luftlinie ab Gostenhof“.
+  - Das Detail zeigt unter „Wo“ die Zeile „ca. 2,1 km Luftlinie ab Gostenhof“.
+  - Was, wann, wo und frei bleibt in 2 Sekunden erfassbar (`review-0004-entdecken-390.png`, `shots4/detail-320-dark.png`).
+- **Daumen-Erreichbarkeit:**
+  - „Meinen Standort nutzen“ ist ein breiter Knopf, die Stadtteil-Auswahl ist voll breit, „Fertig“ steht unten fest.
+  - Die Umkreis-Chips liegen im unteren Drittel des Filter-Sheets.
+  - `expectTouchTargets` ist überall grün (Kind- und Filter-Sheet, 320/390/quer, 100 % und 200 %).
+- **Zustände:**
+  - Kein Startpunkt: „Noch kein Startpunkt – dann zeigen wir keine Entfernung.“
+  - Standort, Verweigerung, „außerhalb“ und Zeitlimit zeigen jeweils ihren Hinweis.
+  - Ohne Startpunkt sind die Umkreise gesperrt und zeigen den Hinweis.
+  - `?umkreis` ohne Startpunkt zeigt den Hinweis.
+  - Eine ungültige ID im Speicher zählt als „kein Startpunkt“.
+  - Lange Anbieternamen brechen bei 320 px / 200 % auf 7–8 Zeilen um, die Entfernung bleibt aber zusammen. Abgeschnitten wird nichts (`shots4/meta-320-light-200.png`).
+  - Laden und Fehler sind von Plan 0004 nicht berührt.
+- **Dark Mode:** `expectNoBrightIslands` ist grün für Liste, Kind-Sheet, Detail, Filter-Sheet und den Umkreis-Hinweis, bei 320/390/quer und 100 %/200 %. Der grüne Erfolgshinweis ist im Dunkelmodus gedämpft. Helle Inseln gibt es keine.
+- **Micro-Interactions:**
+  - Die Chips zeigen `aria-pressed` und sind gefüllt bzw. gelb.
+  - Gesperrte Chips haben Deckkraft 0,55 und den Cursor `not-allowed`.
+  - Der Standort-Knopf zeigt „Suche Standort …“ mit `aria-busy` und `cursor: progress`.
+  - Übergänge sind bei reduzierter Bewegung aus (Kontext `reduce`). Ruckler oder Layoutsprünge waren nicht zu sehen.
+- **Konsistenz mit dem Design-System:**
+  - „Entfernung ab“ nutzt dieselbe Gruppenüberschrift (Versalien) wie „Darstellung“.
+  - Auswahl, Knöpfe, `.hint ok/bad` und Link-Knöpfe mit Wellenlinie folgen den bestehenden Mustern.
+  - Die Gruppe „Entfernung“ sieht im Filter-Sheet aus wie „Kosten“.
+  - Kleine Abweichung siehe H3.
+
+### 1. Geolocation
+| Prüfung | Chromium | WebKit |
+|---|---|---|
+| Spy auf `getCurrentPosition`/`watchPosition`: Aufrufe nach Laden / nach Öffnen des Kind-Sheets / nach Tipp | 0 / 0 / 1 | 0 / 0 / 1 |
+| Ohne Berechtigung: `permissions.query` bleibt `prompt`, also keine Abfrage beim Laden; Tipp → „Standort nicht freigegeben. Wähle stattdessen einen Stadtteil.“ (Playwright verweigert sofort) | ✓ (28 ms) | ✓ (12 ms) |
+| Mit Berechtigung und Stub 49.45213/11.07672: „Startpunkt: **Mein Standort**“, Hinweis „Entfernung ab deinem Standort (auf ca. 100 m gerundet).“, Statuszeile „… ab deinem Standort“, 40/40 Kacheln mit Entfernung | ✓ | ✓ |
+| Verweigerung per Stub `{code: 1}`: Hinweis, Startpunkt bleibt leer | ✓ | ✓ |
+| Standort in München: „Dein Standort liegt außerhalb von Nürnberg. Wähle einen Stadtteil.“ | ✓ | ✓ |
+| Stub ohne Antwort, echte Wartezeit: nach 0,5 s und 14 s `aria-busy="true"`, „Suche Standort …“, nicht `disabled`, Fokus auf dem Knopf, ein zweites Enter tut nichts; nach 16 s „Standort gerade nicht verfügbar. …“, `aria-busy="false"`, Fokus bleibt | ✓ | ✓ |
+| Neu laden: Statuszeile ohne Entfernung, 0 `.dist`, Kind-Sheet „Noch kein Startpunkt“, kein Abfrage-Aufruf | ✓ | ✓ |
+
+Bild: `shots4/geo-standort-chromium.png`, als `review-0004-kind-standort.png` kopiert.
+
+### 2. Stadtteil (Gostenhof, Altstadt, Langwasser; 390 px)
+- Kind-Sheet: „Startpunkt: **Gostenhof**“ bzw. Altstadt oder Langwasser, „Startpunkt entfernen“ erscheint. Die Hinweis-Region bleibt leer, wie geplant.
+- Statuszeile: „333 Angebote ab heute“ und „Entfernung als Luftlinie ab …“ stehen untereinander, Zeile 2 beginnt bei y = 233,6, wo Zeile 1 endet. Ein sichtbares „·“ gibt es nicht. Der Punkt „. “ steht nur in `.sr-only`, die Klasse existiert im Live-CSS.
+- Kacheln: Alle 40 sichtbaren Kacheln haben eine Entfernung, bei allen drei Stadtteilen. **Alle 40 × 3 Werte stimmen mit meiner eigenen Haversine-Rechnung** auf den Daten-Koordinaten überein (Erdradius 6 371 008,8 m, Rundung wie in `roundedDistance`).
+- Detail („Offene Tür für Groß und Klein“): „ca. 2,1 km Luftlinie ab Gostenhof“, „ca. 2,8 km … ab Altstadt“ und „ca. 5,2 km … ab Langwasser“.
+- Nach dem Neuladen bleibt der Stadtteil gesetzt. `localStorage` enthält nur `zwergenplan.entfernung-ab=gostenhof` bzw. `altstadt` oder `langwasser`, also die ID ohne Namen und Koordinate. `sessionStorage` ist leer.
+- Eine ungültige ID (`atlantis`) zählt als „kein Startpunkt“.
+
+### 3. Privatsphäre
+- **URL:** Sie enthält nie eine Koordinate oder einen Stadtteilnamen bzw. eine ID, auch nicht im Detail (`?angebot=…`) und nicht mit Umkreis (`?umkreis=2|5|10`).
+- **Speicher:**
+  - Beim Standort bleiben `localStorage` und `sessionStorage` leer.
+  - Beim Stadtteil enthält `localStorage` nur die ID.
+  - Ein Muster `\d{2}\.\d{2,}` kommt in keinem der Speicher vor.
+- **Requests nach der Wahl:** 0, gezählt ab dem Tipp bzw. der Auswahl. Das gilt für den Standort in Chromium und WebKit, für die drei Stadtteile und für die Wahl über den Umkreis-Hinweis.
+- **Hosts insgesamt:** nur `zwergenplan.app`, in allen Läufen.
+- **Konsole:** keine Fehler. WebKit meldet einmal die bekannte Preload-Warnung zu `site.json`, die mit Plan 0004 nichts zu tun hat.
+
+### 4. Umkreis (Startpunkt Altstadt, echte Daten)
+| Wahl | Knopf im Sheet | Statuszeile | Badge | eigene Rechnung | größte Entfernung in der Liste |
+|---|---|---|---|---|---|
+| Egal | – | 333 | 0 aktiv | 333 | 9,4 km |
+| bis 2 km | „167 Angebote zeigen“ | 167 | 1 aktiv | 167 | 1,9 km |
+| bis 5 km | „274 Angebote zeigen“ | 274 | 1 aktiv | 274 | 4,5 km |
+| bis 10 km | „333 Angebote zeigen“ | 333 | 1 aktiv | 333 | 9,4 km |
+
+- Die Anzahl sinkt plausibel und stimmt genau mit meiner Rechnung überein. „bis 10 km“ ändert ab Altstadt nichts, weil der fernste Ort (Fischbach) 9,4 km entfernt ist. Ab Langwasser blieben bei 10 km 304 von 333 übrig.
+- Das Badge zählt mit, die URL ist `?umkreis=N`, „Zurücksetzen“ führt zurück zu `/`.
+- Ohne Startpunkt sind „bis 2/5/10 km“ `disabled`, „Egal“ ist aktiv, und „Erst einen Startpunkt wählen.“ ist sichtbar.
+  - „Startpunkt wählen“ schließt das Filter-Sheet und öffnet das Kind-Sheet. Der Fokus liegt auf der Stadtteil-Auswahl.
+- `?umkreis=10` ohne Startpunkt:
+  - Statuszeile „333 Angebote ab heute“, der Hinweis „„bis 10 km“ braucht einen Startpunkt.“ steht außerhalb der Status-Region, Badge „0 aktiv“.
+  - „Startpunkt wählen“ führt ins Kind-Sheet mit Fokus auf der Auswahl.
+  - Nach Altstadt und „Fertig“ liegt der Fokus auf **„Alle Filter, 1 aktiv“**, der Hinweis ist weg, es gab 0 Requests.
+- „Für heute ist alles vorbei“ im Kalender, Uhr auf 2026-10-04 20:00 fixiert. Heute gibt es nur Termine im Langwasserbad, 6,8 km entfernt, und alle sind vorbei.
+
+  | Umkreis ab Altstadt | Leerzustand |
+  |---|---|
+  | ohne | „Für heute ist alles vorbei“ |
+  | 2 km | „Freier Tag“ |
+  | 5 km | „Freier Tag“ |
+  | 10 km | „Für heute ist alles vorbei“ |
+
+  Angebote außerhalb des Umkreises zählen also nicht mit (`shots4/kalender-heute-umkreis2.png`).
+
+### 5. Layout
+- **Meta-Zeile:**
+  - Gemessen über Range-Rects an 40 Kacheln: Bei 320, 390 und quer, jeweils mit 100 % und 200 %, in hell und dunkel, **bricht keine Zahl von ihrer Einheit weg** (0 von 40). Keine Entfernung ragt aus der Kachel.
+  - Die Entfernung steht in 20–32 von 40 Kacheln am Anfang der letzten Zeile, nach dem „·“ am Zeilenende. So war es gewollt (`shots4/meta-320-light-200.png`, `shots4/meta-390-light.png`).
+  - Die Gates `expectTextFits` und `expectNoHorizontalScroll` auf der Liste sind überall grün.
+- **Kind-Sheet:**
+  - Bei 320 px scrollt es (913 statt 490 px), der Abschnitt „Entfernung ab“ ist vollständig erreichbar.
+  - Quer (915×412) scrollt es (748 statt 285 px), Auswahl und Knöpfe sind voll breit (`shots4/kind-quer-light.png`).
+  - Bei 200 % ist alles lesbar. „Meinen Standort nutzen“ bricht zweizeilig um, Icon und Text bleiben im Knopf (`shots4/kind-320-dark-200.png`).
+  - Die Auswahl hat 17 px bzw. 34 px Schrift, also kein iOS-Zoom.
+  - Touch-Ziele, horizontaler Scroll und helle Inseln sind grün. `expectTextFits` ist rot nur in der gescrollten Querlage, siehe H1.
+- **Filter-Sheet, Gruppe Entfernung:**
+  - Die Gruppe hat dieselbe Gestalt wie „Kosten“, die gewählte Option ist gefüllt bzw. im Dunkelmodus gelb.
+  - Bei 320 px / 200 % stehen die Chips einzeln bzw. zu zweit, nichts wird abgeschnitten (`shots4/filter-320-light-200.png`).
+  - Ohne Startpunkt sind die Chips gedimmt und der Hinweis steht darunter (`shots4/filter-ohne-startpunkt-412.png`).
+- **Dunkelmodus:** keine hellen Inseln, siehe Checkliste.
+
+### 6. Plausibilität (ab Altstadt = Hauptmarkt 49,454 / 11,077)
+| Ort | Daten-Koordinate | eigene Haversine | Anzeige live | Gegenprobe mit unabhängig geschätzter Adresse ab Hauptmarkt |
+|---|---|---|---|---|
+| Langwasserbad, Breslauer Str. 251 | 49,4116 / 11,1444 | 6 779 m | „ca. 6,8 km“ | ≈ 7,0 km |
+| Neues Museum, Klarissenplatz | 49,4477 / 11,0799 | 734 m | „ca. 700 m“ | ≈ 0,6 km |
+| Haus der Begegnung, Fischbacher Hauptstr. 213 | 49,4198 / 11,1959 | 9 401 m | „ca. 9,4 km“ | ≈ 9,2 km |
+| (zusätzlich) Kliniken Dr. Erler, Kontumazgarten | 49,4528 / 11,0687 | 615 m | „ca. 600 m“ | – |
+
+Die Anzeige stimmt exakt mit der Haversine-Rechnung auf den Daten-Koordinaten. Die Gegenprobe weicht um höchstens 0,2 km ab. Das liegt an der Genauigkeit des Geocodings bzw. meiner Schätzung, nicht an der Rechnung.
+
+### Befunde
+**Blocker:** keine.
+
+**Wichtig:**
+- **W1 – Echte Geräte nicht geprüft** (Plan Schritt 9: „iPhone und Android echt geprüft“). Playwright belegt, dass die Abfrage erst nach dem Tipp startet (Spy 0 → 0 → 1) und der Berechtigungsstatus beim Laden `prompt` bleibt. Den echten Systemdialog auf iOS Safari und Android Chrome muss ein Mensch am Gerät einmal ansehen. Das ist offen, kein Fehler.
+
+**Hinweis:**
+- **H1 – Text-Gate meldet in gescrollten Sheets angeschnittene Überschriften.**
+  - Betroffen sind Kind-Sheet quer („Entfernung ab“, bei 200 % „Startpunkt:“) und Filter-Sheet 320 px / 200 % („Kosten“), jeweils mit der Meldung „stößt an die Rundung von dialog.dlg“.
+  - Ursache ist meine Scroll-Position: Die Zeile ist halb über den oberen Rand des Scroll-Containers gerollt. Das ist normales Scrollen und kein sichtbarer Defekt (`shots4/kind-quer-light.png`, `shots4/filter-320-light-200.png`).
+  - Die Ausnahme in Prüfung 3 gilt nur für *ganz* hinausgerollten Text. Das ist kein Problem, solange die CI-Ansichten oben stehen. Wenn man Sheets künftig gescrollt prüft, kann man die Regel auf „teilweise hinausgerollt“ erweitern; dafür eine Idee in `docs/ideas.md` anlegen.
+- **H2 – „Freier Tag“ trotz Terminen außerhalb des Umkreises.** Das Verhalten entspricht dem Plan: Der Umkreis gilt auch für den Leerzustand. Der Text „Kein Sticker für diesen Tag“ verschweigt aber, dass ein Filter wirkt. Bei anderen Filtern ist es genauso, das ist also nicht neu durch Plan 0004. Der Hinweis „Mit deinen Filtern nichts – Filter ändern?“ wäre eine Idee für `docs/ideas.md` (`shots4/kalender-heute-umkreis2.png`).
+- **H3 – „Startpunkt entfernen“ steht bei 200 % zentriert, bei 100 % linksbündig.** Der Link-Knopf bricht zweizeilig um und erbt `text-align: center` (`shots4/kind-320-dark-200.png`). Das ist kosmetisch.
+- **H4 – Silbentrennung in langen Anbieternamen** („Auferstehungskirc-he“) bei 320 px / 200 % (`shots4/meta-320-light-200.png`). Das ist ein Altbestand aus den Daten bzw. dem Zeilenumbruch und hat nichts mit Plan 0004 zu tun. Die Entfernung bleibt intakt.
+- **H5 – Die Liste ist nicht nach Entfernung sortiert.** Das ist laut Plan kein Ziel, nur zur Einordnung: „bis 2 km“ ist der Weg zu nahen Angeboten.
+
+**Verdict:** Plan 0004 ist live **ohne Blocker abgenommen**. Alle Prüfungen zu Geolocation, Stadtteil, Privatsphäre, Umkreis, Layout und Plausibilität sind grün, in Chromium und WebKit. Offen bleibt nur die Sichtprüfung des echten Berechtigungsdialogs auf iPhone und Android (W1).
+
+**Screenshots:**
+- `/home/suus/.claude/jobs/1aadb80d/tmp/review-0004-kind-standort.png`: Kind-Sheet mit „Mein Standort“ und dem Hinweis „auf ca. 100 m gerundet“.
+- `/home/suus/.claude/jobs/1aadb80d/tmp/review-0004-entdecken-390.png`: Entdecken bei 390 px mit zweizeiliger Statuszeile und Entfernung auf den Kacheln.
+- weitere unter `/home/suus/.claude/jobs/1aadb80d/tmp/shots4/`.
