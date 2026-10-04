@@ -1,0 +1,287 @@
+/* Overlays (native <dialog>): gemeinsame Hülle und Detail-Ansicht (Dialog.tsx, DetailDialog.tsx). */
+
+@layer components {
+  /* Overlays (native <dialog>) */
+  .dlg {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    max-height: none;
+    color: var(--ink);
+    background-color: var(--bg);
+    background-image: radial-gradient(var(--dotc) 1.3px, transparent 1.6px);
+    background-size: 18px 18px;
+    overflow-wrap: anywhere;
+    overscroll-behavior: contain;
+  }
+  .dlg::backdrop {
+    background: rgba(19, 33, 46, 0.45);
+  }
+  .detail {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  }
+  .detail[open] {
+    display: flex;
+    flex-direction: column;
+    animation: slide 0.34s cubic-bezier(0.2, 1.1, 0.4, 1);
+  }
+  @keyframes slide {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .detail-col {
+    width: 100%;
+    max-width: 40rem;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  .dhead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 4px;
+  }
+  .dscroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .dscroll .detail-col {
+    padding: 4px 16px 20px;
+  }
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 2px 0 4px;
+  }
+  .bigsticker {
+    width: 92px;
+    height: 92px;
+    flex: none;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--k);
+    border: 4px solid var(--rim);
+    box-shadow:
+      0 0 0 2.5px var(--line),
+      5px 5px 0 2.5px var(--shadow);
+    display: grid;
+    place-items: center;
+    transform: rotate(-8deg);
+    animation: peelin 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 0.1s both;
+  }
+  @keyframes peelin {
+    from {
+      transform: rotate(-50deg) scale(0.4);
+      opacity: 0;
+    }
+  }
+  .catname {
+    display: inline-block;
+    font-weight: 800;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--k);
+    color: var(--on-color);
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+  }
+  .hero .meta {
+    margin: 6px 0 0;
+  }
+  .dtitle {
+    font-weight: 800;
+    font-size: 1.875rem;
+    line-height: 1.04;
+    letter-spacing: -0.045em;
+    margin: 12px 0 4px;
+  }
+  .summary {
+    margin: 8px 0 14px;
+    hyphens: auto;
+  }
+  .labels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    margin: 0 5px 16px 0;
+  }
+  .label {
+    position: relative;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 14px 14px 14px 4px;
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .label:nth-child(odd) {
+    transform: rotate(-0.5deg);
+  }
+  .label:nth-child(even) {
+    transform: rotate(0.5deg);
+  }
+  .label.full {
+    grid-column: 1 / -1;
+  }
+  .label::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: inset 0 1px 2px var(--edge);
+  }
+  .label .cap {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .label b {
+    font-weight: 800;
+    font-size: 1.0625rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .label span:not(.cap) {
+    font-size: 0.875rem;
+    font-weight: 450;
+    color: var(--muted);
+  }
+  .label span.ok {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .stamp {
+    box-shadow: 3px 3px 0 var(--shadow);
+    border: 3px solid #13212e;
+    border-radius: 12px;
+    padding: 8px 12px 0;
+    margin: 0 5px 18px 0;
+    transform: rotate(-1.5deg);
+    background: var(--sb);
+    color: var(--on-color);
+  }
+  .stamp b {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 800;
+  }
+  .stamp span {
+    display: block;
+    font-size: 0.875rem;
+  }
+  .stamp .linkbtn {
+    color: var(--on-color);
+    padding: 0;
+  }
+  .stamp-wenige {
+    --sb: #ffd93b;
+  }
+  .stamp-ausgebucht,
+  .stamp-warteliste {
+    --sb: #ff9a9a;
+  }
+  .stamp-frei {
+    --sb: #a6db5e;
+  }
+  .h3 {
+    font-weight: 800;
+    font-size: 1.3125rem;
+    letter-spacing: -0.03em;
+    margin: 6px 0 8px;
+  }
+  .dates {
+    list-style: none;
+    margin: 0 4px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dates li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 8px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    box-shadow: 2px 2px 0 var(--shadow);
+    font-weight: 700;
+  }
+  .dates li.sel {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .dates li span {
+    font-weight: 500;
+  }
+  .dfoot {
+    background: var(--surface);
+    border-top: 2.5px solid var(--line);
+    border-radius: 24px 24px 0 0;
+  }
+  .dfoot .detail-col {
+    padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dfoot .lbl {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: center;
+  }
+  .dfoot .btn:not(.primary) {
+    background: var(--soft);
+  }
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 10px;
+  }
+
+  /* Ergänzungen gegenüber dem Mockup */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+  .bigsticker .mini {
+    width: 46px;
+    height: 46px;
+  }
+  .provider-link {
+    margin: 16px 0 0;
+  }
+}
+
+:root[data-theme="dark"] .dlg::backdrop {
+  background: rgba(0, 0, 0, 0.62);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .dlg::backdrop {
+    background: rgba(0, 0, 0, 0.62);
+  }
+}

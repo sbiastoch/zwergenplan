@@ -1,0 +1,202 @@
+/* Sheets von unten (Filter, Kind) und Toast (Sheets.tsx, Toast.tsx). */
+
+@layer components {
+  .sheet {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 40rem;
+    margin: 0 auto;
+    max-height: 90dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    border-top: 2.5px solid var(--line);
+    border-radius: 28px 28px 0 0;
+    padding: 6px 16px calc(18px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 30px -10px rgba(0, 0, 0, 0.4);
+    scrollbar-width: none;
+  }
+  .sheet[open] {
+    animation: up 0.38s cubic-bezier(0.2, 1.25, 0.4, 1);
+  }
+  @keyframes up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .grab {
+    width: 46px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--muted);
+    opacity: 0.5;
+    margin: 6px auto 10px;
+  }
+  .sheet h2 {
+    font-weight: 800;
+    font-size: 1.75rem;
+    letter-spacing: -0.045em;
+    margin: 0 0 10px;
+  }
+  .sheet h3 {
+    font-size: 0.8125rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 18px 0 8px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 800;
+  }
+  .input {
+    min-height: 56px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 0 14px;
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+  }
+  .input::placeholder {
+    color: var(--muted);
+  }
+  .hint {
+    font-size: 0.9375rem;
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+  }
+  .hint.ok {
+    background: #a6db5e;
+    color: var(--on-color);
+  }
+  .hint.bad {
+    background: #ff9a9a;
+    color: var(--on-color);
+  }
+  .swrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .swtext {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .swrow small {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  .switch {
+    width: 64px;
+    height: 44px;
+    flex: none;
+    border: 0;
+    background: none;
+    padding: 0;
+    display: grid;
+    place-items: center;
+  }
+  .track {
+    width: 56px;
+    height: 32px;
+    border-radius: 16px;
+    background: var(--soft);
+    box-shadow:
+      inset 0 1px 3px var(--edge),
+      0 0 0 2px var(--edge2);
+    position: relative;
+    transition: background 0.2s;
+  }
+  .knob {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    transition: transform 0.32s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .switch[aria-checked="true"] .track {
+    background: #2ec4b6;
+  }
+  .switch[aria-checked="true"] .knob {
+    transform: translateX(24px) rotate(180deg);
+    background: #fff;
+  }
+  .sheetfoot {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .toast {
+    position: fixed;
+    z-index: 20;
+    left: 50%;
+    bottom: calc(6.5rem + env(safe-area-inset-bottom));
+    width: calc(min(40rem, 100vw) - 32px);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 10px 10px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 700;
+    border: 2px solid var(--line);
+    box-shadow: 3px 3px 0 var(--shadow);
+    transform: translateX(-50%) rotate(-1deg);
+    animation: toast 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .toast:empty {
+    display: none;
+  }
+  .toast .tk {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    border-radius: 50%;
+    background: #a6db5e;
+    color: var(--on-color);
+    display: grid;
+    place-items: center;
+  }
+  @keyframes toast {
+    from {
+      transform: translateX(-50%) translateY(30px) rotate(-6deg) scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(-50%) rotate(-1deg);
+      opacity: 1;
+    }
+  }
+
+  /* Ergänzung gegenüber dem Mockup */
+  .sheetfoot.single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

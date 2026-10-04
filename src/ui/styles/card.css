@@ -1,0 +1,245 @@
+/* Angebots-Kachel, Herz, Leerzustand (OfferCard.tsx). */
+
+@layer components {
+  /* Angebots-Kachel */
+  .card {
+    position: relative;
+    background: var(--surface);
+    border: 2.5px solid var(--line);
+    border-radius: 22px;
+    box-shadow: 5px 5px 0 var(--shadow);
+    margin: 0 5px 14px 0;
+    transition: transform 0.22s cubic-bezier(0.3, 1.5, 0.5, 1);
+    /* nur später eingefügte Kacheln kleben sich ein (.fresh), nicht das erste Rendern (LCP) */
+  }
+  .card:nth-of-type(odd) {
+    transform: rotate(-0.6deg);
+  }
+  .card:nth-of-type(even) {
+    transform: rotate(0.6deg);
+  }
+  .card:has(.card-open:active) {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--shadow);
+  }
+  .card.unfit {
+    border-style: dashed;
+    box-shadow: none;
+  }
+  @keyframes stick {
+    from {
+      opacity: 0;
+      transform: translateY(14px) rotate(-3deg) scale(0.96);
+    }
+  }
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    padding: 14px 62px 15px 15px;
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px 2px 5px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--k);
+    color: var(--on-color);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    transform: rotate(-1.5deg);
+  }
+  .pill .mini {
+    width: 15px;
+    height: 15px;
+  }
+  .when {
+    font-weight: 800;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+  }
+  .ctitle {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.375rem;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+  /* Stretched-Button: der Titel öffnet das Detail, die ganze Kachel ist Klickfläche */
+  .card.fresh {
+    animation: stick 0.45s cubic-bezier(0.2, 1.3, 0.4, 1) backwards;
+  }
+  /* Touch-Gate misst den Button selbst: ≥ 44 px hoch, Innenabstand und Minus-Rand heben sich optisch auf */
+  .card-open {
+    all: unset;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 10px 0;
+    margin: -10px 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-open::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 19px;
+  }
+  .card-open:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 450;
+    margin: 0;
+  }
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .fact {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 8px;
+    background: var(--soft);
+  }
+  .fact.reg {
+    background: none;
+    box-shadow: inset 0 0 0 1.5px var(--line);
+  }
+  .fact.avail-wenige {
+    background: #ffd93b;
+    color: var(--on-color);
+  }
+  .fact.avail-ausgebucht,
+  .fact.avail-warteliste {
+    background: #ff9a9a;
+    color: var(--on-color);
+  }
+  .fact.avail-frei {
+    background: #a6db5e;
+    color: var(--on-color);
+  }
+  .fact.warn {
+    background: none;
+    border: 1.5px dashed var(--muted);
+  }
+
+  .heart {
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    padding: 0;
+    display: grid;
+    place-items: center;
+  }
+  .heart .hs {
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    box-shadow: 2px 2px 0 var(--shadow);
+    transition:
+      background 0.2s,
+      transform 0.12s,
+      box-shadow 0.12s;
+  }
+  .heart:active .hs {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--shadow);
+  }
+  .heart[aria-pressed="true"] .hs {
+    background: #ff7070;
+    color: var(--on-color);
+    transform: rotate(-10deg);
+    animation: slap 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
+  }
+  .heart[aria-pressed="true"] .ic {
+    fill: currentColor;
+  }
+  .heart.inline {
+    position: static;
+  }
+  @keyframes slap {
+    0% {
+      /* nicht größer als das 44-px-Herz: sonst zählt Chrome die Ausdehnung als Seitenüberlauf */
+      transform: rotate(-45deg) scale(1.15);
+      opacity: 0;
+    }
+    60% {
+      transform: rotate(-4deg) scale(0.9);
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(-10deg) scale(1);
+    }
+  }
+
+  /* Leerzustand */
+  .empty {
+    text-align: center;
+    padding: 28px 12px;
+    color: var(--muted);
+  }
+  .empty b {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    margin: 14px 0 4px;
+  }
+  .slot {
+    width: 104px;
+    height: 104px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px dashed var(--muted);
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    transform: rotate(-6deg);
+    animation: wiggle 3.2s ease-in-out infinite;
+  }
+  @keyframes wiggle {
+    50% {
+      transform: rotate(6deg);
+    }
+  }
+
+  /* Platzhalter beim Laden */
+  .card.placeholder {
+    min-height: 9.5rem;
+    border-style: dashed;
+    box-shadow: none;
+    background: transparent;
+  }
+}

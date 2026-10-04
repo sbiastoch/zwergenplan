@@ -10,10 +10,16 @@ const MIN_TOUCH = 44;
 /** WCAG 2.2 AA (2.5.8) für Links im Fließtext. */
 const MIN_INLINE = 24;
 
+/** Höchstdauer einer Animation oder Transition bei reduzierter Bewegung (Dauer + Verzögerung). */
+const MAX_REDUCED_MS = 1;
+
 /**
  * Erst messen, wenn endliche Animationen (Einkleben, Plop, Aufklappen) durch sind: Mitten in
- * `scale(.98)` ist ein 44-px-Knopf 43 px groß. WebKit spielt sie trotz `reducedMotion` ab.
- * Endlos-Animationen (Wackeln im Leerzustand) zählen nicht.
+ * `scale(.98)` ist ein 44-px-Knopf 43 px groß.
+ * Ursache, warum das trotz `expectReducedMotion` nötig bleibt: Nicht alle Gates emulieren
+ * `prefers-reduced-motion` (z. B. der Smoke-Test mit echten Daten und die Fokusprüfung), dort laufen die
+ * Animationen in voller Länge. Auch mit 0,01 ms endet eine Animation erst mit dem nächsten Frame, settle()
+ * wartet genau diesen Frame ab. Endlos-Animationen (Wackeln im Leerzustand) zählen nicht.
  */
 async function settle(page: Page) {
   await page.evaluate(() =>
@@ -106,6 +112,48 @@ export async function expectVisibleFocus(page: Page, maxTabs = 40) {
     if (!info.visible) missing.push(info.label);
   }
   expect(missing, "Elemente ohne sichtbaren Fokus").toEqual([]);
+}
+
+/**
+ * Mit `prefers-reduced-motion: reduce` dauert keine Animation und keine Transition länger als 1 ms,
+ * Verzögerung eingerechnet (docs/architecture.md, „Mobile-UX-Gates“). Geprüft werden die laufenden
+ * Animationen (`document.getAnimations()`) und die berechneten Stile aller Elemente samt `::before`/`::after`,
+ * damit auch erst später ausgelöste Bewegung (Hover, Aufklappen) auffällt. Aufrufer emulieren `reducedMotion`.
+ */
+export async function expectReducedMotion(page: Page) {
+  const offenders = await page.evaluate((maxMs) => {
+    const ms = (value: string) =>
+      Math.max(
+        ...value.split(",").map((part) => {
+          const v = part.trim();
+          return v.endsWith("ms") ? Number.parseFloat(v) : Number.parseFloat(v) * 1000;
+        }),
+      );
+    const label = (el: Element, pseudo = "") =>
+      `${el.tagName.toLowerCase()}${el.classList.length > 0 ? `.${[...el.classList].join(".")}` : ""}${pseudo}`;
+    const found: string[] = [];
+    for (const animation of document.getAnimations()) {
+      const timing = animation.effect?.getComputedTiming();
+      const total = Number(timing?.delay ?? 0) + Number(timing?.activeDuration ?? 0);
+      if (total > maxMs) {
+        const target = animation.effect instanceof KeyframeEffect ? animation.effect.target : null;
+        const name = animation instanceof CSSAnimation ? animation.animationName : "Animation";
+        found.push(`läuft: ${name} auf ${target ? label(target) : "?"} (${Math.round(total)} ms)`);
+      }
+    }
+    for (const el of document.querySelectorAll("*")) {
+      for (const pseudo of ["", "::before", "::after"]) {
+        const s = getComputedStyle(el, pseudo || null);
+        const animation = s.animationName === "none" ? 0 : ms(s.animationDuration) + ms(s.animationDelay);
+        const transition = ms(s.transitionDuration) + ms(s.transitionDelay);
+        if (animation > maxMs)
+          found.push(`Stil: animation ${s.animationName} auf ${label(el, pseudo)} (${animation} ms)`);
+        if (transition > maxMs) found.push(`Stil: transition auf ${label(el, pseudo)} (${transition} ms)`);
+      }
+    }
+    return [...new Set(found)].slice(0, 10);
+  }, MAX_REDUCED_MS);
+  expect(offenders, "Bewegung trotz prefers-reduced-motion (Dauer + Verzögerung > 1 ms)").toEqual([]);
 }
 
 /** Alle schnellen Layout-Prüfungen auf einmal. */

@@ -1,0 +1,17 @@
+/*
+ * Reduzierte Bewegung: keine Animation und keine Transition länger als 1 ms, Verzögerung eingerechnet
+ * (geprüft von expectReducedMotion in e2e/mobile-ux.ts). Zuletzt importiert.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore-start lint/complexity/noImportantStyles: reduced-motion muss alles übersteuern */
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    /* biome-ignore-end lint/complexity/noImportantStyles: - */
+  }
+}
