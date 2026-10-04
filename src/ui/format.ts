@@ -2,6 +2,7 @@
  * Texte der Oberfläche aus Domänenwerten. Keine Geschäftslogik: Welcher Termin zählt, ob etwas
  * passt oder wöchentlich ist, entscheidet src/domain. Kalendertage sind Berliner Tage (ISO-Strings).
  */
+import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, nextSession, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -166,7 +167,7 @@ export function availabilityLabel(offer: SiteOffer): string | undefined {
 }
 
 export function ageRangeLabel(age: AgeRange | undefined): string {
-  const { minMonths, maxMonths } = age ?? { minMonths: 0, maxMonths: 36 };
+  const { minMonths, maxMonths } = age ?? DEFAULT_AGE;
   return `${minMonths}–${maxMonths} Monate`;
 }
 

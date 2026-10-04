@@ -1,11 +1,9 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { loadSiteData } from "../data/site.ts";
-import { ageInMonths, splitByAge } from "../domain/age.ts";
-import { groupByNextSession, lastSessionDay, sessionsByDay, takeGroups } from "../domain/agenda.ts";
-import { applyFilters, EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
+import { ageInMonths } from "../domain/age.ts";
+import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
 import type { Tab } from "../domain/route.ts";
-import { savedOffers } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CalendarView } from "./CalendarView.tsx";
@@ -19,13 +17,11 @@ import { SavedView } from "./SavedView.tsx";
 import { FilterSheet, KidSheet } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
 import { useAgeOnly, useBirthDate, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
+import { useOfferViews } from "./use-offer-views.ts";
 
 type LoadState = { kind: "loading" } | { kind: "error"; message: string } | { kind: "ready"; data: SiteData };
 
-/** Angebote je Schritt in der Liste (Plan 0003, E8) */
-const PAGE = 40;
 const NO_OFFERS: SiteOffer[] = [];
-const NO_INDEX = new Map();
 
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
@@ -40,10 +36,6 @@ export function App() {
   const today = berlinIsoDate(now);
 
   const [sheet, setSheet] = useState<"filter" | "kid" | null>(null);
-  const [showUnfit, setShowUnfit] = useState(false);
-  const [limit, setLimit] = useState(PAGE);
-  const [calendarDay, setCalendarDay] = useState(today);
-  const [monthOpen, setMonthOpen] = useState(false);
   const [detailDay, setDetailDay] = useState<string>();
   const [animate, setAnimate] = useState(false);
 
@@ -63,26 +55,8 @@ export function App() {
   }, [load.kind]);
 
   const offers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
-  const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
-  const unfitIds = useMemo(
-    () => new Set(birthDate ? splitByAge(upcoming, birthDate, now).unfit.map((o) => o.id) : []),
-    [upcoming, birthDate, now],
-  );
-  const filtered = useMemo(() => applyFilters(offers, route.filter, { now }), [offers, route.filter, now]);
-  const useAge = ageOnly && birthDate !== undefined;
-  const hiddenCount = useAge ? filtered.filter((o) => unfitIds.has(o.id)).length : 0;
-  const visible = useMemo(
-    () => (useAge && !showUnfit ? filtered.filter((o) => !unfitIds.has(o.id)) : filtered),
-    [filtered, useAge, showUnfit, unfitIds],
-  );
-  const groups = useMemo(() => groupByNextSession(visible, now), [visible, now]);
-  const page = takeGroups(groups, limit);
-  const calendarIndex = useMemo(
-    () => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX),
-    [visible, route.tab],
-  );
-  const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
-  const detailOffer = route.offerId ? offers.find((o) => o.id === route.offerId) : undefined;
+  const views = useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now });
+  const { visible, hiddenCount, showUnfit, page, calendar, saved, detailOffer } = views;
 
   // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler): Parameter entfernen.
   useEffect(() => {
@@ -91,11 +65,11 @@ export function App() {
 
   const setFilter = (filter: FilterState) => {
     replace({ ...route, filter });
-    setLimit(PAGE);
+    views.resetPage();
   };
   const setBirthDate = (value: string | undefined) => {
     setBirthDateStored(value);
-    setShowUnfit(false);
+    views.setShowUnfit(false);
   };
   const onTab = (tab: Tab) => {
     replace({ ...route, tab });
@@ -115,7 +89,7 @@ export function App() {
     now,
     animate,
     isSaved: (id) => savedIds.includes(id),
-    isUnfit: (id) => birthDate !== undefined && unfitIds.has(id),
+    isUnfit: (id) => views.unfitIds.has(id),
     onToggleSave,
     onOpen: (offer, day) => {
       setDetailDay(day);
@@ -168,7 +142,7 @@ export function App() {
             {hiddenCount > 0 && (
               <p className="status">
                 {plural(hiddenCount, "passt", "passen")} nicht zu {ageLabel}
-                <button type="button" className="linkbtn" onClick={() => setShowUnfit(!showUnfit)}>
+                <button type="button" className="linkbtn" onClick={() => views.setShowUnfit(!showUnfit)}>
                   {showUnfit ? "ausblenden" : "trotzdem zeigen"}
                 </button>
               </p>
@@ -180,7 +154,7 @@ export function App() {
             <ListView
               groups={page.groups}
               remaining={page.remaining}
-              onMore={() => setLimit((n) => n + PAGE)}
+              onMore={views.showMore}
               today={today}
               ctx={ctx}
               hasData={offers.length > 0}
@@ -191,13 +165,13 @@ export function App() {
         )}
         {load.kind === "ready" && route.tab === "kalender" && (
           <CalendarView
-            index={calendarIndex}
+            index={calendar.index}
             today={today}
-            lastDay={lastSessionDay(visible)}
-            day={calendarDay}
-            onDay={setCalendarDay}
-            monthOpen={monthOpen}
-            onMonthOpen={setMonthOpen}
+            lastDay={calendar.lastDay}
+            day={calendar.day}
+            onDay={calendar.setDay}
+            monthOpen={calendar.monthOpen}
+            onMonthOpen={calendar.setMonthOpen}
             ctx={ctx}
           />
         )}

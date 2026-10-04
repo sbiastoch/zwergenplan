@@ -1,7 +1,8 @@
 /** Kalender (Plan 0003, E14): Wochenleiste, aufklappbares Monatsraster, Agenda des gewählten Tages. */
-import { monthDays, type Occurrence, weekDays } from "../domain/agenda.ts";
+import { monthDays, type Occurrence } from "../domain/agenda.ts";
+import { type CalendarNav, calendarNav, clampDay } from "../domain/calendar.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { addDays, addMonths, parseIsoDate } from "../domain/time.ts";
+import { parseIsoDate } from "../domain/time.ts";
 import { primaryCategory } from "./categories.ts";
 import { agendaHeading, longDate, monthTitle, plural, weekdayShort, weekTitle } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
@@ -20,14 +21,13 @@ interface CalendarViewProps {
   ctx: CardContext;
 }
 
-const firstOfMonth = (day: string) => `${day.slice(0, 8)}01`;
-
 export function CalendarView({ index, today, lastDay, day, onDay, monthOpen, onMonthOpen, ctx }: CalendarViewProps) {
-  const week = weekDays(day);
-  const thisWeek = weekDays(today);
-  const end = lastDay ?? today;
+  const nav = calendarNav(day, today, lastDay);
   const agenda = index.get(day) ?? [];
-  const pick = (d: string) => onDay(d < today ? today : d);
+  const pick = (d: string) => onDay(clampDay(d, today));
+  const go = (target: string | undefined) => () => {
+    if (target) onDay(target);
+  };
   const label = (d: string) => `${longDate(d)}, ${plural(index.get(d)?.length ?? 0, "Angebot", "Angebote")}`;
 
   return (
@@ -36,18 +36,18 @@ export function CalendarView({ index, today, lastDay, day, onDay, monthOpen, onM
         <button
           type="button"
           className="iconbtn"
-          onClick={() => pick(addDays(day, -7))}
-          disabled={week[0] === thisWeek[0]}
+          onClick={go(nav.prevWeek)}
+          disabled={!nav.prevWeek}
           aria-label="Vorherige Woche"
         >
           <Icon name="back" />
         </button>
-        <b>{weekTitle(week)}</b>
+        <b>{weekTitle(nav.week)}</b>
         <button
           type="button"
           className="iconbtn"
-          onClick={() => pick(addDays(week[0] ?? day, 7))}
-          disabled={addDays(week[0] ?? day, 7) > end}
+          onClick={go(nav.nextWeek)}
+          disabled={!nav.nextWeek}
           aria-label="Nächste Woche"
         >
           <Icon name="next" />
@@ -56,7 +56,7 @@ export function CalendarView({ index, today, lastDay, day, onDay, monthOpen, onM
       <fieldset className="plain">
         <legend className="sr-only">Woche</legend>
         <div className="week">
-          {week.map((d) => (
+          {nav.week.map((d) => (
             <button
               key={d}
               type="button"
@@ -90,14 +90,14 @@ export function CalendarView({ index, today, lastDay, day, onDay, monthOpen, onM
         <MonthGrid
           day={day}
           today={today}
-          end={end}
+          nav={nav}
           index={index}
           label={label}
           onPick={(d) => {
             pick(d);
             onMonthOpen(false);
           }}
-          onDay={pick}
+          go={go}
         />
       )}
       <h2 className="daylabel">
@@ -119,21 +119,20 @@ export function CalendarView({ index, today, lastDay, day, onDay, monthOpen, onM
 function MonthGrid({
   day,
   today,
-  end,
+  nav,
   index,
   label,
   onPick,
-  onDay,
+  go,
 }: {
   day: string;
   today: string;
-  end: string;
+  nav: CalendarNav;
   index: Map<string, Occurrence<SiteOffer>[]>;
   label: (d: string) => string;
   onPick: (d: string) => void;
-  onDay: (d: string) => void;
+  go: (target: string | undefined) => () => void;
 }) {
-  const first = firstOfMonth(day);
   const month = monthDays(day);
   return (
     <div className="month">
@@ -141,8 +140,8 @@ function MonthGrid({
         <button
           type="button"
           className="iconbtn"
-          onClick={() => onDay(addMonths(first, -1))}
-          disabled={first <= firstOfMonth(today)}
+          onClick={go(nav.prevMonth)}
+          disabled={!nav.prevMonth}
           aria-label="Vorheriger Monat"
         >
           <Icon name="back" />
@@ -151,8 +150,8 @@ function MonthGrid({
         <button
           type="button"
           className="iconbtn"
-          onClick={() => onDay(addMonths(first, 1))}
-          disabled={addMonths(first, 1) > end}
+          onClick={go(nav.nextMonth)}
+          disabled={!nav.nextMonth}
           aria-label="Nächster Monat"
         >
           <Icon name="next" />
