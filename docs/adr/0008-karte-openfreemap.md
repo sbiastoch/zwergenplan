@@ -63,7 +63,7 @@ Weitere Befunde zu dieser Alternative:
   - der Standort oder Startpunkt, weder als Parameter noch **mittelbar über die Kachelwahl**;
   - Geburtsdatum, Merkliste, Filter, Angebots-IDs.
 - **Kamera-Regel** (daraus folgend): Die Karte zentriert oder zoomt **nie** auf einen Startpunkt aus Standort (GPS) oder Kartenmitte. Sie zeichnet ihn nur als lokalen Layer, der keine Kacheln anfordert.
-  - Der Ausschnitt beim Öffnen ist immer `fitBounds` über die sichtbaren Orte, also über öffentliche Daten.
+  - Der Ausschnitt beim Öffnen ist immer `fitBounds` über die Orte **ohne Umkreis-Filter** (übrige Filter und Altersregel wie auf der Karte), also über öffentliche Daten. Der Umkreis hängt am Startpunkt; ein Ausschnitt über die Orte im Umkreis eines Standorts würde die Gegend über die Kachelwahl verraten (Arch-Review zu Plan 0005, B1). Die Entscheidung trifft die reine Funktion `initialCamera` in `src/domain/camera.ts`.
   - Auf einen **Stadtteil** darf die Karte fahren. Der ist grob, öffentlich und ohnehin einer von 35 festen Punkten.
   - Verschiebt jemand die Karte selbst zu sich nach Hause, ist das seine Handlung. Das unterscheidet sich nicht von jeder anderen Kartennutzung.
 - **Nur in der Kartenansicht**: Solange die Karte nicht offen ist, geht kein Request an OpenFreeMap, und der Karten-Code wird nicht geladen. Das Umschalten auf „Karte“ ist die ausdrückliche Handlung, eine zusätzliche Einwilligung gibt es nicht. Unter der Karte steht: „Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät.“

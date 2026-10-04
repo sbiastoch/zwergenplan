@@ -1,6 +1,6 @@
 # Plan 0005 – Karte der Orte (MapLibre GL + OpenFreeMap)
 
-Status: freigegeben nach Review (mit Änderungen, eingearbeitet) → wartet auf Plan 0004
+Status: umgesetzt auf Branch `karte-0005` (Schritte 2–7), Arch-Review eingearbeitet → Push, CI und Browser-Review live offen
 Datum: 2026-10-04
 Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR 0005 (Startpunkt ohne GPS), **ADR 0008** (Entwurf: MapLibre, OpenFreeMap, Kamera-Regel, Alternativen)
 
@@ -194,7 +194,7 @@ Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR
 
 - **Die Karte fährt und zoomt nie auf einen Startpunkt aus Standort oder Kartenmitte.** Sie zeichnet ihn nur als lokalen GeoJSON-Layer, und der fordert keine Kacheln an. Damit verraten die Kachel-Requests den Standort nicht.
 - Ausschnitt beim Öffnen:
-  - immer `fitBounds` über die sichtbaren Orte (Innenabstand 32 px, `maxZoom: 14`);
+  - immer `fitBounds` über die Orte **ohne Umkreis-Filter** (übrige Filter und Altersregel wie auf der Karte; Innenabstand 32 px, `maxZoom: 14`). Der Umkreis hängt am Startpunkt und darf den Ausschnitt nicht bestimmen (Arch-Review B1). Reine Funktion `initialCamera` in `src/domain/camera.ts`;
   - ohne Orte: Hauptmarkt (49,454 / 11,077), Zoom 11;
   - **Ausnahme Stadtteil**: Ist der Startpunkt ein Stadtteil, zentriert die Karte beim Öffnen auf ihn (Zoom 13). Wird ein Stadtteil gewählt, während die Karte offen ist, fährt sie per `easeTo` hin.
 - Der zuletzt gesehene Ausschnitt gilt für die Sitzung (Modul-Variable in `MapView.tsx`) und wird beim erneuten Öffnen wiederhergestellt. Er steht weder in der URL noch im Speicher.
@@ -452,3 +452,40 @@ Minor:
 11. Kartenhöhe `clamp(240px, 60dvh, 544px)`, px statt rem wegen 200 % (E7).
 12. Referrer-Policy abgewogen und in ADR 0008 begründet.
 13. Fixture-Stile mit Vektorquelle, damit das Kachel-Protokoll aussagekräftig ist (E13).
+
+## Umsetzung (2026-10-04)
+
+Branch `karte-0005`, Commits `981b3e7` (Schritt 2) bis `3e43840` (Schritt 7), dazu die Nacharbeit zum Arch-Review.
+
+Messwerte (`pnpm build && pnpm size`, echte Daten, gzip):
+
+| | vorher | nach Schritt 2 | nach Schritt 5 | Budget |
+|---|---|---|---|---|
+| JS (initial) | 85,67 kB | 86,62 kB | 87,94 kB | 90 kB |
+| CSS | 8,75 kB | 8,80 kB | 9,04 kB | 15 kB |
+| Karte JS (lazy) | – | 419,94 kB | 423,09 kB (MapView-Chunk 276,9 + Worker 144,7) | 450 kB |
+| Karte CSS (lazy) | – | 10,38 kB | 10,66 kB | 12 kB |
+
+Kanarienvögel (je einzeln eingesetzt, `pnpm arch` rot, wieder entfernt): statischer und reiner Typ-Import von `./map/MapView.tsx` in `App.tsx` → `map-only-lazy`; `import "maplibre-gl"` und `import type` daraus in `App.tsx` sowie `import "maplibre-gl"` in `src/data/tiles.ts` → `maplibre-only-in-map`. Leere Vektorkachel (E13): 200 mit leerem Body gilt in Chromium und WebKit als leere Kachel, keine Konsolenmeldung.
+
+Abweichungen und Befunde:
+- dependency-cruiser löste `maplibre-gl` zunächst nicht auf (nur Export-Bedingung `import`): `exportsFields`/`conditionNames` in `enhancedResolveOptions`, die Regel prüft zusätzlich den Paketnamen.
+- `tiles.ts` liegt im Karten-Chunk, nicht im Startbundle (nur `MapView` nutzt es).
+- Drehen und Neigen sind aus: Ohne Kompass gäbe es keinen Weg zurück nach Norden.
+- `maplibre-gl.css` ist ungeschichtet und schlägt `@layer components`; alles zu MapLibre-Elementen (auch `.map-canvas`) steht ungeschichtet in `map-overrides.css`.
+- Vite schreibt `import(…).then(ok, fail)` so um, dass die Handler am rohen Import im Preload-Helfer hängen; ein fehlendes Karten-CSS gab dann eine unbehandelte Ablehnung. `MapPanel` lädt über die async-Funktion `loadMapView`.
+- WebKit (Playwright 1.63) lädt ein fehlgeschlagenes Modul-Skript in derselben Seite nie wieder, auch nicht nach `reload()`; Test 11 prüft dort in einem neuen Tab. Echtes iPhone: Browser-Review.
+- Leerzustand `NoOffers` aus `ListView` herausgezogen und von Liste und Karte genutzt; `ViewToggle` an `Chrome.tsx` angehängt, `TabBar` unverändert (bekommt `tabSection`).
+- `App.tsx` hat 335 Zeilen (Plan ~250). `Overlays.tsx` folgt nach dem Rebase auf Plan 0007 Paket B, um Konflikte mit dessen Sheet-Umbau zu vermeiden.
+- E2E: `MAP_READY` (20 s bis `bereit`, Software-WebGL unter Parallellast), Wächter und Kachel-Protokoll in einer Fixture, zusätzlicher Test „Wächter: Querystring/fremder Host verlassen den Browser nicht, auch nicht aus dem Worker“. Worker-Kacheln belegt über das Resource-Timing des Workers (Test 2).
+
+## Arch-Review (2026-10-04) – Verdict: Nacharbeit nötig → eingearbeitet
+
+- **B1 (Blocker, Privatsphäre)**: Der Startausschnitt war `fitBounds` über `places` aus `visible`, also nach dem Umkreis um einen Standort gefiltert. Liste → „Meinen Standort nutzen“ → „bis 2 km“ → Karte zeigte die Orte um den GPS-Punkt, die Kachel-Requests verrieten die Gegend. Behoben:
+  - `initialCamera(points, origin)` in `src/domain/camera.ts` (rein, getestet): vom Startpunkt zählt nur `source === "stadtteil"`; sonst Orte bzw. Hauptmarkt.
+  - `useOfferViews().startCamera` filtert dafür ohne Startpunkt (der Umkreis wirkt so nicht), mit denselben übrigen Filtern und derselben Altersregel; `MapView` bekommt nur noch `start` und schaut für den Ausschnitt nicht auf Orte oder Startpunkt.
+  - Weitere Wege geprüft: Filterwechsel tauscht nur Daten, `easeTo` nur bei Stadtteil und Cluster-Tipp, `sortPlaces` betrifft nur die Liste.
+  - Tests: `camera.test.ts` (Standort und Kartenmitte = ohne Startpunkt), `use-offer-views.test.ts` (Standort + 2 km = ohne Startpunkt), E2E „Startausschnitt verrät den Standort nicht“ (Kamera und Kachel-Requests identisch; vor dem Fix rot).
+  - ADR 0008, E9 und `docs/architecture.md` präzisiert: „über die Orte ohne Umkreis-Filter“.
+- **m1**: Status, Messwerte, Kanarienvögel und Umsetzung hier nachgetragen.
+- **m2**: `thirdPartyGuard` nahm `tiles.openfreemap.org` ganz aus. Jetzt muss jeder Kontext-Request an den Host von einem Mock-Handler beantwortet sein (Set der bedienten URLs); Tests mit eigenen Antworten nutzen `routeTiles`. Kanarienvogel: ohne Eintrag ins Set meldet der Wächter Stil und Worker-Kacheln als „nicht gemockt“.
