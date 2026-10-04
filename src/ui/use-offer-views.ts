@@ -1,19 +1,21 @@
 /**
  * Abgeleitete Ansichten der Angebote (Plan 0003, Arch-Review 7): Filter, Alters-Sichtbarkeit,
  * Liste in Schritten, Kalender, Merkliste, offenes Detail – plus der Ansichts-Zustand dazu.
- * „Jetzt“ kommt von außen (entsteht nur in App.tsx).
+ * „Jetzt“ kommt von außen (entsteht nur in `useNow`, use-app-state.ts).
  */
 import { useCallback, useMemo, useState } from "react";
 import { ageVisibility } from "../domain/age.ts";
 import {
   type DayGroup,
+  endedOnDay,
   groupByNextSession,
   lastSessionDay,
   type Occurrence,
   sessionsByDay,
   takeGroups,
 } from "../domain/agenda.ts";
-import { applyFilters, EMPTY_FILTER } from "../domain/filter.ts";
+import { clampDay } from "../domain/calendar.ts";
+import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
 import type { Route } from "../domain/route.ts";
 import { savedOffers } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -46,7 +48,13 @@ export interface OfferViews {
   calendar: {
     /** nur in der Kalenderansicht gefüllt */
     index: Map<string, Occurrence<SiteOffer>[]>;
+    /** letzter Tag mit passenden Terminen (Grenze der Navigation) */
     lastDay: string | undefined;
+    /** letzter Tag mit Terminen im ganzen Datenstand, ohne Filter (B8) */
+    dataEnd: string | undefined;
+    /** heute schon beendete Termine aller filterpassenden Angebote, auch ohne kommenden Termin (B2) */
+    endedToday: number;
+    /** gewählter Tag, nie vor heute (auch nach Mitternacht im offenen Tab) */
     day: string;
     setDay: (day: string) => void;
     monthOpen: boolean;
@@ -72,6 +80,19 @@ export function useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now
   const groups = useMemo(() => groupByNextSession(visible, now), [visible, now]);
   const index = useMemo(() => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX), [visible, route.tab]);
   const lastDay = useMemo(() => lastSessionDay(visible), [visible]);
+  const dataEnd = useMemo(() => lastSessionDay(upcoming), [upcoming]);
+  const today = berlinIsoDate(now);
+  const endedToday = useMemo(
+    () =>
+      route.tab === "kalender"
+        ? endedOnDay(
+            offers.filter((o) => matchesFilter(o, route.filter)),
+            today,
+            now,
+          )
+        : 0,
+    [offers, route.filter, route.tab, today, now],
+  );
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
@@ -85,7 +106,16 @@ export function useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now
     page: takeGroups(groups, limit),
     showMore,
     resetPage,
-    calendar: { index, lastDay, day: calendarDay, setDay: setCalendarDay, monthOpen, setMonthOpen },
+    calendar: {
+      index,
+      lastDay,
+      dataEnd,
+      endedToday,
+      day: clampDay(calendarDay, today),
+      setDay: setCalendarDay,
+      monthOpen,
+      setMonthOpen,
+    },
     saved,
     detailOffer: route.offerId ? offers.find((o) => o.id === route.offerId) : undefined,
   };
