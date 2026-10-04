@@ -1,6 +1,6 @@
 # ADR 0008 – Karte mit MapLibre GL und OpenFreeMap, Startpunkt bleibt auf dem Gerät
 
-Status: Entwurf (2026-10-04), wird mit Plan 0005 angenommen. Ergänzt ADR 0001 (Stack), ADR 0005 (Fallback ohne GPS) und die Privatsphäre-Invariante in `docs/architecture.md`. Details in Plan 0005, der Startpunkt selbst in Plan 0004.
+Status: angenommen (2026-10-04), umgesetzt mit Plan 0005. Ergänzt ADR 0001 (Stack), ADR 0005 (Fallback ohne GPS) und die Privatsphäre-Invariante in `docs/architecture.md`. Details in Plan 0005, der Startpunkt selbst in Plan 0004.
 
 ## Kontext
 
