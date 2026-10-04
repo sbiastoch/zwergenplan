@@ -5,6 +5,7 @@
  */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
+import { expectAccessible, expectTextFits, setTextScale } from "./mobile-ux.ts";
 
 async function openCalendar(page: Page, at?: Date) {
   if (at) await page.clock.setFixedTime(at);
@@ -83,6 +84,16 @@ test.describe("mit Fixture-Uhr", () => {
     await expect(page.getByText("Weiter reicht der Plan noch nicht")).toBeVisible();
     await expect(page.getByText(/Termine sind bis Donnerstag, 10\. Dezember eingetragen/)).toBeVisible();
     await expect(page.getByText("Freier Tag")).toHaveCount(0);
+    // Der Leerzustand läuft durch Text-Gate und axe, hell und dunkel (Arch-Review zu Plan 0007, m4) …
+    for (const colorScheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme });
+      await expectTextFits(page);
+      await expectAccessible(page);
+    }
+    // … und bei 320 px/200 %: „Dezember“ ist der längste Monatsname in der Wochen-Navigation.
+    await page.setViewportSize({ width: 320, height: 640 });
+    await setTextScale(page, 2);
+    await expectTextFits(page, { scale: 2 });
   });
 
   test("offener Monat blendet die Woche aus, der Knopf behält den Fokus (H2)", async ({ page }) => {

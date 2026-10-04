@@ -3,7 +3,10 @@
 @layer components {
   /* Kalender */
   .cal-nav {
+    /* Container: Bei großer Schrift steht der Titel über den Pfeilen, statt „Dezember“ zu brechen (B7) */
+    container-type: inline-size;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     margin: 4px 0 8px;
@@ -14,6 +17,17 @@
     font-weight: 800;
     font-size: 1.25rem;
     letter-spacing: -0.03em;
+  }
+  /* Steht nach `.cal-nav b` (gleiche Spezifität, dessen `flex: 1` setzte sonst die Basis zurück). 14 rem: auf
+     Telefonen nie bei 100 % (Spalte ≥ 18 rem), bei 200 % immer (neben den Pfeilen bleiben < 6 rem). */
+  @container (width < 14rem) {
+    .cal-nav > b {
+      order: -1;
+      flex-basis: 100%;
+    }
+    .cal-nav > :last-child {
+      margin-left: auto;
+    }
   }
   .week {
     display: grid;
