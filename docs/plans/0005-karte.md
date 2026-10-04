@@ -459,12 +459,12 @@ Branch `karte-0005`, Commits `981b3e7` (Schritt 2) bis `3e43840` (Schritt 7), da
 
 Messwerte (`pnpm build && pnpm size`, echte Daten, gzip):
 
-| | vorher | nach Schritt 2 | nach Schritt 5 | Budget |
-|---|---|---|---|---|
-| JS (initial) | 85,67 kB | 86,62 kB | 87,94 kB | 90 kB |
-| CSS | 8,75 kB | 8,80 kB | 9,04 kB | 15 kB |
-| Karte JS (lazy) | – | 419,94 kB | 423,09 kB (MapView-Chunk 276,9 + Worker 144,7) | 450 kB |
-| Karte CSS (lazy) | – | 10,38 kB | 10,66 kB | 12 kB |
+| | vorher | nach Schritt 2 | nach Schritt 5 | nach Rebase auf `entfernung-0004` | nach Karten-Oberflächen-Chunk | Budget |
+|---|---|---|---|---|---|---|
+| JS (initial) | 85,67 kB | 86,62 kB | 87,94 kB | 88,46 kB (Basis 85,92) | **87,35 kB** (+1,43 ggü. Basis) | 90 kB |
+| CSS | 8,75 kB | 8,80 kB | 9,04 kB | 9,94 kB | 10,01 kB | 15 kB |
+| Karte JS (lazy) | – | 419,94 kB | 423,09 kB | 423,06 kB | 425,15 kB (MapView 276,9 + Worker 144,7 + Oberfläche 2,1) | 450 kB |
+| Karte CSS (lazy) | – | 10,38 kB | 10,66 kB | 10,66 kB | 10,66 kB | 12 kB |
 
 Kanarienvögel (je einzeln eingesetzt, `pnpm arch` rot, wieder entfernt): statischer und reiner Typ-Import von `./map/MapView.tsx` in `App.tsx` → `map-only-lazy`; `import "maplibre-gl"` und `import type` daraus in `App.tsx` sowie `import "maplibre-gl"` in `src/data/tiles.ts` → `maplibre-only-in-map`. Leere Vektorkachel (E13): 200 mit leerem Body gilt in Chromium und WebKit als leere Kachel, keine Konsolenmeldung.
 
@@ -476,7 +476,14 @@ Abweichungen und Befunde:
 - Vite schreibt `import(…).then(ok, fail)` so um, dass die Handler am rohen Import im Preload-Helfer hängen; ein fehlendes Karten-CSS gab dann eine unbehandelte Ablehnung. `MapPanel` lädt über die async-Funktion `loadMapView`.
 - WebKit (Playwright 1.63) lädt ein fehlgeschlagenes Modul-Skript in derselben Seite nie wieder, auch nicht nach `reload()`; Test 11 prüft dort in einem neuen Tab. Echtes iPhone: Browser-Review.
 - Leerzustand `NoOffers` aus `ListView` herausgezogen und von Liste und Karte genutzt; `ViewToggle` an `Chrome.tsx` angehängt, `TabBar` unverändert (bekommt `tabSection`).
-- `App.tsx` hat 335 Zeilen (Plan ~250). `Overlays.tsx` folgt nach dem Rebase auf Plan 0007 Paket B, um Konflikte mit dessen Sheet-Umbau zu vermeiden.
+- **Orts-Liste nicht mehr im Startbundle (E3, nach dem Rebase):** Ladekette `MapPanel` (Start: Platzhalter in Kartenhöhe, Lader) → `src/ui/karte/` (eigener Lazy-Chunk ohne MapLibre: Zustände, Werkzeugzeile, Orts-Liste, Orts-Sheet, `map-data.ts` mit `placesOf`/`sortPlaces`/`initialCamera`) → `src/ui/map/`. Ohne WebGL, ohne Kacheln und ohne MapLibre-Chunk bleibt die Orts-Liste bedienbar; fällt auch die Karten-Oberfläche aus, verweist die Meldung auf den Umschalter „Liste“. Der gestrichene Ausweg „Orts-Liste in den Karten-Chunk“ bleibt gestrichen, denn MapLibre lädt weiter getrennt. Das spart gegenüber dem Rebase-Stand 1,1 kB Start-JS (siehe Tabelle); `useOfferViews` liefert nur noch `map.placeCount` und `map.cameraOffers`.
+- **Neue Architekturregeln:** `karte-ui-only-lazy`, `karte-ui-entry-only`, `map-entry-only` und die Lader-Prüfung `lazy-loader-static` in `scripts/check-architecture.ts`, weil dependency-cruiser statischen und dynamischen Import desselben Moduls zu einer Kante zusammenfasst. Kanarienvögel in der Commit-Message.
+- **`modulePreload.polyfill` aus:** Ziel es2023, ohne natives modulepreload wird nur nicht vorgeladen. Vites Preload-Helfer (ca. 0,5 kB) bleibt im Start, weil er auch den Import der Karten-Oberfläche umhüllt.
+- **Umschalter neben der Statuszeile (E5):** Statt darüber steht er rechts neben ihr (`.status-row`, `flex-wrap`, bei wenig Platz bzw. 200 % darunter) und ist kompakt (44 px). Mit eigener Zeile hatte die erste Kachel im Querformat 852×393 nur 68 statt der geforderten 80 px frei (layout.spec, Plan 0007).
+- **Stilwechsel-Test über das Kind-Sheet:** Der Theme-Knopf im Kopf entfällt bei 360 px (Plan 0007).
+- **Kartenmitte im `originReducer`** (Aktion `mapCenter`, Plan 0004 Arch-Review m1), mit Test.
+- `App.tsx`: Overlays nach `src/ui/Overlays.tsx`, 296 Zeilen (vor Plan 0005: 280).
+- **Querformat:** Mit der Seitenleiste aus Plan 0007 liegt die Karte nicht mehr unter einer Tab-Leiste.
 - E2E: `MAP_READY` (20 s bis `bereit`, Software-WebGL unter Parallellast), Wächter und Kachel-Protokoll in einer Fixture, zusätzlicher Test „Wächter: Querystring/fremder Host verlassen den Browser nicht, auch nicht aus dem Worker“. Worker-Kacheln belegt über das Resource-Timing des Workers (Test 2).
 
 ## Arch-Review (2026-10-04) – Verdict: Nacharbeit nötig → eingearbeitet

@@ -41,7 +41,11 @@ Regeln:
 - Geolocation läuft nur über `src/data/geolocation.ts` (`canLocate`, `requestPosition`), nur auf Tipp, mit injizierbarer API für den Unit-Test. Die UI fasst `navigator`, `localStorage` und `fetch` nicht an (Biome `noRestrictedGlobals` für `src/ui` und `main.tsx`). Der Umweg über `window.navigator` usw. fällt nicht unter die Regel, den prüft der Review.
 - `scripts/pipeline/lib` bleibt rein und testbar: kein Import aus `io/`, `cli.ts`, `scripts/lib/` und kein Node-I/O (`pipeline-lib-pure`, `pipeline-lib-no-node-io`), kein globales `fetch` (Biome `noRestrictedGlobals`). Unit-Tests laufen ohne Netz (`vitest.setup.ts`), Quellen werden mit Snapshots aus `tests/fixtures/pipeline/` getestet.
 - `src/` hängt nie von `scripts/` ab (`src-not-scripts`, `no-cheerio-in-src`).
-- **Karte** (ADR 0008, Plan 0005): Nur `src/ui/map/` darf `maplibre-gl` importieren (`maplibre-only-in-map`), und von außen erreicht man `src/ui/map/` nur per `import()`, auch Typen nicht statisch (`map-only-lazy`). Die Props-Typen liegen deshalb in `src/ui/map-types.ts`. Karten-Chunk, Worker und Karten-CSS landen in `dist/assets/karte/` mit eigenen Budgets; das Startbudget zählt sie nicht.
+- **Karte** (ADR 0008, Plan 0005), Ladekette in drei Stufen: `src/ui/MapPanel.tsx` (Start: Platzhalter, Lader) → `src/ui/karte/` (Karten-Oberfläche ohne MapLibre: Orts-Liste, Orts-Sheet, Zustände) → `src/ui/map/` (MapLibre).
+  - Nur `src/ui/map/` darf `maplibre-gl` importieren (`maplibre-only-in-map`).
+  - `src/ui/karte/` und `src/ui/map/` erreicht man von außen nur per `import()`, auch Typen nicht statisch (`karte-ui-only-lazy`, `map-only-lazy`), und nur über den jeweiligen Lader (`karte-ui-entry-only`, `map-entry-only`). Die Props-Typen liegen deshalb in `src/ui/map-types.ts`.
+  - dependency-cruiser fasst statischen und dynamischen Import desselben Moduls zu einer Kante zusammen; dass die beiden Lader ihr Ziel nicht zusätzlich statisch importieren, prüft `scripts/check-architecture.ts` (`lazy-loader-static`).
+  - Beide Lazy-Chunks, Worker und Karten-CSS landen in `dist/assets/karte/` mit eigenen Budgets; das Startbudget zählt sie nicht.
 - **Kachel-Host** steht nur in `src/data/tiles.ts`. `guardTileRequest` sitzt als `transformRequest` vor jedem MapLibre-Request (auch denen, die der Worker lädt) und lässt nur `https://tiles.openfreemap.org` ohne Querystring und Fragment durch.
 - Keine Zyklen (`no-circular`). Produktivcode importiert keine Tests oder Fixtures (`no-test-code-in-prod`).
 
