@@ -9,6 +9,7 @@ import {
   filterToSearch,
   matchesFilter,
   toggleIn,
+  withReachLimit,
 } from "./filter.ts";
 import { type Origin, reachTo } from "./reach.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers } from "./test-fixtures.ts";
@@ -206,6 +207,19 @@ describe("Filter bedienen", () => {
     expect(activeFilterCount(state, { hasOrigin: true })).toBe(2);
     expect(activeFilterCount(state, { hasOrigin: false })).toBe(1);
     expect(activeFilterCount(EMPTY_FILTER, { hasOrigin: true })).toBe(0);
+  });
+
+  it("setzt den Umkreis als Einfachwahl und entfernt ihn mit „Egal“", () => {
+    const base: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"] };
+    const at2 = withReachLimit(base, { kind: "km", value: 2 });
+    expect(at2).toEqual({ ...base, reachLimit: { kind: "km", value: 2 } });
+    expect(withReachLimit(at2, { kind: "km", value: 10 })).toEqual({ ...base, reachLimit: { kind: "km", value: 10 } });
+    const egal = withReachLimit(at2, undefined);
+    expect(egal).toEqual(base);
+    // kein Schlüssel mit undefined (exactOptionalPropertyTypes, kanonische URL)
+    expect("reachLimit" in egal).toBe(false);
+    expect(filterToSearch(egal)).toBe("kosten=kostenlos");
+    expect(base.reachLimit).toBeUndefined();
   });
 
   it("schaltet einen Wert an und wieder aus, ohne den Rest anzufassen", () => {

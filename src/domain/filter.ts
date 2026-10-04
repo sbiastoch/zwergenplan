@@ -103,6 +103,15 @@ export function toggleIn<D extends Dimension>(state: FilterState, dim: D, value:
 }
 
 /**
+ * Setzt den Umkreis (Einfachwahl) oder entfernt ihn mit `undefined` („Egal“). Ohne Umkreis fehlt der
+ * Schlüssel ganz, damit der Zustand gleich `EMPTY_FILTER` bleibt und die URL kanonisch.
+ */
+export function withReachLimit(state: FilterState, limit: ReachLimit | undefined): FilterState {
+  const { reachLimit: _old, ...rest } = state;
+  return limit ? { ...rest, reachLimit: limit } : rest;
+}
+
+/**
  * Passt ein Angebot zu den Filtern (Kategorie, Format, Anmeldung, Kosten, Umkreis)? Ohne Zeitbezug:
  * Auch ein vorbei-es Angebot kann passen. Gebraucht für „Für heute ist alles vorbei“ (Plan 0007, E2).
  * Der Umkreis wirkt nur mit Startpunkt (Plan 0004, E7).
