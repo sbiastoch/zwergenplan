@@ -74,6 +74,7 @@ Jede Ansicht besteht in Playwright auf 360 px, Pixel 7, iPhone 15 (WebKit), quer
 - keine Konsolen- oder Seitenfehler (automatisch in jedem Test)
 - reduzierte Bewegung funktioniert: keine Animation oder Transition länger als 1 ms, Verzögerung eingerechnet (`expectReducedMotion`)
 - LCP < 2,5 s und CLS < 0,05 bei gedrosselter Mobile-CPU bzw. gedrosseltem Netz
+- Schrift-Swap verschiebt nichts (`e2e/font-swap*.spec.ts`, Plan 0007): Webfont zurückgehalten, je Fallback (Arial/Liberation, Roboto, Noto, DejaVu) bei 412 und 360 px mit echten Daten CLS < 0,05, gezählt nur ab der Freigabe. Die `size-adjust`-Werte der Fallback-Faces in `tokens.css` kommen aus `node scripts/font-fallback.ts`, nie geschätzt.
 - Bundle-Budgets (`.size-limit.json`)
 
 Eine neue Ansicht bekommt eigene E2E-Tests **und** einen Aufruf von `expectMobileUx`, hell und dunkel. Das gilt auch für jedes Overlay (`<dialog>`: Detail, Sheets), denn es liegt im Top-Layer und wird sonst nie geprüft.

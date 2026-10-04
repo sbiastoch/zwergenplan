@@ -1,6 +1,6 @@
 # Plan 0007 – Nacharbeit zum Browser-Review von Plan 0003
 
-Status: Pakete A und B umgesetzt und zusammengeführt (Schritt 5, siehe „Umsetzung“); Paket C offen
+Status: Pakete A, B und C umgesetzt (A+B zusammengeführt in Schritt 5, siehe „Umsetzung“; C siehe „Umsetzung Paket C“, Zusammenführen Schritt 9 offen)
 Datum: 2026-10-04
 Bezug: Plan 0003, Abschnitt „Browser-Review live (2026-10-04)“, Befunde B1–B8 und H1–H8. Dieser Plan ist die Voraussetzung, die Plan 0004 in „Ausgangslage und Voraussetzungen“ nennt. Plan 0006 (eigene Domain) ist schon auf `main` (`e6ea878`).
 
@@ -1017,7 +1017,7 @@ Verdict: **keine Blocker.**
 
 Bewusst zurückgestellt, damit die Karte mit Entfernung zuerst live geht. Wird nach Plan 0005 als eigener kleiner Plan umgesetzt.
 
-- **Paket C (B6):** Roboto-Fallback und Swap-Matrix, wie in diesem Plan beschrieben. Live gemessen: CLS 0,052 bei 412 px, 0,012 bei 360 px.
+- ~~**Paket C (B6):** Roboto-Fallback und Swap-Matrix, wie in diesem Plan beschrieben. Live gemessen: CLS 0,052 bei 412 px, 0,012 bei 360 px.~~ **Erledigt** auf `nacharbeit-0007-c`, siehe „Umsetzung Paket C“; offen sind Schritt 9 (Zusammenführen) und 10 (live und am Android-Gerät).
 - **WebKit mit „Bewegung reduzieren“:** Nach dem Theme-Wechsel bleibt Text 1–5 s in der alten Farbe. Vermutete Ursache: `transition-duration: 0.01ms` auf `*` in `motion.css`, dazu `transition-property: all`. Fix mit `transition: none` und einem E2E in WebKit, dann am iPhone gegenprüfen.
 - **Text-Gate:**
   - Fehlalarm Prüfung 2 an der Woche mit −12 px Rand bei 320 px („28“ ragt aus `fieldset.plain`).
@@ -1042,3 +1042,52 @@ Bewusst zurückgestellt, damit die Karte mit Entfernung zuerst live geht. Wird n
   - erneuter ICS-Import (Google/Apple)
   - echter Geolocation-Dialog auf iPhone und Android
   - Merklisten-ICS auf dem iPhone
+
+## Umsetzung Paket C (B6, 2026-10-05)
+
+Branch `nacharbeit-0007-c` auf `main` (`a682d4d`, nach den Plänen 0004 und 0005). Die Messwerte stehen auch in den Commit-Messages.
+
+**Messung (`node scripts/font-fallback.ts`)**: echte Daten, Chromium. Gerendert wird zehnfach mit der optischen Größe der echten Größe, siehe Abweichung 2.
+
+| Fallback | normal 200–549 | 550–749 | 750–800 Text | 750–800 Display | größter Restfehler (Klassen, die umbrechen) |
+|---|---|---|---|---|---|
+| Arial/Liberation | 104,2 % (vorher 100,4) | 102,3 % (vorher 102,5) | 100,8 % | 101,4 % | Zeit/Pille ±3,0 %, sonst ≤ 0,4 % |
+| Roboto (neu) | 104,7 % | 107,6 % | 103,8 % | 105,4 % | Zeit/Pille ±5,6 %, Etikett 1,0 %, sonst ≤ 1,0 % |
+| Noto | 99,2 % (vorher 98,4) | 98,1 % (vorher 96,5) | 98,1 % | 98,1 % | Zeit/Pille ±2,2 %, sonst ≤ 0,8 % |
+| DejaVu | 92,9 % (vorher 84,2) | 86,6 % (vorher 86,6) | 84,3 % | 85,6 % | Zeit/Pille ±4,5 %, Titel und Etikett 1,2–1,3 %, sonst ≤ 0,9 % |
+
+- Zeit (15 px/800) und Pille (13 px/800) liegen weit auseinander, weil Bricolage Ziffern schmal und Buchstaben breit setzt. Mit Größe hat das nichts zu tun. Beide stehen in derselben Kachel-Kopfzeile, ihre Fehler gleichen sich dort zum Teil aus.
+- Die Abweichung zwischen Titel (22 px) und Zeit (15 px) lag über 1,5 % (Arial 3,3 %), deshalb gibt es nach E11 den zweiten Stack `--font-display`.
+
+**Swap-Test (CLS nur nach der Freigabe der Webfont)**, Schrift-Rendering wie am Telefon (Abweichung 3):
+
+| | vorher 412 px | vorher 360 px | nachher 412 px | nachher 360 px |
+|---|---|---|---|---|
+| Arial, echte Daten | 0,0031 | 0,0003 | 0,0002 | 0,0002 |
+| Roboto, echte Daten | 0,0325 | 0,0063 | 0,0002 | 0,0003 |
+| Noto, echte Daten | 0,0041 | 0,0032 | 0,0000 | 0,0024 |
+| DejaVu, echte Daten | 0,0216 | 0,0005 | 0,0000 | 0,0000 |
+| Roboto, Fixtures (Test in `font-swap.spec.ts`) | 0,1111 | 0,0281 | 0,0004 | 0,0003 |
+
+- „Vorher“ bei Roboto: Roboto ohne Anpassung, so wie Android bisher über `system-ui` rendert. Gemessen mit einem vorübergehenden Face ohne `size-adjust`, nicht committet.
+- Mit ganzzahliger Glyphen-Rundung (Standard in headless Chromium) waren die echten Daten vorher bei max. 0,0506 (Roboto 412) und nachher bei max. 0,0058.
+- Live gemessen vor C: 0,052 bei 412 px mit Liberation. Lokal hält der Test genau den Swap fest und misst dort weniger; live kamen Datenladen und Swap zusammen.
+
+**Abweichungen vom Plan**
+1. **Grenze per Eintragszahl statt Zeitstempel (E12, Review 2 Blocker 1):** Der Kanarienvogel war mit `new Event().timeStamp` als `t0` rot (0,0025 statt > 0,05), denn die `startTime` eines Layout-Shifts ist der Frame-Beginn und lag bis zu ≈ 60 ms vor dem auslösenden Ereignis. Jetzt holt `markShifts()` nach zwei Frames per `takeRecords()` alles Ausstehende und merkt sich die Anzahl; gezählt wird nur Späteres, ganz ohne Uhr.
+2. **Messung zehnfach (Skript):** Headless Chromium rundet Glyphen-Breiten auf ganze Pixel, bei 13 px verfälschte das die Verhältnisse um mehrere Prozent (Roboto-Fakten 111,8 % statt 107,6 %). Das Skript rendert deshalb bei 10 × Größe mit `font-variation-settings: "opsz" <echte Größe>`.
+3. **Swap-Tests mit `--force-device-scale-factor=2.625`:** Die Geräte-Emulation ändert in headless Chromium nicht die Schrift-Parameter. Erst ein Faktor > 1 schaltet die subpixelgenaue Glyphen-Positionierung ein, wie sie ein hochauflösendes Telefon hat. Weil `launchOptions` nur auf oberster Ebene einer Datei gesetzt werden kann, stehen die Swap-Tests in eigenen Dateien: `font-swap.spec.ts` (Fixtures, Kanarienvögel) und `font-swap.smoke.spec.ts` (echte Daten, läuft über `testMatch` im Smoke-Projekt) statt in `perf.spec.ts`/`smoke.spec.ts`.
+4. **Fit nur auf Klassen, die umbrechen:** Chips (scrollende Leiste), Tabs (feste Spalten), Tagesüberschrift und Marke (einzeilig, Kopfzeile mit Reserve) werden berichtet, bestimmen aber kein `size-adjust`. Sie können beim Laden keine Zeile umbrechen. Ziel „jede Klasse ≤ 1,5 %“ (E11) ist damit für Chips/Tabs nicht erfüllt (z. B. Noto-Tabs −1,6 %).
+5. **Namen:** `useOnlyFallback` heißt `allowOnlyFallback` (Biome hält `use…` für einen React-Hook), `expectOnlyFallback` ist Teil von `loadOnlyFallback` und gibt bei fehlender lokaler Schrift `false` zurück. `holdWebfont` hält alle Bricolage-Dateien zurück (nicht nur Latin), der Kanarienvogel verlangt genau eine Latin-Anfrage.
+6. **`knip.json` → `knip.jsonc`**, damit die Begründung für `ignoreDependencies: @fontsource-variable/roboto` als Kommentar dabeistehen kann (knip erkennt `require.resolve` auf eine Schriftdatei nicht).
+
+**Bekannte Grenze, kein Fehlalarm, aber ehrlich notiert:** In den Fixtures liegt die Fakten-Zeile der ersten Kachel bei 412 px mit Bricolage 0,8 px über der Breite (341,8 von 341 px). Jeder Fallback mit mehr als 0,2 % Abweichung in dieser Zeile kippt sie. Arial und DejaVu tun das bei Telefon-Rendering (0,105), Roboto bei ganzzahliger Rundung (0,10). Getestet ist mit Fixtures nach Plan nur Roboto; die echten Daten liegen über alle vier Fallbacks bei ≤ 0,0024. Ganz ausschließen lässt sich CLS beim Swap für beliebige Inhalte nicht. Der Test fängt groben Rückfall, nicht jede Kante.
+
+**Tests:**
+- `pnpm check` grün, alle sechs Projekte lokal (WebKit mit `libavif16`).
+- E2E: 699 bestanden, 63 übersprungen (gewollt), davon 17 Tests im Smoke-Projekt inkl. der 8 Swap-Tests.
+- Unit: 413 grün.
+- Kanarienvögel dauerhaft in `font-swap.spec.ts`: Shift direkt nach der Grenze zählt; teilweises Umschreiben des CSS (fremdes `src`-Format, fehlender Block) wirft. Dazu `expectHeld` in jedem Lauf.
+
+**Budgets:** CSS 10,01 → 10,37 / 15 kB (24 Faces, `:where`-Regel), JS 87,3 / 90 kB (unverändert).
+
