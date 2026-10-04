@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { icsContextFor, icsForSeries } from "./ics.ts";
-import { toSiteData, venueAddress } from "./site-data.ts";
+import { Venue } from "./schema.ts";
+import { MIN_ADDRESS, toSiteData, venueAddress } from "./site-data.ts";
 import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
@@ -43,6 +44,11 @@ describe("toSiteData", () => {
 });
 
 describe("venueAddress", () => {
+  it("nutzt dasselbe Adress-Minimum wie das Schema", () => {
+    // Die UI darf Zod nicht laden (no-zod-in-client), deshalb steht die Zahl doppelt.
+    expect(MIN_ADDRESS).toBe(Venue.shape.address.minLength);
+  });
+
   it("schneidet den Ortsnamen als Präfix ab", () => {
     expect(venueAddress("CVJM-Haus", "CVJM-Haus, Kornmarkt 6, 90402 Nürnberg (Turnhalle 2. UG)")).toBe(
       "Kornmarkt 6, 90402 Nürnberg (Turnhalle 2. UG)",

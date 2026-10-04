@@ -255,21 +255,21 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
         return tops.length;
       };
 
-      const texts: Text[] = [];
+      // Paare aus Textknoten und Elternelement: So steht der Elternteil typsicher fest (ohne Cast).
+      const texts: { text: Text; parent: Element }[] = [];
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       for (let n = walker.nextNode(); n; n = walker.nextNode()) {
         const parent = n.parentElement;
         if (!(n instanceof Text) || !parent || n.data.trim() === "") continue;
         if (parent.closest("svg, script, style, noscript, template") || isHidden(parent)) continue;
-        texts.push(n);
+        texts.push({ text: n, parent });
       }
 
       // 1. Kein Bruch mitten in kurzen Wörtern. Referenz ist die Textzeile der Seitenspalte (40 rem bei 16 px,
       //    je 16 px Rand), nicht der eigene Kasten: Der zu schmale Kasten (Tab, Knopf, Tageszelle) ist der Fehler.
       //    70 %: Lange Titel bei 200 % sind breiter als die Spalte und müssen brechen, kurze Wörter nie.
       const reference = Math.min(window.innerWidth, 640) - 32;
-      for (const text of texts) {
-        const parent = text.parentElement as Element;
+      for (const { text, parent } of texts) {
         // Ausnahme: `hyphens: auto` (Titel, Zusammenfassung) – dort trennt das Wörterbuch, nicht der Zufall.
         if (getComputedStyle(parent).hyphens === "auto") continue;
         // Wörter ohne Leerraum, Bindestrich und Gedankenstrich (dort ist Umbruch legitim). Der Schrägstrich ist
@@ -288,8 +288,7 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
 
       // 2. Text ragt nicht heraus: seitlich über keinen Innenrand (Padding-Kante) eines Vorfahren, senkrecht nur
       //    bei Vorfahren, die abschneiden (Ober-/Unterlängen ragen bei Zeilenhöhe 1,08 legitim aus dem Zeilenkasten).
-      for (const text of texts) {
-        const parent = text.parentElement as Element;
+      for (const { text, parent } of texts) {
         const rects = rectsOf(text);
         for (let a: Element | null = parent; a && a !== document.documentElement; a = a.parentElement) {
           const s = getComputedStyle(a);
@@ -347,8 +346,7 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
         }
         return undefined;
       };
-      for (const text of texts) {
-        const parent = text.parentElement as Element;
+      for (const { text, parent } of texts) {
         const box = roundBox(parent);
         if (!box) continue;
         const { s } = box;
@@ -444,10 +442,8 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
             c.offsetWidth > 0 &&
             !["absolute", "fixed"].includes(getComputedStyle(c).position),
         );
-        for (let i = 0; i < items.length; i++) {
-          for (let j = i + 1; j < items.length; j++) {
-            const a = items[i] as HTMLElement;
-            const b = items[j] as HTMLElement;
+        for (const [i, a] of items.entries()) {
+          for (const b of items.slice(i + 1)) {
             const w =
               Math.min(a.offsetLeft + a.offsetWidth, b.offsetLeft + b.offsetWidth) -
               Math.max(a.offsetLeft, b.offsetLeft);
@@ -472,8 +468,7 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
           const label = (el.textContent ?? "").replace(/\s+/g, " ").trim();
           if (label === "" || label.length > 32) continue;
           const byParent = new Map<Element, DOMRect[]>();
-          for (const text of texts) {
-            const parent = text.parentElement as Element;
+          for (const { text, parent } of texts) {
             if (!el.contains(text)) continue;
             byParent.set(parent, [...(byParent.get(parent) ?? []), ...rectsOf(text)]);
           }

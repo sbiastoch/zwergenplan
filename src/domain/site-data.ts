@@ -21,8 +21,8 @@ export interface SiteMeta {
   commit: string;
 }
 
-/** Schema-Minimum einer Adresse (`Venue.address`). */
-const MIN_ADDRESS = 5;
+/** Schema-Minimum einer Adresse (`Venue.address`); site-data.test.ts hält beide Werte gleich. */
+export const MIN_ADDRESS = 5;
 
 /**
  * Adresse ohne wiederholten Ortsnamen (Plan 0007, H6): Viele Katalog-Adressen beginnen mit dem
