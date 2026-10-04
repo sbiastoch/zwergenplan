@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, addMonths, fromBerlinLocal, isoWeekday } from "./time.ts";
+import { addDays, addMonths, fromBerlinLocal, isoWeekday, toBerlinIso } from "./time.ts";
 
 describe("fromBerlinLocal", () => {
   it("setzt den Offset nach Sommer- bzw. Winterzeit", () => {
@@ -22,6 +22,15 @@ describe("fromBerlinLocal", () => {
   it("lehnt andere Formate ab", () => {
     expect(() => fromBerlinLocal("2026-10-13 09:30")).toThrow("Keine lokale Zeit");
     expect(() => fromBerlinLocal("2026-10-13T09:30:00+02:00")).toThrow("Keine lokale Zeit");
+  });
+});
+
+describe("toBerlinIso", () => {
+  it("schreibt einen Zeitpunkt mit Berliner Offset (sekundengenau)", () => {
+    expect(toBerlinIso(new Date("2026-10-05T04:07:09.500Z"))).toBe("2026-10-05T06:07:09+02:00");
+    expect(toBerlinIso(new Date("2026-12-24T23:30:00Z"))).toBe("2026-12-25T00:30:00+01:00");
+    expect(toBerlinIso(new Date("2026-10-25T00:30:00Z"))).toBe("2026-10-25T02:30:00+02:00");
+    expect(toBerlinIso(new Date("2026-10-25T01:30:00Z"))).toBe("2026-10-25T02:30:00+01:00");
   });
 });
 

@@ -173,6 +173,7 @@ Jedes Angebot gehört zu einem Katalog-Anbieter mit `role: anbieter` und zu eine
 
 - Fehlt `data/offers.json` (erster Lauf), gilt der Altbestand als leer.
 - Anbieter mit `status: fehler` verlieren ihre Angebote nicht. `build` übernimmt sie aus dem bisherigen `data/offers.json`, mit Terminen ab `from`. Der alte `checkedAt` bleibt, und der Bericht markiert die Übernahme. Angebote ohne verbleibenden Termin fallen weg.
+- Anbieter ohne Status in diesem Lauf (z. B. nicht in einem Paket, weil nur nachgeprüft wurde) und ohne `coveredBy`: Ihre Altangebote werden ebenso übernommen und im Bericht als „nicht geprüft“ markiert.
 - Steht ein **Aggregator mit `adapter`** auf `fehler`, übernimmt `build` die Altangebote aller Anbieter mit `coveredBy` = dieser Aggregator nach derselben Regel. Lücken bei zugeordneten Angeboten anderer Anbieter (die einen eigenen Status haben) dokumentiert der Bericht.
 - `build` schreibt `RUN_DIR/report.json` und eine Kurzfassung auf stdout. Enthalten sind:
   - Angebote und Termine je Status
@@ -398,3 +399,20 @@ Die Blocker aus Review 1 sind gelöst. Die Änderungen stehen oben im Plan.
   - „abgesagt/entfällt“ bei evangelische-termine
   - feste Zuordnung Paket ↔ Rohdatei
 - **abgelehnt**: ein Perf-Fixture mit etwa 300 Angeboten. Die Platzhalter-Liste wird durch das Design der Mockup-Session ersetzt, und Listenlänge bzw. Virtualisierung gehören in diesen UI-Plan (Eintrag in `docs/ideas.md`). Bis dahin prüft der Smoke-Test die echten Daten auf Funktion und Mobile-UX.
+
+## Arch-Review (2026-10-04) – Verdict: „Nacharbeit nötig“, keine Blocker → eingearbeitet
+
+- M1: `select --only` hätte ein fertiges Paket überschrieben. → Nachprüfpakete bekommen die nächste freie Nummer (`nextBatchFiles`, getestet). Ein erneutes `select` ohne `--only` braucht `--force`.
+- M2: Die Kursfortschreibung übernahm auch künftige Alttermine (verlegte Termine doppelt). → Nur vergangene Termine vor dem ersten neuen Termin werden übernommen, mit Test.
+- M3: Ein komplett vergangener Kurs ließ den ganzen `build` scheitern. → Er entfällt mit Hinweis, und `validate-raw` warnt.
+- M4: Logik in `cli.ts` (`add-provider`). → `providerFromCandidate` in `lib/draft.ts`, getestet.
+- Minor, alle übernommen:
+  - Zod an den IO-Grenzen (`lib/run.ts`, Nominatim, Paketdateien) statt `as`-Casts
+  - Ferien-Cache ohne leere Antworten, mit 30 Tagen TTL für laufende und künftige Jahre
+  - Expansion ab Horizontbeginn für Regeln ohne `count`
+  - Slug mit NFC
+  - fehlende Stunde beim geschätzten Ende und bei Anmeldefristen
+  - nächstgelegener Ort beim Geo-Treffer
+  - `vidOf` nur noch an einer Stelle
+  - Doku-Drift bei E8
+  - gleiche Kurs-ID: Termine werden vereinigt

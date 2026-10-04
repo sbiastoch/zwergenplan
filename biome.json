@@ -1,14 +1,35 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-  "files": {
-    "includes": ["**", "!schema", "!**/*.schema.json", "!pnpm-lock.yaml"]
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   },
-  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 120 },
-  "css": { "parser": { "tailwindDirectives": true } },
+  "files": {
+    "includes": [
+      "**",
+      "!schema",
+      "!**/*.schema.json",
+      "!pnpm-lock.yaml",
+      "!tests/fixtures/pipeline/html",
+      "!tests/fixtures/pipeline/api"
+    ]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "linter": {
     "enabled": true,
-    "domains": { "react": "recommended" },
+    "domains": {
+      "react": "recommended"
+    },
     "rules": {
       "preset": "recommended",
       "a11y": "error",
@@ -17,7 +38,12 @@
       },
       "suspicious": {
         "noExplicitAny": "error",
-        "noConsole": { "level": "error", "options": { "allow": ["error", "warn"] } }
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["error", "warn"]
+          }
+        }
       },
       "style": {
         "noNonNullAssertion": "error",
@@ -34,7 +60,30 @@
   "overrides": [
     {
       "includes": ["scripts/**", ".claude/hooks/**"],
-      "linter": { "rules": { "suspicious": { "noConsole": "off" } } }
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["scripts/pipeline/lib/**", "!scripts/pipeline/lib/**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "fetch": "Netzzugriff gehört nach scripts/pipeline/io (Plan 0002)."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }

@@ -1,0 +1,76 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//evangelische-termine.de//NONSGML kigkonsult.se iCalcreator 2.18//
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:iCal Evangelische-Termine 04.10.2026
+X-WR-CALDESC:iCalender von Evangelische-Termine (04.10.2026)
+X-WR-TIMEZONE:Europe/Berlin
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+BEGIN:STANDARD
+DTSTART:19701025T030000
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+TZNAME:CET
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:19700329T020000
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3
+TZNAME:CEST
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:20260913T120000-8122205@evangelische-termine.de
+DTSTAMP:20261004T111812Z
+DESCRIPTION:
+DTSTART;TZID=Europe/Berlin:20260913T120000
+DTEND;TZID=Europe/Berlin:20261025T130000
+LOCATION:Nürnberg: Großer Saal Auferstehungskirche
+SUMMARY:Ausstellung „Wie im Himmel so auf Erden“
+URL:https://www.evangelische-termine.de/veranstaltung_im_detail8122205.html
+END:VEVENT
+BEGIN:VEVENT
+UID:20261005T091500-8108179@evangelische-termine.de
+DTSTAMP:20261004T111812Z
+DESCRIPTION:
+DTSTART;TZID=Europe/Berlin:20261005T091500
+DTEND;TZID=Europe/Berlin:20261005T101500
+LOCATION:Nürnberg: Miniclubraum im gr. Saal
+SUMMARY:Musikzwerge für Eltern mit Kind ab ca. 2 Jahren
+URL:https://www.evangelische-termine.de/veranstaltung_im_detail8108179.html
+END:VEVENT
+BEGIN:VEVENT
+UID:20261005T103000-8108193@evangelische-termine.de
+DTSTAMP:20261004T111812Z
+DESCRIPTION:
+DTSTART;TZID=Europe/Berlin:20261005T103000
+DTEND;TZID=Europe/Berlin:20261005T113000
+LOCATION:Nürnberg: Miniclubraum im gr. Saal
+SUMMARY:Musikzwerge für Eltern mit Baby ab ca. 3 Monaten
+URL:https://www.evangelische-termine.de/veranstaltung_im_detail8108193.html
+END:VEVENT
+BEGIN:VEVENT
+UID:20261006T091500-8122210@evangelische-termine.de
+DTSTAMP:20261004T111812Z
+DESCRIPTION:
+DTSTART;TZID=Europe/Berlin:20261006T091500
+DTEND;TZID=Europe/Berlin:20261006T101500
+LOCATION:Nürnberg: Miniclubraum im gr. Saal
+SUMMARY:Musikzwerge für Eltern mit Kind ab ca. 1 Jahr
+URL:https://www.evangelische-termine.de/veranstaltung_im_detail8122210.html
+END:VEVENT
+BEGIN:VEVENT
+UID:20261006T103000-8108206@evangelische-termine.de
+DTSTAMP:20261004T111812Z
+DESCRIPTION:
+DTSTART;TZID=Europe/Berlin:20261006T103000
+DTEND;TZID=Europe/Berlin:20261006T113000
+LOCATION:Nürnberg: Miniclubraum im gr. Saal
+SUMMARY:Musikzwerge für Eltern mit Kind ab ca. 18 Monaten
+URL:https://www.evangelische-termine.de/veranstaltung_im_detail8108206.html
+END:VEVENT
+END:VCALENDAR

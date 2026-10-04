@@ -75,6 +75,37 @@ module.exports = {
       from: { path: "^src/", pathNot: "(\\.test\\.ts|test-fixtures\\.ts)$" },
       to: { path: "(\\.test\\.ts|test-fixtures\\.ts)$" },
     },
+    {
+      name: "pipeline-lib-pure",
+      severity: "error",
+      comment:
+        "scripts/pipeline/lib ist reine Logik mit Tests (Plan 0002): kein Netz, keine Dateien, kein git – das liegt in io/ und cli.ts.",
+      from: { path: "^scripts/pipeline/lib/", pathNot: "\\.test\\.ts$" },
+      to: {
+        path: ["^scripts/pipeline/(io/|cli\\.ts)", "^scripts/lib/"],
+      },
+    },
+    {
+      name: "pipeline-lib-no-node-io",
+      severity: "error",
+      comment: "Kein Node-I/O in scripts/pipeline/lib (Tests dürfen Snapshots lesen).",
+      from: { path: "^scripts/pipeline/lib/", pathNot: "\\.test\\.ts$" },
+      to: { dependencyTypes: ["core"], path: "^(node:)?(fs|net|http|https|child_process|os|dgram|dns|tls)(/|$)" },
+    },
+    {
+      name: "src-not-scripts",
+      severity: "error",
+      comment: "Die App und die Domäne hängen nie von Build-/Pipeline-Skripten ab.",
+      from: { path: "^src/" },
+      to: { path: "^scripts/" },
+    },
+    {
+      name: "no-cheerio-in-src",
+      severity: "error",
+      comment: "HTML-Parsing gehört in die Pipeline, nicht in die App.",
+      from: { path: "^src/" },
+      to: { path: "(^|/)node_modules/cheerio/" },
+    },
   ],
   options: {
     doNotFollow: { path: "node_modules" },

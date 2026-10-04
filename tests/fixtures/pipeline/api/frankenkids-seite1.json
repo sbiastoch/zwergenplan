@@ -1,0 +1,2857 @@
+{
+ "events": [
+  {
+   "id": 10061880,
+   "global_id": "www.frankenkids.de?id=10061880",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10061880"
+   ],
+   "author": "2",
+   "status": "publish",
+   "date": "2026-08-17 09:39:24",
+   "date_utc": "2026-08-17 07:39:24",
+   "modified": "2026-08-17 09:39:48",
+   "modified_utc": "2026-08-17 07:39:48",
+   "url": "https://www.frankenkids.de/veranstaltungen/kindertanzen/2026-10-05/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10061880",
+   "title": "Kindertanzen",
+   "description": "<p>Kindertanzen &#8211; Freude an der Bewegung zu Musik<br />\nEine unverbindliche Schnupperstunde kann gerne telefonisch vereinbart werden: 0911-556860<br />\nTermine: Montags, 14:45 &#8211; 15:30 Uhr (4- bis 5-Jährige) und 15:45 &#8211; 16:30 Uhr (6- bis 7-Jährige)</p>",
+   "excerpt": "",
+   "slug": "kindertanzen",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-05 14:45:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "14",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-05 16:30:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "16",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-05 12:45:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "12",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-05 14:30:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "14",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.ts-kr.de",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sport",
+     "slug": "sport",
+     "term_group": 0,
+     "term_taxonomy_id": 305,
+     "taxonomy": "tribe_events_cat",
+     "description": "Schwangerschaftsgymnastik, Yogakurs, Sportkurse für Kinder, Schwimmbäder, Sportcamps, Ferienprogramm, Schwimmkurse, Selbstverteidigung, Sportvereine",
+     "parent": 0,
+     "count": 80,
+     "filter": "raw",
+     "id": 305,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/305",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Kindertanz",
+     "slug": "kindertanz",
+     "term_group": 0,
+     "term_taxonomy_id": 1785,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 3,
+     "filter": "raw",
+     "id": 1785,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1785",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Tanzen",
+     "slug": "tanzen",
+     "term_group": 0,
+     "term_taxonomy_id": 357,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 21,
+     "filter": "raw",
+     "id": 357,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/357",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Tanzschule",
+     "slug": "tanzschule",
+     "term_group": 0,
+     "term_taxonomy_id": 7595,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 7595,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/7595",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 24774,
+    "author": "2",
+    "status": "publish",
+    "date": "2022-08-25 14:13:22",
+    "date_utc": "2022-08-25 12:13:22",
+    "modified": "2022-08-25 14:13:22",
+    "modified_utc": "2022-08-25 12:13:22",
+    "url": "https://www.frankenkids.de/veranstaltungsort/tanzschule-koepke-rupprecht/",
+    "venue": "Tanzschule Köpke Rupprecht",
+    "slug": "tanzschule-koepke-rupprecht",
+    "address": "Harmoniestr. 8-10",
+    "city": "Nürnberg",
+    "zip": "90489",
+    "phone": "0911 / 556860",
+    "website": "https://www.ts-kr.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=24774",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=24774"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10062338,
+   "global_id": "www.frankenkids.de?id=10062338",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10062338"
+   ],
+   "author": "2",
+   "status": "publish",
+   "date": "2026-09-07 12:59:57",
+   "date_utc": "2026-09-07 10:59:57",
+   "modified": "2026-09-07 13:00:46",
+   "modified_utc": "2026-09-07 11:00:46",
+   "url": "https://www.frankenkids.de/veranstaltungen/musikzwerge-gemeinsam-musizieren/2026-10-05/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10062338",
+   "title": "Musikzwerge &#8211; Gemeinsam musizieren",
+   "description": "<p>Für Kinder im Alter von 4 bis 7 Jahren. Nicht in den Schulferien.</p>\n<p>INFO: Alexandra Gußner   <a href=\"mailto:alexandra.gussner@cvjm-nuernberg-gostenhof.de\">alexandra.gussner@cvjm-nuernberg-gostenhof.de</a></p>\n<p>Telefon 0151/56071708</p>",
+   "excerpt": "",
+   "slug": "musikzwerge-gemeinsam-musizieren",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-05 16:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "16",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-05 17:15:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "17",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-05 14:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "14",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-05 15:15:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "05",
+    "hour": "15",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.cvjm-nuernberg-gostenhof.de",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Kinder",
+     "slug": "kinder",
+     "term_group": 0,
+     "term_taxonomy_id": 297,
+     "taxonomy": "tribe_events_cat",
+     "description": "Veranstaltungen für Kinder mit/ohne Eltern, Kurse",
+     "parent": 0,
+     "count": 184,
+     "filter": "raw",
+     "id": 297,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/297",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Eltern-Kind-Kurs",
+     "slug": "eltern-kind-kurs",
+     "term_group": 0,
+     "term_taxonomy_id": 314,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 15,
+     "filter": "raw",
+     "id": 314,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/314",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Gostenhof",
+     "slug": "gostenhof",
+     "term_group": 0,
+     "term_taxonomy_id": 4692,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 27,
+     "filter": "raw",
+     "id": 4692,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4692",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Musik",
+     "slug": "musik",
+     "term_group": 0,
+     "term_taxonomy_id": 356,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 32,
+     "filter": "raw",
+     "id": 356,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/356",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Musikzwerge",
+     "slug": "musikzwerge",
+     "term_group": 0,
+     "term_taxonomy_id": 5585,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 3,
+     "filter": "raw",
+     "id": 5585,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/5585",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 17619,
+    "author": "2",
+    "status": "publish",
+    "date": "2022-05-05 08:11:14",
+    "date_utc": "2022-05-05 06:11:14",
+    "modified": "2022-05-05 08:11:14",
+    "modified_utc": "2022-05-05 06:11:14",
+    "url": "https://www.frankenkids.de/veranstaltungsort/cvjm-nuernberg-gostenhof/",
+    "venue": "CVJM Nürnberg-Gostenhof",
+    "slug": "cvjm-nuernberg-gostenhof",
+    "address": "Glockendonstr. 10",
+    "city": "Nürnberg",
+    "zip": "90429",
+    "website": "https://www.cvjm-nuernberg-gostenhof.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=17619",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=17619"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10062331,
+   "global_id": "www.frankenkids.de?id=10062331",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10062331"
+   ],
+   "author": "2",
+   "status": "publish",
+   "date": "2026-07-08 12:25:30",
+   "date_utc": "2026-07-08 10:25:30",
+   "modified": "2026-09-07 12:58:09",
+   "modified_utc": "2026-09-07 10:58:09",
+   "url": "https://www.frankenkids.de/veranstaltungen/mini-club-kniereiter-bewegungslieder-3/2026-10-06/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10062331",
+   "title": "Mini-Club &#8211; Kniereiter, Bewegungslieder",
+   "description": "<p>Für Kinder im Alter von 18 Monaten bis 3 Jahren mit Eltern.</p>\n<p>Dienstags außer in den Schulferien<br />\nINFO: Alexandra Gußner: 0151/56071708</p>",
+   "excerpt": "",
+   "slug": "mini-club-kniereiter-bewegungslieder-3",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-06 10:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "10",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-06 11:30:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "11",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-06 08:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "08",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-06 09:30:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "09",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.cvjm-nuernberg-gostenhof.de",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Kinder",
+     "slug": "kinder",
+     "term_group": 0,
+     "term_taxonomy_id": 297,
+     "taxonomy": "tribe_events_cat",
+     "description": "Veranstaltungen für Kinder mit/ohne Eltern, Kurse",
+     "parent": 0,
+     "count": 184,
+     "filter": "raw",
+     "id": 297,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/297",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "CVJM",
+     "slug": "cvjm",
+     "term_group": 0,
+     "term_taxonomy_id": 3347,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 8,
+     "filter": "raw",
+     "id": 3347,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/3347",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Eltern-Kind-Kurs",
+     "slug": "eltern-kind-kurs",
+     "term_group": 0,
+     "term_taxonomy_id": 314,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 15,
+     "filter": "raw",
+     "id": 314,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/314",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Gostenhof",
+     "slug": "gostenhof",
+     "term_group": 0,
+     "term_taxonomy_id": 4692,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 27,
+     "filter": "raw",
+     "id": 4692,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4692",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Kniereiter",
+     "slug": "kniereiter",
+     "term_group": 0,
+     "term_taxonomy_id": 8102,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 8102,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/8102",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Miniclub",
+     "slug": "miniclub",
+     "term_group": 0,
+     "term_taxonomy_id": 3946,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 3946,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/3946",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 17619,
+    "author": "2",
+    "status": "publish",
+    "date": "2022-05-05 08:11:14",
+    "date_utc": "2022-05-05 06:11:14",
+    "modified": "2022-05-05 08:11:14",
+    "modified_utc": "2022-05-05 06:11:14",
+    "url": "https://www.frankenkids.de/veranstaltungsort/cvjm-nuernberg-gostenhof/",
+    "venue": "CVJM Nürnberg-Gostenhof",
+    "slug": "cvjm-nuernberg-gostenhof",
+    "address": "Glockendonstr. 10",
+    "city": "Nürnberg",
+    "zip": "90429",
+    "website": "https://www.cvjm-nuernberg-gostenhof.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=17619",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=17619"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 90411,
+   "global_id": "www.frankenkids.de?id=90411",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=90411"
+   ],
+   "author": "27",
+   "status": "publish",
+   "date": "2026-08-11 09:08:18",
+   "date_utc": "2026-08-11 07:08:18",
+   "modified": "2026-09-23 09:42:31",
+   "modified_utc": "2026-09-23 07:42:31",
+   "url": "https://www.frankenkids.de/veranstaltungen/kula-kids-der-kulturladen-fuer-kinder/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/90411",
+   "title": "KuLa Kids – der Kulturladen für Kinder",
+   "description": "<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Bist Du zwischen sechs und zwölf Jahre alt? Und möchtest mit anderen Kindern zusammen tolle Dinge erleben? Dann schau doch bei uns vorbei!</span></p>\n<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Mehr Informationen zu Programm und Anmeldung unter 09 11 / 2 31-1 15 40.</span></p>\n<p>Wann? Dienstag bis Freitag von 13 &#8211; 17 Uhr</p>\n<p>DIESES ANGEBOT IST AUSGEBUCHT!</p>",
+   "excerpt": "",
+   "slug": "kula-kids-der-kulturladen-fuer-kinder",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-06 13:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-06 17:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "17",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-06 11:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "11",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-06 15:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.kuf-kultur.de/loni",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Kinder",
+     "slug": "kinder",
+     "term_group": 0,
+     "term_taxonomy_id": 297,
+     "taxonomy": "tribe_events_cat",
+     "description": "Veranstaltungen für Kinder mit/ohne Eltern, Kurse",
+     "parent": 0,
+     "count": 184,
+     "filter": "raw",
+     "id": 297,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/297",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Jugendtreff",
+     "slug": "jugendtreff",
+     "term_group": 0,
+     "term_taxonomy_id": 2957,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 2957,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/2957",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Kindertreff",
+     "slug": "kindertreff",
+     "term_group": 0,
+     "term_taxonomy_id": 3450,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 3,
+     "filter": "raw",
+     "id": 3450,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/3450",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "KuLa",
+     "slug": "kula",
+     "term_group": 0,
+     "term_taxonomy_id": 11148,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 11148,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/11148",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Kulturladen Loni-Übler-Haus",
+     "slug": "kulturladen-loni-uebler-haus",
+     "term_group": 0,
+     "term_taxonomy_id": 4565,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 7,
+     "filter": "raw",
+     "id": 4565,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4565",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Loni",
+     "slug": "loni",
+     "term_group": 0,
+     "term_taxonomy_id": 4940,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 7,
+     "filter": "raw",
+     "id": 4940,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4940",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 7696,
+    "author": "2",
+    "status": "publish",
+    "date": "2021-09-25 05:00:05",
+    "date_utc": "2021-09-25 03:00:05",
+    "modified": "2023-01-08 14:22:57",
+    "modified_utc": "2023-01-08 13:22:57",
+    "url": "https://www.frankenkids.de/veranstaltungsort/kulturladen-loni-uebler-haus/",
+    "venue": "Kulturladen Loni-Übler-Haus",
+    "slug": "kulturladen-loni-uebler-haus",
+    "address": "Marthastr. 60",
+    "city": "Nürnberg",
+    "zip": "90482",
+    "phone": "0911 / 23111540",
+    "website": "https://www.kuf-kultur.de/loni",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=7696",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=7696"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10060838,
+   "global_id": "www.frankenkids.de?id=10060838",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10060838"
+   ],
+   "author": "27",
+   "status": "publish",
+   "date": "2026-06-30 13:39:18",
+   "date_utc": "2026-06-30 11:39:18",
+   "modified": "2026-06-30 13:40:06",
+   "modified_utc": "2026-06-30 11:40:06",
+   "url": "https://www.frankenkids.de/veranstaltungen/koberger-midis-elterncafe-mit-babys-6-12-mon-3/2026-10-06/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10060838",
+   "title": "Koberger Midis &#8211; Elterncafé mit Babys (6-12 Mon.)",
+   "description": "<p>Bei uns könnt ihr andere Eltern mit ihren Kindern kennenlernen und habt die Möglichkeit, Erfahrungen auszutauschen. Für eure Babys und Kleinkinder gibt es eine Vielzahl an altersgerechten Entdeckungsmöglichkeiten. Ohne Anmeldung, nicht in den Schulferien)</p>",
+   "excerpt": "",
+   "slug": "koberger-midis-elterncafe-mit-babys-6-12-mon-3",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-06 15:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-06 16:15:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "16",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-06 13:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-06 14:15:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "06",
+    "hour": "14",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.zentrum-koberger.de",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Eltern",
+     "slug": "eltern",
+     "term_group": 0,
+     "term_taxonomy_id": 298,
+     "taxonomy": "tribe_events_cat",
+     "description": "Veranstaltungen für Eltern zu Familienthemen wie Schule, Erziehung etc.",
+     "parent": 0,
+     "count": 57,
+     "filter": "raw",
+     "id": 298,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/298",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Babys",
+     "slug": "babys",
+     "term_group": 0,
+     "term_taxonomy_id": 2037,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 7,
+     "filter": "raw",
+     "id": 2037,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/2037",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Elterntreff",
+     "slug": "elterntreff",
+     "term_group": 0,
+     "term_taxonomy_id": 463,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 5,
+     "filter": "raw",
+     "id": 463,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/463",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Koberger",
+     "slug": "koberger",
+     "term_group": 0,
+     "term_taxonomy_id": 9312,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 4,
+     "filter": "raw",
+     "id": 9312,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/9312",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 20401,
+    "author": "9",
+    "status": "publish",
+    "date": "2022-06-30 11:30:35",
+    "date_utc": "2022-06-30 09:30:35",
+    "modified": "2024-03-14 10:47:07",
+    "modified_utc": "2024-03-14 09:47:07",
+    "url": "https://www.frankenkids.de/veranstaltungsort/zentrum-kobergerstrasse/",
+    "venue": "Zentrum Kobergerstraße",
+    "slug": "zentrum-kobergerstrasse",
+    "address": "Kobergerstr. 79",
+    "city": "Nürnberg",
+    "country": "Deutschland",
+    "province": "Bayern",
+    "zip": "90408",
+    "phone": "0911 / 361626",
+    "website": "https://www.zentrum-koberger.de/beratungsstelle/",
+    "stateprovince": "Bayern",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=20401",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=20401"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 91364,
+   "global_id": "www.frankenkids.de?id=91364",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=91364"
+   ],
+   "author": "27",
+   "status": "publish",
+   "date": "2026-09-03 11:16:22",
+   "date_utc": "2026-09-03 09:16:22",
+   "modified": "2026-09-03 11:17:37",
+   "modified_utc": "2026-09-03 09:17:37",
+   "url": "https://www.frankenkids.de/veranstaltungen/pekip-4/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/91364",
+   "title": "PEKiP",
+   "description": "<p>Eine Auszeit vom Alltag für Mutter/ Vater und Kind, in der Sie bewusste Zeit mit ihrem Kind verbringen und gemeinsam Freude haben. Für Kinder, die Juli &#8211; August 2026 geboren sind.</p>\n<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Anmeldung unter: 0911 / 5301280</span></p>\n<p>Dauer: 7. Oktober &#8211; 16. Dezember 2026</p>",
+   "excerpt": "",
+   "slug": "pekip-4",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-07 09:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "09",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-07 11:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "11",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-07 07:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "07",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-07 09:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "09",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.kvnuernberg-stadt.brk.de/",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Baby",
+     "slug": "baby",
+     "term_group": 0,
+     "term_taxonomy_id": 302,
+     "taxonomy": "tribe_events_cat",
+     "description": "Kurse und Events speziell für Kinder im ersten Lebensjahr, Babymassage, PEKiP, ",
+     "parent": 0,
+     "count": 27,
+     "filter": "raw",
+     "id": 302,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/302",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Bayerisches Rotes Kreuz",
+     "slug": "bayerisches-rotes-kreuz",
+     "term_group": 0,
+     "term_taxonomy_id": 5251,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 11,
+     "filter": "raw",
+     "id": 5251,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/5251",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "BRK",
+     "slug": "brk",
+     "term_group": 0,
+     "term_taxonomy_id": 4733,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 12,
+     "filter": "raw",
+     "id": 4733,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4733",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Eltern-Baby-Kurs",
+     "slug": "eltern-baby-kurs",
+     "term_group": 0,
+     "term_taxonomy_id": 6568,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 12,
+     "filter": "raw",
+     "id": 6568,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/6568",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Familienzentrum",
+     "slug": "familienzentrum",
+     "term_group": 0,
+     "term_taxonomy_id": 4465,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 16,
+     "filter": "raw",
+     "id": 4465,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4465",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "PEKiP",
+     "slug": "pekip",
+     "term_group": 0,
+     "term_taxonomy_id": 1548,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 10,
+     "filter": "raw",
+     "id": 1548,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1548",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Prager Eltern-Kind-Programm",
+     "slug": "prager-eltern-kind-programm",
+     "term_group": 0,
+     "term_taxonomy_id": 6745,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 6745,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/6745",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 7551,
+    "author": "2",
+    "status": "publish",
+    "date": "2021-09-01 09:51:52",
+    "date_utc": "2021-09-01 07:51:52",
+    "modified": "2022-06-23 10:19:40",
+    "modified_utc": "2022-06-23 08:19:40",
+    "url": "https://www.frankenkids.de/veranstaltungsort/brk-familienzentrum/",
+    "venue": "BRK Familienzentrum",
+    "slug": "brk-familienzentrum",
+    "address": "Nunnenbeckstr. 43",
+    "city": "Nürnberg",
+    "zip": "90489",
+    "phone": "0911 / 5301280",
+    "website": "http://www.kvnuernberg-stadt.brk.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=7551",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=7551"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10060853,
+   "global_id": "www.frankenkids.de?id=10060853",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10060853"
+   ],
+   "author": "27",
+   "status": "publish",
+   "date": "2026-06-30 13:44:35",
+   "date_utc": "2026-06-30 11:44:35",
+   "modified": "2026-06-30 13:48:29",
+   "modified_utc": "2026-06-30 11:48:29",
+   "url": "https://www.frankenkids.de/veranstaltungen/koberger-maxis-fuer-eltern-kinder-12-24-mon/2026-10-07/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10060853",
+   "title": "Koberger Maxis – für Eltern + Kinder (12-24 Mon.)",
+   "description": "<p>Während die Kinder spielen, könnt ihr bei einer Tasse Tee oder Kaffee euch austauschen und zu Eltern Kontakte knüpfen. Im Bewegungsraum gibt es viel Platz zum Toben und zu entdecken, z. B. eine Kletterlandschaft. Wir sind da, um Fragen und Unsicherheiten zu besprechen.</p>\n<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Immer mittwochs (außer in den Schulferien).</span></p>",
+   "excerpt": "",
+   "slug": "koberger-maxis-fuer-eltern-kinder-12-24-mon",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-07 15:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-07 16:15:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "16",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-07 13:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-07 14:15:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "14",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.zentrum-koberger.de/",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Kinder",
+     "slug": "kinder",
+     "term_group": 0,
+     "term_taxonomy_id": 297,
+     "taxonomy": "tribe_events_cat",
+     "description": "Veranstaltungen für Kinder mit/ohne Eltern, Kurse",
+     "parent": 0,
+     "count": 184,
+     "filter": "raw",
+     "id": 297,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/297",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Bewegungsangebot",
+     "slug": "bewegungsangebot",
+     "term_group": 0,
+     "term_taxonomy_id": 4212,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 7,
+     "filter": "raw",
+     "id": 4212,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4212",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Eltern-Kind-Angebot",
+     "slug": "eltern-kind-angebot",
+     "term_group": 0,
+     "term_taxonomy_id": 4751,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 16,
+     "filter": "raw",
+     "id": 4751,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4751",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Eltern-Kind-Cafe",
+     "slug": "eltern-kind-cafe",
+     "term_group": 0,
+     "term_taxonomy_id": 5869,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 2,
+     "filter": "raw",
+     "id": 5869,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/5869",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Koberger",
+     "slug": "koberger",
+     "term_group": 0,
+     "term_taxonomy_id": 9312,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 4,
+     "filter": "raw",
+     "id": 9312,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/9312",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Offener Treff",
+     "slug": "offener-treff",
+     "term_group": 0,
+     "term_taxonomy_id": 2158,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 3,
+     "filter": "raw",
+     "id": 2158,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/2158",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 20401,
+    "author": "9",
+    "status": "publish",
+    "date": "2022-06-30 11:30:35",
+    "date_utc": "2022-06-30 09:30:35",
+    "modified": "2024-03-14 10:47:07",
+    "modified_utc": "2024-03-14 09:47:07",
+    "url": "https://www.frankenkids.de/veranstaltungsort/zentrum-kobergerstrasse/",
+    "venue": "Zentrum Kobergerstraße",
+    "slug": "zentrum-kobergerstrasse",
+    "address": "Kobergerstr. 79",
+    "city": "Nürnberg",
+    "country": "Deutschland",
+    "province": "Bayern",
+    "zip": "90408",
+    "phone": "0911 / 361626",
+    "website": "https://www.zentrum-koberger.de/beratungsstelle/",
+    "stateprovince": "Bayern",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=20401",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=20401"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10062673,
+   "global_id": "www.frankenkids.de?id=10062673",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10062673"
+   ],
+   "author": "9",
+   "status": "publish",
+   "date": "2026-09-15 14:02:31",
+   "date_utc": "2026-09-15 12:02:31",
+   "modified": "2026-09-15 14:05:52",
+   "modified_utc": "2026-09-15 12:05:52",
+   "url": "https://www.frankenkids.de/veranstaltungen/taekwon-do-schnupperkurs/2026-10-07/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10062673",
+   "title": "Taekwon-Do Schnupperkurs",
+   "description": "<p>Stark &amp; selbstbewusst! Unser 3-wöchiger Schnupper-Kurs in traditionellem Taekwondo für Kids (6–11 Jahre) bietet kontaktfreies Training mit coolen Hand- &amp; Fußtechniken zur Selbstverteidigung.</p>\n<p>&nbsp;</p>\n<p>Anmeldung per Mail unter info@taekwondo-nbg.com</p>",
+   "excerpt": "",
+   "slug": "taekwon-do-schnupperkurs",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-07 17:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "17",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-07 18:30:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "18",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-07 15:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "15",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-07 16:30:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "07",
+    "hour": "16",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "http://www.taekwondo-nbg.com",
+   "show_map": false,
+   "show_map_link": false,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sport",
+     "slug": "sport",
+     "term_group": 0,
+     "term_taxonomy_id": 305,
+     "taxonomy": "tribe_events_cat",
+     "description": "Schwangerschaftsgymnastik, Yogakurs, Sportkurse für Kinder, Schwimmbäder, Sportcamps, Ferienprogramm, Schwimmkurse, Selbstverteidigung, Sportvereine",
+     "parent": 0,
+     "count": 80,
+     "filter": "raw",
+     "id": 305,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/305",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Kampfkunst",
+     "slug": "kampfkunst",
+     "term_group": 0,
+     "term_taxonomy_id": 5480,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 3,
+     "filter": "raw",
+     "id": 5480,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/5480",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Kampfsport",
+     "slug": "kampfsport",
+     "term_group": 0,
+     "term_taxonomy_id": 7452,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 2,
+     "filter": "raw",
+     "id": 7452,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/7452",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Schnupperkurs",
+     "slug": "schnupperkurs",
+     "term_group": 0,
+     "term_taxonomy_id": 438,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 438,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/438",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Selbstbewusstsein",
+     "slug": "selbstbewusstsein",
+     "term_group": 0,
+     "term_taxonomy_id": 5462,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 4,
+     "filter": "raw",
+     "id": 5462,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/5462",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Taekwondo",
+     "slug": "taekwondo",
+     "term_group": 0,
+     "term_taxonomy_id": 8525,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 8525,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/8525",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 6570,
+    "author": "2",
+    "status": "publish",
+    "date": "2021-10-15 06:31:06",
+    "date_utc": "2021-10-15 04:31:06",
+    "modified": "2022-12-15 11:10:05",
+    "modified_utc": "2022-12-15 10:10:05",
+    "url": "https://www.frankenkids.de/veranstaltungsort/sportcentrum-nuernberg/",
+    "venue": "Sportcentrum Nürnberg",
+    "slug": "sportcentrum-nuernberg",
+    "address": "Schüblerstr. 15",
+    "city": "Nürnberg",
+    "zip": "90482",
+    "phone": "0911 / 544911",
+    "website": "https://www.sportcentrum-nbg.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=6570",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=6570"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 92083,
+     "author": "28",
+     "status": "publish",
+     "date": "2026-09-15 14:02:31",
+     "date_utc": "2026-09-15 12:02:31",
+     "modified": "2026-09-15 14:02:31",
+     "modified_utc": "2026-09-15 12:02:31",
+     "url": "https://www.frankenkids.de/veranstalter/int-taekwondo-black-belt-center-nuernberg/",
+     "organizer": "Int. Taekwondo Black Belt Center Nürnberg",
+     "slug": "int-taekwondo-black-belt-center-nuernberg",
+     "website": "http://www.taekwondo-nbg.com",
+     "email": "info@taekwondo-nbg.com",
+     "global_id": "www.frankenkids.de?id=92083",
+     "global_id_lineage": [
+      "www.frankenkids.de?id=92083"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 10060868,
+   "global_id": "www.frankenkids.de?id=10060868",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10060868"
+   ],
+   "author": "27",
+   "status": "publish",
+   "date": "2026-06-30 13:51:02",
+   "date_utc": "2026-06-30 11:51:02",
+   "modified": "2026-06-30 13:52:03",
+   "modified_utc": "2026-06-30 11:52:03",
+   "url": "https://www.frankenkids.de/veranstaltungen/koberger-minis-offener-eltern-treff-mit-babys-1-6-mon/2026-10-08/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10060868",
+   "title": "Koberger Minis &#8211; offener Eltern-Treff mit Babys (1-6 Mon.)",
+   "description": "<p>Herzlich Willkommen! Bei uns könnt ihr andere frischgebackene Eltern und ihre Babys (1-6 Mon.) kennenlernen und Erfahrungen austauschen. Gleichzeitig erlebt euer Baby die ersten Kontakte zu Gleichaltrigen. Wir sind da, um bei Bedarf eure Fragen zu beantworten und Impulse zu geben.</p>\n<p>Immer donnerstag außer Schulferien, keine Anm.</p>",
+   "excerpt": "",
+   "slug": "koberger-minis-offener-eltern-treff-mit-babys-1-6-mon",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-08 10:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "10",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-08 11:45:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "11",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-08 08:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "08",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-08 09:45:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "09",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.zentrum-koberger.de",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Eltern",
+     "slug": "eltern",
+     "term_group": 0,
+     "term_taxonomy_id": 298,
+     "taxonomy": "tribe_events_cat",
+     "description": "Veranstaltungen für Eltern zu Familienthemen wie Schule, Erziehung etc.",
+     "parent": 0,
+     "count": 57,
+     "filter": "raw",
+     "id": 298,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/298",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Babys",
+     "slug": "babys",
+     "term_group": 0,
+     "term_taxonomy_id": 2037,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 7,
+     "filter": "raw",
+     "id": 2037,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/2037",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Elterntreff",
+     "slug": "elterntreff",
+     "term_group": 0,
+     "term_taxonomy_id": 463,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 5,
+     "filter": "raw",
+     "id": 463,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/463",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 20401,
+    "author": "9",
+    "status": "publish",
+    "date": "2022-06-30 11:30:35",
+    "date_utc": "2022-06-30 09:30:35",
+    "modified": "2024-03-14 10:47:07",
+    "modified_utc": "2024-03-14 09:47:07",
+    "url": "https://www.frankenkids.de/veranstaltungsort/zentrum-kobergerstrasse/",
+    "venue": "Zentrum Kobergerstraße",
+    "slug": "zentrum-kobergerstrasse",
+    "address": "Kobergerstr. 79",
+    "city": "Nürnberg",
+    "country": "Deutschland",
+    "province": "Bayern",
+    "zip": "90408",
+    "phone": "0911 / 361626",
+    "website": "https://www.zentrum-koberger.de/beratungsstelle/",
+    "stateprovince": "Bayern",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=20401",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=20401"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10061719,
+   "global_id": "www.frankenkids.de?id=10061719",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10061719"
+   ],
+   "author": "2",
+   "status": "publish",
+   "date": "2026-08-11 11:42:30",
+   "date_utc": "2026-08-11 09:42:30",
+   "modified": "2026-08-11 11:43:04",
+   "modified_utc": "2026-08-11 09:43:04",
+   "url": "https://www.frankenkids.de/veranstaltungen/barre-fuer-mamas-babys/2026-10-08/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10061719",
+   "title": "Barre für Mamas &#038; Babys",
+   "description": "<p>Stärke deinen Körper nach der Geburt, finde zurück zu deiner Power und genieße die Zeit mit deinem Baby. Für Babys ca. 6-12 Monate. Auf Deutsch oder Englisch, ärztliche Freigabe erforderlich. Baby im Carrier dabei.</p>\n<p>Jeden Donnerstag, 55 Min. Anmeldung über unsere IMILUV App.</p>",
+   "excerpt": "",
+   "slug": "barre-fuer-mamas-babys",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-08 10:45:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "10",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-08 11:40:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "11",
+    "minutes": "40",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-08 08:45:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "08",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-08 09:40:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "09",
+    "minutes": "40",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://imiluv.de",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sport",
+     "slug": "sport",
+     "term_group": 0,
+     "term_taxonomy_id": 305,
+     "taxonomy": "tribe_events_cat",
+     "description": "Schwangerschaftsgymnastik, Yogakurs, Sportkurse für Kinder, Schwimmbäder, Sportcamps, Ferienprogramm, Schwimmkurse, Selbstverteidigung, Sportvereine",
+     "parent": 0,
+     "count": 80,
+     "filter": "raw",
+     "id": 305,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/305",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Barre",
+     "slug": "barre",
+     "term_group": 0,
+     "term_taxonomy_id": 11162,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 11162,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/11162",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Fitness",
+     "slug": "fitness",
+     "term_group": 0,
+     "term_taxonomy_id": 245,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 6,
+     "filter": "raw",
+     "id": 245,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/245",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Mama-Baby-Kurs",
+     "slug": "mama-baby-kurs",
+     "term_group": 0,
+     "term_taxonomy_id": 3723,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 6,
+     "filter": "raw",
+     "id": 3723,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/3723",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 90450,
+    "author": "2",
+    "status": "publish",
+    "date": "2026-08-11 11:37:47",
+    "date_utc": "2026-08-11 09:37:47",
+    "modified": "2026-08-11 11:37:47",
+    "modified_utc": "2026-08-11 09:37:47",
+    "url": "https://www.frankenkids.de/veranstaltungsort/imiluv-studio-by-julia-beese/",
+    "venue": "IMILUV Studio by Julia Beese",
+    "slug": "imiluv-studio-by-julia-beese",
+    "address": "Schopenhauer Str. 10",
+    "city": "Nürnberg",
+    "zip": "90409",
+    "website": "https://www.imiluv.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=90450",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=90450"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10061629,
+   "global_id": "www.frankenkids.de?id=10061629",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10061629"
+   ],
+   "author": "27",
+   "status": "publish",
+   "date": "2026-08-07 09:50:10",
+   "date_utc": "2026-08-07 07:50:10",
+   "modified": "2026-08-07 09:52:42",
+   "modified_utc": "2026-08-07 07:52:42",
+   "url": "https://www.frankenkids.de/veranstaltungen/pfadfinderinnen-die-woelflinge-3/2026-10-08/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10061629",
+   "title": "Pfadfinder*innen: Die Wölflinge",
+   "description": "<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Der Pfadfinderbund Weltenbummler e.V. bietet wöchentlich ein altersgerechtes Programm für Kinder an. In den Ferien finden Fahrten und Lager statt. Meistens spielen wir draußen, singen, machen Lagerfeuer und haben jede Menge Spaß.</span></p>\n<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Für Kinder von 6 bis 11 Jahre, nicht in den Ferien, </span><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Info und Anmeldung: </span><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Johanna Kittel </span><a href=\"mailto:Johanna-kittel@web.de\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\">Johanna-kittel@web.de</span></a></p>\n<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\"> </span></p>",
+   "excerpt": "",
+   "slug": "pfadfinderinnen-die-woelflinge-3",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-08 17:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "17",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-08 18:30:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "18",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-08 15:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-08 16:30:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "08",
+    "hour": "16",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.kuf-kultur.de/zeltner",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Kinder",
+     "slug": "kinder",
+     "term_group": 0,
+     "term_taxonomy_id": 297,
+     "taxonomy": "tribe_events_cat",
+     "description": "Veranstaltungen für Kinder mit/ohne Eltern, Kurse",
+     "parent": 0,
+     "count": 184,
+     "filter": "raw",
+     "id": 297,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/297",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Kulturladen Zeltnerschloß",
+     "slug": "kulturladen-zeltnerschloss",
+     "term_group": 0,
+     "term_taxonomy_id": 4805,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 6,
+     "filter": "raw",
+     "id": 4805,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4805",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Pfadfinder",
+     "slug": "pfadfinder",
+     "term_group": 0,
+     "term_taxonomy_id": 2095,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 2095,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/2095",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Pfadfinderinnen",
+     "slug": "pfadfinderinnen",
+     "term_group": 0,
+     "term_taxonomy_id": 3732,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 1,
+     "filter": "raw",
+     "id": 3732,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/3732",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 1179,
+    "author": "2",
+    "status": "publish",
+    "date": "2021-02-19 12:03:58",
+    "date_utc": "2021-02-19 11:03:58",
+    "modified": "2023-01-13 14:08:45",
+    "modified_utc": "2023-01-13 13:08:45",
+    "url": "https://www.frankenkids.de/veranstaltungsort/kulturladen-zeltnerschloss/",
+    "venue": "Kulturladen Zeltnerschloss",
+    "slug": "kulturladen-zeltnerschloss",
+    "address": "Gleißhammerstr. 6",
+    "city": "Nürnberg",
+    "zip": "90480",
+    "phone": "0911 / 472945",
+    "website": "https://www.kuf-kultur.de/zeltner",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=1179",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=1179"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10062006,
+   "global_id": "www.frankenkids.de?id=10062006",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10062006"
+   ],
+   "author": "2",
+   "status": "publish",
+   "date": "2026-08-31 08:48:57",
+   "date_utc": "2026-08-31 06:48:57",
+   "modified": "2026-08-31 08:51:05",
+   "modified_utc": "2026-08-31 06:51:05",
+   "url": "https://www.frankenkids.de/veranstaltungen/abenteuerturnen-1/2026-10-09/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10062006",
+   "title": "Abenteuerturnen 1",
+   "description": "<p>Die Kinder klettern gemeinsam, hüpfen und balancieren durch spannende Abenteuer, lernen sich selbst zu vertrauen und mutig neue Dinge auszuprobieren&#8230;</p>\n<p>Anmeldung online, kostenfrei, für Kinder von 1-3 Jahren</p>",
+   "excerpt": "",
+   "slug": "abenteuerturnen-1",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-09 15:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-09 16:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "16",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-09 13:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-09 14:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "14",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.fbs-nuernberg.de/",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sport",
+     "slug": "sport",
+     "term_group": 0,
+     "term_taxonomy_id": 305,
+     "taxonomy": "tribe_events_cat",
+     "description": "Schwangerschaftsgymnastik, Yogakurs, Sportkurse für Kinder, Schwimmbäder, Sportcamps, Ferienprogramm, Schwimmkurse, Selbstverteidigung, Sportvereine",
+     "parent": 0,
+     "count": 80,
+     "filter": "raw",
+     "id": 305,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/305",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Abenteuerturnen",
+     "slug": "abenteuerturnen",
+     "term_group": 0,
+     "term_taxonomy_id": 8605,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 3,
+     "filter": "raw",
+     "id": 8605,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/8605",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Bewegung",
+     "slug": "bewegung",
+     "term_group": 0,
+     "term_taxonomy_id": 1347,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 11,
+     "filter": "raw",
+     "id": 1347,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1347",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Bewegungsangebot",
+     "slug": "bewegungsangebot",
+     "term_group": 0,
+     "term_taxonomy_id": 4212,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 7,
+     "filter": "raw",
+     "id": 4212,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4212",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "FBS",
+     "slug": "fbs",
+     "term_group": 0,
+     "term_taxonomy_id": 5241,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 35,
+     "filter": "raw",
+     "id": 5241,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/5241",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Gostenhof",
+     "slug": "gostenhof",
+     "term_group": 0,
+     "term_taxonomy_id": 4692,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 27,
+     "filter": "raw",
+     "id": 4692,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4692",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "kostenlos",
+     "slug": "kostenlos",
+     "term_group": 0,
+     "term_taxonomy_id": 1464,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 20,
+     "filter": "raw",
+     "id": 1464,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1464",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Turnen",
+     "slug": "turnen",
+     "term_group": 0,
+     "term_taxonomy_id": 4381,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 4,
+     "filter": "raw",
+     "id": 4381,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4381",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 29880,
+    "author": "9",
+    "status": "publish",
+    "date": "2022-10-21 15:47:10",
+    "date_utc": "2022-10-21 13:47:10",
+    "modified": "2026-05-05 10:15:09",
+    "modified_utc": "2026-05-05 08:15:09",
+    "url": "https://www.frankenkids.de/veranstaltungsort/fbs-evang-familien-bildungsstaette/",
+    "venue": "FBS Evang. Familien-Bildungsstätte",
+    "slug": "fbs-evang-familien-bildungsstaette",
+    "address": "Südl. Fürther Str. 18-20",
+    "city": "Nürnberg",
+    "zip": "90429",
+    "phone": "0911 / 2747660",
+    "website": "https://www.fbs-nuernberg.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=29880",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=29880"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10062273,
+   "global_id": "www.frankenkids.de?id=10062273",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10062273"
+   ],
+   "author": "2",
+   "status": "publish",
+   "date": "2026-09-07 09:23:35",
+   "date_utc": "2026-09-07 07:23:35",
+   "modified": "2026-09-07 09:25:09",
+   "modified_utc": "2026-09-07 07:25:09",
+   "url": "https://www.frankenkids.de/veranstaltungen/die-schatzsuche-im-blaumeisental/2026-10-09/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10062273",
+   "title": "Die Schatzsuche im Blaumeisental",
+   "description": "<p>Groß und Klein, Jung und Alt: Erlebt die Magie des Kinos und entdeckt die Liebe zum Film gemeinsam. Das Filmhaus möchte mit euch auf Reise gehen und bittet alle einzusteigen</p>\n<p>Animation, FSK 0, empfohlen ab 7 Jahren.</p>\n<div class=\"container-max\">\n<div id=\"c22796\" class=\"pt-3\">\n<div class=\"ce-textpic ce-right ce-intext\">\n<div class=\"ce-bodytext\">\n<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\"> </span></p>\n</div>\n</div>\n</div>\n</div>\n<p class=\"4WWWFliesstext\"><span style=\"font-size: 11.0pt; font-family: 'Verdana',sans-serif;\"> </span></p>",
+   "excerpt": "",
+   "slug": "die-schatzsuche-im-blaumeisental",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-09 15:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-09 15:01:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "15",
+    "minutes": "01",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-09 13:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-09 13:01:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "13",
+    "minutes": "01",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "http://www.filmhaus.nuernberg.de",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Filme",
+     "slug": "filme",
+     "term_group": 0,
+     "term_taxonomy_id": 293,
+     "taxonomy": "tribe_events_cat",
+     "description": "Kinotipp",
+     "parent": 0,
+     "count": 27,
+     "filter": "raw",
+     "id": 293,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/293",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Filmhaus",
+     "slug": "filmhaus",
+     "term_group": 0,
+     "term_taxonomy_id": 2334,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 16,
+     "filter": "raw",
+     "id": 2334,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/2334",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Kinderfilm",
+     "slug": "kinderfilm",
+     "term_group": 0,
+     "term_taxonomy_id": 1439,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 16,
+     "filter": "raw",
+     "id": 1439,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1439",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Kinderkino",
+     "slug": "kinderkino",
+     "term_group": 0,
+     "term_taxonomy_id": 1678,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 17,
+     "filter": "raw",
+     "id": 1678,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1678",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 6980,
+    "author": "8",
+    "status": "publish",
+    "date": "2021-08-23 12:42:43",
+    "date_utc": "2021-08-23 10:42:43",
+    "modified": "2025-01-16 08:49:34",
+    "modified_utc": "2025-01-16 07:49:34",
+    "url": "https://www.frankenkids.de/veranstaltungsort/filmhaus-nuernberg/",
+    "venue": "Filmhaus Nürnberg",
+    "slug": "filmhaus-nuernberg",
+    "address": "Königstr. 93",
+    "city": "Nürnberg",
+    "zip": "90402",
+    "phone": "0911 / 2317340",
+    "website": "http://www.filmhaus.nuernberg.de/",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=6980",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=6980"
+    ]
+   },
+   "organizer": []
+  },
+  {
+   "id": 10062062,
+   "global_id": "www.frankenkids.de?id=10062062",
+   "global_id_lineage": [
+    "www.frankenkids.de?id=10062062"
+   ],
+   "author": "27",
+   "status": "publish",
+   "date": "2026-09-01 13:20:21",
+   "date_utc": "2026-09-01 11:20:21",
+   "modified": "2026-09-01 13:21:48",
+   "modified_utc": "2026-09-01 11:21:48",
+   "url": "https://www.frankenkids.de/veranstaltungen/abenteuerturnen-2/2026-10-09/",
+   "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/10062062",
+   "title": "Abenteuerturnen 2",
+   "description": "<p>Die Kinder klettern gemeinsam, hüpfen und balancieren durch spannende Abenteuer, lernen sich selbst zu vertrauen und mutig neue Dinge auszuprobieren&#8230;</p>\n<p>Anmeldung online, kostenfrei, für Kinder von 3-6 Jahren</p>",
+   "excerpt": "",
+   "slug": "abenteuerturnen-2",
+   "image": false,
+   "all_day": false,
+   "start_date": "2026-10-09 16:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "16",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-10-09 16:01:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "16",
+    "minutes": "01",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-10-09 14:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "14",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-10-09 14:01:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "10",
+    "day": "09",
+    "hour": "14",
+    "minutes": "01",
+    "seconds": "00"
+   },
+   "timezone": "Europe/Berlin",
+   "timezone_abbr": "CEST",
+   "cost": "",
+   "cost_details": {
+    "currency_symbol": "",
+    "currency_code": "",
+    "currency_position": "suffix",
+    "values": []
+   },
+   "website": "https://www.fbs-nuernberg.de/",
+   "show_map": true,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sport",
+     "slug": "sport",
+     "term_group": 0,
+     "term_taxonomy_id": 305,
+     "taxonomy": "tribe_events_cat",
+     "description": "Schwangerschaftsgymnastik, Yogakurs, Sportkurse für Kinder, Schwimmbäder, Sportcamps, Ferienprogramm, Schwimmkurse, Selbstverteidigung, Sportvereine",
+     "parent": 0,
+     "count": 80,
+     "filter": "raw",
+     "id": 305,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories/305",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [
+    {
+     "name": "Abenteuerturnen",
+     "slug": "abenteuerturnen",
+     "term_group": 0,
+     "term_taxonomy_id": 8605,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 3,
+     "filter": "raw",
+     "id": 8605,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/8605",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Bewegung",
+     "slug": "bewegung",
+     "term_group": 0,
+     "term_taxonomy_id": 1347,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 11,
+     "filter": "raw",
+     "id": 1347,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1347",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Bewegungsangebot",
+     "slug": "bewegungsangebot",
+     "term_group": 0,
+     "term_taxonomy_id": 4212,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 7,
+     "filter": "raw",
+     "id": 4212,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4212",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "FBS",
+     "slug": "fbs",
+     "term_group": 0,
+     "term_taxonomy_id": 5241,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 35,
+     "filter": "raw",
+     "id": 5241,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/5241",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Gostenhof",
+     "slug": "gostenhof",
+     "term_group": 0,
+     "term_taxonomy_id": 4692,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 27,
+     "filter": "raw",
+     "id": 4692,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4692",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "kostenlos",
+     "slug": "kostenlos",
+     "term_group": 0,
+     "term_taxonomy_id": 1464,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 20,
+     "filter": "raw",
+     "id": 1464,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/1464",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Nürnberg",
+     "slug": "nuernberg",
+     "term_group": 0,
+     "term_taxonomy_id": 253,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 364,
+     "filter": "raw",
+     "id": 253,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/253",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    },
+    {
+     "name": "Turnen",
+     "slug": "turnen",
+     "term_group": 0,
+     "term_taxonomy_id": 4381,
+     "taxonomy": "post_tag",
+     "description": "",
+     "parent": 0,
+     "count": 4,
+     "filter": "raw",
+     "id": 4381,
+     "urls": {
+      "self": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags/4381",
+      "collection": "https://www.frankenkids.de/wp-json/tribe/events/v1/tags"
+     }
+    }
+   ],
+   "venue": {
+    "id": 29880,
+    "author": "9",
+    "status": "publish",
+    "date": "2022-10-21 15:47:10",
+    "date_utc": "2022-10-21 13:47:10",
+    "modified": "2026-05-05 10:15:09",
+    "modified_utc": "2026-05-05 08:15:09",
+    "url": "https://www.frankenkids.de/veranstaltungsort/fbs-evang-familien-bildungsstaette/",
+    "venue": "FBS Evang. Familien-Bildungsstätte",
+    "slug": "fbs-evang-familien-bildungsstaette",
+    "address": "Südl. Fürther Str. 18-20",
+    "city": "Nürnberg",
+    "zip": "90429",
+    "phone": "0911 / 2747660",
+    "website": "https://www.fbs-nuernberg.de",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.frankenkids.de?id=29880",
+    "global_id_lineage": [
+     "www.frankenkids.de?id=29880"
+    ]
+   },
+   "organizer": []
+  }
+ ],
+ "rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/?page=1&per_page=50&start_date=2026-10-05 00:00:00&end_date=2026-10-18 23:59:59&status=publish",
+ "next_rest_url": "https://www.frankenkids.de/wp-json/tribe/events/v1/events/?per_page=50&start_date=2026-10-05+00%3A00%3A00&end_date=2026-10-18+23%3A59%3A59&status=publish&page=2",
+ "total": 91,
+ "total_pages": 1
+}

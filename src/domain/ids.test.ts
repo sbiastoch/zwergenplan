@@ -5,6 +5,7 @@ describe("slug", () => {
   it("transliteriert Umlaute und ersetzt Sonderzeichen", () => {
     expect(slug("Bücherzwerge & Fingerspiele")).toBe("buecherzwerge-fingerspiele");
     expect(slug("Große Füße – Österreich")).toBe("grosse-fuesse-oesterreich");
+    expect(slug("Mu\u0308sik")).toBe("muesik"); // NFD-Eingabe ergibt dieselbe ID
     expect(slug("  PEKiP®-Gruppe (Babys geb. Juli–Sept. 2026) ")).toBe("pekip-gruppe-babys-geb-juli-sept-2026");
   });
 

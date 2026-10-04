@@ -10,6 +10,7 @@ const TRANSLIT: Record<string, string> = { ä: "ae", ö: "oe", ü: "ue", ß: "ss
 /** kebab-case aus Freitext: Umlaute transliteriert, höchstens `max` Zeichen, an Wortgrenze gekürzt. */
 export function slug(text: string, max = 60): string {
   const full = text
+    .normalize("NFC") // „a“ + kombinierendes Trema → „ä“, sonst entstünde eine andere ID
     .toLowerCase()
     .replace(/[äöüß]/g, (c) => TRANSLIT[c] ?? c)
     .normalize("NFKD")

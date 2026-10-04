@@ -1,0 +1,703 @@
+{
+ "ANZAHLGESAMT": 13,
+ "ANZAHLERGEBNIS": 13,
+ "STARTZEITPUNKT": "2026-10-09 10:30:00",
+ "ENDEZEITPUNKT": "2027-01-24 16:30:00",
+ "VERANSTALTUNGEN": [
+  {
+   "VERANSTALTUNGID": 378173,
+   "TITEL": "Baby & Museum. Gemeinsam Kunst und Architektur erleben",
+   "UNTERTITEL": "",
+   "DATUM": [
+    {
+     "2026-08-21T10:30": {
+      "E": "2026-08-21 11:30"
+     },
+     "2026-09-04T10:30": {
+      "E": "2026-09-04 11:30"
+     },
+     "2026-09-11T10:30": {
+      "E": "2026-09-11 11:30"
+     },
+     "2026-09-25T10:30": {
+      "E": "2026-09-25 11:30"
+     },
+     "2026-10-09T10:30": {
+      "E": "2026-10-09 11:30"
+     },
+     "2026-10-23T10:30": {
+      "E": "2026-10-23 11:30"
+     },
+     "2026-11-13T10:30": {
+      "E": "2026-11-13 11:30"
+     },
+     "2026-11-27T10:30": {
+      "E": "2026-11-27 11:30"
+     },
+     "2026-12-04T10:30": {
+      "E": "2026-12-04 11:30"
+     },
+     "2026-12-11T10:30": {
+      "E": "2026-12-11 11:30"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-10-09T10:30": {
+     "E": "2026-10-09 11:30"
+    },
+    "2026-10-23T10:30": {
+     "E": "2026-10-23 11:30"
+    },
+    "2026-11-13T10:30": {
+     "E": "2026-11-13 11:30"
+    },
+    "2026-11-27T10:30": {
+     "E": "2026-11-27 11:30"
+    },
+    "2026-12-04T10:30": {
+     "E": "2026-12-04 11:30"
+    },
+    "2026-12-11T10:30": {
+     "E": "2026-12-11 11:30"
+    }
+   },
+   "ORT": "Neues Museum Nürnberg",
+   "VVKLINK": "https://nmn-tickets.de/#/product/event/161?date_id=5140",
+   "VERANSTALTERNAME": "Neues Museum - Staatliches Museum für Kunst und Design in Nürnberg",
+   "BESCHREIBUNG": "Neben Windeln wechseln, Gutenachtgeschichten und Kinderliedern interessierst Du Dich für Kunst, Architektur und Design und willst Dich darüber mit anderen austauschen? Gemeinsam erkunden Menschen mit Babys in entspannter Atmosphäre das Museum.\r\n\r\nPausen zum Füttern und Wickeln sind eingeplant, und Babygebrabbel gehört selbstverständlich dazu. Im Anschluss an die Kurzführung zu monatlich wechselnden Themen gibt es bei einem Kaffee die Möglichkeit zum Austausch.",
+   "ORTSID": "602",
+   "ORTSNAMEEINFACH": "Neues Museum Nürnberg",
+   "ORTSNAMEZUSATZ": "",
+   "ORTSNAMEKOMPLETT": "Neues Museum Nürnberg",
+   "ORTSSTRASSENR": "Klarissenplatz",
+   "ORTSPLZ": "90402",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "http://www.nmn.de",
+   "ORTSLAT": "49.44776153564",
+   "ORTSLNG": "11.08012962341",
+   "ORTSTELEFON": "0911 / 2402069",
+   "ORTSTELEFAX": "0911 / 2402029",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "Dienstag bis Sonntag  von 10 - 18 Uhr\nDonnerstag  von  10 - 20 Uhr\nMontag geschlossen\n\nÖffnung an besonderen Feiertagen siehe Webseite",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 442746,
+   "TITEL": "Basar für Baby- und Kindersachen",
+   "UNTERTITEL": "",
+   "DATUM": [
+    {
+     "2026-10-10T10:00": {
+      "S": "2026-10-10T10:00",
+      "E": "2026-10-10 14:00"
+     }
+    },
+    [],
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-10-10T10:00": {
+     "S": "2026-10-10T10:00",
+     "E": "2026-10-10 14:00"
+    }
+   },
+   "ORT": "Kulturladen Zeltnerschloss",
+   "VVKLINK": "",
+   "VERANSTALTERNAME": "Kulturladen Zeltnerschloss - Amt für Kultur und Freizeit (KUF)",
+   "BESCHREIBUNG": "Verkauft wird alles rund ums Baby und Kind (Größen 50 bis 140). Gut erhaltene Kleidung, Spielsachen und Kinderbücher. Ganz entspannt und und in schöner Atmosphäre können Sie kleine und große Schätze erwerben. Für leckeren Kuchen und Kaffee ist gesorgt.",
+   "ORTSID": "14",
+   "ORTSNAMEEINFACH": "Kulturladen Zeltnerschloss",
+   "ORTSNAMEZUSATZ": "",
+   "ORTSNAMEKOMPLETT": "Kulturladen Zeltnerschloss",
+   "ORTSSTRASSENR": "Gleißhammerstr. 6",
+   "ORTSPLZ": "90480",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "http://www.kuf-kultur.de/zeltner",
+   "ORTSLAT": "49.44749069214",
+   "ORTSLNG": "11.10943031311",
+   "ORTSTELEFON": "0911 / 472945",
+   "ORTSTELEFAX": "0911 / 472936",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "Der Kulturladen Zeltnerschloss verfügt über einen beschränkt barrierefreien Zugang. Die Räumlichkeiten sind nur teilweise mit Rollstuhl erreichbar. Nähere Informationen finden Sie unter:",
+    "WEBSEITE": "https://www.kuf-kultur.de/zeltnerschloss-barrierefrei",
+    "ZUGANG": 1,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 466692,
+   "TITEL": "crisprbaby spear flower",
+   "UNTERTITEL": "Mit crisprbaby und spear flower bringen wir euch am 16. Oktober eine großartig heftige Dosis Industrial NoisePop Synthpunk in den Soft Spot!",
+   "DATUM": [
+    {
+     "2026-10-16T20:00": {
+      "EIN": "19:30"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-10-16T20:00": {
+     "EIN": "19:30"
+    }
+   },
+   "ORT": "Künstlerhaus - Soft Spot",
+   "VVKLINK": "",
+   "VERANSTALTERNAME": "Musikverein im Künstler*innenhaus Nürnberg e. V.",
+   "BESCHREIBUNG": "crisprbaby entwirft Popmusik, die sich gerne der eindeutigen Einordnung entzieht. Digitale Texturen, verzerrte Sounds und fragile Melodien formen eine futuristische Klangwelt, in der sich experimenteller Pop und elektronische Musik gegenseitig aufreiben. Mal verspielt, mal düster und immer mit einer gewissen Unberechenbarkeit – ein spannender neuer Name für alle, die Pop gerne abseits ausgetretener Pfade entdecken.",
+   "ORTSID": "27131",
+   "ORTSNAMEEINFACH": "Künstlerhaus",
+   "ORTSNAMEZUSATZ": "Soft Spot",
+   "ORTSNAMEKOMPLETT": "Künstlerhaus - Soft Spot",
+   "ORTSSTRASSENR": "Königstormauer 7",
+   "ORTSPLZ": "90402",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "https://softspot.club/",
+   "ORTSLAT": "49.44860076904",
+   "ORTSLNG": "11.08164024353",
+   "ORTSTELEFON": "",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 1,
+    "TOILETTE": 1
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 463257,
+   "TITEL": "Trempelmarkt St. Andreas",
+   "UNTERTITEL": "",
+   "DATUM": [
+    {
+     "2026-10-23T14:00": {
+      "E": "2026-10-23 18:00"
+     },
+     "2026-10-24T09:00": {
+      "E": "2026-10-24 13:00"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-10-23T14:00": {
+     "E": "2026-10-23 18:00"
+    },
+    "2026-10-24T09:00": {
+     "E": "2026-10-24 13:00"
+    }
+   },
+   "ORT": "Ökumenisches Gemeindezentrum St. Andreas Thon - evang. Teil EG",
+   "VVKLINK": "",
+   "VERANSTALTERNAME": "Evang.-Luth. Kirchengemeinde St. Andreas",
+   "BESCHREIBUNG": "Goßes Angebot an Saisonbekleidung Herbst/Winter, sortiert nach Größen und getrennt nach Mädchen und Jungen, Sportartikel, Fahrräder, Bücher, Spielwaren, CDs für Babys bis Jugendliche.\r\nWir laden Sie herzlich dazu ein, bei uns als Verkäufer und/oder Käufer mitzumachen. Bis zu 100 Verkäufer bieten Ihnen ein großes Sortiment Saisonbekleidung für Babys, Kinder und Jugendliche von Gr. 56 bis Gr. 176 an.\r\nFür einen übersichtlichen Einkauf sorgt eine Trennung der Kleidung nach Größen und eine Auslegung (ab Gr. 80) getrennt, nach Mädchen und Jungenbekleidung. Natürlich werden auch wieder Spielzeug, Bücher, Fahrräder, Kinderwagen, etc. zum Verkauf stehen.\r\nKommen Sie doch zum Stöbern bei uns vorbei, wir freuen uns sehr auf sie.\r\nWenn Sie gerne als Verkäufer teilnehmen wollen und noch keine Verkäufernummer haben, schicken Sie bitte eine Mail an folgende Adresse: trempelmarkt.st.andreas@gmx.de\r\nSie werden dann in den Verteiler aufgenommen und erhalten rechtzeitig, ca. 4 Wochen vor dem Termin, die Einladung mit den detaillierten Verkaufsbedingungen.",
+   "ORTSID": "39227",
+   "ORTSNAMEEINFACH": "Ökumenisches Gemeindezentrum St. Andreas Thon",
+   "ORTSNAMEZUSATZ": "evang. Teil EG",
+   "ORTSNAMEKOMPLETT": "Ökumenisches Gemeindezentrum St. Andreas Thon - evang. Teil EG",
+   "ORTSSTRASSENR": "Cuxhavener Straße 54",
+   "ORTSPLZ": "90425",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "pfarramt.standreas.nue@elkb.de",
+   "ORTSINTERNET": "http://www.st-andreas-nuernberg.de",
+   "ORTSLAT": "49.47677250000",
+   "ORTSLNG": "11.06622040000",
+   "ORTSTELEFON": "3841956",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 449776,
+   "TITEL": "Baby Dronte",
+   "UNTERTITEL": "Nach dem Kinderbuch von Peter Schössow",
+   "DATUM": [
+    {
+     "2026-10-31T16:00": {
+      "E": "2026-10-31 17:00"
+     },
+     "2026-11-07T16:00": {
+      "E": "2026-11-07 17:00"
+     },
+     "2026-11-08T15:00": {
+      "E": "2026-11-08 16:00"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-10-31T16:00": {
+     "E": "2026-10-31 17:00"
+    },
+    "2026-11-07T16:00": {
+     "E": "2026-11-07 17:00"
+    },
+    "2026-11-08T15:00": {
+     "E": "2026-11-08 16:00"
+    }
+   },
+   "ORT": "Theater Mummpitz im Kachelbau",
+   "VVKLINK": "https://mummpitz.reservix.de/events",
+   "VERANSTALTERNAME": "Theater Mummpitz im Kachelbau",
+   "BESCHREIBUNG": "Käpt’n Lüttich und sein Smutje sitzen auf dem Trockenen, denn Ihr Schlepperkahn »Krautsand« ist im Sturm kaputt gegangen. Am nächsten Tag findet Lüttich am Strand ein seltsames Ei und nimmt es mit nach Hause. Als daraus über Nacht ein seltener Vogel schlüpft, gerät die Freundschaft der beiden mächtig ins Wanken. Aber sie nutzen die Chance, ihren Fehler wieder gut zu machen – auch wenn das alles gegen das Gesetz verstößt und eigentlich nicht erlaubt ist _\r\n\r\nÜber das Richtige im Falschen und ein großes Abenteuer, das Freunde nach der Krise erst so richtig zusammenschweißt.",
+   "ORTSID": "198",
+   "ORTSNAMEEINFACH": "Theater Mummpitz im Kachelbau",
+   "ORTSNAMEZUSATZ": "",
+   "ORTSNAMEKOMPLETT": "Theater Mummpitz im Kachelbau",
+   "ORTSSTRASSENR": "Michael-Ende-Str. 17",
+   "ORTSPLZ": "90439",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "info@theater-mummpitz.de",
+   "ORTSINTERNET": "http://www.theater-mummpitz.de",
+   "ORTSLAT": "49.44287490845",
+   "ORTSLNG": "11.05219173431",
+   "ORTSTELEFON": "0911 / 600050",
+   "ORTSTELEFAX": "0911 / 6000555",
+   "ORTSVGN": "Der Kachelbau ist gut mit der U2 oder der U3 (Haltestelle Rothenburger Straße oder Haltestelle St. Leonhard) bzw. per S-Bahn (Haltestelle Rothenburger Straße) zu erreichen.\nDie Eintrittskarten für die Vorstellungen im Kachelbau gelten auch als Tickets für den VGN.",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 378363,
+   "TITEL": "Chris Boettcher",
+   "UNTERTITEL": "",
+   "DATUM": [
+    {
+     "2026-11-07T20:00": {
+      "E": "2026-11-07 23:59",
+      "EIN": "18:45"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-11-07T20:00": {
+     "E": "2026-11-07 23:59",
+     "EIN": "18:45"
+    }
+   },
+   "ORT": "Gutmann am Dutzendteich",
+   "VVKLINK": "https://www.concertbuero-franken.de/konzert-details/chris-boettcher-2026-11-07.html",
+   "VERANSTALTERNAME": "Concertbüro Franken GmbH",
+   "BESCHREIBUNG": "Baby Boomer - das neue Programm",
+   "ORTSID": "4220",
+   "ORTSNAMEEINFACH": "Gutmann am Dutzendteich",
+   "ORTSNAMEZUSATZ": "",
+   "ORTSNAMEKOMPLETT": "Gutmann am Dutzendteich",
+   "ORTSSTRASSENR": "Bayernstr. 150",
+   "ORTSPLZ": "90478",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "http://www.gutmann-am-dutzendteich.de",
+   "ORTSLAT": "49.43550109863",
+   "ORTSLNG": "11.11643886566",
+   "ORTSTELEFON": "0911 / 414196",
+   "ORTSTELEFAX": "0911 / 413644",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 466537,
+   "TITEL": "Säuglingspflege für (werdende) Großeltern",
+   "UNTERTITEL": "Großvater geworden? Wie wäre eine Auffrischung rund um Entwicklung, Pflege und Ernährung von Babys?",
+   "DATUM": [
+    {
+     "2026-11-14T09:00": {
+      "E": "2026-11-14 12:00"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-11-14T09:00": {
+     "E": "2026-11-14 12:00"
+    }
+   },
+   "ORT": "Zoff + Harmonie, Familienbildung, Katholischen Stadtkirche Nürnberg",
+   "VVKLINK": "",
+   "VERANSTALTERNAME": "Zoff + Harmonie, Familienbildung der Katholischen Stadtkirche",
+   "BESCHREIBUNG": "Inhalte des Workshops:\r\nAktuelles Wissen zur Säuglingspflege \r\npraktische Übungen (Wickeln, Baden, Halten, Anziehen) mit Übungspuppe \r\nhilfreiche Tipps für den Umgang mit Neugeborenen \r\nAnregungen, wie Du in Deiner Rolle als Großvater bestmöglich unterstützen kannst. \r\nDer Kurs gibt Sicherheit und macht einfach nur Spaß!\r\nVeranstaltungsort: Zoff + Harmonie, Familienbildung der Katholischen Stadtkirche Nürnberg, Vordere Sterngasse 1, Nürnberg\r\nin Kooperation mit KEB MittenInFranken",
+   "ORTSID": "39507",
+   "ORTSNAMEEINFACH": "Zoff + Harmonie, Familienbildung, Katholischen Stadtkirche Nürnberg",
+   "ORTSNAMEZUSATZ": null,
+   "ORTSNAMEKOMPLETT": "Zoff + Harmonie, Familienbildung, Katholischen Stadtkirche Nürnberg",
+   "ORTSSTRASSENR": "Vordere Sterngasse 1",
+   "ORTSPLZ": "90402",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "zoff-harmonie@stadtkirche-nuernberg.de",
+   "ORTSINTERNET": "https://zoff-harmonie.de/",
+   "ORTSLAT": "49.44854880000",
+   "ORTSLNG": "11.07826950000",
+   "ORTSTELEFON": "0911/ 24449-493",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 452821,
+   "TITEL": "Michael Behrendt liest aus Playlist zum Glück",
+   "UNTERTITEL": "99 ½ Songs für ein erfülltes Leben",
+   "DATUM": [
+    {
+     "2026-11-27T17:30": {
+      "E": "2026-11-27 19:00",
+      "EIN": "17:15"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-11-27T17:30": {
+     "E": "2026-11-27 19:00",
+     "EIN": "17:15"
+    }
+   },
+   "ORT": "Stadtbibliothek Zentrum - Lernwelt L0",
+   "VVKLINK": "https://bz.nuernberg.de/programm/stadtbibliothek/veranstaltungen-erwachsene/michael-behrendt-playlist-zum-glueck-24802-20202",
+   "VERANSTALTERNAME": "Stadtbibliothek im Bildungscampus",
+   "BESCHREIBUNG": "Achtung: Hören kann glücklich machen! Die Songtherapie\r\n\r\nIn seiner „Playlist zum Glück“, 2025 erschienen bei Reclam, spürt Michael Behrendt der tröstenden, inspirierenden und heilenden Kraft der Musik nach. Anstelle von Fachleuten aus Forschung, Psychologie und Medizin lässt er Songs und ihre Lyrics sprechen. Denn Songwriterinnen und Songwriter vermitteln ihre wertvollen Einsichten und Tipps in poetisch verdichteter Form, was noch einmal einen ganz anderen Zugang im Umgang mit Herausforderungen und Krisen eröffnet. Ob „You can’t hurry love“ (The Supremes), „Do right to me, Baby“ (Bob Dylan) oder „It’s okay not to be okay“ (Demi Lovato + Marshmelo), ob „Veränderung braucht einen klaren Kopf“ (Clueso) oder „Es reist sich besser mit leichtem Gepäck“ (Silbermond) – es sind griffige Formeln, die in Verbindung mit starker Musik direkt unter die Haut gehen. Live spielt Behrendt einige der im Buch versammelten „99 ½ Songs für ein erfülltes Leben“ im Original kurz ein, erklärt, erzählt und liest die eine oder andere Passage. Ein ebenso anregender wie unterhaltsamer Abend.",
+   "ORTSID": "7340",
+   "ORTSNAMEEINFACH": "Stadtbibliothek Zentrum",
+   "ORTSNAMEZUSATZ": "Lernwelt L0",
+   "ORTSNAMEKOMPLETT": "Stadtbibliothek Zentrum - Lernwelt L0",
+   "ORTSSTRASSENR": "Gewerbemuseumsplatz 4",
+   "ORTSPLZ": "90403",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "",
+   "ORTSLAT": "49.45186996460",
+   "ORTSLNG": "11.08288955688",
+   "ORTSTELEFON": "",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 396503,
+   "TITEL": "Kinderkleidertausch",
+   "UNTERTITEL": "zu kleine Größen werden groß",
+   "DATUM": [
+    {
+     "2026-03-21T12:00": {
+      "E": "2026-03-21 18:00"
+     },
+     "2026-05-09T12:00": {
+      "E": "2026-05-09 18:00"
+     },
+     "2026-07-18T12:00": {
+      "E": "2026-07-18 18:00"
+     },
+     "2026-09-26T12:00": {
+      "E": "2026-09-26 18:00"
+     },
+     "2026-11-28T12:00": {
+      "E": "2026-11-28 18:00"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-11-28T12:00": {
+     "E": "2026-11-28 18:00"
+    }
+   },
+   "ORT": "Künstlerhaus - Glasbau Deck 2",
+   "VVKLINK": "",
+   "VERANSTALTERNAME": "Gentlemachine",
+   "BESCHREIBUNG": "Wer Kinder hat, der kennt es, die Kleinen wachsen schnell. So häuft sich daheim die zu klein gewordene Kleidung und gleichzeitig wird größere gebraucht. Deswegen, lasst sie uns tauschen! Kommt mit einer Tasche voller Kleidung und nehmt soviel ihr wollt wieder mit. Vorsicht: Lieblingsteilalarm!\r\nMitbringen könnt ihr neben Kleidung und Schuhen auch Spielsachen in allen Kindergrößen von Baby bis Jugendlich!\r\n\r\nDer Eintritt ist frei, wer möchte, kann etwas spenden. Der Kinderkleidertausch findet alle zwei Monate im Künstlerhaus statt, Infos findest du in unserem Veranstaltungskalender.",
+   "ORTSID": "6579",
+   "ORTSNAMEEINFACH": "Künstlerhaus",
+   "ORTSNAMEZUSATZ": "Glasbau Deck 2",
+   "ORTSNAMEKOMPLETT": "Künstlerhaus - Glasbau Deck 2",
+   "ORTSSTRASSENR": "Königstr. 93",
+   "ORTSPLZ": "90402",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "",
+   "ORTSLAT": "49.44841003418",
+   "ORTSLNG": "11.08174991608",
+   "ORTSTELEFON": "",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "Mit allen öffentlichen Verkehrsmitteln bis zum Hauptbahnhof, von dort aus ca. 200 m Richtung Innenstadt laufen. Der Haupteingang befindet sich direkt am Königstorgraben.",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "Barrierefreie Zugänge, Aufzug und barrierefreie Toiletten \nFür jede Vorstellung sind rollstuhlgerechte Plätze + je ein Platz für eine Begleitperson eingerichtet. \nReservierungen bitte unter 0911  231 2781 5.",
+    "WEBSEITE": "https://www.kunstkulturquartier.de/kuenstlerhaus/information-in-leichter-sprache",
+    "ZUGANG": 1,
+    "TOILETTE": 1
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 430011,
+   "TITEL": "All I Want For Christmas",
+   "UNTERTITEL": "",
+   "DATUM": [
+    {
+     "2026-12-10T19:30": {
+      "E": "2026-12-10 22:00",
+      "EIN": "18:30"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-12-10T19:30": {
+     "E": "2026-12-10 22:00",
+     "EIN": "18:30"
+    }
+   },
+   "ORT": "Meistersingerhalle - Großer Saal",
+   "VVKLINK": "https://resetproduction.reservix.de/p/reservix/event/2499161",
+   "VERANSTALTERNAME": "Reset Production",
+   "BESCHREIBUNG": "Glitzer, Glamour und unvergessliche Weihnachtshits: In diesem Winter bringt eine spektakuläre Live-Show die festliche Stimmung direkt auf die Bühnen Deutschlands! Zweieinhalb Stunden pure Christmas-Magie mit den größten Pop- und Rock-Weihnachtssongs sorgen für Gänsehautmomente und strahlende Augen. \r\n\r\nIn England und den USA sind Christmas-Shows längst eine geliebte Tradition – nun erobert dieses besondere Erlebnis auch Deutschland. „All I Want For Christmas“ vereint die größten Weihnachtshits aller Zeiten: Von Queen, Wham, Mariah Carey und Michael Bublé bis hin zu Ariana Grande, Cher, John Legend, Kelly Clarkson, Katy Perry, Robbie Williams und Kylie Minogue – die Show hat sie (fast) alle! Tickets und Termine sind ab sofort unter www.resetproduction.de erhältlich. \r\n\r\nWeihnachten & Popmusik – eine magische Verbindung! \r\n\r\nJahr für Jahr versetzen uns legendäre Weihnachtssongs in festliche Stimmung. Fast alle großen Musikstars haben mindestens einen unvergesslichen Weihnachtshit beigesteuert – und genau diese Songs bringt „All I Want For Christmas“ live auf die Bühne. Von zeitlosen Klassikern bis hin zu aktuellen Chartstürmern – hier erklingen die größten modernen Christmas-Hits in einer mitreißenden Show. \r\n\r\nStatt „Leise rieselt der Schnee_“ erwartet das Publikum ein Feuerwerk aus Pop- und Rock-Klassikern. Die Show entführt in die romantische Schneehütten-Atmosphäre aus Whams „Last Christmas“, liefert den unverwechselbaren Sound von Queens „Thank God It’s Christmas“ und begeistert mit modernen Festtags-Ohrwürmern wie „Santa Baby“, „Underneath The Tree“, „Do They Know It’s Christmas“ oder „Driving Home For Christmas“. Und natürlich darf Mariah Careys weltberühmter Hit „All I Want For Christmas Is You“ nicht fehlen! \r\n\r\n \r\n\r\n \r\n\r\n \r\n\r\nHerausragende Sängerinnen und Sänger, eine mitreißende Dance-Crew, spektakuläre LED-Effekte und ein opulentes Bühnenbild schaffen eine magische Weihnachtswelt. „All I Want For Christmas“ berührt die Seele, reißt das Publikum mit und lässt die Herzen im gleichen Takt schlagen. Hier wird geschwelgt, geswingt und mitgesungen – Romantik, Rock, Besinnlichkeit und Party-Feeling in perfekter Harmonie. \r\n\r\nDiese Show macht Weihnachten noch magischer! \r\n\r\nGeschäftsführer Michael Noll sagt über das Projekt: „Ich mag die besondere Stimmung an Weihnachten und ich liebe gute, mitreißende Musik. Beides wollte ich mit meinem Kreativ-Team in eine Show packen, in der sich viele Generationen gleichermaßen wohlfühlen. Die Menschen sollen für diese zwei Stunden einfach unbeschwert, ausgelassen und fröhlich feiern können.“  \r\n\r\n„All I Want For Christmas“ – Der etwas andere Weihnachtszauber, den man nicht verpassen sollte! \r\n\r\n \r\n\r\nTourdaten & Tickets: \twww.resetproduction.de \r\n\r\nTicket Ermäßigungen: \tKinder von 7-12 Jahren erhalten 50% Rabatt auf alle Eintrittspreise \r\n\t\t\tGruppen ab zehn Personen erhalten 5,00 € Ermäßigung je Ticket \r\n\t\t\tFreier Eintritt für die Begleitperson bei Gästen mit einem „B“ im Ausweis  \r\n\r\nService Hotline:  \t\t+49 / (0)365 – 54 818 30  \r\n\r\n \r\n\r\nPressekontakt: \t\tmarketing@resetproduction.de   \r\n\r\nPressematerial: \t\twww.resetproduction.de/presse",
+   "ORTSID": "5178",
+   "ORTSNAMEEINFACH": "Meistersingerhalle",
+   "ORTSNAMEZUSATZ": "Großer Saal",
+   "ORTSNAMEKOMPLETT": "Meistersingerhalle - Großer Saal",
+   "ORTSSTRASSENR": "Schultheißallee 2-4",
+   "ORTSPLZ": "90478",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "http://www.nuernberg.de/internet/meistersingerhalle",
+   "ORTSLAT": "49.43796920776",
+   "ORTSLNG": "11.10528469086",
+   "ORTSTELEFON": "0911 / 2318000",
+   "ORTSTELEFAX": "0911 / 2318016",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 1,
+    "TOILETTE": 1
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 466652,
+   "TITEL": "JASMIN BAYER & BAND",
+   "UNTERTITEL": "X-mas Jazz",
+   "DATUM": [
+    {
+     "2026-12-19T21:00": {
+      "E": "2026-12-19 23:30",
+      "EIN": "20:00"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2026-12-19T21:00": {
+     "E": "2026-12-19 23:30",
+     "EIN": "20:00"
+    }
+   },
+   "ORT": "Jazz Studio Nürnberg",
+   "VVKLINK": "https://www.reservix.de/p/reservix/event/2621434",
+   "VERANSTALTERNAME": "Jazz Studio Nürnberg e.V.",
+   "BESCHREIBUNG": "Jasmin Bayer voc / Davide Roberts p / Florian Brandl tp, flh / Markus Wagner b / Hajo v. Hadeln dr\r\n\r\nMERRY CHRISTMAS BABY.\r\n„Jasmin Bayer ist eine Entdeckung. Ihre Jazz Konzerte zeigen eine erfahrene Sängerin, eine makellose warme Intonation, eine charismatische Bühnenpräsenz.“, so Matthias Winckelmann begeistert, auf dessen Label ENJA Records Jasmin Bayer in 2016 debütiert. Und in der Tat überrascht sie, deren Karriere als Musikerin so ungewöhnlich wie überzeugend startet, bei jedem ihrer Auftritte.\r\n„Eine Meisterin der Jazzballade.“, titelt die Augsburger Allgemeine Zeitung. „Jasmin Bayer hat eine wunderbare Stimme_ein neuer Stern am Jazzhimmel.“ ist in der Süddeutschen Zeitung zu lesen. „Weich in der Anlage, makellos in der Atemtechnik: Damit setzte Jasmin Bayer bei jeder Eigenkomposition deren individuellen Charakter um.“, schreibt die Mittelbayerische Zeitung.\r\nEine gestandene Frau, eine Künstlerin, die genau weiß, was sie tut, die ihr Publikum mit musikalischer Qualität zu überzeugen und mit ihrem Charme zu umgarnen weiß, widmet sich hier einem sehr besonderen Programm: Christmas Jazz – und verleiht damit einem jahreszeitlichen Genre einen ganz besonderen Glanz.\r\n\r\nChristmas Jazz mit Jasmin Bayer & Band – das ist konsequenter und swingender, vielseitiger und erfrischender Jazz voller Eleganz und perfekter Ausgewogenheit von Intellekt und Emotion, Garant dafür, jeden im Publikum mitzureißen – und einzustimmen auf das Fest der Feste _ !",
+   "ORTSID": "7366",
+   "ORTSNAMEEINFACH": "Jazz Studio Nürnberg",
+   "ORTSNAMEZUSATZ": "",
+   "ORTSNAMEKOMPLETT": "Jazz Studio Nürnberg",
+   "ORTSSTRASSENR": "Paniersplatz 27/29",
+   "ORTSPLZ": "90403",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "jazz@jazzstudio.de",
+   "ORTSINTERNET": "http://www.jazzstudio.de",
+   "ORTSLAT": "49.45809555054",
+   "ORTSLNG": "11.08031177521",
+   "ORTSTELEFON": "0911 / 23555541",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 433306,
+   "TITEL": "METROPOLIS Stummfilm mit Live-Orchester",
+   "UNTERTITEL": "2. Symphoniker Plus der Nürnberger Symphoniker",
+   "DATUM": [
+    {
+     "2027-01-22T19:30": {
+      "E": "2027-01-22 22:30",
+      "EIN": "18:30"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2027-01-22T19:30": {
+     "E": "2027-01-22 22:30",
+     "EIN": "18:30"
+    }
+   },
+   "ORT": "Kongresshalle - Musiksaal",
+   "VVKLINK": "https://tickets.nuernbergersymphoniker.de/webshop/webticket/seatmap?eventId=1881",
+   "VERANSTALTERNAME": "Nürnberger Symphoniker",
+   "BESCHREIBUNG": "Ben Palmer Leitung\r\n\r\nAuch 100 Jahre nach seiner Premiere ist dieser Film wie neu: Metropolis, der wohl größte Stummfilm der Kinogeschichte, ein Geniestreich des Expressionismus, ein Pionierwerk des Science-Fiction-Genres. Die Faszinationskraft seiner Bilder, die futuristische Monumentalität seines Settings und seine beklemmenden Zukunftsvisionen sind schier überwältigend. Noch dazu, weil es von einer Musik unterlegt ist, die das Ganze im opulenten Orchestersound zum Glühen bringt. Geschrieben hat den kongenialen Soundtrack Gottfried Huppert, die Handlung in Szene gesetzt der legendäre Regisseur Fritz Lang. Sie spielt in einem totalitären Zwei-Klassen-Stadtstaat, in dem alles unter der Kontrolle eines rigiden Autokraten steht. Mensch und Natur werden ausgebeutet, Menschen künstlich erschaffen - KI lässt grüßen! Symphoniker Plus präsentiert den epochalen Film, der zum UNESCO Welt-Dokumentenerbe gehört, in einer renovierten, an das verschollen geglaubte Original größtmöglich angenäherten Fassung - mit einem Nonplusultra-Arrangement der Filmmusik, eingerichtet von Hans Brandner und Ben Palmer vom Babylon Orchester Berlin.\r\n\r\nWeitere Infos finden Sie auch unter benpalmer.net/metropolis2027\r\n\r\nDauer: 2 Stunden, 47 Min. (Pause nach 1 Stunde 35 Min.)\r\n\r\nProgramm im Detail:\r\nGottfried Huppertz Metropolis 2027",
+   "ORTSID": "6193",
+   "ORTSNAMEEINFACH": "Kongresshalle",
+   "ORTSNAMEZUSATZ": "Musiksaal",
+   "ORTSNAMEKOMPLETT": "Kongresshalle - Musiksaal",
+   "ORTSSTRASSENR": "Bayernstraße 100",
+   "ORTSPLZ": "90471",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "",
+   "ORTSLAT": "49.43265151978",
+   "ORTSLNG": "11.11415004730",
+   "ORTSTELEFON": "",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "Straßenbahn Nr. 9 und Nr. 6\nBus Nr. 36 und Nr. 65\nHaltestelle Doku-Zentrum",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  },
+  {
+   "VERANSTALTUNGID": 433311,
+   "TITEL": "METROPOLIS Stummfilm mit Live-Orchester",
+   "UNTERTITEL": "3. Symphoniker Plus der Nürnberger Symphoniker",
+   "DATUM": [
+    {
+     "2027-01-24T16:30": {
+      "E": "2027-01-24 19:30",
+      "EIN": "15:30"
+     }
+    },
+    {
+     "SCHEMATYP": 0
+    },
+    []
+   ],
+   "ALLETERMINE": {
+    "2027-01-24T16:30": {
+     "E": "2027-01-24 19:30",
+     "EIN": "15:30"
+    }
+   },
+   "ORT": "Kongresshalle - Musiksaal",
+   "VVKLINK": "https://tickets.nuernbergersymphoniker.de/webshop/webticket/seatmap?eventId=1882",
+   "VERANSTALTERNAME": "Nürnberger Symphoniker",
+   "BESCHREIBUNG": "Ben Palmer Leitung\r\n\r\nAuch 100 Jahre nach seiner Premiere ist dieser Film wie neu: Metropolis, der wohl größte Stummfilm der Kinogeschichte, ein Geniestreich des Expressionismus, ein Pionierwerk des Science-Fiction-Genres. Die Faszinationskraft seiner Bilder, die futuristische Monumentalität seines Settings und seine beklemmenden Zukunftsvisionen sind schier überwältigend. Noch dazu, weil es von einer Musik unterlegt ist, die das Ganze im opulenten Orchestersound zum Glühen bringt. Geschrieben hat den kongenialen Soundtrack Gottfried Huppert, die Handlung in Szene gesetzt der legendäre Regisseur Fritz Lang. Sie spielt in einem totalitären Zwei-Klassen-Stadtstaat, in dem alles unter der Kontrolle eines rigiden Autokraten steht. Mensch und Natur werden ausgebeutet, Menschen künstlich erschaffen - KI lässt grüßen! Symphoniker Plus präsentiert den epochalen Film, der zum UNESCO Welt-Dokumentenerbe gehört, in einer renovierten, an das verschollen geglaubte Original größtmöglich angenäherten Fassung - mit einem Nonplusultra-Arrangement der Filmmusik, eingerichtet von Hans Brandner und Ben Palmer vom Babylon Orchester Berlin.\r\n\r\nWeitere Infos finden Sie auch unter benpalmer.net/metropolis2027\r\n\r\nDauer: 2 Stunden, 47 Min. (Pause nach 1 Stunde 35 Min.)\r\n\r\nProgramm im Detail:\r\nGottfried Huppertz Metropolis 2027",
+   "ORTSID": "6193",
+   "ORTSNAMEEINFACH": "Kongresshalle",
+   "ORTSNAMEZUSATZ": "Musiksaal",
+   "ORTSNAMEKOMPLETT": "Kongresshalle - Musiksaal",
+   "ORTSSTRASSENR": "Bayernstraße 100",
+   "ORTSPLZ": "90471",
+   "ORTSORT": "Nürnberg",
+   "ORTSEMAIL": "",
+   "ORTSINTERNET": "",
+   "ORTSLAT": "49.43265151978",
+   "ORTSLNG": "11.11415004730",
+   "ORTSTELEFON": "",
+   "ORTSTELEFAX": "",
+   "ORTSVGN": "Straßenbahn Nr. 9 und Nr. 6\nBus Nr. 36 und Nr. 65\nHaltestelle Doku-Zentrum",
+   "ORTSOEFFNUNGSZEITEN": "",
+   "ORTSZUGAENGLICHKEIT": {
+    "ALLGEMEINES": "",
+    "WEBSEITE": "",
+    "ZUGANG": 0,
+    "TOILETTE": 0
+   },
+   "ANMELDUNG": 0
+  }
+ ]
+}

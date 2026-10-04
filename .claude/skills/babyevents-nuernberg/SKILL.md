@@ -1,95 +1,75 @@
 ---
 name: babyevents-nuernberg
-description: Babykurse, Krabbelgruppen, Elterntreffs, Babykonzerte, Theater und Museumsangebote für 0–3 Jahre in Nürnberg für einen Zeitraum finden – mit freien Plätzen, Wegzeit (zu Fuß/ÖPNV) ab einer Adresse und ICS je Termin. Nutzen bei Fragen wie „was können wir nächste Woche mit dem Baby machen“ oder „Babyangebote im November“.
+description: Datenstand des Zwergenplans aktualisieren – alle Anbieter aus data/providers.yaml für die nächsten 4 Monate prüfen, data/offers.json bauen und auf main veröffentlichen. Nutzen bei „Daten aktualisieren“, „Pipeline-Lauf“, „neue Termine holen“ und bei Pflege des Anbieterkatalogs. Fragen wie „was machen wir nächste Woche mit dem Baby“ beantwortet die Website (https://sbiastoch.github.io/zwergenplan/) bzw. data/offers.json.
 ---
 
-# Babyangebote Nürnberg
+# Zwergenplan-Datenstand aktualisieren
 
-Prüft **alle** passenden Quellen aus dem Katalog `data/providers.yaml` (Repo-Root) auf Termine im Zeitraum. Das Ergebnis ist ein Bericht mit Plätzen, Wegzeit und Kalenderdateien. `SKILL_DIR` ist das Verzeichnis dieser Datei. Alle Skripte brauchen Netzzugriff.
+Ein **Lauf** prüft den ganzen Katalog `data/providers.yaml` für den Horizont von 4 Monaten und endet mit einem Commit auf `main` (ADR 0002). Alle Befehle sind `pnpm pipeline …` (Übersicht: Kopf von `scripts/pipeline/cli.ts`). Der Lauf ist **fertig**, wenn CI auf `main` grün ist und die Live-Seite den neuen Commit zeigt.
 
-## 1. Auftrag klären
+Der Datenvertrag ist `src/domain/schema.ts`. Für Agenten ist er exportiert nach `schema/providers.schema.json` (Katalog), `schema/raw-batch.schema.json` (Ergebnis der Subagenten) und `schema/offers.schema.json`. Rohdaten werden korrigiert, das Schema bleibt, wie es ist.
 
-Folgende Angaben werden gebraucht:
-- **Zeitraum** `FROM`–`TO` (ISO-Daten)
-- **Startadresse**
-- optional: **Alter des Kindes** in Monaten
-- optional: **Filter** (Themen-Tags, `kostenlos`, `ohne-anmeldung`, Lage zum Ring)
-- optional: **maximale Wegzeit**
-
-Zeitraum oder Adresse fehlen: einmal nachfragen. Eine in der Memory hinterlegte Heimadresse gilt als Standard. Die vorhandenen Tags zeigt `python3 SKILL_DIR/scripts/select_providers.py --list-tags`.
-
-Lege `RUN_DIR=./runs/<FROM>_<TO>` an. Dort entsteht `meta.json`:
-
-```json
-{"from": "2026-10-05", "to": "2026-10-18", "address": "…", "age_months": 7,
- "filters": "Klartext für den Bericht", "require_tags": ["kostenlos"], "max_minutes": 30}
-```
-
-`require_tags` und `max_minutes` wirken auf die **Termine** (in Schritt 5), nicht auf die Anbieter. Grund: Anbieter mit `teils-kostenlos` haben oft genau die gesuchten Termine.
-
-## 2. Quellen auswählen
+## 1. Lauf anlegen
 
 ```
-python3 SKILL_DIR/scripts/select_providers.py [--topics …] [--ring …] [--age-months N] --batch 6 --out RUN_DIR
+pnpm pipeline init                 # → runs/<heute>/ mit meta.json (from, to)
+pnpm pipeline select runs/<from>   # → batch-<n>.json je Paket, selection.json
 ```
 
-Anbieter werden nur nach Thema, Ring und Alter ausgeschlossen. Die Ausgabe hat drei Teile:
-- `scripts`: Sammelkalender mit eigenem Abfrageskript (Schritt 3a)
-- `batch_files`: `RUN_DIR/batch-<n>.yaml`, ein Paket je Subagent (Schritt 3b)
-- `covered`: Anbieter, deren Termine vollständig über einen Sammelkalender kommen; kein eigener Abruf
+Fertig, wenn `selection.json` die Pakete, die Sammelkalender mit Adapter und die übersprungenen Einträge listet.
 
-## 3. Termine erfassen – 3a und 3b parallel
+## 2. Termine erfassen – Subagenten und Sammelkalender parallel
 
-**3b zuerst starten:** Je Paket startest du einen Subagenten im Hintergrund, alle in **einer** Nachricht. Jeder bekommt:
-- den Pfad zu `SKILL_DIR/references/extraction.md` mit der Anweisung, ihn zuerst zu lesen und genau zu befolgen
-- `FROM`, `TO`, das Alter
-- `SKILL_DIR`
-- den Pfad zum Paket `RUN_DIR/batch-<n>.yaml`
-- den Ausgabepfad `RUN_DIR/raw/batch-<n>.json`
+**Subagenten zuerst**: Starte je Paket einen Subagenten im Hintergrund, alle in **einer** Nachricht. Jeder bekommt:
+- den Pfad `.claude/skills/babyevents-nuernberg/references/extraction.md` mit dem Auftrag, ihn zuerst zu lesen und genau zu befolgen
+- den Horizont `from`–`to` aus `meta.json`
+- das Paket `runs/<from>/batch-<n>.json` und den Ausgabepfad `runs/<from>/raw/batch-<n>.json`
 
-**3a, währenddessen selbst:**
+**Sammelkalender währenddessen selbst**:
 
 ```
-python3 SKILL_DIR/scripts/candidates.py fetch RUN_DIR
-python3 SKILL_DIR/scripts/candidates.py list RUN_DIR
+pnpm pipeline candidates fetch runs/<from>
+pnpm pipeline candidates list runs/<from>
 ```
 
-Sichte die Liste. Behalten wird jeder Kandidat, an dem Eltern **mit** Kind von 0–3 (bzw. im Alter des Kindes) teilnehmen. Dazu gehören Krabbel- und Eltern-Kind-Gruppen, Miniclubs, Babymassage, PEKiP, Musikzwerge, Babykonzert, Bücherzwerge, Eltern-Kind-Turnen, Krabbelgottesdienste sowie Fitness oder Yoga mit Baby. Raus fallen Basare, Kurse ohne Kind, reine Vorträge und Angebote erst ab 3+. Dann:
+`list` zeigt je Kandidat den Vorschlag `→ anbieter/ort` oder `?`. Behalten wird jeder Kandidat, an dem Eltern **mit** Kind von 0–3 Jahren teilnehmen: Krabbel- und Eltern-Kind-Gruppen, Miniclubs, Babymassage, PEKiP, Musikzwerge, Babykonzerte, Bücherzwerge, Eltern-Kind-Turnen, Krabbelgottesdienste, Fitness oder Yoga mit Baby. Kurse für Eltern ohne Kind, Basare, reine Vorträge und Angebote ab 3+ fallen weg.
+- Fehlt der Veranstalter im Katalog: `candidates add-provider runs/<from> <cid> --id <kebab-id>`, danach den neuen Eintrag in `data/providers.yaml` kurz prüfen.
+- Ein falscher oder offener Vorschlag wird überschrieben mit `<cid>=<anbieter>/<ort>`.
 
 ```
-python3 SKILL_DIR/scripts/candidates.py keep RUN_DIR <cid,cid,…>
+pnpm pipeline candidates keep runs/<from> <cid>,<cid>=<anbieter>/<ort>,…
 ```
 
-Fertig ist Schritt 3, wenn `RUN_DIR/raw/` zwei Arten von Dateien enthält: `aggregatoren.json` und eine `batch-<n>.json` je Paket. Jeder Anbieter aus den Paketen muss darin einen `status` haben. Fehlt ein Anbieter, wird er gezielt nachgeprüft (eigener Subagent, nur dieser Anbieter).
+`keep` schreibt den Entwurf `raw/aggregatoren.json` und nennt je Event die offenen Felder. Fülle sie direkt in der Datei: `summary` in eigenen Worten (1–2 Sätze, was passiert), dazu `cost`/`registration`, falls offen. Prüfe dabei das abgeleitete `format`. Dann `pnpm pipeline validate-raw runs/<from>/raw/aggregatoren.json`.
 
-## 4. Anreichern
+Fertig ist Schritt 2, wenn es für jedes `batch-<n>.json` ein `raw/batch-<n>.json` gibt und `validate-raw` für jede Rohdatei grün ist. Hat ein Subagent einen Anbieter ausgelassen, prüft ein neuer Subagent nur diesen: `pnpm pipeline select runs/<from> --only <id>` erzeugt ein zusätzliches Paket mit der nächsten freien Nummer, vorhandene Pakete bleiben unberührt.
 
-```
-python3 SKILL_DIR/scripts/enrich.py RUN_DIR
-```
-
-Das Skript erledigt der Reihe nach:
-1. Es führt alle `raw/*.json` zusammen und entfernt Dubletten über Anbieter und Sammelkalender hinweg.
-2. Bei wöchentlichen offenen Treffs nimmt es die bayerischen Ferien und Feiertage aus.
-3. Je Ort berechnet es die Wegzeit: zu Fuß über OSRM, mit den Öffis über VGN-EFA mit Ankunft zum Terminbeginn.
-4. Es schreibt `RUN_DIR/ics/*.ics` und `alle.ics`.
-
-Meldet es `route_errors`, wird die Adresse im Event korrigiert („Straße Nr, PLZ Nürnberg“ oder „lat,lon“) und das Skript erneut gestartet.
-
-## 5. Berichten
+## 3. Bauen
 
 ```
-python3 SKILL_DIR/scripts/report.py RUN_DIR
+pnpm pipeline build runs/<from>
 ```
 
-Es wendet `require_tags` und `max_minutes` an und schreibt `bericht.md` und `bericht.html`. Im Chat gibst du eine kurze Übersicht aus:
-- die besten Treffer je Tag (frei oder ohne Anmeldung, kurzer Weg; Ring zuerst)
-- die Zahl der Termine und Quellen
-- **jede** Quelle mit `status: fehler` samt Grund
-- Pfade zu `bericht.html` und `ics/alle.ics`
+`build` schreibt `data/offers.json` und `runs/<from>/report.json`. Auf stdout stehen Zahlen, jede Quelle mit `fehler` und jede Drift-Meldung. Bricht es ab, nennt die Meldung Datei, Event und Feld. Korrigiere die Rohdatei und baue erneut. Fertig, wenn `build` „data/offers.json geschrieben“ meldet.
 
-Bei Fernzugriff schickst du `bericht.html` mit SendUserFile. Einzelne ICS-Dateien gibt es auf Wunsch.
+## 4. Katalog pflegen
 
-## 6. Verzeichnis pflegen
+Jede Drift-Meldung aus dem Bericht wird in `data/providers.yaml` umgesetzt (tote URL, Umzug, neues Buchungssystem, Schließung), danach `verified` auf heute. Die Regeln stehen in `references/catalog.md`. Fertig, wenn jede Drift-Meldung umgesetzt oder begründet verworfen ist und `pnpm data:validate` grün ist.
 
-Haben Subagenten **Drift** gemeldet (tote URL, Umzug, Schließung, neues Buchungssystem), korrigierst du den Eintrag in `data/providers.yaml` und setzt `verified` auf heute. Bei einer Schließung wird der Eintrag gelöscht und in `references/excluded.md` vermerkt. Taucht ein Veranstalter in einem Sammelkalender wiederholt auf und fehlt im Verzeichnis, nimmst du ihn nach `references/provider-schema.md` auf. Die Lage zum Ring liefert `python3 SKILL_DIR/scripts/ring.py "<Adresse>"`. Nach jeder Änderung erzeugst du die Übersicht neu: `python3 SKILL_DIR/scripts/providers_md.py ANBIETER.md` (im Projektverzeichnis).
+## 5. Veröffentlichen
+
+```
+pnpm pipeline publish runs/<from>
+gh run watch
+```
+
+`publish` bricht ab, wenn es Änderungen außerhalb von `data/` gibt. Code-Änderungen gehören in einen eigenen Commit. Danach prüft `publish` gegen den deployten Stand, committet `data/` auf `main` und pusht. Ist CI rot, bleibt die alte Version live: Ursache reparieren, neu bauen, neu veröffentlichen.
+
+Fertig, wenn `gh run watch` grün endet und `https://sbiastoch.github.io/zwergenplan/data/meta.json` den neuen Commit zeigt.
+
+## Abschlussbericht im Chat
+
+- Angebote und Termine, verglichen mit dem vorigen Stand
+- **jede** Quelle mit `fehler` samt Grund und **jede** aus dem Altbestand übernommene Quelle
+- umgesetzte Katalogänderungen
+- Link zur Live-Seite

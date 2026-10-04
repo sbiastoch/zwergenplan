@@ -5,7 +5,10 @@ Grundlage für `/arch-review`. Regeln, die maschinell prüfbar sind, stehen zus�
 ## Datenfluss
 
 ```
-Recherche-Skill ──► data/providers.yaml + data/offers.json   (committet auf main)
+Recherche-Skill (.claude/skills/babyevents-nuernberg, orchestriert Subagenten)
+   │  pnpm pipeline …  (scripts/pipeline: Sammelkalender, Rohdaten, build)
+   ▼
+data/providers.yaml + data/offers.json   (Commit auf main per `pipeline publish`)
                           │
             scripts/build-data.ts  (Zod + Invarianten; rot = kein Build)
                           │
@@ -23,7 +26,9 @@ Recherche-Skill ──► data/providers.yaml + data/offers.json   (committet au
 | `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit | nur `src/domain`, `zod` (nur schema/dataset) |
 | `src/data/` | einziger Datenzugriff der App (fetch, localStorage) | `src/domain` (Typen) |
 | `src/ui/` | React-Komponenten, Darstellung, Interaktion | `src/domain`, `src/data` |
-| `scripts/` | Build, Validierung, später die Pipeline (Node) | `src/domain`, `site.config.ts` |
+| `scripts/` | Build, Validierung, Schema-Export (Node) | `src/domain`, `site.config.ts` |
+| `scripts/pipeline/lib/` | reine Pipeline-Logik: Quellen-Parser, Termin-Regeln, Zuordnung, Build der Angebote | `src/domain`, `zod`, `cheerio`, `yaml` – kein Netz, keine Dateien |
+| `scripts/pipeline/io/`, `cli.ts` | Netz, Dateien, git für die Pipeline | `scripts/pipeline/lib`, `src/domain`, Node |
 | `e2e/` | Black-Box-Tests im Browser | nichts aus `src/` |
 | `.claude/hooks/` | Agenten-Hooks | nur Node-Builtins |
 
@@ -32,11 +37,13 @@ Regeln:
 - **Geschäftslogik gehört nach `src/domain`.** Komponenten rufen Domänenfunktionen auf, rechnen aber keine Filter-, Alters- oder Zeitlogik selbst. Das prüft der Review.
 - Die UI lädt geprüfte Daten und importiert `schema.ts`/`dataset.ts` nur als Typ. Zod gehört nicht ins Client-Bundle (`no-zod-in-client`).
 - Datenzugriff läuft nur über `src/data` (`ui-reads-data-only-via-src-data`).
+- `scripts/pipeline/lib` bleibt rein und testbar: kein Import aus `io/`, `cli.ts`, `scripts/lib/` und kein Node-I/O (`pipeline-lib-pure`, `pipeline-lib-no-node-io`), kein globales `fetch` (Biome `noRestrictedGlobals`). Unit-Tests laufen ohne Netz (`vitest.setup.ts`), Quellen werden mit Snapshots aus `tests/fixtures/pipeline/` getestet.
+- `src/` hängt nie von `scripts/` ab (`src-not-scripts`, `no-cheerio-in-src`).
 - Keine Zyklen (`no-circular`). Produktivcode importiert keine Tests oder Fixtures (`no-test-code-in-prod`).
 
 ## Invarianten
 
-- **Ein Datenvertrag**: `src/domain/schema.ts` (Zod 4). Abgeleitete Werte wie Kategorien werden berechnet, nie gespeichert. `schema/*.json` ist ein Export (CI prüft Drift).
+- **Ein Datenvertrag**: `src/domain/schema.ts` (Zod 4), auch für den Anbieterkatalog. Abgeleitete Werte wie Kategorien werden berechnet, nie gespeichert. `schema/*.json` ist ein Export (CI prüft Drift). Das Rohformat der Subagenten (`schema/raw-batch.schema.json`) ist ein daraus abgeleitetes Zwischenformat (ADR 0006).
 - **Zeit**: Jeder Zeitpunkt trägt einen Offset. Kalendertage, das Alter und „heute“ werden in Europe/Berlin bestimmt (`time.ts`), nie in der Geräte-Zeitzone. „Jetzt“ wird in Domänenfunktionen hineingegeben (`FilterContext.now`), nicht intern mit `new Date()` erzeugt.
 - **Stabile IDs** (ADR 0003, ADR 0006): Die Offer-ID ist `providerId--slug(title)--venueId` (Kurse und Einzeltermine mit Beginn im Slug, `src/domain/ids.ts`), die Termin-UID ist `offerId--YYYYMMDDTHHmm@zwergenplan`. Eine geänderte ID erzeugt Duplikate im Kalender der Nutzer.
 - **ICS**: ein VEVENT je Termin in UTC, keine RRULE/RDATE. Die Dateien entstehen statisch zur Build-Zeit.

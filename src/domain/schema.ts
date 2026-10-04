@@ -10,11 +10,11 @@ const kebab = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "kebab-case erwarte
 const Instant = z.iso.datetime({ offset: true, local: false });
 const IsoDate = z.iso.date();
 
-export const Topic = z.enum(TOPICS);
+const Topic = z.enum(TOPICS);
 export const Format = z.enum(["kurs", "regelmaessig", "einmalig"]);
 export const Registration = z.enum(["mit-anmeldung", "ohne-anmeldung"]);
 export const Cost = z.enum(["kostenlos", "kostenpflichtig"]);
-export const AvailabilityStatus = z.enum(["frei", "wenige", "ausgebucht", "warteliste", "ohne-anmeldung", "unbekannt"]);
+const AvailabilityStatus = z.enum(["frei", "wenige", "ausgebucht", "warteliste", "ohne-anmeldung", "unbekannt"]);
 
 /** Großraum Nürnberg/Fürth/Erlangen – alles außerhalb ist ein Geocoding-Fehler. */
 const NUERNBERG_BBOX = { minLat: 49.3, maxLat: 49.65, minLon: 10.85, maxLon: 11.3 } as const;
@@ -76,7 +76,7 @@ const providerBase = {
 };
 
 /** Sammelkalender mit eigenem Abfrage-Adapter in scripts/pipeline (Plan 0002). */
-export const AGGREGATOR_ADAPTERS = ["stadt-vk", "frankenkids", "evtermine"] as const;
+const AGGREGATOR_ADAPTERS = ["stadt-vk", "frankenkids", "evtermine"] as const;
 
 /**
  * Katalog-Eintrag (data/providers.yaml). Die Rolle bestimmt, was Pflicht ist:
@@ -173,7 +173,6 @@ export const ProvidersFile = z.array(Provider);
 export type Venue = z.infer<typeof Venue>;
 export type Provider = z.infer<typeof Provider>;
 export type ProviderAge = z.infer<typeof ProviderAge>;
-export type AvailabilityStatus = z.infer<typeof AvailabilityStatus>;
 export type Session = z.infer<typeof Session>;
 export type AgeRange = z.infer<typeof AgeRange>;
 export type Offer = z.infer<typeof Offer>;

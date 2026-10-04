@@ -13,3 +13,6 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **React Compiler**, sobald es Komponenten mit spürbaren Re-Render-Kosten gibt.
 - **Architektur-Review in CI** über `anthropics/claude-code-action`. Braucht einen API-Key und kostet pro Lauf.
 - **Erinnerung „Anmeldung öffnet“** als eigener ICS-Termin.
+- **Anbieterverzeichnis auf der Website** (ersetzt das frühere `ANBIETER.md`): alle Anbieter mit Ring, Themen und Programm-Links.
+- **Kategorie „Glaube“** für Krabbelgottesdienste. Bis die UI-Session entscheidet, laufen sie unter „Treffs & Cafés“ (Plan 0002, E3).
+- **Lange Listen** (echte Daten: einige hundert Angebote): Virtualisierung bzw. Paginierung und ein Perf-Check mit großem Fixture gehören in den UI-Plan.

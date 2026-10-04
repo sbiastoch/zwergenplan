@@ -8,11 +8,14 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { OffersFile, ProvidersFile } from "../src/domain/schema.ts";
 import { ROOT } from "./lib/load-data.ts";
+import { RawBatch } from "./pipeline/lib/raw.ts";
 
 const outDir = fileURLToPath(new URL("schema/", ROOT));
 const targets = {
   "providers.schema.json": ProvidersFile,
   "offers.schema.json": OffersFile,
+  /** Rohformat der Recherche-Subagenten (ADR 0006) */
+  "raw-batch.schema.json": RawBatch,
 } as const;
 
 const check = process.argv.includes("--check");

@@ -57,10 +57,9 @@ export function berlinKey(instant: string): string {
 
 const LOCAL_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
 
+/** Berlin liegt immer bei UTC+1 oder UTC+2 – ganze Stunden, positives Vorzeichen. */
 function offsetString(minutes: number): string {
-  const sign = minutes >= 0 ? "+" : "-";
-  const abs = Math.abs(minutes);
-  return `${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+  return `+${String(Math.trunc(minutes / 60)).padStart(2, "0")}:00`;
 }
 
 /**
@@ -103,4 +102,25 @@ export function addMonths(isoDate: string, months: number): string {
 export function isoWeekday(isoDate: string): number {
   const { year, month, day } = parseIsoDate(isoDate);
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay() || 7;
+}
+
+const instantFmt = new Intl.DateTimeFormat("en-CA", {
+  timeZone: TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
+});
+
+/** Zeitpunkt → „2026-10-05T06:07:09+02:00“ (Berliner Ortszeit mit Offset, sekundengenau). */
+export function toBerlinIso(date: Date): string {
+  const ms = Math.floor(date.getTime() / 1000) * 1000;
+  const parts = instantFmt.formatToParts(new Date(ms));
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "00";
+  const local = `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}:${get("second")}`;
+  const offset = Math.round((Date.parse(`${local}Z`) - ms) / 60_000);
+  return `${local}${offsetString(offset)}`;
 }
