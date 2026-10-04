@@ -100,7 +100,7 @@ export function DetailContent({ offer, now, day, birthDate, saved, onToggleSave,
             <div className="label full">
               <span className="cap">Anmeldung</span>
               <b>{registrationLabel(offer)}</b>
-              <span>{registrationNote(offer)}</span>
+              <span>{registrationNote(offer, now)}</span>
             </div>
           </div>
           {availability && (
@@ -155,7 +155,8 @@ export function DetailContent({ offer, now, day, birthDate, saved, onToggleSave,
                 }
               >
                 <Icon name="calendarPlus" size={20} />
-                Alle {offer.sessions.length} Termine
+                {/* Ohne Zahl (H5): Die Datei enthält auch vergangene Termine, die Zahl nennt der Toast. */}
+                Alle Termine
               </a>
             </div>
           ) : (
@@ -166,7 +167,7 @@ export function DetailContent({ offer, now, day, birthDate, saved, onToggleSave,
             >
               <Icon name="calendarPlus" size={20} />
               {offer.format === "kurs" && offer.sessions.length > 1
-                ? `Alle ${offer.sessions.length} Kurstermine in den Kalender`
+                ? `Alle ${offer.sessions.length} Kurstermine`
                 : "In den Kalender"}
             </a>
           )}

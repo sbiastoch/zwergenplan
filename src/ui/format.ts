@@ -3,7 +3,8 @@
  * passt oder wöchentlich ist, entscheidet src/domain. Kalendertage sind Berliner Tage (ISO-Strings).
  */
 import { DEFAULT_AGE } from "../domain/age.ts";
-import { courseProgress, nextSession, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
+import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
+import { registrationPhase } from "../domain/registration.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinIsoDate, berlinKey, isoWeekday, parseIsoDate } from "../domain/time.ts";
@@ -111,7 +112,19 @@ export function formatFact(offer: SiteOffer, now: Date): string {
   return r.weekly ? `Jeden ${weekdayName(r.weekday)}` : `${weekdayName(r.weekday)}s`;
 }
 
-/** „Wann“ im Detail: Hauptzeile und Zusatz, je nach Format (Rhythmus und Zählung aus der Domäne). */
+/** Hauptzeile eines Kurses im Detail: wie die Kachel, solange er läuft; nie „noch 0 von 8“ (H8). */
+function courseLine(offer: SiteOffer, now: Date): string {
+  const { total, remaining } = courseProgress(offer, now);
+  const all = `Kurs mit ${plural(total, "Termin", "Terminen")}`;
+  if (remaining === 0) return `${all} – vorbei`;
+  return remaining < total ? `Kurs · noch ${remaining} von ${plural(total, "Termin", "Terminen")}` : all;
+}
+
+/**
+ * „Wann“ im Detail: Hauptzeile und Zusatz, je nach Format (Rhythmus und Zählung aus der Domäne).
+ * Regelmäßige Termine bekommen die Uhrzeit, wenn alle kommenden dieselbe haben (B1). Ohne kommenden
+ * Termin keine Uhrzeit: `uniformTimes([])` ist wahr.
+ */
 export function whenLabels(offer: SiteOffer, now: Date): { main: string; sub: string } {
   const first = offer.sessions[0];
   const last = offer.sessions.at(-1);
@@ -120,29 +133,30 @@ export function whenLabels(offer: SiteOffer, now: Date): { main: string; sub: st
   if (offer.format === "kurs") {
     const range = `${shortDate(sessionDay(first))} bis ${shortDate(sessionDay(last))}`;
     return {
-      main: `Kurs mit ${plural(offer.sessions.length, "Termin", "Terminen")}`,
+      main: courseLine(offer, now),
       sub: uniformTimes(offer.sessions) ? `${range}, jeweils ${timeRange(first)}` : range,
     };
   }
+  const upcoming = upcomingSessions(offer, now);
   const r = rhythm(offer, now);
-  const next = nextSession(offer, now) ?? first;
-  const main = !r
-    ? "Regelmäßig"
-    : r.weekly
-      ? `Jeden ${weekdayName(r.weekday)}, ${timeRange(next)}`
-      : `${weekdayName(r.weekday)}s`;
+  const rhythmText = !r ? "Regelmäßig" : r.weekly ? `Jeden ${weekdayName(r.weekday)}` : `${weekdayName(r.weekday)}s`;
+  const [next] = upcoming;
+  const main = next && uniformTimes(upcoming) ? `${rhythmText}, ${timeRange(next)}` : rhythmText;
   const sub =
     offer.registration === "ohne-anmeldung"
       ? "Einzeln besuchbar"
-      : plural(upcomingSessions(offer, now).length, "kommender Termin", "kommende Termine");
+      : plural(upcoming.length, "kommender Termin", "kommende Termine");
   return { main, sub };
 }
 
-/** Zusatz zur Anmeldung: das Fenster als Berliner Tage, sonst ein Hinweis. */
-export function registrationNote(offer: SiteOffer): string {
+/** Zusatz zur Anmeldung: das Fenster als Berliner Tage relativ zu „jetzt“ (B4), sonst ein Hinweis. */
+export function registrationNote(offer: SiteOffer, now: Date): string {
   const { opens, deadline } = offer.registrationWindow ?? {};
-  const parts = [opens && `ab ${dayDots(opens)}`, deadline && `bis ${dayDots(deadline)}`].filter(Boolean);
-  if (parts.length > 0) return `Anmeldung ${parts.join(", ")}`;
+  const phase = registrationPhase(offer.registrationWindow, now);
+  if (phase === "vorbei" && deadline) return `Anmeldeschluss war am ${dayDots(deadline)}`;
+  if (phase === "offen" && deadline) return `Anmeldung bis ${dayDots(deadline)}`;
+  // „bald“ (mit oder ohne Schluss) und „offen“ ohne Schluss
+  if (phase && opens) return `Anmeldung ab ${dayDots(opens)}${deadline ? `, bis ${dayDots(deadline)}` : ""}`;
   return offer.registration === "mit-anmeldung" ? "Beim Anbieter" : "Einfach vorbeikommen";
 }
 

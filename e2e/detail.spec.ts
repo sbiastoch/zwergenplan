@@ -62,7 +62,7 @@ test("ein unbekanntes Angebot in der URL wird verworfen", async ({ page }) => {
 
 test("Kurs-ICS enthält alle Termine in korrekter Zeit", async ({ page }) => {
   const dialog = await openDetail(page, PEKIP);
-  const link = dialog.getByRole("link", { name: "Alle 8 Kurstermine in den Kalender" });
+  const link = dialog.getByRole("link", { name: "Alle 8 Kurstermine" });
   const href = await link.getAttribute("href");
   expect(href).toMatch(/^\/ics\/.+\.ics$/);
   const body = await vevents(page, href);
@@ -76,7 +76,10 @@ test("regelmäßig: nur der nächste Termin oder alle", async ({ page }) => {
   await expect(dialog.getByText("Einzeln besuchbar")).toBeVisible();
   const one = await vevents(page, await dialog.getByRole("link", { name: "Nur Mi 7.10." }).getAttribute("href"));
   expect(one.match(/BEGIN:VEVENT/g)).toHaveLength(1);
-  const all = await vevents(page, await dialog.getByRole("link", { name: "Alle 5 Termine" }).getAttribute("href"));
+  const all = await vevents(
+    page,
+    await dialog.getByRole("link", { name: "Alle Termine", exact: true }).getAttribute("href"),
+  );
   expect(all.match(/BEGIN:VEVENT/g)).toHaveLength(5);
 });
 
