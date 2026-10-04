@@ -4,7 +4,13 @@
  */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
-import { expectAccessible, expectMobileUx, expectNoHorizontalScroll } from "./mobile-ux.ts";
+import {
+  expectAccessible,
+  expectMobileUx,
+  expectNoHorizontalScroll,
+  expectTextFits,
+  setTextScale,
+} from "./mobile-ux.ts";
 
 async function dataMeta(page: Page): Promise<{ offers: number; generatedAt: string }> {
   const res = await page.request.get("./data/meta.json");
@@ -26,19 +32,36 @@ async function openAtDataTime(page: Page): Promise<{ offers: number }> {
 
 test("echter Build lädt und ist bedienbar", async ({ page }) => {
   await openAtDataTime(page);
-  await expectMobileUx(page);
+  // Knopf-Beschriftungen mit Daten (Anbietername, Tag) dürfen umbrechen: Prüfung 5 nur mit Fixtures (Plan 0007, E10).
+  await expectMobileUx(page, { buttons: false });
 });
 
-test("echte Daten brechen bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 640 });
-  await openAtDataTime(page);
-  await expectNoHorizontalScroll(page);
-  await page.evaluate(() => {
-    document.documentElement.style.fontSize = "200%";
+/** Weg zu den Ansichten mit echten Daten, ausgehend von der geladenen Startseite (Plan 0003, Arch-Hinweis 16). */
+const REAL_VIEWS: Record<string, (page: Page) => Promise<void>> = {
+  Start: async () => {},
+  Kalender: async (page) => {
+    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+    await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
+  },
+  Detail: async (page) => {
+    await page.getByTestId("offer").first().getByRole("heading").getByRole("button").click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+  },
+};
+
+for (const [name, go] of Object.entries(REAL_VIEWS)) {
+  test(`echte Daten brechen bei 320 px und 200 % Textgröße nicht aus (${name})`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    const meta = await openAtDataTime(page);
+    test.skip(meta.offers === 0 && name !== "Start", "keine Daten");
+    await go(page);
+    await expectNoHorizontalScroll(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2, buttons: false });
+    await expectAccessible(page);
   });
-  await expectNoHorizontalScroll(page);
-  await expectAccessible(page);
-});
+}
 
 test("lange Listen werden schrittweise gezeigt (Plan 0003, E8)", async ({ page }) => {
   const meta = await openAtDataTime(page);

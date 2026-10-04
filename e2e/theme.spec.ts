@@ -2,7 +2,10 @@
 import { expect, test } from "./fixtures.ts";
 
 test("Kopf-Knopf schaltet um, die Wahl überlebt das Neuladen", async ({ page }) => {
-  test.skip((page.viewportSize()?.width ?? 0) < 360, "unter 360 px liegt die Darstellung nur im Kind-Sheet");
+  test.skip(
+    (page.viewportSize()?.width ?? 0) < 380,
+    "unter 380 px fehlt der Knopf im Kopf, die Darstellung liegt im Kind-Sheet (Plan 0007, E6)",
+  );
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("./");
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
