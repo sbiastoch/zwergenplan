@@ -1,6 +1,6 @@
 /** Mobile-UX-Gates für jede Ansicht und jedes Overlay, hell und dunkel (Plan 0003, docs/architecture.md). */
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, MAP_READY, test } from "./fixtures.ts";
 import {
   expectAccessible,
   expectMobileUx,
@@ -13,6 +13,19 @@ async function ready(page: Page) {
   await page.goto("./");
   await expect(page.getByTestId("offer").first()).toBeVisible();
 }
+
+/** Karte mit Stadtteil als Startpunkt (Plan 0005): Werkzeugzeile „Startpunkt: Gostenhof“, Orts-Liste mit Entfernung. */
+async function openMap(page: Page) {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+  await kid.getByRole("button", { name: "Fertig" }).click();
+  await page.getByRole("button", { name: "Karte", exact: true }).click();
+  await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+}
+
+/** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
+const MAP_VIEWS = new Set(["karte", "orts-sheet"]);
 
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
@@ -41,31 +54,43 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByLabel("Geburtsdatum").fill("01.09.2026");
     await expect(page.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
   },
+  karte: openMap,
+  "orts-sheet": async (page) => {
+    await openMap(page);
+    await page
+      .getByRole("region", { name: "Orte" })
+      .getByRole("button", { name: /^Familientreff Beispielhof/ })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
+  },
 };
 
 for (const [name, go] of Object.entries(VIEWS)) {
-  for (const colorScheme of ["light", "dark"] as const) {
-    test(`${name} besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+  test.describe(name, () => {
+    if (MAP_VIEWS.has(name)) test.use({ tiles: "mock" });
+    for (const colorScheme of ["light", "dark"] as const) {
+      test(`${name} besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+        await ready(page);
+        await go(page);
+        // vor expectMobileUx: dessen settle() wartet Animationen ab, die hier gar nicht erst laufen dürfen
+        await expectReducedMotion(page);
+        await expectMobileUx(page);
+      });
+    }
+
+    test(`${name} bricht bei 320 px und 200 % Textgröße nicht aus`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
       await ready(page);
       await go(page);
-      // vor expectMobileUx: dessen settle() wartet Animationen ab, die hier gar nicht erst laufen dürfen
-      await expectReducedMotion(page);
-      await expectMobileUx(page);
+      await expectNoHorizontalScroll(page);
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = "200%";
+      });
+      await expectNoHorizontalScroll(page);
+      await expectAccessible(page);
     });
-  }
-
-  test(`${name} bricht bei 320 px und 200 % Textgröße nicht aus`, async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 640 });
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await ready(page);
-    await go(page);
-    await expectNoHorizontalScroll(page);
-    await page.evaluate(() => {
-      document.documentElement.style.fontSize = "200%";
-    });
-    await expectNoHorizontalScroll(page);
-    await expectAccessible(page);
   });
 }
 
@@ -87,4 +112,18 @@ test("zeigt den Fokus auch im Detail-Dialog", async ({ page, isMobile }) => {
   await ready(page);
   await VIEWS["detail"]?.(page);
   await expectVisibleFocus(page, 15);
+});
+
+test.describe("Karte", () => {
+  test.use({ tiles: "mock" });
+
+  test("zeigt den Fokus auf Kartenfläche, Zoom, Attribution, Werkzeugzeile und Orts-Liste", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Tastatur-Fokus wird auf Desktop geprüft");
+    await ready(page);
+    await openMap(page);
+    await expectVisibleFocus(page, 60);
+  });
 });
