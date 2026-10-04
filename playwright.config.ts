@@ -1,8 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 import { BASE } from "./site.config.ts";
 
-const FIXTURE_PORT = 4173;
-const REAL_PORT = 4174;
+// Eigener Port je Worktree (PW_PORT=4273 …), damit parallele Läufe nicht per reuseExistingServer
+// den Server – und damit den Build – eines anderen Worktrees testen.
+const FIXTURE_PORT = Number(process.env["PW_PORT"] ?? 4173);
+const REAL_PORT = FIXTURE_PORT + 1;
 const common = { locale: "de-DE", timezoneId: "Europe/Berlin" } as const;
 
 export default defineConfig({
