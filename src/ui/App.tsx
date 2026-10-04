@@ -162,7 +162,14 @@ export function App() {
               <span>
                 <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
               </span>
-              {origin && <span>· {distanceNote(origin)}</span>}
+              {origin && (
+                // eigene Zeile ohne „·“: Sie brach bei 320–390 px ohnehin um, und der Punkt stand dann verwaist
+                // vorn. Der Punkt nur für Screenreader trennt die beiden Sätze in der Ansage.
+                <span className="status-note">
+                  <span className="sr-only">. </span>
+                  {distanceNote(origin)}
+                </span>
+              )}
             </p>
             {route.filter.reachLimit && !origin && (
               // Geteilter Link mit ?umkreis= ohne Startpunkt: Der Filter wirkt nicht (Plan 0004, E7).

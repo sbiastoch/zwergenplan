@@ -48,6 +48,12 @@ test("Stadtteil als Startpunkt: Entfernung auf Kachel, im Detail und in der Stat
   await sheet.getByRole("button", { name: "Fertig" }).click();
 
   await expect(page.getByRole("status")).toContainText("Entfernung als Luftlinie ab Gostenhof");
+  // eigene Zeile ohne verwaisten „·“ vorn (Screenshot-Befund nach Schritt 5)
+  const note = page.getByRole("status").getByText("Entfernung als Luftlinie ab Gostenhof");
+  expect(await note.evaluate((el) => el.textContent)).not.toContain("·");
+  const count = page.getByRole("status").getByText("Angebote ab heute");
+  const [countBox, noteBox] = [await count.boundingBox(), await note.boundingBox()];
+  expect(noteBox?.y).toBeGreaterThanOrEqual((countBox?.y ?? 0) + (countBox?.height ?? 0) - 1);
   await expect(offers(page).filter({ hasText: "Kuckuck im Nest" })).toContainText("200 m");
   await expect(offers(page).filter({ hasText: "Offener Krabbeltreff" })).toContainText("1,4 km");
   expect(requests, "kein Request nach der Wahl des Startpunkts").toEqual([]);

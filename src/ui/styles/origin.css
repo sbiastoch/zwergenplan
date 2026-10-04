@@ -53,6 +53,11 @@
     margin-top: 6px;
   }
 
+  /* Statuszeile: „Entfernung als Luftlinie ab …“ immer in eigener Zeile, ohne Trennpunkt */
+  .status-note {
+    flex-basis: 100%;
+  }
+
   /* Kachel: „1,4 km“ bricht nie zwischen Zahl und Einheit */
   .meta .dist {
     white-space: nowrap;
