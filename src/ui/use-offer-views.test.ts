@@ -189,29 +189,31 @@ describe("useOfferViews", () => {
       expect(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }).map?.placeCount).toBe(1);
     });
 
-    it("Datenbasis des Startausschnitts hängt nie am Umkreis um einen Standort (Arch-Review B1)", () => {
+    it("Datenbasis des Startausschnitts: alle kommenden Angebote, unabhängig von Filtern, Alter und Startpunkt (Arch-Review B1, m1)", () => {
       const standort: Origin = { source: "standort", point: { lat: 49.4495, lon: 11.0601 }, label: "Mein Standort" };
       const kartenmitte: Origin = { ...standort, source: "karte", label: "Kartenmitte" };
-      const umkreis: Route = { ...within2km, tab: "karte" };
-      const plain = render({ offers: [nah, fern], route: { tab: "karte", filter: EMPTY_FILTER } }).map;
-      expect(ids(plain?.cameraOffers ?? [])).toEqual(["nah", "fern"]);
-      // Der Umkreis blendet „fern“ aus der Liste aus, die Datenbasis des Ausschnitts bleibt.
-      const mitStandort = render({ offers: [nah, fern], route: umkreis, origin: standort });
-      expect(ids(mitStandort.visible)).toEqual(["nah"]);
-      expect(mitStandort.map?.cameraOffers).toEqual(plain?.cameraOffers);
-      expect(render({ offers: [nah, fern], route: umkreis, origin: kartenmitte }).map?.cameraOffers).toEqual(
-        plain?.cameraOffers,
-      );
-      // Andere Filter und das Alter wirken wie auf der Karte
-      const kurse: Route = { tab: "karte", filter: { ...EMPTY_FILTER, formats: ["kurs"] } };
-      expect(render({ offers: [nah, fern], route: kurse }).map?.cameraOffers).toEqual([]);
       const gross = at(GROSS, 49.4301, 11.0892);
-      expect(
-        ids(
-          render({ offers: [nah, gross], route: umkreis, origin: standort, birthDate: "2026-05-01" }).map
-            ?.cameraOffers ?? [],
-        ),
-      ).toEqual(["nah"]);
+      const all = [nah, fern, gross, VORBEI];
+      const plain = render({ offers: all, route: { tab: "karte", filter: EMPTY_FILTER } }).map?.cameraOffers;
+      // nur kommende, sonst alles
+      expect(ids(plain ?? [])).toEqual(["nah", "fern", "gross"]);
+      const variants: Partial<OfferViewsInput>[] = [
+        { route: { ...within2km, tab: "karte" }, origin: standort },
+        { route: { ...within2km, tab: "karte" }, origin: kartenmitte },
+        { route: { tab: "karte", filter: { ...EMPTY_FILTER, formats: ["kurs"] } } },
+        { route: { tab: "karte", filter: EMPTY_FILTER }, birthDate: "2026-05-01" },
+        {
+          route: { ...within2km, tab: "karte", filter: { ...within2km.filter, cost: ["kostenpflichtig"] } },
+          origin: standort,
+          birthDate: "2026-05-01",
+        },
+      ];
+      for (const variant of variants) {
+        const v = render({ offers: all, ...variant });
+        expect(v.map?.cameraOffers, JSON.stringify(variant)).toEqual(plain);
+      }
+      // Die sichtbaren Orte folgen dagegen Umkreis und Alter.
+      expect(render({ offers: all, ...variants[0] }).map?.placeCount).toBe(1);
     });
 
     it("zählt heute beendete Termine nur im Umkreis (B2)", () => {

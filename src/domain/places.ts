@@ -3,7 +3,8 @@
  * selben Haus teilen sich einen Marker. Generisch, damit Domäne und UI dieselbe Logik für ihre
  * Angebotstypen nutzen (`SiteOffer` in der UI, schlanke Objekte im Test).
  */
-import { type GeoPoint, geoKey } from "./geo.ts";
+import type { GeoPoint } from "./geo.ts";
+import { placeKey } from "./place-key.ts";
 import { compareReach, type Origin, reachTo } from "./reach.ts";
 
 /** Der Teil eines Angebots, den die Orte brauchen (passt auf `SiteOffer`). */
@@ -25,11 +26,6 @@ export interface Place<T> {
   /** vom ersten Angebot an dieser Koordinate */
   address: string;
   offers: T[];
-}
-
-/** Schlüssel eines Orts: die Koordinate. Bleibt im Speicher, nie in der URL (E5). */
-export function placeKey(geo: GeoPoint): string {
-  return geoKey(geo);
 }
 
 /** Bündelt Angebote nach Koordinate. Orte und Angebote in Reihenfolge des Auftretens. */

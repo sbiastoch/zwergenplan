@@ -15,7 +15,7 @@ import type { CardContext } from "./OfferCard.tsx";
 export interface MapScreenProps {
   /** sichtbare Angebote (Filter, Alter, Umkreis) */
   offers: readonly SiteOffer[];
-  /** Datenbasis des Startausschnitts ohne Umkreis (`useOfferViews().map.cameraOffers`, ADR 0008) */
+  /** Datenbasis des Startausschnitts: alle kommenden Angebote, ohne Filter, Alter, Startpunkt (ADR 0008) */
   cameraOffers: readonly SiteOffer[];
   origin: Origin | undefined;
   dark: boolean;

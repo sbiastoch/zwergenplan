@@ -1,7 +1,7 @@
 /**
  * Orte und Startausschnitt der Karte (Plan 0005, E6/E9), im Karten-Oberflächen-Chunk gerechnet.
- * `cameraOffers` ist die Datenbasis des Ausschnitts **ohne Umkreis-Filter** (`useOfferViews().map`):
- * Der Umkreis hängt am Startpunkt und darf den Ausschnitt nie bestimmen (ADR 0008, Arch-Review B1).
+ * `cameraOffers` ist die Datenbasis des Ausschnitts: alle kommenden Angebote, unabhängig von Filtern,
+ * Alter und Startpunkt (`useOfferViews().map`; ADR 0008, Arch-Review B1 und m1).
  */
 import { initialCamera, type StartCamera } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";

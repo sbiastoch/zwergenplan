@@ -1,8 +1,8 @@
 /**
  * Startausschnitt der Karte (Plan 0005, E9; ADR 0008, Kamera-Regel). Die Kachel-Requests verraten,
- * welchen Ausschnitt jemand ansieht. Deshalb hängt der Ausschnitt nur an öffentlichen Daten: an den
- * Orten **ohne Umkreis-Filter** (der Umkreis hängt am Startpunkt) und höchstens an einem Stadtteil.
- * Standort und Kartenmitte gehen nie ein. Ohne MapLibre-Typen; die UI übersetzt.
+ * welchen Ausschnitt jemand ansieht. Deshalb hängt der Ausschnitt nur an öffentlichen Daten: an
+ * **allen kommenden Orten**, unabhängig von Filtern, Alter und Startpunkt (Umkreis und Alter verrieten
+ * Standort bzw. Geburtsdatum), und höchstens an einem Stadtteil. Ohne MapLibre-Typen; die UI übersetzt.
  */
 import type { GeoPoint } from "./geo.ts";
 import type { Origin } from "./reach.ts";
@@ -18,8 +18,8 @@ export type StartCamera =
   | { bounds: { minLat: number; minLon: number; maxLat: number; maxLon: number } };
 
 /**
- * `points`: Koordinaten der Orte, gefiltert wie die Karte, aber **ohne Umkreis** (der Aufrufer filtert
- * ohne Startpunkt). Vom Startpunkt zählt nur ein Stadtteil.
+ * `points`: Koordinaten aller kommenden Orte, ohne Filter, Alter und Umkreis (`useOfferViews().map`).
+ * Vom Startpunkt zählt nur ein Stadtteil.
  */
 export function initialCamera(points: readonly GeoPoint[], origin: Origin | undefined): StartCamera {
   if (origin?.source === "stadtteil") return { center: origin.point, zoom: DISTRICT_ZOOM };

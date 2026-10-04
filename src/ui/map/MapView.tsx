@@ -1,6 +1,6 @@
 /**
- * Die Karte (Plan 0005, E2/E6/E9/E10): lädt nur per `import()` aus MapPanel.tsx. Einzige Stelle, die
- * maplibre-gl kennt (`maplibre-only-in-map`). Kamera-Regel (ADR 0008): Die Karte fährt nie auf einen
+ * Die Karte (Plan 0005, E2/E6/E9/E10): lädt nur per `import()` aus karte/MapScreen.tsx. Nur src/ui/map/
+ * kennt maplibre-gl (`maplibre-only-in-map`). Kamera-Regel (ADR 0008): Die Karte fährt nie auf einen
  * Standort oder die Kartenmitte, sie zeichnet den Startpunkt nur. So verraten die Kachel-Requests ihn nicht.
  */
 import {

@@ -17,7 +17,7 @@ import {
 } from "../domain/agenda.ts";
 import { clampDay } from "../domain/calendar.ts";
 import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
-import { geoKey } from "../domain/geo.ts";
+import { countPlaces, placeKey } from "../domain/place-key.ts";
 import { type Origin, type Reach, reachTo } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import { savedOffers } from "../domain/saved.ts";
@@ -70,8 +70,8 @@ export interface OfferViews {
   detailOffer: SiteOffer | undefined;
   /**
    * Nur in der Kartenansicht (Plan 0005): Zahl der Orte für die Statuszeile und die Datenbasis des
-   * Startausschnitts **ohne Umkreis-Filter**, damit die Kachel-Requests nie verraten, wo ein Standort
-   * liegt (Kamera-Regel, ADR 0008; Arch-Review B1). Orte und Ausschnitt rechnet karte/map-data.ts.
+   * Startausschnitts – alle kommenden Angebote, unabhängig von Filtern, Alter und Startpunkt, damit die
+   * Kachel-Requests weder Standort noch Alter verraten (Kamera-Regel, ADR 0008; Arch-Review B1, m1).
    */
   map: { placeCount: number; cameraOffers: readonly SiteOffer[] } | undefined;
   /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
@@ -85,7 +85,7 @@ function reachCache(origin: Origin | undefined): (offer: SiteOffer) => Reach | u
   if (!origin) return NO_REACH;
   const cache = new Map<string, Reach>();
   return ({ venue }) => {
-    const key = geoKey(venue.geo);
+    const key = placeKey(venue.geo);
     let reach = cache.get(key);
     if (!reach) {
       reach = reachTo(origin, venue);
@@ -135,15 +135,12 @@ export function useOfferViews({
     [offers, route.filter, route.tab, today, now, origin],
   );
   const reachOf = useMemo(() => reachCache(origin), [origin]);
-  // Ohne Startpunkt gefiltert: Der Umkreis wirkt nur mit Startpunkt, Alter und übrige Filter gelten wie auf der Karte.
-  const map = useMemo(() => {
-    if (route.tab !== "karte") return undefined;
-    const withoutReach = applyFilters(offers, route.filter, { now });
-    return {
-      placeCount: new Set(visible.map((o) => geoKey(o.venue.geo))).size,
-      cameraOffers: ageVisibility(withoutReach, upcoming, birthDate, now, { ageOnly, showUnfit }).visible,
-    };
-  }, [route.tab, route.filter, offers, now, visible, upcoming, birthDate, ageOnly, showUnfit]);
+  // Startausschnitt nur aus öffentlichen Daten: alle kommenden Angebote, ohne Filter, Alter und Startpunkt
+  // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
+  const map = useMemo(
+    () => (route.tab === "karte" ? { placeCount: countPlaces(visible), cameraOffers: upcoming } : undefined),
+    [route.tab, visible, upcoming],
+  );
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);

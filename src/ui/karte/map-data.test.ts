@@ -25,7 +25,7 @@ describe("mapData: Orte und Startausschnitt der Karte (Plan 0005, E6/E9)", () =>
     expect(keys(standort)).toEqual([["Nah", "Nah zwei"], ["Fern"]]);
   });
 
-  it("Startausschnitt aus der Datenbasis ohne Umkreis, nie aus den sichtbaren Orten (Arch-Review B1)", () => {
+  it("Startausschnitt aus der öffentlichen Datenbasis, nie aus den sichtbaren Orten (Arch-Review B1, m1)", () => {
     const all = mapData([nah, fern], [nah, fern], undefined).start;
     expect(all).toEqual({ bounds: { minLat: 49.4301, minLon: 11.0601, maxLat: 49.4495, maxLon: 11.0892 } });
     // sichtbar nur „nah“ (Umkreis), Datenbasis beide: Ausschnitt wie ohne Startpunkt

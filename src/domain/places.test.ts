@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { GeoPoint } from "./geo.ts";
-import { placeKey, placesOf, sortPlaces } from "./places.ts";
+import { countPlaces, placeKey } from "./place-key.ts";
+import { placesOf, sortPlaces } from "./places.ts";
 import type { Origin } from "./reach.ts";
 import { fixtureSiteOffers } from "./test-fixtures.ts";
 
@@ -115,5 +116,15 @@ describe("sortPlaces", () => {
     sortPlaces(places, gostenhof);
     sortPlaces(places);
     expect(places.map((p) => p.key)).toEqual(before);
+  });
+});
+
+describe("countPlaces", () => {
+  it("zählt wie placesOf: gleiche Koordinate ein Ort, auch bei verschiedenen Namen", () => {
+    const at = (name: string, lat: number, lon: number) => ({ venue: { name, address: "Weg 1", geo: { lat, lon } } });
+    const offers = [at("A", 49.45, 11.07), at("B", 49.45, 11.07), at("A", 49.46, 11.07), at("C", 49.47, 11.08)];
+    expect(countPlaces(offers)).toBe(3);
+    expect(countPlaces(offers)).toBe(placesOf(offers).length);
+    expect(countPlaces([])).toBe(0);
   });
 });
