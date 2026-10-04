@@ -168,6 +168,18 @@ test("geteilter Link mit ?umkreis= ohne Startpunkt: Hinweis, alle Angebote, Badg
 
   await expect(offers(page)).toHaveCount(6);
   await expect(page.getByText("„bis 2 km“ braucht einen Startpunkt.")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Alle Filter, 1 aktiv" })).toBeVisible();
+  // Der Knopf im Hinweis ist mit dem Hinweis verschwunden: Der Fokus landet beim Filter, nicht auf <body>.
+  await expect(page.getByRole("button", { name: "Alle Filter, 1 aktiv" })).toBeFocused();
   await expect(page).toHaveURL(/\?umkreis=2$/);
+});
+
+test("„Startpunkt wählen“ im Hinweis ohne Wahl: Der Fokus kehrt zum Knopf zurück", async ({ page }) => {
+  await ready(page, "./?umkreis=2");
+  const pick = page.getByRole("button", { name: "Startpunkt wählen" });
+  await pick.click();
+  const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await expect(kid.getByLabel("Stadtteil", { exact: true })).toBeFocused();
+  await kid.getByRole("button", { name: "Fertig" }).click();
+  await expect(kid).toBeHidden();
+  await expect(pick).toBeFocused();
 });

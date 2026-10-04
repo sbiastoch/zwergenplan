@@ -3,7 +3,7 @@
  * So gibt es Fokusfalle, inerten Hintergrund und Fokus-Rückgabe vom Browser. Esc/Android-Zurück
  * (`cancel`) und ein Tipp auf den Backdrop nehmen denselben Weg wie der Schließen-Knopf.
  */
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, type RefObject, useEffect, useRef } from "react";
 import { Toast } from "./Toast.tsx";
 
 interface DialogProps {
@@ -13,18 +13,27 @@ interface DialogProps {
   className: string;
   /** Kurzmeldung: Der Seiten-Toast liegt hinter dem Modal und wäre unsichtbar und stumm. */
   toast: string;
+  /**
+   * Fokus-Rückweg, falls der Auslöser beim Schließen nicht mehr existiert (der Browser ließe den
+   * Fokus sonst auf <body> fallen). Beispiel: „Startpunkt wählen“ verschwindet mit der Wahl.
+   */
+  fallbackFocus?: RefObject<HTMLElement | null>;
   children: ReactNode;
 }
 
-export function Dialog({ open, onClose, label, className, toast, children }: DialogProps) {
+export function Dialog({ open, onClose, label, className, toast, fallbackFocus, children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
+    if (!open && dialog.open) {
+      dialog.close();
+      const active = document.activeElement;
+      if (!active || active === document.body) fallbackFocus?.current?.focus();
+    }
+  }, [open, fallbackFocus]);
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: Der Klick ist nur der Backdrop-Tipp; per Tastatur schließt Esc (cancel).

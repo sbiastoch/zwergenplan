@@ -1,4 +1,5 @@
 /** Kopf, Kategorie-Sticker, Schnellfilter und Tab-Leiste (Plan 0003, E10, E15, E16). */
+import type { Ref } from "react";
 import { activeFilterCount, type FilterState, toggleIn } from "../domain/filter.ts";
 import type { Tab } from "../domain/route.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
@@ -85,12 +86,15 @@ export function QuickFilters({
   hasOrigin,
   onChange,
   onOpenSheet,
+  sheetButton,
 }: {
   filter: FilterState;
   /** ohne Startpunkt zählt der Umkreis nicht mit (Plan 0004, E7) */
   hasOrigin: boolean;
   onChange: (f: FilterState) => void;
   onOpenSheet: () => void;
+  /** der Knopf „Alle Filter“, Fokus-Rückweg für das Kind-Sheet */
+  sheetButton?: Ref<HTMLButtonElement>;
 }) {
   const count = activeFilterCount(filter, { hasOrigin });
   const chips = [
@@ -113,6 +117,7 @@ export function QuickFilters({
       <legend className="sr-only">Schnellfilter</legend>
       <div className="chips">
         <button
+          ref={sheetButton}
           type="button"
           className={count > 0 ? "chip on" : "chip"}
           onClick={onOpenSheet}

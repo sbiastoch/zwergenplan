@@ -1,5 +1,5 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { loadSiteData } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
@@ -53,6 +53,8 @@ export function App() {
   const [sheet, setSheet] = useState<"filter" | "kid" | "origin" | null>(null);
   const [detailDay, setDetailDay] = useState<string>();
   const [animate, setAnimate] = useState(false);
+  // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Umkreis-Hinweis verschwindet mit der Wahl.
+  const filterButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // `attempt` startet das Laden neu („Nochmal versuchen“)
@@ -130,6 +132,7 @@ export function App() {
           hasOrigin={origin !== undefined}
           onChange={setFilter}
           onOpenSheet={() => setSheet("filter")}
+          sheetButton={filterButton}
         />
       )}
       <main className="body">
@@ -261,6 +264,7 @@ export function App() {
         label="Kind und Einstellungen"
         className="sheet"
         toast={toast}
+        fallbackFocus={filterButton}
       >
         <KidSheet
           birthDate={birthDate}
