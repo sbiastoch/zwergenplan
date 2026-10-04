@@ -23,7 +23,7 @@ data/providers.yaml + data/offers.json   (Commit auf main per `pipeline publish`
 
 | Ordner | Aufgabe | darf importieren |
 |---|---|---|
-| `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit | nur `src/domain`, `zod` (nur schema/dataset) |
+| `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit, Geometrie und Entfernung (`geo`, `reach`, `districts`) | nur `src/domain`, `zod` (nur schema/dataset) |
 | `src/data/` | einziger Datenzugriff der App (fetch, localStorage, Geolocation) | `src/domain`: Typen, zur Laufzeit nur reine Hilfen ohne Zod, heute `geo` (ADR 0010, `data-domain-runtime-allowlist`) |
 | `src/ui/` | React-Komponenten, Darstellung, Interaktion | `src/domain`, `src/data` |
 | `scripts/` | Build, Validierung, Schema-Export (Node) | `src/domain`, `site.config.ts` |
@@ -38,7 +38,7 @@ Regeln:
 - Die UI lädt geprüfte Daten und importiert `schema.ts`/`dataset.ts` nur als Typ. Zod gehört nicht ins Client-Bundle (`no-zod-in-client`).
 - Datenzugriff läuft nur über `src/data` (`ui-reads-data-only-via-src-data`).
 - `src/data` darf seit Plan 0004 Laufzeit-Code aus `src/domain` importieren, aber nur reine Hilfen ohne Zod, heute nur `geo` (`coarsen`, `inBounds`; ADR 0010, `data-domain-runtime-allowlist`). Begründung: Die Rohkoordinate darf `src/data/geolocation.ts` nie verlassen, also wird dort schon gerundet und gegen die Stadtgrenze geprüft. Ob eine gespeicherte Stadtteil-ID gilt, prüft `useOrigin`, nicht `preferences.ts`.
-- Geolocation läuft nur über `src/data/geolocation.ts` (`canLocate`, `requestPosition`), nur auf Tipp, mit injizierbarer API für den Unit-Test. Die UI fasst `navigator.geolocation` nicht an.
+- Geolocation läuft nur über `src/data/geolocation.ts` (`canLocate`, `requestPosition`), nur auf Tipp, mit injizierbarer API für den Unit-Test. Die UI fasst `navigator`, `localStorage` und `fetch` nicht an (Biome `noRestrictedGlobals` für `src/ui` und `main.tsx`). Der Umweg über `window.navigator` usw. fällt nicht unter die Regel, den prüft der Review.
 - `scripts/pipeline/lib` bleibt rein und testbar: kein Import aus `io/`, `cli.ts`, `scripts/lib/` und kein Node-I/O (`pipeline-lib-pure`, `pipeline-lib-no-node-io`), kein globales `fetch` (Biome `noRestrictedGlobals`). Unit-Tests laufen ohne Netz (`vitest.setup.ts`), Quellen werden mit Snapshots aus `tests/fixtures/pipeline/` getestet.
 - `src/` hängt nie von `scripts/` ab (`src-not-scripts`, `no-cheerio-in-src`).
 - Keine Zyklen (`no-circular`). Produktivcode importiert keine Tests oder Fixtures (`no-test-code-in-prod`).
