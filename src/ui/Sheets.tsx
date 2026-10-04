@@ -1,4 +1,7 @@
-/** Filter-Sheet (E16) und Kind-Sheet (E11, E15). Inhalte der Dialoge, die Hülle ist Dialog.tsx. */
+/**
+ * Filter-Sheet (E16) und Kind-Sheet (E11, E15). Inhalte der Dialoge, die Hülle ist Dialog.tsx.
+ * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
+ */
 import { type ReactNode, useId, useState } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import { ageInMonths } from "../domain/age.ts";
@@ -59,53 +62,55 @@ export function FilterSheet({
     value === undefined ? selected.length === 0 : selected.length === 1 && selected[0] === value;
   return (
     <div className="sheet-body">
-      <div className="grab" />
-      <h2>Filter</h2>
-      <h3>Art</h3>
-      <div className="wrap">
-        {CATEGORIES.map((c) => (
-          <Chip
-            key={c}
-            className={`chip cat k-${c}`}
-            on={filter.categories.includes(c)}
-            onClick={() => onChange(toggleIn(filter, "categories", c))}
-          >
-            <Shape category={c} ink={false} />
-            {CATEGORY_LABELS[c]}
-          </Chip>
-        ))}
-      </div>
-      <h3>Format</h3>
-      <div className="wrap">
-        {FORMATS.map((f) => (
-          <Chip key={f} on={filter.formats.includes(f)} onClick={() => onChange(toggleIn(filter, "formats", f))}>
-            {FORMAT_CHIPS[f]}
-          </Chip>
-        ))}
-      </div>
-      <h3>Anmeldung</h3>
-      <div className="wrap">
-        {REGISTRATION_CHIPS.map(([value, label]) => (
-          <Chip
-            key={label}
-            on={single(filter.registration, value)}
-            onClick={() => onChange({ ...filter, registration: value ? [value] : [] })}
-          >
-            {label}
-          </Chip>
-        ))}
-      </div>
-      <h3>Kosten</h3>
-      <div className="wrap">
-        {COST_CHIPS.map(([value, label]) => (
-          <Chip
-            key={label}
-            on={single(filter.cost, value)}
-            onClick={() => onChange({ ...filter, cost: value ? [value] : [] })}
-          >
-            {label}
-          </Chip>
-        ))}
+      <div className="sheet-scroll">
+        <div className="grab" />
+        <h2>Filter</h2>
+        <h3>Art</h3>
+        <div className="wrap">
+          {CATEGORIES.map((c) => (
+            <Chip
+              key={c}
+              className={`chip cat k-${c}`}
+              on={filter.categories.includes(c)}
+              onClick={() => onChange(toggleIn(filter, "categories", c))}
+            >
+              <Shape category={c} ink={false} />
+              {CATEGORY_LABELS[c]}
+            </Chip>
+          ))}
+        </div>
+        <h3>Format</h3>
+        <div className="wrap">
+          {FORMATS.map((f) => (
+            <Chip key={f} on={filter.formats.includes(f)} onClick={() => onChange(toggleIn(filter, "formats", f))}>
+              {FORMAT_CHIPS[f]}
+            </Chip>
+          ))}
+        </div>
+        <h3>Anmeldung</h3>
+        <div className="wrap">
+          {REGISTRATION_CHIPS.map(([value, label]) => (
+            <Chip
+              key={label}
+              on={single(filter.registration, value)}
+              onClick={() => onChange({ ...filter, registration: value ? [value] : [] })}
+            >
+              {label}
+            </Chip>
+          ))}
+        </div>
+        <h3>Kosten</h3>
+        <div className="wrap">
+          {COST_CHIPS.map(([value, label]) => (
+            <Chip
+              key={label}
+              on={single(filter.cost, value)}
+              onClick={() => onChange({ ...filter, cost: value ? [value] : [] })}
+            >
+              {label}
+            </Chip>
+          ))}
+        </div>
       </div>
       <div className="sheetfoot">
         <button type="button" className="btn" onClick={() => onChange(EMPTY_FILTER)}>
@@ -155,70 +160,72 @@ export function KidSheet({
 
   return (
     <div className="sheet-body">
-      <div className="grab" />
-      <h2>Dein Zwerg</h2>
-      <label className="field">
-        Geburtsdatum
-        <input
-          className="input"
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          placeholder="TT.MM.JJJJ"
-          aria-describedby={hintId}
-          value={text}
-          onChange={(e) => {
-            const next = e.target.value;
-            setText(next);
-            const iso = parseGermanDate(next, today);
-            if (iso) onBirthDate(iso);
-            else if (!next.trim()) onBirthDate(undefined);
-          }}
-          onBlur={() => {
-            if (parsed) setText(formatGermanDate(parsed));
-          }}
-        />
-      </label>
-      <p id={hintId} className={hint.cls}>
-        {hint.text}
-      </p>
-      <p className="small">Bleibt nur auf diesem Gerät.</p>
-      <div className="swrow">
-        <span className="swtext">
-          <b id="age-only-label">Nur passende Angebote</b>
-          <small>geprüft zum Kursstart · bleibt auf diesem Gerät</small>
-        </span>
-        <button
-          type="button"
-          className="switch"
-          role="switch"
-          aria-checked={ageOnly}
-          aria-labelledby="age-only-label"
-          onClick={() => onAgeOnly(!ageOnly)}
-        >
-          <span className="track">
-            <span className="knob" />
+      <div className="sheet-scroll">
+        <div className="grab" />
+        <h2>Dein Zwerg</h2>
+        <label className="field">
+          Geburtsdatum
+          <input
+            className="input"
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="TT.MM.JJJJ"
+            aria-describedby={hintId}
+            value={text}
+            onChange={(e) => {
+              const next = e.target.value;
+              setText(next);
+              const iso = parseGermanDate(next, today);
+              if (iso) onBirthDate(iso);
+              else if (!next.trim()) onBirthDate(undefined);
+            }}
+            onBlur={() => {
+              if (parsed) setText(formatGermanDate(parsed));
+            }}
+          />
+        </label>
+        <p id={hintId} className={hint.cls}>
+          {hint.text}
+        </p>
+        <p className="small">Bleibt nur auf diesem Gerät.</p>
+        <div className="swrow">
+          <span className="swtext">
+            <b id="age-only-label">Nur passende Angebote</b>
+            <small>geprüft zum Kursstart · bleibt auf diesem Gerät</small>
           </span>
-        </button>
-      </div>
-      <h3>Darstellung</h3>
-      <fieldset className="plain">
-        <legend className="sr-only">Darstellung</legend>
-        <div className="seg seg3">
-          <span className="seg-thumb" style={{ transform: `translateX(${themeIndex * 100}%)` }} />
-          {themes.map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              className="seg-btn"
-              aria-pressed={theme === value}
-              onClick={() => onTheme(value)}
-            >
-              {label}
-            </button>
-          ))}
+          <button
+            type="button"
+            className="switch"
+            role="switch"
+            aria-checked={ageOnly}
+            aria-labelledby="age-only-label"
+            onClick={() => onAgeOnly(!ageOnly)}
+          >
+            <span className="track">
+              <span className="knob" />
+            </span>
+          </button>
         </div>
-      </fieldset>
+        <h3>Darstellung</h3>
+        <fieldset className="plain">
+          <legend className="sr-only">Darstellung</legend>
+          <div className="seg seg3">
+            <span className="seg-thumb" style={{ transform: `translateX(${themeIndex * 100}%)` }} />
+            {themes.map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className="seg-btn"
+                aria-pressed={theme === value}
+                onClick={() => onTheme(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      </div>
       <div className="sheetfoot single">
         <button type="button" className="btn primary wide" onClick={onClose}>
           Fertig

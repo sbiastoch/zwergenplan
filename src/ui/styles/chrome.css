@@ -3,10 +3,13 @@
 @layer components {
   /* Kopf */
   .hdr {
+    /* Container-Query statt Media-Query (Plan 0007, E6): reagiert auch auf große Schrift. Sitzt auf .hdr,
+       nicht auf .app, weil container-type Layout-Containment erzeugt (feste Tab-Leiste und Toast in .app). */
+    container: kopf / inline-size;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     padding: 14px 16px 6px;
   }
   .brand {
@@ -14,17 +17,19 @@
     max-width: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     margin: 0;
     font-weight: 800;
-    /* wird es eng (320 px, große Schrift), rutschen Kind-Chip und Theme-Knopf in eine zweite Zeile */
-    font-size: clamp(1.25rem, 5.6vw + 0.1rem, 1.6875rem);
-    letter-spacing: -0.04em;
+    /* einzeilig mit Kind-Chip und Theme-Knopf ab 380 px (B5); bei großer Schrift darf der Kopf umbrechen */
+    font-size: clamp(1.25rem, 5.4vw + 0.1rem, 1.6875rem);
+    letter-spacing: -0.05em;
     min-width: 0;
     overflow-wrap: break-word;
   }
   .mark {
     flex: none;
+    width: 30px;
+    height: 30px;
     transform: rotate(-8deg);
     filter: drop-shadow(0 2px 3px var(--edge));
     animation: peel 3s ease-in-out 1s 2;
@@ -73,7 +78,9 @@
   }
   .kid {
     min-height: 44px;
-    padding: 0 14px 0 5px;
+    /* rechts 10 px (B5, Kopfzeile bis 380 px einzeilig); bei großer Schrift mehr, sonst stößt das Label an die
+       Rundung */
+    padding: 0 max(10px, 0.5em) 0 5px;
     border-radius: 999px;
     border: 2px solid var(--line);
     background: var(--surface);
@@ -81,14 +88,14 @@
     font-weight: 800;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     transform: rotate(1.5deg);
     transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
     white-space: nowrap;
   }
   .kid .face {
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: #ffb13b;
     color: var(--on-color);
@@ -149,11 +156,13 @@
   }
   .stk {
     flex: none;
-    width: 70px;
+    /* breiter statt überlappend, wenn das Label bei großer Schrift nicht in 70 px passt (B7); die Leiste scrollt */
+    min-width: 70px;
+    white-space: nowrap;
     min-height: 82px;
     border: 0;
     background: none;
-    padding: 4px 0;
+    padding: 4px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -202,8 +211,8 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--sel);
+    color: var(--on-sel);
     display: grid;
     place-items: center;
     animation: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
@@ -225,7 +234,8 @@
     min-height: 44px;
     box-sizing: border-box;
     padding: 0 14px;
-    border-radius: 999px;
+    /* halbe Mindesthöhe: einzeilig eine Pille, mehrzeilig ein abgerundetes Rechteck (B7) */
+    border-radius: 22px;
     border: 2px solid var(--line);
     background: var(--surface);
     box-shadow: 2px 2px 0 var(--shadow);
@@ -238,8 +248,8 @@
   }
   .chip[aria-pressed="true"],
   .chip.on {
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--sel);
+    color: var(--on-sel);
     animation: plop 0.38s cubic-bezier(0.3, 1.7, 0.5, 1);
   }
   .chip.cat[aria-pressed="true"] {
@@ -255,6 +265,9 @@
     gap: 8px;
   }
   .wrap .chip {
+    /* darf schrumpfen und umbrechen, statt aus dem Sheet zu ragen (B7, 200 %) */
+    flex: 0 1 auto;
+    min-width: 0;
     white-space: normal;
     text-align: left;
   }
@@ -286,8 +299,8 @@
   }
   .badge {
     min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
+    min-height: 22px;
+    padding: 1px 6px;
     box-sizing: border-box;
     border-radius: 11px;
     background: #ff7070;
@@ -299,8 +312,9 @@
   }
 
   /* Ergänzungen gegenüber dem Mockup (echte Seite statt fester 390×844-Rahmen) */
-  /* Sehr schmal: Der Theme-Knopf im Kopf entfällt, die Darstellung bleibt im Kind-Sheet erreichbar. */
-  @media (max-width: 359px) {
+  /* Schmal (Inhalt < 348 px, also unter 380 px Viewport bei 100 %) oder große Schrift: Der Theme-Knopf im Kopf
+     entfällt, die Darstellung bleibt im Kind-Sheet erreichbar (Plan 0007, E6). */
+  @container kopf (width < 21.75rem) {
     .hdr .iconbtn {
       display: none;
     }
@@ -319,5 +333,24 @@
   .stk .disc svg {
     width: 24px;
     height: 24px;
+  }
+
+  /* Darstellungs-Segment im schmalen Sheet (< 312 px Inhalt: 320 px bei 100 %, große Schrift überall):
+     einspaltig, der gewählte Knopf trägt die Fläche selbst (Plan 0007, E8, H3). Container: .sheet-scroll. */
+  @container sheet (width < 19.5rem) {
+    .seg3 {
+      grid-template-columns: minmax(0, 1fr);
+      /* statt 999 px: sonst schneidet die Rundung die oberste und unterste Zeile */
+      border-radius: 22px;
+    }
+    .seg3 .seg-thumb {
+      display: none;
+    }
+    .seg3 .seg-btn[aria-pressed="true"] {
+      background: var(--surface);
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 2px 2px 0 var(--shadow);
+    }
   }
 }

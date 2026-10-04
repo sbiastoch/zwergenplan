@@ -44,7 +44,15 @@
     bottom: 6px;
     left: 10px;
     width: calc((100% - 20px) / 3);
+    /* folgt der Wahl über --i (Chrome.tsx: at-N), unten waagrecht, an der Seite senkrecht */
+    transform: translateX(calc(var(--i, 0) * 100%));
     transition: transform 0.42s cubic-bezier(0.3, 1.45, 0.5, 1);
+  }
+  .tab-thumb.at-1 {
+    --i: 1;
+  }
+  .tab-thumb.at-2 {
+    --i: 2;
   }
   .tab-thumb::before {
     content: "";
@@ -57,6 +65,9 @@
     transform: rotate(-3deg);
   }
   .tab {
+    /* Jeder Tab ist Container: Ist die eigene Spalte schmaler als das längste Label (≈ 4,4 rem), zeigt er nur das
+       Icon (B7, große Schrift). Der Name bleibt für Screenreader im DOM. */
+    container-type: inline-size;
     position: relative;
     z-index: 1;
     min-height: 56px;
@@ -86,5 +97,96 @@
     position: absolute;
     top: 2px;
     left: calc(50% + 8px);
+  }
+  .tab-label {
+    white-space: nowrap;
+  }
+  @container (width < 4.6rem) {
+    .tab-label {
+      /* wie sr-only */
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  /* Querformat (H1, Plan 0007, E14): Bei geringer Höhe wird die Leiste zur Seitenleiste links neben der Spalte
+     (Toast dazu in sheet.css).
+     Das Washi-Tape ist um 90° gedacht: gleiche Farben, Streifen und gerissene Enden oben und unten. */
+  @media (max-height: 500px) and (min-width: 40rem) {
+    body {
+      /* Breite der Leiste + Abstände; die Spalte .app zentriert sich im Rest */
+      padding-left: calc(env(safe-area-inset-left) + 7.5rem);
+    }
+    .app {
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+    .tabs {
+      left: calc(env(safe-area-inset-left) + 8px);
+      top: 50%;
+      bottom: auto;
+      width: 6.5rem;
+      grid-template-columns: minmax(0, 1fr);
+      padding: 10px 6px;
+      background-image: repeating-linear-gradient(45deg, var(--tape-stripe) 0 6px, transparent 6px 14px);
+      transform: translateY(-50%) rotate(0.6deg);
+      clip-path: polygon(
+        0 0,
+        12.5% 2%,
+        25% 0,
+        37.5% 2%,
+        50% 0,
+        62.5% 2%,
+        75% 0,
+        87.5% 2%,
+        100% 0,
+        100% 100%,
+        87.5% 98%,
+        75% 100%,
+        62.5% 98%,
+        50% 100%,
+        37.5% 98%,
+        25% 100%,
+        12.5% 98%,
+        0 100%
+      );
+    }
+    .tab-thumb {
+      top: 10px;
+      bottom: auto;
+      left: 6px;
+      width: calc(100% - 12px);
+      height: calc((100% - 20px) / 3);
+      transform: translateY(calc(var(--i, 0) * 100%));
+    }
+    .tab-thumb::before {
+      inset: 2px 4px;
+    }
+  }
+
+  /* Sehr kleine Telefone quer (z. B. 568 × 320): kein Platz für die Seitenleiste, die Leiste wird kompakt.
+     Der Toast rückt mit (sheet.css). */
+  @media (max-height: 500px) and (max-width: 39.99rem) {
+    .tabs {
+      bottom: calc(6px + env(safe-area-inset-bottom));
+      padding: 3px 10px;
+    }
+    .tab-thumb {
+      top: 3px;
+      bottom: 3px;
+    }
+    .tab {
+      min-height: 44px;
+      flex-direction: row;
+      gap: 6px;
+    }
+    .app {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
   }
 }

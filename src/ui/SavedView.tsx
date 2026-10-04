@@ -59,7 +59,7 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
             }}
           >
             <Icon name="calendarPlus" />
-            Alle gemerkten in den Kalender
+            Alle in den Kalender
           </button>
           <p className="small">
             {plural(offers.length, "Sticker", "Sticker")} · {plural(sessionCount, "Termin", "Termine")} in einer

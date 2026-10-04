@@ -146,7 +146,8 @@ export function TabBar({ tab, savedCount, onTab }: { tab: Tab; savedCount: numbe
   const index = TAB_ITEMS.findIndex((t) => t.tab === tab);
   return (
     <nav className="tabs" aria-label="Hauptnavigation">
-      <span className="tab-thumb" style={{ transform: `translateX(${index * 100}%)` }} />
+      {/* Position per Klasse statt Inline-transform: unten waagrecht, im Querformat senkrecht (tabs.css). */}
+      <span className={`tab-thumb at-${index}`} />
       {TAB_ITEMS.map((t) => (
         <button
           key={t.tab}
@@ -156,7 +157,8 @@ export function TabBar({ tab, savedCount, onTab }: { tab: Tab; savedCount: numbe
           onClick={() => onTab(t.tab)}
         >
           <Icon name={t.icon} size={24} />
-          {t.label}
+          {/* eigenes Element: bei zu schmaler Spalte nur für Screenreader (Container-Query in tabs.css) */}
+          <span className="tab-label">{t.label}</span>
           {t.tab === "merkliste" && savedCount > 0 && (
             <span className="badge" role="img" aria-label={`${savedCount} gemerkt`}>
               {savedCount}

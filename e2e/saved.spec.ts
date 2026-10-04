@@ -45,7 +45,7 @@ test("lädt alle gemerkten Termine als eine ICS-Datei", async ({ page }) => {
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: "Alle gemerkten in den Kalender" }).click(),
+    page.getByRole("button", { name: "Alle in den Kalender" }).click(),
   ]);
   expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
   const ics = readFileSync((await download.path()) ?? "", "utf8");

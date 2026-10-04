@@ -17,7 +17,8 @@
   }
   .week {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    /* bei 100 % sieben Spalten, bei großer Schrift Umbruch in Zeilen statt senkrechter Tageszahlen (B7) */
+    grid-template-columns: repeat(auto-fit, minmax(max(44px, 2.5rem), 1fr));
     gap: 2px;
   }
   .day {
@@ -32,6 +33,10 @@
     align-items: center;
     justify-content: center;
     gap: 3px;
+  }
+  .day .wd,
+  .day .num {
+    white-space: nowrap;
   }
   .day .wd {
     font-size: 0.75rem;
@@ -54,14 +59,14 @@
     cursor: default;
   }
   .day[aria-pressed="true"] {
-    background: var(--ink);
-    color: var(--bg);
-    border: 2px solid var(--ink);
+    background: var(--sel);
+    color: var(--on-sel);
+    border: 2px solid var(--sel);
     transform: rotate(-4deg);
     animation: stamp 0.38s cubic-bezier(0.2, 1.4, 0.4, 1);
   }
   .day[aria-pressed="true"] .wd {
-    color: var(--bg);
+    color: var(--on-sel);
   }
   @keyframes stamp {
     0% {
@@ -86,7 +91,7 @@
     min-height: 44px;
     margin: 10px 0 2px;
     border: 2px dashed var(--edge2);
-    border-radius: 999px;
+    border-radius: 22px;
     background: none;
     font-weight: 800;
     display: flex;
@@ -131,9 +136,13 @@
     min-height: 44px;
     min-width: 0;
     border: 0;
-    border-radius: 50%;
+    /* 22 statt 50 %: bei 100 % praktisch ein Kreis, bei großer Schrift ein abgerundetes Rechteck (E8) */
+    border-radius: 22px;
     background: none;
     padding: 0;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -142,11 +151,24 @@
     font-weight: 700;
   }
   .mday[aria-pressed="true"] {
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--sel);
+    color: var(--on-sel);
   }
   .mday .mini {
     width: 9px;
     height: 9px;
+  }
+
+  /* Kalendertage ≥ 44 px auch bei 320 px (B3): Beide Raster dehnen sich in den Seitenrand. Media-Query in px,
+     denn es geht um Pixel, nicht um Text (Plan 0007, E9). */
+  @media (max-width: 359px) {
+    .week {
+      margin-inline: -12px;
+      gap: 0;
+    }
+    .month {
+      margin-inline: -16px;
+      padding-inline: 0;
+    }
   }
 }

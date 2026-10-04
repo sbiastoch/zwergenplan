@@ -87,6 +87,17 @@
   --scrim: rgba(19, 33, 46, 0.45);
   /* Text auf Kategorie-, Status- und Akzentfarben ist in beiden Themes dunkel */
   --on-color: #13212e;
+  /* Gewählte Zustände und Toast (Plan 0007, E15): hell dunkle Inversfläche, dunkel keine helle Insel */
+  --sel: #13212e;
+  --on-sel: #e8f1ff;
+  --toast: #13212e;
+  --on-toast: #e8f1ff;
+  /* Alters-Hinweis im Kind-Sheet */
+  --hint-ok-bg: #a6db5e;
+  --hint-bad-bg: #ff9a9a;
+  --hint-ok-line: var(--line);
+  --hint-bad-line: var(--line);
+  --on-hint: #13212e;
   color-scheme: light;
 }
 
@@ -109,6 +120,15 @@
     --tape-stripe: rgba(255, 217, 59, 0.1);
     --on-tape: #f5e7b5;
     --scrim: rgba(0, 0, 0, 0.62);
+    --sel: #ffd93b;
+    --on-sel: #13212e;
+    --toast: #243241;
+    --on-toast: #eef3f8;
+    --hint-ok-bg: color-mix(in srgb, #a6db5e 22%, #1b2733);
+    --hint-bad-bg: color-mix(in srgb, #ff9a9a 22%, #1b2733);
+    --hint-ok-line: #a6db5e;
+    --hint-bad-line: #ff9a9a;
+    --on-hint: #eef3f8;
     color-scheme: dark;
   }
 }
@@ -131,6 +151,16 @@
   --tape-stripe: rgba(255, 217, 59, 0.1);
   --on-tape: #f5e7b5;
   --scrim: rgba(0, 0, 0, 0.62);
+  /* gleiche Werte wie im @media-Zweig oben: jedes neue Token in beide Blöcke (Plan 0007, E15) */
+  --sel: #ffd93b;
+  --on-sel: #13212e;
+  --toast: #243241;
+  --on-toast: #eef3f8;
+  --hint-ok-bg: color-mix(in srgb, #a6db5e 22%, #1b2733);
+  --hint-bad-bg: color-mix(in srgb, #ff9a9a 22%, #1b2733);
+  --hint-ok-line: #a6db5e;
+  --hint-bad-line: #ff9a9a;
+  --on-hint: #eef3f8;
   color-scheme: dark;
 }
 

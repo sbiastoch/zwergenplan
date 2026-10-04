@@ -23,7 +23,10 @@
   input,
   select {
     font: inherit;
-    color: inherit;
+    /* nicht `inherit`: WebKit behält bei gewählter dunkler Darstellung auf hellem System für Formular-
+       elemente mit ausdrücklich geerbter Farbe bis zur nächsten Neuberechnung das helle ButtonText (Schwarz) –
+       axe meldete 47 Kontrastfehler (Plan 0007, Insel-Gate über data-theme). */
+    color: var(--ink);
   }
 
   button {
@@ -89,11 +92,14 @@
     font-size: 2rem;
     letter-spacing: -0.05em;
     margin: 6px 0;
+    /* trennt nur, wenn ein Wort nicht in die Zeile passt („Sticker-heft“ statt „Stickerhef-t“, Plan 0007, E10) */
+    hyphens: auto;
   }
   .btn {
     min-height: 52px;
     box-sizing: border-box;
-    border-radius: 999px;
+    /* halbe Mindesthöhe: mehrzeilig ein abgerundetes Rechteck statt eines Ovals (B7) */
+    border-radius: 26px;
     border: 2px solid var(--line);
     background: var(--surface);
     box-shadow: 3px 3px 0 var(--shadow);

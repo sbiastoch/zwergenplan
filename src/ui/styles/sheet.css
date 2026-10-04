@@ -8,16 +8,35 @@
     max-width: 40rem;
     margin: 0 auto;
     max-height: 90dvh;
-    overflow-y: auto;
+    overflow: hidden;
     box-sizing: border-box;
     border-top: 2.5px solid var(--line);
     border-radius: 28px 28px 0 0;
-    padding: 6px 16px calc(18px + env(safe-area-inset-bottom));
+    padding: 0;
     box-shadow: 0 -10px 30px -10px rgba(0, 0, 0, 0.4);
-    scrollbar-width: none;
   }
+  /* Fuß immer sichtbar unten (H7): Er steht neben dem scrollenden Teil, nicht darüber. Ein klebender Fuß
+     verdeckte gescrollte Chips, und axe meldete sie als zu kleine Ziele (target-size). */
   .sheet[open] {
+    display: flex;
+    flex-direction: column;
     animation: up 0.38s cubic-bezier(0.2, 1.25, 0.4, 1);
+  }
+  .sheet-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .sheet-scroll {
+    /* Container fürs Darstellungs-Segment (chrome.css). Der Toast ist Geschwister, nicht Kind (Dialog.tsx). */
+    container: sheet / inline-size;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px 16px 20px;
+    scrollbar-width: none;
   }
   @keyframes up {
     from {
@@ -40,6 +59,7 @@
     font-size: 1.75rem;
     letter-spacing: -0.045em;
     margin: 0 0 10px;
+    hyphens: auto;
   }
   .sheet h3 {
     font-size: 0.8125rem;
@@ -81,13 +101,16 @@
     background: var(--surface);
     border: 2px solid var(--line);
   }
+  /* über Tokens: im Dunkeln gedämpft statt grell (Plan 0007, E15) */
   .hint.ok {
-    background: #a6db5e;
-    color: var(--on-color);
+    background: var(--hint-ok-bg);
+    border-color: var(--hint-ok-line);
+    color: var(--on-hint);
   }
   .hint.bad {
-    background: #ff9a9a;
-    color: var(--on-color);
+    background: var(--hint-bad-bg);
+    border-color: var(--hint-bad-line);
+    color: var(--on-hint);
   }
   .swrow {
     display: flex;
@@ -144,11 +167,19 @@
     transform: translateX(24px) rotate(180deg);
     background: #fff;
   }
+  /* Fuß unter dem scrollenden Teil, trägt den Abstand zur Home-Leiste selbst (H7). Knöpfe stehen nebeneinander,
+     wenn ihre Beschriftungen einzeilig passen, sonst untereinander (B7). */
   .sheetfoot {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-top: 20px;
+    padding: 12px 16px calc(18px + env(safe-area-inset-bottom));
+    background: var(--bg);
+    border-top: 2px solid var(--edge2);
+  }
+  .sheetfoot .btn {
+    flex: 1 1 auto;
   }
 
   .toast {
@@ -162,14 +193,31 @@
     align-items: center;
     gap: 10px;
     padding: 10px 14px 10px 10px;
-    border-radius: 999px;
-    background: var(--ink);
-    color: var(--bg);
+    /* halbe einzeilige Höhe (32 + 2 × 10 + 2 × 2): mehrzeilig ein abgerundetes Rechteck statt eines Ovals */
+    border-radius: 28px;
+    background: var(--toast);
+    color: var(--on-toast);
     font-weight: 700;
     border: 2px solid var(--line);
     box-shadow: 3px 3px 0 var(--shadow);
     transform: translateX(-50%) rotate(-1deg);
     animation: toast 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  /* Querformat mit Seitenleiste (tabs.css, Plan 0007, E14): Mitte und Breite über der Inhaltsspalte */
+  @media (max-height: 500px) and (min-width: 40rem) {
+    .toast {
+      /* = padding-left von body */
+      --rail: calc(env(safe-area-inset-left) + 7.5rem);
+      left: calc(var(--rail) + (100vw - var(--rail) - env(safe-area-inset-right)) / 2);
+      width: min(26rem, 100vw - var(--rail) - env(safe-area-inset-right) - 32px);
+      bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+  }
+  /* Querformat mit kompakter Leiste */
+  @media (max-height: 500px) and (max-width: 39.99rem) {
+    .toast {
+      bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
   }
   .toast:empty {
     display: none;
@@ -193,10 +241,5 @@
       transform: translateX(-50%) rotate(-1deg);
       opacity: 1;
     }
-  }
-
-  /* Ergänzung gegenüber dem Mockup */
-  .sheetfoot.single {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
