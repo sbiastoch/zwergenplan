@@ -1,5 +1,5 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { loadSiteData } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
@@ -16,7 +16,7 @@ import type { CardContext } from "./OfferCard.tsx";
 import { SavedView } from "./SavedView.tsx";
 import { FilterSheet, KidSheet } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
-import { useAgeOnly, useBirthDate, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
+import { useAgeOnly, useBirthDate, useNow, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 
 type LoadState = { kind: "loading" } | { kind: "error"; message: string } | { kind: "ready"; data: SiteData };
@@ -32,7 +32,8 @@ export function App() {
   const [savedIds, toggleSaved] = useSaved();
   const theme = useTheme();
   const [toast, say] = useToast();
-  const now = useMemo(() => new Date(), []);
+  // erneuert sich im offenen Tab, höchstens einmal pro Minute (Plan 0007, E2)
+  const now = useNow();
   const today = berlinIsoDate(now);
 
   const [sheet, setSheet] = useState<"filter" | "kid" | null>(null);
@@ -166,8 +167,11 @@ export function App() {
         {load.kind === "ready" && route.tab === "kalender" && (
           <CalendarView
             index={calendar.index}
+            now={now}
             today={today}
             lastDay={calendar.lastDay}
+            dataEnd={calendar.dataEnd}
+            endedToday={calendar.endedToday}
             day={calendar.day}
             onDay={calendar.setDay}
             monthOpen={calendar.monthOpen}

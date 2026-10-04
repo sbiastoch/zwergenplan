@@ -6,6 +6,7 @@ import {
   type FilterState,
   filterFromSearch,
   filterToSearch,
+  matchesFilter,
   toggleIn,
 } from "./filter.ts";
 import { FIXTURE_NOW, fixtureKey, loadFixtures } from "./test-fixtures.ts";
@@ -63,6 +64,46 @@ describe("applyFilters", () => {
       "krabbelreime",
       "babykonzert-advent",
     ]);
+  });
+});
+
+describe("matchesFilter", () => {
+  const matching = (state: FilterState) => file.offers.filter((o) => matchesFilter(o, state)).map(fixtureKey);
+
+  it("prüft dieselben Dimensionen wie applyFilters, aber ohne „kommender Termin“", () => {
+    // Das Elterncafé ist am Mo 5.10. um 12 Uhr vorbei – es passt trotzdem zu den Filtern.
+    expect(matching(EMPTY_FILTER)).toContain("vergangen");
+    expect(matching(EMPTY_FILTER)).toHaveLength(file.offers.length);
+    expect(matching({ ...EMPTY_FILTER, registration: ["ohne-anmeldung"] })).toEqual([
+      "krabbeltreff",
+      "krabbelreime",
+      "babykonzert-advent",
+      "vergangen",
+    ]);
+  });
+
+  it("verknüpft wie applyFilters: ODER in der Dimension, UND dazwischen", () => {
+    expect(matching({ ...EMPTY_FILTER, formats: ["kurs", "einmalig"], cost: ["kostenlos"] })).toEqual([
+      "babykonzert-advent",
+      "vergangen",
+    ]);
+    expect(matching({ ...EMPTY_FILTER, categories: ["buecher", "buehne"] })).toEqual([
+      "krabbelreime",
+      "kuckuck-im-nest",
+      "babykonzert-advent",
+    ]);
+  });
+
+  it("ist für kommende Angebote genau applyFilters", () => {
+    const states: FilterState[] = [
+      EMPTY_FILTER,
+      { ...EMPTY_FILTER, formats: ["regelmaessig"] },
+      { ...EMPTY_FILTER, cost: ["kostenpflichtig"], registration: ["mit-anmeldung"] },
+      { ...EMPTY_FILTER, categories: ["musik"] },
+    ];
+    for (const state of states) {
+      expect(matching(state).filter((k) => k !== "vergangen")).toEqual(ids(state));
+    }
   });
 });
 

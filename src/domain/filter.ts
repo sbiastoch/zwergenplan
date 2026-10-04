@@ -80,20 +80,25 @@ export function toggleIn<D extends Dimension>(state: FilterState, dim: D, value:
 }
 
 /**
+ * Passt ein Angebot zu den Filtern (Kategorie, Format, Anmeldung, Kosten)? Ohne Zeitbezug: Auch ein
+ * vorbei-es Angebot kann passen. Gebraucht für „Für heute ist alles vorbei“ (Plan 0007, E2).
+ */
+export function matchesFilter(offer: Offer, state: FilterState): boolean {
+  if (!matches(state.formats, offer.format)) return false;
+  if (!matches(state.registration, offer.registration)) return false;
+  if (!matches(state.cost, offer.cost)) return false;
+  if (state.categories.length > 0) {
+    const cats = categoriesOf(offer.topics);
+    if (!cats.some((c) => state.categories.includes(c))) return false;
+  }
+  return true;
+}
+
+/**
  * Angebote, deren letzter Termin vorbei ist, fallen immer heraus.
  * Das Alter filtert hier bewusst nicht: Die Oberfläche zeigt unpassende Angebote auf Wunsch
  * markiert an (`splitByAge` in age.ts).
  */
 export function applyFilters<T extends Offer>(offers: readonly T[], state: FilterState, ctx: FilterContext): T[] {
-  return offers.filter((o) => {
-    if (!nextSession(o, ctx.now)) return false;
-    if (!matches(state.formats, o.format)) return false;
-    if (!matches(state.registration, o.registration)) return false;
-    if (!matches(state.cost, o.cost)) return false;
-    if (state.categories.length > 0) {
-      const cats = categoriesOf(o.topics);
-      if (!cats.some((c) => state.categories.includes(c))) return false;
-    }
-    return true;
-  });
+  return offers.filter((o) => nextSession(o, ctx.now) !== undefined && matchesFilter(o, state));
 }

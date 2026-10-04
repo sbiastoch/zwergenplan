@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { toSiteData } from "./site-data.ts";
+import { icsContextFor, icsForSeries } from "./ics.ts";
+import { toSiteData, venueAddress } from "./site-data.ts";
 import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
@@ -38,6 +39,76 @@ describe("toSiteData", () => {
 
   it("weist ungeprüfte Referenzen ab", () => {
     expect(() => toSiteData([], file)).toThrow("Ungeprüfte Daten");
+  });
+});
+
+describe("venueAddress", () => {
+  it("schneidet den Ortsnamen als Präfix ab", () => {
+    expect(venueAddress("CVJM-Haus", "CVJM-Haus, Kornmarkt 6, 90402 Nürnberg (Turnhalle 2. UG)")).toBe(
+      "Kornmarkt 6, 90402 Nürnberg (Turnhalle 2. UG)",
+    );
+    expect(venueAddress(" Langwasserbad ", "Langwasserbad,  Breslauer Straße 251, 90471 Nürnberg")).toBe(
+      "Breslauer Straße 251, 90471 Nürnberg",
+    );
+  });
+
+  it("ignoriert Groß- und Kleinschreibung", () => {
+    expect(venueAddress("Tabeahaus", "TabeaHaus, Kölner Straße 33, 90419 Nürnberg")).toBe(
+      "Kölner Straße 33, 90419 Nürnberg",
+    );
+  });
+
+  it("schneidet den Ortsnamen als Suffix in Klammern ab", () => {
+    expect(
+      venueAddress(
+        "Haus der Katholischen Stadtkirche",
+        "Vordere Sterngasse 1, 90402 Nürnberg (Haus der Katholischen Stadtkirche)",
+      ),
+    ).toBe("Vordere Sterngasse 1, 90402 Nürnberg");
+  });
+
+  it("lässt Teilübereinstimmungen unverändert", () => {
+    const eibach = "Gemeindehaus Eibach, Eibacher Hauptstraße 61, 90451 Nürnberg";
+    expect(venueAddress("Gemeindehaus Eibach, Kleiner Saal", eibach)).toBe(eibach);
+    expect(venueAddress("Gemeindehaus", eibach)).toBe(eibach);
+    const thon = "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG), Cuxhavener Straße 54, 90425 Nürnberg";
+    expect(venueAddress("Ökumenisches Gemeindezentrum Thon", thon)).toBe(thon);
+    const muther = "Mutherstudio, Kraftshofer Hauptstraße 181, 90427 Nürnberg (Zugang Am Kressenstein)";
+    expect(venueAddress("Mutherstudio Kraftshof", muther)).toBe(muther);
+    expect(venueAddress("Beispielhof", "Beispielstraße 1, 90402 Nürnberg")).toBe("Beispielstraße 1, 90402 Nürnberg");
+  });
+
+  it("lässt die Adresse unverändert, wenn sonst weniger als 5 Zeichen blieben", () => {
+    expect(venueAddress("Bad", "Bad, Weg")).toBe("Bad, Weg");
+    expect(venueAddress("Bad", "Bad (Bad)")).toBe("Bad (Bad)");
+    expect(venueAddress("", "Lesegasse 3, 90403 Nürnberg")).toBe("Lesegasse 3, 90403 Nürnberg");
+  });
+});
+
+describe("toSiteData mit Ortsnamen in der Adresse (H6)", () => {
+  const { providers, file } = loadFixtures();
+  const [first] = providers;
+  if (!first) throw new Error("Fixture");
+  const doubled = first.venues.map((v) => ({ ...v, name: "CVJM-Haus", address: `CVJM-Haus, ${v.address}` }));
+  const site = toSiteData([{ ...first, venues: doubled }], {
+    ...file,
+    offers: file.offers.filter((o) => o.providerId === first.id),
+  });
+  const [offer] = site.offers;
+  if (!offer) throw new Error("Fixture");
+
+  it("wendet venueAddress an", () => {
+    expect(offer.venue.name).toBe("CVJM-Haus");
+    expect(offer.venue.address).toBe("Beispielstraße 1, 90402 Nürnberg");
+  });
+
+  it("nennt den Ort in der ICS-LOCATION genau einmal", () => {
+    const ics = icsForSeries(offer, icsContextFor(offer, site.generatedAt)).replaceAll("\r\n ", "");
+    const locations = ics.split("\r\n").filter((line) => line.startsWith("LOCATION:"));
+    expect(locations.length).toBeGreaterThan(0);
+    for (const line of locations) {
+      expect(line).toBe("LOCATION:CVJM-Haus\\, Beispielstraße 1\\, 90402 Nürnberg");
+    }
   });
 });
 

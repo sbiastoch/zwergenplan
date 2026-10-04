@@ -1,4 +1,4 @@
-/** Zustand, der den Browser berührt: URL/History, Präferenzen (über src/data), Toast, Farbschema. */
+/** Zustand, der den Browser berührt: URL/History, Präferenzen (über src/data), Toast, Farbschema, Uhr. */
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   loadAgeOnly,
@@ -13,6 +13,7 @@ import {
 } from "../data/preferences.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { toggleId } from "../domain/saved.ts";
+import { sameMinute } from "../domain/time.ts";
 
 /** Markiert einen History-Eintrag, den das Öffnen eines Details erzeugt hat (Plan 0003, E4). */
 const DETAIL_STATE = { zpDetail: true } as const;
@@ -151,4 +152,33 @@ export function useToast(): [string, (message: string) => void] {
     timer.current = setTimeout(() => setMessage(""), 2800);
   }, []);
   return [message, say];
+}
+
+/** Wie oft „jetzt“ geprüft wird. Der Zustand ändert sich trotzdem höchstens einmal pro Minute. */
+const NOW_CHECK_MS = 30_000;
+
+/**
+ * „Jetzt“ für die ganze App (Plan 0007, E2): erneuert sich in einem offenen Tab, damit beendete
+ * Termine auch ohne Neuladen verschwinden und nach Mitternacht „heute“ stimmt. Geprüft wird alle
+ * 30 s und wenn die Seite wieder sichtbar wird (Handy aus der Tasche). Ein neues `Date` gibt es nur
+ * beim Minutenwechsel; sonst bleibt das Objekt gleich, und alle `useMemo` darauf bleiben gültig.
+ */
+export function useNow(): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const check = () => {
+      const next = new Date();
+      setNow((prev) => (sameMinute(prev, next) ? prev : next));
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") check();
+    };
+    const timer = setInterval(check, NOW_CHECK_MS);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+  return now;
 }

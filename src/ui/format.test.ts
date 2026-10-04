@@ -131,31 +131,109 @@ describe("Detail: Wann und Anmeldung", () => {
     expect(whenLabels(wechselnd, FIXTURE_NOW)).toEqual({ main: "Kurs mit 4 Terminen", sub: "Di 13.10. bis Di 3.11." });
   });
 
+  it("zeigt beim laufenden Kurs den Fortschritt wie die Kachel, beim beendeten „vorbei“ (H8)", () => {
+    const sub = "Di 13.10. bis Di 1.12., jeweils 9:30–11:00";
+    // 20.10. 12:00: zwei von acht Terminen sind beendet
+    expect(whenLabels(OFFERS.kurs, new Date("2026-10-20T12:00:00+02:00"))).toEqual({
+      main: "Kurs · noch 6 von 8 Terminen",
+      sub,
+    });
+    // erster Termin läuft gerade: noch nicht begonnen im Sinne der Zählung
+    expect(whenLabels(OFFERS.kurs, new Date("2026-10-13T10:00:00+02:00")).main).toBe("Kurs mit 8 Terminen");
+    expect(whenLabels(OFFERS.kurs, new Date("2026-12-24T12:00:00+01:00"))).toEqual({
+      main: "Kurs mit 8 Terminen – vorbei",
+      sub,
+    });
+  });
+
   it("beschreibt regelmäßige Termine nach Rhythmus und zählt nur kommende", () => {
     expect(whenLabels(OFFERS.woechentlich, FIXTURE_NOW)).toEqual({
       main: "Jeden Mittwoch, 10:00–11:00",
       sub: "5 kommende Termine",
     });
-    expect(whenLabels(OFFERS.vierzehntaegig, FIXTURE_NOW)).toEqual({ main: "Freitags", sub: "4 kommende Termine" });
+    expect(whenLabels(OFFERS.vierzehntaegig, FIXTURE_NOW)).toEqual({
+      main: "Freitags, 10:00–11:00",
+      sub: "4 kommende Termine",
+    });
     expect(whenLabels(OFFERS.vierzehntaegig, new Date("2026-10-24T12:00:00+02:00"))).toEqual({
-      main: "Freitags",
+      main: "Freitags, 10:00–11:00",
       sub: "2 kommende Termine",
     });
     const offen = offer({ ...OFFERS.woechentlich, registration: "ohne-anmeldung" });
     expect(whenLabels(offen, FIXTURE_NOW).sub).toBe("Einzeln besuchbar");
   });
 
+  it("nennt die Uhrzeit, wenn alle kommenden Termine dieselbe haben (B1)", () => {
+    const gemischt = offer({
+      format: "regelmaessig",
+      sessions: [...sessions("2026-10-12", 1, 0, "10:30", "11:00"), ...sessions("2026-10-14", 2, 7, "10:30", "11:00")],
+    });
+    expect(whenLabels(gemischt, FIXTURE_NOW).main).toBe("Regelmäßig, 10:30–11:00");
+    const einer = offer({ format: "regelmaessig", sessions: sessions("2026-10-16", 1, 0, "15:00", "16:30") });
+    expect(whenLabels(einer, FIXTURE_NOW).main).toBe("Regelmäßig, 15:00–16:30");
+  });
+
+  it("lässt die Uhrzeit weg, wenn sie wechselt", () => {
+    const wechselnd = offer({
+      format: "regelmaessig",
+      sessions: [...sessions("2026-10-09", 1, 0, "10:30", "11:00"), ...sessions("2026-10-23", 1, 0, "15:00", "16:00")],
+    });
+    expect(whenLabels(wechselnd, FIXTURE_NOW).main).toBe("Freitags");
+    const gemischt = offer({
+      format: "regelmaessig",
+      sessions: [...sessions("2026-10-12", 1, 0, "10:30", "11:00"), ...sessions("2026-10-14", 1, 0, "15:00", "16:00")],
+    });
+    expect(whenLabels(gemischt, FIXTURE_NOW).main).toBe("Regelmäßig");
+  });
+
+  it("nennt ohne kommenden Termin keine Uhrzeit, obwohl uniformTimes([]) wahr ist", () => {
+    expect(whenLabels(OFFERS.woechentlich, new Date("2027-01-01T00:00:00+01:00"))).toEqual({
+      main: "Regelmäßig",
+      sub: "0 kommende Termine",
+    });
+  });
+
+  it("zählt nur kommende Termine für die Uhrzeit: ein vergangener Ausreißer stört nicht", () => {
+    const verschoben = offer({
+      format: "regelmaessig",
+      sessions: [...sessions("2026-10-02", 1, 0, "15:00", "16:00"), ...sessions("2026-10-09", 3, 7, "10:30", "11:00")],
+    });
+    expect(whenLabels(verschoben, FIXTURE_NOW).main).toBe("Jeden Freitag, 10:30–11:00");
+  });
+
   it("nennt das Anmeldefenster als Berliner Tage, sonst einen Hinweis", () => {
-    const fenster = (registrationWindow?: NonNullable<SiteOffer["registrationWindow"]>) =>
-      registrationNote(offer({ ...OFFERS.kurs, ...(registrationWindow ? { registrationWindow } : {}) }));
+    const fenster = (registrationWindow?: NonNullable<SiteOffer["registrationWindow"]>, now = FIXTURE_NOW) =>
+      registrationNote(offer({ ...OFFERS.kurs, ...(registrationWindow ? { registrationWindow } : {}) }), now);
+    // bald
     expect(fenster({ opens: "2026-10-10T00:30:00+02:00", deadline: "2026-10-20T23:30:00+02:00" })).toBe(
       "Anmeldung ab 10.10., bis 20.10.",
     );
+    expect(fenster({ opens: "2026-10-10T00:30:00+02:00" })).toBe("Anmeldung ab 10.10.");
+    // offen mit bzw. ohne Anmeldeschluss
     expect(fenster({ deadline: "2026-10-20T23:30:00+02:00" })).toBe("Anmeldung bis 20.10.");
+    expect(
+      fenster(
+        { opens: "2026-10-10T00:30:00+02:00", deadline: "2026-10-20T23:30:00+02:00" },
+        new Date("2026-10-12T12:00:00+02:00"),
+      ),
+    ).toBe("Anmeldung bis 20.10.");
+    expect(fenster({ opens: "2026-10-01T08:00:00+02:00" })).toBe("Anmeldung ab 1.10.");
+    // ohne Fenster
     expect(fenster()).toBe("Beim Anbieter");
-    expect(registrationNote(OFFERS.ohneAnmeldung)).toBe("Beim Anbieter");
-    expect(registrationNote(offer({ ...OFFERS.einmalig, registration: "ohne-anmeldung" }))).toBe(
+    expect(registrationNote(OFFERS.ohneAnmeldung, FIXTURE_NOW)).toBe("Beim Anbieter");
+    expect(registrationNote(offer({ ...OFFERS.einmalig, registration: "ohne-anmeldung" }), FIXTURE_NOW)).toBe(
       "Einfach vorbeikommen",
     );
+  });
+
+  it("sagt nach Ablauf der Frist, dass sie vorbei ist (B4)", () => {
+    const pekip = offer({ ...OFFERS.kurs, registrationWindow: { deadline: "2026-10-09T23:59:00+02:00" } });
+    expect(registrationNote(pekip, new Date("2026-10-09T23:59:00+02:00"))).toBe("Anmeldung bis 9.10.");
+    expect(registrationNote(pekip, new Date("2026-10-10T12:00:00+02:00"))).toBe("Anmeldeschluss war am 9.10.");
+    const mitStart = offer({
+      ...OFFERS.kurs,
+      registrationWindow: { opens: "2026-09-01T08:00:00+02:00", deadline: "2026-10-09T23:59:00+02:00" },
+    });
+    expect(registrationNote(mitStart, new Date("2026-10-10T12:00:00+02:00"))).toBe("Anmeldeschluss war am 9.10.");
   });
 });

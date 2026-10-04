@@ -85,6 +85,8 @@ Detail, Filter-Sheet und Kind-Sheet sind `<dialog>` mit `showModal()`. Das bring
 - Fokus: `:focus-visible` mit `outline: 3px solid var(--ink); outline-offset: 2px` (Mockup), Eingabefelder auch bei `:focus`.
 - Lange Komposita: `overflow-wrap: anywhere` bleibt. `hyphens: auto` nur noch für Fließtext (`.summary`), nicht für Titel und Meta-Zeilen („Alt-stadt“). Das Mockup-Review hatte „Nürn-berg“ in Titeln bemängelt.
 
+> **Geändert durch Plan 0007** (E10, E15): `hyphens: auto` jetzt auch für die Titel `.ptitle`, `.dtitle`, `.ctitle`, `.sheet h2` und `.empty b`. Getrennt wird nur, wenn ein Wort nicht in die Zeile passt, sonst bräche `overflow-wrap: anywhere` an beliebiger Stelle. Im Dunkeln haben gewählte Zustände und der Toast eigene Tokens (`--sel`/`--on-sel`, `--toast`/`--on-toast`, `--hint-*`) statt `var(--ink)`.
+
 ### E6 – Schrift und Bewegung
 
 - Bricolage Grotesque über `@fontsource-variable/bricolage-grotesque` (OFL-1.1, neue Laufzeit-Abhängigkeit ohne JS). Eingebunden per `import "@fontsource-variable/bricolage-grotesque/opsz.css"` in `src/main.tsx`; so erkennt knip die Abhängigkeit und Vite schreibt die `url()`s um. Der Familienname ist **`"Bricolage Grotesque Variable"`** (Fontsource), nicht der Name aus dem Mockup.
@@ -93,6 +95,8 @@ Detail, Filter-Sheet und Kind-Sheet sind `<dialog>` mit `showModal()`. Das bring
 - Animationen ausschließlich in CSS: `stick` (Karte erscheint), `plop` (Chip), `slap` (Herz), `stamp` (Kalendertag), `peel` (Logo, 2× nach 1 s), `up` (Sheet), `slide` (Detail), `toast`, `wiggle` (Leerzustand).
 - `prefers-reduced-motion: reduce` schaltet Animationen und Transitionen ab (bestehende Regel, ergänzt um `animation-iteration-count: 1`, sonst flackert `wiggle`).
 - Die Karten-Animation `stick` beginnt mit `opacity: 0`. Damit sie LCP nicht verzögert, bekommen Karten des **ersten** Renderings nach dem Laden keine Animation. Nur später eingefügte Karten (Filterwechsel, „Weitere“) kleben sich ein. Der Zustand „animieren“ wird beim Mounten der Karte festgehalten, ein Re-Render startet die Animation nicht neu.
+
+> **Geändert durch Plan 0007** (E11, E12, Befund B6): Roboto (Android) bekommt ein eigenes Fallback-Face, die Gewichts-Buckets werden nach Messung (`scripts/font-fallback.ts`) gesetzt, und ein Swap-Test hält die Webfont zurück (`e2e/vitals.ts`).
 
 ### E7 – Liste „Entdecken“: jedes Angebot einmal, am nächsten Termin
 
@@ -161,6 +165,8 @@ Die Sticker-Leiste zeigt alle 12 Kategorien (Kurzlabel aus dem Mockup: Babykurse
   Die Zusammenfassung sagt „2 Sticker · 14 Termine in einer .ics-Datei · Kurse immer komplett“. `ics.ts` importiert Zod nur als Typ, das Modul darf also in den Client (Regel `no-zod-in-client-transitive` bleibt grün).
 - Toasts: „Eingeklebt – liegt jetzt in deinem Stickerheft“ bzw. „Sticker abgelöst – nicht mehr gemerkt“. Eine dauerhaft vorhandene `role="status"`-Region, die Text 2,8 s zeigt.
 
+> **Geändert durch Plan 0007** (E4, Befund B7): Der Knopf heißt „Alle in den Kalender“, damit er bei 320 px einzeilig bleibt.
+
 ### E13 – Detail
 
 Inhalt wie im Mockup:
@@ -182,6 +188,8 @@ Inhalt wie im Mockup:
   - Einmalig: „In den Kalender“.
 - Wird das Detail aus der Kalender-Agenda geöffnet, gilt dort der gewählte Tag als „nächster“ Termin (für „Nur …“ und die Markierung in der Terminliste).
 
+> **Geändert durch Plan 0007** (E1, E3, E4): „Wann“ nennt bei regelmäßigen Angeboten die Uhrzeit, sobald alle kommenden Termine dieselbe haben („Freitags, 10:30–11:00“, B1). Ein laufender Kurs heißt „Kurs · noch 6 von 8 Terminen“, ein beendeter „Kurs mit 8 Terminen – vorbei“ (H8). Nach Ablauf der Frist steht „Anmeldeschluss war am 9.10.“ (B4, `registrationPhase`). Die ICS-Knöpfe heißen „Alle Termine“ (ohne Zahl, H5) und „Alle 8 Kurstermine“. Die Adresse unter „Wo“ wiederholt den Ortsnamen nicht (`venueAddress`, H6).
+
 ### E14 – Kalender
 
 - Wochenleiste (Mo–So) mit Navigation. Vergangene Tage sind `disabled` (axe ignoriert so den gedimmten Kontrast). Unter jedem Tag bis zu 3 Kategorie-Formen der Angebote des Tages.
@@ -197,11 +205,15 @@ Inhalt wie im Mockup:
 - Der gewählte Tag und „Monat offen“ sind Sitzungszustand im Speicher (nicht in der URL). Start: heute.
 - Agenda-Überschrift: „Heute, 5. Oktober“ / „Morgen, 6. Oktober“ / „Mittwoch, 7. Oktober“ + „2 Angebote“ bzw. „1 Angebot“. Leer: „Freier Tag“ / „Kein Sticker für diesen Tag – Zeit für den Spielplatz.“
 
+> **Geändert durch Plan 0007** (E2, E5, E9): Die Agenda zeigt nur nicht beendete Termine (`dayAgenda`); ist heute alles vorbei, steht „Für heute ist alles vorbei“, nach dem letzten Termin des Datenstands „Weiter reicht der Plan noch nicht“ (B2, B8). „Jetzt“ erneuert sich im offenen Tab (`useNow`). Bei offenem Monatsraster ist die Wochenleiste ausgeblendet (H2). Bei 320 px dehnen sich Woche und Monat in den Seitenrand aus, die Tage sind dann ≥ 44 px, und das Touch-Gate misst auch dort (B3).
+
 ### E15 – Darstellung (Theme)
 
 - `zwergenplan.darstellung` = `hell | dunkel` (fehlt = automatisch) in `preferences.ts`.
 - Ein kleines Inline-Skript in `index.html` setzt `data-theme` vor dem ersten Paint (kein Aufblitzen). Es liest nur diesen einen Schlüssel und ist in `try/catch` gekapselt.
 - Header-Knopf: wechselt zwischen Hell und Dunkel (ausgehend vom aktuell sichtbaren Theme). Kind-Sheet: Segment Automatisch/Hell/Dunkel. Unter 360 px Breite entfällt der Header-Knopf (Platz für Titel und Kind-Chip), die Darstellung bleibt im Kind-Sheet.
+
+> **Geändert durch Plan 0007** (E6, Befund B5): Der Header-Knopf entfällt per Container-Query unter einer Kopfbreite von 21,75 rem, also unter ≈ 380 px Viewport statt 360 px.
 
 ### E16 – Filter-Bedienung
 
