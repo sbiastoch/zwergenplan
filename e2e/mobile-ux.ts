@@ -346,9 +346,23 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
         }
         return undefined;
       };
+      /**
+       * Sichtbarer Bereich des nächsten senkrechten Scroll-Containers zwischen Text und gerundetem Kasten.
+       * Ausnahme mit Grund: Text, der dort ganz hinausgescrollt ist, ist unsichtbar und kann an keine Rundung
+       * stoßen (gescrolltes Filter-Sheet, Plan 0004: „Filter“ und „Art“ liegen dann über dem Sheet). Sichtbarer
+       * Text in der Rundung zählt weiter, auch im Scroll-Container (Test „Text-Gate erkennt Text in der Rundung“).
+       */
+      const scrollViewport = (start: Element, stop: Element) => {
+        for (let a: Element | null = start; a && a !== stop; a = a.parentElement) {
+          const s = getComputedStyle(a);
+          if (s.overflowY === "auto" || s.overflowY === "scroll") return a.getBoundingClientRect();
+        }
+        return undefined;
+      };
       for (const { text, parent } of texts) {
         const box = roundBox(parent);
         if (!box) continue;
+        const viewport = scrollViewport(parent, box.el);
         const { s } = box;
         const b = box.el.getBoundingClientRect();
         const bw = {
@@ -415,6 +429,7 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
           },
         ];
         outer: for (const r of rectsOf(text)) {
+          if (viewport && (r.bottom <= viewport.top || r.top >= viewport.bottom)) continue;
           for (const c of corners) {
             if (c.rx < 1 || c.ry < 1) continue;
             const x = c.sx < 0 ? r.left : r.right;

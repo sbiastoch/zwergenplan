@@ -175,6 +175,15 @@ test("Text-Gate erkennt Überlappung", async ({ page }) => {
   await expect(expectTextFits(page)).rejects.toThrow(/Überlappung in header\.hdr/);
 });
 
+test("Text-Gate erkennt Text in der Rundung, auch im Scroll-Container des Sheets", async ({ page }) => {
+  await ready(page);
+  await page.getByRole("button", { name: /^Alle Filter/ }).click();
+  await expect(page.getByRole("dialog", { name: "Filter" })).toBeVisible();
+  // „Filter“ rückt ganz in die obere linke Ecke des Sheets (Radius 28 px), bleibt aber sichtbar.
+  await page.addStyleTag({ content: ".sheet-scroll { padding: 0 !important } .sheet .grab { display: none }" });
+  await expect(expectTextFits(page)).rejects.toThrow(/Text stößt an die Rundung von dialog\.dlg: „Filter“/);
+});
+
 test("funktioniert mit reduzierter Bewegung", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await ready(page);
