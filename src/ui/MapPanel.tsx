@@ -5,6 +5,7 @@
  * die Seite bedienbar.
  */
 import { type ComponentType, useEffect, useRef, useState } from "react";
+import type { StartCamera } from "../domain/camera.ts";
 import type { GeoPoint } from "../domain/geo.ts";
 import type { Place } from "../domain/places.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
@@ -51,6 +52,8 @@ const NOTES: Record<MapProblem, string> = {
 
 interface MapPanelProps {
   places: readonly Place<SiteOffer>[];
+  /** Startausschnitt aus öffentlichen Daten (`useOfferViews().startCamera`) */
+  start: StartCamera;
   origin: Origin | undefined;
   dark: boolean;
   reachOf: (offer: SiteOffer) => Reach | undefined;
@@ -85,6 +88,7 @@ export function MapPanel(props: MapPanelProps) {
           <module.View
             key={build}
             places={places}
+            start={props.start}
             origin={origin}
             dark={props.dark}
             onPlace={(key) => {

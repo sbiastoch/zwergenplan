@@ -16,6 +16,7 @@ import {
   takeGroups,
 } from "../domain/agenda.ts";
 import { clampDay } from "../domain/calendar.ts";
+import { initialCamera, type StartCamera } from "../domain/camera.ts";
 import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
 import { type Place, placesOf, sortPlaces } from "../domain/places.ts";
 import { type Origin, type Reach, reachTo } from "../domain/reach.ts";
@@ -71,6 +72,11 @@ export interface OfferViews {
   detailOffer: SiteOffer | undefined;
   /** Orte der sichtbaren Angebote, nur in der Kartenansicht; mit Startpunkt nach Entfernung (Plan 0005, E6) */
   places: Place<SiteOffer>[];
+  /**
+   * Startausschnitt der Karte, nur in der Kartenansicht: über die Orte **ohne Umkreis-Filter**, damit die
+   * Kachel-Requests nie verraten, wo ein Standort liegt (Kamera-Regel, ADR 0008; Arch-Review B1).
+   */
+  startCamera: StartCamera | undefined;
   /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
   reachOf: (offer: SiteOffer) => Reach | undefined;
 }
@@ -132,6 +138,16 @@ export function useOfferViews({
     [offers, route.filter, route.tab, today, now, origin],
   );
   const reachOf = useMemo(() => reachCache(origin), [origin]);
+  // Ohne Startpunkt gefiltert: Der Umkreis wirkt nur mit Startpunkt, Alter und übrige Filter gelten wie auf der Karte.
+  const startCamera = useMemo(() => {
+    if (route.tab !== "karte") return undefined;
+    const withoutReach = applyFilters(offers, route.filter, { now });
+    const shown = ageVisibility(withoutReach, upcoming, birthDate, now, { ageOnly, showUnfit }).visible;
+    return initialCamera(
+      placesOf(shown).map((p) => p.geo),
+      origin,
+    );
+  }, [route.tab, route.filter, offers, now, upcoming, birthDate, ageOnly, showUnfit, origin]);
   const places = useMemo(
     () => (route.tab === "karte" ? sortPlaces(placesOf(visible), origin) : NO_PLACES),
     [visible, route.tab, origin],
@@ -162,6 +178,7 @@ export function useOfferViews({
     saved,
     detailOffer: route.offerId ? offers.find((o) => o.id === route.offerId) : undefined,
     places,
+    startCamera,
     reachOf,
   };
 }

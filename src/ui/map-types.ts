@@ -2,6 +2,7 @@
  * Schnittstelle zur lazy geladenen Karte (Plan 0005, E3). Liegt außerhalb von src/ui/map/, weil von
  * außen nichts statisch nach src/ui/map/ greifen darf, auch kein Typ (`map-only-lazy`).
  */
+import type { StartCamera } from "../domain/camera.ts";
 import type { GeoPoint } from "../domain/geo.ts";
 import type { Place } from "../domain/places.ts";
 import type { Origin } from "../domain/reach.ts";
@@ -9,6 +10,8 @@ import type { Origin } from "../domain/reach.ts";
 export interface MapViewProps {
   /** Orte der sichtbaren Angebote; ein Wechsel tauscht nur die Daten, die Kamera bleibt (E9) */
   places: readonly Place<unknown>[];
+  /** Ausschnitt beim ersten Öffnen der Sitzung, aus öffentlichen Daten (`initialCamera`, ADR 0008) */
+  start: StartCamera;
   /** wird nur gezeichnet; angefahren wird nur ein Stadtteil (E9, ADR 0008) */
   origin: Origin | undefined;
   dark: boolean;

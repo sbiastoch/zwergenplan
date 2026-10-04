@@ -234,9 +234,10 @@ export function App() {
             <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>
           </>
         )}
-        {load.kind === "ready" && route.tab === "karte" && (
+        {load.kind === "ready" && views.startCamera && (
           <MapPanel
             places={views.places}
+            start={views.startCamera}
             origin={origin}
             dark={theme.dark}
             reachOf={views.reachOf}

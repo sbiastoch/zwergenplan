@@ -245,6 +245,47 @@ test.describe("mit gemockten Kacheln", () => {
     await expect.poll(async () => (await camera(page)).lat).toBeLessThan(start.lat - 0.005);
   });
 
+  test("Startausschnitt verrät den Standort nicht: Standort + „bis 2 km“ in der Liste, dann Karte (Arch-Review B1)", async ({
+    page,
+    context,
+    tileLog,
+  }) => {
+    const openFromList = async () => {
+      await page.getByRole("button", { name: "Karte", exact: true }).click();
+      await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
+      await idle(page);
+      return camera(page);
+    };
+    const tilesSince = (index: number) => [...new Set(tileLog.slice(index).map((t) => t.path))].sort();
+
+    // ohne Startpunkt
+    await page.goto("./");
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    const plain = await openFromList();
+    const plainTiles = tilesSince(0);
+
+    // Neuladen leert den Sitzungs-Ausschnitt; Standort (nahe Familientreff) und Umkreis in der Liste
+    await context.grantPermissions(["geolocation"]);
+    await context.setGeolocation({ latitude: 49.45213, longitude: 11.07672 });
+    await page.goto("./");
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
+    await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
+    await kid.getByRole("button", { name: "Fertig" }).click();
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const filter = page.getByRole("dialog", { name: "Filter" });
+    await filter.getByRole("button", { name: "bis 2 km" }).click();
+    await filter.getByRole("button", { name: /Angebote? zeigen$/ }).click();
+    const before = tileLog.length;
+    const withOrigin = await openFromList();
+    // Der Umkreis wirkt auf die Orte, aber nicht auf den Ausschnitt
+    await expect(page.getByRole("status")).not.toContainText("an 5 Orten");
+    expect(withOrigin).toEqual(plain);
+    expect(tilesSince(before)).toEqual(plainTiles);
+  });
+
   test("ohne WebGL: Hinweis, Orts-Liste da, keine Kartenmitte", async ({ page }) => {
     await page.addInitScript(() => {
       const original = HTMLCanvasElement.prototype.getContext;
@@ -266,14 +307,14 @@ test.describe("mit gemockten Kacheln", () => {
 
   test("Wächter: Kachel-URLs mit Querystring oder fremdem Host verlassen den Browser nicht, auch nicht aus dem Worker", async ({
     page,
-    context,
+    routeTiles,
     tileLog,
   }) => {
     for (const tiles of [
       "https://tiles.openfreemap.org/planet/test/{z}/{x}/{y}.pbf?key=geheim",
       "https://example.org/planet/{z}/{x}/{y}.pbf",
     ]) {
-      await context.route("https://tiles.openfreemap.org/styles/positron", (route) =>
+      const unroute = await routeTiles("https://tiles.openfreemap.org/styles/positron", (route) =>
         route.fulfill({
           contentType: "application/json",
           body: JSON.stringify({
@@ -286,7 +327,7 @@ test.describe("mit gemockten Kacheln", () => {
       await page.goto("./?ansicht=karte");
       // guardTileRequest wirft vor dem ersten load → Fehlerzustand, kein Request (fixtures.ts prüft Querystring und Host)
       await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
-      await context.unroute("https://tiles.openfreemap.org/styles/positron");
+      await unroute();
     }
     expect(tileLog).toEqual([]);
   });
@@ -299,8 +340,13 @@ test.describe("Stil nicht ladbar", () => {
     allowedConsoleErrors: [/^https:\/\/tiles\.openfreemap\.org\/\S+ Failed to load resource/],
   });
 
-  test("ohne Kartenbilder (Stil 503): Hinweis, Orts-Liste bedienbar, Neuaufbau klappt", async ({ page, context }) => {
-    await context.route("https://tiles.openfreemap.org/styles/**", (route) => route.fulfill({ status: 503 }));
+  test("ohne Kartenbilder (Stil 503): Hinweis, Orts-Liste bedienbar, Neuaufbau klappt", async ({
+    page,
+    routeTiles,
+  }) => {
+    const unroute = await routeTiles("https://tiles.openfreemap.org/styles/**", (route) =>
+      route.fulfill({ status: 503 }),
+    );
     await page.goto("./?ansicht=karte");
     await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
     await expect(mapBox(page)).toContainText(
@@ -311,7 +357,7 @@ test.describe("Stil nicht ladbar", () => {
     await expect(page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" })).toBeVisible();
     await page.getByRole("dialog").getByRole("button", { name: "Zurück" }).click();
 
-    await context.unroute("https://tiles.openfreemap.org/styles/**");
+    await unroute();
     await mapBox(page).getByRole("button", { name: "Nochmal versuchen" }).click();
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
     await expect(page.getByRole("button", { name: "Kartenmitte als Startpunkt" })).toBeVisible();

@@ -199,6 +199,26 @@ describe("useOfferViews", () => {
       ]);
     });
 
+    it("Startausschnitt der Karte hängt nie am Umkreis um einen Standort (Arch-Review B1)", () => {
+      const standort: Origin = { source: "standort", point: { lat: 49.4495, lon: 11.0601 }, label: "Mein Standort" };
+      const kartenmitte: Origin = { ...standort, source: "karte", label: "Kartenmitte" };
+      const karte: Route = { tab: "karte", filter: EMPTY_FILTER };
+      const umkreis: Route = { ...within2km, tab: "karte" };
+      const plain = render({ offers: [nah, fern], route: karte }).startCamera;
+      expect(plain).toEqual({ bounds: { minLat: 49.4301, minLon: 11.0601, maxLat: 49.4495, maxLon: 11.0892 } });
+      // Der Umkreis blendet „fern“ aus der Liste aus, der Ausschnitt bleibt trotzdem bei allen Orten.
+      const mitStandort = render({ offers: [nah, fern], route: umkreis, origin: standort });
+      expect(mitStandort.places.map((p) => p.key)).toEqual(["49.4495,11.0601"]);
+      expect(mitStandort.startCamera).toEqual(plain);
+      expect(render({ offers: [nah, fern], route: umkreis, origin: kartenmitte }).startCamera).toEqual(plain);
+      // Andere Filter wirken wie auf der Karte
+      expect(
+        render({ offers: [nah, fern], route: { tab: "karte", filter: { ...EMPTY_FILTER, formats: ["kurs"] } } })
+          .startCamera,
+      ).toEqual({ center: { lat: 49.454, lon: 11.077 }, zoom: 11 });
+      expect(render({ offers: [nah, fern] }).startCamera).toBeUndefined();
+    });
+
     it("zählt heute beendete Termine nur im Umkreis (B2)", () => {
       const heuteFern = at(offer("heute-fern", "2026-10-05"), 49.4301, 11.0892);
       const route: Route = { ...within2km, tab: "kalender" };

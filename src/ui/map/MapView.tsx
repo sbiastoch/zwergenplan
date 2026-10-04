@@ -17,8 +17,8 @@ import { useEffect, useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./map-overrides.css"; // nach maplibre-gl.css (E4)
 import { ATTRIBUTION, guardTileRequest, styleUrl } from "../../data/tiles.ts";
+import { DISTRICT_ZOOM, type StartCamera } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
-import type { Origin } from "../../domain/reach.ts";
 import type { MapViewProps } from "../map-types.ts";
 import { nearestHit, originToFeatures, placesToFeatures } from "./geojson.ts";
 import { addOwnLayers, LOCALE, PLACE_LAYERS, readMapColors } from "./layers.ts";
@@ -28,9 +28,6 @@ setWorkerUrl(workerUrl);
 
 const lngLat = ({ lat, lon }: GeoPoint): [number, number] => [lon, lat];
 
-/** Hauptmarkt, wenn es keine Orte gibt */
-const HOME = { center: lngLat({ lat: 49.454, lon: 11.077 }), zoom: 11 };
-const DISTRICT_ZOOM = 13;
 /** ohne `load` bis dahin: Kartenbilder lassen sich nicht laden (E12) */
 const LOAD_TIMEOUT_MS = 15_000;
 /** halbe Kantenlänge des Tipp-Rechtecks: effektiv 44 px (E6) */
@@ -39,17 +36,15 @@ const TAP_PX = 22;
 /** Zuletzt gesehener Ausschnitt dieser Sitzung; nie in URL oder Speicher (E9). */
 let lastCamera: { center: LngLatLike; zoom: number } | undefined;
 
-/** Ausschnitt beim Öffnen (E9): Sitzung, sonst Stadtteil, sonst alle Orte (öffentliche Daten). */
-function startCamera(places: MapViewProps["places"], origin: Origin | undefined): Partial<MapOptions> {
+/**
+ * Ausschnitt beim Öffnen (E9): der dieser Sitzung, sonst `start` aus `initialCamera` (öffentliche Daten,
+ * nie Standort oder Kartenmitte). Als Konstruktor-Option, damit vorher kein anderer Ausschnitt Kacheln lädt.
+ */
+function cameraOptions(start: StartCamera): Partial<MapOptions> {
   if (lastCamera) return lastCamera;
-  if (origin?.source === "stadtteil") return { center: lngLat(origin.point), zoom: DISTRICT_ZOOM };
-  if (places.length === 0) return HOME;
-  const lats = places.map((p) => p.geo.lat);
-  const lons = places.map((p) => p.geo.lon);
-  return {
-    bounds: [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)],
-    fitBoundsOptions: { padding: 32, maxZoom: 14 },
-  };
+  if ("center" in start) return { center: lngLat(start.center), zoom: start.zoom };
+  const { minLat, minLon, maxLat, maxLon } = start.bounds;
+  return { bounds: [minLon, minLat, maxLon, maxLat], fitBoundsOptions: { padding: 32, maxZoom: 14 } };
 }
 
 /** Tipp: nächster Ort oder Cluster im 44-px-Rechteck. Cluster zoomt auf (öffentlicher Zielpunkt), Ort meldet sich. */
@@ -110,7 +105,7 @@ export function MapView(props: MapViewProps) {
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
-        ...startCamera(start.places, start.origin),
+        ...cameraOptions(start.start),
       });
     } catch {
       start.onProblem("webgl");
