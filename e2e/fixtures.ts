@@ -5,7 +5,7 @@
  * tests/fixtures/karte/, offline, nur solange die Karte im DOM ist und nur ohne Querystring.
  */
 import { existsSync } from "node:fs";
-import { test as base, expect, type Page, type Request } from "@playwright/test";
+import { test as base, expect, type Page, type Request, type Route } from "@playwright/test";
 
 /** Muss zu tests/fixtures/offers.json passen: Montag, 5.10.2026, 12:00 Berlin. */
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
@@ -53,35 +53,64 @@ async function mapInDom(request: Request, page: Page): Promise<boolean | string>
   return "nicht prüfbar";
 }
 
+type TileHandler = (route: Route) => Promise<void> | void;
+
+/** Interner Zustand des Kachel-Mocks: Protokoll und jede URL, die ein Mock-Handler beantwortet hat. */
+interface TileMock {
+  log: TileRequest[];
+  served: Set<string>;
+  /** wie context.route, aber die bedienten URLs zählen als gemockt; liefert das passende unroute */
+  route: (pattern: string, handler: TileHandler) => Promise<() => Promise<void>>;
+}
+
 export const test = base.extend<
-  Options & { tileLog: TileRequest[]; consoleGuard: undefined; thirdPartyGuard: undefined }
+  Options & {
+    tileMock: TileMock;
+    tileLog: TileRequest[];
+    /** eigene Antworten auf OpenFreeMap-Pfade in einem Test (z. B. Stil 503), statt context.route */
+    routeTiles: TileMock["route"];
+    consoleGuard: undefined;
+    thirdPartyGuard: undefined;
+  }
 >({
   tiles: ["verboten", { option: true }],
   allowedConsoleErrors: [[], { option: true }],
   // Privatsphäre-Invariante (docs/architecture.md): keine Requests an fremde Origins – Schrift, Daten, ICS kommen von uns.
-  // Über den Kontext, damit auch Requests aus Workern zählen. OpenFreeMap prüft tileLog.
+  // Über den Kontext, damit auch Requests aus Workern zählen. OpenFreeMap nur, wenn ein Mock-Handler ihn beantwortet hat.
   thirdPartyGuard: [
-    async ({ context, baseURL }, use) => {
+    async ({ context, baseURL, tileMock }, use) => {
       const own = new URL(baseURL ?? "http://localhost").origin;
       const foreign: string[] = [];
+      const tileRequests: string[] = [];
       context.on("request", (req) => {
         const url = new URL(req.url());
-        if (url.protocol.startsWith("http") && url.origin !== own && url.origin !== TILE_ORIGIN)
-          foreign.push(req.url());
+        if (url.origin === TILE_ORIGIN) tileRequests.push(req.url());
+        else if (url.protocol.startsWith("http") && url.origin !== own) foreign.push(req.url());
       });
       await use(undefined);
-      expect(foreign, "Keine Requests an fremde Origins").toEqual([]);
+      const unserved = tileRequests.filter((url) => !tileMock.served.has(url)).map((url) => `nicht gemockt: ${url}`);
+      expect([...foreign, ...unserved], "Keine Requests an fremde Origins").toEqual([]);
     },
     { auto: true },
   ],
   // Kartenkacheln (Plan 0005, E13): per context.route, damit auch die Requests aus MapLibres Worker ankommen.
   // Wächter und Kachel-Protokoll in einem; jeder Test kann das Protokoll als `tileLog` lesen.
-  tileLog: [
+  tileMock: [
     async ({ context, page, tiles }, use) => {
       const tileLog: TileRequest[] = [];
+      const served = new Set<string>();
       const violations: string[] = [];
       const checks: Promise<void>[] = [];
-      await context.route(`${TILE_ORIGIN}/**`, (route) => {
+      const route: TileMock["route"] = async (pattern, handler) => {
+        const wrapped: TileHandler = (r) => {
+          // „verboten“ bricht ab, das zählt nicht als bedient
+          if (tiles === "mock") served.add(r.request().url());
+          return handler(r);
+        };
+        await context.route(pattern, wrapped);
+        return () => context.unroute(pattern, wrapped);
+      };
+      await route(`${TILE_ORIGIN}/**`, (route) => {
         const request = route.request();
         const url = request.url();
         if (tiles === "verboten") {
@@ -105,12 +134,18 @@ export const test = base.extend<
         violations.push(`nicht gemockt: ${url}`);
         return route.fulfill({ status: 404 });
       });
-      await use(tileLog);
+      await use({ log: tileLog, served, route });
       await Promise.all(checks);
       expect(violations, "OpenFreeMap nur gemockt, nur mit Karte im DOM, ohne Querystring").toEqual([]);
     },
     { auto: true },
   ],
+  tileLog: async ({ tileMock }, use) => {
+    await use(tileMock.log);
+  },
+  routeTiles: async ({ tileMock }, use) => {
+    await use(tileMock.route);
+  },
   page: async ({ page }, use) => {
     await page.clock.setFixedTime(FIXTURE_NOW);
     await use(page);
