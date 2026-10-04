@@ -67,7 +67,7 @@ Weitere Befunde zu dieser Alternative:
   - Auf einen **Stadtteil** darf die Karte fahren. Der ist grob, öffentlich und ohnehin einer von 35 festen Punkten.
   - Verschiebt jemand die Karte selbst zu sich nach Hause, ist das seine Handlung. Das unterscheidet sich nicht von jeder anderen Kartennutzung.
 - **Nur in der Kartenansicht**: Solange die Karte nicht offen ist, geht kein Request an OpenFreeMap, und der Karten-Code wird nicht geladen. Das Umschalten auf „Karte“ ist die ausdrückliche Handlung, eine zusätzliche Einwilligung gibt es nicht. Unter der Karte steht: „Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät.“
-- **Referrer**: Wir bleiben beim Browser-Standard `strict-origin-when-cross-origin`. OpenFreeMap sieht damit `https://sbiastoch.github.io/`, aber weder Pfad noch Querystring (also keine Filter und kein `angebot=`).
+- **Referrer**: Wir bleiben beim Browser-Standard `strict-origin-when-cross-origin`. OpenFreeMap sieht damit `https://zwergenplan.app/` (ADR 0009), aber weder Pfad noch Querystring (also keine Filter und kein `angebot=`).
   - Abgewogen gegen `no-referrer` für die ganze Seite: Das würde auch die Links zu den Anbietern betreffen. Die Information „diese Seite nutzt OpenFreeMap“ ist ohnehin öffentlich (Repo).
   - MapLibre erlaubt keinen Referrer-Wert pro Request. Ein Wechsel ginge nur über `<meta name="referrer">` für alles.
 - **Kein Cache durch uns**: Kacheln werden nicht vorab geladen und von einem künftigen Service Worker nicht gecacht. Offline zeigt die Karte einen Hinweis, die Orts-Liste funktioniert weiter.

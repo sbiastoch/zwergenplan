@@ -1,6 +1,6 @@
-# ADR 0008 – Eigene Domain zwergenplan.app
+# ADR 0009 – Eigene Domain zwergenplan.app
 
-Status: angenommen (2026-10-04), ersetzt in ADR 0002 den Punkt „GitHub Pages unter `/zwergenplan/`“. Details in Plan 0005.
+Status: angenommen (2026-10-04), ersetzt in ADR 0002 den Punkt „GitHub Pages unter `/zwergenplan/`“. Details in Plan 0006.
 
 ## Kontext
 ADR 0002 legt GitHub Pages unter `https://sbiastoch.github.io/zwergenplan/` fest und nennt eine eigene Domain als optionalen Kostenpunkt. Der Nutzer hat `zwergenplan.app` bei Porkbun gekauft. Eine kurze Adresse lässt sich leichter an Freunde und Familie weitergeben als der GitHub-Unterpfad.

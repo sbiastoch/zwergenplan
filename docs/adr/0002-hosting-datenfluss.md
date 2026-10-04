@@ -3,8 +3,8 @@
 Status: angenommen (2026-10-04)
 
 ## Entscheidung
-- **GitHub Pages** aus dem öffentlichen Repo `sbiastoch/zwergenplan` unter `/zwergenplan/`. Der Pfad steht nur in `site.config.ts`. *Ersetzt durch ADR 0008: eigene Domain `zwergenplan.app` im Wurzelpfad.*
-- **Privat gedacht, technisch öffentlich**: Die Seite ist für Freunde und Familie, ohne Impressum und mit `noindex`. Eine `robots.txt` im Unterpfad wäre wirkungslos und entfällt (auch im Wurzelpfad seit ADR 0008: `Disallow` würde das `noindex` verdecken). Repo und Daten sind öffentlich einsehbar. In die Daten kommt deshalb nichts, was nicht ohnehin öffentlich auf den Anbieterseiten steht.
+- **GitHub Pages** aus dem öffentlichen Repo `sbiastoch/zwergenplan` unter `/zwergenplan/`. Der Pfad steht nur in `site.config.ts`. *Ersetzt durch ADR 0009: eigene Domain `zwergenplan.app` im Wurzelpfad.*
+- **Privat gedacht, technisch öffentlich**: Die Seite ist für Freunde und Familie, ohne Impressum und mit `noindex`. Eine `robots.txt` im Unterpfad wäre wirkungslos und entfällt (auch im Wurzelpfad seit ADR 0009: `Disallow` würde das `noindex` verdecken). Repo und Daten sind öffentlich einsehbar. In die Daten kommt deshalb nichts, was nicht ohnehin öffentlich auf den Anbieterseiten steht.
 - **Kein menschliches Review**: Der Pipeline-Lauf committet direkt auf `main` und pusht. CI ist das einzige Gate (check → E2E → Deploy). Bei Rot bleibt die alte Version live.
 - **Plausibilität gegen den deployten Stand**: Jeder Deploy veröffentlicht `data/meta.json`. CI vergleicht den neuen Bestand mit der *Live*-Version, nicht mit `HEAD^`. So kann ein kaputter Commit auf `main` nicht zur neuen Referenz werden. Bricht der Bestand um mehr als 50 % ein, ist das rot. Ist `generatedAt` älter als 14 Tage, gibt es eine Warnung.
 - Die Pipeline läuft **lokal** (Claude Code mit dem Abo des Nutzers) und pusht mit den Git-Credentials des Nutzers. Das löst CI aus.

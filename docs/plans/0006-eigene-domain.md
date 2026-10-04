@@ -1,22 +1,22 @@
-# Plan 0005 – Umzug auf zwergenplan.app
+# Plan 0006 – Umzug auf zwergenplan.app
 
 Status: freigegeben nach Review (mit Änderungen, eingearbeitet) → Umsetzung
 Datum: 2026-10-04
 
-(Plan 0004 ist für Karte und Entfernung reserviert, siehe Plan 0003, E1.)
+(Plan 0004 Entfernung, Plan 0005 Karte, ADR 0008 Karte.)
 
 ## Ziel
 
 - `https://zwergenplan.app/` zeigt den Zwergenplan mit echten Daten, per HTTPS mit gültigem Zertifikat.
 - `https://www.zwergenplan.app/` und `https://sbiastoch.github.io/zwergenplan/` leiten auf die neue Adresse um.
 - Der Basis-Pfad ist `/`. Alle Stellen, die URL oder Pfad kennen, sind angepasst, `pnpm check:fast` und CI sind grün.
-- Die Entscheidung steht in ADR 0008.
+- Die Entscheidung steht in ADR 0009.
 
 ## Nicht-Ziele
 
 - E-Mail auf der Domain, Mail-Records.
 - PWA-Manifest oder Service Worker (eigener Plan).
-- Migration von `localStorage` vom alten Origin (ADR 0008, Konsequenzen).
+- Migration von `localStorage` vom alten Origin (ADR 0009, Konsequenzen).
 
 ## Ausgangslage
 
@@ -37,8 +37,8 @@ Die Reihenfolge ist wichtig: Sobald die Custom Domain in Pages gesetzt ist, leit
    - `e2e/detail.spec.ts`: `^\/ics\/.+\.ics$`.
    - `scripts/screenshots.ts`: Standard `http://localhost:4173/`.
    - `scripts/validate-data.ts`: HTTP-Fehler beim Abruf des Live-Stands als `::warning::` statt Info-Zeile.
-   - Doku und Skills: neue URL in README, `docs/architecture.md` (Diagramm), `.claude/skills/browser-review/SKILL.md` (lokale und Live-URL), `.claude/skills/babyevents-nuernberg/SKILL.md` (Beschreibung und Fertig-Kriterium `meta.json`), `.claude/settings.json` (`WebFetch(domain:zwergenplan.app)`). ADR 0002 bekommt Verweise auf ADR 0008 (Pfad und `robots.txt`).
-   - Fertig, wenn `pnpm check:fast` und `pnpm e2e` grün sind, `rg -n 'github\.io|/zwergenplan/' --glob '!docs/plans/000[0-3]*' --glob '!data/**'` nur noch ADR 0002/0008, Plan 0005 und den alten `WebFetch`-Eintrag trifft und CI auf dem Branch grün ist.
+   - Doku und Skills: neue URL in README, `docs/architecture.md` (Diagramm), `.claude/skills/browser-review/SKILL.md` (lokale und Live-URL), `.claude/skills/babyevents-nuernberg/SKILL.md` (Beschreibung und Fertig-Kriterium `meta.json`), `.claude/settings.json` (`WebFetch(domain:zwergenplan.app)`). ADR 0002 bekommt Verweise auf ADR 0009 (Pfad und `robots.txt`).
+   - Fertig, wenn `pnpm check:fast` und `pnpm e2e` grün sind, `rg -n 'github\.io|/zwergenplan/' --glob '!docs/plans/000[0-5]*' --glob '!docs/adr/0008*' --glob '!data/**'` nur noch ADR 0002/0008, Plan 0006 und den alten `WebFetch`-Eintrag trifft und CI auf dem Branch grün ist.
 2. **DNS bei Porkbun** (durch den Nutzer; kein API-Key, keine Browser-Verbindung):
    - Alle Parking-Records löschen: Apex `ALIAS` und `www`/`*` `CNAME` auf `pixie.porkbun.com`.
    - Apex `A`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
@@ -56,7 +56,7 @@ Die Reihenfolge ist wichtig: Sobald die Custom Domain in Pages gesetzt ist, leit
 - Das Zertifikat braucht nach der DNS-Umstellung bis zu etwa einer Stunde. Wegen HSTS-Preload ist die Domain bis dahin im Browser nicht erreichbar, während die github.io-Adresse ab Schritt 3 schon umleitet. → Schritt 3 erst, wenn DNS öffentlich sichtbar ist. Die Ausfallzeit für die wenigen privaten Nutzer ist hinnehmbar.
 - Domain-Übernahme, falls die Custom Domain in Pages entfernt wird und die DNS-Records bleiben. → Schritt 6 (Verifizierung) und keine Wildcard (Schritt 2).
 
-## Review (2026-10-04, plan-reviewer)
+## Review (2026-10-04, plan-reviewer, als Plan 0005 / ADR 0008 eingereicht, wegen paralleler Belegung umnummeriert)
 
 Ergebnis: Freigabe mit Änderungen, kein Blocker. Eingearbeitet:
 
@@ -64,5 +64,5 @@ Ergebnis: Freigabe mit Änderungen, kein Blocker. Eingearbeitet:
 - W2 stiller Ausfall der Plausibilität: HTTP-Fehler werden `::warning::`. Ein hartes Gate ist hier nicht sinnvoll, weil das ADR 0002 Netzfehler bewusst nicht blockieren lässt.
 - W3 Reihenfolge: Code zuerst und grün, Fast-Forward direkt nach dem PUT.
 - W4 Porkbun-Wildcard und CAA: Wildcard `*` → `pixie.porkbun.com` existiert und wird gelöscht. Es gibt keinen CAA-Record.
-- W5 `robots.txt` + `noindex`: keine `robots.txt`, Begründung in ADR 0008.
+- W5 `robots.txt` + `noindex`: keine `robots.txt`, Begründung in ADR 0009.
 - H1 keine User-Site `sbiastoch.github.io` vorhanden, Fallback nimmt Query mit. H2 im ADR. H4 Formulierung in Schritt 5. H5 Verifizierung ist Schritt 6.
