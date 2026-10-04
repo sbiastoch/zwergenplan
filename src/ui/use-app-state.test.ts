@@ -92,4 +92,22 @@ describe("useOrigin (Plan 0004, E3)", () => {
     expect(api.origin).toBeUndefined();
     expect(storage.data.size).toBe(0);
   });
+
+  it("Kartenmitte als Startpunkt: gerundet, nur im Speicher, außerhalb Nürnbergs abgelehnt (Plan 0005, E8)", () => {
+    storage.data.set(KEY, "gostenhof");
+    let accepted: boolean | undefined;
+    const api = renderOrigin((a) => {
+      accepted = a.setMapCenter({ lat: 49.45213, lon: 11.07672 });
+    });
+    expect(accepted).toBe(true);
+    expect(api.origin).toEqual({ source: "karte", point: { lat: 49.452, lon: 11.077 }, label: "Kartenmitte" });
+    // gespeichert bleibt nur der Stadtteil von vorher
+    expect([...storage.data]).toEqual([[KEY, "gostenhof"]]);
+
+    const outside = renderOrigin((a) => {
+      accepted = a.setMapCenter({ lat: 48.137, lon: 11.575 });
+    });
+    expect(accepted).toBe(false);
+    expect(outside.origin?.source).toBe("stadtteil");
+  });
 });

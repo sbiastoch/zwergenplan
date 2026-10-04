@@ -13,7 +13,9 @@ import {
   distanceNote,
   distanceShort,
   formatFact,
+  mapStatusParts,
   originPhrase,
+  placeLine,
   plural,
   reachLimitLabel,
   registrationNote,
@@ -279,8 +281,31 @@ describe("Entfernung (Plan 0004, E6)", () => {
     expect(distanceNote(standort)).toBe("Entfernung als Luftlinie ab deinem Standort");
   });
 
+  it("Kartenmitte als Startpunkt (Plan 0005, E8)", () => {
+    const karte: Origin = { source: "karte", point: { lat: 49.452, lon: 11.077 }, label: "Kartenmitte" };
+    expect(originPhrase(karte)).toBe("ab der Kartenmitte");
+    expect(distanceNote(karte)).toBe("Entfernung als Luftlinie ab der Kartenmitte");
+    expect(distanceLong(luftlinie(1427), karte)).toBe("ca. 1,4 km Luftlinie ab der Kartenmitte");
+  });
+
   it("beschriftet den Umkreis", () => {
     expect(reachLimitLabel({ kind: "km", value: 2 })).toBe("bis 2 km");
     expect(reachLimitLabel({ kind: "km", value: 10 })).toBe("bis 10 km");
+  });
+});
+
+describe("Karte und Orte (Plan 0005, E7)", () => {
+  it("Statuszeile: Angebote an Orten, Singular und Plural", () => {
+    expect(mapStatusParts(8, 5)).toEqual([8, " Angebote an ", 5, " Orten"]);
+    expect(mapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort");
+    expect(mapStatusParts(0, 0).join("")).toBe("0 Angebote an 0 Orten");
+  });
+
+  it("Zeile der Orts-Liste: Stadtteil bzw. Adresse, Zahl, Entfernung", () => {
+    const place = { district: "Gostenhof", address: "Beispielweg 1, 90429 Nürnberg", offers: [1, 2, 3] };
+    expect(placeLine(place, undefined)).toBe("Gostenhof · 3 Angebote");
+    expect(placeLine({ address: "Beispielweg 1", offers: [1] }, { kind: "luftlinie", meters: 1427 })).toBe(
+      "Beispielweg 1 · 1 Angebot · 1,4 km",
+    );
   });
 });

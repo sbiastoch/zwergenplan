@@ -17,21 +17,7 @@ interface ListViewProps {
 }
 
 export function ListView({ groups, remaining, onMore, today, ctx, hasData, onResetFilter }: ListViewProps) {
-  if (groups.length === 0) {
-    return hasData ? (
-      <EmptyState icon="search" title="Diese Seite ist noch leer">
-        Mit diesen Filtern gibt es keine Angebote.
-        <br />
-        <button type="button" className="linkbtn" onClick={onResetFilter}>
-          Filter zurücksetzen
-        </button>
-      </EmptyState>
-    ) : (
-      <EmptyState icon="search" title="Noch keine Angebote">
-        Daten folgen.
-      </EmptyState>
-    );
-  }
+  if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} />;
   return (
     <>
       {groups.map((group) => {
@@ -56,6 +42,23 @@ export function ListView({ groups, remaining, onMore, today, ctx, hasData, onRes
         </p>
       )}
     </>
+  );
+}
+
+/** Leerzustand der Liste und der Karte (Plan 0005, E12): Filter passen nicht, oder es gibt noch keine Daten. */
+export function NoOffers({ hasData, onResetFilter }: { hasData: boolean; onResetFilter: () => void }) {
+  return hasData ? (
+    <EmptyState icon="search" title="Diese Seite ist noch leer">
+      Mit diesen Filtern gibt es keine Angebote.
+      <br />
+      <button type="button" className="linkbtn" onClick={onResetFilter}>
+        Filter zurücksetzen
+      </button>
+    </EmptyState>
+  ) : (
+    <EmptyState icon="search" title="Noch keine Angebote">
+      Daten folgen.
+    </EmptyState>
   );
 }
 

@@ -17,6 +17,7 @@ import {
 } from "../domain/agenda.ts";
 import { clampDay } from "../domain/calendar.ts";
 import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
+import { type Place, placesOf, sortPlaces } from "../domain/places.ts";
 import { type Origin, type Reach, reachTo } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import { savedOffers } from "../domain/saved.ts";
@@ -26,6 +27,7 @@ import { berlinIsoDate } from "../domain/time.ts";
 /** Angebote je Schritt in der Liste (Plan 0003, E8) */
 const PAGE = 40;
 const NO_INDEX: Map<string, Occurrence<SiteOffer>[]> = new Map();
+const NO_PLACES: Place<SiteOffer>[] = [];
 
 export interface OfferViewsInput {
   offers: readonly SiteOffer[];
@@ -67,6 +69,8 @@ export interface OfferViews {
   saved: SiteOffer[];
   /** Angebot aus der URL, falls es im Datenstand existiert */
   detailOffer: SiteOffer | undefined;
+  /** Orte der sichtbaren Angebote, nur in der Kartenansicht; mit Startpunkt nach Entfernung (Plan 0005, E6) */
+  places: Place<SiteOffer>[];
   /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
   reachOf: (offer: SiteOffer) => Reach | undefined;
 }
@@ -128,6 +132,10 @@ export function useOfferViews({
     [offers, route.filter, route.tab, today, now, origin],
   );
   const reachOf = useMemo(() => reachCache(origin), [origin]);
+  const places = useMemo(
+    () => (route.tab === "karte" ? sortPlaces(placesOf(visible), origin) : NO_PLACES),
+    [visible, route.tab, origin],
+  );
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
@@ -153,6 +161,7 @@ export function useOfferViews({
     },
     saved,
     detailOffer: route.offerId ? offers.find((o) => o.id === route.offerId) : undefined,
+    places,
     reachOf,
   };
 }
