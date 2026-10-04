@@ -16,10 +16,10 @@
       note: "Nürnberg-Seite mit dem nächsten Termin (nächster: So 08.11.2026, 11 Uhr). Kartenverkauf über ein eingebettetes Widget (JS). Ca. 3–4 Termine pro Jahr (Frühling/Muttertag, Herbst, Advent)."
   availability:
     shown: teilweise
-    how: Die Seite selbst zeigt keine Restplätze; der Ticketkauf läuft über Eventim (Künstlerseite 'Babykonzert – Klassik auf der Krabbeldecke'), dort ist sichtbar, ob verfügbar oder ausverkauft
-    system: Eventim
+    how: Ticketseite bei Eventim Light zeigt, ob Karten verfügbar oder ausverkauft sind
+    system: Eventim Light
   verified: 2026-10-04
-  notes: "Live-Klassik auf der Krabbeldecke, Decke mitbringen. Erwachsene ca. 21 € (Doppelticket ca. 39 €), Babys und Kinder frei. Häufig schnell ausverkauft. Veranstalter: babykonzert.de (Saskia Dürr). Das Format heißt auch 'Herbst-Babykonzert' (gleicher Veranstalter)."
+  notes: "Live-Klassik auf der Krabbeldecke, Decke mitbringen. Erwachsene ca. 21 € (Doppelticket ca. 39 €), Babys und Kinder frei. Häufig schnell ausverkauft. Veranstalter: babykonzert.de (Saskia Dürr). Das Format heißt auch 'Herbst-Babykonzert' (gleicher Veranstalter). | Ticketverkauf über Eventim Light"
   venues:
     - id: babykonzert-nuernberg
       name: Marmorsaal des Presseclubs
@@ -53,7 +53,7 @@
     how: Offenes Angebot ohne Anmeldung
     system: eigenes CMS (Vereinsportal)
   verified: 2026-10-04
-  notes: Danach Café 'Kostbar' im Haus. Früher gab es hier Musikgarten-Kurse – Seite /programm/familien/musikgarten liefert jetzt 403 (nicht mehr öffentlich), daher nicht aufgenommen. | Freispiel in vorbereiteter Turnhalle, anschließend Café 'Kostbar'. Hallenschuhe/ABS-Socken. Kinderturnen 3-6 J. 14-täglich Mi 16 Uhr ebenfalls kostenlos.
+  notes: Danach Café 'Kostbar' im Haus. Früher gab es hier Musikgarten-Kurse – Seite /programm/familien/musikgarten liefert jetzt 403 (nicht mehr öffentlich), daher nicht aufgenommen. | Freispiel in vorbereiteter Turnhalle, anschließend Café 'Kostbar'. Hallenschuhe/ABS-Socken. Kinderturnen 3-6 J. 14-täglich Mi 16 Uhr ebenfalls kostenlos. | Tohuwabohu-Kirche auch in St. Jakob, Jakobsplatz 1 (Termin 5.12. ohne Uhrzeit)
   venues:
     - id: cvjm-nuernberg-wuselwelt
       name: CVJM-Haus
@@ -61,37 +61,6 @@
       district: Altstadt St. Lorenz
       ring: innen
       geo: { lat: 49.449186, lon: 11.075447 }
-- id: eckstein-treff-alleinerziehende
-  role: anbieter
-  name: Evang. Fachstelle Alleinerziehende – eckstein-Treff (mit Kindern)
-  url: https://www.alleinerziehende-nuernberg.de/
-  topics: [ elterntreff ]
-  age:
-    minMonths: 0
-    maxMonths: 144
-  formats: [ regelmaessig ]
-  costs: [ kostenlos ]
-  registrations: [ ohne-anmeldung ]
-  programme:
-    - url: https://www.alleinerziehende-nuernberg.de/
-      kind: html
-      note: Startseite listet 'Unsere nächsten Termine' (eckstein-Treff letzter Fr im Monat 17-19:30; weitere Veranstaltungen meist MIT paralleler Kinderbetreuung, also ohne Kind)
-    - url: https://www.evangelische-termine.de/ical?vid=925
-      kind: ical
-      note: ET vid=925
-  availability:
-    shown: nein
-    how: "-"
-    system: Gemeinde-CMS + evangelische-termine.de
-  verified: 2026-10-04
-  notes: Einziger Treff in diesem Bereich innerhalb des Rings. Nur für Alleinerziehende; Kinder kommen mit ('ohne Kinderbetreuung organisieren zu müssen'), aber nicht speziell 0-3. Andere Angebote der Fachstelle haben Kinderbetreuung im Nebenraum – für den Skill nur eckstein-Treff/Trauercafé relevant.
-  venues:
-    - id: eckstein-treff-alleinerziehende
-      name: eckstein – haus der kirche
-      address: eckstein – haus der kirche, Burgstraße 1-3, 90403 Nürnberg
-      district: Altstadt (Sebald)
-      ring: innen
-      geo: { lat: 49.456001, lon: 11.076878 }
 - id: hebamme-eva-kauper-wunderwerk
   role: anbieter
   name: Hebamme Eva Kauper – Praxis WunderWerk
@@ -213,7 +182,7 @@
     how: Keine Platzanzeige; Reservierung per Telefon/Kontaktformular beim jeweiligen Kulturladen
     system: keins
   verified: 2026-10-04
-  notes: "Aggregator plus Veranstalter. Puppen- und Erzähltheater für Familien und Kitas, Familienvorstellung 5 € pro Kopf. Die jüngsten Stücke sind ab 3 Jahren (z. B. Dornerei 'Was macht die Maus im Wichtelhaus', So 11.10.2026 15 Uhr im Loni-Übler-Haus), viele erst ab 4. Vormittagstermine (10 Uhr) sind meist für Kitas, Familien eher So/Nachmittag. | Ort Kulturladen Ziegelstein: im ev. Gemeindesaal"
+  notes: "Aggregator plus Veranstalter. Puppen- und Erzähltheater für Familien und Kitas, Familienvorstellung 5 € pro Kopf. Die jüngsten Stücke sind ab 3 Jahren (z. B. Dornerei 'Was macht die Maus im Wichtelhaus', So 11.10.2026 15 Uhr im Loni-Übler-Haus), viele erst ab 4. Vormittagstermine (10 Uhr) sind meist für Kitas, Familien eher So/Nachmittag. | Ort Kulturladen Ziegelstein: im ev. Gemeindesaal | Spielzeit 2026/27: alle Stücke ab 3 bzw. 4 Jahren. Kulturladen Schloss Almoshof spielt im Gemeindezentrum Thon, Cuxhavener Str. 60"
   venues:
     - id: kindertheaterreihe-kuf
       name: Amt für Kultur und Freizeit
@@ -328,7 +297,7 @@
     how: JSON-LD offers.availability = schema.org/SoldOut bzw. InStock je Kursinstanz; im Browser Spalte 'Plätze' und Filter 'Nur Kurse mit freien Plätzen'
     system: Kursolino
   verified: 2026-10-04
-  notes: Becken 4x8 m, 32 °C, keine Wickeltische. Nur ein Elternteil im Wasser.
+  notes: Becken 4x8 m, 32 °C, keine Wickeltische. Nur ein Elternteil im Wasser. | Kursolino liefert Plätze und Einzeltermine per Skript über ?ia=show-mobile bzw. ?ia=get-dates
   venues:
     - id: schwimmschule-ohana-nuernberg
       name: Kliniken Dr. Erler
@@ -359,7 +328,7 @@
     how: Keine Platzanzeige; Anmeldung per Telefon/E-Mail bei der jeweiligen Zweigstelle (Langwasser 0911/231-4157, Maxfeld 0911/231-2460)
     system: keins
   verified: 2026-10-04
-  notes: "Bücherzwerge (Langwasser, 1x/Monat do/mo 10–11 Uhr; 2026: 24.9., 22.10., 19.11., 17.12.) = Fingerspiele, Lieder, Geschichten für 12–36 Monate mit Begleitperson. Lesestart 'Vorlesen & Mehr für Dreijährige' in Langwasser, Maxfeld (Mi 7.10., 4.11.2026, Anmeldung ab ca. 4 Wochen vorher) und Südstadt (Do 24.9., 29.10., 26.11.2026, 16 Uhr). Bilderbuchkinos sind ab 4 Jahren, also nicht 0–3. Eltern-Kind-Yoga Südstadt ab 3 Jahren läuft über Kursnummern des Bildungszentrums (6 € pro Paar). | Anmeldestart: je Termin im Programmheft, etwa 4–6 Wochen vorher (z. B. Lesestart Maxfeld 07.10.: ab 09.09.; 04.11.: ab 23.09.); Kurse mit Kursnummer online über bz.nuernberg.de | Ort Stadtbibliothek Zentrum, Kinderbibliothek L3: Lesestart-Sets 1-2-3 zum Abholen, keine Babytermine im Halbjahr 2/2026 | Ort Stadtbibliothek Langwasser: Bücherzwerge 12–36 Monate, Lesestart für Dreijährige | Ort Stadtbibliothek Maxfeld: Lesestart für Dreijährige | Ort Stadtbibliothek Südstadt im südpunkt: Lesestart für Dreijährige"
+  notes: "Bücherzwerge (Langwasser, 1x/Monat do/mo 10–11 Uhr; 2026: 24.9., 22.10., 19.11., 17.12.) = Fingerspiele, Lieder, Geschichten für 12–36 Monate mit Begleitperson. Lesestart 'Vorlesen & Mehr für Dreijährige' in Langwasser, Maxfeld (Mi 7.10., 4.11.2026, Anmeldung ab ca. 4 Wochen vorher) und Südstadt (Do 24.9., 29.10., 26.11.2026, 16 Uhr). Bilderbuchkinos sind ab 4 Jahren, also nicht 0–3. Eltern-Kind-Yoga Südstadt ab 3 Jahren läuft über Kursnummern des Bildungszentrums (6 € pro Paar). | Anmeldestart: je Termin im Programmheft, etwa 4–6 Wochen vorher (z. B. Lesestart Maxfeld 07.10.: ab 09.09.; 04.11.: ab 23.09.); Kurse mit Kursnummer online über bz.nuernberg.de | Ort Stadtbibliothek Zentrum, Kinderbibliothek L3: Lesestart-Sets 1-2-3 zum Abholen, keine Babytermine im Halbjahr 2/2026 | Ort Stadtbibliothek Langwasser: Bücherzwerge 12–36 Monate, Lesestart für Dreijährige | Ort Stadtbibliothek Maxfeld: Lesestart für Dreijährige | Ort Stadtbibliothek Südstadt im südpunkt: Lesestart für Dreijährige | Programmheft 1/2027 noch nicht online (404)"
   venues:
     - id: stadtbibliothek-nuernberg
       name: Stadtbibliothek Zentrum, Kinderbibliothek L3
@@ -411,7 +380,7 @@
     how: Im Eventim-Inhouse-Webshop sind freie Plätze bzw. 'ausverkauft' je Vorstellung sichtbar (JS)
     system: Eventim Inhouse (kukuq)
   verified: 2026-10-04
-  notes: "Theater, Musik, Geschichten, Ballett, Märchenstunde mit dem Christkind. Ein Ticket brauchen Kinder ab 3 Jahren; bei Veranstaltungen, die sich ausdrücklich an Kinder ab 2 richten, schon ab 2. Ein Teil des Programms ist also für 2–3-Jährige. Die Altersangabe steht je Veranstaltung. | Einziger KUF-Ort innerhalb des Rings; nur saisonal (Advent). Für 0-1 J. kaum geeignet; Stücke 'ab 2' gezielt suchen. Liegt an der Kinderweihnacht (Hans-Sachs-Platz). | Anmeldestart: Familienprogramm und Ticketvorverkauf ab 13. Oktober (Saison 28.11.–23.12.); Kitas/Schulen seit 28.09."
+  notes: "Theater, Musik, Geschichten, Ballett, Märchenstunde mit dem Christkind. Ein Ticket brauchen Kinder ab 3 Jahren; bei Veranstaltungen, die sich ausdrücklich an Kinder ab 2 richten, schon ab 2. Ein Teil des Programms ist also für 2–3-Jährige. Die Altersangabe steht je Veranstaltung. | Einziger KUF-Ort innerhalb des Rings; nur saisonal (Advent). Für 0-1 J. kaum geeignet; Stücke 'ab 2' gezielt suchen. Liegt an der Kinderweihnacht (Hans-Sachs-Platz). | Anmeldestart: Familienprogramm und Ticketvorverkauf ab 13. Oktober (Saison 28.11.–23.12.); Kitas/Schulen seit 28.09. | Familienprogramm erscheint erst ab 13.10.2026 – danach neu prüfen"
   venues:
     - id: sternenhaus-kuf
       name: Sternenhaus – Kinderkultur in der Vorweihnachtszeit (KUF)
@@ -500,7 +469,7 @@
     how: "Detailseite (?mode=detail): 'X von Y Plätzen frei' bzw. 'Veranstaltung ist ausgebucht' + Anmeldefrist. In Listen steht im Titel-Suffix '- Ausgebucht!' bzw. '- Abgesagt!'"
     system: eigenes CMS (Kirchen-CMS mit Online-Anmeldeformular, Detail-URLs mit GUID ?mode=detail)
   verified: 2026-10-04
-  notes: "Familienstützpunkt, innerhalb der Stadtmauer. Listen zeigen Termin-Spanne (Beginn - Ende) und Titel; Plätze nur auf Detailseite. PEKiP 92 €/8 Treffen; Elterntreff kostenlos, aber Anmeldung nötig. | Programmheft-PDF und Website können abweichen (Herbst 2026: Starttermine verschoben) – Website gilt. | Anmeldeschluss: 1 Woche vor Kursbeginn (gilt für alle Veranstaltungen) | Wechselnder Treffpunkt: Waldspielgruppen / Papa+Ich Wald (Treffpunkt je Kurs auf Detailseite), wechselnd, Nürnberger Wald"
+  notes: "Familienstützpunkt, innerhalb der Stadtmauer. Listen zeigen Termin-Spanne (Beginn - Ende) und Titel; Plätze nur auf Detailseite. PEKiP 92 €/8 Treffen; Elterntreff kostenlos, aber Anmeldung nötig. | Programmheft-PDF und Website können abweichen (Herbst 2026: Starttermine verschoben) – Website gilt. | Anmeldeschluss: 1 Woche vor Kursbeginn (gilt für alle Veranstaltungen) | Wechselnder Treffpunkt: Waldspielgruppen / Papa+Ich Wald (Treffpunkt je Kurs auf Detailseite), wechselnd, Nürnberger Wald | PDF-Heft weicht von der Website ab (Website gilt). Waldtreffpunkte: „Im Wald am Nürnberger Tiergarten“ und „Rehhof“ (ohne genaue Adresse)"
   venues:
     - id: zoff-harmonie
       name: Haus der Katholischen Stadtkirche
@@ -586,7 +555,7 @@
     how: Eversports zeigt freie Plätze/ausgebucht je Termin (nur im Browser); PEKiP aktuell Warteliste, neue Kurse ab 26.11.2026
     system: Eversports
   verified: 2026-10-04
-  notes: "Familienzentrum mit vielen externen Kursleiterinnen (u. a. Anne Schulz, PEKiP Jasmin Amjadi Manesh). Evtl. Überschneidung mit Familienzentren-Liste. | Familienzentrum mit sehr breitem Programm (PEKiP, Babymassage, Spielgruppen, Café) – hier nur der Bewegungsteil; vermutlich auch im Familienbildungs-Bereich erfasst (Duplikat zusammenführen). Rosenaustraße ca. 500 m westlich des Spittlertors. | Anmeldestart: PEKiP-Folgekurse zuerst für Bestandsfamilien, dann für die Warteliste, danach freier Verkauf (z. B. Kurse ab 26.11.2026)"
+  notes: "Familienzentrum mit vielen externen Kursleiterinnen (u. a. Anne Schulz, PEKiP Jasmin Amjadi Manesh). Evtl. Überschneidung mit Familienzentren-Liste. | Familienzentrum mit sehr breitem Programm (PEKiP, Babymassage, Spielgruppen, Café) – hier nur der Bewegungsteil; vermutlich auch im Familienbildungs-Bereich erfasst (Duplikat zusammenführen). Rosenaustraße ca. 500 m westlich des Spittlertors. | Anmeldestart: PEKiP-Folgekurse zuerst für Bestandsfamilien, dann für die Warteliste, danach freier Verkauf (z. B. Kurse ab 26.11.2026) | Babymassage und Beikost bietet Hebamme Anne Schulz an – dort erfasst (hebanne-schulz). Outdoor-Fitness-Seite veraltet. Eversports ohne Browser nicht lesbar"
   venues:
     - id: die-familienbox
       name: Die FamilienBox – Das 'Dorf' für Familien
@@ -641,7 +610,7 @@
     how: "Ampel je Kurs in Liste UND Detailseite (/veranstaltung/<slug>/): HTML <span class='ampel green' title='Anmelden (Frei)'>, 'ampel yellow' (Restplätze frei), 'ampel red' (Veranstaltung belegt - Anmeldung auf Warteliste), 'ampel blue' (Online-Anmeldung nicht möglich). Im Text nur bei belegt: 'Kurs belegt – Sie können sich anmelden und werden auf eine Warteliste gesetzt.' – Ampel daher aus Roh-HTML (title-Attribut) lesen, nicht aus Text"
     system: WordPress mit eigener Kursverwaltung (Anmeldung über ?anmelden, 'Mein Konto'); kein Event-JSON-API gefunden
   verified: 2026-10-04
-  notes: "Größter Anbieter im Bereich. Laufende Kurse erlauben oft Quereinstieg (anteilige Gebühr). Offene Treffs sind wöchentlich ohne Termintabelle – Skill sollte Wochenregel ausrollen und bayerische Schulferien ausnehmen. Café Lichtblick/Frische Brise/Auszeit sind keine 0-3-Eltern-Kind-Angebote. | FBS ist auch Kursanbieter (Eltern-Kind-Kurse, PEKiP) – Kurse ggf. in anderer Datei; hier nur die offenen Treffs. Krabbelkäfer und MilchZeit direkt hintereinander kombinierbar. Café 'Frische Brise' existiert nicht mehr (aufgegangen in Familien-/BewegungsOase). | Ort FBS Haupthaus: Kursräume Zimmer 2/5/10, Offener Bereich | Ort Gemeindehaus Thomaskirche Großreuth: Musik | Ort Waldracker: Wald, Treffpunkt Parkplatz beim Spielplatz"
+  notes: "Größter Anbieter im Bereich. Laufende Kurse erlauben oft Quereinstieg (anteilige Gebühr). Offene Treffs sind wöchentlich ohne Termintabelle – Skill sollte Wochenregel ausrollen und bayerische Schulferien ausnehmen. Café Lichtblick/Frische Brise/Auszeit sind keine 0-3-Eltern-Kind-Angebote. | FBS ist auch Kursanbieter (Eltern-Kind-Kurse, PEKiP) – Kurse ggf. in anderer Datei; hier nur die offenen Treffs. Krabbelkäfer und MilchZeit direkt hintereinander kombinierbar. Café 'Frische Brise' existiert nicht mehr (aufgegangen in Familien-/BewegungsOase). | Ort FBS Haupthaus: Kursräume Zimmer 2/5/10, Offener Bereich | Ort Gemeindehaus Thomaskirche Großreuth: Musik | Ort Waldracker: Wald, Treffpunkt Parkplatz beim Spielplatz | Kursseiten sind lang: fetch-page mit --max-chars 1000000 abrufen, sonst fehlen Kurse"
   venues:
     - id: fbs-nuernberg
       name: FBS Haupthaus
@@ -679,9 +648,6 @@
     - url: https://www.hebammen-johannis.de/kurse
       kind: html
       note: Eine lange Seite mit allen Kursen (inkl. Gastkursleiterinnen); Termine als Freitext
-    - url: https://musikgarten-cuesta.beeaware.de
-      kind: js
-      note: Musikgarten (Silvia Cuesta) in den Praxisräumen, eigene Buchung
     - url: https://www.wolfpack.yoga
       kind: html
       note: Yoga mit Baby (Simone, Do 9:15) – Starttermine
@@ -690,7 +656,7 @@
     how: Keine Platzanzeige; Anmeldung per Telefon/Mail bei der jeweiligen Kursleitung
     system: keins
   verified: 2026-10-04
-  notes: Babymassage nach Leboyer auf Anfrage (Do vormittags, 90 €); Yoga mit Baby 3-12 M. (Do 9:15, 96 €, nächste Starts auf Seite teils veraltet); Tanzen für Mama & Baby in der Trage (Di 11:15, 80 €); Musikgarten; Erste Hilfe am Kind (Babys bis 6 M. dürfen mit). Rückbildung OHNE Baby und nur für betreute Frauen.
+  notes: Babymassage nach Leboyer auf Anfrage (Do vormittags, 90 €); Yoga mit Baby 3-12 M. (Do 9:15, 96 €, nächste Starts auf Seite teils veraltet); Tanzen für Mama & Baby in der Trage (Di 11:15, 80 €); Musikgarten; Erste Hilfe am Kind (Babys bis 6 M. dürfen mit). Rückbildung OHNE Baby und nur für betreute Frauen. | Musikgarten-Cuesta-Buchungsseite tot (HTTP 500, fremde Inhalte) – entfernt. Yoga mit Baby aktuell auf wolfpack.yoga/yoga-mit-baby
   venues:
     - id: hebammen-johannis
       name: Hebammen in Johannis (Hebammenpraxis St. Johannis)
@@ -717,11 +683,11 @@
       kind: html
       note: Detailseite Achtsame Babymassage
   availability:
-    shown: nein
-    how: Nur 'Hier anmelden'-Links, keine Platzanzeige
+    shown: ja
+    how: Detailseiten zeigen die Teilnehmerzahl X/Y
     system: keins
   verified: 2026-10-04
-  notes: Achtsame Babymassage Mo 09.11.-21.12.2026 11:00-12:15 (85 €); Beikosteinführung 14.10.2026; Trageworkshop 13.10.2026. Alle Kurse finden in der FamilienBox statt (siehe die-familienbox).
+  notes: Achtsame Babymassage Mo 09.11.-21.12.2026 11:00-12:15 (85 €); Beikosteinführung 14.10.2026; Trageworkshop 13.10.2026. Alle Kurse finden in der FamilienBox statt (siehe die-familienbox). | Babymassage laut Detailseite 105 €
   venues:
     - id: hebanne-schulz
       name: HebAnne – Hebamme Anne Schulz
@@ -978,15 +944,12 @@
     - url: https://www.evangelische-termine.de/ical?vid=1496
       kind: ical
       note: ET vid=1496, Titel 'Mini-Club' (Musikzwerge dort = 4-7 J., nicht relevant)
-    - url: https://www.cvjm-nuernberg-gostenhof.de/eventcalendar?calendar=27&cats_as_string=gruppen;veranstaltungen;digitale-angebote;
-      kind: html
-      note: "Vereinskalender (war bei Prüfung leer: 'Es wurden keine Termine gefunden')"
   availability:
     shown: nein
     how: keine Platzanzeige
     system: CVJM-CMS + evangelische-termine.de
   verified: 2026-10-04
-  notes: Ca. 1,1 km vom Spittlertorgraben. Kosten nicht angegeben (cost=kostenlos ist Annahme, unbestätigt). | Kosten/Anmeldung auf der Seite nicht angegeben (offen formuliert 'Wir freuen uns auf Euer Kommen'); Einzeltermine stehen im frankenkids-Kalender. Die dortigen 'Musikzwerge' sind 4-7 J (nicht 0-3).
+  notes: Ca. 1,1 km vom Spittlertorgraben. Kosten nicht angegeben (cost=kostenlos ist Annahme, unbestätigt). | Kosten/Anmeldung auf der Seite nicht angegeben (offen formuliert 'Wir freuen uns auf Euer Kommen'); Einzeltermine stehen im frankenkids-Kalender. Die dortigen 'Musikzwerge' sind 4-7 J (nicht 0-3). | Eigener Veranstaltungskalender lieferte 0 Treffer – Termine über evangelische-termine/frankenkids
   venues:
     - id: cvjm-gostenhof-miniclub
       name: CVJM Nürnberg-Gostenhof – Mini-Club
@@ -1014,7 +977,7 @@
     how: Keine Platzanzeige
     system: keins
   verified: 2026-10-04
-  notes: "Vereinsmitgliedschaft; Terminkalender-Shortcode [MEC] auf der Seite nicht gerendert. | Koordinate: Straßenmitte Fürreuthweg (Hausnummer unbekannt)"
+  notes: "Vereinsmitgliedschaft; Terminkalender-Shortcode [MEC] auf der Seite nicht gerendert. | Koordinate: Straßenmitte Fürreuthweg (Hausnummer unbekannt) | Trainingszeiten-Tabelle Stand 31.03.2023, Termin-Widget lädt nicht; Mini-Club ohne Zeitangabe"
   venues:
     - id: djk-eibach
       name: DJK Nürnberg-Eibach – Eltern-Kind-Turnen und Mini-Club
@@ -1032,7 +995,7 @@
     maxMonths: 72
   formats: [ regelmaessig, einmalig ]
   costs: [ kostenlos ]
-  registrations: [ ohne-anmeldung ]
+  registrations: [ mit-anmeldung ]
   programme:
     - url: https://www.evangelische-termine.de/ical?vid=556
       kind: ical
@@ -1052,6 +1015,7 @@
       district: Fischbach
       ring: aussen
       geo: { lat: 49.419786, lon: 11.195889 }
+  notes: Mutter-Kind-Gruppen in festen Gruppen (ca. 3 Monate bis 4 Jahre), Aufnahme per E-Mail; evangelische-termine nennt abweichend „ab 3 Jahren“
 - id: ev-zerzabelshof-musikzwerge
   role: anbieter
   name: Ev. Auferstehungskirche Zerzabelshof – Musikzwerge (Eltern mit Baby/Kleinkind)
@@ -1216,7 +1180,7 @@
     how: "-"
     system: evangelische-termine.de
   verified: 2026-10-04
-  notes: "Zusätzlich 'Familienarbeit Eibach' (Motterstraße 1) als städtischer Familientreffpunkt gelistet. | Koordinate: Faberpark (Treffpunkt laut Beschreibung)"
+  notes: "Zusätzlich 'Familienarbeit Eibach' (Motterstraße 1) als städtischer Familientreffpunkt gelistet. | Koordinate: Faberpark (Treffpunkt laut Beschreibung) | Waldkrabbelgruppe 70 € je 10er-Block (laut evangelische-termine)"
   venues:
     - id: ev-eibach
       name: Gemeindehaus Eibach, Kleiner Saal
@@ -1255,7 +1219,7 @@
     how: offener Treff, keine Plätze
     system: WordPress + evangelische-termine.de
   verified: 2026-10-04
-  notes: Café für Alle ist generationenübergreifend, nicht nur 0-3.
+  notes: "Café für Alle ist generationenübergreifend, nicht nur 0-3. | Café für Alle: Website nennt Di 15–18 und Di 14–17 Uhr, evangelische-termine Di 15–17 Uhr"
   venues:
     - id: ev-st-markus-gibitzenhof
       name: Markuskirche / FreiRaum
@@ -1521,7 +1485,7 @@
     how: Gemeindeseite vermerkt '(Gruppe ist voll belegt)' bzw. 'Neue Mamis willkommen'; ET ohne Platzangabe
     system: Gemeinde-CMS + evangelische-termine.de
   verified: 2026-10-04
-  notes: "Familienzentrum Julienstraße (www.evang-familienzentrum-julienstr.de/angebote/) bietet zusätzlich Elterncafé nur für eigene Kita-Familien. Kirche Kunterbunt (ohne 'Mini') ist für ältere Kinder. | Ort Evang. Familienzentrum Julienstraße: Turnhalle"
+  notes: "Familienzentrum Julienstraße (www.evang-familienzentrum-julienstr.de/angebote/) bietet zusätzlich Elterncafé nur für eigene Kita-Familien. Kirche Kunterbunt (ohne 'Mini') ist für ältere Kinder. | Ort Evang. Familienzentrum Julienstraße: Turnhalle | Kirche-Kunterbunt-Flyer auf der Website noch von 2025/26"
   venues:
     - id: ev-st-johannis
       name: TabeaHaus
@@ -1639,6 +1603,7 @@
       address: Dr.-Linnert-Ring 28, 90473 Nürnberg
       ring: aussen
       geo: { lat: 49.396995, lon: 11.125972 }
+  notes: Mini-Club Passionskirche Do 15:30–17 Uhr weder auf evangelische-termine noch auf der Gruppenseite
 - id: feg-nuernberg-eltern-kind-kreis
   role: anbieter
   name: Freie evangelische Gemeinde (FeG) Nürnberg – Eltern-Kind-Kreis 'Zwergenaufstand'
@@ -1687,7 +1652,7 @@
     how: Keine Termine/Plätze online; 10er-Kurs oder MamaFLAT, Kontakt hello@fryday-nbg.com
     system: keins
   verified: 2026-10-04
-  notes: "Niedrige Priorität: Angebot beschrieben, aber keine Termine prüfbar – für Zeitraumsuche nur als Hinweis nutzbar."
+  notes: "Niedrige Priorität: Angebot beschrieben, aber keine Termine prüfbar – für Zeitraumsuche nur als Hinweis nutzbar. | Wochenplan nur als Bild mit Stand 01/2023 – aktuelles Angebot unklar"
   venues:
     - id: fryday-nuernberg
       name: FRYDAY Fitnessstudio – Mama Plus Baby Fitness
@@ -1719,12 +1684,15 @@
     - url: https://kinder-hautnah.de/termine-aktuelles/
       kind: html
       note: "Stillberaterin Sonja Knittel: Stilltreff 'Milch-Café' (i. d. R. 2. Mi im Monat 10-11:30, 8 €; 14.10., 11.11., 9.12.2026) mit Spalte 'Freie Plätze'"
+    - url: https://deinkindernotfallkurs.de/
+      kind: html
+      note: Kindernotfallkurs (Termine und Uhrzeiten)
   availability:
     shown: teilweise
     how: Nest-Seite ohne Platzanzeige; Hebamio-Listen zeigen 'Plätze vorhanden'/'Noch wenige Plätze'/'auf Warteliste setzen'; kinder-hautnah zeigt 'Anmeldung möglich'
     system: Hebamio + WordPress
   verified: 2026-10-04
-  notes: Domain nuernberger-nest.de hatte beim Test sporadisch DNS-Fehler (Retry nötig). Babymassage mit Noelle (Di 10-11, 110 €) pausiert bis Oktober 2026. Hebammen-Urlaub 17.12.26-17.01.27.
+  notes: Domain nuernberger-nest.de hatte beim Test sporadisch DNS-Fehler (Retry nötig). Babymassage mit Noelle (Di 10-11, 110 €) pausiert bis Oktober 2026. Hebammen-Urlaub 17.12.26-17.01.27. | Katrina Bauersachs ab 22.02.2027 in der Karolinenstraße 1A, 90402 Nürnberg
   venues:
     - id: geburtshaus-nuernberger-nest
       name: Geburtshaus Nürnberger Nest
@@ -1750,12 +1718,18 @@
     - url: https://www.happy-bellies.de/kurse
       kind: html
       note: "Kursübersicht: Rückbildung Basis/Aufbau (Babys willkommen), Mamas Mitte – Detailseiten mit 'wo/wann/termine'"
+    - url: https://www.happy-bellies.de/kopie-von-laufamholz
+      kind: html
+      note: Rückbildung Basiskurs (Termine)
+    - url: https://www.happy-bellies.de/kopie-von-m%C3%B6geldorf
+      kind: html
+      note: Rückbildung Aufbaukurs (Termine)
   availability:
     shown: nein
     how: Anmeldung per E-Mail, keine Platzanzeige
     system: keins (Wix-Seite, E-Mail)
   verified: 2026-10-04
-  notes: Folgetermine des Kinderwagenkurses nach 23.10. noch nicht veröffentlicht.
+  notes: Folgetermine des Kinderwagenkurses nach 23.10. noch nicht veröffentlicht. | Termine der Rückbildungskurse auf eigenen Unterseiten
   venues:
     - id: happy-bellies
       name: Happy Bellies (Physio Tine) – Kinderwagenkurs Outdoor & Rückbildung mit Baby
@@ -2018,7 +1992,7 @@
     how: Keine Platzanzeige; Anmeldung über die Musikschule (Schuljahreskurs)
     system: keins
   verified: 2026-10-04
-  notes: "Ist ein Kurs, kein Kulturtermin. Kann sich mit der Datei zu Musik-/Babykursen überschneiden, dort ggf. deduplizieren. Auf den Konzertseiten der Musikschule gibt es keine Krabbelkonzerte. | Gebühren laut Gebührensatzung (PDF). Für Terminsuche: als 'regelmäßig wöchentlich außer Schulferien' behandeln. | Anmeldestart: ganzjährig, Vergabe nach Eingangsdatum; Einteilung fürs neue Schuljahr 1.7.–31.8. | Ort Kulturwerkstatt Auf AEG: Di 15.45 / 16.45 Uhr | Ort Musikschule Ziegenstraße: Mo 15 / 16 Uhr"
+  notes: "Ist ein Kurs, kein Kulturtermin. Kann sich mit der Datei zu Musik-/Babykursen überschneiden, dort ggf. deduplizieren. Auf den Konzertseiten der Musikschule gibt es keine Krabbelkonzerte. | Gebühren laut Gebührensatzung (PDF). Für Terminsuche: als 'regelmäßig wöchentlich außer Schulferien' behandeln. | Anmeldestart: ganzjährig, Vergabe nach Eingangsdatum; Einteilung fürs neue Schuljahr 1.7.–31.8. | Ort Kulturwerkstatt Auf AEG: Di 15.45 / 16.45 Uhr | Ort Musikschule Ziegenstraße: Mo 15 / 16 Uhr | Ort „Musikschule Ziegenstraße“ mit dem Musikschulschlösschen (Ziegenstraße 12) zusammengeführt"
   venues:
     - id: musikschule-nuernberg-eltern-kind
       name: Kulturwerkstatt Auf AEG
@@ -2026,11 +2000,6 @@
       district: Muggenhof
       ring: aussen
       geo: { lat: 49.460658, lon: 11.03232 }
-    - id: musikschule-nuernberg-eltern-kind-musikschule-ziegenstrasse
-      name: Musikschule Ziegenstraße
-      address: Ziegenstraße, Nürnberg (Hausnummer nicht geprüft)
-      ring: aussen
-      geo: { lat: 49.464606, lon: 11.135605 }
     - id: musikschule-nuernberg-eltern-kind-musikschulschloesschen
       name: Musikschulschlösschen Ziegenstraße
       address: Ziegenstraße 12, 90482 Nürnberg (Mögeldorf)
@@ -2066,12 +2035,18 @@
     - url: https://mutherstudio.com/kursplan-mutherstudio
       kind: html
       note: Verweist nur auf Canva-Kursplan (Bild)
+    - url: https://mutherstudio.com/waldspielracker
+      kind: html
+      note: Waldspielgruppe ab 15 Monaten
+    - url: https://mutherstudio.thrivecart.com/mama-mini--mental-health-6x-mittwochs/
+      kind: html
+      note: Mama, Mini & Mental Health (Checkout mit Terminen)
   availability:
     shown: nein
     how: Keine Platzanzeige; 'sobald die Kapazitäten voll sind, schließt die Anmeldung'
     system: Squarespace + Canva-Kursplan
   verified: 2026-10-04
-  notes: "Schwerpunkt Mama-Coaching; Detailseite /babymassagekurs liefert 404 – Babymassage-Angebot evtl. eingestellt. Termine nur im Canva-Bild. | Auch Waldspielracker (ab 16 Mon.) und Musikzwerge (ab 6 Mon.) – evtl. anderer Bereich. Studio liegt im Nürnberger Norden (Kraftshof). | Anmeldeschluss: kein festes Datum – schließt, sobald der Kurs voll ist (6–12 Kinder)"
+  notes: "Schwerpunkt Mama-Coaching; Detailseite /babymassagekurs liefert 404 – Babymassage-Angebot evtl. eingestellt. Termine nur im Canva-Bild. | Auch Waldspielracker (ab 16 Mon.) und Musikzwerge (ab 6 Mon.) – evtl. anderer Bereich. Studio liegt im Nürnberger Norden (Kraftshof). | Anmeldeschluss: kein festes Datum – schließt, sobald der Kurs voll ist (6–12 Kinder) | Koordinate Waldtreffpunkt: Spielplatz Schiestlstraße, genauer Treffpunkt erst nach Buchung. Babymassage-Seiten 404 (vermutlich eingestellt)"
   venues:
     - id: mutherstudio
       name: MUTHERSTUDIO Nürnberg
@@ -2079,6 +2054,11 @@
       district: Kraftshof
       ring: aussen
       geo: { lat: 49.512361, lon: 11.047005 }
+    - id: mutherstudio-spielplatz-schiestlstrasse
+      name: Spielplatz Schiestlstraße (Waldspielracker)
+      address: Schiestlstraße, 90427 Nürnberg (Kraftshof)
+      ring: aussen
+      geo: { lat: 49.511053, lon: 11.052141 }
 - id: nachbarschaftshaus-gostenhof
   role: anbieter
   name: Nachbarschaftshaus Gostenhof – Offenes Kinderzimmer
@@ -2197,7 +2177,7 @@
     how: "Kurstabellen Spalte 'Belegung' = 'Platz frei' / 'ausgebucht'; Detailseite 'Freie Plätze: ...' + Warteliste. Dauerangebote (Turnzwerge) ohne Platzanzeige"
     system: eigenes WordPress-Kursplugin (wpmp_kurse)
   verified: 2026-10-04
-  notes: "Schwimmkurse 10 Einheiten, Nichtmitglieder 180 EUR / Mitglieder 95 EUR; aktuell Baby 3-6 Mon. (Fr 10:45) Platz frei, 6-12 Mon. ausgebucht. Turnzwerge/Krabbelturner nur mit Vereinsmitgliedschaft + Zusatzbeitrag 'Fit und Gesund – Kinder', Probestunde möglich (dann ohne Anmeldung). | Anmeldeschluss: vor Kursbeginn – kein Einstieg in laufende Schwimmkurse (Kindersport ohne feste Buchung) | Ort Hallenbad Ebensee: Babyschwimmen 3-12 Mon., Kleinkindschwimmen 2-4 J. | Ort Sportzentrum Nordost: Krabbelturner 0-1, Turnzwerge 1-2 / 2-3 | Ort Vereinshalle Hasenbuck: Turnzwerge 1-3 | Ort Theodor-Billroth-Schule: Turnzwerge 1-3 | Ort Sportpark Schweinau: Turnzwerge 1-3"
+  notes: "Schwimmkurse 10 Einheiten, Nichtmitglieder 180 EUR / Mitglieder 95 EUR; aktuell Baby 3-6 Mon. (Fr 10:45) Platz frei, 6-12 Mon. ausgebucht. Turnzwerge/Krabbelturner nur mit Vereinsmitgliedschaft + Zusatzbeitrag 'Fit und Gesund – Kinder', Probestunde möglich (dann ohne Anmeldung). | Anmeldeschluss: vor Kursbeginn – kein Einstieg in laufende Schwimmkurse (Kindersport ohne feste Buchung) | Ort Hallenbad Ebensee: Babyschwimmen 3-12 Mon., Kleinkindschwimmen 2-4 J. | Ort Sportzentrum Nordost: Krabbelturner 0-1, Turnzwerge 1-2 / 2-3 | Ort Vereinshalle Hasenbuck: Turnzwerge 1-3 | Ort Theodor-Billroth-Schule: Turnzwerge 1-3 | Ort Sportpark Schweinau: Turnzwerge 1-3 | Eltern-Kind-Turnen 2–4 J. (Mo 16:30) in der Reutersbrunnenschule"
   venues:
     - id: post-sv-nuernberg
       name: Hallenbad Ebensee
@@ -2225,6 +2205,12 @@
       address: Daimlerstraße 71, 90441 Nürnberg
       ring: aussen
       geo: { lat: 49.423172, lon: 11.043514 }
+    - id: post-sv-nuernberg-reutersbrunnenschule
+      name: Turnhalle Reutersbrunnenschule
+      address: Reutersbrunnenstraße 12, 90429 Nürnberg
+      district: Himpfelshof
+      ring: knapp-aussen
+      geo: { lat: 49.4532419, lon: 11.0583717 }
 - id: schwimmschule-baer-ritterbad
   role: anbieter
   name: Schwimmschule Bär – Babyschwimmen im Ritterbad
@@ -2282,7 +2268,7 @@
     how: "Kursorganizer: freie Plätze bzw. Warteliste je Kurs (API freePlaces/waitListCount)"
     system: Kursorganizer
   verified: 2026-10-04
-  notes: "Altersstufen: Babyschwimmen 1 ab 3 Mon., Babyschwimmen 2 ab 8 Mon., Kleinkinderschwimmen ab 15 Mon., Eltern-Kind-Schwimmen 1 ab 2,5 J. Monatliche Kursgebühr. Babykurse Langwasser im Sept-Block ausgebucht (Warteliste). Fürth-Standort (Schwimmwelt) ist nicht Nürnberg. | Anmeldestart: Kurse werden standortweise freigeschaltet; Vormerkung mit E-Mail-Benachrichtigung bei Freischaltung (https://www.schwimmschule-wassermaeuse.de/kurs-vormerken/) | Ort Nürnberg Langwasser: NürnbergBad-Gelände; Babyschwimmen, Kleinkinder, Eltern-Kind | Ort Boxdorfer Werkstatt: Eltern-Kind-Schwimmen 2 ab 3,5 J. | Ort Nürnberg West, Tagesstätte Zentrum für Körper- und Sprachbehinderte: derzeit wegen Renovierung geschlossen"
+  notes: "Altersstufen: Babyschwimmen 1 ab 3 Mon., Babyschwimmen 2 ab 8 Mon., Kleinkinderschwimmen ab 15 Mon., Eltern-Kind-Schwimmen 1 ab 2,5 J. Monatliche Kursgebühr. Babykurse Langwasser im Sept-Block ausgebucht (Warteliste). Fürth-Standort (Schwimmwelt) ist nicht Nürnberg. | Anmeldestart: Kurse werden standortweise freigeschaltet; Vormerkung mit E-Mail-Benachrichtigung bei Freischaltung (https://www.schwimmschule-wassermaeuse.de/kurs-vormerken/) | Ort Nürnberg Langwasser: NürnbergBad-Gelände; Babyschwimmen, Kleinkinder, Eltern-Kind | Ort Boxdorfer Werkstatt: Eltern-Kind-Schwimmen 2 ab 3,5 J. | Ort Nürnberg West, Tagesstätte Zentrum für Körper- und Sprachbehinderte: derzeit wegen Renovierung geschlossen | Boxdorfer Werkstatt jetzt auch Babyschwimmen 2 (ab 8 Mon.). Neue Orte Klinikum Nürnberg-Süd und Zentrum für Hörgeschädigte/Bertha-von-Suttner (Maximilianstraße) nur mit Kursen ab 4 J.; Adresse des Orts „Nürnberg West“ prüfen"
   venues:
     - id: schwimmschule-wassermaeuse-nuernberg
       name: Nürnberg Langwasser
@@ -2323,7 +2309,7 @@
     how: "Keine Platzanzeige; Mini-FiSche: 'Bitte erkundigen Sie sich nach freien Plätzen'"
     system: keins (Stadtportal nuernberg.de, Imperia CMS)
   verified: 2026-10-04
-  notes: "Der auf der städtischen 0-3-Seite verlinkte Familien-Café-Link (asd_fisch/aktuell_93794.html) ist tot (404) – Infos stehen auf elterntreffs.html. Mini-FiSche = feste Krabbelgruppen (Monatsbeitrag), kein Drop-in. | Die von nuernberg.de/familienbildung verlinkte Seite asd_fisch/aktuell_93794.html ist 404 – nur elterntreffs.html verwenden. Einstieg auch über www.fisch.nuernberg.de. | Ort Turnhalle Wahlerschule: Eltern-Kind-Turnen, Vater-Kind-Turnhalle"
+  notes: "Der auf der städtischen 0-3-Seite verlinkte Familien-Café-Link (asd_fisch/aktuell_93794.html) ist tot (404) – Infos stehen auf elterntreffs.html. Mini-FiSche = feste Krabbelgruppen (Monatsbeitrag), kein Drop-in. | Die von nuernberg.de/familienbildung verlinkte Seite asd_fisch/aktuell_93794.html ist 404 – nur elterntreffs.html verwenden. Einstieg auch über www.fisch.nuernberg.de. | Ort Turnhalle Wahlerschule: Eltern-Kind-Turnen, Vater-Kind-Turnhalle | Programm-PDF heißt noch programmjanfeb24.pdf; Wochentage dort teils falsch (Website gilt)"
   venues:
     - id: stadtteilhaus-fisch
       name: Stadtteilhaus FiSch
@@ -2420,7 +2406,7 @@
     how: "Eigene Kurse: Eversports mit Platzanzeige (JS); externe Partnerkurse (mit * markiert): Terminliste ohne Platzanzeige, Buchung per Formular/Warteliste"
     system: Eversports + WordPress-Formulare
   verified: 2026-10-04
-  notes: Sehr großes 0-3-Angebot; Events z. B. Laternenumzug 3.11.2026, Halloween-Spielecafé 27./28.10. Evtl. Überschneidung mit Familien-/Sportstudio-Liste. | Kurse finden im Studio Herzschlag statt (dort auch im Kalender gelistet) – bei Dedup beachten. | Spiel-Café ~6 EUR/Erw. inkl. Getränke, Anmeldung über Kalender. Studio vermietet Räume an externe Kursleitungen (Mamalea u.a.) – Dedup mit mamalea-musikzauber. | Breites Familienstudio (auch PEKiP, Babymassage, Krabbel-Café – evtl. Überschneidung mit anderen Bereichen). Wellpass/Wellhub-Drop-ins möglich. Ca. 1 km östlich des Laufertors.
+  notes: "Sehr großes 0-3-Angebot; Events z. B. Laternenumzug 3.11.2026, Halloween-Spielecafé 27./28.10. Evtl. Überschneidung mit Familien-/Sportstudio-Liste. | Kurse finden im Studio Herzschlag statt (dort auch im Kalender gelistet) – bei Dedup beachten. | Spiel-Café ~6 EUR/Erw. inkl. Getränke, Anmeldung über Kalender. Studio vermietet Räume an externe Kursleitungen (Mamalea u.a.) – Dedup mit mamalea-musikzauber. | Breites Familienstudio (auch PEKiP, Babymassage, Krabbel-Café – evtl. Überschneidung mit anderen Bereichen). Wellpass/Wellhub-Drop-ins möglich. Ca. 1 km östlich des Laufertors. | Krabbel-Café und Spiel-Café: Zeiten nur im Eversports-Widget (ohne Browser nicht lesbar). Übersichtsseite /kurse-ab-september/ widerspricht teils den Detailseiten – Detailseiten gelten"
   venues:
     - id: studio-herzschlag
       name: Studio HERZSCHLAG (ehem. Knirpse & Co FamilienTreffpunkt)
@@ -2521,11 +2507,11 @@
     how: Keine Platzanzeige; Anmeldung per Telefon/E-Mail
     system: keins (WordPress, statisch)
   verified: 2026-10-04
-  notes: "Zielgruppe eingeschränkt: nur Mütter/Schwangere bis 25 Jahre (Frühe Hilfen der Stadt). Kosten nicht genannt (Frühe-Hilfen-Angebot, i. d. R. kostenlos). Nur aufnehmen, wenn Nutzerin zur Zielgruppe passt. | Frühe-Hilfen-Angebot der Stadt Nürnberg; Zielgruppe eingeschränkt (junge Mütter ≤25)."
+  notes: "Zielgruppe eingeschränkt: nur Mütter/Schwangere bis 25 Jahre (Frühe Hilfen der Stadt). Kosten nicht genannt (Frühe-Hilfen-Angebot, i. d. R. kostenlos). Nur aufnehmen, wenn Nutzerin zur Zielgruppe passt. | Frühe-Hilfen-Angebot der Stadt Nürnberg; Zielgruppe eingeschränkt (junge Mütter ≤25). | Zugang laut Flyer: Gebäude E6, Eingang Regerstraße"
   venues:
     - id: treffpunkt-mut
       name: Treffpunkt e.V. – Familienstützpunkt Eberhardshof/Muggenhof (Gruppe MUT)
-      address: Fürther Straße 212 (2. OG, nicht barrierefrei), 90429 Nürnberg
+      address: Fürther Straße 212, Gebäude E6 (Eingang Regerstraße), 2. OG, nicht barrierefrei, 90429 Nürnberg
       district: Eberhardshof
       ring: aussen
       geo: { lat: 49.458394, lon: 11.034452 }
@@ -2951,3 +2937,27 @@
       address: Neumühlweg 20a, 90449 Nürnberg
       ring: aussen
       geo: { lat: 49.42815, lon: 11.005056 }
+- id: imiluv-studio
+  role: anbieter
+  name: IMILUV Studio by Julia Beese
+  url: https://imiluv.de
+  topics: [ fitness-mit-baby, rueckbildung ]
+  formats: [ regelmaessig ]
+  costs: [ kostenpflichtig ]
+  registrations: [ mit-anmeldung ]
+  programme:
+    - url: https://imiluv.de
+      kind: html
+  availability:
+    shown: nein
+    how: Buchung nur in der IMILUV-App
+  verified: 2026-10-04
+  notes: Aus frankenkids aufgenommen. Barre und Reformer Pilates für Mamas mit Babys (6 Wochen–12 Monate), 14-täglich laut frankenkids, Anmeldung über die IMILUV-App. Ärztliche Freigabe nach der Geburt erforderlich.
+  venues:
+    - id: imiluv-studio
+      name: IMILUV Studio by Julia Beese
+      address: Schopenhauer Str. 10, 90409 Nürnberg
+      district: Weiterer Innenstadtgürtel West/Nord/Ost
+      ring: aussen
+      geo: { lat: 49.4676674, lon: 11.0895169 }
+  coveredBy: frankenkids-eventkalender
