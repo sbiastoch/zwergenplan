@@ -1,6 +1,6 @@
 ---
 name: browser-review
-description: Pflicht-Sichtprüfung im Browser vor „fertig“ bei jeder UI-Änderung, und nach jedem Deploy auf der Live-URL. Screenshots auf Mobile-Viewports in hell/dunkel ansehen und gegen eine UX-Checkliste prüfen. Argument optional: „live“ für https://sbiastoch.github.io/zwergenplan/.
+description: Pflicht-Sichtprüfung im Browser vor „fertig“ bei jeder UI-Änderung, und nach jedem Deploy auf der Live-URL. Screenshots auf Mobile-Viewports in hell/dunkel ansehen und gegen eine UX-Checkliste prüfen. Argument optional: „live“ für https://zwergenplan.app/.
 ---
 
 # Browser-Review
@@ -8,8 +8,8 @@ description: Pflicht-Sichtprüfung im Browser vor „fertig“ bei jeder UI-Änd
 Automatische Gates prüfen Regeln. Dieser Schritt prüft, ob es **gut** ist.
 
 ## 1. Ziel festlegen
-- **lokal** (Standard): `pnpm build:e2e`, dann `pnpm exec vite preview --strictPort --port 4173 --outDir dist-e2e` im Hintergrund starten. Die URL ist `http://localhost:4173/zwergenplan/` und nutzt Fixture-Daten.
-- **live**: `https://sbiastoch.github.io/zwergenplan/` mit echten Daten.
+- **lokal** (Standard): `pnpm build:e2e`, dann `pnpm exec vite preview --strictPort --port 4173 --outDir dist-e2e` im Hintergrund starten. Die URL ist `http://localhost:4173/` und nutzt Fixture-Daten.
+- **live**: `https://zwergenplan.app/` mit echten Daten.
 
 ## 2. Screenshots
 `node scripts/screenshots.ts <URL>` erzeugt `e2e/.artifacts/screens/*.png`. Die Matrix umfasst

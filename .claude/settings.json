@@ -58,7 +58,8 @@
       "Bash(gh pr view *)",
       "Bash(gh pr checks *)",
       "WebFetch(domain:code.claude.com)",
-      "WebFetch(domain:sbiastoch.github.io)"
+      "WebFetch(domain:sbiastoch.github.io)",
+      "WebFetch(domain:zwergenplan.app)"
     ],
     "deny": [
       "Bash(git push --force*)",

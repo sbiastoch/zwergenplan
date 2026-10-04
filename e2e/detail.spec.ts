@@ -64,7 +64,7 @@ test("Kurs-ICS enthält alle Termine in korrekter Zeit", async ({ page }) => {
   const dialog = await openDetail(page, PEKIP);
   const link = dialog.getByRole("link", { name: "Alle 8 Kurstermine in den Kalender" });
   const href = await link.getAttribute("href");
-  expect(href).toMatch(/^\/zwergenplan\/ics\/.+\.ics$/);
+  expect(href).toMatch(/^\/ics\/.+\.ics$/);
   const body = await vevents(page, href);
   expect(body.match(/BEGIN:VEVENT/g)).toHaveLength(8);
   expect(body).toContain("DTSTART:20261027T083000Z"); // 9:30 nach der Zeitumstellung

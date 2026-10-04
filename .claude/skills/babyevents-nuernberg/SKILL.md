@@ -1,6 +1,6 @@
 ---
 name: babyevents-nuernberg
-description: Datenstand des Zwergenplans aktualisieren – alle Anbieter aus data/providers.yaml für die nächsten 4 Monate prüfen, data/offers.json bauen und auf main veröffentlichen. Nutzen bei „Daten aktualisieren“, „Pipeline-Lauf“, „neue Termine holen“ und bei Pflege des Anbieterkatalogs. Fragen wie „was machen wir nächste Woche mit dem Baby“ beantwortet die Website (https://sbiastoch.github.io/zwergenplan/) bzw. data/offers.json.
+description: Datenstand des Zwergenplans aktualisieren – alle Anbieter aus data/providers.yaml für die nächsten 4 Monate prüfen, data/offers.json bauen und auf main veröffentlichen. Nutzen bei „Daten aktualisieren“, „Pipeline-Lauf“, „neue Termine holen“ und bei Pflege des Anbieterkatalogs. Fragen wie „was machen wir nächste Woche mit dem Baby“ beantwortet die Website (https://zwergenplan.app/) bzw. data/offers.json.
 ---
 
 # Zwergenplan-Datenstand aktualisieren
@@ -65,7 +65,7 @@ gh run watch
 
 `publish` bricht ab, wenn es Änderungen außerhalb von `data/` gibt. Code-Änderungen gehören in einen eigenen Commit. Danach prüft `publish` gegen den deployten Stand, committet `data/` auf `main` und pusht. Ist CI rot, bleibt die alte Version live: Ursache reparieren, neu bauen, neu veröffentlichen.
 
-Fertig, wenn `gh run watch` grün endet und `https://sbiastoch.github.io/zwergenplan/data/meta.json` den neuen Commit zeigt.
+Fertig, wenn `gh run watch` grün endet und `https://zwergenplan.app/data/meta.json` den neuen Commit zeigt.
 
 ## Abschlussbericht im Chat
 
