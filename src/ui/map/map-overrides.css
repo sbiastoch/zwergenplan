@@ -1,1 +1,72 @@
-/* MapLibre-Bedienelemente (Plan 0005, E4/E7). Nach maplibre-gl.css importiert, dazu höhere Spezifität (.map-box …). */
+/*
+ * MapLibre-Bedienelemente (Plan 0005, E4/E7/E10). Nach maplibre-gl.css importiert und zusätzlich mit
+ * höherer Spezifität (.map-box …), damit die Reihenfolge der Lazy-CSS keine Rolle spielt. Farben aus den Tokens.
+ * Ohne @layer wie maplibre-gl.css: Ungeschichtete Regeln schlagen alles in @layer components (map.css).
+ */
+
+/* Container der Karte (MapView.tsx); .maplibregl-map setzt sonst position: relative ohne Höhe */
+.map-box .map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.map-box .maplibregl-canvas:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+}
+
+/* Zoom: 44 × 44 px wie jedes Touch-Ziel */
+.map-box .maplibregl-ctrl-group {
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 var(--shadow);
+  overflow: hidden;
+}
+.map-box .maplibregl-ctrl-group button {
+  width: 44px;
+  height: 44px;
+}
+.map-box .maplibregl-ctrl-group button + button {
+  border-top: 2px solid var(--line);
+}
+.map-box .maplibregl-ctrl-group button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -5px;
+  box-shadow: none;
+}
+
+/* Die Symbole sind dunkle SVG-Hintergründe; im dunklen Theme invertiert. */
+:root[data-theme="dark"] .map-box .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .map-box .maplibregl-ctrl-icon {
+    filter: invert(1);
+  }
+}
+
+/* Attribution: nicht eingeklappt, Links inline mit ≥ 24 px Höhe (WCAG 2.5.8) */
+.map-box .maplibregl-ctrl.maplibregl-ctrl-attrib {
+  background: var(--surface);
+  color: var(--ink);
+  border-top-left-radius: 10px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.map-box .maplibregl-ctrl-attrib a {
+  color: var(--ink);
+  text-decoration: underline;
+  padding-block: 6px;
+}
+.map-box .maplibregl-ctrl-attrib a:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 0;
+}
+
+/* Zwei-Finger-Hinweis (cooperativeGestures) */
+.map-box .maplibregl-cooperative-gesture-screen {
+  background: rgba(19, 33, 46, 0.6);
+  font-weight: 700;
+}

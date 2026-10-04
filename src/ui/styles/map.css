@@ -1,22 +1,120 @@
-/* Karte (Plan 0005, E4/E7): alles, was auch ohne Karten-Chunk gebraucht wird. MapLibre selbst: src/ui/map/map-overrides.css. */
+/*
+ * Karte (Plan 0005, E4/E7/E12): alles, was auch ohne Karten-Chunk gebraucht wird – Rahmen, Platzhalter,
+ * Meldungen, Fadenkreuz, Werkzeugzeile, Orts-Liste, Orts-Sheet. MapLibre selbst: src/ui/map/map-overrides.css.
+ */
 
 @layer components {
   /* Umschalter Liste | Karte (Chrome.tsx), unter den Schnellfiltern */
-  .view-toggle {
+  /* fieldset.plain (base.css) setzt padding: 0 */
+  fieldset.view-toggle {
     padding: 0 16px 8px;
   }
-  /* px und dvh statt rem: Bei 200 % Textgröße füllte eine rem-Karte sonst den Bildschirm (E7). */
+
+  /* px und dvh statt rem: Bei 200 % Textgröße füllte eine rem-Karte sonst den Bildschirm (E7). Auch Platzhalter (CLS). */
   .map-box {
     position: relative;
     height: clamp(240px, 60dvh, 544px);
+    margin-top: 10px;
     border: 2px solid var(--line);
     border-radius: 20px;
     box-shadow: 4px 4px 0 var(--shadow);
     overflow: hidden;
     background: var(--soft);
   }
-  .map-canvas {
+  .map-note {
     position: absolute;
     inset: 0;
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    font-weight: 700;
+    background: var(--soft);
+    overflow-y: auto;
+  }
+  /* Fadenkreuz: markiert die Kartenmitte (E8) */
+  .crosshair {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    pointer-events: none;
+    background:
+      linear-gradient(var(--ink), var(--ink)) center / 2px 100% no-repeat,
+      linear-gradient(var(--ink), var(--ink)) center / 100% 2px no-repeat;
+    opacity: 0.6;
+  }
+  .map-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .map-tools .btn {
+    min-height: 44px;
+    font-size: 0.9375rem;
+  }
+
+  /* Orts-Liste (PlaceList.tsx) */
+  .places h2 {
+    font-weight: 800;
+    font-size: 1.375rem;
+    letter-spacing: -0.03em;
+    margin: 18px 0 8px;
+  }
+  .places ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .place {
+    width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    text-align: left;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 3px 3px 0 var(--shadow);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .place b {
+    font-weight: 800;
+  }
+  .place span {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  /* Orts-Sheet (PlaceSheet.tsx): Kachel-Titel sind h3, die Sheet-Zwischenüberschriften (sheet.css) auch */
+  .sheet .card .ctitle {
+    margin: 0;
+    font-size: 1.375rem;
+    letter-spacing: -0.04em;
+    text-transform: none;
+    color: inherit;
+  }
+  .place-where {
+    margin: -4px 0 14px;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+  .place-where span {
+    display: block;
+    font-weight: 700;
+    color: var(--ink);
   }
 }
