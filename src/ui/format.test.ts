@@ -10,10 +10,12 @@ import {
   dayHeading,
   formatFact,
   plural,
+  registrationNote,
   shortDate,
   standDate,
   timeRange,
   weekTitle,
+  whenLabels,
 } from "./format.ts";
 
 // Eigene Testangebote statt der Zod-Fixtures: src/ui bleibt zod-frei (no-zod-in-client), auch im Test.
@@ -109,5 +111,51 @@ describe("Fakten", () => {
     expect(ageChipLabel(26)).toBe("2 J.");
     expect(plural(1, "Angebot", "Angebote")).toBe("1 Angebot");
     expect(plural(3, "Angebot", "Angebote")).toBe("3 Angebote");
+  });
+});
+
+describe("Detail: Wann und Anmeldung", () => {
+  it("nennt beim einmaligen Termin Datum und Uhrzeit", () => {
+    expect(whenLabels(OFFERS.einmalig, FIXTURE_NOW)).toEqual({ main: "Sonntag, 6. Dezember", sub: "10:00–11:00 Uhr" });
+  });
+
+  it("fasst einen Kurs zusammen, Uhrzeit nur, wenn sie immer gleich ist", () => {
+    expect(whenLabels(OFFERS.kurs, FIXTURE_NOW)).toEqual({
+      main: "Kurs mit 8 Terminen",
+      sub: "Di 13.10. bis Di 1.12., jeweils 9:30–11:00",
+    });
+    const wechselnd = offer({
+      format: "kurs",
+      sessions: [...sessions("2026-10-13", 2, 7, "09:30", "11:00"), ...sessions("2026-10-27", 2, 7, "10:00", "11:30")],
+    });
+    expect(whenLabels(wechselnd, FIXTURE_NOW)).toEqual({ main: "Kurs mit 4 Terminen", sub: "Di 13.10. bis Di 3.11." });
+  });
+
+  it("beschreibt regelmäßige Termine nach Rhythmus und zählt nur kommende", () => {
+    expect(whenLabels(OFFERS.woechentlich, FIXTURE_NOW)).toEqual({
+      main: "Jeden Mittwoch, 10:00–11:00",
+      sub: "5 kommende Termine",
+    });
+    expect(whenLabels(OFFERS.vierzehntaegig, FIXTURE_NOW)).toEqual({ main: "Freitags", sub: "4 kommende Termine" });
+    expect(whenLabels(OFFERS.vierzehntaegig, new Date("2026-10-24T12:00:00+02:00"))).toEqual({
+      main: "Freitags",
+      sub: "2 kommende Termine",
+    });
+    const offen = offer({ ...OFFERS.woechentlich, registration: "ohne-anmeldung" });
+    expect(whenLabels(offen, FIXTURE_NOW).sub).toBe("Einzeln besuchbar");
+  });
+
+  it("nennt das Anmeldefenster als Berliner Tage, sonst einen Hinweis", () => {
+    const fenster = (registrationWindow?: NonNullable<SiteOffer["registrationWindow"]>) =>
+      registrationNote(offer({ ...OFFERS.kurs, ...(registrationWindow ? { registrationWindow } : {}) }));
+    expect(fenster({ opens: "2026-10-10T00:30:00+02:00", deadline: "2026-10-20T23:30:00+02:00" })).toBe(
+      "Anmeldung ab 10.10., bis 20.10.",
+    );
+    expect(fenster({ deadline: "2026-10-20T23:30:00+02:00" })).toBe("Anmeldung bis 20.10.");
+    expect(fenster()).toBe("Beim Anbieter");
+    expect(registrationNote(OFFERS.ohneAnmeldung)).toBe("Beim Anbieter");
+    expect(registrationNote(offer({ ...OFFERS.einmalig, registration: "ohne-anmeldung" }))).toBe(
+      "Einfach vorbeikommen",
+    );
   });
 });

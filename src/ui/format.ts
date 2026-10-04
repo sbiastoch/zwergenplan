@@ -2,7 +2,7 @@
  * Texte der Oberfläche aus Domänenwerten. Keine Geschäftslogik: Welcher Termin zählt, ob etwas
  * passt oder wöchentlich ist, entscheidet src/domain. Kalendertage sind Berliner Tage (ISO-Strings).
  */
-import { courseProgress, rhythm } from "../domain/agenda.ts";
+import { courseProgress, nextSession, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinIsoDate, berlinKey, isoWeekday, parseIsoDate } from "../domain/time.ts";
@@ -24,7 +24,7 @@ const MONTHS = [
   "Dezember",
 ] as const;
 
-export function weekdayName(isoWeekdayNumber: number): string {
+function weekdayName(isoWeekdayNumber: number): string {
   return WEEKDAYS[isoWeekdayNumber - 1] ?? "";
 }
 
@@ -108,6 +108,41 @@ export function formatFact(offer: SiteOffer, now: Date): string {
   const r = rhythm(offer, now);
   if (!r) return "Regelmäßig";
   return r.weekly ? `Jeden ${weekdayName(r.weekday)}` : `${weekdayName(r.weekday)}s`;
+}
+
+/** „Wann“ im Detail: Hauptzeile und Zusatz, je nach Format (Rhythmus und Zählung aus der Domäne). */
+export function whenLabels(offer: SiteOffer, now: Date): { main: string; sub: string } {
+  const first = offer.sessions[0];
+  const last = offer.sessions.at(-1);
+  if (!first || !last) return { main: "", sub: "" };
+  if (offer.format === "einmalig") return { main: longDate(sessionDay(first)), sub: `${timeRange(first)} Uhr` };
+  if (offer.format === "kurs") {
+    const range = `${shortDate(sessionDay(first))} bis ${shortDate(sessionDay(last))}`;
+    return {
+      main: `Kurs mit ${plural(offer.sessions.length, "Termin", "Terminen")}`,
+      sub: uniformTimes(offer.sessions) ? `${range}, jeweils ${timeRange(first)}` : range,
+    };
+  }
+  const r = rhythm(offer, now);
+  const next = nextSession(offer, now) ?? first;
+  const main = !r
+    ? "Regelmäßig"
+    : r.weekly
+      ? `Jeden ${weekdayName(r.weekday)}, ${timeRange(next)}`
+      : `${weekdayName(r.weekday)}s`;
+  const sub =
+    offer.registration === "ohne-anmeldung"
+      ? "Einzeln besuchbar"
+      : plural(upcomingSessions(offer, now).length, "kommender Termin", "kommende Termine");
+  return { main, sub };
+}
+
+/** Zusatz zur Anmeldung: das Fenster als Berliner Tage, sonst ein Hinweis. */
+export function registrationNote(offer: SiteOffer): string {
+  const { opens, deadline } = offer.registrationWindow ?? {};
+  const parts = [opens && `ab ${dayDots(opens)}`, deadline && `bis ${dayDots(deadline)}`].filter(Boolean);
+  if (parts.length > 0) return `Anmeldung ${parts.join(", ")}`;
+  return offer.registration === "mit-anmeldung" ? "Beim Anbieter" : "Einfach vorbeikommen";
 }
 
 export function costLabel(offer: SiteOffer): string {

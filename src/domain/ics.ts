@@ -13,6 +13,27 @@ export interface IcsContext {
   stamp: string;
 }
 
+/** Was ein Angebot für den Kalender mitbringen muss: Anbietername und Ort (wie in `SiteOffer`). */
+export interface IcsSource {
+  providerName: string;
+  venue: IcsContext["venue"];
+}
+
+/**
+ * Der eine Weg zum ICS-Kontext – für die statischen Dateien (scripts/build-data.ts) und die
+ * Sammeldatei der Merkliste (ADR 0007). Nur so entstehen in beiden dieselben VEVENTs.
+ */
+export function icsContextFor(offer: IcsSource, generatedAt: string): IcsContext {
+  const { name, address, geo } = offer.venue;
+  return { providerName: offer.providerName, venue: { name, address, geo }, stamp: generatedAt };
+}
+
+function sessionIndex(offer: Offer, session: Session): number {
+  const index = offer.sessions.findIndex((s) => s.start === session.start);
+  if (index < 0) throw new Error(`Termin ${session.start} gehört nicht zu ${offer.id}`);
+  return index;
+}
+
 const PRODID = "-//Zwergenplan//Babyangebote Nürnberg//DE";
 
 function sessionKey(session: Session): string {
@@ -135,23 +156,12 @@ export interface CollectionItem {
 /** Mehrere Angebote in einem Kalender (Merkliste) – im Browser erzeugt, gleiche UIDs wie die statischen Dateien. */
 export function icsForCollection(items: readonly CollectionItem[], name: string): string {
   return calendar(
-    items.flatMap(({ offer, sessions, ctx }) =>
-      sessions.map((s) =>
-        vevent(
-          offer,
-          s,
-          offer.sessions.findIndex((x) => x.start === s.start),
-          ctx,
-        ),
-      ),
-    ),
+    items.flatMap(({ offer, sessions, ctx }) => sessions.map((s) => vevent(offer, s, sessionIndex(offer, s), ctx))),
     name,
   );
 }
 
 /** Ein einzelner Termin einer regelmäßigen Reihe. */
 export function icsForSession(offer: Offer, session: Session, ctx: IcsContext): string {
-  const index = offer.sessions.findIndex((s) => s.start === session.start);
-  if (index < 0) throw new Error(`Termin ${session.start} gehört nicht zu ${offer.id}`);
-  return calendar([vevent(offer, session, index, ctx)], offer.title);
+  return calendar([vevent(offer, session, sessionIndex(offer, session), ctx)], offer.title);
 }

@@ -3,6 +3,7 @@
  * JSON Schema unter schema/ wird hieraus exportiert – nie von Hand ändern.
  */
 import { z } from "zod";
+import { OFFER_ID_PATTERN } from "./ids.ts";
 import { categoriesOf, TOPICS } from "./topics.ts";
 
 const kebab = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "kebab-case erwartet");
@@ -119,7 +120,7 @@ export const AgeRange = z
 /** Felder eines Angebots ohne Querprüfungen – Basis für Offer und das Rohformat der Pipeline (ADR 0006). */
 export const OfferFields = z.strictObject({
   /** deterministisch, siehe ids.ts (ADR 0003, ADR 0006) */
-  id: z.string().regex(/^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/),
+  id: z.string().regex(OFFER_ID_PATTERN),
   providerId: kebab,
   venueId: kebab,
   title: z.string().min(1).max(140),

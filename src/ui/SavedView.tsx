@@ -1,6 +1,6 @@
 /** Merkliste „Mein Stickerheft“ (Plan 0003, E12) mit Sammel-ICS aus dem Browser (ADR 0007). */
-import { nextSession } from "../domain/filter.ts";
-import { icsForCollection } from "../domain/ics.ts";
+import { nextSession } from "../domain/agenda.ts";
+import { icsContextFor, icsForCollection } from "../domain/ics.ts";
 import { collectionSessions } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { plural } from "./format.ts";
@@ -32,7 +32,7 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
   const items = offers.map((offer) => ({
     offer,
     sessions: collectionSessions(offer, ctx.now),
-    ctx: { providerName: offer.providerName, venue: offer.venue, stamp: generatedAt },
+    ctx: icsContextFor(offer, generatedAt),
   }));
   const sessionCount = items.reduce((sum, i) => sum + i.sessions.length, 0);
 

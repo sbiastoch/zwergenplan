@@ -6,10 +6,9 @@ import {
   type FilterState,
   filterFromSearch,
   filterToSearch,
-  nextSession,
   toggleIn,
 } from "./filter.ts";
-import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
+import { FIXTURE_NOW, fixtureKey, loadFixtures } from "./test-fixtures.ts";
 
 const { file } = loadFixtures();
 const ids = (state: FilterState) => applyFilters(file.offers, state, { now: FIXTURE_NOW }).map(fixtureKey);
@@ -80,14 +79,5 @@ describe("Filter bedienen", () => {
     expect(on).toEqual({ ...EMPTY_FILTER, formats: ["kurs"] });
     expect(toggleIn(on, "formats", "kurs")).toEqual(EMPTY_FILTER);
     expect(toggleIn(on, "categories", "musik")).toEqual({ ...EMPTY_FILTER, formats: ["kurs"], categories: ["musik"] });
-  });
-});
-
-describe("nextSession", () => {
-  it("liefert den nächsten nicht beendeten Termin", () => {
-    const treff = fixtureOffer("krabbeltreff");
-    expect(nextSession(treff, new Date("2026-10-07T11:00:00+02:00"))?.start).toBe("2026-10-07T10:00:00+02:00");
-    expect(nextSession(treff, new Date("2026-10-07T12:00:00+02:00"))?.start).toBe("2026-10-14T10:00:00+02:00");
-    expect(nextSession(treff, new Date("2027-01-01T00:00:00+01:00"))).toBeUndefined();
   });
 });

@@ -7,7 +7,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { icsForSeries, icsForSession, seriesIcsPath, sessionIcsPath } from "../src/domain/ics.ts";
+import { icsContextFor, icsForSeries, icsForSession, seriesIcsPath, sessionIcsPath } from "../src/domain/ics.ts";
 import { type SiteMeta, toSiteData } from "../src/domain/site-data.ts";
 import { dataSource, loadDataset, ROOT } from "./lib/load-data.ts";
 
@@ -40,7 +40,7 @@ write("data/meta.json", `${JSON.stringify(meta, null, 2)}\n`);
 
 let files = 0;
 for (const offer of site.offers) {
-  const ctx = { providerName: offer.providerName, venue: offer.venue, stamp: site.generatedAt };
+  const ctx = icsContextFor(offer, site.generatedAt);
   write(seriesIcsPath(offer), icsForSeries(offer, ctx));
   files++;
   if (offer.format === "regelmaessig") {

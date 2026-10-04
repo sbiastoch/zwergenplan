@@ -2,7 +2,6 @@
  * Kalender- und Listenlogik der Oberfläche: Welcher Termin eines Angebots zählt, wie Tage
  * gruppiert und Raster gebaut werden. Alle Kalendertage sind Berliner Tage (time.ts).
  */
-import { nextSession } from "./filter.ts";
 import type { Offer, Session } from "./schema.ts";
 import { addDays, berlinIsoDate, berlinKey, daysInMonth, isoWeekday, parseIsoDate } from "./time.ts";
 
@@ -15,6 +14,32 @@ export interface DayGroup<I> {
   /** Berliner Kalendertag (ISO) */
   day: string;
   items: I[];
+}
+
+/** Ein Termin zählt als kommend, bis er beendet ist – ein laufender Termin zählt also mit. */
+const notEnded = (now: Date) => (session: Session) => Date.parse(session.end) >= now.getTime();
+
+/** Alle noch nicht beendeten Termine, in der Reihenfolge der Daten (chronologisch). */
+export function upcomingSessions(offer: Offer, now: Date): Session[] {
+  return offer.sessions.filter(notEnded(now));
+}
+
+/** Nächster noch nicht beendeter Termin. */
+export function nextSession(offer: Offer, now: Date): Session | undefined {
+  return offer.sessions.find(notEnded(now));
+}
+
+/**
+ * Der Termin, auf den sich das Detail bezieht: der am gewählten Berliner Kalendertag (aus dem
+ * Kalender geöffnet), sonst der nächste nicht beendete.
+ */
+export function referenceSession(offer: Offer, now: Date, day?: string): Session | undefined {
+  return (day ? sessionOnDay(offer, day) : undefined) ?? nextSession(offer, now);
+}
+
+/** Erster Termin, der am Berliner Kalendertag `day` beginnt. */
+export function sessionOnDay(offer: Offer, day: string): Session | undefined {
+  return offer.sessions.find((s) => berlinIsoDate(s.start) === day);
 }
 
 function byStartThenTitle(a: Occurrence, b: Occurrence): number {
@@ -110,7 +135,7 @@ export function lastSessionDay(offers: readonly Offer[]): string | undefined {
 
 /** Kursfortschritt: wie viele Termine noch nicht beendet sind. */
 export function courseProgress(offer: Offer, now: Date): { total: number; remaining: number } {
-  const remaining = offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime()).length;
+  const remaining = upcomingSessions(offer, now).length;
   return { total: offer.sessions.length, remaining };
 }
 
@@ -121,7 +146,7 @@ const clock = (instant: string) => berlinKey(instant).slice(9);
  * „jede Woche“ ist – lückenlos im 7-Tage-Abstand zur selben Uhrzeit. 14-täglich ist nicht `weekly`.
  */
 export function rhythm(offer: Offer, now: Date): { weekday: number; weekly: boolean } | undefined {
-  const upcoming = offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime());
+  const upcoming = upcomingSessions(offer, now);
   if (upcoming.length < 2) return undefined;
   const days = upcoming.map((s) => berlinIsoDate(s.start));
   const weekday = isoWeekday(days[0] ?? "");

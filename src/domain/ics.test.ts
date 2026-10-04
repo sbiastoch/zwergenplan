@@ -3,12 +3,14 @@ import { describe, expect, it } from "vitest";
 import {
   escapeText,
   foldLine,
+  icsContextFor,
   icsForCollection,
   icsForSeries,
   icsForSession,
   seriesIcsPath,
   sessionIcsPath,
 } from "./ics.ts";
+import { toSiteData } from "./site-data.ts";
 import { fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
 const { providers, file } = loadFixtures();
@@ -113,5 +115,50 @@ describe("Pfade und Escaping", () => {
   it("zerteilt beim Falten keine Umlaute", () => {
     const folded = foldLine(`SUMMARY:${"ä".repeat(60)}`);
     expect(folded.split("\r\n ").join("")).toBe(`SUMMARY:${"ä".repeat(60)}`);
+  });
+});
+
+/** Die VEVENT-Blöcke einer Datei als Text, Zeilenfaltung unverändert. */
+function veventBlocks(ics: string): string[] {
+  return ics.match(/BEGIN:VEVENT\r\n[\s\S]*?END:VEVENT\r\n/g) ?? [];
+}
+
+describe("ADR 0007: Sammel-ICS und statische Dateien sind dieselben VEVENTs", () => {
+  const site = toSiteData(providers, file);
+
+  it("leitet den Kontext aus dem denormalisierten Angebot und dem Datenstand ab", () => {
+    const pekip = site.offers.find((o) => o.id === fixtureOffer("pekip-herbst").id);
+    if (!pekip) throw new Error("Fixture");
+    const ctx = icsContextFor(pekip, site.generatedAt);
+    const { name, address, geo } = pekip.venue;
+    expect(ctx).toEqual({ providerName: pekip.providerName, venue: { name, address, geo }, stamp: site.generatedAt });
+  });
+
+  it("erzeugt für jedes Angebot byte-gleiche VEVENTs wie der Build (Reihe und Einzeltermin)", () => {
+    const merkliste = icsForCollection(
+      site.offers.map((offer) => ({ offer, sessions: offer.sessions, ctx: icsContextFor(offer, site.generatedAt) })),
+      "Zwergenplan – Merkliste",
+    );
+    const build = site.offers.flatMap((offer) =>
+      veventBlocks(icsForSeries(offer, icsContextFor(offer, site.generatedAt))),
+    );
+    expect(build.length).toBeGreaterThan(0);
+    expect(veventBlocks(merkliste)).toEqual(build);
+
+    const blocks = new Set(build);
+    for (const offer of site.offers.filter((o) => o.format === "regelmaessig")) {
+      for (const session of offer.sessions) {
+        const [single] = veventBlocks(icsForSession(offer, session, icsContextFor(offer, site.generatedAt)));
+        expect(single && blocks.has(single)).toBe(true);
+      }
+    }
+  });
+
+  it("wirft, wenn ein Termin nicht zum Angebot gehört", () => {
+    const treff = fixtureOffer("krabbeltreff");
+    const foreign = { start: "2030-01-01T10:00:00+01:00", end: "2030-01-01T11:00:00+01:00" };
+    expect(() =>
+      icsForCollection([{ offer: treff, sessions: [foreign], ctx: ctxFor(treff.id) }], "Zwergenplan – Merkliste"),
+    ).toThrow(/gehört nicht zu/);
   });
 });

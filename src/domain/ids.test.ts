@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { offerId, slug } from "./ids.ts";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import { OFFER_ID_PATTERN, type OfferIdInput, offerId, slug } from "./ids.ts";
+import type { Format } from "./schema.ts";
 
 describe("slug", () => {
   it("transliteriert Umlaute und ersetzt Sonderzeichen", () => {
@@ -40,5 +41,23 @@ describe("offerId", () => {
     expect(offerId({ ...base, format: "einmalig", firstStart: "2026-11-15T11:00:00+01:00" })).toBe(
       "fbs-nuernberg--pekip-20261115t1100--fbs-nuernberg",
     );
+  });
+});
+
+describe("OFFER_ID_PATTERN", () => {
+  it("passt auf jede erzeugte ID und weist Fremdes ab", () => {
+    const base = { providerId: "fbs-nuernberg", venueId: "fbs-nuernberg", title: "Müsik & Spiel" };
+    for (const format of ["kurs", "regelmaessig", "einmalig"] as const) {
+      expect(OFFER_ID_PATTERN.test(offerId({ ...base, format, firstStart: "2026-10-13T09:30:00+02:00" }))).toBe(true);
+    }
+    for (const bad of ["", "a--b", "../../etc", "A--b--c", "a--b--c\n"]) {
+      expect(OFFER_ID_PATTERN.test(bad)).toBe(false);
+    }
+  });
+});
+
+describe("OfferIdInput", () => {
+  it("kennt genau die Formate des Schemas", () => {
+    expectTypeOf<OfferIdInput["format"]>().toEqualTypeOf<Format>();
   });
 });

@@ -3,6 +3,7 @@
  * Geburtsdatum, Merkliste und Darstellung gehören deshalb nie hierher (docs/architecture.md).
  */
 import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts";
+import { OFFER_ID_PATTERN } from "./ids.ts";
 
 const TABS = ["entdecken", "kalender", "merkliste"] as const;
 export type Tab = (typeof TABS)[number];
@@ -14,13 +15,11 @@ export interface Route {
   filter: FilterState;
 }
 
-const OFFER_ID = /^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/;
-
 export function parseRoute(search: string): Route {
   const p = new URLSearchParams(search);
   const tab = TABS.find((t) => t === p.get("ansicht")) ?? "entdecken";
   const offerId = p.get("angebot") ?? "";
-  return { tab, ...(OFFER_ID.test(offerId) ? { offerId } : {}), filter: filterFromSearch(search) };
+  return { tab, ...(OFFER_ID_PATTERN.test(offerId) ? { offerId } : {}), filter: filterFromSearch(search) };
 }
 
 /** Kanonischer Querystring ohne „?“: Filter, dann Ansicht, dann Angebot. */

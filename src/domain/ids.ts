@@ -2,8 +2,13 @@
  * Deterministische IDs (ADR 0003, ADR 0006). Die Pipeline vergibt sie, das Schema prüft Präfix und Suffix.
  * Eine geänderte ID erzeugt im Kalender der Nutzer ein Duplikat – Regeln hier nur per ADR ändern.
  */
-import type { Format } from "./schema.ts";
 import { berlinKey } from "./time.ts";
+
+/**
+ * Form jeder Offer-ID: drei kebab-Teile, getrennt durch „--“. Einzige Definition – das Schema
+ * prüft damit die Daten, die Route damit den `angebot`-Parameter aus der URL.
+ */
+export const OFFER_ID_PATTERN = /^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/;
 
 const TRANSLIT: Record<string, string> = { ä: "ae", ö: "oe", ü: "ue", ß: "ss" };
 
@@ -28,7 +33,11 @@ export interface OfferIdInput {
   providerId: string;
   venueId: string;
   title: string;
-  format: Format;
+  /**
+   * Das `Format` aus schema.ts, hier ausgeschrieben: schema.ts importiert `OFFER_ID_PATTERN`, ein
+   * Import zurück wäre ein Zyklus. Dass beide gleich bleiben, prüft ids.test.ts per Typtest.
+   */
+  format: "kurs" | "regelmaessig" | "einmalig";
   /** Beginn des ersten Termins (mit Offset) */
   firstStart: string;
 }

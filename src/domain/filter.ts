@@ -98,8 +98,3 @@ export function applyFilters<T extends Offer>(offers: readonly T[], state: Filte
     return true;
   });
 }
-
-/** Nächster noch nicht beendeter Termin. */
-export function nextSession(offer: Offer, now: Date): Offer["sessions"][number] | undefined {
-  return offer.sessions.find((s) => Date.parse(s.end) >= now.getTime());
-}

@@ -4,10 +4,13 @@ import {
   groupByNextSession,
   lastSessionDay,
   monthDays,
+  nextSession,
+  referenceSession,
   rhythm,
   sessionsByDay,
   takeGroups,
   uniformTimes,
+  upcomingSessions,
   weekDays,
 } from "./agenda.ts";
 import type { Offer, Session } from "./schema.ts";
@@ -193,5 +196,41 @@ describe("uniformTimes", () => {
         s("2026-10-19T10:30:00+02:00", "2026-10-19T11:00:00+02:00"),
       ]),
     ).toBe(false);
+  });
+});
+
+describe("upcomingSessions / nextSession", () => {
+  const treff = fixtureOffer("krabbeltreff");
+  it("liefert die nicht beendeten Termine, ein laufender zählt mit", () => {
+    const running = new Date("2026-10-07T10:30:00+02:00");
+    expect(upcomingSessions(treff, running)[0]?.start).toBe("2026-10-07T10:00:00+02:00");
+    expect(upcomingSessions(treff, running)).toHaveLength(treff.sessions.length);
+    expect(upcomingSessions(treff, new Date("2026-10-07T12:00:00+02:00"))).toHaveLength(treff.sessions.length - 1);
+    expect(upcomingSessions(treff, new Date("2027-01-01T00:00:00+01:00"))).toEqual([]);
+  });
+
+  it("liefert den nächsten nicht beendeten Termin", () => {
+    expect(nextSession(treff, new Date("2026-10-07T11:00:00+02:00"))?.start).toBe("2026-10-07T10:00:00+02:00");
+    expect(nextSession(treff, new Date("2026-10-07T12:00:00+02:00"))?.start).toBe("2026-10-14T10:00:00+02:00");
+    expect(nextSession(treff, new Date("2027-01-01T00:00:00+01:00"))).toBeUndefined();
+  });
+});
+
+describe("referenceSession", () => {
+  const treff = fixtureOffer("krabbeltreff");
+  it("nimmt den gewählten Berliner Kalendertag, sonst den nächsten Termin", () => {
+    expect(referenceSession(treff, FIXTURE_NOW, "2026-10-14")?.start).toBe("2026-10-14T10:00:00+02:00");
+    expect(referenceSession(treff, FIXTURE_NOW)?.start).toBe("2026-10-07T10:00:00+02:00");
+    // Tag ohne Termin: zurück auf den nächsten Termin
+    expect(referenceSession(treff, FIXTURE_NOW, "2026-10-08")?.start).toBe("2026-10-07T10:00:00+02:00");
+  });
+
+  it("ordnet späte Termine dem Berliner Tag zu, nicht dem UTC- oder Gerätetag", () => {
+    const late = withSessions("spaet", [
+      s("2026-10-12T23:30:00+02:00", "2026-10-12T23:59:00+02:00"),
+      s("2026-10-13T00:30:00+02:00", "2026-10-13T01:00:00+02:00"),
+    ]);
+    expect(referenceSession(late, FIXTURE_NOW, "2026-10-12")?.start).toBe("2026-10-12T23:30:00+02:00");
+    expect(referenceSession(late, FIXTURE_NOW, "2026-10-13")?.start).toBe("2026-10-13T00:30:00+02:00");
   });
 });

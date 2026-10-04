@@ -2,8 +2,7 @@
 import { useState } from "react";
 import { assetUrl } from "../data/site.ts";
 import { ageCheck } from "../domain/age.ts";
-import { rhythm, uniformTimes } from "../domain/agenda.ts";
-import { nextSession } from "../domain/filter.ts";
+import { referenceSession, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
 import { seriesIcsPath, sessionIcsPath } from "../domain/ics.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
@@ -17,10 +16,11 @@ import {
   longDate,
   plural,
   registrationLabel,
+  registrationNote,
   sessionDay,
   shortDate,
   timeRange,
-  weekdayName,
+  whenLabels,
 } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
 import { HeartButton } from "./OfferCard.tsx";
@@ -37,46 +37,12 @@ interface DetailProps {
   onIcs: (message: string) => void;
 }
 
-function whenLabels(offer: SiteOffer, now: Date): { main: string; sub: string } {
-  const first = offer.sessions[0];
-  const last = offer.sessions.at(-1);
-  if (!first || !last) return { main: "", sub: "" };
-  if (offer.format === "einmalig") return { main: longDate(sessionDay(first)), sub: `${timeRange(first)} Uhr` };
-  if (offer.format === "kurs") {
-    const range = `${shortDate(sessionDay(first))} bis ${shortDate(sessionDay(last))}`;
-    return {
-      main: `Kurs mit ${plural(offer.sessions.length, "Termin", "Terminen")}`,
-      sub: uniformTimes(offer.sessions) ? `${range}, jeweils ${timeRange(first)}` : range,
-    };
-  }
-  const r = rhythm(offer, now);
-  const next = nextSession(offer, now) ?? first;
-  const main = !r
-    ? "Regelmäßig"
-    : r.weekly
-      ? `Jeden ${weekdayName(r.weekday)}, ${timeRange(next)}`
-      : `${weekdayName(r.weekday)}s`;
-  const upcoming = offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime()).length;
-  const sub =
-    offer.registration === "ohne-anmeldung"
-      ? "Einzeln besuchbar"
-      : plural(upcoming, "kommender Termin", "kommende Termine");
-  return { main, sub };
-}
-
-function registrationNote(offer: SiteOffer): string {
-  const { opens, deadline } = offer.registrationWindow ?? {};
-  const parts = [opens && `ab ${dayDots(opens)}`, deadline && `bis ${dayDots(deadline)}`].filter(Boolean);
-  if (parts.length > 0) return `Anmeldung ${parts.join(", ")}`;
-  return offer.registration === "mit-anmeldung" ? "Beim Anbieter" : "Einfach vorbeikommen";
-}
-
 export function DetailContent({ offer, now, day, birthDate, saved, onToggleSave, onClose, onIcs }: DetailProps) {
   const [allDates, setAllDates] = useState(false);
   const category = primaryCategory(offer.topics);
-  const fromCalendar = day ? offer.sessions.find((s) => sessionDay(s) === day) : undefined;
-  const ref = fromCalendar ?? nextSession(offer, now);
-  const upcoming = offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime());
+  const fromCalendar = day ? sessionOnDay(offer, day) : undefined;
+  const ref = referenceSession(offer, now, day);
+  const upcoming = upcomingSessions(offer, now);
   const shown = allDates ? upcoming : upcoming.slice(0, 4);
   const when = whenLabels(offer, now);
   const check = birthDate ? ageCheck(offer, birthDate, now, fromCalendar) : undefined;

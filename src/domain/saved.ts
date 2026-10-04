@@ -3,7 +3,7 @@
  * IDs, die im aktuellen Datenstand fehlen, werden nur ausgeblendet, nie gelöscht: Ein lückenhafter
  * Pipeline-Lauf soll keine Merkliste leeren.
  */
-import { nextSession } from "./filter.ts";
+import { nextSession, upcomingSessions } from "./agenda.ts";
 import type { Offer, Session } from "./schema.ts";
 
 export function toggleId(ids: readonly string[], id: string): string[] {
@@ -25,5 +25,5 @@ export function savedOffers<T extends Offer>(offers: readonly T[], ids: readonly
 /** Termine für den Sammel-Export: Kurse immer komplett, sonst nur nicht beendete. */
 export function collectionSessions(offer: Offer, now: Date): Session[] {
   if (offer.format === "kurs") return offer.sessions;
-  return offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime());
+  return upcomingSessions(offer, now);
 }
