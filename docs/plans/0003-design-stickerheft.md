@@ -408,3 +408,34 @@ Hinweise (nach Aufwand):
 - **Zweiter Arch-Review** über `729b3c8..HEAD`: Verdict OK, keine Blocker, nichts Wichtiges. Umgesetzt: `applyFilters` nutzt `nextSession` statt eigenem Prädikat, `expectReducedMotion` wertet unbekannte Dauern (`auto`) als Verstoß, Doku-Drift (E6, Struktur). Offen, optional: eine Quelle für die Formate (`schema.ts`, `ids.ts`, `filter.ts`), Roboto-Fallback, Hinweise 8–10, 12–16 von oben, unbegründete `as never` in `ics.test.ts`.
 - `pnpm check` grün: 229 Unit-Tests (Coverage 98,3/91,6 %), 239 E2E inkl. WebKit, JS 81,9/90 kB, CSS 8,5/15 kB.
 - Offen aus der Übergabe: Punkte 3 (Fast-Forward nach `main` durch den Nutzer), 4 (`/browser-review` live, besonders Kalender nach dem Refactor) und 5 (Plan 0004).
+- Nachtrag: Fast-Forward nach `main` erledigt (`d27ac67`, CI/Deploy-Run 37215925810 grün).
+
+## Browser-Review live (2026-10-04)
+
+Ziel: https://sbiastoch.github.io/zwergenplan/, Stand `d27ac67`, echte Daten (333 Angebote, Datenstand 4.10. 14:05), Prüfung am 4.10. gegen 18:30. Geprüft (Subagent): Screenshot-Matrix (`node scripts/screenshots.ts <URL>`, 48 Bilder: 320/390/412/915 quer × hell/dunkel × start, kalender, merkliste, detail, filter, kind), dazu interaktiv mit Playwright (Chromium mobil, Europe/Berlin): Netzwerk, Kalender-Navigation, Detail per Deep-Link, ICS-Downloads, Webfont blockiert/verzögert, Roboto-Emulation, 200 % Textgröße, reduzierte Bewegung, Lade-/Fehler-/Leerzustände, Zurück-Navigation.
+
+### Checkliste
+- **Lesbarkeit:** Befund. Karten klar (Kategorie, Zeit, Titel, Ort, Chips, Verfügbarkeit). Detail: B1, H6.
+- **Daumen-Erreichbarkeit:** Befund. Tab- und ICS-Leiste unten, Kalenderpfeile 44×44. B3, H7, H1.
+- **Zustände:** ok mit Befunden. Laden (Platzhalter), Fehler („Nochmal versuchen“), leere Filter, leere Merkliste ok, lange Titel brechen sauber. B2, B8.
+- **Dark Mode:** ok, H4.
+- **Micro-Interactions/reduzierte Bewegung:** ok. `:active` überall, Animationen 340–450 ms; mit Reduce alles 0,01 ms ohne Delay. Zurück/Esc schließen das Detail.
+- **Design-System:** ok, einheitlich.
+- **Netzwerk:** ok. 5 Requests, nur `sbiastoch.github.io`, genau eine Schriftdatei (Latin-woff2), keine Konsolenfehler.
+- **Kalender-Grenzen:** ok. Woche 23× vor bis 8.–14. März (letzter Termin 13.3.2027), dann gesperrt; Monat bis März 2027; zurück jeweils bis heute.
+- **ICS:** ok. Sammel-ICS per Blob (3 Sticker → 60 VEVENTs, CRLF, Faltung, UTC), Einzel-ICS „Nur …“ und „Alle N Termine“. **Echtes iPhone: nicht prüfbar, muss der Nutzer testen** (ADR 0007).
+- **Schrift vor dem Laden:** Befund B5, B6.
+- **320 px / 200 %:** 320 px ok; 200 % ohne horizontalen Scroll, aber B7.
+
+### Befunde
+- **B1 (wichtig)** `src/ui/format.ts` `whenLabels`: bei regelmäßigem Rhythmus mit Lücken nur „Montags“/„Freitags“ ohne Uhrzeit, obwohl `uniformTimes` gilt.
+- **B2 (wichtig)** `src/ui/CalendarView.tsx`: Agenda „Heute“ zeigt abends bereits beendete Termine ohne Kennzeichnung.
+- **B5 (wichtig)** `src/ui/styles/chrome.css`: bei 360–370 px bricht die Kopfzeile um (Theme-Knopf allein in Zeile 2, 116 statt 64 px); Ausblende-Breakpoint liegt bei 359 px.
+- **B6 (wichtig)** `src/ui/styles/tokens.css`: Webfont-Swap bei 412 px mit echten Daten CLS 0,070 (Arial-Fallback) bzw. 0,113 (Roboto, Android) > 0,05; Quelle `.card`/`.facts`. Roboto-Fallback ergänzen, Perf-Test mit echten Daten und verzögerter Schrift.
+- **B7 (wichtig)** 200 % bei 320 px: Sticker-Beschriftungen überlappen, Tab-Leiste/ICS-Knöpfe brechen mitten im Wort, Tageszahlen senkrecht, Filter-Chips abgeschnitten (WCAG 1.4.4), Kategorie-Pille im Detail oval. Das Smoke-Gate prüft nur horizontalen Scroll.
+- **B3 (Hinweis)** `calendar.css` `.day`/`.mday`: bei 320 px 39 px breit (< 44), ab 360 px ok.
+- **B4 (Hinweis)** `format.ts` `registrationNote`: abgelaufene Frist ohne Hinweis.
+- **B8 (Hinweis)** Kalender: Tage nach dem letzten Termin zeigen „Freier Tag“ statt Hinweis auf den Datenhorizont.
+- **H1** Quer 915×412: ca. 60 px Inhalt; Toast überdeckt erste Merklisten-Karte. **H2** Woche am Sonntag 6/7 gesperrt, bei offenem Monat Wochenleiste doppelt. **H3** Kind-Sheet 320 px: „Automatisch“ bis an den Rand. **H4** Toast im Dunkelmodus hell. **H5** „Alle N Termine“ zählt vergangene mit. **H6** Ort im Detail und in ICS-`LOCATION` doppelt. **H7** Filter-Sheet: „N Angebote zeigen“ erst nach Scrollen sichtbar. **H8** Kurs-Detail ohne „noch X von N“.
+
+Verdict: keine Blocker. B1, B2, B5, B6, B7 brauchen eine Nacharbeit (eigener kleiner Plan), offen bleibt der iPhone-Test der Merklisten-ICS durch den Nutzer.
