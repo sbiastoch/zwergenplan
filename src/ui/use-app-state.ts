@@ -1,5 +1,5 @@
 /** Zustand, der den Browser berührt: URL/History, Präferenzen (über src/data), Toast, Farbschema, Uhr, Startpunkt. */
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { canLocate, type PositionProblem, requestPosition } from "../data/geolocation.ts";
 import {
   loadAgeOnly,
@@ -19,6 +19,7 @@ import type { Origin } from "../domain/reach.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
+import { initialOriginState, originReducer } from "./origin-state.ts";
 
 /** Markiert einen History-Eintrag, den das Öffnen eines Details erzeugt hat (Plan 0003, E4). */
 const DETAIL_STATE = { zpDetail: true } as const;
@@ -197,7 +198,8 @@ export interface OriginApi {
   problem: PositionProblem | undefined;
   /** ob „Meinen Standort nutzen“ überhaupt angeboten wird */
   canLocate: boolean;
-  useMyLocation: () => void;
+  /** „Meinen Standort nutzen“: fragt einmal ab, nur auf Tipp */
+  locateMe: () => void;
   setDistrict: (id: string) => void;
   /** „Startpunkt entfernen“: Standort und gespeicherten Stadtteil */
   clear: () => void;
@@ -211,50 +213,34 @@ function districtOrigin(id: string | undefined): Origin | undefined {
 /**
  * Startpunkt der Entfernung (Plan 0004, E3). Gespeichert wird nur die ID eines Stadtteils, nie ein
  * Standort; der Standort wird nur auf Tipp abgefragt und ist nach dem Neuladen weg. Wählt man den
- * Standort, bleibt ein gespeicherter Stadtteil liegen und gilt nach dem Neuladen wieder.
+ * Standort, bleibt ein gespeicherter Stadtteil liegen und gilt nach dem Neuladen wieder. Die Reihenfolge
+ * (späte Antworten) regelt `originReducer`; eine unbekannte gespeicherte ID zählt als „kein Startpunkt“.
  */
 export function useOrigin(): OriginApi {
-  const [origin, setOrigin] = useState(() => districtOrigin(loadOriginDistrict()));
-  const [locating, setLocating] = useState(false);
-  const [problem, setProblem] = useState<PositionProblem>();
+  const [state, dispatch] = useReducer(originReducer, undefined, () =>
+    initialOriginState(districtOrigin(loadOriginDistrict())),
+  );
   const [locatable] = useState(() => canLocate());
-  // Eine spät eintreffende Standort-Antwort darf eine neuere Wahl (Stadtteil, Entfernen) nicht überschreiben.
-  const request = useRef(0);
+  const nextRequest = useRef(0);
 
-  const useMyLocation = useCallback(() => {
-    const id = ++request.current;
-    setLocating(true);
-    // alten Fehler leeren, damit die Live-Region einen erneuten Fehlschlag wieder ansagt
-    setProblem(undefined);
-    void requestPosition().then((result) => {
-      if (id !== request.current) return;
-      setLocating(false);
-      if (result.ok) {
-        setOrigin({ source: "standort", point: result.point, label: "Mein Standort" });
-        setProblem(undefined);
-      } else {
-        setProblem(result.reason);
-      }
-    });
+  const locateMe = useCallback(() => {
+    const request = ++nextRequest.current;
+    dispatch({ type: "locate", request });
+    void requestPosition().then((result) => dispatch({ type: "located", request, result }));
   }, []);
 
   const setDistrict = useCallback((id: string) => {
-    const next = districtOrigin(id);
-    if (!next) return;
-    request.current++;
-    setLocating(false);
-    setOrigin(next);
-    setProblem(undefined);
+    const origin = districtOrigin(id);
+    if (!origin) return;
+    dispatch({ type: "district", origin });
     saveOriginDistrict(id);
   }, []);
 
   const clear = useCallback(() => {
-    request.current++;
-    setLocating(false);
-    setOrigin(undefined);
-    setProblem(undefined);
+    dispatch({ type: "clear" });
     saveOriginDistrict(undefined);
   }, []);
 
-  return { origin, locating, problem, canLocate: locatable, useMyLocation, setDistrict, clear };
+  const { origin, locating, problem } = state;
+  return { origin, locating, problem, canLocate: locatable, locateMe, setDistrict, clear };
 }
