@@ -33,7 +33,8 @@
   .origin .linkbtn {
     margin-top: 6px;
   }
-  .btn:disabled {
+  /* „Suche Standort …“: nur dieser Knopf, nicht jedes gesperrte .btn (Arch-Review 0004, m4) */
+  .origin .btn[aria-busy="true"] {
     cursor: progress;
     box-shadow: none;
   }

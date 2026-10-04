@@ -48,7 +48,9 @@ export function OriginPicker({ api, focus }: { api: OriginApi; focus: boolean })
         )}
       </p>
       {api.canLocate && (
-        <button type="button" className="btn wide" disabled={locating} onClick={api.locateMe}>
+        // `aria-busy` statt `disabled`: Ein gesperrter Knopf verlöre den Fokus an <body>. Ein Tipp während der
+        // Suche tut nichts; die Abfrage endet spätestens nach 15 s (geolocation.ts).
+        <button type="button" className="btn wide" aria-busy={locating} onClick={locating ? undefined : api.locateMe}>
           <Icon name="compass" size={20} />
           {locating ? "Suche Standort …" : "Meinen Standort nutzen"}
         </button>

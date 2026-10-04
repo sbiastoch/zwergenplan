@@ -118,6 +118,26 @@ test("Standort verweigert: Hinweis, kein Startpunkt", async ({ page }) => {
   await expect(sheet.getByRole("button", { name: "Meinen Standort nutzen" })).toBeEnabled();
 });
 
+test("Standort antwortet nie: Knopf bleibt fokussiert und „busy“, nach 15 s Hinweis", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator.geolocation, "getCurrentPosition", { value: () => undefined });
+  });
+  await ready(page);
+  // Uhr anhalten (wie FIXTURE_NOW), damit die 15 s ohne Warten vergehen
+  await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
+  const sheet = await openKidSheet(page);
+  await sheet.getByRole("button", { name: "Meinen Standort nutzen" }).click();
+  const busy = sheet.getByRole("button", { name: "Suche Standort …" });
+  await expect(busy).toHaveAttribute("aria-busy", "true");
+  // nicht `disabled`: Der Fokus bleibt auf dem Knopf, statt auf <body> zu fallen (Arch-Review 0004, m4)
+  await expect(busy).toBeFocused();
+  await page.clock.runFor(15_000);
+  await expect(sheet.getByText("Standort gerade nicht verfügbar. Wähle stattdessen einen Stadtteil.")).toBeVisible();
+  const again = sheet.getByRole("button", { name: "Meinen Standort nutzen" });
+  await expect(again).not.toHaveAttribute("aria-busy", "true");
+  await expect(again).toBeFocused();
+});
+
 test("Umkreis mit Startpunkt: bis 2 km blendet Musikschule und Gemeinde aus", async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);
