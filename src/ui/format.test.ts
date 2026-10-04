@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Origin, Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, fromBerlinLocal } from "../domain/time.ts";
 import {
@@ -8,8 +9,13 @@ import {
   availabilityLabel,
   clock,
   dayHeading,
+  distanceLong,
+  distanceNote,
+  distanceShort,
   formatFact,
+  originPhrase,
   plural,
+  reachLimitLabel,
   registrationNote,
   shortDate,
   standDate,
@@ -235,5 +241,46 @@ describe("Detail: Wann und Anmeldung", () => {
       registrationWindow: { opens: "2026-09-01T08:00:00+02:00", deadline: "2026-10-09T23:59:00+02:00" },
     });
     expect(registrationNote(mitStart, new Date("2026-10-10T12:00:00+02:00"))).toBe("Anmeldeschluss war am 9.10.");
+  });
+});
+
+describe("Entfernung (Plan 0004, E6)", () => {
+  const luftlinie = (meters: number): Reach => ({ kind: "luftlinie", meters });
+  const gostenhof: Origin = {
+    source: "stadtteil",
+    point: { lat: 49.448, lon: 11.058 },
+    label: "Gostenhof",
+    districtId: "gostenhof",
+  };
+  const standort: Origin = { source: "standort", point: { lat: 49.452, lon: 11.077 }, label: "Mein Standort" };
+
+  it("kurz für die Kachel: gerundet, deutsches Komma", () => {
+    expect(distanceShort(luftlinie(0))).toBe("100 m");
+    expect(distanceShort(luftlinie(226))).toBe("200 m");
+    expect(distanceShort(luftlinie(400))).toBe("400 m");
+    expect(distanceShort(luftlinie(1427))).toBe("1,4 km");
+    expect(distanceShort(luftlinie(2000))).toBe("2 km");
+    expect(distanceShort(luftlinie(9960))).toBe("10 km");
+    expect(distanceShort(luftlinie(12_400))).toBe("12 km");
+  });
+
+  it("nennt den Startpunkt", () => {
+    expect(originPhrase(gostenhof)).toBe("ab Gostenhof");
+    expect(originPhrase(standort)).toBe("ab deinem Standort");
+  });
+
+  it("lang fürs Detail, immer mit „Luftlinie“", () => {
+    expect(distanceLong(luftlinie(1427), gostenhof)).toBe("ca. 1,4 km Luftlinie ab Gostenhof");
+    expect(distanceLong(luftlinie(226), standort)).toBe("ca. 200 m Luftlinie ab deinem Standort");
+  });
+
+  it("erklärt in der Statuszeile, was die Zahl auf der Kachel ist", () => {
+    expect(distanceNote(gostenhof)).toBe("Entfernung als Luftlinie ab Gostenhof");
+    expect(distanceNote(standort)).toBe("Entfernung als Luftlinie ab deinem Standort");
+  });
+
+  it("beschriftet den Umkreis", () => {
+    expect(reachLimitLabel({ kind: "km", value: 2 })).toBe("bis 2 km");
+    expect(reachLimitLabel({ kind: "km", value: 10 })).toBe("bis 10 km");
   });
 });
