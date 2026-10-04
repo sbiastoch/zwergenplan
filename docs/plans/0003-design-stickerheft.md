@@ -42,6 +42,8 @@ MapLibre GL hat etwa 200 kB gzip. Es passt nur lazy geladen ins Budget, braucht 
 - Im Kind-Sheet entfällt „Entfernung ab“.
 - `docs/ideas.md` bekommt keinen Eintrag; Plan 0004 wird direkt im Anschluss geschrieben. Er muss ADR 0005 aufgreifen (Öffi-Fahrzeit als Ziel, Luftlinie höchstens als Zwischenstufe).
 
+> **Umgesetzt in Plan 0004 (Entfernung) und 0005 (Karte).** Plan 0004 bringt „Entfernung ab“ im Kind-Sheet (Standort oder Stadtteil), die km-Angabe auf der Kachel und den Filter „Entfernung“ zurück, als Luftlinie ohne Drittanbieter. Die Karte mit MapLibre GL und OpenFreeMap folgt in Plan 0005 (ADR 0008).
+
 ### E2 – Layout: Dokument-Scroll statt App-Shell
 
 Das Mockup scrollt in einem festen 390×844-Rahmen. Die Website nutzt dagegen den normalen Dokument-Scroll: Adressleiste klappt ein, 200 % Text funktioniert, Scroll-Wiederherstellung funktioniert.
