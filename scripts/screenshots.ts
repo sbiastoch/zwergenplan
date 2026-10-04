@@ -1,7 +1,7 @@
 /**
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,kalender,…] [--text=200]   Standard: lokale Preview mit Fixtures
- * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003).
+ * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt, filter-entfernung (Plan 0004).
  * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
 import { mkdirSync } from "node:fs";
@@ -33,6 +33,13 @@ async function ready(page: Page) {
   await page.waitForFunction(() => !document.querySelector("[role=status]")?.textContent?.includes("Lade"));
 }
 
+/** Startpunkt Gostenhof: Nur die Stadtteil-ID liegt im Speicher (Plan 0004, E3), nach dem Neuladen gilt sie. */
+async function withGostenhof(page: Page) {
+  await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+  await page.reload();
+  await ready(page);
+}
+
 /** Jede Ansicht: Weg dorthin, ausgehend von der geladenen Startseite. */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   start: async () => {},
@@ -54,6 +61,18 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   kind: async (page) => {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.getByLabel("Geburtsdatum").fill("02.11.2025");
+    // Startpunkt (Plan 0004): Abschnitt „Entfernung ab“ mit gesetztem Stadtteil
+    await page.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+  },
+  "start-startpunkt": async (page) => {
+    await withGostenhof(page);
+  },
+  "filter-entfernung": async (page) => {
+    await withGostenhof(page);
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const sheet = page.getByRole("dialog", { name: "Filter" });
+    await sheet.getByRole("button", { name: "bis 5 km" }).click();
+    await sheet.getByRole("heading", { name: "Entfernung" }).scrollIntoViewIfNeeded();
   },
 };
 

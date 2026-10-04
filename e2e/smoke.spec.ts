@@ -63,6 +63,28 @@ for (const [name, go] of Object.entries(REAL_VIEWS)) {
   });
 }
 
+test("Stadtteil als Startpunkt mit echten Daten (Plan 0004)", async ({ page }) => {
+  const meta = await openAtDataTime(page);
+  test.skip(meta.offers === 0, "keine Daten");
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await sheet.getByLabel("Stadtteil", { exact: true }).selectOption("altstadt");
+  await sheet.getByRole("button", { name: "Fertig" }).click();
+  await expect(sheet).toBeHidden();
+
+  await expect(page.getByRole("status")).toContainText("Entfernung als Luftlinie ab Altstadt");
+  await expect(page.getByTestId("offer").first().locator(".meta .dist")).toHaveText(/^\d+(,\d)? k?m$/);
+  await expectMobileUx(page);
+
+  await page.setViewportSize({ width: 320, height: 640 });
+  await expectNoHorizontalScroll(page);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  await expectNoHorizontalScroll(page);
+  await expectAccessible(page);
+});
+
 test("lange Listen werden schrittweise gezeigt (Plan 0003, E8)", async ({ page }) => {
   const meta = await openAtDataTime(page);
   test.skip(meta.offers <= 60, "zu wenige Angebote für mehrere Schritte");

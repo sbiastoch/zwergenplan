@@ -22,6 +22,23 @@ async function ready(page: Page) {
   await expect(page.getByTestId("offer").first()).toBeVisible();
 }
 
+/** Startpunkt Gostenhof über das Kind-Sheet setzen (Plan 0004); das Sheet bleibt offen. */
+async function pickGostenhof(page: Page) {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await sheet.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+  await expect(sheet.getByText("Startpunkt:")).toContainText("Gostenhof");
+  return sheet;
+}
+
+/** Wie pickGostenhof, danach ist das Sheet wieder zu und die Kacheln zeigen Entfernungen. */
+async function withGostenhof(page: Page) {
+  const sheet = await pickGostenhof(page);
+  await sheet.getByRole("button", { name: "Fertig" }).click();
+  await expect(sheet).toBeHidden();
+  await expect(page.getByRole("status")).toContainText("Luftlinie ab Gostenhof");
+}
+
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   entdecken: async () => {},
@@ -58,6 +75,24 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.getByLabel("Geburtsdatum").fill("01.09.2026");
     await expect(page.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
+  },
+  // Plan 0004: längere Meta-Zeile „Anbieter · Stadtteil · 1,4 km“ und Statuszeile mit „Luftlinie“
+  "entdecken-startpunkt": async (page) => {
+    await withGostenhof(page);
+    await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("200 m");
+  },
+  "kind-sheet-startpunkt": async (page) => {
+    const sheet = await pickGostenhof(page);
+    await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();
+    await expect(sheet.getByText(/^Luftlinie, nicht die Fahrzeit\./)).toBeVisible();
+  },
+  "filter-sheet-entfernung": async (page) => {
+    await withGostenhof(page);
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const sheet = page.getByRole("dialog", { name: "Filter" });
+    await sheet.getByRole("button", { name: "bis 5 km" }).click();
+    await expect(sheet.getByRole("button", { name: "bis 5 km" })).toHaveAttribute("aria-pressed", "true");
+    await sheet.getByRole("heading", { name: "Entfernung" }).scrollIntoViewIfNeeded();
   },
 };
 
