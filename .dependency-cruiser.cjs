@@ -55,6 +55,14 @@ module.exports = {
       to: { path: ["^data/", "^tests/fixtures/", "^public/"] },
     },
     {
+      name: "data-domain-runtime-allowlist",
+      severity: "error",
+      comment:
+        "src/data importiert aus src/domain zur Laufzeit nur reine Hilfen ohne Zod (ADR 0010): geo (Runden, Stadtgrenze). Typ-Importe sind frei.",
+      from: { path: "^src/data/", pathNot: "\\.test\\.ts$" },
+      to: { path: "^src/domain/", pathNot: "^src/domain/geo\\.ts$", dependencyTypesNot: ["type-only"] },
+    },
+    {
       name: "scripts-not-ui",
       severity: "error",
       comment: "Pipeline/Skripte nutzen Domänenlogik, nie UI.",
