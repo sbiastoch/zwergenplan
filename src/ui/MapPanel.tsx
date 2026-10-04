@@ -15,6 +15,15 @@ import { PlaceList } from "./PlaceList.tsx";
 
 type Module = { kind: "laden" } | { kind: "da"; View: ComponentType<MapViewProps> } | { kind: "fehler" };
 
+/**
+ * Eigene Funktion statt `import(…).then(ok, fail)`: Vite hängt die Handler dieser Form an den rohen
+ * Import innerhalb seines Preload-Helfers. Scheitert dann das Karten-CSS, wirft der Helfer an den
+ * Handlern vorbei (unbehandelte Ablehnung, Zustand bliebe „laden“). Mit `await` hängen sie am Ergebnis.
+ */
+async function loadMapView(): Promise<ComponentType<MapViewProps>> {
+  return (await import("./map/MapView.tsx")).MapView;
+}
+
 /** Lädt MapView.tsx; `retry` ruft `import()` erneut auf. `attempt` zählt die Wiederholungen. */
 function useMapModule(): { module: Module; attempt: number; retry: () => void } {
   const [attempt, setAttempt] = useState(0);
@@ -24,8 +33,8 @@ function useMapModule(): { module: Module; attempt: number; retry: () => void } 
     let live = true;
     setModule({ kind: "laden" });
     // vite:preloadError wird bewusst nicht unterdrückt, sonst löste import() ohne Modul auf (E2).
-    import("./map/MapView.tsx").then(
-      (m) => live && setModule({ kind: "da", View: m.MapView }),
+    loadMapView().then(
+      (View) => live && setModule({ kind: "da", View }),
       () => live && setModule({ kind: "fehler" }),
     );
     return () => {

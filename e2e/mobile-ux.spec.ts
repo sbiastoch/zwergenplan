@@ -1,6 +1,6 @@
 /** Mobile-UX-Gates für jede Ansicht und jedes Overlay, hell und dunkel (Plan 0003, Plan 0007, docs/architecture.md). */
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, MAP_READY, test } from "./fixtures.ts";
 import {
   backgroundLuminance,
   expectAccessible,
@@ -38,6 +38,16 @@ async function withGostenhof(page: Page) {
   await expect(sheet).toBeHidden();
   await expect(page.getByRole("status")).toContainText("Luftlinie ab Gostenhof");
 }
+
+/** Karte mit Stadtteil als Startpunkt (Plan 0005): Werkzeugzeile „Startpunkt: Gostenhof“, Orts-Liste mit Entfernung. */
+async function openMap(page: Page) {
+  await withGostenhof(page);
+  await page.getByRole("button", { name: "Karte", exact: true }).click();
+  await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+}
+
+/** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
+const MAP_VIEWS = new Set(["karte", "orts-sheet"]);
 
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
@@ -105,6 +115,15 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
     await expect(page.getByRole("dialog").getByText("ca. 1,4 km Luftlinie ab Gostenhof")).toBeVisible();
   },
+  karte: openMap,
+  "orts-sheet": async (page) => {
+    await openMap(page);
+    await page
+      .getByRole("region", { name: "Orte" })
+      .getByRole("button", { name: /^Familientreff Beispielhof/ })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
+  },
 };
 
 /**
@@ -131,35 +150,38 @@ async function expectDarkTheme(page: Page, scheme: (typeof SCHEMES)[number]) {
 }
 
 for (const [name, go] of Object.entries(VIEWS)) {
-  for (const scheme of SCHEMES) {
-    test(`${name} besteht die Mobile-UX-Gates (${scheme.label})`, async ({ page }) => {
-      await useScheme(page, scheme);
-      await ready(page);
-      await expectDarkTheme(page, scheme);
-      await go(page);
-      // vor expectMobileUx: dessen settle() wartet Animationen ab, die hier gar nicht erst laufen dürfen
-      await expectReducedMotion(page);
-      await expectMobileUx(page);
-      if (scheme.label !== "hell") {
-        await expectNoBrightIslands(page);
-        // Der Alters-Hinweis liegt mit Grün (0,60) unter der Insel-Schwelle, soll im Dunkeln aber gedämpft sein.
-        if (name === "kind-sheet") expect(await backgroundLuminance(page, ".hint.ok")).toBeLessThan(0.2);
-      }
-    });
-  }
+  test.describe(name, () => {
+    if (MAP_VIEWS.has(name)) test.use({ tiles: "mock" });
+    for (const scheme of SCHEMES) {
+      test(`${name} besteht die Mobile-UX-Gates (${scheme.label})`, async ({ page }) => {
+        await useScheme(page, scheme);
+        await ready(page);
+        await expectDarkTheme(page, scheme);
+        await go(page);
+        // vor expectMobileUx: dessen settle() wartet Animationen ab, die hier gar nicht erst laufen dürfen
+        await expectReducedMotion(page);
+        await expectMobileUx(page);
+        if (scheme.label !== "hell") {
+          await expectNoBrightIslands(page);
+          // Der Alters-Hinweis liegt mit Grün (0,60) unter der Insel-Schwelle, soll im Dunkeln aber gedämpft sein.
+          if (name === "kind-sheet") expect(await backgroundLuminance(page, ".hint.ok")).toBeLessThan(0.2);
+        }
+      });
+    }
 
-  test(`${name} bricht bei 320 px und 200 % Textgröße nicht aus`, async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 640 });
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await ready(page);
-    await go(page);
-    await expectNoHorizontalScroll(page);
-    await expectTouchTargets(page); // B3: Kalendertage ≥ 44 px auch bei 320 px
-    await expectTextFits(page); // inkl. einzeiliger Knopf-Beschriftungen bei 100 %
-    await setTextScale(page, 2);
-    await expectNoHorizontalScroll(page);
-    await expectTextFits(page, { scale: 2 });
-    await expectAccessible(page);
+    test(`${name} bricht bei 320 px und 200 % Textgröße nicht aus`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await ready(page);
+      await go(page);
+      await expectNoHorizontalScroll(page);
+      await expectTouchTargets(page); // B3: Kalendertage ≥ 44 px auch bei 320 px
+      await expectTextFits(page); // inkl. einzeiliger Knopf-Beschriftungen bei 100 %
+      await setTextScale(page, 2);
+      await expectNoHorizontalScroll(page);
+      await expectTextFits(page, { scale: 2 });
+      await expectAccessible(page);
+    });
   });
 }
 
@@ -213,4 +235,18 @@ test("zeigt den Fokus auch im Detail-Dialog", async ({ page, isMobile }) => {
   await ready(page);
   await VIEWS["detail"]?.(page);
   await expectVisibleFocus(page, 15);
+});
+
+test.describe("Karte", () => {
+  test.use({ tiles: "mock" });
+
+  test("zeigt den Fokus auf Kartenfläche, Zoom, Attribution, Werkzeugzeile und Orts-Liste", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "Tastatur-Fokus wird auf Desktop geprüft");
+    await ready(page);
+    await openMap(page);
+    await expectVisibleFocus(page, 60);
+  });
 });

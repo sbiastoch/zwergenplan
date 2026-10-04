@@ -3,7 +3,7 @@
  * Ein alter Datenstand ist laut ADR 0002 nur eine Warnung und darf Code-Commits nicht rot machen.
  */
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, MAP_READY, test } from "./fixtures.ts";
 import {
   expectAccessible,
   expectMobileUx,
@@ -127,4 +127,34 @@ test("LCP und CLS bleiben mit echten Daten im Budget", async ({ page, browserNam
   const vitals = await page.evaluate(() => (window as unknown as { __vitals: { lcp: number; cls: number } }).__vitals);
   expect(vitals.lcp, "LCP (ms)").toBeLessThan(2500);
   expect(vitals.cls, "CLS").toBeLessThan(0.05);
+});
+
+test.describe("Karte mit echten Daten (Plan 0005)", () => {
+  test.use({ tiles: "mock" });
+
+  async function openMap(page: Page) {
+    const meta = await openAtDataTime(page);
+    test.skip(meta.offers === 0, "keine Daten");
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+  }
+
+  test("Karte ist bereit, Orts-Liste vollständig, kein Test-Haken im Deploy-Build", async ({ page }) => {
+    await openMap(page);
+    expect(await page.getByRole("region", { name: "Orte" }).getByRole("button").count()).toBeGreaterThanOrEqual(50);
+    // __zpMap gibt es nur im E2E-Build (__E2E__, Plan 0005 E13)
+    expect(await page.evaluate(() => "__zpMap" in window)).toBe(false);
+    // Ortsnamen aus Daten dürfen umbrechen: Prüfung 5 nur mit Fixtures (Plan 0007, E10).
+    await expectMobileUx(page, { buttons: false });
+  });
+
+  test("Karte bricht bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await openMap(page);
+    await expectNoHorizontalScroll(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2, buttons: false });
+    await expectAccessible(page);
+  });
 });

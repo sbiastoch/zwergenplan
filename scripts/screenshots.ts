@@ -1,11 +1,12 @@
 /**
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,kalender,…] [--text=200]   Standard: lokale Preview mit Fixtures
- * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt, filter-entfernung (Plan 0004).
+ * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt, filter-entfernung (Plan 0004),
+ * karte, ort (Plan 0005). Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
  * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
-import { mkdirSync } from "node:fs";
-import { chromium, type Page } from "@playwright/test";
+import { existsSync, mkdirSync } from "node:fs";
+import { type BrowserContext, chromium, type Page } from "@playwright/test";
 
 const args = process.argv.slice(2);
 const url = args.find((a) => !a.startsWith("--")) ?? "http://localhost:4173/";
@@ -38,6 +39,27 @@ async function withGostenhof(page: Page) {
   await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
   await page.reload();
   await ready(page);
+}
+
+/** Kachel-Mock für die lokale Preview (wie e2e/fixtures.ts, tiles: "mock"): Stile, Glyphen, leere Kacheln. */
+async function mockTiles(context: BrowserContext) {
+  await context.route("https://tiles.openfreemap.org/**", (route) => {
+    const path = decodeURIComponent(new URL(route.request().url()).pathname);
+    if (path.startsWith("/planet/")) {
+      return route.fulfill({ status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) });
+    }
+    const file = path.startsWith("/styles/")
+      ? `tests/fixtures/karte/${path.slice("/styles/".length)}.json`
+      : `tests/fixtures/karte${path}`;
+    return existsSync(file) ? route.fulfill({ path: file }) : route.fulfill({ status: 404 });
+  });
+}
+
+/** Karte mit Stadtteil Gostenhof (Werkzeugzeile und Orts-Liste mit Entfernung) */
+async function openMap(page: Page) {
+  await withGostenhof(page);
+  await page.getByRole("button", { name: "Karte", exact: true }).click();
+  await page.locator(".map-box[data-state=bereit]").waitFor({ timeout: 30_000 });
 }
 
 /** Jede Ansicht: Weg dorthin, ausgehend von der geladenen Startseite. */
@@ -74,6 +96,17 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await sheet.getByRole("button", { name: "bis 5 km" }).click();
     await sheet.getByRole("heading", { name: "Entfernung" }).scrollIntoViewIfNeeded();
   },
+  karte: openMap,
+  ort: async (page) => {
+    await openMap(page);
+    await page
+      .getByRole("region", { name: "Orte" })
+      .getByRole("button")
+      .filter({ hasText: "Angebote" })
+      .first()
+      .click();
+    await page.getByRole("dialog").waitFor();
+  },
 };
 
 const views = viewsArg ? viewsArg.split(",") : Object.keys(VIEWS);
@@ -93,6 +126,7 @@ for (const vp of viewports) {
         locale: "de-DE",
         timezoneId: "Europe/Berlin",
       });
+      if (isLocal) await mockTiles(context);
       const page = await context.newPage();
       if (isLocal) await page.clock.setFixedTime(new Date("2026-10-05T12:00:00+02:00"));
       await page.goto(url);
