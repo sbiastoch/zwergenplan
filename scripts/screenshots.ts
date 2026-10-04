@@ -33,6 +33,8 @@ for (const vp of viewports) {
     if (isLocal) await page.clock.setFixedTime(new Date("2026-10-05T12:00:00+02:00"));
     await page.goto(url);
     await page.getByRole("status").first().waitFor();
+    // Erst auslösen, wenn die Daten geladen sind – sonst zeigt das Bild den Ladezustand (Browser-Review 0002).
+    await page.waitForFunction(() => !document.querySelector("[role=status]")?.textContent?.includes("Lade"));
     const file = `${outDir}/${vp.name}-${scheme}.png`;
     await page.screenshot({ path: file, fullPage: false });
     console.log(file);

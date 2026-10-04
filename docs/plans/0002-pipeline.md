@@ -416,3 +416,30 @@ Die Blocker aus Review 1 sind gelöst. Die Änderungen stehen oben im Plan.
   - `vidOf` nur noch an einer Stelle
   - Doku-Drift bei E8
   - gleiche Kurs-ID: Termine werden vereinigt
+
+## Erster Lauf (2026-10-04)
+
+- 9 Pakete mit 62 Anbietern (Subagenten) plus 19 Termine aus den Sammelkalendern. Ergebnis: 333 Angebote mit 2 889 Terminen. 54 Anbieter ok, 7 ohne Termine, kein Fehler. Neu im Katalog ist IMILUV Studio (über `add-provider`). Entfernt wurde der eckstein-Treff, denn die Kinder werden dort separat betreut.
+- Gefunden und behoben:
+  - Kollision gekürzter Titel bei regelmäßigen Angeboten, jetzt Fehler in `validate-raw`/`build`
+  - Dubletten über Anbietergrenzen (HebAnne in der FamilienBox, Yoga bei Hebammen in Johannis/Wolf Pack Yoga), jetzt Hinweis in `build` plus Regel in `extraction.md`
+  - Stadt-Kalender: `[]` je Termin, falscher charset-Header, weiche Trennzeichen
+- Ohne verbundenen Browser blieben die Plätze bei Eversports, Calendly und Kurabu `unbekannt`. Die Termine selbst waren lesbar.
+
+## Browser-Review (live, echte Daten, 2026-10-04)
+
+Screenshots `e2e/.artifacts/screens/{320,iphone,pixel,quer}-{light,dark}.png` und `live-gefiltert-320.png`. Die Live-Interaktion lief per Playwright, weil claude-in-chrome nicht verbunden war. Ergebnis:
+- Filter Kurs → 170, Kurs + Einmalig → 216, Geburtsdatum 15.04.2026 → 102 Angebote. Der Zustand überlebt ein Neuladen, das Datum steht nicht in der URL.
+- ICS-Link: 200, `text/calendar`, 6 VEVENTs, UIDs nach ADR 0003/0006, gefaltet auf 75 Oktette.
+- Angebote nach 0,76 s sichtbar (`site.json` 84 KB gzip), kein Konsolenfehler, Scrollbreite bei 320 px = 320.
+
+Checkliste:
+- **Lesbarkeit**: Kontrast und Hierarchie sind gut, was/wann/wo ist sofort erfassbar. **„Frei?“ fehlt auf der Karte**, die Daten haben `availability` → `docs/ideas.md` (UI-Plan).
+- **Daumen-Erreichbarkeit**: Die Filter liegen oben, die Kartenaktionen mittig mit ausreichendem Abstand. Für die Platzhalter-UI in Ordnung, die Anordnung kommt aus der Mockup-Session.
+- **Zustände**: Laden („Lade Angebote …“) ist sichtbar und kurz. Lange Titel und Anbieternamen brechen sauber um, ohne Überlauf. Der Leerzustand ist per E2E abgedeckt.
+- **Dark Mode**: keine grellen Flächen, Primärbutton gut lesbar.
+- **Micro-Interactions**: Der gedrückte Filter-Chip ist deutlich (gefüllt). Reduzierte Bewegung ist per E2E abgedeckt. Mehr bringt erst das Design.
+- **Konsistenz**: Ein Design-System gibt es noch nicht.
+- Weitere Befunde:
+  - Laufende Kurse stehen oben, weil nach dem ersten Termin sortiert wird, z. B. „Babymassage + Babyyoga … bis 06.10.“ mit 1 Resttermin. Sortierung nach dem nächsten Termin und ein Hinweis auf den Einstieg → `docs/ideas.md`.
+  - `scripts/screenshots.ts` löste vor dem Laden der Daten aus (`quer-dark`). Behoben: Es wartet jetzt, bis die Daten geladen sind.
