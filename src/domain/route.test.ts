@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { EMPTY_FILTER } from "./filter.ts";
+import { DISTRICTS } from "./districts.ts";
+import { EMPTY_FILTER, type FilterState } from "./filter.ts";
+import { RADII_KM } from "./reach.ts";
 import { parseRoute, routeToSearch } from "./route.ts";
 
 const offerId = "familientreff--offener-krabbeltreff--beispielhof";
@@ -28,5 +30,27 @@ describe("URL-Route", () => {
 
   it("kennt kein Geburtsdatum", () => {
     expect(routeToSearch(parseRoute("?geb=2026-01-01&geburtsdatum=2026-01-01"))).toBe("");
+  });
+
+  it("kennt keinen Startpunkt: weder Koordinate noch Stadtteil (Plan 0004, E7)", () => {
+    const filters: FilterState[] = RADII_KM.flatMap((value) => [
+      { ...EMPTY_FILTER, reachLimit: { kind: "km", value } },
+      {
+        categories: ["musik", "buecher"],
+        formats: ["kurs"],
+        registration: ["ohne-anmeldung"],
+        cost: ["kostenlos"],
+        reachLimit: { kind: "km", value },
+      },
+    ]);
+    const names = DISTRICTS.flatMap((d) => [d.id, d.name.toLowerCase()]);
+    for (const filter of filters) {
+      for (const tab of ["entdecken", "kalender", "merkliste"] as const) {
+        const search = routeToSearch({ tab, offerId, filter });
+        expect(search).toContain(`umkreis=${filter.reachLimit?.value}`);
+        expect(search).not.toMatch(/\d{2}\.\d{2,}/);
+        for (const name of names) expect(decodeURIComponent(search).toLowerCase()).not.toContain(name);
+      }
+    }
   });
 });
