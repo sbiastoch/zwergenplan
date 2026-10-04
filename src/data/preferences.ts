@@ -1,14 +1,17 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, Darstellung,
- * „Nur passende Angebote“. Nichts davon gelangt in URL, Logs oder Requests (docs/architecture.md).
- * Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die Einstellung nur für die Sitzung.
+ * „Nur passende Angebote“, Startpunkt-Stadtteil. Nichts davon gelangt in URL, Logs oder Requests
+ * (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die Einstellung
+ * nur für die Sitzung.
  */
+import { districtById } from "../domain/districts.ts";
 
 const KEYS = {
   birthDate: "zwergenplan.geburtsdatum",
   saved: "zwergenplan.merkliste",
   theme: "zwergenplan.darstellung",
   ageOnly: "zwergenplan.nur-passende",
+  originDistrict: "zwergenplan.entfernung-ab",
 } as const;
 
 function read(key: string): string | null {
@@ -70,4 +73,17 @@ export function loadAgeOnly(): boolean {
 
 export function saveAgeOnly(on: boolean): void {
   write(KEYS.ageOnly, on ? undefined : "nein");
+}
+
+/**
+ * Gespeicherter Startpunkt: nur die ID eines Stadtteils, nie ein Standort (Plan 0004, E3).
+ * Eine unbekannte ID zählt als „kein Startpunkt“.
+ */
+export function loadOriginDistrict(): string | undefined {
+  const id = read(KEYS.originDistrict);
+  return id && districtById(id) ? id : undefined;
+}
+
+export function saveOriginDistrict(id: string | undefined): void {
+  write(KEYS.originDistrict, id);
 }
