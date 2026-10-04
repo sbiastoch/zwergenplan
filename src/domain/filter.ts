@@ -67,7 +67,7 @@ export interface FilterContext {
 }
 
 /** Angebote, deren letzter Termin vorbei ist, fallen immer heraus. */
-export function applyFilters(offers: readonly Offer[], state: FilterState, ctx: FilterContext): Offer[] {
+export function applyFilters<T extends Offer>(offers: readonly T[], state: FilterState, ctx: FilterContext): T[] {
   const nowMs = ctx.now.getTime();
   return offers.filter((o) => {
     const last = o.sessions.at(-1);
@@ -79,7 +79,7 @@ export function applyFilters(offers: readonly Offer[], state: FilterState, ctx: 
       const cats = categoriesOf(o.topics);
       if (!cats.some((c) => state.categories.includes(c))) return false;
     }
-    if (ctx.birthDate && !offerFitsAge(o, ctx.birthDate)) return false;
+    if (ctx.birthDate && !offerFitsAge(o, ctx.birthDate, ctx.now)) return false;
     return true;
   });
 }

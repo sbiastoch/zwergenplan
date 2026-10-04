@@ -15,9 +15,14 @@ if (!result.ok) {
 
 let deployed: DatasetSummary | undefined;
 if (process.argv.includes("--against-deployed")) {
-  const res = await fetch(`${SITE_URL}data/meta.json`, { cache: "no-store" });
-  if (res.ok) deployed = (await res.json()) as DatasetSummary;
-  else console.log(`ℹ Kein deployter Stand gefunden (HTTP ${res.status}) – erster Deploy?`);
+  try {
+    const res = await fetch(`${SITE_URL}data/meta.json`, { cache: "no-store" });
+    if (res.ok) deployed = (await res.json()) as DatasetSummary;
+    else console.log(`ℹ Kein deployter Stand gefunden (HTTP ${res.status}) – erster Deploy?`);
+  } catch (e) {
+    // Netzfehler sollen nicht jeden Deploy blockieren – aber sichtbar sein.
+    console.log(`::warning::Deployter Stand nicht abrufbar, Plausibilität nur eingeschränkt: ${(e as Error).message}`);
+  }
 }
 
 const { errors, warnings } = checkPlausibility(result.summary, deployed, {

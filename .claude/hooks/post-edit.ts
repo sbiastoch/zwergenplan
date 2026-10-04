@@ -3,7 +3,9 @@
  * Blockiert nie – Restprobleme gehen als Kontext an Claude (Plan 0001, Review M9).
  */
 import { relative } from "node:path";
-import { addContext, PROJECT_DIR, readInput, run, tail } from "./lib.ts";
+import { addContext, exitIfNotInstalled, PROJECT_DIR, readInput, run, tail } from "./lib.ts";
+
+exitIfNotInstalled();
 
 const input = await readInput<{ tool_input?: { file_path?: string } }>();
 const file = input.tool_input?.file_path;

@@ -1,5 +1,47 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PostToolBatch": [
+      {
+        "hooks": [
+          {
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/post-batch.ts"],
+            "command": "node",
+            "statusMessage": "Typecheck",
+            "timeout": 60,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/post-edit.ts"],
+            "command": "node",
+            "statusMessage": "Biome \u0026 Datenprüfung",
+            "timeout": 60,
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/stop-gate.ts"],
+            "command": "node",
+            "statusMessage": "Stop-Gate: check:fast",
+            "timeout": 180,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(pnpm *)",
@@ -28,48 +70,6 @@
       "Write(schema/**)",
       "Edit(public/data/**)",
       "Edit(public/ics/**)"
-    ]
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/post-edit.ts"],
-            "timeout": 60,
-            "statusMessage": "Biome & Datenprüfung"
-          }
-        ]
-      }
-    ],
-    "PostToolBatch": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/post-batch.ts"],
-            "timeout": 60,
-            "statusMessage": "Typecheck"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/stop-gate.ts"],
-            "timeout": 180,
-            "statusMessage": "Stop-Gate: check:fast"
-          }
-        ]
-      }
     ]
   }
 }

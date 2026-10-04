@@ -17,7 +17,9 @@ const BIRTH_KEY = "zwergenplan.geburtsdatum";
 /** Geburtsdatum bleibt ausschließlich im Browser. */
 export function loadBirthDate(): string | undefined {
   try {
-    return localStorage.getItem(BIRTH_KEY) ?? undefined;
+    const value = localStorage.getItem(BIRTH_KEY);
+    // Beschädigte Werte ignorieren – sonst würfe die Altersprüfung beim Rendern.
+    return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
   } catch {
     return undefined;
   }

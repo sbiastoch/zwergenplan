@@ -26,7 +26,7 @@
     "check:fast": "node scripts/check-fast.ts",
     "check": "pnpm check:fast && pnpm knip && pnpm schema:check && pnpm test:coverage && pnpm e2e && pnpm size",
     "build:e2e": "ZWERGENPLAN_DATA=fixture pnpm build",
-    "prepare": "lefthook install || true"
+    "prepare": "lefthook install"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

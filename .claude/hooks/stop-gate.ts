@@ -4,7 +4,19 @@
  * - Rot → blockieren (Exit 2), höchstens MAX_BLOCKS-mal pro Arbeitsstand, danach mit Warnung durchlassen.
  * - Große Änderung ohne /arch-review → einmaliger Hinweis.
  */
-import { PROJECT_DIR, readInput, readState, run, tail, treeHash, writeState } from "./lib.ts";
+import {
+  changedLines,
+  exitIfNotInstalled,
+  PROJECT_DIR,
+  readInput,
+  readState,
+  run,
+  tail,
+  treeHash,
+  writeState,
+} from "./lib.ts";
+
+exitIfNotInstalled();
 
 const MAX_BLOCKS = 3;
 const REVIEW_THRESHOLD_LINES = 200;
@@ -37,17 +49,15 @@ if (green.hash !== hash) {
   }
 }
 
-// Review-Erinnerung: große Änderung gegenüber main ohne passenden Review-Marker.
-const base = run("git", ["merge-base", "HEAD", "origin/main"]);
-const ref = base.ok ? base.output : "main";
-const stat = run("git", ["diff", "--shortstat", ref]).output;
-const changed = [...stat.matchAll(/(\d+) (?:insertion|deletion)/g)].reduce((n, m) => n + Number(m[1]), 0);
-const review = readState<{ hash?: string }>("arch-review.json", {});
+// Review-Erinnerung: mehr als REVIEW_THRESHOLD_LINES geänderte Zeilen SEIT dem letzten /arch-review.
+const { ref, lines } = changedLines();
+const review = readState<{ hash?: string; ref?: string; lines?: number }>("arch-review.json", {});
+const sinceReview = review.ref === ref ? lines - (review.lines ?? 0) : lines;
 const reminded = readState<{ hash?: string }>("review-reminded.json", {});
-if (changed > REVIEW_THRESHOLD_LINES && review.hash !== hash && reminded.hash !== hash) {
+if (sinceReview > REVIEW_THRESHOLD_LINES && review.hash !== hash && reminded.hash !== hash) {
   writeState("review-reminded.json", { hash });
   process.stderr.write(
-    `Große Änderung (${changed} Zeilen ggü. ${ref.slice(0, 8)}) ohne aktuelles /arch-review. ` +
+    `Große Änderung (${sinceReview} Zeilen seit dem letzten Review, Basis ${ref.slice(0, 8)}) ohne /arch-review. ` +
       `Laut CLAUDE.md vor „fertig“: /arch-review ausführen (bei UI-Änderungen zusätzlich /browser-review). Projekt: ${PROJECT_DIR}\n`,
   );
   process.exit(2);

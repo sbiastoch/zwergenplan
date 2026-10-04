@@ -74,6 +74,7 @@ describe("Pfade und Escaping", () => {
 
   it("escaped Sonderzeichen", () => {
     expect(escapeText("a,b;c\\d\ne")).toBe("a\\,b\\;c\\\\d\\ne");
+    expect(escapeText("x\ry\u0007z")).toBe("x\\nyz");
   });
 
   it("zerteilt beim Falten keine Umlaute", () => {

@@ -37,6 +37,17 @@ module.exports = {
       },
     },
     {
+      name: "no-zod-in-client-transitive",
+      severity: "error",
+      comment:
+        "Domänenmodule, die die UI nutzt, dürfen schema/dataset/zod nur als Typ importieren – sonst landet Zod transitiv im Client-Bundle.",
+      from: { path: "^src/domain/", pathNot: "^src/domain/(schema|dataset|test-fixtures)\\.ts$|\\.test\\.ts$" },
+      to: {
+        path: ["^src/domain/(schema|dataset)\\.ts$", "(^|/)node_modules/(zod|yaml)/"],
+        dependencyTypesNot: ["type-only"],
+      },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",

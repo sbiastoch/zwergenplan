@@ -39,7 +39,7 @@ export function App() {
 
   const now = useMemo(() => new Date(), []);
   const offers = useMemo(
-    () => (load.kind === "ready" ? (applyFilters(load.data.offers, filter, { now, birthDate }) as SiteOffer[]) : []),
+    () => (load.kind === "ready" ? applyFilters(load.data.offers, filter, { now, birthDate }) : []),
     [load, filter, now, birthDate],
   );
 

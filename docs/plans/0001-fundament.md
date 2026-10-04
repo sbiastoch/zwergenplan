@@ -218,3 +218,13 @@ Die folgenden Änderungen **überschreiben** die betroffenen Stellen oben.
 - Die Dauer von `check:fast` wird in CI ausgegeben.
 
 **Nicht übernommen**: Den JSON-Schema-Export **behalten** wir. Die parallele Skill-Session braucht den Datenvertrag jetzt.
+
+## Umsetzung – bewusste Abweichungen (nach /arch-review)
+
+- `FilterState` hat noch keine Dimension „Zeitraum“. Die gehört zur Kalenderansicht und kommt mit dem UI-Plan.
+- Statt „keine Session vor generatedAt − 1 Tag“ gilt jetzt „der **letzte** Termin liegt nicht in der Vergangenheit“. Laufende Kurse mit bereits vergangenen Terminen bleiben gültig, denn die Serien-ICS braucht alle Termine.
+- `?now=` entfällt. E2E friert die Uhr über `page.clock` ein, und die Domänenfunktionen bekommen `now` übergeben.
+- Die Kategorien-Zuordnung liegt in `src/domain/topics.ts`, nicht in `categories.ts`. Themen und Kategorien bilden eine Einheit.
+- Lighthouse ist durch Web-Vitals in Playwright ersetzt (`e2e/perf.spec.ts`).
+- Bootstrap: Solange `data/BOOTSTRAP` existiert, wird `data/` gar nicht gelesen. `data/providers.yaml` liegt noch im Skill-Format (Migration in Plan 0002).
+- Der pre-commit-Hook ist nicht aus dem Worktree installiert (ADR 0004, mehrere Checkouts).

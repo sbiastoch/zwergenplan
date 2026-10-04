@@ -2,7 +2,7 @@ name: CI & Deploy
 
 on:
   push:
-    branches: [main]
+    branches: ["**"] # jeder Branch wird geprüft, deployt wird nur main
   pull_request:
   workflow_dispatch:
 

@@ -1,11 +1,23 @@
 /** Gemeinsame Helfer für Claude-Code-Hooks (nur Node-Builtins, kein node_modules nötig). */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const PROJECT_DIR = process.env["CLAUDE_PROJECT_DIR"] ?? process.cwd();
 const STATE_DIR = join(PROJECT_DIR, ".claude", "state");
+
+/**
+ * Ohne installierte Abhängigkeiten (frischer Checkout, anderer Worktree) können die Gates nicht laufen.
+ * Dann nicht blockieren, sondern einmal sichtbar darauf hinweisen.
+ */
+export function exitIfNotInstalled(): void {
+  if (existsSync(join(PROJECT_DIR, "node_modules", ".bin", "tsc"))) return;
+  process.stdout.write(
+    JSON.stringify({ systemMessage: "Zwergenplan-Hooks inaktiv: zuerst `pnpm install` im Projekt ausführen." }),
+  );
+  process.exit(0);
+}
 
 export async function readInput<T>(): Promise<T> {
   let raw = "";
@@ -43,6 +55,15 @@ export function readState<T>(name: string, fallback: T): T {
 export function writeState(name: string, value: unknown): void {
   mkdirSync(STATE_DIR, { recursive: true });
   writeFileSync(join(STATE_DIR, name), JSON.stringify(value));
+}
+
+/** Geänderte Zeilen (inkl. uncommittet) gegenüber dem Abzweig von origin/main. */
+export function changedLines(): { ref: string; lines: number } {
+  const base = run("git", ["merge-base", "HEAD", "origin/main"]);
+  const ref = base.ok ? base.output : "main";
+  const stat = run("git", ["diff", "--shortstat", ref]).output;
+  const lines = [...stat.matchAll(/(\d+) (?:insertion|deletion)/g)].reduce((n, m) => n + Number(m[1]), 0);
+  return { ref, lines };
 }
 
 /** Fingerabdruck des Arbeitsstands (HEAD + uncommittete Änderungen inkl. neuer Dateien). */

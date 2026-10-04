@@ -32,7 +32,16 @@ export function sessionIcsPath(offer: Offer, session: Session): string {
 }
 
 export function escapeText(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  return (
+    value
+      .replace(/\\/g, "\\\\")
+      .replace(/;/g, "\\;")
+      .replace(/,/g, "\\,")
+      .replace(/\r\n|\r|\n/g, "\\n")
+      // übrige Steuerzeichen sind in TEXT-Werten nicht erlaubt (RFC 5545, 3.3.11)
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: genau die sollen entfernt werden
+      .replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "")
+  );
 }
 
 const encoder = new TextEncoder();

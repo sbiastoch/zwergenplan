@@ -26,13 +26,14 @@ export function fitsAgeAt(range: AgeRange | undefined, birthDate: string, at: st
 
 /**
  * Kurs/einmalig: entscheidend ist das Alter zum (ersten) Termin.
- * Regelmäßig: passt, sobald mindestens ein Termin altersgerecht ist.
+ * Regelmäßig: passt, sobald mindestens ein noch nicht beendeter Termin altersgerecht ist –
+ * vergangene Termine bleiben bis zum nächsten Pipeline-Lauf in den Daten und zählen nicht.
  */
-export function offerFitsAge(offer: Offer, birthDate: string): boolean {
+export function offerFitsAge(offer: Offer, birthDate: string, now: Date): boolean {
   const [first] = offer.sessions;
   if (!first) return false;
   if (offer.format === "regelmaessig") {
-    return offer.sessions.some((s) => fitsAgeAt(offer.age, birthDate, s.start));
+    return offer.sessions.some((s) => Date.parse(s.end) >= now.getTime() && fitsAgeAt(offer.age, birthDate, s.start));
   }
   return fitsAgeAt(offer.age, birthDate, first.start);
 }
