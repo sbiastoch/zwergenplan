@@ -22,3 +22,10 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Schrift-Preload**: `<link rel="preload">` der Latin-woff2 verkürzt das Swap-Fenster, braucht aber den gehashten Asset-Namen im HTML (Plan 0007, E11).
 - **Anmeldeschluss auf der Kachel**: ein Chip „Anmeldung vorbei“. Plan 0007 (B4) zeigt den abgelaufenen Anmeldeschluss nur im Detail.
 - **Katalog-Adressen ohne Ortsnamen-Präfix**: Die Adressen in `data/providers.yaml`, die mit dem Ortsnamen beginnen oder ihn in Klammern wiederholen (32 laut Browser-Review, 29 nach der Regel von `venueAddress`), beim nächsten Pipeline-Lauf über den Skill `babyevents-nuernberg` bereinigen, dazu eine Warnung in `validate-data`. Bis dahin korrigiert `venueAddress` in `toSiteData` nur die Anzeige und die ICS (Plan 0007, H6).
+- **Umkreis-Kreis auf der Karte**: den gewählten Umkreis (2/5/10 km) um den Startpunkt zeichnen (Plan 0005, Nicht-Ziel).
+- **„Auf der Karte zeigen“ im Detail**: aus einem Angebot in die Kartenansicht mit diesem Ort (Plan 0005, Nicht-Ziel).
+- **„Route in Karten-App öffnen“**: Link mit der Adresse des Orts an die Karten-App des Geräts (Plan 0005, Nicht-Ziel).
+- **Adresssuche als Startpunkt**: bräuchte einen Geocoder, also einen weiteren Drittanbieter oder eigene Daten (Plan 0005, Nicht-Ziel).
+- **Karte im Kalender oder in der Merkliste** (Plan 0005, Nicht-Ziel).
+- **Offline-Karte**: Service Worker, Vorab-Laden des Karten-Codes, gecachte Kacheln. ADR 0008 schließt das Cachen fremder Kacheln heute aus.
+- **Selbst gehostete Kacheln (PMTiles) als Ausweichweg** für OpenFreeMap: Extrakt der Stadt auf GitHub Pages (z0–15 ca. 19 MB, z0–14 ca. 9,6 MB, gemessen), `pmtiles` + `@protomaps/basemaps` (+16 kB im Karten-Chunk), eigene Glyphen und Sprites, Aktualisierung per CI-Schritt. Dann gäbe es gar keinen Drittanbieter-Request mehr (ADR 0008, „Alternativen“). Code-seitig hängt alles an `src/data/tiles.ts` und `src/ui/map/`.
