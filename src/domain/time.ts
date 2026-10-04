@@ -54,3 +54,53 @@ export function berlinKey(instant: string): string {
   const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
   return `${get("year")}${get("month")}${get("day")}T${get("hour")}${get("minute")}`;
 }
+
+const LOCAL_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
+
+function offsetString(minutes: number): string {
+  const sign = minutes >= 0 ? "+" : "-";
+  const abs = Math.abs(minutes);
+  return `${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+}
+
+/**
+ * Berliner Ortszeit „2026-10-13T09:30“ → Zeitpunkt mit Offset „2026-10-13T09:30:00+02:00“.
+ * Doppelte Stunde (Ende der Sommerzeit): die frühere Variante. Fehlende Stunde (Beginn): Fehler.
+ */
+export function fromBerlinLocal(local: string): string {
+  const m = LOCAL_RE.exec(local);
+  if (!m) throw new Error(`Keine lokale Zeit (YYYY-MM-DDTHH:MM): ${local}`);
+  const [, y, mo, d, h, mi] = m.map(Number) as [number, number, number, number, number, number];
+  const key = `${m[1]}${m[2]}${m[3]}T${m[4]}${m[5]}`;
+  // Berlin ist UTC+1 oder UTC+2; die frühere Variante (+2) zuerst prüfen.
+  for (const offset of [120, 60]) {
+    const instant = new Date(Date.UTC(y, mo - 1, d, h, mi) - offset * 60_000);
+    if (berlinKey(instant.toISOString()) === key) return `${local}:00${offsetString(offset)}`;
+  }
+  throw new Error(`Die Ortszeit ${local} gibt es in Berlin nicht (Zeitumstellung)`);
+}
+
+function fromUtcDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+/** Kalendertag + n Tage (ISO-Datum, ohne Zeitzonenbezug). */
+export function addDays(isoDate: string, days: number): string {
+  const { year, month, day } = parseIsoDate(isoDate);
+  return fromUtcDate(new Date(Date.UTC(year, month - 1, day + days)));
+}
+
+/** Kalendertag + n Monate; der Tag wird aufs Monatsende gekappt (31.10. + 4 → 28.2.). */
+export function addMonths(isoDate: string, months: number): string {
+  const { year, month, day } = parseIsoDate(isoDate);
+  const total = year * 12 + (month - 1) + months;
+  const y = Math.floor(total / 12);
+  const mo = (total % 12) + 1;
+  return fromUtcDate(new Date(Date.UTC(y, mo - 1, Math.min(day, daysInMonth(y, mo)))));
+}
+
+/** ISO-Wochentag eines Kalendertags: 1 = Montag … 7 = Sonntag. */
+export function isoWeekday(isoDate: string): number {
+  const { year, month, day } = parseIsoDate(isoDate);
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay() || 7;
+}

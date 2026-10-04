@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { toSiteData } from "./site-data.ts";
-import { loadFixtures } from "./test-fixtures.ts";
+import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
 describe("toSiteData", () => {
@@ -8,7 +8,7 @@ describe("toSiteData", () => {
   const site = toSiteData(providers, file);
 
   it("ergänzt Anbietername und Ort", () => {
-    const pekip = site.offers.find((o) => o.id.includes("pekip-herbst"));
+    const pekip = site.offers.find((o) => fixtureKey(o) === "pekip-herbst");
     expect(pekip?.providerName).toBe("Familientreff Beispielhof (fiktiv)");
     expect(pekip?.venue).toEqual({
       name: "Familientreff Beispielhof",

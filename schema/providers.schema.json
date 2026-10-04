@@ -2,221 +2,866 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
   "items": {
-    "type": "object",
-    "properties": {
-      "id": {
-        "type": "string",
-        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-      },
-      "name": {
-        "type": "string",
-        "minLength": 1
-      },
-      "url": {
-        "type": "string",
-        "format": "uri"
-      },
-      "venues": {
-        "minItems": 1,
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-            },
-            "name": {
-              "type": "string",
-              "minLength": 1
-            },
-            "address": {
-              "type": "string",
-              "minLength": 5
-            },
-            "district": {
-              "type": "string"
-            },
-            "ring": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "role": {
+            "type": "string",
+            "const": "anbieter"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "topics": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
               "type": "string",
               "enum": [
-                "innen",
-                "knapp-aussen",
-                "aussen"
+                "pekip",
+                "fenkid",
+                "babymassage",
+                "babysignal",
+                "musik",
+                "singen",
+                "krabbelgruppe",
+                "spielgruppe",
+                "eltern-kind-gruppe",
+                "eltern-kind-turnen",
+                "bewegung",
+                "fitness-mit-baby",
+                "yoga-mit-baby",
+                "rueckbildung",
+                "spielplatz-indoor",
+                "tanz",
+                "waldgruppe",
+                "tiere-natur",
+                "kreativ",
+                "elterncafe",
+                "stillcafe",
+                "elterntreff",
+                "krabbelgottesdienst",
+                "vaeter",
+                "muetter",
+                "mehrsprachig",
+                "beratung",
+                "hebamme",
+                "erste-hilfe",
+                "beikost",
+                "babyschwimmen",
+                "kleinkindschwimmen",
+                "bibliothek",
+                "vorlesen",
+                "museum",
+                "kino",
+                "konzert",
+                "theater"
               ]
+            }
+          },
+          "age": {
+            "type": "object",
+            "properties": {
+              "minMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              },
+              "maxMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              }
             },
-            "geo": {
+            "required": [
+              "minMonths",
+              "maxMonths"
+            ],
+            "additionalProperties": false
+          },
+          "formats": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kurs",
+                "regelmaessig",
+                "einmalig"
+              ]
+            }
+          },
+          "costs": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kostenlos",
+                "kostenpflichtig"
+              ]
+            }
+          },
+          "registrations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mit-anmeldung",
+                "ohne-anmeldung"
+              ]
+            }
+          },
+          "programme": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
               "type": "object",
               "properties": {
-                "lat": {
-                  "type": "number",
-                  "minimum": 49.3,
-                  "maximum": 49.65
+                "url": {
+                  "type": "string",
+                  "format": "uri"
                 },
-                "lon": {
-                  "type": "number",
-                  "minimum": 10.85,
-                  "maximum": 11.3
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "html",
+                    "pdf",
+                    "ical",
+                    "json-api",
+                    "js"
+                  ]
+                },
+                "note": {
+                  "type": "string"
                 }
               },
               "required": [
-                "lat",
-                "lon"
-              ]
-            },
-            "nearestStops": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "stopId": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "walkMeters": {
-                    "type": "number",
-                    "minimum": 0
-                  }
-                },
-                "required": [
-                  "stopId",
-                  "name",
-                  "walkMeters"
-                ],
-                "additionalProperties": false
+                "url",
+                "kind"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "availability": {
+            "type": "object",
+            "properties": {
+              "shown": {
+                "type": "string",
+                "enum": [
+                  "ja",
+                  "teilweise",
+                  "nein",
+                  "unbekannt"
+                ]
+              },
+              "how": {
+                "type": "string"
+              },
+              "system": {
+                "type": "string"
               }
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "address",
-            "ring",
-            "geo"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "topics": {
-        "minItems": 1,
-        "type": "array",
-        "items": {
-          "type": "string",
-          "enum": [
-            "pekip",
-            "fenkid",
-            "babymassage",
-            "babysignal",
-            "musik",
-            "singen",
-            "krabbelgruppe",
-            "spielgruppe",
-            "eltern-kind-gruppe",
-            "eltern-kind-turnen",
-            "bewegung",
-            "fitness-mit-baby",
-            "yoga-mit-baby",
-            "rueckbildung",
-            "spielplatz-indoor",
-            "waldgruppe",
-            "tiere-natur",
-            "kreativ",
-            "elterncafe",
-            "stillcafe",
-            "elterntreff",
-            "vaeter",
-            "muetter",
-            "mehrsprachig",
-            "beratung",
-            "hebamme",
-            "erste-hilfe",
-            "babyschwimmen",
-            "kleinkindschwimmen",
-            "bibliothek",
-            "vorlesen",
-            "museum",
-            "kino",
-            "konzert",
-            "theater"
-          ]
-        }
-      },
-      "programme": {
-        "minItems": 1,
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "url": {
-              "type": "string",
-              "format": "uri"
             },
-            "kind": {
-              "type": "string",
-              "enum": [
-                "html",
-                "pdf",
-                "ical",
-                "json-api",
-                "js"
-              ]
-            },
-            "note": {
-              "type": "string"
-            }
+            "required": [
+              "shown"
+            ],
+            "additionalProperties": false
           },
-          "required": [
-            "url",
-            "kind"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "availability": {
-        "type": "object",
-        "properties": {
-          "shown": {
+          "verified": {
             "type": "string",
-            "enum": [
-              "ja",
-              "teilweise",
-              "nein",
-              "unbekannt"
-            ]
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "how": {
+          "notes": {
             "type": "string"
           },
-          "system": {
-            "type": "string"
+          "venues": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "address": {
+                  "type": "string",
+                  "minLength": 5
+                },
+                "district": {
+                  "type": "string"
+                },
+                "ring": {
+                  "type": "string",
+                  "enum": [
+                    "innen",
+                    "knapp-aussen",
+                    "aussen"
+                  ]
+                },
+                "geo": {
+                  "type": "object",
+                  "properties": {
+                    "lat": {
+                      "type": "number",
+                      "minimum": 49.3,
+                      "maximum": 49.65
+                    },
+                    "lon": {
+                      "type": "number",
+                      "minimum": 10.85,
+                      "maximum": 11.3
+                    }
+                  },
+                  "required": [
+                    "lat",
+                    "lon"
+                  ]
+                },
+                "nearestStops": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "stopId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "walkMeters": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "stopId",
+                      "name",
+                      "walkMeters"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "address",
+                "ring",
+                "geo"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "coveredBy": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           }
         },
         "required": [
-          "shown"
+          "id",
+          "role",
+          "name",
+          "url",
+          "topics",
+          "formats",
+          "costs",
+          "registrations",
+          "programme",
+          "availability",
+          "verified",
+          "venues"
         ],
         "additionalProperties": false
       },
-      "verified": {
-        "type": "string",
-        "format": "date",
-        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+      {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "role": {
+            "type": "string",
+            "const": "aggregator"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "topics": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pekip",
+                "fenkid",
+                "babymassage",
+                "babysignal",
+                "musik",
+                "singen",
+                "krabbelgruppe",
+                "spielgruppe",
+                "eltern-kind-gruppe",
+                "eltern-kind-turnen",
+                "bewegung",
+                "fitness-mit-baby",
+                "yoga-mit-baby",
+                "rueckbildung",
+                "spielplatz-indoor",
+                "tanz",
+                "waldgruppe",
+                "tiere-natur",
+                "kreativ",
+                "elterncafe",
+                "stillcafe",
+                "elterntreff",
+                "krabbelgottesdienst",
+                "vaeter",
+                "muetter",
+                "mehrsprachig",
+                "beratung",
+                "hebamme",
+                "erste-hilfe",
+                "beikost",
+                "babyschwimmen",
+                "kleinkindschwimmen",
+                "bibliothek",
+                "vorlesen",
+                "museum",
+                "kino",
+                "konzert",
+                "theater"
+              ]
+            }
+          },
+          "age": {
+            "type": "object",
+            "properties": {
+              "minMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              },
+              "maxMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              }
+            },
+            "required": [
+              "minMonths",
+              "maxMonths"
+            ],
+            "additionalProperties": false
+          },
+          "formats": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kurs",
+                "regelmaessig",
+                "einmalig"
+              ]
+            }
+          },
+          "costs": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kostenlos",
+                "kostenpflichtig"
+              ]
+            }
+          },
+          "registrations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mit-anmeldung",
+                "ohne-anmeldung"
+              ]
+            }
+          },
+          "programme": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "html",
+                    "pdf",
+                    "ical",
+                    "json-api",
+                    "js"
+                  ]
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url",
+                "kind"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "availability": {
+            "type": "object",
+            "properties": {
+              "shown": {
+                "type": "string",
+                "enum": [
+                  "ja",
+                  "teilweise",
+                  "nein",
+                  "unbekannt"
+                ]
+              },
+              "how": {
+                "type": "string"
+              },
+              "system": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "shown"
+            ],
+            "additionalProperties": false
+          },
+          "verified": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "address": {
+                  "type": "string",
+                  "minLength": 5
+                },
+                "district": {
+                  "type": "string"
+                },
+                "ring": {
+                  "type": "string",
+                  "enum": [
+                    "innen",
+                    "knapp-aussen",
+                    "aussen"
+                  ]
+                },
+                "geo": {
+                  "type": "object",
+                  "properties": {
+                    "lat": {
+                      "type": "number",
+                      "minimum": 49.3,
+                      "maximum": 49.65
+                    },
+                    "lon": {
+                      "type": "number",
+                      "minimum": 10.85,
+                      "maximum": 11.3
+                    }
+                  },
+                  "required": [
+                    "lat",
+                    "lon"
+                  ]
+                },
+                "nearestStops": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "stopId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "walkMeters": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "stopId",
+                      "name",
+                      "walkMeters"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "address",
+                "ring",
+                "geo"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "adapter": {
+            "type": "string",
+            "enum": [
+              "stadt-vk",
+              "frankenkids",
+              "evtermine"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "name",
+          "url",
+          "topics",
+          "formats",
+          "costs",
+          "registrations",
+          "programme",
+          "availability",
+          "verified",
+          "venues"
+        ],
+        "additionalProperties": false
       },
-      "notes": {
-        "type": "string"
+      {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "role": {
+            "type": "string",
+            "const": "verzeichnis"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "topics": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pekip",
+                "fenkid",
+                "babymassage",
+                "babysignal",
+                "musik",
+                "singen",
+                "krabbelgruppe",
+                "spielgruppe",
+                "eltern-kind-gruppe",
+                "eltern-kind-turnen",
+                "bewegung",
+                "fitness-mit-baby",
+                "yoga-mit-baby",
+                "rueckbildung",
+                "spielplatz-indoor",
+                "tanz",
+                "waldgruppe",
+                "tiere-natur",
+                "kreativ",
+                "elterncafe",
+                "stillcafe",
+                "elterntreff",
+                "krabbelgottesdienst",
+                "vaeter",
+                "muetter",
+                "mehrsprachig",
+                "beratung",
+                "hebamme",
+                "erste-hilfe",
+                "beikost",
+                "babyschwimmen",
+                "kleinkindschwimmen",
+                "bibliothek",
+                "vorlesen",
+                "museum",
+                "kino",
+                "konzert",
+                "theater"
+              ]
+            }
+          },
+          "age": {
+            "type": "object",
+            "properties": {
+              "minMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              },
+              "maxMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              }
+            },
+            "required": [
+              "minMonths",
+              "maxMonths"
+            ],
+            "additionalProperties": false
+          },
+          "formats": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kurs",
+                "regelmaessig",
+                "einmalig"
+              ]
+            }
+          },
+          "costs": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "kostenlos",
+                "kostenpflichtig"
+              ]
+            }
+          },
+          "registrations": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mit-anmeldung",
+                "ohne-anmeldung"
+              ]
+            }
+          },
+          "programme": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "html",
+                    "pdf",
+                    "ical",
+                    "json-api",
+                    "js"
+                  ]
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url",
+                "kind"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "availability": {
+            "type": "object",
+            "properties": {
+              "shown": {
+                "type": "string",
+                "enum": [
+                  "ja",
+                  "teilweise",
+                  "nein",
+                  "unbekannt"
+                ]
+              },
+              "how": {
+                "type": "string"
+              },
+              "system": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "shown"
+            ],
+            "additionalProperties": false
+          },
+          "verified": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "address": {
+                  "type": "string",
+                  "minLength": 5
+                },
+                "district": {
+                  "type": "string"
+                },
+                "ring": {
+                  "type": "string",
+                  "enum": [
+                    "innen",
+                    "knapp-aussen",
+                    "aussen"
+                  ]
+                },
+                "geo": {
+                  "type": "object",
+                  "properties": {
+                    "lat": {
+                      "type": "number",
+                      "minimum": 49.3,
+                      "maximum": 49.65
+                    },
+                    "lon": {
+                      "type": "number",
+                      "minimum": 10.85,
+                      "maximum": 11.3
+                    }
+                  },
+                  "required": [
+                    "lat",
+                    "lon"
+                  ]
+                },
+                "nearestStops": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "stopId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "walkMeters": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "stopId",
+                      "name",
+                      "walkMeters"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "address",
+                "ring",
+                "geo"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "name",
+          "url",
+          "topics",
+          "formats",
+          "costs",
+          "registrations",
+          "programme",
+          "availability",
+          "verified",
+          "venues"
+        ],
+        "additionalProperties": false
       }
-    },
-    "required": [
-      "id",
-      "name",
-      "url",
-      "venues",
-      "topics",
-      "programme",
-      "availability",
-      "verified"
-    ],
-    "additionalProperties": false
+    ]
   }
 }

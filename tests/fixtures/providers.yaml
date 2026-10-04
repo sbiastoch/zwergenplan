@@ -1,5 +1,6 @@
 # FIKTIVE Testdaten – nur für Unit- und E2E-Tests, werden nie deployt.
 - id: familientreff-beispiel
+  role: anbieter
   name: "Familientreff Beispielhof (fiktiv)"
   url: "https://example.org/familientreff"
   venues:
@@ -10,12 +11,17 @@
       ring: innen
       geo: { lat: 49.4521, lon: 11.0767 }
   topics: [pekip, krabbelgruppe, elterncafe, babymassage]
+  formats: [kurs, regelmaessig, einmalig]
+  costs: [kostenlos, kostenpflichtig]
+  registrations: [mit-anmeldung, ohne-anmeldung]
+  age: { minMonths: 0, maxMonths: 36 }
   programme:
     - url: "https://example.org/familientreff/programm"
       kind: html
   availability: { shown: ja, how: "Detailseite zeigt freie Plätze" }
   verified: 2026-10-04
 - id: musikschule-beispiel
+  role: anbieter
   name: "Musikschule Beispiel (fiktiv)"
   url: "https://example.org/musikschule"
   venues:
@@ -26,12 +32,17 @@
       ring: aussen
       geo: { lat: 49.4362, lon: 11.0851 }
   topics: [musik, singen]
+  formats: [kurs]
+  costs: [kostenpflichtig]
+  registrations: [mit-anmeldung]
+  age: { minMonths: 4, maxMonths: 72 }
   programme:
     - url: "https://example.org/musikschule/kurse"
       kind: html
   availability: { shown: teilweise }
   verified: 2026-10-04
 - id: stadtbibliothek-beispiel
+  role: anbieter
   name: "Bibliothek Beispiel (fiktiv)"
   url: "https://example.org/bibliothek"
   venues:
@@ -42,12 +53,16 @@
       ring: innen
       geo: { lat: 49.4498, lon: 11.0812 }
   topics: [vorlesen, bibliothek, singen]
+  formats: [regelmaessig]
+  costs: [kostenlos]
+  registrations: [ohne-anmeldung]
   programme:
     - url: "https://example.org/bibliothek/termine"
       kind: html
   availability: { shown: nein }
   verified: 2026-10-04
 - id: theater-beispiel
+  role: anbieter
   name: "Kleines Theater Beispiel (fiktiv)"
   url: "https://example.org/theater"
   venues:
@@ -58,8 +73,32 @@
       ring: knapp-aussen
       geo: { lat: 49.4495, lon: 11.0601 }
   topics: [theater, konzert]
+  formats: [einmalig]
+  costs: [kostenlos, kostenpflichtig]
+  registrations: [mit-anmeldung, ohne-anmeldung]
   programme:
     - url: "https://example.org/theater/spielplan"
       kind: js
   availability: { shown: ja }
+  verified: 2026-10-04
+# Worst Case für die Mobile-UX-Gates: so lang wie der längste echte Anbietername (111 Zeichen), lange Komposita.
+- id: gemeinde-beispiel
+  role: anbieter
+  name: "Ev.-Luth. Kirchengemeinde Beispielhausen-Südstadt – Mutter/Vater-Kind-Gruppen (Gemeindehaus Beispielkirche, fiktiv)"
+  url: "https://example.org/gemeinde"
+  venues:
+    - id: gemeinde-beispiel-gemeindehaus
+      name: "Gemeindehaus der Evangelisch-Lutherischen Beispielkirchengemeinde (Untergeschoss, Zugang über den Pfarrgarten)"
+      address: "Kirchengemeindehausstraße 128a (Hinterhaus), 90461 Nürnberg"
+      district: Südstadt
+      ring: aussen
+      geo: { lat: 49.4301, lon: 11.0892 }
+  topics: [eltern-kind-turnen, bewegung, eltern-kind-gruppe]
+  formats: [regelmaessig]
+  costs: [kostenpflichtig]
+  registrations: [mit-anmeldung]
+  programme:
+    - url: "https://example.org/gemeinde/gruppen"
+      kind: html
+  availability: { shown: nein }
   verified: 2026-10-04

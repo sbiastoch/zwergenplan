@@ -20,7 +20,7 @@ describe("validateDataset", () => {
   it("akzeptiert die Fixtures", () => {
     const r = mutate(() => {});
     expect(errorsOf(r)).toBe("");
-    expect(r.ok && r.summary).toEqual({ offers: 8, providers: 4, generatedAt: "2026-10-05T06:00:00+02:00" });
+    expect(r.ok && r.summary).toEqual({ offers: 9, providers: 5, generatedAt: "2026-10-05T06:00:00+02:00" });
   });
 
   it.each([
@@ -97,6 +97,64 @@ describe("validateDataset", () => {
         }),
       ),
     ).toContain("Anbieter-ID doppelt");
+  });
+
+  it("prüft die ID-Regel (ADR 0006)", () => {
+    expect(
+      errorsOf(
+        mutate((o) => {
+          Object.assign(o.offers[0] as object, {
+            id: "familientreff-beispiel--pekip-herbst--familientreff-beispiel-haus",
+          });
+        }),
+      ),
+    ).toContain("erwartet familientreff-beispiel--pekip-gruppe-herbst");
+  });
+
+  it("prüft Rollen: Pflichtorte, coveredBy und Angebote nur von Anbietern", () => {
+    const aggregator = {
+      id: "sammelkalender-beispiel",
+      role: "aggregator",
+      adapter: "evtermine",
+      name: "Sammelkalender (fiktiv)",
+      url: "https://example.org/kalender",
+      venues: [],
+      topics: ["krabbelgruppe"],
+      formats: ["regelmaessig"],
+      costs: ["kostenlos"],
+      registrations: ["ohne-anmeldung"],
+      programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
+      availability: { shown: "nein" },
+      verified: "2026-10-04",
+    };
+    expect(errorsOf(mutate((_o, p) => p.push(structuredClone(aggregator))))).toBe("");
+    expect(
+      errorsOf(mutate((_o, p) => p.push({ ...structuredClone(aggregator), role: "anbieter", adapter: undefined }))),
+    ).toContain("venues");
+    expect(errorsOf(mutate((_o, p) => p.push({ ...structuredClone(aggregator), role: "verzeichnis" })))).toContain(
+      "adapter",
+    );
+    expect(errorsOf(mutate((_o, p) => Object.assign(p[0] as object, { coveredBy: "musikschule-beispiel" })))).toContain(
+      "coveredBy musikschule-beispiel ist kein Sammelkalender",
+    );
+    expect(
+      errorsOf(
+        mutate((_o, p) => {
+          p.push(structuredClone(aggregator));
+          Object.assign(p[0] as object, { coveredBy: "sammelkalender-beispiel" });
+        }),
+      ),
+    ).toBe("");
+    expect(
+      errorsOf(
+        mutate((_o, p) => {
+          Object.assign(p[0] as object, { role: "aggregator" });
+        }),
+      ),
+    ).toContain("ist kein Anbieter (aggregator)");
+    expect(errorsOf(mutate((_o, p) => Object.assign(p[1] as object, { costs: ["kostenlos", "kostenlos"] })))).toContain(
+      "doppelt",
+    );
   });
 
   it("weist komplett vergangene Angebote und Prüfzeitpunkte nach generatedAt ab", () => {

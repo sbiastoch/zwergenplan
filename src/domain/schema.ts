@@ -10,11 +10,11 @@ const kebab = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "kebab-case erwarte
 const Instant = z.iso.datetime({ offset: true, local: false });
 const IsoDate = z.iso.date();
 
-const Topic = z.enum(TOPICS);
+export const Topic = z.enum(TOPICS);
 export const Format = z.enum(["kurs", "regelmaessig", "einmalig"]);
 export const Registration = z.enum(["mit-anmeldung", "ohne-anmeldung"]);
 export const Cost = z.enum(["kostenlos", "kostenpflichtig"]);
-const AvailabilityStatus = z.enum(["frei", "wenige", "ausgebucht", "warteliste", "ohne-anmeldung", "unbekannt"]);
+export const AvailabilityStatus = z.enum(["frei", "wenige", "ausgebucht", "warteliste", "ohne-anmeldung", "unbekannt"]);
 
 /** Großraum Nürnberg/Fürth/Erlangen – alles außerhalb ist ein Geocoding-Fehler. */
 const NUERNBERG_BBOX = { minLat: 49.3, maxLat: 49.65, minLon: 10.85, maxLon: 11.3 } as const;
@@ -37,29 +37,71 @@ export const Venue = z.strictObject({
     .optional(),
 });
 
-export const Provider = z.strictObject({
-  id: kebab,
+/** Liste ohne Dubletten */
+const uniqueList = <T extends z.ZodType>(item: T) =>
+  z
+    .array(item)
+    .min(1)
+    .refine((xs) => new Set(xs).size === xs.length, "Werte doppelt");
+
+/** Alter, das ein Anbieter insgesamt bedient (inklusiv, vollendete Monate) – auch über 3 Jahre hinaus. */
+export const ProviderAge = z
+  .strictObject({ minMonths: z.int().min(0).max(216), maxMonths: z.int().min(0).max(216) })
+  .refine((a) => a.minMonths <= a.maxMonths, "minMonths <= maxMonths");
+
+const Programme = z.strictObject({
+  url: z.url(),
+  kind: z.enum(["html", "pdf", "ical", "json-api", "js"]),
+  note: z.string().optional(),
+});
+
+const providerBase = {
   name: z.string().min(1),
   url: z.url(),
-  venues: z.array(Venue).min(1),
   topics: z.array(Topic).min(1),
-  programme: z
-    .array(
-      z.strictObject({
-        url: z.url(),
-        kind: z.enum(["html", "pdf", "ical", "json-api", "js"]),
-        note: z.string().optional(),
-      }),
-    )
-    .min(1),
+  age: ProviderAge.optional(),
+  formats: uniqueList(Format),
+  costs: uniqueList(Cost),
+  registrations: uniqueList(Registration),
+  /** ALLE Stellen, an denen Termine stehen */
+  programme: z.array(Programme).min(1),
   availability: z.strictObject({
     shown: z.enum(["ja", "teilweise", "nein", "unbekannt"]),
     how: z.string().optional(),
     system: z.string().optional(),
   }),
+  /** Datum der letzten Live-Prüfung */
   verified: IsoDate,
   notes: z.string().optional(),
-});
+};
+
+/** Sammelkalender mit eigenem Abfrage-Adapter in scripts/pipeline (Plan 0002). */
+export const AGGREGATOR_ADAPTERS = ["stadt-vk", "frankenkids", "evtermine"] as const;
+
+/**
+ * Katalog-Eintrag (data/providers.yaml). Die Rolle bestimmt, was Pflicht ist:
+ * - anbieter: veranstaltet selbst, hat mindestens einen Ort; nur Anbieter haben Angebote
+ * - aggregator: Sammelkalender fremder Veranstalter (Termine werden Anbietern zugeordnet)
+ * - verzeichnis: Liste zur Katalogpflege, liefert keine Termine
+ */
+export const Provider = z.discriminatedUnion("role", [
+  z.strictObject({
+    id: kebab,
+    role: z.literal("anbieter"),
+    ...providerBase,
+    venues: z.array(Venue).min(1),
+    /** Termine kommen vollständig über diesen Sammelkalender (eigene Seite wird nicht abgefragt) */
+    coveredBy: kebab.optional(),
+  }),
+  z.strictObject({
+    id: kebab,
+    role: z.literal("aggregator"),
+    ...providerBase,
+    venues: z.array(Venue),
+    adapter: z.enum(AGGREGATOR_ADAPTERS).optional(),
+  }),
+  z.strictObject({ id: kebab, role: z.literal("verzeichnis"), ...providerBase, venues: z.array(Venue) }),
+]);
 
 export const Session = z
   .strictObject({ start: Instant, end: Instant })
@@ -74,35 +116,39 @@ export const AgeRange = z
   })
   .refine((a) => a.minMonths <= a.maxMonths, "minMonths <= maxMonths");
 
-export const Offer = z
-  .strictObject({
-    /** deterministisch: `${providerId}--${slug(title)}--${venueId}` (ADR 0003) */
-    id: z.string().regex(/^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/),
-    providerId: kebab,
-    venueId: kebab,
-    title: z.string().min(1).max(140),
-    /** eigene Zusammenfassung, nie 1:1 kopierter Anbietertext */
-    summary: z.string().min(1).max(320),
-    topics: z.array(Topic).min(1),
-    format: Format,
-    registration: Registration,
-    cost: Cost,
-    price: z.string().optional(),
-    age: AgeRange.optional(),
-    sessions: z.array(Session).min(1),
-    registrationWindow: z.strictObject({ opens: Instant.optional(), deadline: Instant.optional() }).optional(),
-    availability: z.strictObject({
-      status: AvailabilityStatus,
-      note: z.string().optional(),
-      checkedAt: Instant,
-    }),
-    url: z.url(),
-    sourceUrl: z.url(),
-  })
-  .refine((o) => o.id.startsWith(`${o.providerId}--`) && o.id.endsWith(`--${o.venueId}`), {
+/** Felder eines Angebots ohne Querprüfungen – Basis für Offer und das Rohformat der Pipeline (ADR 0006). */
+export const OfferFields = z.strictObject({
+  /** deterministisch, siehe ids.ts (ADR 0003, ADR 0006) */
+  id: z.string().regex(/^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/),
+  providerId: kebab,
+  venueId: kebab,
+  title: z.string().min(1).max(140),
+  /** eigene Zusammenfassung, nie 1:1 kopierter Anbietertext */
+  summary: z.string().min(1).max(320),
+  topics: z.array(Topic).min(1),
+  format: Format,
+  registration: Registration,
+  cost: Cost,
+  price: z.string().optional(),
+  age: AgeRange.optional(),
+  sessions: z.array(Session).min(1),
+  registrationWindow: z.strictObject({ opens: Instant.optional(), deadline: Instant.optional() }).optional(),
+  availability: z.strictObject({
+    status: AvailabilityStatus,
+    note: z.string().optional(),
+    checkedAt: Instant,
+  }),
+  url: z.url(),
+  sourceUrl: z.url(),
+});
+
+export const Offer = OfferFields.refine(
+  (o) => o.id.startsWith(`${o.providerId}--`) && o.id.endsWith(`--${o.venueId}`),
+  {
     message: "id muss mit providerId-- beginnen und mit --venueId enden",
     path: ["id"],
-  })
+  },
+)
   .refine((o) => categoriesOf(o.topics).length > 0, {
     message: "mindestens ein Thema muss einer Kategorie zugeordnet sein",
     path: ["topics"],
@@ -126,6 +172,8 @@ export const ProvidersFile = z.array(Provider);
 
 export type Venue = z.infer<typeof Venue>;
 export type Provider = z.infer<typeof Provider>;
+export type ProviderAge = z.infer<typeof ProviderAge>;
+export type AvailabilityStatus = z.infer<typeof AvailabilityStatus>;
 export type Session = z.infer<typeof Session>;
 export type AgeRange = z.infer<typeof AgeRange>;
 export type Offer = z.infer<typeof Offer>;

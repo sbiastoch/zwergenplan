@@ -7,11 +7,11 @@ import {
   filterToSearch,
   nextSession,
 } from "./filter.ts";
-import { FIXTURE_NOW, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
+import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
 const { file } = loadFixtures();
 const ids = (state: FilterState, birthDate?: string) =>
-  applyFilters(file.offers, state, { now: FIXTURE_NOW, birthDate }).map((o) => o.id.split("--")[1]);
+  applyFilters(file.offers, state, { now: FIXTURE_NOW, birthDate }).map(fixtureKey);
 
 describe("URL-Zustand", () => {
   it("überlebt den Roundtrip verlustfrei und kanonisch", () => {

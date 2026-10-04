@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 test("zeigt kommende Angebote und blendet vergangene aus", async ({ page }) => {
   const offers = page.getByTestId("offer");
-  await expect(offers).toHaveCount(7);
+  await expect(offers).toHaveCount(8);
   await expect(page.getByText("Elterncafé am Montag")).toHaveCount(0);
   await expect(offers.first()).toContainText("Offener Krabbeltreff");
   await expect(offers.first()).toContainText("Nächster Termin: Mi., 7. Okt., 10:00–11:30 Uhr");

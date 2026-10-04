@@ -2,6 +2,7 @@
  * Prüfungen über einzelne Einträge hinaus. Läuft nur in scripts/ (Build, CI, Hooks),
  * nie im Browser – die Oberfläche bekommt ausschließlich bereits geprüfte Daten.
  */
+import { offerId } from "./ids.ts";
 import { type OffersFile, OffersFile as OffersFileSchema, type Provider, ProvidersFile } from "./schema.ts";
 
 export interface DatasetSummary {
@@ -28,15 +29,22 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
   const file = o.data;
   const generatedAt = Date.parse(file.generatedAt);
 
-  const providerIds = new Set<string>();
+  const providerById = new Map<string, Provider>();
   const venueOwner = new Map<string, string>();
   for (const prov of providers) {
-    if (providerIds.has(prov.id)) errors.push(`Anbieter-ID doppelt: ${prov.id}`);
-    providerIds.add(prov.id);
+    if (providerById.has(prov.id)) errors.push(`Anbieter-ID doppelt: ${prov.id}`);
+    providerById.set(prov.id, prov);
     for (const v of prov.venues) {
       if (venueOwner.has(v.id)) errors.push(`Ort-ID doppelt: ${v.id}`);
       venueOwner.set(v.id, prov.id);
     }
+  }
+
+  for (const prov of providers) {
+    if (prov.role !== "anbieter" || prov.coveredBy === undefined) continue;
+    const via = providerById.get(prov.coveredBy);
+    if (via?.role !== "aggregator")
+      errors.push(`Anbieter ${prov.id}: coveredBy ${prov.coveredBy} ist kein Sammelkalender`);
   }
 
   const offerIds = new Set<string>();
@@ -44,7 +52,13 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
     const where = `Angebot ${offer.id}`;
     if (offerIds.has(offer.id)) errors.push(`${where}: ID doppelt`);
     offerIds.add(offer.id);
-    if (!providerIds.has(offer.providerId)) errors.push(`${where}: unbekannter Anbieter ${offer.providerId}`);
+    const provider = providerById.get(offer.providerId);
+    if (!provider) errors.push(`${where}: unbekannter Anbieter ${offer.providerId}`);
+    else if (provider.role !== "anbieter")
+      errors.push(`${where}: ${offer.providerId} ist kein Anbieter (${provider.role})`);
+    const first = offer.sessions[0];
+    const expected = first && offerId({ ...offer, firstStart: first.start });
+    if (expected !== offer.id) errors.push(`${where}: ID entspricht nicht der Regel (ADR 0006), erwartet ${expected}`);
     const owner = venueOwner.get(offer.venueId);
     if (owner === undefined) errors.push(`${where}: unbekannter Ort ${offer.venueId}`);
     else if (owner !== offer.providerId) errors.push(`${where}: Ort ${offer.venueId} gehört zu ${owner}`);

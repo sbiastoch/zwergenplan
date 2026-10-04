@@ -20,9 +20,26 @@ export function loadFixtures(): { providers: Provider[]; file: OffersFile } {
   return { providers: result.providers, file: result.offers };
 }
 
-export function fixtureOffer(idPart: string): Offer {
-  const offer = loadFixtures().file.offers.find((o) => o.id.includes(idPart));
-  if (!offer) throw new Error(`Fixture-Angebot ${idPart} fehlt`);
+/** Kurze, stabile Testschlüssel → Titel der fiktiven Angebote (die IDs selbst sind lang, ADR 0006). */
+const FIXTURE_TITLES = {
+  "pekip-herbst": "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)",
+  krabbeltreff: "Offener Krabbeltreff",
+  "babymassage-workshop": "Babymassage – Schnupper-Workshop",
+  "musikgarten-1": "Musikgarten 1 (1–2 Jahre)",
+  krabbelreime: "Krabbelreime & Fingerspiele",
+  "kuckuck-im-nest": "„Kuckuck im Nest“ – Theater ab 18 Monaten",
+  "babykonzert-advent": "Babykonzert im Advent",
+  vergangen: "Elterncafé am Montag",
+} as const;
+export type FixtureKey = keyof typeof FIXTURE_TITLES;
+
+export function fixtureKey(offer: Pick<Offer, "title">): FixtureKey | undefined {
+  return (Object.keys(FIXTURE_TITLES) as FixtureKey[]).find((k) => FIXTURE_TITLES[k] === offer.title);
+}
+
+export function fixtureOffer(key: FixtureKey): Offer {
+  const offer = loadFixtures().file.offers.find((o) => o.title === FIXTURE_TITLES[key]);
+  if (!offer) throw new Error(`Fixture-Angebot ${key} fehlt`);
   return offer;
 }
 

@@ -21,15 +21,19 @@ function readOptional(url: URL): string | undefined {
 
 export function loadDataset(source: DataSource = dataSource(), now = new Date()): ValidationResult {
   if (isBootstrap(source)) {
-    // Bootstrap: data/ wird noch NICHT gelesen. Der Recherche-Skill pflegt data/providers.yaml
-    // vorerst im eigenen Format; die Überführung in den Zod-Vertrag kommt mit der Pipeline
-    // (Plan 0002). Erst danach wird data/BOOTSTRAP gelöscht und die Daten-Gates greifen.
+    // Bootstrap: Noch keine Angebote (die Seite bleibt leer), aber der Katalog ist schon im
+    // Zod-Vertrag und wird mit allen Invarianten geprüft (Plan 0002).
     const iso = now.toISOString().replace(/\.\d{3}Z$/, "Z");
-    return validateDataset([], {
-      generatedAt: iso,
-      horizon: { from: iso.slice(0, 10), to: iso.slice(0, 10) },
-      offers: [],
-    });
+    const catalog = readOptional(new URL("data/providers.yaml", ROOT));
+    try {
+      return validateDataset(catalog === undefined ? [] : parse(catalog), {
+        generatedAt: iso,
+        horizon: { from: iso.slice(0, 10), to: iso.slice(0, 10) },
+        offers: [],
+      });
+    } catch (e) {
+      return { ok: false, errors: [`Lesefehler: ${(e as Error).message}`] };
+    }
   }
 
   const dir = new URL(source === "fixture" ? "tests/fixtures/" : "data/", ROOT);
