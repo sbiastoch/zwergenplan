@@ -1,6 +1,6 @@
 # Plan 0007 – Nacharbeit zum Browser-Review von Plan 0003
 
-Status: nach Review überarbeitet (Verdict „Überarbeiten“, eingearbeitet) → wartet auf Freigabe
+Status: freigegeben nach zwei Reviews (Änderungen eingearbeitet) → Umsetzung
 Datum: 2026-10-04
 Bezug: Plan 0003, Abschnitt „Browser-Review live (2026-10-04)“, Befunde B1–B8 und H1–H8. Dieser Plan ist die Voraussetzung, die Plan 0004 in „Ausgangslage und Voraussetzungen“ nennt. Plan 0006 (eigene Domain) ist schon auf `main` (`e6ea878`).
 
@@ -78,22 +78,33 @@ Domäne, `src/domain/agenda.ts`:
 export interface DayAgenda<T extends Offer> {
   /** nicht beendete Termine des Tages, nach Beginn */
   items: Occurrence<T>[];
-  /** wie viele Termine dieses Tages schon beendet sind */
+  /** wie viele passende Termine dieses Tages schon beendet sind (nur heute > 0) */
   ended: number;
   /** Tag liegt nach dem letzten Termin des gesamten Datenstands */
   afterData: boolean;
 }
 export function dayAgenda<T extends Offer>(
-  index: ReadonlyMap<string, Occurrence<T>[]>, day: string, now: Date, dataEnd: string | undefined,
+  index: ReadonlyMap<string, Occurrence<T>[]>, day: string, now: Date,
+  context: { dataEnd: string | undefined; endedToday: number },
 ): DayAgenda<T>;
+
+/** Termine, die am Berliner Tag `day` beginnen und vor `now` beendet sind. */
+export function endedOnDay(offers: readonly Offer[], day: string, now: Date): number;
 ```
 - `items` filtert mit demselben Prädikat `notEnded(now)` wie `upcomingSessions`.
+- `ended` ist `endedToday`, wenn `day` der Berliner Tag von `now` ist, sonst 0 (vergangene Tage sind gesperrt, künftige haben nichts Beendetes).
 - `afterData` ist `dataEnd !== undefined && day > dataEnd`.
 - `sessionsByDay` bleibt unverändert, der Index wird weiter einmal je Filterstand berechnet.
 
+**Woher `endedToday` kommt:** Der Index enthält nur Angebote aus `applyFilters`, und das verlangt einen kommenden Termin (`nextSession`). Ein Einzeltermin, der heute schon vorbei ist, steht also gar nicht drin, und „Für heute ist alles vorbei“ käme für ihn nie. Deshalb zählt `endedToday` aus allen Angeboten, die zu den **Filtern** passen, **ohne** die Bedingung „kommender Termin“:
+- `filter.ts` bekommt `matchesFilter(offer, state)` (Kategorie, Format, Anmeldung, Kosten). `applyFilters` wird zu `nextSession(o, now) && matchesFilter(o, state)`, das Verhalten bleibt gleich.
+- `useOfferViews` berechnet `calendar.endedToday = endedOnDay(offers.filter((o) => matchesFilter(o, route.filter)), today, now)` (memo auf Angebote, Filter, `now`).
+- Die Altersregel wirkt hier nicht. `endedToday` entscheidet nur, welcher Leerzustand-Text erscheint. Im schlimmsten Fall heißt es „alles vorbei“ für ein unpassendes Angebot; die Altersregel für vergangene Termine nachzubauen, lohnt dafür nicht.
+- An den Fixtures geprüft: Am Mo 5.10. gibt es genau einen Termin, „Elterncafé am Montag“ (einmalig, 9–10 Uhr). Um 12:00 ist der Tag in der Agenda also leer, `endedToday` ist 1, und es erscheint „Für heute ist alles vorbei“ statt „Freier Tag“. Das ist der Startzustand jedes Kalender-Tests mit Fixture-Uhr, der Leerzustand läuft also durch die Mobile-Gates der Ansicht `kalender` (hell, dunkel, 320 px, 200 %).
+
 UI, `CalendarView.tsx`: Agenda, Überschrift „N Angebote“, `aria-label` der Tage (Z. 31), Formpunkte (Z. 72) und Monatspunkt (Z. 167) nutzen `dayAgenda(…).items`. Kosten: 7 + 31 Filter über kurze Arrays je Render, das ist vernachlässigbar. Für die Leerzustände gilt in dieser Reihenfolge:
 1. `items.length > 0`: Karten.
-2. `ended > 0`: „**Für heute ist alles vorbei**“ / „Die Termine von heute sind schon zu Ende. Die nächsten Tage stehen oben in der Woche.“ (Symbol `swing`).
+2. `ended > 0` (nur heute): „**Für heute ist alles vorbei**“ / „Die Termine von heute sind schon zu Ende. Die nächsten Tage stehen oben in der Woche.“ (Symbol `swing`).
 3. `afterData` (B8): „**Weiter reicht der Plan noch nicht**“ / „Termine sind bis {longDate(dataEnd)} eingetragen. Neue kommen mit dem nächsten Datenstand.“
 4. sonst wie bisher „Freier Tag“.
 
@@ -101,7 +112,7 @@ UI, `CalendarView.tsx`: Agenda, Überschrift „N Angebote“, `aria-label` der 
 
 **„Jetzt“ erneuern (B2 ohne Neuladen):** Damit die Agenda auch in einem offenen Tab abends richtig ist, erneuert die App „jetzt“ selbst:
 - Neuer Hook `useNow()` in `src/ui/use-app-state.ts`, er ersetzt `useMemo(() => new Date(), [])` in `App.tsx`.
-  - Zustand `now`. Eine Prüfung liest `new Date()` und setzt den Zustand **nur, wenn sich die Berliner Minute geändert hat** (Vergleich auf ganze Minuten). So gibt es höchstens einen Render pro Minute, und solange die Minute gleich ist, bleibt das `Date`-Objekt gleich und alle `useMemo` in `useOfferViews` bleiben gültig.
+  - Zustand `now`. Eine Prüfung liest `new Date()` und setzt den Zustand **nur, wenn sich die Minute geändert hat**: `sameMinute(a, b)` aus `src/domain/time.ts` (neu, Paket A, mit Unit-Test) vergleicht `Math.floor(ms / 60 000)`. Berliner Offsets sind ganze Stunden, die Minute ist also überall dieselbe. So gibt es höchstens einen Render pro Minute, und solange die Minute gleich ist, bleibt das `Date`-Objekt gleich und alle `useMemo` in `useOfferViews` bleiben gültig.
   - Die Prüfung läuft alle 30 s (`setInterval`) und bei `visibilitychange`, wenn die Seite sichtbar wird (Handy aus der Tasche). Aufräumen im Effekt-Cleanup.
 - **Keine unnötige Bewegung:** Die Kacheln merken sich beim Mounten, ob sie animieren (`useState(ctx.animate)` in `OfferCard`). Ein Minuten-Render animiert bestehende Kacheln also nicht. Nur eine Kachel, die wirklich die Tagesgruppe wechselt (ihr Termin ist gerade zu Ende gegangen), wird neu eingehängt; das ist eine echte Änderung.
 - **Tageswechsel:** `useOfferViews` gibt `calendar.day` als `clampDay(calendarDay, today)` zurück. Nach Mitternacht steht der Kalender also nicht auf einem gesperrten Vortag.
@@ -139,7 +150,7 @@ Die Kachel bekommt keinen neuen Chip, das Detail reicht. Eine eigene Datei statt
   - Ist das Ergebnis kürzer als 5 Zeichen (Schema-Minimum), bleibt die Adresse unverändert.
   - Teilübereinstimmungen werden nicht angefasst („Gemeindehaus Eibach, Kleiner Saal“ ≠ Präfix „Gemeindehaus Eibach,“).
 
-  Weil `build-data.ts` die ICS aus `toSiteData` erzeugt, korrigiert das Detail und `LOCATION` an einer Stelle. Die UIDs bleiben gleich (sie hängen nicht an der Adresse), ein erneuter Import aktualisiert also nur den Ort. Die Rohdaten bleiben unverändert: Weder `data/offers.json` noch die 32 Adressen in `data/providers.yaml` werden in diesem Plan bereinigt. Datenpflege läuft über den Skill `babyevents-nuernberg` und einen Pipeline-Lauf (ADR 0006). Dafür entsteht ein Eintrag in `docs/ideas.md` (E17).
+  Weil `build-data.ts` die ICS aus `toSiteData` erzeugt, korrigiert das Detail und `LOCATION` an einer Stelle. Die UIDs bleiben gleich (sie hängen nicht an der Adresse). Ob ein erneuter Import den Ort im Kalender korrigiert, ist aber offen: `DTSTAMP` kommt aus `generatedAt`, und es gibt kein `SEQUENCE`. Viele Kalender (Google, Apple) übernehmen eine Änderung bei gleicher UID ohne höhere `SEQUENCE` nicht. Schon importierte Termine behalten dann die doppelte Ortsangabe, neue bekommen die korrigierte. Das ist hinnehmbar, `SEQUENCE` einzuführen wäre ein eigenes Thema (ADR 0003). Der Browser-Review prüft an einem Termin, was Google bzw. Apple Kalender beim erneuten Import tun. Die Rohdaten bleiben unverändert: Weder `data/offers.json` noch die 32 Adressen in `data/providers.yaml` werden in diesem Plan bereinigt. Datenpflege läuft über den Skill `babyevents-nuernberg` und einen Pipeline-Lauf (ADR 0006). Dafür entsteht ein Eintrag in `docs/ideas.md` (E17).
 - **H8:** Die Hauptzeile im Detail folgt `courseProgress(offer, now)`:
   - nicht begonnen (`remaining === total`): „Kurs mit 8 Terminen“ (wie bisher);
   - läuft (`0 < remaining < total`): „**Kurs · noch 6 von 8 Terminen**“, wie die Kachel;
@@ -187,7 +198,7 @@ Summe R = 193 + W + K. Geeicht am Review-Befund (Umbruch bis 370 px mit „Alter
   - Die Container-Query sitzt auf `.hdr` selbst, nicht auf `.app`. Grund: `container-type` erzeugt Layout-Containment, und `.app` enthält die `position: fixed`-Tab-Leiste und den Toast. Die würden sich sonst an `.app` statt am Viewport ausrichten.
 - Ergebnis: Ab 380 px stehen drei Elemente in einer Zeile (390/393/402/412/414/430: iPhone 15, Pixel 7 …). Darunter (360/375/320) sind es zwei, die Darstellung bleibt im Kind-Sheet. Das bestätigt Plan 0003 E15 („unter 360 px entfällt der Knopf“, Nachtrag 4) und hebt die Schwelle von 360 auf 380 px. Einen Knopf, der bei 320–379 px die Kopfzeile umbrechen lässt, gibt es nicht. Wer die Darstellung dort ändern will, findet sie im Kind-Sheet, einen Tipp entfernt. Ergibt die Messung in Schritt 3.1 mit „23 Mon.“ mehr als 372 px, wird weiter gestrafft (Logo 34 → 30 px), nicht die Schwelle über 390 px gehoben.
 
-**Test** (`e2e/layout.spec.ts`, neu, Projekte `pixel-7` und `iphone-15`, jeweils mit `setViewportSize`):
+**Test** (`e2e/layout.spec.ts`, neu, jeweils mit `setViewportSize`). Er läuft nur in den Projekten `pixel-7` (Chromium) und `iphone-15` (WebKit). Das steht ausdrücklich im Test: `test.skip(!["pixel-7", "iphone-15"].includes(testInfo.project.name), "Layout-Matrix je Engine einmal")`. Sonst liefe die Matrix in allen fünf Projekten, und `desktop`/`android-klein` brächten nichts Neues.
 - Breiten 320, 360, 365, 370, 384, 390, 412 und 420 px, je mit Kind-Label „Alter?“ und „23 Mon.“ (Geburtsdatum 01.11.2024, über das Kind-Sheet gesetzt).
 - Zwei Schriftzustände: Webfont geladen, und Webfont blockiert (`page.route("**/assets/*.woff2", r => r.abort())`, also dauerhaft die Fallback-Schrift der Maschine). Der Test braucht dafür keinen Helfer aus Paket C.
 - Gemessen wird nur mit `offsetTop`/`offsetHeight`, nie mit `getBoundingClientRect`: Der Kind-Chip ist um 1,5° gedreht, die Tab-Leiste um −0,6°, und gedrehte Boxen sind im Bounding-Rect höher.
@@ -218,10 +229,11 @@ Die Seitenzoom-Variante (Chrome Android „Seitenzoom“, also ein 206-px-Viewpo
 | Filter-Chips abgeschnitten | Mehrzeiliger Text in `border-radius: 999px` (`.wrap .chip`, Z. 257–260), die Rundung schneidet die Zeilenenden ab | `.chip { border-radius: 22px }`: einzeilig weiter eine Pille (Mindesthöhe 44), mehrzeilig ein abgerundetes Rechteck. Die Schnellfilter-Leiste (`nowrap`, scrollt) prüft das Gate mit. |
 | Kategorie-Pille im Detail oval | `.catname` inline-block mit 999 px, bricht in 2 Zeilen | `border-radius: calc(0.7em + 4.5px)` (halbe einzeilige Höhe: 0,7 em halbe Zeile + 3 px Padding + 1,5 px Rand). `.hero { flex-wrap: wrap }`, Textblock `flex: 1 1 10rem; min-width: 0`: Bei großer Schrift rutscht er unter den Sticker. |
 | Kachel-Pille (vorsorglich) | `.pill` 999 px | `border-radius: calc(0.7em + 3.5px)`, gleiche Regel. |
+| Gewählter Monatstag bei großer Schrift oval | `.mday { border-radius: 50% }` (`calendar.css` Z. 134) | `border-radius: 22px` (E10, Prüfung 3). |
 | Mehrzeilige Knöpfe | `.btn`, `.monthbtn` 999 px | `.btn { border-radius: 26px }`, `.monthbtn { border-radius: 22px }` (halbe Mindesthöhe). |
 | Titel brechen an beliebiger Stelle | `overflow-wrap: anywhere` (`base.css` Z. 18) ohne Silbentrennung | `hyphens: auto` auf `.ptitle`, `.dtitle`, `.ctitle`, `.sheet h2`, `.empty b` (E10, Prüfung 1). |
 | Fuß im Filter-Sheet | `.sheetfoot` Grid `auto 1fr` (`sheet.css` Z. 147–152), „Zurücksetzen“ lässt dem zweiten Knopf bei 200 % ~12 px | `display: flex; flex-wrap: wrap; gap: 10px`; erster Knopf `flex: 0 1 auto`, zweiter `flex: 1 1 7rem`. Bei 100 % und 320 px bleibt es eine Zeile (156 + 10 + 112 ≤ 288), bei 200 % werden es zwei. |
-| Darstellungs-Segment (auch H3) | 3 × 92 px bei 320 px, „Automatisch“ fett ≈ 87 px | `.sheet-body { container: sheet / inline-size }` (der Toast ist Geschwister, nicht Kind, siehe `Dialog.tsx`). `@container sheet (width < 19.5rem)`: `.seg3` einspaltig, `.seg-thumb` aus, der gewählte Knopf bekommt selbst Fläche, Rand und Schatten. Bei 100 % greift das unter 312 px Inhalt, also bei 320 px (H3), bei 200 % auf allen Telefonen. |
+| Darstellungs-Segment (auch H3) | 3 × 92 px bei 320 px, „Automatisch“ fett ≈ 87 px | `.sheet-body { container: sheet / inline-size }` (der Toast ist Geschwister, nicht Kind, siehe `Dialog.tsx`). `@container sheet (width < 19.5rem)`: `.seg3` einspaltig mit `border-radius: 22px` (statt 999 px, sonst schneidet die Rundung die oberste und unterste Zeile), `.seg-thumb` aus, der gewählte Knopf bekommt selbst Fläche, Rand, Schatten und `border-radius: 18px`. Bei 100 % greift das unter 312 px Inhalt, also bei 320 px (H3), bei 200 % auf allen Telefonen. |
 | Etiketten im Detail | 2 Spalten fest (`dialog.css` Z. 116–121) | `grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr))`, `.label.full` bleibt `1 / -1`. Bei 320 px/100 % 2 Spalten (2 × 128 + 10 ≤ 283), bei 200 % eine. |
 | Zähler-Badge | `height: 22px` fix (`chrome.css` Z. 287–299) | `height: auto; min-height: 22px; padding-block: 1px`. |
 
@@ -244,7 +256,7 @@ Eine Media-Query in px ist hier richtig, denn es geht um Pixel, nicht um Text. B
 
 ### E10 – Gate `expectTextFits` (B7, allgemein)
 
-Neu in `e2e/mobile-ux.ts`, exportiert und in `expectMobileUx` aufgerufen, gilt also bei 100 % in jedem Gate-Lauf. Zusätzlich direkt nach dem Umschalten auf 200 %. Ein `page.evaluate`, fünf Prüfungen. Jede Meldung nennt Element (Tag + erste Klasse) und Text, damit der Fehler ohne Debugging behebbar ist.
+Neu in `e2e/mobile-ux.ts`, exportiert und in `expectMobileUx` aufgerufen, gilt also bei 100 % in jedem Gate-Lauf. Zusätzlich direkt nach dem Umschalten auf 200 %. Ein `page.evaluate`, fünf Prüfungen. **Für alle fünf gilt:** Visuell versteckte Elemente werden übersprungen, also alles mit einem Vorfahren (oder sich selbst) ≤ 1 px breit oder hoch bzw. mit `clip`/`clip-path` auf null, wie `.sr-only`. Sonst wären die versteckten Legenden „Kategorien“, „Schnellfilter“ (`Chrome.tsx` Z. 46, 110) und „Woche“ (`CalendarView.tsx` Z. 57) für Prüfung 2 rot, denn ihr Text ragt aus dem 1-px-Kasten. Jede Meldung nennt Element (Tag + erste Klasse) und Text, damit der Fehler ohne Debugging behebbar ist.
 
 1. **Kein Bruch mitten in kurzen Wörtern.**
    - Ein `TreeWalker` geht über alle Textknoten unter `body`, offene `<dialog>`s eingeschlossen.
@@ -256,15 +268,18 @@ Neu in `e2e/mobile-ux.ts`, exportiert und in `expectMobileUx` aufgerufen, gilt a
    - **Warum die Spalte und nicht der eigene Container:** Genau die zu schmalen Container sind der Fehler. Bei 200 % ist „Entdecken“ ≈ 130 px breit, die Tab-Spalte bei 320 px ≈ 95 px. Gegen den eigenen Container gemessen (130 > 0,7 × 95) wäre das erlaubt, gegen die Spalte (130 ≤ 201,6) ist es ein Verstoß.
    - **Warum 70 %:** Titel sind groß. „Stickerheft“ (`.ptitle`, 2 rem/800), „Krabbeltreff“, „Fingerspiele“, „Babymassage“ (`.ctitle` 1,375 rem, `.dtitle` 1,875 rem) sind bei 200 % ≈ 280–340 px breit, also breiter als die 288-px-Spalte. Sie *müssen* brechen und sind über 70 % (keine Meldung). Bei 100 % sind dieselben Wörter ≈ 140–170 px breit; brächen sie dort, wäre das ein echter Fehler (Meldung). Eine Zeichengrenze (früher „≤ 12 Zeichen“) hätte genau diese Titel bei 200 % fälschlich rot gemacht.
    - Damit Titel sauber brechen statt an beliebiger Stelle, bekommen `.ptitle`, `.dtitle`, `.ctitle`, `.sheet h2` und `.empty b` `hyphens: auto` (`<html lang="de">` ist gesetzt, Paket B). Das ändert Plan 0003 E5 („`hyphens` nur für `.summary`“): Dort ging es um unnötige Trennungen wie „Nürn-berg“ in Titeln, die bei 100 % noch passen würden. `hyphens: auto` trennt nur, wenn ein Wort nicht in die Zeile passt, und dann ist „Sticker-heft“ besser als „Stickerhef-t“ durch `overflow-wrap: anywhere`.
-   - Ausgenommen sind Elemente mit berechnetem `hyphens: auto` (die Trennung kommt dann aus dem Wörterbuch, `.summary` und die Titel) und visuell versteckte Elemente (ein Vorfahr ≤ 1 px breit oder hoch, also `sr-only`).
+   - Ausgenommen sind Elemente mit berechnetem `hyphens: auto` (die Trennung kommt dann aus dem Wörterbuch, `.summary` und die Titel) (versteckte Elemente siehe oben, gilt für alle Prüfungen).
    - Das trifft die Befunde: „Entdecken“ (Tab), „Termine“ (ICS-Knopf), „12“ (Tageszahl), „Automatisch“ (Segment).
 2. **Text ragt nicht heraus und wird nicht abgeschnitten.**
    - Für jede Textzeile (Rects der Textknoten) werden die Vorfahren nach oben verglichen. Horizontal darf die Zeile über keinen Padding-Rand eines Vorfahren um mehr als 1,5 px hinausgehen. Vertikal gilt das nur bei Vorfahren, die abschneiden (`overflow` `hidden`/`clip`). Ascent/Descent ragen bei Zeilenhöhe 1,08 legitim aus dem Zeilenkasten.
    - Der Weg nach oben endet am ersten Scroll-Container (`overflow-x` `auto`/`scroll`, z. B. `.chips`: Text außerhalb des sichtbaren Bereichs ist dort Absicht) und nach dem ersten `position: fixed/absolute`-Vorfahren (dessen Bezug ist nicht der DOM-Vorfahr).
    - Das trifft die Sticker-Labels (Text breiter als `.stk`) und abgeschnittene Inhalte.
 3. **Text bleibt innerhalb der Rundung.**
-   - Für den nächsten Vorfahren mit `border-radius` > 0 wird geometrisch geprüft, ob die Ecken jeder Textzeile innerhalb der abgerundeten Form liegen: r = min(Radius, Höhe/2, Breite/2), Abstand zum Bogenmittelpunkt ≤ r + 1 px.
+   - Geprüft wird der nächste Vorfahr, dessen Rundung **sichtbar** ist: `border-radius` > 0 **und** eine deckende Hintergrundfarbe (Alpha > 0), ein `background-image` oder ein sichtbarer Rand (`border-*-width` > 0 und Stil ≠ `none`). Ein unsichtbarer Kasten mit Rundung (z. B. `.mday` ohne Auswahl, Hintergrund `none`) schneidet optisch nichts ab.
+   - Die Radien werden **je Ecke** gelesen (`border-top-left-radius` …, jeweils horizontal und vertikal), `%`-Werte gegen Breite bzw. Höhe der Box aufgelöst und nach CSS-Regel skaliert, wenn die Summe zweier Radien einer Seite die Seitenlänge übersteigt.
+   - Für jede Ecke jeder Textzeile, die im Eckbereich der Box liegt, gilt: Der Punkt liegt in der Ellipse mit den Halbachsen (rx, ry) um den Bogenmittelpunkt, Toleranz 1 px.
    - Das trifft die ovale Kategorie-Pille und mehrzeilige Chips, nicht aber breite zweizeilige Knöpfe, deren Text die Ecken nicht berührt. So gibt es keinen pauschalen „Pillen müssen einzeilig sein“-Alarm.
+   - Der gewählte Monatstag `.mday[aria-pressed="true"]` hat heute `border-radius: 50%`. Bei 200 % ist er höher als breit (Zahl + Formpunkt), aus dem Kreis wird eine schmale Ellipse, und die Zahl stößt an. Deshalb `.mday { border-radius: 22px }` statt 50 %: bei 100 % (45 × 44 px) praktisch ein Kreis, bei großer Schrift ein abgerundetes Rechteck (E8).
 4. **Geschwister in Leisten überlappen nicht.**
    - Für die Leisten in `BARS` (`.hdr, .stickers, .chips, .tabs, .week, .mgrid, .cal-nav, .card-top, .facts, .two, .sheetfoot, .seg, .labels, .hero`) werden die Layout-Boxen der sichtbaren, nicht absolut/fest positionierten Kinder paarweise verglichen, Toleranz 0,5 px.
    - Gemessen wird mit `offsetLeft/Top/Width/Height` statt `getBoundingClientRect`. Rotationen (Karten ±0,6°, gewählter Tag −4°, Etiketten ±0,5°) blähen sonst die Boxen auf und lösen Fehlalarme aus.
@@ -278,7 +293,7 @@ Neu in `e2e/mobile-ux.ts`, exportiert und in `expectMobileUx` aufgerufen, gilt a
 
 Ohne Fehlalarme heißt hier: Die Toleranzen sind oben festgelegt. Die Ausnahmen (`hyphens: auto`, `sr-only`, Scroll-Container, positionierte Vorfahren) sind im Code mit Grund kommentiert. Eine Ausnahme per Selektor oder per `data-`Attribut gibt es nicht. Meldet das Gate etwas, wird das Layout korrigiert.
 
-**Kanarienvogel (Pflicht):** Das Gate wird *vor* den CSS-Korrekturen geschrieben und auf dem alten CSS laufen gelassen (Schritt 3.2). Es muss bei 320 px/200 % mindestens für Sticker-Labels (Prüfung 2), Tab-Labels, ICS-Knöpfe und Tageszahlen (1) sowie für die Kategorie-Pille und die Sheet-Chips (3) rot sein. Bei 320 px/100 % muss es für „Alle gemerkten in den Kalender“ (Merkliste) rot sein (5). Das Merklisten-Label ändert deshalb Paket B (`SavedView.tsx`, E16), damit B allein grün werden kann. Das Fixture-Detail im Gate ist der PEKiP-Kurs, `.two` prüft dort also niemand. Paket B ergänzt deshalb in `mobile-ux.spec.ts` die Ansicht `detail-regelmaessig` (Detail „Offener Krabbeltreff“). Sie läuft durch alle Gates, hell und dunkel, und durch 320 px/100 % und 200 %. Vor der `.two`-Korrektur muss sie für „Nur Mi 7.10.“ rot sein (5). Die Meldungen kommen als Beleg in die Commit-Message. Prüfung 4 bekommt einen eigenen Kanarienvogel: Vorübergehend `.kid { margin-left: -40px }`, das muss rot werden.
+**Kanarienvogel (Pflicht):** Das Gate wird *vor* den CSS-Korrekturen geschrieben und auf dem alten CSS laufen gelassen (Schritt 3.2). Es muss bei 320 px/200 % mindestens für Sticker-Labels (Prüfung 2), Tab-Labels, ICS-Knöpfe und Tageszahlen (1) sowie für die Kategorie-Pille und die Sheet-Chips (3) rot sein. Bei 320 px/100 % muss es für „Alle gemerkten in den Kalender“ (Merkliste) rot sein (5). Das Merklisten-Label ändert deshalb Paket B (`SavedView.tsx`, E16), damit B allein grün werden kann. Das Fixture-Detail im Gate ist der PEKiP-Kurs, `.two` prüft dort also niemand. Paket B ergänzt deshalb in `mobile-ux.spec.ts` die Ansicht `detail-regelmaessig` (Detail „Offener Krabbeltreff“). Sie läuft durch alle Gates, hell und dunkel, und durch 320 px/100 % und 200 %. Vor der `.two`-Korrektur muss sie für „Nur Mi 7.10.“ rot sein (5). Die Meldungen kommen als Beleg in die Commit-Message. Prüfung 4 bekommt einen eigenen Kanarienvogel: Der Test fügt per `page.addStyleTag({ content: ".hdr .kid { margin-left: -40px }" })` eine Überlappung ein. Die Regel muss `.hdr .kid` heißen, denn `.hdr .kid { margin-left: auto }` in `chrome.css` ist spezifischer als `.kid`. Das Gate muss rot werden. Der Fall bleibt als dauerhafter Test in `mobile-ux.spec.ts` („Text-Gate erkennt Überlappung“, erwartet den Fehler per `expect(…).rejects`).
 
 ### E11 – B6: Roboto-Fallback und genauere Metriken (Paket C, Layout-Maßnahme Paket B)
 
@@ -297,7 +312,7 @@ B6 bleibt in diesem Plan, ist aber ein eigenes **Paket C** (E16). Es läuft nach
 - Neu „Bricolage Fallback Roboto“. Der normale Schnitt hat `src: local("Roboto"), local("Roboto-Regular"), local("Roboto Regular")`, der fette `local("Roboto Bold"), local("Roboto-Bold"), local("Roboto")`. Ab Android 12 gibt es nur die variable Datei „Roboto“, Chromium stellt das Gewicht dann über die wght-Achse ein.
 - Reihenfolge im Stack: Arial, **Roboto**, Noto, DejaVu, `system-ui`, `sans-serif`.
 - **Gewichts-Buckets nach Messung:** Ziel ist, dass jede Textklasse einen Breitenfehler ≤ 1,5 % hat. Reichen die zwei Buckets nicht, kommt zuerst ein dritter hinzu: 200–549, 550–749 (Fakten, Chips, Tabs) und 750–800 (Titel, Zeit), beim Bold-Schnitt mit derselben `local()`-Datei und eigenem `size-adjust`.
-- **Nur wenn der Fehler danach noch > 1,5 % ist** zwischen klein (≤ 16 px) und groß (≥ 20 px), gibt es einen zweiten Stack: `--font-display` mit Faces „… Display“, gesetzt auf die Überschriften-Klassen (`.brand, .ctitle, .dtitle, .daylabel, .ptitle, .sheet h2, .h3, .empty b, .cal-nav b, .label b`). `--font-sans` bleibt der Text-Stack.
+- **Nur wenn der Fehler danach noch > 1,5 % ist** zwischen klein (≤ 16 px) und groß (≥ 20 px), gibt es einen zweiten Stack: `--font-display` mit Faces „… Display“, gesetzt auf die Überschriften-Klassen (`.brand, .ctitle, .dtitle, .daylabel, .ptitle, .sheet h2, .h3, .empty b, .cal-nav b, .label b`). `--font-sans` bleibt der Text-Stack. Die Zuordnung steht als **eine** Regel in `tokens.css` (`:where(.brand, .ctitle, …) { font-family: var(--font-display) }`, Spezifität 0). So muss C keine der Komponenten-Dateien von B anfassen. Braucht eine Klasse doch eine eigene Regel in ihrer Datei (z. B. weil dort `font-family` gesetzt ist), ändert C nur diese eine Zeile, und die Datei steht dann ausdrücklich in Cs Commit.
 - Die Messwerte stehen im Kommentar über den Faces („erzeugt mit `node scripts/font-fallback.ts`, Datum“) und im Commit.
 - CSS-Zuwachs bei 4 Fallbacks × 3 Gewichte × 2 Klassen: 24 kurze Faces, geschätzt < 1 kB gzip.
 
@@ -316,7 +331,8 @@ Gründe: Pro Zeile passen mehr Fakten-Chips, es gibt also weniger Umbruchgrenzen
 ### E12 – B6: Perf-Test mit zurückgehaltener Webfont (Paket C)
 
 Neu `e2e/vitals.ts`. Damit ist auch der Arch-Hinweis 13 aus Plan 0003 erledigt („Web-Vitals-Helfer“):
-- `observeVitals(page)`: Init-Skript für LCP und CLS. Bei CLS werden `sources` (Selektor, alte und neue Rechtecke) gesammelt und bei Rot in die Fehlermeldung geschrieben.
+- **Zeitbasis:** Die Fake-Uhr aus `e2e/fixtures.ts` (Z. 26, `setFixedTime`) ist in **jedem** Test installiert und ersetzt `performance`: `now()`, `mark()` und `getEntries*()` liefern gefälschte Werte (aus `playwright-core` 1.63 gelesen). Die Zeitstempel der `PerformanceObserver`-Einträge (`startTime`) sind dagegen nativ. `vitals.ts` nutzt deshalb **nie** `performance.now`, `performance.mark` oder `performance.getEntries*`. Ein Vergleichszeitpunkt kommt aus einer nativen Quelle mit derselben Zeitbasis wie `startTime`: `new Event("zp").timeStamp` (ersatzweise `document.timeline.currentTime`). Das steht als Kommentar über dem Helfer.
+- `observeVitals(page)`: Init-Skript für LCP und CLS über `PerformanceObserver`. Bei CLS werden `sources` (Selektor, alte und neue Rechtecke) gesammelt und bei Rot in die Fehlermeldung geschrieben.
 - `readVitals(page)`.
 - `throttleMobile(page)`: CDP, CPU 4×, Netz wie bisher.
 - `holdWebfont(page)`: `page.route("**/assets/bricolage-grotesque-latin-opsz-normal*.woff2")` hält die Anfrage, bis `release()` aufgerufen wird. Der Kanarienvogel steckt in `expectHeld()`: Die Route muss genau einmal gegriffen haben, sonst ist der Test wirkungslos.
@@ -332,9 +348,11 @@ Ablauf in `smoke.spec.ts` (Projekt `smoke-echte-daten`, seriell, echte Daten), n
 - Ablauf:
   1. `useOnlyFallback`, `holdWebfont`, `observeVitals`, Uhr auf `generatedAt`, `goto`, erste Karte sichtbar.
   2. Die gewählte Fallback-Familie normal und fett laden: `document.fonts.load('400 16px "Bricolage Fallback <Name>"')` und `('800 16px …')`. Bei Roboto (per URL) ist das Pflicht, bei lokalen Schriften schadet es nicht. Danach `expectOnlyFallback`.
-  3. 300 ms warten, dann `t0 = performance.now()` im Browser merken und `release()`.
+  3. 300 ms warten, dann `t0 = new Event("zp").timeStamp` im Browser merken (nativ, siehe Zeitbasis) und `release()`.
   4. `document.fonts.ready`, `document.fonts.check('800 22px "Bricolage Grotesque Variable"')` muss wahr sein (der Swap hat stattgefunden), 500 ms warten.
 - Erwartung: **CLS < 0,05**, summiert nur aus `layout-shift`-Einträgen mit `startTime ≥ t0`. Gemessen wird also genau der Swap, nicht das Laden der Daten oder das Nachladen der Test-Roboto.
+- **Kanarienvogel für die Zeitbasis (dauerhafter Test in `perf.spec.ts`):** Gleicher Ablauf, aber direkt nach `t0` verschiebt der Test künstlich den Inhalt (`document.querySelector("main").style.paddingTop = "120px"`). Dieser Shift muss gezählt werden (CLS > 0,05). Mit einer gefälschten Zeitbasis fiele er aus der Summe, und der Test wird rot.
+- **Bestehender Code:** `perf.spec.ts` und der LCP/CLS-Test in `smoke.spec.ts` summieren CLS über alle Einträge und vergleichen LCP-`startTime` mit 2 500 ms. Beide nutzen nur `PerformanceObserver`, also native Zeitstempel, und keinen Vergleich mit `performance.now`. Sie sind vom Problem nicht betroffen. Beim Umstellen auf `vitals.ts` bleibt das so.
 - Ist eine lokale Schrift auf der Maschine nicht vorhanden (Face-Status `error` in `document.fonts`), wird `test.skip` mit Begründung gesetzt, und das nie bei Roboto, das immer per URL kommt. Auf CI (Ubuntu mit `playwright install --with-deps`) sind Liberation und DejaVu da. Noto kann fehlen, das ist dann ein Skip und kein Grün ohne Messung.
 - Ohne CPU-Drosselung: Es geht um Verschiebung, nicht um Tempo. Der bestehende LCP/CLS-Test mit Drosselung bleibt, nutzt aber die Helfer.
 - `perf.spec.ts` (Fixtures) nutzt die Helfer und bekommt denselben Swap-Test für Roboto bei 412 px, damit er auch außerhalb des Smoke-Projekts läuft.
@@ -355,13 +373,24 @@ Nachtrag 1 zeigt: Bei 915 × 412 verdeckt die Leiste ≈ 82 von 412 px. Weil der
 - **Seitenleiste** bei `@media (max-height: 500px) and (min-width: 40rem)`. Das betrifft Telefone quer: Pixel 7 quer, iPhone 15 quer (852 px) und das Projekt `pixel-7-quer`.
   - `.tabs` steht fest links: `left: calc(env(safe-area-inset-left) + 8px)`, vertikal mittig, Breite 6,5 rem (Spalte ≈ 5,25 rem ≥ 4,6 rem, die Labels bleiben bei 100 % sichtbar), drei Zeilen statt drei Spalten. Das Washi-Tape ist um 90° gedacht: gleiche Farben und Streifen, Rotation +0,6°.
   - `body` bekommt links `calc(env(safe-area-inset-left) + 7.5rem)` Innenabstand. Die Spalte `.app` zentriert sich im Rest und wird notfalls schmaler (`max-width` bleibt 40 rem). Die Leiste kann den Inhalt also auch mit Notch-Einzug nie überdecken.
-  - `.app` unten nur noch `calc(20px + env(safe-area-inset-bottom))`. Der Toast steht unten mittig über der Spalte.
+  - `.app` unten nur noch `calc(20px + env(safe-area-inset-bottom))`.
+  - Der Toast steht unten mittig über der Inhaltsspalte, nicht über dem ganzen Viewport (er bleibt `position: fixed` mit `translateX(-50%)`):
+    ```css
+    .toast {
+      --rail: calc(env(safe-area-inset-left) + 7.5rem);   /* = body padding-left */
+      left: calc(var(--rail) + (100vw - var(--rail) - env(safe-area-inset-right)) / 2);
+      width: min(26rem, 100vw - var(--rail) - env(safe-area-inset-right) - 32px);
+      bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+    ```
+    Die Mitte des Bereichs rechts der Leiste ist auch die Mitte der zentrierten `.app`-Spalte. Bei 915 px: Leiste 120 px, Mitte bei 120 + 795 / 2 = 517,5 px, Breite 416 px. `layout.spec.ts` prüft: Toast-Box (`offsetLeft`/`offsetWidth` des Toasts gegen `main`) liegt vollständig über `main` und überlappt `.tabs` nicht (mit angehaltener Uhr wie in E15).
   - `.tab-thumb` folgt der Wahl über eine CSS-Variable statt über ein Inline-`translateX`: `Chrome.tsx` setzt `className={`tab-thumb at-${index}`}`, CSS `.at-1 { --i: 1 }`, `.at-2 { --i: 2 }`. Unten gilt `translateX(calc(var(--i, 0) * 100%))`, an der Seite `translateY(…)`. Es kommt ohne Cast aus, und `style` mit eigener Property bräuchte in TS ein `as`.
 - **Kompakte Leiste** bei `@media (max-height: 500px) and (max-width: 39.99rem)` (sehr kleine Telefone quer, z. B. 568 × 320): Icon und Label nebeneinander, `.tab` 44 statt 56 px hoch, weniger Innenabstand. `.app`-Unterabstand und Toast passen sich an.
 - **Test** in `layout.spec.ts`:
   - 915 × 412 und 852 × 393: Die Leiste liegt links neben `main` (`tabs.right ≤ main.left`), und die erste Karte ist ohne Scrollen sichtbar.
   - 568 × 320: Die Leiste ist höchstens 56 px hoch.
   - Hochformat 412 × 915: unverändert unten.
+  - **863 × 360 (Pixel 7 quer) bei 200 %:** Seitenleiste plus große Schrift ist die engste Kombination (Spalte ≈ 863 − 120 − 32 px, Höhe 360). Start, Kalender und Detail mit `expectTextFits(page, { scale: 2 })` und `expectNoHorizontalScroll`, dazu prüft der Test, dass die Tab-Labels per Container-Query ausgeblendet sind oder in ihre Spalte passen.
 
   Die bestehenden Gates im Projekt `pixel-7-quer` prüfen damit automatisch die Seitenleiste (Touch, axe, Text, Überlauf), hell und dunkel.
 
@@ -383,7 +412,7 @@ Die Inversflächen nutzen heute `var(--ink)`/`var(--bg)`. Im Dunkeln ist `--ink`
 - Gate `expectNoBrightIslands(page)` in `e2e/mobile-ux.ts`. Aufgerufen wird es in allen Dunkel-Läufen von `mobile-ux.spec.ts`, und zwar über **beide** Wege zum Dunkelmodus:
   - wie bisher `emulateMedia({ colorScheme: "dark" })` (System-Einstellung, `@media`-Zweig);
   - zusätzlich je Ansicht ein Lauf mit hellem System und gewählter Darstellung „Dunkel“ (`data-theme="dark"`). Dafür setzt `page.addInitScript` vor dem Laden `localStorage["zwergenplan.darstellung"] = "dunkel"`. Der Weg über den Theme-Knopf geht nicht überall, denn unter 380 px ist er ausgeblendet (E6). Der Test prüft vor dem Gate, dass `document.documentElement.dataset.theme === "dark"` ist.
-  - Regel: Kein sichtbares Element ohne `background-image` hat eine deckende Hintergrundfarbe (Alpha > 0,5) mit relativer Luminanz > 0,75 auf mehr als 1 000 px².
+  - Regel: Kein sichtbares Element und kein `::before`/`::after` ohne `background-image` hat eine deckende Hintergrundfarbe (Alpha > 0,5) mit relativer Luminanz > 0,75 auf mehr als 1 000 px². Pseudo-Elemente werden über `getComputedStyle(el, "::before")` gelesen; ihre Fläche wird aus `width`/`height` bzw. bei `inset`-Positionierung aus der Box des Elements geschätzt. So fällt z. B. `.tab-thumb::before` (der gewählte Tab, `background: var(--surface)`) auf, falls er hell würde.
   - Gelb `#FFD93B` (0,71), Grün `#A6DB5E` (0,60) und alle Kategoriefarben liegen darunter, `#EEF3F8` (0,89) und Weiß darüber. Der Schalter-Knopf (24 × 24 = 576 px², weiß) liegt unter der Fläche.
   - **Toast deterministisch:** Der Toast verschwindet nach 2,8 s. Ob ein Gate-Lauf ihn erwischt, wäre Zufall. Deshalb gibt es einen eigenen Test „Toast im Dunkeln“ in `mobile-ux.spec.ts`, in beiden Dunkel-Wegen:
     - Startseite laden, dann `page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"))`. Die Fixture hat die Fake-Uhr per `setFixedTime` schon installiert; `pauseAt` hält jetzt auch die Timer an (`playwright-core` 1.63, Ausgangslage).
@@ -399,7 +428,9 @@ Die Inversflächen nutzen heute `var(--ink)`/`var(--bg)`. Im Dunkeln ist `--ink`
 A und B arbeiten parallel in getrennten Worktrees, **keine Datei gehört beiden**. C läuft danach, im Anschluss an B und durch denselben Playwright-Agenten. Nur B und C starten Playwright, nacheinander, weil die Ports 4173/4174 nur einmal belegt werden können. Paket A schreibt seine E2E-Specs ungetestet, sie laufen erst beim Zusammenführen (Schritt 5).
 
 **Paket A „Domäne + Texte“** (B1, B2 inkl. „jetzt“ erneuern, B4, B8, H2-Teil, H5, H6, H8), Branch `nacharbeit-0007-a`:
-- `src/domain/agenda.ts` + `agenda.test.ts` (`dayAgenda`)
+- `src/domain/agenda.ts` + `agenda.test.ts` (`dayAgenda`, `endedOnDay`)
+- `src/domain/filter.ts` + `filter.test.ts` (`matchesFilter`)
+- `src/domain/time.ts` + `time.test.ts` (`sameMinute`)
 - `src/domain/registration.ts` + `registration.test.ts` (neu)
 - `src/domain/site-data.ts` + `site-data.test.ts` (`venueAddress`)
 - `src/ui/format.ts` + `format.test.ts` (B1, B4, H8)
@@ -407,7 +438,7 @@ A und B arbeiten parallel in getrennten Worktrees, **keine Datei gehört beiden*
 - `src/ui/DetailDialog.tsx` (B4 mit `now`, H5, Kurs-Knopf „Alle 8 Kurstermine“ aus E4)
 - `src/ui/use-offer-views.ts` + `use-offer-views.test.ts` (`dataEnd`, `clampDay` auf `calendar.day`)
 - `src/ui/use-app-state.ts` (`useNow`, E2)
-- `src/ui/App.tsx` (`useNow`, `dataEnd` durchreichen)
+- `src/ui/App.tsx` (`useNow`, `dataEnd` und `endedToday` durchreichen)
 - `e2e/calendar.spec.ts`, `e2e/detail.spec.ts`
 - `docs/ideas.md` (alle Einträge aus E17, auch die für B und C), `docs/plans/0003-design-stickerheft.md` (Verweise „geändert durch Plan 0007“ in E5, E6, E12, E13, E14 und E15 von Plan 0003)
 
@@ -416,13 +447,14 @@ A und B arbeiten parallel in getrennten Worktrees, **keine Datei gehört beiden*
 - `src/ui/styles/base.css`, `chrome.css`, `card.css`, `calendar.css`, `tabs.css`, `dialog.css`, `sheet.css`, `list.css` (falls das Gate dort etwas meldet)
 - `src/ui/Chrome.tsx` (`tab-label`-Span, `tab-thumb at-N` statt Inline-`transform`)
 - `src/ui/SavedView.tsx` (nur das Label „Alle in den Kalender“, E4) und `e2e/saved.spec.ts` Z. 48
-- `e2e/mobile-ux.ts`, `e2e/mobile-ux.spec.ts` (+ Ansicht `detail-regelmaessig`, Dunkel per `data-theme`, Toast-Test), `e2e/layout.spec.ts` (neu)
+- `e2e/mobile-ux.ts`, `e2e/mobile-ux.spec.ts` (+ Ansicht `detail-regelmaessig`, Dunkel per `data-theme`, Toast-Test, Kanarienvogel Überlappung), `e2e/layout.spec.ts` (neu), `e2e/theme.spec.ts` (Schwelle 380 px)
 - `e2e/smoke.spec.ts`: **nur** der Test „echte Daten brechen bei 320 px und 200 % Textgröße nicht aus“ und der Aufruf `expectMobileUx(page, { buttons: false })` in „echter Build lädt und ist bedienbar“
 - `scripts/screenshots.ts` (Option `--text=200`)
 - `docs/architecture.md`: Zeilen zum Text-Gate, zum Insel-Gate und zur Regel aus E7
 
 **Paket C „Font-Swap“** (B6), Branch `nacharbeit-0007-c`, abgezweigt vom fertigen Stand von B (nach Schritt 3, CI grün):
-- `src/ui/styles/tokens.css`: **nur die `@font-face`-Fallback-Blöcke** und `--font-sans` (ggf. `--font-display`, dann auch dessen Verwendung in den Überschriften-Selektoren, E11)
+- `src/ui/styles/tokens.css`: **nur die `@font-face`-Fallback-Blöcke**, `--font-sans` und ggf. `--font-display` samt der einen `:where(…)`-Regel für die Überschriften (E11)
+- nur falls nötig: einzelne `font-family`-Zeilen in den Komponenten-Dateien von B (`base.css` `.ptitle`, `chrome.css` `.brand`, `card.css` `.ctitle`/`.empty b`, `list.css` `.daylabel`, `dialog.css` `.dtitle`/`.h3`/`.label b`, `sheet.css` `.sheet h2`, `calendar.css` `.cal-nav b`). Diese Dateien hat B dann schon abgeschlossen (nacheinander, kein Konflikt), C ändert dort nichts anderes.
 - `scripts/font-fallback.ts` (neu)
 - `package.json`, `pnpm-lock.yaml` (`@fontsource-variable/roboto` als devDependency), ggf. `knip.json`
 - `e2e/vitals.ts` (neu), `e2e/perf.spec.ts`
@@ -467,7 +499,9 @@ Neue Einträge in `docs/ideas.md` (Paket A schreibt sie):
 
 ```
 src/domain/
-  agenda.ts (+test)        + DayAgenda, dayAgenda                         [A]
+  agenda.ts (+test)        + DayAgenda, dayAgenda, endedOnDay             [A]
+  filter.ts (+test)        + matchesFilter                                [A]
+  time.ts (+test)          + sameMinute                                   [A]
   registration.ts (+test)  RegistrationPhase, registrationPhase (neu)       [A]
   site-data.ts (+test)     + venueAddress, in toSiteData angewandt          [A]
 src/ui/
@@ -476,7 +510,7 @@ src/ui/
   DetailDialog.tsx         registrationNote(offer, now), „Alle Termine“, „Alle 8 Kurstermine“ [A]
   use-offer-views.ts (+test)  + calendar.dataEnd, calendar.day geklemmt    [A]
   use-app-state.ts         + useNow (Minutenwechsel, visibilitychange)      [A]
-  App.tsx                  useNow, dataEnd durchreichen                     [A]
+  App.tsx                  useNow, dataEnd/endedToday durchreichen          [A]
   Chrome.tsx               tab-label-Span, tab-thumb at-N                   [B]
   SavedView.tsx            Label „Alle in den Kalender“                     [B]
   styles/*.css             E6, E8, E9, E10 (hyphens), E11 (Kachel), E13, E14, E15 [B]
@@ -504,7 +538,8 @@ Die Schichtregeln bleiben: `registration.ts` ist rein und bekommt „jetzt“ ü
   - Mi 7.10. 20:00 Berlin: Termin 10:00–11:30 → `items` leer, `ended` 1;
   - 11:00: laufend → 1 Item, `ended` 0;
   - Ende genau = jetzt → zählt noch (wie `notEnded`);
-  - künftiger Tag → `ended` 0;
+  - künftiger Tag → `ended` 0, auch wenn `endedToday` > 0;
+  - heute → `ended` = `endedToday`;
   - `afterData`: Tag > `dataEnd` wahr, = falsch, `dataEnd` undefined falsch;
   - ein Termin 00:30 Berlin liegt am richtigen Tag, obwohl der Test in LA läuft.
 - **`registration`:**
@@ -527,7 +562,9 @@ Die Schichtregeln bleiben: `registration.ts` ist rein und bekommt „jetzt“ ü
   - laufender Kurs → „Kurs · noch 6 von 8 Terminen“, nicht begonnener → „Kurs mit 8 Terminen“, beendeter → „Kurs mit 8 Terminen – vorbei“;
   - `registrationNote(offer, now)` für alle fünf Fälle aus E3.
 - **`ui/use-offer-views`:** `calendar.dataEnd` ist der letzte Tag aller kommenden Angebote, auch wenn ein Filter aktiv ist. `calendar.lastDay` bleibt der gefilterte. Liegt der gespeicherte Kalendertag vor heute, liefert `calendar.day` heute.
-- **`ui/use-app-state` – `useNow`:** Die Minuten-Logik steckt in einer reinen Hilfsfunktion `sameMinute(a, b)` (im selben Modul, mit Unit-Test: gleiche Minute, Minutenwechsel, Stundenwechsel). Der Hook selbst wird über das E2E unten geprüft.
+- **`time` – `sameMinute`:** gleiche Minute (…:10 und …:50), Minutenwechsel, Stunden- und Tageswechsel, über die Zeitumstellung (25.10.). Der Hook `useNow` selbst wird über die E2E-Tests unten geprüft.
+- **`agenda` – `endedOnDay`:** zählt nur Termine des Tages mit Ende < jetzt; Ende = jetzt zählt nicht (läuft noch); Termin 00:30 Berlin am richtigen Tag (Test in LA).
+- **`filter` – `matchesFilter`:** gleiche Fälle wie `applyFilters`, aber ein vorbei-es Angebot passt weiter; `applyFilters` bleibt mit seinen bestehenden Tests grün.
 
 **E2E Paket A** (Fixtures, Uhr Mo 5.10.2026 12:00, sonst vor `goto` per `page.clock.setFixedTime`), ungetestet geliefert:
 - `calendar.spec.ts`:
@@ -535,7 +572,10 @@ Die Schichtregeln bleiben: `registration.ts` ist rein und bekommt „jetzt“ ü
   - „laufender Termin bleibt“: Uhr Mi 7.10. 11:00 → „Offener Krabbeltreff“ in der Agenda.
   - „nach dem letzten Termin“: Monat auf, zweimal „Nächster Monat“, „Freitag, 11. Dezember, 0 Angebote“ → „Weiter reicht der Plan noch nicht“ und „Donnerstag, 10. Dezember“.
   - „offener Monat blendet die Woche aus“: Monat auf → kein Knopf „Vorherige Woche“/„Nächste Woche“, der Monatsknopf ist weiter fokussiert (`toBeFocused`), zu → wieder da.
-  - „jetzt wird ohne Neuladen erneuert“ (B2 im offenen Tab): Uhr Mi 7.10. 11:00, Kalender, „Offener Krabbeltreff“ sichtbar (läuft). Dann `page.clock.pauseAt(11:00)`, `page.clock.setFixedTime(new Date("2026-10-07T11:31:00+02:00"))` und `page.clock.runFor(60_000)`: Der 30-s-Timer feuert, die Minute hat gewechselt → „Für heute ist alles vorbei“. Zweiter Fall ohne Timer: nach `setFixedTime` ein `visibilitychange`-Ereignis auslösen (`document.dispatchEvent(new Event("visibilitychange"))`, `visibilityState` ist `visible`) → gleiches Ergebnis.
+  - „jetzt wird ohne Neuladen erneuert“ (B2 im offenen Tab): Uhr Mi 7.10. 11:00, Kalender, „Offener Krabbeltreff“ sichtbar (läuft). Dann `page.clock.pauseAt(11:00)`, `page.clock.setFixedTime(new Date("2026-10-07T11:31:00+02:00"))` und `page.clock.runFor(60_000)`: Der 30-s-Timer feuert, die Minute hat gewechselt → „Für heute ist alles vorbei“. 
+  - „jetzt wird beim Zurückkehren erneuert“ (eigener Test, frische Seite, ohne Timer): Uhr Mi 7.10. 11:00, Kalender laden, „Offener Krabbeltreff“ sichtbar. `page.clock.pauseAt(11:00)` (damit kein Intervall dazwischenfunkt), `setFixedTime(11:31)`, dann `document.dispatchEvent(new Event("visibilitychange"))` (`visibilityState` ist `visible`) → „Für heute ist alles vorbei“.
+  - „Tageswechsel im offenen Tab“: `setFixedTime` Mi 7.10. 23:59:40, Kalender laden („Heute, 7. Oktober“). `pauseAt(23:59:40)`, `setFixedTime` Do 8.10. 00:00:10, `runFor(30_000)` → Überschrift „Heute, 8. Oktober“, der Knopf „Mittwoch, 7. Oktober, …“ ist gesperrt (`toBeDisabled`), und der gewählte Tag ist Do 8.10. (`clampDay`).
+  - „heute schon vorbei, ohne kommende Termine“ (B2, `endedToday`): Fixture-Uhr Mo 5.10. 12:00, Kalender → „Heute, 5. Oktober“, „0 Angebote“, „Für heute ist alles vorbei“ (Elterncafé, 9–10 Uhr).
 - `detail.spec.ts`:
   - B1: „Krabbelreime & Fingerspiele“ zeigt „Freitags, 10:30–11:00“.
   - B4: Uhr Sa 10.10. 12:00, PEKiP → „Anmeldeschluss war am 9.10.“
@@ -551,7 +591,9 @@ Die Schichtregeln bleiben: `registration.ts` ist rein und bekommt „jetzt“ ü
   - `kind-sheet` dunkel: `.hint.ok` mit Luminanz < 0,2;
   - Test „Toast im Dunkeln“ mit angehaltener Uhr (E15);
   - im Test „… bricht bei 320 px und 200 % Textgröße nicht aus“ kommen dazu: bei 100 % `expectTouchTargets` (B3, alle Ansichten) und `expectTextFits` (inkl. Prüfung 5: einzeilige Knöpfe), nach dem Umschalten auf 200 % `expectTextFits(page, { scale: 2 })` neben `expectNoHorizontalScroll` und axe.
-- `layout.spec.ts`: Kopfzeile (E6) und Querformat (E14), Projekte `pixel-7` und `iphone-15`. Gemessen nur mit `offsetTop`/`offsetHeight` (gedrehte Elemente).
+- `layout.spec.ts`: Kopfzeile (E6) und Querformat (E14) inkl. Toast über der Spalte und 863 × 360 bei 200 %; `test.skip` nach `testInfo.project.name` (nur `pixel-7`, `iphone-15`). Gemessen nur mit `offsetTop`/`offsetHeight` (gedrehte Elemente).
+- `theme.spec.ts`: Der Test mit dem Kopf-Knopf überspringt bisher nur unter 360 px (Z. 5). Weil der Knopf jetzt unter 380 px fehlt und `android-klein` 360 px breit ist, wird die Schwelle auf 380 px gehoben (Begründung im Skip-Text).
+- `mobile-ux.spec.ts`: dauerhafter Kanarienvogel „Text-Gate erkennt Überlappung“ (`.hdr .kid { margin-left: -40px }` per `addStyleTag`, E10).
 - `saved.spec.ts`: Knopf „Alle in den Kalender“ (Z. 48).
 - `smoke.spec.ts` (Bs Teil):
   - „echter Build lädt und ist bedienbar“ ruft `expectMobileUx(page, { buttons: false })` auf;
@@ -562,7 +604,7 @@ Die Schichtregeln bleiben: `registration.ts` ist rein und bekommt „jetzt“ ü
 - `vitals.ts` mit den Helfern aus E12.
 - `smoke.spec.ts` (Cs Teil): Swap-Matrix (E12); der bestehende LCP/CLS-Test nutzt die Helfer.
 - `perf.spec.ts`: Helfer und Swap-Test Roboto 412 px.
-- Kanarienvögel laut E12 (Route hat gegriffen, Umschreiben vollständig, Swap-Test ohne Roboto-Faces rot), Ergebnis in der Commit-Message.
+- Kanarienvögel laut E12 (Route hat gegriffen, Umschreiben vollständig, Swap-Test ohne Roboto-Faces rot, künstlicher Shift nach `t0` wird gezählt), Ergebnis in der Commit-Message.
 
 ## Backpressure
 
@@ -572,7 +614,8 @@ Keine Schwelle wird gesenkt, kein Gate gelockert. Neu, und rot, wenn der jeweili
 |---|---|
 | B1 Uhrzeit fehlt | `format.test.ts` (whenLabels), `detail.spec.ts` |
 | B2 Beendete in „Heute“ | `agenda.test.ts` (`dayAgenda`), `calendar.spec.ts` „abends“ |
-| B2 im offenen Tab („jetzt“ veraltet) | `calendar.spec.ts` „jetzt wird ohne Neuladen erneuert“ (Timer und `visibilitychange`) |
+| B2 im offenen Tab („jetzt“ veraltet) | `calendar.spec.ts` „jetzt wird ohne Neuladen erneuert“ (Timer), „… beim Zurückkehren“ (`visibilitychange`), „Tageswechsel im offenen Tab“ |
+| B2 einmaliger Termin heute vorbei → „Freier Tag“ | `agenda.test.ts` (`endedOnDay`), `filter.test.ts` (`matchesFilter`), `calendar.spec.ts` „heute schon vorbei“, Mobile-Gates der Ansicht `kalender` |
 | B3 Tage < 44 px bei 320 px (Woche und Monat) | `expectTouchTargets` bei 320 px in `mobile-ux.spec.ts` (Ansicht `kalender` mit offenem Monat) |
 | B4 Frist ohne Hinweis | `registration.test.ts`, `format.test.ts`, `detail.spec.ts` |
 | B5 Kopfzeile bricht um | `layout.spec.ts` (8 Breiten × 2 Labels × 2 Schriftzustände, Chromium + WebKit) |
@@ -597,9 +640,9 @@ Jeder Schritt ist erst fertig, wenn sein Fertig-Kriterium erfüllt ist. **Playwr
 1. **`/plan-review`**, Review hier einarbeiten.
    *Fertig:* Review-Abschnitt vorhanden, kein Blocker offen (erledigt, siehe unten; Freigabe durch den Koordinator).
 2. **Paket A** (Worktree `.claude/worktrees/nacharbeit-0007-a`, `pnpm install`, kein Playwright):
-   1. Domäne test-first, jeweils erst der rote Test: `dayAgenda` → `registrationPhase` → `venueAddress`.
+   1. Domäne test-first, jeweils erst der rote Test: `sameMinute` → `matchesFilter` → `endedOnDay` → `dayAgenda` → `registrationPhase` → `venueAddress`.
    2. `format.ts` test-first (B1 inkl. Leerfall, B4, H8 inkl. „vorbei“).
-   3. `useNow` mit `sameMinute` (+test), `use-offer-views.ts` (+test), `CalendarView.tsx` (inkl. Scroll-Ausgleich E5), `DetailDialog.tsx`, `App.tsx`.
+   3. `useNow`, `use-offer-views.ts` (+test, `endedToday`), `CalendarView.tsx` (inkl. Scroll-Ausgleich E5), `DetailDialog.tsx`, `App.tsx`.
    4. E2E-Specs schreiben (laufen nicht lokal).
    5. `docs/ideas.md` und Verweise in Plan 0003.
 
@@ -613,7 +656,7 @@ Jeder Schritt ist erst fertig, wenn sein Fertig-Kriterium erfüllt ist. **Playwr
    *Fertig:* `pnpm check` komplett grün inklusive E2E. WebKit lokal ggf. ohne `iphone-15` (CLAUDE.md), dann muss die Branch-CI WebKit grün zeigen. Budgets eingehalten. Commit und Push auf `nacharbeit-0007-b`, CI grün (`gh run watch`).
 4. **Paket C** (derselbe Agent wie B, neuer Worktree `.claude/worktrees/nacharbeit-0007-c`, Branch `nacharbeit-0007-c` vom Ende von `nacharbeit-0007-b`):
    1. `@fontsource-variable/roboto` als devDependency, `scripts/font-fallback.ts`, Messung auf Bs Layout. Werte in den Commit.
-   2. `e2e/vitals.ts` und die Swap-Matrix **zuerst**, auf dem alten `tokens.css` laufen lassen. Kanarienvögel: Roboto bei 412 px rot (≈ 0,11), `useOnlyFallback` zählt die erwarteten Blöcke, `holdWebfont` hat gegriffen.
+   2. `e2e/vitals.ts` und die Swap-Matrix **zuerst**, auf dem alten `tokens.css` laufen lassen. Kanarienvögel: Roboto bei 412 px rot (≈ 0,11), künstlicher Shift nach `t0` wird gezählt, `useOnlyFallback` zählt die erwarteten Blöcke, `holdWebfont` hat gegriffen.
    3. Roboto-Faces und Buckets nach Messung in `tokens.css`, ggf. `--font-display`. Swap-Matrix grün.
    4. `perf.spec.ts` und der LCP/CLS-Test im Smoke-Test auf die Helfer umstellen, `docs/architecture.md` (Cs Zeile).
 
@@ -642,7 +685,9 @@ Jeder Schritt ist erst fertig, wenn sein Fertig-Kriterium erfüllt ist. **Playwr
    - H7: Filter-Sheet auf dem iPhone, der Fuß klebt unten über der Home-Leiste.
    - Dunkelmodus, über System und über die Darstellungs-Wahl: keine hellen Inseln bei Toast, gewähltem Tag, gewählten Chips und Alters-Hinweis (Kind-Sheet).
 
-   Dazu H3, H5, H6, H8 kurz. Ergebnis hier anhängen.
+   - H6: Einen schon importierten Termin erneut aus der statischen ICS importieren (Google und Apple Kalender) und notieren, ob der Ort aktualisiert wird (ohne `SEQUENCE` wohl nicht, E4).
+
+   Dazu H3, H5, H8 kurz. Ergebnis hier anhängen.
    *Fertig:* jede Zeile beantwortet, keine neuen Blocker.
 9. **Paket C zusammenführen:** `nacharbeit-0007-c` auf `main` rebasen. Konflikte kann es nur in `tokens.css`, `smoke.spec.ts` und `architecture.md` geben, und nur, wenn Schritt 5 dort etwas geändert hat; Bs Teile gewinnen, Cs Teile kommen dazu. `pnpm check` komplett, Budgets eintragen. `/arch-review` über C (neue devDependency, neues Skript, neues Testmodul). Push, Fast-Forward nach `main`.
    *Fertig:* kein Blocker offen, CI auf `main` grün, Deploy durch.
@@ -673,7 +718,7 @@ Jeder Schritt ist erst fertig, wenn sein Fertig-Kriterium erfüllt ist. **Playwr
 - **Zusammenführen:** A's E2E-Specs laufen erst in Schritt 5. Brechen sie dort, liegt die Korrektur im Merge-Worktree, nicht in zwei parallelen Nachbesserungen. C kommt getrennt (Schritt 9); bis dahin ist B6 live noch offen, und Plan 0004 wartet auf Schritt 10.
 - **Seitenleiste im Querformat:** `body`-Innenabstand und feste Leiste hängen an `env(safe-area-inset-left)`. Ob die Leiste auf einem iPhone mit Notch richtig sitzt, zeigt nur ein echtes Gerät (Schritt 8). Ausweg: dieselbe Media-Query mit größerem Abstand.
 - **Gelb als Auswahlfarbe im Dunkeln** (E15) ändert den Look gewählter Tage und Chips. Kontrast und axe sind unkritisch (`#13212E` auf `#FFD93B`). Gefällt es nicht, bleibt die Token-Stelle die einzige Stellschraube.
-- **Datenänderung durch H6:** Die statischen ICS bekommen eine andere `LOCATION`. Die UIDs bleiben, Kalender aktualisieren den Ort beim erneuten Import. Gewollt.
+- **Datenänderung durch H6:** Die statischen ICS bekommen eine andere `LOCATION`. Die UIDs bleiben; ohne `SEQUENCE` übernehmen viele Kalender den korrigierten Ort beim erneuten Import nicht (E4). Bereits importierte Termine bleiben dann wie sie sind, das ist hinnehmbar.
 
 ## Review (2026-10-04, plan-reviewer) – Verdict: Überarbeiten → eingearbeitet
 
@@ -707,4 +752,25 @@ Kleiner:
 - **m13 Monatsknopf springt** beim Ausblenden der Woche um ≈ 130 px. → **Übernommen:** Der Knopf bleibt dasselbe Element (Fokus bleibt). Scroll-Ausgleich per `useLayoutEffect` hält ihn an derselben Stelle, sonst folgt `scrollIntoView({ block: "nearest" })`. E2E prüft den Fokus, der Browser-Review das Springen (E5, Schritt 8).
 - **m14 Die 32 Adressen in `data/providers.yaml` gleich mit bereinigen.** → **Abgelehnt:** Datenpflege läuft über den Skill `babyevents-nuernberg` und einen Pipeline-Lauf (ADR 0006), nicht in einem UI-Plan. H6 korrigiert die Anzeige in `toSiteData`. Neuer Eintrag in `docs/ideas.md`: „Katalog-Adressen ohne Ortsnamen-Präfix + Warnung in validate-data“ (E4, E17).
 - **m15 Scope zu groß, B6 abtrennen.** → **Anders gelöst:** B6 bleibt in Plan 0007, wird aber ein eigenes **Paket C** (Font-Swap). Es läuft nach B durch denselben Playwright-Agenten auf `nacharbeit-0007-c` (vom Ende von B), wird getrennt zusammengeführt (Schritt 9) und live geprüft (Schritt 10). Die Dateilisten in E16 überschneiden sich zeitlich nicht. `tokens.css`, `smoke.spec.ts` und `architecture.md` ändern B und C nacheinander, je mit klar zugeordneten Blöcken: B die Farb-Tokens, C die `@font-face`-Fallbacks. Die Kachel-Layoutmaßnahme aus E11 bleibt in B, weil sie auch B7 hilft.
+
+## Review 2 (2026-10-04, plan-reviewer) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Der zweite Review lief auf `82d0e68`. Die Abweichung zu Blocker 1 aus Review 1 (70 % der **Seitenspalte** statt des eigenen Containers) ist bestätigt. Alle 16 Punkte sind übernommen:
+
+1. **(Blocker, C) Gefälschte Zeitbasis.** Die Fake-Uhr ist in jedem Test installiert (`fixtures.ts` Z. 26) und ersetzt `performance.now/mark/getEntries*`. → `t0` kommt nativ aus `new Event("zp").timeStamp` (ersatzweise `document.timeline.currentTime`). `vitals.ts` nutzt diese `performance`-Methoden nie, mit Kommentar dazu. Ein dauerhafter Kanarienvogel in `perf.spec.ts` verlangt, dass ein künstlicher Shift direkt nach `t0` gezählt wird. Geprüft: `perf.spec.ts` und der LCP/CLS-Test in `smoke.spec.ts` nutzen nur `PerformanceObserver` (native `startTime`) und sind nicht betroffen (E12).
+2. **`theme.spec.ts` überspringt nur unter 360 px**, `android-klein` ist 360 px breit. → Die Datei gehört zu Paket B, die Schwelle wird 380 px (E16, Tests).
+3. **`sr-only`-Legenden machen Prüfung 2 rot.** → Die Ausnahme für visuell Verstecktes gilt jetzt für alle fünf Prüfungen von `expectTextFits` (E10).
+4. **Prüfung 3 zu grob.** → Geprüft werden nur sichtbare Rundungen (Hintergrund, Bild oder Rand). Radien werden je Ecke gelesen, `%`-Werte aufgelöst und nach CSS-Regel skaliert. `.mday` bekommt `border-radius: 22px` statt 50 %, damit der gewählte Tag bei großer Schrift nicht oval wird (E8, E10).
+5. **„Für heute ist alles vorbei“ greift nicht für Einzeltermine**, denn der Index enthält nur Angebote mit kommendem Termin. → Neue Domänenfunktionen `matchesFilter` (`filter.ts`) und `endedOnDay` (`agenda.ts`), beide mit Unit-Tests. `dayAgenda` nimmt `endedToday` aus allen filterpassenden Angeboten, ohne die Bedingung `nextSession`. An den Fixtures geprüft: Am Mo 5.10. 12:00 ist der Tag leer, das Elterncafé (9–10 Uhr) zählt als beendet. Ein E2E prüft das. Weil das der Startzustand jedes Kalender-Tests ist, läuft der Leerzustand durch die Mobile-Gates der Ansicht `kalender` (E2, Tests).
+6. **Tageswechsel als E2E.** → Ablauf: `setFixedTime` Mi 23:59:40 → `pauseAt` → `setFixedTime` Do 00:00:10 → `runFor(30_000)`. Erwartet: „Heute, 8. Oktober“, der 7.10. ist gesperrt, der gewählte Tag geklemmt (Tests).
+7. **Kanarienvogel mit falscher Spezifität.** → `.hdr .kid { margin-left: -40px }` kommt per `addStyleTag` und bleibt als dauerhafter Test (E10).
+8. **`layout.spec.ts` ohne ausdrückliche Projektwahl.** → `test.skip` nach `testInfo.project.name`, nur `pixel-7` und `iphone-15` (E6).
+9. **`sameMinute`** liegt jetzt in `src/domain/time.ts` mit Unit-Test, in Paket A (E2, E16).
+10. **`visibilitychange`-Fall als eigener Test** mit frischer Seite und angehaltener Uhr (Tests).
+11. **`expectNoBrightIslands` prüft auch `::before`/`::after`** (E15).
+12. **Toast im Querformat:** Eine konkrete CSS-Regel stellt den Toast mittig über die Inhaltsspalte rechts der Seitenleiste. `layout.spec.ts` prüft, dass er über `main` liegt und `.tabs` nicht überlappt (E14).
+13. **Zusätzlicher Lauf 863 × 360 bei 200 %** mit `expectTextFits` und `expectNoHorizontalScroll` in `layout.spec.ts` (E14).
+14. **Das einspaltige `.seg3`** bekommt in der Container-Query `border-radius: 22px` (E8).
+15. **H6 abgeschwächt:** Ohne `SEQUENCE` und mit gleichem `DTSTAMP` übernehmen viele Kalender den korrigierten Ort beim erneuten Import nicht. Der Browser-Review prüft das (E4, Risiken, Schritt 8).
+16. **Paket C und `--font-display`:** Die Zuordnung der Überschriften steht als eine `:where(…)`-Regel in `tokens.css`, damit C Bs Komponenten-Dateien nicht anfassen muss. Falls doch einzelne `font-family`-Zeilen nötig sind, sind die Dateien in Cs Liste benannt. B und C ändern sie nacheinander, mit klar zugeordneten Teilen (E11, E16).
 
