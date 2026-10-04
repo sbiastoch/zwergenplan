@@ -2,7 +2,7 @@
 
 Status: umgesetzt auf Branch `karte-0005` (Schritte 2–7), Arch-Review eingearbeitet → Push, CI und Browser-Review live offen
 Datum: 2026-10-04
-Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR 0005 (Startpunkt ohne GPS), **ADR 0008** (Entwurf: MapLibre, OpenFreeMap, Kamera-Regel, Alternativen)
+Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR 0005 (Startpunkt ohne GPS), **ADR 0008** (angenommen: MapLibre, OpenFreeMap, Kamera-Regel, Alternativen)
 
 ## Ziel
 
@@ -194,7 +194,7 @@ Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR
 
 - **Die Karte fährt und zoomt nie auf einen Startpunkt aus Standort oder Kartenmitte.** Sie zeichnet ihn nur als lokalen GeoJSON-Layer, und der fordert keine Kacheln an. Damit verraten die Kachel-Requests den Standort nicht.
 - Ausschnitt beim Öffnen:
-  - immer `fitBounds` über die Orte **ohne Umkreis-Filter** (übrige Filter und Altersregel wie auf der Karte; Innenabstand 32 px, `maxZoom: 14`). Der Umkreis hängt am Startpunkt und darf den Ausschnitt nicht bestimmen (Arch-Review B1). Reine Funktion `initialCamera` in `src/domain/camera.ts`;
+  - immer `fitBounds` über **alle kommenden Orte**, unabhängig von Filtern, Alter und Startpunkt (außer Stadtteil-Zoom) (Innenabstand 32 px, `maxZoom: 14`). Umkreis und Altersregel verrieten sonst über die Kachelwahl Standort bzw. Geburtsdatum (Arch-Review B1, Arch-Review 2 m1). Reine Funktion `initialCamera` in `src/domain/camera.ts`;
   - ohne Orte: Hauptmarkt (49,454 / 11,077), Zoom 11;
   - **Ausnahme Stadtteil**: Ist der Startpunkt ein Stadtteil, zentriert die Karte beim Öffnen auf ihn (Zoom 13). Wird ein Stadtteil gewählt, während die Karte offen ist, fährt sie per `easeTo` hin.
 - Der zuletzt gesehene Ausschnitt gilt für die Sitzung (Modul-Variable in `MapView.tsx`) und wird beim erneuten Öffnen wiederhergestellt. Er steht weder in der URL noch im Speicher.
@@ -477,7 +477,13 @@ Abweichungen und Befunde:
 - WebKit (Playwright 1.63) lädt ein fehlgeschlagenes Modul-Skript in derselben Seite nie wieder, auch nicht nach `reload()`; Test 11 prüft dort in einem neuen Tab. Echtes iPhone: Browser-Review.
 - Leerzustand `NoOffers` aus `ListView` herausgezogen und von Liste und Karte genutzt; `ViewToggle` an `Chrome.tsx` angehängt, `TabBar` unverändert (bekommt `tabSection`).
 - **Orts-Liste nicht mehr im Startbundle (E3, nach dem Rebase):** Ladekette `MapPanel` (Start: Platzhalter in Kartenhöhe, Lader) → `src/ui/karte/` (eigener Lazy-Chunk ohne MapLibre: Zustände, Werkzeugzeile, Orts-Liste, Orts-Sheet, `map-data.ts` mit `placesOf`/`sortPlaces`/`initialCamera`) → `src/ui/map/`. Ohne WebGL, ohne Kacheln und ohne MapLibre-Chunk bleibt die Orts-Liste bedienbar; fällt auch die Karten-Oberfläche aus, verweist die Meldung auf den Umschalter „Liste“. Der gestrichene Ausweg „Orts-Liste in den Karten-Chunk“ bleibt gestrichen, denn MapLibre lädt weiter getrennt. Das spart gegenüber dem Rebase-Stand 1,1 kB Start-JS (siehe Tabelle); `useOfferViews` liefert nur noch `map.placeCount` und `map.cameraOffers`.
-- **Neue Architekturregeln:** `karte-ui-only-lazy`, `karte-ui-entry-only`, `map-entry-only` und die Lader-Prüfung `lazy-loader-static` in `scripts/check-architecture.ts`, weil dependency-cruiser statischen und dynamischen Import desselben Moduls zu einer Kante zusammenfasst. Kanarienvögel in der Commit-Message.
+- **Neue Architekturregeln:** `karte-ui-only-lazy`, `karte-ui-entry-only`, `map-entry-only` und die Lader-Prüfung `lazy-loader-static` in `scripts/check-architecture.ts`, weil dependency-cruiser statischen und dynamischen Import desselben Moduls zu einer Kante zusammenfasst (nur `dynamic-import` bleibt). Kanarienvögel, je eingesetzt, rot und zurückgebaut:
+  - `karte-ui-only-lazy`: statischer Import und reiner Typ-Import von `./karte/MapScreen.tsx` in `App.tsx`; statischer Import von `../karte/PlaceList.tsx` in `map/MapView.tsx`.
+  - `karte-ui-entry-only`: dynamischer Import von `./karte/MapScreen.tsx` in `Overlays.tsx`.
+  - `map-entry-only`: dynamischer Import von `../map/MapView.tsx` in `karte/PlaceList.tsx`.
+  - `lazy-loader-static`: zusätzlicher statischer Import von `../map/MapView.tsx` in `karte/MapScreen.tsx` (dependency-cruiser allein blieb hier grün); nach Arch-Review 2 auch Seiteneffekt-Importe ohne `from` (`import "./karte/MapScreen.tsx";` in `MapPanel.tsx`, `import "../map/MapView.tsx";` in `MapScreen.tsx`).
+  - `maplibre-only-in-map`: `import "maplibre-gl"` in `karte/PlaceList.tsx`.
+- **Source-Maps bleiben `sourcemap: true` (bewusst):** Im Repo hängt nichts daran, die Budgets zählen nur `*.js`. Der Browser-Review live nutzt aber DevTools mit lesbaren Stacktraces, und Browser laden Maps nur bei offenen DevTools. `"hidden"` veröffentlichte die Dateien trotzdem, nur ohne Verweis, und brächte keinen Datenschutzgewinn (Quellcode ist öffentlich).
 - **`modulePreload.polyfill` aus:** Ziel es2023, ohne natives modulepreload wird nur nicht vorgeladen. Vites Preload-Helfer (ca. 0,5 kB) bleibt im Start, weil er auch den Import der Karten-Oberfläche umhüllt.
 - **Umschalter neben der Statuszeile (E5):** Statt darüber steht er rechts neben ihr (`.status-row`, `flex-wrap`, bei wenig Platz bzw. 200 % darunter) und ist kompakt (44 px). Mit eigener Zeile hatte die erste Kachel im Querformat 852×393 nur 68 statt der geforderten 80 px frei (layout.spec, Plan 0007).
 - **Stilwechsel-Test über das Kind-Sheet:** Der Theme-Knopf im Kopf entfällt bei 360 px (Plan 0007).
@@ -496,3 +502,13 @@ Abweichungen und Befunde:
   - ADR 0008, E9 und `docs/architecture.md` präzisiert: „über die Orte ohne Umkreis-Filter“.
 - **m1**: Status, Messwerte, Kanarienvögel und Umsetzung hier nachgetragen.
 - **m2**: `thirdPartyGuard` nahm `tiles.openfreemap.org` ganz aus. Jetzt muss jeder Kontext-Request an den Host von einem Mock-Handler beantwortet sein (Set der bedienten URLs); Tests mit eigenen Antworten nutzen `routeTiles`. Kanarienvogel: ohne Eintrag ins Set meldet der Wächter Stil und Worker-Kacheln als „nicht gemockt“.
+
+## Arch-Review 2 (2026-10-05) – Verdict: OK → Minors eingearbeitet
+
+- **m1 (Privatsphäre)**: Die Datenbasis des Startausschnitts (`cameraOffers`) hing an Filtern und am Geburtsdatum (Altersregel), die Kachelwahl also mittelbar am Geburtsdatum. Jetzt sind es alle kommenden Angebote, unabhängig von Filtern, Alter und Startpunkt (außer Stadtteil-Zoom). Test-first in `use-offer-views.test.ts` (Umkreis mit Standort bzw. Kartenmitte, Filter, Geburtsdatum und alles zusammen ändern `cameraOffers` nicht), das E2E „Startausschnitt verrät weder Standort noch Alter“ setzt zusätzlich Geburtsdatum und „Kurse“. ADR 0008, E9 und `docs/architecture.md` nachgeführt.
+- **m2**: `lazy-loader-static` erkennt auch Seiteneffekt-Importe ohne `from`; Kanarienvögel siehe „Umsetzung“.
+- **m3**: Die Prüfungen „kein Querystring/Fragment“ und „Karte im DOM“ laufen im Wrapper von `tileMock.route`, gelten also auch für Antworten aus `routeTiles`. Kanarienvogel (temporäre Spec): `routeTiles` bedient in der Listenansicht `…/kanarienvogel?x=1` → beide Verstöße rot.
+- **m4**: `src/domain/place-key.ts` mit `placeKey` und `countPlaces` ist die einzige Quelle für „gleicher Ort“ (Statuszeile, Entfernungs-Cache, `placesOf`); Test `countPlaces(offers) === placesOf(offers).length`. `geoKey` entfällt. Eigenes Modul, damit `places.ts` im Karten-Oberflächen-Chunk bleibt.
+- **m5**: Kopfkommentar `MapView.tsx` (lädt aus `karte/MapScreen.tsx`), Bezugszeile ADR 0008 „angenommen“, Kanarienvögel je Regel unter „Umsetzung“.
+- **m6**: Gate-Ansicht `karte-fehler` (ohne WebGL) in `mobile-ux.spec.ts`, hell, dunkel, dunkel per Darstellung, 320 px / 200 %.
+- **Hinweis Source-Maps**: geprüft und bewusst bei `true` gelassen (siehe „Umsetzung“).
