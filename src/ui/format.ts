@@ -4,6 +4,7 @@
  */
 import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
+import { type Origin, type Reach, type ReachLimit, roundedDistance } from "../domain/reach.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -201,4 +202,32 @@ export function dayDots(instant: string): string {
 export function standDate(instant: string): string {
   const { year, month, day } = parseIsoDate(berlinIsoDate(instant));
   return `${day}.${month}.${year}`;
+}
+
+const DISTANCE = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
+
+/** Kachel: „400 m“, „1,4 km“, „12 km“ – gerundet von der Domäne (`roundedDistance`). */
+export function distanceShort(reach: Reach): string {
+  const { unit, value } = roundedDistance(reach.meters);
+  return `${DISTANCE.format(value)} ${unit}`;
+}
+
+/** „ab Gostenhof“ / „ab deinem Standort“ */
+export function originPhrase(origin: Origin): string {
+  return origin.source === "standort" ? "ab deinem Standort" : `ab ${origin.label}`;
+}
+
+/** Detail: „ca. 1,4 km Luftlinie ab Gostenhof“ – die lange Form sagt immer „Luftlinie“ (E1). */
+export function distanceLong(reach: Reach, origin: Origin): string {
+  return `ca. ${distanceShort(reach)} Luftlinie ${originPhrase(origin)}`;
+}
+
+/** Statuszeile: erklärt die kurze Form auf den Kacheln. */
+export function distanceNote(origin: Origin): string {
+  return `Entfernung als Luftlinie ${originPhrase(origin)}`;
+}
+
+/** „bis 5 km“ */
+export function reachLimitLabel(limit: ReachLimit): string {
+  return `bis ${limit.value} km`;
 }
