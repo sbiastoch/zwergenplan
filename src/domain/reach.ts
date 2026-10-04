@@ -5,8 +5,11 @@
  */
 import { type GeoPoint, haversineMeters } from "./geo.ts";
 
-/** Herkunft des Startpunkts. Plan 0005 ergänzt „karte“ (Kartenmitte). Export erst, wenn ihn jemand braucht (knip). */
-type OriginSource = "standort" | "stadtteil";
+/**
+ * Herkunft des Startpunkts; „karte“ ist die Kartenmitte (Plan 0005, E8), wie der Standort nur im
+ * Arbeitsspeicher. Export erst, wenn ihn jemand braucht (knip).
+ */
+type OriginSource = "standort" | "stadtteil" | "karte";
 
 /** Startpunkt. Steht nie in URL, Logs oder Requests (docs/architecture.md). */
 export interface Origin {
