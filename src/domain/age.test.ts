@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageCheck, ageInMonths, fitsAgeAt, offerFitsAge, splitByAge } from "./age.ts";
+import { ageCheck, ageInMonths, ageVisibility, DEFAULT_AGE, fitsAgeAt, offerFitsAge, splitByAge } from "./age.ts";
 import { applyFilters, EMPTY_FILTER } from "./filter.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
@@ -84,6 +84,52 @@ describe("splitByAge", () => {
     ]);
     expect(unfit).toHaveLength(upcoming.length - 4);
     expect(unfit.map(fixtureKey)).toContain("krabbeltreff");
+  });
+});
+
+describe("ageVisibility", () => {
+  const upcoming = applyFilters(loadFixtures().file.offers, EMPTY_FILTER, { now: FIXTURE_NOW });
+  // Ausschnitt wie nach einem Filter: ein passendes und zwei unpassende Angebote (Kind geb. 1.9.2026)
+  const filtered = upcoming.filter((o) =>
+    ["pekip-herbst", "krabbeltreff", "musikgarten-1"].includes(fixtureKey(o) ?? ""),
+  );
+  const unfitKeys = (ids: ReadonlySet<string>) => upcoming.filter((o) => ids.has(o.id)).map(fixtureKey);
+
+  it("blendet unpassende Angebote aus und zählt sie", () => {
+    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true, showUnfit: false });
+    expect(v.visible.map(fixtureKey)).toEqual(["pekip-herbst"]);
+    expect(v.hiddenCount).toBe(2);
+  });
+
+  it("markiert unpassende Angebote über alle kommenden, nicht nur die gefilterten", () => {
+    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true, showUnfit: false });
+    expect(v.unfitIds.size).toBe(upcoming.length - 4);
+    expect(unfitKeys(v.unfitIds)).toContain("kuckuck-im-nest");
+    expect(unfitKeys(v.unfitIds)).not.toContain("pekip-herbst");
+  });
+
+  it("„trotzdem zeigen“ zeigt alles, der Hinweis bleibt", () => {
+    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true, showUnfit: true });
+    expect(v.visible).toBe(filtered);
+    expect(v.hiddenCount).toBe(2);
+  });
+
+  it("ohne „nur passende“ wird nichts ausgeblendet, aber markiert", () => {
+    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: false, showUnfit: false });
+    expect(v.visible).toBe(filtered);
+    expect(v.hiddenCount).toBe(0);
+    expect(v.unfitIds.size).toBe(upcoming.length - 4);
+  });
+
+  it("ohne Geburtsdatum passt alles", () => {
+    const v = ageVisibility(filtered, upcoming, undefined, FIXTURE_NOW, { ageOnly: true, showUnfit: false });
+    expect(v).toEqual({ visible: filtered, hiddenCount: 0, unfitIds: new Set() });
+  });
+});
+
+describe("DEFAULT_AGE", () => {
+  it("ist die ganze Zielgruppe 0–3 Jahre", () => {
+    expect(DEFAULT_AGE).toEqual({ minMonths: 0, maxMonths: 36 });
   });
 });
 
