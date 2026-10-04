@@ -1,0 +1,18 @@
+/* Karte (Plan 0005, E4/E7): alles, was auch ohne Karten-Chunk gebraucht wird. MapLibre selbst: src/ui/map/map-overrides.css. */
+
+@layer components {
+  /* px und dvh statt rem: Bei 200 % Textgröße füllte eine rem-Karte sonst den Bildschirm (E7). */
+  .map-box {
+    position: relative;
+    height: clamp(240px, 60dvh, 544px);
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    box-shadow: 4px 4px 0 var(--shadow);
+    overflow: hidden;
+    background: var(--soft);
+  }
+  .map-canvas {
+    position: absolute;
+    inset: 0;
+  }
+}

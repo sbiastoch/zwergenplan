@@ -1,0 +1,30 @@
+{
+  "version": 8,
+  "name": "Zwergenplan-Test dunkel (fiktiv, Plan 0005 E13)",
+  "sources": {
+    "openmaptiles": {
+      "type": "vector",
+      "tiles": ["https://tiles.openfreemap.org/planet/test/{z}/{x}/{y}.pbf"],
+      "maxzoom": 14
+    }
+  },
+  "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "bg-dunkel",
+      "type": "background",
+      "paint": {
+        "background-color": "#0e1620"
+      }
+    },
+    {
+      "id": "wasser-dunkel",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "#1c3550"
+      }
+    }
+  ]
+}

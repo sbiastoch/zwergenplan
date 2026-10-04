@@ -1,0 +1,30 @@
+{
+  "version": 8,
+  "name": "Zwergenplan-Test hell (fiktiv, Plan 0005 E13)",
+  "sources": {
+    "openmaptiles": {
+      "type": "vector",
+      "tiles": ["https://tiles.openfreemap.org/planet/test/{z}/{x}/{y}.pbf"],
+      "maxzoom": 14
+    }
+  },
+  "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "bg-hell",
+      "type": "background",
+      "paint": {
+        "background-color": "#e8f1ff"
+      }
+    },
+    {
+      "id": "wasser-hell",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "#b8d4f0"
+      }
+    }
+  ]
+}
