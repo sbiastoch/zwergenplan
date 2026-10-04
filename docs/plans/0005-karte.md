@@ -513,3 +513,173 @@ Abweichungen und Befunde:
 - **m5**: Kopfkommentar `MapView.tsx` (lädt aus `karte/MapScreen.tsx`), Bezugszeile ADR 0008 „angenommen“, Kanarienvögel je Regel unter „Umsetzung“.
 - **m6**: Gate-Ansicht `karte-fehler` (ohne WebGL) in `mobile-ux.spec.ts`, hell, dunkel, dunkel per Darstellung, 320 px / 200 %.
 - **Hinweis Source-Maps**: geprüft und bewusst bei `true` gelassen (siehe „Umsetzung“).
+
+## Browser-Review live (2026-10-05)
+
+**Verdict: bestanden, kein Blocker.** Die Privatsphäre-Regeln aus ADR 0008 und E9 halten live. Das gilt auch für die Worker-Requests, den Referrer und die Kamera-Regel samt Kachel-Set. Offen ist **ein wichtiger Befund**: Die Attribution steht doppelt da (W1). Dazu kommen einige Hinweise.
+
+- **Ziel**: https://zwergenplan.app/ mit echten Daten (333 Angebote, 76 Orte).
+- **Stand**: `a682d4d`, gleich `origin/main`. Live-HTML `index-BTpp6E6l.js`, Worker `maplibre-gl-worker-BAEWVkqd.js`, Kachel-Version `planet/20260927_080001_pt`.
+- **Methode**:
+  - Playwright 1.63 gegen die Live-URL, Chromium headless mit `--use-angle=swiftshader --enable-unsafe-swiftshader`. `e2e/` setzt keine eigenen WebGL-Flags, Chromium läuft dort mit dem Standard-WebGL; beides rendert, mit den Flags fehlen nur die „GPU stall“-Warnungen. Gegenprobe in WebKit (iPhone 15).
+  - Viewport 390×844 mit DPR 2, Touch, `de-DE`, Europe/Berlin.
+  - Alle Requests über `context.on("request")` aufgezeichnet, Referrer über `request.allHeaders()`. Zusätzlich Resource-Timing in Seite und Worker (`page.workers()[i].evaluate(performance.getEntriesByType("resource"))`).
+  - Drosselung per CDP `Network.emulateNetworkConditions`.
+  - Screenshots mit `node scripts/screenshots.ts https://zwergenplan.app/ --views=start,karte,ort` und `--views=karte,ort --text=200`, nach `e2e/.artifacts/screens/`, dazu eigene Bilder unter `tmp/`. Alle angesehen.
+  - Im Deploy-Build gibt es kein `window.__zpMap` (E13). Die Kamera wird deshalb als schwarzer Kasten belegt: über das angefragte Kachel-Set z/x/y, einen Fingerabdruck der Kartenmitte (Entfernungen der Orts-Liste ab „Kartenmitte als Startpunkt“) und Sichtvergleich.
+  - claude-in-chrome kam nicht zum Einsatz, alles lief per Playwright.
+
+### Checkliste (Skill)
+
+- **Lesbarkeit**: Die Statuszeile „**333** Angebote an **76** Orten“ ist sofort erfassbar.
+  - Die Zahlen auf Markern und Clustern sind gut lesbar: hell weiß auf Dunkelblau, dunkel dunkel auf Gelb. Auch dreistellige Zahlen (100, 119, 150) passen in den Kreis.
+  - Die Orts-Liste ist klar gegliedert: Name fett, darunter „Stadtteil · N Angebote · Entfernung“.
+  - Marker verdecken Kartenbeschriftungen, z. B. „Nuren…g“ unter „100“. Das ist vertretbar, die Marker sind die Hauptinfo.
+  - Störend ist nur die doppelte Attribution (W1).
+- **Daumen-Erreichbarkeit**:
+  - Der Umschalter Liste|Karte (44 px) sitzt im oberen Drittel.
+  - Werkzeugzeile („Kartenmitte als Startpunkt“ 236×44, „Startpunkt wählen“ 177×44) und Orts-Liste (Zeilen ≥ 68 px) liegen unter der Karte.
+  - Die Zoom-Knöpfe (44×44) liegen oben rechts in der Karte. Das ist üblich, auf großen Handys aber weit oben.
+  - Ein Finger scrollt die Seite, zwei bewegen die Karte. Die Abstände zwischen den Touch-Zielen reichen.
+- **Zustände**: Laden, Fehler (Kacheln blockiert), ohne WebGL und lange Titel sind geprüft, nichts bricht.
+  - Der Platzhalter „Karte wird geladen …“ hat dieselbe Höhe wie die fertige Karte (506 px), es gibt keinen Layout-Sprung.
+  - Lange Ortsnamen im Orts-Sheet umbrechen sauber, z. B. „BRK Familienzentrum – Kreisverband Nürnberg-Stadt (Familienstützpunkt)“.
+  - Den Leerzustand habe ich live nicht erzeugt, er ist per E2E abgedeckt.
+- **Dark Mode**: Nach dem Theme-Wechsel kommt der Stil `dark`. Marker sind gelb, Zoom-Knöpfe und Attribution haben dunkle Token-Farben (Attribution-Hintergrund `rgb(27,39,51)`, Link `rgb(238,243,248)`). Grell weiße Inseln gibt es keine (`review-0005-karte-dunkel.png`, `karte-*-dark.png`, `ort-*-dark.png`).
+- **Micro-Interactions**:
+  - Der Zwei-Finger-Hinweis blendet ein und wieder aus.
+  - Ein Tipp auf einen Cluster zoomt hinein, ein Tipp auf einen Ort öffnet Sheet oder Detail.
+  - Den Pressed-State und die reduzierte Bewegung habe ich live nicht gesondert gemessen; das decken die E2E-Gates ab (`expectReducedMotion`). Die Screenshots liefen mit `reducedMotion: reduce`, Cluster-Sprünge dabei ohne Animation.
+- **Konsistenz**:
+  - Kartenrahmen im Stickerheft-Stil (2 px Linie, harter Schatten), Zoom-Knöpfe und Werkzeugknöpfe passen zum Design-System.
+  - Die Attribution nutzt MapLibres Standardschrift (Helvetica/Arial), nicht die App-Schrift (H3).
+
+### 1. Netzwerk in der Liste
+
+- Startseite plus Scrollen, Detail öffnen und zurück: **5 Requests, alle an `zwergenplan.app`**. Das sind `/`, `/data/site.json`, `assets/index-<hash>.js`, `assets/index-<hash>.css` und die Schrift `bricolage-grotesque-…woff2`.
+- **0** Requests an `openfreemap`, **0** an `assets/karte/`, **0** URLs mit `maplibre`.
+- Das Start-JS `index-BTpp6E6l.js` (280 kB roh) enthält **0×** „maplibre“ und keinen Verweis auf `assets/karte/`.
+
+### 2. Netzwerk in der Karte
+
+Ablauf: Tipp auf „Karte“, einmal hinein- und herauszoomen, Theme dunkel, Theme hell. Das ergibt 31 Requests.
+
+- **Hosts**: nur `zwergenplan.app` und `tiles.openfreemap.org`.
+- **Querystring oder Fragment**: 0 von 31. Im Resource-Timing der Seite 0, im Resource-Timing des Workers 0.
+- **Pfad-Muster** (Anzahl):
+  - `zwergenplan.app/assets/karte/MapScreen-<hash>.js` (1), `…/MapView-<hash>.js` (1), `…/MapView-<hash>.css` (1), `…/maplibre-gl-worker-<hash>.js` (1)
+  - `tiles.openfreemap.org/styles/positron` (2), `/styles/dark` (1)
+  - `tiles.openfreemap.org/planet` (TileJSON, 3)
+  - `tiles.openfreemap.org/planet/<version>/{z}/{x}/{y}.pbf` (10)
+  - `tiles.openfreemap.org/sprites/ofm_f384/ofm@2x.json` (3), `ofm@2x.png` (3)
+  - `tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/{range}.pbf` (3), `fonts/Noto%20Sans%20Italic/{range}.pbf` (2)
+- **Worker**: Das Resource-Timing des Workers `maplibre-gl-worker-BAEWVkqd.js` kennt **10 Einträge, alle `/planet/<version>/{z}/{x}/{y}.pbf`** auf `tiles.openfreemap.org`, ohne Querystring. Das sind genau die 10 Kachel-Requests im Kontext-Protokoll.
+  - Der Worker lädt also nur die Vektorkacheln. Stil, TileJSON, Glyphen und Sprites holt in MapLibre 6.12 der Hauptthread (Resource-Timing der Seite).
+  - Playwright meldet die Worker-Requests als `fetch` der Seite. Die Zuordnung zum Worker belegt deshalb das Resource-Timing.
+- **Referrer**: Alle 27 Requests an OpenFreeMap tragen `referer: https://zwergenplan.app/`, also nur den Origin, ohne Pfad und ohne `?ansicht=karte`. Das gilt auch für die 10 Kachel-Requests aus dem Worker.
+- **WebKit** (iPhone 15): Karte `bereit`, 8 Requests an OpenFreeMap, 0 mit Querystring, Hosts wieder nur die beiden.
+
+### 3. Standort nicht verraten
+
+Stub-Standort 49,40 / 11,15, am Südostrand bei Langwasser, Berechtigung erteilt.
+
+| Schritt | Kachel-Requests | Kamera |
+|---|---|---|
+| a) Karte ohne Startpunkt | `10/543/349`, `10/543/350` | Ausgangslage (`k3a.png`) |
+| b) neuer Kontext: Liste → „Meinen Standort nutzen“, Geburtsdatum 01.06.2025, „Kostenlos“, „bis 2 km“ (Liste: „2 Angebote ab heute“, URL `?kosten=kostenlos&umkreis=2`), dann erstmals „Karte“ | **`10/543/349`, `10/543/350`, identisch mit a)**. Vor dem Öffnen 0 Requests an OpenFreeMap. | Gleicher Ausschnitt wie a) (`k3b.png`). Statuszeile „2 Angebote an 2 Orten“, die Filter wirken nur auf die Marker. |
+| c) bei offener Karte (Kontext a) „Startpunkt wählen“ → „Meinen Standort nutzen“ | **0 neue Requests** an OpenFreeMap | unverändert, nur der Startpunkt-Punkt kommt dazu (`k3c.png`) |
+| d) „Kartenmitte als Startpunkt“ vor und nach c) | **0 neue Requests** | Fingerabdruck der Kartenmitte (die ersten 8 Orte mit Entfernung: BRK Familienzentrum 400 m, Geburtshaus 600 m …) vor und nach c) **identisch** → keine Kamerafahrt |
+| e) Gegenprobe: Stadtteil „Langwasser“ | 9 neue: `11/1086–1087/699–700`, `12/2174/1399`, `13/4348–4349/2798–2799` | fährt auf Langwasser (Zoom 13, `k3e.png`), wie gewollt |
+
+**Nachgerechnet**:
+- Die beiden z10-Kacheln aus a) und b) decken 49,153–49,611 N und 10,898–11,250 E ab, also etwa 51 × 25 km und damit den ganzen Großraum Nürnberg. Der Standort liegt in `10/543/349`, die ohnehin jeder Besucher lädt. Die Requests sagen also nur: „jemand sieht sich Nürnberg an“.
+- Erst ab z13 würde eine Kachel den Standort eingrenzen: `13/4349/2799` umfasst 49,382–49,411 N und 11,118–11,162 E, rund 3 × 3 km. Diese Kachel kam nur in e), weil ein öffentlicher Stadtteil gewählt wurde, der zufällig neben dem Stub liegt. In a) bis d) gab es keine Kachel über z10.
+
+### 4. Ladezeit (Tipp auf „Karte“ → erste Kachel / `data-state="bereit"`)
+
+Je Lauf ein neuer Kontext mit kaltem Cache. Gezählt ab dem Klick, die Startseite war schon geladen.
+
+| | Lauf 1 | Lauf 2 | Lauf 3 |
+|---|---|---|---|
+| ungedrosselt, erste Kachel / bereit | 2185 / 2520 ms (kalter OFM-Cache, Stil 2,0 s) | 465 / 875 ms | 498 / 833 ms |
+| „Fast 4G“, erste Kachel / bereit | 1604 / 2345 ms | 1597 / 2337 ms | 1615 / 2349 ms |
+
+- „Fast 4G“ ist das DevTools-Preset: 9 Mbit/s ↓, 1,5 Mbit/s ↑, 60 ms RTT, mit den DevTools-Faktoren 0,9 bzw. ×2,75, also 165 ms Latenz.
+- Unter „Fast 4G“ (Lauf 1) kommt das MapView-JS nach ca. 0,7 s, der Stil nach 1,0 s, das Worker-JS nach 1,1 s.
+- Die Drosselung greift auch im Worker: Eine Kachel dauert gedrosselt 365–399 ms, ungedrosselt 51–68 ms.
+- **Ziel aus E1 und den Akzeptanzkriterien (≤ 4 s bis zu den ersten Kacheln auf „Fast 4G“) erfüllt**, mit ca. 1,6 s. Variante B ist nicht nötig.
+- Offen bleibt die Messung auf einem echten Handy (Schritt 10).
+
+### 5. Bedienung
+
+- **Marker und Cluster** (`review-0005-karte-hell.png`): Startausschnitt mit Clustern 1–119, die Zahlen sind gut lesbar.
+- **Tippen**:
+  - Ein Tipp auf einen Cluster („5“, „100“, „119“, „20“) zoomt hinein; es kommen neue z11-Kacheln, eine Nutzerhandlung.
+  - Ein Ort mit einem Angebot („1“ bei Neunhof) öffnet direkt das Detail („Babyschwimmen 2 ab 8 Monaten …“, URL `?ansicht=karte&angebot=…`).
+  - Ein Ort mit 2 Angeboten (nach drei Cluster-Tipps Richtung Langwasser) öffnet das **Orts-Sheet** „Hebamme Ewelina Kobielski (hebamme-nuernberg.de)“ mit 2 Kacheln (`k5-marker-sheet.png`).
+- **Orts-Liste**: 76 Orte. Ein Ort mit 10 Angeboten öffnet das Orts-Sheet mit 10 Kacheln. Die kleinste Zeilenhöhe ist 68 px.
+- **Gesten**:
+  - Ein-Finger-Wischen über die Karte (CDP-Touch) zeigt „Mit zwei Fingern bewegen“ (`maplibregl-show`, Deckkraft 1) und scrollt die Seite (290 → 402 px), die Karte bleibt stehen (`k5-zweifinger.png`).
+  - Am Desktop zeigt das Scrollrad „Zum Zoomen Strg + Scrollen“ (`k5-desktop-wheel.png`).
+- **Attribution**: **steht doppelt da** (W1). Schrift 12 px, Links 26 px hoch (≥ 24), Linkfarbe `rgb(19,33,46)` auf Weiß, gut lesbar.
+- **Zoom-Knöpfe**: 44 × 44 px, `aria-label` „Hineinzoomen“ bzw. „Herauszoomen“. Die Kartenfläche hat `aria-label` „Karte der Orte“ und `tabindex 0`.
+
+### 6. Theme
+
+- Der Kopf-Knopf „Dunkle Darstellung“ lädt `/styles/dark`. Marker und Cluster bleiben erhalten (gelb), Zoom-Knöpfe und Attribution werden dunkel (`review-0005-karte-dunkel.png`).
+- Zurück auf „Hell“ wird `/styles/positron` geladen, die Marker bleiben.
+- Konsole: nur `warning` aus dem OFM-Stil (`Image "wood-pattern" could not be loaded`), kein Fehler.
+
+### 7. Zustände
+
+- **OFM blockiert** (`context.route("https://tiles.openfreemap.org/**", abort)`), `k7-fehler.png`:
+  - Nach 905 ms `data-state="fehler"` mit „Kartenbilder lassen sich gerade nicht laden. Die Orte stehen unten in der Liste.“ und dem Knopf „Nochmal versuchen“.
+  - Kein Knopf „Kartenmitte als Startpunkt“, „Startpunkt wählen“ bleibt.
+  - Orts-Liste mit 76 Orten; das Orts-Sheet öffnet.
+  - Nach `unroute` führt „Nochmal versuchen“ zu `bereit`.
+  - Konsole: nur `error: https://tiles.openfreemap.org/styles/positron Failed to load resource: net::ERR_FAILED`. Das ist die Netzwerkmeldung des Browsers und entspricht dem erlaubten Muster aus E13. MapLibre selbst loggt nichts.
+- **Ohne WebGL** (`getContext("webgl"/"webgl2")` → `null`), `k7-ohne-webgl.png`:
+  - „Dein Browser kann die Karte nicht zeigen. Die Orte stehen unten in der Liste.“
+  - Orts-Liste mit 76 Orten, ein Ort mit 1 Angebot öffnet das Detail, keine „Kartenmitte“.
+  - **0 Requests an OpenFreeMap**, Konsole leer.
+- **Laden** (MapView-Chunk künstlich um 3 s verzögert): `data-state="laden"` mit „Karte wird geladen …“ in voller Kartenhöhe (506 px = Höhe bei `bereit`), also kein Layout-Sprung.
+
+### 8. Layout
+
+| Viewport | Karte (B × H) | horizontaler Überlauf | Bemerkung |
+|---|---|---|---|
+| 320×640 | 288 × 384 | nein | Attribution 54 px (3 Zeilen, wegen W1) |
+| 390×844 | 358 × 506 | nein | Attribution 36 px (2 Zeilen, wegen W1) |
+| 915×412 quer | 608 × 247 | nein | Seitenleiste links (106 px), Karte beginnt bei y = 266, nur ca. 146 px ohne Scrollen sichtbar (H4) |
+| 320 / 200 % | 288 × 384 | nein | **Attribution 216 px von 384 px Kartenhöhe** (W1), Werkzeugknöpfe 288×88 |
+| 915×412 / 200 % | 643 × 247 | nein | Attribution 108 von 247 px, Karte ganz unter dem Falz |
+
+- Gesichtet: Screenshot-Matrix `karte-*`, `ort-*` und `start-*` für 320, 360, 365, iphone, pixel und quer, je hell und dunkel, dazu `-200`. Weiter `k8-320.png`, `k8-320-200.png`, `k8-quer.png` und `k8-quer-200.png`.
+- Das Orts-Sheet ist auf allen Breiten sauber, auch bei 200 % und im Querformat.
+- **Startbundle**: Die Startseite lädt kein `maplibre` und nichts aus `assets/karte/` (Punkt 1).
+
+### Befunde
+
+**Blocker**: keine.
+
+**Wichtig**
+
+- **W1 – Attribution steht doppelt da** (Plan E4 verlangt „genau einmal“). Sichtbar ist „OpenFreeMap © OpenMapTiles Data from OpenStreetMap | OpenFreeMap © OpenMapTiles Data from OpenStreetMap“, auf allen Viewports, hell und dunkel.
+  - Belege: `k5-zweifinger.png`, `k3-montage.png`, `karte-pixel-light.png`, `k8-320-200.png`.
+  - Ursache: Die TileJSON `https://tiles.openfreemap.org/planet` liefert `<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from …`. `ATTRIBUTION` in `src/data/tiles.ts` weicht davon ab (© außerhalb des Links, ohne `target`), deshalb entfernt MapLibre die Dublette nicht.
+  - Folge: Bei 320 px und 200 % belegt die Attribution 216 von 384 px Kartenhöhe.
+  - E2E hat das nicht gefunden, weil die Fixture-Stile die Kacheln direkt per `tiles: […]` liefern, ohne TileJSON und ohne Attribution.
+  - Vorschlag: `customAttribution` streichen (die Quelle bringt die Pflicht-Attribution mit) oder `ATTRIBUTION` zeichengleich zur OFM-Zeichenkette machen. Zusätzlich sollte die Fixture-Quelle `openmaptiles` die echte OFM-Attribution tragen, damit Test 2 (`toHaveText(…)`) eine Dublette erkennt.
+
+**Hinweise**
+
+- **H1 – Cluster gruppieren sich beim Setzen eines Startpunkts um.** Bei gleicher Kamera: vorher 16 / 100 / 119, nach „Meinen Standort nutzen“ 14 / 62 / 150 / 14 (`k3a.png` vs. `k3c.png`). Vermutlich ändert `sortPlaces` die Reihenfolge der Features, und Supercluster bündelt reihenfolgeabhängig. Das ist kosmetisch und privatsphäre-neutral (keine Requests), kann aber irritieren. Möglicher Ausweg: `placesToFeatures` mit stabiler Reihenfolge, z. B. nach `key`.
+- **H2 – Stadtname englisch**: „Nuremberg“. Der OFM-Stil `positron`/`dark` nutzt für `label_city` `coalesce(name_en, name)`, betroffen sind `karte-*`, `k3b.png` und `k8-quer.png`. Kandidat für `docs/ideas.md`: im `style.load` das `text-field` der Ortslabels auf `name:de`/`name` umstellen.
+- **H3 – Attribution in MapLibres Standardschrift** (Helvetica/Arial) statt der App-Schrift. Ist rein optisch.
+- **H4 – Querformat**: Kopf, Sticker, Schnellfilter und Statuszeile belegen 266 von 412 px, von der Karte sind ohne Scrollen nur ca. 146 px sichtbar, bei 200 % nichts. Das ist bewusst so (die Liste ist die Hauptansicht, die Karte hat `clamp(240px, 60dvh, …)`). Notiert für einen späteren Blick (`karte-quer-light.png`, `k8-quer.png`).
+- **H5 – Konsolen-Warnungen aus den OFM-Stilen**: `highway-shield-…filter: Expected value to be of type number` (positron) und `Image "wood-pattern" could not be loaded` (dark). Es sind nur `warning`, keine `error`, aus dem Fremdstil. Kein Handlungsbedarf.
+- **H6 – Orts-Sheet wiederholt Ortsangaben**: Jede Kachel nennt noch einmal Anbieter, Stadtteil und Entfernung, die schon im Sheet-Kopf stehen (`ort-iphone-light.png`). Ist redundant, aber nicht falsch.
+- **H7 – Zoom-Knöpfe verdecken am oberen rechten Rand gelegentlich einen Marker** (`karte-320-light.png`, „3“). Üblich; der Marker bleibt per Orts-Liste erreichbar.
+- **Offen aus Schritt 10**: Ladezeit und Bedienung auf einem **echten Handy** bzw. echten iPhone (WebKit headless lädt die Karte live fehlerfrei, `k-webkit.png`).
+
+**Nachtrag (2026-10-05):** W1 (Attribution doppelt) ist mit dem Hotfix `192e94e` behoben, siehe „Umsetzung“.
