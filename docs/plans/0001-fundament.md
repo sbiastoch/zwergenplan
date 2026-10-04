@@ -228,3 +228,10 @@ Die folgenden Änderungen **überschreiben** die betroffenen Stellen oben.
 - Lighthouse ist durch Web-Vitals in Playwright ersetzt (`e2e/perf.spec.ts`).
 - Bootstrap: Solange `data/BOOTSTRAP` existiert, wird `data/` gar nicht gelesen. `data/providers.yaml` liegt noch im Skill-Format (Migration in Plan 0002).
 - Der pre-commit-Hook ist nicht aus dem Worktree installiert (ADR 0004, mehrere Checkouts).
+
+## Browser-Review (lokal, Fixture-Daten, 2026-10-04)
+
+Screenshots 320/iPhone/Pixel/quer × hell/dunkel (`scripts/screenshots.ts`). Die Checkliste ist bestanden, Hierarchie, Touch-Ziele, Dark-Mode-Kontrast und Querformat sind in Ordnung. Für die Design-Session notiert:
+- Das native Datumsfeld zeigt das Format der Browsersprache. Headless ist das `mm/dd/yyyy`, auf deutschen Geräten `TT.MM.JJJJ`. Eine eigene, klar deutsche Eingabe erwägen.
+- `hyphens: auto` trennt auf 320 px auch kurze Wörter („Nürn-berg“). Die Typografie wird mit dem Design festgelegt.
+- WebKit-CI fand bei 200 % Text einen Überlauf durch das Datumsfeld. Behoben.
