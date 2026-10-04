@@ -5,6 +5,7 @@
  * `useOrigin` (use-app-state.ts), hier wird nur gerechnet.
  */
 import type { PositionProblem, PositionResult } from "../data/geolocation.ts";
+import type { GeoPoint } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
 
 export interface OriginState {
@@ -21,6 +22,8 @@ export type OriginAction =
   | { type: "locate"; request: number }
   | { type: "located"; request: number; result: PositionResult }
   | { type: "district"; origin: Origin }
+  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8); `point` schon gerundet und in Nürnberg */
+  | { type: "mapCenter"; point: GeoPoint }
   | { type: "clear" };
 
 export function initialOriginState(origin: Origin | undefined): OriginState {
@@ -41,6 +44,8 @@ export function originReducer(state: OriginState, action: OriginAction): OriginS
     }
     case "district":
       return { origin: action.origin, locating: false };
+    case "mapCenter":
+      return { origin: { source: "karte", point: action.point, label: "Kartenmitte" }, locating: false };
     case "clear":
       return { origin: undefined, locating: false };
   }

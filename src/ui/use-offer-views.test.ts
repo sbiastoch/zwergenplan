@@ -177,6 +177,28 @@ describe("useOfferViews", () => {
       expect(kalender.calendar.dataEnd).toBe("2026-10-12");
     });
 
+    it("Orte für die Karte folgen den sichtbaren Angeboten, mit Startpunkt nach Entfernung (Plan 0005, E6)", () => {
+      const karte: Route = { tab: "karte", filter: EMPTY_FILTER };
+      const keys = (v: OfferViews) => v.places.map((p) => [p.key, p.offers.map((o) => o.title)]);
+      // nur in der Kartenansicht
+      expect(render({ offers: [nah, nahZwei, fern] }).places).toEqual([]);
+      // gleicher Ort → ein Ort; ohne Startpunkt nach Name (beide „Ort“), also in Reihenfolge des Auftretens
+      expect(keys(render({ offers: [fern, nah, nahZwei], route: karte }))).toEqual([
+        ["49.4301,11.0892", ["fern"]],
+        ["49.4495,11.0601", ["nah", "nah-zwei"]],
+      ]);
+      // mit Startpunkt nach Entfernung
+      expect(keys(render({ offers: [fern, nah, nahZwei], route: karte, origin }))[0]?.[0]).toBe("49.4495,11.0601");
+      // Umkreis und Alter wirken wie in der Liste
+      expect(keys(render({ offers: [nah, fern], route: { ...within2km, tab: "karte" }, origin }))).toEqual([
+        ["49.4495,11.0601", ["nah"]],
+      ]);
+      const gross = at(GROSS, 49.4301, 11.0892);
+      expect(keys(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }))).toEqual([
+        ["49.4495,11.0601", ["nah"]],
+      ]);
+    });
+
     it("zählt heute beendete Termine nur im Umkreis (B2)", () => {
       const heuteFern = at(offer("heute-fern", "2026-10-05"), 49.4301, 11.0892);
       const route: Route = { ...within2km, tab: "kalender" };

@@ -15,6 +15,7 @@ import {
   type ThemeChoice,
 } from "../data/preferences.ts";
 import { districtById } from "../domain/districts.ts";
+import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { toggleId } from "../domain/saved.ts";
@@ -201,6 +202,8 @@ export interface OriginApi {
   /** „Meinen Standort nutzen“: fragt einmal ab, nur auf Tipp */
   locateMe: () => void;
   setDistrict: (id: string) => void;
+  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8): gerundet, nur im Speicher; `false` außerhalb Nürnbergs */
+  setMapCenter: (center: GeoPoint) => boolean;
   /** „Startpunkt entfernen“: Standort und gespeicherten Stadtteil */
   clear: () => void;
 }
@@ -236,11 +239,18 @@ export function useOrigin(): OriginApi {
     saveOriginDistrict(id);
   }, []);
 
+  const setMapCenter = useCallback((center: GeoPoint) => {
+    const point = coarsen(center);
+    if (!inBounds(point)) return false;
+    dispatch({ type: "mapCenter", point });
+    return true;
+  }, []);
+
   const clear = useCallback(() => {
     dispatch({ type: "clear" });
     saveOriginDistrict(undefined);
   }, []);
 
   const { origin, locating, problem } = state;
-  return { origin, locating, problem, canLocate: locatable, locateMe, setDistrict, clear };
+  return { origin, locating, problem, canLocate: locatable, locateMe, setDistrict, setMapCenter, clear };
 }

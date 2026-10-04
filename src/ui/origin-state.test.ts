@@ -93,4 +93,25 @@ describe("originReducer (Plan 0004, E3)", () => {
     });
     expect(originReducer(failed, { type: "clear" })).toEqual({ origin: undefined, locating: false });
   });
+
+  it("Kartenmitte als Startpunkt: nur im Speicher, löscht den Fehler, späte Standort-Antwort wirkt nicht (Plan 0005, E8)", () => {
+    const center = { lat: 49.45, lon: 11.07 };
+    const state = run(
+      initialOriginState(GOSTENHOF),
+      { type: "locate", request: 1 },
+      { type: "mapCenter", point: center },
+      { type: "located", request: 1, result: { ok: true, point: HERE } },
+    );
+    expect(state).toEqual({
+      origin: { source: "karte", point: center, label: "Kartenmitte" },
+      locating: false,
+    });
+    const failed = run(
+      initialOriginState(undefined),
+      { type: "locate", request: 1 },
+      { type: "located", request: 1, result: { ok: false, reason: "denied" } },
+      { type: "mapCenter", point: center },
+    );
+    expect(failed.problem).toBeUndefined();
+  });
 });

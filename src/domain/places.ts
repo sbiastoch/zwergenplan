@@ -15,7 +15,7 @@ interface PlaceVenue {
   geo: GeoPoint;
 }
 
-interface Place<T> {
+export interface Place<T> {
   key: string;
   geo: GeoPoint;
   /** Namen der Orte an dieser Koordinate, ohne Dubletten, in Reihenfolge des Auftretens */

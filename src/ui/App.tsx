@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { loadSiteData } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
+import type { Place } from "../domain/places.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
@@ -10,11 +11,12 @@ import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
 import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
-import { ageChipLabel, distanceNote, plural, reachLimitLabel, standDate } from "./format.ts";
+import { ageChipLabel, distanceNote, mapStatusParts, plural, reachLimitLabel, standDate } from "./format.ts";
 import { KidSheet } from "./KidSheet.tsx";
 import { ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
+import { PlaceSheet } from "./PlaceSheet.tsx";
 import { SavedView } from "./SavedView.tsx";
 import { FilterSheet } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
@@ -53,6 +55,8 @@ export function App() {
   // „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl)
   const [sheet, setSheet] = useState<"filter" | "kid" | "origin" | null>(null);
   const [detailDay, setDetailDay] = useState<string>();
+  // Orts-Sheet: Sitzungszustand, nie in der URL (Plan 0005, E5)
+  const [placeKey, setPlaceKey] = useState<string>();
   const [animate, setAnimate] = useState(false);
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Umkreis-Hinweis verschwindet mit der Wahl.
   const filterButton = useRef<HTMLButtonElement>(null);
@@ -115,10 +119,18 @@ export function App() {
       openDetail(offer.id);
     },
   };
+  const place = views.places.find((p) => p.key === placeKey);
+  // Ort mit einem Angebot: gleich das Detail (Plan 0005, E6)
+  const openPlace = (p: Place<SiteOffer>) => {
+    const [only, ...more] = p.offers;
+    if (only && more.length === 0) ctx.onOpen(only);
+    else setPlaceKey(p.key);
+  };
+  const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.places.length);
   const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
   // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5)
   const section = tabSection(route.tab);
-  const dialogOpen = sheet !== null || detailOffer !== undefined;
+  const dialogOpen = sheet !== null || detailOffer !== undefined || place !== undefined;
 
   return (
     <div className="app">
@@ -168,9 +180,18 @@ export function App() {
         {load.kind === "ready" && route.tab !== "merkliste" && (
           <>
             <p className="status" role="status">
-              <span>
-                <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
-              </span>
+              {route.tab === "karte" ? (
+                <span>
+                  <b>{mapOffers}</b>
+                  {offersWord}
+                  <b>{mapPlaces}</b>
+                  {placesWord}
+                </span>
+              ) : (
+                <span>
+                  <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
+                </span>
+              )}
               {origin && (
                 // eigene Zeile ohne „·“: Sie brach bei 320–390 px ohnehin um, und der Punkt stand dann verwaist
                 // vorn. Der Punkt nur für Screenreader trennt die beiden Sätze in der Ansage.
@@ -213,7 +234,21 @@ export function App() {
             <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>
           </>
         )}
-        {load.kind === "ready" && route.tab === "karte" && <MapPanel dark={theme.dark} />}
+        {load.kind === "ready" && route.tab === "karte" && (
+          <MapPanel
+            places={views.places}
+            origin={origin}
+            dark={theme.dark}
+            reachOf={views.reachOf}
+            hasData={offers.length > 0}
+            onPlace={openPlace}
+            onPickOrigin={() => setSheet("origin")}
+            onMapCenter={(center) => {
+              if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb von Nürnberg.");
+            }}
+            onResetFilter={() => setFilter(EMPTY_FILTER)}
+          />
+        )}
         {load.kind === "ready" && route.tab === "kalender" && (
           <CalendarView
             index={calendar.index}
@@ -264,6 +299,15 @@ export function App() {
             onIcs={say}
           />
         )}
+      </Dialog>
+      <Dialog
+        open={place !== undefined}
+        onClose={() => setPlaceKey(undefined)}
+        label={place?.names.join(" / ") ?? "Ort"}
+        className="sheet"
+        toast={toast}
+      >
+        {place && <PlaceSheet place={place} origin={origin} ctx={ctx} onClose={() => setPlaceKey(undefined)} />}
       </Dialog>
       <Dialog open={sheet === "filter"} onClose={() => setSheet(null)} label="Filter" className="sheet" toast={toast}>
         <FilterSheet
