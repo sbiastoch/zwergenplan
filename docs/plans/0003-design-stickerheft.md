@@ -352,3 +352,44 @@ Wichtig (alle übernommen):
 10. Budget-Ausweg „lazy laden“ gestrichen (Risiken).
 
 Hinweise: übernommen sind `animation-iteration-count`, keine `stick`-Animation beim ersten Rendern (LCP), festes Herz-Label, eine einzige `role="status"`-Region, Fremd-Origin-Fixture, zusätzliche 320/200-%-Gates und Fokus im Detail, verzögertes `revokeObjectURL`, kein endgültiges Löschen gemerkter IDs (statt `pruneSaved`), Kommentar in `topics.ts`, ADR 0005 als Auftrag für Plan 0004. Der Font-Fallback mit `size-adjust` kommt nur, wenn der Perf-Test ihn braucht (E6). Den Plan nicht zu teilen ist bewusst: Kalender und Merkliste teilen Karte, Filter und Altersregel; die Umsetzung läuft in Blöcken mit jeweils grünem `check:fast`.
+
+## Übergabe (Stand 2026-10-04, Session-Wechsel wegen Kontextgröße)
+
+Branch `design-stickerheft` (Worktree `.claude/worktrees/foundation`), gepusht, **noch nicht auf `main`**. Commits: `e6148d7` (Plan, ADR 0007, Mockup), `32a7cf1` (Umsetzung). Lokal ist `pnpm check` komplett grün (194 Unit-Tests, Coverage 98/91 %, 239 E2E, JS 81,4/90 kB, CSS 8,1/15 kB).
+
+Offen, in dieser Reihenfolge:
+
+1. **CI rot (Run 37211292322):** `e2e/perf.spec.ts` auf `pixel-7` (Fixture-Build) misst CLS 0,38, auch im Retry; lokal grün. Verdacht: Die Fallback-Schrift auf dem CI-Linux ist breiter, Kopfzeile/Titel brechen anders um, der Font-Swap verschiebt alles. Vorgehen: lokal mit `fc-match system-ui` bzw. im Playwright-Docker-Image nachstellen, Layout-Shift-Quellen per `PerformanceObserver` (`entry.sources`) ausgeben. Lösung laut E6: Fallback-`@font-face` mit `size-adjust`/`ascent-override` auf eine überall vorhandene Schrift (z. B. `local("DejaVu Sans")`, `local("Arial")`), oder `font-display: optional` + preload der Latin-Datei. Schwelle bleibt 0,05.
+2. **Arch-Review** (Abschnitt unten): die 7 wichtigen Befunde umsetzen, Hinweise nach Aufwand, `pnpm check` grün.
+3. Push, CI grün auf dem Branch (`gh run watch`). Dann bringt der Nutzer den Branch per Fast-Forward nach `main` (Hintergrund-Sessions pushen nicht auf `main`), CI grün auf `main`, Deploy.
+4. **`/browser-review` live** auf https://sbiastoch.github.io/zwergenplan/ mit echten Daten, Ergebnis hier anhängen. Hilfsmittel: `node scripts/screenshots.ts <URL> [--views=start,kalender,merkliste,detail,filter,kind]` → `e2e/.artifacts/screens/`. Besonders prüfen: Blob-ICS der Merkliste auf einem echten iPhone (ADR 0007), nur eine Schriftdatei im Netzwerk, Kalender-Touch-Ziele.
+5. Plan 0004 (Karte mit MapLibre + OpenFreeMap, Entfernung; ADR 0005 beachten) schreiben.
+
+Hinweise für die nächste Session:
+- Bash-Heredocs und komplexe Pipes lehnt die Worktree-Sandbox teils ab: Dateien mit Write/Edit ändern, Befehle einfach halten.
+- Preview-Server belegen die Ports 4173/4174; vor `playwright test` ggf. `fuser -k 4173/tcp 4174/tcp`.
+- Den Smoke-Test einzeln mit `--project=smoke-echte-daten --no-deps` starten (er hängt sonst an allen anderen Projekten).
+
+## Arch-Review (Subagent `arch-reviewer`, 2026-10-04) – Verdict: „Nacharbeit nötig“, keine Blocker → offen, für die nächste Session
+
+Bestätigt: Schichtregeln, „jetzt“ nur in `App.tsx`, kein Zod im Client, gleiche UIDs. Die drei Gate-Änderungen (smoke seriell, biome-Ausnahme, `settle()`) sind legitim, keine Schwelle gesenkt.
+
+Wichtig (umsetzen):
+1. Termin-/Zeitlogik aus `DetailDialog.tsx` in die Domäne: `upcomingSessions(offer, now)` (ersetzt das Prädikat an 7 Stellen) und `referenceSession(offer, now, day?)` in `agenda.ts`; `whenLabels`/`registrationNote` nach `format.ts` mit Tests (Einmalig, Kurs mit wechselnder Uhrzeit, „Freitags“, `registrationWindow`).
+2. Kalender-Grenzen aus `CalendarView.tsx` in die Domäne: `calendarNav(day, today, lastDay)` + `clampDay`, Tests inkl. Jahreswechsel.
+3. Alters-Sichtbarkeit aus `App.tsx:66-77` nach `age.ts`: `ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, showUnfit })` → `{ visible, hiddenCount, unfitIds }`, Unit-Test.
+4. Offer-ID-Regex nur einmal: `OFFER_ID_PATTERN` in `ids.ts`, genutzt von `schema.ts` und `route.ts`.
+5. ADR 0007 absichern: `icsContextFor(offer, generatedAt)` in der Domäne (genutzt von `SavedView.tsx` und `scripts/build-data.ts`), Test vergleicht ganze VEVENT-Blöcke, `icsForCollection` wirft bei fremdem Termin (Index −1).
+6. Reduzierte Bewegung wirklich prüfen: Reduce-Block um `animation-delay: 0s` und `transition-delay: 0s` ergänzen; Gate `expectReducedMotion` (alle Animationen ≤ 1 ms) in allen Projekten inkl. WebKit; `settle()` bleibt mit benannter Ursache.
+7. Dateigrößen: `styles.css` per `@import` aufteilen (tokens, base, card, calendar, dialog, tabs), Zustand aus `App.tsx` in `useOfferViews`; Struktur-Abschnitt des Plans an `Chrome.tsx`/`Sheets.tsx`/`Dialog.tsx` anpassen.
+
+Hinweise (nach Aufwand):
+- 8 Doppel-Esc/-Zurück ruft `history.back()` zweimal (Schutz-Ref); `Dialog.tsx` auf natives `close` reagieren.
+- 9 Merkliste über zwei Tabs: in `toggle` frisch `loadSaved()`, `storage`-Ereignis abonnieren; kein Ref-Schreiben im Render.
+- 10 Cast in `use-app-state.ts:66` durch Type-Guard ersetzen; `NO_INDEX` typisieren.
+- 11 `DEFAULT_AGE` aus `age.ts` exportieren statt in `format.ts` zu wiederholen.
+- 12 `now` bei `visibilitychange` erneuern (über Nacht offener Tab).
+- 13 Duplikate: Theme-Farben (index.html, use-app-state, CSS), dunkle Tokens per `light-dark()`, Wochentagsköpfe, Web-Vitals-Helfer `e2e/vitals.ts`, `savedOffers` liefert `Occurrence[]`.
+- 14 Doku: architecture.md-Privatsphäre-Invariante um Merkliste/Darstellung und den `thirdPartyGuard` ergänzen; CLAUDE.md: `--no-deps` für den Smoke-Test, veralteter BOOTSTRAP-Abschnitt; Plan E10 (Sticker-Name „Kurz: Voll“); visuelle Regression (ADR 0004, ideas.md) jetzt bewusst entscheiden.
+- 15 ADR 0001: Font-Abhängigkeit in die Stack-Liste.
+- 16 E2E: Fehler-/Ladezustand („Nochmal versuchen“ per `page.route` 500) mit `expectMobileUx`; Smoke 320 px/200 % auch für Detail und Kalender mit echten Daten.
