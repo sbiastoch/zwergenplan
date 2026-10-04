@@ -7,7 +7,7 @@ import { mkdirSync } from "node:fs";
 import { chromium, type Page } from "@playwright/test";
 
 const args = process.argv.slice(2);
-const url = args.find((a) => !a.startsWith("--")) ?? "http://localhost:4173/zwergenplan/";
+const url = args.find((a) => !a.startsWith("--")) ?? "http://localhost:4173/";
 const viewsArg = args.find((a) => a.startsWith("--views="))?.slice("--views=".length);
 const isLocal = url.includes("localhost");
 const outDir = "e2e/.artifacts/screens";

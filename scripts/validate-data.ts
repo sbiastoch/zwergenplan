@@ -18,7 +18,7 @@ if (process.argv.includes("--against-deployed")) {
   try {
     const res = await fetch(`${SITE_URL}data/meta.json`, { cache: "no-store" });
     if (res.ok) deployed = (await res.json()) as DatasetSummary;
-    else console.log(`ℹ Kein deployter Stand gefunden (HTTP ${res.status}) – erster Deploy?`);
+    else console.log(`::warning::Kein deployter Stand unter ${SITE_URL} (HTTP ${res.status}), Plausibilität entfällt.`);
   } catch (e) {
     // Netzfehler sollen nicht jeden Deploy blockieren – aber sichtbar sein.
     console.log(`::warning::Deployter Stand nicht abrufbar, Plausibilität nur eingeschränkt: ${(e as Error).message}`);

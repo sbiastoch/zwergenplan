@@ -14,7 +14,7 @@ data/providers.yaml + data/offers.json   (Commit auf main per `pipeline publish`
                           │
    public/data/site.json, meta.json, public/ics/**.ics   (generiert, nicht committet)
                           │
-              Vite-Build ► dist/ ► GitHub Pages /zwergenplan/
+              Vite-Build ► dist/ ► GitHub Pages zwergenplan.app
                           │
             Browser: src/data lädt site.json per fetch ► src/domain ► src/ui
 ```

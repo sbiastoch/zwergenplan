@@ -27,9 +27,9 @@ test("zeigt jedes kommende Angebot einmal, nach Tagen gruppiert, Vergangenes nic
   await expect(page.getByText("Datenstand:")).toBeVisible();
 });
 
-test("ist für Suchmaschinen gesperrt und liegt unter dem Basis-Pfad", async ({ page }) => {
+test("ist für Suchmaschinen gesperrt und liegt im Wurzelpfad", async ({ page }) => {
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
-  expect(new URL(page.url()).pathname).toBe("/zwergenplan/");
+  expect(new URL(page.url()).pathname).toBe("/");
 });
 
 test("Schnellfilter und Sticker stehen in der URL und überleben ein Neuladen", async ({ page }) => {
@@ -60,7 +60,7 @@ test("Filter-Sheet wirkt sofort, Einfachwahl bei Anmeldung, Zurücksetzen leert"
   await sheet.getByRole("button", { name: "Zurücksetzen" }).click();
   await sheet.getByRole("button", { name: "8 Angebote zeigen" }).click();
   await expect(sheet).toBeHidden();
-  await expect(page).toHaveURL(/\/zwergenplan\/$/);
+  await expect(page).toHaveURL((url) => url.pathname === "/" && url.search === "");
 });
 
 test("Geburtsdatum filtert nach Alter, bleibt lokal und steht nie in der URL", async ({ page }) => {
