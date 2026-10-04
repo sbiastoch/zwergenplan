@@ -1,4 +1,7 @@
-/** Detail (Plan 0003, E3, E4, E13): Dialog, History, Deep-Link, ICS. Fixtures, Uhr Mo 5.10.2026 12:00. */
+/**
+ * Detail (Plan 0003, E3, E4, E13; Plan 0007, E1, E3, E4): Dialog, History, Deep-Link, ICS, Texte.
+ * Fixtures, Uhr Mo 5.10.2026 12:00, sonst per `reloadAt`.
+ */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
 
@@ -16,6 +19,13 @@ async function vevents(page: Page, href: string | null) {
   expect(res.ok()).toBe(true);
   expect(res.headers()["content-type"]).toContain("text/calendar");
   return res.text();
+}
+
+/** Uhr umstellen und neu laden (die Fake-Uhr gilt für jedes neue Dokument). */
+async function reloadAt(page: Page, at: Date) {
+  await page.clock.setFixedTime(at);
+  await page.goto("./");
+  await expect(page.getByTestId("offer").first()).toBeVisible();
 }
 
 test.beforeEach(async ({ page }) => {
@@ -70,7 +80,7 @@ test("Kurs-ICS enthält alle Termine in korrekter Zeit", async ({ page }) => {
   expect(body).toContain("DTSTART:20261027T083000Z"); // 9:30 nach der Zeitumstellung
 });
 
-test("regelmäßig: nur der nächste Termin oder alle", async ({ page }) => {
+test("regelmäßig: nur der nächste Termin oder alle, Knopf ohne Zahl (H5)", async ({ page }) => {
   const dialog = await openDetail(page, "Offener Krabbeltreff");
   await expect(dialog.getByText("Jeden Mittwoch, 10:00–11:30")).toBeVisible();
   await expect(dialog.getByText("Einzeln besuchbar")).toBeVisible();
@@ -95,4 +105,30 @@ test("merkt aus dem Detail, Meldung im Dialog sichtbar", async ({ page }) => {
   await dialog.getByRole("button", { name: `${PEKIP} merken` }).click();
   await expect(dialog.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toBeVisible();
   await expect(dialog.getByRole("button", { name: `${PEKIP} merken` })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("regelmäßig 14-täglich: Wochentag mit Uhrzeit (B1)", async ({ page }) => {
+  const dialog = await openDetail(page, "Krabbelreime & Fingerspiele");
+  await expect(dialog.getByText("Freitags, 10:30–11:00", { exact: true })).toBeVisible();
+  await expect(dialog.getByText("Einzeln besuchbar")).toBeVisible();
+});
+
+test("Anmeldefrist: offen bis 9.10., danach vorbei (B4)", async ({ page }) => {
+  const before = await openDetail(page, PEKIP);
+  await expect(before.getByText("Anmeldung bis 9.10.", { exact: true })).toBeVisible();
+
+  await reloadAt(page, new Date("2026-10-10T12:00:00+02:00"));
+  const after = await openDetail(page, PEKIP);
+  await expect(after.getByText("Anmeldeschluss war am 9.10.", { exact: true })).toBeVisible();
+  await expect(after.getByText("Anmeldung bis 9.10.")).toHaveCount(0);
+});
+
+test("laufender Kurs zählt die übrigen Termine (H8)", async ({ page }) => {
+  // Di 20.10. 12:00: Die Termine vom 13. und 20.10. (9:30–11:00) sind beendet.
+  await reloadAt(page, new Date("2026-10-20T12:00:00+02:00"));
+  const dialog = await openDetail(page, PEKIP);
+  await expect(dialog.getByText("Kurs · noch 6 von 8 Terminen", { exact: true })).toBeVisible();
+  await expect(dialog.getByText("Di 13.10. bis Di 1.12., jeweils 9:30–11:00")).toBeVisible();
+  // Kurse bleiben in der Kalenderdatei komplett (ADR 0007)
+  await expect(dialog.getByRole("link", { name: "Alle 8 Kurstermine" })).toBeVisible();
 });
