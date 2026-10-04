@@ -1,17 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  activeFilterCount,
   applyFilters,
   EMPTY_FILTER,
   type FilterState,
   filterFromSearch,
   filterToSearch,
   nextSession,
+  toggleIn,
 } from "./filter.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
 const { file } = loadFixtures();
-const ids = (state: FilterState, birthDate?: string) =>
-  applyFilters(file.offers, state, { now: FIXTURE_NOW, birthDate }).map(fixtureKey);
+const ids = (state: FilterState) => applyFilters(file.offers, state, { now: FIXTURE_NOW }).map(fixtureKey);
 
 describe("URL-Zustand", () => {
   it("überlebt den Roundtrip verlustfrei und kanonisch", () => {
@@ -64,15 +65,21 @@ describe("applyFilters", () => {
       "babykonzert-advent",
     ]);
   });
+});
 
-  it("berücksichtigt das Alter zum Termin", () => {
-    // Kind geb. 1.9.2026: im Oktober 1 Monat alt
-    expect(ids(EMPTY_FILTER, "2026-09-01")).toEqual([
-      "pekip-herbst",
-      "babymassage-workshop",
-      "krabbelreime",
-      "babykonzert-advent",
-    ]);
+describe("Filter bedienen", () => {
+  it("zählt aktive Filterwerte über alle Dimensionen", () => {
+    expect(activeFilterCount(EMPTY_FILTER)).toBe(0);
+    expect(
+      activeFilterCount({ categories: ["musik", "wasser"], formats: ["kurs"], registration: [], cost: ["kostenlos"] }),
+    ).toBe(4);
+  });
+
+  it("schaltet einen Wert an und wieder aus, ohne den Rest anzufassen", () => {
+    const on = toggleIn(EMPTY_FILTER, "formats", "kurs");
+    expect(on).toEqual({ ...EMPTY_FILTER, formats: ["kurs"] });
+    expect(toggleIn(on, "formats", "kurs")).toEqual(EMPTY_FILTER);
+    expect(toggleIn(on, "categories", "musik")).toEqual({ ...EMPTY_FILTER, formats: ["kurs"], categories: ["musik"] });
   });
 });
 

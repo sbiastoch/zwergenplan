@@ -1,5 +1,5 @@
 /** Alle Kalenderrechnungen laufen in Europe/Berlin – unabhängig von der Zeitzone des Geräts oder CI-Runners. */
-export const TIME_ZONE = "Europe/Berlin";
+const TIME_ZONE = "Europe/Berlin";
 
 export interface CivilDate {
   year: number;
@@ -19,6 +19,35 @@ export function berlinDate(instant: string | Date): CivilDate {
   const parts = dateFmt.formatToParts(typeof instant === "string" ? new Date(instant) : instant);
   const get = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((p) => p.type === type)?.value);
   return { year: get("year"), month: get("month"), day: get("day") };
+}
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+/** Berliner Kalendertag eines Zeitpunkts als ISO-Datum („heute“ ist `berlinIsoDate(now)`). */
+export function berlinIsoDate(instant: string | Date): string {
+  const { year, month, day } = berlinDate(instant);
+  return `${year}-${pad2(month)}-${pad2(day)}`;
+}
+
+/**
+ * Eingabe „TT.MM.JJJJ“ → ISO-Datum; ungültige Tage und Tage nach `today` → undefined.
+ * Die iOS-Zifferntastatur hat keinen Punkt: „01092026“ und die Trenner , / und Leerzeichen gelten auch.
+ */
+export function parseGermanDate(text: string, today: string): string | undefined {
+  const m = /^\s*(\d{1,2})[.,/ ](\d{1,2})[.,/ ](\d{4})\s*$/.exec(text) ?? /^\s*(\d{2})(\d{2})(\d{4})\s*$/.exec(text);
+  if (!m) return undefined;
+  const [day, month, year] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) return undefined;
+  const iso = `${year}-${pad2(month)}-${pad2(day)}`;
+  return iso > today ? undefined : iso;
+}
+
+/** ISO-Datum → „TT.MM.JJJJ“ */
+export function formatGermanDate(iso: string): string {
+  const { year, month, day } = parseIsoDate(iso);
+  return `${pad2(day)}.${pad2(month)}.${year}`;
 }
 
 export function parseIsoDate(iso: string): CivilDate {

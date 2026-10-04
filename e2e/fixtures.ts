@@ -7,7 +7,21 @@ import { test as base, expect } from "@playwright/test";
 /** Muss zu tests/fixtures/offers.json passen: Montag, 5.10.2026, 12:00 Berlin. */
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
 
-export const test = base.extend<{ consoleGuard: undefined }>({
+export const test = base.extend<{ consoleGuard: undefined; thirdPartyGuard: undefined }>({
+  // Privatsphäre-Invariante (docs/architecture.md): keine Requests an fremde Origins – Schrift, Daten, ICS kommen von uns.
+  thirdPartyGuard: [
+    async ({ page, baseURL }, use) => {
+      const own = new URL(baseURL ?? "http://localhost").origin;
+      const foreign: string[] = [];
+      page.on("request", (req) => {
+        const url = new URL(req.url());
+        if (url.protocol.startsWith("http") && url.origin !== own) foreign.push(req.url());
+      });
+      await use(undefined);
+      expect(foreign, "Keine Requests an fremde Origins").toEqual([]);
+    },
+    { auto: true },
+  ],
   page: async ({ page }, use) => {
     await page.clock.setFixedTime(FIXTURE_NOW);
     await use(page);

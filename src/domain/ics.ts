@@ -125,6 +125,30 @@ export function icsForSeries(offer: Offer, ctx: IcsContext): string {
   );
 }
 
+export interface CollectionItem {
+  offer: Offer;
+  /** Auswahl aus `offer.sessions` (Nummerierung „(3/8)“ bleibt die der ganzen Reihe) */
+  sessions: readonly Session[];
+  ctx: IcsContext;
+}
+
+/** Mehrere Angebote in einem Kalender (Merkliste) – im Browser erzeugt, gleiche UIDs wie die statischen Dateien. */
+export function icsForCollection(items: readonly CollectionItem[], name: string): string {
+  return calendar(
+    items.flatMap(({ offer, sessions, ctx }) =>
+      sessions.map((s) =>
+        vevent(
+          offer,
+          s,
+          offer.sessions.findIndex((x) => x.start === s.start),
+          ctx,
+        ),
+      ),
+    ),
+    name,
+  );
+}
+
 /** Ein einzelner Termin einer regelmäßigen Reihe. */
 export function icsForSession(offer: Offer, session: Session, ctx: IcsContext): string {
   const index = offer.sessions.findIndex((s) => s.start === session.start);

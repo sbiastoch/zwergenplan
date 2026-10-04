@@ -12,7 +12,8 @@
       "!**/*.schema.json",
       "!pnpm-lock.yaml",
       "!tests/fixtures/pipeline/html",
-      "!tests/fixtures/pipeline/api"
+      "!tests/fixtures/pipeline/api",
+      "!docs/design"
     ]
   },
   "formatter": {

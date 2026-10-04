@@ -1,4 +1,4 @@
-import type { AgeRange, Offer } from "./schema.ts";
+import type { AgeRange, Offer, Session } from "./schema.ts";
 import { berlinDate, daysInMonth, parseIsoDate } from "./time.ts";
 
 /** Ohne Altersangabe gilt ein Angebot für die ganze Zielgruppe 0–3 Jahre. */
@@ -36,4 +36,42 @@ export function offerFitsAge(offer: Offer, birthDate: string, now: Date): boolea
     return offer.sessions.some((s) => Date.parse(s.end) >= now.getTime() && fitsAgeAt(offer.age, birthDate, s.start));
   }
   return fitsAgeAt(offer.age, birthDate, first.start);
+}
+
+/** Teilt nach `offerFitsAge`; die Reihenfolge bleibt erhalten. */
+export function splitByAge<T extends Offer>(
+  offers: readonly T[],
+  birthDate: string,
+  now: Date,
+): { fitting: T[]; unfit: T[] } {
+  const fitting: T[] = [];
+  const unfit: T[] = [];
+  for (const offer of offers) (offerFitsAge(offer, birthDate, now) ? fitting : unfit).push(offer);
+  return { fitting, unfit };
+}
+
+export interface AgeCheck {
+  fits: boolean;
+  /** Stichtag (Beginn des maßgeblichen Termins) */
+  at: string;
+  /** vollendete Monate am Stichtag */
+  months: number;
+}
+
+/**
+ * Erklärung für das Detail: an welchem Termin wie alt, passt es?
+ * Kurs/einmalig: erster Termin. Regelmäßig: der vorgegebene Termin (Kalender), sonst der erste
+ * passende kommende Termin, sonst der nächste – konsistent mit `offerFitsAge`.
+ */
+export function ageCheck(offer: Offer, birthDate: string, now: Date, session?: Session): AgeCheck | undefined {
+  const fitsAt = (s: Session) => fitsAgeAt(offer.age, birthDate, s.start);
+  let ref: Session | undefined;
+  if (offer.format !== "regelmaessig") ref = offer.sessions[0];
+  else if (session) ref = session;
+  else {
+    const upcoming = offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime());
+    ref = upcoming.find(fitsAt) ?? upcoming[0];
+  }
+  if (!ref) return undefined;
+  return { fits: fitsAt(ref), at: ref.start, months: ageInMonths(birthDate, ref.start) };
 }

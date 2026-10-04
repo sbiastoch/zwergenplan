@@ -24,6 +24,10 @@ export default defineConfig({
       name: "smoke-echte-daten",
       testMatch: /smoke\.spec\.ts/,
       testIgnore: [],
+      // Läuft allein und seriell nach allen anderen: Der LCP-Check mit 4× gedrosselter CPU misst sonst die
+      // Konkurrenz paralleler Worker statt der Seite (Plan 0003, E8). Einzeln: --project=smoke-echte-daten --no-deps
+      dependencies: ["android-klein", "pixel-7", "iphone-15", "pixel-7-quer", "desktop"],
+      fullyParallel: false,
       use: { ...devices["Pixel 7"], baseURL: `http://localhost:${REAL_PORT}${BASE}`, ...common },
     },
   ],

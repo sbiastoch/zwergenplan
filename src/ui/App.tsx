@@ -1,150 +1,266 @@
-import { useEffect, useMemo, useState } from "react";
-import { assetUrl, loadBirthDate, loadSiteData, saveBirthDate } from "../data/site.ts";
-import {
-  applyFilters,
-  type FilterState,
-  FORMATS,
-  filterFromSearch,
-  filterToSearch,
-  nextSession,
-} from "../domain/filter.ts";
-import { seriesIcsPath } from "../domain/ics.ts";
+/** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { loadSiteData } from "../data/site.ts";
+import { ageInMonths, splitByAge } from "../domain/age.ts";
+import { groupByNextSession, lastSessionDay, sessionsByDay, takeGroups } from "../domain/agenda.ts";
+import { applyFilters, EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
+import type { Tab } from "../domain/route.ts";
+import { savedOffers } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
-import { CATEGORY_LABELS, categoriesOf } from "../domain/topics.ts";
-import { FORMAT_LABELS, facts, formatSession } from "./format.ts";
+import { berlinIsoDate } from "../domain/time.ts";
+import { CalendarView } from "./CalendarView.tsx";
+import { Header, QuickFilters, Stickers, TabBar } from "./Chrome.tsx";
+import { DetailContent } from "./DetailDialog.tsx";
+import { Dialog } from "./Dialog.tsx";
+import { ageChipLabel, plural, standDate } from "./format.ts";
+import { ListView } from "./ListView.tsx";
+import type { CardContext } from "./OfferCard.tsx";
+import { SavedView } from "./SavedView.tsx";
+import { FilterSheet, KidSheet } from "./Sheets.tsx";
+import { Toast } from "./Toast.tsx";
+import { useAgeOnly, useBirthDate, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
 
 type LoadState = { kind: "loading" } | { kind: "error"; message: string } | { kind: "ready"; data: SiteData };
 
-function useUrlFilter(): [FilterState, (next: FilterState) => void] {
-  const [state, setState] = useState(() => filterFromSearch(window.location.search));
-  const update = (next: FilterState) => {
-    setState(next);
-    const search = filterToSearch(next);
-    window.history.replaceState(null, "", `${window.location.pathname}${search ? `?${search}` : ""}`);
-  };
-  return [state, update];
-}
+/** Angebote je Schritt in der Liste (Plan 0003, E8) */
+const PAGE = 40;
+const NO_OFFERS: SiteOffer[] = [];
+const NO_INDEX = new Map();
 
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
-  const [filter, setFilter] = useUrlFilter();
-  const [birthDate, setBirthDate] = useState(loadBirthDate);
+  const [attempt, setAttempt] = useState(0);
+  const { route, replace, openDetail, closeDetail } = useRoute();
+  const [birthDate, setBirthDateStored] = useBirthDate();
+  const [ageOnly, setAgeOnly] = useAgeOnly();
+  const [savedIds, toggleSaved] = useSaved();
+  const theme = useTheme();
+  const [toast, say] = useToast();
+  const now = useMemo(() => new Date(), []);
+  const today = berlinIsoDate(now);
+
+  const [sheet, setSheet] = useState<"filter" | "kid" | null>(null);
+  const [showUnfit, setShowUnfit] = useState(false);
+  const [limit, setLimit] = useState(PAGE);
+  const [calendarDay, setCalendarDay] = useState(today);
+  const [monthOpen, setMonthOpen] = useState(false);
+  const [detailDay, setDetailDay] = useState<string>();
+  const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
+    // `attempt` startet das Laden neu („Nochmal versuchen“)
+    void attempt;
+    setLoad({ kind: "loading" });
     loadSiteData().then(
       (data) => setLoad({ kind: "ready", data }),
       (e: unknown) => setLoad({ kind: "error", message: e instanceof Error ? e.message : String(e) }),
     );
-  }, []);
+  }, [attempt]);
 
-  const now = useMemo(() => new Date(), []);
-  const offers = useMemo(
-    () => (load.kind === "ready" ? applyFilters(load.data.offers, filter, { now, birthDate }) : []),
-    [load, filter, now, birthDate],
+  // Erst nach dem ersten Rendern mit Daten dürfen Kacheln sich einkleben (LCP, Plan 0003 E6).
+  useEffect(() => {
+    if (load.kind === "ready") setAnimate(true);
+  }, [load.kind]);
+
+  const offers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
+  const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
+  const unfitIds = useMemo(
+    () => new Set(birthDate ? splitByAge(upcoming, birthDate, now).unfit.map((o) => o.id) : []),
+    [upcoming, birthDate, now],
+  );
+  const filtered = useMemo(() => applyFilters(offers, route.filter, { now }), [offers, route.filter, now]);
+  const useAge = ageOnly && birthDate !== undefined;
+  const hiddenCount = useAge ? filtered.filter((o) => unfitIds.has(o.id)).length : 0;
+  const visible = useMemo(
+    () => (useAge && !showUnfit ? filtered.filter((o) => !unfitIds.has(o.id)) : filtered),
+    [filtered, useAge, showUnfit, unfitIds],
+  );
+  const groups = useMemo(() => groupByNextSession(visible, now), [visible, now]);
+  const page = takeGroups(groups, limit);
+  const calendarIndex = useMemo(
+    () => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX),
+    [visible, route.tab],
+  );
+  const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
+  const detailOffer = route.offerId ? offers.find((o) => o.id === route.offerId) : undefined;
+
+  // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler): Parameter entfernen.
+  useEffect(() => {
+    if (load.kind === "ready" && route.offerId && !detailOffer) closeDetail();
+  }, [load.kind, route.offerId, detailOffer, closeDetail]);
+
+  const setFilter = (filter: FilterState) => {
+    replace({ ...route, filter });
+    setLimit(PAGE);
+  };
+  const setBirthDate = (value: string | undefined) => {
+    setBirthDateStored(value);
+    setShowUnfit(false);
+  };
+  const onTab = (tab: Tab) => {
+    replace({ ...route, tab });
+    window.scrollTo({ top: 0 });
+  };
+  const onToggleSave = useCallback(
+    (offer: SiteOffer) =>
+      say(
+        toggleSaved(offer.id)
+          ? "Eingeklebt – liegt jetzt in deinem Stickerheft"
+          : "Sticker abgelöst – nicht mehr gemerkt",
+      ),
+    [say, toggleSaved],
   );
 
-  const toggleFormat = (f: (typeof FORMATS)[number]) =>
-    setFilter({
-      ...filter,
-      formats: filter.formats.includes(f) ? filter.formats.filter((x) => x !== f) : [...filter.formats, f],
-    });
+  const ctx: CardContext = {
+    now,
+    animate,
+    isSaved: (id) => savedIds.includes(id),
+    isUnfit: (id) => birthDate !== undefined && unfitIds.has(id),
+    onToggleSave,
+    onOpen: (offer, day) => {
+      setDetailDay(day);
+      openDetail(offer.id);
+    },
+  };
+  const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
+  const dialogOpen = sheet !== null || detailOffer !== undefined;
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-16">
-      <header className="pt-6 pb-4">
-        <h1 className="font-bold text-3xl">Zwergenplan</h1>
-        <p className="text-(--color-muted)">Angebote für Kinder unter 3 in Nürnberg · Vorschau, Design folgt</p>
-      </header>
-
-      <section aria-label="Filter" className="flex flex-col gap-4 pb-4">
-        <fieldset className="flex flex-wrap gap-2">
-          <legend className="mb-2 font-semibold">Art des Angebots</legend>
-          {FORMATS.map((f) => {
-            const active = filter.formats.includes(f);
-            return (
-              <button
-                key={f}
-                type="button"
-                aria-pressed={active}
-                onClick={() => toggleFormat(f)}
-                className={`min-h-11 rounded-full border px-4 ${
-                  active
-                    ? "border-(--color-accent) bg-(--color-accent) text-(--color-accent-ink)"
-                    : "border-(--color-line) bg-(--color-surface)"
-                }`}
-              >
-                {FORMAT_LABELS[f]}
-              </button>
-            );
-          })}
-        </fieldset>
-        <label className="flex flex-col gap-1">
-          <span className="font-semibold">Geburtsdatum des Kindes</span>
-          <input
-            type="date"
-            value={birthDate ?? ""}
-            onChange={(e) => {
-              const value = e.target.value || undefined;
-              setBirthDate(value);
-              saveBirthDate(value);
-            }}
-            className="min-h-11 w-full min-w-0 max-w-full rounded-lg border border-(--color-line) bg-(--color-surface) px-3 text-base"
-          />
-          <span className="text-(--color-muted) text-sm">Bleibt nur auf diesem Gerät.</span>
-        </label>
-      </section>
-
-      {load.kind === "loading" && <p role="status">Lade Angebote …</p>}
-      {load.kind === "error" && <p role="alert">{load.message}</p>}
-      {load.kind === "ready" && (
-        <>
-          <p role="status" className="pb-2 text-(--color-muted)">
-            {offers.length === 0 ? "Noch keine passenden Angebote – Daten folgen." : `${offers.length} Angebote`}
-          </p>
-          <ul className="flex flex-col gap-3">
-            {offers.map((offer) => (
-              <OfferCard key={offer.id} offer={offer} now={now} />
-            ))}
-          </ul>
-        </>
+    <div className="app">
+      <Header
+        ageLabel={ageLabel}
+        dark={theme.dark}
+        onKid={() => setSheet("kid")}
+        onToggleTheme={() => theme.setChoice(theme.dark ? "hell" : "dunkel")}
+      />
+      {route.tab === "entdecken" && <Stickers filter={route.filter} onChange={setFilter} />}
+      {route.tab !== "merkliste" && (
+        <QuickFilters filter={route.filter} onChange={setFilter} onOpenSheet={() => setSheet("filter")} />
       )}
-    </main>
-  );
-}
+      <main className="body">
+        {load.kind === "loading" && (
+          <>
+            <p className="status" role="status">
+              Lade Angebote …
+            </p>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="card placeholder" aria-hidden="true" />
+            ))}
+          </>
+        )}
+        {load.kind === "error" && (
+          <div className="empty" role="alert">
+            <b>Das hat nicht geklappt</b>
+            {load.message}
+            <br />
+            <button type="button" className="linkbtn" onClick={() => setAttempt((n) => n + 1)}>
+              Nochmal versuchen
+            </button>
+          </div>
+        )}
+        {load.kind === "ready" && route.tab !== "merkliste" && (
+          <>
+            <p className="status" role="status">
+              <span>
+                <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
+              </span>
+            </p>
+            {hiddenCount > 0 && (
+              <p className="status">
+                {plural(hiddenCount, "passt", "passen")} nicht zu {ageLabel}
+                <button type="button" className="linkbtn" onClick={() => setShowUnfit(!showUnfit)}>
+                  {showUnfit ? "ausblenden" : "trotzdem zeigen"}
+                </button>
+              </p>
+            )}
+          </>
+        )}
+        {load.kind === "ready" && route.tab === "entdecken" && (
+          <>
+            <ListView
+              groups={page.groups}
+              remaining={page.remaining}
+              onMore={() => setLimit((n) => n + PAGE)}
+              today={today}
+              ctx={ctx}
+              hasData={offers.length > 0}
+              onResetFilter={() => setFilter(EMPTY_FILTER)}
+            />
+            <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>
+          </>
+        )}
+        {load.kind === "ready" && route.tab === "kalender" && (
+          <CalendarView
+            index={calendarIndex}
+            today={today}
+            lastDay={lastSessionDay(visible)}
+            day={calendarDay}
+            onDay={setCalendarDay}
+            monthOpen={monthOpen}
+            onMonthOpen={setMonthOpen}
+            ctx={ctx}
+          />
+        )}
+        {load.kind === "ready" && route.tab === "merkliste" && (
+          <SavedView
+            offers={saved}
+            generatedAt={load.data.generatedAt}
+            ctx={ctx}
+            onDiscover={() => onTab("entdecken")}
+            onExported={say}
+          />
+        )}
+      </main>
+      <TabBar tab={route.tab} savedCount={saved.length} onTab={onTab} />
+      <Toast message={dialogOpen ? "" : toast} />
 
-function OfferCard({ offer, now }: { offer: SiteOffer; now: Date }) {
-  const next = nextSession(offer, now);
-  const icsLabel =
-    offer.format === "einmalig" ? "In den Kalender" : `Alle ${offer.sessions.length} Termine in den Kalender`;
-  return (
-    <li className="rounded-2xl border border-(--color-line) bg-(--color-surface) p-4" data-testid="offer">
-      <h2 className="break-words font-semibold text-lg">{offer.title}</h2>
-      <p className="text-(--color-muted)">
-        {offer.providerName} · {offer.venue.district ?? offer.venue.name}
-      </p>
-      {next && <p className="pt-1">Nächster Termin: {formatSession(next)}</p>}
-      <p className="pt-1 text-sm">{facts(offer).join(" · ")}</p>
-      <p className="pt-1 text-(--color-muted) text-sm">
-        {categoriesOf(offer.topics)
-          .map((c) => CATEGORY_LABELS[c])
-          .join(" · ")}
-      </p>
-      <div className="flex flex-wrap gap-2 pt-3">
-        <a
-          href={assetUrl(seriesIcsPath(offer))}
-          className="inline-flex min-h-11 items-center rounded-full bg-(--color-accent) px-4 font-semibold text-(--color-accent-ink)"
-        >
-          {icsLabel}
-        </a>
-        <a
-          href={offer.url}
-          rel="noopener"
-          target="_blank"
-          className="inline-flex min-h-11 items-center rounded-full border border-(--color-line) px-4"
-        >
-          Zum Anbieter
-        </a>
-      </div>
-    </li>
+      <Dialog
+        open={detailOffer !== undefined}
+        onClose={closeDetail}
+        label={detailOffer?.title ?? "Angebot"}
+        className="detail"
+        toast={toast}
+      >
+        {detailOffer && (
+          <DetailContent
+            key={detailOffer.id}
+            offer={detailOffer}
+            now={now}
+            day={detailDay}
+            birthDate={birthDate}
+            saved={savedIds.includes(detailOffer.id)}
+            onToggleSave={onToggleSave}
+            onClose={closeDetail}
+            onIcs={say}
+          />
+        )}
+      </Dialog>
+      <Dialog open={sheet === "filter"} onClose={() => setSheet(null)} label="Filter" className="sheet" toast={toast}>
+        <FilterSheet
+          filter={route.filter}
+          onChange={setFilter}
+          resultCount={visible.length}
+          onClose={() => setSheet(null)}
+        />
+      </Dialog>
+      <Dialog
+        open={sheet === "kid"}
+        onClose={() => setSheet(null)}
+        label="Kind und Einstellungen"
+        className="sheet"
+        toast={toast}
+      >
+        <KidSheet
+          birthDate={birthDate}
+          onBirthDate={setBirthDate}
+          ageOnly={ageOnly}
+          onAgeOnly={setAgeOnly}
+          theme={theme.choice}
+          onTheme={theme.setChoice}
+          today={today}
+          onClose={() => setSheet(null)}
+        />
+      </Dialog>
+    </div>
   );
 }

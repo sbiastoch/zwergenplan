@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { addDays, addMonths, fromBerlinLocal, isoWeekday, toBerlinIso } from "./time.ts";
+import {
+  addDays,
+  addMonths,
+  berlinIsoDate,
+  formatGermanDate,
+  fromBerlinLocal,
+  isoWeekday,
+  parseGermanDate,
+  toBerlinIso,
+} from "./time.ts";
 
 describe("fromBerlinLocal", () => {
   it("setzt den Offset nach Sommer- bzw. Winterzeit", () => {
@@ -51,5 +60,46 @@ describe("Kalenderrechnung", () => {
   it("liefert den ISO-Wochentag (1 = Montag)", () => {
     expect(isoWeekday("2026-10-05")).toBe(1);
     expect(isoWeekday("2026-10-11")).toBe(7);
+  });
+});
+
+describe("berlinIsoDate", () => {
+  it("liefert den Berliner Kalendertag, auch kurz nach Mitternacht", () => {
+    expect(berlinIsoDate(new Date("2026-10-05T22:30:00Z"))).toBe("2026-10-06");
+    expect(berlinIsoDate("2026-10-05T23:59:00+02:00")).toBe("2026-10-05");
+    expect(berlinIsoDate("2026-12-31T23:30:00Z")).toBe("2027-01-01");
+  });
+});
+
+describe("parseGermanDate", () => {
+  const today = "2026-10-05";
+
+  it("liest TT.MM.JJJJ mit und ohne führende Nullen", () => {
+    expect(parseGermanDate("02.11.2025", today)).toBe("2025-11-02");
+    expect(parseGermanDate("2.1.2026", today)).toBe("2026-01-02");
+    expect(parseGermanDate("  05.10.2026 ", today)).toBe("2026-10-05");
+  });
+
+  it("akzeptiert die iOS-Zifferntastatur: ohne Trenner oder mit Komma, Schrägstrich, Leerzeichen", () => {
+    expect(parseGermanDate("01092026", today)).toBe("2026-09-01");
+    expect(parseGermanDate("1,9,2026", today)).toBe("2026-09-01");
+    expect(parseGermanDate("1/9/2026", today)).toBe("2026-09-01");
+    expect(parseGermanDate("1 9 2026", today)).toBe("2026-09-01");
+    expect(parseGermanDate("1092026", today)).toBeUndefined();
+  });
+
+  it("lehnt ungültige Tage, Zukunft und andere Formate ab", () => {
+    expect(parseGermanDate("31.02.2026", today)).toBeUndefined();
+    expect(parseGermanDate("06.10.2026", today)).toBeUndefined();
+    expect(parseGermanDate("2026-01-02", today)).toBeUndefined();
+    expect(parseGermanDate("1.1.26", today)).toBeUndefined();
+    expect(parseGermanDate("", today)).toBeUndefined();
+    expect(parseGermanDate("00.01.2026", today)).toBeUndefined();
+  });
+});
+
+describe("formatGermanDate", () => {
+  it("schreibt TT.MM.JJJJ", () => {
+    expect(formatGermanDate("2025-11-02")).toBe("02.11.2025");
   });
 });

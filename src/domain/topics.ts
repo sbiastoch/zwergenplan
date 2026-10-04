@@ -59,7 +59,7 @@ export const TOPIC_CATEGORIES = {
   elterncafe: ["treffs-cafes"],
   stillcafe: ["treffs-cafes"],
   elterntreff: ["treffs-cafes"],
-  // Gemeinschaft, Singen, kurzer Ablauf. Eine eigene Kategorie „Glaube“ entscheidet die UI-Session (docs/ideas.md).
+  // Gemeinschaft, Singen, kurzer Ablauf. Keine eigene Kategorie „Glaube“ (entschieden in Plan 0003, E10).
   krabbelgottesdienst: ["treffs-cafes"],
   vaeter: [],
   muetter: [],

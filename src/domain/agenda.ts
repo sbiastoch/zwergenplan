@@ -1,0 +1,138 @@
+/**
+ * Kalender- und Listenlogik der Oberfläche: Welcher Termin eines Angebots zählt, wie Tage
+ * gruppiert und Raster gebaut werden. Alle Kalendertage sind Berliner Tage (time.ts).
+ */
+import { nextSession } from "./filter.ts";
+import type { Offer, Session } from "./schema.ts";
+import { addDays, berlinIsoDate, berlinKey, daysInMonth, isoWeekday, parseIsoDate } from "./time.ts";
+
+export interface Occurrence<T extends Offer = Offer> {
+  offer: T;
+  session: Session;
+}
+
+export interface DayGroup<I> {
+  /** Berliner Kalendertag (ISO) */
+  day: string;
+  items: I[];
+}
+
+function byStartThenTitle(a: Occurrence, b: Occurrence): number {
+  return Date.parse(a.session.start) - Date.parse(b.session.start) || a.offer.title.localeCompare(b.offer.title, "de");
+}
+
+function groupByDay<T extends Offer>(occurrences: Occurrence<T>[]): DayGroup<Occurrence<T>>[] {
+  const groups: DayGroup<Occurrence<T>>[] = [];
+  for (const occurrence of occurrences) {
+    const day = berlinIsoDate(occurrence.session.start);
+    const last = groups.at(-1);
+    if (last?.day === day) last.items.push(occurrence);
+    else groups.push({ day, items: [occurrence] });
+  }
+  return groups;
+}
+
+/** Liste „Entdecken“: jedes Angebot genau einmal, am nächsten nicht beendeten Termin. */
+export function groupByNextSession<T extends Offer>(offers: readonly T[], now: Date): DayGroup<Occurrence<T>>[] {
+  const occurrences: Occurrence<T>[] = [];
+  for (const offer of offers) {
+    const session = nextSession(offer, now);
+    if (session) occurrences.push({ offer, session });
+  }
+  return groupByDay(occurrences.sort(byStartThenTitle));
+}
+
+/**
+ * Schrittweises Rendern langer Listen: genau `limit` Einträge, die letzte Tagesgruppe notfalls gekürzt.
+ * (Ein Tag kann in echten Daten > 90 Angebote haben.) Der nächste Schritt setzt denselben Tag fort.
+ */
+export function takeGroups<I>(
+  groups: readonly DayGroup<I>[],
+  limit: number,
+): { groups: DayGroup<I>[]; remaining: number } {
+  const taken: DayGroup<I>[] = [];
+  let count = 0;
+  for (const group of groups) {
+    if (count >= limit) break;
+    const items = group.items.slice(0, limit - count);
+    taken.push(items.length === group.items.length ? group : { ...group, items });
+    count += items.length;
+  }
+  const total = groups.reduce((sum, g) => sum + g.items.length, 0);
+  return { groups: taken, remaining: total - count };
+}
+
+/**
+ * Alle Termine, nach Berliner Kalendertag indiziert, je Tag nach Beginn sortiert.
+ * Einmal je Datenstand/Filter berechnen: Kalender und Monatsraster lesen nur noch nach.
+ */
+export function sessionsByDay<T extends Offer>(offers: readonly T[]): Map<string, Occurrence<T>[]> {
+  const index = new Map<string, Occurrence<T>[]>();
+  for (const offer of offers) {
+    for (const session of offer.sessions) {
+      const day = berlinIsoDate(session.start);
+      const list = index.get(day);
+      if (list) list.push({ offer, session });
+      else index.set(day, [{ offer, session }]);
+    }
+  }
+  for (const list of index.values()) list.sort(byStartThenTitle);
+  return index;
+}
+
+/** Die 7 Tage (Mo–So) der Woche, in der `day` liegt. */
+export function weekDays(day: string): string[] {
+  const monday = addDays(day, 1 - isoWeekday(day));
+  return Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+}
+
+/** Monatsraster mit Montag als erster Spalte: Leerspalten vor dem 1. (`lead`) und alle Tage. */
+export function monthDays(day: string): { lead: number; days: string[] } {
+  const { year, month } = parseIsoDate(day);
+  const first = `${year}-${String(month).padStart(2, "0")}-01`;
+  return {
+    lead: isoWeekday(first) - 1,
+    days: Array.from({ length: daysInMonth(year, month) }, (_, i) => addDays(first, i)),
+  };
+}
+
+/** Letzter Berliner Tag, an dem irgendein Termin beginnt. */
+export function lastSessionDay(offers: readonly Offer[]): string | undefined {
+  let last: string | undefined;
+  for (const offer of offers) {
+    const session = offer.sessions.at(-1);
+    if (!session) continue;
+    const day = berlinIsoDate(session.start);
+    if (!last || day > last) last = day;
+  }
+  return last;
+}
+
+/** Kursfortschritt: wie viele Termine noch nicht beendet sind. */
+export function courseProgress(offer: Offer, now: Date): { total: number; remaining: number } {
+  const remaining = offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime()).length;
+  return { total: offer.sessions.length, remaining };
+}
+
+const clock = (instant: string) => berlinKey(instant).slice(9);
+
+/**
+ * Rhythmus der kommenden Termine (mindestens zwei): gemeinsamer ISO-Wochentag (1 = Mo) und ob es
+ * „jede Woche“ ist – lückenlos im 7-Tage-Abstand zur selben Uhrzeit. 14-täglich ist nicht `weekly`.
+ */
+export function rhythm(offer: Offer, now: Date): { weekday: number; weekly: boolean } | undefined {
+  const upcoming = offer.sessions.filter((s) => Date.parse(s.end) >= now.getTime());
+  if (upcoming.length < 2) return undefined;
+  const days = upcoming.map((s) => berlinIsoDate(s.start));
+  const weekday = isoWeekday(days[0] ?? "");
+  if (days.some((d) => isoWeekday(d) !== weekday)) return undefined;
+  const weekly = days.every((d, i) => i === 0 || addDays(days[i - 1] ?? "", 7) === d) && uniformTimes(upcoming);
+  return { weekday, weekly };
+}
+
+/** Haben alle Termine dieselbe Berliner Uhrzeit (Beginn und Ende)? */
+export function uniformTimes(sessions: readonly Session[]): boolean {
+  const [first] = sessions;
+  if (!first) return true;
+  return sessions.every((s) => clock(s.start) === clock(first.start) && clock(s.end) === clock(first.end));
+}

@@ -1,3 +1,5 @@
+/** Entdecken: Liste nach Tagen, Filter, Alter (Plan 0003, E7–E11, E16). Fixtures, Uhr Mo 5.10.2026 12:00. */
+import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
 
 test.beforeEach(async ({ page }) => {
@@ -5,12 +7,24 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Zwergenplan" })).toBeVisible();
 });
 
-test("zeigt kommende Angebote und blendet vergangene aus", async ({ page }) => {
-  const offers = page.getByTestId("offer");
-  await expect(offers).toHaveCount(8);
+const offers = (page: Page) => page.getByTestId("offer");
+
+async function setBirthDate(page: Page, text: string) {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  await page.getByLabel("Geburtsdatum").fill(text);
+  await page.getByRole("button", { name: "Fertig" }).click();
+}
+
+test("zeigt jedes kommende Angebot einmal, nach Tagen gruppiert, Vergangenes nicht", async ({ page }) => {
+  await expect(offers(page)).toHaveCount(8);
   await expect(page.getByText("Elterncafé am Montag")).toHaveCount(0);
-  await expect(offers.first()).toContainText("Offener Krabbeltreff");
-  await expect(offers.first()).toContainText("Nächster Termin: Mi., 7. Okt., 10:00–11:30 Uhr");
+  const firstDay = page.getByRole("heading", { level: 2 }).first();
+  await expect(firstDay).toHaveText(/Mittwoch\s*7\. Oktober/);
+  await expect(offers(page).first()).toContainText("Offener Krabbeltreff");
+  await expect(offers(page).first()).toContainText("10:00–11:30 Uhr");
+  await expect(offers(page).first()).toContainText("Jeden Mittwoch");
+  await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
+  await expect(page.getByText("Datenstand:")).toBeVisible();
 });
 
 test("ist für Suchmaschinen gesperrt und liegt unter dem Basis-Pfad", async ({ page }) => {
@@ -18,42 +32,78 @@ test("ist für Suchmaschinen gesperrt und liegt unter dem Basis-Pfad", async ({ 
   expect(new URL(page.url()).pathname).toBe("/zwergenplan/");
 });
 
-test("Format-Filter steht in der URL und überlebt ein Neuladen", async ({ page }) => {
-  await page.getByRole("button", { name: "Kurs" }).click();
-  await expect(page.getByRole("button", { name: "Kurs" })).toHaveAttribute("aria-pressed", "true");
+test("Schnellfilter und Sticker stehen in der URL und überleben ein Neuladen", async ({ page }) => {
+  await page.getByRole("button", { name: "Kurse", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Kurse", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/\?format=kurs$/);
-  await expect(page.getByTestId("offer")).toHaveCount(2);
+  await expect(offers(page)).toHaveCount(2);
 
   await page.reload();
-  await expect(page.getByTestId("offer")).toHaveCount(2);
-  await page.getByRole("button", { name: "Einmalig" }).click();
-  await expect(page).toHaveURL(/\?format=kurs,einmalig$/);
-  await expect(page.getByTestId("offer")).toHaveCount(5);
+  await expect(offers(page)).toHaveCount(2);
+  await page.getByRole("button", { name: /^Musik: Musik & Singen/ }).click();
+  await expect(page).toHaveURL(/\?kat=musik&format=kurs$/);
+  await expect(offers(page)).toHaveCount(1);
+  await expect(offers(page)).toContainText("Musikgarten 1");
+  await expect(page.getByRole("button", { name: "Alle Filter, 2 aktiv" })).toBeVisible();
 });
 
-test("Geburtsdatum filtert nach Alter, bleibt lokal und nie in der URL", async ({ page }) => {
-  await page.getByLabel("Geburtsdatum des Kindes").fill("2026-09-01");
-  await expect(page.getByTestId("offer")).toHaveCount(4);
-  expect(page.url()).not.toContain("2026-09-01");
+test("Filter-Sheet wirkt sofort, Einfachwahl bei Anmeldung, Zurücksetzen leert", async ({ page }) => {
+  await page.getByRole("button", { name: /^Alle Filter/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Filter" });
+  await expect(sheet).toBeVisible();
+  await sheet.getByRole("button", { name: "Ohne Anmeldung" }).click();
+  await expect(sheet.getByRole("button", { name: "Ohne Anmeldung" })).toHaveAttribute("aria-pressed", "true");
+  await expect(sheet.getByRole("button", { name: "Egal" }).first()).toHaveAttribute("aria-pressed", "false");
+  await expect(sheet.getByRole("button", { name: "3 Angebote zeigen" })).toBeVisible();
+  await sheet.getByRole("button", { name: "Mit Anmeldung" }).click();
+  await expect(sheet.getByRole("button", { name: "Ohne Anmeldung" })).toHaveAttribute("aria-pressed", "false");
+  await sheet.getByRole("button", { name: "Zurücksetzen" }).click();
+  await sheet.getByRole("button", { name: "8 Angebote zeigen" }).click();
+  await expect(sheet).toBeHidden();
+  await expect(page).toHaveURL(/\/zwergenplan\/$/);
+});
+
+test("Geburtsdatum filtert nach Alter, bleibt lokal und steht nie in der URL", async ({ page }) => {
+  // iOS-Zifferntastatur: ohne Punkte
+  await setBirthDate(page, "01092026");
+  await expect(offers(page)).toHaveCount(4);
+  await expect(page.getByRole("button", { name: /^Kind und Einstellungen/ })).toContainText("1 Mon.");
+  await expect(page.getByText("4 passen nicht zu 1 Mon.")).toBeVisible();
+  expect(page.url()).not.toMatch(/2026-09-01|01092026|01\.09/);
+
+  await page.getByRole("button", { name: "trotzdem zeigen" }).click();
+  await expect(offers(page)).toHaveCount(8);
+  await expect(page.locator(".card.unfit")).toHaveCount(4);
+  await expect(page.locator(".card.unfit").first()).toContainText("Monate");
+
   await page.reload();
-  await expect(page.getByLabel("Geburtsdatum des Kindes")).toHaveValue("2026-09-01");
-  await expect(page.getByTestId("offer")).toHaveCount(4);
+  await expect(offers(page)).toHaveCount(4);
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  await expect(page.getByLabel("Geburtsdatum")).toHaveValue("01.09.2026");
+  await expect(page.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
 });
 
-test("Kurs-ICS enthält alle Termine in korrekter Zeit", async ({ page, request }) => {
-  const card = page.getByTestId("offer").filter({ hasText: "PEKiP-Gruppe Herbst" });
-  const link = card.getByRole("link", { name: "Alle 8 Termine in den Kalender" });
-  const href = await link.getAttribute("href");
-  expect(href).toMatch(/^\/zwergenplan\/ics\/.+\.ics$/);
-  const res = await request.get(new URL(href ?? "", page.url()).toString());
-  expect(res.ok()).toBe(true);
-  expect(res.headers()["content-type"]).toContain("text/calendar");
-  const body = await res.text();
-  expect(body.match(/BEGIN:VEVENT/g)).toHaveLength(8);
-  expect(body).toContain("DTSTART:20261027T083000Z"); // 9:30 nach der Zeitumstellung
+test("„Nur passende“ aus zeigt alles, unpassende markiert", async ({ page }) => {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  await page.getByLabel("Geburtsdatum").fill("01.09.2026");
+  await page.getByRole("switch", { name: "Nur passende Angebote" }).click();
+  await page.getByRole("button", { name: "Fertig" }).click();
+  await expect(offers(page)).toHaveCount(8);
+  await expect(page.locator(".card.unfit")).toHaveCount(4);
 });
 
-test("Leerzustand bei Filtern ohne Treffer", async ({ page }) => {
-  await page.getByLabel("Geburtsdatum des Kindes").fill("2023-01-01");
-  await expect(page.getByRole("status")).toHaveText("Noch keine passenden Angebote – Daten folgen.");
+test("ungültiges Geburtsdatum wird erklärt und nicht gespeichert", async ({ page }) => {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  await page.getByLabel("Geburtsdatum").fill("31.02.2026");
+  await expect(page.getByText("Bitte als TT.MM.JJJJ eingeben")).toBeVisible();
+  await page.getByRole("button", { name: "Fertig" }).click();
+  await expect(offers(page)).toHaveCount(8);
+  await expect(page.getByRole("button", { name: /^Kind und Einstellungen/ })).toContainText("Alter?");
+});
+
+test("Leerzustand bei Filtern ohne Treffer, Zurücksetzen hilft", async ({ page }) => {
+  await page.goto("./?kat=wasser");
+  await expect(page.getByText("Diese Seite ist noch leer")).toBeVisible();
+  await page.getByRole("button", { name: "Filter zurücksetzen" }).click();
+  await expect(offers(page)).toHaveCount(8);
 });

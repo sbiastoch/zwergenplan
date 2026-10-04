@@ -10,15 +10,33 @@ const MIN_TOUCH = 44;
 /** WCAG 2.2 AA (2.5.8) für Links im Fließtext. */
 const MIN_INLINE = 24;
 
+/**
+ * Erst messen, wenn endliche Animationen (Einkleben, Plop, Aufklappen) durch sind: Mitten in
+ * `scale(.98)` ist ein 44-px-Knopf 43 px groß. WebKit spielt sie trotz `reducedMotion` ab.
+ * Endlos-Animationen (Wackeln im Leerzustand) zählen nicht.
+ */
+async function settle(page: Page) {
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getTiming().iterations !== Number.POSITIVE_INFINITY)
+        .map((a) => a.finished.catch(() => undefined)),
+    ),
+  );
+}
+
 export async function expectNoHorizontalScroll(page: Page) {
+  await settle(page);
   const result = await page.evaluate(() => {
     const overflow = document.documentElement.scrollWidth - window.innerWidth;
-    // Verursacher benennen, damit der Fehler ohne Debugging behebbar ist.
+    // Verursacher benennen, damit der Fehler ohne Debugging behebbar ist (clientWidth: ohne Scrollleiste).
+    const width = document.documentElement.clientWidth;
     const culprits = [...document.querySelectorAll<HTMLElement>("body *")]
-      .filter((el) => el.getBoundingClientRect().right > window.innerWidth + 0.5)
+      .filter((el) => el.getBoundingClientRect().right > width + 0.5)
       .map(
         (el) =>
-          `${el.tagName.toLowerCase()}${el.className ? `.${String(el.className).split(" ")[0]}` : ""} (rechts ${Math.round(el.getBoundingClientRect().right)} > ${window.innerWidth})`,
+          `${el.tagName.toLowerCase()}${el.className ? `.${String(el.className).split(" ")[0]}` : ""} (rechts ${Math.round(el.getBoundingClientRect().right)} > ${width})`,
       )
       .slice(0, 5);
     return { overflow, culprits };
@@ -92,7 +110,7 @@ export async function expectVisibleFocus(page: Page, maxTabs = 40) {
 
 /** Alle schnellen Layout-Prüfungen auf einmal. */
 export async function expectMobileUx(page: Page) {
-  await expectNoHorizontalScroll(page);
+  await expectNoHorizontalScroll(page); // wartet per settle() auf Animationen
   await expectTouchTargets(page);
   await expectNoInputZoom(page);
   await expectAccessible(page);

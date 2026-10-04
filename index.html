@@ -5,8 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#e8f1ff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1620" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Babykurse, Krabbelgruppen und Ausflüge für Kinder unter 3 Jahren in Nürnberg." />
     <title>Zwergenplan</title>
+    <!-- Daten parallel zum JS laden statt danach (LCP, Plan 0003 E8); Pfad wie in src/data/site.ts -->
+    <link rel="preload" href="/data/site.json" as="fetch" crossorigin="anonymous" />
+    <script>
+      // Darstellung vor dem ersten Paint setzen (kein Aufblitzen). Schlüssel wie in src/data/preferences.ts.
+      try {
+        const choice = localStorage.getItem("zwergenplan.darstellung");
+        if (choice === "hell") document.documentElement.dataset.theme = "light";
+        if (choice === "dunkel") document.documentElement.dataset.theme = "dark";
+      } catch {
+        // kein Speicher (privater Modus): automatisch
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

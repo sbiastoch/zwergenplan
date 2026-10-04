@@ -1,4 +1,3 @@
-import { offerFitsAge } from "./age.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
 import { CATEGORIES, type Category, categoriesOf } from "./topics.ts";
 
@@ -63,10 +62,27 @@ function matches<T>(selected: readonly T[], value: T): boolean {
 export interface FilterContext {
   /** „Jetzt“ – injiziert, damit Tests und E2E deterministisch sind. */
   now: Date;
-  birthDate?: string | undefined;
 }
 
-/** Angebote, deren letzter Termin vorbei ist, fallen immer heraus. */
+/** Anzahl gewählter Werte über alle Dimensionen (Badge am Filter-Knopf). */
+export function activeFilterCount(state: FilterState): number {
+  return state.categories.length + state.formats.length + state.registration.length + state.cost.length;
+}
+
+type Dimension = keyof FilterState;
+
+/** Schaltet einen Wert einer Dimension um und lässt alles andere unverändert. */
+export function toggleIn<D extends Dimension>(state: FilterState, dim: D, value: FilterState[D][number]): FilterState {
+  const list: readonly string[] = state[dim];
+  const next = list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+  return { ...state, [dim]: next };
+}
+
+/**
+ * Angebote, deren letzter Termin vorbei ist, fallen immer heraus.
+ * Das Alter filtert hier bewusst nicht: Die Oberfläche zeigt unpassende Angebote auf Wunsch
+ * markiert an (`splitByAge` in age.ts).
+ */
 export function applyFilters<T extends Offer>(offers: readonly T[], state: FilterState, ctx: FilterContext): T[] {
   const nowMs = ctx.now.getTime();
   return offers.filter((o) => {
@@ -79,7 +95,6 @@ export function applyFilters<T extends Offer>(offers: readonly T[], state: Filte
       const cats = categoriesOf(o.topics);
       if (!cats.some((c) => state.categories.includes(c))) return false;
     }
-    if (ctx.birthDate && !offerFitsAge(o, ctx.birthDate, ctx.now)) return false;
     return true;
   });
 }

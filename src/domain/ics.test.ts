@@ -1,6 +1,14 @@
 import ICAL from "ical.js";
 import { describe, expect, it } from "vitest";
-import { escapeText, foldLine, icsForSeries, icsForSession, seriesIcsPath, sessionIcsPath } from "./ics.ts";
+import {
+  escapeText,
+  foldLine,
+  icsForCollection,
+  icsForSeries,
+  icsForSession,
+  seriesIcsPath,
+  sessionIcsPath,
+} from "./ics.ts";
 import { fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
 const { providers, file } = loadFixtures();
@@ -62,6 +70,31 @@ describe("icsForSession", () => {
     expect(() =>
       icsForSession(treff, { start: "2030-01-01T10:00:00+01:00", end: "2030-01-01T11:00:00+01:00" }, ctxFor(treff.id)),
     ).toThrow();
+  });
+});
+
+describe("icsForCollection", () => {
+  const pekip = fixtureOffer("pekip-herbst");
+  const treff = fixtureOffer("krabbeltreff");
+  const ics = icsForCollection(
+    [
+      { offer: pekip, sessions: pekip.sessions, ctx: ctxFor(pekip.id) },
+      { offer: treff, sessions: treff.sessions.slice(2), ctx: ctxFor(treff.id) },
+    ],
+    "Zwergenplan – Merkliste",
+  );
+
+  it("bündelt mehrere Angebote in einem Kalender", () => {
+    expect(ics.match(/BEGIN:VCALENDAR/g)).toHaveLength(1);
+    expect(parseEvents(ics)).toHaveLength(8 + 3);
+    expect(ics).toContain("X-WR-CALNAME:Zwergenplan – Merkliste");
+  });
+
+  it("nutzt dieselben UIDs und Titel wie die Einzeldateien", () => {
+    const single = parseEvents(icsForSeries(pekip, ctxFor(pekip.id)));
+    const events = parseEvents(ics);
+    expect(events.slice(0, 8).map((e) => [e.uid, e.summary])).toEqual(single.map((e) => [e.uid, e.summary]));
+    expect(events[8]?.uid).toBe(`${treff.id}--20261021T1000@zwergenplan`);
   });
 });
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { ageInMonths, fitsAgeAt, offerFitsAge } from "./age.ts";
-import { FIXTURE_NOW, fixtureOffer } from "./test-fixtures.ts";
+import { ageCheck, ageInMonths, fitsAgeAt, offerFitsAge, splitByAge } from "./age.ts";
+import { applyFilters, EMPTY_FILTER } from "./filter.ts";
+import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
 describe("ageInMonths", () => {
   it("zählt vollendete Monate am Berliner Kalendertag", () => {
@@ -67,5 +68,54 @@ describe("offerFitsAge", () => {
 
   it("läuft wirklich in einer fremden Zeitzone (sonst wären die Berlin-Tests wertlos)", () => {
     expect(Intl.DateTimeFormat().resolvedOptions().timeZone).toBe("America/Los_Angeles");
+  });
+});
+
+describe("splitByAge", () => {
+  it("teilt nach der Altersregel, Reihenfolge bleibt", () => {
+    const upcoming = applyFilters(loadFixtures().file.offers, EMPTY_FILTER, { now: FIXTURE_NOW });
+    // Kind geb. 1.9.2026: im Oktober 1 Monat alt
+    const { fitting, unfit } = splitByAge(upcoming, "2026-09-01", FIXTURE_NOW);
+    expect(fitting.map(fixtureKey)).toEqual([
+      "pekip-herbst",
+      "babymassage-workshop",
+      "krabbelreime",
+      "babykonzert-advent",
+    ]);
+    expect(unfit).toHaveLength(upcoming.length - 4);
+    expect(unfit.map(fixtureKey)).toContain("krabbeltreff");
+  });
+});
+
+describe("ageCheck", () => {
+  it("prüft Kurse und Einzeltermine zum ersten Termin", () => {
+    const pekip = fixtureOffer("pekip-herbst"); // Start Di 13.10.
+    expect(ageCheck(pekip, "2026-09-10", FIXTURE_NOW)).toEqual({
+      fits: true,
+      at: "2026-10-13T09:30:00+02:00",
+      months: 1,
+    });
+    expect(ageCheck(pekip, "2026-04-13", FIXTURE_NOW)?.fits).toBe(false);
+  });
+
+  it("hat ohne kommende Termine nichts zu erklären", () => {
+    expect(ageCheck(fixtureOffer("krabbeltreff"), "2026-05-01", new Date("2027-01-01T12:00:00+01:00"))).toBeUndefined();
+  });
+
+  it("nimmt bei regelmäßigen Angeboten den ersten passenden kommenden Termin", () => {
+    const treff = fixtureOffer("krabbeltreff"); // 6–24 Monate, mittwochs ab 7.10.
+    const check = ageCheck(treff, "2026-05-01", FIXTURE_NOW); // wird am 1.11. 6 Monate
+    expect(check).toEqual({ fits: true, at: "2026-11-04T10:00:00+01:00", months: 6 });
+    expect(ageCheck(treff, "2026-06-01", FIXTURE_NOW)).toMatchObject({ fits: false, at: "2026-10-07T10:00:00+02:00" });
+  });
+
+  it("prüft einen vorgegebenen Termin einer regelmäßigen Reihe (aus dem Kalender)", () => {
+    const treff = fixtureOffer("krabbeltreff");
+    const first = treff.sessions[0];
+    expect(first && ageCheck(treff, "2026-05-01", FIXTURE_NOW, first)).toEqual({
+      fits: false,
+      at: "2026-10-07T10:00:00+02:00",
+      months: 5,
+    });
   });
 });
