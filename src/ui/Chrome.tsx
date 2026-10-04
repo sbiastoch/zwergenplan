@@ -82,14 +82,17 @@ export function Stickers({ filter, onChange }: { filter: FilterState; onChange: 
 
 export function QuickFilters({
   filter,
+  hasOrigin,
   onChange,
   onOpenSheet,
 }: {
   filter: FilterState;
+  /** ohne Startpunkt zählt der Umkreis nicht mit (Plan 0004, E7) */
+  hasOrigin: boolean;
   onChange: (f: FilterState) => void;
   onOpenSheet: () => void;
 }) {
-  const count = activeFilterCount(filter);
+  const count = activeFilterCount(filter, { hasOrigin });
   const chips = [
     { label: "Kostenlos", on: filter.cost.includes("kostenlos"), next: () => toggleIn(filter, "cost", "kostenlos") },
     {
