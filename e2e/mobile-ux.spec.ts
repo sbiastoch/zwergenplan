@@ -94,6 +94,17 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(sheet.getByRole("button", { name: "bis 5 km" })).toHaveAttribute("aria-pressed", "true");
     await sheet.getByRole("heading", { name: "Entfernung" }).scrollIntoViewIfNeeded();
   },
+  // geteilter Link mit Umkreis, aber ohne Startpunkt: Hinweis mit „Startpunkt wählen“ unter der Statuszeile
+  "entdecken-umkreis-ohne-startpunkt": async (page) => {
+    await page.goto("./?umkreis=10");
+    await expect(page.getByText("„bis 10 km“ braucht einen Startpunkt.")).toBeVisible();
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+  },
+  "detail-entfernung": async (page) => {
+    await withGostenhof(page);
+    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    await expect(page.getByRole("dialog").getByText("ca. 1,4 km Luftlinie ab Gostenhof")).toBeVisible();
+  },
 };
 
 /**
