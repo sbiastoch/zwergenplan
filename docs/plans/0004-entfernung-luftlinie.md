@@ -1,6 +1,6 @@
 # Plan 0004 – Entfernung als Luftlinie ab einem Startpunkt
 
-Status: freigegeben nach Review (mit Änderungen, eingearbeitet) → wartet auf die Nacharbeit zu Plan 0003
+Status: umgesetzt auf Branch `entfernung-0004` (Schritte 2–7, Basis `nacharbeit-0007`), Arch-Review eingearbeitet → offen: Schritt 8 (Push, CI, Fast-Forward nach `main`) und 9 (`/browser-review live`)
 Datum: 2026-10-04
 Bezug: Plan 0003 (E1: „Karte und Entfernung kommen in Plan 0004“), ADR 0005 (ÖPNV-Fahrzeit als Ziel). Die Karte folgt in Plan 0005 (ADR 0008) und baut auf diesem Plan auf.
 
@@ -302,6 +302,17 @@ Außerdem:
 Keine Schwelle wird gesenkt, kein Gate geändert. Neu sind nur Tests und Gate-Aufrufe für die erweiterten Sheets.
 
 - Budget: Dazu kommen geschätzt ~1 kB Domäne, ~0,6 kB Stadtteile und ~1,5–2 kB UI, also ca. +3–3,5 kB gzip. **Gemessen wird nach Schritt 3** (Domäne + `OriginPicker` verdrahtet) mit `pnpm build && pnpm size`, Ergebnis hier notieren.
+- **Gemessen** (gzip, `pnpm build && pnpm size`, echte Daten):
+
+  | Stand | JS / 90 kB | CSS / 15 kB |
+  |---|---|---|
+  | Ausgang (Plan 0007, Paket A) | 82,66 | 8,58 |
+  | nach der Domäne (Schritt 3, vor `OriginPicker`) | 83,7 | 8,58 |
+  | nach Schritt 3/4 (UI verdrahtet) | 85,66 | 8,75 |
+  | nach Schritt 5 (E2E, Fokus-Rückweg) | 85,73 | 8,75 |
+  | nach Rebase auf `nacharbeit-0007` (Plan 0007 A+B) und Arch-Review | 85,92 | 9,58 |
+
+  Plan 0004 kostet damit +3,25 kB JS (Schätzung +3–3,5 kB) und +0,18 kB CSS gegenüber `nacharbeit-0007` (82,67 / 9,40). Die Warnschwelle 88 kB ist nicht erreicht, der Ausweg über `stadtteile.json` bleibt ungenutzt.
 - Wird es knapp (> 88 kB nach Schritt 3), gibt es einen Ausweg ohne Budget-Änderung: Die Stadtteil-Tabelle wird `public/data/stadtteile.json` (vom Build aus `src/domain/districts.ts` geschrieben) und beim Öffnen des Kind-Sheets über `src/data` geladen. Die Speicherregel bleibt gleich: Gespeichert ist nur die ID. Für die Entfernung nach dem Neuladen lädt die App die JSON-Datei vom eigenen Origin, sobald eine ID gespeichert ist. Das ist kein Drittanbieter-Request und verrät nichts.
 
 ## Schritte
@@ -359,3 +370,56 @@ Der Review lief auf dem gemeinsamen Entwurf `0004-karte-luftlinie.md`. Hier steh
 - **Minor** `architecture.md`: Geolocation in `src/data` und Privatsphäre-Invariante als Schritt 6 (E8).
 - **Minor** `test.use({ tiles: "mock" })`: entfällt hier (kein Kachel-Request); in 0005 eingearbeitet.
 - Die übrigen Befunde (B1 Theme-Wechsel, M1, M2, M5, M6 und die Karten-Minors) betreffen nur die Karte und sind in Plan 0005 eingearbeitet.
+
+## Umsetzung (2026-10-04)
+
+Branch `entfernung-0004`, zuerst auf „Plan 0007 Paket A“, danach auf `nacharbeit-0007` (Plan 0007 A+B) umgesetzt. Die Einzelheiten stehen in den Commit-Messages. Hier stehen die Abweichungen vom Plan, je mit einem Satz Begründung.
+
+**Domäne und Daten**
+- **`applyFilters` verlangt `T extends Offer & { venue: ReachTarget }` (E7):** Der Umkreis braucht den Ort. Die Unit-Tests filtern deshalb `SiteOffer`-Fixtures (Helfer `fixtureSiteOffers`), in `age.test.ts` ändert sich nur die erwartete Reihenfolge.
+- **`withReachLimit` (E7):** Neu in `filter.ts`. Es setzt den Umkreis als Einfachwahl oder entfernt ihn. Ohne Umkreis fehlt der Schlüssel ganz, damit der Zustand `EMPTY_FILTER` gleicht. `toggleIn` bleibt auf die Mehrfachwahl beschränkt.
+- **`LocationEnv { geolocation, isSecureContext }` statt nur der API (E3):** So ist auch der sichere Kontext ohne Browser testbar. `PositionApi` ist ein minimales Interface, in das `navigator.geolocation` passt, die Stubs brauchen deshalb keinen `as`-Cast.
+- **Typ-Exporte erst bei Bedarf (knip):** `OriginSource` und `RadiusKm` bleiben modul-intern. `PositionProblem` wird exportiert, seit `OriginPicker` und `useOrigin` es brauchen.
+- **Gesamt-Zeitlimit 15 s in `requestPosition` (Arch-Review m2):** Das Zeitlimit der API zählt erst ab der Freigabe. Bei offenem Berechtigungsdialog hinge die Suche sonst.
+- **`preferences.ts` liefert die rohe Stadtteil-ID (Arch-Review M2):** Ob die ID gilt, prüft `useOrigin`. `src/data` importiert zur Laufzeit nur `geo` (ADR 0010).
+
+**UI**
+- **`KidSheet` in `KidSheet.tsx` (E5):** `Sheets.tsx` wäre mit `OriginPicker` und der neuen Filtergruppe bei ~275 Zeilen gelandet. Nach dem Rebase hat `KidSheet` dieselbe Hülle `.sheet-scroll` wie das Filter-Sheet (Plan 0007, H7).
+- **Texte (E6):** `format.ts` hat zusätzlich `distanceNote` (Statuszeile) und `reachLimitLabel` („bis 5 km“, Filter-Sheet und Umkreis-Hinweis).
+- **Live-Region im `OriginPicker` (E5):** ein `<div aria-live="polite">`, der den `.hint` nur bei Text enthält. Ein leerer `.hint` wäre ein leerer Rahmen.
+- **Leere Option „Stadtteil wählen …“ ist `disabled` (E5):** Der einzige Weg zurück bleibt „Startpunkt entfernen“.
+- **„Startpunkt wählen“ öffnet das Kind-Sheet mit Fokus auf der Stadtteil-Auswahl (E7):** Dafür setzt die Komponente das HTML-Attribut `autofocus`, das `showModal()` beachtet. Das funktioniert auch in WebKit.
+- **Fokus-Rückweg (E7, beim ersten E2E-Lauf gefunden):** Nach der Wahl über den Umkreis-Hinweis verschwand der Auslöser, und der Fokus fiel auf `<body>`. `Dialog` hat dafür `fallbackFocus`, beim Kind-Sheet ist das „Alle Filter“.
+- **„Für heute ist alles vorbei“ beachtet den Umkreis:** `matchesFilter` bekommt den Startpunkt. `dataEnd` bleibt ungefiltert.
+- **Statuszeile (E6):** Der Entfernungshinweis steht in einer eigenen Zeile ohne „·“. Er brach bei 320–390 px ohnehin um und begann dann mit einem verwaisten Punkt. Für Screenreader trennt ein „. “ die beiden Sätze.
+- **„Suche Standort …“ mit `aria-busy` statt `disabled` (Arch-Review m4):** Ein gesperrter Knopf verlöre den Fokus. Ein Tipp während der Suche tut nichts.
+- **Zustand als Reducer (Arch-Review m1):** `originReducer` in `src/ui/origin-state.ts`. `useMyLocation` heißt jetzt `locateMe` (m5).
+
+**Tests und Gates**
+- **`startpunkt.spec.ts`:** Beim ersten Lauf grün, 35/35, auch in WebKit (`autofocus` mit `showModal()`, `grantPermissions`) und ohne Request nach der Wahl. Dazu kamen Fokus-Rückweg (mit und ohne Wahl), „Standort antwortet nie“ (15 s per `page.clock`, `aria-busy`, Fokus bleibt) und die Statuszeile ohne „·“.
+- **`mobile-ux.spec.ts`:** Neue Ansichten `entdecken-startpunkt`, `kind-sheet-startpunkt`, `filter-sheet-entfernung`, `entdecken-umkreis-ohne-startpunkt` und `detail-entfernung`. Sie laufen hell, dunkel, dunkel per Darstellung und bei 320 px / 200 %.
+- **`smoke.spec.ts`:** „Stadtteil als Startpunkt mit echten Daten“ mit Altstadt und `.meta .dist` auf `/^\d+(,\d)? k?m$/`, dazu den Gates aus Plan 0007 (`buttons: false`, `setTextScale`).
+- **Text-Gate, Prüfung 3 (nach dem Rebase):** Text, der ganz aus dem sichtbaren Bereich des nächsten senkrechten Scroll-Containers hinausgescrollt ist, zählt nicht mehr als „stößt an die Rundung“. Das gescrollte Filter-Sheet meldete sonst „Filter“, „Art“ und „Format“, die unsichtbar über dem Sheet lagen. Der Kanarienvogel-Test „Text-Gate erkennt Text in der Rundung, auch im Scroll-Container des Sheets“ belegt, dass sichtbarer Text in der Ecke weiter rot wird.
+- **`scripts/screenshots.ts`:** `kind` wählt zusätzlich Gostenhof. Neu sind `start-startpunkt` und `filter-entfernung`.
+- **Playwright-Port per `PW_PORT`:** damit parallele Worktrees nicht über `reuseExistingServer` den Build eines anderen testen (CLAUDE.md, Stolperfallen).
+
+**Ergebnis Schritt 5:** `PW_PORT=4273 pnpm check` ist grün, inklusive WebKit. Unter paralleler Last (Load Average 17–44 auf 16 Kernen) wurde der CPU-gedrosselte LCP-Test (`perf.spec.ts`, Smoke) einzeln rot (2,6–3,7 s). Einzeln wiederholt war er grün. Messwerte nach dem Rebase stehen in den Commit-Messages.
+
+**Screenshots (320 und 390 px, hell und dunkel):**
+- Kind-Sheet mit Startpunkt, Filter-Sheet mit „Entfernung“ und Entdecken mit Startpunkt sind sauber. Die Entfernung bricht nie zwischen Zahl und Einheit.
+- Mit den Fixtures ändert „bis 5 km“ nichts, weil alle Orte höchstens 3 km von Gostenhof entfernt sind.
+- Gefunden und behoben: der verwaiste „·“ in der Statuszeile.
+
+## Arch-Review (2026-10-04) – Verdict: Nacharbeit nötig, keine Blocker → eingearbeitet
+
+- **M1** `src/data` importiert erstmals Laufzeit-Code aus `src/domain`, das braucht eine Entscheidung und eine Regel. → ADR 0010 (`docs/adr/0010-data-nutzt-reine-domaenenhilfen.md`, angenommen) mit Verweis in `docs/architecture.md`. Dazu die dependency-cruiser-Regel `data-domain-runtime-allowlist` (von `^src/data/` ohne Tests nach `^src/domain/` außer `geo.ts`, Typ-Importe frei), belegt mit Kanarienvögeln in der Commit-Message.
+- **M2** Die Prüfung der Stadtteil-ID gehört nicht in den Speicherzugriff. → Variante (a): `preferences.ts` liefert die rohe ID, `useOrigin` prüft sie. Der Test „unbekannte ID zählt nicht“ steht in `use-app-state.test.ts`. Die Allowlist enthält nur `geo`.
+- **M3** Plan nachführen. → Budget-Messwerte (Tabelle unter „Backpressure“), Status, „Umsetzung“ und dieser Abschnitt.
+- **m1** Die Reihenfolge-Logik in `useOrigin` ist nur indirekt getestet. → reiner `originReducer` (`src/ui/origin-state.ts`) mit Tests: späte Antwort nach Stadtteil-Wahl und nach „Entfernen“, nur die neueste Abfrage zählt, ein Fehler lässt den Startpunkt stehen.
+- **m2** `requestPosition` kann ewig hängen. → eigenes Gesamt-Zeitlimit 15 s mit Ergebnis `timeout`, Unit-Test mit Fake-Timern und nie antwortendem Stub, dazu ein E2E mit `page.clock`.
+- **m3** Zwei Zustände ohne Gate. → `entdecken-umkreis-ohne-startpunkt` (`./?umkreis=10`) und `detail-entfernung` (`distanceLong`) in `VIEWS`.
+- **m4** `.btn:disabled` in `origin.css` traf jeden gesperrten Knopf. → `aria-busy="true"` am Standort-Knopf, CSS nur auf `.origin .btn[aria-busy="true"]`, E2E prüft `aria-busy` und Fokus.
+- **m5** `useMyLocation` sah wie ein Hook aus. → `locateMe`.
+- **m6** `PW_PORT` ist undokumentiert. → ein Satz in CLAUDE.md unter „Stolperfallen“. Der Standard von `scripts/screenshots.ts` bleibt.
+- **m7** In `docs/architecture.md` fehlt Geometrie/Entfernung in der Domänen-Zeile, und „UI fasst `navigator.geolocation` nicht an“ ist ungeprüft. → Schichten-Tabelle ergänzt. Biome `noRestrictedGlobals` für `src/ui` und `main.tsx` verbietet `navigator`, `localStorage` und `fetch`, mit Kanarienvögeln belegt. Der Umweg über `window.navigator` ist als „prüft der Review“ gekennzeichnet.
+- **Zusatz** (Screenshot-Befund): verwaister „·“ in der Statuszeile → eigene Zeile ohne Punkt (siehe „Umsetzung“).
