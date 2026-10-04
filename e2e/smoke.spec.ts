@@ -11,6 +11,7 @@ import {
   expectTextFits,
   setTextScale,
 } from "./mobile-ux.ts";
+import { clsFrom, observeVitals, readVitals, throttleMobile } from "./vitals.ts";
 
 async function dataMeta(page: Page): Promise<{ offers: number; generatedAt: string }> {
   const res = await page.request.get("./data/meta.json");
@@ -100,33 +101,16 @@ test("LCP und CLS bleiben mit echten Daten im Budget", async ({ page, browserNam
   test.skip(browserName !== "chromium", "CDP-Drosselung und LCP-API gibt es nur in Chromium");
   const meta = await dataMeta(page);
   test.skip(meta.offers === 0, "keine Daten");
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
-  await cdp.send("Network.emulateNetworkConditions", {
-    offline: false,
-    latency: 150,
-    downloadThroughput: (1.6 * 1024 * 1024) / 8,
-    uploadThroughput: (750 * 1024) / 8,
-  });
-  await page.addInitScript(() => {
-    const w = window as unknown as { __vitals: { lcp: number; cls: number } };
-    w.__vitals = { lcp: 0, cls: 0 };
-    new PerformanceObserver((list) => {
-      for (const e of list.getEntries()) w.__vitals.lcp = e.startTime;
-    }).observe({ type: "largest-contentful-paint", buffered: true });
-    new PerformanceObserver((list) => {
-      for (const e of list.getEntries() as Array<PerformanceEntry & { value: number; hadRecentInput: boolean }>) {
-        if (!e.hadRecentInput) w.__vitals.cls += e.value;
-      }
-    }).observe({ type: "layout-shift", buffered: true });
-  });
+  await throttleMobile(page);
+  await observeVitals(page);
   await page.clock.setFixedTime(new Date(meta.generatedAt));
   await page.goto("./");
   await expect(page.getByTestId("offer").first()).toBeVisible();
   await page.waitForTimeout(500);
-  const vitals = await page.evaluate(() => (window as unknown as { __vitals: { lcp: number; cls: number } }).__vitals);
+  const vitals = await readVitals(page);
   expect(vitals.lcp, "LCP (ms)").toBeLessThan(2500);
-  expect(vitals.cls, "CLS").toBeLessThan(0.05);
+  const { cls, detail } = clsFrom(vitals);
+  expect(cls, `CLS\n${detail}`).toBeLessThan(0.05);
 });
 
 test.describe("Karte mit echten Daten (Plan 0005)", () => {
