@@ -553,6 +553,33 @@ Nicht in diesem Plan. Gründe:
   - `directory.ts` entsteht ganz in **B**, statt als Stub hier: Es wird nur im Chunk genutzt, ein Stub ohne Logik bräche knip und die Coverage.
   - `ensureFresh` ruft **`ProviderPanel`** auf (A), bevor es den Katalog an Screen bzw. Sheet gibt, nicht der Chunk selbst (E6). So hängt B nicht an `src/data/providers.ts`. E7 hatte den Abgleich ohnehin im Start eingeplant (ca. 0,15 kB). Screen und Sheet bekommen `directory` immer schon abgeglichen.
 
+**Paket B (2026-10-05, Branch `anbieter-0010-b`):**
+- **Inhalt:**
+  - `src/domain/directory.ts` (+Test, test-first): `providerRows`, `providerOffers`, `providerCategories`, `matchesProviderQuery`, Rückfall-Zeilen. Coverage 100 % Zeilen, 96 % Zweige.
+  - Die Tests nutzen `loadFixtures()` und ergänzen den Turnverein (Felder wie E6) nur, solange er in `tests/fixtures/` fehlt. Nach dem Merge mit A gelten sie unverändert. Die Invariante zählt im Test selbst die verschiedenen `providerId` (gleiche Definition wie `countProviders`).
+  - `src/ui/anbieter/`: `ProviderScreen`, `ProviderSheet`, `provider-format.ts` (+Test). `OfferCard` hat `context` statt `atPlace`. `styles/anbieter.css` ist im Start-CSS.
+- **Messung** (`pnpm build && pnpm size`, echte Daten; Ausgang „Schnittstellen“):
+  - Start-JS 89,80 → **89,84 kB** (+0,04 kB, `OfferCard`);
+  - CSS 10,64 → **10,84 kB** (+0,20 kB);
+  - `Anbieter JS (lazy)` 0,50 → **2,75 kB** von 6 kB;
+  - Chunk-Wächter grün.
+- **Abweichungen:**
+  - `directory.ts` exportiert zusätzlich **`findProvider`** (Katalog-Eintrag oder Rückfall aus allen Angeboten), für das Sheet und `onUnknown`. `ProviderState` bleibt modulintern (knip).
+  - **`hiddenCount` ist mit Suchtext 0**, weil die ausgeblendeten Treffer dann blass in `idle` stehen. Die Zeile „N weitere Anbieter …“ steht nur unter aktiven Zeilen. Ohne aktive Zeile übernimmt `NoOffers` den Hinweis samt „Filter zurücksetzen“.
+  - Bei Leerstand ohne Filter (nur die Altersregel blendet aus) steht `EmptyState` „Mit dieser Auswahl gibt es keine Angebote.“ ohne Knopf, weil `NoOffers` einen Reset verlangt.
+  - `idleLine` nennt hinter dem Zustand die Orte aus dem Katalog („Gerade keine Termine im Plan · Schweinau, Gymnastikraum Beispiel“). In der Einzahl heißt es „1 Angebot, passt nicht zur Auswahl“.
+  - Im Sheet tragen die Kacheln mit `context="provider"` Ort und Wegzeit in der Meta-Zeile, ohne den Anbieternamen.
+  - `provider-types.ts` ist unverändert.
+- **Vorab geprüft, nicht committet:**
+  - Die Anbieterliste besteht `expectMobileUx` hell und dunkel sowie 320 px / 200 % auf Pixel 7 und iPhone 15 (WebKit). Geprüft wurden ohne Filter, Sticker „Bücher“, Suche „theater“, Suche ohne Treffer und Startpunkt Gostenhof. Dafür lief ein temporäres Spec auf dem Schnittstellen-Stand, mit leerem Katalog, also mit lauter Rückfall-Zeilen.
+  - `karte.spec.ts` (Pixel 7, iPhone 15) sowie `layout`, `mobile-ux`, `app` und `detail` (Pixel 7) sind mit `context="place"` grün.
+- **Für die Integration offen** (E2E von B, erst mit A lauffähig):
+  - `e2e/anbieter-inhalt.spec.ts`, Fälle 1–6 aus „Tests“;
+  - `mobile-ux.spec.ts`, `VIEWS`: `anbieter`, `anbieter-startpunkt`, `anbieter-filter`, `anbieter-suche-leer`, `anbieter-sheet`, `anbieter-sheet-leer`, `anbieter-fehler`. Der Fehlerzustand nutzt `.lazy-box`/`.lazy-note` aus `anbieter.css`, das Markup baut A;
+  - `smoke.spec.ts`: zweistelliges Badge, mehr als 50 aktive Zeilen, Sheet des Spitzenreiters, Gates mit langen Namen;
+  - `scripts/screenshots.ts`: `anbieter`, `anbieter-sheet`, Tab-Leiste quer.
+  - Sheet-Optik und Turnverein-Zeile sind noch nicht im Browser gesehen: Ohne A gibt es weder den Sheet-Dialog noch den Fixture-Eintrag.
+
 ## Struktur
 
 ```

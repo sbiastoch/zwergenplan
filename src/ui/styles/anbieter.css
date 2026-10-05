@@ -24,10 +24,13 @@
     padding: 0 14px;
     font: inherit;
     font-size: 1rem;
+    font-weight: 700;
     color: var(--ink);
   }
+  /* normal statt fett: sonst liest sich der Platzhalter wie ein eingegebener Wert */
   .provider-search input::placeholder {
     color: var(--muted);
+    font-weight: 400;
   }
   .provider-search .small {
     margin: 0 0 8px;
