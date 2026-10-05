@@ -1140,6 +1140,6 @@ Playwright gegen https://zwergenplan.app/, Chromium (Pixel 7) und WebKit (iPhone
 **Hinweise (offen, kein Blocker):**
 - **H1 – Lücke unter dem Suchfeld:** Die Live-Region hält ohne Suchtext eine leere Zeile frei (`min-height: 1.4em`, gegen Sprung beim ersten Buchstaben). Zwischen Suchfeld und erster Zeile wirkt das wie eine Lücke, bei 200 % deutlicher (`anbieter-320-light-200`). Vorschlag: die Zählung in die Statuszeile oder neben das Label legen.
 - **H2 – Gerade Apostrophe in Namen:** „'Riesen & Zwerge'“ steht im Katalog mit `'` statt typografischer Anführungszeichen. Das ist eine Datenfrage für den nächsten Pipeline-Lauf (Skill `babyevents-nuernberg`), nicht für die UI.
-- **H3 – Detail-Knopf „Mehr von diesem Anbieter“** statt „Alle Angebote dieses Anbieters“ (Paket A, Text-Gate bei 320 px). Die Bestätigung des Nutzers steht aus.
+- **H3 – Detail-Knopf „Mehr von diesem Anbieter“** statt „Alle Angebote dieses Anbieters“ (Paket A, Text-Gate bei 320 px): vom Nutzer bestätigt (2026-10-05).
 
 **Nicht prüfbar (Gerät):** Tab-Leiste und Lesbarkeit der 12-px-Labels an einem echten iPhone und Android; INP beim Öffnen des Sheets mit 71 Kacheln im Performance-Panel eines echten Telefons; Merklisten-Download nach dem `await` (ADR 0007, aus Paket 0).

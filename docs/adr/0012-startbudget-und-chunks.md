@@ -88,7 +88,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 
 **(c) Auf einen Rolldown-Fix warten.**
 - Das Issue ist offen, und es gibt keinen Fix-PR.
-- Mit dem Workaround ist Warten unnötig. Wir kommentieren nur unsere Repro in #11026.
+- Mit dem Workaround ist Warten unnötig. Das Issue wird nur beobachtet.
 - Als eigenständige Option **nicht empfohlen**: Sie blockiert Plan 0010 ohne Termin.
 
 **(d) Weitere Lazy-Chunks, mit Workaround, Budget bleibt 90 kB.**
@@ -107,7 +107,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
   - **(d):** spart 1,4 kB, das sind 1,6 % des Start-JS. Dafür würde ein Haupt-Tab lazy, und es kämen zwei Ladeketten dazu.
   - **(b):** Preact ist der einzige große Hebel (−67 %), aber eine Stack-Entscheidung mit Verhaltensänderungen (Zeitpunkt der Effekte, Dialoge, Fokus). Ein Bedarf ist heute nicht gemessen: Die LCP-Gates sind grün.
   - Beide stehen mit ihren Messwerten in `docs/ideas.md`.
-- **(c):** Wir setzen unsere Repro als Kommentar in #11026.
+- **(c):** Kein Kommentar in #11026 (Nutzerentscheidung 2026-10-05: nichts Öffentliches unter seinem Konto). Das Issue wird beobachtet; ist es behoben, wird die Gruppe ohne Hash-Änderung entfernt.
 
 ## Konsequenzen
 
