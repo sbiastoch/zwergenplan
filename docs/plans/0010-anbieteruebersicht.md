@@ -945,3 +945,30 @@ Keine Blocker.
   - `idle`: erst `ausgeblendet`, dann `ohne-termine`.
   - `.dist`-Platzhalter nur als Ladezustand auf Kacheln; ohne Wert entfällt die Wegzeit in der Zeile.
 - **Scope-Vorschlag „Paket 0 als eigener Plan“: abgelehnt** (Koordinator). Paket 0 bleibt ein klar abgegrenzter Abschnitt dieses Plans (E8) mit eigenem Branch, eigenen Fertig-Kriterien und eigenem Arch-Review. Begründung: kein zusätzlicher Review-Zyklus, gleicher Kontext.
+
+## Browser-Review live, Paket 0 (2026-10-05) – Verdict: bestanden, kein Befund, ein Gerätetest offen
+
+**Stand:** live `903866a` (CI-Lauf 37307015084 grün, Deploy grün), echte Daten (333 Angebote). Live liefert `assets/index-DUZZBaYg.js`, denselben Hash wie der lokale Build von `903866a`. Geprüft mit Playwright gegen https://zwergenplan.app/, Chromium (Pixel 7) und WebKit (iPhone 15), `de-DE`, Europe/Berlin. Das Skript liegt außerhalb des Repos (`e2e/.artifacts/review-live.ts`, ignoriert). Es prüft Paket 0 und die Nacharbeit zu Plan 0009 zusammen (dort „Browser-Review live (Nacharbeit)“).
+
+**Paket 0, je Engine:**
+- **Start und Vorladen:**
+  - Start-JS ist nur `index-DUZZBaYg.js`.
+  - `assets/export/ics-Ji-SLKgv.js` lädt im Leerlauf mit 200, ca. 0,4 s (Chromium) bzw. 1,2 s (WebKit) nach den ersten Kacheln.
+  - Kein ICS-Code im Einstieg (`BEGIN:VCALENDAR` fehlt), keine Requests auf Karte, Wegzeit oder Kacheln.
+  - Konsole: 0 Fehler.
+- **Merkliste-Export:**
+  - Zwei Angebote gemerkt, „Alle in den Kalender“ ergibt `zwergenplan-merkliste.ics` mit 18 VEVENTs.
+  - Der Toast meldet „Kalenderdatei mit 18 Terminen geladen“, Konsole: 0 Fehler.
+- **Export blockiert** (Chunk per Route abgebrochen): Der Toast meldet „Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.“
+- **Screenshots** (`scripts/screenshots.ts`, Ansichten `kind-quelle`, `start-startpunkt`, `merkliste`, `filter-wegzeit`, je 100 und 200 %, 96 Bilder, als Kontaktbögen angesehen): unauffällig.
+  - Bei 320 px/200 % liegt der Toast „Eingeklebt …“ für 2,8 s über „Alle in den Kalender“ (`merkliste-320-light-200`). Das ist bekannt und entschieden: Plan 0008, E9, `pointer-events: none`.
+
+**Checkliste (Skill):**
+- **Lesbarkeit:** ok. Die Merkliste nennt „2 Sticker · 18 Termine in einer .ics-Datei · Kurse immer komplett“.
+- **Daumen:** ok, unverändert.
+- **Zustände:** ok. Export-Fehler mit Ausweg, Laden ohne sichtbaren Unterschied (vorgeladen).
+- **Dunkel:** ok, keine hellen Inseln.
+- **Micro-Interactions:** unverändert.
+- **Design-System:** unverändert, keine neuen Bauteile.
+
+**Offen (Gerät):** Ob der Merklisten-Download am **echten iPhone** nach dem `await` noch als Folge des Tipps gilt (ADR 0007). Playwright-WebKit lädt herunter, ersetzt aber kein iOS Safari. Das prüft der Nutzer am Gerät: Merkliste → „Alle in den Kalender“ → erscheint der Kalender- bzw. Download-Dialog?

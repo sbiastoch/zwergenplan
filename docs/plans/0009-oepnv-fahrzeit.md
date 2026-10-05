@@ -993,3 +993,12 @@ Gefunden mit dem vollen `pnpm check`: Die M7-Tests prüften `visibility: hidden`
   - Den „außerhalb“-Hinweis aus `limitReason` wiederzuverwenden hat 36 B gebracht.
   - Weiteres Kürzen hätte Review-Fixes zurückgedreht.
 - **Entscheidung:** Das Budget bleibt, wie es ist. Die Nacharbeit geht erst nach main, wenn Plan 0010, Paket 0 (Chunk-Wächter, Merklisten-ICS lazy …) Platz geschaffen hat. Dafür wird der Branch auf den neuen Stand gesetzt. Paket 0 muss deshalb gegenüber 89,80 kB zusätzlich etwa 0,3 kB für diese Nacharbeit sparen.
+
+### Browser-Review live (Nacharbeit, 2026-10-05) – Verdict: bestanden
+Live seit `903866a` zusammen mit Plan 0010, Paket 0 (Stand, Methode und Screenshots: Plan 0010, „Browser-Review live, Paket 0“). Je Engine, Chromium (Pixel 7) und WebKit (iPhone 15):
+- **H6 Lizenz-Link:** einzeilig, 106×29 px (Chromium) bzw. 95×29 px (WebKit).
+- **H7 Text-Gate gescrollt:** `expectTextFits` im Kind-Sheet bei Mitte und Ende grün, bei 100 % und bei 320 px/200 %.
+- **H5 außerhalb (Fürth):** Das Kind-Sheet zeigt „Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil.“, kein „Wegzeit ab deinem Standort“.
+- **H2 Fokus:** Nach „Nochmal laden“ hat die Statuszeile den Fokus, beim Laden und danach („Wegzeit ab Gostenhof mit Bus & Bahn …“).
+- **H1 Funkloch:** Tabelle und Chunk blockiert, dann frei: Ein Tipp auf „Nochmal laden“ bringt die Minuten, „Seite neu laden“ erscheint nie. Chromium lädt dabei einmal neu (N1), WebKit holt den Chunk ohne Neuladen. `?wegzeit=20` bleibt erhalten.
+- Konsole: keine Fehler außer den erwarteten bei blockierten Requests.
