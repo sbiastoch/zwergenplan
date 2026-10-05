@@ -9,6 +9,11 @@
     <meta name="theme-color" content="#0e1620" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Babykurse, Krabbelgruppen und Ausflüge für Kinder unter 3 Jahren in Nürnberg." />
     <title>Zwergenplan</title>
+    <!-- Installierbare App (Plan 0011, E2): Pfade mit der Basis wie der Frühstart; Icons aus design/icon.svg
+         (node scripts/icons.ts). Das apple-touch-icon ist deckend, sonst setzt iOS Schwarz dahinter. -->
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+    <link rel="icon" href="%BASE_URL%icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="%BASE_URL%icons/apple-touch-180.png" />
     <!-- Daten parallel zum JS laden statt danach (LCP, Plan 0003 E8). Ersetzt den Preload, den WebKit nicht
          wiederverwendet (Plan 0008, E4). Übernommen von src/data/site.ts (takeEarlyRequest), Pfad wie dort:
          %BASE_URL% ersetzt Vite beim Build durch import.meta.env.BASE_URL (site.config.ts). -->

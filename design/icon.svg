@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Zwergenplan</title>
+  <!--
+    App-Icon des Zwergenplans (Plan 0011, E2), Stickerheft-Stil (Plan 0003): das Logo aus src/ui/icons.tsx
+    (gelber Kreis, rote Zipfelmütze, weißer Bommel) als Sticker mit weißem Rand, Schatten und Klebeband auf dem
+    gepunkteten Heftpapier (--bg, --dotc aus src/ui/styles/tokens.css).
+    Quelle für node scripts/icons.ts: Der Hintergrund ist #papier, das Motiv #motiv. Das Motiv bleibt im inneren
+    Kreis mit 80 % Durchmesser (Schutzzone für maskable); scripts/icons.ts verkleinert es für maskable zusätzlich.
+  -->
+  <defs>
+    <pattern id="punkte" width="32" height="32" patternUnits="userSpaceOnUse" x="8" y="8">
+      <circle cx="16" cy="16" r="2.4" fill="#13212e" fill-opacity="0.13" />
+    </pattern>
+    <filter id="schatten" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="9" stdDeviation="9" flood-color="#13212e" flood-opacity="0.22" />
+    </filter>
+  </defs>
+  <g id="papier">
+    <rect width="512" height="512" fill="#e8f1ff" />
+    <rect width="512" height="512" fill="url(#punkte)" />
+  </g>
+  <g id="motiv">
+    <g transform="rotate(-8 256 262)" filter="url(#schatten)">
+      <!-- Sticker: Logo-Kreis r 14,5 von 34 → r 165, weißer Rand wie --rim -->
+      <circle cx="256" cy="262" r="165" fill="#ffd93b" stroke="#fff" stroke-width="26" />
+      <!-- Zipfelmütze und Bommel wie im Logo, Maßstab 11,4 -->
+      <path d="M165 342 256 148l91 194z" fill="#ff7070" />
+      <circle cx="256" cy="154" r="30" fill="#fff" />
+    </g>
+    <!-- Klebeband (--tape) schräg über dem oberen Rand -->
+    <rect x="300" y="78" width="124" height="44" rx="4" fill="#ffe38a" fill-opacity="0.92" transform="rotate(28 362 100)" />
+  </g>
+</svg>

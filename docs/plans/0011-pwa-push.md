@@ -648,6 +648,13 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
     - Budget `Service Worker`: `dist/sw.js` um 30 kB Zufall aufgebläht → 32,56 kB, rot.
     - Die Regeln zu `app-extras`/`app-data` und das Budget `App-Extras JS (lazy)` bekommen ihre Kanarienvögel in Schritt 3/4, sobald es die Module gibt.
 
+- **2026-10-05, Stufe 1, Schritt 2 (Manifest und Icons):**
+  - `design/icon.svg`: das Logo aus der Kopfzeile (gelber Kreis, rote Zipfelmütze, weißer Bommel) als Sticker mit weißem Rand, Schatten und Klebeband auf gepunktetem Heftpapier (`--bg`, `--dotc`, `--tape`). Gruppen `#papier` und `#motiv`, dazu ein `<title>` (Biome `noSvgWithoutTitle` prüft auch SVG-Dateien).
+  - `node scripts/icons.ts` erzeugt `public/icons/` byte-gleich bei jedem Lauf (geprüft per md5): `icon-192/512.png` und `icon.svg` als abgerundetes Quadrat mit transparenten Ecken (`any`, Favicon), `maskable-512.png` randlos mit Motiv auf 80 %, `apple-touch-180.png` randlos und deckend. `--preview=<ordner>` legt die Abnahmebilder ab (Home-Bildschirm hell/dunkel, Schutzzone).
+  - `public/manifest.webmanifest` wie E2, `index.html` mit `manifest`, `icon` (SVG) und `apple-touch-icon` über `%BASE_URL%`.
+  - `e2e/pwa.spec.ts` Punkt 1 grün (`pixel-7`, `desktop`). **Kanarienvogel:** `apple-touch-180.png` mit transparenten Ecken → `minAlpha: 0`, rot.
+  - **Offen: Abnahme des Icons durch den Nutzer** (Vorschau liegt beim Orchestrator).
+
 ## Akzeptanzkriterien
 
 - **Stufe 1:**
