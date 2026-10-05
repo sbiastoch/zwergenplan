@@ -18,6 +18,7 @@ interface TestMap {
   jumpTo: (options: { zoom: number }) => void;
   getLayer: (id: string) => unknown;
   getPaintProperty: (layer: string, name: string) => unknown;
+  getLayoutProperty: (layer: string, name: string) => unknown;
   loaded: () => boolean;
   once: (event: string, listener: () => void) => void;
 }
@@ -55,6 +56,16 @@ async function camera(page: Page) {
     const { lat, lng } = map.getCenter();
     return { lat, lng, zoom: map.getZoom() };
   });
+}
+
+/** Darstellung über das Kind-Sheet: Der Theme-Knopf im Kopf entfällt auf schmalen Geräten (Plan 0007, B5). */
+async function switchTheme(page: Page, button: "Hell" | "Dunkel", style: string) {
+  const request = page.waitForRequest((req) => req.url().endsWith(style));
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await kid.getByRole("button", { name: button, exact: true }).click();
+  await kid.getByRole("button", { name: "Fertig" }).click();
+  await request;
 }
 
 /** Tippt auf den ersten Marker eines Layers (ohne `angebote`: irgendeinen), Position über `project`. */
@@ -158,13 +169,26 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(places(page)).toHaveText([/^Familientreff Beispielhof/, /^Musikschule Beispiel, Haus Süd/]);
   });
 
-  test("Orts-Liste öffnet das Orts-Sheet, das Detail darüber, Zurück führt ins Sheet", async ({ page }) => {
+  test("Orts-Liste öffnet das Orts-Sheet, das Detail darüber, Zurück führt ins Sheet; Kacheln ohne Ortsangaben", async ({
+    page,
+  }) => {
+    // Startpunkt Gostenhof (nur die Stadtteil-ID liegt im Speicher, Plan 0004): Die Liste zeigt Entfernungen.
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await openMap(page);
     await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText("Beispielstraße 1, 90402 Nürnberg")).toBeVisible();
+    await expect(sheet.getByText(/Luftlinie ab Gostenhof/)).toBeVisible();
     await expect(sheet.getByTestId("offer")).toHaveCount(3);
+    // Der Kopf nennt Ort und Entfernung; die Kacheln nur noch den Anbieter (Plan 0008, E19)
+    const metas = await sheet.getByTestId("offer").locator(".meta").allInnerTexts();
+    expect(metas).toHaveLength(3);
+    for (const meta of metas) {
+      expect(meta, "Meta-Zeile im Orts-Sheet").not.toContain("·");
+      expect(meta, "Meta-Zeile im Orts-Sheet").not.toMatch(/\d+(,\d)? k?m/);
+      expect(meta.trim(), "Anbieter bleibt").not.toBe("");
+    }
     await sheet.getByRole("button", { name: "Offener Krabbeltreff", exact: true }).click();
     await expect(page.getByRole("dialog", { name: "Offener Krabbeltreff" })).toBeVisible();
     await expect(page).toHaveURL(/ansicht=karte&angebot=/);
@@ -173,6 +197,10 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(sheet).toBeVisible();
     await sheet.getByRole("button", { name: "Schließen" }).click();
     await expect(sheet).toBeHidden();
+
+    // In der Liste steht die Entfernung weiter.
+    await page.getByRole("button", { name: "Liste", exact: true }).click();
+    await expect(page.getByTestId("offer").first().locator(".meta")).toContainText(/ · \d+(,\d)? k?m$/);
   });
 
   test("Ort mit einem Angebot öffnet direkt das Detail", async ({ page }) => {
@@ -201,13 +229,7 @@ test.describe("mit gemockten Kacheln", () => {
       ["Dunkel", "/styles/dark", "bg-dunkel"],
       ["Hell", "/styles/positron", "bg-hell"],
     ] as const) {
-      const request = page.waitForRequest((req) => req.url().endsWith(style));
-      // über das Kind-Sheet: Der Theme-Knopf im Kopf entfällt auf schmalen Geräten (Plan 0007, B5)
-      await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
-      const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
-      await kid.getByRole("button", { name: button, exact: true }).click();
-      await kid.getByRole("button", { name: "Fertig" }).click();
-      await request;
+      await switchTheme(page, button, style);
       await expect
         .poll(() =>
           page.evaluate((bg) => !!window.__zpMap?.getLayer(bg) && !!window.__zpMap.getLayer("orte-punkt"), background),
@@ -224,6 +246,68 @@ test.describe("mit gemockten Kacheln", () => {
       const sheet = page.getByRole("dialog", { name: "Kleines Theater Beispiel" });
       await expect(sheet).toBeVisible();
       await sheet.getByRole("button", { name: "Schließen" }).click();
+    }
+  });
+
+  test("Ortsnamen auf Deutsch, auch nach dem Stilwechsel (Plan 0008, E16)", async ({ page }) => {
+    await openMap(page);
+    const textField = () =>
+      page.evaluate(() => JSON.stringify(window.__zpMap?.getLayoutProperty("label-stadt", "text-field") ?? null));
+    expect(await textField()).toContain('"name:de"');
+    expect(await textField()).not.toContain("name_en");
+
+    await switchTheme(page, "Dunkel", "/styles/dark");
+    await expect.poll(() => page.evaluate(() => !!window.__zpMap?.getLayer("bg-dunkel"))).toBe(true);
+    await expect.poll(textField).toContain('"name:de"');
+    expect(await textField()).not.toContain("name_en");
+  });
+
+  test("Attribution in der App-Schrift (Plan 0008, E17)", async ({ page }) => {
+    await openMap(page);
+    const fonts = await page.evaluate(() => {
+      // Engines und Minifier schreiben Familiennamen mal mit, mal ohne Anführungszeichen
+      const first = (value: string) => value.split(",")[0]?.replace(/["']/g, "").trim();
+      const attribution = document.querySelector(".map-box .maplibregl-ctrl-attrib");
+      return {
+        attribution: attribution ? first(getComputedStyle(attribution).fontFamily) : undefined,
+        app: first(getComputedStyle(document.documentElement).getPropertyValue("--font-sans")),
+      };
+    });
+    expect(fonts.app, "--font-sans").toBeTruthy();
+    expect(fonts.attribution).toBe(fonts.app);
+  });
+
+  test("Startausschnitt hält die Ecke der Zoom-Knöpfe frei (Plan 0008, E20)", async ({ page }) => {
+    await openMap(page);
+    const { zoom, markers } = await page.evaluate(() => {
+      const map = window.__zpMap;
+      const canvas = document.querySelector(".map-box .map-canvas")?.getBoundingClientRect();
+      const ctrl = document.querySelector(".maplibregl-ctrl-top-right .maplibregl-ctrl-group")?.getBoundingClientRect();
+      if (!map || !canvas || !ctrl) throw new Error("keine Karte oder keine Zoom-Knöpfe");
+      // Kreisradius plus Rand (layers.ts: Cluster 18, Ort 14, Rand 2)
+      const radius: Record<string, number> = { "orte-cluster": 20, "orte-punkt": 16 };
+      const zoom = {
+        left: ctrl.left - canvas.left,
+        right: ctrl.right - canvas.left,
+        top: ctrl.top - canvas.top,
+        bottom: ctrl.bottom - canvas.top,
+      };
+      const markers = Object.keys(radius).flatMap((layer) =>
+        map.queryRenderedFeatures({ layers: [layer] }).map((f) => {
+          const { x, y } = map.project(f.geometry.coordinates);
+          const dx = Math.max(zoom.left - x, 0, x - zoom.right);
+          const dy = Math.max(zoom.top - y, 0, y - zoom.bottom);
+          return { layer, x, y, r: radius[layer] ?? 0, distance: Math.hypot(dx, dy) };
+        }),
+      );
+      return { zoom, markers };
+    });
+    expect(markers.length, "Marker im Startausschnitt").toBeGreaterThan(0);
+    for (const m of markers) {
+      expect(
+        m.distance,
+        `${m.layer} bei ${Math.round(m.x)}/${Math.round(m.y)} unter den Zoom-Knöpfen ${JSON.stringify(zoom)}`,
+      ).toBeGreaterThan(m.r);
     }
   });
 

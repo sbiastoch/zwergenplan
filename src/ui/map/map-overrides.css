@@ -15,6 +15,12 @@
   outline-offset: -3px;
 }
 
+/* App-Schrift statt MapLibres Helvetica/Arial für Attribution und Zwei-Finger-Hinweis (Plan 0008, E17);
+   die Schriftdatei ist schon geladen. */
+.map-box .maplibregl-map {
+  font-family: var(--font-sans);
+}
+
 /* Zoom: 44 × 44 px wie jedes Touch-Ziel */
 .map-box .maplibregl-ctrl-group {
   background: var(--surface);

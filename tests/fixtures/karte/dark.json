@@ -24,6 +24,16 @@
       "paint": {
         "fill-color": "#1c3550"
       }
+    },
+    {
+      "id": "label-stadt",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "layout": {
+        "text-field": ["coalesce", ["get", "name_en"], ["get", "name"]],
+        "text-font": ["Noto Sans Regular"]
+      }
     }
   ]
 }

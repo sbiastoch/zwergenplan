@@ -26,11 +26,18 @@ const point = <P>({ lat, lon }: GeoPoint, properties: P): PointFeature<P> => ({
   properties,
 });
 
-/** Quelle „orte“: ein Punkt je Ort mit `key` und der Zahl der Angebote (summiert im Cluster). */
+/** Codepunkt-Vergleich: unabhängig von Locale und Engine */
+const byKey = (a: MapPlace, b: MapPlace) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
+
+/**
+ * Quelle „orte“: ein Punkt je Ort mit `key` und der Zahl der Angebote (summiert im Cluster). Sortiert nach
+ * `key`, nicht in der Reihenfolge der Orts-Liste: Supercluster bündelt reihenfolgeabhängig, sonst änderten
+ * sich die Cluster mit dem Startpunkt (Plan 0008, E15).
+ */
 export function placesToFeatures(places: readonly MapPlace[]): PointCollection<{ key: string; angebote: number }> {
   return {
     type: "FeatureCollection",
-    features: places.map((p) => point(p.geo, { key: p.key, angebote: p.offers.length })),
+    features: places.toSorted(byKey).map((p) => point(p.geo, { key: p.key, angebote: p.offers.length })),
   };
 }
 
