@@ -481,6 +481,29 @@ test.describe("Karten-Code nicht ladbar", () => {
 
   /** „Nochmal versuchen“, ggf. „Seite neu laden“; endet mit bereiter Karte und ansicht=karte (E2). */
   async function recover(page: Page, context: BrowserContext, browserName: string) {
+    // Zustandsfolge der Karte ab dem Tipp mitschreiben (Arch-Review 0008, m5): „Seite neu laden“ darf nie vor
+    // „laden“ erscheinen. Früher zeigte ein Zwischen-Render mit altem „fehler“ kurz „Seite neu laden“ (Lazy.tsx).
+    await page.evaluate(() => {
+      const root = document.documentElement;
+      root.dataset["retryLog"] = "";
+      let last = "";
+      const record = () => {
+        const box = document.querySelector(".map-box");
+        const reload = [...(box?.querySelectorAll("button") ?? [])].some(
+          (b) => b.textContent?.trim() === "Seite neu laden",
+        );
+        const entry = `${box?.getAttribute("data-state") ?? "-"}${reload ? "+neu laden" : ""}`;
+        if (entry !== last) root.dataset["retryLog"] = `${root.dataset["retryLog"]}${entry};`;
+        last = entry;
+      };
+      new MutationObserver(record).observe(document.body, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ["data-state"],
+      });
+    });
     await mapBox(page).getByRole("button", { name: "Nochmal versuchen" }).click();
     const reload = mapBox(page).getByRole("button", { name: "Seite neu laden" });
     // Erst der Endzustand des zweiten Versuchs entscheidet, und nur einmal gelesen: Ein zweites isVisible()
@@ -492,6 +515,14 @@ test.describe("Karten-Code nicht ladbar", () => {
         return outcome;
       })
       .toMatch(/^(neu laden|bereit)$/);
+    const states = ((await page.locator("html").getAttribute("data-retry-log")) ?? "").split(";").filter(Boolean);
+    const firstReload = states.findIndex((st) => st.endsWith("+neu laden"));
+    const firstLoading = states.findIndex((st) => st.startsWith("laden"));
+    expect(firstLoading, `„laden“ nach dem Tipp (Folge: ${states.join(" → ")})`).toBeGreaterThanOrEqual(0);
+    if (firstReload >= 0)
+      expect(firstReload, `„Seite neu laden“ erst nach „laden“ (Folge: ${states.join(" → ")})`).toBeGreaterThan(
+        firstLoading,
+      );
     // Manche Browser merken sich den fehlgeschlagenen Import; dann hilft nur Neuladen (E2).
     if (outcome === "neu laden") {
       // auf das load-Ereignis des neuen Dokuments warten; waitForLoadState() hielte das alte schon für geladen

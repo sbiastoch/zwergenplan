@@ -97,7 +97,8 @@
                 "deniedGlobals": {
                   "navigator": "Geräte-APIs wie Geolocation nur über src/data (docs/architecture.md, Plan 0004).",
                   "localStorage": "Speicher nur über src/data/preferences.ts (docs/architecture.md).",
-                  "fetch": "Netzzugriff nur über src/data (docs/architecture.md)."
+                  "fetch": "Netzzugriff nur über src/data (docs/architecture.md).",
+                  "__zpSite": "Frühstart nur über src/data/site.ts (Plan 0008, E4)."
                 }
               }
             }

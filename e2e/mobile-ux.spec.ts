@@ -233,6 +233,11 @@ test("Text-Gate erkennt Text in der Rundung, auch im Scroll-Container des Sheets
   // „Filter“ rückt ganz in die obere linke Ecke des Sheets (Radius 28 px), bleibt aber sichtbar.
   await page.addStyleTag({ content: ".sheet-scroll { padding: 0 !important } .sheet .grab { display: none }" });
   await expect(expectTextFits(page)).rejects.toThrow(/Text stößt an die Rundung von dialog\.dlg: „Filter“/);
+  // auch bei 200 %: Ungescrollt (`scrollTop = 0`) zählt die Zeile an der Oberkante (Prüfung 3, Plan 0008, E3)
+  await setTextScale(page, 2);
+  await expect(expectTextFits(page, { scale: 2 })).rejects.toThrow(
+    /Text stößt an die Rundung von dialog\.dlg: „Filter“/,
+  );
 });
 
 /** Kalender bei 320 px (Wochenleiste dehnt sich in den Seitenrand, calendar.css), reduzierte Bewegung */
@@ -247,9 +252,7 @@ async function calendarAt320(page: Page) {
 // Plan 0008, E2: Die Woche 26.10.–1.11. beginnt mit „26“. Die Tageszahl steckt sichtbar in button.day, das per
 // negativem Rand über das unsichtbare fieldset.plain hinausreicht. Die Uhr bleibt am Datenstand (Fixture).
 test("Text-Gate: Woche mit zweistelligem Montag bei 320 px", async ({ page }) => {
-  await calendarAt320(page);
-  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "Nächste Woche" }).click();
-  await expect(page.locator(".week .day .num").first()).toHaveText("26");
+  await weekWithTwoDigitMonday(page);
   await expectTextFits(page);
 });
 
@@ -258,6 +261,27 @@ test("Text-Gate erkennt Text, der aus seinem sichtbaren Kasten ragt", async ({ p
   // relative Verschiebung statt Rand: Ein Rand verpufft in der zentrierenden Flex-Spalte von .day
   await page.addStyleTag({ content: ".day .num { position: relative; left: -40px }" });
   await expect(expectTextFits(page)).rejects.toThrow(/Text ragt aus button\.day/);
+});
+
+/** Woche 26.10.–1.11. bei 320 px: „26“ ragt per negativem Rand über fieldset.plain hinaus (E2). */
+async function weekWithTwoDigitMonday(page: Page) {
+  await calendarAt320(page);
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "Nächste Woche" }).click();
+  await expect(page.locator(".week .day .num").first()).toHaveText("26");
+}
+
+// Grenzen der E2-Lockerung (Arch-Review 0008, M1): Ein Ausbruch über einen Vorfahren mit sichtbarer Kante oder über
+// einen abschneidenden Vorfahren bleibt rot.
+test("Text-Gate erkennt Ausbruch über einen Kasten mit sichtbarem Rand", async ({ page }) => {
+  await weekWithTwoDigitMonday(page);
+  await page.addStyleTag({ content: "fieldset.plain { border: 1px solid currentColor }" });
+  await expect(expectTextFits(page)).rejects.toThrow(/Text ragt aus fieldset\.plain/);
+});
+
+test("Text-Gate erkennt Ausbruch über einen abschneidenden Kasten", async ({ page }) => {
+  await weekWithTwoDigitMonday(page);
+  await page.addStyleTag({ content: "fieldset.plain { overflow: hidden }" });
+  await expect(expectTextFits(page)).rejects.toThrow(/Text ragt aus fieldset\.plain/);
 });
 
 test("Text-Gate erkennt Text, der aus einem unsichtbaren Kasten ragt", async ({ page }) => {

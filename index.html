@@ -10,10 +10,11 @@
     <meta name="description" content="Babykurse, Krabbelgruppen und Ausflüge für Kinder unter 3 Jahren in Nürnberg." />
     <title>Zwergenplan</title>
     <!-- Daten parallel zum JS laden statt danach (LCP, Plan 0003 E8). Ersetzt den Preload, den WebKit nicht
-         wiederverwendet (Plan 0008, E4). Übernommen von src/data/site.ts (takeEarlyRequest), Pfad wie dort. -->
+         wiederverwendet (Plan 0008, E4). Übernommen von src/data/site.ts (takeEarlyRequest), Pfad wie dort:
+         %BASE_URL% ersetzt Vite beim Build durch import.meta.env.BASE_URL (site.config.ts). -->
     <script>
       try {
-        window.__zpSite = fetch("/data/site.json");
+        window.__zpSite = fetch("%BASE_URL%data/site.json");
         // als behandelt markieren: Den Fehler wertet loadSiteData aus, nicht die Konsole
         window.__zpSite.catch(() => {});
       } catch {

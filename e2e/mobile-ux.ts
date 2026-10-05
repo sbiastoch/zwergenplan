@@ -299,12 +299,16 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
       const sides = ["Top", "Right", "Bottom", "Left"] as const;
       /**
        * Sichtbare Kante (Prüfung 2 und 3, eine Definition, damit beide nicht auseinanderlaufen): deckender
-       * Hintergrund (Alpha > 0), Hintergrundbild oder sichtbarer Rand.
+       * Hintergrund (Alpha > 0), Hintergrundbild oder sichtbarer Rand (Breite > 0, Stil nicht `none`, Farbe mit
+       * Alpha > 0; ein durchsichtiger Rand wie bei den Tagesfeldern im Monat ist keine Kante).
        */
       const hasVisibleEdge = (s: CSSStyleDeclaration) =>
         alpha(s.backgroundColor) > 0 ||
         s.backgroundImage !== "none" ||
-        sides.some((side) => px(s[`border${side}Width`]) > 0 && s[`border${side}Style`] !== "none");
+        sides.some(
+          (side) =>
+            px(s[`border${side}Width`]) > 0 && s[`border${side}Style`] !== "none" && alpha(s[`border${side}Color`]) > 0,
+        );
 
       // 2. Text ragt nicht heraus: seitlich über keinen Innenrand (Padding-Kante) eines Vorfahren, senkrecht nur
       //    bei Vorfahren, die abschneiden (Ober-/Unterlängen ragen bei Zeilenhöhe 1,08 legitim aus dem Zeilenkasten).
@@ -374,9 +378,10 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
       };
       /**
        * Sichtbarer Bereich des nächsten senkrechten Scroll-Containers zwischen Text und gerundetem Kasten.
-       * Präzisierung mit Grund (Plan 0008, E3): Dort zählt nur eine Zeile, die ganz im sichtbaren Bereich liegt
-       * (Toleranz 1 px). Eine an der Ober- oder Unterkante angeschnittene Zeile steht da, weil gescrollt wurde, nicht
-       * wegen des Layouts; dass die Rundung des Sheets sie anschneidet, ist normales Scrollen (Filter-Sheet bei
+       * Präzisierung mit Grund (Plan 0008, E3): Eine Zeile, die die Oberkante kreuzt, zählt nicht, wenn der Bereich
+       * nach unten gescrollt ist (`scrollTop > 0`); eine Zeile an der Unterkante zählt nicht, wenn darunter noch
+       * Inhalt kommt (Toleranz je 1 px). Sie steht dort, weil gescrollt wurde bzw. werden kann, nicht wegen des
+       * Layouts; dass die Rundung des Sheets sie anschneidet, ist normales Scrollen (Filter-Sheet bei
        * 320 px/200 %: „Kosten“, Plan 0004, H1). Kürzen auf den sichtbaren Teil reichte nicht: Bei 16 px Innenabstand
        * liegt der Zeilenanfang an der Oberkante noch außerhalb der Ellipse eines 28-px-Radius. Im Ruhezustand
        * (`scrollTop = 0`) ist jede Zeile in der Ecke ganz sichtbar und wird geprüft (Kanarienvogel „Text-Gate erkennt
@@ -385,7 +390,7 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
       const scrollViewport = (start: Element, stop: Element) => {
         for (let a: Element | null = start; a && a !== stop; a = a.parentElement) {
           const s = getComputedStyle(a);
-          if (s.overflowY === "auto" || s.overflowY === "scroll") return a.getBoundingClientRect();
+          if (s.overflowY === "auto" || s.overflowY === "scroll") return a;
         }
         return undefined;
       };
@@ -459,7 +464,12 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
           },
         ];
         outer: for (const r of rectsOf(text)) {
-          if (viewport && !(r.top >= viewport.top - 1 && r.bottom <= viewport.bottom + 1)) continue;
+          if (viewport) {
+            const v = viewport.getBoundingClientRect();
+            const scrolledDown = viewport.scrollTop > 0;
+            const moreBelow = viewport.scrollTop + viewport.clientHeight < viewport.scrollHeight - 1;
+            if ((r.top < v.top - 1 && scrolledDown) || (r.bottom > v.bottom + 1 && moreBelow)) continue;
+          }
           for (const c of corners) {
             if (c.rx < 1 || c.ry < 1) continue;
             const x = c.sx < 0 ? r.left : r.right;

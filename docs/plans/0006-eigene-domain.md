@@ -21,7 +21,7 @@ Datum: 2026-10-04
 ## Ausgangslage
 
 - `site.config.ts`: `BASE = "/zwergenplan/"`, `SITE_URL = https://sbiastoch.github.io/zwergenplan/`. Genutzt von `vite.config.ts`, `playwright.config.ts` und `scripts/validate-data.ts` (Plausibilität gegen den Live-Stand).
-- Der App-Code nutzt nur `import.meta.env.BASE_URL` (`src/data/site.ts`). `index.html` referenziert `/data/site.json`, Vite setzt den Base davor.
+- Der App-Code nutzt nur `import.meta.env.BASE_URL` (`src/data/site.ts`). `index.html` referenziert `/data/site.json`, Vite setzt den Base davor. (Seit Plan 0008, E4: Frühstart per Inline-Skript `fetch("%BASE_URL%data/site.json")`, Vite ersetzt `%BASE_URL%` beim Build; kein Preload mehr.)
 - Hart kodierte Pfade: `e2e/app.spec.ts` (2×), `e2e/detail.spec.ts` (ICS-Link), `scripts/screenshots.ts` (Standard-URL).
 - Doku und Skills mit Live-URL: `README.md`, `docs/architecture.md` (Datenfluss-Diagramm), `.claude/skills/browser-review/SKILL.md`, `.claude/skills/babyevents-nuernberg/SKILL.md`, `.claude/settings.json` (`WebFetch(domain:…)`).
 - Pages: `build_type: workflow`, keine Custom Domain, HTTPS erzwungen.
