@@ -30,7 +30,7 @@ export function PlaceSheet({
           {reach && origin ? <span>{reachLong(reach, origin)}</span> : ctx.reachPending && <DistPending />}
         </p>
         {groupByNextSession(place.offers, ctx.now).flatMap((group) =>
-          group.items.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated atPlace />),
+          group.items.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated context="place" />),
         )}
       </div>
       <div className="sheetfoot">

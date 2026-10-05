@@ -1,0 +1,103 @@
+/*
+ * Anbieterübersicht (Plan 0010, E7, E10): Suche, blasse Zeilen, Lade- und Fehlerkasten, Sheet-Kopf. Im Start-CSS,
+ * damit Platzhalter und Fehler schon vor dem Chunk gestylt sind. Die Zeilen nutzen .places/.place (map.css).
+ */
+
+@layer components {
+  .provider-search {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+    font-weight: 800;
+  }
+  /* 16 px Mindestschrift, sonst zoomt iOS beim Fokus */
+  .provider-search input {
+    min-height: 48px;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 0 14px;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+  .provider-search input::placeholder {
+    color: var(--muted);
+  }
+  .provider-search .small {
+    margin: 0 0 8px;
+    font-weight: 400;
+  }
+  .provider-name {
+    hyphens: auto;
+  }
+  /* „noch nicht eingeklebt“: gleiche Rahmenfarbe, gestrichelt, Text in --muted (kein opacity, AA) */
+  .place.idle {
+    border-style: dashed;
+    background: transparent;
+    box-shadow: none;
+    color: var(--muted);
+  }
+  .place.idle b {
+    font-weight: 700;
+  }
+  .provider-hidden {
+    margin: 12px 0;
+    color: var(--muted);
+  }
+  .provider-idle {
+    margin-top: 12px;
+  }
+
+  /* Laden und Fehler (ProviderPanel.tsx): feste Mindesthöhe gegen Layoutsprünge (CLS) */
+  .lazy-box {
+    min-height: 12rem;
+    margin-top: 10px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .lazy-note {
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink);
+  }
+
+  /* Sheet-Kopf: viele Namen sind sehr lang (Median 59 Zeichen), darum kleiner als in den übrigen Sheets */
+  .provider-sheet h2 {
+    font-size: 1.375rem;
+    hyphens: auto;
+  }
+  .provider-cats {
+    margin: 0;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .provider-venues {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .provider-venues li {
+    display: flex;
+    flex-direction: column;
+    overflow-wrap: anywhere;
+  }
+  .provider-venues span,
+  .provider-none {
+    color: var(--muted);
+  }
+}

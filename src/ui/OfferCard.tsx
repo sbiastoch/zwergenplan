@@ -42,18 +42,23 @@ interface OfferCardProps {
   dated?: boolean;
   /** Termin gehört zu einem gewählten Kalendertag */
   calendarDay?: string;
-  /** im Orts-Sheet: Kopf nennt Ort und Entfernung schon, die Meta-Zeile nur den Anbieter (Plan 0008, E19) */
-  atPlace?: boolean;
+  /**
+   * Sheet, dessen Kopf schon etwas nennt (Plan 0010, E10; ersetzt `atPlace` aus Plan 0008, E19): im Orts-Sheet
+   * („place“) fehlen Ort und Entfernung in der Meta-Zeile, im Anbieter-Sheet („provider“) der Anbietername.
+   */
+  context?: "place" | "provider";
 }
 
-export function OfferCard({ item, ctx, dated = false, calendarDay, atPlace = false }: OfferCardProps) {
+export function OfferCard({ item, ctx, dated = false, calendarDay, context }: OfferCardProps) {
   const { offer, session } = item;
   const [fresh] = useState(ctx.animate);
   const category = primaryCategory(offer.topics);
   const unfit = ctx.isUnfit(offer.id);
   const saved = ctx.isSaved(offer.id);
   const availability = availabilityLabel(offer);
+  const atPlace = context === "place";
   const reach = atPlace ? undefined : ctx.reachOf(offer);
+  const where = offer.venue.district ?? offer.venue.name;
   const when = dated ? `${shortDate(sessionDay(session))} · ${clock(session.start)} Uhr` : `${timeRange(session)} Uhr`;
 
   return (
@@ -72,8 +77,7 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, atPlace = fal
           </button>
         </h3>
         <p className="meta">
-          {offer.providerName}
-          {!atPlace && ` · ${offer.venue.district ?? offer.venue.name}`}
+          {context === "provider" ? where : atPlace ? offer.providerName : `${offer.providerName} · ${where}`}
           {reach ? (
             <>
               {" · "}
