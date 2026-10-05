@@ -46,6 +46,18 @@ async function openMap(page: Page) {
   await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
 }
 
+const tabButton = (page: Page, name: string) =>
+  page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
+const providerRow = (page: Page, name: string) =>
+  page.getByRole("region", { name: "Anbieter" }).locator(".place").filter({ hasText: name });
+
+/** Tab „Anbieter“ (Plan 0010): fünf aktive Zeilen, der Turnverein blass am Ende */
+async function openProviders(page: Page) {
+  await tabButton(page, "Anbieter").click();
+  await expect(page.locator(".place:not(.idle)")).toHaveCount(5);
+  await expect(page.locator(".place.idle")).toHaveCount(1);
+}
+
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
 const MAP_VIEWS = new Set(["karte", "orts-sheet", "karte-fehler"]);
 
@@ -53,6 +65,7 @@ const MAP_VIEWS = new Set(["karte", "orts-sheet", "karte-fehler"]);
 const CONSOLE_ERRORS: Record<string, RegExp[]> = {
   "entdecken-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
   "filter-sheet-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
+  "anbieter-fehler": [/\/data\/anbieter\.json\b/],
 };
 
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
@@ -206,6 +219,44 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: "Karte", exact: true }).click();
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "fehler", MAP_READY);
     await expect(page.locator(".map-box")).toContainText("Dein Browser kann die Karte nicht zeigen.");
+  },
+  // Plan 0010: Anbieterliste und Anbieter-Sheet mit Zuständen (E10)
+  anbieter: openProviders,
+  "anbieter-startpunkt": async (page) => {
+    await withGostenhof(page);
+    await openProviders(page);
+    await expect(providerRow(page, "Kleines Theater")).toContainText("5 Min.");
+  },
+  // Sticker „Bücher“: eine aktive Zeile, Hinweis mit „Filter zurücksetzen“, Turnverein blass
+  "anbieter-filter": async (page) => {
+    await page.goto("./?kat=buecher&ansicht=anbieter");
+    await expect(page.getByText("4 weitere Anbieter haben gerade nichts Passendes.")).toBeVisible();
+    await expect(page.locator(".place.idle")).toHaveCount(1);
+  },
+  "anbieter-suche-leer": async (page) => {
+    await openProviders(page);
+    await page.getByRole("searchbox", { name: "Anbieter suchen" }).fill("xyz");
+    await expect(page.getByText("Kein Anbieter heißt so.")).toBeVisible();
+  },
+  // längster Name (111 Zeichen) und langer Ortsname: Worst Case für Kopf und Orte
+  "anbieter-sheet": async (page) => {
+    await openProviders(page);
+    await providerRow(page, "Ev.-Luth. Kirchengemeinde").click();
+    await expect(page.getByRole("dialog", { name: "Anbieter" }).getByTestId("offer")).toHaveCount(1);
+  },
+  "anbieter-sheet-leer": async (page) => {
+    await openProviders(page);
+    await providerRow(page, "Turnverein Beispiel").click();
+    await expect(
+      page.getByRole("dialog", { name: "Anbieter" }).getByText(/^Gerade stehen keine Termine/),
+    ).toBeVisible();
+  },
+  // anbieter.json 503: Fehlertext mit „Nochmal versuchen“ in .lazy-box (E10)
+  "anbieter-fehler": async (page) => {
+    await page.route("**/data/anbieter.json", (route) => route.fulfill({ status: 503 }));
+    await tabButton(page, "Anbieter").click();
+    await expect(page.locator(".lazy-box")).toContainText("Die Anbieter konnten nicht geladen werden.");
+    await expect(page.getByRole("button", { name: "Nochmal versuchen" })).toBeVisible();
   },
   "orts-sheet": async (page) => {
     await openMap(page);

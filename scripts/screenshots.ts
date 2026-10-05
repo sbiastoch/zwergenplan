@@ -2,7 +2,9 @@
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,kalender,…] [--text=200]   Standard: lokale Preview mit Fixtures
  * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt (Plan 0004), karte, ort
- * (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet). Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
+ * (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
+ * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste).
+ * Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
  * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
 import { existsSync, mkdirSync } from "node:fs";
@@ -121,7 +123,33 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       .click();
     await page.getByRole("dialog").waitFor();
   },
+  anbieter: openProviders,
+  // erste Zeile der Liste (ohne Startpunkt alphabetisch)
+  "anbieter-sheet": async (page) => {
+    await openProviders(page);
+    await page.getByRole("region", { name: "Anbieter" }).locator(".place").first().click();
+    await page.getByRole("dialog", { name: "Anbieter" }).getByRole("heading", { level: 2 }).waitFor();
+  },
+  // Tab-Leiste mit Badge und „Anbieter“ aktiv; im Viewport „quer“ die Seitenleiste (Plan 0010, E2)
+  tabs: async (page) => {
+    await page
+      .getByRole("button", { name: / merken$/ })
+      .first()
+      .click();
+    await openProviders(page);
+    // Der Toast „Eingeklebt …“ (2,8 s) läge sonst über der Liste
+    await page.locator(".toast").waitFor({ state: "detached" });
+  },
 };
+
+/** Tab „Anbieter“ (Plan 0010), wartet auf die Zeilen statt auf den Ladekasten */
+async function openProviders(page: Page) {
+  await page
+    .getByRole("navigation", { name: "Hauptnavigation" })
+    .getByRole("button", { name: /^Anbieter/ })
+    .click();
+  await page.getByRole("region", { name: "Anbieter" }).locator(".place").first().waitFor();
+}
 
 const views = viewsArg ? viewsArg.split(",") : Object.keys(VIEWS);
 const browser = await chromium.launch();

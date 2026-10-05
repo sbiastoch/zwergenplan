@@ -40,8 +40,10 @@ export function ProviderScreen({
     () => providerRows({ providers: directory.providers, visible, upcoming, reachOf, byReach, query }),
     [directory.providers, visible, upcoming, reachOf, byReach, query],
   );
-  const announced = useSettled(providerCountText(active.length + idle.length), ANNOUNCE_DELAY_MS);
   const searching = query.trim() !== "";
+  // Nur zur Suche: Ohne Suchtext zählt die Statuszeile (aktive Anbieter), eine zweite Zahl darunter, die auch die
+  // blassen Zeilen zählt, widerspräche ihr (Sichtprüfung Integration).
+  const announced = useSettled(searching ? providerCountText(active.length + idle.length) : "", ANNOUNCE_DELAY_MS);
 
   const row = (r: ProviderRow, idleRow: boolean) => (
     <li key={r.provider.id}>

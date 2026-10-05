@@ -32,7 +32,9 @@
     color: var(--muted);
     font-weight: 400;
   }
+  /* Live-Region: ohne Suchtext leer, die Zeile bleibt reserviert (kein Sprung beim ersten Buchstaben) */
   .provider-search .small {
+    min-height: 1.4em;
     margin: 0 0 8px;
     font-weight: 400;
   }

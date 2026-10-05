@@ -614,6 +614,15 @@ Nicht in diesem Plan. Gründe:
   - `scripts/screenshots.ts`: `anbieter`, `anbieter-sheet`, Tab-Leiste quer.
   - Sheet-Optik und Turnverein-Zeile sind noch nicht im Browser gesehen: Ohne A gibt es weder den Sheet-Dialog noch den Fixture-Eintrag.
 
+**Schritt 6, E2E von Paket B (2026-10-05, Branch `anbieter-0010-b-e2e` auf `anbieter-0010-int`):**
+- **Neu bzw. ergänzt:**
+  - `e2e/anbieter-inhalt.spec.ts`: Fälle 1–6, dazu die Umlaut-Suche. Wegzeit ab Gostenhof aus den 0009-Fixtures: Theater „5 Min.“, Familientreff und Bibliothek „15 Min.“, Musikschule „30 Min.“, Gemeinde „35 Min.“. Bei 404 gilt die Luftlinie, das Theater steht mit „200 m“ vorn, die übrigen in km. CLS über den Wechsel vom Platzhalter zu den Zeilen < 0,05, gemessen nur in Chromium (Layout-Shift-API).
+  - `mobile-ux.spec.ts`: die sieben Ansichten `anbieter*`. Das Sheet zeigt die Gemeinde mit dem längsten Namen.
+  - `smoke.spec.ts`: mehr als 50 aktive Zeilen, die blassen am Ende (Zeilen = Katalog, heute 64 + 10), das Sheet des Spitzenreiters mit allen Angeboten (heute 71), 320 px / 200 %, zweistelliges Badge bei 320 px / 200 % und in der Seitenleiste 863×360 / 200 %.
+  - `scripts/screenshots.ts`: Ansichten `anbieter`, `anbieter-sheet` und `tabs` (im Viewport `quer` die Seitenleiste).
+- **Produkt-Fix aus der Sichtprüfung:** Ohne Suchtext stand unter dem Feld „6 Anbieter“ (mit Turnverein), direkt unter der Statuszeile „5 Anbieter mit 8 Angeboten“. Die Live-Region zählt jetzt nur mit Suchtext. Ohne Suchtext bleibt sie leer, die Zeile bleibt reserviert (`min-height`), damit beim ersten Buchstaben nichts springt. Das weicht von E5 ab: Die Zahl ohne Suche nennt schon die Statuszeile.
+- **Ergebnis:** Pixel 7 und iPhone 15 grün mit `anbieter-inhalt`, `anbieter`, `layout`, `app`, `karte` und `mobile-ux` (602 Tests, 6 übersprungen); `smoke` grün (13 Tests).
+
 ## Struktur
 
 ```
