@@ -2,8 +2,8 @@
  * Prüft den Datenbestand und erzeugt die statischen Daten-Assets der Seite:
  *   public/data/site.json, public/data/meta.json, public/ics/**.ics,
  *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7)
- * Ungültige Daten oder ein ungültiger Auszug → Exit 1 → kein Build, kein Deploy. Fehlt der Auszug, gibt es
- * bis Schritt 5 von Plan 0009 nur eine Warnung und keine wegzeit.json (`TIMETABLE_REQUIRED`).
+ * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
+ * (`TIMETABLE_REQUIRED`, seit Plan 0009, Schritt 5).
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";

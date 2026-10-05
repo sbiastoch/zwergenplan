@@ -37,10 +37,10 @@ export function loadDataset(source: DataSource = dataSource()): ValidationResult
 }
 
 /**
- * Plan 0009, E7 (Review B1): Bis zum Zusammenführen von Pipeline und Tabelle (Schritt 5) gibt es den echten
- * Fahrplanauszug noch nicht. Solange ist sein Fehlen nur eine Warnung; Schritt 5 setzt das auf `true`.
+ * Plan 0009, E7 (Review B1): Bis zum Zusammenführen von Pipeline und Tabelle (Schritt 5) gab es den echten
+ * Fahrplanauszug noch nicht, sein Fehlen war nur eine Warnung. Seit Schritt 5 ist es rot.
  */
-export const TIMETABLE_REQUIRED = false;
+export const TIMETABLE_REQUIRED = true;
 
 export type TimetableLoad =
   | { kind: "ok"; timetable: Timetable }

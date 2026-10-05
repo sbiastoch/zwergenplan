@@ -40,8 +40,8 @@ describe("Fahrplanauszug laden (Plan 0009, E7/E12)", () => {
 describe("timetableIssues", () => {
   const missing: TimetableLoad = { kind: "missing", file: "data/oepnv/fahrplan.json" };
 
-  it("bis Schritt 5 ist der Auszug nicht Pflicht (TIMETABLE_REQUIRED = false)", () => {
-    expect(TIMETABLE_REQUIRED).toBe(false);
+  it("seit Schritt 5 ist der Auszug Pflicht (TIMETABLE_REQUIRED = true)", () => {
+    expect(TIMETABLE_REQUIRED).toBe(true);
   });
 
   it("fehlender Auszug ist ohne Pflicht nur eine Warnung", () => {
