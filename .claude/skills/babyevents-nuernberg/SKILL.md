@@ -9,6 +9,16 @@ Ein **Lauf** prüft den ganzen Katalog `data/providers.yaml` für den Horizont v
 
 Der Datenvertrag ist `src/domain/schema.ts`. Für Agenten ist er exportiert nach `schema/providers.schema.json` (Katalog), `schema/raw-batch.schema.json` (Ergebnis der Subagenten) und `schema/offers.schema.json`. Rohdaten werden korrigiert, das Schema bleibt, wie es ist.
 
+## 0. Fahrplan prüfen
+
+```
+pnpm pipeline oepnv
+```
+
+Der Befehl fragt beim VGN mit bedingtem `GET` nach einem neuen GTFS-Feed (Cache unter `~/.cache/zwergenplan/gtfs/`, Plan 0009). Ist der Feed unverändert, meldet er „Fahrplan aktuell“ und ändert nichts. Ist er neu, schreibt er `data/oepnv/fahrplan.json` mit neuem Stichtag (Referenz-Dienstag, Schultag). `publish` committet den Auszug dann mit dem Datenstand. Warnt `pnpm data:validate`, dass der Auszug abgelaufen ist oder ein Fahrplanwechsel ansteht, und der VGN hat noch keinen neuen Feed, bleibt der alte Auszug gültig; das gehört in den Abschlussbericht.
+
+Fertig, wenn der Befehl „Fahrplan aktuell“ oder „data/oepnv/fahrplan.json geschrieben“ meldet. Bricht er ab (Netz, geänderte Spalten im Feed), bleibt der alte Auszug stehen: Grund in den Abschlussbericht, der Lauf geht weiter.
+
 ## 1. Lauf anlegen
 
 ```
@@ -69,6 +79,7 @@ Fertig, wenn `gh run watch` grün endet und `https://zwergenplan.app/data/meta.j
 
 ## Abschlussbericht im Chat
 
+- Fahrplan: „aktuell“ oder neuer Stand mit Stichtag, ggf. Warnung zum Fahrplanwechsel
 - Angebote und Termine, verglichen mit dem vorigen Stand
 - **jede** Quelle mit `fehler` samt Grund und **jede** aus dem Altbestand übernommene Quelle
 - umgesetzte Katalogänderungen
