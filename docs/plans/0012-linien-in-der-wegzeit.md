@@ -1,6 +1,6 @@
 # Plan 0012 – Linien in der Wegzeit („ca. 25 Min. mit Bus 37 → U1“)
 
-Status: Fassung 2 nach den Nutzerentscheidungen vom 2026-10-05 (höchstens 1 Umstieg, Pfeil). Review-Runden 1 (auf Fassung 1) und 2 (auf Fassung 2) eingearbeitet, kein offener Blocker. **Schritte 1–7 umgesetzt** (Branch `linien-0012`, siehe „Umsetzung“); offen: Schritt 8 (Arch-Review), 9 (Push, CI, Merge), 10 (Browser-Review live).
+Status: **Umgesetzt und live seit `61de0da`** (https://zwergenplan.app/, `data/meta.json`). Schritte 1–10 erledigt; Browser-Review live (Schritt 10, 2026-10-06) **bestanden mit Hinweisen**, siehe Abschnitt „Browser-Review live“. Offen bleibt nur die Stichprobe mit VoiceOver und TalkBack am echten Gerät („, dann“, Wischschritte).
 Datum: 2026-10-05
 Bezug:
 - **ADR 0011** (Wegzeit-Tabelle Halt→Ort). Dieser Plan ändert dort:
@@ -817,3 +817,68 @@ Zusätzlich zur Kenntnis: 27 Paare (1,1 %) verlieren ihre Linien durch die Passu
 - **7:** Tests prüfen, dass „10 Min.“ und „1,5 km“ der Erklärung aus `TRANSFER_PENALTY_MINUTES` und `ACCESS_METERS` kommen (`transit.test.ts`, `format.test.ts`) und `EGRESS_METERS = ACCESS_METERS` (`profile-csa.test.ts`).
 - **8:** Im Zufallsnetz gilt „mehr als die Hälfte der Minuten mit Weg“ wieder für jeden Radius (`/ 2`; erster Lauf 300 m 2 799, 800 m 4 564, 1 500 m 4 673 von 5 040). Dabei fiel ein `as`-Cast bei den Zählerschlüsseln weg, ebenso einer in `e2e/fixtures.ts`.
 - **9:** E2E „linien.json passt nicht zur Tabelle“ (`startpunkt.spec.ts`): fremde Kennung → „mit Bus & Bahn“, Minuten unverändert (15 und 30 Min.), keine Konsolenfehler, kein Neuladen (Marker auf `window` bleibt). Kanarienvogel: ohne die Prüfung `file.table !== table.id` in `decodeTransitLines` → rot.
+
+## Browser-Review live (Schritt 10, 2026-10-06) – Ergebnis: bestanden mit Hinweisen
+
+Ziel: https://zwergenplan.app/ mit Stand `61de0da` (geprüft über `data/meta.json`), echte Daten (333 Angebote, 76 Orte). Chromium (Playwright), `isMobile`, `deviceScaleFactor: 2`, `reducedMotion: reduce`, `de-DE`, Europe/Berlin.
+
+**Vorgehen:**
+- Standard-Matrix: `node scripts/screenshots.ts https://zwergenplan.app/`, 168 Bilder (14 Ansichten × 6 Viewports × hell/dunkel), alle angesehen (als Kontaktbögen je Ansicht).
+- Plan-spezifisch: Wegwerf-Skripte außerhalb des Repos (`/home/suus/.claude/jobs/70a152b4/tmp/review-0012/`, dort auch alle Screenshots). Startpunkt per `localStorage` (`zwergenplan.entfernung-ab`), Detail per `?angebot=…`, Orts-Sheet über Karte → Orts-Liste. Je Ansicht 360×740 bei 100 % und 320×640 bei 200 % Wurzel-Schriftgröße (wie `setTextScale`), jeweils hell und dunkel.
+- Die Fälle stammen aus einer Vollrechnung über alle 35 Stadtteile × 76 Orte mit `transitReach` aus `src/domain/transit.ts` auf den Live-Dateien: 1 478 Paare mit einer Linie, 989 mit zwei, 81 zu Fuß, 53 „über 2 Std.“ (davon 1 endlich über 120 Min.), 59 mit Bus & Bahn ohne Linien (E5). Das passt zur Messung aus Schritt 3 (53 „über 2 Std.“, 60 ohne Linien).
+
+**Gezeigte Fälle (Text wörtlich aus dem DOM):**
+
+| Fall | Ort / Angebot | Anzeige | Screenshots |
+|---|---|---|---|
+| Detail, eine Linie | Hebammenpraxis Gugelrund, „Babymassage-Kurs (Sept.–Okt., freitags)“ | „ca. 25 Min. mit U1 ab Gostenhof“ | `detail-1linie-{360,320-200}-{light,dark}.png` |
+| Detail, zwei Linien | Gemeindehaus Eibach, „Rhythmik mit Eltern und Kindern (1–3 Jahre, Fr)“ | „ca. 25 Min. mit U2 → Bus 61 ab Gostenhof“ | `detail-2linien-{360,320-200}-{light,dark}.png` |
+| Orts-Sheet, zwei Linien | Haus der Begegnung (4 Angebote) | „ca. 50 Min. mit U1 → Bus 56 ab Gostenhof“ | `sheet-2linien-…`, `…-320-200-*-wegzeit.png` |
+| Orts-Sheet, eine Linie | Haus der Katholischen Stadtkirche (12) | „ca. 15 Min. mit U1 ab Gostenhof“ | `sheet-1linie-…` |
+| Orts-Sheet, zu Fuß | Nachbarschaftshaus Gostenhof (2) | „ca. 10 Min. zu Fuß ab Gostenhof“ | `sheet-zufuss-…` |
+| Orts-Sheet, über 2 Std. | Mutherstudio Kraftshof (13), ab Altenfurt | „über 2 Std. ab Altenfurt (mit höchstens 1 Umstieg)“ | `sheet-ueber2h-…` |
+| Kachel und Orts-Liste | Liste ab Gostenhof, Karte → Orte | „… · Fischbach · 45 Min.“, keine Linien | `kachel-…`, `kachel-…-karte1.png`, `ortsliste-…` |
+
+**Befunde:**
+- Keine Fehler, die zu beheben sind.
+- **Pfeil und Umbruch:** In allen 8 Varianten mit zwei Linien stehen Linie davor, Pfeil und Linie danach in derselben Zeile (gemessen über `Range.getClientRects`, z. B. „vor 437 / Pfeil 437 / nach 437“). Keine Zeile beginnt mit „→“; bei 320 px/200 % bricht es als „ca. 50 Min. mit / U1 → Bus 56 ab / Gostenhof“ (`sheet-2linien-320-200-*-wegzeit.png`, `detail-2linien-320-200-*.png`). „Bus 61“ bleibt durch U+00A0 zusammen. Kein waagerechtes Scrollen (`scrollWidth = clientWidth` in allen Ansichten).
+- **Kachel (N2):** 40 Kacheln der Liste und 76 Einträge der Orts-Liste je Variante (4 Varianten) ohne „→“ und ohne Liniennamen; die Kachel zeigt nur „45 Min.“ bzw. „30 Min.“. Das Orts-Sheet zeigt die Wegzeit nur im Kopf, die Kacheln darin keine Minuten (wie Plan 0008, E19).
+- **Ladezustand und Fehler** (live, mit `page.route`): `linien.json` 3 s verzögert → zuerst „ca. 25 Min. mit Bus & Bahn ab Gostenhof“, dann „mit U2 → Bus 61“ bei gleicher Höhe des Wo-Blocks (128,8 px vorher und nachher, kein Layout-Sprung; `zustand-verzoegert-{vorher,nachher}.png`). `linien.json` abgebrochen → bleibt „mit Bus & Bahn“, Minuten unverändert, nur die provozierte Netzwerkmeldung in der Konsole (`zustand-fehler-vorher.png`).
+- **Hinweis 1 (Leistung, nicht durch diesen Plan):** Stadtteilwechsel bei 4-fach gedrosselter CPU 250–358 ms bis zur neuen Statuszeile und Kachel-Minuten, 326–441 ms bis zum nächsten Frame (Messwerte unten). Die Rechnung selbst kostet je Stadtteil 0,1–1,3 ms (Node, `transitReach` + 76 Orte, Dekodieren von `linien.json` 2,1 ms). Die Zeit steckt also im Neu-Rendern der Liste, nicht in der Wegzeit oder den Linien. Ungedrosselt 44–97 ms, unauffällig.
+- **Hinweis 2 (gewollt, E9):** `linien.json` kommt nach Tabelle und Chunk, beim Kaltstart rund 300 ms nach `wegzeit.json` (616 → 949 ms). Wer das Detail per Link öffnet, sieht kurz „mit Bus & Bahn“, dann die Linien (122 ms nach Ankunft der Datei, gedrosselt 273 ms), ohne Sprung.
+- **Hinweis 3 (außerhalb dieses Plans):** Im Detail bricht bei 320 px/200 % die Ortsteil-Angabe „Südstadt (Galgenhof/Steinbühl)“ als „(Galgenhof/Steinbü“ / „hl)“ ohne Trennstrich (`detail-1linie-320-200-*.png`, Wo-Block, Adresszeile). Ursache: `overflow-wrap: anywhere` (`dialog.css:15`) greift, weil das Wörterbuch den Schrägstrich-Verbund nicht trennt; `hyphens: auto` aus dem Arch-Review (Befund 3) hilft hier nicht. Betrifft nur Adresszeilen mit langen „A/B“-Ortsteilen bei 200 %; die Wegzeitzeile selbst ist nicht betroffen. Nicht behoben, zur Entscheidung.
+- **Hinweis 4 (fremd):** Die Konsole zeigt auf der Karte nur Warnungen aus dem OpenFreeMap-Stil (`highway-shield-*`/`road_shield_us`-Filter, Bild „wood-pattern“ im dunklen Stil, „GPU stall due to ReadPixels“ in Headless-Chromium). Keine Fehler, kein `pageerror`, keine fehlgeschlagenen Requests, keine HTTP-Antwort ≥ 400 in allen Läufen.
+- Ohne Linien mit Bus & Bahn (E5) kommt live vor, z. B. ab Gostenhof „Theater Mummpitz im Kachelbau“ (11 Min.) und „Nürnberg Langwasser“ (35 Min.): Dort steht wie geplant „mit Bus & Bahn“.
+
+**Stadtteilwechsel** (Liste, Kind-Sheet offen, Wechsel per `change` am Select; Zeit ab dem Ereignis bis zur Statuszeile „ab …“, bis zu geänderten Kachel-Minuten und bis zum nächsten Frame; Daten schon geladen):
+
+| Wechsel | CPU 1× | CPU 4× (CDP-Drosselung) |
+|---|---|---|
+| Gostenhof → Langwasser | 97 / 97 / 121 ms | 271 / 272 / 334 ms |
+| → Eibach | 54 / 54 / 82 ms | 250 / 250 / 326 ms |
+| → Altstadt | 59 / 59 / 80 ms | 358 / 358 / 441 ms |
+| → Gostenhof | 44 / 44 / 55 ms | 299 / 300 / 377 ms |
+| Detail öffnen (zwei Linien) bis Linien sichtbar | 100 ms | 523 ms |
+| Kaltstart Detail: Ankunft `linien.json` → Pfeil sichtbar | 122 ms | 273 ms |
+
+Ungedrosselt keine spürbare Verzögerung; gedrosselt am Rand der 300-ms-Schwelle, verursacht durch das Rendern (Hinweis 1).
+
+**Aria-Snapshot** (Detail mit zwei Linien, Chromium, `locator.ariaSnapshot()`):
+```
+.reach-long:  - text: ca. 25 Min. mit U2 , dann Bus 61 ab Gostenhof
+Wo-Block:     - text: Wo Gemeindehaus Eibach, Kleiner Saal Gemeindehaus Eibach, Eibacher Hauptstraße 61, 90451 Nürnberg · Eibach ca. 25 Min. mit U2 , dann Bus 61 ab Gostenhof
+DOM:          <span class="reach-long">ca. 25 Min. mit U2<span aria-hidden="true">&nbsp;→ </span><span class="sr-only">, dann </span>Bus&nbsp;61 ab Gostenhof</span>
+```
+„, dann“ steht im Vorlesetext, der Pfeil nicht. Das Leerzeichen vor dem Komma ist die bekannte Eigenart der Namensberechnung (Schritt 7). Mit einer Linie, zu Fuß und „über 2 Std.“ ist der Vorlesetext gleich dem sichtbaren Text.
+
+**Checkliste (SKILL.md, Abschnitt 4):**
+- **Lesbarkeit:** ja. Die Wegzeitzeile ist kurz („ca. 25 Min. mit U2 → Bus 61 ab Gostenhof“, bei 360 px eine Zeile) und steht im Wo-Block unter der Adresse bzw. fett im Kopf des Orts-Sheets. Was, wann, wo und frei bleiben in 2 Sekunden erfassbar; die Kachel bleibt unverändert knapp. Kontrast der Zeile hell rgb(71,85,99) bzw. dunkel rgb(169,184,198) auf der Kartenfläche, wie die übrige Nebentextfarbe.
+- **Daumen-Erreichbarkeit:** unverändert. Der Plan bringt kein neues Touch-Ziel; Kalender-Knopf und „Schließen“ liegen weiter unten.
+- **Zustände:** Laden (erst „mit Bus & Bahn“, dann Linien, ohne Sprung), Fehler (Rückfall „mit Bus & Bahn“), ohne Linien (E5) und „über 2 Std.“ geprüft. Lange Ortsnamen im Orts-Sheet trennen bei 320 px/200 % sauber („Mutherstu-dio Krafts-hof“). Nichts wird abgeschnitten; Ausnahme ist der Bruch ohne Trennstrich in der Adresszeile (Hinweis 3, nicht aus diesem Plan).
+- **Dark Mode:** keine grellen Inseln, Pfeil in der Textfarbe, Kontrast ausreichend (alle `*-dark.png`).
+- **Micro-Interactions:** keine neuen Bedienelemente. Der Wechsel „Bus & Bahn“ → Linien ist ein reiner Textwechsel ohne Animation, also auch bei reduzierter Bewegung ruhig.
+- **Konsistenz mit dem Design-System:** gleiche Schrift, Größe und Farbe wie die bisherige Wegzeitzeile; der Pfeil ist ein Textzeichen, keine neue Ikone; Kachel und Orts-Liste unverändert.
+
+**Offene Gerätepunkte:**
+- **VoiceOver (iOS) und TalkBack (Android):** Liest der Screenreader „mit U2, dann Bus 61“ als eine Ansage, oder werden `aria-hidden`-Span und `.sr-only`-Span zu eigenen Wischschritten (Review 2, H4)? Wird der Pfeil wirklich übersprungen? Pause vor „, dann“? Am echten Gerät nicht prüfbar in dieser Session.
+- WebKit lief in diesem Review nicht (nur Chromium); die E2E-Suite prüft „→“ in einer Zeile auch auf iPhone 15 (WebKit).
