@@ -681,3 +681,79 @@ Keine Blocker. Alle Befunde sind übernommen, mit einer Ausnahme bei H1 (siehe d
 - **H8:** beide Grenzen inklusiv in D3, `transit.test.ts:146` umgestellt.
 - **H9:** ADR 0015 ergänzt um die Statuszeile (ADR 0011, Punkt 3, Satz 3) sowie W1 und W2.
 - **H10:** `linien.json` erst, wenn auch die Logik da ist (E9).
+
+## Umsetzung
+
+Stand 2026-10-05, Branch `linien-0012`. Schritte 1–4 umgesetzt, Schritt 3 gemessen. **Angehalten nach Schritt 4:** Mehrere Werte weichen um mehr als 20 % von M4 ab (siehe „Messung Schritt 3“). Die Ursache ist bekannt, die Entscheidung liegt beim Nutzer (siehe „Offene Entscheidung“).
+
+### Schritt 1 – Auszug und Fixture
+
+- `pnpm pipeline oepnv`: Feed unverändert (HTTP 304, VGN-Soll-Daten vom 24.06.2026), Stichtag weiter **Di 13.10.2026**. Der alte Auszug ohne `mode` bestand die Prüfung nicht und wurde ohne `--force` neu geschrieben. 3 405 Fahrten: 2 519 Bus, 373 Tram, 310 U-Bahn, 203 Bahn. 1 062,4 kB roh, 174,5 kB gzip.
+- `route` ohne Namen wirft für übernommene Fahrten als `GTFS: Route <id> ohne Namen` (die Route-ID, weil es keinen Namen gibt).
+- **Fixture-Linie „202E“** (`tests/fixtures/oepnv/fahrplan.json`): Bus 9004:2 → 9008 ohne Zwischenhalt, ab 8:33 alle 10 Min. bis 12:23 (24 Fahrten; eine 25. um 12:33 läge hinter dem Auszugsende 12:30 und brach `tableRows`), 6 Min. Fahrt. Rechenweg ab Gostenhof (49,448 / 11,058; Zugang ≤ 1 500 m: 9001 in 91 m = 1,6 Min., 9002 in 473 m = 8,2 Min., 9003 in 1 368 m = 23,7 Min.):
+  - Tram 1 erreicht 9004:1 um T + 9:30 (T = 8:20, 8:30 …); Umstieg zu 9004:2 (122 m, 2,1 Min. + 1 Min.) ist um T + 12:40 fertig, der 202E fährt um T + 13:00, an 9008 um T + 19:00. Bus 2 (alle 20 Min., 8 Min. bis 9008) kommt nach jeder Tram später an, also gewinnt der 202E jede Minute.
+  - **Direkt mit Tram 1 am besten:** Beispielhof (Zeile 9001: 12 Min. → 1,6 + 12 = 13,6 → „15 Min.“), Bibliothek (14 → 15,6 → „15 Min.“).
+  - **Nur mit „Tram 1 → Bus 202E“:** Gemeindehaus (3,0 km Luftlinie). Zeile 9001: 4,5 Min. Median-Warten + 17 Min. + 47 m (0,8 Min.) = 22,3 → 22, Bit gesetzt. Ab Gostenhof real 1,6 + 22 = 23,6 („25 Min.“), bewertet 33,6; über 9002 28,2 (38,2), über 9003 39,7 (49,7); zu Fuß 52 Min. Passung: Die Folge belegt alle 120 Minuten, `d` ≈ 0,3.
+  - Musikschule: „Tram 1 → Bus 2“ (Zeile 9001: 28 mit Bit, ab Gostenhof 29,6, bewertet 39,6; zu Fuß 40,9). Der 202E kommt der Musikschule über 9008 (694 m) nie näher: Er wäre in jeder Minute mindestens 27 s später als Bus 2.
+  - **Zu Fuß am besten:** Theater (226 m). Im Browser gewinnt allerdings knapp die Zelle 9001 „zu Fuß vom Halt“ (1,6 + 2 = 3,6 gegen 3,9 Min. direkt, Rundung des Zellwerts), also ohne Linien „mit Bus & Bahn“ – das ist der Fall aus E5, wie heute. Ein echtes „zu Fuß“ zeigt weiter der Standort-Test (`startpunkt.spec.ts`, „ca. 5 Min. zu Fuß ab deinem Standort“).
+  - Die längste Folge der Fixture ist „Tram 1 → Bus 202E“ (Gemeindehaus, für E4).
+  - Filter „bis 20 Min.“ blendet Musikschule (29,6) und Gemeindehaus (23,6) weiter aus. Die Reihenfolge der Orts-Liste ändert sich: Gemeindehaus (25 Min.) kommt jetzt vor die Musikschule (30 Min.).
+
+### Schritt 2 – Profil-CSA
+
+- Wie E3. Die Ebene 0 liegt nach ihrem Durchlauf als CSR je Steig (aufsteigend nach Abfahrt) vor; Ebene 1 sucht den Anschluss binär.
+- **Abweichung (Gleichstand):** Bei gleicher Abfahrt und gleicher Bewertung gewinnt die Direktverbindung auch dann, wenn der Umstiegsweg zuerst gescannt wird (beim Überschreiben eines Eintrags mit gleicher Abfahrt). Nur mit „strikt `<`“ hinge das von `connectionOrder` ab (die Verbindung mit der späteren Ankunft am nächsten Halt kommt zuerst). So gilt ADR 0015, Punkt 2 („bei gleicher Abfahrt die Direktverbindung“) wörtlich. Test T5 übt genau diesen Fall.
+- T5 „Sitzenbleiben vor Abgang“ ist nicht beobachtbar (gleiche Fahrt, gleiche Ankunft) und hat keinen eigenen Test. „Abgang vor Umstieg“ an derselben Haltestelle lässt sich mit Gleitkomma-Fußwegen nicht exakt gleich bauen; der Fall ist über „gleiche Abfahrt → Direktverbindung“ abgedeckt.
+- **T2-Zähler** (Zufallsnetz jetzt 60 statt 40 Fahrten, sonst lag „P = 0 und P = 600 wählen verschieden“ unter 5 %): je Radius schwanken die Zähler stark (bei 1 500 m nur 4 % Minuten mit Umstieg), deshalb gelten die Untergrenzen für die Summe über 300, 800 und 1 500 m. Erster Lauf: 15 120 Minuten, ein Umstieg 3 198 (21 %), unbegrenzt schneller 960 (6,3 %), P verschieden 1 291 (8,5 %).
+- **Kanarienvögel:** ohne Aufschlag 10 Tests rot; ohne Direkt-Vorrang 1 rot; ohne Umstiegszeit 4 rot; vertauschte Rückverfolgung 8 rot.
+
+### Schritt 3 – Tabelle und Linien
+
+- Wie E4–E7. **Abweichung:** Eine Folge zählt mit ihrer Fahrtenzahl („U1“ direkt und „U1 → U1“ sind verschiedene Folgen), sonst wäre das Umstiegs-Bit bei zusammengefassten Namen nicht eindeutig. Gleichstand danach wie geplant (weniger Linien, Median, Text), als letztes weniger Fahrten.
+- `encodeMinutes` heißt jetzt `encodeBytes` (kodiert auch die Linien-Ebenen).
+- **Laufzeit:** Der erste Stand brauchte 4,8 s. `valueAt` wurde in den heißen Schleifen megamorph (Int32-, Float64- und Uint8-Arrays, 1,1 s Eigenzeit). Monomorphe Lesehilfen `i32`/`f64` in `profile-csa.ts` und ein Abbruch der Umstiegssuche, wenn kein Anschluss mehr gewinnen kann (`at + 60 s + P ≥ bisher beste Bewertung`), bringen die Tabelle auf **2,1–2,3 s**. Das alte Modell braucht auf derselben Maschine 3,3–3,4 s.
+- **Gate:** `MAX_WITHOUT_LINES = 0,093` (gemessen 4,3 % + 5 Prozentpunkte). Kanarienvögel: Schwelle 4 % → `build-data` rot; keine Linien (Fixture) → rot („keine Zelle hat Linien“); `node:fs` in `lines.ts` → `transit-build-pure` rot.
+- Schritt 4 lief vor der Messung, damit die Messung die echte Browser-Rechnung (`transitReach` mit Bit und Linien) nutzt.
+
+### Messung Schritt 3 (2026-10-05)
+
+**Rechenweg** (Skript außerhalb des Repos, `/tmp/m0012b/measure.ts`):
+- Altes Modell: `git show main:scripts/transit/{profile-csa,table}.ts` und `git archive main src/domain` in ein temporäres Verzeichnis; daraus `buildTransitTable` (unbegrenzt, ohne Aufschlag, Abgang 800 m) und `transitReach` (800 m) aus `main`.
+- Beide auf **demselben neuen Auszug** (Stichtag 13.10.2026) und denselben 76 Orten aus `site.json` (echte Daten), 556 Haltbereiche.
+- Je Stadtteil (35) × Ort (76) = 2 660 Paare: neu `transitReach(table, origin, lines)`, alt `transitReach` aus `main`. Verschiebung = neu − alt, nur wo beide endlich sind (2 608 Paare).
+- Direkt/Umstieg: Bit der gewählten Zelle; „ohne Linien“ getrennt nach „häufigste Folge leer“ (zu Fuß vom Halt) und „unpassend“.
+- „Umstiegs-Bit entscheidet um“: dieselbe Wahl im Browser einmal mit, einmal ohne Aufschlag; gezählt, wo ohne Aufschlag ein Umstiegsweg gewinnt, mit Aufschlag eine andere Zeile (Direktverbindung) oder der Fußweg.
+- `d` je Zelle: Build-Schleife nachgebaut, Median der Minuten der häufigsten Folge gegen den Zellwert.
+- Größen mit gzip Stufe 9.
+
+**Ergebnisse:**
+
+| Wert | M4/M5 (Prototyp) | gemessen, wie geplant (mit Bit) | gemessen ohne Bit im Browser |
+|---|---|---|---|
+| `wegzeit.json` | 62,4 kB / 41,6 kB gzip | 62,5 kB / 42,1 kB | – |
+| `linien.json` | 113,3 kB / 27,9 kB gzip | 113,6 kB / 28,0 kB | – |
+| Linien, Folgen | 67, 651 | 66, 659 | – |
+| Laufzeit Tabelle | 2,8 s | 2,1–2,3 s (alt 3,3 s) | – |
+| Minuten Mittel | +2,3 | **+2,94 (+28 %)** | +2,26 |
+| p90 | +7 | **+8,9 (+27 %)** | +7,0 |
+| p99 | +23 | +23,8 | +23,0 |
+| > 15 Min. länger | 2,1 % | 2,3 % | 2,1 % |
+| neu „über 2 Std.“ | 52 | 53 | 53 |
+| zu Fuß | 2,9 % | 3,0 % | 2,9 % |
+| direkt (von Bus & Bahn) | 45,0 % | **58,5 % (+30 %)** | 44,2 % |
+| ein Umstieg | 53,8 % | **39,1 % (−27 %)** | 53,7 % |
+| ohne Linien (Paare) | 32 | **60 (+88 %)**: 33 zu Fuß vom Halt, 27 unpassend | 54: 32 zu Fuß vom Halt, 22 unpassend |
+
+- **Umstiegs-Bit** (E2, Review 2, W1): Es entscheidet **366 Paare (13,8 %)** zu einer Direktverbindung um, 5 zum Fußweg. Diese Paare werden im Mittel 4,8 Min. länger (p50 4,3, p90 8,9, höchstens 10,0).
+- **`d` je Zelle** (33 889 Zellen mit Linienfolge): p50 0,38, p90 2,56, p99 6,91 Min. Ohne Linien 1 514 von 35 226 Zellen (4,3 %), davon wegen der Passung 143 (0,4 %). Unter der Nachfrage-Schwelle von 10 %.
+
+**Befund:** Ohne das Umstiegs-Bit im Browser trifft die Messung M4 auf wenige Prozent genau. Die Abweichungen über 20 % kommen **allein vom Umstiegs-Bit**, das erst Review 2 (W1) nach der Messung M4 hinzugefügt hat; M4 hat es nicht enthalten. „Ohne Linien“ liegt zusätzlich wegen der Passungsprüfung (Review 1, W1) höher, die M4 ebenfalls nicht kannte (22–27 Paare, 0,4 % der Zellen).
+
+### Offene Entscheidung (Nutzer)
+
+Laut Schritt 3 wird bei mehr als 20 % Abweichung angehalten. Zu entscheiden ist:
+
+1. **Umstiegs-Bit wie geplant behalten** (Direktverbindung hat auch über verschiedene Halte Vorrang): 58,5 % direkt; die Minuten steigen gegenüber heute im Mittel um +2,9 statt +2,3 (p90 +8,9 statt +7). 366 Stadtteil-Ort-Paare zeigen eine Direktverbindung, die im Mittel 4,8 Min. (höchstens 10 Min.) langsamer ist als ein Umstiegsweg ab einem anderen Halt im Umkreis. Dann gelten die Werte der Spalte „mit Bit“ als neue Referenz, und Schritte 5–7 laufen unverändert weiter.
+2. **Ohne Bit** (Vorrang nur je Starthalt, Variante vor Review 2, W1): Werte wie M4 (44 % direkt). Der Browser zeigt dann mitunter einen Umstiegsweg ab einem weiter entfernten Halt, obwohl ab dem nächsten Halt eine nur wenig langsamere Direktverbindung fährt. Das Bit kann in der Datei bleiben (Formatversion 2), nur `transitReach` vergliche ohne Aufschlag; ADR 0015 und E2 wären anzupassen.
+
+Zusätzlich zur Kenntnis: 27 Paare (1,1 %) verlieren ihre Linien durch die Passungsprüfung (`d > max(3 Min., 25 %)`); die Prüfung bleibt wie geplant.
