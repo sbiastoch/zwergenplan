@@ -128,6 +128,8 @@ test("LCP und CLS bleiben mit echten Daten im Budget", async ({ page, browserNam
  */
 test.describe("mit Service Worker (Plan 0011)", () => {
   test.use({ serviceWorkers: "allow" });
+  // Notausgang (README): ohne Service Worker gibt es keinen zweiten Besuch über ihn
+  test.skip(process.env["ZWERGENPLAN_SW"] === "aus", "Notausgang aktiv: Build ohne Service Worker (README)");
 
   test("LCP und CLS beim ersten und zweiten Besuch im Budget", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "CDP-Drosselung und LCP-API gibt es nur in Chromium");

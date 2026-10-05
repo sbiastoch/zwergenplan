@@ -32,12 +32,17 @@ function bundle(html = HTML): MiniBundle {
     "assets/app/AppSection-GGG.js": chunk("assets/app/AppSection-GGG.js", ["assets/app/pwa-FFF.js"], {
       facadeModuleId: "/repo/src/ui/app-extras/AppSection.tsx",
     }),
+    "assets/export/ics-JJJ.js": chunk("assets/export/ics-JJJ.js", [], { facadeModuleId: "/repo/src/domain/ics.ts" }),
     "assets/font-latin-opsz-normal-HHH.woff2": asset("assets/font-latin-opsz-normal-HHH.woff2"),
     "assets/font-latin-ext-opsz-normal-III.woff2": asset("assets/font-latin-ext-opsz-normal-III.woff2"),
   };
 }
 
-const OPTIONS = { base: "/", fonts: /-latin-opsz-normal-[^/]+\.woff2$/, startChunks: /\/src\/data\/pwa\.ts$/ };
+const OPTIONS = {
+  base: "/",
+  fonts: /-latin-opsz-normal-[^/]+\.woff2$/,
+  startChunks: [/\/src\/data\/pwa\.ts$/, /\/src\/domain\/ics\.ts$/],
+};
 
 describe("precacheList (Plan 0011, E3)", () => {
   it("enthält index.html, das Entry-Skript aus index.html, seine statischen Imports, das Start-CSS und die Latin-Schrift", () => {
@@ -45,6 +50,7 @@ describe("precacheList (Plan 0011, E3)", () => {
       "index.html",
       "assets/app/pwa-FFF.js",
       "assets/deep-DDD.js",
+      "assets/export/ics-JJJ.js",
       "assets/font-latin-opsz-normal-HHH.woff2",
       "assets/index-AAA.js",
       "assets/index-CCC.css",
@@ -52,15 +58,24 @@ describe("precacheList (Plan 0011, E3)", () => {
     ]);
   });
 
-  it("enthält keinen Lazy-Chunk aus einem Unterordner, außer dem Start-Chunk der PWA", () => {
+  it("enthält keinen Lazy-Chunk aus einem Unterordner, außer den Start-Chunks (PWA-Kern, Export-Code)", () => {
     const list = precacheList(bundle(), OPTIONS);
     expect(list).not.toContain("assets/karte/MapView-EEE.js");
     expect(list).not.toContain("assets/app/AppSection-GGG.js");
-    expect(list.filter((f) => /^assets\/[^/]+\//.test(f))).toEqual(["assets/app/pwa-FFF.js"]);
+    expect(list.filter((f) => /^assets\/[^/]+\//.test(f))).toEqual([
+      "assets/app/pwa-FFF.js",
+      "assets/export/ics-JJJ.js",
+    ]);
   });
 
   it("ohne Start-Chunks nur der Einstieg", () => {
-    expect(precacheList(bundle(), { ...OPTIONS, startChunks: undefined })).not.toContain("assets/app/pwa-FFF.js");
+    expect(precacheList(bundle(), { ...OPTIONS, startChunks: [] })).not.toContain("assets/app/pwa-FFF.js");
+  });
+
+  it("ein Start-Chunk-Muster ohne Treffer: Fehler (umbenanntes Modul fiele sonst still aus dem Precache)", () => {
+    expect(() =>
+      precacheList(bundle(), { ...OPTIONS, startChunks: [/\/src\/data\/pwa\.ts$/, /\/src\/gibt-es-nicht\.ts$/] }),
+    ).toThrow(/gibt-es-nicht/);
   });
 
   it("Pfade relativ zur Basis (BASE aus site.config.ts)", () => {

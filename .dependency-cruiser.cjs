@@ -200,8 +200,9 @@ module.exports = {
       severity: "error",
       comment:
         "PWA-Kern und (ab Stufe 2) Push und Geräte-Speicher in src/data sind Lazy-Chunks in assets/app/ (Plan 0011, E5): aus src/ui und src/data nur per import(), außer aus der App-Extras-Oberfläche und den Lazy-Modulen selbst. Im Start steht nur src/data/pwa-start.ts. Tests ausgenommen.",
+      // auch src/main.tsx (Arch-Review Stufe 1, H9): der Einstieg ist genauso Start-Bundle
       from: {
-        path: "^src/(ui|data)/",
+        path: "^src/(ui|data)/|^src/main\\.tsx$",
         pathNot: ["^src/ui/app-extras/", "^src/data/(pwa|push|push-start|device-store)\\.ts$", "\\.test\\.ts$"],
       },
       to: { path: "^src/data/(pwa|push|push-start|device-store)\\.ts$", dependencyTypesNot: ["dynamic-import"] },

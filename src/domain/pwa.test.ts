@@ -31,7 +31,7 @@ describe("installHelp: Texte der Installationshilfe je Zustand (Plan 0011, E7)",
       before: "Tippe auf",
       share: "Teilen",
       after: "und dann auf „Zum Home-Bildschirm“.",
-      note: "Die App startet leer: Alter und Merkliste dort noch einmal eintragen.",
+      note: "Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.",
     });
   });
 

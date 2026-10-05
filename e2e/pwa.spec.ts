@@ -29,6 +29,8 @@ async function worker(context: BrowserContext) {
 }
 
 test.use({ serviceWorkers: "allow" });
+// Notausgang (README): Mit ZWERGENPLAN_SW=aus gibt es bewusst keinen Service Worker, der kontrollieren oder cachen könnte.
+test.skip(process.env["ZWERGENPLAN_SW"] === "aus", "Notausgang aktiv: Build ohne Service Worker (README)");
 test.skip(
   () => !["pixel-7", "desktop"].includes(test.info().project.name),
   "Service Worker nur in Chromium (pixel-7, desktop); WebKit prüft der Browser-Review am iPhone (E6)",
@@ -121,11 +123,9 @@ test("3 Kanarienvogel: offline scheitert auch ein fetch aus dem Service Worker (
   expect(await probe(), "offline").toBe("fehler");
 });
 
+// Ohne erlaubte Konsolenfehler: Auch der Export-Code, den die App im Leerlauf vorlädt, liegt im Precache (Arch-Review
+// Stufe 1, H7). Ein Ladefehler offline wäre rot.
 test.describe("offline", () => {
-  // Offline scheitert ein Lazy-Chunk, der nie geladen wurde: das Vorladen des Export-Codes (Plan 0010, E8 A; nicht im
-  // Precache, E3) meldet sich als Ladefehler in der Konsole. Die App fängt ihn ab (Toast erst beim Export).
-  test.use({ allowedConsoleErrors: [/\/assets\/export\/[^/ ]+\.js Failed to load resource: net::ERR_FAILED$/] });
-
   test("4 offline nach dem ersten Besuch: Liste und „Offline – Stand vom …“ aus dem Precache (E4)", async ({
     page,
     context,
@@ -142,22 +142,6 @@ test.describe("offline", () => {
     }
   });
 
-  test("5 Kalender-Datei offline: Seite bleibt stehen, Toast „Kalender-Datei braucht Netz“ (E4, Regel 2)", async ({
-    page,
-    context,
-  }) => {
-    await installed(page);
-    await offers(page).first().getByRole("heading").getByRole("button").click();
-    const detail = page.getByRole("dialog");
-    await expect(detail).toBeVisible();
-    const url = page.url();
-    await context.setOffline(true);
-    await detail.locator('a[href*="/ics/"]').first().click();
-    await expect(page.getByText("Kalender-Datei braucht Netz")).toBeVisible();
-    expect(page.url()).toBe(url);
-    await expect(detail).toBeVisible();
-  });
-
   test("7 wieder online: Die Statuszeile verliert „Offline“ ohne Neustart (E4a)", async ({ page, context }) => {
     await installed(page);
     await context.setOffline(true);
@@ -170,6 +154,23 @@ test.describe("offline", () => {
     await expect(page.getByRole("status")).not.toContainText("Offline");
     await expect(page.getByRole("status")).toContainText("8 Angebote ab heute");
   });
+});
+
+// E6, Punkt 5: ausdrücklich ohne erlaubte Konsolenfehler (204 statt Netzfehler)
+test("5 Kalender-Datei offline: Seite bleibt stehen, Toast „Kalender-Datei braucht Netz“ (E4, Regel 2)", async ({
+  page,
+  context,
+}) => {
+  await installed(page);
+  await offers(page).first().getByRole("heading").getByRole("button").click();
+  const detail = page.getByRole("dialog");
+  await expect(detail).toBeVisible();
+  const url = page.url();
+  await context.setOffline(true);
+  await detail.locator('a[href*="/ics/"]').first().click();
+  await expect(page.getByText("Kalender-Datei braucht Netz")).toBeVisible();
+  expect(page.url()).toBe(url);
+  await expect(detail).toBeVisible();
 });
 
 test("6 online kommt site.json aus dem Netz (ohne X-Zp-Cache), durch den Service Worker (E4)", async ({ page }) => {
@@ -206,9 +207,6 @@ test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request au
 });
 
 test.describe("Laufzeit-Cache der Daten (Arch-Review Stufe 1, B1)", () => {
-  // wie „offline“: Das Vorladen des Export-Codes scheitert offline, wenn der Chunk nie geladen wurde
-  test.use({ allowedConsoleErrors: [/\/assets\/export\/[^/ ]+\.js Failed to load resource: net::ERR_FAILED$/] });
-
   test("(a) Wegzeit-Tabelle kommt nach einem Online-Besuch offline aus zp-data (E4, Regel 5)", async ({
     page,
     context,

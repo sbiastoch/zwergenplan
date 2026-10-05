@@ -2,10 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createInstallStore,
   FRESH_AFTER_MS,
+  ICS_OFFLINE,
   type InstallEnv,
+  offlineNote,
   type PromptEvent,
   type PwaEnv,
   type PwaHooks,
+  STALE_RETRY_MS,
   start,
   UPDATE_WAIT_MS,
   type UpdatableRegistration,
@@ -33,6 +36,7 @@ function fakeEnv(fields: Partial<PwaEnv> = {}) {
     },
     onControllerChange: () => () => undefined,
     visible: () => visible,
+    online: () => true,
     now: () => now,
     reload: () => calls.push("reload"),
     markReady: () => calls.push("bereit"),
@@ -55,12 +59,22 @@ function fakeEnv(fields: Partial<PwaEnv> = {}) {
   };
 }
 
-function hooks(calls: string[], last?: { at: number; stale: boolean }): PwaHooks {
-  return {
-    lastLoad: () => last,
-    refresh: () => calls.push("refresh"),
-    icsOffline: () => calls.push("ics-offline"),
+const STAND = "2026-10-05T06:00:00+02:00";
+
+/** Hooks der App: `refresh`, Toast und Statuszeile protokolliert; `last` kann der Test später ändern */
+function hooks(calls: string[], last?: { at: number; stale: boolean }) {
+  const state = { last: last && { ...last, generatedAt: STAND }, note: "" };
+  const api: PwaHooks = {
+    lastLoad: () => state.last,
+    refresh: async () => {
+      calls.push("refresh");
+    },
+    say: (text) => calls.push(`say: ${text}`),
+    note: (text) => {
+      state.note = text;
+    },
   };
+  return Object.assign(api, { state });
 }
 
 /** Registrierung mit `update()`, die optional einen neuen Service Worker findet */
@@ -111,7 +125,7 @@ describe("start (Plan 0011, E5)", () => {
     f.fire("online");
     await settle();
     f.message({ type: "ics-offline" });
-    expect(f.calls).toEqual(["bereit", "refresh", "ics-offline"]);
+    expect(f.calls).toEqual(["bereit", "refresh", `say: ${ICS_OFFLINE}`]);
   });
 
   it("Nachricht ics-offline vom Service Worker → Hinweis; andere Nachrichten nicht", async () => {
@@ -121,7 +135,7 @@ describe("start (Plan 0011, E5)", () => {
     f.message("ics-offline");
     f.message(null);
     f.message({ type: "ics-offline" });
-    expect(f.calls).toEqual(["bereit", "ics-offline"]);
+    expect(f.calls).toEqual(["bereit", `say: ${ICS_OFFLINE}`]);
   });
 
   it("das Aufräumen entfernt die Listener", async () => {
@@ -213,7 +227,25 @@ describe("Frische-Anlass (Plan 0011, E4a)", () => {
     f.fire("online");
     await vi.advanceTimersByTimeAsync(UPDATE_WAIT_MS);
     expect(f.calls).toEqual(["update", "refresh"]);
+  });
+
+  it("controllerchange kommt später: gemerkt, das nächste Sichtbarwerden lädt neu (Arch-Review, H10)", async () => {
+    const f = await started({ at: 100 * MIN, stale: false }, "neu");
+    f.advance(FRESH_AFTER_MS + 1);
+    f.fire("visibilitychange");
+    await vi.advanceTimersByTimeAsync(UPDATE_WAIT_MS);
+    expect(f.calls).toEqual(["update", "refresh"]);
+    f.controllerChange();
+    await settle();
+    expect(f.calls, "nie mitten in der Bedienung").toEqual(["update", "refresh"]);
     expect(f.listening()).toBe(0);
+    f.setVisible(false);
+    f.fire("visibilitychange");
+    expect(f.calls).toEqual(["update", "refresh"]);
+    f.setVisible(true);
+    f.fire("visibilitychange");
+    await settle();
+    expect(f.calls).toEqual(["update", "refresh", "reload"]);
   });
 
   it("ohne neuen Service Worker: kein Neuladen, auch wenn später controllerchange käme", async () => {
@@ -346,5 +378,60 @@ describe("Installationszustand (Plan 0011, E7)", () => {
     off();
     installed();
     expect(count).toBe(2);
+  });
+});
+
+describe("Statuszeile „Offline – Stand vom …“ (E4; seit dem Arch-Review lazy, Plan 0011, E5)", () => {
+  it("Text: Tag des Datenstands in Berlin", () => {
+    expect(offlineNote("2026-10-04T23:30:00Z")).toBe("Offline – Stand vom 5.10.");
+    expect(offlineNote(STAND)).toBe("Offline – Stand vom 5.10.");
+  });
+
+  it("start setzt die Zeile nach einem Offline-Abruf, sonst leer", async () => {
+    const offline = hooks([], { at: 0, stale: true });
+    await start(offline, fakeEnv().env);
+    expect(offline.state.note).toBe("Offline – Stand vom 5.10.");
+    const online = hooks([], { at: 0, stale: false });
+    await start(online, fakeEnv().env);
+    expect(online.state.note).toBe("");
+  });
+
+  it("nach dem Frische-Anlass gilt der neue Abruf: Zeile verschwindet", async () => {
+    const f = fakeEnv();
+    const h = hooks(f.calls, { at: 0, stale: true });
+    const refresh = h.refresh;
+    h.refresh = async () => {
+      await refresh();
+      h.state.last = { at: 1, stale: false, generatedAt: STAND };
+    };
+    await start(h, f.env);
+    f.fire("online");
+    await settle();
+    expect(h.state.note).toBe("");
+  });
+});
+
+describe(`stale trotz Netz (5-s-Zeitlimit): ein Frische-Anlass nach ${STALE_RETRY_MS / 1000} s (Arch-Review, H5)`, () => {
+  it("online und stale: nach der Wartezeit genau ein Anlass", async () => {
+    const f = fakeEnv();
+    await start(hooks(f.calls, { at: 0, stale: true }), f.env);
+    await vi.advanceTimersByTimeAsync(STALE_RETRY_MS - 1);
+    expect(f.calls).toEqual(["bereit"]);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(f.calls).toEqual(["bereit", "refresh"]);
+    await vi.advanceTimersByTimeAsync(10 * STALE_RETRY_MS);
+    expect(f.calls).toEqual(["bereit", "refresh"]);
+  });
+
+  it("offline (das Ereignis online kommt noch) oder nicht stale: kein Anlass; Aufräumen stoppt den Timer", async () => {
+    const offline = fakeEnv({ online: () => false });
+    await start(hooks(offline.calls, { at: 0, stale: true }), offline.env);
+    const fresh = fakeEnv();
+    await start(hooks(fresh.calls, { at: 0, stale: false }), fresh.env);
+    const stopped = fakeEnv();
+    const stop = await start(hooks(stopped.calls, { at: 0, stale: true }), stopped.env);
+    stop();
+    await vi.advanceTimersByTimeAsync(2 * STALE_RETRY_MS);
+    expect([...offline.calls, ...fresh.calls, ...stopped.calls]).toEqual(["bereit", "bereit", "bereit"]);
   });
 });

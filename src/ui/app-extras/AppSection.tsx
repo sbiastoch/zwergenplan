@@ -7,7 +7,7 @@
  * statischem Import eines anderen Lazy-Chunks lässt Vite den Preload-Helfer `__vite__mapDeps` in den Einstieg
  * schreiben (+0,11 kB Start-JS, gemessen in Plan 0011, „Umsetzung“, Schritt 4).
  */
-import { useId, useSyncExternalStore } from "react";
+import { useId, useRef, useSyncExternalStore } from "react";
 import type { InstallApi } from "../../data/pwa.ts";
 import { installHelp } from "../../domain/pwa.ts";
 
@@ -23,7 +23,16 @@ function ShareIcon() {
 export function AppSection({ install }: { install: InstallApi }) {
   const state = useSyncExternalStore(install.subscribe, install.state);
   const heading = useId();
+  const text = useRef<HTMLParagraphElement>(null);
   const help = installHelp(state);
+  // Nach dem Tipp verschwindet der Knopf mit dem Fokus. Ohne Ziel fiele der Fokus im Modal auf <body>; die Zeile
+  // darüber sagt jetzt, wie es weitergeht (Arch-Review Stufe 1, gefunden mit den Gates für „installiert“).
+  // `preventScroll`: Die Zeile steht, wo der Knopf war. Ein Scrollen in den Blick verschöbe sonst auch das Sheet selbst
+  // (`overflow: hidden`), und der Kopf des Sheets wäre unerreichbar.
+  const promptThenFocus = async () => {
+    await install.prompt();
+    text.current?.focus({ preventScroll: true });
+  };
   if (!help) return null;
   return (
     <section className="app-section" aria-labelledby={heading}>
@@ -41,10 +50,12 @@ export function AppSection({ install }: { install: InstallApi }) {
           <p className="small">{help.note}</p>
         </>
       ) : (
-        <p className="app-text">{help.text}</p>
+        <p ref={text} className="app-text" tabIndex={-1}>
+          {help.text}
+        </p>
       )}
       {help.kind === "knopf" && (
-        <button type="button" className="btn primary wide" onClick={() => void install.prompt()}>
+        <button type="button" className="btn primary wide" onClick={() => void promptThenFocus()}>
           {help.button}
         </button>
       )}

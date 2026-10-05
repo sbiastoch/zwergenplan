@@ -31,11 +31,12 @@ export interface PrecacheOptions {
   /** Schriftschnitte, die beim Start gebraucht werden (die Latin-woff2) */
   fonts: RegExp;
   /**
-   * Lazy-Chunks, die **jeder** Start nach `load` lädt, nach Modul-ID des Einstiegs (`facadeModuleId`). Heute nur der
-   * PWA-Kern `src/data/pwa.ts`: Ohne ihn liefen offline weder Frische (E4a) noch der ICS-Hinweis (Abweichung in Plan
-   * 0011, „Umsetzung“, Schritt 3). Andere Lazy-Chunks in Unterordnern gehören nicht dazu.
+   * Lazy-Chunks, die **jeder** Start lädt, nach Modul-ID des Einstiegs (`facadeModuleId`): der PWA-Kern
+   * `src/data/pwa.ts` (nach `load`; ohne ihn liefen offline weder Frische noch ICS-Hinweis) und der Export-Code
+   * `src/domain/ics.ts` (Vorladen im Leerlauf; sonst ginge der Export offline erst nach einem zweiten Besuch). Plan 0011,
+   * „Umsetzung“ und Arch-Review Stufe 1, H7. Jedes Muster muss genau einen Chunk treffen, sonst wirft der Build.
    */
-  startChunks?: RegExp | undefined;
+  startChunks?: readonly RegExp[] | undefined;
 }
 
 const decoder = new TextDecoder();
@@ -81,10 +82,12 @@ export function precacheList(bundle: MiniBundle, { base, fonts, startChunks }: P
     }
   };
   for (const url of [...scripts, ...others]) add(relative(url));
-  for (const file of Object.values(bundle)) {
-    if (file.type === "chunk" && startChunks && file.facadeModuleId && startChunks.test(file.facadeModuleId)) {
-      add(file.fileName);
-    }
+  for (const pattern of startChunks ?? []) {
+    const hits = Object.values(bundle).filter(
+      (file) => file.type === "chunk" && file.facadeModuleId !== null && pattern.test(file.facadeModuleId),
+    );
+    if (hits.length === 0) throw new Error(`vite-sw: kein Chunk passt zu ${pattern} (startChunks)`);
+    for (const file of hits) add(file.fileName);
   }
   const fontFiles = Object.keys(bundle).filter((name) => fonts.test(name));
   if (fontFiles.length === 0) throw new Error(`vite-sw: keine Schrift passt zu ${fonts}`);

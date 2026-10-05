@@ -14,15 +14,33 @@ import type { InstallState } from "../domain/pwa.ts";
 export const FRESH_AFTER_MS = 30 * 60_000;
 /** So lange wartet ein Frische-Anlass höchstens auf den neuen Service Worker, bevor er nur die Daten tauscht */
 export const UPDATE_WAIT_MS = 10_000;
+/**
+ * Kopie trotz Netz (5-s-Zeitlimit des Service Workers, Funkloch): Das Ereignis `online` kommt dann nie. Ein Anlass
+ * nach dieser Wartezeit holt den frischen Stand (Arch-Review Stufe 1, H5).
+ */
+export const STALE_RETRY_MS = 30_000;
+
+/**
+ * Texte des PWA-Kerns. Sie stehen hier statt in `src/ui/format.ts`, damit sie nicht im Start-Bundle liegen (Plan 0011,
+ * E5, erster Kandidat; Arch-Review Stufe 1, H12). Datum per `Intl` in Berlin, ohne Laufzeit-Import aus `src/domain`
+ * (ADR 0010).
+ */
+const DAY = new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "numeric", timeZone: "Europe/Berlin" });
+/** Statuszeile, wenn `site.json` aus dem Cache des Service Workers kommt (E4): „Offline – Stand vom 5.10.“ */
+export const offlineNote = (generatedAt: string) => `Offline – Stand vom ${DAY.format(new Date(generatedAt))}`;
+/** Toast: Der Service Worker meldet eine Kalender-Datei, die offline nicht lädt (E4, Regel 2) */
+export const ICS_OFFLINE = "Kalender-Datei braucht Netz";
 
 /** Was die App beisteuert (`pwa-start.ts`) */
 export interface PwaHooks {
   /** letzter erfolgreicher Abruf von `site.json` (`lastSiteLoad` aus site.ts) */
-  lastLoad: () => { at: number; stale: boolean } | undefined;
+  lastLoad: () => { at: number; stale: boolean; generatedAt: string } | undefined;
   /** Frische-Anlass ohne neuen Service Worker: Daten (und eine geladene Wegzeit-Tabelle) neu laden */
-  refresh: () => void;
-  /** Der Service Worker meldet: Kalender-Datei offline nicht ladbar (E4, Regel 2) */
-  icsOffline: () => void;
+  refresh: () => Promise<unknown>;
+  /** Toast der App */
+  say: (text: string) => void;
+  /** Zusatzzeile der Statuszeile; leer heißt keine */
+  note: (text: string) => void;
 }
 
 /** Der Teil von `ServiceWorkerRegistration`, den die Frische braucht */
@@ -39,6 +57,7 @@ export interface PwaEnv {
   onMessage: (fn: (data: unknown) => void) => void;
   onControllerChange: (fn: () => void) => () => void;
   visible: () => boolean;
+  online: () => boolean;
   now: () => number;
   reload: () => void;
   /** `data-pwa="bereit"` auf `<html>`: Ab jetzt hört die Seite auf `beforeinstallprompt` (E6) */
@@ -49,8 +68,11 @@ function browserEnv(): PwaEnv {
   const sw = "serviceWorker" in navigator ? navigator.serviceWorker : undefined;
   const target = (type: string) => (type === "online" ? window : document);
   return {
+    // Notausgang (`__SW_OFF__`, README): nicht registrieren, sonst holte jede Seite den sich abmeldenden sw.js zurück
     register: async () =>
-      sw?.register(`${import.meta.env.BASE_URL}sw.js`, { scope: import.meta.env.BASE_URL }) ?? undefined,
+      __SW_OFF__
+        ? undefined
+        : (sw?.register(`${import.meta.env.BASE_URL}sw.js`, { scope: import.meta.env.BASE_URL }) ?? undefined),
     listen: (type, fn) => {
       target(type).addEventListener(type, fn);
       return () => target(type).removeEventListener(type, fn);
@@ -61,6 +83,7 @@ function browserEnv(): PwaEnv {
       return () => sw?.removeEventListener("controllerchange", fn);
     },
     visible: () => document.visibilityState === "visible",
+    online: () => navigator.onLine,
     now: Date.now,
     reload: () => window.location.reload(),
     markReady: () => {
@@ -78,11 +101,18 @@ const isIcsOffline = (data: unknown) =>
  */
 export async function start(hooks: PwaHooks, env: PwaEnv = browserEnv()): Promise<() => void> {
   env.markReady();
+  showNote(hooks);
   env.onMessage((data) => {
-    if (isIcsOffline(data)) hooks.icsOffline();
+    if (isIcsOffline(data)) hooks.say(ICS_OFFLINE);
   });
   const registration = await env.register().catch(() => undefined);
   return watchFreshness(hooks, env, registration);
+}
+
+/** Statuszeile zum letzten Abruf: offline mit Datenstand, sonst nichts */
+function showNote(hooks: PwaHooks) {
+  const last = hooks.lastLoad();
+  hooks.note(last?.stale ? offlineNote(last.generatedAt) : "");
 }
 
 /**
@@ -93,47 +123,74 @@ export async function start(hooks: PwaHooks, env: PwaEnv = browserEnv()): Promis
  */
 function watchFreshness(hooks: PwaHooks, env: PwaEnv, registration: UpdatableRegistration | undefined): () => void {
   let running = false;
+  /** Ein neuer Service Worker hat die Seite erst nach `UPDATE_WAIT_MS` übernommen (Arch-Review, H10) */
+  let lateWorker = false;
+  let retry: ReturnType<typeof setTimeout> | undefined;
   const occasion = async () => {
+    clearTimeout(retry);
     if (running) return;
     running = true;
     try {
-      if (await newWorkerActive(env, registration)) env.reload();
-      else hooks.refresh();
+      if (await newWorkerActive(env, registration, () => (lateWorker = true))) env.reload();
+      else {
+        await hooks.refresh();
+        showNote(hooks);
+      }
     } finally {
       running = false;
     }
   };
   const offVisible = env.listen("visibilitychange", () => {
+    if (!env.visible()) return;
+    // Code und Daten nie in verschiedenen Ständen: der späte Wechsel lädt beim Zurückkehren neu, nie mitten drin
+    if (lateWorker) return env.reload();
     const last = hooks.lastLoad();
-    if (env.visible() && last && env.now() - last.at > FRESH_AFTER_MS) void occasion();
+    if (last && env.now() - last.at > FRESH_AFTER_MS) void occasion();
   });
   const offOnline = env.listen("online", () => {
     if (hooks.lastLoad()?.stale) void occasion();
   });
+  if (hooks.lastLoad()?.stale && env.online()) retry = setTimeout(() => void occasion(), STALE_RETRY_MS);
   return () => {
+    clearTimeout(retry);
     offVisible();
     offOnline();
   };
 }
 
-/** `true`, wenn `update()` einen neuen Service Worker findet und er binnen `UPDATE_WAIT_MS` die Seite übernimmt. */
-async function newWorkerActive(env: PwaEnv, registration: UpdatableRegistration | undefined): Promise<boolean> {
+/**
+ * `true`, wenn `update()` einen neuen Service Worker findet und er binnen `UPDATE_WAIT_MS` die Seite übernimmt. Kommt
+ * der Wechsel später, meldet ihn `onLate` (einmal), statt die Seite mitten in der Bedienung neu zu laden.
+ */
+async function newWorkerActive(
+  env: PwaEnv,
+  registration: UpdatableRegistration | undefined,
+  onLate: () => void,
+): Promise<boolean> {
   if (!registration) return false;
-  let off = () => {};
-  let timer: ReturnType<typeof setTimeout> | undefined;
+  let late = false;
+  let changed: (value: boolean) => void = () => {};
   // vor update() lauschen: Mit skipWaiting/claim kann der Wechsel schnell kommen
-  const changed = new Promise<boolean>((resolve) => {
-    off = env.onControllerChange(() => resolve(true));
-    timer = setTimeout(() => resolve(false), UPDATE_WAIT_MS);
+  const off = env.onControllerChange(() => {
+    if (!late) return changed(true);
+    off();
+    onLate();
   });
+  const settled = new Promise<boolean>((resolve) => {
+    changed = resolve;
+  });
+  const timer = setTimeout(() => changed(false), UPDATE_WAIT_MS);
   try {
     await registration.update();
-    return Boolean(registration.installing ?? registration.waiting) && (await changed);
+    if (!(registration.installing ?? registration.waiting)) return false;
+    if (await settled) return true;
+    late = true;
+    return false;
   } catch {
     return false;
   } finally {
-    off();
     clearTimeout(timer);
+    if (!late) off();
   }
 }
 

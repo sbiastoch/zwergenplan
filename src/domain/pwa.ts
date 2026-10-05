@@ -43,7 +43,7 @@ export function installHelp(state: InstallState): InstallHelp | undefined {
         share: "Teilen",
         after: "und dann auf „Zum Home-Bildschirm“.",
         // Spike (h): Die Home-Bildschirm-App hat einen eigenen Speicher, getrennt von Safari.
-        note: "Die App startet leer: Alter und Merkliste dort noch einmal eintragen.",
+        note: "Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.",
       };
     case "keine":
       return undefined;

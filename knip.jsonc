@@ -1,13 +1,14 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  // src/sw/sw.ts: Einstieg des Service Workers, nur per Pfad aus scripts/vite-sw.ts gebaut (Plan 0011, E3)
+  // src/sw/sw.ts, src/sw/kill.ts (Notausgang): Einstiege des Service Workers, nur per Pfad aus vite.config.ts gebaut
   "entry": [
     "scripts/*.ts",
     ".claude/hooks/*.ts",
     "e2e/**/*.spec.ts",
     "src/**/*.test.ts",
     "scripts/**/*.test.ts",
-    "src/sw/sw.ts"
+    "src/sw/sw.ts",
+    "src/sw/kill.ts"
   ],
   "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts", "e2e/**/*.ts", ".claude/hooks/**/*.ts", "*.ts"],
   // @fontsource-variable/roboto: Schriftdatei, nur per require.resolve gelesen (e2e/vitals.ts,

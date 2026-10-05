@@ -13,11 +13,9 @@ import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
 import {
   ageChipLabel,
-  ICS_OFFLINE,
   limitHint,
   loadErrorText,
   mapStatusParts,
-  offlineNote,
   plural,
   providerStatusParts,
   reachNote,
@@ -44,11 +42,7 @@ import {
 import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
-/** `stale`: Daten aus dem Cache des Service Workers, die Statuszeile sagt „Offline – Stand vom …“ (Plan 0011, E4) */
-type LoadState =
-  | { kind: "loading" }
-  | { kind: "error"; reason: LoadFailure }
-  | { kind: "ready"; data: SiteData; stale: boolean };
+type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
 
 const NO_OFFERS: SiteOffer[] = [];
 
@@ -87,7 +81,7 @@ export function App() {
     void attempt;
     setLoad({ kind: "loading" });
     loadSiteData().then(
-      (site) => setLoad({ kind: "ready", ...site }),
+      (data) => setLoad({ kind: "ready", data }),
       // Die Fehlerart kennt nur src/data; ein unbekannter Fehler zeigt nie seinen Rohtext (Plan 0008, E5).
       (e: unknown) => setLoad({ kind: "error", reason: e instanceof SiteLoadError ? e.reason : "server" }),
     );
@@ -111,20 +105,23 @@ export function App() {
   const transit = useTransit(origin, placeKeys);
   const { mode: reachMode, want } = transit;
 
-  // PWA-Kern nach `load` (Plan 0011, E5). Frische-Anlass (E4a): Daten ohne Ladezustand tauschen, eine geladene
-  // Wegzeit-Tabelle lädt mit. Scheitert das Neuladen, bleibt der bisherige Stand.
+  // PWA-Kern nach `load` (Plan 0011, E5): setzt die Zeile „Offline – Stand vom …“ (`pwaNote`) und meldet ICS offline.
+  // Frische-Anlass (E4a): Daten ohne Ladezustand tauschen, eine geladene Wegzeit-Tabelle lädt mit. Scheitert das
+  // Neuladen, bleibt der bisherige Stand.
+  const [pwaNote, setPwaNote] = useState("");
   const refreshTransit = transit.refresh;
   useEffect(
     () =>
       startPwa({
         refresh: () => {
           refreshTransit();
-          loadSiteData().then(
-            (site) => setLoad({ kind: "ready", ...site }),
+          return loadSiteData().then(
+            (data) => setLoad({ kind: "ready", data }),
             () => {},
           );
         },
-        icsOffline: () => say(ICS_OFFLINE),
+        say,
+        note: setPwaNote,
       }),
     [refreshTransit, say],
   );
@@ -289,11 +286,11 @@ export function App() {
                     <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
                   </span>
                 )}
-                {load.stale && (
-                  // eigene Zeile wie der Wegzeit-Hinweis (Plan 0011, E4)
+                {pwaNote && (
+                  // eigene Zeile wie der Wegzeit-Hinweis (Plan 0011, E4); Text aus dem PWA-Kern
                   <span className="status-note">
                     <span className="sr-only">. </span>
-                    {offlineNote(load.data.generatedAt)}
+                    {pwaNote}
                   </span>
                 )}
                 {origin && reachMode && (

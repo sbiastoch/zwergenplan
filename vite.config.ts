@@ -5,6 +5,11 @@ import { serviceWorker } from "./scripts/vite-sw.ts";
 import { BASE } from "./site.config.ts";
 
 const E2E = process.env["ZWERGENPLAN_DATA"] === "fixture";
+/**
+ * Notausgang (README; Plan 0011, Arch-Review Stufe 1, H3): `ZWERGENPLAN_SW=aus` baut statt des Service Workers
+ * `src/sw/kill.ts`, der sich selbst abmeldet, und die Seite registriert nicht neu (`__SW_OFF__`).
+ */
+const SW_OFF = process.env["ZWERGENPLAN_SW"] === "aus";
 
 /**
  * Karten-Code (src/ui/map/** samt maplibre-gl), Worker und Karten-CSS landen in assets/karte/
@@ -56,16 +61,17 @@ export default defineConfig({
     react(),
     tailwindcss(),
     // Service Worker als dist/sw.js mit Precache-Liste (Plan 0011, E3; ADR 0013). Vorgehalten werden die Start-Assets,
-    // die Latin-Schrift und der PWA-Kern, den jeder Start nach `load` lädt (Abweichung in Plan 0011, „Umsetzung“).
+    // die Latin-Schrift und die Lazy-Chunks, die jeder Start lädt: PWA-Kern und Export-Code (Plan 0011, „Umsetzung“).
     serviceWorker({
-      entry: "src/sw/sw.ts",
+      entry: SW_OFF ? "src/sw/kill.ts" : "src/sw/sw.ts",
       fonts: /\/?bricolage-grotesque-latin-opsz-normal-[^/]+\.woff2$/,
-      startChunks: /\/src\/data\/pwa\.ts$/,
+      startChunks: [/\/src\/data\/pwa\.ts$/, /\/src\/domain\/ics\.ts$/],
     }),
   ],
   define: {
     // Test-Haken window.__zpMap nur im E2E-Build (Plan 0005, E13); im Deploy-Build entfernt Vite den Zweig.
     __E2E__: JSON.stringify(E2E),
+    __SW_OFF__: JSON.stringify(SW_OFF),
   },
   worker: {
     format: "es",

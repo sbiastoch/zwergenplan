@@ -35,12 +35,28 @@ async function ready(page: Page) {
 async function openKidSheet(page: Page) {
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await expect(sheet(page)).toBeVisible();
+  // Einfahren des Sheets (0,38 s) abwarten: Klickt Playwright vorher, scrollt es den Knopf in den Blick und dabei das
+  // Sheet selbst (overflow: hidden). Das kann ein Finger nicht; die Gates meldeten dann den Kopf in der Rundung.
+  await sheet(page).evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
   // Platzhalter weg: Abschnitt geladen (oder bewusst leer)
   await expect(sheet(page).locator(".app-pending")).toHaveCount(0);
 }
 
-/** Bis zum offenen Sheet je Zustand: „app“ (matchMedia-Stub), „angebot“ (synthetisches Event), „ios“ (iphone-15) */
-type Visible = "app" | "angebot" | "ios";
+/**
+ * Bis zum offenen Sheet je sichtbarem Zustand: „app“ (matchMedia-Stub), „angebot“ (synthetisches Event), „installiert“
+ * (Angebot angenommen), „menue“ (Android ohne Angebot), „ios“ (iphone-15).
+ */
+type Visible = "app" | "angebot" | "installiert" | "menue" | "ios";
+
+/** Projekte mit Android-User-Agent (playwright.config.ts) */
+const ANDROID = ["android-klein", "pixel-7", "pixel-7-quer"];
+
+/** Zustände, die nur ein bestimmter User-Agent zeigt; sonst überspringen, mit Begründung */
+function onlyWhereVisible(state: Visible) {
+  const project = test.info().project.name;
+  if (state === "ios") test.skip(project !== "iphone-15", "iOS-User-Agent nur im Projekt iphone-15");
+  if (state === "menue") test.skip(!ANDROID.includes(project), "Browser-Menü nur mit Android-User-Agent");
+}
 
 async function openIn(page: Page, state: Visible) {
   if (state === "app") {
@@ -62,7 +78,7 @@ async function openIn(page: Page, state: Visible) {
     });
   }
   await ready(page);
-  if (state === "angebot") {
+  if (state === "angebot" || state === "installiert") {
     await page.evaluate(() => {
       window.__prompted = 0;
       const event = new Event("beforeinstallprompt", { cancelable: true });
@@ -76,36 +92,39 @@ async function openIn(page: Page, state: Visible) {
     });
   }
   await openKidSheet(page);
+  if (state === "installiert") {
+    await section(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" }).click();
+    await expect.poll(() => page.evaluate(() => window.__prompted)).toBe(1);
+    await expect(section(page).locator(".app-text")).toBeFocused();
+  }
 }
 
 /** Erwarteter Inhalt je Zustand */
 const CONTENT: Record<Visible, string[]> = {
   app: ["Läuft als App."],
   angebot: ["Mit eigenem Symbol auf dem Startbildschirm, ohne Browserleiste."],
+  installiert: ["Installiert. Öffne den Zwergenplan jetzt über das Symbol auf dem Startbildschirm."],
+  menue: ["Im Browser-Menü „App installieren“ wählen."],
   ios: [
     "Tippe auf Teilen und dann auf „Zum Home-Bildschirm“.",
-    "Die App startet leer: Alter und Merkliste dort noch einmal eintragen.",
+    "Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.",
   ],
 };
 const TITLE: Record<Visible, string> = {
   app: "läuft schon als App",
   angebot: "Browser bietet die Installation an",
+  installiert: "nach dem Tipp installiert",
+  menue: "Android ohne Angebot: Browser-Menü",
   ios: "iPhone: Teilen-Symbol, dann „Zum Home-Bildschirm“, Hinweis auf den eigenen Speicher",
 };
 
 // Je sichtbarer Zustand eigene Tests für hell, dunkel und 320 px/200 %: alles in einem Test lag WebKit unter Last
 // über dem Timeout von 30 s (voller `pnpm check` mit 8 Workern).
-for (const state of ["app", "angebot", "ios"] as const) {
-  const onlyIos = () =>
-    test.skip(
-      (state === "ios") !== (test.info().project.name === "iphone-15"),
-      state === "ios" ? "iOS-User-Agent nur im Projekt iphone-15" : "iphone-15 zeigt die iOS-Hilfe statt des Menüs",
-    );
-
+for (const state of ["app", "angebot", "installiert", "menue", "ios"] as const) {
   // je Farbschema ein Test wie in mobile-ux.spec.ts: hell und dunkel in einem Test lagen in WebKit bei ≈ 19 s
   for (const colorScheme of ["light", "dark"] as const) {
     test(`${TITLE[state]}: Inhalt und Gates (${colorScheme === "light" ? "hell" : "dunkel"}, E7)`, async ({ page }) => {
-      if (state === "ios") onlyIos();
+      onlyWhereVisible(state);
       await page.emulateMedia({ colorScheme });
       await openIn(page, state);
       for (const text of CONTENT[state]) await expect(section(page)).toContainText(text);
@@ -116,7 +135,7 @@ for (const state of ["app", "angebot", "ios"] as const) {
   }
 
   test(`${TITLE[state]}: 320 px und 200 % (E7)`, async ({ page }) => {
-    if (state === "ios") onlyIos();
+    onlyWhereVisible(state);
     await page.setViewportSize({ width: 320, height: 640 });
     await openIn(page, state);
     await setTextScale(page, 2);
@@ -126,12 +145,17 @@ for (const state of ["app", "angebot", "ios"] as const) {
   });
 }
 
-test("Browser bietet die Installation an: Knopf ruft prompt(), danach „Installiert“ (E6, E7)", async ({ page }) => {
+test("Browser bietet die Installation an: Knopf ruft prompt(), danach „Installiert“ mit Fokus (E6, E7)", async ({
+  page,
+}) => {
   await openIn(page, "angebot");
   await section(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" }).click();
   await expect.poll(() => page.evaluate(() => window.__prompted)).toBe(1);
-  await expect(section(page)).toContainText("Installiert. Öffne den Zwergenplan jetzt über das Symbol");
+  const done = section(page).getByText("Installiert. Öffne den Zwergenplan jetzt über das Symbol");
+  await expect(done).toBeVisible();
   await expect(section(page).getByRole("button")).toHaveCount(0);
+  // Der Knopf verschwindet mit dem Fokus: Er geht auf die neue Zeile, nicht auf <body> (im Modal)
+  await expect(done).toBeFocused();
 });
 
 test("ohne Angebot: Android zeigt das Browser-Menü, sonst bleibt der Abschnitt weg (E5, E7)", async ({ page }) => {

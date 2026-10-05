@@ -5,12 +5,14 @@
  */
 import { lastSiteLoad } from "./site.ts";
 
-/** Was die App dem PWA-Kern gibt; `lastLoad` steuert `site.ts` bei */
+/** Was die App dem PWA-Kern gibt (Texte stehen im Kern); `lastLoad` steuert `site.ts` bei */
 export interface AppHooks {
-  /** Frische-Anlass ohne neuen Service Worker: Daten neu laden (E4a) */
-  refresh: () => void;
-  /** Kalender-Datei offline (E4, Regel 2) */
-  icsOffline: () => void;
+  /** Frische-Anlass ohne neuen Service Worker: Daten neu laden (E4a); löst nach dem Laden auf */
+  refresh: () => Promise<unknown>;
+  /** Toast der App (ICS offline, E4, Regel 2) */
+  say: (text: string) => void;
+  /** Zusatzzeile der Statuszeile („Offline – Stand vom …“, E4); leer heißt keine */
+  note: (text: string) => void;
 }
 
 /** Destrukturiert direkt am `import()`: So sieht knip, welcher Export des Chunks genutzt wird. */

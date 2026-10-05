@@ -352,12 +352,6 @@ const LOAD_ERRORS: Record<LoadFailure, string> = {
   server: "Die Angebote ließen sich gerade nicht laden. Versuch es später nochmal.",
 };
 
-/** Statuszeile, wenn site.json aus dem Cache des Service Workers kommt (Plan 0011, E4): „Offline – Stand vom 5.10.“ */
-export const offlineNote = (generatedAt: string) => `Offline – Stand vom ${dayDots(generatedAt)}`;
-
-/** Toast: Der Service Worker meldet eine Kalender-Datei, die offline nicht lädt (Plan 0011, E4, Regel 2) */
-export const ICS_OFFLINE = "Kalender-Datei braucht Netz";
-
 /** Fehlerzustand (Plan 0008, E5): ein deutscher Satz je Fehlerart statt „Failed to fetch“. */
 export function loadErrorText(reason: LoadFailure): string {
   return LOAD_ERRORS[reason];

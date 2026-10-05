@@ -24,14 +24,12 @@ export interface SiteEnv {
   now: () => number;
 }
 
-/** Geladene Daten; `stale`: aus dem Cache des Service Workers, weil das Netz fehlte (Plan 0011, E4) */
-export interface LoadedSite {
-  data: SiteData;
-  stale: boolean;
-}
-
-/** Letzter erfolgreicher Abruf, für den Frische-Anlass (Plan 0011, E4a, `src/data/pwa.ts`) */
-let last: { at: number; stale: boolean } | undefined;
+/**
+ * Letzter erfolgreicher Abruf für den PWA-Kern (Plan 0011, E4, E4a; `src/data/pwa.ts`): Frische-Anlass und
+ * Statuszeile „Offline – Stand vom …“. `stale`: aus dem Cache des Service Workers. Die App selbst sieht davon nichts,
+ * so bleibt der Offline-Zweig aus dem Start-Bundle (Arch-Review Stufe 1, H12).
+ */
+let last: { at: number; stale: boolean; generatedAt: string } | undefined;
 export const lastSiteLoad = () => last;
 
 /**
@@ -57,7 +55,7 @@ function browserEnv(): SiteEnv {
   };
 }
 
-export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<LoadedSite> {
+export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<SiteData> {
   let res: Response;
   try {
     // Pfad wie im Frühstart in index.html
@@ -75,9 +73,8 @@ export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<LoadedS
     throw new SiteLoadError("server", e);
   }
   // Header setzt nur der Service Worker, wenn er die Kopie liefert (gleicher Name in src/sw/routes.ts)
-  const stale = res.headers.get("X-Zp-Cache") === "offline";
-  last = { at: env.now(), stale };
-  return { data, stale };
+  last = { at: env.now(), stale: res.headers.get("X-Zp-Cache") === "offline", generatedAt: data.generatedAt };
+  return data;
 }
 
 export function assetUrl(path: string): string {

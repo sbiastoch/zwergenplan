@@ -105,6 +105,8 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.getByLabel("Geburtsdatum").fill("01.09.2026");
     await expect(page.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
+    // Abschnitt „Als App“ geladen (Lazy-Chunk, Plan 0011, E7): Die Gates prüfen sein Ergebnis, nicht den Platzhalter
+    await expect(page.locator(".app-pending")).toHaveCount(0);
   },
   // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „Wegzeit ab … (Di vormittags …)“
   "entdecken-wegzeit": async (page) => {
