@@ -51,6 +51,7 @@ Status: Entwurf (2026-10-05). Wird mit Stufe 2 von Plan 0011 angenommen (Schritt
 ## Konsequenzen
 
 - Erstmals gibt es Infrastruktur außerhalb von GitHub Pages: ein Cloudflare-Konto, ein KV-Namespace und zwei Secrets (`VAPID_PRIVATE_KEY`, `PUSH_ADMIN_TOKEN`). Ein Ausfall des Workers betrifft nur An- und Abmelden und den Versand, nie die Seite.
-- iPhones bekommen Push nur als installierte Home-Bildschirm-App (Annahme, im Spike von Plan 0011 zu bestätigen). Die Installationshilfe aus ADR 0013 ist deshalb Voraussetzung.
+- iPhones bekommen Push nur als installierte Home-Bildschirm-App (im Spike von Plan 0011 bestätigt). Die Installationshilfe aus ADR 0013 ist deshalb Voraussetzung.
+- „Keine Strafe für stille Pushes“ gilt nur, solange der Service Worker rechtzeitig fertig wird. Überzieht er das Zeitbudget von iOS (≈ 10 s), erscheint keine Nachricht, und die nächsten kommen verspätet (Spike). Der Zuschnitt hat deshalb ein hartes Limit von 5 s.
 - Neue Gates für `push-worker/` (Typen, Unit-Tests, dependency-cruiser, knip) und die Fixture-Option `pushWorker: "mock"` im E2E-Drittanbieter-Wächter.
 - Weitere Push-Anlässe (Anmeldung öffnet, Merkliste) und Zuschnitt nach Wegzeit brauchen einen eigenen Plan, gegebenenfalls ein eigenes ADR.
