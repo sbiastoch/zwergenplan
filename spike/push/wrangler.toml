@@ -1,0 +1,12 @@
+# Wegwerf-Spike zu Plan 0011, Schritt 0. Kommt nie auf main.
+name = "zwergenplan-spike"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+VAPID_PUBLIC = "__SETZEN__"
+
+[[kv_namespaces]]
+binding = "SPIKE"
+id = "__SETZEN__"

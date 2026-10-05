@@ -1,0 +1,20 @@
+{
+  "name": "zwergenplan-spike-push",
+  "private": true,
+  "type": "module",
+  "description": "Wegwerf-Spike zu Plan 0011, Schritt 0. Kommt nie auf main.",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "send": "node src/send.ts"
+  },
+  "devDependencies": {
+    "web-push": "^3.6.7",
+    "wrangler": "^4.147.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
+  }
+}
