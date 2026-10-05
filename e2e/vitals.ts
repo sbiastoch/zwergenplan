@@ -8,8 +8,8 @@
  * Ereignis (gemessen: Shift bei 1038 ms, Schrift fertig geladen bei 1101 ms, `new Event().timeStamp` davor 1061 ms).
  * Ein Vergleich mit `t0` verlor so genau den Swap-Shift. Die Grenze ist deshalb die Zahl der bis dahin
  * beobachteten Shifts: `markShifts()` wartet zwei Frames, holt mit `takeRecords()` alles Ausstehende ab und merkt
- * sich die Anzahl; gezählt werden nur spätere Einträge. Der Kanarienvogel in perf.spec.ts verlangt, dass ein Shift
- * direkt nach der Grenze zählt.
+ * sich die Anzahl; gezählt werden nur spätere Einträge. Der Kanarienvogel in font-swap.spec.ts verlangt, dass ein
+ * Shift direkt nach der Grenze zählt.
  */
 import { createRequire } from "node:module";
 import {
@@ -54,12 +54,20 @@ export async function observeVitals(page: Page) {
       `${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}×${Math.round(r.height)}`;
     const record = (entries: PerformanceEntryList) => {
       for (const e of entries) {
-        // LayoutShift fehlt in lib.dom: Felder per Typprüfung lesen statt per Cast
+        // LayoutShift fehlt in lib.dom: Felder per Typprüfung lesen statt per Cast (beide Rechtecke geprüft)
         const value = "value" in e && typeof e.value === "number" ? e.value : 0;
         if ("hadRecentInput" in e && e.hadRecentInput === true) continue;
         const raw: unknown[] = "sources" in e && Array.isArray(e.sources) ? e.sources : [];
         const sources = raw
-          .filter((src): src is LayoutShiftSource => typeof src === "object" && src !== null && "currentRect" in src)
+          .filter(
+            (src): src is LayoutShiftSource =>
+              typeof src === "object" &&
+              src !== null &&
+              "previousRect" in src &&
+              src.previousRect instanceof DOMRectReadOnly &&
+              "currentRect" in src &&
+              src.currentRect instanceof DOMRectReadOnly,
+          )
           .map((src) => {
             const el = src.node instanceof Element ? src.node : src.node?.parentElement;
             const name = el ? `${el.tagName.toLowerCase()}${el.classList[0] ? `.${el.classList[0]}` : ""}` : "?";
@@ -158,8 +166,13 @@ const NO_FONT = 'local("ZP kein Font")';
  * `local(X)` (Lightning CSS lässt Anführungszeichen weg, wo es darf). Bei Roboto kommt die Schrift per URL aus
  * @fontsource-variable/roboto, mit `font-display: block`, damit sie nicht selbst nachrutscht. Zählt die Blöcke je
  * Familie: Weicht eine Zahl ab oder blieb ein Block unverändert (anderes Minifier-Format), wirft die Funktion.
+ * `unadjusted` setzt `size-adjust` der gewählten Familie auf 100 % (nur für den Gegen-Kanarienvogel).
  */
-export function rewriteFallbackCss(css: string, chosen: FallbackName): string {
+export function rewriteFallbackCss(
+  css: string,
+  chosen: FallbackName,
+  { unadjusted = false }: { unadjusted?: boolean } = {},
+): string {
   const blocks = new Map<string, number>();
   const rewritten = new Map<string, number>();
   const out = css.replace(/@font-face\s*\{[^}]*\}/g, (block) => {
@@ -170,6 +183,8 @@ export function rewriteFallbackCss(css: string, chosen: FallbackName): string {
     if (family !== chosen) next = block.replace(/local\((?:"[^"]*"|'[^']*'|[^)"']*)\)/g, NO_FONT);
     else if (chosen === "Roboto")
       next = block.replace(/src:[^;}]*/, `src:url("${TEST_ROBOTO}") format("woff2");font-display:block`);
+    // Gegen-Kanarienvogel: gewählte Familie ohne Breitenanpassung, wie Roboto über system-ui vor Paket C
+    if (family === chosen && unadjusted) next = next.replace(/size-adjust:[^;}]*/, "size-adjust:100%");
     if (next !== block) rewritten.set(family, (rewritten.get(family) ?? 0) + 1);
     return next;
   });
@@ -185,12 +200,12 @@ export function rewriteFallbackCss(css: string, chosen: FallbackName): string {
  * Nur die Fallback-Familie `chosen` darf greifen (Umschreiben siehe `rewriteFallbackCss`). Gilt nur für das CSS mit
  * den Fallback-Faces; andere Stylesheets (z. B. das Lazy-CSS der Karte) bleiben unberührt.
  */
-async function allowOnlyFallback(page: Page, chosen: FallbackName) {
+async function allowOnlyFallback(page: Page, chosen: FallbackName, unadjusted: boolean) {
   await page.route("**/assets/*.css", async (route) => {
     const response = await route.fetch();
     const css = await response.text();
     if (!css.includes("Bricolage Fallback")) return route.fulfill({ response });
-    return route.fulfill({ response, body: rewriteFallbackCss(css, chosen) });
+    return route.fulfill({ response, body: rewriteFallbackCss(css, chosen, { unadjusted }) });
   });
   if (chosen === "Roboto") {
     const file = createRequire(import.meta.url).resolve(
@@ -201,11 +216,14 @@ async function allowOnlyFallback(page: Page, chosen: FallbackName) {
 }
 
 /**
- * Lädt die gewählte Fallback-Familie in allen drei Gewichtsbereichen und prüft über `document.fonts`, dass von den
- * „Bricolage Fallback …“-Faces genau die der gewählten Familie geladen sind. Liefert `false`, wenn die Schrift auf
- * dieser Maschine fehlt (lokale Quelle nicht vorhanden).
+ * Lädt die gewählte Fallback-Familie in allen drei Gewichtsbereichen beider Stacks und prüft über `document.fonts`,
+ * dass von den „Bricolage Fallback …“-Faces genau die der gewählten Familie geladen sind.
+ * - Ein Face lädt, sobald *eine* seiner `local()`-Quellen auflöst; ein einzelner unbekannter Name („DejaVu Sans Bold“
+ *   neben „DejaVuSans-Bold“) schadet also nicht.
+ * - „fehlt“ nur, wenn *alle* Faces der Familie scheitern (Schrift nicht installiert). Scheitern nur einige (z. B. der
+ *   fette Schnitt fehlt), ist das kein stiller Skip, sondern ein Fehler mit den betroffenen Gewichtsbereichen.
  */
-async function loadOnlyFallback(page: Page, chosen: FallbackName): Promise<boolean> {
+async function loadOnlyFallback(page: Page, chosen: FallbackName): Promise<"geladen" | "fehlt"> {
   const state = await page.evaluate(async (name) => {
     for (const family of [`Bricolage Fallback ${name}`, `Bricolage Fallback ${name} Display`])
       for (const weight of [400, 700, 800]) {
@@ -217,20 +235,25 @@ async function loadOnlyFallback(page: Page, chosen: FallbackName): Promise<boole
       }
     // Familie = erstes Wort nach „Bricolage Fallback“ (Text- und Display-Stack zusammen)
     return [...document.fonts]
-      .map((f) => ({ family: /^"?Bricolage Fallback ([A-Za-z]+)/.exec(f.family)?.[1], status: f.status }))
+      .map((f) => ({
+        family: /^"?Bricolage Fallback ([A-Za-z]+)/.exec(f.family)?.[1],
+        face: `${f.family.replaceAll('"', "")} ${f.weight}`,
+        status: f.status,
+      }))
       .filter((f) => f.family !== undefined);
   }, chosen);
   const mine = state.filter((f) => f.family === chosen);
-  if (mine.some((f) => f.status === "error")) return false;
+  expect(mine, `Faces von „Bricolage Fallback ${chosen}“ (beide Stacks)`).toHaveLength(FALLBACK_BUCKETS[chosen]);
+  if (mine.every((f) => f.status === "error")) return "fehlt";
   expect(
-    mine.map((f) => f.status),
-    `alle Faces von „Bricolage Fallback ${chosen}“ geladen`,
-  ).toEqual(mine.map(() => "loaded"));
+    mine.filter((f) => f.status !== "loaded").map((f) => `${f.face}: ${f.status}`),
+    `alle Faces von „Bricolage Fallback ${chosen}“ geladen (teilweise installierte Schrift ist kein Skip)`,
+  ).toEqual([]);
   expect(
-    state.filter((f) => f.family !== chosen && f.status === "loaded"),
+    state.filter((f) => f.family !== chosen && f.status === "loaded").map((f) => f.face),
     "keine andere Fallback-Familie geladen",
   ).toEqual([]);
-  return true;
+  return "geladen";
 }
 
 /** Wartet, bis Bricolage nach `release()` wirklich verwendet wird (der Swap hat stattgefunden). */
@@ -246,21 +269,28 @@ export type SwapResult = { cls: number; detail: string } | "fehlt";
  * Misst den Schrift-Swap (Plan 0007, E12): Webfont zurückhalten, nur `chosen` als Fallback zulassen und laden,
  * 300 ms warten, Grenze setzen (`markShifts`), Webfont freigeben, Swap abwarten, CLS ab der Grenze summieren.
  * Gemessen wird so genau der Swap, nicht das Laden der Daten oder der Test-Roboto. Ohne CPU-Drosselung: Es geht
- * um Verschiebung, nicht um Tempo. `shiftAfterMark` ist nur für den Kanarienvogel der Grenze (perf.spec.ts).
+ * um Verschiebung, nicht um Tempo. `shiftAfterMark` und `unadjusted` sind nur für die Kanarienvögel in
+ * font-swap.spec.ts (Grenze bzw. Gegenprobe ohne Breitenanpassung).
  */
 export async function measureSwap(
   page: Page,
   chosen: FallbackName,
-  { width, height, at, shiftAfterMark = false }: { width: number; height: number; at?: Date; shiftAfterMark?: boolean },
+  {
+    width,
+    height,
+    at,
+    shiftAfterMark = false,
+    unadjusted = false,
+  }: { width: number; height: number; at?: Date; shiftAfterMark?: boolean; unadjusted?: boolean },
 ): Promise<SwapResult> {
-  await allowOnlyFallback(page, chosen);
+  await allowOnlyFallback(page, chosen, unadjusted);
   const font = await holdWebfont(page);
   await observeVitals(page);
   await page.setViewportSize({ width, height });
   if (at) await page.clock.setFixedTime(at);
   await page.goto("./");
   await expect(page.getByTestId("offer").first()).toBeVisible();
-  if (!(await loadOnlyFallback(page, chosen))) {
+  if ((await loadOnlyFallback(page, chosen)) === "fehlt") {
     font.release();
     return "fehlt";
   }

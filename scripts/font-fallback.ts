@@ -15,6 +15,7 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { chromium } from "@playwright/test";
 import { toSiteData } from "../src/domain/site-data.ts";
+import { type ClassRatio, chooseAdjust } from "./lib/font-adjust.ts";
 import { loadDataset } from "./lib/load-data.ts";
 
 const require = createRequire(import.meta.url);
@@ -206,14 +207,15 @@ const page = await browser.newPage();
 await page.setContent(`<!doctype html><html lang="de"><head><style>${faces}
   body { margin: 0; } span { white-space: nowrap; font-optical-sizing: none; letter-spacing: 0; }</style></head><body></body></html>`);
 
-/** Summe der Breiten aller Mustertexte einer Klasse in einer Familie; null, wenn die Schrift fehlt */
-/**
- * Gerendert wird zehnfach, mit der optischen Größe der echten Schriftgröße: Headless-Chromium unter Linux rundet
- * Glyphen-Breiten auf ganze Pixel, bei 13 px verfälscht das die Verhältnisse um mehrere Prozent (Roboto-Fakten:
- * 111,8 % gerundet statt 108 % exakt). Bei 130 px ist der Rundungsfehler vernachlässigbar.
- */
+/** Vergrößerung beim Messen, siehe `width()` */
 const SCALE = 10;
 
+/**
+ * Summe der Breiten aller Mustertexte einer Klasse in einer Familie; null, wenn die Schrift fehlt.
+ * Gerendert wird zehnfach, mit der optischen Größe der echten Schriftgröße: Headless-Chromium unter Linux rundet
+ * Glyphen-Breiten auf ganze Pixel, bei 13 px verfälscht das die Verhältnisse um mehrere Prozent (Roboto-Fakten:
+ * 111,8 % gerundet statt 107,6 % exakt). Bei 130 px ist der Rundungsfehler vernachlässigbar.
+ */
 async function width(family: string, c: TextClass): Promise<number | null> {
   return page.evaluate(
     async ({ family, px, weight, samples, scale }) => {
@@ -240,12 +242,12 @@ async function width(family: string, c: TextClass): Promise<number | null> {
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 const css: string[] = [];
 for (const f of FALLBACKS) {
-  const ratios: { c: TextClass; r: number }[] = [];
+  const ratios: ClassRatio[] = [];
   for (const c of CLASSES) {
     const wb = await width("ZP Bricolage", c);
     const wf = await width(`ZP ${f.name}`, c);
     if (wb === null) throw new Error("Bricolage fehlt");
-    if (wf !== null) ratios.push({ c, r: wb / wf });
+    if (wf !== null) ratios.push({ name: c.name, weight: c.weight, stack: c.stack, fit: c.fit, ratio: wb / wf });
   }
   if (ratios.length === 0) {
     console.log(`\n${f.name}: nicht installiert, übersprungen`);
@@ -255,19 +257,11 @@ for (const f of FALLBACKS) {
     const family = `Bricolage Fallback ${f.name}${stack === "display" ? " Display" : ""}`;
     console.log(`\n${family}`);
     for (const b of BUCKETS) {
-      const inRange = ratios.filter(({ c }) => c.weight >= b.min && c.weight <= b.max);
-      // Display-Stack: nur 750–800 hat eigene Klassen, die übrigen Bereiche (z. B. `small` in .daylabel) wie Text
-      const own = inRange.filter(({ c }) => c.stack === stack);
-      const basis = (own.some(({ c }) => c.fit) ? own : inRange.filter(({ c }) => c.stack === "text")).filter(
-        ({ c }) => c.fit,
-      );
-      const rs = basis.map(({ r }) => r);
-      // Mitte zwischen kleinstem und größtem Verhältnis: hält den größten Fehler der umbrechenden Klassen klein
-      const adjust = Math.round(((Math.min(...rs) + Math.max(...rs)) / 2) * 1000) / 1000;
+      const { adjust, shown } = chooseAdjust(ratios, stack, b);
       console.log(`  ${b.range}: size-adjust ${pct(adjust)}`);
-      for (const { c, r } of own.length > 0 ? own : basis)
+      for (const r of shown)
         console.log(
-          `    ${c.name.padEnd(15)} ${c.fit ? "     " : "(nur)"} Verhältnis ${pct(r)}  Restfehler ${((r / adjust - 1) * 100).toFixed(2)} %`,
+          `    ${r.name.padEnd(15)} ${r.fit ? "     " : "(nur)"} Verhältnis ${pct(r.ratio)}  Restfehler ${((r.ratio / adjust - 1) * 100).toFixed(2)} %`,
         );
       const src = f.name === "Roboto" ? "<siehe tokens.css>" : b.bold ? f.bold : f.regular;
       css.push(

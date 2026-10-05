@@ -9,8 +9,8 @@
  *   das Gewicht über die wght-Achse ein), Noto, DejaVu.
  * - Drei Gewichtsbereiche: normal (Meta, Fließtext), 550–749 (Fakten, Chips, Tabs), 750–800 (Zeit, Pillen, Titel).
  * - Zwei Stacks: Die optische Größe macht Bricolage klein breiter als groß, ein Wert passt nicht für 13 und 22 px.
- *   Überschriften nutzen „… Display“ (--font-display, Zuordnung unten in :where(…)), ihre Bereiche bis 749 sind
- *   gleich dem Text-Stack (z. B. `small` in .daylabel).
+ *   Überschriften nutzen „… Display“ (--font-display, Zuordnung unten per :where(…) in @layer base), ihre
+ *   Bereiche bis 749 sind gleich dem Text-Stack (z. B. `small` in .daylabel).
  * Restfehler je Klasse und Fallback stehen in Plan 0007, „Umsetzung Paket C“.
  */
 @font-face {
@@ -344,9 +344,15 @@
   --color-ink: var(--ink);
 }
 
-/* Überschriften-Klassen auf den Display-Stack; Spezifität 0, damit keine Komponenten-Datei angefasst werden muss. */
-:where(.brand, .ctitle, .dtitle, .daylabel, .ptitle, .sheet h2, .h3, .empty b, .cal-nav b, .label b) {
-  font-family: var(--font-display);
+/*
+ * Überschriften-Klassen auf den Display-Stack, als eine Regel hier statt in den Komponenten-Dateien. In der Ebene
+ * `base` und mit Spezifität 0: Jede Regel in `components` oder ein Utility darf sie überschreiben, ungeschichtet
+ * stünde sie sonst über allen Ebenen.
+ */
+@layer base {
+  :where(.brand, .ctitle, .dtitle, .daylabel, .ptitle, .sheet h2, .h3, .empty b, .cal-nav b, .label b) {
+    font-family: var(--font-display);
+  }
 }
 
 .k-babykurse {

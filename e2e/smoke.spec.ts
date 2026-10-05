@@ -11,12 +11,8 @@ import {
   expectTextFits,
   setTextScale,
 } from "./mobile-ux.ts";
+import { dataMeta } from "./real-data.ts";
 import { clsFrom, observeVitals, readVitals, throttleMobile } from "./vitals.ts";
-
-async function dataMeta(page: Page): Promise<{ offers: number; generatedAt: string }> {
-  const res = await page.request.get("./data/meta.json");
-  return (await res.json()) as { offers: number; generatedAt: string };
-}
 
 async function openAtDataTime(page: Page): Promise<{ offers: number }> {
   const meta = await dataMeta(page);

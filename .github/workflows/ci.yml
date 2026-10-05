@@ -57,6 +57,9 @@ jobs:
         run: pnpm e2e
         env:
           CI: "true"
+      - name: Schrift-Swap je Fallback (Plan 0007, B6)
+        if: always()
+        run: cat test-results/font-swap-werte.txt || echo "keine Swap-Werte"
       - name: Bundle-Budgets
         run: pnpm size
       - uses: actions/upload-artifact@v4

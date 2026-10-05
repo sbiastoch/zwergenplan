@@ -17,6 +17,14 @@ test("Schrift-Swap verschiebt mit Roboto-Fallback nichts (412 px)", async ({ pag
   expect(result.cls, `CLS beim Swap\n${result.detail}`).toBeLessThan(0.05);
 });
 
+// Gegen-Kanarienvogel: Ohne Breitenanpassung (Roboto wie vor Paket C über system-ui) muss derselbe Lauf rot sein,
+// sonst misst der Test den Fallback gar nicht (gemessen vorher 0,1111).
+test("Swap-Messung erkennt Roboto ohne Breitenanpassung", async ({ page }) => {
+  const result = await measureSwap(page, "Roboto", { width: 412, height: 915, unadjusted: true });
+  if (result === "fehlt") throw new Error("Roboto kommt per URL und fehlt nie");
+  expect(result.cls, "Roboto mit size-adjust 100 % muss verschieben").toBeGreaterThan(0.05);
+});
+
 // Kanarienvogel der Grenze: Ein Shift direkt nach markShifts() muss zählen (mit einem Zeitvergleich fiel er heraus).
 test("Swap-Messung zählt einen Shift direkt nach der Grenze", async ({ page }) => {
   const result = await measureSwap(page, "Roboto", { width: 412, height: 915, shiftAfterMark: true });
