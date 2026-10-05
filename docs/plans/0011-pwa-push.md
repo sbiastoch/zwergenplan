@@ -1,0 +1,652 @@
+# Plan 0011 – Installierbare App und Push zu neuen Angeboten
+
+Status: Review 1 und 2 eingearbeitet, freigegeben (2026-10-05); Umsetzung wartet auf Plan 0010 und die offenen Fragen an den Nutzer
+Datum: 2026-10-05
+Bezug:
+- **ADR 0013** (PWA und Service Worker, Entwurf `docs/adr/0013-pwa-service-worker.md`) und **ADR 0014** (Web Push, Entwurf `docs/adr/0014-web-push.md`).
+- ADR 0002 (statisches Hosting, Datenfluss), ADR 0008 (keine fremden Kacheln cachen), ADR 0009 (Domain), ADR 0011 (Wegzeit-Tabelle).
+- Plan 0008 E4 (Frühstart von `site.json`), Plan 0009 E10 (Entscheidungspunkt Start-JS).
+- **Plan 0010 vollständig** (Paket 0 und die Pakete A/B, Branch `anbieter-0010`) ist Voraussetzung (E5). Beide Pläne ändern `route.ts`, `KidSheet.tsx`, `vite.config.ts` und das Start-Budget. Plan 0010 hält „ADR 0012“ als letzten Ausweg fürs Budget frei, deshalb nutzt dieser Plan die Nummern 0013 und 0014.
+- Die Pläne 0001, 0003 und 0006 haben PWA und Service Worker jeweils als „eigener Plan“ zurückgestellt. Das ist dieser Plan.
+
+## Ziel
+
+Der Plan hat zwei Stufen. Jede Stufe wird für sich deployt und reviewt.
+
+**Stufe 1 – installierbare App (PWA)**
+- Der Zwergenplan lässt sich auf Android (Chrome), iPhone (Safari, „Zum Home-Bildschirm“) und am Desktop installieren. Er startet dann ohne Browserleiste, mit eigenem Icon und Namen.
+- Ein Service Worker hält die App-Schale (HTML, Start-JS, CSS, Schrift) und den zuletzt geladenen Datenstand vor. Offline öffnet die App mit dem letzten Stand und dem Hinweis „Offline – Stand vom …“, statt mit einem Ladefehler abzubrechen.
+- Online bleibt alles wie heute: Die Daten kommen frisch aus dem Netz, LCP und CLS halten die Gates.
+- Eine installierte App, die tagelang im Speicher bleibt, holt beim Zurückkehren selbst den neuen Stand (E4a).
+- Im Kind-Sheet gibt es einen Abschnitt „Als App“ mit Installationshilfe: auf Android über den Browser-Dialog, auf dem iPhone mit einer kurzen Anleitung.
+
+**Stufe 2 – Push bei neuen Angeboten**
+- Wer möchte, schaltet im Kind-Sheet „Benachrichtigen bei neuen Angeboten“ ein. Nach jedem Deploy mit neuen Angeboten kommt **eine** Benachrichtigung aufs Gerät.
+- Ein **einziges Payload-Format** für alle Browser: **Declarative Web Push** (`"web_push": 8030`). Safari ab iOS/iPadOS 18.4 und macOS 15.5 zeigt die Nachricht ohne Service Worker an. Chrome, Edge, Firefox und ältere Safari-Versionen bekommen ein klassisches `push`-Event, der Service Worker liest dasselbe JSON und zeigt die Nachricht selbst an.
+- **Persönlich zugeschnitten wird nur auf dem Gerät.** Der Absender kennt kein Alter und keinen Stadtteil. Er schickt einen allgemeinen Text („7 neue Angebote im Zwergenplan“) mit `"mutable": true`. Der Service Worker ersetzt ihn, wenn er kann, durch einen persönlichen („3 neue Angebote passen zu 14 Monaten“). Scheitert er oder gibt es nichts zuzuschneiden, bleibt der allgemeine Text.
+- Ein Tipp auf die Nachricht öffnet die App mit den neuen Angeboten (`/?neu`).
+- Der Absender ist so klein wie möglich: Ein Cloudflare Worker speichert nur die Push-Anmeldungen. Gesendet wird aus der CI nach einem erfolgreichen Deploy (ADR 0014).
+
+## Nicht-Ziele
+
+- **Periodic Background Sync** oder Background Fetch: läuft nicht auf iOS und nicht in Firefox. Push ersetzt das.
+- Push für anderes als neue Angebote („Anmeldung öffnet“, „Kurs morgen“, Merkliste). Der Eintrag „Erinnerung ‚Anmeldung öffnet‘“ steht schon in `docs/ideas.md`.
+- Zuschnitt nach **Wegzeit oder Stadtteil** in der Benachrichtigung. Dafür bräuchte der Service Worker `wegzeit.json` und die Wegzeit-Logik. Stufe 2 schneidet nur nach Alter zu. → `docs/ideas.md` (Schritt 12).
+- Eine allgemeine „Neu“-Markierung für alle ohne Push-Abo. → `docs/ideas.md` (Schritt 12).
+- Offline-Karte, Vorab-Laden des Karten-Chunks, Cachen fremder Kacheln (ADR 0008, `docs/ideas.md`).
+- Offline-Download von ICS-Dateien.
+- Mehrere Kinder je Gerät, Push-Konten, Synchronisierung zwischen Geräten.
+- Workbox oder `vite-plugin-pwa` (E3).
+- Service Worker unter `pnpm dev`. Er wird nur im Produktions-Build registriert (`import.meta.env.PROD`).
+
+## Ausgangslage
+
+- **Kein Manifest, kein Service Worker, keine Icons.** Es gibt keinen Ordner `public/`, nur die generierten `public/data/` und `public/ics/` (gitignored). `index.html` hat weder Favicon noch `apple-touch-icon`.
+- `index.html` startet zwei Inline-Skripte (Plan 0008, E4): den Frühstart von `data/site.json` (`window.__zpSite`) und die Darstellung vor dem ersten Paint. Weitere Inline-Skripte brauchen eine Begründung (`docs/architecture.md`, Bootstrap). Dieser Plan fügt **keines** hinzu.
+- Einstellungen liegen nur im `localStorage` (`src/data/preferences.ts`). **Ein Service Worker kann `localStorage` nicht lesen.**
+- Datenbuild: `scripts/build-data.ts` schreibt `public/data/site.json` (`SiteData`: `generatedAt`, `offers[]` mit stabilen IDs nach ADR 0003/0006), `meta.json` (`offers`, `providers`, `generatedAt`, `commit` aus `git rev-parse --short HEAD`), `wegzeit.json` und `ics/**`.
+- CI (`.github/workflows/ci.yml`): `check` → `e2e` → `deploy` (GitHub Pages über `actions/deploy-pages`, nur `main`). Auf `main` vergleicht `pnpm data:validate --against-deployed` den neuen Bestand mit dem Live-Stand. Die Concurrency-Gruppe je Ref bricht Push-Läufe nicht ab, zwei Läufe auf `main` laufen also nacheinander.
+- Die Pipeline läuft lokal, committet auf `main` und pusht (ADR 0002). Jeder Pipeline-Lauf mit neuen Angeboten löst genau einen CI-Lauf mit Deploy aus.
+- **Budgets:**
+  - `JS (initial)` 90 kB gzip, gezählt über `dist/assets/*.js`, also über jedes JS direkt im Ordner `assets/`, auch Lazy-Chunks.
+  - Stand nach Plan 0009: **89,80 kB** (Plan 0009, Arch-Review, Messung).
+  - Plan 0010 senkt mit Paket 0 auf ≤ 87,7 kB vor und ≤ 89,0 kB nach seiner UI und führt einen **Chunk-Wächter** ein: Direkt in `dist/assets/` liegt genau eine JS-Datei.
+  - Lazy-Chunks bekommen eigene Ordner und Budgets (`assets/karte/`, `assets/oepnv/`, bei Plan 0010 `assets/anbieter/`).
+- Playwright: Projekte `android-klein`, `pixel-7`, `iphone-15` (WebKit), `pixel-7-quer`, `desktop`, dazu seriell `smoke-echte-daten`.
+  - Die Uhr der Seite ist eingefroren (`e2e/fixtures.ts`, `page.clock.setFixedTime`, 5.10.2026 12:00 Berlin). Sie gilt **nicht** im Service Worker.
+  - Der Drittanbieter-Wächter macht jeden Request an einen fremden Origin rot, auch wenn er per `context.route` gemockt ist. Ausnahme ist der Kachel-Mock (`tiles: "mock"`).
+- Gates, die heute **nur** `src/`, `scripts/`, `e2e/` und `.claude/hooks/` sehen: Vitest-Include (`vitest.config.ts`), dependency-cruiser (`DIRS` in `scripts/check-architecture.ts`), `tsc -p .` (`tsconfig.json`), knip.
+- Routen-Zustand: `src/domain/route.ts` parst die URL, `src/ui/use-app-state.ts` schreibt sie per `replaceState` neu (`urlFor`). Unbekannte Parameter gehen dabei verloren.
+- Das Kind-Sheet (`src/ui/KidSheet.tsx`, „Dein Zwerg“) liegt im Start-Bundle und enthält Geburtsdatum, Startpunkt und „Darstellung“.
+
+### Declarative Web Push (Stand der Recherche, 2026-10-05, ergänzt im Review)
+
+Quellen:
+- [WebKit-Blog „Meet Declarative Web Push“](https://webkit.org/blog/16535/meet-declarative-web-push/)
+- [WebKit-Explainer](https://github.com/WebKit/explainers/blob/main/DeclarativeWebPush/README.md)
+- [Push API (W3C Editor's Draft)](https://w3c.github.io/push-api/), dort ist Declarative Push inzwischen spezifiziert
+- [Pushpad](https://pushpad.xyz/blog/declarative-web-push)
+
+Stand:
+- Payload: `{"web_push": 8030, "notification": {"title", "body"?, "navigate", "lang"?, "dir"?, "silent"?, "tag"?, "data"?, "app_badge"?}, "mutable"?: bool}`. `title` und `navigate` sind Pflicht, `mutable` steht auf oberster Ebene.
+- Der Parser der Push-API-Spec erkennt die Payload an `web_push == 8030`. Einen `Content-Type` prüft er nicht.
+- Verfügbar ab iOS/iPadOS 18.4 und macOS 15.5. `window.pushManager` erlaubt ein Abo ohne Service Worker. Ist ein Service Worker registriert, teilen beide dasselbe Abo.
+- Mit `mutable: true` bekommt ein vorhandener Service Worker das `push`-Event. `PushEvent.notification` (Typ `Notification?`) trägt die vorgeschlagene Nachricht. Zeigt der Service Worker selbst eine an, ersetzt sie die vorgeschlagene. Sonst oder bei einem Fehler erscheint die deklarative Fassung. **Keine Strafe für stille Pushes**, weil immer etwas angezeigt wird.
+- Browser ohne Unterstützung behandeln das JSON als gewöhnliche Payload und feuern das klassische `push`-Event (`event.data`). Der Service Worker muss die Nachricht dann selbst anzeigen (`userVisibleOnly`).
+- Chromium hat im April 2025 ein „Intent to Prototype“ veröffentlicht, ausgeliefert ist dort nichts. Firefox unterstützt es nicht. Für beide bleibt der klassische Weg, mit derselben Payload.
+- **Im Spike (Schritt 0) zu prüfen:**
+  - (a) ob iOS Push weiterhin nur für Apps auf dem Home-Bildschirm erlaubt (angenommen: ja);
+  - (d) wie lange der Service Worker auf iOS für den Zuschnitt Zeit hat;
+  - (e) was iOS zeigt, wenn der Service Worker wirft;
+  - (f) ob der Ersatz mit `mutable: true` so funktioniert wie beschrieben;
+  - (g) ob `app_badge` ankommt;
+  - (h) ob die Home-Bildschirm-App auf iOS einen eigenen Speicher hat, getrennt von Safari ([WebKit Bug 181849](https://bugs.webkit.org/show_bug.cgi?id=181849)). Dann fehlen dort Geburtsdatum, Merkliste und Stadtteil aus Safari;
+  - (i) ob `pushManager.subscribe` nach `await Notification.requestPermission()` auf iOS noch als Nutzeraktion gilt;
+  - (j) ob `WindowClient.navigate` und die Option `navigate` in `showNotification` auf iOS wirken.
+
+## Entscheidungen
+
+### E1 – Zwei Stufen, Stufe 1 ohne neue Infrastruktur
+
+- Stufe 1 braucht keinen Server und kein Konto. Sie bringt aber Cache- und Datenzugriff außerhalb von `src/data` (Service Worker), und das verlangt ein ADR (`docs/architecture.md`, Bootstrap-Regel). Dafür steht **ADR 0013**, angenommen in Schritt 5.
+- Stufe 1 geht zuerst live und wird per `/browser-review live` abgenommen.
+- Stufe 2 beginnt erst danach, auf derselben Service-Worker-Basis, mit **ADR 0014**, angenommen in Schritt 11. So bleibt bei Problemen mit Push wenigstens die installierbare App.
+
+### E2 – Manifest und Icons
+
+- `public/manifest.webmanifest`:
+  - `name` und `short_name` „Zwergenplan“, `lang: "de"`;
+  - `start_url: "./"`, `scope: "./"`, `id: "./"`, also relativ zum Manifest, damit `BASE` (`site.config.ts`) die einzige Pfadquelle bleibt;
+  - `display: "standalone"`;
+  - `background_color` und `theme_color` aus den hellen Tokens (`#e8f1ff` wie die heutige `theme-color`). Der Android-Splash ist deshalb auch im Dunkelmodus hell. Hingenommen, weil das Manifest keine Farbe je Farbschema kennt. Prüfpunkt im Browser-Review.
+  - `icons`: 192 und 512 px (`purpose: "any"`) sowie 512 px `maskable`.
+- `index.html` bekommt `<link rel="manifest">`, `<link rel="icon">` (SVG) und `<link rel="apple-touch-icon">` (180 px PNG, **deckend**, ohne Transparenz, sonst setzt iOS Schwarz dahinter). Das sind nur Tags, kein Inline-Skript.
+- Die Icon-Quelle ist **eine SVG** im Stickerheft-Stil (Plan 0003) in `design/icon.svg`.
+  - Die PNGs erzeugt `node scripts/icons.ts` reproduzierbar: Playwright-Chromium rendert die SVG, `maskable` mit 10 % Schutzzone. Die PNGs werden committet, wie Schrift-Assets.
+  - Ein neues npm-Paket gibt es dafür nicht.
+- Der Entwurf des Icons ist ein **Nutzer-Abnahmepunkt** (Schritt 2): Screenshot der Icons auf hellem und dunklem Home-Bildschirm.
+
+### E3 – Eigener kleiner Service Worker statt `vite-plugin-pwa`
+
+- **Gewählt:** `src/sw/sw.ts` (rund 150 Zeilen) plus ein Vite-Plugin `scripts/vite-sw.ts`.
+  - Das Plugin baut den Service Worker nach dem App-Bundle als einzelne IIFE-Datei `sw.js` im Wurzelpfad, ungehasht. GitHub Pages liefert `max-age=600`. Browser prüfen das Skript eines Service Workers beim Update ohnehin am HTTP-Cache vorbei.
+  - Per `define` setzt es `__PRECACHE__`: die Liste der Start-Assets. Das sind `index.html`, der Entry-Chunk mit seinen statischen Imports, das Start-CSS und die Latin-woff2 der Schrift. Lazy-Chunks in Unterordnern von `assets/` gehören nicht dazu.
+  - Außerdem `__SW_VERSION__`: Hash über die Precache-Liste **und den Inhalt von `index.html`**, denn die Inline-Skripte können sich ändern, ohne dass sich ein Asset-Name ändert.
+  - Ein Unit-Test des Plugins prüft gegen ein Mini-Bundle, dass das Entry-Skript aus `index.html` in der Liste steht und kein Lazy-Chunk.
+- Das Plugin läuft für `dist/` und für `dist-e2e/`.
+- **Abgelehnt:**
+  - `vite-plugin-pwa`/Workbox: mehrere Abhängigkeiten für ein Regelwerk aus fünf Routen. ADR 0001 nimmt Bibliotheken erst auf, wenn sie gebraucht werden („Motion kommt erst, wenn sie gebraucht wird“). Hier reicht eigener Code, der in die Budgets passt.
+  - Modul-Service-Worker mit geteilten Chunks: Firefox unterstützt `type: "module"` für Service Worker nicht überall, und ein geteilter Chunk würde den Chunk-Wächter aus Plan 0010 verletzen.
+- Eigener TypeScript-Kontext:
+  - `src/sw/tsconfig.json` mit `lib: ["es2023", "webworker"]`.
+  - Im Haupt-`tsconfig.json` wird `src/sw` ausgeschlossen, denn `dom` und `webworker` vertragen sich nicht.
+  - `check:fast` bekommt den Schritt „Typen SW“.
+
+### E4 – Caching-Regeln des Service Workers
+
+Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. Die Regeln werden **in dieser Reihenfolge** geprüft, die erste passende gilt. Pfadregeln stehen also vor der Navigationsregel, und `routes.test.ts` prüft die Reihenfolge.
+
+| # | Anfrage | Strategie | Begründung |
+|---|---|---|---|
+| 1 | fremde Origins (Kacheln, Push-Worker) | Service Worker greift **nie** ein | ADR 0008: keine fremden Kacheln cachen |
+| 2 | `ics/**` (auch als Navigation, die Links im Detail sind einfache `<a href>`, `DetailDialog.tsx`) | Netz. Offline bzw. bei Netzfehler: Antwort **204** (die Seite bleibt stehen) und `postMessage({ type: "ics-offline" })` an den Client, `src/data/pwa.ts` meldet das der App, Toast „Kalender-Datei braucht Netz“ | Die iOS-App hat keinen Zurück-Knopf; eine Fehlerseite wäre eine Sackgasse |
+| 3 | `assets/**` (gehasht, unveränderlich) | Cache zuerst, sonst Netz und in `zp-assets` ablegen | Unveränderlich. Lazy-Chunks landen beim ersten Laden im Cache, werden aber nicht vorab geladen |
+| 4 | `data/site.json` | Netz zuerst (`cache: "no-cache"`); gibt es eine Kopie in `zp-data`, nach **5 s** (Funkloch) oder bei Netzfehler die Kopie | Frische Daten. Den Frühstart-Request aus `index.html` sieht der Service Worker ebenfalls |
+| 5 | `data/wegzeit.json` | Netz zuerst, offline der Cache | Wie `site.json`. Das 8-s-Zeitlimit in `src/data/transit.ts` bleibt maßgeblich |
+| 6 | Navigation auf die App (`./`, `./index.html`, jeweils mit beliebiger Query) | **Navigation Preload** an; Netz zuerst (Preload-Antwort), nach **3 s** oder offline die vorgehaltene `index.html`. Beim Ausweichen `event.waitUntil(event.preloadResponse)`, sonst warnt die Konsole | Online immer die aktuelle Version, ohne den Start des Service Workers in den LCP zu ziehen; offline die Schale |
+| 7 | alles andere vom eigenen Origin (`data/meta.json`, `sw.js`, `manifest.webmanifest`, Icons, andere Navigationen) | nur Netz (Service Worker greift nicht ein) | `meta.json` ist für CI; Manifest und Icons prüft der Browser selbst |
+
+- **Precache** im `install`:
+  - `index.html` mit `new Request(url, { cache: "reload" })`, damit keine alte Seite aus dem HTTP-Cache zu einer neuen Asset-Liste passt. Gehashte Assets dürfen aus dem HTTP-Cache kommen.
+  - Außerdem **`data/site.json` mit `cache: "reload"` in `zp-data`**. So öffnet die App auch offline, wenn sie nach dem ersten Besuch nie wieder online war, und beim ersten Start der Home-Bildschirm-App.
+- Cache-Namen: `zp-shell-<version>`, `zp-assets`, `zp-data`.
+- Beim `activate` werden alte `zp-shell-*`-Caches gelöscht.
+- `zp-assets` hält höchstens 60 Einträge. Die ältesten fliegen raus, **nie** aber ein Eintrag, der in der aktuellen Precache-Liste steht.
+- **Aktualisierung:** `skipWaiting()` und `clients.claim()`, **kein** automatisches Neuladen. Begründung: Gehashte Assets bleiben im Cache, eine offene Seite läuft mit ihrem alten Code weiter. Ein Lazy-Chunk, der weder im Cache noch auf dem Server liegt, scheitert heute schon nach jedem Deploy (bestehende Fehleranzeige in `Lazy.tsx`).
+- **Offline-Hinweis:** Kommt `site.json` aus dem Cache, setzt der Service Worker den Antwort-Header `X-Zp-Cache: offline`. `loadSiteData` liefert dann zusätzlich `stale: true`. Die Statuszeile zeigt „Offline – Stand vom 5.10.“ (Text in `src/ui/format.ts`). Nur `src/data` liest den Header.
+
+### E4a – Frischer Stand in der installierten App
+
+- Eine installierte App hat auf iOS weder „Neu laden“ noch Pull-to-refresh und bleibt tagelang im Speicher.
+- `src/data/pwa.ts` bekommt `watchFreshness(handlers)`. Ein **Frische-Anlass** liegt vor, wenn
+  - die Seite wieder sichtbar wird (`visibilitychange`) und der letzte erfolgreiche Abruf älter als **30 Min.** ist, oder
+  - das Gerät nach einem Offline-Abruf (`stale: true`) wieder `online` ist.
+- Bei jedem Frische-Anlass:
+  1. **Zuerst `registration.update()`.** Wird dabei ein neuer Service Worker aktiv (`controllerchange`), lädt die Seite neu (`location.reload()`). Das passiert nur hier, beim Zurückkehren zur App, nie mitten in einer Bedienung. So laufen Code und Daten nie in verschiedenen Ständen, etwa nach einer Schemaänderung.
+  2. Sonst lädt `App` `site.json` neu (gleicher Lade-Weg, gleicher Request für alle) und tauscht die Daten ohne Layoutsprung aus.
+  3. War die Wegzeit-Tabelle geladen, lädt `useTransit` sie **mit** neu, sonst würden neue Orte die Wegzeit bis zum Neustart auf die Luftlinie zurückwerfen (`App.tsx`, Prüfung auf neue Orte). Das ist eine Ausnahme von „höchstens einmal je Sitzung“ (`use-transit.ts`). Der Request ist für alle gleich und hängt nicht vom Startpunkt ab (ADR 0011). Festgehalten in `docs/architecture.md` (Absatz Wegzeit) und ADR 0013.
+- Schwelle und Ablauf werden als Konstanten gesetzt und per Unit-Test mit Fake-Timern geprüft. E2E: Nach einem Frische-Anlass mit gesetztem Stadtteil bleibt die Wegzeit erhalten, und es gibt genau einen weiteren Request auf `wegzeit.json`.
+
+### E5 – Start-Bundle: fast nichts, alles andere lazy (Entscheidungspunkt)
+
+- **Voraussetzung:** Plan 0010 ist vollständig auf `main` (Paket 0 und Pakete A/B, mit Chunk-Wächter). Vor Schritt 1 wird `JS (initial)` auf `main` gemessen und als `X` hier notiert. Plan 0010 zielt auf X ≤ 89,0 kB.
+- **Im Start-Bundle** steht nur `src/data/pwa-start.ts`: nach `load` ein `import("./pwa.ts")` (nur im Produktions-Build), dazu das Lesen von `X-Zp-Cache` in `site.ts` (E4), das Flag `neu` in `route.ts` (E13), der Lader `src/ui/AppExtras.tsx` und eine Prüfung „Push an?“ (`localStorage`), die bei Bedarf `import("./push-start.ts")` auslöst.
+- **Lazy, ohne React, Ordner `assets/app/`:**
+  - `src/data/pwa.ts`: Registrierung, Listener für `beforeinstallprompt`, `installState()`, `watchFreshness` (E4a), Nachrichten des Service Workers (`ics-offline`).
+  - `src/data/push-start.ts` (Stufe 2, nur bei Push an): `seenIds` aktualisieren, Badge leeren, Endpoint-Abgleich (E12).
+  - `src/data/push.ts` (Abo) und `src/data/device-store.ts`.
+  - Der Listener für `beforeinstallprompt` hängt erst nach `load`. Chrome feuert das Event meist danach. Geht es doch verloren, bleibt auf Android das Browser-Menü „App installieren“, und der Abschnitt zeigt dann einen Hinweis darauf statt des Knopfs (E7). Das ist bewusst günstiger als ein Listener im Start-Bundle.
+- **Lazy, mit React, Ordner `assets/app/`:** `src/ui/app-extras/AppSection.tsx` (beim Öffnen des Kind-Sheets) und `src/ui/app-extras/NewsBlock.tsx` mit `src/domain/news.ts` (nur bei `neu`).
+- Budget `App-Extras JS (lazy)`: `dist/assets/app/*.js`, 5 kB gzip.
+- **Geschätzter Zuwachs im Start** (gzip, je Teil, gemessen in Schritt 3 und 10):
+
+  | Teil | Stufe | Schätzung |
+  |---|---|---|
+  | `pwa-start.ts` (`load` → `import()`) | 1 | 0,08 kB |
+  | `X-Zp-Cache` → `stale`, Text „Offline – Stand vom …“ | 1 | 0,10 kB |
+  | Lader `AppExtras.tsx` (zwei `lazy()`-Einstiege, Fehlerzustand mit `className`) | 1 | 0,12 kB |
+  | Frische-Anlass → Neuladen in `App` (Callback) | 1 | 0,05 kB |
+  | Flag `neu` in `parseRoute`/`routeToSearch` | 2 | 0,03 kB |
+  | Platzhalter für `NewsBlock`, „Push an?“ → `import("./push-start.ts")` | 2 | 0,07 kB |
+  | **Summe** | | **≈ 0,45 kB** |
+
+- **Entscheidungspunkt** nach Schritt 3 und nach Schritt 10: Ziel `JS (initial)` ≤ X + 0,5 kB und ≤ 89,5 kB.
+  - Liegt es darüber, ist der erste Kandidat zum Auslagern der Offline-Text samt `stale`-Zweig: Er wandert nach `pwa.ts`, das die Statuszeile per Callback setzt (≈ 0,08 kB).
+  - Der zweite Kandidat ist der Platzhalter von `NewsBlock`: Statt seiner hält die Liste bei `neu` kurz zurück (gleiche Mechanik wie `ListPending`, Plan 0009).
+  - Über 90 kB ist Schluss: kein Anheben des Budgets. Dann gibt es eine Rückfrage an den Nutzer, welche Start-Funktion stattdessen lazy wird.
+- **Chunk-Wächter und React-Abspaltung:** Plan 0010 hat gemessen, dass ein Lazy-Chunk mit React React in einen eigenen Start-Chunk abspalten kann (+3,16 kB). **Vor Schritt 4** läuft deshalb eine Stub-Probe: `AppSection` als leere Komponente, `vite build`, Chunk-Wächter und `pnpm size`. Spaltet sich etwas ab, gilt dieselbe Abhilfe wie in Plan 0010 (`manualChunks`/`advancedChunks`), bevor Inhalt dazukommt.
+- `vite.config.ts`: Prädikat `isAppExtrasModule(id)` = `/src/ui/app-extras/`, `/src/data/(pwa|push|push-start|device-store)\.ts$`, `/src/domain/news\.ts$` → `assets/app/[name]-[hash].js`, eingeordnet wie `isMapModule` und `isTransitModule`.
+
+### E5b – Architekturregeln und Schichten
+
+- Geräte-APIs haben je einen festen Ort:
+  - `src/data/pwa.ts` (lazy) ist der einzige Ort für `navigator.serviceWorker`, `beforeinstallprompt`, `display-mode` und das App-Badge (`setAppBadge`/`clearAppBadge`).
+  - `src/data/push.ts` (lazy) ist der einzige Ort für `PushManager` und `Notification`.
+  - Beide haben eine injizierbare API wie `geolocation.ts`.
+- **`serviceWorkers: "block"` in Playwright** ersetzt `register` durch eine async-Funktion, die nur warnt und `undefined` liefert, und `navigator.serviceWorker.ready` löst dann nie auf. `pwa.ts` und `push.ts` kommen mit `undefined` zurecht und warten **nie** unbegrenzt auf `ready` (Zeitlimit 3 s, dann `pushSupport() = "kein-sw"`). Unit-Test für genau diesen Fall.
+- Neue Schicht `src/sw/`:
+  - darf `src/domain` (reine Hilfen ohne Zod) und `src/data/device-store.ts` importieren, nichts aus `src/ui` und nichts sonst aus `src/data`;
+  - nichts außer `scripts/vite-sw.ts` referenziert `src/sw`.
+- **dependency-cruiser**, ausgeschrieben mit `from`/`to` wie in Plan 0010 (E7):
+
+  | Regel | from | to | Art |
+  |---|---|---|---|
+  | `sw-isolated` | `^src/sw/` | alles außer `^src/domain/`, `^src/data/device-store\.ts$`, `^src/sw/` | verboten |
+  | `sw-not-imported` | alles außer `^scripts/vite-sw\.ts$` | `^src/sw/` | verboten |
+  | `no-zod-in-sw` | `^src/sw/` | `zod` (auch transitiv) | verboten |
+  | `app-extras-ui-only-lazy` | `^src/` außer `^src/ui/app-extras/` | `^src/ui/app-extras/` | nur `import()`, auch Typen nicht statisch |
+  | `app-extras-ui-entry-only` | alles außer `^src/ui/AppExtras\.tsx$` | `^src/ui/app-extras/` | verboten |
+  | `app-data-only-lazy` | `^src/(ui\|data)/` außer `^src/ui/app-extras/` und den Lazy-Modulen selbst | `^src/data/(pwa\|push\|push-start\|device-store)\.ts$` | nur `import()` |
+  | `news-not-in-start` | `^src/(ui\|data)/` außer `^src/ui/app-extras/` | `^src/domain/news\.ts$` | verboten (erlaubt aus `src/sw`, `scripts`, `src/ui/app-extras`) |
+  | `push-worker-isolated` | `^push-worker/` | `^src/` außer `^src/domain/push-(payload\|types)\.ts$` | verboten |
+  | `web-push-only-in-push-send` | alles außer `^scripts/push-send\.ts$` | `web-push` | verboten |
+
+  `scripts/check-architecture.ts`: `LAZY_LOADERS` um `["src/ui/AppExtras.tsx", "./app-extras/"]`, `["src/data/pwa-start.ts", "./pwa.ts"]`, `["src/data/pwa-start.ts", "./push-start.ts"]` und `["src/data/preferences.ts", "./device-store.ts"]` ergänzen. `DIRS` um `push-worker`.
+- **Biome `noRestrictedGlobals` für `src/ui` und `main.tsx`** um `indexedDB`, `caches`, `Notification` und `PushManager` ergänzen (heute nur `navigator`, `localStorage`, `fetch`, `__zpSite`). So prüft das Gate „einziger Ort“, nicht nur der Review.
+- **Kanarienvögel (ADR 0004)** für jedes neue Gate: je Regel oben ein absichtlicher Verstoß, je Budget eine aufgeblähte Datei, je `tsc`-Schritt („Typen SW“, „Typen Worker“) ein Typfehler, die neuen Globals. Jeder muss rot werden. Das Ergebnis steht im Plan unter „Umsetzung“.
+- `docs/architecture.md` bekommt:
+  - die Zeilen für `src/sw/` und `push-worker/` in der Schichtentabelle;
+  - den Absatz „Service Worker“ (E3, E4, E4a);
+  - die Lazy-Kette „App-Extras“ (E5);
+  - die Ausnahme im Absatz Wegzeit (E4a);
+  - ab Stufe 2 den Absatz „Push“ (E9–E13) und die geänderten Privatsphäre-Invarianten (ADR 0014).
+- Budget `.size-limit.json`: `Service Worker` (`dist/sw.js`, 8 kB gzip) und `App-Extras JS (lazy)` (`dist/assets/app/*.js`, 5 kB gzip).
+
+### E6 – E2E mit Service Worker
+
+- Global gilt in `playwright.config.ts` `serviceWorkers: "block"`. Begründung: Ein Service Worker, der Fixture-Daten aus einem früheren Test liefert, ließe Tests voneinander abhängen. Außerdem sieht `context.route` Requests des Service Workers je nach Browser unterschiedlich.
+- Neue Spec `e2e/pwa.spec.ts` mit `test.use({ serviceWorkers: "allow" })`, **nur in Chromium-Projekten** (`pixel-7`, `desktop`). WebKit prüft der Browser-Review auf einem echten iPhone (Schritt 6). Inhalt:
+  1. Das Manifest ist verlinkt und gültig: `name`, `start_url`, `display`, Icons erreichbar, 192 und 512 px; das `apple-touch-icon` ist deckend (Alpha überall 255).
+  2. Der Service Worker wird aktiv und kontrolliert nach dem Neuladen die Seite.
+  3. **Kanarienvogel:** Nach `context.setOffline(true)` scheitert ein `fetch` **aus dem Service Worker** (per `serviceWorker.evaluate`). Sonst wäre Prüfung 4 trügerisch grün. Wirkt `setOffline` dort nicht, ist der Rückfall `context.route("**", (r) => r.abort("internetdisconnected"))`. Der Kanarienvogel gilt dann für diesen Weg.
+  4. **Offline nach dem ersten Besuch:** Seite **einmal** laden, warten, bis der Service Worker aktiv ist (`navigator.serviceWorker.ready` per `page.evaluate`), sofort offline gehen und neu laden. Erwartet werden Liste und Statuszeile „Offline – Stand vom …“ mit Fixture-Daten aus dem Precache (E4). `expectMobileUx` läuft hell und dunkel.
+  5. **ICS offline:** Ein Tipp auf einen Kalender-Link im Detail lässt die Seite stehen (URL unverändert, Detail offen) und zeigt den Toast „Kalender-Datei braucht Netz“. Kein Seitenfehler, keine erlaubten Konsolenfehler nötig (204).
+  6. Online lädt `site.json` aus dem Netz (Antwort ohne `X-Zp-Cache`).
+  7. **Wieder online** (E4a): `setOffline(false)` und das Ereignis `online` → die Statuszeile verliert „Offline“.
+  8. Kein fremder Origin im Cache: Mit `tiles: "mock"` und offener Karte enthält `caches` keinen Eintrag von `tiles.openfreemap.org`.
+- **LCP/CLS mit Service Worker** gehört in `e2e/smoke.spec.ts` (Projekt `smoke-echte-daten`, seriell). Dort ein eigener `describe` mit `serviceWorkers: "allow"`: erster und zweiter Besuch, LCP < 2,5 s, CLS < 0,05.
+- **Installationshilfe Black-Box** (E7), ohne neue Hintertür neben `__zpMap`:
+  - „läuft als App“: `page.addInitScript` stubbt `matchMedia("(display-mode: standalone)")`.
+  - „Browser bietet an“: Nach `load` und nachdem `pwa.ts` geladen ist (sichtbar am Attribut `data-pwa="bereit"` auf `<html>`, das `pwa.ts` setzt), löst `page.evaluate` ein synthetisches `beforeinstallprompt` aus. Das ist ein `Event` mit `prompt()`-Stub und `userChoice`-Promise (`{ outcome: "accepted" }`). Der Test prüft auch, dass der Tipp `prompt()` aufruft. Kein Inline-Skript, keine Hintertür.
+  - „iPhone“: Projekt `iphone-15` (WebKit, iOS-User-Agent).
+
+  Je Zustand `expectMobileUx` hell und dunkel.
+
+### E7 – Installationshilfe (Stufe 1, UI)
+
+- Neuer Abschnitt „Als App“ im Kind-Sheet, unter „Darstellung“, lazy (E5).
+  - **Laden:** Ein Platzhalter fester Höhe (eine Zeile) verhindert einen Sprung im Sheet.
+  - **Chunk nicht ladbar** (offline, nicht im Cache): `LoadFailed` aus `Lazy.tsx` mit einem `className` für den Sheet-Kontext. Heute sitzt `.map-note` absolut im Kartenrahmen, deshalb bekommt `LoadFailed` den Parameter wie in Plan 0010 (E7).
+- Je Zustand (`installState()` aus `src/data/pwa.ts`, Texte über die reine Funktion `src/domain/pwa.ts` mit Test):
+  - **läuft schon als App** (`display-mode: standalone` bzw. `navigator.standalone`): „Läuft als App.“ Ab Stufe 2 steht hier der Push-Schalter.
+  - **Browser bietet Installation an** (`beforeinstallprompt` gemerkt): Knopf „Zum Startbildschirm hinzufügen“ (≥ 44 px). Ist das Event verloren gegangen (E5), steht auf Android stattdessen „Im Browser-Menü ‚App installieren‘ wählen“.
+  - **iPhone/iPad in Safari:** „Teilen-Symbol → ‚Zum Home-Bildschirm‘“ mit dem Teilen-Symbol als Inline-Icon.
+    - Bestätigt der Spike (h) eigenen Speicher, kommt der Satz dazu: „Die App startet leer: Alter und Merkliste dort noch einmal eintragen.“
+  - **sonst:** Der Abschnitt ist ausgeblendet.
+- Die Erkennung von iOS steckt in `src/data/pwa.ts` (`navigator.userAgent`, `maxTouchPoints` für iPadOS) und ist als heuristisch dokumentiert. Fällt sie falsch aus, sieht man nur einen Hilfetext.
+
+### E8 – Geräte-Speicher für den Service Worker (Stufe 2)
+
+- Neues Modul `src/data/device-store.ts`: ein schmaler IndexedDB-Wrapper ohne npm-Paket (Datenbank `zwergenplan`, Store `kv`, Funktionen `get`, `set`, `del`). Es läuft im Fenster und im Service Worker.
+- **Gespiegelt wird nur, solange Push an ist, und nur das Nötige:**
+  - das Geburtsdatum;
+  - `seenIds`, also die Angebots-IDs, die das Gerät beim letzten Öffnen der App kannte;
+  - `endpointHash`, der SHA-256 des zuletzt beim Worker gemeldeten Endpoints (für den Abgleich in E12).
+
+  „Nur passende“ wird **nicht** gespiegelt (Datensparsamkeit, siehe E9).
+- `preferences.ts` schreibt bei jeder Änderung des Geburtsdatums zusätzlich in den Geräte-Speicher (per `import()`, E5), wenn `zwergenplan.push` gesetzt ist.
+- Beim Abschalten von Push werden alle Einträge **gelöscht**.
+- Das weicht von der Invariante „Das Geburtsdatum bleibt im `localStorage`“ ab. Der Wert bleibt auf dem Gerät und im eigenen Origin und erscheint nie in URL, Logs oder Requests. Festgehalten in ADR 0014 und `docs/architecture.md`.
+
+### E9 – Was „neu“ heißt (Domäne)
+
+`src/domain/news.ts`, rein, test-first. **`now` wird immer hineingegeben** (Invariante „Zeit“).
+
+- `newOfferIds(before: readonly string[], after: readonly SiteOffer[], now: Date): string[]` liefert die IDs aus `after`, die nicht in `before` stehen **und** noch einen kommenden Termin haben, nach derselben Regel wie die Liste.
+- `newsText({ count, birthDate?, now }): NewsText | undefined` liefert die persönliche Nachricht oder `undefined`. Bei `undefined` bleibt die allgemeine.
+  - ohne Geburtsdatum → `undefined`;
+  - **`count === 0`** (App zwischen Deploy und Push geöffnet) → `undefined`;
+  - **`seenIds` fehlen** (IndexedDB geräumt), was der Aufrufer erkennt → `undefined`, statt alle Angebote als neu zu melden;
+  - mit Geburtsdatum, passende vorhanden → „3 neue Angebote passen zu 14 Monaten“, im Text die ersten zwei Titel, Rest „und 1 weiteres“;
+  - mit Geburtsdatum, keines passend → „7 neue Angebote, gerade keins für 14 Monate“;
+  - `app_badge` = Zahl der passenden bzw. aller neuen.
+- „Nur passende“ wirkt nicht auf die Nachricht. Die Zahl der passenden steht im Text, eine Nachricht kommt bei jedem Deploy mit neuen Angeboten. Darum wird die Einstellung nicht gespiegelt.
+- Bekannte Unschärfe: Ein geänderter Titel erzeugt eine neue ID (ADR 0003) und zählt als neu. → Risiken.
+- `declarativePayload({ count, siteUrl, sentAt })` (`src/domain/push-payload.ts`, rein) baut die allgemeine Payload für den Absender:
+  - `notification.title` „Zwergenplan“, `body` „7 neue Angebote im Zwergenplan“, `navigate` `${siteUrl}?neu`, `tag` „neue-angebote“, `app_badge` = count;
+  - `data: { sentAt }` (ISO mit Offset);
+  - `lang: "de"`, `mutable: true`.
+
+  Service Worker, Worker und CI-Skript teilen die Typen (`src/domain/push-types.ts`).
+- **Das Zod-Schema der Payload** liegt in `scripts/lib/push-payload-schema.ts`, nicht in `src/domain`. Begründung: `no-zod-in-client-transitive` verbietet Zod in jedem Domänenmodul außer `schema.ts`/`dataset.ts`, und die Payload ist kein Teil des Datenvertrags. `push-send.ts` prüft jede Payload damit vor dem Versand.
+- Der Worker prüft Abos mit einem eigenen Zod-Schema in `push-worker/src/lib/subscription.ts`. Zod im Worker berührt kein Client-Bundle.
+
+### E10 – Push im Service Worker
+
+Die Entscheidung, was angezeigt wird, steckt in der **reinen Funktion `src/sw/push-decision.ts`**:
+- `decidePush({ proposed?, payload?, outcome })`, wobei `outcome` eines von `{ kind: "text", text }`, `{ kind: "nichts" }`, `{ kind: "zeit" }` oder `{ kind: "fehler" }` ist. Ergebnis: `{ show: { title, options } }` oder `{ show: null }`.
+- Unit-Tests decken jeden Zweig ab: auch den deklarativen (`proposed` gesetzt, nichts anzeigen), den Chromium im E2E nie erreicht, dazu kaputte Payload und Zeitlimit. Die Datei steht in `coverage.include`.
+- `sw.ts` verdrahtet nur Events, Speicher und Fetch.
+
+`self.addEventListener("push", …)`:
+1. Vorgeschlagene Nachricht lesen: `event.notification`, **wann immer vorhanden** (keine Browser-Erkennung), sonst `event.data.json().notification`. Ist die Payload kaputt, kommt der feste Text „Neues im Zwergenplan“ (Chrome verlangt eine sichtbare Nachricht).
+2. **`now` = `notification.data.sentAt`**, nur wenn das fehlt `new Date()`. Das ist fachlich die richtige Zeit (Stand beim Versand) und macht die E2E deterministisch.
+3. Höchstens **5 s** insgesamt (Wert aus dem Spike, Punkt d):
+   - `data/site.json` mit `cache: "no-cache"` laden;
+   - `seenIds` und Geburtsdatum aus dem Geräte-Speicher lesen;
+   - `newOfferIds` und `newsText` rechnen.
+4. Liefert `newsText` einen Text: `registration.showNotification(title, { body, tag: "neue-angebote", navigate, data: { navigate }, icon, lang: "de" })` und, wo vorhanden, `navigator.setAppBadge(n)`. `navigate` steht in den `NotificationOptions` der Push-API-Spec. WebKit öffnet damit ohne `notificationclick` (Spike j).
+5. Sonst (kein Text, Zeit abgelaufen, Fehler):
+   - mit `event.notification` (Declarative) **nichts** anzeigen, das System zeigt die allgemeine Fassung;
+   - ohne `event.notification` die vorgeschlagene Nachricht selbst anzeigen.
+6. `notificationclick` (Browser ohne `navigate`-Option): offenes Fenster fokussieren und auf `data.navigate` bzw. `./?neu` navigieren (`WindowClient.navigate`), sonst `clients.openWindow`. Die App leert den Badge beim Öffnen über `src/data/pwa.ts` (`push-start.ts`), nie aus `src/ui`.
+7. **`pushsubscriptionchange`** (Chrome und Firefox tauschen Abos gelegentlich aus):
+   - Der Service Worker abonniert mit demselben `applicationServerKey` neu, sofern `event.newSubscription` fehlt.
+   - Er meldet das neue Abo per `POST /abo`, das alte per `DELETE /abo`, und speichert `endpointHash`.
+   - Das ist der einzige Request ohne Tipp. Er enthält nur das Abo (ADR 0014).
+   - Schlägt er fehl, holt der Abgleich beim nächsten App-Start (E12) das nach.
+
+Der Request auf `site.json` ist für alle gleich. Alter und Einstellungen verlassen das Gerät nicht.
+
+### E11 – Absender: CI und ein Cloudflare Worker (ADR 0014)
+
+**Worker `push-worker/`** (Ordner im Repo, TypeScript, `wrangler`, Workers KV, Gratis-Tarif):
+- **Origin-Prüfung im Worker:** Jede öffentliche Route verlangt `Origin: https://zwergenplan.app`, sonst 403, auch ohne `Origin`-Header. CORS-Header plus `OPTIONS`-Preflight dienen dem Browser.
+  - **Das ist kein Schutz** gegen Skripte, die den Header frei setzen. Es hält nur fremde Webseiten ab.
+  - Die eigentlichen Grenzen sind Allowlist, Größe, Obergrenze und ein Rate-Limit von 10 Anmeldungen je IP und Stunde. Der Zähler liegt in KV mit TTL, die IP wird nur gehasht und nur für diese Stunde gehalten.
+- `POST /abo`: Body ist das `PushSubscription`-JSON. Er prüft:
+  - Schema;
+  - Endpoint-Host gegen die Allowlist der Push-Dienste, exakt bzw. als Suffix mit Punkt: `*.push.apple.com`, `fcm.googleapis.com`, `updates.push.services.mozilla.com`, `*.push.services.mozilla.com`, `*.notify.windows.com`;
+  - nur `https:`, keine Userinfo, kein Port;
+  - Größe ≤ 2 kB;
+  - Gesamtzahl ≤ 500.
+
+  Schlüssel ist der SHA-256 des Endpoints. Antwort 204.
+- `DELETE /abo` mit `{ endpoint }`: Löschen, 204, auch wenn nichts da war.
+- `GET /abos` und `POST /abos/loeschen` nur mit `Authorization: Bearer <PUSH_ADMIN_TOKEN>` (Vergleich in konstanter Zeit), ohne Origin-Pflicht.
+- Er speichert nur das Abo und das Datum der Anmeldung, loggt keine Endpoints (nur Zähler) und setzt keine Cookies.
+- `GET /version` liefert den Commit, mit dem der Worker deployt wurde. `pnpm push:deploy` setzt ihn per `--var VERSION:$(git rev-parse --short HEAD)`.
+  - `push-send.ts` gibt ein `::warning::` aus, wenn der Worker älter ist als der letzte Commit, der `push-worker/` ändert.
+  - Grund: Der Worker wird manuell deployt und kann sonst unbemerkt vom Repo abweichen.
+- Reine Logik (Prüfung, Allowlist, Schlüssel, Origin, Rate-Limit) in `push-worker/src/lib/`, Handler mit `Request`/`Response` und einem KV-Fake getestet.
+
+**Gates für `push-worker/`** (sonst läge er außerhalb aller Prüfungen):
+- `vitest.config.ts`: Include um `push-worker/**/*.test.ts`.
+- `scripts/check-architecture.ts`: `push-worker` in `DIRS`, Regel `push-worker-isolated` (importiert aus dem Repo nur `src/domain/push-payload.ts` und `src/domain/push-types.ts`).
+- `check:fast`: Schritt „Typen Worker“ (`tsc --noEmit -p push-worker`).
+- `knip.jsonc`: Entry `push-worker/src/index.ts`, Project `push-worker/**/*.ts`.
+- `biome.json` erfasst den Ordner ohnehin (`biome check .`).
+- **Abhängigkeiten im Root-`package.json`** als devDependencies (kein pnpm-Workspace): `wrangler`, `@cloudflare/workers-types`, `web-push`, `@types/web-push`. Gepinnt wie alle anderen, ein Lockfile. `wrangler` zieht `workerd` mit Build-Skript nach. `workerd` und was `pnpm install` sonst meldet, kommt in `pnpm.onlyBuiltDependencies`.
+
+**CI** (`.github/workflows/ci.yml`, nur `main`):
+- Job `check`, vor dem Deploy: `node scripts/push-news.ts --against-deployed` rechnet aus `data/offers.json` (über `loadDataset` und `toSiteData`) und der Live-`site.json` die Zahl neuer Angebote (`newOfferIds`, `now` = Laufzeit).
+  - Ergebnis als Job-Output `news` (`echo "news=$n" >> "$GITHUB_OUTPUT"`). Das Skript setzt den Output **immer**, im Zweifel auf 0, auch auf Branches (dort ohne Abruf). So bekommt `fromJSON` nie einen leeren String.
+  - Ist die Live-Datei nicht erreichbar: `news=0` mit `::warning::`. Lieber keine Nachricht als eine falsche.
+- Neuer Job `notify`: `needs: [check, deploy]`, `if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && fromJSON(needs.check.outputs.news) > 0`.
+  1. `node scripts/push-send.ts` wartet bis höchstens 10 Min., bis die Live-`meta.json` den neuen Stand zeigt: `GITHUB_SHA.startsWith(meta.commit)` (`meta.commit` ist der Kurz-Hash aus `build-data.ts`). Sonst lädt der Service Worker womöglich noch die alte `site.json`. Läuft die Zeit ab: `::warning::`, kein Versand.
+  2. Abos vom Worker holen und jedem mit `web-push` senden:
+     - VAPID mit `subject: "https://zwergenplan.app/"` (keine E-Mail-Adresse im öffentlichen Repo);
+     - Payload `declarativePayload({ count: news, siteUrl: SITE_URL, sentAt: jetzt })`;
+     - `TTL: 172800` (2 Tage), `urgency: "normal"`, `topic: "neue-angebote"` (ein noch nicht zugestelltes Push wird ersetzt).
+  3. Abos mit Antwort 404 oder 410 gehen an `POST /abos/loeschen`.
+  4. Ausgabe nur als Zahlen: gesendet, entfernt, Fehler.
+  5. Fehler beim Senden: `::warning::` und **Exit 0**. Der Job ist kein Gate, denn der Deploy ist schon live. Rot wird er nur bei einem Programmierfehler (ungültige Payload laut `declarativePayload`-Schema).
+- **Testversand ohne Deploy:**
+  - `push-send.ts` kennt `--force-news=<n>`, `--dry-run` (zählt nur Abos) und **`--only=<hash-präfix>`** (nur Abos, deren Endpoint-Hash so beginnt).
+  - Bei eingeschaltetem Push zeigt der Abschnitt „Als App“ die ersten 8 Zeichen des eigenen `endpointHash` als „Geräte-Kennung“ an. Sie verrät nichts.
+  - **Auf dem Branch** wird lokal getestet: `VAPID_PRIVATE_KEY=… PUSH_ADMIN_TOKEN=… node scripts/push-send.ts --force-news=1 --only=<kennung>`. Die Secrets hat der Nutzer aus Schritt 7. `workflow_dispatch` geht nur für Workflows, die auf dem Standard-Branch liegen.
+  - **Nach dem Merge** steht `.github/workflows/push-test.yml` für spätere Tests bereit: `workflow_dispatch` mit den Eingaben `count`, `only` und `dry_run` (Standard `true`). `only` ist Pflicht, sobald `dry_run` aus ist, damit ein Test nie an alle geht.
+- Secrets: `VAPID_PRIVATE_KEY`, `PUSH_ADMIN_TOKEN` (GitHub-Secrets). Der öffentliche VAPID-Schlüssel und die Worker-URL stehen in `site.config.ts`.
+- `web-push` (MPL-2.0, ausgereift) nur in `scripts/push-send.ts` (`web-push-only-in-push-send`).
+- Abgelehnt: das Senden im Worker. Dann müsste die RFC-8291-Verschlüsselung selbst gebaut oder `web-push` unter `nodejs_compat` betrieben werden, und Abos und privater Schlüssel lägen am selben Ort im Netz.
+
+### E12 – An- und Abmelden (UI, Stufe 2)
+
+- Im Abschnitt „Als App“ steht ein Schalter „Benachrichtigen bei neuen Angeboten“ (`role="switch"`, `aria-checked`, ≥ 44 px).
+  - Er erscheint nur, wenn `pushSupport()` = `"ok"`. Das heißt: `PushManager` vorhanden, Service Worker aktiv (mit Zeitlimit, E5b), auf iOS als App installiert.
+  - Sonst steht dort ein Hinweis: auf dem iPhone „Erst als App installieren“, sonst „Dieser Browser kann keine Benachrichtigungen“.
+- **Einschalten** nur auf Tipp, Reihenfolge fest:
+  1. `Notification.requestPermission()` ist das **erste `await`** im Tipp-Handler. Sonst verliert iOS die Nutzeraktivierung. Das hält ein Kommentar im Code fest, ein Unit-Test prüft es über die Reihenfolge der Fake-Aufrufe.
+  2. Ab hier **Wartezustand**: Schalter deaktiviert, `aria-busy`, Text „Wird eingeschaltet …“. Kein Doppel-Tipp möglich.
+  3. `registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })`.
+  4. `POST /abo`.
+  5. Geräte-Speicher füllen (E8), `zwergenplan.push = "an"` im `localStorage`.
+
+  Jeder Fehler (abgelehnt, Netz, Worker) setzt den Schalter zurück, meldet ein bereits erzeugtes Abo wieder ab und zeigt einen Toast mit Grund (Texte in `src/ui/format.ts`).
+- **Ausschalten** (ebenfalls mit Wartezustand):
+  1. `subscription.unsubscribe()`;
+  2. `DELETE /abo` (Fehler stillschweigend, der Push-Dienst kennt das Abo nicht mehr);
+  3. Geräte-Speicher löschen, `zwergenplan.push` entfernen.
+- Der Schalter zeigt den **echten** Zustand (`pushManager.getSubscription()`), nicht nur den `localStorage`-Wert. Bei `Notification.permission === "denied"`: „aus“ mit dem Hinweis „In den Einstellungen des Geräts erlaubt?“.
+- Die App aktualisiert `seenIds` im Geräte-Speicher bei jedem erfolgreichen Laden von `site.json`, nur bei Push an und nach dem Block „Neu“ (E13).
+- **Abgleich beim Start** (`push-start.ts`, nur bei Push an):
+  - `getSubscription()` lesen und den SHA-256 des Endpoints mit `endpointHash` vergleichen.
+  - Weicht er ab (Abo ausgetauscht, `pushsubscriptionchange` verpasst): das neue Abo per `POST /abo` melden, das alte per `DELETE /abo` abmelden, `endpointHash` aktualisieren.
+  - Gibt es kein Abo mehr: Der Schalter zeigt „aus“, und `zwergenplan.push` wird entfernt.
+  - Der Request enthält nur das Abo und ist für alle gleich aufgebaut.
+
+### E13 – „Neu“ in der App
+
+- `src/domain/route.ts` kennt das Flag `neu` (`parseRoute`/`routeToSearch`). Sonst entfernt `replaceState` (über `urlFor` in `use-app-state.ts`) den Parameter, bevor der Block ihn liest. Test in `route.test.ts`.
+- Mit `neu` lädt `App` lazy den `NewsBlock` (E5). Er zeigt über dem Tag „Heute“ „Neu seit deinem letzten Besuch“ mit den Angeboten aus `newOfferIds(seenIds, site.offers, now)`.
+  - **Kein Layoutsprung:**
+    - Solange `seenIds` aus dem Geräte-Speicher gelesen werden und der Chunk lädt, steht an seiner Stelle ein Platzhalter fester Höhe (Überschrift plus eine Kachelhöhe).
+    - Ist danach nichts Neues da, schrumpft er auf die eine Zeile „Nichts Neues mehr“. Das passiert über dem Falz, bevor die Liste darunter gelesen wird.
+    - E2E misst CLS < 0,05 für `/?neu`.
+  - **Filter:** Der Block wendet nur die Altersregel der Liste an (`ageVisibility`, also auch „Nur passende“), nicht die Filter nach Kategorie, Format oder Wegzeit. Die Nachricht hat „neue Angebote“ versprochen, ein Filter soll sie nicht still verstecken. Was das Alter ausblendet, steht als Zeile „2 weitere passen nicht zum Alter“.
+  - Danach wird `seenIds` aktualisiert und `neu` per `replace` aus der Route entfernt.
+  - Ohne neue Angebote steht dort „Nichts Neues mehr“.
+  - **Chunk nicht ladbar:** Der Platzhalter verschwindet, `neu` wird still entfernt, kein Fehlerkasten.
+- `?neu` ist ein Flag ohne Inhalt und verrät nichts. Die IDs stehen nie in der URL.
+- Der Block nutzt die bestehenden Kacheln. Er bekommt E2E und `expectMobileUx` hell und dunkel.
+- Ohne `seenIds` (kein Push-Abo) erscheint der Block nicht, und `neu` wird still entfernt.
+
+## Struktur
+
+```
+design/icon.svg                         Icon-Quelle (E2)
+public/manifest.webmanifest             (E2)
+public/icons/{icon-192,icon-512,maskable-512,apple-touch-180}.png, icon.svg
+scripts/icons.ts                        PNGs aus design/icon.svg (Playwright, E2)
+scripts/vite-sw.ts (+ .test.ts)         Vite-Plugin: baut sw.js, Precache-Liste (E3)
+src/sw/sw.ts, src/sw/tsconfig.json      Service Worker (E3, E4, E10)
+src/sw/routes.ts (+ .test.ts)           reine Routing-Entscheidung URL → Strategie, in Prüfreihenfolge
+src/sw/push-decision.ts (+ .test.ts)    reine Entscheidung: was beim Push angezeigt wird (E10)
+src/data/pwa-start.ts                   Start: nach `load` → import("./pwa.ts"), „Push an?“ → import("./push-start.ts") (E5)
+src/data/pwa.ts                         lazy: Registrierung, Installationszustand, Frische, Badge (E4a, E5, E7)
+src/data/push.ts                        lazy: Push-Abo (E12)
+src/data/push-start.ts                  lazy: seenIds, Badge leeren, Endpoint-Abgleich (E12)
+src/data/device-store.ts                lazy: IndexedDB-Wrapper (E8)
+src/domain/pwa.ts                       Installationshilfe: Zustand → Text (E7)
+src/domain/news.ts                      neu, Nachrichtentext (E9)
+src/domain/push-payload.ts, push-types.ts  Payload (E9), geteilt mit CI und Worker
+src/ui/AppExtras.tsx                    Lader der Lazy-Kette „App-Extras“ (E5)
+src/ui/app-extras/AppSection.tsx        Abschnitt „Als App“ mit Push-Schalter (E7, E12)
+src/ui/app-extras/NewsBlock.tsx         „Neu seit deinem letzten Besuch“ (E13)
+push-worker/                            Cloudflare Worker (E11): src/index.ts, src/lib/*, wrangler.toml, tsconfig.json, Tests
+scripts/push-news.ts, push-send.ts      CI und lokaler Testversand (E11)
+scripts/lib/push-payload-schema.ts      Zod-Schema der Payload (E9)
+.github/workflows/push-test.yml         Testversand nach dem Merge, `only` Pflicht (E11)
+docs/adr/0013-pwa-service-worker.md     (Entwurf liegt bei)
+docs/adr/0014-web-push.md               (Entwurf liegt bei)
+```
+
+## Tests
+
+- **Unit (vitest, test-first, Zeitzone `America/Los_Angeles`):**
+  - `src/domain/news.ts`: neu/bekannt, vergangene Angebote, Tagesgrenze in Berlin, Alter genau an der Grenze, Pluralformen, `app_badge`, **`count === 0` → undefined**, **ohne Geburtsdatum → undefined**.
+  - `src/domain/push-payload.ts`: Pflichtfelder (`web_push`, `title`, `navigate`), `mutable`, `sentAt` mit Offset.
+  - `src/domain/pwa.ts`: alle Zustände der Installationshilfe.
+  - `src/domain/route.ts`: `neu` hin und zurück.
+  - `src/sw/routes.ts` (in `coverage.include`): jede Zeile der Tabelle in E4 **und ihre Reihenfolge** (`ics/…` als Navigation trifft Regel 2, nicht 6), fremde Origins, Querystrings, Pfade relativ zum Scope.
+  - `src/sw/push-decision.ts` (in `coverage.include`): alle Zweige, auch der deklarative.
+  - Rotation von `zp-assets`: Einträge der aktuellen Precache-Liste bleiben.
+  - `scripts/vite-sw.ts`: Entry aus `index.html` in der Liste, kein Lazy-Chunk.
+  - `src/data/pwa.ts` mit Fakes:
+    - Registrierung nach `load`;
+    - **`register()` liefert `undefined`, `ready` löst nie auf** → kein Hänger;
+    - `watchFreshness` mit Fake-Timern (30 Min., `online`), `registration.update()` zuerst, Neuladen nur bei `controllerchange`.
+  - `src/data/push.ts` mit Fakes: jeder Fehlerpfad (Abo wird zurückgerollt), Abmelden räumt auf, `requestPermission` als erster Aufruf.
+  - `src/data/push-start.ts` mit Fakes: Endpoint gleich → kein Request; Endpoint anders → genau ein `POST` und ein `DELETE`; kein Abo → Push aus.
+  - `push-worker/src/lib`, Rate-Limit: elfte Anmeldung je IP und Stunde → 429.
+  - `preferences.ts`: Spiegelung nur bei Push an, Löschen beim Abschalten.
+  - `push-worker/src/lib`:
+    - Schema;
+    - Allowlist, auch `fcm.googleapis.com.evil.com`, `evil.com/?fcm.googleapis.com`, Userinfo, Port, Unicode-Hosts;
+    - Origin-Prüfung (fehlend, fremd, richtig);
+    - Größe, Obergrenze, Schlüssel, Token-Vergleich.
+  - `scripts/push-news.ts`: Logik über `newOfferIds`; fehlt die Live-Datei → 0.
+  - `device-store.ts` hat keinen Unit-Test (kein `fake-indexeddb`, keine neue Abhängigkeit). Der Wrapper ist dünn und läuft in `e2e/push.spec.ts` im echten Browser.
+- **E2E:** `e2e/pwa.spec.ts` und Installationshilfe (E6). Dazu `e2e/push.spec.ts`, nur Chromium:
+  - Neue Fixture-Option **`pushWorker: "mock"`** analog zu `tiles`:
+    - Der Drittanbieter-Wächter lässt dann genau die Worker-URL aus `site.config.ts` zu und bedient sie per `context.route`.
+    - Er protokolliert jeden Body. Der Test prüft, dass er nur das Abo enthält, ohne Geburtsdatum, ohne `seenIds`.
+    - Ohne Option bleibt jeder Request an den Worker rot.
+  - Berechtigung per `context.grantPermissions(["notifications"])`.
+  - `PushManager.prototype.subscribe`, **`getSubscription` und `unsubscribe`** werden per `page.addInitScript` durch einen gemeinsamen Fake mit Zustand ersetzt. Ein echter Push-Dienst wäre ein Drittanbieter-Request, und der Schalter liest `getSubscription()`.
+  - Push-Zustellung über CDP `ServiceWorker.deliverPushMessage` mit einer Payload aus `declarativePayload` mit **`sentAt` = Fixture-Jetzt**. Danach prüft `registration.getNotifications()` Titel und Text: mit und ohne Geburtsdatum, mit und ohne neue Angebote für das Gerät.
+  - **Frühe Probe** (erster Schritt von Schritt 10): Funktionieren CDP-Zustellung und `getNotifications()` in Headless-Chromium? Wenn nicht, ist der Rückfall: `showNotification` per `serviceWorker.evaluate` umhüllen und die Aufrufe protokollieren. Das Ergebnis steht im Plan.
+  - `/?neu`: Platzhalter ohne Sprung, CLS < 0,05.
+  - `notificationclick` lässt sich nicht auslösen, deshalb wird `/?neu` geöffnet und der Block geprüft (`expectMobileUx`, hell und dunkel).
+  - Schalter: Wartezustand sichtbar, Doppel-Tipp wirkungslos, Fehler des Workers (Mock 500) → Toast und Schalter aus.
+- **Manuell auf echten Geräten** (Browser-Review, Checklisten in Schritt 6 und 11): iPhone mit iOS ≥ 18.4 (installiert), Android Chrome, Desktop-Chrome.
+
+## Backpressure
+
+- Neue Gates:
+  - `Typen SW` und `Typen Worker` in `check:fast`;
+  - Budgets `Service Worker` und `App-Extras JS (lazy)`, unverändert `JS (initial)` mit Entscheidungspunkt (E5);
+  - dependency-cruiser `sw-isolated`, `sw-not-imported`, `no-zod-in-sw`, `app-extras-only-lazy`, `app-extras-entry-only`, `push-worker-isolated`, `web-push-only-in-push-send`;
+  - Vitest und knip über `push-worker/`.
+- Ein roter Smoke-Test (LCP/CLS mit Service Worker) wird an der Ursache behoben, etwa mit späterer Registrierung oder kleinerer Precache-Liste, nie durch eine höhere Schwelle.
+- Der Job `notify` ist bewusst kein Gate (E11). Seine Zahlen stehen im CI-Log.
+
+## Schritte
+
+**Schritt 0 – Spike Declarative Web Push** (Wegwerf-Code, nicht auf `main`, kann parallel zu Stufe 1 laufen)
+- Braucht vorgezogen den Cloudflare-Zugang aus Schritt 7. Der Worker liefert unter `/spike` eine temporäre Seite mit Manifest, Service Worker und Abo-Knopf. Gesendet wird lokal mit `web-push`.
+- Der Nutzer installiert die Seite auf einem iPhone mit iOS ≥ 18.4 und meldet sich an.
+- Geprüft und unter „Spike-Ergebnis“ festgehalten werden die Punkte (a) und (d)–(h) aus der Ausgangslage, außerdem ob `event.notification` wie spezifiziert gesetzt ist.
+- Fertig, wenn alle Punkte beantwortet sind und E7, E10 und E11 bei Bedarf angepasst sind.
+- Fällt (f) negativ aus, entfällt der Zuschnitt auf iOS (nur der allgemeine Text). Dann gibt es eine Rückfrage an den Nutzer, ob Stufe 2 so noch gewollt ist.
+- Die Spike-Route wird danach aus dem Worker entfernt.
+
+**Stufe 1**
+1. **Voraussetzung und Build:**
+   - Plan 0010 mit Paket 0 auf `main`; `X` = `JS (initial)` messen und hier notieren.
+   - `scripts/vite-sw.ts` (test-first) und `src/sw/` mit den Routen aus E4, zunächst ohne Push.
+   - tsconfig-Trennung, „Typen SW“, dependency-cruiser-Regeln, Budgets, `knip.jsonc`, `coverage.include`.
+   - `serviceWorkers: "block"` in `playwright.config.ts`.
+   - Biome-Globals für `src/ui` ergänzen (E5b).
+   - Kanarienvögel für jede neue Regel, jedes Budget und „Typen SW“ (ADR 0004).
+
+   Fertig, wenn `pnpm check:fast` grün ist, jeder Kanarienvogel rot war und `dist/sw.js` die Precache-Liste enthält.
+2. **Manifest und Icons:** `design/icon.svg`, `scripts/icons.ts`, PNGs, `index.html`-Tags. Fertig, wenn `e2e/pwa.spec.ts` Punkt 1 grün ist und der Nutzer das Icon abgenommen hat.
+3. **Registrierung, Offline, Frische:**
+   - `src/data/pwa.ts`, `X-Zp-Cache`, `stale` in `loadSiteData`, Statuszeile „Offline – Stand vom …“, `watchFreshness` (E4a).
+   - Test-first für `routes.ts` und `pwa.ts`.
+   - Fertig, wenn `e2e/pwa.spec.ts` 2–8 und der Smoke mit Service Worker grün sind.
+   - **Entscheidungspunkt E5** gemessen und notiert.
+4. **Installationshilfe** (E7):
+   - **Zuerst die Stub-Probe** (E5): leere `AppSection`, `vite build`, Chunk-Wächter, `pnpm size`. React darf sich nicht abspalten.
+   - Dann `src/domain/pwa.ts` test-first, Lazy-Kette „App-Extras“, Abschnitt „Als App“ mit Platzhalter und Fehlerzustand.
+   - E2E Black-Box (E6) mit `expectMobileUx` hell und dunkel und bei 320 px/200 % für die drei sichtbaren Zustände.
+5. **Doku und Review:**
+   - `docs/architecture.md` (Schicht `src/sw`, Absatz Service Worker, Lazy-Kette), README (Installation, Notausgang „selbst abmeldender `sw.js`“).
+   - ADR 0013 auf „angenommen“.
+   - `PW_PORT=4373 pnpm check` grün.
+   - `/arch-review` (neue Schicht, neues Modul).
+6. **Deploy und Browser-Review:** Branch pushen, CI grün, Fast-Forward nach `main`, `gh run watch`. Danach `/browser-review live` mit Zusatzcheckliste:
+   - Installation auf Android und iPhone;
+   - Icon deckend, ohne schwarzen Rand;
+   - Start ohne Browserleiste, Statusleiste hell und dunkel;
+   - Splash auf Android (hell, auch im Dunkelmodus: bewusst);
+   - Flugmodus → App öffnet mit „Offline – Stand vom …“, Flugmodus aus → frische Daten ohne Neustart;
+   - frisch installierte Home-Bildschirm-App sofort im Flugmodus starten → öffnet;
+   - offline im Detail „In den Kalender“ → Toast, App bleibt bedienbar;
+   - Karte offline zeigt den bestehenden Hinweis;
+   - App 30 Min. im Hintergrund, nach einem Deploy zurückholen → neuer Stand.
+
+**Stufe 2** (erst nach Abnahme von Stufe 1 und Spike)
+
+7. **Infrastruktur** (Nutzer-Schritte, Anleitung hier):
+   - Cloudflare-Konto, `pnpm exec wrangler login`, KV-Namespace anlegen (ID in `push-worker/wrangler.toml`);
+   - VAPID-Schlüssel erzeugen (`pnpm exec web-push generate-vapid-keys`);
+   - `gh secret set VAPID_PRIVATE_KEY`, `gh secret set PUSH_ADMIN_TOKEN`, `pnpm exec wrangler secret put PUSH_ADMIN_TOKEN`;
+   - öffentlichen Schlüssel und Worker-URL in `site.config.ts`.
+8. **Domäne:** `news.ts`, `push-payload.ts`, `push-types.ts`, test-first.
+9. **Worker:** `push-worker/` mit Tests und Gates (E11), Kanarienvögel für „Typen Worker“ und `push-worker-isolated`, Deploy per `pnpm push:deploy` (`wrangler deploy`). Fertig, wenn:
+   - Unit-Tests grün sind;
+   - `curl -X POST` **ohne** `Origin` bzw. mit `Origin: https://evil.example` 403 liefert (Funktionsprüfung, kein Sicherheitsnachweis, E11);
+   - `curl -X OPTIONS` mit `Origin: https://zwergenplan.app` die CORS-Header liefert;
+   - `GET /abos` ohne Token 401 liefert;
+   - `GET /version` den deployten Commit zeigt.
+10. **App:**
+    - zuerst die frühe Probe zu CDP und `getNotifications()` (Tests);
+    - `device-store.ts`, Spiegelung in `preferences.ts`, `src/data/push.ts`, `push-start.ts`, `push-decision.ts`;
+    - Push im Service Worker (E10), Schalter (E12), `neu` in `route.ts`, Block „Neu“ (E13);
+    - `e2e/push.spec.ts` mit Fixture `pushWorker: "mock"`;
+    - `docs/architecture.md` (Privatsphäre-Invarianten nach ADR 0014, Absatz Push).
+    - Entscheidungspunkt E5 erneut gemessen.
+11. **CI und Abnahme:**
+    - `scripts/push-news.ts`, `scripts/push-send.ts`, Job `notify`, Workflow `push-test.yml`.
+    - Test auf dem Branch **lokal**: `push-send.ts --dry-run`, dann `--force-news=1 --only=<Geräte-Kennung>` an die eigenen Testgeräte (Secrets aus Schritt 7 als Umgebungsvariablen). `push-test.yml` ist erst nach dem Merge per `workflow_dispatch` nutzbar.
+    - ADR 0014 auf „angenommen“, `/arch-review`.
+    - Fast-Forward, CI grün, dann `/browser-review live` mit Zusatzcheckliste:
+      - Anmelden auf iPhone, Android und Desktop;
+      - Test-Push per `push-test.yml` mit `only` = eigene Geräte-Kennung;
+      - Abo-Wechsel: in Chrome die Website-Daten für Push zurücksetzen, App neu öffnen → Abgleich meldet das neue Abo, nächster Test-Push kommt an;
+      - Nachricht persönlich auf iPhone und Android;
+      - Tipp öffnet `/?neu` mit dem Block;
+      - Abmelden → kein Push mehr;
+      - Berechtigung im System entzogen → Schalter zeigt den Hinweis.
+12. **Abschluss:**
+    - Ergebnis und Spike-Ergebnis im Plan festhalten, Status auf „umgesetzt“.
+    - `docs/ideas.md` ergänzen: „Push-Zuschnitt nach Wegzeit/Stadtteil“, „allgemeine Neu-Markierung ohne Push“, „weitere Push-Anlässe (Merkliste, Kurs morgen)“.
+
+## Akzeptanzkriterien
+
+- **Stufe 1:**
+  - Chrome zeigt „Installieren“. Ein iPhone startet nach „Zum Home-Bildschirm“ im Vollbild mit Icon.
+  - Offline öffnet die App mit dem letzten Stand und dem Hinweis, online wieder frisch.
+  - Alle bestehenden E2E-Tests sind unverändert grün (mit `serviceWorkers: "block"`).
+  - `JS (initial)` ≤ 90 kB (Ziel ≤ X + 0,5 kB), die neuen Budgets halten, LCP/CLS mit Service Worker halten.
+- **Stufe 2:**
+  - Nach einem Deploy mit neuen Angeboten kommt auf jedem angemeldeten Gerät genau eine Nachricht. Mit gesetztem Geburtsdatum nennt sie die passenden Angebote, sonst die Gesamtzahl.
+  - Ohne neue Angebote kommt keine Nachricht.
+  - Der Worker-Endpunkt erhält nie Geburtsdatum, Stadtteil, Merkliste, `seenIds` oder Standort (E2E-Protokoll des Request-Bodys).
+  - Nach dem Abmelden ist das Abo in KV gelöscht (bzw. beim nächsten Senden per 410 entfernt) und der Geräte-Speicher leer.
+
+## Risiken
+
+- **iOS-Verhalten ist nur teilweise dokumentiert.** → Spike zuerst. Der allgemeine Text funktioniert in jedem Fall.
+- **Eigener Speicher der Home-Bildschirm-App auf iOS** (Spike h): Nach der Installation fehlen Alter und Merkliste. → Hinweis in der Installationshilfe. Eine Übertragung (z. B. per Link) wäre ein eigener Plan.
+- **Apple beendet Push-Abos** bei längerer Nichtnutzung oder nach einem Neuinstallieren. → 410 räumt auf. Der Schalter zeigt den echten Zustand.
+- **Geänderte IDs zählen als neu** (E9). → Hinnehmbar. Gibt es auffällig viele, prüft die Pipeline Titeländerungen (eigener Plan).
+- **Pages-Cache:** `site.json` ist bis zu 10 Min. gecacht. → `notify` wartet auf den neuen Commit in `meta.json`, der Service Worker lädt mit `no-cache`.
+- **Ein Service Worker kann einen alten Stand festhalten.** → Netz zuerst für Navigation und Daten, `cache: "reload"` im Precache, E4a. Notausgang im README: ein Deploy mit `sw.js`, der sich selbst abmeldet.
+- **Start-JS-Budget** (E5): kaum Luft. → Lazy-Kette, Entscheidungspunkt, kein Anheben.
+- **Missbrauch des Abo-Endpunkts** (Spam-Abos). → Allowlist der Push-Dienste, Größen- und Mengengrenze, Rate-Limit je IP. Die Origin-Prüfung hält nur fremde Webseiten ab, keine Skripte. Im schlimmsten Fall ist die Grenze von 500 voll. Dann `wrangler kv` leeren und neu einladen.
+- **Kosten:** Cloudflare Workers und KV im Gratis-Tarif (100 000 Requests/Tag, 1 000 Schreibvorgänge/Tag) reichen für Familie und Freunde um Größenordnungen.
+
+## Offene Fragen an den Nutzer
+
+1. **Cloudflare** als Ort für die Abos (ADR 0014), oder lieber ein anderer Anbieter? Die Alternativen stehen im ADR.
+2. **Icon:** Gibt es eine Vorstellung (Motiv, Farbe), oder soll ein Entwurf im Stickerheft-Stil zur Abnahme kommen?
+3. **Gerät für den Spike:** Ein iPhone mit iOS ≥ 18.4 wird gebraucht, auf dem die Spike-Seite installiert werden kann.
+
+## Review (2026-10-05, plan-reviewer, Runde 1) – Verdict: Überarbeiten → eingearbeitet
+
+Alle Findings übernommen, keines abgelehnt.
+
+- **B1 Start-JS-Budget** (89,80/90 kB, `dist/assets/*.js` zählt Lazy-Chunks im Wurzelordner): Plan 0010 mit Paket 0 als Voraussetzung, Ausgangswert `X` messen, neue UI in die Lazy-Kette `assets/app/` mit Budget und Regeln, Entscheidungspunkt mit Schwelle 89,5 kB (E5).
+- **B2 Uhr im Service Worker:** `now` kommt als `notification.data.sentAt` aus der Payload (E9, E10). Die E2E setzt `sentAt` auf das Fixture-Jetzt.
+- **W1** `serviceWorkers: "block"` liefert `register() → undefined`, `ready` löst nie auf: Zeitlimit, kein Hänger, Unit-Test (E5b).
+- **W2** Drittanbieter-Wächter: Fixture-Option `pushWorker: "mock"`. LCP mit Service Worker in `smoke.spec.ts` (E6, Tests).
+- **W3** `push-worker/` in Vitest, dependency-cruiser (`DIRS`, `push-worker-isolated`), „Typen Worker“, knip. Abhängigkeiten im Root (E11).
+- **W4** ADR geteilt: PWA/SW (angenommen in Schritt 5) und Push (Schritt 11); seit Runde 2 als ADR 0013 und 0014 nummeriert. Installationshilfe Black-Box per `addInitScript` und `iphone-15` statt `__E2E__`-Hintertür (E6).
+- **W5** Precache mit `cache: "reload"`, Navigation Preload, Plugin-Test für den Entry (E3, E4).
+- **W6** Origin-Prüfung serverseitig mit 403, Abnahme per `curl` ohne/mit fremdem `Origin` und Preflight (E11, Schritt 9).
+- **W7** Eigener Workflow `push-test.yml`, Exit 0 mit `::warning::`, `fromJSON(...) > 0`, Commit-Vergleich mit `git rev-parse --short` (E11).
+- **W8** `newsText`: 0 neue je Gerät und fehlende `seenIds` → allgemeiner Text bzw. bei Declarative nichts anzeigen (E9, E10). Tests ergänzt.
+- **W9** Schalter mit Wartezustand und `role="switch"` (E12); Frische bei `visibilitychange`/`online` (E4a); eigener Speicher der iOS-App im Spike (h) und als Hinweis (E7); Checkliste mit deckendem Icon und hellem Splash (E2, Schritt 6).
+- **H1** Recherche nach Push-API-Spec aktualisiert: `event.notification` immer nutzen, kein Content-Type nötig, Blink „Intent to Prototype“. Spike-Punkte (b), (c) entfallen.
+- **H2** VAPID-`subject` `https://zwergenplan.app/`. **H3** Manifest-Pfade `./`, Service-Worker-Routen relativ zum Scope. **H4** `neu` in `route.ts`, keine Registrierung unter `pnpm dev`. **H5** „Nur passende“ wird nicht gespiegelt (Datensparsamkeit). **H6** `beforeinstallprompt` auf Modulebene. **H7** Kanarienvogel für `setOffline` im Service Worker. **H8** `routes.ts` in `coverage.include`, Rotation schont die aktuelle Version. **H9** Einträge in `docs/ideas.md` in Schritt 12. **H10** `requestPermission` als erstes `await`, mit Test.
+
+## Review (2026-10-05, plan-reviewer, Runde 2) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Kein Blocker. Alle Findings übernommen, keines abgelehnt.
+
+- **W1** Frische: zuerst `registration.update()`, bei neuem Service Worker Neuladen, sonst Daten tauschen. Eine geladene Wegzeit-Tabelle lädt mit, als dokumentierte Ausnahme von „einmal je Sitzung“ (E4a).
+- **W2** Erster Start offline: `site.json` im Precache, E2E „einmal laden, sofort offline“ (E4, E6).
+- **W3** ICS-Links sind Navigationen: Pfadregeln vor der Navigationsregel, die Schale nur für App-Pfade, offline 204 und Toast (E4, E6).
+- **W4** `beforeinstallprompt` im Test nach `load` per `page.evaluate`, Stub mit `prompt()` und `userChoice`, kein Inline-Skript (E6).
+- **W5** Lazy-Kette ausgeschrieben: Regeln mit `from`/`to`, `LAZY_LOADERS`, Vite-Prädikat, Stub-Probe gegen React-Abspaltung vor Schritt 4 (E5, E5b).
+- **W6** Voraussetzung ist Plan 0010 vollständig. Der Kern der PWA ist nun ganz lazy, im Start nur ≈ 0,45 kB laut Tabelle, mit benannten Kandidaten zum Auslagern (E5).
+- **W7** `NewsBlock` mit Platzhalter fester Höhe und CLS-Messung. Lade- und Fehlerzustände von `AppSection` und `NewsBlock`, `LoadFailed` mit `className` (E7, E13).
+- **W8** `pushsubscriptionchange` im Service Worker und Endpoint-Abgleich beim Start, in ADR 0014 als Request ohne Tipp festgehalten (E10, E12).
+- **W9** Reine Funktion `push-decision.ts` mit allen Zweigen in der Coverage, frühe Probe zu CDP und `getNotifications()` mit Rückfall, Fake auch für `getSubscription` und `unsubscribe` (E10, Tests).
+- **W10** Biome-Globals für `src/ui` ergänzt, Kanarienvögel je Gate nach ADR 0004 (E5b, Schritte 1 und 9).
+- **W11** `workflow_dispatch` geht nur vom Standard-Branch: Test auf dem Branch lokal, `--only=<Geräte-Kennung>`, `only` Pflicht im Workflow (E11, Schritt 11).
+- **H1** ADR-Nummern auf 0013 (PWA) und 0014 (Push), weil Plan 0010 „ADR 0012“ freihält.
+- **H2** Origin-Prüfung ist kein Schutz gegen Skripte. Grenzen sind Allowlist, Obergrenze und das neue Rate-Limit je IP (E11, Risiken).
+- **H3** Zod-Schema der Payload in `scripts/lib/`, Worker mit eigenem Schema (E9).
+- **H4** `GITHUB_SHA.startsWith(meta.commit)`, Output `news` immer gesetzt (E11).
+- **H5** `cache: "reload"` nur für `index.html` und `site.json`, `waitUntil(preloadResponse)`, Zeitlimit 5 s für `site.json` (E4).
+- **H6** `__SW_VERSION__` enthält den Inhalt von `index.html` (E3).
+- **H7** `navigate` in `showNotification`, Spike (i) und (j) (E10, Ausgangslage).
+- **H8** Funktionsnamen korrigiert: `parseRoute`/`routeToSearch` in `route.ts`, `urlFor` in `use-app-state.ts` (E13).
+- **H9** Badge nur über `src/data/pwa.ts` (E5b, E10).
+- **H10** `workerd` in `onlyBuiltDependencies`, `GET /version` mit Warnung bei veraltetem Worker (E11).
+- **H11** Rückfall `context.route(…abort("internetdisconnected"))`, falls `setOffline` den Service Worker nicht trifft (E6).
+- **H12** `NewsBlock` wendet nur die Altersregel an, keine anderen Filter. Was ausgeblendet ist, wird genannt (E13).
