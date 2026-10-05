@@ -19,6 +19,9 @@ const PATHS = {
   face: "M9 15.5c1.6 1.4 4.4 1.4 6 0M9.5 11.5h.01M14.5 11.5h.01M12 5c-.8-1.6.6-2.8 2-2",
   search: "m20 20-4.5-4.5",
   swing: "M4 18c3-6 13-6 16 0M7 10a5 5 0 0 1 10 0",
+  // Laden mit Markise über der Tür (Plan 0010, E2): Tab „Anbieter“ und Knopf im Detail
+  store:
+    "M3.5 8 5 4h14l1.5 4M3.5 8a2.1 2.1 0 0 0 4.25 0 2.1 2.1 0 0 0 4.25 0 2.1 2.1 0 0 0 4.25 0 2.1 2.1 0 0 0 4.25 0M5 10.5V20h14v-9.5M10 20v-5h4v5",
 } as const;
 
 export type IconName = keyof typeof PATHS;

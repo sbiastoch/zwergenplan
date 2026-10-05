@@ -102,3 +102,45 @@
       kind: html
   availability: { shown: nein }
   verified: 2026-10-04
+# Anbieter ohne kommende Angebote (Plan 0010, E6): steht blass am Ende der Anbieterliste. Der erste Ort beginnt mit
+# seinem Namen (venueAddress kürzt), der zweite hat keinen Stadtteil.
+- id: turnverein-beispiel
+  role: anbieter
+  name: "Turnverein Beispiel (fiktiv)"
+  url: "https://example.org/turnverein"
+  venues:
+    - id: turnverein-beispiel-halle
+      name: "Turnhalle Beispiel"
+      address: "Turnhalle Beispiel, Sportweg 3, 90441 Nürnberg"
+      district: Schweinau
+      ring: aussen
+      geo: { lat: 49.4392, lon: 11.0442 }
+    - id: turnverein-beispiel-gymnastik
+      name: "Gymnastikraum Beispiel"
+      address: "Am Beispielpark 7, 90480 Nürnberg"
+      ring: aussen
+      geo: { lat: 49.4502, lon: 11.1301 }
+  topics: [eltern-kind-turnen, bewegung]
+  formats: [kurs]
+  costs: [kostenpflichtig]
+  registrations: [mit-anmeldung]
+  programme:
+    - url: "https://example.org/turnverein"
+      kind: html
+  availability: { shown: nein }
+  verified: 2026-10-04
+# Sammelkalender (Recherchequelle, Plan 0010, E6): darf nicht in anbieter.json stehen.
+- id: sammelkalender-beispiel
+  role: aggregator
+  name: "Sammelkalender Beispiel (fiktiv)"
+  url: "https://example.org/sammelkalender"
+  venues: []
+  topics: [krabbelgruppe]
+  formats: [regelmaessig]
+  costs: [kostenlos]
+  registrations: [ohne-anmeldung]
+  programme:
+    - url: "https://example.org/sammelkalender/termine"
+      kind: html
+  availability: { shown: unbekannt }
+  verified: 2026-10-04

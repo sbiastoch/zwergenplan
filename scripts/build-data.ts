@@ -1,6 +1,7 @@
 /**
  * Prüft den Datenbestand und erzeugt die statischen Daten-Assets der Seite:
  *   public/data/site.json, public/data/meta.json, public/ics/**.ics,
+ *   public/data/anbieter.json (Anbieterübersicht, lädt erst beim Öffnen; Plan 0010, E6),
  *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7)
  * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
  * (`TIMETABLE_REQUIRED`, seit Plan 0009, Schritt 5).
@@ -12,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { DISTRICTS } from "../src/domain/districts.ts";
 import { icsContextFor, icsForSeries, icsForSession } from "../src/domain/ics.ts";
 import { seriesIcsPath, sessionIcsPath } from "../src/domain/ics-paths.ts";
-import { type SiteMeta, toSiteData } from "../src/domain/site-data.ts";
+import { type SiteMeta, toProviderDirectory, toSiteData } from "../src/domain/site-data.ts";
 import { ACCESS_METERS, decodeTransitTable } from "../src/domain/transit.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { buildTransitTable, withoutAccess } from "./transit/table.ts";
@@ -46,6 +47,9 @@ try {
 const meta: SiteMeta = { ...result.summary, commit };
 write("data/site.json", JSON.stringify(site));
 write("data/meta.json", `${JSON.stringify(meta, null, 2)}\n`);
+// derselbe Datenstand wie site.json: Weicht er im Browser ab, lädt ensureFresh einmal neu (src/data/providers.ts)
+const directory = toProviderDirectory(result.providers, site.generatedAt);
+write("data/anbieter.json", JSON.stringify(directory));
 
 let files = 0;
 for (const offer of site.offers) {
@@ -60,7 +64,9 @@ for (const offer of site.offers) {
   }
 }
 
-console.log(`✓ Daten (${source}): ${meta.offers} Angebote, ${meta.providers} Anbieter, ${files} ICS-Dateien`);
+console.log(
+  `✓ Daten (${source}): ${meta.offers} Angebote, ${meta.providers} Katalog-Einträge (${directory.providers.length} Anbieter), ${files} ICS-Dateien`,
+);
 
 const timetable = loadTimetable(source);
 const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });

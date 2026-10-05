@@ -340,6 +340,11 @@ export function mapStatusParts(offers: number, places: number): [number, string,
   return [offers, offers === 1 ? " Angebot an " : " Angebote an ", places, places === 1 ? " Ort" : " Orten"];
 }
 
+/** Statuszeile im Tab „Anbieter“ „5 Anbieter mit 8 Angeboten“ (Plan 0010, E4); die Zahlen getrennt, fett. */
+export function providerStatusParts(providers: number, offers: number): [number, string, number, string] {
+  return [providers, " Anbieter mit ", offers, offers === 1 ? " Angebot" : " Angeboten"];
+}
+
 const LOAD_ERRORS: Record<LoadFailure, string> = {
   // kein automatisches Neuladen, der Text verspricht also keins (Plan-Review 0008, m1)
   offline: "Du bist gerade offline. Sobald das Netz wieder da ist, tippe auf ‚Nochmal versuchen‘.",

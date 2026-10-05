@@ -18,6 +18,7 @@ import {
   originHint,
   originPhrase,
   plural,
+  providerStatusParts,
   reachLimitLabel,
   reachLong,
   reachNote,
@@ -401,6 +402,14 @@ describe("Karte und Orte (Plan 0005, E7)", () => {
     expect(mapStatusParts(8, 5)).toEqual([8, " Angebote an ", 5, " Orten"]);
     expect(mapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort");
     expect(mapStatusParts(0, 0).join("")).toBe("0 Angebote an 0 Orten");
+  });
+});
+
+describe("Statuszeile im Tab „Anbieter“ (Plan 0010, E4)", () => {
+  it("nennt Anbieter und Angebote, die Zahlen getrennt", () => {
+    expect(providerStatusParts(5, 8)).toEqual([5, " Anbieter mit ", 8, " Angeboten"]);
+    expect(providerStatusParts(1, 1).join("")).toBe("1 Anbieter mit 1 Angebot");
+    expect(providerStatusParts(0, 0).join("")).toBe("0 Anbieter mit 0 Angeboten");
   });
 });
 

@@ -41,6 +41,8 @@ interface DetailProps {
   saved: boolean;
   onToggleSave: (offer: SiteOffer) => void;
   onClose: () => void;
+  /** „Alle Angebote dieses Anbieters“: öffnet das Anbieter-Sheet (Plan 0010, E2, E3) */
+  onProvider: (providerId: string) => void;
   onIcs: (message: string) => void;
 }
 
@@ -55,6 +57,7 @@ export function DetailContent({
   saved,
   onToggleSave,
   onClose,
+  onProvider,
   onIcs,
 }: DetailProps) {
   const [allDates, setAllDates] = useState(false);
@@ -150,6 +153,10 @@ export function DetailContent({
             </button>
           )}
           <p className="provider-link">
+            <button type="button" className="btn wide" onClick={() => onProvider(offer.providerId)}>
+              <Icon name="store" size={20} />
+              Alle Angebote dieses Anbieters
+            </button>
             <a className="btn wide" href={offer.url} target="_blank" rel="noopener">
               <Icon name="external" size={20} />
               Website von {offer.providerName}

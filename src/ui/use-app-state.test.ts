@@ -1,7 +1,10 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type OriginApi, useOrigin } from "./use-app-state.ts";
+import { type OriginApi, type RouteApi, useOrigin, useRoute } from "./use-app-state.ts";
+
+const preloadProviderUi = vi.hoisted(() => vi.fn());
+vi.mock("./ProviderPanel.tsx", () => ({ preloadProviderUi }));
 
 const KEY = "zwergenplan.entfernung-ab";
 
@@ -114,5 +117,99 @@ describe("useOrigin (Plan 0004, E3)", () => {
     });
     expect(accepted).toBe(false);
     expect(outside.origin?.source).toBe("stadtteil");
+  });
+});
+
+/** window mit Location und History, gerade so viel, wie `useRoute` anfasst (kein DOM in Unit-Tests) */
+function fakeWindow(search: string, state: unknown = null) {
+  const history = {
+    state,
+    pushState: vi.fn((next: unknown) => {
+      history.state = next;
+    }),
+    replaceState: vi.fn((next: unknown) => {
+      history.state = next;
+    }),
+    back: vi.fn(),
+  };
+  return {
+    location: { pathname: "/", search },
+    history,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  };
+}
+
+function renderRoute(): RouteApi {
+  let result: RouteApi | undefined;
+  function Probe() {
+    result = useRoute();
+    return null;
+  }
+  renderToStaticMarkup(createElement(Probe));
+  if (!result) throw new Error("Hook nicht gerendert");
+  return result;
+}
+
+describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
+  const offerId = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    preloadProviderUi.mockClear();
+  });
+
+  it("openProvider pusht einen eigenen Eintrag und schließt das Detail", () => {
+    const win = fakeWindow(`?ansicht=kalender&angebot=${offerId}`);
+    vi.stubGlobal("window", win);
+    renderRoute().openProvider("theater-beispiel");
+    expect(win.history.pushState).toHaveBeenCalledWith(
+      { zpProvider: true },
+      "",
+      "/?ansicht=kalender&anbieter=theater-beispiel",
+    );
+  });
+
+  it("openDetail aus dem offenen Sheet behält anbieter", () => {
+    const win = fakeWindow("?anbieter=theater-beispiel");
+    vi.stubGlobal("window", win);
+    renderRoute().openDetail(offerId);
+    expect(win.history.pushState).toHaveBeenCalledWith(
+      { zpDetail: true },
+      "",
+      `/?anbieter=theater-beispiel&angebot=${offerId}`,
+    );
+  });
+
+  it("closeProvider geht zurück, wenn der Eintrag von openProvider kommt", () => {
+    const win = fakeWindow("?ansicht=anbieter");
+    vi.stubGlobal("window", win);
+    const api = renderRoute();
+    api.openProvider("theater-beispiel");
+    api.closeProvider();
+    expect(win.history.back).toHaveBeenCalledTimes(1);
+    expect(win.history.replaceState).not.toHaveBeenCalled();
+  });
+
+  it("closeProvider ersetzt den Eintrag nach einem Deep-Link", () => {
+    const win = fakeWindow("?ansicht=kalender&anbieter=theater-beispiel");
+    vi.stubGlobal("window", win);
+    renderRoute().closeProvider();
+    expect(win.history.back).not.toHaveBeenCalled();
+    expect(win.history.replaceState).toHaveBeenCalledWith(null, "", "/?ansicht=kalender");
+  });
+
+  it("lädt beim Start mit anbieter= oder ansicht=anbieter Chunk und Katalog vor, genau einmal", () => {
+    for (const search of ["?anbieter=theater-beispiel", "?ansicht=anbieter", "?ansicht=anbieter&anbieter=x-y"]) {
+      vi.stubGlobal("window", fakeWindow(search));
+      renderRoute();
+      expect(preloadProviderUi, search).toHaveBeenCalledTimes(1);
+      preloadProviderUi.mockClear();
+    }
+    for (const search of ["", "?ansicht=kalender", "?anbieter=../x"]) {
+      vi.stubGlobal("window", fakeWindow(search));
+      renderRoute();
+      expect(preloadProviderUi, search).not.toHaveBeenCalled();
+    }
   });
 });

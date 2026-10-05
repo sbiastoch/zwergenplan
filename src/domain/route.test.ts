@@ -46,6 +46,36 @@ describe("URL-Route", () => {
     });
   });
 
+  it("kennt das Anbieter-Sheet: anbieter=<id> überlebt den Roundtrip, kanonisch nach der Ansicht (Plan 0010, E2)", () => {
+    const providerId = "theater-beispiel";
+    expect(parseRoute(`?anbieter=${providerId}`)).toEqual({ tab: "entdecken", providerId, filter: EMPTY_FILTER });
+    expect(routeToSearch({ tab: "entdecken", providerId, filter: EMPTY_FILTER })).toBe(`anbieter=${providerId}`);
+    const full = {
+      tab: "anbieter" as const,
+      providerId,
+      offerId,
+      filter: { ...EMPTY_FILTER, categories: ["musik" as const] },
+    };
+    const search = routeToSearch(full);
+    expect(search).toBe(`kat=musik&ansicht=anbieter&anbieter=${providerId}&angebot=${offerId}`);
+    expect(parseRoute(`?${search}`)).toEqual(full);
+    // gleiche Bedeutung in anderer Reihenfolge, kanonisch zurück
+    expect(routeToSearch(parseRoute(`?angebot=${offerId}&anbieter=${providerId}&ansicht=kalender`))).toBe(
+      `ansicht=kalender&anbieter=${providerId}&angebot=${offerId}`,
+    );
+  });
+
+  it("verwirft kaputte und überlange Anbieter-IDs", () => {
+    for (const bad of ["../x", "Theater", "a--b", "-a", "a-", "", "a b", `${"a".repeat(81)}`]) {
+      expect(parseRoute(`?anbieter=${encodeURIComponent(bad)}`), JSON.stringify(bad)).toEqual({
+        tab: "entdecken",
+        filter: EMPTY_FILTER,
+      });
+    }
+    const longest = "a".repeat(80);
+    expect(parseRoute(`?anbieter=${longest}`).providerId).toBe(longest);
+  });
+
   it("übernimmt den alten Umkreis nicht, die Wegzeit schon", () => {
     expect(routeToSearch(parseRoute("?umkreis=5&ansicht=karte"))).toBe("ansicht=karte");
     expect(routeToSearch(parseRoute("?ansicht=karte&wegzeit=30"))).toBe("wegzeit=30&ansicht=karte");
@@ -69,7 +99,7 @@ describe("URL-Route", () => {
     const names = DISTRICTS.flatMap((d) => [d.id, d.name.toLowerCase()]);
     for (const filter of filters) {
       for (const tab of ["entdecken", "karte", "kalender", "anbieter", "merkliste"] as const) {
-        const search = routeToSearch({ tab, offerId, filter });
+        const search = routeToSearch({ tab, offerId, providerId: "theater-beispiel", filter });
         expect(search).toContain(`wegzeit=${filter.reachLimit?.value}`);
         expect(search).not.toContain("umkreis");
         expect(search).not.toMatch(/\d{2}\.\d{2,}/);

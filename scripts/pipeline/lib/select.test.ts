@@ -17,17 +17,22 @@ describe("selectBatches", () => {
     const s = selectBatches(catalog, { batchSize: 3 });
     expect(s.batches.map((b) => b.map((p) => p.id))).toEqual([
       ["familientreff-beispiel", "musikschule-beispiel", "stadtbibliothek-beispiel"],
-      ["gemeinde-beispiel"],
+      ["gemeinde-beispiel", "turnverein-beispiel"],
     ]);
     expect(s.adapters).toEqual([{ id: "kalender", adapter: "stadt-vk" }]);
-    expect(s.skipped.map((x) => x.id)).toEqual(["theater-beispiel", "anderer-kalender", "liste"]);
+    expect(s.skipped.map((x) => x.id)).toEqual([
+      "theater-beispiel",
+      "sammelkalender-beispiel",
+      "anderer-kalender",
+      "liste",
+    ]);
   });
 
   it("--only prüft gezielt einzelne Anbieter, auch abgedeckte", () => {
     const s = selectBatches(catalog, { batchSize: 7, only: ["theater-beispiel"] });
     expect(s.batches.map((b) => b.map((p) => p.id))).toEqual([["theater-beispiel"]]);
     expect(() => selectBatches(catalog, { batchSize: 7, only: ["gibts-nicht"] })).toThrow("Unbekannter Anbieter");
-    expect(selectBatches(catalog, { batchSize: 0 }).batches).toHaveLength(4);
+    expect(selectBatches(catalog, { batchSize: 0 }).batches).toHaveLength(5);
   });
 });
 

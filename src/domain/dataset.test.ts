@@ -20,7 +20,8 @@ describe("validateDataset", () => {
   it("akzeptiert die Fixtures", () => {
     const r = mutate(() => {});
     expect(errorsOf(r)).toBe("");
-    expect(r.ok && r.summary).toEqual({ offers: 9, providers: 5, generatedAt: "2026-10-05T06:00:00+02:00" });
+    // 7 Katalog-Einträge: 6 Anbieter (einer ohne Angebote) und ein Sammelkalender (Plan 0010, E6)
+    expect(r.ok && r.summary).toEqual({ offers: 9, providers: 7, generatedAt: "2026-10-05T06:00:00+02:00" });
   });
 
   it.each([
@@ -113,7 +114,7 @@ describe("validateDataset", () => {
 
   it("prüft Rollen: Pflichtorte, coveredBy und Angebote nur von Anbietern", () => {
     const aggregator = {
-      id: "sammelkalender-beispiel",
+      id: "kalender-mit-adapter",
       role: "aggregator",
       adapter: "evtermine",
       name: "Sammelkalender (fiktiv)",
@@ -141,7 +142,7 @@ describe("validateDataset", () => {
       errorsOf(
         mutate((_o, p) => {
           p.push(structuredClone(aggregator));
-          Object.assign(p[0] as object, { coveredBy: "sammelkalender-beispiel" });
+          Object.assign(p[0] as object, { coveredBy: "kalender-mit-adapter" });
         }),
       ),
     ).toBe("");

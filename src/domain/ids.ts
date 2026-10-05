@@ -10,6 +10,12 @@ import { berlinKey } from "./time.ts";
  */
 export const OFFER_ID_PATTERN = /^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/;
 
+/**
+ * Form jeder Katalog-ID (Anbieter, Ort): kebab-case ohne doppelte oder randständige Bindestriche. Einzige
+ * Definition – das Schema prüft damit den Katalog, die Route damit den `anbieter`-Parameter (Plan 0010, E2).
+ */
+export const KEBAB_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 const TRANSLIT: Record<string, string> = { ä: "ae", ö: "oe", ü: "ue", ß: "ss" };
 
 /** kebab-case aus Freitext: Umlaute transliteriert, höchstens `max` Zeichen, an Wortgrenze gekürzt. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { icsContextFor, icsForSeries } from "./ics.ts";
 import { Venue } from "./schema.ts";
-import { MIN_ADDRESS, toSiteData, venueAddress } from "./site-data.ts";
+import { MIN_ADDRESS, toProviderDirectory, toSiteData, venueAddress } from "./site-data.ts";
 import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
@@ -40,6 +40,71 @@ describe("toSiteData", () => {
 
   it("weist ungeprüfte Referenzen ab", () => {
     expect(() => toSiteData([], file)).toThrow("Ungeprüfte Daten");
+  });
+});
+
+describe("toProviderDirectory (Plan 0010, E6)", () => {
+  const { providers, file } = loadFixtures();
+  const directory = toProviderDirectory(providers, file.generatedAt);
+
+  it("übernimmt den Datenstand von site.json", () => {
+    expect(directory.generatedAt).toBe(file.generatedAt);
+    expect(directory.generatedAt).toBe(toSiteData(providers, file).generatedAt);
+  });
+
+  it("enthält nur Anbieter, auch ohne Angebote, nach Name sortiert (de)", () => {
+    expect(directory.providers.map((p) => p.id)).toEqual([
+      "stadtbibliothek-beispiel",
+      "gemeinde-beispiel",
+      "familientreff-beispiel",
+      "theater-beispiel",
+      "musikschule-beispiel",
+      "turnverein-beispiel",
+    ]);
+    expect(providers.some((p) => p.role === "aggregator")).toBe(true);
+  });
+
+  it("sortiert Umlaute wie im Deutschen", () => {
+    const [first] = providers;
+    if (!first) throw new Error("Fixture");
+    const named = ["Bad Beispiel", "Ärztehaus Beispiel", "Apotheke Beispiel"].map((name, i) => ({
+      ...first,
+      id: `p-${i}`,
+      name,
+    }));
+    expect(toProviderDirectory(named, file.generatedAt).providers.map((p) => p.name)).toEqual([
+      "Apotheke Beispiel",
+      "Ärztehaus Beispiel",
+      "Bad Beispiel",
+    ]);
+  });
+
+  it("liefert genau die Felder für Eltern, nichts aus der Recherche", () => {
+    for (const p of directory.providers) {
+      expect(Object.keys(p).sort()).toEqual(["id", "name", "topics", "url", "venues"]);
+      for (const v of p.venues) {
+        expect(Object.keys(v).every((k) => ["name", "address", "district"].includes(k))).toBe(true);
+      }
+    }
+    const json = JSON.stringify(directory);
+    for (const key of ["programme", "notes", "geo", "ring", "availability", "verified", "coveredBy", "role"]) {
+      expect(json).not.toContain(`"${key}"`);
+    }
+  });
+
+  it("kürzt Adressen per venueAddress und lässt district ohne Wert weg", () => {
+    const turnverein = directory.providers.find((p) => p.id === "turnverein-beispiel");
+    expect(turnverein).toEqual({
+      id: "turnverein-beispiel",
+      name: "Turnverein Beispiel (fiktiv)",
+      url: "https://example.org/turnverein",
+      topics: ["eltern-kind-turnen", "bewegung"],
+      venues: [
+        { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
+        { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
+      ],
+    });
+    expect(turnverein?.venues[1] && "district" in turnverein.venues[1]).toBe(false);
   });
 });
 

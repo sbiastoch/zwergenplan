@@ -319,6 +319,9 @@
   }
   .provider-link {
     margin: 16px 0 0;
+    /* „Alle Angebote dieses Anbieters“ über „Website von …“ (Plan 0010, E2) */
+    display: grid;
+    gap: 12px;
   }
 }
 

@@ -1,5 +1,5 @@
 /**
- * Overlays der App (Plan 0003, E3; ausgelagert mit Plan 0005): Detail, Filter-Sheet, Kind-Sheet als
+ * Overlays der App (Plan 0003, E3; ausgelagert mit Plan 0005): Anbieter-Sheet, Detail, Filter-Sheet, Kind-Sheet als
  * native <dialog>. Das Orts-Sheet gehört zur Karten-Oberfläche (karte/MapScreen.tsx).
  */
 import type { RefObject } from "react";
@@ -10,6 +10,7 @@ import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
 import { KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
+import { ProviderSheetLoader } from "./ProviderPanel.tsx";
 import { FilterSheet, type LimitActionFor } from "./Sheets.tsx";
 import type { OriginApi } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
@@ -24,6 +25,17 @@ interface OverlaysProps {
   detailOffer: SiteOffer | undefined;
   detailDay: string | undefined;
   closeDetail: () => void;
+  /** offenes Anbieter-Sheet (`anbieter=<id>`, Plan 0010, E3) */
+  providerId: string | undefined;
+  openProvider: (providerId: string) => void;
+  closeProvider: () => void;
+  /** ID weder im Katalog noch in den Angeboten: `anbieter=` entfernen */
+  onUnknownProvider: () => void;
+  /** Datenstand von site.json; `undefined`, solange sie lädt */
+  generatedAt: string | undefined;
+  /** alle Angebote und die sichtbaren (Filter, Alter) für das Anbieter-Sheet */
+  offers: readonly SiteOffer[];
+  visible: readonly SiteOffer[];
   /** Merken, Wegzeit und „jetzt“ wie auf den Kacheln */
   ctx: CardContext;
   say: (message: string) => void;
@@ -53,11 +65,38 @@ interface OverlaysProps {
 export function Overlays(props: OverlaysProps) {
   const { toast, sheet, setSheet, detailOffer, detailDay, closeDetail, ctx, say, filter, setFilter } = props;
   const { birthDate, setBirthDate, ageOnly, setAgeOnly, theme, today, originApi, filterButton, activeTab } = props;
-  const { transit } = props;
+  const { transit, providerId, openProvider, closeProvider } = props;
   const { origin } = originApi;
   const { now, onToggleSave } = ctx;
+  // Das Sheet dieses Anbieters liegt schon unter dem Detail: zurück dorthin, ohne neuen History-Eintrag (E3).
+  const onProvider = (id: string) => (id === providerId ? closeDetail() : openProvider(id));
   return (
     <>
+      {/*
+        Vor dem Detail und immer gemountet (Plan 0010, E3): React ruft die Effekte in Baumreihenfolge, öffnen beide im
+        selben Commit (Deep-Link, Zurück), ruft das Sheet zuerst showModal() und das Detail liegt oben.
+      */}
+      <Dialog
+        open={providerId !== undefined}
+        onClose={closeProvider}
+        label="Anbieter"
+        className="sheet"
+        toast={toast}
+        fallbackFocus={activeTab}
+      >
+        {providerId !== undefined && (
+          <ProviderSheetLoader
+            key={providerId}
+            providerId={providerId}
+            generatedAt={props.generatedAt}
+            offers={props.offers}
+            visible={props.visible}
+            ctx={ctx}
+            onUnknown={props.onUnknownProvider}
+            onClose={closeProvider}
+          />
+        )}
+      </Dialog>
       <Dialog
         open={detailOffer !== undefined}
         onClose={closeDetail}
@@ -79,6 +118,7 @@ export function Overlays(props: OverlaysProps) {
             saved={ctx.isSaved(detailOffer.id)}
             onToggleSave={onToggleSave}
             onClose={closeDetail}
+            onProvider={onProvider}
             onIcs={say}
           />
         )}

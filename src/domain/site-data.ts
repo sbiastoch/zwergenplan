@@ -92,3 +92,29 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
   );
   return { generatedAt: file.generatedAt, offers };
 }
+
+/**
+ * Katalog für die Anbieterübersicht (Plan 0010, E6): nur `role: anbieter`, auch ohne Angebote, nach Name (`de`).
+ * Genau die Felder aus `SiteProvider` – Recherche-Angaben (`programme`, `notes`, `ring`, `geo` …) bleiben draußen.
+ */
+export function toProviderDirectory(providers: readonly Provider[], generatedAt: string): ProviderDirectoryData {
+  const list = providers.flatMap((p): SiteProvider[] =>
+    p.role === "anbieter"
+      ? [
+          {
+            id: p.id,
+            name: p.name,
+            url: p.url,
+            topics: p.topics,
+            venues: p.venues.map(({ name, address, district }) => ({
+              name,
+              address: venueAddress(name, address),
+              ...(district === undefined ? {} : { district }),
+            })),
+          },
+        ]
+      : [],
+  );
+  list.sort((a, b) => a.name.localeCompare(b.name, "de"));
+  return { generatedAt, providers: list };
+}
