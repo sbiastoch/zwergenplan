@@ -3,7 +3,13 @@ import { describe, expect, it } from "vitest";
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { placeKey } from "../../src/domain/place-key.ts";
 import { Timetable } from "../../src/domain/schema.ts";
-import { decodeTransitTable, NO_MINUTES, transitReach, walkMinutes } from "../../src/domain/transit.ts";
+import {
+  decodeTransitLines,
+  decodeTransitTable,
+  NO_MINUTES,
+  transitReach,
+  walkMinutes,
+} from "../../src/domain/transit.ts";
 import { areaId, buildTransitTables, cellValue, contentId, encodeBytes, tableRows, withoutAccess } from "./table.ts";
 
 const fixture = Timetable.parse(
@@ -166,6 +172,22 @@ describe("buildTransitTables", () => {
     expect(first.length).toBe(raw.length);
     expect(second.length).toBe(raw.length);
     expect(Number.isInteger(built.lat[1])).toBe(true);
+  });
+
+  it("Rundlauf: linien.json → decodeTransitLines → dieselben Namen je Zelle (L5)", () => {
+    if (!decoded) throw new Error("Tabelle ungültig");
+    const back = decodeTransitLines(JSON.parse(JSON.stringify(lines)), decoded);
+    expect(back).toBeDefined();
+    expect(back?.names).toEqual(lines.lines);
+    rowIds.forEach((rowId) => {
+      for (const place of places) {
+        const i = cell(rowId, place);
+        const got = [back?.first[i], back?.second[i]].filter((v) => v !== undefined && v > 0);
+        expect(got.map((v) => back?.names[(v ?? 0) - 1])).toEqual(names(rowId, place));
+      }
+    });
+    // eine Linien-Datei zu einer anderen Tabelle passt nicht
+    expect(decodeTransitLines({ ...lines, table: "00000000" }, decoded)).toBeUndefined();
   });
 
   // L4: drei Zellen von Hand nachgerechnet (Fixture tests/fixtures/oepnv/fahrplan.json, Plan 0009, E15)

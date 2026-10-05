@@ -75,6 +75,13 @@ export interface TransitTable {
   minutes: Uint8Array;
 }
 
+/** Dekodierte Linien (`decodeTransitLines`, Plan 0012, E8): Ebenen wie `TransitLinesFile`, Werte Index + 1 in `names` */
+export interface TransitLines {
+  names: readonly string[];
+  first: Uint8Array;
+  second: Uint8Array;
+}
+
 /**
  * Wegzeit mit Bus & Bahn oder zu Fuß (E8). `minutes` ist ungerundet; `Infinity` heißt „über 2 Std.“
  * bzw. unerreichbar. Zweig der Union `Reach` (`src/domain/reach.ts`).
@@ -83,4 +90,6 @@ export interface TransitReach {
   kind: "oepnv";
   minutes: number;
   byFoot: boolean;
+  /** Linien der Verbindung („Bus 37“, „U1“), nur mit Bus & Bahn bis 120 Min. und wenn Linien vorliegen (Plan 0012) */
+  lines?: readonly [string] | readonly [string, string];
 }
