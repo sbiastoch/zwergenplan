@@ -15,7 +15,7 @@ interface TestMap {
   }>;
   getCenter: () => { lat: number; lng: number };
   getZoom: () => number;
-  jumpTo: (options: { zoom: number }) => void;
+  jumpTo: (options: { zoom?: number; center?: [number, number] }) => void;
   getLayer: (id: string) => unknown;
   getPaintProperty: (layer: string, name: string) => unknown;
   getLayoutProperty: (layer: string, name: string) => unknown;
@@ -89,13 +89,13 @@ async function tapMarker(page: Page, layer: "orte-punkt" | "orte-cluster", angeb
   await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
 }
 
-test("Startseite lädt keinen Karten-Code und fragt OpenFreeMap nicht an", async ({ page, context }) => {
+test("Startseite lädt weder Karten- noch Wegzeit-Code und fragt OpenFreeMap nicht an", async ({ page, context }) => {
   const requests: string[] = [];
   context.on("request", (req) => requests.push(req.url()));
   await page.goto("./");
   await expect(page.getByTestId("offer").first()).toBeVisible();
   await page.waitForLoadState("networkidle");
-  expect(requests.filter((url) => url.includes("/assets/karte/") || url.includes("openfreemap"))).toEqual([]);
+  expect(requests.filter((url) => /\/assets\/(karte|oepnv)\/|openfreemap|\/data\/wegzeit\.json/.test(url))).toEqual([]);
 });
 
 test.describe("mit gemockten Kacheln", () => {
@@ -172,21 +172,21 @@ test.describe("mit gemockten Kacheln", () => {
   test("Orts-Liste öffnet das Orts-Sheet, das Detail darüber, Zurück führt ins Sheet; Kacheln ohne Ortsangaben", async ({
     page,
   }) => {
-    // Startpunkt Gostenhof (nur die Stadtteil-ID liegt im Speicher, Plan 0004): Die Liste zeigt Entfernungen.
+    // Startpunkt Gostenhof (nur die Stadtteil-ID liegt im Speicher, Plan 0004): Die Liste zeigt Wegzeiten.
     await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await openMap(page);
     await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText("Beispielstraße 1, 90402 Nürnberg")).toBeVisible();
-    await expect(sheet.getByText(/Luftlinie ab Gostenhof/)).toBeVisible();
+    await expect(sheet.getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
     await expect(sheet.getByTestId("offer")).toHaveCount(3);
-    // Der Kopf nennt Ort und Entfernung; die Kacheln nur noch den Anbieter (Plan 0008, E19)
+    // Der Kopf nennt Ort und Wegzeit; die Kacheln nur noch den Anbieter (Plan 0008, E19)
     const metas = await sheet.getByTestId("offer").locator(".meta").allInnerTexts();
     expect(metas).toHaveLength(3);
     for (const meta of metas) {
       expect(meta, "Meta-Zeile im Orts-Sheet").not.toContain("·");
-      expect(meta, "Meta-Zeile im Orts-Sheet").not.toMatch(/\d+(,\d)? k?m/);
+      expect(meta, "Meta-Zeile im Orts-Sheet").not.toMatch(/\d+(,\d)? k?m|Min\./);
       expect(meta.trim(), "Anbieter bleibt").not.toBe("");
     }
     await sheet.getByRole("button", { name: "Offener Krabbeltreff", exact: true }).click();
@@ -198,9 +198,54 @@ test.describe("mit gemockten Kacheln", () => {
     await sheet.getByRole("button", { name: "Schließen" }).click();
     await expect(sheet).toBeHidden();
 
-    // In der Liste steht die Entfernung weiter.
+    // In der Liste steht die Wegzeit weiter.
     await page.getByRole("button", { name: "Liste", exact: true }).click();
-    await expect(page.getByTestId("offer").first().locator(".meta")).toContainText(/ · \d+(,\d)? k?m$/);
+    await expect(page.getByTestId("offer").first().locator(".meta")).toContainText(/ · \d+ Min\.$/);
+  });
+
+  test("Wegzeit: Öffnen der Karte lädt die Tabelle, Orts-Liste mit Minuten nach Wegzeit sortiert (Plan 0009, E9/E11)", async ({
+    page,
+  }) => {
+    await page.goto("./");
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    const table = page.waitForResponse((r) => r.url().endsWith("/data/wegzeit.json") && r.ok());
+    const chunk = page.waitForResponse((r) => /\/assets\/oepnv\/[^/]+\.js$/.test(r.url()) && r.ok());
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await Promise.all([table, chunk]);
+    await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
+
+    // Startpunkt über das Kind-Sheet: ab der Wahl kein Request, auch keine Kachel (Kamera-Regel)
+    const requests: string[] = [];
+    page.on("request", (req) => requests.push(req.url()));
+    await page.getByRole("button", { name: "Startpunkt wählen" }).click();
+    const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+    await kid.getByRole("button", { name: "Fertig" }).click();
+    await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof mit Bus & Bahn");
+    // nach Wegzeit: Theater 3,6, Beispielhof 13,6, Bibliothek 15,6, Musikschule 29,6, Gemeinde 32,6 Min.
+    await expect(places(page)).toHaveText([
+      /^Kleines Theater Beispiel.* · 5 Min\.$/,
+      /^Familientreff Beispielhof.* · 15 Min\.$/,
+      /^Bibliothek Beispiel Zentrum.* · 15 Min\.$/,
+      /^Musikschule Beispiel, Haus Süd.* · 30 Min\.$/,
+      /^Gemeindehaus.* · 35 Min\.$/,
+    ]);
+    await places(page).filter({ hasText: "Musikschule Beispiel" }).click();
+    await expect(page.getByRole("dialog").getByText("ca. 30 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    // Stadtteil-Zoom lädt Kacheln (erlaubt, ADR 0008); sonst kommt nichts dazu, schon gar nicht wegzeit.json
+    expect(requests.filter((url) => !url.startsWith("https://tiles.openfreemap.org/"))).toEqual([]);
+  });
+
+  test("Kartenmitte als Startpunkt ergibt Minuten (Plan 0009, E9)", async ({ page }) => {
+    await openMap(page);
+    // Kartenmitte zum Beispielhof schieben (wie ein Wischen); die Kamera-Regel betrifft nur das Fahren der App
+    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.0767, 49.4521] }));
+    await idle(page);
+    await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
+    await expect(page.getByRole("status")).toContainText(
+      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, inkl. Warten)",
+    );
+    await expect(places(page).first()).toHaveText(/^Familientreff Beispielhof.* · 5 Min\.$/);
   });
 
   test("Ort mit einem Angebot öffnet direkt das Detail", async ({ page }) => {
@@ -333,14 +378,14 @@ test.describe("mit gemockten Kacheln", () => {
     expect(await camera(page)).toEqual(start);
 
     await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
-    await expect(page.getByRole("status")).toContainText("Entfernung als Luftlinie ab der Kartenmitte");
+    await expect(page.getByRole("status")).toContainText("ab der Kartenmitte");
     await expect(page.getByRole("button", { name: "Startpunkt: Kartenmitte" })).toBeVisible();
     await idle(page);
     expect(tileLog.length, "keine Kacheln nach „Kartenmitte als Startpunkt“").toBe(tiles);
     expect(await camera(page)).toEqual(start);
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
-    // mit Startpunkt steht die Entfernung an jedem Ort
-    await expect(places(page).first()).toContainText(/ · \d[\d,]* k?m$/);
+    // mit Startpunkt steht die Entfernung an jedem Ort (Wegzeit oder, weit weg von jedem Halt, Luftlinie)
+    await expect(places(page).first()).toContainText(/ · (\d+ Min\.|\d[\d,]* k?m)$/);
 
     // Gegenprobe: Ein Stadtteil darf die Kamera bewegen.
     await page.getByRole("button", { name: "Startpunkt: Kartenmitte" }).click();
@@ -349,7 +394,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expect.poll(async () => (await camera(page)).lat).toBeLessThan(start.lat - 0.005);
   });
 
-  test("Startausschnitt verrät weder Standort noch Alter: Standort, Geburtsdatum, „Kurse“ und „bis 2 km“ in der Liste, dann Karte (Arch-Review B1, m1)", async ({
+  test("Startausschnitt verrät weder Standort noch Alter: Standort, Geburtsdatum, „Kurse“ und „bis 20 Min.“ in der Liste, dann Karte (Arch-Review B1, m1; Plan 0009)", async ({
     page,
     context,
     tileLog,
@@ -368,7 +413,7 @@ test.describe("mit gemockten Kacheln", () => {
     const plain = await openFromList();
     const plainTiles = tilesSince(0);
 
-    // Neuladen leert den Sitzungs-Ausschnitt; Standort (nahe Familientreff) und Umkreis in der Liste
+    // Neuladen leert den Sitzungs-Ausschnitt; Standort (nahe Familientreff) und Wegzeit-Grenze in der Liste
     await context.grantPermissions(["geolocation"]);
     await context.setGeolocation({ latitude: 49.45213, longitude: 11.07672 });
     await page.goto("./");
@@ -383,11 +428,11 @@ test.describe("mit gemockten Kacheln", () => {
     await page.getByRole("button", { name: "Kurse", exact: true }).click();
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const filter = page.getByRole("dialog", { name: "Filter" });
-    await filter.getByRole("button", { name: "bis 2 km" }).click();
+    await filter.getByRole("button", { name: "bis 20 Min." }).click();
     await filter.getByRole("button", { name: /Angebote? zeigen$/ }).click();
     const before = tileLog.length;
     const withOrigin = await openFromList();
-    // Filter, Alter und Umkreis wirken auf die Orte, aber nicht auf den Ausschnitt
+    // Filter, Alter und Wegzeit wirken auf die Orte, aber nicht auf den Ausschnitt
     await expect(page.getByRole("status")).not.toContainText("an 5 Orten");
     expect(withOrigin).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);

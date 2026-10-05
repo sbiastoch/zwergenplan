@@ -23,10 +23,10 @@ const browserEnv = (): TransitEnv => ({
 /** Wirft bei Netzfehler, HTTP-Fehler, kaputtem JSON und nach dem Zeitlimit. */
 export async function loadTransitTable(env: TransitEnv = browserEnv()): Promise<TransitTableFile> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(new Error("Wegzeit-Tabelle: Zeitlimit")), env.timeoutMs);
+  const timer = setTimeout(() => controller.abort(new Error("Zeitlimit")), env.timeoutMs);
   try {
     const res = await env.fetch(`${import.meta.env.BASE_URL}data/wegzeit.json`, { signal: controller.signal });
-    if (!res.ok) throw new Error(`Wegzeit-Tabelle: HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     // Build-Artefakt ohne Zod im Client: `decodeTransitTable` prüft Version, Längen und Spalten (E8).
     const file: TransitTableFile = await res.json();
     return file;

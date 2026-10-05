@@ -60,17 +60,29 @@ for (const [name, go] of Object.entries(REAL_VIEWS)) {
   });
 }
 
-test("Stadtteil als Startpunkt mit echten Daten (Plan 0004)", async ({ page }) => {
+test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle (Plan 0004, Plan 0009)", async ({
+  page,
+}) => {
   const meta = await openAtDataTime(page);
   test.skip(meta.offers === 0, "keine Daten");
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  // Quellenhinweis aus der echten wegzeit.json (CC BY-SA 3.0 DE, E3)
+  await expect(sheet.getByRole("link", { name: /^VGN-Soll-Daten vom / })).toBeVisible();
+  await expect(sheet.getByRole("link", { name: "CC BY-SA 3.0 DE" })).toHaveAttribute(
+    "href",
+    "https://creativecommons.org/licenses/by-sa/3.0/de/",
+  );
   await sheet.getByLabel("Stadtteil", { exact: true }).selectOption("altstadt");
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
 
-  await expect(page.getByRole("status")).toContainText("Entfernung als Luftlinie ab Altstadt");
-  await expect(page.getByTestId("offer").first().locator(".meta .dist")).toHaveText(/^\d+(,\d)? k?m$/);
+  await expect(page.getByRole("status")).toContainText(
+    "Wegzeit ab Altstadt mit Bus & Bahn (Di vormittags, inkl. Warten)",
+  );
+  const dists = page.getByTestId("offer").locator(".meta .dist");
+  await expect(dists.first()).toHaveText(/^(\d+ Min\.|über 2 Std\.)$/);
+  for (const text of await dists.allInnerTexts()) expect(text).toMatch(/^(\d+ Min\.|über 2 Std\.)$/);
   // Knopf-Beschriftungen mit Daten dürfen umbrechen: Prüfung 5 nur mit Fixtures (Plan 0007, E10).
   await expectMobileUx(page, { buttons: false });
 

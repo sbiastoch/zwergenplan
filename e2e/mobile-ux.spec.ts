@@ -31,15 +31,15 @@ async function pickGostenhof(page: Page) {
   return sheet;
 }
 
-/** Wie pickGostenhof, danach ist das Sheet wieder zu und die Kacheln zeigen Entfernungen. */
+/** Wie pickGostenhof, danach ist das Sheet wieder zu und die Kacheln zeigen Wegzeiten (Plan 0009). */
 async function withGostenhof(page: Page) {
   const sheet = await pickGostenhof(page);
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
-  await expect(page.getByRole("status")).toContainText("Luftlinie ab Gostenhof");
+  await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof mit Bus & Bahn");
 }
 
-/** Karte mit Stadtteil als Startpunkt (Plan 0005): Werkzeugzeile „Startpunkt: Gostenhof“, Orts-Liste mit Entfernung. */
+/** Karte mit Stadtteil als Startpunkt (Plan 0005): Werkzeugzeile „Startpunkt: Gostenhof“, Orts-Liste mit Wegzeit. */
 async function openMap(page: Page) {
   await withGostenhof(page);
   await page.getByRole("button", { name: "Karte", exact: true }).click();
@@ -48,6 +48,9 @@ async function openMap(page: Page) {
 
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
 const MAP_VIEWS = new Set(["karte", "orts-sheet", "karte-fehler"]);
+
+/** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
+const CONSOLE_ERRORS: Record<string, RegExp[]> = { "entdecken-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/] };
 
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
@@ -86,34 +89,47 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByLabel("Geburtsdatum").fill("01.09.2026");
     await expect(page.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
   },
-  // Plan 0004: längere Meta-Zeile „Anbieter · Stadtteil · 1,4 km“ und Statuszeile mit „Luftlinie“
-  "entdecken-startpunkt": async (page) => {
+  // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „Wegzeit ab … (Di vormittags …)“
+  "entdecken-wegzeit": async (page) => {
     await withGostenhof(page);
-    await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("200 m");
+    await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("5 Min.");
   },
-  "kind-sheet-startpunkt": async (page) => {
+  // Quellenhinweis mit zwei Fließtext-Links (≥ 24 px, Plan 0009, E3)
+  "kind-sheet-wegzeit": async (page) => {
     const sheet = await pickGostenhof(page);
     await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();
-    await expect(sheet.getByText(/^Luftlinie, nicht die Fahrzeit\./)).toBeVisible();
+    await expect(sheet.getByText(/^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß/)).toBeVisible();
+    await expect(sheet.getByRole("link", { name: "Fiktiver Fahrplan für Tests" })).toBeVisible();
+    await expect(sheet.getByRole("link", { name: "CC0 1.0" })).toBeVisible();
+    await sheet.getByRole("link", { name: "CC0 1.0" }).scrollIntoViewIfNeeded();
   },
-  "filter-sheet-entfernung": async (page) => {
+  "filter-sheet-wegzeit": async (page) => {
     await withGostenhof(page);
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filter" });
-    await sheet.getByRole("button", { name: "bis 5 km" }).click();
-    await expect(sheet.getByRole("button", { name: "bis 5 km" })).toHaveAttribute("aria-pressed", "true");
-    await sheet.getByRole("heading", { name: "Entfernung" }).scrollIntoViewIfNeeded();
+    await sheet.getByRole("button", { name: "bis 30 Min." }).click();
+    await expect(sheet.getByRole("button", { name: "bis 30 Min." })).toHaveAttribute("aria-pressed", "true");
+    await sheet.getByRole("heading", { name: "Wegzeit" }).scrollIntoViewIfNeeded();
   },
-  // geteilter Link mit Umkreis, aber ohne Startpunkt: Hinweis mit „Startpunkt wählen“ unter der Statuszeile
-  "entdecken-umkreis-ohne-startpunkt": async (page) => {
-    await page.goto("./?umkreis=10");
-    await expect(page.getByText("„bis 10 km“ braucht einen Startpunkt.")).toBeVisible();
+  // geteilter Link mit Wegzeit, aber ohne Startpunkt: Hinweis mit „Startpunkt wählen“ unter der Statuszeile
+  "entdecken-wegzeit-ohne-startpunkt": async (page) => {
+    await page.goto("./?wegzeit=45");
+    await expect(page.getByText("„bis 45 Min.“ braucht einen Startpunkt.")).toBeVisible();
     await expect(page.getByTestId("offer").first()).toBeVisible();
   },
-  "detail-entfernung": async (page) => {
+  "detail-wegzeit": async (page) => {
     await withGostenhof(page);
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
-    await expect(page.getByRole("dialog").getByText("ca. 1,4 km Luftlinie ab Gostenhof")).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+  },
+  // Tabelle blockiert (E11): Luftlinie, längste Statuszeile und Hinweis mit „Nochmal laden“
+  "entdecken-wegzeit-rueckfall": async (page) => {
+    await page.route("**/data/wegzeit.json", (route) => route.abort());
+    await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await page.goto("./?wegzeit=30");
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    await expect(page.getByRole("button", { name: "Nochmal laden" })).toBeVisible();
+    await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("200 m");
   },
   karte: openMap,
   // Fehlerzustand (E12): Meldung im Kartenrahmen, Orts-Liste und „Startpunkt …“ bleiben, keine Kartenmitte
@@ -170,6 +186,8 @@ async function expectDarkTheme(page: Page, scheme: (typeof SCHEMES)[number]) {
 for (const [name, go] of Object.entries(VIEWS)) {
   test.describe(name, () => {
     if (MAP_VIEWS.has(name)) test.use({ tiles: "mock" });
+    const allowed = CONSOLE_ERRORS[name];
+    if (allowed) test.use({ allowedConsoleErrors: allowed });
     for (const scheme of SCHEMES) {
       test(`${name} besteht die Mobile-UX-Gates (${scheme.label})`, async ({ page }) => {
         await useScheme(page, scheme);

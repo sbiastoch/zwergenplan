@@ -7,7 +7,15 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Mehrere Kinder / Geschwister**: Ein Angebot passt, wenn es für eines der Kinder passt.
 - **Abo-Feeds (webcal)** für vordefinierte Filter-Sets.
 - **Englische Oberfläche**: Die Texte liegen zentral, damit das billig wird.
-- **Live-Routing-APIs** für echte Wegzeiten. Vorrang hat die statische GTFS-Matrix (ADR 0005).
+- **Live-Routing-APIs** für echte Wegzeiten. Vorrang hat die statische Wegzeit-Tabelle aus VGN-GTFS (ADR 0005, ADR 0011).
+- **Echtzeit der Öffis** (GTFS-Realtime: Verspätungen, Baustellen-Umleitungen), Tarife, Barrierefreiheit (Aufzüge), Kinderwagen-Plätze (Plan 0009, Nicht-Ziele).
+- **Routenvorschlag oder Linienangabe** („U1 bis Plärrer“): Die Seite nennt nur Minuten (Plan 0009, Nicht-Ziel).
+- **Haltestelle als Startpunkt** (ADR 0005 nannte „Haltestelle wählen“): Stadtteil, Standort und Kartenmitte reichen, eine Liste mit 570 Halten wäre schlecht bedienbar (Plan 0009, ADR 0011).
+- **Weitere Zeitfenster der Wegzeit** (nachmittags, Wochenende): Die Nachmittagsspitze um 15 Uhr ist real, verdoppelt aber `wegzeit.json` (Plan 0009, Nutzerentscheidung: erst nur Di vormittags).
+- **Wegzeit ab Fürth oder Erlangen**: Startpunkte außerhalb des Nürnberger Stadtgebiets bekommen heute die Luftlinie mit Hinweis (Plan 0009, Nutzerentscheidung).
+- **Isochronen oder Linien auf der Karte** (Plan 0009, Nicht-Ziel).
+- **Sortierung der Tagesliste nach Wegzeit** (Plan 0004 und 0009, Nicht-Ziel).
+- **`transfers.txt` des VGN** für Umstiegszeiten: deckt nur einen Teil der Paare ab und ist in sich nicht einheitlich; heute gilt ein eigenes, überall gleiches Modell (Plan 0009, E6).
 - **Visuelle Regression** (Playwright-Screenshots als Gate), sobald das Design steht. Baselines entstehen dann im Playwright-Docker-Image, plus ein `workflow_dispatch` zum Aktualisieren.
 - **Lighthouse CI**, falls `@lhci/cli` wieder aktuell gepflegt wird. Bis dahin decken Playwright-Web-Vitals und axe das ab.
 - **React Compiler**, sobald es Komponenten mit spürbaren Re-Render-Kosten gibt.
@@ -22,7 +30,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Schrift-Preload**: `<link rel="preload">` der Latin-woff2 verkürzt das Swap-Fenster, braucht aber den gehashten Asset-Namen im HTML (Plan 0007, E11).
 - **Anmeldeschluss auf der Kachel**: ein Chip „Anmeldung vorbei“. Plan 0007 (B4) zeigt den abgelaufenen Anmeldeschluss nur im Detail.
 - **Katalog-Adressen ohne Ortsnamen-Präfix**: Die Adressen in `data/providers.yaml`, die mit dem Ortsnamen beginnen oder ihn in Klammern wiederholen (32 laut Browser-Review, 29 nach der Regel von `venueAddress`), beim nächsten Pipeline-Lauf über den Skill `babyevents-nuernberg` bereinigen, dazu eine Warnung in `validate-data`. Bis dahin korrigiert `venueAddress` in `toSiteData` nur die Anzeige und die ICS (Plan 0007, H6). Rest nach Plan 0007: 9 Angebote an 3 Orten, die `venueAddress` bewusst nicht erkennt, weil es dafür eine unscharfe Heuristik bräuchte (Plan 0008, E21). Beispiele: „Pfarramt Lutherkirche (Keller, Zugang vom Garten), Nerzstraße 34 …“, „Ökumenisches Gemeindezentrum Thon (evang. Teil, UG), …“, „Nürnberg Langwasser“ → „Nürnberg Langwasser Bad, …“. Bereinigung beim nächsten Lauf über den Skill `babyevents-nuernberg`.
-- **Umkreis-Kreis auf der Karte**: den gewählten Umkreis (2/5/10 km) um den Startpunkt zeichnen (Plan 0005, Nicht-Ziel).
+- **Wegzeit-Gebiet auf der Karte**: die gewählte Grenze (20/30/45 Min.) um den Startpunkt zeichnen (Plan 0005, Nicht-Ziel; mit Plan 0009 eine Isochrone statt eines Kreises).
 - **„Auf der Karte zeigen“ im Detail**: aus einem Angebot in die Kartenansicht mit diesem Ort (Plan 0005, Nicht-Ziel).
 - **„Route in Karten-App öffnen“**: Link mit der Adresse des Orts an die Karten-App des Geräts (Plan 0005, Nicht-Ziel).
 - **Adresssuche als Startpunkt**: bräuchte einen Geocoder, also einen weiteren Drittanbieter oder eigene Daten (Plan 0005, Nicht-Ziel).

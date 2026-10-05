@@ -1,8 +1,8 @@
 /**
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,kalender,…] [--text=200]   Standard: lokale Preview mit Fixtures
- * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt, filter-entfernung (Plan 0004),
- * karte, ort (Plan 0005). Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
+ * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt (Plan 0004), karte, ort
+ * (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet). Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
  * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
 import { existsSync, mkdirSync } from "node:fs";
@@ -34,11 +34,15 @@ async function ready(page: Page) {
   await page.waitForFunction(() => !document.querySelector("[role=status]")?.textContent?.includes("Lade"));
 }
 
-/** Startpunkt Gostenhof: Nur die Stadtteil-ID liegt im Speicher (Plan 0004, E3), nach dem Neuladen gilt sie. */
+/**
+ * Startpunkt Gostenhof: Nur die Stadtteil-ID liegt im Speicher (Plan 0004, E3), nach dem Neuladen gilt sie. Wartet,
+ * bis die Wegzeit geladen ist (Plan 0009, E11), sonst zeigt das Bild die Platzhalter.
+ */
 async function withGostenhof(page: Page) {
   await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
   await page.reload();
   await ready(page);
+  await page.locator(".status-note:not(.pending)").waitFor();
 }
 
 /** Kachel-Mock für die lokale Preview (wie e2e/fixtures.ts, tiles: "mock"): Stile, Glyphen, leere Kacheln. */
@@ -57,7 +61,7 @@ async function mockTiles(context: BrowserContext) {
   });
 }
 
-/** Karte mit Stadtteil Gostenhof (Werkzeugzeile und Orts-Liste mit Entfernung) */
+/** Karte mit Stadtteil Gostenhof (Werkzeugzeile und Orts-Liste mit Wegzeit) */
 async function openMap(page: Page) {
   await withGostenhof(page);
   await page.getByRole("button", { name: "Karte", exact: true }).click();
@@ -85,18 +89,26 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   kind: async (page) => {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.getByLabel("Geburtsdatum").fill("02.11.2025");
-    // Startpunkt (Plan 0004): Abschnitt „Entfernung ab“ mit gesetztem Stadtteil
+    // Startpunkt (Plan 0004): Abschnitt „Wegzeit ab“ mit gesetztem Stadtteil
     await page.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+  },
+  // Quellenhinweis der Wegzeit mit zwei Links (Plan 0009, E3), aus der geladenen wegzeit.json
+  "kind-quelle": async (page) => {
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    await page.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+    const license = page.locator(".source-note a").last();
+    await page.locator(".source-note a").nth(1).waitFor();
+    await license.scrollIntoViewIfNeeded();
   },
   "start-startpunkt": async (page) => {
     await withGostenhof(page);
   },
-  "filter-entfernung": async (page) => {
+  "filter-wegzeit": async (page) => {
     await withGostenhof(page);
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filter" });
-    await sheet.getByRole("button", { name: "bis 5 km" }).click();
-    await sheet.getByRole("heading", { name: "Entfernung" }).scrollIntoViewIfNeeded();
+    await sheet.getByRole("button", { name: "bis 30 Min." }).click();
+    await sheet.getByRole("heading", { name: "Wegzeit" }).scrollIntoViewIfNeeded();
   },
   karte: openMap,
   ort: async (page) => {

@@ -213,6 +213,8 @@ Nur wenn ein Startpunkt gesetzt ist, sonst entfällt jede Entfernungsangabe.
 
 ### E9 – Ausblick: Karte (Plan 0005) und Wegzeit (ADR 0005)
 
+> **Umgesetzt in Plan 0009** (ADR 0011), mit Abweichungen: keine `nearestStops` in `ReachTarget` (Halt→Ort-Tabelle `wegzeit.json` statt Halt→Halt-Matrix), `reachTo` heißt `airlineReach`, `FilterContext.origin` wurde zu `FilterContext.reach`, `umkreis=` entfällt zugunsten von `wegzeit=`.
+
 - **Plan 0005** ergänzt `OriginSource` um `"karte"` (Kartenmitte) und baut Orte (`places.ts`) auf `reachTo`/`compareReach` auf. Diese Funktionen müssen dafür nicht geändert werden.
 - **ADR 0005** bleibt lokal austauschbar:
   - `Reach` bekommt `{ kind: "oepnv"; minutes: number }`.

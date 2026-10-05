@@ -7,28 +7,31 @@ Grundlage für `/arch-review`. Regeln, die maschinell prüfbar sind, stehen zus�
 ```
 Recherche-Skill (.claude/skills/babyevents-nuernberg, orchestriert Subagenten)
    │  pnpm pipeline …  (scripts/pipeline: Sammelkalender, Rohdaten, build)
+   │  pnpm pipeline oepnv  (VGN-GTFS, nur lokal, Cache + bedingtes GET; Plan 0009, E4)
    ▼
-data/providers.yaml + data/offers.json   (Commit auf main per `pipeline publish`)
+data/providers.yaml + data/offers.json + data/oepnv/fahrplan.json   (Commit auf main per `pipeline publish`)
                           │
-            scripts/build-data.ts  (Zod + Invarianten; rot = kein Build)
+            scripts/build-data.ts  (Zod + Invarianten; rot = kein Build; scripts/transit rechnet die Wegzeit-Tabelle)
                           │
-   public/data/site.json, meta.json, public/ics/**.ics   (generiert, nicht committet)
+   public/data/site.json, meta.json, wegzeit.json, public/ics/**.ics   (generiert, nicht committet)
                           │
               Vite-Build ► dist/ ► GitHub Pages zwergenplan.app
                           │
             Browser: index.html startet den Abruf von site.json (Frühstart), src/data übernimmt ihn ► src/domain ► src/ui
+                     wegzeit.json nur auf Anlass (Kind-Sheet, Karte, gespeicherter Stadtteil; Plan 0009, E9)
 ```
 
 ## Schichten
 
 | Ordner | Aufgabe | darf importieren |
 |---|---|---|
-| `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit, Geometrie und Entfernung (`geo`, `reach`, `districts`) | nur `src/domain`, `zod` (nur schema/dataset) |
+| `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit, Geometrie, Entfernung und Wegzeit (`geo`, `reach`, `districts`, `transit`) | nur `src/domain`, `zod` (nur schema/dataset) |
 | `src/data/` | einziger Datenzugriff der App (fetch, localStorage, Geolocation; Ausnahme: Bootstrap in `index.html`, siehe Regeln) | `src/domain`: Typen, zur Laufzeit nur reine Hilfen ohne Zod, heute `geo` (ADR 0010, `data-domain-runtime-allowlist`) |
 | `src/ui/` | React-Komponenten, Darstellung, Interaktion | `src/domain`, `src/data` |
 | `scripts/` | Build, Validierung, Schema-Export (Node) | `src/domain`, `site.config.ts` |
 | `scripts/pipeline/lib/` | reine Pipeline-Logik: Quellen-Parser, Termin-Regeln, Zuordnung, Build der Angebote | `src/domain`, `zod`, `cheerio`, `yaml` – kein Netz, keine Dateien |
 | `scripts/pipeline/io/`, `cli.ts` | Netz, Dateien, git für die Pipeline | `scripts/pipeline/lib`, `src/domain`, Node |
+| `scripts/transit/` | reine Build-Logik der Wegzeit (Plan 0009): Profil-CSA, Halt→Ort-Tabelle, Aktualität des Fahrplans | nur `src/domain` und `scripts/transit` – kein Node-I/O, kein npm-Paket, kein Netz (`transit-build-pure`) |
 | `e2e/` | Black-Box-Tests im Browser | nichts aus `src/` (einzige Hintertür: `window.__zpMap`, siehe unten) |
 | `.claude/hooks/` | Agenten-Hooks | nur Node-Builtins |
 
@@ -47,6 +50,9 @@ Regeln:
   - `src/ui/karte/` und `src/ui/map/` erreicht man von außen nur per `import()`, auch Typen nicht statisch (`karte-ui-only-lazy`, `map-only-lazy`), und nur über den jeweiligen Lader (`karte-ui-entry-only`, `map-entry-only`). Die Props-Typen liegen deshalb in `src/ui/map-types.ts`.
   - dependency-cruiser fasst statischen und dynamischen Import desselben Moduls zu einer Kante zusammen; dass die beiden Lader ihr Ziel nicht zusätzlich statisch importieren, prüft `scripts/check-architecture.ts` (`lazy-loader-static`).
   - Beide Lazy-Chunks, Worker und Karten-CSS landen in `dist/assets/karte/` mit eigenen Budgets; das Startbudget zählt sie nicht.
+- **Wegzeit** (Plan 0009, ADR 0011): Die Tabelle `wegzeit.json` lädt nur `src/data/transit.ts` (eigener Origin, Zeitlimit 8 s). Wann, entscheidet allein `useTransit().want()` (`src/ui/use-transit.ts`): beim Öffnen von Kind-Sheet oder Karte, auf „Nochmal laden“ oder beim Start mit gespeichertem Stadtteil, höchstens einmal je Sitzung.
+  - Die Rechenlogik `src/domain/transit.ts` ist ein Lazy-Chunk in `dist/assets/oepnv/` (Entscheidungspunkt E10: statisch lag das Start-JS bei 90,5 kB). Von `src/` aus nur per `import()`, auch Typen nicht statisch (`transit-only-lazy`), und nur über den Lader `use-transit.ts` (`transit-entry-only`, `lazy-loader-static`). Typen stehen in `src/domain/transit-types.ts`; Budget `Wegzeit JS (lazy)`.
+  - Je Startpunkt ist alles eine Art: Wegzeit mit Bus & Bahn, oder als Rückfall die Luftlinie (Tabelle fehlt oder passt nicht, Startpunkt außerhalb des Stadtgebiets). Solange sie lädt, stehen Platzhalter ohne Layoutsprung (`ReachMode` „laedt“).
   - **Deutsche Beschriftung** (Plan 0008, E16): Die OpenFreeMap-Stile beschriften mit `coalesce(name_en, name)`. `germanTextField` (`src/ui/map/labels.ts`, rein) setzt im `style.load`, also auch nach jedem Stilwechsel, das `text-field` jedes Symbol-Layers auf `coalesce(name:de, name_de, name)`. Kein Request.
   - Die Kartenquelle `orte` ist nach `key` sortiert, unabhängig von der Orts-Liste: Cluster hängen nicht am Startpunkt (E15).
   - Der Startausschnitt hält rechts die Zoom-Knöpfe frei (Padding 32 / 90 / 32 / 32, gleich für jeden Ausschnitt; E20).
@@ -59,8 +65,9 @@ Regeln:
 - **Zeit**: Jeder Zeitpunkt trägt einen Offset. Kalendertage, das Alter und „heute“ werden in Europe/Berlin bestimmt (`time.ts`), nie in der Geräte-Zeitzone. „Jetzt“ wird in Domänenfunktionen hineingegeben (`FilterContext.now`), nicht intern mit `new Date()` erzeugt.
 - **Stabile IDs** (ADR 0003, ADR 0006): Die Offer-ID ist `providerId--slug(title)--venueId` (Kurse und Einzeltermine mit Beginn im Slug, `src/domain/ids.ts`), die Termin-UID ist `offerId--YYYYMMDDTHHmm@zwergenplan`. Eine geänderte ID erzeugt Duplikate im Kalender der Nutzer.
 - **ICS**: ein VEVENT je Termin in UTC, keine RRULE/RDATE. Die Dateien entstehen statisch zur Build-Zeit. Einzige Ausnahme ist die Sammeldatei der Merkliste: Sie entsteht im Browser aus denselben VEVENTs (ADR 0007).
-- **Privatsphäre**: Das Geburtsdatum bleibt im `localStorage`. Es steht nie in URL, Logs oder Requests. Kein Tracking, keine Drittanbieter-Requests außer Kartenkacheln von `tiles.openfreemap.org`, nur bei offener Karte; die Karte zentriert nie auf Standort oder Kartenmitte, sie zeichnet einen solchen Startpunkt nur als lokalen Layer (Kamera-Regel, ADR 0008). Ihr Startausschnitt liegt über alle kommenden Orte, unabhängig von Filtern, Alter und Startpunkt (außer Stadtteil-Zoom) (`initialCamera`, `src/domain/camera.ts`); er hängt also nie mittelbar an Standort oder Geburtsdatum. Auf einen Stadtteil darf sie fahren.
-- **Startpunkt** (Plan 0004, Plan 0005): Der Startpunkt (Standort, Stadtteil oder Kartenmitte) steht nie in URL, Logs oder Requests. Der Standort wird nur auf Tipp abgefragt, in `src/data` sofort auf ca. 100 m gerundet (`coarsen`) und lebt nur im Arbeitsspeicher, ebenso die gerundete Kartenmitte. Gespeichert wird höchstens die ID eines Stadtteils (`zwergenplan.entfernung-ab`), nie eine Koordinate, auch keine gerundete. In die URL darf nur der Umkreis (`umkreis=`), weil er ohne Startpunkt nichts verrät. E2E belegt: Ab der Wahl des Startpunkts entsteht kein Request (`e2e/startpunkt.spec.ts`), bei offener Karte auch kein Kachel-Request (`e2e/karte.spec.ts`).
+- **Privatsphäre**: Das Geburtsdatum bleibt im `localStorage`. Es steht nie in URL, Logs oder Requests. Kein Tracking, keine Drittanbieter-Requests außer Kartenkacheln von `tiles.openfreemap.org`, nur bei offener Karte (auch die Wegzeit kommt vom eigenen Origin und wird lokal gerechnet); die Karte zentriert nie auf Standort oder Kartenmitte, sie zeichnet einen solchen Startpunkt nur als lokalen Layer (Kamera-Regel, ADR 0008). Ihr Startausschnitt liegt über alle kommenden Orte, unabhängig von Filtern, Alter und Startpunkt (außer Stadtteil-Zoom) (`initialCamera`, `src/domain/camera.ts`); er hängt also nie mittelbar an Standort oder Geburtsdatum. Auf einen Stadtteil darf sie fahren.
+- **Startpunkt** (Plan 0004, Plan 0005): Der Startpunkt (Standort, Stadtteil oder Kartenmitte) steht nie in URL, Logs oder Requests. Der Standort wird nur auf Tipp abgefragt, in `src/data` sofort auf ca. 100 m gerundet (`coarsen`) und lebt nur im Arbeitsspeicher, ebenso die gerundete Kartenmitte. Gespeichert wird höchstens die ID eines Stadtteils (`zwergenplan.entfernung-ab`), nie eine Koordinate, auch keine gerundete. In die URL darf nur die Wegzeit-Grenze (`wegzeit=`, Plan 0009; `umkreis=` wird nicht mehr gelesen), weil sie ohne Startpunkt nichts verrät. E2E belegt: Ab der Wahl des Startpunkts entsteht kein Request (`e2e/startpunkt.spec.ts`, erst nach der Antwort von Tabelle und Chunk gezählt), bei offener Karte auch kein Kachel-Request (`e2e/karte.spec.ts`).
+- **Kein Request hängt davon ab, welcher Startpunkt gilt** (Plan 0009, E9; ADR 0011): URL und Inhalt jedes Requests sind für alle gleich. Die Wegzeit-Tabelle lädt beim Öffnen einer Startpunkt-Oberfläche (Kind-Sheet, Karte), auf „Nochmal laden“ oder beim Start, wenn irgendein Stadtteil gespeichert ist, nie als Folge einer Wahl. Bewusste Ausnahme: Der Request beim Start verrät dem eigenen Host ein Bit, nämlich dass *ein* Stadtteil gespeichert ist, aber nicht welcher. E2E belegt: ohne Anlass kein Request auf `wegzeit.json`, mit gespeichertem Stadtteil genau einer.
 - **Testdaten gehen nie live**: Der Fixture-Build schreibt nach `dist-e2e/`, nur `dist/` wird deployt.
 - **Altersprüfung**: Kurs und einmalig zählen zum (ersten) Termin, regelmäßig zählt, wenn irgendein Termin passt. Die Grenzen sind inklusiv, es zählen vollendete Monate.
 
