@@ -1077,9 +1077,16 @@ Branch `nacharbeit-0007-c` auf `main` (`a682d4d`, nach den Plänen 0004 und 0005
 1. **Grenze per Eintragszahl statt Zeitstempel (E12, Review 2 Blocker 1):** Der Kanarienvogel war mit `new Event().timeStamp` als `t0` rot (0,0025 statt > 0,05), denn die `startTime` eines Layout-Shifts ist der Frame-Beginn und lag bis zu ≈ 60 ms vor dem auslösenden Ereignis. Jetzt holt `markShifts()` nach zwei Frames per `takeRecords()` alles Ausstehende und merkt sich die Anzahl; gezählt wird nur Späteres, ganz ohne Uhr.
 2. **Messung zehnfach (Skript):** Headless Chromium rundet Glyphen-Breiten auf ganze Pixel, bei 13 px verfälschte das die Verhältnisse um mehrere Prozent (Roboto-Fakten 111,8 % statt 107,6 %). Das Skript rendert deshalb bei 10 × Größe mit `font-variation-settings: "opsz" <echte Größe>`.
 3. **Swap-Tests mit `--force-device-scale-factor=2.625`:** Die Geräte-Emulation ändert in headless Chromium nicht die Schrift-Parameter. Erst ein Faktor > 1 schaltet die subpixelgenaue Glyphen-Positionierung ein, wie sie ein hochauflösendes Telefon hat. Weil `launchOptions` nur auf oberster Ebene einer Datei gesetzt werden kann, stehen die Swap-Tests in eigenen Dateien: `font-swap.spec.ts` (Fixtures, Kanarienvögel) und `font-swap.smoke.spec.ts` (echte Daten, läuft über `testMatch` im Smoke-Projekt) statt in `perf.spec.ts`/`smoke.spec.ts`.
-4. **Fit nur auf Klassen, die umbrechen:** Chips (scrollende Leiste), Tabs (feste Spalten), Tagesüberschrift und Marke (einzeilig, Kopfzeile mit Reserve) werden berichtet, bestimmen aber kein `size-adjust`. Sie können beim Laden keine Zeile umbrechen. Ziel „jede Klasse ≤ 1,5 %“ (E11) ist damit für Chips/Tabs nicht erfüllt (z. B. Noto-Tabs −1,6 %).
+4. **Ziel „jede Klasse ≤ 1,5 %“ (E11) nicht erreicht:**
+   - Zeit und Pille liegen bis ±5,6 % daneben (Roboto; Arial ±3,0, DejaVu ±4,5, Noto ±2,2). Mit drei Gewichtsbereichen und zwei Stacks lässt sich das nicht trennen, denn die Ursache sind Ziffern gegen Buchstaben, nicht Größe oder Gewicht.
+   - Chips, Tabs, Tagesüberschrift und Marke bestimmen kein `size-adjust` (z. B. Noto-Tabs −1,6 %, Roboto-Tagesüberschrift 2,8 %). Sie stehen in einer scrollenden Leiste, in festen Spalten bzw. einzeilig mit Reserve und brechen beim Laden nicht um.
+   - Maßgeblich ist deshalb das CLS-Gate, nicht der Breitenfehler je Klasse.
 5. **Namen:** `useOnlyFallback` heißt `allowOnlyFallback` (Biome hält `use…` für einen React-Hook), `expectOnlyFallback` ist Teil von `loadOnlyFallback` und gibt bei fehlender lokaler Schrift `false` zurück. `holdWebfont` hält alle Bricolage-Dateien zurück (nicht nur Latin), der Kanarienvogel verlangt genau eine Latin-Anfrage.
 6. **`knip.json` → `knip.jsonc`**, damit die Begründung für `ignoreDependencies: @fontsource-variable/roboto` als Kommentar dabeistehen kann (knip erkennt `require.resolve` auf eine Schriftdatei nicht).
+
+**Noto 3 × 98,1 % gegengeprüft:** Die drei Werte kommen aus getrennten Basen und treffen sich zufällig: Fakten 98,1 %, Mitte von Zeit 96,0 % und Pille 100,3 %, Mitte von Titel 97,7 % und Etikett 98,5 %. Ein Kopierfehler ist das nicht.
+
+**Bei Rot nach einem Datenupdate:** `node scripts/font-fallback.ts` neu laufen lassen und die Werte übernehmen, dann die gemeldete Stelle im Layout prüfen; die Verursacher stehen in der Fehlermeldung. Die Schwelle 0,05 wird nie gesenkt, eine Ausnahme gibt es nur per ADR.
 
 **Bekannte Grenze, kein Fehlalarm, aber ehrlich notiert:** In den Fixtures liegt die Fakten-Zeile der ersten Kachel bei 412 px mit Bricolage 0,8 px über der Breite (341,8 von 341 px). Jeder Fallback mit mehr als 0,2 % Abweichung in dieser Zeile kippt sie. Arial und DejaVu tun das bei Telefon-Rendering (0,105), Roboto bei ganzzahliger Rundung (0,10). Getestet ist mit Fixtures nach Plan nur Roboto; die echten Daten liegen über alle vier Fallbacks bei ≤ 0,0024. Ganz ausschließen lässt sich CLS beim Swap für beliebige Inhalte nicht. Der Test fängt groben Rückfall, nicht jede Kante.
 
@@ -1090,4 +1097,25 @@ Branch `nacharbeit-0007-c` auf `main` (`a682d4d`, nach den Plänen 0004 und 0005
 - Kanarienvögel dauerhaft in `font-swap.spec.ts`: Shift direkt nach der Grenze zählt; teilweises Umschreiben des CSS (fremdes `src`-Format, fehlender Block) wirft. Dazu `expectHeld` in jedem Lauf.
 
 **Budgets:** CSS 10,01 → 10,37 / 15 kB (24 Faces, `:where`-Regel), JS 87,3 / 90 kB (unverändert).
+
+## Arch-Review Paket C (2026-10-05) – Verdict: Nacharbeit nötig → eingearbeitet
+
+Keine Blocker. Vorher `origin/main` (`ffddb46`) eingemergt, ohne Konflikte.
+
+- **M1 Swap-Matrix auf CI nicht still überspringen.** → `font-swap.smoke.spec.ts` verlangt bei `CI` Messwerte für Roboto, Arial (Liberation) und DejaVu; nur Noto darf fehlen (Begründung im Code: Ubuntu-Image ohne Noto Sans).
+  - Ein einzelner unbekannter `local()`-Name ließ nie die Familie ausfallen, denn ein Face lädt, sobald *eine* Quelle auflöst. Der Skip griff aber schon, wenn *ein* Face scheiterte (z. B. nur der fette Schnitt fehlt).
+  - Jetzt gilt „fehlt“ nur, wenn alle sechs Faces scheitern. Teilweise installiert ist ein Fehler mit den betroffenen Faces.
+  - Jeder Wert steht in `test-results/font-swap-werte.txt`, und ein CI-Schritt gibt die Datei aus. Ergebnis aus dem Branch-CI: siehe unten.
+- **m1** `docs/architecture.md`: Telefon-Rendering (`PHONE_FONT_RENDERING`, nur Chromium), Schritt 10 bestätigt am echten Android, Noto auf CI übersprungen.
+- **m2** Abweichung 4 ehrlich formuliert: Ziel ≤ 1,5 % für Zeit/Pille und Chips/Tabs nicht erreicht, maßgeblich ist das CLS-Gate.
+- **m3** Dauerhafter Gegen-Kanarienvogel in `font-swap.spec.ts`: Roboto mit `size-adjust: 100 %` (`rewriteFallbackCss(…, { unadjusted })`) muss bei 412 px mit Fixtures CLS > 0,05 liefern.
+- **m4** `loadOnlyFallback` prüft zuerst die Zahl der Faces (`FALLBACK_BUCKETS[chosen]`).
+- **m5** Die Verursacher eines Shifts werden nur übernommen, wenn `previousRect` und `currentRect` echte `DOMRectReadOnly` sind.
+- **m6** Die `:where`-Regel steht in `@layer base`, der Kommentar ist korrigiert; das Swap-Gate bleibt grün.
+- **m7** Verweise in `vitals.ts` zeigen auf `font-swap.spec.ts`.
+- **m8** JSDoc hängt an `width()`.
+- **m9** `chooseAdjust` liegt rein in `scripts/lib/font-adjust.ts`, mit Unit-Test; ohne umbrechende Klasse wirft es. Die Skriptausgabe ist unverändert (geprüft per Diff).
+- **m10** Noto 3 × 98,1 % gegengeprüft (siehe oben).
+- **m11** `dataMeta` liegt in `e2e/real-data.ts` und prüft die Form, statt per Cast anzunehmen.
+- **m12** Handlungsanweisung bei Rot nach einem Datenupdate in diesem Plan und in `docs/architecture.md`.
 

@@ -74,7 +74,8 @@ Jede Ansicht besteht in Playwright auf 360 px, Pixel 7, iPhone 15 (WebKit), quer
 - keine Konsolen- oder Seitenfehler (automatisch in jedem Test)
 - reduzierte Bewegung funktioniert: keine Animation oder Transition länger als 1 ms, Verzögerung eingerechnet (`expectReducedMotion`)
 - LCP < 2,5 s und CLS < 0,05 bei gedrosselter Mobile-CPU bzw. gedrosseltem Netz
-- Schrift-Swap verschiebt nichts (`e2e/font-swap*.spec.ts`, Plan 0007): Webfont zurückgehalten, je Fallback (Arial/Liberation, Roboto, Noto, DejaVu) bei 412 und 360 px mit echten Daten CLS < 0,05, gezählt nur ab der Freigabe. Die `size-adjust`-Werte der Fallback-Faces in `tokens.css` kommen aus `node scripts/font-fallback.ts`, nie geschätzt.
+- Schrift-Swap verschiebt nichts (`e2e/font-swap*.spec.ts`, Plan 0007): Webfont zurückgehalten, je Fallback (Arial/Liberation, Roboto, Noto, DejaVu) bei 412 und 360 px mit echten Daten CLS < 0,05, gezählt nur ab der Freigabe. Swap-Tests laufen mit Telefon-Rendering (`PHONE_FONT_RENDERING`, nur Chromium); ob ein echtes Android die Annahme bestätigt, prüft Schritt 10 von Plan 0007. Auf CI müssen Roboto, Arial (Liberation) und DejaVu gemessen werden, nur Noto darf dort fehlen und wird übersprungen; die Werte stehen im CI-Log („Schrift-Swap je Fallback“). Die `size-adjust`-Werte der Fallback-Faces in `tokens.css` kommen aus `node scripts/font-fallback.ts`, nie geschätzt.
+  - **Rot nach einem Datenupdate:** Skript neu laufen lassen und die Werte übernehmen, dann die gemeldete Stelle im Layout prüfen (Verursacher stehen in der Fehlermeldung). Die Schwelle wird nie gesenkt, eine Ausnahme gibt es nur per ADR.
 - Bundle-Budgets (`.size-limit.json`)
 
 Eine neue Ansicht bekommt eigene E2E-Tests **und** einen Aufruf von `expectMobileUx`, hell und dunkel. Das gilt auch für jedes Overlay (`<dialog>`: Detail, Sheets), denn es liegt im Top-Layer und wird sonst nie geprüft.
