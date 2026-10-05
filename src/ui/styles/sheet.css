@@ -181,6 +181,10 @@
   .sheetfoot .btn {
     flex: 1 1 auto;
   }
+  /* „Zurücksetzen“ als Textknopf links (Plan 0008, E10): Der Fuß ist so ab ca. 340 px einzeilig. */
+  .sheetfoot .linkbtn {
+    flex: none;
+  }
 
   .toast {
     position: fixed;
@@ -202,6 +206,8 @@
     box-shadow: 3px 3px 0 var(--shadow);
     transform: translateX(-50%) rotate(-1deg);
     animation: toast 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
+    /* reine Meldung ohne Bedienelement: Tipps gehen auf den Knopf darunter (Plan 0008, E9) */
+    pointer-events: none;
   }
   /* Querformat mit Seitenleiste (tabs.css, Plan 0007, E14): Mitte und Breite über der Inhaltsspalte */
   @media (max-height: 500px) and (min-width: 40rem) {

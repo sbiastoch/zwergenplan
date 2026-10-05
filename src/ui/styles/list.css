@@ -29,6 +29,8 @@
     text-underline-offset: 5px;
     display: inline-flex;
     align-items: center;
+    /* Ausrichtung der Umgebung statt UA-`center` (Plan 0008, E13): im Kind-Sheet links, im Leerzustand zentriert */
+    text-align: inherit;
   }
   .daylabel {
     display: flex;

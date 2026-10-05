@@ -123,6 +123,8 @@
     font-size: 0.875rem;
     font-weight: 450;
     margin: 0;
+    /* Silbentrennung wie bei Titeln (Plan 0008, E14), overflow-wrap aus body bleibt der Notausgang */
+    hyphens: auto;
   }
   .facts {
     display: flex;

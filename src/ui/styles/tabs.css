@@ -167,6 +167,10 @@
     .tab-thumb::before {
       inset: 2px 4px;
     }
+    /* gleich hohe Zeilen, auch wenn das Badge unter „Merkliste“ steht: Der Daumen (ein Drittel) bleibt auf dem Tab */
+    .tabs {
+      grid-auto-rows: 1fr;
+    }
   }
 
   /* Sehr kleine Telefone quer (z. B. 568 × 320): kein Platz für die Seitenleiste, die Leiste wird kompakt.
@@ -187,6 +191,14 @@
     }
     .app {
       padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Beide Querformat-Modi (Plan 0008, E8): Das Badge steht im Fluss hinter dem Label, in der kompakten Leiste
+     rechts daneben, in der Seitenleiste darunter. Am Herz verdeckte es dort Label bzw. Herz. Hochformat: am Herz. */
+  @media (max-height: 500px) {
+    .tab .badge {
+      position: static;
     }
   }
 }

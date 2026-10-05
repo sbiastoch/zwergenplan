@@ -39,6 +39,19 @@
       transform: none;
     }
   }
+  /* Hülle um Kopf, Inhalt und ICS-Fuß (DetailDialog.tsx), wie .sheet-body beim Sheet. Der Toast ist Geschwister:
+     `container-type: size` macht die Hülle zum umgebenden Block für `position: fixed`, auf .detail scrollte er mit. */
+  .detail-body {
+    container: detail / size;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    /* unbedingt: Eine Container-Query trifft nur Nachfahren, nie den Container selbst. Ohne Überlauf (100 %,
+       hochkant) scrollt die Hülle nicht, dort scrollt weiter nur .dscroll. */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
   .detail-col {
     width: 100%;
     max-width: 40rem;
@@ -266,6 +279,21 @@
   }
   .dfoot .btn:not(.primary) {
     background: var(--soft);
+  }
+  /* Wenig Höhe in rem (große Schrift, Querformat; Plan 0008, E6): Der ICS-Fuß belegte bis zu 40 % der Höhe. Er steht
+     dann am Ende des Inhalts und scrollt mit der Hülle; rem, weil die Regel auf die Textgröße reagieren soll. */
+  @container detail (height < 34rem) {
+    .dscroll {
+      flex: none;
+      overflow: visible;
+    }
+    /* Zurück und Herz bleiben beim Scrollen erreichbar; --bg steht in beiden Dunkel-Blöcken (keine helle Insel) */
+    .dhead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--bg);
+    }
   }
   /* Passen beide Knöpfe einzeilig nebeneinander, stehen sie nebeneinander, sonst untereinander (B7): Die
      Basis ist die Textbreite, umgebrochen wird die Leiste, nicht die Beschriftung. */

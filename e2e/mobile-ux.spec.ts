@@ -235,6 +235,71 @@ test("Text-Gate erkennt Text in der Rundung, auch im Scroll-Container des Sheets
   await expect(expectTextFits(page)).rejects.toThrow(/Text stößt an die Rundung von dialog\.dlg: „Filter“/);
 });
 
+/** Kalender bei 320 px (Wochenleiste dehnt sich in den Seitenrand, calendar.css), reduzierte Bewegung */
+async function calendarAt320(page: Page) {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await ready(page);
+  await page.getByRole("button", { name: "Kalender", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+}
+
+// Plan 0008, E2: Die Woche 26.10.–1.11. beginnt mit „26“. Die Tageszahl steckt sichtbar in button.day, das per
+// negativem Rand über das unsichtbare fieldset.plain hinausreicht. Die Uhr bleibt am Datenstand (Fixture).
+test("Text-Gate: Woche mit zweistelligem Montag bei 320 px", async ({ page }) => {
+  await calendarAt320(page);
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "Nächste Woche" }).click();
+  await expect(page.locator(".week .day .num").first()).toHaveText("26");
+  await expectTextFits(page);
+});
+
+test("Text-Gate erkennt Text, der aus seinem sichtbaren Kasten ragt", async ({ page }) => {
+  await calendarAt320(page);
+  // relative Verschiebung statt Rand: Ein Rand verpufft in der zentrierenden Flex-Spalte von .day
+  await page.addStyleTag({ content: ".day .num { position: relative; left: -40px }" });
+  await expect(expectTextFits(page)).rejects.toThrow(/Text ragt aus button\.day/);
+});
+
+test("Text-Gate erkennt Text, der aus einem unsichtbaren Kasten ragt", async ({ page }) => {
+  await ready(page);
+  // `flex: none`, sonst setzt `flex: 1 1 10rem` die Breite außer Kraft. Kein sichtbarer Kasten liegt dazwischen.
+  await page.addStyleTag({ content: ".status-row > .status { flex: none; width: 2rem; white-space: nowrap }" });
+  await expect(expectTextFits(page)).rejects.toThrow(/Text ragt aus p\.status/);
+});
+
+// Plan 0008, E3: Eine an der Oberkante des Scrollbereichs angeschnittene Zeile ist Scroll-Zustand, kein Layout.
+test("Text-Gate übergeht halb hinausgescrollte Überschriften im Sheet", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await ready(page);
+  await page.getByRole("button", { name: /^Alle Filter/ }).click();
+  await expect(page.getByRole("dialog", { name: "Filter" })).toBeVisible();
+  await setTextScale(page, 2);
+  const crossing = await page.evaluate(() => {
+    const el = document.querySelector<HTMLElement>("dialog[open] .sheet-scroll");
+    const h = [...document.querySelectorAll("dialog[open] h3")].find((x) => x.textContent?.trim() === "Kosten");
+    if (!el || !h) throw new Error("Scrollbereich oder „Kosten“ fehlt");
+    const hr = h.getBoundingClientRect();
+    el.scrollTop += hr.top - el.getBoundingClientRect().top + hr.height / 2;
+    const top = el.getBoundingClientRect().top;
+    const r = h.getBoundingClientRect();
+    return r.top < top && top < r.bottom;
+  });
+  expect(crossing, "„Kosten“ kreuzt die Oberkante des Scrollbereichs").toBe(true);
+  await expectTextFits(page, { scale: 2 });
+});
+
+test("Bewegungs-Gate erkennt Transition trotz Reduce", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await ready(page);
+  // auch 0,01 ms ist eine echte Transition, die WebKit verspätet abschließt (Plan 0008, E1)
+  await page.addStyleTag({ content: ".brand { transition: color 0.01ms !important }" });
+  await expect(expectReducedMotion(page)).rejects.toThrow(/transition auf .*brand/);
+  // .brand ist spezifischer als `*` in motion.css, beide ungeschichtet und !important
+  await page.addStyleTag({ content: ".brand { transition: color 0.3s !important }" });
+  await expect(expectReducedMotion(page)).rejects.toThrow(/transition auf .*brand/);
+});
+
 test("funktioniert mit reduzierter Bewegung", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await ready(page);

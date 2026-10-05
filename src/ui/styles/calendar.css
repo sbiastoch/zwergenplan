@@ -106,6 +106,8 @@
     margin: 10px 0 2px;
     border: 2px dashed var(--edge2);
     border-radius: 22px;
+    /* Innenabstand: Bei 200 % stieß einzeiliger Text in WebKit an die Rundung, so bricht er vorher um (Plan 0008) */
+    padding: 2px 16px;
     background: none;
     font-weight: 800;
     display: flex;
@@ -171,6 +173,25 @@
   .mday .mini {
     width: 9px;
     height: 9px;
+  }
+  /* Große Schrift im Verhältnis zur Spalte (Plan 0008, E7): Die Zahlen liefen zur Kette zusammen („12131415“).
+     Jeder Tag bekommt ein zartes Feld. 19 rem greift bei 100 % auf keinem Telefon (Raster ≥ 19,75 rem), bei 200 %
+     auf jedem. Durchsichtiger Rand statt `gap`: sichtbare Lücke, die Spalte bleibt ≥ 44 px (B3). */
+  .mgrid {
+    container: mgrid / inline-size;
+  }
+  @container mgrid (width < 19rem) {
+    .mday {
+      border: 2px solid transparent;
+      background: var(--soft) padding-box;
+      /* 7 statt 12 px: Die Zahl steht bei 200 % 0,6 px (Chromium) bzw. 2 px (WebKit) vom Rand des Felds, bei
+         größerem Radius ragte sie in die Rundung (Text-Gate, Prüfung 3) */
+      border-radius: 7px;
+      letter-spacing: normal;
+    }
+    .mday[aria-pressed="true"] {
+      background: var(--sel) padding-box;
+    }
   }
 
   /* Kalendertage ≥ 44 px auch bei 320 px (B3): Beide Raster dehnen sich in den Seitenrand. Media-Query in px,
