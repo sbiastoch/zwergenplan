@@ -95,7 +95,9 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
     await titles.nth(i).getByRole("button").click();
     const dialog = page.getByRole("dialog");
     const text = await dialog.locator(".reach-long").innerText();
-    if (/mit (Bus|Tram|U\d|S\d|R)/.test(text)) named.push(text);
+    // Echte Linien tragen U+00A0 („Bus\u00a037“, „RB\u00a011“); „mit Bus & Bahn“ (normales Leerzeichen) zählt nicht
+    // (Arch-Review 0012, Blocker 1).
+    if (/mit (?:(?:Bus|Tram|R[BE]?)\u00a0|U\d|S\d)/.test(text) && !text.includes("Bus & Bahn")) named.push(text);
     await dialog.getByRole("button", { name: "Zurück" }).click();
     await expect(dialog).toBeHidden();
   }
