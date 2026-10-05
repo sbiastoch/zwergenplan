@@ -1,8 +1,8 @@
 # Plan 0008 – Feinschliff nach den Live-Reviews
 
-Status: Entwurf, `/plan-review` offen
+Status: `/plan-review` eingearbeitet (Freigabe mit Änderungen), Umsetzung offen
 Datum: 2026-10-05
-Bezug: Plan 0007, Abschnitt „Offen für die Feinschliff-Runde (Stand 2026-10-05, nach Plan 0005)“ und dessen „Browser-Review live“ (Wichtig 1, Hinweise 1–9); Plan 0004, „Browser-Review live“ (H1–H4, W1); Plan 0005, Browser-Review live vom 2026-10-05 (H1–H7; steht noch nicht im Plan 0005, Quelle ist der Review-Bericht des Koordinators). Basis ist `main` auf `a682d4d`.
+Bezug: Plan 0007, Abschnitt „Offen für die Feinschliff-Runde (Stand 2026-10-05, nach Plan 0005)“ und dessen „Browser-Review live“ (Wichtig 1, Hinweise 1–9); Plan 0004, „Browser-Review live“ (H1–H4, W1); Plan 0005, Abschnitt „Browser-Review live (2026-10-05)“ (H1–H7, W1). Er steht auf `main`, sobald der Attributions-Hotfix gelandet ist (Commit `ffddb46`). Geschrieben auf `a682d4d`. Basis der Umsetzung ist `main` **nach** dem Attributions-Hotfix; der Koordinator rebased diesen Branch darauf (Schritt 0).
 
 **Läuft parallel und gehört nicht in diesen Plan:**
 - **Plan 0007, Paket C** (B6: Roboto-Fallback, Swap-Matrix, CLS). Es ändert `tokens.css`, `e2e/smoke.spec.ts`, `e2e/perf.spec.ts`, `e2e/vitals.ts`, `scripts/font-fallback.ts`, `package.json` und ggf. einzelne `font-family`-Zeilen in Komponenten-CSS. Dieser Plan fasst `tokens.css`, `smoke.spec.ts`, `perf.spec.ts` und `vitals.ts` nicht an (E22).
@@ -138,13 +138,15 @@ Die offenen Befunde der drei Live-Reviews sind entschieden: umgesetzt mit Test o
 
 **Warum nicht die Woche umbauen** (Padding statt negativem Rand): Das behebt nur diese eine Stelle. Der gleiche Ausbruch ist ein legitimes Muster (auch `.month` nutzt `margin-inline: -16px`, sitzt aber zufällig direkt im Innenabstand von `.body`). Die Regel soll den Unterschied zwischen sichtbarem und unsichtbarem Überstand kennen.
 
+**Ehrlich benannt:** Das ist eine bewusste Lockerung für gewollte Ausbrüche über unsichtbare Kästen, keine reine Fehlerkorrektur. Ein Kasten, der über den Seitenrand hinausläuft, fällt weiter auf: `expectNoHorizontalScroll` misst jedes Element gegen die Viewport-Breite. Die Kanarienvögel unten belegen, dass herausragender Text weiter rot wird.
+
 Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
 
-**Test zuerst rot:** In `mobile-ux.spec.ts` neuer Test „Text-Gate: Woche mit zweistelligem Montag bei 320 px“. Ablauf: `page.clock.setFixedTime(new Date("2026-09-28T12:00:00+02:00"))` vor `goto`, Viewport 320 × 640, `reducedMotion: "reduce"`, Kalender öffnen (Woche 28.9.–4.10., Monat zu), `expectTextFits(page)`. Auf dem alten Gate rot mit „Text ragt aus fieldset.plain: „28““, danach grün.
+**Test zuerst rot:** In `mobile-ux.spec.ts` neuer Test „Text-Gate: Woche mit zweistelligem Montag bei 320 px“. Ablauf: Fixture-Uhr unverändert (Mo 5.10.), Viewport 320 × 640, `reducedMotion: "reduce"`, Kalender öffnen, dreimal „Nächste Woche“ (Woche 26.10.–1.11., Monat zu), `expectTextFits(page)`. Die Uhr bleibt so am Datenstand, statt vor die Fixtures zu springen. Warum 26 und nicht 12: Die Ziffer 1 ist schmal, „12“ ragt nach Rechnung (≈ 22 px in 44,6 px Zelle, −12 px Rand) nur ≈ 0,7 px heraus, also innerhalb der Toleranz von 1,5 px. „26“ ist ≈ 25 px breit wie „28“ im Review (2–3 px). Auf dem alten Gate rot mit „Text ragt aus fieldset.plain: „26““; der gemessene Überstand je Engine kommt in die Commit-Message. Danach grün.
 
 **Kanarienvögel (dauerhaft, `mobile-ux.spec.ts`):**
-- „Text-Gate erkennt Text, der aus seinem sichtbaren Kasten ragt“: Kalender bei 320 px, `addStyleTag(".day .num { margin-left: -30px }")`. Erwartet `rejects.toThrow(/Text ragt aus button\.day/)`.
-- „Text-Gate erkennt Text, der aus einem unsichtbaren Kasten ragt“: Startseite, `addStyleTag(".status-row > .status { width: 2rem; white-space: nowrap }")`. Zwischen Text und `p.status` liegt kein sichtbarer Kasten. Erwartet `rejects.toThrow(/Text ragt aus p\.status/)`.
+- „Text-Gate erkennt Text, der aus seinem sichtbaren Kasten ragt“: Kalender bei 320 px, `addStyleTag(".day .num { position: relative; left: -40px }")`. Ein Rand wie `margin-left` würde in der zentrierenden Flex-Spalte von `.day` verpuffen, eine relative Verschiebung nicht. Erwartet `rejects.toThrow(/Text ragt aus button\.day/)`.
+- „Text-Gate erkennt Text, der aus einem unsichtbaren Kasten ragt“: Startseite, `addStyleTag(".status-row > .status { flex: none; width: 2rem; white-space: nowrap }")`. Ohne `flex: none` setzt die bestehende `flex: 1 1 10rem` die Breite außer Kraft. Zwischen Text und `p.status` liegt kein sichtbarer Kasten. Erwartet `rejects.toThrow(/Text ragt aus p\.status/)`.
 
 ### E3 – Text-Gate, Prüfung 3: nur ganz sichtbare Zeilen in Scroll-Containern (Paket B)
 
@@ -183,12 +185,16 @@ Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
 
 - **Warum kein anderes Preload-Attribut:** Welche Kombination aus `crossorigin`, `credentials` und `Accept` WebKit einem `as=fetch`-Preload zuordnet, ist nicht dokumentiert und ohne Gerät nicht prüfbar. Ein im HTML gestarteter `fetch` ist in jeder Engine genau ein Request und startet so früh wie der Preload (beim Parsen des `<head>`).
 - `src/data/site.ts`:
-  - `takeEarlyRequest(): Promise<Response> | undefined` liest `window.__zpSite`, setzt es auf `undefined` und gibt es zurück. Es wird also **höchstens einmal** übernommen; „Nochmal versuchen“ lädt neu.
+  - `takeEarlyRequest(): Promise<Response> | undefined` liest `globalThis.__zpSite`, setzt es auf `undefined` und gibt es zurück. Es wird also **höchstens einmal** übernommen; „Nochmal versuchen“ lädt neu. `globalThis` statt `window`, damit das Modul auch im Vitest-Umfeld (Node, ohne `window`) läuft; `window.__zpSite` aus dem Inline-Skript ist dieselbe Eigenschaft.
   - `loadSiteData(env)` nimmt die Abhängigkeiten als Parameter, wie `LocationEnv` in `geolocation.ts`: `{ early, fetch, online }`. Standard sind `takeEarlyRequest()`, `globalThis.fetch` und `() => navigator.onLine`. Der Unit-Test braucht so keinen Browser.
-  - Typ in `src/env.d.ts`: `interface Window { __zpSite?: Promise<Response> }` (als `declare global`).
+  - Typ in `src/env.d.ts`, ohne `declare global` und ohne `export`. Die Datei ist ein Skript ohne Import, ihre Deklarationen sind also schon global, wie `__E2E__`. Es reicht **nicht**, nur `interface Window { __zpSite?: … }` zu ergänzen: `globalThis` hat den Typ `typeof globalThis`, und der kennt nur `var`-Deklarationen, keine Window-Felder. Deshalb steht dort `declare var __zpSite: Promise<Response> | undefined;`. Das typisiert `globalThis.__zpSite` und, über `Window & typeof globalThis`, auch `window.__zpSite`. Meldet Biome `noVar` für die Ambient-Deklaration, kommt ein `biome-ignore` mit dieser Begründung dazu (ADR 0004).
 - **Schichtregel:** `index.html` ist Bootstrap. Den bisherigen Preload gab es dort auch, der Request ist derselbe. Die UI fasst weiter kein `fetch` an. `docs/architecture.md`, Datenfluss, bekommt eine Zeile: „`index.html` startet den Abruf von `site.json` (Frühstart), `src/data/site.ts` übernimmt ihn“. Ein neues ADR gibt es nicht, weil die Schichtregel unverändert bleibt. Sieht das Arch-Review das anders, folgt ADR 0011.
 - **E2E zuerst rot** (`e2e/app.spec.ts`, alle Projekte): „`site.json` wird genau einmal geladen“. `page.on("request")` zählt URLs, die auf `/data/site.json` enden, ab vor `goto`. Nach sichtbarer erster Kachel und 500 ms Pause muss die Zahl genau 1 sein. Auf dem alten Stand rot in `iphone-15` (2), grün in Chromium. Dazu ein Test für den Fehlerweg in E5.
-- **Unit** (`src/data/site.test.ts`, neu): übernimmt die frühe Anfrage, ohne `fetch` aufzurufen. Ein zweiter Aufruf ruft `fetch` (nur einmal übernehmen). Ohne frühe Anfrage ruft er `fetch` mit `BASE_URL + "data/site.json"`.
+- **Unit** (`src/data/site.test.ts`, neu), mit `vi.stubGlobal("__zpSite", Promise.resolve(response))` und `vi.stubGlobal("fetch", vi.fn(…))`, Aufräumen per `vi.unstubAllGlobals()`:
+  - Der erste Aufruf übernimmt die frühe Anfrage, `fetch` wird nicht gerufen.
+  - Der zweite Aufruf ruft `fetch` (nur einmal übernehmen).
+  - Ohne frühe Anfrage ruft er `fetch` mit `BASE_URL + "data/site.json"`.
+  - Dazu dieselben Fälle über den injizierten `env`.
 
 ### E5 – Fehlerzustand mit eigenem Text; die Fehlerart bestimmt `src/data` (Paket A)
 
@@ -197,13 +203,14 @@ Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
   - `netz`: `fetch` wirft, `online()` ist `true` („Failed to fetch“, „Load failed“, Abbruch).
   - `server`: HTTP ≠ 2xx oder `res.json()` wirft.
   - `loadSiteData` wirft nur noch `SiteLoadError`. Die rohe Meldung steht in `cause`, nie in der Anzeige.
+  - TypeScript-Regeln des Projekts: `erasableSyntaxOnly` verbietet Parameter-Properties. `reason` wird deshalb als Feld deklariert und im Konstruktor zugewiesen (`readonly reason: LoadFailure; constructor(reason: LoadFailure, cause: unknown) { super(…, { cause }); this.reason = reason; }`). Unter `exactOptionalPropertyTypes` werden optionale Felder als `?: T | undefined` geschrieben, auch die von `SiteEnv` (`early?: Promise<Response> | undefined`).
 - Texte zentral in `src/ui/format.ts`, `loadErrorText(reason)`:
-  - `offline`: „Du bist gerade offline. Sobald das Netz wieder da ist, klappt es.“
+  - `offline`: „Du bist gerade offline. Sobald das Netz wieder da ist, tippe auf ‚Nochmal versuchen‘.“ Es gibt kein automatisches Neuladen, der Text verspricht also keins.
   - `netz`: „Die Verbindung ist abgebrochen. Versuch es gleich nochmal.“
   - `server`: „Die Angebote ließen sich gerade nicht laden. Versuch es später nochmal.“
 - `App.tsx`: `LoadState` `{ kind: "error"; reason }`. Im Fehlerfall gilt `e instanceof SiteLoadError ? e.reason : "server"`. Ein unbekannter Fehler zeigt also nie seinen Rohtext. Überschrift „Das hat nicht geklappt“ und „Nochmal versuchen“ bleiben.
 - **Unit:** `site.test.ts`, je Grund ein Fall mit gestubbtem `fetch`, `online` und `early`. Dazu `cause` gesetzt, Meldung ohne „fetch“/„Load“. `format.test.ts`: drei Texte, keiner enthält englische Wörter.
-- **E2E** (`e2e/app.spec.ts`), mit `test.use({ allowedConsoleErrors: [/\/data\/site\.json /] })`. Das Muster greift nur, wenn die Quelle der Konsolenmeldung `site.json` ist:
+- **E2E** (`e2e/app.spec.ts`), mit `test.use({ allowedConsoleErrors: [/\/data\/site\.json\b/] })`. Das Muster greift in Chromium und WebKit nur, wenn die Konsolenmeldung `site.json` als Quelle oder im Text nennt (`fixtures.ts` prüft `` `${url} ${text}` ``):
   - „Fehlerzustand mit eigenem Text, danach lädt ‚Nochmal versuchen‘“:
     - `page.route("**/data/site.json", (r) => r.abort())` vor `goto`.
     - `getByRole("alert")` enthält „Die Verbindung ist abgebrochen.“ und **nicht** `/fetch|load failed/i`.
@@ -215,32 +222,53 @@ Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
 
 **Entscheidung:** Ist der Dialog niedriger als 34 rem, steht der ICS-Fuß am Ende des Inhalts und scrollt mit. Sonst bleibt er fest unten wie heute.
 
+`DetailContent` (`DetailDialog.tsx`) bekommt eine Hülle `<div className="detail-body">` um Kopf, Scrollbereich und Fuß, wie `.sheet-body` beim Sheet. Der Toast bleibt Geschwister der Hülle, so rendert ihn `Dialog.tsx` ohnehin.
+
 ```css
-.detail {
+.detail-body {
   container: detail / size;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* unbedingt: Eine Container-Query trifft nur Nachfahren, nie den Container selbst. Ohne Überlauf
+     (100 %, hochkant) scrollt die Hülle nicht, dort scrollt weiter nur .dscroll. */
+  overflow-y: auto;
 }
 @container detail (height < 34rem) {
-  .detail[open] {
-    overflow-y: auto;
-  }
   .dscroll {
     flex: none;
     overflow: visible;
   }
+  /* Zurück und Herz bleiben beim Scrollen erreichbar */
+  .dhead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--bg);
+  }
 }
 ```
 
+- **Warum eine Hülle statt `.detail` selbst:**
+  - Eine Regel für `.detail[open]` *in* der Query wirkte nie. Die Query fragt den Container ab und trifft nur seine Nachfahren.
+  - `container-type: size` bringt Layout-Containment mit. Der Container wird damit zum umgebenden Block für `position: fixed`. Läge er auf `.detail`, hinge der Toast (`.toast`, fest positioniert, Kind des Dialogs) an der scrollenden Fläche und scrollte mit. Auf der Hülle ist der Toast Geschwister und bleibt am Viewport.
+- **Wer scrollt:** `overflow-y: auto` steht unbedingt auf `.detail-body`. Bei 100 % hochkant läuft die Hülle nicht über, weil `.dscroll` mit `min-height: 0` schrumpft und selbst scrollt. In der Query wird `.dscroll` zu `flex: none`, der Inhalt läuft über, und die Hülle scrollt.
+- **Kopf bleibt stehen:** Scrollt die Hülle, verließe `.dhead` (Zurück und Herz) sonst den Bildschirm. In der Query wird er `sticky` mit `background: var(--bg)`. `--bg` steht in beiden Dunkel-Blöcken von `tokens.css`, der Kopf ist also auch im Dunkeln keine helle Insel. Das Punktmuster des Dialogs fehlt unter dem Kopf, das ist gewollt: So hebt er sich vom gescrollten Inhalt ab.
 - **Warum Container-Query in `rem`:** Sie reagiert auf die Textgröße (Plan 0007, E7, Regel in `docs/architecture.md`), eine Viewport-Media-Query nicht. Größenbeispiele:
   - 640 px bei 200 % = 20 rem, ja;
   - Pixel 7 bei 200 % (915 px) = 28,6 rem, ja;
   - 640 px bei 100 % = 40 rem, nein;
   - iPhone SE bei 100 % (568 px) = 35,5 rem, nein;
   - quer 412 px bei 100 % = 25,75 rem, ja. Der Fuß belegte quer 26–28 %, das ist ein gewollter Nebeneffekt.
-- `.detail` ist fest positioniert mit `inset: 0` und hängt in seiner Größe nicht vom Inhalt ab. `container-type: size` ist deshalb unkritisch.
+- Die Hülle bekommt ihre Höhe vom Dialog (`.detail` fest mit `inset: 0`, Flex-Spalte, `flex: 1 1 auto; min-height: 0`), nicht vom Inhalt. `container-type: size` ist deshalb unkritisch. Der Überlauf ändert die gemessene Höhe nicht, es gibt also keine Rückkopplung.
+- `DetailDialog.tsx` gehört damit zu Paket B. Die Änderung betrifft nur die Hülle, der Inhalt bleibt gleich. Kein anderes Paket fasst die Datei an.
 - Der Fuß behält Rahmen und Rundung. Er ist am Ende des Inhalts mit einem Wisch erreichbar.
 - **Warum nicht nur das Label ausblenden:** Das spart ≈ 34 px, der Fuß bliebe bei ≈ 25 %.
 - **E2E zuerst rot** (`e2e/layout.spec.ts`, `pixel-7` und `iphone-15`):
-  - 320 × 640, `setTextScale(page, 2)`, Detail „Offener Krabbeltreff“. Erwartet: `.dfoot` liegt anfangs ganz unter dem Viewport (`getBoundingClientRect().top >= innerHeight`). Nach `scrollIntoViewIfNeeded()` ist „Alle Termine“ sichtbar und klickbar.
+  - 320 × 640, `setTextScale(page, 2)`, Detail „Offener Krabbeltreff“. Erwartet: `.dfoot` liegt anfangs ganz unter dem Viewport (`getBoundingClientRect().top >= innerHeight`). Nach `scrollIntoViewIfNeeded()` auf `.dfoot` ist „Alle Termine“ sichtbar und klickbar, und „Zurück“ ist weiter ganz im Viewport (`toBeInViewport({ ratio: 1 })`).
+  - Im gescrollten Zustand mit angehaltener Uhr (`page.clock.pauseAt(FIXTURE_NOW)`) „Alle Termine“ antippen. Der Toast „Kalenderdatei mit … geladen“ liegt ganz im Viewport. Der Download-Link öffnet eine `.ics`; den Download fängt der Test per `page.waitForEvent("download")` ab.
+  - Dieselbe Ansicht dunkel (System-Dunkel und `data-theme="dark"`), gescrollt: `expectNoBrightIslands` und `expectAccessible` (Kopf auf `--bg`).
   - 412 × 915 bei 100 %: `.dfoot` endet bündig am unteren Rand (Abweichung ≤ 1 px), wie bisher.
   - Auf dem alten Stand ist der erste Fall rot.
 
@@ -274,6 +302,7 @@ Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
   - 320 × 640, Monat offen, `setTextScale(page, 2)`. Für jede Zeile von `.mgrid` haben benachbarte freigegebene `.mday` einen Hintergrund mit Alpha > 0. Ihre Hintergrundflächen (Border-Box minus 2 px Rand je Seite) liegen ≥ 3 px auseinander.
   - Bei 100 % ist der Hintergrund nicht gewählter Tage durchsichtig (unverändert).
   - Dazu `expectTouchTargets` bei 100 % wie bisher.
+  - Dieselbe Ansicht bei 200 % dunkel (System-Dunkel und `data-theme="dark"`): `expectNoBrightIslands` und `expectAccessible`. Die Felder auf `--soft` dürfen den Kontrast der Zahlen nicht senken, auch nicht beim gesperrten Tag (Deckkraft 0,45).
 
 ### E8 – Badge in den Querformat-Leisten im Fluss (Paket B)
 
@@ -296,7 +325,8 @@ Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
 - Die Markup-Reihenfolge in `TabBar` (Icon, Label, Badge) passt. `Chrome.tsx` ändert sich dafür nicht.
 - **Warum nicht am Icon verankern:** Bei 200 % ist das Badge 24 px hoch und würde aus der Leiste ragen, die `clip-path` hat.
 - **Höhe in der Seitenleiste:** 100 % ergibt 3 × 68 px + 20 = 224 px, 200 % ergibt 3 × 88 px + 20 = 284 px. Beides passt in 360 bzw. 412 px Höhe.
-- **E2E zuerst rot** (`layout.spec.ts`): ein Angebot merken, dann bei 568 × 320 (100 %) und 863 × 360 (100 % und 200 %) die Rechtecke von `.tab .badge`, `.tab-label` und dem Icon des Merklisten-Tabs vergleichen. Erwartet: keine Überschneidung über 0,5 px. Auf dem alten Stand rot bei 568 × 320 (Label) und 863 × 360/200 % (Herz). Der Daumen sitzt weiter auf dem gewählten Tab (`offsetTop`/`offsetHeight` von `.tab-thumb` und `.tab[aria-current]` gleich, ±2 px).
+- **E2E zuerst rot** (`layout.spec.ts`): ein Angebot merken, dann bei 568 × 320 und 863 × 360, jeweils bei 100 % und 200 %, die Rechtecke von `.tab .badge`, `.tab-label` und dem Icon des Merklisten-Tabs vergleichen. Erwartet: keine Überschneidung über 0,5 px. Auf dem alten Stand rot bei 568 × 320 (Label) und 863 × 360/200 % (Herz). Der Daumen sitzt weiter auf dem gewählten Tab (`offsetTop`/`offsetHeight` von `.tab-thumb` und `.tab[aria-current]` gleich, ±2 px). Bei 568 × 320/200 % zeigt die kompakte Leiste nur Icons (Label per Container-Query versteckt); dann darf das Badge das Icon nicht überdecken, und `expectTextFits` sowie `expectNoHorizontalScroll` bleiben grün.
+- Dazu je Größe dunkel (System-Dunkel und `data-theme="dark"`): `expectNoBrightIslands` und `expectAccessible` (Badge-Kontrast auf dem Washi-Tape).
 
 ### E9 – Toast fängt keine Tipps ab (Paket B)
 
@@ -334,26 +364,30 @@ Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
 
 **UI** (`CalendarView.tsx`, `AgendaEmpty`). Reihenfolge der Leerzustände:
 1. Karten,
-2. `ended > 0` „Für heute ist alles vorbei“,
-3. **neu** `hidden > 0`,
+2. **neu** `hidden > 0`,
+3. `ended > 0` „Für heute ist alles vorbei“,
 4. `afterData`,
 5. „Freier Tag“.
 
 Der neue Zustand:
 - Titel „Nichts, was zu deiner Auswahl passt“.
-- Text aus `format.ts` `hiddenNote(n)`: „1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Umkreis oder Alter.“ bzw. „3 Angebote an diesem Tag sind ausgeblendet – …“.
+- Text aus `format.ts` `hiddenNote(hidden, ended)`: „1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Umkreis oder Alter.“ bzw. „3 Angebote an diesem Tag sind ausgeblendet – …“. Ist heute zusätzlich etwas Passendes schon beendet (`ended > 0`), folgt der Satz „Was zu deiner Auswahl passt, ist heute schon vorbei.“
 - Darunter `.linkbtn` „Filter zurücksetzen“, nur wenn `activeFilterCount(route.filter, { hasOrigin }) > 0`. `CalendarView` bekommt dafür `onResetFilter?: () => void`, `App.tsx` reicht es nur dann durch. Blendet nur das Alter aus, gibt es keinen Knopf, der Text nennt das Alter.
 - Symbol `search` (wie „Diese Seite ist noch leer“).
 
-**Warum `hidden` vor `afterData`:** Nach dem Datenende gibt es keine Termine, `hidden` ist dort 0. Die Reihenfolge ändert also nichts an B8.
+**Warum `hidden` zuerst:**
+- Vor `ended`: Heute können die passenden Termine vorbei sein, während ausgeblendete noch kommen. „Für heute ist alles vorbei“ wäre dann falsch, denn es gibt heute noch etwas, nur nicht in der Auswahl. Der kombinierte Text nennt beides.
+- Vor `afterData`: Nach dem Datenende gibt es keine Termine, `hidden` ist dort 0. Die Reihenfolge ändert also nichts an B8.
+- Ohne Filter ist `hidden` 0. Das bestehende „Für heute ist alles vorbei“ (Fixture-Uhr Mo 5.10. 12:00, Test „heute schon vorbei“) bleibt deshalb unverändert.
 
 **Tests:**
 - `agenda.test.ts`, test-first:
   - `hidden` zählt die Differenz;
   - beendete Termine zählen nicht (Uhr nach Terminende);
   - ohne `allIndex`-Eintrag ist `hidden` 0;
+  - heute mit einem beendeten passenden und einem kommenden ausgeblendeten Termin: `ended` 1 und `hidden` 1, beide gesetzt;
   - der Termin um 00:30 Berlin liegt am richtigen Tag (Test in LA).
-- `format.test.ts`: `hiddenNote(1)`, `hiddenNote(3)`.
+- `format.test.ts`: `hiddenNote(1, 0)`, `hiddenNote(3, 0)`, `hiddenNote(1, 2)` (mit dem Satz zu heute).
 - `use-offer-views.test.ts`: `allIndex` enthält gefilterte Angebote, `index` nicht.
 - E2E `calendar.spec.ts` „ausgeblendete Angebote statt ‚Freier Tag‘“, zuerst rot:
   - Schnellfilter „Kurse“, Kalender, Mi 7.10. Dort liegt nur „Offener Krabbeltreff“ (regelmäßig).
@@ -402,7 +436,7 @@ Der neue Zustand:
 ### E17 – Karte H3: Attribution in der App-Schrift (Paket C)
 
 **Entscheidung:** `map-overrides.css`: `.map-box .maplibregl-map { font-family: var(--font-sans); }`. Das gilt für Attribution und Zwei-Finger-Hinweis. Größe und Zeilenhöhe der Attribution bleiben (Z. 50–57). Die Schriftdatei ist schon geladen, es gibt keinen weiteren Request.
-- **E2E** (`karte.spec.ts`): berechnetes `fontFamily` von `.maplibregl-ctrl-attrib` beginnt mit dem ersten Eintrag von `--font-sans` (im Test aus `getComputedStyle(document.documentElement)` gelesen). Auf dem alten Stand rot („Helvetica Neue“).
+- **E2E** (`karte.spec.ts`): Der erste Eintrag des berechneten `fontFamily` von `.maplibregl-ctrl-attrib` ist gleich dem ersten Eintrag von `--font-sans` (im Test aus `getComputedStyle(document.documentElement)` gelesen). Verglichen wird nach dem Entfernen von Anführungszeichen und Leerraum (`.split(",")[0].replace(/["']/g, "").trim()`), denn Engines und der Minifier schreiben Familiennamen mal mit, mal ohne Anführungszeichen. Auf dem alten Stand rot („Helvetica Neue“).
 - Die Attribution-Zeichenkette selbst ändert der Hotfix (W1), nicht dieser Plan.
 
 ### E18 – Karte H5: Konsolen-Warnungen der OFM-Stile → `docs/ideas.md`
@@ -460,6 +494,7 @@ Läuft Plan 0007 Paket C gleichzeitig, nutzt es einen vierten Port (z. B. 4473).
 **Paket B:**
 - `src/ui/styles/motion.css`, `dialog.css`, `calendar.css`, `tabs.css`, `sheet.css`, `list.css`, `card.css`
 - `src/ui/Sheets.tsx` (nur der Fuß)
+- `src/ui/DetailDialog.tsx` (nur die Hülle `.detail-body`, E6)
 - `e2e/mobile-ux.ts`, `e2e/mobile-ux.spec.ts`, `e2e/layout.spec.ts`, `e2e/theme.spec.ts`
 
 **Paket C:**
@@ -531,8 +566,9 @@ src/ui/
   Chrome.tsx                       TabBar: currentRef                               [A]
   Overlays.tsx                     Detail: fallbackFocus                            [A]
   Sheets.tsx                       Fuß: „Zurücksetzen“ als .linkbtn                 [B]
+  DetailDialog.tsx                 Hülle .detail-body (E6)                          [B]
   styles/motion.css                animation/transition: none                       [B]
-  styles/dialog.css                .detail Container, ICS-Fuß scrollt              [B]
+  styles/dialog.css                .detail-body Container, ICS-Fuß scrollt, .dhead sticky [B]
   styles/calendar.css              .mgrid Container, Felder                         [B]
   styles/tabs.css                  Badge im Fluss (quer), gleich hohe Zeilen        [B]
   styles/sheet.css                 Toast pointer-events, .sheetfoot .linkbtn        [B]
@@ -650,14 +686,15 @@ Keine Schwelle wird gesenkt, kein Gate gelockert. `MAX_REDUCED_MS` wird schärfe
 Jeder Schritt ist erst fertig, wenn sein Fertig-Kriterium erfüllt ist. Die Schritte 2, 3 und 4 laufen parallel.
 
 0. **Voraussetzungen:**
-   - Der Attributions-Hotfix (W1) ist auf `main` und deployt, bevor Paket C abzweigt.
+   - Der Attributions-Hotfix (W1) ist auf `main` und deployt (`ffddb46` bzw. Folge-Commit).
+   - Der Koordinator rebased `feinschliff-0008` auf diesen Stand. **Alle drei Pakete** zweigen danach davon ab, nicht nur C. Zeilenangaben dieses Plans sind gegen `a682d4d` geprüft. Wo der Hotfix Dateien geändert hat (`MapView.tsx`, `tiles.ts`, Karten-Fixtures, `karte.spec.ts`), gelten die Funktions- und Selektornamen.
    - Mit Plan 0007 Paket C ist der Port abgesprochen.
 
-   *Fertig:* `git log origin/main` enthält den Hotfix, und die Ports stehen fest (4173/4273/4373, 0007-C z. B. 4473).
+   *Fertig:* `git log origin/main` enthält den Hotfix, `feinschliff-0008` ist darauf rebased, und die Ports stehen fest (4173/4273/4373, 0007-C z. B. 4473).
 1. **`/plan-review`**, Review hier einarbeiten.
 
    *Fertig:* Review-Abschnitt vorhanden, kein Blocker offen.
-2. **Paket A** (Worktree `.claude/worktrees/feinschliff-0008-a`, Branch `feinschliff-0008-a` von `main`, `pnpm install`, `PW_PORT=4173`):
+2. **Paket A** (Worktree `.claude/worktrees/feinschliff-0008-a`, Branch `feinschliff-0008-a` vom rebasten `feinschliff-0008`, `pnpm install`, `PW_PORT=4173`):
    1. Unit-Tests zuerst, je erst rot: `agenda` (`hidden`), `site` (frühe Anfrage, Fehlerarten), `format` (`loadErrorText`, `hiddenNote`), `use-offer-views` (`allIndex`).
    2. E2E zuerst rot: `app.spec.ts` (einmal, Fehler), `calendar.spec.ts`, `saved.spec.ts`. Das Rot gegen den alten Stand belegen (`site.json` doppelt nur in `iphone-15`, lokal mit `libavif16`, sonst über die Branch-CI wie in E1).
    3. Umsetzung E4, E5, E11, E12, dann `docs/ideas.md` (E18, E21).
@@ -667,7 +704,7 @@ Jeder Schritt ist erst fertig, wenn sein Fertig-Kriterium erfüllt ist. Die Schr
    - `PW_PORT=4173 pnpm e2e` grün; Perf einzeln wiederholt, falls unter Last rot (E22).
    - Budgets eingehalten.
    - Commit mit Rot-Belegen und den Zeilen für `architecture.md`, Push, Branch-CI grün.
-3. **Paket B** (Worktree `.claude/worktrees/feinschliff-0008-b`, Branch `feinschliff-0008-b`, `PW_PORT=4273`):
+3. **Paket B** (Worktree `.claude/worktrees/feinschliff-0008-b`, Branch `feinschliff-0008-b` vom rebasten `feinschliff-0008`, `PW_PORT=4273`):
    1. **Rot zuerst:**
       - `theme.spec.ts` (E1) auf dem alten `motion.css`, in `iphone-15`. Ohne `libavif16` als eigener Commit gepusht, Branch-CI rot in `iphone-15`.
       - Dazu die Regressionen aus E2/E3 auf dem alten Gate und die `layout.spec.ts`-Tests aus E6–E10, E13, E14 auf dem alten CSS.
@@ -678,7 +715,7 @@ Jeder Schritt ist erst fertig, wenn sein Fertig-Kriterium erfüllt ist. Die Schr
    3. **CSS:** `motion.css`, dann E6–E10, E13, E14, `Sheets.tsx`. Alle Gates grün, ohne Ausnahmen.
 
    *Fertig:* `PW_PORT=4273 pnpm check` grün inklusive E2E (WebKit lokal ggf. ohne `iphone-15`, dann muss die Branch-CI WebKit grün zeigen). Budgets eingehalten. Commit und Push, Branch-CI grün.
-4. **Paket C** (Worktree `.claude/worktrees/feinschliff-0008-c`, Branch `feinschliff-0008-c` von `main` **nach** Schritt 0, `PW_PORT=4373`):
+4. **Paket C** (Worktree `.claude/worktrees/feinschliff-0008-c`, Branch `feinschliff-0008-c` vom rebasten `feinschliff-0008` (also mit Hotfix), `PW_PORT=4373`):
    1. Unit-Tests zuerst: `geojson.test.ts` (Reihenfolge), `labels.test.ts`.
    2. Fixture-Stile mit `label-stadt`, E2E in `karte.spec.ts` zuerst rot (Labels, Schrift, Orts-Sheet; Zoom-Ecke ggf. Absicherung).
    3. Umsetzung E15–E17, E19, E20.
@@ -746,18 +783,51 @@ Ohne Umsetzung in diesem Plan. Bitte jeweils kurz notieren: Gerät, Betriebssyst
 - **Präzisierte Text-Gate-Regeln:** Bedingung 3 in E2 hängt am Begriff „sichtbare Kante“. Er ist identisch mit Prüfung 3 und wird geteilt, damit beide nicht auseinanderlaufen. Taucht ein neuer Fehlalarm auf, wird wieder die Regel präzisiert, mit Kanarienvogel, nie per Selektor.
 - **Frühstart in `index.html`:** Ein globales `window.__zpSite` ist eine versteckte Kopplung zwischen HTML und `src/data`. Sie ist auf eine Stelle begrenzt (`takeEarlyRequest`), kommentiert und durch `app.spec.ts` (einmal) sowie den Fehlertest (übernimmt nur einmal) abgesichert. LCP ändert sich nicht, der Request startet wie der Preload beim Parsen des `<head>`. Die Perf-Tests messen das. Wird ein Pfadwechsel nötig (`BASE`), muss die Zeile in `index.html` mit; der Kommentar dort verweist auf `site.ts`.
 - **ICS-Fuß scrollt mit:** Bei großer Schrift und quer ist der Kalender-Knopf nicht mehr ohne Scrollen zu sehen. Das ist der Tausch für mehr Lesefläche. Der Browser-Review sieht es an, eine offene Geschmacksfrage steht unten.
-- **Container `size` am Detail:** Größencontainment verhindert, dass die Größe des Dialogs vom Inhalt abhängt. Bei `inset: 0` ist das ohnehin so. Ältere Browser ohne Container-Queries (Safari < 16) zeigen den Fuß fest wie bisher.
+- **Container `size` an `.detail-body`:** Größencontainment verhindert, dass die Höhe der Hülle vom Inhalt abhängt. Sie kommt ohnehin vom Dialog (`inset: 0`, Flex-Spalte). Das Layout-Containment macht die Hülle zum umgebenden Block für feste Nachfahren. Deshalb liegt der Toast außerhalb der Hülle (E6), und ein E2E prüft ihn im gescrollten Zustand. Ältere Browser ohne Container-Queries (Safari < 16) zeigen den Fuß fest wie bisher.
 - **Felder im Monatsraster:** Bei 125–150 % greift die Regel teils schon. Das ist gewollt, die Zahlen werden dort ebenfalls eng. Das Text-Gate prüft die neue Rundung (Prüfung 3), der Radius wird notfalls kleiner.
 - **Deutsche Beschriftung:** Hängt an den Feldnamen der OFM-Kacheln (`name:de`, `name_de`, `name`). Ändert OpenFreeMap das Schema, fällt `coalesce` auf `name` zurück, also den lokalen Namen. Es gibt keinen Totalausfall.
 - **Asymmetrisches Padding:** Der Startausschnitt verschiebt sich leicht nach links und zoomt etwas heraus. Die Kamera-Regel bleibt erfüllt, der Test „Startausschnitt verrät weder Standort noch Alter“ vergleicht weiter gleiche Paddings.
 - **Parallele Arbeiten:**
   - Plan 0007 Paket C und der Hotfix ändern Nachbardateien. E22 trennt die Dateien. C zweigt nach dem Hotfix ab.
   - Konflikte bei Nachbarzeilen löst, wer später nach `main` kommt.
+  - **Swap-Matrix:** `.meta { hyphens: auto }` (E14) kann Zeilenumbrüche in Kacheln ändern, und genau daran misst Plan 0007 Paket C den CLS beim Schrift-Swap. Wer von Plan 0008 und Plan 0007 Paket C als Zweiter nach `main` kommt, lässt die Swap-Matrix einzeln laufen (`--project=smoke-echte-daten --no-deps`, ohne Parallellast) und notiert das Ergebnis in seinem Plan unter „Umsetzung“.
   - Die CPU-gedrosselten Perf-Tests sind unter paralleler Last unzuverlässig. Lokal gilt „einzeln grün“, endgültig entscheidet die CI.
 
 ## Offene Fragen an den Nutzer (Geschmack)
+
+Ohne Antwort des Nutzers gilt bei jeder Frage der Plan-Vorschlag.
+
 
 1. **ICS-Fuß bei großer Schrift und im Querformat:** am Ende des Inhalts mitscrollen (Plan, mehr Lesefläche) oder fest unten lassen (immer sichtbar, aber 35–40 % der Höhe)?
 2. **Monatsraster bei großer Schrift:** zarte Felder je Tag (Plan) oder lieber nur eine dünne Trennlinie zwischen den Spalten?
 3. **„Zurücksetzen“ im Filter-Sheet:** als Textknopf links im Fuß (Plan) oder oben rechts neben der Überschrift „Filter“ (Fuß dann immer einzeilig, Zurücksetzen scrollt aber weg)?
 4. **Merklisten-Badge im Querformat:** hinter bzw. unter dem Wort „Merkliste“ (Plan) statt als Punkt am Herz. Passt das zum Stickerheft-Look?
+
+## Review (2026-10-05, plan-reviewer) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Keine Blocker. Alle Punkte sind übernommen, bei M1 und M4/M5 mit einer Ergänzung (begründet unten).
+
+Wichtig:
+- **M1 (E6) Die Query traf den Container selbst.** `@container detail (…) { .detail[open] { … } }` wirkte nie. → `overflow-y: auto` steht jetzt unbedingt auf dem Container. **Ergänzung:** Der Container liegt nicht auf `.detail`, sondern auf einer neuen Hülle `.detail-body` in `DetailDialog.tsx`. `container-type: size` bringt Layout-Containment mit und macht den Container zum umgebenden Block für `position: fixed`. Auf `.detail` hätte der Toast (Kind des Dialogs) mit dem Inhalt gescrollt. `DetailDialog.tsx` gehört damit zu Paket B (E6, E22, Struktur, Risiken).
+- **M2 (E6) Kopf scrollt weg.** → `.dhead` in der Query `position: sticky; top: 0; background: var(--bg)`, `--bg` in beiden Dunkel-Blöcken. Neue E2E-Erwartungen:
+  - nach `scrollIntoViewIfNeeded()` auf `.dfoot` ist „Zurück“ ganz im Viewport;
+  - nach „Alle Termine“ im gescrollten Zustand liegt der Toast ganz im Viewport;
+  - dunkel: Insel-Gate und axe.
+- **M3 (E2) Kanarienvögel hätten nicht gegriffen.** → `.day .num { position: relative; left: -40px }` (ein Rand verpufft in der zentrierenden Flex-Spalte) und `.status-row > .status { flex: none; width: 2rem; white-space: nowrap }` (sonst setzt `flex: 1 1 10rem` die Breite außer Kraft).
+- **M4 (E4) Typ ohne `declare global`.** → `src/env.d.ts` bleibt ein Skript ohne Export. **Ergänzung:** statt `interface Window { … }` ein `declare var __zpSite: Promise<Response> | undefined`. Nur so ist `globalThis.__zpSite` (M5) typisiert, `typeof globalThis` kennt keine Window-Felder. `window.__zpSite` ist darüber mit typisiert.
+- **M5 (E4) Lesen über `globalThis`.** → `takeEarlyRequest` liest `globalThis.__zpSite`. Unit-Test mit `vi.stubGlobal`: Der erste Aufruf übernimmt die frühe Anfrage, der zweite ruft `fetch`.
+
+Kleiner:
+- **m1 (E5)** Offline-Text ohne falsches Versprechen: „… tippe auf ‚Nochmal versuchen‘.“ Es gibt kein automatisches Neuladen.
+- **m2 (E5)** Muster der erlaubten Konsolenfehler für beide Engines: `/\/data\/site\.json\b/`.
+- **m3 (E12)** `hidden` wird vor `ended` geprüft. Der Text nennt beides, wenn beides zutrifft (`hiddenNote(hidden, ended)`). Dazu ein Fall in `agenda.test.ts`. Ohne Filter bleibt „Für heute ist alles vorbei“ unverändert.
+- **m4 (E2)** Ausdrücklich als bewusste Lockerung für gewollte Ausbrüche benannt. Den Seitenrand prüft weiter `expectNoHorizontalScroll`.
+- **m5 (E2)** Regressionstest per „Nächste Woche“ statt Uhr auf den 28.9. **Ergänzung:** dreimal bis zum 26.10., nicht zum 12.10. „12“ ragt nach Rechnung nur ≈ 0,7 px heraus und bliebe unter der Toleranz von 1,5 px, der Test wäre also nicht rot.
+- **m6 (E17)** Anführungszeichen vor dem Vergleich der Schriftfamilie entfernen.
+- **m7 (E7, E8)** Zusätzlich dunkel (beide Wege) mit `expectNoBrightIslands` und `expectAccessible`.
+- **m8 (E8)** Die kompakte Leiste 568 × 320 wird auch bei 200 % geprüft (nur Icons, Badge überdeckt das Icon nicht).
+- **m9 (E4, E5)** `erasableSyntaxOnly` und `exactOptionalPropertyTypes`: `SiteLoadError` ohne Parameter-Properties, optionale Felder als `?: T | undefined`.
+- **m10 (Risiken)** Wer von Plan 0008 und Plan 0007 Paket C als Zweiter nach `main` kommt, lässt die Swap-Matrix einzeln laufen und notiert das Ergebnis (wegen `.meta { hyphens: auto }`).
+- **m11 (Offene Fragen)** Ohne Antwort gilt der Plan-Vorschlag.
+- **m12 (Bezug)** Der Review-Abschnitt zu Plan 0005 steht mit dem Hotfix auf `main` (`ffddb46`). Der Kopf verweist darauf.
+- **Schritt 0:** Basis der Umsetzung ist `main` nach dem Attributions-Hotfix. Der Koordinator rebased `feinschliff-0008`, alle drei Paket-Branches zweigen davon ab.
