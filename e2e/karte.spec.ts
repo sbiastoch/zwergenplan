@@ -483,13 +483,21 @@ test.describe("Karten-Code nicht ladbar", () => {
   async function recover(page: Page, context: BrowserContext, browserName: string) {
     await mapBox(page).getByRole("button", { name: "Nochmal versuchen" }).click();
     const reload = mapBox(page).getByRole("button", { name: "Seite neu laden" });
+    // Erst der Endzustand des zweiten Versuchs entscheidet, und nur einmal gelesen: Ein zweites isVisible()
+    // konnte früher in den Ladezustand fallen, dann fehlte das Neuladen (CI-Befund zu ffddb46, desktop).
+    let outcome: string | null = null;
     await expect
-      .poll(async () => (await reload.isVisible()) || (await mapBox(page).getAttribute("data-state")) === "bereit")
-      .toBe(true);
+      .poll(async () => {
+        outcome = (await reload.isVisible()) ? "neu laden" : await mapBox(page).getAttribute("data-state");
+        return outcome;
+      })
+      .toMatch(/^(neu laden|bereit)$/);
     // Manche Browser merken sich den fehlgeschlagenen Import; dann hilft nur Neuladen (E2).
-    if (await reload.isVisible()) {
+    if (outcome === "neu laden") {
+      // auf das load-Ereignis des neuen Dokuments warten; waitForLoadState() hielte das alte schon für geladen
+      const loaded = page.waitForEvent("load");
       await reload.click();
-      await page.waitForLoadState();
+      await loaded;
     }
     await expect(page).toHaveURL(/ansicht=karte/);
     let target = page;

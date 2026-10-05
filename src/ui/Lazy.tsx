@@ -27,7 +27,13 @@ export function useLazy<C>(load: () => Promise<C>): { module: Lazy<C>; attempt: 
       live = false;
     };
   }, [attempt, load]);
-  return { module, attempt, retry: () => setAttempt((n) => n + 1) };
+  // „laden“ zugleich mit dem neuen Versuch setzen (ein Render): Sonst zeigt ein Zwischen-Render mit altem
+  // „fehler“ und attempt 1 kurz „Seite neu laden“, bevor der Effekt „laden“ setzt (CI-Befund zu ffddb46).
+  const retry = () => {
+    setModule({ kind: "laden" });
+    setAttempt((n) => n + 1);
+  };
+  return { module, attempt, retry };
 }
 
 /** „Nochmal versuchen“, beim zweiten Fehlschlag „Seite neu laden“ (manche Browser merken sich den Fehlschlag). */
