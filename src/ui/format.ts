@@ -229,17 +229,36 @@ export function originPhrase(origin: Origin): string {
 
 const BY_TRANSIT = "mit Bus & Bahn";
 
-/** Detail und Orts-Sheet: sagt immer, was gemeint ist (E1): „mit Bus & Bahn“, „zu Fuß“ oder „Luftlinie“. */
-export function reachLong(reach: Reach, origin: Origin): string {
-  const short = reachShort(reach);
-  const how = reach.kind === "luftlinie" ? "Luftlinie" : reach.byFoot ? "zu Fuß" : BY_TRANSIT;
-  return `${short.startsWith("über") ? "" : "ca. "}${short} ${how} ${originPhrase(origin)}`;
+/**
+ * Lange Form in Teilen (Plan 0012, E10): Text davor, die Linien (eine oder zwei, gerendert mit Pfeil in
+ * `ReachLong.tsx`) und Text danach. Ohne Linien steht alles in `before`.
+ */
+export interface ReachLongParts {
+  before: string;
+  lines?: readonly string[];
+  after: string;
 }
 
-/** Statuszeile: erklärt die kurze Form auf den Kacheln, einmal mit der Annahme (E1, E11). */
+/**
+ * Detail und Orts-Sheet: sagt immer, was gemeint ist (E1): „mit Bus 37 → U1“ bzw. „mit Bus & Bahn“, „zu Fuß“ oder
+ * „Luftlinie“. Über 2 Std. oder ohne Weg neutral „über 2 Std. ab … (mit höchstens 1 Umstieg)“ (Plan 0012, E10).
+ */
+export function reachLong(reach: Reach, origin: Origin): ReachLongParts {
+  const short = reachShort(reach);
+  const from = originPhrase(origin);
+  if (reach.kind === "luftlinie") return { before: `ca. ${short} Luftlinie ${from}`, after: "" };
+  if (reach.byFoot) return { before: `ca. ${short} zu Fuß ${from}`, after: "" };
+  if (roundedMinutes(reach.minutes).over) return { before: `${short} ${from} (mit höchstens 1 Umstieg)`, after: "" };
+  if (reach.lines) return { before: `ca. ${short} mit `, lines: reach.lines, after: ` ${from}` };
+  return { before: `ca. ${short} ${BY_TRANSIT} ${from}`, after: "" };
+}
+
+/** Statuszeile: erklärt die kurze Form auf den Kacheln, einmal mit der Annahme (E1, E11; Plan 0012, E10). */
 export function reachNote(mode: ReachMode, origin: Origin): string {
   const from = originPhrase(origin);
-  if (mode.kind !== "luftlinie") return `Wegzeit ${from} ${BY_TRANSIT} (Di vormittags, inkl. Warten)`;
+  if (mode.kind !== "luftlinie") {
+    return `Wegzeit ${from} ${BY_TRANSIT} (Di vormittags, höchstens 1 Umstieg, inkl. Warten)`;
+  }
   return `Entfernung als Luftlinie ${from} – ${mode.reason === "fehler" ? "Wegzeiten gerade nicht verfügbar" : "außerhalb des Stadtgebiets"}.`;
 }
 
@@ -323,7 +342,10 @@ const LICENSE: NotePart = {
  */
 export function transitSourceNote(source: TransitSource | undefined): NotePart[] {
   const lead =
-    "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. Fahrplan: ";
+    "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
+    "Direktverbindungen gehen vor, ein Umstieg nur, wenn er mindestens 10 Min. spart; mehr als einen Umstieg gibt " +
+    "es nicht, dann lieber zu Fuß (bis 1,5 km zum und vom Halt). Genannt sind die Linien der häufigsten " +
+    "Verbindung. Fahrplan: ";
   if (!source) return [lead, { text: VGN, href: VGN_URL }, ", ", LICENSE, "."];
   return [
     `${lead}${source.attribution}, ‚`,

@@ -290,23 +290,59 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
     expect(originPhrase(karte)).toBe("ab der Kartenmitte");
   });
 
+  /** Teile von `reachLong` als sichtbarer Text, mit Pfeil wie `ReachLong` (Plan 0012, E10) */
+  const long = (reach: Reach, origin: Origin) => {
+    const { before, lines, after } = reachLong(reach, origin);
+    return `${before}${(lines ?? []).join("\u00a0→ ")}${after}`;
+  };
+  const NB = "\u00a0";
+  const withLines = (minutes: number, lines: [string] | [string, string]): Reach => ({
+    kind: "oepnv",
+    minutes,
+    byFoot: false,
+    lines,
+  });
+
   it("lang fürs Detail: sagt, was gemeint ist (E1)", () => {
-    expect(reachLong(oepnv(23), gostenhof)).toBe("ca. 25 Min. mit Bus & Bahn ab Gostenhof");
-    expect(reachLong(oepnv(9.6, true), standort)).toBe("ca. 10 Min. zu Fuß ab deinem Standort");
-    expect(reachLong(oepnv(31), karte)).toBe("ca. 30 Min. mit Bus & Bahn ab der Kartenmitte");
-    expect(reachLong(oepnv(Number.POSITIVE_INFINITY), gostenhof)).toBe("über 2 Std. mit Bus & Bahn ab Gostenhof");
-    expect(reachLong(luftlinie(1427), gostenhof)).toBe("ca. 1,4 km Luftlinie ab Gostenhof");
-    expect(reachLong(luftlinie(226), standort)).toBe("ca. 200 m Luftlinie ab deinem Standort");
-    expect(reachLong(luftlinie(1427), karte)).toBe("ca. 1,4 km Luftlinie ab der Kartenmitte");
+    expect(long(oepnv(23), gostenhof)).toBe("ca. 25 Min. mit Bus & Bahn ab Gostenhof");
+    expect(long(oepnv(9.6, true), standort)).toBe("ca. 10 Min. zu Fuß ab deinem Standort");
+    expect(long(oepnv(31), karte)).toBe("ca. 30 Min. mit Bus & Bahn ab der Kartenmitte");
+    expect(long(luftlinie(1427), gostenhof)).toBe("ca. 1,4 km Luftlinie ab Gostenhof");
+    expect(long(luftlinie(226), standort)).toBe("ca. 200 m Luftlinie ab deinem Standort");
+    expect(long(luftlinie(1427), karte)).toBe("ca. 1,4 km Luftlinie ab der Kartenmitte");
+    expect(reachLong(oepnv(23), gostenhof).lines).toBeUndefined();
+  });
+
+  it("nennt eine oder zwei Linien als eigene Teile (Plan 0012, E10, F1)", () => {
+    expect(reachLong(withLines(23, [`Bus${NB}37`, "U1"]), gostenhof)).toEqual({
+      before: "ca. 25 Min. mit ",
+      lines: [`Bus${NB}37`, "U1"],
+      after: " ab Gostenhof",
+    });
+    expect(long(withLines(13.6, [`Tram${NB}1`]), karte)).toBe(`ca. 15 Min. mit Tram${NB}1 ab der Kartenmitte`);
+    expect(long(withLines(23, [`Bus${NB}37`, "U1"]), gostenhof)).toBe(
+      `ca. 25 Min. mit Bus${NB}37${NB}→ U1 ab Gostenhof`,
+    );
+  });
+
+  it("zu Fuß ignoriert Linien", () => {
+    const foot: Reach = { kind: "oepnv", minutes: 9.6, byFoot: true, lines: [`Tram${NB}1`] };
+    expect(reachLong(foot, standort)).toEqual({ before: "ca. 10 Min. zu Fuß ab deinem Standort", after: "" });
+  });
+
+  it("über 2 Std. oder ohne Weg: neutral mit „höchstens 1 Umstieg“, ohne Linien", () => {
+    expect(long(oepnv(130), gostenhof)).toBe("über 2 Std. ab Gostenhof (mit höchstens 1 Umstieg)");
+    expect(long(oepnv(Number.POSITIVE_INFINITY), gostenhof)).toBe("über 2 Std. ab Gostenhof (mit höchstens 1 Umstieg)");
+    expect(reachLong(withLines(130, ["U1"]), gostenhof).lines).toBeUndefined();
   });
 
   it("Statuszeile je Modus (E11)", () => {
-    const wegzeit = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, inkl. Warten)";
+    const wegzeit = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)";
     expect(reachNote({ kind: "oepnv" }, gostenhof)).toBe(wegzeit);
     // lädt: derselbe Text, unsichtbar (die Höhe steht schon)
     expect(reachNote({ kind: "laedt" }, gostenhof)).toBe(wegzeit);
     expect(reachNote({ kind: "oepnv" }, karte)).toBe(
-      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, inkl. Warten)",
+      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)",
     );
     expect(reachNote({ kind: "luftlinie", reason: "fehler" }, gostenhof)).toBe(
       "Entfernung als Luftlinie ab Gostenhof – Wegzeiten gerade nicht verfügbar.",
@@ -364,6 +400,9 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
     const parts = transitSourceNote(source);
     expect(text(parts)).toBe(
       "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
+        "Direktverbindungen gehen vor, ein Umstieg nur, wenn er mindestens 10 Min. spart; mehr als einen Umstieg " +
+        "gibt es nicht, dann lieber zu Fuß (bis 1,5 km zum und vom Halt). Genannt sind die Linien der häufigsten " +
+        "Verbindung. " +
         "Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, ‚VGN-Soll-Daten vom 24.06.2026‘, abgewandelt, " +
         "Lizenz CC BY-SA 3.0 DE.",
     );
@@ -388,6 +427,9 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
     const parts = transitSourceNote(undefined);
     expect(text(parts)).toBe(
       "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
+        "Direktverbindungen gehen vor, ein Umstieg nur, wenn er mindestens 10 Min. spart; mehr als einen Umstieg " +
+        "gibt es nicht, dann lieber zu Fuß (bis 1,5 km zum und vom Halt). Genannt sind die Linien der häufigsten " +
+        "Verbindung. " +
         "Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, CC BY-SA 3.0 DE.",
     );
     expect(links(parts)).toEqual([

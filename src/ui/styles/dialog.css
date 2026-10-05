@@ -194,6 +194,12 @@
     color: var(--ink);
     font-weight: 700;
   }
+  /* Wegzeit mit Linien (ReachLong.tsx, Plan 0012, E10), im Detail und im Orts-Sheet: Die Namen tragen U+00A0;
+     gegen `overflow-wrap: anywhere` von .place-where bricht „202E“ nie mitten im Namen, nur am Leerzeichen nach
+     dem Pfeil. */
+  .reach-long {
+    overflow-wrap: normal;
+  }
   .stamp {
     box-shadow: 3px 3px 0 var(--shadow);
     border: 3px solid #13212e;
