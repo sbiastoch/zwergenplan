@@ -15,6 +15,7 @@ import {
   limitReason,
   loadErrorText,
   mapStatusParts,
+  originHint,
   originPhrase,
   plural,
   reachLimitLabel,
@@ -29,6 +30,7 @@ import {
   weekTitle,
   whenLabels,
 } from "./format.ts";
+import type { ReachMode } from "./use-transit.ts";
 
 // Eigene Testangebote statt der Zod-Fixtures: src/ui bleibt zod-frei (no-zod-in-client), auch im Test.
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
@@ -366,8 +368,13 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
     );
     expect(links(parts)).toEqual([
       { text: "VGN-Soll-Daten vom 24.06.2026", href: "https://www.vgn.de/web-entwickler/open-data/" },
-      { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/" },
+      { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/", nowrap: true },
     ]);
+  });
+
+  it("lange Lizenz-Bezeichnung aus den Daten darf umbrechen (N4)", () => {
+    const long = { ...source, license: "Datenlizenz Deutschland – Namensnennung – Version 2.0" };
+    expect(links(transitSourceNote(long)).at(-1)).toEqual({ text: long.license, href: long.licenseUrl });
   });
 
   it("entsteht aus `source`, nicht fest im Code", () => {
@@ -384,7 +391,7 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
     );
     expect(links(parts)).toEqual([
       { text: "VGN – Verkehrsverbund Großraum Nürnberg GmbH", href: "https://www.vgn.de/web-entwickler/open-data/" },
-      { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/" },
+      { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/", nowrap: true },
     ]);
   });
 });
@@ -421,5 +428,48 @@ describe("Kalender: ausgeblendete Angebote (Plan 0008, E12)", () => {
       "1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Wegzeit oder Alter. " +
         "Was zu deiner Auswahl passt, ist heute schon vorbei.",
     );
+  });
+});
+
+describe("Hinweis im Kind-Sheet (Plan 0009, N3)", () => {
+  const point = { lat: 49.4, lon: 11.2 };
+  const standort: Origin = { source: "standort", point, label: "Mein Standort" };
+  const karte: Origin = { source: "karte", point, label: "Kartenmitte" };
+  const stadtteil: Origin = { source: "stadtteil", point, label: "Gostenhof" };
+  const ausserhalb: ReachMode = { kind: "luftlinie", reason: "ausserhalb" };
+  const fehler: ReachMode = { kind: "luftlinie", reason: "fehler" };
+
+  it("ein Problem der Standortabfrage geht vor; Großraum heißt Großraum, nicht Stadtgebiet", () => {
+    expect(originHint("outside", undefined, undefined)).toEqual({
+      cls: "hint bad",
+      text: "Dein Standort liegt außerhalb des Großraums Nürnberg. Wähle einen Stadtteil.",
+    });
+    expect(originHint("denied", standort, { kind: "oepnv" })?.cls).toBe("hint bad");
+  });
+
+  it("außerhalb des Stadtgebiets sagt es das Sheet selbst, für Standort und Kartenmitte", () => {
+    const text = "Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil.";
+    expect(originHint(undefined, standort, ausserhalb)).toEqual({ cls: "hint bad", text });
+    expect(originHint(undefined, karte, ausserhalb)).toEqual({ cls: "hint bad", text });
+  });
+
+  it("Standort: Wegzeit nur, wenn sie kommt oder da ist; ohne Tabelle Entfernung", () => {
+    const modes: ReachMode[] = [{ kind: "oepnv" }, { kind: "laedt" }];
+    for (const mode of modes) {
+      expect(originHint(undefined, standort, mode)).toEqual({
+        cls: "hint ok",
+        text: "Wegzeit ab deinem Standort (auf ca. 100 m gerundet).",
+      });
+    }
+    expect(originHint(undefined, standort, fehler)?.text).toBe(
+      "Entfernung ab deinem Standort (auf ca. 100 m gerundet).",
+    );
+  });
+
+  it("kein Hinweis ohne Startpunkt, beim Stadtteil und bei der Kartenmitte im Stadtgebiet", () => {
+    expect(originHint(undefined, undefined, undefined)).toBeUndefined();
+    expect(originHint(undefined, stadtteil, fehler)).toBeUndefined();
+    expect(originHint(undefined, karte, { kind: "oepnv" })).toBeUndefined();
+    expect(originHint(undefined, karte, fehler)).toBeUndefined();
   });
 });

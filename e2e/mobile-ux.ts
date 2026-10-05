@@ -377,27 +377,38 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
         return undefined;
       };
       /**
-       * Sichtbarer Bereich des nächsten senkrechten Scroll-Containers zwischen Text und gerundetem Kasten.
-       * Präzisierung mit Grund (Plan 0008, E3): Eine Zeile, die die Oberkante kreuzt, zählt nicht, wenn der Bereich
-       * nach unten gescrollt ist (`scrollTop > 0`); eine Zeile an der Unterkante zählt nicht, wenn darunter noch
-       * Inhalt kommt (Toleranz je 1 px). Sie steht dort, weil gescrollt wurde bzw. werden kann, nicht wegen des
-       * Layouts; dass die Rundung des Sheets sie anschneidet, ist normales Scrollen (Filter-Sheet bei
-       * 320 px/200 %: „Kosten“, Plan 0004, H1). Kürzen auf den sichtbaren Teil reichte nicht: Bei 16 px Innenabstand
-       * liegt der Zeilenanfang an der Oberkante noch außerhalb der Ellipse eines 28-px-Radius. Im Ruhezustand
-       * (`scrollTop = 0`) ist jede Zeile in der Ecke ganz sichtbar und wird geprüft (Kanarienvogel „Text-Gate erkennt
-       * Text in der Rundung, auch im Scroll-Container des Sheets“).
+       * Senkrechter Scroll-Versatz zwischen Text und gerundetem Kasten, den Kasten eingeschlossen, über alle
+       * Scroll-Container summiert. Präzisierung mit Grund (Plan 0008, E3; Plan 0009, N5): In einem Scroll-Container
+       * zählt die Lage, die das Layout einer Zeile gibt, nicht die, in die das Scrollen sie gerade schiebt. Für die
+       * oberen Ecken wird die Zeile deshalb dort geprüft, wo sie bei `scrollTop = 0` stünde (`toRest` tiefer), für
+       * die unteren dort, wo sie am Ende stünde (`toEnd` höher). Text in einem `position: sticky`-Element steht
+       * nicht dort, wo das Layout ihn ohne Scrollen hätte; er wird an seiner tatsächlichen Lage geprüft.
+       *
+       * Dass die Rundung des Sheets eine Zeile beim Scrollen anschneidet, ist normales Scrollen (Filter-Sheet bei
+       * 320 px/200 %: „Kosten“, Plan 0004, H1; Kind-Sheet in WebKit: eine ganz sichtbare Zeile knapp unter der
+       * Oberkante, Plan 0009, H7). Ohne scrollbaren Bereich ist das die gewöhnliche Prüfung, und Text, den das
+       * Layout in die Ecke legt, bleibt in jeder Scroll-Lage rot (Kanarienvögel „Text-Gate erkennt Text in der
+       * Rundung, auch im Scroll-Container des Sheets“ und „… auch im gescrollten Sheet“). Die frühere Ausnahme
+       * („kreuzt die Kante und es ist gescrollt“) geht darin auf.
        */
-      const scrollViewport = (start: Element, stop: Element) => {
-        for (let a: Element | null = start; a && a !== stop; a = a.parentElement) {
+      const scrollOffsets = (start: Element, stop: Element) => {
+        let toRest = 0;
+        let toEnd = 0;
+        for (let a: Element | null = start; a; a = a.parentElement) {
           const s = getComputedStyle(a);
-          if (s.overflowY === "auto" || s.overflowY === "scroll") return a;
+          if (s.position === "sticky") return { toRest: 0, toEnd: 0 };
+          if (s.overflowY === "auto" || s.overflowY === "scroll") {
+            toRest += a.scrollTop;
+            toEnd += Math.max(0, a.scrollHeight - a.clientHeight - a.scrollTop);
+          }
+          if (a === stop) break;
         }
-        return undefined;
+        return { toRest, toEnd };
       };
       for (const { text, parent } of texts) {
         const box = roundBox(parent);
         if (!box) continue;
-        const viewport = scrollViewport(parent, box.el);
+        const { toRest, toEnd } = scrollOffsets(parent, box.el);
         const { s } = box;
         const b = box.el.getBoundingClientRect();
         const bw = {
@@ -464,16 +475,11 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
           },
         ];
         outer: for (const r of rectsOf(text)) {
-          if (viewport) {
-            const v = viewport.getBoundingClientRect();
-            const scrolledDown = viewport.scrollTop > 0;
-            const moreBelow = viewport.scrollTop + viewport.clientHeight < viewport.scrollHeight - 1;
-            if ((r.top < v.top - 1 && scrolledDown) || (r.bottom > v.bottom + 1 && moreBelow)) continue;
-          }
           for (const c of corners) {
             if (c.rx < 1 || c.ry < 1) continue;
             const x = c.sx < 0 ? r.left : r.right;
-            const y = c.sy < 0 ? r.top : r.bottom;
+            // obere Ecken in der Ruhelage, untere in der Endlage der Scroll-Container (N5)
+            const y = c.sy < 0 ? r.top + toRest : r.bottom - toEnd;
             const dx = (x - c.cx) * c.sx;
             const dy = (y - c.cy) * c.sy;
             if (dx <= 0 || dy <= 0) continue; // Punkt liegt nicht im Eckbereich

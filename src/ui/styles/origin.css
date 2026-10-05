@@ -48,6 +48,10 @@
     text-decoration: underline;
     padding-block: 6px;
   }
+  /* kurze Links (Lizenz) brechen nie um, sonst stünde „DE“ allein als winziges Ziel (Plan 0009, N4) */
+  .source-note a.nowrap {
+    white-space: nowrap;
+  }
 
   /* Filter-Sheet: Wegzeit-Grenze gesperrt (kein Startpunkt, lädt, Fehler, außerhalb) */
   .chip:disabled {
@@ -83,7 +87,9 @@
     display: inline-block;
     min-width: 6ch;
   }
-  .status.pending,
+  /* Bei .status nur die Kinder: Die Zeile selbst bleibt fokussierbar, sie ist das Fokus-Ziel nach „Nochmal laden“
+     (N2). visibility: hidden nimmt die Kinder auch aus dem Barrierefreiheitsbaum, die Live-Region sagt nichts. */
+  .status.pending > *,
   .status-note.pending {
     visibility: hidden;
   }

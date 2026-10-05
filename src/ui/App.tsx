@@ -15,7 +15,7 @@ import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import { SavedView } from "./SavedView.tsx";
-import { LimitAction } from "./Sheets.tsx";
+import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
 import {
   useAgeOnly,
@@ -59,6 +59,8 @@ export function App() {
   const filterButton = useRef<HTMLButtonElement>(null);
   // Fokus-Rückweg des Details: Die Kachel, die es geöffnet hat, kann beim Schließen fehlen (Plan 0008, E11).
   const activeTab = useRef<HTMLButtonElement>(null);
+  /** Fokus-Ziel nach „Nochmal laden“ unter der Statuszeile (Plan 0009, N2) */
+  const statusLine = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     // `attempt` startet das Laden neu („Nochmal versuchen“)
@@ -156,12 +158,12 @@ export function App() {
   // gespeicherter Stadtteil + wegzeit=: Platzhalter statt ungefilterter Liste bzw. ungefiltertem Kalender, bis die
   // Wegzeit da ist (M7, Arch-Review 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11).
   const listPending = reachMode?.kind === "laedt" && limit !== undefined;
-  const limitAction = (
+  const limitAction: LimitActionFor = (focusTarget) => (
     <LimitAction
       mode={reachMode}
-      reloadPage={transit.reloadPage}
+      focusTarget={focusTarget}
       onPickOrigin={() => setSheet("origin")}
-      onRetry={want}
+      onRetry={transit.retry}
     />
   );
 
@@ -211,7 +213,7 @@ export function App() {
           <>
             <div className="status-row">
               {/* Lädt die Wegzeit zur Grenze, wäre die Zahl ungefiltert: unsichtbar, keine Ansage (M7). */}
-              <p className={listPending ? "status pending" : "status"} role="status">
+              <p ref={statusLine} className={listPending ? "status pending" : "status"} role="status" tabIndex={-1}>
                 {route.tab === "karte" ? (
                   <span>
                     <b>{mapOffers}</b>
@@ -240,7 +242,7 @@ export function App() {
               // wegzeit= wirkt nicht (ohne Startpunkt, Fehler, außerhalb): Hinweis außerhalb der Status-Region (E11)
               <p className="status">
                 {hint}
-                {limitAction}
+                {limitAction(statusLine)}
               </p>
             )}
             {hiddenCount > 0 && (
@@ -285,7 +287,7 @@ export function App() {
             onSheetOpen={setPlaceSheet}
             onPickOrigin={() => setSheet("origin")}
             onMapCenter={(center) => {
-              if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb von Nürnberg.");
+              if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.");
             }}
             onResetFilter={() => setFilter(EMPTY_FILTER)}
           />

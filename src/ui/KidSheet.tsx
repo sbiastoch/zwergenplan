@@ -11,6 +11,7 @@ import type { TransitSource } from "../domain/transit-types.ts";
 import { plural } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
 import type { OriginApi } from "./use-app-state.ts";
+import type { ReachMode } from "./use-transit.ts";
 
 export function KidSheet({
   birthDate,
@@ -21,6 +22,7 @@ export function KidSheet({
   onTheme,
   today,
   origin,
+  reachMode,
   transitSource,
   focusOrigin,
   onClose,
@@ -33,6 +35,8 @@ export function KidSheet({
   onTheme: (t: ThemeChoice) => void;
   today: string;
   origin: OriginApi;
+  /** Modus ab dem Startpunkt: „außerhalb“ sagt das Sheet selbst (Plan 0009, N3) */
+  reachMode: ReachMode | undefined;
   /** Namensnennung der Wegzeit-Tabelle (E3); `undefined`, solange sie nicht geladen ist */
   transitSource: TransitSource | undefined;
   /** geöffnet über „Startpunkt wählen“: die Stadtteil-Auswahl bekommt den Fokus */
@@ -103,7 +107,7 @@ export function KidSheet({
             </span>
           </button>
         </div>
-        <OriginPicker api={origin} source={transitSource} focus={focusOrigin} />
+        <OriginPicker api={origin} mode={reachMode} source={transitSource} focus={focusOrigin} />
         <h3>Darstellung</h3>
         <fieldset className="plain">
           <legend className="sr-only">Darstellung</legend>

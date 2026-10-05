@@ -4,22 +4,12 @@
  * angezeigt und gewählt.
  */
 import { useId } from "react";
-import type { PositionProblem } from "../data/geolocation.ts";
 import { DISTRICTS } from "../domain/districts.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
-import { transitSourceNote } from "./format.ts";
+import { originHint, transitSourceNote } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import type { OriginApi } from "./use-app-state.ts";
-
-const UNAVAILABLE = "Standort gerade nicht verfügbar. Wähle stattdessen einen Stadtteil.";
-const PROBLEMS: Record<PositionProblem, string> = {
-  denied: "Standort nicht freigegeben. Wähle stattdessen einen Stadtteil.",
-  unavailable: UNAVAILABLE,
-  timeout: UNAVAILABLE,
-  outside: "Dein Standort liegt außerhalb von Nürnberg. Wähle einen Stadtteil.",
-  // Ohne API erscheint der Knopf gar nicht; der Text ist nur die Rückfallebene.
-  unsupported: UNAVAILABLE,
-};
+import type { ReachMode } from "./use-transit.ts";
 
 /**
  * Setzt das HTML-Attribut `autofocus`: Dann fokussiert `showModal()` die Auswahl selbst. Reacts
@@ -31,20 +21,19 @@ function markAutofocus(el: HTMLSelectElement | null) {
 
 export function OriginPicker({
   api,
+  mode,
   source,
   focus,
 }: {
   api: OriginApi;
+  /** Modus der Anzeige ab dem Startpunkt (useTransit) */
+  mode: ReachMode | undefined;
   source: TransitSource | undefined;
   focus: boolean;
 }) {
-  const { origin, locating, problem } = api;
+  const { origin, locating } = api;
   const selectId = useId();
-  const hint = problem
-    ? { cls: "hint bad", text: PROBLEMS[problem] }
-    : origin?.source === "standort"
-      ? { cls: "hint ok", text: "Wegzeit ab deinem Standort (auf ca. 100 m gerundet)." }
-      : undefined;
+  const hint = originHint(api.problem, origin, mode);
 
   return (
     <section className="origin" aria-labelledby={`${selectId}-h`}>
@@ -101,7 +90,13 @@ export function OriginPicker({
           typeof part === "string" ? (
             part
           ) : (
-            <a key={part.href} href={part.href} target="_blank" rel="noopener">
+            <a
+              key={part.href}
+              href={part.href}
+              target="_blank"
+              rel="noopener"
+              className={part.nowrap ? "nowrap" : undefined}
+            >
               {part.text}
             </a>
           ),

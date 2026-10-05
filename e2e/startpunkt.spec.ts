@@ -251,6 +251,8 @@ test.describe("Rückfall auf die Luftlinie (E11)", () => {
 
     await page.unroute(TABLE);
     await sheet.getByRole("button", { name: "Nochmal laden" }).click();
+    // Der Knopf verschwindet; der Fokus steht auf der Überschrift vor den Chips, nicht auf <body> (N2, H2)
+    await expect(sheet.getByRole("heading", { name: "Wegzeit" })).toBeFocused();
     await expect(sheet.getByRole("button", { name: "bis 20 Min." })).toBeEnabled();
     await expect(sheet.getByText("Wegzeiten gerade nicht verfügbar.")).toHaveCount(0);
     await sheet.getByRole("button", { name: /Angebote zeigen$/ }).click();
@@ -268,9 +270,12 @@ test.describe("Rückfall auf die Luftlinie (E11)", () => {
     await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
     await page.unroute(TABLE);
     await page.getByRole("button", { name: "Nochmal laden" }).click();
+    // Der Hinweis samt Knopf verschwindet; der Fokus steht auf der Statuszeile mit dem Ergebnis (N2, H2)
+    await expect(page.getByRole("status")).toBeFocused();
     await expect(offers(page)).toHaveCount(6);
     await expect(page.getByText(/wirkt gerade nicht/)).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Alle Filter, 1 aktiv" })).toBeVisible();
+    await expect(page.getByRole("status")).toBeFocused();
   });
 });
 
@@ -313,32 +318,79 @@ test("Veraltete Tabelle: Hinweis, „Nochmal laden“ lädt ohne Cache neu und b
   await expect(page.getByText(/wirkt gerade nicht/)).toHaveCount(0);
 });
 
-test.describe("Rechenlogik nicht ladbar (M8)", () => {
+// Plan 0009, N1 (H1): Chromium behält einen gescheiterten import() in der Module-Map, ein neuer Versuch scheitert
+// dort sofort; WebKit holt ihn neu. Scheitert beim Wiederholen nur der Chunk, lädt die Seite deshalb gleich neu,
+// statt erst einen Knopf „Seite neu laden“ anzubieten (ersetzt M8). Ohne Netz (Tabelle auch weg) nie.
+test.describe("Rechenlogik nicht ladbar (M8, N1)", () => {
   test.use({
     allowedConsoleErrors: [
       /\/assets\/oepnv\/\S+ .*(ERR_FAILED|Failed to load|Failed to fetch dynamically imported module)/,
     ],
   });
 
-  test("Chunk blockiert: Luftlinie, „Nochmal laden“, beim zweiten Fehlschlag „Seite neu laden“", async ({ page }) => {
+  test("Chunk blockiert: „Nochmal laden“ lädt die Seite neu, sobald nur der Chunk scheitert", async ({ page }) => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
     await page.route(CHUNK, (route) => route.abort());
     await ready(page, "./?wegzeit=20");
     await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
     await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("1,4 km");
-    await page.getByRole("button", { name: "Nochmal laden" }).click();
-    const reload = page.getByRole("button", { name: "Seite neu laden" });
-    await expect(reload).toBeVisible();
-    await expect(page.getByRole("button", { name: "Nochmal laden" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Seite neu laden" })).toHaveCount(0);
 
-    await page.unroute(CHUNK);
-    const loaded = page.waitForEvent("load");
-    await reload.click();
-    await loaded;
-    // Die URL behält den Filter, der gespeicherte Stadtteil lädt die Wegzeit
+    // Chunk weiter blockiert, Tabelle kommt: Das Netz steht, also gleich neu laden (in beiden Engines)
+    const reloaded = page.waitForEvent("load");
+    await page.getByRole("button", { name: "Nochmal laden" }).click();
+    await reloaded;
     await expect(page).toHaveURL(/\?wegzeit=20$/);
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+
+    // Chunk wieder erreichbar: ein Tipp bringt die Minuten, je nach Engine mit oder ohne weiteres Neuladen
+    await page.unroute(CHUNK);
+    await page.getByRole("button", { name: "Nochmal laden" }).click();
     await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
     await expect(offers(page)).toHaveCount(6);
+    await expect(page).toHaveURL(/\?wegzeit=20$/);
+    await expect(page.getByRole("button", { name: "Seite neu laden" })).toHaveCount(0);
+  });
+
+  // Arch-Review zur Nacharbeit, Befund 1: Nur „Nochmal laden“ darf neu laden, nicht das Öffnen eines Sheets
+  test("Chunk blockiert: Kind-Sheet öffnen lädt die Seite nicht neu", async ({ page }) => {
+    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+    await page.route(CHUNK, (route) => route.abort());
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    await page.evaluate(() => Object.assign(window, { e2eSameDocument: true }));
+    const retried = page.waitForResponse((r) => isTable(r.url()) && r.ok());
+    const sheet = await openKidSheet(page);
+    await retried;
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    await expect(sheet).toBeVisible();
+    expect(await page.evaluate(() => "e2eSameDocument" in window), "kein Neuladen beim Öffnen").toBe(true);
+  });
+});
+
+// Chunk und Tabelle blockiert: Der Browser meldet beide (eigenes Opt-in nur für diesen Test).
+test.describe("Rechenlogik und Tabelle nicht ladbar (N1)", () => {
+  test.use({
+    // ein Muster: Ein Array mit zwei Elementen läse Playwright als Tupel [Wert, Optionen]
+    allowedConsoleErrors: [
+      /\/assets\/oepnv\/\S+ .*(ERR_FAILED|Failed to load|Failed to fetch dynamically imported module)|\/data\/wegzeit\.json\b/,
+    ],
+  });
+
+  test("ohne Netz (Chunk und Tabelle scheitern) kein Neuladen, „Nochmal laden“ bleibt", async ({ page }) => {
+    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+    await page.route(CHUNK, (route) => route.abort());
+    await ready(page, "./?wegzeit=20");
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    await page.route(TABLE, (route) => route.abort());
+    // Markierung im Dokument: Ein Neuladen würde sie löschen
+    await page.evaluate(() => Object.assign(window, { e2eSameDocument: true }));
+    const retried = page.waitForRequest((r) => isTable(r.url()));
+    await page.getByRole("button", { name: "Nochmal laden" }).click();
+    await retried;
+    await expect(page.getByRole("button", { name: "Nochmal laden" })).toBeVisible();
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    expect(await page.evaluate(() => "e2eSameDocument" in window), "kein Neuladen ohne Netz").toBe(true);
   });
 });
 
@@ -355,6 +407,11 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
   await loaded;
   await sheet.getByRole("button", { name: "Meinen Standort nutzen" }).click();
   await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
+  // Das Kind-Sheet sagt es selbst, nicht erst die Statuszeile (N3, H5)
+  await expect(
+    sheet.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil."),
+  ).toBeVisible();
+  await expect(sheet.getByText(/^Wegzeit ab deinem Standort/)).toHaveCount(0);
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(page.getByRole("status")).toContainText(
     "Entfernung als Luftlinie ab deinem Standort – außerhalb des Stadtgebiets.",
@@ -367,6 +424,16 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
   await expect(filter.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.")).toBeVisible();
   await filter.getByRole("button", { name: "Startpunkt wählen" }).click();
   await expect(page.getByRole("dialog", { name: "Kind und Einstellungen" })).toBeVisible();
+});
+
+// N4 (H6): Die kurze Lizenz bricht nie um (live stand „DE“ allein in der zweiten Zeile); der Titel darf umbrechen.
+test("Quellenhinweis: Lizenz-Link bricht nicht um, Titel-Link schon", async ({ page }) => {
+  await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+  await ready(page);
+  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  const sheet = await openKidSheet(page);
+  await expect(sheet.getByRole("link", { name: "CC0 1.0" })).toHaveCSS("white-space", "nowrap");
+  await expect(sheet.getByRole("link", { name: "Fiktiver Fahrplan für Tests" })).toHaveCSS("white-space", "normal");
 });
 
 test("Wegzeit-Filter mit Startpunkt: bis 20 Min. blendet Musikschule und Gemeinde aus", async ({ page }) => {
@@ -448,6 +515,23 @@ test("„Startpunkt wählen“ im Hinweis ohne Wahl: Der Fokus kehrt zum Knopf z
   await expect(pick).toBeFocused();
 });
 
+/**
+ * Statuszeile beim Laden: Jedes Kind ist unsichtbar (keine ungefilterte Zahl, keine Ansage), die Zeile selbst bleibt
+ * sichtbar und damit fokussierbar, sie ist das Fokus-Ziel nach „Nochmal laden“ (Plan 0009, N2).
+ */
+async function expectStatusHidden(page: Page) {
+  const status = page.locator("p.status[role=status]");
+  await expect(status).toHaveCSS("visibility", "visible");
+  await expect
+    .poll(() => status.evaluate((p) => [...p.children].map((c) => getComputedStyle(c).visibility)))
+    .toEqual(expect.arrayContaining(["hidden"]));
+  expect(
+    await status.evaluate((p) => [...p.children].every((c) => getComputedStyle(c).visibility === "hidden")),
+    "alle Kinder der Statuszeile unsichtbar",
+  ).toBe(true);
+  expect(await status.evaluate((p) => [...p.childNodes].some((n) => n.nodeType === Node.TEXT_NODE))).toBe(false);
+}
+
 test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
   /** hält die Tabelle zurück, bis `release()` gerufen wird */
   async function holdTable(page: Page) {
@@ -485,7 +569,7 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     await expect(pending).toBeVisible();
     await expect(pending).toHaveText("Wegzeiten werden geladen …");
     await expect(offers(page)).toHaveCount(0);
-    await expect(page.locator("p.status[role=status]")).toHaveCSS("visibility", "hidden");
+    await expectStatusHidden(page);
     // kein Hinweis „wirkt nicht“ während des Ladens
     await expect(page.getByText(/wirkt|braucht einen Startpunkt/)).toHaveCount(0);
     release();
@@ -505,7 +589,7 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     await expect(pending).toHaveText("Wegzeiten werden geladen …");
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toHaveCount(0);
     await expect(offers(page)).toHaveCount(0);
-    await expect(page.locator("p.status[role=status]")).toHaveCSS("visibility", "hidden");
+    await expectStatusHidden(page);
     await expect(page.getByText(/wirkt|braucht einen Startpunkt/)).toHaveCount(0);
     release();
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();

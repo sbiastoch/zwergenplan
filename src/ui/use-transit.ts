@@ -5,7 +5,7 @@
  * Der Startpunkt geht nur in `resolveReach` ein, nie in den Ladezustand.
  */
 import { useCallback, useEffect, useMemo, useReducer } from "react";
-import { loadTransit } from "../data/transit.ts";
+import { type ChunkOutcome, loadTransit } from "../data/transit.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
 import type { TransitSource, TransitTable, TransitTableFile } from "../domain/transit-types.ts";
 
@@ -35,45 +35,60 @@ export type ReachMode =
   | { kind: "luftlinie"; reason: "fehler" | "ausserhalb" };
 
 /**
- * `attempt` zählt die Ladeversuche (nur die Antwort des laufenden zählt), `chunkFailures` die gescheiterten
- * Importe der Rechenlogik: ab dem zweiten heißt es „Seite neu laden“ (M8).
+ * `attempt` zählt die Ladeversuche; nur die Antwort des laufenden zählt. `retry`: Der laufende Versuch kommt vom
+ * Knopf „Nochmal laden“, nicht vom Öffnen eines Sheets oder der Karte. Nur dann darf die Seite neu laden (N1,
+ * Arch-Review zur Nacharbeit 0009, Befund 1).
  */
-type Counters = { attempt: number; chunkFailures: number };
 export type TransitState =
-  | ({ kind: "aus" | "laedt" | "fehler" } & Counters)
-  | ({ kind: "bereit"; file: TransitTableFile; logic: TransitLogic } & Counters);
+  | { kind: "aus" | "fehler"; attempt: number }
+  | { kind: "laedt"; attempt: number; retry: boolean }
+  | { kind: "bereit"; file: TransitTableFile; logic: TransitLogic; attempt: number };
 
 export type TransitAction =
-  | { type: "want" }
+  /** `retry`: „Nochmal laden“ (N1) */
+  | { type: "want"; retry?: true }
   | { type: "loaded"; attempt: number; file: TransitTableFile; logic: TransitLogic }
-  | { type: "failed"; attempt: number; chunk: boolean }
+  | { type: "failed"; attempt: number }
   /** Tabelle geladen, passt aber nicht zu den Orten der Seite (alte `wegzeit.json`, E8): wie ein Fehlschlag */
   | { type: "stale"; attempt: number };
 
 /** Mit gespeichertem Stadtteil lädt die Tabelle gleich beim Start (E9, Auslöser 1). */
 export function initialTransitState(storedDistrict: boolean): TransitState {
-  return { kind: storedDistrict ? "laedt" : "aus", attempt: storedDistrict ? 1 : 0, chunkFailures: 0 };
+  return storedDistrict ? { kind: "laedt", attempt: 1, retry: false } : { kind: "aus", attempt: 0 };
 }
 
 export function transitReducer(state: TransitState, action: TransitAction): TransitState {
-  const { attempt, chunkFailures } = state;
+  const { attempt } = state;
   switch (action.type) {
     case "want":
       // nur aus „aus“ oder „fehler“; laufend oder fertig bleibt es, wie es ist (höchstens einmal je Sitzung)
       return state.kind === "aus" || state.kind === "fehler"
-        ? { kind: "laedt", attempt: attempt + 1, chunkFailures }
+        ? { kind: "laedt", attempt: attempt + 1, retry: action.retry === true }
         : state;
     case "loaded":
       if (state.kind !== "laedt" || action.attempt !== attempt) return state;
-      return { kind: "bereit", file: action.file, logic: action.logic, attempt, chunkFailures };
+      return { kind: "bereit", file: action.file, logic: action.logic, attempt };
     case "failed":
       if (state.kind !== "laedt" || action.attempt !== attempt) return state;
-      return { kind: "fehler", attempt, chunkFailures: chunkFailures + (action.chunk ? 1 : 0) };
+      return { kind: "fehler", attempt };
     case "stale":
       // erst so wirkt „Nochmal laden“ (want() nur aus „fehler“), Arch-Review 0009, Befund 2
       if (state.kind !== "bereit" || action.attempt !== attempt) return state;
-      return { kind: "fehler", attempt, chunkFailures };
+      return { kind: "fehler", attempt };
   }
+}
+
+/**
+ * Gleich die Seite neu laden (Plan 0009, N1; ersetzt den Knopf „Seite neu laden“ aus M8): Beim Wiederholen
+ * („Nochmal laden“) scheiterte nur der Import der Rechenlogik, die Tabelle kam, das Netz steht also. Chromium behält
+ * einen gescheiterten `import()` in der Module-Map, dort hilft nur noch das Neuladen; WebKit und Firefox holen ihn
+ * neu (whatwg/html#10327) und kommen beim Wiederholen meist gar nicht hierher. Nicht beim ersten Versuch (dann erst
+ * „Nochmal laden“), nicht ohne Tabelle (wohl ohne Netz: ein Neuladen endete auf der Fehlerseite des Browsers), nicht
+ * nach dem Zeitlimit (der Import läuft weiter, der nächste Versuch bekommt ihn). Das Neuladen verliert Standort bzw.
+ * Kartenmitte (nur im Speicher); URL-Filter und gespeicherter Stadtteil bleiben.
+ */
+export function reloadAfterRetry(retry: boolean, load: { chunk: ChunkOutcome; file: unknown }): boolean {
+  return retry && load.chunk === "fehler" && load.file !== undefined;
 }
 
 /**
@@ -120,10 +135,10 @@ export interface TransitApi {
   reach: ReachFn | undefined;
   /** Namensnennung aus `wegzeit.json` (E3), sobald die Tabelle passt */
   source: TransitSource | undefined;
-  /** Rechenlogik zweimal nicht geladen: „Seite neu laden“ statt „Nochmal laden“ (M8) */
-  reloadPage: boolean;
-  /** Auslöser 2–4 aus E9: Kind-Sheet, Karte, „Nochmal laden“ */
+  /** Auslöser 2 und 3 aus E9: Kind-Sheet, Karte */
   want: () => void;
+  /** Auslöser 4 aus E9: „Nochmal laden“; scheitert dabei nur der Chunk, lädt die Seite neu (N1) */
+  retry: () => void;
 }
 
 /**
@@ -133,20 +148,26 @@ export interface TransitApi {
 export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<string> | undefined): TransitApi {
   const [state, dispatch] = useReducer(transitReducer, origin?.source === "stadtteil", initialTransitState);
   const attempt = state.kind === "laedt" ? state.attempt : 0;
+  const retry = state.kind === "laedt" && state.retry;
 
   useEffect(() => {
     if (attempt === 0) return;
     let live = true;
-    // Rechenlogik und Tabelle parallel, ein Zeitlimit für beide; ein Fehlschlag der Logik zählt als Chunk-Fehler
-    // (M8). Ab dem zweiten Versuch („Nochmal laden“) ohne HTTP-Cache.
-    void loadTransit(loadLogic, attempt > 1).then(({ logic, file }) => {
+    // Rechenlogik und Tabelle parallel, ein Zeitlimit für beide. Ab dem zweiten Versuch ohne HTTP-Cache; scheitert
+    // bei „Nochmal laden“ nur der Chunk, lädt die Seite neu (N1).
+    void loadTransit(loadLogic, attempt > 1).then((load) => {
       if (!live) return;
-      dispatch(logic && file ? { type: "loaded", attempt, file, logic } : { type: "failed", attempt, chunk: !logic });
+      if (reloadAfterRetry(retry, load)) {
+        window.location.reload();
+        return;
+      }
+      const { logic, file } = load;
+      dispatch(logic && file ? { type: "loaded", attempt, file, logic } : { type: "failed", attempt });
     });
     return () => {
       live = false;
     };
-  }, [attempt]);
+  }, [attempt, retry]);
 
   const table = useMemo(() => decodeFor(state, placeKeys), [state, placeKeys]);
   // Passt die Tabelle nicht, führt der Reducer das als Fehler; die Anzeige fällt schon jetzt zurück (resolveReach).
@@ -156,5 +177,6 @@ export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<st
   }, [table, loadedAttempt]);
   const { mode, reach } = useMemo(() => resolveReach(state, table, origin), [state, table, origin]);
   const want = useCallback(() => dispatch({ type: "want" }), []);
-  return { mode, reach, source: table?.source, reloadPage: state.chunkFailures >= 2, want };
+  const retryNow = useCallback(() => dispatch({ type: "want", retry: true }), []);
+  return { mode, reach, source: table?.source, want, retry: retryNow };
 }

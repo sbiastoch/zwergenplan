@@ -6,6 +6,7 @@ import {
   decodeFor,
   initialTransitState,
   limitActive,
+  reloadAfterRetry,
   resolveReach,
   type TransitAction,
   type TransitState,
@@ -43,13 +44,13 @@ const ready = (): TransitState => run(initialTransitState(true), { type: "loaded
 
 describe("transitReducer (Plan 0009, E9/E11)", () => {
   it("lädt beim Start nur mit gespeichertem Stadtteil", () => {
-    expect(initialTransitState(false)).toEqual({ kind: "aus", attempt: 0, chunkFailures: 0 });
-    expect(initialTransitState(true)).toEqual({ kind: "laedt", attempt: 1, chunkFailures: 0 });
+    expect(initialTransitState(false)).toEqual({ kind: "aus", attempt: 0 });
+    expect(initialTransitState(true)).toEqual({ kind: "laedt", attempt: 1, retry: false });
   });
 
   it("want() lädt einmal; weitere Auslöser während des Ladens oder danach ändern nichts", () => {
     const loading = transitReducer(initialTransitState(false), { type: "want" });
-    expect(loading).toEqual({ kind: "laedt", attempt: 1, chunkFailures: 0 });
+    expect(loading).toEqual({ kind: "laedt", attempt: 1, retry: false });
     expect(transitReducer(loading, { type: "want" })).toBe(loading);
     const done = transitReducer(loading, { type: "loaded", attempt: 1, file: FILE, logic });
     expect(done.kind).toBe("bereit");
@@ -59,29 +60,45 @@ describe("transitReducer (Plan 0009, E9/E11)", () => {
   it("eine Antwort zählt nur für den laufenden Versuch", () => {
     const loading = run(initialTransitState(false), { type: "want" });
     expect(transitReducer(loading, { type: "loaded", attempt: 7, file: FILE, logic })).toBe(loading);
-    expect(transitReducer(loading, { type: "failed", attempt: 7, chunk: false })).toBe(loading);
+    expect(transitReducer(loading, { type: "failed", attempt: 7 })).toBe(loading);
   });
 
   it("Fehlschlag → fehler; erst das nächste want() lädt neu", () => {
-    const failed = run(initialTransitState(true), { type: "failed", attempt: 1, chunk: false });
-    expect(failed).toEqual({ kind: "fehler", attempt: 1, chunkFailures: 0 });
-    expect(transitReducer(failed, { type: "want" })).toEqual({ kind: "laedt", attempt: 2, chunkFailures: 0 });
+    const failed = run(initialTransitState(true), { type: "failed", attempt: 1 });
+    expect(failed).toEqual({ kind: "fehler", attempt: 1 });
+    expect(transitReducer(failed, { type: "want" })).toEqual({ kind: "laedt", attempt: 2, retry: false });
   });
 
-  it("zählt Fehlschläge des Chunks; ab dem zweiten heißt es „Seite neu laden“ (M8)", () => {
-    const once = run(initialTransitState(true), { type: "failed", attempt: 1, chunk: true });
-    expect(once).toEqual({ kind: "fehler", attempt: 1, chunkFailures: 1 });
-    const twice = run(once, { type: "want" }, { type: "failed", attempt: 2, chunk: true });
-    expect(twice).toEqual({ kind: "fehler", attempt: 2, chunkFailures: 2 });
-    // ein späterer Erfolg setzt nichts zurück, was die Anzeige bräuchte
-    expect(run(twice, { type: "want" }, { type: "loaded", attempt: 3, file: FILE, logic }).kind).toBe("bereit");
+  // Plan 0009, N1 (H1): Chromium behält einen gescheiterten import() in der Module-Map, ein neuer Versuch scheitert
+  // dort sofort. WebKit und Firefox holen ihn neu (whatwg/html#10327). Kam die Tabelle, steht das Netz: Dann hilft
+  // nur noch das Neuladen der Seite, und zwar gleich, statt erst einen Knopf „Seite neu laden“ anzubieten.
+  it("lädt die Seite neu, wenn beim Wiederholen nur der Chunk scheitert (N1)", () => {
+    expect(reloadAfterRetry(true, { chunk: "fehler", file: FILE })).toBe(true);
+    // erster Versuch: erst „Nochmal laden“ anbieten, WebKit/Firefox schaffen es dann ohne Neuladen
+    expect(reloadAfterRetry(false, { chunk: "fehler", file: FILE })).toBe(false);
+    // Tabelle auch weg: wohl kein Netz, ein Neuladen endete auf der Fehlerseite des Browsers
+    expect(reloadAfterRetry(true, { chunk: "fehler", file: undefined })).toBe(false);
+    // Zeitlimit ist kein Fehlschlag: Der Import läuft weiter, der nächste Versuch bekommt ihn
+    expect(reloadAfterRetry(true, { chunk: "zeitlimit", file: FILE })).toBe(false);
+    expect(reloadAfterRetry(true, { chunk: "ok", file: FILE })).toBe(false);
+  });
+
+  // N1, Arch-Review zur Nacharbeit, Befund 1: Öffnet jemand nach einem Fehler das Kind-Sheet oder die Karte, ist das
+  // kein „Nochmal laden“; die Seite darf darunter nicht neu laden.
+  it("merkt sich, ob der Versuch von „Nochmal laden“ kommt", () => {
+    const failed = run(initialTransitState(true), { type: "failed", attempt: 1 });
+    expect(transitReducer(failed, { type: "want" })).toEqual({ kind: "laedt", attempt: 2, retry: false });
+    expect(transitReducer(failed, { type: "want", retry: true })).toEqual({ kind: "laedt", attempt: 2, retry: true });
+    // ein laufender Versuch bleibt, wie er ist, auch beim Tipp auf „Nochmal laden“
+    const loading = transitReducer(failed, { type: "want" });
+    expect(transitReducer(loading, { type: "want", retry: true })).toBe(loading);
   });
 
   // Arch-Review 0009, Befund 2: Sonst bliebe der Reducer „bereit“ und want() wirkungslos.
   it("veraltete Tabelle → fehler; „Nochmal laden“ lädt neu", () => {
     const stale = transitReducer(ready(), { type: "stale", attempt: 1 });
-    expect(stale).toEqual({ kind: "fehler", attempt: 1, chunkFailures: 0 });
-    expect(transitReducer(stale, { type: "want" })).toEqual({ kind: "laedt", attempt: 2, chunkFailures: 0 });
+    expect(stale).toEqual({ kind: "fehler", attempt: 1 });
+    expect(transitReducer(stale, { type: "want" })).toEqual({ kind: "laedt", attempt: 2, retry: false });
   });
 
   it("„veraltet“ zählt nur für die fertige Tabelle des laufenden Versuchs", () => {
@@ -109,7 +126,7 @@ describe("resolveReach: Modus je Lage (E11)", () => {
   });
 
   it("fehler → Luftlinie", () => {
-    const failed = run(initialTransitState(true), { type: "failed", attempt: 1, chunk: false });
+    const failed = run(initialTransitState(true), { type: "failed", attempt: 1 });
     const { mode, reach } = resolveReach(failed, undefined, GOSTENHOF);
     expect(mode).toEqual({ kind: "luftlinie", reason: "fehler" });
     expect(reach?.(BEISPIELHOF).kind).toBe("luftlinie");

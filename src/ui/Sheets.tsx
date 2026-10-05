@@ -3,7 +3,7 @@
  * Kind-Sheet: KidSheet.tsx.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
-import type { ReactNode } from "react";
+import { type ReactNode, type RefObject, useRef } from "react";
 import { EMPTY_FILTER, type FilterState, FORMATS, toggleIn, withReachLimit } from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
@@ -35,28 +35,36 @@ const REACH_CHIPS: [ReachLimit | undefined, string][] = [
   }),
 ];
 
+/** `LimitAction` für ein Fokus-Ziel: Statuszeile (App) bzw. Überschrift „Wegzeit“ (Filter-Sheet), N2 */
+export type LimitActionFor = (focusTarget: RefObject<HTMLElement | null>) => ReactNode;
+
 /**
  * Knopf zur Begründung, warum die Wegzeit-Grenze nicht wirkt (E11): ohne Startpunkt oder außerhalb „Startpunkt
- * wählen“, bei Fehler „Nochmal laden“ (`want()`), nach zwei gescheiterten Chunks „Seite neu laden“ (M8).
+ * wählen“, bei Fehler „Nochmal laden“ (`want()`; scheitert dabei nur der Chunk, lädt die Seite neu, N1).
+ * „Nochmal laden“ verschwindet mit dem Ladezustand: Vorher geht der Fokus auf `focusTarget`, sonst fiele er auf
+ * `<body>` (Plan 0009, N2).
  */
 export function LimitAction({
   mode,
-  reloadPage,
+  focusTarget,
   onPickOrigin,
   onRetry,
 }: {
   mode: ReachMode | undefined;
-  reloadPage: boolean;
+  /** bleibt beim Laden sichtbar und fokussierbar (`tabIndex={-1}`) */
+  focusTarget: RefObject<HTMLElement | null>;
   onPickOrigin: () => void;
   onRetry: () => void;
 }) {
   if (mode?.kind === "oepnv" || mode?.kind === "laedt") return null;
   const failed = mode?.reason === "fehler";
-  // Die URL behält den Filter.
-  const onClick = !failed ? onPickOrigin : reloadPage ? () => window.location.reload() : onRetry;
+  const retry = () => {
+    focusTarget.current?.focus();
+    onRetry();
+  };
   return (
-    <button type="button" className="linkbtn" onClick={onClick}>
-      {!failed ? "Startpunkt wählen" : reloadPage ? "Seite neu laden" : "Nochmal laden"}
+    <button type="button" className="linkbtn" onClick={failed ? retry : onPickOrigin}>
+      {failed ? "Nochmal laden" : "Startpunkt wählen"}
     </button>
   );
 }
@@ -94,10 +102,11 @@ export function FilterSheet({
   resultCount: number;
   /** nur mit Wegzeit sind die Grenzen bedienbar; sonst steht die Begründung darunter (E11, M6) */
   mode: ReachMode | undefined;
-  /** Knopf zur Begründung (`LimitAction`) */
-  limitAction: ReactNode;
+  /** Knopf zur Begründung (`LimitAction`), Fokus-Ziel ist die Überschrift „Wegzeit“ (N2) */
+  limitAction: LimitActionFor;
   onClose: () => void;
 }) {
+  const reachHeading = useRef<HTMLHeadingElement>(null);
   const reason = limitReason(mode);
   /** Einfachwahl auf einer Listen-Dimension: „Egal“ = leere Liste */
   const single = <T extends string>(selected: readonly T[], value: T | undefined) =>
@@ -153,7 +162,9 @@ export function FilterSheet({
             </Chip>
           ))}
         </div>
-        <h3>Wegzeit</h3>
+        <h3 ref={reachHeading} tabIndex={-1}>
+          Wegzeit
+        </h3>
         <div className="wrap">
           {REACH_CHIPS.map(([limit, label]) => (
             <Chip
@@ -170,7 +181,7 @@ export function FilterSheet({
         {reason && (
           <p className="small origin-need">
             {reason}
-            {limitAction}
+            {limitAction(reachHeading)}
           </p>
         )}
       </div>

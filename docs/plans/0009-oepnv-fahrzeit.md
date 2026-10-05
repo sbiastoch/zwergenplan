@@ -888,3 +888,108 @@ Branch `oepnv-0009-int`, Commits `3a9737d` … (dieser Abschnitt). Domänen- und
 - **H8 – LCP:** Mit `?wegzeit=20` liegt es unter Drosselung bei 2,45 s, knapp unter 2,5 s, weil die Liste auf die Tabelle wartet.
 
 **Nicht prüfbar (Gerät):** „Nochmal laden“ nach einer veralteten `wegzeit.json` mit echtem HTTP-Cache und die Stichproben im VGN-Portal von Hand.
+
+## Nacharbeit zu den Hinweisen H1–H8 (2026-10-05)
+
+Bewertung der Hinweise aus „Browser-Review live“. Kleine Fixes, je test-first. H3, H4 und H8 wandern nach `docs/ideas.md`.
+
+### N1 – H1: Nach einem Funkloch reicht ein Tipp (ersetzt M8)
+- **Befund:** Chromium merkt sich einen gescheiterten `import()` in der Module-Map. „Nochmal laden“ scheitert dort beim Chunk sofort ein zweites Mal, erst dann kam „Seite neu laden“. WebKit und Firefox holen einen gescheiterten Import neu (whatwg/html#10327). Das passt zur Beobachtung im Browser-Review: WebKit lädt nach „Nochmal laden“ sofort.
+- **Entscheidung:**
+  - Der Knopf heißt immer „Nochmal laden“. Den Knopf „Seite neu laden“ der Wegzeit gibt es nicht mehr, ebenso wenig den Zähler `chunkFailures` (M8).
+  - Scheitert **beim Wiederholen über „Nochmal laden“** nur der Chunk, während die Tabelle ankommt (das Netz steht also), lädt die Seite gleich neu (`reloadAfterRetry`, `use-transit.ts`). Der Reducer merkt sich dafür im Zustand `laedt` das Flag `retry`. Nur `TransitApi.retry()` setzt es (der Knopf), `want()` setzt es nicht (Kind-Sheet, Karte). Damit reicht in jedem Browser ein Tipp. WebKit und Firefox kommen meist gar nicht so weit und behalten Standort bzw. Kartenmitte.
+  - **Nicht neu laden:**
+    - beim ersten Versuch;
+    - ohne Tabelle: wohl kein Netz, ein Neuladen endete auf der Fehlerseite des Browsers, denn es gibt keinen Service Worker;
+    - nach dem Zeitlimit: Der Import ist dann nicht gescheitert, er läuft noch, und ein neuer Versuch bekommt ihn. `loadTransit` meldet dafür `chunk: "ok" | "fehler" | "zeitlimit"`.
+  - Ein Chunk, der nach einem Deploy nicht mehr existiert (alter Hash, 404), läuft auf denselben Weg. Das Neuladen holt das neue `index.html`.
+- **Verworfen:**
+  - **sofort „Seite neu laden“ nach dem ersten Chunk-Fehler** (erster Entwurf): verschlechtert iOS. Dort gibt es nur WebKit, ein Neuladen wäre nötig statt eines erfolgreichen Wiederholens, und der Standort ginge verloren (Plan-Review, Befund 3).
+  - **Import mit Cache-Buster:** bräuchte die gehashte Chunk-URL zur Laufzeit (`import(/* @vite-ignore */ url + "?r=2")`). Vites Preload-Helfer und die Lazy-Regeln (`transit-entry-only`, `lazy-loader-static`) fielen weg, dazu käme eine zweite Modulinstanz.
+- **Kosten:** Ein Neuladen verliert Standort bzw. Kartenmitte, die nur im Speicher leben (Privatsphäre-Invariante). URL-Filter und gespeicherter Stadtteil bleiben.
+- **Karte (`Lazy.tsx`):** bleibt bei „Nochmal versuchen“, dann „Seite neu laden“. Dort scheitern auch CSS oder WebGL, und ein Wiederholen kann gelingen. Der Weg hier wäre übertragbar, notiert in `docs/ideas.md`.
+- **Tests:**
+  - `src/data/transit.test.ts`: Ausgang des Chunks, Zeitlimit ≠ Fehlschlag.
+  - `use-transit.test.ts`: `reloadAfterRetry`.
+  - `e2e/startpunkt.spec.ts`:
+    - Chunk blockiert, Tabelle kommt: „Nochmal laden“ lädt die Seite neu.
+    - Danach ist der Chunk frei: Ein Tipp bringt die Minuten, „Seite neu laden“ erscheint nie.
+    - Ohne Netz: kein Neuladen.
+    - Chunk blockiert, danach öffnet jemand das Kind-Sheet: kein Neuladen, das Sheet bleibt offen.
+
+### N2 – H2: Fokus nach „Nochmal laden“
+- **Befund:** Der Knopf verschwindet mit dem Ladezustand, und der Fokus fällt auf `<body>`. Das gilt für den Statuszeilen-Hinweis und für das Filter-Sheet.
+- **Entscheidung:** `LimitAction` bekommt ein `focusTarget` (Ref). Beim Tipp auf „Nochmal laden“ geht der Fokus dorthin, bevor der Knopf verschwindet.
+  - **Unter der Statuszeile** ist das Ziel die Statuszeile selbst (`p[role=status]`, `tabIndex=-1`). Dort erscheint auch das Ergebnis.
+    - Damit sie beim Laden fokussierbar bleibt, blendet `.status.pending` nur noch ihre **Kinder** aus (`visibility: hidden`), nicht sie selbst (Plan-Review, Befund 1: ein Blocker).
+    - Die Live-Region schweigt weiter, denn ausgeblendete Kinder fehlen im Barrierefreiheitsbaum.
+    - Ein Screenreader kann den Inhalt beim Fokus und danach in der Live-Ansage doppelt lesen. Das ist vertretbar.
+  - **Im Filter-Sheet** ist das Ziel die Überschrift „Wegzeit“ (`tabIndex=-1`). Sie steht direkt vor den Chips, die nach dem Laden bedienbar werden.
+  - `App` erzeugt `limitAction` dafür als Funktion des Ziels (`LimitActionFor`). `FilterSheet` übergibt seine Überschrift.
+- **Tests:** E2E in `startpunkt.spec.ts`. Nach „Nochmal laden“ hat die Statuszeile den Fokus, beim Laden und danach. Im Filter-Sheet hat ihn die Überschrift „Wegzeit“.
+
+### N3 – H5: Kind-Sheet sagt „außerhalb“
+- **Entscheidung:** `OriginPicker` bekommt den `ReachMode`. Die Textwahl ist die reine Funktion `originHint` in `format.ts`.
+  - Bei `luftlinie/ausserhalb` steht statt „Wegzeit ab deinem Standort …“ der Hinweis (Klasse `hint bad`): „Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil.“ Das gilt für Standort und Kartenmitte. Der erste Satz ist die Begründung aus dem Filter-Sheet (`limitReason`). Er steht schon im Startbundle und kostet gzip fast nichts. Eigene Sätze je Startpunkt hätten das Budget gesprengt (siehe „Budget“). Für die Kartenmitte zeigt das Sheet sonst keinen Hinweis.
+  - Bei `luftlinie/fehler` sagt der Standort-Hinweis „Entfernung ab deinem Standort …“ statt „Wegzeit …“ (Plan-Review, Befund 7).
+  - **Zwei Grenzen, zwei Wörter:** Liegt der Standort außerhalb von `NUERNBERG_BBOX` (Großraum mit Fürth und Erlangen), gibt es gar keinen Startpunkt. Der Text heißt dann „außerhalb des Großraums Nürnberg“ (vorher „außerhalb von Nürnberg“), ebenso bei der Kartenmitte. „Stadtgebiet“ bleibt der Grenze der Wegzeit vorbehalten.
+- **Tests:**
+  - `format.test.ts`: `originHint` für Problem, Stadtteil sowie Standort und Kartenmitte × außerhalb, Fehler, Laden, Wegzeit.
+  - E2E „Außerhalb des Stadtgebiets“ prüft den Text im Kind-Sheet.
+  - Die Ansicht `kind-sheet-ausserhalb` läuft in `mobile-ux.spec.ts` durch `expectMobileUx`.
+
+### N4 – H6: Lizenz-Link bricht nicht um
+- **Entscheidung:**
+  - Ein `NotePart`-Link kann `nowrap: true` tragen. `transitSourceNote` setzt das nur für die Lizenz und nur bis 20 Zeichen (`NOWRAP_MAX`). „CC BY-SA 3.0 DE“ hat 15 Zeichen, das sind bei 320 px und 200 % etwa 230 von 288 px.
+  - Eine längere Bezeichnung aus `wegzeit.json` darf umbrechen, denn das Gate sieht nur Fixture-Daten (Plan-Review, Befund 8).
+  - Der Titel-Link bleibt umbrechbar.
+  - CSS: `.source-note a.nowrap { white-space: nowrap }`.
+- **Tests:**
+  - `format.test.ts`: nur die kurze Lizenz trägt `nowrap`, eine lange nicht.
+  - E2E: Der Lizenz-Link hat `white-space: nowrap`, der Titel-Link `normal`.
+
+### N5 – H7: Text-Gate, Rundung im gescrollten Sheet
+- **Befund:** Die E3-Ausnahme übergeht nur Zeilen, die die Ober- bzw. Unterkante des Scrollbereichs **kreuzen**. Eine ganz sichtbare Zeile knapp unter der Oberkante eines gescrollten Bereichs kann trotzdem in der Rundung des umschließenden `dialog.dlg` liegen. Das ist normales Scrollen, aber das Gate meldet es (WebKit, Kind-Sheet, 100 %).
+- **Entscheidung (Präzisierung von E3, Plan 0008):** In Scroll-Containern wird jede Zeile dort geprüft, wo das Layout sie hinlegt, nicht wo das Scrollen sie gerade hat.
+  - Für die oberen Ecken zählt die Lage bei `scrollTop = 0`. Die Zeile wird um die Summe der `scrollTop` aller Scroll-Container zwischen Text und gerundetem Kasten nach unten versetzt, den Kasten eingeschlossen.
+  - Für die unteren Ecken zählt die Lage am Ende. Die Zeile wird um die Summe der Reste `scrollHeight − clientHeight − scrollTop` nach oben versetzt.
+  - Text in einem `position: sticky`-Element wird an seiner tatsächlichen Lage geprüft (z. B. `.dhead`).
+  - Ohne scrollbaren Bereich ist das die bisherige Prüfung. Die alte Ausnahme („kreuzt die Kante, und es ist gescrollt bzw. es folgt Inhalt“) geht darin auf und entfällt.
+  - Neu geprüft werden auch Zeilen an der Unterkante eines ungescrollten, scrollbaren Bereichs, nämlich in ihrer Endlage (bisher übersprungen).
+  - **Strenger als bisher:** Text, den das Layout in die Ecke legt, bleibt auch im gescrollten Zustand rot. Bisher war er grün, sobald er die Kante kreuzte.
+- **Kanarienvögel (`mobile-ux.spec.ts`):**
+  - grün: Filter-Sheet so gescrollt, dass eine Überschrift ganz sichtbar in der oberen linken Rundung des Dialogs steht. Vor dem Fix muss der Test rot sein (Reproduktion von H7 in Chromium).
+  - rot: der bestehende Fall „Filter“ ohne Innenabstand in der Ecke, zusätzlich um 4 px gescrollt (alte Regel: grün).
+  - Die bestehenden Kanarienvögel bleiben unverändert grün bzw. rot.
+- `docs/architecture.md`, Abschnitt Mobile-UX-Gates (E3), bekommt die neue Formulierung.
+
+### Notiert statt umgesetzt
+- **H3** (fokussierter Eintrag der Orts-Liste rutscht beim Umsortieren weg): Das ist die bewusste Lücke aus E11 und kommt nach `docs/ideas.md`.
+- **H4** (Stichproben unter VGN): Nachprüfung am VGN-Portal von Hand, Tür zu Tür, landet in `docs/ideas.md`. Am Modell ändert sich ohne Befund nichts.
+- **H8** (LCP 2,45 s mit `?wegzeit=20` unter Drosselung): Das Gate (< 2,5 s) ist grün. Spielraum gäbe es mit einem Preload der Tabelle bei gespeichertem Stadtteil im Bootstrap; das berührt aber die Bootstrap-Regel (genau zwei Inline-Skripte). Das kommt nach `docs/ideas.md`.
+
+### Plan-Review (2026-10-05, plan-reviewer) – Verdict: Blocker → eingearbeitet
+1. **Blocker (N2):** Das Fokus-Ziel `p[role=status]` war beim Laden selbst `visibility: hidden` (`.status.pending`) und damit nicht fokussierbar. → Nur die Kinder werden ausgeblendet. Der Test prüft den Fokus beim Laden und danach.
+2. **Major (N1):** Ein Zeitlimit ist kein Fehlschlag. → `chunk: "ok" | "fehler" | "zeitlimit"`, nur `fehler` zählt.
+3. **Major (N1):** WebKit und Firefox laden einen gescheiterten Import neu (whatwg/html#10327). Sofort „Seite neu laden“ hätte iOS verschlechtert. → Variante a: bei „Nochmal laden“ bleiben, beim Wiederholen mit Tabelle und gescheitertem Chunk gleich neu laden. Die Begründung in Plan und Code ist korrigiert.
+4. **Minor (N1):** „Seite neu laden“ ohne Netz endet auf der Fehlerseite des Browsers. → Ohne Tabelle wird nie neu geladen, dafür gibt es einen E2E-Test.
+5. **Minor (N5):** Bisher zählte nur der nächste Scroll-Container. → Die Versätze werden summiert, der Kasten ist eingeschlossen, `sticky` ausgenommen.
+6. **Minor (N5):** Die Formulierung „ohne Scrollen ist das die bisherige Prüfung“ war ungenau. → Sie lautet jetzt „ohne scrollbaren Bereich“, die neue Prüfung an der Unterkante ist genannt.
+7. **Minor (N3):** Zwei Wörter für zwei Grenzen, dazu die Lücke bei `fehler`. → Großraum und Stadtgebiet sind getrennt benannt, bei `fehler` heißt es „Entfernung ab deinem Standort“.
+8. **Minor (N4):** `nowrap` hing an einem Text aus den Daten. → Gilt nur bis 20 Zeichen, mit Test.
+9. **Minor (N2):** Die mögliche doppelte Ansage ist im Plan vermerkt.
+
+### Arch-Review (2026-10-05, arch-reviewer) – Verdict: Nacharbeit nötig → eingearbeitet
+1. **Major (N1):** Das Neuladen hing an jedem `want()` aus „fehler“, also auch am Öffnen von Kind-Sheet oder Karte. In Chromium hätte die Seite unter einem offenen Sheet neu geladen. → Der Wiederholversuch steht ausdrücklich im Zustand (`laedt.retry`), nur `retry()` („Nochmal laden“) setzt ihn. Dazu ein Unit-Test im Reducer und ein E2E-Test: Kind-Sheet nach Chunk-Fehler lädt nicht neu.
+2. **Minor (N3):** Die Textwahl lag in der Komponente, und zwei Zweige waren ungetestet. → `originHint` liegt jetzt in `format.ts`, mit Unit-Tests für alle Kombinationen.
+3. **Minor:** Die Konsolen-Lockerung für `wegzeit.json` galt für den ganzen `describe`-Block. → Der Test „ohne Netz“ hat einen eigenen `describe` mit eigenem Opt-in.
+4. **Minor:** Der Kommentarblock des Text-Gates war schlecht umbrochen. → Er ist neu umbrochen.
+
+Gefunden mit dem vollen `pnpm check`: Die M7-Tests prüften `visibility: hidden` am `p.status` selbst. Nach N2 liegt das auf den Kindern. → Der Helfer `expectStatusHidden` prüft: Die Zeile ist sichtbar, alle Kinder sind unsichtbar, es gibt keinen nackten Textknoten.
+
+### Budget
+- **Messung:** Start-JS laut size-limit 90,09 kB gegenüber 89,80 kB auf main. Das Budget von 90 kB ist um 95 B überschritten.
+  - Im gebauten Chunk (gzip -9) kommen rund 300 B hinzu: Neuladen nach dem Wiederholen samt Retry-Flag, Fokus-Ziele, `originHint`, `nowrap`.
+  - Den „außerhalb“-Hinweis aus `limitReason` wiederzuverwenden hat 36 B gebracht.
+  - Weiteres Kürzen hätte Review-Fixes zurückgedreht.
+- **Entscheidung:** Das Budget bleibt, wie es ist. Die Nacharbeit geht erst nach main, wenn Plan 0010, Paket 0 (Chunk-Wächter, Merklisten-ICS lazy …) Platz geschaffen hat. Dafür wird der Branch auf den neuen Stand gesetzt. Paket 0 muss deshalb gegenüber 89,80 kB zusätzlich etwa 0,3 kB für diese Nacharbeit sparen.

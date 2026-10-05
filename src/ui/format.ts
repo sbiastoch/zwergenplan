@@ -2,6 +2,7 @@
  * Texte der Oberfläche aus Domänenwerten. Keine Geschäftslogik: Welcher Termin zählt, ob etwas
  * passt oder wöchentlich ist, entscheidet src/domain. Kalendertage sind Berliner Tage (ISO-Strings).
  */
+import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
 import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
@@ -242,6 +243,39 @@ export function reachNote(mode: ReachMode, origin: Origin): string {
   return `Entfernung als Luftlinie ${from} – ${mode.reason === "fehler" ? "Wegzeiten gerade nicht verfügbar" : "außerhalb des Stadtgebiets"}.`;
 }
 
+/** Hinweise im Kind-Sheet, Abschnitt „Wegzeit ab“ (OriginPicker.tsx; Plan 0004, E5; Plan 0009, N3) */
+const UNAVAILABLE = "Standort gerade nicht verfügbar. Wähle stattdessen einen Stadtteil.";
+const PROBLEMS: Record<PositionProblem, string> = {
+  denied: "Standort nicht freigegeben. Wähle stattdessen einen Stadtteil.",
+  unavailable: UNAVAILABLE,
+  timeout: UNAVAILABLE,
+  // NUERNBERG_BBOX, also der Großraum; nicht zu verwechseln mit dem Stadtgebiet der Wegzeit (N3)
+  outside: "Dein Standort liegt außerhalb des Großraums Nürnberg. Wähle einen Stadtteil.",
+  // Ohne API erscheint der Knopf gar nicht; der Text ist nur die Rückfallebene.
+  unsupported: UNAVAILABLE,
+};
+
+/**
+ * Hinweis unter der Auswahl: Problem der Standortabfrage, sonst was ab dem Startpunkt gilt. Das Sheet sagt
+ * „außerhalb“ selbst, nicht erst die Statuszeile, und verspricht ohne Tabelle keine Wegzeit (N3).
+ */
+export function originHint(
+  problem: PositionProblem | undefined,
+  origin: Origin | undefined,
+  mode: ReachMode | undefined,
+): { cls: string; text: string } | undefined {
+  if (problem) return { cls: "hint bad", text: PROBLEMS[problem] };
+  if (!origin || origin.source === "stadtteil") return undefined;
+  // Standort oder Kartenmitte außerhalb des Stadtgebiets: dieselbe Begründung wie im Filter-Sheet (Text schon im
+  // Startbundle, Plan 0009, N3)
+  if (mode?.kind === "luftlinie" && mode.reason === "ausserhalb") {
+    return { cls: "hint bad", text: `${limitReason(mode)} Wähle einen Stadtteil.` };
+  }
+  if (origin.source !== "standort") return undefined;
+  const what = mode?.kind === "luftlinie" ? "Entfernung" : "Wegzeit";
+  return { cls: "hint ok", text: `${what} ab deinem Standort (auf ca. 100 m gerundet).` };
+}
+
 /** „bis 30 Min.“ */
 export function reachLimitLabel(limit: ReachLimit): string {
   return `bis ${limit.value} Min.`;
@@ -269,12 +303,18 @@ export function limitHint(limit: ReachLimit, mode: ReachMode | undefined): strin
     : `${label} wirkt nicht: Startpunkt außerhalb des Stadtgebiets.`;
 }
 
-/** Fließtext mit Links (Quellenhinweis) */
-type NotePart = string | { text: string; href: string };
+/** Fließtext mit Links; `nowrap`: kurzer Link, der nie umbricht (N4, H6) */
+type NotePart = string | { text: string; href: string; nowrap?: true };
 
+/** längster Link-Text ohne Umbruch: „CC BY-SA 3.0 DE“ hat 15 Zeichen, 20 passen bei 320 px/200 % noch (N4) */
+const NOWRAP_MAX = 20;
 const VGN = "VGN – Verkehrsverbund Großraum Nürnberg GmbH";
 const VGN_URL = "https://www.vgn.de/web-entwickler/open-data/";
-const LICENSE = { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/" };
+const LICENSE: NotePart = {
+  text: "CC BY-SA 3.0 DE",
+  href: "https://creativecommons.org/licenses/by-sa/3.0/de/",
+  nowrap: true,
+};
 
 /**
  * Quellenhinweis im Kind-Sheet nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (E3): Rechteinhaber, Titel mit Stand (Link
@@ -289,7 +329,8 @@ export function transitSourceNote(source: TransitSource | undefined): NotePart[]
     `${lead}${source.attribution}, ‚`,
     { text: source.title, href: source.url },
     "‘, abgewandelt, Lizenz ",
-    { text: source.license, href: source.licenseUrl },
+    // nur kurze Bezeichnungen: Eine lange aus den Daten muss bei 320 px/200 % umbrechen dürfen (N4)
+    { text: source.license, href: source.licenseUrl, ...(source.license.length <= NOWRAP_MAX ? { nowrap: true } : {}) },
     ".",
   ];
 }

@@ -24,7 +24,16 @@ const browserEnv = (): TransitEnv => ({
 export interface TransitLoad<L> {
   logic: L | undefined;
   file: TransitTableFile | undefined;
+  /**
+   * Ausgang des Imports: `zeitlimit` ist kein Fehlschlag, der Import läuft weiter und ein neuer Versuch kann ihn
+   * noch bekommen (Plan 0009, N1).
+   */
+  chunk: ChunkOutcome;
 }
+
+export type ChunkOutcome = "ok" | "fehler" | "zeitlimit";
+
+type Settled<L> = { value: L | undefined; chunk: Exclude<ChunkOutcome, "zeitlimit"> };
 
 /**
  * Lädt Tabelle und Rechenlogik (`loadLogic`, der Lazy-Chunk aus use-transit.ts) parallel, unter **einem**
@@ -38,7 +47,11 @@ export async function loadTransit<L>(
 ): Promise<TransitLoad<L>> {
   const controller = new AbortController();
   const { signal } = controller;
-  const expired = new Promise<undefined>((resolve) => signal.addEventListener("abort", () => resolve(undefined)));
+  const expired = new Promise<"zeitlimit">((resolve) => signal.addEventListener("abort", () => resolve("zeitlimit")));
+  const logic = loadLogic().then(
+    (value): Settled<L> => ({ value, chunk: "ok" }),
+    (): Settled<L> => ({ value: undefined, chunk: "fehler" }),
+  );
   const timer = setTimeout(() => controller.abort(), env.timeoutMs);
   const table = async (): Promise<TransitTableFile> => {
     const res = await env.fetch(`${import.meta.env.BASE_URL}data/wegzeit.json`, {
@@ -50,11 +63,10 @@ export async function loadTransit<L>(
     return await res.json();
   };
   try {
-    const [logic, file] = await Promise.all([
-      Promise.race([loadLogic().catch(() => undefined), expired]),
-      table().catch(() => undefined),
-    ]);
-    return { logic, file };
+    const [settled, file] = await Promise.all([Promise.race([logic, expired]), table().catch(() => undefined)]);
+    return settled === "zeitlimit"
+      ? { logic: undefined, file, chunk: settled }
+      : { logic: settled.value, file, chunk: settled.chunk };
   } finally {
     clearTimeout(timer);
   }

@@ -162,6 +162,17 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(sheet.getByRole("button", { name: "bis 20 Min." })).toBeDisabled();
     await sheet.getByRole("button", { name: "Nochmal laden" }).scrollIntoViewIfNeeded();
   },
+  // Standort außerhalb des Stadtgebiets im Kind-Sheet: Hinweis statt „Wegzeit ab deinem Standort“ (N3, H5)
+  "kind-sheet-ausserhalb": async (page) => {
+    await page.context().grantPermissions(["geolocation"]);
+    await page.context().setGeolocation({ latitude: 49.4, longitude: 11.2 });
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
+    await expect(
+      kid.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil."),
+    ).toBeVisible();
+  },
   // Standort außerhalb des Stadtgebiets: Begründung mit „Startpunkt wählen“ (E11, m16)
   "filter-sheet-wegzeit-ausserhalb": async (page) => {
     await page.context().grantPermissions(["geolocation"]);
@@ -375,6 +386,63 @@ test("Text-Gate übergeht halb hinausgescrollte Überschriften im Sheet", async 
   });
   expect(crossing, "„Kosten“ kreuzt die Oberkante des Scrollbereichs").toBe(true);
   await expectTextFits(page, { scale: 2 });
+});
+
+/** Filter-Sheet bei 320 px und 200 %: Der Scrollbereich ist sicher länger als sichtbar. */
+async function filterSheetAt320(page: Page) {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await ready(page);
+  await page.getByRole("button", { name: /^Alle Filter/ }).click();
+  await expect(page.getByRole("dialog", { name: "Filter" })).toBeVisible();
+  await setTextScale(page, 2);
+}
+
+// Plan 0009, N5 (H7): Eine ganz sichtbare Zeile knapp unter der Oberkante eines gescrollten Bereichs liegt in der
+// Rundung des Dialogs, weil gescrollt ist. Geprüft wird die Lage bei `scrollTop = 0`, dort liegt sie weit unten.
+test("Text-Gate übergeht Zeilen, die erst das Scrollen in die Rundung des Sheets schiebt", async ({ page }) => {
+  await filterSheetAt320(page);
+  // 8 px Innenabstand statt 16: Die Zeile liegt dann eindeutig im Eckbereich (Radius 28 px), nicht auf der Kante.
+  // In Ruhe hält Griff plus Innenabstand oben „Filter“ unter der Rundung.
+  await page.addStyleTag({ content: ".sheet-scroll { padding-inline: 8px !important }" });
+  const inCorner = await page.evaluate(() => {
+    const el = document.querySelector<HTMLElement>("dialog[open] .sheet-scroll");
+    const h = [...document.querySelectorAll("dialog[open] h3")].find((x) => x.textContent?.trim() === "Kosten");
+    const text = h?.firstChild;
+    if (!el || !text) throw new Error("Scrollbereich oder „Kosten“ fehlt");
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    // Textoberkante 0,5 px unter die Oberkante des Bereichs: ganz sichtbar, kreuzt also nichts
+    el.scrollTop += range.getBoundingClientRect().top - el.getBoundingClientRect().top - 0.5;
+    const r = range.getBoundingClientRect();
+    const v = el.getBoundingClientRect();
+    return el.scrollTop > 0 && r.top >= v.top - 1 && r.left - v.left < 28 && r.top - v.top < 3;
+  });
+  expect(inCorner, "„Kosten“ steht ganz sichtbar in der oberen linken Ecke des gescrollten Bereichs").toBe(true);
+  await expectTextFits(page, { scale: 2 });
+});
+
+// Gegenstück (N5): Liegt der Text schon in Ruhe in der Rundung, bleibt er rot, auch wenn gescrollt ist. Die alte
+// E3-Ausnahme übersah ihn, sobald er die Oberkante kreuzte.
+test("Text-Gate erkennt Text in der Rundung auch im gescrollten Sheet", async ({ page }) => {
+  await filterSheetAt320(page);
+  await page.addStyleTag({ content: ".sheet-scroll { padding: 0 !important } .sheet .grab { display: none }" });
+  const crossing = await page.evaluate(() => {
+    const el = document.querySelector<HTMLElement>("dialog[open] .sheet-scroll");
+    const text = document.querySelector("dialog[open] h2")?.firstChild;
+    if (!el || !text) throw new Error("Scrollbereich oder „Filter“ fehlt");
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    // Textoberkante 4 px über die Oberkante des Bereichs: Die Zeile kreuzt sie, ist aber noch zu sehen
+    el.scrollTop += range.getBoundingClientRect().top - el.getBoundingClientRect().top + 4;
+    const r = range.getBoundingClientRect();
+    const top = el.getBoundingClientRect().top;
+    return el.scrollTop > 0 && r.top < top - 1 && top < r.bottom;
+  });
+  expect(crossing, "„Filter“ kreuzt die Oberkante des gescrollten Bereichs").toBe(true);
+  await expect(expectTextFits(page, { scale: 2 })).rejects.toThrow(
+    /Text stößt an die Rundung von dialog\.dlg: „Filter“/,
+  );
 });
 
 test("Bewegungs-Gate erkennt Transition trotz Reduce", async ({ page }) => {

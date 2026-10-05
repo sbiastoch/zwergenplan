@@ -2,7 +2,7 @@
  * Overlays der App (Plan 0003, E3; ausgelagert mit Plan 0005): Detail, Filter-Sheet, Kind-Sheet als
  * native <dialog>. Das Orts-Sheet gehört zur Karten-Oberfläche (karte/MapScreen.tsx).
  */
-import type { ReactNode, RefObject } from "react";
+import type { RefObject } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import type { FilterState } from "../domain/filter.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -10,7 +10,7 @@ import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
 import { KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
-import { FilterSheet } from "./Sheets.tsx";
+import { FilterSheet, type LimitActionFor } from "./Sheets.tsx";
 import type { OriginApi } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
 
@@ -40,7 +40,7 @@ interface OverlaysProps {
   /** Wegzeit: Modus für die Filtergruppe, Quelle für den Hinweis im Kind-Sheet */
   transit: TransitApi;
   /** Knopf zur Begründung der gesperrten Wegzeit-Grenze (`LimitAction`) */
-  limitAction: ReactNode;
+  limitAction: LimitActionFor;
   /** Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. */
   filterButton: RefObject<HTMLButtonElement | null>;
   /**
@@ -110,6 +110,7 @@ export function Overlays(props: OverlaysProps) {
           onTheme={theme.setChoice}
           today={today}
           origin={originApi}
+          reachMode={transit.mode}
           transitSource={transit.source}
           focusOrigin={sheet === "origin"}
           onClose={() => setSheet(null)}
