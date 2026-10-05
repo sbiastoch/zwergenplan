@@ -1,6 +1,6 @@
 # Plan 0011 – Installierbare App und Push zu neuen Angeboten
 
-Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05); Umsetzung wartet nur noch auf Plan 0010 (Stufe 1). Der Spike (Schritt 0) darf sofort beginnen.
+Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). Stufe 1 wartet auf Plan 0010 (Pakete A/B auf `main`).
 Datum: 2026-10-05
 Bezug:
 - **ADR 0013** (PWA und Service Worker, Entwurf `docs/adr/0013-pwa-service-worker.md`) und **ADR 0014** (Web Push, Entwurf `docs/adr/0014-web-push.md`).
@@ -83,6 +83,35 @@ Stand:
   - (h) ob die Home-Bildschirm-App auf iOS einen eigenen Speicher hat, getrennt von Safari ([WebKit Bug 181849](https://bugs.webkit.org/show_bug.cgi?id=181849)). Dann fehlen dort Geburtsdatum, Merkliste und Stadtteil aus Safari;
   - (i) ob `pushManager.subscribe` nach `await Notification.requestPermission()` auf iOS noch als Nutzeraktion gilt;
   - (j) ob `WindowClient.navigate` und die Option `navigate` in `showNotification` auf iOS wirken.
+
+  Die Antworten stehen unter „Spike-Ergebnis“.
+
+## Spike-Ergebnis (2026-10-05)
+
+Gemessen auf einem iPhone mit iOS 26.5.2 (UA `iPhone OS 18_7 … Version/26.5.2`), Spike-Seite als Home-Bildschirm-App, Wegwerf-Worker auf `workers.dev`, Versand lokal mit `web-push`. Der Code liegt auf dem Branch `spike-push-0011` (`spike/push/`), nicht auf `main`. Seite und Service Worker haben jede Beobachtung in ein Protokoll geschrieben, die Anzeige hat der Nutzer per Screenshot bestätigt, zusätzlich `registration.getNotifications()`.
+
+| Punkt | Ergebnis |
+|---|---|
+| (a) Push nur als Home-Bildschirm-App | **Ja.** Im Safari-Tab gibt es `Notification` gar nicht (`ReferenceError`), `PushManager` schon. Erst die installierte App hat `Notification`, `window.pushManager` und einen Push-Dienst (`web.push.apple.com`). |
+| `event.notification` / `event.data` | `event.notification` ist bei `mutable: true` gesetzt (`Notification` mit `title`, `body`, `tag`, `lang`, `navigate`, `data`). **`event.data` ist `null`.** Die Payload kommt auf iOS also nur über `event.notification`. |
+| (d) Zeit für den Zuschnitt | **≈ 10 s**, dann beendet iOS den Service Worker (Lebenszeichen bis 10,2 s, danach nichts). Der realistische Zuschnitt (`site.json` von zwergenplan.app mit `no-cache`, Geburtsdatum aus IndexedDB, Nachricht anzeigen) brauchte **0,3 s**. |
+| Zeit überschritten | **Gar keine Nachricht**, auch nicht die deklarative. Die nächsten Pushes an das Gerät kamen danach **bis zu 10 Min. verspätet** (Latenz 216 s und 575 s statt 1–5 s). Das Abo blieb gültig (201, keine Entziehung). |
+| (e) Service Worker wirft | Synchron wie asynchron (`waitUntil` mit abgelehntem Promise): iOS zeigt die **deklarative Fassung**. |
+| (f) Ersetzen mit `mutable: true` | **Funktioniert.** `showNotification` im `push`-Handler ersetzt die vorgeschlagene Nachricht, keine Dublette. |
+| (g) `app_badge` | **Wirkt nicht** (Kennzeichen in den Einstellungen an). `navigator.setAppBadge` aus der Seite wirkt. `setAppBadge` im Service Worker kam nie zurück, der Lauf endete ohne Nachricht (wie „Zeit überschritten“). Später zeigte das Icon die Zahl der Mitteilungen (11); ob iOS die selbst setzt, ist offen. |
+| (h) Eigener Speicher der App | **Ja.** Eine in Safari gesetzte Marke (`localStorage` und IndexedDB) fehlt in der App. |
+| (i) `subscribe` nach `await Notification.requestPermission()` | **Funktioniert** (`granted`, Abo angelegt). |
+| (j) Navigation per Tipp | `navigate` der deklarativen Nachricht und die Option `navigate` in `showNotification` öffnen die App mit der jeweiligen URL. **Ohne `navigate` lehnt iOS `showNotification` ab** (`TypeError: … did not include NotificationOptions that specify a valid defaultAction url`), dann erscheint die deklarative Fassung. `notificationclick` wird auf iOS also nicht gebraucht. |
+| `tag` | Nachrichten mit gleichem `tag` **ersetzen sich nicht**, sie stapeln sich. |
+| `Topic`-Header | Apple antwortet auf `topic: "neue-angebote"` (13 Zeichen) und `"spike"` (5) mit **400 `BadWebPushTopic`**, auf `"neueangebote"` (12) mit 201. Apple dekodiert das Topic offenbar als Base64url, die Länge muss ein Vielfaches von 4 sein. |
+| nicht `mutable` | Der Service Worker wird nicht geweckt, die deklarative Nachricht erscheint. |
+
+Folgen, eingearbeitet in E7, E10, E11 und Risiken:
+- Das Zeitlimit im Service Worker ist **Pflicht mit Abstand**: Alles im `push`-Handler endet nach spätestens 5 s, auch ein hängendes Promise. Sonst kostet es die Nachricht und verzögert die nächsten.
+- Kein `setAppBadge` im Service Worker.
+- `navigate` in jedem `showNotification`.
+- Topic `neueangebote`.
+- Hinweis „Die App startet leer“ in der Installationshilfe ist fest.
 
 ## Entscheidungen
 
@@ -251,9 +280,10 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
   - **läuft schon als App** (`display-mode: standalone` bzw. `navigator.standalone`): „Läuft als App.“ Ab Stufe 2 steht hier der Push-Schalter.
   - **Browser bietet Installation an** (`beforeinstallprompt` gemerkt): Knopf „Zum Startbildschirm hinzufügen“ (≥ 44 px). Ist das Event verloren gegangen (E5), steht auf Android stattdessen „Im Browser-Menü ‚App installieren‘ wählen“.
   - **iPhone/iPad in Safari:** „Teilen-Symbol → ‚Zum Home-Bildschirm‘“ mit dem Teilen-Symbol als Inline-Icon.
-    - Bestätigt der Spike (h) eigenen Speicher, kommt der Satz dazu: „Die App startet leer: Alter und Merkliste dort noch einmal eintragen.“
+    - Dazu der Satz „Die App startet leer: Alter und Merkliste dort noch einmal eintragen.“ (Spike h: Die Home-Bildschirm-App hat einen eigenen Speicher.)
   - **sonst:** Der Abschnitt ist ausgeblendet.
 - Die Erkennung von iOS steckt in `src/data/pwa.ts` (`navigator.userAgent`, `maxTouchPoints` für iPadOS) und ist als heuristisch dokumentiert. Fällt sie falsch aus, sieht man nur einen Hilfetext.
+  - **Keine Versionsprüfung über den UA.** iOS 26 meldet dort eingefroren `iPhone OS 18_7`, die echte Version steht nur in `Version/26.x` (Spike). Ob Push geht, entscheidet die Feature-Erkennung in `pushSupport()` (E12), nicht die Version.
 
 ### E8 – Geräte-Speicher für den Service Worker (Stufe 2)
 
@@ -299,17 +329,29 @@ Die Entscheidung, was angezeigt wird, steckt in der **reinen Funktion `src/sw/pu
 - `sw.ts` verdrahtet nur Events, Speicher und Fetch.
 
 `self.addEventListener("push", …)`:
-1. Vorgeschlagene Nachricht lesen: `event.notification`, **wann immer vorhanden** (keine Browser-Erkennung), sonst `event.data.json().notification`. Ist die Payload kaputt, kommt der feste Text „Neues im Zwergenplan“ (Chrome verlangt eine sichtbare Nachricht).
+1. Vorgeschlagene Nachricht lesen: `event.notification`, **wann immer vorhanden** (keine Browser-Erkennung), sonst `event.data.json().notification`. Auf iOS ist `event.data` `null`, die Payload steht nur in `event.notification` (Spike). Ist die Payload kaputt, kommt der feste Text „Neues im Zwergenplan“ (Chrome verlangt eine sichtbare Nachricht).
 2. **`now` = `notification.data.sentAt`**, nur wenn das fehlt `new Date()`. Das ist fachlich die richtige Zeit (Stand beim Versand) und macht die E2E deterministisch.
-3. Höchstens **5 s** insgesamt (Wert aus dem Spike, Punkt d):
+3. Höchstens **5 s** insgesamt, **hart**:
    - `data/site.json` mit `cache: "no-cache"` laden;
    - `seenIds` und Geburtsdatum aus dem Geräte-Speicher lesen;
    - `newOfferIds` und `newsText` rechnen.
-4. Liefert `newsText` einen Text: `registration.showNotification(title, { body, tag: "neue-angebote", navigate, data: { navigate }, icon, lang: "de" })` und, wo vorhanden, `navigator.setAppBadge(n)`. `navigate` steht in den `NotificationOptions` der Push-API-Spec. WebKit öffnet damit ohne `notificationclick` (Spike j).
+
+   iOS beendet den Service Worker nach ≈ 10 s. Dann erscheint **gar keine** Nachricht, und die nächsten Pushes kommen bis zu 10 Min. verspätet (Spike d). Deshalb:
+   - Die Arbeit läuft in einem `Promise.race` gegen einen 5-s-Timer. Das Promise in `event.waitUntil` endet in jedem Fall nach spätestens 5 s, auch wenn ein Schritt hängt.
+   - `fetch` bekommt zusätzlich ein `AbortSignal.timeout(4000)`.
+   - Nach Ablauf gilt `outcome` `{ kind: "zeit" }` (Schritt 5). Ein später fertig werdender Zuschnitt zeigt nichts mehr an (Flag nach dem Rennen).
+   - Unit-Test mit Fake-Timern: Ein nie auflösender Speicherzugriff führt nach 5 s zu `zeit`, und `waitUntil` ist erfüllt.
+
+   Gemessen brauchte der echte Zuschnitt 0,3 s, das Limit ist reiner Schutz.
+4. Liefert `newsText` einen Text: `registration.showNotification(title, { body, tag: "neue-angebote", navigate, data: { navigate }, icon, lang: "de" })`.
+   - **`navigate` ist Pflicht.** Ohne gültige `navigate`-URL lehnt iOS `showNotification` im `push`-Event mit `TypeError` ab (Spike j). `decidePush` setzt sie immer, Test dazu.
+   - **Kein `setAppBadge` im Service Worker.** Auf iOS kam der Aufruf nie zurück, und der Lauf endete ohne Nachricht (Spike g). `app_badge` in der Payload wirkt auf iOS 26.5 nicht, bleibt aber drin (Spec, schadet nicht).
+   - `tag` ersetzt auf iOS keine ältere Nachricht, mehrere Pushes stapeln sich (Spike). Bei einer Nachricht je Deploy ist das hinnehmbar.
 5. Sonst (kein Text, Zeit abgelaufen, Fehler):
-   - mit `event.notification` (Declarative) **nichts** anzeigen, das System zeigt die allgemeine Fassung;
+   - mit `event.notification` (Declarative) **nichts** anzeigen, das System zeigt die allgemeine Fassung (Spike e, f);
    - ohne `event.notification` die vorgeschlagene Nachricht selbst anzeigen.
-6. `notificationclick` (Browser ohne `navigate`-Option): offenes Fenster fokussieren und auf `data.navigate` bzw. `./?neu` navigieren (`WindowClient.navigate`), sonst `clients.openWindow`. Die App leert den Badge beim Öffnen über `src/data/pwa.ts` (`push-start.ts`), nie aus `src/ui`.
+6. `notificationclick` nur für Browser ohne `navigate`-Option (Chromium, Firefox): offenes Fenster fokussieren und auf `data.navigate` bzw. `./?neu` navigieren (`WindowClient.navigate`), sonst `clients.openWindow`. Auf iOS wird er nie erreicht (Spike j).
+   - Die App leert den Badge beim Öffnen über `src/data/pwa.ts` (`push-start.ts`), nie aus `src/ui`. Gesetzt wird er nur dort, wo der Browser es selbst tut. Ein eigener Zähler ist kein Ziel.
 7. **`pushsubscriptionchange`** (Chrome und Firefox tauschen Abos gelegentlich aus):
    - Der Service Worker abonniert mit demselben `applicationServerKey` neu, sofern `event.newSubscription` fehlt.
    - Er meldet das neue Abo per `POST /abo`, das alte per `DELETE /abo`, und speichert `endpointHash`.
@@ -357,7 +399,8 @@ Der Request auf `site.json` ist für alle gleich. Alter und Einstellungen verlas
   2. Abos vom Worker holen und jedem mit `web-push` senden:
      - VAPID mit `subject: "https://zwergenplan.app/"` (keine E-Mail-Adresse im öffentlichen Repo);
      - Payload `declarativePayload({ count: news, siteUrl: SITE_URL, sentAt: jetzt })`;
-     - `TTL: 172800` (2 Tage), `urgency: "normal"`, `topic: "neue-angebote"` (ein noch nicht zugestelltes Push wird ersetzt).
+     - `TTL: 172800` (2 Tage), `urgency: "normal"`, `topic: "neueangebote"` (ein noch nicht zugestelltes Push wird ersetzt).
+     - **Das Topic muss gültiges Base64url sein, mit einer Länge, die ein Vielfaches von 4 ist.** Apple lehnt `neue-angebote` mit 400 `BadWebPushTopic` ab, `neueangebote` nimmt es an (Spike). Die Konstante liegt in `push-payload.ts`, ein Unit-Test prüft `^[A-Za-z0-9_-]{1,32}$` und Länge % 4 = 0.
   3. Abos mit Antwort 404 oder 410 gehen an `POST /abos/loeschen`.
   4. Ausgabe nur als Zahlen: gesendet, entfernt, Fehler.
   5. Fehler beim Senden: `::warning::` und **Exit 0**. Der Job ist kein Gate, denn der Deploy ist schon live. Rot wird er nur bei einem Programmierfehler (ungültige Payload laut `declarativePayload`-Schema).
@@ -373,7 +416,7 @@ Der Request auf `site.json` ist für alle gleich. Alter und Einstellungen verlas
 ### E12 – An- und Abmelden (UI, Stufe 2)
 
 - Im Abschnitt „Als App“ steht ein Schalter „Benachrichtigen bei neuen Angeboten“ (`role="switch"`, `aria-checked`, ≥ 44 px).
-  - Er erscheint nur, wenn `pushSupport()` = `"ok"`. Das heißt: `PushManager` vorhanden, Service Worker aktiv (mit Zeitlimit, E5b), auf iOS als App installiert.
+  - Er erscheint nur, wenn `pushSupport()` = `"ok"`. Das heißt: `PushManager` **und** `Notification` vorhanden, Service Worker aktiv (mit Zeitlimit, E5b), auf iOS als App installiert. Im Safari-Tab fehlt `Notification`, `PushManager` aber nicht (Spike a), deshalb prüft `pushSupport()` beides.
   - Sonst steht dort ein Hinweis: auf dem iPhone „Erst als App installieren“, sonst „Dieser Browser kann keine Benachrichtigungen“.
 - **Einschalten** nur auf Tipp, Reihenfolge fest:
   1. `Notification.requestPermission()` ist das **erste `await`** im Tipp-Handler. Sonst verliert iOS die Nutzeraktivierung. Das hält ein Kommentar im Code fest, ein Unit-Test prüft es über die Reihenfolge der Fake-Aufrufe.
@@ -500,6 +543,7 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 - Fertig, wenn alle Punkte beantwortet sind und E7, E10 und E11 bei Bedarf angepasst sind.
 - Fällt (f) negativ aus, entfällt der Zuschnitt auf iOS (nur der allgemeine Text). Dann gibt es eine Rückfrage an den Nutzer, ob Stufe 2 so noch gewollt ist.
 - Die Spike-Route wird danach aus dem Worker entfernt.
+- *Erledigt (2026-10-05):* alle Punkte beantwortet, siehe „Spike-Ergebnis“. (f) ist positiv. Der Spike lief als eigener Worker `zwergenplan-spike` auf `workers.dev`, nicht im späteren `push-worker/`. Er wird gelöscht, sobald keine Nachmessung mehr nötig ist (`wrangler delete`, KV-Namespace `SPIKE`).
 
 **Stufe 1**
 1. **Voraussetzung und Build:**
@@ -574,6 +618,21 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
     - Ergebnis und Spike-Ergebnis im Plan festhalten, Status auf „umgesetzt“.
     - `docs/ideas.md` ergänzen: „Push-Zuschnitt nach Wegzeit/Stadtteil“, „allgemeine Neu-Markierung ohne Push“, „weitere Push-Anlässe (Merkliste, Kurs morgen)“.
 
+## Umsetzung
+
+- **2026-10-05, Schritt 0 (Spike):**
+  - Branch `spike-push-0011` (gepusht, nie nach `main`), Code in `spike/push/` (Worker, Seite, Service Worker, Versandskript).
+  - Cloudflare-Konto des Nutzers, `wrangler login` (OAuth), KV-Namespace `SPIKE`, Worker `zwergenplan-spike.sbiastoch.workers.dev`, Wegwerf-VAPID-Schlüssel nur lokal.
+  - Drei Runden auf dem iPhone (Ersetzen/Fehler/Badge, Wartezeiten, Antippen) plus Topic- und Gesundheitsproben.
+  - Ergebnis unter „Spike-Ergebnis“, eingearbeitet in E7, E10, E11, Risiken und ADR 0014.
+  - Die echten VAPID-Schlüssel und Secrets entstehen erst in Schritt 7.
+- **Stufe 1:** wartet. Plan 0010 hat auf `main` nur Paket 0, die Pakete A/B fehlen noch (Stand `origin/main` 1415eb0).
+- **Hinweis für E5:** Seit `1415eb0` gilt **ADR 0012** (angenommen):
+  - `JS (initial)` 92 kB statt 90 kB, Ziel nach Plan 0010 ≤ 91,0 kB;
+  - die Rolldown-Gruppe `$initial` in `vite.config.ts` hält gemeinsame Start-Module im Einstieg.
+
+  Die 90 kB und die Schwelle 89,5 kB in E5 beziehen sich auf den alten Stand. Zu Beginn von Stufe 1 werden `X` gemessen und Schwelle sowie Ziel mit gleicher Reserve (0,5 kB unter Budget) neu notiert. Die Stub-Probe gegen React-Abspaltung prüft dann auch, dass `$initial` die Lazy-Kette `assets/app/` nicht in den Einstieg zieht. Das Budget selbst hebt dieser Plan nicht an.
+
 ## Akzeptanzkriterien
 
 - **Stufe 1:**
@@ -589,7 +648,8 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 
 ## Risiken
 
-- **iOS-Verhalten ist nur teilweise dokumentiert.** → Spike zuerst. Der allgemeine Text funktioniert in jedem Fall.
+- **iOS-Verhalten ist nur teilweise dokumentiert.** → Spike zuerst (erledigt, siehe „Spike-Ergebnis“). Der allgemeine Text erscheint, wenn der Service Worker nichts anzeigt oder wirft.
+- **Service Worker überzieht das Zeitbudget** (≈ 10 s auf iOS): keine Nachricht, und die nächsten Pushes kommen bis zu 10 Min. verspätet (Spike). → Hartes 5-s-Limit mit `Promise.race` und Fetch-Abbruch, Unit-Test mit hängendem Schritt (E10), kein `setAppBadge` im Service Worker.
 - **Eigener Speicher der Home-Bildschirm-App auf iOS** (Spike h): Nach der Installation fehlen Alter und Merkliste. → Hinweis in der Installationshilfe. Eine Übertragung (z. B. per Link) wäre ein eigener Plan.
 - **Apple beendet Push-Abos** bei längerer Nichtnutzung oder nach einem Neuinstallieren. → 410 räumt auf. Der Schalter zeigt den echten Zustand.
 - **Geänderte IDs zählen als neu** (E9). → Hinnehmbar. Gibt es auffällig viele, prüft die Pipeline Titeländerungen (eigener Plan).
