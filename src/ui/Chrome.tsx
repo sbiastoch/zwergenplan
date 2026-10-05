@@ -150,7 +150,18 @@ const TAB_ITEMS = [
   { tab: "merkliste", label: "Merkliste", icon: "heart" },
 ] as const;
 
-export function TabBar({ tab, savedCount, onTab }: { tab: Tab; savedCount: number; onTab: (t: Tab) => void }) {
+export function TabBar({
+  tab,
+  savedCount,
+  onTab,
+  currentRef,
+}: {
+  tab: Tab;
+  savedCount: number;
+  onTab: (t: Tab) => void;
+  /** hängt nur am Knopf des aktiven Tabs: Fokus-Rückweg des Details (Plan 0008, E11) */
+  currentRef?: Ref<HTMLButtonElement> | undefined;
+}) {
   const index = TAB_ITEMS.findIndex((t) => t.tab === tab);
   return (
     <nav className="tabs" aria-label="Hauptnavigation">
@@ -160,6 +171,7 @@ export function TabBar({ tab, savedCount, onTab }: { tab: Tab; savedCount: numbe
         <button
           key={t.tab}
           type="button"
+          ref={t.tab === tab ? currentRef : undefined}
           className="tab"
           aria-current={t.tab === tab ? "page" : undefined}
           onClick={() => onTab(t.tab)}

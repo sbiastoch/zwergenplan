@@ -9,8 +9,17 @@
     <meta name="theme-color" content="#0e1620" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Babykurse, Krabbelgruppen und Ausflüge für Kinder unter 3 Jahren in Nürnberg." />
     <title>Zwergenplan</title>
-    <!-- Daten parallel zum JS laden statt danach (LCP, Plan 0003 E8); Pfad wie in src/data/site.ts -->
-    <link rel="preload" href="/data/site.json" as="fetch" crossorigin="anonymous" />
+    <!-- Daten parallel zum JS laden statt danach (LCP, Plan 0003 E8). Ersetzt den Preload, den WebKit nicht
+         wiederverwendet (Plan 0008, E4). Übernommen von src/data/site.ts (takeEarlyRequest), Pfad wie dort. -->
+    <script>
+      try {
+        window.__zpSite = fetch("/data/site.json");
+        // als behandelt markieren: Den Fehler wertet loadSiteData aus, nicht die Konsole
+        window.__zpSite.catch(() => {});
+      } catch {
+        // ohne fetch: loadSiteData lädt selbst
+      }
+    </script>
     <script>
       // Darstellung vor dem ersten Paint setzen (kein Aufblitzen). Schlüssel wie in src/data/preferences.ts.
       try {

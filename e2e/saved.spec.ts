@@ -39,6 +39,29 @@ test("Herz merkt, Badge zählt, Merkliste überlebt das Neuladen und steht nicht
   await expect(page.getByTestId("offer")).toHaveCount(1);
 });
 
+test("Fokus landet auf dem aktiven Tab, wenn die Kachel nach dem Ablösen im Detail fehlt (Plan 0008, E11)", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+  await page.getByRole("button", { name: `${PEKIP} merken` }).click();
+  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await expect(page.getByTestId("offer")).toHaveCount(2);
+
+  await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+  const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
+  await detail.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+  await expect(detail.getByRole("button", { name: "Offener Krabbeltreff merken" })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+  await detail.getByRole("button", { name: "Zurück" }).click();
+  await expect(detail).toBeHidden();
+
+  // Die Kachel, die das Detail geöffnet hat, ist weg: ohne Rückweg fiele der Fokus auf <body>.
+  await expect(page.getByTestId("offer")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: /^Merkliste/ })).toBeFocused();
+});
+
 test("lädt alle gemerkten Termine als eine ICS-Datei", async ({ page }) => {
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
   await page.getByRole("button", { name: `${PEKIP} merken` }).click();

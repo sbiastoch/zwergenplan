@@ -38,11 +38,16 @@ interface OverlaysProps {
   originApi: OriginApi;
   /** Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Umkreis-Hinweis verschwindet mit der Wahl. */
   filterButton: RefObject<HTMLButtonElement | null>;
+  /**
+   * Fokus-Rückweg des Details: der Knopf des aktiven Tabs. Die Kachel, die das Detail geöffnet hat,
+   * fehlt nach dem Ablösen in der Merkliste oder bei einem Deep-Link (Plan 0008, E11).
+   */
+  activeTab: RefObject<HTMLButtonElement | null>;
 }
 
 export function Overlays(props: OverlaysProps) {
   const { toast, sheet, setSheet, detailOffer, detailDay, closeDetail, ctx, say, filter, setFilter } = props;
-  const { birthDate, setBirthDate, ageOnly, setAgeOnly, theme, today, originApi, filterButton } = props;
+  const { birthDate, setBirthDate, ageOnly, setAgeOnly, theme, today, originApi, filterButton, activeTab } = props;
   const { origin } = originApi;
   const { now, onToggleSave } = ctx;
   return (
@@ -53,6 +58,7 @@ export function Overlays(props: OverlaysProps) {
         label={detailOffer?.title ?? "Angebot"}
         className="detail"
         toast={toast}
+        fallbackFocus={activeTab}
       >
         {detailOffer && (
           <DetailContent

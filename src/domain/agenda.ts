@@ -113,6 +113,11 @@ export interface DayAgenda<T extends Offer> {
   ended: number;
   /** Tag liegt nach dem letzten Termin des gesamten Datenstands */
   afterData: boolean;
+  /**
+   * nicht beendete Termine des Tages, die Filter, Umkreis oder Alter ausblenden (Plan 0008, E12):
+   * ungefilterter Index minus `items`, nie negativ
+   */
+  hidden: number;
 }
 
 /**
@@ -120,19 +125,24 @@ export interface DayAgenda<T extends Offer> {
  * (gleiche Regel wie überall: ein Termin zählt, bis er beendet ist).
  * `endedToday` zählt der Aufrufer mit `endedOnDay` über alle filterpassenden Angebote – auch
  * solche ohne kommenden Termin, die gar nicht im Index stehen. `dataEnd` ist der letzte Tag des
- * ungefilterten Datenstands.
+ * ungefilterten Datenstands. `allIndex` ist der Index aller kommenden Angebote ohne Filter, Alter und
+ * Umkreis; `index` ist eine Teilmenge davon, die Differenz also genau das Ausgeblendete.
  */
 export function dayAgenda<T extends Offer>(
   index: ReadonlyMap<string, Occurrence<T>[]>,
   day: string,
   now: Date,
-  context: { dataEnd: string | undefined; endedToday: number },
+  context: { dataEnd: string | undefined; endedToday: number; allIndex: ReadonlyMap<string, Occurrence<T>[]> },
 ): DayAgenda<T> {
   const isNotEnded = notEnded(now);
+  const items = (index.get(day) ?? []).filter((o) => isNotEnded(o.session));
+  // Beendetes zählt nicht: „ausgeblendet“ heißt nur, was man noch besuchen könnte.
+  const all = (context.allIndex.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
   return {
-    items: (index.get(day) ?? []).filter((o) => isNotEnded(o.session)),
+    items,
     ended: day === berlinIsoDate(now) ? context.endedToday : 0,
     afterData: context.dataEnd !== undefined && day > context.dataEnd,
+    hidden: Math.max(0, all - items.length),
   };
 }
 

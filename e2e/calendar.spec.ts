@@ -5,7 +5,7 @@
  */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
-import { expectAccessible, expectTextFits, setTextScale } from "./mobile-ux.ts";
+import { expectAccessible, expectMobileUx, expectTextFits, setTextScale } from "./mobile-ux.ts";
 
 async function openCalendar(page: Page, at?: Date) {
   if (at) await page.clock.setFixedTime(at);
@@ -51,6 +51,23 @@ test.describe("mit Fixture-Uhr", () => {
       "aria-pressed",
       "true",
     );
+  });
+
+  test("ausgeblendete Angebote statt „Freier Tag“ (Plan 0008, E12)", async ({ page }) => {
+    // Am Mi 7.10. liegt nur der „Offene Krabbeltreff“ (regelmäßig); „Kurse“ blendet ihn aus.
+    await page.getByRole("button", { name: "Kurse", exact: true }).click();
+    await page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Angebote" }).click();
+    await expectAgenda(page, /Mittwoch, 7\. Oktober/, "0 Angebote");
+    await expect(page.getByText("Nichts, was zu deiner Auswahl passt")).toBeVisible();
+    await expect(page.getByText("1 Angebot an diesem Tag ist ausgeblendet")).toBeVisible();
+    await expect(page.getByText("Freier Tag")).toHaveCount(0);
+    // Der neue Leerzustand läuft durch die Gates (Plan 0008, „Neue Zustände durch die Gates“).
+    await expectMobileUx(page);
+
+    await page.getByRole("button", { name: "Filter zurücksetzen" }).click();
+    await expect(page.getByTestId("offer")).toHaveCount(1);
+    await expect(page.getByTestId("offer")).toContainText("Offener Krabbeltreff");
+    await expect(page.getByRole("button", { name: "Kurse", exact: true })).toHaveAttribute("aria-pressed", "false");
   });
 
   test("blättert wochenweise und bleibt im Datenhorizont", async ({ page }) => {
