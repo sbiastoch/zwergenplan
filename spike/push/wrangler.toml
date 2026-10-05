@@ -5,8 +5,8 @@ compatibility_date = "2026-09-01"
 workers_dev = true
 
 [vars]
-VAPID_PUBLIC = "__SETZEN__"
+VAPID_PUBLIC = "BPYtlxt7oQQwlHLmw_KjiDumhgK2b7MQ1NpShZtOrrErXgfmmRncKz3i0tlQvBs6RArF4Rwo0RqCPF-jQHhEG_k"
 
 [[kv_namespaces]]
 binding = "SPIKE"
-id = "__SETZEN__"
+id = "1e23768a23eb42ed9a4e793ad9faa2a7"

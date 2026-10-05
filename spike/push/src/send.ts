@@ -57,7 +57,7 @@ const notification: Record<string, unknown> = {
   title: `Spike: ${variant}`,
   body: `Deklarativ (allgemein), ${new Date().toLocaleTimeString("de-DE")}`,
   navigate: `${config.base}/spike/?ziel=deklarativ-${variant}`,
-  tag: "neue-angebote",
+  tag: `spike-${variant}`,
   lang: "de",
   data: { variant, sentAt },
 };
