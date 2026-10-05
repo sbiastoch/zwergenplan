@@ -207,7 +207,13 @@ describe("extractTimetable", () => {
 
   it("sortiert die Halte einer Fahrt nach stop_sequence, auch verstreut in stop_times.txt", () => {
     const trip = t.trips.find((x) => x.times[0] === 32_400);
-    expect(trip).toEqual({ route: "T1", stops: [1, 3, 5], times: [32_400, 0, 120, 0, 120, 0], flags: [3, 3, 3] });
+    expect(trip).toEqual({
+      route: "T1",
+      mode: "tram",
+      stops: [1, 3, 5],
+      times: [32_400, 0, 120, 0, 120, 0],
+      flags: [3, 3, 3],
+    });
   });
 
   it("pickup_type 2 sperrt das Einsteigen, drop_off_type 1 das Aussteigen, leer heißt erlaubt", () => {
@@ -279,6 +285,44 @@ describe("extractTimetable: Feed-Fehler brechen laut ab", () => {
   it("ohne Kurznamen nennt die Fahrt den langen Linienname", () => {
     const { timetable } = run(replace("routes", '"x5","","X5"', '"x5","",""'))();
     expect(timetable.trips.map((t) => t.route)).toContain("Nachbarstadt - Weit draußen - Testhof");
+  });
+
+  it("ohne Kurz- und Langnamen bricht eine übernommene Fahrt ab (Plan 0012, E1)", () => {
+    const nameless = replace("routes", '"x5","","X5","Nachbarstadt - Weit draußen - Testhof"', '"x5","","",""');
+    expect(run(nameless)).toThrow(/Route x5 ohne Namen/);
+  });
+});
+
+describe("extractTimetable: Verkehrsmittel aus route_type (Plan 0012, E1, G1)", () => {
+  const texts = fixtureTexts();
+  const withType = (route: string, type: string): GtfsTexts => ({
+    ...texts,
+    routes: texts.routes.replace(new RegExp(`^("${route}",.*,)"\\d+"$`, "m"), `$1"${type}"`),
+  });
+  const run = (t: GtfsTexts) => extractTimetable(gtfsTables(t), { serviceDay: "2026-10-13", source }).timetable;
+  const modes = (t: Timetable) => new Map(t.trips.map((trip) => [trip.route, trip.mode]));
+
+  it("bildet 0/1/2/3 auf tram/u-bahn/bahn/bus ab", () => {
+    expect(modes(run(texts))).toEqual(
+      new Map([
+        ["T1", "tram"],
+        ["B2", "bus"],
+        ["X5", "bus"],
+      ]),
+    );
+    expect(modes(run(withType("t1", "1"))).get("T1")).toBe("u-bahn");
+    expect(modes(run(withType("t1", "2"))).get("T1")).toBe("bahn");
+    expect(modes(run(withType("b2", "0"))).get("B2")).toBe("tram");
+  });
+
+  it("wirft bei unbekanntem route_type mit dem Liniennamen, wenn die Fahrt im Auszug bleibt", () => {
+    expect(() => run(withType("b2", "7"))).toThrow("GTFS: Linie B2 hat unbekannten route_type 7");
+  });
+
+  it("wirft nicht für Bedarfsverkehre und Fahrten außerhalb des Auszugs", () => {
+    // R9 ist ein Rufbus (weggelassen), N7 fährt nur um 23:50 (außerhalb des Fensters)
+    expect(() => run(withType("r9", "715"))).not.toThrow();
+    expect(() => run(withType("n7", "700"))).not.toThrow();
   });
 });
 

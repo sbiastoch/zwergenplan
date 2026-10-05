@@ -23,7 +23,7 @@ function base() {
       ["de:09564:2:1:1", 49.46, 11.08],
     ] as [string, number, number][],
     // an 9:00, ab 9:00, an 9:03, ab 9:03
-    trips: [{ route: "U1", stops: [0, 1], times: [32_400, 0, 180, 0], flags: [3, 3] }],
+    trips: [{ route: "U1", mode: "u-bahn", stops: [0, 1], times: [32_400, 0, 180, 0], flags: [3, 3] }],
   };
 }
 
@@ -60,6 +60,10 @@ describe("Timetable", () => {
     ["Lizenz-URI fehlt", (t) => Object.assign(t.source, { licenseUrl: "keine" }), /licenseUrl/],
     ["Zeit ohne Offset", (t) => Object.assign(t.source, { modified: "2026-06-24T16:20:02" }), /modified/],
     ["unbekanntes Feld", (t) => Object.assign(t, { extra: 1 }), /extra|Unrecognized/],
+    // Plan 0012, E1 (G2): Verkehrsmittel ist Pflicht und eines von vier, der Linienname nie leer
+    ["Fahrt ohne Verkehrsmittel", (t) => Reflect.deleteProperty(t.trips[0] ?? {}, "mode"), /mode/],
+    ["unbekanntes Verkehrsmittel", (t) => Object.assign(t.trips[0] ?? {}, { mode: "faehre" }), /mode/],
+    ["leerer Linienname", (t) => Object.assign(t.trips[0] ?? {}, { route: "" }), /route/],
   ])("lehnt ab: %s", (_name, fn, where) => {
     const found = issues(fn);
     expect(found.length).toBeGreaterThan(0);
