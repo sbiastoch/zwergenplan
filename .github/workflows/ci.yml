@@ -50,12 +50,9 @@ jobs:
       fail-fast: false # alle Fehler eines Laufs auf einmal sehen; gates sperrt den Deploy trotzdem
       matrix:
         include:
-          - { engine: chromium, shard: 1, total: 4 }
-          - { engine: chromium, shard: 2, total: 4 }
-          - { engine: chromium, shard: 3, total: 4 }
-          - { engine: chromium, shard: 4, total: 4 }
-          - { engine: webkit, shard: 1, total: 2 }
-          - { engine: webkit, shard: 2, total: 2 }
+          - { engine: chromium, shard: 1, total: 2 }
+          - { engine: chromium, shard: 2, total: 2 }
+          - { engine: webkit, shard: 1, total: 1 }
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -69,7 +66,7 @@ jobs:
       - name: Fixture-Build
         run: pnpm build:e2e
       - name: E2E
-        run: pnpm exec playwright test --shard=${{ matrix.shard }}/${{ matrix.total }} --workers=2
+        run: pnpm exec playwright test --shard=${{ matrix.shard }}/${{ matrix.total }} --workers=4
         env:
           CI: "true"
           PW_SUITE: ${{ matrix.engine }}
