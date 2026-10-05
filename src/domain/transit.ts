@@ -18,6 +18,11 @@ export const NO_MINUTES = 255;
 export const COORD_SCALE = 1e4;
 /** Zugangshalte: Luftlinie Startpunkt → Haltbereich, Grenze inklusiv (E8) */
 export const ACCESS_METERS = 800;
+/**
+ * Aufschlag je Umstieg in der Wahl der Verbindung, nie in der angezeigten Zeit (Plan 0012, E2; ADR 0015):
+ * Ein Umstieg zählt nur, wenn er mindestens so viel früher ankommt. Einzige Quelle, der Build leitet davon ab.
+ */
+export const TRANSFER_PENALTY_MINUTES = 10;
 
 /** Umwegfaktor auf die Luftlinie (E6) */
 const DETOUR = 1.3;

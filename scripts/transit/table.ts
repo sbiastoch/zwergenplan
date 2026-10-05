@@ -134,24 +134,33 @@ export function buildTransitTable(
   const net = buildNetwork(timetable, { from });
   const cols = columns.size;
   const bytes = new Uint8Array(rows.length * cols);
-  const swept = new Float64Array(count);
-  const best = new Float64Array(count);
+  const sweptRated = new Float64Array(count);
+  const sweptReal = new Float64Array(count);
+  const sweptEntry = new Int32Array(count);
+  const bestRated = new Float64Array(count);
+  const bestReal = new Float64Array(count);
   const x = new Array<number>(count);
 
   [...columns.values()].forEach((place, col) => {
     const egress = egressSeconds(net, place, opts.egressMeters ?? EGRESS_METERS);
     const profiles = scanProfiles(net, egress);
     rows.forEach((row, r) => {
-      best.fill(Number.POSITIVE_INFINITY);
+      // kleinste Bewertung; bei Gleichstand der Abgang vor der Fahrt, dann die Reihenfolge der Steige (E4)
+      const walk = row.steige.reduce((w, s) => Math.min(w, valueAt(egress, s)), Number.POSITIVE_INFINITY);
+      for (let m = 0; m < count; m++) {
+        bestRated[m] = from + m * STEP_SECONDS + walk;
+        bestReal[m] = valueAt(bestRated, m);
+      }
       for (const s of row.steige) {
-        profiles.sweep(s, from, STEP_SECONDS, count, swept);
-        const walk = valueAt(egress, s);
+        profiles.sweep(s, from, STEP_SECONDS, count, sweptRated, sweptReal, sweptEntry);
         for (let m = 0; m < count; m++) {
-          const t = from + m * STEP_SECONDS;
-          best[m] = Math.min(valueAt(best, m), valueAt(swept, m), t + walk);
+          if (valueAt(sweptRated, m) < valueAt(bestRated, m)) {
+            bestRated[m] = valueAt(sweptRated, m);
+            bestReal[m] = valueAt(sweptReal, m);
+          }
         }
       }
-      for (let m = 0; m < count; m++) x[m] = (valueAt(best, m) - (from + m * STEP_SECONDS)) / 60;
+      for (let m = 0; m < count; m++) x[m] = (valueAt(bestReal, m) - (from + m * STEP_SECONDS)) / 60;
       bytes[r * cols + col] = cellValue(x);
     });
   });

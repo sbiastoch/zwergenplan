@@ -171,7 +171,7 @@ describe("buildTransitTable", () => {
   it("verlängert den Abgang auf Wunsch (Vergleich 800 gegen 1 000 m, Schritt 5)", () => {
     // Punkt 900 m südlich von 9007: zu Fuß ab 9007 nur mit 1 000 m Abgang, sonst über B2 und 9008
     const far: GeoPoint = { lat: 49.4365 - 0.0081, lon: 11.085 };
-    const short = buildTransitTable(fixture, [far]);
+    const short = buildTransitTable(fixture, [far], { egressMeters: 800 });
     const long = buildTransitTable(fixture, [far], { egressMeters: 1000 });
     expect(short.minutes).not.toBe(long.minutes);
   });
