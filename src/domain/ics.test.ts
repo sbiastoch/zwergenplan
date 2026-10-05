@@ -1,15 +1,6 @@
 import ICAL from "ical.js";
 import { describe, expect, it } from "vitest";
-import {
-  escapeText,
-  foldLine,
-  icsContextFor,
-  icsForCollection,
-  icsForSeries,
-  icsForSession,
-  seriesIcsPath,
-  sessionIcsPath,
-} from "./ics.ts";
+import { escapeText, foldLine, icsContextFor, icsForCollection, icsForSeries, icsForSession } from "./ics.ts";
 import { toSiteData } from "./site-data.ts";
 import { fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
@@ -100,13 +91,8 @@ describe("icsForCollection", () => {
   });
 });
 
-describe("Pfade und Escaping", () => {
-  it("leitet Dateipfade aus IDs ab", () => {
-    const treff = fixtureOffer("krabbeltreff");
-    expect(seriesIcsPath(treff)).toBe(`ics/${treff.id}.ics`);
-    expect(sessionIcsPath(treff, treff.sessions[0] as never)).toBe(`ics/${treff.id}/20261007T1000.ics`);
-  });
-
+// Pfade: ics-paths.test.ts
+describe("Escaping", () => {
   it("escaped Sonderzeichen", () => {
     expect(escapeText("a,b;c\\d\ne")).toBe("a\\,b\\;c\\\\d\\ne");
     expect(escapeText("x\ry\u0007z")).toBe("x\\nyz");

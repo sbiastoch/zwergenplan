@@ -3,7 +3,7 @@ import { useState } from "react";
 import { assetUrl } from "../data/site.ts";
 import { ageCheck } from "../domain/age.ts";
 import { referenceSession, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
-import { seriesIcsPath, sessionIcsPath } from "../domain/ics.ts";
+import { seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";

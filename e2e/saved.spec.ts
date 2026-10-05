@@ -78,3 +78,40 @@ test("lädt alle gemerkten Termine als eine ICS-Datei", async ({ page }) => {
   // gefaltete Zeilen (RFC 5545) vor dem Vergleich entfalten
   expect(ics.replaceAll("\r\n ", "")).toMatch(/UID:.+--20261013T0930@zwergenplan/);
 });
+
+// Plan 0010, E8 (Paket 0, A): Der ICS-Code ist ein Lazy-Chunk in assets/export/. Er lädt im Leerlauf nach dem ersten
+// Rendern vor (ohne Service Worker wäre der Export offline sonst weg), nie als Teil des Starts.
+test("Export-Code ist ein eigener Chunk und lädt im Leerlauf vor", async ({ page }) => {
+  const isExport = (url: string) => /\/assets\/export\/[^/]+\.js$/.test(new URL(url).pathname);
+  const chunk = page.waitForResponse((r) => isExport(r.url()));
+  await page.reload();
+  const response = await chunk;
+  expect(response.ok()).toBe(true);
+  expect(await response.text()).toContain("BEGIN:VCALENDAR");
+  const start = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLScriptElement>("script[type=module][src]")].map((s) => s.src),
+  );
+  expect(start.length).toBeGreaterThan(0);
+  for (const src of start) {
+    expect(await (await page.request.get(src)).text(), src).not.toContain("BEGIN:VCALENDAR");
+  }
+});
+
+test.describe("Export-Code nicht ladbar", () => {
+  test.use({ allowedConsoleErrors: [/\/assets\/export\/\S+/] });
+
+  test("meldet es im Toast statt still nichts zu tun", async ({ page }) => {
+    await page.route("**/assets/export/*.js", (route) => route.abort());
+    await page.reload();
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    let downloaded = false;
+    page.on("download", () => {
+      downloaded = true;
+    });
+    await page.getByRole("button", { name: "Alle in den Kalender" }).click();
+    await expect(page.getByText("Export gerade nicht möglich – bitte mit Netz nochmal versuchen.")).toBeVisible();
+    expect(downloaded).toBe(false);
+  });
+});

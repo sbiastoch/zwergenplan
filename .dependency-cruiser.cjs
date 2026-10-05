@@ -105,6 +105,22 @@ module.exports = {
       to: { path: "^src/domain/transit\\.ts$" },
     },
     {
+      name: "ics-only-lazy",
+      severity: "error",
+      comment:
+        "Der ICS-Code src/domain/ics.ts ist ein Lazy-Chunk (assets/export/, Plan 0010, E8 A: Export der Merkliste ist eine seltene, ausdrückliche Handlung). Von src/ aus nur per import(), auch Typen nicht statisch; Pfade und Termin-Schlüssel stehen in src/domain/ics-paths.ts. Tests ausgenommen.",
+      from: { path: "^src/", pathNot: "\\.test\\.ts$" },
+      to: { path: "^src/domain/ics\\.ts$", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
+      name: "ics-entry-only",
+      severity: "error",
+      comment:
+        "Nur der Lader src/ui/SavedView.tsx greift auf src/domain/ics.ts zu (Plan 0010, E8 A), wie transit-entry-only. Den Lader selbst prüft scripts/check-architecture.ts. Tests ausgenommen.",
+      from: { path: "^src/", pathNot: ["^src/ui/SavedView\\.tsx$", "^src/domain/ics\\.ts$", "\\.test\\.ts$"] },
+      to: { path: "^src/domain/ics\\.ts$" },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",

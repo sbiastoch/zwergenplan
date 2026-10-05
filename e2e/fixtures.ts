@@ -179,4 +179,13 @@ export const test = base.extend<
  */
 export const MAP_READY = { timeout: 20_000 };
 
+/**
+ * Antwort auf den Export-Code der Merkliste, den die App nach dem ersten Rendern im Leerlauf vorlädt (Plan 0010, E8 A).
+ * Vor `goto` aufrufen und vor dem Zählen „kein Request ab …“ abwarten: Der Request ist für alle gleich, käme unter
+ * Last aber zu einem zufälligen Zeitpunkt. (Die Resource-Timing-Liste ist in diesen Läufen leer, deshalb die Antwort.)
+ */
+export function exportPreload(page: Page) {
+  return page.waitForResponse((r) => /\/assets\/export\/[^/]+\.js$/.test(new URL(r.url()).pathname));
+}
+
 export { expect };

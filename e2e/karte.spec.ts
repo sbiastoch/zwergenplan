@@ -4,7 +4,7 @@
  * `window.__zpMap` gibt es nur im E2E-Build (E13, begründete Ausnahme von „E2E ist Black-Box“).
  */
 import type { BrowserContext, Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, exportPreload, MAP_READY, test } from "./fixtures.ts";
 
 /** Nur das, was die Tests von MapLibre brauchen (ohne Abhängigkeit von src/). */
 interface TestMap {
@@ -206,6 +206,7 @@ test.describe("mit gemockten Kacheln", () => {
   test("Wegzeit: Öffnen der Karte lädt die Tabelle, Orts-Liste mit Minuten nach Wegzeit sortiert (Plan 0009, E9/E11)", async ({
     page,
   }) => {
+    const preloaded = exportPreload(page);
     await page.goto("./");
     await expect(page.getByTestId("offer").first()).toBeVisible();
     const table = page.waitForResponse((r) => r.url().endsWith("/data/wegzeit.json") && r.ok());
@@ -215,6 +216,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
 
     // Startpunkt über das Kind-Sheet: ab der Wahl kein Request, auch keine Kachel (Kamera-Regel)
+    await preloaded;
     const requests: string[] = [];
     page.on("request", (req) => requests.push(req.url()));
     await page.getByRole("button", { name: "Startpunkt wählen" }).click();

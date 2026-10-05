@@ -6,7 +6,7 @@
  * Luftlinie: Theater 226 m, Beispielhof 1 427 m, Bibliothek 1 689 m, Musikschule 2 358 m, Gemeinde 3 008 m.
  */
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, exportPreload, test } from "./fixtures.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
 /** Eine Koordinate mit mindestens zwei Nachkommastellen, z. B. „49.45“ */
@@ -20,9 +20,12 @@ const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, i
 const offers = (page: Page) => page.getByTestId("offer");
 const card = (page: Page, title: string) => offers(page).filter({ hasText: title });
 
+/** Seite bereit, auch der Export-Code ist vorgeladen: Danach entsteht kein Request ohne Anlass (Plan 0010, E8 A). */
 async function ready(page: Page, path = "./") {
+  const preloaded = exportPreload(page);
   await page.goto(path);
   await expect(offers(page).first()).toBeVisible();
+  await preloaded;
 }
 
 async function openKidSheet(page: Page) {

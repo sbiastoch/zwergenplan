@@ -3,8 +3,10 @@
  * keine RRULE/RDATE, weil Ausfälle/Ferien sonst falsch wären und Google RDATE ignoriert.
  * Zeiten in UTC (…Z) – eindeutig über die Zeitumstellung, kein VTIMEZONE nötig.
  */
+
+import { sessionKey } from "./ics-paths.ts";
 import type { Offer, Session, Venue } from "./schema.ts";
-import { berlinKey, toIcsUtc } from "./time.ts";
+import { toIcsUtc } from "./time.ts";
 
 export interface IcsContext {
   providerName: string;
@@ -36,20 +38,8 @@ function sessionIndex(offer: Offer, session: Session): number {
 
 const PRODID = "-//Zwergenplan//Babyangebote Nürnberg//DE";
 
-function sessionKey(session: Session): string {
-  return berlinKey(session.start);
-}
-
 function sessionUid(offer: Offer, session: Session): string {
   return `${offer.id}--${sessionKey(session)}@zwergenplan`;
-}
-
-/** Pfade relativ zur Site-Basis. */
-export function seriesIcsPath(offer: Offer): string {
-  return `ics/${offer.id}.ics`;
-}
-export function sessionIcsPath(offer: Offer, session: Session): string {
-  return `ics/${offer.id}/${sessionKey(session)}.ics`;
 }
 
 export function escapeText(value: string): string {

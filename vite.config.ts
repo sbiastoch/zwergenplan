@@ -26,6 +26,13 @@ const isMapModule = (id: string) => /\/src\/ui\/(karte|map)\/|\/node_modules\/.*
 const OEPNV = "assets/oepnv/[name]-[hash]";
 const isTransitModule = (id: string) => /\/src\/domain\/transit\.ts$/.test(id);
 
+/**
+ * ICS-Code der Merkliste (src/domain/ics.ts) als Lazy-Chunk in assets/export/ (Plan 0010, E8 A). Budget
+ * `Export JS (lazy)`; `ics-only-lazy` hält ihn aus dem Start.
+ */
+const EXPORT = "assets/export/[name]-[hash]";
+const isExportModule = (id: string) => /\/src\/domain\/ics\.ts$/.test(id);
+
 export default defineConfig({
   base: BASE,
   plugins: [react(), tailwindcss()],
@@ -55,7 +62,9 @@ export default defineConfig({
               ? `${KARTE}.js`
               : chunk.moduleIds.some(isTransitModule)
                 ? `${OEPNV}.js`
-                : "assets/[name]-[hash].js",
+                : chunk.moduleIds.some(isExportModule)
+                  ? `${EXPORT}.js`
+                  : "assets/[name]-[hash].js",
         assetFileNames: (asset) =>
           asset.names.some((n) => /^Map(View|Screen)\b/.test(n))
             ? `${KARTE}[extname]`
