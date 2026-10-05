@@ -14,6 +14,7 @@ import { ListPending, ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
+import { ProviderPanel } from "./ProviderPanel.tsx";
 import { preloadExportWhenIdle, SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
@@ -55,6 +56,8 @@ export function App() {
   // Orts-Sheet offen (karte/MapScreen.tsx): Der Seiten-Toast schweigt dann wie bei jedem Modal.
   const [placeSheet, setPlaceSheet] = useState(false);
   const [animate, setAnimate] = useState(false);
+  // Suchtext der Anbieterliste: übersteht den Tab-Wechsel, nie in der URL (Plan 0010, E5)
+  const [providerQuery, setProviderQuery] = useState("");
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl.
   const filterButton = useRef<HTMLButtonElement>(null);
   // Fokus-Rückweg des Details: Die Kachel, die es geöffnet hat, kann beim Schließen fehlen (Plan 0008, E11).
@@ -311,6 +314,23 @@ export function App() {
             onMonthOpen={calendar.setMonthOpen}
             ctx={ctx}
             // nur mit aktivem Filter: Blendet allein das Alter aus, hilft Zurücksetzen nicht (Plan 0008, E12)
+            onResetFilter={
+              activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? () => setFilter(EMPTY_FILTER) : undefined
+            }
+          />
+        )}
+        {load.kind === "ready" && route.tab === "anbieter" && (
+          <ProviderPanel
+            generatedAt={load.data.generatedAt}
+            offers={offers}
+            visible={visible}
+            now={now}
+            reachOf={views.reachOf}
+            reachMode={reachMode}
+            query={providerQuery}
+            onQuery={setProviderQuery}
+            // Stand „Schnittstellen“: Das Sheet (anbieter=<id>, openProvider) verdrahtet Paket A (Plan 0010, E3).
+            onOpenProvider={() => {}}
             onResetFilter={
               activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? () => setFilter(EMPTY_FILTER) : undefined
             }

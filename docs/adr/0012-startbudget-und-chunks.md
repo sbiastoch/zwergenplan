@@ -116,7 +116,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
   - **Kanarienvogel:** Ohne die Gruppe muss der realistische Stub den Wächter rot machen.
 - **Plan 0010:**
   - **E8:** Ergebnis, Entscheidung und Verweis auf dieses ADR.
-  - **Schritt 4 „Schnittstellen“:** Der Stub `anbieter/entry.ts` muss **geteilte Start-Module** nutzen (`Dialog`, `Icon`, `time.ts`). Nur dann prüft er die Abspaltung. Ein trivialer Stub mit `useState` spaltet nie ab.
+  - **Schritt 4 „Schnittstellen“:** Der Stub `anbieter/entry.ts` muss **geteilte Start-Module** nutzen (umgesetzt mit `Icon`, `plural`, `standDate` samt `time.ts`). Nur dann prüft er die Abspaltung. Ein trivialer Stub mit `useState` spaltet nie ab.
   - **E7, Budgets:** `JS (initial)` 92 kB, Zuwachs weiter ≤ 1,3 kB.
   - **Akzeptanz:** Start-JS ≤ 91,0 kB statt ≤ 89,0 kB.
   - **Risiken:** Der Punkt „Startbudget“ wird entschärft.
@@ -125,3 +125,4 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
   - „Kalender/Merkliste lazy (−1,65 kB gemessen)“;
   - „Preact/compat (−60,5 kB gemessen, Befunde siehe ADR 0012)“.
 - **ADR 0001** bleibt unverändert, der Stack bleibt React 19.
+- **ADR 0008** nennt beim Startbudget noch 90 kB. Die Zahl ist durch dieses ADR ersetzt (92 kB); ADR 0008 selbst bleibt unverändert.

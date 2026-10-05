@@ -35,6 +35,17 @@ describe("URL-Route", () => {
     expect(parseRoute(`?ansicht=karte&angebot=${offerId}`)).toEqual({ tab: "karte", offerId, filter: EMPTY_FILTER });
   });
 
+  it("kennt den Tab „Anbieter“: ansicht=anbieter überlebt den Roundtrip (Plan 0010, E2)", () => {
+    const route = { tab: "anbieter" as const, filter: { ...EMPTY_FILTER, categories: ["musik" as const] } };
+    expect(routeToSearch(route)).toBe("kat=musik&ansicht=anbieter");
+    expect(parseRoute("?kat=musik&ansicht=anbieter")).toEqual(route);
+    expect(parseRoute(`?ansicht=anbieter&angebot=${offerId}`)).toEqual({
+      tab: "anbieter",
+      offerId,
+      filter: EMPTY_FILTER,
+    });
+  });
+
   it("übernimmt den alten Umkreis nicht, die Wegzeit schon", () => {
     expect(routeToSearch(parseRoute("?umkreis=5&ansicht=karte"))).toBe("ansicht=karte");
     expect(routeToSearch(parseRoute("?ansicht=karte&wegzeit=30"))).toBe("wegzeit=30&ansicht=karte");
@@ -57,7 +68,7 @@ describe("URL-Route", () => {
     ]);
     const names = DISTRICTS.flatMap((d) => [d.id, d.name.toLowerCase()]);
     for (const filter of filters) {
-      for (const tab of ["entdecken", "karte", "kalender", "merkliste"] as const) {
+      for (const tab of ["entdecken", "karte", "kalender", "anbieter", "merkliste"] as const) {
         const search = routeToSearch({ tab, offerId, filter });
         expect(search).toContain(`wegzeit=${filter.reachLimit?.value}`);
         expect(search).not.toContain("umkreis");
@@ -73,6 +84,7 @@ describe("tabSection", () => {
     expect(tabSection("entdecken")).toBe("entdecken");
     expect(tabSection("karte")).toBe("entdecken");
     expect(tabSection("kalender")).toBe("kalender");
+    expect(tabSection("anbieter")).toBe("anbieter");
     expect(tabSection("merkliste")).toBe("merkliste");
   });
 });

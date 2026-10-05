@@ -33,6 +33,13 @@ const isTransitModule = (id: string) => /\/src\/domain\/transit\.ts$/.test(id);
 const EXPORT = "assets/export/[name]-[hash]";
 const isExportModule = (id: string) => /\/src\/domain\/ics\.ts$/.test(id);
 
+/**
+ * Anbieterübersicht (src/ui/anbieter/, Plan 0010, E7) als Lazy-Chunk in assets/anbieter/. Budget `Anbieter JS (lazy)`;
+ * `anbieter-ui-only-lazy` hält sie aus dem Start.
+ */
+const ANBIETER = "assets/anbieter/[name]-[hash]";
+const isProviderModule = (id: string) => /\/src\/ui\/anbieter\//.test(id);
+
 export default defineConfig({
   base: BASE,
   plugins: [react(), tailwindcss()],
@@ -64,7 +71,9 @@ export default defineConfig({
                 ? `${OEPNV}.js`
                 : chunk.moduleIds.some(isExportModule)
                   ? `${EXPORT}.js`
-                  : "assets/[name]-[hash].js",
+                  : chunk.moduleIds.some(isProviderModule)
+                    ? `${ANBIETER}.js`
+                    : "assets/[name]-[hash].js",
         // Alles, was der Einstieg statisch erreicht, bleibt im Einstieg, auch wenn Lazy-Chunks es teilen (ADR 0012).
         // Workaround für rolldown#11026: Ohne die Gruppe spaltet chunkOptimization z. B. jsx-runtime und time.ts als
         // eigene Start-Chunks ab, sobald mehrere Lazy-Chunks geteilte UI-Module nutzen. Auf main ändert die Gruppe

@@ -121,6 +121,22 @@ module.exports = {
       to: { path: "^src/domain/ics\\.ts$" },
     },
     {
+      name: "anbieter-ui-only-lazy",
+      severity: "error",
+      comment:
+        "Die Anbieterübersicht src/ui/anbieter/ (Liste und Sheet) ist ein eigener Lazy-Chunk (assets/anbieter/, Plan 0010, E7): von außen nur per import(), auch Typen nicht statisch – sonst wächst das Startbundle. Props-Typen: src/ui/provider-types.ts.",
+      from: { path: "^src/", pathNot: "^src/ui/anbieter/" },
+      to: { path: "^src/ui/anbieter/", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
+      name: "anbieter-ui-entry-only",
+      severity: "error",
+      comment:
+        "Nur der Lader src/ui/ProviderPanel.tsx greift auf src/ui/anbieter/ zu (Plan 0010, E7), wie karte-ui-entry-only. Den Lader selbst prüft scripts/check-architecture.ts.",
+      from: { path: "^src/", pathNot: ["^src/ui/anbieter/", "^src/ui/ProviderPanel\\.tsx$"] },
+      to: { path: "^src/ui/anbieter/" },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",

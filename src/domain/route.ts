@@ -5,8 +5,11 @@
 import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts";
 import { OFFER_ID_PATTERN } from "./ids.ts";
 
-/** „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5), kein eigener Tab in der Leiste. */
-const TABS = ["entdecken", "karte", "kalender", "merkliste"] as const;
+/**
+ * „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5), kein eigener Tab in der Leiste. „anbieter“ ist der
+ * vierte Tab (Plan 0010, E2), vor der Merkliste.
+ */
+const TABS = ["entdecken", "karte", "kalender", "anbieter", "merkliste"] as const;
 export type Tab = (typeof TABS)[number];
 
 /** Welcher Eintrag der Tab-Leiste aktiv ist: Liste und Karte gehören beide zu „Entdecken“. */

@@ -3,6 +3,7 @@
  * Anbietername und Ort. Die UI importiert hieraus nur Typen – kein zod im Client-Bundle.
  */
 import type { Offer, OffersFile, Provider, Venue } from "./schema.ts";
+import type { Topic } from "./topics.ts";
 
 export interface SiteOffer extends Offer {
   providerName: string;
@@ -12,6 +13,28 @@ export interface SiteOffer extends Offer {
 export interface SiteData {
   generatedAt: string;
   offers: SiteOffer[];
+}
+
+/**
+ * Ein Anbieter in der Anbieterübersicht (Plan 0010, E6): nur Angaben für Eltern, nichts aus der Recherche
+ * (kein `programme`, `notes`, `ring`, `geo`). Nur Katalog-Einträge mit `role: anbieter`.
+ */
+export interface SiteProvider {
+  id: string;
+  name: string;
+  /** Website; laut Katalog bei allen Anbietern zugleich eine Programm-URL („Website & Programm“) */
+  url: string;
+  topics: Topic[];
+  /** Adresse ohne wiederholten Ortsnamen (`venueAddress`); `district` nur mit Wert */
+  venues: Array<{ name: string; address: string; district?: string }>;
+}
+
+/** Was die Anbieterübersicht lädt (public/data/anbieter.json), erst beim Öffnen von Tab oder Sheet (E6). */
+export interface ProviderDirectoryData {
+  /** derselbe Datenstand wie site.json; weicht er ab, lädt `ensureFresh` einmal neu (M4) */
+  generatedAt: string;
+  /** nach Name sortiert (`de`) */
+  providers: SiteProvider[];
 }
 
 export interface SiteMeta {

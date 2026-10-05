@@ -268,7 +268,7 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
   - `ensureFresh(data, expected, fetchFn = fetch)`: Der Abgleich ist ein eigener Schritt, sobald `site.json` da ist.
     - Stimmt `data.generatedAt` mit `expected` (aus `site.json`) überein, liefert er `data` unverändert zurück.
     - Sonst, weil GitHub Pages oder der Browser eine ältere Fassung cacht, folgt **höchstens ein** Request mit `cache: "reload"`. Das Ergebnis wird im Modul gemerkt (ein Promise je `expected`), damit Liste und Sheet nicht zweimal nachladen.
-    - Aufgerufen wird er im Lazy-Chunk (Screen bzw. Sheet) per `useEffect`, sobald `expected` vorliegt. Bis dahin zeigt der Chunk die geladene Fassung bzw. den Ladezustand.
+    - Aufgerufen wird er in `ProviderPanel.tsx` (Start, Paket A) per `useEffect`, sobald `expected` vorliegt, für Liste und Sheet. Screen und Sheet bekommen `directory` schon abgeglichen und rufen ihn nie selbst auf (geändert im Schritt „Schnittstellen“, siehe „Umsetzung“).
   - Weicht der Stand nach dem Reload immer noch ab, wird die Datei trotzdem genutzt. Für jeden Anbieter, der in den Angeboten vorkommt, aber in der Datei fehlt, baut `directory.ts` eine **Rückfall-Zeile** aus `providerName` und `venue` der Angebote: Themen aus den Angeboten, keine Website, im Sheet kein Website-Knopf.
   - Anbieter, die nur in der Datei stehen, sind ohne Angebote ohnehin `ohne-termine`.
   - So gilt immer `active.length === countProviders(visible)` (Test).
@@ -419,10 +419,10 @@ Da gzip nicht additiv ist, wurde die Ersparnis gemessen. Dafür wurde der Kandid
 - `JS (initial)` steigt auf 92 kB. Das Eintrittsziel von 87,7 kB entfällt, das Ziel nach diesem Plan ist ≤ 91,0 kB.
 - Kalender und Merkliste lazy (−1,65 kB) sowie Preact (−60,5 kB) stehen mit Messwerten in `docs/ideas.md`.
 
-**Fertig, wenn** das Start-JS ≤ 87,7 kB ist (bzw. `X` − Ersparnis notiert), der Chunk-Wächter läuft, `pnpm check` grün ist und Arch-Review sowie Browser-Review (Merkliste-Export, ggf. Kalender offline nach dem Laden) eingetragen sind.
+**Fertig, wenn** das Start-JS ≤ 87,7 kB ist (bzw. `X` − Ersparnis notiert; ersetzt durch ADR 0012: Budget 92 kB, kein Eintrittsziel mehr), der Chunk-Wächter läuft, `pnpm check` grün ist und Arch-Review sowie Browser-Review (Merkliste-Export, ggf. Kalender offline nach dem Laden) eingetragen sind.
 
 **Wechselwirkung mit diesem Plan:** Der Anbieter-Chunk ist selbst eine React-Lazy-Komponente.
-- Ob er die Abspaltung auslöst, wird **vor** den parallelen Paketen geprüft: Im Schritt „Schnittstellen“ ist der Stub `anbieter/entry.ts` eine kleine Komponente, die `ProviderPanel` per `import()` lädt und **geteilte Start-Module** nutzt (`Dialog`, `Icon`, `time.ts`), wie es Screen und Sheet später tun (ADR 0012). Danach laufen `pnpm build && pnpm size` samt Chunk-Wächter.
+- Ob er die Abspaltung auslöst, wird **vor** den parallelen Paketen geprüft: Im Schritt „Schnittstellen“ ist der Stub `anbieter/entry.ts` eine kleine Komponente, die `ProviderPanel` per `import()` lädt und **geteilte Start-Module** nutzt (umgesetzt mit `Icon`, `plural`, `standDate` samt `time.ts`), wie es Screen und Sheet später tun (ADR 0012). Danach laufen `pnpm build && pnpm size` samt Chunk-Wächter.
 - **Kanarienvogel des Workarounds:** Ohne die Gruppe `$initial` wird der Wächter mit diesem Stub rot, mit ihr grün.
 - Bleibt der Wächter grün, beginnen A und B. Wird er trotz Gruppe rot, wird nichts parallel begonnen, bis die Ursache geklärt ist.
 
@@ -516,7 +516,7 @@ Nicht in diesem Plan. Gründe:
 ### E13 – Arbeitsteilung
 
 - **Paket 0** (E8) läuft allein und zuerst, auf eigenem Branch, nach Plan 0009.
-- Danach ein gemeinsamer Schritt „Schnittstellen“ (ein Commit): `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts`, `directory.ts` mit Typen und Stubs, `anbieter/entry.ts` als Stub mit `useState` per `import()` verdrahtet, danach `pnpm build && pnpm size` samt Chunk-Wächter (Schritt 4).
+- Danach ein gemeinsamer Schritt „Schnittstellen“ (ein Commit): `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts`, `anbieter/entry.ts` als Stub per `import()` verdrahtet, die Regeln `anbieter-ui-only-lazy`/`anbieter-ui-entry-only`, `LAZY_LOADERS` und die Budget-Zeile `Anbieter JS (lazy)`, danach `pnpm build && pnpm size` samt Chunk-Wächter (Schritt 4). `directory.ts` entsteht ganz in B (siehe „Umsetzung“).
 - Dann zwei Pakete parallel in eigenen Worktrees:
 
 | | Paket A – Daten, Route, Tab-Leiste, Verdrahtung (`PW_PORT=4173`) | Paket B – Oberfläche im Chunk (`PW_PORT=4273`) |
@@ -533,6 +533,25 @@ Nicht in diesem Plan. Gründe:
 ## Umsetzung
 
 **Stapel (2026-10-05):** `main` (2d134a2) ← Nacharbeit 0009 (`worktree-hinweise-0009`) ← diese Plan-Doku (`anbieter-0010-v2`, aus `origin/anbieter-0010` übernommen, ohne Force-Push) ← Paket 0. `main` springt per Fast-Forward erst auf einen Stand mit grünem Budget.
+
+**Schritt 3, Ausgangswert (2026-10-05):** `main` 6ab43b5 plus ADR 0012 (Branch `adr-0012`, ec737bc): Start-JS 89,62 kB von 92 kB, gleicher Hash wie ohne die Gruppe `$initial`, Chunk-Wächter grün.
+
+**Schritt 4, Schnittstellen (2026-10-05, Branch `anbieter-0010-schnitt`):**
+- **Inhalt:**
+  - `route.ts`: Tab `anbieter` zwischen Kalender und Merkliste, mit Tests (Roundtrip, `tabSection`, „kein Startpunkt“ über alle fünf Tabs). `providerId`/`anbieter=` folgt in A.
+  - `site-data.ts`: Typen `SiteProvider`, `ProviderDirectoryData`. `toProviderDirectory` folgt in A.
+  - `provider-types.ts`: `ProviderScreenProps`, `ProviderSheetProps`, `ProviderUiModule`.
+  - `anbieter/entry.ts` mit Stubs `ProviderScreen` (`useState`, `Icon`, `plural`, `standDate` samt `time.ts`) und `ProviderSheet`.
+  - `ProviderPanel.tsx`: Lader per `import()`, vorerst mit leerem Katalog.
+  - `App.tsx`: rendert ihn bei `ansicht=anbieter`; `providerQuery` lebt hier.
+  - `vite.config.ts`: Ordnerregel `assets/anbieter/`.
+  - Vorgezogen aus A (Arch-Review M1): Regeln `anbieter-ui-only-lazy` und `anbieter-ui-entry-only`, `LAZY_LOADERS`-Eintrag `ProviderPanel.tsx`, Budget-Zeile `Anbieter JS (lazy)` 6 kB. Kanarienvögel rot: Typ-Import aus `anbieter/` in `App.tsx` (beide Regeln), dynamischer Import in `Overlays.tsx` (`anbieter-ui-entry-only`), zusätzlicher statischer Import im Lader (`lazy-loader-static`; dependency-cruiser fasst die Kanten zusammen).
+  - Noch kein Knopf in der Tab-Leiste, erreichbar nur per URL.
+- **Messung:** Start-JS **89,80 kB** (+0,18 kB: Tab, Lader, Verdrahtung), Chunk `assets/anbieter/entry-*.js` 0,50 kB. Chunk-Wächter grün.
+- **Kanarienvogel** (ADR 0012): ohne die Gruppe `$initial` spaltet schon dieser Stub `jsx-runtime` und `time` ab, der Wächter wird rot. Zurückgebaut.
+- **Abweichungen vom Plan, beide ohne Folgen für das Budget:**
+  - `directory.ts` entsteht ganz in **B**, statt als Stub hier: Es wird nur im Chunk genutzt, ein Stub ohne Logik bräche knip und die Coverage.
+  - `ensureFresh` ruft **`ProviderPanel`** auf (A), bevor es den Katalog an Screen bzw. Sheet gibt, nicht der Chunk selbst (E6). So hängt B nicht an `src/data/providers.ts`. E7 hatte den Abgleich ohnehin im Start eingeplant (ca. 0,15 kB). Screen und Sheet bekommen `directory` immer schon abgeglichen.
 
 ## Struktur
 
@@ -793,8 +812,8 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
 3. **Worktree und Ausgangswert:** Branch auf dem aktuellen `main` (mit ADR 0012), `pnpm install --ignore-scripts`, `pnpm build && pnpm size`.
    - *Fertig:* Wert notiert, Chunk-Wächter grün.
 4. **Schnittstellen** (ein Commit):
-   - `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts`, `directory.ts` mit Typen und Stubs.
-   - `anbieter/entry.ts` als **Stub mit `useState`, der geteilte Start-Module nutzt** (`Dialog`, `Icon`, `time.ts`), schon von `ProviderPanel` per `import()` geladen und im Tab „Anbieter“ verdrahtet (Review 2, M5; ADR 0012).
+   - `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts` (`directory.ts` entsteht ganz in B, siehe „Umsetzung“).
+   - `anbieter/entry.ts` als **Stub mit `useState`, der geteilte Start-Module nutzt** (umgesetzt mit `Icon`, `plural`, `standDate` samt `time.ts`), schon von `ProviderPanel` per `import()` geladen und im Tab „Anbieter“ verdrahtet (Review 2, M5; ADR 0012).
    - Dann `pnpm build && pnpm size` samt Chunk-Wächter, dazu der Kanarienvogel ohne Gruppe `$initial` (rot).
    - *Fertig:* `pnpm check:fast` grün, Chunk-Wächter grün (keine Abspaltung durch den Anbieter-Chunk), Kanarienvogel rot gesehen, Messwert notiert. Erst dann beginnen A und B.
 5. **Pakete A und B parallel** (E13), test-first für die Domäne, nach jedem Block `pnpm check:fast`.
@@ -808,6 +827,7 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
    - **B:** `directory.ts`, `provider-format.ts`, Screen, Sheet, `context`, CSS.
      - *Fertig:* `check:fast` und Unit-Tests grün.
 6. **Zusammenführen:**
+   - **Erst dieser Stand geht nach `main`.** „Schnittstellen“ und A bzw. B allein bleiben auf ihren Branches (Branch-CI), weil `?ansicht=anbieter` dort ohne Tab-Knopf, E2E und `expectMobileUx` erreichbar wäre (Arch-Review „Schnittstellen“, M2).
    - A nach B, dann die E2E von B.
    - `pnpm check` komplett, inklusive WebKit (lokal ggf. ohne `iphone-15`).
    - Budget messen.
@@ -978,3 +998,9 @@ Keine Blocker.
 - **Design-System:** unverändert, keine neuen Bauteile.
 
 **Offen (Gerät):** Ob der Merklisten-Download am **echten iPhone** nach dem `await` noch als Folge des Tipps gilt (ADR 0007). Playwright-WebKit lädt herunter, ersetzt aber kein iOS Safari. Das prüft der Nutzer am Gerät: Merkliste → „Alle in den Kalender“ → erscheint der Kalender- bzw. Download-Dialog?
+
+### Arch-Review „Schnittstellen“ (2026-10-05, arch-reviewer) – Verdict: OK, keine Blocker → eingearbeitet
+- **M1:** Kommentare nannten Regeln und ein Budget, die es noch nicht gab. → Regeln, `LAZY_LOADERS` und Budget-Zeile sind in „Schnittstellen“ vorgezogen, mit Kanarienvögeln.
+- **M2:** `?ansicht=anbieter` ist ohne Tab-Knopf, E2E und `expectMobileUx` erreichbar. → Der Zwischenstand geht nie allein nach `main` (Schritt 6).
+- **M3:** E6 (`ensureFresh` im Chunk) und E13/Schritt 4 (`directory.ts`-Stub) widersprachen der Umsetzung. → Nachgeführt.
+- **M4:** ADR 0012 nannte `Dialog` im Stub, ADR 0008 nennt noch 90 kB, „Fertig, wenn ≤ 87,7 kB“ stand unverändert. → Korrigiert bzw. als ersetzt markiert.
