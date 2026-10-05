@@ -1,6 +1,6 @@
 /** Merkliste (Plan 0003, E12, ADR 0007). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import { readFileSync } from "node:fs";
-import { expect, test } from "./fixtures.ts";
+import { expect, exportPreload, test } from "./fixtures.ts";
 
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
 
@@ -82,12 +82,13 @@ test("lädt alle gemerkten Termine als eine ICS-Datei", async ({ page }) => {
 // Plan 0010, E8 (Paket 0, A): Der ICS-Code ist ein Lazy-Chunk in assets/export/. Er lädt im Leerlauf nach dem ersten
 // Rendern vor (ohne Service Worker wäre der Export offline sonst weg), nie als Teil des Starts.
 test("Export-Code ist ein eigener Chunk und lädt im Leerlauf vor", async ({ page }) => {
-  const isExport = (url: string) => /\/assets\/export\/[^/]+\.js$/.test(new URL(url).pathname);
-  const chunk = page.waitForResponse((r) => isExport(r.url()));
+  // Auf eine frische Seite: beforeEach hat schon geladen, dessen Vorladen könnte sonst die Antwort sein
+  const preloaded = exportPreload(page);
   await page.reload();
-  const response = await chunk;
+  const response = await preloaded;
   expect(response.ok()).toBe(true);
-  expect(await response.text()).toContain("BEGIN:VCALENDAR");
+  // Inhalt über einen eigenen Abruf: Den Body einer Antwort gibt der Browser nach einer Navigation nicht mehr her
+  expect(await (await page.request.get(response.url())).text()).toContain("BEGIN:VCALENDAR");
   const start = await page.evaluate(() =>
     [...document.querySelectorAll<HTMLScriptElement>("script[type=module][src]")].map((s) => s.src),
   );
