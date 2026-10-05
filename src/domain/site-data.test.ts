@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { icsContextFor, icsForSeries } from "./ics.ts";
 import { Venue } from "./schema.ts";
-import { MIN_ADDRESS, toProviderDirectory, toSiteData, venueAddress } from "./site-data.ts";
+import { MIN_ADDRESS, type SiteProvider, toProviderDirectory, toSiteData, venueAddress } from "./site-data.ts";
 import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
@@ -94,7 +94,7 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
 
   it("kürzt Adressen per venueAddress und lässt district ohne Wert weg", () => {
     const turnverein = directory.providers.find((p) => p.id === "turnverein-beispiel");
-    expect(turnverein).toEqual({
+    const expected: SiteProvider = {
       id: "turnverein-beispiel",
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
@@ -103,7 +103,8 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
         { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
         { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
       ],
-    });
+    };
+    expect(turnverein).toEqual(expected);
     expect(turnverein?.venues[1] && "district" in turnverein.venues[1]).toBe(false);
   });
 });

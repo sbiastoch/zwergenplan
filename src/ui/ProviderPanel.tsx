@@ -22,9 +22,15 @@ interface ProviderUi extends ProviderUiModule {
 /** Ein Promise für Vorladen, Tab und Sheet: ein Chunk- und ein Daten-Request. Ein Fehlschlag leert ihn. */
 let pending: Promise<ProviderUi> | undefined;
 
+/** Destrukturiert direkt am `import()`: So sieht knip, welche Exporte des Chunks genutzt werden. */
+async function loadChunk(): Promise<ProviderUiModule> {
+  const { ProviderScreen, ProviderSheet } = await import("./anbieter/entry.ts");
+  return { ProviderScreen, ProviderSheet };
+}
+
 async function fetchUi(): Promise<ProviderUi> {
-  const [ui, data] = await Promise.all([import("./anbieter/entry.ts"), loadProviderDirectory()]);
-  return { ProviderScreen: ui.ProviderScreen, ProviderSheet: ui.ProviderSheet, data };
+  const [ui, data] = await Promise.all([loadChunk(), loadProviderDirectory()]);
+  return { ...ui, data };
 }
 
 /**

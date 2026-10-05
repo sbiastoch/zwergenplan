@@ -170,14 +170,14 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await expect(providerSheet(page)).toBeHidden();
   });
 
-  test("Detail → „Alle Angebote dieses Anbieters“: Sheet offen, Detail zu; Zurück öffnet wieder das Detail", async ({
+  test("Detail → „Mehr von diesem Anbieter“: Sheet offen, Detail zu; Zurück öffnet wieder das Detail", async ({
     page,
   }) => {
     await ready(page);
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
     const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
     await expect(detail).toBeVisible();
-    await detail.getByRole("button", { name: "Alle Angebote dieses Anbieters" }).click();
+    await detail.getByRole("button", { name: "Mehr von diesem Anbieter" }).click();
     const sheet = providerSheet(page);
     await expect(sheet.getByRole("heading", { level: 2, name: "Familientreff Beispielhof (fiktiv)" })).toBeVisible();
     await expect(detail).toBeHidden();
@@ -202,7 +202,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     expect(onTop, "über dem Sheet liegt das Detail").toBe("Offener Krabbeltreff");
 
     const length = await page.evaluate(() => window.history.length);
-    await detail.getByRole("button", { name: "Alle Angebote dieses Anbieters" }).click();
+    await detail.getByRole("button", { name: "Mehr von diesem Anbieter" }).click();
     await expect(detail).toBeHidden();
     await expect(sheet.getByRole("heading", { level: 2, name: "Familientreff Beispielhof (fiktiv)" })).toBeVisible();
     expect(new URL(page.url()).search).toBe("?anbieter=familientreff-beispiel");

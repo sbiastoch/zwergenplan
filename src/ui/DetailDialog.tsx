@@ -41,7 +41,10 @@ interface DetailProps {
   saved: boolean;
   onToggleSave: (offer: SiteOffer) => void;
   onClose: () => void;
-  /** „Alle Angebote dieses Anbieters“: öffnet das Anbieter-Sheet (Plan 0010, E2, E3) */
+  /**
+   * „Mehr von diesem Anbieter“: öffnet das Anbieter-Sheet (Plan 0010, E2, E3). Statt „Alle Angebote dieses Anbieters“
+   * aus dem Plan: Das brach bei 320 px mit Icon auf zwei Zeilen um (Text-Gate, kurze Knöpfe einzeilig).
+   */
   onProvider: (providerId: string) => void;
   onIcs: (message: string) => void;
 }
@@ -155,7 +158,7 @@ export function DetailContent({
           <p className="provider-link">
             <button type="button" className="btn wide" onClick={() => onProvider(offer.providerId)}>
               <Icon name="store" size={20} />
-              Alle Angebote dieses Anbieters
+              Mehr von diesem Anbieter
             </button>
             <a className="btn wide" href={offer.url} target="_blank" rel="noopener">
               <Icon name="external" size={20} />
