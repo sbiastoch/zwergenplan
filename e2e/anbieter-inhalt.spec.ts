@@ -9,7 +9,7 @@
  */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
-import { observeVitals, readVitals } from "./vitals.ts";
+import { clsFrom, observeVitals, readVitals } from "./vitals.ts";
 
 const BIBLIOTHEK = "Bibliothek Beispiel (fiktiv)";
 const GEMEINDE =
@@ -101,9 +101,9 @@ test.describe("Startpunkt Gostenhof", () => {
     // Layout-Shift-API gibt es nur in Chromium
     if (browserName === "chromium") {
       await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-      const shifts = (await readVitals(page)).shifts.slice(before);
-      const cls = shifts.reduce((sum, s) => sum + s.value, 0);
-      expect(cls, shifts.map((s) => s.sources.join("; ")).join("\n")).toBeLessThan(0.05);
+      // ohne Eingabe-Shifts, wie die CLS-Definition (Plan 0013, Befund F1)
+      const { cls, detail } = clsFrom(await readVitals(page), before);
+      expect(cls, `CLS\n${detail}`).toBeLessThan(0.05);
     }
   });
 });

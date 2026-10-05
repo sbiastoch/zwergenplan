@@ -10,6 +10,10 @@
  * beobachteten Shifts: `markShifts()` wartet zwei Frames, holt mit `takeRecords()` alles Ausstehende ab und merkt
  * sich die Anzahl; gezählt werden nur spätere Einträge. Der Kanarienvogel in font-swap.spec.ts verlangt, dass ein
  * Shift direkt nach der Grenze zählt.
+ *
+ * Eingabe-Shifts (`hadRecentInput`) werden mitgeschrieben und markiert. `clsFrom` lässt sie wie die CLS-Definition
+ * weg, die Swap-Messung zählt sie mit: Chrome wertet auch eine Viewport-Änderung als Eingabe, und auf CI-Runnern
+ * verschluckte das 500-ms-Fenster danach den Swap (Plan 0013, Befund F1).
  */
 import { createRequire } from "node:module";
 import {
@@ -23,6 +27,8 @@ import {
 interface Shift {
   startTime: number;
   value: number;
+  /** hadRecentInput: innerhalb von 500 ms nach einer Eingabe, laut Chrome auch nach einer Viewport-Änderung */
+  input: boolean;
   sources: string[];
 }
 interface Vitals {
@@ -41,7 +47,7 @@ declare global {
   }
 }
 
-/** LCP und alle Layout-Shifts (ohne Eingabe) samt Verursachern mitschreiben, vor dem Laden registrieren. */
+/** LCP und alle Layout-Shifts samt Verursachern und Eingabe-Merkmal mitschreiben, vor dem Laden registrieren. */
 export async function observeVitals(page: Page) {
   await page.addInitScript(() => {
     const shifts: Shift[] = [];
@@ -56,7 +62,7 @@ export async function observeVitals(page: Page) {
       for (const e of entries) {
         // LayoutShift fehlt in lib.dom: Felder per Typprüfung lesen statt per Cast (beide Rechtecke geprüft)
         const value = "value" in e && typeof e.value === "number" ? e.value : 0;
-        if ("hadRecentInput" in e && e.hadRecentInput === true) continue;
+        const input = "hadRecentInput" in e && e.hadRecentInput === true;
         const raw: unknown[] = "sources" in e && Array.isArray(e.sources) ? e.sources : [];
         const sources = raw
           .filter(
@@ -73,7 +79,7 @@ export async function observeVitals(page: Page) {
             const name = el ? `${el.tagName.toLowerCase()}${el.classList[0] ? `.${el.classList[0]}` : ""}` : "?";
             return `${name} ${box(src.previousRect)} → ${box(src.currentRect)}`;
           });
-        shifts.push({ startTime: e.startTime, value, sources });
+        shifts.push({ startTime: e.startTime, value, input, sources });
       }
     };
     const observer = new PerformanceObserver((list) => record(list.getEntries()));
@@ -101,12 +107,22 @@ async function markShifts(page: Page): Promise<number> {
   });
 }
 
-/** CLS-Summe der Shifts ab Eintrag `from` (siehe `markShifts`), dazu die Verursacher für die Fehlermeldung */
-export function clsFrom(vitals: Vitals, from = 0): { cls: number; detail: string } {
-  const shifts = vitals.shifts.slice(from);
+/**
+ * CLS-Summe der Shifts ab Eintrag `from` (siehe `markShifts`), dazu die Verursacher für die Fehlermeldung.
+ * Eingabe-Shifts zählen nur mit `withInput` (Swap-Messung), sonst gilt die CLS-Definition.
+ */
+export function clsFrom(
+  vitals: Vitals,
+  from = 0,
+  { withInput = false }: { withInput?: boolean } = {},
+): { cls: number; detail: string } {
+  const shifts = vitals.shifts.slice(from).filter((s) => withInput || !s.input);
   const cls = shifts.reduce((sum, s) => sum + s.value, 0);
   const detail = shifts
-    .map((s) => `${s.value.toFixed(4)} @${Math.round(s.startTime)} ms: ${s.sources.slice(0, 4).join("; ")}`)
+    .map(
+      (s) =>
+        `${s.value.toFixed(4)} @${Math.round(s.startTime)} ms${s.input ? " [input]" : ""}: ${s.sources.slice(0, 4).join("; ")}`,
+    )
     .join("\n");
   return { cls, detail };
 }
@@ -269,8 +285,13 @@ export type SwapResult = { cls: number; detail: string } | "fehlt";
  * Misst den Schrift-Swap (Plan 0007, E12): Webfont zurückhalten, nur `chosen` als Fallback zulassen und laden,
  * 300 ms warten, Grenze setzen (`markShifts`), Webfont freigeben, Swap abwarten, CLS ab der Grenze summieren.
  * Gemessen wird so genau der Swap, nicht das Laden der Daten oder der Test-Roboto. Ohne CPU-Drosselung: Es geht
- * um Verschiebung, nicht um Tempo. `shiftAfterMark` und `unadjusted` sind nur für die Kanarienvögel in
- * font-swap.spec.ts (Grenze bzw. Gegenprobe ohne Breitenanpassung).
+ * um Verschiebung, nicht um Tempo. `shiftAfterMark`, `resizeBeforeMark` und `unadjusted` sind nur für die
+ * Kanarienvögel in font-swap.spec.ts (Grenze, Viewport-Änderung bzw. Gegenprobe ohne Breitenanpassung).
+ *
+ * `width`/`height` sind der erwartete Viewport. Er kommt aus `test.use({ viewport })`, nie aus `setViewportSize`:
+ * Die Größenänderung kam auf CI-Runnern teils erst im neuen Dokument an und öffnete dort ein Eingabe-Fenster
+ * (Plan 0013, Befund F1). Zwischen Grenze und `release()` darf keine Eingabe (`click()` …) stehen, denn die
+ * Messung zählt Eingabe-Shifts mit.
  */
 export async function measureSwap(
   page: Page,
@@ -280,13 +301,20 @@ export async function measureSwap(
     height,
     at,
     shiftAfterMark = false,
+    resizeBeforeMark = false,
     unadjusted = false,
-  }: { width: number; height: number; at?: Date; shiftAfterMark?: boolean; unadjusted?: boolean },
+  }: {
+    width: number;
+    height: number;
+    at?: Date;
+    shiftAfterMark?: boolean;
+    resizeBeforeMark?: boolean;
+    unadjusted?: boolean;
+  },
 ): Promise<SwapResult> {
   await allowOnlyFallback(page, chosen, unadjusted);
   const font = await holdWebfont(page);
   await observeVitals(page);
-  await page.setViewportSize({ width, height });
   if (at) await page.clock.setFixedTime(at);
   await page.goto("./");
   await expect(page.getByTestId("offer").first()).toBeVisible();
@@ -296,6 +324,11 @@ export async function measureSwap(
   }
   font.expectHeld();
   await page.waitForTimeout(300);
+  expect(
+    await page.evaluate(() => [window.innerWidth, window.innerHeight]),
+    "Viewport per test.use({ viewport }) setzen (Plan 0013, F1)",
+  ).toEqual([width, height]);
+  if (resizeBeforeMark) await page.setViewportSize({ width, height: height - 1 });
   const boundary = await markShifts(page);
   if (shiftAfterMark)
     await page.evaluate(() => {
@@ -305,7 +338,7 @@ export async function measureSwap(
   font.release();
   await expectWebfontSwapped(page);
   await page.waitForTimeout(500);
-  return clsFrom(await readVitals(page), boundary);
+  return clsFrom(await readVitals(page), boundary, { withInput: true });
 }
 
 /**

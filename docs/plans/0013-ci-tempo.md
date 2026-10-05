@@ -301,6 +301,40 @@ Queue-Zeit lag in allen Läufen bei 2–4 s je Job, kein Befund.
 - **Test 4** ([Lauf 37350873604](https://github.com/sbiastoch/zwergenplan/actions/runs/37350873604), Commit `acc6ef5`, Server für `PW_SUITE=smoke` auf `dist-e2e/`, dort E2E-Build mit echten Daten, siehe Abweichungen): Rot ist nur der Smoke-Job mit genau 1 failed, im Test „Karte ist bereit, Orts-Liste vollständig, kein Test-Haken im Deploy-Build“ an `e2e/smoke.spec.ts:138` (`"__zpMap" in window`, Expected false, Received true). Alle E2E-Shards grün, `gates` übersprungen. Zurückgenommen in `4afcffa`.
 - Wieder grün: LAUF_GRUEN.
 
+### Befund F1: Swap-Messung verwirft Shifts nach einer Viewport-Änderung (Nachtrag 2026-10-05)
+
+**Beobachtung.** Nach dem Fast-Forward waren drei main-Läufe hintereinander rot, alle in `E2E chromium 2/4` (`pixel-7`), immer in den Gegen-Kanarienvögeln von `e2e/font-swap.spec.ts`:
+- [37359159821](https://github.com/sbiastoch/zwergenplan/actions/runs/37359159821) (`10643e8`): „zählt einen Shift direkt nach der Grenze“.
+- [37360033809](https://github.com/sbiastoch/zwergenplan/actions/runs/37360033809) (`693ffd1`): dazu „erkennt Roboto ohne Breitenanpassung“.
+- [37361003270](https://github.com/sbiastoch/zwergenplan/actions/runs/37361003270) (`workflow_dispatch`): wie der erste.
+
+Gemessen wurde jeweils CLS 0 statt > 0,05, im ersten Versuch und im Retry. Derselbe Fehler trat schon vor diesem Plan auf, in [37332253362](https://github.com/sbiastoch/zwergenplan/actions/runs/37332253362) (Branch `spike-push-0011`, alter Einzel-Job). Mit der Parallelisierung hat er nichts zu tun.
+
+**Ursache** (Diagnose-Branch `diag-font-swap`, [Lauf 37362036634](https://github.com/sbiastoch/zwergenplan/actions/runs/37362036634): sechs Runner, je 40 Wiederholungen, alle `layout-shift`-Einträge roh protokolliert):
+- Auf einem der sechs Runner tragen alle Shifts in den ersten ca. 550–580 ms nach dem Navigationsstart `hadRecentInput: true`, auch die künstliche Verschiebung um 120 px. `observeVitals` verwirft solche Einträge, also misst der Test 0 (4 von 40 rot).
+- Eine Eingabe gibt es im Test nicht. Chrome zählt aber eine Viewport-Änderung als Eingabe. `measureSwap` setzt die Größe mit `setViewportSize` vor `goto`. Auf diesem Runner kam die neue Größe erst im neuen Dokument an (Trace: erstes Bild 839 px hoch, dann 915 px). Das 500-ms-Fenster reichte deshalb bis über die Grenze.
+- Lokal deterministisch nachgestellt: Eine Viewport-Änderung direkt vor der Grenze macht „Shift nach der Grenze“ rot, 5 von 5.
+
+Das ist ein **Loch im Swap-Gate**, nicht nur ein wackelnder Test. Ein echter Swap-Shift in diesem Fenster würde ebenso verworfen, und das Gate bliebe grün.
+
+**Entscheidung** (nach Review, siehe unten):
+- **Ursache abstellen**: `measureSwap` ändert den Viewport nicht mehr. Er kommt aus `test.use({ viewport })` (font-swap.spec.ts: 412×915, font-swap.smoke.spec.ts: je Breite ein `describe`). `measureSwap` prüft vor der Grenze `innerWidth`/`innerHeight` gegen die erwartete Größe.
+- **Zweite Sicherung**: `observeVitals` schreibt jeden Shift mit, samt Merkmal `input` (`hadRecentInput`). `clsFrom(vitals, from, { withInput })` lässt Eingabe-Shifts standardmäßig weg. Das ist die CLS-Definition und gilt für `perf.spec.ts`, `smoke.spec.ts` und `anbieter-inhalt.spec.ts`; Letzteres summierte bisher selbst und nutzt jetzt `clsFrom`. `measureSwap` zählt ab der Grenze alle Shifts (`withInput: true`). Zwischen Grenze und `release()` steht keine Eingabe, ein Eingabe-Shift ist dort ein Artefakt. Das hält ein Kommentar an `measureSwap` fest. `detail` markiert Eingabe-Shifts mit `[input]`.
+- Schwellen unverändert. Die Gates mit `< 0,05` werden nur strenger. Die Gegen-Kanarienvögel mit `> 0,05` könnten durch ein Eingabe-Artefakt grün werden. Da der Viewport nicht mehr wechselt, gibt es dieses Artefakt aber nicht mehr.
+- **Neuer Kanarienvogel** in `font-swap.spec.ts`: Viewport-Änderung direkt vor der Grenze, danach die künstliche Verschiebung. Er muss > 0,05 messen.
+- Verworfen: die Grenze erst 500 ms nach der letzten Größenänderung setzen. Das hängt an der Annahme über den Auslöser des Fensters und kostet Zeit.
+
+**Belege lokal**:
+- Neuer Kanarienvogel ohne Korrektur: 5 von 5 rot (`Received: 0`).
+- Mit Korrektur grün; nimmt man nur `withInput` wieder heraus: 3 von 3 rot.
+- `font-swap.spec.ts` 10 Wiederholungen: 50 passed.
+- `anbieter-inhalt.spec.ts`: 65 passed.
+- `font-swap.smoke.spec.ts`: 8 passed, CLS 0,0000–0,0024.
+
+**Review (plan-reviewer, Freigabe mit Änderungen, eingearbeitet)**: W1 `anbieter-inhalt.spec.ts` auf `clsFrom`. W2 Viewport per `test.use` statt nur die Wirkung abzufangen, plus Größenprüfung. W3 Abnahme in CI muss einen Eingabe-Shift nach der Grenze zeigen, sonst beweist „0 Rote“ nichts. Hinweise: `[input]` in `detail`, Optionsobjekt, Doku (Kopf von `vitals.ts`, `docs/architecture.md`), Kommentar „keine Eingabe zwischen Grenze und `release()`“.
+
+**Abnahme in CI**: CI_F1
+
 ### Abweichungen vom Plan
 
 - **`console.warn` statt `console.log`** für die `[perf]`-Zeile: Biome erlaubt in `e2e/` nur `warn` und `error` (`noConsole`). Ein `biome-ignore` wäre die schlechtere Wahl.
