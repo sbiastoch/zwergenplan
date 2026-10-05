@@ -5,7 +5,7 @@
  * Einzelnen prüft anbieter-inhalt.spec.ts (Paket B). Hier zählen die Wege: Zeile → Sheet → Kachel → Detail und zurück.
  */
 import type { Page, Request } from "@playwright/test";
-import { expect, exportPreload, test } from "./fixtures.ts";
+import { expect, startPreloads, test } from "./fixtures.ts";
 import { expectMobileUx } from "./mobile-ux.ts";
 
 const KRABBELTREFF = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
@@ -27,9 +27,9 @@ const row = (page: Page, name: string) =>
 /** „Website & Programm“ im Sheet (E10, Punkt 3) */
 const websiteLink = (page: Page) => providerSheet(page).getByRole("link", { name: "Website & Programm" });
 
-/** Seite bereit, auch der Export-Code ist vorgeladen: Danach entsteht kein Request ohne Anlass (Plan 0010, E8 A). */
+/** Seite bereit, auch Export-Code und PWA-Kern sind nachgeladen: Danach entsteht kein Request ohne Anlass (Plan 0010, E8 A; Plan 0011, E5). */
 async function ready(page: Page, path = "./") {
-  const preloaded = exportPreload(page);
+  const preloaded = startPreloads(page);
   await page.goto(path);
   await expect(page.getByRole("status")).toBeVisible();
   await preloaded;

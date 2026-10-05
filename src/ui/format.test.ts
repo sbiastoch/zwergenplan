@@ -11,10 +11,12 @@ import {
   dayHeading,
   formatFact,
   hiddenNote,
+  ICS_OFFLINE,
   limitHint,
   limitReason,
   loadErrorText,
   mapStatusParts,
+  offlineNote,
   originHint,
   originPhrase,
   plural,
@@ -480,5 +482,16 @@ describe("Hinweis im Kind-Sheet (Plan 0009, N3)", () => {
     expect(originHint(undefined, stadtteil, fehler)).toBeUndefined();
     expect(originHint(undefined, karte, { kind: "oepnv" })).toBeUndefined();
     expect(originHint(undefined, karte, fehler)).toBeUndefined();
+  });
+});
+
+describe("Offline-Stand und ICS offline (Plan 0011, E4)", () => {
+  it("Statuszeile nennt den Tag des Datenstands in Berlin", () => {
+    expect(offlineNote("2026-10-04T23:30:00Z")).toBe("Offline – Stand vom 5.10.");
+    expect(offlineNote("2026-10-05T06:00:00+02:00")).toBe("Offline – Stand vom 5.10.");
+  });
+
+  it("Toast, wenn eine Kalender-Datei offline nicht lädt", () => {
+    expect(ICS_OFFLINE).toBe("Kalender-Datei braucht Netz");
   });
 });

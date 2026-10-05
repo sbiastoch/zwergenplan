@@ -109,6 +109,48 @@ describe("transitReducer (Plan 0009, E9/E11)", () => {
   });
 });
 
+describe("Frische-Anlass: geladene Tabelle neu laden (Plan 0011, E4a)", () => {
+  const NEW_FILE: TransitTableFile = { ...FILE, serviceDay: "2026-10-20" };
+
+  it("nur eine fertige Tabelle lädt neu; die alte bleibt solange in Gebrauch", () => {
+    const refreshing = transitReducer(ready(), { type: "refresh" });
+    expect(refreshing).toEqual({ kind: "bereit", file: FILE, logic, attempt: 2, refresh: true });
+    const table = decodeFor(refreshing, KEYS);
+    expect(resolveReach(refreshing, table, GOSTENHOF).mode).toEqual({ kind: "oepnv" });
+  });
+
+  it("ohne Tabelle (aus, lädt, fehler) und während des Neuladens: nichts", () => {
+    const aus = initialTransitState(false);
+    const laedt = initialTransitState(true);
+    const fehler = run(laedt, { type: "failed", attempt: 1 });
+    const refreshing = transitReducer(ready(), { type: "refresh" });
+    for (const state of [aus, laedt, fehler, refreshing]) {
+      expect(transitReducer(state, { type: "refresh" })).toBe(state);
+    }
+  });
+
+  it("die neue Tabelle ersetzt die alte", () => {
+    const next = run(ready(), { type: "refresh" }, { type: "loaded", attempt: 2, file: NEW_FILE, logic });
+    expect(next).toEqual({ kind: "bereit", file: NEW_FILE, logic, attempt: 2 });
+  });
+
+  it("scheitert das Neuladen, bleibt die alte Tabelle (kein Rückfall auf die Luftlinie)", () => {
+    const next = run(ready(), { type: "refresh" }, { type: "failed", attempt: 2 });
+    expect(next).toEqual({ kind: "bereit", file: FILE, logic, attempt: 2 });
+  });
+
+  it("passt die alte Tabelle nicht zu neuen Orten: kein Fehler, solange die neue lädt", () => {
+    const refreshing = transitReducer(ready(), { type: "refresh" });
+    expect(transitReducer(refreshing, { type: "stale", attempt: 2 })).toBe(refreshing);
+  });
+
+  it("Antworten eines alten Versuchs zählen nicht", () => {
+    const refreshing = transitReducer(ready(), { type: "refresh" });
+    expect(transitReducer(refreshing, { type: "loaded", attempt: 1, file: NEW_FILE, logic })).toBe(refreshing);
+    expect(transitReducer(refreshing, { type: "failed", attempt: 1 })).toBe(refreshing);
+  });
+});
+
 describe("resolveReach: Modus je Lage (E11)", () => {
   const table = decodeFor(ready(), KEYS);
 

@@ -1,5 +1,6 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { activeFilterCount, EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
@@ -12,9 +13,11 @@ import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
 import {
   ageChipLabel,
+  ICS_OFFLINE,
   limitHint,
   loadErrorText,
   mapStatusParts,
+  offlineNote,
   plural,
   providerStatusParts,
   reachNote,
@@ -41,7 +44,11 @@ import {
 import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
-type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
+/** `stale`: Daten aus dem Cache des Service Workers, die Statuszeile sagt „Offline – Stand vom …“ (Plan 0011, E4) */
+type LoadState =
+  | { kind: "loading" }
+  | { kind: "error"; reason: LoadFailure }
+  | { kind: "ready"; data: SiteData; stale: boolean };
 
 const NO_OFFERS: SiteOffer[] = [];
 
@@ -80,7 +87,7 @@ export function App() {
     void attempt;
     setLoad({ kind: "loading" });
     loadSiteData().then(
-      (data) => setLoad({ kind: "ready", data }),
+      (site) => setLoad({ kind: "ready", ...site }),
       // Die Fehlerart kennt nur src/data; ein unbekannter Fehler zeigt nie seinen Rohtext (Plan 0008, E5).
       (e: unknown) => setLoad({ kind: "error", reason: e instanceof SiteLoadError ? e.reason : "server" }),
     );
@@ -103,6 +110,24 @@ export function App() {
   // Wegzeit (Plan 0009, E9–E11): lädt beim Start nur mit gespeichertem Stadtteil, sonst erst auf Anlass
   const transit = useTransit(origin, placeKeys);
   const { mode: reachMode, want } = transit;
+
+  // PWA-Kern nach `load` (Plan 0011, E5). Frische-Anlass (E4a): Daten ohne Ladezustand tauschen, eine geladene
+  // Wegzeit-Tabelle lädt mit. Scheitert das Neuladen, bleibt der bisherige Stand.
+  const refreshTransit = transit.refresh;
+  useEffect(
+    () =>
+      startPwa({
+        refresh: () => {
+          refreshTransit();
+          loadSiteData().then(
+            (site) => setLoad({ kind: "ready", ...site }),
+            () => {},
+          );
+        },
+        icsOffline: () => say(ICS_OFFLINE),
+      }),
+    [refreshTransit, say],
+  );
   const views = useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now, reach: transit.reach });
   const { visible, hiddenCount, showUnfit, page, calendar, saved, detailOffer } = views;
 
@@ -262,6 +287,13 @@ export function App() {
                 ) : (
                   <span>
                     <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
+                  </span>
+                )}
+                {load.stale && (
+                  // eigene Zeile wie der Wegzeit-Hinweis (Plan 0011, E4)
+                  <span className="status-note">
+                    <span className="sr-only">. </span>
+                    {offlineNote(load.data.generatedAt)}
                   </span>
                 )}
                 {origin && reachMode && (

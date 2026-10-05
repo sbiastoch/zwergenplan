@@ -8,6 +8,7 @@ import type { ThemeChoice } from "../data/preferences.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { formatGermanDate, parseGermanDate } from "../domain/time.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
+import { AppExtrasSection } from "./AppExtras.tsx";
 import { plural } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
 import type { OriginApi } from "./use-app-state.ts";
@@ -126,6 +127,7 @@ export function KidSheet({
             ))}
           </div>
         </fieldset>
+        <AppExtrasSection />
       </div>
       <div className="sheetfoot single">
         <button type="button" className="btn primary wide" onClick={onClose}>

@@ -42,7 +42,8 @@ export type ReachMode =
 export type TransitState =
   | { kind: "aus" | "fehler"; attempt: number }
   | { kind: "laedt"; attempt: number; retry: boolean }
-  | { kind: "bereit"; file: TransitTableFile; logic: TransitLogic; attempt: number };
+  /** `refresh`: lädt nach einem Frische-Anlass neu (Plan 0011, E4a); bis dahin gilt die alte Tabelle */
+  | { kind: "bereit"; file: TransitTableFile; logic: TransitLogic; attempt: number; refresh?: true };
 
 export type TransitAction =
   /** `retry`: „Nochmal laden“ (N1) */
@@ -50,12 +51,17 @@ export type TransitAction =
   | { type: "loaded"; attempt: number; file: TransitTableFile; logic: TransitLogic }
   | { type: "failed"; attempt: number }
   /** Tabelle geladen, passt aber nicht zu den Orten der Seite (alte `wegzeit.json`, E8): wie ein Fehlschlag */
-  | { type: "stale"; attempt: number };
+  | { type: "stale"; attempt: number }
+  /** Frische-Anlass (Plan 0011, E4a): eine fertige Tabelle neu laden, am HTTP-Cache vorbei */
+  | { type: "refresh" };
 
 /** Mit gespeichertem Stadtteil lädt die Tabelle gleich beim Start (E9, Auslöser 1). */
 export function initialTransitState(storedDistrict: boolean): TransitState {
   return storedDistrict ? { kind: "laedt", attempt: 1, retry: false } : { kind: "aus", attempt: 0 };
 }
+
+/** Ein Versuch läuft: erstes Laden oder Neuladen einer fertigen Tabelle (E4a) */
+const loading = (state: TransitState) => state.kind === "laedt" || (state.kind === "bereit" && state.refresh === true);
 
 export function transitReducer(state: TransitState, action: TransitAction): TransitState {
   const { attempt } = state;
@@ -66,15 +72,21 @@ export function transitReducer(state: TransitState, action: TransitAction): Tran
         ? { kind: "laedt", attempt: attempt + 1, retry: action.retry === true }
         : state;
     case "loaded":
-      if (state.kind !== "laedt" || action.attempt !== attempt) return state;
+      if (!loading(state) || action.attempt !== attempt) return state;
       return { kind: "bereit", file: action.file, logic: action.logic, attempt };
     case "failed":
-      if (state.kind !== "laedt" || action.attempt !== attempt) return state;
-      return { kind: "fehler", attempt };
+      if (!loading(state) || action.attempt !== attempt) return state;
+      // Scheitert das Neuladen, bleibt die alte Tabelle (E4a)
+      return state.kind === "bereit"
+        ? { kind: "bereit", file: state.file, logic: state.logic, attempt }
+        : { kind: "fehler", attempt };
     case "stale":
-      // erst so wirkt „Nochmal laden“ (want() nur aus „fehler“), Arch-Review 0009, Befund 2
-      if (state.kind !== "bereit" || action.attempt !== attempt) return state;
+      // erst so wirkt „Nochmal laden“ (want() nur aus „fehler“), Arch-Review 0009, Befund 2. Während des Neuladens
+      // nicht: Die neue Tabelle kennt die neuen Orte (E4a).
+      if (state.kind !== "bereit" || state.refresh || action.attempt !== attempt) return state;
       return { kind: "fehler", attempt };
+    case "refresh":
+      return state.kind === "bereit" && !state.refresh ? { ...state, attempt: attempt + 1, refresh: true } : state;
   }
 }
 
@@ -139,6 +151,11 @@ export interface TransitApi {
   want: () => void;
   /** Auslöser 4 aus E9: „Nochmal laden“; scheitert dabei nur der Chunk, lädt die Seite neu (N1) */
   retry: () => void;
+  /**
+   * Frische-Anlass (Plan 0011, E4a): War die Tabelle geladen, lädt sie mit neu. Ausnahme von „höchstens einmal je
+   * Sitzung“; der Request ist für alle gleich und hängt nicht vom Startpunkt ab (ADR 0011).
+   */
+  refresh: () => void;
 }
 
 /**
@@ -147,7 +164,7 @@ export interface TransitApi {
  */
 export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<string> | undefined): TransitApi {
   const [state, dispatch] = useReducer(transitReducer, origin?.source === "stadtteil", initialTransitState);
-  const attempt = state.kind === "laedt" ? state.attempt : 0;
+  const attempt = loading(state) ? state.attempt : 0;
   const retry = state.kind === "laedt" && state.retry;
 
   useEffect(() => {
@@ -178,5 +195,6 @@ export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<st
   const { mode, reach } = useMemo(() => resolveReach(state, table, origin), [state, table, origin]);
   const want = useCallback(() => dispatch({ type: "want" }), []);
   const retryNow = useCallback(() => dispatch({ type: "want", retry: true }), []);
-  return { mode, reach, source: table?.source, want, retry: retryNow };
+  const refresh = useCallback(() => dispatch({ type: "refresh" }), []);
+  return { mode, reach, source: table?.source, want, retry: retryNow, refresh };
 }

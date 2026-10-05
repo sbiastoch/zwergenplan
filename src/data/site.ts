@@ -20,7 +20,19 @@ export interface SiteEnv {
   early?: Promise<Response> | undefined;
   fetch: (url: string) => Promise<Response>;
   online: () => boolean;
+  /** Zeitpunkt für `lastSiteLoad` (Plan 0011, E4a) */
+  now: () => number;
 }
+
+/** Geladene Daten; `stale`: aus dem Cache des Service Workers, weil das Netz fehlte (Plan 0011, E4) */
+export interface LoadedSite {
+  data: SiteData;
+  stale: boolean;
+}
+
+/** Letzter erfolgreicher Abruf, für den Frische-Anlass (Plan 0011, E4a, `src/data/pwa.ts`) */
+let last: { at: number; stale: boolean } | undefined;
+export const lastSiteLoad = () => last;
 
 /**
  * Übernimmt die Anfrage, die das Inline-Skript in index.html beim Parsen des `<head>` startet
@@ -41,10 +53,11 @@ function browserEnv(): SiteEnv {
     fetch: (url) => globalThis.fetch(url),
     // ohne navigator (Node) gilt das Gerät als online
     online: () => typeof navigator === "undefined" || navigator.onLine !== false,
+    now: Date.now,
   };
 }
 
-export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<SiteData> {
+export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<LoadedSite> {
   let res: Response;
   try {
     // Pfad wie im Frühstart in index.html
@@ -54,12 +67,17 @@ export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<SiteDat
     throw new SiteLoadError(env.online() ? "netz" : "offline", e);
   }
   if (!res.ok) throw new SiteLoadError("server", new Error(`HTTP ${res.status}`));
+  let data: SiteData;
   try {
     // Bereits beim Build mit Zod geprüft (scripts/build-data.ts) – hier kein erneutes Parsen.
-    return (await res.json()) as SiteData;
+    data = (await res.json()) as SiteData;
   } catch (e) {
     throw new SiteLoadError("server", e);
   }
+  // Header setzt nur der Service Worker, wenn er die Kopie liefert (gleicher Name in src/sw/routes.ts)
+  const stale = res.headers.get("X-Zp-Cache") === "offline";
+  last = { at: env.now(), stale };
+  return { data, stale };
 }
 
 export function assetUrl(path: string): string {

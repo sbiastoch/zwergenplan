@@ -121,6 +121,41 @@ test("LCP und CLS bleiben mit echten Daten im Budget", async ({ page, browserNam
   expect(cls, `CLS\n${detail}`).toBeLessThan(0.05);
 });
 
+/**
+ * LCP und CLS mit Service Worker (Plan 0011, E6): erster Besuch (Registrierung nach `load`, Precache) und zweiter
+ * Besuch (Navigation über den Service Worker, Schale und Assets aus dem Cache, Daten aus dem Netz). Ein Rot wird an der
+ * Ursache behoben (spätere Registrierung, kleinere Precache-Liste), nie mit einer höheren Schwelle.
+ */
+test.describe("mit Service Worker (Plan 0011)", () => {
+  test.use({ serviceWorkers: "allow" });
+
+  test("LCP und CLS beim ersten und zweiten Besuch im Budget", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "CDP-Drosselung und LCP-API gibt es nur in Chromium");
+    const meta = await dataMeta(page);
+    test.skip(meta.offers === 0, "keine Daten");
+    await throttleMobile(page);
+    await observeVitals(page);
+    await page.clock.setFixedTime(new Date(meta.generatedAt));
+    for (const visit of ["erster", "zweiter"] as const) {
+      const site = page.waitForResponse((r) => new URL(r.url()).pathname.endsWith("/data/site.json"));
+      await page.goto("./");
+      expect((await site).fromServiceWorker(), `${visit} Besuch: site.json über den Service Worker`).toBe(
+        visit === "zweiter",
+      );
+      await expect(page.getByTestId("offer").first()).toBeVisible();
+      await page.waitForTimeout(500);
+      const vitals = await readVitals(page);
+      expect(vitals.lcp, `LCP (ms), ${visit} Besuch`).toBeLessThan(2500);
+      const { cls, detail } = clsFrom(vitals);
+      expect(cls, `CLS, ${visit} Besuch\n${detail}`).toBeLessThan(0.05);
+      // erst mit aktivem Service Worker zum zweiten Besuch
+      await page.evaluate(async () => {
+        await navigator.serviceWorker.ready;
+      });
+    }
+  });
+});
+
 test.describe("Karte mit echten Daten (Plan 0005)", () => {
   test.use({ tiles: "mock" });
 

@@ -6,3 +6,11 @@ declare const __E2E__: boolean;
  * kennt keine Window-Felder); `window.__zpSite` ist dieselbe Eigenschaft.
  */
 declare var __zpSite: Promise<Response> | undefined;
+/** Chromium: Angebot zur Installation (Plan 0011, E7), fehlt in lib.dom. Gelesen nur in src/data/pwa.ts. */
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  readonly userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+}
+interface WindowEventMap {
+  beforeinstallprompt: BeforeInstallPromptEvent;
+}

@@ -1,6 +1,6 @@
 /** Merkliste (Plan 0003, E12, ADR 0007). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import { readFileSync } from "node:fs";
-import { expect, exportPreload, test } from "./fixtures.ts";
+import { expect, startPreloads, test } from "./fixtures.ts";
 
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
 
@@ -83,9 +83,9 @@ test("lädt alle gemerkten Termine als eine ICS-Datei", async ({ page }) => {
 // Rendern vor (ohne Service Worker wäre der Export offline sonst weg), nie als Teil des Starts.
 test("Export-Code ist ein eigener Chunk und lädt im Leerlauf vor", async ({ page }) => {
   // Auf eine frische Seite: beforeEach hat schon geladen, dessen Vorladen könnte sonst die Antwort sein
-  const preloaded = exportPreload(page);
+  const preloaded = startPreloads(page);
   await page.reload();
-  const response = await preloaded;
+  const [response] = await preloaded;
   expect(response.ok()).toBe(true);
   // Inhalt über einen eigenen Abruf: Den Body einer Antwort gibt der Browser nach einer Navigation nicht mehr her
   expect(await (await page.request.get(response.url())).text()).toContain("BEGIN:VCALENDAR");

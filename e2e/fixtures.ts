@@ -180,12 +180,15 @@ export const test = base.extend<
 export const MAP_READY = { timeout: 20_000 };
 
 /**
- * Antwort auf den Export-Code der Merkliste, den die App nach dem ersten Rendern im Leerlauf vorlädt (Plan 0010, E8 A).
- * Vor `goto` aufrufen und vor dem Zählen „kein Request ab …“ abwarten: Der Request ist für alle gleich, käme unter
- * Last aber zu einem zufälligen Zeitpunkt. (Die Resource-Timing-Liste ist in diesen Läufen leer, deshalb die Antwort.)
+ * Antworten auf das, was die App nach dem Start ohne Anlass nachlädt: den Export-Code der Merkliste (nach dem ersten
+ * Rendern im Leerlauf, Plan 0010, E8 A) und den PWA-Kern (nach `load`, Plan 0011, E5). Vor `goto` aufrufen und vor
+ * dem Zählen „kein Request ab …“ abwarten: Die Requests sind für alle gleich, kämen unter Last aber zu einem
+ * zufälligen Zeitpunkt. (Die Resource-Timing-Liste ist in diesen Läufen leer, deshalb die Antworten.)
  */
-export function exportPreload(page: Page) {
-  return page.waitForResponse((r) => /\/assets\/export\/[^/]+\.js$/.test(new URL(r.url()).pathname));
+export function startPreloads(page: Page) {
+  const chunk = (dir: string, name: string) =>
+    page.waitForResponse((r) => new RegExp(`/assets/${dir}/${name}-[^/]+\\.js$`).test(new URL(r.url()).pathname));
+  return Promise.all([chunk("export", "ics"), chunk("app", "pwa")]);
 }
 
 export { expect };

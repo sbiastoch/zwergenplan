@@ -47,8 +47,8 @@ if (violations.length > 0) {
   process.exit(1);
 }
 /**
- * Lazy-Lader der Karte (Plan 0005), der Wegzeit-Logik (Plan 0009, E10), des ICS-Exports (Plan 0010, E8) und der
- * Anbieterübersicht (Plan 0010, E7): Ihr Ziel darf nur per import() kommen.
+ * Lazy-Lader der Karte (Plan 0005), der Wegzeit-Logik (Plan 0009, E10), des ICS-Exports (Plan 0010, E8), der
+ * Anbieterübersicht (Plan 0010, E7) und der App-Extras (Plan 0011, E5): Ihr Ziel darf nur per import() kommen.
  * dependency-cruiser fasst einen zusätzlichen statischen Import mit dem dynamischen zu einer Kante zusammen und sähe
  * ihn nicht. Das Ziel der Wegzeit steht mit Endung, damit es nicht auch `../domain/transit-types.ts` trifft.
  */
@@ -60,6 +60,11 @@ const LAZY_LOADERS: Array<[file: string, target: string]> = [
   ["src/ui/SavedView.tsx", "../domain/ics.ts"],
   // Anbieterübersicht (Plan 0010, E7)
   ["src/ui/ProviderPanel.tsx", "./anbieter/"],
+  // PWA-Kern nach `load` (Plan 0011, E5); mit Endung, damit es nicht `./pwa-start.ts` trifft
+  ["src/data/pwa-start.ts", "./pwa.ts"],
+  // Abschnitt „Als App“ im Kind-Sheet (Plan 0011, E5, E7)
+  ["src/ui/AppExtras.tsx", "./app-extras/"],
+  ["src/ui/AppExtras.tsx", "../data/pwa.ts"],
 ];
 for (const [file, target] of LAZY_LOADERS) {
   // auch Seiteneffekt-Importe ohne `from` (import "./karte/MapScreen.tsx")

@@ -248,4 +248,21 @@
       opacity: 1;
     }
   }
+
+  /* Abschnitt „Als App“ (Plan 0011, E7): Platzhalter so hoch wie die Überschrift, solange der Chunk lädt */
+  .app-pending {
+    height: 1.25rem;
+    margin: 18px 0 8px;
+  }
+  .app-text {
+    margin: 0 0 12px;
+  }
+  .app-section .share {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 800;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
 }
