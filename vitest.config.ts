@@ -8,7 +8,8 @@ export default defineConfig({
     env: { TZ: "America/Los_Angeles" },
     coverage: {
       provider: "v8",
-      include: ["src/domain/**/*.ts", "scripts/pipeline/lib/**/*.ts"],
+      // scripts/transit: reine Build-Logik der Wegzeit (Plan 0009, E10)
+      include: ["src/domain/**/*.ts", "scripts/pipeline/lib/**/*.ts", "scripts/transit/**/*.ts"],
       exclude: ["**/*.test.ts", "src/domain/test-fixtures.ts"],
       thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 },
     },

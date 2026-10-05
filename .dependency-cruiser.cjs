@@ -142,6 +142,14 @@ module.exports = {
       to: { dependencyTypes: ["core"], path: "^(node:)?(fs|net|http|https|child_process|os|dgram|dns|tls)(/|$)" },
     },
     {
+      name: "transit-build-pure",
+      severity: "error",
+      comment:
+        "scripts/transit ist reine Build-Logik der Wegzeit (Plan 0009, E6/E10): kein node:*, kein scripts/lib, kein scripts/pipeline/io, kein npm-Paket – nur src/domain und scripts/transit selbst. Dateien liest build-data.ts, Tests dürfen Fixtures lesen.",
+      from: { path: "^scripts/transit/", pathNot: "\\.test\\.ts$" },
+      to: { pathNot: "^(src/domain|scripts/transit)/" },
+    },
+    {
       name: "src-not-scripts",
       severity: "error",
       comment: "Die App und die Domäne hängen nie von Build-/Pipeline-Skripten ab.",
