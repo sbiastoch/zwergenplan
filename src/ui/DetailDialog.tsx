@@ -66,7 +66,9 @@ export function DetailContent({
   const regular = offer.format === "regelmaessig";
 
   return (
-    <>
+    // Hülle als Größen-Container (Plan 0008, E6): Bei wenig Höhe scrollt sie samt ICS-Fuß. Der Toast bleibt
+    // außerhalb (Dialog.tsx), denn ein Container ist umgebender Block für feste Nachfahren.
+    <div className="detail-body">
       <div className="detail-col dhead">
         <button type="button" className="iconbtn" onClick={onClose} aria-label="Zurück">
           <Icon name="back" />
@@ -190,6 +192,6 @@ export function DetailContent({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

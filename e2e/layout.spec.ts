@@ -5,7 +5,14 @@
  */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
-import { expectNoHorizontalScroll, expectTextFits, setTextScale } from "./mobile-ux.ts";
+import {
+  expectAccessible,
+  expectNoBrightIslands,
+  expectNoHorizontalScroll,
+  expectTextFits,
+  expectTouchTargets,
+  setTextScale,
+} from "./mobile-ux.ts";
 
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
 
@@ -210,3 +217,302 @@ for (const [name, go] of Object.entries(LANDSCAPE_200)) {
     expect(tooWide, "Tab-Labels breiter als ihre Spalte").toEqual([]);
   });
 }
+
+/** Dunkel auf beiden Wegen (Plan 0007, E15): per System und per gewählter Darstellung (vor dem Laden gespeichert). */
+const DARK = [
+  { label: "dunkel", colorScheme: "dark", chosen: false },
+  { label: "dunkel per Darstellung", colorScheme: "light", chosen: true },
+] as const;
+
+async function useDark(page: Page, dark: (typeof DARK)[number]) {
+  await page.emulateMedia({ colorScheme: dark.colorScheme, reducedMotion: "reduce" });
+  if (dark.chosen)
+    await page.addInitScript(() => {
+      localStorage.setItem("zwergenplan.darstellung", "dunkel");
+    });
+}
+
+async function openKrabbeltreff(page: Page) {
+  await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+}
+
+/** Plan 0008, E6: Bei wenig Höhe (< 34 rem) steht der ICS-Fuß am Ende des Inhalts, der Kopf bleibt stehen. */
+test.describe("ICS-Fuß im Detail", () => {
+  test("bei 320 px und 200 % scrollt der Fuß mit, Zurück bleibt sichtbar, Toast im Viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await ready(page);
+    await setTextScale(page, 2);
+    await openKrabbeltreff(page);
+    const dialog = page.getByRole("dialog");
+    const foot = dialog.locator(".dfoot");
+    const start = await foot.evaluate((el) => ({ top: el.getBoundingClientRect().top, height: window.innerHeight }));
+    expect(start.top, "Fuß liegt anfangs ganz unter dem Viewport").toBeGreaterThanOrEqual(start.height);
+
+    await foot.scrollIntoViewIfNeeded();
+    const all = dialog.getByRole("link", { name: "Alle Termine" });
+    await expect(all).toBeInViewport();
+    await all.click({ trial: true });
+    await expect(dialog.getByRole("button", { name: "Zurück" })).toBeInViewport({ ratio: 1 });
+
+    // Toast bleibt am Viewport, nicht an der scrollenden Hülle (Plan 0008, E6: Layout-Containment)
+    await page.clock.pauseAt(FIXTURE_NOW);
+    const [download] = await Promise.all([page.waitForEvent("download"), all.click()]);
+    expect(download.suggestedFilename()).toMatch(/\.ics$/);
+    const toast = page.locator(".toast").filter({ hasText: /^Kalenderdatei mit .* geladen$/ });
+    await expect(toast).toBeVisible();
+    await expect(toast).toBeInViewport({ ratio: 1 });
+  });
+
+  for (const dark of DARK) {
+    test(`bei 320 px und 200 % gescrollt ohne helle Inseln (${dark.label})`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await useDark(page, dark);
+      await ready(page);
+      await setTextScale(page, 2);
+      await openKrabbeltreff(page);
+      await page.getByRole("dialog").locator(".dfoot").scrollIntoViewIfNeeded();
+      await expectNoBrightIslands(page);
+      await expectAccessible(page);
+    });
+  }
+
+  test("bei 412×915 und 100 % bleibt der Fuß fest unten", async ({ page }) => {
+    await page.setViewportSize({ width: 412, height: 915 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await ready(page);
+    await openKrabbeltreff(page);
+    const gap = await page
+      .getByRole("dialog")
+      .locator(".dfoot")
+      .evaluate((el) => window.innerHeight - el.getBoundingClientRect().bottom);
+    expect(Math.abs(gap), "Fuß endet bündig am unteren Rand").toBeLessThanOrEqual(1);
+  });
+});
+
+/** Monatsraster 320 × 640 mit offenem Monat */
+async function openMonth(page: Page) {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await ready(page);
+  await page.getByRole("button", { name: "Kalender", exact: true }).click();
+  await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
+  await expect(page.getByText("Oktober 2026")).toBeVisible();
+}
+
+/** Je Zeile des Monatsrasters: Alpha des Hintergrunds je freigegebenem Tag und Lücken zwischen den Feldern. */
+async function monthFields(page: Page) {
+  return page.evaluate(() => {
+    const alpha = (color: string) => {
+      if (color === "transparent") return 0;
+      const m = color.match(/\/\s*([\d.]+%?)\s*\)$/) ?? color.match(/^rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+%?)\)$/);
+      if (!m?.[1]) return 1;
+      return m[1].endsWith("%") ? Number.parseFloat(m[1]) / 100 : Number.parseFloat(m[1]);
+    };
+    const days = [...document.querySelectorAll<HTMLButtonElement>(".mgrid .mday")].filter((d) => !d.disabled);
+    const rows = new Map<number, HTMLButtonElement[]>();
+    for (const d of days) rows.set(d.offsetTop, [...(rows.get(d.offsetTop) ?? []), d]);
+    const transparent: string[] = [];
+    const tight: string[] = [];
+    for (const row of rows.values()) {
+      row.sort((a, b) => a.offsetLeft - b.offsetLeft);
+      for (const d of row) {
+        const pressed = d.getAttribute("aria-pressed") === "true";
+        if (!pressed && alpha(getComputedStyle(d).backgroundColor) === 0) transparent.push(d.textContent ?? "");
+      }
+      for (const [i, a] of row.entries()) {
+        const b = row[i + 1];
+        if (!b) continue;
+        // Hintergrundfläche = Border-Box minus 2 px durchsichtiger Rand je Seite (padding-box)
+        const gap = b.offsetLeft + 2 - (a.offsetLeft + a.offsetWidth - 2);
+        if (gap < 3) tight.push(`${a.textContent}|${b.textContent}: ${gap} px`);
+      }
+    }
+    return { count: days.length, transparent, tight };
+  });
+}
+
+/** Plan 0008, E7: Bei großer Schrift bekommt jeder Tag im Monatsraster ein eigenes Feld. */
+test.describe("Monatsraster", () => {
+  test("bei 200 % hat jeder Tag ein eigenes Feld mit Abstand", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await openMonth(page);
+    await setTextScale(page, 2);
+    const f = await monthFields(page);
+    expect(f.count, "freigegebene Tage").toBeGreaterThan(20);
+    expect(f.transparent, "Tage ohne Feld").toEqual([]);
+    expect(f.tight, "Felder mit weniger als 3 px Abstand").toEqual([]);
+  });
+
+  test("bei 100 % bleiben nicht gewählte Tage ohne Hintergrund", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await openMonth(page);
+    const f = await monthFields(page);
+    // alle nicht gewählten Tage durchsichtig: transparent enthält jeden davon
+    const unpressed = await page.locator(".mgrid .mday:not(:disabled):not([aria-pressed='true'])").count();
+    expect(f.transparent).toHaveLength(unpressed);
+    await expectTouchTargets(page);
+  });
+
+  for (const dark of DARK) {
+    test(`bei 200 % ohne helle Inseln, Kontrast hält (${dark.label})`, async ({ page }) => {
+      await useDark(page, dark);
+      await openMonth(page);
+      await setTextScale(page, 2);
+      await expectNoBrightIslands(page);
+      await expectAccessible(page);
+    });
+  }
+});
+
+/** Plan 0008, E8: Das Merklisten-Badge überdeckt in den Querformat-Leisten weder Label noch Herz. */
+test.describe("Badge im Querformat", () => {
+  for (const viewport of [
+    { width: 568, height: 320 },
+    { width: 863, height: 360 },
+  ]) {
+    for (const scale of [1, 2]) {
+      const at = `${viewport.width}×${viewport.height} bei ${scale * 100} %`;
+
+      /** gemerktes Angebot, Merkliste offen, Textgröße gesetzt */
+      const prepare = async (page: Page) => {
+        await page.setViewportSize(viewport);
+        await ready(page);
+        await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+        await page.getByRole("button", { name: /^Merkliste/ }).click();
+        await expect(page.getByTestId("offer")).toHaveCount(1);
+        await setTextScale(page, scale);
+      };
+
+      test(`${at}: Badge, Label und Herz überschneiden sich nicht, Daumen auf dem Tab`, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        await prepare(page);
+        const m = await page.evaluate(() => {
+          const tab = document.querySelector<HTMLElement>(".tab[aria-current='page']");
+          const badge = tab?.querySelector(".badge");
+          const label = tab?.querySelector(".tab-label");
+          const icon = tab?.querySelector("svg");
+          const thumb = document.querySelector<HTMLElement>(".tab-thumb");
+          if (!tab || !badge || !label || !icon || !thumb) throw new Error("Merklisten-Tab unvollständig");
+          const rect = (el: Element) => el.getBoundingClientRect();
+          const overlap = (a: DOMRect, b: DOMRect) =>
+            Math.min(
+              Math.min(a.right, b.right) - Math.max(a.left, b.left),
+              Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top),
+            );
+          const labelBox = rect(label);
+          // Die Verschiebung des Daumens steckt im transform (tabs.css), offset* kennt sie nicht.
+          const t = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
+          return {
+            label: labelBox.width > 1 ? overlap(rect(badge), labelBox) : Number.NEGATIVE_INFINITY,
+            icon: overlap(rect(badge), rect(icon)),
+            thumb: { top: thumb.offsetTop + t.m42, height: thumb.offsetHeight, left: thumb.offsetLeft + t.m41 },
+            tab: { top: tab.offsetTop, height: tab.offsetHeight, left: tab.offsetLeft, width: tab.offsetWidth },
+            thumbWidth: thumb.offsetWidth,
+          };
+        });
+        expect(m.label, `${at}: Badge über dem Label`).toBeLessThanOrEqual(0.5);
+        expect(m.icon, `${at}: Badge über dem Herz`).toBeLessThanOrEqual(0.5);
+        expect(Math.abs(m.thumb.top - m.tab.top), `${at}: Daumen oben bündig mit dem Tab`).toBeLessThanOrEqual(2);
+        expect(Math.abs(m.thumb.height - m.tab.height), `${at}: Daumen so hoch wie der Tab`).toBeLessThanOrEqual(2);
+        expect(Math.abs(m.thumb.left - m.tab.left), `${at}: Daumen links bündig mit dem Tab`).toBeLessThanOrEqual(2);
+        expect(Math.abs(m.thumbWidth - m.tab.width), `${at}: Daumen so breit wie der Tab`).toBeLessThanOrEqual(2);
+        await expectNoHorizontalScroll(page);
+        await expectTextFits(page, { scale });
+      });
+
+      for (const dark of DARK) {
+        test(`${at}: Badge ohne helle Inseln, Kontrast hält (${dark.label})`, async ({ page }) => {
+          await useDark(page, dark);
+          await prepare(page);
+          await expectNoBrightIslands(page);
+          await expectAccessible(page);
+        });
+      }
+    }
+  }
+});
+
+/** Plan 0008, E9: Der Toast ist reine Meldung und fängt keine Tipps ab. */
+test("Toast lässt Tipps durch (320 px, 200 %)", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await ready(page);
+  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+  await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
+  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await expect(page.getByTestId("offer")).toHaveCount(2);
+  await setTextScale(page, 2);
+  await page.clock.pauseAt(FIXTURE_NOW); // Toast bleibt stehen (Plan 0007, E15)
+  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+  const toast = page.locator(".toast").filter({ hasText: "Sticker abgelöst" });
+  await expect(toast).toBeVisible();
+  const inside = await toast.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const hit = document.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+    return hit !== null && el.contains(hit);
+  });
+  expect(inside, "Tipp in der Mitte des Toasts trifft den Toast").toBe(false);
+  await page.getByRole("button", { name: "Alle in den Kalender" }).click({ trial: true });
+});
+
+/** Plan 0008, E10: Im Filter-Fuß ist „Zurücksetzen“ ein Textknopf, der Fuß einzeilig ab 360 px. */
+for (const viewport of [
+  { width: 360, height: 640 },
+  { width: 390, height: 844 },
+]) {
+  test(`Filter-Fuß einzeilig bei ${viewport.width} px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await ready(page);
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const sheet = page.getByRole("dialog", { name: "Filter" });
+    await expect(sheet).toBeVisible();
+    const top = (el: HTMLElement | SVGElement) => (el instanceof HTMLElement ? el.offsetTop : Number.NaN);
+    const reset = await sheet.getByRole("button", { name: "Zurücksetzen" }).evaluate(top);
+    const show = await sheet.getByRole("button", { name: /Angebote zeigen$/ }).evaluate(top);
+    expect(reset, "„Zurücksetzen“ und „… Angebote zeigen“ in einer Zeile").toBe(show);
+    const height = await sheet.locator(".sheetfoot").evaluate((el) => el.getBoundingClientRect().height);
+    expect(height, "Fuß höchstens 90 px hoch").toBeLessThanOrEqual(90);
+  });
+}
+
+/** Plan 0008, E13: Textknöpfe übernehmen die Ausrichtung der Umgebung, im Kind-Sheet also linksbündig. */
+test("„Startpunkt entfernen“ bleibt bei 200 % linksbündig", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await ready(page);
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await sheet.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+  const button = sheet.getByRole("button", { name: "Startpunkt entfernen" });
+  await expect(button).toBeVisible();
+  await setTextScale(page, 2);
+  const m = await button.evaluate((el) => {
+    const text = [...el.childNodes].find((n) => n instanceof Text && n.data.trim() !== "");
+    if (!text) throw new Error("Textknoten fehlt");
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    const s = getComputedStyle(el);
+    return {
+      lefts: [...range.getClientRects()].filter((r) => r.width > 0.5).map((r) => r.left),
+      contentLeft:
+        el.getBoundingClientRect().left + Number.parseFloat(s.borderLeftWidth) + Number.parseFloat(s.paddingLeft),
+    };
+  });
+  expect(m.lefts.length, "Text muss bei 200 % zweizeilig sein, sonst prüft der Test nichts").toBeGreaterThanOrEqual(2);
+  for (const left of m.lefts)
+    expect(Math.abs(left - m.contentLeft), "Zeile am linken Innenrand").toBeLessThanOrEqual(1);
+});
+
+/** Plan 0008, E14: Anbieternamen trennen nach Silben wie Titel (Sichtprüfung der Trennstelle im Browser-Review). */
+test("Anbietername in Kachel und Detail mit hyphens: auto", async ({ page }) => {
+  await ready(page);
+  expect(
+    await page
+      .locator(".card .meta")
+      .first()
+      .evaluate((el) => getComputedStyle(el).hyphens),
+  ).toBe("auto");
+  await openKrabbeltreff(page);
+  expect(await page.locator(".hero .meta").evaluate((el) => getComputedStyle(el).hyphens)).toBe("auto");
+});

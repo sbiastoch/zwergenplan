@@ -147,7 +147,7 @@ export function FilterSheet({
         )}
       </div>
       <div className="sheetfoot">
-        <button type="button" className="btn" onClick={() => onChange(EMPTY_FILTER)}>
+        <button type="button" className="linkbtn" onClick={() => onChange(EMPTY_FILTER)}>
           Zurücksetzen
         </button>
         <button type="button" className="btn primary" onClick={onClose}>
