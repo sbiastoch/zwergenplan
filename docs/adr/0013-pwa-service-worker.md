@@ -1,12 +1,12 @@
 # ADR 0013 – Installierbare App und eigener Service Worker
 
-Status: Entwurf (2026-10-05). Wird mit Stufe 1 von Plan 0011 angenommen (Schritt 5). Ergänzt ADR 0002 und die Bootstrap-Regel in `docs/architecture.md`. Details stehen in Plan 0011 (E2–E7).
+Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt ADR 0002 und die Bootstrap-Regel in `docs/architecture.md`. Details stehen in Plan 0011 (E2–E7), Abweichungen der Umsetzung dort unter „Umsetzung“.
 
 ## Kontext
 
 - Familie und Freunde öffnen den Zwergenplan fast nur auf dem Handy. Ohne Manifest gibt es kein eigenes Icon und keinen Vollbild-Start. Ohne Netz bricht die Seite mit „Keine Verbindung“ ab.
 - `docs/architecture.md` erlaubt Daten- und Gerätezugriff außerhalb von `src/data` nur per ADR. Ein Service Worker cacht Antworten und beantwortet Requests der Seite. Das ist ein solcher Zugriff.
-- Das Start-JS liegt am Budget (90 kB gzip). Neue Logik im Start-Bundle braucht einen Grund.
+- Das Start-JS liegt am Budget (90 kB gzip, seit ADR 0012 92 kB). Neue Logik im Start-Bundle braucht einen Grund.
 
 ## Entscheidung
 
@@ -38,3 +38,7 @@ Status: Entwurf (2026-10-05). Wird mit Stufe 1 von Plan 0011 angenommen (Schritt
 - Ein Service Worker kann einen alten Stand festhalten. Gegenmittel sind Netz zuerst, `cache: "reload"` im Precache und ein dokumentierter Notausgang (selbst abmeldender `sw.js`).
 - Zwei weitere Budgets (`Service Worker`, `App-Extras JS (lazy)`) und ein zweiter `tsc`-Lauf (`lib: webworker`).
 - Die Invariante „Kein Request hängt davon ab, welcher Startpunkt gilt“ (ADR 0011) und die Kamera-Regel (ADR 0008) bleiben unverändert.
+- Umgesetzt mit zwei Präzisierungen (Plan 0011, „Umsetzung“):
+  - Die Precache-Liste enthält zusätzlich den PWA-Kern (`assets/app/pwa-*.js`). Jeder Start lädt ihn nach `load`; ohne ihn liefen offline weder die Frische (Punkt 7) noch der ICS-Hinweis (Punkt 8).
+  - Der Abschnitt „Als App“ bekommt den Installationszustand vom Lader als Prop, statt `src/data/pwa.ts` statisch zu importieren. Ein statischer Import zwischen zwei Lazy-Chunks lässt Vite einen Preload-Helfer in den Einstieg schreiben (+0,11 kB Start-JS).
+- Gemessen (Stand Umsetzung): Start-JS 91,37 kB statt 90,90 kB (+0,47 kB, Ziel ≤ 91,40 kB), `Service Worker` 1,5 kB, `App-Extras JS (lazy)` 2,1 kB.

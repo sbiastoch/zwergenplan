@@ -1,6 +1,6 @@
 # Plan 0011 – Installierbare App und Push zu neuen Angeboten
 
-Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). Stufe 1 wartet auf Plan 0010 (Pakete A/B auf `main`).
+Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). **Stufe 1, Schritte 1–5 umgesetzt** auf Branch `pwa-0011` (2026-10-05); offen: Abnahme des Icons, `/arch-review`, Deploy und Browser-Review (Schritt 6). Stufe 2 beginnt nach der Abnahme von Stufe 1.
 Datum: 2026-10-05
 Bezug:
 - **ADR 0013** (PWA und Service Worker, Entwurf `docs/adr/0013-pwa-service-worker.md`) und **ADR 0014** (Web Push, Entwurf `docs/adr/0014-web-push.md`).
@@ -654,6 +654,31 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
   - `public/manifest.webmanifest` wie E2, `index.html` mit `manifest`, `icon` (SVG) und `apple-touch-icon` über `%BASE_URL%`.
   - `e2e/pwa.spec.ts` Punkt 1 grün (`pixel-7`, `desktop`). **Kanarienvogel:** `apple-touch-180.png` mit transparenten Ecken → `minAlpha: 0`, rot.
   - **Offen: Abnahme des Icons durch den Nutzer** (Vorschau liegt beim Orchestrator).
+
+- **2026-10-05, Stufe 1, Schritt 3 (Registrierung, Offline, Frische):**
+  - `src/data/site.ts` (test-first): `loadSiteData` liefert `{ data, stale }`; `stale`, wenn die Antwort `X-Zp-Cache: offline` trägt, auch über den Frühstart. `lastSiteLoad()` merkt Zeitpunkt und Art des letzten erfolgreichen Abrufs für die Frische.
+  - `src/data/pwa-start.ts` (Start): nach `load` `import("./pwa.ts")`, nur im Produktions-Build. `src/data/pwa.ts` (lazy, test-first mit Fakes, 21 Tests): `start` setzt `data-pwa="bereit"`, registriert `sw.js`, hört auf `ics-offline` und startet `watchFreshness` (30 Min. sichtbar bzw. `online` nach `stale`, zuerst `update()`, Neuladen nur bei `controllerchange` binnen 10 s, sonst Daten tauschen; ein Durchlauf zur Zeit). `register()` → `undefined` (Playwright „block“): kein Warten auf `ready`, Frische lädt nur Daten.
+  - `src/ui/use-transit.ts` (test-first): Aktion `refresh` lädt eine fertige Tabelle neu (am HTTP-Cache vorbei); die alte gilt weiter, ein Fehlschlag behält sie, `stale` wird während des Neuladens ignoriert.
+  - `App`: Frische tauscht Daten ohne Ladezustand; Statuszeile „Offline – Stand vom 5.10.“ als eigene Zeile wie der Wegzeit-Hinweis (`offlineNote`, Toast `ICS_OFFLINE` in `format.ts`).
+  - E2E `e2e/pwa.spec.ts` 2–8 und „Frische-Anlass nach 30 Min.“ grün in `pixel-7` und `desktop`; Smoke „mit Service Worker“ (erster und zweiter Besuch, LCP < 2,5 s, CLS < 0,05) grün.
+    - Punkt 3 (Kanarienvogel `setOffline`): `context.setOffline(true)` trifft auch `fetch` aus dem Service Worker (Chromium, Playwright 1.63). Der Rückfall über `context.route` war nicht nötig.
+    - Punkt 7: `setOffline(false)` löst in Chromium selbst das Ereignis `online` aus (geprüft ohne eigenes Ereignis).
+    - Punkt 4 braucht einen erlaubten Konsolenfehler, eng gefasst auf `/assets/export/*.js … net::ERR_FAILED`: Das Vorladen des Export-Codes scheitert offline, wenn der Chunk nie geladen wurde (nicht im Precache, E3).
+  - **Abweichung (Precache):** Die Liste enthält zusätzlich den PWA-Kern `assets/app/pwa-*.js` (Plugin-Option `startChunks`). Er lädt bei jedem Start nach `load`. Ohne ihn fehlte er beim ersten Offline-Start, und weder die Frische (Punkt 7) noch der ICS-Hinweis (Punkt 5) liefen. Andere Lazy-Chunks bleiben draußen.
+  - **Kanarienvögel E2E, alle rot gesehen und zurückgenommen:** ohne `site.json` im Precache → Punkt 4 rot; ICS offline als Netzfehler statt 204 → Punkt 5 rot; fremde Origins im Service Worker gecacht → Punkt 8 rot; Frische ohne `transit.refresh()` → E4a-Test rot (kein Request auf `wegzeit.json`); ohne `X-Zp-Cache` → Punkt 4 rot (kein „Offline“).
+  - Weitere Kanarienvögel: Budget `App-Extras JS (lazy)` (Chunk um 20 kB aufgebläht → rot); `app-data-only-lazy` (statischer bzw. Typ-Import von `pwa.ts` aus `App.tsx` und aus dem Lader `pwa-start.ts` → rot; ein zusätzlicher statischer Import im Lader fängt dieselbe Regel, bevor `lazy-loader-static` an der Reihe ist); Chunk-Wächter (Zuordnung `assets/app/` entfernt → `pwa-*.js` direkt in `assets/`, rot).
+  - Bestehende E2E: `exportPreload` heißt jetzt `startPreloads` und wartet zusätzlich auf den PWA-Kern (der Request ist für alle gleich, käme sonst zu zufälliger Zeit in die Zählung). Nach dem Öffnen des Kind-Sheets warten die Zählungen in `startpunkt.spec.ts` und `karte.spec.ts` auf den Abschnitt „Als App“.
+  - **Entscheidungspunkt E5 (nach Schritt 3):** `JS (initial)` 91,22 kB (+0,31 kB über X), unter dem Ziel 91,40 kB.
+- **2026-10-05, Stufe 1, Schritt 4 (Installationshilfe):**
+  - **Stub-Probe:** `AppSection` als Stub mit geteilten Start-Modulen (`Icon`, `plural`, `standDate`, wie ADR 0012 verlangt), `vite build`: Chunk-Wächter grün, nichts abgespalten, `$initial` zieht `assets/app/` nicht in den Einstieg. Start-JS 91,35 kB, `App-Extras` 0,99 kB.
+  - `src/domain/pwa.ts` (test-first): `installHelp(state)` für `app`, `angebot`, `installiert`, `menue`, `ios`, `keine`. `src/data/pwa.ts` (test-first): `createInstallStore` merkt `beforeinstallprompt` (`preventDefault`), erkennt `display-mode`/`navigator.standalone`, iOS heuristisch (UA, iPadOS über `maxTouchPoints`), Android über den UA; `prompt()` gilt einmal. Typ des Events in `src/env.d.ts` statt eines Casts.
+  - **Kleine Ergänzung zu E7:** Zustand `installiert` („Installiert. Öffne den Zwergenplan jetzt über das Symbol auf dem Startbildschirm.“) nach angenommenem Angebot bzw. `appinstalled`. Sonst zeigte Android danach wieder „Im Browser-Menü …“.
+  - `src/ui/AppExtras.tsx` (Start) lädt Abschnitt und PWA-Kern parallel; `src/ui/app-extras/AppSection.tsx` mit `useSyncExternalStore`, Teilen-Symbol inline (nicht in `icons.tsx`, das läge im Start). Platzhalter `.app-pending` in Höhe der Überschrift, `LoadFailed` mit `lazy-note`.
+  - **Abweichung (Lazy-Kette):** `AppSection` importiert `pwa.ts` nicht statisch, der Lader reicht `install` als Prop herein. Gemessen: Mit statischem Import schreibt Vite den Preload-Helfer `__vite__mapDeps` in den Einstieg (91,47 kB, über dem Ziel); mit dem Prop 91,37 kB. Dazu `setLoad({ kind: "ready", ...site })` statt Feldern (−11 B).
+  - E2E `e2e/installieren.spec.ts`: „läuft als App“, „Browser bietet an“ (Tipp ruft `prompt()`, danach „Installiert“), „iPhone“ (nur `iphone-15`), „ohne Angebot“ (Android: Browser-Menü, Desktop: kein Abschnitt). Je sichtbarer Zustand `expectMobileUx` hell und dunkel und 320 px/200 %, in allen fünf Geräteprojekten grün. **Kanarienvögel:** `prompt()` nicht gerufen → rot; `display-mode` ignoriert → rot.
+  - Kanarienvögel der Regeln: `KidSheet` importiert `AppSection` statisch → `app-extras-ui-only-lazy` und `app-extras-ui-entry-only` rot; dynamisch aus `KidSheet` → `app-extras-ui-entry-only` rot; Typ-Import von `pwa.ts` aus `KidSheet` → `app-data-only-lazy` rot.
+  - **Entscheidungspunkt E5 (nach Schritt 4, Stand Stufe 1):** `JS (initial)` **91,37 kB** = X + 0,47 kB, unter dem Ziel 91,40 kB und dem Budget 92 kB. `App-Extras JS (lazy)` 2,13 kB (Budget 5 kB), `Service Worker` 1,48 kB (Budget 8 kB). Für Stufe 2 bleiben bis zum Ziel nur 0,03 kB: Die Schätzung dort (Flag `neu`, Platzhalter `NewsBlock`, „Push an?“, ≈ 0,10 kB) passt nicht ohne die benannten Kandidaten zum Auslagern. Das ist bei Schritt 10 zu entscheiden.
+- **2026-10-05, Stufe 1, Schritt 5 (Doku):** `docs/architecture.md` (Schicht `src/sw/`, Absätze „Service Worker“ und „App-Extras“, Ausnahme im Absatz Wegzeit, Biome-Globals, E2E mit Service Worker), README („Als App installieren“, Notausgang), ADR 0013 angenommen.
 
 ## Akzeptanzkriterien
 
