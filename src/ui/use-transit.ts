@@ -13,7 +13,7 @@ import type { TransitSource, TransitTable, TransitTableFile } from "../domain/tr
  * Rechenlogik aus `src/domain/transit.ts`, strukturell beschrieben: Das Modul ist ein Lazy-Chunk (E10), auch Typen
  * kommen nicht statisch von dort (`transit-only-lazy`).
  */
-export interface TransitLogic {
+interface TransitLogic {
   decodeTransitTable(file: TransitTableFile, placeKeys: ReadonlySet<string>): TransitTable | undefined;
   transitReach(table: TransitTable, origin: Origin): ReachFn | undefined;
 }

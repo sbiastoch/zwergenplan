@@ -101,7 +101,6 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(sheet.getByText(/^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß/)).toBeVisible();
     await expect(sheet.getByRole("link", { name: "Fiktiver Fahrplan für Tests" })).toBeVisible();
     await expect(sheet.getByRole("link", { name: "CC0 1.0" })).toBeVisible();
-    await sheet.getByRole("link", { name: "CC0 1.0" }).scrollIntoViewIfNeeded();
   },
   "filter-sheet-wegzeit": async (page) => {
     await withGostenhof(page);
