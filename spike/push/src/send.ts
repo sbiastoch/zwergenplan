@@ -31,6 +31,7 @@ const config = JSON.parse(readFileSync(new URL("../.spike.json", import.meta.url
 const args = process.argv.slice(2);
 const variant = args.find((a) => !a.startsWith("--"));
 const only = args.find((a) => a.startsWith("--only="))?.slice(7);
+const topic = args.find((a) => a.startsWith("--topic="))?.slice(8);
 if (!variant || !(VARIANTS as readonly string[]).includes(variant)) {
   process.stderr.write(`Variante fehlt. Erlaubt: ${VARIANTS.join(", ")}` + "\n");
   process.exit(1);
@@ -69,7 +70,7 @@ for (const target of targets) {
     const r = await webpush.sendNotification(target.subscription, JSON.stringify(payload), {
       TTL: 600,
       urgency: "high",
-      topic: "spike",
+      ...(topic ? { topic } : {}),
     });
     process.stdout.write(`${target.kennung} (${target.ctx}): ${r.statusCode}` + "\n");
   } catch (e) {
