@@ -7,6 +7,7 @@ import {
   lastSessionDay,
   monthDays,
   nextSession,
+  type Occurrence,
   referenceSession,
   rhythm,
   sessionsByDay,
@@ -267,13 +268,17 @@ describe("dayAgenda", () => {
   const treff = fixtureOffer("krabbeltreff");
   const index = sessionsByDay([treff]);
   const at = (iso: string) => new Date(iso);
-  const context = (endedToday = 0, dataEnd: string | undefined = "2026-11-04") => ({ dataEnd, endedToday });
-  const noDataEnd = { dataEnd: undefined, endedToday: 0 };
+  const context = (endedToday = 0, dataEnd: string | undefined = "2026-11-04") => ({
+    dataEnd,
+    endedToday,
+    allIndex: index,
+  });
+  const noDataEnd = { dataEnd: undefined, endedToday: 0, allIndex: index };
 
   it("lässt abends beendete Termine von heute weg und zählt sie", () => {
     const now = at("2026-10-07T20:00:00+02:00");
     const agenda = dayAgenda(index, "2026-10-07", now, context(endedOnDay([treff], "2026-10-07", now)));
-    expect(agenda).toEqual({ items: [], ended: 1, afterData: false });
+    expect(agenda).toEqual({ items: [], ended: 1, afterData: false, hidden: 0 });
   });
 
   it("behält einen laufenden Termin", () => {
@@ -307,8 +312,65 @@ describe("dayAgenda", () => {
     const nightIndex = sessionsByDay([night]);
     // 7.10. 20:00 Berlin = 7.10. 11:00 in LA; „heute“ ist trotzdem der Berliner 7.10.
     const now = at("2026-10-07T20:00:00+02:00");
-    expect(dayAgenda(nightIndex, "2026-10-08", now, context(5)).items).toHaveLength(1);
-    expect(dayAgenda(nightIndex, "2026-10-08", now, context(5)).ended).toBe(0);
-    expect(dayAgenda(nightIndex, "2026-10-07", now, context(5))).toEqual({ items: [], ended: 5, afterData: false });
+    const nightContext = { ...context(5), allIndex: nightIndex };
+    expect(dayAgenda(nightIndex, "2026-10-08", now, nightContext).items).toHaveLength(1);
+    expect(dayAgenda(nightIndex, "2026-10-08", now, nightContext).ended).toBe(0);
+    expect(dayAgenda(nightIndex, "2026-10-07", now, nightContext)).toEqual({
+      items: [],
+      ended: 5,
+      afterData: false,
+      hidden: 0,
+    });
+  });
+
+  describe("ausgeblendete Termine (Plan 0008, E12)", () => {
+    // Index der sichtbaren Angebote: leer, als blendeten Filter, Umkreis oder Alter den Treff aus.
+    const none = new Map<string, Occurrence[]>();
+
+    it("zählt die Termine des Tages, die die Auswahl ausblendet", () => {
+      const now = at("2026-10-05T12:00:00+02:00");
+      const agenda = dayAgenda(none, "2026-10-07", now, context());
+      expect(agenda.items).toEqual([]);
+      expect(agenda.hidden).toBe(1);
+      // nichts ausgeblendet, wenn der Treff sichtbar ist
+      expect(dayAgenda(index, "2026-10-07", now, context()).hidden).toBe(0);
+    });
+
+    it("zählt die Differenz, nie weniger als 0", () => {
+      const other = withSessions("Anderes", [s("2026-10-07T15:00:00+02:00", "2026-10-07T16:00:00+02:00")]);
+      const allIndex = sessionsByDay([treff, other]);
+      const now = at("2026-10-05T12:00:00+02:00");
+      expect(dayAgenda(index, "2026-10-07", now, { ...context(), allIndex }).hidden).toBe(1);
+      expect(dayAgenda(none, "2026-10-07", now, { ...context(), allIndex }).hidden).toBe(2);
+      // Index größer als allIndex (darf nicht vorkommen): trotzdem nie negativ
+      expect(dayAgenda(allIndex, "2026-10-07", now, context()).hidden).toBe(0);
+    });
+
+    it("zählt beendete Termine nicht mit", () => {
+      const evening = at("2026-10-07T20:00:00+02:00");
+      expect(dayAgenda(none, "2026-10-07", evening, context()).hidden).toBe(0);
+    });
+
+    it("ist 0, wenn der ungefilterte Index den Tag nicht kennt", () => {
+      const now = at("2026-10-05T12:00:00+02:00");
+      expect(dayAgenda(none, "2026-10-08", now, context()).hidden).toBe(0);
+      expect(dayAgenda(none, "2026-10-07", now, { ...context(), allIndex: new Map() }).hidden).toBe(0);
+    });
+
+    it("nennt heute Beendetes und Ausgeblendetes zugleich", () => {
+      // heute: ein passender Termin ist vorbei (endedToday 1), ein ausgeblendeter kommt noch
+      const later = withSessions("Später", [s("2026-10-07T15:00:00+02:00", "2026-10-07T16:00:00+02:00")]);
+      const now = at("2026-10-07T12:00:00+02:00");
+      const agenda = dayAgenda(none, "2026-10-07", now, { ...context(1), allIndex: sessionsByDay([treff, later]) });
+      expect(agenda).toEqual({ items: [], ended: 1, afterData: false, hidden: 1 });
+    });
+
+    it("ordnet einen ausgeblendeten Termin um 00:30 Berlin dem Berliner Tag zu (Test läuft in LA)", () => {
+      const night = withSessions("Nachts", [s("2026-10-08T00:30:00+02:00", "2026-10-08T01:00:00+02:00")]);
+      const allIndex = sessionsByDay([night]);
+      const now = at("2026-10-07T20:00:00+02:00");
+      expect(dayAgenda(none, "2026-10-08", now, { ...context(), allIndex }).hidden).toBe(1);
+      expect(dayAgenda(none, "2026-10-07", now, { ...context(), allIndex }).hidden).toBe(0);
+    });
   });
 });

@@ -53,6 +53,11 @@ export interface OfferViews {
   calendar: {
     /** nur in der Kalenderansicht gefüllt */
     index: Map<string, Occurrence<SiteOffer>[]>;
+    /**
+     * alle kommenden Angebote ohne Filter, Alter und Umkreis, nur in der Kalenderansicht gefüllt: Daraus
+     * zählt `dayAgenda`, was die Auswahl an einem Tag ausblendet (Plan 0008, E12)
+     */
+    allIndex: Map<string, Occurrence<SiteOffer>[]>;
     /** letzter Tag mit passenden Terminen (Grenze der Navigation) */
     lastDay: string | undefined;
     /** letzter Tag mit Terminen im ganzen Datenstand, ohne Filter (B8) */
@@ -120,6 +125,10 @@ export function useOfferViews({
   );
   const groups = useMemo(() => groupByNextSession(visible, now), [visible, now]);
   const index = useMemo(() => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX), [visible, route.tab]);
+  const allIndex = useMemo(
+    () => (route.tab === "kalender" ? sessionsByDay(upcoming) : NO_INDEX),
+    [upcoming, route.tab],
+  );
   const lastDay = useMemo(() => lastSessionDay(visible), [visible]);
   const dataEnd = useMemo(() => lastSessionDay(upcoming), [upcoming]);
   const today = berlinIsoDate(now);
@@ -156,6 +165,7 @@ export function useOfferViews({
     resetPage,
     calendar: {
       index,
+      allIndex,
       lastDay,
       dataEnd,
       endedToday,

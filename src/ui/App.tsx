@@ -1,14 +1,22 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadSiteData } from "../data/site.ts";
+import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
-import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
+import { activeFilterCount, EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
-import { ageChipLabel, distanceNote, mapStatusParts, plural, reachLimitLabel, standDate } from "./format.ts";
+import {
+  ageChipLabel,
+  distanceNote,
+  loadErrorText,
+  mapStatusParts,
+  plural,
+  reachLimitLabel,
+  standDate,
+} from "./format.ts";
 import { ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
@@ -27,7 +35,7 @@ import {
 } from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 
-type LoadState = { kind: "loading" } | { kind: "error"; message: string } | { kind: "ready"; data: SiteData };
+type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
 
 const NO_OFFERS: SiteOffer[] = [];
 
@@ -54,6 +62,8 @@ export function App() {
   const [animate, setAnimate] = useState(false);
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Umkreis-Hinweis verschwindet mit der Wahl.
   const filterButton = useRef<HTMLButtonElement>(null);
+  // Fokus-Rückweg des Details: Die Kachel, die es geöffnet hat, kann beim Schließen fehlen (Plan 0008, E11).
+  const activeTab = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // `attempt` startet das Laden neu („Nochmal versuchen“)
@@ -61,7 +71,8 @@ export function App() {
     setLoad({ kind: "loading" });
     loadSiteData().then(
       (data) => setLoad({ kind: "ready", data }),
-      (e: unknown) => setLoad({ kind: "error", message: e instanceof Error ? e.message : String(e) }),
+      // Die Fehlerart kennt nur src/data; ein unbekannter Fehler zeigt nie seinen Rohtext (Plan 0008, E5).
+      (e: unknown) => setLoad({ kind: "error", reason: e instanceof SiteLoadError ? e.reason : "server" }),
     );
   }, [attempt]);
 
@@ -158,7 +169,7 @@ export function App() {
         {load.kind === "error" && (
           <div className="empty" role="alert">
             <b>Das hat nicht geklappt</b>
-            {load.message}
+            {loadErrorText(load.reason)}
             <br />
             <button type="button" className="linkbtn" onClick={() => setAttempt((n) => n + 1)}>
               Nochmal versuchen
@@ -245,6 +256,7 @@ export function App() {
         {load.kind === "ready" && route.tab === "kalender" && (
           <CalendarView
             index={calendar.index}
+            allIndex={calendar.allIndex}
             now={now}
             today={today}
             lastDay={calendar.lastDay}
@@ -255,6 +267,12 @@ export function App() {
             monthOpen={calendar.monthOpen}
             onMonthOpen={calendar.setMonthOpen}
             ctx={ctx}
+            // nur mit aktivem Filter: Blendet allein das Alter aus, hilft Zurücksetzen nicht (Plan 0008, E12)
+            onResetFilter={
+              activeFilterCount(route.filter, { hasOrigin: origin !== undefined }) > 0
+                ? () => setFilter(EMPTY_FILTER)
+                : undefined
+            }
           />
         )}
         {load.kind === "ready" && route.tab === "merkliste" && (
@@ -267,7 +285,7 @@ export function App() {
           />
         )}
       </main>
-      <TabBar tab={section} savedCount={saved.length} onTab={onTab} />
+      <TabBar tab={section} savedCount={saved.length} onTab={onTab} currentRef={activeTab} />
       <Toast message={dialogOpen ? "" : toast} />
 
       <Overlays
@@ -290,6 +308,7 @@ export function App() {
         today={today}
         originApi={originApi}
         filterButton={filterButton}
+        activeTab={activeTab}
       />
     </div>
   );

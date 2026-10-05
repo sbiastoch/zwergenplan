@@ -13,6 +13,8 @@ import {
   distanceNote,
   distanceShort,
   formatFact,
+  hiddenNote,
+  loadErrorText,
   mapStatusParts,
   originPhrase,
   plural,
@@ -298,5 +300,32 @@ describe("Karte und Orte (Plan 0005, E7)", () => {
     expect(mapStatusParts(8, 5)).toEqual([8, " Angebote an ", 5, " Orten"]);
     expect(mapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort");
     expect(mapStatusParts(0, 0).join("")).toBe("0 Angebote an 0 Orten");
+  });
+});
+
+describe("Fehlerzustand (Plan 0008, E5)", () => {
+  it("erklärt jede Fehlerart auf Deutsch, ohne Browsertext", () => {
+    expect(loadErrorText("offline")).toBe(
+      "Du bist gerade offline. Sobald das Netz wieder da ist, tippe auf ‚Nochmal versuchen‘.",
+    );
+    expect(loadErrorText("netz")).toBe("Die Verbindung ist abgebrochen. Versuch es gleich nochmal.");
+    expect(loadErrorText("server")).toBe("Die Angebote ließen sich gerade nicht laden. Versuch es später nochmal.");
+    for (const reason of ["offline", "netz", "server"] as const) {
+      expect(loadErrorText(reason)).not.toMatch(/fetch|load|failed|error|network/i);
+    }
+  });
+});
+
+describe("Kalender: ausgeblendete Angebote (Plan 0008, E12)", () => {
+  it("nennt die Zahl im Singular und Plural", () => {
+    expect(hiddenNote(1, 0)).toBe("1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Umkreis oder Alter.");
+    expect(hiddenNote(3, 0)).toBe("3 Angebote an diesem Tag sind ausgeblendet – durch Filter, Umkreis oder Alter.");
+  });
+
+  it("sagt dazu, wenn heute Passendes schon vorbei ist", () => {
+    expect(hiddenNote(1, 2)).toBe(
+      "1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Umkreis oder Alter. " +
+        "Was zu deiner Auswahl passt, ist heute schon vorbei.",
+    );
   });
 });

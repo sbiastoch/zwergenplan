@@ -1,8 +1,13 @@
 /** Entdecken: Liste nach Tagen, Filter, Alter (Plan 0003, E7–E11, E16). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
+import { expectMobileUx } from "./mobile-ux.ts";
 
-test.beforeEach(async ({ page }) => {
+/** Tests mit diesem Tag laden selbst, weil sie vor dem ersten Laden zählen oder Requests umleiten. */
+const OWN_START = "@eigener-start";
+
+test.beforeEach(async ({ page }, testInfo) => {
+  if (testInfo.tags.includes(OWN_START)) return;
   await page.goto("./");
   await expect(page.getByRole("heading", { level: 1, name: "Zwergenplan" })).toBeVisible();
 });
@@ -106,4 +111,44 @@ test("Leerzustand bei Filtern ohne Treffer, Zurücksetzen hilft", async ({ page 
   await expect(page.getByText("Diese Seite ist noch leer")).toBeVisible();
   await page.getByRole("button", { name: "Filter zurücksetzen" }).click();
   await expect(offers(page)).toHaveCount(8);
+});
+
+test("site.json wird genau einmal geladen (Plan 0008, E4)", { tag: OWN_START }, async ({ page }) => {
+  // Frühstart in index.html statt Preload: WebKit nutzte den Preload nicht und lud ein zweites Mal.
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith("/data/site.json")) requests.push(request.url());
+  });
+  await page.goto("./");
+  await expect(offers(page).first()).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(requests).toHaveLength(1);
+});
+
+test.describe("Fehlerzustand (Plan 0008, E5)", () => {
+  // Der abgebrochene bzw. fehlgeschlagene Request meldet sich in beiden Engines in der Konsole.
+  test.use({ allowedConsoleErrors: [/\/data\/site\.json\b/] });
+
+  test("eigener Text statt Browsertext, danach lädt „Nochmal versuchen“", { tag: OWN_START }, async ({ page }) => {
+    await page.route("**/data/site.json", (route) => route.abort());
+    await page.goto("./");
+    const alert = page.getByRole("alert");
+    await expect(alert).toContainText("Das hat nicht geklappt");
+    await expect(alert).toContainText("Die Verbindung ist abgebrochen.");
+    await expect(alert).not.toContainText(/fetch|load failed/i);
+    await expectMobileUx(page);
+
+    await page.unroute("**/data/site.json");
+    await alert.getByRole("button", { name: "Nochmal versuchen" }).click();
+    // lädt neu, statt die gescheiterte frühe Anfrage noch einmal zu übernehmen
+    await expect(offers(page)).toHaveCount(8);
+    await expect(alert).toHaveCount(0);
+  });
+
+  test("Serverfehler", { tag: OWN_START }, async ({ page }) => {
+    await page.route("**/data/site.json", (route) => route.fulfill({ status: 503, body: "" }));
+    await page.goto("./");
+    await expect(page.getByRole("alert")).toContainText("Die Angebote ließen sich gerade nicht laden.");
+    await expect(page.getByRole("alert")).not.toContainText("HTTP");
+  });
 });

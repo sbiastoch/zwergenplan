@@ -2,6 +2,7 @@
  * Texte der Oberfläche aus Domänenwerten. Keine Geschäftslogik: Welcher Termin zählt, ob etwas
  * passt oder wöchentlich ist, entscheidet src/domain. Kalendertage sind Berliner Tage (ISO-Strings).
  */
+import type { LoadFailure } from "../data/site.ts";
 import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
 import { type Origin, type Reach, type ReachLimit, roundedDistance } from "../domain/reach.ts";
@@ -237,4 +238,25 @@ export function reachLimitLabel(limit: ReachLimit): string {
 /** Statuszeile der Karte „8 Angebote an 5 Orten“; die Zahlen getrennt, damit sie fett stehen. */
 export function mapStatusParts(offers: number, places: number): [number, string, number, string] {
   return [offers, offers === 1 ? " Angebot an " : " Angebote an ", places, places === 1 ? " Ort" : " Orten"];
+}
+
+const LOAD_ERRORS: Record<LoadFailure, string> = {
+  // kein automatisches Neuladen, der Text verspricht also keins (Plan-Review 0008, m1)
+  offline: "Du bist gerade offline. Sobald das Netz wieder da ist, tippe auf ‚Nochmal versuchen‘.",
+  netz: "Die Verbindung ist abgebrochen. Versuch es gleich nochmal.",
+  server: "Die Angebote ließen sich gerade nicht laden. Versuch es später nochmal.",
+};
+
+/** Fehlerzustand (Plan 0008, E5): ein deutscher Satz je Fehlerart statt „Failed to fetch“. */
+export function loadErrorText(reason: LoadFailure): string {
+  return LOAD_ERRORS[reason];
+}
+
+/**
+ * Kalender-Leerzustand, wenn die Auswahl Termine des Tages ausblendet (Plan 0008, E12). Ist heute
+ * zusätzlich Passendes schon beendet, sagt der zweite Satz das.
+ */
+export function hiddenNote(hidden: number, ended: number): string {
+  const note = `${plural(hidden, "Angebot", "Angebote")} an diesem Tag ${hidden === 1 ? "ist" : "sind"} ausgeblendet – durch Filter, Umkreis oder Alter.`;
+  return ended > 0 ? `${note} Was zu deiner Auswahl passt, ist heute schon vorbei.` : note;
 }

@@ -92,6 +92,20 @@ describe("useOfferViews", () => {
     expect(v.calendar.monthOpen).toBe(false);
   });
 
+  it("baut den ungefilterten Kalender-Index nur in der Kalenderansicht (Plan 0008, E12)", () => {
+    expect(render({}).calendar.allIndex.size).toBe(0);
+    const v = render({
+      birthDate: "2026-05-01",
+      route: { tab: "kalender", filter: { ...EMPTY_FILTER, formats: ["kurs"] } },
+    });
+    // Filter und Alter blenden beide aus: nur im ungefilterten Index stehen sie
+    expect(v.calendar.index.size).toBe(0);
+    expect([...v.calendar.allIndex.keys()]).toEqual(["2026-10-10", "2026-10-12"]);
+    expect(v.calendar.allIndex.get("2026-10-12")?.map((o) => o.offer.title)).toEqual(["gross"]);
+    // Vergangenes fehlt auch dort
+    expect(v.calendar.allIndex.has("2026-10-01")).toBe(false);
+  });
+
   it("kennt den Datenhorizont ungefiltert, die Navigationsgrenze gefiltert (B8)", () => {
     const kurs = offer("kurs", "2026-10-20", undefined, "kurs");
     const v = render({

@@ -8,13 +8,15 @@ import { type CalendarNav, calendarNav, clampDay } from "../domain/calendar.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { parseIsoDate } from "../domain/time.ts";
 import { primaryCategory } from "./categories.ts";
-import { agendaHeading, longDate, monthTitle, plural, weekdayShort, weekTitle } from "./format.ts";
+import { agendaHeading, hiddenNote, longDate, monthTitle, plural, weekdayShort, weekTitle } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
 import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 
 interface CalendarViewProps {
   index: Map<string, Occurrence<SiteOffer>[]>;
+  /** alle kommenden Angebote ohne Filter, Alter und Umkreis: Was fehlt, blendet die Auswahl aus (Plan 0008, E12) */
+  allIndex: Map<string, Occurrence<SiteOffer>[]>;
   now: Date;
   today: string;
   /** letzter Tag mit passenden Terminen (Grenze für „vor“) */
@@ -28,6 +30,8 @@ interface CalendarViewProps {
   monthOpen: boolean;
   onMonthOpen: (open: boolean) => void;
   ctx: CardContext;
+  /** nur bei aktivem Filter: Knopf „Filter zurücksetzen“ im Leerzustand ausgeblendeter Angebote */
+  onResetFilter?: (() => void) | undefined;
 }
 
 /** Wo der Monatsknopf vor dem Umschalten stand, damit er danach an derselben Stelle bleibt (E5). */
@@ -38,6 +42,7 @@ interface MonthAnchor {
 
 export function CalendarView({
   index,
+  allIndex,
   now,
   today,
   lastDay,
@@ -48,6 +53,7 @@ export function CalendarView({
   monthOpen,
   onMonthOpen,
   ctx,
+  onResetFilter,
 }: CalendarViewProps) {
   const nav = calendarNav(day, today, lastDay);
   // Je Render einmal je Tag: Label, Formpunkte und Agenda fragen denselben Tag mehrfach ab.
@@ -55,7 +61,7 @@ export function CalendarView({
   const agendaOf = (d: string) => {
     const cached = agendas.get(d);
     if (cached) return cached;
-    const fresh = dayAgenda(index, d, now, { dataEnd, endedToday });
+    const fresh = dayAgenda(index, d, now, { dataEnd, endedToday, allIndex });
     agendas.set(d, fresh);
     return fresh;
   };
@@ -116,14 +122,40 @@ export function CalendarView({
       {agenda.items.map((item) => (
         <OfferCard key={`${item.offer.id}-${item.session.start}`} item={item} ctx={ctx} calendarDay={day} />
       ))}
-      <AgendaEmpty agenda={agenda} dataEnd={dataEnd} />
+      <AgendaEmpty agenda={agenda} dataEnd={dataEnd} onResetFilter={onResetFilter} />
     </>
   );
 }
 
-/** Leerzustände der Agenda, in dieser Reihenfolge (Plan 0007, E2). */
-function AgendaEmpty({ agenda, dataEnd }: { agenda: DayAgenda<SiteOffer>; dataEnd: string | undefined }) {
+/**
+ * Leerzustände der Agenda, in dieser Reihenfolge (Plan 0007, E2; Plan 0008, E12). Ausgeblendetes zuerst:
+ * Heute kann Passendes vorbei sein, während Ausgeblendetes noch kommt – „alles vorbei“ wäre dann falsch.
+ */
+function AgendaEmpty({
+  agenda,
+  dataEnd,
+  onResetFilter,
+}: {
+  agenda: DayAgenda<SiteOffer>;
+  dataEnd: string | undefined;
+  onResetFilter: (() => void) | undefined;
+}) {
   if (agenda.items.length > 0) return null;
+  if (agenda.hidden > 0) {
+    return (
+      <EmptyState icon="search" title="Nichts, was zu deiner Auswahl passt">
+        {hiddenNote(agenda.hidden, agenda.ended)}
+        {onResetFilter && (
+          <>
+            <br />
+            <button type="button" className="linkbtn" onClick={onResetFilter}>
+              Filter zurücksetzen
+            </button>
+          </>
+        )}
+      </EmptyState>
+    );
+  }
   if (agenda.ended > 0) {
     return (
       <EmptyState icon="swing" title="Für heute ist alles vorbei">
