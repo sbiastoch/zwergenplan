@@ -384,14 +384,16 @@ async function saveCopies(page: Page, count: number) {
 
 /**
  * Plan 0008, E8: Das Merklisten-Badge überdeckt in den Querformat-Leisten weder Label noch Herz. W1 (Browser-Review
- * live zu Plan 0008): Zweistellig brach es bei 568×320/200 % senkrecht um, deshalb auch 10 und 100 gemerkte.
+ * live zu Plan 0008): Zweistellig brach es bei 568×320/200 % senkrecht um, deshalb auch 10 und 100 gemerkte; danach
+ * stand der Tab-Inhalt in der kompakten Leiste ab 150 % seitlich über seiner Karte.
  */
 test.describe("Badge im Querformat", () => {
   for (const viewport of [
     { width: 568, height: 320 },
+    { width: 639, height: 320 }, // breiteste kompakte Leiste
     { width: 863, height: 360 },
   ]) {
-    for (const [scale, count] of [1, 2].flatMap((s) => [1, 10, 100].map((n) => [s, n] as const))) {
+    for (const [scale, count] of [1, 1.5, 2].flatMap((s) => [1, 10, 100].map((n) => [s, n] as const))) {
       const at = `${viewport.width}×${viewport.height} bei ${scale * 100} %, ${count} gemerkt`;
 
       /** gemerkte Angebote, Merkliste offen, Textgröße gesetzt */
@@ -417,6 +419,8 @@ test.describe("Badge im Querformat", () => {
           const thumb = document.querySelector<HTMLElement>(".tab-thumb");
           if (!tab || !badge || !label || !icon || !thumb) throw new Error("Merklisten-Tab unvollständig");
           const rect = (el: Element) => el.getBoundingClientRect();
+          // Ausgeblendetes Label (sr-only) ist 1 px breit, in der gedrehten Leiste (−0,6°) etwas mehr.
+          const HIDDEN = 2;
           const overlap = (a: DOMRect, b: DOMRect) =>
             Math.min(
               Math.min(a.right, b.right) - Math.max(a.left, b.left),
@@ -425,14 +429,23 @@ test.describe("Badge im Querformat", () => {
           const labelBox = rect(label);
           // Die Verschiebung des Daumens steckt im transform (tabs.css), offset* kennt sie nicht.
           const t = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
+          // Sichtbare Karte des Tabs ist `.tab-thumb::before` (eingerückt, tabs.css). Herz, Label und Badge stehen
+          // darauf; ragen sie seitlich hinaus, stehen sie auf dem Tape (W1, Browser-Review live zu Plan 0008).
+          const card = getComputedStyle(thumb, "::before");
+          const thumbBox = rect(thumb);
+          const cardLeft = thumbBox.left + Number.parseFloat(card.left);
+          const cardRight = thumbBox.right - Number.parseFloat(card.right);
+          const parts = [icon, label, badge].map(rect).filter((r) => r.width > HIDDEN);
           return {
-            label: labelBox.width > 1 ? overlap(rect(badge), labelBox) : Number.NEGATIVE_INFINITY,
+            beyondCard: Math.max(...parts.map((r) => Math.max(cardLeft - r.left, r.right - cardRight))),
+            label: labelBox.width > HIDDEN ? overlap(rect(badge), labelBox) : Number.NEGATIVE_INFINITY,
             icon: overlap(rect(badge), rect(icon)),
             thumb: { top: thumb.offsetTop + t.m42, height: thumb.offsetHeight, left: thumb.offsetLeft + t.m41 },
             tab: { top: tab.offsetTop, height: tab.offsetHeight, left: tab.offsetLeft, width: tab.offsetWidth },
             thumbWidth: thumb.offsetWidth,
           };
         });
+        expect(m.beyondCard, `${at}: Herz, Label oder Badge ragt seitlich über die Tab-Karte`).toBeLessThanOrEqual(1);
         expect(m.label, `${at}: Badge über dem Label`).toBeLessThanOrEqual(0.5);
         expect(m.icon, `${at}: Badge über dem Herz`).toBeLessThanOrEqual(0.5);
         expect(Math.abs(m.thumb.top - m.tab.top), `${at}: Daumen oben bündig mit dem Tab`).toBeLessThanOrEqual(2);
@@ -443,7 +456,8 @@ test.describe("Badge im Querformat", () => {
         await expectTextFits(page, { scale });
       });
 
-      for (const dark of DARK) {
+      // Farben hängen nicht an der Textgröße: dunkel nur bei 100 und 200 %
+      for (const dark of scale === 1.5 ? [] : DARK) {
         test(`${at}: Badge ohne helle Inseln, Kontrast hält (${dark.label})`, async ({ page }) => {
           await useDark(page, dark);
           await prepare(page);

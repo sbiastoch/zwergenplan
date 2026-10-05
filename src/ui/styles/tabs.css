@@ -192,6 +192,22 @@
     .app {
       padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
     }
+    /* Herz, Label und Badge stehen hier nebeneinander. Ab etwa 125 % Text sind sie mit Badge breiter als die
+       Tab-Karte (568 px: Spalte 178 px, Karte 150 px, Inhalt bis 208 px bei 200 %; W1, Browser-Review live zu
+       Plan 0008). Dann bleiben Herz und Zähler, der Name nur für Screenreader (wie B7). 9,5 rem: bei 100 % zeigt
+       jede kompakte Leiste das Label (≥ 178 px Spalte), ab 150 % keine. */
+    @container (width < 9.5rem) {
+      .tab:has(.badge) .tab-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+    }
   }
 
   /* Beide Querformat-Modi (Plan 0008, E8): Das Badge steht im Fluss hinter dem Label, in der kompakten Leiste
