@@ -337,6 +337,13 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
 
 **Ziel:** Start-JS nach Plan 0009 und 0010 **≤ 89,0 kB** (1 kB Reserve). Mit dem Zuwachs von ≤ 1,3 kB (E7) muss das Start-JS **vor** der Anbieter-UI bei ≤ 87,7 kB liegen. Die Schwellen passen zu Plan 0009: 88,6 kB ist dort der Entscheidungspunkt, 89,0 kB die Obergrenze nach seiner UI. Liegt 0009 am Ende bei `X`, muss Paket 0 `X − 87,7` kB einsparen. Bei `X = 89,0` sind das 1,3 kB.
 
+**Stand nach Plan 0009 (2026-10-05):**
+- `X = 89,80 kB` auf `main` (2d134a2, Plan 0009 live). Paket 0 muss also **≈ 2,1 kB** sparen.
+- Mit der Nacharbeit zu Plan 0009 (H1–H8, Branch `worktree-hinweise-0009`, 66ed39c) sind es **90,09 kB**. Die Nacharbeit wartet auf Paket 0, weil sie allein das Budget von 90 kB reißt (Plan 0009, „Budget“).
+- Paket 0 baut deshalb auf der Nacharbeit auf und muss **≈ 2,4 kB** sparen.
+- Die gemessenen Kandidaten reichen knapp: A −0,64 kB, B ≈ −1,3 kB (nur ohne React-Abspaltung), C −0,6 bis −0,9 kB.
+- Reicht es nicht, greift Schritt 6 (ADR 0012, Entscheidung des Nutzers).
+
 **Messung per Sourcemap und Versuch** (2026-10-05, `4d4c063`, Ausgang 87,30 kB). Die Sourcemap von `index-*.js` (minifiziert, ohne gzip) zeigt die Verteilung:
 - React-DOM 207 kB von 280 kB;
 - vom eigenen Code `App.tsx` 4,7 kB, `CalendarView.tsx` 4,2 kB, `DetailDialog.tsx` 4,1 kB, `Chrome.tsx` 3,8 kB, `format.ts` 3,6 kB, `use-app-state.ts` 3,1 kB, `districts.ts` 2,4 kB, `Sheets.tsx` 2,3 kB, `KidSheet.tsx` 2,2 kB, `agenda.ts`/`time.ts`/`icons.tsx` je 2,0 kB, `ics.ts` 1,9 kB.
@@ -438,6 +445,13 @@ Nicht in diesem Plan. Gründe:
 
 **Voraussetzungen:** Plan 0008 und Plan 0009 sind auf `main` (N1). Dieser Plan baut auf deren Stand auf.
 
+**Stand 2026-10-05:** Plan 0009 ist live (`main` 2d134a2, Start-JS 89,80 kB). Die Nacharbeit H1–H8 (66ed39c) liegt darunter, mit 90,09 kB. Die Spalte „Plan 0009“ unten gilt mit diesen Ergänzungen der Nacharbeit:
+- `src/ui/Sheets.tsx`: `LimitAction` mit `focusTarget`, `LimitActionFor`.
+- `src/ui/use-transit.ts`: `retry()`, `reloadAfterRetry`.
+- `src/ui/format.ts`: `originHint`.
+- `src/ui/OriginPicker.tsx`, `KidSheet.tsx`: `reachMode`.
+- `e2e/mobile-ux.ts`: Text-Gate N5.
+
 | Datei | Plan 0008 | Plan 0009 | Plan 0010 ändert |
 |---|---|---|---|
 | `src/domain/route.ts`, `route.test.ts` | – | `umkreis` → `wegzeit`, Test „kein Startpunkt“ | Tab `anbieter`, `providerId`, Tests |
@@ -476,6 +490,10 @@ Nicht in diesem Plan. Gründe:
 
 - B testet bis zur Zusammenführung mit Unit-Tests. Seine E2E-Läufe starten nach dem Merge von A.
 - **Lokale Perf-Tests** (`perf.spec.ts`, Schrift-Swap) sind unter Parallellast unzuverlässig. Rot nur lokal unter Last ist kein Befund, das Gate ist die CI.
+
+## Umsetzung
+
+**Stapel (2026-10-05):** `main` (2d134a2) ← Nacharbeit 0009 (`worktree-hinweise-0009`) ← diese Plan-Doku (`anbieter-0010-v2`, aus `origin/anbieter-0010` übernommen, ohne Force-Push) ← Paket 0. `main` springt per Fast-Forward erst auf einen Stand mit grünem Budget.
 
 ## Struktur
 
