@@ -5,7 +5,7 @@
  * tests/fixtures/karte/, offline, nur solange die Karte im DOM ist und nur ohne Querystring.
  */
 import { existsSync } from "node:fs";
-import { test as base, expect, type Page, type Request, type Route } from "@playwright/test";
+import { test as base, expect, type Locator, type Page, type Request, type Route } from "@playwright/test";
 
 /** Muss zu tests/fixtures/offers.json passen: Montag, 5.10.2026, 12:00 Berlin. */
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
@@ -186,6 +186,63 @@ export const MAP_READY = { timeout: 20_000 };
  */
 export function exportPreload(page: Page) {
   return page.waitForResponse((r) => /\/assets\/export\/[^/]+\.js$/.test(new URL(r.url()).pathname));
+}
+
+/**
+ * Wegzeit mit zwei Linien (Plan 0012, E1, Review 2, W3/W5): `getByText` sähe Pfeil und „, dann“ zusammen und taugt
+ * dafür nicht. Vorgelesen wird `spoken` (Aria-Snapshot: ohne aria-hidden, mit sr-only), sichtbar steht „→“, und
+ * Linie davor, Pfeil und Linie danach stehen in derselben Zeile.
+ */
+export async function expectTwoLines(el: Locator, spoken: string) {
+  // Playwright setzt vor „, dann“ ein Leerzeichen, weil `.sr-only` absolut positioniert (also Block) ist, wie die
+  // Namensberechnung der Browser; vorgelesen wird es als Pause. Leerzeichen dürfen auch U+00A0 sein.
+  const pattern = spoken
+    .replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")
+    .replaceAll(", dann", " ?, dann")
+    .replaceAll(" ", "\\s");
+  await expect(el).toMatchAriaSnapshot(`- text: /${pattern}/`);
+  await expect(el.locator('[aria-hidden="true"]')).toHaveText("→");
+  const tops = await el.evaluate((root) => {
+    const arrow = root.querySelector('[aria-hidden="true"]');
+    const before = arrow?.previousSibling;
+    const after = arrow?.nextElementSibling?.nextSibling;
+    if (!arrow || !before || !after) return [];
+    // Text davor: seine letzte Zeile; Text danach: seine erste
+    const top = (node: Node, last: boolean) => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const rects = range.getClientRects();
+      return (last ? rects[rects.length - 1] : rects[0])?.top ?? Number.NaN;
+    };
+    return [top(before, true), top(arrow, false), top(after, false)];
+  });
+  expect(tops).toHaveLength(3);
+  const [a = 0, b = 0, c = 0] = tops;
+  expect(Math.abs(a - b), "Linie davor und Pfeil in einer Zeile").toBeLessThanOrEqual(1);
+  expect(Math.abs(b - c), "Pfeil und Linie danach in einer Zeile").toBeLessThanOrEqual(1);
+}
+
+/**
+ * Die Fixture hat keinen Ort mit mehreren Angeboten (Orts-Sheet) und zwei Linien: Ab Gostenhof fahren Gemeinde und
+ * Musikschule mit Umstieg, haben aber je ein Angebot (Detail). Für Tests des Orts-Sheets schreibt diese Route die
+ * Linien-Datei um: Jede Zelle mit nur „Tram 1“ bekommt „Bus 202E“ als zweite Linie, die längste Folge der Fixture
+ * (Plan 0012, E1/E4). Kennung und Minuten bleiben, die Datei passt also weiter zur Tabelle.
+ */
+export async function twoLinesEverywhere(page: Page) {
+  await page.route("**/data/linien.json", async (route) => {
+    const response = await route.fetch();
+    const file: { lines: string[]; first: string; second: string } = await response.json();
+    const bytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const tram = file.lines.indexOf("Tram\u00a01") + 1;
+    const bus = file.lines.indexOf("Bus\u00a0202E") + 1;
+    if (tram === 0 || bus === 0) throw new Error(`Fixture-Linien unerwartet: ${file.lines.join(", ")}`);
+    const first = bytes(file.first);
+    const second = bytes(file.second);
+    first.forEach((v, i) => {
+      if (v === tram && second[i] === 0) second[i] = bus;
+    });
+    await route.fulfill({ response, json: { ...file, second: btoa(String.fromCharCode(...second)) } });
+  });
 }
 
 export { expect };

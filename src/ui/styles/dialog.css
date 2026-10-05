@@ -185,6 +185,13 @@
     line-height: 1.2;
     letter-spacing: -0.02em;
   }
+  /* Werte aus den Daten (Preis, Anmeldung, Ort) stehen oft in der halben Spalte: lange Wörter wie
+     „Geschwisterkinder“ trennt das Wörterbuch (lang="de"), nicht overflow-wrap mitten im Wort (Arch-Review 0012,
+     Befund 3; Regel „Titel trennen mit hyphens: auto“, docs/architecture.md). */
+  .label b,
+  .label span:not(.cap) {
+    hyphens: auto;
+  }
   .label span:not(.cap) {
     font-size: 0.875rem;
     font-weight: 450;
@@ -193,6 +200,13 @@
   .label span.ok {
     color: var(--ink);
     font-weight: 700;
+  }
+  /* Wegzeit mit Linien (ReachLong.tsx, Plan 0012, E10), im Detail und im Orts-Sheet: Die Namen tragen U+00A0;
+     gegen `overflow-wrap: anywhere` von .place-where bricht „202E“ nie mitten im Namen, nur am Leerzeichen nach
+     dem Pfeil. */
+  .reach-long {
+    overflow-wrap: normal;
+    hyphens: manual;
   }
   .stamp {
     box-shadow: 3px 3px 0 var(--shadow);

@@ -3,8 +3,8 @@ import { groupByNextSession } from "../../domain/agenda.ts";
 import type { Place } from "../../domain/places.ts";
 import type { Origin } from "../../domain/reach.ts";
 import type { SiteOffer } from "../../domain/site-data.ts";
-import { reachLong } from "../format.ts";
 import { type CardContext, DistPending, OfferCard } from "../OfferCard.tsx";
+import { ReachLong } from "../ReachLong.tsx";
 
 export function PlaceSheet({
   place,
@@ -27,7 +27,7 @@ export function PlaceSheet({
         <h2>{place.names.join(" / ")}</h2>
         <p className="place-where">
           {place.address}
-          {reach && origin ? <span>{reachLong(reach, origin)}</span> : ctx.reachPending && <DistPending />}
+          {reach && origin ? <ReachLong reach={reach} origin={origin} /> : ctx.reachPending && <DistPending />}
         </p>
         {groupByNextSession(place.offers, ctx.now).flatMap((group) =>
           group.items.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated context="place" />),

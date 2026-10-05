@@ -1,13 +1,13 @@
 # Plan 0012 – Linien in der Wegzeit („ca. 25 Min. mit Bus 37 → U1“)
 
-Status: Fassung 2 nach den Nutzerentscheidungen vom 2026-10-05 (höchstens 1 Umstieg, Pfeil). Review-Runden 1 (auf Fassung 1) und 2 (auf Fassung 2) eingearbeitet, kein offener Blocker. **Bereit zur Umsetzung ab Schritt 1.**
+Status: Fassung 2 nach den Nutzerentscheidungen vom 2026-10-05 (höchstens 1 Umstieg, Pfeil). Review-Runden 1 (auf Fassung 1) und 2 (auf Fassung 2) eingearbeitet, kein offener Blocker. **Schritte 1–7 umgesetzt** (Branch `linien-0012`, siehe „Umsetzung“); offen: Schritt 8 (Arch-Review), 9 (Push, CI, Merge), 10 (Browser-Review live).
 Datum: 2026-10-05
 Bezug:
 - **ADR 0011** (Wegzeit-Tabelle Halt→Ort). Dieser Plan ändert dort:
   - Punkt 2: Zugang und Abgang zu Fuß bis 1 500 m statt 800 m;
   - Punkt 3: welche Verbindung je Abfahrtsminute zählt, höchstens 1 Umstieg.
 
-  Er ergänzt die Punkte 4 bis 6 um eine zweite Build-Datei. Das hält **ADR 0015** fest (Entwurf `docs/adr/0015-wegzeit-linien.md`).
+  Er ergänzt die Punkte 4 bis 6 um eine zweite Build-Datei. Das hält **ADR 0015** fest (angenommen, `docs/adr/0015-wegzeit-linien.md`).
 - Plan 0009 (Öffi-Fahrzeit): E4 Auszug, E5 Tabelle, E6 Profil-CSA, E7 `wegzeit.json`, E8 Domäne, E9 Laden, E11 Rückfall, E15 Tests.
 - ADR 0010 (`src/data` importiert zur Laufzeit nichts aus `src/domain` außer `geo`).
 - Plan 0011 und ADR 0013 (Service Worker, noch nicht umgesetzt): `linien.json` kommt in die Zeile von `wegzeit.json` (E9).
@@ -116,6 +116,7 @@ Die Wegwerf-Prototypen lagen außerhalb des Repos. Sie nutzen `buildNetwork`, `e
 - **N2:** Linien nur im Detail und im Orts-Sheet, nicht auf der Kachel.
 - **N3:** Schreibweise mit Pfeil.
 - **N4:** Direktverbindungen haben Vorrang, ein Umstieg nur, wenn er deutlich schneller ist oder es direkt nicht geht, zwei Umstiege nie, dann lieber länger zu Fuß.
+- **N5 (nach der Messung in Schritt 3):** Umstiegs-Bit im Browser behalten; die gemessenen Werte „mit Bit“ ersetzen M4 als Referenz (siehe „Umsetzung“).
 
 **Übersetzt in Zahlen** (Annahmen dieses Plans, als Konstanten leicht änderbar):
 - „deutlich schneller“ = mindestens **10 Min.**;
@@ -681,3 +682,138 @@ Keine Blocker. Alle Befunde sind übernommen, mit einer Ausnahme bei H1 (siehe d
 - **H8:** beide Grenzen inklusiv in D3, `transit.test.ts:146` umgestellt.
 - **H9:** ADR 0015 ergänzt um die Statuszeile (ADR 0011, Punkt 3, Satz 3) sowie W1 und W2.
 - **H10:** `linien.json` erst, wenn auch die Logik da ist (E9).
+
+## Umsetzung
+
+Stand 2026-10-05, Branch `linien-0012`. Schritte 1–4 umgesetzt, Schritt 3 gemessen. Nach Schritt 4 angehalten, weil mehrere Werte um mehr als 20 % von M4 abwichen (siehe „Messung Schritt 3“). **Nutzerentscheidung N5 (2026-10-05): Umstiegs-Bit behalten wie geplant**, siehe „Entscheidung zur Abweichung“. Danach Schritte 5–7.
+
+### Schritt 1 – Auszug und Fixture
+
+- `pnpm pipeline oepnv`: Feed unverändert (HTTP 304, VGN-Soll-Daten vom 24.06.2026), Stichtag weiter **Di 13.10.2026**. Der alte Auszug ohne `mode` bestand die Prüfung nicht und wurde ohne `--force` neu geschrieben. 3 405 Fahrten: 2 519 Bus, 373 Tram, 310 U-Bahn, 203 Bahn. 1 062,4 kB roh, 174,5 kB gzip.
+- `route` ohne Namen wirft für übernommene Fahrten als `GTFS: Route <id> ohne Namen` (die Route-ID, weil es keinen Namen gibt).
+- **Fixture-Linie „202E“** (`tests/fixtures/oepnv/fahrplan.json`): Bus 9004:2 → 9008 ohne Zwischenhalt, ab 8:33 alle 10 Min. bis 12:23 (24 Fahrten; eine 25. um 12:33 läge hinter dem Auszugsende 12:30 und brach `tableRows`), 6 Min. Fahrt. Rechenweg ab Gostenhof (49,448 / 11,058; Zugang ≤ 1 500 m: 9001 in 91 m = 1,6 Min., 9002 in 473 m = 8,2 Min., 9003 in 1 368 m = 23,7 Min.):
+  - Tram 1 erreicht 9004:1 um T + 9:30 (T = 8:20, 8:30 …); Umstieg zu 9004:2 (122 m, 2,1 Min. + 1 Min.) ist um T + 12:40 fertig, der 202E fährt um T + 13:00, an 9008 um T + 19:00. Bus 2 (alle 20 Min., 8 Min. bis 9008) kommt nach jeder Tram später an, also gewinnt der 202E jede Minute.
+  - **Direkt mit Tram 1 am besten:** Beispielhof (Zeile 9001: 12 Min. → 1,6 + 12 = 13,6 → „15 Min.“), Bibliothek (14 → 15,6 → „15 Min.“).
+  - **Nur mit „Tram 1 → Bus 202E“:** Gemeindehaus (3,0 km Luftlinie). Zeile 9001: 4,5 Min. Median-Warten + 17 Min. + 47 m (0,8 Min.) = 22,3 → 22, Bit gesetzt. Ab Gostenhof real 1,6 + 22 = 23,6 („25 Min.“), bewertet 33,6; über 9002 28,2 (38,2), über 9003 39,7 (49,7); zu Fuß 52 Min. Passung: Die Folge belegt alle 120 Minuten, `d` ≈ 0,3.
+  - Musikschule: „Tram 1 → Bus 2“ (Zeile 9001: 28 mit Bit, ab Gostenhof 29,6, bewertet 39,6; zu Fuß 40,9). Der 202E kommt der Musikschule über 9008 (694 m) nie näher: Er wäre in jeder Minute mindestens 27 s später als Bus 2.
+  - **Zu Fuß am besten:** Theater (226 m). Im Browser gewinnt allerdings knapp die Zelle 9001 „zu Fuß vom Halt“ (1,6 + 2 = 3,6 gegen 3,9 Min. direkt, Rundung des Zellwerts), also ohne Linien „mit Bus & Bahn“ – das ist der Fall aus E5, wie heute. Ein echtes „zu Fuß“ zeigt weiter der Standort-Test (`startpunkt.spec.ts`, „ca. 5 Min. zu Fuß ab deinem Standort“).
+  - Die längste Folge der Fixture ist „Tram 1 → Bus 202E“ (Gemeindehaus, für E4).
+  - Filter „bis 20 Min.“ blendet Musikschule (29,6) und Gemeindehaus (23,6) weiter aus. Die Reihenfolge der Orts-Liste ändert sich: Gemeindehaus (25 Min.) kommt jetzt vor die Musikschule (30 Min.).
+
+### Schritt 2 – Profil-CSA
+
+- Wie E3. Die Ebene 0 liegt nach ihrem Durchlauf als CSR je Steig (aufsteigend nach Abfahrt) vor; Ebene 1 sucht den Anschluss binär.
+- **Abweichung (Gleichstand):** Bei gleicher Abfahrt und gleicher Bewertung gewinnt die Direktverbindung auch dann, wenn der Umstiegsweg zuerst gescannt wird (beim Überschreiben eines Eintrags mit gleicher Abfahrt). Nur mit „strikt `<`“ hinge das von `connectionOrder` ab (die Verbindung mit der späteren Ankunft am nächsten Halt kommt zuerst). So gilt ADR 0015, Punkt 2 („bei gleicher Abfahrt die Direktverbindung“) wörtlich. Test T5 übt genau diesen Fall.
+- T5 „Sitzenbleiben vor Abgang“ ist nicht beobachtbar (gleiche Fahrt, gleiche Ankunft) und hat keinen eigenen Test. „Abgang vor Umstieg“ an derselben Haltestelle lässt sich mit Gleitkomma-Fußwegen nicht exakt gleich bauen; der Fall ist über „gleiche Abfahrt → Direktverbindung“ abgedeckt.
+- **T2-Zähler** (Zufallsnetz jetzt 60 statt 40 Fahrten, sonst lag „P = 0 und P = 600 wählen verschieden“ unter 5 %): je Radius schwanken die Zähler stark (bei 1 500 m nur 4 % Minuten mit Umstieg), deshalb gelten die Untergrenzen für die Summe über 300, 800 und 1 500 m. Erster Lauf: 15 120 Minuten, ein Umstieg 3 198 (21 %), unbegrenzt schneller 960 (6,3 %), P verschieden 1 291 (8,5 %).
+- **Kanarienvögel:** ohne Aufschlag 10 Tests rot; ohne Direkt-Vorrang 1 rot; ohne Umstiegszeit 4 rot; vertauschte Rückverfolgung 8 rot.
+
+### Schritt 3 – Tabelle und Linien
+
+- Wie E4–E7. **Abweichung:** Eine Folge zählt mit ihrer Fahrtenzahl („U1“ direkt und „U1 → U1“ sind verschiedene Folgen), sonst wäre das Umstiegs-Bit bei zusammengefassten Namen nicht eindeutig. Gleichstand danach wie geplant (weniger Linien, Median, Text), als letztes weniger Fahrten.
+- `encodeMinutes` heißt jetzt `encodeBytes` (kodiert auch die Linien-Ebenen).
+- **Laufzeit:** Der erste Stand brauchte 4,8 s. `valueAt` wurde in den heißen Schleifen megamorph (Int32-, Float64- und Uint8-Arrays, 1,1 s Eigenzeit). Monomorphe Lesehilfen `i32`/`f64` in `profile-csa.ts` und ein Abbruch der Umstiegssuche, wenn kein Anschluss mehr gewinnen kann (`at + 60 s + P ≥ bisher beste Bewertung`), bringen die Tabelle auf **2,1–2,3 s**. Das alte Modell braucht auf derselben Maschine 3,3–3,4 s.
+- **Gate:** `MAX_WITHOUT_LINES = 0,093` (gemessen 4,3 % + 5 Prozentpunkte). Kanarienvögel: Schwelle 4 % → `build-data` rot; keine Linien (Fixture) → rot („keine Zelle hat Linien“); `node:fs` in `lines.ts` → `transit-build-pure` rot.
+- **Budgets** (`pnpm build && pnpm size`, Stand Schritt 4): Linien-Daten 27,99 kB (≤ 40), Wegzeit-Daten 42,12 kB (≤ 64), Wegzeit JS (lazy) 1,41 kB (≤ 3), JS (initial) 90,9 kB (≤ 92, Anzeige aus Schritt 6 fehlt noch). Kanarienvogel: Grenze „Linien-Daten“ 20 kB → `size-limit` rot.
+- Schritt 4 lief vor der Messung, damit die Messung die echte Browser-Rechnung (`transitReach` mit Bit und Linien) nutzt.
+
+### Messung Schritt 3 (2026-10-05)
+
+**Rechenweg** (Skript außerhalb des Repos, `/tmp/m0012b/measure.ts`):
+- Altes Modell: `git show main:scripts/transit/{profile-csa,table}.ts` und `git archive main src/domain` in ein temporäres Verzeichnis; daraus `buildTransitTable` (unbegrenzt, ohne Aufschlag, Abgang 800 m) und `transitReach` (800 m) aus `main`.
+- Beide auf **demselben neuen Auszug** (Stichtag 13.10.2026) und denselben 76 Orten aus `site.json` (echte Daten), 556 Haltbereiche.
+- Je Stadtteil (35) × Ort (76) = 2 660 Paare: neu `transitReach(table, origin, lines)`, alt `transitReach` aus `main`. Verschiebung = neu − alt, nur wo beide endlich sind (2 608 Paare).
+- Direkt/Umstieg: Bit der gewählten Zelle; „ohne Linien“ getrennt nach „häufigste Folge leer“ (zu Fuß vom Halt) und „unpassend“.
+- „Umstiegs-Bit entscheidet um“: dieselbe Wahl im Browser einmal mit, einmal ohne Aufschlag; gezählt, wo ohne Aufschlag ein Umstiegsweg gewinnt, mit Aufschlag eine andere Zeile (Direktverbindung) oder der Fußweg.
+- `d` je Zelle: Build-Schleife nachgebaut, Median der Minuten der häufigsten Folge gegen den Zellwert.
+- Größen mit gzip Stufe 9.
+
+**Ergebnisse:**
+
+| Wert | M4/M5 (Prototyp) | gemessen, wie geplant (mit Bit) | gemessen ohne Bit im Browser |
+|---|---|---|---|
+| `wegzeit.json` | 62,4 kB / 41,6 kB gzip | 62,5 kB / 42,1 kB | – |
+| `linien.json` | 113,3 kB / 27,9 kB gzip | 113,6 kB / 28,0 kB | – |
+| Linien, Folgen | 67, 651 | 66, 659 | – |
+| Laufzeit Tabelle | 2,8 s | 2,1–2,3 s (alt 3,3 s) | – |
+| Minuten Mittel | +2,3 | **+2,94 (+28 %)** | +2,26 |
+| p90 | +7 | **+8,9 (+27 %)** | +7,0 |
+| p99 | +23 | +23,8 | +23,0 |
+| > 15 Min. länger | 2,1 % | 2,3 % | 2,1 % |
+| neu „über 2 Std.“ | 52 | 53 | 53 |
+| zu Fuß | 2,9 % | 3,0 % | 2,9 % |
+| direkt (von Bus & Bahn) | 45,0 % | **58,5 % (+30 %)** | 44,2 % |
+| ein Umstieg | 53,8 % | **39,1 % (−27 %)** | 53,7 % |
+| ohne Linien (Paare) | 32 | **60 (+88 %)**: 33 zu Fuß vom Halt, 27 unpassend | 54: 32 zu Fuß vom Halt, 22 unpassend |
+
+- **Umstiegs-Bit** (E2, Review 2, W1): Es entscheidet **366 Paare (13,8 %)** zu einer Direktverbindung um, 5 zum Fußweg. Diese Paare werden im Mittel 4,8 Min. länger (p50 4,3, p90 8,9, höchstens 10,0).
+- **`d` je Zelle** (33 889 Zellen mit Linienfolge): p50 0,38, p90 2,56, p99 6,91 Min. Ohne Linien 1 514 von 35 226 Zellen (4,3 %), davon wegen der Passung 143 (0,4 %). Unter der Nachfrage-Schwelle von 10 %.
+
+**Befund:** Ohne das Umstiegs-Bit im Browser trifft die Messung M4 auf wenige Prozent genau. Die Abweichungen über 20 % kommen **allein vom Umstiegs-Bit**, das erst Review 2 (W1) nach der Messung M4 hinzugefügt hat; M4 hat es nicht enthalten. „Ohne Linien“ liegt zusätzlich wegen der Passungsprüfung (Review 1, W1) höher, die M4 ebenfalls nicht kannte (22–27 Paare, 0,4 % der Zellen).
+
+### Entscheidung zur Abweichung (Nutzer, N5, 2026-10-05)
+
+**Umstiegs-Bit behalten wie geplant (Option 1).** Die Werte der Spalte „mit Bit“ sind die neue Referenz statt M4.
+- Begründung: Die Abweichung kommt allein von Review 2, W1 (Bit im Browser), nicht von einem Fehler im Modell; ohne Bit trifft die Messung M4. Das Bit setzt die Nutzerregel „direkt vor Umstieg, Umstieg nur bei ≥ 10 Min. Gewinn“ (N4) auch über verschiedene Zugangshalte um.
+- `MAX_WITHOUT_LINES = 0,093` bleibt.
+
+Zur Nachvollziehbarkeit die Optionen, die zur Wahl standen:
+
+1. **Umstiegs-Bit wie geplant behalten** (Direktverbindung hat auch über verschiedene Halte Vorrang): 58,5 % direkt; die Minuten steigen gegenüber heute im Mittel um +2,9 statt +2,3 (p90 +8,9 statt +7). 366 Stadtteil-Ort-Paare zeigen eine Direktverbindung, die im Mittel 4,8 Min. (höchstens 10 Min.) langsamer ist als ein Umstiegsweg ab einem anderen Halt im Umkreis. Dann gelten die Werte der Spalte „mit Bit“ als neue Referenz, und Schritte 5–7 laufen unverändert weiter.
+2. **Ohne Bit** (Vorrang nur je Starthalt, Variante vor Review 2, W1): Werte wie M4 (44 % direkt). Der Browser zeigt dann mitunter einen Umstiegsweg ab einem weiter entfernten Halt, obwohl ab dem nächsten Halt eine nur wenig langsamere Direktverbindung fährt. Das Bit kann in der Datei bleiben (Formatversion 2), nur `transitReach` vergliche ohne Aufschlag; ADR 0015 und E2 wären anzupassen.
+
+Zusätzlich zur Kenntnis: 27 Paare (1,1 %) verlieren ihre Linien durch die Passungsprüfung (`d > max(3 Min., 25 %)`); die Prüfung bleibt wie geplant.
+
+### Schritt 5 – Laden
+
+- Wie E9. `loadTransit` startet `linien.json` erst, wenn Tabelle **und** Logik da sind (bei Zeitlimit des Chunks nie), mit `priority: "low"`, eigenem `AbortController` und eigenem Timer (`TRANSIT_TIMEOUT_MS`).
+- `decodeFor` nimmt jetzt `(file, logic, placeKeys)` statt des ganzen Zustands; so dekodiert die Ankunft der Linien die Tabelle nicht neu.
+- Kanarienvögel: Linien-Zustellung mit `isLive`-Prüfung → B1-Test rot; Linien-Anfrage parallel zur Tabelle → 2 Tests rot.
+
+### Schritt 6 – Anzeige
+
+- **Abweichung:** `ReachLong` rendert höchstens zwei Linien ohne Schleife, also ganz ohne `key` (statt `key` = Index, Review 2, H3). Das Ergebnis im DOM ist dasselbe.
+- `reachLong` liefert ohne Linien den ganzen Text in `before`, `after` ist dann leer.
+- `.reach-long { overflow-wrap: normal }` steht in `dialog.css` (Detail und Orts-Sheet nutzen sie; beide Dateien liegen im Start-CSS).
+- JS (initial) 91,42 kB (vorher 90,9 kB, ≤ 92): mehr als die erwarteten 0,3 kB, vor allem durch den längeren Quellensatz und das Laden der Linien in `src/data` und `use-transit.ts`.
+
+### Schritt 7 – E2E und Doku
+
+**Fixture-Erwartungen ab Gostenhof, von Hand nachgerechnet** (Rechenweg im Kopf von `e2e/startpunkt.spec.ts`, Zellen in `scripts/transit/table.test.ts`): Theater 3,6 „5 Min. mit Bus & Bahn“ (ohne Linien, E5), Beispielhof 13,6 „15 Min. mit Tram 1“, Bibliothek 15,6 „15 Min. mit Tram 1“, Gemeinde 23,6 „25 Min. mit Tram 1 → Bus 202E“, Musikschule 29,6 „30 Min. mit Tram 1 → Bus 2“. Die Orts-Liste (`karte.spec.ts`) und die Anbieterliste (`anbieter-inhalt.spec.ts`) sortieren jetzt die Gemeinde (25) vor die Musikschule (30). Der Filter „bis 20 Min.“ blendet weiter beide aus.
+
+**Abweichungen:**
+- **Aria-Snapshot:** Playwright liest „Tram 1 , dann Bus 2“ mit Leerzeichen vor dem Komma, weil `.sr-only` absolut positioniert ist (Block in der Namensberechnung, wie in den Browsern). Die Prüfung (`expectTwoLines` in `e2e/fixtures.ts`) lässt dieses Leerzeichen zu und vergleicht sonst wörtlich. Ob VoiceOver/TalkBack dort eine Pause machen, klärt Schritt 10.
+- **Orts-Sheet mit zwei Linien:** Kein Fixture-Ort mit mehreren Angeboten (Orts-Sheet) hat zwei Linien; Gemeinde und Musikschule haben je ein Angebot und öffnen direkt das Detail. Für das Orts-Sheet (E1 „eine Zeile“, E4) schreibt `twoLinesEverywhere` (`e2e/fixtures.ts`) im Test die Linien-Datei um: Jede Zelle mit nur „Tram 1“ bekommt „Bus 202E“ als zweite Linie (Kennung bleibt). Die Fixture-Daten selbst bleiben unverändert.
+- **E4 im Detail:** Das Detail der Gemeinde (echte Folge „Tram 1 → Bus 202E“) besteht `expectTextFits` nicht, unabhängig von diesem Plan: Der Preis „48 € für vier Nachmittage, **Geschwisterkinder** ermäßigt“ bricht in der halben Label-Spalte mitten im Wort (156 px ≤ 70 % von 380 px, Pixel 7, 100 %). Das Detail dieses Angebots stand bisher in keinem UX-Gate. **Befund für den Orchestrator**, nicht hier behoben. E4 nutzt deshalb das Detail des Beispielhofs mit `twoLinesEverywhere` (gleicher Text der Linien).
+- E2 (abgebrochen) prüft zusätzlich den Filter „bis 20 Min.“ (6 Angebote); E6 hält `linien.json` 1,5 s zurück.
+- Kanarienvogel E1/W3: `.place-where span` statt `.place-where > span` → „Linie davor und Pfeil in einer Zeile“ rot.
+
+**Doku:** `docs/architecture.md` (Datenfluss, Absatz Wegzeit, Invariante), README (Lizenzabsatz), `docs/ideas.md` (Linien auf der Kachel, VGN-Auskunft, Piktogramme, Profil „ohne Kinderwagen“, „zu Fuß vom Halt“ als „zu Fuß“), Plan 0011 (E4 Zeile 5, E4a Punkt 3), ADR 0013 (Punkt 3 und 7), ADR 0015 „angenommen“ mit den gemessenen Werten, Verweis oben in ADR 0011.
+
+### Stand `pnpm check` (2026-10-05, lokal, `PW_PORT=4273`)
+
+- `check:fast`, knip, `schema:check`, Unit-Tests mit Coverage (771 Tests, alle Dateien 98,5 % Zeilen, 92,8 % Zweige) grün; `pnpm size` grün (Werte siehe Schritt 3 und 6).
+- E2E: 1 554 bestanden, 3 rot, alle außerhalb dieses Plans und lastabhängig. Die Maschine lief mit Lastmittel 50–78 auf 16 Kernen (parallele Sessions).
+  - `perf.spec.ts` „LCP und CLS bleiben im Budget“ (Startseite ohne Wegzeit): LCP 2,4–4,1 s statt < 2,5 s. Gegenprobe mit `origin/main` (temporärer Export, gleicher Lauf direkt danach): ebenfalls rot (2,4–3,9 s); umgekehrt war dieser Branch in einem ruhigeren Moment grün (1,5–2,0 s). Kein Bezug zu den Linien: Die Startseite lädt weder Tabelle noch Linien.
+  - `layout.spec.ts:471` (iPhone 15, Badge quer) und im ersten Lauf zwei Karten-Tests auf iPhone 15: Zeitüberschreitung, einzeln wiederholt grün.
+- Im ersten Lauf rot und behoben: `anbieter.spec.ts` „mit offenem Tab einen Startpunkt wählen“ zählte die nachgelagerte Linien-Anfrage mit; der Test wartet jetzt auch auf `linien.json` (E3).
+
+## Arch-Review (Schritt 8, 2026-10-05) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+**Blocker**
+- **1, Smoke E5 konnte nicht rot werden:** `/mit (Bus|Tram|…)/` traf auch „mit Bus & Bahn“. Jetzt `/mit (?:(?:Bus|Tram|R[BE]?) |U\d|S\d)/` (echte Namen tragen U+00A0), und „Bus & Bahn“ darf nicht vorkommen. Kanarienvögel mit echten Daten: `linien.json` abgebrochen → „ein Detail ab Altstadt mit Linien“ rot (dazu der Konsolenfehler); `linien.json` mit fremder Kennung (`table: "deadbeef"`, ohne Konsolenfehler) → rot. Mit dem alten Muster wäre der zweite Fall grün gewesen.
+
+**Wichtig**
+- **2, Start-JS 91,42 kB:** Gemessen über die Sourcemap (Zuordnung der minifizierten Bytes je Quelldatei, gzip einzeln, gegen einen Export von `origin/main`): `ReachLong.tsx` +228 B, `format.ts` +162 B, `use-transit.ts` +152 B, `src/data/transit.ts` +122 B. Gesenkt:
+  - Die Erklärung im Quellenhinweis des Kind-Sheets („Geschätzte Wegzeit … Genannt sind die Linien der häufigsten Verbindung.“) ist jetzt `TRANSIT_RULE` in `src/domain/transit.ts` (Wegzeit-Chunk, 1,41 → 1,66 kB), gebaut aus `TRANSFER_PENALTY_MINUTES` und `ACCESS_METERS`. `decodeTransitTable` hängt sie als `source.rule` an; `transitSourceNote` setzt sie vor „Fahrplan: …“. Bevor die Tabelle dekodiert ist, nennt das Kind-Sheet nur die Quelle (das Öffnen des Sheets lädt die Tabelle ohnehin).
+  - Ein Abruf-Helfer `getJson` für Tabelle und Linien; der Zustand „bereit“ wird in `useTransit` einmal gelesen.
+  - **Ergebnis 91,28 kB** (main 90,9 kB). Das Ziel ≤ 91,0 kB aus ADR 0012 ist um 0,28 kB verfehlt, die **Restreserve zum Budget beträgt 0,72 kB**. Weiter senken ginge nur mit der Anzeige selbst (`ReachLong`, Zustellung der Linien), die beim Öffnen des Details gebraucht wird. Eingetragen in ADR 0012 (Konsequenzen) und Plan 0011 (Risiken); das Budget bleibt 92 kB.
+- **3, „Geschwisterkinder“ brach im Detail der Gemeinde:** behoben. `.label b` und `.label span:not(.cap)` in `dialog.css` trennen mit `hyphens: auto` (`<html lang="de">` ist gesetzt), `.reach-long` bleibt `hyphens: manual`. Neue Ansicht „detail-gemeinde“ in `mobile-ux.spec.ts`; „detail-wegzeit“ nutzt wieder das natürliche Detail der Gemeinde („Tram 1 → Bus 202E“). Kanarienvogel: ohne den Fix 8 Tests rot („Wort gebrochen: Geschwisterkinder“, bei 320 px auch „Nachmittage,“). Mit Fix alle 81 Detail-Tests grün (5 Geräte inkl. WebKit, hell, dunkel, dunkel per Darstellung, 320 px/200 %). Der Abschnitt „E4 im Detail“ unter Schritt 7 ist damit überholt; `twoLinesEverywhere` bleibt nur für das Orts-Sheet.
+
+**Hinweise**
+- **4:** U+00A0 steht als Escape ` ` in `ReachLong.tsx`, `lines.ts` und `lines.test.ts`.
+- **5:** Kommentar zum 8-s-Timer-Hack in `mobile-ux.spec.ts` korrigiert: Auch `loadLines` nutzt `TRANSIT_TIMEOUT_MS`, die Ansicht hält aber `wegzeit.json` zurück, also wird `linien.json` nie angefordert.
+- **6, Doku:** `docs/architecture.md` (Datenfluss und Schichtentabelle mit `lines.ts`, Startpunkt-Invariante „Tabelle, Chunk und Linien“), README („Alle drei“), ADR 0015 Punkt 6 („nach Tabelle und Rechenlogik“), Plan 0012 Bezug (ADR 0015 „angenommen“), Plan 0011 E4a (genau ein weiterer Request auf `linien.json`), ADR 0003 mit Rückverweis auf ADR 0015.
+- **7:** Tests prüfen, dass „10 Min.“ und „1,5 km“ der Erklärung aus `TRANSFER_PENALTY_MINUTES` und `ACCESS_METERS` kommen (`transit.test.ts`, `format.test.ts`) und `EGRESS_METERS = ACCESS_METERS` (`profile-csa.test.ts`).
+- **8:** Im Zufallsnetz gilt „mehr als die Hälfte der Minuten mit Weg“ wieder für jeden Radius (`/ 2`; erster Lauf 300 m 2 799, 800 m 4 564, 1 500 m 4 673 von 5 040). Dabei fiel ein `as`-Cast bei den Zählerschlüsseln weg, ebenso einer in `e2e/fixtures.ts`.
+- **9:** E2E „linien.json passt nicht zur Tabelle“ (`startpunkt.spec.ts`): fremde Kennung → „mit Bus & Bahn“, Minuten unverändert (15 und 30 Min.), keine Konsolenfehler, kein Neuladen (Marker auf `window` bleibt). Kanarienvogel: ohne die Prüfung `file.table !== table.id` in `decodeTransitLines` → rot.

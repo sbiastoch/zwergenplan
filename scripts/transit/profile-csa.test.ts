@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { Timetable } from "../../src/domain/schema.ts";
-import { walkMinutes } from "../../src/domain/transit.ts";
+import { ACCESS_METERS, walkMinutes } from "../../src/domain/transit.ts";
 import {
   buildNetwork,
   type Connection,
@@ -13,15 +13,19 @@ import {
   scanProfiles,
   TRANSFER_BUFFER_SECONDS,
   TRANSFER_METERS,
+  TRANSFER_PENALTY_SECONDS,
 } from "./profile-csa.ts";
 
 // ── Hilfen ───────────────────────────────────────────────────────────────
 
+const INF = Number.POSITIVE_INFINITY;
 const M_PER_DEG = (6_371_008.8 * Math.PI) / 180;
 const BASE: GeoPoint = { lat: 49.45, lon: 11.07 };
 /** Punkt `meters` nördlich von BASE (reine Breitendifferenz: Haversine = Bogenlänge) */
 const at = (meters: number): GeoPoint => ({ lat: BASE.lat + meters / M_PER_DEG, lon: BASE.lon });
 const hm = (h: number, m: number, s = 0) => h * 3600 + m * 60 + s;
+/** Toleranz für Bewertungen (Plan 0012, E3): Fußwege sind Gleitkommazahlen */
+const EPS = 1e-6;
 
 interface TripSpec {
   stops: number[];
@@ -47,21 +51,53 @@ function input(stops: GeoPoint[], trips: TripSpec[]): NetworkInput {
   };
 }
 
-/** Profil-Ankunft (Sekunden) ab Steig `stop` zur Zeit `t`, wie die Tabelle sie nutzt: mit direktem Abgang. */
-function profileArrival(inp: NetworkInput, place: GeoPoint, stop: number, t: number, from = hm(8, 30)): number {
-  const net = buildNetwork(inp, { from });
-  const egress = egressSeconds(net, place);
-  return Math.min(scanProfiles(net, egress).earliestArrival(stop, t), t + (egress[stop] ?? Number.POSITIVE_INFINITY));
+/** Fahrt `stops[0] → stops[1]`, ab `dep`, an `arr` */
+const ride = (from: number, to: number, dep: number, arr: number): TripSpec => ({
+  stops: [from, to],
+  at: [
+    [0, dep],
+    [arr, 0],
+  ],
+});
+
+interface Choice {
+  /** echte Ankunft am Ort */
+  real: number;
+  /** bewertete Ankunft (echt + Aufschlag je Umstieg) */
+  rated: number;
+  /** Fahrten der gewählten Verbindung; leer = direkter Abgang zu Fuß */
+  trips: number[];
 }
 
 /**
- * Vorwärts-Referenz (nur Testcode, E6): klassische Earliest-Arrival-CSA je Startsteig und Startzeit,
- * unabhängig vom Produktivcode aus dem Rohformat gebaut. Gleiches Modell: Sitzenbleiben kostet nichts,
- * Umsteigen am selben Steig oder zu Fuß ≤ 400 m kostet Fußweg + 1 Min., Fußwege nicht verkettet,
- * Abgang zum Ort ≤ 800 m, Ein-/Aussteigen nur mit Flag.
+ * Wahl wie in der Tabelle (E4) für einen Steig und eine Abfahrtsminute: Profil-Eintrag gegen direkten
+ * Abgang, kleinste Bewertung, bei Gleichstand der Abgang.
  */
-function forwardArrival(inp: NetworkInput, place: GeoPoint, start: number, t: number): number {
-  const coords = inp.stops.map(([, lat, lon]) => ({ lat, lon }));
+function choose(
+  inp: NetworkInput,
+  place: GeoPoint,
+  stop: number,
+  t: number,
+  opts: { penaltySeconds?: number; egressMeters?: number; from?: number } = {},
+): Choice {
+  const net = buildNetwork(inp, { from: opts.from ?? hm(8, 30) });
+  const egress = egressSeconds(net, place, opts.egressMeters);
+  const profiles = scanProfiles(net, egress, opts);
+  const rated = new Float64Array(1);
+  const real = new Float64Array(1);
+  const entry = new Int32Array(1);
+  profiles.sweep(stop, t, 60, 1, rated, real, entry);
+  const walk = t + (egress[stop] ?? INF);
+  if (walk <= (rated[0] ?? INF)) return { real: walk, rated: walk, trips: [] };
+  const e = entry[0] ?? -1;
+  return { real: real[0] ?? INF, rated: rated[0] ?? INF, trips: e === -1 ? [] : [...profiles.trips(e)] };
+}
+
+/** Echte Ankunft wie in der Tabelle */
+const arrival = (inp: NetworkInput, place: GeoPoint, stop: number, t: number) => choose(inp, place, stop, t).real;
+
+/** Verbindungen aus dem Rohformat, unabhängig vom Produktivcode, aufsteigend (Vorwärts-Referenzen) */
+function rawConnections(inp: NetworkInput): Connection[] {
   const conns: Connection[] = [];
   inp.trips.forEach((trip, ti) => {
     let acc = 0;
@@ -82,58 +118,229 @@ function forwardArrival(inp: NetworkInput, place: GeoPoint, start: number, t: nu
       });
     }
   });
-  conns.sort((a, b) => a.dep - b.dep || a.arr - b.arr || a.trip - b.trip || a.seq - b.seq);
-  const egress = (s: number) => {
-    const m = haversineMeters(coords[s] ?? BASE, place);
-    return m <= 800 ? walkMinutes(m) * 60 : Number.POSITIVE_INFINITY;
-  };
+  return conns.sort((a, b) => a.dep - b.dep || a.arr - b.arr || a.trip - b.trip || a.seq - b.seq);
+}
+
+/** Umstiege ≤ 400 m mit Fußweg + Puffer, unabhängig vom Produktivcode */
+function rawTransfers(inp: NetworkInput): Map<number, [to: number, seconds: number][]> {
+  const coords = inp.stops.map(([, lat, lon]) => ({ lat, lon }));
+  const out = new Map<number, [number, number][]>();
+  coords.forEach((p, s) => {
+    const list: [number, number][] = [];
+    coords.forEach((q, r) => {
+      const m = haversineMeters(p, q);
+      if (m <= 400) list.push([r, walkMinutes(m) * 60 + 60]);
+    });
+    out.set(s, list);
+  });
+  return out;
+}
+
+/**
+ * Früheste Ankunft an jedem Steig (Aussteigen) mit genau einer Fahrt, Einstieg nur an Steigen mit
+ * `ready[s] ≤ dep`. Klassische Vorwärts-CSA ohne Umstieg.
+ */
+function oneRide(conns: readonly Connection[], ready: ReadonlyMap<number, number>, stops: number): Float64Array {
+  const out = new Float64Array(stops).fill(INF);
+  const inTrip = new Set<number>();
+  for (const c of conns) {
+    if (!inTrip.has(c.trip)) {
+      if (!c.board || (ready.get(c.from) ?? INF) > c.dep) continue;
+      inTrip.add(c.trip);
+    }
+    if (c.alight && c.arr < (out[c.to] ?? INF)) out[c.to] = c.arr;
+  }
+  return out;
+}
+
+/**
+ * Vorwärts-Referenz in zwei Ebenen (T2, nur Testcode): `arr_0` = früheste Ankunft ohne Umstieg,
+ * `arr_1` = früheste Ankunft mit genau einem Umstieg; Referenz = min(arr_0, arr_1 + P). Für P ≥ 0 ist das
+ * gleichwertig zu „höchstens einem Umstieg“ in arr_1. Ohne direkten Abgang vom Startsteig.
+ */
+function twoLevelReference(
+  conns: readonly Connection[],
+  transfers: ReadonlyMap<number, [number, number][]>,
+  egress: Float64Array,
+  start: number,
+  t: number,
+  penalty: number,
+): { arr0: number; arr1: number; rated: number } {
+  const n = egress.length;
+  const first = oneRide(conns, new Map([[start, t]]), n);
+  let arr0 = INF;
+  const ready = new Map<number, number>();
+  first.forEach((a, s) => {
+    if (!Number.isFinite(a)) return;
+    arr0 = Math.min(arr0, a + (egress[s] ?? INF));
+    for (const [to, sec] of transfers.get(s) ?? []) ready.set(to, Math.min(ready.get(to) ?? INF, a + sec));
+  });
+  let arr1 = INF;
+  oneRide(conns, ready, n).forEach((a, s) => {
+    arr1 = Math.min(arr1, a + (egress[s] ?? INF));
+  });
+  return { arr0, arr1, rated: Math.min(arr0, arr1 + penalty) };
+}
+
+/**
+ * Unbegrenzte Vorwärts-Referenz (das Modell vor Plan 0012, nur Testcode): beliebig viele Umstiege ohne
+ * Aufschlag. Dient nur dem Zähler „unbegrenzt wäre schneller“.
+ */
+function unboundedArrival(
+  conns: readonly Connection[],
+  transfers: ReadonlyMap<number, [number, number][]>,
+  egress: Float64Array,
+  start: number,
+  t: number,
+): number {
   const ready = new Map<number, number>([[start, t]]);
   const inTrip = new Set<number>();
-  let best = t + egress(start);
+  let best = INF;
   for (const c of conns) {
     if (c.dep < t) continue;
     if (!inTrip.has(c.trip)) {
-      if (!c.board || (ready.get(c.from) ?? Number.POSITIVE_INFINITY) > c.dep) continue;
+      if (!c.board || (ready.get(c.from) ?? INF) > c.dep) continue;
       inTrip.add(c.trip);
     }
     if (!c.alight) continue;
-    best = Math.min(best, c.arr + egress(c.to));
-    coords.forEach((p, s) => {
-      const m = haversineMeters(coords[c.to] ?? BASE, p);
-      if (m > 400) return;
-      const r = c.arr + walkMinutes(m) * 60 + 60;
-      if (r < (ready.get(s) ?? Number.POSITIVE_INFINITY)) ready.set(s, r);
-    });
+    best = Math.min(best, c.arr + (egress[c.to] ?? INF));
+    for (const [to, sec] of transfers.get(c.to) ?? []) {
+      if (c.arr + sec < (ready.get(to) ?? INF)) ready.set(to, c.arr + sec);
+    }
   }
   return best;
 }
 
-/** Profil gegen Referenz für jeden Steig und jede Minute 8:30–10:29 */
-function compareWithReference(inp: NetworkInput, places: GeoPoint[]) {
+const COUNTER_KEYS: readonly (keyof Counters)[] = [
+  "compared",
+  "finite",
+  "transfer",
+  "unboundedFaster",
+  "penaltyMatters",
+];
+
+interface Counters {
+  compared: number;
+  finite: number;
+  /** Minuten mit genau einem Umstieg im Optimum */
+  transfer: number;
+  /** Minuten, in denen die unbegrenzte Referenz schneller wäre */
+  unboundedFaster: number;
+  /** Minuten, in denen P = 0 und P = 600 verschieden wählen (Fahrtenzahl oder Ankunft) */
+  penaltyMatters: number;
+}
+
+/**
+ * Profil gegen die Referenz in zwei Ebenen für jeden Steig und jede Minute 8:30–10:29, mit P = 600 und P = 0
+ * (T2). Prüft dabei die Rückverfolgung jedes Eintrags (T3).
+ */
+function compareWithReference(inp: NetworkInput, places: GeoPoint[], egressMeters: number): Counters {
   const from = hm(8, 30);
   const net = buildNetwork(inp, { from });
-  let compared = 0;
-  let finite = 0;
+  const conns = rawConnections(inp);
+  const transfers = rawTransfers(inp);
+  const counters: Counters = { compared: 0, finite: 0, transfer: 0, unboundedFaster: 0, penaltyMatters: 0 };
+  const rated = new Float64Array(120);
+  const real = new Float64Array(120);
+  const entry = new Int32Array(120);
   for (const place of places) {
-    const egress = egressSeconds(net, place);
-    const profiles = scanProfiles(net, egress);
-    const swept = new Float64Array(120);
-    for (let stop = 0; stop < inp.stops.length; stop++) {
-      profiles.sweep(stop, from, 60, 120, swept);
-      for (let m = 0; m < 120; m++) {
-        const t = from + 60 * m;
-        const profile = Math.min(profiles.earliestArrival(stop, t), t + (egress[stop] ?? Number.POSITIVE_INFINITY));
-        const viaSweep = Math.min(swept[m] ?? 0, t + (egress[stop] ?? Number.POSITIVE_INFINITY));
-        const reference = forwardArrival(inp, place, stop, t);
-        if (profile !== reference || viaSweep !== reference) {
-          throw new Error(`Ort ${place.lat},${place.lon}, Steig ${stop}, Minute ${m}: ${profile} ≠ ${reference}`);
+    const egress = egressSeconds(net, place, egressMeters);
+    const byPenalty = [TRANSFER_PENALTY_SECONDS, 0].map((penalty) => {
+      const profiles = scanProfiles(net, egress, { penaltySeconds: penalty });
+      const result: { rated: number; real: number; legs: number }[][] = [];
+      for (let stop = 0; stop < inp.stops.length; stop++) {
+        profiles.sweep(stop, from, 60, 120, rated, real, entry);
+        const row: { rated: number; real: number; legs: number }[] = [];
+        for (let m = 0; m < 120; m++) {
+          const t = from + 60 * m;
+          const ref = twoLevelReference(conns, transfers, egress, stop, t, penalty);
+          const got = rated[m] ?? Number.NaN;
+          const ok = Number.isFinite(ref.rated) ? Math.abs(got - ref.rated) <= EPS : got === INF;
+          if (!ok)
+            throw new Error(
+              `P ${penalty}, Ort ${place.lat},${place.lon}, Steig ${stop}, Minute ${m}: ${got} ≠ ${ref.rated}`,
+            );
+          const e = entry[m] ?? -1;
+          let legs = 0;
+          if (e !== -1) {
+            const trips = profiles.trips(e);
+            legs = trips.length;
+            checkTraceable(inp, egress, stop, t, trips, real[m] ?? INF);
+            expect(Math.abs((real[m] ?? INF) + (legs - 1) * penalty - got)).toBeLessThanOrEqual(EPS);
+          } else {
+            expect(got).toBe(INF);
+          }
+          row.push({ rated: got, real: real[m] ?? INF, legs });
         }
-        compared++;
-        if (Number.isFinite(reference)) finite++;
+        result.push(row);
+      }
+      return result;
+    });
+    const [withP, noP] = byPenalty;
+    for (let stop = 0; stop < inp.stops.length; stop++) {
+      for (let m = 0; m < 120; m++) {
+        const a = withP?.[stop]?.[m];
+        const b = noP?.[stop]?.[m];
+        if (!a || !b) throw new Error("Lücke");
+        counters.compared++;
+        if (Number.isFinite(a.rated)) counters.finite++;
+        if (a.legs === 2) counters.transfer++;
+        const unbounded = unboundedArrival(conns, transfers, egress, stop, from + 60 * m);
+        if (unbounded < b.rated - EPS) counters.unboundedFaster++;
+        if (a.legs !== b.legs || Math.abs(a.real - b.real) > EPS) counters.penaltyMatters++;
       }
     }
   }
-  return { compared, finite };
+  return counters;
+}
+
+/**
+ * T3: Die Fahrten eines Eintrags sind fahrbar und ergeben die echte Ankunft: Einstieg ab `t` am Startsteig mit
+ * Flag, Ausstieg mit Flag, Umstieg ≤ 400 m mit Fußweg + 60 s, Abgang laut `egress` (≤ Radius).
+ */
+function checkTraceable(
+  inp: NetworkInput,
+  egress: Float64Array,
+  start: number,
+  t: number,
+  trips: readonly number[],
+  real: number,
+) {
+  expect(trips.length === 1 || trips.length === 2).toBe(true);
+  const coords = inp.stops.map(([, lat, lon]) => ({ lat, lon }));
+  const legs = (trip: number, boardAt: number, ready: number) => {
+    const tr = inp.trips[trip];
+    if (!tr) throw new Error(`Fahrt ${trip}`);
+    let acc = 0;
+    const abs = tr.times.map((v) => {
+      acc += v;
+      return acc;
+    });
+    const out: { stop: number; arr: number }[] = [];
+    for (let k = 0; k + 1 < tr.stops.length; k++) {
+      if (tr.stops[k] !== boardAt || ((tr.flags[k] ?? 0) & 1) === 0 || (abs[2 * k + 1] ?? 0) < ready) continue;
+      for (let j = k + 1; j < tr.stops.length; j++) {
+        if (((tr.flags[j] ?? 0) & 2) !== 0) out.push({ stop: tr.stops[j] ?? -1, arr: abs[2 * j] ?? 0 });
+      }
+    }
+    return out;
+  };
+  const [a, b] = trips;
+  const arrivals: number[] = [];
+  for (const x of legs(a ?? -1, start, t)) {
+    if (b === undefined) {
+      arrivals.push(x.arr + (egress[x.stop] ?? INF));
+      continue;
+    }
+    coords.forEach((p, s) => {
+      const meters = haversineMeters(coords[x.stop] ?? BASE, p);
+      if (meters > TRANSFER_METERS) return;
+      for (const y of legs(b, s, x.arr + walkMinutes(meters) * 60 + TRANSFER_BUFFER_SECONDS)) {
+        arrivals.push(y.arr + (egress[y.stop] ?? INF));
+      }
+    });
+  }
+  expect(arrivals.some((v) => Math.abs(v - real) <= EPS)).toBe(true);
 }
 
 // ── Tests ────────────────────────────────────────────────────────────────
@@ -170,7 +377,7 @@ describe("connectionOrder (M4)", () => {
 
   it("lässt bei zwei Verbindungen dep == arr derselben Fahrt sitzen bleiben", () => {
     // A → B → C zur selben Sekunde (Halte im Sekundenabstand gerundet), Ort direkt an C
-    const stops = [at(0), at(1000), at(2000)];
+    const stops = [at(0), at(2000), at(4000)];
     const inp = input(stops, [
       {
         stops: [0, 1, 2],
@@ -181,59 +388,34 @@ describe("connectionOrder (M4)", () => {
         ],
       },
     ]);
-    expect(profileArrival(inp, at(2000), 0, hm(8, 55))).toBe(hm(9, 0));
-    expect(forwardArrival(inp, at(2000), 0, hm(8, 55))).toBe(hm(9, 0));
+    expect(choose(inp, at(4000), 0, hm(8, 55))).toEqual({ real: hm(9, 0), rated: hm(9, 0), trips: [0] });
   });
 });
 
-describe("Profil-CSA", () => {
+describe("Profil-CSA (T1, umgestellt auf höchstens einen Umstieg)", () => {
   it("fährt direkt und läuft vom Ausstieg zum Ort", () => {
-    const inp = input(
-      [at(0), at(3000)],
-      [
-        {
-          stops: [0, 1],
-          at: [
-            [0, hm(9, 0)],
-            [hm(9, 10), 0],
-          ],
-        },
-      ],
-    );
+    const inp = input([at(0), at(3000)], [ride(0, 1, hm(9, 0), hm(9, 10))]);
     const place = at(3150);
-    expect(profileArrival(inp, place, 0, hm(8, 50))).toBeCloseTo(hm(9, 10) + walkMinutes(150) * 60, 6);
-    // Abfahrt verpasst, keine weitere Fahrt: nur der Fußweg wäre möglich, aber 3 km > 800 m
-    expect(profileArrival(inp, place, 0, hm(9, 1))).toBe(Number.POSITIVE_INFINITY);
+    expect(arrival(inp, place, 0, hm(8, 50))).toBeCloseTo(hm(9, 10) + walkMinutes(150) * 60, 6);
+    // Abfahrt verpasst, keine weitere Fahrt: nur der Fußweg wäre möglich, aber 3 km > 1 500 m
+    expect(arrival(inp, place, 0, hm(9, 1))).toBe(INF);
   });
 
   it("nimmt den nächsten Takt, wenn der Umstieg 30 s unter dem Puffer liegt", () => {
     expect(TRANSFER_BUFFER_SECONDS).toBe(60);
     const stops = [at(0), at(3000), at(6000)];
     const trips = (wait: number): TripSpec[] => [
-      {
-        stops: [0, 1],
-        at: [
-          [0, hm(9, 0)],
-          [hm(9, 10), 0],
-        ],
-      },
-      {
-        stops: [1, 2],
-        at: [
-          [0, hm(9, 10) + wait],
-          [hm(9, 20) + wait, 0],
-        ],
-      },
-      {
-        stops: [1, 2],
-        at: [
-          [0, hm(9, 20) + wait],
-          [hm(9, 30) + wait, 0],
-        ],
-      },
+      ride(0, 1, hm(9, 0), hm(9, 10)),
+      ride(1, 2, hm(9, 10) + wait, hm(9, 20) + wait),
+      ride(1, 2, hm(9, 20) + wait, hm(9, 30) + wait),
     ];
-    expect(profileArrival(input(stops, trips(30)), at(6000), 0, hm(9, 0))).toBe(hm(9, 30, 30));
-    expect(profileArrival(input(stops, trips(60)), at(6000), 0, hm(9, 0))).toBe(hm(9, 21));
+    // ein Umstieg: echte Ankunft wie bisher, Bewertung + 10 Min.
+    expect(choose(input(stops, trips(30)), at(6000), 0, hm(9, 0))).toEqual({
+      real: hm(9, 30, 30),
+      rated: hm(9, 40, 30),
+      trips: [0, 2],
+    });
+    expect(arrival(input(stops, trips(60)), at(6000), 0, hm(9, 0))).toBe(hm(9, 21));
   });
 
   it("bleibt ohne Puffer in derselben Fahrt sitzen", () => {
@@ -248,68 +430,52 @@ describe("Profil-CSA", () => {
         ],
       },
     ]);
-    expect(profileArrival(inp, at(6000), 0, hm(9, 0))).toBe(hm(9, 20));
+    expect(choose(inp, at(6000), 0, hm(9, 0))).toEqual({ real: hm(9, 20), rated: hm(9, 20), trips: [0] });
   });
 
   it("steigt zu Fuß bis 400 m um, bei 401 m nicht", () => {
     expect(TRANSFER_METERS).toBe(400);
-    const trips: TripSpec[] = [
-      {
-        stops: [0, 1],
-        at: [
-          [0, hm(9, 0)],
-          [hm(9, 10), 0],
-        ],
-      },
-      {
-        stops: [2, 3],
-        at: [
-          [0, hm(9, 20)],
-          [hm(9, 30), 0],
-        ],
-      },
-    ];
+    const trips = [ride(0, 1, hm(9, 0), hm(9, 10)), ride(2, 3, hm(9, 20), hm(9, 30))];
     const near = input([at(0), at(3000), at(3399.9), at(8000)], trips);
-    expect(profileArrival(near, at(8000), 0, hm(9, 0))).toBe(hm(9, 30));
+    expect(arrival(near, at(8000), 0, hm(9, 0))).toBe(hm(9, 30));
     const far = input([at(0), at(3000), at(3401), at(8000)], trips);
-    expect(profileArrival(far, at(8000), 0, hm(9, 0))).toBe(Number.POSITIVE_INFINITY);
+    expect(arrival(far, at(8000), 0, hm(9, 0))).toBe(INF);
   });
 
   it("rechnet Fußweg und Puffer in den Umstieg, ohne Fußwege zu verketten", () => {
     // Umstieg 300 m (5,2 Min. + 1 Min.): Anschluss 9:16 knapp verpasst, 9:17 erreicht
     const stops = [at(0), at(3000), at(3300), at(3600), at(9000)];
     const trips: TripSpec[] = [
-      {
-        stops: [0, 1],
-        at: [
-          [0, hm(9, 0)],
-          [hm(9, 10), 0],
-        ],
-      },
-      {
-        stops: [2, 4],
-        at: [
-          [0, hm(9, 16)],
-          [hm(9, 30), 0],
-        ],
-      },
-      {
-        stops: [2, 4],
-        at: [
-          [0, hm(9, 17)],
-          [hm(9, 31), 0],
-        ],
-      },
+      ride(0, 1, hm(9, 0), hm(9, 10)),
+      ride(2, 4, hm(9, 16), hm(9, 30)),
+      ride(2, 4, hm(9, 17), hm(9, 31)),
       // 3 liegt 600 m von 1, aber nur 300 m von 2: zwei Fußwege hintereinander gibt es nicht
+      ride(3, 4, hm(9, 11), hm(9, 20)),
+    ];
+    expect(choose(input(stops, trips), at(9000), 0, hm(9, 0))).toEqual({
+      real: hm(9, 31),
+      rated: hm(9, 41),
+      trips: [0, 2],
+    });
+  });
+
+  it("nimmt nie zwei Umstiege, auch wenn der Weg sonst ginge (früher: Ankunft 9:30)", () => {
+    // 0 → 1, umsteigen, 1 → 2 → 3, umsteigen, 3 → 4: drei Fahrten, also unerreichbar
+    const stops = [at(0), at(3000), at(6000), at(9000), at(15_000)];
+    const trips: TripSpec[] = [
+      ride(0, 1, hm(9, 0), hm(9, 5)),
       {
-        stops: [3, 4],
+        stops: [1, 2, 3],
         at: [
-          [0, hm(9, 11)],
-          [hm(9, 20), 0],
+          [0, hm(9, 10)],
+          [hm(9, 14), hm(9, 14)],
+          [hm(9, 18), 0],
         ],
       },
+      ride(3, 4, hm(9, 20), hm(9, 30)),
     ];
-    expect(profileArrival(input(stops, trips), at(9000), 0, hm(9, 0))).toBe(hm(9, 31));
+    // Ort an 4: 6 km von 3, nur mit drei Fahrten erreichbar
+    expect(arrival(input(stops, trips), at(15_000), 0, hm(9, 0))).toBe(INF);
   });
 
   it("beachtet Einsteige- und Aussteigesperren", () => {
@@ -324,53 +490,146 @@ describe("Profil-CSA", () => {
       flags,
     });
     // Einsteigen an 0 verboten
-    expect(profileArrival(input(stops, [trip([2, 3, 3])]), at(6000), 0, hm(9, 0))).toBe(Number.POSITIVE_INFINITY);
+    expect(arrival(input(stops, [trip([2, 3, 3])]), at(6000), 0, hm(9, 0))).toBe(INF);
     // Aussteigen an 2 verboten, Ort nur von 2 aus erreichbar
-    expect(profileArrival(input(stops, [trip([3, 3, 1])]), at(6000), 0, hm(9, 0))).toBe(Number.POSITIVE_INFINITY);
+    expect(arrival(input(stops, [trip([3, 3, 1])]), at(6000), 0, hm(9, 0))).toBe(INF);
     // Aussteigen an 1 verboten: Durchfahren geht trotzdem
-    expect(profileArrival(input(stops, [trip([3, 1, 3])]), at(6000), 0, hm(9, 0))).toBe(hm(9, 20));
+    expect(arrival(input(stops, [trip([3, 1, 3])]), at(6000), 0, hm(9, 0))).toBe(hm(9, 20));
     // Einsteigen an 1 verboten: dort Zusteigen unmöglich
-    expect(profileArrival(input(stops, [trip([3, 2, 3])]), at(6000), 1, hm(9, 5))).toBe(Number.POSITIVE_INFINITY);
-  });
-
-  it("geht vom Steig bis 800 m zum Ort, weiter nicht", () => {
-    expect(EGRESS_METERS).toBe(800);
-    const inp = input(
-      [at(0), at(3000)],
-      [
-        {
-          stops: [0, 1],
-          at: [
-            [0, hm(9, 0)],
-            [hm(9, 10), 0],
-          ],
-        },
-      ],
-    );
-    expect(profileArrival(inp, at(3799.9), 0, hm(9, 0))).toBeCloseTo(hm(9, 10) + walkMinutes(799.9) * 60, 6);
-    expect(profileArrival(inp, at(3801), 0, hm(9, 0))).toBe(Number.POSITIVE_INFINITY);
-    // direkter Abgang ohne Fahrt
-    expect(profileArrival(inp, at(500), 0, hm(9, 5))).toBeCloseTo(hm(9, 5) + walkMinutes(500) * 60, 6);
+    expect(arrival(input(stops, [trip([3, 2, 3])]), at(6000), 1, hm(9, 5))).toBe(INF);
   });
 
   it("lässt Verbindungen vor dem Fenster weg", () => {
-    const inp = input(
-      [at(0), at(3000)],
-      [
-        {
-          stops: [0, 1],
-          at: [
-            [0, hm(8, 0)],
-            [hm(8, 10), 0],
-          ],
-        },
-      ],
-    );
+    const inp = input([at(0), at(3000)], [ride(0, 1, hm(8, 0), hm(8, 10))]);
     expect(buildNetwork(inp, { from: hm(8, 30) }).connections).toBe(0);
     expect(buildNetwork(inp, { from: hm(7, 0) }).connections).toBe(1);
   });
+});
 
-  it("gleicht der Vorwärts-Referenz für jeden Steig und jede Minute (Fixture-Netz)", () => {
+describe("Radius des Abgangs (T6)", () => {
+  it("geht vom Steig bis 1 500 m zum Ort, bei 1 501 m nicht", () => {
+    expect(EGRESS_METERS).toBe(1500);
+    // Der Erklärsatz im Kind-Sheet nennt einen Wert für Zugang und Abgang (TRANSIT_RULE, Arch-Review 0012, H7)
+    expect(EGRESS_METERS).toBe(ACCESS_METERS);
+    const inp = input([at(0), at(5000)], [ride(0, 1, hm(9, 0), hm(9, 10))]);
+    expect(arrival(inp, at(6500), 0, hm(9, 0))).toBeCloseTo(hm(9, 10) + walkMinutes(1500) * 60, 6);
+    expect(arrival(inp, at(6501), 0, hm(9, 0))).toBe(INF);
+    // direkter Abgang ohne Fahrt
+    expect(arrival(inp, at(500), 0, hm(9, 5))).toBeCloseTo(hm(9, 5) + walkMinutes(500) * 60, 6);
+  });
+});
+
+describe("Direktverbindung gegen einen Umstieg (T4, P = 10 Min.)", () => {
+  // 0 → 2 direkt; 0 → 1, am selben Steig 1 umsteigen, 1 → 2. Ort direkt an 2.
+  const stops = [at(0), at(3000), at(9000)];
+  const net = (directArr: number) =>
+    input(stops, [ride(0, 2, hm(9, 0), directArr), ride(0, 1, hm(9, 0), hm(9, 5)), ride(1, 2, hm(9, 10), hm(9, 20))]);
+
+  it("Direktverbindung 9 Min. langsamer als der Umstiegsweg → Direktverbindung", () => {
+    expect(TRANSFER_PENALTY_SECONDS).toBe(600);
+    expect(choose(net(hm(9, 29)), at(9000), 0, hm(9, 0))).toEqual({
+      real: hm(9, 29),
+      rated: hm(9, 29),
+      trips: [0],
+    });
+  });
+
+  it("11 Min. langsamer → Umstieg, mit der echten Ankunft", () => {
+    expect(choose(net(hm(9, 31)), at(9000), 0, hm(9, 0))).toEqual({
+      real: hm(9, 20),
+      rated: hm(9, 30),
+      trips: [1, 2],
+    });
+  });
+
+  it("Ziel nur mit zwei Umstiegen erreichbar → kein Eintrag", () => {
+    const inp = input(
+      [at(0), at(3000), at(6000), at(9000)],
+      [ride(0, 1, hm(9, 0), hm(9, 5)), ride(1, 2, hm(9, 10), hm(9, 15)), ride(2, 3, hm(9, 20), hm(9, 25))],
+    );
+    expect(choose(inp, at(9000), 0, hm(9, 0))).toEqual({ real: INF, rated: INF, trips: [] });
+  });
+});
+
+describe("Gleichstand (T5)", () => {
+  const stops = [at(0), at(3000), at(9000), at(3000)];
+
+  it("Sitzenbleiben vor Umstieg: gleiche Bewertung → in der Fahrt bleiben", () => {
+    // Fahrt 0: 0 → 1 → 2 (an 9:30). An 1 umsteigen auf Fahrt 1 nach 2 (an 9:20, bewertet 9:30).
+    const inp = input(stops, [
+      {
+        stops: [0, 1, 2],
+        at: [
+          [0, hm(9, 0)],
+          [hm(9, 5), hm(9, 5)],
+          [hm(9, 30), 0],
+        ],
+      },
+      ride(1, 2, hm(9, 10), hm(9, 20)),
+    ]);
+    expect(choose(inp, at(9000), 0, hm(9, 0)).trips).toEqual([0]);
+  });
+
+  it("gleiche Abfahrt, genau 10 Min. Unterschied → Direktverbindung, auch wenn der Umstiegsweg zuerst gescannt wird", () => {
+    // Direkt 0 → 3 → 2 (erste Verbindung an 9:01), Umstieg 0 → 1 (an 9:05) und 1 → 2: Bei gleicher Abfahrt
+    // kommt die Verbindung mit der späteren Ankunft zuerst, hier also der Umstiegsweg (connectionOrder).
+    const inp = input(
+      [at(0), at(3000), at(9000), at(500)],
+      [
+        {
+          stops: [0, 3, 2],
+          at: [
+            [0, hm(9, 0)],
+            [hm(9, 1), hm(9, 1)],
+            [hm(9, 30), 0],
+          ],
+        },
+        ride(0, 1, hm(9, 0), hm(9, 5)),
+        ride(1, 2, hm(9, 10), hm(9, 20)),
+      ],
+    );
+    expect(choose(inp, at(9000), 0, hm(9, 0))).toEqual({ real: hm(9, 30), rated: hm(9, 30), trips: [0] });
+    // Gegenprobe: eine Sekunde schneller gewinnt der Umstieg
+    const faster = input(
+      [at(0), at(3000), at(9000), at(500)],
+      [ride(0, 2, hm(9, 0), hm(9, 30)), ride(0, 1, hm(9, 0), hm(9, 5)), ride(1, 2, hm(9, 10), hm(9, 19, 59))],
+    );
+    expect(choose(faster, at(9000), 0, hm(9, 0)).trips).toEqual([1, 2]);
+  });
+
+  it("gleiche Bewertung, Umstiegsweg fährt später ab → Umstiegsweg (Pareto-Regel, Review 2, W2)", () => {
+    const inp = input(stops, [
+      // direkt ab 9:00, an 9:40
+      ride(0, 2, hm(9, 0), hm(9, 40)),
+      // ab 9:05, umsteigen an 1, an 9:30 (bewertet 9:40)
+      ride(0, 1, hm(9, 5), hm(9, 10)),
+      ride(1, 2, hm(9, 15), hm(9, 30)),
+    ]);
+    expect(choose(inp, at(9000), 0, hm(9, 0))).toEqual({ real: hm(9, 30), rated: hm(9, 40), trips: [1, 2] });
+  });
+
+  it("gleiche Bewertung, Direktverbindung fährt später ab → Direktverbindung", () => {
+    const inp = input(stops, [
+      ride(0, 2, hm(9, 5), hm(9, 40)),
+      ride(0, 1, hm(9, 0), hm(9, 10)),
+      ride(1, 2, hm(9, 15), hm(9, 30)),
+    ]);
+    expect(choose(inp, at(9000), 0, hm(9, 0))).toEqual({ real: hm(9, 40), rated: hm(9, 40), trips: [0] });
+  });
+
+  it("zwei Umstiege gleicher Bewertung → der erste der Umstiegsliste", () => {
+    // Steige 1 und 3 liegen am selben Punkt; von 1 aus sind 1 und 3 Umstiegsziele, in Index-Reihenfolge
+    const inp = input(stops, [
+      ride(0, 1, hm(9, 0), hm(9, 5)),
+      ride(3, 2, hm(9, 10), hm(9, 20)),
+      ride(1, 2, hm(9, 10), hm(9, 20)),
+    ]);
+    expect(choose(inp, at(9000), 0, hm(9, 0)).trips).toEqual([0, 2]);
+  });
+});
+
+describe("Referenz in zwei Ebenen und Rückverfolgung (T2, T3)", () => {
+  it("gleicht der Referenz für jeden Steig und jede Minute (Fixture-Netz)", () => {
     const fixture = Timetable.parse(
       JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/fahrplan.json", import.meta.url), "utf8")),
     );
@@ -384,12 +643,13 @@ describe("Profil-CSA", () => {
       { lat: 49.448, lon: 11.058 },
       { lat: 49.6, lon: 10.9 },
     ];
-    const { compared, finite } = compareWithReference(fixture, places);
-    expect(compared).toBe(places.length * fixture.stops.length * 120);
-    expect(finite).toBeGreaterThan(compared / 3);
+    const c = compareWithReference(fixture, places, EGRESS_METERS);
+    expect(c.compared).toBe(places.length * fixture.stops.length * 120);
+    expect(c.finite).toBeGreaterThan(c.compared / 3);
+    expect(c.transfer).toBeGreaterThan(0);
   });
 
-  it("gleicht der Vorwärts-Referenz auf einem zufälligen Netz mit Umstiegen und Sperren", () => {
+  describe("auf einem zufälligen Netz mit Umstiegen und Sperren", () => {
     let seed = 20261013;
     const rnd = () => {
       seed = (seed * 1_103_515_245 + 12_345) % 2_147_483_648;
@@ -398,7 +658,7 @@ describe("Profil-CSA", () => {
     const pick = (n: number) => Math.floor(rnd() * n);
     // 14 Steige auf 2 km × 2 km: viele Fußweg-Umstiege unter 400 m, manche darüber
     const stops = Array.from({ length: 14 }, () => ({ lat: BASE.lat + rnd() * 0.018, lon: BASE.lon + rnd() * 0.028 }));
-    const trips: TripSpec[] = Array.from({ length: 40 }, () => {
+    const trips: TripSpec[] = Array.from({ length: 60 }, () => {
       const len = 2 + pick(4);
       const route: number[] = [];
       while (route.length < len) {
@@ -416,8 +676,29 @@ describe("Profil-CSA", () => {
       return { stops: route, at: times, flags };
     });
     const places = [stops[0], stops[5], { lat: BASE.lat + 0.009, lon: BASE.lon + 0.014 }].map((p) => p ?? BASE);
-    const { compared, finite } = compareWithReference(input(stops, trips), places);
-    expect(compared).toBe(3 * 14 * 120);
-    expect(finite).toBeGreaterThan(compared / 2);
+    const inp = input(stops, trips);
+
+    // Bei 1 500 m reicht fast jeder Ausstieg (Review 2, W6): die Grenze üben zusätzlich 300 m und 800 m.
+    it("gleicht der Referenz bei Abgang 300, 800 und 1 500 m; Zähler über alle drei mit Untergrenze", () => {
+      const sum: Counters = { compared: 0, finite: 0, transfer: 0, unboundedFaster: 0, penaltyMatters: 0 };
+      for (const meters of [300, 800, 1500]) {
+        const c = compareWithReference(inp, places, meters);
+        expect(c.compared).toBe(3 * 14 * 120);
+        // wie vor Plan 0012 mehr als die Hälfte der Minuten mit Weg, für jeden Radius (erster Lauf: 300 m 2 799,
+        // 800 m 4 564, 1 500 m 4 673 von 5 040; bei 300 m knapp, aber mit festem Startwert deterministisch)
+        expect(c.finite).toBeGreaterThan(c.compared / 2);
+        for (const key of COUNTER_KEYS) sum[key] += c[key];
+      }
+      // Erster Lauf (2026-10-05), 60 Fahrten: 15 120 Minuten; ein Umstieg im Optimum 3 198 (21 %), unbegrenzt
+      // schneller 960 (6,3 %), P = 0 und P = 600 wählen verschieden 1 291 (8,5 %). Je Radius schwankt das stark
+      // (bei 1 500 m nur 4 % mit Umstieg), deshalb die Summe. Untergrenzen = diese Werte, mindestens 5 %.
+      expect(sum.compared).toBe(15_120);
+      expect(sum.transfer).toBeGreaterThanOrEqual(3198);
+      expect(sum.unboundedFaster).toBeGreaterThanOrEqual(960);
+      expect(sum.penaltyMatters).toBeGreaterThanOrEqual(1291);
+      for (const n of [sum.transfer, sum.unboundedFaster, sum.penaltyMatters]) {
+        expect(n / sum.compared).toBeGreaterThanOrEqual(0.05);
+      }
+    });
   });
 });

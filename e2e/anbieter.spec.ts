@@ -446,6 +446,8 @@ test.describe("Privatsphäre (E9)", () => {
     const loaded = Promise.all([
       page.waitForResponse((r) => new URL(r.url()).pathname.endsWith("/data/wegzeit.json") && r.ok()),
       page.waitForResponse((r) => /\/assets\/oepnv\/[^/]+\.js$/.test(new URL(r.url()).pathname) && r.ok()),
+      // Plan 0012, E3: die Linien kommen nach Tabelle und Chunk, auch sie vor der Wahl
+      page.waitForResponse((r) => new URL(r.url()).pathname.endsWith("/data/linien.json") && r.ok()),
     ]);
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });

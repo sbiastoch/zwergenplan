@@ -1,16 +1,20 @@
 /**
- * Wegzeit-Tabelle laden (Plan 0009, E9; ADR 0011): nur `fetch` vom eigenen Origin, für alle gleich. Kein
- * Laufzeit-Import aus src/domain (ADR 0010 bleibt); prüfen und dekodieren macht `decodeTransitTable`.
- * Wann geladen wird, entscheidet `useTransit` (src/ui/use-transit.ts), nie die Wahl eines Startpunkts.
+ * Wegzeit-Tabelle und Linien laden (Plan 0009, E9; Plan 0012, E9; ADR 0011, ADR 0015): nur `fetch` vom eigenen
+ * Origin, für alle gleich. Kein Laufzeit-Import aus src/domain (ADR 0010 bleibt); prüfen und dekodieren machen
+ * `decodeTransitTable` und `decodeTransitLines`. Wann geladen wird, entscheidet `useTransit`
+ * (src/ui/use-transit.ts), nie die Wahl eines Startpunkts.
  */
-import type { TransitTableFile } from "../domain/transit-types.ts";
+import type { TransitLinesFile, TransitTableFile } from "../domain/transit-types.ts";
 
-/** Gemeinsames Zeitlimit für Tabelle (Abruf und Lesen) und Rechenlogik (E9) */
+/** Gemeinsames Zeitlimit für Tabelle (Abruf und Lesen) und Rechenlogik (E9); die Linien haben ein eigenes gleich langes */
 export const TRANSIT_TIMEOUT_MS = 8000;
 
 /** Abhängigkeiten von `loadTransit`, wie `SiteEnv`: Im Unit-Test stehen hier Stubs. */
 export interface TransitEnv {
-  fetch: (url: string, init: { signal: AbortSignal; cache: RequestCache }) => Promise<Response>;
+  fetch: (
+    url: string,
+    init: { signal: AbortSignal; cache: RequestCache; priority?: RequestPriority },
+  ) => Promise<Response>;
   timeoutMs: number;
 }
 
@@ -29,6 +33,11 @@ export interface TransitLoad<L> {
    * noch bekommen (Plan 0009, N1).
    */
   chunk: ChunkOutcome;
+  /**
+   * Linien (Plan 0012, E9): angefordert erst, wenn Tabelle und Logik da sind, sonst `undefined`. Wirft nie; die
+   * Minuten warten nicht darauf.
+   */
+  lines: Promise<TransitLinesFile | undefined>;
 }
 
 export type ChunkOutcome = "ok" | "fehler" | "zeitlimit";
@@ -53,21 +62,47 @@ export async function loadTransit<L>(
     (): Settled<L> => ({ value: undefined, chunk: "fehler" }),
   );
   const timer = setTimeout(() => controller.abort(), env.timeoutMs);
-  const table = async (): Promise<TransitTableFile> => {
-    const res = await env.fetch(`${import.meta.env.BASE_URL}data/wegzeit.json`, {
-      signal,
-      cache: retry ? "reload" : "default",
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    // Build-Artefakt ohne Zod im Client: `decodeTransitTable` prüft Version, Längen und Spalten (E8).
-    return await res.json();
-  };
+  const cache: RequestCache = retry ? "reload" : "default";
   try {
-    const [settled, file] = await Promise.all([Promise.race([logic, expired]), table().catch(() => undefined)]);
-    return settled === "zeitlimit"
-      ? { logic: undefined, file, chunk: settled }
-      : { logic: settled.value, file, chunk: settled.chunk };
+    const [settled, file] = await Promise.all([
+      Promise.race([logic, expired]),
+      getJson<TransitTableFile>("wegzeit.json", { signal, cache }, env),
+    ]);
+    if (settled === "zeitlimit") return { logic: undefined, file, chunk: settled, lines: Promise.resolve(undefined) };
+    // Ohne Logik gibt es keine Wegzeit, ohne Tabelle keine Zellen: dann keine Linien-Anfrage (Review W2, H10)
+    const lines =
+      settled.value !== undefined && file !== undefined ? loadLines(cache, env) : Promise.resolve(undefined);
+    return { logic: settled.value, file, chunk: settled.chunk, lines };
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * Build-Artefakt vom eigenen Origin als JSON, `undefined` bei Netz-, HTTP- oder JSON-Fehler. Ohne Zod im Client:
+ * `decodeTransitTable` bzw. `decodeTransitLines` prüfen den Inhalt (E8; Plan 0012, E8). Wirft nie.
+ */
+async function getJson<T>(
+  file: string,
+  init: Parameters<TransitEnv["fetch"]>[1],
+  env: TransitEnv,
+): Promise<T | undefined> {
+  try {
+    const res = await env.fetch(`${import.meta.env.BASE_URL}data/${file}`, init);
+    return res.ok ? await res.json() : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * `linien.json` mit niedriger Priorität, eigenem Abbruch und eigenem Zeitlimit ab der Anfrage; das `finally` von
+ * `loadTransit` räumt diesen Timer nicht ab (Plan 0012, E9). Wirft nie.
+ */
+function loadLines(cache: RequestCache, env: TransitEnv): Promise<TransitLinesFile | undefined> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), env.timeoutMs);
+  return getJson<TransitLinesFile>("linien.json", { signal: controller.signal, cache, priority: "low" }, env).finally(
+    () => clearTimeout(timer),
+  );
 }

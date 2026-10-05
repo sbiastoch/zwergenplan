@@ -1,27 +1,35 @@
 /**
- * Profil-CSA, all-to-one (Plan 0009, E6; Dibbelt/Pajor/Strasser/Wagner, „Connection Scan Algorithm“, 2018).
- * Ein Lauf je Ort: Für jeden Steig entsteht ein Profil „Abfahrt ab Steig → früheste Ankunft am Ort“.
+ * Profil-CSA, all-to-one (Plan 0009, E6; Dibbelt/Pajor/Strasser/Wagner, „Connection Scan Algorithm“, 2018),
+ * seit Plan 0012 (E3, ADR 0015) mit höchstens einem Umstieg. Ein Lauf je Ort: Für jeden Steig entsteht ein
+ * Profil „Abfahrt ab Steig → bewertete und echte Ankunft am Ort“, mit den Fahrten dahinter.
  *
  * Modell:
+ * - Erlaubt sind eine Fahrt (direkt) oder zwei Fahrten (ein Umstieg), mehr nie.
+ * - Gewählt wird die kleinste bewertete Ankunft: echte Ankunft, bei einem Umstieg plus Aufschlag
+ *   (`TRANSFER_PENALTY_SECONDS`). Der Aufschlag steckt nur im Vergleich, nie in der echten Ankunft.
  * - Sitzenbleiben in derselben Fahrt kostet nichts.
  * - Umsteigen am selben Steig oder zu Fuß zu einem Steig ≤ 400 m kostet Fußweg + 1 Min. Puffer.
- *   Fußwege werden nicht verkettet (das Profil eines Steigs beginnt immer mit einem Einstieg dort).
- * - Abgang zum Ort von jedem Steig ≤ 800 m.
+ * - Abgang zum Ort von jedem Steig ≤ 1 500 m.
  * - Einsteigen nur mit Flag-Bit 1, Aussteigen nur mit Flag-Bit 2 (Schema `Timetable`).
  * - Fußweg: `walkMinutes` aus `src/domain/transit.ts`, dieselbe Funktion wie im Browser.
  *
- * Rein: keine Dateien, kein Netz (dependency-cruiser `transit-build-pure`). Gegen eine Vorwärts-CSA geprüft
- * (nur im Test), für jeden Steig und jede Minute.
+ * Zwei Durchläufe je Ort: Ebene 0 (nur direkt) ist vollständig, bevor Ebene 1 (direkt oder ein Umstieg auf
+ * eine Fahrt aus Ebene 0) sie liest. Der Aufschlag ist je Ebene konstant, also bleiben beide Profile FIFO.
+ *
+ * Rein: keine Dateien, kein Netz (dependency-cruiser `transit-build-pure`). Gegen eine Vorwärts-Referenz in zwei
+ * Ebenen geprüft (nur im Test), für jeden Steig und jede Minute.
  */
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
-import { valueAt, walkMinutes } from "../../src/domain/transit.ts";
+import { TRANSFER_PENALTY_MINUTES, valueAt, walkMinutes } from "../../src/domain/transit.ts";
 
 /** Fußweg-Umstieg bis hierhin (Luftlinie, inklusiv) */
 export const TRANSFER_METERS = 400;
 /** Puffer je Umstieg, auch am selben Steig */
 export const TRANSFER_BUFFER_SECONDS = 60;
-/** Abgang vom Steig zum Ort bis hierhin (Luftlinie, inklusiv) */
-export const EGRESS_METERS = 800;
+/** Abgang vom Steig zum Ort bis hierhin (Luftlinie, inklusiv; Plan 0012, E2) */
+export const EGRESS_METERS = 1500;
+/** Aufschlag je Umstieg in der Wahl (Plan 0012, E2), abgeleitet aus der einzigen Quelle im Browser-Code */
+export const TRANSFER_PENALTY_SECONDS = TRANSFER_PENALTY_MINUTES * 60;
 
 const BOARD = 1;
 const ALIGHT = 2;
@@ -183,72 +191,238 @@ export function egressSeconds(net: Network, place: GeoPoint, maxMeters = EGRESS_
 
 /** Profile aller Steige zu einem Ort */
 export interface Profiles {
-  /** Früheste Ankunft am Ort bei Einstieg an `stop` ab Zeitpunkt `t` (ohne direkten Abgang) */
+  /**
+   * Früheste **bewertete** Ankunft am Ort bei Einstieg an `stop` ab Zeitpunkt `t` (ohne direkten Abgang).
+   * Nur Tests nutzen sie; die Tabelle nimmt `sweep`.
+   */
   earliestArrival(stop: number, t: number): number;
-  /** Wie `earliestArrival` für `t = from + i · step`, `i = 0 … count − 1`, in einem Durchgang */
-  sweep(stop: number, from: number, step: number, count: number, out: Float64Array): void;
+  /**
+   * Für `t = from + i · step`, `i = 0 … count − 1`, in einem Durchgang: bewertete Ankunft, echte Ankunft und
+   * Eintrag (für `trips`, −1 = keiner).
+   */
+  sweep(
+    stop: number,
+    from: number,
+    step: number,
+    count: number,
+    outRated: Float64Array,
+    outReal: Float64Array,
+    outEntry: Int32Array,
+  ): void;
+  /** Fahrten (Index in `trips` des Auszugs) eines Eintrags: die erste und, nach einem Umstieg, die zweite */
+  trips(entry: number): [number] | [number, number];
 }
 
 /**
- * Ein Scan über alle Verbindungen in `connectionOrder`. Je Steig liegt das Profil als verkettete Liste
- * (Pareto-Menge): Der Kopf hat die früheste Abfahrt, jeder Nachfolger eine spätere Abfahrt und Ankunft.
+ * Monomorphe Lesehilfen für die heißen Schleifen (Plan 0012, Laufzeit): wie `valueAt`, aber je Array-Typ eine
+ * eigene Funktion. `valueAt` sieht dort Int32-, Float64- und Uint8-Arrays und wird megamorph (gemessen 1,1 s von
+ * 3,8 s der Tabelle).
  */
-export function scanProfiles(net: Network, egress: Float64Array): Profiles {
+export function i32(a: Int32Array, i: number): number {
+  const v = a[i];
+  if (v === undefined) throw new RangeError(`Index ${i} außerhalb von 0…${a.length - 1}`);
+  return v;
+}
+export function f64(a: Float64Array, i: number): number {
+  const v = a[i];
+  if (v === undefined) throw new RangeError(`Index ${i} außerhalb von 0…${a.length - 1}`);
+  return v;
+}
+function u8(a: Uint8Array, i: number): number {
+  const v = a[i];
+  if (v === undefined) throw new RangeError(`Index ${i} außerhalb von 0…${a.length - 1}`);
+  return v;
+}
+
+/** Erster Index in `dep[lo … hi − 1]` (aufsteigend) mit `dep ≥ t`, sonst `hi` */
+function lowerBound(dep: Int32Array, lo: number, hi: number, t: number): number {
+  let a = lo;
+  let b = hi;
+  while (a < b) {
+    const mid = (a + b) >>> 1;
+    if (i32(dep, mid) < t) a = mid + 1;
+    else b = mid;
+  }
+  return a;
+}
+
+/**
+ * Zwei Scans über alle Verbindungen in `connectionOrder` (E3). Je Steig liegt das Profil als Pareto-Menge vor:
+ * jeder spätere Eintrag hat eine spätere Abfahrt und eine spätere (bewertete) Ankunft.
+ *
+ * Gleichstand, festgeschrieben (Vergleiche strikt `<`): Sitzenbleiben vor Aussteigen; Abgang zum Ort vor
+ * Umsteigen; Umstiege in der Reihenfolge der CSR-Liste. Über verschiedene Abfahrten bleibt bei gleicher
+ * Bewertung die spätere (Pareto-Regel), bei gleicher Abfahrt und gleicher Bewertung die Direktverbindung.
+ *
+ * Überschreiben eines Eintrags (gleiche Abfahrt): Alle Felder werden gemeinsam ersetzt. In Ebene 0 ist das
+ * unkritisch, weil Ebene 1 sie erst nach dem vollständigen Durchlauf liest; auf Einträge der Ebene 1 verweist
+ * niemand.
+ */
+export function scanProfiles(net: Network, egress: Float64Array, opts: { penaltySeconds?: number } = {}): Profiles {
+  const penalty = opts.penaltySeconds ?? TRANSFER_PENALTY_SECONDS;
   const n = net.connections;
-  const head = new Int32Array(net.stops).fill(-1);
-  const pDep = new Int32Array(n);
-  const pArr = new Float64Array(n);
-  const pNext = new Int32Array(n);
-  let size = 0;
-  const inTrip = new Float64Array(net.trips).fill(INF);
   const { dep, arr, from, to, trip, flags, transferStart, transferTo, transferSeconds } = net;
 
-  const earliestArrival = (stop: number, t: number): number => {
-    let e = valueAt(head, stop);
-    while (e !== -1 && valueAt(pDep, e) < t) e = valueAt(pNext, e);
-    return e === -1 ? INF : valueAt(pArr, e);
+  // ── Ebene 0: nur direkt ────────────────────────────────────────────────
+  const head0 = new Int32Array(net.stops).fill(-1);
+  const dep0 = new Int32Array(n);
+  const arr0 = new Float64Array(n);
+  const trip0 = new Int32Array(n);
+  const next0 = new Int32Array(n);
+  let size0 = 0;
+  const inTrip0 = new Float64Array(net.trips).fill(INF);
+  for (let i = 0; i < n; i++) {
+    const tr = i32(trip, i);
+    const f = u8(flags, i);
+    let best = f64(inTrip0, tr);
+    if (f & ALIGHT) {
+      const out = i32(arr, i) + f64(egress, i32(to, i));
+      if (out < best) best = out;
+    }
+    if (best === INF) continue;
+    inTrip0[tr] = best;
+    if (!(f & BOARD)) continue;
+    const stop = i32(from, i);
+    const d = i32(dep, i);
+    const h = i32(head0, stop);
+    if (h !== -1 && i32(dep0, h) === d) {
+      if (best < f64(arr0, h)) {
+        arr0[h] = best;
+        trip0[h] = tr;
+      }
+      continue;
+    }
+    // dominiert: eine spätere Abfahrt kommt mindestens so früh an
+    if (h !== -1 && f64(arr0, h) <= best) continue;
+    dep0[size0] = d;
+    arr0[size0] = best;
+    trip0[size0] = tr;
+    next0[size0] = h;
+    head0[stop] = size0++;
+  }
+
+  // Ebene 0 als CSR je Steig, aufsteigend nach Abfahrt: Ebene 1 sucht darin binär.
+  const start0 = new Int32Array(net.stops + 1);
+  const sDep0 = new Int32Array(size0);
+  const sArr0 = new Float64Array(size0);
+  const sTrip0 = new Int32Array(size0);
+  let k0 = 0;
+  for (let s = 0; s < net.stops; s++) {
+    start0[s] = k0;
+    for (let e = i32(head0, s); e !== -1; e = i32(next0, e)) {
+      sDep0[k0] = i32(dep0, e);
+      sArr0[k0] = f64(arr0, e);
+      sTrip0[k0] = i32(trip0, e);
+      k0++;
+    }
+  }
+  start0[net.stops] = k0;
+  /** Eintrag der Ebene 0 an `stop` mit der frühesten Abfahrt ab `t`, sonst −1 */
+  const entry0 = (stop: number, t: number): number => {
+    const hi = i32(start0, stop + 1);
+    const k = lowerBound(sDep0, i32(start0, stop), hi, t);
+    return k < hi ? k : -1;
   };
 
+  // ── Ebene 1: direkt oder ein Umstieg auf eine Fahrt der Ebene 0 ─────────
+  const head = new Int32Array(net.stops).fill(-1);
+  const pDep = new Int32Array(n);
+  const pRated = new Float64Array(n);
+  const pReal = new Float64Array(n);
+  const pTrip = new Int32Array(n);
+  /** Anschluss: Eintrag der Ebene 0 (CSR-Index) oder −1 = direkt */
+  const pConn = new Int32Array(n);
+  const pNext = new Int32Array(n);
+  let size = 0;
+  const rated1 = new Float64Array(net.trips).fill(INF);
+  const real1 = new Float64Array(net.trips).fill(INF);
+  const conn1 = new Int32Array(net.trips).fill(-1);
   for (let i = 0; i < n; i++) {
-    const tr = valueAt(trip, i);
-    const f = valueAt(flags, i);
-    let best = valueAt(inTrip, tr);
+    const tr = i32(trip, i);
+    const f = u8(flags, i);
+    // 1. Sitzenbleiben: der bisherige Wert der Fahrt
+    let best = f64(rated1, tr);
+    let real = f64(real1, tr);
+    let conn = i32(conn1, tr);
     if (f & ALIGHT) {
-      const stop = valueAt(to, i);
-      const at = valueAt(arr, i);
-      best = Math.min(best, at + valueAt(egress, stop));
-      const end = valueAt(transferStart, stop + 1);
-      for (let k = valueAt(transferStart, stop); k < end; k++) {
-        best = Math.min(best, earliestArrival(valueAt(transferTo, k), at + valueAt(transferSeconds, k)));
+      const stop = i32(to, i);
+      const at = i32(arr, i);
+      // 2. Abgang zum Ort
+      const out = at + f64(egress, stop);
+      if (out < best) {
+        best = out;
+        real = out;
+        conn = -1;
+      }
+      // 3. Umstiege in der Reihenfolge der CSR-Liste. Jeder Anschluss fährt frühestens nach Puffer ab, kommt
+      // also nicht vor `at + Puffer` an; ist das mit Aufschlag schon nicht besser, entfällt die Suche.
+      const end = i32(transferStart, stop + 1);
+      const reachable = at + TRANSFER_BUFFER_SECONDS + penalty < best;
+      for (let k = reachable ? i32(transferStart, stop) : end; k < end; k++) {
+        const e = entry0(i32(transferTo, k), at + f64(transferSeconds, k));
+        if (e === -1) continue;
+        const r = f64(sArr0, e) + penalty;
+        if (r < best) {
+          best = r;
+          real = f64(sArr0, e);
+          conn = e;
+        }
       }
     }
     if (best === INF) continue;
-    inTrip[tr] = best;
+    rated1[tr] = best;
+    real1[tr] = real;
+    conn1[tr] = conn;
     if (!(f & BOARD)) continue;
-    const stop = valueAt(from, i);
-    const d = valueAt(dep, i);
-    const h = valueAt(head, stop);
-    // dominiert: eine spätere (oder gleich frühe) Abfahrt kommt mindestens so früh an
-    if (h !== -1 && valueAt(pArr, h) <= best) continue;
-    if (h !== -1 && pDep[h] === d) {
-      pArr[h] = best;
+    const stop = i32(from, i);
+    const d = i32(dep, i);
+    const h = i32(head, stop);
+    if (h !== -1 && i32(pDep, h) === d) {
+      const old = f64(pRated, h);
+      // gleiche Abfahrt: kleinere Bewertung, bei Gleichstand die Direktverbindung (ADR 0015, Punkt 2)
+      if (best < old || (best === old && conn === -1 && i32(pConn, h) !== -1)) {
+        pRated[h] = best;
+        pReal[h] = real;
+        pTrip[h] = tr;
+        pConn[h] = conn;
+      }
       continue;
     }
+    // dominiert: eine spätere Abfahrt ist mindestens so gut bewertet
+    if (h !== -1 && f64(pRated, h) <= best) continue;
     pDep[size] = d;
-    pArr[size] = best;
+    pRated[size] = best;
+    pReal[size] = real;
+    pTrip[size] = tr;
+    pConn[size] = conn;
     pNext[size] = h;
     head[stop] = size++;
   }
 
+  const first = (stop: number, t: number): number => {
+    let e = i32(head, stop);
+    while (e !== -1 && i32(pDep, e) < t) e = i32(pNext, e);
+    return e;
+  };
+
   return {
-    earliestArrival,
-    sweep(stop, start, step, count, out) {
-      let e = valueAt(head, stop);
+    earliestArrival(stop, t) {
+      const e = first(stop, t);
+      return e === -1 ? INF : f64(pRated, e);
+    },
+    sweep(stop, start, step, count, outRated, outReal, outEntry) {
+      let e = i32(head, stop);
       for (let i = 0; i < count; i++) {
         const t = start + i * step;
-        while (e !== -1 && valueAt(pDep, e) < t) e = valueAt(pNext, e);
-        out[i] = e === -1 ? INF : valueAt(pArr, e);
+        while (e !== -1 && i32(pDep, e) < t) e = i32(pNext, e);
+        outRated[i] = e === -1 ? INF : f64(pRated, e);
+        outReal[i] = e === -1 ? INF : f64(pReal, e);
+        outEntry[i] = e;
       }
+    },
+    trips(entry) {
+      const c = i32(pConn, entry);
+      return c === -1 ? [i32(pTrip, entry)] : [i32(pTrip, entry), i32(sTrip0, c)];
     },
   };
 }
