@@ -163,7 +163,7 @@ Die Wegwerf-Prototypen lagen außerhalb des Repos. Sie nutzen `buildNetwork`, `e
 **Radien** (ersetzt ADR 0011, Punkt 2, und Plan 0009, E6, „Abgang 800 m“):
 - `EGRESS_METERS = 1500`: Abgang vom Steig zum Ort im Build.
 - `ACCESS_METERS = 1500`: Zugang vom Startpunkt zum Halt im Browser.
-- **Neu `INSIDE_METERS = 800`** (`src/domain/transit.ts`): Ist im Umkreis von 800 m kein Haltbereich, liegt der Startpunkt außerhalb (ADR 0011, Punkt 9, unverändert). Gerechnet wird dann wie heute mit der Luftlinie. Auch `withoutAccess` (`table.ts:173`) und die Meldung in `build-data.ts:88` prüfen weiter gegen 800 m.
+- **Neu `INSIDE_METERS = 800`** (`src/domain/transit.ts`): Ist im Umkreis von 800 m kein Haltbereich, liegt der Startpunkt außerhalb (ADR 0011, Punkt 9, unverändert). Gerechnet wird dann wie heute mit der Luftlinie. Auch `withoutAccess` (`table.ts:173`) und die Meldung in `build-data.ts:94` prüfen weiter gegen 800 m.
   - Begründung: Sonst bekämen Startpunkte bis 1,5 km außerhalb der Stadtgrenze plötzlich eine Wegzeit. Der Zugangsradius ist eine Frage des Modells, der Innen-Test eine Frage des Datenbereichs.
 
 **Begründung:**
@@ -381,7 +381,7 @@ Service Worker (Plan 0011, noch nicht umgesetzt). Schritt 7 ergänzt Plan 0011 u
   - Vor dem Pfeil steht U+00A0, damit keine Zeile mit „→“ beginnt (Review 2, H4).
   - `.sr-only` gibt es schon über Tailwind v4 (`styles.css:1`, genutzt in `App.tsx:237` und `Chrome.tsx:47`). Es kommt keine neue Hilfsklasse dazu (Review 2, W3). Die Kopie in `tabs.css:106` sitzt in einer Container-Query und bleibt.
   - Grund: Screenreader lesen „→“ je nach Einstellung als „Pfeil nach rechts“ oder gar nicht. Sichtbar steht der Pfeil (N3), vorgelesen wird „mit Bus 37, dann U1“.
-  - Das Rendern übernimmt eine kleine Komponente `ReachLong` (`src/ui/ReachLong.tsx`). Sie enthält keine Logik außer der Schleife über die Teile. `DetailDialog.tsx:104` und `karte/PlaceSheet.tsx:30` nutzen sie statt `{reachLong(…)}`.
+  - Das Rendern übernimmt eine kleine Komponente `ReachLong` (`src/ui/ReachLong.tsx`). Sie enthält keine Logik außer der Schleife über die Teile. `DetailDialog.tsx:110` und `karte/PlaceSheet.tsx:30` nutzen sie statt `{reachLong(…)}`.
   - Sie liegt nicht unter `src/ui/karte/`, weil das Detail im Start-Bundle ist. Für die Karte ist sie ein statischer Import aus dem Lazy-Chunk heraus; das ist erlaubt (Review 2 bestätigt: `karte-ui-*`, Gruppe `$initial`).
   - **CSS (Review 2, W3):** `.place-where span { display: block }` (`src/ui/styles/map.css:142`) träfe auch die inneren Spans und setzte den Pfeil auf eine eigene Zeile. Deshalb wird der Selektor zu `.place-where > span`.
 - Texte:
@@ -524,8 +524,8 @@ Test-first für Domänen- und Build-Logik (CLAUDE.md). Die Unit-Tests laufen in 
 
 **E2E** (Fixture-Build, eingefrorene Uhr)
 - E1 Detail und Orts-Sheet zeigen „ca. … Min. mit 〈Linie〉 → 〈Linie〉 ab Gostenhof“ bzw. eine Linie.
-  - Die genauen Erwartungen in `startpunkt.spec.ts:104`, `karte.spec.ts:182/236` und `mobile-ux.spec.ts:125` werden auf das von Hand nachgerechnete Fixture-Ergebnis umgestellt.
-  - Ebenso die Statuszeile (`startpunkt.spec.ts:18`, `karte.spec.ts:226/248`, `mobile-ux.spec.ts:39`, `smoke.spec.ts:81`) und der Quellensatz (`mobile-ux.spec.ts:104`).
+  - Die genauen Erwartungen in `startpunkt.spec.ts:104`, `karte.spec.ts:182/236` und `mobile-ux.spec.ts:139` werden auf das von Hand nachgerechnete Fixture-Ergebnis umgestellt.
+  - Ebenso die Statuszeile (`startpunkt.spec.ts:18`, `karte.spec.ts:226/248`, `mobile-ux.spec.ts:39`, `smoke.spec.ts:81`) und der Quellensatz (`mobile-ux.spec.ts:118`).
   - **Wie geprüft wird (Review 2, W5):** `getByText` vergleicht den `textContent` mit Pfeil und sr-only zusammen („Tram 1 → , dann Bus 2“) und taugt dafür nicht.
     - Die **vorgelesene** Form prüft `toMatchAriaSnapshot` auf dem Text-Element. Es lässt `aria-hidden` aus und liest sr-only mit: „ca. 15 Min. mit Tram 1, dann Bus 2 ab Gostenhof“.
     - Die **sichtbare** Form prüft der Locator `[aria-hidden="true"]` mit „→“, dazu `toHaveText` auf die Linien-Namen.
