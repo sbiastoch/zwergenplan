@@ -1212,3 +1212,32 @@ Ablauf: Karte öffnen, 2 × herauszoomen, dunkel, hell. Das ergibt 44 Requests i
   - E7, Monatsraster 360/200 % mit Tagesfeldern;
   - E12, Leerzustand mit „Filter zurücksetzen“ (WebKit 320/200 %);
   - E16, Karte hell nach dem Wechsel mit „Nürnberg“.
+
+## Hotfix W1 und W1b (2026-10-05)
+
+**Stand:** live `c228011` (Commits `7ff2db0` W1, `c228011` W1b; CI auf `main` grün, Deploy durch).
+
+- **W1** (`7ff2db0`): `.badge { white-space: nowrap; flex: none }`. Der E8-Test in `e2e/layout.spec.ts` läuft mit 1, 10 und 100 gemerkten Angeboten. Für 10/100 ergänzt `page.route` die `site.json` um Kopien des Krabbeltreffs (die Fixture hat 9 Angebote). Vorher rot („Wort gebrochen: „10“ in span.badge“), danach grün.
+- **W1b** (`c228011`), gefunden im Browser-Review live zu W1:
+  - Mit Badge stehen in der kompakten Querleiste (< 40 rem breit, ≤ 500 px hoch) Herz, Label und Badge nebeneinander. Ab etwa 125 % Text ist das breiter als die Tab-Karte (`.tab-thumb::before`).
+  - Gemessen bei 568×320 und 200 %: Spalte 178 px, Karte 150 px. Der Inhalt ist 177, 192 bzw. 208 px breit (1, 10, 100 gemerkt), der Überstand bis 29 px. Herz und Badge stehen dann auf dem Tape.
+  - Das gab es schon seit E8 mit **einem** gemerkten Angebot. Der Umbruch hatte die Breite verdeckt.
+  - `expectTextFits` sieht es nicht, weil der Tab selbst keine sichtbare Kante hat.
+  - Lösung wie B7: Ein Tab mit Badge zeigt in der kompakten Leiste unter 9,5 rem Spaltenbreite nur Herz und Zähler. Der Name bleibt für Screenreader.
+  - Der E8-Test prüft jetzt, dass Herz, Label und Badge auf der Karte liegen (≤ 1 px), zusätzlich bei 639×320 und 150 %. Vorher 14 rote Fälle, danach 162/162 grün in Chromium und WebKit.
+- **Browser-Review live** (Playwright gegen https://zwergenplan.app/, echte Daten, 1/10/100 echte Angebote gemerkt; Chromium/Pixel 7 und WebKit/iPhone 15):
+  - **Text-Gate:** `expectTextFits`, `expectNoHorizontalScroll` und dunkel `expectNoBrightIslands` sind bei 568×320, 863×360, 915×412, 390×844 und 320×640 mit 100/200 % grün, 72 von 72.
+  - **Kompakte Leiste, 568×320/200 %:** Badge „10“ 37×36 px, Tab 44 px, Leiste 50 px (vorher umgebrochen 23×69 px).
+  - **Überstand über die Karte:** bei 568, 600 und 640 px × 100/150/200 % × 0/1/10/100 gemerkt in 72 Messungen nie über 1 px.
+  - **Screenshot-Matrix:** `scripts/screenshots.ts` bei 100 und 200 % ergibt 240 Bilder, angesehen als 20 Kontaktbögen. Keine neuen Befunde.
+  - **Checkliste:**
+    - Lesbarkeit: unverändert ok.
+    - Daumen: Die Leiste bleibt 50 px hoch.
+    - Zustände: ok, auch 100 gemerkte Angebote.
+    - Dunkel: ok.
+    - Bewegung: Keine Änderung, reduzierte Bewegung ist in den Tests aktiv.
+    - Design-System: Herz und Zähler auf der Karte wie im Hochformat.
+- **CI:** Der erste main-Lauf von `c228011` war rot durch den Kanarienvogel `font-swap.spec.ts` „Swap-Messung zählt einen Shift direkt nach der Grenze“ (412 px hochkant, CLS 0 bzw. 0,0002 statt > 0,05, beide Versuche).
+  - Derselbe Commit war auf der Branch-CI grün und lokal 24/24 grün. In den 40 Läufen davor fiel der Test nie aus.
+  - Der Neustart des Jobs war grün.
+  - Beobachten: Fällt er wieder aus, braucht die Messung einen festen Frame zwischen `markShifts` und dem künstlichen Shift.
