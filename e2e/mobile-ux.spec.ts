@@ -50,7 +50,10 @@ async function openMap(page: Page) {
 const MAP_VIEWS = new Set(["karte", "orts-sheet", "karte-fehler"]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
-const CONSOLE_ERRORS: Record<string, RegExp[]> = { "entdecken-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/] };
+const CONSOLE_ERRORS: Record<string, RegExp[]> = {
+  "entdecken-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
+  "filter-sheet-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
+};
 
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
@@ -129,6 +132,50 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
     await expect(page.getByRole("button", { name: "Nochmal laden" })).toBeVisible();
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("200 m");
+  },
+  // Tabelle zurückgehalten (M7): Platzhalter-Block statt ungefilterter Liste, Statuszeile unsichtbar (Arch-Review
+  // 0009, Befund 5). Das Zeitlimit des Ladens (8 s, `TRANSIT_TIMEOUT_MS`) darf während der Prüfungen nicht ablaufen.
+  // Die Uhr anzuhalten geht nicht, axe braucht laufende Timer; deshalb fällt nur der eine 8-s-Timer weg (in src
+  // gibt es keinen zweiten).
+  "entdecken-wegzeit-laedt": async (page) => {
+    await page.addInitScript(() => {
+      const original = window.setTimeout.bind(window);
+      Object.defineProperty(window, "setTimeout", {
+        value: (handler: TimerHandler, ms?: number, ...args: unknown[]) =>
+          ms === 8000 ? 0 : original(handler, ms, ...args),
+      });
+    });
+    await page.route("**/data/wegzeit.json", () => {});
+    await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await page.goto("./?wegzeit=30");
+    await expect(page.locator(".list-pending")).toHaveText("Wegzeiten werden geladen …");
+    await expect(page.getByTestId("offer")).toHaveCount(0);
+  },
+  // Filter-Sheet bei Tabelle blockiert: gesperrte Chips, Begründung mit „Nochmal laden“ (E11, M6)
+  "filter-sheet-wegzeit-rueckfall": async (page) => {
+    await page.route("**/data/wegzeit.json", (route) => route.abort());
+    await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await page.goto("./");
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const sheet = page.getByRole("dialog", { name: "Filter" });
+    await expect(sheet.getByRole("button", { name: "bis 20 Min." })).toBeDisabled();
+    await sheet.getByRole("button", { name: "Nochmal laden" }).scrollIntoViewIfNeeded();
+  },
+  // Standort außerhalb des Stadtgebiets: Begründung mit „Startpunkt wählen“ (E11, m16)
+  "filter-sheet-wegzeit-ausserhalb": async (page) => {
+    await page.context().grantPermissions(["geolocation"]);
+    await page.context().setGeolocation({ latitude: 49.4, longitude: 11.2 });
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
+    await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
+    await kid.getByRole("button", { name: "Fertig" }).click();
+    await expect(page.getByRole("status")).toContainText("außerhalb des Stadtgebiets.");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const sheet = page.getByRole("dialog", { name: "Filter" });
+    await expect(sheet.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.")).toBeVisible();
+    await sheet.getByRole("button", { name: "Startpunkt wählen" }).scrollIntoViewIfNeeded();
   },
   karte: openMap,
   // Fehlerzustand (E12): Meldung im Kartenrahmen, Orts-Liste und „Startpunkt …“ bleiben, keine Kartenmitte
