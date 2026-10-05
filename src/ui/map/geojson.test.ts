@@ -23,6 +23,23 @@ describe("GeoJSON für die Karte (Plan 0005, E6)", () => {
     });
   });
 
+  it("feste Reihenfolge nach key, unabhängig von der Eingabe (Plan 0008, E15: Cluster ohne Einfluss des Startpunkts)", () => {
+    const zoo = { key: "49.4467,11.1428", geo: { lat: 49.4467, lon: 11.1428 }, offers: ["d"] };
+    const input = [zoo, bibliothek, theater];
+    const copy = [...input];
+    const sorted = placesToFeatures(input);
+    expect(sorted).toEqual(placesToFeatures([theater, zoo, bibliothek]));
+    expect(sorted.features.map((f) => f.properties.key)).toEqual([zoo.key, theater.key, bibliothek.key]);
+    // Codepunkt-Vergleich, nicht localeCompare: „Z“ vor „a“
+    expect(
+      placesToFeatures([
+        { ...theater, key: "a" },
+        { ...theater, key: "Z" },
+      ]).features.map((f) => f.properties.key),
+    ).toEqual(["Z", "a"]);
+    expect(input).toEqual(copy);
+  });
+
   it("leere Liste ergibt eine leere Sammlung", () => {
     expect(placesToFeatures([])).toEqual({ type: "FeatureCollection", features: [] });
   });

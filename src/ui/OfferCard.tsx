@@ -40,16 +40,18 @@ interface OfferCardProps {
   dated?: boolean;
   /** Termin gehört zu einem gewählten Kalendertag */
   calendarDay?: string;
+  /** im Orts-Sheet: Kopf nennt Ort und Entfernung schon, die Meta-Zeile nur den Anbieter (Plan 0008, E19) */
+  atPlace?: boolean;
 }
 
-export function OfferCard({ item, ctx, dated = false, calendarDay }: OfferCardProps) {
+export function OfferCard({ item, ctx, dated = false, calendarDay, atPlace = false }: OfferCardProps) {
   const { offer, session } = item;
   const [fresh] = useState(ctx.animate);
   const category = primaryCategory(offer.topics);
   const unfit = ctx.isUnfit(offer.id);
   const saved = ctx.isSaved(offer.id);
   const availability = availabilityLabel(offer);
-  const reach = ctx.reachOf(offer);
+  const reach = atPlace ? undefined : ctx.reachOf(offer);
   const when = dated ? `${shortDate(sessionDay(session))} · ${clock(session.start)} Uhr` : `${timeRange(session)} Uhr`;
 
   return (
@@ -68,7 +70,8 @@ export function OfferCard({ item, ctx, dated = false, calendarDay }: OfferCardPr
           </button>
         </h3>
         <p className="meta">
-          {offer.providerName} · {offer.venue.district ?? offer.venue.name}
+          {offer.providerName}
+          {!atPlace && ` · ${offer.venue.district ?? offer.venue.name}`}
           {reach && (
             <>
               {" · "}
