@@ -1,6 +1,6 @@
 # Plan 0013 – Schnellere CI durch parallele E2E-Jobs
 
-Status: freigegeben (Review mit Änderungen eingearbeitet), nicht umgesetzt
+Status: umgesetzt (2026-10-05), inklusive Befund F1
 Datum: 2026-10-05
 
 (ADR 0002 Hosting, ADR 0004 Backpressure, `docs/architecture.md` Mobile-UX-Gates, Plan 0003 E8 Smoke allein und seriell, Plan 0011 ändert dieselben Dateien.)
@@ -299,7 +299,7 @@ Queue-Zeit lag in allen Läufen bei 2–4 s je Job, kein Befund.
 
 - **Test 3** ([Lauf 37349973498](https://github.com/sbiastoch/zwergenplan/actions/runs/37349973498), Commit `01a218a`): Rot ist nur `E2E chromium 4/4` mit 1 failed („Kanarienvogel Plan 0013: absichtlich rot auf desktop“). Die anderen sieben Jobs liefen grün zu Ende, `gates` und `deploy` wurden übersprungen. Summe 1916 = 1911 + 5 (der Kanarienvogel auf jedem Gerät, auf vier davon übersprungen). Zurückgenommen in `d2eff0c`.
 - **Test 4** ([Lauf 37350873604](https://github.com/sbiastoch/zwergenplan/actions/runs/37350873604), Commit `acc6ef5`, Server für `PW_SUITE=smoke` auf `dist-e2e/`, dort E2E-Build mit echten Daten, siehe Abweichungen): Rot ist nur der Smoke-Job mit genau 1 failed, im Test „Karte ist bereit, Orts-Liste vollständig, kein Test-Haken im Deploy-Build“ an `e2e/smoke.spec.ts:138` (`"__zpMap" in window`, Expected false, Received true). Alle E2E-Shards grün, `gates` übersprungen. Zurückgenommen in `4afcffa`.
-- Wieder grün: LAUF_GRUEN.
+- Wieder grün nach beiden Rücknahmen: [Lauf 37358265120](https://github.com/sbiastoch/zwergenplan/actions/runs/37358265120) (`10643e8`): 1911 Tests, 0 flaky, 6,3 min.
 
 ### Befund F1: Swap-Messung verwirft Shifts nach einer Viewport-Änderung (Nachtrag 2026-10-05)
 
@@ -333,7 +333,11 @@ Das ist ein **Loch im Swap-Gate**, nicht nur ein wackelnder Test. Ein echter Swa
 
 **Review (plan-reviewer, Freigabe mit Änderungen, eingearbeitet)**: W1 `anbieter-inhalt.spec.ts` auf `clsFrom`. W2 Viewport per `test.use` statt nur die Wirkung abzufangen, plus Größenprüfung. W3 Abnahme in CI muss einen Eingabe-Shift nach der Grenze zeigen, sonst beweist „0 Rote“ nichts. Hinweise: `[input]` in `detail`, Optionsobjekt, Doku (Kopf von `vitals.ts`, `docs/architecture.md`), Kommentar „keine Eingabe zwischen Grenze und `release()`“.
 
-**Abnahme in CI**: CI_F1
+**Abnahme in CI**:
+- Diagnose-Branch `diag-font-swap-2`, [Lauf 37363992113](https://github.com/sbiastoch/zwergenplan/actions/runs/37363992113): Korrektur `32db3b0` plus Protokoll der Eingabe-Shifts nach der Grenze, `font-swap.spec.ts` 10× je Runner.
+- Wegen eines GitHub-Actions-Störfalls (Verzögerungen bei der Runner-Zuteilung ab 19:12Z, Jobs nach 15 min ohne Runner abgebrochen) kamen über zwei Versuche 4 von 6 Runnern durch. Das sind 200 Messungen, alle grün.
+- Normale Messungen: kein Eingabe-Shift nach der Grenze (`input 0`), die Ursache ist also weg.
+- Viewport-Kanarienvogel: 1–2 Eingabe-Shifts nach der Grenze, Summe 0,091, gezählt und grün. Damit ist die Bedingung aus W3 erfüllt: Eine Messung mit Eingabe-Shift nach der Grenze ist dabei, und weder Gate noch Gegen-Kanarienvögel werden falsch rot.
 
 ### Abweichungen vom Plan
 
@@ -345,4 +349,28 @@ Das ist ein **Loch im Swap-Gate**, nicht nur ein wackelnder Test. Ein echter Swa
 
 ### Abnahme auf `main` (Schritt 7)
 
-MAIN_LAEUFE
+- Erster Fast-Forward `d793791..10643e8`: Die main-Läufe [37359159821](https://github.com/sbiastoch/zwergenplan/actions/runs/37359159821), [37360033809](https://github.com/sbiastoch/zwergenplan/actions/runs/37360033809) (`693ffd1`, Commit einer anderen Session) und [37361003270](https://github.com/sbiastoch/zwergenplan/actions/runs/37361003270) waren rot, wegen Befund F1. `gates` hat den Deploy jedes Mal gesperrt, live blieb `d793791`. Das ist zugleich der Beleg für das Akzeptanzkriterium „Rot in einem Shard sperrt den Deploy“ auf `main`.
+- Branch mit Korrektur ([Lauf 37364042075](https://github.com/sbiastoch/zwergenplan/actions/runs/37364042075), `32db3b0`): grün, 1916 Tests (1911 + neuer Kanarienvogel auf 5 Projekten), 0 flaky. Wegen des GitHub-Actions-Störfalls (19:12–21:32Z, zeitweise „major outage“) brauchte es drei Wiederholungen der abgebrochenen Jobs. Die Laufzeit dieses Laufs ist deshalb nicht aussagekräftig.
+- Fast-Forward `693ffd1..32db3b0` um 21:39:39Z. Abnahme mit zwei aufeinanderfolgenden Läufen auf `main`:
+
+| | M3 (Push) | M4 (`workflow_dispatch`) |
+|---|---|---|
+| Lauf | [37377322577](https://github.com/sbiastoch/zwergenplan/actions/runs/37377322577) | [37378235579](https://github.com/sbiastoch/zwergenplan/actions/runs/37378235579) |
+| check | 0,6 min | 0,4 min |
+| chromium 1/4 · 2/4 · 3/4 · 4/4 | 4,9 · 5,5 · 3,5 · 4,6 min | 6,3 · 5,7 · 4,5 · 4,6 min |
+| webkit 1/2 · 2/2 | 6,1 · 6,0 min | 5,9 · 5,8 min |
+| smoke | 3,1 min | 2,7 min |
+| Queue je Job | 2–3 s | 2–3 s |
+| Tests | 1537 passed + 379 skipped = 1916, 0 flaky | 1537 + 379 = 1916, 0 flaky |
+| LCP `android-klein` / `pixel-7` / `pixel-7-quer` | 1380 / 1372 / 1084 ms | 1900 / 1404 / 1192 ms |
+| **Start bis Deploy-Ende ohne Queue** | **6,4 min** | **6,5 min** |
+
+- Live (`curl -s https://zwergenplan.app/data/meta.json`) nach M3: `"commit": "32db3b0"`.
+- Akzeptanzkriterien:
+  - ≤ 10 min in zwei aufeinanderfolgenden Läufen: erfüllt, 6,4 und 6,5 min. Vorher waren es 21–39 min.
+  - Gleiche Testzahl: erfüllt, 1911 bis F1, danach 1916 mit dem neuen Kanarienvogel.
+  - Rot in einem Shard sperrt den Deploy: erfüllt, siehe Test 3 und die roten main-Läufe.
+  - Smoke allein gegen den Deploy-Build: erfüllt, siehe Test 4 und „Running 21 tests using 1 worker“.
+  - Lokal unverändert: erfüllt, voller Lauf ohne `PW_SUITE` grün.
+- Queue-Zeit außerhalb des Störfalls meist 2–8 s, vereinzelt 30–77 s für einen Job (G, `693ffd1`, M2). Sie liegt nicht regelmäßig über 1 min, also kein Befund für Variante B.
+- Ausreißer: LCP `android-klein` 1900 ms in M4. Die Marge zum Budget (2500 ms) liegt damit bei 600 ms. Das ist kein Rot, aber ein Wert zum Beobachten.
