@@ -46,3 +46,5 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Anbieter merken oder „folgen“**: Die Merkliste bleibt bei Angeboten (Plan 0010, Nicht-Ziele).
 - **Kurzname und Einrichtungsart im Katalog** („Familienzentrum“, „Bibliothek“): Namen sind im Median 59 Zeichen lang, eine Einrichtungsart gibt es nicht. Beides wäre eine Schemaänderung samt Skill-Lauf (ADR 0006, Plan 0010).
 - **Anbietername auf der Kachel antippbar**: Heute führt der Weg über das Detail („Mehr von diesem Anbieter“, Plan 0010, Nicht-Ziele).
+- **Gerätematrix für fachliche Specs ausdünnen**: Kalender, Merkliste, Startpunkt … nur auf einem Teil der fünf Geräte. Spart grob 30–40 % Testzeit, ändert aber die Mobile-UX-Regel in `docs/architecture.md` und braucht ein ADR (Messung in Plan 0013).
+- **Selbsttests der Gates nur auf einem Gerät**: Die Kanarienvögel „Text-Gate erkennt …“ laufen heute auf allen fünf Geräten (8 Tests × 5, lokal ca. 130 s Testzeit). Nach Plan 0013 bringt das unter 20 s Wandzeit und ist eine Entscheidung über Testinhalt.

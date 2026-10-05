@@ -242,3 +242,73 @@ Kein Blocker. Der Reviewer hat die Kernannahmen im Quellcode bzw. per API bestä
 - **H11** Abnahmezeit ohne Queue, Queue-Zeit wird daneben notiert (Akzeptanzkriterien, Schritt 3).
 
 Abgelehnt: nichts.
+
+## Ergebnis (2026-10-05)
+
+Umgesetzt auf `worktree-ci-tempo` (abgezweigt vom Plan-Branch), per Fast-Forward nach `main`.
+
+### Lokal (Schritt 1)
+
+- **Test 1**: `--list` ohne `PW_SUITE` 1911 Tests = 1512 (`chromium`) + 378 (`webkit`) + 21 (`smoke`).
+- **Test 5**: `PW_SUITE=chromum` wirft: „PW_SUITE=chromum ist unbekannt. Erlaubt: chromium, webkit, smoke oder leer.“
+- **Test 6**: Ein temporäres Projekt mit `devices["Desktop Firefox"]` wirft: „Projekt firefox-test: Engine firefox hat keine CI-Suite. PW_SUITE hier und die Matrix in .github/workflows/ci.yml ergänzen (Plan 0013).“ Ein temporäres `dependencies: ["desktop"]` an `pixel-7` wirft bei `PW_SUITE=chromium` (und auch ohne): „Projekt pixel-7: dependencies in einer geshardeten Suite laufen in jedem Shard komplett mit (Plan 0013, E2).“
+- **Test 7**: `pnpm check:fast` grün.
+- Voller Lauf `PW_PORT=4373 pnpm e2e` ohne `PW_SUITE`: grün, 1538 passed, 373 skipped (11,8 min, 8 Worker). Lokal ist Noto installiert, deshalb 2 Swap-Tests mehr als in CI.
+- `PW_SUITE=smoke` mit `CI=1`: „Running 21 tests using 1 worker“, 21 passed. Die `[perf]`-Zeilen erscheinen auch im CI-Modus: Weil der `github`-Reporter nicht auf stdout schreibt, hängt Playwright dort den `dot`-Reporter an, und der gibt die Konsolenausgabe der Tests aus.
+
+### Messung in CI (Schritt 3)
+
+Dauer je Job vom Start bis zum Ende, Queue von `created_at` bis `started_at` (Jobs-API). In allen Läufen 0 „flaky“, 1536 passed + 375 skipped = 1911 (Test 2).
+
+| Job | A1 | A2 | B1 | B2 |
+|---|---|---|---|---|
+| Lauf | [37345119548 #1](https://github.com/sbiastoch/zwergenplan/actions/runs/37345119548/attempts/1) | [37345119548 #2](https://github.com/sbiastoch/zwergenplan/actions/runs/37345119548/attempts/2) | [37346996607 #1](https://github.com/sbiastoch/zwergenplan/actions/runs/37346996607/attempts/1) | [37346996607 #2](https://github.com/sbiastoch/zwergenplan/actions/runs/37346996607/attempts/2) |
+| check | 0,6 min / 4 s | 0,6 / 2 s | 0,6 / 2 s | 0,5 / 2 s |
+| chromium 1/4 (A) bzw. 1/2 (B) | 4,5 / 4 s | 3,4 / 2 s | 5,3 / 2 s | **8,0** / 3 s |
+| chromium 2/4 (`pixel-7`) bzw. 2/2 | 5,5 / 3 s | 5,6 / 3 s | 5,7 / 3 s | 6,8 / 2 s |
+| chromium 3/4 | 4,3 / 3 s | 4,3 / 2 s | – | – |
+| chromium 4/4 | 4,4 / 2 s | 3,5 / 2 s | – | – |
+| webkit 1/2 (A) bzw. 1/1 (B) | 3,9 / 3 s | 5,8 / 2 s | **6,8** / 3 s | 7,3 / 3 s |
+| webkit 2/2 | **6,2** / 4 s | **6,1** / 2 s | – | – |
+| smoke | 2,6 / 2 s | 2,5 / 2 s | 2,5 / 3 s | 2,6 / 2 s |
+| gates | 0,1 / 4 s | 0,1 / 2 s | 0,1 / 2 s | 0,1 / 3 s |
+| erster Start bis gates | 6,4 min | 6,2 min | 6,9 min | 8,2 min |
+
+Reiner Testschritt (ohne Setup), A1/A2: `pixel-7` 297/300 s, die anderen Chromium-Shards 166–229 s, webkit 2/2 311/315 s. Setup bis zum Test: ca. 35 s, davon `playwright install` 20–29 s (Chromium) und 33–60 s (WebKit).
+
+`[perf]`-Werte (LCP in ms; Budget 2500 ms):
+
+| Projekt | A1 | A2 | B1 | B2 |
+|---|---|---|---|---|
+| `android-klein` | 1456 | 1176 | 1216 | 1592 |
+| `pixel-7` | 1428 | 1448 | 1280 | **2044** |
+| `pixel-7-quer` | 1212 | 1216 | 1228 | 1396 |
+
+CLS war in allen Läufen gleich: 0,00028 / 0,00046 / 0,00021 (LCP-Test), 0 („Wegzeit lädt …“). Budget 0,05.
+
+**Wahl: Variante A.** B verfehlt zwei der drei Bedingungen aus E4:
+1. Langsamster E2E-Job B 6,8 bzw. 8,0 min gegen A 6,2 min: +10 % bzw. **+29 %** (erlaubt +20 %).
+2. Kein „flaky“: erfüllt.
+3. LCP `pixel-7` in B2 2044 ms: Die Marge zum Budget fällt von ca. 1060 ms (A) auf 456 ms, also um mehr als die Hälfte.
+
+Queue-Zeit lag in allen Läufen bei 2–4 s je Job, kein Befund.
+
+**Timeouts (E5)**: E2E 15 min (2 × 6,2 min, aufgerundet), Smoke 10 min (2 × 2,6 min, aufgerundet).
+
+### Kanarienvögel in CI (Schritt 4)
+
+- **Test 3** ([Lauf 37349973498](https://github.com/sbiastoch/zwergenplan/actions/runs/37349973498), Commit `01a218a`): Rot ist nur `E2E chromium 4/4` mit 1 failed („Kanarienvogel Plan 0013: absichtlich rot auf desktop“). Die anderen sieben Jobs liefen grün zu Ende, `gates` und `deploy` wurden übersprungen. Summe 1916 = 1911 + 5 (der Kanarienvogel auf jedem Gerät, auf vier davon übersprungen). Zurückgenommen in `d2eff0c`.
+- **Test 4** ([Lauf 37350873604](https://github.com/sbiastoch/zwergenplan/actions/runs/37350873604), Commit `acc6ef5`, Server für `PW_SUITE=smoke` auf `dist-e2e/`, dort E2E-Build mit echten Daten, siehe Abweichungen): Rot ist nur der Smoke-Job mit genau 1 failed, im Test „Karte ist bereit, Orts-Liste vollständig, kein Test-Haken im Deploy-Build“ an `e2e/smoke.spec.ts:138` (`"__zpMap" in window`, Expected false, Received true). Alle E2E-Shards grün, `gates` übersprungen. Zurückgenommen in `4afcffa`.
+- Wieder grün: LAUF_GRUEN.
+
+### Abweichungen vom Plan
+
+- **`console.warn` statt `console.log`** für die `[perf]`-Zeile: Biome erlaubt in `e2e/` nur `warn` und `error` (`noConsole`). Ein `biome-ignore` wäre die schlechtere Wahl.
+- **Kanarienvogel 4 mit echten Daten im E2E-Build.** Gegen das normale `dist-e2e/` (Fixtures) wird der Smoke-Job zwar rot, aber schon an den Datenprüfungen: lokal 9 rote Tests, im `__zpMap`-Test bereits an „≥ 50 Orte“ (Fixtures: 5). Damit ist nicht gezeigt, dass der Build-Unterschied selbst auffällt. Der Kanarienvogel baut deshalb nach `pnpm build` zusätzlich `ZWERGENPLAN_DATA=fixture vite build`: E2E-Build (`__E2E__`) mit den echten Daten aus `public/`. Lokal war damit genau ein Test rot, am `__zpMap`-Check (`e2e/smoke.spec.ts:138`).
+- **Kein 5. Chromium-Shard.** Der `pixel-7`-Shard liegt im Testschritt 24–40 % über dem Chromium-Schnitt, also über der 30-%-Grenze aus „Risiken“. Er ist aber nicht der kritische Pfad: `webkit 2/2` ist in beiden A-Läufen der längste Job (6,1–6,2 min gegen 5,5–5,6 min). Ein 5. Shard kostet einen Job und verkürzt den Lauf nicht. Wird WebKit schneller oder `pixel-7` teurer, ist das wieder die erste Stellschraube.
+- `PW_SUITE=""` gilt wie „nicht gesetzt“.
+- Der Branch liegt im Worktree `plan-ci-tempo`, nicht in einem neuen Worktree. Die Session war an diesen Worktree gebunden.
+
+### Abnahme auf `main` (Schritt 7)
+
+MAIN_LAEUFE
