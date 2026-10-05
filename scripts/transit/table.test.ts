@@ -4,7 +4,7 @@ import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { placeKey } from "../../src/domain/place-key.ts";
 import { Timetable } from "../../src/domain/schema.ts";
 import { decodeTransitTable, NO_MINUTES, transitReach, walkMinutes } from "../../src/domain/transit.ts";
-import { areaId, buildTransitTable, cellValue, encodeMinutes, tableRows } from "./table.ts";
+import { areaId, buildTransitTable, cellValue, encodeMinutes, tableRows, withoutAccess } from "./table.ts";
 
 const fixture = Timetable.parse(
   JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/fahrplan.json", import.meta.url), "utf8")),
@@ -178,5 +178,24 @@ describe("buildTransitTable", () => {
 
   it("ist deterministisch", () => {
     expect(JSON.stringify(buildTransitTable(fixture, places))).toBe(JSON.stringify(built));
+  });
+});
+
+describe("withoutAccess", () => {
+  const table = (() => {
+    const file = buildTransitTable(fixture, places);
+    const decoded = decodeTransitTable(file, new Set(places.map(placeKey)));
+    if (!decoded) throw new Error("Fixture-Tabelle ungültig");
+    return decoded;
+  })();
+  const gostenhof = { id: "gostenhof", name: "Gostenhof", point: { lat: 49.448, lon: 11.058 } };
+  const altenfurt = { id: "altenfurt", name: "Altenfurt", point: { lat: 49.408, lon: 11.167 } };
+
+  it("nennt Stadtteile ohne Halt im Zugangsradius (Plan 0009, Schritt 5)", () => {
+    expect(withoutAccess(table, [gostenhof, altenfurt])).toEqual([altenfurt]);
+  });
+
+  it("ist leer, wenn jeder Startpunkt einen Zugangshalt hat", () => {
+    expect(withoutAccess(table, [gostenhof])).toEqual([]);
   });
 });

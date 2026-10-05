@@ -9,10 +9,12 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { DISTRICTS } from "../src/domain/districts.ts";
 import { icsContextFor, icsForSeries, icsForSession, seriesIcsPath, sessionIcsPath } from "../src/domain/ics.ts";
 import { type SiteMeta, toSiteData } from "../src/domain/site-data.ts";
+import { ACCESS_METERS, decodeTransitTable } from "../src/domain/transit.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
-import { buildTransitTable } from "./transit/table.ts";
+import { buildTransitTable, withoutAccess } from "./transit/table.ts";
 
 /** Ab hier warnt der Build: Die Profil-CSA läuft in jedem data:build (Plan 0009, Backpressure). */
 const TRANSIT_WARN_SECONDS = 20;
@@ -76,6 +78,17 @@ if (timetable.kind === "ok") {
   write("data/wegzeit.json", JSON.stringify(table));
   const took = seconds.toLocaleString("de-DE", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
   console.log(`✓ Wegzeit: ${table.lat.length} Halte × ${table.places.length} Orte in ${took} s`);
+  // Jeder wählbare Stadtteil braucht einen Zugangshalt, sonst hieße es dort „außerhalb des Stadtgebiets“
+  // (Plan 0009, Schritt 5). Das Fixture-Netz deckt nur Gostenhof ab.
+  if (source === "real") {
+    const decoded = decodeTransitTable(table, new Set(table.places));
+    const missing = decoded ? withoutAccess(decoded, DISTRICTS) : DISTRICTS;
+    if (missing.length > 0) {
+      console.error(`✗ Wegzeit: ohne Zugangshalt (${ACCESS_METERS} m): ${missing.map((d) => d.name).join(", ")}`);
+      process.exit(1);
+    }
+    console.log(`✓ Zugangshalt für alle ${DISTRICTS.length} Stadtteile`);
+  }
   if (seconds > TRANSIT_WARN_SECONDS) {
     console.log(
       `::warning::Wegzeit-Berechnung dauerte ${took} s (> ${TRANSIT_WARN_SECONDS} s) – Cache über einen Hash aus Auszug und Orten erwägen (Plan 0009, Backpressure)`,

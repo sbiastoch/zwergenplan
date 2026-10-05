@@ -6,11 +6,18 @@
  *
  * Rein: keine Dateien, kein Netz (dependency-cruiser `transit-build-pure`).
  */
-import type { GeoPoint } from "../../src/domain/geo.ts";
+import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { placeKey } from "../../src/domain/place-key.ts";
 import type { Timetable } from "../../src/domain/schema.ts";
-import { COORD_SCALE, MAX_MINUTES, NO_MINUTES, TRANSIT_TABLE_VERSION, valueAt } from "../../src/domain/transit.ts";
-import type { TransitTableFile } from "../../src/domain/transit-types.ts";
+import {
+  ACCESS_METERS,
+  COORD_SCALE,
+  MAX_MINUTES,
+  NO_MINUTES,
+  TRANSIT_TABLE_VERSION,
+  valueAt,
+} from "../../src/domain/transit.ts";
+import type { TransitTable, TransitTableFile } from "../../src/domain/transit-types.ts";
 import { buildNetwork, EGRESS_METERS, egressSeconds, scanProfiles } from "./profile-csa.ts";
 
 /** Zeilen nur für Haltbereiche dieser Gemeinde (Nürnberg, E5); das Netz zum Rechnen ist der ganze Auszug. */
@@ -160,4 +167,21 @@ export function buildTransitTable(
     lon: delta(rows.map((r) => r.lon)),
     minutes: encodeMinutes(bytes),
   };
+}
+
+/**
+ * Startpunkte ohne Haltbereich im Zugangsradius (`ACCESS_METERS`). Für die Stadtteile muss die Liste leer
+ * sein, sonst bekäme ein wählbarer Stadtteil nur die Luftlinie (Plan 0009, Schritt 5; `build-data` prüft das).
+ */
+export function withoutAccess<T extends { point: GeoPoint }>(
+  table: Pick<TransitTable, "lat" | "lon">,
+  origins: readonly T[],
+): T[] {
+  return origins.filter(({ point }) => {
+    for (let row = 0; row < table.lat.length; row++) {
+      const stop = { lat: valueAt(table.lat, row), lon: valueAt(table.lon, row) };
+      if (haversineMeters(point, stop) <= ACCESS_METERS) return false;
+    }
+    return true;
+  });
 }
