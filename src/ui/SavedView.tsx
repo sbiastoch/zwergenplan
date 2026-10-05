@@ -1,7 +1,7 @@
 /** Merkliste „Mein Stickerheft“ (Plan 0003, E12) mit Sammel-ICS aus dem Browser (ADR 0007). */
 import { nextSession } from "../domain/agenda.ts";
+import type { CollectionItem, IcsContext, IcsSource } from "../domain/ics-types.ts";
 import { collectionSessions } from "../domain/saved.ts";
-import type { Session, Venue } from "../domain/schema.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { plural } from "./format.ts";
 import { Icon } from "./icons.tsx";
@@ -18,19 +18,12 @@ interface SavedViewProps {
 
 /**
  * ICS-Code aus `src/domain/ics.ts`, strukturell beschrieben: Das Modul ist ein Lazy-Chunk (assets/export/, Plan 0010,
- * E8 A), auch Typen kommen nicht statisch von dort (`ics-only-lazy`).
+ * E8 A), auch Typen kommen nicht statisch von dort (`ics-only-lazy`); sie stehen in `ics-types.ts`.
  */
-interface IcsContext {
-  providerName: string;
-  venue: Pick<Venue, "name" | "address" | "geo">;
-  stamp: string;
-}
 interface IcsExport {
-  icsContextFor(offer: SiteOffer, generatedAt: string): IcsContext;
-  icsForCollection(
-    items: readonly { offer: SiteOffer; sessions: readonly Session[]; ctx: IcsContext }[],
-    name: string,
-  ): string;
+  // Property-Syntax: Parameter werden streng geprüft, eine Änderung in ics-types.ts fällt hier auf
+  icsContextFor: (offer: IcsSource, generatedAt: string) => IcsContext;
+  icsForCollection: (items: readonly CollectionItem[], name: string) => string;
 }
 
 /** Einziger Lader von `src/domain/ics.ts` (`ics-entry-only`); async mit `await import(…)` wie in Lazy.tsx. */
@@ -84,7 +77,9 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
     try {
       ics = await loadExport();
     } catch {
-      onExported("Export gerade nicht möglich – bitte mit Netz nochmal versuchen.");
+      // Chromium behält einen gescheiterten import() (auch des Vorladens): Nur ein Neuladen hilft sicher, die
+      // Merkliste liegt im localStorage und übersteht es (Arch-Review Paket 0, Befund 1).
+      onExported("Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.");
       return;
     }
     const withCtx = items.map((i) => ({ ...i, ctx: ics.icsContextFor(i.offer, generatedAt) }));

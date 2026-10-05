@@ -13,6 +13,6 @@ ADR 0003 und `docs/architecture.md` legen fest, dass ICS-Dateien statisch zur Bu
 - Alle übrigen ICS-Dateien bleiben statisch. `ics.ts` importiert Zod nur als Typ, das Modul darf deshalb in den Client (`no-zod-in-client-transitive`).
 
 ## Konsequenzen
-- Etwa 1 kB mehr JS im Client-Bundle.
+- Etwa 1 kB mehr JS im Client-Bundle. Seit Plan 0010, E8 A ist das ein Lazy-Chunk (`assets/export/`), den die App im Leerlauf vorlädt. Der Download folgt deshalb auf ein `await` im Tipp; ob iOS ihn noch als Folge des Tipps gelten lässt, prüft der Browser-Review am iPhone.
 - iOS Safari bietet eine Blob-`.ics` je nach Version als Datei-Download statt „Zum Kalender hinzufügen“ an. Das prüft der Browser-Review auf einem echten iPhone. Fällt es schlecht aus, listet die Merkliste zusätzlich die statischen Einzel-Links.
 - Die Gleichheit der VEVENTs prüft ein Unit-Test (`icsForCollection` vs. `icsForSeries`).

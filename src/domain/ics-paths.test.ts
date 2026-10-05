@@ -6,7 +6,9 @@ import { fixtureOffer } from "./test-fixtures.ts";
 describe("ICS-Pfade", () => {
   it("leitet Dateipfade aus IDs ab", () => {
     const treff = fixtureOffer("krabbeltreff");
+    const [first] = treff.sessions;
+    if (!first) throw new Error("Fixture ohne Termin");
     expect(seriesIcsPath(treff)).toBe(`ics/${treff.id}.ics`);
-    expect(sessionIcsPath(treff, treff.sessions[0] as never)).toBe(`ics/${treff.id}/20261007T1000.ics`);
+    expect(sessionIcsPath(treff, first)).toBe(`ics/${treff.id}/20261007T1000.ics`);
   });
 });

@@ -380,6 +380,39 @@ Da gzip nicht additiv ist, wurde die Ersparnis gemessen. Dafür wurde der Kandid
 5. Reicht es noch nicht für ≤ 87,7 kB: **C messen** und ggf. umsetzen.
 6. Reicht auch das nicht: **ADR 0012** (Budget oder Stack, z. B. ein kleineres React-Pendant). Das ist der letzte Ausweg, nicht Teil dieses Plans.
 
+**Ergebnis Paket 0 (2026-10-05, Branch `paket0-0010`):**
+- **Ausgang:** `X` = 90,09 kB (Plan 0009 mit Nacharbeit). Die Sourcemap von `index-*.js` (minifiziert) zeigt:
+  - react-dom 207,0 kB, react 8,2 kB, scheduler 3,5 kB;
+  - `format.ts` 6,2 kB, `App.tsx` 5,4 kB, `CalendarView.tsx` 4,5 kB, `DetailDialog.tsx` 4,1 kB, `Chrome.tsx` 3,8 kB, `use-app-state.ts` 3,1 kB, `Sheets.tsx` 2,5 kB, `districts.ts` 2,4 kB, `KidSheet.tsx` 2,3 kB, `agenda.ts` 2,1 kB, `Lazy.tsx` 2,1 kB, `icons.tsx` 2,0 kB, `time.ts` 2,0 kB, `ics.ts` 1,9 kB.
+- **Chunk-Wächter:** `scripts/check-chunks.ts` mit `scripts/lib/chunks.ts` (Unit-Test), am Skript `size`. Der Kanarienvogel (dynamischer Import von `src/ui/zz-canary.ts` ohne Ordnerregel) ist rot geworden: „Chunk direkt in dist/assets/: zz-canary-….js“.
+- **A umgesetzt:** **90,09 → 89,61 kB (−0,48 kB)**, Chunk `assets/export/ics-*.js` 1,15 kB.
+  - Etwas weniger als die gemessenen −0,64 kB: Lader, Vorladen im Leerlauf und Fehler-Toast bleiben im Start.
+  - Das Vorladen startet nach dem ersten Rendern mit Daten (`requestIdleCallback`, Zeitlimit 3 s, sonst `setTimeout` 1 s), für alle gleich.
+  - E2E-Tests, die „kein Request ab …“ zählen, warten vorher darauf (`exportPreload` in `e2e/fixtures.ts`).
+  - Fehlschlag: Der Toast lautet „Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.“ Chromium behält einen gescheiterten `import()`, auch den des Vorladens im Leerlauf. „Nochmal versuchen“ allein liefe dort in eine Schleife (Arch-Review, Befund 1).
+  - Typen in `src/domain/ics-types.ts`, Vorbild `transit-types.ts`.
+  - **Kanarienvögel der neuen Regeln** (Arch-Review, Befund 4), jeweils rot, nach dem Rückbau grün:
+    - Typ-Import aus `ics.ts` in `DetailDialog.tsx` → `ics-only-lazy` und `ics-entry-only`;
+    - statischer Import im Lader `SavedView.tsx` → `ics-only-lazy`. dependency-cruiser meldet ihn hier selbst, `lazy-loader-static` ist die zweite Linie;
+    - dynamischer Import aus `DetailDialog.tsx` → `ics-entry-only`.
+- **Schritt 4, Ursache der Abspaltung (Rolldown 1.2.12):**
+  - Mit lazy Kalender spaltet Rolldown **`jsx-runtime`** (react samt `__commonJS`-Helfer, 3,2 kB gzip) und **`time.ts`** (0,9 kB) als eigene Start-Chunks ab. Beide erreichen der Einstieg und **mehrere** Lazy-Chunks: `jsx-runtime` Karte und Kalender, `time.ts` Export und Kalender.
+  - Ohne `experimental.chunkOptimization` entstehen elf Start-Chunks. Die Optimierung (`mergeCommonChunks`) holt alle bis auf diese zwei in den Einstieg zurück, auch Module mit drei Nutzern wie `geo.ts`. Laut Doku mischt sie nicht, wenn eine zirkuläre Chunk-Abhängigkeit entstünde. Warum sie gerade diese zwei für unsicher hält, steht nicht in Typen oder Doku.
+  - **Ohne Wirkung:**
+    - `treeshake.moduleSideEffects` für React und eigene Module (dieselben Hashes);
+    - `preserveEntrySignatures: false`;
+    - eine `codeSplitting`-Gruppe namens `index` (ergibt einen weiteren Chunk plus `rolldown-runtime`).
+  - `codeSplitting.experimentalInlineCommonChunks` verschlechtert auf 93,67 kB mit Laufzeit-Chunk.
+  - **Kalender verworfen** (Plan-Vorgabe). Für die Anbieter-UI heißt das: Ihr Lazy-Chunk teilt `jsx-runtime` mit Karte bzw. Kalender und wird dieselbe Abspaltung auslösen. Der Chunk-Wächter macht das im Schritt „Schnittstellen“ sofort sichtbar.
+- **C gemessen:** kein Gewinn. Auch mit `modulePreload: false` und vorübergehend ganz ohne CSS in Lazy-Chunks bleibt Vites Preload-Helfer im Start-JS (89,61 kB unverändert).
+- **Ziel ≤ 87,7 kB nicht erreicht.** Es fehlen 1,9 kB. Nach Schritt 6 entscheidet der Nutzer über **ADR 0012**. Optionen:
+  - (a) Budget anheben, z. B. auf 92 kB;
+  - (b) kleineres React-Pendant (Preact), Stack-Änderung;
+  - (c) Rolldown-Abspaltung als Issue melden, auf eine Version warten und dann Kalender und Anbieter lazy machen;
+  - (d) weitere Kandidaten aus der Sourcemap.
+  Bis dahin starten weder „Schnittstellen“ noch A/B.
+- Nacharbeit 0009 und Paket 0 liegen zusammen unter dem Budget von 90 kB und gehen gemeinsam nach `main`.
+
 **Fertig, wenn** das Start-JS ≤ 87,7 kB ist (bzw. `X` − Ersparnis notiert), der Chunk-Wächter läuft, `pnpm check` grün ist und Arch-Review sowie Browser-Review (Merkliste-Export, ggf. Kalender offline nach dem Laden) eingetragen sind.
 
 **Wechselwirkung mit diesem Plan:** Der Anbieter-Chunk ist selbst eine React-Lazy-Komponente.

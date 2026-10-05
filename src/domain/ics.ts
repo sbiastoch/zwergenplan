@@ -5,21 +5,9 @@
  */
 
 import { sessionKey } from "./ics-paths.ts";
-import type { Offer, Session, Venue } from "./schema.ts";
+import type { CollectionItem, IcsContext, IcsSource } from "./ics-types.ts";
+import type { Offer, Session } from "./schema.ts";
 import { toIcsUtc } from "./time.ts";
-
-export interface IcsContext {
-  providerName: string;
-  venue: Pick<Venue, "name" | "address" | "geo">;
-  /** DTSTAMP – aus generatedAt, damit die Ausgabe deterministisch ist. */
-  stamp: string;
-}
-
-/** Was ein Angebot für den Kalender mitbringen muss: Anbietername und Ort (wie in `SiteOffer`). */
-export interface IcsSource {
-  providerName: string;
-  venue: IcsContext["venue"];
-}
 
 /**
  * Der eine Weg zum ICS-Kontext – für die statischen Dateien (scripts/build-data.ts) und die
@@ -134,13 +122,6 @@ export function icsForSeries(offer: Offer, ctx: IcsContext): string {
     offer.sessions.map((s, i) => vevent(offer, s, i, ctx)),
     offer.title,
   );
-}
-
-export interface CollectionItem {
-  offer: Offer;
-  /** Auswahl aus `offer.sessions` (Nummerierung „(3/8)“ bleibt die der ganzen Reihe) */
-  sessions: readonly Session[];
-  ctx: IcsContext;
 }
 
 /** Mehrere Angebote in einem Kalender (Merkliste) – im Browser erzeugt, gleiche UIDs wie die statischen Dateien. */

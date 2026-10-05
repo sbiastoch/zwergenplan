@@ -100,7 +100,7 @@ test("Export-Code ist ein eigener Chunk und lädt im Leerlauf vor", async ({ pag
 test.describe("Export-Code nicht ladbar", () => {
   test.use({ allowedConsoleErrors: [/\/assets\/export\/\S+/] });
 
-  test("meldet es im Toast statt still nichts zu tun", async ({ page }) => {
+  test("meldet es im Toast; mit Netz und neu geladener Seite klappt der Export", async ({ page }) => {
     await page.route("**/assets/export/*.js", (route) => route.abort());
     await page.reload();
     await expect(page.getByTestId("offer").first()).toBeVisible();
@@ -111,7 +111,20 @@ test.describe("Export-Code nicht ladbar", () => {
       downloaded = true;
     });
     await page.getByRole("button", { name: "Alle in den Kalender" }).click();
-    await expect(page.getByText("Export gerade nicht möglich – bitte mit Netz nochmal versuchen.")).toBeVisible();
+    await expect(
+      page.getByText("Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen."),
+    ).toBeVisible();
     expect(downloaded).toBe(false);
+
+    // Netz wieder da: Chromium behielte den gescheiterten Import, deshalb rät der Toast zum Neuladen (Arch-Review
+    // Paket 0, Befund 1). Die Merkliste übersteht es.
+    await page.unroute("**/assets/export/*.js");
+    await page.reload();
+    await expect(page.getByTestId("offer")).toHaveCount(1);
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("button", { name: "Alle in den Kalender" }).click(),
+    ]);
+    expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
   });
 });
