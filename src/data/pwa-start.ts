@@ -3,7 +3,7 @@
  * nur im Produktions-Build, damit `pnpm dev` keinen Service Worker registriert. Ab Stufe 2 kommt hier die Prüfung
  * „Push an?“ dazu. Statisch importiert diesen Kern niemand (`app-data-only-lazy`, `lazy-loader-static`).
  */
-import { lastSiteLoad } from "./site.ts";
+import { lastSiteLoad, onSiteLoad } from "./site.ts";
 
 /** Was die App dem PWA-Kern gibt (Texte stehen im Kern); `lastLoad` steuert `site.ts` bei */
 export interface AppHooks {
@@ -18,7 +18,7 @@ export interface AppHooks {
 /** Destrukturiert direkt am `import()`: So sieht knip, welcher Export des Chunks genutzt wird. */
 async function run(app: AppHooks) {
   const { start } = await import("./pwa.ts");
-  await start({ ...app, lastLoad: lastSiteLoad });
+  await start({ ...app, lastLoad: lastSiteLoad, onLoad: onSiteLoad });
 }
 
 /** Startet den PWA-Kern nach `load`, einmal je Seite. Scheitert der Chunk (offline, nicht im Cache), bleibt alles wie ohne. */

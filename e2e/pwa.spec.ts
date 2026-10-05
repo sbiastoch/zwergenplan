@@ -160,6 +160,80 @@ test.describe("offline", () => {
   });
 });
 
+/**
+ * Live (Browser-Review, B1): Die echte site.json (≈ 600 KB) ist oft erst nach `load` gelesen, also nach dem Start des
+ * PWA-Kerns. Hier hält ein Init-Skript die Antwort zurück, bis der Kern läuft (`data-pwa="bereit"`).
+ */
+async function holdSiteUntilPwaReady(page: Page) {
+  await page.addInitScript(() => {
+    const original = window.fetch.bind(window);
+    const pwaReady = new Promise<void>((resolve) => {
+      const check = () => {
+        if (document.documentElement?.dataset["pwa"] === "bereit") {
+          observer.disconnect();
+          setTimeout(resolve, 300);
+        }
+      };
+      const observer = new MutationObserver(check);
+      // Init-Skripte laufen vor dem Parsen: <html> gibt es noch nicht, deshalb das Dokument samt Unterbaum
+      observer.observe(document, { attributes: true, subtree: true, attributeFilter: ["data-pwa"] });
+    });
+    window.fetch = (input, init) => {
+      const response = original(input, init);
+      const url = input instanceof Request ? input.url : String(input);
+      return url.includes("data/site.json") ? pwaReady.then(() => response) : response;
+    };
+  });
+}
+
+test("offline: site.json kommt erst nach dem Start des PWA-Kerns, die Zeile erscheint trotzdem (Browser-Review live, B1)", async ({
+  page,
+  context,
+}) => {
+  await installed(page);
+  await holdSiteUntilPwaReady(page);
+  await context.setOffline(true);
+  await page.reload();
+  await expect(offers(page).first()).toBeVisible();
+  await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
+});
+
+test("H5 mit später Antwort: Kopie trotz Netz nach dem Start des Kerns → nach 30 s frischer Stand (Browser-Review live, B1)", async ({
+  page,
+}) => {
+  await installed(page);
+  // online, aber der Service Worker hätte die Kopie geliefert (5-s-Zeitlimit): Antwort mit X-Zp-Cache, erst nach
+  // dem Start des Kerns. Der nächste Abruf (der Wiederholer) geht normal durchs Netz.
+  await page.addInitScript(() => {
+    const original = window.fetch.bind(window);
+    let first = true;
+    const pwaReady = new Promise<void>((resolve) => {
+      const observer = new MutationObserver(() => {
+        if (document.documentElement?.dataset["pwa"] !== "bereit") return;
+        observer.disconnect();
+        setTimeout(resolve, 300);
+      });
+      observer.observe(document, { attributes: true, subtree: true, attributeFilter: ["data-pwa"] });
+    });
+    window.fetch = async (input, init) => {
+      const url = input instanceof Request ? input.url : String(input);
+      if (!first || !url.includes("data/site.json")) return original(input, init);
+      first = false;
+      const res = await original(input, init);
+      await pwaReady;
+      const headers = new Headers(res.headers);
+      headers.set("X-Zp-Cache", "offline");
+      return new Response(await res.text(), { status: res.status, headers });
+    };
+  });
+  await page.reload();
+  await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
+  const fresh = page.waitForResponse((r) => isSite(r.url()));
+  await page.clock.fastForward(31_000);
+  await fresh;
+  await expect(page.getByRole("status")).not.toContainText("Offline");
+});
+
 // E6, Punkt 5: ausdrücklich ohne erlaubte Konsolenfehler (204 statt Netzfehler)
 test("5 Kalender-Datei offline: Seite bleibt stehen, Toast „Kalender-Datei braucht Netz“ (E4, Regel 2)", async ({
   page,

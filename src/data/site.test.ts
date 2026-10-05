@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { lastSiteLoad, loadSiteData, type SiteEnv, SiteLoadError } from "./site.ts";
+import { lastSiteLoad, loadSiteData, onSiteLoad, type SiteEnv, SiteLoadError } from "./site.ts";
 
 const DATA = { generatedAt: "2026-10-05T06:00:00+02:00", offers: [] };
 
@@ -143,5 +143,17 @@ describe("letzter erfolgreicher Abruf (Plan 0011, E4a)", () => {
     const cached = new Response(JSON.stringify(DATA), { headers: { "X-Zp-Cache": "offline" } });
     await loadSiteData(env({ fetch: vi.fn(async () => cached), now: () => 7000 }));
     expect(lastSiteLoad()).toEqual({ at: 7000, stale: true, generatedAt: DATA.generatedAt });
+  });
+});
+
+describe("Rückruf nach jedem Laden (Plan 0011, Browser-Review live B1)", () => {
+  it("meldet jeden erfolgreichen Abruf, nach dem Setzen von lastSiteLoad; ein Fehlschlag meldet nichts", async () => {
+    const seen: Array<boolean | undefined> = [];
+    onSiteLoad(() => seen.push(lastSiteLoad()?.stale));
+    const cached = new Response(JSON.stringify(DATA), { headers: { "X-Zp-Cache": "offline" } });
+    await loadSiteData(env({ fetch: vi.fn(async () => cached) }));
+    await failure(loadSiteData(env({ fetch: vi.fn(failed) })));
+    await loadSiteData(env());
+    expect(seen).toEqual([true, false]);
   });
 });

@@ -63,9 +63,16 @@ const STAND = "2026-10-05T06:00:00+02:00";
 
 /** Hooks der App: `refresh`, Toast und Statuszeile protokolliert; `last` kann der Test später ändern */
 function hooks(calls: string[], last?: { at: number; stale: boolean }) {
-  const state = { last: last && { ...last, generatedAt: STAND }, note: "" };
+  const state: { last: ReturnType<PwaHooks["lastLoad"]>; note: string; loaded: (() => void) | undefined } = {
+    last: last && { ...last, generatedAt: STAND },
+    note: "",
+    loaded: undefined,
+  };
   const api: PwaHooks = {
     lastLoad: () => state.last,
+    onLoad: (fn) => {
+      state.loaded = fn;
+    },
     refresh: async () => {
       calls.push("refresh");
     },
@@ -74,7 +81,12 @@ function hooks(calls: string[], last?: { at: number; stale: boolean }) {
       state.note = text;
     },
   };
-  return Object.assign(api, { state });
+  /** `loadSiteData` ist fertig (wie `onSiteLoad` in site.ts): neuer Stand, dann der Rückruf */
+  const finishLoad = (next: { at: number; stale: boolean }) => {
+    state.last = { ...next, generatedAt: STAND };
+    state.loaded?.();
+  };
+  return Object.assign(api, { state, finishLoad });
 }
 
 /** Registrierung mit `update()`, die optional einen neuen Service Worker findet */
@@ -433,5 +445,31 @@ describe(`stale trotz Netz (5-s-Zeitlimit): ein Frische-Anlass nach ${STALE_RETR
     stop();
     await vi.advanceTimersByTimeAsync(2 * STALE_RETRY_MS);
     expect([...offline.calls, ...fresh.calls, ...stopped.calls]).toEqual(["bereit", "bereit", "bereit"]);
+  });
+});
+
+describe("Daten kommen erst nach dem Start des Kerns (Browser-Review live, B1)", () => {
+  it("die Zeile erscheint, sobald loadSiteData nach dem Start fertig wird", async () => {
+    const f = fakeEnv();
+    const h = hooks(f.calls);
+    await start(h, f.env);
+    expect(h.state.note).toBe("");
+    h.finishLoad({ at: 1, stale: true });
+    expect(h.state.note).toBe("Offline – Stand vom 5.10.");
+    h.finishLoad({ at: 2, stale: false });
+    expect(h.state.note).toBe("");
+  });
+
+  it("H5: Kopie trotz Netz kommt nach dem Start → der Wiederholer wird trotzdem geplant, einmal", async () => {
+    const f = fakeEnv();
+    const h = hooks(f.calls);
+    await start(h, f.env);
+    h.finishLoad({ at: 1, stale: true });
+    await vi.advanceTimersByTimeAsync(STALE_RETRY_MS);
+    expect(f.calls).toEqual(["bereit", "refresh"]);
+    // der Anlass liefert wieder eine Kopie: kein zweiter Wiederholer (einmal je Seite)
+    h.finishLoad({ at: 2, stale: true });
+    await vi.advanceTimersByTimeAsync(10 * STALE_RETRY_MS);
+    expect(f.calls).toEqual(["bereit", "refresh"]);
   });
 });

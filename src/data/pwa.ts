@@ -35,6 +35,8 @@ export const ICS_OFFLINE = "Kalender-Datei braucht Netz";
 export interface PwaHooks {
   /** letzter erfolgreicher Abruf von `site.json` (`lastSiteLoad` aus site.ts) */
   lastLoad: () => { at: number; stale: boolean; generatedAt: string } | undefined;
+  /** meldet jedes erfolgreiche Laden von `site.json` (`onSiteLoad`), auch nach dem Start des Kerns (B1) */
+  onLoad: (fn: () => void) => void;
   /** Frische-Anlass ohne neuen Service Worker: Daten (und eine geladene Wegzeit-Tabelle) neu laden */
   refresh: () => Promise<unknown>;
   /** Toast der App */
@@ -101,7 +103,6 @@ const isIcsOffline = (data: unknown) =>
  */
 export async function start(hooks: PwaHooks, env: PwaEnv = browserEnv()): Promise<() => void> {
   env.markReady();
-  showNote(hooks);
   env.onMessage((data) => {
     if (isIcsOffline(data)) hooks.say(ICS_OFFLINE);
   });
@@ -150,8 +151,19 @@ function watchFreshness(hooks: PwaHooks, env: PwaEnv, registration: UpdatableReg
   const offOnline = env.listen("online", () => {
     if (hooks.lastLoad()?.stale) void occasion();
   });
-  if (hooks.lastLoad()?.stale && env.online()) retry = setTimeout(() => void occasion(), STALE_RETRY_MS);
+  // Nach jedem Laden auswerten, nicht nur jetzt: Live ist site.json oft erst nach dem Start des Kerns gelesen
+  // (Browser-Review live, B1). Ist sie schon da, wirkt der erste Aufruf sofort. Der Wiederholer (H5) einmal je Seite.
+  let retried = false;
+  const evaluate = () => {
+    showNote(hooks);
+    if (retried || !hooks.lastLoad()?.stale || !env.online()) return;
+    retried = true;
+    retry = setTimeout(() => void occasion(), STALE_RETRY_MS);
+  };
+  hooks.onLoad(evaluate);
+  evaluate();
   return () => {
+    hooks.onLoad(() => {});
     clearTimeout(retry);
     offVisible();
     offOnline();

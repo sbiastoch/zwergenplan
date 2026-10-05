@@ -33,6 +33,15 @@ let last: { at: number; stale: boolean; generatedAt: string } | undefined;
 export const lastSiteLoad = () => last;
 
 /**
+ * Rückruf nach jedem erfolgreichen Abruf, für den PWA-Kern (ein Abonnent). Live ist die echte site.json oft erst nach
+ * dem Start des Kerns gelesen; ohne Rückruf fehlte die Zeile „Offline – Stand vom …“ (Browser-Review live, B1).
+ */
+let loaded: (() => void) | undefined;
+export const onSiteLoad = (fn: () => void) => {
+  loaded = fn;
+};
+
+/**
  * Übernimmt die Anfrage, die das Inline-Skript in index.html beim Parsen des `<head>` startet
  * (Plan 0008, E4; ersetzt den Preload, den WebKit nicht wiederverwendet). Höchstens einmal: Danach
  * ist sie weg, „Nochmal versuchen“ lädt neu. `globalThis` statt `window`, damit das Modul auch im
@@ -74,6 +83,7 @@ export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<SiteDat
   }
   // Header setzt nur der Service Worker, wenn er die Kopie liefert (gleicher Name in src/sw/routes.ts)
   last = { at: env.now(), stale: res.headers.get("X-Zp-Cache") === "offline", generatedAt: data.generatedAt };
+  loaded?.();
   return data;
 }
 
