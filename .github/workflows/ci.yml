@@ -38,13 +38,24 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: pnpm data:validate --against-deployed
 
+  # E2E je Engine und Shard, parallel zu check (Plan 0013). Welche Projekte eine Suite hat, legt PW_SUITE in
+  # playwright.config.ts fest; ein Gerät mit neuer Engine wirft dort beim Laden, bis es hier eine Zeile bekommt.
+  # Playwright shardet nach Testzahl, nicht nach Dauer: deshalb Chromium und WebKit (≈ 2,5× teurer) getrennt.
   e2e:
-    name: Build, E2E & Budgets
-    needs: check
+    name: E2E ${{ matrix.engine }} ${{ matrix.shard }}/${{ matrix.total }}
     runs-on: ubuntu-latest
-    # Schutz gegen Hänger, kein Qualitäts-Gate: 20 Min. reichten mit den Wegzeit-Specs (Plan 0009) nicht mehr.
-    # Gemessen: E2E 16,7 → 17,3 → 18,8 Min. bei 2 Workern, dazu ≈ 1,5 Min. Smoke mit echten Daten und Setup.
-    timeout-minutes: 30
+    # Schutz gegen Hänger, kein Qualitäts-Gate (vorläufig, Plan 0013, E5).
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false # alle Fehler eines Laufs auf einmal sehen; gates sperrt den Deploy trotzdem
+      matrix:
+        include:
+          - { engine: chromium, shard: 1, total: 4 }
+          - { engine: chromium, shard: 2, total: 4 }
+          - { engine: chromium, shard: 3, total: 4 }
+          - { engine: chromium, shard: 4, total: 4 }
+          - { engine: webkit, shard: 1, total: 2 }
+          - { engine: webkit, shard: 2, total: 2 }
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -54,11 +65,44 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Playwright-Browser
-        run: pnpm exec playwright install --with-deps chromium webkit
-      - name: E2E (Fixture-Build + Smoke gegen Deploy-Build)
-        run: pnpm e2e
+        run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
+      - name: Fixture-Build
+        run: pnpm build:e2e
+      - name: E2E
+        run: pnpm exec playwright test --shard=${{ matrix.shard }}/${{ matrix.total }} --workers=2
         env:
           CI: "true"
+          PW_SUITE: ${{ matrix.engine }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-${{ matrix.engine }}-${{ matrix.shard }}
+          path: playwright-report/
+          retention-days: 7
+
+  # Smoke mit echten Daten gegen genau den Build, der deployt wird, allein auf seinem Runner (Plan 0003 E8, Plan 0013).
+  smoke:
+    name: Smoke (Deploy-Build) & Budgets
+    runs-on: ubuntu-latest
+    # Schutz gegen Hänger, kein Qualitäts-Gate (vorläufig, Plan 0013, E5).
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Playwright-Browser
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Deploy-Build
+        run: pnpm build
+      - name: Smoke mit echten Daten
+        run: pnpm exec playwright test
+        env:
+          CI: "true"
+          PW_SUITE: smoke
       - name: Schrift-Swap je Fallback (Plan 0007, B6)
         if: always()
         run: cat test-results/font-swap-werte.txt || echo "keine Swap-Werte"
@@ -67,7 +111,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-smoke
           path: playwright-report/
           retention-days: 7
       - name: Pages-Artefakt
@@ -76,9 +120,18 @@ jobs:
         with:
           path: dist
 
+  # Der eine Knoten für „alles grün“, auch auf Branches. Wird übersprungen, sobald ein Prüf-Job rot ist.
+  gates:
+    name: Alle Gates grün
+    needs: [check, e2e, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: echo "alle Gates grün"
+
   deploy:
     name: Deploy (GitHub Pages)
-    needs: e2e
+    needs: gates
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
