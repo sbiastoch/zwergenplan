@@ -1,8 +1,8 @@
 /**
  * Anbieterübersicht (Plan 0010), Paket A: Tab, Route, Lazy-Laden von Chunk und `anbieter.json`, Sheet und History,
  * Fehler, Datenstand-Abgleich und Privatsphäre. Fixtures mit eingefrorener Uhr (Mo 5.10.2026 12:00): 8 kommende
- * Angebote von 5 Anbietern, dazu der Turnverein ohne Angebote. Was Zeilen und Sheet-Inhalt prüft, steht in
- * anbieter-inhalt.spec.ts (Paket B). Hier zählt nur, was der Start (ProviderPanel, Overlays, useRoute) liefert.
+ * Angebote von 5 Anbietern, dazu der Turnverein ohne Angebote. Reihenfolge, Filter, Suche und Sheet-Inhalt im
+ * Einzelnen prüft anbieter-inhalt.spec.ts (Paket B). Hier zählen die Wege: Zeile → Sheet → Kachel → Detail und zurück.
  */
 import type { Page, Request } from "@playwright/test";
 import { expect, exportPreload, test } from "./fixtures.ts";
@@ -18,8 +18,14 @@ const offers = (page: Page) => page.getByTestId("offer");
 const tab = (page: Page, name: string) =>
   page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
 const providerSheet = (page: Page) => page.getByRole("dialog", { name: "Anbieter" });
-/** Was der Lazy-Chunk im Tab rendert: Das Suchfeld steht im Stub wie in der fertigen Liste (E5). */
+/** Suchfeld der Anbieterliste (E5): steht, sobald der Lazy-Chunk da ist */
 const searchField = (page: Page) => page.getByRole("searchbox", { name: "Anbieter suchen" });
+/** Zeilen der Anbieterliste (E10), wahlweise die eines Anbieters */
+const rows = (page: Page) => page.locator("section.providers button.place");
+const row = (page: Page, name: string) =>
+  rows(page).filter({ has: page.locator("b.provider-name", { hasText: name }) });
+/** „Website & Programm“ im Sheet (E10, Punkt 3) */
+const websiteLink = (page: Page) => providerSheet(page).getByRole("link", { name: "Website & Programm" });
 
 /** Seite bereit, auch der Export-Code ist vorgeladen: Danach entsteht kein Request ohne Anlass (Plan 0010, E8 A). */
 async function ready(page: Page, path = "./") {
@@ -151,6 +157,59 @@ test.describe("Lazy-Laden (E7, E9)", () => {
 });
 
 test.describe("Anbieter-Sheet und History (E3)", () => {
+  test("Zeile → Sheet mit anbieter=, Zurück schließt es und gibt den Fokus an die Zeile", async ({ page }) => {
+    await ready(page, "./?ansicht=anbieter");
+    await expect(rows(page)).toHaveCount(6);
+    await row(page, THEATER).click();
+    const sheet = providerSheet(page);
+    await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
+    expect(new URL(page.url()).search).toBe("?ansicht=anbieter&anbieter=theater-beispiel");
+
+    await page.goBack();
+    await expect(sheet).toBeHidden();
+    expect(new URL(page.url()).search).toBe("?ansicht=anbieter");
+    await expect(row(page, THEATER)).toBeFocused();
+  });
+
+  test("Kachel im Sheet → Detail darüber; Zurück schließt nur das Detail, Sheet und Scrollposition bleiben", async ({
+    page,
+  }) => {
+    // niedrig, damit das Sheet scrollt
+    await page.setViewportSize({ width: 360, height: 520 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await ready(page, "./?ansicht=anbieter");
+    await row(page, "Familientreff Beispielhof (fiktiv)").click();
+    const sheet = providerSheet(page);
+    const scroller = sheet.locator(".provider-sheet .sheet-scroll");
+    const card = sheet.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button");
+    await card.scrollIntoViewIfNeeded();
+    const scrolled = await scroller.evaluate((el) => el.scrollTop);
+    expect(scrolled, "das Sheet ist gescrollt, sonst prüft der Test nichts").toBeGreaterThan(0);
+
+    await card.click();
+    const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
+    await expect(detail).toBeVisible();
+    expect(new URL(page.url()).search).toBe(
+      `?ansicht=anbieter&anbieter=familientreff-beispiel&angebot=${KRABBELTREFF}`,
+    );
+    expect(await topDialogOverSheet(page), "über dem Sheet liegt das Detail").toBe("Offener Krabbeltreff");
+
+    await page.goBack();
+    await expect(detail).toBeHidden();
+    await expect(sheet).toBeVisible();
+    expect(new URL(page.url()).search).toBe("?ansicht=anbieter&anbieter=familientreff-beispiel");
+    expect(await scroller.evaluate((el) => el.scrollTop), "Scrollposition erhalten").toBe(scrolled);
+  });
+
+  test("Website-Link im Sheet: neuer Tab, rel=noopener, Katalog-href (nicht angeklickt, E9)", async ({ page }) => {
+    await ready(page, "./?anbieter=theater-beispiel");
+    const link = websiteLink(page);
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "https://example.org/theater");
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(link).toHaveAttribute("rel", "noopener");
+  });
+
   test("Deep-Link öffnet das Sheet über dem Tab „Kalender“, ohne Tabwechsel; Schließen entfernt den Parameter", async ({
     page,
   }) => {
@@ -264,6 +323,8 @@ test.describe("Fehler (E10)", () => {
     await page.unroute("**/data/anbieter.json");
     await box.getByRole("button", { name: "Nochmal versuchen" }).click();
     await expect(searchField(page)).toBeVisible();
+    await expect(rows(page)).toHaveCount(6);
+    await expect(row(page, THEATER)).toBeVisible();
     await expect(box).toHaveCount(0);
   });
 
@@ -277,6 +338,8 @@ test.describe("Fehler (E10)", () => {
     await page.unroute("**/data/anbieter.json");
     await sheet.getByRole("button", { name: "Nochmal versuchen" }).click();
     await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
+    await expect(websiteLink(page)).toBeVisible();
+    await expect(sheet.getByRole("heading", { level: 3, name: "Kuckuck im Nest", exact: false })).toBeVisible();
   });
 });
 
@@ -294,6 +357,28 @@ test.describe("Datenstand (E6, M4)", () => {
     await tab(page, "Anbieter").click();
     await expect(searchField(page)).toBeVisible();
     expect(requests).toHaveLength(2);
+  });
+
+  test("fehlt ein Anbieter in anbieter.json, steht er als Rückfall-Zeile da, im Sheet ohne Website-Knopf", async ({
+    page,
+  }) => {
+    // gleicher Datenstand, kein Reload: Der Theater-Eintrag fehlt einfach (z. B. Katalog älter als site.json, M4)
+    await page.route("**/data/anbieter.json", async (route) => {
+      const response = await route.fetch();
+      const data = (await response.json()) as { providers: { id: string }[] };
+      await route.fulfill({
+        response,
+        json: { ...data, providers: data.providers.filter((p) => p.id !== "theater-beispiel") },
+      });
+    });
+    await ready(page, "./?ansicht=anbieter");
+    await expect(rows(page)).toHaveCount(6);
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await row(page, THEATER).click();
+    const sheet = providerSheet(page);
+    await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
+    await expect(sheet.getByRole("heading", { level: 3, name: /^Kommende Angebote/ })).toBeVisible();
+    await expect(websiteLink(page)).toHaveCount(0);
   });
 
   test("Deep-Link plus anderer Datenstand: Vorladen und genau ein Reload, ein Chunk, danach das Sheet", async ({
