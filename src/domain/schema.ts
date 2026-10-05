@@ -173,10 +173,15 @@ const ClockTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "HH:MM erwartet"
 /** Bit 1 = Einsteigen erlaubt, Bit 2 = Aussteigen erlaubt (GTFS pickup_type/drop_off_type = 0) */
 const StopFlags = z.int().min(0).max(3);
 
+/** Verkehrsmittel einer Fahrt aus GTFS `route_type` 0–3 (Plan 0012, E1) */
+const TransitMode = z.enum(["tram", "u-bahn", "bahn", "bus"]);
+
 const TimetableTrip = z
   .strictObject({
-    /** Kurzname der Linie („U1“, „36“), nur zur Fehlersuche */
-    route: z.string(),
+    /** Kurzname der Linie („U1“, „36“), für die Anzeige der Linien (Plan 0012) */
+    route: z.string().min(1),
+    /** Verkehrsmittel, für den Anzeigenamen („Tram 4“, „Bus 36“, „U1“; Plan 0012, E1) */
+    mode: TransitMode,
     /** Indizes in `stops` */
     stops: z.array(z.int().nonnegative()).min(2),
     /** je Halt [an, ab] in Sekunden ab Mitternacht des Stichtags; ab dem zweiten Wert als Differenz (≥ 0) */
@@ -238,6 +243,7 @@ export type AgeRange = z.infer<typeof AgeRange>;
 export type Offer = z.infer<typeof Offer>;
 export type OffersFile = z.infer<typeof OffersFile>;
 export type Timetable = z.infer<typeof Timetable>;
+export type TransitMode = z.infer<typeof TransitMode>;
 export type Format = z.infer<typeof Format>;
 export type Registration = z.infer<typeof Registration>;
 export type Cost = z.infer<typeof Cost>;

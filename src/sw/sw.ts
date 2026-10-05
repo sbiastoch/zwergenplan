@@ -65,7 +65,7 @@ self.addEventListener("fetch", (event) => {
   if (strategy === "ics") event.respondWith(ics(event));
   else if (strategy === "asset") event.respondWith(asset(event));
   else if (strategy === "site") event.respondWith(site(event));
-  else if (strategy === "wegzeit") event.respondWith(wegzeit(event));
+  else if (strategy === "oepnv") event.respondWith(oepnv(event));
   else if (strategy === "schale") event.respondWith(shell(event));
   // nicht eingegriffen: Die Preload-Antwort abwarten, sonst warnt die Konsole
   else if (navigate) event.waitUntil(Promise.resolve(event.preloadResponse).catch(() => undefined));
@@ -147,8 +147,8 @@ async function site(event: FetchEvent): Promise<Response> {
   }
 }
 
-/** Regel 5: Netz zuerst (das Zeitlimit hat src/data/transit.ts), offline die Kopie. */
-async function wegzeit(event: FetchEvent): Promise<Response> {
+/** Regel 5: Wegzeit-Tabelle und Linien, Netz zuerst (die Zeitlimits hat src/data/transit.ts), offline die Kopie. */
+async function oepnv(event: FetchEvent): Promise<Response> {
   try {
     return await networkKeeping(event, event.request);
   } catch (e) {

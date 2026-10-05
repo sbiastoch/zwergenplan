@@ -1,6 +1,6 @@
 /** Mobile-UX-Gates für jede Ansicht und jedes Overlay, hell und dunkel (Plan 0003, Plan 0007, docs/architecture.md). */
 import type { Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, MAP_READY, test, twoLinesEverywhere } from "./fixtures.ts";
 import {
   backgroundLuminance,
   expectAccessible,
@@ -59,7 +59,7 @@ async function openProviders(page: Page) {
 }
 
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
-const MAP_VIEWS = new Set(["karte", "orts-sheet", "karte-fehler"]);
+const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-fehler"]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
 const CONSOLE_ERRORS: Record<string, RegExp[]> = {
@@ -117,7 +117,9 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   "kind-sheet-wegzeit": async (page) => {
     const sheet = await pickGostenhof(page);
     await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();
-    await expect(sheet.getByText(/^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß/)).toBeVisible();
+    await expect(
+      sheet.getByText(/^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß.*mehr als einen Umstieg/),
+    ).toBeVisible();
     await expect(sheet.getByRole("link", { name: "Fiktiver Fahrplan für Tests" })).toBeVisible();
     await expect(sheet.getByRole("link", { name: "CC0 1.0" })).toBeVisible();
   },
@@ -135,10 +137,24 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByText("„bis 45 Min.“ braucht einen Startpunkt.")).toBeVisible();
     await expect(page.getByTestId("offer").first()).toBeVisible();
   },
+  // Plan 0012, E4: längste Folge der Fixture „Tram 1 → Bus 202E“ (Gemeinde ab Gostenhof, 23,6 → „ca. 25 Min.“), mit
+  // dem längsten Ortsnamen und dem längsten Preis („… Geschwisterkinder ermäßigt“ in der halben Label-Spalte,
+  // Arch-Review 0012, Befund 3)
   "detail-wegzeit": async (page) => {
     await withGostenhof(page);
-    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
-    await expect(page.getByRole("dialog").getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    await page
+      .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
+      .getByRole("button")
+      .click();
+    await expect(page.getByRole("dialog").locator(".reach-long")).toContainText("Bus\u00a0202E");
+  },
+  // dasselbe Detail ohne Startpunkt (Arch-Review 0012, Befund 3): Preis in der halben Spalte
+  "detail-gemeinde": async (page) => {
+    await page
+      .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
+      .getByRole("button")
+      .click();
+    await expect(page.getByRole("dialog").getByText(/Geschwisterkinder ermäßigt/)).toBeVisible();
   },
   // Tabelle blockiert (E11): Luftlinie, längste Statuszeile und Hinweis mit „Nochmal laden“
   "entdecken-wegzeit-rueckfall": async (page) => {
@@ -151,8 +167,10 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   },
   // Tabelle zurückgehalten (M7): Platzhalter-Block statt ungefilterter Liste, Statuszeile unsichtbar (Arch-Review
   // 0009, Befund 5). Das Zeitlimit des Ladens (8 s, `TRANSIT_TIMEOUT_MS`) darf während der Prüfungen nicht ablaufen.
-  // Die Uhr anzuhalten geht nicht, axe braucht laufende Timer; deshalb fällt nur der eine 8-s-Timer weg (in src
-  // gibt es keinen zweiten).
+  // Die Uhr anzuhalten geht nicht, axe braucht laufende Timer; deshalb fallen die 8-s-Timer weg. Seit Plan 0012
+  // nutzt auch das Laden der Linien (`loadLines`) `TRANSIT_TIMEOUT_MS`; hier trifft der Hack aber nur den Timer der
+  // Tabelle, denn die Linien werden erst nach der Antwort von wegzeit.json angefordert, und die hält diese Ansicht
+  // zurück. Sonst gibt es in src keinen 8-s-Timer.
   "entdecken-wegzeit-laedt": async (page) => {
     await page.addInitScript(() => {
       const original = window.setTimeout.bind(window);
@@ -269,6 +287,18 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     const sheet = page.getByRole("dialog", { name: "Anbieter" });
     await expect(sheet.locator(".lazy-box")).toContainText("Die Anbieter konnten nicht geladen werden.");
     await expect(sheet.getByRole("button", { name: "Nochmal versuchen" })).toBeVisible();
+  },
+  // Orts-Sheet mit zwei Linien: Die Fixture hat dafür keinen Ort, die Linien-Datei wird umgeschrieben (fixtures.ts)
+  "orts-sheet-wegzeit": async (page) => {
+    await twoLinesEverywhere(page);
+    await openMap(page);
+    await page
+      .getByRole("region", { name: "Orte" })
+      .getByRole("button", { name: /^Familientreff Beispielhof/ })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" }).locator(".reach-long")).toContainText(
+      "Bus\u00a0202E",
+    );
   },
   "orts-sheet": async (page) => {
     await openMap(page);

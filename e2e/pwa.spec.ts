@@ -9,7 +9,11 @@ import { expectMobileUx } from "./mobile-ux.ts";
 
 /** Fixture-Datenstand (tests/fixtures/offers.json, generatedAt 5.10.2026) */
 const OFFLINE_NOTE = "Offline – Stand vom 5.10.";
-const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, inkl. Warten)";
+const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)";
+/** Beispielhof ab Gostenhof direkt mit Tram 1 (Plan 0012, E1; Fixture wie in startpunkt.spec.ts) */
+const KRABBELTREFF_TRAM = "ca. 15 Min. mit Tram\u00a01 ab Gostenhof";
+const isTable = (url: string) => new URL(url).pathname.endsWith("/data/wegzeit.json");
+const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.json");
 const offers = (page: Page) => page.getByTestId("offer");
 const isSite = (url: string) => new URL(url).pathname.endsWith("/data/site.json");
 
@@ -191,37 +195,46 @@ test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request au
   await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
   await expect(page.locator("html")).toHaveAttribute("data-pwa", "bereit");
   const tables: string[] = [];
+  const lines: string[] = [];
   page.on("request", (req) => {
-    if (new URL(req.url()).pathname.endsWith("/data/wegzeit.json")) tables.push(req.url());
+    if (isTable(req.url())) tables.push(req.url());
+    if (isLines(req.url())) lines.push(req.url());
   });
   const site = page.waitForResponse((r) => isSite(r.url()));
-  const table = page.waitForResponse((r) => r.url().endsWith("/data/wegzeit.json"));
+  const table = page.waitForResponse((r) => isTable(r.url()));
+  const linesLoaded = page.waitForResponse((r) => isLines(r.url()));
   // 31 Minuten später kehrt die App zurück (die Seite ist sichtbar, das Ereignis kommt vom System)
   await page.clock.setFixedTime(new Date("2026-10-05T12:31:00+02:00"));
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-  await Promise.all([site, table]);
+  await Promise.all([site, table, linesLoaded]);
   await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
   await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
   await page.waitForTimeout(300);
-  expect(tables).toHaveLength(1);
+  expect(tables, "genau ein weiterer Request auf wegzeit.json").toHaveLength(1);
+  expect(lines, "genau ein weiterer Request auf linien.json (Plan 0012)").toHaveLength(1);
 });
 
 test.describe("Laufzeit-Cache der Daten (Arch-Review Stufe 1, B1)", () => {
-  test("(a) Wegzeit-Tabelle kommt nach einem Online-Besuch offline aus zp-data (E4, Regel 5)", async ({
+  test("(a) Wegzeit-Tabelle und Linien kommen nach einem Online-Besuch offline aus zp-data (E4, Regel 5)", async ({
     page,
     context,
   }) => {
     await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await installed(page);
     // zweiter Besuch online: Tabelle und Rechenlogik laufen jetzt durch den Service Worker
-    const table = page.waitForResponse((r) => r.url().endsWith("/data/wegzeit.json") && r.ok());
+    const table = page.waitForResponse((r) => isTable(r.url()) && r.ok());
+    const lines = page.waitForResponse((r) => isLines(r.url()) && r.ok());
     await page.reload();
     expect((await table).fromServiceWorker()).toBe(true);
+    expect((await lines).fromServiceWorker(), "linien.json über den Service Worker (Plan 0012)").toBe(true);
     await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
     await context.setOffline(true);
     await page.reload();
     await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
     await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    // Linien offline aus zp-data: das Detail nennt die Tram statt nur „mit Bus & Bahn“
+    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    await expect(page.getByRole("dialog").getByText(KRABBELTREFF_TRAM)).toBeVisible();
   });
 
   test("(b) jeder Online-Abruf erneuert site.json in zp-data (E4, Regel 4)", async ({ page }) => {

@@ -6,6 +6,8 @@ import { expect, test } from "./fixtures.ts";
 import { FALLBACK_BUCKETS, measureSwap, PHONE_FONT_RENDERING, rewriteFallbackCss } from "./vitals.ts";
 
 test.use(PHONE_FONT_RENDERING);
+// Viewport schon beim Kontextstart, nicht per setViewportSize (Plan 0013, Befund F1)
+test.use({ viewport: { width: 412, height: 915 } });
 
 test.beforeEach(() => {
   test.skip(test.info().project.name !== "pixel-7", "einmal je Lauf, Chromium-Mobile");
@@ -30,6 +32,20 @@ test("Swap-Messung zählt einen Shift direkt nach der Grenze", async ({ page }) 
   const result = await measureSwap(page, "Roboto", { width: 412, height: 915, shiftAfterMark: true });
   if (result === "fehlt") throw new Error("Roboto kommt per URL und fehlt nie");
   expect(result.cls, "künstlicher Shift nach der Grenze muss zählen").toBeGreaterThan(0.05);
+});
+
+// Kanarienvogel der Viewport-Änderung (Plan 0013, Befund F1): Chrome zählt sie als Eingabe, Shifts in den 500 ms
+// danach tragen hadRecentInput. Auf schnellen CI-Runnern kam die Größe aus setViewportSize erst nach dem Laden an,
+// und die Messung verwarf den Swap still.
+test("Swap-Messung zählt einen Shift kurz nach einer Viewport-Änderung", async ({ page }) => {
+  const result = await measureSwap(page, "Roboto", {
+    width: 412,
+    height: 915,
+    resizeBeforeMark: true,
+    shiftAfterMark: true,
+  });
+  if (result === "fehlt") throw new Error("Roboto kommt per URL und fehlt nie");
+  expect(result.cls, "künstlicher Shift nach Viewport-Änderung muss zählen").toBeGreaterThan(0.05);
 });
 
 // Kanarienvogel des Umschreibens: Ein Block in fremdem Format darf nicht still unverändert bleiben.

@@ -4,7 +4,7 @@
  * Rein: Laden, Cache und Entpacken liegen in io/gtfs.ts, „heute“ wird hineingegeben.
  */
 import { inBounds } from "../../../src/domain/geo.ts";
-import { Timetable } from "../../../src/domain/schema.ts";
+import { Timetable, type TransitMode } from "../../../src/domain/schema.ts";
 import { addDays, berlinIsoDate, formatGermanDate, isoWeekday, toBerlinIso } from "../../../src/domain/time.ts";
 
 export const VGN_FEED_URL = "https://www.vgn.de/opendata/GTFS.zip";
@@ -16,6 +16,9 @@ const HORIZON_SECONDS = 120 * 60;
 
 /** Bedarfsverkehre zählen nicht (E2): Anmeldung nötig, kein Takt. */
 const DEMAND_RESPONSIVE = new Set(["Rufbus", "Linienbedarfstaxi", "Anrufsammeltaxi", "Linientaxi"]);
+
+/** GTFS `route_type` → Verkehrsmittel (Plan 0012, E1); andere Typen kommen im VGN-Feed nicht vor. */
+const MODES: Readonly<Record<string, TransitMode>> = { "0": "tram", "1": "u-bahn", "2": "bahn", "3": "bus" };
 
 /** Bit 1 = Einsteigen erlaubt, Bit 2 = Aussteigen erlaubt (Schema `Timetable`) */
 const BOARD = 1;
@@ -295,14 +298,23 @@ export function extractTimetable(
   const from = clockSeconds(WINDOW.from);
   const to = clockSeconds(WINDOW.to) + HORIZON_SECONDS;
 
-  const routes = new Map<string, { name: string; demand: boolean }>();
+  interface RouteInfo {
+    id: string;
+    name: string;
+    /** GTFS `route_type`, erst für übernommene Fahrten geprüft (Plan 0012, E1, Review W5) */
+    type: string;
+    demand: boolean;
+  }
+  const routes = new Map<string, RouteInfo>();
   for (const r of feed.routes) {
+    const id = field(r, "route_id");
     const name = field(r, "route_short_name") || field(r, "route_long_name");
-    routes.set(field(r, "route_id"), { name, demand: DEMAND_RESPONSIVE.has(field(r, "route_desc")) });
+    const demand = DEMAND_RESPONSIVE.has(field(r, "route_desc"));
+    routes.set(id, { id, name, type: field(r, "route_type"), demand });
   }
 
   const allTrips = new Set<string>();
-  const tripRoute = new Map<string, string>();
+  const tripRoute = new Map<string, RouteInfo>();
   let demandTrips = 0;
   for (const t of feed.trips) {
     const id = field(t, "trip_id");
@@ -312,7 +324,7 @@ export function extractTimetable(
     const route = routes.get(routeId);
     if (!route) throw new Error(`GTFS: Fahrt ${id} verweist auf unbekannte Route ${routeId}`);
     if (route.demand) demandTrips++;
-    else tripRoute.set(id, route.name);
+    else tripRoute.set(id, route);
   }
 
   /** Steige (location_type 0 oder leer) → Koordinate, `undefined` außerhalb der BBOX */
@@ -348,7 +360,7 @@ export function extractTimetable(
     });
   }
 
-  const kept: { tripId: string; route: string; events: StopEvent[] }[] = [];
+  const kept: { tripId: string; route: string; mode: TransitMode; events: StopEvent[] }[] = [];
   for (const [tripId, list] of events) {
     list.sort((a, b) => a.seq - b.seq);
     list.forEach((e, k) => {
@@ -361,7 +373,9 @@ export function extractTimetable(
     const first = list.findIndex((e, k) => k < list.length - 1 && e.dep >= from);
     const last = list.findLastIndex((e, k) => k < list.length - 1 && e.dep <= to);
     if (first === -1 || last < first) continue;
-    kept.push({ tripId, route: tripRoute.get(tripId) ?? "", events: list.slice(first, last + 2) });
+    const route = tripRoute.get(tripId);
+    if (route === undefined) throw new Error(`GTFS: Fahrt ${tripId} ohne Route`);
+    kept.push({ tripId, ...lineOf(route), events: list.slice(first, last + 2) });
   }
   const firstDep = (k: (typeof kept)[number]) => k.events[0]?.dep ?? 0;
   kept.sort((a, b) => firstDep(a) - firstDep(b) || cmp(a.route, b.route) || cmp(a.tripId, b.tripId));
@@ -376,6 +390,7 @@ export function extractTimetable(
     stops: [...positions].sort(([a], [b]) => cmp(a, b)).map(([id, [lat, lon]]) => [id, round5(lat), round5(lon)]),
     trips: kept.map((k) => ({
       route: k.route,
+      mode: k.mode,
       stops: k.events.map((e) => index.get(e.stop) ?? -1),
       times: deltas(k.events.flatMap((e) => [e.arr, e.dep])),
       flags: k.events.map((e) => e.flags),
@@ -383,6 +398,17 @@ export function extractTimetable(
   });
   const connections = kept.reduce((n, k) => n + k.events.length - 1, 0);
   return { timetable, stats: { stops: usedStops.length, trips: kept.length, connections, demandTrips } };
+}
+
+/**
+ * Name und Verkehrsmittel einer Linie, deren Fahrt im Auszug bleibt (Plan 0012, E1). Erst hier geprüft, damit
+ * eine Bedarfs- oder inaktive Route mit erweitertem Typ (700, 900 …) den Lauf nicht abbricht (Review W5).
+ */
+function lineOf(route: { id: string; name: string; type: string }): { route: string; mode: TransitMode } {
+  if (route.name === "") throw new Error(`GTFS: Route ${route.id} ohne Namen`);
+  const mode = MODES[route.type];
+  if (mode === undefined) throw new Error(`GTFS: Linie ${route.name} hat unbekannten route_type ${route.type}`);
+  return { route: route.name, mode };
 }
 
 /** Code-Unit-Vergleich: unabhängig von der Locale, also deterministisch. */

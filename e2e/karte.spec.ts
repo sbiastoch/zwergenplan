@@ -4,7 +4,9 @@
  * `window.__zpMap` gibt es nur im E2E-Build (E13, begründete Ausnahme von „E2E ist Black-Box“).
  */
 import type { BrowserContext, Page } from "@playwright/test";
-import { expect, MAP_READY, startPreloads, test } from "./fixtures.ts";
+import { expect, expectTwoLines, MAP_READY, startPreloads, test, twoLinesEverywhere } from "./fixtures.ts";
+
+const NB = "\u00a0";
 
 /** Nur das, was die Tests von MapLibre brauchen (ohne Abhängigkeit von src/). */
 interface TestMap {
@@ -179,7 +181,8 @@ test.describe("mit gemockten Kacheln", () => {
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText("Beispielstraße 1, 90402 Nürnberg")).toBeVisible();
-    await expect(sheet.getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    // Beispielhof ab Gostenhof: 1,58 Min. zu Halt 9001 + Zelle 12 (Tram 1) = 13,6 → „ca. 15 Min. mit Tram 1“
+    await expect(sheet.getByText(`ca. 15 Min. mit Tram${NB}1 ab Gostenhof`)).toBeVisible();
     await expect(sheet.getByTestId("offer")).toHaveCount(3);
     // Der Kopf nennt Ort und Wegzeit; die Kacheln nur noch den Anbieter (Plan 0008, E19)
     const metas = await sheet.getByTestId("offer").locator(".meta").allInnerTexts();
@@ -203,6 +206,19 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(page.getByTestId("offer").first().locator(".meta")).toContainText(/ · \d+ Min\.$/);
   });
 
+  test("Orts-Sheet mit zwei Linien: „→“ in einer Zeile mit beiden Namen (Plan 0012, E1, Review 2, W3)", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 412, height: 915 });
+    await twoLinesEverywhere(page);
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await openMap(page);
+    await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
+    const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
+    // .place-where > span: nur der Wrapper steht als eigene Zeile, nicht Pfeil und „, dann“
+    await expectTwoLines(sheet.locator(".reach-long"), "ca. 15 Min. mit Tram 1, dann Bus 202E ab Gostenhof");
+  });
+
   test("Wegzeit: Öffnen der Karte lädt die Tabelle, Orts-Liste mit Minuten nach Wegzeit sortiert (Plan 0009, E9/E11)", async ({
     page,
   }) => {
@@ -211,8 +227,10 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(page.getByTestId("offer").first()).toBeVisible();
     const table = page.waitForResponse((r) => r.url().endsWith("/data/wegzeit.json") && r.ok());
     const chunk = page.waitForResponse((r) => /\/assets\/oepnv\/[^/]+\.js$/.test(r.url()) && r.ok());
+    // Plan 0012, E3: die Linien kommen nach Tabelle und Chunk; erst danach beginnt die Zählung
+    const lines = page.waitForResponse((r) => r.url().endsWith("/data/linien.json") && r.ok());
     await page.getByRole("button", { name: "Karte", exact: true }).click();
-    await Promise.all([table, chunk]);
+    await Promise.all([table, chunk, lines]);
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
 
     // Startpunkt über das Kind-Sheet: ab der Wahl kein Request, auch keine Kachel (Kamera-Regel)
@@ -226,16 +244,22 @@ test.describe("mit gemockten Kacheln", () => {
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
     await kid.getByRole("button", { name: "Fertig" }).click();
     await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof mit Bus & Bahn");
-    // nach Wegzeit: Theater 3,6, Beispielhof 13,6, Bibliothek 15,6, Musikschule 29,6, Gemeinde 32,6 Min.
+    // nach Wegzeit (Plan 0012, von Hand nachgerechnet, Rechenweg in startpunkt.spec.ts): Theater 3,6, Beispielhof
+    // 13,6, Bibliothek 15,6, Gemeinde 23,6 (Tram 1 → Bus 202E; vorher 32,6 über Bus 2, die Fixture-Linie 202E kam mit Plan 0012),
+    // Musikschule 29,6 Min. (Tram 1 → Bus 2)
     await expect(places(page)).toHaveText([
       /^Kleines Theater Beispiel.* · 5 Min\.$/,
       /^Familientreff Beispielhof.* · 15 Min\.$/,
       /^Bibliothek Beispiel Zentrum.* · 15 Min\.$/,
+      /^Gemeindehaus.* · 25 Min\.$/,
       /^Musikschule Beispiel, Haus Süd.* · 30 Min\.$/,
-      /^Gemeindehaus.* · 35 Min\.$/,
     ]);
+    // ein Angebot: Das Detail öffnet direkt, mit zwei Linien
     await places(page).filter({ hasText: "Musikschule Beispiel" }).click();
-    await expect(page.getByRole("dialog").getByText("ca. 30 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    await expectTwoLines(
+      page.getByRole("dialog").locator(".reach-long"),
+      "ca. 30 Min. mit Tram 1, dann Bus 2 ab Gostenhof",
+    );
     // Stadtteil-Zoom lädt Kacheln (erlaubt, ADR 0008); sonst kommt nichts dazu, schon gar nicht wegzeit.json
     expect(requests.filter((url) => !url.startsWith("https://tiles.openfreemap.org/"))).toEqual([]);
   });
@@ -247,7 +271,7 @@ test.describe("mit gemockten Kacheln", () => {
     await idle(page);
     await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
     await expect(page.getByRole("status")).toContainText(
-      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, inkl. Warten)",
+      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)",
     );
     await expect(places(page).first()).toHaveText(/^Familientreff Beispielhof.* · 5 Min\.$/);
   });

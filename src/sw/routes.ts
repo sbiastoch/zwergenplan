@@ -15,8 +15,8 @@ export type Strategy =
   | "asset"
   /** `site.json`: Netz zuerst, nach 5 s oder bei Netzfehler die Kopie */
   | "site"
-  /** `wegzeit.json`: Netz zuerst, offline die Kopie */
-  | "wegzeit"
+  /** Wegzeit-Daten (`TRANSIT_FILES`: Tabelle und Linien, Plan 0012): Netz zuerst, offline die Kopie; nie im Precache */
+  | "oepnv"
   /** Navigation auf die App: Navigation Preload, nach 3 s oder offline die vorgehaltene `index.html` */
   | "schale"
   /** alles andere: nur Netz, der Service Worker greift nicht ein */
@@ -38,13 +38,16 @@ interface Target {
   navigate: boolean;
 }
 
+/** Dateien der Wegzeit (Plan 0009, Plan 0012): Sie laden nur auf Anlass, deshalb kein Precache, nur Laufzeit-Cache */
+const TRANSIT_FILES: readonly string[] = ["data/wegzeit.json", "data/linien.json"];
+
 /** Die Regeln in Prüfreihenfolge: Die erste passende gilt. Pfadregeln stehen vor der Navigationsregel. */
 export const RULES: ReadonlyArray<{ strategy: Exclude<Strategy, "netz">; test: (t: Target) => boolean }> = [
   { strategy: "fremd", test: (t) => t.foreign },
   { strategy: "ics", test: (t) => t.path?.startsWith("ics/") === true },
   { strategy: "asset", test: (t) => t.path?.startsWith("assets/") === true },
   { strategy: "site", test: (t) => t.path === "data/site.json" },
-  { strategy: "wegzeit", test: (t) => t.path === "data/wegzeit.json" },
+  { strategy: "oepnv", test: (t) => t.path !== undefined && TRANSIT_FILES.includes(t.path) },
   { strategy: "schale", test: (t) => t.navigate && (t.path === "" || t.path === "index.html") },
 ];
 

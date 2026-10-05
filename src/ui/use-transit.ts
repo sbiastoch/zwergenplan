@@ -5,9 +5,15 @@
  * Der Startpunkt geht nur in `resolveReach` ein, nie in den Ladezustand.
  */
 import { useCallback, useEffect, useMemo, useReducer } from "react";
-import { type ChunkOutcome, loadTransit } from "../data/transit.ts";
+import { type ChunkOutcome, loadTransit, type TransitLoad } from "../data/transit.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
-import type { TransitSource, TransitTable, TransitTableFile } from "../domain/transit-types.ts";
+import type {
+  TransitLines,
+  TransitLinesFile,
+  TransitSource,
+  TransitTable,
+  TransitTableFile,
+} from "../domain/transit-types.ts";
 
 /**
  * Rechenlogik aus `src/domain/transit.ts`, strukturell beschrieben: Das Modul ist ein Lazy-Chunk (E10), auch Typen
@@ -15,7 +21,8 @@ import type { TransitSource, TransitTable, TransitTableFile } from "../domain/tr
  */
 interface TransitLogic {
   decodeTransitTable(file: TransitTableFile, placeKeys: ReadonlySet<string>): TransitTable | undefined;
-  transitReach(table: TransitTable, origin: Origin): ReachFn | undefined;
+  decodeTransitLines(file: TransitLinesFile, table: TransitTable): TransitLines | undefined;
+  transitReach(table: TransitTable, origin: Origin, lines?: TransitLines): ReachFn | undefined;
 }
 
 /**
@@ -42,8 +49,18 @@ export type ReachMode =
 export type TransitState =
   | { kind: "aus" | "fehler"; attempt: number }
   | { kind: "laedt"; attempt: number; retry: boolean }
-  /** `refresh`: lädt nach einem Frische-Anlass neu (Plan 0011, E4a); bis dahin gilt die alte Tabelle */
-  | { kind: "bereit"; file: TransitTableFile; logic: TransitLogic; attempt: number; refresh?: true };
+  /**
+   * `lines`: Linien-Datei, sobald sie da ist (Plan 0012, E9); sie kommt nach der Tabelle oder gar nicht.
+   * `refresh`: lädt nach einem Frische-Anlass neu (Plan 0011, E4a); bis dahin gelten die alte Tabelle und ihre Linien.
+   */
+  | {
+      kind: "bereit";
+      file: TransitTableFile;
+      logic: TransitLogic;
+      attempt: number;
+      lines?: TransitLinesFile;
+      refresh?: true;
+    };
 
 export type TransitAction =
   /** `retry`: „Nochmal laden“ (N1) */
@@ -52,6 +69,8 @@ export type TransitAction =
   | { type: "failed"; attempt: number }
   /** Tabelle geladen, passt aber nicht zu den Orten der Seite (alte `wegzeit.json`, E8): wie ein Fehlschlag */
   | { type: "stale"; attempt: number }
+  /** Linien angekommen (Plan 0012, E9): nur für die fertige Tabelle desselben Versuchs */
+  | { type: "lines"; attempt: number; lines: TransitLinesFile }
   /** Frische-Anlass (Plan 0011, E4a): eine fertige Tabelle neu laden, am HTTP-Cache vorbei */
   | { type: "refresh" };
 
@@ -76,15 +95,21 @@ export function transitReducer(state: TransitState, action: TransitAction): Tran
       return { kind: "bereit", file: action.file, logic: action.logic, attempt };
     case "failed":
       if (!loading(state) || action.attempt !== attempt) return state;
-      // Scheitert das Neuladen, bleibt die alte Tabelle (E4a)
-      return state.kind === "bereit"
-        ? { kind: "bereit", file: state.file, logic: state.logic, attempt }
-        : { kind: "fehler", attempt };
+      if (state.kind === "bereit") {
+        // Scheitert das Neuladen, bleiben die alte Tabelle und ihre Linien (E4a; Arch-Review 0011, Finding 4). Ohne
+        // `refresh`, nicht `refresh: undefined` (exactOptionalPropertyTypes).
+        const { refresh: _done, ...rest } = state;
+        return { ...rest, attempt };
+      }
+      return { kind: "fehler", attempt };
     case "stale":
       // erst so wirkt „Nochmal laden“ (want() nur aus „fehler“), Arch-Review 0009, Befund 2. Während des Neuladens
       // nicht: Die neue Tabelle kennt die neuen Orte (E4a).
       if (state.kind !== "bereit" || state.refresh || action.attempt !== attempt) return state;
       return { kind: "fehler", attempt };
+    case "lines":
+      if (state.kind !== "bereit" || action.attempt !== attempt) return state;
+      return { ...state, lines: action.lines };
     case "refresh":
       return state.kind === "bereit" && !state.refresh ? { ...state, attempt: attempt + 1, refresh: true } : state;
   }
@@ -104,15 +129,63 @@ export function reloadAfterRetry(retry: boolean, load: { chunk: ChunkOutcome; fi
 }
 
 /**
- * Dekodierte Tabelle zu den Orten der Seite: `undefined`, solange Tabelle oder Orte fehlen; `null`, wenn sie
- * nicht passt (alte `wegzeit.json` aus dem HTTP-Cache, E8). `useTransit` meldet `null` dem Reducer als `stale`.
+ * Zustellung eines Ladeergebnisses (Plan 0012, E9, Review B1; als reine Funktion testbar, Review 2, W4):
+ * Neuladen (N1), `loaded`/`failed` nur, solange der Versuch aktuell ist (`isLive`), danach die Linien **ohne**
+ * `isLive`. Der Effekt ist nach `loaded` schon abgeräumt (`attempt` wird 0), die Linien kommen später; geschützt
+ * wird allein über den Reducer (nur „bereit“, gleicher Versuch).
+ */
+export function deliverLoad(
+  load: TransitLoad<TransitLogic>,
+  ctx: {
+    attempt: number;
+    retry: boolean;
+    isLive: () => boolean;
+    dispatch: (action: TransitAction) => void;
+    reload: () => void;
+  },
+): void {
+  if (!ctx.isLive()) return;
+  if (reloadAfterRetry(ctx.retry, load)) {
+    ctx.reload();
+    return;
+  }
+  const { logic, file } = load;
+  const { attempt, dispatch } = ctx;
+  if (!logic || !file) {
+    dispatch({ type: "failed", attempt });
+    return;
+  }
+  dispatch({ type: "loaded", attempt, file, logic });
+  void load.lines.then((lines) => {
+    if (lines) dispatch({ type: "lines", attempt, lines });
+  });
+}
+
+/**
+ * Dekodierte Tabelle zu den Orten der Seite: `undefined`, solange Tabelle, Logik oder Orte fehlen; `null`, wenn
+ * sie nicht passt (alte `wegzeit.json` aus dem HTTP-Cache, E8). `useTransit` meldet `null` dem Reducer als `stale`.
+ * Hängt nur an Datei und Logik, nicht am ganzen Zustand: Die Ankunft der Linien dekodiert die Tabelle nicht neu.
  */
 export function decodeFor(
-  state: TransitState,
+  file: TransitTableFile | undefined,
+  logic: TransitLogic | undefined,
   placeKeys: ReadonlySet<string> | undefined,
 ): TransitTable | null | undefined {
-  if (state.kind !== "bereit" || !placeKeys) return undefined;
-  return state.logic.decodeTransitTable(state.file, placeKeys) ?? null;
+  if (!file || !logic || !placeKeys) return undefined;
+  return logic.decodeTransitTable(file, placeKeys) ?? null;
+}
+
+/**
+ * Dekodierte Linien zur Tabelle (Plan 0012, E8/E9). `undefined` ohne Datei oder wenn sie nicht passt: Das ist kein
+ * `stale`, die Wegzeit bleibt, nur ohne Linien.
+ */
+export function decodeLinesFor(
+  lines: TransitLinesFile | undefined,
+  table: TransitTable | null | undefined,
+  logic: TransitLogic | undefined,
+): TransitLines | undefined {
+  if (!lines || !table || !logic) return undefined;
+  return logic.decodeTransitLines(lines, table);
 }
 
 /** Modus und Entfernung je Lage (E11). Je Startpunkt ist alles eine Art: Wegzeit oder Luftlinie. */
@@ -120,13 +193,14 @@ export function resolveReach(
   state: TransitState,
   table: TransitTable | null | undefined,
   origin: Origin | undefined,
+  lines?: TransitLines,
 ): { mode: ReachMode | undefined; reach: ReachFn | undefined } {
   if (!origin) return { mode: undefined, reach: undefined };
   if (state.kind === "fehler" || table === null) {
     return { mode: { kind: "luftlinie", reason: "fehler" }, reach: airlineReach(origin) };
   }
   if (state.kind !== "bereit" || !table) return { mode: { kind: "laedt" }, reach: undefined };
-  const reach = state.logic.transitReach(table, origin);
+  const reach = state.logic.transitReach(table, origin, lines);
   return reach
     ? { mode: { kind: "oepnv" }, reach }
     : { mode: { kind: "luftlinie", reason: "ausserhalb" }, reach: airlineReach(origin) };
@@ -172,27 +246,27 @@ export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<st
     let live = true;
     // Rechenlogik und Tabelle parallel, ein Zeitlimit für beide. Ab dem zweiten Versuch ohne HTTP-Cache; scheitert
     // bei „Nochmal laden“ nur der Chunk, lädt die Seite neu (N1).
-    void loadTransit(loadLogic, attempt > 1).then((load) => {
-      if (!live) return;
-      if (reloadAfterRetry(retry, load)) {
-        window.location.reload();
-        return;
-      }
-      const { logic, file } = load;
-      dispatch(logic && file ? { type: "loaded", attempt, file, logic } : { type: "failed", attempt });
-    });
+    // Die Linien kommen danach, auch wenn der Effekt dann schon abgeräumt ist (deliverLoad, Plan 0012, E9).
+    void loadTransit(loadLogic, attempt > 1).then((load) =>
+      deliverLoad(load, { attempt, retry, isLive: () => live, dispatch, reload: () => window.location.reload() }),
+    );
     return () => {
       live = false;
     };
   }, [attempt, retry]);
 
-  const table = useMemo(() => decodeFor(state, placeKeys), [state, placeKeys]);
+  const ready = state.kind === "bereit" ? state : undefined;
+  const file = ready?.file;
+  const logic = ready?.logic;
+  const linesFile = ready?.lines;
+  const table = useMemo(() => decodeFor(file, logic, placeKeys), [file, logic, placeKeys]);
+  const lines = useMemo(() => decodeLinesFor(linesFile, table, logic), [linesFile, table, logic]);
   // Passt die Tabelle nicht, führt der Reducer das als Fehler; die Anzeige fällt schon jetzt zurück (resolveReach).
   const loadedAttempt = state.attempt;
   useEffect(() => {
     if (table === null) dispatch({ type: "stale", attempt: loadedAttempt });
   }, [table, loadedAttempt]);
-  const { mode, reach } = useMemo(() => resolveReach(state, table, origin), [state, table, origin]);
+  const { mode, reach } = useMemo(() => resolveReach(state, table, origin, lines), [state, table, origin, lines]);
   const want = useCallback(() => dispatch({ type: "want" }), []);
   const retryNow = useCallback(() => dispatch({ type: "want", retry: true }), []);
   const refresh = useCallback(() => dispatch({ type: "refresh" }), []);

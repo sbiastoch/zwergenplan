@@ -16,7 +16,6 @@ import {
   dayDots,
   longDate,
   plural,
-  reachLong,
   registrationLabel,
   registrationNote,
   sessionDay,
@@ -26,6 +25,7 @@ import {
 } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
 import { DistPending, HeartButton } from "./OfferCard.tsx";
+import { ReachLong } from "./ReachLong.tsx";
 
 interface DetailProps {
   offer: SiteOffer;
@@ -107,7 +107,7 @@ export function DetailContent({
               <span className="cap">Wo</span>
               <b>{offer.venue.name}</b>
               <span>{[offer.venue.address, offer.venue.district].filter(Boolean).join(" · ")}</span>
-              {origin && reach ? <span>{reachLong(reach, origin)}</span> : reachPending && <DistPending />}
+              {origin && reach ? <ReachLong reach={reach} origin={origin} /> : reachPending && <DistPending />}
             </div>
             <div className="label">
               <span className="cap">Alter</span>

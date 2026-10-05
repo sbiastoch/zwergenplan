@@ -112,6 +112,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 ## Konsequenzen
 
 - **Budget:** `.size-limit.json` setzt `JS (initial)` auf 92 kB. Das Ziel nach Plan 0010 ist ≤ 91,0 kB (1 kB Reserve). Das Eintrittsziel von 87,7 kB entfällt.
+  - **Stand nach Plan 0012 (2026-10-05, size-limit):** 91,28 kB (vorher auf `main` 90,9 kB). Erst 91,42 kB; gesenkt um 0,14 kB, indem die Erklärung im Quellenhinweis aus `format.ts` in den Wegzeit-Chunk zog (`TRANSIT_RULE`) und Tabelle und Linien einen Abruf-Helfer teilen. Übrig bleiben Anzeige (`ReachLong.tsx`), Laden und Zustellen der Linien (`src/data/transit.ts`, `use-transit.ts`). Das Ziel ≤ 91,0 kB ist um 0,28 kB überschritten, **Restreserve zum Budget 0,72 kB**. Das Budget bleibt 92 kB.
 - **Workaround:** `vite.config.ts` bekommt die Gruppe `$initial` mit Kommentar und Verweis auf #11026, in einem eigenen Commit vor „Schnittstellen“.
   - **Kanarienvogel:** Ohne die Gruppe muss der realistische Stub den Wächter rot machen.
 - **Plan 0010:**
@@ -126,3 +127,9 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
   - „Preact/compat (−60,5 kB gemessen, Befunde siehe ADR 0012)“.
 - **ADR 0001** bleibt unverändert, der Stack bleibt React 19.
 - **ADR 0008** nennt beim Startbudget noch 90 kB. Die Zahl ist durch dieses ADR ersetzt (92 kB); ADR 0008 selbst bleibt unverändert.
+
+## Nachtrag (2026-10-05): Stand nach Plan 0011, Stufe 1, und Plan 0012
+
+- Gemessen nach dem Merge von Plan 0012 (Linien, `main` 61de0da: 91,28 kB) in Plan 0011, Stufe 1 (PWA): **`JS (initial)` 91,72 kB** von 92 kB. Die Anteile addieren sich (0012 +0,38 kB, 0011 +0,44 kB gegenüber 90,90 kB vor beiden).
+- Rest 0,28 kB. Das Budget bleibt bei 92 kB. Wie Stufe 2 von Plan 0011 (≈ 0,10 kB geschätzt) und spätere Pläne hineinpassen, entscheidet Plan 0011 vor Schritt 9; die Kandidaten zum Auslagern stehen dort und hier unter „Optionen“ (d) bzw. in `docs/ideas.md`.
+

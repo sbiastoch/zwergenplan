@@ -161,7 +161,7 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
 | 2 | `ics/**` (auch als Navigation, die Links im Detail sind einfache `<a href>`, `DetailDialog.tsx`) | Netz. Offline bzw. bei Netzfehler: Antwort **204** (die Seite bleibt stehen) und `postMessage({ type: "ics-offline" })` an den Client, `src/data/pwa.ts` meldet das der App, Toast „Kalender-Datei braucht Netz“ | Die iOS-App hat keinen Zurück-Knopf; eine Fehlerseite wäre eine Sackgasse |
 | 3 | `assets/**` (gehasht, unveränderlich) | Cache zuerst, sonst Netz und in `zp-assets` ablegen | Unveränderlich. Lazy-Chunks landen beim ersten Laden im Cache, werden aber nicht vorab geladen |
 | 4 | `data/site.json` | Netz zuerst (`cache: "no-cache"`); gibt es eine Kopie in `zp-data`, nach **5 s** (Funkloch) oder bei Netzfehler die Kopie | Frische Daten. Den Frühstart-Request aus `index.html` sieht der Service Worker ebenfalls |
-| 5 | `data/wegzeit.json` | Netz zuerst, offline der Cache | Wie `site.json`. Das 8-s-Zeitlimit in `src/data/transit.ts` bleibt maßgeblich |
+| 5 | `data/wegzeit.json`, `data/linien.json` (Plan 0012) | Netz zuerst, offline der Cache | Wie `site.json`. Das 8-s-Zeitlimit in `src/data/transit.ts` bleibt maßgeblich (die Linien haben ein eigenes) |
 | 6 | Navigation auf die App (`./`, `./index.html`, jeweils mit beliebiger Query) | **Navigation Preload** an; Netz zuerst (Preload-Antwort), nach **3 s** oder offline die vorgehaltene `index.html`. Beim Ausweichen `event.waitUntil(event.preloadResponse)`, sonst warnt die Konsole | Online immer die aktuelle Version, ohne den Start des Service Workers in den LCP zu ziehen; offline die Schale |
 | 7 | alles andere vom eigenen Origin (`data/meta.json`, `sw.js`, `manifest.webmanifest`, Icons, andere Navigationen) | nur Netz (Service Worker greift nicht ein) | `meta.json` ist für CI; Manifest und Icons prüft der Browser selbst |
 
@@ -183,8 +183,8 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
 - Bei jedem Frische-Anlass:
   1. **Zuerst `registration.update()`.** Wird dabei ein neuer Service Worker aktiv (`controllerchange`), lädt die Seite neu (`location.reload()`). Das passiert nur hier, beim Zurückkehren zur App, nie mitten in einer Bedienung. So laufen Code und Daten nie in verschiedenen Ständen, etwa nach einer Schemaänderung.
   2. Sonst lädt `App` `site.json` neu (gleicher Lade-Weg, gleicher Request für alle) und tauscht die Daten ohne Layoutsprung aus.
-  3. War die Wegzeit-Tabelle geladen, lädt `useTransit` sie **mit** neu, sonst würden neue Orte die Wegzeit bis zum Neustart auf die Luftlinie zurückwerfen (`App.tsx`, Prüfung auf neue Orte). Das ist eine Ausnahme von „höchstens einmal je Sitzung“ (`use-transit.ts`). Der Request ist für alle gleich und hängt nicht vom Startpunkt ab (ADR 0011). Festgehalten in `docs/architecture.md` (Absatz Wegzeit) und ADR 0013.
-- Schwelle und Ablauf werden als Konstanten gesetzt und per Unit-Test mit Fake-Timern geprüft. E2E: Nach einem Frische-Anlass mit gesetztem Stadtteil bleibt die Wegzeit erhalten, und es gibt genau einen weiteren Request auf `wegzeit.json`.
+  3. War die Wegzeit-Tabelle geladen, lädt `useTransit` sie **mit** neu (und damit `linien.json`, Plan 0012, E9; alte Linien verwirft die Kennung `id`/`table`), sonst würden neue Orte die Wegzeit bis zum Neustart auf die Luftlinie zurückwerfen (`App.tsx`, Prüfung auf neue Orte). Das ist eine Ausnahme von „höchstens einmal je Sitzung“ (`use-transit.ts`). Der Request ist für alle gleich und hängt nicht vom Startpunkt ab (ADR 0011). Festgehalten in `docs/architecture.md` (Absatz Wegzeit) und ADR 0013.
+- Schwelle und Ablauf werden als Konstanten gesetzt und per Unit-Test mit Fake-Timern geprüft. E2E: Nach einem Frische-Anlass mit gesetztem Stadtteil bleibt die Wegzeit erhalten, und es gibt genau einen weiteren Request auf `wegzeit.json` und genau einen weiteren auf `linien.json` (Plan 0012).
 
 ### E5 – Start-Bundle: fast nichts, alles andere lazy (Entscheidungspunkt)
 
@@ -584,8 +584,8 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 **Stufe 2** (erst nach Abnahme von Stufe 1 und Spike)
 
 **Vorab, vor Schritt 9: Start-Budget für Stufe 2 entscheiden** (verschoben aus E5, Arch-Review Stufe 1, H12).
-- Ausgangslage: Stufe 1 endet bei 91,34 kB (Ziel 91,40 kB, Budget 92 kB). Plan 0012 bringt parallel etwa +0,5 kB Start-JS mit; zusammen rund 91,9 kB.
-- Stufe 2 schätzt ≈ 0,10 kB im Start (Flag `neu`, Platzhalter `NewsBlock`, „Push an?“). Das passt nicht ohne Gegenmaßnahme.
+- Ausgangslage: Stufe 1 allein 91,34 kB. **Gemessen nach dem Merge mit Plan 0012 (`main` 61de0da, 91,28 kB): 91,72 kB** von 92 kB, also 0,28 kB Rest (Plan 0012 +0,38 kB, Plan 0011 +0,44 kB gegenüber X; die Anteile addieren sich).
+- Stufe 2 schätzt ≈ 0,10 kB im Start (Flag `neu`, Platzhalter `NewsBlock`, „Push an?“). Das passt rechnerisch, ließe aber nur ≈ 0,18 kB für alles Weitere bis zum Budget.
 - Zu entscheiden (Rückfrage an den Nutzer, kein Anheben ohne ADR): welche Start-Funktion lazy wird. Kandidaten aus E5: der Platzhalter von `NewsBlock` (Liste hält bei `neu` zurück wie `ListPending`); weitere nach Messung auf dem dann aktuellen `main`.
 
 7. **Infrastruktur** (Nutzer-Schritte, Anleitung hier):
@@ -722,6 +722,16 @@ Alle Befunde übernommen außer Finding 4 und der Zusammenführung mit Plan 0012
   - Die Budget-Entscheidung für Stufe 2 steht jetzt vor Schritt 9 (siehe „Schritte“).
 - Gates nach dem Review: `pnpm check:fast` grün, `pnpm size` grün (Chunk-Wächter, `JS (initial)` 91,34 kB, `App-Extras JS (lazy)` 2,48 kB, `Service Worker` 1,54 kB). Gezielt gelaufen: Chromium `pwa`, `mobile-ux`, `startpunkt`, `theme` (651 grün), `installieren` 3 × mit 6 Workern (159 grün), WebKit `installieren` und `mobile-ux`-Kind-Sheet (144 grün), Smoke „mit Service Worker“ grün.
 
+## Merge mit Plan 0012 (2026-10-05)
+
+`origin/main` 61de0da (Plan 0012 „Linien“ und der Font-Swap-Fix aus Plan 0013) per Merge-Commit nach `pwa-0011` geholt.
+
+- **Konflikte:** nur drei. Die Imports in `e2e/karte.spec.ts` und `e2e/startpunkt.spec.ts`: `startPreloads` statt `exportPreload`, dazu `expectTwoLines`/`twoLinesEverywhere` aus 0012. Und der Reducer in `src/ui/use-transit.ts`: `bereit` trägt jetzt `lines?` **und** `refresh?`, die Aktionen `lines` und `refresh`. Alles andere (Doku, ADR 0013, `.size-limit.json`, `fixtures.ts`, `smoke.spec.ts`, `mobile-ux.spec.ts`) ließ sich ohne Konflikt zusammenführen. Die Doku-Stellen zu `wegzeit.json` und `linien.json` folgen der Fassung aus 0012 und sind um 0011 ergänzt.
+- **Service Worker:** Regel 5 heißt jetzt `oepnv` und gilt für `TRANSIT_FILES` (`data/wegzeit.json`, `data/linien.json`), auch mit Query; Reihenfolge in `routes.test.ts` angepasst. `linien.json` kommt **nicht** in den Precache (lädt nur auf Anlass), sondern wie die Tabelle in den Laufzeit-Cache `zp-data`.
+- **Reducer (Arch-Review, Finding 4):** `failed` beim Neuladen behält Tabelle **und** Linien (`{ ...rest, attempt }` ohne `refresh`, wegen `exactOptionalPropertyTypes`). Der Effekt nutzt `deliverLoad` aus 0012. Neue Tests (test-first, `failed` war vorher rot): `refresh` → `lines` mit altem Versuch wird ignoriert; `refresh` → `failed` behält Tabelle und Linien; `refresh` → `loaded` → `lines` des neuen Versuchs wird übernommen.
+- **E2E:** Der Frische-Test wartet auch auf `linien.json` und zählt genau einen weiteren Request je Datei. Offline-Test (a) prüft zusätzlich die Linie im Detail („ca. 15 Min. mit Tram 1 ab Gostenhof“) aus `zp-data`. **Kanarienvogel:** ohne die Erweiterung in `routes.ts` rot, zuerst schon bei „`linien.json` über den Service Worker“; ohne diese Zwischenprüfung fehlt offline „mit Tram 1“ im Detail.
+- **Start-JS gemeinsam:** 91,72 kB (Budget 92 kB, nicht angehoben). Eingetragen auch in ADR 0012.
+
 ## Akzeptanzkriterien
 
 - **Stufe 1:**
@@ -744,7 +754,7 @@ Alle Befunde übernommen außer Finding 4 und der Zusammenführung mit Plan 0012
 - **Geänderte IDs zählen als neu** (E9). → Hinnehmbar. Gibt es auffällig viele, prüft die Pipeline Titeländerungen (eigener Plan).
 - **Pages-Cache:** `site.json` ist bis zu 10 Min. gecacht. → `notify` wartet auf den neuen Commit in `meta.json`, der Service Worker lädt mit `no-cache`.
 - **Ein Service Worker kann einen alten Stand festhalten.** → Netz zuerst für Navigation und Daten, `cache: "reload"` im Precache, E4a. Notausgang im README: ein Deploy mit `sw.js`, der sich selbst abmeldet.
-- **Start-JS-Budget** (E5): kaum Luft. → Lazy-Kette, Entscheidungspunkt, kein Anheben.
+- **Start-JS-Budget** (E5): kaum Luft. Seit Plan 0012 liegt das Start-JS bei 91,28 kB, 0,72 kB unter dem Budget von 92 kB und 0,28 kB über dem Ziel 91,0 kB aus ADR 0012. → Lazy-Kette, Entscheidungspunkt, kein Anheben.
 - **Missbrauch des Abo-Endpunkts** (Spam-Abos). → Allowlist der Push-Dienste, Größen- und Mengengrenze, Rate-Limit je IP. Die Origin-Prüfung hält nur fremde Webseiten ab, keine Skripte. Im schlimmsten Fall ist die Grenze von 500 voll. Dann `wrangler kv` leeren und neu einladen.
 - **Kosten:** Cloudflare Workers und KV im Gratis-Tarif (100 000 Requests/Tag, 1 000 Schreibvorgänge/Tag) reichen für Familie und Freunde um Größenordnungen.
 

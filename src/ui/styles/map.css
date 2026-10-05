@@ -139,7 +139,8 @@
     color: var(--muted);
     overflow-wrap: anywhere;
   }
-  .place-where span {
+  /* nur direkte Kinder: die Spans im Inneren von ReachLong (Pfeil, „, dann“) bleiben inline (Plan 0012, E10) */
+  .place-where > span {
     display: block;
     font-weight: 700;
     color: var(--ink);
