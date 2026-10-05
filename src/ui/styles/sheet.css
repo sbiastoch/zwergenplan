@@ -213,7 +213,7 @@
   @media (max-height: 500px) and (min-width: 40rem) {
     .toast {
       /* = padding-left von body */
-      --rail: calc(env(safe-area-inset-left) + 7.5rem);
+      --rail: calc(env(safe-area-inset-left) + 8rem);
       left: calc(var(--rail) + (100vw - var(--rail) - env(safe-area-inset-right)) / 2);
       width: min(26rem, 100vw - var(--rail) - env(safe-area-inset-right) - 32px);
       bottom: calc(16px + env(safe-area-inset-bottom));

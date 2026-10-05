@@ -137,6 +137,22 @@ module.exports = {
       to: { path: "^src/ui/anbieter/" },
     },
     {
+      name: "directory-only-lazy",
+      severity: "error",
+      comment:
+        "Die Logik der Anbieterliste src/domain/directory.ts gehört in den Lazy-Chunk assets/anbieter/ (Plan 0010, E7, M5): nur src/ui/anbieter/ und ihr Test importieren sie, auch Typen nicht von außen (die stehen in src/ui/provider-types.ts bzw. src/domain/site-data.ts). Die Statuszeile zählt im Start mit src/domain/provider-count.ts.",
+      from: { path: "^src/", pathNot: ["^src/ui/anbieter/", "^src/domain/directory\\.(test\\.)?ts$"] },
+      to: { path: "^src/domain/directory\\.ts$" },
+    },
+    {
+      name: "lazy-domain-apart",
+      severity: "error",
+      comment:
+        "Anbieter- und Karten-Chunk teilen kein Domänenmodul, das nur sie nutzen (Plan 0010, E7, M5): Rolldown legte es als eigenen Chunk direkt nach assets/, und es zählte ins Startbudget (Chunk-Wächter). Die Anbieterübersicht nutzt deshalb keine Karten-Module (places.ts, camera.ts). Die Gegenrichtung (Karte → directory.ts) verbietet schon directory-only-lazy.",
+      from: { path: "^src/(ui/anbieter/|domain/directory\\.ts$)" },
+      to: { path: "^src/domain/(places|camera)\\.ts$" },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",

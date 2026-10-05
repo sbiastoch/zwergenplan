@@ -1,4 +1,4 @@
-/* Washi-Tape-Tab-Leiste (Chrome.tsx). */
+/* Washi-Tape-Tab-Leiste (Chrome.tsx), vier Tabs (Plan 0010, E2). */
 
 @layer components {
   /* Washi-Tape-Tab-Leiste */
@@ -10,8 +10,11 @@
     width: calc(min(40rem, 100vw - env(safe-area-inset-left) - env(safe-area-inset-right)) - 16px);
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding: 6px 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    /* Rand innen: 6 px bei 320 px, ab 480 px 10 px. Bei 320 px bleibt so jede Spalte 73 px breit (E2). Der Daumen
+       rechnet mit demselben Wert. */
+    --tabs-pad: clamp(4px, 2.5vw - 2px, 10px);
+    padding: 6px var(--tabs-pad);
     background-color: var(--tape);
     background-image: repeating-linear-gradient(-45deg, var(--tape-stripe) 0 6px, transparent 6px 14px);
     color: var(--on-tape);
@@ -42,8 +45,8 @@
     position: absolute;
     top: 6px;
     bottom: 6px;
-    left: 10px;
-    width: calc((100% - 20px) / 3);
+    left: var(--tabs-pad);
+    width: calc((100% - 2 * var(--tabs-pad)) / 4);
     /* folgt der Wahl über --i (Chrome.tsx: at-N), unten waagrecht, an der Seite senkrecht */
     transform: translateX(calc(var(--i, 0) * 100%));
     transition: transform 0.42s cubic-bezier(0.3, 1.45, 0.5, 1);
@@ -54,10 +57,14 @@
   .tab-thumb.at-2 {
     --i: 2;
   }
+  .tab-thumb.at-3 {
+    --i: 3;
+  }
   .tab-thumb::before {
     content: "";
     position: absolute;
-    inset: 0 clamp(2px, 3.5vw - 6px, 14px);
+    /* bei 320 px 2 px Einzug: Die Pille bleibt ≥ 67 px breit, breiter als das aktive Label (E2) */
+    inset: 0 clamp(2px, 2.5vw - 6px, 10px);
     border-radius: 20px;
     background: var(--surface);
     border: 2px solid var(--line);
@@ -65,23 +72,30 @@
     transform: rotate(-3deg);
   }
   .tab {
-    /* Jeder Tab ist Container: Ist die eigene Spalte schmaler als das längste Label (≈ 4,4 rem), zeigt er nur das
-       Icon (B7, große Schrift). Der Name bleibt für Screenreader im DOM. */
+    /* Jeder Tab ist Container: Ist die eigene Spalte schmaler als das längste Label (≈ 4,06 rem bei 12 px), zeigt er
+       nur das Icon (B7, große Schrift). Der Name bleibt für Screenreader im DOM. */
     container-type: inline-size;
     position: relative;
     z-index: 1;
     min-height: 56px;
     border: 0;
     background: none;
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    /* Grid statt Spalten-Flex: Die Container-Query kann den Tab selbst nicht umstellen, nur seine Kinder. Über die
+       Zeile je Kind wechseln Icon, Label und Badge zwischen „untereinander“ und „nebeneinander“ (E2). */
+    display: grid;
+    grid-auto-flow: column;
     justify-content: center;
-    gap: 2px;
+    align-content: center;
+    align-items: center;
+    justify-items: center;
+    gap: 2px 4px;
     padding: 0;
     color: inherit;
+  }
+  .tab .ic {
+    grid-row: 1;
   }
   .tab[aria-current="page"] {
     color: var(--ink);
@@ -99,9 +113,11 @@
     left: calc(50% + 8px);
   }
   .tab-label {
+    grid-row: 2;
     white-space: nowrap;
   }
-  @container (width < 4.6rem) {
+  /* Schwelle: längstes Label (4,06 rem) plus 0,2 rem Reserve, in rem, damit sie mit der Schrift wandert */
+  @container (width < 4.25rem) {
     .tab-label {
       /* wie sr-only */
       position: absolute;
@@ -113,6 +129,12 @@
       clip-path: inset(50%);
       white-space: nowrap;
     }
+    /* Nur Icons: Das Badge steht im Fluss rechts neben dem Icon (24 + 4 + 41 ≤ 73 px bei 200 %). Absolut neben der
+       Mitte ragte ein zweistelliges Badge aus der Spalte (E2, Review 2 M4). */
+    .tab .badge {
+      position: static;
+      grid-row: 1;
+    }
   }
 
   /* Querformat (H1, Plan 0007, E14): Bei geringer Höhe wird die Leiste zur Seitenleiste links neben der Spalte
@@ -121,7 +143,7 @@
   @media (max-height: 500px) and (min-width: 40rem) {
     body {
       /* Breite der Leiste + Abstände; die Spalte .app zentriert sich im Rest */
-      padding-left: calc(env(safe-area-inset-left) + 7.5rem);
+      padding-left: calc(env(safe-area-inset-left) + 8rem);
     }
     .app {
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
@@ -130,7 +152,8 @@
       left: calc(env(safe-area-inset-left) + 8px);
       top: 50%;
       bottom: auto;
-      width: 6.5rem;
+      /* 7 rem: innen 100 px für „Merkliste“ + 2 px + zweistelliges Badge (E2) */
+      width: 7rem;
       grid-template-columns: minmax(0, 1fr);
       padding: 10px 6px;
       background-image: repeating-linear-gradient(45deg, var(--tape-stripe) 0 6px, transparent 6px 14px);
@@ -161,15 +184,26 @@
       bottom: auto;
       left: 6px;
       width: calc(100% - 12px);
-      height: calc((100% - 20px) / 3);
+      height: calc((100% - 20px) / 4);
       transform: translateY(calc(var(--i, 0) * 100%));
     }
     .tab-thumb::before {
       inset: 2px 4px;
     }
-    /* gleich hohe Zeilen, auch wenn das Badge unter „Merkliste“ steht: Der Daumen (ein Drittel) bleibt auf dem Tab */
+    /* gleich hohe Zeilen: Der Daumen (ein Viertel) bleibt auf dem Tab */
     .tabs {
       grid-auto-rows: 1fr;
+    }
+    /* Icon über Label und Badge, die sich die zweite Zeile teilen (E2): vier Zeilen passen so auch bei 200 % in
+       360 px Höhe. Ohne Badge bleibt die zweite Spalte leer. */
+    .tab {
+      column-gap: 2px;
+    }
+    .tab .ic {
+      grid-column: span 2;
+    }
+    .tab .badge {
+      grid-row: 2;
     }
   }
 
@@ -178,26 +212,34 @@
   @media (max-height: 500px) and (max-width: 39.99rem) {
     .tabs {
       bottom: calc(6px + env(safe-area-inset-bottom));
-      padding: 3px 10px;
+      padding: 3px var(--tabs-pad);
     }
     .tab-thumb {
       top: 3px;
       bottom: 3px;
     }
+    /* Die Karte fast so breit wie die Spalte (133 px bei 568 px): Herz, „Merkliste“ und ein dreistelliges Badge
+       passen darauf (W1, Plan 0008; Plan 0010, E2). */
+    .tab-thumb::before {
+      inset: 0 2px;
+    }
     .tab {
       min-height: 44px;
-      flex-direction: row;
       gap: 6px;
+    }
+    /* Icon, Label und Badge in einer Zeile */
+    .tab-label,
+    .tab .badge {
+      grid-row: 1;
     }
     .app {
       padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
     }
-    /* Herz, Label und Badge stehen hier nebeneinander. Ab etwa 125 % Text sind sie mit Badge breiter als die
-       Tab-Karte (568 px: Spalte 178 px, Karte 150 px, Inhalt bis 208 px bei 200 %; W1, Browser-Review live zu
-       Plan 0008). Dann bleiben Herz und Zähler, der Name nur für Screenreader (wie B7). 9,5 rem: bei 100 % zeigt
-       jede kompakte Leiste das Label (≥ 178 px Spalte), ab 150 % keine. */
-    @container (width < 9.5rem) {
-      .tab:has(.badge) .tab-label {
+    /* Herz, Label und Badge stehen hier nebeneinander. Eigene Schwelle (E2, Review 2 M2): Label plus Icon, zwei
+       Abstände und Badge (60 px = 24 + 2 · 6 + 22 + 2). Bei 568 px (Spalte 133 px) mit Labels nur bei 100 %, ab
+       125 % nur Herz und Zähler, der Name nur für Screenreader (wie B7). */
+    @container (width < calc(4.25rem + 60px)) {
+      .tab-label {
         position: absolute;
         width: 1px;
         height: 1px;
