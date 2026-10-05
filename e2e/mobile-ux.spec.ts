@@ -135,14 +135,24 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByText("„bis 45 Min.“ braucht einen Startpunkt.")).toBeVisible();
     await expect(page.getByTestId("offer").first()).toBeVisible();
   },
-  // Plan 0012, E4: längste Folge der Fixture „Tram 1 → Bus 202E“. Echt hat sie nur die Gemeinde ab Gostenhof; deren
-  // Detail bricht aber unabhängig davon „Geschwisterkinder“ im Preis (Befund im Plan, „Umsetzung“). Deshalb das
-  // Detail des Beispielhofs mit umgeschriebener Linien-Datei (fixtures.ts), gleicher Text der Linien.
+  // Plan 0012, E4: längste Folge der Fixture „Tram 1 → Bus 202E“ (Gemeinde ab Gostenhof, 23,6 → „ca. 25 Min.“), mit
+  // dem längsten Ortsnamen und dem längsten Preis („… Geschwisterkinder ermäßigt“ in der halben Label-Spalte,
+  // Arch-Review 0012, Befund 3)
   "detail-wegzeit": async (page) => {
-    await twoLinesEverywhere(page);
     await withGostenhof(page);
-    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    await page
+      .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
+      .getByRole("button")
+      .click();
     await expect(page.getByRole("dialog").locator(".reach-long")).toContainText("Bus\u00a0202E");
+  },
+  // dasselbe Detail ohne Startpunkt (Arch-Review 0012, Befund 3): Preis in der halben Spalte
+  "detail-gemeinde": async (page) => {
+    await page
+      .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
+      .getByRole("button")
+      .click();
+    await expect(page.getByRole("dialog").getByText(/Geschwisterkinder ermäßigt/)).toBeVisible();
   },
   // Tabelle blockiert (E11): Luftlinie, längste Statuszeile und Hinweis mit „Nochmal laden“
   "entdecken-wegzeit-rueckfall": async (page) => {
@@ -155,8 +165,10 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   },
   // Tabelle zurückgehalten (M7): Platzhalter-Block statt ungefilterter Liste, Statuszeile unsichtbar (Arch-Review
   // 0009, Befund 5). Das Zeitlimit des Ladens (8 s, `TRANSIT_TIMEOUT_MS`) darf während der Prüfungen nicht ablaufen.
-  // Die Uhr anzuhalten geht nicht, axe braucht laufende Timer; deshalb fällt nur der eine 8-s-Timer weg (in src
-  // gibt es keinen zweiten).
+  // Die Uhr anzuhalten geht nicht, axe braucht laufende Timer; deshalb fallen die 8-s-Timer weg. Seit Plan 0012
+  // nutzt auch das Laden der Linien (`loadLines`) `TRANSIT_TIMEOUT_MS`; hier trifft der Hack aber nur den Timer der
+  // Tabelle, denn die Linien werden erst nach der Antwort von wegzeit.json angefordert, und die hält diese Ansicht
+  // zurück. Sonst gibt es in src keinen 8-s-Timer.
   "entdecken-wegzeit-laedt": async (page) => {
     await page.addInitScript(() => {
       const original = window.setTimeout.bind(window);

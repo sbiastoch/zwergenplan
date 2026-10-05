@@ -15,7 +15,7 @@ export function ReachLong({ reach, origin }: { reach: Reach; origin: Origin }) {
       {first}
       {second !== undefined && (
         <>
-          <span aria-hidden="true">{" → "}</span>
+          <span aria-hidden="true">{"\u00a0→ "}</span>
           <span className="sr-only">, dann </span>
           {second}
         </>

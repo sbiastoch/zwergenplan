@@ -13,7 +13,7 @@ export const LINES_FIT_SHARE = 0.25;
 /** Bytewerte 1–254 je Ebene; 0 = keine Linie, 255 bleibt frei (E7) */
 const MAX_LINES = 254;
 
-const NBSP = " ";
+const NBSP = "\u00a0";
 
 /**
  * Anzeigename (E1): „Tram 4“, „Bus 36“, „U1“, „S2“, „RB 11“. Leerzeichen werden zu U+00A0, damit Art und Nummer

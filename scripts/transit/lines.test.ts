@@ -11,7 +11,7 @@ import {
   lineLabel,
 } from "./lines.ts";
 
-const NB = " ";
+const NB = "\u00a0";
 
 describe("lineLabel (L1)", () => {
   it("nennt Tram und Bus mit Art, U-Bahn und Bahn nur mit Namen", () => {
