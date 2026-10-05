@@ -789,3 +789,11 @@ Zusätzlich zur Kenntnis: 27 Paare (1,1 %) verlieren ihre Linien durch die Passu
 - Kanarienvogel E1/W3: `.place-where span` statt `.place-where > span` → „Linie davor und Pfeil in einer Zeile“ rot.
 
 **Doku:** `docs/architecture.md` (Datenfluss, Absatz Wegzeit, Invariante), README (Lizenzabsatz), `docs/ideas.md` (Linien auf der Kachel, VGN-Auskunft, Piktogramme, Profil „ohne Kinderwagen“, „zu Fuß vom Halt“ als „zu Fuß“), Plan 0011 (E4 Zeile 5, E4a Punkt 3), ADR 0013 (Punkt 3 und 7), ADR 0015 „angenommen“ mit den gemessenen Werten, Verweis oben in ADR 0011.
+
+### Stand `pnpm check` (2026-10-05, lokal, `PW_PORT=4273`)
+
+- `check:fast`, knip, `schema:check`, Unit-Tests mit Coverage (771 Tests, alle Dateien 98,5 % Zeilen, 92,8 % Zweige) grün; `pnpm size` grün (Werte siehe Schritt 3 und 6).
+- E2E: 1 554 bestanden, 3 rot, alle außerhalb dieses Plans und lastabhängig. Die Maschine lief mit Lastmittel 50–78 auf 16 Kernen (parallele Sessions).
+  - `perf.spec.ts` „LCP und CLS bleiben im Budget“ (Startseite ohne Wegzeit): LCP 2,4–4,1 s statt < 2,5 s. Gegenprobe mit `origin/main` (temporärer Export, gleicher Lauf direkt danach): ebenfalls rot (2,4–3,9 s); umgekehrt war dieser Branch in einem ruhigeren Moment grün (1,5–2,0 s). Kein Bezug zu den Linien: Die Startseite lädt weder Tabelle noch Linien.
+  - `layout.spec.ts:471` (iPhone 15, Badge quer) und im ersten Lauf zwei Karten-Tests auf iPhone 15: Zeitüberschreitung, einzeln wiederholt grün.
+- Im ersten Lauf rot und behoben: `anbieter.spec.ts` „mit offenem Tab einen Startpunkt wählen“ zählte die nachgelagerte Linien-Anfrage mit; der Test wartet jetzt auch auf `linien.json` (E3).
