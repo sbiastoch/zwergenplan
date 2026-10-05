@@ -1,6 +1,6 @@
 # Plan 0010 – Anbieterübersicht
 
-Status: umgesetzt und zusammengeführt (2026-10-05, Branch `anbieter-0010-int`) → CI, `main`, Browser-Review live
+Status: live seit `27b7b3b` (2026-10-05), Browser-Review live bestanden; offen: Geräteprüfung am echten iPhone/Android
 Datum: 2026-10-05
 Bezug: `docs/ideas.md` („Anbieterverzeichnis auf der Website, ersetzt das frühere `ANBIETER.md`“), Plan 0004 (Startpunkt, `reachOf`), Plan 0005 (Ladekette der Karte, Orts-Liste und Orts-Sheet als Vorbild), Plan 0007 (Text-Gate, Tab-Leiste quer als Seitenleiste, E14), Plan 0008 (Feinschliff: Badge quer, `atPlace`, `retry`), **Plan 0009** (Öffi-Wegzeit, `ReachMode`, ADR 0011: kommt vor diesem Plan), ADR 0002 (Datenfluss), ADR 0003 (Themen → Kategorien), ADR 0006 (Katalog im Zod-Vertrag), ADR 0008 (Privatsphäre, Lazy-Budgets).
 
@@ -1095,3 +1095,51 @@ Keine Blocker.
 - **M2:** `?ansicht=anbieter` ist ohne Tab-Knopf, E2E und `expectMobileUx` erreichbar. → Der Zwischenstand geht nie allein nach `main` (Schritt 6).
 - **M3:** E6 (`ensureFresh` im Chunk) und E13/Schritt 4 (`directory.ts`-Stub) widersprachen der Umsetzung. → Nachgeführt.
 - **M4:** ADR 0012 nannte `Dialog` im Stub, ADR 0008 nennt noch 90 kB, „Fertig, wenn ≤ 87,7 kB“ stand unverändert. → Korrigiert bzw. als ersetzt markiert.
+
+## Browser-Review live (2026-10-05) – Verdict: bestanden, kein Blocker, Hinweise offen
+
+**Stand:** live `27b7b3b`, main-CI 37334514544 grün (Gates, E2E & Budgets, Deploy). Live liefert `index-ClX4lluz.js`, denselben Hash wie der lokale Build. Echte Daten: 74 Anbieter, 333 Angebote.
+
+Playwright gegen https://zwergenplan.app/, Chromium (Pixel 7) und WebKit (iPhone 15), `de-DE`, Europe/Berlin. Das Skript `e2e/.artifacts/review-0010.ts` ist ignoriert, es lief vorab gegen eine lokale Vorschau.
+
+**Schritt 10, je Engine:**
+- **Lazy und Requests:**
+  - Der Start lädt weder `anbieter.json` noch `assets/anbieter/`. Der Tab lädt beides genau einmal (`data/anbieter.json`, `anbieter/entry-*.js`), Wechsel und Rückkehr laden nichts mehr.
+  - Hosts: nur `zwergenplan.app`. Konsole: 0 Fehler.
+  - Statuszeile „64 Anbieter mit 333 Angeboten“; 64 aktive, 10 blasse Zeilen.
+- **Sortierung mit echtem Stadtteil (Gostenhof):** aufsteigend nach Minuten (5, 5, 5, 10 …). Vorn steht die FBS – Evangelische Familien-Bildungsstätte.
+- **Sheet des Spitzenreiters (FBS, 71 Angebote):**
+  - 71 Kacheln. Vom Klick bis zur ersten Kachel vergehen 128 ms (Chromium) bzw. 371 ms (WebKit), headless gemessen.
+  - Gescrollt, eine Kachel → Detail darüber, Zurück → Sheet offen, `scrollTop` unverändert (8 476 bzw. 8 231).
+  - „Website & Programm“ mit `target="_blank"`, `rel="noopener"`, nicht angeklickt. Keine fremden Hosts.
+- **Detail → „Mehr von diesem Anbieter“:** öffnet das Sheet, URL `?anbieter=<id>`.
+- **Tab-Leiste:** Bei 320, 360, 390 und 412 px (100 %) sind alle vier Labels sichtbar, bei 320 px / 200 % nur Icons.
+- **Gates mit echten Daten:**
+  - Text-Gate der Liste und des Sheets bei 320 px / 200 % grün;
+  - `expectMobileUx` des Sheets bei 412 px grün.
+- **Screenshots** (`scripts/screenshots.ts`, Ansichten `anbieter`, `anbieter-sheet`, `tabs`, je 100 und 200 %, 72 Bilder): als Kontaktbögen angesehen.
+  - Liste: lange Namen trennen sauber (`hyphens: auto`).
+  - Sheet: Kopf, Kategorie, Link, Ort mit Stadtteil, Kachel ohne Anbieternamen.
+  - Tab-Leiste: Badge in der eigenen Spalte, auch bei 200 %.
+  - Seitenleiste quer: vier Tabs, Badge neben „Merkliste“, auch bei 200 %.
+  - Hell und dunkel ohne helle Inseln.
+
+**Checkliste (Skill):**
+- **Lesbarkeit:** ok.
+  - Die Zeile nennt Name, „N Angebote · Stadtteil · Min.“; das Sheet beginnt mit Name und Kategorie.
+  - Bei 200 % nimmt ein langer Name im Sheet viel Höhe ein, er scrollt aber (E10, `h2` 1,375 rem).
+- **Daumen:** ok. Der Tab „Anbieter“ liegt unten, die Zeilen sind ganze Knöpfe ≥ 44 px, „Schließen“ steht im Fuß.
+- **Zustände:** ok.
+  - Laden, Fehler und leer sind per E2E und `mobile-ux` geprüft.
+  - Fehler im Sheet sind jetzt auch dunkel und bei 200 % geprüft (m5).
+  - Ohne `site.json` gibt es kein Sheet über der Fehlerseite (m3).
+- **Dunkel:** ok, keine hellen Inseln, blasse Zeilen gestrichelt in `--muted`.
+- **Micro-Interactions:** wie die Orts-Liste (`.place`). Die Rückkehr in den Tab kommt ohne Ladekasten aus (m4).
+- **Design-System:** Zeilen, Sheet-Hülle, Kacheln und Chips sind die bestehenden Bauteile. Neu ist nur das Icon `store`.
+
+**Hinweise (offen, kein Blocker):**
+- **H1 – Lücke unter dem Suchfeld:** Die Live-Region hält ohne Suchtext eine leere Zeile frei (`min-height: 1.4em`, gegen Sprung beim ersten Buchstaben). Zwischen Suchfeld und erster Zeile wirkt das wie eine Lücke, bei 200 % deutlicher (`anbieter-320-light-200`). Vorschlag: die Zählung in die Statuszeile oder neben das Label legen.
+- **H2 – Gerade Apostrophe in Namen:** „'Riesen & Zwerge'“ steht im Katalog mit `'` statt typografischer Anführungszeichen. Das ist eine Datenfrage für den nächsten Pipeline-Lauf (Skill `babyevents-nuernberg`), nicht für die UI.
+- **H3 – Detail-Knopf „Mehr von diesem Anbieter“** statt „Alle Angebote dieses Anbieters“ (Paket A, Text-Gate bei 320 px). Die Bestätigung des Nutzers steht aus.
+
+**Nicht prüfbar (Gerät):** Tab-Leiste und Lesbarkeit der 12-px-Labels an einem echten iPhone und Android; INP beim Öffnen des Sheets mit 71 Kacheln im Performance-Panel eines echten Telefons; Merklisten-Download nach dem `await` (ADR 0007, aus Paket 0).
