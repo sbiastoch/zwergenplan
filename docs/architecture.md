@@ -16,7 +16,7 @@ data/providers.yaml + data/offers.json   (Commit auf main per `pipeline publish`
                           │
               Vite-Build ► dist/ ► GitHub Pages zwergenplan.app
                           │
-            Browser: src/data lädt site.json per fetch ► src/domain ► src/ui
+            Browser: index.html startet den Abruf von site.json (Frühstart), src/data übernimmt ihn ► src/domain ► src/ui
 ```
 
 ## Schichten
@@ -24,7 +24,7 @@ data/providers.yaml + data/offers.json   (Commit auf main per `pipeline publish`
 | Ordner | Aufgabe | darf importieren |
 |---|---|---|
 | `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit, Geometrie und Entfernung (`geo`, `reach`, `districts`) | nur `src/domain`, `zod` (nur schema/dataset) |
-| `src/data/` | einziger Datenzugriff der App (fetch, localStorage, Geolocation) | `src/domain`: Typen, zur Laufzeit nur reine Hilfen ohne Zod, heute `geo` (ADR 0010, `data-domain-runtime-allowlist`) |
+| `src/data/` | einziger Datenzugriff der App (fetch, localStorage, Geolocation; Ausnahme: Bootstrap in `index.html`, siehe Regeln) | `src/domain`: Typen, zur Laufzeit nur reine Hilfen ohne Zod, heute `geo` (ADR 0010, `data-domain-runtime-allowlist`) |
 | `src/ui/` | React-Komponenten, Darstellung, Interaktion | `src/domain`, `src/data` |
 | `scripts/` | Build, Validierung, Schema-Export (Node) | `src/domain`, `site.config.ts` |
 | `scripts/pipeline/lib/` | reine Pipeline-Logik: Quellen-Parser, Termin-Regeln, Zuordnung, Build der Angebote | `src/domain`, `zod`, `cheerio`, `yaml` – kein Netz, keine Dateien |
@@ -37,6 +37,7 @@ Regeln:
 - **Geschäftslogik gehört nach `src/domain`.** Komponenten rufen Domänenfunktionen auf, rechnen aber keine Filter-, Alters- oder Zeitlogik selbst. Das prüft der Review.
 - Die UI lädt geprüfte Daten und importiert `schema.ts`/`dataset.ts` nur als Typ. Zod gehört nicht ins Client-Bundle (`no-zod-in-client`).
 - Datenzugriff läuft nur über `src/data` (`ui-reads-data-only-via-src-data`).
+- **Bootstrap** (Plan 0008, E4): `index.html` enthält genau zwei Inline-Skripte. Eines setzt die Darstellung vor dem ersten Paint (Schlüssel aus `src/data/preferences.ts`), das andere startet den Abruf von `site.json` (Frühstart, `window.__zpSite`, Pfad `%BASE_URL%data/site.json`, Vite ersetzt den Platzhalter beim Build). Diesen Abruf übernimmt nur `takeEarlyRequest` in `src/data/site.ts`, höchstens einmal; die UI fasst `__zpSite` nicht an (Biome `noRestrictedGlobals`). `loadSiteData` wirft nur `SiteLoadError` (`offline` | `netz` | `server`), die Texte stehen in `src/ui/format.ts` (E5). Weiterer Daten- oder Gerätezugriff außerhalb von `src/data` nur per ADR.
 - `src/data` darf seit Plan 0004 Laufzeit-Code aus `src/domain` importieren, aber nur reine Hilfen ohne Zod, heute nur `geo` (`coarsen`, `inBounds`; ADR 0010, `data-domain-runtime-allowlist`). Begründung: Die Rohkoordinate darf `src/data/geolocation.ts` nie verlassen, also wird dort schon gerundet und gegen die Stadtgrenze geprüft. Ob eine gespeicherte Stadtteil-ID gilt, prüft `useOrigin`, nicht `preferences.ts`.
 - Geolocation läuft nur über `src/data/geolocation.ts` (`canLocate`, `requestPosition`), nur auf Tipp, mit injizierbarer API für den Unit-Test. Die UI fasst `navigator`, `localStorage` und `fetch` nicht an (Biome `noRestrictedGlobals` für `src/ui` und `main.tsx`). Der Umweg über `window.navigator` usw. fällt nicht unter die Regel, den prüft der Review.
 - `scripts/pipeline/lib` bleibt rein und testbar: kein Import aus `io/`, `cli.ts`, `scripts/lib/` und kein Node-I/O (`pipeline-lib-pure`, `pipeline-lib-no-node-io`), kein globales `fetch` (Biome `noRestrictedGlobals`). Unit-Tests laufen ohne Netz (`vitest.setup.ts`), Quellen werden mit Snapshots aus `tests/fixtures/pipeline/` getestet.
@@ -46,6 +47,9 @@ Regeln:
   - `src/ui/karte/` und `src/ui/map/` erreicht man von außen nur per `import()`, auch Typen nicht statisch (`karte-ui-only-lazy`, `map-only-lazy`), und nur über den jeweiligen Lader (`karte-ui-entry-only`, `map-entry-only`). Die Props-Typen liegen deshalb in `src/ui/map-types.ts`.
   - dependency-cruiser fasst statischen und dynamischen Import desselben Moduls zu einer Kante zusammen; dass die beiden Lader ihr Ziel nicht zusätzlich statisch importieren, prüft `scripts/check-architecture.ts` (`lazy-loader-static`).
   - Beide Lazy-Chunks, Worker und Karten-CSS landen in `dist/assets/karte/` mit eigenen Budgets; das Startbudget zählt sie nicht.
+  - **Deutsche Beschriftung** (Plan 0008, E16): Die OpenFreeMap-Stile beschriften mit `coalesce(name_en, name)`. `germanTextField` (`src/ui/map/labels.ts`, rein) setzt im `style.load`, also auch nach jedem Stilwechsel, das `text-field` jedes Symbol-Layers auf `coalesce(name:de, name_de, name)`. Kein Request.
+  - Die Kartenquelle `orte` ist nach `key` sortiert, unabhängig von der Orts-Liste: Cluster hängen nicht am Startpunkt (E15).
+  - Der Startausschnitt hält rechts die Zoom-Knöpfe frei (Padding 32 / 90 / 32 / 32, gleich für jeden Ausschnitt; E20).
 - **Kachel-Host** steht nur in `src/data/tiles.ts`. `guardTileRequest` sitzt als `transformRequest` vor jedem MapLibre-Request (auch denen, die der Worker lädt) und lässt nur `https://tiles.openfreemap.org` ohne Querystring und Fragment durch.
 - Keine Zyklen (`no-circular`). Produktivcode importiert keine Tests oder Fixtures (`no-test-code-in-prod`).
 
@@ -67,12 +71,14 @@ Jede Ansicht besteht in Playwright auf 360 px, Pixel 7, iPhone 15 (WebKit), quer
 - Touch-Ziele ≥ 44 px (Links im Fließtext ≥ 24 px)
 - Eingabefelder ≥ 16 px (sonst zoomt iOS)
 - axe WCAG 2.2 AA ohne Verstöße, hell und dunkel (dunkel über die System-Einstellung und über die gewählte Darstellung `data-theme="dark"`)
-- Text passt in seinen Kasten (`expectTextFits`, Plan 0007): kein Bruch mitten in kurzen Wörtern, nichts ragt heraus oder wird abgeschnitten, kein Text in sichtbaren Rundungen, keine Überlappung in Leisten; bei 100 % zusätzlich einzeilige kurze Knopf-Beschriftungen (nur mit Fixture-Daten). Läuft in jedem `expectMobileUx` und bei 320 px/200 %. Ausnahmen nur als begründete Regel im Gate, nie per Selektor.
+- Text passt in seinen Kasten (`expectTextFits`, Plan 0007): kein Bruch mitten in kurzen Wörtern, nichts ragt heraus oder wird abgeschnitten, kein Text in sichtbaren Rundungen, keine Überlappung in Leisten; bei 100 % zusätzlich einzeilige kurze Knopf-Beschriftungen (nur mit Fixture-Daten). Läuft in jedem `expectMobileUx` und bei 320 px/200 %. Ausnahmen nur als begründete Regel im Gate, nie per Selektor. Sichtbare Kante heißt: Hintergrund mit Alpha > 0, Hintergrundbild oder Rand mit Breite, Stil und deckender Farbe (`hasVisibleEdge`, gemeinsam für Prüfung 2 und 3). Präzisierungen (Plan 0008), je mit Kanarienvögeln in `mobile-ux.spec.ts`:
+  - **E2, bewusste Lockerung für Ausbrüche über unsichtbare, nicht abschneidende Kästen:** Prüfung 2 übergeht einen Vorfahren ohne sichtbare Kante, der nicht abschneidet, wenn der Text schon in einem sichtbaren Kasten dazwischen steht (Woche bei 320 px mit negativem Rand). Ohne sichtbaren Kasten dazwischen, über einer sichtbaren Kante oder einem abschneidenden Kasten bleibt herausragender Text rot; den Seitenrand prüft `expectNoHorizontalScroll`.
+  - **E3:** Prüfung 3 übergeht in Scroll-Containern eine Zeile an der Oberkante nur, wenn der Bereich gescrollt ist (`scrollTop > 0`), an der Unterkante nur, wenn darunter Inhalt folgt. Im Ruhezustand zählt jede Zeile in der Ecke.
 - Dunkelmodus ohne helle Inseln (`expectNoBrightIslands`): keine deckende Fläche (auch `::before`/`::after`) mit Luminanz > 0,75 auf mehr als 1 000 px². Gewählte Zustände und Toast nutzen die Tokens `--sel`/`--on-sel` und `--toast`/`--on-toast`, die in **beiden** Dunkel-Blöcken von `tokens.css` stehen.
 - Große Schrift: Umschaltungen dafür laufen über intrinsische Layouts (`flex-wrap`, `grid auto-fit` mit `rem`-Mindestbreiten) oder Container-Queries in `rem`, nie über Viewport-Media-Queries (die reagieren nicht auf die Schriftgröße). Kurze Wörter in Bedienelementen brechen nie mitten im Wort, `overflow-wrap: anywhere` ist nur der Notausgang für lange Komposita und URLs; Titel trennen mit `hyphens: auto`.
 - sichtbarer Fokus bei Tastaturbedienung
 - keine Konsolen- oder Seitenfehler (automatisch in jedem Test)
-- reduzierte Bewegung funktioniert: keine Animation oder Transition länger als 1 ms, Verzögerung eingerechnet (`expectReducedMotion`)
+- reduzierte Bewegung funktioniert: keine Animation und keine Transition (0 ms, Dauer + Verzögerung), `expectReducedMotion`; `motion.css` setzt `animation: none` und `transition: none`, nie eine kurze Dauer (WebKit schloss 0,01-ms-Transitionen erst Sekunden später ab, Plan 0008, E1). Wer auf `animationend`/`transitionend` hört, behandelt den Fall „reduzieren“ selbst.
 - LCP < 2,5 s und CLS < 0,05 bei gedrosselter Mobile-CPU bzw. gedrosseltem Netz
 - Schrift-Swap verschiebt nichts (`e2e/font-swap*.spec.ts`, Plan 0007): Webfont zurückgehalten, je Fallback (Arial/Liberation, Roboto, Noto, DejaVu) bei 412 und 360 px mit echten Daten CLS < 0,05, gezählt nur ab der Freigabe. Swap-Tests laufen mit Telefon-Rendering (`PHONE_FONT_RENDERING`, nur Chromium); ob ein echtes Android die Annahme bestätigt, prüft Schritt 10 von Plan 0007. Auf CI müssen Roboto, Arial (Liberation) und DejaVu gemessen werden, nur Noto darf dort fehlen und wird übersprungen; die Werte stehen im CI-Log („Schrift-Swap je Fallback“). Die `size-adjust`-Werte der Fallback-Faces in `tokens.css` kommen aus `node scripts/font-fallback.ts`, nie geschätzt.
   - **Rot nach einem Datenupdate:** Skript neu laufen lassen und die Werte übernehmen, dann die gemeldete Stelle im Layout prüfen (Verursacher stehen in der Fehlermeldung). Die Schwelle wird nie gesenkt, eine Ausnahme gibt es nur per ADR.

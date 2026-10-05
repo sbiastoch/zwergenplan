@@ -1,6 +1,6 @@
 # Plan 0008 – Feinschliff nach den Live-Reviews
 
-Status: `/plan-review` eingearbeitet (Freigabe mit Änderungen), Umsetzung offen
+Status: umgesetzt (Pakete A, B, C zusammengeführt auf `feinschliff-0008-int`), Arch-Review eingearbeitet; offen: Fast-Forward nach `main`, `/browser-review live` (Schritt 8), Geräte-Checkliste (Schritt 9)
 Datum: 2026-10-05
 Bezug: Plan 0007, Abschnitt „Offen für die Feinschliff-Runde (Stand 2026-10-05, nach Plan 0005)“ und dessen „Browser-Review live“ (Wichtig 1, Hinweise 1–9); Plan 0004, „Browser-Review live“ (H1–H4, W1); Plan 0005, Abschnitt „Browser-Review live (2026-10-05)“ (H1–H7, W1). Er steht auf `main`, sobald der Attributions-Hotfix gelandet ist (Commit `ffddb46`). Geschrieben auf `a682d4d`. Basis der Umsetzung ist `main` **nach** dem Attributions-Hotfix; der Koordinator rebased diesen Branch darauf (Schritt 0).
 
@@ -45,7 +45,7 @@ Die offenen Befunde der drei Live-Reviews sind entschieden: umgesetzt mit Test o
 - Schemaänderung, Änderung an `data/offers.json` oder `data/providers.yaml`. Die 9 Angebote mit doppeltem Ortsnamen bereinigt ein Pipeline-Lauf (E21).
 - Ein neues Design für den Kopfbereich im Querformat (Review 0005, H4). Das steht schon als „Kompakter Kopfbereich im Querformat“ in `docs/ideas.md`.
 - Sortierung der Liste nach Entfernung (Review 0004, H5, laut Plan 0004 kein Ziel).
-- Neue Schwellen oder gelockerte Gates. Einzige Schwellenänderung ist eine Verschärfung: `MAX_REDUCED_MS` geht von 1 auf 0 (E1).
+- Neue Schwellen oder gelockerte Gates. Einzige Schwellenänderung ist eine Verschärfung: `MAX_REDUCED_MS` geht von 1 auf 0 (E1). Einzige Lockerung einer Regel ist E2, bewusst und benannt: Prüfung 2 des Text-Gates übergeht Ausbrüche über unsichtbare, nicht abschneidende Kästen, wenn der Text in einem sichtbaren Kasten steht (mit Kanarienvögeln).
 
 ## Ausgangslage
 
@@ -479,7 +479,7 @@ Läuft Plan 0007 Paket C gleichzeitig, nutzt es einen vierten Port (z. B. 4473).
 
 **Paket A:**
 - `index.html` (Frühstart statt Preload)
-- `src/env.d.ts` (`Window.__zpSite`)
+- `src/env.d.ts` (`declare var __zpSite`)
 - `src/data/site.ts`, `src/data/site.test.ts` (neu)
 - `src/domain/agenda.ts`, `src/domain/agenda.test.ts`
 - `src/ui/format.ts`, `src/ui/format.test.ts` (`loadErrorText`, `hiddenNote`)
@@ -555,7 +555,7 @@ Läuft Plan 0007 Paket C gleichzeitig, nutzt es einen vierten Port (z. B. 4473).
 
 ```
 index.html                         Frühstart statt Preload                          [A]
-src/env.d.ts                       Window.__zpSite                                  [A]
+src/env.d.ts                       declare var __zpSite                             [A]
 src/data/site.ts (+test, neu)      takeEarlyRequest, SiteLoadError, loadSiteData(env) [A]
 src/domain/agenda.ts (+test)       DayAgenda.hidden, context.allIndex               [A]
 src/ui/
@@ -645,7 +645,7 @@ Die Schichtregeln bleiben:
 
 ## Backpressure
 
-Keine Schwelle wird gesenkt, kein Gate gelockert. `MAX_REDUCED_MS` wird schärfer (1 → 0 ms). Die zwei Präzisierungen im Text-Gate sind begründete Regeln mit Kanarienvögeln, keine Ausnahmen per Selektor.
+Keine Schwelle wird gesenkt. `MAX_REDUCED_MS` wird schärfer (1 → 0 ms). Die zwei Präzisierungen im Text-Gate sind begründete Regeln mit Kanarienvögeln, keine Ausnahmen per Selektor. E2 ist dabei eine bewusste Lockerung für Ausbrüche über unsichtbare, nicht abschneidende Kästen; E3 korrigiert einen Fehlalarm im Scroll-Zustand.
 
 | Fehler kommt zurück | Gate wird rot |
 |---|---|
@@ -831,3 +831,105 @@ Kleiner:
 - **m11 (Offene Fragen)** Ohne Antwort gilt der Plan-Vorschlag.
 - **m12 (Bezug)** Der Review-Abschnitt zu Plan 0005 steht mit dem Hotfix auf `main` (`ffddb46`). Der Kopf verweist darauf.
 - **Schritt 0:** Basis der Umsetzung ist `main` nach dem Attributions-Hotfix. Der Koordinator rebased `feinschliff-0008`, alle drei Paket-Branches zweigen davon ab.
+
+## Umsetzung (2026-10-05)
+
+Drei Pakete parallel in eigenen Worktrees (E22), zusammengeführt auf `feinschliff-0008-int` über `main` 4d4c063 (mit Plan 0007 Paket C), ohne Konflikte:
+- **Paket A** (`44c67d6`, `ed4e5e4`): E4, E5, E11, E12, `docs/ideas.md` (E18, E21).
+- **Paket B** (`3f4379c`, `9c9b175`): E1–E3, E6–E10, E13, E14.
+- **Paket C** (`9a0e199`, dazu `ad9b69f` Retry-Fix in `Lazy.tsx`): E15–E17, E19, E20.
+
+Die Rot-Belege je Test stehen in den Commit-Messages. Kurz:
+- E1 war lokal in WebKit rot: 300 ms nach dem Tipp hatten `.brand`, `.daylabel` und `.when` noch die helle Farbe, beim Laden standen `.brand` und `.daylabel` auf Schwarz.
+- E2 war rot mit „Text ragt aus fieldset.plain: „26““ (Überstand Chromium 3,9 px, WebKit 2,4 px). E3 war rot mit „„Kosten““ in der Rundung.
+- `site.json` doppelt war nur in `iphone-15` rot. Fehlerzustand, Leerzustand und Fokus waren in allen Projekten rot.
+- Karte: Beschriftung, Schrift und Orts-Sheet waren rot. Der Test zur Zoom-Ecke ist eine Absicherung, weil der Fixture-Ausschnitt nicht breitenbegrenzt ist.
+
+**Abweichungen vom Plan:**
+- **A:**
+  - Tests, die vor dem ersten Laden zählen bzw. umleiten, tragen das Tag `@eigener-start`. Der `beforeEach` (goto) überspringt sie.
+  - `takeEarlyRequest` ist nicht exportiert. Der Unit-Test prüft es über `loadSiteData()` mit `vi.stubGlobal("__zpSite")`.
+  - `online()` gilt ohne `navigator.onLine` (Node) als online.
+  - Ein `biome-ignore` für `declare var` war nicht nötig.
+  - Start-JS +0,62 kB statt < 0,5 kB.
+- **B:**
+  - Radius der Tagesfelder 7 statt 12 px (E7). Bei 12 px stieß die Zahl bei 200 % an die Rundung (Prüfung 3). Das ist der im Plan vorgesehene Weg, keine Ausnahme.
+  - `.monthbtn` bekommt `padding: 2px 16px`. Seit E1 misst WebKit bei 200 % wirklich 200 %, dort stieß „Monat zuklappen“ einzeilig an die 22-px-Rundung.
+  - E8: Bei 568×320/200 % bleibt das Tab-Label sichtbar (Spalte ≈ 177 px > 4,6 rem). Der Test prüft beide Fälle.
+  - `.detail-body` hat zusätzlich `overscroll-behavior: contain`.
+  - Nebenbefund E1: Die 0,01-ms-Transition über `all` verzögerte in WebKit auch die Schriftgröße. Die WebKit-Läufe „320 px/200 %“ haben in Dialogen bisher 100 % gemessen.
+- **C:**
+  - Ein `as` an der Grenze zu `setLayoutProperty`, begründet im Code. MapLibre validiert den Ausdruck zur Laufzeit.
+  - Vor dem Zusammenführen kam der Retry-Fix `ad9b69f` dazu: `useLazy.retry` setzt „laden“ im selben Render. Das behebt den CI-Befund zu ffddb46. `Lazy.tsx` stand in keiner Paketliste.
+- **Zusammenführen:** Befunde aus dem Arch-Review siehe unten.
+
+**Offene Geschmacksfragen:** Alle vier sind nach dem Plan-Vorschlag entschieden:
+- Der ICS-Fuß scrollt bei wenig Höhe mit.
+- Im Monatsraster bekommt jeder Tag ein Feld.
+- „Zurücksetzen“ ist ein Textknopf links im Fuß.
+- Das Badge steht im Querformat hinter bzw. unter dem Label.
+
+**Gates auf dem kombinierten Stand** (`PW_PORT=4273 pnpm check`, Load anfangs < 1):
+- check:fast, knip, schema:check und Coverage grün: 443 Unit-Tests in 44 Dateien.
+- E2E: 821 bestanden, 143 übersprungen (gewollt), 1 rot. Rot war Perf-LCP in pixel-7 (2 716 ms), weil der volle Lauf parallel lief.
+- Einzeln wiederholt (E22) war alles grün:
+  - `perf.spec.ts` in android-klein, pixel-7 und pixel-7-quer;
+  - das Projekt `smoke-echte-daten --no-deps` (17 Tests, inkl. Smoke-LCP und der Swap-Matrix);
+  - `font-swap.spec.ts` (4 Tests in pixel-7).
+
+**Swap-Matrix (m10)**, einzeln bei Load < 4. CLS beim Swap, echte Daten, Telefon-Rendering:
+
+| Fallback | 412 px | 360 px |
+|---|---|---|
+| Arial/Liberation | 0,0001 | 0,0002 |
+| Roboto | 0,0001 | 0,0003 |
+| Noto | 0,0000 | 0,0024 |
+| DejaVu | 0,0000 | 0,0000 |
+
+Gegenüber Plan 0007 („nachher“: Arial 0,0002/0,0002, Roboto 0,0002/0,0003, Noto 0,0000/0,0024, DejaVu 0,0000/0,0000) hat sich nichts verschlechtert. `.meta { hyphens: auto }` (E14) ändert beim Swap also keinen Umbruch, der ins Gewicht fällt.
+
+**Budgets** (gzip, kombiniert):
+- JS (initial) 87,95 / 90 kB (vor 0008: 87,30)
+- CSS 10,53 / 15 kB
+- Karte JS 425,34 / 450 kB
+- Karte CSS 10,77 / 12 kB
+- site.json 80,14 / 250 kB
+
+**Sichtprüfung des kombinierten Stands** (Chromium und WebKit, hell und dunkel):
+- Kalender mit „Kurse“ am Mi 7.10.: „Nichts, was zu deiner Auswahl passt“, „1 Angebot an diesem Tag ist ausgeblendet …“, „Filter zurücksetzen“ zentriert (`.linkbtn` erbt die Ausrichtung). Bei 320 px/200 % steht der Titel vierzeilig in voller Größe, das ist lesbar.
+- Fehlerzustand mit deutschem Satz und „Nochmal versuchen“.
+- Detail bei 200 % mit mitscrollendem Fuß.
+- Karte mit Attribution in der App-Schrift.
+- Auffällig, aber nicht neu: Headless-WebKit hat kein Wörterbuch und trennt „Krabbeltreff“ bei 320 px/200 % als „Krabbeltref|f“. Chromium trennt „Krabbel-treff“. Das ist die bekannte Grenze von `hyphens: auto` in Headless-Engines, siehe E14. Prüfen gehört in den Browser-Review mit echtem Safari.
+
+## Arch-Review (2026-10-05) – Verdict: Nacharbeit nötig → eingearbeitet
+
+Keine Blocker. Alle Punkte sind übernommen (Commit „fix: Befunde aus dem Arch-Review zu Plan 0008“ und Doku-Commit).
+
+Wichtig:
+- **M1, Grenzen der E2-Lockerung belegt:** Zwei neue Kanarienvögel in `mobile-ux.spec.ts` laufen auf der Woche ab 26.10. bei 320 px:
+  - „Text-Gate erkennt Ausbruch über einen Kasten mit sichtbarem Rand“ mit `fieldset.plain { border: 1px solid currentColor }`;
+  - „… über einen abschneidenden Kasten“ mit `fieldset.plain { overflow: hidden }`.
+  - Beide erwarten „Text ragt aus fieldset.plain“.
+  - Mutationsprobe in pixel-7 und iphone-15: Ohne `!visibleEdge` in `bleedOnly` wird der Rand-Kanarienvogel rot, ohne `!clips` der Overflow-Kanarienvogel. Der jeweils andere bleibt grün.
+- **M2, `docs/architecture.md`:**
+  - reduzierte Bewegung 0 ms bzw. `none`;
+  - Text-Gate mit E2 als bewusste Lockerung für Ausbrüche über unsichtbare, nicht abschneidende Kästen, dazu E3;
+  - Frühstart im Datenfluss;
+  - deutsche Beschriftung, sortierte Quelle und Zoom-Ecke im Karten-Abschnitt;
+  - neue Regel „Bootstrap“ (genau zwei Inline-Skripte in `index.html`, Frühstart nur über `takeEarlyRequest`, weiterer Zugriff außerhalb von `src/data` nur per ADR) und Verweis in der Schichten-Tabelle.
+
+Kleiner:
+- **m1, Prüfung 3:** `scrollViewport` gibt das Element zurück.
+  - Eine Zeile an der Oberkante wird nur bei `scrollTop > 0` übersprungen, an der Unterkante nur, wenn darunter noch Inhalt kommt.
+  - Der Kanarienvogel „Text in der Rundung, auch im Scroll-Container des Sheets“ läuft zusätzlich bei 200 % und schlägt an.
+- **m2, `hasVisibleEdge`:** Ein Rand zählt nur mit `alpha(border*Color) > 0`.
+- **m3, Biome:** `noRestrictedGlobals` für `src/ui/**` und `src/main.tsx` verbietet `__zpSite`. Probe: Ein `__zpSite` in `src/ui` meldet „Frühstart nur über src/data/site.ts (Plan 0008, E4).“
+- **m4, `index.html`:** `fetch("%BASE_URL%data/site.json")`, Kommentar angepasst, Plan 0006 nachgeführt. Im Build geprüft: Vite ersetzt den Platzhalter auch im Inline-Skript (`/data/site.json`, mit `--base /zwergenplan/` entsprechend `/zwergenplan/data/site.json`).
+- **m5, Regressionstest zum Retry-Fix:** `recover()` in `karte.spec.ts` (beide Tests „Karten-Code nicht ladbar“) schreibt per `MutationObserver` die Zustandsfolge der Karte ab dem Tipp mit. „Seite neu laden“ darf nie vor „laden“ erscheinen.
+  - Mit dem alten `Lazy.tsx` (vor `ad9b69f`) waren 12 von 12 Läufen rot (pixel-7, desktop, iphone-15, je 2×). Folgen: „fehler+neu laden → laden → fehler+neu laden“, „fehler+neu laden → laden → bereit“, „fehler+neu laden“.
+  - Mit dem neuen `Lazy.tsx` waren 12 von 12 grün.
+- **m6, Plan:**
+  - Nicht-Ziele und Backpressure nennen die E2-Lockerung ausdrücklich.
+  - Paketliste und Struktur nennen `declare var __zpSite`.
+  - „Umsetzung“ nennt `Lazy.tsx` und das `.monthbtn`-Padding.
