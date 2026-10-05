@@ -4,8 +4,7 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "tiles": ["https://tiles.openfreemap.org/planet/test/{z}/{x}/{y}.pbf"],
-      "maxzoom": 14
+      "url": "https://tiles.openfreemap.org/planet"
     }
   },
   "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",

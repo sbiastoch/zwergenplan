@@ -16,7 +16,7 @@ import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { useEffect, useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./map-overrides.css"; // nach maplibre-gl.css (E4)
-import { ATTRIBUTION, guardTileRequest, styleUrl } from "../../data/tiles.ts";
+import { guardTileRequest, styleUrl } from "../../data/tiles.ts";
 import { DISTRICT_ZOOM, type StartCamera } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
 import type { MapViewProps } from "../map-types.ts";
@@ -97,7 +97,9 @@ export function MapView(props: MapViewProps) {
         container: el,
         style: styleUrl(start.dark),
         transformRequest: guardTileRequest,
-        attributionControl: { compact: false, customAttribution: ATTRIBUTION },
+        // Attribution aus der TileJSON von OpenFreeMap (genau einmal, W1). Ohne `compact`: MapLibre klappt sie
+        // auf Karten ≤ 640 px nach dem ersten Verschieben zum „i“ ein, beim Öffnen steht sie ausgeschrieben.
+        attributionControl: {},
         // Handy: zwei Finger bewegen die Karte, einer scrollt die Seite (E7)
         cooperativeGestures: true,
         locale: LOCALE,

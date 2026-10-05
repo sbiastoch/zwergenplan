@@ -27,10 +27,12 @@ interface Options {
   allowedConsoleErrors: RegExp[];
 }
 
-/** Mock-Datei zu einem Pfad: Stil `/styles/<name>` → `<name>.json`, Glyphen unter `fonts/`. */
+/** Mock-Datei zu einem Pfad: Stil `/styles/<name>` → `<name>.json`, TileJSON `/planet`, Glyphen unter `fonts/`. */
 function fixtureFile(path: string): string | undefined {
   const style = /^\/styles\/(positron|dark)$/.exec(path);
   if (style) return `${TILE_FIXTURES}/${style[1]}.json`;
+  // TileJSON der Vektorquelle mit der echten Pflicht-Attribution (wie tiles.openfreemap.org/planet)
+  if (path === "/planet") return `${TILE_FIXTURES}/planet.json`;
   if (/^\/fonts\/[^/]+\/\d+-\d+\.pbf$/.test(path)) return `${TILE_FIXTURES}${path}`;
   return undefined;
 }

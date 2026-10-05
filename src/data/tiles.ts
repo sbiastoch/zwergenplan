@@ -3,6 +3,10 @@
  * Kachel-Host. MapLibre lädt selbst; `guardTileRequest` sitzt als `transformRequest` davor und
  * lässt nur diesen Host durch, ohne Querystring und Fragment. So kann nichts außer der
  * Kachelkoordinate an OpenFreeMap gehen, und nie ein anderer Drittanbieter (docs/architecture.md).
+ *
+ * Die Pflicht-Attribution (OpenFreeMap, © OpenMapTiles, OpenStreetMap, je verlinkt) liefert OpenFreeMap
+ * selbst in der TileJSON der Vektorquelle (`/planet`), MapLibre zeigt sie an. Ohne TileJSON gibt es auch
+ * keine Kacheln. Eine eigene `customAttribution` stand doppelt da (Browser-Review live, W1).
  */
 
 /** Ohne abschließenden Schrägstrich, wie `URL.origin`. Export erst, wenn ihn jemand braucht (knip). */
@@ -12,10 +16,6 @@ const TILE_ORIGIN = "https://tiles.openfreemap.org";
 export function styleUrl(dark: boolean): string {
   return `${TILE_ORIGIN}/styles/${dark ? "dark" : "positron"}`;
 }
-
-/** Pflicht-Attribution von OpenFreeMap, als `customAttribution` (E4). */
-export const ATTRIBUTION =
-  '<a href="https://openfreemap.org">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 /** lokale Daten von MapLibre selbst (Worker, Bilder) – kein Request ins Netz */
 const LOCAL_SCHEMES = ["blob:", "data:"];
