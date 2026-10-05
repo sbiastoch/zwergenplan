@@ -652,6 +652,28 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
     });
   });
 
+  test("linien.json passt nicht zur Tabelle (fremde Kennung): „mit Bus & Bahn“, Minuten unverändert, kein Neuladen (Arch-Review 0012, H9)", async ({
+    page,
+  }) => {
+    await page.route(LINES, async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({ response, json: { ...(await response.json()), table: "deadbeef" } });
+    });
+    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+    const answered = page.waitForResponse((r) => isLines(r.url()));
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await answered;
+    await page.evaluate(() => Object.assign(window, { zpOhneNeuladen: true }));
+    await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
+    await expect(card(page, "Musikgarten").locator(".dist")).toHaveText("30 Min.");
+    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    await expect(page.getByRole("dialog").getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    await page.waitForTimeout(300);
+    await expect(page.getByRole("dialog").locator(".reach-long")).not.toContainText("Tram");
+    expect(await page.evaluate(() => "zpOhneNeuladen" in window), "kein Neuladen").toBe(true);
+  });
+
   test("linien.json kommt 1,5 s später: erst „mit Bus & Bahn“, dann die Linien ohne Interaktion (Review B1)", async ({
     page,
   }) => {

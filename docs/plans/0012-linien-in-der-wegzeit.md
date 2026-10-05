@@ -7,7 +7,7 @@ Bezug:
   - Punkt 2: Zugang und Abgang zu Fuß bis 1 500 m statt 800 m;
   - Punkt 3: welche Verbindung je Abfahrtsminute zählt, höchstens 1 Umstieg.
 
-  Er ergänzt die Punkte 4 bis 6 um eine zweite Build-Datei. Das hält **ADR 0015** fest (Entwurf `docs/adr/0015-wegzeit-linien.md`).
+  Er ergänzt die Punkte 4 bis 6 um eine zweite Build-Datei. Das hält **ADR 0015** fest (angenommen, `docs/adr/0015-wegzeit-linien.md`).
 - Plan 0009 (Öffi-Fahrzeit): E4 Auszug, E5 Tabelle, E6 Profil-CSA, E7 `wegzeit.json`, E8 Domäne, E9 Laden, E11 Rückfall, E15 Tests.
 - ADR 0010 (`src/data` importiert zur Laufzeit nichts aus `src/domain` außer `geo`).
 - Plan 0011 und ADR 0013 (Service Worker, noch nicht umgesetzt): `linien.json` kommt in die Zeile von `wegzeit.json` (E9).
@@ -797,3 +797,23 @@ Zusätzlich zur Kenntnis: 27 Paare (1,1 %) verlieren ihre Linien durch die Passu
   - `perf.spec.ts` „LCP und CLS bleiben im Budget“ (Startseite ohne Wegzeit): LCP 2,4–4,1 s statt < 2,5 s. Gegenprobe mit `origin/main` (temporärer Export, gleicher Lauf direkt danach): ebenfalls rot (2,4–3,9 s); umgekehrt war dieser Branch in einem ruhigeren Moment grün (1,5–2,0 s). Kein Bezug zu den Linien: Die Startseite lädt weder Tabelle noch Linien.
   - `layout.spec.ts:471` (iPhone 15, Badge quer) und im ersten Lauf zwei Karten-Tests auf iPhone 15: Zeitüberschreitung, einzeln wiederholt grün.
 - Im ersten Lauf rot und behoben: `anbieter.spec.ts` „mit offenem Tab einen Startpunkt wählen“ zählte die nachgelagerte Linien-Anfrage mit; der Test wartet jetzt auch auf `linien.json` (E3).
+
+## Arch-Review (Schritt 8, 2026-10-05) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+**Blocker**
+- **1, Smoke E5 konnte nicht rot werden:** `/mit (Bus|Tram|…)/` traf auch „mit Bus & Bahn“. Jetzt `/mit (?:(?:Bus|Tram|R[BE]?) |U\d|S\d)/` (echte Namen tragen U+00A0), und „Bus & Bahn“ darf nicht vorkommen. Kanarienvögel mit echten Daten: `linien.json` abgebrochen → „ein Detail ab Altstadt mit Linien“ rot (dazu der Konsolenfehler); `linien.json` mit fremder Kennung (`table: "deadbeef"`, ohne Konsolenfehler) → rot. Mit dem alten Muster wäre der zweite Fall grün gewesen.
+
+**Wichtig**
+- **2, Start-JS 91,42 kB:** Gemessen über die Sourcemap (Zuordnung der minifizierten Bytes je Quelldatei, gzip einzeln, gegen einen Export von `origin/main`): `ReachLong.tsx` +228 B, `format.ts` +162 B, `use-transit.ts` +152 B, `src/data/transit.ts` +122 B. Gesenkt:
+  - Die Erklärung im Quellenhinweis des Kind-Sheets („Geschätzte Wegzeit … Genannt sind die Linien der häufigsten Verbindung.“) ist jetzt `TRANSIT_RULE` in `src/domain/transit.ts` (Wegzeit-Chunk, 1,41 → 1,66 kB), gebaut aus `TRANSFER_PENALTY_MINUTES` und `ACCESS_METERS`. `decodeTransitTable` hängt sie als `source.rule` an; `transitSourceNote` setzt sie vor „Fahrplan: …“. Bevor die Tabelle dekodiert ist, nennt das Kind-Sheet nur die Quelle (das Öffnen des Sheets lädt die Tabelle ohnehin).
+  - Ein Abruf-Helfer `getJson` für Tabelle und Linien; der Zustand „bereit“ wird in `useTransit` einmal gelesen.
+  - **Ergebnis 91,28 kB** (main 90,9 kB). Das Ziel ≤ 91,0 kB aus ADR 0012 ist um 0,28 kB verfehlt, die **Restreserve zum Budget beträgt 0,72 kB**. Weiter senken ginge nur mit der Anzeige selbst (`ReachLong`, Zustellung der Linien), die beim Öffnen des Details gebraucht wird. Eingetragen in ADR 0012 (Konsequenzen) und Plan 0011 (Risiken); das Budget bleibt 92 kB.
+- **3, „Geschwisterkinder“ brach im Detail der Gemeinde:** behoben. `.label b` und `.label span:not(.cap)` in `dialog.css` trennen mit `hyphens: auto` (`<html lang="de">` ist gesetzt), `.reach-long` bleibt `hyphens: manual`. Neue Ansicht „detail-gemeinde“ in `mobile-ux.spec.ts`; „detail-wegzeit“ nutzt wieder das natürliche Detail der Gemeinde („Tram 1 → Bus 202E“). Kanarienvogel: ohne den Fix 8 Tests rot („Wort gebrochen: Geschwisterkinder“, bei 320 px auch „Nachmittage,“). Mit Fix alle 81 Detail-Tests grün (5 Geräte inkl. WebKit, hell, dunkel, dunkel per Darstellung, 320 px/200 %). Der Abschnitt „E4 im Detail“ unter Schritt 7 ist damit überholt; `twoLinesEverywhere` bleibt nur für das Orts-Sheet.
+
+**Hinweise**
+- **4:** U+00A0 steht als Escape ` ` in `ReachLong.tsx`, `lines.ts` und `lines.test.ts`.
+- **5:** Kommentar zum 8-s-Timer-Hack in `mobile-ux.spec.ts` korrigiert: Auch `loadLines` nutzt `TRANSIT_TIMEOUT_MS`, die Ansicht hält aber `wegzeit.json` zurück, also wird `linien.json` nie angefordert.
+- **6, Doku:** `docs/architecture.md` (Datenfluss und Schichtentabelle mit `lines.ts`, Startpunkt-Invariante „Tabelle, Chunk und Linien“), README („Alle drei“), ADR 0015 Punkt 6 („nach Tabelle und Rechenlogik“), Plan 0012 Bezug (ADR 0015 „angenommen“), Plan 0011 E4a (genau ein weiterer Request auf `linien.json`), ADR 0003 mit Rückverweis auf ADR 0015.
+- **7:** Tests prüfen, dass „10 Min.“ und „1,5 km“ der Erklärung aus `TRANSFER_PENALTY_MINUTES` und `ACCESS_METERS` kommen (`transit.test.ts`, `format.test.ts`) und `EGRESS_METERS = ACCESS_METERS` (`profile-csa.test.ts`).
+- **8:** Im Zufallsnetz gilt „mehr als die Hälfte der Minuten mit Weg“ wieder für jeden Radius (`/ 2`; erster Lauf 300 m 2 799, 800 m 4 564, 1 500 m 4 673 von 5 040). Dabei fiel ein `as`-Cast bei den Zählerschlüsseln weg, ebenso einer in `e2e/fixtures.ts`.
+- **9:** E2E „linien.json passt nicht zur Tabelle“ (`startpunkt.spec.ts`): fremde Kennung → „mit Bus & Bahn“, Minuten unverändert (15 und 30 Min.), keine Konsolenfehler, kein Neuladen (Marker auf `window` bleibt). Kanarienvogel: ohne die Prüfung `file.table !== table.id` in `decodeTransitLines` → rot.

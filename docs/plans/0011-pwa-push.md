@@ -184,7 +184,7 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
   1. **Zuerst `registration.update()`.** Wird dabei ein neuer Service Worker aktiv (`controllerchange`), lädt die Seite neu (`location.reload()`). Das passiert nur hier, beim Zurückkehren zur App, nie mitten in einer Bedienung. So laufen Code und Daten nie in verschiedenen Ständen, etwa nach einer Schemaänderung.
   2. Sonst lädt `App` `site.json` neu (gleicher Lade-Weg, gleicher Request für alle) und tauscht die Daten ohne Layoutsprung aus.
   3. War die Wegzeit-Tabelle geladen, lädt `useTransit` sie **mit** neu (und damit `linien.json`, Plan 0012, E9; alte Linien verwirft die Kennung `id`/`table`), sonst würden neue Orte die Wegzeit bis zum Neustart auf die Luftlinie zurückwerfen (`App.tsx`, Prüfung auf neue Orte). Das ist eine Ausnahme von „höchstens einmal je Sitzung“ (`use-transit.ts`). Der Request ist für alle gleich und hängt nicht vom Startpunkt ab (ADR 0011). Festgehalten in `docs/architecture.md` (Absatz Wegzeit) und ADR 0013.
-- Schwelle und Ablauf werden als Konstanten gesetzt und per Unit-Test mit Fake-Timern geprüft. E2E: Nach einem Frische-Anlass mit gesetztem Stadtteil bleibt die Wegzeit erhalten, und es gibt genau einen weiteren Request auf `wegzeit.json`.
+- Schwelle und Ablauf werden als Konstanten gesetzt und per Unit-Test mit Fake-Timern geprüft. E2E: Nach einem Frische-Anlass mit gesetztem Stadtteil bleibt die Wegzeit erhalten, und es gibt genau einen weiteren Request auf `wegzeit.json` und genau einen weiteren auf `linien.json` (Plan 0012).
 
 ### E5 – Start-Bundle: fast nichts, alles andere lazy (Entscheidungspunkt)
 

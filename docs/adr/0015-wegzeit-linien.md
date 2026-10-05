@@ -45,7 +45,7 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
    - zwei Byte-Ebenen (erste und zweite Linie);
    - über eine Inhaltskennung (`id` in `wegzeit.json`, `table` in `linien.json`, gebildet über den Inhalt beider Dateien) an die Tabelle gebunden;
    - gleiche Lizenz und Namensnennung (CC BY-SA 3.0 DE).
-6. **Laden:** zu denselben Anlässen und im selben Aufruf wie `wegzeit.json` (ADR 0011, Punkt 6), aber erst nach deren Antwort, mit niedriger Priorität und eigenständig.
+6. **Laden:** zu denselben Anlässen und im selben Aufruf wie `wegzeit.json` (ADR 0011, Punkt 6), aber erst nach Tabelle und Rechenlogik, mit niedriger Priorität und eigenständig.
    - Die Minuten warten nicht auf die Linien.
    - Fehlt die Datei oder passt sie nicht, bleibt die Wegzeit ohne Linien.
    - Die Invariante „Kein Request hängt davon ab, welcher Startpunkt gilt“ gilt unverändert.
