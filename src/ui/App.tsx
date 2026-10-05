@@ -153,7 +153,8 @@ export function App() {
   const limit = route.filter.reachLimit;
   const limitOn = limitActive(reachMode);
   const hint = limit && limitHint(limit, reachMode);
-  // gespeicherter Stadtteil + wegzeit=: Platzhalter statt ungefilterter Liste, bis die Wegzeit da ist (M7)
+  // gespeicherter Stadtteil + wegzeit=: Platzhalter statt ungefilterter Liste bzw. ungefiltertem Kalender, bis die
+  // Wegzeit da ist (M7, Arch-Review 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11).
   const listPending = reachMode?.kind === "laedt" && limit !== undefined;
   const limitAction = (
     <LimitAction
@@ -289,7 +290,8 @@ export function App() {
             onResetFilter={() => setFilter(EMPTY_FILTER)}
           />
         )}
-        {load.kind === "ready" && route.tab === "kalender" && (
+        {load.kind === "ready" && route.tab === "kalender" && listPending && <ListPending />}
+        {load.kind === "ready" && route.tab === "kalender" && !listPending && (
           <CalendarView
             index={calendar.index}
             allIndex={calendar.allIndex}

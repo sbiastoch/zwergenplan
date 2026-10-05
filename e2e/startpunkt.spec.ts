@@ -494,4 +494,23 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
     await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
   });
+
+  // Arch-Review 0009, Befund 4: auch der Kalender springt nicht von ungefiltert auf gefiltert
+  test("Kalender mit ?wegzeit=20: Platzhalter-Block statt ungefiltertem Kalender", async ({ page }) => {
+    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+    const release = await holdTable(page);
+    await page.goto("./?ansicht=kalender&wegzeit=20");
+    const pending = page.locator(".list-pending");
+    await expect(pending).toBeVisible();
+    await expect(pending).toHaveText("Wegzeiten werden geladen …");
+    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toHaveCount(0);
+    await expect(offers(page)).toHaveCount(0);
+    await expect(page.locator("p.status[role=status]")).toHaveCSS("visibility", "hidden");
+    await expect(page.getByText(/wirkt|braucht einen Startpunkt/)).toHaveCount(0);
+    release();
+    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+    await expect(pending).toHaveCount(0);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
+  });
 });
