@@ -3,9 +3,9 @@
  * (Mo 5.10.2026 12:00): 8 kommende Angebote von 5 Anbietern, dazu der Turnverein ohne Angebote. Tab, Lazy-Laden,
  * History und Privatsphäre stehen in anbieter.spec.ts (Paket A).
  *
- * Wegzeit ab Gostenhof aus der Fixture-Tabelle (`tests/fixtures/oepnv`, nachgerechnet in transit.test.ts):
- * Theater 3,6 → „5 Min.“, Beispielhof 13,6 → „15 Min.“, Bibliothek 15,6 → „15 Min.“, Musikschule 29,6 → „30 Min.“,
- * Gemeinde 32,6 → „35 Min.“.
+ * Wegzeit ab Gostenhof aus der Fixture-Tabelle (`tests/fixtures/oepnv`, nachgerechnet in startpunkt.spec.ts und
+ * scripts/transit/table.test.ts; Plan 0012): Theater 3,6 → „5 Min.“, Beispielhof 13,6 → „15 Min.“, Bibliothek 15,6
+ * → „15 Min.“, Gemeinde 23,6 → „25 Min.“ (Tram 1 → Bus 202E), Musikschule 29,6 → „30 Min.“.
  */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
@@ -58,9 +58,9 @@ test.describe("Startpunkt Gostenhof", () => {
     await openList(page);
     await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof mit Bus & Bahn");
     await expect(row(page, THEATER)).toContainText("2 Angebote · Gostenhof · 5 Min.");
-    expect(await names(activeRows(page))).toEqual([THEATER, TREFF, BIBLIOTHEK, MUSIKSCHULE, GEMEINDE]);
+    expect(await names(activeRows(page))).toEqual([THEATER, TREFF, BIBLIOTHEK, GEMEINDE, MUSIKSCHULE]);
     const lines = await activeRows(page).locator("span").allInnerTexts();
-    expect(lines.map((l) => l.split(" · ").at(-1))).toEqual(["5 Min.", "15 Min.", "15 Min.", "30 Min.", "35 Min."]);
+    expect(lines.map((l) => l.split(" · ").at(-1))).toEqual(["5 Min.", "15 Min.", "15 Min.", "25 Min.", "30 Min."]);
     await expect(list(page).locator(".place").last()).toContainText(TURNVEREIN);
   });
 

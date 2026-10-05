@@ -65,6 +65,7 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
 }) => {
   const meta = await openAtDataTime(page);
   test.skip(meta.offers === 0, "keine Daten");
+  const lines = page.waitForResponse((r) => r.url().endsWith("/data/linien.json") && r.ok());
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
   // Quellenhinweis aus der echten wegzeit.json (CC BY-SA 3.0 DE, E3)
@@ -78,13 +79,27 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
   await expect(sheet).toBeHidden();
 
   await expect(page.getByRole("status")).toContainText(
-    "Wegzeit ab Altstadt mit Bus & Bahn (Di vormittags, inkl. Warten)",
+    "Wegzeit ab Altstadt mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)",
   );
   const dists = page.getByTestId("offer").locator(".meta .dist");
   await expect(dists.first()).toHaveText(/^(\d+ Min\.|über 2 Std\.)$/);
   for (const text of await dists.allInnerTexts()) expect(text).toMatch(/^(\d+ Min\.|über 2 Std\.)$/);
   // Knopf-Beschriftungen mit Daten dürfen umbrechen: Prüfung 5 nur mit Fixtures (Plan 0007, E10).
   await expectMobileUx(page, { buttons: false });
+
+  // Plan 0012, E5 (Review W3): Die echte linien.json passt zur Tabelle, mindestens ein Detail nennt Linien.
+  await lines;
+  const titles = page.getByTestId("offer").getByRole("heading", { level: 3 });
+  const named: string[] = [];
+  for (let i = 0; i < Math.min(30, await titles.count()) && named.length === 0; i++) {
+    await titles.nth(i).getByRole("button").click();
+    const dialog = page.getByRole("dialog");
+    const text = await dialog.locator(".reach-long").innerText();
+    if (/mit (Bus|Tram|U\d|S\d|R)/.test(text)) named.push(text);
+    await dialog.getByRole("button", { name: "Zurück" }).click();
+    await expect(dialog).toBeHidden();
+  }
+  expect(named, "ein Detail ab Altstadt mit Linien").toHaveLength(1);
 
   await page.setViewportSize({ width: 320, height: 640 });
   await expectNoHorizontalScroll(page);

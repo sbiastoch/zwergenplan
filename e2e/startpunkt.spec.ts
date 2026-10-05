@@ -1,12 +1,18 @@
 /**
  * Startpunkt und Wegzeit (Plan 0004, E3/E5–E8; Plan 0009, E8–E11): Stadtteil, Standort, Verweigerung, Filter
  * „Wegzeit“, Laden der Tabelle nur auf Anlass, Rückfall auf die Luftlinie, Privatsphäre. Fixtures, Uhr
- * Mo 5.10.2026 12:00. Wegzeit ab Gostenhof (49,448 / 11,058) aus der Fixture-Tabelle (tests/fixtures/oepnv):
- * Theater 3,6 → „5 Min.“, Beispielhof 13,6 → „15 Min.“, Bibliothek 15,6, Musikschule 29,6, Gemeinde 32,6 Min.
+ * Mo 5.10.2026 12:00. Wegzeit ab Gostenhof (49,448 / 11,058) aus der Fixture-Tabelle (tests/fixtures/oepnv), von
+ * Hand nachgerechnet (Plan 0012, „Umsetzung“, Schritt 1; Zellen in scripts/transit/table.test.ts):
+ * - Zugang: Halt 9001 in 91 m = 1,58 Min. Fußweg (9002 in 473 m und 9003 in 1 368 m sind nie günstiger).
+ * - Zellen ab 9001: Theater 2 (zu Fuß vom Halt, ohne Linien), Beispielhof 12 (Tram 1), Bibliothek 14 (Tram 1),
+ *   Gemeinde 22 mit Umstiegs-Bit (Tram 1 → Bus 202E), Musikschule 28 mit Bit (Tram 1 → Bus 2).
+ * - Also Theater 3,6 → „5 Min.“ mit Bus & Bahn (direkt zu Fuß wären es 3,9), Beispielhof 13,6 → „15 Min.“,
+ *   Bibliothek 15,6 → „15 Min.“, Gemeinde 23,6 → „25 Min.“ (bewertet 33,6 < 52 zu Fuß), Musikschule 29,6 → „30 Min.“
+ *   (bewertet 39,6 < 40,9 zu Fuß).
  * Luftlinie: Theater 226 m, Beispielhof 1 427 m, Bibliothek 1 689 m, Musikschule 2 358 m, Gemeinde 3 008 m.
  */
 import type { Page } from "@playwright/test";
-import { expect, exportPreload, test } from "./fixtures.ts";
+import { expect, expectTwoLines, exportPreload, test } from "./fixtures.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
 /** Eine Koordinate mit mindestens zwei Nachkommastellen, z. B. „49.45“ */
@@ -15,7 +21,10 @@ const TABLE = "**/data/wegzeit.json";
 const CHUNK = "**/assets/oepnv/*.js";
 const isTable = (url: string) => new URL(url).pathname.endsWith("/data/wegzeit.json");
 const isChunk = (url: string) => /\/assets\/oepnv\/[^/]+\.js$/.test(new URL(url).pathname);
-const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, inkl. Warten)";
+const LINES = "**/data/linien.json";
+const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.json");
+const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)";
+const NB = "\u00a0";
 
 const offers = (page: Page) => page.getByTestId("offer");
 const card = (page: Page, title: string) => offers(page).filter({ hasText: title });
@@ -36,13 +45,14 @@ async function openKidSheet(page: Page) {
 }
 
 /**
- * Wartet auf die Antworten von Tabelle und Rechenlogik (Lazy-Chunk), bevor die Zählung „kein Request ab der Wahl“
- * beginnt (M9). Vor dem Auslöser aufrufen, danach auslösen, dann abwarten.
+ * Wartet auf die Antworten von Tabelle, Rechenlogik (Lazy-Chunk) und Linien (Plan 0012, E3), bevor die Zählung
+ * „kein Request ab der Wahl“ beginnt (M9). Vor dem Auslöser aufrufen, danach auslösen, dann abwarten.
  */
 function transitLoaded(page: Page) {
   return Promise.all([
     page.waitForResponse((r) => isTable(r.url()) && r.ok()),
     page.waitForResponse((r) => isChunk(r.url()) && r.ok()),
+    page.waitForResponse((r) => isLines(r.url()) && r.ok()),
   ]);
 }
 
@@ -53,11 +63,11 @@ function collectRequests(page: Page): string[] {
   return requests;
 }
 
-/** Zählt die Requests auf die Wegzeit-Tabelle ab jetzt. */
-function tableRequests(page: Page): string[] {
+/** Zählt die Requests auf eine Datei ab jetzt (Standard: die Wegzeit-Tabelle). */
+function tableRequests(page: Page, matches: (url: string) => boolean = isTable): string[] {
   const requests: string[] = [];
   page.on("request", (req) => {
-    if (isTable(req.url())) requests.push(req.url());
+    if (matches(req.url())) requests.push(req.url());
   });
   return requests;
 }
@@ -101,7 +111,8 @@ test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein
 
   await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
   const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
-  await expect(detail.getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+  // eine Linie (Plan 0012, E1): Beispielhof direkt mit Tram 1
+  await expect(detail.getByText(`ca. 15 Min. mit Tram${NB}1 ab Gostenhof`)).toBeVisible();
   expect(page.url()).not.toContain("gostenhof");
   expect(page.url()).not.toMatch(COORDINATE);
   await detail.getByRole("button", { name: "Zurück" }).click();
@@ -114,10 +125,10 @@ test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein
   expect(await page.evaluate((key) => localStorage.getItem(key), KEY)).toBe("gostenhof");
 });
 
-test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request auf wegzeit.json (E9)", async ({
+test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request auf wegzeit.json und linien.json (E9)", async ({
   page,
 }) => {
-  const requests = tableRequests(page);
+  const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
   await ready(page);
   // Filter-Sheet und Kalender sind kein Anlass
   await page.getByRole("button", { name: /^Alle Filter/ }).click();
@@ -134,17 +145,22 @@ test.describe("Gespeicherter Stadtteil", () => {
   // Die Karte (zweiter Auslöser) lädt Kacheln
   test.use({ tiles: "mock" });
 
-  test("genau ein Request beim Start; Kind-Sheet und Karte laden nicht erneut (E9)", async ({ page }) => {
+  test("genau ein Request beim Start, auch auf linien.json; Kind-Sheet und Karte laden nicht erneut (E9)", async ({
+    page,
+  }) => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
     const requests = tableRequests(page);
+    const lines = tableRequests(page, isLines);
     await ready(page);
     await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expect.poll(() => lines.length).toBe(1);
     const sheet = await openKidSheet(page);
     await sheet.getByRole("button", { name: "Fertig" }).click();
     await page.getByRole("button", { name: "Karte", exact: true }).click();
     await expect(page.locator(".places")).toBeVisible();
     await page.waitForTimeout(300);
     expect(requests).toHaveLength(1);
+    expect(lines).toHaveLength(1);
   });
 });
 
@@ -178,7 +194,7 @@ test("Standort mit Freigabe: gerundet, nur im Speicher, Wegzeit, ab dem Tipp kei
   await expect(sheet.getByText(/Wegzeit ab deinem Standort \(auf ca\. 100 m gerundet\)/)).toBeVisible();
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(page.getByRole("status")).toContainText(
-    "Wegzeit ab deinem Standort mit Bus & Bahn (Di vormittags, inkl. Warten)",
+    "Wegzeit ab deinem Standort mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)",
   );
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText(/^\d+ Min\.$/);
   await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
@@ -599,5 +615,62 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     await expect(pending).toHaveCount(0);
     await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
     await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
+  });
+});
+
+// Plan 0012, E1: zwei Linien im Detail. Musikschule ab Gostenhof: Zelle 9001 = 28 mit Umstiegs-Bit, „Tram 1 → Bus 2“
+// (Tram 1 bis 9004:1, Umstieg zu 9004:2, Bus 2 bis 9007, 34 m zu Fuß); 1,58 + 28 = 29,6 → „ca. 30 Min.“.
+test("Detail mit zwei Linien: sichtbar „→“, vorgelesen „, dann“, in einer Zeile", async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+  await ready(page);
+  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await page
+    .getByRole("heading", { level: 3, name: /^Musikgarten/ })
+    .getByRole("button")
+    .click();
+  const reach = page.getByRole("dialog").locator(".reach-long");
+  await expect(reach).toContainText(`Tram${NB}1`);
+  await expectTwoLines(reach, "ca. 30 Min. mit Tram 1, dann Bus 2 ab Gostenhof");
+});
+
+test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
+  test.describe("abgebrochen", () => {
+    // Der abgebrochene Request meldet sich je nach Engine in der Konsole.
+    test.use({ allowedConsoleErrors: [/\/data\/linien\.json\b/] });
+
+    test("linien.json abgebrochen: „mit Bus & Bahn“, Minuten und Filter wirken", async ({ page }) => {
+      await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+      await page.route(LINES, (route) => route.abort());
+      await ready(page, "./?wegzeit=20");
+      await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+      // bis 20 Min.: ohne Musikschule (29,6) und Gemeinde (23,6)
+      await expect(offers(page)).toHaveCount(6);
+      await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
+      await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+      await expect(page.getByRole("dialog").getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    });
+  });
+
+  test("linien.json kommt 1,5 s später: erst „mit Bus & Bahn“, dann die Linien ohne Interaktion (Review B1)", async ({
+    page,
+  }) => {
+    let release: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(LINES, async (route) => {
+      await held;
+      await route.continue();
+    });
+    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+    await ready(page);
+    await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
+    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    await page.waitForTimeout(1500);
+    release();
+    await expect(dialog.getByText(`ca. 15 Min. mit Tram${NB}1 ab Gostenhof`)).toBeVisible();
   });
 });

@@ -1,6 +1,6 @@
 /** Mobile-UX-Gates für jede Ansicht und jedes Overlay, hell und dunkel (Plan 0003, Plan 0007, docs/architecture.md). */
 import type { Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, MAP_READY, test, twoLinesEverywhere } from "./fixtures.ts";
 import {
   backgroundLuminance,
   expectAccessible,
@@ -59,7 +59,7 @@ async function openProviders(page: Page) {
 }
 
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
-const MAP_VIEWS = new Set(["karte", "orts-sheet", "karte-fehler"]);
+const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-fehler"]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
 const CONSOLE_ERRORS: Record<string, RegExp[]> = {
@@ -115,7 +115,9 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   "kind-sheet-wegzeit": async (page) => {
     const sheet = await pickGostenhof(page);
     await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();
-    await expect(sheet.getByText(/^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß/)).toBeVisible();
+    await expect(
+      sheet.getByText(/^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß.*mehr als einen Umstieg/),
+    ).toBeVisible();
     await expect(sheet.getByRole("link", { name: "Fiktiver Fahrplan für Tests" })).toBeVisible();
     await expect(sheet.getByRole("link", { name: "CC0 1.0" })).toBeVisible();
   },
@@ -133,10 +135,14 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByText("„bis 45 Min.“ braucht einen Startpunkt.")).toBeVisible();
     await expect(page.getByTestId("offer").first()).toBeVisible();
   },
+  // Plan 0012, E4: längste Folge der Fixture „Tram 1 → Bus 202E“. Echt hat sie nur die Gemeinde ab Gostenhof; deren
+  // Detail bricht aber unabhängig davon „Geschwisterkinder“ im Preis (Befund im Plan, „Umsetzung“). Deshalb das
+  // Detail des Beispielhofs mit umgeschriebener Linien-Datei (fixtures.ts), gleicher Text der Linien.
   "detail-wegzeit": async (page) => {
+    await twoLinesEverywhere(page);
     await withGostenhof(page);
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
-    await expect(page.getByRole("dialog").getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    await expect(page.getByRole("dialog").locator(".reach-long")).toContainText("Bus\u00a0202E");
   },
   // Tabelle blockiert (E11): Luftlinie, längste Statuszeile und Hinweis mit „Nochmal laden“
   "entdecken-wegzeit-rueckfall": async (page) => {
@@ -267,6 +273,18 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     const sheet = page.getByRole("dialog", { name: "Anbieter" });
     await expect(sheet.locator(".lazy-box")).toContainText("Die Anbieter konnten nicht geladen werden.");
     await expect(sheet.getByRole("button", { name: "Nochmal versuchen" })).toBeVisible();
+  },
+  // Orts-Sheet mit zwei Linien: Die Fixture hat dafür keinen Ort, die Linien-Datei wird umgeschrieben (fixtures.ts)
+  "orts-sheet-wegzeit": async (page) => {
+    await twoLinesEverywhere(page);
+    await openMap(page);
+    await page
+      .getByRole("region", { name: "Orte" })
+      .getByRole("button", { name: /^Familientreff Beispielhof/ })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" }).locator(".reach-long")).toContainText(
+      "Bus\u00a0202E",
+    );
   },
   "orts-sheet": async (page) => {
     await openMap(page);
