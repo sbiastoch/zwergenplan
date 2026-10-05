@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   findProvider,
+  hasOffersOutside,
   matchesProviderQuery,
   type ProviderRow,
   providerCategories,
@@ -9,13 +10,13 @@ import {
 } from "./directory.ts";
 import { applyFilters, EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { airlineReach, type Origin, type Reach } from "./reach.ts";
-import { type SiteOffer, type SiteProvider, venueAddress } from "./site-data.ts";
+import { type SiteOffer, type SiteProvider, toProviderDirectory } from "./site-data.ts";
 import { FIXTURE_NOW, fixtureSiteOffers, loadFixtures } from "./test-fixtures.ts";
 
-/**
- * Katalog wie in anbieter.json (Plan 0010, E6), aus den Fixtures. Den Turnverein (ohne Angebote) ergänzt Paket A in
- * `tests/fixtures/`; bis dahin kommt er hier dazu, mit denselben Feldern. Danach greift die Bedingung nicht mehr.
- */
+/** Katalog wie in anbieter.json (Plan 0010, E6): derselbe Weg wie im Build, damit die Tests nicht abdriften. */
+const catalog = toProviderDirectory(loadFixtures().providers, FIXTURE_NOW.toISOString()).providers;
+
+/** Der Anbieter ohne Angebote aus den Fixtures, so wie er in anbieter.json steht (Adresse ohne Ortsnamen) */
 const TURNVEREIN: SiteProvider = {
   id: "turnverein-beispiel",
   name: "Turnverein Beispiel (fiktiv)",
@@ -26,24 +27,10 @@ const TURNVEREIN: SiteProvider = {
     { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
   ],
 };
-const fromFixtures: SiteProvider[] = loadFixtures().providers.flatMap((p) =>
-  p.role === "anbieter"
-    ? [
-        {
-          id: p.id,
-          name: p.name,
-          url: p.url,
-          topics: p.topics,
-          venues: p.venues.map(({ name, address, district }) => ({
-            name,
-            address: venueAddress(name, address),
-            ...(district === undefined ? {} : { district }),
-          })),
-        },
-      ]
-    : [],
-);
-const catalog = fromFixtures.some((p) => p.id === TURNVEREIN.id) ? fromFixtures : [...fromFixtures, TURNVEREIN];
+
+it("Katalog der Fixtures enthält den Turnverein ohne Angebote", () => {
+  expect(catalog).toContainEqual(TURNVEREIN);
+});
 
 const offers = fixtureSiteOffers();
 const upcoming = applyFilters(offers, EMPTY_FILTER, { now: FIXTURE_NOW });
@@ -255,6 +242,16 @@ describe("providerOffers", () => {
     expect(own.every((o) => o.providerId === "familientreff-beispiel")).toBe(true);
     expect(own.map((o) => o.title)).not.toContain("Elterncafé am Montag");
     expect(providerOffers(offers, "turnverein-beispiel", FIXTURE_NOW)).toEqual([]);
+  });
+});
+
+describe("hasOffersOutside", () => {
+  it("meldet, ob die Auswahl Angebote des Anbieters ausblendet (Hinweis im Sheet, E4)", () => {
+    const own = providerOffers(offers, "theater-beispiel", FIXTURE_NOW);
+    expect(own.length).toBeGreaterThan(0);
+    expect(hasOffersOutside(own, upcoming)).toBe(false);
+    expect(hasOffersOutside(own, visibleWith(buecher))).toBe(true);
+    expect(hasOffersOutside([], visibleWith(buecher))).toBe(false);
   });
 });
 

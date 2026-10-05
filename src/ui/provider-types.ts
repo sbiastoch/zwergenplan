@@ -41,8 +41,6 @@ export interface ProviderSheetProps {
   visible: readonly SiteOffer[];
   /** Kacheln: merken, Detail über dem Sheet öffnen, unpassende markieren (E3, E4) */
   ctx: CardContext;
-  /** ID weder im Katalog noch in den Angeboten: Die App entfernt `anbieter=` (E3) */
-  onUnknown: () => void;
   onClose: () => void;
 }
 

@@ -66,6 +66,7 @@ const CONSOLE_ERRORS: Record<string, RegExp[]> = {
   "entdecken-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
   "filter-sheet-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
   "anbieter-fehler": [/\/data\/anbieter\.json\b/],
+  "anbieter-sheet-fehler": [/\/data\/anbieter\.json\b/],
 };
 
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
@@ -257,6 +258,15 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await tabButton(page, "Anbieter").click();
     await expect(page.locator(".lazy-box")).toContainText("Die Anbieter konnten nicht geladen werden.");
     await expect(page.getByRole("button", { name: "Nochmal versuchen" })).toBeVisible();
+  },
+  // dasselbe im Sheet (Overlay im Top-Layer), erreicht über das Detail (Arch-Review m5)
+  "anbieter-sheet-fehler": async (page) => {
+    await page.route("**/data/anbieter.json", (route) => route.fulfill({ status: 503 }));
+    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    await page.getByRole("button", { name: "Mehr von diesem Anbieter" }).click();
+    const sheet = page.getByRole("dialog", { name: "Anbieter" });
+    await expect(sheet.locator(".lazy-box")).toContainText("Die Anbieter konnten nicht geladen werden.");
+    await expect(sheet.getByRole("button", { name: "Nochmal versuchen" })).toBeVisible();
   },
   "orts-sheet": async (page) => {
     await openMap(page);

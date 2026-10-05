@@ -28,6 +28,7 @@ const DETAIL_STATE = { zpDetail: true } as const;
 /** Markiert einen History-Eintrag, den das Öffnen des Anbieter-Sheets erzeugt hat (Plan 0010, E3). */
 const PROVIDER_STATE = { zpProvider: true } as const;
 
+// `history.state` ist `any`: Gelesen werden nur unsere eigenen Marker, fremde Einträge ergeben `undefined`.
 const historyState = () => window.history.state as { zpDetail?: boolean; zpProvider?: boolean } | null;
 
 function urlFor(route: Route): string {

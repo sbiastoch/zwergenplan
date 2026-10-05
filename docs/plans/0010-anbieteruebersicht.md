@@ -1,6 +1,6 @@
 # Plan 0010 – Anbieterübersicht
 
-Status: Paket 0 live, ADR 0012 entschieden (2026-10-05) → Umsetzung ab Schritt 4 „Schnittstellen“
+Status: umgesetzt und zusammengeführt (2026-10-05, Branch `anbieter-0010-int`) → CI, `main`, Browser-Review live
 Datum: 2026-10-05
 Bezug: `docs/ideas.md` („Anbieterverzeichnis auf der Website, ersetzt das frühere `ANBIETER.md`“), Plan 0004 (Startpunkt, `reachOf`), Plan 0005 (Ladekette der Karte, Orts-Liste und Orts-Sheet als Vorbild), Plan 0007 (Text-Gate, Tab-Leiste quer als Seitenleiste, E14), Plan 0008 (Feinschliff: Badge quer, `atPlace`, `retry`), **Plan 0009** (Öffi-Wegzeit, `ReachMode`, ADR 0011: kommt vor diesem Plan), ADR 0002 (Datenfluss), ADR 0003 (Themen → Kategorien), ADR 0006 (Katalog im Zod-Vertrag), ADR 0008 (Privatsphäre, Lazy-Budgets).
 
@@ -15,7 +15,7 @@ Eltern sehen auf einen Blick, **wer** in Nürnberg etwas für Kinder unter 3 Jah
   - Anbieter ohne kommende Termine stehen offen und blass am Ende, mit „Gerade keine Termine im Plan“ (N3).
   - Filter, Kategorie-Sticker und Altersregel wirken wie in „Entdecken“. Eine Suche filtert nach Namen.
 - Ein Tipp auf einen Anbieter öffnet das **Anbieter-Sheet** (`?anbieter=<id>`): Kategorien, „Website & Programm“, Orte und alle kommenden Angebote als Kacheln.
-- Aus dem **Detail** führt „Alle Angebote dieses Anbieters“ in dasselbe Sheet, aus jeder Ansicht.
+- Aus dem **Detail** führt „Alle Angebote dieses Anbieters“ (umgesetzt als „Mehr von diesem Anbieter“, siehe „Umsetzung, Paket A“) in dasselbe Sheet, aus jeder Ansicht.
 - Die Daten kommen aus dem vorhandenen Katalog. **Keine Schemaänderung**, kein neuer Pipeline-Lauf. Eine eigene Datei `data/anbieter.json` (7,6 kB gzip) lädt erst beim ersten Öffnen.
 - Der Code der Übersicht ist ein eigener **Lazy-Chunk** in `dist/assets/anbieter/`.
 - **Paket 0** verschlankt vorher das Startbundle (E8). Nach ADR 0012 gilt das Budget `JS (initial)` von 92 kB; das Start-JS liegt nach Plan 0009 und 0010 bei **≤ 91,0 kB** (1 kB Reserve).
@@ -170,7 +170,7 @@ CSS-Änderungen (Startwerte, entscheiden tun Text-Gate und `layout.spec.ts`):
 
 **Was „Anbieter“ oben zeigt:** Sticker und Schnellfilter wie in „Entdecken“, weil sie in der Liste wirken (E4). Die Bedingung in `App.tsx` lautet `section === "entdecken" || section === "anbieter"`. Die Statuszeile ist die einzige `role="status"`-Region, Hinweise (Alter, Wegzeit) stehen darunter wie in den anderen Tabs.
 
-**Detail-Knopf:** „Alle Angebote dieses Anbieters“ (`.btn wide`, Icon `store`) steht direkt über „Website von …“. Er öffnet das Sheet über dem aktuellen Tab (E3).
+**Detail-Knopf:** „Alle Angebote dieses Anbieters“ (umgesetzt als „Mehr von diesem Anbieter“: Die lange Fassung brach bei 320 px um, siehe „Umsetzung, Paket A“) (`.btn wide`, Icon `store`) steht direkt über „Website von …“. Er öffnet das Sheet über dem aktuellen Tab (E3).
 
 ### E3 – Anbieter-Sheet und History, ohne Wartemechanik (M2)
 
@@ -622,6 +622,27 @@ Nicht in diesem Plan. Gründe:
   - `scripts/screenshots.ts`: Ansichten `anbieter`, `anbieter-sheet` und `tabs` (im Viewport `quer` die Seitenleiste).
 - **Produkt-Fix aus der Sichtprüfung:** Ohne Suchtext stand unter dem Feld „6 Anbieter“ (mit Turnverein), direkt unter der Statuszeile „5 Anbieter mit 8 Angeboten“. Die Live-Region zählt jetzt nur mit Suchtext. Ohne Suchtext bleibt sie leer, die Zeile bleibt reserviert (`min-height`), damit beim ersten Buchstaben nichts springt. Das weicht von E5 ab: Die Zahl ohne Suche nennt schon die Statuszeile.
 - **Ergebnis:** Pixel 7 und iPhone 15 grün mit `anbieter-inhalt`, `anbieter`, `layout`, `app`, `karte` und `mobile-ux` (602 Tests, 6 übersprungen); `smoke` grün (13 Tests).
+
+**Schritt 6, Zusammenführung (2026-10-05, Branch `anbieter-0010-int`):**
+- **Reihenfolge:**
+  - Schnittstellen ← B, dann A gemergt. Konflikt nur in diesem Plan, beide Abschnitte übernommen.
+  - Danach die E2E-Ergänzungen von A (`anbieter.spec.ts`, Fälle 3, 4, 6, 7, 8) und von B (`anbieter-inhalt.spec.ts`, `mobile-ux.spec.ts`, `smoke.spec.ts`, `screenshots.ts`).
+- **`PW_PORT=4373 pnpm check` komplett, mit WebKit:** grün. 691 Unit-Tests, 1 513 E2E-Fälle bestanden, 373 per Projektfilter übersprungen.
+- **Budget** (echte Daten, gzip, nach den Fixes aus dem Arch-Review):
+  - Start-JS **90,90 kB** von 92 kB. Ziel ≤ 91,0 kB eingehalten. Zuwachs durch diesen Plan +1,28 kB gegenüber 89,62 kB (Vorgabe ≤ 1,3 kB).
+  - `Anbieter JS (lazy)` 2,74 kB von 6 kB, `Daten (anbieter.json)` 7,61 kB von 15 kB, CSS 10,95 kB von 15 kB.
+  - Chunk-Wächter grün.
+
+### Arch-Review Schritt 8 (2026-10-05, arch-reviewer) – Verdict: OK, keine Blocker → eingearbeitet
+- **M1 (Nachweis Schritt 6):** `pnpm check` komplett und das Budget am integrierten Stand. → Siehe oben.
+- **m1:** Die Mengenrechnung „Angebote außerhalb der Auswahl“ stand im Sheet. → `hasOffersOutside` in `directory.ts`, mit Test.
+- **m2:** Die Prüfung auf eine unbekannte ID gab es doppelt, der Zweig im Sheet war tot. → `isKnownProvider` in `provider-count.ts` (Start, mit Test) für den Lader. Das Sheet und `ProviderSheetProps` kennen kein `onUnknown` mehr.
+- **m3:** Scheiterte `site.json`, stand das Sheet beim Deep-Link endlos auf „wird geladen“, modal über der Fehlerseite. → Ohne Daten bleibt der Dialog zu (`sheetProviderId` in `App.tsx`), `anbieter=` bleibt in der URL, nach „Nochmal versuchen“ öffnet das Sheet. Test in `anbieter.spec.ts`, erst rot, dann grün.
+- **m4:** Bei der Rückkehr in den Tab blitzte der Ladekasten auf. → Abgeglichene Kataloge sind je Datenstand gemerkt. `useLazy` bekommt optional `peek` für ein schon geladenes Modul, und ein Modul im Zustand „da“ fällt im Effekt nicht mehr auf „laden“ zurück. Der Test (MutationObserver im Datenstand-Fall) war mit dem Cache allein noch rot, mit `peek` ist er grün.
+- **m5:** Der Fehlerzustand des Sheets war nur hell geprüft. → Ansicht `anbieter-sheet-fehler` in `mobile-ux.spec.ts`: hell, dunkel, 320 px / 200 %, beide Engines.
+- **m6:** `as`-Casts ohne Begründung. → Begründungen im Code, zwei davon in `anbieter.spec.ts`. Der neue Test kommt ohne Cast aus (`data`-Attribut).
+- **m7:** Die Testhilfe in `directory.test.ts` baute den Katalog von Hand nach. → Sie nutzt jetzt `toProviderDirectory`, der Turnverein ist nur noch ein erwartetes Objekt mit eigenem Test.
+- **m8:** Doku-Drift. → `architecture.md` hat jetzt die Tab-Leiste und `anbieter.json` in der Startpunkt-Invariante. Statuszeile, Ziel und E2 hier verweisen auf „Mehr von diesem Anbieter“.
 
 ## Struktur
 

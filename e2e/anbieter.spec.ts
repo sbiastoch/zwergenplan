@@ -65,6 +65,7 @@ async function staleDirectoryOnce(page: Page) {
     calls++;
     if (calls > 1) return route.continue();
     const response = await route.fetch();
+    // Antwort des eigenen Fixture-Builds (beim Build per Zod geprüft); gelesen wird nur das eine Feld
     const data = (await response.json()) as { generatedAt: string };
     await route.fulfill({ response, json: { ...data, generatedAt: "2026-09-01T06:00:00+02:00" } });
   });
@@ -308,6 +309,26 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
   });
 });
 
+test.describe("site.json scheitert (Arch-Review m3)", () => {
+  test.use({ allowedConsoleErrors: [/\/data\/site\.json\b/] });
+
+  test("Deep-Link ?anbieter=: kein Sheet über der Fehlerseite; „Nochmal versuchen“ öffnet es dann", async ({
+    page,
+  }) => {
+    await page.route("**/data/site.json", (route) => route.fulfill({ status: 503, body: "" }));
+    await page.goto("./?anbieter=theater-beispiel");
+    const alert = page.getByRole("alert");
+    await expect(alert).toContainText("Die Angebote ließen sich gerade nicht laden.");
+    // Ohne Datenstand gäbe es nur „wird geladen …“ ohne Ende: Das Sheet bleibt zu, die Fehlerseite ist bedienbar.
+    await expect(providerSheet(page)).toBeHidden();
+    expect(new URL(page.url()).searchParams.get("anbieter")).toBe("theater-beispiel");
+
+    await page.unroute("**/data/site.json");
+    await alert.getByRole("button", { name: "Nochmal versuchen" }).click();
+    await expect(providerSheet(page).getByRole("heading", { level: 2 })).toHaveText(/Kleines Theater/);
+  });
+});
+
 test.describe("Fehler (E10)", () => {
   test.use({ allowedConsoleErrors: [/\/data\/anbieter\.json\b/] });
 
@@ -352,11 +373,18 @@ test.describe("Datenstand (E6, M4)", () => {
     await expect(searchField(page)).toBeVisible();
     expect(requests, "erst geladen, dann einmal neu").toHaveLength(2);
 
-    // Wechsel und Rückkehr fragen nicht noch einmal nach
+    // Wechsel und Rückkehr fragen nicht noch einmal nach und zeigen den Katalog sofort, ohne einen Frame mit dem
+    // Ladekasten (Arch-Review m4)
     await tab(page, "Entdecken").click();
+    await page.evaluate(() => {
+      new MutationObserver(() => {
+        if (document.querySelector(".lazy-box")) document.documentElement.dataset["sahLazyBox"] = "ja";
+      }).observe(document.body, { childList: true, subtree: true });
+    });
     await tab(page, "Anbieter").click();
     await expect(searchField(page)).toBeVisible();
     expect(requests).toHaveLength(2);
+    await expect(page.locator("html")).not.toHaveAttribute("data-sah-lazy-box");
   });
 
   test("fehlt ein Anbieter in anbieter.json, steht er als Rückfall-Zeile da, im Sheet ohne Website-Knopf", async ({
@@ -365,6 +393,7 @@ test.describe("Datenstand (E6, M4)", () => {
     // gleicher Datenstand, kein Reload: Der Theater-Eintrag fehlt einfach (z. B. Katalog älter als site.json, M4)
     await page.route("**/data/anbieter.json", async (route) => {
       const response = await route.fetch();
+      // Antwort des eigenen Fixture-Builds (beim Build per Zod geprüft); gelesen werden nur die IDs
       const data = (await response.json()) as { providers: { id: string }[] };
       await route.fulfill({
         response,

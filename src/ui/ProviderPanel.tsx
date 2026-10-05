@@ -10,6 +10,7 @@
  */
 import { useEffect, useState } from "react";
 import { ensureFresh, loadProviderDirectory } from "../data/providers.ts";
+import { isKnownProvider } from "../domain/provider-count.ts";
 import type { ProviderDirectoryData } from "../domain/site-data.ts";
 import { LoadFailed, useLazy } from "./Lazy.tsx";
 import type { ProviderScreenProps, ProviderSheetProps, ProviderUiModule } from "./provider-types.ts";
@@ -28,9 +29,14 @@ async function loadChunk(): Promise<ProviderUiModule> {
   return { ProviderScreen, ProviderSheet };
 }
 
+/** Schon geladen: für `useLazy` (peek), damit die Rückkehr in den Tab ohne Ladekasten auskommt */
+let loaded: ProviderUi | undefined;
+const peekProviderUi = (): ProviderUi | undefined => loaded;
+
 async function fetchUi(): Promise<ProviderUi> {
   const [ui, data] = await Promise.all([loadChunk(), loadProviderDirectory()]);
-  return { ...ui, data };
+  loaded = { ...ui, data };
+  return loaded;
 }
 
 /**
@@ -49,6 +55,12 @@ export function loadProviderUi(): Promise<ProviderUi> {
 export const preloadProviderUi = (): void => void loadProviderUi().catch(() => {});
 
 /**
+ * Abgeglichene Kataloge je Datenstand von site.json: Ein neuer Mount (Tabwechsel, nächstes Sheet) hat das Ergebnis so
+ * sofort, ohne einen Frame mit dem Ladekasten (Arch-Review m4). `ensureFresh` merkt sich das Promise ohnehin.
+ */
+const fresh = new Map<string, ProviderDirectoryData>();
+
+/**
  * Katalog mit dem Datenstand von site.json (`expected`). Gleich: sofort. Abweichend: höchstens ein Reload
  * (`ensureFresh`), solange `undefined`. Ohne `expected` (site.json lädt noch, Deep-Link) ebenfalls `undefined`.
  */
@@ -56,21 +68,22 @@ function useFreshDirectory(
   data: ProviderDirectoryData | undefined,
   expected: string | undefined,
 ): ProviderDirectoryData | undefined {
-  const [fresh, setFresh] = useState<{ expected: string; data: ProviderDirectoryData }>();
+  const [, setResolved] = useState(0);
   const stale = data !== undefined && expected !== undefined && data.generatedAt !== expected;
+  const known = expected === undefined ? undefined : fresh.get(expected);
   useEffect(() => {
-    if (!stale || data === undefined || expected === undefined) return;
+    if (!stale || known !== undefined || data === undefined || expected === undefined) return;
     let live = true;
     void ensureFresh(data, expected).then((next) => {
-      if (live) setFresh({ expected, data: next });
+      fresh.set(expected, next);
+      if (live) setResolved((n) => n + 1);
     });
     return () => {
       live = false;
     };
-  }, [stale, data, expected]);
+  }, [stale, known, data, expected]);
   if (data === undefined || expected === undefined) return undefined;
-  if (!stale) return data;
-  return fresh?.expected === expected ? fresh.data : undefined;
+  return stale ? known : data;
 }
 
 function Loading({ children }: { children: string }) {
@@ -97,7 +110,7 @@ type ProviderPanelProps = Omit<ProviderScreenProps, "directory"> & {
 };
 
 export function ProviderPanel({ generatedAt, ...props }: ProviderPanelProps) {
-  const { module, attempt, retry } = useLazy(loadProviderUi);
+  const { module, attempt, retry } = useLazy(loadProviderUi, peekProviderUi);
   const directory = useFreshDirectory(module.kind === "da" ? module.View.data : undefined, generatedAt);
   if (module.kind === "fehler") return <Failed attempt={attempt} retry={retry} />;
   if (module.kind === "laden" || directory === undefined) return <Loading>Anbieter werden geladen …</Loading>;
@@ -105,6 +118,8 @@ export function ProviderPanel({ generatedAt, ...props }: ProviderPanelProps) {
 }
 
 type ProviderSheetLoaderProps = Omit<ProviderSheetProps, "directory"> & {
+  /** ID weder im Katalog noch in den Angeboten: Die App entfernt `anbieter=` (E3) */
+  onUnknown: () => void;
   /** Datenstand von site.json; `undefined`, solange site.json noch lädt (Deep-Link `?anbieter=`) */
   generatedAt: string | undefined;
 };
@@ -113,14 +128,11 @@ type ProviderSheetLoaderProps = Omit<ProviderSheetProps, "directory"> & {
  * Inhalt des Anbieter-Sheets (E3). Rendert nur bei offenem Dialog, erst dann lädt `useLazy`. Gibt es die ID weder im
  * Katalog noch in den Angeboten, meldet er das nach dem Laden (`onUnknown`), und die App entfernt `anbieter=`.
  */
-export function ProviderSheetLoader({ generatedAt, ...props }: ProviderSheetLoaderProps) {
-  const { providerId, offers, onUnknown, onClose } = props;
-  const { module, attempt, retry } = useLazy(loadProviderUi);
+export function ProviderSheetLoader({ generatedAt, onUnknown, ...props }: ProviderSheetLoaderProps) {
+  const { providerId, offers, onClose } = props;
+  const { module, attempt, retry } = useLazy(loadProviderUi, peekProviderUi);
   const directory = useFreshDirectory(module.kind === "da" ? module.View.data : undefined, generatedAt);
-  const unknown =
-    directory !== undefined &&
-    !directory.providers.some((p) => p.id === providerId) &&
-    !offers.some((o) => o.providerId === providerId);
+  const unknown = directory !== undefined && !isKnownProvider(directory.providers, offers, providerId);
   useEffect(() => {
     if (unknown) onUnknown();
   }, [unknown, onUnknown]);

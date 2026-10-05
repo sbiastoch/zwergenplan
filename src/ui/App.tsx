@@ -178,7 +178,10 @@ export function App() {
   const toggle = section === "entdecken" && (
     <ViewToggle map={route.tab === "karte"} onMap={(map) => replace({ ...route, tab: map ? "karte" : "entdecken" })} />
   );
-  const dialogOpen = sheet !== null || detailOffer !== undefined || placeSheet || route.providerId !== undefined;
+  // Ohne site.json bliebe das Anbieter-Sheet beim Laden stehen, modal über der Fehlerseite (Arch-Review m3). Es öffnet
+  // erst mit den Daten; `anbieter=` bleibt in der URL, „Nochmal versuchen“ öffnet es dann.
+  const sheetProviderId = load.kind === "error" ? undefined : route.providerId;
+  const dialogOpen = sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined;
   const limit = route.filter.reachLimit;
   const limitOn = limitActive(reachMode);
   const hint = limit && limitHint(limit, reachMode);
@@ -384,7 +387,7 @@ export function App() {
         detailOffer={detailOffer}
         detailDay={detailDay}
         closeDetail={closeDetail}
-        providerId={route.providerId}
+        providerId={sheetProviderId}
         openProvider={openProvider}
         closeProvider={closeProvider}
         onUnknownProvider={dropProvider}

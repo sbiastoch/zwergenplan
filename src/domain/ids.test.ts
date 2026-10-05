@@ -65,6 +65,7 @@ describe("OfferIdInput", () => {
 
 describe("KEBAB_ID_PATTERN (Plan 0010, E2)", () => {
   it("akzeptiert alle Anbieter-IDs der Fixtures", () => {
+    // Rohdaten der Fixtures vor Zod; gelesen wird nur `id`, die das Schema für jeden Eintrag verlangt
     const ids = (rawFixtures().providers as Array<{ id: string }>).map((p) => p.id);
     expect(ids).toHaveLength(7);
     for (const id of ids) expect(KEBAB_ID_PATTERN.test(id), id).toBe(true);

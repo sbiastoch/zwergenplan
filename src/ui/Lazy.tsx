@@ -11,13 +11,24 @@ import { useEffect, useState } from "react";
 
 export type Lazy<C> = { kind: "laden" } | { kind: "da"; View: C } | { kind: "fehler" };
 
-export function useLazy<C>(load: () => Promise<C>): { module: Lazy<C>; attempt: number; retry: () => void } {
+/**
+ * `peek` (optional) liefert ein schon geladenes Modul synchron: Ein neuer Mount (Tabwechsel) zeigt es dann sofort,
+ * ohne einen Frame im Ladezustand (Plan 0010, Arch-Review m4).
+ */
+export function useLazy<C>(
+  load: () => Promise<C>,
+  peek?: () => C | undefined,
+): { module: Lazy<C>; attempt: number; retry: () => void } {
   const [attempt, setAttempt] = useState(0);
-  const [module, setModule] = useState<Lazy<C>>({ kind: "laden" });
+  const [module, setModule] = useState<Lazy<C>>(() => {
+    const View = peek?.();
+    return View === undefined ? { kind: "laden" } : { kind: "da", View };
+  });
   useEffect(() => {
     void attempt;
     let live = true;
-    setModule({ kind: "laden" });
+    // Ein schon geladenes Modul (peek) bleibt stehen, sonst „laden“ bis zur Antwort
+    setModule((m) => (m.kind === "da" ? m : { kind: "laden" }));
     // vite:preloadError wird bewusst nicht unterdrückt, sonst löste import() ohne Modul auf (E2).
     load().then(
       (View) => live && setModule({ kind: "da", View }),

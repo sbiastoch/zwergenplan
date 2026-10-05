@@ -6,3 +6,15 @@
 export function countProviders(offers: readonly { providerId: string }[]): number {
   return new Set(offers.map((o) => o.providerId)).size;
 }
+
+/**
+ * Gibt es den Anbieter aus `anbieter=<id>` (E3)? Im Katalog oder, als Rückfall-Zeile, in den Angeboten. Sonst entfernt
+ * die App den Parameter. Liegt im Start, weil der Lader des Sheets (ProviderPanel.tsx) das vor dem Chunk prüft.
+ */
+export function isKnownProvider(
+  providers: readonly { id: string }[],
+  offers: readonly { providerId: string }[],
+  providerId: string,
+): boolean {
+  return providers.some((p) => p.id === providerId) || offers.some((o) => o.providerId === providerId);
+}

@@ -150,6 +150,12 @@ export function providerOffers(offers: readonly SiteOffer[], providerId: string,
   return offers.filter((o) => o.providerId === providerId && nextSession(o, now) !== undefined);
 }
 
+/** Blendet die Auswahl (Filter, Alter, Wegzeit) Angebote dieses Anbieters aus? Dann sagt das Sheet es dazu (E4). */
+export function hasOffersOutside(own: readonly SiteOffer[], visible: readonly SiteOffer[]): boolean {
+  const shown = new Set(visible.map((o) => o.id));
+  return own.some((o) => !shown.has(o.id));
+}
+
 /** Katalog-Eintrag oder Rückfall aus allen Angeboten des Anbieters; `undefined`, wenn es die ID nirgends gibt (E3) */
 export function findProvider(
   providers: readonly SiteProvider[],

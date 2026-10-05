@@ -2,28 +2,25 @@
  * Anbieter-Sheet (Plan 0010, E10): Name, Kategorien, „Website & Programm“, Orte und alle kommenden Angebote als
  * Kacheln, unabhängig von Filtern und Alter (E4). Inhalt des Dialogs, die Hülle rendert Overlays.tsx (E3).
  */
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { groupByNextSession } from "../../domain/agenda.ts";
-import { findProvider, providerCategories, providerOffers } from "../../domain/directory.ts";
+import { findProvider, hasOffersOutside, providerCategories, providerOffers } from "../../domain/directory.ts";
 import { CATEGORY_LABELS } from "../../domain/topics.ts";
 import { Icon } from "../icons.tsx";
 import { OfferCard } from "../OfferCard.tsx";
 import type { ProviderSheetProps } from "../provider-types.ts";
 
-export function ProviderSheet({ directory, providerId, offers, visible, ctx, onUnknown, onClose }: ProviderSheetProps) {
+export function ProviderSheet({ directory, providerId, offers, visible, ctx, onClose }: ProviderSheetProps) {
   const { now } = ctx;
   const provider = useMemo(
     () => findProvider(directory.providers, offers, providerId),
     [directory.providers, offers, providerId],
   );
   const own = useMemo(() => providerOffers(offers, providerId, now), [offers, providerId, now]);
-  useEffect(() => {
-    if (!provider) onUnknown();
-  }, [provider, onUnknown]);
+  // Unbekannte IDs fängt schon der Lader ab (`isKnownProvider`, ProviderPanel.tsx) und rendert das Sheet dann nicht.
   if (!provider) return null;
 
-  const shown = new Set(visible.map((o) => o.id));
-  const outside = own.some((o) => !shown.has(o.id));
+  const outside = hasOffersOutside(own, visible);
   const categories = providerCategories(provider, own);
 
   return (
