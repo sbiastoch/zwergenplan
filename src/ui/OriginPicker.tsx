@@ -1,10 +1,13 @@
 /**
- * Kind-Sheet, Abschnitt „Entfernung ab“ (Plan 0004, E5): Startpunkt per Standort oder Stadtteil.
- * Der Zustand kommt aus `useOrigin` (use-app-state.ts); hier wird nur angezeigt und gewählt.
+ * Kind-Sheet, Abschnitt „Wegzeit ab“ (Plan 0004, E5; Plan 0009, E1/E3): Startpunkt per Standort oder Stadtteil,
+ * darunter der Quellenhinweis der Wegzeit. Der Zustand kommt aus `useOrigin` (use-app-state.ts); hier wird nur
+ * angezeigt und gewählt.
  */
 import { useId } from "react";
 import type { PositionProblem } from "../data/geolocation.ts";
 import { DISTRICTS } from "../domain/districts.ts";
+import type { TransitSource } from "../domain/transit-types.ts";
+import { transitSourceNote } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import type { OriginApi } from "./use-app-state.ts";
 
@@ -26,25 +29,33 @@ function markAutofocus(el: HTMLSelectElement | null) {
   el?.setAttribute("autofocus", "");
 }
 
-export function OriginPicker({ api, focus }: { api: OriginApi; focus: boolean }) {
+export function OriginPicker({
+  api,
+  source,
+  focus,
+}: {
+  api: OriginApi;
+  source: TransitSource | undefined;
+  focus: boolean;
+}) {
   const { origin, locating, problem } = api;
   const selectId = useId();
   const hint = problem
     ? { cls: "hint bad", text: PROBLEMS[problem] }
     : origin?.source === "standort"
-      ? { cls: "hint ok", text: "Entfernung ab deinem Standort (auf ca. 100 m gerundet)." }
+      ? { cls: "hint ok", text: "Wegzeit ab deinem Standort (auf ca. 100 m gerundet)." }
       : undefined;
 
   return (
     <section className="origin" aria-labelledby={`${selectId}-h`}>
-      <h3 id={`${selectId}-h`}>Entfernung ab</h3>
+      <h3 id={`${selectId}-h`}>Wegzeit ab</h3>
       <p className="origin-now">
         {origin ? (
           <>
             Startpunkt: <b>{origin.label}</b>
           </>
         ) : (
-          "Noch kein Startpunkt – dann zeigen wir keine Entfernung."
+          "Noch kein Startpunkt – dann zeigen wir keine Wegzeit."
         )}
       </p>
       {api.canLocate && (
@@ -85,9 +96,18 @@ export function OriginPicker({ api, focus }: { api: OriginApi; focus: boolean })
       )}
       {/* Eigene Live-Region im Dialog; die einzige role="status" der Seite bleibt die Statuszeile. */}
       <div aria-live="polite">{hint && <p className={hint.cls}>{hint.text}</p>}</div>
-      <p className="small">
-        Luftlinie, nicht die Fahrzeit. Dein Standort wird nicht gespeichert, ein Stadtteil bleibt auf diesem Gerät.
-        Stadtteile: © OpenStreetMap-Mitwirkende.
+      <p className="small source-note">
+        {transitSourceNote(source).map((part) =>
+          typeof part === "string" ? (
+            part
+          ) : (
+            <a key={part.href} href={part.href} target="_blank" rel="noopener">
+              {part.text}
+            </a>
+          ),
+        )}{" "}
+        Dein Standort wird nicht gespeichert, ein Stadtteil bleibt auf diesem Gerät. Stadtteile: ©
+        OpenStreetMap-Mitwirkende.
       </p>
     </section>
   );

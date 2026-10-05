@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DISTRICTS } from "./districts.ts";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
-import { RADII_KM } from "./reach.ts";
+import { LIMIT_MINUTES } from "./reach.ts";
 import { parseRoute, routeToSearch, tabSection } from "./route.ts";
 
 const offerId = "familientreff--offener-krabbeltreff--beispielhof";
@@ -35,26 +35,32 @@ describe("URL-Route", () => {
     expect(parseRoute(`?ansicht=karte&angebot=${offerId}`)).toEqual({ tab: "karte", offerId, filter: EMPTY_FILTER });
   });
 
+  it("übernimmt den alten Umkreis nicht, die Wegzeit schon", () => {
+    expect(routeToSearch(parseRoute("?umkreis=5&ansicht=karte"))).toBe("ansicht=karte");
+    expect(routeToSearch(parseRoute("?ansicht=karte&wegzeit=30"))).toBe("wegzeit=30&ansicht=karte");
+  });
+
   it("kennt kein Geburtsdatum", () => {
     expect(routeToSearch(parseRoute("?geb=2026-01-01&geburtsdatum=2026-01-01"))).toBe("");
   });
 
-  it("kennt keinen Startpunkt: weder Koordinate noch Stadtteil (Plan 0004, E7)", () => {
-    const filters: FilterState[] = RADII_KM.flatMap((value) => [
-      { ...EMPTY_FILTER, reachLimit: { kind: "km", value } },
+  it("kennt keinen Startpunkt: weder Koordinate noch Stadtteil, auch mit wegzeit= (Plan 0004, E7; Plan 0009, E8)", () => {
+    const filters: FilterState[] = LIMIT_MINUTES.flatMap((value) => [
+      { ...EMPTY_FILTER, reachLimit: { kind: "minuten", value } },
       {
         categories: ["musik", "buecher"],
         formats: ["kurs"],
         registration: ["ohne-anmeldung"],
         cost: ["kostenlos"],
-        reachLimit: { kind: "km", value },
+        reachLimit: { kind: "minuten", value },
       },
     ]);
     const names = DISTRICTS.flatMap((d) => [d.id, d.name.toLowerCase()]);
     for (const filter of filters) {
       for (const tab of ["entdecken", "karte", "kalender", "merkliste"] as const) {
         const search = routeToSearch({ tab, offerId, filter });
-        expect(search).toContain(`umkreis=${filter.reachLimit?.value}`);
+        expect(search).toContain(`wegzeit=${filter.reachLimit?.value}`);
+        expect(search).not.toContain("umkreis");
         expect(search).not.toMatch(/\d{2}\.\d{2,}/);
         for (const name of names) expect(decodeURIComponent(search).toLowerCase()).not.toContain(name);
       }

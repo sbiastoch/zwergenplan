@@ -7,17 +7,19 @@
 import type { StartCamera } from "../domain/camera.ts";
 import type { GeoPoint } from "../domain/geo.ts";
 import type { Place } from "../domain/places.ts";
-import type { Origin } from "../domain/reach.ts";
+import type { Origin, ReachFn } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import type { CardContext } from "./OfferCard.tsx";
 
 /** Props der Karten-Oberfläche (karte/MapScreen.tsx), durchgereicht von MapPanel.tsx */
 export interface MapScreenProps {
-  /** sichtbare Angebote (Filter, Alter, Umkreis) */
+  /** sichtbare Angebote (Filter, Alter, Wegzeit) */
   offers: readonly SiteOffer[];
   /** Datenbasis des Startausschnitts: alle kommenden Angebote, ohne Filter, Alter, Startpunkt (ADR 0008) */
   cameraOffers: readonly SiteOffer[];
   origin: Origin | undefined;
+  /** Wegzeit bzw. Luftlinie zum Sortieren der Orts-Liste; `undefined` ohne Startpunkt oder solange sie lädt */
+  reach: ReachFn | undefined;
   dark: boolean;
   hasData: boolean;
   /** Kacheln im Orts-Sheet; `reachOf` auch für die Orts-Liste */
@@ -26,7 +28,7 @@ export interface MapScreenProps {
   toast: string;
   /** Orts-Sheet auf oder zu: Der Seiten-Toast schweigt dann (App) */
   onSheetOpen: (open: boolean) => void;
-  /** öffnet das Kind-Sheet bei „Entfernung ab“ */
+  /** öffnet das Kind-Sheet bei „Wegzeit ab“ */
   onPickOrigin: () => void;
   onMapCenter: (center: GeoPoint) => void;
   onResetFilter: () => void;

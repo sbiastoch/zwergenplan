@@ -2,7 +2,8 @@
  * Abgeleitete Ansichten der Angebote (Plan 0003, Arch-Review 7): Filter, Alters-Sichtbarkeit,
  * Liste in Schritten, Kalender, Merkliste, offenes Detail – plus der Ansichts-Zustand dazu.
  * „Jetzt“ kommt von außen (entsteht nur in `useNow`, use-app-state.ts), ebenso der Startpunkt
- * (`useOrigin`). Die Entfernung entsteht hier einmal je Koordinate, nicht je Render (Plan 0004, E6).
+ * als Entfernungs-Funktion (`useTransit`: Wegzeit oder Luftlinie). Die Entfernung entsteht hier einmal je
+ * Koordinate, nicht je Render (Plan 0004, E6; Plan 0009, E8).
  */
 import { useCallback, useMemo, useState } from "react";
 import { ageVisibility } from "../domain/age.ts";
@@ -18,7 +19,7 @@ import {
 import { clampDay } from "../domain/calendar.ts";
 import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
 import { countPlaces, placeKey } from "../domain/place-key.ts";
-import { type Origin, type Reach, reachTo } from "../domain/reach.ts";
+import type { Reach, ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import { savedOffers } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -35,8 +36,8 @@ export interface OfferViewsInput {
   ageOnly: boolean;
   savedIds: readonly string[];
   now: Date;
-  /** Startpunkt für Entfernung und Umkreis; nur im Speicher (Plan 0004, E3) */
-  origin?: Origin | undefined;
+  /** Entfernung ab dem Startpunkt (Wegzeit oder Luftlinie); ohne Startpunkt oder solange sie lädt `undefined` */
+  reach?: ReachFn | undefined;
 }
 
 export interface OfferViews {
@@ -54,7 +55,7 @@ export interface OfferViews {
     /** nur in der Kalenderansicht gefüllt */
     index: Map<string, Occurrence<SiteOffer>[]>;
     /**
-     * alle kommenden Angebote ohne Filter, Alter und Umkreis, nur in der Kalenderansicht gefüllt: Daraus
+     * alle kommenden Angebote ohne Filter, Alter und Wegzeit, nur in der Kalenderansicht gefüllt: Daraus
      * zählt `dayAgenda`, was die Auswahl an einem Tag ausblendet (Plan 0008, E12)
      */
     allIndex: Map<string, Occurrence<SiteOffer>[]>;
@@ -86,14 +87,14 @@ export interface OfferViews {
 const NO_REACH = (): undefined => undefined;
 
 /** Entfernung je Koordinate zwischengespeichert: Viele Angebote teilen sich einen Ort. */
-function reachCache(origin: Origin | undefined): (offer: SiteOffer) => Reach | undefined {
-  if (!origin) return NO_REACH;
+function reachCache(reachFn: ReachFn | undefined): (offer: SiteOffer) => Reach | undefined {
+  if (!reachFn) return NO_REACH;
   const cache = new Map<string, Reach>();
   return ({ venue }) => {
     const key = placeKey(venue.geo);
     let reach = cache.get(key);
     if (!reach) {
-      reach = reachTo(origin, venue);
+      reach = reachFn(venue);
       cache.set(key, reach);
     }
     return reach;
@@ -107,7 +108,7 @@ export function useOfferViews({
   ageOnly,
   savedIds,
   now,
-  origin,
+  reach,
 }: OfferViewsInput): OfferViews {
   const [showUnfit, setShowUnfit] = useState(false);
   const [limit, setLimit] = useState(PAGE);
@@ -116,8 +117,8 @@ export function useOfferViews({
 
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
   const filtered = useMemo(
-    () => applyFilters(offers, route.filter, { now, ...(origin ? { origin } : {}) }),
-    [offers, route.filter, now, origin],
+    () => applyFilters(offers, route.filter, { now, reach }),
+    [offers, route.filter, now, reach],
   );
   const { visible, hiddenCount, unfitIds } = useMemo(
     () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, showUnfit }),
@@ -136,14 +137,14 @@ export function useOfferViews({
     () =>
       route.tab === "kalender"
         ? endedOnDay(
-            offers.filter((o) => matchesFilter(o, route.filter, origin)),
+            offers.filter((o) => matchesFilter(o, route.filter, reach)),
             today,
             now,
           )
         : 0,
-    [offers, route.filter, route.tab, today, now, origin],
+    [offers, route.filter, route.tab, today, now, reach],
   );
-  const reachOf = useMemo(() => reachCache(origin), [origin]);
+  const reachOf = useMemo(() => reachCache(reach), [reach]);
   // Startausschnitt nur aus öffentlichen Daten: alle kommenden Angebote, ohne Filter, Alter und Startpunkt
   // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
   const map = useMemo(

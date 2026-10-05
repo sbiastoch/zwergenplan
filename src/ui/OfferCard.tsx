@@ -10,8 +10,8 @@ import {
   availabilityLabel,
   clock,
   costLabel,
-  distanceShort,
   formatFact,
+  reachShort,
   registrationLabel,
   sessionDay,
   shortDate,
@@ -31,6 +31,8 @@ export interface CardContext {
   animate: boolean;
   /** Entfernung zum Ort, nur mit Startpunkt (Plan 0004, E6); je Koordinate zwischengespeichert */
   reachOf: (offer: SiteOffer) => Reach | undefined;
+  /** Wegzeit lädt: Platzhalter statt Entfernung, ohne Layoutsprung (Plan 0009, E11) */
+  reachPending: boolean;
 }
 
 interface OfferCardProps {
@@ -72,11 +74,19 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, atPlace = fal
         <p className="meta">
           {offer.providerName}
           {!atPlace && ` · ${offer.venue.district ?? offer.venue.name}`}
-          {reach && (
+          {reach ? (
             <>
               {" · "}
-              <span className="dist">{distanceShort(reach)}</span>
+              <span className="dist">{reachShort(reach)}</span>
             </>
+          ) : (
+            ctx.reachPending &&
+            !atPlace && (
+              <>
+                {" · "}
+                <DistPending />
+              </>
+            )
           )}
         </p>
         <div className="facts">
@@ -91,6 +101,15 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, atPlace = fal
       </div>
       <HeartButton offer={offer} saved={saved} onToggle={ctx.onToggleSave} />
     </article>
+  );
+}
+
+/** Platzhalter der Entfernung mit reservierter Breite und Zeilenhöhe, solange die Wegzeit lädt (E11) */
+export function DistPending() {
+  return (
+    <span className="dist pending" aria-hidden="true">
+      {"\u00a0"}
+    </span>
   );
 }
 

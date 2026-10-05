@@ -1,4 +1,7 @@
-/* Entfernung (Plan 0004): Kind-Sheet „Entfernung ab“ (OriginPicker.tsx), gesperrte Umkreis-Chips, Kachel-Meta. */
+/*
+ * Startpunkt und Wegzeit (Plan 0004, Plan 0009): Kind-Sheet „Wegzeit ab“ mit Quellenhinweis (OriginPicker.tsx),
+ * gesperrte Wegzeit-Chips, Kachel-Meta, Platzhalter beim Laden der Wegzeit.
+ */
 
 @layer components {
   .origin-now {
@@ -39,7 +42,14 @@
     box-shadow: none;
   }
 
-  /* Filter-Sheet: Umkreis ohne Startpunkt */
+  /* Quellenhinweis der Wegzeit (Plan 0009, E3): Fließtext-Links, Trefferfläche ≥ 24 px wie die Karten-Attribution */
+  .source-note a {
+    color: var(--ink);
+    text-decoration: underline;
+    padding-block: 6px;
+  }
+
+  /* Filter-Sheet: Wegzeit-Grenze gesperrt (kein Startpunkt, lädt, Fehler, außerhalb) */
   .chip:disabled {
     cursor: not-allowed;
     opacity: 0.55;
@@ -53,14 +63,34 @@
     margin-top: 6px;
   }
 
-  /* Statuszeile: „Entfernung als Luftlinie ab …“ immer in eigener Zeile, ohne Trennpunkt */
+  /* Statuszeile: „Wegzeit ab …“ bzw. „Entfernung als Luftlinie ab …“ immer in eigener Zeile, ohne Trennpunkt */
   .status-note {
     flex-basis: 100%;
   }
 
-  /* Kachel: „1,4 km“ bricht nie zwischen Zahl und Einheit */
+  /* Kachel: „25 Min.“ bzw. „1,4 km“ bricht nie zwischen Zahl und Einheit */
   .meta .dist {
     white-space: nowrap;
+    font-weight: 700;
+  }
+
+  /*
+   * Wegzeit lädt (Plan 0009, E11, M7): Platzhalter mit reservierter Breite statt erst „km“, dann „Min.“; der Text
+   * der Statuszeile steht schon, unsichtbar (Höhe fest, keine Ansage). Bei gesetzter Grenze ersetzt ein Block so hoch
+   * wie zwei Tagesgruppen die noch ungefilterte Liste.
+   */
+  .dist.pending {
+    display: inline-block;
+    min-width: 6ch;
+  }
+  .status.pending,
+  .status-note.pending {
+    visibility: hidden;
+  }
+  .list-pending {
+    min-height: 25rem;
+    padding-top: 16px;
+    color: var(--muted);
     font-weight: 700;
   }
 }

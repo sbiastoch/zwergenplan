@@ -14,9 +14,9 @@ import {
   availabilityLabel,
   costLabel,
   dayDots,
-  distanceLong,
   longDate,
   plural,
+  reachLong,
   registrationLabel,
   registrationNote,
   sessionDay,
@@ -25,7 +25,7 @@ import {
   whenLabels,
 } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
-import { HeartButton } from "./OfferCard.tsx";
+import { DistPending, HeartButton } from "./OfferCard.tsx";
 
 interface DetailProps {
   offer: SiteOffer;
@@ -36,6 +36,8 @@ interface DetailProps {
   /** Startpunkt und Entfernung zum Ort; beides nur mit Startpunkt (Plan 0004, E6) */
   origin: Origin | undefined;
   reach: Reach | undefined;
+  /** Wegzeit lädt: Platzhalter statt Entfernung (Plan 0009, E11) */
+  reachPending: boolean;
   saved: boolean;
   onToggleSave: (offer: SiteOffer) => void;
   onClose: () => void;
@@ -49,6 +51,7 @@ export function DetailContent({
   birthDate,
   origin,
   reach,
+  reachPending,
   saved,
   onToggleSave,
   onClose,
@@ -98,7 +101,7 @@ export function DetailContent({
               <span className="cap">Wo</span>
               <b>{offer.venue.name}</b>
               <span>{[offer.venue.address, offer.venue.district].filter(Boolean).join(" · ")}</span>
-              {origin && reach && <span>{distanceLong(reach, origin)}</span>}
+              {origin && reach ? <span>{reachLong(reach, origin)}</span> : reachPending && <DistPending />}
             </div>
             <div className="label">
               <span className="cap">Alter</span>

@@ -1,0 +1,152 @@
+/**
+ * Wegzeit-Tabelle: Laden und Modus der Anzeige (Plan 0009, E9–E11; ADR 0011). Kern ist ein reiner Reducer
+ * (wie origin-state.ts): Geladen wird nur auf `want()` (Kind-Sheet, Karte, „Nochmal laden“) oder beim Start mit
+ * gespeichertem Stadtteil, höchstens einmal je Sitzung. Die Wahl eines Startpunkts löst nie einen Request aus:
+ * Der Startpunkt geht nur in `resolveReach` ein, nie in den Ladezustand.
+ */
+import { useCallback, useEffect, useMemo, useReducer } from "react";
+import { loadTransitTable } from "../data/transit.ts";
+import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
+import type { TransitSource, TransitTable, TransitTableFile } from "../domain/transit-types.ts";
+
+/**
+ * Rechenlogik aus `src/domain/transit.ts`, strukturell beschrieben: Das Modul ist ein Lazy-Chunk (E10), auch Typen
+ * kommen nicht statisch von dort (`transit-only-lazy`).
+ */
+export interface TransitLogic {
+  decodeTransitTable(file: TransitTableFile, placeKeys: ReadonlySet<string>): TransitTable | undefined;
+  transitReach(table: TransitTable, origin: Origin): ReachFn | undefined;
+}
+
+/**
+ * Einziger Lader von `src/domain/transit.ts` (`transit-entry-only`), Chunk in `assets/oepnv/`. Entschieden am
+ * Entscheidungspunkt E10: statisch lag das Start-JS über der Schwelle von 88,6 kB. Als async-Funktion mit
+ * `await import(…)` wie die Lader in Lazy.tsx (Vites Preload-Helfer, Plan 0008).
+ */
+async function loadLogic(): Promise<TransitLogic> {
+  return await import("../domain/transit.ts");
+}
+
+/** Was die Anzeige je Startpunkt zeigt (E11). Ohne Startpunkt gibt es keinen Modus. */
+export type ReachMode =
+  | { kind: "oepnv" }
+  /** Platzhalter, weder Luftlinie noch Wegzeit (M7) */
+  | { kind: "laedt" }
+  | { kind: "luftlinie"; reason: "fehler" | "ausserhalb" };
+
+/**
+ * `attempt` zählt die Ladeversuche (nur die Antwort des laufenden zählt), `chunkFailures` die gescheiterten
+ * Importe der Rechenlogik: ab dem zweiten heißt es „Seite neu laden“ (M8).
+ */
+type Counters = { attempt: number; chunkFailures: number };
+export type TransitState =
+  | ({ kind: "aus" | "laedt" | "fehler" } & Counters)
+  | ({ kind: "bereit"; file: TransitTableFile; logic: TransitLogic } & Counters);
+
+export type TransitAction =
+  | { type: "want" }
+  | { type: "loaded"; attempt: number; file: TransitTableFile; logic: TransitLogic }
+  | { type: "failed"; attempt: number; chunk: boolean };
+
+/** Mit gespeichertem Stadtteil lädt die Tabelle gleich beim Start (E9, Auslöser 1). */
+export function initialTransitState(storedDistrict: boolean): TransitState {
+  return { kind: storedDistrict ? "laedt" : "aus", attempt: storedDistrict ? 1 : 0, chunkFailures: 0 };
+}
+
+export function transitReducer(state: TransitState, action: TransitAction): TransitState {
+  const { attempt, chunkFailures } = state;
+  switch (action.type) {
+    case "want":
+      // nur aus „aus“ oder „fehler“; laufend oder fertig bleibt es, wie es ist (höchstens einmal je Sitzung)
+      return state.kind === "aus" || state.kind === "fehler"
+        ? { kind: "laedt", attempt: attempt + 1, chunkFailures }
+        : state;
+    case "loaded":
+      if (state.kind !== "laedt" || action.attempt !== attempt) return state;
+      return { kind: "bereit", file: action.file, logic: action.logic, attempt, chunkFailures };
+    case "failed":
+      if (state.kind !== "laedt" || action.attempt !== attempt) return state;
+      return { kind: "fehler", attempt, chunkFailures: chunkFailures + (action.chunk ? 1 : 0) };
+  }
+}
+
+/**
+ * Dekodierte Tabelle zu den Orten der Seite: `undefined`, solange Tabelle oder Orte fehlen; `null`, wenn sie
+ * nicht passt (alte `wegzeit.json` aus dem HTTP-Cache, E8).
+ */
+export function decodeFor(
+  state: TransitState,
+  placeKeys: ReadonlySet<string> | undefined,
+): TransitTable | null | undefined {
+  if (state.kind !== "bereit" || !placeKeys) return undefined;
+  return state.logic.decodeTransitTable(state.file, placeKeys) ?? null;
+}
+
+/** Modus und Entfernung je Lage (E11). Je Startpunkt ist alles eine Art: Wegzeit oder Luftlinie. */
+export function resolveReach(
+  state: TransitState,
+  table: TransitTable | null | undefined,
+  origin: Origin | undefined,
+): { mode: ReachMode | undefined; reach: ReachFn | undefined } {
+  if (!origin) return { mode: undefined, reach: undefined };
+  if (state.kind === "fehler" || table === null) {
+    return { mode: { kind: "luftlinie", reason: "fehler" }, reach: airlineReach(origin) };
+  }
+  if (state.kind !== "bereit" || !table) return { mode: { kind: "laedt" }, reach: undefined };
+  const reach = state.logic.transitReach(table, origin);
+  return reach
+    ? { mode: { kind: "oepnv" }, reach }
+    : { mode: { kind: "luftlinie", reason: "ausserhalb" }, reach: airlineReach(origin) };
+}
+
+/**
+ * Ob die Grenze „bis … Min.“ zählt (Badge, Zurücksetzen): mit Wegzeit und schon solange sie lädt, damit das
+ * Badge nach dem Laden nicht springt (M7). Bei Luftlinie oder ohne Startpunkt wirkt sie nicht.
+ */
+export function limitActive(mode: ReachMode | undefined): boolean {
+  return mode?.kind === "oepnv" || mode?.kind === "laedt";
+}
+
+export interface TransitApi {
+  /** `undefined`: kein Startpunkt */
+  mode: ReachMode | undefined;
+  /** `undefined`: kein Startpunkt oder Tabelle lädt */
+  reach: ReachFn | undefined;
+  /** Namensnennung aus `wegzeit.json` (E3), sobald die Tabelle passt */
+  source: TransitSource | undefined;
+  /** Rechenlogik zweimal nicht geladen: „Seite neu laden“ statt „Nochmal laden“ (M8) */
+  reloadPage: boolean;
+  /** Auslöser 2–4 aus E9: Kind-Sheet, Karte, „Nochmal laden“ */
+  want: () => void;
+}
+
+/**
+ * `origin` beim ersten Aufruf entscheidet über das Laden beim Start (gespeicherter Stadtteil, E9). Danach geht der
+ * Startpunkt nur noch in die Rechnung ein. `placeKeys`: Orte der Seite (`undefined`, solange `site.json` lädt).
+ */
+export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<string> | undefined): TransitApi {
+  const [state, dispatch] = useReducer(transitReducer, origin?.source === "stadtteil", initialTransitState);
+  const attempt = state.kind === "laedt" ? state.attempt : 0;
+
+  useEffect(() => {
+    if (attempt === 0) return;
+    let live = true;
+    // Rechenlogik und Tabelle parallel; ein Fehlschlag der Logik zählt als Chunk-Fehler (M8).
+    void Promise.all([loadLogic().catch(() => undefined), loadTransitTable().catch(() => undefined)]).then(
+      ([logic, file]) => {
+        if (!live) return;
+        if (!logic) dispatch({ type: "failed", attempt, chunk: true });
+        else if (!file) dispatch({ type: "failed", attempt, chunk: false });
+        else dispatch({ type: "loaded", attempt, file, logic });
+      },
+    );
+    return () => {
+      live = false;
+    };
+  }, [attempt]);
+
+  const table = useMemo(() => decodeFor(state, placeKeys), [state, placeKeys]);
+  const { mode, reach } = useMemo(() => resolveReach(state, table, origin), [state, table, origin]);
+  const want = useCallback(() => dispatch({ type: "want" }), []);
+  return { mode, reach, source: table?.source, reloadPage: state.chunkFailures >= 2, want };
+}

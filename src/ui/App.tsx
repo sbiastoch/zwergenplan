@@ -1,27 +1,21 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { activeFilterCount, EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
+import { placeKey } from "../domain/place-key.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
-import {
-  ageChipLabel,
-  distanceNote,
-  loadErrorText,
-  mapStatusParts,
-  plural,
-  reachLimitLabel,
-  standDate,
-} from "./format.ts";
-import { ListView } from "./ListView.tsx";
+import { ageChipLabel, limitHint, loadErrorText, mapStatusParts, plural, reachNote, standDate } from "./format.ts";
+import { ListPending, ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import { SavedView } from "./SavedView.tsx";
+import { LimitAction } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
 import {
   useAgeOnly,
@@ -34,6 +28,7 @@ import {
   useToast,
 } from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
+import { limitActive, useTransit } from "./use-transit.ts";
 
 type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
 
@@ -55,12 +50,12 @@ export function App() {
   const originApi = useOrigin();
   const { origin } = originApi;
 
-  const [sheet, setSheet] = useState<SheetKind>(null);
+  const [sheet, setSheetState] = useState<SheetKind>(null);
   const [detailDay, setDetailDay] = useState<string>();
   // Orts-Sheet offen (karte/MapScreen.tsx): Der Seiten-Toast schweigt dann wie bei jedem Modal.
   const [placeSheet, setPlaceSheet] = useState(false);
   const [animate, setAnimate] = useState(false);
-  // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Umkreis-Hinweis verschwindet mit der Wahl.
+  // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl.
   const filterButton = useRef<HTMLButtonElement>(null);
   // Fokus-Rückweg des Details: Die Kachel, die es geöffnet hat, kann beim Schließen fehlen (Plan 0008, E11).
   const activeTab = useRef<HTMLButtonElement>(null);
@@ -82,8 +77,29 @@ export function App() {
   }, [load.kind]);
 
   const offers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
-  const views = useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now, origin });
+  // Orte der Seite: Die Wegzeit-Tabelle muss zu ihnen passen (E8). Erst mit site.json bekannt.
+  const placeKeys = useMemo(
+    () => (load.kind === "ready" ? new Set(load.data.offers.map((o) => placeKey(o.venue.geo))) : undefined),
+    [load],
+  );
+  // Wegzeit (Plan 0009, E9–E11): lädt beim Start nur mit gespeichertem Stadtteil, sonst erst auf Anlass
+  const transit = useTransit(origin, placeKeys);
+  const { mode: reachMode, want } = transit;
+  const views = useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now, reach: transit.reach });
   const { visible, hiddenCount, showUnfit, page, calendar, saved, detailOffer } = views;
+
+  // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
+  useEffect(() => {
+    if (route.tab === "karte") want();
+  }, [route.tab, want]);
+  // Das Kind-Sheet auch (Auslöser 2). Nie die Wahl selbst: Ab da entsteht kein Request.
+  const setSheet = useCallback(
+    (next: SheetKind) => {
+      if (next === "kid" || next === "origin") want();
+      setSheetState(next);
+    },
+    [want],
+  );
 
   // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler): Parameter entfernen.
   useEffect(() => {
@@ -118,6 +134,7 @@ export function App() {
     isSaved: (id) => savedIds.includes(id),
     isUnfit: (id) => views.unfitIds.has(id),
     reachOf: views.reachOf,
+    reachPending: reachMode?.kind === "laedt",
     onToggleSave,
     onOpen: (offer, day) => {
       setDetailDay(day);
@@ -133,6 +150,19 @@ export function App() {
     <ViewToggle map={route.tab === "karte"} onMap={(map) => replace({ ...route, tab: map ? "karte" : "entdecken" })} />
   );
   const dialogOpen = sheet !== null || detailOffer !== undefined || placeSheet;
+  const limit = route.filter.reachLimit;
+  const limitOn = limitActive(reachMode);
+  const hint = limit && limitHint(limit, reachMode);
+  // gespeicherter Stadtteil + wegzeit=: Platzhalter statt ungefilterter Liste, bis die Wegzeit da ist (M7)
+  const listPending = reachMode?.kind === "laedt" && limit !== undefined;
+  const limitAction = (
+    <LimitAction
+      mode={reachMode}
+      reloadPage={transit.reloadPage}
+      onPickOrigin={() => setSheet("origin")}
+      onRetry={want}
+    />
+  );
 
   return (
     <div className="app">
@@ -146,7 +176,7 @@ export function App() {
       {route.tab !== "merkliste" && (
         <QuickFilters
           filter={route.filter}
-          hasOrigin={origin !== undefined}
+          limitActive={limitOn}
           onChange={setFilter}
           onOpenSheet={() => setSheet("filter")}
           sheetButton={filterButton}
@@ -179,7 +209,8 @@ export function App() {
         {load.kind === "ready" && route.tab !== "merkliste" && (
           <>
             <div className="status-row">
-              <p className="status" role="status">
+              {/* Lädt die Wegzeit zur Grenze, wäre die Zahl ungefiltert: unsichtbar, keine Ansage (M7). */}
+              <p className={listPending ? "status pending" : "status"} role="status">
                 {route.tab === "karte" ? (
                   <span>
                     <b>{mapOffers}</b>
@@ -192,24 +223,23 @@ export function App() {
                     <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
                   </span>
                 )}
-                {origin && (
+                {origin && reachMode && (
                   // eigene Zeile ohne „·“: Sie brach bei 320–390 px ohnehin um, und der Punkt stand dann verwaist
-                  // vorn. Der Punkt nur für Screenreader trennt die beiden Sätze in der Ansage.
-                  <span className="status-note">
+                  // vorn. Der Punkt nur für Screenreader trennt die beiden Sätze in der Ansage. Beim Laden steht
+                  // der endgültige Text unsichtbar: Die Höhe stimmt, die Live-Region sagt nichts (E11).
+                  <span className={reachMode.kind === "laedt" ? "status-note pending" : "status-note"}>
                     <span className="sr-only">. </span>
-                    {distanceNote(origin)}
+                    {reachNote(reachMode, origin)}
                   </span>
                 )}
               </p>
               {toggle}
             </div>
-            {route.filter.reachLimit && !origin && (
-              // Geteilter Link mit ?umkreis= ohne Startpunkt: Der Filter wirkt nicht (Plan 0004, E7).
+            {hint && (
+              // wegzeit= wirkt nicht (ohne Startpunkt, Fehler, außerhalb): Hinweis außerhalb der Status-Region (E11)
               <p className="status">
-                „{reachLimitLabel(route.filter.reachLimit)}“ braucht einen Startpunkt.
-                <button type="button" className="linkbtn" onClick={() => setSheet("origin")}>
-                  Startpunkt wählen
-                </button>
+                {hint}
+                {limitAction}
               </p>
             )}
             {hiddenCount > 0 && (
@@ -224,16 +254,21 @@ export function App() {
         )}
         {load.kind === "ready" && route.tab === "entdecken" && (
           <>
-            <ListView
-              groups={page.groups}
-              remaining={page.remaining}
-              onMore={views.showMore}
-              today={today}
-              ctx={ctx}
-              hasData={offers.length > 0}
-              onResetFilter={() => setFilter(EMPTY_FILTER)}
-            />
-            <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>
+            {listPending ? (
+              <ListPending />
+            ) : (
+              <ListView
+                groups={page.groups}
+                remaining={page.remaining}
+                onMore={views.showMore}
+                today={today}
+                ctx={ctx}
+                hasData={offers.length > 0}
+                onResetFilter={() => setFilter(EMPTY_FILTER)}
+              />
+            )}
+            {/* erst mit der Liste: Sonst rutschte er beim Ersetzen des Platzhalters (CLS) */}
+            {!listPending && <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>}
           </>
         )}
         {load.kind === "ready" && views.map && (
@@ -241,6 +276,7 @@ export function App() {
             offers={visible}
             cameraOffers={views.map.cameraOffers}
             origin={origin}
+            reach={transit.reach}
             dark={theme.dark}
             hasData={offers.length > 0}
             ctx={ctx}
@@ -269,9 +305,7 @@ export function App() {
             ctx={ctx}
             // nur mit aktivem Filter: Blendet allein das Alter aus, hilft Zurücksetzen nicht (Plan 0008, E12)
             onResetFilter={
-              activeFilterCount(route.filter, { hasOrigin: origin !== undefined }) > 0
-                ? () => setFilter(EMPTY_FILTER)
-                : undefined
+              activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? () => setFilter(EMPTY_FILTER) : undefined
             }
           />
         )}
@@ -307,6 +341,8 @@ export function App() {
         theme={theme}
         today={today}
         originApi={originApi}
+        transit={transit}
+        limitAction={limitAction}
         filterButton={filterButton}
         activeTab={activeTab}
       />

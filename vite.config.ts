@@ -19,6 +19,13 @@ const KARTE = "assets/karte/[name]-[hash]";
  */
 const isMapModule = (id: string) => /\/src\/ui\/(karte|map)\/|\/node_modules\/.*maplibre-gl\//.test(id);
 
+/**
+ * Rechenlogik der Wegzeit (src/domain/transit.ts) als eigener Lazy-Chunk in assets/oepnv/ (Plan 0009, E10): Statisch
+ * lag das Start-JS über der Schwelle. Budget `Wegzeit JS (lazy)`; `transit-only-lazy` hält sie aus dem Start.
+ */
+const OEPNV = "assets/oepnv/[name]-[hash]";
+const isTransitModule = (id: string) => /\/src\/domain\/transit\.ts$/.test(id);
+
 export default defineConfig({
   base: BASE,
   plugins: [react(), tailwindcss()],
@@ -42,7 +49,13 @@ export default defineConfig({
     rolldownOptions: {
       output: {
         chunkFileNames: (chunk) =>
-          !chunk.isEntry && chunk.moduleIds.some(isMapModule) ? `${KARTE}.js` : "assets/[name]-[hash].js",
+          chunk.isEntry
+            ? "assets/[name]-[hash].js"
+            : chunk.moduleIds.some(isMapModule)
+              ? `${KARTE}.js`
+              : chunk.moduleIds.some(isTransitModule)
+                ? `${OEPNV}.js`
+                : "assets/[name]-[hash].js",
         assetFileNames: (asset) =>
           asset.names.some((n) => /^Map(View|Screen)\b/.test(n))
             ? `${KARTE}[extname]`

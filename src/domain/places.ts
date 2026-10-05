@@ -5,7 +5,7 @@
  */
 import type { GeoPoint } from "./geo.ts";
 import { placeKey } from "./place-key.ts";
-import { compareReach, type Origin, reachTo } from "./reach.ts";
+import { compareReach, type ReachFn } from "./reach.ts";
 
 /** Der Teil eines Angebots, den die Orte brauchen (passt auf `SiteOffer`). */
 interface PlaceVenue {
@@ -54,11 +54,14 @@ export function placesOf<T extends { venue: PlaceVenue }>(offers: readonly T[]):
 
 const byName = <T>(a: Place<T>, b: Place<T>) => a.names[0].localeCompare(b.names[0], "de");
 
-/** Mit Startpunkt nach Entfernung, sonst bzw. bei Gleichstand nach Name. Liefert eine neue Liste. */
-export function sortPlaces<T>(places: readonly Place<T>[], origin?: Origin): Place<T>[] {
-  if (!origin) return [...places].sort(byName);
+/**
+ * Mit Startpunkt nach Wegzeit bzw. Luftlinie (`reach`), sonst bzw. bei Gleichstand nach Name. Liefert eine
+ * neue Liste. Solange die Wegzeit lädt, kommt kein `reach`: dann nach Name (Plan 0009, E11).
+ */
+export function sortPlaces<T>(places: readonly Place<T>[], reach?: ReachFn): Place<T>[] {
+  if (!reach) return [...places].sort(byName);
   return places
-    .map((place) => ({ place, reach: reachTo(origin, place) }))
+    .map((place) => ({ place, reach: reach(place) }))
     .sort((a, b) => compareReach(a.reach, b.reach) || byName(a.place, b.place))
     .map(({ place }) => place);
 }

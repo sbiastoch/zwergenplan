@@ -5,11 +5,13 @@
 import type { LoadFailure } from "../data/site.ts";
 import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
-import { type Origin, type Reach, type ReachLimit, roundedDistance } from "../domain/reach.ts";
+import { type Origin, type Reach, type ReachLimit, roundedDistance, roundedMinutes } from "../domain/reach.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinIsoDate, berlinKey, isoWeekday, parseIsoDate } from "../domain/time.ts";
+import type { TransitSource } from "../domain/transit-types.ts";
+import type { ReachMode } from "./use-transit.ts";
 
 const WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"] as const;
 const WD_SHORT = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] as const;
@@ -207,8 +209,12 @@ export function standDate(instant: string): string {
 
 const DISTANCE = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
 
-/** Kachel: „400 m“, „1,4 km“, „12 km“ – gerundet von der Domäne (`roundedDistance`). */
-export function distanceShort(reach: Reach): string {
+/** Kachel und Orts-Liste: „25 Min.“, „über 2 Std.“ bzw. „1,4 km“ – gerundet von der Domäne (E8). */
+export function reachShort(reach: Reach): string {
+  if (reach.kind === "oepnv") {
+    const { over, value } = roundedMinutes(reach.minutes);
+    return over ? "über 2 Std." : `${value} Min.`;
+  }
   const { unit, value } = roundedDistance(reach.meters);
   return `${DISTANCE.format(value)} ${unit}`;
 }
@@ -220,19 +226,72 @@ export function originPhrase(origin: Origin): string {
   return origin.source === "stadtteil" ? `ab ${origin.label}` : ORIGIN_PHRASES[origin.source];
 }
 
-/** Detail: „ca. 1,4 km Luftlinie ab Gostenhof“ – die lange Form sagt immer „Luftlinie“ (E1). */
-export function distanceLong(reach: Reach, origin: Origin): string {
-  return `ca. ${distanceShort(reach)} Luftlinie ${originPhrase(origin)}`;
+const BY_TRANSIT = "mit Bus & Bahn";
+
+/** Detail und Orts-Sheet: sagt immer, was gemeint ist (E1): „mit Bus & Bahn“, „zu Fuß“ oder „Luftlinie“. */
+export function reachLong(reach: Reach, origin: Origin): string {
+  const short = reachShort(reach);
+  const how = reach.kind === "luftlinie" ? "Luftlinie" : reach.byFoot ? "zu Fuß" : BY_TRANSIT;
+  return `${short.startsWith("über") ? "" : "ca. "}${short} ${how} ${originPhrase(origin)}`;
 }
 
-/** Statuszeile: erklärt die kurze Form auf den Kacheln. */
-export function distanceNote(origin: Origin): string {
-  return `Entfernung als Luftlinie ${originPhrase(origin)}`;
+/** Statuszeile: erklärt die kurze Form auf den Kacheln, einmal mit der Annahme (E1, E11). */
+export function reachNote(mode: ReachMode, origin: Origin): string {
+  const from = originPhrase(origin);
+  if (mode.kind !== "luftlinie") return `Wegzeit ${from} ${BY_TRANSIT} (Di vormittags, inkl. Warten)`;
+  return `Entfernung als Luftlinie ${from} – ${mode.reason === "fehler" ? "Wegzeiten gerade nicht verfügbar" : "außerhalb des Stadtgebiets"}.`;
 }
 
-/** „bis 5 km“ */
+/** „bis 30 Min.“ */
 export function reachLimitLabel(limit: ReachLimit): string {
-  return `bis ${limit.value} km`;
+  return `bis ${limit.value} Min.`;
+}
+
+/** Begründung unter den gesperrten Chips „bis … Min.“ (M6); mit Wegzeit keine. */
+export function limitReason(mode: ReachMode | undefined): string | undefined {
+  if (!mode) return "Erst einen Startpunkt wählen.";
+  if (mode.kind === "laedt") return "Wegzeiten werden geladen …";
+  if (mode.kind === "luftlinie") {
+    return mode.reason === "fehler"
+      ? "Wegzeiten gerade nicht verfügbar."
+      : "Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.";
+  }
+  return undefined;
+}
+
+/** Hinweis unter der Statuszeile, wenn `wegzeit=` gesetzt ist, aber nicht wirkt (E11); beim Laden keiner. */
+export function limitHint(limit: ReachLimit, mode: ReachMode | undefined): string | undefined {
+  const label = `„${reachLimitLabel(limit)}“`;
+  if (!mode) return `${label} braucht einen Startpunkt.`;
+  if (mode.kind !== "luftlinie") return undefined;
+  return mode.reason === "fehler"
+    ? `${label} wirkt gerade nicht: Wegzeiten nicht geladen.`
+    : `${label} wirkt nicht: Startpunkt außerhalb des Stadtgebiets.`;
+}
+
+/** Fließtext mit Links (Quellenhinweis) */
+type NotePart = string | { text: string; href: string };
+
+const VGN = "VGN – Verkehrsverbund Großraum Nürnberg GmbH";
+const VGN_URL = "https://www.vgn.de/web-entwickler/open-data/";
+const LICENSE = { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/" };
+
+/**
+ * Quellenhinweis im Kind-Sheet nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (E3): Rechteinhaber, Titel mit Stand (Link
+ * auf die Quelle), „abgewandelt“, Lizenz (Link). Aus `source` in `wegzeit.json`; ohne geladene Tabelle nur VGN und
+ * Lizenz.
+ */
+export function transitSourceNote(source: TransitSource | undefined): NotePart[] {
+  const lead =
+    "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. Fahrplan: ";
+  if (!source) return [lead, { text: VGN, href: VGN_URL }, ", ", LICENSE, "."];
+  return [
+    `${lead}${source.attribution}, ‚`,
+    { text: source.title, href: source.url },
+    "‘, abgewandelt, Lizenz ",
+    { text: source.license, href: source.licenseUrl },
+    ".",
+  ];
 }
 
 /** Statuszeile der Karte „8 Angebote an 5 Orten“; die Zahlen getrennt, damit sie fett stehen. */
@@ -257,6 +316,6 @@ export function loadErrorText(reason: LoadFailure): string {
  * zusätzlich Passendes schon beendet, sagt der zweite Satz das.
  */
 export function hiddenNote(hidden: number, ended: number): string {
-  const note = `${plural(hidden, "Angebot", "Angebote")} an diesem Tag ${hidden === 1 ? "ist" : "sind"} ausgeblendet – durch Filter, Umkreis oder Alter.`;
+  const note = `${plural(hidden, "Angebot", "Angebote")} an diesem Tag ${hidden === 1 ? "ist" : "sind"} ausgeblendet – durch Filter, Wegzeit oder Alter.`;
   return ended > 0 ? `${note} Was zu deiner Auswahl passt, ist heute schon vorbei.` : note;
 }

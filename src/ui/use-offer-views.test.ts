@@ -2,7 +2,8 @@ import { createElement, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EMPTY_FILTER } from "../domain/filter.ts";
-import type { Origin } from "../domain/reach.ts";
+import { placeKey } from "../domain/place-key.ts";
+import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { fromBerlinLocal } from "../domain/time.ts";
@@ -155,7 +156,7 @@ describe("useOfferViews", () => {
     expect(result?.calendar.day).toBe("2026-10-06");
   });
 
-  describe("Entfernung (Plan 0004, E6/E7)", () => {
+  describe("Entfernung und Wegzeit (Plan 0004, E6/E7; Plan 0009, E8/E11)", () => {
     // Gostenhof; „nah“ liegt beim Theater (226 m), „fern“ bei der Gemeinde (3 008 m)
     const origin: Origin = { source: "stadtteil", point: { lat: 49.448, lon: 11.058 }, label: "Gostenhof" };
     const at = (o: SiteOffer, lat: number, lon: number): SiteOffer => ({
@@ -165,26 +166,46 @@ describe("useOfferViews", () => {
     const nah = at(offer("nah", "2026-10-10"), 49.4495, 11.0601);
     const nahZwei = at(offer("nah-zwei", "2026-10-11"), 49.4495, 11.0601);
     const fern = at(offer("fern", "2026-10-12"), 49.4301, 11.0892);
-    const within2km: Route = { tab: "entdecken", filter: { ...EMPTY_FILTER, reachLimit: { kind: "km", value: 2 } } };
+    /** Wegzeit wie aus der Tabelle: „nah“ 4 Min., „fern“ 33 Min.; zählt die Aufrufe */
+    const calls: string[] = [];
+    const wegzeit: ReachFn = ({ geo }) => {
+      calls.push(placeKey(geo));
+      return { kind: "oepnv", minutes: geo.lat === 49.4301 ? 33 : 4, byFoot: false };
+    };
+    const within20: Route = {
+      tab: "entdecken",
+      filter: { ...EMPTY_FILTER, reachLimit: { kind: "minuten", value: 20 } },
+    };
 
     it("kennt ohne Startpunkt keine Entfernung", () => {
       expect(render({ offers: [nah] }).reachOf(nah)).toBeUndefined();
     });
 
-    it("rechnet je Koordinate einmal", () => {
-      const v = render({ offers: [nah, nahZwei, fern], origin });
+    it("reachOf nutzt die Wegzeit-Funktion, je Koordinate einmal", () => {
+      calls.length = 0;
+      const v = render({ offers: [nah, nahZwei, fern], reach: wegzeit });
       const reach = v.reachOf(nah);
-      expect(reach?.kind).toBe("luftlinie");
-      expect(Math.round(reach?.meters ?? 0)).toBe(226);
+      expect(reach).toEqual({ kind: "oepnv", minutes: 4, byFoot: false });
       // gleicher Ort, gleiches (zwischengespeichertes) Ergebnis
       expect(v.reachOf(nahZwei)).toBe(reach);
-      expect(Math.round(v.reachOf(fern)?.meters ?? 0)).toBe(3008);
+      expect(v.reachOf(fern)).toEqual({ kind: "oepnv", minutes: 33, byFoot: false });
+      expect(calls.filter((k) => k === placeKey(nah.venue.geo))).toHaveLength(1);
     });
 
-    it("wendet den Umkreis nur mit Startpunkt an, auch im Kalender", () => {
-      expect(ids(render({ offers: [nah, fern], route: within2km }).visible)).toEqual(["nah", "fern"]);
-      expect(ids(render({ offers: [nah, fern], route: within2km, origin }).visible)).toEqual(["nah"]);
-      const kalender = render({ offers: [nah, fern], route: { ...within2km, tab: "kalender" }, origin });
+    it("Luftlinie als Rückfall (E11)", () => {
+      const v = render({ offers: [nah, fern], reach: airlineReach(origin) });
+      const reach = v.reachOf(nah);
+      expect(reach?.kind === "luftlinie" && Math.round(reach.meters)).toBe(226);
+    });
+
+    it("wendet die Wegzeit-Grenze nur mit Wegzeit an, auch im Kalender", () => {
+      expect(ids(render({ offers: [nah, fern], route: within20 }).visible)).toEqual(["nah", "fern"]);
+      expect(ids(render({ offers: [nah, fern], route: within20, reach: airlineReach(origin) }).visible)).toEqual([
+        "nah",
+        "fern",
+      ]);
+      expect(ids(render({ offers: [nah, fern], route: within20, reach: wegzeit }).visible)).toEqual(["nah"]);
+      const kalender = render({ offers: [nah, fern], route: { ...within20, tab: "kalender" }, reach: wegzeit });
       expect([...kalender.calendar.index.keys()]).toEqual(["2026-10-10"]);
       expect(kalender.calendar.lastDay).toBe("2026-10-10");
       // Der Datenhorizont bleibt ungefiltert
@@ -197,28 +218,29 @@ describe("useOfferViews", () => {
       expect(render({ offers: [nah, nahZwei, fern] }).map).toBeUndefined();
       // gleicher Ort → ein Ort
       expect(render({ offers: [fern, nah, nahZwei], route: karte }).map?.placeCount).toBe(2);
-      // Umkreis und Alter wirken wie in der Liste
-      expect(render({ offers: [nah, fern], route: { ...within2km, tab: "karte" }, origin }).map?.placeCount).toBe(1);
+      // Wegzeit und Alter wirken wie in der Liste
+      expect(
+        render({ offers: [nah, fern], route: { ...within20, tab: "karte" }, reach: wegzeit }).map?.placeCount,
+      ).toBe(1);
       const gross = at(GROSS, 49.4301, 11.0892);
       expect(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }).map?.placeCount).toBe(1);
     });
 
-    it("Datenbasis des Startausschnitts: alle kommenden Angebote, unabhängig von Filtern, Alter und Startpunkt (Arch-Review B1, m1)", () => {
+    it("Datenbasis des Startausschnitts: alle kommenden Angebote, unabhängig von Filtern, Alter, Startpunkt und Tabelle (Arch-Review B1, m1)", () => {
       const standort: Origin = { source: "standort", point: { lat: 49.4495, lon: 11.0601 }, label: "Mein Standort" };
-      const kartenmitte: Origin = { ...standort, source: "karte", label: "Kartenmitte" };
       const gross = at(GROSS, 49.4301, 11.0892);
       const all = [nah, fern, gross, VORBEI];
       const plain = render({ offers: all, route: { tab: "karte", filter: EMPTY_FILTER } }).map?.cameraOffers;
       // nur kommende, sonst alles
       expect(ids(plain ?? [])).toEqual(["nah", "fern", "gross"]);
       const variants: Partial<OfferViewsInput>[] = [
-        { route: { ...within2km, tab: "karte" }, origin: standort },
-        { route: { ...within2km, tab: "karte" }, origin: kartenmitte },
+        { route: { ...within20, tab: "karte" }, reach: wegzeit },
+        { route: { ...within20, tab: "karte" }, reach: airlineReach(standort) },
         { route: { tab: "karte", filter: { ...EMPTY_FILTER, formats: ["kurs"] } } },
         { route: { tab: "karte", filter: EMPTY_FILTER }, birthDate: "2026-05-01" },
         {
-          route: { ...within2km, tab: "karte", filter: { ...within2km.filter, cost: ["kostenpflichtig"] } },
-          origin: standort,
+          route: { ...within20, tab: "karte", filter: { ...within20.filter, cost: ["kostenpflichtig"] } },
+          reach: wegzeit,
           birthDate: "2026-05-01",
         },
       ];
@@ -226,15 +248,15 @@ describe("useOfferViews", () => {
         const v = render({ offers: all, ...variant });
         expect(v.map?.cameraOffers, JSON.stringify(variant)).toEqual(plain);
       }
-      // Die sichtbaren Orte folgen dagegen Umkreis und Alter.
+      // Die sichtbaren Orte folgen dagegen Wegzeit und Alter.
       expect(render({ offers: all, ...variants[0] }).map?.placeCount).toBe(1);
     });
 
-    it("zählt heute beendete Termine nur im Umkreis (B2)", () => {
+    it("zählt heute beendete Termine nur bis zur Wegzeit-Grenze (B2)", () => {
       const heuteFern = at(offer("heute-fern", "2026-10-05"), 49.4301, 11.0892);
-      const route: Route = { ...within2km, tab: "kalender" };
+      const route: Route = { ...within20, tab: "kalender" };
       expect(render({ offers: [nah, heuteFern], route }).calendar.endedToday).toBe(1);
-      expect(render({ offers: [nah, heuteFern], route, origin }).calendar.endedToday).toBe(0);
+      expect(render({ offers: [nah, heuteFern], route, reach: wegzeit }).calendar.endedToday).toBe(0);
     });
   });
 

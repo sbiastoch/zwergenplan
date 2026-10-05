@@ -2,7 +2,7 @@
  * Overlays der App (Plan 0003, E3; ausgelagert mit Plan 0005): Detail, Filter-Sheet, Kind-Sheet als
  * native <dialog>. Das Orts-Sheet gehört zur Karten-Oberfläche (karte/MapScreen.tsx).
  */
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import type { FilterState } from "../domain/filter.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -12,6 +12,7 @@ import { KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { FilterSheet } from "./Sheets.tsx";
 import type { OriginApi } from "./use-app-state.ts";
+import type { TransitApi } from "./use-transit.ts";
 
 /** „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl) */
 export type SheetKind = "filter" | "kid" | "origin" | null;
@@ -23,7 +24,7 @@ interface OverlaysProps {
   detailOffer: SiteOffer | undefined;
   detailDay: string | undefined;
   closeDetail: () => void;
-  /** Merken, Entfernung und „jetzt“ wie auf den Kacheln */
+  /** Merken, Wegzeit und „jetzt“ wie auf den Kacheln */
   ctx: CardContext;
   say: (message: string) => void;
   filter: FilterState;
@@ -36,7 +37,11 @@ interface OverlaysProps {
   theme: { choice: ThemeChoice; setChoice: (choice: ThemeChoice) => void };
   today: string;
   originApi: OriginApi;
-  /** Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Umkreis-Hinweis verschwindet mit der Wahl. */
+  /** Wegzeit: Modus für die Filtergruppe, Quelle für den Hinweis im Kind-Sheet */
+  transit: TransitApi;
+  /** Knopf zur Begründung der gesperrten Wegzeit-Grenze (`LimitAction`) */
+  limitAction: ReactNode;
+  /** Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. */
   filterButton: RefObject<HTMLButtonElement | null>;
   /**
    * Fokus-Rückweg des Details: der Knopf des aktiven Tabs. Die Kachel, die das Detail geöffnet hat,
@@ -48,6 +53,7 @@ interface OverlaysProps {
 export function Overlays(props: OverlaysProps) {
   const { toast, sheet, setSheet, detailOffer, detailDay, closeDetail, ctx, say, filter, setFilter } = props;
   const { birthDate, setBirthDate, ageOnly, setAgeOnly, theme, today, originApi, filterButton, activeTab } = props;
+  const { transit } = props;
   const { origin } = originApi;
   const { now, onToggleSave } = ctx;
   return (
@@ -69,6 +75,7 @@ export function Overlays(props: OverlaysProps) {
             birthDate={birthDate}
             origin={origin}
             reach={ctx.reachOf(detailOffer)}
+            reachPending={ctx.reachPending}
             saved={ctx.isSaved(detailOffer.id)}
             onToggleSave={onToggleSave}
             onClose={closeDetail}
@@ -81,8 +88,8 @@ export function Overlays(props: OverlaysProps) {
           filter={filter}
           onChange={setFilter}
           resultCount={props.resultCount}
-          hasOrigin={origin !== undefined}
-          onPickOrigin={() => setSheet("origin")}
+          mode={transit.mode}
+          limitAction={props.limitAction}
           onClose={() => setSheet(null)}
         />
       </Dialog>
@@ -103,6 +110,7 @@ export function Overlays(props: OverlaysProps) {
           onTheme={theme.setChoice}
           today={today}
           origin={originApi}
+          transitSource={transit.source}
           focusOrigin={sheet === "origin"}
           onClose={() => setSheet(null)}
         />

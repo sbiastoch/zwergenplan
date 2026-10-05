@@ -1,5 +1,5 @@
 import { nextSession } from "./agenda.ts";
-import { type Origin, RADII_KM, type ReachLimit, type ReachTarget, reachTo, withinLimit } from "./reach.ts";
+import { LIMIT_MINUTES, type ReachFn, type ReachLimit, type ReachTarget, withinLimit } from "./reach.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
 import { CATEGORIES, type Category, categoriesOf } from "./topics.ts";
 
@@ -11,22 +11,23 @@ const COSTS = ["kostenlos", "kostenpflichtig"] as const satisfies readonly Cost[
  * Filterzustand. Innerhalb einer Dimension ODER, zwischen Dimensionen UND.
  * Eine leere Liste heißt „egal“. Das Geburtsdatum ist bewusst NICHT Teil der URL
  * (Links werden geteilt – das Geburtsdatum des Kindes gehört nicht hinein).
- * Der Umkreis darf in die URL, weil er ohne Startpunkt nichts verrät; der Startpunkt selbst nie
- * (Plan 0004, E7).
+ * Die Wegzeit-Grenze darf in die URL, weil sie ohne Startpunkt nichts verrät; der Startpunkt selbst nie
+ * (Plan 0004, E7; Plan 0009, E8).
  */
 export interface FilterState {
   categories: Category[];
   formats: Format[];
   registration: Registration[];
   cost: Cost[];
-  /** wirkt nur mit Startpunkt (`FilterContext.origin`) */
+  /** wirkt nur mit Wegzeit (`FilterContext.reach`, Art „oepnv“) */
   reachLimit?: ReachLimit;
 }
 
-/** die Mehrfachwahl-Dimensionen; der Umkreis ist eine Einfachwahl */
+/** die Mehrfachwahl-Dimensionen; die Wegzeit ist eine Einfachwahl */
 const LIST_DIMENSIONS = ["categories", "formats", "registration", "cost"] as const;
 type Dimension = (typeof LIST_DIMENSIONS)[number];
-const REACH_KEY = "umkreis";
+/** `umkreis=` (km, Plan 0004) wird nicht mehr gelesen (Plan 0009, E8). */
+const REACH_KEY = "wegzeit";
 
 export const EMPTY_FILTER: FilterState = { categories: [], formats: [], registration: [], cost: [] };
 
@@ -44,10 +45,10 @@ function parseList<T extends string>(raw: string | null, allowed: readonly T[]):
   return allowed.filter((v) => wanted.has(v));
 }
 
-/** Nur genau „2“, „5“ oder „10“; alles andere wird verworfen. */
+/** Nur genau „20“, „30“ oder „45“; alles andere wird verworfen. */
 function parseReachLimit(raw: string | null): ReachLimit | undefined {
-  const value = RADII_KM.find((r) => String(r) === raw);
-  return value === undefined ? undefined : { kind: "km", value };
+  const value = LIMIT_MINUTES.find((m) => String(m) === raw);
+  return value === undefined ? undefined : { kind: "minuten", value };
 }
 
 export function filterFromSearch(search: string): FilterState {
@@ -82,17 +83,17 @@ function matches<T>(selected: readonly T[], value: T): boolean {
 export interface FilterContext {
   /** „Jetzt“ – injiziert, damit Tests und E2E deterministisch sind. */
   now: Date;
-  /** Startpunkt für den Umkreis; ohne ihn wirkt `reachLimit` nicht */
-  origin?: Origin;
+  /** Entfernung ab dem Startpunkt; nur mit Wegzeit (Art „oepnv“) wirkt `reachLimit` (E11) */
+  reach?: ReachFn | undefined;
 }
 
 /**
- * Anzahl gewählter Werte über alle Dimensionen (Badge am Filter-Knopf). Der Umkreis zählt nur mit
- * Startpunkt – ohne ihn wirkt er nicht (Plan 0004, E7).
+ * Anzahl gewählter Werte über alle Dimensionen (Badge am Filter-Knopf). Die Wegzeit zählt nur, wenn sie
+ * wirkt (`limitActive`, Plan 0009, E8).
  */
-export function activeFilterCount(state: FilterState, { hasOrigin }: { hasOrigin: boolean }): number {
+export function activeFilterCount(state: FilterState, { limitActive }: { limitActive: boolean }): number {
   const lists = state.categories.length + state.formats.length + state.registration.length + state.cost.length;
-  return lists + (hasOrigin && state.reachLimit ? 1 : 0);
+  return lists + (limitActive && state.reachLimit ? 1 : 0);
 }
 
 /** Schaltet einen Wert einer Dimension um und lässt alles andere unverändert. */
@@ -103,7 +104,7 @@ export function toggleIn<D extends Dimension>(state: FilterState, dim: D, value:
 }
 
 /**
- * Setzt den Umkreis (Einfachwahl) oder entfernt ihn mit `undefined` („Egal“). Ohne Umkreis fehlt der
+ * Setzt die Wegzeit-Grenze (Einfachwahl) oder entfernt sie mit `undefined` („Egal“). Ohne Grenze fehlt der
  * Schlüssel ganz, damit der Zustand gleich `EMPTY_FILTER` bleibt und die URL kanonisch.
  */
 export function withReachLimit(state: FilterState, limit: ReachLimit | undefined): FilterState {
@@ -112,11 +113,11 @@ export function withReachLimit(state: FilterState, limit: ReachLimit | undefined
 }
 
 /**
- * Passt ein Angebot zu den Filtern (Kategorie, Format, Anmeldung, Kosten, Umkreis)? Ohne Zeitbezug:
+ * Passt ein Angebot zu den Filtern (Kategorie, Format, Anmeldung, Kosten, Wegzeit)? Ohne Zeitbezug:
  * Auch ein vorbei-es Angebot kann passen. Gebraucht für „Für heute ist alles vorbei“ (Plan 0007, E2).
- * Der Umkreis wirkt nur mit Startpunkt (Plan 0004, E7).
+ * Die Wegzeit-Grenze wirkt nur mit Wegzeit; bei Luftlinie oder ohne Startpunkt nicht (E11).
  */
-export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: FilterState, origin?: Origin): boolean {
+export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: FilterState, reach?: ReachFn): boolean {
   if (!matches(state.formats, offer.format)) return false;
   if (!matches(state.registration, offer.registration)) return false;
   if (!matches(state.cost, offer.cost)) return false;
@@ -125,19 +126,19 @@ export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: Filt
     if (!cats.some((c) => state.categories.includes(c))) return false;
   }
   const limit = state.reachLimit;
-  if (origin && limit && !withinLimit(reachTo(origin, offer.venue), limit)) return false;
+  if (reach && limit && withinLimit(reach(offer.venue), limit) === false) return false;
   return true;
 }
 
 /**
  * Angebote, deren letzter Termin vorbei ist, fallen immer heraus.
  * Das Alter filtert hier bewusst nicht: Die Oberfläche zeigt unpassende Angebote auf Wunsch
- * markiert an (`splitByAge` in age.ts). Der Umkreis wirkt nur mit Startpunkt.
+ * markiert an (`splitByAge` in age.ts). Die Wegzeit-Grenze wirkt nur mit Wegzeit.
  */
 export function applyFilters<T extends Offer & { venue: ReachTarget }>(
   offers: readonly T[],
   state: FilterState,
   ctx: FilterContext,
 ): T[] {
-  return offers.filter((o) => nextSession(o, ctx.now) !== undefined && matchesFilter(o, state, ctx.origin));
+  return offers.filter((o) => nextSession(o, ctx.now) !== undefined && matchesFilter(o, state, ctx.reach));
 }

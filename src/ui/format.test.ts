@@ -9,20 +9,23 @@ import {
   availabilityLabel,
   clock,
   dayHeading,
-  distanceLong,
-  distanceNote,
-  distanceShort,
   formatFact,
   hiddenNote,
+  limitHint,
+  limitReason,
   loadErrorText,
   mapStatusParts,
   originPhrase,
   plural,
   reachLimitLabel,
+  reachLong,
+  reachNote,
+  reachShort,
   registrationNote,
   shortDate,
   standDate,
   timeRange,
+  transitSourceNote,
   weekTitle,
   whenLabels,
 } from "./format.ts";
@@ -247,8 +250,9 @@ describe("Detail: Wann und Anmeldung", () => {
   });
 });
 
-describe("Entfernung (Plan 0004, E6)", () => {
+describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
   const luftlinie = (meters: number): Reach => ({ kind: "luftlinie", meters });
+  const oepnv = (minutes: number, byFoot = false): Reach => ({ kind: "oepnv", minutes, byFoot });
   const gostenhof: Origin = {
     source: "stadtteil",
     point: { lat: 49.448, lon: 11.058 },
@@ -256,42 +260,132 @@ describe("Entfernung (Plan 0004, E6)", () => {
     districtId: "gostenhof",
   };
   const standort: Origin = { source: "standort", point: { lat: 49.452, lon: 11.077 }, label: "Mein Standort" };
+  const karte: Origin = { source: "karte", point: { lat: 49.452, lon: 11.077 }, label: "Kartenmitte" };
 
-  it("kurz für die Kachel: gerundet, deutsches Komma", () => {
-    expect(distanceShort(luftlinie(0))).toBe("100 m");
-    expect(distanceShort(luftlinie(226))).toBe("200 m");
-    expect(distanceShort(luftlinie(400))).toBe("400 m");
-    expect(distanceShort(luftlinie(1427))).toBe("1,4 km");
-    expect(distanceShort(luftlinie(2000))).toBe("2 km");
-    expect(distanceShort(luftlinie(9960))).toBe("10 km");
-    expect(distanceShort(luftlinie(12_400))).toBe("12 km");
+  it("kurz für die Kachel: Luftlinie gerundet mit deutschem Komma", () => {
+    expect(reachShort(luftlinie(0))).toBe("100 m");
+    expect(reachShort(luftlinie(226))).toBe("200 m");
+    expect(reachShort(luftlinie(400))).toBe("400 m");
+    expect(reachShort(luftlinie(1427))).toBe("1,4 km");
+    expect(reachShort(luftlinie(2000))).toBe("2 km");
+    expect(reachShort(luftlinie(9960))).toBe("10 km");
+    expect(reachShort(luftlinie(12_400))).toBe("12 km");
+  });
+
+  it("kurz für die Kachel: Wegzeit gerundet, über 2 Std.", () => {
+    expect(reachShort(oepnv(23))).toBe("25 Min.");
+    expect(reachShort(oepnv(13.6))).toBe("15 Min.");
+    expect(reachShort(oepnv(0, true))).toBe("5 Min.");
+    expect(reachShort(oepnv(64))).toBe("60 Min.");
+    expect(reachShort(oepnv(121))).toBe("über 2 Std.");
+    expect(reachShort(oepnv(Number.POSITIVE_INFINITY))).toBe("über 2 Std.");
   });
 
   it("nennt den Startpunkt", () => {
     expect(originPhrase(gostenhof)).toBe("ab Gostenhof");
     expect(originPhrase(standort)).toBe("ab deinem Standort");
-  });
-
-  it("lang fürs Detail, immer mit „Luftlinie“", () => {
-    expect(distanceLong(luftlinie(1427), gostenhof)).toBe("ca. 1,4 km Luftlinie ab Gostenhof");
-    expect(distanceLong(luftlinie(226), standort)).toBe("ca. 200 m Luftlinie ab deinem Standort");
-  });
-
-  it("erklärt in der Statuszeile, was die Zahl auf der Kachel ist", () => {
-    expect(distanceNote(gostenhof)).toBe("Entfernung als Luftlinie ab Gostenhof");
-    expect(distanceNote(standort)).toBe("Entfernung als Luftlinie ab deinem Standort");
-  });
-
-  it("Kartenmitte als Startpunkt (Plan 0005, E8)", () => {
-    const karte: Origin = { source: "karte", point: { lat: 49.452, lon: 11.077 }, label: "Kartenmitte" };
     expect(originPhrase(karte)).toBe("ab der Kartenmitte");
-    expect(distanceNote(karte)).toBe("Entfernung als Luftlinie ab der Kartenmitte");
-    expect(distanceLong(luftlinie(1427), karte)).toBe("ca. 1,4 km Luftlinie ab der Kartenmitte");
   });
 
-  it("beschriftet den Umkreis", () => {
-    expect(reachLimitLabel({ kind: "km", value: 2 })).toBe("bis 2 km");
-    expect(reachLimitLabel({ kind: "km", value: 10 })).toBe("bis 10 km");
+  it("lang fürs Detail: sagt, was gemeint ist (E1)", () => {
+    expect(reachLong(oepnv(23), gostenhof)).toBe("ca. 25 Min. mit Bus & Bahn ab Gostenhof");
+    expect(reachLong(oepnv(9.6, true), standort)).toBe("ca. 10 Min. zu Fuß ab deinem Standort");
+    expect(reachLong(oepnv(31), karte)).toBe("ca. 30 Min. mit Bus & Bahn ab der Kartenmitte");
+    expect(reachLong(oepnv(Number.POSITIVE_INFINITY), gostenhof)).toBe("über 2 Std. mit Bus & Bahn ab Gostenhof");
+    expect(reachLong(luftlinie(1427), gostenhof)).toBe("ca. 1,4 km Luftlinie ab Gostenhof");
+    expect(reachLong(luftlinie(226), standort)).toBe("ca. 200 m Luftlinie ab deinem Standort");
+    expect(reachLong(luftlinie(1427), karte)).toBe("ca. 1,4 km Luftlinie ab der Kartenmitte");
+  });
+
+  it("Statuszeile je Modus (E11)", () => {
+    const wegzeit = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, inkl. Warten)";
+    expect(reachNote({ kind: "oepnv" }, gostenhof)).toBe(wegzeit);
+    // lädt: derselbe Text, unsichtbar (die Höhe steht schon)
+    expect(reachNote({ kind: "laedt" }, gostenhof)).toBe(wegzeit);
+    expect(reachNote({ kind: "oepnv" }, karte)).toBe(
+      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, inkl. Warten)",
+    );
+    expect(reachNote({ kind: "luftlinie", reason: "fehler" }, gostenhof)).toBe(
+      "Entfernung als Luftlinie ab Gostenhof – Wegzeiten gerade nicht verfügbar.",
+    );
+    expect(reachNote({ kind: "luftlinie", reason: "ausserhalb" }, standort)).toBe(
+      "Entfernung als Luftlinie ab deinem Standort – außerhalb des Stadtgebiets.",
+    );
+  });
+
+  it("beschriftet die Wegzeit-Grenze", () => {
+    expect(reachLimitLabel({ kind: "minuten", value: 20 })).toBe("bis 20 Min.");
+    expect(reachLimitLabel({ kind: "minuten", value: 45 })).toBe("bis 45 Min.");
+  });
+
+  it("Begründung unter gesperrten Chips je Modus (M6)", () => {
+    expect(limitReason(undefined)).toBe("Erst einen Startpunkt wählen.");
+    expect(limitReason({ kind: "laedt" })).toBe("Wegzeiten werden geladen …");
+    expect(limitReason({ kind: "luftlinie", reason: "fehler" })).toBe("Wegzeiten gerade nicht verfügbar.");
+    expect(limitReason({ kind: "luftlinie", reason: "ausserhalb" })).toBe(
+      "Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.",
+    );
+    expect(limitReason({ kind: "oepnv" })).toBeUndefined();
+  });
+
+  it("Hinweis unter der Statuszeile, wenn wegzeit= nicht wirkt (E11)", () => {
+    const at30 = { kind: "minuten", value: 30 } as const;
+    expect(limitHint(at30, undefined)).toBe("„bis 30 Min.“ braucht einen Startpunkt.");
+    expect(limitHint(at30, { kind: "luftlinie", reason: "fehler" })).toBe(
+      "„bis 30 Min.“ wirkt gerade nicht: Wegzeiten nicht geladen.",
+    );
+    expect(limitHint(at30, { kind: "luftlinie", reason: "ausserhalb" })).toBe(
+      "„bis 30 Min.“ wirkt nicht: Startpunkt außerhalb des Stadtgebiets.",
+    );
+    // lädt: Platzhalter-Block statt Hinweis; mit Wegzeit wirkt die Grenze
+    expect(limitHint(at30, { kind: "laedt" })).toBeUndefined();
+    expect(limitHint(at30, { kind: "oepnv" })).toBeUndefined();
+  });
+});
+
+describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)", () => {
+  const source = {
+    attribution: "VGN – Verkehrsverbund Großraum Nürnberg GmbH",
+    title: "VGN-Soll-Daten vom 24.06.2026",
+    url: "https://www.vgn.de/web-entwickler/open-data/",
+    license: "CC BY-SA 3.0 DE",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/de/",
+    validFrom: "2026-06-24",
+    validTo: "2026-12-12",
+  };
+  const text = (parts: ReturnType<typeof transitSourceNote>) =>
+    parts.map((p) => (typeof p === "string" ? p : p.text)).join("");
+  const links = (parts: ReturnType<typeof transitSourceNote>) => parts.filter((p) => typeof p !== "string");
+
+  it("nennt Rechteinhaber, Titel mit Stand, „abgewandelt“ und die Lizenz, beide als Link", () => {
+    const parts = transitSourceNote(source);
+    expect(text(parts)).toBe(
+      "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
+        "Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, ‚VGN-Soll-Daten vom 24.06.2026‘, abgewandelt, " +
+        "Lizenz CC BY-SA 3.0 DE.",
+    );
+    expect(links(parts)).toEqual([
+      { text: "VGN-Soll-Daten vom 24.06.2026", href: "https://www.vgn.de/web-entwickler/open-data/" },
+      { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/" },
+    ]);
+  });
+
+  it("entsteht aus `source`, nicht fest im Code", () => {
+    const fixture = { ...source, attribution: "Fiktive Testdaten", title: "Fiktiver Fahrplan", license: "CC0 1.0" };
+    expect(text(transitSourceNote(fixture))).toContain("Fahrplan: Fiktive Testdaten, ‚Fiktiver Fahrplan‘, abgewandelt");
+    expect(text(transitSourceNote(fixture))).toContain("Lizenz CC0 1.0.");
+  });
+
+  it("ohne geladene Tabelle: VGN und Lizenz, beide als Link", () => {
+    const parts = transitSourceNote(undefined);
+    expect(text(parts)).toBe(
+      "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
+        "Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, CC BY-SA 3.0 DE.",
+    );
+    expect(links(parts)).toEqual([
+      { text: "VGN – Verkehrsverbund Großraum Nürnberg GmbH", href: "https://www.vgn.de/web-entwickler/open-data/" },
+      { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/" },
+    ]);
   });
 });
 
@@ -318,13 +412,13 @@ describe("Fehlerzustand (Plan 0008, E5)", () => {
 
 describe("Kalender: ausgeblendete Angebote (Plan 0008, E12)", () => {
   it("nennt die Zahl im Singular und Plural", () => {
-    expect(hiddenNote(1, 0)).toBe("1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Umkreis oder Alter.");
-    expect(hiddenNote(3, 0)).toBe("3 Angebote an diesem Tag sind ausgeblendet – durch Filter, Umkreis oder Alter.");
+    expect(hiddenNote(1, 0)).toBe("1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Wegzeit oder Alter.");
+    expect(hiddenNote(3, 0)).toBe("3 Angebote an diesem Tag sind ausgeblendet – durch Filter, Wegzeit oder Alter.");
   });
 
   it("sagt dazu, wenn heute Passendes schon vorbei ist", () => {
     expect(hiddenNote(1, 2)).toBe(
-      "1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Umkreis oder Alter. " +
+      "1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Wegzeit oder Alter. " +
         "Was zu deiner Auswahl passt, ist heute schon vorbei.",
     );
   });

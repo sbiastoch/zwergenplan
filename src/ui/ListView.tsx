@@ -45,6 +45,18 @@ export function ListView({ groups, remaining, onMore, today, ctx, hasData, onRes
   );
 }
 
+/**
+ * Platzhalter der Liste, solange die Wegzeit zu einer gesetzten Grenze lädt (Plan 0009, E11, M7): so hoch wie zwei
+ * Tagesgruppen, danach erscheint die gefilterte Liste, ohne dass Kacheln springen.
+ */
+export function ListPending() {
+  return (
+    <div className="list-pending">
+      <p>Wegzeiten werden geladen …</p>
+    </div>
+  );
+}
+
 /** Leerzustand der Liste und der Karte (Plan 0005, E12): Filter passen nicht, oder es gibt noch keine Daten. */
 export function NoOffers({ hasData, onResetFilter }: { hasData: boolean; onResetFilter: () => void }) {
   return hasData ? (

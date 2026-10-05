@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { GeoPoint } from "./geo.ts";
 import { countPlaces, placeKey } from "./place-key.ts";
 import { placesOf, sortPlaces } from "./places.ts";
-import type { Origin } from "./reach.ts";
+import { airlineReach, type Origin, type ReachFn } from "./reach.ts";
 import { fixtureSiteOffers } from "./test-fixtures.ts";
 
 interface TestOffer {
@@ -79,7 +79,32 @@ describe("sortPlaces", () => {
 
   it("sortiert mit Startpunkt nach Entfernung", () => {
     const places = placesOf([far, near, middle]);
-    expect(sortPlaces(places, gostenhof).map((p) => p.names[0])).toEqual(["Zwergenhaus", "Bärenhöhle", "Ameisenbau"]);
+    expect(sortPlaces(places, airlineReach(gostenhof)).map((p) => p.names[0])).toEqual([
+      "Zwergenhaus",
+      "Bärenhöhle",
+      "Ameisenbau",
+    ]);
+  });
+
+  it("sortiert nach Wegzeit, Unerreichbares ans Ende und dort nach Name (Plan 0009, E8)", () => {
+    const minutes = new Map([
+      [placeKey(near.venue.geo), 40],
+      [placeKey(middle.venue.geo), Number.POSITIVE_INFINITY],
+      [placeKey(far.venue.geo), 12],
+    ]);
+    const extra = offer("x", "Adlerhorst", { lat: 49.5, lon: 11.0 });
+    const wegzeit: ReachFn = ({ geo }) => ({
+      kind: "oepnv",
+      minutes: minutes.get(placeKey(geo)) ?? Number.POSITIVE_INFINITY,
+      byFoot: false,
+    });
+    const places = placesOf([near, middle, far, extra]);
+    expect(sortPlaces(places, wegzeit).map((p) => p.names[0])).toEqual([
+      "Ameisenbau",
+      "Zwergenhaus",
+      "Adlerhorst",
+      "Bärenhöhle",
+    ]);
   });
 
   it("sortiert ohne Startpunkt nach Name, deutsch: „Ö“ steht bei „O“, nicht hinter „Z“", () => {
@@ -102,18 +127,18 @@ describe("sortPlaces", () => {
       offer("w", "Ost-West", { lat: 49.45, lon: 11.06 }),
       offer("a", "Am Rand", { lat: 49.5, lon: 11.07 }),
     ]);
-    expect(sortPlaces(places, origin).map((p) => p.names[0])).toEqual(["Ost", "Ost-West", "Am Rand"]);
+    expect(sortPlaces(places, airlineReach(origin)).map((p) => p.names[0])).toEqual(["Ost", "Ost-West", "Am Rand"]);
     const reversed = placesOf([
       offer("w", "Ost-West", { lat: 49.45, lon: 11.06 }),
       offer("o", "Ost", { lat: 49.45, lon: 11.08 }),
     ]);
-    expect(sortPlaces(reversed, origin).map((p) => p.names[0])).toEqual(["Ost", "Ost-West"]);
+    expect(sortPlaces(reversed, airlineReach(origin)).map((p) => p.names[0])).toEqual(["Ost", "Ost-West"]);
   });
 
   it("verändert die Eingabe nicht", () => {
     const places = placesOf([far, near]);
     const before = places.map((p) => p.key);
-    sortPlaces(places, gostenhof);
+    sortPlaces(places, airlineReach(gostenhof));
     sortPlaces(places);
     expect(places.map((p) => p.key)).toEqual(before);
   });

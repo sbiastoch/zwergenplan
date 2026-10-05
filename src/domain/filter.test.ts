@@ -11,7 +11,8 @@ import {
   toggleIn,
   withReachLimit,
 } from "./filter.ts";
-import { type Origin, reachTo } from "./reach.ts";
+import { placeKey } from "./place-key.ts";
+import { airlineReach, type Origin, type ReachFn } from "./reach.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers } from "./test-fixtures.ts";
 
 const offers = fixtureSiteOffers();
@@ -25,6 +26,25 @@ const gostenhof: Origin = {
   label: gostenhofDistrict.name,
   districtId: gostenhofDistrict.id,
 };
+
+/**
+ * Wegzeit ab Gostenhof wie aus der Fixture-Tabelle (`tests/fixtures/oepnv`, nachgerechnet in transit.test.ts):
+ * Theater 3,6, Beispielhof 13,6, Bibliothek 15,6, Musikschule 29,6, Gemeinde 32,6 Min.
+ */
+const MINUTES: Record<string, number> = {
+  "theater-beispiel-buehne": 3.6,
+  "familientreff-beispiel-haus": 13.6,
+  "stadtbibliothek-beispiel-zentrum": 15.6,
+  "musikschule-beispiel-sued": 29.6,
+  "gemeinde-beispiel-gemeindehaus": 32.6,
+};
+const byPlace = new Map(offers.map((o) => [placeKey(o.venue.geo), MINUTES[o.venueId] ?? Number.NaN]));
+const wegzeitAbGostenhof: ReachFn = ({ geo }) => ({
+  kind: "oepnv",
+  minutes: byPlace.get(placeKey(geo)) ?? Number.NaN,
+  byFoot: false,
+});
+const within20 = { ...EMPTY_FILTER, reachLimit: { kind: "minuten", value: 20 } } satisfies FilterState;
 
 describe("URL-Zustand", () => {
   it("überlebt den Roundtrip verlustfrei und kanonisch", () => {
@@ -52,23 +72,29 @@ describe("URL-Zustand", () => {
     });
   });
 
-  it("liest den Umkreis und schreibt ihn kanonisch nach den Kosten", () => {
-    const state: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"], reachLimit: { kind: "km", value: 5 } };
+  it("liest die Wegzeit und schreibt sie kanonisch nach den Kosten (Plan 0009, E8)", () => {
+    const state: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"], reachLimit: { kind: "minuten", value: 30 } };
     const search = filterToSearch(state);
-    expect(search).toBe("kosten=kostenlos&umkreis=5");
-    expect(filterFromSearch(`?umkreis=5&kosten=kostenlos`)).toEqual(state);
-    for (const value of [2, 10] as const) {
-      expect(filterFromSearch(`?umkreis=${value}`).reachLimit).toEqual({ kind: "km", value });
+    expect(search).toBe("kosten=kostenlos&wegzeit=30");
+    expect(filterFromSearch(`?wegzeit=30&kosten=kostenlos`)).toEqual(state);
+    for (const value of [20, 45] as const) {
+      expect(filterFromSearch(`?wegzeit=${value}`).reachLimit).toEqual({ kind: "minuten", value });
     }
   });
 
-  it.each(["3", "abc", "-5", "", "02", "2.0", "5,10"])("verwirft den Umkreis „%s“", (raw) => {
-    const state = filterFromSearch(`?umkreis=${raw}`);
+  it.each(["15", "abc", "-20", "", "020", "20.0", "20,30", "60"])("verwirft die Wegzeit „%s“", (raw) => {
+    const state = filterFromSearch(`?wegzeit=${raw}`);
     expect(state).toEqual(EMPTY_FILTER);
     expect("reachLimit" in state).toBe(false);
   });
 
-  it("hat ohne Umkreis keinen Parameter umkreis", () => {
+  it.each(["2", "5", "10"])("liest den alten Umkreis umkreis=%s nicht mehr (E8)", (raw) => {
+    const state = filterFromSearch(`?umkreis=${raw}&kosten=kostenlos`);
+    expect(state).toEqual({ ...EMPTY_FILTER, cost: ["kostenlos"] });
+    expect(filterToSearch(state)).toBe("kosten=kostenlos");
+  });
+
+  it("hat ohne Grenze keinen Parameter wegzeit", () => {
     expect(filterToSearch({ ...EMPTY_FILTER, formats: ["kurs"] })).toBe("format=kurs");
     expect("reachLimit" in EMPTY_FILTER).toBe(false);
   });
@@ -137,55 +163,43 @@ describe("matchesFilter", () => {
     }
   });
 
-  it("beachtet den Umkreis nur mit Startpunkt", () => {
-    const within2km = { ...EMPTY_FILTER, reachLimit: { kind: "km", value: 2 } } satisfies FilterState;
-    const near = offers.filter((o) => matchesFilter(o, within2km, gostenhof)).map((o) => o.venueId);
+  it("beachtet die Wegzeit nur mit Wegzeit-Funktion", () => {
+    const near = offers.filter((o) => matchesFilter(o, within20, wegzeitAbGostenhof)).map((o) => o.venueId);
     expect(near).not.toContain("musikschule-beispiel-sued");
-    expect(offers.filter((o) => matchesFilter(o, within2km))).toHaveLength(offers.length);
+    expect(offers.filter((o) => matchesFilter(o, within20))).toHaveLength(offers.length);
   });
 });
 
-describe("applyFilters mit Umkreis", () => {
-  const within2km = { ...EMPTY_FILTER, reachLimit: { kind: "km", value: 2 } } satisfies FilterState;
+describe("applyFilters mit Wegzeit (Plan 0009, E8/E11)", () => {
   const venuesOf = (list: readonly { venueId: string }[]) => [...new Set(list.map((o) => o.venueId))].sort();
 
-  it("rechnet ab Gostenhof die Luftlinie aus Plan 0004", () => {
-    const meters = Object.fromEntries(offers.map((o) => [o.venueId, Math.round(reachTo(gostenhof, o.venue).meters)]));
-    expect(meters).toEqual({
-      "theater-beispiel-buehne": 226,
-      "familientreff-beispiel-haus": 1427,
-      "stadtbibliothek-beispiel-zentrum": 1689,
-      "musikschule-beispiel-sued": 2358,
-      "gemeinde-beispiel-gemeindehaus": 3008,
-    });
-  });
-
-  it("behält mit Startpunkt nur Orte im Umkreis", () => {
-    const kept = applyFilters(offers, within2km, { now: FIXTURE_NOW, origin: gostenhof });
+  it("behält mit Wegzeit nur Orte bis zur Grenze, ungerundet verglichen", () => {
+    const kept = applyFilters(offers, within20, { now: FIXTURE_NOW, reach: wegzeitAbGostenhof });
     expect(venuesOf(kept)).toEqual([
       "familientreff-beispiel-haus",
       "stadtbibliothek-beispiel-zentrum",
       "theater-beispiel-buehne",
     ]);
+    // 29,6 Min. wird als „30 Min.“ angezeigt und fällt unter „bis 30 Min.“, 32,6 Min. nicht
+    const at30 = { ...EMPTY_FILTER, reachLimit: { kind: "minuten", value: 30 } } satisfies FilterState;
+    const kept30 = applyFilters(offers, at30, { now: FIXTURE_NOW, reach: wegzeitAbGostenhof });
+    expect(venuesOf(kept30)).toContain("musikschule-beispiel-sued");
+    expect(venuesOf(kept30)).not.toContain("gemeinde-beispiel-gemeindehaus");
   });
 
-  it("zieht die Grenze zwischen 1 689 m und 2 358 m bei 2 km, 5 km behalten alle", () => {
-    const at5 = { ...EMPTY_FILTER, reachLimit: { kind: "km", value: 5 } } satisfies FilterState;
-    expect(ids({ ...EMPTY_FILTER })).toEqual(
-      applyFilters(offers, at5, { now: FIXTURE_NOW, origin: gostenhof }).map(fixtureKey),
-    );
-    const kept = applyFilters(offers, within2km, { now: FIXTURE_NOW, origin: gostenhof });
-    expect(kept.some((o) => o.venueId === "stadtbibliothek-beispiel-zentrum")).toBe(true);
-    expect(kept.some((o) => o.venueId === "musikschule-beispiel-sued")).toBe(false);
+  it("wirkt mit der Luftlinie nicht (Rückfall, E11)", () => {
+    expect(
+      applyFilters(offers, within20, { now: FIXTURE_NOW, reach: airlineReach(gostenhof) }).map(fixtureKey),
+    ).toEqual(ids(EMPTY_FILTER));
   });
 
-  it("wirkt ohne Startpunkt nicht", () => {
-    expect(ids(within2km)).toEqual(ids(EMPTY_FILTER));
+  it("wirkt ohne Wegzeit-Funktion nicht", () => {
+    expect(ids(within20)).toEqual(ids(EMPTY_FILTER));
   });
 
-  it("verknüpft den Umkreis mit den anderen Filtern per UND", () => {
-    const state: FilterState = { ...within2km, categories: ["musik"] };
-    const kept = applyFilters(offers, state, { now: FIXTURE_NOW, origin: gostenhof });
+  it("verknüpft die Wegzeit mit den anderen Filtern per UND", () => {
+    const state: FilterState = { ...within20, categories: ["musik"] };
+    const kept = applyFilters(offers, state, { now: FIXTURE_NOW, reach: wegzeitAbGostenhof });
     expect(kept.length).toBeLessThan(ids({ ...EMPTY_FILTER, categories: ["musik"] }).length);
     expect(venuesOf(kept)).not.toContain("musikschule-beispiel-sued");
   });
@@ -193,27 +207,30 @@ describe("applyFilters mit Umkreis", () => {
 
 describe("Filter bedienen", () => {
   it("zählt aktive Filterwerte über alle Dimensionen", () => {
-    expect(activeFilterCount(EMPTY_FILTER, { hasOrigin: false })).toBe(0);
+    expect(activeFilterCount(EMPTY_FILTER, { limitActive: false })).toBe(0);
     expect(
       activeFilterCount(
         { categories: ["musik", "wasser"], formats: ["kurs"], registration: [], cost: ["kostenlos"] },
-        { hasOrigin: false },
+        { limitActive: false },
       ),
     ).toBe(4);
   });
 
-  it("zählt den Umkreis nur mit Startpunkt", () => {
-    const state: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"], reachLimit: { kind: "km", value: 2 } };
-    expect(activeFilterCount(state, { hasOrigin: true })).toBe(2);
-    expect(activeFilterCount(state, { hasOrigin: false })).toBe(1);
-    expect(activeFilterCount(EMPTY_FILTER, { hasOrigin: true })).toBe(0);
+  it("zählt die Wegzeit nur, wenn sie wirkt", () => {
+    const state: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"], reachLimit: { kind: "minuten", value: 20 } };
+    expect(activeFilterCount(state, { limitActive: true })).toBe(2);
+    expect(activeFilterCount(state, { limitActive: false })).toBe(1);
+    expect(activeFilterCount(EMPTY_FILTER, { limitActive: true })).toBe(0);
   });
 
-  it("setzt den Umkreis als Einfachwahl und entfernt ihn mit „Egal“", () => {
+  it("setzt die Wegzeit als Einfachwahl und entfernt ihn mit „Egal“", () => {
     const base: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"] };
-    const at2 = withReachLimit(base, { kind: "km", value: 2 });
-    expect(at2).toEqual({ ...base, reachLimit: { kind: "km", value: 2 } });
-    expect(withReachLimit(at2, { kind: "km", value: 10 })).toEqual({ ...base, reachLimit: { kind: "km", value: 10 } });
+    const at2 = withReachLimit(base, { kind: "minuten", value: 20 });
+    expect(at2).toEqual({ ...base, reachLimit: { kind: "minuten", value: 20 } });
+    expect(withReachLimit(at2, { kind: "minuten", value: 45 })).toEqual({
+      ...base,
+      reachLimit: { kind: "minuten", value: 45 },
+    });
     const egal = withReachLimit(at2, undefined);
     expect(egal).toEqual(base);
     // kein Schlüssel mit undefined (exactOptionalPropertyTypes, kanonische URL)

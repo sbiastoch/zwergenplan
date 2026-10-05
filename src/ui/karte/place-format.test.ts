@@ -8,5 +8,6 @@ describe("Orts-Liste (Plan 0005, E7)", () => {
     expect(placeLine({ address: "Beispielweg 1", offers: [1] }, { kind: "luftlinie", meters: 1427 })).toBe(
       "Beispielweg 1 · 1 Angebot · 1,4 km",
     );
+    expect(placeLine(place, { kind: "oepnv", minutes: 23, byFoot: false })).toBe("Gostenhof · 3 Angebote · 25 Min.");
   });
 });

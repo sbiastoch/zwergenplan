@@ -25,8 +25,11 @@ const NOTES: Record<MapProblem, string> = {
 };
 
 export function MapScreen(props: MapScreenProps) {
-  const { offers, cameraOffers, origin, ctx, onSheetOpen } = props;
-  const { places, start } = useMemo(() => mapData(offers, cameraOffers, origin), [offers, cameraOffers, origin]);
+  const { offers, cameraOffers, origin, reach, ctx, onSheetOpen } = props;
+  const { places, start } = useMemo(
+    () => mapData(offers, cameraOffers, origin, reach),
+    [offers, cameraOffers, origin, reach],
+  );
   const { module, attempt, retry } = useLazy(loadMapView);
   const [ready, setReady] = useState(false);
   const [problem, setProblem] = useState<MapProblem>();
@@ -106,7 +109,7 @@ export function MapScreen(props: MapScreenProps) {
       </div>
       <p className="small">Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät.</p>
       {places.length > 0 ? (
-        <PlaceList places={places} reachOf={ctx.reachOf} onPlace={openPlace} />
+        <PlaceList places={places} reachOf={ctx.reachOf} reachPending={ctx.reachPending} onPlace={openPlace} />
       ) : (
         <NoOffers hasData={props.hasData} onResetFilter={props.onResetFilter} />
       )}

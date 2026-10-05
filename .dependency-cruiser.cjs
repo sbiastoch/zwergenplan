@@ -89,6 +89,22 @@ module.exports = {
       to: { path: "^src/ui/map/" },
     },
     {
+      name: "transit-only-lazy",
+      severity: "error",
+      comment:
+        "Die Rechenlogik der Wegzeit src/domain/transit.ts ist ein Lazy-Chunk (assets/oepnv/, Plan 0009, E10: statisch lag das Start-JS über der Schwelle). Von src/ aus nur per import(), auch Typen nicht statisch; Typen stehen in src/domain/transit-types.ts. Tests ausgenommen.",
+      from: { path: "^src/", pathNot: "\\.test\\.ts$" },
+      to: { path: "^src/domain/transit\\.ts$", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
+      name: "transit-entry-only",
+      severity: "error",
+      comment:
+        "Nur der Lader src/ui/use-transit.ts greift auf src/domain/transit.ts zu (Plan 0009, E10), aus demselben Grund wie karte-ui-entry-only. Den Lader selbst prüft scripts/check-architecture.ts. Tests ausgenommen.",
+      from: { path: "^src/", pathNot: ["^src/ui/use-transit\\.ts$", "^src/domain/transit\\.ts$", "\\.test\\.ts$"] },
+      to: { path: "^src/domain/transit\\.ts$" },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",

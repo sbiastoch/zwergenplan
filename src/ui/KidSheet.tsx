@@ -1,11 +1,13 @@
 /**
- * Kind-Sheet (Plan 0003, E11, E15; Plan 0004, E5): Geburtsdatum, „Nur passende“, Startpunkt, Darstellung.
+ * Kind-Sheet (Plan 0003, E11, E15; Plan 0004, E5; Plan 0009, E3): Geburtsdatum, „Nur passende“, Startpunkt mit
+ * Quellenhinweis der Wegzeit, Darstellung.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7).
  */
 import { useId, useState } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { formatGermanDate, parseGermanDate } from "../domain/time.ts";
+import type { TransitSource } from "../domain/transit-types.ts";
 import { plural } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
 import type { OriginApi } from "./use-app-state.ts";
@@ -19,6 +21,7 @@ export function KidSheet({
   onTheme,
   today,
   origin,
+  transitSource,
   focusOrigin,
   onClose,
 }: {
@@ -30,6 +33,8 @@ export function KidSheet({
   onTheme: (t: ThemeChoice) => void;
   today: string;
   origin: OriginApi;
+  /** Namensnennung der Wegzeit-Tabelle (E3); `undefined`, solange sie nicht geladen ist */
+  transitSource: TransitSource | undefined;
   /** geöffnet über „Startpunkt wählen“: die Stadtteil-Auswahl bekommt den Fokus */
   focusOrigin: boolean;
   onClose: () => void;
@@ -98,7 +103,7 @@ export function KidSheet({
             </span>
           </button>
         </div>
-        <OriginPicker api={origin} focus={focusOrigin} />
+        <OriginPicker api={origin} source={transitSource} focus={focusOrigin} />
         <h3>Darstellung</h3>
         <fieldset className="plain">
           <legend className="sr-only">Darstellung</legend>

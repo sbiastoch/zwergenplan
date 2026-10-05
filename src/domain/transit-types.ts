@@ -4,10 +4,10 @@
  */
 
 /**
- * Namensnennung nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (E3); den Abwandlungshinweis setzt der Text.
- * Export erst, wenn ihn jemand braucht (knip).
+ * Namensnennung nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (E3); den Abwandlungshinweis setzt der Text
+ * (`transitSourceNote` in src/ui/format.ts).
  */
-interface TransitSource {
+export interface TransitSource {
   attribution: string;
   title: string;
   url: string;
@@ -54,7 +54,7 @@ export interface TransitTable {
 
 /**
  * Wegzeit mit Bus & Bahn oder zu Fuß (E8). `minutes` ist ungerundet; `Infinity` heißt „über 2 Std.“
- * bzw. unerreichbar. Paket C nimmt diesen Zweig in die Union `Reach` (`src/domain/reach.ts`) auf.
+ * bzw. unerreichbar. Zweig der Union `Reach` (`src/domain/reach.ts`).
  */
 export interface TransitReach {
   kind: "oepnv";

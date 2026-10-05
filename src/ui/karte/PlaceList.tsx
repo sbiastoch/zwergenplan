@@ -5,15 +5,19 @@
 import type { Place } from "../../domain/places.ts";
 import type { Reach } from "../../domain/reach.ts";
 import type { SiteOffer } from "../../domain/site-data.ts";
+import { DistPending } from "../OfferCard.tsx";
 import { placeLine } from "./place-format.ts";
 
 export function PlaceList({
   places,
   reachOf,
+  reachPending,
   onPlace,
 }: {
   places: readonly Place<SiteOffer>[];
   reachOf: (offer: SiteOffer) => Reach | undefined;
+  /** Wegzeit lädt: Platzhalter, sortiert nach Name (Plan 0009, E11) */
+  reachPending: boolean;
   onPlace: (place: Place<SiteOffer>) => void;
 }) {
   return (
@@ -24,7 +28,15 @@ export function PlaceList({
           <li key={place.key}>
             <button type="button" className="place" onClick={() => onPlace(place)}>
               <b>{place.names.join(" / ")}</b>
-              <span>{placeLine(place, place.offers[0] && reachOf(place.offers[0]))}</span>
+              <span>
+                {placeLine(place, place.offers[0] && reachOf(place.offers[0]))}
+                {reachPending && (
+                  <>
+                    {" · "}
+                    <DistPending />
+                  </>
+                )}
+              </span>
             </button>
           </li>
         ))}

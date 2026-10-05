@@ -83,20 +83,20 @@ export function Stickers({ filter, onChange }: { filter: FilterState; onChange: 
 
 export function QuickFilters({
   filter,
-  hasOrigin,
+  limitActive,
   onChange,
   onOpenSheet,
   sheetButton,
 }: {
   filter: FilterState;
-  /** ohne Startpunkt zählt der Umkreis nicht mit (Plan 0004, E7) */
-  hasOrigin: boolean;
+  /** die Wegzeit-Grenze zählt nur, wenn sie wirkt (Plan 0009, E8) */
+  limitActive: boolean;
   onChange: (f: FilterState) => void;
   onOpenSheet: () => void;
   /** der Knopf „Alle Filter“, Fokus-Rückweg für das Kind-Sheet */
   sheetButton?: Ref<HTMLButtonElement>;
 }) {
-  const count = activeFilterCount(filter, { hasOrigin });
+  const count = activeFilterCount(filter, { limitActive });
   const chips = [
     { label: "Kostenlos", on: filter.cost.includes("kostenlos"), next: () => toggleIn(filter, "cost", "kostenlos") },
     {

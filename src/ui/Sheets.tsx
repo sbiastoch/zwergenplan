@@ -1,14 +1,16 @@
 /**
- * Filter-Sheet (Plan 0003, E16; Plan 0004, E7). Inhalt des Dialogs, die Hülle ist Dialog.tsx. Kind-Sheet: KidSheet.tsx.
+ * Filter-Sheet (Plan 0003, E16; Plan 0004, E7; Plan 0009, E11). Inhalt des Dialogs, die Hülle ist Dialog.tsx.
+ * Kind-Sheet: KidSheet.tsx.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
 import type { ReactNode } from "react";
 import { EMPTY_FILTER, type FilterState, FORMATS, toggleIn, withReachLimit } from "../domain/filter.ts";
-import { RADII_KM, type ReachLimit } from "../domain/reach.ts";
+import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
-import { plural, reachLimitLabel } from "./format.ts";
+import { limitReason, plural, reachLimitLabel } from "./format.ts";
 import { Shape } from "./icons.tsx";
+import type { ReachMode } from "./use-transit.ts";
 
 const FORMAT_CHIPS: Record<(typeof FORMATS)[number], string> = {
   kurs: "Kurs",
@@ -27,11 +29,37 @@ const COST_CHIPS: [Cost | undefined, string][] = [
 ];
 const REACH_CHIPS: [ReachLimit | undefined, string][] = [
   [undefined, "Egal"],
-  ...RADII_KM.map((value): [ReachLimit, string] => {
-    const limit: ReachLimit = { kind: "km", value };
+  ...LIMIT_MINUTES.map((value): [ReachLimit, string] => {
+    const limit: ReachLimit = { kind: "minuten", value };
     return [limit, reachLimitLabel(limit)];
   }),
 ];
+
+/**
+ * Knopf zur Begründung, warum die Wegzeit-Grenze nicht wirkt (E11): ohne Startpunkt oder außerhalb „Startpunkt
+ * wählen“, bei Fehler „Nochmal laden“ (`want()`), nach zwei gescheiterten Chunks „Seite neu laden“ (M8).
+ */
+export function LimitAction({
+  mode,
+  reloadPage,
+  onPickOrigin,
+  onRetry,
+}: {
+  mode: ReachMode | undefined;
+  reloadPage: boolean;
+  onPickOrigin: () => void;
+  onRetry: () => void;
+}) {
+  if (mode?.kind === "oepnv" || mode?.kind === "laedt") return null;
+  const failed = mode?.reason === "fehler";
+  // Die URL behält den Filter.
+  const onClick = !failed ? onPickOrigin : reloadPage ? () => window.location.reload() : onRetry;
+  return (
+    <button type="button" className="linkbtn" onClick={onClick}>
+      {!failed ? "Startpunkt wählen" : reloadPage ? "Seite neu laden" : "Nochmal laden"}
+    </button>
+  );
+}
 
 function Chip({
   on,
@@ -57,19 +85,20 @@ export function FilterSheet({
   filter,
   onChange,
   resultCount,
-  hasOrigin,
-  onPickOrigin,
+  mode,
+  limitAction,
   onClose,
 }: {
   filter: FilterState;
   onChange: (f: FilterState) => void;
   resultCount: number;
-  /** ohne Startpunkt sind die Umkreise gesperrt (Plan 0004, E7) */
-  hasOrigin: boolean;
-  /** schließt das Filter-Sheet und öffnet das Kind-Sheet bei „Entfernung ab“ */
-  onPickOrigin: () => void;
+  /** nur mit Wegzeit sind die Grenzen bedienbar; sonst steht die Begründung darunter (E11, M6) */
+  mode: ReachMode | undefined;
+  /** Knopf zur Begründung (`LimitAction`) */
+  limitAction: ReactNode;
   onClose: () => void;
 }) {
+  const reason = limitReason(mode);
   /** Einfachwahl auf einer Listen-Dimension: „Egal“ = leere Liste */
   const single = <T extends string>(selected: readonly T[], value: T | undefined) =>
     value === undefined ? selected.length === 0 : selected.length === 1 && selected[0] === value;
@@ -124,25 +153,24 @@ export function FilterSheet({
             </Chip>
           ))}
         </div>
-        <h3>Entfernung</h3>
+        <h3>Wegzeit</h3>
         <div className="wrap">
           {REACH_CHIPS.map(([limit, label]) => (
             <Chip
               key={label}
               on={limit ? filter.reachLimit?.value === limit.value : !filter.reachLimit}
-              disabled={limit !== undefined && !hasOrigin}
+              // „Egal“ bleibt immer bedienbar: So lässt sich eine gesetzte Grenze jederzeit entfernen.
+              disabled={limit !== undefined && reason !== undefined}
               onClick={() => onChange(withReachLimit(filter, limit))}
             >
               {label}
             </Chip>
           ))}
         </div>
-        {!hasOrigin && (
+        {reason && (
           <p className="small origin-need">
-            Erst einen Startpunkt wählen.
-            <button type="button" className="linkbtn" onClick={onPickOrigin}>
-              Startpunkt wählen
-            </button>
+            {reason}
+            {limitAction}
           </p>
         )}
       </div>
