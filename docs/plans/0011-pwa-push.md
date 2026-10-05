@@ -1,6 +1,6 @@
 # Plan 0011 – Installierbare App und Push zu neuen Angeboten
 
-Status: Review 1 und 2 eingearbeitet, freigegeben (2026-10-05); Umsetzung wartet auf Plan 0010 und die offenen Fragen an den Nutzer
+Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05); Umsetzung wartet nur noch auf Plan 0010 (Stufe 1). Der Spike (Schritt 0) darf sofort beginnen.
 Datum: 2026-10-05
 Bezug:
 - **ADR 0013** (PWA und Service Worker, Entwurf `docs/adr/0013-pwa-service-worker.md`) und **ADR 0014** (Web Push, Entwurf `docs/adr/0014-web-push.md`).
@@ -599,11 +599,11 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 - **Missbrauch des Abo-Endpunkts** (Spam-Abos). → Allowlist der Push-Dienste, Größen- und Mengengrenze, Rate-Limit je IP. Die Origin-Prüfung hält nur fremde Webseiten ab, keine Skripte. Im schlimmsten Fall ist die Grenze von 500 voll. Dann `wrangler kv` leeren und neu einladen.
 - **Kosten:** Cloudflare Workers und KV im Gratis-Tarif (100 000 Requests/Tag, 1 000 Schreibvorgänge/Tag) reichen für Familie und Freunde um Größenordnungen.
 
-## Offene Fragen an den Nutzer
+## Nutzerentscheidungen (2026-10-05)
 
-1. **Cloudflare** als Ort für die Abos (ADR 0014), oder lieber ein anderer Anbieter? Die Alternativen stehen im ADR.
-2. **Icon:** Gibt es eine Vorstellung (Motiv, Farbe), oder soll ein Entwurf im Stickerheft-Stil zur Abnahme kommen?
-3. **Gerät für den Spike:** Ein iPhone mit iOS ≥ 18.4 wird gebraucht, auf dem die Spike-Seite installiert werden kann.
+1. **Cloudflare** als Ort für die Abos (ADR 0014): ja.
+2. **Icon:** keine Vorgabe. Ein Entwurf im Stickerheft-Stil (Plan 0003) kommt in Schritt 2 zur Abnahme.
+3. **Gerät für den Spike:** Ein aktuelles iPhone ist vorhanden. Schritt 0 kann beginnen, sobald Cloudflare eingerichtet ist (Teil von Schritt 7, vorgezogen).
 
 ## Review (2026-10-05, plan-reviewer, Runde 1) – Verdict: Überarbeiten → eingearbeitet
 
