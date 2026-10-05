@@ -42,7 +42,9 @@ jobs:
     name: Build, E2E & Budgets
     needs: check
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Schutz gegen Hänger, kein Qualitäts-Gate: 20 Min. reichten mit den Wegzeit-Specs (Plan 0009) nicht mehr.
+    # Gemessen: E2E 16,7 → 17,3 → 18,8 Min. bei 2 Workern, dazu ≈ 1,5 Min. Smoke mit echten Daten und Setup.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
