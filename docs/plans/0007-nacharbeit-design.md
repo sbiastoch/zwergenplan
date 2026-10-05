@@ -1105,7 +1105,16 @@ Keine Blocker. Vorher `origin/main` (`ffddb46`) eingemergt, ohne Konflikte.
 - **M1 Swap-Matrix auf CI nicht still überspringen.** → `font-swap.smoke.spec.ts` verlangt bei `CI` Messwerte für Roboto, Arial (Liberation) und DejaVu; nur Noto darf fehlen (Begründung im Code: Ubuntu-Image ohne Noto Sans).
   - Ein einzelner unbekannter `local()`-Name ließ nie die Familie ausfallen, denn ein Face lädt, sobald *eine* Quelle auflöst. Der Skip griff aber schon, wenn *ein* Face scheiterte (z. B. nur der fette Schnitt fehlt).
   - Jetzt gilt „fehlt“ nur, wenn alle sechs Faces scheitern. Teilweise installiert ist ein Fehler mit den betroffenen Faces.
-  - Jeder Wert steht in `test-results/font-swap-werte.txt`, und ein CI-Schritt gibt die Datei aus. Ergebnis aus dem Branch-CI: siehe unten.
+  - Jeder Wert steht in `test-results/font-swap-werte.txt`, und ein CI-Schritt gibt die Datei aus („Schrift-Swap je Fallback“).
+  - **Nachweis Branch-CI** (Run 37252565587, `nacharbeit-0007-c`, grün; E2E 703 bestanden, 69 übersprungen), echte Daten, Telefon-Rendering, 412 / 360 px:
+    - Arial (Liberation): gemessen, CLS 0,0002 / 0,0002
+    - Roboto: gemessen, 0,0002 / 0,0003
+    - DejaVu: gemessen, 0,0000 / 0,0000
+    - Noto: übersprungen (nicht installiert), wie erlaubt
+- **Gefunden im ersten Branch-CI** (Run 37250903104, rot in iphone-15, Kopfzeile bei 320 px zweizeilig und Text-Gate im Filter-Sheet): WebKit löst `local()` nur über den Familiennamen auf.
+  - „Liberation Sans Bold“ und „DejaVu Sans Bold“ scheiterten, fetter Text fiel auf den normalen Schnitt mit künstlichem Fett zurück. Damit galt auch dessen `size-adjust`, seit C 104,2 % statt 100,4 %.
+  - Abhilfe: Die fetten Faces nennen am Ende den Familiennamen (`local("Liberation Sans")` …). Lokal nachgestellt mit einer fontconfig ohne Noto; danach in WebKit alle 24 Faces geladen. Chromium-Werte bleiben unverändert.
+  - Das betrifft vermutlich auch Safari auf dem iPhone und gehört in Schritt 10.
 - **m1** `docs/architecture.md`: Telefon-Rendering (`PHONE_FONT_RENDERING`, nur Chromium), Schritt 10 bestätigt am echten Android, Noto auf CI übersprungen.
 - **m2** Abweichung 4 ehrlich formuliert: Ziel ≤ 1,5 % für Zeit/Pille und Chips/Tabs nicht erreicht, maßgeblich ist das CLS-Gate.
 - **m3** Dauerhafter Gegen-Kanarienvogel in `font-swap.spec.ts`: Roboto mit `size-adjust: 100 %` (`rewriteFallbackCss(…, { unadjusted })`) muss bei 412 px mit Fixtures CLS > 0,05 liefern.
