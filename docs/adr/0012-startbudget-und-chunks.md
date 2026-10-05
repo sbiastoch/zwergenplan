@@ -1,0 +1,130 @@
+# ADR 0012 – Startbudget, Rolldown-Workaround und Stack
+
+Status: **vorgeschlagen** (2026-10-05). Entscheidung des Nutzers offen. Betrifft ADR 0001 (Stack), Plan 0010 (E7, E8) und `.size-limit.json`.
+
+## Kontext
+
+- **Budget:** `JS (initial)` hat ein Budget von 90 kB gzip.
+  - Auf `main` (`903866a`) liegt das Start-JS bei **89,62 kB**.
+  - Plan 0010 (Anbieterübersicht) bringt bis zu 1,3 kB hinzu.
+  - Sein Eintrittsziel von ≤ 87,7 kB hat Paket 0 um 1,9 kB verfehlt (Plan 0010, E8, „Ergebnis Paket 0“).
+- **Verteilung:** react-dom macht laut Sourcemap 203 kB vom minifizierten Einstieg aus. Der größte eigene Brocken ist `format.ts` mit 6,2 kB.
+- **Abspaltung:** Wird der Kalender lazy, spaltet Rolldown `jsx-runtime` (3,2 kB) und `time.ts` (0,9 kB) als eigene Start-Chunks ab. Der Chunk-Wächter (`scripts/check-chunks.ts`) wird rot.
+
+Gemessen am 2026-10-05, alle Werte in kB gzip wie size-limit. Gemessen wurde mit Vite 8.3.2 und Rolldown 1.2.12, beide `latest`; eine neuere Version gibt es nicht.
+
+### Ursache der Abspaltung
+
+Es ist ein offener Rolldown-Fehler, [rolldown/rolldown#11026](https://github.com/rolldown/rolldown/issues/11026):
+- `experimental.chunkOptimization` führt gemeinsame Chunks in einem einzigen Durchlauf und abhängig von der Reihenfolge zusammen.
+- Ein früh ausgeführtes Blatt wie React oder `time.ts` kommt an die Reihe, solange seine Importeure noch eigene Chunks sind.
+- Die Prüfung meldet dann einen Zyklus, den es nur vorübergehend gibt. Der Merge wird abgelehnt und später nicht nachgeholt.
+- Eine minimale Repro mit sieben Dateien, nur Rolldown und den Standardoptionen liegt vor. Das Issue nennt nur eine Variante mit `avoidRedundantChunkLoads: false`.
+
+Auslöser ist die Form des Modulgraphen, nicht JSX, Hooks oder React. Das zeigen drei Befunde:
+- Ein trivialer Anbieter-Stub (Komponente mit `useState`) spaltet nicht ab: Start-JS 89,74 kB, Wächter grün.
+- Ein **realistischer Stub**, der geteilte Start-Module nutzt (`Dialog`, `Icon`, `plural`, `berlinIsoDate`), spaltet `jsx-runtime` und `time` ab, auch **ohne** lazy Kalender: 90,86 kB, Wächter rot.
+  - Die Anbieter-UI aus Plan 0010 löst die Abspaltung also sicher aus.
+  - Das ist unabhängig davon, wie dieses ADR entschieden wird.
+- Unter Preact bleibt die Abspaltung ebenfalls; dort wird das ganze Preact als `jsxRuntime` abgespalten (7,2 kB).
+
+### Workaround
+
+```ts
+// vite.config.ts, build.rolldownOptions.output
+codeSplitting: { groups: [{ name: "index", tags: ["$initial"] }] },
+```
+
+- Alle Module, die der Einstieg statisch erreicht, bleiben im Einstieg, auch wenn Lazy-Chunks sie teilen.
+- **Auf `main` neutral:** gleicher Hash `index-DUZZBaYg.js`, 89,62 kB. Lazy-Budgets unverändert: Karte 425,40, Wegzeit 1,01, Export 1,15 kB. Kein zusätzlicher Preload in `index.html`.
+- Gegenprobe ohne Gruppe: `jsx-runtime` und `time` als eigene Chunks, Start 91,53 kB.
+- Frühere Fehlversuche (Plan 0010, E8) nutzten eine Gruppe namens `index` **ohne** `tags`. Der Name ist egal, entscheidend ist `$initial`.
+
+### Messungen
+
+| Variante | Start-JS | Chunk-Wächter | Bemerkung |
+|---|---|---|---|
+| `main` heute | 89,62 | grün | |
+| + Gruppe `$initial` | 89,62 | grün | gleicher Hash |
+| realistischer Anbieter-Stub, ohne Gruppe | 90,86 | **rot** | `jsx-runtime` + `time` abgespalten |
+| realistischer Anbieter-Stub, mit Gruppe | 89,75 | grün | +0,13 = Lader |
+| Kalender lazy, mit Gruppe | **88,53** | grün | Kalender-Chunk 1,83 |
+| Merkliste (`SavedView`) lazy, mit Gruppe | 89,11 | grün | Chunk 1,25 |
+| Kalender + Merkliste lazy, mit Gruppe | **87,97** | grün | Chunks zusammen 3,12 |
+| Anbieter-Stub + Kalender lazy, mit Gruppe | 88,67 | grün | |
+| **Preact 11 / `preact/compat`** (Alias, Code unverändert) | **29,09** | grün | Karte 425,35, Export 1,15, Wegzeit 1,01 |
+
+Die Lazy-Werte gelten mit einem minimalen `React.lazy`-Lader. Vorladen im Leerlauf und `LoadFailed`, wie beim Export, kosten geschätzt 0,1–0,2 kB je Chunk.
+
+Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-Optionen ergeben denselben Hash, und `topics.ts` vorzuberechnen widerspräche der Regel „Kategorien nie gespeichert“.
+
+**Preact im Detail** (Experiment-Worktree, Alias in `vite.config.ts` und `vitest.config.ts`):
+- **Tests:**
+  - Vitest 630/630 grün, Typecheck gegen die `preact/compat`-Typen ohne Fehler.
+  - E2E Pixel 7: 277 grün, 5 rot.
+    - 3× Schrift-Swap: `load` kommt später, weil Preact synchron rendert. Mit `waitUntil: "commit"` in `e2e/vitals.ts` grün.
+    - 1× `startpunkt.spec.ts:213`: Preact führt `useEffect` (also `showModal`) erst nach dem Zeichnen aus, und `clock.pauseAt` hält das an.
+    - 1× `karte.spec.ts:172`: Kachel-Request beim Wechsel Karte → Liste, **ungeklärt**.
+  - WebKit nicht gelaufen.
+- **Folgen:**
+  - Effekte laufen später als unter React.
+  - `StrictMode` prüft nichts mehr.
+  - knip und `domain-is-pure` (`.dependency-cruiser.cjs`) brauchen Anpassungen.
+  - `@types/react` entfällt.
+  - Künftige React-APIs sind nicht nutzbar, und Preact 11 ist ein neues Major.
+- **Aufwand:** geschätzt 1–1,5 Tage.
+
+## Optionen
+
+**(a) Budget anheben auf 92 kB, mit Workaround.**
+- Nach Plan 0010 sind es ≤ 90,9 kB, gut 1 kB Reserve.
+- Kein weiterer Umbau.
+- Der Workaround ist trotzdem nötig, denn ohne ihn macht die Anbieter-UI den Wächter rot.
+
+**(b) Preact/compat statt React.**
+- −60,5 kB Start-JS. Das Budget könnte auf etwa 35 kB **sinken**.
+- Stack-Änderung gegen ADR 0001, mit eigenem Plan, Plan-Review und Browser-Review an echten Geräten.
+- `karte.spec.ts:172` ist vorher zu klären.
+
+**(c) Auf einen Rolldown-Fix warten.**
+- Das Issue ist offen, und es gibt keinen Fix-PR.
+- Mit dem Workaround ist Warten unnötig. Wir kommentieren nur unsere Repro in #11026.
+- Als eigenständige Option **nicht empfohlen**: Sie blockiert Plan 0010 ohne Termin.
+
+**(d) Weitere Lazy-Chunks, mit Workaround, Budget bleibt 90 kB.**
+- Kalender und Merkliste lazy, jeweils mit Vorladen im Leerlauf, `LoadFailed` und Regeln wie beim Export: ca. 88,2 kB.
+- Nach Plan 0010 sind das ca. 89,5 kB, 0,5 kB Reserve.
+- Der Kalender ist ein Haupt-Tab. Ohne Service Worker hängt er offline am Vorladen.
+- Dazu kommen zwei weitere Ladeketten mit Regeln, Kanarienvögeln und E2E-Tests.
+
+## Empfehlung
+
+**(a) mit Workaround jetzt, (b) als eigener Plan danach, wenn gewünscht.**
+- **Workaround:** Er ist für jede Option Pflicht, sobald die Anbieter-UI kommt. Er ist auf `main` neutral, und der Chunk-Wächter bleibt das Gate.
+  - Ein Kommentar an der Konfiguration verweist auf #11026.
+  - Ist der Fehler behoben, wird geprüft, ob die Gruppe entfallen kann. Gleicher Hash ohne Gruppe heißt: entfernen.
+- **(a) statt (d):**
+  - (d) spart 1,4 kB, das sind 1,6 % des Start-JS.
+  - Dafür würde ein Haupt-Tab lazy, und es kämen zwei Ladeketten dazu.
+  - Das Verhältnis von Nutzen zu Risiko ist schlecht. Die Messwerte von (d) wandern nach `docs/ideas.md`.
+- **(b) erst danach:**
+  - Preact ist der einzige große Hebel (−67 %), und die Seite käme damit auf langsamen Handys spürbar schneller in Gang.
+  - Es ist aber eine Stack-Entscheidung mit Verhaltensänderungen: Zeitpunkt der Effekte, Dialoge, Fokus.
+  - Plan 0010 braucht sie nicht. Deshalb ein eigener Plan nach 0010, nicht dazwischen.
+
+## Konsequenzen (bei Empfehlung a + Workaround)
+
+- **Budget:** `.size-limit.json` setzt `JS (initial)` auf 92 kB. Das Ziel nach Plan 0010 ist ≤ 91,0 kB (1 kB Reserve). Das Eintrittsziel von 87,7 kB entfällt.
+- **Workaround:** `vite.config.ts` bekommt die Gruppe `$initial` mit Kommentar und Verweis auf #11026, in einem eigenen Commit vor „Schnittstellen“.
+  - **Kanarienvogel:** Ohne die Gruppe muss der realistische Stub den Wächter rot machen.
+- **Plan 0010:**
+  - **E8:** Ergebnis, Entscheidung und Verweis auf dieses ADR.
+  - **Schritt 4 „Schnittstellen“:** Der Stub `anbieter/entry.ts` muss **geteilte Start-Module** nutzen (`Dialog`, `Icon`, `time.ts`). Nur dann prüft er die Abspaltung. Ein trivialer Stub mit `useState` spaltet nie ab.
+  - **E7, Budgets:** `JS (initial)` 92 kB, Zuwachs weiter ≤ 1,3 kB.
+  - **Akzeptanz:** Start-JS ≤ 91,0 kB statt ≤ 89,0 kB.
+  - **Risiken:** Der Punkt „Startbudget“ wird entschärft.
+- **`docs/architecture.md`, Abschnitt Chunk-Wächter:** neu ist der Satz zur Gruppe `$initial`: Sie hält gemeinsame Start-Module im Einstieg. Fällt sie weg, zeigt der Wächter die Abspaltung.
+- **`docs/ideas.md`:**
+  - „Kalender/Merkliste lazy (−1,65 kB gemessen)“;
+  - „Preact/compat (−60,5 kB gemessen, Befunde siehe ADR 0012)“.
+- **ADR 0001** bleibt unverändert, der Stack bleibt React 19.
