@@ -805,3 +805,20 @@ Der Koordinator überträgt hier die Messwerte und Entscheidungen der Pakete aus
   - E2E 947 grün, 1 Ausreißer `perf` unter Last, einzeln grün.
   - Smoke mit echten Daten 17/17.
   - Der neue CLS-Test (gespeicherter Stadtteil, `?wegzeit=20`, Tabelle 1,5 s verzögert) misst CLS 0.
+
+## Arch-Review (2026-10-05) – Verdict: Nacharbeit nötig → eingearbeitet
+
+Branch `oepnv-0009-int`, Commits `3a9737d` … (dieser Abschnitt). Domänen- und Reducer-Logik test-first, die Tests waren vor dem Fix rot.
+
+1. **Major: Privatsphäre-Invariante zu absolut.** `docs/architecture.md` und ADR 0011 nennen die Ausnahme der Kartenkacheln beim Stadtteil-Zoom (ADR 0008). Die E2E-Aussagen sind eingegrenzt: Standort und Kartenmitte laden keine Kachel, ein Stadtteil höchstens Kacheln; für die Tabelle gilt ab der Wahl kein Request.
+2. **„Nochmal laden“ bei veralteter Tabelle.** Passt `wegzeit.json` nicht zu `site.json`, meldet `useTransit` das dem Reducer als neue Aktion `stale` (bereit → fehler); erst so wirkt `want()`. Ab dem zweiten Versuch lädt `fetch` mit `cache: "reload"`. Tests: „veraltete Tabelle → fehler; „Nochmal laden“ lädt neu“, „„veraltet“ zählt nur für die fertige Tabelle des laufenden Versuchs“, „„Nochmal laden“ umgeht den HTTP-Cache …“ (`src/data/transit.test.ts`), E2E „Veraltete Tabelle: Hinweis, „Nochmal laden“ lädt ohne Cache neu und bringt die Minuten“. Das E2E beobachtet die `cache`-Option per Init-Skript, weil Chromium den Header `no-cache` bei aktivem Routing nicht meldet.
+3. **Zeitlimit auch für den Chunk.** `loadTransitTable` heißt jetzt `loadTransit(loadLogic, retry)` (`src/data/transit.ts`): Tabelle und Rechenlogik laden parallel unter einem gemeinsamen Zeitlimit (`TRANSIT_TIMEOUT_MS`, 8 s). Hängt der Import, zählt das als Chunk-Fehler. Tests mit Fake-Timern: „dasselbe Zeitlimit gilt für den Chunk: Hängt der Import, ist nach 8 s Schluss“, „ein gemeinsames Zeitlimit, nicht je Ladeweg“.
+4. **Flackern in Kalender und Karte.** Der Kalender zeigt in `laedt` mit `wegzeit=` den Platzhalter `ListPending` (E2E „Kalender mit ?wegzeit=20: Platzhalter-Block statt ungefiltertem Kalender“). Für die Karte bleibt eine bewusste Lücke: Marker und Orts-Liste zeigen beim Laden alle Orte, höchstens bis zum Zeitlimit (E11, `docs/architecture.md`).
+5. **Neue Zustände in den Mobile-UX-Gates.** Neue Ansichten `entdecken-wegzeit-laedt` (Tabelle zurückgehalten, `.list-pending`), `filter-sheet-wegzeit-rueckfall` („Nochmal laden“) und `filter-sheet-wegzeit-ausserhalb` („Startpunkt wählen“), je hell, dunkel, dunkel per Darstellung und 320 px/200 %. In `entdecken-wegzeit-laedt` lässt ein Init-Skript nur den 8-s-Timer wegfallen; die Uhr anzuhalten geht nicht, weil axe Timer braucht.
+6. **Gliederung `docs/architecture.md`.** Der Punkt „Wegzeit“ steht hinter den Karten-Unterpunkten, vor „Kachel-Host“. Aus „die beiden Lader“ wurde „die Lader“.
+7. **Doku-Drift.** `CLAUDE.md` (Stolperfallen → Daten) nennt `data/oepnv/fahrplan.json`: nur über `pnpm pipeline oepnv`, von Biome ausgenommen, per Zod in `validate-data` geprüft. In der Schichten-Tabelle ist `fflate` für `scripts/pipeline/io/` erlaubt.
+8. **Budget-Nacharbeit.** E10 und „Umsetzung“ verweisen auf Plan 0010, Paket 0 (E8) auf Branch `anbieter-0010`. Kein Eintrag in `docs/ideas.md`, weil die Pflicht dort schon steht.
+
+**Messung:** `JS (initial)` **89,80 kB** (vorher 89,69). Die Fixes kosten im Start ≈ 0,1 kB (Aktion `stale`, gemeinsames Zeitlimit, Kalender-Platzhalter). Für Paket 0 aus Plan 0010 heißt das X = 89,80, also ≈ 2,1 kB Einsparung. `Wegzeit JS (lazy)` 1,01/3 kB, `Wegzeit-Daten` 42,03/64 kB.
+
+**Lokal** (`PW_PORT=4473 pnpm check`, inkl. WebKit): Unit 621/621, E2E 1089 grün, 298 übersprungen, keine Ausreißer, Smoke mit echten Daten im selben Lauf.
