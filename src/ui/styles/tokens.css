@@ -8,6 +8,10 @@
  * - Vier Fallbacks in der Reihenfolge des Stacks: Arial/Liberation, Roboto (Android, ab 12 variabel: Chromium stellt
  *   das Gewicht über die wght-Achse ein), Noto, DejaVu.
  * - Drei Gewichtsbereiche: normal (Meta, Fließtext), 550–749 (Fakten, Chips, Tabs), 750–800 (Zeit, Pillen, Titel).
+ * - Fette Schnitte nennen am Ende den Familiennamen (local("Liberation Sans") …): WebKit löst local() nur über den
+ *   Familiennamen samt gewünschtem Gewicht auf, „Liberation Sans Bold“ scheitert dort. Ohne diese Quelle fiel WebKit
+ *   für fetten Text auf den normalen Schnitt mit künstlichem Fett und dessen size-adjust zurück (Kopfzeile brach bei
+ *   320 px um). Chromium findet den fetten Schnitt vorher über den vollen Namen.
  * - Zwei Stacks: Die optische Größe macht Bricolage klein breiter als groß, ein Wert passt nicht für 13 und 22 px.
  *   Überschriften nutzen „… Display“ (--font-display, Zuordnung unten per :where(…) in @layer base), ihre
  *   Bereiche bis 749 sind gleich dem Text-Stack (z. B. `small` in .daylabel).
@@ -25,7 +29,9 @@
 @font-face {
   font-family: "Bricolage Fallback Arial";
   font-weight: 550 749;
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"),
+    local("Arial"), local("Liberation Sans");
   size-adjust: 102.3%;
   ascent-override: 90.9%;
   descent-override: 26.4%;
@@ -34,7 +40,9 @@
 @font-face {
   font-family: "Bricolage Fallback Arial";
   font-weight: 750 800;
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"),
+    local("Arial"), local("Liberation Sans");
   size-adjust: 100.8%;
   ascent-override: 92.3%;
   descent-override: 26.8%;
@@ -52,7 +60,9 @@
 @font-face {
   font-family: "Bricolage Fallback Arial Display";
   font-weight: 550 749;
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"),
+    local("Arial"), local("Liberation Sans");
   size-adjust: 102.3%;
   ascent-override: 90.9%;
   descent-override: 26.4%;
@@ -61,7 +71,9 @@
 @font-face {
   font-family: "Bricolage Fallback Arial Display";
   font-weight: 750 800;
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"),
+    local("Arial"), local("Liberation Sans");
   size-adjust: 101.4%;
   ascent-override: 91.7%;
   descent-override: 26.6%;
@@ -133,7 +145,7 @@
 @font-face {
   font-family: "Bricolage Fallback Noto";
   font-weight: 550 749;
-  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  src: local("Noto Sans Bold"), local("NotoSans-Bold"), local("Noto Sans");
   size-adjust: 98.1%;
   ascent-override: 94.8%;
   descent-override: 27.5%;
@@ -142,7 +154,7 @@
 @font-face {
   font-family: "Bricolage Fallback Noto";
   font-weight: 750 800;
-  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  src: local("Noto Sans Bold"), local("NotoSans-Bold"), local("Noto Sans");
   size-adjust: 98.1%;
   ascent-override: 94.8%;
   descent-override: 27.5%;
@@ -160,7 +172,7 @@
 @font-face {
   font-family: "Bricolage Fallback Noto Display";
   font-weight: 550 749;
-  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  src: local("Noto Sans Bold"), local("NotoSans-Bold"), local("Noto Sans");
   size-adjust: 98.1%;
   ascent-override: 94.8%;
   descent-override: 27.5%;
@@ -169,7 +181,7 @@
 @font-face {
   font-family: "Bricolage Fallback Noto Display";
   font-weight: 750 800;
-  src: local("Noto Sans Bold"), local("NotoSans-Bold");
+  src: local("Noto Sans Bold"), local("NotoSans-Bold"), local("Noto Sans");
   size-adjust: 98.1%;
   ascent-override: 94.8%;
   descent-override: 27.5%;
@@ -187,7 +199,7 @@
 @font-face {
   font-family: "Bricolage Fallback DejaVu";
   font-weight: 550 749;
-  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold"), local("DejaVu Sans");
   size-adjust: 86.6%;
   ascent-override: 107.4%;
   descent-override: 31.2%;
@@ -196,7 +208,7 @@
 @font-face {
   font-family: "Bricolage Fallback DejaVu";
   font-weight: 750 800;
-  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold"), local("DejaVu Sans");
   size-adjust: 84.3%;
   ascent-override: 110.3%;
   descent-override: 32%;
@@ -214,7 +226,7 @@
 @font-face {
   font-family: "Bricolage Fallback DejaVu Display";
   font-weight: 550 749;
-  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold"), local("DejaVu Sans");
   size-adjust: 86.6%;
   ascent-override: 107.4%;
   descent-override: 31.2%;
@@ -223,7 +235,7 @@
 @font-face {
   font-family: "Bricolage Fallback DejaVu Display";
   font-weight: 750 800;
-  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold"), local("DejaVu Sans");
   size-adjust: 85.6%;
   ascent-override: 108.6%;
   descent-override: 31.5%;
