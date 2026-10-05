@@ -1,6 +1,6 @@
 # Plan 0009 – Öffi-Fahrzeit statt Luftlinie
 
-Status: Review und Nutzerentscheidungen eingearbeitet (2026-10-05) → Umsetzung ab Schritt 2
+Status: umgesetzt bis Schritt 8 (2026-10-05), Arch-Review, Deploy und Browser-Review siehe „Umsetzung“
 Datum: 2026-10-05
 Bezug: ADR 0005 (Öffi-Wegzeit, Stufe 2: hier umgesetzt, mit Abweichungen → **ADR 0011**, Entwurf in `docs/adr/0011-oepnv-wegzeit-tabelle.md`, E14), Plan 0004 (Startpunkt, Luftlinie, Schnittstelle `Reach`, E2/E9), Plan 0005 (Karte, Kamera-Regel, Kartenmitte), ADR 0002 (Datenfluss), ADR 0003 (`nearestStops`), ADR 0006 (Pipeline), ADR 0008 (Privatsphäre der Karte), ADR 0010 (`src/data` und Domänenhilfen).
 
@@ -131,7 +131,7 @@ Fußweg: Luftlinie × 1,3 bei 4,5 km/h. Umstiegspuffer 1 Min. Bedarfsverkehre au
 | (b) Halt→Ort, Stadt, Minuten ≤ 120 (`Uint8`) | 570 × 76 = 43 320 | 43 kB | **38,2 kB** als JSON mit Base64 |
 | (b) Halt→Ort, BBOX | 1 771 × 76 = 134 596 | 135 kB | 114,3 kB als JSON mit Base64 (85,9 kB binär) |
 | (b′) nur 35 Stadtteile → Ort | 2 660 | 2,7 kB | – |
-| Fahrplanauszug 8:30–12:30 (Repo, E4) | 52 579 Verbindungen | ≈ 650 kB JSON | ≈ 121 kB |
+| Fahrplanauszug 8:30–12:30 (Repo, E4) | 52 579 Verbindungen | ≈ 650 kB JSON (gemessen: 1 017 kB, siehe „Umsetzung“) | ≈ 121 kB (gemessen: 169 kB) |
 
 GitHub Pages komprimiert JSON (`site.json`: `content-encoding: gzip`, 83,5 kB übertragen), Binärdateien dagegen nicht (ADR 0008, Range-Prüfung). Deshalb JSON mit Base64 statt `.bin`.
 
@@ -193,7 +193,7 @@ Neuer Befehl `pnpm pipeline oepnv [--force]`. Er läuft lokal wie alle Netzschri
    - `pickServiceDay({ validFrom, validTo, freeDays, today })`: Kandidaten sind alle Dienstage im Gültigkeitszeitraum, die weder Feiertag noch Ferientag in Bayern sind (`loadFreeDays` aus `io/holidays.ts`). Gewählt wird der erste Kandidat ab `today + 7 Tage`, sonst der letzte. Ohne Kandidat bricht der Befehl ab.
    - Begründung: Ein Schultag hat den Regelfahrplan. Die Woche Abstand meidet kurzfristige Ausnahmen in `calendar_dates`.
 3. **Auszug** (rein): aktive `service_id` am Stichtag aus `calendar` und `calendar_dates` (1 = hinzu, 2 = weg); Fahrten ohne Bedarfsverkehr (E2); je Fahrt nur die Halte-Ereignisse in `NUERNBERG_BBOX`; nur Fahrten mit einem Ereignis zwischen **8:30 und 12:30** (Abfahrtsfenster 8:30–10:30 plus 120 Min. Obergrenze, E8). Eine Fahrt, die die BBOX verlässt und wieder hineinfährt, bleibt eine Fahrt: Der Abschnitt draußen wird eine Verbindung ohne Zwischenhalt.
-4. **Ausgabe** `data/oepnv/fahrplan.json` (committet, ≈ 650 kB, eine Fahrt je Zeile für lesbare Diffs), geprüft mit dem Zod-Schema `Timetable` aus `src/domain/schema.ts` (E12).
+4. **Ausgabe** `data/oepnv/fahrplan.json` (committet, ≈ 650 kB geschätzt, gemessen 1 017 kB roh / 169 kB gzip, eine Fahrt je Zeile für lesbare Diffs), geprüft mit dem Zod-Schema `Timetable` aus `src/domain/schema.ts` (E12).
    - **Format und Biome (M2):** Ein eigener Serialisierer (`serializeTimetable` in `scripts/pipeline/lib/gtfs.ts`) schreibt ein Steig bzw. eine Fahrt je Zeile. Durch `biome format` geschickt (wie `writeOffers`) würde die Datei gemessen **3,3 MB mit 272 232 Zeilen** (224 kB gzip), weil Biome jede Zahl auf eine eigene Zeile setzt.
    - Deshalb bekommt `biome.json` unter `files.includes` die Ausnahmen `!data/oepnv` und `!tests/fixtures/oepnv`, mit Kommentar: „generierter Fahrplanauszug, eigenes Zeilenformat (Plan 0009, E4), Prüfung per Zod in validate-data“.
    - **Besitzer** ist Paket B1, weil B1 die Fixture `tests/fixtures/oepnv/fahrplan.json` als Erstes anlegt (E16). Die Fixture steht von Hand im selben Zeilenformat.
@@ -736,3 +736,70 @@ Plan-Vorschlag gilt für die übrigen Fragen:
 5. **Zeitfenster:** nur Dienstag vormittags, Abfahrt 8:30–10:30 (E5). Nachmittags → `docs/ideas.md`.
 6. **Wartezeit:** Die Wartezeit am ersten Halt zählt mit (Median Tür-zu-Tür, E5).
 7. **Gehtempo:** 4,5 km/h mit Umwegfaktor 1,3 (E6).
+
+## Umsetzung (2026-10-05)
+
+Der Koordinator überträgt hier die Messwerte und Entscheidungen der Pakete aus ihren Commit-Messages. Branches: `oepnv-0009-b1` (B1), `oepnv-0009-a` (A), `oepnv-0009-b2` (B2), `oepnv-0009-int` (Zusammenführung und Schritt 5), `oepnv-0009-c` (C). Der alte Branch `oepnv-0009` wird nicht genutzt.
+
+**Paket A, Pipeline** (`69ba8cb` … `ae68fd0`, CI 37269139875 grün):
+- **Feed:** VGN-GTFS mit 15,26 MB, Last-Modified 24.06.2026, gültig 24.06.–12.12.2026. Der Feed hat kein `feed_info`, die Gültigkeit kommt deshalb aus `calendar.txt`.
+- **Auszug:**
+  - Stichtag Di 13.10.2026, 3 534 Steige, 3 405 Fahrten, 52 617 Verbindungen.
+  - 2 210 Fahrten mit Bedarfsverkehr weggelassen.
+  - Gesperrt: 203 Halte-Ereignisse ohne Ein- und Aussteigen, 75 nur Aussteigen, 5 nur Einsteigen.
+- **Größe:** 1 017 kB roh und 169 kB gzip statt der geschätzten 650/121 kB (schon der Prototyp hatte 992/160 kB). In der Git-Historie sind das ≈ 170 kB je Fahrplanwechsel.
+- **Laufzeit:** 10 s. Ein zweiter Lauf meldet „HTTP 304 … Fahrplan aktuell“. Die Prüfung „aktuell“ vergleicht `Last-Modified` mit `source.modified`. `--force` baut byte-gleich neu.
+- **Coverage** `lib/gtfs.ts`: 100 % Zeilen, 93 % Zweige.
+- **Zuschnitt:** jede Fahrt auf die Verbindungen mit Abfahrt 8:30–12:30 (inklusiv).
+- Fehler im Feed (unbekannte Fahrt, Route oder Steig, fehlende Spalte, rückwärts laufende Zeit) brechen laut ab.
+- Gegenüber dem Prototyp sind es +5 Steige und +38 Verbindungen. Der Prototyp setzte die Ankunft als Abfahrt an, seine Messwerte sind deshalb nur grobe Vergleichswerte.
+
+**Paket B2, Tabelle** (`14149b3` … `4d0acaa`, CI 37269392824 grün):
+- **Format** `wegzeit.json`:
+  - `version`, `source` (Namensnennung, Lizenz, Gültigkeit), `serviceDay`, `window`;
+  - `places` in der Reihenfolge von `site.json`;
+  - `lat`/`lon` ×1e4 als Differenzen;
+  - `minutes` als Base64 (0–120, 255 = unerreichbar).
+- **Referenztest:** Profil- und Vorwärts-CSA sind für jeden Steig und jede Minute gleich, auf dem Fixture-Netz und auf einem Zufallsnetz. Eingebaute Fehler (Sortierung, Tiebreak, Dominanz, Einsteigesperre) machen den Test rot.
+- **Coverage** `scripts/transit` und `src/domain/transit.ts`: 100 %. Der Lesehelfer `valueAt` ersetzt tote `?? 0`.
+- **`transit-build-pure`:** eine Positivliste. Kanarienvögel: `node:fs` und `scripts/lib` sind rot.
+- `transitReach` liefert `TransitReach`. C hat den Typ in die Union `Reach` aufgenommen. Der direkte Fußweg zählt bis 120 Min.
+
+**Schritt 5, Zusammenführung** (`b58e53a`, `d8cdf74`):
+- **Echter Build:** „✓ Wegzeit: 556 Halte × 76 Orte in 3,4 s“, `data:build` gesamt 7,5 s, max. RSS 214 MB. `wegzeit.json` hat **62,4 kB roh / 42,0 kB gzip** (Plan ≈ 38 kB, Budget 64 kB). Es sind 556 statt 570 Halte, weil das Fenster 8:30–10:30 statt 8–13 Uhr ist.
+- **Zugangshalt:** Jeder der 35 Stadtteile hat 4–14 Haltbereiche in 800 m, der weiteste nächste liegt 340 m entfernt (Eberhardshof).
+  - Neu: `build-data` bricht mit echten Daten ab, wenn ein Stadtteil keinen Zugangshalt hat (`withoutAccess`, test-first, Kanarienvogel Altenfurt).
+- **Abgang 800 gegen 1 000 m** (m13):
+  - 2 477 von 42 256 Zellen (5,9 %) sind anders, fast nur bei Halten 800–1 000 m vom Ort (255 → Fußweg).
+  - Stadtteil → Ort: 149 von 2 660 Paaren (5,6 %) ändern sich um ≥ 0,5 Min., 3 Paare um > 5 Min., höchstens 6,0 Min.
+  - Die Erwartung < 1 % ist **nicht** erfüllt. Es bleibt bei 800 m (E6/E8): Die Abweichung ist klein und geht in Richtung „pessimistisch“.
+- **Stichproben:**
+  - Gostenhof → Marmorsaal 18,4 Min. (Erwartung ≈ 18);
+  - Altstadt → Boxdorfer Werkstatt 48,4 (≈ 50);
+  - Altstadt → Haus der Begegnung 41,8;
+  - Buch → Haus der Begegnung 77,6 (Prototyp 72,2).
+- `TIMETABLE_REQUIRED = true` als eigener Commit, Test zuerst rot.
+
+**Paket C, Domäne und UI** (`2dc33d2` … `f9a827d`, CI 37277454216 grün):
+- **Entscheidungspunkt E10:**
+  - Ausgang 87,95 kB.
+  - Statisch wären es 90,52 kB, über der Schwelle (88,6) und über dem Budget. Deshalb **lazy**: 89,70 kB, nach Kürzen der Fehlertexte **89,69 kB**.
+  - Die Wegzeit-Texte und -Zustände kosten im Start ≈ 1,7 kB gzip.
+  - Das Ziel ≤ 89,0 kB ist verfehlt. Für Plan 0010 heißt das: Paket 0 muss X − 87,7 = **2,0 kB** einsparen.
+- **Budgets:** `JS (initial)` 89,69/90 kB, `Wegzeit JS (lazy)` 1,01/3 kB, `Wegzeit-Daten` 42,03/64 kB, CSS 10,62/15 kB.
+- **Kanarienvögel**, alle wie erwartet:
+  - statischer Import und reiner Typ-Import von `transit.ts` in `App.tsx`: rot (`transit-only-lazy`, `transit-entry-only`);
+  - Typ-Import aus `transit-types.ts`: grün;
+  - zusätzlicher statischer Import im Lader: rot (`lazy-loader-static`).
+- **Abweichungen:**
+  - `useLazy` bleibt ungenutzt, weil es beim Einhängen lädt. Das Laden steckt im Reducer `use-transit` (`attempt`, `chunkFailures`), Tabelle und Chunk laden parallel.
+  - `want()` beim Öffnen der Karte sitzt im `App`-Effekt auf `route.tab === "karte"` (deckt Deep-Links ab).
+  - `places.ts` sortiert nach `ReachFn`.
+  - Das Badge zählt die Grenze schon während „laedt“, damit nichts springt. Statuszeile und Datenstand erscheinen erst mit der Liste.
+  - E2E „Kartenmitte ergibt Minuten“ verschiebt die Karte per `__zpMap.jumpTo`, weil die Startmitte der Fixture-Karte > 800 m von jedem Fixture-Halt entfernt liegt.
+- **CI:** Das Zeitlimit des E2E-Jobs steigt von 20 auf 30 Min. Der erste Lauf brach nach 963 grünen Tests bei 18,8 Min. ab, main lag schon bei 17,3 Min. Die Begründung steht in `ci.yml`.
+- **Lokal** (`PW_PORT=4291 pnpm check`, inkl. WebKit):
+  - Unit 616/616.
+  - E2E 947 grün, 1 Ausreißer `perf` unter Last, einzeln grün.
+  - Smoke mit echten Daten 17/17.
+  - Der neue CLS-Test (gespeicherter Stadtteil, `?wegzeit=20`, Tabelle 1,5 s verzögert) misst CLS 0.
