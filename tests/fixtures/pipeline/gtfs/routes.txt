@@ -1,0 +1,6 @@
+﻿route_id,agency_id,route_short_name,route_long_name,route_desc,route_type
+"t1","","T1","Beispielplatz - Testhof","Tram","0"
+"b2","","B2","Beispielplatz - Testhof","Stadtbus","3"
+"r9","","R9","Rufbus Testhof","Rufbus","3"
+"n7","","N7","Nachtlinie","Stadtbus","3"
+"x5","","X5","Nachbarstadt - Weit draußen - Testhof","Regionalbus","3"

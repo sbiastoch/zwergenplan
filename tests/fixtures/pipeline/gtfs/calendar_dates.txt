@@ -1,0 +1,4 @@
+﻿service_id,date,exception_type
+"AUSF","20261013","2"
+"EXTRA","20261013","1"
+"WT","20261020","2"
