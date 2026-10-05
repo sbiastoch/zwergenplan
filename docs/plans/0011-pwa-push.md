@@ -1,6 +1,6 @@
 # Plan 0011 – Installierbare App und Push zu neuen Angeboten
 
-Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). **Stufe 1, Schritte 1–5 umgesetzt** auf Branch `pwa-0011` (2026-10-05); Icon abgenommen; Arch-Review „Freigabe mit Änderungen“ eingearbeitet (Abschnitt „Arch-Review (Stufe 1)“); offen: Deploy und Browser-Review (Schritt 6). Stufe 2 beginnt nach der Abnahme von Stufe 1.
+Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). **Stufe 1 live seit `b23eb6c`** (https://zwergenplan.app/, `data/meta.json`); Icon abgenommen; Arch-Review „Freigabe mit Änderungen“ eingearbeitet (Abschnitt „Arch-Review (Stufe 1)“). **Browser-Review live im Browser (Schritt 6, 2026-10-06): bestanden bis auf einen Fehler** – die Statuszeile „Offline – Stand vom …“ fehlt live fast immer (Befund B1, Entscheidung über die Behebung offen), dazu Hinweise; siehe Abschnitt „Browser-Review live (Stufe 1, Schritt 6, 2026-10-06)“. **Offen: Geräteprüfung** (Android, iPhone, Checkliste dort). Stufe 2 wartet auf die Abnahme von Stufe 1.
 Datum: 2026-10-05
 Bezug:
 - **ADR 0013** (PWA und Service Worker, Entwurf `docs/adr/0013-pwa-service-worker.md`) und **ADR 0014** (Web Push, Entwurf `docs/adr/0014-web-push.md`).
@@ -731,6 +731,85 @@ Alle Befunde übernommen außer Finding 4 und der Zusammenführung mit Plan 0012
 - **Reducer (Arch-Review, Finding 4):** `failed` beim Neuladen behält Tabelle **und** Linien (`{ ...rest, attempt }` ohne `refresh`, wegen `exactOptionalPropertyTypes`). Der Effekt nutzt `deliverLoad` aus 0012. Neue Tests (test-first, `failed` war vorher rot): `refresh` → `lines` mit altem Versuch wird ignoriert; `refresh` → `failed` behält Tabelle und Linien; `refresh` → `loaded` → `lines` des neuen Versuchs wird übernommen.
 - **E2E:** Der Frische-Test wartet auch auf `linien.json` und zählt genau einen weiteren Request je Datei. Offline-Test (a) prüft zusätzlich die Linie im Detail („ca. 15 Min. mit Tram 1 ab Gostenhof“) aus `zp-data`. **Kanarienvogel:** ohne die Erweiterung in `routes.ts` rot, zuerst schon bei „`linien.json` über den Service Worker“; ohne diese Zwischenprüfung fehlt offline „mit Tram 1“ im Detail.
 - **Start-JS gemeinsam:** 91,72 kB (Budget 92 kB, nicht angehoben). Eingetragen auch in ADR 0012.
+
+## Browser-Review live (Stufe 1, Schritt 6, 2026-10-06) – Ergebnis: bestanden bis auf Befund B1, Geräteprüfung offen
+
+Ziel: https://zwergenplan.app/ mit Stand `b23eb6c` (geprüft über `data/meta.json`), echte Daten (333 Angebote, Stand 4.10.). Playwright 1.63 mit **echtem Service Worker** (`serviceWorkers: "allow"`), Chromium (Profil Pixel 7 bzw. Desktop Chrome) und WebKit (Profil iPhone 15), `de-DE`, Europe/Berlin, `reducedMotion: reduce`. Wegwerf-Skripte und alle Screenshots liegen außerhalb des Repos in `/home/suus/.claude/jobs/70a152b4/tmp/review-0011/` (`pwa-live.ts`, Bilder in `shots/`, Kontaktbögen in `sheets/`).
+
+**Vorgehen:**
+- Standard-Matrix `node scripts/screenshots.ts https://zwergenplan.app/`: 168 Bilder (14 Ansichten × 6 Viewports × hell/dunkel), alle angesehen (Kontaktbögen je Ansicht). Dazu derselbe Lauf mit `serviceWorkers: "block"` als Vergleich, Pixelvergleich per ImageMagick (`compare -fuzz 2%`).
+- Manifest, Icons und Tags; Registrierung und Caches; Offline mit und ohne gespeicherten Stadtteil; erster Start offline; wieder online; Frische nach 30 Min.; Installationshilfe in allen sichtbaren Zuständen (je hell/dunkel, 360 px und 320 px/200 % Wurzel-Schriftgröße); Konsole; LCP mit und ohne Service Worker.
+
+**Befunde:**
+- **B1 (Fehler, nicht behoben, zur Entscheidung): Die Statuszeile „Offline – Stand vom …“ fehlt live fast immer.** Offline neu geladen erscheint nur „333 Angebote ab heute“ (`chromium-{light,dark}-offline-start.png`, `chromium-erster-start-offline.png`). Gezählt: in 2 von 30 Offline-Starts erschien die Zeile, in 0 von 20 Neuladungen in Folge (je 10 bei CPU 1× und 4×).
+  - Der Service Worker arbeitet richtig: `site.json` kommt offline mit `X-Zp-Cache: offline`, `data-pwa="bereit"` ist gesetzt.
+  - **Ursache, gemessen mit Zeitstempeln:** `load` (40–83 ms) → PWA-Kern `start()` setzt `data-pwa` und ruft sofort `showNote` (78–279 ms) → erst danach ist `site.json` gelesen und die Liste da (117–374 ms). `showNote` liest `lastSiteLoad()`. Das ist zu diesem Zeitpunkt noch `undefined`, also setzt es eine leere Zeile, und später ruft es niemand mehr. Die Reihenfolge kommt aus Arch-Review H12: Seitdem setzt der PWA-Kern die Zeile, nicht mehr die App nach dem Laden. Mit den kleinen Fixture-Daten ist `site.json` vor `load` fertig, deshalb bleiben `pwa.spec.ts` 4 und 7 grün.
+  - **Mitbetroffen:** Der 30-s-Wiederholer nach einem Funkloch (Arch-Review H5) wird in `watchFreshness` nur geplant, wenn `lastLoad()?.stale` beim Start schon gilt. Live wird er deshalb ebenso selten geplant. Nicht betroffen ist der `online`-Listener, denn er liest `lastLoad()` erst beim Ereignis. Wird er per Hand ausgelöst, erscheint die Zeile richtig (`chromium-dark-offline-statuszeile-provoziert.png`), und nach dem Wieder-online-Gehen verschwindet sie wieder (`chromium-*-wieder-online-nach-note.png`).
+  - **Mögliche Richtung, nicht umgesetzt:** Der Kern wertet nach jedem abgeschlossenen Laden aus statt nur beim Start. Zum Beispiel ruft `pwa-start.ts` einen Rückruf aus `loadSiteData`, oder `start()` wartet auf den ersten Abruf, dann folgen `showNote` und der Wiederholer. Als Kanarienvogel in `pwa.spec.ts` 4 sollte `site.json` verzögert ausgeliefert werden (z. B. per `page.route` mit 1 s Verzögerung vor dem Offline-Gehen bzw. eine große Fixture). So läuft der Test in derselben Reihenfolge wie live.
+- **H1 (Hinweis):** Der Toast „Kalender-Datei braucht Netz“ trägt das grüne Häkchen des Toasts (`Toast.tsx` zeigt immer `check`), obwohl er etwas meldet, das nicht geklappt hat (`chromium-{light,dark}-offline-ics-toast.png`). Funktional korrekt: Die Seite bleibt stehen (URL unverändert, Detail offen), der Service Worker antwortet mit 204. → `docs/ideas.md`.
+- **H2 (Hinweis, gewollt nach E4):** Der zweite Besuch ist mit Service Worker etwas langsamer als mit HTTP-Cache allein (LCP-Median 572 statt 392 ms, Tabelle unten). Grund: Netz zuerst mit `cache: "no-cache"` prüft `site.json` jedes Mal nach, der HTTP-Cache allein liefert die bis zu 10 Min. alte Kopie ohne Request. Der erste Besuch ist unverändert, beide Werte liegen weit unter 2,5 s, CLS ≤ 0,0001.
+- **H3 (Hinweis, Werkzeug):** Drei von 168 Bildern weichen vom Lauf ohne Service Worker ab (`kind-quelle-{iphone,quer,320}-dark.png`). Auf den Bildern ist nur die Scrollposition im Kind-Sheet anders. Wiederholt man den Lauf, wechselt die Abweichung zufällig die Ansicht und tritt auch **ohne** Service Worker auf (drei Wiederholungen mit `block`). Ursache ist die Ansicht „kind-quelle“ in `scripts/screenshots.ts`: Sie scrollt, bevor der Platzhalter „Als App“ verschwindet. Danach klemmt die Scrollhöhe. Für die App ohne Bedeutung, die übrigen 165 Bilder sind pixelgleich.
+- **Offen (Werkzeug):** In Playwright-WebKit führt jede Navigation nach `context.setOffline(true)` zu „WebKit encountered an internal error“, und ein `fetch` aus der Seite über den Service Worker endet mit „Load failed“. Offline in WebKit ist damit hier nicht prüfbar und bleibt bei der Geräteprüfung. Online war in WebKit alles wie in Chromium: Registrierung, `controller`, Precache, `zp-data` mit `wegzeit.json`/`linien.json`, Navigation Preload an, Zustand „ios“ der Installationshilfe.
+
+**Geprüft und in Ordnung:**
+- **Darstellung mit Service Worker:** 165 von 168 Bildern pixelgleich mit dem Lauf ohne Service Worker, die übrigen 3 siehe H3. Keine Regression in den Ansichten Start, Kalender, Merkliste, Detail, Filter, Kind, Startpunkt, Wegzeit-Filter, Karte, Ort, Anbieter, Anbieter-Sheet und Tabs (alle Viewports, hell und dunkel).
+- **Manifest** (`/manifest.webmanifest`, 200, `application/manifest+json`): `name`/`short_name` „Zwergenplan“, `lang: de`, `id`/`start_url`/`scope` `./`, `display: standalone`, `background_color`/`theme_color` `#e8f1ff`, Icons 192 und 512 `any` sowie 512 `maskable`.
+- **Icons:** Alle liefern 200 mit der angegebenen Größe. `icon-192/512.png` haben wie vorgesehen transparente Ecken (abgerundetes Quadrat). `maskable-512.png` und `apple-touch-180.png` (180 × 180) sind deckend, mit Alpha überall 255 und Eckfarbe `#e8f1ff`. `icons/icon.svg` liefert 200 als `image/svg+xml`.
+- **`index.html`:** `theme-color` hell `#e8f1ff` und dunkel `#0e1620` (je mit `media`), `color-scheme: light dark`, `manifest`, `icon` (SVG), `apple-touch-icon`, `robots: noindex, nofollow`. Es gibt kein `apple-mobile-web-app-status-bar-style` und kein `apple-mobile-web-app-title`. Die Statusleiste prüft die Geräteprüfung.
+- **`sw.js`:** 200, `application/javascript`, `max-age=600`, 4 045 B.
+- **Registrierung:** `ready`, Zustand `activated`, Scope `https://zwergenplan.app/`, `controller` schon nach dem ersten Besuch (`clients.claim`) und nach dem Neuladen, Navigation Preload `enabled`.
+- **Precache** `zp-shell-5beb5ac63eeb`: `index.html`, Einstieg, Start-CSS, Latin-woff2, `assets/app/pwa-*.js`, `assets/export/ics-*.js` (6 Einträge). In `zp-data` liegt `site.json`.
+  - Mit Stadtteil kommen nach dem Gebrauch `wegzeit.json` und `linien.json` in `zp-data` und der Chunk `assets/oepnv/transit-*.js` in `zp-assets`. Im Schalen-Cache stehen sie nie.
+  - Nach dem Öffnen der Karte liegen deren Chunks in `zp-assets`. In keinem Cache steht ein fremder Origin (0 Einträge, ADR 0008).
+- **Offline mit Stadtteil Gostenhof** (abgesehen von B1): Die Liste kommt mit 40 Kacheln und der Wegzeitzeile „Wegzeit ab Gostenhof mit Bus & Bahn …“. Das Detail „Babymassage (Sept.–Okt., dienstags)“ zeigt offline aus `zp-data` „ca. 45 Min. mit U1 → Bus 54 ab Gostenhof“ (`chromium-*-offline-detail.png`). „In den Kalender“ zeigt den Toast, die Seite bleibt stehen. Danach lässt sich das Filter-Sheet öffnen und schließen.
+- **Karte offline:**
+  - Ohne gecachten Chunk erscheint der bestehende Hinweis „Die Karte konnte nicht geladen werden. Alle Angebote stehen in der Liste.“ mit „Nochmal versuchen“ (`chromium-*-offline-karte.png`).
+  - Mit vorher online geöffneter Karte kommt der Chunk aus `zp-assets`. Die Kacheln liefert dann der HTTP-Cache des Browsers, nicht der Service Worker, und die Karte steht (`chromium-*-offline-karte-chunk-gecacht.png`).
+- **Erster Start offline:** neuer Kontext, einmal online laden, `ready`, sofort offline und neu laden. Die App öffnet mit der Liste aus dem Precache (die Zeile fehlt, siehe B1).
+- **Wieder online:** `setOffline(false)` und `online` laden `site.json` frisch aus dem Netz (200, ohne `X-Zp-Cache`), ohne Neustart. Die Statuszeile ist danach normal.
+- **Frische nach 30 Min.:** Die Uhr der Seite wird um 31 Min. vorgestellt, dann folgt `visibilitychange`. Danach gibt es genau einen Request je Datei (`site.json`, `wegzeit.json`, `linien.json`), und die Wegzeitzeile bleibt erhalten.
+- **Installationshilfe** (`install-<zustand>-<hell|dunkel>-<360|320-200>.png`, Kontaktbögen `sheets/install-*.png`):
+  - `menue` (Pixel 7 ohne Angebot): „Im Browser-Menü „App installieren“ wählen.“
+  - `angebot` (Stub wie `installieren.spec.ts`): Text und Knopf „Zum Startbildschirm hinzufügen“, 52 px hoch, bei 200 % 138 px (dreizeilig, ohne Abschneiden).
+  - `installiert`: nach dem Tipp `prompt()` genau einmal gerufen. Der **Fokus liegt auf der Zeile** „Installiert. Öffne den Zwergenplan jetzt über das Symbol auf dem Startbildschirm.“ (`<p>`).
+  - `app` (`display-mode`-Stub): „Läuft als App.“
+  - `ios` (WebKit, iPhone 15): Teilen-Symbol inline und „Die App startet leer: …“.
+  - `keine` (Desktop Chrome): Der Abschnitt fehlt.
+  - In allen Zuständen kein waagerechtes Scrollen und nichts abgeschnitten. Der Abschnitt steht unter „Darstellung“ über „Fertig“.
+
+**Messwerte LCP/CLS** (Chromium, Pixel 7, CPU 4×, 150 ms Latenz, 1,6 Mbit/s wie `throttleMobile`; je 5 Läufe, Median, in Klammern Min.–Max.):
+
+| | erster Besuch | zweiter Besuch |
+|---|---|---|
+| mit Service Worker | 1896 ms (1848–2032) | 572 ms (452–648), `site.json` über den SW |
+| ohne Service Worker (`block`) | 1880 ms (1852–1900) | 392 ms (384–404), HTTP-Cache |
+
+CLS in allen Läufen ≤ 0,0001.
+
+**Konsole:** Online gab es in keinem Lauf (Chromium, WebKit, Installationshilfe) einen Fehler oder eine Warnung, kein `pageerror`, keinen fehlgeschlagenen Request und keine Antwort ≥ 400. Offline fielen nur die bewusst abgebrochenen Requests an: die ICS-Navigation (`net::ERR_ABORTED` nach der 204-Antwort) und der ungecachte Karten-Chunk `assets/karte/MapScreen-*.js` (`net::ERR_FAILED` samt „Failed to load resource“).
+
+**Checkliste (SKILL.md, Abschnitt 4):**
+- **Lesbarkeit:** ja. Liste, Detail und Statuszeile sehen aus wie vor dem Service Worker. Der Abschnitt „Als App“ nutzt die Überschrift- und Textstile des Sheets und ist kurz. Was, wann, wo und frei sind in 2 Sekunden erfassbar. Die Offline-Zeile ist, wenn sie erscheint, gut lesbar in der Nebentextfarbe (`chromium-dark-offline-statuszeile-provoziert.png`). Dass sie live meist fehlt, ist B1.
+- **Daumen-Erreichbarkeit:** ja. Der Knopf „Zum Startbildschirm hinzufügen“ ist ≥ 44 px hoch (52 px), volle Breite, im unteren Drittel des Sheets mit Abstand zu „Fertig“.
+- **Zustände:**
+  - Leer: Der Abschnitt fehlt am Desktop ohne Angebot.
+  - Fehler offline: Die Karte zeigt ihren Hinweis, die Kalender-Datei den Toast.
+  - Laden: Der Platzhalter `.app-pending` ist auf keinem Bild sichtbar, der Abschnitt springt nicht.
+  - Lange Texte: „Installiert …“ und der iOS-Hinweis brechen bei 320 px/200 % sauber um.
+  - Nichts wird abgeschnitten. Der fehlende Offline-Zustand ist B1.
+- **Dark Mode:** keine grellen Inseln. Abschnitt, Knopf (gelb wie „Fertig“), Toast und Statuszeile haben genug Kontrast (alle `*-dark*.png`).
+- **Micro-Interactions:** Der Tipp auf „Zum Startbildschirm hinzufügen“ lässt den Knopf verschwinden und setzt den Fokus auf die neue Zeile, ohne dass das Sheet scrollt. Der ICS-Toast erscheint ohne Sprung, trägt aber das Häkchen (H1). Geprüft wurde mit `reducedMotion: reduce`; neue Animationen bringt Stufe 1 nicht.
+- **Konsistenz mit dem Design-System:** ja. `btn primary wide` wie die übrigen Hauptaktionen, Abschnittsüberschrift wie „Darstellung“, das Teilen-Symbol im Linienstil der übrigen Icons.
+
+**Geräteprüfung (offen, durch den Nutzer):**
+1. **Android, Chrome:** Kind-Sheet → „Als App“ → „Zum Startbildschirm hinzufügen“ (bzw. Menü „App installieren“). Erwartet: Das Symbol „Zwergenplan“ (Zipfelmützen-Sticker) ist deckend und ohne schwarzen Rand; danach steht dort „Installiert …“.
+2. **iPhone, Safari:** Teilen → „Zum Home-Bildschirm“. Erwartet: Das Symbol ist deckend, ohne schwarzen oder weißen Rand, mit dem Namen „Zwergenplan“.
+3. **Start über das Symbol (beide), hell und dunkel:** Erwartet: keine Browserleiste, eine lesbare Statusleiste ohne störenden Balken über dem Kopf, und im Kind-Sheet „Läuft als App.“
+4. **Android-Splash:** Erwartet: hellblaue Fläche (`#e8f1ff`) mit Symbol, auch im Dunkelmodus (bewusst so).
+5. **Flugmodus (beide):** App ganz schließen, Flugmodus an, App öffnen. Erwartet: Die Liste erscheint. „Offline – Stand vom …“ erscheint wegen B1 derzeit meist nicht; das bitte notieren. Im Detail führt „In den Kalender“ zum Toast „Kalender-Datei braucht Netz“, und die App bleibt bedienbar. Die Karte zeigt ihren Hinweis oder die zwischengespeicherte Karte.
+6. **Flugmodus aus, App bleibt offen:** Erwartet: binnen Sekunden frische Daten ohne Neustart, kein „Offline“ in der Statuszeile.
+7. **iPhone, erster Start offline:** Die frisch installierte App einmal öffnen, im App-Umschalter schließen, Flugmodus an und wieder öffnen. Erwartet: Die App öffnet mit der Liste, nicht mit „Keine Verbindung“. Den Stadtteil in der App neu setzen (eigener Speicher), dann zeigt das Detail offline die Linie (z. B. „mit U1“).
+8. **Frische nach einem Deploy:** Die App mindestens 30 Min. im Hintergrund lassen, während ein neuer Stand live geht (`data/meta.json` zeigt einen neuen `commit`), dann zurückholen. Erwartet: neuer Stand ohne manuelles Neuladen.
 
 ## Akzeptanzkriterien
 
