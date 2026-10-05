@@ -626,12 +626,27 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
   - Drei Runden auf dem iPhone (Ersetzen/Fehler/Badge, Wartezeiten, Antippen) plus Topic- und Gesundheitsproben.
   - Ergebnis unter „Spike-Ergebnis“, eingearbeitet in E7, E10, E11, Risiken und ADR 0014.
   - Die echten VAPID-Schlüssel und Secrets entstehen erst in Schritt 7.
-- **Stufe 1:** wartet. Plan 0010 hat auf `main` nur Paket 0, die Pakete A/B fehlen noch (Stand `origin/main` 1415eb0).
+- **Stufe 1:** Plan 0010 ist vollständig auf `main` (Stand `origin/main` 693ffd1). Umsetzung auf Branch `pwa-0011`.
 - **Hinweis für E5:** Seit `1415eb0` gilt **ADR 0012** (angenommen):
   - `JS (initial)` 92 kB statt 90 kB, Ziel nach Plan 0010 ≤ 91,0 kB;
   - die Rolldown-Gruppe `$initial` in `vite.config.ts` hält gemeinsame Start-Module im Einstieg.
 
   Die 90 kB und die Schwelle 89,5 kB in E5 beziehen sich auf den alten Stand. Zu Beginn von Stufe 1 werden `X` gemessen und Schwelle sowie Ziel mit gleicher Reserve (0,5 kB unter Budget) neu notiert. Die Stub-Probe gegen React-Abspaltung prüft dann auch, dass `$initial` die Lazy-Kette `assets/app/` nicht in den Einstieg zieht. Das Budget selbst hebt dieser Plan nicht an.
+
+- **2026-10-05, Stufe 1, Schritt 1 (Build):**
+  - **X gemessen** auf `693ffd1` (Plan 0010 vollständig): `JS (initial)` = **90,90 kB** (90 902 B, Budget 92 kB nach ADR 0012). Neu notiert mit gleicher Reserve wie in E5: **Ziel ≤ X + 0,5 kB = 91,40 kB**, Schwelle 0,5 kB unter Budget = 91,5 kB. Maßgeblich ist das engere Ziel 91,40 kB. Über 92 kB bleibt Schluss (kein Anheben).
+  - `scripts/vite-sw.ts` (test-first, `scripts/vite-sw.test.ts` mit Mini-Bundle): Die Precache-Liste kommt aus den Tags von `index.html` (Modul-Skript, Modul-Preloads, Stylesheets) samt statischer Imports und `importedCss`, dazu die Latin-woff2 und die `startChunks`. Fehlt etwas (kein Entry-Skript, keine Schrift, Datei nicht im Bundle), wirft der Build. `sw.js` entsteht im `writeBundle` per zweitem `vite build` (Lib-Modus, IIFE). `dist/sw.js`: 3,8 kB roh, 1,46 kB gzip, Liste `index.html`, Latin-Schrift, Start-CSS, Einstieg.
+  - `src/sw/routes.ts` (test-first, in `coverage.include`, 100 %): Regeln als geordnete Liste `RULES`, Cache-Namen, Zeitlimits, Rotation `assetsToEvict`. `src/sw/sw.ts` verdrahtet nur Events.
+  - Gates: „Typen SW“ (`src/sw/tsconfig.json`, `lib: webworker`, im Haupt-`tsconfig.json` ausgeschlossen), Budget `Service Worker` 8 kB, knip-Entry `src/sw/sw.ts`, `serviceWorkers: "block"` in `use`, Biome-Globals, dependency-cruiser `sw-isolated`, `sw-not-imported`, `no-zod-in-sw`, `app-extras-ui-only-lazy`, `app-extras-ui-entry-only`, `app-data-only-lazy`. Die Regeln für Stufe 2 (`news-not-in-start`, `push-worker-isolated`, `web-push-only-in-push-send`) kommen mit Schritt 9/10: Ihre Ziele gibt es noch nicht, ein Kanarienvogel wäre nicht möglich.
+  - **Abweichung `no-zod-in-sw`:** als direkte Regel (Laufzeit-Import von `schema`/`dataset` oder `zod`), nicht mit `reachable`. Kanarienvogel: Mit `reachable: true` wurde schon ein reiner Typ-Import (`import type { SiteOffer } from "../domain/site-data.ts"`) rot, weil `reachable` Typ-Kanten mitzählt und `viaOnly` nur für Zyklen gilt. Transitiv hält `no-zod-in-client-transitive` jedes andere Domänenmodul zodfrei, wie bei `no-zod-in-client`.
+  - **Kanarienvögel, alle rot gesehen und zurückgenommen:**
+    - „Typen SW“: Typfehler in `sw.ts` → Exit 1; `document` im Service Worker → „Cannot find name 'document'“. Der Haupt-`tsc` blieb dabei grün (sieht `src/sw` nicht).
+    - `sw-isolated`: `sw.ts` importiert `../ui/format.ts` und `react` → beide rot.
+    - `no-zod-in-sw`: Laufzeit-Import `../domain/dataset.ts` → rot; `zod` direkt → rot (auch `sw-isolated`); Typ-Import aus `site-data.ts` → grün.
+    - `sw-not-imported`: `App.tsx` importiert `../sw/routes.ts` → rot.
+    - Biome: `caches`, `indexedDB`, `Notification`, `PushManager` in `src/ui` → 4 × `noRestrictedGlobals`.
+    - Budget `Service Worker`: `dist/sw.js` um 30 kB Zufall aufgebläht → 32,56 kB, rot.
+    - Die Regeln zu `app-extras`/`app-data` und das Budget `App-Extras JS (lazy)` bekommen ihre Kanarienvögel in Schritt 3/4, sobald es die Module gibt.
 
 ## Akzeptanzkriterien
 

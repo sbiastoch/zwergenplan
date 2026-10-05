@@ -117,7 +117,11 @@
                   "navigator": "Geräte-APIs wie Geolocation nur über src/data (docs/architecture.md, Plan 0004).",
                   "localStorage": "Speicher nur über src/data/preferences.ts (docs/architecture.md).",
                   "fetch": "Netzzugriff nur über src/data (docs/architecture.md).",
-                  "__zpSite": "Frühstart nur über src/data/site.ts (Plan 0008, E4)."
+                  "__zpSite": "Frühstart nur über src/data/site.ts (Plan 0008, E4).",
+                  "indexedDB": "Geräte-Speicher nur über src/data (Plan 0011, E5b).",
+                  "caches": "Caches gehören dem Service Worker (src/sw) bzw. src/data (Plan 0011, E5b).",
+                  "Notification": "Benachrichtigungen nur über src/data/push.ts (Plan 0011, E5b).",
+                  "PushManager": "Push-Abo nur über src/data/push.ts (Plan 0011, E5b)."
                 }
               }
             }

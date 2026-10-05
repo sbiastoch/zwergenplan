@@ -153,6 +153,60 @@ module.exports = {
       to: { path: "^src/domain/(places|camera)\\.ts$" },
     },
     {
+      name: "sw-isolated",
+      severity: "error",
+      comment:
+        "Der Service Worker src/sw/ (Plan 0011, E5b; ADR 0013) importiert nur sich selbst, reine Domänenhilfen und ab Stufe 2 src/data/device-store.ts: kein React, keine UI, kein anderer Datenzugriff, kein npm-Paket. Tests ausgenommen.",
+      from: { path: "^src/sw/", pathNot: "\\.test\\.ts$" },
+      to: { pathNot: ["^src/(sw|domain)/", "^src/data/device-store\\.ts$"] },
+    },
+    {
+      name: "sw-not-imported",
+      severity: "error",
+      comment:
+        "Nichts außer dem Build-Plugin scripts/vite-sw.ts (per Pfad, nicht per Import) erreicht src/sw/ (Plan 0011, E5b): Der Service Worker ist eine eigene IIFE-Datei, kein Teil des App-Bundles.",
+      from: { pathNot: ["^scripts/vite-sw\\.ts$", "^src/sw/"] },
+      to: { path: "^src/sw/" },
+    },
+    {
+      name: "no-zod-in-sw",
+      severity: "error",
+      comment:
+        "Zod gehört nicht in den Service Worker (Budget 8 kB, Plan 0011, E5b): schema/dataset nur als Typ. Transitiv hält no-zod-in-client-transitive jedes andere Domänenmodul zodfrei; `reachable` scheidet aus, weil es Typ-Importe mitzählt (Kanarienvogel in Plan 0011, „Umsetzung“).",
+      from: { path: "^src/sw/", pathNot: "\\.test\\.ts$" },
+      to: {
+        path: ["^src/domain/(schema|dataset)\\.ts$", "(^|/)node_modules/zod/"],
+        dependencyTypesNot: ["type-only"],
+      },
+    },
+    {
+      name: "app-extras-ui-only-lazy",
+      severity: "error",
+      comment:
+        "Die App-Extras-Oberfläche src/ui/app-extras/ (Abschnitt „Als App“, Plan 0011, E5) ist ein Lazy-Chunk in assets/app/: von außen nur per import(), auch Typen nicht statisch – sonst wächst das Startbundle.",
+      from: { path: "^src/", pathNot: "^src/ui/app-extras/" },
+      to: { path: "^src/ui/app-extras/", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
+      name: "app-extras-ui-entry-only",
+      severity: "error",
+      comment:
+        "Nur der Lader src/ui/AppExtras.tsx greift auf src/ui/app-extras/ zu (Plan 0011, E5), wie karte-ui-entry-only. Den Lader selbst prüft scripts/check-architecture.ts.",
+      from: { path: "^src/", pathNot: ["^src/ui/app-extras/", "^src/ui/AppExtras\\.tsx$"] },
+      to: { path: "^src/ui/app-extras/" },
+    },
+    {
+      name: "app-data-only-lazy",
+      severity: "error",
+      comment:
+        "PWA-Kern und (ab Stufe 2) Push und Geräte-Speicher in src/data sind Lazy-Chunks in assets/app/ (Plan 0011, E5): aus src/ui und src/data nur per import(), außer aus der App-Extras-Oberfläche und den Lazy-Modulen selbst. Im Start steht nur src/data/pwa-start.ts. Tests ausgenommen.",
+      from: {
+        path: "^src/(ui|data)/",
+        pathNot: ["^src/ui/app-extras/", "^src/data/(pwa|push|push-start|device-store)\\.ts$", "\\.test\\.ts$"],
+      },
+      to: { path: "^src/data/(pwa|push|push-start|device-store)\\.ts$", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",

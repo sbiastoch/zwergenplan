@@ -1,0 +1,171 @@
+/**
+ * Service Worker des Zwergenplans (Plan 0011, E3, E4; ADR 0013). Gebaut von `scripts/vite-sw.ts` als IIFE `sw.js`.
+ * Die Regeln stehen rein in `routes.ts`; hier nur Events, Caches und Fetch.
+ *
+ * - Precache im `install`: Schale (`index.html` am HTTP-Cache vorbei, Start-Assets) und `data/site.json`, damit die
+ *   App auch beim ersten Start offline öffnet.
+ * - `activate`: alte Schalen löschen, Navigation Preload an, `clients.claim()`. Kein automatisches Neuladen; das
+ *   macht nur die Seite beim Frische-Anlass (E4a, `src/data/pwa.ts`).
+ * - Fremde Origins und alles ohne Regel: kein `respondWith` (ADR 0008).
+ */
+import {
+  ASSETS_CACHE,
+  assetsToEvict,
+  DATA_CACHE,
+  NAVIGATION_TIMEOUT_MS,
+  OFFLINE_HEADER,
+  SITE_TIMEOUT_MS,
+  shellCache,
+  staleShells,
+  strategyFor,
+} from "./routes.ts";
+
+declare const self: ServiceWorkerGlobalScope;
+/** Start-Assets relativ zum Scope, gesetzt von scripts/vite-sw.ts */
+declare const __PRECACHE__: readonly string[];
+/** Hash über Precache-Liste und index.html */
+declare const __SW_VERSION__: string;
+
+const SHELL = shellCache(__SW_VERSION__);
+const abs = (path: string) => new URL(path, self.registration.scope).href;
+
+/** löst nach `ms` mit `undefined` auf (Funkloch: lieber die Kopie als warten) */
+const timeout = (ms: number) => new Promise<undefined>((resolve) => setTimeout(resolve, ms, undefined));
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    (async () => {
+      const shell = await caches.open(SHELL);
+      // index.html am HTTP-Cache vorbei: Eine alte Seite passte sonst nicht zur neuen Asset-Liste.
+      // Gehashte Assets dürfen aus dem HTTP-Cache kommen.
+      await Promise.all(
+        __PRECACHE__.map((path) => shell.add(new Request(abs(path), path === "index.html" ? { cache: "reload" } : {}))),
+      );
+      const data = await caches.open(DATA_CACHE);
+      await data.add(new Request(abs("data/site.json"), { cache: "reload" }));
+      await self.skipWaiting();
+    })(),
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      await Promise.all(staleShells(await caches.keys(), __SW_VERSION__).map((name) => caches.delete(name)));
+      await self.registration.navigationPreload?.enable();
+      await self.clients.claim();
+    })(),
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const navigate = request.mode === "navigate";
+  const strategy = strategyFor({ url: request.url, scope: self.registration.scope, method: request.method, navigate });
+  if (strategy === "ics") event.respondWith(ics(event));
+  else if (strategy === "asset") event.respondWith(asset(event));
+  else if (strategy === "site") event.respondWith(site(event));
+  else if (strategy === "wegzeit") event.respondWith(wegzeit(event));
+  else if (strategy === "schale") event.respondWith(shell(event));
+  // nicht eingegriffen: Die Preload-Antwort abwarten, sonst warnt die Konsole
+  else if (navigate) event.waitUntil(Promise.resolve(event.preloadResponse).catch(() => undefined));
+});
+
+/** Netz, bei Navigation über die Preload-Antwort */
+async function network(event: FetchEvent): Promise<Response> {
+  const preloaded: unknown = event.request.mode === "navigate" ? await event.preloadResponse : undefined;
+  return preloaded instanceof Response ? preloaded : fetch(event.request);
+}
+
+/** Regel 2: Offline bleibt die Seite stehen (204), die App zeigt den Hinweis (`src/data/pwa.ts`). */
+async function ics(event: FetchEvent): Promise<Response> {
+  try {
+    return await network(event);
+  } catch {
+    event.waitUntil(tellClients(event.clientId, { type: "ics-offline" }));
+    return new Response(null, { status: 204 });
+  }
+}
+
+/** Den auslösenden Tab; bei einer Navigation (ohne `clientId`) die Tabs im Vordergrund, sonst alle. */
+async function tellClients(clientId: string, message: { type: "ics-offline" }) {
+  const own = clientId ? await self.clients.get(clientId) : undefined;
+  const windows = own ? [own] : await self.clients.matchAll({ type: "window" });
+  const focused = windows.filter((c) => c instanceof WindowClient && c.focused);
+  for (const client of focused.length > 0 ? focused : windows) client.postMessage(message);
+}
+
+/** Regel 3: gehasht und unveränderlich, also Cache zuerst. */
+async function asset(event: FetchEvent): Promise<Response> {
+  const cached = await caches.match(event.request, { ignoreVary: true });
+  if (cached) return cached;
+  const response = await fetch(event.request);
+  if (response.ok) event.waitUntil(keepAsset(event.request.url, response.clone()));
+  return response;
+}
+
+async function keepAsset(url: string, response: Response) {
+  const cache = await caches.open(ASSETS_CACHE);
+  await cache.put(url, response);
+  const keys = (await cache.keys()).map((r) => r.url);
+  const keep = new Set(__PRECACHE__.map(abs));
+  await Promise.all(assetsToEvict(keys, keep).map((key) => cache.delete(key)));
+}
+
+/** Antwort aus dem Cache, gekennzeichnet für `loadSiteData` (Statuszeile „Offline – Stand vom …“) */
+function fromCache(copy: Response): Response {
+  const headers = new Headers(copy.headers);
+  headers.set(OFFLINE_HEADER, "offline");
+  return new Response(copy.body, { status: copy.status, statusText: copy.statusText, headers });
+}
+
+/** Netz, die erfolgreiche Antwort landet zusätzlich in `zp-data` */
+function networkKeeping(event: FetchEvent, request: Request): Promise<Response> {
+  const response = fetch(request);
+  event.waitUntil(
+    response
+      .then(async (res) => {
+        if (res.status === 200) await (await caches.open(DATA_CACHE)).put(request.url, res.clone());
+      })
+      .catch(() => undefined),
+  );
+  return response;
+}
+
+/** Regel 4: Netz zuerst ohne HTTP-Cache; mit Kopie nach 5 s oder bei Netzfehler die Kopie. */
+async function site(event: FetchEvent): Promise<Response> {
+  const request = new Request(event.request, { cache: "no-cache" });
+  const response = networkKeeping(event, request);
+  const copy = await caches.match(request.url, { cacheName: DATA_CACHE });
+  if (!copy) return response;
+  try {
+    return (await Promise.race([response, timeout(SITE_TIMEOUT_MS)])) ?? fromCache(copy);
+  } catch {
+    return fromCache(copy);
+  }
+}
+
+/** Regel 5: Netz zuerst (das Zeitlimit hat src/data/transit.ts), offline die Kopie. */
+async function wegzeit(event: FetchEvent): Promise<Response> {
+  try {
+    return await networkKeeping(event, event.request);
+  } catch (e) {
+    const copy = await caches.match(event.request.url, { cacheName: DATA_CACHE });
+    if (copy) return copy;
+    throw e;
+  }
+}
+
+/** Regel 6: online immer die aktuelle Seite; nach 3 s oder offline die vorgehaltene Schale. */
+async function shell(event: FetchEvent): Promise<Response> {
+  const response = network(event);
+  try {
+    const fresh = await Promise.race([response, timeout(NAVIGATION_TIMEOUT_MS)]);
+    if (fresh) return fresh;
+  } catch {
+    // offline: Schale
+  }
+  // Die Preload-Antwort trotzdem abwarten, sonst warnt die Konsole
+  event.waitUntil(response.catch(() => undefined));
+  return (await caches.match(abs("index.html"), { cacheName: SHELL })) ?? response;
+}

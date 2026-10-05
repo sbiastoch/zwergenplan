@@ -9,7 +9,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       // scripts/transit: reine Build-Logik der Wegzeit (Plan 0009, E10)
-      include: ["src/domain/**/*.ts", "scripts/pipeline/lib/**/*.ts", "scripts/transit/**/*.ts"],
+      // src/sw/routes.ts: reine Regeln des Service Workers (Plan 0011, E4); sw.ts verdrahtet nur Events (E2E)
+      include: ["src/domain/**/*.ts", "scripts/pipeline/lib/**/*.ts", "scripts/transit/**/*.ts", "src/sw/routes.ts"],
       exclude: ["**/*.test.ts", "src/domain/test-fixtures.ts"],
       thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 },
     },

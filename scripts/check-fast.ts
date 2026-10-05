@@ -7,6 +7,8 @@ import { spawn } from "node:child_process";
 
 const STEPS: Array<[name: string, cmd: string[]]> = [
   ["Typen", ["pnpm", "exec", "tsc", "--noEmit", "-p", "."]],
+  // Service Worker mit lib „webworker“, getrennt vom Haupt-tsconfig (Plan 0011, E3)
+  ["Typen SW", ["pnpm", "exec", "tsc", "--noEmit", "-p", "src/sw"]],
   ["Lint", ["pnpm", "exec", "biome", "check", "."]],
   ["Architektur", ["node", "scripts/check-architecture.ts"]],
   ["Daten", ["node", "scripts/validate-data.ts"]],

@@ -24,5 +24,7 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "scripts", "e2e", "tests", ".claude/hooks", "*.ts"]
+  "include": ["src", "scripts", "e2e", "tests", ".claude/hooks", "*.ts"],
+  // Service Worker: eigener Typkontext (lib webworker), geprüft als „Typen SW“ (Plan 0011, E3)
+  "exclude": ["src/sw"]
 }

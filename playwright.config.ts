@@ -82,7 +82,14 @@ export default defineConfig({
   retries: process.env["CI"] ? 1 : 0,
   reporter: process.env["CI"] ? [["github"], ["html", { open: "never" }]] : [["list"]],
   outputDir: "test-results",
-  use: { baseURL: `http://localhost:${FIXTURE_PORT}${BASE}`, trace: "retain-on-failure", ...common },
+  use: {
+    baseURL: `http://localhost:${FIXTURE_PORT}${BASE}`,
+    trace: "retain-on-failure",
+    // Kein Service Worker, außer eine Spec erlaubt ihn (Plan 0011, E6): Sonst lieferte er Fixture-Daten eines
+    // früheren Tests, und context.route sähe seine Requests je nach Browser anders. Gilt für alle Suites (Plan 0013).
+    serviceWorkers: "block",
+    ...common,
+  },
   projects,
   // smoke.spec.ts läuft nur im Projekt mit echten Daten (überschreibt dort testIgnore).
   testIgnore: /smoke\.spec\.ts/,

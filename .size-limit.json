@@ -6,6 +6,7 @@
   { "name": "Wegzeit JS (lazy)", "path": "dist/assets/oepnv/*.js", "limit": "3 kB", "gzip": true },
   { "name": "Export JS (lazy)", "path": "dist/assets/export/*.js", "limit": "2 kB", "gzip": true },
   { "name": "Anbieter JS (lazy)", "path": "dist/assets/anbieter/*.js", "limit": "6 kB", "gzip": true },
+  { "name": "Service Worker", "path": "dist/sw.js", "limit": "8 kB", "gzip": true },
   { "name": "Daten (site.json)", "path": "dist/data/site.json", "limit": "250 kB", "gzip": true },
   { "name": "Daten (anbieter.json)", "path": "dist/data/anbieter.json", "limit": "15 kB", "gzip": true },
   { "name": "Wegzeit-Daten", "path": "dist/data/wegzeit.json", "limit": "64 kB", "gzip": true }

@@ -1,6 +1,14 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["scripts/*.ts", ".claude/hooks/*.ts", "e2e/**/*.spec.ts", "src/**/*.test.ts", "scripts/**/*.test.ts"],
+  // src/sw/sw.ts: Einstieg des Service Workers, nur per Pfad aus scripts/vite-sw.ts gebaut (Plan 0011, E3)
+  "entry": [
+    "scripts/*.ts",
+    ".claude/hooks/*.ts",
+    "e2e/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "scripts/**/*.test.ts",
+    "src/sw/sw.ts"
+  ],
   "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts", "e2e/**/*.ts", ".claude/hooks/**/*.ts", "*.ts"],
   // @fontsource-variable/roboto: Schriftdatei, nur per require.resolve gelesen (e2e/vitals.ts,
   // scripts/font-fallback.ts); knip erkennt das nicht (Plan 0007, E12)

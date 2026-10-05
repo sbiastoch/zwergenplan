@@ -1,6 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { serviceWorker } from "./scripts/vite-sw.ts";
 import { BASE } from "./site.config.ts";
 
 const E2E = process.env["ZWERGENPLAN_DATA"] === "fixture";
@@ -40,9 +41,28 @@ const isExportModule = (id: string) => /\/src\/domain\/ics\.ts$/.test(id);
 const ANBIETER = "assets/anbieter/[name]-[hash]";
 const isProviderModule = (id: string) => /\/src\/ui\/anbieter\//.test(id);
 
+/**
+ * App-Extras (Plan 0011, E5) als Lazy-Kette in assets/app/: PWA-Kern (Registrierung, Installationszustand, Frische),
+ * ab Stufe 2 Push und Geräte-Speicher, dazu die Oberfläche src/ui/app-extras/. Budget `App-Extras JS (lazy)`;
+ * `app-extras-ui-only-lazy` und `app-data-only-lazy` halten sie aus dem Start.
+ */
+const APP = "assets/app/[name]-[hash]";
+const isAppExtrasModule = (id: string) =>
+  /\/src\/ui\/app-extras\/|\/src\/data\/(pwa|push|push-start|device-store)\.ts$|\/src\/domain\/news\.ts$/.test(id);
+
 export default defineConfig({
   base: BASE,
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    // Service Worker als dist/sw.js mit Precache-Liste (Plan 0011, E3; ADR 0013). Vorgehalten werden die Start-Assets,
+    // die Latin-Schrift und der PWA-Kern, den jeder Start nach `load` lädt (Abweichung in Plan 0011, „Umsetzung“).
+    serviceWorker({
+      entry: "src/sw/sw.ts",
+      fonts: /\/?bricolage-grotesque-latin-opsz-normal-[^/]+\.woff2$/,
+      startChunks: /\/src\/data\/pwa\.ts$/,
+    }),
+  ],
   define: {
     // Test-Haken window.__zpMap nur im E2E-Build (Plan 0005, E13); im Deploy-Build entfernt Vite den Zweig.
     __E2E__: JSON.stringify(E2E),
@@ -73,7 +93,9 @@ export default defineConfig({
                   ? `${EXPORT}.js`
                   : chunk.moduleIds.some(isProviderModule)
                     ? `${ANBIETER}.js`
-                    : "assets/[name]-[hash].js",
+                    : chunk.moduleIds.some(isAppExtrasModule)
+                      ? `${APP}.js`
+                      : "assets/[name]-[hash].js",
         // Alles, was der Einstieg statisch erreicht, bleibt im Einstieg, auch wenn Lazy-Chunks es teilen (ADR 0012).
         // Workaround für rolldown#11026: Ohne die Gruppe spaltet chunkOptimization z. B. jsx-runtime und time.ts als
         // eigene Start-Chunks ab, sobald mehrere Lazy-Chunks geteilte UI-Module nutzen. Auf main ändert die Gruppe
