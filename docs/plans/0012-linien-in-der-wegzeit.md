@@ -116,6 +116,7 @@ Die Wegwerf-Prototypen lagen außerhalb des Repos. Sie nutzen `buildNetwork`, `e
 - **N2:** Linien nur im Detail und im Orts-Sheet, nicht auf der Kachel.
 - **N3:** Schreibweise mit Pfeil.
 - **N4:** Direktverbindungen haben Vorrang, ein Umstieg nur, wenn er deutlich schneller ist oder es direkt nicht geht, zwei Umstiege nie, dann lieber länger zu Fuß.
+- **N5 (nach der Messung in Schritt 3):** Umstiegs-Bit im Browser behalten; die gemessenen Werte „mit Bit“ ersetzen M4 als Referenz (siehe „Umsetzung“).
 
 **Übersetzt in Zahlen** (Annahmen dieses Plans, als Konstanten leicht änderbar):
 - „deutlich schneller“ = mindestens **10 Min.**;
@@ -684,7 +685,7 @@ Keine Blocker. Alle Befunde sind übernommen, mit einer Ausnahme bei H1 (siehe d
 
 ## Umsetzung
 
-Stand 2026-10-05, Branch `linien-0012`. Schritte 1–4 umgesetzt, Schritt 3 gemessen. **Angehalten nach Schritt 4:** Mehrere Werte weichen um mehr als 20 % von M4 ab (siehe „Messung Schritt 3“). Die Ursache ist bekannt, die Entscheidung liegt beim Nutzer (siehe „Offene Entscheidung“).
+Stand 2026-10-05, Branch `linien-0012`. Schritte 1–4 umgesetzt, Schritt 3 gemessen. Nach Schritt 4 angehalten, weil mehrere Werte um mehr als 20 % von M4 abwichen (siehe „Messung Schritt 3“). **Nutzerentscheidung N5 (2026-10-05): Umstiegs-Bit behalten wie geplant**, siehe „Entscheidung zur Abweichung“. Danach Schritte 5–7.
 
 ### Schritt 1 – Auszug und Fixture
 
@@ -750,9 +751,13 @@ Stand 2026-10-05, Branch `linien-0012`. Schritte 1–4 umgesetzt, Schritt 3 geme
 
 **Befund:** Ohne das Umstiegs-Bit im Browser trifft die Messung M4 auf wenige Prozent genau. Die Abweichungen über 20 % kommen **allein vom Umstiegs-Bit**, das erst Review 2 (W1) nach der Messung M4 hinzugefügt hat; M4 hat es nicht enthalten. „Ohne Linien“ liegt zusätzlich wegen der Passungsprüfung (Review 1, W1) höher, die M4 ebenfalls nicht kannte (22–27 Paare, 0,4 % der Zellen).
 
-### Offene Entscheidung (Nutzer)
+### Entscheidung zur Abweichung (Nutzer, N5, 2026-10-05)
 
-Laut Schritt 3 wird bei mehr als 20 % Abweichung angehalten. Zu entscheiden ist:
+**Umstiegs-Bit behalten wie geplant (Option 1).** Die Werte der Spalte „mit Bit“ sind die neue Referenz statt M4.
+- Begründung: Die Abweichung kommt allein von Review 2, W1 (Bit im Browser), nicht von einem Fehler im Modell; ohne Bit trifft die Messung M4. Das Bit setzt die Nutzerregel „direkt vor Umstieg, Umstieg nur bei ≥ 10 Min. Gewinn“ (N4) auch über verschiedene Zugangshalte um.
+- `MAX_WITHOUT_LINES = 0,093` bleibt.
+
+Zur Nachvollziehbarkeit die Optionen, die zur Wahl standen:
 
 1. **Umstiegs-Bit wie geplant behalten** (Direktverbindung hat auch über verschiedene Halte Vorrang): 58,5 % direkt; die Minuten steigen gegenüber heute im Mittel um +2,9 statt +2,3 (p90 +8,9 statt +7). 366 Stadtteil-Ort-Paare zeigen eine Direktverbindung, die im Mittel 4,8 Min. (höchstens 10 Min.) langsamer ist als ein Umstiegsweg ab einem anderen Halt im Umkreis. Dann gelten die Werte der Spalte „mit Bit“ als neue Referenz, und Schritte 5–7 laufen unverändert weiter.
 2. **Ohne Bit** (Vorrang nur je Starthalt, Variante vor Review 2, W1): Werte wie M4 (44 % direkt). Der Browser zeigt dann mitunter einen Umstiegsweg ab einem weiter entfernten Halt, obwohl ab dem nächsten Halt eine nur wenig langsamere Direktverbindung fährt. Das Bit kann in der Datei bleiben (Formatversion 2), nur `transitReach` vergliche ohne Aufschlag; ADR 0015 und E2 wären anzupassen.

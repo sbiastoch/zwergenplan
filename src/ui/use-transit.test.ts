@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Origin } from "../domain/reach.ts";
 import * as logic from "../domain/transit.ts";
-import type { TransitTableFile } from "../domain/transit-types.ts";
+import type { TransitLinesFile, TransitTableFile } from "../domain/transit-types.ts";
 import {
   decodeFor,
+  decodeLinesFor,
+  deliverLoad,
   initialTransitState,
   limitActive,
   reloadAfterRetry,
@@ -42,6 +44,16 @@ const FERN: Origin = { source: "standort", point: { lat: 49.4, lon: 11.2 }, labe
 const BEISPIELHOF = { geo: { lat: 49.4521, lon: 11.0767 } };
 
 const ready = (): TransitState => run(initialTransitState(true), { type: "loaded", attempt: 1, file: FILE, logic });
+const NB = "\u00a0";
+/** Linien zur Tabelle FILE (2 Zeilen × 2 Spalten): Zeile 9001 → Beispielhof „Tram 4“ */
+const LINES: TransitLinesFile = {
+  version: 1,
+  table: FILE.id,
+  source: FILE.source,
+  lines: [`Tram${NB}4`],
+  first: btoa(String.fromCharCode(1, 0, 0, 0)),
+  second: btoa(String.fromCharCode(0, 0, 0, 0)),
+};
 
 describe("transitReducer (Plan 0009, E9/E11)", () => {
   it("lädt beim Start nur mit gespeichertem Stadtteil", () => {
@@ -111,7 +123,7 @@ describe("transitReducer (Plan 0009, E9/E11)", () => {
 });
 
 describe("resolveReach: Modus je Lage (E11)", () => {
-  const table = decodeFor(ready(), KEYS);
+  const table = decodeFor(FILE, logic, KEYS);
 
   it("ohne Startpunkt: kein Modus, keine Entfernung", () => {
     expect(resolveReach(ready(), table, undefined)).toEqual({ mode: undefined, reach: undefined });
@@ -134,7 +146,7 @@ describe("resolveReach: Modus je Lage (E11)", () => {
   });
 
   it("alte Tabelle ohne Spalte für einen Ort der Seite → fehler (E8)", () => {
-    const stale = decodeFor(ready(), new Set([...KEYS, "49.5,11.1"]));
+    const stale = decodeFor(FILE, logic, new Set([...KEYS, "49.5,11.1"]));
     expect(stale).toBeNull();
     expect(resolveReach(ready(), stale, GOSTENHOF).mode).toEqual({ kind: "luftlinie", reason: "fehler" });
   });
@@ -158,6 +170,119 @@ describe("resolveReach: Modus je Lage (E11)", () => {
     resolveReach(state, table, GOSTENHOF);
     resolveReach(state, table, FERN);
     expect(state).toEqual(ready());
+  });
+});
+
+describe("Linien (Plan 0012, E9, S2)", () => {
+  const table = decodeFor(FILE, logic, KEYS);
+
+  it("Reducer „lines“ nur in „bereit“ mit gleichem Versuch", () => {
+    const done = ready();
+    const withLines = transitReducer(done, { type: "lines", attempt: 1, lines: LINES });
+    expect(withLines).toEqual({ ...done, lines: LINES });
+    expect(transitReducer(done, { type: "lines", attempt: 2, lines: LINES })).toBe(done);
+    const loading = initialTransitState(true);
+    expect(transitReducer(loading, { type: "lines", attempt: 1, lines: LINES })).toBe(loading);
+    const failed = run(loading, { type: "failed", attempt: 1 });
+    expect(transitReducer(failed, { type: "lines", attempt: 1, lines: LINES })).toBe(failed);
+  });
+
+  it("resolveReach mit Linien nennt sie, ohne Linien nicht", () => {
+    const lines = decodeLinesFor(LINES, table, logic);
+    expect(lines?.names).toEqual([`Tram${NB}4`]);
+    const withLines = resolveReach(ready(), table, GOSTENHOF, lines).reach?.(BEISPIELHOF);
+    expect(withLines?.kind === "oepnv" && withLines.lines).toEqual([`Tram${NB}4`]);
+    const without = resolveReach(ready(), table, GOSTENHOF).reach?.(BEISPIELHOF);
+    expect(without?.kind === "oepnv" && without.lines).toBeUndefined();
+  });
+
+  it("unpassende Linien: keine Linien, aber kein „veraltet“ – die Wegzeit bleibt", () => {
+    expect(decodeLinesFor({ ...LINES, table: "deadbeef" }, table, logic)).toBeUndefined();
+    expect(decodeLinesFor(undefined, table, logic)).toBeUndefined();
+    expect(decodeLinesFor(LINES, undefined, logic)).toBeUndefined();
+    expect(decodeLinesFor(LINES, null, logic)).toBeUndefined();
+    expect(decodeLinesFor(LINES, table, undefined)).toBeUndefined();
+    const { mode } = resolveReach(ready(), table, GOSTENHOF, undefined);
+    expect(mode).toEqual({ kind: "oepnv" });
+  });
+
+  /** Versprechen, das der Test von außen erfüllt */
+  function deferred<T>() {
+    let resolve: (v: T) => void = () => {};
+    const promise = new Promise<T>((r) => {
+      resolve = r;
+    });
+    return { promise, resolve };
+  }
+
+  // Review B1: Der Effekt räumt nach `loaded` auf (attempt wird 0); kämen die Linien danach mit `live`-Prüfung,
+  // gingen sie immer verloren.
+  it("deliverLoad: erst loaded, dann wird der Effekt abgeräumt, dann kommen die Linien – sie kommen trotzdem an", async () => {
+    const lines = deferred<TransitLinesFile | undefined>();
+    let live = true;
+    let state = initialTransitState(true);
+    const dispatch = (a: TransitAction) => {
+      state = transitReducer(state, a);
+    };
+    deliverLoad(
+      { logic, file: FILE, chunk: "ok", lines: lines.promise },
+      { attempt: 1, retry: false, isLive: () => live, dispatch, reload: () => {} },
+    );
+    expect(state.kind).toBe("bereit");
+    live = false;
+    lines.resolve(LINES);
+    await lines.promise;
+    await Promise.resolve();
+    expect(state).toEqual({ kind: "bereit", file: FILE, logic, attempt: 1, lines: LINES });
+  });
+
+  it("deliverLoad: Linien eines veralteten Versuchs ändern über den Reducer nichts", async () => {
+    const lines = deferred<TransitLinesFile | undefined>();
+    let state: TransitState = initialTransitState(true);
+    const actions: TransitAction[] = [];
+    const dispatch = (a: TransitAction) => {
+      actions.push(a);
+      state = transitReducer(state, a);
+    };
+    deliverLoad(
+      { logic, file: FILE, chunk: "ok", lines: lines.promise },
+      { attempt: 1, retry: false, isLive: () => true, dispatch, reload: () => {} },
+    );
+    // die Tabelle passt nicht → fehler, „Nochmal laden“ startet Versuch 2
+    dispatch({ type: "stale", attempt: 1 });
+    dispatch({ type: "want", retry: true });
+    const before = state;
+    lines.resolve(LINES);
+    await lines.promise;
+    await Promise.resolve();
+    expect(actions.at(-1)).toEqual({ type: "lines", attempt: 1, lines: LINES });
+    expect(state).toBe(before);
+  });
+
+  it("deliverLoad: nicht mehr aktuell → nichts; Fehlschlag → failed; Chunk scheitert beim Wiederholen → Neuladen", () => {
+    const none = Promise.resolve(undefined);
+    const dispatch = vi.fn();
+    const reload = vi.fn();
+    const ctx = { attempt: 2, retry: true, dispatch, reload };
+    deliverLoad({ logic, file: FILE, chunk: "ok", lines: none }, { ...ctx, isLive: () => false });
+    expect(dispatch).not.toHaveBeenCalled();
+    deliverLoad({ logic: undefined, file: undefined, chunk: "fehler", lines: none }, { ...ctx, isLive: () => true });
+    expect(dispatch).toHaveBeenCalledWith({ type: "failed", attempt: 2 });
+    deliverLoad({ logic: undefined, file: FILE, chunk: "fehler", lines: none }, { ...ctx, isLive: () => true });
+    expect(reload).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledTimes(1);
+  });
+
+  it("deliverLoad: keine Linien (undefined) → keine Aktion „lines“", async () => {
+    const dispatch = vi.fn();
+    const none = Promise.resolve(undefined);
+    deliverLoad(
+      { logic, file: FILE, chunk: "ok", lines: none },
+      { attempt: 1, retry: false, isLive: () => true, dispatch, reload: () => {} },
+    );
+    await none;
+    await Promise.resolve();
+    expect(dispatch.mock.calls.map(([a]) => a.type)).toEqual(["loaded"]);
   });
 });
 

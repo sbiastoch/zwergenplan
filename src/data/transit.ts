@@ -1,16 +1,20 @@
 /**
- * Wegzeit-Tabelle laden (Plan 0009, E9; ADR 0011): nur `fetch` vom eigenen Origin, für alle gleich. Kein
- * Laufzeit-Import aus src/domain (ADR 0010 bleibt); prüfen und dekodieren macht `decodeTransitTable`.
- * Wann geladen wird, entscheidet `useTransit` (src/ui/use-transit.ts), nie die Wahl eines Startpunkts.
+ * Wegzeit-Tabelle und Linien laden (Plan 0009, E9; Plan 0012, E9; ADR 0011, ADR 0015): nur `fetch` vom eigenen
+ * Origin, für alle gleich. Kein Laufzeit-Import aus src/domain (ADR 0010 bleibt); prüfen und dekodieren machen
+ * `decodeTransitTable` und `decodeTransitLines`. Wann geladen wird, entscheidet `useTransit`
+ * (src/ui/use-transit.ts), nie die Wahl eines Startpunkts.
  */
-import type { TransitTableFile } from "../domain/transit-types.ts";
+import type { TransitLinesFile, TransitTableFile } from "../domain/transit-types.ts";
 
-/** Gemeinsames Zeitlimit für Tabelle (Abruf und Lesen) und Rechenlogik (E9) */
+/** Gemeinsames Zeitlimit für Tabelle (Abruf und Lesen) und Rechenlogik (E9); die Linien haben ein eigenes gleich langes */
 export const TRANSIT_TIMEOUT_MS = 8000;
 
 /** Abhängigkeiten von `loadTransit`, wie `SiteEnv`: Im Unit-Test stehen hier Stubs. */
 export interface TransitEnv {
-  fetch: (url: string, init: { signal: AbortSignal; cache: RequestCache }) => Promise<Response>;
+  fetch: (
+    url: string,
+    init: { signal: AbortSignal; cache: RequestCache; priority?: RequestPriority },
+  ) => Promise<Response>;
   timeoutMs: number;
 }
 
@@ -29,6 +33,11 @@ export interface TransitLoad<L> {
    * noch bekommen (Plan 0009, N1).
    */
   chunk: ChunkOutcome;
+  /**
+   * Linien (Plan 0012, E9): angefordert erst, wenn Tabelle und Logik da sind, sonst `undefined`. Wirft nie; die
+   * Minuten warten nicht darauf.
+   */
+  lines: Promise<TransitLinesFile | undefined>;
 }
 
 export type ChunkOutcome = "ok" | "fehler" | "zeitlimit";
@@ -64,10 +73,34 @@ export async function loadTransit<L>(
   };
   try {
     const [settled, file] = await Promise.all([Promise.race([logic, expired]), table().catch(() => undefined)]);
-    return settled === "zeitlimit"
-      ? { logic: undefined, file, chunk: settled }
-      : { logic: settled.value, file, chunk: settled.chunk };
+    if (settled === "zeitlimit") return { logic: undefined, file, chunk: settled, lines: Promise.resolve(undefined) };
+    // Ohne Logik gibt es keine Wegzeit, ohne Tabelle keine Zellen: dann keine Linien-Anfrage (Review W2, H10)
+    const lines =
+      settled.value !== undefined && file !== undefined ? loadLines(retry, env) : Promise.resolve(undefined);
+    return { logic: settled.value, file, chunk: settled.chunk, lines };
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * `linien.json` mit niedriger Priorität, eigenem Abbruch und eigenem Zeitlimit ab der Anfrage; das `finally` von
+ * `loadTransit` räumt diesen Timer nicht ab (Plan 0012, E9). Wirft nie.
+ */
+function loadLines(retry: boolean, env: TransitEnv): Promise<TransitLinesFile | undefined> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), env.timeoutMs);
+  const request = async (): Promise<TransitLinesFile> => {
+    const res = await env.fetch(`${import.meta.env.BASE_URL}data/linien.json`, {
+      signal: controller.signal,
+      cache: retry ? "reload" : "default",
+      priority: "low",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // Build-Artefakt ohne Zod: `decodeTransitLines` prüft Version, Kennung und Ebenen (Plan 0012, E8).
+    return await res.json();
+  };
+  return request()
+    .catch(() => undefined)
+    .finally(() => clearTimeout(timer));
 }
