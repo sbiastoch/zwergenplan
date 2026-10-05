@@ -65,6 +65,12 @@ export default defineConfig({
                 : chunk.moduleIds.some(isExportModule)
                   ? `${EXPORT}.js`
                   : "assets/[name]-[hash].js",
+        // Alles, was der Einstieg statisch erreicht, bleibt im Einstieg, auch wenn Lazy-Chunks es teilen (ADR 0012).
+        // Workaround für rolldown#11026: Ohne die Gruppe spaltet chunkOptimization z. B. jsx-runtime und time.ts als
+        // eigene Start-Chunks ab, sobald mehrere Lazy-Chunks geteilte UI-Module nutzen. Auf main ändert die Gruppe
+        // nichts (gleicher Hash). Ist der Fehler behoben und der Hash ohne Gruppe gleich, entfällt sie. Gate bleibt
+        // der Chunk-Wächter (scripts/check-chunks.ts).
+        codeSplitting: { groups: [{ name: "index", tags: ["$initial"] }] },
         assetFileNames: (asset) =>
           asset.names.some((n) => /^Map(View|Screen)\b/.test(n))
             ? `${KARTE}[extname]`

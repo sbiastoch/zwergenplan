@@ -1,6 +1,6 @@
 # Plan 0010 – Anbieterübersicht
 
-Status: Review und Nutzerentscheidungen eingearbeitet (2026-10-05) → Umsetzung nach Plan 0009, beginnend mit Paket 0
+Status: Paket 0 live, ADR 0012 entschieden (2026-10-05) → Umsetzung ab Schritt 4 „Schnittstellen“
 Datum: 2026-10-05
 Bezug: `docs/ideas.md` („Anbieterverzeichnis auf der Website, ersetzt das frühere `ANBIETER.md`“), Plan 0004 (Startpunkt, `reachOf`), Plan 0005 (Ladekette der Karte, Orts-Liste und Orts-Sheet als Vorbild), Plan 0007 (Text-Gate, Tab-Leiste quer als Seitenleiste, E14), Plan 0008 (Feinschliff: Badge quer, `atPlace`, `retry`), **Plan 0009** (Öffi-Wegzeit, `ReachMode`, ADR 0011: kommt vor diesem Plan), ADR 0002 (Datenfluss), ADR 0003 (Themen → Kategorien), ADR 0006 (Katalog im Zod-Vertrag), ADR 0008 (Privatsphäre, Lazy-Budgets).
 
@@ -18,7 +18,7 @@ Eltern sehen auf einen Blick, **wer** in Nürnberg etwas für Kinder unter 3 Jah
 - Aus dem **Detail** führt „Alle Angebote dieses Anbieters“ in dasselbe Sheet, aus jeder Ansicht.
 - Die Daten kommen aus dem vorhandenen Katalog. **Keine Schemaänderung**, kein neuer Pipeline-Lauf. Eine eigene Datei `data/anbieter.json` (7,6 kB gzip) lädt erst beim ersten Öffnen.
 - Der Code der Übersicht ist ein eigener **Lazy-Chunk** in `dist/assets/anbieter/`.
-- **Paket 0** verschlankt vorher das Startbundle, damit das Start-JS nach Plan 0009 und 0010 bei **≤ 89,0 kB** liegt (E8).
+- **Paket 0** verschlankt vorher das Startbundle (E8). Nach ADR 0012 gilt das Budget `JS (initial)` von 92 kB; das Start-JS liegt nach Plan 0009 und 0010 bei **≤ 91,0 kB** (1 kB Reserve).
 - Kein neuer Drittanbieter-Request. Externe Links öffnen mit `target="_blank" rel="noopener"`.
 - Mobile-UX-Gates grün für Tab-Leiste, Anbieterliste, Anbieter-Sheet und deren Zustände, hell und dunkel, bei 320 px / 200 % und in beiden Querformaten.
 
@@ -318,7 +318,7 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
 - **Chunk-Wächter** (aus Paket 0, E8): Direkt in `dist/assets/` liegt genau eine JS-Datei (`index-*.js`). Die Prüfung ist nicht rekursiv, Unterordner wie `karte/` und `anbieter/` zählen nicht, `.js.map` wird ignoriert. Damit fällt eine Abspaltung gemeinsamer Teile wie im Kalender-Versuch sofort auf.
 
 **Budgets** (`.size-limit.json`):
-- `JS (initial)` bleibt 90 kB.
+- `JS (initial)` steigt auf **92 kB** (ADR 0012, Option a). Ziel nach diesem Plan ≤ 91,0 kB.
 - **Zuwachs durch diesen Plan: ≤ 1,3 kB gzip.** Geschätzt:
   - Route und `useRoute` ca. 0,3 kB;
   - Lader, Sheet-Loader und Vorladen ca. 0,35 kB;
@@ -413,12 +413,18 @@ Da gzip nicht additiv ist, wurde die Ersparnis gemessen. Dafür wurde der Kandid
   Bis dahin starten weder „Schnittstellen“ noch A/B.
 - Nacharbeit 0009 und Paket 0 liegen zusammen unter dem Budget von 90 kB und gehen gemeinsam nach `main`.
 
+**Entscheidung (2026-10-05, ADR 0012):** Option (a) mit Workaround.
+- Nachgemessen: Ursache der Abspaltung ist rolldown#11026. `output.codeSplitting.groups: [{ name: "index", tags: ["$initial"] }]` hält alles, was der Einstieg statisch erreicht, im Einstieg. Auf `main` ändert die Gruppe nichts (gleicher Hash, 89,62 kB).
+- Ein **realistischer** Anbieter-Stub, der geteilte Start-Module nutzt (`Dialog`, `Icon`, `plural`, `berlinIsoDate`), spaltet ohne Gruppe `jsx-runtime` und `time` ab, auch ohne lazy Kalender (90,86 kB, Wächter rot). Mit Gruppe sind es 89,75 kB, Wächter grün. Ein trivialer Stub mit `useState` spaltet nie ab und taugt deshalb nicht als Probe.
+- `JS (initial)` steigt auf 92 kB. Das Eintrittsziel von 87,7 kB entfällt, das Ziel nach diesem Plan ist ≤ 91,0 kB.
+- Kalender und Merkliste lazy (−1,65 kB) sowie Preact (−60,5 kB) stehen mit Messwerten in `docs/ideas.md`.
+
 **Fertig, wenn** das Start-JS ≤ 87,7 kB ist (bzw. `X` − Ersparnis notiert), der Chunk-Wächter läuft, `pnpm check` grün ist und Arch-Review sowie Browser-Review (Merkliste-Export, ggf. Kalender offline nach dem Laden) eingetragen sind.
 
 **Wechselwirkung mit diesem Plan:** Der Anbieter-Chunk ist selbst eine React-Lazy-Komponente.
-- Ob er die Abspaltung auslöst, wird **vor** den parallelen Paketen geprüft: Im Schritt „Schnittstellen“ ist der Stub `anbieter/entry.ts` eine kleine Komponente mit `useState`, die `ProviderPanel` per `import()` lädt. Danach laufen `pnpm build && pnpm size` samt Chunk-Wächter.
-- Bleibt der Wächter grün, beginnen A und B.
-- Wird er rot, gilt die Konfiguration aus Paket 0, Schritt 4 auch hier. Gibt es keine, wird nichts parallel begonnen, bis die Ursache geklärt ist.
+- Ob er die Abspaltung auslöst, wird **vor** den parallelen Paketen geprüft: Im Schritt „Schnittstellen“ ist der Stub `anbieter/entry.ts` eine kleine Komponente, die `ProviderPanel` per `import()` lädt und **geteilte Start-Module** nutzt (`Dialog`, `Icon`, `time.ts`), wie es Screen und Sheet später tun (ADR 0012). Danach laufen `pnpm build && pnpm size` samt Chunk-Wächter.
+- **Kanarienvogel des Workarounds:** Ohne die Gruppe `$initial` wird der Wächter mit diesem Stub rot, mit ihr grün.
+- Bleibt der Wächter grün, beginnen A und B. Wird er trotz Gruppe rot, wird nichts parallel begonnen, bis die Ursache geklärt ist.
 
 ### E9 – Privatsphäre
 
@@ -783,14 +789,14 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
 1. **Plan und `/plan-review`.**
    - *Fertig:* erledigt, siehe „Review“ und „Nutzerentscheidungen“.
 2. **Paket 0** (E8) auf eigenem Branch: Messung, Chunk-Wächter, A, B untersuchen, ggf. C. Danach `/arch-review`, CI, Fast-Forward nach `main`, `/browser-review live` (Export am echten iPhone: kommt der Download nach dem `await` noch an; ggf. Kalender offline nach dem Laden).
-   - *Fertig:* Start-JS ≤ 87,7 kB auf `main` und notiert, oder die Entscheidung für ADR 0012 ist dem Nutzer vorgelegt.
-3. **Worktree und Ausgangswert:** Branch `anbieter-0010` auf dem aktuellen `main`, `pnpm install`, `pnpm build && pnpm size`.
-   - *Fertig:* Wert notiert und ≤ 87,7 kB.
+   - *Fertig:* erledigt. Start-JS 89,62 kB auf `main`, ADR 0012 entschieden (Option a, Budget 92 kB, Workaround).
+3. **Worktree und Ausgangswert:** Branch auf dem aktuellen `main` (mit ADR 0012), `pnpm install --ignore-scripts`, `pnpm build && pnpm size`.
+   - *Fertig:* Wert notiert, Chunk-Wächter grün.
 4. **Schnittstellen** (ein Commit):
    - `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts`, `directory.ts` mit Typen und Stubs.
-   - `anbieter/entry.ts` als **Stub mit `useState`**, schon von `ProviderPanel` per `import()` geladen und im Tab „Anbieter“ verdrahtet (Review 2, M5).
-   - Dann `pnpm build && pnpm size` samt Chunk-Wächter.
-   - *Fertig:* `pnpm check:fast` grün, Chunk-Wächter grün (keine React-Abspaltung durch den Anbieter-Chunk), Messwert notiert. Erst dann beginnen A und B.
+   - `anbieter/entry.ts` als **Stub mit `useState`, der geteilte Start-Module nutzt** (`Dialog`, `Icon`, `time.ts`), schon von `ProviderPanel` per `import()` geladen und im Tab „Anbieter“ verdrahtet (Review 2, M5; ADR 0012).
+   - Dann `pnpm build && pnpm size` samt Chunk-Wächter, dazu der Kanarienvogel ohne Gruppe `$initial` (rot).
+   - *Fertig:* `pnpm check:fast` grün, Chunk-Wächter grün (keine Abspaltung durch den Anbieter-Chunk), Kanarienvogel rot gesehen, Messwert notiert. Erst dann beginnen A und B.
 5. **Pakete A und B parallel** (E13), test-first für die Domäne, nach jedem Block `pnpm check:fast`.
    - **A:**
      - Route, Daten, Fixtures samt nachgezogenen Tests;
@@ -805,7 +811,7 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
    - A nach B, dann die E2E von B.
    - `pnpm check` komplett, inklusive WebKit (lokal ggf. ohne `iphone-15`).
    - Budget messen.
-   - *Fertig:* `pnpm check` grün, Start-JS ≤ 89,0 kB, alle Lazy- und Datenbudgets eingehalten, Werte notiert.
+   - *Fertig:* `pnpm check` grün, Start-JS ≤ 91,0 kB, alle Lazy- und Datenbudgets eingehalten, Werte notiert.
 7. **Doku:**
    - `docs/architecture.md`:
      - Datenfluss (`anbieter.json`);
@@ -832,7 +838,7 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
 
 ## Akzeptanzkriterien
 
-- Paket 0 ist auf `main`, das Start-JS vor 0010 liegt bei ≤ 87,7 kB, und der Chunk-Wächter läuft in CI.
+- Paket 0 ist auf `main`, der Chunk-Wächter läuft in CI, und ADR 0012 ist umgesetzt (Budget 92 kB, Gruppe `$initial`).
 - Vierter Tab „Anbieter“, Anbieterliste mit Suche, Sortierung nach Wegzeit mit Startpunkt (alphabetisch ohne), blasse Anbieter ohne Termine am Ende, Anbieter-Sheet, Detail-Einstieg, Deep-Link: umgesetzt und per E2E abgedeckt.
 - Die Tab-Leiste besteht `layout.spec.ts` in allen Lagen aus E2 sowie Text-Gate und Touch-Gate.
 - `anbieter.json` enthält nur die Felder aus E6 und nur Anbieter. Datenstand-Abgleich und Rückfall-Zeilen sind getestet.
@@ -840,7 +846,7 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
 - Alle neuen Ansichten und Zustände bestehen `expectMobileUx` hell und dunkel, dazu 320 px / 200 %.
 - `pnpm check` grün, CI grün auf `main`.
 - Budgets:
-  - Start-JS ≤ 89,0 kB (Zuwachs durch 0010 ≤ 1,3 kB, notiert);
+  - Start-JS ≤ 91,0 kB (Zuwachs durch 0010 ≤ 1,3 kB, notiert);
   - `Anbieter JS (lazy)` ≤ 6 kB;
   - `Daten (anbieter.json)` ≤ 15 kB;
   - CSS ≤ 15 kB.
@@ -849,7 +855,7 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
 
 ## Risiken
 
-- **Startbudget:** Paket 0 muss je nach Stand nach Plan 0009 bis zu 1,3 kB einsparen. Gemessen sicher sind nur −0,64 kB (Export). Der Kalender bringt nur etwas, wenn sich die React-Abspaltung verhindern lässt. Danach bleibt C, als letzter Ausweg ADR 0012. Der Anbieter-Chunk kann dieselbe Abspaltung auslösen, das zeigt der Chunk-Wächter (E8).
+- **Startbudget:** entschärft durch ADR 0012 (92 kB, 1 kB Reserve nach diesem Plan). Der Anbieter-Chunk löst ohne die Gruppe `$initial` die Rolldown-Abspaltung aus (rolldown#11026); ein Rolldown-Update kann das Verhalten ändern, das zeigt der Chunk-Wächter (E8).
 - **Tab-Leiste:** Die Breiten sind aus dem CSS abgeleitet, nicht gerendert (kein Browser in der Planung). Am knappsten ist es hochkant bei 320 px mit 73 px Spalte gegen ca. 65–68 px Label. Notausgang in zwei Stufen, entschieden von `layout.spec.ts`:
   1. Den Rand bis 4 px senken (Spalte 74 px). Kein Test ändert sich.
   2. Reicht das nicht, zeigt die Leiste bei 320 px / 100 % nur Icons, wie bei 200 %. Dann ändert sich **genau eine** Erwartung in `layout.spec.ts`: Der Fall „Hochkant 320 bei 100 %: alle vier Labels sichtbar“ wird zu „nur Icons, Badge in der eigenen Spalte“. 360, 390 und 412 behalten ihre Labels.

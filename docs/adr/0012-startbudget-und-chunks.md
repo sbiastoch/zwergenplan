@@ -1,6 +1,6 @@
 # ADR 0012 – Startbudget, Rolldown-Workaround und Stack
 
-Status: **vorgeschlagen** (2026-10-05). Entscheidung des Nutzers offen. Betrifft ADR 0001 (Stack), Plan 0010 (E7, E8) und `.size-limit.json`.
+Status: angenommen (2026-10-05), Nutzerentscheidung: Option (a) mit Workaround. Betrifft Plan 0010 (E7, E8) und `.size-limit.json`. ADR 0001 (Stack) bleibt unverändert.
 
 ## Kontext
 
@@ -97,22 +97,19 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 - Der Kalender ist ein Haupt-Tab. Ohne Service Worker hängt er offline am Vorladen.
 - Dazu kommen zwei weitere Ladeketten mit Regeln, Kanarienvögeln und E2E-Tests.
 
-## Empfehlung
+## Entscheidung
 
-**(a) mit Workaround jetzt, (b) als eigener Plan danach, wenn gewünscht.**
-- **Workaround:** Er ist für jede Option Pflicht, sobald die Anbieter-UI kommt. Er ist auf `main` neutral, und der Chunk-Wächter bleibt das Gate.
+**(a) mit Workaround.** Begründung des Nutzers: Die Performance soll nicht vorzeitig und unnötig hart optimiert werden.
+- **Workaround:** Er ist Pflicht, sobald die Anbieter-UI kommt, und auf `main` neutral. Der Chunk-Wächter bleibt das Gate.
   - Ein Kommentar an der Konfiguration verweist auf #11026.
   - Ist der Fehler behoben, wird geprüft, ob die Gruppe entfallen kann. Gleicher Hash ohne Gruppe heißt: entfernen.
-- **(a) statt (d):**
-  - (d) spart 1,4 kB, das sind 1,6 % des Start-JS.
-  - Dafür würde ein Haupt-Tab lazy, und es kämen zwei Ladeketten dazu.
-  - Das Verhältnis von Nutzen zu Risiko ist schlecht. Die Messwerte von (d) wandern nach `docs/ideas.md`.
-- **(b) erst danach:**
-  - Preact ist der einzige große Hebel (−67 %), und die Seite käme damit auf langsamen Handys spürbar schneller in Gang.
-  - Es ist aber eine Stack-Entscheidung mit Verhaltensänderungen: Zeitpunkt der Effekte, Dialoge, Fokus.
-  - Plan 0010 braucht sie nicht. Deshalb ein eigener Plan nach 0010, nicht dazwischen.
+- **Nicht gewählt:**
+  - **(d):** spart 1,4 kB, das sind 1,6 % des Start-JS. Dafür würde ein Haupt-Tab lazy, und es kämen zwei Ladeketten dazu.
+  - **(b):** Preact ist der einzige große Hebel (−67 %), aber eine Stack-Entscheidung mit Verhaltensänderungen (Zeitpunkt der Effekte, Dialoge, Fokus). Ein Bedarf ist heute nicht gemessen: Die LCP-Gates sind grün.
+  - Beide stehen mit ihren Messwerten in `docs/ideas.md`.
+- **(c):** Wir setzen unsere Repro als Kommentar in #11026.
 
-## Konsequenzen (bei Empfehlung a + Workaround)
+## Konsequenzen
 
 - **Budget:** `.size-limit.json` setzt `JS (initial)` auf 92 kB. Das Ziel nach Plan 0010 ist ≤ 91,0 kB (1 kB Reserve). Das Eintrittsziel von 87,7 kB entfällt.
 - **Workaround:** `vite.config.ts` bekommt die Gruppe `$initial` mit Kommentar und Verweis auf #11026, in einem eigenen Commit vor „Schnittstellen“.
