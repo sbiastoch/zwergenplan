@@ -1,6 +1,6 @@
 # ADR 0015 – Wegzeit mit höchstens einem Umstieg und Linien
 
-Status: Entwurf (2026-10-05), Umsetzung mit Plan 0012. Nutzerentscheidungen vom 2026-10-05.
+Status: angenommen (2026-10-05), Umsetzung mit Plan 0012. Nutzerentscheidungen vom 2026-10-05, nach der Messung in Plan 0012, Schritt 3 bestätigt (N5: Umstiegs-Bit bleibt).
 - Ersetzt ADR 0011, Punkt 2 (Radius des Fußwegs zum Halt), Punkt 3, Satz 2 (welche Verbindung zählt) und Punkt 3, Satz 3 (Anzeige: „… inkl. Warten“ wird zu „Di vormittags, höchstens 1 Umstieg, inkl. Warten“).
 - Ergänzt ADR 0011, Punkt 4 (zweite Build-Datei), Punkt 5 (Lizenz und Namensnennung gelten für Auszug, Tabelle und Linien) und Punkt 6 (Laden der Linien).
 - Ergänzt ADR 0003 (Schema `Timetable`).
@@ -18,11 +18,11 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
   - Direktverbindungen haben Vorrang.
   - Ein Umstieg nur, wenn er deutlich schneller ist oder es direkt nicht geht.
   - Zwei Umstiege nie, dann lieber länger zu Fuß.
-- Gemessen (Plan 0012, M4/M5) für 35 Stadtteile × 76 Orte, bei höchstens 1 Umstieg, 10 Min. Aufschlag und 1 500 m Fußweg zum und vom Halt:
-  - Minuten im Mittel +2,3 (p90 +7, p99 +23);
-  - 52 Paare (2 %) ohne Weg;
-  - 45 % Direktverbindungen;
-  - Linien-Datei 27,9 kB gzip, Build 2,8 s.
+- Gemessen (Plan 0012, Schritt 3, „Umsetzung“) für 35 Stadtteile × 76 Orte, bei höchstens 1 Umstieg, 10 Min. Aufschlag und 1 500 m Fußweg zum und vom Halt, mit Umstiegs-Bit im Browser:
+  - Minuten im Mittel +2,9 (p90 +8,9, p99 +23,8) gegenüber heute;
+  - 53 Paare (2 %) ohne Weg;
+  - 58,5 % Direktverbindungen (ohne Umstiegs-Bit wären es 44 %; das Bit entscheidet 366 Paare zu einer Direktverbindung um, im Mittel 4,8 Min. langsamer);
+  - Linien-Datei 28,0 kB gzip, Tabelle 2,1–2,3 s.
 
 ## Entscheidung
 
@@ -64,7 +64,7 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
 
 ## Konsequenzen
 
-- Weite Wege werden länger, 2 % der Stadtteil-Ort-Paare haben keinen Weg mehr. Der Filter „bis … Min.“ zeigt für weite Startpunkte weniger Orte. Das ist gewollt.
+- Weite Wege werden länger, 2 % der Stadtteil-Ort-Paare haben keinen Weg mehr. Ein Gate in `build-data` bricht ab, wenn mit echten Daten mehr als 9,3 % der Zellen ohne Linien sind (gemessen 4,3 %). Der Filter „bis … Min.“ zeigt für weite Startpunkte weniger Orte. Das ist gewollt.
 - Gezeigt wird mitunter eine Direktverbindung, die bis zu 10 Min. langsamer ist als ein Umstiegsweg, auch ab einem anderen Halt. Die Minuten sind dann die der Direktverbindung.
 - `wegzeit.json` hat Formatversion 2. Eine alte Datei aus dem HTTP-Cache führt kurz zum Rückfall auf die Luftlinie.
 - Ein Profil „ohne Kinderwagen“ mit mehr Umstiegen wäre ein neues ADR (`docs/ideas.md`).

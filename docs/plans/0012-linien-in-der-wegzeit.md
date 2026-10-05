@@ -1,6 +1,6 @@
 # Plan 0012 – Linien in der Wegzeit („ca. 25 Min. mit Bus 37 → U1“)
 
-Status: Fassung 2 nach den Nutzerentscheidungen vom 2026-10-05 (höchstens 1 Umstieg, Pfeil). Review-Runden 1 (auf Fassung 1) und 2 (auf Fassung 2) eingearbeitet, kein offener Blocker. **Bereit zur Umsetzung ab Schritt 1.**
+Status: Fassung 2 nach den Nutzerentscheidungen vom 2026-10-05 (höchstens 1 Umstieg, Pfeil). Review-Runden 1 (auf Fassung 1) und 2 (auf Fassung 2) eingearbeitet, kein offener Blocker. **Schritte 1–7 umgesetzt** (Branch `linien-0012`, siehe „Umsetzung“); offen: Schritt 8 (Arch-Review), 9 (Push, CI, Merge), 10 (Browser-Review live).
 Datum: 2026-10-05
 Bezug:
 - **ADR 0011** (Wegzeit-Tabelle Halt→Ort). Dieser Plan ändert dort:
@@ -763,3 +763,29 @@ Zur Nachvollziehbarkeit die Optionen, die zur Wahl standen:
 2. **Ohne Bit** (Vorrang nur je Starthalt, Variante vor Review 2, W1): Werte wie M4 (44 % direkt). Der Browser zeigt dann mitunter einen Umstiegsweg ab einem weiter entfernten Halt, obwohl ab dem nächsten Halt eine nur wenig langsamere Direktverbindung fährt. Das Bit kann in der Datei bleiben (Formatversion 2), nur `transitReach` vergliche ohne Aufschlag; ADR 0015 und E2 wären anzupassen.
 
 Zusätzlich zur Kenntnis: 27 Paare (1,1 %) verlieren ihre Linien durch die Passungsprüfung (`d > max(3 Min., 25 %)`); die Prüfung bleibt wie geplant.
+
+### Schritt 5 – Laden
+
+- Wie E9. `loadTransit` startet `linien.json` erst, wenn Tabelle **und** Logik da sind (bei Zeitlimit des Chunks nie), mit `priority: "low"`, eigenem `AbortController` und eigenem Timer (`TRANSIT_TIMEOUT_MS`).
+- `decodeFor` nimmt jetzt `(file, logic, placeKeys)` statt des ganzen Zustands; so dekodiert die Ankunft der Linien die Tabelle nicht neu.
+- Kanarienvögel: Linien-Zustellung mit `isLive`-Prüfung → B1-Test rot; Linien-Anfrage parallel zur Tabelle → 2 Tests rot.
+
+### Schritt 6 – Anzeige
+
+- **Abweichung:** `ReachLong` rendert höchstens zwei Linien ohne Schleife, also ganz ohne `key` (statt `key` = Index, Review 2, H3). Das Ergebnis im DOM ist dasselbe.
+- `reachLong` liefert ohne Linien den ganzen Text in `before`, `after` ist dann leer.
+- `.reach-long { overflow-wrap: normal }` steht in `dialog.css` (Detail und Orts-Sheet nutzen sie; beide Dateien liegen im Start-CSS).
+- JS (initial) 91,42 kB (vorher 90,9 kB, ≤ 92): mehr als die erwarteten 0,3 kB, vor allem durch den längeren Quellensatz und das Laden der Linien in `src/data` und `use-transit.ts`.
+
+### Schritt 7 – E2E und Doku
+
+**Fixture-Erwartungen ab Gostenhof, von Hand nachgerechnet** (Rechenweg im Kopf von `e2e/startpunkt.spec.ts`, Zellen in `scripts/transit/table.test.ts`): Theater 3,6 „5 Min. mit Bus & Bahn“ (ohne Linien, E5), Beispielhof 13,6 „15 Min. mit Tram 1“, Bibliothek 15,6 „15 Min. mit Tram 1“, Gemeinde 23,6 „25 Min. mit Tram 1 → Bus 202E“, Musikschule 29,6 „30 Min. mit Tram 1 → Bus 2“. Die Orts-Liste (`karte.spec.ts`) und die Anbieterliste (`anbieter-inhalt.spec.ts`) sortieren jetzt die Gemeinde (25) vor die Musikschule (30). Der Filter „bis 20 Min.“ blendet weiter beide aus.
+
+**Abweichungen:**
+- **Aria-Snapshot:** Playwright liest „Tram 1 , dann Bus 2“ mit Leerzeichen vor dem Komma, weil `.sr-only` absolut positioniert ist (Block in der Namensberechnung, wie in den Browsern). Die Prüfung (`expectTwoLines` in `e2e/fixtures.ts`) lässt dieses Leerzeichen zu und vergleicht sonst wörtlich. Ob VoiceOver/TalkBack dort eine Pause machen, klärt Schritt 10.
+- **Orts-Sheet mit zwei Linien:** Kein Fixture-Ort mit mehreren Angeboten (Orts-Sheet) hat zwei Linien; Gemeinde und Musikschule haben je ein Angebot und öffnen direkt das Detail. Für das Orts-Sheet (E1 „eine Zeile“, E4) schreibt `twoLinesEverywhere` (`e2e/fixtures.ts`) im Test die Linien-Datei um: Jede Zelle mit nur „Tram 1“ bekommt „Bus 202E“ als zweite Linie (Kennung bleibt). Die Fixture-Daten selbst bleiben unverändert.
+- **E4 im Detail:** Das Detail der Gemeinde (echte Folge „Tram 1 → Bus 202E“) besteht `expectTextFits` nicht, unabhängig von diesem Plan: Der Preis „48 € für vier Nachmittage, **Geschwisterkinder** ermäßigt“ bricht in der halben Label-Spalte mitten im Wort (156 px ≤ 70 % von 380 px, Pixel 7, 100 %). Das Detail dieses Angebots stand bisher in keinem UX-Gate. **Befund für den Orchestrator**, nicht hier behoben. E4 nutzt deshalb das Detail des Beispielhofs mit `twoLinesEverywhere` (gleicher Text der Linien).
+- E2 (abgebrochen) prüft zusätzlich den Filter „bis 20 Min.“ (6 Angebote); E6 hält `linien.json` 1,5 s zurück.
+- Kanarienvogel E1/W3: `.place-where span` statt `.place-where > span` → „Linie davor und Pfeil in einer Zeile“ rot.
+
+**Doku:** `docs/architecture.md` (Datenfluss, Absatz Wegzeit, Invariante), README (Lizenzabsatz), `docs/ideas.md` (Linien auf der Kachel, VGN-Auskunft, Piktogramme, Profil „ohne Kinderwagen“, „zu Fuß vom Halt“ als „zu Fuß“), Plan 0011 (E4 Zeile 5, E4a Punkt 3), ADR 0013 (Punkt 3 und 7), ADR 0015 „angenommen“ mit den gemessenen Werten, Verweis oben in ADR 0011.
