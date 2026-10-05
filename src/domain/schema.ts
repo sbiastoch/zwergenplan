@@ -3,8 +3,9 @@
  * JSON Schema unter schema/ wird hieraus exportiert – nie von Hand ändern.
  */
 import { z } from "zod";
-import { NUERNBERG_BBOX } from "./geo.ts";
+import { inBounds, NUERNBERG_BBOX } from "./geo.ts";
 import { OFFER_ID_PATTERN } from "./ids.ts";
+import { isoWeekday } from "./time.ts";
 import { categoriesOf, TOPICS } from "./topics.ts";
 
 const kebab = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "kebab-case erwartet");
@@ -31,10 +32,7 @@ export const Venue = z.strictObject({
   district: z.string().optional(),
   ring: z.enum(["innen", "knapp-aussen", "aussen"]),
   geo: Geo,
-  /** Stufe 2 (ADR 0005): nächste Haltestellen für die Öffi-Fahrzeitmatrix. */
-  nearestStops: z
-    .array(z.strictObject({ stopId: z.string(), name: z.string(), walkMeters: z.number().nonnegative() }))
-    .optional(),
+  // `nearestStops` (ADR 0005) entfällt: nächste Halte sind ein abgeleiteter Wert (ADR 0011, Plan 0009 E12).
 });
 
 /** Liste ohne Dubletten */
@@ -170,6 +168,68 @@ export const OffersFile = z.strictObject({
 
 export const ProvidersFile = z.array(Provider);
 
+/** „08:30“ */
+const ClockTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "HH:MM erwartet");
+/** Bit 1 = Einsteigen erlaubt, Bit 2 = Aussteigen erlaubt (GTFS pickup_type/drop_off_type = 0) */
+const StopFlags = z.int().min(0).max(3);
+
+const TimetableTrip = z
+  .strictObject({
+    /** Kurzname der Linie („U1“, „36“), nur zur Fehlersuche */
+    route: z.string(),
+    /** Indizes in `stops` */
+    stops: z.array(z.int().nonnegative()).min(2),
+    /** je Halt [an, ab] in Sekunden ab Mitternacht des Stichtags; ab dem zweiten Wert als Differenz (≥ 0) */
+    times: z.array(z.int()),
+    flags: z.array(StopFlags),
+  })
+  .refine((t) => t.times.length === 2 * t.stops.length, { message: "times braucht 2 Werte je Halt", path: ["times"] })
+  .refine((t) => t.times.every((x) => x >= 0), { message: "Zeiten dürfen nicht rückwärts laufen", path: ["times"] })
+  .refine((t) => t.flags.length === t.stops.length, { message: "flags braucht 1 Wert je Halt", path: ["flags"] });
+
+/**
+ * Fahrplanauszug für die Wegzeit (Plan 0009, E4; ADR 0011): ein Referenz-Dienstag, Fahrten im Großraum,
+ * Abfahrtsfenster. Erzeugt von `pnpm pipeline oepnv` aus den VGN-Soll-Daten (CC BY-SA 3.0 DE).
+ */
+export const Timetable = z
+  .strictObject({
+    /** Namensnennung nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (Plan 0009, E3) */
+    source: z.strictObject({
+      attribution: z.string().min(1),
+      title: z.string().min(1),
+      url: z.url(),
+      download: z.url(),
+      license: z.string().min(1),
+      licenseUrl: z.url(),
+      /** Last-Modified des Feeds */
+      modified: Instant,
+      validFrom: IsoDate,
+      validTo: IsoDate,
+      fetchedAt: Instant,
+    }),
+    /** Referenz-Dienstag */
+    serviceDay: IsoDate,
+    /** Abfahrtsfenster */
+    window: z.strictObject({ from: ClockTime, to: ClockTime }),
+    /** Steige: [DHID, lat, lon] */
+    stops: z.array(z.tuple([z.string().min(1), z.number(), z.number()])),
+    trips: z.array(TimetableTrip),
+  })
+  .refine((t) => t.window.from < t.window.to, { message: "window.from muss vor window.to liegen", path: ["window"] })
+  .refine((t) => isoWeekday(t.serviceDay) === 2, { message: "Stichtag muss ein Dienstag sein", path: ["serviceDay"] })
+  .refine((t) => t.source.validFrom <= t.serviceDay && t.serviceDay <= t.source.validTo, {
+    message: "Stichtag muss im Gültigkeitszeitraum liegen",
+    path: ["serviceDay"],
+  })
+  .refine((t) => t.stops.every(([, lat, lon]) => inBounds({ lat, lon })), {
+    message: "alle Steige müssen in NUERNBERG_BBOX liegen",
+    path: ["stops"],
+  })
+  .refine((t) => t.trips.every((trip) => trip.stops.every((i) => i < t.stops.length)), {
+    message: "Steig-Index außerhalb von stops",
+    path: ["trips"],
+  });
+
 export type Venue = z.infer<typeof Venue>;
 export type Provider = z.infer<typeof Provider>;
 export type ProviderAge = z.infer<typeof ProviderAge>;
@@ -177,6 +237,7 @@ export type Session = z.infer<typeof Session>;
 export type AgeRange = z.infer<typeof AgeRange>;
 export type Offer = z.infer<typeof Offer>;
 export type OffersFile = z.infer<typeof OffersFile>;
+export type Timetable = z.infer<typeof Timetable>;
 export type Format = z.infer<typeof Format>;
 export type Registration = z.infer<typeof Registration>;
 export type Cost = z.infer<typeof Cost>;

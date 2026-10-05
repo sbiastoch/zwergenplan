@@ -1,6 +1,6 @@
 # ADR 0011 – Öffi-Wegzeit: Halt→Ort-Tabelle aus VGN-GTFS mit Bus
 
-Status: Entwurf (2026-10-05), wird mit Plan 0009 Schritt 2 angenommen. Ersetzt Teile von ADR 0005, ergänzt ADR 0002, ADR 0003 und ADR 0006. Details, Messungen und Begründungen stehen in Plan 0009.
+Status: angenommen (2026-10-05), Umsetzung mit Plan 0009. Ersetzt Teile von ADR 0005, ergänzt ADR 0002, ADR 0003 und ADR 0006. Details, Messungen und Begründungen stehen in Plan 0009.
 
 ## Kontext
 

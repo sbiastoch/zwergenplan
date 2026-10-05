@@ -12,7 +12,7 @@ Status: angenommen (2026-10-04), ID-Regel ergänzt durch ADR 0006
 - **Themen und Kategorien**: Die Daten speichern Themen aus einem geschlossenen Vokabular. Die 12 Filter-Kategorien werden über `TOPIC_CATEGORIES` abgeleitet. Merkmals-Themen (`mehrsprachig`, `vaeter`, `muetter`) haben keine Kategorie. Jedes Angebot braucht mindestens ein kategorisiertes Thema.
 - **Alter**: `age.minMonths/maxMonths` sind inklusiv und zählen vollendete Monate. Ohne Angabe gilt 0–36. Geprüft wird zum (ersten) Termin bzw. bei regelmäßigen Angeboten zu irgendeinem Termin.
 - **Verfügbarkeit** ist eine Momentaufnahme mit `checkedAt`. Die UI zeigt das Datum und einen Link zum Anbieter.
-- **Ort**: `geo` ist Pflicht (Bounding-Box Großraum Nürnberg). `nearestStops` ist für ADR 0005 vorbereitet.
+- **Ort**: `geo` ist Pflicht (Bounding-Box Großraum Nürnberg). `nearestStops` war für ADR 0005 vorbereitet und ist mit ADR 0011 gestrichen (abgeleiteter Wert, Plan 0009 E12).
 
 ## Konsequenzen
 - Ändert ein Anbieter einen Titel, entsteht eine neue ID. Das ist akzeptiert, denn neuer Titel heißt meist neues Angebot.

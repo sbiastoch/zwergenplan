@@ -233,30 +233,6 @@
                     "lat",
                     "lon"
                   ]
-                },
-                "nearestStops": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "stopId": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "walkMeters": {
-                        "type": "number",
-                        "minimum": 0
-                      }
-                    },
-                    "required": [
-                      "stopId",
-                      "name",
-                      "walkMeters"
-                    ],
-                    "additionalProperties": false
-                  }
                 }
               },
               "required": [
@@ -519,30 +495,6 @@
                     "lat",
                     "lon"
                   ]
-                },
-                "nearestStops": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "stopId": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "walkMeters": {
-                        "type": "number",
-                        "minimum": 0
-                      }
-                    },
-                    "required": [
-                      "stopId",
-                      "name",
-                      "walkMeters"
-                    ],
-                    "additionalProperties": false
-                  }
                 }
               },
               "required": [
@@ -809,30 +761,6 @@
                     "lat",
                     "lon"
                   ]
-                },
-                "nearestStops": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "stopId": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "walkMeters": {
-                        "type": "number",
-                        "minimum": 0
-                      }
-                    },
-                    "required": [
-                      "stopId",
-                      "name",
-                      "walkMeters"
-                    ],
-                    "additionalProperties": false
-                  }
                 }
               },
               "required": [

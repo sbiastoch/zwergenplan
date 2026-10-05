@@ -1,6 +1,6 @@
 # ADR 0005 – Öffi-Wegzeit über eine statische GTFS-Fahrzeitmatrix (Stufe 2)
 
-Status: angenommen, Umsetzung später (2026-10-04)
+Status: angenommen (2026-10-04), **teilweise ersetzt durch ADR 0011** (2026-10-05): Bus gehört dazu, Halt→Ort-Tabelle statt Halt→Halt-Matrix, Wartezeit zählt, kein `Venue.nearestStops`, kein „Haltestelle wählen“. Umsetzung mit Plan 0009.
 
 ## Kontext
 Bisher zeigt die Seite die Entfernung als Luftlinie ab dem GPS-Standort. Entscheidend ist aber die Fahrzeit mit den Öffis: Drei Stationen U-Bahn können „weit“ sein und trotzdem schnell. Live-Routing-APIs (VGN-EFA) aus dem Browser sind fragil (CORS, Rate-Limits) und verraten den Standort an Dritte.

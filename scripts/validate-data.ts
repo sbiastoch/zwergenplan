@@ -1,10 +1,11 @@
 /**
- * Prüft den Datenbestand (Schema + Invarianten).
+ * Prüft den Datenbestand (Schema + Invarianten) und den Fahrplanauszug für die Wegzeit (Plan 0009).
  *   --against-deployed   zusätzlich Plausibilität gegen den LIVE deployten Stand (ADR 0002)
  */
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
-import { dataSource, loadDataset } from "./lib/load-data.ts";
+import { dataSource, loadDataset, loadTimetable, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
+import { timetableWarnings } from "./transit/freshness.ts";
 
 const source = dataSource();
 const result = loadDataset(source);
@@ -25,10 +26,17 @@ if (process.argv.includes("--against-deployed")) {
   }
 }
 
-const { errors, warnings } = checkPlausibility(result.summary, deployed, {
-  fixture: source === "fixture",
-  now: new Date(),
-});
+const now = new Date();
+const fixture = source === "fixture";
+const plausibility = checkPlausibility(result.summary, deployed, { fixture, now });
+const timetable = loadTimetable(source);
+const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
+const errors = [...plausibility.errors, ...timetableCheck.errors];
+const warnings = [
+  ...plausibility.warnings,
+  ...timetableCheck.warnings,
+  ...(timetable.kind === "ok" ? timetableWarnings(timetable.timetable.source, now, { fixture }) : []),
+];
 for (const w of warnings) console.log(`::warning::${w}`);
 if (errors.length > 0) {
   console.error(`✗ Plausibilität:\n  ${errors.join("\n  ")}`);
@@ -36,5 +44,8 @@ if (errors.length > 0) {
 }
 console.log(
   `✓ Daten (${source}) gültig: ${result.summary.offers} Angebote, ${result.summary.providers} Anbieter` +
-    (deployed ? ` (deployt: ${deployed.offers})` : ""),
+    (deployed ? ` (deployt: ${deployed.offers})` : "") +
+    (timetable.kind === "ok"
+      ? `, Fahrplanauszug ${timetable.timetable.serviceDay} (${timetable.timetable.trips.length} Fahrten)`
+      : ""),
 );

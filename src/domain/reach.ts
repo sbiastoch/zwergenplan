@@ -23,7 +23,7 @@ export interface Origin {
 /** Wie weit ein Ort vom Startpunkt weg ist. Heute Luftlinie; mit ADR 0005 kommt { kind: "oepnv"; minutes; … } dazu. */
 export type Reach = { kind: "luftlinie"; meters: number };
 
-/** Ziel einer Entfernung. Mit ADR 0005 kommen `nearestStops` dazu. */
+/** Ziel einer Entfernung. Die Wegzeit (Plan 0009, ADR 0011) braucht nur die Koordinate. */
 export interface ReachTarget {
   geo: GeoPoint;
 }

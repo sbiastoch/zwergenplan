@@ -13,7 +13,9 @@
       "!pnpm-lock.yaml",
       "!tests/fixtures/pipeline/html",
       "!tests/fixtures/pipeline/api",
-      "!docs/design"
+      "!docs/design",
+      "!data/oepnv",
+      "!tests/fixtures/oepnv"
     ]
   },
   "formatter": {
@@ -79,6 +81,23 @@
               "options": {
                 "deniedGlobals": {
                   "fetch": "Netzzugriff gehört nach scripts/pipeline/io (Plan 0002)."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["scripts/transit/**", "!scripts/transit/**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "fetch": "scripts/transit ist reine Build-Logik ohne Netz (Plan 0009, E10)."
                 }
               }
             }
