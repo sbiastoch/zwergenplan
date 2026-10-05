@@ -1,17 +1,19 @@
 /*
- * Reduzierte Bewegung: keine Animation und keine Transition länger als 1 ms, Verzögerung eingerechnet
- * (geprüft von expectReducedMotion in e2e/mobile-ux.ts). Zuletzt importiert.
+ * Reduzierte Bewegung: keine Animation und keine Transition, auch keine von 0,01 ms (geprüft von
+ * expectReducedMotion in e2e/mobile-ux.ts, Schwelle 0 ms). Zuletzt importiert.
+ * `none` statt einer kurzen Dauer: Mit `none` entsteht kein Animations- bzw. Transitionsobjekt, das eine Engine
+ * erst abschließen muss. Eine 0,01-ms-Transition über `all` (Anfangswert von transition-property) schloss WebKit
+ * Sekunden später ab, Text stand so lange in der alten Farbe (Plan 0008, E1).
+ * Bedingung: Kein Code hört auf `animationend`/`transitionend`, und keine Animation hält mit `forwards` einen
+ * Endzustand. Wer das künftig tut, muss den Fall „reduzieren“ selbst behandeln, denn hier feuert kein Ereignis.
  */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     /* biome-ignore-start lint/complexity/noImportantStyles: reduced-motion muss alles übersteuern */
-    animation-duration: 0.01ms !important;
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0s !important;
+    animation: none !important;
+    transition: none !important;
     /* biome-ignore-end lint/complexity/noImportantStyles: - */
   }
 }

@@ -10,16 +10,18 @@ const MIN_TOUCH = 44;
 /** WCAG 2.2 AA (2.5.8) für Links im Fließtext. */
 const MIN_INLINE = 24;
 
-/** Höchstdauer einer Animation oder Transition bei reduzierter Bewegung (Dauer + Verzögerung). */
-const MAX_REDUCED_MS = 1;
+/**
+ * Höchstdauer einer Animation oder Transition bei reduzierter Bewegung (Dauer + Verzögerung): 0 ms. Auch 0,01 ms
+ * ist eine echte Transition, die WebKit erst Sekunden später abschloss (Plan 0008, E1); motion.css setzt `none`.
+ */
+const MAX_REDUCED_MS = 0;
 
 /**
  * Erst messen, wenn endliche Animationen (Einkleben, Plop, Aufklappen) durch sind: Mitten in
  * `scale(.98)` ist ein 44-px-Knopf 43 px groß.
- * Ursache, warum das trotz `expectReducedMotion` nötig bleibt: Nicht alle Gates emulieren
- * `prefers-reduced-motion` (z. B. der Smoke-Test mit echten Daten und die Fokusprüfung), dort laufen die
- * Animationen in voller Länge. Auch mit 0,01 ms endet eine Animation erst mit dem nächsten Frame, settle()
- * wartet genau diesen Frame ab. Endlos-Animationen (Wackeln im Leerzustand) zählen nicht.
+ * Mit `prefers-reduced-motion` gibt es keine Animationen mehr (motion.css: `animation: none`, Plan 0008, E1).
+ * settle() bleibt für die Läufe ohne Emulation (z. B. der Smoke-Test mit echten Daten und die Fokusprüfung), dort
+ * laufen die Animationen in voller Länge. Endlos-Animationen (Wackeln im Leerzustand) zählen nicht.
  */
 async function settle(page: Page) {
   await page.evaluate(() =>
@@ -115,10 +117,11 @@ export async function expectVisibleFocus(page: Page, maxTabs = 40) {
 }
 
 /**
- * Mit `prefers-reduced-motion: reduce` dauert keine Animation und keine Transition länger als 1 ms,
- * Verzögerung eingerechnet (docs/architecture.md, „Mobile-UX-Gates“). Geprüft werden die laufenden
- * Animationen (`document.getAnimations()`) und die berechneten Stile aller Elemente samt `::before`/`::after`,
- * damit auch erst später ausgelöste Bewegung (Hover, Aufklappen) auffällt. Aufrufer emulieren `reducedMotion`.
+ * Mit `prefers-reduced-motion: reduce` gibt es keine Animation und keine Transition, auch keine von 0,01 ms
+ * (Dauer + Verzögerung > 0 ms ist ein Verstoß; docs/architecture.md, „Mobile-UX-Gates“, Plan 0008, E1).
+ * Geprüft werden die laufenden Animationen (`document.getAnimations()`) und die berechneten Stile aller Elemente
+ * samt `::before`/`::after`, damit auch erst später ausgelöste Bewegung (Hover, Aufklappen) auffällt. Aufrufer
+ * emulieren `reducedMotion`.
  */
 export async function expectReducedMotion(page: Page) {
   const offenders = await page.evaluate((maxMs) => {
@@ -155,7 +158,7 @@ export async function expectReducedMotion(page: Page) {
     }
     return [...new Set(found)].slice(0, 10);
   }, MAX_REDUCED_MS);
-  expect(offenders, "Bewegung trotz prefers-reduced-motion (Dauer + Verzögerung > 1 ms)").toEqual([]);
+  expect(offenders, "Bewegung trotz prefers-reduced-motion (Dauer + Verzögerung > 0 ms)").toEqual([]);
 }
 
 /**
@@ -286,32 +289,66 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
         }
       }
 
+      /** Deckkraft einer berechneten Farbe (0 bei `transparent`, 1 ohne Alpha-Angabe) */
+      const alpha = (color: string) => {
+        if (color === "transparent") return 0;
+        const m = color.match(/\/\s*([\d.]+%?)\s*\)$/) ?? color.match(/^rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+%?)\)$/);
+        if (!m?.[1]) return 1;
+        return m[1].endsWith("%") ? px(m[1]) / 100 : px(m[1]);
+      };
+      const sides = ["Top", "Right", "Bottom", "Left"] as const;
+      /**
+       * Sichtbare Kante (Prüfung 2 und 3, eine Definition, damit beide nicht auseinanderlaufen): deckender
+       * Hintergrund (Alpha > 0), Hintergrundbild oder sichtbarer Rand.
+       */
+      const hasVisibleEdge = (s: CSSStyleDeclaration) =>
+        alpha(s.backgroundColor) > 0 ||
+        s.backgroundImage !== "none" ||
+        sides.some((side) => px(s[`border${side}Width`]) > 0 && s[`border${side}Style`] !== "none");
+
       // 2. Text ragt nicht heraus: seitlich über keinen Innenrand (Padding-Kante) eines Vorfahren, senkrecht nur
       //    bei Vorfahren, die abschneiden (Ober-/Unterlängen ragen bei Zeilenhöhe 1,08 legitim aus dem Zeilenkasten).
+      //    Präzisierung (Plan 0008, E2), eine bewusste Lockerung für gewollte Ausbrüche: Ein Vorfahr ohne sichtbare
+      //    Kante, der nicht abschneidet, zählt nicht, wenn zwischen ihm und dem Text schon ein Kasten mit sichtbarer
+      //    Kante liegt, in dessen Padding-Kante der Text steht. Dann steckt der Text sichtbar in seinem eigenen Kasten
+      //    (Tageszahl in button.day), und dass dieser Kasten per negativem Rand über einen unsichtbaren Layout-Kasten
+      //    hinausreicht (Woche bei 320 px über fieldset.plain), sieht niemand. Ohne sichtbaren Kasten dazwischen
+      //    zählt der unsichtbare Vorfahr weiter (Text läuft aus einer unsichtbaren Zelle in die Nachbarzelle, Etiketten
+      //    .stk). Sichtbare Kanten weiter oben zählen immer, den Seitenrand prüft expectNoHorizontalScroll.
+      //    Kanarienvögel in mobile-ux.spec.ts: „… aus seinem sichtbaren Kasten ragt“, „… aus einem unsichtbaren …“.
       for (const { text, parent } of texts) {
         const rects = rectsOf(text);
+        let inVisibleBox = false;
         for (let a: Element | null = parent; a && a !== document.documentElement; a = a.parentElement) {
           const s = getComputedStyle(a);
           // Ende am ersten Scroll-Container: Text außerhalb des sichtbaren Bereichs ist dort Absicht (.chips).
           if (s.overflowX === "auto" || s.overflowX === "scroll") break;
+          const visibleEdge = hasVisibleEdge(s);
+          const clips = s.overflowX !== "visible" || s.overflowY !== "visible";
+          // gewollter Ausbruch über einen unsichtbaren, nicht abschneidenden Kasten (E2, siehe oben)
+          const bleedOnly = inVisibleBox && !visibleEdge && !clips;
           // Inline-Kästen entstehen aus dem Text selbst, `contents` hat keinen Kasten.
-          if (s.display !== "inline" && s.display !== "contents") {
+          if (s.display !== "inline" && s.display !== "contents" && !bleedOnly) {
             const b = a.getBoundingClientRect();
             const left = b.left + px(s.borderLeftWidth);
             const right = b.right - px(s.borderRightWidth);
             const top = b.top + px(s.borderTopWidth);
             const bottom = b.bottom - px(s.borderBottomWidth);
             const clipsY = s.overflowY === "hidden" || s.overflowY === "clip";
+            let fits = true;
             for (const r of rects) {
               if (r.left < left - 1.5 || r.right > right + 1.5) {
                 found.push(`Text ragt aus ${name(a)}: „${short(text.data)}“ (${name(parent)})`);
+                fits = false;
                 break;
               }
               if (clipsY && (r.top < top - 1.5 || r.bottom > bottom + 1.5)) {
                 found.push(`Text abgeschnitten in ${name(a)}: „${short(text.data)}“ (${name(parent)})`);
+                fits = false;
                 break;
               }
             }
+            if (visibleEdge && fits) inVisibleBox = true;
           }
           // Nach dem ersten fest/absolut positionierten Vorfahren endet der Weg: Sein Bezug ist nicht der DOM-Vorfahr.
           if (s.position === "fixed" || s.position === "absolute") break;
@@ -320,13 +357,6 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
 
       // 3. Text bleibt innerhalb der Rundung des nächsten Vorfahren, dessen Rundung sichtbar ist (Hintergrund,
       //    Bild oder Rand). Radien je Ecke, `%` aufgelöst und nach CSS-Regel skaliert, Innenradius = außen − Rand.
-      const alpha = (color: string) => {
-        if (color === "transparent") return 0;
-        const m = color.match(/\/\s*([\d.]+%?)\s*\)$/) ?? color.match(/^rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+%?)\)$/);
-        if (!m?.[1]) return 1;
-        return m[1].endsWith("%") ? px(m[1]) / 100 : px(m[1]);
-      };
-      const sides = ["Top", "Right", "Bottom", "Left"] as const;
       const roundBox = (start: Element) => {
         for (let a: Element | null = start; a && a !== document.body; a = a.parentElement) {
           const s = getComputedStyle(a);
@@ -338,19 +368,19 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
             s.borderBottomLeftRadius,
           ];
           if (radii.every((r) => px(r) === 0)) continue;
-          const visible =
-            alpha(s.backgroundColor) > 0 ||
-            s.backgroundImage !== "none" ||
-            sides.some((side) => px(s[`border${side}Width`]) > 0 && s[`border${side}Style`] !== "none");
-          if (visible) return { el: a, s };
+          if (hasVisibleEdge(s)) return { el: a, s };
         }
         return undefined;
       };
       /**
        * Sichtbarer Bereich des nächsten senkrechten Scroll-Containers zwischen Text und gerundetem Kasten.
-       * Ausnahme mit Grund: Text, der dort ganz hinausgescrollt ist, ist unsichtbar und kann an keine Rundung
-       * stoßen (gescrolltes Filter-Sheet, Plan 0004: „Filter“ und „Art“ liegen dann über dem Sheet). Sichtbarer
-       * Text in der Rundung zählt weiter, auch im Scroll-Container (Test „Text-Gate erkennt Text in der Rundung“).
+       * Präzisierung mit Grund (Plan 0008, E3): Dort zählt nur eine Zeile, die ganz im sichtbaren Bereich liegt
+       * (Toleranz 1 px). Eine an der Ober- oder Unterkante angeschnittene Zeile steht da, weil gescrollt wurde, nicht
+       * wegen des Layouts; dass die Rundung des Sheets sie anschneidet, ist normales Scrollen (Filter-Sheet bei
+       * 320 px/200 %: „Kosten“, Plan 0004, H1). Kürzen auf den sichtbaren Teil reichte nicht: Bei 16 px Innenabstand
+       * liegt der Zeilenanfang an der Oberkante noch außerhalb der Ellipse eines 28-px-Radius. Im Ruhezustand
+       * (`scrollTop = 0`) ist jede Zeile in der Ecke ganz sichtbar und wird geprüft (Kanarienvogel „Text-Gate erkennt
+       * Text in der Rundung, auch im Scroll-Container des Sheets“).
        */
       const scrollViewport = (start: Element, stop: Element) => {
         for (let a: Element | null = start; a && a !== stop; a = a.parentElement) {
@@ -429,7 +459,7 @@ export async function expectTextFits(page: Page, { scale = 1, buttons = true }: 
           },
         ];
         outer: for (const r of rectsOf(text)) {
-          if (viewport && (r.bottom <= viewport.top || r.top >= viewport.bottom)) continue;
+          if (viewport && !(r.top >= viewport.top - 1 && r.bottom <= viewport.bottom + 1)) continue;
           for (const c of corners) {
             if (c.rx < 1 || c.ry < 1) continue;
             const x = c.sx < 0 ? r.left : r.right;
