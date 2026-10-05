@@ -5,12 +5,12 @@
  */
 import type { TransitTableFile } from "../domain/transit-types.ts";
 
-/** Zeitlimit für Abruf und Lesen der Antwort (E9) */
+/** Gemeinsames Zeitlimit für Tabelle (Abruf und Lesen) und Rechenlogik (E9) */
 export const TRANSIT_TIMEOUT_MS = 8000;
 
-/** Abhängigkeiten von `loadTransitTable`, wie `SiteEnv`: Im Unit-Test stehen hier Stubs. */
+/** Abhängigkeiten von `loadTransit`, wie `SiteEnv`: Im Unit-Test stehen hier Stubs. */
 export interface TransitEnv {
-  fetch: (url: string, init: { signal: AbortSignal }) => Promise<Response>;
+  fetch: (url: string, init: { signal: AbortSignal; cache: RequestCache }) => Promise<Response>;
   timeoutMs: number;
 }
 
@@ -20,16 +20,41 @@ const browserEnv = (): TransitEnv => ({
   timeoutMs: TRANSIT_TIMEOUT_MS,
 });
 
-/** Wirft bei Netzfehler, HTTP-Fehler, kaputtem JSON und nach dem Zeitlimit. */
-export async function loadTransitTable(env: TransitEnv = browserEnv()): Promise<TransitTableFile> {
+/** Ergebnis beider Ladewege; `undefined` heißt gescheitert, auch nach dem Zeitlimit. */
+export interface TransitLoad<L> {
+  logic: L | undefined;
+  file: TransitTableFile | undefined;
+}
+
+/**
+ * Lädt Tabelle und Rechenlogik (`loadLogic`, der Lazy-Chunk aus use-transit.ts) parallel, unter **einem**
+ * Zeitlimit: Hängt der Chunk, endet das Laden trotzdem (Arch-Review 0009, Befund 3). `retry` („Nochmal laden“)
+ * umgeht den HTTP-Cache, sonst käme eine veraltete `wegzeit.json` wieder aus dem Cache (Befund 2). Wirft nie.
+ */
+export async function loadTransit<L>(
+  loadLogic: () => Promise<L>,
+  retry: boolean,
+  env: TransitEnv = browserEnv(),
+): Promise<TransitLoad<L>> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(new Error("Zeitlimit")), env.timeoutMs);
-  try {
-    const res = await env.fetch(`${import.meta.env.BASE_URL}data/wegzeit.json`, { signal: controller.signal });
+  const { signal } = controller;
+  const expired = new Promise<undefined>((resolve) => signal.addEventListener("abort", () => resolve(undefined)));
+  const timer = setTimeout(() => controller.abort(), env.timeoutMs);
+  const table = async (): Promise<TransitTableFile> => {
+    const res = await env.fetch(`${import.meta.env.BASE_URL}data/wegzeit.json`, {
+      signal,
+      cache: retry ? "reload" : "default",
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     // Build-Artefakt ohne Zod im Client: `decodeTransitTable` prüft Version, Längen und Spalten (E8).
-    const file: TransitTableFile = await res.json();
-    return file;
+    return await res.json();
+  };
+  try {
+    const [logic, file] = await Promise.all([
+      Promise.race([loadLogic().catch(() => undefined), expired]),
+      table().catch(() => undefined),
+    ]);
+    return { logic, file };
   } finally {
     clearTimeout(timer);
   }

@@ -76,6 +76,20 @@ describe("transitReducer (Plan 0009, E9/E11)", () => {
     // ein späterer Erfolg setzt nichts zurück, was die Anzeige bräuchte
     expect(run(twice, { type: "want" }, { type: "loaded", attempt: 3, file: FILE, logic }).kind).toBe("bereit");
   });
+
+  // Arch-Review 0009, Befund 2: Sonst bliebe der Reducer „bereit“ und want() wirkungslos.
+  it("veraltete Tabelle → fehler; „Nochmal laden“ lädt neu", () => {
+    const stale = transitReducer(ready(), { type: "stale", attempt: 1 });
+    expect(stale).toEqual({ kind: "fehler", attempt: 1, chunkFailures: 0 });
+    expect(transitReducer(stale, { type: "want" })).toEqual({ kind: "laedt", attempt: 2, chunkFailures: 0 });
+  });
+
+  it("„veraltet“ zählt nur für die fertige Tabelle des laufenden Versuchs", () => {
+    const loading = initialTransitState(true);
+    expect(transitReducer(loading, { type: "stale", attempt: 1 })).toBe(loading);
+    const done = ready();
+    expect(transitReducer(done, { type: "stale", attempt: 7 })).toBe(done);
+  });
 });
 
 describe("resolveReach: Modus je Lage (E11)", () => {

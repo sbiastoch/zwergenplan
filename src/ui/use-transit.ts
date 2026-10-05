@@ -5,7 +5,7 @@
  * Der Startpunkt geht nur in `resolveReach` ein, nie in den Ladezustand.
  */
 import { useCallback, useEffect, useMemo, useReducer } from "react";
-import { loadTransitTable } from "../data/transit.ts";
+import { loadTransit } from "../data/transit.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
 import type { TransitSource, TransitTable, TransitTableFile } from "../domain/transit-types.ts";
 
@@ -46,7 +46,9 @@ export type TransitState =
 export type TransitAction =
   | { type: "want" }
   | { type: "loaded"; attempt: number; file: TransitTableFile; logic: TransitLogic }
-  | { type: "failed"; attempt: number; chunk: boolean };
+  | { type: "failed"; attempt: number; chunk: boolean }
+  /** Tabelle geladen, passt aber nicht zu den Orten der Seite (alte `wegzeit.json`, E8): wie ein Fehlschlag */
+  | { type: "stale"; attempt: number };
 
 /** Mit gespeichertem Stadtteil lädt die Tabelle gleich beim Start (E9, Auslöser 1). */
 export function initialTransitState(storedDistrict: boolean): TransitState {
@@ -67,12 +69,16 @@ export function transitReducer(state: TransitState, action: TransitAction): Tran
     case "failed":
       if (state.kind !== "laedt" || action.attempt !== attempt) return state;
       return { kind: "fehler", attempt, chunkFailures: chunkFailures + (action.chunk ? 1 : 0) };
+    case "stale":
+      // erst so wirkt „Nochmal laden“ (want() nur aus „fehler“), Arch-Review 0009, Befund 2
+      if (state.kind !== "bereit" || action.attempt !== attempt) return state;
+      return { kind: "fehler", attempt, chunkFailures };
   }
 }
 
 /**
  * Dekodierte Tabelle zu den Orten der Seite: `undefined`, solange Tabelle oder Orte fehlen; `null`, wenn sie
- * nicht passt (alte `wegzeit.json` aus dem HTTP-Cache, E8).
+ * nicht passt (alte `wegzeit.json` aus dem HTTP-Cache, E8). `useTransit` meldet `null` dem Reducer als `stale`.
  */
 export function decodeFor(
   state: TransitState,
@@ -131,21 +137,23 @@ export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<st
   useEffect(() => {
     if (attempt === 0) return;
     let live = true;
-    // Rechenlogik und Tabelle parallel; ein Fehlschlag der Logik zählt als Chunk-Fehler (M8).
-    void Promise.all([loadLogic().catch(() => undefined), loadTransitTable().catch(() => undefined)]).then(
-      ([logic, file]) => {
-        if (!live) return;
-        if (!logic) dispatch({ type: "failed", attempt, chunk: true });
-        else if (!file) dispatch({ type: "failed", attempt, chunk: false });
-        else dispatch({ type: "loaded", attempt, file, logic });
-      },
-    );
+    // Rechenlogik und Tabelle parallel, ein Zeitlimit für beide; ein Fehlschlag der Logik zählt als Chunk-Fehler
+    // (M8). Ab dem zweiten Versuch („Nochmal laden“) ohne HTTP-Cache.
+    void loadTransit(loadLogic, attempt > 1).then(({ logic, file }) => {
+      if (!live) return;
+      dispatch(logic && file ? { type: "loaded", attempt, file, logic } : { type: "failed", attempt, chunk: !logic });
+    });
     return () => {
       live = false;
     };
   }, [attempt]);
 
   const table = useMemo(() => decodeFor(state, placeKeys), [state, placeKeys]);
+  // Passt die Tabelle nicht, führt der Reducer das als Fehler; die Anzeige fällt schon jetzt zurück (resolveReach).
+  const loadedAttempt = state.attempt;
+  useEffect(() => {
+    if (table === null) dispatch({ type: "stale", attempt: loadedAttempt });
+  }, [table, loadedAttempt]);
   const { mode, reach } = useMemo(() => resolveReach(state, table, origin), [state, table, origin]);
   const want = useCallback(() => dispatch({ type: "want" }), []);
   return { mode, reach, source: table?.source, reloadPage: state.chunkFailures >= 2, want };

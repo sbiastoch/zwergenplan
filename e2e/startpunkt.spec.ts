@@ -274,6 +274,45 @@ test.describe("Rückfall auf die Luftlinie (E11)", () => {
   });
 });
 
+// Arch-Review 0009, Befund 2: Eine alte wegzeit.json (HTTP-Cache) passt nicht zu site.json. „Nochmal laden“ muss
+// dann wirklich neu laden, und zwar am HTTP-Cache vorbei, sonst käme dieselbe Datei wieder.
+test("Veraltete Tabelle: Hinweis, „Nochmal laden“ lädt ohne Cache neu und bringt die Minuten (E8, E11)", async ({
+  page,
+}) => {
+  await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+  // Protokolliert die Cache-Art jedes Abrufs der Tabelle (sessionStorage „e2e-wegzeit-cache“). Chromium zeigt den
+  // Header „no-cache“ bei aktivem Routing nicht, deshalb wird die Option des Aufrufs selbst beobachtet.
+  await page.addInitScript(() => {
+    const original = window.fetch;
+    window.fetch = (input, init) => {
+      if (String(input).endsWith("/data/wegzeit.json")) {
+        const seen = sessionStorage.getItem("e2e-wegzeit-cache");
+        sessionStorage.setItem("e2e-wegzeit-cache", `${seen ? `${seen} ` : ""}${init?.cache}`);
+      }
+      return original(input, init);
+    };
+  });
+  await page.route(TABLE, async (route) => {
+    const response = await route.fetch();
+    const file = await response.json();
+    // ein Ort, den site.json nicht mehr kennt: Die Spalte für einen Ort der Seite fehlt
+    file.places[0] = "0,0";
+    await route.fulfill({ response, json: file });
+  });
+  await ready(page, "./?wegzeit=20");
+  await expect(page.getByText("„bis 20 Min.“ wirkt gerade nicht: Wegzeiten nicht geladen.")).toBeVisible();
+  await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+  await expect(offers(page)).toHaveCount(8);
+
+  await page.unroute(TABLE);
+  await page.getByRole("button", { name: "Nochmal laden" }).click();
+  await expect(offers(page)).toHaveCount(6);
+  // erster Abruf mit dem HTTP-Cache, der zweite an ihm vorbei
+  expect(await page.evaluate(() => sessionStorage.getItem("e2e-wegzeit-cache"))).toBe("default reload");
+  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expect(page.getByText(/wirkt gerade nicht/)).toHaveCount(0);
+});
+
 test.describe("Rechenlogik nicht ladbar (M8)", () => {
   test.use({
     allowedConsoleErrors: [
