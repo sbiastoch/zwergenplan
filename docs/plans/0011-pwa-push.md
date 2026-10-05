@@ -209,7 +209,7 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
   | Platzhalter für `NewsBlock`, „Push an?“ → `import("./push-start.ts")` | 2 | 0,07 kB |
   | **Summe** | | **≈ 0,45 kB** |
 
-- **Entscheidungspunkt** nach Schritt 3 und nach Schritt 10: Ziel `JS (initial)` ≤ X + 0,5 kB und ≤ 89,5 kB.
+- **Entscheidungspunkt** nach Schritt 3 und nach Schritt 10: Ziel `JS (initial)` ≤ X + 0,5 kB und ≤ 89,5 kB. (Seit dem Arch-Review Stufe 1: Die Budget-Entscheidung für Stufe 2 fällt **vor Schritt 9**, siehe „Stufe 2“ unter „Schritte“.)
   - Liegt es darüber, ist der erste Kandidat zum Auslagern der Offline-Text samt `stale`-Zweig: Er wandert nach `pwa.ts`, das die Statuszeile per Callback setzt (≈ 0,08 kB).
   - Der zweite Kandidat ist der Platzhalter von `NewsBlock`: Statt seiner hält die Liste bei `neu` kurz zurück (gleiche Mechanik wie `ListPending`, Plan 0009).
   - Über 90 kB ist Schluss: kein Anheben des Budgets. Dann gibt es eine Rückfrage an den Nutzer, welche Start-Funktion stattdessen lazy wird.
@@ -280,7 +280,7 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
   - **läuft schon als App** (`display-mode: standalone` bzw. `navigator.standalone`): „Läuft als App.“ Ab Stufe 2 steht hier der Push-Schalter.
   - **Browser bietet Installation an** (`beforeinstallprompt` gemerkt): Knopf „Zum Startbildschirm hinzufügen“ (≥ 44 px). Ist das Event verloren gegangen (E5), steht auf Android stattdessen „Im Browser-Menü ‚App installieren‘ wählen“.
   - **iPhone/iPad in Safari:** „Teilen-Symbol → ‚Zum Home-Bildschirm‘“ mit dem Teilen-Symbol als Inline-Icon.
-    - Dazu der Satz „Die App startet leer: Alter und Merkliste dort noch einmal eintragen.“ (Spike h: Die Home-Bildschirm-App hat einen eigenen Speicher.)
+    - Dazu der Satz „Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.“ (Spike h: Die Home-Bildschirm-App hat einen eigenen Speicher.)
   - **sonst:** Der Abschnitt ist ausgeblendet.
 - Die Erkennung von iOS steckt in `src/data/pwa.ts` (`navigator.userAgent`, `maxTouchPoints` für iPadOS) und ist als heuristisch dokumentiert. Fällt sie falsch aus, sieht man nur einen Hilfetext.
   - **Keine Versionsprüfung über den UA.** iOS 26 meldet dort eingefroren `iPhone OS 18_7`, die echte Version steht nur in `Version/26.x` (Spike). Ob Push geht, entscheidet die Feature-Erkennung in `pushSupport()` (E12), nicht die Version.
@@ -583,6 +583,11 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 
 **Stufe 2** (erst nach Abnahme von Stufe 1 und Spike)
 
+**Vorab, vor Schritt 9: Start-Budget für Stufe 2 entscheiden** (verschoben aus E5, Arch-Review Stufe 1, H12).
+- Ausgangslage: Stufe 1 endet bei 91,34 kB (Ziel 91,40 kB, Budget 92 kB). Plan 0012 bringt parallel etwa +0,5 kB Start-JS mit; zusammen rund 91,9 kB.
+- Stufe 2 schätzt ≈ 0,10 kB im Start (Flag `neu`, Platzhalter `NewsBlock`, „Push an?“). Das passt nicht ohne Gegenmaßnahme.
+- Zu entscheiden (Rückfrage an den Nutzer, kein Anheben ohne ADR): welche Start-Funktion lazy wird. Kandidaten aus E5: der Platzhalter von `NewsBlock` (Liste hält bei `neu` zurück wie `ListPending`); weitere nach Messung auf dem dann aktuellen `main`.
+
 7. **Infrastruktur** (Nutzer-Schritte, Anleitung hier):
    - Cloudflare-Konto, `pnpm exec wrangler login`, KV-Namespace anlegen (ID in `push-worker/wrangler.toml`);
    - VAPID-Schlüssel erzeugen (`pnpm exec web-push generate-vapid-keys`);
@@ -677,7 +682,7 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
   - **Abweichung (Lazy-Kette):** `AppSection` importiert `pwa.ts` nicht statisch, der Lader reicht `install` als Prop herein. Gemessen: Mit statischem Import schreibt Vite den Preload-Helfer `__vite__mapDeps` in den Einstieg (91,47 kB, über dem Ziel); mit dem Prop 91,37 kB. Dazu `setLoad({ kind: "ready", ...site })` statt Feldern (−11 B).
   - E2E `e2e/installieren.spec.ts`: „läuft als App“, „Browser bietet an“ (Tipp ruft `prompt()`, danach „Installiert“), „iPhone“ (nur `iphone-15`), „ohne Angebot“ (Android: Browser-Menü, Desktop: kein Abschnitt). Je sichtbarer Zustand `expectMobileUx` hell und dunkel und 320 px/200 % als eigene Tests, in allen fünf Geräteprojekten grün. **Kanarienvögel:** `prompt()` nicht gerufen → rot; `display-mode` ignoriert → rot.
   - Kanarienvögel der Regeln: `KidSheet` importiert `AppSection` statisch → `app-extras-ui-only-lazy` und `app-extras-ui-entry-only` rot; dynamisch aus `KidSheet` → `app-extras-ui-entry-only` rot; Typ-Import von `pwa.ts` aus `KidSheet` → `app-data-only-lazy` rot.
-  - **Entscheidungspunkt E5 (nach Schritt 4, Stand Stufe 1):** `JS (initial)` **91,37 kB** = X + 0,47 kB, unter dem Ziel 91,40 kB und dem Budget 92 kB. `App-Extras JS (lazy)` 2,13 kB (Budget 5 kB), `Service Worker` 1,48 kB (Budget 8 kB). Für Stufe 2 bleiben bis zum Ziel nur 0,03 kB: Die Schätzung dort (Flag `neu`, Platzhalter `NewsBlock`, „Push an?“, ≈ 0,10 kB) passt nicht ohne die benannten Kandidaten zum Auslagern. Das ist bei Schritt 10 zu entscheiden.
+  - **Entscheidungspunkt E5 (nach Schritt 4, Stand Stufe 1):** `JS (initial)` **91,37 kB** = X + 0,47 kB, unter dem Ziel 91,40 kB und dem Budget 92 kB. `App-Extras JS (lazy)` 2,13 kB (Budget 5 kB), `Service Worker` 1,48 kB (Budget 8 kB). Für Stufe 2 bleiben bis zum Ziel nur 0,03 kB: Die Schätzung dort (Flag `neu`, Platzhalter `NewsBlock`, „Push an?“, ≈ 0,10 kB) passt nicht ohne die benannten Kandidaten zum Auslagern. Entschieden wird vor Schritt 9 (siehe „Stufe 2“ unter „Schritte“).
   - **Erster voller `pnpm check` (8 Worker, alle Projekte, Rechner mit Last 23–56 durch parallele Sitzungen): 6 rot.** Ursachen:
     - `installieren.spec.ts` (3 × `iphone-15`): hell, dunkel und 320 px/200 % in einem Test lagen in WebKit bei ≈ 19 s und unter Last über dem Timeout von 30 s. Behoben wie in `mobile-ux.spec.ts`: je Zustand eigene Tests für hell, dunkel und 320 px/200 % (je ≈ 13 s). Die Kanarienvögel (`prompt()` fehlt, `display-mode` ignoriert) wurden auf der neuen Struktur erneut rot gesehen.
     - `perf.spec.ts` LCP (`pixel-7` 2764 ms, `android-klein` 4524 ms): allein mit einem Worker 1436 ms bzw. 2064 ms, grün. Der Service Worker ist dort blockiert, der PWA-Kern lädt nach `load`; die Messung zeigt die Konkurrenz der Worker, nicht die Seite (vgl. Plan 0003, E8). Keine Schwelle geändert.
@@ -691,6 +696,31 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 
     Kein messbarer Unterschied (≤ 1,5 %, im Rauschen), kein Lauf ≥ 2500 ms. Das Rot im vollen Lauf kommt von der Last (8 Worker, WebKit parallel, Rechner mit Last bis 56 durch andere Sitzungen); in CI läuft E2E geshardet mit 2 Workern (Plan 0013).
 - **2026-10-05, Stufe 1, Schritt 5 (Doku):** `docs/architecture.md` (Schicht `src/sw/`, Absätze „Service Worker“ und „App-Extras“, Ausnahme im Absatz Wegzeit, Biome-Globals, E2E mit Service Worker), README („Als App installieren“, Notausgang), ADR 0013 angenommen.
+
+## Arch-Review (Stufe 1) – Verdict: Freigabe mit Änderungen → eingearbeitet (2026-10-05)
+
+Alle Befunde übernommen außer Finding 4 und der Zusammenführung mit Plan 0012 (`linien.json` in `routes.ts`, `failed`-Zweig im Reducer, Frische-Test mit Linien): Die macht der Orchestrator bei der Integration, sobald 0012 auf `main` ist.
+
+- **B1 (Blocker) `networkKeeping`:** `res.clone()` kam erst nach `await caches.open()`. Da hatte `respondWith` den Body schon gelesen, `clone()` warf, `.catch` schluckte es: `wegzeit.json` landete nie in `zp-data`, `site.json` blieb auf dem Stand des Installs.
+  - Behoben: Kopie synchron mit der Antwort, `waitUntil` sofort (auch wenn `site()` per Zeitlimit die Kopie liefert).
+  - Neue E2E in `pwa.spec.ts`: (a) mit gespeichertem Stadtteil installieren, online neu laden, offline neu laden → „Wegzeit ab Gostenhof mit Bus & Bahn“; (b) nach einem zweiten Online-Laden enthält `zp-data` die frische `site.json` (die Kopie vom Install wird vorher durch eine erkennbar alte ersetzt).
+  - **Kanarienvogel:** Beide Tests liefen zuerst gegen den alten Code: (a) zeigte „Entfernung als Luftlinie … Wegzeiten gerade nicht verfügbar“, (b) behielt „alt“. Beide rot, mit dem Fix grün.
+- **H2 Gates für „menue“ und „installiert“:** `installieren.spec.ts` prüft jetzt alle fünf sichtbaren Zustände je hell, dunkel und 320 px/200 % (`menue` nur in den Android-Projekten, `ios` nur in `iphone-15`). `mobile-ux.spec.ts` („kind-sheet“) wartet auf `.app-pending` = 0.
+  - **Befund dabei (echter Fehler):** Nach dem Tipp auf „Zum Startbildschirm hinzufügen“ verschwand der Knopf mit dem Fokus, der Fokus fiel im Modal auf `<body>`. Jetzt geht er auf die Zeile „Installiert …“ (`tabIndex={-1}`, `focus({ preventScroll: true })`). Test „… danach ‚Installiert‘ mit Fokus“, Kanarienvogel: ohne `focus()` rot.
+  - **Befund dabei (Test):** Unter Last klickte Playwright, während das Sheet noch einfuhr (0,38 s), und scrollte dabei das Sheet selbst (`overflow: hidden`). Die Gates meldeten dann „Dein Zwerg“ in der Rundung. Ein Finger kann das nicht; `focus()` ohne `preventScroll` aber schon. Die Specs warten deshalb vor dem Tipp auf das Ende der Öffnungs-Animation. Danach 3 × wiederholt mit 6 Workern alle grün (159 Tests).
+- **H3 Notausgang:** statt „`return;` in `startPwa`“ (scheiterte an Biome `noUnreachable` und den E2E) ein Schalter zur Build-Zeit: `ZWERGENPLAN_SW=aus` setzt `__SW_OFF__` (die Seite registriert nicht) und baut `src/sw/kill.ts` als `sw.js`. Die Logik steht rein in `src/sw/retire.ts` (Unit-Test, in `coverage.include`, „Typen SW“, knip-Entry). `pwa.spec.ts` und der Smoke „mit Service Worker“ überspringen sich mit Begründung. Einmal im Browser durchgespielt (Skript in `e2e/.artifacts/`, nicht committet): normaler Build installiert, Kill-Build ausgetauscht, Neuladen → Controller weg, keine Registrierung, keine `zp-*`-Caches, auch nach erneutem Laden nicht. README beschreibt den Weg über `env` in `ci.yml`.
+- **H5 `stale` trotz Netz:** Nach dem 5-s-Zeitlimit kommt die Kopie, obwohl das Gerät online ist, und `online` folgt nie. `start()` plant dann einmal nach 30 s (`STALE_RETRY_MS`) einen Frische-Anlass; ein früherer Anlass oder das Aufräumen stoppt ihn. Unit-Tests, Kanarienvogel: ohne den Timer rot.
+- **H6 `startChunks`:** jetzt eine Liste, jedes Muster muss einen Chunk treffen, sonst wirft der Build. Unit-Test; Kanarienvogel: umbenanntes Muster in `vite.config.ts` → „vite-sw: kein Chunk passt zu …“.
+- **H7 Export-Code im Precache:** `src/domain/ics.ts` steht in `startChunks`. Damit entfallen die erlaubten Konsolenfehler in `pwa.spec.ts` ganz.
+- **H8:** Test 5 (ICS offline) steht außerhalb jedes `describe` mit erlaubten Konsolenfehlern (es gibt keine mehr).
+- **H9:** `app-data-only-lazy` gilt auch für `src/main.tsx`. Kanarienvogel: `main.tsx` importiert `pwa.ts` statisch → rot.
+- **H10 später `controllerchange`:** Kommt der Wechsel erst nach 10 s, merkt sich `watchFreshness` das und lädt beim nächsten Sichtbarwerden neu, nie mitten in der Bedienung. Unit-Test; Kanarienvogel: ohne das Neuladen rot.
+- **H11 Text:** „Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.“ einheitlich in `src/domain/pwa.ts`, README und E7.
+- **H12 Start-Budget:** Offline-Text und `stale`-Zweig liegen jetzt im PWA-Kern (`offlineNote`, `ICS_OFFLINE` in `src/data/pwa.ts`, Datum per `Intl` in Berlin). `loadSiteData` liefert wieder nur `SiteData`; `lastSiteLoad()` trägt `stale` und `generatedAt`. Die App hält nur eine Zusatzzeile `pwaNote`, die der Kern setzt.
+  - Folge: Die Zeile „Offline – Stand vom …“ erscheint erst nach `load` (offline ein kleiner Sprung, kein Gate betroffen, CLS wird offline nicht gemessen).
+  - Gemessen: **91,37 kB → 91,34 kB** (−33 B). Ein gemeinsamer `import()` für Start und Abschnitt (`loadPwa` in `pwa-start.ts`) brachte +3 B und wurde verworfen. Der Rest im Start ist der Lader des Abschnitts (≈ 0,16 kB) und der PWA-Start samt Frische-Callback (≈ 0,15 kB); weiter ginge es nur, indem Funktionen wegfallen.
+  - Die Budget-Entscheidung für Stufe 2 steht jetzt vor Schritt 9 (siehe „Schritte“).
+- Gates nach dem Review: `pnpm check:fast` grün, `pnpm size` grün (Chunk-Wächter, `JS (initial)` 91,34 kB, `App-Extras JS (lazy)` 2,48 kB, `Service Worker` 1,54 kB). Gezielt gelaufen: Chromium `pwa`, `mobile-ux`, `startpunkt`, `theme` (651 grün), `installieren` 3 × mit 6 Workern (159 grün), WebKit `installieren` und `mobile-ux`-Kind-Sheet (144 grün), Smoke „mit Service Worker“ grün.
 
 ## Akzeptanzkriterien
 

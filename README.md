@@ -21,31 +21,23 @@ Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnber
 Der Zwergenplan ist eine installierbare Web-App (Plan 0011, ADR 0013). Offline öffnet er mit dem zuletzt geladenen Stand.
 
 - **Android (Chrome):** Im Kind-Sheet („Dein Zwerg“) unter „Als App“ auf „Zum Startbildschirm hinzufügen“ tippen, oder im Browser-Menü „App installieren“ wählen.
-- **iPhone/iPad (Safari):** Teilen-Symbol, dann „Zum Home-Bildschirm“. Die App hat dort einen eigenen Speicher: Alter, Merkliste und Stadtteil einmal neu eintragen.
+- **iPhone/iPad (Safari):** Teilen-Symbol, dann „Zum Home-Bildschirm“. Die App hat dort einen eigenen Speicher (Spike h). Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.
 - **Desktop (Chrome, Edge):** Symbol „Installieren“ in der Adressleiste.
 
 Icons entstehen aus `design/icon.svg` mit `node scripts/icons.ts` (die PNGs in `public/icons/` werden committet).
 
 ### Notausgang: Service Worker abmelden
 
-Hält ein Service Worker einen kaputten Stand fest, hilft ein Deploy mit einem `sw.js`, der sich selbst abmeldet. Zwei Änderungen, beide vorübergehend:
+Hält ein Service Worker einen kaputten Stand fest, hilft ein Deploy mit dem Schalter `ZWERGENPLAN_SW=aus` (Plan 0011, Arch-Review Stufe 1). Er wirkt zur Build-Zeit:
 
-1. In `src/data/pwa-start.ts` die Registrierung abschalten (erste Zeile von `startPwa`: `return;`). Sonst registriert jede Seite den Notausgang neu, und mit dem Neuladen unten entstünde eine Schleife.
-2. In `src/sw/sw.ts` alles ersetzen durch:
+- Statt `src/sw/sw.ts` wird `src/sw/kill.ts` zu `sw.js` gebaut. Der neue Service Worker übernimmt sofort, löscht die eigenen Caches (`zp-*`), meldet sich ab und lädt offene Fenster neu (`src/sw/retire.ts`, Unit-Test, „Typen SW“).
+- Die Seite registriert keinen Service Worker mehr (`__SW_OFF__`), es gibt also keine Schleife.
+- `e2e/pwa.spec.ts` und der Smoke „mit Service Worker“ überspringen sich bei gesetztem Schalter.
 
-```ts
-declare const self: ServiceWorkerGlobalScope;
-self.addEventListener("install", () => void self.skipWaiting());
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    (async () => {
-      for (const name of await caches.keys()) await caches.delete(name);
-      await self.registration.unregister();
-      for (const client of await self.clients.matchAll({ type: "window" })) await client.navigate(client.url);
-    })(),
-  );
-});
-export {};
-```
+So geht es:
 
-Der Browser prüft `sw.js` bei Navigationen auf eine neue Version, spätestens nach 24 Stunden am HTTP-Cache vorbei. Danach läuft die Seite ohne Service Worker, bis der reparierte Stand mit wieder eingeschalteter Registrierung deployt ist. Die Gates gelten auch für diesen Deploy; die E2E-Prüfungen mit Service Worker (`e2e/pwa.spec.ts`) werden dabei rot und brauchen eine schriftliche Begründung im Commit.
+1. In `.github/workflows/ci.yml` auf Ebene des Workflows `env: ZWERGENPLAN_SW: aus` setzen (gilt für Build und Tests), committen, CI grün, Deploy.
+2. Der Browser prüft `sw.js` bei Navigationen auf eine neue Version, spätestens nach 24 Stunden am HTTP-Cache vorbei. Danach läuft die Seite ohne Service Worker.
+3. Nach der Reparatur den Schalter wieder entfernen und deployen.
+
+Lokal ausprobieren: `ZWERGENPLAN_SW=aus pnpm build`, dann enthält `dist/sw.js` den Notausgang.

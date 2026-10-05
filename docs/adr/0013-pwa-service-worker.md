@@ -41,4 +41,8 @@ Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt 
 - Umgesetzt mit zwei Präzisierungen (Plan 0011, „Umsetzung“):
   - Die Precache-Liste enthält zusätzlich den PWA-Kern (`assets/app/pwa-*.js`). Jeder Start lädt ihn nach `load`; ohne ihn liefen offline weder die Frische (Punkt 7) noch der ICS-Hinweis (Punkt 8).
   - Der Abschnitt „Als App“ bekommt den Installationszustand vom Lader als Prop, statt `src/data/pwa.ts` statisch zu importieren. Ein statischer Import zwischen zwei Lazy-Chunks lässt Vite einen Preload-Helfer in den Einstieg schreiben (+0,11 kB Start-JS).
-- Gemessen (Stand Umsetzung): Start-JS 91,37 kB statt 90,90 kB (+0,47 kB, Ziel ≤ 91,40 kB), `Service Worker` 1,5 kB, `App-Extras JS (lazy)` 2,1 kB.
+- Nach dem Arch-Review (Plan 0011, „Arch-Review (Stufe 1)“):
+  - Die Precache-Liste enthält auch den Export-Code (jeder Start lädt ihn im Leerlauf vor).
+  - Text und Zweig der Zeile „Offline – Stand vom …“ liegen im PWA-Kern statt im Start-Bundle. Die Zeile erscheint erst nach `load`.
+  - Notausgang zur Build-Zeit (`ZWERGENPLAN_SW=aus`): ein selbst abmeldender Service Worker statt einer Anleitung zum Umschreiben.
+- Gemessen (Stand nach dem Arch-Review): Start-JS 91,34 kB statt 90,90 kB (+0,44 kB, Ziel ≤ 91,40 kB), `Service Worker` 1,5 kB, `App-Extras JS (lazy)` 2,5 kB.
