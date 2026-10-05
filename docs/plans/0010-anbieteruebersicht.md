@@ -131,24 +131,41 @@ Typische Fragen:
 |---|---|---|---|---|---|
 | 320 hochkant, 100 % | 94,7 px | 71 px < 73,6 → nur Icons | Rand 6 px → **73 px** | 68 px | Labels ✓ |
 | 360 hochkant | 108 | 81 | 82,5 | 68 | Labels ✓ |
-| 390 hochkant | 118 | 88,5 | 90 | 68 | Labels ✓ |
-| 412 hochkant | 125 | 94 | 95,8 | 68 | Labels ✓ |
-| 412 hochkant, 200 % | 125 < 147 → nur Icons | 94 | 95,8 | 136 | nur Icons, wie heute |
+| 390 hochkant | 118 | 88,5 | 89,6 | 68 | Labels ✓ |
+| 412 hochkant | 125 | 94 | 94,9 | 68 | Labels ✓ |
+| 412 hochkant, 125 % | 125 | 94 | 94,9 | 85 | Labels ✓ (Label ≈ 81 px) |
+| 412 hochkant, 150–200 % | 125 < 147 → nur Icons | 94 | 94,9 | 102–136 | nur Icons, wie heute |
 | Desktop 40 rem, 200 % | 201 | 151 | 151 | 136 | Labels ✓ |
-| kompakt 568×320, 100 % | 177 | 133 | 133 | 68 | Icon + Label + Badge nebeneinander: 24 + 6 + 65 + 6 + 22 = 123 ✓ |
-| kompakt 568×320, 200 % | 177 | 133 | 133 | 136 | nur Icons, Badge daneben ✓ |
+| kompakt 568×320, 100 % | 177 | 133 | 133 | eigene Schwelle 128 | Icon + Label + Badge: 24 + 6 + 65 + 6 + 22 = 123 ✓ |
+| kompakt 568×320, 125 % | 177 | 133 | 133 | eigene Schwelle 145 | nur Icons (ohne eigene Schwelle bräuchte es 24 + 6 + 81 + 6 + 27 ≈ 144 > 133) |
+| kompakt 568×320, 150–200 % | 177 | 133 | 133 | eigene Schwelle 162–188 | nur Icons, Badge daneben ✓ |
+
+Rechenweg zu 412 px: Leiste 396 px, Rand `2.5 · 4,12 − 2 = 8,3` px, Spalte `(396 − 16,6) / 4 = 94,9` px.
 
 CSS-Änderungen (Startwerte, entscheiden tun Text-Gate und `layout.spec.ts`):
 - `.tabs`: `grid-template-columns: repeat(4, minmax(0, 1fr))`, `padding: 6px clamp(4px, 2.5vw - 2px, 10px)` (bei 320 px 6 px Rand, ab 480 px 10 px).
 - `.tab`: `font-size: 0.75rem` (12 statt 13 px, im Rahmen üblicher Tab-Leisten), `@container (width < 4.25rem)` statt `4.6rem`. Die Schwelle ist das neue längste Label (4,06 rem) plus 0,2 rem Reserve, in `rem`, damit sie mit der Schriftgröße wandert (architecture.md: keine Viewport-Media-Queries für Schriftgrößen-Umschaltungen).
 - Der Daumen ist `calc((100% - 2 · Rand) / 4)` breit, neu ist die Klasse `at-3`. Der Rand kommt als Custom Property `--tabs-pad`, die auch `padding` setzt. Im Daumen-Hintergrund gilt `inset: 0 clamp(2px, 2.5vw - 6px, 10px)`: Bei 320 px bleibt die weiße Pille ≥ 67 px breit, also breiter als das aktive Label.
-- **Badge hochkant:** Mit Label wie heute (`left: calc(50% + 8px)`). Bei 73 px Spalte endet es bei 66,5 px. Im Nur-Icon-Zustand (gleiche Container-Query) gilt `left: calc(50% + 4px)`, damit ein 200-%-Badge (ca. 31 px) in der eigenen Spalte bleibt (36,5 + 4 + 31 = 71,5 ≤ 73). Es überdeckt die Icon-Ecke, wie hochkant schon heute.
+- **Badge hochkant:** Mit Label wie heute (`left: calc(50% + 8px)`). Bei 73 px Spalte endet ein einstelliges Badge bei 66,5 px.
+- **Badge im Nur-Icon-Zustand** (gleiche Container-Query, also ab 125–200 % je nach Breite):
+  - Das Badge kann zweistellig werden (≥ 10 gemerkt). Bei 200 % ist es dann ca. 41 px breit: Schrift 24 px, zwei Ziffern ≈ 29 px, Innenabstand 12 px.
+  - `left: calc(50% + 4px)` ragte dann aus der Spalte (36,5 + 4 + 41 > 73).
+  - Review 2 schlug `right: 2px` vor. Das hält die Spalte ein, verdeckt das 24-px-Icon aber fast vollständig: Das Badge reicht von 31 bis 71 px, das Icon liegt bei 24,5–48,5 px, frei blieben 6,5 px.
+  - **Entschieden:** Im Nur-Icon-Zustand steht das Badge **im Fluss rechts neben dem Icon** (`.tab` als Zeile, `gap: 4px`), wie in der kompakten Querleiste bei 200 %. Platz: 24 + 4 + 41 = 69 ≤ 73 px. Das Icon bleibt frei und ist um ca. 22 px aus der Mitte versetzt.
+  - Ergibt der Browser-Review, dass der Versatz schlechter aussieht als die Überdeckung, gilt `right: 2px`. Die Tests unten gelten für beide Varianten: Badge in der eigenen Spalte und in der Leiste.
 - **Seitenleiste quer:** Mit vier Tabs und dem Badge unter dem Label (Plan 0008, E8) wäre sie bei 200 % 4 · 88 + 20 = 372 px hoch. Das passt nicht in 360 px (z. B. 740×360, 863×360). Darum:
   - Label und Badge teilen sich in der Seitenleiste die zweite Zeile (`.tab` als Grid: Icon über beide Spalten, darunter Label und Badge mit 2 px Abstand). Es gibt keine Markup-Änderung. Das ändert die Seitenleisten-Variante aus Plan 0008, E8, deren Bedingung (keine Überschneidung) bleibt.
-  - Zeilenhöhe: 100 % max(56, 24 + 2 + 22) = 56 px, Leiste 4 · 56 + 20 = **244 px**; 200 % 24 + 2 + 31 ≈ 57 px, Leiste ≈ **248 px**. Beides passt in 320 bzw. 360 px.
-  - Breite: 6,5 rem lassen innen 92 px, „Merkliste“ (65) + 2 + Badge (22) = 89 px. Das ist zu knapp. Darum wird die Seitenleiste **7 rem** breit (innen 100 px; bei 200 % 212 px gegen 130 + 2 + 31 = 163 px), Body `padding-left: 8rem`. Die Inhaltsspalte verliert quer 8 px.
+  - **Zeilenhöhe, gerechnet mit `line-height: 1.4`** (`base.css`) und dem Badge (`min-height: 22px`, `padding: 1px 6px`, Schrift 0,75 rem):
+    - 100 %: Label 12 · 1,4 = 16,8 px, Badge max(22, 16,8 + 2) = 22 px, Zeile max(56, 24 + 2 + 22) = **56 px**, Leiste 4 · 56 + 20 = **244 px**.
+    - 200 %: Label 24 · 1,4 = 33,6 px, Badge 33,6 + 2 = **35,6 px**, Zeile 24 + 2 + 35,6 = 61,6 px, Leiste 4 · 61,6 + 20 ≈ **266 px**.
+  - **Kriterium:** Die Leiste liegt vollständig im Viewport, mit mindestens **8 px Rand** oben und unten. Bei 360 px Höhe bleiben 47 px je Seite. Reicht es auf einem Gerät nicht, bekommen Label und Badge in der Seitenleiste `line-height: 1.2`. Das spart bei 200 % ca. 4,8 px je Zeile und ist der vorab festgelegte Notausgang.
+  - Breite: 6,5 rem lassen innen 92 px. „Merkliste“ (65) + 2 + zweistelliges Badge (ca. 26) = 93 px, das passt nicht. Darum wird die Seitenleiste **7 rem** breit: innen 100 px; bei 200 % 212 px gegen 130 + 2 + 41 = 173 px. Body `padding-left: 8rem`, die Inhaltsspalte verliert quer 8 px.
   - Zeilen bleiben gleich hoch (`grid-auto-rows: 1fr`, Plan 0008), der Daumen ist `(100% - 20px) / 4` hoch.
-- **Kompakte Querleiste** (568×320): vier Spalten mit je 133 px, Höhe weiter ≤ 56 px. Das Badge steht im Fluss hinter dem Label (Plan 0008), bei 200 % hinter dem Icon.
+- **Kompakte Querleiste** (568×320): vier Spalten mit je 133 px, Höhe weiter ≤ 56 px. Das Badge steht im Fluss hinter dem Label (Plan 0008), ohne Label hinter dem Icon.
+  - **Eigene Schwelle (Review 2, M2):** Hier stehen Icon, Label und Badge nebeneinander. Die Spalte muss also Label, Icon, zwei Abstände und Badge fassen. Innerhalb der kompakten Media-Query gilt deshalb `@container (width < calc(4.25rem + 60px))` (60 px = Icon 24 + 2 · 6 + Badge 22 + 2).
+  - Bei 100 % sind das 128 px ≤ 133, also mit Labels. Ab 125 % (145 px) bleiben nur Icons.
+  - Unterstützt WebKit `calc()` in Container-Queries nicht (der Test zeigt es), gilt die feste Näherung `8rem`: 128 px bei 100 %, 160 px bei 125 %.
+  - Ohne eigene Schwelle ragten Label und Badge bei 125–175 % aus der Spalte (siehe Tabelle).
 - `scripts/font-fallback.ts`: Die Klasse „Tabs 13/600“ wird zu „Tabs 12/600“. Sie wird nur berichtet und hat kein Gewicht für den `size-adjust`.
 
 **Was „Anbieter“ oben zeigt:** Sticker und Schnellfilter wie in „Entdecken“, weil sie in der Liste wirken (E4). Die Bedingung in `App.tsx` lautet `section === "entdecken" || section === "anbieter"`. Die Statuszeile ist die einzige `role="status"`-Region, Hinweise (Alter, Wegzeit) stehen darunter wie in den anderen Tabs.
@@ -194,8 +211,10 @@ Grundlage sind `visible` (Filter, Sticker, Wegzeit-Grenze, Altersregel) und `upc
 **Sortierung:**
 - **Ohne Startpunkt:** alphabetisch, `localeCompare(…, "de")`.
 - **Mit Startpunkt:** `aktiv` nach dem **nächsten Ort** des Anbieters, also nach der kleinsten Wegzeit über seine sichtbaren Angebote. Verglichen wird mit `compareReach` aus `reach.ts` (Plan 0009), bei Gleichstand alphabetisch.
-  - Ohne Wert (nicht erreichbar bzw. kein Ort in der Wegzeit-Tabelle, wie Plan 0009 es meldet) ans Ende der aktiven Gruppe, alphabetisch.
-  - Im Modus `luftlinie` (Tabelle fehlt oder Startpunkt außerhalb) wird nach Luftlinie sortiert. Plan 0009 garantiert je Startpunkt eine einzige Art, es mischt nichts.
+  - **Unerreichbar** heißt in Plan 0009 Wegzeit `Infinity`. `compareReach` sortiert diese Anbieter ans Ende der aktiven Gruppe. Zwei unerreichbare (`Infinity` gegen `Infinity`) gelten als gleich und stehen alphabetisch.
+  - **Fehlt** in der Tabelle die Spalte eines Orts, fällt laut Plan 0009 die **ganze Tabelle** auf die Luftlinie zurück (Modus `luftlinie`). Es gibt also nie eine Liste, in der Minuten und Kilometer gemischt stehen, und `directory.ts` braucht dafür keinen eigenen Fall.
+  - Im Modus `luftlinie` (Tabelle fehlt, Spalte fehlt oder Startpunkt außerhalb) wird nach Luftlinie sortiert.
+  - Liefert `reachOf` ohne Startpunkt `undefined`, wird nicht nach Entfernung sortiert (`byReach` ist falsch).
   - Im Modus `laedt` steht statt der Zeilen der Platzhalter-Block `.list-pending` („Wegzeiten werden geladen …“, Höhe wie zwei Tagesgruppen), wie die Liste in Plan 0009. Die Reihenfolge hängt hier am Ergebnis, ein Umsortieren nach dem Laden ließe die Zeilen springen.
 - **`ohne-termine` immer am Ende, alphabetisch.** Begründung:
   - Sie haben keine Angebote, also keinen Ort in der Wegzeit-Tabelle (Plan 0009 rechnet nur die Orte mit Angeboten). Eine Luftlinie aus den Katalog-Orten dazwischen zu mischen, verbietet Plan 0009, E11 („je Startpunkt eine Art“).
@@ -210,9 +229,10 @@ Grundlage sind `visible` (Filter, Sticker, Wegzeit-Grenze, Altersregel) und `upc
   - Der Suchtext wird an Leerzeichen zerlegt. Jeder Teil muss im Namen vorkommen.
   - **Beide Seiten** werden gleich gefaltet: Kleinbuchstaben, NFD ohne Diakritika, `ß` → `ss`, dann `ae`/`oe`/`ue` → `a`/`o`/`u`. Damit treffen sich „Nürnberg“, „nurnberg“ und „nuernberg“.
   - Ein Wort mit echtem „ue“ („Steuer“) wird auf beiden Seiten gleich gefaltet und findet sich selbst (Test).
-- Unter dem Feld zählt eine Live-Region mit, `<p aria-live="polite" class="small">` „12 Anbieter“. Das ist keine `role="status"`, die bleibt die Statuszeile, wie beim Hinweis im `OriginPicker`.
+- Unter dem Feld zählt eine Live-Region mit, `<p aria-live="polite" class="small">` „12 Anbieter“. Der Text wird **entprellt** (ca. 500 ms nach dem letzten Tastendruck), damit Screenreader nicht jeden Buchstaben ansagen. Das ist keine `role="status"`, die bleibt die Statuszeile, wie beim Hinweis im `OriginPicker`.
 - Kein Treffer: „Kein Anbieter heißt so.“ mit Textknopf „Suche löschen“.
 - Der Suchtext ist Sitzungszustand und steht nie in der URL. Tippen löst keinen Request aus.
+- Der Suchtext lebt **im Start**, nicht im Lazy-Chunk: als `useState` in `App.tsx` (`providerQuery`), an `ProviderPanel` und den Screen durchgereicht. So übersteht er einen Tab-Wechsel, bei dem `ProviderPanel` und Screen abgebaut werden. Ein Neuladen leert ihn.
 
 ### E6 – Daten: Katalog als eigene Lazy-Datei, keine Schemaänderung
 
@@ -242,10 +262,14 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
 - **Kategorien** = `categoriesOf(Katalog-Themen ∪ Themen der kommenden Angebote)`, weil bei 10 Anbietern die Angebote mehr Kategorien haben als der Katalog nennt.
 - **Datei** `public/data/anbieter.json`, geschrieben von `scripts/build-data.ts`. Gemessen: **30,6 kB roh, 7,63 kB gzip**, ca. +0,1 kB je Anbieter.
   - **Verworfen: in `site.json`.** Das wären +7 bis 9 kB gzip für jeden Besuch, auf dem Weg zum LCP, für eine Nebenfunktion.
-- **Laden:** `src/data/providers.ts`, `loadProviderDirectory(expected: string, fetchFn = fetch)`:
-  - Sie lädt `${BASE_URL}data/anbieter.json`. HTTP ≠ 2xx wirft. `fetch` wird injiziert, weil `vitest.setup.ts` `fetch` verbietet.
-  - **Datenstand abgleichen (M4):** Weicht `generatedAt` von dem aus `site.json` (`expected`) ab, weil GitHub Pages oder der Browser eine ältere Fassung cacht, folgt **einmal** ein Request mit `cache: "reload"`.
-  - Weicht es danach immer noch ab, wird die Datei trotzdem genutzt. Für jeden Anbieter, der in den Angeboten vorkommt, aber in der Datei fehlt, baut `directory.ts` eine **Rückfall-Zeile** aus `providerName` und `venue` der Angebote: Themen aus den Angeboten, keine Website, im Sheet kein Website-Knopf.
+- **Laden** (`src/data/providers.ts`), in zwei getrennten Schritten (Review 2, M1):
+  - `loadProviderDirectory(fetchFn = fetch)` lädt `${BASE_URL}data/anbieter.json` **ohne** Kenntnis von `site.json`. HTTP ≠ 2xx wirft. `fetch` wird injiziert, weil `vitest.setup.ts` `fetch` verbietet.
+    - Grund: Beim Deep-Link startet das Vorladen schon beim Parsen der Route, also bevor `site.json` da ist (E3). Ein Lader, der den erwarteten Stand als Argument braucht, könnte dann nicht starten. Ein Argument, das sich nach dem Laden von `site.json` ändert, gäbe `useLazy` eine neue `load`-Identität und damit einen zweiten Ladelauf.
+  - `ensureFresh(data, expected, fetchFn = fetch)`: Der Abgleich ist ein eigener Schritt, sobald `site.json` da ist.
+    - Stimmt `data.generatedAt` mit `expected` (aus `site.json`) überein, liefert er `data` unverändert zurück.
+    - Sonst, weil GitHub Pages oder der Browser eine ältere Fassung cacht, folgt **höchstens ein** Request mit `cache: "reload"`. Das Ergebnis wird im Modul gemerkt (ein Promise je `expected`), damit Liste und Sheet nicht zweimal nachladen.
+    - Aufgerufen wird er im Lazy-Chunk (Screen bzw. Sheet) per `useEffect`, sobald `expected` vorliegt. Bis dahin zeigt der Chunk die geladene Fassung bzw. den Ladezustand.
+  - Weicht der Stand nach dem Reload immer noch ab, wird die Datei trotzdem genutzt. Für jeden Anbieter, der in den Angeboten vorkommt, aber in der Datei fehlt, baut `directory.ts` eine **Rückfall-Zeile** aus `providerName` und `venue` der Angebote: Themen aus den Angeboten, keine Website, im Sheet kein Website-Knopf.
   - Anbieter, die nur in der Datei stehen, sind ohne Angebote ohnehin `ohne-termine`.
   - So gilt immer `active.length === countProviders(visible)` (Test).
 - `data/offers.json` und `data/providers.yaml` werden nicht angefasst. Die Plausibilität gegen die Live-Seite (ADR 0002) bleibt gleich.
@@ -263,19 +287,20 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
   - `ProviderPanel` für den Tab;
   - `ProviderSheetLoader`, den Inhalt des immer gemounteten Sheet-Dialogs (E3);
   - `preloadProviderUi()`.
-  - Gemeinsamer Lader:
+  - Gemeinsamer Lader, **ohne Argument** (stabile Identität für `useLazy`, Review 2 M1):
     ```ts
     let pending: Promise<ProviderUi> | undefined;
-    async function fetchUi(expected: string): Promise<ProviderUi> {
-      const [ui, data] = await Promise.all([import("./anbieter/entry.ts"), loadProviderDirectory(expected)]);
+    async function fetchUi(): Promise<ProviderUi> {
+      const [ui, data] = await Promise.all([import("./anbieter/entry.ts"), loadProviderDirectory()]);
       return { ...ui, data };
     }
-    export function loadProviderUi(expected: string): Promise<ProviderUi> {
-      pending ??= fetchUi(expected).catch((e: unknown) => { pending = undefined; throw e; });
+    export function loadProviderUi(): Promise<ProviderUi> {
+      pending ??= fetchUi().catch((e: unknown) => { pending = undefined; throw e; });
       return pending;
     }
+    export const preloadProviderUi = (): void => void loadProviderUi().catch(() => {});
     ```
-    Das bleibt eine async-Funktion mit `await import(…)`, wie `Lazy.tsx` verlangt.
+    Das bleibt eine async-Funktion mit `await import(…)`, wie `Lazy.tsx` verlangt. Den Datenstand gleicht `ensureFresh` danach ab (E6).
   - Zustände: laden (Platzhalter in `.lazy-box`), Fehler (`LoadFailed` in `.lazy-box`), da.
   - `LoadFailed` bekommt eine Prop `className` (Standard `"map-note"`, die Anbieter nutzen `"lazy-note"`). `.map-note` ist absolut im Kartenrahmen positioniert und passt nicht in eine Liste.
 - **Lazy:** `src/ui/anbieter/`: `entry.ts` (exportiert `ProviderScreen` und `ProviderSheet`, damit es ein Chunk bleibt), `ProviderScreen.tsx`, `ProviderSheet.tsx`, `provider-format.ts` (+Test). Dazu `src/domain/directory.ts`, das nur von hier importiert wird.
@@ -290,7 +315,7 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
 - **`lazy-domain-apart` (M5):** `directory.ts` importiert keine nur von der Karte genutzten Domänenmodule (`places.ts`, `camera.ts`). Und umgekehrt: Ein Modul, das nur die beiden Lazy-Chunks teilen, käme sonst als eigener Chunk nach `assets/` und zählte ins Startbudget.
 - `scripts/check-architecture.ts`, `LAZY_LOADERS`: Neu ist `["src/ui/ProviderPanel.tsx", "./anbieter/"]`.
 - `vite.config.ts`, `chunkFileNames`: Ein Chunk mit einem Modul aus `/src/ui/anbieter/` landet in `assets/anbieter/[name]-[hash].js`.
-- **Chunk-Wächter** (aus Paket 0, E8): `dist/assets/` enthält genau eine JS-Datei (`index-*.js`). Damit fällt eine Abspaltung gemeinsamer Teile wie im Kalender-Versuch sofort auf.
+- **Chunk-Wächter** (aus Paket 0, E8): Direkt in `dist/assets/` liegt genau eine JS-Datei (`index-*.js`). Die Prüfung ist nicht rekursiv, Unterordner wie `karte/` und `anbieter/` zählen nicht, `.js.map` wird ignoriert. Damit fällt eine Abspaltung gemeinsamer Teile wie im Kalender-Versuch sofort auf.
 
 **Budgets** (`.size-limit.json`):
 - `JS (initial)` bleibt 90 kB.
@@ -321,7 +346,7 @@ Da gzip nicht additiv ist, wurde die Ersparnis gemessen. Dafür wurde der Kandid
 | Kandidat | entfernt | als Lazy-Chunk | Bewertung |
 |---|---|---|---|
 | **A – Merklisten-ICS lazy beim Export.** `icsForCollection`/`icsContextFor` per `import()` im Export-Handler. `seriesIcsPath`/`sessionIcsPath` ziehen nach `src/domain/ics-paths.ts`, damit `ics.ts` den Start verlässt. | −0,72 kB | **−0,64 kB** (Chunk 1,04 kB, keine Abspaltung) | **empfohlen.** Export ist eine seltene, ausdrückliche Handlung. Offline: Chunk nach dem ersten Rendern im Leerlauf vorladen (`requestIdleCallback`, sonst `setTimeout`). Schlägt der Export trotzdem fehl, meldet der Toast „Export gerade nicht möglich – bitte mit Netz nochmal versuchen.“ |
-| **B – Kalender lazy beim Tab-Wechsel** (`CalendarView`) | −1,51 kB | **−0,19 kB**: Rolldown spaltet React samt `jsx-runtime` in einen eigenen Start-Chunk ab (3,16 kB), Start 83,92 + 3,16 = 87,08 kB. Ein Lader im Stil von `useLazy` statt `React.lazy` ändert nichts. Eine triviale zweite Lazy-Komponente spaltet nicht ab | **bedingt**: Erst die Ursache der Abspaltung klären und per Rolldown-Konfiguration verhindern. Dann sind etwa −1,3 kB zu erwarten (entfernt −1,51 abzüglich Lader). Dazu nach dem ersten Rendern im Leerlauf vorladen, weil es keinen Service Worker gibt (offline wäre der Kalender sonst weg). Gelingt das nicht: verworfen |
+| **B – Kalender lazy beim Tab-Wechsel** (`CalendarView`) | −1,51 kB | **−0,22 kB** (mit `useLazy`-Lader −0,19 kB): Rolldown spaltet React samt `jsx-runtime` in einen eigenen Start-Chunk ab (3,16 kB), Start 83,92 + 3,16 = 87,08 kB. Ein Lader im Stil von `useLazy` statt `React.lazy` ändert nichts. Eine triviale zweite Lazy-Komponente spaltet nicht ab | **bedingt**: Erst die Ursache der Abspaltung klären und per Rolldown-Konfiguration verhindern. Dann sind etwa −1,3 kB zu erwarten (entfernt −1,51 abzüglich Lader). Dazu nach dem ersten Rendern im Leerlauf vorladen, weil es keinen Service Worker gibt (offline wäre der Kalender sonst weg). Gelingt das nicht: verworfen |
 | **C – Vite-Preload-Helfer** | ca. −0,6 bis −0,9 kB (Ausschnitt aus dem Bundle, grob) | – | **prüfen.** Er entfällt nur mit `build.modulePreload: false`, wenn kein Lazy-Chunk CSS-Abhängigkeiten hat. Das Karten-CSS müsste `MapView` dann selbst als `<link>` setzen (`?url`), mit Lade-Zustand gegen ungestylte Bedienelemente. Messen, dann entscheiden |
 | D – Detail-Inhalt lazy | −1,40 kB | – | **verworfen**: Kern-Interaktion, der erste Tipp auf eine Kachel würde warten, Deep-Link `angebot=`, offline |
 | E – Stadtteil-Tabelle lazy | −0,73 kB | – | **verworfen**: Ein gespeicherter Stadtteil braucht sie beim Start (Entfernung bzw. Wegzeit sofort, Plan 0009 lädt dann die Tabelle), das Kind-Sheet bleibt statisch |
@@ -330,15 +355,30 @@ Da gzip nicht additiv ist, wurde die Ersparnis gemessen. Dafür wurde der Kandid
 **Vorgehen in Paket 0** (eigener Branch, eigener Commit, eigenes Arch-Review, weil Lazy-Chunks und Regeln dazukommen):
 1. Ausgangswert `X` auf `main` nach Plan 0009 messen und notieren. Sourcemap-Tabelle neu erzeugen.
    - Das Skript liegt **nicht** im Repo. Die Methode steht hier: Segmente der Sourcemap je Quelle aufsummieren, Ersparnis per Entfernen messen.
-2. **Chunk-Wächter** einbauen: `scripts/check-chunks.ts` prüft nach dem Build, dass `dist/assets/` genau eine `.js`-Datei hat. Er hängt am Skript `size` in `package.json` (`node scripts/check-chunks.ts && size-limit`) und läuft damit lokal und in CI. Kanarienvogel: Kalender per `import()` → rot.
-3. **A umsetzen** (test-first: `ics-paths.ts` mit den Pfad-Tests aus `ics.test.ts`; `SavedView` lädt `ics.ts` im Handler). Vite-Ziel `assets/export/`, Budget-Zeile `Export JS (lazy)` 2 kB. Messen.
-4. **B untersuchen:** Warum spaltet Rolldown React ab? Zu prüfen sind die Rolldown-Chunk-Optionen von Vite 8, z. B. Gruppen über `advancedChunks`, und die Frage, ob gemeinsame CJS-Module die Ursache sind. Gelingt eine Aufteilung ohne Abspaltung (Chunk-Wächter grün): umsetzen (`assets/kalender/`, Budget `Kalender JS (lazy)` 3 kB, Regeln `kalender-only-lazy`/`kalender-entry-only`, `LAZY_LOADERS`, Vorladen im Leerlauf, `LoadFailed` im Tab). Sonst verwerfen und das Ergebnis notieren.
+2. **Chunk-Wächter** einbauen:
+   - `scripts/check-chunks.ts` prüft nach dem Build, dass **direkt** in `dist/assets/` genau eine Datei auf `.js` endet. Nicht rekursiv, `.js.map` und andere Endungen werden ignoriert.
+   - Er hängt am Skript `size` in `package.json` (`node scripts/check-chunks.ts && size-limit`) und läuft damit lokal und in CI.
+   - **Kanarienvogel:** ein dynamischer Import eines neuen Moduls, für das keine Ordnerregel in `chunkFileNames` greift. Der Chunk landet in `assets/`, der Wächter wird rot.
+3. **A umsetzen**, test-first:
+   - `ics-paths.ts` bekommt die Pfad-Tests aus `ics.test.ts`.
+   - `SavedView` lädt `ics.ts` im Export-Handler. **Auch `icsContextFor`** wandert in den Handler: Heute baut `SavedView` die Einträge samt Kontext schon beim Rendern. Bleibt der Import dafür statisch, bleibt `ics.ts` im Start.
+   - Vite-Ziel `assets/export/`, Budget-Zeile `Export JS (lazy)` 2 kB. Messen.
+   - Der Download geschieht nach einem `await`. Ob iOS Safari ihn dann noch als Folge des Tipps gelten lässt, prüft der Browser-Review am echten iPhone. Das Vorladen im Leerlauf sorgt dafür, dass das `await` praktisch sofort auflöst.
+4. **Ursache der React-Abspaltung klären** (Pflicht, auch wenn der Kalender am Ende nicht lazy wird, denn der Anbieter-Chunk hängt davon ab):
+   - **Hooks sind es nicht.** `karte/MapScreen.tsx` nutzt Hooks und spaltet nicht ab, eine triviale Probe mit `useState` auch nicht.
+   - Zu untersuchen: was `CalendarView` anders importiert (Modulgraph des Chunks gegen den von `MapScreen` vergleichen, z. B. per `rolldown`-Ausgabe oder Sourcemap), und ob der zweite statisch erreichbare React-Nutzer im Lazy-Graphen die Aufteilung auslöst.
+   - Werkzeug ist die Rolldown-Option **`output.codeSplitting`** (Gruppen, Mindestgrößen). Das veraltete `advancedChunks` wird nicht verwendet.
+   - Ergebnis (Ursache und Konfiguration) wird hier notiert.
+   - Gelingt eine Aufteilung ohne Abspaltung (Chunk-Wächter grün): Kalender umsetzen (`assets/kalender/`, Budget `Kalender JS (lazy)` 3 kB, Regeln `kalender-only-lazy`/`kalender-entry-only`, `LAZY_LOADERS`, Vorladen im Leerlauf, `LoadFailed` im Tab). Sonst den Kalender verwerfen und das Ergebnis notieren.
 5. Reicht es noch nicht für ≤ 87,7 kB: **C messen** und ggf. umsetzen.
 6. Reicht auch das nicht: **ADR 0012** (Budget oder Stack, z. B. ein kleineres React-Pendant). Das ist der letzte Ausweg, nicht Teil dieses Plans.
 
 **Fertig, wenn** das Start-JS ≤ 87,7 kB ist (bzw. `X` − Ersparnis notiert), der Chunk-Wächter läuft, `pnpm check` grün ist und Arch-Review sowie Browser-Review (Merkliste-Export, ggf. Kalender offline nach dem Laden) eingetragen sind.
 
-**Wechselwirkung mit diesem Plan:** Der Anbieter-Chunk ist selbst eine React-Lazy-Komponente. Ob er die Abspaltung auslöst, zeigt der Chunk-Wächter in Schritt 4 von Paket A sofort. Die Lösung aus Paket 0 (B) gilt dann auch hier. Ohne Lösung müsste der Anbieter-Chunk so geschnitten werden, dass er nicht abspaltet, im Notfall auch ohne eigene Hooks im Chunk (reine Darstellung, Zustand im Loader).
+**Wechselwirkung mit diesem Plan:** Der Anbieter-Chunk ist selbst eine React-Lazy-Komponente.
+- Ob er die Abspaltung auslöst, wird **vor** den parallelen Paketen geprüft: Im Schritt „Schnittstellen“ ist der Stub `anbieter/entry.ts` eine kleine Komponente mit `useState`, die `ProviderPanel` per `import()` lädt. Danach laufen `pnpm build && pnpm size` samt Chunk-Wächter.
+- Bleibt der Wächter grün, beginnen A und B.
+- Wird er rot, gilt die Konfiguration aus Paket 0, Schritt 4 auch hier. Gibt es keine, wird nichts parallel begonnen, bis die Ursache geklärt ist.
 
 ### E9 – Privatsphäre
 
@@ -355,8 +395,8 @@ Da gzip nicht additiv ist, wurde die Ersparnis gemessen. Dafür wurde der Kandid
 - Zweite Zeile aus `providerLine(row, mode)`: „3 Angebote · Gostenhof · 25 Min.“.
   - Bei mehr als zwei Stadtteilen: „Gostenhof, St. Johannis +2“. Der Stadtteil ist `venue.district ?? venue.name`.
   - Die Wegzeit bzw. Entfernung kommt in der Kurzform der Kachel aus Plan 0009.
-  - Im Modus `laedt` gibt es keine Zeilen, sondern den Platzhalter-Block (E5). Liefert eine einzelne Zeile ausnahmsweise keinen Wert, steht dort wie auf der Kachel der leere Platzhalter `.dist`.
-- `idle`-Zeilen (`ohne-termine`, bei Suche auch `ausgeblendet`):
+  - Im Modus `laedt` gibt es keine Zeilen, sondern den Platzhalter-Block (E5). Zeilen kennen deshalb keinen `.dist`-Platzhalter, den gibt es nur auf den Kacheln im Sheet (Plan 0009), und nur als Ladezustand. Hat eine Zeile **keinen Wert** (kein Startpunkt bzw. kein sichtbares Angebot), entfällt die Wegzeit ganz.
+- `idle`-Zeilen (`ohne-termine`, bei Suche auch `ausgeblendet`). **Reihenfolge:** erst die `ausgeblendet`-Treffer der Suche, dann `ohne-termine`, jeweils alphabetisch. Wer Angebote hat, die nur nicht zur Auswahl passen, ist näher an „nutzbar“ als ein Anbieter ganz ohne Termine.
   - Klasse `.place.idle` mit gestricheltem Rahmen (Stickerheft: „noch nicht eingeklebt“) in derselben Rahmenfarbe wie die normale Zeile, nur gestrichelt. Text in `--muted`, kein `opacity`. AA prüft axe.
   - Zweite Zeile: „Gerade keine Termine im Plan“ bzw. „3 Angebote, keins passt zur Auswahl“. Die Stadtteile kommen dann aus dem Katalog.
 
@@ -423,7 +463,7 @@ Nicht in diesem Plan. Gründe:
 ### E13 – Arbeitsteilung
 
 - **Paket 0** (E8) läuft allein und zuerst, auf eigenem Branch, nach Plan 0009.
-- Danach ein gemeinsamer Schritt „Schnittstellen“ (ein Commit): `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts`, `directory.ts` mit Typen und Stubs, `anbieter/entry.ts`.
+- Danach ein gemeinsamer Schritt „Schnittstellen“ (ein Commit): `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts`, `directory.ts` mit Typen und Stubs, `anbieter/entry.ts` als Stub mit `useState` per `import()` verdrahtet, danach `pnpm build && pnpm size` samt Chunk-Wächter (Schritt 4).
 - Dann zwei Pakete parallel in eigenen Worktrees:
 
 | | Paket A – Daten, Route, Tab-Leiste, Verdrahtung (`PW_PORT=4173`) | Paket B – Oberfläche im Chunk (`PW_PORT=4273`) |
@@ -442,10 +482,10 @@ Nicht in diesem Plan. Gründe:
 ```
 Paket 0 (E8)
   src/domain/ics-paths.ts (+test)  seriesIcsPath, sessionIcsPath (aus ics.ts)
-  src/ui/SavedView.tsx             ics.ts per import() im Export-Handler, Vorladen im Leerlauf
+  src/ui/SavedView.tsx             ics.ts (icsForCollection, icsContextFor) per import() im Export-Handler, Vorladen im Leerlauf
   src/ui/DetailDialog.tsx          Pfade aus ics-paths.ts
   [bedingt] src/ui/CalendarPanel.tsx + Kalender-Chunk, Regeln, Vorladen
-  scripts/check-chunks.ts          genau eine JS-Datei in dist/assets/
+  scripts/check-chunks.ts          genau eine *.js direkt in dist/assets/ (nicht rekursiv, ohne .js.map)
   package.json                     size = check-chunks && size-limit
   vite.config.ts, .size-limit.json assets/export/ (2 kB) [, assets/kalender/ (3 kB)]
 
@@ -460,7 +500,7 @@ src/domain/
   directory.ts (+test)             NUR LAZY: providerRows, providerOffers, providerCategories,
                                    matchesProviderQuery, Rückfall-Zeilen                          [B]
 src/data/
-  providers.ts (+test)             loadProviderDirectory (generatedAt-Abgleich, cache: reload)   [A]
+  providers.ts (+test)             loadProviderDirectory (ohne Argument), ensureFresh (≤ 1 Reload) [A]
 src/ui/
   ProviderPanel.tsx                ProviderPanel, ProviderSheetLoader, preloadProviderUi         [A]
   provider-types.ts                ProviderScreenProps (inkl. reachMode), ProviderSheetProps      [Schnittstellen]
@@ -503,7 +543,7 @@ export function providerRows(input: {
   reachOf: (offer: SiteOffer) => Reach | undefined;
   byReach: boolean;     // Startpunkt gesetzt und Modus nicht „laedt“
   query: string;
-}): { active: ProviderRow[]; hiddenCount: number; idle: ProviderRow[] };
+}): { active: ProviderRow[]; hiddenCount: number; idle: ProviderRow[] }; // idle: erst ausgeblendet (nur mit query), dann ohne-termine
 export function providerOffers(offers: readonly SiteOffer[], providerId: string, now: Date): SiteOffer[];
 export function providerCategories(provider: ProviderEntry, offers: readonly SiteOffer[]): Category[];
 export function matchesProviderQuery(name: string, query: string): boolean;
@@ -539,7 +579,11 @@ Test-first für die Domäne (Vitest, TZ `America/Los_Angeles`, Coverage ≥ 90 %
   - Ohne Filter, ohne Startpunkt: `active` = Bibliothek, Ev.-Luth. Kirchengemeinde, Familientreff, Kleines Theater, Musikschule (alphabetisch); `idle` = Turnverein (`ohne-termine`); `hiddenCount` 0. Familientreff `shown = upcoming = 3`.
   - Sticker „Bücher“: `active` nur die Bibliothek, `hiddenCount` 4, `idle` weiter der Turnverein.
   - Mit Suchtext „theater“ und Sticker „Bücher“: das Theater erscheint in `idle` als `ausgeblendet`.
-  - `byReach` mit gestubbtem `reachOf` (Luftlinie ab Gostenhof, Werte aus Plan 0004): Theater 226 m, Familientreff 1 427 m, Bibliothek 1 689 m, Musikschule 2 358 m, Gemeinde 3 008 m → genau diese Reihenfolge. Ein Anbieter ohne Wert steht am Ende der aktiven Gruppe. Bei Gleichstand alphabetisch.
+  - Mit Suchtext „beispiel“ und Sticker „Bücher“: `idle` = erst die vier `ausgeblendet` (alphabetisch), dann der Turnverein.
+  - `byReach` mit gestubbtem Luftlinien-`reachOf` (ab Gostenhof, Werte aus Plan 0004): Theater 226 m, Familientreff 1 427 m, Bibliothek 1 689 m, Musikschule 2 358 m, Gemeinde 3 008 m → genau diese Reihenfolge. Bei Gleichstand alphabetisch.
+  - `byReach` mit gestubbtem **Wegzeit**-`reachOf` (`kind: "oepnv"`, Plan 0009): z. B. Gemeinde 12 Min., Theater 18, Bibliothek 18, Familientreff `Infinity`, Musikschule `Infinity`.
+    - Ergebnis: Gemeinde, dann Bibliothek vor Theater (gleich, also alphabetisch), dann Familientreff vor Musikschule.
+    - `Infinity` gegen `Infinity` gilt als gleich und wird alphabetisch geordnet. Unerreichbare stehen am Ende der aktiven Gruppe, vor den `idle`-Zeilen.
   - `ohne-termine` bleibt auch mit `byReach` am Ende, alphabetisch.
   - **Rückfall (M4):** Katalog ohne `theater-beispiel` → Zeile aus `providerName`/`venue` ohne `url`. Invariante `active.length === countProviders(visible)` über die Fälle ohne Filter, mit Sticker und mit fehlendem Katalog-Eintrag.
   - Umlaute in der Sortierung (Testname „Ärztehaus …“ zwischen A und B).
@@ -552,14 +596,15 @@ Test-first für die Domäne (Vitest, TZ `America/Los_Angeles`, Coverage ≥ 90 %
   - mehrere Teile in beliebiger Reihenfolge;
   - Leerstring trifft alles, „xyz“ nichts.
 - **`data/providers`:**
-  - lädt `…/data/anbieter.json` (injizierter `fetch`);
-  - gleicher Datenstand → ein Request;
-  - abweichender Datenstand → genau ein zweiter mit `cache: "reload"`, danach wird die Datei auch bei weiterer Abweichung genutzt;
-  - 503 wirft, der nächste Aufruf fragt neu an.
+  - `loadProviderDirectory` lädt `…/data/anbieter.json` (injizierter `fetch`), ohne Argument zum Datenstand;
+  - 503 wirft, der nächste Aufruf fragt neu an;
+  - `ensureFresh` mit gleichem Datenstand → kein weiterer Request;
+  - `ensureFresh` mit abweichendem Datenstand → genau ein Request mit `cache: "reload"`. Zwei Aufrufe mit demselben `expected` (Liste und Sheet) ergeben zusammen weiter nur einen Request. Danach wird die Datei auch bei weiterer Abweichung genutzt.
+- **`ui/ProviderPanel` bzw. Lader:** `loadProviderUi` hat keine Parameter. Vorladen und `useLazy` teilen sich ein Promise: zwei Aufrufe, ein Chunk- und ein Daten-Request.
 - **`ui/format`:** `providerStatusParts`, Einzahl.
 - **`provider-format`:**
   - `providerLine` mit „3 Angebote“, „1 Angebot“, „1 von 3 Angeboten“, einem, zwei und vier Stadtteilen („+2“);
-  - Minuten bzw. km je `ReachMode`, leerer Platzhalter;
+  - Minuten bzw. km je `ReachMode`; ohne Wert entfällt die Wegzeit (kein Platzhalter in der Zeile);
   - `idleLine` in beiden Fällen;
   - „12 weitere Anbieter haben gerade nichts Passendes.“;
   - Live-Text „12 Anbieter“ / „1 Anbieter“.
@@ -593,7 +638,10 @@ Test-first für die Domäne (Vitest, TZ `America/Los_Angeles`, Coverage ≥ 90 %
    - 503 → Fehlertext in `.lazy-box`, `expectMobileUx`;
    - `unroute`, dann „Nochmal versuchen“ → Zeilen da;
    - dasselbe im Sheet.
-7. **Datenstand (M4):** `anbieter.json` mit anderem `generatedAt` → genau ein zweiter Request mit Reload, danach Zeilen; fehlt ein Anbieter, erscheint seine Rückfall-Zeile ohne Website-Knopf.
+7. **Datenstand (M4):**
+   - `anbieter.json` mit anderem `generatedAt` → genau ein zweiter Request mit Reload, danach Zeilen.
+   - Fehlt ein Anbieter, erscheint seine Rückfall-Zeile ohne Website-Knopf.
+   - **Deep-Link plus abweichender Stand** (Review 2, M1): Start mit `?anbieter=theater-beispiel`, `site.json` verzögert, `anbieter.json` mit anderem `generatedAt`. Erwartet: insgesamt genau zwei Requests an `anbieter.json` (Vorladen und genau ein Reload), ein Chunk-Request, das Sheet zeigt danach den Anbieter.
 8. **Privatsphäre:**
    - Tippen in der Suche → kein Request, kein Suchtext in der URL.
    - Mit offenem Tab den Startpunkt Gostenhof wählen → ab dem Tipp kein Request.
@@ -623,13 +671,18 @@ Test-first für die Domäne (Vitest, TZ `America/Los_Angeles`, Coverage ≥ 90 %
   - das aktive Label liegt innerhalb der Daumen-Pille (±1 px);
   - jede Spalte ≥ 44 px breit und ≥ 56 px hoch;
   - Merklisten-Badge (ein Angebot gemerkt) innerhalb der eigenen Spalte und innerhalb der Leiste.
-- **Hochkant 320 und 412 bei 200 %:** nur Icons (Labels per Container-Query versteckt), Badge in der eigenen Spalte, keine Überlappung mit dem Nachbar-Tab.
+- **Hochkant 320 und 412 bei 200 %:** nur Icons (Labels per Container-Query versteckt), Badge in der eigenen Spalte, keine Überlappung mit dem Nachbar-Tab und dem Icon (Badge im Fluss). Geprüft wird ein- und zweistellig: Die Fixtures haben nur 8 Angebote, deshalb wird das zweistellige Badge mit echten Daten geprüft (siehe `smoke.spec.ts`).
+- **Hochkant 412 bei 125 %:** Labels sichtbar und einzeilig. Bei 150 und 175 %: nur Icons.
 - **Seitenleiste 863×360 und 740×360, je 100 % und 200 %:**
-  - Leiste vollständig im Viewport (top ≥ 0, bottom ≤ Höhe), Höhe ≤ 260 px;
+  - Leiste vollständig im Viewport mit mindestens 8 px Rand (top ≥ 8, bottom ≤ Höhe − 8);
   - Label und Badge ohne Überschneidung (> 0,5 px);
   - Daumen auf dem aktiven Tab (`offsetTop`/`offsetHeight` ±2 px), für jeden der vier Tabs.
   - Der bestehende Test „Querformat 852×393/915×412: erste Kachel ≥ 80 px frei“ bleibt grün, mit 7 rem Leistenbreite.
-- **Kompakt 568×320, 100 % und 200 %:** Höhe ≤ 56 px, Labels bei 100 % sichtbar, bei 200 % nur Icons, Badge ohne Überschneidung.
+- **Kompakt 568×320 bei 100, 125, 150, 175 und 200 %:**
+  - Höhe ≤ 56 px;
+  - Labels nur bei 100 % sichtbar, ab 125 % nur Icons (eigene Schwelle);
+  - in keiner Stufe ragt ein Label oder Badge aus seiner Spalte (`scrollWidth ≤ clientWidth`, Rechtecke);
+  - Badge ohne Überschneidung.
 - `LANDSCAPE_200` bekommt die Einträge „Anbieter“ und „Merkliste mit Badge“.
 
 `e2e/mobile-ux.spec.ts` [B]:
@@ -638,6 +691,7 @@ Test-first für die Domäne (Vitest, TZ `America/Los_Angeles`, Coverage ≥ 90 %
 - Die bestehenden Ansichten prüfen die Tab-Leiste mit vier Tabs automatisch (`.tabs` steht in `BARS`, Prüfung 4).
 
 `e2e/smoke.spec.ts` [B], echte Daten:
+- **Zweistelliges Badge:** 10 Angebote merken, dann bei 320 px / 200 % prüfen: Badge in der eigenen Spalte, in der Leiste, ohne Überschneidung mit dem Icon. Dasselbe in der Seitenleiste 863×360 bei 200 % (Label und Badge in einer Zeile, Leiste mit 8 px Rand im Viewport).
 - > 50 aktive Zeilen, die 10 blassen am Ende.
 - Das Sheet des Spitzenreiters (71 Angebote) öffnet.
 - Gates und 320 px / 200 % bestehen, mit langen Namen.
@@ -677,12 +731,15 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
    - *Fertig:* Beide Stände und das Start-JS `X` stehen unter „Umsetzung“.
 1. **Plan und `/plan-review`.**
    - *Fertig:* erledigt, siehe „Review“ und „Nutzerentscheidungen“.
-2. **Paket 0** (E8) auf eigenem Branch: Messung, Chunk-Wächter, A, B untersuchen, ggf. C. Danach `/arch-review`, CI, Fast-Forward nach `main`, `/browser-review live` (Export, ggf. Kalender offline).
+2. **Paket 0** (E8) auf eigenem Branch: Messung, Chunk-Wächter, A, B untersuchen, ggf. C. Danach `/arch-review`, CI, Fast-Forward nach `main`, `/browser-review live` (Export am echten iPhone: kommt der Download nach dem `await` noch an; ggf. Kalender offline nach dem Laden).
    - *Fertig:* Start-JS ≤ 87,7 kB auf `main` und notiert, oder die Entscheidung für ADR 0012 ist dem Nutzer vorgelegt.
 3. **Worktree und Ausgangswert:** Branch `anbieter-0010` auf dem aktuellen `main`, `pnpm install`, `pnpm build && pnpm size`.
    - *Fertig:* Wert notiert und ≤ 87,7 kB.
-4. **Schnittstellen** (ein Commit).
-   - *Fertig:* `pnpm check:fast` grün.
+4. **Schnittstellen** (ein Commit):
+   - `SiteProvider`/`ProviderDirectoryData`, `provider-types.ts`, `directory.ts` mit Typen und Stubs.
+   - `anbieter/entry.ts` als **Stub mit `useState`**, schon von `ProviderPanel` per `import()` geladen und im Tab „Anbieter“ verdrahtet (Review 2, M5).
+   - Dann `pnpm build && pnpm size` samt Chunk-Wächter.
+   - *Fertig:* `pnpm check:fast` grün, Chunk-Wächter grün (keine React-Abspaltung durch den Anbieter-Chunk), Messwert notiert. Erst dann beginnen A und B.
 5. **Pakete A und B parallel** (E13), test-first für die Domäne, nach jedem Block `pnpm check:fast`.
    - **A:**
      - Route, Daten, Fixtures samt nachgezogenen Tests;
@@ -742,7 +799,11 @@ Kanarienvögel (je einzeln, rot sehen, zurückbauen, unter „Umsetzung“ notie
 ## Risiken
 
 - **Startbudget:** Paket 0 muss je nach Stand nach Plan 0009 bis zu 1,3 kB einsparen. Gemessen sicher sind nur −0,64 kB (Export). Der Kalender bringt nur etwas, wenn sich die React-Abspaltung verhindern lässt. Danach bleibt C, als letzter Ausweg ADR 0012. Der Anbieter-Chunk kann dieselbe Abspaltung auslösen, das zeigt der Chunk-Wächter (E8).
-- **Tab-Leiste:** Die Breiten sind aus dem CSS abgeleitet, nicht gerendert (kein Browser in der Planung). Am knappsten ist es hochkant bei 320 px mit 73 px Spalte gegen ca. 65–68 px Label. Notausgang ohne neue Regel: den Rand bis 4 px senken (Spalte 74 px), sonst zeigt die Leiste dort nur Icons, wie bei 200 %. Entscheiden tut `layout.spec.ts`.
+- **Tab-Leiste:** Die Breiten sind aus dem CSS abgeleitet, nicht gerendert (kein Browser in der Planung). Am knappsten ist es hochkant bei 320 px mit 73 px Spalte gegen ca. 65–68 px Label. Notausgang in zwei Stufen, entschieden von `layout.spec.ts`:
+  1. Den Rand bis 4 px senken (Spalte 74 px). Kein Test ändert sich.
+  2. Reicht das nicht, zeigt die Leiste bei 320 px / 100 % nur Icons, wie bei 200 %. Dann ändert sich **genau eine** Erwartung in `layout.spec.ts`: Der Fall „Hochkant 320 bei 100 %: alle vier Labels sichtbar“ wird zu „nur Icons, Badge in der eigenen Spalte“. 360, 390 und 412 behalten ihre Labels.
+     - Die Änderung kommt mit Begründung und Messwerten (Spalte gegen Label) in den Commit und unter „Umsetzung“.
+     - Sie ist eine Planentscheidung, keine gesenkte Schwelle: Text-Gate und Touch-Gate bleiben unverändert.
 - **Kleinere Tab-Schrift** (12 statt 13 px): Lesbarkeit prüft der Browser-Review am Gerät.
 - **Lange Namen:** Median 59, max. 111 Zeichen. Abhilfe: Silbentrennung, `h2` 1,375 rem, Text-Gate mit echten Daten. Kurznamen kämen über `docs/ideas.md`.
 - **Sheet mit 71 Kacheln:** Das Öffnen rendert viele Kacheln auf einmal. Der Browser-Review misst INP. Ist es zu langsam, folgt „mehr zeigen“ in Schritten wie die Liste (40).
@@ -758,14 +819,14 @@ Alle beantwortet, siehe „Nutzerentscheidungen (2026-10-05)“. Die früheren F
 ## Review (2026-10-05, plan-reviewer) – Verdict: Freigabe mit Änderungen → eingearbeitet
 
 - **M1 Budget** → E8 „Paket 0“, Reihenfolge 0009 → Paket 0 → 0010, Schritte 2/3:
-  - Sourcemap-Verteilung und gemessene Ersparnis je Kandidat: Export −0,64 kB; Kalender entfernt −1,51 kB, als Chunk heute nur −0,19 kB wegen der React-Abspaltung; Detail −1,40 kB und Stadtteile −0,73 kB verworfen; Preload-Helfer zu prüfen.
+  - Sourcemap-Verteilung und gemessene Ersparnis je Kandidat: Export −0,64 kB; Kalender entfernt −1,51 kB, als Chunk heute nur −0,22 kB wegen der React-Abspaltung; Detail −1,40 kB und Stadtteile −0,73 kB verworfen; Preload-Helfer zu prüfen.
   - Filter- und Kind-Sheet ausdrücklich nicht lazy.
   - Ziel ≤ 89,0 kB nach 0009 + 0010, Eintritt ≤ 87,7 kB, Schwellen wie 0009 (88,6/89,0 kB).
   - ADR 0012 nur als letzter Ausweg.
   - Der vierte Tab ist im Zuwachs von ≤ 1,3 kB eingerechnet.
   - Neu: Chunk-Wächter.
 - **M2** → E3: Wartemechanik gestrichen. Der Sheet-Dialog ist immer gemountet und steht vor dem Detail, `useLazy` nur im Kind bei offenem Dialog. E2E-Test 5 bleibt.
-- **M3** → E10, E7, E12: `reachMode` in `ProviderScreenProps`, Platzhalter in `providerLine`, Platzhalter-Block in `laedt`, kein `want()`. E12 nennt `route.test.ts` als von 0009 geändert.
+- **M3** → E10, E7, E12: `reachMode` in `ProviderScreenProps`, Platzhalter-Block in `laedt` (Review 2 präzisiert: kein `.dist` in der Zeile), kein `want()`. E12 nennt `route.test.ts` als von 0009 geändert.
 - **M4** → E6: `generatedAt` in `anbieter.json`, einmal `cache: "reload"`, Rückfall-Zeilen aus `providerName`/`venue`, Test `active.length === countProviders(visible)`.
 - **M5** → E7: `directory-only-lazy` und `lazy-domain-apart` (keine nur-Karten-Module wie `places.ts`), je mit Kanarienvogel.
 - **Minors:**
@@ -793,3 +854,43 @@ Alle beantwortet, siehe „Nutzerentscheidungen (2026-10-05)“. Die früheren F
 - **N4 Sortierung:** mit Startpunkt nach Wegzeit zum nächsten Ort (`compareReach`, Unerreichbare ans Ende der aktiven Gruppe), ohne Startpunkt alphabetisch. → E5.
   - Die blassen Anbieter stehen immer am Ende, alphabetisch: Sie haben keinen Ort in der Wegzeit-Tabelle, und eine Luftlinie dazwischen widerspräche Plan 0009 („je Startpunkt eine Art“). Trotzdem stehen sie offen in der Liste.
   - Die Sortierung läuft lokal, ohne Request. Die Kamera-Regel betrifft nur die Karte.
+
+## Review 2 (2026-10-05, plan-reviewer) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Keine Blocker.
+
+- **M1 Vorladen gegen Datenstand** → E6, E7, Tests:
+  - `loadProviderDirectory()` und `loadProviderUi()` haben kein Argument mehr. Chunk und Datei laden und cachen sich unabhängig von `site.json`, `useLazy` behält eine stabile `load`-Identität.
+  - Der Abgleich ist der eigene Schritt `ensureFresh(data, expected)`, sobald `site.json` da ist, mit höchstens einem Reload-Request (gemerkt je `expected`).
+  - Unit-Tests für beide Funktionen und den gemeinsamen Lader, dazu der E2E-Fall „Deep-Link plus abweichender Stand → genau ein Reload“.
+- **M2 Kompakte Querleiste bei Zwischengrößen** → E2:
+  - eigene Schwelle `@container (width < calc(4.25rem + 60px))` in der kompakten Media-Query, Rückfall `8rem`, falls WebKit kein `calc()` in Container-Queries kann;
+  - Tabelle um 125 % und 150–200 % ergänzt;
+  - `layout.spec.ts` prüft 100, 125, 150, 175 und 200 %, hochkant 412 zusätzlich bei 125/150/175 %.
+- **M3 Seitenleisten-Höhe** → E2, Tests:
+  - neu gerechnet mit `line-height: 1.4` und Badge 35,6 px bei 200 %: 244 px bei 100 %, ca. 266 px bei 200 %;
+  - Kriterium „vollständig im Viewport + 8 px Rand“ statt „≤ 260 px“, Notausgang `line-height: 1.2` in der Seitenleiste;
+  - Breite mit zweistelligem Badge nachgerechnet (7 rem reichen).
+- **M4 Zweistelliges Badge** → E2, Tests:
+  - `left: calc(50% + 4px)` entfällt.
+  - **Abweichung mit Begründung:** Statt `right: 2px` steht das Badge im Nur-Icon-Zustand im Fluss neben dem Icon (24 + 4 + 41 = 69 ≤ 73 px). `right: 2px` hielte die Spalte ein, verdeckte das Icon aber bis auf 6,5 px. `right: 2px` bleibt der festgelegte Ausweg, falls der Browser-Review den Versatz schlechter findet. Die Tests gelten für beide Varianten.
+  - Smoke mit echten Daten: 10 Angebote merken, 320 px / 200 % und Seitenleiste prüfen.
+- **M5 React-Abspaltung** → E8, Schritt 4, E13:
+  - Paket 0, Schritt 4 klärt die Ursache verbindlich. Hooks sind es nicht (`MapScreen` nutzt Hooks und spaltet nicht ab).
+  - Werkzeug ist `output.codeSplitting`, nicht `advancedChunks`.
+  - Im Schritt „Schnittstellen“ ist `anbieter/entry.ts` ein Stub mit `useState`, per `import()` verdrahtet. `pnpm build && pnpm size` samt Chunk-Wächter laufen vor den parallelen Paketen.
+  - Die Notlösung „ohne eigene Hooks“ ist gestrichen.
+- **Minors:**
+  - Chunk-Wächter nicht rekursiv, ignoriert `.js.map`.
+  - Kanarienvogel: dynamischer Import ohne Ordnerregel.
+  - Kalender-Ersparnis −0,22 kB (mit `useLazy`-Lader −0,19 kB).
+  - 412 px: 94,9 px Spalte (390 px: 89,6 px).
+  - E5: unerreichbar = `Infinity`, eine fehlende Spalte lässt die ganze Tabelle auf die Luftlinie zurückfallen.
+  - Sortier-Test mit gestubbter Wegzeit inklusive `Infinity` gegen `Infinity` → alphabetisch.
+  - Notausgang 320 px: Stufe 1 ändert keinen Test, Stufe 2 genau eine Erwartung in `layout.spec.ts`, mit Begründung im Commit.
+  - Export lazy: auch `icsContextFor` in den Handler; iPhone-Download nach `await` im Browser-Review.
+  - Suchtext als `providerQuery` in `App.tsx` (übersteht Tab-Wechsel).
+  - Live-Region entprellt (ca. 500 ms).
+  - `idle`: erst `ausgeblendet`, dann `ohne-termine`.
+  - `.dist`-Platzhalter nur als Ladezustand auf Kacheln; ohne Wert entfällt die Wegzeit in der Zeile.
+- **Scope-Vorschlag „Paket 0 als eigener Plan“: abgelehnt** (Koordinator). Paket 0 bleibt ein klar abgegrenzter Abschnitt dieses Plans (E8) mit eigenem Branch, eigenen Fertig-Kriterien und eigenem Arch-Review. Begründung: kein zusätzlicher Review-Zyklus, gleicher Kontext.
