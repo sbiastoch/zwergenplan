@@ -226,9 +226,10 @@ export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<st
     };
   }, [attempt, retry]);
 
-  const file = state.kind === "bereit" ? state.file : undefined;
-  const logic = state.kind === "bereit" ? state.logic : undefined;
-  const linesFile = state.kind === "bereit" ? state.lines : undefined;
+  const ready = state.kind === "bereit" ? state : undefined;
+  const file = ready?.file;
+  const logic = ready?.logic;
+  const linesFile = ready?.lines;
   const table = useMemo(() => decodeFor(file, logic, placeKeys), [file, logic, placeKeys]);
   const lines = useMemo(() => decodeLinesFor(linesFile, table, logic), [linesFile, table, logic]);
   // Passt die Tabelle nicht, führt der Reducer das als Fehler; die Anzeige fällt schon jetzt zurück (resolveReach).

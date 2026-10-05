@@ -10,6 +10,7 @@ import {
   MAX_MINUTES,
   NO_MINUTES,
   TRANSFER_PENALTY_MINUTES,
+  TRANSIT_RULE,
   TRANSIT_TABLE_VERSION,
   transitReach,
   valueAt,
@@ -93,7 +94,7 @@ describe("decodeTransitTable", () => {
     expect(Array.from(t?.minutes ?? [])).toEqual([12, 30, 10, 255]);
     expect(t?.columns.get("49.4362,11.0851")).toBe(1);
     expect(t?.places).toEqual([...keys]);
-    expect(t?.source).toEqual(source);
+    expect(t?.source).toEqual({ ...source, rule: TRANSIT_RULE });
     expect(t?.serviceDay).toBe("2026-10-13");
     expect(t?.window).toEqual({ from: "08:30", to: "10:30" });
   });
@@ -369,6 +370,15 @@ describe("transitReach mit Umstiegs-Bit und Linien (D2)", () => {
     const close = north(start, 300);
     const reach = transitReach(table([rowA], [close], [[30]]), origin(), lines(names, [[2, 0]]));
     expectLines(reach?.({ geo: close }), walkMinutes(haversineMeters(start, close)), true, undefined);
+  });
+});
+
+describe("TRANSIT_RULE (Satz zum Modell, Plan 0012, E10; Arch-Review 0012, Hinweis 7)", () => {
+  it("nennt Aufschlag und Fußweg aus den Konstanten der Rechnung", () => {
+    expect(TRANSIT_RULE).toContain(`mindestens ${TRANSFER_PENALTY_MINUTES} Min. spart`);
+    expect(TRANSIT_RULE).toContain(`bis ${String(ACCESS_METERS / 1000).replace(".", ",")} km zum und vom Halt`);
+    expect(TRANSIT_RULE).toContain("bis 1,5 km zum und vom Halt");
+    expect(TRANSIT_RULE).toContain("mindestens 10 Min. spart");
   });
 });
 

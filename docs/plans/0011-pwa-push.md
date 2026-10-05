@@ -655,7 +655,7 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 - **Geänderte IDs zählen als neu** (E9). → Hinnehmbar. Gibt es auffällig viele, prüft die Pipeline Titeländerungen (eigener Plan).
 - **Pages-Cache:** `site.json` ist bis zu 10 Min. gecacht. → `notify` wartet auf den neuen Commit in `meta.json`, der Service Worker lädt mit `no-cache`.
 - **Ein Service Worker kann einen alten Stand festhalten.** → Netz zuerst für Navigation und Daten, `cache: "reload"` im Precache, E4a. Notausgang im README: ein Deploy mit `sw.js`, der sich selbst abmeldet.
-- **Start-JS-Budget** (E5): kaum Luft. → Lazy-Kette, Entscheidungspunkt, kein Anheben.
+- **Start-JS-Budget** (E5): kaum Luft. Seit Plan 0012 liegt das Start-JS bei 91,28 kB, 0,72 kB unter dem Budget von 92 kB und 0,28 kB über dem Ziel 91,0 kB aus ADR 0012. → Lazy-Kette, Entscheidungspunkt, kein Anheben.
 - **Missbrauch des Abo-Endpunkts** (Spam-Abos). → Allowlist der Push-Dienste, Größen- und Mengengrenze, Rate-Limit je IP. Die Origin-Prüfung hält nur fremde Webseiten ab, keine Skripte. Im schlimmsten Fall ist die Grenze von 500 voll. Dann `wrangler kv` leeren und neu einladen.
 - **Kosten:** Cloudflare Workers und KV im Gratis-Tarif (100 000 Requests/Tag, 1 000 Schreibvorgänge/Tag) reichen für Familie und Freunde um Größenordnungen.
 

@@ -35,6 +35,12 @@ const MAX_LINE_NAMES = 254;
  * Ein Umstieg zählt nur, wenn er mindestens so viel früher ankommt. Einzige Quelle, der Build leitet davon ab.
  */
 export const TRANSFER_PENALTY_MINUTES = 10;
+/**
+ * Erklärung des Modells im Quellenhinweis des Kind-Sheets (Plan 0012, E10), aus denselben Konstanten wie die
+ * Rechnung. Der Abgang im Build (`EGRESS_METERS`) ist gleich `ACCESS_METERS`, das prüft ein Test. Steht hier im
+ * Lazy-Chunk statt in `src/ui/format.ts`, um Start-JS zu sparen (Arch-Review 0012, Befund 2).
+ */
+export const TRANSIT_RULE = `Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. Direktverbindungen gehen vor, ein Umstieg nur, wenn er mindestens ${TRANSFER_PENALTY_MINUTES} Min. spart; mehr als einen Umstieg gibt es nicht, dann lieber zu Fuß (bis ${String(ACCESS_METERS / 1000).replace(".", ",")} km zum und vom Halt). Genannt sind die Linien der häufigsten Verbindung.`;
 
 /** Umwegfaktor auf die Luftlinie (E6) */
 const DETOUR = 1.3;
@@ -101,7 +107,7 @@ export function decodeTransitTable(file: TransitTableFile, placeKeys: ReadonlySe
   for (const key of placeKeys) if (!columns.has(key)) return undefined;
   return {
     id,
-    source: file.source,
+    source: { ...file.source, rule: TRANSIT_RULE },
     serviceDay: file.serviceDay,
     window: file.window,
     places,

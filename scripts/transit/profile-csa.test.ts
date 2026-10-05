@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { Timetable } from "../../src/domain/schema.ts";
-import { walkMinutes } from "../../src/domain/transit.ts";
+import { ACCESS_METERS, walkMinutes } from "../../src/domain/transit.ts";
 import {
   buildNetwork,
   type Connection,
@@ -210,6 +210,14 @@ function unboundedArrival(
   }
   return best;
 }
+
+const COUNTER_KEYS: readonly (keyof Counters)[] = [
+  "compared",
+  "finite",
+  "transfer",
+  "unboundedFaster",
+  "penaltyMatters",
+];
 
 interface Counters {
   compared: number;
@@ -501,6 +509,8 @@ describe("Profil-CSA (T1, umgestellt auf höchstens einen Umstieg)", () => {
 describe("Radius des Abgangs (T6)", () => {
   it("geht vom Steig bis 1 500 m zum Ort, bei 1 501 m nicht", () => {
     expect(EGRESS_METERS).toBe(1500);
+    // Der Erklärsatz im Kind-Sheet nennt einen Wert für Zugang und Abgang (TRANSIT_RULE, Arch-Review 0012, H7)
+    expect(EGRESS_METERS).toBe(ACCESS_METERS);
     const inp = input([at(0), at(5000)], [ride(0, 1, hm(9, 0), hm(9, 10))]);
     expect(arrival(inp, at(6500), 0, hm(9, 0))).toBeCloseTo(hm(9, 10) + walkMinutes(1500) * 60, 6);
     expect(arrival(inp, at(6501), 0, hm(9, 0))).toBe(INF);
@@ -674,8 +684,10 @@ describe("Referenz in zwei Ebenen und Rückverfolgung (T2, T3)", () => {
       for (const meters of [300, 800, 1500]) {
         const c = compareWithReference(inp, places, meters);
         expect(c.compared).toBe(3 * 14 * 120);
-        expect(c.finite).toBeGreaterThan(c.compared / 3);
-        for (const key of Object.keys(sum) as (keyof Counters)[]) sum[key] += c[key];
+        // wie vor Plan 0012 mehr als die Hälfte der Minuten mit Weg, für jeden Radius (erster Lauf: 300 m 2 799,
+        // 800 m 4 564, 1 500 m 4 673 von 5 040; bei 300 m knapp, aber mit festem Startwert deterministisch)
+        expect(c.finite).toBeGreaterThan(c.compared / 2);
+        for (const key of COUNTER_KEYS) sum[key] += c[key];
       }
       // Erster Lauf (2026-10-05), 60 Fahrten: 15 120 Minuten; ein Umstieg im Optimum 3 198 (21 %), unbegrenzt
       // schneller 960 (6,3 %), P = 0 und P = 600 wählen verschieden 1 291 (8,5 %). Je Radius schwankt das stark

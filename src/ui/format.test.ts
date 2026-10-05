@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Origin, Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, fromBerlinLocal } from "../domain/time.ts";
+// nur im Test: Konstanten der Rechnung gegen den Text (src/ui importiert transit.ts sonst nur per import())
+import { ACCESS_METERS, TRANSFER_PENALTY_MINUTES, TRANSIT_RULE } from "../domain/transit.ts";
 import {
   ageChipLabel,
   agendaHeading,
@@ -391,6 +393,8 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
     licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/de/",
     validFrom: "2026-06-24",
     validTo: "2026-12-12",
+    // Satz zum Modell: setzt erst decodeTransitTable (Lazy-Chunk, TRANSIT_RULE); hier ein Platzhalter
+    rule: "Regel.",
   };
   const text = (parts: ReturnType<typeof transitSourceNote>) =>
     parts.map((p) => (typeof p === "string" ? p : p.text)).join("");
@@ -399,10 +403,7 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
   it("nennt Rechteinhaber, Titel mit Stand, „abgewandelt“ und die Lizenz, beide als Link", () => {
     const parts = transitSourceNote(source);
     expect(text(parts)).toBe(
-      "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
-        "Direktverbindungen gehen vor, ein Umstieg nur, wenn er mindestens 10 Min. spart; mehr als einen Umstieg " +
-        "gibt es nicht, dann lieber zu Fuß (bis 1,5 km zum und vom Halt). Genannt sind die Linien der häufigsten " +
-        "Verbindung. " +
+      "Regel. " +
         "Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, ‚VGN-Soll-Daten vom 24.06.2026‘, abgewandelt, " +
         "Lizenz CC BY-SA 3.0 DE.",
     );
@@ -410,6 +411,19 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
       { text: "VGN-Soll-Daten vom 24.06.2026", href: "https://www.vgn.de/web-entwickler/open-data/" },
       { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/", nowrap: true },
     ]);
+  });
+
+  it("nennt den Satz zum Modell aus der Domäne, mit 10 Min. und 1,5 km aus den Konstanten (Arch-Review 0012, H7)", () => {
+    const parts = transitSourceNote({ ...source, rule: TRANSIT_RULE });
+    expect(text(parts)).toMatch(
+      /^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten\. /,
+    );
+    expect(text(parts)).toContain(`${TRANSIT_RULE} Fahrplan: `);
+    expect(TRANSIT_RULE).toContain(`mindestens ${TRANSFER_PENALTY_MINUTES} Min. spart`);
+    expect(TRANSIT_RULE).toContain(`bis ${String(ACCESS_METERS / 1000).replace(".", ",")} km zum und vom Halt`);
+    // ohne Erklärung (Tabelle noch nicht dekodiert) nur die Quelle
+    const { rule: _rule, ...plain } = source;
+    expect(text(transitSourceNote(plain))).toMatch(/^Fahrplan: VGN/);
   });
 
   it("lange Lizenz-Bezeichnung aus den Daten darf umbrechen (N4)", () => {
@@ -423,15 +437,9 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
     expect(text(transitSourceNote(fixture))).toContain("Lizenz CC0 1.0.");
   });
 
-  it("ohne geladene Tabelle: VGN und Lizenz, beide als Link", () => {
+  it("ohne geladene Tabelle: VGN und Lizenz, beide als Link (die Erklärung kommt mit der Tabelle)", () => {
     const parts = transitSourceNote(undefined);
-    expect(text(parts)).toBe(
-      "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
-        "Direktverbindungen gehen vor, ein Umstieg nur, wenn er mindestens 10 Min. spart; mehr als einen Umstieg " +
-        "gibt es nicht, dann lieber zu Fuß (bis 1,5 km zum und vom Halt). Genannt sind die Linien der häufigsten " +
-        "Verbindung. " +
-        "Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, CC BY-SA 3.0 DE.",
-    );
+    expect(text(parts)).toBe("Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, CC BY-SA 3.0 DE.");
     expect(links(parts)).toEqual([
       { text: "VGN – Verkehrsverbund Großraum Nürnberg GmbH", href: "https://www.vgn.de/web-entwickler/open-data/" },
       { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/", nowrap: true },

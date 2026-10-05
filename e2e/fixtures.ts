@@ -231,7 +231,7 @@ export async function expectTwoLines(el: Locator, spoken: string) {
 export async function twoLinesEverywhere(page: Page) {
   await page.route("**/data/linien.json", async (route) => {
     const response = await route.fetch();
-    const file = (await response.json()) as { lines: string[]; first: string; second: string };
+    const file: { lines: string[]; first: string; second: string } = await response.json();
     const bytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
     const tram = file.lines.indexOf("Tram\u00a01") + 1;
     const bus = file.lines.indexOf("Bus\u00a0202E") + 1;

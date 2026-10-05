@@ -62,21 +62,16 @@ export async function loadTransit<L>(
     (): Settled<L> => ({ value: undefined, chunk: "fehler" }),
   );
   const timer = setTimeout(() => controller.abort(), env.timeoutMs);
-  const table = async (): Promise<TransitTableFile> => {
-    const res = await env.fetch(`${import.meta.env.BASE_URL}data/wegzeit.json`, {
-      signal,
-      cache: retry ? "reload" : "default",
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    // Build-Artefakt ohne Zod im Client: `decodeTransitTable` prüft Version, Längen und Spalten (E8).
-    return await res.json();
-  };
+  const cache: RequestCache = retry ? "reload" : "default";
   try {
-    const [settled, file] = await Promise.all([Promise.race([logic, expired]), table().catch(() => undefined)]);
+    const [settled, file] = await Promise.all([
+      Promise.race([logic, expired]),
+      getJson<TransitTableFile>("wegzeit.json", { signal, cache }, env),
+    ]);
     if (settled === "zeitlimit") return { logic: undefined, file, chunk: settled, lines: Promise.resolve(undefined) };
     // Ohne Logik gibt es keine Wegzeit, ohne Tabelle keine Zellen: dann keine Linien-Anfrage (Review W2, H10)
     const lines =
-      settled.value !== undefined && file !== undefined ? loadLines(retry, env) : Promise.resolve(undefined);
+      settled.value !== undefined && file !== undefined ? loadLines(cache, env) : Promise.resolve(undefined);
     return { logic: settled.value, file, chunk: settled.chunk, lines };
   } finally {
     clearTimeout(timer);
@@ -84,23 +79,30 @@ export async function loadTransit<L>(
 }
 
 /**
+ * Build-Artefakt vom eigenen Origin als JSON, `undefined` bei Netz-, HTTP- oder JSON-Fehler. Ohne Zod im Client:
+ * `decodeTransitTable` bzw. `decodeTransitLines` prüfen den Inhalt (E8; Plan 0012, E8). Wirft nie.
+ */
+async function getJson<T>(
+  file: string,
+  init: Parameters<TransitEnv["fetch"]>[1],
+  env: TransitEnv,
+): Promise<T | undefined> {
+  try {
+    const res = await env.fetch(`${import.meta.env.BASE_URL}data/${file}`, init);
+    return res.ok ? await res.json() : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * `linien.json` mit niedriger Priorität, eigenem Abbruch und eigenem Zeitlimit ab der Anfrage; das `finally` von
  * `loadTransit` räumt diesen Timer nicht ab (Plan 0012, E9). Wirft nie.
  */
-function loadLines(retry: boolean, env: TransitEnv): Promise<TransitLinesFile | undefined> {
+function loadLines(cache: RequestCache, env: TransitEnv): Promise<TransitLinesFile | undefined> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), env.timeoutMs);
-  const request = async (): Promise<TransitLinesFile> => {
-    const res = await env.fetch(`${import.meta.env.BASE_URL}data/linien.json`, {
-      signal: controller.signal,
-      cache: retry ? "reload" : "default",
-      priority: "low",
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    // Build-Artefakt ohne Zod: `decodeTransitLines` prüft Version, Kennung und Ebenen (Plan 0012, E8).
-    return await res.json();
-  };
-  return request()
-    .catch(() => undefined)
-    .finally(() => clearTimeout(timer));
+  return getJson<TransitLinesFile>("linien.json", { signal: controller.signal, cache, priority: "low" }, env).finally(
+    () => clearTimeout(timer),
+  );
 }

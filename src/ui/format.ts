@@ -341,11 +341,8 @@ const LICENSE: NotePart = {
  * Lizenz.
  */
 export function transitSourceNote(source: TransitSource | undefined): NotePart[] {
-  const lead =
-    "Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten. " +
-    "Direktverbindungen gehen vor, ein Umstieg nur, wenn er mindestens 10 Min. spart; mehr als einen Umstieg gibt " +
-    "es nicht, dann lieber zu Fuß (bis 1,5 km zum und vom Halt). Genannt sind die Linien der häufigsten " +
-    "Verbindung. Fahrplan: ";
+  // Die Erklärung des Modells liefert die geladene Tabelle (`source.rule`, Lazy-Chunk; Arch-Review 0012, Befund 2).
+  const lead = `${source?.rule ? `${source.rule} ` : ""}Fahrplan: `;
   if (!source) return [lead, { text: VGN, href: VGN_URL }, ", ", LICENSE, "."];
   return [
     `${lead}${source.attribution}, ‚`,

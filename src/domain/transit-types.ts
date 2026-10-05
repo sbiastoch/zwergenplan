@@ -15,6 +15,12 @@ export interface TransitSource {
   licenseUrl: string;
   validFrom: string;
   validTo: string;
+  /**
+   * Erklärung des Modells für den Quellenhinweis (Plan 0012, E10). Steht nie in den Dateien, erst `decodeTransitTable`
+   * setzt ihn aus den Konstanten der Rechnung. So liegt der Text im Lazy-Chunk statt im Start-JS (Arch-Review 0012,
+   * Befund 2).
+   */
+  rule?: string;
 }
 
 /**
