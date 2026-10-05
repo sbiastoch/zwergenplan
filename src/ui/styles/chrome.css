@@ -309,6 +309,10 @@
     font-weight: 800;
     display: inline-grid;
     place-items: center;
+    /* Zähler bleibt eine Zeile und schrumpft nicht: In der kompakten Querleiste (568×320, 200 %) brach „10“
+       sonst in „1“ über „0“ um (W1, Browser-Review live zu Plan 0008). */
+    white-space: nowrap;
+    flex: none;
   }
 
   /* Ergänzungen gegenüber dem Mockup (echte Seite statt fester 390×844-Rahmen) */

@@ -933,3 +933,282 @@ Kleiner:
   - Nicht-Ziele und Backpressure nennen die E2-Lockerung ausdrücklich.
   - Paketliste und Struktur nennen `declare var __zpSite`.
   - „Umsetzung“ nennt `Lazy.tsx` und das `.monthbtn`-Padding.
+
+## Browser-Review live (2026-10-05)
+
+**Verdict: bestanden, kein Blocker.** B6 (Plan 0007, Paket C) und E1–E20 aus Plan 0008 halten live mit echten Daten, in Chromium und WebKit. Es gibt **einen wichtigen Befund**: Bei 568×320 und 200 % bricht das zweistellige Merklisten-Badge („10“) senkrecht um, und das Text-Gate wird rot (W1). Dazu kommen einige Hinweise.
+
+- **Ziel**: https://zwergenplan.app/, echte Daten. `data/meta.json` meldet 333 Angebote, 83 Anbieter, Datenstand 4.10. 14:05 und `commit: 4a709ad`.
+- **Stand**: `4a709ad` (Worktree `feinschliff-0008-int`). Live-HTML lädt `assets/index-D5KtcqMb.js` und `assets/index-BdFMkAV4.css`. Im `<head>` gibt es keinen Preload mehr, dafür die zwei Inline-Skripte (Frühstart `fetch("/data/site.json")` und Darstellung).
+- **Methode**:
+  - Playwright 1.63 gegen die Live-URL, ohne lokalen Server. Chromium mobil und WebKit (iPhone 15), `de-DE`, Europe/Berlin, echte Uhrzeit (Mo 5.10., ab 07:00). Wo nicht anders genannt, gilt `reducedMotion: "reduce"`.
+  - Karte in Chromium mit `--use-angle=swiftshader --enable-unsafe-swiftshader`, Gegenprobe in WebKit.
+  - Die Gates kommen direkt aus `e2e/mobile-ux.ts` (Import aus dem Worktree), B6 direkt aus `e2e/vitals.ts` (`measureSwap` mit `allowOnlyFallback`/`rewriteFallbackCss`, `holdWebfont`, `markShifts`). Telefon-Rendering wie `PHONE_FONT_RENDERING` (`--force-device-scale-factor=2.625`).
+  - Skripte unter `$CLAUDE_JOB_DIR/tmp/`: `b6-swap.ts`, `b6-webkit-faces.ts`, `e1.mjs`, `e5.mjs`, `layout8.mjs` (E6–E10, E13, E14), `e11e12.mjs`, `karte8.mjs`, `karte-dark.mjs`, `geo8.mjs`, `gates8.mjs`, `kindquer.mjs`. Gemeinsame Helfer in `lib8.mjs`.
+  - **Screenshot-Matrix**: `node scripts/screenshots.ts https://zwergenplan.app/` und `--text=200` ergeben 240 Bilder (10 Ansichten × 6 Viewports × hell/dunkel × 100/200 %) in `e2e/.artifacts/screens/`. Ich habe sie als 20 Kontaktbögen (`tmp/sheets8/*.png`) angesehen, auffällige Bilder einzeln. Eigene Bilder liegen in `tmp/shots8/`.
+  - claude-in-chrome kam nicht zum Einsatz.
+
+### Checkliste (Skill)
+
+- **Lesbarkeit: ok.**
+  - Kacheln sind in 2 s erfassbar: Kategorie, Zeit, Titel, Anbieter/Ort, Fakten.
+  - Das Monatsraster bei 200 % ist jetzt lesbar, jeder Tag steht in einem eigenen Feld (E7).
+  - Der Leerzustand im Kalender nennt den Grund (E12). Der Fehlerzustand spricht Deutsch (E5).
+  - Rest: In WebKit (headless) bricht ein Wort ohne Trennstrich um, etwa „Musikzwer|ge“ (H1).
+- **Daumen-Erreichbarkeit: ok.**
+  - Der Filter-Fuß ist ab 360 px einzeilig, 84 px hoch, mit „Zurücksetzen“ als Textknopf (E10).
+  - Der ICS-Fuß liegt bei 100 % hochkant fest unten. Bei wenig Höhe scrollt er mit, „Zurück“ und das Herz bleiben dabei sticky (E6).
+  - Das Touch-Gate ist in allen geprüften Ansichten grün.
+- **Zustände: ok.**
+  - Laden, Fehler (Abbruch, offline, 503), Leerzustände (Merkliste, „Nichts, was zu deiner Auswahl passt“) und lange Titel brechen nicht.
+  - Einzige Ausnahme ist das Badge „10“ bei 568×320/200 % (W1).
+- **Dark Mode: ok.**
+  - Das Insel-Gate ist auf beiden Wegen (System, Darstellungswahl) und in beiden Engines grün: Matrix bei 320 px mit 100/200 %, dazu Detail gescrollt, Monat 200 %, Badge quer 200 %.
+  - Die Karte ist dunkel, Marker gelb, Attribution auf dunklem Grund.
+  - Nach dem Theme-Wechsel stimmen die Farben sofort, auch in WebKit mit „reduzieren“ (E1).
+- **Micro-Interactions / reduzierte Bewegung: ok.**
+  - `expectReducedMotion` ist in beiden Engines grün und verlangt seit E1 0 ms.
+  - Toasts erscheinen und lassen Tipps durch (E9).
+  - Zurück und Esc schließen das Detail, der Fokus geht auf den aktiven Tab (E11).
+  - Einen Pressed-State habe ich live nicht gesondert gemessen; den decken die E2E-Gates ab.
+- **Konsistenz mit dem Design-System: ok.**
+  - Textknöpfe (`.linkbtn`) haben einheitlich die Wellenlinie: „Zurücksetzen“, „Filter zurücksetzen“, „Startpunkt entfernen“.
+  - Die Tagesfelder (7 px Radius, `--soft`) und die Attribution in Bricolage passen zum Stickerheft-Stil.
+
+### B6 – Schrift-Fallback live (Plan 0007, Schritt 10)
+
+**Ergebnis: bestanden.** CLS beim Swap liegt in allen Fällen ≤ 0,0024 (Ziel < 0,05; live vor Paket C: 0,052). Es lädt genau eine Schriftdatei. In WebKit lösen die fetten Fallback-Schnitte über den Familiennamen auf, und zwar in den **echten Fettschnitt**.
+
+**CLS beim Swap**:
+- Chromium, Telefon-Rendering (DSF 2,625), echte Daten, Uhr auf `generatedAt`.
+- Je Fallback wird nur diese Familie zugelassen (`rewriteFallbackCss`). Roboto kommt per URL aus `@fontsource-variable/roboto`, wie in `font-swap.smoke.spec.ts`.
+- Die Webfont wird zurückgehalten und nach 300 ms freigegeben (`expectHeld`: genau eine Latin-Anfrage).
+- Je Zelle 2 Läufe, beide identisch:
+
+| Fallback | 412 px | 360 px | Verursacher (Auszug) |
+|---|---|---|---|
+| Roboto | 0,0001 | 0,0003 | `span.when` (Zeit 119→107 px breit), `span.tab-label`; bei 360 `p.meta` |
+| Arial (Liberation Sans) | 0,0001 | 0,0002 | `small` in der Tab-Leiste, Status-`span`; bei 360 `p.meta` |
+| Noto Sans | 0,0000 | 0,0024 | bei 360 `p.meta`/`div.facts` (Fakten-Zeile rutscht um 24 px) |
+| DejaVu Sans | 0,0000 | 0,0000 | – |
+
+- Das sind dieselben Werte wie unter „Umsetzung“ in Plan 0008 (lokal, Swap-Matrix m10). Live ist also nichts schlechter geworden.
+- **Natürlicher Lauf** ohne Umschreiben, Webfont 1,5 s verzögert, Fallback der Maschine (Liberation über „Bricolage Fallback Arial“): CLS über den **ganzen** Ladevorgang 0,0003 bei 412 px und 0,0014 bei 360 px.
+
+**Netzwerk (genau eine Schriftdatei):**
+- **Chromium**: 5 Requests: `/`, `index-D5KtcqMb.js`, `index-BdFMkAV4.css`, `data/site.json`, `bricolage-grotesque-latin-opsz-normal-Cre6nC2_.woff2`.
+- **WebKit**: dieselben 5 Requests, `site.json` dabei schon vor dem JS.
+- Keine Latin-Ext- oder Vietnamese-Datei, keine Fallback-Datei. Auch in allen Swap-Läufen lud die App nur die eine Latin-Datei; dazu kam nur die Test-Roboto des Skripts.
+
+**WebKit: Lösen die fetten Fallback-Faces auf?**
+- **Methode**: Alle 24 Faces über `document.fonts.load` laden und ihren Status lesen. Dazu eine **Breitenprobe** mit `font-synthesis: none`: Breite des Face bei Gewicht 800 bzw. 749, geteilt durch die Breite der lokalen Familie beim selben Gewicht und durch `size-adjust`. Ergibt das 1,000, steckt der echte Fettschnitt dahinter. Wäre es der normale Schnitt mit künstlichem Fett, käme das Verhältnis zum Gewicht 400 auf 1,000.
+- **Status**: Alle 18 Faces der installierten Familien (Arial/Liberation, Noto, DejaVu, je Text- und Display-Stack) sind `loaded`.
+  - Die 6 Roboto-Faces sind `error`, wie erwartet: Roboto ist auf dieser Maschine nicht installiert, sie gibt es nur auf Android.
+- **Breitenprobe WebKit**, fette Bereiche 550–749 und 750–800:
+
+| Familie | ÷ Familie fett | ÷ Familie 400 | Urteil |
+|---|---|---|---|
+| Liberation Sans | 1,000 | 1,072 | echter Fettschnitt |
+| DejaVu Sans | 1,000 | 1,125 | echter Fettschnitt |
+| Noto Sans | 1,000 | 1,052–1,067 | echter Fettschnitt |
+
+  - Die normalen Bereiche (200–549) liegen bei 1,000.
+- **Chromium zum Vergleich**: alle 18 `loaded`, Verhältnisse 0,986–1,006.
+- Damit ist der CI-Befund aus dem Arch-Review Paket C (fette Faces scheiterten in WebKit) live behoben. WebKit wählt über `local("Liberation Sans")` usw. den passenden Schnitt der Familie.
+
+**Nicht prüfbar ohne Gerät:**
+- Echtes Android: Greift „Bricolage Fallback Roboto“? Prüfung über Remote-Debugging, „Rendered Fonts“.
+- Safari auf dem iPhone: Löst `local(Arial Bold)` bzw. `local(Arial)` den Fettschnitt auf?
+- Beides bleibt für die Geräte-Checkliste. Kein neuer Blocker.
+
+### E1–E20 einzeln
+
+- **E1 ok.** WebKit und Chromium, 412×915, `reducedMotion: "reduce"`:
+  - **Referenz**: eingeschwungene Farben von `.brand`, `.kid`, 3 × `.stk`, `.daylabel`, `.when`, `.ctitle` und `.chip` (9 Werte).
+  - **Wechsel hell → dunkel und dunkel → hell** über den Kopf-Knopf: Nach **300 ms** weichen 0 von 9 Farben ab, axe hat keine Kontrastfehler. Das gilt in beiden Richtungen und beiden Engines.
+  - **Beim Laden** steht `.brand` sofort auf `rgb(19,33,46)` (hell) bzw. `rgb(238,243,248)` (dunkel), ohne Abweichung zum Stand nach 1,5 s. Der schwarze Moment ist weg.
+  - Screenshots `shots8/e1-webkit-dark-300ms.png` und `e1-webkit-light-300ms.png`.
+- **E2/E3 ok.** Gates auf echten Daten, siehe „Text-Gate live“.
+  - Die Woche ab 12.10. und ab 26.10. (zweistelliger Montag) ist bei 320 px in beiden Engines grün.
+  - Im Filter-Sheet bei 200 % mit halbierter Überschrift „Kosten“ (geprüft: kreuzt die Oberkante) ist das Gate grün.
+  - Das Kind-Sheet quer (568×320, 100/200 %, gescrollt auf 33/50/77 %) ist grün.
+- **E4 ok.**
+  - WebKit lädt `site.json` **1×**, die Konsole ist leer, es gibt keine Preload-Warnung.
+  - Chromium bleibt unverändert bei 5 Requests und lädt `site.json` 1×.
+  - Im HTML steht kein `rel=preload` mehr.
+- **E5 ok.** Getestet in Chromium und WebKit, bei 320 und 412 px:
+
+| Fall | Angezeigter Text |
+|---|---|
+| Abbruch | „Die Verbindung ist abgebrochen. Versuch es gleich nochmal.“ |
+| Offline (`setOffline` + `internetdisconnected`) | „Du bist gerade offline. Sobald das Netz wieder da ist, tippe auf ‚Nochmal versuchen‘.“ |
+| HTTP 503 | „Die Angebote ließen sich gerade nicht laden. Versuch es später nochmal.“ |
+
+  - Die Überschrift ist jeweils „Das hat nicht geklappt“. Nirgends steht „fetch“ oder „Load failed“.
+  - „Nochmal versuchen“ ist zentriert und lädt danach die Kacheln, mit genau einem weiteren `site.json`-Request.
+  - Bei 320 px sind HScroll-, Touch-, Text-Gate und axe grün.
+  - Screenshots `shots8/e5-*-{abort,offline,503}-{320,412}.png`.
+- **E6 ok.** Detail „Offene Tür für Groß und Klein (Mo vormittags)“:
+
+| Viewport | Fuß anfangs | Wer scrollt | Zurück nach dem Scrollen | Toast nach „Nur Mo 5.10.“ |
+|---|---|---|---|---|
+| 320×640, 200 % | top 3572 bzw. 3335 > 640, unter dem Viewport | Hülle; `.dhead` sticky | y = 14, ganz sichtbar | im Viewport (y 226–434), Download `20261005T0900.ics` |
+| 412×915, 200 % | unter dem Viewport | Hülle | ganz sichtbar | im Viewport |
+| 915×412, 100 % | unter dem Viewport | Hülle | ganz sichtbar | im Viewport |
+| 915×412, 200 % | unter dem Viewport | Hülle | ganz sichtbar | im Viewport |
+| 568×320, 200 % | unter dem Viewport | Hülle | ganz sichtbar | im Viewport |
+| 412×915, 100 % | fest, 0 px Abstand unten | keiner, `.dhead` static | – | – |
+| 320×640, 100 % | fest, 0 px Abstand unten | keiner, `.dhead` static | – | – |
+
+  - Dunkel gescrollt (System und Wahl): Insel-Gate und axe grün.
+  - Screenshots `shots8/e6-{chromium,webkit}-320-200-gescrollt-toast.png` und `e6-*-quer-200-gescrollt.png`.
+- **E7 ok.**
+  - **Bei 200 %** (320/360/390 px, hell und dunkel, beide Engines): 27 freigegebene Tage, alle mit Feld, 0 Paare unter 3 px Abstand. Spalten sind ≥ 45 px breit, Radius 7 px. Text-Gate, Insel-Gate und axe sind grün.
+  - **Bei 100 %**: 26 nicht gewählte Tage ohne Feld (unverändert), Radius 22 px, Touch-Gate grün.
+  - Screenshots `shots8/e7-chromium-360-200-{light,dark}.png` und `e7-chromium-360-100-light.png`.
+- **E8 ok mit W1.** Je 1 und 10 gemerkte Angebote, 100/200 %, beide Engines:
+  - **Querformat** (568×320, 863×360, 915×412): Das Badge ist `static` und überschneidet weder Label (−1,2 bis −5,8 px) noch Herz. Es bleibt in Tab und Leiste.
+  - **Hochformat**: Das Badge sitzt am Herz und ist auch zweistellig sauber (37×36 bzw. 34×36 px bei 200 %).
+  - **Seitenleiste 863×360/200 %** mit „10“: 37×36 px, sauber.
+  - **Aber 568×320 bei 200 % mit „10“**: Das Badge bricht in „1“/„0“ um (23×69 bzw. 34×70 px), Tab 71 statt 46 px, Leiste 81 statt 56 px. Das Text-Gate ist rot, siehe **W1**. Mit „1“ ist es sauber.
+  - Dunkel bei 200 % (568×320, 863×360): Insel-Gate und axe grün.
+- **E9 ok.** 320 px, Merkliste mit 2 Angeboten, eins gelöst:
+  - Der Toast „Sticker abgelöst – nicht mehr gemerkt“ hat `pointer-events: none`.
+  - `elementFromPoint` in seiner Mitte trifft `button.card-open` darunter, nicht den Toast.
+  - Ein Trial-Klick auf „Alle in den Kalender“ geht durch, bei 100 % und 200 %, in beiden Engines.
+  - Bei 200 % ist der Toast 208 px hoch (y 226–434), flüchtig und blockiert nichts.
+  - Screenshot `shots8/e9-webkit-320-200-toast.png`.
+- **E10 ok.**
+
+| Breite | Fuß | Zeilen | Breite „Zurücksetzen“ |
+|---|---|---|---|
+| 360, 375, 390, 412 px | 84 px | einzeilig, gleicher `offsetTop` | 115 px (Chromium), 106 px (WebKit), links |
+| 320 px, 100 % | 138 px | zwei Zeilen, wie im Plan erwartet („bricht bei 320 px um“) | – |
+| 320 px, 200 % | 180 px | zwei Zeilen | – |
+
+  - Bei 360–412 px ist „… Angebote zeigen“ rechts daneben, der Fuß endet bündig unten. Touch-Gate grün.
+  - Screenshots `shots8/e10-*-{320,360}-*.png`.
+- **E11 ok.**
+  - Ablauf: Desktop 1280×800, 412×915 und 915×412, nur per Tastatur. Merkliste mit 2 Angeboten, Detail mit Enter öffnen, Herz mit Enter lösen, dann „Zurück“ per Enter bzw. Esc.
+  - Die Kachel ist weg, der Fokus liegt auf `button.tab` „Merkliste“ mit `aria-current=page`.
+  - Der Fokus ist sichtbar: `:focus-visible`, `outline` 3 px solid. Das gilt in allen 12 Kombinationen.
+- **E12 ok.**
+  - **Mit „Kurse“** gibt es in den echten Daten keinen solchen Tag, weil jeden Tag Kurse stattfinden (10–24 pro Tag).
+  - **Mit Startpunkt Gostenhof und Umkreis 2 km** zeigt So 11.10.:
+    - „Nichts, was zu deiner Auswahl passt“,
+    - „8 Angebote an diesem Tag sind ausgeblendet – durch Filter, Umkreis oder Alter.“,
+    - „Filter zurücksetzen“ (zentriert).
+  - Nach dem Tipp darauf stehen 8 Kacheln am Tag.
+  - Bei 320 px und 412 px sind Text-Gate, Touch-Gate und axe grün, bei 320/200 % das Text-Gate.
+  - Screenshot `shots8/e12-webkit-leer-320-200.png`.
+- **E13 ok.**
+  - Im Kind-Sheet bei 320 px/200 % ist „Startpunkt entfernen“ zweizeilig, mit `text-align: start`. Beide Zeilen beginnen bei 20 px, das ist der Innenrand.
+  - Der Leerzustand der Merkliste bleibt zentriert.
+  - Screenshot `shots8/e13-webkit-320-200.png`.
+- **E14 teilweise prüfbar (H1).**
+  - Berechnet ist `hyphens: auto` für `.card .meta` und `.ctitle`, `lang="de"`.
+  - **Chromium** trennt nach Silben, mit Strich: „Musik-zwerge“, „Ev. Auferstehungs-kirche Zerzabels-hof“.
+  - **Headless-WebKit** hat auf dieser Maschine kein deutsches Wörterbuch (nur `hyph_en`). Es bricht ohne Strich um: „Musikzwer|ge“, „Krabbelgr|uppe“; im Detail-Link „Kirchengemein|de“.
+  - „Krabbeltreff“ steht in den echten Daten nur noch in „Offener Krabbeltreff Nordost (Di)“. Geprüft habe ich deshalb an der Kachel „Musikzwerge … / Ev. Auferstehungskirche Zerzabelshof“.
+  - Eine echte Trennung in Safari ist nur am iPhone prüfbar.
+  - Screenshots `shots8/e14-webkit-320-200-karte.png` und `e14-chromium-320-200-karte.png`.
+- **E15 ok.** Cluster stabil mit und ohne Startpunkt:
+  - „Kartenmitte als Startpunkt“ im selben Tab bei 320/390/412 px und 915×412 ergibt dieselben Cluster: 21, 1, 20, 24, 225, 14, 6, 22.
+  - „Meinen Standort nutzen“ (Geolocation freigegeben, 412 px) ändert ebenfalls nichts. Das Diff-Bild zeigt nur den Startpunkt-Marker und 1 px Scrollversatz, die Kamera bleibt.
+  - Mit Stadtteil Gostenhof aus dem Speicher zoomt die Karte gewollt auf den Stadtteil.
+  - Screenshots `shots8/cluster-390x844-{ohne,kartenmitte}.png`, `geo-vorher.png`, `geo-nachher.png`, `geo-diff.png`.
+- **E16 ok.**
+  - **Hell**: „Nürnberg“, „Fürth“, „Erlangen“, „Röthenbach an der Pegnitz“, „Roßtal“.
+  - **Dunkel** (System und Wahl): „FÜRTH“, „ERLANGEN“. Den Namen Nürnberg verdeckt in der Startansicht der Cluster „225“. Herausgezoomt steht „…RNBERG“ neben „333“; englisch wäre es „…EMBERG“.
+  - **Nach dem Wechsel** hell → dunkel → hell im selben Tab bleibt die Beschriftung deutsch.
+  - Screenshots `shots8/karte-chromium-390-hell-start.png`, `karte-system-dunkel-412.png`, `karte-wahl-hell-nach-dunkel-412.png` und `karte-chromium-390-dunkel-zoom-2.png`.
+- **E17 ok.**
+  - Es gibt genau **ein** `.maplibregl-ctrl-attrib`, auch nach dem Wechsel auf dunkel. Text: „OpenFreeMap © OpenMapTiles Data from OpenStreetMap“.
+  - Die Schrift ist „Bricolage Grotesque Variable“, gleich `--font-sans`, in Chromium und WebKit.
+- **E18/E21:** nicht Teil der UI, siehe `docs/ideas.md`.
+- **E19 ok.** Orts-Sheet bei 390 und 320 px, mit Startpunkt Gostenhof:
+  - Geprüft an 4 Orten: FBS Haupthaus mit 62 Kacheln, HebAnne/FamilienBox mit 28, Nachbarschaftshaus Gostenhof, Theater Mummpitz.
+  - Keine `.meta` enthält „·“ oder eine Entfernung. Die Meta-Zeile nennt nur den Anbieter; bei HebAnne/FamilienBox sind es zwei verschiedene.
+  - Die Liste zeigt die Entfernung weiter („… · Gibitzenhof · 2,1 km“).
+  - Screenshots `shots8/ort-chromium-{390,320}.png`.
+- **E20 ok.** Im Startausschnitt bei 320, 390 und 412 px sowie 915×412 liegt kein Marker unter den Zoom-Knöpfen (48×92 px oben rechts). Screenshots `shots8/cluster-*-ohne.png`. Zur Unterkante quer siehe H2.
+
+### Karte: Netzwerk
+
+Ablauf: Karte öffnen, 2 × herauszoomen, dunkel, hell. Das ergibt 44 Requests in Chromium und WebKit.
+
+- **Hosts**: nur `zwergenplan.app` und `tiles.openfreemap.org`.
+- **Querystring oder Fragment**: 0 von 44. Das Resource-Timing des Workers zeigt 18 Einträge, alle `tiles.openfreemap.org`, ohne Query.
+- **Pfade**:
+  - Stile: `/styles/positron` (2), `/styles/dark` (1)
+  - TileJSON: `/planet` (3)
+  - Kacheln: `/planet/<v>/{z}/{x}/{y}.pbf` (18)
+  - Sprites: `ofm@2x.json` (3), `ofm@2x.png` (3)
+  - Glyphen: `Noto Sans Regular` (6), `Italic` (2), `Bold` (2)
+- Konsole: keine Fehler, 1 Warnung aus dem OFM-Stil (E18).
+
+### Text-Gate live (`e2e/mobile-ux.ts`)
+
+**Matrix**:
+- Chromium und WebKit, 320×640, bei 100 % und 200 %.
+- Hell, dunkel (System) und dunkel (Darstellungswahl).
+- 13 Ansichten: start, Woche 5.10., Woche 12.10., Woche 26.10., Monat, Merkliste, Detail (regelmäßig), Detail (Kurs), Filter, Filter mit halbierter „Kosten“, Kind (mit Gostenhof), Kalender-Leerzustand (E12), Fehlerzustand.
+
+**Je Kombination**:
+- `expectTextFits` (`buttons: false`, wie mit echten Daten vorgesehen, `scale` 1 bzw. 2).
+- Im Dunkeln dazu `expectNoBrightIslands`.
+- Hell bei 100 % dazu `expectNoHorizontalScroll` und `expectTouchTargets`.
+
+**Ergebnis: 156 von 156 grün** (78 je Engine). Dazu kommt das Kind-Sheet quer, 12 von 12 grün.
+
+- **Fehlalarme der Projekt-Gates: keine.**
+- Das einzige Rot außerhalb der Matrix ist echt, kein Fehlalarm: W1, „Wort gebrochen: „10“ in span.badge“, in Chromium zusätzlich „Text stößt an die Rundung von span.badge“.
+- **Fehlalarm im eigenen Review-Skript, nicht im Projekt:** Meine Wortbruch-Suche für E14 zählt Zeichen pro Zeile. In Chromium meldete sie Brüche wie „Musikz|werge“, obwohl dort sauber „Musik-zwerge“ getrennt ist; der eingefügte Trennstrich verfälscht die Zeichengeometrie. Für E14 gilt deshalb die Sichtprüfung.
+
+### Befunde
+
+**Blocker:** keine.
+
+**Wichtig**
+1. **W1 – Zweistelliges Badge bricht bei 568×320/200 % senkrecht um.**
+   - **Wo**: In der kompakten Querleiste mit „10“ gemerkten Angeboten steht das Badge als „1“ über „0“ (Chromium 23×69 px, WebKit 34×70 px). Es ragt über den rechten Rand der Tab-Karte. Der Tab wächst von 46 auf 71 px, die Leiste von 56 auf 81 px.
+   - **Gates**: `expectTextFits` ist in beiden Engines rot. Bei 100 %, in der Seitenleiste (863×360, 915×412) und im Hochformat ist alles sauber.
+   - **Warum E2E es nicht fängt**: Der E8-Test in `layout.spec.ts` merkt nur **ein** Angebot.
+   - **Vorschlag**:
+     - `.badge { white-space: nowrap }` bzw. `flex: none`, damit es nicht schrumpft. Dazu den E8-Test zusätzlich mit 10 gemerkten Angeboten laufen lassen, Rot zuerst.
+     - Gemessen ist nur bis „10“. Dreistellige Zahlen sind unwahrscheinlich, sollten aber im selben Test mitlaufen.
+   - **Screenshots**: `review-0008-badge-quer-200.png`, Einzelbilder `shots8/e8-{chromium,webkit}-568x320-200-n10.png`.
+
+**Hinweis**
+1. **H1 – Silbentrennung in Safari nicht belegbar.**
+   - Headless-WebKit hat hier kein deutsches Wörterbuch. Ohne Wörterbuch greift `overflow-wrap: anywhere`, etwa „Musikzwer|ge“ (Titel bei 320/200 %) oder „Kirchengemein|de“ (Detail-Link).
+   - Chromium trennt korrekt mit Strich.
+   - Das ist kein Fehler des Codes. Belegen lässt es sich aber nur am iPhone, deshalb **als Zeile in die Geräte-Checkliste** aufnehmen: Kacheln bei großer Schrift, „Musikzwerge“ bzw. „Auferstehungskirche“.
+   - Screenshot `shots8/e14-webkit-320-200-karte.png`.
+2. **H2 – Querformat: Die Attribution verdeckt im Startausschnitt den unteren Marker.**
+   - Bei 915×412 liegt der Cluster „22“ zur Hälfte unter der einzeiligen Attribution.
+   - E20 hält nur die Ecke der Zoom-Knöpfe frei. Das Padding unten (32 px) ist kleiner als Attribution plus Abstand.
+   - Im Hochformat ist es unauffällig.
+   - Screenshot `shots8/cluster-915x412-ohne.png`.
+   - Kandidat für `docs/ideas.md` oder ein `bottom`-Padding in Höhe der Attribution.
+3. **H3 – Detail bei 320 px/100 % in Chromium:**
+   - Die ICS-Knöpfe stehen untereinander, der Fuß ist 170 px hoch (27 %). In WebKit stehen sie nebeneinander (109 px, 17 %).
+   - Das ist nicht neu (Plan 0007: 26 %) und bleibt fest, wie E6 es für ≥ 34 rem will.
+   - Screenshot `e2e/.artifacts/screens/detail-320-light.png`.
+4. **H4 – Dunkle Karte:** In der Startansicht verdeckt der Cluster „225“ den Namen Nürnberg. Das ist bekannt aus Review 0005 („Nuren…g“) und vertretbar.
+5. **H5 – Toast bei 200 %:** Er ist bei 320 px 3–4 Zeilen und 208 px hoch. Seit E9 blockiert er nichts. Er verdeckt nur kurz den Inhalt, das ist vertretbar.
+
+**Nicht prüfbar (Gerät):**
+- Android „Bricolage Fallback Roboto“ (Rendered Fonts),
+- Safari-Fettschnitt über `local(Arial …)`,
+- Silbentrennung in Safari (H1),
+- „Bewegung reduzieren“ am iPhone (E1-Gegenprobe),
+- dazu der Rest der Geräte-Checkliste aus Schritt 9.
+
+**Screenshots für den Nutzer:**
+- `review-0008-badge-quer-200.png`: W1, Chromium links, WebKit rechts.
+- `review-0008-live-uebersicht.png`, von links:
+  - E6, Detail 320/200 % gescrollt mit sticky Kopf und Toast (WebKit);
+  - E7, Monatsraster 360/200 % mit Tagesfeldern;
+  - E12, Leerzustand mit „Filter zurücksetzen“ (WebKit 320/200 %);
+  - E16, Karte hell nach dem Wechsel mit „Nürnberg“.

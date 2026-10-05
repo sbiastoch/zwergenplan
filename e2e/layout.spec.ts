@@ -365,22 +365,44 @@ test.describe("Monatsraster", () => {
   }
 });
 
-/** Plan 0008, E8: Das Merklisten-Badge überdeckt in den Querformat-Leisten weder Label noch Herz. */
+/**
+ * Mehr gemerkte Angebote, als die Fixture hat (9): `site.json` bekommt Kopien des Krabbeltreffs mit eigener ID, die
+ * Merkliste kennt nur die Kopien. Nur über Netz und localStorage, die Seite bleibt Black-Box.
+ */
+async function saveCopies(page: Page, count: number) {
+  const ids = Array.from({ length: count }, (_, i) => `badge-kopie-${i}`);
+  await page.route("**/data/site.json", async (route) => {
+    const response = await route.fetch();
+    const site = (await response.json()) as { offers: { id: string; title: string }[] };
+    const template = site.offers.find((o) => o.title === "Offener Krabbeltreff");
+    if (!template) throw new Error("Krabbeltreff fehlt in den Fixture-Daten");
+    site.offers.push(...ids.map((id) => ({ ...template, id })));
+    await route.fulfill({ response, json: site });
+  });
+  await page.addInitScript((saved) => localStorage.setItem("zwergenplan.merkliste", saved), JSON.stringify(ids));
+}
+
+/**
+ * Plan 0008, E8: Das Merklisten-Badge überdeckt in den Querformat-Leisten weder Label noch Herz. W1 (Browser-Review
+ * live zu Plan 0008): Zweistellig brach es bei 568×320/200 % senkrecht um, deshalb auch 10 und 100 gemerkte.
+ */
 test.describe("Badge im Querformat", () => {
   for (const viewport of [
     { width: 568, height: 320 },
     { width: 863, height: 360 },
   ]) {
-    for (const scale of [1, 2]) {
-      const at = `${viewport.width}×${viewport.height} bei ${scale * 100} %`;
+    for (const [scale, count] of [1, 2].flatMap((s) => [1, 10, 100].map((n) => [s, n] as const))) {
+      const at = `${viewport.width}×${viewport.height} bei ${scale * 100} %, ${count} gemerkt`;
 
-      /** gemerktes Angebot, Merkliste offen, Textgröße gesetzt */
+      /** gemerkte Angebote, Merkliste offen, Textgröße gesetzt */
       const prepare = async (page: Page) => {
         await page.setViewportSize(viewport);
+        if (count > 1) await saveCopies(page, count);
         await ready(page);
-        await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+        if (count === 1) await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
         await page.getByRole("button", { name: /^Merkliste/ }).click();
-        await expect(page.getByTestId("offer")).toHaveCount(1);
+        await expect(page.getByTestId("offer")).toHaveCount(count);
+        await expect(page.locator(".tab .badge")).toHaveText(String(count));
         await setTextScale(page, scale);
       };
 

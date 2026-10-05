@@ -1128,3 +1128,20 @@ Keine Blocker. Vorher `origin/main` (`ffddb46`) eingemergt, ohne Konflikte.
 - **m11** `dataMeta` liegt in `e2e/real-data.ts` und prüft die Form, statt per Cast anzunehmen.
 - **m12** Handlungsanweisung bei Rot nach einem Datenupdate in diesem Plan und in `docs/architecture.md`.
 
+
+## Browser-Review live Paket C / B6 (2026-10-05)
+
+Auf https://zwergenplan.app/, Stand `4a709ad`, zusammen mit Plan 0008 geprüft. Der ganze Bericht steht in Plan 0008 unter „Browser-Review live (2026-10-05)“, Unterabschnitt B6.
+
+- **CLS beim Swap**: gemessen mit `measureSwap` aus `e2e/vitals.ts`, Telefon-Rendering, je zwei Läufe, bei 412 / 360 px:
+  - Roboto: 0,0001 / 0,0003
+  - Arial (Liberation): 0,0001 / 0,0002
+  - Noto: 0,0000 / 0,0024
+  - DejaVu: 0 / 0
+  - Vor Paket C lag der Wert live bei 0,052.
+- **Normaler Ladevorgang** mit um 1,5 s verzögerter Webfont: CLS insgesamt 0,0003 / 0,0014.
+- **Requests**: genau eine Schriftdatei, sowohl in Chromium als auch in WebKit.
+- **WebKit**: Alle fetten Faces sind `loaded`. Dahinter steckt der echte Fettschnitt, kein synthetischer (Breitenverhältnis 1,000).
+- **Offen, nur am Gerät prüfbar**:
+  - Greift auf einem echten Android-Gerät „Bricolage Fallback Roboto“ (Remote-Debugging, „Rendered Fonts“)?
+  - Findet Safari auf dem iPhone den Fettschnitt über `local()`?
