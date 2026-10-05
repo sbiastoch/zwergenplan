@@ -63,6 +63,9 @@ importers:
       dependency-cruiser:
         specifier: 18.5.0
         version: 18.5.0
+      fflate:
+        specifier: 0.8.3
+        version: 0.8.3
       ical.js:
         specifier: 2.2.1
         version: 2.2.1
@@ -1078,6 +1081,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   formatly@0.7.1:
     resolution: {integrity: sha512-ESuCEJE0SGgabl9q+zABI8LhJDmF+8nhpuqDzuM48HfJ9QTD5o6PqFJDFZY7w6f8xsh5lixuj5nJsQNvYOWvKQ==}
@@ -2449,6 +2455,8 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
       picomatch: 4.0.7
+
+  fflate@0.8.3: {}
 
   formatly@0.7.1:
     dependencies:

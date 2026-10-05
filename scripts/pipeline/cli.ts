@@ -12,15 +12,18 @@
  *   geocode "Adresse"                           Koordinaten, Stadtteil, Ring
  *   build RUN_DIR                               data/offers.json + RUN_DIR/report.json
  *   publish RUN_DIR                             prüfen, committen, pushen (ADR 0002)
+ *   oepnv [--force]                             Fahrplanauszug data/oepnv/fahrplan.json aus dem VGN-Feed
+ *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
+import { gzipSync } from "node:zlib";
 import { z } from "zod";
 import { validateDataset } from "../../src/domain/dataset.ts";
 import type { Provider } from "../../src/domain/schema.ts";
-import { addMonths, berlinDate, toBerlinIso } from "../../src/domain/time.ts";
+import { addMonths, berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
 import {
   appendToCatalog,
   batchFileFor,
@@ -39,11 +42,21 @@ import {
   writeOffers,
 } from "./io/files.ts";
 import { geocode } from "./io/geocode.ts";
+import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
+import {
+  extractTimetable,
+  feedModified,
+  feedValidity,
+  gtfsTables,
+  pickServiceDay,
+  serializeTimetable,
+  vgnSource,
+} from "./lib/gtfs.ts";
 import { renderFetchReport } from "./lib/html-extract.ts";
 import { matchCandidate, vidOf } from "./lib/match.ts";
 import { RawBatch, validateRaw } from "./lib/raw.ts";
@@ -325,6 +338,50 @@ function publish(runDir: string) {
   print(`✓ ${message} – jetzt \`gh run watch\` und Live-Seite prüfen`);
 }
 
+const germanDate = (instantOrDate: string) => formatGermanDate(berlinIsoDate(instantOrDate));
+const count = (n: number) => n.toLocaleString("de-DE");
+const kB = (bytes: number) => `${(bytes / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} kB`;
+
+/** Fahrplanauszug für die Wegzeit (Plan 0009, E4; Skill-Schritt 0). */
+async function oepnv() {
+  const started = performance.now();
+  const feed = await fetchFeed();
+  const modified = feedModified(feed.lastModified);
+  print(
+    `Feed vom ${germanDate(modified)}: ${feed.status === 304 ? "HTTP 304, unverändert (Cache)" : "HTTP 200, neu geladen"}`,
+  );
+  const current = readCurrentTimetable();
+  if (current?.source.modified === modified && !values.force) {
+    print(`✓ Fahrplan aktuell (Stand ${germanDate(modified)}, Stichtag ${current.serviceDay}) – nichts geändert`);
+    return;
+  }
+  const tables = gtfsTables(unzipFeed(feed.zip()));
+  const { validFrom, validTo } = feedValidity(tables.calendar, tables.calendarDates);
+  const serviceDay = pickServiceDay({
+    validFrom,
+    validTo,
+    freeDays: await loadFreeDays(validFrom, validTo),
+    today: today(),
+  });
+  const source = vgnSource({ lastModified: feed.lastModified, fetchedAt: feed.fetchedAt, validFrom, validTo });
+  const { timetable, stats } = extractTimetable(tables, { serviceDay, source });
+  const text = serializeTimetable(timetable);
+  writeTimetable(text);
+  const seconds = ((performance.now() - started) / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 });
+  print(
+    `${source.title}, gültig ${germanDate(validFrom)}–${germanDate(validTo)}, Stichtag Di ${germanDate(serviceDay)}`,
+  );
+  print(
+    `Steige ${count(stats.stops)}, Fahrten ${count(stats.trips)}, Verbindungen ${count(stats.connections)} ` +
+      `(Bedarfsverkehr weggelassen: ${count(stats.demandTrips)} Fahrten)`,
+  );
+  const bytes = Buffer.byteLength(text);
+  print(
+    `✓ ${TIMETABLE_FILE.slice(ROOT.length)} geschrieben: ${kB(bytes)} roh, ${kB(gzipSync(text).length)} gzip, ` +
+      `${count(text.split("\n").length - 1)} Zeilen, Laufzeit ${seconds} s`,
+  );
+}
+
 switch (command) {
   case "init":
     await init();
@@ -361,6 +418,9 @@ switch (command) {
     break;
   case "publish":
     publish(need(args[0], "RUN_DIR"));
+    break;
+  case "oepnv":
+    await oepnv();
     break;
   default:
     fail(`Unbekannter Befehl: ${command ?? "(keiner)"} – siehe Kopf von scripts/pipeline/cli.ts`);
