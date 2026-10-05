@@ -16,7 +16,8 @@ import {
 const run = (state: TransitState, ...actions: TransitAction[]) => actions.reduce(transitReducer, state);
 
 const FILE: TransitTableFile = {
-  version: 1,
+  version: 2,
+  id: "0badc0de",
   source: {
     attribution: "VGN – Verkehrsverbund Großraum Nürnberg GmbH",
     title: "VGN-Soll-Daten vom 24.06.2026",

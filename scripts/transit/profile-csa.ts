@@ -213,13 +213,34 @@ export interface Profiles {
   trips(entry: number): [number] | [number, number];
 }
 
+/**
+ * Monomorphe Lesehilfen für die heißen Schleifen (Plan 0012, Laufzeit): wie `valueAt`, aber je Array-Typ eine
+ * eigene Funktion. `valueAt` sieht dort Int32-, Float64- und Uint8-Arrays und wird megamorph (gemessen 1,1 s von
+ * 3,8 s der Tabelle).
+ */
+export function i32(a: Int32Array, i: number): number {
+  const v = a[i];
+  if (v === undefined) throw new RangeError(`Index ${i} außerhalb von 0…${a.length - 1}`);
+  return v;
+}
+export function f64(a: Float64Array, i: number): number {
+  const v = a[i];
+  if (v === undefined) throw new RangeError(`Index ${i} außerhalb von 0…${a.length - 1}`);
+  return v;
+}
+function u8(a: Uint8Array, i: number): number {
+  const v = a[i];
+  if (v === undefined) throw new RangeError(`Index ${i} außerhalb von 0…${a.length - 1}`);
+  return v;
+}
+
 /** Erster Index in `dep[lo … hi − 1]` (aufsteigend) mit `dep ≥ t`, sonst `hi` */
 function lowerBound(dep: Int32Array, lo: number, hi: number, t: number): number {
   let a = lo;
   let b = hi;
   while (a < b) {
     const mid = (a + b) >>> 1;
-    if (valueAt(dep, mid) < t) a = mid + 1;
+    if (i32(dep, mid) < t) a = mid + 1;
     else b = mid;
   }
   return a;
@@ -251,28 +272,28 @@ export function scanProfiles(net: Network, egress: Float64Array, opts: { penalty
   let size0 = 0;
   const inTrip0 = new Float64Array(net.trips).fill(INF);
   for (let i = 0; i < n; i++) {
-    const tr = valueAt(trip, i);
-    const f = valueAt(flags, i);
-    let best = valueAt(inTrip0, tr);
+    const tr = i32(trip, i);
+    const f = u8(flags, i);
+    let best = f64(inTrip0, tr);
     if (f & ALIGHT) {
-      const out = valueAt(arr, i) + valueAt(egress, valueAt(to, i));
+      const out = i32(arr, i) + f64(egress, i32(to, i));
       if (out < best) best = out;
     }
     if (best === INF) continue;
     inTrip0[tr] = best;
     if (!(f & BOARD)) continue;
-    const stop = valueAt(from, i);
-    const d = valueAt(dep, i);
-    const h = valueAt(head0, stop);
-    if (h !== -1 && valueAt(dep0, h) === d) {
-      if (best < valueAt(arr0, h)) {
+    const stop = i32(from, i);
+    const d = i32(dep, i);
+    const h = i32(head0, stop);
+    if (h !== -1 && i32(dep0, h) === d) {
+      if (best < f64(arr0, h)) {
         arr0[h] = best;
         trip0[h] = tr;
       }
       continue;
     }
     // dominiert: eine spätere Abfahrt kommt mindestens so früh an
-    if (h !== -1 && valueAt(arr0, h) <= best) continue;
+    if (h !== -1 && f64(arr0, h) <= best) continue;
     dep0[size0] = d;
     arr0[size0] = best;
     trip0[size0] = tr;
@@ -288,18 +309,18 @@ export function scanProfiles(net: Network, egress: Float64Array, opts: { penalty
   let k0 = 0;
   for (let s = 0; s < net.stops; s++) {
     start0[s] = k0;
-    for (let e = valueAt(head0, s); e !== -1; e = valueAt(next0, e)) {
-      sDep0[k0] = valueAt(dep0, e);
-      sArr0[k0] = valueAt(arr0, e);
-      sTrip0[k0] = valueAt(trip0, e);
+    for (let e = i32(head0, s); e !== -1; e = i32(next0, e)) {
+      sDep0[k0] = i32(dep0, e);
+      sArr0[k0] = f64(arr0, e);
+      sTrip0[k0] = i32(trip0, e);
       k0++;
     }
   }
   start0[net.stops] = k0;
   /** Eintrag der Ebene 0 an `stop` mit der frühesten Abfahrt ab `t`, sonst −1 */
   const entry0 = (stop: number, t: number): number => {
-    const hi = valueAt(start0, stop + 1);
-    const k = lowerBound(sDep0, valueAt(start0, stop), hi, t);
+    const hi = i32(start0, stop + 1);
+    const k = lowerBound(sDep0, i32(start0, stop), hi, t);
     return k < hi ? k : -1;
   };
 
@@ -317,31 +338,33 @@ export function scanProfiles(net: Network, egress: Float64Array, opts: { penalty
   const real1 = new Float64Array(net.trips).fill(INF);
   const conn1 = new Int32Array(net.trips).fill(-1);
   for (let i = 0; i < n; i++) {
-    const tr = valueAt(trip, i);
-    const f = valueAt(flags, i);
+    const tr = i32(trip, i);
+    const f = u8(flags, i);
     // 1. Sitzenbleiben: der bisherige Wert der Fahrt
-    let best = valueAt(rated1, tr);
-    let real = valueAt(real1, tr);
-    let conn = valueAt(conn1, tr);
+    let best = f64(rated1, tr);
+    let real = f64(real1, tr);
+    let conn = i32(conn1, tr);
     if (f & ALIGHT) {
-      const stop = valueAt(to, i);
-      const at = valueAt(arr, i);
+      const stop = i32(to, i);
+      const at = i32(arr, i);
       // 2. Abgang zum Ort
-      const out = at + valueAt(egress, stop);
+      const out = at + f64(egress, stop);
       if (out < best) {
         best = out;
         real = out;
         conn = -1;
       }
-      // 3. Umstiege in der Reihenfolge der CSR-Liste
-      const end = valueAt(transferStart, stop + 1);
-      for (let k = valueAt(transferStart, stop); k < end; k++) {
-        const e = entry0(valueAt(transferTo, k), at + valueAt(transferSeconds, k));
+      // 3. Umstiege in der Reihenfolge der CSR-Liste. Jeder Anschluss fährt frühestens nach Puffer ab, kommt
+      // also nicht vor `at + Puffer` an; ist das mit Aufschlag schon nicht besser, entfällt die Suche.
+      const end = i32(transferStart, stop + 1);
+      const reachable = at + TRANSFER_BUFFER_SECONDS + penalty < best;
+      for (let k = reachable ? i32(transferStart, stop) : end; k < end; k++) {
+        const e = entry0(i32(transferTo, k), at + f64(transferSeconds, k));
         if (e === -1) continue;
-        const r = valueAt(sArr0, e) + penalty;
+        const r = f64(sArr0, e) + penalty;
         if (r < best) {
           best = r;
-          real = valueAt(sArr0, e);
+          real = f64(sArr0, e);
           conn = e;
         }
       }
@@ -351,13 +374,13 @@ export function scanProfiles(net: Network, egress: Float64Array, opts: { penalty
     real1[tr] = real;
     conn1[tr] = conn;
     if (!(f & BOARD)) continue;
-    const stop = valueAt(from, i);
-    const d = valueAt(dep, i);
-    const h = valueAt(head, stop);
-    if (h !== -1 && valueAt(pDep, h) === d) {
-      const old = valueAt(pRated, h);
+    const stop = i32(from, i);
+    const d = i32(dep, i);
+    const h = i32(head, stop);
+    if (h !== -1 && i32(pDep, h) === d) {
+      const old = f64(pRated, h);
       // gleiche Abfahrt: kleinere Bewertung, bei Gleichstand die Direktverbindung (ADR 0015, Punkt 2)
-      if (best < old || (best === old && conn === -1 && valueAt(pConn, h) !== -1)) {
+      if (best < old || (best === old && conn === -1 && i32(pConn, h) !== -1)) {
         pRated[h] = best;
         pReal[h] = real;
         pTrip[h] = tr;
@@ -366,7 +389,7 @@ export function scanProfiles(net: Network, egress: Float64Array, opts: { penalty
       continue;
     }
     // dominiert: eine spätere Abfahrt ist mindestens so gut bewertet
-    if (h !== -1 && valueAt(pRated, h) <= best) continue;
+    if (h !== -1 && f64(pRated, h) <= best) continue;
     pDep[size] = d;
     pRated[size] = best;
     pReal[size] = real;
@@ -377,29 +400,29 @@ export function scanProfiles(net: Network, egress: Float64Array, opts: { penalty
   }
 
   const first = (stop: number, t: number): number => {
-    let e = valueAt(head, stop);
-    while (e !== -1 && valueAt(pDep, e) < t) e = valueAt(pNext, e);
+    let e = i32(head, stop);
+    while (e !== -1 && i32(pDep, e) < t) e = i32(pNext, e);
     return e;
   };
 
   return {
     earliestArrival(stop, t) {
       const e = first(stop, t);
-      return e === -1 ? INF : valueAt(pRated, e);
+      return e === -1 ? INF : f64(pRated, e);
     },
     sweep(stop, start, step, count, outRated, outReal, outEntry) {
-      let e = valueAt(head, stop);
+      let e = i32(head, stop);
       for (let i = 0; i < count; i++) {
         const t = start + i * step;
-        while (e !== -1 && valueAt(pDep, e) < t) e = valueAt(pNext, e);
-        outRated[i] = e === -1 ? INF : valueAt(pRated, e);
-        outReal[i] = e === -1 ? INF : valueAt(pReal, e);
+        while (e !== -1 && i32(pDep, e) < t) e = i32(pNext, e);
+        outRated[i] = e === -1 ? INF : f64(pRated, e);
+        outReal[i] = e === -1 ? INF : f64(pReal, e);
         outEntry[i] = e;
       }
     },
     trips(entry) {
-      const c = valueAt(pConn, entry);
-      return c === -1 ? [valueAt(pTrip, entry)] : [valueAt(pTrip, entry), valueAt(sTrip0, c)];
+      const c = i32(pConn, entry);
+      return c === -1 ? [i32(pTrip, entry)] : [i32(pTrip, entry), i32(sTrip0, c)];
     },
   };
 }

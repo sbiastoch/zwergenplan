@@ -22,7 +22,10 @@ export interface TransitSource {
  * `scripts/transit/table.ts`, geprüft im Round-Trip-Test (E12).
  */
 export interface TransitTableFile {
-  version: 1;
+  /** Formatversion 2 seit Plan 0012 (Umstiegs-Bit, `id`) */
+  version: 2;
+  /** Inhaltskennung über beide Build-Dateien (Plan 0012, E6): 8 Hex-Ziffern, `table` in `linien.json` */
+  id: string;
   source: TransitSource;
   /** Referenz-Dienstag, „2026-10-13“ */
   serviceDay: string;
@@ -33,12 +36,32 @@ export interface TransitTableFile {
   /** Zeilen (Haltbereiche): Grad × 1e4, ganzzahlig, ab dem zweiten Wert als Differenz zum vorigen */
   lat: number[];
   lon: number[];
-  /** Base64 eines `Uint8Array(Zeilen × Spalten)`, zeilenweise; Minuten 0–120, 255 = keine Angabe */
+  /**
+   * Base64 eines `Uint8Array(Zeilen × Spalten)`, zeilenweise. Bit 0–6: Minuten 0–120; Bit 7: die Verbindung hat
+   * einen Umstieg (Plan 0012, E2). 255 = keine Angabe.
+   */
   minutes: string;
+}
+
+/** `public/data/linien.json` (Plan 0012, E7): Linien je Zelle der Wegzeit-Tabelle */
+export interface TransitLinesFile {
+  version: 1;
+  /** `id` der passenden `wegzeit.json` (E6) */
+  table: string;
+  /** Namensnennung wie `wegzeit.json` (CC BY-SA 3.0 DE, ADR 0011 Punkt 5) */
+  source: TransitSource;
+  /** Anzeigenamen, sortiert (Code-Unit), höchstens 254: „Bus 36“, „S2“, „Tram 4“, „U1“ (mit U+00A0) */
+  lines: string[];
+  /** Base64 eines `Uint8Array(Zeilen × Spalten)`, zeilenweise wie `minutes`: erste Linie, 0 = keine, sonst `lines[v − 1]` */
+  first: string;
+  /** dasselbe für die zweite Linie (nach dem Umstieg), 0 = keine (Direktverbindung oder keine Linien) */
+  second: string;
 }
 
 /** Dekodierte Tabelle (`decodeTransitTable`). */
 export interface TransitTable {
+  /** Inhaltskennung (E6), prüft die Linien-Datei */
+  id: string;
   source: TransitSource;
   serviceDay: string;
   window: { from: string; to: string };
@@ -48,7 +71,7 @@ export interface TransitTable {
   /** Mittelpunkt je Haltbereich in Grad */
   lat: Float64Array;
   lon: Float64Array;
-  /** Zeilen × Spalten, zeilenweise */
+  /** Zeilen × Spalten, zeilenweise; Bit 7 = Umstieg, 255 = keine Angabe */
   minutes: Uint8Array;
 }
 

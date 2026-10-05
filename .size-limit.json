@@ -8,5 +8,6 @@
   { "name": "Anbieter JS (lazy)", "path": "dist/assets/anbieter/*.js", "limit": "6 kB", "gzip": true },
   { "name": "Daten (site.json)", "path": "dist/data/site.json", "limit": "250 kB", "gzip": true },
   { "name": "Daten (anbieter.json)", "path": "dist/data/anbieter.json", "limit": "15 kB", "gzip": true },
-  { "name": "Wegzeit-Daten", "path": "dist/data/wegzeit.json", "limit": "64 kB", "gzip": true }
+  { "name": "Wegzeit-Daten", "path": "dist/data/wegzeit.json", "limit": "64 kB", "gzip": true },
+  { "name": "Linien-Daten", "path": "dist/data/linien.json", "limit": "40 kB", "gzip": true }
 ]

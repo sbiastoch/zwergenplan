@@ -8,8 +8,8 @@ import { placeKey } from "./place-key.ts";
 import type { Origin, ReachTarget } from "./reach.ts";
 import type { TransitReach, TransitTable, TransitTableFile } from "./transit-types.ts";
 
-/** Formatversion von `wegzeit.json` (E7) */
-export const TRANSIT_TABLE_VERSION = 1;
+/** Formatversion von `wegzeit.json` (E7); 2 seit Plan 0012 (Umstiegs-Bit, `id`) */
+export const TRANSIT_TABLE_VERSION = 2;
 /** Größter gespeicherter Wert; mehr gilt als „über 2 Std.“ (E5) */
 export const MAX_MINUTES = 120;
 /** Zellwert „keine Angabe“: unerreichbar oder über `MAX_MINUTES` (E5) */
@@ -18,6 +18,13 @@ export const NO_MINUTES = 255;
 export const COORD_SCALE = 1e4;
 /** Zugangshalte: Luftlinie Startpunkt → Haltbereich, Grenze inklusiv (E8) */
 export const ACCESS_METERS = 800;
+/**
+ * Innen-Test (ADR 0011, Punkt 9; Plan 0012, E2): Ohne Haltbereich in diesem Umkreis liegt der Startpunkt
+ * außerhalb des Stadtgebiets. Grenze inklusiv.
+ */
+export const INSIDE_METERS = 800;
+/** Bit 7 eines Zellwerts: Die Verbindung hat einen Umstieg (Plan 0012, E2) */
+export const TRANSFER_BIT = 0x80;
 /**
  * Aufschlag je Umstieg in der Wahl der Verbindung, nie in der angezeigten Zeit (Plan 0012, E2; ADR 0015):
  * Ein Umstieg zählt nur, wenn er mindestens so viel früher ankommt. Einzige Quelle, der Build leitet davon ab.
@@ -78,14 +85,17 @@ function fromBase64(text: string): Uint8Array | undefined {
  */
 export function decodeTransitTable(file: TransitTableFile, placeKeys: ReadonlySet<string>): TransitTable | undefined {
   if (typeof file !== "object" || file === null || file.version !== TRANSIT_TABLE_VERSION) return undefined;
-  const { places, lat, lon, minutes } = file;
-  if (!Array.isArray(places) || !isIntArray(lat) || !isIntArray(lon) || typeof minutes !== "string") return undefined;
-  if (lat.length !== lon.length) return undefined;
+  const { id, places, lat, lon, minutes } = file;
+  if (typeof id !== "string" || !Array.isArray(places) || !isIntArray(lat) || !isIntArray(lon)) return undefined;
+  if (typeof minutes !== "string" || lat.length !== lon.length) return undefined;
   const bytes = fromBase64(minutes);
   if (bytes === undefined || bytes.length !== lat.length * places.length) return undefined;
+  // jedes Byte ist „keine Angabe“ oder Minuten ≤ 120, mit oder ohne Umstiegs-Bit (E6)
+  for (const b of bytes) if (b !== NO_MINUTES && (b & ~TRANSFER_BIT) > MAX_MINUTES) return undefined;
   const columns = new Map(places.map((key, i) => [key, i]));
   for (const key of placeKeys) if (!columns.has(key)) return undefined;
   return {
+    id,
     source: file.source,
     serviceDay: file.serviceDay,
     window: file.window,
@@ -116,8 +126,8 @@ export function transitReach(table: TransitTable, origin: Origin): TransitReachF
     access++;
     const walk = walkMinutes(meters);
     for (let col = 0; col < cols; col++) {
-      const value = valueAt(minutes, row * cols + col);
-      if (value !== NO_MINUTES) byTransit[col] = Math.min(valueAt(byTransit, col), walk + value);
+      const byte = valueAt(minutes, row * cols + col);
+      if (byte !== NO_MINUTES) byTransit[col] = Math.min(valueAt(byTransit, col), walk + (byte & ~TRANSFER_BIT));
     }
   }
   if (access === 0) return undefined;

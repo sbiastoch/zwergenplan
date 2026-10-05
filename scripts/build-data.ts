@@ -2,7 +2,8 @@
  * Prüft den Datenbestand und erzeugt die statischen Daten-Assets der Seite:
  *   public/data/site.json, public/data/meta.json, public/ics/**.ics,
  *   public/data/anbieter.json (Anbieterübersicht, lädt erst beim Öffnen; Plan 0010, E6),
- *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7)
+ *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7),
+ *   public/data/linien.json (Linien je Zelle der Tabelle, Plan 0012, E7)
  * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
  * (`TIMETABLE_REQUIRED`, seit Plan 0009, Schritt 5).
  */
@@ -14,12 +15,18 @@ import { DISTRICTS } from "../src/domain/districts.ts";
 import { icsContextFor, icsForSeries, icsForSession } from "../src/domain/ics.ts";
 import { seriesIcsPath, sessionIcsPath } from "../src/domain/ics-paths.ts";
 import { type SiteMeta, toProviderDirectory, toSiteData } from "../src/domain/site-data.ts";
-import { ACCESS_METERS, decodeTransitTable } from "../src/domain/transit.ts";
+import { decodeTransitTable, INSIDE_METERS } from "../src/domain/transit.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
-import { buildTransitTable, withoutAccess } from "./transit/table.ts";
+import { buildTransitTables, withoutAccess } from "./transit/table.ts";
 
 /** Ab hier warnt der Build: Die Profil-CSA läuft in jedem data:build (Plan 0009, Backpressure). */
 const TRANSIT_WARN_SECONDS = 20;
+/**
+ * Gate gegen einen stillen Ausfall der Linien (Plan 0012, E7, Review W3): Mit echten Daten darf höchstens dieser
+ * Anteil der Zellen mit Wegzeit ohne Linien sein. Gemessen am 2026-10-05 (Auszug Stichtag 13.10.2026, 556 × 76):
+ * 1 514 von 35 226 Zellen = 4,3 %; Schwelle = Messwert + 5 Prozentpunkte.
+ */
+const MAX_WITHOUT_LINES = 0.093;
 
 const source = dataSource();
 const result = loadDataset(source);
@@ -77,21 +84,35 @@ if (timetableCheck.errors.length > 0) {
 }
 if (timetable.kind === "ok") {
   const started = performance.now();
-  const table = buildTransitTable(
+  const { table, lines, stats } = buildTransitTables(
     timetable.timetable,
     site.offers.map((o) => o.venue.geo),
   );
   const seconds = (performance.now() - started) / 1000;
   write("data/wegzeit.json", JSON.stringify(table));
+  write("data/linien.json", JSON.stringify(lines));
   const took = seconds.toLocaleString("de-DE", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
   console.log(`✓ Wegzeit: ${table.lat.length} Halte × ${table.places.length} Orte in ${took} s`);
+  console.log(
+    `✓ Linien: ${stats.lines} Linien, ${stats.combos} Folgen, ${stats.withoutLines} Zellen ohne Linien (davon ${stats.outliers} unpassend)`,
+  );
+  const share = stats.cells === 0 ? 1 : stats.withoutLines / stats.cells;
+  if (stats.withoutLines === stats.cells) {
+    console.error("✗ Linien: keine Zelle hat Linien (Plan 0012, E7)");
+    process.exit(1);
+  }
+  if (source === "real" && share > MAX_WITHOUT_LINES) {
+    const pct = (v: number) => `${(v * 100).toLocaleString("de-DE", { maximumFractionDigits: 1 })} %`;
+    console.error(`✗ Linien: ${pct(share)} der Zellen ohne Linien, erlaubt ${pct(MAX_WITHOUT_LINES)} (Plan 0012, E7)`);
+    process.exit(1);
+  }
   // Jeder wählbare Stadtteil braucht einen Zugangshalt, sonst hieße es dort „außerhalb des Stadtgebiets“
   // (Plan 0009, Schritt 5). Das Fixture-Netz deckt nur Gostenhof ab.
   if (source === "real") {
     const decoded = decodeTransitTable(table, new Set(table.places));
     const missing = decoded ? withoutAccess(decoded, DISTRICTS) : DISTRICTS;
     if (missing.length > 0) {
-      console.error(`✗ Wegzeit: ohne Zugangshalt (${ACCESS_METERS} m): ${missing.map((d) => d.name).join(", ")}`);
+      console.error(`✗ Wegzeit: ohne Zugangshalt (${INSIDE_METERS} m): ${missing.map((d) => d.name).join(", ")}`);
       process.exit(1);
     }
     console.log(`✓ Zugangshalt für alle ${DISTRICTS.length} Stadtteile`);

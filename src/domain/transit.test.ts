@@ -35,6 +35,7 @@ const source: TransitTableFile["source"] = {
 function table(rows: GeoPoint[], places: GeoPoint[], values: number[][]): TransitTable {
   const keys = places.map(placeKey);
   return {
+    id: "0badc0de",
     source,
     serviceDay: "2026-10-13",
     window: { from: "08:30", to: "10:30" },
@@ -56,7 +57,8 @@ const base64 = (bytes: number[]) => btoa(String.fromCharCode(...bytes));
 
 function file(overrides: Partial<TransitTableFile> = {}): TransitTableFile {
   return {
-    version: 1,
+    version: 2,
+    id: "0badc0de",
     source,
     serviceDay: "2026-10-13",
     window: { from: "08:30", to: "10:30" },
@@ -93,6 +95,12 @@ describe("decodeTransitTable", () => {
     expect(t?.window).toEqual({ from: "08:30", to: "10:30" });
   });
 
+  it("nimmt Bytes mit Umstiegs-Bit an: 130 ist 2 Min. mit Umstieg, 248 ist 120 Min. mit Umstieg", () => {
+    const t = decodeTransitTable(file({ minutes: base64([130, 248, 10, 255]) }), keys);
+    expect(Array.from(t?.minutes ?? [])).toEqual([130, 248, 10, 255]);
+    expect(t?.id).toBe("0badc0de");
+  });
+
   it("nimmt mehr Spalten hin, als die Seite Orte hat", () => {
     expect(decodeTransitTable(file(), new Set(["49.4521,11.0767"]))).toBeDefined();
   });
@@ -102,7 +110,10 @@ describe("decodeTransitTable", () => {
   });
 
   it.each<[string, Partial<TransitTableFile>]>([
-    ["falsche Version", { version: 2 as 1 }],
+    ["Version 1 (vor Plan 0012)", { version: 1 as 2 }],
+    ["Kennung fehlt", { id: undefined as unknown as string }],
+    ["Byte 121 (Minuten über 120)", { minutes: base64([12, 30, 121, 255]) }],
+    ["Byte 249 (Minuten über 120 mit Umstiegs-Bit)", { minutes: base64([12, 30, 249, 255]) }],
     ["lat und lon verschieden lang", { lon: [110590] }],
     ["zu wenige Werte", { minutes: base64([12, 30, 10]) }],
     ["zu viele Werte", { minutes: base64([12, 30, 10, 255, 7]) }],
@@ -210,7 +221,7 @@ describe("valueAt", () => {
 
 describe("Format-Konstanten", () => {
   it("passen zu E5/E7", () => {
-    expect(TRANSIT_TABLE_VERSION).toBe(1);
+    expect(TRANSIT_TABLE_VERSION).toBe(2);
     expect(MAX_MINUTES).toBe(120);
     expect(NO_MINUTES).toBe(255);
   });
