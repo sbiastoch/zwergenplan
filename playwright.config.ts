@@ -70,7 +70,7 @@ const fixtureServer = {
   reuseExistingServer: !process.env["CI"],
 };
 const realServer = {
-  command: `pnpm exec vite preview --strictPort --port ${REAL_PORT} --outDir dist-e2e`,
+  command: `pnpm exec vite preview --strictPort --port ${REAL_PORT} --outDir dist`,
   url: `http://localhost:${REAL_PORT}${BASE}`,
   reuseExistingServer: !process.env["CI"],
 };
