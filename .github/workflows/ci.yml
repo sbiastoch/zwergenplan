@@ -101,6 +101,9 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Deploy-Build
         run: pnpm build
+      # Kanarienvogel Plan 0013, Test 4 (wird zurückgenommen): E2E-Build (__E2E__) mit echten Daten aus public/.
+      - name: Kanarienvogel E2E-Build mit echten Daten
+        run: ZWERGENPLAN_DATA=fixture pnpm exec vite build
       - name: Smoke mit echten Daten
         run: pnpm exec playwright test
         env:
