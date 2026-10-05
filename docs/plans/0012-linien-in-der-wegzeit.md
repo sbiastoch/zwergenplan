@@ -713,6 +713,7 @@ Stand 2026-10-05, Branch `linien-0012`. Schritte 1–4 umgesetzt, Schritt 3 geme
 - `encodeMinutes` heißt jetzt `encodeBytes` (kodiert auch die Linien-Ebenen).
 - **Laufzeit:** Der erste Stand brauchte 4,8 s. `valueAt` wurde in den heißen Schleifen megamorph (Int32-, Float64- und Uint8-Arrays, 1,1 s Eigenzeit). Monomorphe Lesehilfen `i32`/`f64` in `profile-csa.ts` und ein Abbruch der Umstiegssuche, wenn kein Anschluss mehr gewinnen kann (`at + 60 s + P ≥ bisher beste Bewertung`), bringen die Tabelle auf **2,1–2,3 s**. Das alte Modell braucht auf derselben Maschine 3,3–3,4 s.
 - **Gate:** `MAX_WITHOUT_LINES = 0,093` (gemessen 4,3 % + 5 Prozentpunkte). Kanarienvögel: Schwelle 4 % → `build-data` rot; keine Linien (Fixture) → rot („keine Zelle hat Linien“); `node:fs` in `lines.ts` → `transit-build-pure` rot.
+- **Budgets** (`pnpm build && pnpm size`, Stand Schritt 4): Linien-Daten 27,99 kB (≤ 40), Wegzeit-Daten 42,12 kB (≤ 64), Wegzeit JS (lazy) 1,41 kB (≤ 3), JS (initial) 90,9 kB (≤ 92, Anzeige aus Schritt 6 fehlt noch). Kanarienvogel: Grenze „Linien-Daten“ 20 kB → `size-limit` rot.
 - Schritt 4 lief vor der Messung, damit die Messung die echte Browser-Rechnung (`transitReach` mit Bit und Linien) nutzt.
 
 ### Messung Schritt 3 (2026-10-05)
