@@ -147,6 +147,8 @@ export function QuickFilters({
 const TAB_ITEMS = [
   { tab: "entdecken", label: "Entdecken", icon: "compass" },
   { tab: "kalender", label: "Kalender", icon: "calendar" },
+  // Plan 0010, E2: vor der Merkliste, die bleibt ganz rechts
+  { tab: "anbieter", label: "Anbieter", icon: "store" },
   { tab: "merkliste", label: "Merkliste", icon: "heart" },
 ] as const;
 

@@ -36,17 +36,30 @@ export function useLazy<C>(load: () => Promise<C>): { module: Lazy<C>; attempt: 
   return { module, attempt, retry };
 }
 
-/** „Nochmal versuchen“, beim zweiten Fehlschlag „Seite neu laden“ (manche Browser merken sich den Fehlschlag). */
-export function LoadFailed({ attempt, retry, children }: { attempt: number; retry: () => void; children: string }) {
+/**
+ * „Nochmal versuchen“, beim zweiten Fehlschlag „Seite neu laden“ (manche Browser merken sich den Fehlschlag).
+ * `className`: `map-note` liegt absolut im Kartenrahmen; die Anbieter nutzen `lazy-note` in `.lazy-box` (Plan 0010, E7).
+ */
+export function LoadFailed({
+  attempt,
+  retry,
+  className = "map-note",
+  children,
+}: {
+  attempt: number;
+  retry: () => void;
+  className?: string;
+  children: string;
+}) {
   return (
-    <p className="map-note">
+    <p className={className}>
       {children}
       {attempt === 0 ? (
         <button type="button" className="btn" onClick={retry}>
           Nochmal versuchen
         </button>
       ) : (
-        // Die URL behält ansicht=karte.
+        // Die URL behält ansicht=karte bzw. ansicht=anbieter und anbieter=<id>.
         <button type="button" className="btn" onClick={() => window.location.reload()}>
           Seite neu laden
         </button>

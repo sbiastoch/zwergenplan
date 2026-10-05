@@ -21,9 +21,14 @@ import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
 import { initialOriginState, originReducer } from "./origin-state.ts";
+import { preloadProviderUi } from "./ProviderPanel.tsx";
 
 /** Markiert einen History-Eintrag, den das Öffnen eines Details erzeugt hat (Plan 0003, E4). */
 const DETAIL_STATE = { zpDetail: true } as const;
+/** Markiert einen History-Eintrag, den das Öffnen des Anbieter-Sheets erzeugt hat (Plan 0010, E3). */
+const PROVIDER_STATE = { zpProvider: true } as const;
+
+const historyState = () => window.history.state as { zpDetail?: boolean; zpProvider?: boolean } | null;
 
 function urlFor(route: Route): string {
   const search = routeToSearch(route);
@@ -34,12 +39,22 @@ export interface RouteApi {
   route: Route;
   /** Filter/Ansicht ändern: ersetzt den Eintrag (kein Zurück-Schritt je Filter-Tipp) */
   replace: (next: Route) => void;
+  /** Detail öffnen; ein offenes Anbieter-Sheet bleibt darunter (Plan 0010, E3) */
   openDetail: (offerId: string) => void;
   closeDetail: () => void;
+  /** Anbieter-Sheet über dem aktuellen Tab öffnen; ein offenes Detail schließt (Plan 0010, E3) */
+  openProvider: (providerId: string) => void;
+  closeProvider: () => void;
 }
 
 export function useRoute(): RouteApi {
-  const [route, setRouteState] = useState(() => parseRoute(window.location.search));
+  const [route, setRouteState] = useState(() => {
+    const parsed = parseRoute(window.location.search);
+    // Deep-Link: Chunk und Katalog starten, bevor site.json da ist (Plan 0010, E3). Gemerkt im Lader, also auch unter
+    // StrictMode (doppelter Initializer) nur ein Request.
+    if (parsed.providerId !== undefined || parsed.tab === "anbieter") preloadProviderUi();
+    return parsed;
+  });
   // Aktueller Stand für Callbacks – History-Aufrufe gehören nicht in setState-Updater (StrictMode ruft die doppelt).
   const current = useRef(route);
   const setRoute = useCallback((next: Route) => {
@@ -71,7 +86,7 @@ export function useRoute(): RouteApi {
   );
 
   const closeDetail = useCallback(() => {
-    if ((window.history.state as { zpDetail?: boolean } | null)?.zpDetail) {
+    if (historyState()?.zpDetail) {
       window.history.back(); // popstate setzt den Zustand
       return;
     }
@@ -80,7 +95,27 @@ export function useRoute(): RouteApi {
     setRoute(rest);
   }, [setRoute]);
 
-  return { route, replace, openDetail, closeDetail };
+  const openProvider = useCallback(
+    (providerId: string) => {
+      const { offerId: _closed, ...rest } = current.current;
+      const next = { ...rest, providerId };
+      window.history.pushState(PROVIDER_STATE, "", urlFor(next));
+      setRoute(next);
+    },
+    [setRoute],
+  );
+
+  const closeProvider = useCallback(() => {
+    if (historyState()?.zpProvider) {
+      window.history.back(); // popstate setzt den Zustand
+      return;
+    }
+    const { providerId: _closed, ...rest } = current.current;
+    window.history.replaceState(null, "", urlFor(rest));
+    setRoute(rest);
+  }, [setRoute]);
+
+  return { route, replace, openDetail, closeDetail, openProvider, closeProvider };
 }
 
 export function useBirthDate(): [string | undefined, (value: string | undefined) => void] {

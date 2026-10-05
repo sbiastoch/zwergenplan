@@ -4,12 +4,22 @@ import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { activeFilterCount, EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
 import { placeKey } from "../domain/place-key.ts";
+import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
-import { ageChipLabel, limitHint, loadErrorText, mapStatusParts, plural, reachNote, standDate } from "./format.ts";
+import {
+  ageChipLabel,
+  limitHint,
+  loadErrorText,
+  mapStatusParts,
+  plural,
+  providerStatusParts,
+  reachNote,
+  standDate,
+} from "./format.ts";
 import { ListPending, ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
@@ -38,7 +48,7 @@ const NO_OFFERS: SiteOffer[] = [];
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [attempt, setAttempt] = useState(0);
-  const { route, replace, openDetail, closeDetail } = useRoute();
+  const { route, replace, openDetail, closeDetail, openProvider, closeProvider } = useRoute();
   const [birthDate, setBirthDateStored] = useBirthDate();
   const [ageOnly, setAgeOnly] = useAgeOnly();
   const [savedIds, toggleSaved] = useSaved();
@@ -114,6 +124,12 @@ export function App() {
     if (load.kind === "ready" && route.offerId && !detailOffer) closeDetail();
   }, [load.kind, route.offerId, detailOffer, closeDetail]);
 
+  // Unbekannte Anbieter-ID (Tippfehler, aus dem Katalog verschwunden): Das Sheet meldet es nach dem Laden (E3).
+  const dropProvider = useCallback(() => {
+    const { providerId: _unknown, ...rest } = route;
+    replace(rest);
+  }, [route, replace]);
+
   const setFilter = (filter: FilterState) => {
     replace({ ...route, filter });
     views.resetPage();
@@ -150,6 +166,11 @@ export function App() {
     },
   };
   const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.map?.placeCount ?? 0);
+  // „5 Anbieter mit 8 Angeboten“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4)
+  const [providerCount, providersWord, providerOffers, providerOffersWord] = providerStatusParts(
+    countProviders(visible),
+    visible.length,
+  );
   const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
   // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5)
   const section = tabSection(route.tab);
@@ -157,7 +178,7 @@ export function App() {
   const toggle = section === "entdecken" && (
     <ViewToggle map={route.tab === "karte"} onMap={(map) => replace({ ...route, tab: map ? "karte" : "entdecken" })} />
   );
-  const dialogOpen = sheet !== null || detailOffer !== undefined || placeSheet;
+  const dialogOpen = sheet !== null || detailOffer !== undefined || placeSheet || route.providerId !== undefined;
   const limit = route.filter.reachLimit;
   const limitOn = limitActive(reachMode);
   const hint = limit && limitHint(limit, reachMode);
@@ -181,7 +202,8 @@ export function App() {
         onKid={() => setSheet("kid")}
         onToggleTheme={() => theme.setChoice(theme.dark ? "hell" : "dunkel")}
       />
-      {section === "entdecken" && <Stickers filter={route.filter} onChange={setFilter} />}
+      {/* Sticker wirken auch in der Anbieterliste (Plan 0010, E2, E4) */}
+      {(section === "entdecken" || section === "anbieter") && <Stickers filter={route.filter} onChange={setFilter} />}
       {route.tab !== "merkliste" && (
         <QuickFilters
           filter={route.filter}
@@ -226,6 +248,13 @@ export function App() {
                     {offersWord}
                     <b>{mapPlaces}</b>
                     {placesWord}
+                  </span>
+                ) : route.tab === "anbieter" ? (
+                  <span>
+                    <b>{providerCount}</b>
+                    {providersWord}
+                    <b>{providerOffers}</b>
+                    {providerOffersWord}
                   </span>
                 ) : (
                   <span>
@@ -329,8 +358,7 @@ export function App() {
             reachMode={reachMode}
             query={providerQuery}
             onQuery={setProviderQuery}
-            // Stand „Schnittstellen“: Das Sheet (anbieter=<id>, openProvider) verdrahtet Paket A (Plan 0010, E3).
-            onOpenProvider={() => {}}
+            onOpenProvider={openProvider}
             onResetFilter={
               activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? () => setFilter(EMPTY_FILTER) : undefined
             }
@@ -356,6 +384,13 @@ export function App() {
         detailOffer={detailOffer}
         detailDay={detailDay}
         closeDetail={closeDetail}
+        providerId={route.providerId}
+        openProvider={openProvider}
+        closeProvider={closeProvider}
+        onUnknownProvider={dropProvider}
+        generatedAt={load.kind === "ready" ? load.data.generatedAt : undefined}
+        offers={offers}
+        visible={visible}
         ctx={ctx}
         say={say}
         filter={route.filter}

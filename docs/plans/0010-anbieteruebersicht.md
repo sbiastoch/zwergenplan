@@ -553,7 +553,41 @@ Nicht in diesem Plan. Gründe:
   - `directory.ts` entsteht ganz in **B**, statt als Stub hier: Es wird nur im Chunk genutzt, ein Stub ohne Logik bräche knip und die Coverage.
   - `ensureFresh` ruft **`ProviderPanel`** auf (A), bevor es den Katalog an Screen bzw. Sheet gibt, nicht der Chunk selbst (E6). So hängt B nicht an `src/data/providers.ts`. E7 hatte den Abgleich ohnehin im Start eingeplant (ca. 0,15 kB). Screen und Sheet bekommen `directory` immer schon abgeglichen.
 
-**Paket B (2026-10-05, Branch `anbieter-0010-b`):**
+**Schritt 5, Paket A (2026-10-05, Branch `anbieter-0010-a`):**
+- **Inhalt:** wie E13 und „Struktur“ [A]:
+  - Domäne test-first: `KEBAB_ID_PATTERN`, `providerId`/`anbieter=`, `countProviders`, `toProviderDirectory`.
+  - Daten: `anbieter.json` aus `build-data.ts`, `loadProviderDirectory`/`ensureFresh`.
+  - Fixtures: Turnverein und Sammelkalender; nachgezogen wurden nur `dataset.test.ts` (7 Einträge, Test-Sammelkalender umbenannt) und `select.test.ts`. Die übrigen Fixture-Tests blieben grün.
+  - UI: Lader, Sheet-Dialog, Detail-Knopf, Statuszeile, vierter Tab.
+  - Regeln und Budget-Zeile.
+- **Messung** (`pnpm build && pnpm size`, echte Daten, gzip):
+  - Start-JS **90,81 kB**, also **+1,01 kB** gegenüber 89,80 kB (Schnittstellen). Ohne Tab-Leiste lag es bei 90,78 kB.
+  - CSS 10,74 kB. Chunk `assets/anbieter/` 0,51 kB (Stub).
+  - `anbieter.json` **7,61 kB** (31,2 kB roh, 74 Anbieter). Chunk-Wächter grün.
+- **Kanarienvögel**, je rot gesehen, danach zurückgebaut:
+  - `programme` in `toProviderDirectory` → `site-data.test.ts` rot.
+  - Temporäre `directory.ts` mit Import von `places.ts`, importiert aus `App.tsx`: `directory-only-lazy` rot, auch beim reinen Typ-Import, dazu `lazy-domain-apart`.
+  - Sheet-Dialog hinter dem Detail im Baum → `anbieter.spec.ts` „Zurück auf einen Eintrag mit Sheet und Detail“ rot. Der Deep-Link allein zeigt die Reihenfolge nicht: Dort öffnet das Sheet sofort, das Detail erst mit `site.json`.
+  - `dialogOpen` ohne `providerId` → Toast-Test rot.
+  - `layout.spec.ts` zuerst rot (24 von 37 neuen Fällen), dann grün in Chromium und WebKit.
+- **Abweichungen:**
+  - **`.tab` als Grid statt Spalten-Flex** (E2): Eine Container-Query stylt nur Kinder des Containers, nicht den Tab selbst. „Badge im Fluss neben dem Icon“ geht deshalb nur über die Zeile je Kind: Icon in Zeile 1, Label in Zeile 2, im Nur-Icon-Zustand das Badge in Zeile 1. In der Seitenleiste spannt das Icon über Label und Badge, kompakt stehen alle drei in Zeile 1. Das Markup bleibt gleich.
+  - **Pille in der kompakten Querleiste 2 px statt 8 px eingezogen:** E2 rechnete mit der Spalte (133 px). Der Bestandstest „Badge im Querformat“ misst gegen die sichtbare Pille, bei 568 px also 116,6 px. Mit dreistelligem Badge (100 gemerkt) ragte der Inhalt bei 100 % über die Pille. Mit 2 px Einzug ist die Pille 129 px breit.
+  - **Hochkant mit Label sitzt das Badge wie bisher am Herz.** Die Prüfung „Badge überdeckt das Herz nicht“ gilt nur im Nur-Icon-Zustand.
+  - **Detail-Knopf heißt „Mehr von diesem Anbieter“** statt „Alle Angebote dieses Anbieters“. Das Text-Gate verlangt kurze Knöpfe (≤ 32 Zeichen) bei 100 % einzeilig. Bei 320 px stehen neben dem Icon 224 px zur Verfügung, die lange Fassung braucht in Chromium 244 px und brach um (`mobile-ux.spec.ts`, „detail … 320 px“). Die neue Fassung braucht 206 px. Icon `store` und Platz über „Website von …“ bleiben.
+  - **`onUnknown` ruft der Loader** (`ProviderSheetLoader`), wie E3 es beschreibt. Er prüft nach dem Laden Katalog und Angebote. Das Sheet von B muss `onUnknown` nicht selbst aufrufen und rendert nur für bekannte IDs.
+  - **Scheitert der Reload in `ensureFresh`, gilt die zuerst geladene Datei** (ohne weiteren Request, gemerkt je `expected`). Bis der Reload da ist, zeigen Tab und Sheet den Ladezustand.
+  - Neu ist ein Test „Zurück auf einen Eintrag mit Sheet und Detail“ (popstate). Nur dort öffnen beide Dialoge im selben Commit.
+  - **knip:** Der CI-Lauf von „Schnittstellen“ war rot, weil `SiteProvider` als Export ungenutzt war. A nutzt den Typ jetzt in `site-data.test.ts`. Der Lader destrukturiert den Chunk direkt am `import()` (`loadChunk`). Sonst meldet knip `ProviderScreen` und `ProviderSheet` als ungenutzt, weil es Exporte durch `Promise.all` nicht verfolgt.
+- **Prüfung:** `PW_PORT=4173 pnpm check` grün, mit WebKit (`libavif16` vorhanden): 1 284 E2E-Fälle bestanden, 373 übersprungen (Projektfilter). Unit-Tests 658.
+- **Offen für die Zusammenführung** (brauchen den Chunk von B; die Tests in `anbieter.spec.ts` nutzen nur das Suchfeld „Anbieter suchen“ und `h2` mit dem Namen im Sheet):
+  - Test 3: Zeile → Sheet und Zurück schließt.
+  - Test 4: Kachel im Sheet → Detail darüber, Zurück → Sheet offen.
+  - Test 6: Nach „Nochmal versuchen“ erscheinen Zeilen, nicht nur das Suchfeld.
+  - Test 7: Rückfall-Zeile ohne Website-Knopf.
+  - Test 8: Website-Link mit `target`, `rel` und Katalog-`href`.
+
+**Schritt 5, Paket B (2026-10-05, Branch `anbieter-0010-b`):**
 - **Inhalt:**
   - `src/domain/directory.ts` (+Test, test-first): `providerRows`, `providerOffers`, `providerCategories`, `matchesProviderQuery`, Rückfall-Zeilen. Coverage 100 % Zeilen, 96 % Zweige.
   - Die Tests nutzen `loadFixtures()` und ergänzen den Turnverein (Felder wie E6) nur, solange er in `tests/fixtures/` fehlt. Nach dem Merge mit A gelten sie unverändert. Die Invariante zählt im Test selbst die verschiedenen `providerId` (gleiche Definition wie `countProviders`).

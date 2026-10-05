@@ -4,11 +4,11 @@
  */
 import { z } from "zod";
 import { inBounds, NUERNBERG_BBOX } from "./geo.ts";
-import { OFFER_ID_PATTERN } from "./ids.ts";
+import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN } from "./ids.ts";
 import { isoWeekday } from "./time.ts";
 import { categoriesOf, TOPICS } from "./topics.ts";
 
-const kebab = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "kebab-case erwartet");
+const kebab = z.string().regex(KEBAB_ID_PATTERN, "kebab-case erwartet");
 /** Zeitpunkt mit Offset, z. B. 2026-10-25T10:00:00+01:00 (Zeitumstellung eindeutig). */
 const Instant = z.iso.datetime({ offset: true, local: false });
 const IsoDate = z.iso.date();

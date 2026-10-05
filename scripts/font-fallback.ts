@@ -131,12 +131,12 @@ const CLASSES: TextClass[] = [
     ],
   },
   {
-    name: "Tabs 13/600",
+    name: "Tabs 12/600",
     stack: "text",
     fit: false,
-    px: 13,
+    px: 12,
     weight: 600,
-    samples: ["Entdecken", "Kalender", "Merkliste", "Liste", "Karte"],
+    samples: ["Entdecken", "Kalender", "Anbieter", "Merkliste", "Liste", "Karte"],
   },
   {
     name: "Meta 14/450",

@@ -192,6 +192,16 @@ const LANDSCAPE_200: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
   },
+  // Plan 0010, E2: vierter Tab und Merkliste mit Badge in der Seitenleiste
+  Anbieter: async (page) => {
+    await page.getByRole("button", { name: "Anbieter", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("Anbieter mit");
+  },
+  "Merkliste mit Badge": async (page) => {
+    await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await expect(page.locator(".tab .badge")).toHaveText("1");
+  },
 };
 
 for (const [name, go] of Object.entries(LANDSCAPE_200)) {
@@ -551,4 +561,208 @@ test("Anbietername in Kachel und Detail mit hyphens: auto", async ({ page }) => 
   ).toBe("auto");
   await openKrabbeltreff(page);
   expect(await page.locator(".hero .meta").evaluate((el) => getComputedStyle(el).hyphens)).toBe("auto");
+});
+
+/**
+ * Plan 0010, E2: Tab-Leiste mit vier Tabs (Entdecken · Kalender · Anbieter · Merkliste). Gemessen werden Spalten,
+ * Labels, Icons, Badge, Daumen und die sichtbare Pille (`.tab-thumb::before`) als Rechtecke im Viewport.
+ */
+type Box = { left: number; right: number; top: number; bottom: number; width: number; height: number };
+
+async function tabBar(page: Page) {
+  return page.evaluate(() => {
+    const box = (el: Element): Box => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
+    };
+    const bar = document.querySelector<HTMLElement>(".tabs");
+    const thumb = document.querySelector<HTMLElement>(".tab-thumb");
+    if (!bar || !thumb) throw new Error("Tab-Leiste fehlt");
+    const tabs = [...bar.querySelectorAll<HTMLElement>(".tab")].map((tab) => {
+      const label = tab.querySelector<HTMLElement>(".tab-label");
+      const icon = tab.querySelector("svg");
+      if (!label || !icon) throw new Error("Tab unvollständig");
+      const badge = tab.querySelector(".badge");
+      return {
+        name: label.textContent ?? "",
+        active: tab.getAttribute("aria-current") === "page",
+        box: box(tab),
+        offset: { top: tab.offsetTop, height: tab.offsetHeight, left: tab.offsetLeft, width: tab.offsetWidth },
+        clientWidth: tab.clientWidth,
+        scrollWidth: tab.scrollWidth,
+        label: box(label),
+        labelScrollWidth: label.scrollWidth,
+        icon: box(icon),
+        badge: badge ? box(badge) : undefined,
+      };
+    });
+    // Die Verschiebung des Daumens steckt im transform, offset* kennt sie nicht.
+    const t = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
+    const pill = getComputedStyle(thumb, "::before");
+    const thumbBox = box(thumb);
+    return {
+      bar: box(bar),
+      barHeight: bar.offsetHeight,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      tabs,
+      thumb: { top: thumb.offsetTop + t.m42, height: thumb.offsetHeight },
+      pill: {
+        left: thumbBox.left + Number.parseFloat(pill.left),
+        right: thumbBox.right - Number.parseFloat(pill.right),
+      },
+    };
+  });
+}
+
+/** Ausgeblendetes Label (sr-only) ist 1 px breit, in der gedrehten Leiste etwas mehr. */
+const HIDDEN = 2;
+const overlap = (a: Box, b: Box) =>
+  Math.min(
+    Math.min(a.right, b.right) - Math.max(a.left, b.left),
+    Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top),
+  );
+const inside = (inner: Box, outer: Box, tolerance = 0.5) =>
+  inner.left >= outer.left - tolerance &&
+  inner.right <= outer.right + tolerance &&
+  inner.top >= outer.top - tolerance &&
+  inner.bottom <= outer.bottom + tolerance;
+
+const TAB_NAMES = ["Entdecken", "Kalender", "Anbieter", "Merkliste"];
+
+/** Startseite, `count` Angebote gemerkt (Badge an der Merkliste), Bewegung aus */
+async function withBadge(page: Page, viewport: { width: number; height: number }, count: number) {
+  await page.setViewportSize(viewport);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  if (count > 1) await saveCopies(page, count);
+  await ready(page);
+  if (count === 1) await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+  await expect(page.locator(".tab .badge")).toHaveText(String(count));
+}
+
+test.describe("Tab-Leiste mit vier Tabs (Plan 0010, E2)", () => {
+  for (const width of [320, 360, 390, 412]) {
+    test(`hochkant ${width} px bei 100 %: vier Labels einzeilig, aktives Label auf der Pille, Badge in der Spalte`, async ({
+      page,
+    }) => {
+      await withBadge(page, { width, height: 800 }, 1);
+      for (const name of TAB_NAMES) {
+        await page.getByRole("button", { name: new RegExp(`^${name}(\\s|$)`) }).click();
+        const m = await tabBar(page);
+        expect(m.tabs.map((t) => t.name)).toEqual(TAB_NAMES);
+        const at = `${width} px, ${name} aktiv`;
+        for (const t of m.tabs) {
+          expect(t.label.width, `${at}: Label „${t.name}“ sichtbar`).toBeGreaterThan(HIDDEN);
+          expect(t.labelScrollWidth, `${at}: Label „${t.name}“ einzeilig in der Spalte`).toBeLessThanOrEqual(
+            t.clientWidth,
+          );
+          expect(t.offset.width, `${at}: Spalte „${t.name}“ breit genug`).toBeGreaterThanOrEqual(44);
+          expect(t.offset.height, `${at}: Spalte „${t.name}“ hoch genug`).toBeGreaterThanOrEqual(56);
+        }
+        const active = m.tabs.find((t) => t.active);
+        expect(active?.name, at).toBe(name);
+        if (!active) continue;
+        expect(active.label.left, `${at}: aktives Label links auf der Pille`).toBeGreaterThanOrEqual(m.pill.left - 1);
+        expect(active.label.right, `${at}: aktives Label rechts auf der Pille`).toBeLessThanOrEqual(m.pill.right + 1);
+        const saved = m.tabs[3];
+        if (!saved?.badge) throw new Error("Badge fehlt");
+        expect(inside(saved.badge, saved.box), `${at}: Badge in der eigenen Spalte`).toBe(true);
+        expect(inside(saved.badge, m.bar), `${at}: Badge in der Leiste`).toBe(true);
+      }
+    });
+  }
+
+  for (const [width, scale, labels] of [
+    [412, 1.25, true],
+    [412, 1.5, false],
+    [412, 1.75, false],
+    [320, 2, false],
+    [412, 2, false],
+  ] as const) {
+    for (const count of [1, 10]) {
+      const at = `hochkant ${width} px bei ${scale * 100} %, ${count} gemerkt`;
+      test(`${at}: ${labels ? "Labels einzeilig" : "nur Icons"}, Badge in der Spalte, frei`, async ({ page }) => {
+        await withBadge(page, { width, height: 800 }, count);
+        await setTextScale(page, scale);
+        const m = await tabBar(page);
+        for (const t of m.tabs) {
+          if (labels) {
+            expect(t.label.width, `${at}: Label „${t.name}“ sichtbar`).toBeGreaterThan(HIDDEN);
+            expect(t.labelScrollWidth, `${at}: Label „${t.name}“ einzeilig`).toBeLessThanOrEqual(t.clientWidth);
+          } else {
+            expect(t.label.width, `${at}: Label „${t.name}“ nur für Screenreader`).toBeLessThanOrEqual(HIDDEN);
+          }
+          expect(inside(t.icon, t.box), `${at}: Icon „${t.name}“ in der Spalte`).toBe(true);
+        }
+        const saved = m.tabs[3];
+        const neighbour = m.tabs[2];
+        if (!saved?.badge || !neighbour) throw new Error("Badge fehlt");
+        expect(inside(saved.badge, saved.box), `${at}: Badge in der eigenen Spalte`).toBe(true);
+        expect(inside(saved.badge, m.bar), `${at}: Badge in der Leiste`).toBe(true);
+        expect(overlap(saved.badge, neighbour.box), `${at}: Badge über dem Nachbar-Tab`).toBeLessThanOrEqual(0.5);
+        // Mit Label sitzt das Badge hochkant wie bisher am Herz, ohne Label steht es im Fluss daneben (E2).
+        if (labels) expect(overlap(saved.badge, saved.label), `${at}: Badge über dem Label`).toBeLessThanOrEqual(0.5);
+        else expect(overlap(saved.badge, saved.icon), `${at}: Badge über dem Herz`).toBeLessThanOrEqual(0.5);
+        await expectNoHorizontalScroll(page);
+      });
+    }
+  }
+
+  for (const viewport of [
+    { width: 863, height: 360 },
+    { width: 740, height: 360 },
+  ]) {
+    for (const scale of [1, 2]) {
+      const at = `Seitenleiste ${viewport.width}×${viewport.height} bei ${scale * 100} %`;
+      test(`${at}: im Viewport mit Rand, Badge frei, Daumen auf jedem Tab`, async ({ page }) => {
+        await withBadge(page, viewport, 1);
+        await setTextScale(page, scale);
+        for (const name of TAB_NAMES) {
+          await page.getByRole("button", { name: new RegExp(`^${name}(\\s|$)`) }).click();
+          const m = await tabBar(page);
+          const where = `${at}, ${name} aktiv`;
+          expect(m.bar.top, `${where}: Leiste oben mit 8 px Rand`).toBeGreaterThanOrEqual(8);
+          expect(m.bar.bottom, `${where}: Leiste unten mit 8 px Rand`).toBeLessThanOrEqual(m.viewport.height - 8);
+          const saved = m.tabs[3];
+          if (!saved?.badge) throw new Error("Badge fehlt");
+          if (saved.label.width > HIDDEN) {
+            expect(overlap(saved.badge, saved.label), `${where}: Badge über dem Label`).toBeLessThanOrEqual(0.5);
+          }
+          expect(overlap(saved.badge, saved.icon), `${where}: Badge über dem Herz`).toBeLessThanOrEqual(0.5);
+          const active = m.tabs.find((t) => t.active);
+          if (!active) throw new Error(`${where}: kein aktiver Tab`);
+          expect(Math.abs(m.thumb.top - active.offset.top), `${where}: Daumen oben bündig`).toBeLessThanOrEqual(2);
+          expect(
+            Math.abs(m.thumb.height - active.offset.height),
+            `${where}: Daumen so hoch wie der Tab`,
+          ).toBeLessThanOrEqual(2);
+        }
+      });
+    }
+  }
+
+  for (const scale of [1, 1.25, 1.5, 1.75, 2]) {
+    const at = `kompakt 568×320 bei ${scale * 100} %`;
+    test(`${at}: höchstens 56 px, ${scale === 1 ? "mit Labels" : "nur Icons"}, nichts ragt heraus`, async ({
+      page,
+    }) => {
+      await withBadge(page, { width: 568, height: 320 }, 1);
+      await setTextScale(page, scale);
+      const m = await tabBar(page);
+      expect(m.barHeight, `${at}: Leiste höchstens 56 px hoch`).toBeLessThanOrEqual(56);
+      for (const t of m.tabs) {
+        if (scale === 1) expect(t.label.width, `${at}: Label „${t.name}“ sichtbar`).toBeGreaterThan(HIDDEN);
+        else expect(t.label.width, `${at}: Label „${t.name}“ nur für Screenreader`).toBeLessThanOrEqual(HIDDEN);
+        expect(t.scrollWidth, `${at}: Inhalt von „${t.name}“ ragt nicht heraus`).toBeLessThanOrEqual(t.clientWidth);
+        expect(inside(t.icon, t.box), `${at}: Icon „${t.name}“ in der Spalte`).toBe(true);
+        if (t.label.width > HIDDEN) expect(inside(t.label, t.box), `${at}: Label „${t.name}“ in der Spalte`).toBe(true);
+      }
+      const saved = m.tabs[3];
+      if (!saved?.badge) throw new Error("Badge fehlt");
+      expect(inside(saved.badge, saved.box), `${at}: Badge in der Spalte`).toBe(true);
+      expect(overlap(saved.badge, saved.icon), `${at}: Badge über dem Herz`).toBeLessThanOrEqual(0.5);
+      if (saved.label.width > HIDDEN) {
+        expect(overlap(saved.badge, saved.label), `${at}: Badge über dem Label`).toBeLessThanOrEqual(0.5);
+      }
+    });
+  }
 });
