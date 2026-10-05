@@ -682,6 +682,14 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
     - `installieren.spec.ts` (3 × `iphone-15`): hell, dunkel und 320 px/200 % in einem Test lagen in WebKit bei ≈ 19 s und unter Last über dem Timeout von 30 s. Behoben wie in `mobile-ux.spec.ts`: je Zustand eigene Tests für hell, dunkel und 320 px/200 % (je ≈ 13 s). Die Kanarienvögel (`prompt()` fehlt, `display-mode` ignoriert) wurden auf der neuen Struktur erneut rot gesehen.
     - `perf.spec.ts` LCP (`pixel-7` 2764 ms, `android-klein` 4524 ms): allein mit einem Worker 1436 ms bzw. 2064 ms, grün. Der Service Worker ist dort blockiert, der PWA-Kern lädt nach `load`; die Messung zeigt die Konkurrenz der Worker, nicht die Seite (vgl. Plan 0003, E8). Keine Schwelle geändert.
     - `karte.spec.ts:363` (`pixel-7-quer`) und `:401` (`iphone-15`): allein zweimal wiederholt grün.
+  - **Zweiter voller `pnpm check`:** alles grün bis auf `perf.spec.ts` LCP (`pixel-7`, `android-klein`). **A/B gegen `main` (`693ffd1`)**, abwechselnd, je 10 Läufe, Fixture-Build, `PW_SUITE=chromium`, Median (Max) in ms:
+
+    | Gerät | main, 1 Worker | Branch, 1 Worker | main, 4 Worker | Branch, 4 Worker |
+    |---|---|---|---|---|
+    | `pixel-7` | 1404 (1532) | 1406 (1552) | 1606 (1716) | 1622 (1784) |
+    | `android-klein` | 1376 (1420) | 1394 (1464) | 1598 (1672) | 1614 (1712) |
+
+    Kein messbarer Unterschied (≤ 1,5 %, im Rauschen), kein Lauf ≥ 2500 ms. Das Rot im vollen Lauf kommt von der Last (8 Worker, WebKit parallel, Rechner mit Last bis 56 durch andere Sitzungen); in CI läuft E2E geshardet mit 2 Workern (Plan 0013).
 - **2026-10-05, Stufe 1, Schritt 5 (Doku):** `docs/architecture.md` (Schicht `src/sw/`, Absätze „Service Worker“ und „App-Extras“, Ausnahme im Absatz Wegzeit, Biome-Globals, E2E mit Service Worker), README („Als App installieren“, Notausgang), ADR 0013 angenommen.
 
 ## Akzeptanzkriterien
