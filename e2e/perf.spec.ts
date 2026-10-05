@@ -7,6 +7,16 @@ import { clsFrom, observeVitals, readVitals, throttleMobile } from "./vitals.ts"
 
 const BUDGET = { lcpMs: 2500, cls: 0.05 };
 
+/**
+ * Messwert als Annotation und `[perf]`-Zeile ins Log, damit die Marge zum Budget in CI sichtbar ist (Plan 0013, E4).
+ * Reine Ausgabe. console.warn, weil Biome in e2e/ nur warn und error erlaubt.
+ */
+function report(metric: string, value: number) {
+  const info = test.info();
+  info.annotations.push({ type: metric, description: String(value) });
+  console.warn(`[perf] ${info.project.name} | ${info.title} | ${metric} ${value}`);
+}
+
 test("LCP und CLS bleiben im Budget", async ({ page, browserName, isMobile }) => {
   test.skip(browserName !== "chromium" || !isMobile, "nur Chromium-Mobile");
   await throttleMobile(page);
@@ -15,8 +25,10 @@ test("LCP und CLS bleiben im Budget", async ({ page, browserName, isMobile }) =>
   await expect(page.getByTestId("offer").first()).toBeVisible();
   await page.waitForTimeout(500);
   const vitals = await readVitals(page);
-  expect(vitals.lcp, "LCP (ms)").toBeLessThan(BUDGET.lcpMs);
   const { cls, detail } = clsFrom(vitals);
+  report("LCP (ms)", vitals.lcp);
+  report("CLS", cls);
+  expect(vitals.lcp, "LCP (ms)").toBeLessThan(BUDGET.lcpMs);
   expect(cls, `CLS\n${detail}`).toBeLessThan(BUDGET.cls);
 });
 
@@ -40,5 +52,6 @@ test("Wegzeit lädt bei gespeichertem Stadtteil und ?wegzeit=: kein Flackern, CL
   await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
   await page.waitForTimeout(500);
   const { cls, detail } = clsFrom(await readVitals(page));
+  report("CLS", cls);
   expect(cls, `CLS\n${detail}`).toBeLessThan(BUDGET.cls);
 });
