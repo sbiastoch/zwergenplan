@@ -13,12 +13,13 @@ data/providers.yaml + data/offers.json + data/oepnv/fahrplan.json   (Commit auf 
                           │
             scripts/build-data.ts  (Zod + Invarianten; rot = kein Build; scripts/transit rechnet die Wegzeit-Tabelle)
                           │
-   public/data/site.json, meta.json, wegzeit.json, public/ics/**.ics   (generiert, nicht committet)
+   public/data/site.json, meta.json, wegzeit.json, anbieter.json, public/ics/**.ics   (generiert, nicht committet)
                           │
               Vite-Build ► dist/ ► GitHub Pages zwergenplan.app
                           │
             Browser: index.html startet den Abruf von site.json (Frühstart), src/data übernimmt ihn ► src/domain ► src/ui
                      wegzeit.json nur auf Anlass (Kind-Sheet, Karte, gespeicherter Stadtteil; Plan 0009, E9)
+                     anbieter.json nur mit Tab „Anbieter“ bzw. Anbieter-Sheet (Plan 0010, E6)
 ```
 
 ## Schichten
@@ -57,6 +58,11 @@ Regeln:
   - Die Rechenlogik `src/domain/transit.ts` ist ein Lazy-Chunk in `dist/assets/oepnv/` (Entscheidungspunkt E10: statisch lag das Start-JS bei 90,5 kB). Von `src/` aus nur per `import()`, auch Typen nicht statisch (`transit-only-lazy`), und nur über den Lader `use-transit.ts` (`transit-entry-only`, `lazy-loader-static`). Typen stehen in `src/domain/transit-types.ts`; Budget `Wegzeit JS (lazy)`.
   - Je Startpunkt ist alles eine Art: Wegzeit mit Bus & Bahn, oder als Rückfall die Luftlinie (Tabelle fehlt oder passt nicht, Startpunkt außerhalb des Stadtgebiets). Solange sie lädt, stehen Platzhalter ohne Layoutsprung (`ReachMode` „laedt“); mit gesetzter Grenze (`wegzeit=`) ersetzt ein Platzhalter-Block Liste und Kalender. Bewusste Lücke: Die Karte (Marker, Orts-Liste) zeigt beim Laden alle Orte, höchstens bis zum Zeitlimit; die Statuszeile ist solange unsichtbar.
 - **Export der Merkliste** (Plan 0010, E8 A; ergänzt ADR 0007): `src/domain/ics.ts` ist ein Lazy-Chunk in `dist/assets/export/` (Budget `Export JS (lazy)`). Von `src/` aus nur per `import()`, auch Typen nicht statisch (`ics-only-lazy`), und nur über den Lader `src/ui/SavedView.tsx` (`ics-entry-only`, `lazy-loader-static`). Pfade und Termin-Schlüssel der statischen ICS-Dateien stehen in `src/domain/ics-paths.ts`, das das Detail beim Start braucht. Die App lädt den Chunk nach dem ersten Rendern mit Daten im Leerlauf vor, für alle gleich. Typen stehen in `src/domain/ics-types.ts`. Scheitert er, rät der Toast zum Neuladen mit Netz (Chromium behält einen gescheiterten `import()`, auch den des Vorladens).
+- **Anbieterübersicht** (Plan 0010, E3, E6, E7), Ladekette in zwei Stufen wie die Karte: `src/ui/ProviderPanel.tsx` (Start: Tab-Inhalt, `ProviderSheetLoader`, gemeinsamer Lader `loadProviderUi` ohne Argument, `preloadProviderUi` beim Parsen von `ansicht=anbieter`/`anbieter=`) → `src/ui/anbieter/` (Lazy-Chunk in `dist/assets/anbieter/`, Budget `Anbieter JS (lazy)`: Liste und Sheet).
+  - `src/ui/anbieter/` erreicht man von außen nur per `import()`, auch Typen nicht statisch, und nur über `ProviderPanel.tsx` (`anbieter-ui-only-lazy`, `anbieter-ui-entry-only`, `lazy-loader-static`). Props-Typen stehen in `src/ui/provider-types.ts`.
+  - `src/domain/directory.ts` (Zustände, Sortierung, Suche, Rückfall-Zeilen) wird nur aus `src/ui/anbieter/` importiert (`directory-only-lazy`) und importiert keine nur von der Karte genutzten Module (`lazy-domain-apart`). Die Zahl der Statuszeile kommt aus `provider-count.ts` im Start.
+  - Daten: `public/data/anbieter.json` (`toProviderDirectory`, nur `role: anbieter`, nur Felder für Eltern, Budget `Daten (anbieter.json)`) lädt allein `src/data/providers.ts`. Weicht ihr `generatedAt` von `site.json` ab, lädt `ensureFresh` (aufgerufen in `ProviderPanel`) höchstens einmal mit `cache: "reload"` nach; Anbieter, die dann noch fehlen, erscheinen als Rückfall-Zeile aus den Angeboten.
+  - Der Anbieter-Dialog ist immer gemountet und steht im Baum **vor** dem Detail: Öffnen beide im selben Commit (Deep-Link, Zurück), liegt das Detail oben.
 - **Chunk-Wächter** (Plan 0010, E8): Direkt in `dist/assets/` liegt genau eine JS-Datei, `index-*.js` (`scripts/check-chunks.ts`, läuft im Skript `size`). Lazy-Chunks bekommen per `chunkFileNames` einen Unterordner. Ein gemeinsamer Teil, den Rolldown abspaltet (z. B. React, sobald mehrere Lazy-Chunks es mit dem Einstieg teilen), wird so sofort rot, nicht erst als Summe im Budget. Die `codeSplitting`-Gruppe mit `tags: ["$initial"]` (`vite.config.ts`, ADR 0012) hält alles, was der Einstieg statisch erreicht, im Einstieg; sie umgeht rolldown#11026. Fällt sie weg oder wirkt sie nicht mehr, zeigt der Wächter die Abspaltung.
 - **Kachel-Host** steht nur in `src/data/tiles.ts`. `guardTileRequest` sitzt als `transformRequest` vor jedem MapLibre-Request (auch denen, die der Worker lädt) und lässt nur `https://tiles.openfreemap.org` ohne Querystring und Fragment durch.
 - Keine Zyklen (`no-circular`). Produktivcode importiert keine Tests oder Fixtures (`no-test-code-in-prod`).

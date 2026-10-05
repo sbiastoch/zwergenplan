@@ -21,7 +21,6 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **React Compiler**, sobald es Komponenten mit spürbaren Re-Render-Kosten gibt.
 - **Architektur-Review in CI** über `anthropics/claude-code-action`. Braucht einen API-Key und kostet pro Lauf.
 - **Erinnerung „Anmeldung öffnet“** als eigener ICS-Termin.
-- **Anbieterverzeichnis auf der Website** (ersetzt das frühere `ANBIETER.md`): alle Anbieter mit Ring, Themen und Programm-Links.
 - **Einstieg in laufende Kurse**: Die Liste sortiert nach dem nächsten Termin und zeigt „Kurs · noch 4 von 8“ (Plan 0003). Ob ein Quereinstieg möglich ist, wissen die Daten nicht – dafür bräuchte das Schema ein Feld.
 - **Browser für den Recherche-Lauf**: Mit verbundenem claude-in-chrome werden Plätze bei Eversports, Calendly und Kurabu lesbar (im ersten Lauf `unbekannt`).
 - **Kompakter Kopfbereich im Querformat**: Sticker und Chips nehmen quer ≈ 150 px Höhe ein. Mit der Seitenleiste (Plan 0007, E14) ist das tragbar, ein kompakterer Kopf wäre ein eigenes Designthema (Befund H1).
@@ -43,3 +42,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Karten-Chunk nach einem Funkloch**: `Lazy.tsx` bietet erst „Nochmal versuchen“, dann „Seite neu laden“. Wie bei der Wegzeit (Plan 0009, N1) könnte ein Wiederholen, bei dem nur der Import scheitert, gleich neu laden. Dort scheitern aber auch CSS oder WebGL, deshalb gibt es keine Änderung ohne eigenen Befund.
 - **Preact statt React** (`preact/compat` per Alias, Code unverändert): Start-JS 89,62 → 29,09 kB gzip, gemessen. Vitest grün. E2E: 5 rote Tests, davon `karte.spec.ts:172` ungeklärt; dazu verschobene Effekt-Zeitpunkte (Dialoge, Fokus), kein `StrictMode`, Anpassungen an knip und dependency-cruiser. Stack-Änderung gegen ADR 0001, deshalb ein eigener Plan, und erst mit gemessenem Bedarf (ADR 0012, Option b).
 - **Kalender und Merkliste als Lazy-Chunks**: −1,65 kB Start-JS gemessen (Kalender allein −1,09 kB), seit dem Rolldown-Workaround ohne Abspaltung. Kosten: Vorladen im Leerlauf, `LoadFailed`, Regeln und E2E je Chunk; der Kalender ist ein Haupt-Tab und hinge offline am Vorladen (ADR 0012, Option d).
+- **Anbieter-Feed (webcal)**: alle Termine eines Anbieters als Abo, damit neue Termine von selbst kommen. Eine statische Datei je Anbieter veraltete und flutete bei bis zu 71 Angeboten den Kalender (Plan 0010, E11).
+- **Anbieter merken oder „folgen“**: Die Merkliste bleibt bei Angeboten (Plan 0010, Nicht-Ziele).
+- **Kurzname und Einrichtungsart im Katalog** („Familienzentrum“, „Bibliothek“): Namen sind im Median 59 Zeichen lang, eine Einrichtungsart gibt es nicht. Beides wäre eine Schemaänderung samt Skill-Lauf (ADR 0006, Plan 0010).
+- **Anbietername auf der Kachel antippbar**: Heute führt der Weg über das Detail („Mehr von diesem Anbieter“, Plan 0010, Nicht-Ziele).
