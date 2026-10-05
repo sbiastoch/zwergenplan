@@ -152,3 +152,9 @@ test.describe("Fehlerzustand (Plan 0008, E5)", () => {
     await expect(page.getByRole("alert")).not.toContainText("HTTP");
   });
 });
+
+// Kanarienvogel Plan 0013, Test 3 (nur auf dem Branch, wird zurückgenommen): rot nur im Shard mit desktop.
+test("Kanarienvogel Plan 0013: absichtlich rot auf desktop", () => {
+  test.skip(test.info().project.name !== "desktop", "nur desktop");
+  expect(1, "Kanarienvogel Shard").toBe(2);
+});
