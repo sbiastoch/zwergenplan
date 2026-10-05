@@ -1,6 +1,6 @@
 # Plan 0011 – Installierbare App und Push zu neuen Angeboten
 
-Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). **Stufe 1, Schritte 1–5 umgesetzt** auf Branch `pwa-0011` (2026-10-05); offen: Abnahme des Icons, `/arch-review`, Deploy und Browser-Review (Schritt 6). Stufe 2 beginnt nach der Abnahme von Stufe 1.
+Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). **Stufe 1, Schritte 1–5 umgesetzt** auf Branch `pwa-0011` (2026-10-05); Icon abgenommen; Arch-Review „Freigabe mit Änderungen“ eingearbeitet (Abschnitt „Arch-Review (Stufe 1)“); offen: Deploy und Browser-Review (Schritt 6). Stufe 2 beginnt nach der Abnahme von Stufe 1.
 Datum: 2026-10-05
 Bezug:
 - **ADR 0013** (PWA und Service Worker, Entwurf `docs/adr/0013-pwa-service-worker.md`) und **ADR 0014** (Web Push, Entwurf `docs/adr/0014-web-push.md`).
@@ -653,7 +653,7 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
   - `node scripts/icons.ts` erzeugt `public/icons/` byte-gleich bei jedem Lauf (geprüft per md5): `icon-192/512.png` und `icon.svg` als abgerundetes Quadrat mit transparenten Ecken (`any`, Favicon), `maskable-512.png` randlos mit Motiv auf 80 %, `apple-touch-180.png` randlos und deckend. `--preview=<ordner>` legt die Abnahmebilder ab (Home-Bildschirm hell/dunkel, Schutzzone).
   - `public/manifest.webmanifest` wie E2, `index.html` mit `manifest`, `icon` (SVG) und `apple-touch-icon` über `%BASE_URL%`.
   - `e2e/pwa.spec.ts` Punkt 1 grün (`pixel-7`, `desktop`). **Kanarienvogel:** `apple-touch-180.png` mit transparenten Ecken → `minAlpha: 0`, rot.
-  - **Offen: Abnahme des Icons durch den Nutzer** (Vorschau liegt beim Orchestrator).
+  - **Icon vom Nutzer abgenommen** (2026-10-05, „Icon passt“), siehe „Nutzerentscheidungen“.
 
 - **2026-10-05, Stufe 1, Schritt 3 (Registrierung, Offline, Frische):**
   - `src/data/site.ts` (test-first): `loadSiteData` liefert `{ data, stale }`; `stale`, wenn die Antwort `X-Zp-Cache: offline` trägt, auch über den Frühstart. `lastSiteLoad()` merkt Zeitpunkt und Art des letzten erfolgreichen Abrufs für die Frische.
@@ -723,6 +723,7 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 1. **Cloudflare** als Ort für die Abos (ADR 0014): ja.
 2. **Icon:** keine Vorgabe. Ein Entwurf im Stickerheft-Stil (Plan 0003) kommt in Schritt 2 zur Abnahme.
 3. **Gerät für den Spike:** Ein aktuelles iPhone ist vorhanden. Schritt 0 kann beginnen, sobald Cloudflare eingerichtet ist (Teil von Schritt 7, vorgezogen).
+4. **Icon (Schritt 2):** abgenommen am 2026-10-05 („Icon passt“), Vorschau hell/dunkel und Schutzzone aus `node scripts/icons.ts --preview`.
 
 ## Review (2026-10-05, plan-reviewer, Runde 1) – Verdict: Überarbeiten → eingearbeitet
 

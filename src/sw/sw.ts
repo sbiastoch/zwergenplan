@@ -119,17 +119,19 @@ function fromCache(copy: Response): Response {
   return new Response(copy.body, { status: copy.status, statusText: copy.statusText, headers });
 }
 
-/** Netz, die erfolgreiche Antwort landet zusätzlich in `zp-data` */
+/**
+ * Netz, die erfolgreiche Antwort landet zusätzlich in `zp-data`. Die Kopie entsteht **synchron** mit der Antwort, bevor
+ * `respondWith` den Body liest: Ein `clone()` erst nach `await caches.open()` warf, und nichts wurde gecacht
+ * (Arch-Review Stufe 1, B1). `waitUntil` hängt sofort, auch wenn `site()` vorher per Zeitlimit die Kopie liefert.
+ */
 function networkKeeping(event: FetchEvent, request: Request): Promise<Response> {
-  const response = fetch(request);
-  event.waitUntil(
-    response
-      .then(async (res) => {
-        if (res.status === 200) await (await caches.open(DATA_CACHE)).put(request.url, res.clone());
-      })
-      .catch(() => undefined),
-  );
-  return response;
+  const fetched = fetch(request).then((res) => {
+    const copy = res.status === 200 ? res.clone() : undefined;
+    const stored = copy ? caches.open(DATA_CACHE).then((cache) => cache.put(request.url, copy)) : Promise.resolve();
+    return { res, stored };
+  });
+  event.waitUntil(fetched.then(({ stored }) => stored).catch(() => undefined));
+  return fetched.then(({ res }) => res);
 }
 
 /** Regel 4: Netz zuerst ohne HTTP-Cache; mit Kopie nach 5 s oder bei Netzfehler die Kopie. */

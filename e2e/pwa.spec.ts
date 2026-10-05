@@ -205,6 +205,50 @@ test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request au
   expect(tables).toHaveLength(1);
 });
 
+test.describe("Laufzeit-Cache der Daten (Arch-Review Stufe 1, B1)", () => {
+  // wie „offline“: Das Vorladen des Export-Codes scheitert offline, wenn der Chunk nie geladen wurde
+  test.use({ allowedConsoleErrors: [/\/assets\/export\/[^/ ]+\.js Failed to load resource: net::ERR_FAILED$/] });
+
+  test("(a) Wegzeit-Tabelle kommt nach einem Online-Besuch offline aus zp-data (E4, Regel 5)", async ({
+    page,
+    context,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await installed(page);
+    // zweiter Besuch online: Tabelle und Rechenlogik laufen jetzt durch den Service Worker
+    const table = page.waitForResponse((r) => r.url().endsWith("/data/wegzeit.json") && r.ok());
+    await page.reload();
+    expect((await table).fromServiceWorker()).toBe(true);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  });
+
+  test("(b) jeder Online-Abruf erneuert site.json in zp-data (E4, Regel 4)", async ({ page }) => {
+    await installed(page);
+    const url = new URL("data/site.json", page.url()).href;
+    // Kopie vom Install durch eine erkennbar alte ersetzen
+    await page.evaluate(async (u) => {
+      const data = await caches.open("zp-data");
+      await data.put(u, new Response(JSON.stringify({ generatedAt: "alt", offers: [] })));
+    }, url);
+    const site = page.waitForResponse((r) => isSite(r.url()));
+    await page.reload();
+    await site;
+    await expect
+      .poll(() =>
+        page.evaluate(async (u) => {
+          const copy = await (await caches.open("zp-data")).match(u);
+          const json: unknown = await copy?.json();
+          return typeof json === "object" && json !== null && "generatedAt" in json ? json.generatedAt : undefined;
+        }, url),
+      )
+      .toBe("2026-10-05T06:00:00+02:00");
+  });
+});
+
 test.describe("Karte", () => {
   test.use({ tiles: "mock" });
 
