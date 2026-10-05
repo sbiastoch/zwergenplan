@@ -374,6 +374,7 @@ export const ACCESS_METERS = 800;
   - **Darüber** kommt `transit.ts` **lazy** in `dist/assets/oepnv/` (Vite `chunkFileNames` über den Chunk-Namen, wie `karte/`), mit Budget `Wegzeit JS (lazy)` `dist/assets/oepnv/*.js` **3 kB**, und es gelten die Regeln unten.
   - Die Entscheidung samt Messwert steht in der Commit-Message und wird hier eingetragen.
 - **Nach Schritt 6** wird wieder gemessen. Über 89 kB wird verschlankt (Texte kürzen; im Fall „statisch“ doch lazy). Das Budget von 90 kB bleibt; mehr braucht ein ADR.
+  - Ergebnis (Umsetzung, Paket C): 89,69 kB, Texte gekürzt, weiter über 89 kB. Die restliche Verschlankung ist Pflicht von **Paket 0 aus Plan 0010** (E8 „Paket 0: Verschlankung des Startbundles“, Reihenfolge Plan 0009 → Paket 0). Plan 0010 liegt noch nicht auf `main`, sondern auf Branch `anbieter-0010` (`docs/plans/0010-anbieteruebersicht.md`).
 - **Typen getrennt** (M3): `TransitTableFile` und `TransitTable` liegen in `src/domain/transit-types.ts` (wie `src/ui/map-types.ts`). Dieses Modul darf jeder statisch importieren. So braucht `transit-only-lazy` keine Ausnahme für Typ-Importe.
 - **Regeln, nur im Fall „lazy“**, je mit Kanarienvogel (ADR 0004):
   - `transit-only-lazy` (dependency-cruiser): `from: { path: "^src/", pathNot: "\\.test\\.ts$" }` → `to: { path: "^src/domain/transit\\.ts$", dependencyTypesNot: ["dynamic-import"] }` verboten, auch für reine Typ-Importe.
@@ -408,6 +409,7 @@ type ReachMode =
   - Ist zusätzlich `wegzeit=` gesetzt, zeigt die Liste in `laedt` statt der ungefilterten Angebote einen Platzhalter-Block (`.list-pending`, `min-height` wie zwei Tagesgruppen, Text „Wegzeiten werden geladen …“). Danach erscheint die gefilterte Liste, ohne dass Kacheln springen.
   - Ohne `wegzeit=` steht die Liste sofort, nur die `.dist`-Platzhalter füllen sich.
   - Die Orts-Liste der Karte sortiert in `laedt` nach Namen und danach nach Wegzeit. Sie liegt unter der Karte und meist außerhalb des Sichtbereichs; der Browser-Review prüft das.
+  - Der Kalender zeigt mit `wegzeit=` denselben Platzhalter-Block (Arch-Review, Befund 4). Bewusste Lücke: Die Karte (Marker und Orts-Liste) zeigt in `laedt` mit `wegzeit=` alle Orte, höchstens bis zum Zeitlimit von 8 s, und filtert danach; die Statuszeile ist solange unsichtbar.
 
 **Filtergruppe „Wegzeit“ je Modus** (M6). Die Chips „bis 20 / 30 / 45 Min.“ sind nur in `oepnv` bedienbar, sonst `disabled` mit Begründung darunter:
 
@@ -785,7 +787,7 @@ Der Koordinator überträgt hier die Messwerte und Entscheidungen der Pakete aus
   - Ausgang 87,95 kB.
   - Statisch wären es 90,52 kB, über der Schwelle (88,6) und über dem Budget. Deshalb **lazy**: 89,70 kB, nach Kürzen der Fehlertexte **89,69 kB**.
   - Die Wegzeit-Texte und -Zustände kosten im Start ≈ 1,7 kB gzip.
-  - Das Ziel ≤ 89,0 kB ist verfehlt. Für Plan 0010 heißt das: Paket 0 muss X − 87,7 = **2,0 kB** einsparen.
+  - Das Ziel ≤ 89,0 kB ist verfehlt. Für Plan 0010 (Branch `anbieter-0010`, `docs/plans/0010-anbieteruebersicht.md`, E8 „Paket 0: Verschlankung des Startbundles“) heißt das: Paket 0 muss X − 87,7 kB einsparen, bei X = 89,69 also ≈ **2,0 kB**. Nach dem Arch-Review liegt X bei 89,81 kB (≈ 2,1 kB, siehe unten).
 - **Budgets:** `JS (initial)` 89,69/90 kB, `Wegzeit JS (lazy)` 1,01/3 kB, `Wegzeit-Daten` 42,03/64 kB, CSS 10,62/15 kB.
 - **Kanarienvögel**, alle wie erwartet:
   - statischer Import und reiner Typ-Import von `transit.ts` in `App.tsx`: rot (`transit-only-lazy`, `transit-entry-only`);

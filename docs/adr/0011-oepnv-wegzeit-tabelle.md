@@ -26,7 +26,7 @@ ADR 0005 legte fest, dass die Wegzeit aus einer statischen GTFS-Matrix entsteht:
    - Die Angaben stehen im Kind-Sheet, im README und im Feld `source` beider Dateien.
 6. **Laden und Privatsphäre.**
    - Die Tabelle ist für alle gleich und kommt vom eigenen Origin. Sie lädt beim Öffnen einer Startpunkt-Oberfläche (Kind-Sheet, Karte), auf „Nochmal laden“ oder beim Start, wenn ein Stadtteil gespeichert ist, nie als Folge einer Wahl.
-   - Neue Invariante: **Kein Request hängt davon ab, welcher Startpunkt gilt.**
+   - Neue Invariante: **Kein Request hängt davon ab, welcher Startpunkt gilt**, außer den Kartenkacheln beim Stadtteil-Zoom (ADR 0008). URL und Inhalt jedes anderen Requests sind für alle gleich.
    - Bewusste Ausnahme: Der Request beim Start verrät dem eigenen Host ein Bit, nämlich dass ein Stadtteil gespeichert ist, aber nicht welcher.
 7. **Filter in Minuten.** `wegzeit=20|30|45` ersetzt `umkreis=2|5|10` (km). Die Grenze wirkt nur, wenn die Wegzeit verfügbar ist.
 8. **„Haltestelle wählen“ entfällt** als Startpunkt-Quelle (ADR 0005, Fallback ohne GPS). Stadtteil, Standort und Kartenmitte decken das ab, eine Liste mit 570 Halten wäre schlecht bedienbar.
