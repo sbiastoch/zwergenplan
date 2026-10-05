@@ -1,6 +1,6 @@
 # Plan 0009 – Öffi-Fahrzeit statt Luftlinie
 
-Status: umgesetzt bis Schritt 8 (2026-10-05), Arch-Review, Deploy und Browser-Review siehe „Umsetzung“
+Status: umgesetzt und live (2026-10-05, `97f1216`); Hinweise H1–H8 aus dem Browser-Review offen
 Datum: 2026-10-05
 Bezug: ADR 0005 (Öffi-Wegzeit, Stufe 2: hier umgesetzt, mit Abweichungen → **ADR 0011**, Entwurf in `docs/adr/0011-oepnv-wegzeit-tabelle.md`, E14), Plan 0004 (Startpunkt, Luftlinie, Schnittstelle `Reach`, E2/E9), Plan 0005 (Karte, Kamera-Regel, Kartenmitte), ADR 0002 (Datenfluss), ADR 0003 (`nearestStops`), ADR 0006 (Pipeline), ADR 0008 (Privatsphäre der Karte), ADR 0010 (`src/data` und Domänenhilfen).
 
@@ -822,3 +822,69 @@ Branch `oepnv-0009-int`, Commits `3a9737d` … (dieser Abschnitt). Domänen- und
 **Messung:** `JS (initial)` **89,80 kB** (vorher 89,69). Die Fixes kosten im Start ≈ 0,1 kB (Aktion `stale`, gemeinsames Zeitlimit, Kalender-Platzhalter). Für Paket 0 aus Plan 0010 heißt das X = 89,80, also ≈ 2,1 kB Einsparung. `Wegzeit JS (lazy)` 1,01/3 kB, `Wegzeit-Daten` 42,03/64 kB.
 
 **Lokal** (`PW_PORT=4473 pnpm check`, inkl. WebKit): Unit 621/621, E2E 1089 grün, 298 übersprungen, keine Ausreißer, Smoke mit echten Daten im selben Lauf.
+
+## Browser-Review live (2026-10-05) – Verdict: bestanden, kein Blocker, Hinweise offen
+
+**Stand:** live `97f1216`, echte Daten (333 Angebote, 76 Orte). Playwright gegen https://zwergenplan.app/, Chromium (Pixel 7) und WebKit (iPhone 15), `de-DE`, Europe/Berlin.
+- Screenshot-Matrix: `scripts/screenshots.ts` bei 100 und 200 % ergibt 264 Bilder. Davon sind die 12 Kontaktbögen der von Plan 0009 betroffenen Ansichten angesehen: `start-startpunkt`, `kind-quelle`, `filter-wegzeit`, `karte`, `ort`, `kind`, `detail`, je 100 und 200 %.
+- Skripte und Bilder liegen außerhalb des Repos (Job-Verzeichnis `r0009/`).
+
+**Schritt 11, einzeln:**
+- **Netzwerk:**
+  - Ohne Anlass kein Request auf `wegzeit.json` oder `assets/oepnv/*`.
+  - Kind-Sheet bzw. Karte laden Tabelle und Chunk parallel, je einmal.
+  - Ab der Wahl von Stadtteil, Standort oder Kartenmitte gibt es 0 Requests. Einzige Ausnahme sind Kacheln von `tiles.openfreemap.org` beim Stadtteil-Zoom der offenen Karte.
+  - Mit gespeichertem Stadtteil kommt beim Start genau 1 Request.
+  - Hosts: nur `zwergenplan.app` und `tiles.openfreemap.org`. Kein Startpunkt in URL oder Requests, im `localStorage` nur die Stadtteil-ID.
+- **Stichproben gegen VGN:**
+  - Die EFA routet nicht ab Koordinaten. Verglichen wurde deshalb Halt zu Halt (EFA, Di 13.10.) plus unsere Fußweg-Formel, als Median 9–10 Uhr.
+  - Abweichung unsere − VGN:
+    - Gostenhof → Marmorsaal +0,1;
+    - Altstadt → Boxdorfer Werkstatt −0,3;
+    - Altstadt → Haus der Begegnung −3,6;
+    - Buch → Haus der Begegnung −3,8;
+    - St. Johannis → Stadtbibliothek Langwasser −2,1 Min.
+  - Erwartet war „eher etwas höher“. Plausibel ist der Unterschied trotzdem: Wir werten alle Halte in 800 m aus, die Stichprobe nur die 6 nächsten, und die EFA hat Umsteigepuffer.
+- **CLS:** gespeicherter Stadtteil, gedrosselt (150 ms, 1,6 Mbit/s, 4× CPU).
+  - `?wegzeit=20`: CLS 0, LCP 2 448 ms.
+  - Kalender mit `wegzeit=20`: CLS 0,0001.
+  - Ohne Grenze: CLS 0,0007, LCP 1 968 ms.
+  - In keinem Frame stand „km“ vor „Min.“ (MutationObserver, auch in WebKit).
+- **Orts-Liste:** Nach dem Laden ist sie nach Wegzeit sortiert, alle 76 Orte haben einen Wert. Siehe H3.
+- **Kind-Sheet mit Quellenhinweis:**
+  - Bei 320 px und 200 %, hell, dunkel (System) und dunkel (Darstellung), sind TextFits, TouchTargets, axe und NoBrightIslands in beiden Engines grün.
+  - Die Links sind 29 px (100 %) bzw. 46 px (200 %) hoch.
+  - Die Namensnennung ist vollständig: Rechteinhaber, Titel mit Link, „abgewandelt“, Lizenz mit Link.
+- **Rückfall offline:**
+  - Luftlinie mit „Wegzeiten gerade nicht verfügbar.“, Chips gesperrt, „Nochmal laden“ wird angeboten.
+  - WebKit lädt nach dem Wiederverbinden sofort die Minuten. Chromium siehe H1.
+- **Filter mit Stadtteil Gostenhof:** Liste, Kalender und Karte zeigen dieselben Zahlen.
+  - bis 20 Min.: 159 Angebote an 23 Orten;
+  - bis 30 Min.: 259 an 50;
+  - bis 45 Min.: 311 an 72;
+  - Badge 1. `?umkreis=5` bleibt wirkungslos.
+- **Außerhalb (Fürth):** Luftlinie, „außerhalb des Stadtgebiets“, Chips gesperrt, „Startpunkt wählen“. Siehe H5.
+- **Konsole:** keine Fehler außer den erwarteten im Offline-Test.
+
+**Checkliste (Skill):**
+- **Lesbarkeit:** ok. Die Kachel endet auf „· 35 Min.“, die Statuszeile nennt „Di vormittags, inkl. Warten“. Bei 200 % ist sie 4 Zeilen lang, das ist vertretbar.
+- **Daumen:** ok. Die Wegzeit-Chips sind ≥ 44 px, der Quellenhinweis liegt im scrollbaren Sheet.
+- **Zustände:** ok.
+  - Laden: Platzhalter ohne Sprung.
+  - Fehler und außerhalb: beschriftet, mit Ausweg.
+  - Leer: unverändert.
+- **Dunkel:** ok, keine hellen Inseln, auch im Quellenhinweis.
+- **Micro-Interactions / Bewegung:** unverändert. Reduzierte Bewegung ist in den Läufen aktiv.
+- **Design-System:** Die Wegzeit-Chips nutzen dieselben Chips wie Anmeldung und Kosten.
+
+**Hinweise (offen, kein Blocker):**
+- **H1 – Chromium nach einem Funkloch:** Chromium merkt sich den gescheiterten `import()` des Chunks. „Nochmal laden“ scheitert deshalb sofort ein zweites Mal und bietet erst dann „Seite neu laden“ an. Vorschlag: nach einem Chunk-Fehler direkt „Seite neu laden“ anbieten oder den Import mit Cache-Buster wiederholen.
+- **H2 – Fokus:** Nach „Nochmal laden“ im Hinweis unter der Statuszeile verschwindet der Knopf, und der Fokus fällt auf `<body>`. Bei „Startpunkt wählen“ ist das gelöst.
+- **H3 – Orts-Liste der Karte:** Ein fokussierter Eintrag rutscht beim Umsortieren aus dem Sichtbereich. Das ist die bewusste Lücke aus E11. Praktisch selten, weil die Tabelle live nach 0,4–1 s da ist.
+- **H4 – Stichproben:** In 3 von 5 Fällen liegen unsere Werte unter der VGN-Stichprobe statt darüber. Am echten VGN-Portal (Tür zu Tür) nachprüfen.
+- **H5 – Kind-Sheet außerhalb:** Es sagt „Wegzeit ab deinem Standort“, obwohl der Standort außerhalb des Stadtgebiets liegt. Das erfährt man erst in der Statuszeile.
+- **H6 – Lizenz-Link:** „CC BY-SA 3.0 DE“ bricht bei 100 % auf Pixel 7 um, der Rest „DE“ ist 18×29 px. `white-space: nowrap` würde helfen.
+- **H7 – Gate:** `expectTextFits` meldet im gescrollten Kind-Sheet in WebKit (100 %) „Text stößt an die Rundung von dialog.dlg“. Das ist ein Fehlalarm: Die E3-Ausnahme kennt die Rundung des umschließenden Dialogs nicht, wenn `.sheet-scroll` scrollt.
+- **H8 – LCP:** Mit `?wegzeit=20` liegt es unter Drosselung bei 2,45 s, knapp unter 2,5 s, weil die Liste auf die Tabelle wartet.
+
+**Nicht prüfbar (Gerät):** „Nochmal laden“ nach einer veralteten `wegzeit.json` mit echtem HTTP-Cache und die Stichproben im VGN-Portal von Hand.
