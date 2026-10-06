@@ -106,6 +106,8 @@ describe("öffentliche Routen", () => {
       204,
     );
     expect([...kv.data.keys()].join(" ")).not.toContain("203.0.113.7");
+    // auch nicht als nackter SHA-256 (durchprobierbar), sondern als HMAC mit dem Secret
+    expect([...kv.data.keys()].join(" ")).not.toContain(await sha256Hex("203.0.113.7"));
     clock += 60 * 60 * 1000;
     expect((await req("POST", "/abo", { body: { ...SUB, endpoint: `${ENDPOINT}z` } })).status).toBe(204);
   });
@@ -114,6 +116,15 @@ describe("öffentliche Routen", () => {
     for (let i = 0; i < MAX_SUBSCRIPTIONS; i++) await kv.put(`abo:${i}`, "{}");
     expect((await req("POST", "/abo", { body: SUB })).status).toBe(507);
     await kv.put(`abo:${await sha256Hex(ENDPOINT)}`, "{}");
+    expect((await req("POST", "/abo", { body: SUB })).status).toBe(204);
+  });
+
+  it("begrenzt auch das Abmelden je IP und Stunde", async () => {
+    for (let i = 0; i < RATE_LIMIT; i++) {
+      expect((await req("DELETE", "/abo", { body: { endpoint: `${ENDPOINT}${i}` } })).status).toBe(204);
+    }
+    expect((await req("DELETE", "/abo", { body: { endpoint: ENDPOINT } })).status).toBe(429);
+    // An- und Abmelden zählen getrennt
     expect((await req("POST", "/abo", { body: SUB })).status).toBe(204);
   });
 

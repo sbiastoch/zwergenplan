@@ -6,14 +6,13 @@
  * Such-Abos, Startpunkt und gesehene IDs aus dem Geräte-Speicher. Alles in höchstens `timeoutMs` (iOS beendet den
  * Service Worker nach ≈ 10 s, Spike); nach Ablauf wird nichts mehr geschrieben.
  */
-import { districtById } from "../domain/districts.ts";
 import { filterFromSearch } from "../domain/filter.ts";
-import { coarsen, inBounds } from "../domain/geo.ts";
 import { newOfferIds, offersInWeek, type WeeklyText, weeklyText } from "../domain/news.ts";
 import { placeKey } from "../domain/place-key.ts";
 import type { Origin, ReachFn } from "../domain/reach.ts";
 import { parseSearches } from "../domain/searches.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
+import { originFromStored } from "../domain/stored-origin.ts";
 import { decodeTransitTable, transitReach } from "../domain/transit.ts";
 import type { TransitTableFile } from "../domain/transit-types.ts";
 
@@ -37,22 +36,8 @@ export interface TailorEnv {
   reachFor?(table: unknown, offers: readonly SiteOffer[], origin: Origin): ReachFn | undefined;
 }
 
-/** Gespeicherter Startpunkt (wie im `localStorage`, ADR 0017) → Origin; ungültig oder außerhalb → `undefined` */
-export function originFromStored(value: unknown): Origin | undefined {
-  if (typeof value === "string") {
-    const district = districtById(value);
-    return district && { source: "stadtteil", point: district.point, label: district.name, districtId: district.id };
-  }
-  const { source, lat, lon } = Object(value) as { source?: unknown; lat?: unknown; lon?: unknown };
-  if ((source !== "standort" && source !== "karte") || typeof lat !== "number" || typeof lon !== "number") {
-    return undefined;
-  }
-  // erneut runden und gegen die Stadtgrenze prüfen wie `storedPointOrigin` (src/ui/origin-state.ts)
-  const point = coarsen({ lat, lon });
-  return inBounds(point) ? { source, point, label: "" } : undefined;
-}
-
 function defaultReach(table: unknown, offers: readonly SiteOffer[], origin: Origin): ReachFn | undefined {
+  // `decodeTransitTable` prüft Version und Form selbst und liefert sonst `undefined` (Cast ohne Risiko, Arch-Review N9)
   const decoded = decodeTransitTable(table as TransitTableFile, new Set(offers.map((o) => placeKey(o.venue.geo))));
   return decoded && transitReach(decoded, origin);
 }
@@ -87,6 +72,8 @@ export async function tailorPush({
     ]);
     const offers = (site as { offers?: unknown } | undefined)?.offers;
     if (!Array.isArray(offers)) return { kind: "fehler" };
+    // site.json entsteht zur Build-Zeit aus Zod-geprüften Daten; ein Formfehler wirft unten und endet als „fehler“, dann
+    // zeigt das System die allgemeine Fassung (Arch-Review N9)
     const siteOffers = offers as SiteOffer[];
     const ids = siteOffers.map((o) => o.id);
     if (!isStringArray(seen)) {

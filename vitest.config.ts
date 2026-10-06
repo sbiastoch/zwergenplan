@@ -23,8 +23,12 @@ export default defineConfig({
         // Push im Service Worker (Plan 0017, E10)
         "src/sw/push-decision.ts",
         "src/sw/push-tailor.ts",
+        "src/sw/resubscribe.ts",
+        // Push-Worker: Routen und Prüfung (Arch-Review N12)
+        "push-worker/src/**/*.ts",
       ],
-      exclude: ["**/*.test.ts", "src/domain/test-fixtures.ts"],
+      // push-worker/src/index.ts verdrahtet nur die Workers-Laufzeit (curl-Prüfung nach dem Deploy)
+      exclude: ["**/*.test.ts", "src/domain/test-fixtures.ts", "push-worker/src/index.ts"],
       thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 },
     },
   },

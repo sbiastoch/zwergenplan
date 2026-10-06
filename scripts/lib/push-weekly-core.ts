@@ -35,6 +35,9 @@ export function parseWeeklyArgs(argv: readonly string[]): WeeklyArgs {
     else throw new Error(`Argument unbekannt: ${arg}`);
   }
   if (args.only === "") delete args.only;
+  // Ein kurzer Präfix träfe viele Geräte (`a`: jedes 16.); die Geräte-Kennung hat 8 Zeichen (Arch-Review N11)
+  if (args.only !== undefined && !/^[0-9a-f]{8,64}$/.test(args.only))
+    throw new Error("--only braucht die Geräte-Kennung (8 Hex-Zeichen)");
   // Ein Testversand geht nie an alle (Plan 0011, E11)
   if (args.force && !args.dryRun && args.only === undefined)
     throw new Error("Testversand nur mit --only=<Geräte-Kennung>");

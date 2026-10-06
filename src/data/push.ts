@@ -162,8 +162,16 @@ export function createPush(env: PushEnv = browserEnv()) {
         throw new PushError(problem);
       }
       written.clear();
-      await env.store.set("endpoint", sub.endpoint);
-      await mirror(data);
+      try {
+        await env.store.set("endpoint", sub.endpoint);
+        await mirror(data);
+      } catch {
+        // Geräte-Speicher kaputt oder voll: alles zurück, damit der Schalter den echten Zustand zeigt (Arch-Review M1)
+        await sub.unsubscribe().catch(() => false);
+        await forget(sub.endpoint);
+        await clearAll().catch(() => undefined);
+        throw new PushError("abo");
+      }
       return sub.endpoint;
     },
 

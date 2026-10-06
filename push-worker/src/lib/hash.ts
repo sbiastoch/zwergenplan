@@ -4,6 +4,19 @@ export async function sha256Hex(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/** HMAC-SHA-256 als Hex, z. B. für die IP im Rate-Limit-Zähler (Schlüssel: ein Secret des Workers) */
+export async function hmacHex(secret: string, text: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(text));
+  return [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 /** Vergleich in konstanter Zeit: verglichen werden die Hashes, die immer gleich lang sind. */
 export async function sameSecret(given: string, expected: string): Promise<boolean> {
   const [a, b] = await Promise.all([sha256Hex(given), sha256Hex(expected)]);
