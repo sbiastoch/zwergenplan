@@ -1,6 +1,6 @@
 # Plan 0016 – Der Startpunkt übersteht das Neuladen
 
-Status: umgesetzt (Branch `standort-speichern`), Deploy und Browser-Review stehen aus
+Status: **umgesetzt und live seit `b2023c1`** (https://zwergenplan.app/). Browser-Review live bestanden, ohne Blocker.
 Datum: 2026-10-06
 Bezug: ADR 0017 (neu), Plan 0004 (E3), Plan 0005 (E8), Plan 0009 (E9), ADR 0008 (Kamera-Regel), ADR 0011 (Punkt 6), ADR 0012 (Startbudget)
 
@@ -194,3 +194,24 @@ Unabhängiger `plan-reviewer`. Keine Blocker. Alle Punkte übernommen:
 - **m3** veraltete Kommentare und Testnamen → `reach.ts`, `use-transit.test.ts` und `ideas.md` nachgezogen.
 - **m4** E2E zur gespeicherten Kartenmitte prüfte die Kamera-Regel nicht selbst → Vergleich von Kamera und Kachelpfaden mit dem Stand ohne Startpunkt.
 - **m5** ADR 0017 noch „Entwurf“ → „angenommen“.
+
+## Browser-Review live (2026-10-06) – bestanden, ohne Blocker
+
+- **Ablauf live** (Playwright gegen https://zwergenplan.app/, Bundle `index-BlaEC7uo.js`; Pixel 7 hell und dunkel, iPhone 15/WebKit hell; Geolocation 49,45391/11,07752):
+  - „Meinen Standort nutzen“ speichert genau `{"source":"standort","lat":49.454,"lon":11.078}`. Die Rohkoordinate steht nirgends.
+  - Nach dem Neuladen: Statuszeile „Wegzeit ab deinem Standort mit Bus & Bahn …“, Kacheln mit Minuten, Kind-Sheet „Startpunkt: Mein Standort“ samt „(auf ca. 100 m gerundet)“. `getCurrentPosition` wird 0-mal aufgerufen, es gibt keine Konsolenfehler.
+- **Screenshots** `node scripts/screenshots.ts https://zwergenplan.app/`: alle 168 Bilder angesehen (14 Ansichten × 6 Viewports × hell/dunkel).
+  - Die neue Fußnote „Dein Startpunkt bleibt nur auf diesem Gerät (ein Standort auf ca. 100 m gerundet).“ steht in jeder Variante vollständig, ohne Abschneiden oder Überlappen (`kind-quelle-*`, `kind-*`).
+- **Checkliste:**
+  - **Lesbarkeit:** in Ordnung. Die Fußnote ist Sekundärtext mit ausreichendem Kontrast, hell und dunkel (`kind-quelle-320-dark`, `kind-quelle-365-dark`).
+  - **Daumen:** in Ordnung. „Fertig“ steht fest unten, Standort-Knopf und Stadtteil-Auswahl sind voll breit (`kind-360-light`).
+  - **Zustände:** Der Startpunkt übersteht das Neuladen (`start-startpunkt-*`, Ablauf oben). Nichts ist abgeschnitten.
+  - **Dark Mode:** keine kontrastlosen Flächen, keine grellen Inseln (`kind-pixel-dark`, `start-*-dark`).
+  - **Micro-Interactions:** keine neuen. Die bestehenden Zustände sind sichtbar (aktiver Chip und Tab, Segment).
+  - **Stickerheft-Stil:** durchgängig.
+- **Befunde ohne Bezug zu dieser Änderung** (schon vorher da, offen):
+  - Mittel: Das Herz überdeckt bei 360–412 px das Ende langer Kurstitel (`ort-pixel-light/dark`, knapp `ort-360-*`, `ort-365-*`).
+  - Mittel: Detail bei 320 px, die gestapelte Aktionsleiste schiebt „Wann/Wo“ unter die Falz (`detail-320-*`).
+  - Mittel: Anbieter-Sheet und Anbieterliste quer zeigen kaum Inhalt über der Falz (`anbieter-sheet-quer-*`, `anbieter-quer-*`).
+  - Mittel: Zoom-Knöpfe verdecken Cluster am rechten Kartenrand (`karte-320-*`, `karte-pixel-*`, `karte-quer-*`).
+  - Klein: geschützte Leerzeichen fehlen („10 / Min.“, „12 / € im Monat“, „© / OpenStreetMap“), dazu Silbentrennung in Eigennamen („Nürn-berg“) und der Monatskalender bei 320 px ohne Seitenrand.
