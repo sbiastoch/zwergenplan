@@ -92,16 +92,19 @@ module.exports = {
       name: "transit-only-lazy",
       severity: "error",
       comment:
-        "Die Rechenlogik der Wegzeit src/domain/transit.ts ist ein Lazy-Chunk (assets/oepnv/, Plan 0009, E10: statisch lag das Start-JS über der Schwelle). Von src/ aus nur per import(), auch Typen nicht statisch; Typen stehen in src/domain/transit-types.ts. Tests ausgenommen.",
-      from: { path: "^src/", pathNot: "\\.test\\.ts$" },
+        "Die Rechenlogik der Wegzeit src/domain/transit.ts ist ein Lazy-Chunk (assets/oepnv/, Plan 0009, E10: statisch lag das Start-JS über der Schwelle). Von src/ aus nur per import(), auch Typen nicht statisch; Typen stehen in src/domain/transit-types.ts. Tests ausgenommen. Ausnahme src/sw/ (ADR 0014, Punkt 5): Der Service Worker bündelt sich selbst und berührt das Start-JS nicht; aus src/ui/ bleibt die Regel rot (Kanarienvogel).",
+      from: { path: "^src/", pathNot: ["\\.test\\.ts$", "^src/sw/"] },
       to: { path: "^src/domain/transit\\.ts$", dependencyTypesNot: ["dynamic-import"] },
     },
     {
       name: "transit-entry-only",
       severity: "error",
       comment:
-        "Nur der Lader src/ui/use-transit.ts greift auf src/domain/transit.ts zu (Plan 0009, E10), aus demselben Grund wie karte-ui-entry-only. Den Lader selbst prüft scripts/check-architecture.ts. Tests ausgenommen.",
-      from: { path: "^src/", pathNot: ["^src/ui/use-transit\\.ts$", "^src/domain/transit\\.ts$", "\\.test\\.ts$"] },
+        "Nur der Lader src/ui/use-transit.ts greift auf src/domain/transit.ts zu (Plan 0009, E10), aus demselben Grund wie karte-ui-entry-only. Den Lader selbst prüft scripts/check-architecture.ts. Tests ausgenommen. Ausnahme src/sw/ wie bei transit-only-lazy (ADR 0014, Punkt 5).",
+      from: {
+        path: "^src/",
+        pathNot: ["^src/ui/use-transit\\.ts$", "^src/domain/transit\\.ts$", "\\.test\\.ts$", "^src/sw/"],
+      },
       to: { path: "^src/domain/transit\\.ts$" },
     },
     {
@@ -156,9 +159,9 @@ module.exports = {
       name: "sw-isolated",
       severity: "error",
       comment:
-        "Der Service Worker src/sw/ (Plan 0011, E5b; ADR 0013) importiert nur sich selbst, reine Domänenhilfen und ab Stufe 2 src/data/device-store.ts: kein React, keine UI, kein anderer Datenzugriff, kein npm-Paket. Tests ausgenommen.",
+        "Der Service Worker src/sw/ (Plan 0011, E5b; ADR 0013) importiert nur sich selbst, reine Domänenhilfen und ab Stufe 2 src/data/device-store.ts: kein React, keine UI, kein anderer Datenzugriff, kein npm-Paket, kein node:-Modul. Dazu site.config.ts (nur Konstanten: Worker-URL und öffentlicher VAPID-Schlüssel für pushsubscriptionchange, Plan 0017). Tests ausgenommen.",
       from: { path: "^src/sw/", pathNot: "\\.test\\.ts$" },
-      to: { pathNot: ["^src/(sw|domain)/", "^src/data/device-store\\.ts$"] },
+      to: { pathNot: ["^src/(sw|domain)/", "^src/data/device-store\\.ts$", "^site\\.config\\.ts$"] },
     },
     {
       name: "sw-not-imported",
@@ -203,9 +206,9 @@ module.exports = {
       // auch src/main.tsx (Arch-Review Stufe 1, H9): der Einstieg ist genauso Start-Bundle
       from: {
         path: "^src/(ui|data)/|^src/main\\.tsx$",
-        pathNot: ["^src/ui/app-extras/", "^src/data/(pwa|push|push-start|device-store)\\.ts$", "\\.test\\.ts$"],
+        pathNot: ["^src/ui/app-extras/", "^src/data/(pwa|push|device-store|searches-store)\\.ts$", "\\.test\\.ts$"],
       },
-      to: { path: "^src/data/(pwa|push|push-start|device-store)\\.ts$", dependencyTypesNot: ["dynamic-import"] },
+      to: { path: "^src/data/(pwa|push|device-store|searches-store)\\.ts$", dependencyTypesNot: ["dynamic-import"] },
     },
     {
       name: "ui-reads-data-only-via-src-data",
