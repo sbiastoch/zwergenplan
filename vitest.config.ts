@@ -14,6 +14,8 @@ export default defineConfig({
         "src/domain/**/*.ts",
         "scripts/pipeline/lib/**/*.ts",
         "scripts/transit/**/*.ts",
+        // Zeitplan der Wochen-Nachricht (Plan 0017, E1)
+        "scripts/lib/push-schedule.ts",
         "src/sw/routes.ts",
         "src/sw/retire.ts",
       ],

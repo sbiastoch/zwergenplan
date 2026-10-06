@@ -1,12 +1,13 @@
 /**
- * Die allgemeine Push-Nachricht, die die CI an alle Abos schickt (Plan 0011, E9 und E11). Sie nennt nur die Zahl
- * neuer Angebote – den Zuschnitt aufs Kind macht der Service Worker auf dem Gerät (`news.ts`, ADR 0014).
+ * Die allgemeine Wochen-Nachricht, die die CI samstags an alle Abos schickt (Plan 0017, E2, E5). Sie nennt nur Zahlen
+ * aus den öffentlichen Daten – den Zuschnitt auf Such-Abos und Alter macht der Service Worker auf dem Gerät
+ * (`news.ts`, ADR 0014). Den allgemeinen Text sieht man nur, wenn das Gerät nicht zuschneiden kann.
  */
 import type { DeclarativePushPayload } from "./push-types.ts";
 import { toBerlinIso } from "./time.ts";
 
 /** Tag der Nachricht; ersetzt auf iOS keine ältere, mehrere Pushes stapeln sich (Spike). */
-export const PUSH_TAG = "neue-angebote";
+export const PUSH_TAG = "wochen-nachricht";
 
 /**
  * Topic des Push-Dienstes: Ein noch nicht zugestelltes Push wird ersetzt. Muss Base64url sein, mit einer Länge,
@@ -14,42 +15,50 @@ export const PUSH_TAG = "neue-angebote";
  */
 export const PUSH_TOPIC = "neueangebote";
 
-/** Wie lange der Push-Dienst ein Push für ein offline Gerät aufhebt: 2 Tage. */
-export const PUSH_TTL_SECONDS = 172_800;
+/** Wie lange der Push-Dienst ein Push für ein offline Gerät aufhebt: 1 Tag (am Montag ist die Samstagsnachricht alt). */
+export const PUSH_TTL_SECONDS = 86_400;
 
-/** Fester Text, wenn die Payload kaputt ist: Chrome verlangt bei jedem Push eine sichtbare Nachricht (E10). */
+/** Fester Text, wenn die Payload kaputt ist: Chrome verlangt bei jedem Push eine sichtbare Nachricht (Plan 0011, E10). */
 export const FALLBACK_TITLE = "Neues im Zwergenplan";
 
-/** Ziel eines Tipps auf die Nachricht: die App mit dem Block „Neu“ (E13). */
-export function newsUrl(siteUrl: string): string {
-  return new URL("?neu", siteUrl).href;
+function count(n: number, what: string): number {
+  if (!Number.isInteger(n) || n < 0) throw new RangeError(`Keine gültige Anzahl für ${what}: ${n}`);
+  return n;
 }
 
-export function generalBody(count: number): string {
-  return count === 1 ? "1 neues Angebot im Zwergenplan" : `${count} neue Angebote im Zwergenplan`;
+function generalBody(news: number, week: number): string {
+  if (news > 0) return `${news === 1 ? "1 neues Angebot" : `${news} neue Angebote`} seit letztem Samstag`;
+  if (week === 0) return "Diese Woche nichts Neues.";
+  return `Diese Woche nichts Neues. ${week === 1 ? "1 Angebot" : `${week} Angebote`} in den nächsten 7 Tagen.`;
 }
 
-export function declarativePayload({
-  count,
+/**
+ * `news`: neue Angebote seit dem Datenstand vor 7 × 24 h; `week`: Angebote mit einem Termin in den nächsten 7 Tagen.
+ * `navigate` ist immer die Startseite (Nutzerentscheidung 4). `test` markiert einen Testversand: Der Service Worker
+ * schreibt dann nichts in den Geräte-Speicher (E3).
+ */
+export function weeklyPayload({
+  news,
+  week,
   siteUrl,
   sentAt,
+  test,
 }: {
-  count: number;
+  news: number;
+  week: number;
   siteUrl: string;
   sentAt: Date;
+  test?: true;
 }): DeclarativePushPayload {
-  // Ohne neue Angebote gibt es keine Nachricht (Job `notify` läuft dann nicht); alles andere ist ein Programmierfehler.
-  if (!Number.isInteger(count) || count < 1) throw new RangeError(`Keine Nachricht für ${count} neue Angebote`);
   return {
     web_push: 8030,
     notification: {
       title: "Zwergenplan",
-      body: generalBody(count),
-      navigate: newsUrl(siteUrl),
+      body: generalBody(count(news, "neue Angebote"), count(week, "Angebote der Woche")),
+      navigate: new URL("./", siteUrl).href,
       tag: PUSH_TAG,
       lang: "de",
-      app_badge: count,
-      data: { sentAt: toBerlinIso(sentAt) },
+      data: test ? { sentAt: toBerlinIso(sentAt), test } : { sentAt: toBerlinIso(sentAt) },
     },
     mutable: true,
   };
