@@ -846,10 +846,10 @@ for (const [label, key, value] of [
   });
 }
 
-/** Sichtbarer Text ohne `.sr-only` („, dann“, „, “): so, wie die Karte „Wege ab …“ ihn zeigt */
+/** Sichtbarer Text ohne `.sr-only` („, dann“, „, “): so, wie das Sheet „Wege ab …“ ihn zeigt */
 async function shownRows(page: Page): Promise<string[]> {
   return page
-    .getByRole("dialog")
+    .getByRole("dialog", { name: /^Wege ab/ })
     .locator(".ways li")
     .evaluateAll((items) =>
       items.map((li) => {
@@ -862,9 +862,9 @@ async function shownRows(page: Page): Promise<string[]> {
     );
 }
 
-/** Jeder Maps-Link im Dialog: ohne Referrer, ohne Koordinate (Plan 0019, E3; Review 3, N5) */
+/** Jeder Maps-Link in Detail und Sheet: ohne Referrer, ohne Koordinate (Plan 0019, E3; Review 3, N5) */
 async function expectPrivateMapsLinks(page: Page) {
-  const links = page.getByRole("dialog").locator('a[href^="https://www.google.com/maps"]');
+  const links = page.locator('dialog[open] a[href^="https://www.google.com/maps"]');
   expect(await links.count()).toBeGreaterThan(0);
   for (const link of await links.all()) {
     await expect(link).toHaveAttribute("rel", "noopener noreferrer");
@@ -872,7 +872,18 @@ async function expectPrivateMapsLinks(page: Page) {
   }
 }
 
-// Plan 0019, E4/E6: Karte „Wege ab …“, nachgerechnet mit dist-e2e/data (Review 3 unabhängig bestätigt).
+/** Kachel „Wo“ im Detail antippen: öffnet das Sheet „Wege ab …“ (Plan 0019, E10) */
+async function openWays(page: Page, title: string) {
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: /Wege & Route in Google Maps/ })
+    .click();
+  const sheet = page.getByRole("dialog", { name: title });
+  await expect(sheet.getByRole("heading", { level: 2 })).toHaveText(title);
+  return sheet;
+}
+
+// Plan 0019, E4/E6/E10: Sheet „Wege ab …“, nachgerechnet mit dist-e2e/data (Review 3 unabhängig bestätigt).
 // Ab STORED_HERE (49,452 / 11,077) liegen 9001 (1 358 m), 9002 (974 m), 9003, 9004 und 9005 im Umkreis von 1 500 m.
 // „Eltern-Kind-Bewegungslandschaft…“ (Gemeinde, Kirchengemeindehausstraße):
 // - Hauptweg 9004: 5,89 Min. zum Halt + 10 = 15,9, Bus 202E → „ca. 15 Min. · Bus 202E · 6 Min. zum Halt“
@@ -889,8 +900,7 @@ test("Wege ab deinem Standort: Hauptweg und ein Weg mit Umstieg, dafür kürzere
     .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
     .getByRole("button")
     .click();
-  const ways = page.getByRole("dialog").locator(".ways");
-  await expect(ways.locator(".cap")).toHaveText("Wege ab deinem Standort");
+  const ways = await openWays(page, "Wege ab deinem Standort");
   await expect
     .poll(() => shownRows(page))
     .toEqual([
@@ -899,7 +909,7 @@ test("Wege ab deinem Standort: Hauptweg und ein Weg mit Umstieg, dafür kürzere
     ]);
   // gleich schnell in der Anzeige: kein Grund
   await expect(ways.getByText(/^Vorschlag:/)).toHaveCount(0);
-  await expect(ways.getByRole("link", { name: "Route in Google Maps", exact: true })).toBeVisible();
+  await expect(ways.getByRole("link", { name: "In Google Maps navigieren" })).toBeVisible();
   await expectPrivateMapsLinks(page);
 });
 
@@ -913,7 +923,7 @@ test("Wege ab Gostenhof: Hauptweg mit Umstieg, zu Fuß als anderer Weg", async (
     .getByRole("heading", { level: 3, name: /^Musikgarten/ })
     .getByRole("button")
     .click();
-  await expect(page.getByRole("dialog").locator(".ways .cap")).toHaveText("Wege ab Gostenhof");
+  await openWays(page, "Wege ab Gostenhof");
   await expect
     .poll(() => shownRows(page))
     .toEqual([

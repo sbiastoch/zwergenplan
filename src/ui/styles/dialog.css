@@ -208,11 +208,18 @@
   /* Route in Google Maps (Plan 0019, E5): Kachel „Wo“, Orte im Anbieter-Sheet, Ortszeile im Orts-Sheet. Die ganze
      Fläche ist der Link; sie sieht aus wie eine Kachel und gibt beim Tippen nach wie ein Knopf. */
   a.label.route,
+  button.label.route,
   .venue-route,
   .place-route {
     color: inherit;
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
+  }
+  /* Kachel „Wo“ als Knopf (E10): Schrift und Ausrichtung wie die Kachel */
+  button.label.route {
+    font: inherit;
+    text-align: left;
+    width: 100%;
   }
   .venue-route,
   .place-route {
@@ -226,6 +233,7 @@
     padding: 10px 12px;
   }
   a.label.route:active,
+  button.label.route:active,
   .venue-route:active,
   .place-route:active {
     transform: translate(2px, 2px) rotate(var(--tilt, 0deg));
@@ -234,29 +242,13 @@
       transform 0.12s ease,
       box-shadow 0.12s ease;
   }
-  /* Karte „Wege ab …“ (Plan 0019, E6): sieht aus wie eine Kachel, zählt aber nicht zur Drehung der Kacheln */
-  .ways {
-    grid-column: 1 / -1;
-    background: var(--surface);
-    border: 2px solid var(--line);
-    border-radius: 14px 14px 4px 14px;
-    box-shadow: 3px 3px 0 var(--shadow);
-    padding: 10px 12px;
-    transform: rotate(0.3deg);
-  }
-  .ways .cap {
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
+  /* Sheet „Wege ab …“ (Plan 0019, E6, E10): Liste der Wege, darunter der Knopf nach Google Maps */
   .ways ol {
     list-style: none;
     margin: 4px 0 0;
     padding: 0;
     display: grid;
-    gap: 6px;
+    gap: 10px;
   }
   .ways li {
     font-size: 0.9375rem;
@@ -288,9 +280,6 @@
     margin: 6px 0 0;
     font-size: 0.875rem;
     color: var(--muted);
-  }
-  .ways-note .linkbtn {
-    padding: 0 2px;
   }
 
   /* gegen `.label span:not(.cap)` (gleiche Spezifität, steht danach): eigene Farbe, nie Silbentrennung */

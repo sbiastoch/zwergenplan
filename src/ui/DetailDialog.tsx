@@ -25,7 +25,7 @@ import {
 import { Icon, Shape } from "./icons.tsx";
 import { DistPending, HeartButton } from "./OfferCard.tsx";
 import { ReachLong } from "./ReachLong.tsx";
-import { RouteHint, routeLink, Ways } from "./Ways.tsx";
+import { WhereTile } from "./Ways.tsx";
 
 interface DetailProps {
   offer: SiteOffer;
@@ -105,15 +105,13 @@ export function DetailContent({
               <b>{when.main}</b>
               <span>{when.sub}</span>
             </div>
-            {/* Die ganze Kachel öffnet die Route in Google Maps (Plan 0019, E5) */}
-            <a className="label full route" {...routeLink(offer.venue.address)}>
+            {/* Die ganze Kachel öffnet die Wege bzw. die Route in Google Maps (Plan 0019, E5, E10) */}
+            <WhereTile reach={reach} origin={origin} address={offer.venue.address}>
               <span className="cap">Wo</span>
               <b>{offer.venue.name}</b>
               <span>{[offer.venue.address, offer.venue.district].filter(Boolean).join(" · ")}</span>
               {origin && reach ? <ReachLong reach={reach} origin={origin} /> : reachPending && <DistPending />}
-              <RouteHint />
-            </a>
-            {origin && reach && <Ways reach={reach} origin={origin} address={offer.venue.address} />}
+            </WhereTile>
             <div className="label">
               <span className="cap">Alter</span>
               <b>{ageRangeLabel(offer.age)}</b>

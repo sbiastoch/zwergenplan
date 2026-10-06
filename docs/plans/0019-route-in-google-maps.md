@@ -386,3 +386,13 @@ Messung im vollständigen Check: `LCP und CLS bleiben im Budget` war auf Android
 - Plan 0019: 2 484, 3 196, 2 792, 2 540 ms
 
 Die Werte sind nicht zu unterscheiden, auch `main` reißt das Budget unter dieser Last. Bei geringerer Last lag Plan 0019 bei 1 812–2 176 ms. Es entscheidet die CI.
+
+## E10 – Nutzerfeedback nach dem Deploy (2026-10-06): Wege im Sheet statt als eigene Kachel
+
+Nutzer: „Ich hätte mir eher gedacht, dass man auf die eine Kachel, wo die Wegezeit draufsteht, draufklicken kann. Dann öffnet sich unten so ein Dialog […] oder dann als Button unten in Google Maps navigieren. Aktuell nimmt das Routing ziemlich viel Platz ein auf der Detailseite.“ Dazu: „möglichst fokussiert“, deshalb ohne neue Review-Runde.
+
+- Die Karte „Wege ab …“ steht nicht mehr im Detail (E6 ersetzt).
+- Gibt es andere Wege (`wayParts`), ist die Kachel „Wo“ ein Knopf mit der Hinweiszeile „N Wege & Route in Google Maps“. Er öffnet unten das Sheet „Wege ab …“ (`Dialog`, Klasse `sheet`). Das Sheet enthält die Liste wie bisher und darunter den Hauptknopf „In Google Maps navigieren“ (`btn primary`, `noopener noreferrer`) sowie „Schließen“.
+- Ohne andere Wege (ohne Startpunkt, Luftlinie, ohne Linien) bleibt die Kachel der direkte Link nach Google Maps. Ein Sheet nur mit einem Knopf wäre ein unnötiger Zwischenschritt.
+- Der Scrollbereich des Sheets ist fokussierbar (`tabIndex={0}`, begründetes `biome-ignore`), denn bei 320 px und 200 % Schrift scrollt die Liste ohne eigenes Bedienelement (axe `scrollable-region-focusable`).
+- Tests: Die E2E-Fälle „Wege ab …“ öffnen das Sheet über die Kachel. Die Mobile-UX-Ansicht `detail-wege` prüft das offene Sheet.

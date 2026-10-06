@@ -150,16 +150,20 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       .click();
     await expect(page.getByRole("dialog").locator(".reach-long")).toContainText("Bus\u00a0202E");
   },
-  // Plan 0019, E6: Karte „Wege ab …“ mit Linien, „1 Umstieg“, „zum Halt“, Marke „Vorschlag“ und dem zweiten
-  // Maps-Link (Musikgarten ab Gostenhof: Tram 1 → Bus 2, dazu zu Fuß)
+  // Plan 0019, E6/E10: Sheet „Wege ab …“ mit Linien, „1 Umstieg“, „zum Halt“, Marke „Vorschlag“ und dem Knopf
+  // „In Google Maps navigieren“ (Musikgarten ab Gostenhof: Tram 1 → Bus 2, dazu zu Fuß)
   "detail-wege": async (page) => {
     await withGostenhof(page);
     await page
       .getByRole("heading", { level: 3, name: /^Musikgarten/ })
       .getByRole("button")
       .click();
-    await expect(page.getByRole("dialog").locator(".ways li")).toHaveCount(2);
-    await page.getByRole("dialog").locator(".ways").scrollIntoViewIfNeeded();
+    // Sheet über der Kachel „Wo“ (Plan 0019, E10)
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: /Wege & Route in Google Maps/ })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Wege ab Gostenhof" }).locator(".ways li")).toHaveCount(2);
   },
   // dasselbe Detail ohne Startpunkt (Arch-Review 0012, Befund 3): Preis in der halben Spalte
   "detail-gemeinde": async (page) => {
