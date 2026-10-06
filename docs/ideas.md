@@ -6,6 +6,11 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Anbieter vorschlagen** über ein GitHub-Issue-Template (Name, Programm-URL). Ein Agent arbeitet die Vorschläge ab.
 - **Mehrere Kinder / Geschwister**: Ein Angebot passt, wenn es für eines der Kinder passt.
 - **Abo-Feeds (webcal)** für vordefinierte Filter-Sets.
+- **Wochen-Nachricht nur bei Treffern (Stufe 3)**: Filterung beim Absender. Dazu bekäme der Push-Worker Such-Abos, Startpunkt-Stadtteil und Geburtsmonat; eigenes ADR, ändert die Privatsphäre-Invarianten (Plan 0017, „Stufe 3“).
+- **Such-Abos als Schnellwahl in der Liste** (Plan 0017, Nicht-Ziel): heute schneiden die Abos nur die Wochen-Nachricht zu.
+- **„Suche abonnieren“ im Filter-Sheet**, wenn das Start-Budget es erlaubt (Plan 0017, E7: der Filter-Sheet liegt im Start-Bundle).
+- **Sheet „Neu seit der letzten Wochen-Nachricht“** (≈ 0,1 kB Start-JS: Flag `neu`, Lazy-Einstieg in `App`): erst mit freiem Start-Budget, etwa nach „Kalender und Merkliste als Lazy-Chunks“ (Plan 0017, Nutzerentscheidung 4).
+- **Abgleich und Spiegeln beim App-Start** statt beim Öffnen des Kind-Sheets (0,09–0,11 kB Start-JS, gemessen): ein woanders gewählter Startpunkt wirkte dann sofort in der Nachricht (Plan 0017, E9).
 - **Englische Oberfläche**: Die Texte liegen zentral, damit das billig wird.
 - **Live-Routing-APIs** für echte Wegzeiten. Vorrang hat die statische Wegzeit-Tabelle aus VGN-GTFS (ADR 0005, ADR 0011).
 - **Echtzeit der Öffis** (GTFS-Realtime: Verspätungen, Baustellen-Umleitungen), Tarife, Barrierefreiheit (Aufzüge), Kinderwagen-Plätze (Plan 0009, Nicht-Ziele).
