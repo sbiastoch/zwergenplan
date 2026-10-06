@@ -23,7 +23,7 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
 
 1. **Eine Nachricht pro Woche, immer**: samstags gegen 10 Uhr Berliner Zeit, auch wenn es nichts Neues gibt (Nutzerentscheidung 2026-10-06). Sie wird **auf dem Gerät** zugeschnitten.
    - Ein Payload-Format für alle Browser: Declarative Web Push mit `mutable: true`. Der Absender schickt nur einen allgemeinen Text mit Zahlen aus den öffentlichen Daten (neu seit letztem Samstag, Angebote der nächsten 7 Tage) und den Versandzeitpunkt, ohne Bezug zu Personen.
-   - Der Service Worker ersetzt ihn durch einen Text nach den **Such-Abos** (gemerkte Filter der Liste, ODER), dem **Alter** des Kindes und der Wegzeit ab dem **gespeicherten Startpunkt**. Auf Chromium und Firefox zeigt er ihn selbst an. Ein Tipp öffnet immer die Startseite.
+   - Der Service Worker ersetzt ihn durch einen Text nach den **Such-Abos** (gemerkte Filter der Liste, ODER), dem **Alter** des Kindes und der Wegzeit ab dem **gespeicherten Startpunkt**. Auf Chromium und Firefox zeigt er ihn selbst an. Ein Tipp öffnet die Startseite (ist die App offen, kommt ihr Fenster nach vorn).
 2. **Abos in einem Cloudflare Worker mit Workers KV** (`push-worker/` im Repo, Gratis-Tarif).
    - Er speichert nur das `PushSubscription`-JSON und das Datum der Anmeldung, dazu je Samstag eine Versand-Marke (höchstens ein Versand je Tag).
    - Öffentlich sind nur An- und Abmelden. Die Grenzen sind Allowlist der Push-Dienste, Größen- und Mengengrenze und ein Rate-Limit je IP (gehasht, eine Stunde). Die Origin-Prüfung (403) hält nur fremde Webseiten ab.
@@ -57,6 +57,8 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
 
 ## Konsequenzen
 
+- **Abhängigkeiten** (devDependencies im Root, gepinnt): `web-push` (Versand), `wrangler` und `@cloudflare/workers-types` (Worker-Deploy und -Typen). `wrangler` zieht `workerd` mit Build-Skript nach (`onlyBuiltDependencies`); jeder CI-Job lädt es mit.
+- **Bewusstes Risiko Kontingent:** Workers KV im Gratis-Tarif begrenzt Schreib- und Löschvorgänge je Tag. An- und Abmelden sind je IP und Stunde begrenzt (IP nur als HMAC mit einem Secret), die `Origin`-Prüfung lässt sich aber fälschen. Wer das Tageskontingent leert, lässt die Versand-Marke scheitern; dann fällt die Woche aus (`::warning::`). Das ist im Sinn von „ein Ausfall betrifft nur An-/Abmelden und Versand“.
 - Erstmals gibt es Infrastruktur außerhalb von GitHub Pages: ein Cloudflare-Konto, ein KV-Namespace und zwei Secrets (`VAPID_PRIVATE_KEY`, `PUSH_ADMIN_TOKEN`). Ein Ausfall des Workers betrifft nur An- und Abmelden und den Versand, nie die Seite.
 - iPhones bekommen Push nur als installierte Home-Bildschirm-App (im Spike von Plan 0011 bestätigt). Die Installationshilfe aus ADR 0013 ist deshalb Voraussetzung.
 - „Keine Strafe für stille Pushes“ gilt nur, solange der Service Worker rechtzeitig fertig wird. Überzieht er das Zeitbudget von iOS (≈ 10 s), erscheint keine Nachricht, und die nächsten kommen verspätet (Spike). Der Zuschnitt hat deshalb ein hartes Limit von 5 s.

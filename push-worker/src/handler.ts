@@ -7,7 +7,7 @@
  * Mit Token: `GET /abos`, `POST /abos/loeschen`, `POST /versand/<YYYY-MM-DD>`. Frei: `GET /version`.
  */
 import { toBerlinIso } from "../../src/domain/time.ts";
-import { sameSecret, sha256Hex } from "./lib/hash.ts";
+import { hmacHex, sameSecret, sha256Hex } from "./lib/hash.ts";
 import { MAX_BODY_BYTES, parseSubscription } from "./lib/subscription.ts";
 
 /** Der Teil von `KVNamespace`, den der Worker nutzt (im Test ein Fake) */
@@ -84,9 +84,10 @@ async function listAboKeys(kv: Kv): Promise<string[]> {
 }
 
 /** Zähler je gehashter IP für die laufende Stunde; `false`, wenn das Limit erreicht ist */
-async function withinRateLimit(request: Request, env: Env, now: number): Promise<boolean> {
+async function withinRateLimit(request: Request, env: Env, now: number, kind: "an" | "ab"): Promise<boolean> {
   const ip = request.headers.get("cf-connecting-ip") ?? "unbekannt";
-  const key = `rl:${Math.floor(now / (HOUR_S * 1000))}:${await sha256Hex(ip)}`;
+  // HMAC statt nacktem SHA-256: Ein IPv4-Hash ließe sich durchprobieren (Arch-Review 0017, N10)
+  const key = `rl:${kind}:${Math.floor(now / (HOUR_S * 1000))}:${await hmacHex(env.PUSH_ADMIN_TOKEN, ip)}`;
   const count = Number((await env.PUSH.get(key)) ?? "0");
   if (count >= RATE_LIMIT) return false;
   await env.PUSH.put(key, String(count + 1), { expirationTtl: HOUR_S });
@@ -97,7 +98,7 @@ async function subscribe(request: Request, env: Env, now: number): Promise<Respo
   const body = await readBody(request);
   const subscription = body === undefined ? undefined : parseSubscription(body);
   if (!subscription) return reply(400, undefined, CORS);
-  if (!(await withinRateLimit(request, env, now))) return reply(429, undefined, CORS);
+  if (!(await withinRateLimit(request, env, now, "an"))) return reply(429, undefined, CORS);
   const key = `${ABO}${await sha256Hex(subscription.endpoint)}`;
   if ((await env.PUSH.get(key)) === null && (await listAboKeys(env.PUSH)).length >= MAX_SUBSCRIPTIONS) {
     return reply(507, undefined, CORS);
@@ -106,10 +107,12 @@ async function subscribe(request: Request, env: Env, now: number): Promise<Respo
   return reply(204, undefined, CORS);
 }
 
-async function unsubscribe(request: Request, env: Env): Promise<Response> {
+async function unsubscribe(request: Request, env: Env, now: number): Promise<Response> {
   const body = parseJson(await readBody(request));
   const endpoint = typeof body === "object" && body !== null ? (body as { endpoint?: unknown }).endpoint : undefined;
   if (typeof endpoint !== "string") return reply(400, undefined, CORS);
+  // auch Abmelden begrenzt: jedes Löschen ist ein KV-Schreibvorgang im Tageskontingent (Arch-Review 0017, N10)
+  if (!(await withinRateLimit(request, env, now, "ab"))) return reply(429, undefined, CORS);
   await env.PUSH.delete(`${ABO}${await sha256Hex(endpoint)}`);
   return reply(204, undefined, CORS);
 }
@@ -154,7 +157,7 @@ export async function handle(request: Request, env: Env, now: () => number = Dat
     if (!["POST", "DELETE", "OPTIONS"].includes(method)) return reply(404);
     if (request.headers.get("origin") !== ALLOWED_ORIGIN) return reply(403);
     if (method === "OPTIONS") return reply(204, undefined, CORS);
-    return method === "POST" ? subscribe(request, env, now()) : unsubscribe(request, env);
+    return method === "POST" ? subscribe(request, env, now()) : unsubscribe(request, env, now());
   }
   if (method === "GET" && pathname === "/version") return reply(200, { version: env.VERSION ?? "unbekannt" });
 

@@ -451,3 +451,26 @@ Kein Blocker.
 - **Schritt 5b:** `AppSection` mit `pushView` (Matrix als reine Funktion in `src/domain/pwa.ts`, 12 Unit-Tests), `PushControls`, `push-texts.ts`. **Gemessen:** `JS (initial)` **91,97 kB** von 92 kB (wie die Probe), `App-Extras JS (lazy)` 6,1 kB → Budget auf 7,1 kB (Messung plus 1 kB, E9), Service Worker 7,32 kB. Befund: `import * as deviceStore` erzeugte ein Namensraum-Objekt, dessen Export-Helfer rolldown in den Einstieg legte (+0,07 kB, Budget überschritten); benannte Importe beheben das (Kommentar in `push.ts`). E2E `e2e/push.spec.ts`: 7 Tests je `pixel-7` und `desktop` grün, dazu `installieren`, `startpunkt`, `pwa` (Chromium) und `installieren` auf `iphone-15` mit dem neuen Hinweis.
 - **Schritt 6:** `scripts/lib/push-weekly-core.ts` (11 Unit-Tests), `scripts/push-weekly.ts`, `scripts/lib/push-payload-schema.ts`, `.github/workflows/push-weekly.yml` (YAML-Abgleich im Test von `push-schedule.ts`), Regel `web-push-only-in-push-weekly` (Kanarienvogel rot). Trockenlauf gegen den echten Worker: 0 Abos, 194 Angebote in den nächsten 7 Tagen. **Befund:** `data/offers.json` hat erst einen Commit (4.10.); am ersten Samstag fehlt der Stand vor 7 Tagen, die allgemeine Nachricht meldet dann neu = 0 (Warnung). Der Zuschnitt auf dem Gerät hängt nicht daran. **Testversand an Geräte erst nach dem Deploy** (Schritt 8): Der Worker nimmt Anmeldungen nur vom Origin `https://zwergenplan.app`.
 - `scripts/transit/profile-csa.test.ts` lief einmal parallel zum Build ins Zeitlimit (6,3 s), allein grün; unabhängig von diesem Plan.
+
+## Arch-Review (2026-10-06, arch-reviewer) – Verdict: Nacharbeit nötig (kein Blocker) → eingearbeitet
+
+**Übernommen:**
+- **M1** (Einschalten scheitert nach der Anmeldung, Abo bleibt): Fehler im Geräte-Speicher nach `POST /abo` meldet ab, löscht beim Worker, leert den Speicher und wirft `abo`; Unit-Test.
+- **M2** (`pushsubscriptionchange` ohne Test): Logik als `src/sw/resubscribe.ts` mit 4 Unit-Tests, in `coverage.include`; `sw.ts` verdrahtet nur.
+- **M3** (Matrix nur teilweise im E2E): `verweigert`, `kein-push` (Android), eingeschaltet mit Geräte-Kennung und Installationsknopf plus Push-Teil, je hell, dunkel und 320 px/200 % in `e2e/push.spec.ts`.
+- **M4** (Privatsphäre-Invariante nannte die neuen Origins nicht): Push-Worker und Push-Dienst in `docs/architecture.md`.
+- **N1:** `originFromStored` nach `src/domain/stored-origin.ts`, genutzt von Service Worker und `PushControls` (Punkt zuerst wie `useOrigin`, Stadtgrenze); in `push-domain-not-in-start`. Start-JS 91,98 kB.
+- **N2:** `.catch` für Ausschalten und Geräte-Kennung; der Schalter zeigt danach den echten Zustand.
+- **N3, N4:** Doku präzisiert (offenes Fenster kommt nach vorn; Kopie nur für `wegzeit.json`).
+- **N6:** Regel `pwa-core-no-push` (Kanarienvogel rot).
+- **N7:** `isAppExtrasModule` ohne `push-start`/`news`, mit `searches-store`, `searches`, `stored-origin`.
+- **N8:** `src/sw/tsconfig.json` ohne Node-Typen und ohne Tests; `tsconfig.test.json` als „Typen SW-Tests“ (Kanarienvogel: `process` im SW-Code ist ein Typfehler).
+- **N9:** Begründung an beiden `as`-Casts in `push-tailor.ts`.
+- **N10:** IP im Rate-Limit als HMAC mit dem Admin-Token; Rate-Limit auch für `DELETE /abo`; Kontingent-Risiko in ADR 0014.
+- **N11:** `--only` verlangt die Geräte-Kennung (8–64 Hex-Zeichen); Test.
+- **N12:** `push-worker/src/**` in `coverage.include` (ohne `index.ts`, nur Verdrahtung).
+- **N13:** Abhängigkeiten in ADR 0014.
+
+**Abgelehnt bzw. anders:**
+- **N5** (dauerhafter Selbsttest der `src/sw/`-Ausnahme): wie bisher per Kanarienvogel im Plan belegt (Praxis seit Plan 0011); `push-tailor.ts` hält die Ausnahme ohnehin in Gebrauch, und eine Lockerung für `src/ui/` fiele beim nächsten Kanarienvogel auf.
+- **N14** (Zeilen in CLAUDE.md): nicht auf Vorschlag eines Reviewers geändert; Deploy des Workers, `.push.local.json` und `channel: "chromium"` stehen in README und `docs/architecture.md`. Ob sie zusätzlich unter „Stolperfallen“ gehören, entscheidet der Nutzer.

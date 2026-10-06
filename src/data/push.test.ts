@@ -152,6 +152,16 @@ describe("enable", () => {
     }
   });
 
+  it("scheitert der Geräte-Speicher nach der Anmeldung: abmelden, beim Worker löschen, „abo“ (Arch-Review M1)", async () => {
+    const f = fake();
+    f.env.store.set = async () => {
+      throw new DOMException("voll", "QuotaExceededError");
+    };
+    await expect(createPush(f.env).enable(DATA)).rejects.toEqual(new PushError("abo"));
+    expect(f.sub()).toBeUndefined();
+    expect(f.requests.map((r) => r.method)).toEqual(["POST", "DELETE"]);
+  });
+
   it("wirft „abo“, wenn das Abonnieren scheitert", async () => {
     const f = fake({ subscribeFails: true });
     await expect(createPush(f.env).enable(DATA)).rejects.toEqual(new PushError("abo"));

@@ -57,6 +57,9 @@ describe("parseWeeklyArgs", () => {
     expect(() => parseWeeklyArgs(["--force"])).toThrow(/--only/);
     expect(() => parseWeeklyArgs(["--force", "--only="])).toThrow(/--only/);
     expect(() => parseWeeklyArgs(["--bunt"])).toThrow(/unbekannt/);
+    // kurzer Präfix träfe viele Geräte (Arch-Review N11)
+    expect(() => parseWeeklyArgs(["--force", "--only=a"])).toThrow(/Geräte-Kennung/);
+    expect(() => parseWeeklyArgs(["--force", "--only=ab12cd3"])).toThrow(/Geräte-Kennung/);
   });
 });
 
