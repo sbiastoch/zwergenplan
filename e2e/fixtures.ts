@@ -6,6 +6,7 @@
  */
 import { existsSync } from "node:fs";
 import { test as base, expect, type Locator, type Page, type Request, type Route } from "@playwright/test";
+import { PUSH_WORKER_URL } from "../site.config.ts";
 
 /** Muss zu tests/fixtures/offers.json passen: Montag, 5.10.2026, 12:00 Berlin. */
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
@@ -13,6 +14,16 @@ const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
 /** Einziger erlaubter Drittanbieter, nur bei offener Karte (ADR 0008) */
 const TILE_ORIGIN = "https://tiles.openfreemap.org";
 const TILE_FIXTURES = "tests/fixtures/karte";
+
+/** Push-Worker (Plan 0017): nur mit `test.use({ pushWorker: "mock" })`, dann protokolliert statt im Netz */
+const PUSH_ORIGIN = new URL(PUSH_WORKER_URL).origin;
+
+/** Ein vom Push-Mock beantworteter Request: Methode, Pfad und JSON-Body */
+export interface PushRequest {
+  method: string;
+  path: string;
+  body: unknown;
+}
 
 /** Ein vom Mock bedienter Kachel-Request `/planet/test/{z}/{x}/{y}.pbf` (für die Kamera-Regel). */
 export interface TileRequest {
@@ -25,6 +36,8 @@ interface Options {
   tiles: "verboten" | "mock";
   /** Opt-in je Test: konkrete Muster gegen `${url} ${text}` eines console.error, nie global */
   allowedConsoleErrors: RegExp[];
+  /** „verboten“: jeder Request an den Push-Worker ist rot. „mock“: 204 und Protokoll in `pushLog` (Plan 0017). */
+  pushWorker: "verboten" | "mock";
 }
 
 /** Mock-Datei zu einem Pfad: Stil `/styles/<name>` → `<name>.json`, TileJSON `/planet`, Glyphen unter `fonts/`. */
@@ -73,8 +86,40 @@ export const test = base.extend<
     routeTiles: TileMock["route"];
     consoleGuard: undefined;
     thirdPartyGuard: undefined;
+    /** Requests an den Push-Worker, wie der Mock sie bekam (nur mit pushWorker: "mock") */
+    pushLog: PushRequest[];
   }
 >({
+  pushWorker: ["verboten", { option: true }],
+  pushLog: [
+    async ({ context, pushWorker }, use) => {
+      const log: PushRequest[] = [];
+      const violations: string[] = [];
+      await context.route(`${PUSH_ORIGIN}/**`, (route) => {
+        const request = route.request();
+        if (pushWorker === "verboten") {
+          violations.push(`Push-Worker ohne pushWorker: "mock": ${request.method()} ${request.url()}`);
+          return route.abort();
+        }
+        const cors = {
+          "access-control-allow-origin": "*",
+          "access-control-allow-methods": "POST, DELETE, OPTIONS",
+          "access-control-allow-headers": "content-type",
+        };
+        if (request.method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
+        const raw = request.postData();
+        log.push({
+          method: request.method(),
+          path: new URL(request.url()).pathname,
+          body: raw ? JSON.parse(raw) : undefined,
+        });
+        return route.fulfill({ status: 204, headers: cors });
+      });
+      await use(log);
+      expect(violations, "Push-Worker nur gemockt").toEqual([]);
+    },
+    { auto: true },
+  ],
   tiles: ["verboten", { option: true }],
   allowedConsoleErrors: [[], { option: true }],
   // Privatsphäre-Invariante (docs/architecture.md): keine Requests an fremde Origins – Schrift, Daten, ICS kommen von uns.
@@ -87,6 +132,8 @@ export const test = base.extend<
       context.on("request", (req) => {
         const url = new URL(req.url());
         if (url.origin === TILE_ORIGIN) tileRequests.push(req.url());
+        // Push-Worker: der Mock in pushLog beantwortet oder verbietet jeden Request selbst
+        else if (url.origin === PUSH_ORIGIN) return;
         else if (url.protocol.startsWith("http") && url.origin !== own) foreign.push(req.url());
       });
       await use(undefined);

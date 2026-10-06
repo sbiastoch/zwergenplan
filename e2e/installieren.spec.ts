@@ -40,6 +40,8 @@ async function openKidSheet(page: Page) {
   await sheet(page).evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
   // Platzhalter weg: Abschnitt geladen (oder bewusst leer)
   await expect(sheet(page).locator(".app-pending")).toHaveCount(0);
+  // Push-Teil entschieden (Plan 0017, E7): data-push in jedem Zweig, auch wenn der Abschnitt leer bleibt
+  await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
 }
 
 /**
@@ -108,6 +110,8 @@ const CONTENT: Record<Visible, string[]> = {
   ios: [
     "Tippe auf Teilen und dann auf „Zum Home-Bildschirm“.",
     "Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.",
+    // Push-Matrix (Plan 0017, E7): im Safari-Tab ohne Push der Hinweis auf die App
+    "Benachrichtigungen gibt es in der App.",
   ],
 };
 const TITLE: Record<Visible, string> = {
