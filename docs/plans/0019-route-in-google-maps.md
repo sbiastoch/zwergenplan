@@ -1,6 +1,6 @@
 # Plan 0019 – Route in Google Maps und andere Wege
 
-Status: **umgesetzt** (Teil A und Teil B), freigegeben nach drei Reviews, Budget-Entscheidung des Nutzers in E9. Arch-Review ohne Blocker, eingearbeitet (Abschnitt „Arch-Review“). Offen: CI auf `main`, Deploy, Browser-Review live, Gerätematrix (E8) durch den Nutzer. Nummer 0019, weil 0017 schon doppelt vergeben ist: auf `main` (Kalender) und auf dem Branch `push-0017`.
+Status: **umgesetzt** (Teil A und Teil B), freigegeben nach drei Reviews, Budget-Entscheidung des Nutzers in E9. Arch-Review ohne Blocker, eingearbeitet (Abschnitt „Arch-Review“). Live seit `9963355` (mit E10). Offen ist nur die Gerätematrix (E8) durch den Nutzer. Nummer 0019, weil 0017 schon doppelt vergeben ist: auf `main` (Kalender) und auf dem Branch `push-0017`.
 Datum: 2026-10-06
 Bezug: Plan 0005 (Nicht-Ziel „Route in Karten-App öffnen“, `docs/ideas.md`), Plan 0009 und 0012 (Wegzeit, Linien, ADR 0011, ADR 0015), Plan 0010 (Anbieter-Sheet), ADR 0008 (Referrer-Policy), `docs/architecture.md` (Invarianten „Privatsphäre“ und „Startpunkt“)
 
@@ -396,3 +396,14 @@ Nutzer: „Ich hätte mir eher gedacht, dass man auf die eine Kachel, wo die Weg
 - Ohne andere Wege (ohne Startpunkt, Luftlinie, ohne Linien) bleibt die Kachel der direkte Link nach Google Maps. Ein Sheet nur mit einem Knopf wäre ein unnötiger Zwischenschritt.
 - Der Scrollbereich des Sheets ist fokussierbar (`tabIndex={0}`, begründetes `biome-ignore`), denn bei 320 px und 200 % Schrift scrollt die Liste ohne eigenes Bedienelement (axe `scrollable-region-focusable`).
 - Tests: Die E2E-Fälle „Wege ab …“ öffnen das Sheet über die Kachel. Die Mobile-UX-Ansicht `detail-wege` prüft das offene Sheet.
+
+## Browser-Review live (2026-10-06, Stand `9963355`)
+
+Geprüft wurde fokussiert, was Plan 0019 ändert: iPhone 15 (WebKit) und Pixel 7, hell und dunkel, Startpunkt Gostenhof. Wegwerf-Skript und Bilder liegen außerhalb des Repos.
+
+- **Kachel „Wo“** mit „2 Wege & Route in Google Maps“: kompakt, Drehung und Lochpunkt wie die übrigen Kacheln.
+- **Sheet „Wege ab Gostenhof“**: zwei bis drei Zeilen, Marke „Vorschlag“, Hauptknopf „In Google Maps navigieren“ gut mit dem Daumen erreichbar. Im Dunkelmodus gelb wie die übrigen Hauptknöpfe, keine hellen Inseln.
+- **Echte Problem-Adressen** gehen bereinigt an Maps, zum Beispiel „Nerzstraße 34, 90461 Nürnberg“, „Kornmarkt 6, 90402 Nürnberg“, „Fürther Straße 212, 90429 Nürnberg“, „Cuxhavener Straße 54, 90425 Nürnberg“. Ohne PLZ bleibt „Wöhrder See, Nürnberg“.
+- **Andere Wege plausibel**, zum Beispiel CVJM: „U2 · 8 Min. zum Halt“ gegen „U1 · 5 Min. zum Halt“; Thon: „Tram 10“ gegen „U1 → Tram 10 · 1 Umstieg“.
+- **Klick**: Google Maps öffnet sich mit dem Ziel im Modus `transit`, `document.referrer` ist leer. Der kopflose Browser landet zuerst bei Googles Zustimmungsseite.
+- Keine Konsolenfehler.
