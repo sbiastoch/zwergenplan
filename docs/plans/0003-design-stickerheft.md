@@ -135,6 +135,9 @@ Aufbau wie im Mockup:
   - Anmeldung: „Anmeldung nötig“ (umrandet) / „Ohne Anmeldung“.
   - Verfügbarkeit: `frei` → „Plätze frei“ (`#A6DB5E`), `wenige` → „Wenige Plätze“ (`#FFD93B`), `ausgebucht` → „Ausgebucht“ (`#FF9A9A`), `warteliste` → „Warteliste“ (`#FF9A9A`), Text immer `#13212E`. `unbekannt` und `ohne-anmeldung` → kein Chip.
   - Altershinweis „6–24 Monate“ (gestrichelt), nur bei einer unpassenden Karte, die per „trotzdem zeigen“ sichtbar ist.
+
+> **Geändert durch Plan 0021:** Unpassende Karten werden sichtbar, wenn der Altersschalter im Filter-Sheet aus ist; „trotzdem zeigen“ gibt es nicht mehr.
+
 - In Kalender-Agenda und Merkliste lautet die Kopfzeile „Di 6.10. · 9:30 Uhr“ bzw. Uhrzeit. Die Merkliste zeigt den nächsten Termin mit Datum.
 - Herz: `button` mit festem Label „<Titel> merken“ und `aria-pressed` (ein wechselndes Label ergäbe „nicht mehr merken, gedrückt“).
 
@@ -314,6 +317,9 @@ E2E (Fixtures, eingefrorene Uhr Mo 5.10.2026 12:00):
   - Vergangenes fehlt.
   - Filter per Chip und Sticker in der URL, überleben das Neuladen.
   - Geburtsdatum im Kind-Sheet als „01.09.2026“: Filter, nie in der URL, überlebt das Neuladen. „trotzdem zeigen“ zeigt die unpassenden gestrichelt.
+
+> **Geändert durch Plan 0021:** Statt „trotzdem zeigen“ schaltet der Test den Altersschalter im Filter-Sheet aus (`e2e/app.spec.ts`, „Altersfilter im Filter-Sheet“).
+
   - Leerzustand mit „Filter zurücksetzen“.
 - `detail.spec.ts`:
   - Öffnen per Karte, URL hat `angebot=`, Zurück-Geste (`page.goBack()`) schließt, Deep-Link öffnet direkt.

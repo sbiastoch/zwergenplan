@@ -294,6 +294,9 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
   - `endpointHash`, der SHA-256 des zuletzt beim Worker gemeldeten Endpoints (für den Abgleich in E12).
 
   „Nur passende“ wird **nicht** gespiegelt (Datensparsamkeit, siehe E9).
+
+> **Geändert durch Plan 0021:** Den Altersschalter gibt es nur noch im Speicher (Standard an), gespeichert wird er gar nicht mehr.
+
 - `preferences.ts` schreibt bei jeder Änderung des Geburtsdatums zusätzlich in den Geräte-Speicher (per `import()`, E5), wenn `zwergenplan.push` gesetzt ist.
 - Beim Abschalten von Push werden alle Einträge **gelöscht**.
 - Das weicht von der Invariante „Das Geburtsdatum bleibt im `localStorage`“ ab. Der Wert bleibt auf dem Gerät und im eigenen Origin und erscheint nie in URL, Logs oder Requests. Festgehalten in ADR 0014 und `docs/architecture.md`.
@@ -311,6 +314,9 @@ Alle Pfade werden relativ zu `registration.scope` gebildet, nie mit festem `/`. 
   - mit Geburtsdatum, keines passend → „7 neue Angebote, gerade keins für 14 Monate“;
   - `app_badge` = Zahl der passenden bzw. aller neuen.
 - „Nur passende“ wirkt nicht auf die Nachricht. Die Zahl der passenden steht im Text, eine Nachricht kommt bei jedem Deploy mit neuen Angeboten. Darum wird die Einstellung nicht gespiegelt.
+
+> **Geändert durch Plan 0021:** Der Schalter heißt jetzt „Nur passend für …“ und steht im Filter-Sheet; er wird nicht gespeichert.
+
 - Bekannte Unschärfe: Ein geänderter Titel erzeugt eine neue ID (ADR 0003) und zählt als neu. → Risiken.
 - `declarativePayload({ count, siteUrl, sentAt })` (`src/domain/push-payload.ts`, rein) baut die allgemeine Payload für den Absender:
   - `notification.title` „Zwergenplan“, `body` „7 neue Angebote im Zwergenplan“, `navigate` `${siteUrl}?neu`, `tag` „neue-angebote“, `app_badge` = count;
@@ -447,6 +453,9 @@ Der Request auf `site.json` ist für alle gleich. Alter und Einstellungen verlas
     - Ist danach nichts Neues da, schrumpft er auf die eine Zeile „Nichts Neues mehr“. Das passiert über dem Falz, bevor die Liste darunter gelesen wird.
     - E2E misst CLS < 0,05 für `/?neu`.
   - **Filter:** Der Block wendet nur die Altersregel der Liste an (`ageVisibility`, also auch „Nur passende“), nicht die Filter nach Kategorie, Format oder Wegzeit. Die Nachricht hat „neue Angebote“ versprochen, ein Filter soll sie nicht still verstecken. Was das Alter ausblendet, steht als Zeile „2 weitere passen nicht zum Alter“.
+
+> **Geändert durch Plan 0021:** `ageVisibility` nimmt nur noch `{ ageOnly }`, der Block nutzt den Standard „an“.
+
   - Danach wird `seenIds` aktualisiert und `neu` per `replace` aus der Route entfernt.
   - Ohne neue Angebote steht dort „Nichts Neues mehr“.
   - **Chunk nicht ladbar:** Der Platzhalter verschwindet, `neu` wird still entfernt, kein Fehlerkasten.

@@ -187,7 +187,11 @@ test.describe("Altersfilter im Filter-Sheet (Plan 0021)", () => {
     await expect(show).toBeVisible();
 
     await page.getByRole("button", { name: "Anbieter", exact: true }).click();
-    await expect(show).toBeVisible();
+    await show.click();
+    await expect(page.locator(".place:not(.idle)")).not.toHaveCount(0);
+    await expect(page.getByRole("status")).toBeFocused();
+    // wieder an für den Kalender: Der Altersfilter gilt für alle Tabs
+    await page.getByRole("button", { name: "ausblenden" }).click();
 
     await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Angebote" }).click();

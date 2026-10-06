@@ -30,9 +30,6 @@
     padding-left: 8px;
     margin-top: 6px;
   }
-  .age-warn .ic {
-    flex-shrink: 0;
-  }
   .linkbtn {
     min-height: 44px;
     border: 0;

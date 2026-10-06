@@ -92,6 +92,30 @@ describe("useOfferViews", () => {
     expect(result?.unfitIds.has(GROSS.id)).toBe(true);
   });
 
+  it("Umschalten des Altersfilters beginnt die Liste wieder mit dem ersten Schritt (Plan 0021, E1)", () => {
+    // 45 Angebote an verschiedenen Tagen: ein Schritt (40) reicht nicht
+    const many = Array.from({ length: 45 }, (_, i) =>
+      offer(`o${i}`, `2026-11-${String((i % 28) + 1).padStart(2, "0")}`),
+    );
+    let result: OfferViews | undefined;
+    let step = 0;
+    function Probe() {
+      result = useOfferViews({ offers: many, route: ENTDECKEN, birthDate: undefined, savedIds: [], now: NOW });
+      // Updates während des Renderns: erst „Weitere zeigen“, dann den Schalter umlegen
+      if (step === 0) {
+        step = 1;
+        result.showMore();
+      } else if (step === 1) {
+        step = 2;
+        result.setAgeOnly(false);
+      }
+      return null;
+    }
+    renderToStaticMarkup(createElement(Probe));
+    expect(step).toBe(2);
+    expect(result?.page.remaining).toBe(5);
+  });
+
   it("baut den Kalender-Index nur in der Kalenderansicht, startet heute", () => {
     expect(render({}).calendar.index.size).toBe(0);
     const v = render({ route: { tab: "kalender", filter: EMPTY_FILTER } });
