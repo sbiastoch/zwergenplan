@@ -1,0 +1,11 @@
+{
+  // Eigener Typkontext des Push-Workers (Plan 0011, E11): Workers-Laufzeit statt DOM; check:fast prüft ihn als
+  // „Typen Worker“. Importiert aus dem Repo nur reine Domänenmodule (push-worker-isolated).
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2023"],
+    "types": ["@cloudflare/workers-types"]
+  },
+  "include": [".", "../src/domain/push-types.ts", "../src/domain/time.ts"],
+  "exclude": []
+}

@@ -6,7 +6,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 const MIN_MODULES = 15;
-const DIRS = ["src", "scripts", "e2e", ".claude/hooks"];
+const DIRS = ["src", "scripts", "e2e", ".claude/hooks", "push-worker"];
 
 interface CruiseOutput {
   modules: Array<{ source: string }>;
