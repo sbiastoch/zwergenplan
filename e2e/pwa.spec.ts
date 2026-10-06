@@ -9,7 +9,7 @@ import { expectMobileUx } from "./mobile-ux.ts";
 
 /** Fixture-Datenstand (tests/fixtures/offers.json, generatedAt 5.10.2026) */
 const OFFLINE_NOTE = "Offline – Stand vom 5.10.";
-const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)";
+const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof";
 /** Beispielhof ab Gostenhof direkt mit Tram 1 (Plan 0012, E1; Fixture wie in startpunkt.spec.ts) */
 const KRABBELTREFF_TRAM = "ca. 15 Min. mit Tram\u00a01 ab Gostenhof";
 const isTable = (url: string) => new URL(url).pathname.endsWith("/data/wegzeit.json");

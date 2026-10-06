@@ -195,6 +195,17 @@ export function App() {
     countProviders(visible),
     visible.length,
   );
+  /*
+   * Startpunkt hinter der Zahl, im selben Fließtext (Plan 0018, E1): U+00A0 vor dem Punkt, damit er nie verwaist am
+   * Zeilenanfang steht; der Ausdruck selbst ist ein Inline-Block und wandert als Ganzes in die nächste Zeile. Beim
+   * Laden steht der endgültige Text unsichtbar: Die Breite stimmt, die Live-Region sagt nichts (Plan 0009, E11).
+   */
+  const reachSuffix = origin && reachMode && (
+    <span className={reachMode.kind === "laedt" ? "status-reach pending" : "status-reach"}>
+      {" · "}
+      <span className="status-reach-text">{reachNote(reachMode, origin)}</span>
+    </span>
+  );
   const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
   // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5)
   const section = tabSection(route.tab);
@@ -223,12 +234,7 @@ export function App() {
 
   return (
     <div className="app">
-      <Header
-        ageLabel={ageLabel}
-        dark={theme.dark}
-        onKid={() => setSheet("kid")}
-        onToggleTheme={() => theme.setChoice(theme.dark ? "hell" : "dunkel")}
-      />
+      <Header ageLabel={ageLabel} onKid={() => setSheet("kid")} />
       {/* Sticker wirken auch in der Anbieterliste (Plan 0010, E2, E4) */}
       {(section === "entdecken" || section === "anbieter") && <Stickers filter={route.filter} onChange={setFilter} />}
       {route.tab !== "merkliste" && (
@@ -275,6 +281,7 @@ export function App() {
                     {offersWord}
                     <b>{mapPlaces}</b>
                     {placesWord}
+                    {reachSuffix}
                   </span>
                 ) : route.tab === "anbieter" ? (
                   <span>
@@ -282,26 +289,19 @@ export function App() {
                     {providersWord}
                     <b>{providerOffers}</b>
                     {providerOffersWord}
+                    {reachSuffix}
                   </span>
                 ) : (
                   <span>
                     <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
+                    {reachSuffix}
                   </span>
                 )}
                 {pwaNote && (
-                  // eigene Zeile wie der Wegzeit-Hinweis (Plan 0011, E4); Text aus dem PWA-Kern
+                  // eigene Zeile unter Zahl und Startpunkt (Plan 0011, E4; Plan 0018, E1); Text aus dem PWA-Kern
                   <span className="status-note">
                     <span className="sr-only">. </span>
                     {pwaNote}
-                  </span>
-                )}
-                {origin && reachMode && (
-                  // eigene Zeile ohne „·“: Sie brach bei 320–390 px ohnehin um, und der Punkt stand dann verwaist
-                  // vorn. Der Punkt nur für Screenreader trennt die beiden Sätze in der Ansage. Beim Laden steht
-                  // der endgültige Text unsichtbar: Die Höhe stimmt, die Live-Region sagt nichts (E11).
-                  <span className={reachMode.kind === "laedt" ? "status-note pending" : "status-note"}>
-                    <span className="sr-only">. </span>
-                    {reachNote(reachMode, origin)}
                   </span>
                 )}
               </p>

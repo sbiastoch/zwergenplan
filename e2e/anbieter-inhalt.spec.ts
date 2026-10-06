@@ -56,7 +56,7 @@ test.describe("Startpunkt Gostenhof", () => {
   test("mit Wegzeit nach dem nächsten Ort sortiert, Turnverein weiter am Ende", async ({ page }) => {
     await storeGostenhof(page);
     await openList(page);
-    await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof mit Bus & Bahn");
+    await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
     await expect(row(page, THEATER)).toContainText("2 Angebote · Gostenhof · 5 Min.");
     expect(await names(activeRows(page))).toEqual([THEATER, TREFF, BIBLIOTHEK, GEMEINDE, MUSIKSCHULE]);
     const lines = await activeRows(page).locator("span").allInnerTexts();
@@ -71,7 +71,7 @@ test.describe("Startpunkt Gostenhof", () => {
       await page.route("**/data/wegzeit.json", (route) => route.fulfill({ status: 404 }));
       await storeGostenhof(page);
       await openList(page);
-      await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+      await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
       await expect(row(page, THEATER)).toContainText("200 m");
       expect(await names(activeRows(page))).toEqual([THEATER, TREFF, BIBLIOTHEK, MUSIKSCHULE, GEMEINDE]);
       const lines = await activeRows(page).locator("span").allInnerTexts();

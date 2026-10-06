@@ -1,6 +1,6 @@
 # Plan 0018 – Startseite entrümpeln
 
-Status: freigegeben (Review Runde 2), Umsetzung offen
+Status: umgesetzt (Branch `startseite-entruempeln`), Arch-Review, Deploy und Browser-Review stehen aus
 Datum: 2026-10-06
 Bezug: Plan 0003 (E11, E15), Plan 0007 (E6), Plan 0009 (E1, E11), Plan 0012 (E10), ADR 0011 (Punkt 3), ADR 0015 (Kopf, Punkt 7)
 
@@ -200,3 +200,13 @@ Geprüft hat ein neuer Subagent `plan-reviewer`. Keine Blocker. Alles übernomme
 - **H6**: Vermerke in Plan 0003 und Plan 0007 (E4).
 - **H7**: Die Reihenfolge mit `pwaNote` ist in E1 festgelegt.
 - **H8**: Der NBSP bekommt einen Kommentar im Code (E1).
+
+## Umsetzung (2026-10-06)
+
+Branch `startseite-entruempeln`. Abweichungen und Befunde gegenüber dem Plan:
+
+- **Autofokus ist engine-abhängig.** Ohne `autofocus` fokussiert nur WebKit (iOS) beim `showModal()` das erste Feld, Chromium fokussiert es nicht. Das erklärt, warum die Tastatur nur auf dem iPhone aufging. Test 5 prüft den Leer-Fall („Feld fokussiert“) deshalb nur auf WebKit. Die Fälle „ausgefüllt → Überschrift“ und „Startpunkt wählen → Stadtteil“ laufen auf allen Projekten.
+- **Röthenbach liegt in der Fixture außerhalb des Stadtgebiets.** Test 2 prüft dort den längsten Zusatz „Luftlinie ab Röthenbach b. Schweinau (außerhalb des Stadtgebiets)“, das ist strenger als geplant.
+- **Kartenmitte auf „Karte“** ist ein eigener Test mit `tiles: "mock"`, weil die Karte sonst OpenFreeMap anfragt (Wächter in `fixtures.ts`).
+- `reachSuffix` ist ein JSX-Wert in `App.tsx` statt einer eigenen Komponente `ReachSuffix`. Er wird in alle drei Zähl-`<span>` gesetzt.
+- ADR 0019 ist neu (`docs/adr/0019-statuszeile-nur-startpunkt.md`).

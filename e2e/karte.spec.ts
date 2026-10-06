@@ -60,7 +60,7 @@ async function camera(page: Page) {
   });
 }
 
-/** Darstellung über das Kind-Sheet: Der Theme-Knopf im Kopf entfällt auf schmalen Geräten (Plan 0007, B5). */
+/** Darstellung über das Kind-Sheet, dem einzigen Ort dafür (Plan 0018, E2). */
 async function switchTheme(page: Page, button: "Hell" | "Dunkel", style: string) {
   const request = page.waitForRequest((req) => req.url().endsWith(style));
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
@@ -243,7 +243,7 @@ test.describe("mit gemockten Kacheln", () => {
     page.on("request", (req) => requests.push(req.url()));
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof mit Bus & Bahn");
+    await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
     // nach Wegzeit (Plan 0012, von Hand nachgerechnet, Rechenweg in startpunkt.spec.ts): Theater 3,6, Beispielhof
     // 13,6, Bibliothek 15,6, Gemeinde 23,6 (Tram 1 → Bus 202E; vorher 32,6 über Bus 2, die Fixture-Linie 202E kam mit Plan 0012),
     // Musikschule 29,6 Min. (Tram 1 → Bus 2)
@@ -270,9 +270,7 @@ test.describe("mit gemockten Kacheln", () => {
     await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.0767, 49.4521] }));
     await idle(page);
     await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
-    await expect(page.getByRole("status")).toContainText(
-      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)",
-    );
+    await expect(page.getByRole("status")).toContainText("Wegzeit ab der Kartenmitte");
     await expect(places(page).first()).toHaveText(/^Familientreff Beispielhof.* · 5 Min\.$/);
   });
 

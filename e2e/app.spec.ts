@@ -97,6 +97,32 @@ test("„Nur passende“ aus zeigt alles, unpassende markiert", async ({ page })
   await expect(page.locator(".card.unfit")).toHaveCount(4);
 });
 
+test("Kind-Sheet fokussiert das Geburtsdatum nur, solange es leer ist (Plan 0018, E3)", async ({
+  page,
+  browserName,
+}) => {
+  const kidButton = page.getByRole("button", { name: /^Kind und Einstellungen/ });
+  const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await kidButton.click();
+  // Ohne `autofocus` nimmt nur WebKit (iOS) beim showModal() das erste Feld, Chromium fokussiert es nicht.
+  if (browserName === "webkit") await expect(sheet.getByLabel("Geburtsdatum")).toBeFocused();
+  await sheet.getByLabel("Geburtsdatum").fill("01.09.2026");
+  await sheet.getByRole("button", { name: "Fertig" }).click();
+
+  // ausgefüllt: die Überschrift statt des Feldes (iOS öffnete sonst jedes Mal die Tastatur)
+  await kidButton.click();
+  await expect(sheet.getByRole("heading", { name: "Dein Zwerg" })).toBeFocused();
+  await expect(sheet.getByLabel("Geburtsdatum")).not.toBeFocused();
+  await sheet.getByRole("button", { name: "Fertig" }).click();
+
+  // „Startpunkt wählen“ führt weiter zur Stadtteil-Auswahl, auch mit Geburtsdatum
+  await page.getByRole("button", { name: /^Alle Filter/ }).click();
+  const filter = page.getByRole("dialog", { name: "Filter" });
+  await filter.getByRole("button", { name: "Startpunkt wählen" }).click();
+  await expect(sheet.getByLabel("Stadtteil", { exact: true })).toBeFocused();
+  await expect(sheet.getByRole("heading", { name: "Dein Zwerg" })).not.toHaveAttribute("tabindex");
+});
+
 test("ungültiges Geburtsdatum wird erklärt und nicht gespeichert", async ({ page }) => {
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await page.getByLabel("Geburtsdatum").fill("31.02.2026");

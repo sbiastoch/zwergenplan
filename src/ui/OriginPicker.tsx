@@ -6,18 +6,11 @@
 import { useId } from "react";
 import { DISTRICTS } from "../domain/districts.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
+import { markAutofocus } from "./Dialog.tsx";
 import { originHint, transitSourceNote } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import type { OriginApi } from "./use-app-state.ts";
 import type { ReachMode } from "./use-transit.ts";
-
-/**
- * Setzt das HTML-Attribut `autofocus`: Dann fokussiert `showModal()` die Auswahl selbst. Reacts
- * `autoFocus` hilft hier nicht, es fokussiert vor dem Öffnen des Dialogs und schreibt kein Attribut.
- */
-function markAutofocus(el: HTMLSelectElement | null) {
-  el?.setAttribute("autofocus", "");
-}
 
 export function OriginPicker({
   api,

@@ -67,9 +67,10 @@
     margin-top: 6px;
   }
 
-  /* Statuszeile: „Wegzeit ab …“ bzw. „Entfernung als Luftlinie ab …“ immer in eigener Zeile, ohne Trennpunkt */
-  .status-note {
-    flex-basis: 100%;
+  /* Statuszeile: „· Wegzeit ab …“ hinter der Zahl (App.tsx, Plan 0018, E1). Als Inline-Block wandert der Ausdruck
+     als Ganzes in die nächste Zeile; ist er breiter als die Zeile, bricht er darin um, ohne überzulaufen. */
+  .status-reach-text {
+    display: inline-block;
   }
 
   /* Kachel: „25 Min.“ bzw. „1,4 km“ bricht nie zwischen Zahl und Einheit */
@@ -90,7 +91,7 @@
   /* Bei .status nur die Kinder: Die Zeile selbst bleibt fokussierbar, sie ist das Fokus-Ziel nach „Nochmal laden“
      (N2). visibility: hidden nimmt die Kinder auch aus dem Barrierefreiheitsbaum, die Live-Region sagt nichts. */
   .status.pending > *,
-  .status-note.pending {
+  .status-reach.pending {
     visibility: hidden;
   }
   .list-pending {

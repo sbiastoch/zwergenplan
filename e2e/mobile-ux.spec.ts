@@ -36,7 +36,7 @@ async function withGostenhof(page: Page) {
   const sheet = await pickGostenhof(page);
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
-  await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof mit Bus & Bahn");
+  await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
 }
 
 /** Karte mit Stadtteil als Startpunkt (Plan 0005): Werkzeugzeile „Startpunkt: Gostenhof“, Orts-Liste mit Wegzeit. */
@@ -108,7 +108,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     // Abschnitt „Als App“ geladen (Lazy-Chunk, Plan 0011, E7): Die Gates prüfen sein Ergebnis, nicht den Platzhalter
     await expect(page.locator(".app-pending")).toHaveCount(0);
   },
-  // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „Wegzeit ab … (Di vormittags …)“
+  // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „… · Wegzeit ab Gostenhof“ (Plan 0018)
   "entdecken-wegzeit": async (page) => {
     await withGostenhof(page);
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("5 Min.");
@@ -161,7 +161,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.route("**/data/wegzeit.json", (route) => route.abort());
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await page.goto("./?wegzeit=30");
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
     await expect(page.getByRole("button", { name: "Nochmal laden" })).toBeVisible();
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("200 m");
   },
@@ -190,7 +190,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.route("**/data/wegzeit.json", (route) => route.abort());
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await page.goto("./");
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar.");
+    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filter" });
     await expect(sheet.getByRole("button", { name: "bis 20 Min." })).toBeDisabled();
@@ -216,7 +216,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    await expect(page.getByRole("status")).toContainText("außerhalb des Stadtgebiets.");
+    await expect(page.getByRole("status")).toContainText("außerhalb des Stadtgebiets");
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filter" });
     await expect(sheet.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.")).toBeVisible();
@@ -313,7 +313,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
 /**
  * Drei Wege zur Darstellung. Dunkel gibt es zweimal, weil die Tokens doppelt stehen (Plan 0007, E15): per System
  * (`@media`-Zweig) und per gewählter Darstellung (`data-theme="dark"`). Die Wahl wird vor dem Laden gespeichert,
- * denn unter 380 px fehlt der Theme-Knopf im Kopf (E6).
+ * denn die Darstellung steht nur im Kind-Sheet (Plan 0018, E2).
  */
 const SCHEMES = [
   { label: "hell", colorScheme: "light", chosenDark: false },

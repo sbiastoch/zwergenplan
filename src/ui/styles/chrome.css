@@ -1,11 +1,8 @@
-/* Kopf, Darstellungs-Umschalter, Kategorie-Sticker, Chips, Zähler-Badge (Chrome.tsx, Sheets.tsx). */
+/* Kopf, Kategorie-Sticker, Chips, Zähler-Badge (Chrome.tsx, Sheets.tsx). */
 
 @layer components {
   /* Kopf */
   .hdr {
-    /* Container-Query statt Media-Query (Plan 0007, E6): reagiert auch auf große Schrift. Sitzt auf .hdr,
-       nicht auf .app, weil container-type Layout-Containment erzeugt (feste Tab-Leiste und Toast in .app). */
-    container: kopf / inline-size;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -20,7 +17,7 @@
     gap: 6px;
     margin: 0;
     font-weight: 800;
-    /* einzeilig mit Kind-Chip und Theme-Knopf ab 380 px (B5); bei großer Schrift darf der Kopf umbrechen */
+    /* einzeilig mit Kind-Chip (B5; Theme-Knopf entfallen, Plan 0018, E2); bei großer Schrift darf der Kopf umbrechen */
     font-size: clamp(1.25rem, 5.4vw + 0.1rem, 1.6875rem);
     letter-spacing: -0.05em;
     min-width: 0;
@@ -316,13 +313,6 @@
   }
 
   /* Ergänzungen gegenüber dem Mockup (echte Seite statt fester 390×844-Rahmen) */
-  /* Schmal (Inhalt < 348 px, also unter 380 px Viewport bei 100 %) oder große Schrift: Der Theme-Knopf im Kopf
-     entfällt, die Darstellung bleibt im Kind-Sheet erreichbar (Plan 0007, E6). */
-  @container kopf (width < 21.75rem) {
-    .hdr .iconbtn {
-      display: none;
-    }
-  }
   .hdr .kid {
     margin-left: auto;
   }

@@ -6,6 +6,8 @@ Status: angenommen (2026-10-05), Umsetzung mit Plan 0012. Nutzerentscheidungen v
 - Ergänzt ADR 0003 (Schema `Timetable`).
 - Punkt 9 von ADR 0011 („außerhalb des Stadtgebiets“ bei 800 m) bleibt unverändert.
 
+**Geändert durch ADR 0019 (Plan 0018):** Die Statuszeile nennt nur den Startpunkt („Wegzeit ab Gostenhof“). Die Annahme „Di vormittags, höchstens 1 Umstieg, inkl. Warten“ steht nur noch im Kind-Sheet unter „Wegzeit ab“.
+
 Details, Messungen und Alternativen stehen in Plan 0012.
 
 ## Kontext
@@ -52,6 +54,7 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
 7. **Anzeige:**
    - Detail und Orts-Sheet zeigen „mit Bus 37 → U1“, vorgelesen als „mit Bus 37, dann U1“. Die Kachel bleibt bei den Minuten.
    - Über 2 Std. oder ohne Weg steht im Detail „über 2 Std. ab … (mit höchstens 1 Umstieg)“, ohne Linien.
+   - Statuszeile: nur „Wegzeit ab …“ hinter der Zahl (ADR 0019).
 
 ## Alternativen
 

@@ -78,9 +78,7 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
 
-  await expect(page.getByRole("status")).toContainText(
-    "Wegzeit ab Altstadt mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)",
-  );
+  await expect(page.getByRole("status")).toContainText("Wegzeit ab Altstadt");
   const dists = page.getByTestId("offer").locator(".meta .dist");
   await expect(dists.first()).toHaveText(/^(\d+ Min\.|über 2 Std\.)$/);
   for (const text of await dists.allInnerTexts()) expect(text).toMatch(/^(\d+ Min\.|über 2 Std\.)$/);

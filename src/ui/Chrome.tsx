@@ -6,17 +6,8 @@ import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { CATEGORY_UI } from "./categories.ts";
 import { Icon, Logo } from "./icons.tsx";
 
-export function Header({
-  ageLabel,
-  dark,
-  onKid,
-  onToggleTheme,
-}: {
-  ageLabel: string;
-  dark: boolean;
-  onKid: () => void;
-  onToggleTheme: () => void;
-}) {
+/** Kopf: Marke und Kind-Knopf. Die Darstellung (hell/dunkel) steht nur im Kind-Sheet (Plan 0018, E2). */
+export function Header({ ageLabel, onKid }: { ageLabel: string; onKid: () => void }) {
   return (
     <header className="hdr">
       <h1 className="brand">
@@ -28,14 +19,6 @@ export function Header({
           <Icon name="face" size={20} />
         </span>
         <span>{ageLabel}</span>
-      </button>
-      <button
-        type="button"
-        className="iconbtn"
-        onClick={onToggleTheme}
-        aria-label={dark ? "Helle Darstellung" : "Dunkle Darstellung"}
-      >
-        <Icon name={dark ? "sun" : "moon"} />
       </button>
     </header>
   );
