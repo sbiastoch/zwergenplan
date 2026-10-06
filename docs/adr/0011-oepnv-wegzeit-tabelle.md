@@ -53,3 +53,7 @@ ADR 0005 legte fest, dass die Wegzeit aus einer statischen GTFS-Matrix entsteht:
 - Der Auszug muss mit dem Fahrplanwechsel erneuert werden. Der Skill prüft das bei jedem Lauf, CI warnt kurz vor dem Ablauf und danach, wird aber nie rot.
 - Die Tabelle wächst linear mit der Zahl der Orte (≈ 0,5 kB gzip je Ort), Budget 64 kB.
 - ADR 0005 gilt weiter als Ziel („Öffi-Wegzeit statt Luftlinie, offline, ohne Drittanbieter“), mit den Abweichungen oben. ADR 0003: `nearestStops` gestrichen. ADR 0010 bleibt unverändert, denn `src/data/transit.ts` lädt nur und importiert nichts aus `src/domain`.
+
+## Nachtrag (2026-10-06): Wochen-Push (Plan 0017, ADR 0014)
+
+- **Punkt 6 ergänzt durch ADR 0014 (Punkt 4):** Neuer Anlass „beim Push“. Der Service Worker lädt bei jedem Push genau einmal `wegzeit.json` (bedingt, `no-cache`, bei Fehler die Kopie aus dem Cache), egal ob ein Startpunkt oder ein Abo mit Wegzeit gespeichert ist. Der Request ist für alle gleich und verrät nichts über den Startpunkt; die Wegzeit rechnet der Service Worker lokal.

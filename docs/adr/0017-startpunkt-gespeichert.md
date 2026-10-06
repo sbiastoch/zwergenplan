@@ -36,3 +36,7 @@ Im Alltag passt das nicht: Die App wird als PWA vom Startbildschirm geöffnet, u
 - Wer an einem anderen Ort ist, sieht nach dem Neuladen die Wegzeit ab dem alten Standort. Ein Tipp auf „Meinen Standort nutzen“ aktualisiert ihn.
 - Die Kartenmitte heißt auch nach dem Neuladen „Kartenmitte“. Die Karte startet aber im üblichen Ausschnitt (Kamera-Regel), die gespeicherte Mitte ist dann nur der Startpunkt-Punkt auf der Karte.
 - E2E belegt: Standort und Kartenmitte überstehen das Neuladen, gespeichert ist nur der gerundete Wert, und beim Start mit gespeichertem Punkt laden Tabelle und Linien genau einmal.
+
+## Nachtrag (2026-10-06): Wochen-Push (Plan 0017, ADR 0014)
+
+- **Punkt 1 und 3 ergänzt durch ADR 0014 (Punkt 4):** Bei eingeschaltetem Push liegt der gespeicherte Startpunkt zusätzlich im IndexedDB des eigenen Origins, genau so wie im `localStorage` (Stadtteil-ID oder schon gerundeter Punkt), damit der Service Worker die Wegzeit eines Such-Abos rechnen kann. Er verlässt das Gerät weiterhin nie und wird beim Abschalten gelöscht. Der Service Worker rundet einen Punkt erneut und prüft die Stadtgrenze wie `storedPointOrigin`.
