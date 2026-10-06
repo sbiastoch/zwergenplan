@@ -3,8 +3,7 @@ import { useState } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
 import type { Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { CATEGORY_LABELS } from "../domain/topics.ts";
-import { primaryCategory } from "./categories.ts";
+import { CATEGORY_LABELS, type Category } from "../domain/topics.ts";
 import {
   ageRangeLabel,
   availabilityLabel,
@@ -33,6 +32,8 @@ export interface CardContext {
   reachOf: (offer: SiteOffer) => Reach | undefined;
   /** Wegzeit lädt: Platzhalter statt Entfernung, ohne Layoutsprung (Plan 0009, E11) */
   reachPending: boolean;
+  /** Leitkategorie (Etikett, Farbe, Form); folgt dem Kategoriefilter (Plan 0014, E2) */
+  categoryOf: (offer: SiteOffer) => Category;
 }
 
 interface OfferCardProps {
@@ -52,7 +53,7 @@ interface OfferCardProps {
 export function OfferCard({ item, ctx, dated = false, calendarDay, context }: OfferCardProps) {
   const { offer, session } = item;
   const [fresh] = useState(ctx.animate);
-  const category = primaryCategory(offer.topics);
+  const category = ctx.categoryOf(offer);
   const unfit = ctx.isUnfit(offer.id);
   const saved = ctx.isSaved(offer.id);
   const availability = availabilityLabel(offer);

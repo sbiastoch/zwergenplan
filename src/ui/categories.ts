@@ -3,7 +3,7 @@
  * 24er-Raster) – überall gleich. Die Farbe kommt aus CSS (`.k-<kategorie>`, styles.css).
  * Quelle: docs/design/stickerheft-mockup.html (SHAPES, CATS).
  */
-import { type Category, categoriesOf, type Topic } from "../domain/topics.ts";
+import type { Category } from "../domain/topics.ts";
 
 const SHAPES = {
   circle: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z",
@@ -35,8 +35,3 @@ export const CATEGORY_UI: Record<Category, { short: string; shape: string }> = {
   natur: { short: "Natur", shape: SHAPES.leaf },
   beratung: { short: "Beratung", shape: SHAPES.plus },
 };
-
-/** Leitkategorie eines Angebots (erste in der festen Reihenfolge) – bestimmt Farbe und Form. */
-export function primaryCategory(topics: readonly Topic[]): Category {
-  return categoriesOf(topics)[0] ?? "treffs-cafes";
-}

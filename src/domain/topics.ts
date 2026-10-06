@@ -85,3 +85,14 @@ export function categoriesOf(topics: readonly Topic[]): Category[] {
   const found = new Set<Category>(topics.flatMap((t) => TOPIC_CATEGORIES[t]));
   return CATEGORIES.filter((c) => found.has(c));
 }
+
+/**
+ * Leitkategorie eines Angebots – bestimmt Etikett, Farbe und Form. Liegt eine seiner Kategorien im Fokus
+ * (gewählter Kategoriefilter), gewinnt die erste davon, sonst die erste überhaupt (feste Reihenfolge).
+ * `focus` ist Pflicht, damit keine Aufrufstelle den Filter still vergisst (Plan 0014, E1).
+ */
+export function leadCategory(topics: readonly Topic[], focus: readonly Category[]): Category {
+  const cats = categoriesOf(topics);
+  // Rückfall nur für den Typ: Das Schema verbietet Angebote ohne Kategorie.
+  return cats.find((c) => focus.includes(c)) ?? cats[0] ?? "treffs-cafes";
+}

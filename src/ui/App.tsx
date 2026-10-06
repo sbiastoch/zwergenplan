@@ -9,6 +9,7 @@ import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
+import { leadCategory } from "../domain/topics.ts";
 import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
 import {
@@ -181,6 +182,7 @@ export function App() {
     isUnfit: (id) => views.unfitIds.has(id),
     reachOf: views.reachOf,
     reachPending: reachMode?.kind === "laedt",
+    categoryOf: (offer) => leadCategory(offer.topics, route.filter.categories),
     onToggleSave,
     onOpen: (offer, day) => {
       setDetailDay(day);

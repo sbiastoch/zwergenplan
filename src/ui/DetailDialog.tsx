@@ -7,8 +7,7 @@ import { seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
-import { CATEGORY_LABELS } from "../domain/topics.ts";
-import { primaryCategory } from "./categories.ts";
+import { CATEGORY_LABELS, type Category } from "../domain/topics.ts";
 import {
   ageRangeLabel,
   availabilityLabel,
@@ -38,6 +37,8 @@ interface DetailProps {
   reach: Reach | undefined;
   /** Wegzeit lädt: Platzhalter statt Entfernung (Plan 0009, E11) */
   reachPending: boolean;
+  /** Leitkategorie, wie auf der Kachel (`CardContext.categoryOf`, Plan 0014, E2) */
+  category: Category;
   saved: boolean;
   onToggleSave: (offer: SiteOffer) => void;
   onClose: () => void;
@@ -57,6 +58,7 @@ export function DetailContent({
   origin,
   reach,
   reachPending,
+  category,
   saved,
   onToggleSave,
   onClose,
@@ -64,7 +66,6 @@ export function DetailContent({
   onIcs,
 }: DetailProps) {
   const [allDates, setAllDates] = useState(false);
-  const category = primaryCategory(offer.topics);
   const fromCalendar = day ? sessionOnDay(offer, day) : undefined;
   const ref = referenceSession(offer, now, day);
   const upcoming = upcomingSessions(offer, now);

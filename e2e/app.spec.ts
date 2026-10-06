@@ -106,6 +106,46 @@ test("ungültiges Geburtsdatum wird erklärt und nicht gespeichert", async ({ pa
   await expect(page.getByRole("button", { name: /^Kind und Einstellungen/ })).toContainText("Alter?");
 });
 
+test.describe("Kategorie-Etikett folgt dem Filter (Plan 0014)", () => {
+  const pill = (page: Page, title: string) => offers(page).filter({ hasText: title }).locator(".pill");
+
+  test("ohne Filter die erste Kategorie, mit Filter die gewählte, auch im Detail", async ({ page }) => {
+    await expect(pill(page, "Babykonzert im Advent")).toHaveText("Musik & Singen");
+
+    await page.goto("./?kat=buehne");
+    await expect(pill(page, "Babykonzert im Advent")).toHaveText("Bühne & Konzert");
+    await offers(page).filter({ hasText: "Babykonzert im Advent" }).getByRole("heading").getByRole("button").click();
+    const detail = page.getByRole("dialog", { name: "Babykonzert im Advent" });
+    await expect(detail.locator(".catname")).toHaveText("Bühne & Konzert");
+  });
+
+  for (const [kat, title, label] of [
+    ["buecher", "Krabbelreime & Fingerspiele", "Bücher & Vorlesen"],
+    ["treffs-cafes", "Offener Krabbeltreff", "Treffs & Cafés"],
+  ] as const) {
+    test(`?kat=${kat}: „${title}“ trägt „${label}“, die Pille passt hell und dunkel`, async ({ page }) => {
+      await page.goto(`./?kat=${kat}`);
+      await expect(pill(page, title)).toHaveText(label);
+      // Diese Pille erscheint auf Fixture-Kacheln erst mit Plan 0014 (Review, Finding 3).
+      for (const colorScheme of ["light", "dark"] as const) {
+        await page.emulateMedia({ colorScheme });
+        await expectMobileUx(page);
+      }
+    });
+  }
+
+  test("Kalender: der Punkt im Monatsraster trägt die gewählte Kategorie", async ({ page }) => {
+    await page.goto("./?kat=buehne");
+    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+    await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
+    await page.getByRole("button", { name: "Nächster Monat" }).click();
+    await page.getByRole("button", { name: "Nächster Monat" }).click();
+    const day = page.getByRole("button", { name: /^Sonntag, 6\. Dezember, 1 Angebot$/ });
+    await expect(day.locator("span.k-buehne")).toHaveCount(1);
+    await expect(day.locator("span.k-musik")).toHaveCount(0);
+  });
+});
+
 test("Leerzustand bei Filtern ohne Treffer, Zurücksetzen hilft", async ({ page }) => {
   await page.goto("./?kat=wasser");
   await expect(page.getByText("Diese Seite ist noch leer")).toBeVisible();

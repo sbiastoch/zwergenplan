@@ -118,7 +118,7 @@ Detail, Filter-Sheet und Kind-Sheet sind `<dialog>` mit `showModal()`. Das bring
 
 Aufbau wie im Mockup:
 - `article.card` (`data-testid="offer"`), Rotation abwechselnd ±0,6°.
-- Kopfzeile: Kategorie-Pille (Farbe und Form der **ersten** Kategorie aus `categoriesOf`) und Uhrzeit „10:00–11:30 Uhr“.
+- Kopfzeile: Kategorie-Pille (Farbe und Form der **ersten** Kategorie aus `categoriesOf`; geändert durch Plan 0014, E1: bei aktivem Kategoriefilter die erste gewählte) und Uhrzeit „10:00–11:30 Uhr“.
 - Titel als `h3` mit einem Button, der per `::after` die ganze Kachel abdeckt (Stretched-Button). So bleibt der Name des Buttons kurz (Titel), es gibt eine Überschriften-Navigation, und die ganze Fläche ist klickbar. Das Herz liegt darüber (`z-index`).
   - Das Touch-Gate misst das Rechteck des Buttons, nicht `::after`. Der Button ist deshalb `display: flex; align-items: center; min-height: 44px` mit `margin: -10px 0`; optisch bleibt die Zeile gleich hoch.
   - Fokus: eigener `:focus-visible`-Rahmen am Button (das Fokus-Gate prüft das fokussierte Element selbst).
@@ -195,7 +195,7 @@ Inhalt wie im Mockup:
 ### E14 – Kalender
 
 - Wochenleiste (Mo–So) mit Navigation. Vergangene Tage sind `disabled` (axe ignoriert so den gedimmten Kontrast). Unter jedem Tag bis zu 3 Kategorie-Formen der Angebote des Tages.
-- „Ganzen Monat zeigen“ klappt ein Monatsraster auf (Mo-erste Spalte, Formpunkt der ersten Kategorie). Ein Tag dort wählt den Tag und klappt zu.
+- „Ganzen Monat zeigen“ klappt ein Monatsraster auf (Mo-erste Spalte, Formpunkt der ersten Kategorie; geändert durch Plan 0014, E1). Ein Tag dort wählt den Tag und klappt zu.
 - Darunter die Agenda des gewählten Tages: alle gefilterten Angebote mit einem Termin an diesem Berliner Tag, nach Uhrzeit. Leer: „Freier Tag“.
 - Grenzen: Zurück ist ab der aktuellen Woche bzw. dem aktuellen Monat gesperrt. Vor ist gesperrt, wenn die Woche bzw. der Monat nach dem letzten Termin der Daten beginnt.
 - Domäne `agenda.ts`: `sessionsByDay(offers)` → `Map<Tag, { offer, session }[]>` nach Uhrzeit, einmal je Filterstand berechnet (bei 2 889 Terminen wäre eine Suche je Rasterzelle zu teuer). `weekDays(isoDate)` → 7 ISO-Daten ab Montag, `monthDays(isoDate)` → `{ lead, days }` (der 1. bekommt `grid-column-start`, keine Leerzellen), `lastSessionDay(offers)`. Kalendertage immer über `berlinIsoDate`.

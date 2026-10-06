@@ -1,6 +1,6 @@
 # Plan 0014 – Das Kategorie-Etikett folgt dem Filter
 
-Status: Review eingearbeitet, freigegeben zur Umsetzung
+Status: umgesetzt auf Branch `fix-filter-etikett`; Deploy und Browser-Review live folgen (Schritte 6–7)
 Datum: 2026-10-06
 Bezug: Plan 0003 (E9 Kachel, E10 Kategorien), `src/domain/topics.ts`, `src/ui/categories.ts`
 
@@ -119,8 +119,8 @@ Test-first. Der Unit-Test ist zuerst rot, weil `leadCategory` noch fehlt. Der E2
 **E2E (`e2e/app.spec.ts`, Fixture-Daten, alle Geräte)**
 
 - `./?kat=buehne`: Die Kachel „Babykonzert im Advent“ zeigt „Bühne & Konzert“. Nach Tipp auf den Titel (`getByRole("heading").getByRole("button")`, wie `e2e/pwa.spec.ts`) zeigt auch `page.getByRole("dialog", { name: "Babykonzert im Advent" }).locator(".catname")` „Bühne & Konzert“.
-- `./?kat=buecher`: Die Kachel „Krabbelreime & Fingerspiele“ zeigt „Bücher & Vorlesen“. Danach läuft `expectMobileUx(page)`, denn diese Pille erscheint auf Fixture-Kacheln zum ersten Mal (Review, Finding 3). Das Theme deckt der Geräte- bzw. Farbschema-Lauf der Suite ab, wie bei den anderen `expectMobileUx`-Aufrufen in `app.spec.ts`.
-- `./?kat=treffs-cafes`: Die Kachel „Offener Krabbeltreff“ zeigt „Treffs & Cafés“, ebenfalls mit `expectMobileUx(page)`.
+- `./?kat=buecher`: Die Kachel „Krabbelreime & Fingerspiele“ zeigt „Bücher & Vorlesen“. Danach läuft `expectMobileUx(page)` hell und dunkel (`emulateMedia`), denn diese Pille erscheint auf Fixture-Kacheln zum ersten Mal (Review, Finding 3).
+- `./?kat=treffs-cafes`: Die Kachel „Offener Krabbeltreff“ zeigt „Treffs & Cafés“, ebenfalls mit `expectMobileUx(page)` hell und dunkel.
 - Kalender (Review, Finding 1b): `./?kat=buehne`, Tab Kalender, „Ganzen Monat zeigen“, bis Dezember blättern. Der Tag 6. Dezember im Monatsraster enthält `span.k-buehne` und kein `span.k-musik`.
 - `./` ohne Filter: „Babykonzert im Advent“ zeigt weiter „Musik & Singen“. Das sichert ab, dass sich ohne Filter nichts ändert.
 - Prüft nur die Pille der jeweiligen Kachel (`offers(page).filter({ hasText })`, darin `.pill`) bzw. `.catname` im Dialog. Die bestehenden Layout- und Text-Gates decken die Darstellung ab, längere Labels gibt es nicht, denn es sind dieselben zwölf.
@@ -159,3 +159,10 @@ Keine Blocker. Alle Findings übernommen:
 4. **Minor: Ein unsichtbarer Filter ändert Etiketten in der Merkliste.** → Die Abwägung steht jetzt in E3. Wir bleiben bei „überall gleich“, weil sonst Detail und Kachel auseinanderliefen. Schritt 7 prüft den Fall im Browser.
 5. **Minor: Plan 0003 beschreibt den alten Stand.** → Hinweise an E9 und E14 (Struktur, Schritt 4).
 6. **Minor: Dialog-Selektor zu offen.** → Rolle und Name des Dialogs, Titel per `heading` → `button` (Tests).
+
+## Ergebnis (2026-10-06)
+
+- **Test-first:** `src/domain/topics.test.ts` war rot (5 von 5), weil `leadCategory` fehlte. Die vier neuen E2E-Tests in `e2e/app.spec.ts` waren gegen den alten UI-Stand rot (`pixel-7`). Danach waren alle grün.
+- **Lokal:** `pnpm check:fast` grün. `app`, `calendar`, `detail` und `saved` liefen auf `pixel-7`, `android-klein` und `desktop`, 135 von 135 grün. WebKit (`iphone-15`) prüft die CI.
+- **Start-JS** (Review, Finding 2): 91,73 kB auf `origin/main` (`5c3c140`), 91,77 kB mit dem Fix, also +0,04 kB. Budget 92 kB, die Reserve beträgt danach 0,23 kB.
+- **Abweichungen vom Plan:** keine. `WeekStrip` und `MonthGrid` bekommen `categoryOf` mit dem Typ `CardContext["categoryOf"]`.

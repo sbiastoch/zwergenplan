@@ -7,7 +7,6 @@ import { type DayAgenda, dayAgenda, monthDays, type Occurrence } from "../domain
 import { type CalendarNav, calendarNav, clampDay } from "../domain/calendar.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { parseIsoDate } from "../domain/time.ts";
-import { primaryCategory } from "./categories.ts";
 import { agendaHeading, hiddenNote, longDate, monthTitle, plural, weekdayShort, weekTitle } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
 import { EmptyState } from "./ListView.tsx";
@@ -95,7 +94,16 @@ export function CalendarView({
   return (
     <>
       {!monthOpen && (
-        <WeekStrip nav={nav} day={day} today={today} agendaOf={agendaOf} label={label} pick={pick} go={go} />
+        <WeekStrip
+          nav={nav}
+          day={day}
+          today={today}
+          agendaOf={agendaOf}
+          categoryOf={ctx.categoryOf}
+          label={label}
+          pick={pick}
+          go={go}
+        />
       )}
       <button ref={monthButton} type="button" className="monthbtn" aria-expanded={monthOpen} onClick={toggleMonth}>
         {monthOpen ? "Monat zuklappen" : "Ganzen Monat zeigen"}
@@ -107,6 +115,7 @@ export function CalendarView({
           today={today}
           nav={nav}
           agendaOf={agendaOf}
+          categoryOf={ctx.categoryOf}
           label={label}
           onPick={(d) => {
             pick(d);
@@ -182,6 +191,7 @@ function WeekStrip({
   day,
   today,
   agendaOf,
+  categoryOf,
   label,
   pick,
   go,
@@ -190,6 +200,7 @@ function WeekStrip({
   day: string;
   today: string;
   agendaOf: (d: string) => DayAgenda<SiteOffer>;
+  categoryOf: CardContext["categoryOf"];
   label: (d: string) => string;
   pick: (d: string) => void;
   go: (target: string | undefined) => () => void;
@@ -236,7 +247,7 @@ function WeekStrip({
                 {agendaOf(d)
                   .items.slice(0, 3)
                   .map((o) => {
-                    const c = primaryCategory(o.offer.topics);
+                    const c = categoryOf(o.offer);
                     return (
                       <span key={`${o.offer.id}-${o.session.start}`} className={`k-${c}`}>
                         <Shape category={c} ink={false} />
@@ -257,6 +268,7 @@ function MonthGrid({
   today,
   nav,
   agendaOf,
+  categoryOf,
   label,
   onPick,
   go,
@@ -265,6 +277,7 @@ function MonthGrid({
   today: string;
   nav: CalendarNav;
   agendaOf: (d: string) => DayAgenda<SiteOffer>;
+  categoryOf: CardContext["categoryOf"];
   label: (d: string) => string;
   onPick: (d: string) => void;
   go: (target: string | undefined) => () => void;
@@ -301,7 +314,7 @@ function MonthGrid({
         ))}
         {month.days.map((d, i) => {
           const [first] = agendaOf(d).items;
-          const c = first && primaryCategory(first.offer.topics);
+          const c = first && categoryOf(first.offer);
           return (
             <button
               key={d}

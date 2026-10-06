@@ -115,6 +115,7 @@ export function Overlays(props: OverlaysProps) {
             origin={origin}
             reach={ctx.reachOf(detailOffer)}
             reachPending={ctx.reachPending}
+            category={ctx.categoryOf(detailOffer)}
             saved={ctx.isSaved(detailOffer.id)}
             onToggleSave={onToggleSave}
             onClose={closeDetail}
