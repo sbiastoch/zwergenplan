@@ -19,6 +19,9 @@ export default defineConfig({
         "scripts/lib/push-schedule.ts",
         "src/sw/routes.ts",
         "src/sw/retire.ts",
+        // Push im Service Worker (Plan 0017, E10)
+        "src/sw/push-decision.ts",
+        "src/sw/push-tailor.ts",
       ],
       exclude: ["**/*.test.ts", "src/domain/test-fixtures.ts"],
       thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 },
