@@ -58,7 +58,6 @@ async function openProviders(page: Page) {
   await expect(page.locator(".place.idle")).toHaveCount(1);
 }
 
-/** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
 async function setBirthDate(page: Page, text: string) {
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await page.getByLabel("Geburtsdatum").fill(text);
@@ -67,6 +66,7 @@ async function setBirthDate(page: Page, text: string) {
   await expect(page.getByRole("dialog", { name: "Kind und Einstellungen" })).toBeHidden();
 }
 
+/** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
 const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-fehler"]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */

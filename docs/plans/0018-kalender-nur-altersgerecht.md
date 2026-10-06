@@ -176,7 +176,7 @@ Formatiert in `src/ui/format.ts` mit den vorhandenen Helfern (`plural`, Datum oh
 2. **Lader (E5)** mit Unit-Test, Regeln und Kanarienvogel. Fertig, wenn `pnpm arch` grün ist und der Kanarienvogel rot wird.
 3. **UI (E2–E4):** `seriesToast`/`collectionToast` mit Tests, `say(message, ms?)`, Alterszeile, Detail, Merkliste, `generatedAt` durchreichen. Fertig, wenn `pnpm check:fast` grün ist.
 4. **E2E** mit Fixture-Daten und Uhr 5.10.2026.
-   - Geburtsdatum und Merkliste kommen per `addInitScript` (`zwergenplan.geburtsdatum`, `zwergenplan.merkliste`, wie `layout.spec.ts:392`). Das Detail wird per `?angebot=<id>` geöffnet. Grund: `nur-passende` ist Standard und blendet unpassende Angebote in „Entdecken“ aus.
+   - Geburtsdatum und Merkliste kommen per `addInitScript` (`zwergenplan.geburtsdatum`, `zwergenplan.merkliste`, wie `layout.spec.ts:392`). Das Detail wird per `?angebot=<id>` geöffnet. Grund: Der Altersfilter ist Standard an und blendet unpassende Angebote in „Entdecken“ aus (bis Plan 0021 hieß er `nur-passende`).
    - Weil der Klick auf den Chunk wartet (E2), braucht es kein `startPreloads`. Der Test wartet auf das `download`-Ereignis.
    - Erwartungen:
    - Detail „Offener Krabbeltreff“, Geburtsdatum 2024-09-18 (24 Monate am 14.10., 25 am 21.10.): Download mit **2** VEVENTs (7.10., 14.10.). Ihre UIDs sind eine Teilmenge der statischen Datei. Toast „… mit 2 Terminen geladen – bis 14.10., danach passt es nicht mehr zum Alter“.
