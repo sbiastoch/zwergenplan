@@ -589,6 +589,7 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 - Zu entscheiden (Rückfrage an den Nutzer, kein Anheben ohne ADR): welche Start-Funktion lazy wird. Kandidaten aus E5: der Platzhalter von `NewsBlock` (Liste hält bei `neu` zurück wie `ListPending`); weitere nach Messung auf dem dann aktuellen `main`.
 - **Neu gemessen (2026-10-06, `main` c4861bb, nach Plan 0014): 91,77 kB** von 92 kB, also 0,23 kB Rest.
 - **Entscheidung (2026-10-06, Vorschlag angenommen, Budget bleibt 92 kB):** Der Platzhalter von `NewsBlock` kommt **nicht** ins Start-Bundle. Bei `neu` hält die Liste zurück, bis der Lazy-Chunk mit `NewsBlock` geladen ist (gleiche Mechanik wie `ListPending`, Plan 0009). Im Start bleiben nur das Flag `neu` in `route.ts` und die Prüfung „Push an?“ → `import("./push-start.ts")`. Liegt `JS (initial)` nach Schritt 10 trotzdem über 92 kB, gibt es eine erneute Rückfrage, kein Anheben.
+- **Überholt am 2026-10-06 durch Plan 0019 (E9):** Der Nutzer hat das Budget auf 100 kB angehoben (Nachtrag in ADR 0012). Die Schwelle für die Rückfrage ist damit 100 kB. Wer Stufe 2 merged, misst neu und trägt sein Delta in die Tabelle in ADR 0012 ein.
 
 7. **Infrastruktur** (Nutzer-Schritte, Anleitung hier):
    - Cloudflare-Konto, `pnpm exec wrangler login`, KV-Namespace anlegen (ID in `push-worker/wrangler.toml`);

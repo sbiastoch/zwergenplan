@@ -815,6 +815,32 @@ test("Detail mit zwei Linien: sichtbar „→“, vorgelesen „, dann“, in ei
   await expectTwoLines(reach, "ca. 30 Min. mit Tram 1, dann Bus 2 ab Gostenhof");
 });
 
+// Plan 0019, E3: Der Link nach Google Maps trägt nur die Adresse, nie den Startpunkt – mit Stadtteil wie mit Punkt.
+for (const [label, key, value] of [
+  ["Stadtteil", KEY, "gostenhof"],
+  ["gespeicherter Punkt", POINT_KEY, STORED_HERE],
+] as const) {
+  test(`Route in Google Maps mit Startpunkt (${label}): Wegzeit in der Kachel, Link ohne Startpunkt`, async ({
+    page,
+  }) => {
+    await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key, value });
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText("mit Bus & Bahn");
+    await page
+      .getByRole("heading", { level: 3, name: /Kuckuck im Nest/ })
+      .getByRole("button")
+      .click();
+    const link = page.getByRole("dialog").getByRole("link", { name: /Route in Google Maps/ });
+    await expect(link.locator(".reach-long")).toContainText("Min.");
+    const href = await link.getAttribute("href");
+    expect(href).toBe(
+      "https://www.google.com/maps/dir/?api=1&destination=B%C3%BChnenplatz+2%2C+90429+N%C3%BCrnberg&travelmode=transit",
+    );
+    expect(href).not.toMatch(COORDINATE);
+    expect(href).not.toMatch(/origin|gostenhof/i);
+  });
+}
+
 test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
   test.describe("abgebrochen", () => {
     // Der abgebrochene Request meldet sich je nach Engine in der Konsole.

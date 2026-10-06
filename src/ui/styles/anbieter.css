@@ -97,11 +97,9 @@
     gap: 8px;
   }
   .provider-venues li {
-    display: flex;
-    flex-direction: column;
     overflow-wrap: anywhere;
   }
-  .provider-venues span,
+  .provider-venues span:not(.route-hint),
   .provider-none {
     color: var(--muted);
   }

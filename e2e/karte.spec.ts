@@ -215,8 +215,16 @@ test.describe("mit gemockten Kacheln", () => {
     await openMap(page);
     await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
-    // .place-where > span: nur der Wrapper steht als eigene Zeile, nicht Pfeil und „, dann“
+    // .place-route > span: nur der Wrapper steht als eigene Zeile, nicht Pfeil und „, dann“
     await expectTwoLines(sheet.locator(".reach-long"), "ca. 15 Min. mit Tram 1, dann Bus 202E ab Gostenhof");
+    // Plan 0019, E5: Adresse und Wegzeit sind ein Link zur Route in Google Maps, ohne Startpunkt
+    const route = sheet.getByRole("link", { name: /Route in Google Maps/ });
+    await expect(route).toContainText("Beispielstraße 1, 90402 Nürnberg");
+    await expect(route).toHaveAttribute(
+      "href",
+      "https://www.google.com/maps/dir/?api=1&destination=Beispielstra%C3%9Fe+1%2C+90402+N%C3%BCrnberg&travelmode=transit",
+    );
+    await expect(route).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   test("Wegzeit: Öffnen der Karte lädt die Tabelle, Orts-Liste mit Minuten nach Wegzeit sortiert (Plan 0009, E9/E11)", async ({

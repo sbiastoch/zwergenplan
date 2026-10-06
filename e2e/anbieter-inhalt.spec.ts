@@ -203,8 +203,23 @@ test.describe("Anbieter-Sheet", () => {
     await expect(sheet(page).getByRole("heading", { level: 3, name: "Orte" })).toBeVisible();
     const venues = sheet(page).locator(".provider-venues li");
     await expect(venues).toHaveCount(2);
-    await expect(venues.nth(0)).toHaveText(/^Turnhalle Beispiel\s*Sportweg 3, 90441 Nürnberg · Schweinau$/);
-    await expect(venues.nth(1)).toHaveText(/^Gymnastikraum Beispiel\s*Am Beispielpark 7, 90480 Nürnberg$/);
+    await expect(venues.nth(0)).toHaveText(
+      /^Turnhalle Beispiel\s*Sportweg 3, 90441 Nürnberg · Schweinau\s*Route in Google Maps$/,
+    );
+    await expect(venues.nth(1)).toHaveText(
+      /^Gymnastikraum Beispiel\s*Am Beispielpark 7, 90480 Nürnberg\s*Route in Google Maps$/,
+    );
+    // Plan 0019, E5: Jeder Ort ist ein Link zur Route in Google Maps, nur mit der Adresse als Ziel
+    const routes = venues.getByRole("link", { name: /Route in Google Maps/ });
+    await expect(routes).toHaveCount(2);
+    const maps = "https://www.google.com/maps/dir/?api=1&destination=";
+    await expect(routes.nth(0)).toHaveAttribute("href", `${maps}Sportweg+3%2C+90441+N%C3%BCrnberg&travelmode=transit`);
+    await expect(routes.nth(1)).toHaveAttribute(
+      "href",
+      `${maps}Am+Beispielpark+7%2C+90480+N%C3%BCrnberg&travelmode=transit`,
+    );
+    await expect(routes.nth(0)).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(routes.nth(0)).toHaveAttribute("target", "_blank");
     await expect(sheet(page).getByRole("heading", { level: 3, name: "Kommende Angebote (0)" })).toBeVisible();
   });
 });

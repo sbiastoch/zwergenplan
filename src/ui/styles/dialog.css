@@ -151,12 +151,15 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    transform: rotate(var(--tilt));
   }
-  .label:nth-child(odd) {
-    transform: rotate(-0.5deg);
+  /* Drehung als Variable, damit `:active` der Routen-Kachel sie behält (Plan 0019, E5). Gezählt werden nur Kacheln:
+     Die Karte „Wege ab …“ im Grid kippt die übrigen nicht um, wenn sie mit den Linien dazukommt (Review 2, N1). */
+  .label:nth-child(odd of .label) {
+    --tilt: -0.5deg;
   }
-  .label:nth-child(even) {
-    transform: rotate(0.5deg);
+  .label:nth-child(even of .label) {
+    --tilt: 0.5deg;
   }
   .label.full {
     grid-column: 1 / -1;
@@ -200,6 +203,48 @@
   .label span.ok {
     color: var(--ink);
     font-weight: 700;
+  }
+
+  /* Route in Google Maps (Plan 0019, E5): Kachel „Wo“, Orte im Anbieter-Sheet, Ortszeile im Orts-Sheet. Die ganze
+     Fläche ist der Link; sie sieht aus wie eine Kachel und gibt beim Tippen nach wie ein Knopf. */
+  a.label.route,
+  .venue-route,
+  .place-route {
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .venue-route,
+  .place-route {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 14px 14px 14px 4px;
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 10px 12px;
+  }
+  a.label.route:active,
+  .venue-route:active,
+  .place-route:active {
+    transform: translate(2px, 2px) rotate(var(--tilt, 0deg));
+    box-shadow: 0 0 0 var(--shadow);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  /* gegen `.label span:not(.cap)` (gleiche Spezifität, steht danach): eigene Farbe, nie Silbentrennung */
+  .label span.route-hint,
+  .route-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--ink);
+    hyphens: manual;
   }
   /* Wegzeit mit Linien (ReachLong.tsx, Plan 0012, E10), im Detail und im Orts-Sheet: Die Namen tragen U+00A0;
      gegen `overflow-wrap: anywhere` von .place-where bricht „202E“ nie mitten im Namen, nur am Leerzeichen nach

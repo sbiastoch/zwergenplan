@@ -1,5 +1,5 @@
 [
-  { "name": "JS (initial)", "path": "dist/assets/*.js", "limit": "92 kB", "gzip": true },
+  { "name": "JS (initial)", "path": "dist/assets/*.js", "limit": "100 kB", "gzip": true },
   { "name": "CSS", "path": "dist/assets/*.css", "limit": "15 kB", "gzip": true },
   { "name": "Karte JS (lazy)", "path": "dist/assets/karte/*.js", "limit": "450 kB", "gzip": true },
   { "name": "Karte CSS (lazy)", "path": "dist/assets/karte/*.css", "limit": "12 kB", "gzip": true },

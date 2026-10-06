@@ -6,7 +6,7 @@ Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt 
 
 - Familie und Freunde öffnen den Zwergenplan fast nur auf dem Handy. Ohne Manifest gibt es kein eigenes Icon und keinen Vollbild-Start. Ohne Netz bricht die Seite mit „Keine Verbindung“ ab.
 - `docs/architecture.md` erlaubt Daten- und Gerätezugriff außerhalb von `src/data` nur per ADR. Ein Service Worker cacht Antworten und beantwortet Requests der Seite. Das ist ein solcher Zugriff.
-- Das Start-JS liegt am Budget (90 kB gzip, seit ADR 0012 92 kB). Neue Logik im Start-Bundle braucht einen Grund.
+- Das Start-JS liegt am Budget (90 kB gzip, seit ADR 0012 92 kB; seit Plan 0019 100 kB, Nachtrag in ADR 0012). Neue Logik im Start-Bundle braucht einen Grund.
 
 ## Entscheidung
 
