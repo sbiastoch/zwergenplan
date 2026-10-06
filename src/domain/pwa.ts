@@ -49,3 +49,19 @@ export function installHelp(state: InstallState): InstallHelp | undefined {
       return undefined;
   }
 }
+
+/**
+ * Was `pushSupport()` (src/data/push.ts) meldet: `kein-sw` heißt nur „gerade kein Service Worker“ (blockiert,
+ * Erstbesuch vor der Registrierung, Notausgang), nicht „Browser kann nicht“ (Plan 0017, Runde 3 M1).
+ */
+export type PushSupport = "ok" | "kein-sw" | "kein-push" | "verweigert";
+
+export type PushView = { kind: "teil" } | { kind: "hinweis"; text: string } | { kind: "nichts" };
+
+/** Sichtbarkeit des Push-Teils im Abschnitt „Als App“ (Plan 0017, E7, Matrix) */
+export function pushView(state: InstallState, support: PushSupport): PushView {
+  if (support === "ok" || support === "verweigert") return { kind: "teil" };
+  if (state === "ios") return { kind: "hinweis", text: "Benachrichtigungen gibt es in der App." };
+  if (state === "keine" || support === "kein-sw") return { kind: "nichts" };
+  return { kind: "hinweis", text: "Dieser Browser kann keine Benachrichtigungen." };
+}

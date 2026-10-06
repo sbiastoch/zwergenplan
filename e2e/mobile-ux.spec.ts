@@ -107,6 +107,8 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
     // Abschnitt „Als App“ geladen (Lazy-Chunk, Plan 0011, E7): Die Gates prüfen sein Ergebnis, nicht den Platzhalter
     await expect(page.locator(".app-pending")).toHaveCount(0);
+    // Push-Teil entschieden (Plan 0017, E7): data-push in jedem Zweig, auch wenn der Abschnitt leer bleibt
+    await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
   },
   // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „Wegzeit ab … (Di vormittags …)“
   "entdecken-wegzeit": async (page) => {

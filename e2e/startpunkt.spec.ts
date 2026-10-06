@@ -47,6 +47,8 @@ async function openKidSheet(page: Page) {
   await expect(sheet).toBeVisible();
   // Abschnitt „Als App“ geladen (Lazy-Chunk beim Öffnen, für alle gleich; Plan 0011, E5): erst danach zählen
   await expect(sheet.locator(".app-pending")).toHaveCount(0);
+  // Push-Teil entschieden (Plan 0017, E7): data-push in jedem Zweig, auch wenn der Abschnitt leer bleibt
+  await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
   return sheet;
 }
 

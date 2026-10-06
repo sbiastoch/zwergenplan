@@ -7,11 +7,12 @@
  * Zuschnitt im Service Worker. Die Umgebung ist injizierbar wie in `geolocation.ts`.
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
+import type { PushSupport } from "../domain/pwa.ts";
 import type { DeviceKey } from "./device-store.ts";
-import * as deviceStore from "./device-store.ts";
+// benannt statt `import * as`: ein Namensraum-Objekt zöge den Export-Helfer von rolldown in den Einstieg (+0,07 kB)
+import { clear, get, set } from "./device-store.ts";
 import type { StoredOriginPoint } from "./preferences.ts";
 
-export type PushSupport = "ok" | "kein-sw" | "kein-push" | "verweigert";
 export type PushProblem = "verweigert" | "abo" | "netz" | "server";
 
 export class PushError extends Error {
@@ -76,7 +77,7 @@ function browserEnv(): PushEnv {
       return sw.ready;
     },
     fetch: (url, init) => fetch(url, { ...init, headers: { "content-type": "application/json" } }),
-    store: deviceStore,
+    store: { get, set, clear },
   };
 }
 
