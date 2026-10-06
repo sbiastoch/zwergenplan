@@ -1,0 +1,10 @@
+# Push-Worker des Zwergenplans (Plan 0011, E11; Plan 0017; ADR 0014). Deploy: pnpm push:deploy
+# Secret PUSH_ADMIN_TOKEN: pnpm exec wrangler secret put PUSH_ADMIN_TOKEN -c push-worker/wrangler.toml
+name = "zwergenplan-push"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "PUSH"
+id = "f862e197f63a49af851023046e2c10a9"

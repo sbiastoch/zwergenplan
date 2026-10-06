@@ -8,9 +8,19 @@
     "src/**/*.test.ts",
     "scripts/**/*.test.ts",
     "src/sw/sw.ts",
-    "src/sw/kill.ts"
+    "src/sw/kill.ts",
+    // Cloudflare Worker der Push-Abos, gebaut von wrangler (Plan 0017)
+    "push-worker/src/index.ts",
+    "push-worker/**/*.test.ts"
   ],
-  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.ts", "e2e/**/*.ts", ".claude/hooks/**/*.ts", "*.ts"],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "push-worker/**/*.ts",
+    "scripts/**/*.ts",
+    "e2e/**/*.ts",
+    ".claude/hooks/**/*.ts",
+    "*.ts"
+  ],
   // @fontsource-variable/roboto: Schriftdatei, nur per require.resolve gelesen (e2e/vitals.ts,
   // scripts/font-fallback.ts); knip erkennt das nicht (Plan 0007, E12)
   "ignoreDependencies": ["tailwindcss", "@swc/core", "@fontsource-variable/roboto"]

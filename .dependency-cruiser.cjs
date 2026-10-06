@@ -276,6 +276,40 @@ module.exports = {
       to: { path: "^scripts/" },
     },
     {
+      name: "push-worker-isolated",
+      severity: "error",
+      comment:
+        "Der Cloudflare Worker push-worker/ (Plan 0011, E11; Plan 0017; ADR 0014) importiert aus dem Repo nur die geteilten Push-Typen und time.ts (Datum mit Offset). Sonst läge App- oder Pipeline-Code im Worker-Bundle. Tests ausgenommen.",
+      from: { path: "^push-worker/", pathNot: "\\.test\\.ts$" },
+      to: { path: "^(src|scripts|e2e|tests)/", pathNot: "^src/domain/(push-types|time)\\.ts$" },
+    },
+    {
+      name: "push-worker-not-imported",
+      severity: "error",
+      comment: "Nichts im Repo importiert den Worker; er wird nur mit wrangler gebaut (Plan 0017).",
+      from: { pathNot: "^push-worker/" },
+      to: { path: "^push-worker/" },
+    },
+    {
+      name: "push-domain-not-in-start",
+      severity: "error",
+      comment:
+        "Domäne der Wochen-Nachricht (Plan 0017, E9): news.ts nutzen nur Service Worker und CI, searches.ts dazu die App-Extras-Oberfläche (Lazy-Chunk). Aus dem übrigen src/ landeten sie im Start-Bundle, das keinen Platz hat. scripts/ bleibt frei; Tests ausgenommen.",
+      from: {
+        path: "^src/",
+        pathNot: ["^src/sw/", "^src/ui/app-extras/", "^src/domain/(news|searches)\\.ts$", "\\.test\\.ts$"],
+      },
+      to: { path: "^src/domain/(news|searches)\\.ts$" },
+    },
+    {
+      name: "push-news-not-in-app",
+      severity: "error",
+      comment:
+        "news.ts (Zuschnitt der Wochen-Nachricht) gehört nur in Service Worker und CI, auch nicht in die App-Extras (Plan 0017, E9).",
+      from: { path: "^src/ui/" },
+      to: { path: "^src/domain/news\\.ts$" },
+    },
+    {
       name: "no-cheerio-in-src",
       severity: "error",
       comment: "HTML-Parsing gehört in die Pipeline, nicht in die App.",

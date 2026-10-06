@@ -9,6 +9,8 @@ const STEPS: Array<[name: string, cmd: string[]]> = [
   ["Typen", ["pnpm", "exec", "tsc", "--noEmit", "-p", "."]],
   // Service Worker mit lib „webworker“, getrennt vom Haupt-tsconfig (Plan 0011, E3)
   ["Typen SW", ["pnpm", "exec", "tsc", "--noEmit", "-p", "src/sw"]],
+  // Cloudflare Worker der Push-Abos mit Workers-Typen (Plan 0011, E11; Plan 0017)
+  ["Typen Worker", ["pnpm", "exec", "tsc", "--noEmit", "-p", "push-worker"]],
   ["Lint", ["pnpm", "exec", "biome", "check", "."]],
   ["Architektur", ["node", "scripts/check-architecture.ts"]],
   ["Daten", ["node", "scripts/validate-data.ts"]],
