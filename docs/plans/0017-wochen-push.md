@@ -1,10 +1,10 @@
 # Plan 0017 – Wochen-Push mit Such-Abos
 
-Status: **freigegeben** (2026-10-06), Review Runde 1 und 2 eingearbeitet; Nachtrag nach dem Rebase auf `main` (Plan 0016, ADR 0017) mit Nutzerentscheidungen 4–6 eingearbeitet, siehe „Nachtrag“. Umsetzung auf Branch `push-0017`.
+Status: **freigegeben** (2026-10-06), Review Runde 1, 2 und 3 eingearbeitet; Nachtrag nach dem Rebase auf `main` (Plan 0016, ADR 0017) mit Nutzerentscheidungen 4–6 eingearbeitet, siehe „Nachtrag“. Umsetzung auf Branch `push-0017`.
 Datum: 2026-10-06 (zuerst als Plan 0015; die Nummer war auf `main` schon vergeben)
 Bezug:
 - **Ersetzt Stufe 2 von Plan 0011** (Push nach jedem Deploy). Stufe 1 von Plan 0011 (installierbare App, Service Worker, Offline) ist live und am Gerät abgenommen. Was aus Plan 0011 gilt, steht unter „Übernommen aus Plan 0011“.
-- **ADR 0014** (Web Push, Entwurf): wird in Schritt 7 überarbeitet (Auslöser wöchentlich, Such-Abos auf dem Gerät) und dann angenommen. ADR 0013 (PWA und Service Worker) gilt unverändert.
+- **ADR 0014** (Web Push, Entwurf): wird in Schritt 7 überarbeitet (Auslöser wöchentlich, Such-Abos auf dem Gerät) und dann angenommen. Es **ändert** ADR 0013 Punkt 5 (`push.ts` liest die Registrierung), ADR 0011 Punkt 6 (Anlass „beim Push“ für `wegzeit.json`) und **ergänzt** ADR 0017 Punkt 1 und 3 (der Startpunkt liegt zusätzlich im Geräte-Speicher), siehe E0. Sonst gilt ADR 0013 unverändert.
 - Spike-Ergebnis in Plan 0011 (iOS 26.5): gilt vollständig.
 - Domäne aus Plan 0011, Schritt 8, liegt schon auf dem Branch `worktree-push-0011-s2` (`7b5ec18`): `src/domain/news.ts`, `push-payload.ts`, `push-types.ts`. Dieser Plan baut sie um (E4, E5).
 
@@ -42,7 +42,7 @@ Nutzerentscheidungen dazu (2026-10-06):
 - **E5b** Architekturregeln: `src/data/push.ts` ist der einzige Ort für `PushManager` und `Notification`, `src/data/pwa.ts` für Service Worker und Badge; Schicht `src/sw/`; die dependency-cruiser-Regeln `sw-isolated`, `sw-not-imported`, `no-zod-in-sw`, `app-extras-*`, `app-data-only-lazy`, `news-not-in-start`, `push-worker-isolated`, `web-push-only-in-push-send`; Biome-Globals; Kanarienvögel für jedes neue Gate.
 - **E8** Geräte-Speicher `src/data/device-store.ts` (IndexedDB `zwergenplan`, Store `kv`, `get`/`set`/`del`, ohne npm-Paket). Die gespiegelten Einträge erweitert E6 dieses Plans.
 - **E10** Push im Service Worker: Payload aus `event.notification`, sonst `event.data.json()`; `now` = `data.sentAt`; **hartes Limit 5 s** mit `Promise.race` und `AbortSignal.timeout(4000)`; `navigate` in jedem `showNotification`; kein `setAppBadge`; mit `event.notification` bei Fehler oder Zeitablauf **nichts** anzeigen (das System zeigt die deklarative Fassung), ohne `event.notification` die vorgeschlagene selbst anzeigen; `notificationclick` für Chromium/Firefox; `pushsubscriptionchange`. Die reine Entscheidung steckt in `src/sw/push-decision.ts`.
-- **E11** Cloudflare Worker `push-worker/` vollständig: Routen `POST /abo`, `DELETE /abo`, `GET /abos`, `POST /abos/loeschen`, `GET /version`; Origin-Prüfung, Allowlist der Push-Dienste, Größe ≤ 2 kB, höchstens 500 Abos, Rate-Limit 10 je IP und Stunde; Gates für `push-worker/` (vitest, „Typen Worker“, knip, dependency-cruiser); devDependencies `wrangler`, `@cloudflare/workers-types`, `web-push`, `@types/web-push`. VAPID mit `subject: "https://zwergenplan.app/"`, `topic: "neueangebote"`, 404/410 → aufräumen, Ausgabe nur als Zahlen, Fehler beim Senden sind `::warning::` mit Exit 0. Testversand `--dry-run`, `--force` und `--only=<hash-präfix>`, „Geräte-Kennung“ (erste 8 Zeichen des `endpointHash`) im Abschnitt „Als App“.
+- **E11** Cloudflare Worker `push-worker/` vollständig: Routen `POST /abo`, `DELETE /abo`, `GET /abos`, `POST /abos/loeschen`, `GET /version`; Origin-Prüfung, Allowlist der Push-Dienste, Größe ≤ 2 kB, höchstens 500 Abos, Rate-Limit 10 je IP und Stunde; Gates für `push-worker/` (vitest, „Typen Worker“, knip, dependency-cruiser); devDependencies `wrangler`, `@cloudflare/workers-types`, `web-push`, `@types/web-push`. VAPID mit `subject: "https://zwergenplan.app/"`, `topic: "neueangebote"`, 404/410 → aufräumen, Ausgabe nur als Zahlen, Fehler beim Senden sind `::warning::` mit Exit 0. Testversand `--dry-run`, `--force` und `--only=<hash-präfix>`, „Geräte-Kennung“ (erste 8 Zeichen des SHA-256 des Endpoints) im Abschnitt „Als App“.
   - **Geändert:** Es gibt keinen Job `notify` nach dem Deploy und kein `push-news.ts --against-deployed`. Den Auslöser regelt E1.
 - **E12** An- und Abmelden (**geändert:** `seenIds` schreibt nur noch der Service Worker, E3): Schalter mit `role="switch"`, `Notification.requestPermission()` als **erstes `await`** im Tipp, Wartezustand, Rücksetzen bei jedem Fehler, Abmelden räumt auf, Schalter zeigt den echten Zustand. **Geändert:** `pushSupport()` ohne Zeitlimit über `getRegistration()` (E9); der Abgleich (Endpoint-Hash, Abo weg → aus) läuft beim Öffnen des Kind-Sheets in `PushControls`, nicht beim Start (E6, kein `push-start.ts`); Rückmeldungen als Statuszeile im Abschnitt statt Toast (E7); die Texte (E7).
 - **E13** „Neu“ in der App: **entfällt** (Nutzerentscheidung 4). Kein Flag `neu`, kein Block, kein Sheet.
@@ -62,7 +62,7 @@ Nutzerentscheidungen dazu (2026-10-06):
 
 ### E0 – ADR 0014 zuerst (Review M6)
 
-Vor Schritt 1 wird ADR 0014 (noch Entwurf) überarbeitet: Auslöser wöchentlich (E1), was zusätzlich im Geräte-Speicher liegt (E6, auch der gerundete Startpunkt nach ADR 0017), `push.ts` liest die Registrierung selbst (E9), der neue Anlass „beim Push“ für `site.json` und `wegzeit.json` im Service Worker (E10, für alle gleich) und die Ausnahme von `transit-only-lazy`/`transit-entry-only` für `src/sw/` (E10). Die Invarianten in `docs/architecture.md` („Privatsphäre“, „Startpunkt“, „Kein Request hängt davon ab, welcher Startpunkt gilt“) werden im selben Schritt angepasst, nicht erst am Ende. Angenommen wird das ADR in Schritt 7.
+Vor Schritt 1 wird ADR 0014 (noch Entwurf) überarbeitet: Auslöser wöchentlich (E1), was zusätzlich im Geräte-Speicher liegt (E6, auch der gerundete Startpunkt nach ADR 0017), `push.ts` liest die Registrierung selbst (E9), der neue Anlass „beim Push“ für `site.json` und `wegzeit.json` im Service Worker (E10, für alle gleich) und die Ausnahme von `transit-only-lazy`/`transit-entry-only` für `src/sw/` (E10). Die Invarianten in `docs/architecture.md` („Privatsphäre“, „Startpunkt“, „Kein Request hängt davon ab, welcher Startpunkt gilt“) werden im selben Schritt angepasst, nicht erst am Ende. Die Abgleich-Stelle in ADR 0014 heißt jetzt „beim Öffnen des Kind-Sheets“ statt „beim App-Start“. Das ADR nennt ausdrücklich, was es an ADR 0013 (Punkt 5), ADR 0011 (Punkt 6) und ADR 0017 (Punkt 1 und 3) ändert; diese ADRs bekommen in Schritt 0 einen Nachtrag mit Verweis (Runde 3 H2). Angenommen wird das ADR in Schritt 7.
 
 ### E1 – Auslöser: Zeitplan in GitHub Actions
 
@@ -90,7 +90,7 @@ Vor Schritt 1 wird ADR 0014 (noch Entwurf) überarbeitet: Auslöser wöchentlich
    - `news`: `newOfferIds(vorher, jetzt, now).length`. `jetzt` = die Angebote aus `loadDataset()` (`scripts/lib/load-data.ts`) bzw. `toSiteData(providers, file)` aus dem Checkout; `vorher` = IDs aus `data/offers.json` im letzten Commit **vor `now − 7 × 24 h`** (`git rev-list -1 --before=… HEAD -- data/offers.json`, Checkout mit `fetch-depth: 0`). Fehlt der alte Stand: `news = 0` mit `::warning::`.
    - `week`: `offersInWeek(jetzt, now).length` (E4).
 3. Payload `weeklyPayload({ news, week, siteUrl: SITE_URL, sentAt: now })` (E5), geprüft mit dem Zod-Schema in `scripts/lib/push-payload-schema.ts`.
-4. Versand-Marke setzen (E1), dann Abos vom Worker (`GET /abos`), Versand wie Plan 0011 E11, `TTL` 1 Tag (`PUSH_TTL_SECONDS = 86_400`: Die Nachricht vom Samstag ist am Sonntag noch sinnvoll, am Montag nicht mehr).
+4. Abos vom Worker (`GET /abos`), dann Versand-Marke setzen (E1; erst lesen, damit ein Lesefehler die Woche nicht kostet, Runde 3), dann Versand wie Plan 0011 E11, `TTL` 1 Tag (`PUSH_TTL_SECONDS = 86_400`: Die Nachricht vom Samstag ist am Sonntag noch sinnvoll, am Montag nicht mehr).
 
 Der allgemeine Text erscheint nur, wenn das Gerät nicht zuschneiden kann (Service Worker zu langsam oder kaputt, `seenIds` fehlen):
 - `news > 0`: Titel „Zwergenplan“, Text „7 neue Angebote seit letztem Samstag“ (Singular „1 neues Angebot …“).
@@ -100,7 +100,7 @@ Der allgemeine Text erscheint nur, wenn das Gerät nicht zuschneiden kann (Servi
 ### E3 – Was „neu“ auf dem Gerät heißt (Review H1)
 
 - `seenIds` im Geräte-Speicher: die Angebots-IDs, die das Gerät bei der letzten Wochen-Nachricht kannte.
-  - **Nur der Service Worker schreibt sie**, nach jedem Push, auf die IDs der dabei geladenen `site.json`. Dazu einmal beim Einschalten: `src/data/push.ts` lädt im Tipp-Handler nach dem Abo `data/site.json` (derselbe Request wie beim App-Start, für alle gleich, meist aus dem Cache) und schreibt die IDs. So braucht `PushControls` keine Angebote als Prop (E9).
+  - **Nur der Service Worker schreibt sie**, nach jedem Push, auf die IDs der dabei geladenen `site.json`. Beim Einschalten schreibt die App **keine** `seenIds` (Runde 3, Scope): Der erste Push nach dem Einschalten findet keine und schreibt sie (Schritt 3 in E10); die erste Woche zeigt dann den allgemeinen Text. Das spart einen Netzpfad samt Tests, und `PushControls` braucht keine Angebote.
   - Die App schreibt sie beim Öffnen **nicht** (Abweichung von Plan 0011 E12): Die Liste markiert nichts als neu, Öffnen heißt also nicht Bemerken. Wer freitags die Liste öffnet, bekommt samstags trotzdem alles, was in der Woche dazukam. Damit entfällt auch ein zweiter Abonnent von `onSiteLoad` (`src/data/site.ts`, heute genau einer für den PWA-Kern).
   - Fehlen `seenIds` (Geräte-Speicher geräumt): kein Zuschnitt (allgemeiner Text), aber `seenIds` werden geschrieben, damit es nächste Woche wieder geht.
 - Ein Testversand (`data.test: true`, E5) schreibt keine `seenIds` (Runde 2 M-D).
@@ -172,11 +172,11 @@ export function weeklyText<T extends Offer & { venue: ReachTarget }>(input: Week
 - **Speicher nur im Lazy-Code (Review H3, Runde 2 H-B):** Die Abos liest und schreibt nur `src/data/searches-store.ts` (Gruppe `push`, E9) im `localStorage` `zwergenplan.such-abos`, **roh** (`string | null`). Geparst wird mit `parseSearches` in `PushControls` und im Service Worker; so braucht `data-domain-runtime-allowlist` keine Ausnahme. `src/data` bleibt der einzige Ort für `localStorage`, `preferences.ts` (Start) bleibt unverändert. Die Abos stehen nie in URL, Logs oder Requests.
 - **Beschriftung und Texte nicht im Start-Bundle (Review H3):** `searchLabel(filter)` („Musik & Singen, Natur & Draußen · Kurs · bis 20 Min.“) und alle Toast- und Hinweistexte des Push liegen in `src/ui/app-extras/push-texts.ts`. Die Kategorienamen kommen aus `CATEGORY_LABELS` in `src/domain/topics.ts`.
 - Die Abos sind unabhängig vom Push-Schalter (anlegen geht, sobald Push möglich ist, auch wenn er noch aus ist). Der Service Worker sieht sie nur, solange Push an ist.
-- **Gespiegelt in den Geräte-Speicher, nur bei Push an:** Geburtsdatum, `seenIds`, `endpointHash` (wie Plan 0011) und **neu** `searches` (die rohe Liste) und `origin`, der gespeicherte Startpunkt genau so, wie er im `localStorage` steht: `{ districtId }` oder der schon gerundete `StoredOriginPoint` (ADR 0017, Nutzerentscheidung 5). Nie eine Rohkoordinate; gleiche Schutzklasse wie im `localStorage`, nur auf dem Gerät.
+- **Gespiegelt in den Geräte-Speicher, nur bei Push an:** Geburtsdatum, `seenIds`, **`endpoint`** (statt `endpointHash`: nur auf dem Gerät, gebraucht, um ein ausgetauschtes Abo beim Worker per `DELETE /abo { endpoint }` abzumelden, Runde 3 M5; die Geräte-Kennung wird daraus gehasht) und **neu** `searches` (die rohe Liste) und `origin`, der gespeicherte Startpunkt genau so, wie er im `localStorage` steht: die rohe Stadtteil-ID als String oder der schon gerundete `StoredOriginPoint` (ADR 0017, Nutzerentscheidung 5). Nie eine Rohkoordinate; gleiche Schutzklasse wie im `localStorage`, nur auf dem Gerät.
 - **Wer spiegelt (kein Haken im Start, kein `push-start.ts`, E9):** nur `PushControls`, solange das Kind-Sheet offen ist.
   - Es liest Geburtsdatum und Startpunkt bei jedem Rendern selbst aus `preferences.ts` (`loadBirthDate`, `loadOriginDistrict`, `loadOriginPoint`), ohne Props. `KidSheet` rendert `AppExtrasSection` bei jeder Änderung neu, also sieht es eine Änderung im selben Sheet sofort.
   - Ein Effekt nach jedem Rendern schreibt Geburtsdatum, Startpunkt und Abos in den Geräte-Speicher, wenn sie sich gegenüber dem zuletzt Geschriebenen geändert haben (Vergleich als JSON-Text; beim Öffnen einmal).
-  - **Abgleich beim Öffnen** (statt beim Start, Plan 0011 E12): `getSubscription()` lesen, SHA-256 des Endpoints mit `endpointHash` vergleichen; abweichend → neues Abo `POST /abo`, altes `DELETE /abo`, `endpointHash` neu; kein Abo mehr → Schalter „aus“, `zwergenplan.push` entfernen, Geräte-Speicher leeren.
+  - **Abgleich beim Öffnen** (statt beim Start, Plan 0011 E12): `getSubscription()` lesen und den Endpoint mit dem gespeicherten `endpoint` vergleichen; abweichend → neues Abo `POST /abo`, altes `DELETE /abo { endpoint: alt }`, `endpoint` neu; kein Abo mehr → Schalter „aus“, Geräte-Speicher leeren. „Push an“ heißt immer: `getSubscription()` liefert ein Abo; einen eigenen Schlüssel `zwergenplan.push` gibt es nicht (Runde 3).
   - Ein Startpunkt, der anderswo gewählt wird (Karte, „Stadtteil wählen“ im Filter, „Meinen Standort nutzen“), kommt erst beim nächsten Öffnen des Kind-Sheets beim Service Worker an. Bewusst: Es spart den Haken im Start-Bundle (Risiken).
   - Beim Einschalten werden alle einmal geschrieben, beim Ausschalten alle gelöscht.
 
@@ -184,9 +184,11 @@ export function weeklyText<T extends Offer & { venue: ReachTarget }>(input: Week
 
 **Kein Knopf im Filter-Sheet.** Der Filter-Sheet liegt im Start-Bundle; sein Lazy-Einstieg samt Props passt nicht in den Rest (E9). Abonniert wird im Kind-Sheet, wo der Abschnitt „Als App“ ohnehin lazy lädt.
 
-**Rückmeldungen als Statuszeile, nicht als Toast** (Nachtrag, E9): Der Toast der App hängt an `say` aus `App`; ihn hereinzureichen kostet Start-Bytes. Stattdessen steht unter dem Push-Teil eine Zeile mit `role="status"` (Live-Region), die den letzten Text zeigt. Die Texte unten heißen weiter „Toast“, gemeint ist diese Zeile.
+**Rückmeldungen als Statuszeile, nicht als Toast** (Nachtrag, E9): Der Toast der App hängt an `say` aus `App`; ihn hereinzureichen kostet Start-Bytes. Stattdessen steht **direkt unter „Suche abonnieren“** eine Zeile mit `role="status"` (Live-Region), die den letzten Text zeigt; vor jedem neuen Text wird sie geleert, damit ein gleicher Text erneut angesagt wird (Runde 3 M2). Die Texte unten heißen weiter „Toast“, gemeint ist diese Zeile.
 
-**Aufbau:** `AppSection` gibt heute ohne Installationshilfe `null` zurück. Neu rendert es die Überschrift „Als App“, wenn Installationshilfe **oder** Push-Teil etwas zeigt (Matrix). `PushControls` hängt statisch in `AppSection` (gleicher Chunk, E9).
+**Fokus (Runde 3 M2):** Nach „Entfernen“ verschwindet der Knopf; der Fokus geht mit `preventScroll` auf die Überschrift „Deine Such-Abos“ (`tabIndex={-1}`), wie `AppSection` es nach der Installation macht.
+
+**Aufbau (Runde 3 H3):** `AppSection` entscheidet `pushSupport()` selbst (ein Effekt beim Mounten). Bis die Antwort da ist (sofort, `getRegistration()`), bleibt der Platzhalter `app-pending` stehen, kein Sprung im Sheet. Danach rendert es die Überschrift „Als App“, wenn Installationshilfe **oder** Push-Teil etwas zeigt (Matrix), sonst nichts, und setzt **in jedem Zweig** `data-push="bereit"` auf `<html>`; beim Unmount entfernt es die Marke wieder, damit ein zweites Öffnen nicht schon „bereit“ ist. `PushControls` hängt statisch in `AppSection` (gleicher Chunk, E9) und bekommt `support` als Prop.
 
 **Abschnitt „Als App“ – Sichtbarkeit (Review M3)**
 
@@ -198,7 +200,9 @@ export function weeklyText<T extends Offer & { venue: ReachTarget }>(input: Week
 | `ios` | nicht `ok` | Installationshilfe, Hinweis „Benachrichtigungen gibt es in der App.“ |
 | `keine` (Desktop ohne Angebot) | `ok` | Push-Teil (Desktop-Chrome/Firefox) |
 | `keine` | nicht `ok` | ausgeblendet (wie heute) |
-| sonst | nicht `ok` | Installationshilfe bzw. „Läuft als App.“, Hinweis „Dieser Browser kann keine Benachrichtigungen.“ |
+| sonst | `kein-push` | Installationshilfe bzw. „Läuft als App.“, Hinweis „Dieser Browser kann keine Benachrichtigungen.“ |
+| sonst | `kein-sw` (blockiert, Erstbesuch vor der Registrierung, Notausgang) | Installationshilfe bzw. „Läuft als App.“, **kein** Hinweis (Runde 3 M1) |
+| sonst | `verweigert` | wie `ok`, der Schalter steht auf „aus“ mit „In den Einstellungen des Geräts erlaubt?“ (Plan 0011 E12) |
 
 **Push-Teil (`src/ui/app-extras/PushControls.tsx`, nur bei `pushSupport() === "ok"`; Review H5: im Safari-Tab nutzlos)**
 - Schalter „Wochen-Nachricht“ mit Untertitel „Samstags gegen 10 Uhr: was es Neues für euch gibt.“ (`role="switch"`, Verhalten Plan 0011 E12).
@@ -236,8 +240,9 @@ Daraus folgt:
 - **Ein Lazy-Chunk für Abschnitt und Push:** `AppSection.tsx` importiert `PushControls.tsx` statisch; dieser importiert `push.ts`, `device-store.ts`, `searches-store.ts`, `domain/searches.ts` und `push-texts.ts` statisch. Kein anderer Chunk importiert diese Module, deshalb landen sie ohne Gruppe im `AppSection`-Chunk (`assets/app/`). `isAppExtrasModule` in `vite.config.ts` bekommt `searches-store` und `domain/searches` dazu (nur Dateiname/Ordner) und verliert `push-start` und `domain/news` (die Domäne `news.ts` nutzt nur noch der Service Worker).
 - **Keine Chunk-Gruppe `push`, kein Budget `Push JS (lazy)`.** Stattdessen steigt **`App-Extras JS (lazy)` von 5 auf 9 kB** (gemessen mit Stubs 4,73 kB; dazu kommen Fehlerpfade, Abgleich, Texte, Geräte-Kennung). Begründung im Commit und hier (JSON hat keine Kommentare): Push liegt jetzt im selben Chunk wie der Abschnitt, damit der Start nichts kostet. Nach Schritt 5 wird das Budget auf die Messung plus 1 kB gesetzt, höchstens 9 kB.
 - **`push.ts` liest die Registrierung selbst** (Runde 2 H-A, geändert): `navigator.serviceWorker.getRegistration()` nur lesend, für `pushManager` und `pushSupport()`. `pwa.ts` bleibt der einzige Ort, der den Service Worker **registriert, aktualisiert oder auf Nachrichten hört**. Eine Injektion über den Lader kostete Start-Bytes. `docs/architecture.md` (Abschnitt App-Extras) und ADR 0014 halten die Ausnahme fest.
-- **`pushSupport()` ohne Hänger (Runde 2 M-E):** `getRegistration()` löst sofort auf, auch mit `serviceWorkers: "block"` (dann `undefined` → `"kein-sw"`). Kein `ready`, kein Zeitlimit. Ist der Push-Teil entschieden (gezeigt oder nicht), setzt `PushControls` `data-push="bereit"` auf `<html>`, wie `data-pwa` (Wartebedingung für die Request-Zählungen).
-- **Regeln:** `news-not-in-start` wird zu `push-domain-not-in-start` (`^src/domain/(news|searches)\.ts$` nur aus `src/ui/app-extras/` und `src/sw/`, dazu die eigenen Tests). `app-data-only-lazy` um `searches-store` erweitert. `LAZY_LOADERS` bleibt. Kanarienvogel je geänderter Regel.
+- **`pushSupport()` ohne Hänger (Runde 2 M-E):** `getRegistration()` löst sofort auf, auch mit `serviceWorkers: "block"` (dann `undefined` → `"kein-sw"`). Kein `ready` beim Anzeigen, kein Zeitlimit. Erst im Tipp-Handler, **nach** `requestPermission`, wartet `push.ts` auf `navigator.serviceWorker.ready` (hängt nicht, weil es eine Registrierung gibt; `pushManager.subscribe` braucht einen aktiven Worker, Runde 3 M1). Die Marke `data-push="bereit"` setzt `AppSection` (E7).
+- **Regeln:** `news-not-in-start` wird zu `push-domain-not-in-start` (`from: ^src/`, `to: ^src/domain/(news|searches)\.ts$`, erlaubt aus `src/ui/app-extras/` und `src/sw/` sowie den eigenen Tests; `scripts/` bleibt frei, `push-weekly-core.ts` nutzt `news.ts`, Runde 3). `app-data-only-lazy` um `searches-store` erweitert und um `push-start` gekürzt. `LAZY_LOADERS` bleibt. Kanarienvogel je geänderter Regel.
+- **Start-Exporte (Runde 3 M4):** Jedes Start-Modul-Symbol, das der Lazy-Chunk zusätzlich nutzt, wird ein Export des Einstiegs und kostet Bytes. Erlaubt sind nur Symbole, die schon ein anderer Lazy-Chunk aus dem Start nutzt oder die die Probe gemessen hat (`filterFromSearch`, `filterToSearch`, `CATEGORY_LABELS`, die `load…`-Funktionen aus `preferences.ts`, React-Hooks). Die Labels für Format, Anmeldung und Kosten stehen lokal in `push-texts.ts`; `plural` usw. aus `format.ts` werden nicht importiert. In 5b läuft `pnpm size` nach jeder neuen Datei.
 - **Prüfung in 5b:** Chunk-Wächter, kein `__vite__mapDeps` im Einstieg, `pnpm size`. Über 92 kB: Rückfrage an den Nutzer, kein Anheben.
 
 ### E10 – Push im Service Worker (Ergänzung zu Plan 0011 E10)
@@ -248,10 +253,11 @@ Daraus folgt:
 
 1. Parallel laden:
    - `data/site.json` mit `cache: "no-cache"`;
-   - `data/wegzeit.json` **bei jedem Push**, Cache `zp-data` zuerst, sonst Netz (die Tabelle ändert sich selten; `TRANSIT_TABLE_VERSION` prüft das Format). Bei jedem Push gleich, deshalb verrät der Request nichts, auch nicht, ob ein Startpunkt oder ein Abo mit Wegzeit gespeichert ist (Runde 2, Alternative zu M2; die Invariante bleibt in der Sache unverändert, E0 ergänzt nur den Anlass „beim Push“);
+   - `data/wegzeit.json` **bei jedem Push mit `cache: "no-cache"`** (bedingte Anfrage, meist 304), bei einem Fehler die Kopie aus `zp-data` (Runde 3 H1: eine Kopie aus dem Cache passte nach jedem Datenlauf mit neuem Ort nicht mehr, `decodeTransitTable` verwirft sie dann). `TRANSIT_TABLE_VERSION` prüft das Format. Bei jedem Push gleich, deshalb verrät der Request nichts, auch nicht, ob ein Startpunkt oder ein Abo mit Wegzeit gespeichert ist (Runde 2, Alternative zu M2; die Invariante bleibt in der Sache unverändert, E0 ergänzt nur den Anlass „beim Push“);
    - aus dem Geräte-Speicher: `seenIds`, `searches`, `birthDate`, `origin`.
 2. `reach` = `transitReach(decodeTransitTable(file, placeKeys), origin)`; `placeKeys` = `new Set(site.offers.map((o) => placeKey(o.venue.geo)))` (wie `App.tsx`). `origin` (Nutzerentscheidung 5): `{ districtId }` → `districtById` (`source: "stadtteil"`); ein Punkt (`source` „standort“ oder „karte“, `lat`/`lon` Zahlen) → erneut `coarsen` und `inBounds` aus `src/domain/geo.ts`, wie `storedPointOrigin` in `src/ui/origin-state.ts` (der Service Worker darf `src/ui` nicht importieren; die zwei Aufrufe stehen in `push-tailor.ts`, Start-Code bleibt unberührt). Ungültig, außerhalb, fehlt etwas oder scheitert das Dekodieren: `undefined`, die Wegzeit-Grenze wirkt dann nicht.
-3. Fehlen `seenIds`: `seenIds` schreiben, Ergebnis „kein Zuschnitt“ (allgemeiner Text).
+3. Testversand (`data.test: true`): Ab hier wird nichts geschrieben (siehe 5); die Prüfung steht vor jedem Schreiben (Runde 3). Nach Ablauf des Zeitlimits wird ebenfalls nichts mehr geschrieben.
+   Fehlen `seenIds`: `seenIds` schreiben (außer beim Testversand), Ergebnis „kein Zuschnitt“ (allgemeiner Text).
 4. Sonst `fresh` = Angebote aus `newOfferIds(seenIds, site.offers, now)`, `week` = `offersInWeek(site.offers, now)`, `searches` = `parseSearches(raw).map(filterFromSearch)`, `weeklyText(…)`.
 5. **Testversand (Runde 2 M-D):** Trägt die Payload `data.test: true`, schreibt der Zuschnitt **nichts**. So verbraucht ein Testversand die Woche nicht.
 6. Sonst **vor** dem Anzeigen `seenIds` = alle IDs der geladenen `site.json` schreiben. Scheitert das Schreiben, wird trotzdem der zugeschnittene Text gezeigt (nächste Woche zählt dann dieselben noch einmal).
@@ -265,7 +271,7 @@ Daraus folgt:
 ## Struktur
 
 ```
-src/domain/news.ts (+ .test.ts)              newOfferIds, offersInWeek, weeklyText (E3, E4); nur der Service Worker nutzt es
+src/domain/news.ts (+ .test.ts)              newOfferIds, offersInWeek, weeklyText (E3, E4); Service Worker und CI, nie die App
 src/domain/push-payload.ts (+ .test.ts)      weeklyPayload, Konstanten (E5)
 src/domain/push-types.ts                     geteilte Typen (ohne app_badge, mit data.test)
 src/domain/searches.ts (+ .test.ts)          Such-Abos (E6)
@@ -296,11 +302,14 @@ Unverändert bleiben `src/ui/AppExtras.tsx` (Lader), `src/data/pwa.ts`, `src/dat
   - `searches.ts`: kanonisch (Reihenfolge der Werte egal), Dublette, leer, Limit 5, `parseSearches` mit Müll (`null`, kein JSON, kein Array, Zahlen, unbekannte Schlüssel, 7 Einträge).
   - `push-schedule.ts`: siehe E1, dazu der Abgleich von `cron`/`timezone` mit `push-weekly.yml`.
   - `push-weekly-core.ts`: Zählen mit altem und neuem Datenstand (Fixtures über `readOffersAt`), fehlender alter Stand → 0 mit Warnung, Wächter verneint → kein Versand, Versand-Marke schon gesetzt → kein Versand, `--only` Pflicht ohne `--dry-run`, Test-Payload mit `data.test`.
-  - `push-tailor.ts`: Erfolg mit und ohne Abos/Alter/Wegzeit; Startpunkt als Stadtteil, als Punkt, als Punkt außerhalb der Stadt (keine Wegzeit) und kaputt; `seenIds` fehlen → schreiben, kein Zuschnitt; `data.test` → nichts geschrieben; `wegzeit.json` fehlt oder kaputt → ohne Wegzeit; Schreiben von `seenIds` scheitert → Text trotzdem; hängender Speicherzugriff → nach 5 s `zeit` (Fake-Timer).
-  - `push.ts` mit injizierter Umgebung: `getRegistration` → `undefined` → `"kein-sw"` ohne Warten; `requestPermission` als erster Aufruf beim Einschalten; Fehler setzt zurück und meldet ein erzeugtes Abo ab; Abgleich (Hash gleich, Hash anders, kein Abo); Spiegeln schreibt nur bei Änderung.
+  - `push-tailor.ts`: Erfolg mit und ohne Abos/Alter/Wegzeit; Startpunkt als Stadtteil, als Punkt, als Punkt außerhalb der Stadt (keine Wegzeit) und kaputt (dieselben Fälle wie `storedPointOrigin` in `origin-state.test.ts`); veraltete Kopie in `zp-data` plus frisches Netz → Wegzeit wirkt, Netzfehler → Kopie (Runde 3 H1); Testversand ohne `seenIds` → nichts geschrieben; `seenIds` fehlen → schreiben, kein Zuschnitt; `data.test` → nichts geschrieben; `wegzeit.json` fehlt oder kaputt → ohne Wegzeit; Schreiben von `seenIds` scheitert → Text trotzdem; hängender Speicherzugriff → nach 5 s `zeit` (Fake-Timer).
+  - `push.ts` mit injizierter Umgebung: `getRegistration` → `undefined` → `"kein-sw"` ohne Warten; `requestPermission` als erster Aufruf beim Einschalten; Fehler setzt zurück und meldet ein erzeugtes Abo ab; Abgleich (Endpoint gleich, anders → `DELETE` mit dem alten, kein Abo); Spiegeln schreibt nur bei Änderung; nach `requestPermission` wird auf den aktiven Worker gewartet.
   - `push-decision.ts`, Worker (auch `POST /versand`: erstes Mal 204, zweites Mal 409, ohne Token 401): wie Plan 0011.
 - **E2E (Chromium, `e2e/push.spec.ts`, Fixture `pushWorker: "mock"`, eingefrorene Uhr):**
   - Kind-Sheet mit gefilterter Route: „Suche abonnieren“ → gedrückt mit „Abonniert“, die Liste zeigt das Abo mit Beschriftung; „Entfernen“ entfernt es, die Statuszeile sagt es. Push-Teil fehlt ohne Push-Fähigkeit. Jeder sichtbare Zustand der Matrix in E7 mit `expectMobileUx` hell, dunkel, 320 px/200 % (Stubs wie `installieren.spec.ts`; `iphone-15` für `ios`); ein Abo mit allen Dimensionen (längste Beschriftung).
+  - **Mechanismus (Runde 3):** Suite `chromium`; Push-Fähigkeit per Init-Skript-Stub für `navigator.serviceWorker.getRegistration`/`ready`, `PushManager` und `Notification` (wie die Stubs in `installieren.spec.ts`). Die Zustellung per CDP (unten) läuft mit echtem Service Worker wie `e2e/pwa.spec.ts`.
+  - Nach „Entfernen“ liegt der Fokus auf „Deine Such-Abos“, nicht auf `<body>` (Runde 3 M2).
+  - **Spiegeln im offenen Sheet (Runde 3 M3):** bei eingeschaltetem Push im offenen Kind-Sheet Stadtteil wechseln, Geburtsdatum leeren, ein Abo anlegen; danach steht genau das im Geräte-Speicher (IndexedDB per `page.evaluate`).
   - Schalter an (Fake-Push-Manager wie Plan 0011), Request-Body an den Worker enthält nur das Abo: kein Geburtsdatum, keine Such-Abos, kein Startpunkt, keine `seenIds`.
   - Geräte-Speicher nach dem Öffnen des Kind-Sheets: Geburtsdatum, Abos und Startpunkt (Stadtteil bzw. gespeicherter gerundeter Punkt) stehen darin, genau wie im `localStorage`.
   - Push per CDP mit `weeklyPayload` (`sentAt` = Fixture-Jetzt), danach `registration.getNotifications()`:
@@ -310,9 +319,9 @@ Unverändert bleiben `src/ui/AppExtras.tsx` (Lader), `src/data/pwa.ts`, `src/dat
     - mit Abo ohne neue Treffer → „Diese Woche nichts Neues für deine Suchen“;
     - Abo mit Wegzeit und Stadtteil bzw. gespeichertem Standort → Wegzeit wirkt (ein Angebot außerhalb der Grenze fehlt in der Zahl);
     - zweiter Push ohne neue Daten → „nichts Neues“; ein Test-Push (`data.test`) dazwischen ändert daran nichts.
-  - Privatsphäre: Requests des Service Workers beim Push sind ohne Query und **mit und ohne** Startpunkt bzw. Wegzeit-Abo dieselben (`site.json`, `wegzeit.json`) (Runde 2 M-A).
+  - Privatsphäre: Requests des Service Workers beim Push sind ohne Query und **mit und ohne** Startpunkt bzw. Wegzeit-Abo dieselben, nämlich genau je einer auf `site.json` und `wegzeit.json` (Runde 2 M-A, Runde 3 H1).
   - Schalter aus → Geräte-Speicher leer (IndexedDB per `page.evaluate`).
-- **Request-Zählungen (Review M4):** Der Push-Code lädt mit dem Abschnitt „Als App“. `e2e/startpunkt.spec.ts` und `e2e/karte.spec.ts` warten nach dem Öffnen des Kind-Sheets auf `data-push="bereit"` (E9), wie heute auf den Abschnitt (`docs/architecture.md`, Abschnitt E2E). `pushSupport()` macht keinen Request.
+- **Request-Zählungen (Review M4):** Der Push-Code lädt mit dem Abschnitt „Als App“. `e2e/startpunkt.spec.ts`, `e2e/karte.spec.ts`, `e2e/mobile-ux.spec.ts` und `e2e/installieren.spec.ts` warten nach dem Öffnen des Kind-Sheets auf `data-push="bereit"` (E7, gesetzt in jedem Zweig), wie heute auf den Abschnitt (`docs/architecture.md`, Abschnitt E2E). `pushSupport()` macht keinen Request.
 - **Manuell (Browser-Review live, Schritt 8):** iPhone (installiert) und Android: Einschalten, Abo anlegen, Testversand mit `only`, Text passt, Tipp öffnet die Startseite, Abmelden. Der Fall „Treffer“ wird geprüft, indem Push **vor** einem Pipeline-Lauf eingeschaltet und nach dessen Deploy ein Testversand geschickt wird (Runde 2 M-D).
 
 ## Backpressure
@@ -410,5 +419,25 @@ Kein Blocker. B1, H1, H2, H5, M3, M5 und M6 aus Runde 1 bestätigt gelöst.
 - **M-G** (keine Regel für `searches.ts`): `push-domain-not-in-start` (E9).
 - **Niedrig:** TTL in E5; Kategorienamen aus `CATEGORY_LABELS` (`src/domain/topics.ts`); Woche eindeutig 7 × 24 h; getrennte `concurrency`-Gruppen; Alter filtert die Nachricht unabhängig von „Nur passende“ (Entscheidung, E7) und Test „0 Monaten“; Matrix um `ios` + `ok`; E2E mit längster Beschriftung.
 - **Scope** (Filter-Sheet-Knopf streichen): übernommen, als Idee in `docs/ideas.md` (Schritt 7).
+
+**Abgelehnt:** keins.
+
+## Review (2026-10-06, plan-reviewer, Runde 3, Nachtrag) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Kein Blocker.
+
+**Übernommen:**
+- **H1** (Kopie von `wegzeit.json` veraltet nach neuen Orten): bei jedem Push `cache: "no-cache"`, Kopie aus `zp-data` nur bei Fehler; Unit-Test veraltete Kopie plus Netz; Privatsphäre-E2E zählt genau einen Request je Datei (E10, Tests).
+- **H2** (Abweichung von angenommenen ADRs ohne Änderung): Kopf und E0 nennen, was ADR 0014 an ADR 0013 Punkt 5, ADR 0011 Punkt 6 und ADR 0017 Punkt 1/3 ändert; die drei ADRs bekommen in Schritt 0 einen Nachtrag; ADR 0014 sagt „Abgleich beim Öffnen des Kind-Sheets“.
+- **H3** (`data-push` fehlt, wenn der Push-Teil ausgeblendet ist): `AppSection` entscheidet `pushSupport()`, hält den Platzhalter bis dahin, setzt die Marke in jedem Zweig und entfernt sie beim Unmount; auch `mobile-ux.spec.ts` und `installieren.spec.ts` warten darauf (E7, Tests).
+- **M1** (`kein-sw` ≠ „Browser kann nicht“): eigene Zeile der Matrix ohne Hinweis; nach `requestPermission` auf den aktiven Worker warten (E7, E9).
+- **M2** (Fokus, Statuszeile): Fokus nach „Entfernen“ auf „Deine Such-Abos“, Statuszeile direkt unter dem Knopf, vor neuem Text leeren, E2E (E7, Tests).
+- **M3** (Spiegeln im offenen Sheet ungetestet): E2E mit Wechsel von Stadtteil, Geburtsdatum und Abo bei offenem Sheet (Tests).
+- **M4** (Start-Exporte): nur gemessene bzw. schon geteilte Start-Exporte, Labels lokal, `pnpm size` nach jeder Datei in 5b (E9).
+- **Niedrig:** Testversand-Prüfung vor jedem Schreiben (E10); `push-domain-not-in-start` mit `from: ^src/`, `scripts/` frei (E9); `app-data-only-lazy` ohne `push-start`; erst `GET /abos`, dann Versand-Marke (E2); gemeinsame Fälle mit `origin-state.test.ts`, Stadtteil als rohe ID (E6, Tests); `zwergenplan.push` gestrichen, „an“ = `getSubscription()` liefert ein Abo (E6); E2E-Mechanismus und Suite benannt (Tests).
+- **Scope:** Abruf von `site.json` beim Einschalten gestrichen; die erste Woche zeigt den allgemeinen Text (E3).
+
+**Anders gelöst:**
+- **M5** (altes Abo nicht abmeldbar, nur `endpointHash` gespeichert): Statt `DELETE /abo { hash }` im Worker liegt der `endpoint` selbst im Geräte-Speicher (nur auf dem Gerät, wie das Abo im Browser); `DELETE /abo { endpoint }` bleibt wie in Plan 0011, die Geräte-Kennung wird daraus gehasht. Eine Worker-Route weniger, gleiche Privatsphäre.
 
 **Abgelehnt:** keins.
