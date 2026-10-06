@@ -47,3 +47,7 @@ Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt 
   - Notausgang zur Build-Zeit (`ZWERGENPLAN_SW=aus`): ein selbst abmeldender Service Worker statt einer Anleitung zum Umschreiben.
 - Gemessen (Stand nach dem Arch-Review): Start-JS 91,34 kB statt 90,90 kB (+0,44 kB, Ziel ≤ 91,40 kB), `Service Worker` 1,5 kB, `App-Extras JS (lazy)` 2,5 kB. Zusammen mit Plan 0012: 91,72 kB (ADR 0012, Nachtrag).
 - Mit Plan 0012: Regel 5 (`oepnv`) gilt für `wegzeit.json` und `linien.json`, beide nur im Laufzeit-Cache, nie im Precache. Beim Frische-Anlass bleiben Tabelle und Linien zusammen, bis die neuen da sind, auch wenn das Neuladen scheitert.
+
+## Nachtrag (2026-10-06): Wochen-Push (Plan 0017, ADR 0014)
+
+- **Punkt 5 geändert durch ADR 0014 (Punkt 6):** `src/data/push.ts` liest `navigator.serviceWorker.getRegistration()` und im Tipp-Handler `ready` selbst, nur lesend für `pushManager`. Registrieren, aktualisieren und auf Nachrichten hören bleibt allein `src/data/pwa.ts`. Grund: Eine Injektion über den Lader kostete Start-JS (Plan 0017, E9).
