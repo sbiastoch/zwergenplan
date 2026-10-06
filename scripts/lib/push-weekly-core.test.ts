@@ -1,7 +1,16 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { SiteOffer } from "../../src/domain/site-data.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers } from "../../src/domain/test-fixtures.ts";
-import { parseWeeklyArgs, runWeekly, type WeeklyDeps } from "./push-weekly-core.ts";
+import {
+  parseWeeklyArgs,
+  runWeekly,
+  type WeeklyDeps,
+  WORKER_SOURCES,
+  workerVersionWarning,
+} from "./push-weekly-core.ts";
 
 const offers = fixtureSiteOffers();
 
@@ -148,5 +157,56 @@ describe("runWeekly", () => {
     };
     expect(await runWeekly(d, { force: false, dryRun: false })).toMatchObject({ sent: 0, failed: 3 });
     expect(warnings).toHaveLength(3);
+  });
+});
+
+describe("workerVersionWarning", () => {
+  it("still, wenn der Worker-Code beim Deploy-Commit derselbe ist wie in HEAD (auch wenn der Commit neuer ist)", () => {
+    const asked: string[] = [];
+    const warning = workerVersionWarning("29335c8", (version) => {
+      asked.push(version);
+      return true;
+    });
+    expect(warning).toBeUndefined();
+    expect(asked).toEqual(["29335c8"]);
+  });
+
+  it("warnt, wenn sich der Worker-Code seit dem Deploy-Commit geändert hat", () => {
+    expect(workerVersionWarning("29335c8", () => false)).toMatch(/29335c8.*pnpm push:deploy/);
+  });
+
+  it("warnt, wenn das Repo den Deploy-Commit nicht kennt (z. B. nach einem Rebase verworfen)", () => {
+    expect(workerVersionWarning("deadbee", () => undefined)).toMatch(/deadbee.*kennt das Repo nicht/);
+  });
+
+  it("gibt keine fremde Version weiter: ohne Commit-Hash nur eine Warnung", () => {
+    const asked: string[] = [];
+    const sameCode = (version: string) => {
+      asked.push(version);
+      return true;
+    };
+    for (const version of [undefined, "", "unbekannt", "--output=/tmp/x", "HEAD", "29335c8 HEAD"]) {
+      expect(workerVersionWarning(version, sameCode)).toMatch(/pnpm push:deploy/);
+    }
+    expect(asked).toEqual([]);
+  });
+});
+
+describe("WORKER_SOURCES", () => {
+  it("enthält jede Repo-Datei, die der Push-Worker importiert (sonst bliebe ein veralteter Worker unbemerkt)", () => {
+    const root = fileURLToPath(new URL("../../", import.meta.url));
+    const workerDir = join(root, "push-worker/src");
+    const imported = new Set<string>();
+    for (const file of readdirSync(workerDir, { recursive: true, encoding: "utf8" })) {
+      if (!file.endsWith(".ts") || file.endsWith(".test.ts")) continue;
+      const path = join(workerDir, file);
+      for (const [, spec] of readFileSync(path, "utf8").matchAll(/from "(\.{1,2}\/[^"]+)"/g)) {
+        imported.add(relative(root, join(dirname(path), spec ?? "")));
+      }
+    }
+    const outside = [...imported].filter((p) => !p.startsWith("push-worker/"));
+    expect(outside.length).toBeGreaterThan(0);
+    for (const path of outside) expect(WORKER_SOURCES).toContain(path);
+    expect(WORKER_SOURCES).toContain("push-worker");
   });
 });

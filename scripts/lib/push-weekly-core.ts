@@ -44,6 +44,32 @@ export function parseWeeklyArgs(argv: readonly string[]): WeeklyArgs {
   return args;
 }
 
+/**
+ * Was der Push-Worker bündelt: sein Ordner und die Domänen-Dateien, die `push-worker-isolated` erlaubt (ein Test
+ * gleicht die Liste mit den Importen ab). Ändert sich eine davon, muss er neu deployt werden.
+ */
+export const WORKER_SOURCES: readonly string[] = ["push-worker", "src/domain/push-types.ts", "src/domain/time.ts"];
+
+/**
+ * Warnung, wenn der deployte Worker nicht zum Repo passt (Plan 0011, E11). `/version` ist HEAD beim Deploy
+ * (`pnpm push:deploy`), selten der letzte Commit, der den Worker ändert; verglichen wird deshalb der Code.
+ * `sameCode(version)`: ob sich `WORKER_SOURCES` zwischen `version` und HEAD nicht unterscheiden, `undefined` bei einem
+ * unbekannten Commit. Die Version kommt aus dem Netz und geht nur als Commit-Hash weiter.
+ */
+export function workerVersionWarning(
+  version: string | undefined,
+  sameCode: (version: string) => boolean | undefined,
+): string | undefined {
+  if (version === undefined || !/^[0-9a-f]{7,40}$/.test(version)) {
+    return `Push-Worker meldet keinen Commit (${version || "leer"}): pnpm push:deploy`;
+  }
+  const same = sameCode(version);
+  if (same === true) return undefined;
+  return same === false
+    ? `Push-Worker läuft mit ${version}, der Worker-Code im Repo ist seitdem geändert: pnpm push:deploy`
+    : `Push-Worker läuft mit ${version}, den Commit kennt das Repo nicht: pnpm push:deploy`;
+}
+
 export interface WeeklyDeps {
   now: Date;
   siteUrl: string;

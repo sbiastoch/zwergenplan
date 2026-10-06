@@ -493,3 +493,10 @@ Screenshots `node scripts/screenshots.ts https://zwergenplan.app/ --views=push,k
 - **Konsistenz:** Knöpfe, Schalter, Überschriften und Abstände wie im Kind-Sheet; der gedrückte Zustand jetzt wie die Filter-Chips.
 - 200 %: In der Skript-Reihe wird nach dem Scrollen skaliert, die Bilder zeigen dort meist den Quellenhinweis; den Push-Teil bei 200 % zeigen `push-320-light-200` und `push-quer-dark-200`, belegt ist er durch die E2E-Gates (320 px/200 % je Zustand).
 - Bewusst nicht geprüft: Testversand und Einschalten an echten Geräten (Geräteprüfung durch den Nutzer).
+
+## Nachprüfung (2026-10-06, unabhängige Session, Branch `push-0017-review`)
+
+Gates auf `fc39cf7`: `check:fast`, `knip`, `test:coverage` grün; `pnpm check` mit 3 Lastfehlern (`perf.spec.ts` auf `android-klein`, zwei WebKit-Tests auf `iphone-15`), einzeln mit `--workers=1` grün. Budgets: `JS (initial)` 93,24/100 kB, `App-Extras` 6,27/7,1 kB, Service Worker 8,01/9 kB. Kanarienvögel der Push-Regeln erneut rot (`push-domain-not-in-start`, `push-news-not-in-app`, `pwa-core-no-push` statisch und per `import()`, `web-push-only-in-push-weekly`, `push-worker-isolated`, `push-worker-not-imported`, `transit-only-lazy` aus `src/ui/`, `sw-isolated`, `no-zod-in-sw`, `app-data-only-lazy`). Mutationsproben: 113 von 128 Unit- und 6 von 7 E2E-Mutationen gefangen.
+
+- **Behoben (Hoch):** `scripts/push-weekly.ts` warnte bei jedem Lauf „Push-Worker läuft mit 29335c8, im Repo zuletzt geändert in 862bcba“: `/version` ist HEAD beim Deploy, verglichen wurde mit dem letzten Commit unter `push-worker/`. Jetzt vergleicht `workerVersionWarning` (`scripts/lib/push-weekly-core.ts`) den Code: `git diff --quiet <version> HEAD -- WORKER_SOURCES` (Ordner plus `push-types.ts` und `time.ts`; ein Test gleicht die Liste mit den Importen des Workers ab). Unbekannter Commit (z. B. nach Rebase verworfen) → Warnung; die Version aus dem Netz geht nur als Hex-Hash an git.
+- Offen (Rücksprache): siehe Befundliste der Session (Arch-Review M1 Allowlist `push-worker-isolated`, M2 Wettlauf `mirror`/`clearAll`, Testlücken aus den Mutationsproben, `maxBuffer` beim Lesen des alten Datenstands, Doku-Drift).

@@ -20,7 +20,7 @@ import { PUSH_TOPIC, PUSH_TTL_SECONDS } from "../src/domain/push-payload.ts";
 import type { PushSubscriptionJson } from "../src/domain/push-types.ts";
 import { toSiteData } from "../src/domain/site-data.ts";
 import { loadDataset, ROOT } from "./lib/load-data.ts";
-import { parseWeeklyArgs, runWeekly } from "./lib/push-weekly-core.ts";
+import { parseWeeklyArgs, runWeekly, WORKER_SOURCES, workerVersionWarning } from "./lib/push-weekly-core.ts";
 
 const inActions = process.env["GITHUB_ACTIONS"] === "true";
 const warn = (line: string) => console.log(inActions ? `::warning::${line}` : `Warnung: ${line}`);
@@ -39,6 +39,16 @@ function secrets(): { vapidPrivateKey: string; adminToken: string } {
 }
 
 const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8", cwd: ROOT }).trim();
+
+/** Worker-Code beim Commit `version` gleich HEAD? `git diff --quiet`: 0 gleich, 1 verschieden, sonst unbekannt */
+function sameWorkerCode(version: string): boolean | undefined {
+  try {
+    execFileSync("git", ["diff", "--quiet", version, "HEAD", "--", ...WORKER_SOURCES], { cwd: ROOT, stdio: "ignore" });
+    return true;
+  } catch (error) {
+    return error instanceof Error && "status" in error && error.status === 1 ? false : undefined;
+  }
+}
 
 /** Angebots-IDs aus `data/offers.json` im letzten Commit vor `before` (Checkout mit `fetch-depth: 0`) */
 async function previousIds(before: Date): Promise<string[] | undefined> {
@@ -67,13 +77,11 @@ async function main() {
     return response;
   };
 
-  // Der Worker wird von Hand deployt; weicht er vom Repo ab, eine Warnung (Plan 0011, E11)
+  // Der Worker wird von Hand deployt; weicht sein Code vom Repo ab, eine Warnung (Plan 0011, E11)
   try {
     const { version } = (await (await fetch(`${PUSH_WORKER_URL}/version`)).json()) as { version?: string };
-    const expected = git("log", "-1", "--format=%h", "--", "push-worker");
-    if (expected && version && !expected.startsWith(version) && !version.startsWith(expected)) {
-      warn(`Push-Worker läuft mit ${version}, im Repo zuletzt geändert in ${expected}: pnpm push:deploy`);
-    }
+    const warning = workerVersionWarning(version, sameWorkerCode);
+    if (warning) warn(warning);
   } catch {
     warn("Version des Push-Workers nicht lesbar");
   }
