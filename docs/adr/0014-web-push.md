@@ -1,6 +1,6 @@
 # ADR 0014 – Wochen-Nachricht per Web Push (Declarative Web Push, Zuschnitt auf dem Gerät)
 
-Status: Entwurf (2026-10-05, überarbeitet 2026-10-06 für Plan 0017). Wird mit Plan 0017, Schritt 7, angenommen.
+Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-10-05, überarbeitet 2026-10-06.
 - Baut auf ADR 0013 auf und ergänzt ADR 0002 (Hosting).
 - **Ändert** ADR 0013, Punkt 5 (`src/data/push.ts` liest die Registrierung selbst, Punkt 6 unten), und ADR 0011, Punkt 6 (neuer Anlass „beim Push“ für `wegzeit.json`, für alle gleich, Punkt 4 unten).
 - **Ergänzt** ADR 0017, Punkt 1 und 3: Der gespeicherte Startpunkt liegt bei eingeschaltetem Push zusätzlich im Geräte-Speicher (IndexedDB) und verlässt das Gerät weiterhin nie.

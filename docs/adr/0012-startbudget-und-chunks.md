@@ -138,3 +138,9 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 
 - Gemessen gegen `main` 32d4edb (**91,77 kB**): Plan 0016 (Startpunkt gespeichert, ADR 0017) bringt **`JS (initial)` 91,95 kB** von 92 kB, also +0,18 kB. Schon eingespart sind −30 B (ein gemeinsames `saveOrigin`, knappe Formprüfung, ein Ref statt zwei).
 - Rest **0,05 kB**. Das Budget bleibt bei 92 kB. Stufe 2 von Plan 0011 (≈ 0,10 kB) passt damit nur mit den dort benannten Kandidaten zum Auslagern. Wer nach Plan 0016 nach `main` merged, misst neu.
+
+## Nachtrag (2026-10-06): Stand nach Plan 0017 (Wochen-Push)
+
+- Gemessen gegen `main` b2023c1 (91,95 kB): Plan 0017 bringt **`JS (initial)` 91,97 kB** von 92 kB (+0,02 kB, nur Exporte des Einstiegs für den Lazy-Chunk). Der ganze Push-Code liegt im Lazy-Chunk des Abschnitts „Als App“; ein Sheet „Neu“, ein Abgleich beim App-Start und eine eigene Chunk-Gruppe passten nicht (Stub-Probe, Plan 0017, E9).
+- Zwei Fallen, gemessen: Eine zweite Gruppe in `codeSplitting.groups` kostete allein 0,09 kB; `import * as` eines Lazy-Moduls zog den Export-Helfer von rolldown in den Einstieg (+0,07 kB). Benannte Importe vermeiden das.
+- Rest **0,03 kB**. Das Budget bleibt bei 92 kB. Der nächste Plan mit Start-Code muss zuerst Platz schaffen (Optionen (b) und (d) oben, `docs/ideas.md`).

@@ -26,6 +26,16 @@ Der Zwergenplan ist eine installierbare Web-App (Plan 0011, ADR 0013). Offline �
 
 Icons entstehen aus `design/icon.svg` mit `node scripts/icons.ts` (die PNGs in `public/icons/` werden committet).
 
+### Wochen-Nachricht (Push)
+
+Samstags gegen 10 Uhr kommt eine Nachricht aufs Gerät, auch wenn es nichts Neues gibt (Plan 0017, ADR 0014). Eingeschaltet wird sie im Kind-Sheet unter „Als App“ (Schalter „Wochen-Nachricht“); dort lassen sich auch Such-Abos anlegen („Aktuelle Suche abonnieren“). Auf dem iPhone geht das nur in der installierten App.
+
+- **Zuschnitt auf dem Gerät:** Der Service Worker rechnet die Nachricht aus Such-Abos, Alter und Wegzeit ab dem gespeicherten Startpunkt. Der Push-Worker kennt nur das Abo.
+- **Push-Worker:** `push-worker/` (Cloudflare Worker mit KV, `https://zwergenplan-push.sbiastoch.workers.dev`). Deploy von Hand: `pnpm push:deploy`, danach zeigt `/version` den Commit. Secret im Worker: `pnpm exec wrangler secret put PUSH_ADMIN_TOKEN -c push-worker/wrangler.toml`.
+- **Versand:** `.github/workflows/push-weekly.yml` (Zeitplan Sa 10:07 Europe/Berlin) ruft `node scripts/push-weekly.ts`. Secrets: `VAPID_PRIVATE_KEY`, `PUSH_ADMIN_TOKEN` (GitHub). Höchstens ein Versand je Samstag (Versand-Marke im Worker).
+- **Testversand:** Im Kind-Sheet steht bei eingeschalteter Nachricht die „Geräte-Kennung“. In GitHub unter Actions → „Wochen-Nachricht“ → „Run workflow“ mit `only` = Kennung und `dry_run` aus. Lokal: `node scripts/push-weekly.ts --force --only=<kennung>` (liest die Secrets aus der gitignorierten `.push.local.json`); `--force --dry-run` zählt nur die Abos. Ein Testversand verbraucht die Woche nicht.
+- **Zeitplan wieder einschalten:** GitHub schaltet Zeitpläne nach 60 Tagen ohne Commit ab. Dann unter Actions → „Wochen-Nachricht“ → „Enable workflow“.
+
 ### Notausgang: Service Worker abmelden
 
 Hält ein Service Worker einen kaputten Stand fest, hilft ein Deploy mit dem Schalter `ZWERGENPLAN_SW=aus` (Plan 0011, Arch-Review Stufe 1). Er wirkt zur Build-Zeit:
