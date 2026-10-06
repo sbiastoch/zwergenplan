@@ -5,11 +5,12 @@ import {
   loadAgeOnly,
   loadBirthDate,
   loadOriginDistrict,
+  loadOriginPoint,
   loadSaved,
   loadTheme,
   saveAgeOnly,
   saveBirthDate,
-  saveOriginDistrict,
+  saveOrigin,
   saveSaved,
   saveTheme,
   type ThemeChoice,
@@ -20,7 +21,7 @@ import type { Origin } from "../domain/reach.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
-import { initialOriginState, originReducer } from "./origin-state.ts";
+import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
 import { preloadProviderUi } from "./ProviderPanel.tsx";
 
 /** Markiert einen History-Eintrag, den das Öffnen eines Details erzeugt hat (Plan 0003, E4). */
@@ -227,7 +228,7 @@ export function useNow(): Date {
 }
 
 export interface OriginApi {
-  /** gewählter Startpunkt; ein Standort lebt nur im Speicher */
+  /** gewählter Startpunkt; der zuletzt gewählte bleibt auf dem Gerät (ADR 0017) */
   origin: Origin | undefined;
   /** Standortabfrage läuft */
   locating: boolean;
@@ -238,9 +239,9 @@ export interface OriginApi {
   /** „Meinen Standort nutzen“: fragt einmal ab, nur auf Tipp */
   locateMe: () => void;
   setDistrict: (id: string) => void;
-  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8): gerundet, nur im Speicher; `false` außerhalb Nürnbergs */
+  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8): gerundet und so gespeichert; `false` außerhalb Nürnbergs */
   setMapCenter: (center: GeoPoint) => boolean;
-  /** „Startpunkt entfernen“: Standort und gespeicherten Stadtteil */
+  /** „Startpunkt entfernen“: auch den gespeicherten Punkt bzw. Stadtteil */
   clear: () => void;
 }
 
@@ -250,41 +251,50 @@ function districtOrigin(id: string | undefined): Origin | undefined {
 }
 
 /**
- * Startpunkt der Entfernung (Plan 0004, E3). Gespeichert wird nur die ID eines Stadtteils, nie ein
- * Standort; der Standort wird nur auf Tipp abgefragt und ist nach dem Neuladen weg. Wählt man den
- * Standort, bleibt ein gespeicherter Stadtteil liegen und gilt nach dem Neuladen wieder. Die Reihenfolge
- * (späte Antworten) regelt `originReducer`; eine unbekannte gespeicherte ID zählt als „kein Startpunkt“.
+ * Startpunkt der Entfernung (Plan 0004, E3; Plan 0016). Gespeichert wird der zuletzt gewählte: ein Stadtteil als
+ * ID, Standort und Kartenmitte als schon gerundeter Punkt (ADR 0017), nie beides. Der Standort wird nur auf Tipp
+ * abgefragt, auch mit gespeichertem Standort nie beim Start. Die Reihenfolge (späte Antworten) regelt
+ * `originReducer`; ein ungültiger gespeicherter Punkt oder eine unbekannte ID zählt als „nicht gespeichert“.
  */
 export function useOrigin(): OriginApi {
   const [state, dispatch] = useReducer(originReducer, undefined, () =>
-    initialOriginState(districtOrigin(loadOriginDistrict())),
+    initialOriginState(storedPointOrigin(loadOriginPoint()) ?? districtOrigin(loadOriginDistrict())),
   );
   const [locatable] = useState(() => canLocate());
+  // Jede Wahl zählt hoch: Eine Standort-Antwort wird nur gespeichert, solange ihre Abfrage die neueste ist; dieselbe
+  // Regel wie `pending` im Reducer (Plan 0016, E2).
   const nextRequest = useRef(0);
 
   const locateMe = useCallback(() => {
     const request = ++nextRequest.current;
     dispatch({ type: "locate", request });
-    void requestPosition().then((result) => dispatch({ type: "located", request, result }));
+    void requestPosition().then((result) => {
+      dispatch({ type: "located", request, result });
+      if (result.ok && nextRequest.current === request) saveOrigin({ source: "standort", ...result.point });
+    });
   }, []);
 
   const setDistrict = useCallback((id: string) => {
     const origin = districtOrigin(id);
     if (!origin) return;
+    nextRequest.current++;
     dispatch({ type: "district", origin });
-    saveOriginDistrict(id);
+    saveOrigin(id);
   }, []);
 
   const setMapCenter = useCallback((center: GeoPoint) => {
     const point = coarsen(center);
     if (!inBounds(point)) return false;
+    nextRequest.current++;
     dispatch({ type: "mapCenter", point });
+    saveOrigin({ source: "karte", ...point });
     return true;
   }, []);
 
   const clear = useCallback(() => {
+    nextRequest.current++;
     dispatch({ type: "clear" });
-    saveOriginDistrict(undefined);
+    saveOrigin(undefined);
   }, []);
 
   const { origin, locating, problem } = state;

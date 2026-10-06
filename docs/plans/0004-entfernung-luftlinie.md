@@ -86,7 +86,7 @@ Jedes Angebot zeigt eine **Entfernung** ab einem selbst gewählten Startpunkt, u
   - Die Geolocation-API wird als Parameter übergeben (Standard `navigator.geolocation`), damit der Unit-Test ohne Browser läuft.
   - Fehlt die API oder ist `window.isSecureContext` falsch, ist das Ergebnis `unsupported`, und der Knopf erscheint gar nicht (`canLocate()`).
 - **Stadtteil:** Auswahl aus der kurzen Liste in E4.
-- **Speicherung** (Nutzerentscheidung 1):
+- **Speicherung** (Nutzerentscheidung 1; **ersetzt durch ADR 0017 / Plan 0016**: Standort und Kartenmitte werden gerundet gespeichert):
   - **Der Standort bleibt nur im Arbeitsspeicher** und ist nach dem Neuladen weg.
   - Gespeichert wird nur ein gewählter Stadtteil, und zwar nur seine ID unter `zwergenplan.entfernung-ab` (`loadOriginDistrict`/`saveOriginDistrict` in `preferences.ts`). Eine unbekannte ID zählt als „kein Startpunkt“.
   - Begründung: Eine Koordinate, auch gerundet, ist praktisch die Wohnadresse. `localStorage` bleibt unbegrenzt liegen. Ein Stadtteil ist grob und öffentlich.

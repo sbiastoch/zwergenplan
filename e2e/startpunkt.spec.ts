@@ -15,6 +15,10 @@ import type { Page } from "@playwright/test";
 import { expect, expectTwoLines, startPreloads, test } from "./fixtures.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
+/** gespeicherter Punkt (Plan 0016): 49,45213 / 11,07672, gerundet */
+const POINT_KEY = "zwergenplan.startpunkt";
+const STORED_HERE = '{"source":"standort","lat":49.452,"lon":11.077}';
+const WEGZEIT_STANDORT = "Wegzeit ab deinem Standort mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)";
 /** Eine Koordinate mit mindestens zwei Nachkommastellen, z. B. „49.45“ */
 const COORDINATE = /\d{2}\.\d{2,}/;
 const TABLE = "**/data/wegzeit.json";
@@ -179,7 +183,7 @@ test("Startpunkt entfernen löscht auch den gespeicherten Stadtteil", async ({ p
   expect(await page.evaluate((key) => localStorage.getItem(key), KEY)).toBeNull();
 });
 
-test("Standort mit Freigabe: gerundet, nur im Speicher, Wegzeit, ab dem Tipp kein Request", async ({
+test("Standort mit Freigabe: gerundet gespeichert, Wegzeit, ab dem Tipp kein Request, nach dem Neuladen ohne neue Abfrage (Plan 0016)", async ({
   page,
   context,
 }) => {
@@ -205,12 +209,101 @@ test("Standort mit Freigabe: gerundet, nur im Speicher, Wegzeit, ab dem Tipp kei
   await expect(page.getByRole("dialog").getByText("ca. 5 Min. zu Fuß ab deinem Standort")).toBeVisible();
   expect(requests, "kein Request nach der Standortabfrage").toEqual([]);
   expect(page.url()).not.toMatch(COORDINATE);
-  for (const value of await storedValues(page)) expect(value).not.toContain("49.45");
+  // gespeichert nur der gerundete Punkt (ADR 0017), nie die Rohkoordinate
+  expect(await storedValues(page)).toEqual([`${POINT_KEY}=${STORED_HERE}`]);
+  await page.getByRole("dialog").getByRole("button", { name: "Zurück" }).click();
 
+  // Neuladen: Der Startpunkt steht wieder, ohne neue Standortabfrage (nur auf Tipp, Plan 0004)
+  await page.addInitScript(() => {
+    const geo = navigator.geolocation;
+    const original = geo.getCurrentPosition.bind(geo);
+    Object.assign(window, { __geoWrapped: true, __geoCalls: 0 });
+    Object.defineProperty(geo, "getCurrentPosition", {
+      value: (...args: Parameters<Geolocation["getCurrentPosition"]>) => {
+        Object.assign(window, { __geoCalls: Number(Reflect.get(window, "__geoCalls")) + 1 });
+        original(...args);
+      },
+    });
+  });
   await page.reload();
-  await expect(offers(page).first()).toBeVisible();
-  await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
-  for (const value of await storedValues(page)) expect(value).not.toContain("49.45");
+  await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+  await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText(/^\d+ Min\.$/);
+  expect(await page.evaluate(() => [Reflect.get(window, "__geoWrapped"), Reflect.get(window, "__geoCalls")])).toEqual([
+    true,
+    0,
+  ]);
+  expect(await storedValues(page)).toEqual([`${POINT_KEY}=${STORED_HERE}`]);
+});
+
+test.describe("Gespeicherter Standort (Plan 0016)", () => {
+  test("genau ein Request beim Start auf wegzeit.json und linien.json, Kind-Sheet zeigt „Mein Standort“", async ({
+    page,
+  }) => {
+    await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
+      key: POINT_KEY,
+      value: STORED_HERE,
+    });
+    const requests = tableRequests(page);
+    const lines = tableRequests(page, isLines);
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+    await expect.poll(() => lines.length).toBe(1);
+    const sheet = await openKidSheet(page);
+    await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
+    await expect(sheet.getByText(/Wegzeit ab deinem Standort \(auf ca\. 100 m gerundet\)/)).toBeVisible();
+    await expect(sheet.getByText(/Dein Startpunkt bleibt nur auf diesem Gerät/)).toBeVisible();
+    await sheet.getByRole("button", { name: "Fertig" }).click();
+    await page.waitForTimeout(300);
+    expect(requests).toHaveLength(1);
+    expect(lines).toHaveLength(1);
+  });
+
+  test("Stadtteil-Wahl ersetzt den gespeicherten Standort", async ({ page }) => {
+    await page.addInitScript(
+      ({ key, value }) => {
+        // nur beim ersten Laden setzen, sonst überschriebe das Neuladen die Wahl
+        if (sessionStorage.getItem("gesetzt") === null) {
+          sessionStorage.setItem("gesetzt", "1");
+          localStorage.setItem(key, value);
+        }
+      },
+      { key: POINT_KEY, value: STORED_HERE },
+    );
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+    const sheet = await openKidSheet(page);
+    await sheet.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+    await sheet.getByRole("button", { name: "Fertig" }).click();
+    expect(await storedValues(page)).toEqual([`${KEY}=gostenhof`]);
+    await page.reload();
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  });
+
+  test("Startpunkt entfernen löscht den gespeicherten Standort; nach dem Neuladen kein Startpunkt, kein Laden", async ({
+    page,
+  }) => {
+    await page.addInitScript(
+      ({ key, value }) => {
+        if (sessionStorage.getItem("gesetzt") === null) {
+          sessionStorage.setItem("gesetzt", "1");
+          localStorage.setItem(key, value);
+        }
+      },
+      { key: POINT_KEY, value: STORED_HERE },
+    );
+    await ready(page);
+    const sheet = await openKidSheet(page);
+    await sheet.getByRole("button", { name: "Startpunkt entfernen" }).click();
+    await expect(sheet.getByText("Noch kein Startpunkt – dann zeigen wir keine Wegzeit.")).toBeVisible();
+    await sheet.getByRole("button", { name: "Fertig" }).click();
+    expect(await storedValues(page)).toEqual([]);
+
+    const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
+    await ready(page);
+    await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
+    await page.waitForTimeout(300);
+    expect(requests).toEqual([]);
+  });
 });
 
 test("Standort verweigert: Hinweis, kein Startpunkt", async ({ page }) => {

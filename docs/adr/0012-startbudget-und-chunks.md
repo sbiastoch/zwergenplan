@@ -133,3 +133,8 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 - Gemessen nach dem Merge von Plan 0012 (Linien, `main` 61de0da: 91,28 kB) in Plan 0011, Stufe 1 (PWA): **`JS (initial)` 91,72 kB** von 92 kB. Die Anteile addieren sich (0012 +0,38 kB, 0011 +0,44 kB gegenüber 90,90 kB vor beiden).
 - Rest 0,28 kB. Das Budget bleibt bei 92 kB. Wie Stufe 2 von Plan 0011 (≈ 0,10 kB geschätzt) und spätere Pläne hineinpassen, entscheidet Plan 0011 vor Schritt 9; die Kandidaten zum Auslagern stehen dort und hier unter „Optionen“ (d) bzw. in `docs/ideas.md`.
 
+
+## Nachtrag (2026-10-06): Stand nach Plan 0016
+
+- Gemessen gegen `main` 32d4edb (**91,77 kB**): Plan 0016 (Startpunkt gespeichert, ADR 0017) bringt **`JS (initial)` 91,95 kB** von 92 kB, also +0,18 kB. Schon eingespart sind −30 B (ein gemeinsames `saveOrigin`, knappe Formprüfung, ein Ref statt zwei).
+- Rest **0,05 kB**. Das Budget bleibt bei 92 kB. Stufe 2 von Plan 0011 (≈ 0,10 kB) passt damit nur mit den dort benannten Kandidaten zum Auslagern. Wer nach Plan 0016 nach `main` merged, misst neu.

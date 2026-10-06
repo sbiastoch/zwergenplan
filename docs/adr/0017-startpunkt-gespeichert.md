@@ -1,6 +1,6 @@
 # ADR 0017 – Der Startpunkt bleibt auf dem Gerät, auch als gerundeter Punkt
 
-Status: Entwurf (2026-10-06), wird mit der Umsetzung von Plan 0016 angenommen. Nutzerentscheidung vom 2026-10-06.
+Status: angenommen (2026-10-06), umgesetzt mit Plan 0016. Nutzerentscheidung vom 2026-10-06.
 - Ersetzt Plan 0004, E3, „Der Standort bleibt nur im Arbeitsspeicher“ (Nutzerentscheidung 1) und Plan 0005, E8, „Kartenmitte nur im Speicher“.
 - Ändert die Invarianten „Startpunkt“ und „Kein Request hängt davon ab, welcher Startpunkt gilt“ in `docs/architecture.md`.
 - Ändert ADR 0011, Punkt 6, Spiegelstriche 1 und 3 (Laden beim Start und das verratene Bit: „ein Startpunkt“ statt „ein Stadtteil“).
@@ -21,7 +21,7 @@ Im Alltag passt das nicht: Die App wird als PWA vom Startbildschirm geöffnet, u
 2. **Höchstens ein Eintrag gilt.** Wer einen Punkt wählt, löscht den gespeicherten Stadtteil, und umgekehrt. „Startpunkt entfernen“ löscht beide.
 3. **Nichts davon verlässt das Gerät.** Der Startpunkt steht weiterhin nie in URL, Logs oder Requests. Der Standort wird weiterhin nur auf Tipp abgefragt, auch beim Start mit gespeichertem Standort nicht automatisch.
 4. **Laden beim Start:** Die Wegzeit-Tabelle und die Linien laden beim Start, wenn *irgendein* Startpunkt gespeichert ist. Bisher galt das nur für einen Stadtteil. Der Request bleibt für alle gleich und verrät dem eigenen Host weiterhin nur ein Bit: dass ein Startpunkt gespeichert ist.
-5. **Ein gespeicherter Wert wird beim Lesen geprüft.** Die Form wird in `src/data` geprüft (Quelle bekannt, Zahlen endlich). Danach rundet `useOrigin` erneut und prüft gegen `NUERNBERG_BBOX`. Ein ungültiger Wert zählt als „kein gespeicherter Punkt“, dann gilt ein gespeicherter Stadtteil, sonst keiner.
+5. **Ein gespeicherter Wert wird beim Lesen geprüft.** Die Form wird in `src/data` geprüft (Quelle bekannt, `lat` und `lon` sind Zahlen; die Endlichkeit sichert `inBounds`). Danach rundet `useOrigin` erneut und prüft gegen `NUERNBERG_BBOX`. Ein ungültiger Wert zählt als „kein gespeicherter Punkt“, dann gilt ein gespeicherter Stadtteil, sonst keiner.
 
 ## Alternativen
 

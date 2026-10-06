@@ -1,8 +1,8 @@
 /**
  * Wegzeit-Tabelle: Laden und Modus der Anzeige (Plan 0009, E9–E11; ADR 0011). Kern ist ein reiner Reducer
  * (wie origin-state.ts): Geladen wird nur auf `want()` (Kind-Sheet, Karte, „Nochmal laden“) oder beim Start mit
- * gespeichertem Stadtteil, höchstens einmal je Sitzung. Die Wahl eines Startpunkts löst nie einen Request aus:
- * Der Startpunkt geht nur in `resolveReach` ein, nie in den Ladezustand.
+ * gespeichertem Startpunkt (ADR 0017), höchstens einmal je Sitzung. Die Wahl eines Startpunkts löst nie einen
+ * Request aus: Der Startpunkt geht nur in `resolveReach` ein, nie in den Ladezustand.
  */
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { type ChunkOutcome, loadTransit, type TransitLoad } from "../data/transit.ts";
@@ -74,9 +74,9 @@ export type TransitAction =
   /** Frische-Anlass (Plan 0011, E4a): eine fertige Tabelle neu laden, am HTTP-Cache vorbei */
   | { type: "refresh" };
 
-/** Mit gespeichertem Stadtteil lädt die Tabelle gleich beim Start (E9, Auslöser 1). */
-export function initialTransitState(storedDistrict: boolean): TransitState {
-  return storedDistrict ? { kind: "laedt", attempt: 1, retry: false } : { kind: "aus", attempt: 0 };
+/** Mit gespeichertem Startpunkt (Stadtteil oder Punkt, ADR 0017) lädt die Tabelle gleich beim Start (E9, Auslöser 1). */
+export function initialTransitState(storedOrigin: boolean): TransitState {
+  return storedOrigin ? { kind: "laedt", attempt: 1, retry: false } : { kind: "aus", attempt: 0 };
 }
 
 /** Ein Versuch läuft: erstes Laden oder Neuladen einer fertigen Tabelle (E4a) */
@@ -121,8 +121,8 @@ export function transitReducer(state: TransitState, action: TransitAction): Tran
  * einen gescheiterten `import()` in der Module-Map, dort hilft nur noch das Neuladen; WebKit und Firefox holen ihn
  * neu (whatwg/html#10327) und kommen beim Wiederholen meist gar nicht hierher. Nicht beim ersten Versuch (dann erst
  * „Nochmal laden“), nicht ohne Tabelle (wohl ohne Netz: ein Neuladen endete auf der Fehlerseite des Browsers), nicht
- * nach dem Zeitlimit (der Import läuft weiter, der nächste Versuch bekommt ihn). Das Neuladen verliert Standort bzw.
- * Kartenmitte (nur im Speicher); URL-Filter und gespeicherter Stadtteil bleiben.
+ * nach dem Zeitlimit (der Import läuft weiter, der nächste Versuch bekommt ihn). URL-Filter und der gespeicherte
+ * Startpunkt bleiben beim Neuladen (ADR 0017).
  */
 export function reloadAfterRetry(retry: boolean, load: { chunk: ChunkOutcome; file: unknown }): boolean {
   return retry && load.chunk === "fehler" && load.file !== undefined;
@@ -233,11 +233,11 @@ export interface TransitApi {
 }
 
 /**
- * `origin` beim ersten Aufruf entscheidet über das Laden beim Start (gespeicherter Stadtteil, E9). Danach geht der
+ * `origin` beim ersten Aufruf entscheidet über das Laden beim Start (gespeicherter Startpunkt, E9; ADR 0017). Danach geht der
  * Startpunkt nur noch in die Rechnung ein. `placeKeys`: Orte der Seite (`undefined`, solange `site.json` lädt).
  */
 export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<string> | undefined): TransitApi {
-  const [state, dispatch] = useReducer(transitReducer, origin?.source === "stadtteil", initialTransitState);
+  const [state, dispatch] = useReducer(transitReducer, origin !== undefined, initialTransitState);
   const attempt = loading(state) ? state.attempt : 0;
   const retry = state.kind === "laedt" && state.retry;
 

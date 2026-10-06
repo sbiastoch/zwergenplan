@@ -351,7 +351,7 @@ export const ACCESS_METERS = 800;
 - Der Aufwand je Startpunkt sind 570 Abstände plus 76 × (Zugangshalte, Median 9) Additionen, also unter 1 ms.
 - **Laden der Tabelle** (`src/data/transit.ts`, `loadTransitTable()`, nur `fetch` vom eigenen Origin, kein Laufzeit-Import aus `src/domain`, ADR 0010 bleibt):
   - Auslöser ist `useTransit().want()` in `src/ui/use-transit.ts`. Er feuert, wenn
-    1. beim Start ein Stadtteil gespeichert ist (`zwergenplan.entfernung-ab`),
+    1. beim Start ein Stadtteil gespeichert ist (`zwergenplan.entfernung-ab`; seit ADR 0017 / Plan 0016 jeder gespeicherte Startpunkt),
     2. das Kind-Sheet geöffnet wird (dort wählt man Standort oder Stadtteil),
     3. die Karte geöffnet wird (dort gibt es „Kartenmitte als Startpunkt“),
     4. jemand im Modus „fehler“ auf „Nochmal laden“ tippt (E11). Das ist eine eigene Handlung, unabhängig davon, welcher Startpunkt gilt.

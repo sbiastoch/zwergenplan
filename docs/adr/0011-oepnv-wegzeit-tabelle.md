@@ -4,6 +4,8 @@ Status: angenommen (2026-10-05), Umsetzung mit Plan 0009. Ersetzt Teile von ADR 
 
 **Geändert durch ADR 0015 (Plan 0012):** Punkt 2 (Radius) und Punkt 3, Satz 2 ersetzt durch ADR 0015; Punkte 4, 5 und 6 ergänzt.
 
+**Geändert durch ADR 0017 (Plan 0016):** Punkt 6, Spiegelstriche 1 und 3 (Laden beim Start und das verratene Bit gelten für jeden gespeicherten Startpunkt, nicht nur für einen Stadtteil).
+
 ## Kontext
 
 ADR 0005 legte fest, dass die Wegzeit aus einer statischen GTFS-Matrix entsteht: ~150 Halte U-Bahn, S-Bahn und Tram, `Venue.nearestStops`, Fahrzeit ohne Umsteige-Wartezeit. Plan 0009 hat das am VGN-Feed nachgemessen (Stand 24.06.2026, gültig bis 12.12.2026, 15,3 MB):

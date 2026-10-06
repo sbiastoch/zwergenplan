@@ -422,6 +422,30 @@ test.describe("mit gemockten Kacheln", () => {
     await expect.poll(async () => (await camera(page)).lat).toBeLessThan(start.lat - 0.005);
   });
 
+  test("gespeicherte Kartenmitte: nach dem Start wieder Startpunkt, als Punkt auf der Karte; Ausschnitt und Kacheln wie ohne Startpunkt (Plan 0016, ADR 0008)", async ({
+    page,
+    tileLog,
+  }) => {
+    const tilePaths = (from: number) => [...new Set(tileLog.slice(from).map((t) => t.path))].sort();
+    // Bezug ohne Startpunkt
+    await openMap(page);
+    const plain = await camera(page);
+    const plainTiles = tilePaths(0);
+
+    await page.evaluate(() =>
+      localStorage.setItem("zwergenplan.startpunkt", '{"source":"karte","lat":49.452,"lon":11.077}'),
+    );
+    const before = tileLog.length;
+    await openMap(page);
+    await expect(page.getByRole("button", { name: "Startpunkt: Kartenmitte" })).toBeVisible();
+    await expect(page.getByRole("status")).toContainText("ab der Kartenmitte");
+    await idle(page);
+    // Der gespeicherte Punkt ist nur ein Layer: Kamera und Kachelwahl verraten ihn nicht (Kamera-Regel).
+    expect(await camera(page)).toEqual(plain);
+    expect(tilePaths(before)).toEqual(plainTiles);
+    expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
+  });
+
   test("Startausschnitt verrät weder Standort noch Alter: Standort, Geburtsdatum, „Kurse“ und „bis 20 Min.“ in der Liste, dann Karte (Arch-Review B1, m1; Plan 0009)", async ({
     page,
     context,

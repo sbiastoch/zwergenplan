@@ -56,7 +56,7 @@ const LINES: TransitLinesFile = {
 };
 
 describe("transitReducer (Plan 0009, E9/E11)", () => {
-  it("lädt beim Start nur mit gespeichertem Stadtteil", () => {
+  it("lädt beim Start nur mit gespeichertem Startpunkt (ADR 0017)", () => {
     expect(initialTransitState(false)).toEqual({ kind: "aus", attempt: 0 });
     expect(initialTransitState(true)).toEqual({ kind: "laedt", attempt: 1, retry: false });
   });

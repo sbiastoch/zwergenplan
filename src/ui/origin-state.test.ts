@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Origin } from "../domain/reach.ts";
-import { initialOriginState, type OriginState, originReducer } from "./origin-state.ts";
+import { initialOriginState, type OriginState, originReducer, pointOrigin, storedPointOrigin } from "./origin-state.ts";
 
 const GOSTENHOF: Origin = {
   source: "stadtteil",
@@ -94,7 +94,7 @@ describe("originReducer (Plan 0004, E3)", () => {
     expect(originReducer(failed, { type: "clear" })).toEqual({ origin: undefined, locating: false });
   });
 
-  it("Kartenmitte als Startpunkt: nur im Speicher, löscht den Fehler, späte Standort-Antwort wirkt nicht (Plan 0005, E8)", () => {
+  it("Kartenmitte als Startpunkt: löscht den Fehler, späte Standort-Antwort wirkt nicht (Plan 0005, E8)", () => {
     const center = { lat: 49.45, lon: 11.07 };
     const state = run(
       initialOriginState(GOSTENHOF),
@@ -113,5 +113,30 @@ describe("originReducer (Plan 0004, E3)", () => {
       { type: "mapCenter", point: center },
     );
     expect(failed.problem).toBeUndefined();
+  });
+});
+
+describe("gespeicherter Punkt (Plan 0016, E3)", () => {
+  it("pointOrigin: feste Labels je Quelle", () => {
+    expect(pointOrigin("standort", HERE)).toEqual(MINE);
+    expect(pointOrigin("karte", HERE)).toEqual({ source: "karte", point: HERE, label: "Kartenmitte" });
+  });
+
+  it("storedPointOrigin rundet erneut und stellt Standort bzw. Kartenmitte wieder her", () => {
+    expect(storedPointOrigin({ source: "standort", lat: 49.45213, lon: 11.07672 })).toEqual(MINE);
+    expect(storedPointOrigin({ source: "karte", lat: 49.452, lon: 11.077 })).toEqual({
+      source: "karte",
+      point: HERE,
+      label: "Kartenmitte",
+    });
+  });
+
+  it("storedPointOrigin verwirft Punkte außerhalb Nürnbergs und fehlende Werte", () => {
+    expect(storedPointOrigin({ source: "standort", lat: 48.137, lon: 11.575 })).toBeUndefined();
+    expect(storedPointOrigin({ source: "karte", lat: 0, lon: 0 })).toBeUndefined();
+    // `loadOriginPoint` prüft nur `typeof`; `1e999` im JSON wird zu Infinity (Arch-Review 0016, m1)
+    expect(storedPointOrigin({ source: "standort", lat: Number.POSITIVE_INFINITY, lon: 11.077 })).toBeUndefined();
+    expect(storedPointOrigin({ source: "standort", lat: Number.NaN, lon: 11.077 })).toBeUndefined();
+    expect(storedPointOrigin(undefined)).toBeUndefined();
   });
 });

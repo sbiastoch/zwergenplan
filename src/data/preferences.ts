@@ -1,8 +1,8 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, Darstellung,
- * „Nur passende Angebote“, Startpunkt-Stadtteil. Nichts davon gelangt in URL, Logs oder Requests
- * (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die Einstellung
- * nur für die Sitzung.
+ * „Nur passende Angebote“, Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017). Nichts davon gelangt in URL,
+ * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
+ * Einstellung nur für die Sitzung.
  */
 const KEYS = {
   birthDate: "zwergenplan.geburtsdatum",
@@ -10,6 +10,7 @@ const KEYS = {
   theme: "zwergenplan.darstellung",
   ageOnly: "zwergenplan.nur-passende",
   originDistrict: "zwergenplan.entfernung-ab",
+  originPoint: "zwergenplan.startpunkt",
 } as const;
 
 function read(key: string): string | null {
@@ -74,13 +75,45 @@ export function saveAgeOnly(on: boolean): void {
 }
 
 /**
- * Gespeicherter Startpunkt: nur die ID eines Stadtteils, nie ein Standort (Plan 0004, E3). Geliefert wird der
- * rohe Wert; ob es den Stadtteil gibt, prüft `useOrigin` (eine unbekannte ID zählt dort als „kein Startpunkt“).
+ * Gespeicherter Stadtteil als ID (Plan 0004, E3). Geliefert wird der rohe Wert; ob es den Stadtteil gibt, prüft
+ * `useOrigin` (eine unbekannte ID zählt dort als „kein Startpunkt“). Gespeichert ist höchstens eins: Stadtteil
+ * oder Punkt (Plan 0016, E2).
  */
 export function loadOriginDistrict(): string | undefined {
   return read(KEYS.originDistrict) || undefined;
 }
 
-export function saveOriginDistrict(id: string | undefined): void {
-  write(KEYS.originDistrict, id);
+/** Standort oder Kartenmitte, schon gerundet (`coarsen`); nie eine Rohkoordinate (ADR 0017) */
+export interface StoredOriginPoint {
+  source: "standort" | "karte";
+  lat: number;
+  lon: number;
+}
+
+/**
+ * Gespeicherter Punkt (Plan 0016, E1). Geprüft wird nur die Form; erneut runden und die Stadtgrenze prüft
+ * `useOrigin`. Ohne `Number.isFinite`: `inBounds` verwirft auch `Infinity` (etwa aus `1e999`).
+ */
+export function loadOriginPoint(): StoredOriginPoint | undefined {
+  try {
+    // `Object(…)` macht aus `null`, Zahlen usw. ein Objekt ohne diese Felder (Start-Budget statt `in`-Prüfungen)
+    const { source, lat, lon } = Object(JSON.parse(read(KEYS.originPoint) ?? "0"));
+    return (source === "standort" || source === "karte") && typeof lat === "number" && typeof lon === "number"
+      ? { source, lat, lon }
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Startpunkt speichern (Plan 0016, E2): eine ID als Stadtteil, ein Punkt als Standort bzw. Kartenmitte, nie beides;
+ * `undefined` löscht. Der Punkt wird neu gebaut, damit nur diese drei Felder im Speicher landen.
+ */
+export function saveOrigin(value: string | StoredOriginPoint | undefined): void {
+  write(KEYS.originDistrict, typeof value === "string" ? value : undefined);
+  write(
+    KEYS.originPoint,
+    typeof value === "object" ? JSON.stringify({ source: value.source, lat: value.lat, lon: value.lon }) : undefined,
+  );
 }

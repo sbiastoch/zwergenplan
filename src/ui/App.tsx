@@ -59,7 +59,7 @@ export function App() {
   // erneuert sich im offenen Tab, höchstens einmal pro Minute (Plan 0007, E2)
   const now = useNow();
   const today = berlinIsoDate(now);
-  // Startpunkt der Entfernung: Standort nur im Speicher, gespeichert höchstens die Stadtteil-ID (Plan 0004, E3)
+  // Startpunkt der Entfernung: der zuletzt gewählte bleibt auf dem Gerät, ein Punkt nur gerundet (ADR 0017)
   const originApi = useOrigin();
   const { origin } = originApi;
 
@@ -102,7 +102,7 @@ export function App() {
     () => (load.kind === "ready" ? new Set(load.data.offers.map((o) => placeKey(o.venue.geo))) : undefined),
     [load],
   );
-  // Wegzeit (Plan 0009, E9–E11): lädt beim Start nur mit gespeichertem Stadtteil, sonst erst auf Anlass
+  // Wegzeit (Plan 0009, E9–E11): lädt beim Start nur mit gespeichertem Startpunkt, sonst erst auf Anlass
   const transit = useTransit(origin, placeKeys);
   const { mode: reachMode, want } = transit;
 
@@ -209,7 +209,7 @@ export function App() {
   const limit = route.filter.reachLimit;
   const limitOn = limitActive(reachMode);
   const hint = limit && limitHint(limit, reachMode);
-  // gespeicherter Stadtteil + wegzeit=: Platzhalter statt ungefilterter Liste bzw. ungefiltertem Kalender, bis die
+  // gespeicherter Startpunkt + wegzeit=: Platzhalter statt ungefilterter Liste bzw. ungefiltertem Kalender, bis die
   // Wegzeit da ist (M7, Arch-Review 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11).
   const listPending = reachMode?.kind === "laedt" && limit !== undefined;
   const limitAction: LimitActionFor = (focusTarget) => (

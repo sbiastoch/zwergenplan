@@ -1,7 +1,8 @@
 /**
  * Standort des Geräts (Plan 0004, E3). Nur auf Tipp, nie automatisch. Die Rohkoordinate verlässt
  * diese Datei nie: Sie wird sofort auf ca. 100 m gerundet (`coarsen`) und gegen `NUERNBERG_BBOX`
- * geprüft. Nichts davon wird gespeichert, geloggt oder verschickt (docs/architecture.md).
+ * geprüft. Die Rohkoordinate wird nie gespeichert, geloggt oder verschickt; den gerundeten Punkt behält
+ * höchstens `preferences.ts` auf dem Gerät (ADR 0017, docs/architecture.md).
  */
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 

@@ -8,8 +8,8 @@ import { type GeoPoint, haversineMeters } from "./geo.ts";
 import type { TransitReach } from "./transit-types.ts";
 
 /**
- * Herkunft des Startpunkts; „karte“ ist die Kartenmitte (Plan 0005, E8), wie der Standort nur im
- * Arbeitsspeicher. Export erst, wenn ihn jemand braucht (knip).
+ * Herkunft des Startpunkts; „karte“ ist die Kartenmitte (Plan 0005, E8), wie der Standort gerundet und nur
+ * auf dem Gerät gespeichert (ADR 0017). Export erst, wenn ihn jemand braucht (knip).
  */
 type OriginSource = "standort" | "stadtteil" | "karte";
 

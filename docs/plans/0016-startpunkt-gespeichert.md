@@ -1,6 +1,6 @@
 # Plan 0016 – Der Startpunkt übersteht das Neuladen
 
-Status: Entwurf, Review eingearbeitet (Freigabe mit Änderungen)
+Status: umgesetzt (Branch `standort-speichern`), Deploy und Browser-Review stehen aus
 Datum: 2026-10-06
 Bezug: ADR 0017 (neu), Plan 0004 (E3), Plan 0005 (E8), Plan 0009 (E9), ADR 0008 (Kamera-Regel), ADR 0011 (Punkt 6), ADR 0012 (Startbudget)
 
@@ -176,3 +176,21 @@ Unabhängiger `plan-reviewer`. Keine Blocker. Alle Punkte übernommen:
 - **K10** Fußnote → „Dein Startpunkt bleibt nur auf diesem Gerät (ein Standort auf ca. 100 m gerundet).“
 - **K11** ADR-Status → „Entwurf“ bis zum Merge; Verweis „(E5)“ korrigiert.
 - **K12** E3-Signatur → `import type { StoredOriginPoint }` aus `src/data/preferences.ts`.
+
+## Umsetzung (2026-10-06)
+
+- Umgesetzt wie geplant, mit drei Abweichungen fürs Start-Budget (Schritt 5, Entscheidungspunkt):
+  - **Ein `saveOrigin(value: string | StoredOriginPoint | undefined)`** statt `saveOriginDistrict` und `saveOriginPoint`. Eine ID speichert den Stadtteil, ein Punkt Standort bzw. Kartenmitte, `undefined` löscht. Der jeweils andere Schlüssel wird immer gelöscht, „nie beides“ (E2) liegt also in `src/data` und ist dort getestet.
+  - **Kein zweiter Ref `latestRequest`.** `nextRequest` zählt bei jeder Wahl hoch (Stadtteil, Kartenmitte, Entfernen). Eine Standort-Antwort wird nur gespeichert, solange `nextRequest.current === request`. Die Regel ist dieselbe, die parametrisierten Unit-Tests (Tests, 3) belegen sie.
+  - **Formprüfung über `Object(JSON.parse(…))`** statt `in`-Prüfungen. `null`, Zahlen und Wahrheitswerte werden so zu Objekten ohne die Felder.
+- **Start-Budget:** `main` 32d4edb 91,77 kB → **91,95 kB** (+0,18 kB, Budget 92 kB unverändert, Rest 0,05 kB). Eingetragen in ADR 0012 („Nachtrag 2026-10-06“). Für Plan 0011, Stufe 2 heißt das: nur mit Auslagern.
+- **Gates:** `pnpm check:fast` grün. `PW_PORT=4473 pnpm check` grün, mit 1738 E2E-Tests, Coverage, knip, Schema und Size. Nach den Arch-Review-Fixes liefen `startpunkt.spec.ts` und `karte.spec.ts` auf Pixel 7 und Desktop erneut, 104 grün.
+
+## Arch-Review (2026-10-06) – Verdict: Nacharbeit nötig, keine Blocker
+
+- **M1** Entscheidungspunkt Start-Budget nicht dokumentiert → gemessen (91,77 → 91,95 kB), Abschnitt „Umsetzung“ und Nachtrag in ADR 0012.
+- **m1** ADR 0017, Punkt 5 und der Kommentar zu `Infinity` waren ungenau → Text korrigiert, Unit-Fälle `Infinity`/`NaN` in `origin-state.test.ts`.
+- **m2** `architecture.md`: Der Satz zur Kartenmitte stimmte nicht → „die Kartenmitte rundet `useOrigin` (`setMapCenter`) ebenso“.
+- **m3** veraltete Kommentare und Testnamen → `reach.ts`, `use-transit.test.ts` und `ideas.md` nachgezogen.
+- **m4** E2E zur gespeicherten Kartenmitte prüfte die Kamera-Regel nicht selbst → Vergleich von Kamera und Kachelpfaden mit dem Stand ohne Startpunkt.
+- **m5** ADR 0017 noch „Entwurf“ → „angenommen“.

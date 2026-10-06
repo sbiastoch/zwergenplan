@@ -186,7 +186,7 @@ Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR
 - `OriginSource` aus Plan 0004 bekommt den Wert `"karte"`, Label „Kartenmitte“, `originPhrase` → „ab der Kartenmitte“.
 - Ein dezentes Fadenkreuz (CSS, `aria-hidden`, `pointer-events: none`) markiert die Mitte.
 - „Kartenmitte als Startpunkt“ übernimmt `coarsen(map.getCenter())`. Liegt der Punkt außerhalb von `NUERNBERG_BBOX`, kommt der Toast „Die Kartenmitte liegt außerhalb von Nürnberg.“
-- Speicherung wie beim Standort: **nur im Arbeitsspeicher** (Plan 0004, E3).
+- Speicherung wie beim Standort: **nur im Arbeitsspeicher** (Plan 0004, E3). **Ersetzt durch ADR 0017 / Plan 0016:** gerundet gespeichert.
 - Der Knopf erscheint nur bei `data-state="bereit"`. Bei Fehler, ohne WebGL und beim Laden fehlt er.
 - Warum kein „auf die Karte tippen“ (ADR 0005 nennt das als Fallback): Ein Tipp öffnet schon Marker. Die Kartenmitte ist auch mit Tastatur und Bildschirmleser bedienbar. Festgehalten in ADR 0008.
 

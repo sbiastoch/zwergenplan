@@ -7,6 +7,7 @@ const preloadProviderUi = vi.hoisted(() => vi.fn());
 vi.mock("./ProviderPanel.tsx", () => ({ preloadProviderUi }));
 
 const KEY = "zwergenplan.entfernung-ab";
+const POINT_KEY = "zwergenplan.startpunkt";
 
 /** localStorage gibt es in Node nicht; ein Map-Stub reicht. */
 function fakeStorage() {
@@ -101,7 +102,7 @@ describe("useOrigin (Plan 0004, E3)", () => {
     expect(storage.data.size).toBe(0);
   });
 
-  it("Kartenmitte als Startpunkt: gerundet, nur im Speicher, außerhalb Nürnbergs abgelehnt (Plan 0005, E8)", () => {
+  it("Kartenmitte als Startpunkt: gerundet gespeichert statt des Stadtteils, außerhalb Nürnbergs abgelehnt (Plan 0005, E8; Plan 0016)", () => {
     storage.data.set(KEY, "gostenhof");
     let accepted: boolean | undefined;
     const api = renderOrigin((a) => {
@@ -109,14 +110,142 @@ describe("useOrigin (Plan 0004, E3)", () => {
     });
     expect(accepted).toBe(true);
     expect(api.origin).toEqual({ source: "karte", point: { lat: 49.452, lon: 11.077 }, label: "Kartenmitte" });
-    // gespeichert bleibt nur der Stadtteil von vorher
-    expect([...storage.data]).toEqual([[KEY, "gostenhof"]]);
+    expect([...storage.data]).toEqual([[POINT_KEY, '{"source":"karte","lat":49.452,"lon":11.077}']]);
 
+    storage.data.clear();
+    storage.data.set(KEY, "gostenhof");
     const outside = renderOrigin((a) => {
       accepted = a.setMapCenter({ lat: 48.137, lon: 11.575 });
     });
     expect(accepted).toBe(false);
     expect(outside.origin?.source).toBe("stadtteil");
+    expect([...storage.data]).toEqual([[KEY, "gostenhof"]]);
+  });
+});
+
+/** Geolocation, deren Antworten der Test selbst auslöst; `answer(i, …)` beantwortet die i-te Abfrage. */
+function controlledGeolocation() {
+  const pending: ((coords: { latitude: number; longitude: number }) => void)[] = [];
+  const failures: ((error: { code: number }) => void)[] = [];
+  vi.stubGlobal("isSecureContext", true);
+  vi.stubGlobal("navigator", {
+    geolocation: {
+      getCurrentPosition: (
+        ok: (position: { coords: { latitude: number; longitude: number } }) => void,
+        fail: (error: { code: number }) => void,
+      ) => {
+        pending.push((coords) => ok({ coords }));
+        failures.push(fail);
+      },
+    },
+  });
+  return {
+    answer: (i: number, latitude: number, longitude: number) => pending[i]?.({ latitude, longitude }),
+    fail: (i: number, code: number) => failures[i]?.({ code }),
+  };
+}
+
+/** `requestPosition(…).then(…)` in useOrigin zu Ende laufen lassen */
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+describe("useOrigin: gespeicherter Startpunkt (Plan 0016)", () => {
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("stellt einen gespeicherten Standort bzw. eine gespeicherte Kartenmitte wieder her (erneut gerundet)", () => {
+    storage.data.set(POINT_KEY, '{"source":"standort","lat":49.45213,"lon":11.07672}');
+    expect(renderOrigin().origin).toEqual({
+      source: "standort",
+      point: { lat: 49.452, lon: 11.077 },
+      label: "Mein Standort",
+    });
+    storage.data.set(POINT_KEY, '{"source":"karte","lat":49.46,"lon":11.08}');
+    expect(renderOrigin().origin).toEqual({ source: "karte", point: { lat: 49.46, lon: 11.08 }, label: "Kartenmitte" });
+  });
+
+  it("ein gespeicherter Punkt geht vor; ist er ungültig, gilt der Stadtteil", () => {
+    storage.data.set(KEY, "gostenhof");
+    storage.data.set(POINT_KEY, '{"source":"standort","lat":49.452,"lon":11.077}');
+    expect(renderOrigin().origin?.source).toBe("standort");
+    for (const raw of ['{"source":"standort","lat":48.137,"lon":11.575}', "kaputt"]) {
+      storage.data.set(POINT_KEY, raw);
+      expect(renderOrigin().origin?.districtId).toBe("gostenhof");
+    }
+  });
+
+  it("Stadtteil-Wahl löscht einen gespeicherten Punkt, eine unbekannte ID lässt alles stehen", () => {
+    const stored = '{"source":"standort","lat":49.452,"lon":11.077}';
+    storage.data.set(POINT_KEY, stored);
+    renderOrigin((a) => a.setDistrict("gibt-es-nicht"));
+    expect([...storage.data]).toEqual([[POINT_KEY, stored]]);
+    renderOrigin((a) => a.setDistrict("gostenhof"));
+    expect([...storage.data]).toEqual([[KEY, "gostenhof"]]);
+  });
+
+  it("„Startpunkt entfernen“ löscht Punkt und Stadtteil", () => {
+    storage.data.set(KEY, "gostenhof");
+    storage.data.set(POINT_KEY, '{"source":"karte","lat":49.46,"lon":11.08}');
+    expect(renderOrigin((a) => a.clear()).origin).toBeUndefined();
+    expect(storage.data.size).toBe(0);
+  });
+
+  it("speichert einen gefundenen Standort gerundet und löscht den Stadtteil", async () => {
+    storage.data.set(KEY, "gostenhof");
+    const geo = controlledGeolocation();
+    renderOrigin((a) => a.locateMe());
+    geo.answer(0, 49.45213, 11.07672);
+    await settle();
+    expect([...storage.data]).toEqual([[POINT_KEY, '{"source":"standort","lat":49.452,"lon":11.077}']]);
+  });
+
+  it("ein Fehlschlag ändert am Gespeicherten nichts", async () => {
+    storage.data.set(KEY, "gostenhof");
+    const geo = controlledGeolocation();
+    renderOrigin((a) => a.locateMe());
+    geo.fail(0, 1);
+    await settle();
+    expect([...storage.data]).toEqual([[KEY, "gostenhof"]]);
+  });
+
+  it.each([
+    ["Stadtteil", (a: OriginApi) => a.setDistrict("gostenhof"), [[KEY, "gostenhof"]]],
+    [
+      "Kartenmitte",
+      (a: OriginApi) => a.setMapCenter({ lat: 49.46, lon: 11.08 }),
+      [[POINT_KEY, '{"source":"karte","lat":49.46,"lon":11.08}']],
+    ],
+    ["Entfernen", (a: OriginApi) => a.clear(), []],
+  ])("eine späte Standort-Antwort nach „%s“ wird nicht gespeichert", async (_name, then, expected) => {
+    const geo = controlledGeolocation();
+    renderOrigin((a) => {
+      a.locateMe();
+      then(a);
+    });
+    geo.answer(0, 49.45213, 11.07672);
+    await settle();
+    expect([...storage.data]).toEqual(expected);
+  });
+
+  it("von zwei Abfragen speichert nur die neueste", async () => {
+    const geo = controlledGeolocation();
+    renderOrigin((a) => {
+      a.locateMe();
+      a.locateMe();
+    });
+    geo.answer(0, 49.45213, 11.07672);
+    await settle();
+    expect(storage.data.size).toBe(0);
+    geo.answer(1, 49.46, 11.08);
+    await settle();
+    expect([...storage.data]).toEqual([[POINT_KEY, '{"source":"standort","lat":49.46,"lon":11.08}']]);
   });
 });
 

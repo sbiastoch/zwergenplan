@@ -101,7 +101,7 @@ export function OriginPicker({
             </a>
           ),
         )}{" "}
-        Dein Standort wird nicht gespeichert, ein Stadtteil bleibt auf diesem Gerät. Stadtteile: ©
+        Dein Startpunkt bleibt nur auf diesem Gerät (ein Standort auf ca. 100 m gerundet). Stadtteile: ©
         OpenStreetMap-Mitwirkende.
       </p>
     </section>
