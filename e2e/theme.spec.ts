@@ -1,29 +1,35 @@
-/** Darstellung (Plan 0003, E15): Automatisch folgt dem System, Hell/Dunkel bleiben gespeichert. */
+/**
+ * Darstellung (Plan 0003, E15): Automatisch folgt dem System, Hell/Dunkel bleiben gespeichert. Gewählt wird nur im
+ * Kind-Sheet, der Knopf im Kopf ist entfallen (Plan 0018, E2).
+ */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
 import { expectAccessible } from "./mobile-ux.ts";
 
-test("Kopf-Knopf schaltet um, die Wahl überlebt das Neuladen", async ({ page }) => {
-  test.skip(
-    (page.viewportSize()?.width ?? 0) < 380,
-    "unter 380 px fehlt der Knopf im Kopf, die Darstellung liegt im Kind-Sheet (Plan 0007, E6)",
-  );
+async function openKidSheet(page: Page) {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  return page.getByRole("dialog", { name: "Kind und Einstellungen" });
+}
+
+test("Darstellung im Kind-Sheet überlebt das Neuladen, im Kopf gibt es keinen Knopf", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("./");
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
-  await page.getByRole("button", { name: "Dunkle Darstellung" }).click();
+  await expect(page.locator(".hdr").getByRole("button", { name: /Darstellung/ })).toHaveCount(0);
+  const sheet = await openKidSheet(page);
+  await sheet.getByRole("button", { name: "Dunkel", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("button", { name: "Helle Darstellung" })).toBeVisible();
+  await openKidSheet(page);
+  await expect(sheet.getByRole("button", { name: "Dunkel", exact: true })).toHaveAttribute("aria-pressed", "true");
 });
 
 test("„Automatisch“ im Kind-Sheet folgt wieder dem System", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("./");
-  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
-  const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  const sheet = await openKidSheet(page);
   await sheet.getByRole("button", { name: "Hell" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await sheet.getByRole("button", { name: "Automatisch" }).click();
@@ -67,10 +73,6 @@ function colorDiffs(actual: Record<string, string>, expected: Record<string, str
 }
 
 test("Darstellung wechselt bei reduzierter Bewegung sofort die Textfarben", async ({ page }) => {
-  test.skip(
-    (page.viewportSize()?.width ?? 0) < 380,
-    "unter 380 px fehlt der Knopf im Kopf, die Darstellung liegt im Kind-Sheet (Plan 0007, E6)",
-  );
   // Referenz: eingeschwungene dunkle Darstellung, auf derselben Seite (Konsolen- und Drittanbieter-Wächter)
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   await page.goto("./");
@@ -83,11 +85,14 @@ test("Darstellung wechselt bei reduzierter Bewegung sofort die Textfarben", asyn
   await page.evaluate(() => localStorage.removeItem("zwergenplan.darstellung"));
   await page.reload();
   await expect(page.getByTestId("offer").first()).toBeVisible();
-  await page.getByRole("button", { name: "Dunkle Darstellung" }).click();
+  // Gemessen bei offenem Sheet: getComputedStyle wirkt auch hinter dem Dialog, die Schließzeit zählt nicht mit.
+  const sheet = await openKidSheet(page);
+  await sheet.getByRole("button", { name: "Dunkel", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   // Echte Zeit: Die Fake-Uhr der Fixture hält nur `Date` fest, nicht die CSS-Zeitachse (Transitionen laufen weiter).
   await page.waitForTimeout(300);
   expect(colorDiffs(await textColors(page), dark), "Textfarben 300 ms nach dem Wechsel").toEqual([]);
+  await sheet.getByRole("button", { name: "Fertig" }).click();
   await expectAccessible(page);
 });
 

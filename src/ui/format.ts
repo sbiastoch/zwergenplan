@@ -253,13 +253,14 @@ export function reachLong(reach: Reach, origin: Origin): ReachLongParts {
   return { before: `ca. ${short} ${BY_TRANSIT} ${from}`, after: "" };
 }
 
-/** Statuszeile: erklärt die kurze Form auf den Kacheln, einmal mit der Annahme (E1, E11; Plan 0012, E10). */
+/**
+ * Zusatz der Statuszeile hinter der Zahl (Plan 0018, E1; ADR 0019): nur der Startpunkt, die Annahme (Di vormittags,
+ * 1 Umstieg, Warten) erklärt das Kind-Sheet. Der seltene Rückfall auf die Luftlinie nennt seinen Grund (ADR 0011, 9).
+ */
 export function reachNote(mode: ReachMode, origin: Origin): string {
   const from = originPhrase(origin);
-  if (mode.kind !== "luftlinie") {
-    return `Wegzeit ${from} ${BY_TRANSIT} (Di vormittags, höchstens 1 Umstieg, inkl. Warten)`;
-  }
-  return `Entfernung als Luftlinie ${from} – ${mode.reason === "fehler" ? "Wegzeiten gerade nicht verfügbar" : "außerhalb des Stadtgebiets"}.`;
+  if (mode.kind !== "luftlinie") return `Wegzeit ${from}`;
+  return `Luftlinie ${from} (${mode.reason === "fehler" ? "Wegzeiten gerade nicht verfügbar" : "außerhalb des Stadtgebiets"})`;
 }
 
 /** Hinweise im Kind-Sheet, Abschnitt „Wegzeit ab“ (OriginPicker.tsx; Plan 0004, E5; Plan 0009, N3) */

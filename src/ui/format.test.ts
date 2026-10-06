@@ -338,19 +338,20 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
     expect(reachLong(withLines(130, ["U1"]), gostenhof).lines).toBeUndefined();
   });
 
-  it("Statuszeile je Modus (E11)", () => {
-    const wegzeit = "Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)";
-    expect(reachNote({ kind: "oepnv" }, gostenhof)).toBe(wegzeit);
-    // lädt: derselbe Text, unsichtbar (die Höhe steht schon)
-    expect(reachNote({ kind: "laedt" }, gostenhof)).toBe(wegzeit);
-    expect(reachNote({ kind: "oepnv" }, karte)).toBe(
-      "Wegzeit ab der Kartenmitte mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)",
-    );
+  it("Statuszeile je Modus: nur der Startpunkt, im Rückfall mit Grund (E11; Plan 0018, E1)", () => {
+    expect(reachNote({ kind: "oepnv" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
+    expect(reachNote({ kind: "oepnv" }, standort)).toBe("Wegzeit ab deinem Standort");
+    expect(reachNote({ kind: "oepnv" }, karte)).toBe("Wegzeit ab der Kartenmitte");
+    // lädt: derselbe Text, unsichtbar (die Breite steht schon)
+    expect(reachNote({ kind: "laedt" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
     expect(reachNote({ kind: "luftlinie", reason: "fehler" }, gostenhof)).toBe(
-      "Entfernung als Luftlinie ab Gostenhof – Wegzeiten gerade nicht verfügbar.",
+      "Luftlinie ab Gostenhof (Wegzeiten gerade nicht verfügbar)",
     );
     expect(reachNote({ kind: "luftlinie", reason: "ausserhalb" }, standort)).toBe(
-      "Entfernung als Luftlinie ab deinem Standort – außerhalb des Stadtgebiets.",
+      "Luftlinie ab deinem Standort (außerhalb des Stadtgebiets)",
+    );
+    expect(reachNote({ kind: "luftlinie", reason: "ausserhalb" }, karte)).toBe(
+      "Luftlinie ab der Kartenmitte (außerhalb des Stadtgebiets)",
     );
   });
 

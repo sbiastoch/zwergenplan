@@ -6,6 +6,15 @@
 import { type ReactNode, type RefObject, useEffect, useRef } from "react";
 import { Toast } from "./Toast.tsx";
 
+/**
+ * Setzt das HTML-Attribut `autofocus` (als Ref-Callback): Dann fokussiert `showModal()` dieses Element statt des
+ * ersten fokussierbaren. Reacts `autoFocus` hilft hier nicht, es fokussiert vor dem Öffnen des Dialogs und schreibt
+ * kein Attribut. Genutzt von OriginPicker (Stadtteil-Auswahl) und KidSheet (Überschrift, Plan 0018, E3).
+ */
+export function markAutofocus(el: HTMLElement | null) {
+  el?.setAttribute("autofocus", "");
+}
+
 interface DialogProps {
   open: boolean;
   onClose: () => void;

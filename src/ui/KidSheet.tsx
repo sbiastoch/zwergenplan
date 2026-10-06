@@ -9,6 +9,7 @@ import { ageInMonths } from "../domain/age.ts";
 import { formatGermanDate, parseGermanDate } from "../domain/time.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
 import { AppExtrasSection } from "./AppExtras.tsx";
+import { markAutofocus } from "./Dialog.tsx";
 import { plural } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
 import type { OriginApi } from "./use-app-state.ts";
@@ -45,6 +46,10 @@ export function KidSheet({
   onClose: () => void;
 }) {
   const [text, setText] = useState(birthDate ? formatGermanDate(birthDate) : "");
+  // Plan 0018, E3: Ist das Geburtsdatum schon gesetzt, fokussiert das Öffnen die Überschrift statt des Feldes (iOS
+  // öffnete sonst jedes Mal die Tastatur). Nur dann fokussierbar: Ohne Autofokus nähme `showModal()` sonst die
+  // Überschrift als erstes fokussierbares Element. Stand beim Öffnen; das Sheet wird je Öffnen neu gemountet.
+  const [focusHeading] = useState(() => birthDate !== undefined && !focusOrigin);
   const hintId = useId();
   const parsed = parseGermanDate(text, today);
   const hint = parsed
@@ -63,7 +68,9 @@ export function KidSheet({
     <div className="sheet-body">
       <div className="sheet-scroll">
         <div className="grab" />
-        <h2>Dein Zwerg</h2>
+        <h2 ref={focusHeading ? markAutofocus : undefined} tabIndex={focusHeading ? -1 : undefined}>
+          Dein Zwerg
+        </h2>
         <label className="field">
           Geburtsdatum
           <input

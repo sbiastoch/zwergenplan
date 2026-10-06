@@ -17,6 +17,10 @@
   .status b {
     color: var(--ink);
   }
+  /* „Offline – Stand vom …“ immer in eigener Zeile unter Zahl und Startpunkt (Plan 0011, E4; Plan 0018, E1) */
+  .status-note {
+    flex-basis: 100%;
+  }
   .linkbtn {
     min-height: 44px;
     border: 0;

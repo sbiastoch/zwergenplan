@@ -72,8 +72,7 @@ for (const font of ["Webfont", "Fallback-Schrift"] as const) {
         const m = await page.evaluate(() => {
           const hdr = document.querySelector<HTMLElement>(".hdr");
           const brand = hdr?.querySelector<HTMLElement>(".brand");
-          const button = hdr?.querySelector<HTMLElement>(".iconbtn");
-          if (!hdr || !brand || !button) throw new Error("Kopfzeile fehlt");
+          if (!hdr || !brand) throw new Error("Kopfzeile fehlt");
           const items = [...hdr.children].filter(
             (c): c is HTMLElement => c instanceof HTMLElement && c.offsetWidth > 0,
           );
@@ -87,15 +86,15 @@ for (const font of ["Webfont", "Fallback-Schrift"] as const) {
             brandHeight: brand.offsetHeight,
             lineHeight,
             headerHeight: hdr.offsetHeight,
-            button: button.offsetWidth > 0,
+            // Plan 0018, E2: Die Darstellung steht nur im Kind-Sheet
+            button: hdr.querySelector(".iconbtn") !== null,
           };
         });
         const at = `${width} px, ${label}, ${font}`;
         expect(m.spread, `${at}: alle Teile der Kopfzeile in einer Zeile`).toBeLessThan(2);
         expect(m.brandHeight, `${at}: „Zwergenplan“ einzeilig`).toBeLessThan(1.5 * m.lineHeight);
         expect(m.headerHeight, `${at}: Kopfzeile höchstens 66 px hoch`).toBeLessThanOrEqual(66);
-        if (width >= 384) expect(m.button, `${at}: Theme-Knopf sichtbar`).toBe(true);
-        if (width <= 370) expect(m.button, `${at}: Theme-Knopf ausgeblendet`).toBe(false);
+        expect(m.button, `${at}: kein Theme-Knopf im Kopf`).toBe(false);
       }
     });
   }

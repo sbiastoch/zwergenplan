@@ -9,8 +9,6 @@ const PATHS = {
   back: "m15 5-7 7 7 7",
   next: "m9 5 7 7-7 7",
   down: "m6 9 6 6 6-6",
-  moon: "M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z",
-  sun: "M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
   sliders: "M4 7h9M18 7h2M4 17h3M12 17h8",
   compass: "m15.5 8.5-2 5-5 2 2-5z",
   calendar: "M3.5 10h17M8 3v4M16 3v4",
@@ -29,8 +27,6 @@ export type IconName = keyof typeof PATHS;
 /** Zusatzformen, die nicht als einzelner Pfad gehen */
 function extra(name: IconName) {
   switch (name) {
-    case "sun":
-      return <circle cx="12" cy="12" r="4" />;
     case "sliders":
       return (
         <>
