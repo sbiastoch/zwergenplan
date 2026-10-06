@@ -17,3 +17,7 @@ runs/
 __pycache__/
 # Agenten-Worktrees (eigene Checkouts mit eigener Konfiguration)
 .claude/worktrees/
+# Push: privater VAPID-Schlüssel und Admin-Token für den lokalen Testversand (Plan 0017, Schritt 2) – nie committen
+.push.local.json
+# Wrangler (lokaler Zustand des Push-Workers)
+.wrangler/
