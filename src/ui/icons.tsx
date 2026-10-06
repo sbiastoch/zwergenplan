@@ -16,6 +16,8 @@ const PATHS = {
   calendar: "M3.5 10h17M8 3v4M16 3v4",
   calendarPlus: "M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5",
   external: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5",
+  // Navigationspfeil (Plan 0019, E5): Route in Google Maps
+  route: "m4 11 16-7-7 16-2-7z",
   face: "M9 15.5c1.6 1.4 4.4 1.4 6 0M9.5 11.5h.01M14.5 11.5h.01M12 5c-.8-1.6.6-2.8 2-2",
   search: "m20 20-4.5-4.5",
   swing: "M4 18c3-6 13-6 16 0M7 10a5 5 0 0 1 10 0",

@@ -135,12 +135,13 @@
     color: inherit;
   }
   .place-where {
-    margin: -4px 0 14px;
+    margin: 0 0 14px;
     color: var(--muted);
     overflow-wrap: anywhere;
   }
-  /* nur direkte Kinder: die Spans im Inneren von ReachLong (Pfeil, „, dann“) bleiben inline (Plan 0012, E10) */
-  .place-where > span {
+  /* nur direkte Kinder: die Spans im Inneren von ReachLong (Pfeil, „, dann“) bleiben inline (Plan 0012, E10); die
+     Hinweiszeile hat ihren eigenen Stil (Plan 0019, Review 1, M1) */
+  .place-route > span:not(.route-hint) {
     display: block;
     font-weight: 700;
     color: var(--ink);

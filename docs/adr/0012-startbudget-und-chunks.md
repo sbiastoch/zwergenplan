@@ -1,6 +1,6 @@
 # ADR 0012 – Startbudget, Rolldown-Workaround und Stack
 
-Status: angenommen (2026-10-05), Nutzerentscheidung: Option (a) mit Workaround. Betrifft Plan 0010 (E7, E8) und `.size-limit.json`. ADR 0001 (Stack) bleibt unverändert.
+Status: angenommen (2026-10-05), Nutzerentscheidung: Option (a) mit Workaround. Betrifft Plan 0010 (E7, E8) und `.size-limit.json`. ADR 0001 (Stack) bleibt unverändert. **Geändert am 2026-10-06 durch Plan 0019 (E9): Budget `JS (initial)` 100 kB statt 92 kB, Nutzerentscheidung** (Nachtrag unten).
 
 ## Kontext
 
@@ -111,7 +111,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 
 ## Konsequenzen
 
-- **Budget:** `.size-limit.json` setzt `JS (initial)` auf 92 kB. Das Ziel nach Plan 0010 ist ≤ 91,0 kB (1 kB Reserve). Das Eintrittsziel von 87,7 kB entfällt.
+- **Budget:** `.size-limit.json` setzt `JS (initial)` auf 92 kB (**seit Plan 0019: 100 kB**, Nachtrag „Stand nach Plan 0019“). Das Ziel nach Plan 0010 ist ≤ 91,0 kB (1 kB Reserve). Das Eintrittsziel von 87,7 kB entfällt.
   - **Stand nach Plan 0012 (2026-10-05, size-limit):** 91,28 kB (vorher auf `main` 90,9 kB). Erst 91,42 kB; gesenkt um 0,14 kB, indem die Erklärung im Quellenhinweis aus `format.ts` in den Wegzeit-Chunk zog (`TRANSIT_RULE`) und Tabelle und Linien einen Abruf-Helfer teilen. Übrig bleiben Anzeige (`ReachLong.tsx`), Laden und Zustellen der Linien (`src/data/transit.ts`, `use-transit.ts`). Das Ziel ≤ 91,0 kB ist um 0,28 kB überschritten, **Restreserve zum Budget 0,72 kB**. Das Budget bleibt 92 kB.
 - **Workaround:** `vite.config.ts` bekommt die Gruppe `$initial` mit Kommentar und Verweis auf #11026, in einem eigenen Commit vor „Schnittstellen“.
   - **Kanarienvogel:** Ohne die Gruppe muss der realistische Stub den Wächter rot machen.
@@ -138,3 +138,15 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 
 - Gemessen gegen `main` 32d4edb (**91,77 kB**): Plan 0016 (Startpunkt gespeichert, ADR 0017) bringt **`JS (initial)` 91,95 kB** von 92 kB, also +0,18 kB. Schon eingespart sind −30 B (ein gemeinsames `saveOrigin`, knappe Formprüfung, ein Ref statt zwei).
 - Rest **0,05 kB**. Das Budget bleibt bei 92 kB. Stufe 2 von Plan 0011 (≈ 0,10 kB) passt damit nur mit den dort benannten Kandidaten zum Auslagern. Wer nach Plan 0016 nach `main` merged, misst neu.
+
+## Nachtrag (2026-10-06): Budget 100 kB, Stand nach Plan 0019
+
+- **Ausgangslage:** gemessen auf `b2023c1` (Plan 0016): `JS (initial)` 91,95 kB von 92 kB, Rest 0,05 kB. Plan 0019 (Route in Google Maps, Karte „Wege ab …“) braucht im Start geschätzt 0,7–0,8 kB.
+- **Rückfrage an den Nutzer** mit drei Optionen: „Budget auf 93 kB (Empfohlen)“, „Kalender lazy, 92 kB bleibt“, „Wege-Karte lazy, Rest anheben“. **Antwort, wörtlich: „Budget auf 100kb“.**
+- **Begründung:** Die billigen Kandidaten zum Auslagern sind verbraucht (Platzhalter von `NewsBlock`, Plan 0011). Der nächste wäre ein Umbau des Kalenders (−1,65 kB, `docs/ideas.md`). 8 kB gzip Luft reichen für die nächsten Pläne. Über Ladezeit und Bedienbarkeit wachen LCP < 2,5 s, CLS < 0,05 und die Schrift-Swap-Gates bei gedrosselter CPU und gedrosseltem Netz. Diese Gates bleiben unverändert.
+- **Umsetzung:** `.size-limit.json` setzt `JS (initial)` auf 100 kB. Die Begründung steht hier und im Commit, weil die JSON-Datei keinen Kommentar tragen kann.
+- **Ab jetzt** trägt jeder Plan, der das Start-JS ändert, hier sein Delta ein. So schwindet die Luft nicht unbemerkt. Wer nach einem anderen Plan merged, misst neu.
+
+| Plan | vorher | nachher | Delta |
+|---|---|---|---|
+| 0019 Teil A (Link nach Google Maps) | 91,95 kB | 92,28 kB | +0,33 kB |

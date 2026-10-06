@@ -9,6 +9,7 @@ import { CATEGORY_LABELS } from "../../domain/topics.ts";
 import { Icon } from "../icons.tsx";
 import { OfferCard } from "../OfferCard.tsx";
 import type { ProviderSheetProps } from "../provider-types.ts";
+import { RouteHint, routeLink } from "../Ways.tsx";
 
 export function ProviderSheet({ directory, providerId, offers, visible, ctx, onClose }: ProviderSheetProps) {
   const { now } = ctx;
@@ -46,8 +47,12 @@ export function ProviderSheet({ directory, providerId, offers, visible, ctx, onC
             <ul className="provider-venues">
               {provider.venues.map((v) => (
                 <li key={`${v.name}\n${v.address}`}>
-                  <b>{v.name}</b>
-                  <span>{v.district ? `${v.address} · ${v.district}` : v.address}</span>
+                  {/* jeder Ort öffnet die Route in Google Maps (Plan 0019, E5) */}
+                  <a className="venue-route" {...routeLink(v.address)}>
+                    <b>{v.name}</b>
+                    <span>{v.district ? `${v.address} · ${v.district}` : v.address}</span>
+                    <RouteHint />
+                  </a>
                 </li>
               ))}
             </ul>

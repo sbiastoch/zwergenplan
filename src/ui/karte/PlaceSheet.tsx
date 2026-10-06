@@ -5,6 +5,7 @@ import type { Origin } from "../../domain/reach.ts";
 import type { SiteOffer } from "../../domain/site-data.ts";
 import { type CardContext, DistPending, OfferCard } from "../OfferCard.tsx";
 import { ReachLong } from "../ReachLong.tsx";
+import { RouteHint, routeLink } from "../Ways.tsx";
 
 export function PlaceSheet({
   place,
@@ -26,8 +27,12 @@ export function PlaceSheet({
         <div className="grab" />
         <h2>{place.names.join(" / ")}</h2>
         <p className="place-where">
-          {place.address}
-          {reach && origin ? <ReachLong reach={reach} origin={origin} /> : ctx.reachPending && <DistPending />}
+          {/* Adresse und Wegzeit öffnen die Route in Google Maps (Plan 0019, E5) */}
+          <a className="place-route" {...routeLink(place.address)}>
+            {place.address}
+            {reach && origin ? <ReachLong reach={reach} origin={origin} /> : ctx.reachPending && <DistPending />}
+            <RouteHint />
+          </a>
         </p>
         {groupByNextSession(place.offers, ctx.now).flatMap((group) =>
           group.items.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated context="place" />),

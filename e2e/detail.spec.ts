@@ -7,7 +7,7 @@ import { expect, test } from "./fixtures.ts";
 
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
 
-async function openDetail(page: Page, title: string) {
+async function openDetail(page: Page, title: string | RegExp) {
   await page.getByRole("heading", { level: 3, name: title }).getByRole("button").click();
   const dialog = page.getByRole("dialog", { name: title });
   await expect(dialog).toBeVisible();
@@ -131,4 +131,42 @@ test("laufender Kurs zählt die übrigen Termine (H8)", async ({ page }) => {
   await expect(dialog.getByText("Di 13.10. bis Di 1.12., jeweils 9:30–11:00")).toBeVisible();
   // Kurse bleiben in der Kalenderdatei komplett (ADR 0007)
   await expect(dialog.getByRole("link", { name: "Alle 8 Kurstermine" })).toBeVisible();
+});
+
+// Plan 0019, E1–E3, E5: Die Kachel „Wo“ öffnet die Route in Google Maps, nur mit der Adresse als Ziel. Kein Test tippt
+// den Link an: Der Drittanbieter-Wächter (fixtures.ts) bleibt scharf.
+const MAPS = "https://www.google.com/maps/dir/?api=1&destination=";
+
+test("Kachel „Wo“ ist ein Link zur Route in Google Maps, ohne Startpunkt und Referrer (Plan 0019)", async ({
+  page,
+}) => {
+  const dialog = await openDetail(page, /Kuckuck im Nest/);
+  const link = dialog.getByRole("link", { name: /Route in Google Maps/ });
+  await expect(link).toHaveCount(1);
+  await expect(link).toContainText("Kleines Theater Beispiel");
+  await expect(link).toHaveAttribute("href", `${MAPS}B%C3%BChnenplatz+2%2C+90429+N%C3%BCrnberg&travelmode=transit`);
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAttribute("rel", /(^| )noopener( |$)/);
+  await expect(link).toHaveAttribute("rel", /(^| )noreferrer( |$)/);
+  // Die ganze Kachel ist antippbar: In ihrer Mitte liegt der Link, kein anderes Element darüber (Review 1, N3).
+  // Quer liegt die Kachel unter dem Falz, und das Detail fährt beim Öffnen herein: in die Mitte holen und abwarten
+  await expect
+    .poll(() =>
+      link.evaluate((a) => {
+        a.scrollIntoView({ block: "center" });
+        const box = a.getBoundingClientRect();
+        return document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)?.closest("a") === a;
+      }),
+    )
+    .toBe(true);
+  // ohne Startpunkt keine Karte „Wege ab …“
+  await expect(dialog.locator(".ways")).toHaveCount(0);
+});
+
+test("Adresse mit Klammerzusatz: Ziel nur „Straße, PLZ Ort“ (Plan 0019, E2)", async ({ page }) => {
+  const dialog = await openDetail(page, /^Eltern-Kind-Bewegungslandschaft/);
+  await expect(dialog.getByRole("link", { name: /Route in Google Maps/ })).toHaveAttribute(
+    "href",
+    `${MAPS}Kirchengemeindehausstra%C3%9Fe+128a%2C+90461+N%C3%BCrnberg&travelmode=transit`,
+  );
 });

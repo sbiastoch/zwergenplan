@@ -25,6 +25,7 @@ import {
 import { Icon, Shape } from "./icons.tsx";
 import { DistPending, HeartButton } from "./OfferCard.tsx";
 import { ReachLong } from "./ReachLong.tsx";
+import { RouteHint, routeLink } from "./Ways.tsx";
 
 interface DetailProps {
   offer: SiteOffer;
@@ -104,12 +105,14 @@ export function DetailContent({
               <b>{when.main}</b>
               <span>{when.sub}</span>
             </div>
-            <div className="label full">
+            {/* Die ganze Kachel öffnet die Route in Google Maps (Plan 0019, E5) */}
+            <a className="label full route" {...routeLink(offer.venue.address)}>
               <span className="cap">Wo</span>
               <b>{offer.venue.name}</b>
               <span>{[offer.venue.address, offer.venue.district].filter(Boolean).join(" · ")}</span>
               {origin && reach ? <ReachLong reach={reach} origin={origin} /> : reachPending && <DistPending />}
-            </div>
+              <RouteHint />
+            </a>
             <div className="label">
               <span className="cap">Alter</span>
               <b>{ageRangeLabel(offer.age)}</b>
