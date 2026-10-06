@@ -1,6 +1,6 @@
 # Plan 0014 – Das Kategorie-Etikett folgt dem Filter
 
-Status: umgesetzt auf Branch `fix-filter-etikett`; Deploy und Browser-Review live folgen (Schritte 6–7)
+Status: **umgesetzt und live seit `2b8f92a`** (https://zwergenplan.app/). Browser-Review live bestanden, ohne Blocker.
 Datum: 2026-10-06
 Bezug: Plan 0003 (E9 Kachel, E10 Kategorien), `src/domain/topics.ts`, `src/ui/categories.ts`
 
@@ -166,3 +166,20 @@ Keine Blocker. Alle Findings übernommen:
 - **Lokal:** `pnpm check:fast` grün. `app`, `calendar`, `detail` und `saved` liefen auf `pixel-7`, `android-klein` und `desktop`, 135 von 135 grün. WebKit (`iphone-15`) prüft die CI.
 - **Start-JS** (Review, Finding 2): 91,73 kB auf `origin/main` (`5c3c140`), 91,77 kB mit dem Fix, also +0,04 kB. Budget 92 kB, die Reserve beträgt danach 0,23 kB.
 - **Abweichungen vom Plan:** keine. `WeekStrip` und `MonthGrid` bekommen `categoryOf` mit dem Typ `CardContext["categoryOf"]`.
+
+## Browser-Review live (2026-10-06, Stand `2b8f92a`, Bundle `index-Bedk2Slk.js`)
+
+**Gezielt mit Filter** (360 px, hell und dunkel, echte Daten):
+- Jede sichtbare Kachel trägt die gewählte Kategorie: `?kat=musik` 40 von 40 („Musik & Singen“), `?kat=buehne` 9 von 9, `?kat=treffs-cafes` 34 von 34, `?kat=beratung` 20 von 20. Vor dem Fix trugen im Musik-Filter 46 der 95 Treffer ein fremdes Etikett.
+- Detail aus dem Bühne-Filter („Klassik für Kinder: Schlag und Zeug!“): „Bühne & Konzert“, gleiche Farbe und Form wie die Kachel.
+- Kalender mit `?kat=musik`: Alle 22 Formpunkte im Monatsraster sind `k-musik`.
+- Merkliste mit weiter aktivem Bühne-Filter (E3): Das gemerkte Konzert trägt „Bühne & Konzert“ wie im Detail. Das wirkt bei einem Konzert stimmig, kein Handlungsbedarf.
+- Keine Konsolenfehler.
+
+**Standard-Matrix** (`node scripts/screenshots.ts https://zwergenplan.app/ --views=start,kalender,detail,merkliste`, 48 Bilder, alle angesehen). Checkliste:
+- Lesbarkeit: ok. Was, wann, wo und frei sind sofort erfassbar. Im Detail quer ist die Beschreibung mit rund 100 Zeichen pro Zeile lang (bestehend).
+- Daumen-Erreichbarkeit: ok. Untere Leiste und ICS-Fuß liegen unten.
+- Zustände: ok für diese Änderung. Keine Kategorie-Pille ist abgeschnitten oder bricht um, auch nicht das längste Etikett „Krabbel- & Spielgruppen“. **Bestehender Befund, nicht durch Plan 0014:** In `kalender-320-*` reicht die Monatskarte bis an den Bildschirmrand, Rand und Schatten sind rechts abgeschnitten, die 16-px-Seitenränder fehlen. Ab 360 px stimmt es. Das gehört in einen eigenen Fix.
+- Dark Mode: ok. Kleinigkeit (bestehend): Der rosa Formpunkt am markierten heutigen Tag ist auf der Markierung schwer zu sehen.
+- Micro-Interactions: unverändert. Beim Filterwechsel ändert sich nur die Klasse, ohne Übergang.
+- Konsistenz: ok. Das Etikett ist über alle Breiten und beide Modi einheitlich. Das Detail setzt es bewusst in Versalien neben die große Form (Plan 0003).
