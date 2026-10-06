@@ -1,6 +1,6 @@
 # Plan 0020 – Startseite entrümpeln
 
-Status: umgesetzt (Branch `startseite-entruempeln-0020`), Arch-Review OK; Deploy und Browser-Review stehen aus
+Status: live seit `0e146b9` (2026-10-06), Browser-Review bestanden
 Nummer: zuerst als Plan 0018 geschrieben; umbenannt, weil 0017 (Push), 0018 (Kalender) und 0019 (Route) parallel vergeben wurden.
 Datum: 2026-10-06
 Bezug: Plan 0003 (E11, E15), Plan 0007 (E6), Plan 0009 (E1, E11), Plan 0012 (E10), ADR 0011 (Punkt 3), ADR 0015 (Kopf, Punkt 7)
@@ -217,3 +217,28 @@ Branch `startseite-entruempeln`. Abweichungen und Befunde gegenüber dem Plan:
 Geprüft hat der Subagent `arch-reviewer` am Diff gegen `2ff6d26`. Blocker: keine. Major: keine. Beide Minor-Punkte sind übernommen:
 - **M1**: Das U+00A0 vor dem Punkt stand als unsichtbares Literalzeichen in `App.tsx`. Ein Editor oder Formatter könnte es still ersetzen. Jetzt steht es als Escape `" · "`.
 - **M2**: `statusLayout` (`e2e/startpunkt.spec.ts`) prüft jetzt hart, dass der Zusatz mit U+00A0 beginnt. Die Messung „gleiche Zeile“ allein fiele nur auf, wenn genau dort umbrochen wird.
+
+## Browser-Review live (2026-10-06) – bestanden
+
+Geprüft wurde auf https://zwergenplan.app/ (Bundle `index-BP9y-Orm.js`, `main` = `0e146b9`, CI und Deploy grün). Ein Subagent hat alle 168 Screenshots aus `scripts/screenshots.ts` gesichtet. Selbst angesehen wurden `start-startpunkt-320-light`, `-iphone-light`, `-pixel-dark`, `kind-iphone-dark` und `karte-320-light`.
+
+- **Statuszeile:**
+  - 390 px: einzeilig („332 Angebote ab heute · Wegzeit ab Gostenhof“).
+  - 320 px: zweizeilig, der „·“ steht am Ende der ersten Zeile.
+  - 412 px: neben dem Umschalter zwei kurze Zeilen.
+  - Nirgends ein verwaister Punkt, kein Überlauf.
+- **Kopf:** In allen 168 Bildern einzeilig, ohne Theme-Knopf und ohne Lücke.
+- **Autofokus**, live per Playwright geprüft:
+  - iPhone 15 (WebKit): leer → Feld, ausgefüllt → „Dein Zwerg“.
+  - Pixel 7: ausgefüllt → „Dein Zwerg“.
+  - Keine Konsolenfehler.
+- **Fokusring** auf „Dein Zwerg“ nach Öffnen per Tastatur, hochkant und quer: vollständig sichtbar, nicht beschnitten. Quer liegt er eng am „D“ an. Das ist kosmetisch und tritt nur per Tastatur auf.
+- Checkliste:
+  - Lesbarkeit: in Ordnung, die Statuszeile ist deutlich kürzer.
+  - Daumen-Erreichbarkeit: unverändert.
+  - Zustände: Laden, Luftlinie und außerhalb sind durch E2E abgedeckt, in den Screenshots unauffällig.
+  - Dark Mode: keine hellen Inseln.
+  - Micro-Interactions: unverändert.
+  - Design-System: konsistent („·“ als Trenner wie auf den Kacheln).
+
+Offen (Hinweis, nicht behoben): `karte-pixel-*`. Auf „Karte“ bei 412 px wird die Statuszeile neben dem Umschalter dreizeilig („332 Angebote an 76“ / „Orten ·“ / „Wegzeit ab Gostenhof“). Das ist nach E1 erlaubt, wirkt aber unruhig. Mögliche Abhilfen: ein U+00A0 zwischen Zahl und „Orten“ in `mapStatusParts`, oder der Umschalter rückt bis ca. 420 px unter die Zeile. Die übrigen Hinweise der Sichtung (Silbentrennung in Titeln, Cluster unter den Zoom-Knöpfen, Kalenderpunkt im Dunkeln, Badge quer) bestanden schon vorher und haben mit diesem Plan nichts zu tun.
