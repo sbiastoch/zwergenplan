@@ -8,7 +8,9 @@ import {
   decodeTransitTable,
   INSIDE_METERS,
   MAX_MINUTES,
+  MAX_OTHERS,
   NO_MINUTES,
+  OTHER_SLACK_MINUTES,
   TRANSFER_PENALTY_MINUTES,
   TRANSIT_RULE,
   TRANSIT_TABLE_VERSION,
@@ -477,15 +479,16 @@ describe("andere Wege (Plan 0019, E4)", () => {
   });
 
   it("Schwelle 15 Min. inklusiv: 15 Min. mehr bleibt, 16 Min. mehr fällt weg", () => {
+    expect(OTHER_SLACK_MINUTES).toBe(15);
     const keep = reachOf([
       [0, 20 | T, [iU1, 0]],
-      [0, 35, [iTram, 0]],
+      [0, 20 + OTHER_SLACK_MINUTES, [iTram, 0]],
     ]);
     expect(keep?.minutes).toBe(20);
     expect(keep?.others).toEqual([{ byFoot: false, minutes: 35, toStop: 0, lines: [TRAM] }]);
     const drop = reachOf([
       [0, 20 | T, [iU1, 0]],
-      [0, 36, [iTram, 0]],
+      [0, 20 + OTHER_SLACK_MINUTES + 1, [iTram, 0]],
     ]);
     expect(drop).not.toHaveProperty("others");
   });
@@ -529,6 +532,7 @@ describe("andere Wege (Plan 0019, E4)", () => {
       [0, 26 | T, [iBus, iTram]],
     ]);
     expect(reach?.lines).toEqual([U1]);
+    expect(reach?.others).toHaveLength(MAX_OTHERS);
     expect(reach?.others?.map((o) => !o.byFoot && o.lines)).toEqual([
       [BUS, TRAM],
       [TRAM, U1],

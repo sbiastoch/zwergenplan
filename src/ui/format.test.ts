@@ -4,6 +4,7 @@ import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, fromBerlinLocal } from "../domain/time.ts";
 // nur im Test: Konstanten der Rechnung gegen den Text (src/ui importiert transit.ts sonst nur per import())
 import { ACCESS_METERS, TRANSFER_PENALTY_MINUTES, TRANSIT_RULE } from "../domain/transit.ts";
+import type { TransitOther } from "../domain/transit-types.ts";
 import {
   ageChipLabel,
   agendaHeading,
@@ -345,6 +346,12 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
     it("ohne andere Wege keine Karte", () => {
       expect(wayParts(withLines(23, ["U1"]), gostenhof)).toBeUndefined();
       expect(wayParts(luftlinie(800), gostenhof)).toBeUndefined();
+    });
+
+    it("Bus & Bahn ohne Linien oder Halt: keine Karte, nie als „zu Fuß“ umgedeutet (Arch-Review 0019, m1)", () => {
+      const foot = { byFoot: true, minutes: 40 } satisfies TransitOther;
+      expect(wayParts({ ...base, minutes: 29.6, others: [foot] }, gostenhof)).toBeUndefined();
+      expect(wayParts({ ...base, minutes: 29.6, lines: ["U1"], others: [foot] }, gostenhof)).toBeUndefined();
     });
 
     it("Hauptweg zuerst, mit Linien, Umstieg aus dem Bit und Fußweg zum Halt; zu Fuß als eigene Zeile", () => {

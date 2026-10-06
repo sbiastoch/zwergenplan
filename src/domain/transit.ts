@@ -6,7 +6,7 @@
  */
 import { haversineMeters } from "./geo.ts";
 import { placeKey } from "./place-key.ts";
-import { type Origin, type ReachTarget, roundedMinutes } from "./reach.ts";
+import { type Origin, type ReachTarget, roundedMinutes, stopMinutes } from "./reach.ts";
 import type {
   TransitLineNames,
   TransitLines,
@@ -172,6 +172,8 @@ export function transitReach(table: TransitTable, origin: Origin, lines?: Transi
   const byRated = new Float64Array(cols).fill(Number.POSITIVE_INFINITY);
   const byReal = new Float64Array(cols).fill(Number.POSITIVE_INFINITY);
   const bestRow = new Int32Array(cols).fill(-1);
+  /** Fußweg zum Halt der gewählten Zeile, exakt statt aus der Differenz (Arch-Review 0019, m4) */
+  const bestWalk = new Float64Array(cols);
   /** Zugangshalte mit Fußweg, nach Zeile: Grundlage der anderen Wege (Plan 0019, E4) */
   const near: Access[] = [];
   let inside = false;
@@ -190,6 +192,7 @@ export function transitReach(table: TransitTable, origin: Origin, lines?: Transi
         byRated[col] = rated;
         byReal[col] = real;
         bestRow[col] = row;
+        bestWalk[col] = walk;
       }
     }
   }
@@ -212,7 +215,7 @@ export function transitReach(table: TransitTable, origin: Origin, lines?: Transi
     let main: Way | undefined;
     if (names && col !== undefined) {
       const transfer = (valueAt(minutes, row * cols + col) & TRANSFER_BIT) !== 0;
-      const toStop = valueAt(byReal, col) - (valueAt(minutes, row * cols + col) & ~TRANSFER_BIT);
+      const toStop = valueAt(bestWalk, col);
       reach.lines = names;
       reach.toStop = toStop;
       if (transfer) reach.transfer = true;
@@ -293,7 +296,7 @@ const codeUnits = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
 /** Werte, wie die Karte „Wege ab …“ sie zeigt (Review 3, H1): gerundete Minuten, Fußweg, Umstiege */
 function shown(way: Way): [number, number, number] {
-  const walk = way.byFoot ? roundedMinutes(way.walk).value : Math.max(1, Math.round(way.walk));
+  const walk = way.byFoot ? roundedMinutes(way.walk).value : stopMinutes(way.walk);
   return [roundedMinutes(way.minutes).value, walk, Number(way.transfer)];
 }
 

@@ -1,6 +1,6 @@
 # Plan 0019 – Route in Google Maps und andere Wege
 
-Status: **freigegeben** nach drei Reviews (Review 3: Freigabe mit Auflagen, eingearbeitet), Budget-Entscheidung des Nutzers in E9. Umsetzung in Teil A (Link) und Teil B (andere Wege). Nummer 0019, weil 0017 schon doppelt vergeben ist: auf `main` (Kalender) und auf dem Branch `push-0017`.
+Status: **umgesetzt** (Teil A und Teil B), freigegeben nach drei Reviews, Budget-Entscheidung des Nutzers in E9. Arch-Review ohne Blocker, eingearbeitet (Abschnitt „Arch-Review“). Offen: CI auf `main`, Deploy, Browser-Review live, Gerätematrix (E8) durch den Nutzer. Nummer 0019, weil 0017 schon doppelt vergeben ist: auf `main` (Kalender) und auf dem Branch `push-0017`.
 Datum: 2026-10-06
 Bezug: Plan 0005 (Nicht-Ziel „Route in Karten-App öffnen“, `docs/ideas.md`), Plan 0009 und 0012 (Wegzeit, Linien, ADR 0011, ADR 0015), Plan 0010 (Anbieter-Sheet), ADR 0008 (Referrer-Policy), `docs/architecture.md` (Invarianten „Privatsphäre“ und „Startpunkt“)
 
@@ -366,3 +366,23 @@ Abgelehnt:
 - **N8** Test über alle Adressen aus `data/providers.yaml`. Ein Unit-Test auf echte Daten wird mit jedem nächtlichen Lauf (Plan 0015) zum Zufallsrot, ohne dass ein Fehler vorliegt. Die Regel fällt sicher zurück: Ohne Treffer bleibt die nur von Klammern bereinigte Adresse. Geprüft wurde einmalig gegen alle 125 echten Adressen (Review 2, N6), und die Browser-Prüfung sieht sich echte Problemfälle an.
 
 Status nach Review 3: freigegeben, keine offenen Blocker.
+
+## Arch-Review (2026-10-06) – Verdict: Nacharbeit, kein Blocker
+
+Unabhängiger `arch-reviewer` auf den Diff gegen `main` (Teil A und B).
+
+Übernommen:
+- **M1** Die Rundung „zum Halt“ stand doppelt, in `transit.ts` (Pareto) und `format.ts` (Anzeige). Jetzt gibt es eine Quelle: `stopMinutes` in `src/domain/reach.ts`, mit Unit-Test. So bleibt Pareto an die angezeigten Werte gebunden.
+- **m1** `wayParts` deutet Bus & Bahn ohne Linien oder Halt nicht mehr als „zu Fuß“ um. Es zeigt dann keine Karte, abgesichert mit Unit-Test.
+- **m2** `OTHER_SLACK_MINUTES` und `MAX_OTHERS` werden im Test importiert. `WayRow` ist nicht mehr exportiert (knip war schon grün).
+- **m3** Ziel und Reserve in ADR 0012 sowie zwei Stellen in Plan 0011 sind als überholt markiert.
+- **m4** `toStop` kommt exakt aus `bestWalk` statt aus einer Differenz.
+
+Abgelehnt:
+- **m3**, Teil „eigenes ADR statt Nachtrag“. ADR 0012 hat seine Budgetstände schon zweimal per Nachtrag fortgeschrieben (Plan 0011/0012, Plan 0016). Die Entscheidung selbst bleibt dieselbe, nur die Zahl ändert sich: Budget im Start-JS mit Workaround und Chunk-Wächter. Status, Abschnitt „Entscheidung“ und Nachtrag sind angepasst. Eine neue ADR-Nummer hätte zudem mit den parallel vergebenen Nummern kollidiert (0017/0018).
+
+Messung im vollständigen Check: `LCP und CLS bleiben im Budget` war auf Android klein und Pixel 7 rot (LCP 2 952 ms). Es wurde abwechselnd unter gleicher Last gemessen, Load 24–61 auf 16 Kernen durch parallele Sessions:
+- `main`: 2 652, 2 948, 2 468, 2 836 ms
+- Plan 0019: 2 484, 3 196, 2 792, 2 540 ms
+
+Die Werte sind nicht zu unterscheiden, auch `main` reißt das Budget unter dieser Last. Bei geringerer Last lag Plan 0019 bei 1 812–2 176 ms. Es entscheidet die CI.

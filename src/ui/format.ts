@@ -6,7 +6,14 @@ import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
 import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
-import { type Origin, type Reach, type ReachLimit, roundedDistance, roundedMinutes } from "../domain/reach.ts";
+import {
+  type Origin,
+  type Reach,
+  type ReachLimit,
+  roundedDistance,
+  roundedMinutes,
+  stopMinutes,
+} from "../domain/reach.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -254,7 +261,7 @@ export function reachLong(reach: Reach, origin: Origin): ReachLongParts {
 }
 
 /** Eine Zeile der Karte „Wege ab …“ (Plan 0019, E6): Minuten, Linien (mit Pfeil in `LineChain`), Zusätze */
-export interface WayRow {
+interface WayRow {
   minutes: string;
   lines?: TransitLineNames;
   /** „zu Fuß“ bzw. „1 Umstieg“, „6 Min. zum Halt“; je ein Segment, das nicht umbricht (Review 3, N6) */
@@ -267,7 +274,7 @@ const about = (minutes: number) => `ca. ${roundedMinutes(minutes).value} Min.`;
 
 function wayRow(way: TransitOther, main: boolean): WayRow {
   if (way.byFoot) return { minutes: about(way.minutes), extra: ["zu Fuß"], main };
-  const extra = [`${Math.max(1, Math.round(way.toStop))} Min. zum Halt`];
+  const extra = [`${stopMinutes(way.toStop)} Min. zum Halt`];
   if (way.transfer) extra.unshift("1 Umstieg");
   return { minutes: about(way.minutes), lines: way.lines, extra, main };
 }
@@ -282,6 +289,8 @@ export function wayParts(
 ): { title: string; rows: WayRow[]; reason: string | undefined } | undefined {
   if (reach.kind !== "oepnv" || !reach.others) return undefined;
   const { minutes, lines, toStop, transfer } = reach;
+  // Bus & Bahn ohne Linien oder Halt: keine Karte, statt den Weg als „zu Fuß“ umzudeuten (Arch-Review 0019, m1)
+  if (!reach.byFoot && (!lines || toStop === undefined)) return undefined;
   const main: TransitOther =
     reach.byFoot || !lines || toStop === undefined
       ? { byFoot: true, minutes }

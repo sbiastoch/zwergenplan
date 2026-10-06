@@ -8,8 +8,19 @@ import {
   type Reach,
   roundedDistance,
   roundedMinutes,
+  stopMinutes,
   withinLimit,
 } from "./reach.ts";
+
+describe("stopMinutes (Plan 0019, E6)", () => {
+  it("ganze Minuten, mindestens 1", () => {
+    expect(stopMinutes(0)).toBe(1);
+    expect(stopMinutes(0.4)).toBe(1);
+    expect(stopMinutes(1.58)).toBe(2);
+    expect(stopMinutes(3.6)).toBe(4);
+    expect(stopMinutes(5.89)).toBe(6);
+  });
+});
 
 const gostenhof: Origin = {
   source: "stadtteil",

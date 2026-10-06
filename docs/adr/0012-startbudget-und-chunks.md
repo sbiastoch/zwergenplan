@@ -111,7 +111,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 
 ## Konsequenzen
 
-- **Budget:** `.size-limit.json` setzt `JS (initial)` auf 92 kB (**seit Plan 0019: 100 kB**, Nachtrag „Stand nach Plan 0019“). Das Ziel nach Plan 0010 ist ≤ 91,0 kB (1 kB Reserve). Das Eintrittsziel von 87,7 kB entfällt.
+- **Budget:** `.size-limit.json` setzt `JS (initial)` auf 92 kB (**seit Plan 0019: 100 kB**, Nachtrag „Stand nach Plan 0019“). Das Ziel nach Plan 0010 ist ≤ 91,0 kB (1 kB Reserve). Das Eintrittsziel von 87,7 kB entfällt. **Ziel und Reserve sind seit Plan 0019 überholt.** Statt eines Ziels führt der Nachtrag „Stand nach Plan 0019“ eine Delta-Tabelle je Plan.
   - **Stand nach Plan 0012 (2026-10-05, size-limit):** 91,28 kB (vorher auf `main` 90,9 kB). Erst 91,42 kB; gesenkt um 0,14 kB, indem die Erklärung im Quellenhinweis aus `format.ts` in den Wegzeit-Chunk zog (`TRANSIT_RULE`) und Tabelle und Linien einen Abruf-Helfer teilen. Übrig bleiben Anzeige (`ReachLong.tsx`), Laden und Zustellen der Linien (`src/data/transit.ts`, `use-transit.ts`). Das Ziel ≤ 91,0 kB ist um 0,28 kB überschritten, **Restreserve zum Budget 0,72 kB**. Das Budget bleibt 92 kB.
 - **Workaround:** `vite.config.ts` bekommt die Gruppe `$initial` mit Kommentar und Verweis auf #11026, in einem eigenen Commit vor „Schnittstellen“.
   - **Kanarienvogel:** Ohne die Gruppe muss der realistische Stub den Wächter rot machen.

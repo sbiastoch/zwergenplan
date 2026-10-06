@@ -77,6 +77,14 @@ export function roundedMinutes(minutes: number): { over: boolean; value: number 
 }
 
 /**
+ * Fußweg zum Halt in der Karte „Wege ab …“ (Plan 0019, E6): ganze Minuten, mindestens 1. Einzige Quelle für Anzeige
+ * und Auswahl der anderen Wege, die auf den angezeigten Werten läuft (Review 3, H1; Arch-Review 0019, M1).
+ */
+export function stopMinutes(walk: number): number {
+  return Math.max(1, Math.round(walk));
+}
+
+/**
  * Gerundete Anzeige: unter 950 m auf 100 m (mindestens 100 m), sonst auf 0,1 km,
  * ab 10 km auf ganze km. Die Luftlinie ist ohnehin nur eine Näherung.
  */
