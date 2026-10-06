@@ -235,6 +235,13 @@
     margin: 14px 0 4px;
     hyphens: auto;
   }
+  /* zwei Textknöpfe im Leerzustand (Plan 0021, E4): nebeneinander, bei Platzmangel untereinander */
+  .empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 16px;
+  }
   .slot {
     width: 104px;
     height: 104px;

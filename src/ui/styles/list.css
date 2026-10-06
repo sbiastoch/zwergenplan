@@ -21,6 +21,18 @@
   .status-note {
     flex-basis: 100%;
   }
+  /*
+   * Altersfilter aus (Plan 0021, E3): ruhig, ohne Fläche. Die Linie ist Schmuck (hell grau, dunkel rötlich wie der
+   * Hinweis im Kind-Sheet); das Icon nimmt die Textfarbe, damit sein Kontrast in beiden Themes reicht.
+   */
+  .age-warn {
+    border-left: 3px solid var(--hint-bad-line);
+    padding-left: 8px;
+    margin-top: 6px;
+  }
+  .age-warn .ic {
+    flex-shrink: 0;
+  }
   .linkbtn {
     min-height: 44px;
     border: 0;

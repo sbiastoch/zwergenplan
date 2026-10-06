@@ -33,7 +33,6 @@ export interface OfferViewsInput {
   offers: readonly SiteOffer[];
   route: Route;
   birthDate: string | undefined;
-  ageOnly: boolean;
   savedIds: readonly string[];
   now: Date;
   /** Entfernung ab dem Startpunkt (Wegzeit oder Luftlinie); ohne Startpunkt oder solange sie lädt `undefined` */
@@ -42,10 +41,16 @@ export interface OfferViewsInput {
 
 export interface OfferViews {
   visible: readonly SiteOffer[];
-  hiddenCount: number;
+  /** gefilterte Angebote, die nicht zum Kind passen (ausgeblendet oder markiert, Plan 0021) */
+  unfitCount: number;
   unfitIds: ReadonlySet<string>;
-  showUnfit: boolean;
-  setShowUnfit: (show: boolean) => void;
+  /**
+   * Altersfilter „Nur passend für …“ (Plan 0021, E1): Standard an, nur im Speicher. Nach dem Neuladen ist er
+   * wieder an; ein neues Geburtsdatum schaltet ihn ebenfalls wieder ein (`App.setBirthDate`).
+   */
+  ageOnly: boolean;
+  /** schaltet den Altersfilter und beginnt die Liste wieder mit dem ersten Schritt */
+  setAgeOnly: (on: boolean) => void;
   /** aktueller Ausschnitt der Liste „Entdecken“ */
   page: { groups: DayGroup<Occurrence<SiteOffer>>[]; remaining: number };
   showMore: () => void;
@@ -101,16 +106,8 @@ function reachCache(reachFn: ReachFn | undefined): (offer: SiteOffer) => Reach |
   };
 }
 
-export function useOfferViews({
-  offers,
-  route,
-  birthDate,
-  ageOnly,
-  savedIds,
-  now,
-  reach,
-}: OfferViewsInput): OfferViews {
-  const [showUnfit, setShowUnfit] = useState(false);
+export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }: OfferViewsInput): OfferViews {
+  const [ageOnly, setAgeOnlyState] = useState(true);
   const [limit, setLimit] = useState(PAGE);
   const [calendarDay, setCalendarDay] = useState(() => berlinIsoDate(now));
   const [monthOpen, setMonthOpen] = useState(false);
@@ -120,9 +117,9 @@ export function useOfferViews({
     () => applyFilters(offers, route.filter, { now, reach }),
     [offers, route.filter, now, reach],
   );
-  const { visible, hiddenCount, unfitIds } = useMemo(
-    () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, showUnfit }),
-    [filtered, upcoming, birthDate, now, ageOnly, showUnfit],
+  const { visible, unfitCount, unfitIds } = useMemo(
+    () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly }),
+    [filtered, upcoming, birthDate, now, ageOnly],
   );
   const groups = useMemo(() => groupByNextSession(visible, now), [visible, now]);
   const index = useMemo(() => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX), [visible, route.tab]);
@@ -154,13 +151,17 @@ export function useOfferViews({
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
+  const setAgeOnly = useCallback((on: boolean) => {
+    setAgeOnlyState(on);
+    setLimit(PAGE);
+  }, []);
 
   return {
     visible,
-    hiddenCount,
+    unfitCount,
     unfitIds,
-    showUnfit,
-    setShowUnfit,
+    ageOnly,
+    setAgeOnly,
     page: takeGroups(groups, limit),
     showMore,
     resetPage,

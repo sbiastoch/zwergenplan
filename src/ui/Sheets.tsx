@@ -1,14 +1,14 @@
 /**
- * Filter-Sheet (Plan 0003, E16; Plan 0004, E7; Plan 0009, E11). Inhalt des Dialogs, die Hülle ist Dialog.tsx.
+ * Filter-Sheet (Plan 0003, E16; Plan 0004, E7; Plan 0009, E11; Plan 0021, E2: Altersschalter oben). Inhalt des Dialogs, die Hülle ist Dialog.tsx.
  * Kind-Sheet: KidSheet.tsx.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
-import { type ReactNode, type RefObject, useRef } from "react";
-import { EMPTY_FILTER, type FilterState, FORMATS, toggleIn, withReachLimit } from "../domain/filter.ts";
+import { type ReactNode, type RefObject, useId, useRef } from "react";
+import { type FilterState, FORMATS, toggleIn, withReachLimit } from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
-import { limitReason, plural, reachLimitLabel } from "./format.ts";
+import { ageOnlyNote, limitReason, plural, reachLimitLabel } from "./format.ts";
 import { Shape } from "./icons.tsx";
 import type { ReachMode } from "./use-transit.ts";
 
@@ -34,6 +34,16 @@ const REACH_CHIPS: [ReachLimit | undefined, string][] = [
     return [limit, reachLimitLabel(limit)];
   }),
 ];
+
+/** Altersfilter im Filter-Sheet (Plan 0021, E2); nur mit Geburtsdatum */
+export interface AgeFilter {
+  /** Alter wie im Kopf, z. B. „7 Mon.“ */
+  label: string;
+  on: boolean;
+  /** gefilterte Angebote, die nicht zum Kind passen */
+  unfitCount: number;
+  onChange: (on: boolean) => void;
+}
 
 /** `LimitAction` für ein Fokus-Ziel: Statuszeile (App) bzw. Überschrift „Wegzeit“ (Filter-Sheet), N2 */
 export type LimitActionFor = (focusTarget: RefObject<HTMLElement | null>) => ReactNode;
@@ -92,6 +102,8 @@ function Chip({
 export function FilterSheet({
   filter,
   onChange,
+  onReset,
+  age,
   resultCount,
   mode,
   limitAction,
@@ -99,6 +111,9 @@ export function FilterSheet({
 }: {
   filter: FilterState;
   onChange: (f: FilterState) => void;
+  /** „Zurücksetzen“: URL-Filter leeren und Altersfilter wieder an (Plan 0021, E2) */
+  onReset: () => void;
+  age: AgeFilter | undefined;
   resultCount: number;
   /** nur mit Wegzeit sind die Grenzen bedienbar; sonst steht die Begründung darunter (E11, M6) */
   mode: ReachMode | undefined;
@@ -107,6 +122,8 @@ export function FilterSheet({
   onClose: () => void;
 }) {
   const reachHeading = useRef<HTMLHeadingElement>(null);
+  const ageLabelId = useId();
+  const ageNoteId = useId();
   const reason = limitReason(mode);
   /** Einfachwahl auf einer Listen-Dimension: „Egal“ = leere Liste */
   const single = <T extends string>(selected: readonly T[], value: T | undefined) =>
@@ -116,6 +133,30 @@ export function FilterSheet({
       <div className="sheet-scroll">
         <div className="grab" />
         <h2>Filter</h2>
+        {age && (
+          <>
+            <h3>Alter</h3>
+            <div className="swrow">
+              <span className="swtext">
+                <b id={ageLabelId}>Nur passend für {age.label}</b>
+                <small id={ageNoteId}>{ageOnlyNote(age.unfitCount, age.on)}</small>
+              </span>
+              <button
+                type="button"
+                className="switch"
+                role="switch"
+                aria-checked={age.on}
+                aria-labelledby={ageLabelId}
+                aria-describedby={ageNoteId}
+                onClick={() => age.onChange(!age.on)}
+              >
+                <span className="track">
+                  <span className="knob" />
+                </span>
+              </button>
+            </div>
+          </>
+        )}
         <h3>Art</h3>
         <div className="wrap">
           {CATEGORIES.map((c) => (
@@ -186,7 +227,7 @@ export function FilterSheet({
         )}
       </div>
       <div className="sheetfoot">
-        <button type="button" className="linkbtn" onClick={() => onChange(EMPTY_FILTER)}>
+        <button type="button" className="linkbtn" onClick={onReset}>
           Zurücksetzen
         </button>
         <button type="button" className="btn primary" onClick={onClose}>

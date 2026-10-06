@@ -113,6 +113,25 @@ export function plural(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
+const AGE_RULE = "geprüft zum Kursstart";
+
+/** Untertitel des Altersschalters im Filter-Sheet (Plan 0021, E2): an zählt die Ausgeblendeten, aus die Markierten */
+export function ageOnlyNote(unfitCount: number, on: boolean): string {
+  if (unfitCount === 0) return AGE_RULE;
+  const one = unfitCount === 1;
+  const count = on
+    ? `${unfitCount} ${one ? "weiteres passt" : "weitere passen"} nicht`
+    : `${unfitCount} ${one ? "unpassendes ist" : "unpassende sind"} markiert`;
+  return `${count} · ${AGE_RULE}`;
+}
+
+/** Hinweis bei abgeschaltetem Altersfilter (Plan 0021, E3) */
+export function ageWarnText(unfitCount: number, ageLabel: string): string {
+  return unfitCount === 1
+    ? `Zeigt auch 1 Angebot, das nicht zu ${ageLabel} passt`
+    : `Zeigt auch ${unfitCount} Angebote, die nicht zu ${ageLabel} passen`;
+}
+
 export function formatFact(offer: SiteOffer, now: Date): string {
   if (offer.format === "einmalig") return "Einmalig";
   if (offer.format === "kurs") {

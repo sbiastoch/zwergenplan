@@ -1,6 +1,6 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, Darstellung,
- * „Nur passende Angebote“, Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017). Nichts davon gelangt in URL,
+ * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017). Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
  */
@@ -8,7 +8,6 @@ const KEYS = {
   birthDate: "zwergenplan.geburtsdatum",
   saved: "zwergenplan.merkliste",
   theme: "zwergenplan.darstellung",
-  ageOnly: "zwergenplan.nur-passende",
   originDistrict: "zwergenplan.entfernung-ab",
   originPoint: "zwergenplan.startpunkt",
 } as const;
@@ -63,15 +62,6 @@ export function loadTheme(): ThemeChoice {
 
 export function saveTheme(choice: ThemeChoice): void {
   write(KEYS.theme, choice === "auto" ? undefined : choice);
-}
-
-/** Standard: an. */
-export function loadAgeOnly(): boolean {
-  return read(KEYS.ageOnly) !== "nein";
-}
-
-export function saveAgeOnly(on: boolean): void {
-  write(KEYS.ageOnly, on ? undefined : "nein");
 }
 
 /**

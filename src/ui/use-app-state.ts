@@ -2,13 +2,11 @@
 import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { canLocate, type PositionProblem, requestPosition } from "../data/geolocation.ts";
 import {
-  loadAgeOnly,
   loadBirthDate,
   loadOriginDistrict,
   loadOriginPoint,
   loadSaved,
   loadTheme,
-  saveAgeOnly,
   saveBirthDate,
   saveOrigin,
   saveSaved,
@@ -125,15 +123,6 @@ export function useBirthDate(): [string | undefined, (value: string | undefined)
   const update = useCallback((next: string | undefined) => {
     setValue(next);
     saveBirthDate(next);
-  }, []);
-  return [value, update];
-}
-
-export function useAgeOnly(): [boolean, (on: boolean) => void] {
-  const [value, setValue] = useState(loadAgeOnly);
-  const update = useCallback((on: boolean) => {
-    setValue(on);
-    saveAgeOnly(on);
   }, []);
   return [value, update];
 }

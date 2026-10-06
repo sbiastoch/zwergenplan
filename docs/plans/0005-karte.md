@@ -141,6 +141,9 @@ Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR
   - Generisch über `T extends { venue: { name; address; district?; geo } }`.
   - `sortPlaces(places, origin?)`: mit Startpunkt nach `compareReach`, sonst bzw. bei Gleichstand nach `names[0]` (`localeCompare(…, "de")`).
 - Die Karte zeigt die Orte von `views.visible`, also nach Filtern, Altersregel samt „trotzdem zeigen“ und Umkreis.
+
+> **Geändert durch Plan 0021:** „trotzdem zeigen“ ist der Altersschalter im Filter-Sheet; der Leerzustand der Orts-Liste bietet „Auch unpassende zeigen“.
+
 - **Marker als WebGL-Layer**, nicht als DOM-Marker. 44-px-Knöpfe für 76 Orte überlappen in der Stadtansicht, und die zugängliche Bedienung übernimmt die Orts-Liste.
   - GeoJSON-Quelle `orte` mit `cluster: true`, `clusterRadius: 40`, `clusterMaxZoom: 14`, `clusterProperties: { angebote: ["+", ["get", "angebote"]] }`.
   - Layer `orte-cluster` (Kreis 18 px) mit `orte-cluster-zahl`.

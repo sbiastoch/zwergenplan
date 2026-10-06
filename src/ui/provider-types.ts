@@ -6,6 +6,7 @@
 import type { ComponentType } from "react";
 import type { Reach } from "../domain/reach.ts";
 import type { ProviderDirectoryData, SiteOffer } from "../domain/site-data.ts";
+import type { AgeEscape } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import type { ReachMode } from "./use-transit.ts";
 
@@ -29,6 +30,8 @@ export interface ProviderScreenProps {
   onOpenProvider: (providerId: string) => void;
   /** nur mit aktivem Filter: Textknopf „Filter zurücksetzen“ (E4) */
   onResetFilter: (() => void) | undefined;
+  /** nur, wenn der Altersfilter etwas ausblendet: „Auch unpassende zeigen“ (Plan 0021, E4) */
+  age: AgeEscape | undefined;
 }
 
 /** Props des Anbieter-Sheets. Den Dialog rendert Overlays.tsx immer, diesen Inhalt nur bei offenem Dialog (E3). */

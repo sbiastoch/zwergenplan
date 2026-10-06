@@ -13,11 +13,14 @@ interface ListViewProps {
   today: string;
   ctx: CardContext;
   hasData: boolean;
-  onResetFilter: () => void;
+  /** nur mit aktiven URL-Filtern */
+  onResetFilter?: (() => void) | undefined;
+  /** nur, wenn der Altersfilter etwas ausblendet (Plan 0021, E4) */
+  age?: AgeEscape | undefined;
 }
 
-export function ListView({ groups, remaining, onMore, today, ctx, hasData, onResetFilter }: ListViewProps) {
-  if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} />;
+export function ListView({ groups, remaining, onMore, today, ctx, hasData, onResetFilter, age }: ListViewProps) {
+  if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} age={age} />;
   return (
     <>
       {groups.map((group) => {
@@ -57,19 +60,59 @@ export function ListPending() {
   );
 }
 
-/** Leerzustand der Liste und der Karte (Plan 0005, E12): Filter passen nicht, oder es gibt noch keine Daten. */
-export function NoOffers({ hasData, onResetFilter }: { hasData: boolean; onResetFilter: () => void }) {
-  return hasData ? (
+/** Ausweg aus einem Leerzustand, den der Altersfilter verursacht (Plan 0021, E4) */
+export interface AgeEscape {
+  /** Alter wie im Kopf, z. B. „7 Mon.“ */
+  label: string;
+  /** Altersfilter aus; der Fokus geht vorher auf die Statuszeile, denn der Leerzustand verschwindet */
+  onShow: () => void;
+}
+
+/**
+ * Leerzustand von Liste, Karte und Anbietern (Plan 0005, E12; Plan 0021, E4): Filter oder Alter blenden alles aus,
+ * oder es gibt noch keine Daten. „Auch unpassende zeigen“ steht vor „Filter zurücksetzen“, es ist der direkte Weg.
+ */
+export function NoOffers({
+  hasData,
+  onResetFilter,
+  age,
+}: {
+  hasData: boolean;
+  /** nur mit aktiven URL-Filtern */
+  onResetFilter?: (() => void) | undefined;
+  age?: AgeEscape | undefined;
+}) {
+  if (!hasData) {
+    return (
+      <EmptyState icon="search" title="Noch keine Angebote">
+        Daten folgen.
+      </EmptyState>
+    );
+  }
+  const text = age
+    ? onResetFilter
+      ? `Mit diesen Filtern passt nichts zu ${age.label}.`
+      : `Nichts davon passt zu ${age.label}.`
+    : onResetFilter
+      ? "Mit diesen Filtern gibt es keine Angebote."
+      : "Mit dieser Auswahl gibt es keine Angebote.";
+  return (
     <EmptyState icon="search" title="Diese Seite ist noch leer">
-      Mit diesen Filtern gibt es keine Angebote.
-      <br />
-      <button type="button" className="linkbtn" onClick={onResetFilter}>
-        Filter zurücksetzen
-      </button>
-    </EmptyState>
-  ) : (
-    <EmptyState icon="search" title="Noch keine Angebote">
-      Daten folgen.
+      {text}
+      {(age || onResetFilter) && (
+        <span className="empty-actions">
+          {age && (
+            <button type="button" className="linkbtn" onClick={age.onShow}>
+              Auch unpassende zeigen
+            </button>
+          )}
+          {onResetFilter && (
+            <button type="button" className="linkbtn" onClick={onResetFilter}>
+              Filter zurücksetzen
+            </button>
+          )}
+        </span>
+      )}
     </EmptyState>
   );
 }

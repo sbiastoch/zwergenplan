@@ -97,34 +97,28 @@ describe("ageVisibility", () => {
   const unfitKeys = (ids: ReadonlySet<string>) => upcoming.filter((o) => ids.has(o.id)).map(fixtureKey);
 
   it("blendet unpassende Angebote aus und zählt sie", () => {
-    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true, showUnfit: false });
+    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true });
     expect(v.visible.map(fixtureKey)).toEqual(["pekip-herbst"]);
-    expect(v.hiddenCount).toBe(2);
+    expect(v.unfitCount).toBe(2);
   });
 
   it("markiert unpassende Angebote über alle kommenden, nicht nur die gefilterten", () => {
-    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true, showUnfit: false });
+    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true });
     expect(v.unfitIds.size).toBe(upcoming.length - 4);
     expect(unfitKeys(v.unfitIds)).toContain("kuckuck-im-nest");
     expect(unfitKeys(v.unfitIds)).not.toContain("pekip-herbst");
   });
 
-  it("„trotzdem zeigen“ zeigt alles, der Hinweis bleibt", () => {
-    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: true, showUnfit: true });
+  it("Altersfilter aus: nichts ausgeblendet, unpassende gezählt und markiert (Plan 0021, E1)", () => {
+    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: false });
     expect(v.visible).toBe(filtered);
-    expect(v.hiddenCount).toBe(2);
-  });
-
-  it("ohne „nur passende“ wird nichts ausgeblendet, aber markiert", () => {
-    const v = ageVisibility(filtered, upcoming, "2026-09-01", FIXTURE_NOW, { ageOnly: false, showUnfit: false });
-    expect(v.visible).toBe(filtered);
-    expect(v.hiddenCount).toBe(0);
+    expect(v.unfitCount).toBe(2);
     expect(v.unfitIds.size).toBe(upcoming.length - 4);
   });
 
   it("ohne Geburtsdatum passt alles", () => {
-    const v = ageVisibility(filtered, upcoming, undefined, FIXTURE_NOW, { ageOnly: true, showUnfit: false });
-    expect(v).toEqual({ visible: filtered, hiddenCount: 0, unfitIds: new Set() });
+    const v = ageVisibility(filtered, upcoming, undefined, FIXTURE_NOW, { ageOnly: true });
+    expect(v).toEqual({ visible: filtered, unfitCount: 0, unfitIds: new Set() });
   });
 });
 

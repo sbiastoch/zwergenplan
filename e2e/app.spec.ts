@@ -1,7 +1,7 @@
 /** Entdecken: Liste nach Tagen, Filter, Alter (Plan 0003, E7–E11, E16). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
-import { expectMobileUx } from "./mobile-ux.ts";
+import { expectAccessible, expectMobileUx } from "./mobile-ux.ts";
 
 /** Tests mit diesem Tag laden selbst, weil sie vor dem ersten Laden zählen oder Requests umleiten. */
 const OWN_START = "@eigener-start";
@@ -18,6 +18,8 @@ async function setBirthDate(page: Page, text: string) {
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await page.getByLabel("Geburtsdatum").fill(text);
   await page.getByRole("button", { name: "Fertig" }).click();
+  // erst nach dem Schließen weiter: WebKit scrollt sonst den nächsten Knopf nicht ins Bild (Scroll-Sperre des Dialogs)
+  await expect(page.getByRole("dialog", { name: "Kind und Einstellungen" })).toBeHidden();
 }
 
 test("zeigt jedes kommende Angebot einmal, nach Tagen gruppiert, Vergangenes nicht", async ({ page }) => {
@@ -68,33 +70,131 @@ test("Filter-Sheet wirkt sofort, Einfachwahl bei Anmeldung, Zurücksetzen leert"
   await expect(page).toHaveURL((url) => url.pathname === "/" && url.search === "");
 });
 
-test("Geburtsdatum filtert nach Alter, bleibt lokal und steht nie in der URL", async ({ page }) => {
+test("Geburtsdatum filtert nach Alter, ohne Zusatzzeile, bleibt lokal und steht nie in der URL", async ({ page }) => {
   // iOS-Zifferntastatur: ohne Punkte
   await setBirthDate(page, "01092026");
   await expect(offers(page)).toHaveCount(4);
   await expect(page.getByRole("button", { name: /^Kind und Einstellungen/ })).toContainText("1 Mon.");
-  await expect(page.getByText("4 passen nicht zu 1 Mon.")).toBeVisible();
+  // Plan 0021, E3: Mit Altersfilter steht auf der Seite nichts zum Alter
+  await expect(page.getByText(/passen nicht|passt nicht|Zeigt auch/)).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /trotzdem zeigen/i })).toHaveCount(0);
   expect(page.url()).not.toMatch(/2026-09-01|01092026|01\.09/);
-
-  await page.getByRole("button", { name: "trotzdem zeigen" }).click();
-  await expect(offers(page)).toHaveCount(8);
-  await expect(page.locator(".card.unfit")).toHaveCount(4);
-  await expect(page.locator(".card.unfit").first()).toContainText("Monate");
 
   await page.reload();
   await expect(offers(page)).toHaveCount(4);
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await expect(page.getByLabel("Geburtsdatum")).toHaveValue("01.09.2026");
   await expect(page.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
+  // Der Schalter steht nicht mehr im Kind-Sheet (Plan 0021, E2)
+  await expect(page.getByRole("switch")).toHaveCount(0);
+  await expect(page.getByText("Unpassende Angebote blendet der Filter aus.")).toBeVisible();
 });
 
-test("„Nur passende“ aus zeigt alles, unpassende markiert", async ({ page }) => {
-  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
-  await page.getByLabel("Geburtsdatum").fill("01.09.2026");
-  await page.getByRole("switch", { name: "Nur passende Angebote" }).click();
-  await page.getByRole("button", { name: "Fertig" }).click();
-  await expect(offers(page)).toHaveCount(8);
-  await expect(page.locator(".card.unfit")).toHaveCount(4);
+test.describe("Altersfilter im Filter-Sheet (Plan 0021)", () => {
+  const ageSwitch = (page: Page) => page.getByRole("switch", { name: "Nur passend für 1 Mon." });
+  const warn = (page: Page) => page.getByText("Zeigt auch 4 Angebote, die nicht zu 1 Mon. passen");
+  const openFilter = async (page: Page) => {
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    return page.getByRole("dialog", { name: "Filter" });
+  };
+  const switchOff = async (page: Page) => {
+    const sheet = await openFilter(page);
+    await ageSwitch(page).click();
+    await sheet.getByRole("button", { name: "8 Angebote zeigen" }).click();
+  };
+
+  test("ohne Geburtsdatum gibt es keinen Altersschalter", async ({ page }) => {
+    const sheet = await openFilter(page);
+    await expect(sheet.getByRole("heading", { name: "Art" })).toBeVisible();
+    await expect(sheet.getByRole("switch")).toHaveCount(0);
+  });
+
+  test("abschalten zeigt alles markiert und warnt auf jedem Tab, „ausblenden“ schaltet zurück", async ({ page }) => {
+    await setBirthDate(page, "01.09.2026");
+    const sheet = await openFilter(page);
+    await expect(ageSwitch(page)).toHaveAttribute("aria-checked", "true");
+    await expect(ageSwitch(page)).toHaveAccessibleDescription("4 weitere passen nicht · geprüft zum Kursstart");
+    await expect(sheet.getByRole("button", { name: "4 Angebote zeigen" })).toBeVisible();
+
+    await ageSwitch(page).click();
+    await expect(ageSwitch(page)).toHaveAttribute("aria-checked", "false");
+    await expect(ageSwitch(page)).toHaveAccessibleDescription("4 unpassende sind markiert · geprüft zum Kursstart");
+    await expectAccessible(page);
+    await sheet.getByRole("button", { name: "8 Angebote zeigen" }).click();
+
+    await expect(offers(page)).toHaveCount(8);
+    await expect(page.locator(".card.unfit")).toHaveCount(4);
+    await expect(page.locator(".card.unfit").first()).toContainText("Monate");
+    await expect(warn(page)).toBeVisible();
+    await expectAccessible(page);
+    expect(page.url()).not.toMatch(/2026-09-01|01\.09|alter|passend/);
+
+    // Der Zustand überlebt den Tab-Wechsel
+    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+    await expect(warn(page)).toBeVisible();
+    await page.getByRole("button", { name: "Entdecken", exact: true }).click();
+
+    await page.getByRole("button", { name: "ausblenden" }).click();
+    await expect(offers(page)).toHaveCount(4);
+    await expect(warn(page)).toHaveCount(0);
+    await expect(page.getByRole("status")).toBeFocused();
+  });
+
+  test("nach dem Neuladen, nach „Zurücksetzen“ und bei neuem Geburtsdatum ist der Filter wieder an", async ({
+    page,
+  }) => {
+    await setBirthDate(page, "01.09.2026");
+    await switchOff(page);
+    await expect(warn(page)).toBeVisible();
+    await page.reload();
+    await expect(offers(page)).toHaveCount(4);
+    await expect(warn(page)).toHaveCount(0);
+
+    await switchOff(page);
+    const sheet = await openFilter(page);
+    await sheet.getByRole("button", { name: "Zurücksetzen" }).click();
+    await expect(ageSwitch(page)).toHaveAttribute("aria-checked", "true");
+    await sheet.getByRole("button", { name: "4 Angebote zeigen" }).click();
+    await expect(warn(page)).toHaveCount(0);
+
+    await switchOff(page);
+    await setBirthDate(page, "01.08.2026");
+    await expect(page.getByText(/^Zeigt auch/)).toHaveCount(0);
+    await openFilter(page);
+    await expect(page.getByRole("switch", { name: "Nur passend für 2 Mon." })).toHaveAttribute("aria-checked", "true");
+  });
+
+  test("Leerzustand nur durch das Alter: „Auch unpassende zeigen“ neben „Filter zurücksetzen“", async ({ page }) => {
+    // „Bewegung“ hat nur die Bewegungslandschaft (24–36 Mon.)
+    await page.goto("./?kat=bewegung");
+    await setBirthDate(page, "01.09.2026");
+    await expect(page.getByText("Mit diesen Filtern passt nichts zu 1 Mon.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();
+    await page.getByRole("button", { name: "Auch unpassende zeigen" }).click();
+    await expect(offers(page)).toHaveCount(1);
+    await expect(page.getByText("Zeigt auch 1 Angebot, das nicht zu 1 Mon. passt")).toBeVisible();
+    await expect(page.getByRole("status")).toBeFocused();
+  });
+
+  test("passt gar nichts, bieten Liste, Anbieter und Kalender „Auch unpassende zeigen“ (Karte: karte.spec)", async ({
+    page,
+  }) => {
+    await setBirthDate(page, "01.01.2023");
+    const show = page.getByRole("button", { name: "Auch unpassende zeigen" });
+
+    await expect(page.getByText(/Nichts davon passt zu/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toHaveCount(0);
+    await expect(show).toBeVisible();
+
+    await page.getByRole("button", { name: "Anbieter", exact: true }).click();
+    await expect(show).toBeVisible();
+
+    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+    await page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Angebote" }).click();
+    await show.click();
+    await expect(offers(page)).toHaveCount(1);
+    await expect(page.getByText(/^Zeigt auch 8 Angebote/)).toBeVisible();
+  });
 });
 
 test("Kind-Sheet fokussiert das Geburtsdatum nur, solange es leer ist (Plan 0020, E3)", async ({

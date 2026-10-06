@@ -14,15 +14,16 @@ import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
 import {
   ageChipLabel,
+  ageWarnText,
   limitHint,
   loadErrorText,
   mapStatusParts,
-  plural,
   providerStatusParts,
   reachNote,
   standDate,
 } from "./format.ts";
-import { ListPending, ListView } from "./ListView.tsx";
+import { Icon } from "./icons.tsx";
+import { type AgeEscape, ListPending, ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
@@ -30,16 +31,7 @@ import { ProviderPanel } from "./ProviderPanel.tsx";
 import { preloadExportWhenIdle, SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
-import {
-  useAgeOnly,
-  useBirthDate,
-  useNow,
-  useOrigin,
-  useRoute,
-  useSaved,
-  useTheme,
-  useToast,
-} from "./use-app-state.ts";
+import { useBirthDate, useNow, useOrigin, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
@@ -52,7 +44,6 @@ export function App() {
   const [attempt, setAttempt] = useState(0);
   const { route, replace, openDetail, closeDetail, openProvider, closeProvider } = useRoute();
   const [birthDate, setBirthDateStored] = useBirthDate();
-  const [ageOnly, setAgeOnly] = useAgeOnly();
   const [savedIds, toggleSaved] = useSaved();
   const theme = useTheme();
   const [toast, say] = useToast();
@@ -126,8 +117,8 @@ export function App() {
       }),
     [refreshTransit, say],
   );
-  const views = useOfferViews({ offers, route, birthDate, ageOnly, savedIds, now, reach: transit.reach });
-  const { visible, hiddenCount, showUnfit, page, calendar, saved, detailOffer } = views;
+  const views = useOfferViews({ offers, route, birthDate, savedIds, now, reach: transit.reach });
+  const { visible, unfitCount, ageOnly, page, calendar, saved, detailOffer } = views;
 
   // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
   useEffect(() => {
@@ -159,7 +150,8 @@ export function App() {
   };
   const setBirthDate = (value: string | undefined) => {
     setBirthDateStored(value);
-    views.setShowUnfit(false);
+    // neues Alter, neuer Zusammenhang: Altersfilter wieder an (Plan 0021, E1)
+    views.setAgeOnly(true);
   };
   const onTab = (tab: Tab) => {
     replace({ ...route, tab });
@@ -223,6 +215,23 @@ export function App() {
   // gespeicherter Startpunkt + wegzeit=: Platzhalter statt ungefilterter Liste bzw. ungefiltertem Kalender, bis die
   // Wegzeit da ist (M7, Arch-Review 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11).
   const listPending = reachMode?.kind === "laedt" && limit !== undefined;
+  /** „Zurücksetzen“: URL-Filter leer, Altersfilter wieder an – zurück auf den Standard (Plan 0021, E2) */
+  const resetFilters = () => {
+    setFilter(EMPTY_FILTER);
+    views.setAgeOnly(true);
+  };
+  // Zurücksetzen nur mit aktiven URL-Filtern; fürs Alter gibt es „Auch unpassende zeigen“ (Plan 0021, E4).
+  const resetIfActive = activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? resetFilters : undefined;
+  /*
+   * Beide Altersknöpfe verschwinden nach dem Tipp (Leerzustand bzw. Warnhinweis): Der Fokus geht vorher auf die
+   * Statuszeile, sonst fiele er auf <body> (Muster wie LimitAction, Plan 0009, N2). Sie meldet die neue Zahl selbst.
+   */
+  const setAgeOnlyKeepFocus = (on: boolean) => {
+    statusLine.current?.focus();
+    views.setAgeOnly(on);
+  };
+  const ageEscape: AgeEscape | undefined =
+    birthDate && ageOnly && unfitCount > 0 ? { label: ageLabel, onShow: () => setAgeOnlyKeepFocus(false) } : undefined;
   const limitAction: LimitActionFor = (focusTarget) => (
     <LimitAction
       mode={reachMode}
@@ -314,11 +323,13 @@ export function App() {
                 {limitAction(statusLine)}
               </p>
             )}
-            {hiddenCount > 0 && (
-              <p className="status">
-                {plural(hiddenCount, "passt", "passen")} nicht zu {ageLabel}
-                <button type="button" className="linkbtn" onClick={() => views.setShowUnfit(!showUnfit)}>
-                  {showUnfit ? "ausblenden" : "trotzdem zeigen"}
+            {birthDate && !ageOnly && unfitCount > 0 && (
+              // Altersfilter aus (Plan 0021, E3); ist er an, steht hier nichts zum Alter
+              <p className="status age-warn">
+                <Icon name="alert" size={18} />
+                <span>{ageWarnText(unfitCount, ageLabel)}</span>
+                <button type="button" className="linkbtn" onClick={() => setAgeOnlyKeepFocus(true)}>
+                  ausblenden
                 </button>
               </p>
             )}
@@ -336,7 +347,8 @@ export function App() {
                 today={today}
                 ctx={ctx}
                 hasData={offers.length > 0}
-                onResetFilter={() => setFilter(EMPTY_FILTER)}
+                onResetFilter={resetIfActive}
+                age={ageEscape}
               />
             )}
             {/* erst mit der Liste: Sonst rutschte er beim Ersetzen des Platzhalters (CLS) */}
@@ -358,7 +370,8 @@ export function App() {
             onMapCenter={(center) => {
               if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.");
             }}
-            onResetFilter={() => setFilter(EMPTY_FILTER)}
+            onResetFilter={resetIfActive}
+            age={ageEscape}
           />
         )}
         {load.kind === "ready" && route.tab === "kalender" && listPending && <ListPending />}
@@ -376,10 +389,8 @@ export function App() {
             monthOpen={calendar.monthOpen}
             onMonthOpen={calendar.setMonthOpen}
             ctx={ctx}
-            // nur mit aktivem Filter: Blendet allein das Alter aus, hilft Zurücksetzen nicht (Plan 0008, E12)
-            onResetFilter={
-              activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? () => setFilter(EMPTY_FILTER) : undefined
-            }
+            onResetFilter={resetIfActive}
+            onShowUnfit={ageEscape?.onShow}
           />
         )}
         {load.kind === "ready" && route.tab === "anbieter" && (
@@ -393,9 +404,8 @@ export function App() {
             query={providerQuery}
             onQuery={setProviderQuery}
             onOpenProvider={openProvider}
-            onResetFilter={
-              activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? () => setFilter(EMPTY_FILTER) : undefined
-            }
+            onResetFilter={resetIfActive}
+            age={ageEscape}
           />
         )}
         {load.kind === "ready" && route.tab === "merkliste" && (
@@ -432,8 +442,8 @@ export function App() {
         resultCount={visible.length}
         birthDate={birthDate}
         setBirthDate={setBirthDate}
-        ageOnly={ageOnly}
-        setAgeOnly={setAgeOnly}
+        filterAge={birthDate ? { label: ageLabel, on: ageOnly, unfitCount, onChange: views.setAgeOnly } : undefined}
+        resetFilters={resetFilters}
         theme={theme}
         today={today}
         originApi={originApi}

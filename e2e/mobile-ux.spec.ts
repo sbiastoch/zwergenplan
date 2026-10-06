@@ -59,6 +59,14 @@ async function openProviders(page: Page) {
 }
 
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
+async function setBirthDate(page: Page, text: string) {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  await page.getByLabel("Geburtsdatum").fill(text);
+  await page.getByRole("button", { name: "Fertig" }).click();
+  // erst nach dem Schließen weiter: WebKit scrollt sonst den nächsten Knopf nicht ins Bild (Scroll-Sperre des Dialogs)
+  await expect(page.getByRole("dialog", { name: "Kind und Einstellungen" })).toBeHidden();
+}
+
 const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-fehler"]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
@@ -100,6 +108,25 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   "filter-sheet": async (page) => {
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     await expect(page.getByRole("dialog", { name: "Filter" })).toBeVisible();
+  },
+  // Plan 0021: Altersschalter im Filter-Sheet (aus), Warnhinweis und Leerzustand mit zwei Textknöpfen
+  "filter-sheet-alter": async (page) => {
+    await setBirthDate(page, "01.09.2026");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await page.getByRole("switch", { name: "Nur passend für 1 Mon." }).click();
+    await expect(page.getByRole("switch", { name: "Nur passend für 1 Mon." })).toHaveAttribute("aria-checked", "false");
+  },
+  "entdecken-alter-aus": async (page) => {
+    await setBirthDate(page, "01.09.2026");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await page.getByRole("switch", { name: "Nur passend für 1 Mon." }).click();
+    await page.getByRole("button", { name: "8 Angebote zeigen" }).click();
+    await expect(page.getByText("Zeigt auch 4 Angebote, die nicht zu 1 Mon. passen")).toBeVisible();
+  },
+  "entdecken-alter-leer": async (page) => {
+    await page.goto("./?kat=bewegung");
+    await setBirthDate(page, "01.09.2026");
+    await expect(page.getByRole("button", { name: "Auch unpassende zeigen" })).toBeVisible();
   },
   "kind-sheet": async (page) => {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();

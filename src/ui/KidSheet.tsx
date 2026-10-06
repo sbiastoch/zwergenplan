@@ -1,5 +1,5 @@
 /**
- * Kind-Sheet (Plan 0003, E11, E15; Plan 0004, E5; Plan 0009, E3): Geburtsdatum, „Nur passende“, Startpunkt mit
+ * Kind-Sheet (Plan 0003, E11, E15; Plan 0004, E5; Plan 0009, E3): Geburtsdatum, Startpunkt mit
  * Quellenhinweis der Wegzeit, Darstellung.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7).
  */
@@ -18,8 +18,6 @@ import type { ReachMode } from "./use-transit.ts";
 export function KidSheet({
   birthDate,
   onBirthDate,
-  ageOnly,
-  onAgeOnly,
   theme,
   onTheme,
   today,
@@ -31,8 +29,6 @@ export function KidSheet({
 }: {
   birthDate: string | undefined;
   onBirthDate: (iso: string | undefined) => void;
-  ageOnly: boolean;
-  onAgeOnly: (on: boolean) => void;
   theme: ThemeChoice;
   onTheme: (t: ThemeChoice) => void;
   today: string;
@@ -96,25 +92,7 @@ export function KidSheet({
         <p id={hintId} className={hint.cls}>
           {hint.text}
         </p>
-        <p className="small">Bleibt nur auf diesem Gerät.</p>
-        <div className="swrow">
-          <span className="swtext">
-            <b id="age-only-label">Nur passende Angebote</b>
-            <small>geprüft zum Kursstart · bleibt auf diesem Gerät</small>
-          </span>
-          <button
-            type="button"
-            className="switch"
-            role="switch"
-            aria-checked={ageOnly}
-            aria-labelledby="age-only-label"
-            onClick={() => onAgeOnly(!ageOnly)}
-          >
-            <span className="track">
-              <span className="knob" />
-            </span>
-          </button>
-        </div>
+        <p className="small">Bleibt nur auf diesem Gerät. Unpassende Angebote blendet der Filter aus.</p>
         <OriginPicker api={origin} mode={reachMode} source={transitSource} focus={focusOrigin} />
         <h3>Darstellung</h3>
         <fieldset className="plain">

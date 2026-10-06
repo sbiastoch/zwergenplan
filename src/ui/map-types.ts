@@ -9,6 +9,7 @@ import type { GeoPoint } from "../domain/geo.ts";
 import type { Place } from "../domain/places.ts";
 import type { Origin, ReachFn } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
+import type { AgeEscape } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 
 /** Props der Karten-Oberfläche (karte/MapScreen.tsx), durchgereicht von MapPanel.tsx */
@@ -31,7 +32,10 @@ export interface MapScreenProps {
   /** öffnet das Kind-Sheet bei „Wegzeit ab“ */
   onPickOrigin: () => void;
   onMapCenter: (center: GeoPoint) => void;
-  onResetFilter: () => void;
+  /** nur mit aktiven URL-Filtern */
+  onResetFilter: (() => void) | undefined;
+  /** nur, wenn der Altersfilter etwas ausblendet (Plan 0021, E4) */
+  age: AgeEscape | undefined;
 }
 
 export interface MapViewProps {
