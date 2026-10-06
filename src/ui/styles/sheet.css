@@ -282,6 +282,11 @@
   .push-done {
     font-weight: 800;
   }
+  /* gedrückt wie ein gewählter Chip (Browser-Review 0017, F1): der Zustand steht nicht nur im Wort daneben */
+  .push-row .btn[aria-pressed="true"] {
+    background: var(--sel);
+    color: var(--on-sel);
+  }
   .push-status:empty {
     margin: 0;
   }

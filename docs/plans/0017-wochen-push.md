@@ -480,3 +480,16 @@ Kein Blocker.
 **Abgelehnt bzw. anders:**
 - **N5** (dauerhafter Selbsttest der `src/sw/`-Ausnahme): wie bisher per Kanarienvogel im Plan belegt (Praxis seit Plan 0011); `push-tailor.ts` hält die Ausnahme ohnehin in Gebrauch, und eine Lockerung für `src/ui/` fiele beim nächsten Kanarienvogel auf.
 - **N14** (Zeilen in CLAUDE.md): nicht auf Vorschlag eines Reviewers geändert; Deploy des Workers, `.push.local.json` und `channel: "chromium"` stehen in README und `docs/architecture.md`. Ob sie zusätzlich unter „Stolperfallen“ gehören, entscheidet der Nutzer.
+
+## Browser-Review live (2026-10-06, `https://zwergenplan.app/`, Commit 29335c8)
+
+Screenshots `node scripts/screenshots.ts https://zwergenplan.app/ --views=push,kind` (neue Ansicht `push`: lange Suche abonniert, Abschnitt „Als App“ im Blick) und `--views=push --text=200`, je 320, 360, 365, 390 (iPhone), 412 (Pixel) und 915×412 (quer), hell und dunkel; dazu eine Live-Interaktion im vollen Chromium mit erlaubten Benachrichtigungen (Zustand `ok`, Schalter nicht angetippt: kein echtes Abo ohne Nutzer). Die Chrome-Erweiterung war nicht verbunden.
+
+- **Lesbarkeit:** Überschrift „Als App“, Schalter „Wochen-Nachricht“ mit Untertitel, „Aktuelle Suche“ mit voller Beschriftung (alle Dimensionen, bricht sauber um), Statuszeile direkt unter dem Knopf. Die Hierarchie entspricht dem übrigen Kind-Sheet. In 2 Sekunden klar, was abonniert ist.
+- **Daumen-Erreichbarkeit:** „Suche abonnieren“ und „Entfernen“ ≥ 44 px, im unteren Drittel des Sheets; „Entfernen“ steht rechts neben der Beschriftung und rutscht bei wenig Platz darunter (`push-320-*`, `live-push-abo-*`).
+- **Zustände:** abgelehnt (Headless-Shell: Schalter gesperrt, „In den Einstellungen des Geräts erlaubt?“, `push-*`), `ok` (Schalter aktiv, `live-push-*`), ohne Filter (Hinweis statt Knopf, E2E), leere Liste („Noch keine. Bis dahin kommen alle neuen Angebote.“, `live-push-entfernt-light`), lange Beschriftung (`push-320-*`, `push-quer-*`). Nichts bricht oder wird abgeschnitten. Nach „Entfernen“ liegt der Fokus auf „Deine Such-Abos“, Statuszeile „Such-Abo entfernt.“. Keine Konsolen- oder Seitenfehler (hell, dunkel, nach Neuladen).
+- **Dark Mode:** keine grellen Inseln, Schalter, Knöpfe und Trennlinie mit Kontrast (`push-*-dark`).
+- **Micro-Interactions:** **Befund F1:** Der gedrückte Knopf „Suche abonnieren“ sah aus wie der ungedrückte, nur das Wort „Abonniert“ daneben zeigte den Zustand. **Behoben:** gedrückt wie ein gewählter Chip (`--sel`/`--on-sel`), geprüft lokal (hell dunkel gefüllt, dunkel gelb) und mit den Gates in `e2e/push.spec.ts` (35 grün).
+- **Konsistenz:** Knöpfe, Schalter, Überschriften und Abstände wie im Kind-Sheet; der gedrückte Zustand jetzt wie die Filter-Chips.
+- 200 %: In der Skript-Reihe wird nach dem Scrollen skaliert, die Bilder zeigen dort meist den Quellenhinweis; den Push-Teil bei 200 % zeigen `push-320-light-200` und `push-quer-dark-200`, belegt ist er durch die E2E-Gates (320 px/200 % je Zustand).
+- Bewusst nicht geprüft: Testversand und Einschalten an echten Geräten (Geräteprüfung durch den Nutzer).

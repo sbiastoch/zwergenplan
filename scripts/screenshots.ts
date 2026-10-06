@@ -3,7 +3,8 @@
  *   node scripts/screenshots.ts [URL] [--views=start,kalender,…] [--text=200]   Standard: lokale Preview mit Fixtures
  * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt (Plan 0004), karte, ort
  * (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
- * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste).
+ * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
+ * (Plan 0017: Push-Teil im Kind-Sheet mit langem Such-Abo).
  * Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
  * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
@@ -101,6 +102,21 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     const license = page.locator(".source-note a").last();
     await page.locator(".source-note a").nth(1).waitFor();
     await license.scrollIntoViewIfNeeded();
+  },
+  // Push-Teil (Plan 0017, E7): lange Suche abonniert, Abschnitt „Als App“ im Blick. Mit der Headless-Shell sind
+  // Benachrichtigungen immer abgelehnt, man sieht also den Zustand „verweigert“ (Schalter gesperrt).
+  push: async (page) => {
+    await page.goto(
+      new URL(
+        "?kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
+        page.url(),
+      ).href,
+    );
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    await page.locator('html[data-push="bereit"]').waitFor();
+    const subscribe = page.getByRole("button", { name: "Suche abonnieren" });
+    if (await subscribe.count()) await subscribe.click();
+    await page.getByRole("heading", { name: "Deine Such-Abos" }).scrollIntoViewIfNeeded();
   },
   "start-startpunkt": async (page) => {
     await withGostenhof(page);
