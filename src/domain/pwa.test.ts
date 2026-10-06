@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type InstallState, installHelp } from "./pwa.ts";
+import { type InstallState, installHelp, pushView } from "./pwa.ts";
 
 describe("installHelp: Texte der Installationshilfe je Zustand (Plan 0011, E7)", () => {
   it("läuft schon als App", () => {
@@ -42,5 +42,37 @@ describe("installHelp: Texte der Installationshilfe je Zustand (Plan 0011, E7)",
   it("jeder Zustand ist abgedeckt", () => {
     const all: InstallState[] = ["app", "angebot", "installiert", "menue", "ios", "keine"];
     expect(all.filter((s) => installHelp(s) !== undefined)).toHaveLength(5);
+  });
+});
+
+describe("pushView: Sichtbarkeit des Push-Teils je Zustand (Plan 0017, E7)", () => {
+  const states: InstallState[] = ["app", "angebot", "installiert", "menue", "ios", "keine"];
+
+  it("mit Push-Fähigkeit überall der Push-Teil, auch im Safari-Tab und am Desktop ohne Angebot", () => {
+    for (const state of states) expect(pushView(state, "ok"), state).toEqual({ kind: "teil" });
+  });
+
+  it("abgelehnt: Push-Teil (Schalter aus, Hinweis auf die Einstellungen)", () => {
+    for (const state of states) expect(pushView(state, "verweigert"), state).toEqual({ kind: "teil" });
+  });
+
+  it("iPhone im Browser ohne Push: Hinweis auf die App", () => {
+    expect(pushView("ios", "kein-push")).toEqual({ kind: "hinweis", text: "Benachrichtigungen gibt es in der App." });
+    expect(pushView("ios", "kein-sw")).toEqual({ kind: "hinweis", text: "Benachrichtigungen gibt es in der App." });
+  });
+
+  it("Browser ohne Push: Hinweis; ohne Service Worker (blockiert, Erstbesuch, Notausgang) keiner", () => {
+    for (const state of ["app", "angebot", "installiert", "menue"] as const) {
+      expect(pushView(state, "kein-push")).toEqual({
+        kind: "hinweis",
+        text: "Dieser Browser kann keine Benachrichtigungen.",
+      });
+      expect(pushView(state, "kein-sw")).toEqual({ kind: "nichts" });
+    }
+  });
+
+  it("Desktop ohne Angebot und ohne Push: nichts (der Abschnitt bleibt leer)", () => {
+    expect(pushView("keine", "kein-push")).toEqual({ kind: "nichts" });
+    expect(pushView("keine", "kein-sw")).toEqual({ kind: "nichts" });
   });
 });

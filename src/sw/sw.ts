@@ -9,7 +9,7 @@
  * - Fremde Origins und alles ohne Regel: kein `respondWith` (ADR 0008).
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
-import * as deviceStore from "../data/device-store.ts";
+import { get as storeGet, set as storeSet } from "../data/device-store.ts";
 import { decidePush, readProposed } from "./push-decision.ts";
 import { type TailorEnv, tailorPush } from "./push-tailor.ts";
 import {
@@ -193,7 +193,7 @@ const tailorEnv: TailorEnv = {
     return response.json();
   },
   cachedJson: async (path) => (await caches.match(abs(path), { cacheName: DATA_CACHE }))?.json(),
-  store: deviceStore,
+  store: { get: storeGet, set: storeSet },
 };
 
 /** `PushEvent.notification` (Declarative Web Push) steht noch nicht in lib.webworker */
@@ -273,10 +273,10 @@ self.addEventListener("pushsubscriptionchange", (event: Event) => {
         });
       const response = await send("POST", fresh.toJSON());
       if (!response.ok) return;
-      const old = change.oldSubscription?.endpoint ?? (await deviceStore.get("endpoint"));
+      const old = change.oldSubscription?.endpoint ?? (await storeGet("endpoint"));
       if (typeof old === "string" && old !== fresh.endpoint)
         await send("DELETE", { endpoint: old }).catch(() => undefined);
-      await deviceStore.set("endpoint", fresh.endpoint);
+      await storeSet("endpoint", fresh.endpoint);
     })(),
   );
 });

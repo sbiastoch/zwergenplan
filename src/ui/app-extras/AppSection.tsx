@@ -1,15 +1,18 @@
 /**
- * Abschnitt „Als App“ im Kind-Sheet (Plan 0011, E7), Lazy-Chunk `assets/app/` über den Lader `src/ui/AppExtras.tsx`.
- * Den Zustand liefert `src/data/pwa.ts` (Geräte-APIs), die Texte `src/domain/pwa.ts`. Ohne Hilfe (Desktop ohne
- * Angebot) bleibt der Abschnitt leer. Ab Stufe 2 steht hier der Push-Schalter.
+ * Abschnitt „Als App“ im Kind-Sheet (Plan 0011, E7; Plan 0017, E7), Lazy-Chunk `assets/app/` über den Lader
+ * `src/ui/AppExtras.tsx`. Den Zustand liefert `src/data/pwa.ts` (Geräte-APIs), die Texte `src/domain/pwa.ts`.
+ * Darunter der Push-Teil (`PushControls`) nach der Matrix `pushView`; ohne Hilfe und ohne Push bleibt der Abschnitt leer.
  *
  * Den Installationszustand reicht der Lader als `install` herein, statt ihn hier statisch zu importieren: Ein Lazy-Chunk mit
  * statischem Import eines anderen Lazy-Chunks lässt Vite den Preload-Helfer `__vite__mapDeps` in den Einstieg
- * schreiben (+0,11 kB Start-JS, gemessen in Plan 0011, „Umsetzung“, Schritt 4).
+ * schreiben (+0,11 kB Start-JS, gemessen in Plan 0011, „Umsetzung“, Schritt 4). Der Push-Code (`push.ts` und was
+ * `PushControls` importiert) importiert nur dieser Chunk, also liegt er mit darin (Plan 0017, E9).
  */
-import { useId, useRef, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { createPush } from "../../data/push.ts";
 import type { InstallApi } from "../../data/pwa.ts";
-import { installHelp } from "../../domain/pwa.ts";
+import { installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
+import { PushControls } from "./PushControls.tsx";
 
 /** Teilen-Symbol von iOS (Kasten mit Pfeil nach oben). Nur hier gebraucht, deshalb nicht in icons.tsx (Start-Bundle). */
 function ShareIcon() {
@@ -24,7 +27,32 @@ export function AppSection({ install }: { install: InstallApi }) {
   const state = useSyncExternalStore(install.subscribe, install.state);
   const heading = useId();
   const text = useRef<HTMLParagraphElement>(null);
+  const [push] = useState(() => createPush());
+  /** `undefined`, solange `pushSupport()` läuft (sofort, `getRegistration`); so lange steht der Platzhalter */
+  const [support, setSupport] = useState<PushSupport>();
   const help = installHelp(state);
+
+  useEffect(() => {
+    let live = true;
+    void push.support().then((s) => {
+      if (live) setSupport(s);
+    });
+    return () => {
+      live = false;
+    };
+  }, [push]);
+
+  // Wartebedingung für E2E (Request-Zählungen, Mobile-UX-Gates): entschieden ist der Abschnitt in jedem Zweig, auch
+  // wenn er leer bleibt. Beim Schließen des Sheets wieder weg, damit ein zweites Öffnen nicht schon „bereit“ ist.
+  useEffect(() => {
+    if (!support) return;
+    const root = document.documentElement;
+    root.dataset["push"] = "bereit";
+    return () => {
+      delete root.dataset["push"];
+    };
+  }, [support]);
+
   // Nach dem Tipp verschwindet der Knopf mit dem Fokus. Ohne Ziel fiele der Fokus im Modal auf <body>; die Zeile
   // darüber sagt jetzt, wie es weitergeht (Arch-Review Stufe 1, gefunden mit den Gates für „installiert“).
   // `preventScroll`: Die Zeile steht, wo der Knopf war. Ein Scrollen in den Blick verschöbe sonst auch das Sheet selbst
@@ -33,11 +61,13 @@ export function AppSection({ install }: { install: InstallApi }) {
     await install.prompt();
     text.current?.focus({ preventScroll: true });
   };
-  if (!help) return null;
+  if (!support) return <div className="app-pending" aria-hidden="true" />;
+  const view = pushView(state, support);
+  if (!help && view.kind === "nichts") return null;
   return (
     <section className="app-section" aria-labelledby={heading}>
       <h3 id={heading}>Als App</h3>
-      {help.kind === "ios" ? (
+      {help?.kind === "ios" ? (
         <>
           <p className="app-text">
             {help.before}{" "}
@@ -50,15 +80,21 @@ export function AppSection({ install }: { install: InstallApi }) {
           <p className="small">{help.note}</p>
         </>
       ) : (
-        <p ref={text} className="app-text" tabIndex={-1}>
-          {help.text}
-        </p>
+        help && (
+          <p ref={text} className="app-text" tabIndex={-1}>
+            {help.text}
+          </p>
+        )
       )}
-      {help.kind === "knopf" && (
+      {help?.kind === "knopf" && (
         <button type="button" className="btn primary wide" onClick={() => void promptThenFocus()}>
           {help.button}
         </button>
       )}
+      {view.kind === "teil" && (support === "ok" || support === "verweigert") && (
+        <PushControls push={push} support={support} />
+      )}
+      {view.kind === "hinweis" && <p className="small">{view.text}</p>}
     </section>
   );
 }

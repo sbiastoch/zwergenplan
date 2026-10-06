@@ -257,6 +257,51 @@
   .app-text {
     margin: 0 0 12px;
   }
+  /* Push-Teil (Plan 0017, E7): Unterüberschriften wie h3, Abo-Zeilen mit Knopf rechts, bei wenig Platz darunter */
+  .push-h {
+    font-size: 0.875rem;
+    font-weight: 800;
+    margin: 16px 0 6px;
+  }
+  .push-label {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .push-label small {
+    display: block;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  .push-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .push-done {
+    font-weight: 800;
+  }
+  .push-status:empty {
+    margin: 0;
+  }
+  .push-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .push-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    padding: 8px 0;
+    border-top: 1px solid var(--edge2);
+  }
+  .push-list .push-label {
+    flex: 1 1 12rem;
+  }
   .app-section .share {
     display: inline-flex;
     align-items: center;

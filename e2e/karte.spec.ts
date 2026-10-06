@@ -247,6 +247,8 @@ test.describe("mit gemockten Kacheln", () => {
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
     // Das Öffnen lädt den Abschnitt „Als App“ (für alle gleich, Plan 0011, E5); gezählt wird ab der Wahl
     await expect(kid.locator(".app-pending")).toHaveCount(0);
+    // Push-Teil entschieden (Plan 0017, E7): data-push in jedem Zweig, auch wenn der Abschnitt leer bleibt
+    await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
     const requests: string[] = [];
     page.on("request", (req) => requests.push(req.url()));
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
