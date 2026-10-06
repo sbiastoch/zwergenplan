@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { parse } from "yaml";
 import { berlinDay, PUSH_CRON, PUSH_TIMEZONE, shouldSendNow } from "./push-schedule.ts";
 
 const at = (iso: string) => shouldSendNow(new Date(iso));
@@ -47,5 +49,10 @@ describe("Zeitplan", () => {
   it("steht für Samstag 10:07 in Berliner Zeit (Minute 7: volle Stunden verwirft GitHub unter Last)", () => {
     expect(PUSH_CRON).toBe("7 10 * * 6");
     expect(PUSH_TIMEZONE).toBe("Europe/Berlin");
+  });
+
+  it("stimmt mit .github/workflows/push-weekly.yml überein (genau ein Zeitplan)", () => {
+    const workflow = parse(readFileSync(new URL("../../.github/workflows/push-weekly.yml", import.meta.url), "utf8"));
+    expect(workflow.on.schedule).toEqual([{ cron: PUSH_CRON, timezone: PUSH_TIMEZONE }]);
   });
 });

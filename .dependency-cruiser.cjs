@@ -287,6 +287,14 @@ module.exports = {
       to: { path: "^(src|scripts|e2e|tests)/", pathNot: "^src/domain/(push-types|time)\\.ts$" },
     },
     {
+      name: "web-push-only-in-push-weekly",
+      severity: "error",
+      comment:
+        "web-push (VAPID-Signatur, Verschlüsselung) nur im Versand-Skript (Plan 0017, E2; ADR 0014): nie in der App, im Service Worker oder im Push-Worker.",
+      from: { pathNot: "^scripts/push-weekly\\.ts$" },
+      to: { path: "(^|/)node_modules/web-push/" },
+    },
+    {
       name: "push-worker-not-imported",
       severity: "error",
       comment: "Nichts im Repo importiert den Worker; er wird nur mit wrangler gebaut (Plan 0017).",
