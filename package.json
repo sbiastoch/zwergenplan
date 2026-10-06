@@ -20,6 +20,7 @@
     "lint:fix": "biome check --write .",
     "arch": "node scripts/check-architecture.ts",
     "knip": "knip",
+    "push:deploy": "wrangler deploy -c push-worker/wrangler.toml --var VERSION:$(git rev-parse --short HEAD)",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "e2e": "pnpm build:e2e && pnpm build && playwright test",
