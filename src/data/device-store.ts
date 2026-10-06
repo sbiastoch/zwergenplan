@@ -5,7 +5,7 @@
  */
 
 /** Was gespiegelt wird (E6); `seenIds` schreibt nur der Service Worker (E3) */
-export const DEVICE_KEYS = ["birthDate", "searches", "origin", "seenIds", "endpoint"] as const;
+const DEVICE_KEYS = ["birthDate", "searches", "origin", "seenIds", "endpoint"] as const;
 export type DeviceKey = (typeof DEVICE_KEYS)[number];
 
 const DB = "zwergenplan";

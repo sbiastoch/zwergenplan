@@ -1,0 +1,65 @@
+# Wochen-Nachricht (Plan 0017, E1; ADR 0014): samstags gegen 10 Uhr Berliner Zeit an alle Push-Abos.
+# Minute 7: Läufe zur vollen Stunde verspätet oder verwirft GitHub unter Last. Der Wächter in
+# scripts/lib/push-schedule.ts sendet nur Samstag 10–14 Uhr; die Versand-Marke im Worker verhindert einen zweiten
+# Versand am selben Tag. Cron und Zeitzone gleicht scripts/lib/push-schedule.test.ts mit dem Code ab.
+# Kein Gate: Fehler beim Senden sind Warnungen. Nach 60 Tagen ohne Commit schaltet GitHub den Zeitplan ab (README).
+name: Wochen-Nachricht
+
+on:
+  schedule:
+    - cron: "7 10 * * 6"
+      timezone: "Europe/Berlin"
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Geräte-Kennung (Pflicht, sobald dry_run aus ist)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Nur Abos zählen"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # getrennt, damit ein Testversand keinen wartenden Zeitplan-Lauf abbricht
+  group: push-weekly-${{ github.event_name == 'schedule' && 'schedule' || 'test' }}
+  cancel-in-progress: false
+
+jobs:
+  send:
+    name: Wochen-Nachricht senden
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # der Datenstand vor 7 Tagen kommt aus der git-Historie
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Senden (Zeitplan)
+        if: github.event_name == 'schedule'
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PUSH_ADMIN_TOKEN: ${{ secrets.PUSH_ADMIN_TOKEN }}
+        run: node scripts/push-weekly.ts
+      - name: Testversand
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PUSH_ADMIN_TOKEN: ${{ secrets.PUSH_ADMIN_TOKEN }}
+          ONLY: ${{ inputs.only }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            node scripts/push-weekly.ts --force --dry-run ${ONLY:+--only=$ONLY}
+          else
+            node scripts/push-weekly.ts --force --only="$ONLY"
+          fi
