@@ -108,7 +108,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     // Abschnitt „Als App“ geladen (Lazy-Chunk, Plan 0011, E7): Die Gates prüfen sein Ergebnis, nicht den Platzhalter
     await expect(page.locator(".app-pending")).toHaveCount(0);
   },
-  // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „… · Wegzeit ab Gostenhof“ (Plan 0018)
+  // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „… · Wegzeit ab Gostenhof“ (Plan 0020)
   "entdecken-wegzeit": async (page) => {
     await withGostenhof(page);
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("5 Min.");
@@ -313,7 +313,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
 /**
  * Drei Wege zur Darstellung. Dunkel gibt es zweimal, weil die Tokens doppelt stehen (Plan 0007, E15): per System
  * (`@media`-Zweig) und per gewählter Darstellung (`data-theme="dark"`). Die Wahl wird vor dem Laden gespeichert,
- * denn die Darstellung steht nur im Kind-Sheet (Plan 0018, E2).
+ * denn die Darstellung steht nur im Kind-Sheet (Plan 0020, E2).
  */
 const SCHEMES = [
   { label: "hell", colorScheme: "light", chosenDark: false },

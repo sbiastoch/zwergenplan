@@ -1,6 +1,6 @@
 # ADR 0019 – Die Statuszeile nennt nur den Startpunkt
 
-Status: angenommen (2026-10-06), Nutzerentscheidung. Umsetzung mit Plan 0018. Ändert die Anzeige aus ADR 0011 (Punkt 3, Satz 3) und ADR 0015 (Kopf).
+Status: angenommen (2026-10-06), Nutzerentscheidung. Umsetzung mit Plan 0020. Ändert die Anzeige aus ADR 0011 (Punkt 3, Satz 3) und ADR 0015 (Kopf).
 
 ## Kontext
 

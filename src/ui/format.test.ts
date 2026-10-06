@@ -338,7 +338,7 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
     expect(reachLong(withLines(130, ["U1"]), gostenhof).lines).toBeUndefined();
   });
 
-  it("Statuszeile je Modus: nur der Startpunkt, im Rückfall mit Grund (E11; Plan 0018, E1)", () => {
+  it("Statuszeile je Modus: nur der Startpunkt, im Rückfall mit Grund (E11; Plan 0020, E1)", () => {
     expect(reachNote({ kind: "oepnv" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
     expect(reachNote({ kind: "oepnv" }, standort)).toBe("Wegzeit ab deinem Standort");
     expect(reachNote({ kind: "oepnv" }, karte)).toBe("Wegzeit ab der Kartenmitte");

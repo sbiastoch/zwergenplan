@@ -1,6 +1,7 @@
-# Plan 0018 – Startseite entrümpeln
+# Plan 0020 – Startseite entrümpeln
 
-Status: umgesetzt (Branch `startseite-entruempeln`), Arch-Review, Deploy und Browser-Review stehen aus
+Status: umgesetzt (Branch `startseite-entruempeln-0020`), Arch-Review OK; Deploy und Browser-Review stehen aus
+Nummer: zuerst als Plan 0018 geschrieben; umbenannt, weil 0017 (Push), 0018 (Kalender) und 0019 (Route) parallel vergeben wurden.
 Datum: 2026-10-06
 Bezug: Plan 0003 (E11, E15), Plan 0007 (E6), Plan 0009 (E1, E11), Plan 0012 (E10), ADR 0011 (Punkt 3), ADR 0015 (Kopf, Punkt 7)
 
@@ -109,9 +110,9 @@ Nutzermeldung (2026-10-06): Die Startseite wirkt überladen.
   - Entscheidung: E1. Die Annahme steht im Kind-Sheet unter „Wegzeit ab“ (`TRANSIT_RULE`), der Rückfall auf die Luftlinie behält seinen Grund in Klammern.
   - Alternativen: Hinweis ganz weglassen (verworfen: Der gespeicherte Startpunkt wäre auf der Seite unsichtbar), Umschalter immer darunter.
   - Konsequenzen: siehe E1.
-- ADR 0015 bekommt die Kopfzeile „**Geändert durch ADR 0019 (Plan 0018):** Die Anzeige in der Statuszeile (Kopf, „Di vormittags, höchstens 1 Umstieg, inkl. Warten“) gilt nur noch für die Erklärung im Kind-Sheet.“
-- ADR 0011 bekommt in den Kopfzeilen den Vermerk „**Geändert durch ADR 0019 (Plan 0018):** Wortlaut der Statuszeile. Punkt 9 bleibt erfüllt (‚außerhalb des Stadtgebiets‘ steht weiter dort).“
-- Plan 0003 (E15) und Plan 0007 (E6) bekommen je einen Vermerk nach dem Muster `> **Geändert durch Plan …**` (`docs/plans/0003-design-stickerheft.md:218`): „Der Theme-Knopf im Kopf entfällt, die Darstellung steht nur im Kind-Sheet (Plan 0018, E2).“
+- ADR 0015 bekommt die Kopfzeile „**Geändert durch ADR 0019 (Plan 0020):** Die Anzeige in der Statuszeile (Kopf, „Di vormittags, höchstens 1 Umstieg, inkl. Warten“) gilt nur noch für die Erklärung im Kind-Sheet.“
+- ADR 0011 bekommt in den Kopfzeilen den Vermerk „**Geändert durch ADR 0019 (Plan 0020):** Wortlaut der Statuszeile. Punkt 9 bleibt erfüllt (‚außerhalb des Stadtgebiets‘ steht weiter dort).“
+- Plan 0003 (E15) und Plan 0007 (E6) bekommen je einen Vermerk nach dem Muster `> **Geändert durch Plan …**` (`docs/plans/0003-design-stickerheft.md:218`): „Der Theme-Knopf im Kopf entfällt, die Darstellung steht nur im Kind-Sheet (Plan 0020, E2).“
 - Kommentare in `format.ts` (`reachNote`), `App.tsx` (Statuszeile) und `Chrome.tsx` (Kopf) werden angepasst.
 - `docs/architecture.md` nennt den Knopf und die Statuszeile nicht im Wortlaut, keine Änderung.
 
@@ -173,7 +174,7 @@ Geprüft hat der Subagent `plan-reviewer`, ohne Chat-Kontext.
   - 360 px ist ausdrücklich festgelegt.
 - **W2**: Die Testliste war lückenhaft. Neu in der Ausgangslage stehen `layout.spec.ts:75–98`, `startpunkt.spec.ts:30/100–106/203/353/531/671/674`, `pwa.spec.ts:12` und alle Fehler- und Außerhalb-Signale. Den Ersatz je Stelle nennt Test 3.
 - **W3**: Im Fehlerfall verschwände die einzige Erklärung auf der Seite. Entschieden ist Variante (a): Der seltene Rückfall auf die Luftlinie behält den Grund kurz in Klammern. So bleibt ADR 0011, Punkt 9 erfüllt, und die Fehler-Signale der E2E-Tests bleiben ohne Schlusspunkt gültig.
-- **H5**: ADR-Weg. ADR 0015 bekommt die Kopfzeile „Geändert durch Plan 0018“ nach dem Muster von ADR 0011, dazu ein Vermerk in ADR 0011, Punkt 9 (E4).
+- **H5**: ADR-Weg. ADR 0015 bekommt die Kopfzeile „Geändert durch Plan 0020“ nach dem Muster von ADR 0011, dazu ein Vermerk in ADR 0011, Punkt 9 (E4).
 - **H6**: Aufräumen von `case "sun"`, `container: kopf` und überholten Kommentaren. `.status-note.pending` wird ersetzt statt erweitert.
 - **H7**: Der Theme-Test misst bei offenem Sheet.
 - **H8**: Der Fokusring wird im Browser-Review geprüft (siehe Risiken).

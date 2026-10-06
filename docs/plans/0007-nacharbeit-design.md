@@ -170,7 +170,7 @@ Die Kachel bekommt keinen neuen Chip, das Detail reicht. Eine eigene Datei statt
 
 ### E6 – B5: Kopfzeile, Mindestbreite und Schwelle
 
-> **Geändert durch Plan 0018** (E2): Der Theme-Knopf im Kopf entfällt ganz, mit ihm `container: kopf` und die Container-Query. Die Darstellung steht nur im Kind-Sheet.
+> **Geändert durch Plan 0020** (E2): Der Theme-Knopf im Kopf entfällt ganz, mit ihm `container: kopf` und die Container-Query. Die Darstellung steht nur im Kind-Sheet.
 
 **Mindestbreite aus dem Code** (100 % Textgröße, CSS-px):
 

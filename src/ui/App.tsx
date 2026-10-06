@@ -196,7 +196,7 @@ export function App() {
     visible.length,
   );
   /*
-   * Startpunkt hinter der Zahl, im selben Fließtext (Plan 0018, E1): U+00A0 vor dem Punkt, damit er nie verwaist am
+   * Startpunkt hinter der Zahl, im selben Fließtext (Plan 0020, E1): U+00A0 vor dem Punkt, damit er nie verwaist am
    * Zeilenanfang steht; der Ausdruck selbst ist ein Inline-Block und wandert als Ganzes in die nächste Zeile. Beim
    * Laden steht der endgültige Text unsichtbar: Die Breite stimmt, die Live-Region sagt nichts (Plan 0009, E11).
    */
@@ -298,7 +298,7 @@ export function App() {
                   </span>
                 )}
                 {pwaNote && (
-                  // eigene Zeile unter Zahl und Startpunkt (Plan 0011, E4; Plan 0018, E1); Text aus dem PWA-Kern
+                  // eigene Zeile unter Zahl und Startpunkt (Plan 0011, E4; Plan 0020, E1); Text aus dem PWA-Kern
                   <span className="status-note">
                     <span className="sr-only">. </span>
                     {pwaNote}

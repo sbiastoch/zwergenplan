@@ -46,7 +46,7 @@ export function KidSheet({
   onClose: () => void;
 }) {
   const [text, setText] = useState(birthDate ? formatGermanDate(birthDate) : "");
-  // Plan 0018, E3: Ist das Geburtsdatum schon gesetzt, fokussiert das Öffnen die Überschrift statt des Feldes (iOS
+  // Plan 0020, E3: Ist das Geburtsdatum schon gesetzt, fokussiert das Öffnen die Überschrift statt des Feldes (iOS
   // öffnete sonst jedes Mal die Tastatur). Nur dann fokussierbar: Ohne Autofokus nähme `showModal()` sonst die
   // Überschrift als erstes fokussierbares Element. Stand beim Öffnen; das Sheet wird je Öffnen neu gemountet.
   const [focusHeading] = useState(() => birthDate !== undefined && !focusOrigin);

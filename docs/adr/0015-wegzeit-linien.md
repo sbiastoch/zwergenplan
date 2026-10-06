@@ -6,7 +6,7 @@ Status: angenommen (2026-10-05), Umsetzung mit Plan 0012. Nutzerentscheidungen v
 - Ergänzt ADR 0003 (Schema `Timetable`).
 - Punkt 9 von ADR 0011 („außerhalb des Stadtgebiets“ bei 800 m) bleibt unverändert.
 
-**Geändert durch ADR 0019 (Plan 0018):** Die Statuszeile nennt nur den Startpunkt („Wegzeit ab Gostenhof“). Die Annahme „Di vormittags, höchstens 1 Umstieg, inkl. Warten“ steht nur noch im Kind-Sheet unter „Wegzeit ab“.
+**Geändert durch ADR 0019 (Plan 0020):** Die Statuszeile nennt nur den Startpunkt („Wegzeit ab Gostenhof“). Die Annahme „Di vormittags, höchstens 1 Umstieg, inkl. Warten“ steht nur noch im Kind-Sheet unter „Wegzeit ab“.
 
 Details, Messungen und Alternativen stehen in Plan 0012.
 

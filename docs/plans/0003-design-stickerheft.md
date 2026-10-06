@@ -217,7 +217,7 @@ Inhalt wie im Mockup:
 
 > **Geändert durch Plan 0007** (E6, Befund B5): Der Header-Knopf entfällt per Container-Query unter einer Kopfbreite von 21,75 rem, also unter ≈ 380 px Viewport statt 360 px.
 
-> **Geändert durch Plan 0018** (E2): Der Header-Knopf entfällt ganz, die Darstellung steht nur im Kind-Sheet.
+> **Geändert durch Plan 0020** (E2): Der Header-Knopf entfällt ganz, die Darstellung steht nur im Kind-Sheet.
 
 ### E16 – Filter-Bedienung
 

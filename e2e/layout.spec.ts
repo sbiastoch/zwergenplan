@@ -86,7 +86,7 @@ for (const font of ["Webfont", "Fallback-Schrift"] as const) {
             brandHeight: brand.offsetHeight,
             lineHeight,
             headerHeight: hdr.offsetHeight,
-            // Plan 0018, E2: Die Darstellung steht nur im Kind-Sheet
+            // Plan 0020, E2: Die Darstellung steht nur im Kind-Sheet
             button: hdr.querySelector(".iconbtn") !== null,
           };
         });

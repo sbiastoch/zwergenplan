@@ -17,7 +17,7 @@
     gap: 6px;
     margin: 0;
     font-weight: 800;
-    /* einzeilig mit Kind-Chip (B5; Theme-Knopf entfallen, Plan 0018, E2); bei großer Schrift darf der Kopf umbrechen */
+    /* einzeilig mit Kind-Chip (B5; Theme-Knopf entfallen, Plan 0020, E2); bei großer Schrift darf der Kopf umbrechen */
     font-size: clamp(1.25rem, 5.4vw + 0.1rem, 1.6875rem);
     letter-spacing: -0.05em;
     min-width: 0;

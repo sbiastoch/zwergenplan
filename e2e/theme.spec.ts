@@ -1,6 +1,6 @@
 /**
  * Darstellung (Plan 0003, E15): Automatisch folgt dem System, Hell/Dunkel bleiben gespeichert. Gewählt wird nur im
- * Kind-Sheet, der Knopf im Kopf ist entfallen (Plan 0018, E2).
+ * Kind-Sheet, der Knopf im Kopf ist entfallen (Plan 0020, E2).
  */
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";

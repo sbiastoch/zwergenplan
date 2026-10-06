@@ -60,7 +60,7 @@ async function camera(page: Page) {
   });
 }
 
-/** Darstellung über das Kind-Sheet, dem einzigen Ort dafür (Plan 0018, E2). */
+/** Darstellung über das Kind-Sheet, dem einzigen Ort dafür (Plan 0020, E2). */
 async function switchTheme(page: Page, button: "Hell" | "Dunkel", style: string) {
   const request = page.waitForRequest((req) => req.url().endsWith(style));
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();

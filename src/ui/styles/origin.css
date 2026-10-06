@@ -67,7 +67,7 @@
     margin-top: 6px;
   }
 
-  /* Statuszeile: „· Wegzeit ab …“ hinter der Zahl (App.tsx, Plan 0018, E1). Als Inline-Block wandert der Ausdruck
+  /* Statuszeile: „· Wegzeit ab …“ hinter der Zahl (App.tsx, Plan 0020, E1). Als Inline-Block wandert der Ausdruck
      als Ganzes in die nächste Zeile; ist er breiter als die Zeile, bricht er darin um, ohne überzulaufen. */
   .status-reach-text {
     display: inline-block;

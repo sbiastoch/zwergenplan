@@ -97,7 +97,7 @@ test("„Nur passende“ aus zeigt alles, unpassende markiert", async ({ page })
   await expect(page.locator(".card.unfit")).toHaveCount(4);
 });
 
-test("Kind-Sheet fokussiert das Geburtsdatum nur, solange es leer ist (Plan 0018, E3)", async ({
+test("Kind-Sheet fokussiert das Geburtsdatum nur, solange es leer ist (Plan 0020, E3)", async ({
   page,
   browserName,
 }) => {

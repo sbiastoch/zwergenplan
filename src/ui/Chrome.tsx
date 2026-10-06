@@ -6,7 +6,7 @@ import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { CATEGORY_UI } from "./categories.ts";
 import { Icon, Logo } from "./icons.tsx";
 
-/** Kopf: Marke und Kind-Knopf. Die Darstellung (hell/dunkel) steht nur im Kind-Sheet (Plan 0018, E2). */
+/** Kopf: Marke und Kind-Knopf. Die Darstellung (hell/dunkel) steht nur im Kind-Sheet (Plan 0020, E2). */
 export function Header({ ageLabel, onKid }: { ageLabel: string; onKid: () => void }) {
   return (
     <header className="hdr">

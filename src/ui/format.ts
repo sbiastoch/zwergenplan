@@ -254,7 +254,7 @@ export function reachLong(reach: Reach, origin: Origin): ReachLongParts {
 }
 
 /**
- * Zusatz der Statuszeile hinter der Zahl (Plan 0018, E1; ADR 0019): nur der Startpunkt, die Annahme (Di vormittags,
+ * Zusatz der Statuszeile hinter der Zahl (Plan 0020, E1; ADR 0019): nur der Startpunkt, die Annahme (Di vormittags,
  * 1 Umstieg, Warten) erklärt das Kind-Sheet. Der seltene Rückfall auf die Luftlinie nennt seinen Grund (ADR 0011, 9).
  */
 export function reachNote(mode: ReachMode, origin: Origin): string {

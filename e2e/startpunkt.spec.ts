@@ -99,7 +99,7 @@ test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein
   await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();
   await sheet.getByRole("button", { name: "Fertig" }).click();
 
-  // hinter der Zahl, im selben Satz (Plan 0018, E1); Lage und Umbruch prüft „Statuszeile: Startpunkt …“
+  // hinter der Zahl, im selben Satz (Plan 0020, E1); Lage und Umbruch prüft „Statuszeile: Startpunkt …“
   await expect(page.getByRole("status")).toContainText(`8 Angebote ab heute · ${WEGZEIT_GOSTENHOF}`);
   // von Hand nachgerechnet (E15): Gostenhof → Beispielhof 13,6 Min. → „15 Min.“
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
@@ -129,7 +129,7 @@ test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein
 });
 
 /**
- * Lage des Zusatzes „ · Wegzeit ab …“ in der Statuszeile (Plan 0018, E1): Der Punkt steht in derselben Zeile wie das
+ * Lage des Zusatzes „ · Wegzeit ab …“ in der Statuszeile (Plan 0020, E1): Der Punkt steht in derselben Zeile wie das
  * Wort davor (U+00A0), die Zeile läuft nicht über. Gemessen per `Range` am Punkt und am letzten Zeichen davor.
  */
 async function statusLayout(page: Page) {
@@ -171,7 +171,7 @@ async function expectReachLayout(page: Page, what: string) {
   return m;
 }
 
-test("Statuszeile: Startpunkt hinter der Zahl, Punkt nie verwaist, kein Überlauf (Plan 0018, E1)", async ({ page }) => {
+test("Statuszeile: Startpunkt hinter der Zahl, Punkt nie verwaist, kein Überlauf (Plan 0020, E1)", async ({ page }) => {
   const width = page.viewportSize()?.width ?? 0;
   const check = (what: string) => expectReachLayout(page, what);
 
@@ -209,7 +209,7 @@ test("Statuszeile: Startpunkt hinter der Zahl, Punkt nie verwaist, kein Überlau
 test.describe("Statuszeile auf „Karte“", () => {
   test.use({ tiles: "mock" });
 
-  test("Kartenmitte als Startpunkt neben dem Umschalter: Punkt nie verwaist, kein Überlauf (Plan 0018, E1)", async ({
+  test("Kartenmitte als Startpunkt neben dem Umschalter: Punkt nie verwaist, kein Überlauf (Plan 0020, E1)", async ({
     page,
   }) => {
     await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {

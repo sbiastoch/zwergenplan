@@ -6,7 +6,7 @@ Status: angenommen (2026-10-05), Umsetzung mit Plan 0009. Ersetzt Teile von ADR 
 
 **Geändert durch ADR 0017 (Plan 0016):** Punkt 6, Spiegelstriche 1 und 3 (Laden beim Start und das verratene Bit gelten für jeden gespeicherten Startpunkt, nicht nur für einen Stadtteil).
 
-**Geändert durch ADR 0019 (Plan 0018):** Wortlaut der Statuszeile (Punkt 3, Satz 3). Punkt 9 bleibt erfüllt, „außerhalb des Stadtgebiets“ steht weiter dort.
+**Geändert durch ADR 0019 (Plan 0020):** Wortlaut der Statuszeile (Punkt 3, Satz 3). Punkt 9 bleibt erfüllt, „außerhalb des Stadtgebiets“ steht weiter dort.
 
 ## Kontext
 
