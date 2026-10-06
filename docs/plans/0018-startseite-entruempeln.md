@@ -210,3 +210,9 @@ Branch `startseite-entruempeln`. Abweichungen und Befunde gegenüber dem Plan:
 - **Kartenmitte auf „Karte“** ist ein eigener Test mit `tiles: "mock"`, weil die Karte sonst OpenFreeMap anfragt (Wächter in `fixtures.ts`).
 - `reachSuffix` ist ein JSX-Wert in `App.tsx` statt einer eigenen Komponente `ReachSuffix`. Er wird in alle drei Zähl-`<span>` gesetzt.
 - ADR 0019 ist neu (`docs/adr/0019-statuszeile-nur-startpunkt.md`).
+
+## Arch-Review (2026-10-06) – Verdict: OK
+
+Geprüft hat der Subagent `arch-reviewer` am Diff gegen `2ff6d26`. Blocker: keine. Major: keine. Beide Minor-Punkte sind übernommen:
+- **M1**: Das U+00A0 vor dem Punkt stand als unsichtbares Literalzeichen in `App.tsx`. Ein Editor oder Formatter könnte es still ersetzen. Jetzt steht es als Escape `" · "`.
+- **M2**: `statusLayout` (`e2e/startpunkt.spec.ts`) prüft jetzt hart, dass der Zusatz mit U+00A0 beginnt. Die Messung „gleiche Zeile“ allein fiele nur auf, wenn genau dort umbrochen wird.

@@ -202,7 +202,7 @@ export function App() {
    */
   const reachSuffix = origin && reachMode && (
     <span className={reachMode.kind === "laedt" ? "status-reach pending" : "status-reach"}>
-      {" · "}
+      {"\u00a0· "}
       <span className="status-reach-text">{reachNote(reachMode, origin)}</span>
     </span>
   );
