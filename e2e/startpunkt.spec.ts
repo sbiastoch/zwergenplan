@@ -825,7 +825,8 @@ for (const [label, key, value] of [
   }) => {
     await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key, value });
     await ready(page);
-    await expect(page.getByRole("status")).toContainText("mit Bus & Bahn");
+    // Statuszeile nur mit Startpunkt (Plan 0020): Tabelle geladen, Wegzeit statt Luftlinie
+    await expect(page.getByRole("status")).toContainText("Wegzeit ab");
     await page
       .getByRole("heading", { level: 3, name: /Kuckuck im Nest/ })
       .getByRole("button")
