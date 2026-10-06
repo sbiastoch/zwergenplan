@@ -10,6 +10,9 @@ Die Platzhalter-UI wird durch das freigegebene Design ersetzt. Das ist die Mocku
 - Die Seite hat drei Bereiche in einer Washi-Tape-Tab-Leiste unten: **Entdecken** (Liste nach Tagen), **Kalender** (Woche, Monat, Tagesagenda) und **Merkliste** („Mein Stickerheft“).
 - Jedes Angebot öffnet ein **Detail** mit Etiketten (Wann/Wo/Alter/Kosten/Anmeldung), Verfügbarkeits-Stempel, Terminliste und ICS-Export.
 - Filter gibt es als Sticker-Leiste (Kategorien), Schnellfilter-Chips und Filter-Sheet. Ein **Kind-Sheet** enthält das Geburtsdatum (TT.MM.JJJJ), „Nur passende Angebote“ und die Darstellung (Automatisch/Hell/Dunkel).
+
+> **Geändert durch Plan 0021:** Der Schalter steht als „Nur passend für …“ oben im Filter-Sheet, nicht mehr im Kind-Sheet.
+
 - Hell und Dunkel entsprechen den Mockup-Tokens. Bricolage Grotesque ist selbst gehostet.
 - Alle Mobile-UX-Gates sind grün, für jede neue Ansicht hell und dunkel. Die Budgets bleiben unverändert (JS 90 kB, CSS 15 kB).
 - Live unter https://sbiastoch.github.io/zwergenplan/ mit echten Daten (333 Angebote).
@@ -70,6 +73,9 @@ Detail, Filter-Sheet und Kind-Sheet sind `<dialog>` mit `showModal()`. Das bring
   - Das Schließen (Zurück-Button, Esc, Backdrop) ruft `history.back()` auf, wenn `history.state?.zpDetail` gesetzt ist. Das Flag steht in `history.state` und übersteht damit ein Neuladen. Bei einem Deep-Link (direkt mit `?angebot=`) ersetzt das Schließen den Eintrag per `replaceState`.
   - Ein unbekanntes `angebot` (abgelaufen, falsche ID) zeigt kein Detail und entfernt den Parameter.
 - Geburtsdatum, Merkliste, Darstellung und „Nur passende“ stehen **nie** in der URL.
+
+> **Geändert durch Plan 0021:** Der Altersschalter wird gar nicht mehr gespeichert, weder in der URL noch in localStorage.
+
 - Die reine Parse-/Serialisier-Logik liegt in `src/domain/route.ts` (testbar), `filter.ts` bleibt für die Filter-Parameter zuständig.
 
 ### E5 – Design-Tokens und CSS
@@ -147,6 +153,9 @@ Die Sticker-Leiste zeigt alle 12 Kategorien (Kurzlabel aus dem Mockup: Babykurse
   - „trotzdem zeigen“ ist Sitzungszustand im Speicher, gilt für Liste **und** Kalender und wird zurückgesetzt, wenn sich das Geburtsdatum ändert.
   - Aus: alle Angebote, unpassende gestrichelt markiert.
   - „Filter zurücksetzen“ setzt nur Kategorie/Format/Anmeldung/Kosten zurück, nie Alter oder „Nur passende“.
+
+> **Geändert durch Plan 0021:** Ein Schalter statt zwei: „Nur passend für …“ im Filter-Sheet ersetzt „Nur passende Angebote“ und „trotzdem zeigen“. Er ist nur im Speicher (nach dem Neuladen wieder an), springt bei neuem Geburtsdatum wieder an, und „Zurücksetzen“ schaltet ihn ebenfalls an. Ist er an, steht auf der Seite nichts zum Alter; ist er aus, warnt „Zeigt auch N Angebote, die nicht zu … passen · ausblenden“. Leerzustände bieten „Auch unpassende zeigen“.
+
 - Domäne: `applyFilters` bekommt kein Geburtsdatum mehr, sondern filtert nur nach Kategorie, Format, Anmeldung, Kosten und „vorbei“. Neu ist `splitByAge(offers, birthDate, now)` → `{ fitting, unfit }` in `age.ts`. Die Altersregel bleibt `offerFitsAge` (Invariante unverändert).
 - Kind-Chip im Header: „Alter?“ ohne Datum, sonst „11 Mon.“ (unter 24 Monaten) bzw. „2 J.“. Die Formatierung liegt in `format.ts`, das Alter kommt aus `ageInMonths(birth, now)`.
 - Detail „Alter“-Etikett: „6–24 Monate“ (ohne Angabe „0–36 Monate“). Darunter: „Passt: am Di 6.10. 11 Monate alt“, „Passt nicht: …“ oder „Geburtsdatum eintragen, dann prüfen wir das“. Logik: `ageCheck(offer, birth, now, session?)` in `age.ts`, liefert `{ fits, at, months }`. Stichtag:
@@ -204,6 +213,9 @@ Inhalt wie im Mockup:
   - Monatsraster: Außenrand 0, Rahmen 2 px, Innenabstand 4 px, Abstand 0 → (328 − 4 − 8) / 7 = 45,1 px.
   - Der Gate-Test bei 360 px beweist das. Bei 320 px gilt nur „kein horizontales Scrollen“ (das Gate misst dort keine Touch-Ziele, die Tage sind dann ~39 px breit, über WCAG 2.5.8 mit 24 px).
 - Der Kalender nutzt dieselben Filter (Chips), dieselbe Altersregel und denselben „trotzdem zeigen“-Zustand wie die Liste. Sticker-Leiste nur auf „Entdecken“.
+
+> **Geändert durch Plan 0021:** Der Kalender nutzt denselben Altersschalter wie die Liste; „trotzdem zeigen“ gibt es nicht mehr.
+
 - Der gewählte Tag und „Monat offen“ sind Sitzungszustand im Speicher (nicht in der URL). Start: heute.
 - Agenda-Überschrift: „Heute, 5. Oktober“ / „Morgen, 6. Oktober“ / „Mittwoch, 7. Oktober“ + „2 Angebote“ bzw. „1 Angebot“. Leer: „Freier Tag“ / „Kein Sticker für diesen Tag – Zeit für den Spielplatz.“
 
@@ -261,6 +273,9 @@ src/domain/
 src/data/
   site.ts               loadSiteData, assetUrl
   preferences.ts        Geburtsdatum, Merkliste, Darstellung, nur-passende (localStorage, try/catch)
+
+> **Geändert durch Plan 0021:** `nur-passende` entfällt aus `preferences.ts`.
+
 src/ui/
   App.tsx               Laden, URL-Zustand, Tabs, Overlays
   Chrome.tsx            Header, Stickers, QuickFilters, TabBar
@@ -372,6 +387,9 @@ Wichtig (alle übernommen):
 7. Stretched-Button mit `min-height: 44px` und eigenem Fokusrahmen (E9).
 8. `src/ui/format.test.ts` in fremder Zeitzone und `timezone.spec.ts` (Tests).
 9. Lade-, Fehler-, Leerzustände, Pluralformen, „trotzdem zeigen“-Zustand, Merkliste ohne Filter, Kalendertag im Speicher (E11, E12, E14, E17).
+
+> **Geändert durch Plan 0021:** Statt „trotzdem zeigen“: Altersschalter, Warnhinweis und „Auch unpassende zeigen“ (Tests in `e2e/app.spec.ts`).
+
 10. Budget-Ausweg „lazy laden“ gestrichen (Risiken).
 
 Hinweise: übernommen sind `animation-iteration-count`, keine `stick`-Animation beim ersten Rendern (LCP), festes Herz-Label, eine einzige `role="status"`-Region, Fremd-Origin-Fixture, zusätzliche 320/200-%-Gates und Fokus im Detail, verzögertes `revokeObjectURL`, kein endgültiges Löschen gemerkter IDs (statt `pruneSaved`), Kommentar in `topics.ts`, ADR 0005 als Auftrag für Plan 0004. Der Font-Fallback mit `size-adjust` kommt nur, wenn der Perf-Test ihn braucht (E6). Den Plan nicht zu teilen ist bewusst: Kalender und Merkliste teilen Karte, Filter und Altersregel; die Umsetzung läuft in Blöcken mit jeweils grünem `check:fast`.

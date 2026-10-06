@@ -157,6 +157,8 @@ Die `district`-Texte der Daten taugen nicht als Startpunkt: Es sind 51 uneinheit
 
 Eigene Komponente `src/ui/OriginPicker.tsx`, in `KidSheet` eingebunden zwischen „Nur passende Angebote“ und „Darstellung“. Inhalt, von oben nach unten:
 
+> **Geändert durch Plan 0021:** Der Schalter „Nur passende Angebote“ darüber ist ins Filter-Sheet gewandert; der `OriginPicker` folgt direkt auf das Geburtsdatum.
+
 - `h3` „Entfernung ab“.
 - Zeile „Startpunkt: **Gostenhof**“ / „Startpunkt: **Mein Standort**“ bzw. „Noch kein Startpunkt – dann zeigen wir keine Entfernung.“
 - Knopf `.btn` „Meinen Standort nutzen“, nur wenn `canLocate`. Während der Suche ist er `disabled` und heißt „Suche Standort …“.

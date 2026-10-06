@@ -171,6 +171,17 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(places(page)).toHaveText([/^Familientreff Beispielhof/, /^Musikschule Beispiel, Haus Süd/]);
   });
 
+  test("passt kein Ort zum Alter: Leerzustand mit „Auch unpassende zeigen“ (Plan 0021, E4)", async ({ page }) => {
+    await openMap(page);
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    await page.getByLabel("Geburtsdatum").fill("01.01.2023");
+    await page.getByRole("button", { name: "Fertig" }).click();
+    await expect(page.getByText(/Nichts davon passt zu/)).toBeVisible();
+    await page.getByRole("button", { name: "Auch unpassende zeigen" }).click();
+    await expect(page.getByText(/^Zeigt auch 8 Angebote/)).toBeVisible();
+    await expect(page.getByRole("status")).toBeFocused();
+  });
+
   test("Orts-Liste öffnet das Orts-Sheet, das Detail darüber, Zurück führt ins Sheet; Kacheln ohne Ortsangaben", async ({
     page,
   }) => {

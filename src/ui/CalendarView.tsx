@@ -31,6 +31,8 @@ interface CalendarViewProps {
   ctx: CardContext;
   /** nur bei aktivem Filter: Knopf „Filter zurücksetzen“ im Leerzustand ausgeblendeter Angebote */
   onResetFilter?: (() => void) | undefined;
+  /** nur, wenn der Altersfilter etwas ausblendet: Knopf „Auch unpassende zeigen“ (Plan 0021, E4) */
+  onShowUnfit?: (() => void) | undefined;
 }
 
 /** Wo der Monatsknopf vor dem Umschalten stand, damit er danach an derselben Stelle bleibt (E5). */
@@ -53,6 +55,7 @@ export function CalendarView({
   onMonthOpen,
   ctx,
   onResetFilter,
+  onShowUnfit,
 }: CalendarViewProps) {
   const nav = calendarNav(day, today, lastDay);
   // Je Render einmal je Tag: Label, Formpunkte und Agenda fragen denselben Tag mehrfach ab.
@@ -131,7 +134,7 @@ export function CalendarView({
       {agenda.items.map((item) => (
         <OfferCard key={`${item.offer.id}-${item.session.start}`} item={item} ctx={ctx} calendarDay={day} />
       ))}
-      <AgendaEmpty agenda={agenda} dataEnd={dataEnd} onResetFilter={onResetFilter} />
+      <AgendaEmpty agenda={agenda} dataEnd={dataEnd} onResetFilter={onResetFilter} onShowUnfit={onShowUnfit} />
     </>
   );
 }
@@ -144,23 +147,33 @@ function AgendaEmpty({
   agenda,
   dataEnd,
   onResetFilter,
+  onShowUnfit,
 }: {
   agenda: DayAgenda<SiteOffer>;
   dataEnd: string | undefined;
   onResetFilter: (() => void) | undefined;
+  onShowUnfit: (() => void) | undefined;
 }) {
   if (agenda.items.length > 0) return null;
   if (agenda.hidden > 0) {
     return (
       <EmptyState icon="search" title="Nichts, was zu deiner Auswahl passt">
         {hiddenNote(agenda.hidden, agenda.ended)}
-        {onResetFilter && (
-          <>
-            <br />
-            <button type="button" className="linkbtn" onClick={onResetFilter}>
-              Filter zurücksetzen
-            </button>
-          </>
+        {/* Zählt je Tag Filter, Wegzeit und Alter zusammen; der Altersknopf kann also auch dort stehen, wo nur Filter
+            ausblenden. Danach steht der Warnhinweis da, „ausblenden“ macht es rückgängig (Plan 0021, E4). */}
+        {(onShowUnfit || onResetFilter) && (
+          <span className="empty-actions">
+            {onShowUnfit && (
+              <button type="button" className="linkbtn" onClick={onShowUnfit}>
+                Auch unpassende zeigen
+              </button>
+            )}
+            {onResetFilter && (
+              <button type="button" className="linkbtn" onClick={onResetFilter}>
+                Filter zurücksetzen
+              </button>
+            )}
+          </span>
         )}
       </EmptyState>
     );

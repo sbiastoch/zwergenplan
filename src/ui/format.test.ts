@@ -8,7 +8,9 @@ import type { TransitOther } from "../domain/transit-types.ts";
 import {
   ageChipLabel,
   agendaHeading,
+  ageOnlyNote,
   ageRangeLabel,
+  ageWarnText,
   availabilityLabel,
   clock,
   dayHeading,
@@ -615,5 +617,21 @@ describe("Hinweis im Kind-Sheet (Plan 0009, N3)", () => {
     expect(originHint(undefined, stadtteil, fehler)).toBeUndefined();
     expect(originHint(undefined, karte, { kind: "oepnv" })).toBeUndefined();
     expect(originHint(undefined, karte, fehler)).toBeUndefined();
+  });
+});
+
+describe("Altersfilter (Plan 0021, E2/E3)", () => {
+  it("Untertitel des Schalters: an zählt die weiteren, aus die markierten", () => {
+    expect(ageOnlyNote(148, true)).toBe("148 weitere passen nicht · geprüft zum Kursstart");
+    expect(ageOnlyNote(1, true)).toBe("1 weiteres passt nicht · geprüft zum Kursstart");
+    expect(ageOnlyNote(148, false)).toBe("148 unpassende sind markiert · geprüft zum Kursstart");
+    expect(ageOnlyNote(1, false)).toBe("1 unpassendes ist markiert · geprüft zum Kursstart");
+    expect(ageOnlyNote(0, true)).toBe("geprüft zum Kursstart");
+    expect(ageOnlyNote(0, false)).toBe("geprüft zum Kursstart");
+  });
+
+  it("Warnhinweis bei abgeschaltetem Filter ist ein ganzer Satz", () => {
+    expect(ageWarnText(148, "7 Mon.")).toBe("Zeigt auch 148 Angebote, die nicht zu 7 Mon. passen");
+    expect(ageWarnText(1, "7 Mon.")).toBe("Zeigt auch 1 Angebot, das nicht zu 7 Mon. passt");
   });
 });

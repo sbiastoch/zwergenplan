@@ -18,6 +18,8 @@ const PATHS = {
   route: "m4 11 16-7-7 16-2-7z",
   face: "M9 15.5c1.6 1.4 4.4 1.4 6 0M9.5 11.5h.01M14.5 11.5h.01M12 5c-.8-1.6.6-2.8 2-2",
   search: "m20 20-4.5-4.5",
+  // Warndreieck: Hinweis bei abgeschaltetem Altersfilter (Plan 0021, E3)
+  alert: "M12 4 2.8 19.5h18.4zM12 10v4.5M12 17v.01",
   swing: "M4 18c3-6 13-6 16 0M7 10a5 5 0 0 1 10 0",
   // Laden mit Markise über der Tür (Plan 0010, E2): Tab „Anbieter“ und Knopf im Detail
   store:

@@ -32,6 +32,7 @@ export function ProviderScreen({
   onQuery,
   onOpenProvider,
   onResetFilter,
+  age,
 }: ProviderScreenProps) {
   const inputId = useId();
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
@@ -63,14 +64,9 @@ export function ProviderScreen({
           Suche löschen
         </button>
       </EmptyState>
-    ) : upcoming.length === 0 || onResetFilter ? (
-      // keine Daten bzw. Filter ohne aktiven Anbieter; die Anbieter ohne Termine stehen darunter (E10)
-      <NoOffers hasData={upcoming.length > 0} onResetFilter={onResetFilter ?? (() => {})} />
     ) : (
-      // nur die Altersregel blendet alles aus, es gibt keinen Filter zum Zurücksetzen
-      <EmptyState icon="search" title="Diese Seite ist noch leer">
-        Mit dieser Auswahl gibt es keine Angebote.
-      </EmptyState>
+      // keine Daten bzw. Filter oder Alter ohne aktiven Anbieter; die Anbieter ohne Termine stehen darunter (E10)
+      <NoOffers hasData={upcoming.length > 0} onResetFilter={onResetFilter} age={age} />
     );
 
   return (

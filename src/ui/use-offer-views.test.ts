@@ -47,7 +47,6 @@ function render(input: Partial<OfferViewsInput>): OfferViews {
       offers: OFFERS,
       route: ENTDECKEN,
       birthDate: undefined,
-      ageOnly: true,
       savedIds: [],
       now: NOW,
       ...input,
@@ -65,23 +64,32 @@ describe("useOfferViews", () => {
   it("zeigt kommende Angebote, gruppiert nach Tag, ohne Kind alles", () => {
     const v = render({});
     expect(ids(v.visible)).toEqual(["baby", "gross"]);
-    expect(v.hiddenCount).toBe(0);
+    expect(v.unfitCount).toBe(0);
     expect(v.page.groups.map((g) => g.day)).toEqual(["2026-10-10", "2026-10-12"]);
     expect(v.page.remaining).toBe(0);
-    expect(v.showUnfit).toBe(false);
+    expect(v.ageOnly).toBe(true);
   });
 
   it("blendet mit Geburtsdatum unpassende Angebote aus und markiert sie", () => {
     const v = render({ birthDate: "2026-05-01" });
     expect(ids(v.visible)).toEqual(["baby"]);
-    expect(v.hiddenCount).toBe(1);
+    expect(v.unfitCount).toBe(1);
     expect(v.unfitIds.has(GROSS.id)).toBe(true);
   });
 
-  it("ohne „nur passende“ bleibt alles sichtbar", () => {
-    const v = render({ birthDate: "2026-05-01", ageOnly: false });
-    expect(ids(v.visible)).toEqual(["baby", "gross"]);
-    expect(v.unfitIds.has(GROSS.id)).toBe(true);
+  it("Altersfilter aus: alles sichtbar, unpassende gezählt und markiert (Plan 0021, E1)", () => {
+    let result: OfferViews | undefined;
+    function Probe() {
+      result = useOfferViews({ offers: OFFERS, route: ENTDECKEN, birthDate: "2026-05-01", savedIds: [], now: NOW });
+      // Update während des Renderns: React rendert sofort neu, wie nach einem Tipp auf den Schalter.
+      if (result.ageOnly) result.setAgeOnly(false);
+      return null;
+    }
+    renderToStaticMarkup(createElement(Probe));
+    expect(result?.ageOnly).toBe(false);
+    expect(ids(result?.visible ?? [])).toEqual(["baby", "gross"]);
+    expect(result?.unfitCount).toBe(1);
+    expect(result?.unfitIds.has(GROSS.id)).toBe(true);
   });
 
   it("baut den Kalender-Index nur in der Kalenderansicht, startet heute", () => {
@@ -144,7 +152,6 @@ describe("useOfferViews", () => {
         offers: OFFERS,
         route: { tab: "kalender", filter: EMPTY_FILTER },
         birthDate: undefined,
-        ageOnly: true,
         savedIds: [],
         now,
       });

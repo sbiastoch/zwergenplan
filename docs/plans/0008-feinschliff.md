@@ -373,6 +373,9 @@ Der neue Zustand:
 - Titel „Nichts, was zu deiner Auswahl passt“.
 - Text aus `format.ts` `hiddenNote(hidden, ended)`: „1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Umkreis oder Alter.“ bzw. „3 Angebote an diesem Tag sind ausgeblendet – …“. Ist heute zusätzlich etwas Passendes schon beendet (`ended > 0`), folgt der Satz „Was zu deiner Auswahl passt, ist heute schon vorbei.“
 - Darunter `.linkbtn` „Filter zurücksetzen“, nur wenn `activeFilterCount(route.filter, { hasOrigin }) > 0`. `CalendarView` bekommt dafür `onResetFilter?: () => void`, `App.tsx` reicht es nur dann durch. Blendet nur das Alter aus, gibt es keinen Knopf, der Text nennt das Alter.
+
+> **Geändert durch Plan 0021:** Blendet allein das Alter aus, bietet der Leerzustand „Auch unpassende zeigen“ (`onShowUnfit`); „Filter zurücksetzen“ schaltet auch den Altersfilter wieder an.
+
 - Symbol `search` (wie „Diese Seite ist noch leer“).
 
 **Warum `hidden` zuerst:**

@@ -11,7 +11,7 @@ import { Dialog } from "./Dialog.tsx";
 import { KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { ProviderSheetLoader } from "./ProviderPanel.tsx";
-import { FilterSheet, type LimitActionFor } from "./Sheets.tsx";
+import { type AgeFilter, FilterSheet, type LimitActionFor } from "./Sheets.tsx";
 import type { OriginApi } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
 
@@ -44,8 +44,10 @@ interface OverlaysProps {
   resultCount: number;
   birthDate: string | undefined;
   setBirthDate: (value: string | undefined) => void;
-  ageOnly: boolean;
-  setAgeOnly: (on: boolean) => void;
+  /** Altersschalter im Filter-Sheet (Plan 0021, E2); ohne Geburtsdatum `undefined` */
+  filterAge: AgeFilter | undefined;
+  /** „Zurücksetzen“ im Filter-Sheet: URL-Filter leeren, Altersfilter wieder an (Plan 0021, E2) */
+  resetFilters: () => void;
   theme: { choice: ThemeChoice; setChoice: (choice: ThemeChoice) => void };
   today: string;
   originApi: OriginApi;
@@ -64,7 +66,7 @@ interface OverlaysProps {
 
 export function Overlays(props: OverlaysProps) {
   const { toast, sheet, setSheet, detailOffer, detailDay, closeDetail, ctx, say, filter, setFilter } = props;
-  const { birthDate, setBirthDate, ageOnly, setAgeOnly, theme, today, originApi, filterButton, activeTab } = props;
+  const { birthDate, setBirthDate, theme, today, originApi, filterButton, activeTab } = props;
   const { transit, providerId, openProvider, closeProvider } = props;
   const { origin } = originApi;
   const { now, onToggleSave } = ctx;
@@ -128,6 +130,8 @@ export function Overlays(props: OverlaysProps) {
         <FilterSheet
           filter={filter}
           onChange={setFilter}
+          onReset={props.resetFilters}
+          age={props.filterAge}
           resultCount={props.resultCount}
           mode={transit.mode}
           limitAction={props.limitAction}
@@ -145,8 +149,6 @@ export function Overlays(props: OverlaysProps) {
         <KidSheet
           birthDate={birthDate}
           onBirthDate={setBirthDate}
-          ageOnly={ageOnly}
-          onAgeOnly={setAgeOnly}
           theme={theme.choice}
           onTheme={theme.setChoice}
           today={today}

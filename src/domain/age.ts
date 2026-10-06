@@ -80,26 +80,25 @@ export function ageCheck(offer: Offer, birthDate: string, now: Date, session?: S
 export interface AgeVisibility<T> {
   /** angezeigte Angebote (bei nichts Ausgeblendetem dieselbe Liste wie `filtered`) */
   visible: readonly T[];
-  /** gefilterte Angebote, die nicht zum Kind passen („… passen nicht zu 11 Mon.“) */
-  hiddenCount: number;
+  /** gefilterte Angebote, die nicht zum Kind passen: bei `ageOnly` ausgeblendet, sonst markiert sichtbar */
+  unfitCount: number;
   /** IDs aller kommenden Angebote, die nicht zum Kind passen (Markierung auf der Karte) */
   unfitIds: ReadonlySet<string>;
 }
 
 /**
  * Alters-Sichtbarkeit der Liste: `unfitIds` gilt für alle kommenden Angebote (`upcoming`),
- * ausgeblendet wird nur bei „nur passende“ (`ageOnly`) mit Geburtsdatum und ohne „trotzdem zeigen“.
+ * ausgeblendet wird nur mit Altersfilter (`ageOnly`, Plan 0021) und Geburtsdatum.
  */
 export function ageVisibility<T extends Offer>(
   filtered: readonly T[],
   upcoming: readonly T[],
   birthDate: string | undefined,
   now: Date,
-  { ageOnly, showUnfit }: { ageOnly: boolean; showUnfit: boolean },
+  { ageOnly }: { ageOnly: boolean },
 ): AgeVisibility<T> {
-  if (birthDate === undefined) return { visible: filtered, hiddenCount: 0, unfitIds: new Set() };
+  if (birthDate === undefined) return { visible: filtered, unfitCount: 0, unfitIds: new Set() };
   const unfitIds = new Set(splitByAge(upcoming, birthDate, now).unfit.map((o) => o.id));
-  if (!ageOnly) return { visible: filtered, hiddenCount: 0, unfitIds };
   const fitting = filtered.filter((o) => !unfitIds.has(o.id));
-  return { visible: showUnfit ? filtered : fitting, hiddenCount: filtered.length - fitting.length, unfitIds };
+  return { visible: ageOnly ? fitting : filtered, unfitCount: filtered.length - fitting.length, unfitIds };
 }
