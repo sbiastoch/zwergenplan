@@ -8,6 +8,10 @@
  *   macht nur die Seite beim Frische-Anlass (E4a, `src/data/pwa.ts`).
  * - Fremde Origins und alles ohne Regel: kein `respondWith` (ADR 0008).
  */
+import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
+import * as deviceStore from "../data/device-store.ts";
+import { decidePush, readProposed } from "./push-decision.ts";
+import { type TailorEnv, tailorPush } from "./push-tailor.ts";
 import {
   ASSETS_CACHE,
   assetsToEvict,
@@ -171,3 +175,108 @@ async function shell(event: FetchEvent): Promise<Response> {
   event.waitUntil(response.catch(() => undefined));
   return (await caches.match(abs("index.html"), { cacheName: SHELL })) ?? response;
 }
+
+/**
+ * Wochen-Nachricht (Plan 0017, E10; ADR 0014). Die Payload steht auf iOS nur in `event.notification` (Declarative Web
+ * Push), sonst in `event.data`. `now` ist der Versandzeitpunkt aus der Payload. Höchstens 5 s Zuschnitt, sonst zeigt
+ * das System die allgemeine Fassung bzw. der Service Worker die vorgeschlagene (`push-decision.ts`).
+ */
+const TAILOR_TIMEOUT_MS = 5000;
+const FETCH_TIMEOUT_MS = 4000;
+
+const tailorEnv: TailorEnv = {
+  timeoutMs: TAILOR_TIMEOUT_MS,
+  // bei jedem Push genau ein Request je Datei, für alle gleich; bedingt, also meist 304 (Runde 3, H1)
+  fetchJson: async (path) => {
+    const response = await fetch(abs(path), { cache: "no-cache", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+    if (!response.ok) throw new Error(`${path}: ${response.status}`);
+    return response.json();
+  },
+  cachedJson: async (path) => (await caches.match(abs(path), { cacheName: DATA_CACHE }))?.json(),
+  store: deviceStore,
+};
+
+/** `PushEvent.notification` (Declarative Web Push) steht noch nicht in lib.webworker */
+type DeclarativePushEvent = PushEvent & { notification?: Notification };
+
+function proposedOf(event: DeclarativePushEvent) {
+  if (event.notification) {
+    const { title, body, data } = event.notification;
+    return readProposed({ title, body, data });
+  }
+  try {
+    return readProposed((event.data?.json() as { notification?: unknown } | undefined)?.notification);
+  } catch {
+    return undefined;
+  }
+}
+
+self.addEventListener("push", (event: DeclarativePushEvent) => {
+  const proposed = proposedOf(event);
+  const sent = proposed?.sentAt === undefined ? Number.NaN : Date.parse(proposed.sentAt);
+  const now = Number.isNaN(sent) ? new Date() : new Date(sent);
+  event.waitUntil(
+    (async () => {
+      const outcome = await tailorPush({ now, test: proposed?.test ?? false, env: tailorEnv });
+      const { show } = decidePush({
+        proposed,
+        declarative: event.notification !== undefined,
+        outcome,
+        scope: self.registration.scope,
+      });
+      // `navigate` kennt lib.webworker noch nicht; ohne lehnt iOS die Nachricht ab (Spike j)
+      if (show) await self.registration.showNotification(show.title, show.options as NotificationOptions);
+    })(),
+  );
+});
+
+/** Nur Chromium und Firefox (iOS folgt `navigate` selbst): offenes Fenster nach vorn, sonst die Startseite öffnen. */
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const data = Object(event.notification.data) as { navigate?: unknown };
+  const target = typeof data.navigate === "string" ? data.navigate : self.registration.scope;
+  event.waitUntil(
+    (async () => {
+      const [open] = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      if (open) await open.focus();
+      else await self.clients.openWindow(target);
+    })(),
+  );
+});
+
+/** `pushsubscriptionchange` noch nicht in lib.webworker */
+type SubscriptionChangeEvent = ExtendableEvent & {
+  oldSubscription?: PushSubscription | null;
+  newSubscription?: PushSubscription | null;
+};
+
+/**
+ * Chrome und Firefox tauschen Abos gelegentlich aus (Plan 0011, E10.7): neues Abo melden, altes abmelden. Der einzige
+ * Request ohne Tipp; er enthält nur das Abo (ADR 0014). Scheitert er, holt der Abgleich beim Öffnen des Kind-Sheets
+ * es nach.
+ */
+self.addEventListener("pushsubscriptionchange", (event: Event) => {
+  const change = event as SubscriptionChangeEvent;
+  change.waitUntil(
+    (async () => {
+      const fresh =
+        change.newSubscription ??
+        (await self.registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: VAPID_PUBLIC_KEY,
+        }));
+      const send = (method: "POST" | "DELETE", body: unknown) =>
+        fetch(`${PUSH_WORKER_URL}/abo`, {
+          method,
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      const response = await send("POST", fresh.toJSON());
+      if (!response.ok) return;
+      const old = change.oldSubscription?.endpoint ?? (await deviceStore.get("endpoint"));
+      if (typeof old === "string" && old !== fresh.endpoint)
+        await send("DELETE", { endpoint: old }).catch(() => undefined);
+      await deviceStore.set("endpoint", fresh.endpoint);
+    })(),
+  );
+});

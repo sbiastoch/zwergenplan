@@ -1,10 +1,12 @@
 {
   // Eigener Typkontext des Service Workers (Plan 0011, E3): lib „webworker“ verträgt sich nicht mit „dom“.
   // Das Haupt-tsconfig.json schließt src/sw deshalb aus; check:fast prüft es als „Typen SW“.
+  // Node-Typen nur für die Unit-Tests (Fixtures lesen mit node:fs, Plan 0017). Zur Laufzeit hält sw-isolated
+  // jeden node:-Import aus src/sw fern (Kanarienvogel in Plan 0017, „Umsetzung“).
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["es2023", "webworker"],
-    "types": []
+    "types": ["node"]
   },
   "include": ["."],
   "exclude": []
