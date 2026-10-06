@@ -138,6 +138,9 @@ async function statusLayout(page: Page) {
     const reach = status?.querySelector<HTMLElement>(".status-reach");
     const dotNode = reach?.firstChild;
     if (!status || !(dotNode instanceof Text) || !dotNode.data.includes("·")) throw new Error("Zusatz fehlt");
+    // U+00A0 vor dem Punkt ist die Zusage aus E1; ein normales Leerzeichen fiele beim Messen nur auf, wenn genau dort
+    // umbrochen wird.
+    if (!dotNode.data.startsWith("\u00a0")) throw new Error("vor dem Punkt fehlt das geschützte Leerzeichen");
     let prev = reach?.previousSibling ?? null;
     while (prev && !(prev instanceof Text && prev.data.trim())) prev = prev.previousSibling;
     if (!(prev instanceof Text)) throw new Error("Text vor dem Zusatz fehlt");
