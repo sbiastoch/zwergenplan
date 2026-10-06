@@ -1,6 +1,6 @@
 # Plan 0011 – Installierbare App und Push zu neuen Angeboten
 
-Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). **Stufe 1 live seit `b23eb6c`** (https://zwergenplan.app/, `data/meta.json`); Icon abgenommen; Arch-Review „Freigabe mit Änderungen“ eingearbeitet (Abschnitt „Arch-Review (Stufe 1)“). **Browser-Review live im Browser (Schritt 6, 2026-10-06): bestanden bis auf einen Fehler** – die Statuszeile „Offline – Stand vom …“ fehlte live fast immer (Befund B1, **behoben in `fb5059b`, live bestätigt 2026-10-06: 10 von 10 Offline-Starts zeigen die Zeile, vorher 2 von 30**), dazu Hinweise; siehe Abschnitt „Browser-Review live (Stufe 1, Schritt 6, 2026-10-06)“. **Offen: Geräteprüfung** (Android, iPhone, Checkliste dort). Stufe 2 wartet auf die Abnahme von Stufe 1.
+Status: Review 1 und 2 eingearbeitet, freigegeben, Nutzerfragen beantwortet (2026-10-05). Spike (Schritt 0) erledigt, Ergebnis eingearbeitet (2026-10-05). **Stufe 1 live seit `b23eb6c`** (https://zwergenplan.app/, `data/meta.json`); Icon abgenommen; Arch-Review „Freigabe mit Änderungen“ eingearbeitet (Abschnitt „Arch-Review (Stufe 1)“). **Browser-Review live im Browser (Schritt 6, 2026-10-06): bestanden bis auf einen Fehler** – die Statuszeile „Offline – Stand vom …“ fehlte live fast immer (Befund B1, **behoben in `fb5059b`, live bestätigt 2026-10-06: 10 von 10 Offline-Starts zeigen die Zeile, vorher 2 von 30**), dazu Hinweise; siehe Abschnitt „Browser-Review live (Stufe 1, Schritt 6, 2026-10-06)“. **Geräteprüfung bestanden** (2026-10-06, alle 8 Punkte vom Nutzer bestätigt) – **Stufe 1 abgenommen.** Stufe 2 in Arbeit; Budget-Entscheidung siehe „Stufe 2“ unter „Schritte“.
 Datum: 2026-10-05
 Bezug:
 - **ADR 0013** (PWA und Service Worker, Entwurf `docs/adr/0013-pwa-service-worker.md`) und **ADR 0014** (Web Push, Entwurf `docs/adr/0014-web-push.md`).
@@ -587,6 +587,8 @@ docs/adr/0014-web-push.md               (Entwurf liegt bei)
 - Ausgangslage: Stufe 1 allein 91,34 kB. **Gemessen nach dem Merge mit Plan 0012 (`main` 61de0da, 91,28 kB): 91,72 kB** von 92 kB, also 0,28 kB Rest (Plan 0012 +0,38 kB, Plan 0011 +0,44 kB gegenüber X; die Anteile addieren sich).
 - Stufe 2 schätzt ≈ 0,10 kB im Start (Flag `neu`, Platzhalter `NewsBlock`, „Push an?“). Das passt rechnerisch, ließe aber nur ≈ 0,18 kB für alles Weitere bis zum Budget.
 - Zu entscheiden (Rückfrage an den Nutzer, kein Anheben ohne ADR): welche Start-Funktion lazy wird. Kandidaten aus E5: der Platzhalter von `NewsBlock` (Liste hält bei `neu` zurück wie `ListPending`); weitere nach Messung auf dem dann aktuellen `main`.
+- **Neu gemessen (2026-10-06, `main` c4861bb, nach Plan 0014): 91,77 kB** von 92 kB, also 0,23 kB Rest.
+- **Entscheidung (2026-10-06, Vorschlag angenommen, Budget bleibt 92 kB):** Der Platzhalter von `NewsBlock` kommt **nicht** ins Start-Bundle. Bei `neu` hält die Liste zurück, bis der Lazy-Chunk mit `NewsBlock` geladen ist (gleiche Mechanik wie `ListPending`, Plan 0009). Im Start bleiben nur das Flag `neu` in `route.ts` und die Prüfung „Push an?“ → `import("./push-start.ts")`. Liegt `JS (initial)` nach Schritt 10 trotzdem über 92 kB, gibt es eine erneute Rückfrage, kein Anheben.
 
 7. **Infrastruktur** (Nutzer-Schritte, Anleitung hier):
    - Cloudflare-Konto, `pnpm exec wrangler login`, KV-Namespace anlegen (ID in `push-worker/wrangler.toml`);
@@ -732,7 +734,7 @@ Alle Befunde übernommen außer Finding 4 und der Zusammenführung mit Plan 0012
 - **E2E:** Der Frische-Test wartet auch auf `linien.json` und zählt genau einen weiteren Request je Datei. Offline-Test (a) prüft zusätzlich die Linie im Detail („ca. 15 Min. mit Tram 1 ab Gostenhof“) aus `zp-data`. **Kanarienvogel:** ohne die Erweiterung in `routes.ts` rot, zuerst schon bei „`linien.json` über den Service Worker“; ohne diese Zwischenprüfung fehlt offline „mit Tram 1“ im Detail.
 - **Start-JS gemeinsam:** 91,72 kB (Budget 92 kB, nicht angehoben). Eingetragen auch in ADR 0012.
 
-## Browser-Review live (Stufe 1, Schritt 6, 2026-10-06) – Ergebnis: bestanden bis auf Befund B1, Geräteprüfung offen
+## Browser-Review live (Stufe 1, Schritt 6, 2026-10-06) – Ergebnis: bestanden bis auf Befund B1 (behoben), Geräteprüfung bestanden
 
 Ziel: https://zwergenplan.app/ mit Stand `b23eb6c` (geprüft über `data/meta.json`), echte Daten (333 Angebote, Stand 4.10.). Playwright 1.63 mit **echtem Service Worker** (`serviceWorkers: "allow"`), Chromium (Profil Pixel 7 bzw. Desktop Chrome) und WebKit (Profil iPhone 15), `de-DE`, Europe/Berlin, `reducedMotion: reduce`. Wegwerf-Skripte und alle Screenshots liegen außerhalb des Repos in `/home/suus/.claude/jobs/70a152b4/tmp/review-0011/` (`pwa-live.ts`, Bilder in `shots/`, Kontaktbögen in `sheets/`).
 
@@ -808,7 +810,7 @@ CLS in allen Läufen ≤ 0,0001.
 - **Micro-Interactions:** Der Tipp auf „Zum Startbildschirm hinzufügen“ lässt den Knopf verschwinden und setzt den Fokus auf die neue Zeile, ohne dass das Sheet scrollt. Der ICS-Toast erscheint ohne Sprung, trägt aber das Häkchen (H1). Geprüft wurde mit `reducedMotion: reduce`; neue Animationen bringt Stufe 1 nicht.
 - **Konsistenz mit dem Design-System:** ja. `btn primary wide` wie die übrigen Hauptaktionen, Abschnittsüberschrift wie „Darstellung“, das Teilen-Symbol im Linienstil der übrigen Icons.
 
-**Geräteprüfung (offen, durch den Nutzer):**
+**Geräteprüfung (durch den Nutzer) – bestanden am 2026-10-06:** Der Nutzer hat alle 8 Punkte am echten Android-Gerät und iPhone bestätigt. Damit ist Stufe 1 abgenommen.
 1. **Android, Chrome:** Kind-Sheet → „Als App“ → „Zum Startbildschirm hinzufügen“ (bzw. Menü „App installieren“). Erwartet: Das Symbol „Zwergenplan“ (Zipfelmützen-Sticker) ist deckend und ohne schwarzen Rand; danach steht dort „Installiert …“.
 2. **iPhone, Safari:** Teilen → „Zum Home-Bildschirm“. Erwartet: Das Symbol ist deckend, ohne schwarzen oder weißen Rand, mit dem Namen „Zwergenplan“.
 3. **Start über das Symbol (beide), hell und dunkel:** Erwartet: keine Browserleiste, eine lesbare Statusleiste ohne störenden Balken über dem Kopf, und im Kind-Sheet „Läuft als App.“
