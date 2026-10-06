@@ -838,8 +838,87 @@ for (const [label, key, value] of [
     );
     expect(href).not.toMatch(COORDINATE);
     expect(href).not.toMatch(/origin|gostenhof/i);
+    // Theater: Hauptweg ohne Linien bzw. zu Fuß ohne Kandidaten mit Linien → keine Karte „Wege ab …“ (Review 2, H1)
+    await expect(page.getByRole("dialog").locator(".ways")).toHaveCount(0);
   });
 }
+
+/** Sichtbarer Text ohne `.sr-only` („, dann“, „, “): so, wie die Karte „Wege ab …“ ihn zeigt */
+async function shownRows(page: Page): Promise<string[]> {
+  return page
+    .getByRole("dialog")
+    .locator(".ways li")
+    .evaluateAll((items) =>
+      items.map((li) => {
+        const copy = li.cloneNode(true);
+        if (!(copy instanceof HTMLElement)) return "";
+        for (const hidden of copy.querySelectorAll(".sr-only")) hidden.remove();
+        // nur Umbrüche und Leerzeichen zusammenfassen; U+00A0 der Liniennamen bleibt (`\s` träfe es mit)
+        return (copy.textContent ?? "").replace(/[ \t\r\n]+/g, " ").trim();
+      }),
+    );
+}
+
+/** Jeder Maps-Link im Dialog: ohne Referrer, ohne Koordinate (Plan 0019, E3; Review 3, N5) */
+async function expectPrivateMapsLinks(page: Page) {
+  const links = page.getByRole("dialog").locator('a[href^="https://www.google.com/maps"]');
+  expect(await links.count()).toBeGreaterThan(0);
+  for (const link of await links.all()) {
+    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(await link.getAttribute("href")).not.toMatch(COORDINATE);
+  }
+}
+
+// Plan 0019, E4/E6: Karte „Wege ab …“, nachgerechnet mit dist-e2e/data (Review 3 unabhängig bestätigt).
+// Ab STORED_HERE (49,452 / 11,077) liegen 9001 (1 358 m), 9002 (974 m), 9003, 9004 und 9005 im Umkreis von 1 500 m.
+// „Eltern-Kind-Bewegungslandschaft…“ (Gemeinde, Kirchengemeindehausstraße):
+// - Hauptweg 9004: 5,89 Min. zum Halt + 10 = 15,9, Bus 202E → „ca. 15 Min. · Bus 202E · 6 Min. zum Halt“
+// - 9003: 1,31 + 16 mit Bit = 17,3, Tram 1 → Bus 202E (9001/9002 mit derselben Folge: 45,5 bzw. 36,9, zusammengefasst)
+// - Bus 2 ab 9005: 7,5 + 18 = 25,5, vom Hauptweg dominiert; zu Fuß 44,9 > 15,9 + 15
+test("Wege ab deinem Standort: Hauptweg und ein Weg mit Umstieg, dafür kürzerem Fußweg zum Halt", async ({ page }) => {
+  await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
+    key: POINT_KEY,
+    value: STORED_HERE,
+  });
+  await ready(page);
+  await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+  await page
+    .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
+    .getByRole("button")
+    .click();
+  const ways = page.getByRole("dialog").locator(".ways");
+  await expect(ways.locator(".cap")).toHaveText("Wege ab deinem Standort");
+  await expect
+    .poll(() => shownRows(page))
+    .toEqual([
+      `ca. 15 Min. · Bus${NB}202E · 6 Min. zum Halt Vorschlag`,
+      `ca. 15 Min. · Tram${NB}1${NB}→ Bus${NB}202E · 1 Umstieg · 1 Min. zum Halt`,
+    ]);
+  // gleich schnell in der Anzeige: kein Grund
+  await expect(ways.getByText(/^Vorschlag:/)).toHaveCount(0);
+  await expect(ways.getByRole("link", { name: "Route in Google Maps", exact: true })).toBeVisible();
+  await expectPrivateMapsLinks(page);
+});
+
+// Musikgarten ab Gostenhof: Hauptweg 9001, 1,58 + 28 mit Bit = 29,6 (Tram 1 → Bus 2); zu Fuß 40,9 ohne Umstieg, also
+// nicht dominiert und in der Schwelle (+11,3) (Review 3, M1)
+test("Wege ab Gostenhof: Hauptweg mit Umstieg, zu Fuß als anderer Weg", async ({ page }) => {
+  await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+  await ready(page);
+  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await page
+    .getByRole("heading", { level: 3, name: /^Musikgarten/ })
+    .getByRole("button")
+    .click();
+  await expect(page.getByRole("dialog").locator(".ways .cap")).toHaveText("Wege ab Gostenhof");
+  await expect
+    .poll(() => shownRows(page))
+    .toEqual([
+      `ca. 30 Min. · Tram${NB}1${NB}→ Bus${NB}2 · 1 Umstieg · 2 Min. zum Halt Vorschlag`,
+      "ca. 40 Min. · zu Fuß",
+    ]);
+  await expectPrivateMapsLinks(page);
+});
 
 test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
   test.describe("abgebrochen", () => {
@@ -856,6 +935,20 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
       await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
       await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
       await expect(page.getByRole("dialog").getByText("ca. 15 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+    });
+
+    // Gegentest zu „Wege ab Gostenhof“ (Plan 0019, Review 3, M1): Musikgarten hätte mit Linien eine Karte
+    test("linien.json abgebrochen: keine Karte „Wege ab …“ beim Musikgarten", async ({ page }) => {
+      await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+      await page.route(LINES, (route) => route.abort());
+      await ready(page);
+      await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+      await page
+        .getByRole("heading", { level: 3, name: /^Musikgarten/ })
+        .getByRole("button")
+        .click();
+      await expect(page.getByRole("dialog").getByText("ca. 30 Min. mit Bus & Bahn ab Gostenhof")).toBeVisible();
+      await expect(page.getByRole("dialog").locator(".ways")).toHaveCount(0);
     });
   });
 

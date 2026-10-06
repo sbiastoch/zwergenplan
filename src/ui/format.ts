@@ -11,7 +11,7 @@ import { registrationPhase } from "../domain/registration.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinIsoDate, berlinKey, isoWeekday, parseIsoDate } from "../domain/time.ts";
-import type { TransitSource } from "../domain/transit-types.ts";
+import type { TransitLineNames, TransitOther, TransitSource } from "../domain/transit-types.ts";
 import type { ReachMode } from "./use-transit.ts";
 
 const WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"] as const;
@@ -235,7 +235,7 @@ const BY_TRANSIT = "mit Bus & Bahn";
  */
 export interface ReachLongParts {
   before: string;
-  lines?: readonly string[];
+  lines?: TransitLineNames;
   after: string;
 }
 
@@ -251,6 +251,48 @@ export function reachLong(reach: Reach, origin: Origin): ReachLongParts {
   if (roundedMinutes(reach.minutes).over) return { before: `${short} ${from} (mit höchstens 1 Umstieg)`, after: "" };
   if (reach.lines) return { before: `ca. ${short} mit `, lines: reach.lines, after: ` ${from}` };
   return { before: `ca. ${short} ${BY_TRANSIT} ${from}`, after: "" };
+}
+
+/** Eine Zeile der Karte „Wege ab …“ (Plan 0019, E6): Minuten, Linien (mit Pfeil in `LineChain`), Zusätze */
+export interface WayRow {
+  minutes: string;
+  lines?: TransitLineNames;
+  /** „zu Fuß“ bzw. „1 Umstieg“, „6 Min. zum Halt“; je ein Segment, das nicht umbricht (Review 3, N6) */
+  extra: string[];
+  /** der Hauptweg, Marke „Vorschlag“ */
+  main: boolean;
+}
+
+const about = (minutes: number) => `ca. ${roundedMinutes(minutes).value} Min.`;
+
+function wayRow(way: TransitOther, main: boolean): WayRow {
+  if (way.byFoot) return { minutes: about(way.minutes), extra: ["zu Fuß"], main };
+  const extra = [`${Math.max(1, Math.round(way.toStop))} Min. zum Halt`];
+  if (way.transfer) extra.unshift("1 Umstieg");
+  return { minutes: about(way.minutes), lines: way.lines, extra, main };
+}
+
+/**
+ * Karte „Wege ab …“ im Detail (Plan 0019, E6): Hauptweg zuerst, dann die anderen Wege aus `transitReach`. Nur mit
+ * anderen Wegen. Der Grund steht nur, wenn ein anderer Weg in der Anzeige schneller ist (Review 3, H1).
+ */
+export function wayParts(
+  reach: Reach,
+  origin: Origin,
+): { title: string; rows: WayRow[]; reason: string | undefined } | undefined {
+  if (reach.kind !== "oepnv" || !reach.others) return undefined;
+  const { minutes, lines, toStop, transfer } = reach;
+  const main: TransitOther =
+    reach.byFoot || !lines || toStop === undefined
+      ? { byFoot: true, minutes }
+      : { byFoot: false, minutes, lines, toStop, ...(transfer && { transfer }) };
+  const shown = roundedMinutes(minutes).value;
+  const faster = reach.others.some((other) => roundedMinutes(other.minutes).value < shown);
+  return {
+    title: `Wege ${originPhrase(origin)}`,
+    rows: [wayRow(main, true), ...reach.others.map((other) => wayRow(other, false))],
+    reason: faster ? "Vorschlag: direkt vor Umstieg, wenn der Umstieg nur wenig Zeit spart" : undefined,
+  };
 }
 
 /**

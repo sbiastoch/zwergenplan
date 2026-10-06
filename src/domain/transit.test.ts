@@ -373,6 +373,216 @@ describe("transitReach mit Umstiegs-Bit und Linien (D2)", () => {
   });
 });
 
+describe("andere Wege (Plan 0019, E4)", () => {
+  /** über 2 Std. zu Fuß: kein Fuß-Kandidat */
+  const away = north(start, 8000);
+  const T = 0x80;
+  const U1 = "U1";
+  const TRAM = `Tram${NB}4`;
+  const BUS = `Bus${NB}37`;
+  const names = [BUS, TRAM, U1];
+  const [iBus, iTram, iU1] = [1, 2, 3];
+  /** Linien von Hand: je Zelle [erste, zweite] als Index + 1 in `names` */
+  const lines = (cells: [number, number][]): TransitLines => ({
+    names,
+    first: Uint8Array.from(cells.map(([a]) => a)),
+    second: Uint8Array.from(cells.map(([, b]) => b)),
+  });
+  const at = (meters: number) => north(start, meters);
+  const w = (meters: number) => walkMinutes(haversineMeters(start, at(meters)));
+  /** eine Spalte: je Zeile [Abstand, Wert, Linien] */
+  function reachOf(rows: [number, number, [number, number]][], place: GeoPoint = away, withLines = true) {
+    const t = table(
+      rows.map(([m]) => at(m)),
+      [place],
+      rows.map(([, v]) => [v]),
+    );
+    return transitReach(t, origin(), withLines ? lines(rows.map(([, , l]) => l)) : undefined)?.({ geo: place });
+  }
+
+  it("Hauptweg wie bisher, dazu toStop; ein langsamerer Weg mit kürzerem Fußweg zum Halt bleibt", () => {
+    const reach = reachOf([
+      [400, 10, [iTram, 0]],
+      [100, 20, [iU1, 0]],
+    ]);
+    expectReach(reach, w(400) + 10, false);
+    expect(reach?.lines).toEqual([TRAM]);
+    expect(reach?.toStop).toBeCloseTo(w(400), 9);
+    expect(reach).not.toHaveProperty("transfer");
+    expect(reach?.others).toHaveLength(1);
+    const [other] = reach?.others ?? [];
+    expect(other).toMatchObject({ byFoot: false, lines: [U1] });
+    expect(other?.minutes).toBeCloseTo(w(100) + 20, 9);
+    expect(other?.byFoot === false && other.toStop).toBeCloseTo(w(100), 9);
+    expect(other).not.toHaveProperty("transfer");
+  });
+
+  it("Pareto: langsamer, längerer Fußweg, nicht weniger Umstiege → fällt weg", () => {
+    const reach = reachOf([
+      [400, 10, [iTram, 0]],
+      [100, 20, [iU1, 0]],
+      [600, 12, [iBus, 0]],
+    ]);
+    expect(reach?.others?.map((o) => !o.byFoot && o.lines)).toEqual([[U1]]);
+  });
+
+  it("Pareto auf den angezeigten Werten: 0,3 Min. weniger Fußweg (gerundet gleich) bei 10 Min. mehr → fällt weg", () => {
+    expect(Math.round(w(400))).toBe(Math.round(w(383)));
+    expect(w(383)).toBeLessThan(w(400) - 0.25);
+    const reach = reachOf([
+      [400, 10, [iTram, 0]],
+      [383, 20, [iU1, 0]],
+    ]);
+    expect(reach).not.toHaveProperty("others");
+  });
+
+  it("gleiche Linienfolge mit gleichem Bit wird zusammengefasst, die Folge des Hauptwegs fällt weg", () => {
+    const reach = reachOf([
+      [400, 10, [iTram, 0]],
+      [100, 20, [iU1, 0]],
+      [50, 22, [iU1, 0]],
+      [200, 9, [iTram, 0]],
+    ]);
+    // Tram ab 200 m (3,5 + 9) ist schneller als ab 400 m, also Hauptweg; die andere Tram-Zeile ist dieselbe Folge
+    expect(reach?.lines).toEqual([TRAM]);
+    expect(reach?.others).toHaveLength(1);
+    expect(reach?.others?.[0]?.minutes).toBeCloseTo(w(100) + 20, 9);
+  });
+
+  it("„U1“ mit Bit und „U1“ ohne Bit sind zwei Folgen", () => {
+    const reach = reachOf([
+      [0, 20, [iU1, 0]],
+      [0, 15 | T, [iU1, 0]],
+    ]);
+    expect(reach?.lines).toEqual([U1]);
+    expect(reach).not.toHaveProperty("transfer");
+    expect(reach?.others).toEqual([{ byFoot: false, minutes: 15, toStop: 0, lines: [U1], transfer: true }]);
+  });
+
+  it("ein schnellerer Weg mit Umstieg, den der Aufschlag verdrängt hat, steht in others", () => {
+    const reach = reachOf([
+      [400, 25, [iTram, 0]],
+      [100, 22 | T, [iBus, iU1]],
+    ]);
+    expect(reach?.lines).toEqual([TRAM]);
+    expect(reach?.others).toHaveLength(1);
+    expect(reach?.others?.[0]).toMatchObject({ byFoot: false, lines: [BUS, U1], transfer: true });
+    expect(reach?.others?.[0]?.minutes).toBeLessThan(reach?.minutes ?? 0);
+  });
+
+  it("Hauptweg mit Umstieg: transfer am Hauptweg", () => {
+    const reach = reachOf([[100, 22 | T, [iBus, iU1]]]);
+    expect(reach?.transfer).toBe(true);
+    expect(reach?.toStop).toBeCloseTo(w(100), 9);
+  });
+
+  it("Schwelle 15 Min. inklusiv: 15 Min. mehr bleibt, 16 Min. mehr fällt weg", () => {
+    const keep = reachOf([
+      [0, 20 | T, [iU1, 0]],
+      [0, 35, [iTram, 0]],
+    ]);
+    expect(keep?.minutes).toBe(20);
+    expect(keep?.others).toEqual([{ byFoot: false, minutes: 35, toStop: 0, lines: [TRAM] }]);
+    const drop = reachOf([
+      [0, 20 | T, [iU1, 0]],
+      [0, 36, [iTram, 0]],
+    ]);
+    expect(drop).not.toHaveProperty("others");
+  });
+
+  it("zu Fuß als anderer Weg, wenn der Hauptweg einen Umstieg hat (Musikgarten-Fall)", () => {
+    const place = at((40.9 * 75) / 1.3);
+    const reach = reachOf([[100, 28 | T, [iTram, iBus]]], place);
+    expectReach(reach, w(100) + 28, false);
+    expect(reach?.others).toHaveLength(1);
+    expect(reach?.others?.[0]?.byFoot).toBe(true);
+    expect(reach?.others?.[0]?.minutes).toBeCloseTo(40.9, 6);
+  });
+
+  it("zu Fuß fällt weg, wenn der Hauptweg schneller ist, kürzeren Fußweg hat und keinen Umstieg", () => {
+    const place = at((30 * 75) / 1.3);
+    expect(reachOf([[100, 15, [iTram, 0]]], place)).not.toHaveProperty("others");
+  });
+
+  it("Hauptweg zu Fuß: langsamere Linie mit kürzerem Fußweg bleibt, eine mit längerem fällt weg; ohne toStop", () => {
+    const place = at((7 * 75) / 1.3);
+    const reach = reachOf(
+      [
+        [100, 10, [iU1, 0]],
+        [400, 8, [iTram, 0]],
+      ],
+      place,
+    );
+    expect(reach?.byFoot).toBe(true);
+    expect(reach).not.toHaveProperty("toStop");
+    expect(reach).not.toHaveProperty("transfer");
+    expect(reach?.others?.map((o) => !o.byFoot && o.lines)).toEqual([[U1]]);
+  });
+
+  it("höchstens zwei, nach Zeit, bei Gleichstand ohne Umstieg zuerst, dann kürzerer Fußweg, dann Linientext", () => {
+    // Hauptweg 35 direkt (bewertet 35); drei Umstiegswege mit 26, 26 und 27 Min. (bewertet ≥ 36), angezeigt alle
+    // „ca. 25 Min.“, 1 Min. zum Halt, 1 Umstieg: keiner dominiert den anderen
+    const reach = reachOf([
+      [0, 35, [iU1, 0]],
+      [0, 27 | T, [iU1, iBus]],
+      [0, 26 | T, [iTram, iU1]],
+      [0, 26 | T, [iBus, iTram]],
+    ]);
+    expect(reach?.lines).toEqual([U1]);
+    expect(reach?.others?.map((o) => !o.byFoot && o.lines)).toEqual([
+      [BUS, TRAM],
+      [TRAM, U1],
+    ]);
+    // gleiche Zeit, gleicher Fußweg, kein Umstieg: Code-Unit-Vergleich; beide langsamer als der Hauptweg, aber mit
+    // kürzerem Fußweg zum Halt
+    const tie = reachOf([
+      [400, 25, [iU1, 0]],
+      [0, 34, [iTram, 0]],
+      [0, 34, [iBus, 0]],
+    ]);
+    // „Bus 37“ vor „Tram 4“
+    expect(tie?.others?.map((o) => !o.byFoot && o.lines)).toEqual([[BUS], [TRAM]]);
+  });
+
+  it("ohne Linien-Datei weder others noch toStop noch transfer; Zeilen ohne Linien sind keine Kandidaten", () => {
+    // Hauptweg 400 m + 10 mit Umstieg (bewertet 26,9); die Zeile ohne Linien (31,7) wäre sonst ein anderer Weg
+    const rows: [number, number, [number, number]][] = [
+      [400, 10 | T, [iTram, iU1]],
+      [100, 30, [0, 0]],
+    ];
+    expect(reachOf(rows, away, false)).toEqual({ kind: "oepnv", minutes: w(400) + 10, byFoot: false });
+    const reach = reachOf(rows);
+    expect(reach?.lines).toEqual([TRAM, U1]);
+    expect(reach?.transfer).toBe(true);
+    expect(reach).not.toHaveProperty("others");
+  });
+
+  it("Hauptweg mit Bus & Bahn ohne Linien: keine anderen Wege, kein toStop (Review 2, H1)", () => {
+    const reach = reachOf([
+      [400, 10, [0, 0]],
+      [100, 20, [iU1, 0]],
+    ]);
+    expect(reach).toEqual({ kind: "oepnv", minutes: w(400) + 10, byFoot: false });
+  });
+
+  it("ein Kandidat über 120 Min. zählt nie (Review 2, M1)", () => {
+    const edge = reachOf([
+      [0, 120, [iU1, 0]],
+      [400, 118, [iTram, 0]],
+    ]);
+    // Hauptweg genau 120 (bewertet 120 < 124,9); die Tram mit 6,9 + 118 läge über 120
+    expect(edge?.minutes).toBe(120);
+    expect(edge?.toStop).toBe(0);
+    expect(edge).not.toHaveProperty("others");
+  });
+
+  it("Hauptweg über 120 Min.: weder others noch toStop", () => {
+    const over = reachOf([[400, 120, [iU1, 0]]]);
+    expect(over?.minutes).toBeGreaterThan(MAX_MINUTES);
+    expect(over).toEqual({ kind: "oepnv", minutes: w(400) + 120, byFoot: false });
+  });
+});
+
 describe("TRANSIT_RULE (Satz zum Modell, Plan 0012, E10; Arch-Review 0012, Hinweis 7)", () => {
   it("nennt Aufschlag und Fußweg aus den Konstanten der Rechnung", () => {
     expect(TRANSIT_RULE).toContain(`mindestens ${TRANSFER_PENALTY_MINUTES} Min. spart`);

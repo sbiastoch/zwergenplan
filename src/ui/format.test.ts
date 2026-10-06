@@ -30,6 +30,7 @@ import {
   standDate,
   timeRange,
   transitSourceNote,
+  wayParts,
   weekTitle,
   whenLabels,
 } from "./format.ts";
@@ -336,6 +337,82 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
     expect(long(oepnv(130), gostenhof)).toBe("über 2 Std. ab Gostenhof (mit höchstens 1 Umstieg)");
     expect(long(oepnv(Number.POSITIVE_INFINITY), gostenhof)).toBe("über 2 Std. ab Gostenhof (mit höchstens 1 Umstieg)");
     expect(reachLong(withLines(130, ["U1"]), gostenhof).lines).toBeUndefined();
+  });
+
+  describe("Karte „Wege ab …“ (Plan 0019, E6)", () => {
+    const base: { kind: "oepnv"; byFoot: false } = { kind: "oepnv", byFoot: false };
+
+    it("ohne andere Wege keine Karte", () => {
+      expect(wayParts(withLines(23, ["U1"]), gostenhof)).toBeUndefined();
+      expect(wayParts(luftlinie(800), gostenhof)).toBeUndefined();
+    });
+
+    it("Hauptweg zuerst, mit Linien, Umstieg aus dem Bit und Fußweg zum Halt; zu Fuß als eigene Zeile", () => {
+      const reach: Reach = {
+        ...base,
+        minutes: 29.6,
+        lines: [`Tram${NB}1`, `Bus${NB}2`],
+        toStop: 1.58,
+        transfer: true,
+        others: [{ byFoot: true, minutes: 40.9 }],
+      };
+      expect(wayParts(reach, gostenhof)).toEqual({
+        title: "Wege ab Gostenhof",
+        rows: [
+          {
+            minutes: "ca. 30 Min.",
+            lines: [`Tram${NB}1`, `Bus${NB}2`],
+            extra: ["1 Umstieg", "2 Min. zum Halt"],
+            main: true,
+          },
+          { minutes: "ca. 40 Min.", extra: ["zu Fuß"], main: false },
+        ],
+        reason: undefined,
+      });
+    });
+
+    it("„1 Umstieg“ auch bei nur einer Linie; „zum Halt“ gerundet, mindestens 1", () => {
+      const reach: Reach = {
+        ...base,
+        minutes: 15.9,
+        lines: [`Bus${NB}202E`],
+        toStop: 5.89,
+        others: [{ byFoot: false, minutes: 17.3, toStop: 0.4, lines: ["U1"], transfer: true }],
+      };
+      expect(wayParts(reach, standort)?.rows).toEqual([
+        { minutes: "ca. 15 Min.", lines: [`Bus${NB}202E`], extra: ["6 Min. zum Halt"], main: true },
+        { minutes: "ca. 15 Min.", lines: ["U1"], extra: ["1 Umstieg", "1 Min. zum Halt"], main: false },
+      ]);
+      expect(wayParts(reach, standort)?.title).toBe("Wege ab deinem Standort");
+    });
+
+    it("Hauptweg zu Fuß", () => {
+      const reach: Reach = {
+        ...base,
+        byFoot: true,
+        minutes: 7,
+        others: [{ byFoot: false, minutes: 11.7, toStop: 1.7, lines: ["U1"] }],
+      };
+      expect(wayParts(reach, karte)?.rows).toEqual([
+        { minutes: "ca. 5 Min.", extra: ["zu Fuß"], main: true },
+        { minutes: "ca. 10 Min.", lines: ["U1"], extra: ["2 Min. zum Halt"], main: false },
+      ]);
+    });
+
+    it("Grund nur, wenn ein anderer Weg in der Anzeige schneller ist", () => {
+      const reach = (other: number): Reach => ({
+        ...base,
+        minutes: 31.9,
+        lines: [`Tram${NB}4`],
+        toStop: 6.9,
+        others: [{ byFoot: false, minutes: other, toStop: 1.7, lines: ["U1"], transfer: true }],
+      });
+      expect(wayParts(reach(23.7), gostenhof)?.reason).toBe(
+        "Vorschlag: direkt vor Umstieg, wenn der Umstieg nur wenig Zeit spart",
+      );
+      // 31,2 und 31,9 zeigen beide „ca. 30 Min.“
+      expect(wayParts(reach(31.2), gostenhof)?.reason).toBeUndefined();
+    });
   });
 
   it("Statuszeile je Modus: nur der Startpunkt, im Rückfall mit Grund (E11; Plan 0020, E1)", () => {

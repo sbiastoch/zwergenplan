@@ -25,7 +25,7 @@ import {
 import { Icon, Shape } from "./icons.tsx";
 import { DistPending, HeartButton } from "./OfferCard.tsx";
 import { ReachLong } from "./ReachLong.tsx";
-import { RouteHint, routeLink } from "./Ways.tsx";
+import { RouteHint, routeLink, Ways } from "./Ways.tsx";
 
 interface DetailProps {
   offer: SiteOffer;
@@ -113,6 +113,7 @@ export function DetailContent({
               {origin && reach ? <ReachLong reach={reach} origin={origin} /> : reachPending && <DistPending />}
               <RouteHint />
             </a>
+            {origin && reach && <Ways reach={reach} origin={origin} address={offer.venue.address} />}
             <div className="label">
               <span className="cap">Alter</span>
               <b>{ageRangeLabel(offer.age)}</b>

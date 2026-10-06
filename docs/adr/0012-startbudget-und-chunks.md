@@ -150,3 +150,4 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 | Plan | vorher | nachher | Delta |
 |---|---|---|---|
 | 0019 Teil A (Link nach Google Maps) | 91,95 kB | 92,28 kB | +0,33 kB |
+| 0019 Teil B (Karte „Wege ab …“; Lazy-Chunk `Wegzeit JS` 1,66 → 2,30 kB von 3 kB) | 92,28 kB | 92,82 kB | +0,54 kB |

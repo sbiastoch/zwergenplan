@@ -33,6 +33,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Wegzeit-Gebiet auf der Karte**: die gewählte Grenze (20/30/45 Min.) um den Startpunkt zeichnen (Plan 0005, Nicht-Ziel; mit Plan 0009 eine Isochrone statt eines Kreises).
 - **„Auf der Karte zeigen“ im Detail**: aus einem Angebot in die Kartenansicht mit diesem Ort (Plan 0005, Nicht-Ziel).
 - **Wegzeit je Ort im Anbieter-Sheet**: Die Orte dort öffnen seit Plan 0019 die Route in Google Maps, zeigen aber keine Wegzeit. Katalog-Orte in `anbieter.json` haben kein `geo` (Plan 0019, Nicht-Ziel).
+- **Haltestellennamen, Umstiegsort und Abfahrtszeiten** in der Karte „Wege ab …“: `wegzeit.json` kennt je Zeile nur die Koordinate des Haltbereichs. Bräuchte eine Datenänderung (Plan 0019, Nicht-Ziel).
+- **Mehrere Verbindungen ab demselben Halt**: Der Build speichert je Halt-Ort-Paar eine Verbindung, andere Wege gibt es nur über andere Zugangshalte (Plan 0019, E4).
+- **Andere Wege im Orts-Sheet der Karte**: Heute nur im Detail (Plan 0019, Nicht-Ziel).
 - **Apple Karten oder Wahl der Karten-App** für die Routen-Links (Plan 0019, Nicht-Ziel: der Nutzer will Google Maps).
 - **Adresssuche als Startpunkt**: bräuchte einen Geocoder, also einen weiteren Drittanbieter oder eigene Daten (Plan 0005, Nicht-Ziel).
 - **Karte im Kalender oder in der Merkliste** (Plan 0005, Nicht-Ziel).

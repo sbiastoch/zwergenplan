@@ -148,6 +148,17 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       .click();
     await expect(page.getByRole("dialog").locator(".reach-long")).toContainText("Bus\u00a0202E");
   },
+  // Plan 0019, E6: Karte „Wege ab …“ mit Linien, „1 Umstieg“, „zum Halt“, Marke „Vorschlag“ und dem zweiten
+  // Maps-Link (Musikgarten ab Gostenhof: Tram 1 → Bus 2, dazu zu Fuß)
+  "detail-wege": async (page) => {
+    await withGostenhof(page);
+    await page
+      .getByRole("heading", { level: 3, name: /^Musikgarten/ })
+      .getByRole("button")
+      .click();
+    await expect(page.getByRole("dialog").locator(".ways li")).toHaveCount(2);
+    await page.getByRole("dialog").locator(".ways").scrollIntoViewIfNeeded();
+  },
   // dasselbe Detail ohne Startpunkt (Arch-Review 0012, Befund 3): Preis in der halben Spalte
   "detail-gemeinde": async (page) => {
     await page

@@ -97,5 +97,22 @@ export interface TransitReach {
   minutes: number;
   byFoot: boolean;
   /** Linien der Verbindung („Bus 37“, „U1“), nur mit Bus & Bahn bis 120 Min. und wenn Linien vorliegen (Plan 0012) */
-  lines?: readonly [string] | readonly [string, string];
+  lines?: TransitLineNames;
+  /**
+   * Fußweg in Minuten (ungerundet) zum Halt der Verbindung. Genau dann, wenn es Linien gibt, also mit Bus & Bahn
+   * bis 120 Min. (Plan 0019, E4).
+   */
+  toStop?: number;
+  /** Die Verbindung hat einen Umstieg (Umstiegs-Bit); nur zusammen mit `toStop` */
+  transfer?: true;
+  /** Andere Wege, höchstens zwei, aufsteigend nach Minuten; fehlt ohne andere Wege, nie leer (Plan 0019, E4) */
+  others?: readonly TransitOther[];
 }
+
+/** Linien einer Verbindung, die zweite nach dem Umstieg */
+export type TransitLineNames = readonly [string] | readonly [string, string];
+
+/** Ein anderer Weg zum selben Ort (Plan 0019, E4): zu Fuß oder mit Bus & Bahn ab einem anderen Halt */
+export type TransitOther =
+  | { byFoot: true; minutes: number }
+  | { byFoot: false; minutes: number; toStop: number; lines: TransitLineNames; transfer?: true };

@@ -234,6 +234,65 @@
       transform 0.12s ease,
       box-shadow 0.12s ease;
   }
+  /* Karte „Wege ab …“ (Plan 0019, E6): sieht aus wie eine Kachel, zählt aber nicht zur Drehung der Kacheln */
+  .ways {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 14px 14px 4px 14px;
+    box-shadow: 3px 3px 0 var(--shadow);
+    padding: 10px 12px;
+    transform: rotate(0.3deg);
+  }
+  .ways .cap {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .ways ol {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+  }
+  .ways li {
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+  /* Segmente brechen nie in sich um, nur dazwischen (Review 3, N6) */
+  .ways .way-seg {
+    white-space: nowrap;
+  }
+  .ways b.way-seg {
+    font-weight: 800;
+  }
+  .ways .dot {
+    color: var(--muted);
+  }
+  .way-tag {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--sel);
+    color: var(--on-sel);
+    font-size: 0.75rem;
+    font-weight: 800;
+    white-space: nowrap;
+    vertical-align: 1px;
+  }
+  .ways-note {
+    margin: 6px 0 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .ways-note .linkbtn {
+    padding: 0 2px;
+  }
+
   /* gegen `.label span:not(.cap)` (gleiche Spezifität, steht danach): eigene Farbe, nie Silbentrennung */
   .label span.route-hint,
   .route-hint {

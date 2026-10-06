@@ -74,3 +74,10 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
 - Beim ersten Anlass kommen ca. 28 kB gzip nach der Tabelle dazu.
 - Die Linien-Datei wächst linear mit den Orten (≈ 0,37 kB gzip je Ort), das Budget reicht bis rund 110 Orte.
 - Der Auszug wird ca. 50 kB größer.
+
+## Nachtrag (2026-10-06): ergänzt durch Plan 0019
+
+- Die Wahl des Hauptwegs bleibt, wie oben beschrieben: Direktverbindung vor Umstieg, Aufschlag 10 Min.
+- Neu zeigt das Detail unter „Wo“ die Karte „Wege ab …“ (Plan 0019, E4/E6). Sie listet den Hauptweg und bis zu zwei **andere Wege** aus derselben Rechnung im Browser: je Linienfolge der schnellste Zugangshalt im Umkreis, dazu zu Fuß.
+- Damit wird die Konsequenz „Gezeigt wird mitunter eine Direktverbindung, die bis zu 10 Min. langsamer ist als ein Umstiegsweg“ sichtbar gemacht statt verschwiegen. Der verdrängte Umstiegsweg erscheint dort ausdrücklich mit „1 Umstieg“. Ist er in der Anzeige schneller, erklärt die Karte, warum er nicht der Vorschlag ist.
+- Keine neue Datei, kein neuer Request. Grenzen: je Halt eine Verbindung, keine Haltestellennamen, der Fußweg vom Ziel-Halt ist unbekannt.
