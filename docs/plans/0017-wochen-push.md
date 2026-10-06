@@ -1,4 +1,4 @@
-# Plan 0015 – Wochen-Push mit Such-Abos
+# Plan 0017 – Wochen-Push mit Such-Abos
 
 Status: **freigegeben** (2026-10-06), Review Runde 1 und 2 eingearbeitet. Umsetzung ab Schritt 0 offen.
 Datum: 2026-10-06
@@ -321,7 +321,7 @@ scripts/lib/push-payload-schema.ts           Zod-Schema der Payload
 
 ## Schritte
 
-0. **ADR und Invarianten (E0):** ADR 0014 überarbeiten (Entwurf bleibt Entwurf), `docs/architecture.md` (Privatsphäre, Startpunkt, Anlass „beim Push“ in der Request-Liste, Ausnahme `src/sw/` für die Wegzeit-Logik). Plan 0011: Status „Stufe 2 ersetzt durch Plan 0015“. Fertig, wenn committet.
+0. **ADR und Invarianten (E0):** ADR 0014 überarbeiten (Entwurf bleibt Entwurf), `docs/architecture.md` (Privatsphäre, Startpunkt, Anlass „beim Push“ in der Request-Liste, Ausnahme `src/sw/` für die Wegzeit-Logik). Plan 0011: Status „Stufe 2 ersetzt durch Plan 0017“. Fertig, wenn committet.
 1. **Domäne** (test-first): `news.ts` umbauen (E4), `push-payload.ts`/`push-types.ts` (E5), `searches.ts` (E6), `scripts/lib/push-schedule.ts` (E1). Fertig, wenn `pnpm check:fast` grün ist.
 2. **Abhängigkeiten und Infrastruktur:**
    - zuerst devDependencies `wrangler`, `@cloudflare/workers-types`, `web-push`, `@types/web-push` gepinnt installieren, `workerd` in `pnpm.onlyBuiltDependencies` (Plan 0011 E11);
