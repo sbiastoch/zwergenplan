@@ -1,6 +1,6 @@
 # Plan 0015 – Nächtliche Datenpipeline mit Evals
 
-Status: freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0017 (Kalender-Export nur altersgerecht)
+Status: freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0018 (Kalender-Export nur altersgerecht)
 Datum: 2026-10-06
 
 (ADR 0002 Hosting und Datenfluss, ADR 0003 Datenmodell, ADR 0004 Backpressure, ADR 0006 Recherche-Pipeline, Plan 0002 Pipeline, Plan 0009 Fahrplan; neu: ADR-Entwurf 0016.)
@@ -537,7 +537,7 @@ knip meldet tote Reste.
 Jeder Schritt endet mit grünem `pnpm check:fast`. Neue Logik entsteht test-first (Vitest, ohne Netz).
 
 Die Schritte bilden drei **Stufen**. Jede Stufe ist für sich lieferbar, wird eigens committet und nach `main` gebracht:
-- **Stufe A** (Schritte 1–3): ADR, Horizont, Zustand in `data/raw`. **Voraussetzung:** Plan 0017 (Kalender-Export nur altersgerecht) ist live. Ab dann baut `offers.json` aus `data/raw` mit 12-Monats-Fenster. Zwischen Stufe A und Stufe B gibt es **keinen** Skill-Lauf. Der Bestand vom 04.10. bleibt stehen, der nächste Datenlauf ist der erste lokale `pnpm pipeline run` in Stufe B. Eine Übergangsfunktion für das alte Paketformat gibt es nicht.
+- **Stufe A** (Schritte 1–3): ADR, Horizont, Zustand in `data/raw`. **Voraussetzung:** Plan 0018 (Kalender-Export nur altersgerecht) ist live. Ab dann baut `offers.json` aus `data/raw` mit 12-Monats-Fenster. Zwischen Stufe A und Stufe B gibt es **keinen** Skill-Lauf. Der Bestand vom 04.10. bleibt stehen, der nächste Datenlauf ist der erste lokale `pnpm pipeline run` in Stufe B. Eine Übergangsfunktion für das alte Paketformat gibt es nicht.
 - **Stufe B** (Schritte 4–8): Abruf, Katalog, Extraktion, `run`/`status`, Evals. Danach läuft alles lokal per `pnpm pipeline run`.
 - **Stufe C** (Schritte 9–11): Modellwahl, Nachtlauf im Schatten, Umschalten.
 
@@ -726,4 +726,4 @@ Dritter, unabhängiger `plan-reviewer`. Die Blocker der Durchgänge 1 und 2 best
 - **E9:** Eval-Eingaben im öffentlichen Repo (Variante a). Damit entfallen die Ausschlüsse im Artefakt (E5).
 - **Datenhorizont 12 Monate** (E2) bestätigt.
 - **Secrets und Variablen** (Stufe C) legt der Nutzer später an.
-- **Neue Anforderung:** Regelmäßige Termine landen beim ICS-Export nur, solange das Angebot zum Alter des Kindes passt. Umgesetzt als eigener Plan 0017 (UI, unabhängig lieferbar). Er muss live sein, bevor Stufe A das 12-Monats-Fenster veröffentlicht. Sonst brächte „Alle Termine“ eine Wochengruppe mit etwa 50 Terminen in den Kalender, auch nachdem das Kind herausgewachsen ist.
+- **Neue Anforderung:** Regelmäßige Termine landen beim ICS-Export nur, solange das Angebot zum Alter des Kindes passt. Umgesetzt als eigener Plan 0018 (UI, unabhängig lieferbar). Er muss live sein, bevor Stufe A das 12-Monats-Fenster veröffentlicht. Sonst brächte „Alle Termine“ eine Wochengruppe mit etwa 50 Terminen in den Kalender, auch nachdem das Kind herausgewachsen ist.
