@@ -1,21 +1,23 @@
 /**
- * Geteilte Typen für Push (Plan 0011, E9; ADR 0014): Service Worker, Cloudflare Worker (`push-worker/`) und die
+ * Geteilte Typen für Push (Plan 0011, E9; Plan 0017, E5; ADR 0014): Service Worker, Cloudflare Worker (`push-worker/`) und die
  * CI-Skripte nutzen dieselben Formen. Rein, ohne Zod – geprüft wird in `scripts/lib/push-payload-schema.ts` und
  * `push-worker/src/lib/subscription.ts`.
  */
 
 /** Die vorgeschlagene Nachricht einer Declarative-Web-Push-Payload. */
-export interface PushNotificationFields {
+interface PushNotificationFields {
   title: string;
   body: string;
   /** absolute URL, Pflicht: ohne `navigate` lehnt iOS `showNotification` im `push`-Event ab (Spike j) */
   navigate: string;
   tag: string;
   lang: "de";
-  /** wirkt auf iOS 26.5 nicht (Spike g), bleibt laut Spec drin */
-  app_badge: number;
-  /** Versandzeitpunkt, ISO mit Offset: das `now` des Zuschnitts im Service Worker (E10) */
-  data: { sentAt: string };
+  /**
+   * Versandzeitpunkt, ISO mit Offset: das `now` des Zuschnitts im Service Worker (Plan 0017, E10). `test` markiert
+   * einen Testversand; der Service Worker schreibt dann nichts in den Geräte-Speicher (E3). Kein `app_badge`: wirkt
+   * auf iOS nicht (Spike g).
+   */
+  data: { sentAt: string; test?: true };
 }
 
 /** Declarative Web Push (`"web_push": 8030`); `mutable` erlaubt dem Service Worker den Zuschnitt. */
