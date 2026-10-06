@@ -384,6 +384,100 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
 }
 
+/**
+ * Weitere Zustände der Matrix (E7; Arch-Review 0017, M3), je hell, dunkel und 320 px/200 %:
+ * - „verweigert“: `Notification.permission` gestubbt auf „denied“;
+ * - „kein-push“: ohne `PushManager` (Android-UA, Installationszustand „menue“: Hinweis);
+ * - „an“: eingeschaltet, mit Geräte-Kennung;
+ * - „angebot“: Installationsknopf und Push-Teil im selben Abschnitt.
+ */
+type MatrixState = "verweigert" | "kein-push" | "an" | "angebot";
+
+const MATRIX: Record<MatrixState, { title: string; project?: string; expect: (page: Page) => Promise<void> }> = {
+  verweigert: {
+    title: "Benachrichtigungen abgelehnt: Schalter gesperrt, Hinweis",
+    expect: async (page) => {
+      await expect(pushSwitch(page)).toBeDisabled();
+      await expect(section(page)).toContainText("In den Einstellungen des Geräts erlaubt?");
+    },
+  },
+  "kein-push": {
+    title: "Browser ohne Push: Hinweis statt Schalter",
+    // Der Hinweis gehört zur Installationshilfe; am Desktop ohne Angebot bliebe der Abschnitt leer
+    project: "pixel-7",
+    expect: async (page) => {
+      await expect(section(page)).toContainText("Dieser Browser kann keine Benachrichtigungen.");
+      await expect(pushSwitch(page)).toHaveCount(0);
+    },
+  },
+  an: {
+    title: "eingeschaltet: Geräte-Kennung",
+    expect: async (page) => {
+      await pushSwitch(page).click();
+      await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
+      await expect(section(page)).toContainText(/Geräte-Kennung: [0-9a-f]{8}/);
+    },
+  },
+  angebot: {
+    title: "Browser bietet die Installation an: Knopf und Push-Teil",
+    expect: async (page) => {
+      await expect(section(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" })).toBeVisible();
+      await expect(pushSwitch(page)).toBeVisible();
+    },
+  },
+};
+
+async function openInState(page: Page, context: BrowserContext, state: MatrixState) {
+  if (state === "verweigert") {
+    await page.addInitScript(() => {
+      Object.defineProperty(Notification, "permission", { get: () => "denied" });
+    });
+  }
+  if (state === "kein-push") {
+    await page.addInitScript(() => {
+      Reflect.deleteProperty(window, "PushManager");
+    });
+  }
+  await installed(page, context);
+  if (state === "angebot") {
+    await expect(page.locator("html")).toHaveAttribute("data-pwa", "bereit");
+    await page.evaluate(() => {
+      const event = new Event("beforeinstallprompt", { cancelable: true });
+      Object.assign(event, { prompt: async () => {}, userChoice: Promise.resolve({ outcome: "dismissed" }) });
+      window.dispatchEvent(event);
+    });
+  }
+  await openKidSheet(page);
+  await MATRIX[state].expect(page);
+}
+
+for (const state of Object.keys(MATRIX) as MatrixState[]) {
+  const onlyIn = () => {
+    const project = MATRIX[state].project;
+    test.skip(project !== undefined && test.info().project.name !== project, `Zustand nur in ${project}`);
+  };
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`${MATRIX[state].title}: Gates (${colorScheme === "light" ? "hell" : "dunkel"}, E7)`, async ({
+      page,
+      context,
+    }) => {
+      onlyIn();
+      await page.emulateMedia({ colorScheme });
+      await openInState(page, context, state);
+      await expectMobileUx(page);
+    });
+  }
+  test(`${MATRIX[state].title}: 320 px und 200 % (E7)`, async ({ page, context }) => {
+    onlyIn();
+    await page.setViewportSize({ width: 320, height: 640 });
+    await openInState(page, context, state);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
+    await expectAccessible(page);
+  });
+}
+
 test("Push-Teil mit langem Abo: 320 px und 200 % (E7)", async ({ page, context }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await installed(

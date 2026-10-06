@@ -48,12 +48,15 @@ const isProviderModule = (id: string) => /\/src\/ui\/anbieter\//.test(id);
 
 /**
  * App-Extras (Plan 0011, E5) als Lazy-Kette in assets/app/: PWA-Kern (Registrierung, Installationszustand, Frische),
- * ab Stufe 2 Push und Geräte-Speicher, dazu die Oberfläche src/ui/app-extras/. Budget `App-Extras JS (lazy)`;
- * `app-extras-ui-only-lazy` und `app-data-only-lazy` halten sie aus dem Start.
+ * Push, Geräte-Speicher und Such-Abos (Plan 0017, E9: statisch unter AppSection, ohne eigene Gruppe), dazu die
+ * Oberfläche src/ui/app-extras/. Budget `App-Extras JS (lazy)`; `app-extras-ui-only-lazy`, `app-data-only-lazy` und
+ * `push-domain-not-in-start` halten sie aus dem Start. `src/domain/news.ts` nutzt nur der Service Worker.
  */
 const APP = "assets/app/[name]-[hash]";
 const isAppExtrasModule = (id: string) =>
-  /\/src\/ui\/app-extras\/|\/src\/data\/(pwa|push|push-start|device-store)\.ts$|\/src\/domain\/news\.ts$/.test(id);
+  /\/src\/ui\/app-extras\/|\/src\/data\/(pwa|push|device-store|searches-store)\.ts$|\/src\/domain\/(searches|stored-origin)\.ts$/.test(
+    id,
+  );
 
 export default defineConfig({
   base: BASE,

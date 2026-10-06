@@ -287,6 +287,14 @@ module.exports = {
       to: { path: "^(src|scripts|e2e|tests)/", pathNot: "^src/domain/(push-types|time)\\.ts$" },
     },
     {
+      name: "pwa-core-no-push",
+      severity: "error",
+      comment:
+        "Kein Push-Code beim App-Start (Plan 0017, E9): Der PWA-Kern src/data/pwa.ts läuft nach jedem load und importiert Push, Geräte-Speicher und Such-Abos nicht, auch nicht per import() (der geteilte Chunk schriebe __vite__mapDeps in den Einstieg). Arch-Review 0017, N6.",
+      from: { path: "^src/data/pwa(-start)?\\.ts$" },
+      to: { path: "^src/data/(push|device-store|searches-store)\\.ts$" },
+    },
+    {
       name: "web-push-only-in-push-weekly",
       severity: "error",
       comment:
@@ -305,12 +313,17 @@ module.exports = {
       name: "push-domain-not-in-start",
       severity: "error",
       comment:
-        "Domäne der Wochen-Nachricht (Plan 0017, E9): news.ts nutzen nur Service Worker und CI, searches.ts dazu die App-Extras-Oberfläche (Lazy-Chunk). Aus dem übrigen src/ landeten sie im Start-Bundle, das keinen Platz hat. scripts/ bleibt frei; Tests ausgenommen.",
+        "Domäne der Wochen-Nachricht (Plan 0017, E9): news.ts nutzen nur Service Worker und CI, searches.ts und stored-origin.ts dazu die App-Extras-Oberfläche (Lazy-Chunk). Aus dem übrigen src/ landeten sie im Start-Bundle, das keinen Platz hat. scripts/ bleibt frei; Tests ausgenommen.",
       from: {
         path: "^src/",
-        pathNot: ["^src/sw/", "^src/ui/app-extras/", "^src/domain/(news|searches)\\.ts$", "\\.test\\.ts$"],
+        pathNot: [
+          "^src/sw/",
+          "^src/ui/app-extras/",
+          "^src/domain/(news|searches|stored-origin)\\.ts$",
+          "\\.test\\.ts$",
+        ],
       },
-      to: { path: "^src/domain/(news|searches)\\.ts$" },
+      to: { path: "^src/domain/(news|searches|stored-origin)\\.ts$" },
     },
     {
       name: "push-news-not-in-app",

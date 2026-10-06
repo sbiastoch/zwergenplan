@@ -12,6 +12,7 @@ import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
 import { get as storeGet, set as storeSet } from "../data/device-store.ts";
 import { decidePush, readProposed } from "./push-decision.ts";
 import { type TailorEnv, tailorPush } from "./push-tailor.ts";
+import { resubscribe } from "./resubscribe.ts";
 import {
   ASSETS_CACHE,
   assetsToEvict,
@@ -265,18 +266,17 @@ self.addEventListener("pushsubscriptionchange", (event: Event) => {
           userVisibleOnly: true,
           applicationServerKey: VAPID_PUBLIC_KEY,
         }));
-      const send = (method: "POST" | "DELETE", body: unknown) =>
-        fetch(`${PUSH_WORKER_URL}/abo`, {
-          method,
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(body),
-        });
-      const response = await send("POST", fresh.toJSON());
-      if (!response.ok) return;
-      const old = change.oldSubscription?.endpoint ?? (await storeGet("endpoint"));
-      if (typeof old === "string" && old !== fresh.endpoint)
-        await send("DELETE", { endpoint: old }).catch(() => undefined);
-      await storeSet("endpoint", fresh.endpoint);
-    })(),
+      await resubscribe(fresh, change.oldSubscription?.endpoint, {
+        send: async (method, body) =>
+          (
+            await fetch(`${PUSH_WORKER_URL}/abo`, {
+              method,
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify(body),
+            })
+          ).ok,
+        store: { get: storeGet, set: storeSet },
+      });
+    })().catch(() => undefined),
   );
 });

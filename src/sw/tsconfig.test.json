@@ -1,0 +1,10 @@
+{
+  // Unit-Tests des Service Workers mit Node-Typen (Fixtures, Plan 0017). Der Produktivcode bleibt in tsconfig.json
+  // ohne Node-Typen, damit dort weder `process` noch `Buffer` typprüfen (Arch-Review 0017, N8).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["."],
+  "exclude": []
+}

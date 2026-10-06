@@ -14,13 +14,15 @@ import { loadSearchesRaw, saveSearches } from "../../data/searches-store.ts";
 import { filterFromSearch, filterToSearch } from "../../domain/filter.ts";
 import type { PushSupport } from "../../domain/pwa.ts";
 import { addSearch, parseSearches, removeSearch } from "../../domain/searches.ts";
+import { originFromStored } from "../../domain/stored-origin.ts";
 import { problemText, searchLabel, PUSH_TEXTS as T } from "./push-texts.ts";
 
 function mirrorData(): MirrorData {
   return {
     birthDate: loadBirthDate(),
     searches: loadSearchesRaw(),
-    origin: loadOriginDistrict() ?? loadOriginPoint(),
+    // Punkt zuerst wie `useOrigin`; gespeichert ist ohnehin höchstens eins (ADR 0017)
+    origin: loadOriginPoint() ?? loadOriginDistrict(),
   };
 }
 
@@ -36,7 +38,8 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
 
   const current = filterToSearch(filterFromSearch(location.search));
   const pressed = current !== "" && list.includes(current);
-  const hasOrigin = (loadOriginDistrict() ?? loadOriginPoint()) !== undefined;
+  // dieselbe Prüfung wie im Service Worker: ein Punkt außerhalb der Stadt zählt nicht (Arch-Review N1)
+  const hasOrigin = originFromStored(loadOriginPoint() ?? loadOriginDistrict()) !== undefined;
 
   // Abgleich beim Öffnen (Plan 0017, E6): ausgetauschtes Abo neu melden, fehlendes Abo → aus
   useEffect(() => {
@@ -68,7 +71,8 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
       .then((sub) => sub && push.deviceId(sub.endpoint))
       .then((id) => {
         if (live) setDeviceId(id);
-      });
+      })
+      .catch(() => undefined);
     return () => {
       live = false;
     };
@@ -94,6 +98,13 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
           setOn(false);
           say(T.off);
         })
+        // Geräte-Speicher kaputt: Der Schalter zeigt, ob noch ein Abo läuft (Arch-Review N2)
+        .catch(() =>
+          push
+            .subscription()
+            .then((sub) => setOn(sub !== undefined))
+            .catch(() => undefined),
+        )
         .finally(() => setBusy(undefined));
       return;
     }

@@ -2,8 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { placeKey } from "../domain/place-key.ts";
 import type { Origin, ReachFn } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
+import { originFromStored } from "../domain/stored-origin.ts";
 import { FIXTURE_NOW, type FixtureKey, fixtureKey, fixtureSiteOffers } from "../domain/test-fixtures.ts";
-import { originFromStored, type TailorEnv, tailorPush } from "./push-tailor.ts";
+import { type TailorEnv, tailorPush } from "./push-tailor.ts";
 
 const offers = fixtureSiteOffers();
 const id = (key: FixtureKey) => {
