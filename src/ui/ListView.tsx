@@ -2,7 +2,7 @@
 import type { ReactNode } from "react";
 import type { DayGroup, Occurrence } from "../domain/agenda.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { dayHeading } from "./format.ts";
+import { ageEmptyText, dayHeading } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 
@@ -90,9 +90,7 @@ export function NoOffers({
     );
   }
   const text = age
-    ? onResetFilter
-      ? `Mit diesen Filtern passt nichts zu ${age.label}.`
-      : `Nichts davon passt zu ${age.label}.`
+    ? ageEmptyText(age.label, onResetFilter !== undefined)
     : onResetFilter
       ? "Mit diesen Filtern gibt es keine Angebote."
       : "Mit dieser Auswahl gibt es keine Angebote.";

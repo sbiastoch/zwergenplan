@@ -327,7 +327,7 @@ export function App() {
               // Altersfilter aus (Plan 0021, E3); ist er an, steht hier nichts zum Alter
               <p className="status age-warn">
                 <Icon name="alert" size={18} />
-                <span>{ageWarnText(unfitCount, ageLabel)}</span>
+                <span>{ageWarnText(unfitCount, ageLabel)}</span>{" "}
                 <button type="button" className="linkbtn" onClick={() => setAgeOnlyKeepFocus(true)}>
                   ausblenden
                 </button>

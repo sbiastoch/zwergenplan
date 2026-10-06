@@ -26,9 +26,17 @@
    * Hinweis im Kind-Sheet); das Icon nimmt die Textfarbe, damit sein Kontrast in beiden Themes reicht.
    */
   .age-warn {
+    /* Fließtext statt Flex: sonst stünden Icon und „ausblenden“ je in eigener Zeile (Browser-Review live) */
+    display: block;
     border-left: 3px solid var(--hint-bad-line);
     padding-left: 8px;
     margin-top: 6px;
+  }
+  .age-warn .ic {
+    /* das Reset macht SVGs zu Blöcken; hier steht das Icon im Satz */
+    display: inline-block;
+    vertical-align: -0.2em;
+    margin-right: 4px;
   }
   .linkbtn {
     min-height: 44px;

@@ -125,11 +125,22 @@ export function ageOnlyNote(unfitCount: number, on: boolean): string {
   return `${count} · ${AGE_RULE}`;
 }
 
+/** „7 Mon.“ im Fließtext: U+00A0, damit Zahl und Einheit nie getrennt umbrechen (Browser-Review live, 320 px) */
+const inlineAge = (ageLabel: string) => ageLabel.replace(" ", "\u00a0");
+
 /** Hinweis bei abgeschaltetem Altersfilter (Plan 0021, E3) */
 export function ageWarnText(unfitCount: number, ageLabel: string): string {
+  const age = inlineAge(ageLabel);
   return unfitCount === 1
-    ? `Zeigt auch 1 Angebot, das nicht zu ${ageLabel} passt`
-    : `Zeigt auch ${unfitCount} Angebote, die nicht zu ${ageLabel} passen`;
+    ? `Zeigt auch 1 Angebot, das nicht zu ${age} passt`
+    : `Zeigt auch ${unfitCount} Angebote, die nicht zu ${age} passen`;
+}
+
+/** Leerzustand, wenn der Altersfilter alles ausblendet (Plan 0021, E4); „3 J.“ endet schon mit Punkt */
+export function ageEmptyText(ageLabel: string, withFilters: boolean): string {
+  const age = inlineAge(ageLabel);
+  const sentence = withFilters ? `Mit diesen Filtern passt nichts zu ${age}` : `Nichts davon passt zu ${age}`;
+  return sentence.endsWith(".") ? sentence : `${sentence}.`;
 }
 
 export function formatFact(offer: SiteOffer, now: Date): string {

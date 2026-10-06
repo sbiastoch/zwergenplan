@@ -7,6 +7,7 @@ import { ACCESS_METERS, TRANSFER_PENALTY_MINUTES, TRANSIT_RULE } from "../domain
 import type { TransitOther } from "../domain/transit-types.ts";
 import {
   ageChipLabel,
+  ageEmptyText,
   agendaHeading,
   ageOnlyNote,
   ageRangeLabel,
@@ -630,8 +631,14 @@ describe("Altersfilter (Plan 0021, E2/E3)", () => {
     expect(ageOnlyNote(0, false)).toBe("geprüft zum Kursstart");
   });
 
+  // U+00A0: „7 Mon.“ bricht nie um (Browser-Review live, 320 px)
   it("Warnhinweis bei abgeschaltetem Filter ist ein ganzer Satz", () => {
-    expect(ageWarnText(148, "7 Mon.")).toBe("Zeigt auch 148 Angebote, die nicht zu 7 Mon. passen");
-    expect(ageWarnText(1, "7 Mon.")).toBe("Zeigt auch 1 Angebot, das nicht zu 7 Mon. passt");
+    expect(ageWarnText(148, "7 Mon.")).toBe("Zeigt auch 148 Angebote, die nicht zu 7\u00a0Mon. passen");
+    expect(ageWarnText(1, "7 Mon.")).toBe("Zeigt auch 1 Angebot, das nicht zu 7\u00a0Mon. passt");
+  });
+
+  it("Leerzustand nennt das Alter ohne doppelten Punkt (Browser-Review live)", () => {
+    expect(ageEmptyText("3 J.", false)).toBe("Nichts davon passt zu 3\u00a0J.");
+    expect(ageEmptyText("7 Mon.", true)).toBe("Mit diesen Filtern passt nichts zu 7\u00a0Mon.");
   });
 });
