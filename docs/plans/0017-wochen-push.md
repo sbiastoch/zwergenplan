@@ -358,7 +358,7 @@ Unverändert bleiben `src/ui/AppExtras.tsx` (Lader), `src/data/pwa.ts`, `src/dat
 - Samstags gegen 10 Uhr Berlin kommt auf jedem angemeldeten Gerät **höchstens eine** Nachricht, auch an den Umstellungs-Wochenenden und bei einem „Re-run“ (Versand-Marke im Worker, E1). Verwirft GitHub einen Lauf, fällt die Woche aus.
 - Mit Abos nennt sie die neuen Angebote, die zu einem Abo und zum Alter passen, oder sagt „nichts Neues“ mit der Zahl passender Angebote der nächsten 7 Tage. Ohne Abo zählt das Alter, ohne beides zählen alle. Den allgemeinen Text des Absenders sieht man nur, wenn das Gerät nicht zuschneiden kann. Ein Tipp öffnet die Startseite.
 - Der Worker erhält nie Geburtsdatum, Such-Abos, Startpunkt oder `seenIds` (E2E-Protokoll). Die Requests des Service Workers beim Push sind für alle Geräte gleich.
-- `JS (initial)` ≤ 92 kB, `App-Extras JS (lazy)` ≤ 9 kB, `Service Worker` ≤ 8 kB.
+- `JS (initial)` ≤ 100 kB (Budget seit Plan 0019, ADR 0012), `App-Extras JS (lazy)` ≤ 7,1 kB, `Service Worker` ≤ 9 kB (siehe „Nachtrag 2“).
 - Nach dem Abschalten sind Abo beim Worker und Geräte-Speicher leer; die Such-Abos im `localStorage` bleiben (sie gehören dem Nutzer, nicht dem Push).
 
 ## Risiken
@@ -378,6 +378,12 @@ Unverändert bleiben `src/ui/AppExtras.tsx` (Lader), `src/data/pwa.ts`, `src/dat
 - **Stub-Probe vorgezogen** (E9, Tabelle): Mit Sheet „Neu“, Props oder Abgleich beim Start geht das Budget nicht auf; ohne sie 91,97 kB.
 - **Nutzerentscheidungen 4–6** (Ziel): Tipp → Startseite, kein Sheet „Neu“; Wegzeit ab dem gespeicherten Startpunkt (Stadtteil oder gerundeter Punkt); Infrastruktur freigegeben, Spike-Worker bleibt.
 - **Geändert:** E3 (`announced` entfällt), E4/E5 (`navigate` immer Startseite, `newsUrl` entfällt), E6 (Spiegeln und Abgleich nur in `PushControls`, Startpunkt mit Punkt), E7 (Statuszeile statt Toast, `AppSection` zeigt auch nur den Push-Teil), E8 (entfällt), E9 (neu), E10 (Startpunkt als Punkt, kein `announced`), Struktur, Tests, Budgets, Schritte, Akzeptanz, Risiken. Kein Review-Befund aus Runde 1/2 wird dadurch wieder offen; H-A ist anders gelöst (`push.ts` liest die Registrierung selbst statt Injektion), M-E bleibt gelöst.
+
+## Nachtrag 2 (2026-10-06): Rebase auf `main` nach Plan 0018–0020
+
+- Auf `main` kamen Plan 0018 (Kalender-Export nur altersgerecht), 0019 (Route in Google Maps, Karte „Wege ab …“) und 0020 (Startseite entrümpeln). Die Nummer 0017 blieb frei. Der Branch ist neu als `push-0017-v2` gepusht (rebast, kein Force-Push).
+- **Start-Budget:** Auf Nutzerentscheidung in Plan 0019 („Budget auf 100kb“) liegt `JS (initial)` bei 100 kB. Nach dem Rebase: **92,78 kB**. Die Entscheidungen dieses Plans (kein Sheet „Neu“, kein Abgleich beim Start) bleiben; ob das Sheet mit dem neuen Budget nachkommt, ist eine eigene Frage (`docs/ideas.md`).
+- **Service Worker 8,01 kB** > 8 kB: Plan 0019 hat `src/domain/transit.ts` um die „anderen Wege“ erweitert (`Wegzeit JS` 1,66 → 2,30 kB), und der Service Worker bündelt `transit.ts` für die Wegzeit der Nachricht (ADR 0014, Punkt 5). Budget **8 → 9 kB**, Begründung hier und im Commit. Gekürzt wird nicht: Zehn Bytes Kosmetik rissen beim nächsten Plan wieder.
 
 ## Review (2026-10-06, plan-reviewer, Runde 1) – Verdict: Überarbeiten → eingearbeitet
 
