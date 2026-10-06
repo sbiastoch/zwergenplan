@@ -1,6 +1,6 @@
 # Plan 0015 – Nächtliche Datenpipeline mit Evals
 
-Status: freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen; E9 wartet auf Nutzerentscheidung
+Status: freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0017 (Kalender-Export nur altersgerecht)
 Datum: 2026-10-06
 
 (ADR 0002 Hosting und Datenfluss, ADR 0003 Datenmodell, ADR 0004 Backpressure, ADR 0006 Recherche-Pipeline, Plan 0002 Pipeline, Plan 0009 Fahrplan; neu: ADR-Entwurf 0016.)
@@ -94,7 +94,7 @@ nightly.yml (cron, täglich 01:30 UTC)
          Einbruch (≥ 3 Events → leer oder < Hälfte) → zurückhalten bis zur Bestätigung (E5)
     4. build: data/raw/*.json (+ Kursfortschreibung aus data/offers.json) → data/offers.json
     5. Bericht (E7) → stdout, $GITHUB_STEP_SUMMARY, runs/<datum>/bericht.md
-  upload-artifact runs/<datum>/       # Bericht, Modellantworten, Kandidaten – keine Seitentexte (E9), 14 Tage
+  upload-artifact runs/<datum>/       # Eingaben, Modellantworten, Kandidaten, Bericht, Zustand – 14 Tage
   pnpm pipeline publish               # nur data/, nur bei Änderung; NIGHTLY_PUBLISH=1 nötig (E12)
   gh workflow run ci.yml --ref main   # nur wenn gepusht wurde
 ci.yml (unverändert) → Gates → Deploy
@@ -277,10 +277,8 @@ Derselbe Befehl `pnpm pipeline run` läuft lokal mit eigenen Umgebungsvariablen.
   - Das Schema liegt deshalb wie `RawBatch` (ADR 0006) in `scripts/pipeline/lib/raw.ts`. Seine Event-Felder sind aus `OfferFields` abgeleitet, und es wird nach `schema/provider-raw.schema.json` exportiert.
   - `scripts/validate-data.ts` darf dafür aus `scripts/pipeline/lib` importieren. Das ist eine neue erlaubte Kante in der Schichtentabelle, die ADR 0016 begründet.
 - **Commit-Rauschen:** `checkedAt` ändert sich jede Nacht, also gibt es jede Nacht einen Commit. Das ist gewollt. Der Commit ist der Herzschlag des Systems und hält den Cron über die 60-Tage-Regel aktiv. Der Commit enthält nur `data/`.
-- **`runs/<datum>/`** ist gitignored. Darin liegen `inputs/<id>.txt` (nur lokal), `responses/<id>.json` (nur neu extrahierte), `candidates/` (Kandidaten der Sammelkalender), `summary.json` (Laufzahlen für `publish`) und `bericht.md`.
-  - In `candidates/` stehen die Kandidaten **ohne** `description`: Titel, Datum, Ort, Veranstalter und Link reichen für `add-provider`. Die vollständigen Beschreibungstexte fremder Seiten bleiben so aus dem öffentlichen Artefakt (E9).
-  - Das Artefakt des Nachtlaufs enthält alles **außer `inputs/`**. Artefakte öffentlicher Repos kann jeder angemeldete Nutzer laden, und Seitentexte sollen nicht öffentlich kopiert werden (E9).
-  - Zum Nachstellen einer Eingabe dient lokal `pnpm pipeline fetch --only <id>`.
+- **`runs/<datum>/`** ist gitignored. Darin liegen `inputs/<id>.txt`, `responses/<id>.json` (nur neu extrahierte), `candidates/` (Kandidaten der Sammelkalender), `summary.json` (Laufzahlen für `publish`) und `bericht.md`.
+  - Das Artefakt des Nachtlaufs enthält `runs/<datum>/` vollständig (E9).
 
 ### E6 – Nachtlauf-Workflow `.github/workflows/nightly.yml`
 
@@ -307,7 +305,7 @@ jobs:
       - pnpm pipeline oepnv || echo "$?" > runs/oepnv-fehler   # Fehler → Datei, run nimmt sie in den Bericht
       - id: run
         run: set +e; pnpm pipeline run; echo "code=$?" >> "$GITHUB_OUTPUT"   # env: LLM_*, ONLY: ${{ inputs.only }} (nur über env)
-      - actions/upload-artifact nachtlauf-<datum>: runs/ ohne runs/*/inputs, dazu data/raw und data/offers.json (14 Tage), if: always()
+      - actions/upload-artifact nachtlauf-<datum>: runs/, data/raw und data/offers.json (14 Tage), if: always()
       - if code in (0, 2):
           NIGHTLY_PUBLISH == '1' → pnpm pipeline publish
           sonst → actions/cache/save des Schattenzustands (E12)
@@ -467,16 +465,13 @@ evals/
   - Die erlaubten URLs kommen aus `case.json`.
 - **Fehlerpfade mit Fake-Client:** kein JSON, Schemafehler mit Korrektur in der Wiederholung, zweimal Schemafehler, 429 und dann Erfolg, Timeout, `finish_reason: length`, fremde `sourceUrl`, Cache-Treffer ohne Aufruf, Seitenfehler (alte Events bleiben, `failingSince` wird gesetzt), Erholung (`failingSince` verschwindet), 429 nach allen Wiederholungen (`ausstehend`, kein `failingSince`, nicht in der 20-%-Regel), Sammelkalender ausgefallen (abhängige Anbieter `fehler`, alte Events bleiben), Build-Probelauf scheitert (nur dieser Anbieter `fehler`), Titel-Anker, 3 systemische 401 (Exit 1), mehr als 20 % Fehler (Exit 2).
 
-### E9 – Ablage der eingefrorenen Eingaben (Nutzerentscheidung offen)
+### E9 – Ablage der eingefrorenen Eingaben: im öffentlichen Repo (Nutzerentscheidung 2026-10-06)
 
-`evals/inputs/**` sind vollständige Texte fremder Webseiten, und das Repo ist öffentlich. Das Projekt schreibt Zusammenfassungen bewusst in eigenen Worten (Skill-Regel). Aus demselben Grund enthält das Artefakt des Nachtlaufs keine Seitentexte (E5).
+`evals/inputs/**` enthält vollständige Texte fremder Webseiten, und das Repo ist öffentlich. Der Nutzer hat entschieden: Die Eingaben liegen **im öffentlichen Repo** unter `evals/inputs/` (Variante a). Das ist die einfachste Lösung, ohne zweites Repo und ohne Token.
 
-- **(a)** Im öffentlichen Repo unter `evals/inputs/`. Am einfachsten, aber eine öffentliche Kopie fremder Texte (25 Seiten von Vereinen, Kirchengemeinden, Hebammen).
-- **(b, Empfehlung)** Privates Repo `sbiastoch/zwergenplan-evals` mit nur den Eingaben. Es wird lokal nach `evals/inputs/` geklont (gitignored). `eval.yml` checkt es mit einem fein granulierten PAT (Secret `EVALS_REPO_TOKEN`, nur Lesen) aus.
-  - CI-Tests brauchen `inputs/` nicht (E8, Replay). Die Hürde betrifft nur echte Eval-Läufe.
-- (c) Nur lokal. Nicht reproduzierbar, verworfen.
-
-Bis zur Entscheidung plant der Rest mit (b). Bei (a) entfallen nur das Klonen und das Secret.
+- Verworfen: (b) ein privates Repo mit PAT, (c) nur lokal (nicht reproduzierbar).
+- Folge für das Artefakt des Nachtlaufs: Die Ausschlüsse aus E5 (keine `inputs/`, Kandidaten ohne `description`) dienten nur diesem Schutz. Sie **entfallen**, das Artefakt enthält `runs/<datum>/` vollständig. Das ist einfacher und hilft beim Nachsehen.
+- Unverändert gilt: Was auf der Website erscheint, steht in eigenen Worten (`summary`).
 
 ### E10 – Der Skill wird zum Wartungslauf
 
@@ -542,7 +537,7 @@ knip meldet tote Reste.
 Jeder Schritt endet mit grünem `pnpm check:fast`. Neue Logik entsteht test-first (Vitest, ohne Netz).
 
 Die Schritte bilden drei **Stufen**. Jede Stufe ist für sich lieferbar, wird eigens committet und nach `main` gebracht:
-- **Stufe A** (Schritte 1–3): ADR, Horizont, Zustand in `data/raw`. Ab dann baut `offers.json` aus `data/raw` mit 12-Monats-Fenster. Zwischen Stufe A und Stufe B gibt es **keinen** Skill-Lauf. Der Bestand vom 04.10. bleibt stehen, der nächste Datenlauf ist der erste lokale `pnpm pipeline run` in Stufe B. Eine Übergangsfunktion für das alte Paketformat gibt es nicht.
+- **Stufe A** (Schritte 1–3): ADR, Horizont, Zustand in `data/raw`. **Voraussetzung:** Plan 0017 (Kalender-Export nur altersgerecht) ist live. Ab dann baut `offers.json` aus `data/raw` mit 12-Monats-Fenster. Zwischen Stufe A und Stufe B gibt es **keinen** Skill-Lauf. Der Bestand vom 04.10. bleibt stehen, der nächste Datenlauf ist der erste lokale `pnpm pipeline run` in Stufe B. Eine Übergangsfunktion für das alte Paketformat gibt es nicht.
 - **Stufe B** (Schritte 4–8): Abruf, Katalog, Extraktion, `run`/`status`, Evals. Danach läuft alles lokal per `pnpm pipeline run`.
 - **Stufe C** (Schritte 9–11): Modellwahl, Nachtlauf im Schatten, Umschalten.
 
@@ -602,7 +597,6 @@ Die Schritte bilden drei **Stufen**. Jede Stufe ist für sich lieferbar, wird ei
 
 ### Was der Nutzer tun muss
 
-- E9 entscheiden (Ablage der Eingaben).
 - API-Schlüssel anlegen und als Secrets hinterlegen: Anthropic (Basislauf Haiku) und je kostenloser Kandidat (Google AI Studio, OpenRouter).
 - Repo-Variablen `LLM_BASE_URL`, `LLM_MODEL` setzen, später `NIGHTLY_PUBLISH=1`.
 - 5 Referenzfälle stichprobenartig prüfen (Schritt 8).
@@ -726,3 +720,10 @@ Dritter, unabhängiger `plan-reviewer`. Die Blocker der Durchgänge 1 und 2 best
 
 **Abgelehnt**
 - keine
+
+## Nutzerentscheidungen (2026-10-06, nach dem Review)
+
+- **E9:** Eval-Eingaben im öffentlichen Repo (Variante a). Damit entfallen die Ausschlüsse im Artefakt (E5).
+- **Datenhorizont 12 Monate** (E2) bestätigt.
+- **Secrets und Variablen** (Stufe C) legt der Nutzer später an.
+- **Neue Anforderung:** Regelmäßige Termine landen beim ICS-Export nur, solange das Angebot zum Alter des Kindes passt. Umgesetzt als eigener Plan 0017 (UI, unabhängig lieferbar). Er muss live sein, bevor Stufe A das 12-Monats-Fenster veröffentlicht. Sonst brächte „Alle Termine“ eine Wochengruppe mit etwa 50 Terminen in den Kalender, auch nachdem das Kind herausgewachsen ist.
