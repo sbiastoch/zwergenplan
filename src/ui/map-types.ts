@@ -39,8 +39,8 @@ export interface MapScreenProps {
 }
 
 export interface MapViewProps {
-  /** Orte der sichtbaren Angebote; ein Wechsel tauscht nur die Daten, die Kamera bleibt (E9) */
-  places: readonly Place<unknown>[];
+  /** Orte der sichtbaren Angebote; ein Wechsel tauscht nur die Daten, die Kamera bleibt (E9). Die Themen bestimmen das Marker-Symbol (Plan 0024, E5). */
+  places: readonly Place<Pick<SiteOffer, "topics">>[];
   /** Ausschnitt beim ersten Öffnen der Sitzung, aus öffentlichen Daten (`initialCamera`, ADR 0008) */
   start: StartCamera;
   /** wird nur gezeichnet; angefahren wird nur ein Stadtteil (E9, ADR 0008) */
