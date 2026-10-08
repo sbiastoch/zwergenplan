@@ -1,4 +1,4 @@
-import { type SessionFit, shownSession, upcomingSessions } from "./agenda.ts";
+import { referenceSession, type SessionFit, upcomingSessions } from "./agenda.ts";
 import type { AgeRange, Offer, Session } from "./schema.ts";
 import { berlinDate, daysInMonth, parseIsoDate } from "./time.ts";
 
@@ -68,6 +68,20 @@ export function splitByAge<T extends Offer>(
   return { fitting, unfit };
 }
 
+/**
+ * Der Termin, auf den sich das Detail bezieht (Terminliste, „Nur …“, Alters-Kachel): der am gewählten Kalendertag,
+ * sonst mit Geburtsdatum der erste passende, sonst der nächste (`referenceSession` mit `sessionFit`; Browser-Review
+ * Plan 0028). Kurse und Einzeltermine prüft das Prädikat nicht, für sie bleibt es der nächste (ADR 0007).
+ */
+export function detailSession(
+  offer: Offer,
+  now: Date,
+  day: string | undefined,
+  birthDate: string | undefined,
+): Session | undefined {
+  return referenceSession(offer, now, day, sessionFit(birthDate));
+}
+
 export interface AgeCheck {
   fits: boolean;
   /** Stichtag (Beginn des maßgeblichen Termins) */
@@ -83,10 +97,8 @@ export interface AgeCheck {
  */
 export function ageCheck(offer: Offer, birthDate: string, now: Date, session?: Session): AgeCheck | undefined {
   const fitsAt = (s: Session) => fitsAgeAt(offer.age, birthDate, s.start);
-  let ref: Session | undefined;
-  if (offer.format !== "regelmaessig") ref = offer.sessions[0];
-  else if (session) ref = session;
-  else ref = shownSession(offer, now, undefined, sessionFit(birthDate));
+  const ref =
+    offer.format === "regelmaessig" ? (session ?? detailSession(offer, now, undefined, birthDate)) : offer.sessions[0];
   if (!ref) return undefined;
   return { fits: fitsAt(ref), at: ref.start, months: ageInMonths(birthDate, ref.start) };
 }

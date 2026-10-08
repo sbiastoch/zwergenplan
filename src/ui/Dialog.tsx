@@ -4,7 +4,7 @@
  * (`cancel`) und ein Tipp auf den Backdrop nehmen denselben Weg wie der Schließen-Knopf.
  */
 import { type ReactNode, type RefObject, useEffect, useRef } from "react";
-import { Toast } from "./Toast.tsx";
+import { Toast, type ToastMessage } from "./Toast.tsx";
 
 /**
  * Setzt das HTML-Attribut `autofocus` (als Ref-Callback): Dann fokussiert `showModal()` dieses Element statt des
@@ -22,7 +22,7 @@ interface DialogProps {
   label: string;
   className: string;
   /** Kurzmeldung: Der Seiten-Toast liegt hinter dem Modal und wäre unsichtbar und stumm. */
-  toast: string;
+  toast: ToastMessage;
   /**
    * Fokus-Rückweg, falls der Auslöser beim Schließen nicht mehr existiert (der Browser ließe den
    * Fokus sonst auf <body> fallen). Beispiel: „Startpunkt wählen“ verschwindet mit der Wahl.
@@ -66,7 +66,7 @@ export function Dialog({ open, onClose, label, className, toast, fallbackFocus, 
       {open && (
         <>
           {children}
-          <Toast message={toast} />
+          <Toast toast={toast} />
         </>
       )}
     </dialog>

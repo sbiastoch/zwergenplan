@@ -34,7 +34,7 @@ import { ProviderPanel } from "./ProviderPanel.tsx";
 import { ProviderSearch } from "./ProviderSearch.tsx";
 import { SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
-import { Toast } from "./Toast.tsx";
+import { NO_TOAST, Toast } from "./Toast.tsx";
 import {
   useBirthDate,
   useNow,
@@ -157,7 +157,7 @@ export function App() {
   // warum nichts aufgeht (Plan 0026, E7).
   useEffect(() => {
     if (load.kind === "ready" && route.offerId && !detailOffer) {
-      say(OFFER_GONE);
+      say(OFFER_GONE, undefined, "hint");
       closeDetail();
     }
   }, [load.kind, route.offerId, detailOffer, closeDetail, say]);
@@ -288,7 +288,8 @@ export function App() {
         onSheetOpen={setPlaceSheet}
         onPickOrigin={() => setSheet("origin")}
         onMapCenter={(center) => {
-          if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.");
+          if (!originApi.setMapCenter(center))
+            say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.", undefined, "hint");
         }}
         onResetFilter={onResetFilter}
         age={age}
@@ -478,7 +479,7 @@ export function App() {
         )}
       </main>
       <TabBar tab={section} savedCount={saved.length} onTab={onTab} currentRef={activeTab} />
-      <Toast message={dialogOpen ? "" : toast} />
+      <Toast toast={dialogOpen ? NO_TOAST : toast} />
 
       <Overlays
         toast={toast}

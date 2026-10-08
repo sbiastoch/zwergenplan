@@ -11,6 +11,7 @@ import type { Origin, ReachFn } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import type { AgeEscape } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
+import type { ToastMessage } from "./Toast.tsx";
 
 /** Props der Karten-Oberfläche (karte/MapScreen.tsx), durchgereicht von MapPanel.tsx */
 export interface MapScreenProps {
@@ -26,7 +27,7 @@ export interface MapScreenProps {
   /** Kacheln im Orts-Sheet; `reachOf` auch für die Orts-Liste */
   ctx: CardContext;
   /** Kurzmeldung für das Orts-Sheet (der Seiten-Toast liegt hinter dem Modal) */
-  toast: string;
+  toast: ToastMessage;
   /** Orts-Sheet auf oder zu: Der Seiten-Toast schweigt dann (App) */
   onSheetOpen: (open: boolean) => void;
   /** öffnet das Kind-Sheet bei „Wegzeit ab“ */

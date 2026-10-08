@@ -4,6 +4,7 @@ import {
   ageInMonths,
   ageVisibility,
   DEFAULT_AGE,
+  detailSession,
   fitsAgeAt,
   fittingSessions,
   offerFitsAge,
@@ -168,6 +169,28 @@ describe("ageCheck", () => {
       at: "2026-10-07T10:00:00+02:00",
       months: 5,
     });
+  });
+});
+
+describe("detailSession (Browser-Review Plan 0028)", () => {
+  const treff = fixtureOffer("krabbeltreff"); // regelmäßig, 6–24 Monate, mittwochs 7.10.–4.11.
+  const pekip = fixtureOffer("pekip-herbst"); // Kurs ab Di 13.10.
+
+  it("nimmt bei regelmäßigen den ersten passenden Termin, wie die Alters-Kachel", () => {
+    expect(detailSession(treff, FIXTURE_NOW, undefined, "2026-04-20")?.start).toBe("2026-10-21T10:00:00+02:00");
+    expect(detailSession(treff, FIXTURE_NOW, undefined, "2026-04-20")?.start).toBe(
+      ageCheck(treff, "2026-04-20", FIXTURE_NOW)?.at,
+    );
+  });
+
+  it("bleibt am gewählten Kalendertag, ohne Geburtsdatum und ohne passenden Termin beim bisherigen", () => {
+    expect(detailSession(treff, FIXTURE_NOW, "2026-10-14", "2026-04-20")?.start).toBe("2026-10-14T10:00:00+02:00");
+    expect(detailSession(treff, FIXTURE_NOW, undefined, undefined)?.start).toBe("2026-10-07T10:00:00+02:00");
+    expect(detailSession(treff, FIXTURE_NOW, undefined, "2026-08-01")?.start).toBe("2026-10-07T10:00:00+02:00");
+  });
+
+  it("lässt Kurse unverändert (ADR 0007)", () => {
+    expect(detailSession(pekip, FIXTURE_NOW, undefined, "2023-01-01")).toEqual(pekip.sessions[0]);
   });
 });
 

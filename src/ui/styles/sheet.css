@@ -262,6 +262,10 @@
     display: grid;
     place-items: center;
   }
+  /* Hinweis statt Erfolg (Browser-Review Plan 0028): gelb wie das Klebeband, nichts wurde geladen */
+  .toast.hint .tk {
+    background: #ffd93b;
+  }
   @keyframes toast {
     from {
       transform: translateX(-50%) translateY(30px) rotate(-6deg) scale(0.9);

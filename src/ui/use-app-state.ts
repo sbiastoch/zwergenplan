@@ -25,6 +25,7 @@ import { sameMinute } from "../domain/time.ts";
 import { SHARE_COPIED } from "./format.ts";
 import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
 import { preloadProviderUi } from "./ProviderPanel.tsx";
+import { NO_TOAST, type ToastMessage, type ToastTone } from "./Toast.tsx";
 
 /** Markiert einen History-Eintrag, den das Öffnen eines Details erzeugt hat (Plan 0003, E4). */
 const DETAIL_STATE = { zpDetail: true } as const;
@@ -205,15 +206,18 @@ const TOAST_MS = 2800;
  */
 export const LONG_TOAST_MS = 6000;
 
+/** Meldung zeigen: 2,8 s oder `ms` lang, standardmäßig als Erfolg */
+export type Say = (message: string, ms?: number, tone?: ToastTone) => void;
+
 /** Kurzmeldung, 2,8 s sichtbar oder `ms` lang. */
-export function useToast(): [string, (message: string, ms?: number) => void] {
-  const [message, setMessage] = useState("");
+export function useToast(): [ToastMessage, Say] {
+  const [message, setMessage] = useState(NO_TOAST);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const say = useCallback((next: string, ms = TOAST_MS) => {
+  const say = useCallback<Say>((text, ms = TOAST_MS, tone = "ok") => {
     clearTimeout(timer.current);
-    setMessage(next);
-    timer.current = setTimeout(() => setMessage(""), ms);
+    setMessage({ text, tone });
+    timer.current = setTimeout(() => setMessage(NO_TOAST), ms);
   }, []);
   return [message, say];
 }

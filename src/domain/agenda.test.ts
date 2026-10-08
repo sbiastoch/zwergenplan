@@ -278,6 +278,17 @@ describe("referenceSession", () => {
     expect(referenceSession(treff, FIXTURE_NOW, "2026-10-08")?.start).toBe("2026-10-07T10:00:00+02:00");
   });
 
+  it("nimmt mit Prädikat ohne gewählten Tag den ersten passenden Termin, sonst den nächsten (Browser-Review 0028)", () => {
+    const fromOct21: SessionFit = (_offer, session) => session.start >= "2026-10-21";
+    expect(referenceSession(treff, FIXTURE_NOW, undefined, fromOct21)?.start).toBe("2026-10-21T10:00:00+02:00");
+    // Tag ohne Termin: wie ohne Tag
+    expect(referenceSession(treff, FIXTURE_NOW, "2026-10-08", fromOct21)?.start).toBe("2026-10-21T10:00:00+02:00");
+    // gewählter Tag gilt, auch wenn er nicht passt (Kalender)
+    expect(referenceSession(treff, FIXTURE_NOW, "2026-10-14", fromOct21)?.start).toBe("2026-10-14T10:00:00+02:00");
+    // nichts passt: wie bisher der nächste
+    expect(referenceSession(treff, FIXTURE_NOW, undefined, () => false)?.start).toBe("2026-10-07T10:00:00+02:00");
+  });
+
   it("ordnet späte Termine dem Berliner Tag zu, nicht dem UTC- oder Gerätetag", () => {
     const late = withSessions("spaet", [
       s("2026-10-12T23:30:00+02:00", "2026-10-12T23:59:00+02:00"),

@@ -35,10 +35,11 @@ export function nextSession(offer: Offer, now: Date): Session | undefined {
 
 /**
  * Der Termin, auf den sich das Detail bezieht: der am gewählten Berliner Kalendertag (aus dem
- * Kalender geöffnet), sonst der nächste nicht beendete.
+ * Kalender geöffnet), sonst der, an dem das Angebot in Liste und Merkliste steht (`shownSession`): mit `fits` der
+ * erste passende, sonst der nächste nicht beendete (Browser-Review Plan 0028).
  */
-export function referenceSession(offer: Offer, now: Date, day?: string): Session | undefined {
-  return (day ? sessionOnDay(offer, day) : undefined) ?? nextSession(offer, now);
+export function referenceSession(offer: Offer, now: Date, day?: string, fits?: SessionFit): Session | undefined {
+  return (day ? sessionOnDay(offer, day) : undefined) ?? shownSession(offer, now, undefined, fits);
 }
 
 /** Erster Termin, der am Berliner Kalendertag `day` beginnt. */

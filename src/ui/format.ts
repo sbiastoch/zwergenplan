@@ -4,6 +4,7 @@
  */
 import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
+import { fittingSessions } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
 import type { DateRange } from "../domain/date-range.ts";
 import { MONTHS, monthShort, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
@@ -146,7 +147,7 @@ function courseLine(offer: SiteOffer, now: Date): string {
  * Regelmäßige Termine bekommen die Uhrzeit, wenn alle kommenden dieselbe haben (B1). Ohne kommenden
  * Termin keine Uhrzeit: `uniformTimes([])` ist wahr.
  */
-export function whenLabels(offer: SiteOffer, now: Date): { main: string; sub: string } {
+export function whenLabels(offer: SiteOffer, now: Date, birthDate?: string): { main: string; sub: string } {
   const first = offer.sessions[0];
   const last = offer.sessions.at(-1);
   if (!first || !last) return { main: "", sub: "" };
@@ -163,10 +164,14 @@ export function whenLabels(offer: SiteOffer, now: Date): { main: string; sub: st
   const rhythmText = !r ? "Regelmäßig" : r.weekly ? `Jeden ${weekdayName(r.weekday)}` : `${weekdayName(r.weekday)}s`;
   const [next] = upcoming;
   const main = next && uniformTimes(upcoming) ? `${rhythmText}, ${timeRange(next)}` : rhythmText;
-  const sub =
-    offer.registration === "ohne-anmeldung"
-      ? "Einzeln besuchbar"
+  // Mit Geburtsdatum „3 passende von 5 Terminen“, wenn nur ein Teil passt (Browser-Review Plan 0028); passt keiner,
+  // nennt die Alters-Kachel es, und die Zahl bleibt die der kommenden Termine.
+  const fitting = fittingSessions(offer, now, birthDate).length;
+  const count =
+    fitting > 0 && fitting < upcoming.length
+      ? `${plural(fitting, "passender", "passende")} von ${upcoming.length} Terminen`
       : plural(upcoming.length, "kommender Termin", "kommende Termine");
+  const sub = offer.registration === "ohne-anmeldung" ? "Einzeln besuchbar" : count;
   return { main, sub };
 }
 
@@ -220,11 +225,14 @@ export function seriesToast({ sessions, from, until }: ExportSelection, now: Dat
   return loaded;
 }
 
+/** Zusatz für `missing` gemerkte Angebote ohne passenden Termin: Export-Toast und Statuszeile gleich lautend */
+function missingSuffix(missing: number): string {
+  return missing === 0 ? "" : ` – ${plural(missing, "Angebot passt", "Angebote passen")} nicht zum Alter`;
+}
+
 /** Toast nach dem Export der Merkliste (Plan 0018, E4): `missing` gemerkte Angebote ohne passenden Termin */
 export function collectionToast(count: number, missing: number): string {
-  const loaded = calendarLoaded(count);
-  if (missing === 0) return loaded;
-  return `${loaded} – ${plural(missing, "Angebot passt", "Angebote passen")} nicht zum Alter`;
+  return `${calendarLoaded(count)}${missingSuffix(missing)}`;
 }
 
 /**
@@ -456,14 +464,15 @@ export function mapStatusParts(offers: number, places: number): [number, string,
 
 /**
  * Statuszeile der Merkliste als Liste (Plan 0025, E3a): „5 Angebote mit insgesamt 28 Terminen gemerkt“. `sessions`
- * zählt die kommenden Termine, wie der Kalender sie zeigt; die Zahlen getrennt, damit sie fett stehen.
+ * zählt die kommenden Termine, wie der Kalender sie zeigt; die Zahlen getrennt, damit sie fett stehen. `missing`
+ * gemerkte Angebote ohne passenden Termin nennt sie wie der Export-Toast (Browser-Review Plan 0028).
  */
-export function savedStatusParts(offers: number, sessions: number): [number, string, number, string] {
+export function savedStatusParts(offers: number, sessions: number, missing = 0): [number, string, number, string] {
   return [
     offers,
     offers === 1 ? " Angebot mit insgesamt " : " Angebote mit insgesamt ",
     sessions,
-    sessions === 1 ? " Termin gemerkt" : " Terminen gemerkt",
+    `${sessions === 1 ? " Termin gemerkt" : " Terminen gemerkt"}${missingSuffix(missing)}`,
   ];
 }
 
