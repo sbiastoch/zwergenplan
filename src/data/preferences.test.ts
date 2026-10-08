@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { loadOriginDistrict, loadOriginPoint, saveOrigin } from "./preferences.ts";
+import {
+  loadOriginDistrict,
+  loadOriginPoint,
+  loadSavedProviders,
+  saveOrigin,
+  saveSavedProviders,
+} from "./preferences.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
 const POINT_KEY = "zwergenplan.startpunkt";
@@ -133,5 +139,38 @@ describe("Startpunkt-Punkt (Plan 0016, E1)", () => {
     expect(loadOriginPoint()).toBeUndefined();
     expect(() => saveOrigin({ source: "standort", lat: 49.452, lon: 11.077 })).not.toThrow();
     expect(() => saveOrigin(undefined)).not.toThrow();
+  });
+});
+
+describe("gemerkte Anbieter: nur die Form (Plan 0025, E1)", () => {
+  const PROVIDERS_KEY = "zwergenplan.anbieter-merkliste";
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("kaputtes JSON und kein Array ergeben eine leere Liste", () => {
+    storage.data.set(PROVIDERS_KEY, "{kaputt");
+    expect(loadSavedProviders()).toEqual([]);
+    storage.data.set(PROVIDERS_KEY, JSON.stringify({ id: "a-anbieter" }));
+    expect(loadSavedProviders()).toEqual([]);
+  });
+
+  it("Einträge, die keine Strings sind, fallen weg", () => {
+    storage.data.set(PROVIDERS_KEY, JSON.stringify(["a-anbieter", 3, { id: "b-anbieter" }, null, "Ungeprüft"]));
+    expect(loadSavedProviders()).toEqual(["a-anbieter", "Ungeprüft"]);
+  });
+
+  it("hin und zurück dieselbe Liste, eine leere Liste entfernt den Schlüssel", () => {
+    saveSavedProviders(["b-anbieter", "a-anbieter"]);
+    expect(loadSavedProviders()).toEqual(["b-anbieter", "a-anbieter"]);
+    saveSavedProviders([]);
+    expect(storage.data.has(PROVIDERS_KEY)).toBe(false);
   });
 });

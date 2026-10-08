@@ -18,8 +18,10 @@ const offers = (page: Page) => page.getByTestId("offer");
 const tab = (page: Page, name: string) =>
   page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
 const providerSheet = (page: Page) => page.getByRole("dialog", { name: "Anbieter" });
-/** Suchfeld der Anbieterliste (E5): steht, sobald der Lazy-Chunk da ist */
+/** Suchfeld der Anbieterliste (E5); steht seit Plan 0025 (E3) im Start, also schon vor dem Chunk */
 const searchField = (page: Page) => page.getByRole("searchbox", { name: "Anbieter suchen" });
+/** Liste geladen: Die Region „Anbieter“ kommt mit dem Lazy-Chunk (Plan 0025, Review M1) */
+const listReady = (page: Page) => expect(page.getByRole("region", { name: "Anbieter" })).toBeVisible();
 /** Zeilen der Anbieterliste (E10), wahlweise die eines Anbieters */
 const rows = (page: Page) => page.locator("section.providers button.place");
 const row = (page: Page, name: string) =>
@@ -107,12 +109,12 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
     await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
     await expect(page.getByRole("group", { name: "Kategorien" })).toBeVisible();
     await expect(page.getByRole("button", { name: /^Alle Filter/ })).toBeVisible();
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
 
     await page.reload();
     await expect(tab(page, "Anbieter")).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
   });
 
   test("Einzahl in der Statuszeile: „1 Anbieter mit 1 Angebot“", async ({ page }) => {
@@ -129,7 +131,7 @@ test.describe("Lazy-Laden (E7, E9)", () => {
     expect(urls(requests), "Startseite ohne Anbieter-Requests").toEqual([]);
 
     await tab(page, "Anbieter").click();
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     expect(
       requests.filter((r) => isDirectory(r.url())),
       "anbieter.json genau einmal",
@@ -142,7 +144,7 @@ test.describe("Lazy-Laden (E7, E9)", () => {
     await tab(page, "Entdecken").click();
     await expect(offers(page).first()).toBeVisible();
     await tab(page, "Anbieter").click();
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     expect(urls(requests.slice(before)), "erneutes Öffnen ohne Request").toEqual([]);
   });
 
@@ -164,6 +166,8 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await row(page, THEATER).click();
     const sheet = providerSheet(page);
     await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
+    // Startfokus auf dem Namen, nicht auf dem Herz daneben (Plan 0025, E2)
+    await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeFocused();
     expect(new URL(page.url()).search).toBe("?ansicht=anbieter&anbieter=theater-beispiel");
 
     await page.goBack();
@@ -343,7 +347,7 @@ test.describe("Fehler (E10)", () => {
 
     await page.unroute("**/data/anbieter.json");
     await box.getByRole("button", { name: "Nochmal versuchen" }).click();
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     await expect(rows(page)).toHaveCount(6);
     await expect(row(page, THEATER)).toBeVisible();
     await expect(box).toHaveCount(0);
@@ -370,7 +374,7 @@ test.describe("Datenstand (E6, M4)", () => {
     const requests = collect(page, isDirectory);
     await ready(page);
     await tab(page, "Anbieter").click();
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     expect(requests, "erst geladen, dann einmal neu").toHaveLength(2);
 
     // Wechsel und Rückkehr fragen nicht noch einmal nach und zeigen den Katalog sofort, ohne einen Frame mit dem
@@ -382,7 +386,7 @@ test.describe("Datenstand (E6, M4)", () => {
       }).observe(document.body, { childList: true, subtree: true });
     });
     await tab(page, "Anbieter").click();
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     expect(requests).toHaveLength(2);
     await expect(page.locator("html")).not.toHaveAttribute("data-sah-lazy-box");
   });
@@ -431,7 +435,7 @@ test.describe("Datenstand (E6, M4)", () => {
 test.describe("Privatsphäre (E9)", () => {
   test("Tippen in der Suche: kein Request, kein Suchtext in der URL", async ({ page }) => {
     await ready(page, "./?ansicht=anbieter");
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     const requests = collect(page);
     await searchField(page).fill("bibliothek");
     await searchField(page).press("Enter");
@@ -442,7 +446,7 @@ test.describe("Privatsphäre (E9)", () => {
 
   test("mit offenem Tab einen Startpunkt wählen: ab dem Tipp kein Request", async ({ page }) => {
     await ready(page, "./?ansicht=anbieter");
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     const loaded = Promise.all([
       page.waitForResponse((r) => new URL(r.url()).pathname.endsWith("/data/wegzeit.json") && r.ok()),
       page.waitForResponse((r) => /\/assets\/oepnv\/[^/]+\.js$/.test(new URL(r.url()).pathname) && r.ok()),
@@ -456,7 +460,7 @@ test.describe("Privatsphäre (E9)", () => {
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
     await kid.getByRole("button", { name: "Fertig" }).click();
     await expect(page.getByRole("status")).toContainText("Gostenhof");
-    await expect(searchField(page)).toBeVisible();
+    await listReady(page);
     expect(urls(requests), "kein Request nach der Wahl des Startpunkts").toEqual([]);
     expect(page.url()).not.toContain("gostenhof");
   });

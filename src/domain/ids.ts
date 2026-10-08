@@ -16,6 +16,12 @@ export const OFFER_ID_PATTERN = /^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/;
  */
 export const KEBAB_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+/**
+ * Längste zulässige Anbieter-ID; die längste echte hat 47 Zeichen (Plan 0010, E2). Gilt für `anbieter=` in der URL
+ * und für gemerkte Anbieter im Speicher (Plan 0025, E1).
+ */
+export const MAX_PROVIDER_ID = 80;
+
 const TRANSLIT: Record<string, string> = { ä: "ae", ö: "oe", ü: "ue", ß: "ss" };
 
 /** kebab-case aus Freitext: Umlaute transliteriert, höchstens `max` Zeichen, an Wortgrenze gekürzt. */

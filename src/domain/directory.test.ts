@@ -46,6 +46,7 @@ const rows = (overrides: Partial<Parameters<typeof providerRows>[0]> = {}) =>
     reachOf: noReach,
     byReach: false,
     query: "",
+    saved: [],
     ...overrides,
   });
 const ids = (list: readonly ProviderRow[]) => list.map((r) => r.provider.id);
@@ -224,6 +225,7 @@ describe("providerRows", () => {
       reachOf: noReach,
       byReach: false,
       query: "",
+      saved: [],
     });
     expect(result.idle.map((r) => r.provider.name)).toEqual(["Apotheke", "Ärztehaus Beispiel", "Bücherei"]);
   });
@@ -232,6 +234,49 @@ describe("providerRows", () => {
     const first = catalog[0];
     if (!first) throw new Error("Katalog leer");
     expect(rows({ providers: [first, first] }).active.filter((r) => r.provider.id === first.id)).toHaveLength(1);
+  });
+});
+
+describe("providerRows: gemerkte Anbieter (Plan 0025, E3)", () => {
+  it("ohne gemerkte Anbieter wie bisher", () => {
+    expect(rows().saved).toEqual([]);
+  });
+
+  it("ein gemerkter aktiver Anbieter steht nur unter saved; zusammen ergeben sie die Zahl der Statuszeile", () => {
+    const result = rows({ saved: ["theater-beispiel"] });
+    expect(result.saved.map((r) => [r.provider.id, r.state])).toEqual([["theater-beispiel", "aktiv"]]);
+    expect(ids(result.active)).not.toContain("theater-beispiel");
+    const activeSaved = result.saved.filter((r) => r.state === "aktiv").length;
+    expect(result.active.length + activeSaved).toBe(distinctProviders(upcoming));
+  });
+
+  it("ausgeblendet: bleibt unter saved, blass, und zählt nicht in hiddenCount", () => {
+    const result = rows({ visible: visibleWith(buecher), saved: ["theater-beispiel"] });
+    expect(result.saved.map((r) => [r.provider.id, r.state, r.upcoming])).toEqual([
+      ["theater-beispiel", "ausgeblendet", 2],
+    ]);
+    expect(result.hiddenCount).toBe(3);
+  });
+
+  it("ohne Termine: unter saved, nicht in idle", () => {
+    const result = rows({ saved: ["turnverein-beispiel"] });
+    expect(result.saved.map((r) => [r.provider.id, r.state])).toEqual([["turnverein-beispiel", "ohne-termine"]]);
+    expect(result.idle).toEqual([]);
+  });
+
+  it("die Suche wirkt auf saved; saved ist nach Name sortiert, auch mit Startpunkt", () => {
+    const reach = airlineReach(gostenhof);
+    const saved = ["turnverein-beispiel", "theater-beispiel", "familientreff-beispiel"];
+    const all = rows({ saved, reachOf: (o) => reach(o.venue), byReach: true });
+    const byName = [...all.saved].sort((a, b) => a.provider.name.localeCompare(b.provider.name, "de"));
+    expect(ids(all.saved)).toEqual(ids(byName));
+    expect(all.saved).toHaveLength(3);
+    expect(ids(rows({ saved, query: "theater" }).saved)).toEqual(["theater-beispiel"]);
+    expect(rows({ saved, query: "xyz" }).saved).toEqual([]);
+  });
+
+  it("eine gemerkte unbekannte ID ergibt keine Zeile", () => {
+    expect(rows({ saved: ["gibt-es-nicht"] }).saved).toEqual([]);
   });
 });
 

@@ -6,12 +6,32 @@ import { useMemo } from "react";
 import { groupByNextSession } from "../../domain/agenda.ts";
 import { findProvider, hasOffersOutside, providerCategories, providerOffers } from "../../domain/directory.ts";
 import { CATEGORY_LABELS } from "../../domain/topics.ts";
+import { markAutofocus } from "../Dialog.tsx";
 import { Icon } from "../icons.tsx";
 import { OfferCard } from "../OfferCard.tsx";
 import type { ProviderSheetProps } from "../provider-types.ts";
 import { RouteHint, routeLink } from "../Ways.tsx";
 
-export function ProviderSheet({ directory, providerId, offers, visible, ctx, onClose }: ProviderSheetProps) {
+/**
+ * Startfokus auf dem Namen. Ist der Chunk schon da, öffnet der Dialog erst nach diesem Ref (`autofocus`). Kam er erst
+ * nach dem Öffnen, ist der Ladekasten samt „Schließen“ weg und der Fokus aus dem Dialog gefallen: dann direkt hierher.
+ */
+function focusName(el: HTMLElement | null) {
+  markAutofocus(el);
+  const dialog = el?.closest("dialog");
+  if (el && dialog?.open && !dialog.contains(document.activeElement)) el.focus();
+}
+
+export function ProviderSheet({
+  directory,
+  providerId,
+  offers,
+  visible,
+  ctx,
+  saved,
+  onToggleSaved,
+  onClose,
+}: ProviderSheetProps) {
   const { now } = ctx;
   const provider = useMemo(
     () => findProvider(directory.providers, offers, providerId),
@@ -29,7 +49,24 @@ export function ProviderSheet({ directory, providerId, offers, visible, ctx, onC
     <div className="sheet-body provider-sheet">
       <div className="sheet-scroll">
         <div className="grab" />
-        <h2 lang="de">{provider.name}</h2>
+        {/* Herz wie auf der Kachel (Plan 0025, E2): ein Muster für alles Merkbare, „… merken“ mit aria-pressed */}
+        <div className="sheet-head">
+          {/* Startfokus auf dem Namen, nicht auf dem Herz (wie KidSheet): `showModal()` nimmt sonst das erste Bedienelement */}
+          <h2 lang="de" ref={focusName} tabIndex={-1}>
+            {provider.name}
+          </h2>
+          <button
+            type="button"
+            className="heart inline"
+            aria-pressed={saved}
+            aria-label={`${provider.name} merken`}
+            onClick={() => onToggleSaved(provider.id)}
+          >
+            <span className="hs">
+              <Icon name="heart" size={20} />
+            </span>
+          </button>
+        </div>
         {categories.length > 0 && (
           <p className="provider-cats">{categories.map((c) => CATEGORY_LABELS[c]).join(" · ")}</p>
         )}

@@ -1,7 +1,8 @@
 # Plan 0025 – Merkliste als Planungszentrale: Anbieter merken, Karte, Kalender, Filter
 
-Status: freigegeben (Review eingearbeitet, Nutzerentscheide getroffen)
+Status: in Umsetzung (Etappe 1; Nachtrag aus dem Mockup vom 2026-10-08, Review eingearbeitet)
 Datum: 2026-10-08
+Mockup: https://claude.ai/artifact/QMwK1e16a2GQPKbVtMwMx9 (Design-Canvas, Stand „Feedback 2“, vom Nutzer am 2026-10-08 freigegeben)
 Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
 Abhängigkeiten: **alle erfüllt**, seit `main` `d5fab1b` (Plan 0022–0024 umgesetzt; geprüft am 2026-10-08, Abschnitt „Abgleich mit `main`“). Der Plan ist gegen diesen Stand geschrieben.
 - **Plan 0022** (`docs/plans/archiv/0022-feedback-kleinigkeiten.md`): „Sticker/Stickerheft“ ist aus der UI verschwunden. Die Merkliste heißt „Meine Merkliste“ (`SavedView.tsx:92`), der Leerzustand „Noch nichts gemerkt“ (`:94`), die Toasts „Gemerkt – liegt jetzt auf deiner Merkliste“ und „Nicht mehr gemerkt“ (`App.tsx:162`).
@@ -29,11 +30,18 @@ Verbindliche Nutzerentscheidungen (2026-10-08):
 - **a)** Der eigene Tab „Kalender“ entfällt. Die Merkliste bekommt wie „Entdecken“ einen Umschalter **Liste | Karte | Kalender**. Alle Angebote nach Datum durchsuchen geht künftig über den Zeitraumfilter (Plan 0023).
 - **b)** „Beginn ab“ ist kein eigener Regler. Es nutzt dieselbe Zeitraumlogik wie die Startseite, ergänzt um Schnellwahlen „ab nächstem Monat“, „in 2 Monaten“, „in 3 Monaten“ (die Daten reichen ca. 4 Monate). Nach dem Review (Simplicity) gibt es auf der Merkliste **nur** diese Schnellwahlen, direkt als Chips. Die freie Datumseingabe bleibt der Startseite vorbehalten (E7).
 
+Nutzerentscheidungen aus dem Mockup (Feedback 1 und 2, 2026-10-08):
+
+- **c)** Die drei Tabs heißen **Angebote · Anbieter · Merkliste**. „Entdecken“ wird zu „Angebote“ (E8). Wo der Plan „Entdecken“ schreibt, meint er diesen Tab; der Routenwert bleibt `entdecken`.
+- **d)** Gemerkte Anbieter stehen **oben im Tab „Anbieter“**, nicht auf der Merkliste. Das Suchfeld steht ganz oben, gemerkte Anbieter tauchen darunter nicht noch einmal auf, und jede Zeile hat ein Herz zum Merken (E3).
+- **e)** Auf der Merkliste geht der Umschalter über die ganze Breite. Statt „5 gemerkt“ und der Export-Zeile gibt es eine Zeile „5 Angebote mit insgesamt 28 Terminen gemerkt“, daneben ein kompakter Export-Knopf nur mit Icon (E3a, E9).
+
 Die Merkliste wird damit vom Sammelkorb zur Planungszentrale:
 - was ich vorhabe (gemerkte Angebote),
 - wo es ist (Karte),
-- wann es ist (Kalender als Wochenplaner),
-- bei wem ich weitersuchen will (gemerkte Anbieter).
+- wann es ist (Kalender als Wochenplaner).
+
+Bei wem ich weitersuchen will (gemerkte Anbieter), steht oben im Tab „Anbieter“.
 
 UX-Leitlinien:
 
@@ -51,8 +59,7 @@ UX-Leitlinien:
 - **Keine Schnellwahlen auf der Startseite** durch diesen Plan. Ob das Filter-Sheet der Startseite sie bekommt, entscheidet Plan 0023 bzw. ein Folgeplan.
 - **Der Altersfilter gilt auf der Merkliste weiterhin nicht** (Plan 0021, Nicht-Ziele). Unpassende gemerkte Angebote bleiben markiert sichtbar, auch im Kalender.
 - **Der Merklisten-ICS-Export bleibt, wie er ist** (ADR 0007, ADR 0018). Er nimmt alle gemerkten Angebote, unabhängig vom Merklisten-Filter (E9; Alternative in N3).
-- **Keine Angebote gemerkter Anbieter in Liste, Karte oder Kalender der Merkliste.** Gemerkte Anbieter sind eine Adressliste (E3). Die Erweiterung steht in `docs/ideas.md` (N1).
-- **Kein Herz in der Anbieterliste** (Tab „Anbieter“) und keine Sortierung „gemerkte zuerst“. Gemerkt wird im Anbieter-Sheet (E2).
+- **Keine Angebote gemerkter Anbieter in Liste, Karte oder Kalender der Merkliste**, und die Merkliste zeigt keine Anbieter. Gemerkte Anbieter sind eine Adressliste oben im Tab „Anbieter“ (E3). Die Erweiterung steht in `docs/ideas.md` (N1).
 - **Keine Benachrichtigung über neue Angebote gemerkter Anbieter** (Wochen-Push, Plan 0017).
 - **Merklisten-Filter stehen nicht in der URL** und überstehen kein Neuladen (E6).
 - **Keine rollende Kalenderwoche** (`docs/ideas.md`, Befund H2): Die Woche bleibt Mo–So.
@@ -124,6 +131,10 @@ Stand `main` `d5fab1b` (nach Plan 0022–0024).
 - `src/ui/map/MapView.tsx:44–52`: `lastCamera` gilt für die ganze Sitzung und wird nie gespeichert.
 
 **Anbieter**
+- Tab „Anbieter“ in `src/ui/App.tsx`: oben Sticker und Schnellfilter, dann die Statuszeile „5 Anbieter mit 8 Angeboten“ (`countProviders`), dann `ProviderScreen` (Lazy-Chunk) über `ProviderPanel`. Der Suchtext `providerQuery` lebt in `App.tsx` (Plan 0010, E5).
+- `src/ui/anbieter/ProviderScreen.tsx` rendert das Suchfeld `.provider-search` (Label, Eingabe, Live-Region „12 Anbieter“ nach 500 ms) und darunter die Zeilen. Jede Zeile ist ein `li` mit **einem** Knopf `button.place` über die ganze Breite (Name fett, darunter `providerLine` bzw. `idleLine` aus `provider-format.ts`).
+- `src/domain/directory.ts:85` `providerRows({ providers, visible, upcoming, reachOf, byReach, query })` liefert `{ active, hiddenCount, idle }`. Zustand je Anbieter: `aktiv` (sichtbares Angebot), `ausgeblendet` (kommend, aber gefiltert), `ohne-termine`. Rückfall-Einträge aus den Angeboten, wenn der Katalog einen Anbieter nicht kennt.
+- Die Stile `.provider-search`, `.place.idle` usw. stehen in `src/ui/styles/anbieter.css` und damit im Start-CSS.
 - `src/ui/anbieter/ProviderSheet.tsx` (Lazy-Chunk `anbieter/`) zeigt Name, Kategorien, „Website & Programm“, Orte und kommende Angebote. Props `ProviderSheetProps` stehen in `src/ui/provider-types.ts:37–48`. Den Dialog rendert `Overlays.tsx` immer, mit `toast`.
 - `src/domain/site-data.ts:8–11`: Jedes `SiteOffer` trägt `providerId` und `providerName`.
 - Den Katalog (`anbieter.json`) lädt nur `src/data/providers.ts`, und nur mit Tab oder Sheet „Anbieter“. Das ist eine Invariante in `docs/architecture.md:103`, belegt per E2E in `e2e/anbieter.spec.ts` (Privatsphäre).
@@ -169,29 +180,23 @@ Stand `main` `d5fab1b` (nach Plan 0022–0024).
 ### E1 – Speicher für gemerkte Anbieter
 
 - Neuer Schlüssel in `src/data/preferences.ts`: `KEYS.savedProviders = "zwergenplan.anbieter-merkliste"`.
-- Wert: JSON-Array von `{ "id": string, "name": string }` in der Reihenfolge des Merkens.
-- Der Name ist ein Schnappschuss beim Merken. Er wird gebraucht, wenn ein Anbieter gerade keine kommenden Angebote hat. Dann kennt `site.json` ihn nicht, und `anbieter.json` darf die Merkliste nicht laden (Invariante „`anbieter.json` nur mit Tab bzw. Sheet“).
-  - Verworfen: nur IDs speichern und den Namen aus `anbieter.json` holen. Das wäre ein Request, der verrät, dass jemand Anbieter gemerkt hat. Er bräche die Invariante.
-  - Verworfen: nur IDs und ohne kommende Angebote die ID als Namen zeigen (`familientreff-beispiel`). Das ist unlesbar.
+- Wert: JSON-Array von Anbieter-IDs in der Reihenfolge des Merkens, genau wie `zwergenplan.merkliste`.
+- **Nur IDs, kein Name** (Nachtrag Mockup, Entscheidung d). Gemerkte Anbieter erscheinen nur im Tab „Anbieter“ und im Anbieter-Sheet. Dort ist `anbieter.json` ohnehin geladen, Namen und Orte kommen aus dem Katalog bzw. aus dem Rückfall-Eintrag (`directory.ts`).
+  - Der frühere Namens-Schnappschuss war nur nötig, solange die Merkliste die Anbieter ohne `anbieter.json` zeigen sollte. Er entfällt.
+  - Eine gemerkte ID, die weder der Katalog noch ein Angebot kennt, hat keine Zeile. Sie bleibt im Speicher und erscheint wieder, sobald der Anbieter zurück ist (wie `savedOffers`, nie automatisch löschen).
 - **Aufteilung nach ADR 0010** (Review B1):
-  - `src/data/preferences.ts` liefert nur die **Rohform**. `loadSavedProviders(): { id: string; name: string }[]` prüft wie `loadSaved` nur JSON und Typen: Array, je Eintrag `id` und `name` als String. Einträge mit anderer Form fallen weg, kaputtes JSON ergibt `[]`. Ein Laufzeit-Import aus `src/domain` gibt es dort nicht.
-  - `saveSavedProviders(list)` baut jeden Eintrag neu (nur `id`, `name`). Bei leerer Liste entfernt es den Schlüssel.
+  - `src/data/preferences.ts` liefert nur die **Rohform**: `loadSavedProviders(): string[]` prüft wie `loadSaved` nur JSON und Typen (Array, nur Strings), kaputtes JSON ergibt `[]`. Ein Laufzeit-Import aus `src/domain` gibt es dort nicht.
+  - `saveSavedProviders(ids)` speichert wie `saveSaved`. Bei leerer Liste entfernt es den Schlüssel.
   - Die inhaltliche Prüfung ist eine reine Funktion in `src/domain/saved.ts`:
     ```ts
     /** Gemerkte Anbieter aus dem Speicher bereinigen (Plan 0025, E1): gültige ID, höchstens MAX_PROVIDER_ID, keine Dubletten. */
-    export function cleanSavedProviders(raw: readonly { id: string; name: string }[]): SavedProvider[];
+    export function cleanSavedProviders(raw: readonly string[]): string[];
     ```
     Sie prüft die ID gegen `KEBAB_ID_PATTERN` und `MAX_PROVIDER_ID`. Bei Dubletten gilt der erste Eintrag.
   - `useSavedProviders()` ruft `cleanSavedProviders(loadSavedProviders())` im Initializer auf, wie `useOrigin` die Rohwerte aus `preferences.ts` prüft (ADR 0017, Punkt 5).
   - `MAX_PROVIDER_ID` zieht von `src/domain/route.ts:9` nach `src/domain/ids.ts` und wird von dort exportiert. `route.ts` importiert ihn.
-- `SavedProvider` ist ein Typ in `src/domain/saved.ts` (`{ id: string; name: string }`).
-- Weitere reine Logik in `src/domain/saved.ts`:
-  - `toggleProvider(list, entry): SavedProvider[]` entfernt per ID oder hängt an.
-  - `savedProviderRows(list, offers, now): SavedProviderRow[]` liefert `{ id, name, upcoming: number, next?: Session }`.
-    - `name` kommt aus dem ersten kommenden Angebot (`providerName`, aktueller Datenstand), sonst aus dem Schnappschuss.
-    - `upcoming` zählt die kommenden Angebote des Anbieters (`nextSession !== undefined`).
-    - Sortiert nach Name (`localeCompare(…, "de")`).
-- Hook `useSavedProviders()` in `src/ui/use-app-state.ts`, gebaut wie `useSaved()`. Er liefert `[list, toggle]`, und `toggle(entry)` meldet, ob danach gemerkt.
+- Merken und Entfernen nutzt das bestehende `toggleId` aus `saved.ts`.
+- Hook `useSavedProviders()` in `src/ui/use-app-state.ts`, gebaut wie `useSaved()`. Er liefert `[ids, toggle]`, und `toggle(id)` meldet, ob danach gemerkt.
 - **Privatsphäre**: Der Abschnitt „Privatsphäre“ in `docs/architecture.md` wird ergänzt.
   - Gemerkte Anbieter bleiben im `localStorage`. Sie stehen nie in URL, Logs, Requests oder IndexedDB.
   - Der Push (ADR 0014) liest sie nicht.
@@ -205,37 +210,63 @@ Stand `main` `d5fab1b` (nach Plan 0022–0024).
   - Icon (`heart`), Animation (`slap`) und Klasse sind dieselben wie auf der Kachel. Touch-Ziel (≥ 44 px), Fokusring und reduzierte Bewegung sind damit schon geprüft.
   - Der Kopf ist eine Flex-Zeile. Links steht der Name (`flex: 1`, darf umbrechen, `hyphens: auto`), rechts oben das Herz (`align-self: start`).
   - Der Name des Knopfs folgt dem Muster der Kachel („… merken“ mit `aria-pressed`), nicht „Anbieter merken/entfernen“. So gibt es ein Muster für alles Merkbare.
-- Toasts im Dialog (`toast` aus `Overlays.tsx`), nach dem Muster aus Plan 0022 (`App.tsx:162`): „Anbieter gemerkt – liegt jetzt auf deiner Merkliste“ bzw. „Anbieter nicht mehr gemerkt“.
-- `ProviderSheetProps` (`src/ui/provider-types.ts`) bekommt `saved: boolean` und `onToggleSaved: (entry: SavedProvider) => void`.
+- Toasts nach dem Muster aus Plan 0022 (`App.tsx:162`), im Sheet über `toast` aus `Overlays.tsx`, in der Liste über `say`: „Anbieter gemerkt – steht jetzt oben im Tab „Anbieter““ bzw. „Anbieter nicht mehr gemerkt“. Derselbe Text für Sheet und Liste, denn das Sheet lässt sich auch aus „Angebote“ öffnen.
+- `ProviderSheetProps` (`src/ui/provider-types.ts`) bekommt `saved: boolean` und `onToggleSaved: (providerId: string) => void`.
   - `Overlays.tsx` reicht beides durch, `App.tsx` baut es aus `useSavedProviders()`.
-  - Der Name im Eintrag ist `provider.name` (Katalog bzw. Rückfall-Zeile, `findProvider`).
-- Der Ladezustand des Sheets (`ProviderSheetLoader`, noch ohne Chunk) zeigt kein Herz. Gemerkt werden kann erst, wenn der Name feststeht.
+- Der Ladezustand des Sheets (`ProviderSheetLoader`, noch ohne Chunk) zeigt kein Herz. Gemerkt werden kann erst, wenn der Anbieter feststeht.
 
-### E3 – Merkliste: Aufbau und Abschnitt „Gemerkte Anbieter“
+### E3 – Tab „Anbieter“: Suche oben, gemerkte Anbieter, Herz in jeder Zeile (Nachtrag Mockup, Entscheidung d)
 
 Aufbau von oben nach unten:
 
+1. Sticker und Schnellfilter wie heute.
+2. **Suchfeld** `.provider-search` (Label „Anbieter suchen“, Eingabe). Es zieht aus `ProviderScreen` nach `App.tsx` und steht **über** der Statuszeile. `providerQuery` lebt dort schon. Die neue kleine Komponente `src/ui/ProviderSearch.tsx` (Start) übernimmt Label und Eingabe aus `ProviderScreen`, die Stile stehen schon im Start-CSS (`anbieter.css`).
+   - Vor dem Laden des Chunks ist das Feld schon da und nimmt Text an. Das ist unkritisch, denn der Suchtext ist bereits Start-Zustand.
+   - Es steht im Tab „Anbieter“ auch, solange `site.json` lädt, damit die Statuszeile danach nicht springt; im Fehlerfall nicht.
+   - Die Live-Region „12 Anbieter“ (`useSettled`, 500 ms) bleibt im Chunk, als `p.sr-only.provider-announce[aria-live]` oben in `ProviderScreen`. Sichtbar stünde „1 Anbieter“ verwirrend unter „5 Anbieter mit 8 Angeboten“ (Review Nachtrag, Minor). Sie zählt jetzt gemerkte und weitere Treffer zusammen.
+3. Statuszeile wie heute: „**6** Anbieter mit **11** Angeboten“. Sie zählt alle aktiven Anbieter, gemerkte eingeschlossen (`countProviders`, unverändert).
+4. Abschnitt **„Gemerkte Anbieter“**: `h2` (Stil `.places h2` wie die Orts-Liste), darunter `ul.provider-saved` mit den Zeilen. Nur wenn mindestens ein gemerkter Anbieter eine Zeile hat (Suche eingerechnet).
+5. **„Weitere Anbieter“**: `h2`, nur wenn es den Abschnitt „Gemerkte Anbieter“ gibt und darunter noch eine Zeile oder der Hinweis auf ausgeblendete steht. Darunter die heutige Liste (aktive Zeilen, Hinweis auf ausgeblendete, blasse Zeilen), **ohne** die gemerkten.
+
+**Zeilen** (`directory.ts`, reine Logik):
+- `providerRows` bekommt die Eingabe `saved: readonly string[]` und liefert zusätzlich `saved: ProviderRow[]`.
+  - Gemerkte Anbieter werden **vor** der Einteilung in aktiv, ausgeblendet und ohne Termine herausgenommen. `active`, `hiddenCount` und `idle` enthalten sie nie.
+  - `saved` enthält jeden gemerkten Anbieter mit Eintrag (Katalog oder Rückfall), der zur Suche passt, nach Name sortiert (`byName`). Eine Adressliste, deshalb nicht nach Wegzeit.
+  - Der Zustand je Zeile bleibt (`aktiv`, `ausgeblendet`, `ohne-termine`). Der Startseiten-Filter blendet einen gemerkten Anbieter also nicht aus, er macht seine Zeile blass („1 Angebot, passt nicht zur Auswahl“, `idleLine`). Der Text der zweiten Zeile ist derselbe wie in der übrigen Liste (`providerLine` bzw. `idleLine`).
+  - Ohne Suchtext gilt weiter: `active.length` plus die aktiven unter `saved` ergibt die Zahl der Statuszeile.
+- Leerzustände wie heute, aber über **alle** Zeilen gerechnet und **über beiden Abschnitten** (Review Nachtrag M2), damit sie auch blasse gemerkte Zeilen erklären: „Kein Anbieter heißt so.“ nur, wenn weder ein gemerkter noch ein weiterer Anbieter passt; `NoOffers` nur, wenn es auch unter den gemerkten keine aktive Zeile gibt. Der Hinweis „3 weitere Anbieter haben gerade nichts Passendes.“ steht, sobald es irgendeine aktive Zeile gibt, auch wenn sie nur unter den gemerkten steht.
+- Mit `reachMode.kind === "laedt"` zeigt der Tab wie heute nur `ListPending`, auch für den Abschnitt der gemerkten.
+
+**Herz in jeder Zeile**
+- Jede Zeile wird ein `li.provider-row` (Flex) mit zwei Knöpfen: links `button.place` wie heute (öffnet das Sheet), rechts `button.heart.inline` mit `aria-pressed` und `aria-label={`${name} merken`}`, wie im Sheet (E2). Das Herz ist ≥ 44 px und gehört nicht zum Sheet-Knopf.
+- Ein Tipp merkt bzw. entfernt sofort (`onToggleProvider(id)` aus `App.tsx`, Toast nach E2). Die Zeile wandert in den anderen Abschnitt.
+- **Fokus** (Muster aus Plan 0021, E3: erst fokussieren, dann ändern; Review Nachtrag M3): Vor dem Umschalten geht der Fokus auf das nächste Herz desselben Abschnitts in DOM-Reihenfolge (über aktive und blasse Zeilen hinweg), sonst das vorige. Bleibt im Abschnitt keins, geht er auf `section.providers` (`tabIndex={-1}`). So springt die Seite beim Merken mehrerer Anbieter nicht nach oben.
+  - Beide Abschnitte sind als `div.provider-group` **immer** gerendert, nur die Überschriften sind bedingt. Sonst hängte React beim ersten Merken Listen neu ein, und der Fokus fiele auf `<body>`.
+  - Den Zustandswechsel meldet der Toast (WCAG 4.1.3). Der neue Fokus ist das nächste Element derselben Liste (WCAG 2.4.3, 3.2.2).
+  - **Fokus nicht verdeckt** (WCAG 2.4.11): `html { scroll-padding-bottom }` mit denselben Werten wie `.app { padding-bottom }` (Hochformat `base.css`, Querformat und kompakt `tabs.css`), damit ein fokussiertes Herz nie unter der festen Tab-Leiste liegt.
+- `ProviderScreenProps` bekommt `saved: readonly string[]` und `onToggleSaved: (providerId: string) => void`.
+
+**Privatsphäre**
+- Der Start liest die gemerkten IDs, gibt sie aber nur an Chunk und Sheet. Sie ändern keinen Request: Tab „Anbieter“ und Sheet laden `anbieter.json` wie heute, mit oder ohne Gemerktes (E2E, Test 9).
+
+**Merkliste und Badge**
+- Die Merkliste zeigt keine Anbieter. Das Badge der Tab-Leiste zählt wie heute nur gemerkte Angebote mit kommendem Termin.
+
+### E3a – Merkliste: Aufbau (Nachtrag Mockup, Entscheidung e)
+
+Von oben nach unten:
+
 1. `h2.ptitle` „Meine Merkliste“ (Plan 0022).
-2. **Statuszeile** wie auf den anderen Tabs: `.status-row` mit `p.status[role=status][tabIndex=-1]`, rechts der Umschalter Liste | Karte | Kalender (E4).
-   - Text: „**5** gemerkt“, mit gemerkten Anbietern „**5** gemerkt · **2** Anbieter“.
-   - Bei aktivem Merklisten-Filter zählt die erste Zahl die sichtbaren gemerkten Angebote: „**2** von 5 gemerkt“. In der Darstellung Kalender zählt der Zeitraum nicht mit (`useRange: false`, E6).
-   - Die Statuszeile hat keinen Wegzeit-Zusatz, weil die Merkliste keine Wegzeit-Grenze kennt, und kein `pwaNote` (wie heute).
+2. **Umschalter** Liste | Karte | Kalender über die ganze Breite, als eigene Zeile direkt unter der Überschrift (E4).
 3. **Filterzeile** (E6), horizontal scrollend wie die Schnellfilter.
-4. Nur in der Darstellung **Liste**: der Knopf „Alle in den Kalender“ und die Zeile darunter (E9).
+4. **Statuszeile** `.status-row` mit `p.status[role=status][tabIndex=-1]`, rechts daneben nur in der Darstellung Liste der runde Export-Knopf (E9). Texte (neu in `format.ts`, `savedStatusParts`, fette Zahlen wie `statusParts`):
+   - Liste und Kalender ohne Filter: „**5** Angebote mit insgesamt **28** Terminen gemerkt“. Die Terminzahl zählt die **kommenden** Termine (`upcomingSessions`), wie der Kalender sie zeigt (Review Nachtrag, Minor). Der Export nimmt bei Kursen weiter auch vergangene Kurstermine (ADR 0007); der Knopf nennt keine Zahl, also widerspricht sich nichts. Singular: „**1** Angebot mit insgesamt **1** Termin gemerkt“.
+   - Mit aktivem Merklisten-Filter: „**2** von 5 gemerkten Angeboten passen“, Singular „**1** von 5 gemerkten Angeboten passt“. Im Kalender zählt der Zeitraum nicht mit (`useRange: false`, E6).
+   - Karte: „**5** Angebote an **5** Orten gemerkt“, mit Filter „**2** von 5 gemerkten Angeboten an **2** Orten“ (`savedMapStatusParts`).
+   - Kein Wegzeit-Zusatz (die Merkliste kennt keine Wegzeit-Grenze) und kein `pwaNote`, wie heute.
 5. Gemerkte Angebote (gefiltert), je eine `OfferCard` mit Datum. Ohne Zeitraum gilt der nächste Termin (wie heute). Mit Zeitraum gilt der maßgebliche Termin im Zeitraum (`rangeSession`, `date-range.ts:70`), und danach wird sortiert.
-6. Abschnitt **„Gemerkte Anbieter“** als `h3` mit `tabIndex={-1}`, nur wenn mindestens ein Anbieter gemerkt ist und nur in der Darstellung Liste.
-   - Er steht **unter** den Angeboten. Die Angebote sind das, was man plant. Die Anbieter sind der Ort zum Weitersuchen.
 
-Zeile je gemerktem Anbieter (`savedProviderRows`), als Liste `ul.saved-providers`:
-
-- Ein Knopf über die ganze Zeile außer dem Herz.
-  - Er zeigt den Namen (fett) und darunter „3 kommende Angebote · nächster Mi 7.10.“ bzw. „Gerade keine Termine im Zwergenplan“. Die Zeile ist dann blass wie „ohne Termine“ im Tab „Anbieter“ (`anbieter.css`).
-  - Ein Tipp öffnet das Anbieter-Sheet (`openProvider(id)`, `anbieter=<id>` in der URL wie überall). Erst **dieser Tipp** lädt Chunk und `anbieter.json`. Das ist zulässig, denn es ist das Sheet „Anbieter“.
-- Rechts das Herz (`aria-pressed="true"`, „{Name} merken“). Ein Tipp entfernt den Anbieter sofort, mit dem Toast „Anbieter nicht mehr gemerkt“.
-  - Der Fokus geht vorher auf die Überschrift „Gemerkte Anbieter“. Verschwindet der Abschnitt mit dem letzten Anbieter, geht er auf die Statuszeile. Das Muster stammt aus Plan 0021, E3: erst fokussieren, dann entfernen.
-- Unbekannte ID beim Öffnen (Anbieter nicht mehr im Katalog und ohne Angebote): Das Sheet entfernt `anbieter=` wie heute (`onUnknown`, Plan 0010, E3). Die Zeile bleibt, bis man das Herz tippt. Ihr Text sagt schon „Gerade keine Termine im Zwergenplan“.
-- Die Merklisten-Filter wirken auf den Anbieter-Abschnitt **nicht**. Er ist eine Adressliste, keine Terminliste, und „3 kommende Angebote“ zählt ungefiltert.
-- Das Badge der Tab-Leiste zählt wie heute nur gemerkte Angebote mit kommendem Termin. Das Badge steht für das, was geplant ist und in den Kalender geht; Anbieter sind keine Termine.
+Die heutige Zeile „N gemerkt · M Termine in einer .ics-Datei · Kurse immer komplett“ und der breite Knopf „Alle in den Kalender“ entfallen (Entscheidung e).
 
 ### E4 – Umschalter Liste | Karte | Kalender
 
@@ -264,10 +295,11 @@ Zeile je gemerktem Anbieter (`savedProviderRows`), als Liste `ul.saved-providers
 - Die Klasse bleibt `seg`, **nicht** `seg3`. `.seg3` gehört dem Darstellungs-Umschalter im Kind-Sheet, mit Umbruch und einspaltiger Container-Query.
 - Das Element setzt `style={{ "--n": options.length }}` und den Daumen per `translateX(${index * 100}%)`.
 - `map.css:33–38`: Die Daumenbreite wird `calc(100% / var(--n, 2))` statt `50%`.
-- Neue Klasse `.view-toggle.three` (in `map.css` neben `.view-toggle`, weil der Umschalter dort schon steht):
-  - `flex: 0 1 16rem; min-width: 13.5rem`, sonst würde der Deckel `12rem` die drei Wörter quetschen,
+- **Auf der Merkliste steht der Umschalter allein über die ganze Breite** (Entscheidung e), direkt unter „Meine Merkliste“ und nicht in der Statuszeile. Neue Klasse `.view-toggle.full` (in `map.css` neben `.view-toggle`, weil der Umschalter dort schon steht):
+  - `flex: none; width: 100%; min-width: 0` statt des Deckels `0 1 12rem`,
   - `.seg-btn { white-space: nowrap }`, „Kalender“ bricht nie.
-  - Reicht die Zeile nicht, bricht der ganze Umschalter unter die Statuszeile, wie heute (Plan 0005, E5). Das Layout-Gate prüft 320 px bei 200 % (Test 15).
+  - **Schmal einspaltig** (Review Nachtrag B1): Bei 320 px und 200 % bleiben je Segment etwa 84 px, „Kalender“ braucht in 32 px gut 120 px. `.view-toggle.full` bekommt deshalb `container: seg-full / inline-size` und unter `19rem` dasselbe Muster wie `.seg3` (`chrome.css:332–349`): eine Spalte, kein Daumen, der gewählte Knopf trägt die Fläche selbst (`--surface`, Rahmen, Schatten). Test 15 prüft 320 px bei 100 % (drei Spalten) und 200 % (eine Spalte).
+- In „Angebote“ bleibt der Umschalter Liste | Karte in der Statuszeile wie heute (Plan 0005, E5).
 - Die Legende lautet „Darstellung der Angebote“ bzw. „Darstellung der Merkliste“.
 
 **Karte der Merkliste**
@@ -276,7 +308,7 @@ Zeile je gemerktem Anbieter (`savedProviderRows`), als Liste `ul.saved-providers
   - `cameraOffers` = **alle kommenden Angebote** (`views.map.cameraOffers`, wie „Entdecken“). Der Startausschnitt darf nicht von der Merkliste abhängen, sonst verrieten die Kachel-Requests, wo die gemerkten Angebote liegen (Kamera-Regel, ADR 0008). Das ist keine Abweichung von ADR 0008.
   - `onResetFilter` setzt die Merklisten-Filter zurück. `age` ist `undefined`, weil die Merkliste das Alter ignoriert.
 - Die Karte wird **nur gerendert, wenn mindestens ein gemerktes Angebot zum Filter passt**. Sonst zeigt `SavedView` einen eigenen Leerzustand (E5a), ohne `MapPanel` und damit ohne Kacheln. `NoOffers` in `MapScreen.tsx:111–115` wird auf der Merkliste so nie erreicht.
-- Statuszeile: „**3** gemerkt an **2** Orten“. Der neue Text `savedMapStatusParts` in `format.ts` folgt dem Muster von `mapStatusParts`.
+- Statuszeile: „**5** Angebote an **5** Orten gemerkt“ (E3a). Der neue Text `savedMapStatusParts` in `format.ts` folgt dem Muster von `mapStatusParts`.
 - Orts-Sheet, Orts-Liste und „Kartenmitte als Startpunkt“ funktionieren wie in „Entdecken“. `lastCamera` (Sitzung) teilen sich beide Karten, und das ist gewollt.
 
 **Fokus**
@@ -396,11 +428,11 @@ export function rangeAgenda<T extends Offer>(
 
 | Lage | Liste | Karte | Kalender |
 |---|---|---|---|
-| nichts gemerkt (weder Angebot noch Anbieter) | Leerzustand „Noch nichts gemerkt“ (Plan 0022, `SavedView.tsx:94`) mit „Angebote entdecken“; **keine** Statuszeile, kein Umschalter, keine Filter | wie Liste | wie Liste |
-| nur Anbieter gemerkt, kein Angebot mit kommendem Termin | Hinweis „Noch keine Angebote gemerkt – tipp auf das Herz bei einem Angebot.“, darunter der Abschnitt „Gemerkte Anbieter“ | `EmptyState` „Noch keine Angebote gemerkt“ / „Auf der Karte stehen die Orte deiner gemerkten Angebote.“ mit „Angebote entdecken“; **kein** `MapPanel`, keine Kacheln | `EmptyState` „Noch keine Angebote gemerkt“ / „Hier planst du deine Woche mit den gemerkten Terminen.“ mit „Angebote entdecken“; kein Wochenstreifen |
-| Filter blendet alle gemerkten Angebote aus | `EmptyState` „Nichts, was zu deinem Filter passt“ / „Von deinen 5 gemerkten Angeboten passt keins.“ mit „Filter zurücksetzen“; darunter der Anbieter-Abschnitt | derselbe `EmptyState`, kein `MapPanel` | Kalender bleibt; je Auswahl `RangeEmpty` Fall 1 |
+| kein gemerktes Angebot mit kommendem Termin (gemerkte Anbieter zählen nicht) | Leerzustand „Noch nichts gemerkt“ (Plan 0022, `SavedView.tsx:94`) mit „Angebote entdecken“; **keine** Statuszeile, kein Umschalter, keine Filter | wie Liste | wie Liste |
+| Filter blendet alle gemerkten Angebote aus | `EmptyState` „Nichts, was zu deinem Filter passt“ / „Von deinen 5 gemerkten Angeboten passt keins.“ mit „Filter zurücksetzen“ | derselbe `EmptyState`, kein `MapPanel` | Kalender bleibt; je Auswahl `RangeEmpty` Fall 1 |
 
-- Der Leerzustand ohne Gemerktes gilt auch, wenn die URL auf `merkliste-karte`/`-kalender` steht. Die URL bleibt stehen.
+- Der Leerzustand ohne Gemerktes gilt auch, wenn die URL auf `merkliste-karte`/`-kalender` steht. Die URL bleibt stehen. Ohne gemerktes Angebot gibt es also nie `MapPanel` und keine Kacheln.
+- Der frühere Fall „nur Anbieter gemerkt“ entfällt, denn die Merkliste zeigt keine Anbieter (E3).
 - Neue reine Texte in `format.ts`: `savedFilteredEmpty(total)` („Von deinen 5 gemerkten Angeboten passt keins.“, Singular „Dein gemerktes Angebot passt nicht.“).
 
 ### E6 – Filter auf der Merkliste: eigener Zustand, nicht in der URL
@@ -443,7 +475,7 @@ export function savedFilterCount(filter: SavedFilter, opts: { useRange: boolean 
 - **Wo der Filter wirkt:**
   - Liste und Karte: Format, Anmeldung, Zeitraum.
   - Kalender: Format und Anmeldung (E5).
-  - Anbieter-Abschnitt (E3) und Export (E9): nie.
+  - Export (E9): nie.
 - **Startseiten-Filter auf der Merkliste** wirken nicht, wie heute (E4, Weichen über `section`). Einzige Ausnahme bleibt `ctx.categoryOf`, das die Kategorie-Pille wählt (Plan 0014). Es filtert nichts.
 
 ### E7 – Schnellwahlen „ab …“ als Chips
@@ -467,7 +499,12 @@ export function quickRanges(today: string, dataEnd: string | undefined): Array<{
 
 ### E8 – Tab „Kalender“ entfällt
 
-- `TAB_ITEMS` (`Chrome.tsx:130–136`) wird zu Entdecken · Anbieter · Merkliste. Die Reihenfolge bleibt sonst gleich (Merkliste ganz rechts, Plan 0010, E2).
+- `TAB_ITEMS` (`Chrome.tsx:130–136`) wird zu **Angebote** · Anbieter · Merkliste (Entscheidung c). Die Reihenfolge bleibt sonst gleich (Merkliste ganz rechts, Plan 0010, E2).
+- **„Entdecken“ heißt „Angebote“.** Nur die Beschriftung ändert sich, das Icon `compass` und der Routenwert `entdecken` bleiben (keine URL ändert sich).
+  - Sichtbare Texte, die den Tab beim Namen nennen, werden angepasst (grep „Entdecken“ in `src/ui`, Schritt 0). Verben wie „Angebote entdecken“ oder „Für diese Woche entdecken“ bleiben, sie nennen keinen Tab.
+  - Kommentare im Code dürfen „Entdecken“ behalten, wo sie Pläne zitieren.
+  - E2E: Selektoren auf den Tab-Namen („Entdecken“) in `e2e/anbieter.spec.ts`, `app.spec.ts`, `layout.spec.ts`, `saved.spec.ts`, `karte.spec.ts` und `merkliste-anbieter.spec.ts` werden „Angebote“, mit `exact: true` bzw. `^Angebote` im Tab-Navigator, sonst träfe „Angebote“ auch „… Angebote zeigen“ (`karte.spec.ts:162, 189`).
+  - `scripts/font-fallback.ts:139` bekommt „Angebote“ als Probe; geänderte `size-adjust`-Werte wandern nach `tokens.css`.
 - `styles/tabs.css` wird über eine Variable gesteuert. `.tabs` setzt `--n: 3`, und diese Stellen nutzen sie:
   - `repeat(var(--n), minmax(0, 1fr))` statt `repeat(4, …)` (`:13`),
   - `/ var(--n)` statt `/ 4` (`:49`, `:187`),
@@ -499,27 +536,32 @@ export function quickRanges(today: string, dataEnd: string | undefined): Array<{
   - Die Auswahl trifft `collectionSessions` bzw. nach Plan 0018 `exportSessions`, mit denselben VEVENTs und UIDs.
   - Merklisten-Filter, Kalenderauswahl und gemerkte Anbieter ändern daran nichts. ADR 0007 und ADR 0018 bleiben unverändert.
 - Der Knopf steht **nur in der Darstellung Liste** (Simplicity). Karte und Kalender bleiben ruhig. Wer exportieren will, ist mit einem Tipp in der Liste.
-- Ist ein Merklisten-Filter aktiv, sagt die Zeile darunter ausdrücklich „alle 5 gemerkten, auch ausgeblendete“. Sonst könnte man annehmen, nur die sichtbaren gingen in den Kalender. Die Begriffe folgen Plan 0022 (heute `SavedView.tsx:108–110`, „N gemerkt · …“). Der neue reine Text ist `exportNote(savedCount, sessionCount, filtered: boolean)` in `format.ts`.
+- **Kompakter Knopf** (Entscheidung e): rund, 48 px, nur Icon (`calendarPlus` aus `icons.tsx`, wie heute im breiten Knopf), rechts neben der Statuszeile (E3a). Der breite Knopf und die Zeile „… · Kurse immer komplett“ entfallen.
+  - Zugänglicher Name und `title`: „Alle in den Kalender“. Ist ein Merklisten-Filter aktiv: „Alle 5 gemerkten in den Kalender, auch ausgeblendete“. So weiß auch ein Screenreader, dass der Filter nicht wirkt. Der neue reine Text ist `exportLabel(savedCount, filtered: boolean)` in `format.ts`.
+  - Sichtbar steht der Hinweis „auch ausgeblendete“ nur im Tooltip. Der Nutzer hat das so freigegeben (Mockup, Abwägung im Chat am 2026-10-08).
+  - Der Toast nach dem Export bleibt wie heute.
 - Der Lader des Export-Chunks bleibt in `SavedView.tsx` (`LAZY_LOADERS`, `ics-entry-only`). Ist Plan 0018 vorher umgesetzt, liegt er in `src/ui/ics-export.ts`, und `SavedView` importiert ihn von dort. In beiden Fällen gibt es keinen neuen Lader.
 
 ### E10 – Mobile-UX und Barrierefreiheit
 
 - Neue Ansichten und Overlays bekommen `expectMobileUx`, hell und dunkel (`docs/architecture.md:128`):
-  - Merkliste als Liste, mit Filtern und Anbietern,
+  - Merkliste als Liste, mit Filtern,
+  - Tab „Anbieter“ mit gemerkten Anbietern,
   - Karte,
   - Kalender in der Woche,
   - Kalender im Monat mit gewähltem Tag,
   - Anbieter-Sheet mit gemerktem Herz,
   - Leerzustände.
-- Touch-Ziele ≥ 44 px: das Herz im Anbieter-Sheet und in der Anbieterzeile, die Titelknöpfe von Woche und Monat, die Chips und die drei Segmente des Umschalters bei 320 px.
+- Touch-Ziele ≥ 44 px: das Herz im Anbieter-Sheet und in jeder Zeile im Tab „Anbieter“, der Export-Knopf, die Titelknöpfe von Woche und Monat, die Chips und die drei Segmente des Umschalters bei 320 px.
 - Text passt:
   - Der Anbietername neben dem Herz bricht um (`hyphens: auto`, kein Bruch mitten in kurzen Wörtern).
-  - Die Segmente „Liste“, „Karte“ und „Kalender“ bleiben einzeilig (`nowrap`, E4). Zu eng heißt: Der Umschalter bricht als Ganzes in die nächste Zeile.
-  - Die Statuszeile „**2** von 5 gemerkt · **2** Anbieter“ passt bei 320 px/200 %.
+  - Die Segmente „Liste“, „Karte“ und „Kalender“ bleiben einzeilig (`nowrap`, E4). Zu eng heißt: Der Umschalter wird einspaltig (Container-Query, E4).
+  - Die Statuszeile „**5** Angebote mit insgesamt **28** Terminen gemerkt“ bricht neben dem Export-Knopf um und passt bei 320 px/200 %.
+  - Der Anbietername neben dem Herz in der Zeile bricht um wie im Sheet.
 - Dunkelmodus: Ein gewählter Wochen- oder Monatstitel nutzt `--sel`/`--on-sel`, ohne helle Inseln.
 - Reduzierte Bewegung: Der Daumen des dreiteiligen Umschalters hat keine Transition (über `motion.css`, wie der zweiteilige). `scrollIntoView` ist ohne `smooth` (E5).
 - Screenreader:
-  - Die Statuszeile ist die Live-Region und meldet nach einem Filterwechsel „2 von 5 gemerkt“.
+  - Die Statuszeile ist die Live-Region und meldet nach einem Filterwechsel „2 von 5 gemerkten Angeboten passen“.
   - Die Titelknöpfe haben `aria-pressed`, der sichtbare Text steht am Anfang des Namens (E5).
   - `h2.daylabel` bildet die Auswahl ab und sagt die Zahl an; `h3` je Tag.
 
@@ -527,7 +569,7 @@ export function quickRanges(today: string, dataEnd: string | undefined): Array<{
 
 - Die Merkliste bleibt im Start-Bundle.
   - Der Kalender-Code zieht nur um (`CalendarView` → `SavedCalendar`), und der Entdecken-Kalender in `use-offer-views.ts` fällt weg.
-  - Dazu kommen Anbieter-Abschnitt, Filterzeile, Auswahl-Logik und Texte.
+  - Dazu kommen Suchfeld (zieht aus dem Chunk in den Start), Statuszeile mit Export-Knopf, Filterzeile, Auswahl-Logik und Texte. Die Anbieter-Abschnitte liegen im Lazy-Chunk.
   - Schätzung: +1,0 bis +1,5 kB gzip über alle Etappen. Ohne Zeitraum-Sheet ist das weniger als im Entwurf.
 - Jede Etappe misst `JS (initial)` und trägt ihr Delta in die Tabelle von ADR 0012 ein („Nachtrag 2026-10-06: Budget 100 kB“).
 - **Entscheidungspunkt:** Liegt die Summe aller Etappen über +2,5 kB, entscheidet der Nutzer vor dem Merge der nächsten Etappe (N5).
@@ -545,6 +587,7 @@ export function quickRanges(today: string, dataEnd: string | undefined): Array<{
 | 0013 Service Worker | nein | keine neue Route, kein neuer Start-Chunk |
 | 0014 Push | nein | liest gemerkte Anbieter nicht |
 | 0018 ICS altersgerecht | ja, Export | unverändert |
+| 0020 Teilen per Link | ja, Plan 0026 Stufe 2 | Gemerkte Anbieter bleiben nur IDs im `localStorage`; das Fragment von Stufe 2 bleibt möglich, braucht für Namen aber `anbieter.json` (Vermerk in Plan 0026) |
 | 0019 Statuszeile nur Startpunkt | ja, Statuszeile der Merkliste | Die Merkliste hat eine eigene Statuszeile mit Zahlen und ohne Startpunkt (E3). Die anderen Statuszeilen bleiben wie in ADR 0019; keine Abweichung |
 
 **Ergebnis: kein neues ADR.** Geändert werden Regeln in `docs/architecture.md`: Tab-Leiste mit drei Spalten, Privatsphäre um gemerkte Anbieter ergänzt, Wegzeit-Platzhalter nur noch für die Liste, Karte der Merkliste als Wegzeit-Anlass. Pläne bekommen Vermerke (E13). Kommt es zum Lazy-Chunk (E11), wird das ein ADR.
@@ -553,11 +596,10 @@ export function quickRanges(today: string, dataEnd: string | undefined): Array<{
 
 - `docs/architecture.md`: wie in E12, dazu im Datenfluss-Block „wegzeit.json nur auf Anlass (Kind-Sheet, Karte **auch auf der Merkliste**, …)“.
 - `docs/ideas.md`:
-  - entfallen, weil umgesetzt: „Anbieter merken oder ‚folgen‘“ (`:61`), „Merkliste ‚Beginn ab‘“ (`:69`) und „Karte im Kalender oder in der Merkliste“ (`:46`),
+  - entfallen, weil umgesetzt: „Anbieter merken oder ‚folgen‘“ (`:61`, samt Herz in der Anbieterliste), „Merkliste ‚Beginn ab‘“ (`:69`) und „Karte im Kalender oder in der Merkliste“ (`:46`),
   - „Kalender und Merkliste als Lazy-Chunks“ (`:59`) wird zu „Merkliste als Lazy-Chunk“, mit Verweis auf E11; der Verweis darauf in `:12` wird angepasst,
   - neu:
     - **„Angebote gemerkter Anbieter in der Merkliste“** (früher Etappe 5, N1): ein Chip „+ von meinen Anbietern“ in Liste und Karte, Standard aus, eigener Abschnitt „Von deinen Anbietern“, auf der Karte auch ihre Orte; Kalender, Export und Badge zählen sie nie. Stärkt die Suche nach einem Ersatzkurs. Logik als reine Funktion in `saved.ts`, nicht aus `directory.ts` (nur Lazy-Chunk).
-    - „Herz in der Anbieterliste“,
     - „Neue Angebote gemerkter Anbieter in der Wochen-Nachricht“,
     - „Merklisten-Filter in der URL“,
     - „Freie Datumseingabe auf der Merkliste“.
@@ -569,6 +611,8 @@ export function quickRanges(today: string, dataEnd: string | undefined): Array<{
   - Plan 0010: Z. 11 und E2 (vier Tabs), Nicht-Ziel „Anbieter merken“,
   - Plan 0021: Test „Hinweis auf Tab Kalender“.
 - `README.md`: anpassen, falls es Tabs aufzählt (grep in Schritt 0).
+- Vermerk in Plan 0026, Stufe 2 (Review Nachtrag, Minor): Gemerkte Anbieter stehen oben im Tab „Anbieter“, nicht auf der Merkliste, und sind nur IDs. Der Kopf der Merkliste hat Umschalter, Filter und Statuszeile mit Export-Knopf; den Ort von „Liste teilen“ (E15) und die Anbieterzeilen im Sheet (E13) legt Stufe 2 neu fest.
+- `docs/architecture.md`, Privatsphäre: nur IDs, Anbieter nur in Tab und Sheet „Anbieter“ (statt Namens-Schnappschuss).
 
 ## Tests (test-first)
 
@@ -580,15 +624,6 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
      - verwirft eine zu lange ID (81 Zeichen),
      - bei Dubletten gilt der erste Eintrag,
      - die Reihenfolge bleibt erhalten.
-   - `toggleProvider`:
-     - hinzufügen,
-     - entfernen per ID,
-     - erneut gemerkt aktualisiert den Namen.
-   - `savedProviderRows`:
-     - Der Name aus `providerName` des aktuellen Datenstands schlägt den Schnappschuss.
-     - Ohne kommende Angebote gilt der Schnappschuss, mit `upcoming: 0` und ohne `next`.
-     - Vergangene Angebote zählen nicht.
-     - Sortiert wird nach `de`.
    - `applySavedFilter`:
      - Format wirkt als ODER, dazu Anmeldung.
      - Zeitraum mit `useRange: true`: Ein Kurs mit erstem Termin im Zeitraum passt, mit erstem Termin davor nicht. Ein regelmäßiges Angebot passt mit irgendeinem Termin.
@@ -619,6 +654,14 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
    - `isLegacyView`.
 
    `src/domain/ids.test.ts`: `MAX_PROVIDER_ID` ist 80.
+
+   **`src/domain/directory.test.ts`**: `providerRows` mit `saved`
+   - Ein gemerkter aktiver Anbieter steht nur in `saved`, nicht in `active`; ohne Suchtext ergibt `active.length` plus aktive in `saved` die Zahl aus `countProviders`.
+   - Ein gemerkter ausgeblendeter Anbieter steht in `saved` mit Zustand `ausgeblendet` und zählt nicht in `hiddenCount`.
+   - Ein gemerkter Anbieter ohne Termine steht in `saved`, nicht in `idle`.
+   - Die Suche wirkt auf `saved`; `saved` ist nach Name sortiert, auch mit Startpunkt.
+   - Eine gemerkte unbekannte ID ergibt keine Zeile.
+   - Ohne gemerkte Anbieter ist das Ergebnis wie bisher (`saved: []`).
 5. **`src/domain/date-range.test.ts`**: `quickRanges`
    - am 8.10.2026: 2026-11, 2026-12, 2027-01,
    - am 31.1.: der Folgemonat ist der Februar,
@@ -627,19 +670,18 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 6. **`src/data/preferences.test.ts`** (nur die Form):
    - kaputtes JSON → `[]`,
    - kein Array → `[]`,
-   - Einträge mit falschen Typen fallen weg,
+   - Einträge, die keine Strings sind, fallen weg,
    - `saveSavedProviders([])` entfernt den Schlüssel,
-   - gespeichert werden nur `id` und `name` (Zusatzfelder fallen weg).
+   - Hin und zurück ergibt dieselbe Liste.
 
    Ungültige ID, Länge und Dubletten prüft Test 1.
 7. **`src/ui/format.test.ts`**:
    - `selectionHeading`,
-   - `savedStatusParts`: „5 gemerkt“, „2 von 5 gemerkt · 2 Anbieter“, Singular „1 Anbieter“,
+   - `savedStatusParts`: „5 Angebote mit insgesamt 28 Terminen gemerkt“, Singular „1 Angebot mit insgesamt 1 Termin gemerkt“, mit Filter „2 von 5 gemerkten Angeboten passen“ bzw. „1 von 5 … passt“,
    - `savedMapStatusParts`,
-   - `exportNote` mit und ohne Filter,
+   - `exportLabel` mit und ohne Filter,
    - `savedFilteredEmpty` im Singular und Plural,
    - `quickRangeLabel`: „ab Nov.“, „ab Jan.“, „ab Mai“, „ab Juni“,
-   - die Anbieterzeile: „3 kommende Angebote · nächster Mi 7.10.“, „1 kommendes Angebot …“, „Gerade keine Termine im Zwergenplan“.
 8. **`src/ui/use-offer-views.test.ts`**:
    - `views.map` ist bei `karte` gesetzt (`placeCount` aus `visible`), ebenso bei `merkliste-karte` (`placeCount` aus den gefilterten gemerkten Angeboten). Beide Male ist `cameraOffers` gleich `upcoming`. Sonst ist es `undefined`.
    - `savedCalendar` ist nur bei `merkliste-kalender` gefüllt.
@@ -650,24 +692,16 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 **E2E** (Fixtures, Uhr Mo 5.10.2026 12:00). Die Merkliste wird per `localStorage` vorbelegt (`zwergenplan.merkliste`, `zwergenplan.anbieter-merkliste`, über `page.addInitScript`), nicht per Herz-Tipp. Ausnahme sind die Tests, die das Merken selbst prüfen. Die Zahlen werden in Schritt 0 gegen `tests/fixtures/offers.json` nachgerechnet.
 
 9. **`e2e/saved.spec.ts`**, erweitert:
-   - **Anbieter merken:**
-     - Detail „Offener Krabbeltreff“ → „Mehr von diesem Anbieter“ → Herz im Sheet. Erwartet: Toast und `aria-pressed="true"`.
-     - Die Merkliste zeigt den Abschnitt „Gemerkte Anbieter“ mit „3 kommende Angebote · nächster Mi 7.10.“.
-     - Das übersteht ein Neuladen.
-     - Die URL enthält keine Anbieter-ID, außer bei offenem Sheet.
-   - Das Herz in der Anbieterzeile entfernt den Anbieter. Der Fokus landet auf der Überschrift bzw. der Statuszeile.
-   - **Nur ein Anbieter gemerkt** (vorbelegt):
-     - Liste mit Hinweis und Abschnitt.
-     - Karte: „Noch keine Angebote gemerkt“, `.map-box` hat die Anzahl 0, kein Kachel-Request.
-     - Kalender: Leerzustand ohne Wochenstreifen.
-   - **Privatsphäre:** Merkliste mit gemerktem Anbieter öffnen, nacheinander Liste, Karte (Kachel-Mock) und Kalender. Es gibt keinen Request auf `anbieter.json` und keinen Anbieter-Chunk. Erst der Tipp auf die Zeile lädt beides, je genau einmal. Gezählt wird nach `startPreloads`.
+   - Die Merkliste zeigt auch mit gemerkten Anbietern im Speicher keine Anbieter.
+   - **Merkliste ohne gemerktes Angebot** (vorbelegt nur ein Anbieter): Karte und Kalender zeigen „Noch nichts gemerkt“, `.map-box` hat die Anzahl 0, kein Kachel-Request (Etappe 2 bzw. 3).
    - **Filter:** PEKiP (Kurs, mit Anmeldung, erster Termin 13.10.), Musikgarten (Kurs, mit Anmeldung, erster Termin 5.11.) und Krabbeltreff (regelmäßig, ohne Anmeldung, letzter Termin 4.11.) vorbelegen.
      - „Kurse“ ergibt 2 Karten. Mit zusätzlich „Ohne Anmeldung“ ergibt es 0, mit „Nichts, was zu deinem Filter passt“ / „Von deinen 3 gemerkten Angeboten passt keins.“ und „Filter zurücksetzen“. Zurücksetzen ergibt 3.
-     - Nur „ab Nov.“ ergibt Musikgarten und Krabbeltreff, nicht PEKiP (Kurs-Regel: erster Termin im Oktober). Die Statuszeile zeigt „**2** von 3 gemerkt“.
+     - Nur „ab Nov.“ ergibt Musikgarten und Krabbeltreff, nicht PEKiP (Kurs-Regel: erster Termin im Oktober). Die Statuszeile zeigt „**2** von 3 gemerkten Angeboten passen“.
      - Es stehen genau „ab Nov.“ und „ab Dez.“ da. „ab Jan.“ fehlt, weil der letzte Fixture-Termin am 10.12. liegt (Musikgarten; in Schritt 0 nachprüfen).
      - Tab-Wechsel und zurück: Der Filter bleibt. Neuladen: Der Filter ist weg.
      - Die URL enthält nie `format=`, `anmeldung=` oder `von=` aus der Merkliste. Der Startseiten-Filter bleibt unberührt, in „Entdecken“ ist kein Chip aktiv.
-   - **Export:** Er steht nur in der Liste, nicht in Karte und Kalender. Mit aktivem Filter enthält er weiter alle Termine (dieselbe Zahl wie ohne Filter), und die Zeile nennt „auch ausgeblendete“.
+   - **Statuszeile und Export:** „5 Angebote mit insgesamt N Terminen gemerkt“ (Zahl in Schritt 0 nachrechnen). Der Knopf „Alle in den Kalender“ steht nur in der Liste, nicht in Karte und Kalender. Mit aktivem Filter heißt er „Alle 3 gemerkten in den Kalender, auch ausgeblendete“ und enthält weiter alle Termine (dieselbe Zahl wie ohne Filter).
+   - **Umschalter über die ganze Breite:** Seine Breite ist die des Inhalts (± 1 px), bei 320 px und 412 px.
 10. **`e2e/merkliste-kalender.spec.ts`** (ersetzt `calendar.spec.ts`), mit Krabbeltreff und PEKiP vorbelegt:
     - **Start:** Die Woche 5.–11. Okt. ist gewählt (`aria-pressed` am Wochentitel). Die Liste „Diese Woche“ hat 1 Termin (Krabbeltreff Mi 7.10.).
     - **Tag und Woche:**
@@ -692,27 +726,35 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
       - das Detail nimmt den gewählten Termin,
       - „jetzt“ erneuert sich (Timer, `visibilitychange`, Tageswechsel).
     - **Zeitraum:** Die Chips „ab …“ sind im Kalender ausgeblendet. Ihr Wert gilt wieder in der Liste.
+9a. **`e2e/merkliste-anbieter.spec.ts`** (neu, Tab „Anbieter“, Fixtures aus `tests/fixtures/`):
+    - **Merken im Sheet:** Detail „Offener Krabbeltreff“ → „Mehr von diesem Anbieter“ → Herz im Sheet. Erwartet: Toast „Anbieter gemerkt – steht jetzt oben im Tab „Anbieter““ und `aria-pressed="true"`. Im Tab „Anbieter“ steht er unter „Gemerkte Anbieter“ und nicht noch einmal unter „Weitere Anbieter“. Das übersteht ein Neuladen.
+    - **Merken in der Liste:** Herz an einer Zeile unter „Weitere Anbieter“ → die Zeile steht unter „Gemerkte Anbieter“, mit `aria-pressed="true"`. Der Fokus liegt danach auf dem Herz der nachrückenden Zeile. Herz im Abschnitt „Gemerkte Anbieter“ → zurück unter „Weitere Anbieter“; war es der letzte, verschwinden beide Überschriften.
+    - **Reihenfolge:** Suchfeld, Statuszeile, „Gemerkte Anbieter“, „Weitere Anbieter“ (DOM-Reihenfolge).
+    - **Suche:** Ein Suchtext, der nur einen gemerkten Anbieter trifft, zeigt ihn unter „Gemerkte Anbieter“ und kein „Kein Anbieter heißt so.“. Die Statuszeile bleibt unverändert.
+    - **Filter:** Mit einem Startseiten-Filter, der den gemerkten Anbieter ausblendet, bleibt seine Zeile oben, blass mit „passt nicht zur Auswahl“.
+    - **URL:** Sie enthält nie eine gemerkte Anbieter-ID, außer `anbieter=` bei offenem Sheet.
+    - **Privatsphäre:** Mit gemerkten Anbietern im Speicher laden Start, „Angebote“ und Merkliste weder `anbieter.json` noch den Anbieter-Chunk. Der Tab „Anbieter“ lädt beides je genau einmal, wie ohne Gemerktes. Gezählt wird nach `startPreloads`.
 11. **Umschalter und Route** (`e2e/saved.spec.ts`):
     - Liste | Karte | Kalender setzt `ansicht=merkliste`, `merkliste-karte` bzw. `merkliste-kalender`.
     - Ein Deep-Link auf jede Darstellung funktioniert, und der Tab „Merkliste“ ist aktiv.
     - Der Fokus bleibt auf dem Segment.
     - Auf keiner Merklisten-Ansicht stehen Sticker oder Schnellfilter der Startseite (M1).
 12. **Merklisten-Karte** (`e2e/karte.spec.ts`, `tiles: "mock"`):
-    - Die Orts-Liste enthält nur gemerkte Orte. Die Statuszeile zeigt „N gemerkt an M Orten“.
+    - Die Orts-Liste enthält nur gemerkte Orte. Die Statuszeile zeigt „N Angebote an M Orten gemerkt“.
     - Der Startausschnitt ist gleich dem von „Entdecken“ (Kamera-Regel: dieselben Kachel-Requests beim ersten Öffnen einer frischen Sitzung).
     - Das Öffnen lädt die Wegzeit-Tabelle (Anlass), Liste und Kalender der Merkliste nicht (`e2e/startpunkt.spec.ts`).
 13. **Alte URL** (`e2e/app.spec.ts`):
     - `?ansicht=kalender&kat=musik` → URL wird `?kat=musik`, Tab „Entdecken“ aktiv, Musik-Filter aktiv.
     - `?ansicht=kalender&anbieter=theater-beispiel` → Sheet offen über „Entdecken“.
     - `?von=2026-11-06&ansicht=kalender` → URL wird `?von=2026-11-06`, „Entdecken“ mit Zeitraum (ersetzt `e2e/zeitraum.spec.ts:161–168`).
-14. **Tab-Leiste** (`e2e/layout.spec.ts`): drei Tabs (`TAB_NAMES = ["Entdecken", "Anbieter", "Merkliste"]`). Geprüft werden Spalten, Badge, Seitenleiste quer und kompakt quer, bei 320–412 px und 100–200 %.
+14. **Tab-Leiste** (`e2e/layout.spec.ts`): drei Tabs (`TAB_NAMES = ["Angebote", "Anbieter", "Merkliste"]`). Geprüft werden Spalten, Badge, Seitenleiste quer und kompakt quer, bei 320–412 px und 100–200 %.
 15. **Mobile-UX-Matrix** (`e2e/mobile-ux.spec.ts`). Neue Zustände statt `kalender`/`kalender-woche`:
-    - `merkliste-liste`: 3 gemerkt, 1 Anbieter, Filter „Kurse“ aktiv,
+    - `merkliste-liste`: 3 gemerkt, Filter „Kurse“ aktiv,
     - `merkliste-karte`,
     - `merkliste-kalender-woche`,
     - `merkliste-kalender-monat`: Tag gewählt,
+    - `anbieter-gemerkt`: Tab „Anbieter“ mit zwei gemerkten (einer ohne Termine),
     - `anbieter-sheet-gemerkt`,
-    - `merkliste-nur-anbieter`,
     - `merkliste-gefiltert-leer`.
 
     Die Hilfen `calendarAt320`/`weekWithTwoDigitMonday` (`:466–490`) und der Test bei 320 px mit reduzierter Bewegung (`:455–460`) laufen im Merklisten-Kalender. Der Umschalter mit drei Segmenten wird bei 320 px und 200 % geprüft.
@@ -728,20 +770,18 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 - Die Fixture-Zahlen der E2E-Fälle nachrechnen. Das Start-JS auf `main` messen (`pnpm size`).
 
 **Etappe 1 – Anbieter merken** (unabhängig von 0023, einzeln mergebar)
-1. Die Tests 1 (Anbieter-Teil), 4 (`MAX_PROVIDER_ID`), 6 und 7 (Anbieterzeile) rot schreiben.
+1. Die Tests 1 (`cleanSavedProviders`), 4 (`MAX_PROVIDER_ID`, `providerRows` mit `saved`) und 6 rot schreiben.
 2. Logik umsetzen:
    - `MAX_PROVIDER_ID` nach `ids.ts` verschieben,
-   - `SavedProvider`, `cleanSavedProviders`, `toggleProvider`, `savedProviderRows` in `saved.ts`,
-   - `loadSavedProviders`/`saveSavedProviders` in `preferences.ts` (Rohform),
-   - `useSavedProviders` in `use-app-state.ts`.
+   - `cleanSavedProviders` in `saved.ts`,
+   - `loadSavedProviders`/`saveSavedProviders` in `preferences.ts` (Rohform, nur IDs),
+   - `useSavedProviders` in `use-app-state.ts`,
+   - `providerRows` mit `saved` in `directory.ts`.
 3. Herz im `ProviderSheet` (E2). Die Props laufen durch `provider-types.ts`, `Overlays.tsx` und `App.tsx`.
-4. In `SavedView`:
-   - Abschnitt „Gemerkte Anbieter“ (E3),
-   - Leerzustand „nur Anbieter“ (E5a, nur Liste),
-   - Statuszeile der Merkliste mit Anbieterzahl.
-5. E2E: Test 9 (Anbieter, Privatsphäre, nur Liste). Mobile-UX: `anbieter-sheet-gemerkt`, `merkliste-nur-anbieter`.
+4. Tab „Anbieter“ (E3): `ProviderSearch` über der Statuszeile, Abschnitte „Gemerkte Anbieter“ und „Weitere Anbieter“, Herz in jeder Zeile mit Fokusregel. `SavedView` bleibt in dieser Etappe unberührt.
+5. E2E: Test 9a. Mobile-UX: `anbieter-gemerkt`, `anbieter-sheet-gemerkt`. **Signal „Liste geladen“** (Review Nachtrag M1): Das Suchfeld steht jetzt vor dem Chunk. `e2e/anbieter.spec.ts` und `e2e/anbieter-inhalt.spec.ts` warten deshalb auf die Region „Anbieter“ (`listReady`), nicht auf das Suchfeld.
 6. Doku: Privatsphäre-Invariante, `ideas.md`, Vermerk in Plan 0010. Das Delta in ADR 0012 eintragen.
-7. `PW_PORT=4273 pnpm check`, `/arch-review` (Speicherformat, wahrscheinlich > 200 Zeilen), Branch, CI, Fast-Forward, `/browser-review live`.
+7. Gates nach CLAUDE.md („Lokal prüfen“, Review Nachtrag M4): `pnpm verify`, dazu gezielt `pnpm e2e:local e2e/merkliste-anbieter.spec.ts e2e/anbieter.spec.ts e2e/anbieter-inhalt.spec.ts e2e/mobile-ux.spec.ts e2e/layout.spec.ts` (`run_in_background`) und `pnpm size` für ADR 0012. Dann `/arch-review` (Speicherformat, > 200 Zeilen), Branch, CI, Fast-Forward, `/browser-review live`.
 
 **Etappe 2 – Umschalter und Karte auf der Merkliste** (zwei Segmente Liste | Karte)
 1. Rot schreiben:
@@ -751,8 +791,9 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 2. `TABS` um `merkliste-karte` erweitern, `tabSection` anpassen. `ViewToggle` wird allgemein, mit `--n` und der Daumenbreite in `map.css` (E4).
 3. Die Weichen in `App.tsx` auf `section` umstellen (E4, M1). `views.map` für beide Karten berechnen.
 4. `MapPanel` in der Merkliste mit `cameraOffers = upcoming` und Wegzeit-Anlass. Leerzustände der Karte (E5a).
-5. E2E: Tests 11 und 12 sowie der Karten-Teil von Test 9. Mobile-UX: `merkliste-karte`.
-6. Doku: `architecture.md` (Anlass), Vermerk in Plan 0005. Das Delta in ADR 0012 eintragen. Dann Gates, Review, Merge, Browser-Review.
+5. Kopf der Merkliste nach E3a: Umschalter `.view-toggle.full` unter der Überschrift, Statuszeile `savedStatusParts`/`savedMapStatusParts` (ohne Filter-Varianten), runder Export-Knopf mit `exportLabel` nur in der Liste (E9). Der breite Knopf und die Export-Zeile entfallen. Test 7 (`savedStatusParts` ohne Filter, `exportLabel` ohne Filter) zuerst rot.
+6. E2E: Tests 11 und 12 sowie Statuszeile, Export und Umschalterbreite aus Test 9. Mobile-UX: `merkliste-karte`, Merkliste als Liste.
+7. Doku: `architecture.md` (Anlass), Vermerk in Plan 0005. Das Delta in ADR 0012 eintragen. Gates: `pnpm verify`, gezielt `e2e/saved.spec.ts`, `e2e/karte.spec.ts`, `e2e/startpunkt.spec.ts`, `e2e/mobile-ux.spec.ts`, `e2e/layout.spec.ts`, `pnpm size`. Dann Review, Merge, Browser-Review.
 
 **Etappe 3 – Merklisten-Kalender, der Tab „Kalender“ entfällt** (braucht Plan 0023, auf `main` seit `d5fab1b`)
 1. Rot schreiben: Tests 2, 3, 4 (Rest), 7 (`selectionHeading`) und 8 (`savedCalendar`, `endedToday`).
@@ -760,10 +801,10 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 3. UI:
    - `git mv src/ui/CalendarView.tsx src/ui/SavedCalendar.tsx` und nach E5 umbauen,
    - `scrollIntoView` nach dem Tipp im Monat,
-   - dritte Option `.view-toggle.three` im Umschalter,
+   - dritte Option „Kalender“ im Umschalter,
    - Umbau in `use-offer-views.ts` (E8),
    - Leerzustände des Kalenders.
-4. Den Tab entfernen:
+4. Den Tab entfernen und „Entdecken“ in „Angebote“ umbenennen (E8):
    - `TAB_ITEMS`,
    - `tabs.css` über `--n`,
    - `isLegacyView` mit `replaceState` in `useRoute`,
@@ -774,23 +815,22 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
    - `architecture.md`: Tab-Leiste, Wegzeit-Platzhalter,
    - Vermerke in den Plänen 0003, 0007, 0008, 0010 und 0021,
    - das Delta in ADR 0012.
-8. Gates, `/arch-review`, Merge, `/browser-review live`.
+8. Gates: `pnpm verify`, gezielt alle Specs der Inventar-Tabelle plus `e2e/merkliste-kalender.spec.ts`, `e2e/layout.spec.ts`, `e2e/smoke.spec.ts` (`PW_SUITE=smoke`), bei Änderungen an `e2e/fixtures.ts` oder `e2e/mobile-ux.ts` auch `e2e/theme.spec.ts`; `pnpm size`. Dann `/arch-review`, Merge, `/browser-review live`.
 
 **Etappe 4 – Filter auf der Merkliste** (braucht Plan 0023, auf `main` seit `d5fab1b`)
 1. Rot schreiben:
    - Test 1 (`applySavedFilter`, `savedFilterCount`),
    - Test 5,
-   - Test 7 (`savedStatusParts`, `exportNote`, `savedFilteredEmpty`, `quickRangeLabel`).
+   - Test 7 (Filter-Varianten von `savedStatusParts`, `savedMapStatusParts` und `exportLabel`; `savedFilteredEmpty`, `quickRangeLabel`).
 2. `SavedFilter` und seine Funktionen in `saved.ts`, `quickRanges` in `date-range.ts`.
 3. UI:
    - `SavedFilters.tsx` mit Chips für Format, Anmeldung und „ab …“,
    - der Zustand in `App.tsx`,
-   - die Statuszeile „N von M gemerkt“,
-   - die Export-Zeile, nur in der Liste (E9),
+   - die Filter-Varianten der Statuszeile („2 von 5 gemerkten Angeboten passen“) und des Export-Namens (E3a, E9),
    - die gefilterten Leerzustände (E5a),
    - „Filter zurücksetzen“ in den Leerzuständen des Kalenders.
 4. E2E: Test 9 (Filter, Export) und Test 10 (Filter im Kalender). Mobile-UX: `merkliste-liste`, `merkliste-gefiltert-leer`.
-5. Doku: Die `ideas.md`-Einträge aus E13 (auch `:69` „Merkliste ‚Beginn ab‘“ streichen). Das Delta in ADR 0012 eintragen. Dann Gates, Review, Merge, Browser-Review.
+5. Doku: Die `ideas.md`-Einträge aus E13 (auch `:69` „Merkliste ‚Beginn ab‘“ streichen). Das Delta in ADR 0012 eintragen. Gates: `pnpm verify`, gezielt `e2e/saved.spec.ts`, `e2e/merkliste-kalender.spec.ts`, `e2e/mobile-ux.spec.ts`, `pnpm size`. Dann Review, Merge, Browser-Review.
 
 ## Offene Punkte (Nutzerentscheid)
 
@@ -843,6 +883,34 @@ Plan 0022–0024 sind umgesetzt. Geprüft wurde gegen den echten Stand. Die frei
 - **Plan 0024:** Die Annahmen stimmen. Die Marker liegen in `src/ui/map/marker-images.ts` und `layers.ts`, die Grundkarte in `basemap.ts`. Die Kategorie je Ort ist die häufigste der übergebenen Angebote (`geojson.ts:45–49`), auf der Merkliste also die der gemerkten. Es braucht keinen eigenen Code.
 - **Zeilen:** `App.tsx`, `use-offer-views.ts`, `docs/architecture.md`, `docs/ideas.md` und die E2E-Tabelle sind auf `d5fab1b` umgestellt. Unverändert sind `ViewToggle` (`Chrome.tsx:179`), `.view-toggle .seg-thumb { width: 50% }` (`map.css:33–38`), `TABS`/`MAX_PROVIDER_ID` (`route.ts:9, 15`) und `NoOffers` in `MapScreen.tsx:114`. Plan 0018 ist weiter nicht umgesetzt (`src/ui/ics-export.ts` fehlt). E9 gilt also mit dem Lader in `SavedView.tsx`.
 
+## Nachtrag aus dem Mockup (2026-10-08)
+
+Der Nutzer hat das Mockup (Kopfzeile „Mockup“) in zwei Runden kommentiert und dann freigegeben. Geändert gegenüber dem freigegebenen Stand:
+
+- **Tabs** heißen Angebote · Anbieter · Merkliste (Entscheidung c, E8, Test 14).
+- **Gemerkte Anbieter** wandern von der Merkliste in den Tab „Anbieter“: Suchfeld ganz oben, darunter „Gemerkte Anbieter“ und „Weitere Anbieter“ ohne Dubletten, Herz in jeder Zeile (Entscheidung d, E3, Tests 4 und 9a). Damit entfallen
+  - der Namens-Schnappschuss im Speicher, gespeichert werden nur IDs (E1),
+  - `SavedProvider`, `toggleProvider`, `savedProviderRows` und die Anbieterzeile in `format.ts`,
+  - der Merklisten-Abschnitt „Gemerkte Anbieter“ und der Leerzustand „nur Anbieter“ (E5a),
+  - das Nicht-Ziel „Kein Herz in der Anbieterliste“ und der Eintrag dazu in `docs/ideas.md`.
+- **Kopf der Merkliste** (Entscheidung e, E3a): Umschalter über die ganze Breite unter der Überschrift (`.view-toggle.full` statt `.view-toggle.three`, E4), eine Statuszeile „5 Angebote mit insgesamt 28 Terminen gemerkt“ und ein runder Export-Knopf nur mit Icon (E9, `exportLabel` statt `exportNote`). Der Hinweis „Kurse immer komplett“ entfällt. Umgesetzt in Etappe 2 bzw. die Filter-Varianten in Etappe 4.
+- **Etappe 1** war vor dem Mockup-Feedback schon teilweise umgesetzt (Merkliste mit Anbieter-Abschnitt, uncommittet). Sie wird nach E1–E3 umgebaut, bevor sie gemergt wird.
+
+### Review des Nachtrags (2026-10-08) – Urteil: Freigabe mit Änderungen → eingearbeitet
+
+Unabhängiger `plan-reviewer`, nur der Nachtrag.
+
+- **B1** „Kalender“ passt im Umschalter über die ganze Breite bei 320 px/200 % nicht. → Container-Query, einspaltig unter `19rem` wie `.seg3` (E4, E10, Test 15). Betrifft Etappe 3.
+- **M1** Das Suchfeld im Start nimmt Tests ihr Signal „Chunk geladen“. → `listReady` (Region „Anbieter“) in `anbieter.spec.ts` und `anbieter-inhalt.spec.ts` (Etappe 1, Schritt 5).
+- **M2** Nur gemerkte aktiv: Hinweis auf ausgeblendete fehlte. → Hinweis bei irgendeiner aktiven Zeile, Leerzustand über beiden Abschnitten (E3, E2E in 9a).
+- **M3** Fokusregel ungenau, Remount-Gefahr, verdeckter Fokus. → nächstes Herz des Abschnitts in DOM-Reihenfolge, Abschnitte immer gerendert, `scroll-padding-bottom`; E2E per Tastatur (E3, 9a).
+- **M4** Gates nicht nach CLAUDE.md. → je Etappe `pnpm verify`, gezielte Specs, `pnpm size`.
+- **Minor**, alle übernommen: Live-Region `sr-only`; Suchfeld auch beim Laden; „Angebote“ mit `exact` und als Font-Probe; `architecture.md` ohne Schnappschuss; Wortlaute in Test 9 und E10; Terminzahl zählt kommende Termine; ADR 0020 und Vermerk in Plan 0026.
+- **Simplicity**:
+  - übernommen: eine Hilfe `loadIds`/`saveIds` in `preferences.ts`.
+  - abgelehnt: Suchfeld im Chunk unter der Statuszeile lassen. Der Nutzer wollte es „ganz oben“ (Feedback 2), das Mockup zeigt es über der Statuszeile.
+  - abgelehnt: Abschnitte bis zum nächsten Öffnen festhalten. Im Mockup wandert die Zeile sofort („steht jetzt oben“), und doppelt stünde sie sonst auch nicht; die Fokusregel ist mit M3 belastbar.
+
 ## Review (2026-10-08) – Urteil: freigabefähig nach Einarbeitung → eingearbeitet
 
 Unabhängiger `plan-reviewer`. Alle Befunde sind übernommen.
@@ -879,4 +947,4 @@ Abgelehnt wurde nichts.
 
 ## Status
 
-Freigegeben (Review eingearbeitet, Nutzerentscheide vom 2026-10-08 getroffen). Plan 0022–0024 sind auf `main` (`d5fab1b`), Etappe 1 kann beginnen.
+Freigegeben (Review eingearbeitet, Nutzerentscheide vom 2026-10-08 getroffen). Plan 0022–0024 sind auf `main` (`d5fab1b`). Etappe 1 läuft. Der Nachtrag aus dem Mockup (Entscheidungen c–e) ist reviewt und eingearbeitet (Abschnitt „Review des Nachtrags“); kein Blocker offen.

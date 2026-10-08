@@ -32,6 +32,10 @@ export interface ProviderScreenProps {
   onResetFilter: (() => void) | undefined;
   /** nur, wenn der Altersfilter etwas ausblendet: „Auch unpassende zeigen“ (Plan 0021, E4) */
   age: AgeEscape | undefined;
+  /** IDs der gemerkten Anbieter: stehen oben, Herz gedrückt (Plan 0025, E3) */
+  saved: readonly string[];
+  /** merkt bzw. entfernt einen Anbieter, mit Toast */
+  onToggleSaved: (providerId: string) => void;
 }
 
 /** Props des Anbieter-Sheets. Den Dialog rendert Overlays.tsx immer, diesen Inhalt nur bei offenem Dialog (E3). */
@@ -44,6 +48,10 @@ export interface ProviderSheetProps {
   visible: readonly SiteOffer[];
   /** Kacheln: merken, Detail über dem Sheet öffnen, unpassende markieren (E3, E4) */
   ctx: CardContext;
+  /** Herz im Kopf (Plan 0025, E2): Anbieter gemerkt? */
+  saved: boolean;
+  /** merkt bzw. entfernt den Anbieter, mit Toast */
+  onToggleSaved: (providerId: string) => void;
   onClose: () => void;
 }
 

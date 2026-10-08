@@ -29,6 +29,9 @@ interface OverlaysProps {
   providerId: string | undefined;
   openProvider: (providerId: string) => void;
   closeProvider: () => void;
+  /** gemerkte Anbieter (Plan 0025, E2): Herz im Anbieter-Sheet */
+  isProviderSaved: (providerId: string) => boolean;
+  onToggleProvider: (providerId: string) => void;
   /** ID weder im Katalog noch in den Angeboten: `anbieter=` entfernen */
   onUnknownProvider: () => void;
   /** Datenstand von site.json; `undefined`, solange sie lädt */
@@ -94,6 +97,8 @@ export function Overlays(props: OverlaysProps) {
             offers={props.offers}
             visible={props.visible}
             ctx={ctx}
+            saved={props.isProviderSaved(providerId)}
+            onToggleSaved={props.onToggleProvider}
             onUnknown={props.onUnknownProvider}
             onClose={closeProvider}
           />

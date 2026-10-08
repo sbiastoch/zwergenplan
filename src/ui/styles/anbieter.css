@@ -32,11 +32,18 @@
     color: var(--muted);
     font-weight: 400;
   }
-  /* Live-Region: ohne Suchtext leer, die Zeile bleibt reserviert (kein Sprung beim ersten Buchstaben) */
-  .provider-search .small {
-    min-height: 1.4em;
-    margin: 0 0 8px;
-    font-weight: 400;
+  /* Zeile mit Herz daneben (Plan 0025, E3): der Knopf zum Sheet nimmt den Rest, das Herz bleibt 44 px */
+  .provider-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .provider-row .place {
+    flex: 1;
+    min-width: 0;
+  }
+  .provider-row .heart {
+    flex: none;
   }
   .provider-name {
     hyphens: auto;
@@ -83,6 +90,19 @@
   .provider-sheet h2 {
     font-size: 1.375rem;
     hyphens: auto;
+  }
+  /* Name links (bricht um), Herz rechts oben (Plan 0025, E2) */
+  .sheet-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .sheet-head h2 {
+    flex: 1;
+    min-width: 0;
+  }
+  .sheet-head .heart {
+    align-self: start;
   }
   .provider-cats {
     margin: 0;

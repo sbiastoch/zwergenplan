@@ -84,8 +84,10 @@ function nearestOf(offers: readonly SiteOffer[], reachOf: (offer: SiteOffer) => 
  * - `active`: mit Startpunkt (`byReach`) nach dem nächsten Ort (`compareReach`), sonst und bei Gleichstand nach Name.
  * - `hiddenCount`: ausgeblendete Anbieter ohne eigene Zeile; mit Suchtext stehen die Treffer blass in `idle`, dann 0.
  * - `idle`: erst die ausgeblendeten Treffer der Suche, dann die ohne Termine, jeweils nach Name.
+ * - `saved`: gemerkte Anbieter (Plan 0025, E3), vorab herausgenommen und in keiner anderen Liste; nach Name, mit
+ *   ihrem Zustand (ein ausgeblendeter steht blass oben, statt in `hiddenCount` zu verschwinden).
  * Jeder Anbieter aus `visible` bekommt eine aktive Zeile, notfalls als Rückfall: ohne Suchtext gilt
- * `active.length` = Zahl der verschiedenen `providerId` in `visible` (Statuszeile, `countProviders`).
+ * `active.length` + aktive in `saved` = Zahl der verschiedenen `providerId` in `visible` (Statuszeile, `countProviders`).
  */
 export function providerRows(input: {
   providers: readonly SiteProvider[];
@@ -95,8 +97,11 @@ export function providerRows(input: {
   /** Startpunkt gesetzt und Modus nicht „laedt“ */
   byReach: boolean;
   query: string;
-}): { active: ProviderRow[]; hiddenCount: number; idle: ProviderRow[] } {
+  /** IDs der gemerkten Anbieter; unbekannte ergeben keine Zeile */
+  saved: readonly string[];
+}): { saved: ProviderRow[]; active: ProviderRow[]; hiddenCount: number; idle: ProviderRow[] } {
   const { providers, visible, upcoming, reachOf, byReach, query } = input;
+  const savedIds = new Set(input.saved);
   const shownBy = groupByProvider(visible);
   const upcomingBy = groupByProvider(upcoming);
 
@@ -107,6 +112,7 @@ export function providerRows(input: {
     if (fallback) entries.set(id, fallback);
   }
 
+  const saved: ProviderRow[] = [];
   const active: ProviderRow[] = [];
   const hidden: ProviderRow[] = [];
   const empty: ProviderRow[] = [];
@@ -114,10 +120,19 @@ export function providerRows(input: {
     const shownOffers = shownBy.get(provider.id) ?? [];
     const shown = shownOffers.length;
     const count = Math.max(upcomingBy.get(provider.id)?.length ?? 0, shown);
+    const isSaved = savedIds.has(provider.id);
     if (shown > 0) {
       const nearest = nearestOf(shownOffers, reachOf);
       const places = unique(shownOffers.map((o) => placeName(o.venue)));
-      active.push({ provider, state: "aktiv", shown, upcoming: count, places, ...(nearest ? { nearest } : {}) });
+      const row: ProviderRow = {
+        provider,
+        state: "aktiv",
+        shown,
+        upcoming: count,
+        places,
+        ...(nearest ? { nearest } : {}),
+      };
+      (isSaved ? saved : active).push(row);
       continue;
     }
     const row: ProviderRow = {
@@ -127,7 +142,7 @@ export function providerRows(input: {
       upcoming: count,
       places: unique(provider.venues.map(placeName)),
     };
-    (count > 0 ? hidden : empty).push(row);
+    (isSaved ? saved : count > 0 ? hidden : empty).push(row);
   }
 
   const matches = (row: ProviderRow) => matchesProviderQuery(row.provider.name, query);
@@ -139,6 +154,7 @@ export function providerRows(input: {
   const sortActive = byReach ? (a: ProviderRow, b: ProviderRow) => nearestFirst(a, b) || byName(a, b) : byName;
 
   return {
+    saved: saved.filter(matches).sort(byName),
     active: active.filter(matches).sort(sortActive),
     hiddenCount: searching ? 0 : hidden.length,
     idle: [...(searching ? hidden.filter(matches).sort(byName) : []), ...empty.filter(matches).sort(byName)],

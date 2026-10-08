@@ -30,7 +30,8 @@ const sheet = (page: Page) => page.getByRole("dialog", { name: "Anbieter" });
 /** Tab „Anbieter“ direkt per URL (Filter davor, kanonisch), Liste geladen */
 async function openList(page: Page, filter = "") {
   await page.goto(`./?${filter ? `${filter}&` : ""}ansicht=anbieter`);
-  await expect(search(page)).toBeVisible();
+  // die Region kommt mit dem Chunk; das Suchfeld steht schon vorher (Plan 0025, E3)
+  await expect(list(page)).toBeVisible();
 }
 
 /** Stadtteil Gostenhof als gespeicherter Startpunkt: Die Tabelle lädt beim Start (Plan 0009, E9). */

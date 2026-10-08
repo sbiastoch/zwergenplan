@@ -6,10 +6,12 @@ import {
   loadOriginDistrict,
   loadOriginPoint,
   loadSaved,
+  loadSavedProviders,
   loadTheme,
   saveBirthDate,
   saveOrigin,
   saveSaved,
+  saveSavedProviders,
   saveTheme,
   type ThemeChoice,
 } from "../data/preferences.ts";
@@ -17,7 +19,7 @@ import { districtById } from "../domain/districts.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
-import { toggleId } from "../domain/saved.ts";
+import { cleanSavedProviders, toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
 import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
 import { preloadProviderUi } from "./ProviderPanel.tsx";
@@ -137,6 +139,24 @@ export function useSaved(): [string[], (id: string) => boolean] {
     idsRef.current = next;
     setIds(next);
     saveSaved(next);
+    return next.includes(id);
+  }, []);
+  return [ids, toggle];
+}
+
+/**
+ * Gemerkte Anbieter (Plan 0025, E1), gebaut wie `useSaved`. Die Rohform aus dem Speicher prüft `cleanSavedProviders`
+ * (wie `useOrigin` die Rohwerte, ADR 0017). `toggle` liefert, ob der Anbieter danach gemerkt ist.
+ */
+export function useSavedProviders(): [string[], (id: string) => boolean] {
+  const [ids, setIds] = useState(() => cleanSavedProviders(loadSavedProviders()));
+  const idsRef = useRef(ids);
+  idsRef.current = ids;
+  const toggle = useCallback((id: string) => {
+    const next = toggleId(idsRef.current, id);
+    idsRef.current = next;
+    setIds(next);
+    saveSavedProviders(next);
     return next.includes(id);
   }, []);
   return [ids, toggle];

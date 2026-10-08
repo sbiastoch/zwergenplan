@@ -27,6 +27,8 @@ Eltern sehen auf einen Blick, **wer** in Nürnberg etwas für Kinder unter 3 Jah
 - **Neue Katalogfelder**, etwa eine Einrichtungsart („Familienzentrum“, „Bibliothek“) oder ein Kurzname. Beides wäre eine Schemaänderung samt Skill-Lauf (ADR 0006). → `docs/ideas.md`.
 - **Alle Termine eines Anbieters als Kalenderdatei oder Abo** (E11). → `docs/ideas.md`.
 - **Anbieter merken oder „folgen“.** Die Merkliste bleibt bei Angeboten. → `docs/ideas.md`.
+
+  > **Geändert durch Plan 0025:** Anbieter lassen sich im Anbieter-Sheet und in jeder Zeile der Anbieterliste merken. Gemerkte stehen oben im Tab „Anbieter“, das Suchfeld steht über der Statuszeile (E1–E3).
 - **Anbietername auf der Kachel antippbar.** Der Weg geht über das Detail. → `docs/ideas.md`.
 - **Ring** (innen / knapp außen / außen) in der Oberfläche. Er beschreibt den Recherche-Fokus (Altstadtring), nicht die Lage zum Startpunkt. Plan 0004 hat eine Gewichtung nach `ring` schon ausgeschlossen.
 - **Aggregatoren und Verzeichnisse** (9 Einträge). Sie sind Recherchequellen ohne eigene Angebote (ADR 0006).

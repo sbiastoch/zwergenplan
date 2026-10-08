@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { collectionSessions, savedOffers, toggleId } from "./saved.ts";
+import { cleanSavedProviders, collectionSessions, savedOffers, toggleId } from "./saved.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
 const { file } = loadFixtures();
@@ -35,5 +35,22 @@ describe("collectionSessions", () => {
     const treff = fixtureOffer("krabbeltreff"); // 7.10.–4.11., 5 Termine
     expect(collectionSessions(treff, FIXTURE_NOW)).toHaveLength(5);
     expect(collectionSessions(treff, new Date("2026-10-21T12:00:00+02:00"))).toHaveLength(2);
+  });
+});
+
+describe("cleanSavedProviders (Plan 0025, E1)", () => {
+  it("verwirft ungültige IDs", () => {
+    expect(cleanSavedProviders(["Familientreff", "mit leerzeichen", "familientreff-beispiel"])).toEqual([
+      "familientreff-beispiel",
+    ]);
+  });
+
+  it("verwirft zu lange IDs", () => {
+    expect(cleanSavedProviders(["a".repeat(81)])).toEqual([]);
+    expect(cleanSavedProviders(["a".repeat(80)])).toHaveLength(1);
+  });
+
+  it("bei Dubletten gilt der erste Eintrag, die Reihenfolge bleibt", () => {
+    expect(cleanSavedProviders(["b-anbieter", "a-anbieter", "b-anbieter"])).toEqual(["b-anbieter", "a-anbieter"]);
   });
 });

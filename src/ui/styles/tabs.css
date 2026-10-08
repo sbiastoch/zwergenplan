@@ -145,8 +145,9 @@
       /* Breite der Leiste + Abstände; die Spalte .app zentriert sich im Rest */
       padding-left: calc(env(safe-area-inset-left) + 8rem);
     }
-    .app {
-      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    /* Seitenende und Fokusabstand (base.css) */
+    :root {
+      --tabbar-space: calc(20px + env(safe-area-inset-bottom));
     }
     .tabs {
       left: calc(env(safe-area-inset-left) + 8px);
@@ -232,8 +233,9 @@
     .tab .badge {
       grid-row: 1;
     }
-    .app {
-      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    /* Seitenende und Fokusabstand (base.css) */
+    :root {
+      --tabbar-space: calc(4.5rem + env(safe-area-inset-bottom));
     }
     /* Herz, Label und Badge stehen hier nebeneinander. Eigene Schwelle (E2, Review 2 M2): Label plus Icon, zwei
        Abstände und Badge (60 px = 24 + 2 · 6 + 22 + 2). Bei 568 px (Spalte 133 px) mit Labels nur bei 100 %, ab

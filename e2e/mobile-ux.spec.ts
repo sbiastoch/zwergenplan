@@ -96,6 +96,30 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: /^Merkliste/ }).click();
     await expect(page.getByTestId("offer")).toHaveCount(2);
   },
+  // Plan 0025, E2: Anbieter-Sheet mit gedrücktem Herz neben dem längsten Namen (Kirchengemeinde, mehrzeilig)
+  "anbieter-sheet-gemerkt": async (page) => {
+    await page
+      .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
+      .getByRole("button")
+      .click();
+    await page.getByRole("button", { name: "Mehr von diesem Anbieter" }).click();
+    const heart = page
+      .getByRole("dialog", { name: "Anbieter" })
+      .getByRole("button", { name: /^Ev\.-Luth\. Kirchengemeinde.* merken$/ });
+    await heart.click();
+    await expect(heart).toHaveAttribute("aria-pressed", "true");
+  },
+  // Plan 0025, E3: Tab „Anbieter“ mit zwei gemerkten oben, einer davon ohne Termine (gestrichelt), Herz an jeder Zeile
+  "anbieter-gemerkt": async (page) => {
+    await page.evaluate(() =>
+      localStorage.setItem(
+        "zwergenplan.anbieter-merkliste",
+        JSON.stringify(["gemeinde-beispiel", "turnverein-beispiel"]),
+      ),
+    );
+    await page.goto("./?ansicht=anbieter");
+    await expect(page.locator("ul.provider-saved li")).toHaveCount(2);
+  },
   detail: async (page) => {
     await page.getByRole("heading", { level: 3, name: /PEKiP/ }).getByRole("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();

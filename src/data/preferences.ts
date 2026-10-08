@@ -1,5 +1,5 @@
 /**
- * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, Darstellung,
+ * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, gemerkte Anbieter, Darstellung,
  * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017). Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
@@ -7,6 +7,7 @@
 const KEYS = {
   birthDate: "zwergenplan.geburtsdatum",
   saved: "zwergenplan.merkliste",
+  savedProviders: "zwergenplan.anbieter-merkliste",
   theme: "zwergenplan.darstellung",
   originDistrict: "zwergenplan.entfernung-ab",
   originPoint: "zwergenplan.startpunkt",
@@ -39,17 +40,38 @@ export function saveBirthDate(value: string | undefined): void {
   write(KEYS.birthDate, value);
 }
 
-export function loadSaved(): string[] {
+/** Liste von IDs als JSON-Array; geprüft werden nur JSON und Typen, eine leere Liste entfernt den Schlüssel */
+function loadIds(key: string): string[] {
   try {
-    const parsed: unknown = JSON.parse(read(KEYS.saved) ?? "[]");
+    const parsed: unknown = JSON.parse(read(key) ?? "[]");
     return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [];
   } catch {
     return [];
   }
 }
 
+function saveIds(key: string, ids: readonly string[]): void {
+  write(key, ids.length > 0 ? JSON.stringify(ids) : undefined);
+}
+
+export function loadSaved(): string[] {
+  return loadIds(KEYS.saved);
+}
+
 export function saveSaved(ids: readonly string[]): void {
-  write(KEYS.saved, ids.length > 0 ? JSON.stringify(ids) : undefined);
+  saveIds(KEYS.saved, ids);
+}
+
+/**
+ * Gemerkte Anbieter in der Rohform (Plan 0025, E1), gebaut wie `loadSaved`: geprüft werden nur JSON und Typen. Ob die
+ * ID gültig ist, prüft `cleanSavedProviders` in der Domäne (ADR 0010: src/data importiert dafür nichts aus src/domain).
+ */
+export function loadSavedProviders(): string[] {
+  return loadIds(KEYS.savedProviders);
+}
+
+export function saveSavedProviders(ids: readonly string[]): void {
+  saveIds(KEYS.savedProviders, ids);
 }
 
 export type ThemeChoice = "hell" | "dunkel" | "auto";

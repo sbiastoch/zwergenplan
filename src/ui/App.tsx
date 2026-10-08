@@ -29,10 +29,20 @@ import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import { ProviderPanel } from "./ProviderPanel.tsx";
+import { ProviderSearch } from "./ProviderSearch.tsx";
 import { preloadExportWhenIdle, SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
-import { useBirthDate, useNow, useOrigin, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
+import {
+  useBirthDate,
+  useNow,
+  useOrigin,
+  useRoute,
+  useSaved,
+  useSavedProviders,
+  useTheme,
+  useToast,
+} from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
@@ -46,6 +56,7 @@ export function App() {
   const { route, replace, openDetail, closeDetail, openProvider, closeProvider } = useRoute();
   const [birthDate, setBirthDateStored] = useBirthDate();
   const [savedIds, toggleSaved] = useSaved();
+  const [savedProviders, toggleSavedProvider] = useSavedProviders();
   const theme = useTheme();
   const [toast, say] = useToast();
   // erneuert sich im offenen Tab, höchstens einmal pro Minute (Plan 0007, E2)
@@ -163,6 +174,16 @@ export function App() {
       say(toggleSaved(offer.id) ? "Gemerkt – liegt jetzt auf deiner Merkliste" : "Nicht mehr gemerkt"),
     [say, toggleSaved],
   );
+  // Toasts nach dem Muster aus Plan 0022 (Plan 0025, E2), in Liste und Sheet gleich; im Sheet zeigt der Dialog sie.
+  const onToggleProvider = useCallback(
+    (providerId: string) =>
+      say(
+        toggleSavedProvider(providerId)
+          ? "Anbieter gemerkt – steht jetzt oben im Tab „Anbieter“"
+          : "Anbieter nicht mehr gemerkt",
+      ),
+    [say, toggleSavedProvider],
+  );
 
   const ctx: CardContext = {
     now,
@@ -254,6 +275,11 @@ export function App() {
         />
       )}
       <main className="body">
+        {/* Suche ganz oben, über der Statuszeile (Plan 0025, E3). Nur einmal gerendert, damit die Eingabe beim
+            Übergang von „Lade …“ zu den Daten nicht neu eingehängt wird und den Fokus behält. */}
+        {route.tab === "anbieter" && load.kind !== "error" && (
+          <ProviderSearch query={providerQuery} onQuery={setProviderQuery} />
+        )}
         {load.kind === "loading" && (
           <>
             <div className="status-row">
@@ -406,6 +432,8 @@ export function App() {
             onOpenProvider={openProvider}
             onResetFilter={resetIfActive}
             age={ageEscape}
+            saved={savedProviders}
+            onToggleSaved={onToggleProvider}
           />
         )}
         {load.kind === "ready" && route.tab === "merkliste" && (
@@ -431,6 +459,8 @@ export function App() {
         providerId={sheetProviderId}
         openProvider={openProvider}
         closeProvider={closeProvider}
+        isProviderSaved={(id) => savedProviders.includes(id)}
+        onToggleProvider={onToggleProvider}
         onUnknownProvider={dropProvider}
         generatedAt={load.kind === "ready" ? load.data.generatedAt : undefined}
         offers={offers}

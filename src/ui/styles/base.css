@@ -71,7 +71,15 @@
     max-width: 40rem;
     margin: 0 auto;
     /* Platz für die feste Tab-Leiste */
-    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+    padding-bottom: var(--tabbar-space);
+  }
+  /* Platz der festen Tab-Leiste, Querformat und breite Leiste in tabs.css. Dient dem Seitenende (.app) und hält den
+     Fokus nie unter der Leiste (WCAG 2.4.11, Plan 0025, Review M3). */
+  :root {
+    --tabbar-space: calc(6.5rem + env(safe-area-inset-bottom));
+  }
+  html {
+    scroll-padding-bottom: var(--tabbar-space);
   }
 
   /* gemeinsames Eindrücken (Knete) */

@@ -270,6 +270,8 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 
 > Eigene Etappe, eigener Branch, eigener Merge. Sie setzt Plan 0025 voraus (gemerkte Anbieter, neue `SavedView`). Vor dem Start von Stufe 2 werden E10–E15 an den gemergten Stand von 0025 angepasst: Ort des Knopfs und Name des Schlüssels für Anbieter.
 
+> **Geändert durch Plan 0025 (Nachtrag aus dem Mockup):** Gemerkte Anbieter stehen nicht auf der Merkliste, sondern oben im Tab „Anbieter“. Gespeichert sind nur IDs (`zwergenplan.anbieter-merkliste`), Namen kommen aus `anbieter.json`. Anbieterzeilen im Sheet (E13) brauchen also `anbieter.json` oder zeigen nur die Zahl. Der Kopf der Merkliste hat Überschrift, Umschalter, Filter und Statuszeile mit rundem Export-Knopf; den Ort von „Liste teilen“ (E15) legt Stufe 2 neu fest.
+
 ### E10 – Kodierung v1: Kurz-IDs im Fragment
 
 - Form: `{SITE_URL}#merkliste=1.{A}` bzw. mit Anbietern `…#merkliste=1.{A}.{P}`.

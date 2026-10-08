@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN, type OfferIdInput, offerId, slug } from "./ids.ts";
+import { KEBAB_ID_PATTERN, MAX_PROVIDER_ID, OFFER_ID_PATTERN, type OfferIdInput, offerId, slug } from "./ids.ts";
 import { type Format, Venue } from "./schema.ts";
 import { rawFixtures } from "./test-fixtures.ts";
 
@@ -83,5 +83,11 @@ describe("KEBAB_ID_PATTERN (Plan 0010, E2)", () => {
     const bad = Venue.safeParse({ ...venue, id: "Ort--Eins" });
     expect(bad.success).toBe(false);
     expect(bad.error?.issues.map((i) => i.message)).toEqual(["kebab-case erwartet"]);
+  });
+});
+
+describe("MAX_PROVIDER_ID (Plan 0025, E1)", () => {
+  it("lässt 80 Zeichen zu, das längste echte ist 47", () => {
+    expect(MAX_PROVIDER_ID).toBe(80);
   });
 });

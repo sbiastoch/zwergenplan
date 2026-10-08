@@ -4,6 +4,7 @@
  * Pipeline-Lauf soll keine Merkliste leeren.
  */
 import { nextSession, upcomingSessions } from "./agenda.ts";
+import { KEBAB_ID_PATTERN, MAX_PROVIDER_ID } from "./ids.ts";
 import type { Offer, Session } from "./schema.ts";
 
 export function toggleId(ids: readonly string[], id: string): string[] {
@@ -26,4 +27,17 @@ export function savedOffers<T extends Offer>(offers: readonly T[], ids: readonly
 export function collectionSessions(offer: Offer, now: Date): Session[] {
   if (offer.format === "kurs") return offer.sessions;
   return upcomingSessions(offer, now);
+}
+
+/**
+ * Gemerkte Anbieter aus dem Speicher bereinigen (Plan 0025, E1): gültige ID, höchstens MAX_PROVIDER_ID, keine
+ * Dubletten. Gemerkt und entfernt wird wie bei Angeboten mit `toggleId`.
+ */
+export function cleanSavedProviders(raw: readonly string[]): string[] {
+  const seen = new Set<string>();
+  return raw.filter((id) => {
+    if (id.length > MAX_PROVIDER_ID || !KEBAB_ID_PATTERN.test(id) || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
 }
