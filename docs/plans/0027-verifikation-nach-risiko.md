@@ -733,6 +733,20 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
   - **m7:** Ungültige Fristen fallen auf den Standard zurück (`graceMs`). Die Tests setzen `ZP_HEAVY_LOCK` leer; `afterEach` beendet auch die Gruppe aus `heavy.holder`.
   - **m8:** Neue Tests für „ersetzt“ außerhalb von `archiv/` und für eine Plandatei ohne Titel. Die Auswahl von Suite und Builds ist die reine Funktion `runPlan` mit Test; `--all` mit `PW_SUITE=smoke` baut beide.
 
+### Nacharbeit zum Review des Wächters (`ef36c19`, Verdict OK)
+
+- **m1:** Der Wächter hängt jetzt an einer Pipe zu seinem stdin (`stdio: ["pipe", "ignore", "ignore"]`) statt PIDs zu pollen. Schließt sich die Pipe, auch bei SIGKILL an `heavy.ts`, beendet er die Gruppe in Stufen und endet selbst. Damit entfallen Polling, die Wiederverwendung von PIDs und der Zombie-Fall.
+- **m2:** Der Wächter startet mit `process.execPath`; scheitert der Start, kommt eine Warnung.
+- **m3:** Das Fenster zwischen den beiden `spawn`-Aufrufen steht als bekannte Grenze im ADR und im Code.
+- **m4:**
+  - Der Wächter schreibt seine PID nach `heavy.watchdog.<pgid>` im Sperr-Ordner.
+  - Neue Tests: Nach einem normalen Ende und nach dem Aufräumen nach SIGKILL endet der Wächter selbst und entfernt seine Datei.
+  - `afterEach` beendet übrig gebliebene Wächter.
+  - Der SIGKILL-Test hat ein Limit von 15 s.
+- **m5:** CLAUDE.md nennt den Wächter am Ende des Punkts.
+- **m6:** Der Test nutzt `alive` aus `process-group.ts`.
+- **Abnahme erneut:** TaskStop mitten in `e2e:local e2e/layout.spec.ts`. Danach liefen kein Preview-Server, kein `e2e-local` und kein Wächter, und die Sperre war frei.
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.

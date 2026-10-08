@@ -74,11 +74,20 @@ if (!hasFlock) console.error("⚠ flock fehlt oder ist zu alt: schwerer Lauf ohn
 const child = spawn(cmd ?? "sh", args, { detached: true, stdio: "inherit", env });
 const pgid = child.pid ?? 0;
 
-// Wächter in eigener Gruppe: räumt ab, falls heavy.ts selbst per SIGKILL endet (Arch-Review e6, M2).
+// Wächter in eigener Gruppe: räumt ab, falls heavy.ts selbst per SIGKILL endet (Arch-Review e6, M2). Er hängt an
+// einer Pipe zu seinem stdin, die der Kernel beim Ende von heavy.ts schließt, auch bei SIGKILL (Review ef36c19, m1).
+// Bekannte Grenze: Stirbt heavy.ts genau zwischen den beiden spawn-Aufrufen, gibt es keinen Wächter.
 // ZP_NO_WATCHDOG=1 nur für den Test, der zeigt, dass flock -o die Sperre auch ohne Aufräumen freigibt.
 if (pgid > 0 && process.env["ZP_NO_WATCHDOG"] !== "1") {
   const watchdog = fileURLToPath(new URL("./heavy-watchdog.ts", import.meta.url));
-  spawn("node", [watchdog, String(process.pid), String(pgid)], { detached: true, stdio: "ignore" }).unref();
+  const w = spawn(process.execPath, [watchdog, String(pgid), join(dir, `heavy.watchdog.${pgid}`)], {
+    detached: true,
+    stdio: ["pipe", "ignore", "ignore"],
+  });
+  w.on("error", (e) => console.error("⚠ Wächter nicht gestartet:", e.message));
+  w.stdin?.on("error", () => {
+    // Wächter schon weg: nichts zu tun
+  });
 }
 
 let exitCode: number | undefined;

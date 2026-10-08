@@ -1,9 +1,10 @@
 import { type ChildProcess, spawn, spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
+import { alive as processAlive } from "./lib/process-group.ts";
 
 /**
  * Maschinenweite Sperre für schwere Läufe (Plan 0027, E7, Review M1). Jeder Test nutzt einen eigenen Ordner für die
@@ -24,6 +25,14 @@ afterEach(() => {
   // auch die Gruppe des Laufs (flock), die heavy.holder nennt (Arch-Review e6, m7)
   for (const d of dirs.splice(0)) {
     if (existsSync(holderFile(d))) kill(pgidOf(d));
+    // und übrig gebliebene Wächter (eigene Gruppe, PID in heavy.watchdog.<pgid>)
+    for (const f of readdirSync(d).filter((n) => n.startsWith("heavy.watchdog."))) {
+      try {
+        process.kill(Number(readFileSync(join(d, f), "utf8")), "SIGKILL");
+      } catch {
+        // schon beendet
+      }
+    }
     rmSync(d, { recursive: true, force: true });
   }
 });
@@ -64,14 +73,10 @@ async function until(cond: () => boolean, ms = 5_000): Promise<void> {
 
 const holderFile = (dir: string) => join(dir, "heavy.holder");
 const pgidOf = (dir: string) => Number(readFileSync(holderFile(dir), "utf8").split("\n")[3]);
-function alive(pgid: number): boolean {
-  try {
-    process.kill(-pgid, 0);
-    return true;
-  } catch {
-    return false;
-  }
-}
+/** Lebt die Gruppe noch? (process-group.ts: negative Zahl = Gruppe) */
+const alive = (pgid: number) => processAlive(-pgid);
+const watchdogFile = (dir: string, pgid: number) => join(dir, `heavy.watchdog.${pgid}`);
+const watchdogPid = (dir: string, pgid: number) => Number(readFileSync(watchdogFile(dir, pgid), "utf8"));
 const tryLock = (dir: string) =>
   spawnSync("node", [HEAVY, "sh", "-c", "exit 0"], { env: env(dir, "0"), encoding: "utf8" });
 
@@ -142,9 +147,25 @@ describe("heavy.ts", () => {
     const h = holder(dir, "sleep 30 & wait");
     await until(() => existsSync(holderFile(dir)));
     const pgid = pgidOf(dir);
+    await until(() => existsSync(watchdogFile(dir, pgid)));
+    const watchdog = watchdogPid(dir, pgid);
     h.kill("SIGKILL");
     await until(() => !alive(pgid));
     expect(tryLock(dir).status).toBe(0);
+    // der Wächter beendet sich nach dem Aufräumen selbst
+    await until(() => !processAlive(watchdog));
+  }, 15_000);
+
+  it("nach normalem Ende beendet sich der Wächter selbst (Review ef36c19, m4)", async () => {
+    const dir = lockDir();
+    const h = holder(dir, "sleep 1");
+    await until(() => existsSync(holderFile(dir)));
+    const pgid = pgidOf(dir);
+    await until(() => existsSync(watchdogFile(dir, pgid)));
+    const watchdog = watchdogPid(dir, pgid);
+    await new Promise((r) => h.on("exit", r));
+    await until(() => !processAlive(watchdog));
+    expect(existsSync(watchdogFile(dir, pgid))).toBe(false);
   });
 
   it("reicht Argumente an `sh -c` unverändert durch (Arch-Review Etappe 4, M1)", () => {

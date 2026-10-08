@@ -1,25 +1,36 @@
 /**
  * Wächter für scripts/heavy.ts (Plan 0027, E7; Arch-Review e6, M2). Läuft in einer eigenen Prozessgruppe und
  * überlebt deshalb ein SIGKILL an die Gruppe von heavy.ts, etwa wenn das Bash-Tool eines Agents einen
- * Hintergrundlauf beendet. Ist heavy.ts weg, die Gruppe des Laufs aber noch da, beendet er sie in Stufen
- * (SIGINT, SIGTERM, SIGKILL). Damit wird auch die Sperre frei. Ist die Gruppe leer, endet er von selbst.
+ * Hintergrundlauf beendet.
  *
- *   node scripts/heavy-watchdog.ts <pid von heavy.ts> <pgid des Laufs>
+ * heavy.ts hält eine Pipe zu seinem stdin offen. Endet heavy.ts, auf welche Weise auch immer, schließt der Kernel
+ * die Pipe. Dann beendet der Wächter die Gruppe des Laufs in Stufen (SIGINT, SIGTERM, SIGKILL) und endet selbst.
+ * Damit wird auch die Sperre frei. Ist die Gruppe schon leer (normales Ende), endet er sofort. Node öffnet die Pipe
+ * mit O_CLOEXEC, also erbt flock sie nicht (Arch-Review ef36c19, m1).
+ *
+ *   node scripts/heavy-watchdog.ts <pgid des Laufs> [<Datei für die eigene PID>]
  */
-import { alive, graceMs, stopGroup } from "./lib/process-group.ts";
+import { rmSync, writeFileSync } from "node:fs";
+import { graceMs, stopGroup } from "./lib/process-group.ts";
 
-const heavyPid = Number(process.argv[2]);
-const pgid = Number(process.argv[3]);
-if (!(heavyPid > 0 && pgid > 0)) process.exit(2);
+const pgid = Number(process.argv[2]);
+const pidFile = process.argv[3];
+if (!(pgid > 0)) process.exit(2);
+if (pidFile) writeFileSync(pidFile, String(process.pid));
 
 const INT_GRACE_MS = graceMs(process.env["ZP_INT_GRACE_MS"], 7_000);
 const TERM_GRACE_MS = graceMs(process.env["ZP_TERM_GRACE_MS"], 3_000);
 
-for (;;) {
-  if (!alive(-pgid)) process.exit(0);
-  if (!alive(heavyPid)) {
-    await stopGroup(pgid, INT_GRACE_MS, TERM_GRACE_MS);
-    process.exit(0);
-  }
-  await new Promise((r) => setTimeout(r, 250));
+let done = false;
+async function onParentGone(): Promise<void> {
+  if (done) return;
+  done = true;
+  await stopGroup(pgid, INT_GRACE_MS, TERM_GRACE_MS);
+  if (pidFile) rmSync(pidFile, { force: true });
+  process.exit(0);
 }
+
+process.stdin.on("close", () => void onParentGone());
+process.stdin.on("end", () => void onParentGone());
+process.stdin.on("error", () => void onParentGone());
+process.stdin.resume();
