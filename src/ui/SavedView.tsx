@@ -4,8 +4,7 @@
  * Export-Knopf (nur in der Liste). Karte und Kalender rendert App über `renderMap` bzw. `renderCalendar`.
  */
 import type { ReactNode } from "react";
-import { sessionFit } from "../domain/age.ts";
-import { shownSession } from "../domain/agenda.ts";
+import type { Occurrence } from "../domain/agenda.ts";
 import { collectionExport, upcomingSessionCount } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
@@ -26,8 +25,8 @@ const VIEW_OPTIONS: readonly ViewOption<SavedTab>[] = [
 ];
 
 interface SavedViewProps {
-  /** gemerkte Angebote mit kommendem Termin, nach dem angezeigten Termin sortiert (`savedOffers`) */
-  offers: SiteOffer[];
+  /** gemerkte Angebote mit kommendem Termin, je mit dem angezeigten Termin und danach sortiert (`savedOffers`) */
+  items: readonly Occurrence<SiteOffer>[];
   tab: SavedTab;
   onTab: (tab: SavedTab) => void;
   /** Orte der gemerkten Angebote (`views.map`), nur auf der Karte gebraucht */
@@ -49,7 +48,7 @@ interface SavedViewProps {
 }
 
 export function SavedView({
-  offers,
+  items: savedItems,
   tab,
   onTab,
   placeCount,
@@ -61,8 +60,8 @@ export function SavedView({
   onDiscover,
   onExported,
 }: SavedViewProps) {
+  const offers = savedItems.map((item) => item.offer);
   const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
-  const fits = sessionFit(birthDate);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
     if (count === 0) {
@@ -124,10 +123,7 @@ export function SavedView({
           {tab === "merkliste-karte" && renderMap(offers)}
           {tab === "merkliste-kalender" && renderCalendar()}
           {tab === "merkliste" &&
-            offers.map((offer) => {
-              const session = shownSession(offer, ctx.now, undefined, fits);
-              return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
-            })}
+            savedItems.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated />)}
         </>
       )}
     </>

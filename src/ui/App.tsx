@@ -453,7 +453,7 @@ export function App() {
         )}
         {load.kind === "ready" && section === "merkliste" && (
           <SavedView
-            offers={saved}
+            items={saved}
             tab={route.tab === "merkliste-karte" || route.tab === "merkliste-kalender" ? route.tab : "merkliste"}
             onTab={(tab) => replace({ ...route, tab })}
             placeCount={views.map?.placeCount ?? 0}

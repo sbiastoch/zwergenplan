@@ -60,7 +60,8 @@ export interface OfferViews {
    * Hook: Sie überstehen Tab- und Darstellungswechsel, nicht das Neuladen.
    */
   savedCalendar: SavedCalendarData | undefined;
-  saved: SiteOffer[];
+  /** gemerkte Angebote mit kommendem Termin, je am Termin, an dem sie in der Merkliste stehen (`savedOffers`) */
+  saved: Occurrence<SiteOffer>[];
   /** Angebot aus der URL, falls es im Datenstand existiert */
   detailOffer: SiteOffer | undefined;
   /**
@@ -143,15 +144,18 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
   // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
   // Die Karte der Merkliste zählt die Orte der gemerkten Angebote, ihr Startausschnitt ist derselbe (Plan 0025, E4).
   const saved = useMemo(() => savedOffers(offers, savedIds, now, birthDate), [offers, savedIds, now, birthDate]);
+  const savedList = useMemo(() => saved.map((o) => o.offer), [saved]);
   const onCalendar = route.tab === "merkliste-kalender";
   // Der Kalender der Merkliste zeigt regelmäßige Angebote nur an Terminen, die zum Alter passen, wie Liste, Statuszeile
   // und Datei (Plan 0028, E3). Unabhängig vom Altersfilter in „Entdecken“: Gemerktes ist bewusst gewählt.
+  const savedFits = useMemo(() => sessionFit(birthDate), [birthDate]);
   const savedIndex = useMemo(
-    () => (onCalendar ? sessionsByDay(saved, sessionFit(birthDate)) : undefined),
-    [onCalendar, saved, birthDate],
+    () => (onCalendar ? sessionsByDay(savedList, savedFits) : undefined),
+    [onCalendar, savedList, savedFits],
   );
   // Bewusst nicht über `saved`: Das kennt nur Angebote mit kommendem Termin. Ein gemerktes Angebot, dessen einziger
-  // Termin heute schon vorbei ist, zählt sonst nicht (Review M7, B2).
+  // Termin heute schon vorbei ist, zählt sonst nicht (Review M7, B2). Mit demselben Prädikat wie der Index: Ein
+  // unpassender Termin steht nie im Kalender, also auch nicht in „heute schon vorbei“ (Arch-Review 0025, M1).
   const endedToday = useMemo(
     () =>
       onCalendar
@@ -159,15 +163,16 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
             offers.filter((o) => savedIds.includes(o.id)),
             today,
             now,
+            savedFits,
           )
         : 0,
-    [onCalendar, offers, savedIds, today, now],
+    [onCalendar, offers, savedIds, today, now, savedFits],
   );
   const map = useMemo(() => {
     if (route.tab === "karte") return { placeCount: countPlaces(visible), cameraOffers: upcoming };
-    if (route.tab === "merkliste-karte") return { placeCount: countPlaces(saved), cameraOffers: upcoming };
+    if (route.tab === "merkliste-karte") return { placeCount: countPlaces(savedList), cameraOffers: upcoming };
     return undefined;
-  }, [route.tab, visible, saved, upcoming]);
+  }, [route.tab, visible, savedList, upcoming]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
   const setAgeOnly = useCallback((on: boolean) => {

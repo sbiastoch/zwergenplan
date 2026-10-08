@@ -5,7 +5,7 @@
  * Pipeline-Lauf soll keine Merkliste leeren.
  */
 import { fittingSessions, sessionFit } from "./age.ts";
-import { shownSession, upcomingSessions } from "./agenda.ts";
+import { type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
 import { KEBAB_ID_PATTERN, MAX_KEBAB_ID } from "./ids.ts";
 import type { Offer, Session } from "./schema.ts";
 
@@ -14,25 +14,28 @@ export function toggleId(ids: readonly string[], id: string): string[] {
 }
 
 /**
- * Gemerkte Angebote mit kommendem Termin, sortiert nach dem Termin, an dem die Karte steht (`shownSession`): mit
- * Geburtsdatum bei regelmäßigen der erste passende (Plan 0028). Passt keiner, bleibt das Angebot am nächsten Termin
- * stehen, denn es ist bewusst gemerkt; der Export lässt es weg und zählt es (`collectionExport`).
+ * Gemerkte Angebote mit kommendem Termin, je mit dem Termin, an dem die Karte steht (`shownSession`), und danach
+ * sortiert: mit Geburtsdatum bei regelmäßigen der erste passende (Plan 0028). Passt keiner, bleibt das Angebot am
+ * nächsten Termin stehen, denn es ist bewusst gemerkt; der Export lässt es weg und zählt es (`collectionExport`).
+ * Die Regel steht nur hier, die Liste der Merkliste zeigt den Termin von hier (Arch-Review 0025, Minor 1).
  */
 export function savedOffers<T extends Offer>(
   offers: readonly T[],
   ids: readonly string[],
   now: Date,
   birthDate: string | undefined,
-): T[] {
+): Occurrence<T>[] {
   const wanted = new Set(ids);
   const fits = sessionFit(birthDate);
   return offers
     .flatMap((offer) => {
-      const next = wanted.has(offer.id) ? shownSession(offer, now, undefined, fits) : undefined;
-      return next ? [{ offer, start: Date.parse(next.start) }] : [];
+      const session = wanted.has(offer.id) ? shownSession(offer, now, undefined, fits) : undefined;
+      return session ? [{ offer, session }] : [];
     })
-    .sort((a, b) => a.start - b.start || a.offer.title.localeCompare(b.offer.title, "de"))
-    .map((x) => x.offer);
+    .sort(
+      (a, b) =>
+        Date.parse(a.session.start) - Date.parse(b.session.start) || a.offer.title.localeCompare(b.offer.title, "de"),
+    );
 }
 
 /**

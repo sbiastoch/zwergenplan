@@ -31,9 +31,11 @@ describe("toggleId", () => {
 });
 
 describe("savedOffers", () => {
+  const savedKey = ({ offer }: { offer: Offer }) => fixtureKey(offer);
+
   it("liefert gemerkte, noch nicht vorbei-e Angebote nach nächstem Termin", () => {
     const ids = [id("babykonzert-advent"), id("vergangen"), id("krabbeltreff"), "gibt-es--nicht--mehr"];
-    expect(savedOffers(file.offers, ids, FIXTURE_NOW, undefined).map(fixtureKey)).toEqual([
+    expect(savedOffers(file.offers, ids, FIXTURE_NOW, undefined).map(savedKey)).toEqual([
       "krabbeltreff",
       "babykonzert-advent",
     ]);
@@ -42,28 +44,28 @@ describe("savedOffers", () => {
   it("sortiert laufende Kurse nach dem nächsten, nicht dem ersten Termin", () => {
     const later = new Date("2026-11-11T12:00:00+01:00"); // PEKiP läuft, nächster Termin 17.11.
     const ids = [id("pekip-herbst"), id("kuckuck-im-nest")];
-    expect(savedOffers(file.offers, ids, later, undefined).map(fixtureKey)).toEqual([
-      "kuckuck-im-nest",
-      "pekip-herbst",
-    ]);
+    expect(savedOffers(file.offers, ids, later, undefined).map(savedKey)).toEqual(["kuckuck-im-nest", "pekip-herbst"]);
   });
 
   it("sortiert regelmäßige mit Geburtsdatum nach dem ersten passenden Termin (Plan 0028)", () => {
     const ids = [id("krabbeltreff"), id("pekip-herbst")]; // Treff ab 7.10., PEKiP ab 13.10.
-    expect(savedOffers(file.offers, ids, FIXTURE_NOW, undefined).map(fixtureKey)).toEqual([
+    expect(savedOffers(file.offers, ids, FIXTURE_NOW, undefined).map(savedKey)).toEqual([
       "krabbeltreff",
       "pekip-herbst",
     ]);
     // 5 Monate am 14.10., 6 am 21.10.: Der Treff passt erst ab 21.10. und steht hinter PEKiP.
-    expect(savedOffers(file.offers, ids, FIXTURE_NOW, "2026-04-20").map(fixtureKey)).toEqual([
+    expect(savedOffers(file.offers, ids, FIXTURE_NOW, "2026-04-20").map(savedKey)).toEqual([
       "pekip-herbst",
       "krabbeltreff",
     ]);
+    // mit dem Termin, an dem die Karte steht: Die Liste rechnet ihn nicht noch einmal (Arch-Review 0025, Minor 1)
+    const treff = savedOffers(file.offers, ids, FIXTURE_NOW, "2026-04-20").at(-1);
+    expect(treff && berlinIsoDate(treff.session.start)).toBe("2026-10-21");
   });
 
   it("behält regelmäßige ohne passenden Termin am nächsten Termin (bewusst gemerkt, Plan 0028)", () => {
     const ids = [id("krabbeltreff"), id("pekip-herbst")];
-    expect(savedOffers(file.offers, ids, FIXTURE_NOW, "2026-08-01").map(fixtureKey)).toEqual([
+    expect(savedOffers(file.offers, ids, FIXTURE_NOW, "2026-08-01").map(savedKey)).toEqual([
       "krabbeltreff",
       "pekip-herbst",
     ]);

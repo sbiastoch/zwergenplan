@@ -131,8 +131,9 @@
       clip-path: inset(50%);
       white-space: nowrap;
     }
-    /* Nur Icons: Das Badge steht im Fluss rechts neben dem Icon (24 + 4 + 41 ≤ 73 px bei 200 %). Absolut neben der
-       Mitte ragte ein zweistelliges Badge aus der Spalte (E2, Review 2 M4). */
+    /* Nur Icons: Das Badge steht im Fluss rechts neben dem Icon (Icon 24 + Abstand 4 + Badge 41 bei 200 % = 69 px,
+       Spalte mit drei Tabs bei 320 px 98 px; Plan 0025, E8). Absolut neben der Mitte ragte ein zweistelliges Badge aus
+       der Spalte (E2, Review 2 M4). */
     .tab .badge {
       position: static;
       grid-row: 1;

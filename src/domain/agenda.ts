@@ -188,13 +188,16 @@ export function rangeAgenda<T extends Offer>(
   };
 }
 
-/** Termine, die am Berliner Tag `day` beginnen und vor `now` beendet sind. */
-export function endedOnDay(offers: readonly Offer[], day: string, now: Date): number {
+/**
+ * Termine, die am Berliner Tag `day` beginnen und vor `now` beendet sind. Mit `fits` nur die passenden, wie in
+ * `sessionsByDay` (Arch-Review 0025, M1): Der Kalender zählt sonst einen Termin als „heute vorbei“, den er nie zeigt.
+ */
+export function endedOnDay(offers: readonly Offer[], day: string, now: Date, fits?: SessionFit): number {
   const isNotEnded = notEnded(now);
   let count = 0;
   for (const offer of offers) {
     for (const session of offer.sessions) {
-      if (!isNotEnded(session) && berlinIsoDate(session.start) === day) count += 1;
+      if (!isNotEnded(session) && berlinIsoDate(session.start) === day && (!fits || fits(offer, session))) count += 1;
     }
   }
   return count;

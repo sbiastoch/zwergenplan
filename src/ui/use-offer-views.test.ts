@@ -59,6 +59,8 @@ function render(input: Partial<OfferViewsInput>): OfferViews {
 }
 
 const ids = (offers: readonly SiteOffer[]) => offers.map((o) => o.title);
+/** Titel der Merkliste; `saved` trägt je Angebot den angezeigten Termin (`savedOffers`) */
+const savedTitles = (v: OfferViews) => ids(v.saved.map((o) => o.offer));
 
 describe("useOfferViews", () => {
   it("zeigt kommende Angebote, gruppiert nach Tag, ohne Kind alles", () => {
@@ -142,7 +144,8 @@ describe("useOfferViews", () => {
       expect(render({ route: kalender, savedIds: [BABY.id] }).savedCalendar).toBeDefined();
     });
 
-    it("zeigt nur gemerkte Termine; die Startseiten-Filter, Wegzeit und Alter wirken nicht", () => {
+    // Das Alter wirkt nur als Prädikat je Termin (Plan 0028), siehe „regelmäßig, Kind wächst erst hinein“
+    it("zeigt nur gemerkte Termine; Startseiten-Filter, Wegzeit und Altersfilter wirken nicht", () => {
       const v = render({
         route: { ...kalender, filter: { ...EMPTY_FILTER, formats: ["kurs"] } },
         birthDate: "2026-05-01",
@@ -168,7 +171,7 @@ describe("useOfferViews", () => {
     it("zählt ein gemerktes Angebot, dessen einziger Termin heute schon vorbei ist (M7, B2)", () => {
       const heute = offer("heute", "2026-10-05"); // 10–11 Uhr, um 12 Uhr vorbei
       const v = render({ offers: [...OFFERS, heute], route: kalender, savedIds: [heute.id, BABY.id] });
-      expect(ids(v.saved)).toEqual(["baby"]);
+      expect(savedTitles(v)).toEqual(["baby"]);
       expect(v.savedCalendar?.endedToday).toBe(1);
       // nicht gemerkt: zählt nicht
       expect(
@@ -381,6 +384,22 @@ describe("useOfferViews", () => {
       ]);
     });
 
+    it("ein unpassender Termin, der heute vorbei ist, zählt im Kalender der Merkliste nicht (Arch-Review 0025, M1)", () => {
+      // Mo 5.10. 10–11 Uhr, um 12 Uhr vorbei; das Kind ist dann 5 Monate alt, der Treff passt ab 6
+      const heute: SiteOffer = {
+        ...treff,
+        sessions: [
+          { start: fromBerlinLocal("2026-10-05T10:00"), end: fromBerlinLocal("2026-10-05T11:00") },
+          ...treff.sessions,
+        ],
+      };
+      const route: Route = { tab: "merkliste-kalender", filter: EMPTY_FILTER };
+      const v = render({ ...input, offers: [BABY, heute], route, savedIds: [heute.id] });
+      expect(v.savedCalendar?.endedToday).toBe(0);
+      // ohne Geburtsdatum zählt er
+      expect(render({ offers: [BABY, heute], route, savedIds: [heute.id] }).savedCalendar?.endedToday).toBe(1);
+    });
+
     it("Altersfilter aus: am nächsten Termin, wie ohne Kind", () => {
       let result: OfferViews | undefined;
       function Probe() {
@@ -394,14 +413,14 @@ describe("useOfferViews", () => {
 
     it("sortiert die Merkliste nach dem ersten passenden Termin", () => {
       const savedIds = [treff.id, BABY.id];
-      expect(ids(render({ ...input, birthDate: undefined, savedIds }).saved)).toEqual(["treff", "baby"]);
-      expect(ids(render({ ...input, savedIds }).saved)).toEqual(["baby", "treff"]);
+      expect(savedTitles(render({ ...input, birthDate: undefined, savedIds }))).toEqual(["treff", "baby"]);
+      expect(savedTitles(render({ ...input, savedIds }))).toEqual(["baby", "treff"]);
     });
   });
 
   it("liefert Merkliste und offenes Angebot aus den Daten", () => {
     const v = render({ savedIds: [GROSS.id, "weg--weg--weg"], route: { ...ENTDECKEN, offerId: BABY.id } });
-    expect(ids(v.saved)).toEqual(["gross"]);
+    expect(savedTitles(v)).toEqual(["gross"]);
     expect(v.detailOffer).toBe(BABY);
     expect(render({ route: { ...ENTDECKEN, offerId: "weg--weg--weg" } }).detailOffer).toBeUndefined();
   });

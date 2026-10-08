@@ -313,6 +313,12 @@ describe("endedOnDay", () => {
     expect(endedOnDay([treff], "2026-10-07", new Date("2026-10-07T11:30:00.001+02:00"))).toBe(1);
   });
 
+  it("zählt mit `fits` nur passende Termine, wie `sessionsByDay` (Arch-Review 0025, M1)", () => {
+    const evening = new Date("2026-10-07T20:00:00+02:00");
+    expect(endedOnDay([treff], "2026-10-07", evening, () => false)).toBe(0);
+    expect(endedOnDay([treff], "2026-10-07", evening, () => true)).toBe(1);
+  });
+
   it("findet Einzeltermine, die heute schon vorbei sind (Fixtures: Elterncafé am Mo 5.10.)", () => {
     expect(endedOnDay(file.offers, "2026-10-05", FIXTURE_NOW)).toBe(1);
   });
