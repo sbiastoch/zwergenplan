@@ -553,6 +553,15 @@ Unabhängiger `plan-reviewer`, kein Blocker. Alle Befunde übernommen:
 
 Die Vorschauseiten mit echten Daten (2026-10-08) wiegen im Median 3,2 kB, die größte 3,5 kB, nicht die geschätzten 2,5 kB. Die geplante Grenze von 4 kB hätte ein Titel voller „&“ reißen können, das widerspricht Review M4. Der Wächter `checkSharePages` liegt deshalb bei **10 kB**: Die strenge Obergrenze aus den Kürzungen (jedes Zeichen escaped höchstens 6 Byte, Titel und Beschreibung je mehrfach in der Seite, ID ≤ 200 Zeichen, fester Text) liegt bei etwa 8,6 kB; darüber liegt nur ein Generatorfehler. Ein Unit-Test belegt, dass Titel und Anbietername aus 300 Anführungszeichen ihn nicht reißen.
 
+### Umsetzung Stufe 1: Abweichungen und Messwerte
+
+- **`labels.ts`** enthält zusätzlich `clock`, `timeRange` und `availabilityLabel`: Vorschauseite und Kachelbild brauchen sie, `format.ts` re-exportiert alle.
+- **Meta-Zeile des Bildes**: Ort zuerst, `{Ort}, {Stadtteil} · {Anbieter}` (E16 nannte den Anbieter zuerst). Mit echten Daten verdrängten lange Anbieternamen („Post SV Nürnberg – Babyschwimmen, Kleinkindschwimmen, …“) sonst das „Wo“ aus den zwei Zeilen. Heißt der Ort ohne Klammerzusatz wie der Anbieter („Studio X (ehem. Y)“), steht der Name nur einmal da, in Meta und Beschreibung (dort entfällt dann „– {Anbieter}“).
+- **Wann bei „Montags“**: Haben alle kommenden Termine dieselbe Uhrzeit, steht sie auch bei gleichem Wochentag ohne wöchentlichen Takt dabei („Montags, 9:30“); E3 sah sie nur für „jeden …“ vor.
+- **Kürzen**: Eine angeschnittene Klammer („41,36 € (2…“) fällt ganz weg, solange mehr als die Hälfte bleibt.
+- **Kachelbilder** (lokal, 2026-10-08, echte Daten): 333 Bilder in 7,4 s, 72–109 kB (Median 93 kB), zusammen 31 MB; 156 Kacheln mit kleinerem Zoom als 2,4. Qualität 75 statt 82 spart nur etwa 12 kB je Bild, das Punktraster etwa 3 kB; die Größe kommt von den Textkanten. Es bleibt bei Qualität 82 für scharfe Schrift.
+- **Generisches Bild** `public/og/vorschau-v1.jpg`: 48 kB. `scripts/icons.ts` erzeugt die Icons dabei byte-gleich neu.
+
 ## Risiken
 
 - **Messenger-Verhalten ist nicht spezifiziert.** Wann WhatsApp große oder kleine Vorschauen zeigt, wie lange es cacht und ob iMessage JavaScript ausführt, ist nur empirisch bekannt. Abgesichert durch Standard-Tags, ein Bild in 1,91 : 1 unter 100 kB, die Bot-Ausnahme, kein `meta refresh` und den Gerätetest (Schritt 9).

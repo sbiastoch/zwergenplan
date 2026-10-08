@@ -122,12 +122,11 @@ function whenText(offer: SiteOffer, ref: Date): string {
   }
   const r = rhythm(offer, ref);
   if (!r) return "regelmäßig";
-  if (!r.weekly) return `${weekdayName(r.weekday)}s`;
+  // Uhrzeit nur, wenn alle kommenden Termine sie teilen; auch bei „Montags“ (Umsetzung: sonst fehlte das Wann)
   const upcoming = upcomingSessions(offer, ref);
   const [next] = upcoming;
-  return next && uniformTimes(upcoming)
-    ? `jeden ${weekdayName(r.weekday)}, ${clock(next.start)}`
-    : `jeden ${weekdayName(r.weekday)}`;
+  const days = r.weekly ? `jeden ${weekdayName(r.weekday)}` : `${weekdayName(r.weekday)}s`;
+  return next && uniformTimes(upcoming) ? `${days}, ${clock(next.start)}` : days;
 }
 
 /** „Studio X (ehem. Y)“ und „Studio X“ heißen gleich: ohne Klammerzusatz, ohne Groß-/Kleinschreibung */

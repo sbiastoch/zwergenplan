@@ -42,6 +42,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Mehrere Verbindungen ab demselben Halt**: Der Build speichert je Halt-Ort-Paar eine Verbindung, andere Wege gibt es nur über andere Zugangshalte (Plan 0019, E4).
 - **Andere Wege im Orts-Sheet der Karte**: Heute nur im Detail (Plan 0019, Nicht-Ziel).
 - **Apple Karten oder Wahl der Karten-App** für die Routen-Links (Plan 0019, Nicht-Ziel: der Nutzer will Google Maps).
+- **Bild je Anbieter und je Kategorie** in der Link-Vorschau: Angebote haben seit Plan 0026 (Nachtrag A) ein Kachelbild, Anbieter, Startseite und Merkliste das generische Bild.
+- **Teilen-Knopf auf den Kacheln** in Liste, Kalender und Karte: geteilt wird heute aus dem Detail und dem Anbieter-Sheet (Plan 0026, Nicht-Ziel).
+- **Filter oder Suchen mit eigener Link-Vorschau teilen** (`?kat=…`): Das geht mit der Adresszeile, nur mit der generischen Vorschau (Plan 0026, Nicht-Ziel).
 - **Adresssuche als Startpunkt**: bräuchte einen Geocoder, also einen weiteren Drittanbieter oder eigene Daten (Plan 0005, Nicht-Ziel).
 - **Karte im Kalender oder in der Merkliste** (Plan 0005, Nicht-Ziel).
 - **Offline-Karte**: Service Worker, Vorab-Laden des Karten-Codes, gecachte Kacheln. ADR 0008 schließt das Cachen fremder Kacheln heute aus.

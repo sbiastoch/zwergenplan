@@ -11,7 +11,7 @@ import { OfferCard } from "../OfferCard.tsx";
 import type { ProviderSheetProps } from "../provider-types.ts";
 import { RouteHint, routeLink } from "../Ways.tsx";
 
-export function ProviderSheet({ directory, providerId, offers, visible, ctx, onClose }: ProviderSheetProps) {
+export function ProviderSheet({ directory, providerId, offers, visible, ctx, onShare, onClose }: ProviderSheetProps) {
   const { now } = ctx;
   const provider = useMemo(
     () => findProvider(directory.providers, offers, providerId),
@@ -75,7 +75,11 @@ export function ProviderSheet({ directory, providerId, offers, visible, ctx, onC
         )}
       </div>
       <div className="sheetfoot">
-        <button type="button" className="btn primary wide" onClick={onClose}>
+        <button type="button" className="btn" onClick={() => onShare(provider)}>
+          <Icon name="share" size={20} />
+          Teilen
+        </button>
+        <button type="button" className="btn primary" onClick={onClose}>
           Schließen
         </button>
       </div>

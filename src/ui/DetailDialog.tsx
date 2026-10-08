@@ -42,6 +42,8 @@ interface DetailProps {
   category: Category;
   saved: boolean;
   onToggleSave: (offer: SiteOffer) => void;
+  /** Teilen per Link (Plan 0026, E6): synchron im Tipp */
+  onShare: (offer: SiteOffer) => void;
   onClose: () => void;
   /**
    * „Mehr von diesem Anbieter“: öffnet das Anbieter-Sheet (Plan 0010, E2, E3). Statt „Alle Angebote dieses Anbieters“
@@ -62,6 +64,7 @@ export function DetailContent({
   category,
   saved,
   onToggleSave,
+  onShare,
   onClose,
   onProvider,
   onIcs,
@@ -84,7 +87,12 @@ export function DetailContent({
         <button type="button" className="iconbtn" onClick={onClose} aria-label="Zurück">
           <Icon name="back" />
         </button>
-        <HeartButton offer={offer} saved={saved} onToggle={onToggleSave} inline />
+        <div className="dhead-actions">
+          <button type="button" className="iconbtn" onClick={() => onShare(offer)} aria-label="Teilen">
+            <Icon name="share" />
+          </button>
+          <HeartButton offer={offer} saved={saved} onToggle={onToggleSave} inline />
+        </div>
       </div>
       <div className="dscroll">
         <div className="detail-col">

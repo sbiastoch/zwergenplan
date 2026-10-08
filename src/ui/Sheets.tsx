@@ -3,13 +3,14 @@
  * Kind-Sheet: KidSheet.tsx.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
-import { type ReactNode, type RefObject, useId, useRef, useState } from "react";
+import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
 import { type BoundCheck, type BoundLimits, checkBound, fieldLimits } from "../domain/date-range.ts";
 import { type FilterState, FORMATS, toggleIn, withDateRange, withReachLimit } from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
-import { ageOnlyNote, limitReason, plural, reachLimitLabel } from "./format.ts";
+import { markAutofocus } from "./Dialog.tsx";
+import { ageOnlyNote, limitReason, plural, reachLimitLabel, SHARE_MANUAL_HINT } from "./format.ts";
 import { Shape } from "./icons.tsx";
 import type { ReachMode } from "./use-transit.ts";
 
@@ -335,6 +336,45 @@ export function FilterSheet({
         </button>
         <button type="button" className="btn primary" onClick={onClose}>
           {plural(resultCount, "Angebot", "Angebote")} zeigen
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * „Link zum Teilen“ (Plan 0026, E6, Review M2): Teilen und Kopieren scheiterten. Der Link steht markiert in einem
+ * schreibgeschützten Feld; gedrückt halten kopiert ihn auch in der installierten App (ohne Adresszeile).
+ */
+export function ManualLinkSheet({ url, onClose }: { url: string; onClose: () => void }) {
+  const field = useRef<HTMLInputElement>(null);
+  // showModal fokussiert das Feld (autofocus), `onFocus` markiert; der Effekt deckt einen Fokus vor dem Öffnen ab
+  useEffect(() => {
+    field.current?.select();
+  }, []);
+  return (
+    <div className="sheet-body">
+      <div className="sheet-scroll">
+        <div className="grab" />
+        <h2>Link zum Teilen</h2>
+        <label className="field">
+          {SHARE_MANUAL_HINT}
+          <input
+            ref={(el) => {
+              field.current = el;
+              markAutofocus(el);
+            }}
+            className="input share-link"
+            type="url"
+            readOnly
+            value={url}
+            onFocus={(e) => e.currentTarget.select()}
+          />
+        </label>
+      </div>
+      <div className="sheetfoot">
+        <button type="button" className="btn primary wide" onClick={onClose}>
+          Fertig
         </button>
       </div>
     </div>

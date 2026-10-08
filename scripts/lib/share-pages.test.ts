@@ -36,7 +36,7 @@ describe("Titel der Vorschau: Rhythmus statt nächster Termin (Plan 0026, E3)", 
   });
 
   it("gleicher Wochentag, nicht wöchentlich", () => {
-    expect(offerPreview(byTitle("Krabbelreime"), GENERATED_AT).when).toBe("Freitags");
+    expect(offerPreview(byTitle("Krabbelreime"), GENERATED_AT).when).toBe("Freitags, 10:30");
   });
 
   it("Rhythmus ab generatedAt, nie ab der Systemuhr", () => {

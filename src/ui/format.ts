@@ -389,6 +389,11 @@ export function transitSourceNote(source: TransitSource | undefined): NotePart[]
   ];
 }
 
+/** Teilen (Plan 0026, E6, E7): Toast nach dem Kopieren, Hinweis im Sheet „Link zum Teilen“, verschwundenes Angebot */
+export const SHARE_COPIED = "Link kopiert – zum Einfügen in WhatsApp & Co.";
+export const SHARE_MANUAL_HINT = "Halte den Link gedrückt, um ihn zu kopieren.";
+export const OFFER_GONE = "Dieses Angebot ist nicht mehr im Zwergenplan.";
+
 /** Statuszeile der Karte „8 Angebote an 5 Orten“; die Zahlen getrennt, damit sie fett stehen. */
 export function mapStatusParts(offers: number, places: number): [number, string, number, string] {
   return [offers, offers === 1 ? " Angebot an " : " Angebote an ", places, places === 1 ? " Ort" : " Orten"];

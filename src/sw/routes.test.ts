@@ -42,6 +42,11 @@ describe("strategyFor: Tabelle aus Plan 0011, E4", () => {
     ["https://zwergenplan.app/manifest.webmanifest", false, "netz"],
     ["https://zwergenplan.app/icons/icon-192.png", false, "netz"],
     ["https://zwergenplan.app/anderes.html", true, "netz"],
+    // Vorschauseiten, Kachelbild und 404.html zum Teilen: nie vorgehalten, nie abgefangen (Plan 0026, E7; ADR 0020)
+    ["https://zwergenplan.app/angebot/a--b--c/", true, "netz"],
+    ["https://zwergenplan.app/angebot/a--b--c/vorschau.jpg?v=0123abcd", false, "netz"],
+    ["https://zwergenplan.app/anbieter/familientreff-beispiel/", true, "netz"],
+    ["https://zwergenplan.app/404.html", true, "netz"],
     ["https://zwergenplan.app/", false, "netz"],
   ];
   for (const [url, navigate, expected] of rows) {
