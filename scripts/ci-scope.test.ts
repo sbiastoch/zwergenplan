@@ -12,6 +12,8 @@ import { afterEach, describe, expect, it } from "vitest";
  */
 const SCRIPT = fileURLToPath(new URL("./ci-scope.ts", import.meta.url));
 const HEAD = "a666dbe0123456789abcdef0123456789abcdef0";
+// Im Zweifel volle Prüfung, alle Ausgaben in einem Schreibvorgang (Plan 0029, B5)
+const ALL_FULL = "full=true\ne2e=full\nspecs=\ndevices=true\nsmoke=true\n";
 const dirs: string[] = [];
 afterEach(() => {
   for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
@@ -36,14 +38,14 @@ describe("ci-scope.ts als Prozess", () => {
   it("pull_request → full=true, Exit 0", () => {
     const r = run({ GITHUB_EVENT_NAME: "pull_request", GITHUB_REF: "refs/pull/1/merge", GITHUB_SHA: HEAD });
     expect(r.code).toBe(0);
-    expect(r.output).toBe("full=true\n");
+    expect(r.output).toBe(ALL_FULL);
     expect(r.stdout).toContain("::notice title=Umfang::full=true – Ereignis pull_request");
   });
 
   it("Ausnahme im Skript (Repository und Token fehlen) → full=true, Exit 0", () => {
     const r = run({ GITHUB_EVENT_NAME: "push", GITHUB_REF: "refs/heads/main", GITHUB_SHA: HEAD });
     expect(r.code).toBe(0);
-    expect(r.output).toBe("full=true\n");
+    expect(r.output).toBe(ALL_FULL);
     expect(r.stdout).toContain("GITHUB_REPOSITORY fehlt");
   });
 

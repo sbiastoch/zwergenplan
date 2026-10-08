@@ -14,6 +14,7 @@
  * `success` (Deploy läuft, gescheitert oder abgelöst), gilt `full=true`, statt ältere Deployments abzufragen.
  */
 import { classify } from "./change-class.ts";
+import type { Selection } from "./e2e-select.ts";
 
 export interface ScopeEvent {
   /** GITHUB_EVENT_NAME */
@@ -142,4 +143,75 @@ function parseJson(text: string, what: string): unknown {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * E2E nach Diff (Plan 0029, B5; ADR 0023): Nur bei `push` auf einen Branch außer `main` fährt die CI eine Auswahl.
+ * Der Diff läuft von `merge-base origin/main HEAD` bis HEAD, also über den ganzen Branch. Auf `main`, bei Pull
+ * Requests, `workflow_dispatch` und bei jedem Fehler gilt `e2e=full`, nie Rot.
+ */
+export interface E2eIo {
+  /** `git merge-base <a> <b>`; wirft, wenn es einen der beiden nicht gibt (etwa `origin/main`). */
+  mergeBase(a: string, b: string): string;
+  /** wie ScopeIo.changedPaths */
+  changedPaths(from: string, to: string): string[];
+  /** Auswahl für die geänderten Pfade (e2e-select.ts mit dem Graphen des Checkouts) */
+  select(changed: string[]): Selection;
+}
+
+export interface E2eScope {
+  e2e: "full" | "select" | "none";
+  /** Geräte-Specs, nur bei `select` */
+  specs: string[];
+  /** Gibt es Geräte-Specs? Sonst überspringt die CI den Job e2e (Review B1). */
+  devices: boolean;
+  /** Laufen die Smoke-Specs? */
+  smoke: boolean;
+  reason: string;
+}
+
+// Die Spec-Liste landet in einer Shell (ci.yml, `$SPECS` ohne Anführungszeichen): nur harmlose Namen (Review m3).
+const SPEC_NAME = /^e2e\/[a-z0-9.-]+\.spec\.ts$/;
+
+const fullE2e = (reason: string): E2eScope => ({ e2e: "full", specs: [], devices: true, smoke: true, reason });
+
+/** Entscheidet `e2e`; wirft nie. */
+export function decideE2e({ event, ref, sha }: ScopeEvent, io: E2eIo): E2eScope {
+  if (event !== "push") return fullE2e(`Ereignis ${event || "unbekannt"}`);
+  if (ref === MAIN_REF) return fullE2e("main: volle Suite vor dem Deploy");
+  if (!ref.startsWith(BRANCH_PREFIX)) return fullE2e(`kein Branch: ${ref}`);
+  if (!FULL_SHA.test(sha)) return fullE2e(`SHA des Laufs ungültig: ${sha}`);
+  try {
+    const base = io.mergeBase("origin/main", sha);
+    const changed = io.changedPaths(base, sha);
+    const selection = io.select(changed);
+    const since = `seit ${short(base)} (${changed.length} Dateien)`;
+    if (selection.kind === "none") {
+      return { e2e: "none", specs: [], devices: false, smoke: false, reason: `keine Spec betroffen ${since}` };
+    }
+    if (selection.kind === "full") return fullE2e(`${selection.reason} ${since}`);
+    const bad = selection.device.find((s) => !SPEC_NAME.test(s));
+    if (bad !== undefined) return fullE2e(`Spec-Name außerhalb des Musters: ${bad}`);
+    return {
+      e2e: "select",
+      specs: selection.device,
+      devices: selection.device.length > 0,
+      smoke: selection.smoke.length > 0,
+      reason: `${selection.device.length} Geräte-Specs, ${selection.smoke.length} Smoke-Specs ${since}`,
+    };
+  } catch (error) {
+    return fullE2e(`Ausnahme: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/** Alle Ausgaben für $GITHUB_OUTPUT in einem String, damit sie in einem Schreibvorgang landen (Review 2, m4). */
+export function scopeOutputs(scope: Scope, e2e: E2eScope): string {
+  return [
+    `full=${scope.full}`,
+    `e2e=${e2e.e2e}`,
+    `specs=${e2e.specs.join(" ")}`,
+    `devices=${e2e.devices}`,
+    `smoke=${e2e.smoke}`,
+    "",
+  ].join("\n");
 }

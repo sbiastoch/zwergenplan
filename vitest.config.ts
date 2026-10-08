@@ -27,6 +27,10 @@ export default defineConfig({
         "scripts/lib/stop-decision.ts",
         // Doku-Pfad der CI (Plan 0027, E10)
         "scripts/lib/ci-scope.ts",
+        // E2E nach Diff: Importgraph, Auswahl, Entscheidung von gates (Plan 0029, B2–B5)
+        "scripts/lib/import-graph.ts",
+        "scripts/lib/e2e-select.ts",
+        "scripts/lib/ci-gates.ts",
         "src/sw/routes.ts",
         "src/sw/retire.ts",
         // Push im Service Worker (Plan 0017, E10)
