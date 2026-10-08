@@ -4,6 +4,8 @@
  * - C: alles andere, einschließlich unbekannter Pfade (fail-safe). Geprüft wird check:fast.
  * Kein Build, kein Test und kein Skript liest die Dateien der Positivliste. Das hält der Test
  * „Doku liest niemand“ in change-class.test.ts fest. Rein, nur Strings.
+ * Auch der CI-Job `scope` nutzt dieses Modul, ohne `pnpm install`: also keine Importe außer Node-Builtins
+ * (Regel `ci-scope-builtins-only`, Plan 0027, E10).
  */
 
 export type Tier = "0" | "C";

@@ -83,6 +83,10 @@ describe("Doku liest niemand", () => {
     "vitest.config.ts",
     "vitest.setup.ts",
     "playwright.config.ts",
+    // eingebunden von Build, Service Worker und E2E; seit dem CI-Doku-Pfad entscheidet die Stufe auch über E2E in der
+    // CI (Arch-Review Etappe 7, m3)
+    "playwright.devices.ts",
+    "site.config.ts",
     "biome.json",
     "knip.jsonc",
     "lefthook.yml",

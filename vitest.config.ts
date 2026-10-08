@@ -25,6 +25,8 @@ export default defineConfig({
         "scripts/lib/doc-check.ts",
         // Entscheidung des Stop-Gates über Stempel (Plan 0027, E5)
         "scripts/lib/stop-decision.ts",
+        // Doku-Pfad der CI (Plan 0027, E10)
+        "scripts/lib/ci-scope.ts",
         "src/sw/routes.ts",
         "src/sw/retire.ts",
         // Push im Service Worker (Plan 0017, E10)

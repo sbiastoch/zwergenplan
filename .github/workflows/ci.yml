@@ -14,6 +14,39 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Doku-Pfad (Plan 0027, E10; ADR 0021, Teil B): full=false nur, wenn seit einem voll grün geprüften Stand nur Dateien
+  # der Doku-Positivliste dazukamen (scripts/lib/change-class.ts). Auf main ist das der live ausgelieferte Commit
+  # (Deployments-API), auf anderen Branches der Vorgänger mit grünem Push-Lauf derselben Ref. Dann laufen nur check
+  # und gates, ohne E2E, Smoke und Deploy. Im Zweifel und bei jedem Fehler full=true, nie Rot.
+  scope:
+    name: Umfang (Doku-Pfad)
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: read
+      deployments: read
+    outputs:
+      # Fehlt die Ausgabe (Skript abgestürzt), gilt full=true.
+      full: ${{ steps.scope.outputs.full || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Vorfahre und Diff bis zum live ausgelieferten Commit
+          persist-credentials: false
+      # Ohne pnpm install: ci-scope.ts braucht nur Node-Builtins und reine Module aus scripts/lib.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - id: scope
+        name: full bestimmen
+        # Ein Absturz macht den Lauf nicht rot; ohne Ausgabe greift oben full=true (Review 2, Minor 2).
+        continue-on-error: true
+        run: node scripts/ci-scope.ts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CI_BEFORE: ${{ github.event.before }}
+
   check:
     name: Statische Gates & Unit-Tests
     runs-on: ubuntu-latest
@@ -46,6 +79,8 @@ jobs:
   # langsamster Job chromium 2/4 (pixel-7) mit 8,8 Min. – immer noch unter dem Timeout von 15 Min.
   e2e:
     name: E2E ${{ matrix.engine }} ${{ matrix.shard }}/${{ matrix.total }}
+    needs: scope
+    if: needs.scope.outputs.full == 'true'
     runs-on: ubuntu-latest
     # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (6,2 Min.), aufgerundet (Plan 0013, E5).
     timeout-minutes: 15
@@ -86,6 +121,8 @@ jobs:
   # Smoke mit echten Daten gegen genau den Build, der deployt wird, allein auf seinem Runner (Plan 0003 E8, Plan 0013).
   smoke:
     name: Smoke (Deploy-Build) & Budgets
+    needs: scope
+    if: needs.scope.outputs.full == 'true'
     runs-on: ubuntu-latest
     # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (2,6 Min.), aufgerundet (Plan 0013, E5).
     timeout-minutes: 10
@@ -123,19 +160,41 @@ jobs:
         with:
           path: dist
 
-  # Der eine Knoten für „alles grün“, auch auf Branches. Wird übersprungen, sobald ein Prüf-Job rot ist.
+  # Der eine Knoten für „alles grün“, auch auf Branches. Läuft auch, wenn ein Prüf-Job rot oder übersprungen ist
+  # (Doku-Pfad), und prüft die Ergebnisse selbst: scope und check immer success; E2E und Smoke success, außer bei
+  # full=false, dann übersprungen (Plan 0027, E10).
   gates:
     name: Alle Gates grün
-    needs: [check, e2e, smoke]
+    needs: [scope, check, e2e, smoke]
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - run: echo "alle Gates grün"
+      - name: Ergebnisse prüfen
+        env:
+          SCOPE: ${{ needs.scope.result }}
+          FULL: ${{ needs.scope.outputs.full }}
+          CHECK: ${{ needs.check.result }}
+          E2E: ${{ needs.e2e.result }}
+          SMOKE: ${{ needs.smoke.result }}
+        run: |
+          echo "scope=$SCOPE full=$FULL check=$CHECK e2e=$E2E smoke=$SMOKE"
+          [ "$SCOPE" = success ] || { echo "::error::scope ist $SCOPE"; exit 1; }
+          [ "$CHECK" = success ] || { echo "::error::check ist $CHECK"; exit 1; }
+          if [ "$FULL" = false ]; then
+            [ "$E2E" = skipped ] && [ "$SMOKE" = skipped ] || { echo "::error::Doku-Pfad, aber E2E $E2E, Smoke $SMOKE"; exit 1; }
+            echo "Doku-Pfad: nur check, kein E2E, kein Deploy"
+          else
+            [ "$E2E" = success ] || { echo "::error::E2E ist $E2E"; exit 1; }
+            [ "$SMOKE" = success ] || { echo "::error::Smoke ist $SMOKE"; exit 1; }
+            echo "alle Gates grün"
+          fi
 
   deploy:
     name: Deploy (GitHub Pages)
-    needs: gates
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [gates, scope]
+    # Doku-Pfad deployt nicht: Live bleibt der zuletzt voll geprüfte Stand (Plan 0027, E10).
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.scope.outputs.full == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

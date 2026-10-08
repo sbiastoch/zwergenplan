@@ -1,6 +1,6 @@
 # Plan 0027 – Verifikation nach Risiko
 
-Status: in Umsetzung – Etappen 1–6 umgesetzt (Branches harness-0027-e1 … e6), Etappe 7 offen; freigegeben nach 2 Review-Runden, Nutzerentscheide getroffen. Früherer Status: freigegeben (2 Review-Runden, Nutzerentscheide getroffen)
+Status: in Umsetzung – Etappen 1–6 umgesetzt (Branches harness-0027-e1 … e6), Etappe 7 umgesetzt auf `harness-0027-e7`, K9 offen; freigegeben nach 2 Review-Runden, Nutzerentscheide getroffen. Früherer Status: freigegeben (2 Review-Runden, Nutzerentscheide getroffen)
 Datum: 2026-10-08
 Bezug: ADR 0004 (Backpressure, ergänzt durch ADR 0021), ADR 0002 (Hosting, „check → E2E → Deploy“, Teil B von ADR 0021 ändert das für Doku-Commits), ADR 0012 (Budgets, unverändert), Plan 0013 (CI-Sharding, `PW_SUITE`), `docs/architecture.md` (Schicht `.claude/hooks/`: nur Node-Builtins)
 
@@ -774,6 +774,58 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
 - **Ergebnis:**
   - `heavy.test.ts` braucht 3,6 s, und fünf Läufe nacheinander waren grün.
   - `check:fast` braucht **6,8 / 7,1 / 7,0 s** bei Last 4,9.
+
+### Etappe 7 (Branch `harness-0027-e7`, auf `ci-apt-lock` `c0b3217`)
+
+- **`scripts/lib/ci-scope.ts`**, rein, mit Test 6 vorab (`scripts/lib/ci-scope.test.ts`, 48 Fälle):
+  - `decideScope(event, io)` bekommt Git (`isAncestor`, `changedPaths`) und die API (`api(path)` liefert den Rumpf) als Eingaben und wirft nie. Jede Ausnahme ergibt `full=true` mit dem Grund.
+  - `main`: höchstens zwei Abfragen, Deployments in `github-pages` und die Statuses des neuesten. Neuestes Deployment und letzter Status sind jeweils der Eintrag mit der höchsten `id`, unabhängig von der Sortierung der Antwort. Der SHA wird vor der zweiten Abfrage gegen `^[0-9a-f]{40}$` geprüft.
+  - Branches: zuerst Git (Vorfahre, Diff nur Doku), erst dann eine Abfrage der Läufe von `ci.yml` mit `event=push`, `branch` und `head_sha`. Gezählt wird nur ein Lauf mit gleichem `head_sha`, gleichem `head_branch`, `event: push` und `conclusion: success`.
+  - Abgedeckt sind alle Fälle aus Test 6, dazu: gleicher Stand wie live (leerer Diff → `false`), Status `inactive`, `in_progress` oder `failure` → `true`, Force-Push, Tag, ungültiger SHA des Laufs, Branchname mit Schrägstrich. Abdeckung 100 % der Zeilen, 96 % der Zweige.
+- **`scripts/ci-scope.ts`** verdrahtet Git (`scripts/lib/ci-scope-git.ts`), `fetch` mit 10 s je Abfrage und `$GITHUB_OUTPUT`. Jede Ausnahme zur Laufzeit endet mit Exit 0. Den Grund schreibt es als `::notice` in den Lauf. `scripts/ci-scope.test.ts` startet es als Prozess: `pull_request`, eine Ausnahme (Repository und Token fehlen) und fehlendes `GITHUB_OUTPUT` enden mit Exit 0 und `full=true`.
+- **`ci.yml`:**
+  - Neuer Job `scope` mit `fetch-depth: 0`, Node ohne `pnpm install` und den Rechten `{ contents: read, actions: read, deployments: read }`.
+  - `e2e` und `smoke` haben `needs: scope` und `if: needs.scope.outputs.full == 'true'`.
+  - `gates` hat `needs: [scope, check, e2e, smoke]` und `if: ${{ !cancelled() }}`. Es verlangt `scope` und `check` mit `success`. Bei `full=false` verlangt es `e2e` und `smoke` als `skipped`, bei jedem anderen Wert (auch leer) als `success`.
+  - `deploy` hat `needs: [gates, scope]` und läuft nur bei `full == 'true'`.
+  - Die Schritte zur Browser-Installation sind unverändert.
+- **Doku:** ADR 0021 ist ganz angenommen, Teil B nennt die zwei Abfragen und die Absicherung gegen Rot. ADR 0002 verweist auf ADR 0021, Teil B. CLAUDE.md, Schritt 6, beschreibt den Doku-Pfad statt „Sobald Etappe 7 …“.
+- **Abweichungen vom Plan:**
+  - Test 6 liegt neben dem reinen Modul in `scripts/lib/`, wie Test 2 (`stop-decision`). `scripts/ci-scope.test.ts` prüft nur das Skript als Prozess, also den Fall „Ausnahme im Skript → `true` und Exit 0“.
+  - Auf `main` zählt nur das neueste Deployment. Ist sein letzter Status nicht `success`, gilt `full=true`, statt ältere Deployments abzufragen. So bleibt es bei zwei Abfragen (E13). Ein laufender oder gescheiterter Deploy führt also zu einem vollen Lauf; das prüft mehr, nie weniger.
+  - `check` wartet nicht auf `scope` und startet sofort. Nur `e2e`, `smoke`, `gates` und `deploy` hängen an `scope`.
+  - Kein Rot durch `scope`, doppelt abgesichert: `continue-on-error` am Schritt, und die Job-Ausgabe ist `steps.scope.outputs.full || 'true'`. Ein Absturz des Skripts ergibt also `full=true`.
+  - `persist-credentials: false` am Checkout von `scope`, denn der Job schreibt nichts.
+  - Die API ruft das Skript mit `fetch` auf statt mit `gh api` (E10): So ist das Zeitlimit von 10 s je Abfrage steuerbar, und der Job braucht `gh` nicht.
+- **Nacharbeit zum Arch-Review** (Verdict: Nacharbeit nötig, kein Blocker):
+  - **M1** (Kanarienvogel für das umgebaute `gates`): K9 hat die Fälle 6 bis 8, siehe unten.
+  - **M2** (ohne `pnpm install`): neue Regel `ci-scope-builtins-only` in `.dependency-cruiser.cjs` und eine Zeile in `docs/architecture.md`. Das Skript und seine Module `lib/ci-scope`, `lib/ci-scope-git`, `lib/change-class` und `lib/git-env` dürfen nur Node-Builtins und einander importieren. Kanarienvogel: `import "zod"` und ein Import aus `src/domain/` in `change-class.ts` ergeben zwei Verstöße, danach zurückgenommen.
+  - **m1:** ADR 0021 und der Kopf des Skripts sagen genau, was nie rot wird: eine Ausnahme im Skript. Scheitert der Job selbst, ist der Lauf rot, aber nie grün ohne volle Prüfung. Die git-Aufrufe haben ein Zeitlimit von 30 s.
+  - **m2:** Skill `browser-review`, Ziel `live`: Liegen nach dem UI-Commit nur Doku-Commits, zeigt `meta.json` den letzten Commit mit Build-Eingaben.
+  - **m3:** Der Test „Doku liest niemand“ prüft auch `site.config.ts` und `playwright.devices.ts`.
+  - **m4:** Die Dauer von `scope` wird in K9 gemessen, siehe Fall 9.
+  - **m5:** Der git-Teil liegt in `scripts/lib/ci-scope-git.ts` und ist gegen ein Temp-Repo getestet (`tempRepo()`). Geprüft werden alle Pfade, auch mit Leerzeichen und Umlaut, bei einer Umbenennung beide Pfade, Vorfahre ja und nein, und dass ein unbekanntes Objekt oder ein fehlendes Repo wirft.
+  - **m6:** ADR 0021, Teil B: Ohne neuen Commit liefert nur `workflow_dispatch` neu aus. „Re-run all jobs“ auf dem Lauf des Live-Commits ergibt `full=false`.
+  - **Hinweis zum Merge:** Gegenüber `origin/main` (`8a75abb`) nimmt dieser Branch die Wiederholung bei der Browser-Installation zurück, denn er baut auf `ci-apt-lock` (`c0b3217`) auf. Das ist gewollt, siehe „CI: Browser-Installation mit Zeitlimit und Wiederholung“.
+- **Formen der API geprüft** (2026-10-08, je eine Abfrage mit `gh api`):
+  - Deployments in `github-pages`: neuestes zuerst, `sha` voll, `ref: main`.
+  - Statuses: neuestes zuerst (`success` vor `in_progress`, `queued`, `waiting`).
+  - Läufe von `ci.yml` mit `event=push&branch=ci-apt-lock&head_sha=d07f229…`: ein Lauf mit `head_sha`, `head_branch`, `event: push` und `conclusion: success`.
+- **Probe mit echtem Git**, ohne Token:
+  - Code-Diff `d07f229..c0b3217` → `full=true`, „`.github/workflows/ci.yml` geändert“.
+  - `before` kein Vorfahre → `full=true`.
+  - unbekannter SHA → `full=true` über die Ausnahme.
+  - Doku-Diff `4700445..8113cd3` erreicht die Abfrage der Läufe; die scheitert ohne Token → `full=true`.
+- **K9: offen.** Er braucht Läufe auf einem Branch und auf `main`, und Subagents beobachten die CI nicht (E13). Der erste Lauf von `harness-0027-e7` ist ein neuer Branch und fährt deshalb voll; er belegt die neuen Jobs mit `full=true`. Ablauf für die Haupt-Session:
+  1. Auf dem Branch nach dem grünen Lauf einen reinen Doku-Commit pushen → `e2e` und `smoke` übersprungen, `gates` grün, kein `deploy`.
+  2. Einen Doku-Commit nach einem roten oder abgebrochenen Vorgänger pushen → volle Matrix.
+  3. Doku plus eine Datei in `src/` → volle Matrix.
+  4. **Wartender Lauf abgebrochen**, auf `main`: Ein Lauf X läuft, dann Code-Commit C0 pushen (wartet) und direkt danach Doku-Commit D1 (bricht den wartenden C0 ab). D1 fährt `full=true`, weil der Diff von live (X) nach D1 C0 enthält, und deployt; `meta.json` zeigt D1.
+  5. Danach auf `main` ein reiner Doku-Commit → `full=false`, kein Deploy, `meta.json` bleibt.
+  6. **Kanarienvogel `gates` bei voller Matrix** (Arch-Review M1), auf dem Branch: ein absichtlich roter E2E-Test, danach ein Doku-Commit → volle Matrix, `gates` rot mit „E2E ist failure“, kein `deploy`.
+  7. **Kanarienvogel `gates` im Doku-Pfad**: nach grünem Lauf ein Doku-Commit mit totem Plan-Pfad (im Commit-Text beschrieben, wie K1) → `full=false`, `check` rot, `gates` rot.
+  8. **Absturz von `scope`**: Das Skript endet absichtlich vor der Ausgabe mit `exit 1` → Schritt rot, Job grün (`continue-on-error`), `full=true`, volle Matrix.
+  9. **Dauer von `scope`** in einem vollen Lauf messen. Verzögert der volle Klon E2E und Smoke spürbar, bekommt der Checkout `filter: blob:none`; `merge-base` und `diff --name-only` brauchen nur Commits und Trees.
 
 ## Entschieden (Nutzer, 2026-10-08)
 

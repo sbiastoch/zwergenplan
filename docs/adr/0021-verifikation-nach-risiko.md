@@ -1,6 +1,6 @@
 # ADR 0021 – Verifikation nach Risiko
 
-Status: **Teil A angenommen** (2026-10-08, umgesetzt mit Plan 0027, Etappen 1 bis 5). **Teil B ist Entwurf** und gilt als angenommen mit Etappe 7. Der Nutzer hat Teil B am 2026-10-08 zugestimmt. Dieses ADR ergänzt ADR 0004 (Backpressure). Teil B ändert für Doku-Commits ADR 0002 („check → E2E → Deploy“).
+Status: **angenommen** (2026-10-08). Teil A ist umgesetzt mit Plan 0027, Etappen 1 bis 5, Teil B mit Etappe 7 (Job `scope`, `scripts/ci-scope.ts`). Der Nutzer hat Teil B am 2026-10-08 zugestimmt. Dieses ADR ergänzt ADR 0004 (Backpressure). Teil B ändert für Doku-Commits ADR 0002 („check → E2E → Deploy“).
 
 ## Kontext
 
@@ -46,9 +46,10 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
 ### Teil B: CI-Doku-Pfad
 
 8. **Der Job `scope` entscheidet `full`.**
-   - Auf `main` gilt `full=false` nur, wenn der live ausgelieferte Commit ein Vorfahre ist und der Diff von dort bis zum Push nur Stufe 0 enthält. Den Live-Commit liefert die Deployments-API von GitHub: der volle SHA (40 Hex-Zeichen) des neuesten Deployments in `github-pages` mit Status `success`. `https://zwergenplan.app/data/meta.json` scheidet dafür aus, weil es nur einen Kurz-SHA oder `"unbekannt"` enthält und aus einem CDN-Cache kommen kann.
+   - Auf `main` gilt `full=false` nur, wenn der live ausgelieferte Commit ein Vorfahre ist und der Diff von dort bis zum Push nur Stufe 0 enthält. Den Live-Commit liefert die Deployments-API von GitHub: der volle SHA (40 Hex-Zeichen) des neuesten Deployments in `github-pages`, wenn dessen letzter Status `success` ist. Ist er es nicht (Deploy läuft, gescheitert oder abgelöst), gilt `full=true`; ältere Deployments fragt `scope` nicht ab, denn es fragt die API höchstens zweimal je Lauf ab (Plan 0027, E13). `https://zwergenplan.app/data/meta.json` scheidet dafür aus, weil es nur einen Kurz-SHA oder `"unbekannt"` enthält und aus einem CDN-Cache kommen kann.
    - Auf anderen Branches gilt `full=false` nur, wenn der Vorgänger einen grünen Lauf mit `event: push` auf derselben Ref hat und der Diff nur Stufe 0 enthält.
-   - In jedem anderen Fall gilt `full=true`, auch wenn eine Abfrage fehlschlägt, bei neuen Branches, bei Pull Requests und bei `workflow_dispatch`. Ein Fehler in `scope` macht den Lauf nie rot, er führt nur zu `full=true`. Der Job `scope` braucht die Rechte `contents: read`, `actions: read` und `deployments: read`.
+   - In jedem anderen Fall gilt `full=true`, auch wenn eine Abfrage fehlschlägt, bei neuen Branches, bei Pull Requests und bei `workflow_dispatch`. Ein Fehler im Skript macht den Lauf nicht rot, er führt nur zu `full=true`: Jede Ausnahme zur Laufzeit endet mit Exit 0, der Schritt hat `continue-on-error`, und fehlt seine Ausgabe, setzt der Job `full=true`. Scheitert der Job selbst (Checkout, Node, Zeitlimit), ist der Lauf rot, aber nie grün ohne volle Prüfung. Der Job `scope` braucht die Rechte `contents: read`, `actions: read` und `deployments: read`. Er läuft ohne `pnpm install`, deshalb nutzen das Skript und seine Module nur Node-Builtins (`ci-scope-builtins-only`).
+   - **Neu ausliefern ohne neuen Commit** geht nur per `workflow_dispatch`. „Re-run all jobs“ auf dem Lauf des Live-Commits ergibt einen leeren Diff, also `full=false`, und deployt nicht.
 9. **Bei `full=false`** laufen nur `scope`, `check` und `gates`, ohne E2E, Smoke und Deploy.
    - `gates` läuft mit `!cancelled()` und prüft alle Ergebnisse.
    - `deploy` hängt an `gates` und `scope` und läuft nur bei `full == 'true'`.

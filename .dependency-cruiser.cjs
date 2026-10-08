@@ -272,6 +272,17 @@ module.exports = {
       to: { pathNot: "^(src/domain|scripts/transit)/" },
     },
     {
+      name: "ci-scope-builtins-only",
+      severity: "error",
+      comment:
+        "Der CI-Job scope läuft ohne pnpm install (Plan 0027, E10): scripts/ci-scope.ts und seine Importe nutzen nur Node-Builtins und die reinen Module lib/ci-scope, lib/ci-scope-git, lib/change-class und lib/git-env. Ein npm-Paket oder ein Modul aus src/ ließe das Skript im Job beim Import abstürzen, und der Doku-Pfad fiele still auf full=true (Arch-Review Etappe 7, M2).",
+      from: { path: "^scripts/(ci-scope|lib/(ci-scope|ci-scope-git|change-class|git-env))\\.ts$" },
+      to: {
+        dependencyTypesNot: ["core"],
+        pathNot: "^scripts/lib/(ci-scope|ci-scope-git|change-class|git-env)\\.ts$",
+      },
+    },
+    {
       name: "src-not-scripts",
       severity: "error",
       comment: "Die App und die Domäne hängen nie von Build-/Pipeline-Skripten ab.",
