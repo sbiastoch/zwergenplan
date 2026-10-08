@@ -106,9 +106,17 @@ const UNIT_WORDS: Record<CalendarSelection["unit"], string> = {
   monat: "diesen Monat",
 };
 
-/** Leerzustand „Nichts gemerkt“ im Kalender der Merkliste und sein Knopf nach „Angebote“ (Plan 0025, E5, Fall 4) */
-export function rangeEmptyTexts(unit: CalendarSelection["unit"]): { text: string; action: string } {
-  return { text: `Für ${UNIT_WORDS[unit]} hast du nichts gemerkt.`, action: `Für ${UNIT_WORDS[unit]} entdecken` };
+/**
+ * Leerzustand „Nichts gemerkt“ im Kalender der Merkliste und sein Knopf nach „Angebote“ (Plan 0025, E5, Fall 4).
+ * `ageText`, wenn nur das Alter Gemerktes ausblendet (Browser-Review 0025).
+ */
+export function rangeEmptyTexts(unit: CalendarSelection["unit"]): { text: string; ageText: string; action: string } {
+  const words = UNIT_WORDS[unit];
+  return {
+    text: `Für ${words} hast du nichts gemerkt.`,
+    ageText: `Für ${words} hast du nur Termine gemerkt, die nicht zum Alter passen.`,
+    action: `Für ${words} entdecken`,
+  };
 }
 
 /** „2 gemerkte Termine blendet der Filter aus.“ (Plan 0025, E5, Fall 1) */

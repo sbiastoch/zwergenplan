@@ -820,3 +820,31 @@ test.describe("Export-Knopf der Merkliste über der ersten Kachel", () => {
     }
   }
 });
+
+/*
+ * Browser-Review live Plan 0025, Etappe 3, Minor 2: Bei 320 px stieß der Export-Knopf an den Umschalter, im Kalender
+ * klebte die Statuszeile mit etwa 4 px daran. Seit Etappe 4 steht dazwischen die Filterzeile; gemessen wird der Abstand
+ * vom Umschalter zum ersten Chip und vom Chip zum Export-Knopf bzw. zur Statuszeile.
+ */
+test.describe("Abstand unter dem Umschalter der Merkliste", () => {
+  for (const view of ["merkliste", "merkliste-kalender"] as const) {
+    for (const scale of [1, 2]) {
+      test(`${view} bei 320 px und ${scale * 100} %: Filterzeile und Statuszeile mit Abstand`, async ({ page }) => {
+        await page.setViewportSize({ width: 320, height: 800 });
+        await page.addInitScript(
+          (saved) => localStorage.setItem("zwergenplan.merkliste", saved),
+          JSON.stringify(["familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus"]),
+        );
+        await page.goto(`./?ansicht=${view}`);
+        await expect(page.locator(".saved-filters .chip").first()).toBeVisible();
+        await setTextScale(page, scale);
+        const toggle = await page.locator(".view-toggle.full .seg").boundingBox();
+        const chip = await page.locator(".saved-filters .chip").first().boundingBox();
+        const next = await page.locator(view === "merkliste" ? ".exportbtn" : ".status-row > .status").boundingBox();
+        if (!toggle || !chip || !next) throw new Error("Umschalter, Filterzeile oder Statuszeile fehlt");
+        expect(chip.y - (toggle.y + toggle.height), "Umschalter → Filterzeile").toBeGreaterThanOrEqual(8);
+        expect(next.y - (chip.y + chip.height), "Filterzeile → Export bzw. Statuszeile").toBeGreaterThanOrEqual(8);
+      });
+    }
+  }
+});

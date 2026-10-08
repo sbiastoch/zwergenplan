@@ -28,6 +28,16 @@ export function upcomingSessions(offer: Offer, now: Date): Session[] {
   return offer.sessions.filter(notEnded(now));
 }
 
+/**
+ * Eingeklappte Terminliste im Detail: die ersten `limit` Termine. Liegt der Bezugstermin (`referenceSession`) dahinter,
+ * wird er angehängt, damit der hervorgehobene Termin auch eingeklappt sichtbar ist (Browser-Review Plan 0025/0028).
+ */
+export function collapsedSessions(upcoming: readonly Session[], ref: Session | undefined, limit: number): Session[] {
+  const head = upcoming.slice(0, limit);
+  const later = ref && upcoming.slice(limit).find((s) => s.start === ref.start);
+  return later ? [...head, later] : head;
+}
+
 /** Nächster noch nicht beendeter Termin. */
 export function nextSession(offer: Offer, now: Date): Session | undefined {
   return offer.sessions.find(notEnded(now));
@@ -148,6 +158,11 @@ export interface RangeAgenda<T extends Offer> {
   ended: number;
   /** nicht beendete Termine in [from, to], die der Merklisten-Filter ausblendet (allIndex minus index, nie < 0) */
   hidden: number;
+  /**
+   * nicht beendete Termine in [from, to], die nur das Alter ausblendet (ageIndex minus index, nie < 0; Browser-Review
+   * Plan 0025): Der Leerzustand nennt dann das Alter statt „nichts gemerkt“
+   */
+  ageHidden: number;
   /** `from` liegt nach dem letzten Tag des Datenstands */
   afterData: boolean;
 }
@@ -157,25 +172,33 @@ export interface RangeAgenda<T extends Offer> {
  * Termine fallen weg (gleiche Regel wie überall: ein Termin zählt, bis er beendet ist). `endedToday` zählt der
  * Aufrufer mit `endedOnDay` über alle passenden Angebote – auch solche ohne kommenden Termin, die gar nicht im Index
  * stehen. `dataEnd` ist der letzte Tag des ganzen Datenstands. `allIndex` ist der Index ohne Merklisten-Filter;
- * `index` ist eine Teilmenge davon, die Differenz also genau das Ausgeblendete.
+ * `index` ist eine Teilmenge davon, die Differenz also genau das Ausgeblendete. `ageIndex` ist der Index nach dem
+ * Merklisten-Filter, aber ohne Altersprüfung (nur mit Geburtsdatum); die Differenz zu `index` blendet das Alter aus.
  */
 export function rangeAgenda<T extends Offer>(
   index: ReadonlyMap<string, Occurrence<T>[]>,
   range: { from: string; to: string },
   now: Date,
-  context: { dataEnd: string | undefined; endedToday: number; allIndex: ReadonlyMap<string, Occurrence<T>[]> },
+  context: {
+    dataEnd: string | undefined;
+    endedToday: number;
+    allIndex: ReadonlyMap<string, Occurrence<T>[]>;
+    ageIndex?: ReadonlyMap<string, Occurrence<T>[]> | undefined;
+  },
 ): RangeAgenda<T> {
   const isNotEnded = notEnded(now);
   const today = berlinIsoDate(now);
   const groups: DayGroup<Occurrence<T>>[] = [];
   let count = 0;
   let all = 0;
+  let ageAll = 0;
   // Die Tage zählen, nicht die Map: Sie kennt jeden Tag des Datenstands.
   let day = range.from;
   for (let i = 0; i < MAX_RANGE_DAYS && day <= range.to; i += 1, day = addDays(day, 1)) {
     const items = (index.get(day) ?? []).filter((o) => isNotEnded(o.session));
     // Beendetes zählt nicht: „ausgeblendet“ heißt nur, was man noch besuchen könnte.
     all += (context.allIndex.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
+    ageAll += (context.ageIndex?.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
     count += items.length;
     if (items.length > 0) groups.push({ day, items });
   }
@@ -184,6 +207,7 @@ export function rangeAgenda<T extends Offer>(
     count,
     ended: range.from <= today && today <= range.to ? context.endedToday : 0,
     hidden: Math.max(0, all - count),
+    ageHidden: context.ageIndex ? Math.max(0, ageAll - count) : 0,
     afterData: context.dataEnd !== undefined && range.from > context.dataEnd,
   };
 }

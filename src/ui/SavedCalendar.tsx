@@ -44,8 +44,8 @@ interface MonthAnchor {
 const termine = (n: number) => plural(n, "Termin", "Termine");
 
 export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFilter }: SavedCalendarProps) {
-  const { index, allIndex, dataEnd, endedToday, selection, setSelection, monthOpen, setMonthOpen } = calendar;
-  const context = { dataEnd, endedToday, allIndex };
+  const { index, allIndex, ageIndex, dataEnd, endedToday, selection, setSelection, monthOpen, setMonthOpen } = calendar;
+  const context = { dataEnd, endedToday, allIndex, ageIndex };
   const agendaOf = (sel: CalendarSelection) => rangeAgenda(index, selectionRange(sel, today), now, context);
   // Je Render einmal je Tag: Label und Formpunkte fragen denselben Tag mehrfach ab.
   const days = new Map<string, Occurrence<SiteOffer>[]>();
@@ -219,6 +219,16 @@ function RangeEmpty({
     return (
       <EmptyState icon="search" title="Weiter reicht der Plan noch nicht">
         Termine sind bis {longDate(dataEnd)} eingetragen. Neue kommen mit dem nächsten Datenstand.
+      </EmptyState>
+    );
+  }
+  if (agenda.ageHidden > 0) {
+    // Gemerktes gäbe es, nur passt es nicht zum Alter: „nichts gemerkt“ wäre falsch (Browser-Review 0025)
+    return (
+      <EmptyState icon="heart" title="Nichts passt zum Alter">
+        {empty.ageText}
+        <br />
+        {discover}
       </EmptyState>
     );
   }

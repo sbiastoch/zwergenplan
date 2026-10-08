@@ -101,6 +101,11 @@ export interface SavedCalendarData {
   /** dieselben ohne Merklisten-Filter: Daraus zählt `rangeAgenda`, was der Filter ausblendet (E5, Fall 1) */
   allIndex: Map<string, Occurrence<SiteOffer>[]>;
   /**
+   * nur mit Geburtsdatum: dieselben nach dem Merklisten-Filter, aber ohne Altersprüfung. Daraus zählt `rangeAgenda`,
+   * was nur das Alter ausblendet (Browser-Review 0025).
+   */
+  ageIndex: Map<string, Occurrence<SiteOffer>[]> | undefined;
+  /**
    * letzter Tag mit Terminen im ganzen Datenstand (B8), zugleich die Grenze der Pfeile: So kann man auch in Wochen ohne
    * Gemerktes blättern und von dort „Für diese Woche entdecken“ nutzen (E5)
    */
@@ -192,6 +197,10 @@ export function useOfferViews({
     () => (onCalendar && savedFiltered ? sessionsByDay(savedVisibleList, savedFits) : allIndex),
     [onCalendar, savedFiltered, savedVisibleList, savedFits, allIndex],
   );
+  const ageIndex = useMemo(
+    () => (onCalendar && birthDate !== undefined ? sessionsByDay(savedVisibleList) : undefined),
+    [onCalendar, birthDate, savedVisibleList],
+  );
   // Bewusst nicht über `saved`: Das kennt nur Angebote mit kommendem Termin. Ein gemerktes Angebot, dessen einziger
   // Termin heute schon vorbei ist, zählt sonst nicht (Review M7, B2). Mit demselben Prädikat wie der Index: Ein
   // unpassender Termin steht nie im Kalender, also auch nicht in „heute schon vorbei“ (Arch-Review 0025, M1). Ebenso
@@ -233,6 +242,7 @@ export function useOfferViews({
       allIndex && {
         index: savedIndex,
         allIndex,
+        ageIndex,
         dataEnd,
         endedToday,
         selection: { ...selection, day: clampDay(selection.day, today) },

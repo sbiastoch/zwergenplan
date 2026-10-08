@@ -284,6 +284,21 @@ test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
     expect(ics).toContain("DTSTART:20261103T140000Z");
   });
 
+  test("erster passender Termin nach den ersten vier: eingeklappt angehängt und hervorgehoben (Browser-Review 0025)", async ({
+    page,
+  }) => {
+    // 6–24 Monate, mittwochs 7.10.–4.11.; das Kind wird am 1.11. 6 Monate alt, passt also erst am 5. Termin
+    const { dialog } = await openAged(page, TREFF, "2026-05-01");
+    const dates = dialog.locator(".dates li");
+    await expect(dates).toHaveCount(5);
+    await expect(dates.nth(3)).toHaveText(/^Mittwoch, 28\. Oktober/);
+    await expect(dialog.locator(".dates li.sel")).toHaveText(/^Mittwoch, 4\. November/);
+    await expect(dialog.locator(".dates li.sel")).toBeVisible();
+    // alle fünf schon sichtbar: kein Knopf „Alle … zeigen“
+    await expect(dialog.getByRole("button", { name: /^Alle \d+ Termine zeigen$/ })).toHaveCount(0);
+    await expect(dialog.getByRole("link", { name: "Nur Mi 4.11." })).toBeVisible();
+  });
+
   test("passt über die ganze Reihe: trotzdem aus dem Browser, ohne Zusatz (Review 3, W2)", async ({ page }) => {
     const { dialog, all, icsRequests } = await openAged(page, REIME, "2024-09-18");
     await expect(ageLine(dialog)).toHaveText("Passt: am Fr 9.10. 24 Monate alt");

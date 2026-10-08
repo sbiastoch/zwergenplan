@@ -2,8 +2,10 @@
 
 @layer components {
   /* Inhalt */
+  /* `--body-pad`: seitlicher Rand des Inhalts; die Filterzeile der Merkliste hebt ihn auf (unten) */
   .body {
-    padding: 0 16px 20px;
+    --body-pad: 16px;
+    padding: 0 var(--body-pad) 20px;
   }
   .status {
     display: flex;
@@ -19,7 +21,7 @@
   }
   /* Filterzeile der Merkliste (Plan 0025, E6): scrollt wie die Schnellfilter bis an den Rand des Inhalts */
   .saved-filters .chips {
-    margin-inline: -16px;
+    margin-inline: calc(-1 * var(--body-pad));
   }
   /* runder Export-Knopf der Merkliste rechts neben der Statuszeile, nur Icon (Plan 0025, E9) */
   .exportbtn {

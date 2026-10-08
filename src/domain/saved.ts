@@ -166,6 +166,13 @@ export type SavedFilterChip =
   | { kind: "registration"; value: Registration }
   | { kind: "range"; range: DateRange };
 
+/** Ist der Chip gewählt? Dieselbe Regel wie in `toggleSavedFilter` (Arch-Review 0025, Etappe 4). */
+export function isSavedFilterChipOn(filter: SavedFilter, chip: SavedFilterChip): boolean {
+  if (chip.kind === "format") return filter.formats.includes(chip.value);
+  if (chip.kind === "registration") return filter.registration.includes(chip.value);
+  return filter.range?.from === chip.range.from && filter.range?.to === chip.range.to;
+}
+
 /**
  * Tipp auf einen Chip: Format als Mehrfachwahl, Anmeldung als Einfachwahl wie im Filter-Sheet, die Schnellwahlen
  * „ab …“ als Einfachwahl, die ein zweiter Tipp aufhebt. Ohne Zeitraum fehlt der Schlüssel (kanonisch wie `withDateRange`).
@@ -173,11 +180,10 @@ export type SavedFilterChip =
 export function toggleSavedFilter(filter: SavedFilter, chip: SavedFilterChip): SavedFilter {
   if (chip.kind === "format") return { ...filter, formats: toggleId(filter.formats, chip.value) };
   if (chip.kind === "registration") {
-    return { ...filter, registration: filter.registration.includes(chip.value) ? [] : [chip.value] };
+    return { ...filter, registration: isSavedFilterChipOn(filter, chip) ? [] : [chip.value] };
   }
-  const { range, ...rest } = filter;
-  const same = range?.from === chip.range.from && range?.to === chip.range.to;
-  return same ? rest : { ...rest, range: chip.range };
+  const { range: _range, ...rest } = filter;
+  return isSavedFilterChipOn(filter, chip) ? rest : { ...rest, range: chip.range };
 }
 
 /** Gewählte Werte; der Zeitraum zählt als einer und nur mit `useRange` (Statuszeile, „Zurücksetzen“, Export-Name). */

@@ -1,10 +1,10 @@
 /**
  * Filterzeile der Merkliste (Plan 0025, E6, E7): Chips wie die Schnellfilter, ohne Sheet. Format (Mehrfachwahl),
- * Anmeldung (Einfachwahl) und in Liste und Karte die Schnellwahlen „ab …“. Was ein Tipp bewirkt, entscheidet
- * `toggleSavedFilter` in der Domäne.
+ * Anmeldung (Einfachwahl) und in Liste und Karte die Schnellwahlen „ab …“. Was ein Tipp bewirkt und ob ein Chip an
+ * ist, entscheiden `toggleSavedFilter` und `isSavedFilterChipOn` in der Domäne.
  */
 import type { DateRange } from "../domain/date-range.ts";
-import { type SavedFilter, type SavedFilterChip, toggleSavedFilter } from "../domain/saved.ts";
+import { isSavedFilterChipOn, type SavedFilter, type SavedFilterChip, toggleSavedFilter } from "../domain/saved.ts";
 import type { Format, Registration } from "../domain/schema.ts";
 import { quickRangeLabel } from "./format.ts";
 import { Icon } from "./icons.tsx";
@@ -21,7 +21,6 @@ const REGISTRATION_CHIPS = [
 
 interface Chip {
   label: string;
-  on: boolean;
   chip: SavedFilterChip;
 }
 
@@ -42,42 +41,31 @@ export function SavedFilters({
   onReset: (() => void) | undefined;
 }) {
   const chips: Chip[] = [
-    ...FORMAT_CHIPS.map(
-      ([value, label]): Chip => ({ label, on: filter.formats.includes(value), chip: { kind: "format", value } }),
-    ),
-    ...REGISTRATION_CHIPS.map(
-      ([value, label]): Chip => ({
-        label,
-        on: filter.registration.includes(value),
-        chip: { kind: "registration", value },
-      }),
-    ),
+    ...FORMAT_CHIPS.map(([value, label]): Chip => ({ label, chip: { kind: "format", value } })),
+    ...REGISTRATION_CHIPS.map(([value, label]): Chip => ({ label, chip: { kind: "registration", value } })),
     ...(showRange
-      ? quick.map(
-          ({ month, range }): Chip => ({
-            label: quickRangeLabel(month),
-            on: filter.range?.from === range.from,
-            chip: { kind: "range", range },
-          }),
-        )
+      ? quick.map(({ month, range }): Chip => ({ label: quickRangeLabel(month), chip: { kind: "range", range } }))
       : []),
   ];
   return (
     <fieldset className="plain saved-filters">
       <legend className="sr-only">Merkliste filtern</legend>
       <div className="chips">
-        {chips.map(({ label, on, chip }) => (
-          <button
-            key={label}
-            type="button"
-            className="chip"
-            aria-pressed={on}
-            onClick={() => onChange(toggleSavedFilter(filter, chip))}
-          >
-            {on && <Icon name="check" size={18} />}
-            {label}
-          </button>
-        ))}
+        {chips.map(({ label, chip }) => {
+          const on = isSavedFilterChipOn(filter, chip);
+          return (
+            <button
+              key={label}
+              type="button"
+              className="chip"
+              aria-pressed={on}
+              onClick={() => onChange(toggleSavedFilter(filter, chip))}
+            >
+              {on && <Icon name="check" size={18} />}
+              {label}
+            </button>
+          );
+        })}
         {onReset && (
           <button type="button" className="chip" onClick={onReset}>
             Zurücksetzen

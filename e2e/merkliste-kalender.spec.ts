@@ -330,6 +330,12 @@ test("regelmäßig gemerkt, Kind wächst erst hinein: nur Tage, an denen es zum 
   await openCalendar(page, { ids: [IDS.treff], birthDate: "2026-04-20" });
   await expect(page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Termine" })).toBeVisible();
   await expect(offers(page)).toHaveCount(0);
+  // Gemerkt ist etwas, nur passt es nicht zum Alter: kein „Nichts gemerkt“ (Browser-Review 0025)
+  await expect(page.getByText("Nichts passt zum Alter", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Für diese Woche hast du nur Termine gemerkt, die nicht zum Alter passen."),
+  ).toBeVisible();
+  await expect(page.getByText("Nichts gemerkt", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Nächste Woche" }).click();
   await expect(page.getByRole("button", { name: "Mittwoch, 14. Oktober, 0 Termine" })).toBeVisible();
   await page.getByRole("button", { name: "Nächste Woche" }).click();

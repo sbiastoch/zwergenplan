@@ -7,6 +7,7 @@ import {
   collectionExport,
   EMPTY_SAVED_FILTER,
   exportSessions,
+  isSavedFilterChipOn,
   matchesSavedFilter,
   type SavedFilter,
   savedFilterCount,
@@ -411,6 +412,28 @@ describe("Filter der Merkliste (Plan 0025, E6)", () => {
     expect(matchesSavedFilter(cafe, filter({ formats: ["kurs"] }))).toBe(false);
     expect(matchesSavedFilter(cafe, filter({ registration: ["mit-anmeldung"] }))).toBe(false);
     expect(matchesSavedFilter(cafe, filter({ range: { from: "2027-01-01" } }))).toBe(true);
+  });
+});
+
+describe("isSavedFilterChipOn (Arch-Review 0025, Etappe 4)", () => {
+  const nov = { from: "2026-11-01" };
+  const f: SavedFilter = { formats: ["kurs"], registration: ["mit-anmeldung"], range: nov };
+
+  it("ist an, wenn der Wert gewählt ist; Zeitraum über von und bis", () => {
+    expect(isSavedFilterChipOn(f, { kind: "format", value: "kurs" })).toBe(true);
+    expect(isSavedFilterChipOn(f, { kind: "format", value: "einmalig" })).toBe(false);
+    expect(isSavedFilterChipOn(f, { kind: "registration", value: "mit-anmeldung" })).toBe(true);
+    expect(isSavedFilterChipOn(f, { kind: "registration", value: "ohne-anmeldung" })).toBe(false);
+    expect(isSavedFilterChipOn(f, { kind: "range", range: { ...nov } })).toBe(true);
+    expect(isSavedFilterChipOn(f, { kind: "range", range: { from: "2026-12-01" } })).toBe(false);
+    expect(isSavedFilterChipOn(f, { kind: "range", range: { from: "2026-11-01", to: "2026-11-30" } })).toBe(false);
+    expect(isSavedFilterChipOn(EMPTY_SAVED_FILTER, { kind: "range", range: nov })).toBe(false);
+  });
+
+  it("passt zu toggleSavedFilter: ein Tipp schaltet genau diesen Chip um", () => {
+    const chip = { kind: "format", value: "regelmaessig" } as const;
+    expect(isSavedFilterChipOn(toggleSavedFilter(f, chip), chip)).toBe(true);
+    expect(isSavedFilterChipOn(toggleSavedFilter(toggleSavedFilter(f, chip), chip), chip)).toBe(false);
   });
 });
 

@@ -6,13 +6,7 @@
 import { type ReactNode, useRef } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
 import type { DateRange } from "../domain/date-range.ts";
-import {
-  collectionExport,
-  EMPTY_SAVED_FILTER,
-  type SavedFilter,
-  savedFilterCount,
-  upcomingSessionCount,
-} from "../domain/saved.ts";
+import { collectionExport, EMPTY_SAVED_FILTER, type SavedFilter, upcomingSessionCount } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
@@ -96,8 +90,8 @@ export function SavedView({
   const offers = savedItems.map((item) => item.offer);
   const shown = visible.map((item) => item.offer);
   const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
-  // Export immer mit allen gemerkten (E9); der Name sagt es, wenn der Filter in der Liste etwas ausblenden könnte
-  const exportName = exportLabel(offers.length, savedFilterCount(filter, { useRange: true }) > 0);
+  // Export immer mit allen gemerkten (E9); der Name sagt es, wenn der Filter in dieser Darstellung etwas ausblendet
+  const exportName = exportLabel(offers.length, filtered);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
     if (count === 0) {

@@ -2,7 +2,7 @@
 import { type MouseEvent, useState } from "react";
 import { assetUrl } from "../data/site.ts";
 import { ageCheck, detailSession } from "../domain/age.ts";
-import { sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
+import { collapsedSessions, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
 import { seriesIcsFileName, seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
 import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
@@ -85,11 +85,12 @@ export function DetailContent({
   // Ohne Kalendertag der erste passende Termin, wie in der Alters-Kachel (Browser-Review Plan 0028)
   const ref = detailSession(offer, now, day, birthDate);
   const upcoming = upcomingSessions(offer, now);
-  const shown = allDates ? upcoming : upcoming.slice(0, 4);
+  const regular = offer.format === "regelmaessig";
+  // Eingeklappt der hervorgehobene Termin auch dann, wenn er nicht unter den ersten vier ist (Browser-Review 0025)
+  const shown = allDates ? upcoming : collapsedSessions(upcoming, regular ? ref : undefined, 4);
   const when = whenLabels(offer, now, birthDate);
   const check = birthDate ? ageCheck(offer, birthDate, now, fromCalendar) : undefined;
   const availability = availabilityLabel(offer);
-  const regular = offer.format === "regelmaessig";
   // Altersgrenze dauerhaft sichtbar (Plan 0018, E4): In der iOS-App verdeckt der Kalender-Dialog den Toast sofort.
   const ageWindow = regular && birthDate ? ageWindowLabel(exportSessions(offer, now, birthDate), now) : undefined;
 
@@ -217,7 +218,7 @@ export function DetailContent({
               </li>
             ))}
           </ol>
-          {!allDates && upcoming.length > 4 && (
+          {!allDates && upcoming.length > shown.length && (
             <button type="button" className="linkbtn" onClick={() => setAllDates(true)}>
               Alle {upcoming.length} Termine zeigen
             </button>

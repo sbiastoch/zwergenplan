@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  collapsedSessions,
   courseProgress,
   endedOnDay,
   groupByNextSession,
@@ -269,6 +270,38 @@ describe("upcomingSessions / nextSession", () => {
   });
 });
 
+describe("collapsedSessions (Browser-Review Plan 0025/0028)", () => {
+  const treff = fixtureOffer("krabbeltreff"); // 5 Termine, 7.10.–4.11.
+  const upcoming = upcomingSessions(treff, FIXTURE_NOW);
+  const starts = (list: readonly Session[]) => list.map((x) => x.start.slice(0, 10));
+
+  it("zeigt die ersten vier, wenn der Bezugstermin darunter ist oder fehlt", () => {
+    expect(starts(collapsedSessions(upcoming, upcoming[3], 4))).toEqual([
+      "2026-10-07",
+      "2026-10-14",
+      "2026-10-21",
+      "2026-10-28",
+    ]);
+    expect(collapsedSessions(upcoming, undefined, 4)).toHaveLength(4);
+  });
+
+  it("hängt einen späteren Bezugstermin an, damit er eingeklappt sichtbar bleibt", () => {
+    expect(starts(collapsedSessions(upcoming, upcoming[4], 4))).toEqual([
+      "2026-10-07",
+      "2026-10-14",
+      "2026-10-21",
+      "2026-10-28",
+      "2026-11-04",
+    ]);
+    // gleicher Termin als neues Objekt (Vergleich über den Beginn)
+    expect(collapsedSessions(upcoming, s("2026-11-04T10:00:00+01:00", "2026-11-04T11:30:00+01:00"), 4)).toHaveLength(5);
+  });
+
+  it("hängt einen Bezugstermin außerhalb der kommenden Termine nicht an", () => {
+    expect(collapsedSessions(upcoming, s("2026-09-30T10:00:00+02:00", "2026-09-30T11:30:00+02:00"), 4)).toHaveLength(4);
+  });
+});
+
 describe("referenceSession", () => {
   const treff = fixtureOffer("krabbeltreff");
   it("nimmt den gewählten Berliner Kalendertag, sonst den nächsten Termin", () => {
@@ -365,6 +398,7 @@ describe("rangeAgenda (Plan 0025, E5)", () => {
       count: 0,
       ended: 0,
       hidden: 0,
+      ageHidden: 0,
       afterData: false,
     });
   });
@@ -396,6 +430,24 @@ describe("rangeAgenda (Plan 0025, E5)", () => {
     expect(rangeAgenda(new Map(), span("2026-10-07", "2026-10-07"), evening, context()).hidden).toBe(0);
   });
 
+  it("zählt, was nur das Alter ausblendet: ageIndex minus index im Bereich (Browser-Review 0025)", () => {
+    const fromOct21: SessionFit = (_offer, session) => session.start >= "2026-10-21";
+    const fitIndex = sessionsByDay([treff], fromOct21);
+    const ageIndex = sessionsByDay([treff]);
+    const withAge = { ...context(), allIndex: fitIndex, ageIndex };
+    expect(rangeAgenda(fitIndex, span("2026-10-12", "2026-10-18"), FIXTURE_NOW, withAge)).toMatchObject({
+      count: 0,
+      hidden: 0,
+      ageHidden: 1,
+    });
+    expect(rangeAgenda(fitIndex, span("2026-10-19", "2026-10-25"), FIXTURE_NOW, withAge).ageHidden).toBe(0);
+    // ohne ageIndex (kein Geburtsdatum) nie etwas
+    expect(rangeAgenda(fitIndex, span("2026-10-12", "2026-10-18"), FIXTURE_NOW, context()).ageHidden).toBe(0);
+    // Beendetes zählt nicht
+    const evening = at("2026-10-07T20:00:00+02:00");
+    expect(rangeAgenda(fitIndex, span("2026-10-07", "2026-10-07"), evening, withAge).ageHidden).toBe(0);
+  });
+
   it("erkennt einen Bereich nach dem Ende des Datenstands", () => {
     expect(rangeAgenda(index, span("2026-12-11", "2026-12-11"), FIXTURE_NOW, context()).afterData).toBe(true);
     expect(rangeAgenda(index, span("2026-12-07", "2026-12-13"), FIXTURE_NOW, context()).afterData).toBe(false);
@@ -418,6 +470,7 @@ describe("rangeAgenda (Plan 0025, E5)", () => {
       count: 0,
       ended: 5,
       hidden: 0,
+      ageHidden: 0,
       afterData: false,
     });
   });

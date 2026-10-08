@@ -685,14 +685,17 @@ describe("Kalender der Merkliste (Plan 0025, E5)", () => {
   it("nennt den leeren Zeitraum und den Weg zu „Angebote“", () => {
     expect(rangeEmptyTexts("tag")).toEqual({
       text: "Für diesen Tag hast du nichts gemerkt.",
+      ageText: "Für diesen Tag hast du nur Termine gemerkt, die nicht zum Alter passen.",
       action: "Für diesen Tag entdecken",
     });
     expect(rangeEmptyTexts("woche")).toEqual({
       text: "Für diese Woche hast du nichts gemerkt.",
+      ageText: "Für diese Woche hast du nur Termine gemerkt, die nicht zum Alter passen.",
       action: "Für diese Woche entdecken",
     });
     expect(rangeEmptyTexts("monat")).toEqual({
       text: "Für diesen Monat hast du nichts gemerkt.",
+      ageText: "Für diesen Monat hast du nur Termine gemerkt, die nicht zum Alter passen.",
       action: "Für diesen Monat entdecken",
     });
   });
