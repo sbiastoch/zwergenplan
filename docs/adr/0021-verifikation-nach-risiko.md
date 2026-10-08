@@ -17,7 +17,7 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
 
 1. **Zwei Stufen aus dem Diff.** `scripts/lib/change-class.ts` vergibt Stufe 0, wenn jeder geänderte Pfad auf der Doku-Positivliste steht. Die Liste umfasst `docs/**/*.md` außer `docs/design/**`, `*.md` im Wurzelverzeichnis, `.claude/skills/**/*.md` und `.claude/agents/*.md`. Jeder andere Diff bekommt Stufe C. Ein Test hält fest, dass kein Build, kein Test, kein Skript und keine Werkzeugkonfiguration Markdown liest. **Grenze:** In der Frontmatter von Skills und Agents könnten `hooks:`, `permissionMode:`, `allowed-tools:` oder `model:` Prozessregeln ändern. Solche Änderungen sichert nur das Review, kein Gate.
 2. **Was jede Stufe prüft.**
-   - Stufe 0 prüft nur `check-docs`: Planstatus, eindeutige Plan- und ADR-Nummern, Pfadverweise.
+   - Stufe 0 prüft nur `check-docs`: eindeutige Plan- und ADR-Nummern, Pfadverweise, ab Plan 0027, Etappe 6, auch den Planstatus.
    - Stufe C ist `check:fast` mit knip, `schema:check` und `check-docs`.
    - Coverage, Builds, `size` und die volle E2E-Suite laufen lokal nur auf ausdrücklichen Aufruf. Sonst laufen sie in der CI.
 3. **Die Hooks prüfen nach Stufe.**

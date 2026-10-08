@@ -98,7 +98,8 @@ describe("Doku liest niemand", () => {
     "scripts/lib/change-class.ts",
     "scripts/lib/change-class.test.ts",
   ]);
-  const MD_STRING = /\.md["'`]|\*\.md\b|\.md\$/;
+  // auch Vite-Importe mit Query wie "./x.md?raw" (Arch-Review m2)
+  const MD_STRING = /\.md(\?[^"'`]*)?["'`]|\*\.md\b|\.md\$/;
   const READS = /readFileSync|readFile\b|readdirSync|readdir\b|import\b|fetch\(|glob|endsWith|include|entry|project/;
 
   it("keine eingecheckte Code- oder Konfigurationsdatei liest .md", () => {
@@ -120,6 +121,13 @@ describe("Doku liest niemand", () => {
       });
     }
     expect(hits).toEqual([]);
+  });
+
+  it("es gibt keine getrackten Symlinks, über die eine Doku-Datei Code sein könnte", () => {
+    const links = execFileSync("git", ["ls-files", "-s"], { encoding: "utf8", env: withoutGitEnv() })
+      .split("\n")
+      .filter((l) => l.startsWith("120000 "));
+    expect(links).toEqual([]);
   });
 
   it("Biome verarbeitet weder docs/ noch CLAUDE.md", () => {

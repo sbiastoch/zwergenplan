@@ -19,14 +19,42 @@ const projectGit = (...args: string[]) =>
   execFileSync("git", args, { cwd: PROJECT, env: withoutGitEnv(), encoding: "utf8" }).trim();
 
 let projectHead = "";
+let projectConfigPath = "";
+let projectConfig = Buffer.alloc(0);
 beforeAll(() => {
   projectHead = projectGit("rev-parse", "HEAD");
+  // gemeinsame Konfiguration aller Worktrees (Arch-Review m6)
+  projectConfigPath = join(projectGit("rev-parse", "--path-format=absolute", "--git-common-dir"), "config");
+  projectConfig = readFileSync(projectConfigPath);
 });
 afterAll(() => {
-  // Das echte Projekt: nicht bare, keine Test-Identität, HEAD unverändert
+  // Das echte Projekt: Konfiguration byte-gleich, nicht bare, HEAD unverändert. Ändert eine parallele Session
+  // während dieser paar Sekunden die Konfiguration (etwa `git push -u`), wird das hier rot: dann neu laufen lassen.
   expect(projectGit("config", "--bool", "core.bare")).toBe("false");
-  expect(() => projectGit("config", "--local", "--get", "user.email")).toThrow();
+  expect(readFileSync(projectConfigPath).equals(projectConfig)).toBe(true);
   expect(projectGit("rev-parse", "HEAD")).toBe(projectHead);
+});
+
+describe("Tests rufen git nur isoliert auf (Arch-Review M2)", () => {
+  it('jede Zeile mit execFileSync/spawnSync("git" in einem Test nutzt withoutGitEnv oder liegt in tempRepo', () => {
+    const tests = projectGit("ls-files", "--", "*.test.ts")
+      .split("\n")
+      .filter((f) => f !== "");
+    const offenders: string[] = [];
+    for (const file of tests) {
+      readFileSync(join(PROJECT, file), "utf8")
+        .split("\n")
+        .forEach((line, i) => {
+          if (
+            /(?:execFileSync|spawnSync|spawn|execSync|exec)\(\s*["'`]git\b/.test(line) &&
+            !line.includes("withoutGitEnv")
+          ) {
+            offenders.push(`${file}:${i + 1}: ${line.trim()}`);
+          }
+        });
+    }
+    expect(offenders).toEqual([]);
+  });
 });
 
 describe("git-Aufrufe der Skripte und Tests greifen nicht auf ein fremdes Repo durch", () => {

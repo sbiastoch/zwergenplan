@@ -209,7 +209,7 @@ Warum diese Grenze trägt:
    - `mark-reviewed.ts` und die Review-Erinnerung nutzen dieselbe Funktion.
 2. **Gemeinsame grüne Stempel.**
    - **Wer stempelt:** nur `verify.ts`, in jedem Modus (E9 und Punkt 3). Das Gate und der pre-commit-Hook werten nur den Exit-Code aus und schreiben selbst nichts.
-   - **Was gespeichert wird:** Nach einem grünen Lauf schreibt `verify` die Datei `~/.cache/zwergenplan/green/<tree-id>` mit `{ stufe, at, cAt }`. Dazu kommt `.claude/state/last-green.json` mit `{ tree }`.
+   - **Was gespeichert wird:** Nach einem grünen Lauf schreibt `verify` die Datei `~/.cache/zwergenplan/green/<tree-id>` mit `{ tier, at, cAt }`. Dazu kommt `.claude/state/last-green.json` mit `{ tree }`.
      - `cAt` ist der Zeitpunkt des letzten Laufs der Stufe C, der diesen Inhalt abdeckt.
      - Ein Lauf der Stufe C setzt `cAt = at`.
      - Ein Lauf der Stufe 0 erbt `cAt` vom Stempel seiner Basis (Review 2, M-B).
@@ -588,6 +588,24 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
   | Datei während der Prüfung geändert | „Baum hat sich während der Prüfung geändert → kein Stempel“; Gegenprobe ohne Änderung stempelt |
   | `node_modules` fehlt | Hinweis „Hooks inaktiv“, Exit 0, kein Block (wie bisher) |
 
+- **Abweichung von Test 2:**
+  - `decide` ist schmaler als geplant und liefert nur `pass` oder `check(base?)`.
+  - `nextStamp` baut den Stempel.
+  - `shouldStamp(mode, tier)` legt fest, welcher Modus stempeln darf.
+  - Die Blocks zählt weiter `stop-gate.ts`.
+  - Kein Vergleich vor und nach dem Lauf in `decide`, das macht `verify.ts`.
+- **Doku:** CLAUDE.md enthält schon je einen kurzen Satz zu `verify` im pre-commit, zum Stop-Gate mit Stempeln und zur git-Isolation. Die vollständige Fassung der Arbeitsweise kommt mit Etappe 5 (E12).
+- **Nacharbeit nach dem Arch-Review zu Etappe 2 und 3:**
+  - **M1:** Ein Fehler im Stop-Gate selbst blockiert jetzt (Exit 2) statt still durchzulassen (Exit 1), höchstens dreimal, danach Freigabe mit Warnung. `treeHash` verträgt fehlendes stdout. Ein ungültiges `ZP_GATE_TIMEOUT_MS` ist ein Fehler.
+  - **M2:** `vitest.setup.ts` löscht alle GIT_* für jeden Test. Ein statischer Test verlangt `withoutGitEnv` in jeder Zeile, die in einem Test git startet.
+  - **Minor:**
+    - `verify` kommentiert, warum `--staged` die Umgebung erbt, und nutzt `-z`.
+    - Ein Diff-Fehler führt zu Stufe C statt zu Rot.
+    - Exit 3 von `check:fast` heißt Zeitlimit, und `verify` reicht es durch.
+    - `MD_STRING` erkennt `?raw`.
+    - Getrackte Symlinks sind verboten.
+    - Der Kanarienvogel vergleicht `.git/config` byte-gleich.
+    - `CLAUDE_PROJECT_DIR` wird nach dem Test zurückgesetzt.
 - **Bekannte Grenze:** Beendet das Gate `verify` per SIGKILL (die letzte Sicherung, 165 s), läuft das `check:fast` darunter in seiner eigenen Prozessgruppe weiter. Es endet nach höchstens 140 s an seinem eigenen Zeitlimit. Im Normalfall greift vorher das Zeitlimit von `verify` (150 s), und dann bleibt nichts übrig (Zeile „Zeitlimit in `verify`“ in der Tabelle).
 - **Ergänzung zum Plan:** Greift ein Stempel, setzt `verify --stop` den gestempelten Baum als `last-green.json` dieses Worktrees. Ein frischer Checkout auf grünem Inhalt hat damit sofort eine Basis für den Doku-Kurzschluss.
 - **Vorfall beim ersten Commit (2026-10-08, 12:43):**

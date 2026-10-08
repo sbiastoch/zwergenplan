@@ -16,6 +16,8 @@ export interface StepResult {
   timedOut: boolean;
   output: string;
   pid: number;
+  /** Exit-Code des Schritts; `null` bei Signal oder Startfehler */
+  code: number | null;
 }
 
 const KILL_GRACE_MS = 2_000;
@@ -59,15 +61,15 @@ function runStep({ name, cmd: [cmd = "", ...args] }: Step, timeoutMs: number): P
       killGroup(pid, "SIGTERM");
       setTimeout(() => killGroup(pid, "SIGKILL"), KILL_GRACE_MS).unref();
     }, timeoutMs);
-    const finish = (ok: boolean) => {
+    const finish = (code: number | null) => {
       clearTimeout(timer);
       running.delete(pid);
-      resolve({ name, ok: ok && !timedOut, timedOut, output, pid });
+      resolve({ name, ok: code === 0 && !timedOut, timedOut, output, pid, code });
     };
     child.on("error", (e) => {
       output += String(e);
-      finish(false);
+      finish(null);
     });
-    child.on("close", (code) => finish(code === 0));
+    child.on("close", (code) => finish(code));
   });
 }

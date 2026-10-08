@@ -21,7 +21,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { classify, type Tier } from "./lib/change-class.ts";
 import { runSteps } from "./lib/run-steps.ts";
-import { decide, nextStamp, type Stamp } from "./lib/stop-decision.ts";
+import { decide, nextStamp, type Stamp, shouldStamp } from "./lib/stop-decision.ts";
 import { readStamp, treeExists, treeId, writeJsonAtomic } from "./lib/tree-id.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -32,12 +32,18 @@ const LAST_GREEN = join(ROOT, ".claude", "state", "last-green.json");
 // Die Prüfschritte nutzen Pfade relativ zur Projektwurzel.
 process.chdir(ROOT);
 
+/**
+ * git im Projekt, nur lesend. Bewusst MIT geerbter Umgebung: Bei `git commit -a` oder `git commit <pfad>` steht der
+ * zu committende Stand in einem eigenen Index, auf den nur das geerbte GIT_INDEX_FILE zeigt. `--staged` sähe ohne
+ * ihn nicht, was committet wird (Arch-Review m1). Die Tree-ID (tree-id.ts) läuft dagegen ohne GIT_*.
+ */
 function git(args: string[]): string {
   return execFileSync("git", args, { cwd: ROOT, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
 }
 
-function lines(text: string): string[] {
-  return text.split("\n").filter((l) => l !== "");
+/** Pfadliste aus `-z`-Ausgabe, auch für Namen mit Zeilenumbruch oder Sonderzeichen. */
+function paths0(text: string): string[] {
+  return text.split("\0").filter((l) => l !== "");
 }
 
 function lastGreenTree(): string | undefined {
@@ -75,9 +81,14 @@ if (mode === "stop") {
     process.exit(0);
   }
   if (decision.base !== undefined) {
-    paths = lines(git(["diff", "--name-only", "--no-renames", decision.base, treeBefore]));
-    baseStamp = base?.stamp;
-    scope = `seit grünem Stand ${decision.base.slice(0, 8)}`;
+    try {
+      paths = paths0(git(["diff", "-z", "--name-only", "--no-renames", decision.base, treeBefore]));
+      baseStamp = base?.stamp;
+      scope = `seit grünem Stand ${decision.base.slice(0, 8)}`;
+    } catch {
+      // Diff nicht bestimmbar: dann Stufe C für den ganzen Baum, nie Rot ohne Prüfung (Arch-Review m4)
+      scope = "Diff zum grünen Stand nicht bestimmbar";
+    }
   } else {
     scope = "kein frischer grüner Stand";
   }
@@ -85,10 +96,12 @@ if (mode === "stop") {
   try {
     paths =
       mode === "staged"
-        ? lines(git(["diff", "--cached", "--name-only", "--no-renames"]))
+        ? paths0(git(["diff", "-z", "--cached", "--name-only", "--no-renames"]))
         : [
-            ...lines(git(["diff", "--name-only", "--no-renames", git(["merge-base", "HEAD", "origin/main"]).trim()])),
-            ...lines(git(["ls-files", "--others", "--exclude-standard"])),
+            ...paths0(
+              git(["diff", "-z", "--name-only", "--no-renames", git(["merge-base", "HEAD", "origin/main"]).trim()]),
+            ),
+            ...paths0(git(["ls-files", "-z", "--others", "--exclude-standard"])),
           ];
   } catch {
     paths = undefined;
@@ -115,10 +128,11 @@ const [result] = await runSteps(
 );
 if (result === undefined) process.exit(1);
 process.stdout.write(result.output.endsWith("\n") ? result.output : `${result.output}\n`);
-if (!result.ok) process.exit(result.timedOut ? 3 : 1);
+// Exit 3 = Zeitlimit, auch wenn check:fast es selbst gemeldet hat (Arch-Review m5)
+if (!result.ok) process.exit(result.timedOut || result.code === 3 ? 3 : 1);
 
 // Stempeln (E5.2): nur bei gleichem Baum vor und nach dem Lauf, sonst prüft das nächste Gate erneut (Review M5).
-const stamp = tier === "C" || mode === "stop" ? nextStamp(tier, now, baseStamp) : undefined;
+const stamp = shouldStamp(mode, tier) ? nextStamp(tier, now, baseStamp) : undefined;
 if (stamp !== undefined) {
   const treeAfter = treeId(ROOT);
   if (treeAfter === treeBefore) {

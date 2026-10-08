@@ -42,6 +42,17 @@ export function nextStamp(tier: Tier, now: number, baseStamp?: Stamp): Stamp | u
   return baseStamp === undefined ? undefined : { tier, at: now, cAt: baseStamp.cAt };
 }
 
+export type VerifyMode = "stop" | "staged" | "manual";
+
+/**
+ * Welcher Lauf darf stempeln? Stufe C prüft mit check:fast den ganzen Arbeitsbaum und stempelt in jedem Modus.
+ * Stufe 0 prüft nur einen Diff: Nur mit --stop ist der relativ zu einem grünen Baum. Im pre-commit (Index-Diff)
+ * und von Hand (Diff zu origin/main) wäre er kein Beleg für den ganzen Arbeitsbaum.
+ */
+export function shouldStamp(mode: VerifyMode, tier: Tier): boolean {
+  return tier === "C" || mode === "stop";
+}
+
 /** Liest einen Stempel aus JSON; alles Unerwartete gilt als kein Stempel. */
 export function parseStamp(raw: string | undefined): Stamp | undefined {
   if (raw === undefined) return undefined;

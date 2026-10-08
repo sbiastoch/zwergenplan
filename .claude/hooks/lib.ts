@@ -105,15 +105,16 @@ export function treeHash(): string {
       cwd: PROJECT_DIR,
       env: clean,
       encoding: "utf8",
-    }).stdout.trim();
-    copyFileSync(real, index);
+    }).stdout?.trim();
+    if (real) copyFileSync(real, index);
   } catch {
     // noch kein Index: leer anfangen
   }
   const env = { ...clean, GIT_INDEX_FILE: index };
   try {
     spawnSync("git", ["add", "-A"], { cwd: PROJECT_DIR, env });
-    return spawnSync("git", ["write-tree"], { cwd: PROJECT_DIR, env, encoding: "utf8" }).stdout.trim();
+    // stdout kann unter Last fehlen (EAGAIN): dann leerer Hash statt Absturz; er passt zu keinem Zustand.
+    return spawnSync("git", ["write-tree"], { cwd: PROJECT_DIR, env, encoding: "utf8" }).stdout?.trim() ?? "";
   } finally {
     rmSync(index, { force: true });
   }

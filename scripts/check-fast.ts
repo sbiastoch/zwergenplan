@@ -61,4 +61,5 @@ for (const r of failed) {
 }
 const timedOut = failed.some((r) => r.timedOut);
 console.log(`check:fast ${failed.length === 0 ? "grün" : timedOut ? "ROT (Zeitlimit)" : "ROT"} in ${seconds}s`);
-process.exit(failed.length === 0 ? 0 : 1);
+// 3 = Zeitlimit, damit verify und das Stop-Gate es als „Zeitlimit“ statt als gewöhnliches Rot melden (Arch-Review m5).
+process.exit(failed.length === 0 ? 0 : timedOut ? 3 : 1);

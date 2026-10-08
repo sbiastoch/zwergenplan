@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { decide, FRESH_MS, isFresh, nextStamp, parseStamp, type Stamp } from "./stop-decision.ts";
+import { decide, FRESH_MS, isFresh, nextStamp, parseStamp, type Stamp, shouldStamp } from "./stop-decision.ts";
+
+describe("shouldStamp: welcher verify-Lauf stempelt (Arch-Review m8)", () => {
+  it.each([
+    ["stop", "C", true],
+    ["stop", "0", true],
+    ["staged", "C", true],
+    ["staged", "0", false],
+    ["manual", "C", true],
+    ["manual", "0", false],
+  ] as const)("%s, Stufe %s → %s", (mode, tier, expected) => {
+    expect(shouldStamp(mode, tier)).toBe(expected);
+  });
+});
 
 describe("parseStamp", () => {
   it("liest einen gültigen Stempel", () => {
