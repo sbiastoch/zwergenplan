@@ -500,3 +500,13 @@ Gates auf `fc39cf7`: `check:fast`, `knip`, `test:coverage` grün; `pnpm check` m
 
 - **Behoben (Hoch):** `scripts/push-weekly.ts` warnte bei jedem Lauf „Push-Worker läuft mit 29335c8, im Repo zuletzt geändert in 862bcba“: `/version` ist HEAD beim Deploy, verglichen wurde mit dem letzten Commit unter `push-worker/`. Jetzt vergleicht `workerVersionWarning` (`scripts/lib/push-weekly-core.ts`) den Code: `git diff --quiet <version> HEAD -- WORKER_SOURCES` (Ordner plus `push-types.ts` und `time.ts`; ein Test gleicht die Liste mit den Importen des Workers ab). Unbekannter Commit (z. B. nach Rebase verworfen) → Warnung; die Version aus dem Netz geht nur als Hex-Hash an git.
 - Offen (Rücksprache): siehe Befundliste der Session (Arch-Review M1 Allowlist `push-worker-isolated`, M2 Wettlauf `mirror`/`clearAll`, Testlücken aus den Mutationsproben, `maxBuffer` beim Lesen des alten Datenstands, Doku-Drift).
+
+## Nachtrag (2026-10-08): Fix Race beim Ausschalten (`mirroring`-Flag), Commit 288e10d
+
+Das ist der offene Punkt M2 der Nachprüfung („Wettlauf `mirror`/`clearAll`“).
+
+- **Befund**: CI-Lauf 37765545767, `e2e/push.spec.ts:306` (E6). Nach dem Ausschalten blieben `{ origin, searches }` im Geräte-Speicher.
+- **Ursache**: `clearAll` leerte zuerst `written` und dann IndexedDB. Ein Spiegeln aus einem Rendern mit noch eingeschaltetem Schalter fand `written` leer und schrieb nach dem `clear` erneut. Das galt für ein Spiegeln, das während des Leerens startete (z. B. der 50-ms-Timer der Statuszeile), und für eines, das schon lief.
+- **Privatsphäre**: Startpunkt und Such-Abos blieben bei ausgeschaltetem Push auf dem Gerät, entgegen E6 („beim Abschalten geleert“). Das betraf echte Nutzer. Die Daten verließen das Gerät nicht. Erst das nächste Öffnen des Kind-Sheets ohne Abo leert den Speicher (`reconcile`).
+- **Fix**: In `src/data/push.ts` erlaubt das Flag `mirroring` das Spiegeln erst nach einer Bestätigung durch `enable` oder `reconcile`. `disable` setzt es vor dem ersten `await` zurück, `clearAll` ebenso. `mirror` prüft es vor jedem Schreiben. Dazu gibt es 4 Unit-Tests in `src/data/push.test.ts`.
+- **Reproduktion**: per Fehlerinjektion, dabei wurde der Status-Timer bis zum `clear` zurückgehalten. Vorher waren 6/30 Läufe rot, nachher 0/30 (pixel-7, CPU-Drosselung 4x).
