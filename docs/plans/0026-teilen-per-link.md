@@ -1,6 +1,6 @@
 # Plan 0026 – Teilen per Link: Angebote, Anbieter und Merkliste
 
-Status: Review eingearbeitet, wartet auf Nutzerentscheide (N1–N4). Zwei Etappen: **Stufe 1** (Angebote und Anbieter) ist unabhängig umsetzbar. **Stufe 2** (Merkliste) wird eigens gemergt, nach Plan 0025 (Nutzerentscheid N1).
+Status: freigegeben (Stufe 1 umsetzbar; Stufe 2 nach Plan 0025). Review eingearbeitet, Nutzerentscheide N1–N4 vom 2026-10-08 siehe „Offene Punkte“. Zwei Etappen: **Stufe 1** (Angebote und Anbieter) ist unabhängig umsetzbar. **Stufe 2** (Merkliste) wird eigens gemergt, nach Plan 0025 (Nutzerentscheid N1).
 Datum: 2026-10-08
 Bezug:
 - ADR 0002 (Datenfluss), ADR 0003 (stabile IDs), ADR 0009 (`noindex`), ADR 0012 (Startbudget), ADR 0013 (Service Worker), ADR 0016 (nächtlicher Deploy), **neu ADR 0020** (Entwurf, im selben Commit)
@@ -444,7 +444,7 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 5. Vorschaubild in `scripts/icons.ts`, `public/og/vorschau-v1.jpg` erzeugen und committen. `index.html` und das Plugin `zp-site-url` (E5).
 6. `src/data/share.ts` test-first (Tests 4), `useShare`, `ManualLinkSheet`, Icon, Knopf im Detail und im Anbieter-Sheet, Toast bei unbekanntem Angebot (E6, E7). `src/sw/routes.test.ts` ergänzen (Tests 5).
 7. E2E und Smoke (Tests 6–9). `PW_PORT=4273 pnpm check:fast`, dann `PW_PORT=4273 pnpm check`.
-8. Doku: `docs/architecture.md` (E8), ADR 0020 auf „angenommen (Stufe 1)“, Delta in ADR 0012, `docs/ideas.md` („Vorschaubild je Kategorie“, „Teilen auf der Kachel“). `/arch-review` (neues Modul, mehr als 200 Zeilen), Branch pushen, CI grün, Fast-Forward nach `main`, CI auf `main` grün.
+8. Doku: `docs/architecture.md` (E8), ADR 0020: Vermerk „Stufe 1 umgesetzt (SHA)“, Delta in ADR 0012, `docs/ideas.md` („Vorschaubild je Kategorie“, „Teilen auf der Kachel“). `/arch-review` (neues Modul, mehr als 200 Zeilen), Branch pushen, CI grün, Fast-Forward nach `main`, CI auf `main` grün.
 9. `/browser-review live` und **Gerätetest** durch den Nutzer:
    - Link aus dem Detail per WhatsApp (Android und iOS) an sich selbst schicken: Erscheint die Vorschau mit Titel, Beschreibung und Bild? Öffnet ein Tipp das Detail?
    - Dasselbe mit Signal und iMessage, falls vorhanden.
@@ -456,9 +456,17 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 11. `shortId`, Kodierung, `mergeSaved` und `takeSharedFragment` test-first (Tests 11, 12, 12a). Kollisionswarnung in `build-data`.
 12. Aufruf in `App` vor `useRoute`, Sheet, Senden (E12, E13, E15). Budget messen (E13, ggf. lazy).
 13. E2E und Mobile-UX (Tests 13, 14), `pnpm check`.
-14. Doku: Vermerk in Plan 0003, Zeile 75, in Plan 0025 (gemerkte Anbieter „nie in URL“, Zeile 122) und im Kopfkommentar von `route.ts`; `docs/architecture.md`, Privatsphäre (Fragment-Ausnahme); ADR 0020 auf „angenommen“; Delta in ADR 0012. `/arch-review`, CI, Fast-Forward, `/browser-review live`. **Gerätetest iOS**: Link aus WhatsApp in Safari öffnen, während der Zwergenplan als App installiert ist. Ergebnis hier eintragen, dann N3 entscheiden.
+14. Doku: Vermerk in Plan 0003, Zeile 75, in Plan 0025 (gemerkte Anbieter „nie in URL“, Zeile 122) und im Kopfkommentar von `route.ts`; `docs/architecture.md`, Privatsphäre (Fragment-Ausnahme); ADR 0020: Vermerk „Stufe 2 umgesetzt (SHA)“; Delta in ADR 0012. `/arch-review`, CI, Fast-Forward, `/browser-review live`. **Gerätetest iOS**: Link aus WhatsApp in Safari öffnen, während der Zwergenplan als App installiert ist. Ergebnis hier eintragen, dann N3 entscheiden.
 
 ## Offene Punkte (Nutzerentscheid)
+
+**Entschieden (Nutzer, 2026-10-08):** Alle Empfehlungen sind angenommen.
+- N1: Stufe 2 kommt später, direkt nach Plan 0025.
+- N2: Rhythmus statt nächstem Termin.
+- N3: Entscheidung nach dem Gerätetest von Stufe 2.
+- N4: generisches Vorschaubild.
+
+Die Begründungen zu den einzelnen Punkten:
 
 - **N1 – Stufe 2 jetzt oder später?** **Empfehlung: später**, als eigene Etappe direkt nach dem Merge von Plan 0025.
   - Plan 0025 baut `SavedView` um (Liste, Karte, Kalender) und führt „Anbieter merken“ ein. Stufe 2 hängt an beidem: am Ort des Knopfs, am Speicherschlüssel und an der Kachel für Anbieter. Parallel gebaut gäbe es Konflikte und doppelte Arbeit.
