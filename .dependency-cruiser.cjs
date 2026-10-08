@@ -275,11 +275,14 @@ module.exports = {
       name: "ci-scope-builtins-only",
       severity: "error",
       comment:
-        "Der CI-Job scope läuft ohne pnpm install (Plan 0027, E10): scripts/ci-scope.ts und seine Importe nutzen nur Node-Builtins und die reinen Module lib/ci-scope, lib/ci-scope-git, lib/change-class und lib/git-env. Ein npm-Paket oder ein Modul aus src/ ließe das Skript im Job beim Import abstürzen, und der Doku-Pfad fiele still auf full=true (Arch-Review Etappe 7, M2).",
-      from: { path: "^scripts/(ci-scope|lib/(ci-scope|ci-scope-git|change-class|git-env))\\.ts$" },
+        "Die CI-Jobs scope und gates laufen ohne pnpm install (Plan 0027, E10; Plan 0029, B5): scripts/ci-scope.ts, scripts/ci-gates.ts und ihre Importe nutzen nur Node-Builtins und die reinen Module lib/ci-scope, lib/ci-scope-git, lib/change-class, lib/git-env, lib/ci-gates und für die E2E-Auswahl lib/import-graph, lib/import-graph-io, lib/e2e-map und lib/e2e-select. Ein npm-Paket oder ein Modul aus src/ ließe das Skript im Job beim Import abstürzen: scope fiele still auf full=true und e2e=full, gates würde rot (Arch-Review Etappe 7, M2).",
+      from: {
+        path: "^scripts/(ci-scope|ci-gates|lib/(ci-scope|ci-scope-git|change-class|git-env|ci-gates|import-graph|import-graph-io|e2e-map|e2e-select))\\.ts$",
+      },
       to: {
         dependencyTypesNot: ["core"],
-        pathNot: "^scripts/lib/(ci-scope|ci-scope-git|change-class|git-env)\\.ts$",
+        pathNot:
+          "^scripts/lib/(ci-scope|ci-scope-git|change-class|git-env|ci-gates|import-graph|import-graph-io|e2e-map|e2e-select)\\.ts$",
       },
     },
     {

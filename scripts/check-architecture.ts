@@ -4,12 +4,13 @@
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { importsOf } from "./lib/import-graph.ts";
 
 const MIN_MODULES = 15;
 const DIRS = ["src", "scripts", "e2e", ".claude/hooks", "push-worker"];
 
 interface CruiseOutput {
-  modules: Array<{ source: string }>;
+  modules: Array<{ source: string; dependencies: Array<{ resolved: string; dependencyTypes: string[] }> }>;
   summary: { violations: Array<{ rule: { name: string }; from: string; to: string }> };
 }
 
@@ -46,6 +47,23 @@ if (violations.length > 0) {
   console.error("Regeln und Begründungen: .dependency-cruiser.cjs, docs/architecture.md");
   process.exit(1);
 }
+// Kanarienvogel des Importgraphen der E2E-Auswahl (Plan 0029, B6): Jede lokale Kante, die dependency-cruiser findet,
+// muss auch importsOf finden, je Datei geprüft. Sonst übersähe die Auswahl Specs, die ein Modul erreicht.
+// Die Konfigurationsdateien im Wurzelverzeichnis cruist depcruise nicht; die prüft import-graph.test.ts.
+const missed: string[] = [];
+for (const m of out.modules) {
+  if (m.source.includes("node_modules/") || !/\.(ts|tsx|mts)$/.test(m.source)) continue;
+  const local = m.dependencies.filter((d) => d.dependencyTypes.includes("local"));
+  if (local.length === 0) continue;
+  const found = new Set(importsOf(m.source, readFileSync(m.source, "utf8")));
+  for (const d of local) if (!found.has(d.resolved)) missed.push(`${m.source} → ${d.resolved}`);
+}
+if (missed.length > 0) {
+  for (const edge of missed) console.error(`✗ Importgraph der E2E-Auswahl übersieht ${edge}`);
+  console.error("Import-Formen: scripts/lib/import-graph.ts (Plan 0029, B2)");
+  process.exit(1);
+}
+
 /**
  * Lazy-Lader der Karte (Plan 0005), der Wegzeit-Logik (Plan 0009, E10), des ICS-Exports (Plan 0010, E8), der
  * Anbieterübersicht (Plan 0010, E7) und der App-Extras (Plan 0011, E5): Ihr Ziel darf nur per import() kommen.
