@@ -75,7 +75,7 @@ Stand `main` `d5fab1b` (nach Plan 0022–0024).
 - `src/domain/saved.ts:9–29`:
   - `toggleId`,
   - `savedOffers(offers, ids, now)`: nur mit kommendem Termin, sortiert nach dem nächsten Termin,
-  - `collectionSessions`: die Auswahl für den Export.
+  - `collectionSessions`: die Auswahl für den Export (seit Plan 0018 `exportSessions` je Angebot und `collectionExport` für die Merkliste).
 - `src/data/preferences.ts:7–13, 41–52`: Schlüssel `zwergenplan.merkliste`, `loadSaved()`/`saveSaved()` als JSON-Array von IDs.
 - `src/ui/use-app-state.ts:130–143`: `useSaved()` liefert `[ids, toggle]`. `toggle` meldet, ob das Angebot danach gemerkt ist.
 - `src/ui/App.tsx`:

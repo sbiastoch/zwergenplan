@@ -219,6 +219,15 @@ Basis `5701141`. `JS (initial)` vorher 94,41 kB von 100 kB, Export-Chunk 1,15 kB
   | `import("../domain/ics.ts")` aus `SavedView.tsx` | rot: `ics-entry-only` |
   | `import type * as Ics from "../domain/ics.ts"` im Lader | rot: `ics-only-lazy` |
 
+- **Schritt 3:**
+  - `say(message, ms?)` mit `LONG_TOAST_MS = 6000` in `src/ui/use-app-state.ts`, mit Unit-Test. 6 s stehen die Toasts mit `from`/`until`, mit fehlenden Angeboten und die beiden „nichts passt“. „Export gerade nicht möglich – …“ bleibt bei 2,8 s wie bisher. Der Text liegt als `EXPORT_UNAVAILABLE` in `format.ts`, Detail und Merkliste teilen ihn.
+  - Merkliste: Auswahl und Zählung macht `collectionExport` in `saved.ts` (unit-getestet), den Text unter dem Knopf `savedExportNote` in `format.ts`. `collectionSessions` ist entfernt. Der Test, der beide verglich, prüft jetzt gegen ein Orakel im Test (Kurs → alle Termine, sonst `upcomingSessions`).
+  - Detail: Ein Handler `onSeries` bedient beide Knöpfe (`.two` und `wide`), für Kurse und Einzeltermine liefert `seriesExport` `static`. `generatedAt` ist in `Overlays` `string | undefined`, solange `site.json` lädt. Ohne ihn läuft der statische Link.
+  - Für Plan 0025, E9: Statt eines neuen `exportNote(savedCount, sessionCount, filtered)` bekommt `savedExportNote(saved, sessions, byAge)` den Merklisten-Filter dazu.
+- **Schritt 4:** E2E auf `pixel-7`. Die Zahlen stimmen mit der Fixture: Detail 2 / 3 / 4 / kein Download, ohne Geburtsdatum die statische Datei mit 5; Merkliste 10 / kein Download / 4.
+  - Zusätzlich geprüft: Blob-Weg und „keiner passt“ lösen keinen Request auf `ics/` aus (ADR 0018). Dateiname und VEVENTs samt Titel und `DTSTAMP` sind die der statischen Datei, nicht nur die UIDs. Die langen Toasts (Detail gekürzt, Merkliste mit fehlendem Angebot) stehen nach 5,5 s noch und sind nach 6,5 s weg.
+  - Kanarienvögel, je temporär: ohne `LONG_TOAST_MS` im Detail und mit `birthDate` `undefined` in der Merkliste wurden die betroffenen Tests rot.
+  - Mobile-UX: Ansichten `merkliste-mit-geburtsdatum` und `detail-mit-geburtsdatum`. Dazu kommen die längsten Toasts bei 320 px, je bei 100 % und 200 %: im Detail „… bis 14.10., danach passt es nicht mehr zum Alter“ (87 Zeichen), in der Merkliste „… – 1 Angebot passt nicht zum Alter“. Den Fall „vom … bis …“ hat die Fixture nicht, er ist mit 82 Zeichen kürzer.
 - **Offen für den Browser-Review:** Die Alterszeile nennt den Bezugstermin aus `ageCheck`, beim Fall „zu jung“ ist das der erste passende Termin. Mit Zusatz steht dort z. B. „Passt: am Mi 21.10. 6 Monate alt · passt ab 21.10.“, also das Datum doppelt. Umgesetzt wie in E4. Der `/browser-review` entscheidet, ob der Text nachgeschärft wird.
 
 ## Review (2026-10-06) – Verdict: Überarbeiten (1. Durchgang)

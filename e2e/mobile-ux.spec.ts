@@ -58,6 +58,27 @@ async function openProviders(page: Page) {
   await expect(page.locator(".place.idle")).toHaveCount(1);
 }
 
+/** IDs der Fixture-Angebote für Merkliste und Deep-Link (Plan 0018) */
+const PEKIP_ID =
+  "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus";
+const TREFF_ID = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+const REIME_ID = "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum";
+
+/**
+ * Geburtsdatum (ISO) und Merkliste vor dem Laden speichern und `path` laden (Plan 0018): `VIEWS` startet nach
+ * `ready()`, und der Altersfilter blendet in „Entdecken“ Unpassendes aus.
+ */
+async function loadAged(page: Page, path: string, birthDate: string, saved: string[] = []) {
+  await page.addInitScript(
+    ([born, ids]) => {
+      localStorage.setItem("zwergenplan.geburtsdatum", born);
+      localStorage.setItem("zwergenplan.merkliste", ids);
+    },
+    [birthDate, JSON.stringify(saved)] as const,
+  );
+  await page.goto(path);
+}
+
 async function setBirthDate(page: Page, text: string) {
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await page.getByLabel("Geburtsdatum").fill(text);
@@ -99,6 +120,20 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   detail: async (page) => {
     await page.getByRole("heading", { level: 3, name: /PEKiP/ }).getByRole("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
+  },
+  // Plan 0018, E3: längster Text unter „Alle in den Kalender“ (Kurs komplett, Treff nur passend zum Alter)
+  "merkliste-mit-geburtsdatum": async (page) => {
+    await loadAged(page, "./?ansicht=merkliste", "2024-09-18", [PEKIP_ID, TREFF_ID]);
+    await expect(
+      page.getByText("2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter"),
+    ).toBeVisible();
+  },
+  // Plan 0018, E4: Alterszeile mit Grenze „· passt bis 14.10.“
+  "detail-mit-geburtsdatum": async (page) => {
+    await loadAged(page, `./?angebot=${TREFF_ID}`, "2024-09-18");
+    await expect(
+      page.getByRole("dialog").getByText("Passt: am Mi 7.10. 24 Monate alt · passt bis 14.10."),
+    ).toBeVisible();
   },
   // Regelmäßige Reihe: zwei ICS-Knöpfe nebeneinander (`.two`), die der Kurs oben nicht hat.
   "detail-regelmaessig": async (page) => {
@@ -435,6 +470,48 @@ for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
     await page.clock.runFor(3000);
     await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toHaveCount(0);
   });
+}
+
+// Plan 0018, E4: die längsten Kalender-Toasts aus Detail und Merkliste bei 320 px, auch bei 200 %. Die Uhr hält den
+// Toast; vorher die Textgröße setzen, denn `setTextScale` wartet auf Frames.
+const LONG_TOASTS = [
+  {
+    name: "Detail, gekürzt",
+    path: `./?angebot=${TREFF_ID}`,
+    birthDate: "2024-09-18",
+    saved: [],
+    trigger: (page: Page) => page.getByRole("dialog").getByRole("link", { name: "Alle Termine", exact: true }),
+    toast: "Kalenderdatei mit 2 Terminen geladen – bis 14.10., danach passt es nicht mehr zum Alter",
+  },
+  {
+    name: "Merkliste, ein Angebot passt nicht",
+    path: "./?ansicht=merkliste",
+    birthDate: "2026-08-01",
+    saved: [TREFF_ID, REIME_ID],
+    trigger: (page: Page) => page.getByRole("button", { name: "Alle in den Kalender" }),
+    toast: "Kalenderdatei mit 4 Terminen geladen – 1 Angebot passt nicht zum Alter",
+  },
+];
+
+for (const item of LONG_TOASTS) {
+  for (const scale of [1, 2]) {
+    test(`langer Kalender-Toast passt bei 320 px und ${scale * 100} % (${item.name})`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await ready(page);
+      await loadAged(page, item.path, item.birthDate, item.saved);
+      const trigger = item.trigger(page);
+      await expect(trigger).toBeVisible();
+      await setTextScale(page, scale);
+      await page.clock.pauseAt(FIXTURE_NOW);
+      await Promise.all([page.waitForEvent("download"), trigger.click()]);
+      const toast = page.locator(".toast").filter({ hasText: item.toast });
+      await expect(toast).toHaveText(item.toast);
+      await expect(toast).toBeInViewport({ ratio: 1 });
+      await expectNoHorizontalScroll(page);
+      await expectTextFits(page, { scale });
+    });
+  }
 }
 
 test("Text-Gate erkennt Überlappung", async ({ page }) => {

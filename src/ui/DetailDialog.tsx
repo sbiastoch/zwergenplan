@@ -1,30 +1,36 @@
 /** Detail eines Angebots (Plan 0003, E13) – Inhalt des Vollbild-Dialogs. */
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { assetUrl } from "../data/site.ts";
 import { ageCheck } from "../domain/age.ts";
 import { referenceSession, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
 import { seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
+import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CATEGORY_LABELS, type Category } from "../domain/topics.ts";
 import {
   ageRangeLabel,
+  ageWindowLabel,
   availabilityLabel,
   costLabel,
   dayDots,
+  EXPORT_UNAVAILABLE,
   longDate,
   plural,
   registrationLabel,
   registrationNote,
+  seriesToast,
   sessionDay,
   shortDate,
   timeRange,
   whenLabels,
 } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
+import { download, type IcsExport, loadExport } from "./ics-export.ts";
 import { DistPending, HeartButton } from "./OfferCard.tsx";
 import { ReachLong } from "./ReachLong.tsx";
+import { LONG_TOAST_MS } from "./use-app-state.ts";
 import { WhereTile } from "./Ways.tsx";
 
 interface DetailProps {
@@ -33,6 +39,8 @@ interface DetailProps {
   /** gewählter Kalendertag, falls aus der Kalender-Agenda geöffnet */
   day: string | undefined;
   birthDate: string | undefined;
+  /** Datenstand für den ICS-Kontext (`DTSTAMP` wie in den statischen Dateien); ohne ihn nur die statische Datei */
+  generatedAt: string | undefined;
   /** Startpunkt und Entfernung zum Ort; beides nur mit Startpunkt (Plan 0004, E6) */
   origin: Origin | undefined;
   reach: Reach | undefined;
@@ -48,7 +56,8 @@ interface DetailProps {
    * aus dem Plan: Das brach bei 320 px mit Icon auf zwei Zeilen um (Text-Gate, kurze Knöpfe einzeilig).
    */
   onProvider: (providerId: string) => void;
-  onIcs: (message: string) => void;
+  /** Toast nach dem Tipp auf einen ICS-Knopf; `ms` für lange Meldungen (Plan 0018, E4) */
+  onIcs: (message: string, ms?: number) => void;
 }
 
 export function DetailContent({
@@ -56,6 +65,7 @@ export function DetailContent({
   now,
   day,
   birthDate,
+  generatedAt,
   origin,
   reach,
   reachPending,
@@ -75,6 +85,43 @@ export function DetailContent({
   const check = birthDate ? ageCheck(offer, birthDate, now, fromCalendar) : undefined;
   const availability = availabilityLabel(offer);
   const regular = offer.format === "regelmaessig";
+  // Altersgrenze dauerhaft sichtbar (Plan 0018, E4): In der iOS-App verdeckt der Kalender-Dialog den Toast sofort.
+  const ageWindow = regular && birthDate ? ageWindowLabel(exportSessions(offer, now, birthDate), now) : undefined;
+
+  /** Datei aus dem Browser (Plan 0018, E2): gleiche VEVENTs und gleicher Name wie die statische Datei (ADR 0018) */
+  const exportSeries = async (selection: ExportSelection, stamp: string, container: HTMLElement | undefined) => {
+    let ics: IcsExport;
+    try {
+      ics = await loadExport();
+    } catch {
+      onIcs(EXPORT_UNAVAILABLE);
+      return;
+    }
+    const item = { offer, sessions: selection.sessions, ctx: ics.icsContextFor(offer, stamp) };
+    const path = seriesIcsPath(offer);
+    download(ics.icsForCollection([item], offer.title), path.slice(path.lastIndexOf("/") + 1), container);
+    onIcs(seriesToast(selection, now), selection.from || selection.until ? LONG_TOAST_MS : undefined);
+  };
+
+  /**
+   * „Alle Termine“ bzw. „In den Kalender“ (Plan 0018, E2): entscheidet synchron. Statisch läuft der Link; sonst lädt
+   * nichts („keiner passt“) oder eine Datei aus dem Browser, für Kurse und Einzeltermine immer statisch.
+   */
+  const onSeries = (e: MouseEvent<HTMLAnchorElement>) => {
+    const plan = seriesExport(offer, now, birthDate);
+    if (plan.kind === "static" || generatedAt === undefined) {
+      onIcs(`Kalenderdatei mit ${plural(offer.sessions.length, "Termin", "Terminen")} geladen`);
+      return;
+    }
+    e.preventDefault();
+    if (plan.kind === "none") {
+      onIcs("Keiner der kommenden Termine passt zum Alter.", LONG_TOAST_MS);
+      return;
+    }
+    // vor dem ersten `await`: Danach ist `currentTarget` null. Im Dialog, denn `body` ist dann inert (E2).
+    const container = e.currentTarget.parentElement ?? undefined;
+    void exportSeries(plan.selection, generatedAt, container);
+  };
 
   return (
     // Hülle als Größen-Container (Plan 0008, E6): Bei wenig Höhe scrollt sie samt ICS-Fuß. Der Toast bleibt
@@ -118,7 +165,7 @@ export function DetailContent({
               {check ? (
                 <span className={check.fits ? "ok" : undefined}>
                   {check.fits ? "Passt" : "Passt nicht"}: am {shortDate(berlinIsoDate(check.at))}{" "}
-                  {plural(check.months, "Monat", "Monate")} alt
+                  {plural(check.months, "Monat", "Monate")} alt{ageWindow && ` · ${ageWindow}`}
                 </span>
               ) : (
                 <span>Geburtsdatum eintragen, dann prüfen wir das</span>
@@ -182,24 +229,14 @@ export function DetailContent({
               >
                 Nur {shortDate(sessionDay(ref))}
               </a>
-              <a
-                className="btn primary"
-                href={assetUrl(seriesIcsPath(offer))}
-                onClick={() =>
-                  onIcs(`Kalenderdatei mit ${plural(offer.sessions.length, "Termin", "Terminen")} geladen`)
-                }
-              >
+              <a className="btn primary" href={assetUrl(seriesIcsPath(offer))} onClick={onSeries}>
                 <Icon name="calendarPlus" size={20} />
                 {/* Ohne Zahl (H5): Die Datei enthält auch vergangene Termine, die Zahl nennt der Toast. */}
                 Alle Termine
               </a>
             </div>
           ) : (
-            <a
-              className="btn primary wide"
-              href={assetUrl(seriesIcsPath(offer))}
-              onClick={() => onIcs(`Kalenderdatei mit ${plural(offer.sessions.length, "Termin", "Terminen")} geladen`)}
-            >
+            <a className="btn primary wide" href={assetUrl(seriesIcsPath(offer))} onClick={onSeries}>
               <Icon name="calendarPlus" size={20} />
               {offer.format === "kurs" && offer.sessions.length > 1
                 ? `Alle ${offer.sessions.length} Kurstermine`

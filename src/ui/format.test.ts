@@ -34,6 +34,7 @@ import {
   reachNote,
   reachShort,
   registrationNote,
+  savedExportNote,
   seriesToast,
   shortDate,
   standDate,
@@ -695,6 +696,15 @@ describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
     expect(seriesToast(selection("2026-10-21", 8, { from: "2026-10-21", until: "2027-03-14" }), FIXTURE_NOW)).toBe(
       "Kalenderdatei mit 8 Terminen geladen – vom 21.10. bis 14.3.2027 passt es zum Alter",
     );
+  });
+
+  it("Text unter „Alle in den Kalender“ nennt die Auswahl (E3, mit „gemerkt“ seit Plan 0022)", () => {
+    expect(savedExportNote(2, 13, false)).toBe("2 gemerkt · 13 Termine in einer .ics-Datei · Kurse immer komplett");
+    expect(savedExportNote(1, 1, false)).toBe("1 gemerkt · 1 Termin in einer .ics-Datei · Kurse immer komplett");
+    expect(savedExportNote(2, 10, true)).toBe(
+      "2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter",
+    );
+    expect(savedExportNote(2, 0, true)).toBe("2 gemerkt · keiner passt gerade zum Alter");
   });
 
   it("Toast der Merkliste zählt fehlende Angebote", () => {

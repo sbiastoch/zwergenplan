@@ -23,15 +23,6 @@ export function savedOffers<T extends Offer>(offers: readonly T[], ids: readonly
     .map((x) => x.offer);
 }
 
-/**
- * Termine für den Sammel-Export: Kurse immer komplett, sonst nur nicht beendete.
- * Entfällt mit Plan 0018, Schritt 3 (exportSessions).
- */
-export function collectionSessions(offer: Offer, now: Date): Session[] {
-  if (offer.format === "kurs") return offer.sessions;
-  return upcomingSessions(offer, now);
-}
-
 /** Auswahl für den ICS-Export einer Reihe bzw. der Merkliste (Plan 0018). */
 export interface ExportSelection {
   sessions: Session[];
@@ -79,4 +70,31 @@ export function seriesExport(offer: Offer, now: Date, birthDate: string | undefi
   if (offer.format !== "regelmaessig" || birthDate === undefined) return { kind: "static" };
   const selection = exportSessions(offer, now, birthDate);
   return selection.sessions.length === 0 ? { kind: "none" } : { kind: "blob", selection };
+}
+
+/** Sammel-Export der Merkliste (Plan 0018, E3) */
+export interface CollectionExport<T extends Offer> {
+  /** je Angebot mit passendem Termin dessen Auswahl, in der Reihenfolge der Merkliste */
+  items: { offer: T; sessions: Session[] }[];
+  /** Termine in der Datei */
+  count: number;
+  /** gemerkte Angebote ohne passenden Termin; sie fehlen in der Datei */
+  missing: number;
+}
+
+/**
+ * Auswahl für „Alle in den Kalender“ (Plan 0018, E3) mit `exportSessions` je gemerktem Angebot. Der Text unter dem
+ * Knopf zählt mit derselben Auswahl, Datei und Zahl stimmen also überein.
+ */
+export function collectionExport<T extends Offer>(
+  offers: readonly T[],
+  now: Date,
+  birthDate: string | undefined,
+): CollectionExport<T> {
+  const items = offers.flatMap((offer) => {
+    const { sessions } = exportSessions(offer, now, birthDate);
+    return sessions.length > 0 ? [{ offer, sessions }] : [];
+  });
+  const count = items.reduce((sum, item) => sum + item.sessions.length, 0);
+  return { items, count, missing: offers.length - items.length };
 }

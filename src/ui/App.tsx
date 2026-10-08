@@ -413,6 +413,7 @@ export function App() {
           <SavedView
             offers={saved}
             generatedAt={load.data.generatedAt}
+            birthDate={birthDate}
             ctx={ctx}
             onDiscover={() => onTab("entdecken")}
             onExported={say}

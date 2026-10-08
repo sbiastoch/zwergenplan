@@ -38,7 +38,8 @@ interface OverlaysProps {
   visible: readonly SiteOffer[];
   /** Merken, Wegzeit und „jetzt“ wie auf den Kacheln */
   ctx: CardContext;
-  say: (message: string) => void;
+  /** Toast; `ms` für lange Meldungen (Plan 0018, E4) */
+  say: (message: string, ms?: number) => void;
   filter: FilterState;
   setFilter: (filter: FilterState) => void;
   resultCount: number;
@@ -114,6 +115,7 @@ export function Overlays(props: OverlaysProps) {
             now={now}
             day={detailDay}
             birthDate={birthDate}
+            generatedAt={props.generatedAt}
             origin={origin}
             reach={ctx.reachOf(detailOffer)}
             reachPending={ctx.reachPending}

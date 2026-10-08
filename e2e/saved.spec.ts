@@ -1,5 +1,6 @@
 /** Merkliste (Plan 0003, E12, ADR 0007). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import { readFileSync } from "node:fs";
+import type { Download, Page } from "@playwright/test";
 import { expect, startPreloads, test } from "./fixtures.ts";
 
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
@@ -127,5 +128,80 @@ test.describe("Export-Code nicht ladbar", () => {
       page.getByRole("button", { name: "Alle in den Kalender" }).click(),
     ]);
     expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
+  });
+});
+
+// Plan 0018, E3/E4: Mit Geburtsdatum kommen regelmäßige Angebote nur passend zum Alter in die Datei, Kurse komplett.
+// Merkliste und Geburtsdatum stehen vor dem Laden im localStorage: Der Altersfilter blendet in „Entdecken“ aus.
+test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
+  const IDS = {
+    pekip:
+      "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
+    treff: "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
+    reime: "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
+  };
+
+  async function openSaved(page: Page, ids: string[], birthDate: string) {
+    await page.addInitScript(
+      ([saved, born]) => {
+        localStorage.setItem("zwergenplan.merkliste", saved);
+        localStorage.setItem("zwergenplan.geburtsdatum", born);
+      },
+      [JSON.stringify(ids), birthDate] as const,
+    );
+    await page.goto("./?ansicht=merkliste");
+    await expect(page.getByTestId("offer")).toHaveCount(ids.length);
+    return page.getByRole("button", { name: "Alle in den Kalender" });
+  }
+
+  async function vevents(download: Download) {
+    return readFileSync((await download.path()) ?? "", "utf8").match(/BEGIN:VEVENT/g)?.length ?? 0;
+  }
+
+  test("Kurs komplett, Treff nur bis 14.10.: 8 + 2 Termine", async ({ page }) => {
+    const button = await openSaved(page, [IDS.pekip, IDS.treff], "2024-09-18");
+    await expect(
+      page.getByText("2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
+    expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
+    expect(await vevents(download)).toBe(10);
+    await expect(page.locator(".toast")).toHaveText("Kalenderdatei mit 10 Terminen geladen");
+  });
+
+  test("nichts passt: kein Download, Toast", async ({ page }) => {
+    const button = await openSaved(page, [IDS.treff], "2026-08-01");
+    await expect(page.getByText("1 gemerkt · keiner passt gerade zum Alter", { exact: true })).toBeVisible();
+    let downloaded = false;
+    page.on("download", () => {
+      downloaded = true;
+    });
+    await button.click();
+    await expect(page.locator(".toast")).toHaveText("Keins der gemerkten Angebote passt zum Alter.");
+    expect(downloaded).toBe(false);
+  });
+
+  test("ein Angebot passt nicht: nur die anderen in der Datei, Toast nennt es 6 s lang", async ({ page }) => {
+    const button = await openSaved(page, [IDS.treff, IDS.reime], "2026-08-01");
+    await expect(
+      page.getByText("2 gemerkt · 4 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    // Hält die Timer an: Die Anzeigedauer des Toasts wird gezielt vorgespult.
+    await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
+    const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
+    const ics = readFileSync((await download.path()) ?? "", "utf8").replaceAll("\r\n ", "");
+    const uids = ics.match(/^UID:.+$/gm) ?? [];
+    expect(uids).toHaveLength(4);
+    for (const uid of uids) expect(uid).toContain(IDS.reime);
+    const toast = page.locator(".toast");
+    await expect(toast).toHaveText("Kalenderdatei mit 4 Terminen geladen – 1 Angebot passt nicht zum Alter");
+    await page.clock.runFor(5_500);
+    await expect(toast, "nach 5,5 s noch sichtbar").toBeVisible();
+    await page.clock.runFor(1_000);
+    await expect(toast).toHaveCount(0);
   });
 });

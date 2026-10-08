@@ -276,6 +276,24 @@ export function collectionToast(count: number, missing: number): string {
 }
 
 /**
+ * Text unter „Alle in den Kalender“ (Plan 0018, E3; „gemerkt“ seit Plan 0022): `sessions` Termine in der Datei,
+ * `byAge` mit Geburtsdatum, dann kommen regelmäßige Angebote nur passend zum Alter hinein.
+ */
+export function savedExportNote(saved: number, sessions: number, byAge: boolean): string {
+  const head = `${saved} gemerkt`;
+  if (byAge && sessions === 0) return `${head} · keiner passt gerade zum Alter`;
+  const file = `${plural(sessions, "Termin", "Termine")} in einer .ics-Datei`;
+  return `${head} · ${file} · ${byAge ? "Kurse komplett, regelmäßige nur passend zum Alter" : "Kurse immer komplett"}`;
+}
+
+/**
+ * Toast, wenn der Export-Code nicht lädt (Merkliste und Detail). Chromium behält einen gescheiterten `import()`, auch
+ * den des Vorladens: Nur ein Neuladen hilft sicher, die Merkliste liegt im localStorage und übersteht es (Arch-Review
+ * Paket 0, Befund 1).
+ */
+export const EXPORT_UNAVAILABLE = "Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.";
+
+/**
  * Zusatz der Alterszeile im Detail (Plan 0018, E4): „passt bis 14.10.“, „passt ab 21.10.“, „passt 21.10.–14.3.2027“.
  * Ohne Kürzung keiner. Den Trenner davor setzt die Oberfläche.
  */

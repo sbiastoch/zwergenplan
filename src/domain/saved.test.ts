@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { offerFitsAge } from "./age.ts";
-import { collectionSessions, exportSessions, savedOffers, seriesExport, toggleId } from "./saved.ts";
+import { upcomingSessions } from "./agenda.ts";
+import { collectionExport, exportSessions, savedOffers, seriesExport, toggleId } from "./saved.ts";
 import type { Offer } from "./schema.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 import { addDays, berlinIsoDate, fromBerlinLocal } from "./time.ts";
@@ -71,10 +72,12 @@ describe("exportSessions (Plan 0018, E1)", () => {
       expect(exportSessions(fixtureOffer("vergangen"), FIXTURE_NOW, undefined)).toEqual({ sessions: [] });
     });
 
-    it("wählt für jedes Fixture-Angebot dasselbe wie collectionSessions", () => {
+    it("wählt für jedes Fixture-Angebot wie bisher: Kurse komplett, sonst die kommenden Termine", () => {
       for (const now of [FIXTURE_NOW, new Date("2026-11-11T12:00:00+01:00")]) {
         for (const offer of file.offers) {
-          expect(exportSessions(offer, now, undefined).sessions).toEqual(collectionSessions(offer, now));
+          // Orakel: die Regel aus ADR 0007, bis Plan 0018 `collectionSessions`
+          const expected = offer.format === "kurs" ? offer.sessions : upcomingSessions(offer, now);
+          expect(exportSessions(offer, now, undefined), offer.title).toEqual({ sessions: expected });
         }
       }
     });
@@ -200,5 +203,45 @@ describe("seriesExport (Plan 0018, E1/E2)", () => {
       kind: "blob",
       selection: { sessions: reime.sessions },
     });
+  });
+});
+
+describe("collectionExport (Plan 0018, E3)", () => {
+  const pekip = fixtureOffer("pekip-herbst"); // Kurs, 1–5 Monate, 8 Termine
+  const treff = fixtureOffer("krabbeltreff"); // regelmäßig, 6–24 Monate, 5 Termine
+  const reime = fixtureOffer("krabbelreime"); // regelmäßig, 0–36 Monate, 4 Termine
+
+  it("nimmt ohne Geburtsdatum alles wie bisher", () => {
+    const result = collectionExport([pekip, treff], FIXTURE_NOW, undefined);
+    expect(result.items).toEqual([
+      { offer: pekip, sessions: pekip.sessions },
+      { offer: treff, sessions: treff.sessions },
+    ]);
+    expect(result).toMatchObject({ count: 13, missing: 0 });
+  });
+
+  it("kürzt regelmäßige Angebote nach dem Alter, Kurse bleiben komplett", () => {
+    const result = collectionExport([pekip, treff], FIXTURE_NOW, "2024-09-18");
+    expect(result.items).toEqual([
+      { offer: pekip, sessions: pekip.sessions },
+      { offer: treff, sessions: treff.sessions.slice(0, 2) },
+    ]);
+    expect(result).toMatchObject({ count: 10, missing: 0 });
+  });
+
+  it("lässt Angebote ohne passenden Termin weg und zählt sie", () => {
+    expect(collectionExport([treff], FIXTURE_NOW, "2026-08-01")).toEqual({ items: [], count: 0, missing: 1 });
+    expect(collectionExport([treff, reime], FIXTURE_NOW, "2026-08-01")).toEqual({
+      items: [{ offer: reime, sessions: reime.sessions }],
+      count: 4,
+      missing: 1,
+    });
+  });
+
+  it("behält Reihenfolge und Objekte der übergebenen Angebote", () => {
+    const offers = [{ ...reime }, { ...pekip }];
+    const [first, second] = collectionExport(offers, FIXTURE_NOW, undefined).items;
+    expect(first?.offer).toBe(offers[0]);
+    expect(second?.offer).toBe(offers[1]);
   });
 });

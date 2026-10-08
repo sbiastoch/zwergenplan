@@ -174,15 +174,24 @@ export function useTheme(): { choice: ThemeChoice; dark: boolean; setChoice: (c:
   return { choice, dark, setChoice };
 }
 
-/** Kurzmeldung, 2,8 s sichtbar. */
-export function useToast(): [string, (message: string) => void] {
+/** Standarddauer einer Kurzmeldung */
+const TOAST_MS = 2800;
+
+/**
+ * Dauer der langen Kalender-Toasts (Plan 0018, E4): mit Altersgrenze, mit fehlenden Angeboten und „nichts passt“. Sie
+ * sind bis knapp 90 Zeichen lang, nach der Faustregel etwa 1 s je 15 Zeichen.
+ */
+export const LONG_TOAST_MS = 6000;
+
+/** Kurzmeldung, 2,8 s sichtbar oder `ms` lang. */
+export function useToast(): [string, (message: string, ms?: number) => void] {
   const [message, setMessage] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const say = useCallback((next: string) => {
+  const say = useCallback((next: string, ms = TOAST_MS) => {
     clearTimeout(timer.current);
     setMessage(next);
-    timer.current = setTimeout(() => setMessage(""), 2800);
+    timer.current = setTimeout(() => setMessage(""), ms);
   }, []);
   return [message, say];
 }

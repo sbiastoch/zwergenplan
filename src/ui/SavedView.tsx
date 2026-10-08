@@ -1,38 +1,43 @@
 /** „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007). */
 import { nextSession } from "../domain/agenda.ts";
-import { collectionSessions } from "../domain/saved.ts";
+import { collectionExport } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
-import { plural } from "./format.ts";
+import { collectionToast, EXPORT_UNAVAILABLE, savedExportNote } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { download, type IcsExport, loadExport } from "./ics-export.ts";
 import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
+import { LONG_TOAST_MS } from "./use-app-state.ts";
 
 interface SavedViewProps {
   offers: SiteOffer[];
   generatedAt: SiteData["generatedAt"];
+  /** mit Geburtsdatum kommen regelmäßige Angebote nur passend zum Alter in die Datei (Plan 0018, E3) */
+  birthDate: string | undefined;
   ctx: CardContext;
   onDiscover: () => void;
-  onExported: (message: string) => void;
+  /** Toast nach dem Export; `ms` für lange Meldungen (Plan 0018, E4) */
+  onExported: (message: string, ms?: number) => void;
 }
 
-export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: SavedViewProps) {
-  const items = offers.map((offer) => ({ offer, sessions: collectionSessions(offer, ctx.now) }));
-  const sessionCount = items.reduce((sum, i) => sum + i.sessions.length, 0);
+export function SavedView({ offers, generatedAt, birthDate, ctx, onDiscover, onExported }: SavedViewProps) {
+  const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
+    if (count === 0) {
+      onExported("Keins der gemerkten Angebote passt zum Alter.", LONG_TOAST_MS);
+      return;
+    }
     let ics: IcsExport;
     try {
       ics = await loadExport();
     } catch {
-      // Chromium behält einen gescheiterten import() (auch des Vorladens): Nur ein Neuladen hilft sicher, die
-      // Merkliste liegt im localStorage und übersteht es (Arch-Review Paket 0, Befund 1).
-      onExported("Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.");
+      onExported(EXPORT_UNAVAILABLE);
       return;
     }
     const withCtx = items.map((i) => ({ ...i, ctx: ics.icsContextFor(i.offer, generatedAt) }));
     download(ics.icsForCollection(withCtx, "Zwergenplan – Merkliste"), "zwergenplan-merkliste.ics");
-    onExported(`Kalenderdatei mit ${plural(sessionCount, "Termin", "Terminen")} geladen`);
+    onExported(collectionToast(count, missing), missing > 0 ? LONG_TOAST_MS : undefined);
   };
 
   return (
@@ -53,10 +58,7 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
             <Icon name="calendarPlus" />
             Alle in den Kalender
           </button>
-          <p className="small">
-            {offers.length} gemerkt · {plural(sessionCount, "Termin", "Termine")} in einer .ics-Datei · Kurse immer
-            komplett
-          </p>
+          <p className="small">{savedExportNote(offers.length, count, birthDate !== undefined)}</p>
           {offers.map((offer) => {
             const session = nextSession(offer, ctx.now);
             return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
