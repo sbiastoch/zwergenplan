@@ -274,6 +274,8 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 
 ### E10 – Kodierung v1: Kurz-IDs im Fragment
 
+> **Hinweis (2026-10-08):** Plan 0015, Nachtrag A (Stufe 0, ADR-Entwurf 0022) macht die Angebots-ID selbst zur gespeicherten 8-Zeichen-Kurz-ID. Dann entfallen Hash, Kollisionsprüfung und Verwerfen mehrdeutiger Kurz-IDs; Anbieter stehen mit ihrer Katalog-ID im Fragment (dort E20). E10–E12 werden vor Beginn von Stufe 2 daran angepasst. Stufe 2 setzt Stufe 0 von Plan 0015 voraus.
+
 - Form: `{SITE_URL}#merkliste=1.{A}` bzw. mit Anbietern `…#merkliste=1.{A}.{P}`.
   - `1` ist die Formatversion.
   - `{A}` sind die Kurz-IDs der Angebote, `{P}` die der Anbieter, jeweils **ohne Trenner** aneinandergereiht (je genau 8 Zeichen).
