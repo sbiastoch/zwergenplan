@@ -1,9 +1,9 @@
 # Plan 0015 – Nächtliche Datenpipeline mit Evals
 
-Status: freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0018 (Kalender-Export nur altersgerecht)
+Status: Review eingearbeitet für Nachtrag A (stabile IDs, 2026-10-08, neue Stufe 0; Nutzerentscheide N-I1–N-I4 offen, umsetzbar mit den empfohlenen Standards). Hauptteil freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0018 (Kalender-Export nur altersgerecht)
 Datum: 2026-10-06
 
-(ADR 0002 Hosting und Datenfluss, ADR 0003 Datenmodell, ADR 0004 Backpressure, ADR 0006 Recherche-Pipeline, Plan 0002 Pipeline, Plan 0009 Fahrplan; neu: ADR-Entwurf 0016.)
+(ADR 0002 Hosting und Datenfluss, ADR 0003 Datenmodell, ADR 0004 Backpressure, ADR 0006 Recherche-Pipeline, Plan 0002 Pipeline, Plan 0009 Fahrplan; neu: ADR-Entwurf 0016; mit Nachtrag A neu: ADR-Entwurf 0022 stabile IDs.)
 
 ## Ziel
 
@@ -89,10 +89,10 @@ nightly.yml (cron, täglich 01:30 UTC)
          Entscheidungstabelle (E5): Seite ausgefallen → fehler; Sammelkalender (teilweise) ausgefallen → ausstehend
          gleicher Hash, gleicher Extraktor, gleiches Modell → alte Events übernehmen (Cache, E5)
          sonst → Modell (E3) → validateRaw + Build-Probelauf → bei Fehlern 1 Wiederholung mit den Meldungen
-         Erfolg → Titel-Anker → data/raw/<id>.json neu
+         Erfolg → data/raw/<id>.json neu   (kein Titel-Anker mehr, Nachtrag A, E21)
          Fehler → alte Events bleiben, status fehler; Rate-Limit oder Zeitbudget erschöpft → status ausstehend
          Einbruch (≥ 3 Events → leer oder < Hälfte) → zurückhalten bis zur Bestätigung (E5)
-    4. build: data/raw/*.json (+ Kursfortschreibung aus data/offers.json) → data/offers.json
+    4. build: data/raw/*.json (+ ID-Zuordnung und Kursfortschreibung gegen data/offers.json, Nachtrag A, E14) → data/offers.json
     5. Bericht (E7) → stdout, $GITHUB_STEP_SUMMARY, runs/<datum>/bericht.md
   upload-artifact runs/<datum>/       # Eingaben, Modellantworten, Kandidaten, Bericht, Zustand – 14 Tage
   pnpm pipeline publish               # nur data/, nur bei Änderung; NIGHTLY_PUBLISH=1 nötig (E12)
@@ -157,7 +157,7 @@ Derselbe Befehl `pnpm pipeline run` läuft lokal mit eigenen Umgebungsvariablen.
   - Das Themen-Vokabular und das Antwortformat fügt der Code aus dem Zod-Vertrag ein (`schema/raw-batch.schema.json`). Es gibt also keine zweite Liste.
   - `extraction.md` wird gelöscht. Der Prompt ist die einzige Quelle der Extraktionsregeln.
 - **Zuschnitt der Module:** Was das Modell sieht oder was seine Antwort bewertet, liegt in **`lib/extract-prompt.ts`**: Eingabe-Bauer, Zusammenbau des Prompts, Parsen der Antwort, Validierung samt Build-Probelauf.
-  - Alles Übrige liegt in **`lib/refresh.ts`**: Zustandslogik, Cache-Regel, Einbruchschutz, Zeitbudget, Titel-Anker, Ausfall-Regeln, Platzhalter.
+  - Alles Übrige liegt in **`lib/refresh.ts`**: Zustandslogik, Cache-Regel, Einbruchschutz, Zeitbudget, Ausfall-Regeln, Platzhalter.
 - **Extraktor-Version:** `EXTRACTOR_VERSION` = die ersten 12 Zeichen von sha256 über den Inhalt von `prompt/extract.md`, `lib/extract-prompt.ts` und das eingefügte Schema. Berechnet wird sie zur Laufzeit.
   - Jede Änderung daran ergibt eine neue Version und verlangt ein neues Eval. Auch reine Umformatierungen zählen; das ist billiger als eine vergessene Versionsnummer, die von Hand gepflegt werden müsste.
   - Bugfixes in `lib/refresh.ts` ändern die Version nicht. Sie kosten weder ein Eval noch eine Neu-Extraktion.
@@ -173,11 +173,7 @@ Derselbe Befehl `pnpm pipeline run` läuft lokal mit eigenen Umgebungsvariablen.
 - **Plausibilität der URLs** (Schutz gegen Prompt-Injection aus Webseiten):
   - `sourceUrl` muss in der Menge der erlaubten URLs liegen: die abgerufenen URLs, ihre Ziele nach Redirects (`finalUrl`) und die `detailUrl` der Kandidaten in der Eingabe. Sonst ist das ein Validierungsfehler.
   - `url` muss `http:` oder `https:` sein; es gibt Bestandsdaten mit `http://`, z. B. `providers.yaml:1571`. Der Bericht listet Hosts, die in keiner Katalog-URL vorkommen, als Hinweis. Er lehnt sie nicht ab.
-- **Titel-Anker (stabile IDs, ADR 0003/0006):** Nach der Validierung vergleicht der Code jedes neue Event mit den alten Events des Anbieters und übernimmt bei einem Treffer den **alten Titel**.
-  - Ein Modell, das „Krabbelgruppe (Di)“ einmal „Krabbelgruppe Dienstag“ nennt, ändert so weder die ID noch die Kalender der Nutzer.
-  - Die Zuordnung ist **1:1**: zuerst exakt gleiche Titel. Dann für die übrigen Paare mit gleichem `venueId` und `format`, ähnlichem Titel (`similarTitle`) und sich überschneidenden Terminen, gierig nach größter Überschneidung der Termine (Jaccard).
-  - Jedes alte Event verankert höchstens ein neues. Ergäben sich zwei gleiche Titel, unterbleibt der Anker für das zweite.
-  - Die Regel ist rein und unit-getestet, auch mit zwei ähnlich benannten Gruppen.
+- **Titel-Anker – entfällt (Nachtrag A, E21).** Ursprünglich sollte der Code nach der Validierung den alten Titel übernehmen, wenn ein neues Event einem alten des Anbieters entspricht (1:1, exakte Titel zuerst, dann ähnlicher Titel mit überlappenden Terminen), damit sich die ID nicht ändert. Seit Nachtrag A hängt die ID nicht mehr am Titel: Die Zuordnung in `build` (E14) übernimmt die gespeicherte ID mit fast denselben Regeln. Der Titel darf sich also ändern, und ein zweiter Mechanismus wäre doppelt.
 - **`via`:** Das Modell setzt `via` nicht, das macht der Code.
   - Für Anbieter mit `coveredBy` ist es der Adapter des Sammelkalenders.
   - Sonst bleibt es leer (Rang `anbieter`). Hier kombiniert das Modell Seite und Kandidaten in einer Antwort und führt doppelte Termine selbst zusammen. Die Dublettenregeln in `buildOffers` bleiben als Netz.
@@ -247,7 +243,7 @@ Derselbe Befehl `pnpm pipeline run` läuft lokal mit eigenen Umgebungsvariablen.
   | 2 | Sammelkalender (teilweise) ausgefallen, Rate-Limit, Budget erschöpft | alt | `ausstehend` | alt | alt | bleibt | bleibt |
   | 3 | `held` besteht und neuer Hash = `held.inputHash` | `held.events` | aus `held` | neu | jetzt | löschen | löschen |
   | 4 | neuer Hash = gespeicherter Hash (Cache) | alt | alt | alt | jetzt | löschen | löschen |
-  | 5 | Modell liefert gültiges Ergebnis, kein Einbruch | neu (mit Titel-Anker) | aus Antwort | neu | jetzt | löschen | löschen |
+  | 5 | Modell liefert gültiges Ergebnis, kein Einbruch | neu | aus Antwort | neu | jetzt | löschen | löschen |
   | 6 | Modell liefert gültiges Ergebnis mit Einbruch | alt | alt | **alt** | alt | `{ neuer Hash, jetzt, neue Events }` | bleibt |
   | 7 | Modell meldet selbst `status: fehler` | alt | `fehler` (`reason` aus der Antwort) | alt | alt | bleibt | setzen, falls leer |
   | 8 | Modellantwort ungültig, abgeschnitten, Timeout | alt | `fehler` | alt | alt | bleibt | setzen, falls leer |
@@ -270,7 +266,7 @@ Derselbe Befehl `pnpm pipeline run` läuft lokal mit eigenen Umgebungsvariablen.
 - **Keine Handarbeit in `data/raw`:** Wie `data/offers.json` wird es nie von Hand bearbeitet. Eine Handkorrektur bliebe über den Cache dauerhaft stehen und wäre nicht reproduzierbar. Korrekturen laufen über Katalog, Prompt oder Eval-Fall. Diese Regel kommt in `CLAUDE.md`, Abschnitt Stolperfallen/Daten.
   - `availability.checkedAt` der Angebote kommt aus `checkedAt` des Anbieters.
   - Die Übernahme aus dem Altbestand bei Fehlern (Schritt 5 in `buildOffers`) entfällt, denn `data/raw` hält die alten Events.
-  - Die Kursfortschreibung (Schritt 2, ADR 0006) bleibt und liest weiter das bisherige `data/offers.json`.
+  - Die Kursfortschreibung (ADR 0006) bleibt und liest weiter das bisherige `data/offers.json`. Seit Nachtrag A hängt sie an der ID-Zuordnung (E14) statt an gleichem Titel-Slug.
 - **Warum im Repo und nicht in `actions/cache`?** Der Zustand ist sichtbar, diffbar und dauerhaft. Lokale Läufe und der Nachtlauf sehen denselben Stand, und es braucht keine weitere Infrastruktur. Einzige Ausnahme ist der vorübergehende Schattenbetrieb (E12).
 - **Biome:** `data/raw/**` schreibt `writeJson` (`JSON.stringify(v, null, 1)`, Schlüssel in fester Reihenfolge des Zod-Schemas). Biome nimmt die Dateien aus, wie `data/oepnv/fahrplan.json`.
 - **Schema-Ort (Abweichung von „ein Datenvertrag“, `docs/architecture.md`):** `ProviderRaw` ist Zustand der Pipeline, kein Datenvertrag der Website. Weder `build-data.ts` noch `src/` lesen ihn.
@@ -463,7 +459,7 @@ evals/
 - **Replay:** Ein Fake-Client antwortet in jedem Fall mit `expected.json`. Der volle Weg `extractProvider` → `data/raw` → `buildOffers` bleibt grün.
   - Er braucht nur `cases/`, nicht `inputs/`: Der Fake ignoriert die Seitentexte, und der Test setzt leere Seiten ein.
   - Die erlaubten URLs kommen aus `case.json`.
-- **Fehlerpfade mit Fake-Client:** kein JSON, Schemafehler mit Korrektur in der Wiederholung, zweimal Schemafehler, 429 und dann Erfolg, Timeout, `finish_reason: length`, fremde `sourceUrl`, Cache-Treffer ohne Aufruf, Seitenfehler (alte Events bleiben, `failingSince` wird gesetzt), Erholung (`failingSince` verschwindet), 429 nach allen Wiederholungen (`ausstehend`, kein `failingSince`, nicht in der 20-%-Regel), Sammelkalender ausgefallen (abhängige Anbieter `fehler`, alte Events bleiben), Build-Probelauf scheitert (nur dieser Anbieter `fehler`), Titel-Anker, 3 systemische 401 (Exit 1), mehr als 20 % Fehler (Exit 2).
+- **Fehlerpfade mit Fake-Client:** kein JSON, Schemafehler mit Korrektur in der Wiederholung, zweimal Schemafehler, 429 und dann Erfolg, Timeout, `finish_reason: length`, fremde `sourceUrl`, Cache-Treffer ohne Aufruf, Seitenfehler (alte Events bleiben, `failingSince` wird gesetzt), Erholung (`failingSince` verschwindet), 429 nach allen Wiederholungen (`ausstehend`, kein `failingSince`, nicht in der 20-%-Regel), Sammelkalender ausgefallen (abhängige Anbieter `fehler`, alte Events bleiben), Build-Probelauf scheitert (nur dieser Anbieter `fehler`), 3 systemische 401 (Exit 1), mehr als 20 % Fehler (Exit 2).
 
 ### E9 – Ablage der eingefrorenen Eingaben: im öffentlichen Repo (Nutzerentscheidung 2026-10-06)
 
@@ -537,6 +533,7 @@ knip meldet tote Reste.
 Jeder Schritt endet mit grünem `pnpm check:fast`. Neue Logik entsteht test-first (Vitest, ohne Netz).
 
 Die Schritte bilden drei **Stufen**. Jede Stufe ist für sich lieferbar, wird eigens committet und nach `main` gebracht:
+- **Stufe 0** (Schritte S1–S5, Nachtrag A): stabile IDs. Unabhängig von Plan 0018 und von den übrigen Stufen. Sie muss live sein, bevor Stufe B den ersten Datenstand veröffentlicht, denn der erste Modelllauf extrahiert alle Anbieter neu und ändert viele Titel.
 - **Stufe A** (Schritte 1–3): ADR, Horizont, Zustand in `data/raw`. **Voraussetzung:** Plan 0018 (Kalender-Export nur altersgerecht) ist live. Ab dann baut `offers.json` aus `data/raw` mit 12-Monats-Fenster. Zwischen Stufe A und Stufe B gibt es **keinen** Skill-Lauf. Der Bestand vom 04.10. bleibt stehen, der nächste Datenlauf ist der erste lokale `pnpm pipeline run` in Stufe B. Eine Übergangsfunktion für das alte Paketformat gibt es nicht.
 - **Stufe B** (Schritte 4–8): Abruf, Katalog, Extraktion, `run`/`status`, Evals. Danach läuft alles lokal per `pnpm pipeline run`.
 - **Stufe C** (Schritte 9–11): Modellwahl, Nachtlauf im Schatten, Umschalten.
@@ -606,7 +603,7 @@ Die Schritte bilden drei **Stufen**. Jede Stufe ist für sich lieferbar, wird ei
 | Bereich | Art | Wo |
 |---|---|---|
 | Horizont, Fenster, Zählung | Unit | `lib/build-offers.test.ts`, `lib/raw.test.ts` |
-| `ProviderRaw`, Cache-Regel, Fehler-, `ausstehend`- und Erholungspfad, Build-Probelauf, Titel-Anker, `via` | Unit mit Fake-Client | `lib/extract.test.ts` |
+| `ProviderRaw`, Cache-Regel, Fehler-, `ausstehend`- und Erholungspfad, Build-Probelauf, `via` | Unit mit Fake-Client | `lib/extract.test.ts` |
 | Wiederhol-Regeln (429, 5xx, `Retry-After`, Timeout) | Unit mit injiziertem `send`/`sleep` | `lib/llm-retry.test.ts` |
 | Eingabe-Bauer, Platzhalter, `request`, Ausfall-Regel Sammelkalender, erlaubte URLs | Unit | `lib/input.test.ts` |
 | Abruf je `kind` (ohne Playwright) | Unit mit Fixtures | `lib/*.test.ts` |
@@ -625,7 +622,7 @@ Die Schritte bilden drei **Stufen**. Jede Stufe ist für sich lieferbar, wird ei
 - **R2 – Ausgabelimit bei großen Anbietern** (FBS, 85 Events in einem Paket). Fall `gross` im Eval. Ist ein Modell sonst gut und scheitert nur hier, wäre die Idee „Anbieter je Programmseite aufteilen“ der nächste Plan. Bis dahin bleibt der Anbieter mit alten Daten und 🟡 sichtbar.
 - **R3 – Bot-Schutz** (Eversports 403 auch im Headless-Browser). Der Anbieter bleibt `fehler` und sichtbar. Der Wartungslauf sucht eine andere Seite (z. B. die Kursseite des Anbieters statt des Widgets).
 - **R4 – Rauschen im Seitentext** (Datumsanzeigen, Teaser) zerstört Cache-Treffer. Das kostet nur Aufrufe, und der Bericht zeigt die Quote. Normalisieren erst bei Bedarf (Idee).
-- **R5 – Änderungen trotz `temperature: 0`.** Eine geänderte Seite kann auch unbeteiligte Angebote dieses Anbieters leicht verändern (Themen, Titel → neue ID bei Kursen). Die Evals messen die Streuung über `--repeat`. Der Bericht zeigt +neu/−weg je Anbieter.
+- **R5 – Änderungen trotz `temperature: 0`.** Eine geänderte Seite kann auch unbeteiligte Angebote dieses Anbieters leicht verändern (Themen, Titel). Die ID bleibt seit Nachtrag A trotzdem (E14). Die Evals messen die Streuung über `--repeat`. Der Bericht zeigt +neu/−weg je Anbieter.
 - **R6 – Prompt-Injection über Webseiten.** Die Ausgabe ist durch Schema, `sourceUrl` und `https:`-Regel begrenzt. React escaped Texte. Der Schaden wäre ein falscher Text oder Link auf einer privaten Seite. Das ist hinnehmbar.
 - **R7 – Wachsende Git-Historie** durch nächtliche Commits (`offers.json` ≈ 63 kB gzip, Deltas kleiner). Nach einem Monat messen (`git count-objects -vH`), Idee falls nötig.
 - **R8 – Rechtliches zu den Eval-Eingaben:** E9.
@@ -727,3 +724,338 @@ Dritter, unabhängiger `plan-reviewer`. Die Blocker der Durchgänge 1 und 2 best
 - **Datenhorizont 12 Monate** (E2) bestätigt.
 - **Secrets und Variablen** (Stufe C) legt der Nutzer später an.
 - **Neue Anforderung:** Regelmäßige Termine landen beim ICS-Export nur, solange das Angebot zum Alter des Kindes passt. Umgesetzt als eigener Plan 0018 (UI, unabhängig lieferbar). Er muss live sein, bevor Stufe A das 12-Monats-Fenster veröffentlicht. Sonst brächte „Alle Termine“ eine Wochengruppe mit etwa 50 Terminen in den Kalender, auch nachdem das Kind herausgewachsen ist.
+
+## Nachtrag A (2026-10-08): stabile IDs für Angebote und Anbieter
+
+Auftrag des Nutzers: Das Konzept „stabile IDs“ kommt in diesen Plan, nicht in einen eigenen. Es bildet die neue **Stufe 0** (Schritte S1–S5). Sie ist unabhängig von Plan 0018 und von den Stufen A–C lieferbar und geht vor ihnen live.
+
+Bezug: ADR 0003 (Datenmodell, UID), ADR 0006 (ID-Regel, Kursfortschreibung), ADR 0007 (Merklisten-ICS im Browser), ADR 0010 (Schichten `src/data`), ADR 0012 (Startbudget), ADR 0014 (Push), ADR 0016 (dieser Plan), ADR 0020 (Teilen per Link, Pfadvertrag); **neu ADR-Entwurf 0022** (`docs/adr/0022-stabile-ids.md`, im selben Commit). Plan 0026 (Stufe 2 baut hierauf).
+
+### Befund (2026-10-08)
+
+- **Regel heute** (ADR 0003, ADR 0006, `src/domain/ids.ts`): Die Offer-ID ist `providerId--slug(title)--venueId`, bei `kurs` und `einmalig` mit `-YYYYMMDDtHHmm` des ersten Termins im Mittelteil. `validateDataset` prüft `id === offerId(offer)` (`src/domain/dataset.ts:60`). Die ID ist also eine Funktion von Titel und erstem Termin.
+- **Titel ändern sich:** Von 333 Angeboten (117 regelmäßig, 170 Kurse, 46 einmalig) tragen 251 Wochentag, Uhrzeit, Datum oder Saison im Titel, z. B. „PEKiP (Babys geb. Jan.–Feb. 2026, Di 9:30)“, „Auf Entdeckungsreise mit Papa (10–24 Monate, Mi ab 11.11.)“. Jede Umformulierung durch die Recherche ergibt eine neue ID. In Stufe B extrahiert ein Sprachmodell alle Anbieter neu; danach ändern sich viele Titel auf einmal.
+- **Was heute hält:** Nur laufende Kurse mit **gleichem Titel-Slug** behalten ihre ID (`scripts/pipeline/lib/build-offers.ts`, Schritt 2 „Kursfortschreibung“). Der Titel-Anker aus E3 hätte ähnliche Titel gehalten, wirkt aber erst ab Stufe B und hilft nicht bei geänderter Uhrzeit oder verschobenem Kursbeginn.
+- **Folgen einer neuen ID:**
+  - Geteilte Links (Plan 0026, seit 2026-10-08 live unter `angebot/<id>/` und `anbieter/<id>/`, ADR 0020) landen auf „Dieses Angebot ist nicht mehr im Zwergenplan.“.
+  - Gemerkte Angebote verschwinden still von der Merkliste (`src/domain/saved.ts` blendet unbekannte IDs aus).
+  - Ein erneuter Kalender-Import erzeugt Duplikate, weil die UID die ID enthält (ADR 0003).
+  - Die Wochen-Nachricht hält das Angebot für neu (`seenIds`, `src/sw/push-tailor.ts`).
+  - Plan 0026, Stufe 2 (Merkliste im Fragment über Kurz-Hashes der IDs) erbte das Problem.
+- **Wo die Angebots-ID überall steht:**
+
+  | Stelle | Ort im Code |
+  |---|---|
+  | `data/offers.json`, `site.json` (Reihenfolge bei gleichem Beginn nach ID) | `src/domain/schema.ts`, `src/domain/site-data.ts`, `scripts/build-data.ts` |
+  | ICS-Pfade `ics/<id>.ics`, `ics/<id>/<YYYYMMDDTHHmm>.ics` | `src/domain/ics-paths.ts` |
+  | UID `<id>--<YYYYMMDDTHHmm>@zwergenplan` (auch Merklisten-ICS, ADR 0007) | `src/domain/ics.ts:30` |
+  | Merkliste `zwergenplan.merkliste` (JSON-Array von IDs) | `src/data/preferences.ts`, gelesen in `useSaved` (`src/ui/use-app-state.ts`) |
+  | `seenIds` im IndexedDB (Wochen-Nachricht, Plan 0017) | `src/sw/push-tailor.ts` |
+  | Query `?angebot=` | `src/domain/route.ts` |
+  | Vorschauseite `angebot/<id>/`, Kachelbild, `404.html` (Muster `[a-z0-9-]{1,240}`) | `src/domain/share.ts`, `scripts/lib/share-pages.ts`, `scripts/og-images.ts` |
+  | Merkliste im Fragment (geplant) | Plan 0026, E10 |
+
+- **Anbieter-IDs** sind kebab-case, im Katalog von Hand vergeben (höchstens 38 Zeichen, Stand 2026-10-08) und nicht aus Recherchetext abgeleitet. Sie ändern sich nur durch eine bewusste Umbenennung im Wartungslauf (E10). Sie stehen in `offers.providerId`, `coveredBy`, ab Stufe A im Dateinamen `data/raw/<id>.json`, in `?anbieter=` und in `anbieter/<id>/`.
+- **Messungen am Bestand** (Wegwerf-Skript außerhalb des Repos, 2026-10-08):
+  - Die Kurz-IDs `shortId(id, 0)` (E13) der 333 heutigen IDs kollidieren nicht.
+  - Selbstabgleich: 2 Paare **verschiedener** Angebote haben gleichen Anbieter, gleichen Ort und identische Termine, z. B. „Kleinkindturnen nach Pikler (12–36 Monate, Mo 16:30)“ und „Musikalische Früherziehung (1–3 Jahre, Mo 16:30)“.
+  - 213 Paare haben gleichen Anbieter, Ort und Format und mindestens 50 % gemeinsame Tage, z. B. zwei PEKiP-Gruppen dienstags um 9:30 und 11:30.
+  - Folgerung: Termine allein oder Tage allein reichen für eine Zuordnung nicht. E14 verlangt deshalb Eindeutigkeit, in Stufe 2 sogar den einzigen Kandidaten.
+
+### Ziel
+
+- Eine einmal vergebene Angebots-ID bleibt, solange es das Angebot gibt, auch wenn sich Titel, Uhrzeit oder Kursbeginn ändern.
+- Alte Links, Merklisten-Einträge und `seenIds` leben weiter.
+- Die ID ist kurz genug für Links und für die Merkliste im Fragment, ohne Hash im Browser.
+- `pipeline build` bleibt rein und deterministisch: gleiche Eingabe und gleicher Vorstand ergeben dieselben IDs.
+
+### Nicht-Ziele
+
+- **Verlegte Einzeltermine** (gleicher Titel, anderer Tag) behalten ihre ID nicht. Das bleibt wie in ADR 0006 „ein anderer Termin“. Idee für `docs/ideas.md` (S5).
+- **Zusammenlegung** zweier alter Angebote zu einem, mit Weiterleitung der verschwundenen ID (Review B2). Sie ordnete in genau den Fällen aus dem Befund falsch zu. Ein verschwundenes Angebot bleibt verschwunden, wie heute. Idee für `docs/ideas.md` (S5).
+- **Anbieter umbenennen.** Katalog-IDs werden nicht umbenannt (E16). Braucht es das einmal, kommt vorher `formerIds` für Anbieter (Idee).
+- **Kalendereinträge bei Nutzern umschreiben.** Das ist technisch unmöglich (E18).
+- **Kurz-ID für Anbieter**, **neue Pfade `/a/`, `/p/`** und **Aliasseiten mit Vorschau für alte Links**: Standard „nein“, Nutzerentscheide N-I1, N-I2 und N-I4 unten.
+
+### E13 – Angebots-ID: 8 Zeichen, gespeichert statt abgeleitet
+
+- **Form:** `Offer.id` passt auf `/^[0-9a-z]{8}$/` (`OFFER_ID_PATTERN` neu in `src/domain/ids.ts`). Sie steht in `data/offers.json`. Die Pipeline übernimmt sie aus dem Vorstand (E14), statt sie zu berechnen.
+- **Alte Form:** `LEGACY_OFFER_ID_PATTERN` ist das bisherige `OFFER_ID_PATTERN`, `MAX_LEGACY_OFFER_ID = 240` das bisherige `MAX_OFFER_ID`. Beide braucht nur noch die Abbildung alt → neu (E15) und `notFoundPage` (`404.html`). Alle Nutzer von `MAX_OFFER_ID` werden umgestellt: `src/domain/schema.ts:7`, `src/domain/share.ts:7,15`, `scripts/lib/share-pages.ts:10,292`.
+- **Zuordnungsschlüssel:** Die bisherige Formel heißt künftig `offerKey(o)` (Umbenennung von `offerId`, Regel unverändert, weiter in `src/domain/ids.ts`). Er wird nirgends gespeichert. Die Pipeline nutzt ihn für Dubletten (E14, Reihenfolge Schritt 3), für Stufe 0 der Zuordnung und als Saat neuer IDs.
+- **`shortId`** (`src/domain/ids.ts`, rein, synchron; cyrb53 nach bryc, diese Fassung, damit die Testvektoren gelten):
+
+  ```ts
+  function cyrb53(text: string, seed: number): number {
+    let h1 = 0xdeadbeef ^ seed;
+    let h2 = 0x41c6ce57 ^ seed;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+  }
+  /** 8 Zeichen [0-9a-z], 41 Bit */
+  export const shortId = (text: string, seed = 0): string => (cyrb53(text, seed) % 36 ** 8).toString(36).padStart(8, "0");
+  ```
+
+  Testvektoren (im Befund gerechnet): `atv-1873-frankonia--riesen-zwerge-turnen-fuer-2-bis-3-jaehrige-mo--atv-1873-frankonia` → `d4qshjw0`; `babykonzert-nuernberg--herbst-babykonzert-klassik-auf-der-krabbeldecke-20261108t1100--babykonzert-nuernberg` → `4tpu5qaq`; `brk-familienzentrum--auf-entdeckungsreise-mit-papa-10-24-monate-mi-ab-11-11-20261111t1600--brk-familienzentrum` → `toieuwx3`.
+- **Neue ID:** `shortId(offerKey(d), seed)` mit dem kleinsten `seed` (0, 1, 2 …), dessen Ergebnis nicht **belegt** ist. Belegt ist jede `id` im Vorstand und in der schon erzeugten Ausgabe. Vergeben wird in der Reihenfolge von `offerKey`, damit das Ergebnis deterministisch bleibt.
+  - **Warum ein Hash und kein Zufall:** Der Build bleibt rein und ohne injizierte Zufallsquelle testbar. Ein Angebot, das nach einer Lücke mit demselben Schlüssel zurückkommt, bekommt seine alte ID zurück. Das gilt auch für Angebote, die schon vor dem Umstieg verschwunden waren: Ihr Schlüssel ist ihre alte lange ID, und die App rechnet diese genauso um (E15).
+  - **Warum 8 Zeichen base36 (41 Bit):** Bei 1 000 IDs liegt die Kollisionswahrscheinlichkeit bei etwa 2 · 10⁻⁷, und die Vergabe weicht ohnehin aus. Links bleiben kurz (`angebot/4tpu5qaq/`), und das Fragment braucht 8 Zeichen je Angebot ohne Trenner.
+  - **Keine Wiedervergabe:** Eine ID aus dem Vorstand wird nie an ein anderes Angebot vergeben. Längst verschwundene IDs verfolgt niemand; eine Wiedervergabe an ein anderes Angebot setzte eine Hash-Kollision voraus (R10).
+- **Sortierung** von `data/offers.json`: nach `providerId`, `title` (`localeCompare(…, "de")`), Beginn des ersten Termins und zuletzt `id`. Bisher war es die ID, die mit `providerId` begann. Diffs bleiben so lesbar.
+- **`site.json`** sortiert weiter nach erstem Termin; bei gleichem Beginn entscheidet künftig der Titel und erst dann die ID (`src/domain/site-data.ts:89–92`). Sonst bestimmte bei gleichem Beginn eine zufällig wirkende ID die Reihenfolge in Liste und Wochen-Nachricht.
+- **Schema** (`src/domain/schema.ts`), danach `pnpm schema:export`: `id: z.string().regex(OFFER_ID_PATTERN)`; die Prüfung „id beginnt mit `providerId--` und endet mit `--venueId`“ entfällt. Ein Feld für Aliasse gibt es nicht (E15).
+- **`validateDataset`:** Statt `id === offerId(offer)` bleibt nur „IDs eindeutig“ (wie bisher) mit der neuen Form aus dem Schema.
+
+### E14 – Zuordnung gegen den Vorstand
+
+Neues reines Modul **`scripts/pipeline/lib/stable-ids.ts`**:
+
+```ts
+export type Draft = Omit<Offer, "id">;
+export interface IdAssignment { offers: Offer[]; notes: string[] }
+export function assignIds(input: {
+  drafts: readonly Draft[];               // nach den Dubletten-Schritten von buildOffers
+  previous: OffersFile | undefined;       // data/offers.json vor dem Lauf (fehlt beim ersten Lauf)
+  providers: readonly Provider[];         // Katalog, für vorhandene Orte
+  horizon: { from: string; to: string };  // Datenhorizont des Laufs (Berliner Daten)
+}): IdAssignment;
+export function checkIdContinuity(previous: OffersFile | undefined, next: readonly Offer[]): string[];
+```
+
+**Vergleichsfenster:** von `horizon.from` des Laufs bis `min(previous.horizon.to, horizon.to)` (Berliner Tage, beide Grenzen inklusive). Beide Seiten werden darauf beschnitten. Grund (Review M1): Der Vorstand endet an seinem eigenen Horizont. Ohne Beschnitt sänke der Wert bei vier Wochen zwischen zwei Läufen und 4 Monaten Horizont auf etwa 13/17 ≈ 0,76.
+
+**Vergleichsgrößen** je Paar aus altem Angebot `p` und neuem Entwurf `d`:
+- **gleicher Anbieter:** `p.providerId === d.providerId`.
+- **gleicher Ort:** `p.venueId === d.venueId`.
+- **`T(p, d)`:** Jaccard-Index der Beginn-Zeitpunkte (auf die Minute) der Termine im Vergleichsfenster. Vergangene Termine zählen nicht, sonst sänke der Wert für laufende Kurse, deren Entwurf nur künftige Termine hat. Hat eine Seite keinen Termin im Fenster, ist `T = 0`.
+- **`D(p, d)`:** derselbe Index über die Berliner Tage dieser Termine.
+- **Titel:** `similarTitle` aus `scripts/pipeline/lib/similar.ts`.
+
+**Drei Stufen**, nacheinander, jeweils nur über Angebote und Entwürfe, die noch keinen Partner haben:
+
+| Stufe | Bedingung | Auswahl |
+|---|---|---|
+| 0 gleicher Schlüssel | `offerKey(p) === offerKey(d)` | nur wenn auf beiden Seiten genau ein Paar |
+| 1 gleiche Termine | gleicher Anbieter; gleicher Ort, oder `p.venueId` steht nicht mehr im Katalog; `T ≥ 0,8` | Rang `T`, strikt bester für beide Seiten |
+| 2 ähnlicher Titel, gleiche Tage | gleicher Anbieter, gleicher Ort, gleiches `format`, `similarTitle`, `D ≥ 0,5` | nur wenn `p` und `d` füreinander der **einzige** Kandidat sind |
+
+- **Eindeutigkeit in Stufe 1:** Ein Paar wird nur genommen, wenn sein `T` für **beide** Seiten strikt größer ist als das jedes anderen Paars dieser Stufe mit `p` oder mit `d`. Dann scheiden beide aus, und die Stufe prüft die übrigen erneut, bis sich nichts mehr ändert. Bei Gleichstand gibt es keinen Treffer, nur den Hinweis „mehrdeutig“; Stufe 2 darf es erneut versuchen.
+  - Begründung: Die zwei Paare mit identischen Terminen aus dem Befund würden sonst vertauscht, wenn beide ihren Titel ändern. Eine neue ID ist der heutige Zustand, eine vertauschte wäre ein neuer Fehler.
+  - Stufe 1 fragt das Format nicht ab: Ein Angebot, das bei gleichen Terminen von `kurs` zu `regelmaessig` kippt (Modellstreuung), ist dasselbe. Der Ort darf nur fehlen, wenn der alte Ort aus dem Katalog verschwunden ist (Umbenennung im Wartungslauf).
+- **Einziger Kandidat in Stufe 2** (Review M2): Zwei Gruppen am selben Wochentag haben `D = 1`. Eine Rangfolge über die Titelähnlichkeit entschiede dann über einen Zufallswert der Formulierung. Deshalb gilt: Hat `d` mehr als ein mögliches `p` oder `p` mehr als ein mögliches `d`, gibt es keinen Treffer.
+- **Schwellen** als Konstanten `SAME_SESSIONS = 0.8` und `SAME_DAYS = 0.5` im Modul. 0,8 lässt einer Wochengruppe einzelne Ferientage, 0,5 lässt eine Uhrzeit wechseln und einige Termine wegfallen. Der Probelauf in S1 misst sie an echten Daten mit gestörten Titeln, der erste volle Lauf in Stufe B prüft sie am Bericht. Eine Änderung braucht eine Begründung im Code und im Commit (ADR 0004).
+- **Treffer:** `d` bekommt `p.id`.
+  - **Kursfortschreibung** hängt jetzt hier: Sind `p` und `d` beide `kurs`, kommen die Termine von `p` dazu, die vor `horizon.from` beginnen, also wirklich vergangen sind (Review m2). Bisher übernahm `build-offers.ts:247` alles vor dem ersten neuen Termin, auch abgesagte künftige Termine. Die Suche nach gleichem Titel-Slug entfällt.
+- **Ohne Treffer:** neue ID (E13).
+- **Teilung:** Erfüllt ein `p` mit Partner `d` die Bedingung von Stufe 1 oder 2 auch mit einem Entwurf `d'`, der eine neue ID bekam, behält `d` die ID, `d'` bekommt eine neue. Hinweis „geteilt?“.
+- **Keine Zusammenlegung** (Nicht-Ziele): Ein `p` ohne Partner verschwindet mit seiner ID.
+- **Hinweise** (`notes`, im Bericht von `build` und ab Stufe B im Statusbericht E7, eigener Abschnitt „IDs“): Treffer je Stufe, neue und weggefallene IDs je Anbieter, jede Zuordnung aus Stufe 1 und 2 mit altem und neuem Titel, Mehrdeutigkeiten und Teilungen. Eine falsche Zuordnung fällt so beim Lesen auf.
+- **`checkIdContinuity`** (Fehler kommen in `report.errors` und brechen den Build ab): Eine ID, die vorher und nachher besteht, behält ihren Anbieter. Das kann nur ein Fehler im Code verletzen; die Prüfung ist das Netz dagegen, dass ein alter Link still auf ein fremdes Angebot zeigt.
+
+**Reihenfolge in `buildOffers`:**
+1. Rohevents → Kandidaten (unverändert).
+2. Die bisherige Kursfortschreibung an dieser Stelle entfällt.
+3. Dubletten mit gleichem **Fensterschlüssel**: `offerKey` mit dem ersten Termin ab `horizon.from` (ohne Termin im Fenster: dem ersten Termin). Sonst unverändert. Grund (Review m3): Bisher machte die Fortschreibung zwei Kandidaten desselben laufenden Kurses (eine Quelle mit, eine ohne vergangene Termine) vor diesem Schritt gleich. Ohne sie fasst nur der Fensterschlüssel sie zusammen. Test dazu in Tests 3.
+4. Dubletten über Titel hinweg (unverändert).
+5. **`assignIds`** samt Kursfortschreibung.
+6. `crossProviderDuplicates` (braucht IDs, deshalb nach `assignIds`).
+7. Übernahme aus dem Altbestand (unverändert; übernommene Angebote behalten ihre ID aus dem Vorstand; `ids.has(old.id)` prüft gegen die vergebenen IDs). Ab Stufe A entfällt dieser Schritt ohnehin (E5).
+8. Sortierung (E13), `validateDataset`, `checkIdContinuity`.
+
+`BuildInput.previous` ist schon ein `OffersFile`; `assignIds` bekommt es ganz (für `horizon.to`). Ab Stufe A liest `build` die Events aus `data/raw` und den Vorstand weiter aus `data/offers.json`. Die Äquivalenzprüfung in Schritt 3 vergleicht dann auch die IDs.
+
+### E15 – Alt → neu: eine Rechenregel statt einer Liste
+
+- Die Alias-Liste aus dem Auftrag braucht keine Daten: **Die neue ID einer alten ID ist `shortId(alteId, 0)`.** Genau das vergibt die Migration (E17), und für Angebote, die schon vor dem Umstieg verschwunden waren, vergäbe die Pipeline bei einer Rückkehr dieselbe ID (E13).
+- Danach entstehen keine Aliasse mehr: Die Zuordnung hält die ID, eine Teilung erzeugt eine neue, und Zusammenlegungen gibt es nicht.
+- **`resolveOfferId(id)`** (rein, `src/domain/ids.ts`): IDs der alten Form werden `shortId(id, 0)`, IDs der neuen Form bleiben, alles andere ist `undefined`.
+- **Anwendungen:**
+  - **`?angebot=`:** `parseRoute` nimmt beide Formen an (`OFFER_ID_PATTERN` oder `LEGACY_OFFER_ID_PATTERN` bis 240 Zeichen) und gibt die ID unverändert weiter. `App.tsx` (heute `:140–143`, `OFFER_GONE`) löst sie vor dem Hinweis „nicht mehr im Zwergenplan“ (Plan 0026, E7) über `resolveOfferId` auf und ersetzt die Query per `replace`, wenn sie sich ändert.
+  - **Alte Links aus Chats:** Für `angebot/<lange-id>/` gibt es keine Seite mehr. GitHub Pages liefert `404.html`, deren Skript nach `?angebot=<lange-id>` weiterleitet (`notFoundPage` in `scripts/lib/share-pages.ts:288`, unverändert bis auf `MAX_LEGACY_OFFER_ID`), und die App öffnet das Angebot. Verloren geht nur die Vorschau, wenn jemand einen alten Link **erneut** teilt (N-I4).
+  - **Merkliste:** Der Initialwert in `useSaved` (`src/ui/use-app-state.ts:133`) wird `migrateSavedIds(loadSaved())`; nur wenn sich etwas ändert, folgt `saveSaved`. `migrateSavedIds` (rein, `src/domain/saved.ts`) bildet IDs der alten Form ab, entfernt Dubletten und hält die Reihenfolge. Unter `<StrictMode>` läuft der Initialisierer doppelt; das ist unschädlich, denn der zweite Lauf liest schon die umgeschriebene Liste. **`src/data/preferences.ts` bleibt unverändert** (Review B1): `src/data` darf zur Laufzeit nur `src/domain/geo.ts` importieren (`data-domain-runtime-allowlist`, ADR 0010), und die Prüfung gespeicherter Werte gehört in die UI-Zustandsschicht.
+  - **Wochen-Nachricht:** `tailorPush` bildet `seenIds` der alten Form über `resolveOfferId` ab, bevor `newOfferIds` rechnet. Sonst meldete die erste Nachricht nach dem Umstieg alle Angebote als neu.
+  - **Plan 0026, Stufe 2:** Das Fragment enthält nur IDs der neuen Form (E20).
+- **ICS** braucht keine Abbildung (E18).
+- **Wann die Altform-Logik entfällt:** frühestens, wenn kein Gerät mehr alte IDs gespeichert hat. Das lässt sich nicht messen. Ein Restpunkt in `docs/ideas.md` schlägt vor, sie nach 12 Monaten zu entfernen (`LEGACY_OFFER_ID_PATTERN`, `resolveOfferId`-Zweig, `migrateSavedIds`, Abbildung in `tailorPush`).
+
+### E16 – Anbieter: Die Katalog-ID bleibt öffentlich
+
+- **Standard (Nutzerentscheid N-I2 offen): keine Kurz-ID für Anbieter.** Begründung:
+  - Das Problem der Angebote, eine aus Recherchetext abgeleitete ID, gibt es bei Anbietern nicht. Ihre ID vergibt ein Mensch im Katalog.
+  - Eine zweite ID je Anbieter müsste die Wartung bei jedem neuen Eintrag vergeben, die App müsste zwischen beiden übersetzen (`offer.providerId` ist kebab), und `?anbieter=` hätte zwei Formen.
+  - Für die Merkliste im Fragment reichen die Katalog-IDs mit Trenner (E20).
+- **Regel:** Katalog-IDs werden nicht umbenannt. Sie stehen in geteilten Links (ADR 0020), und die Zuordnung (E14) verlangt den gleichen Anbieter. Die Regel kommt in den Skill `babyevents-nuernberg` (Abschnitt Katalogpflege) und in `CLAUDE.md` (S4). Muss es doch einmal sein, kommt vorher ein Feld `formerIds` für Anbieter mit Aliasseite und Abbildung in der Zuordnung (Idee in `docs/ideas.md`).
+
+### E17 – Migration, einmalig
+
+- Neuer Befehl **`pnpm pipeline migrate-ids <datei>`** (ein `case` in `scripts/pipeline/cli.ts`, Logik als reine Funktion `migrateOfferIds(file)` in `scripts/pipeline/lib/stable-ids.ts`). Ein Befehl statt eines losen Skripts, damit knip ihn über `cli.ts` erreicht und er nach einem Rebase erneut laufen kann (Review m4).
+  - Er liest ein `OffersFile`, setzt je Angebot `id = shortId(id, 0)`, sortiert nach E13, prüft mit `validateDataset` und schreibt die Datei mit `writeJson`.
+  - Er bricht bei **jeder** Kollision ab und weicht nicht auf einen anderen `seed` aus, denn die App rechnet alte IDs mit `seed` 0 um (E15). Heute gibt es keine Kollision (Befund). Entstünde bis zur Umsetzung eine, entscheidet der Nutzer, bevor es weitergeht.
+  - Er bricht ab, wenn eine ID schon die neue Form hat (zweiter Lauf).
+- Er läuft einmal auf `data/offers.json` und auf `tests/fixtures/offers.json`. Das ist eine benannte Ausnahme von „`data/offers.json` wird nie von Hand bearbeitet“: eine deterministische Umformung per Pipeline-Befehl, im Commit genannt.
+- Migration und Code gehen im selben Push nach `main`. Kommt vorher ein Daten-Commit auf `main`, nimmt der Rebase dessen `data/offers.json` (upstream, E6), und `migrate-ids` läuft darauf erneut.
+- S5 entfernt Befehl und Funktion wieder (knip grün).
+
+### E18 – Kalender: UID und Pfade folgen der neuen ID (Nutzerentscheid N-I3 offen, Empfehlung ja)
+
+- ICS-Pfade und UID bleiben in ihrer Form, nur mit der neuen ID: `ics/<id>.ics`, `ics/<id>/<YYYYMMDDTHHmm>.ics`, UID `<id>--<YYYYMMDDTHHmm>@zwergenplan`. Der Code nutzt schon `offer.id` und ändert sich nicht, nur Tests und Doku.
+- **Folge:** Wer ein Angebot vor dem Umstieg in den Kalender übernommen hat und es danach erneut übernimmt, hat dessen Termine doppelt. Das passiert einmalig. Danach bleibt die UID über Titel- und Zeitänderungen stabil, besser als heute.
+- **Begründung der Empfehlung:**
+  - Der Nutzerkreis ist klein (Freunde und Familie), die Daten sind seit 2026-10-04 live, und dasselbe Angebot ein zweites Mal zu importieren ist selten.
+  - Die heutige UID ist ohnehin nicht stabil: Jede Titeländerung erzeugt schon heute Duplikate.
+- **Alternative: alte UID-Basis behalten.** Abgelehnt: Die Merklisten-ICS entsteht im Browser und muss dieselben UIDs haben wie die statischen Dateien (ADR 0007). Die lange ID ist aber nicht aus der kurzen rückrechenbar; `site.json` bräuchte sie je Angebot, rund 32 kB roh bei jedem Start, und es gäbe auf Dauer zwei UID-Regeln.
+
+### E19 – Pfade: Ordner bleiben, die Kurz-ID steht darin (Nutzerentscheide N-I1 und N-I4 offen)
+
+- `angebot/<id>/` mit der neuen ID, `anbieter/<id>/` unverändert. Der Pfadvertrag aus ADR 0020, Punkt 1 bleibt, nur die Form der Angebots-ID ändert sich. `checkedOfferId` in `src/domain/share.ts` prüft die neue Form.
+- **Warum nicht `/a/<id>/` und `/p/<id>/` (N-I1):**
+  - Der Gewinn sind 6 Zeichen je Link. Messenger zeigen ohnehin die Vorschaukarte, nicht die URL.
+  - Die bestehenden Ordner sind seit 2026-10-08 öffentlicher Vertrag und müssen sowieso weiterleben. Ein zweiter Vertrag hieße doppelte Seiten, zwei Muster in `404.html` und zwei Pfadregeln auf Dauer.
+  - Anbieter hätten ohne Kurz-ID (E16) nichts davon.
+  - Falls N-I1 = ja: `SHARE_DIRS` wird `{ offer: "a", provider: "p" }`, `anbieter/<id>/` bekommt für jede ID eine Weiterleitungsseite, `404.html` kennt beide Muster, ADR 0022 nennt beide Verträge.
+- **Warum keine Aliasseiten für alte lange Links (N-I4, Review M4):**
+  - Alte Links funktionieren auch ohne sie: `404.html` leitet in die App, und die App rechnet um (E15).
+  - Aliasseiten bräuchten die langen IDs als Daten (ein Feld `formerIds` an jedem Angebot, gepflegt über alle Läufe) und 333 weitere Seiten im Artefakt.
+  - Sie brächten nur eins: die Vorschaukarte, wenn jemand einen vor dem Umstieg geteilten Link erneut teilt. Das betrifft Links aus wenigen Tagen.
+  - Falls N-I4 = ja: `formerIds?: string[]` am Angebot (lange ID aus der Migration, bei Treffern geerbt, nie in `site.json`), `validateDataset` prüft `shortId(alias, 0) === id`, `build-data` schreibt je Alias eine Seite `angebot/<alias>/` mit dem Inhalt der kanonischen Seite (`og:url`, `og:image` und Weiterleitung auf die neue ID), plus Test in `scripts/lib/share-pages.test.ts`.
+
+### E20 – Plan 0026, Stufe 2: Die Kurz-IDs sind die IDs
+
+- **Fragment v1:** `#merkliste=1.{A}` bzw. `#merkliste=1.{A}.{p1}.{p2}…`.
+  - `{A}` sind die gespeicherten Angebots-IDs ohne Trenner (je genau 8 Zeichen). `{A}` darf leer sein, wenn nur Anbieter geteilt werden (`1..{p1}`).
+  - Danach folgen die Katalog-IDs der Anbieter, je durch `.` getrennt.
+  - Der Zeichensatz ist `[0-9a-z.-]`. Das letzte Zeichen ist nie `-`, denn Katalog-IDs enden auf Buchstabe oder Ziffer.
+- **Es entfallen:** der Hash im Browser für die Merkliste, `findShortIdCollisions`, die Build-Warnung „Kurz-ID-Kollision“ und das Verwerfen mehrdeutiger Kurz-IDs. Die IDs sind eindeutig, das prüft schon `validateDataset`.
+- **Empfang:** Angebote und Anbieter per Nachschlagen der ID.
+- **Länge:** 30 Angebote wie bisher geplant 277 Zeichen. Jeder gemerkte Anbieter kostet seine ID plus Trenner (höchstens 39 Zeichen). Der Parser lehnt weiter mehr als 200 Einträge je Gruppe ab.
+- **Budget:** `shortId` liegt ab Stufe 0 schon im Start-JS (E15). Die Schätzung von Stufe 2 (+0,6–0,9 kB) sinkt entsprechend.
+- Plan 0026, E10 hat dazu einen Hinweis. E10–E12 werden vor Beginn von Stufe 2 angepasst; das sieht Plan 0026 dort ohnehin vor.
+
+### E21 – Titel-Anker entfällt
+
+- E14 ersetzt den Titel-Anker aus E3: Die ID hängt nicht mehr am Titel, und die Zuordnung nutzt verwandte Regeln (1:1, ähnlicher Titel, überlappende Termine). Zwei Mechanismen für dasselbe Ziel wären doppelt.
+- Ein Modell, das einen Titel umformuliert, ändert ab Stufe B also den angezeigten Titel, aber nicht mehr die ID, die Merkliste oder die Kalender-UID. Gegen tägliches Flattern schützt weiter der Cache (E5): Unveränderte Seiten liefern unveränderte Events.
+- E1, E3, E5, die Entscheidungstabelle in E5, E8 und die Testtabelle sind angepasst. ADR 0016 nennt statt des Titel-Ankers ADR 0022.
+
+### E22 – ADR und Doku
+
+- **ADR-Entwurf 0022** `docs/adr/0022-stabile-ids.md` liegt im selben Commit. Er ersetzt die ID-Regeln von ADR 0003 („Stabile IDs“, UID) und ADR 0006 („ID-Regel“) und ergänzt ADR 0007 (UID-Form), ADR 0016 (Titel-Anker) und ADR 0020 (ID-Form in Punkt 1, Höchstlängen in Punkt 2, `404.html` in Punkt 4, Kurz-IDs in Punkt 8).
+- **Bei Annahme (S4):**
+  - ADR 0003, 0006, 0007, 0016 und 0020 bekommen an den betroffenen Stellen den Verweis „ersetzt bzw. ergänzt durch ADR 0022“.
+  - `docs/architecture.md`: Invariante „Stabile IDs“ neu gefasst (gespeicherte Kurz-ID, Zuordnung in `build`, Rechenregel alt → neu, UID); Schichtentabelle mit `scripts/pipeline/lib/stable-ids.ts`.
+  - `CLAUDE.md`, Stolperfallen/Daten: IDs vergibt nur `pipeline build`, nie ein Mensch; Katalog-IDs werden nicht umbenannt; die einmalige Migration ist als Ausnahme genannt.
+  - Skill `babyevents-nuernberg`: Katalog-IDs nicht umbenennen (E16).
+  - Kopfkommentar von `src/domain/ids.ts`.
+
+### Budget
+
+- **Start-JS** (`JS (initial)`, 100 kB): `shortId` (cyrb53), `LEGACY_OFFER_ID_PATTERN`, `resolveOfferId`, `migrateSavedIds` und die Verdrahtung in `App.tsx` und `useSaved`. Geschätzt +0,25–0,35 kB. Vorher und nachher messen, Zeile in die Delta-Tabelle von ADR 0012. Liegt es über 0,6 kB, wird vor dem Merge geprüft, was entfallen kann.
+- **Service Worker** (9 kB): `resolveOfferId` samt `shortId`, geschätzt +0,2 kB. Messen.
+- **`site.json`** wird kleiner: IDs schrumpfen im Median von 95 auf 8 Zeichen, bei 333 Angeboten rund 29 kB roh weniger. Messen und im Plan festhalten.
+- **`anbieter.json`**, **Anbieter-Chunk**, **Artefakt:** unverändert (keine Aliasseiten, keine Anbieter-Felder).
+
+### Tests zu Nachtrag A (test-first)
+
+1. **`src/domain/ids.test.ts`:** `shortId` mit den drei Testvektoren aus E13, `seed` ändert das Ergebnis, immer 8 Zeichen `[0-9a-z]`; `offerKey` mit den bisherigen Fällen von `offerId`; beide Muster; `resolveOfferId` für neue Form, alte Form, Unfug.
+2. **`scripts/pipeline/lib/stable-ids.test.ts`:**
+   - Stufe 0: unveränderter Bestand behält alle IDs.
+   - Stufe 1: Titeländerung bei gleichen Terminen; Wechsel `kurs` → `regelmaessig`; alter Ort fehlt im Katalog; vorhandener anderer Ort verhindert den Treffer.
+   - Stufe 2: Uhrzeit 9:30 → 9:45 samt Titel „(Di 9:30)“ → „(Di 9:45)“, während eine zweite PEKiP-Gruppe am selben Tag um 11:30 unverändert bleibt (Stufe 0 bindet sie, die erste trifft in Stufe 2).
+   - Einziger Kandidat: Beide PEKiP-Gruppen ändern ihren Titel und die erste auch ihre Uhrzeit → kein Treffer für die erste (zwei Kandidaten), neue ID.
+   - Mehrdeutigkeit in Stufe 1: die zwei Angebote mit identischen Terminen ändern beide den Titel → kein Tausch.
+   - Entfallenes Angebot mit Schwester gleicher Termine (Review B2): Die Schwester behält ihre ID, die ID des entfallenen wird nicht weitergegeben.
+   - Vergleichsfenster: Vorstand mit kürzerem Horizont als der Lauf (4 Wochen Abstand, 4 Monate Horizont) behält die IDs einer Wochengruppe.
+   - Laufender Kurs: Entwurf nur mit künftigen Terminen behält die ID; fortgeschrieben werden nur Termine vor `horizon.from`, nicht ein abgesagter künftiger Termin.
+   - Folgekurs mit gleichem Titel und gleichem Wochentag nach Kursende → neue ID.
+   - Schwellen an der Grenze (0,8 / 0,5 genau getroffen bzw. knapp verfehlt).
+   - Teilung: einer behält, einer neu.
+   - Neue ID: Kollision mit belegter `id` → nächster `seed`; deterministisch bei vertauschter Eingabereihenfolge.
+   - `checkIdContinuity`: eine ID, die den Anbieter wechselt, ist ein Fehler.
+   - `migrateOfferIds`: Ergebnis gleich `shortId(alt, 0)` je Angebot, Abbruch bei künstlicher Kollision (injizierte Hashfunktion) und bei schon migrierter Datei.
+3. **`scripts/pipeline/lib/build-offers.test.ts`:** Die bestehenden Fälle laufen mit der neuen Reihenfolge; Kursfortschreibung über die Zuordnung; zwei Kandidaten desselben laufenden Kurses aus gleichrangigen Quellen, einer mit und einer ohne vergangene Termine, werden über den Fensterschlüssel ein Angebot; Sortierung nach E13; übernommene Angebote (Altbestand) behalten ihre ID; `crossProviderDuplicates` meldet weiter mit IDs.
+4. **`src/domain/dataset.test.ts`, Schema:** ID-Form, doppelte ID; die alte Regel „ID entspricht der Formel“ ist weg.
+5. **`src/domain/site-data.test.ts`:** gleicher Beginn → Reihenfolge nach Titel.
+6. **`src/domain/route.test.ts`:** `?angebot=` in beiden Formen; Unfug abgelehnt.
+7. **`src/domain/saved.test.ts`, `src/ui/use-app-state.test.ts`:** `migrateSavedIds` (alte Form → Kurz-ID, Dubletten weg, Reihenfolge bleibt); `useSaved` schreibt nur bei einer Änderung zurück.
+8. **`src/sw/push-tailor.test.ts`:** `seenIds` in alter Form ergeben nach dem Umstieg keine „neuen“ Angebote.
+9. **`src/domain/ics.test.ts`, `scripts/lib/share-pages.test.ts`, `src/domain/share.test.ts`:** UID, Pfade, Vorschauseiten und `404.html`-Muster mit der neuen ID bzw. `MAX_LEGACY_OFFER_ID` (Testdaten angepasst).
+10. **E2E** (Fixtures nach E17):
+    - `e2e/teilen.spec.ts`: Teilen-Link mit Kurz-ID; ein alter langer Link `angebot/<lang>/` landet über `404.html` im Detail, die Adresszeile zeigt danach die Kurz-ID.
+    - `e2e/saved.spec.ts`: Merkliste mit langer ID im `localStorage` zeigt das Angebot und ist danach umgeschrieben.
+    - Angepasste IDs: `e2e/detail.spec.ts`, `e2e/anbieter.spec.ts`, `e2e/pwa.spec.ts`, `e2e/mobile-ux.spec.ts`.
+
+### Schritte zu Nachtrag A (Stufe 0)
+
+Stufe 0 geht als Ganzes in einem Push nach `main`; die Zwischenstände liegen nur auf ihrem Branch. Jeder Schritt ist ein Commit mit grünem `pnpm verify`. Domänenlogik entsteht test-first. Schema, Daten und Pipeline müssen zusammen wechseln, deshalb ist S1 der große Schritt.
+
+- **S1 – Umstellung (Domäne, Schema, Zuordnung, Migration).**
+  - `src/domain/ids.ts`: `OFFER_ID_PATTERN` neu, `LEGACY_OFFER_ID_PATTERN`, `MAX_LEGACY_OFFER_ID`, `shortId`, `offerKey` (Umbenennung von `offerId`), `resolveOfferId`; alle Nutzer von `MAX_OFFER_ID` umstellen (E13).
+  - Schema, `validateDataset`, `pnpm schema:export`; Sortierung in `site-data.ts`.
+  - `scripts/pipeline/lib/stable-ids.ts`, neue Reihenfolge in `buildOffers`, Befehl `migrate-ids`.
+  - Migration auf `data/offers.json` und `tests/fixtures/offers.json`.
+  - Unit-Tests mit langen IDs (heute 16 Dateien, `grep -rlE "[a-z0-9]+--[a-z0-9-]+--[a-z0-9]+" src scripts e2e`) auf die neue Form umstellen.
+  - **Probelauf** (Review M3): ein Wegwerf-Skript unter `runs/` (gitignored) ruft `buildOffers` direkt auf, mit den Rohdaten vom 04.10. (`runs/2026-10-04/raw/`, liegt im Haupt-Checkout), dem migrierten `data/offers.json` als `previous` und `generatedAt` und `horizon` aus diesem Vorstand. Es schreibt nichts ins Repo.
+    - Durchgang 1: Alle 333 IDs bleiben (Stufe 0 trifft jedes Angebot).
+    - Durchgang 2 mit gestörten Titeln: In jedem Rohevent wird ein Klammerzusatz am Titelende entfernt (Uhrzeit, Wochentag, Datum, z. B. „(Babys geb. Jan.–Feb. 2026, Di 9:30)“). Treffer je Stufe, Mehrdeutigkeiten und neue IDs kommen in den Plan, mit Stichprobe der Zuordnungen aus Stufe 1 und 2.
+  - Fertig, wenn Tests 1–7 und 9 (Unit-Teil) grün sind, Durchgang 1 alle IDs behält und Durchgang 2 im Plan steht. Zeigt Durchgang 2 eine falsche Zuordnung, wird vor S2 nachgeschärft.
+- **S2 – App und Service Worker.** `parseRoute`, Auflösung in `App.tsx`, `migrateSavedIds` in `useSaved`, `tailorPush`. Fertig, wenn Tests 6–8 grün sind.
+- **S3 – E2E und Budget.** Lokal: `pnpm e2e:local e2e/teilen.spec.ts e2e/saved.spec.ts e2e/detail.spec.ts e2e/anbieter.spec.ts e2e/pwa.spec.ts e2e/mobile-ux.spec.ts` mit `run_in_background`. Die Fixtures ändern sich, die volle Suite fährt die CI auf dem Branch. Start-JS, Service Worker und `site.json` messen, Zeile in ADR 0012. Fertig, wenn die Specs lokal und die CI auf dem Branch grün sind und die Messwerte im Plan stehen.
+- **S4 – ADR und Doku.** ADR 0022 auf „angenommen“, Verweise in ADR 0003, 0006, 0007, 0016 und 0020, `docs/architecture.md`, `CLAUDE.md`, Skill (E22). Fertig, wenn `pnpm docs:check` grün ist.
+- **S5 – Prüfen, ausliefern, aufräumen.**
+  - `/arch-review` (Schemaänderung, neues Modul, mehr als 200 Zeilen) vor dem Push nach `main`.
+  - Nach dem Deploy `/browser-review live`: Teilen-Link, alter Link, Merkliste, auf Pixel 7 und iPhone, hell und dunkel.
+  - Live-Probe: Ein am 2026-10-08 geteilter langer Link, z. B. `https://zwergenplan.app/angebot/atv-1873-frankonia--riesen-zwerge-turnen-fuer-2-bis-3-jaehrige-mo--atv-1873-frankonia/`, öffnet das Detail, und die Adresszeile zeigt danach `?angebot=d4qshjw0`.
+  - Danach `migrate-ids` und `migrateOfferIds` entfernen (knip grün), eigener Commit.
+  - Restpunkte nach `docs/ideas.md`: verlegte Einzeltermine, Zusammenlegung, `formerIds` für Anbieter vor einer Umbenennung, Altform-Logik nach 12 Monaten entfernen (E15).
+  - Fertig, wenn die CI auf `main` grün ist und `meta.json` den Commit zeigt.
+
+### Risiken zu Nachtrag A
+
+- **R9 – Falsche Zuordnung:** Zwei verschiedene Angebote bekommen über zwei Läufe dieselbe ID. Dann zeigt ein alter Link oder ein Merklisten-Eintrag auf ein anderes Angebot. Dagegen: gleicher Anbieter (und außer bei verschwundenem Ort gleicher Ort) als Pflicht, strikte Eindeutigkeit in Stufe 1, einziger Kandidat in Stufe 2, keine Zusammenlegung, `checkIdContinuity`, der Probelauf mit gestörten Titeln, und jede Zuordnung aus Stufe 1 und 2 steht mit beiden Titeln im Bericht.
+- **R10 – Verpasste Zuordnung:** Ein Angebot bekommt trotzdem eine neue ID, z. B. bei neuem Titel **und** neuer Uhrzeit oder bei zwei Schwestergruppen, die sich zugleich ändern. Das ist der heutige Zustand, nur seltener. Der Bericht zeigt neue und weggefallene IDs je Anbieter.
+- **R11 – Einmalige Kalender-Duplikate** durch den UID-Wechsel (E18).
+- **R12 – Kein einfaches Zurück:** Nach dem Deploy schreibt die App Merklisten in Kurz-IDs um. Ein Revert brächte lange IDs zurück, und die Merklisten wären leer. Ein Rückweg wäre ein Fix nach vorn. Deshalb gehören Tests 7 und 10 zur Pflicht vor dem Merge.
+- **R13 – Hash-Kollision bei der Migration:** Der Befehl bricht ab (E17). Heute gibt es keine.
+- **R14 – Erneut geteilte alte Links ohne Vorschau** (N-I4): Der Link funktioniert, die Karte im Chat fehlt.
+
+### Nutzerentscheide (offen; umgesetzt wird mit der Empfehlung, solange nichts anderes entschieden ist)
+
+| Nr. | Frage | Empfehlung | Abschnitt |
+|---|---|---|---|
+| N-I1 | Neue kurze Pfade `/a/<id>/` und `/p/<id>/`? | nein, Ordner `angebot/` und `anbieter/` bleiben, die Kurz-ID steht darin | E19 |
+| N-I2 | Feste Kurz-ID auch für Anbieter? | nein, Katalog-ID bleibt öffentlich und wird nicht umbenannt | E16 |
+| N-I3 | ICS-UID auf die Kurz-ID umstellen (einmalig Duplikate bei erneutem Import)? | ja | E18 |
+| N-I4 | Aliasseiten mit Vorschau für alte lange Links (Feld `formerIds`)? | nein, `404.html` und die Rechenregel reichen | E19 |
+
+### Review zu Nachtrag A (2026-10-08) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Unabhängiger `plan-reviewer` auf Nachtrag A, ADR-Entwurf 0022 und die Folgeänderungen. Er hat die Zahlen des Befunds am Bestand nachgezählt; die cyrb53-Vektoren konnte er ohne Shell nicht nachrechnen (sie stammen aus dem Befund-Skript mit genau dem Code aus E13). Alle Punkte sind eingearbeitet, offene Blocker gibt es keine.
+
+**Übernommen**
+
+| Befund | Einarbeitung |
+|---|---|
+| **B1** Migration in `loadSaved()` verletzt `data-domain-runtime-allowlist` (ADR 0010) | Migration im Initialwert von `useSaved`, `preferences.ts` unverändert; Test nach `use-app-state.test.ts` (E15, Tests 7) |
+| **B2** Zusammenlegung ordnet verschiedene Angebote zu (Paar mit identischen Terminen, Schwestergruppen); Konflikt mit der Übernahme aus dem Altbestand | Zusammenlegung gestrichen (Nicht-Ziele, Idee); damit entfallen kurze Aliasse in `site.json`, `remapSaved` und der Fixture-Alias; Test „entfallene Schwester“ (E14, Tests 2) |
+| **M1** `T`/`D` hängen am Abstand der Läufe | Vergleichsfenster bis `min(previous.horizon.to, horizon.to)`, `previous` als `OffersFile`, Test mit verschieden langen Fenstern (E14) |
+| **M2** Stufe 2 entscheidet über den Zufallswert der Titelähnlichkeit | Stufe 2 nur bei einzigem Kandidaten auf beiden Seiten, Test mit zwei umbenannten Gruppen (E14) |
+| **M3** Probelauf über `pipeline build` scheitert an `generatedAt` und überschreibt `data/offers.json` | Wegwerf-Skript unter `runs/` ruft `buildOffers` mit `generatedAt` und `horizon` des Vorstands, schreibt nichts; zweiter Durchgang mit gestörten Titeln (S1) |
+| **M4** schlanke Variante ohne `formerIds` | übernommen als Standard: Rechenregel `shortId(alt, 0)` statt Liste, alte Links über `404.html`; Aliasseiten als Nutzerentscheid N-I4 (E15, E19); Anbieter-`formerIds` erst vor einer Umbenennung (E16) |
+| **m1** S1 unvollständig (`MAX_OFFER_ID`-Nutzer, `crossProviderDuplicates`) | Fundstellen in E13, `crossProviderDuplicates` nach `assignIds` (E14); `toSiteData` entfällt mangels `formerIds` |
+| **m2** Kursfortschreibung übernimmt abgesagte künftige Termine | nur Termine vor `horizon.from` (E14, Tests 2) |
+| **m3** zwei Kandidaten desselben laufenden Kurses werden nicht mehr zusammengefasst | Dubletten über den Fensterschlüssel (E14, Tests 3) |
+| **m4** Migrationsskript gelöscht und doch „aus der Historie“ | Pipeline-Befehl `migrate-ids` (knip über `cli.ts`), entfernt in S5 (E17) |
+| **m5** E2E-Liste | `pwa.spec.ts` und `mobile-ux.spec.ts` ergänzt, `layout.spec.ts` gestrichen (S3, Tests 10) |
+| **m6** Backpressure Alias ↔ Rechenregel, cyrb53-Fassung | Code von cyrb53 in E13; die Alias-Prüfung gilt nur bei N-I4 = ja (E19) |
+| **m7** Doku | ADR 0022 Punkt 3 nennt die Ortsausnahme; ADR 0020 Punkte 2 und 4 unter „ergänzt“ |
+| **m8** Budget, Sortierung in `site.json` | Gleichstand in `site-data.ts` nach Titel (E13, Tests 5); Anbieter-Chunk unberührt, da keine Anbieter-Felder |
+
+**Abgelehnt**
+- **m7, Statuszeile „Entwurf“:** Die Statuszeile wurde vor dem Review gesetzt; nach der Einarbeitung ist „Review eingearbeitet“ richtig.

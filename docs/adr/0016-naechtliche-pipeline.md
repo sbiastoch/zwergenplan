@@ -16,7 +16,7 @@ Bisher aktualisiert ein interaktiver Lauf in Claude Code die Daten (ADR 0002: lo
 - **Ein Extraktionsweg:** Seiten holt deterministischer Code: HTML, iCal, JSON, PDF per `pdftotext`, JS per Playwright.
   - Der Katalog nennt jede Seite ausdrücklich, mit Platzhaltern `{von}`/`{bis}` (Monatsanfang) und optionalem `request`. Links werden nie verfolgt.
   - Je Anbieter gibt es **einen** Aufruf eines Sprachmodells ohne Werkzeuge, gestreamt, mit Validierung samt Build-Probelauf und einer Wiederholung.
-  - Ein Titel-Anker im Code hält Titel und damit IDs stabil.
+  - Stabile IDs hält seit Plan 0015, Nachtrag A nicht mehr ein Titel-Anker, sondern die Zuordnung gegen den Vorstand in `build` (ADR-Entwurf 0022). Titel dürfen sich ändern.
 - **Modell als Konfiguration:** OpenAI-kompatibles `chat/completions` per `fetch` mit `stream: true`, ohne SDK. Endpunkt, Modell und Schlüssel kommen aus der Umgebung.
 - **Zustand im Repo:** `data/raw/<providerId>.json` hält je Anbieter Events, Eingabe-Hash, Extraktor-Version, Modell, Status (`ok | keine-termine | fehler | ausstehend`) und Zeitstempel.
   - Gleiche Eingabe bedeutet kein Modellaufruf.
@@ -44,7 +44,7 @@ Bisher aktualisiert ein interaktiver Lauf in Claude Code die Daten (ADR 0002: lo
 - **ADR 0006:**
   - Keine Subagenten-Pakete und keine Übernahme aus dem Altbestand mehr: `data/raw` hält die alten Events.
   - Das Rohformat liegt je Anbieter vor (`ProviderRaw`) statt je Paket.
-  - Die Kursfortschreibung bleibt.
+  - Die Kursfortschreibung bleibt; sie hängt seit Plan 0015, Nachtrag A an der ID-Zuordnung (ADR-Entwurf 0022).
 - **ADR 0011 Nr. 4:** `pipeline oepnv` läuft auch im Nachtlauf, nicht nur lokal. Der Feed-Cache liegt dann in `actions/cache`.
 - **`docs/architecture.md`, „ein Datenvertrag“:** `data/raw` ist dauerhafter Zustand in `data/`, aber kein Vertrag der Website. Sein Schema liegt wie `RawBatch` in `scripts/pipeline/lib/raw.ts` und wird nach `schema/` exportiert. `scripts/validate-data.ts` darf dafür aus `scripts/pipeline/lib` importieren.
 
