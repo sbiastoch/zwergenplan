@@ -1,6 +1,6 @@
 # Plan 0015 – Nächtliche Datenpipeline mit Evals
 
-Status: Review eingearbeitet für Nachtrag A (stabile IDs, 2026-10-08, neue Stufe 0; Nutzerentscheide N-I1–N-I4 offen, umsetzbar mit den empfohlenen Standards). Hauptteil freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0018 (Kalender-Export nur altersgerecht)
+Status: Review eingearbeitet für Nachtrag A (stabile IDs, 2026-10-08, neue Stufe 0; Nutzerentscheide N-I1 und N-I2 am 2026-10-08 mit „ja“ entschieden und eingearbeitet, N-I3 und N-I4 offen, umsetzbar mit den empfohlenen Standards). Hauptteil freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0018 (Kalender-Export nur altersgerecht)
 Datum: 2026-10-06
 
 (ADR 0002 Hosting und Datenfluss, ADR 0003 Datenmodell, ADR 0004 Backpressure, ADR 0006 Recherche-Pipeline, Plan 0002 Pipeline, Plan 0009 Fahrplan; neu: ADR-Entwurf 0016; mit Nachtrag A neu: ADR-Entwurf 0022 stabile IDs.)
@@ -729,6 +729,12 @@ Dritter, unabhängiger `plan-reviewer`. Die Blocker der Durchgänge 1 und 2 best
 
 Auftrag des Nutzers: Das Konzept „stabile IDs“ kommt in diesen Plan, nicht in einen eigenen. Es bildet die neue **Stufe 0** (Schritte S1–S5). Sie ist unabhängig von Plan 0018 und von den Stufen A–C lieferbar und geht vor ihnen live.
 
+**Nutzerentscheid vom 2026-10-08**, wörtlich „NI1 Und 2: doch“, also gegen die bisherige Empfehlung:
+- **N-I1 = ja:** kurze Pfade `a/<id>/` (Angebot) und `p/<id>/` (Anbieter). Die alten Ordner `angebot/` und `anbieter/` leiten weiter (E19).
+- **N-I2 = ja:** Auch Anbieter bekommen eine feste Kurz-ID, gespeichert im Katalog (E16).
+
+Eingearbeitet sind die beiden Entscheide in E13, E15, E16, E19, E20, E22, Budget, Tests, Schritte, Risiken und ADR-Entwurf 0022.
+
 Bezug: ADR 0003 (Datenmodell, UID), ADR 0006 (ID-Regel, Kursfortschreibung), ADR 0007 (Merklisten-ICS im Browser), ADR 0010 (Schichten `src/data`), ADR 0012 (Startbudget), ADR 0014 (Push), ADR 0016 (dieser Plan), ADR 0020 (Teilen per Link, Pfadvertrag); **neu ADR-Entwurf 0022** (`docs/adr/0022-stabile-ids.md`, im selben Commit). Plan 0026 (Stufe 2 baut hierauf).
 
 ### Befund (2026-10-08)
@@ -755,32 +761,38 @@ Bezug: ADR 0003 (Datenmodell, UID), ADR 0006 (ID-Regel, Kursfortschreibung), ADR
   | Vorschauseite `angebot/<id>/`, Kachelbild, `404.html` (Muster `[a-z0-9-]{1,240}`) | `src/domain/share.ts`, `scripts/lib/share-pages.ts`, `scripts/og-images.ts` |
   | Merkliste im Fragment (geplant) | Plan 0026, E10 |
 
-- **Anbieter-IDs** sind kebab-case, im Katalog von Hand vergeben (höchstens 38 Zeichen, Stand 2026-10-08) und nicht aus Recherchetext abgeleitet. Sie ändern sich nur durch eine bewusste Umbenennung im Wartungslauf (E10). Sie stehen in `offers.providerId`, `coveredBy`, ab Stufe A im Dateinamen `data/raw/<id>.json`, in `?anbieter=` und in `anbieter/<id>/`.
+- **Anbieter-IDs** sind kebab-case, im Katalog von Hand vergeben (höchstens 38 Zeichen, Stand 2026-10-08) und nicht aus Recherchetext abgeleitet. Sie ändern sich nur durch eine bewusste Umbenennung im Wartungslauf (E10).
+  - Intern stehen sie in `offers.providerId`, `coveredBy`, in den Rohdaten der Subagenten (`schema/raw-batch.schema.json`), ab Stufe A im Dateinamen `data/raw/<id>.json` und über `offerKey` in jeder Angebots-ID.
+  - Öffentlich stehen sie in `site.json` (`providerId` je Angebot), `anbieter.json` (`id`), `?anbieter=`, `anbieter/<id>/` und seit Plan 0025, Etappe 1 (live seit 83da3b0) in der Merkliste gemerkter Anbieter (`zwergenplan.anbieter-merkliste`, `src/data/preferences.ts:10`, bereinigt von `cleanSavedProviders` in `src/domain/saved.ts:108`).
 - **Messungen am Bestand** (Wegwerf-Skript außerhalb des Repos, 2026-10-08):
   - Die Kurz-IDs `shortId(id, 0)` (E13) der 333 heutigen IDs kollidieren nicht.
   - Selbstabgleich: 2 Paare **verschiedener** Angebote haben gleichen Anbieter, gleichen Ort und identische Termine, z. B. „Kleinkindturnen nach Pikler (12–36 Monate, Mo 16:30)“ und „Musikalische Früherziehung (1–3 Jahre, Mo 16:30)“.
   - 213 Paare haben gleichen Anbieter, Ort und Format und mindestens 50 % gemeinsame Tage, z. B. zwei PEKiP-Gruppen dienstags um 9:30 und 11:30.
   - Folgerung: Termine allein oder Tage allein reichen für eine Zuordnung nicht. E14 verlangt deshalb Eindeutigkeit, in Stufe 2 sogar den einzigen Kandidaten.
+  - Anbieter (nach N-I2): `shortId(katalogId, 0)` kollidiert weder unter den 74 Einträgen mit `role: anbieter` noch unter allen 83 Katalog-Einträgen. Keine Katalog-ID passt auf `^[0-9a-z]{8}$`; alte und neue Form sind also eindeutig unterscheidbar (E15). Die Katalog-IDs der Angebote in `site.json` sind im Median 16 Zeichen lang, zusammen 3 186 Zeichen mehr als 8 je Angebot; in `anbieter.json` sind es 941 Zeichen mehr.
 
 ### Ziel
 
 - Eine einmal vergebene Angebots-ID bleibt, solange es das Angebot gibt, auch wenn sich Titel, Uhrzeit oder Kursbeginn ändern.
 - Alte Links, Merklisten-Einträge und `seenIds` leben weiter.
 - Die ID ist kurz genug für Links und für die Merkliste im Fragment, ohne Hash im Browser.
+- Anbieter haben ebenfalls eine feste Kurz-ID; jede Anbieter-ID im Browser ist sie (N-I2).
+- Geteilte Links sind kurz: `a/<id>/` und `p/<id>/` (N-I1). Alte Links unter `angebot/` und `anbieter/` funktionieren weiter.
 - `pipeline build` bleibt rein und deterministisch: gleiche Eingabe und gleicher Vorstand ergeben dieselben IDs.
 
 ### Nicht-Ziele
 
 - **Verlegte Einzeltermine** (gleicher Titel, anderer Tag) behalten ihre ID nicht. Das bleibt wie in ADR 0006 „ein anderer Termin“. Idee für `docs/ideas.md` (S5).
 - **Zusammenlegung** zweier alter Angebote zu einem, mit Weiterleitung der verschwundenen ID (Review B2). Sie ordnete in genau den Fällen aus dem Befund falsch zu. Ein verschwundenes Angebot bleibt verschwunden, wie heute. Idee für `docs/ideas.md` (S5).
-- **Anbieter umbenennen.** Katalog-IDs werden nicht umbenannt (E16). Braucht es das einmal, kommt vorher `formerIds` für Anbieter (Idee).
+- **Anbieter umbenennen.** Katalog-IDs werden nicht umbenannt (E16). Links hängen nach N-I2 nicht mehr an ihnen, wohl aber die Zuordnung und die Angebots-IDs. Braucht es das einmal, kommt vorher eine Abbildung alt → neu für die Zuordnung (Idee).
 - **Kalendereinträge bei Nutzern umschreiben.** Das ist technisch unmöglich (E18).
-- **Kurz-ID für Anbieter**, **neue Pfade `/a/`, `/p/`** und **Aliasseiten mit Vorschau für alte Links**: Standard „nein“, Nutzerentscheide N-I1, N-I2 und N-I4 unten.
+- **Aliasseiten mit Vorschau für alte Links:** Standard „nein“, Nutzerentscheid N-I4 unten.
+- **Kurze Query-Namen** (`?a=`, `?p=`): nein, `?angebot=` und `?anbieter=` bleiben (E19).
 
 ### E13 – Angebots-ID: 8 Zeichen, gespeichert statt abgeleitet
 
-- **Form:** `Offer.id` passt auf `/^[0-9a-z]{8}$/` (`OFFER_ID_PATTERN` neu in `src/domain/ids.ts`). Sie steht in `data/offers.json`. Die Pipeline übernimmt sie aus dem Vorstand (E14), statt sie zu berechnen.
-- **Alte Form:** `LEGACY_OFFER_ID_PATTERN` ist das bisherige `OFFER_ID_PATTERN`, `MAX_LEGACY_OFFER_ID = 240` das bisherige `MAX_OFFER_ID`. Beide braucht nur noch die Abbildung alt → neu (E15) und `notFoundPage` (`404.html`). Alle Nutzer von `MAX_OFFER_ID` werden umgestellt: `src/domain/schema.ts:7`, `src/domain/share.ts:7,15`, `scripts/lib/share-pages.ts:10,292`.
+- **Form:** `Offer.id` passt auf `/^[0-9a-z]{8}$/` (`SHORT_ID_PATTERN` neu in `src/domain/ids.ts`; dasselbe Muster gilt für die Kurz-ID der Anbieter, E16). Sie steht in `data/offers.json`. Die Pipeline übernimmt sie aus dem Vorstand (E14), statt sie zu berechnen.
+- **Alte Form:** `LEGACY_OFFER_ID_PATTERN` ist das bisherige `OFFER_ID_PATTERN`, `MAX_LEGACY_OFFER_ID = 240` das bisherige `MAX_OFFER_ID`. Beide braucht nur noch die Abbildung alt → neu (E15) und `notFoundPage` (`404.html`). Alle Nutzer von `OFFER_ID_PATTERN` und `MAX_OFFER_ID` werden umgestellt: `src/domain/schema.ts:7,120`, `src/domain/route.ts:6`, `src/domain/share.ts:7,15`, `scripts/lib/share-pages.ts:10,292`.
 - **Zuordnungsschlüssel:** Die bisherige Formel heißt künftig `offerKey(o)` (Umbenennung von `offerId`, Regel unverändert, weiter in `src/domain/ids.ts`). Er wird nirgends gespeichert. Die Pipeline nutzt ihn für Dubletten (E14, Reihenfolge Schritt 3), für Stufe 0 der Zuordnung und als Saat neuer IDs.
 - **`shortId`** (`src/domain/ids.ts`, rein, synchron; cyrb53 nach bryc, diese Fassung, damit die Testvektoren gelten):
 
@@ -806,11 +818,11 @@ Bezug: ADR 0003 (Datenmodell, UID), ADR 0006 (ID-Regel, Kursfortschreibung), ADR
   Testvektoren (im Befund gerechnet): `atv-1873-frankonia--riesen-zwerge-turnen-fuer-2-bis-3-jaehrige-mo--atv-1873-frankonia` → `d4qshjw0`; `babykonzert-nuernberg--herbst-babykonzert-klassik-auf-der-krabbeldecke-20261108t1100--babykonzert-nuernberg` → `4tpu5qaq`; `brk-familienzentrum--auf-entdeckungsreise-mit-papa-10-24-monate-mi-ab-11-11-20261111t1600--brk-familienzentrum` → `toieuwx3`.
 - **Neue ID:** `shortId(offerKey(d), seed)` mit dem kleinsten `seed` (0, 1, 2 …), dessen Ergebnis nicht **belegt** ist. Belegt ist jede `id` im Vorstand und in der schon erzeugten Ausgabe. Vergeben wird in der Reihenfolge von `offerKey`, damit das Ergebnis deterministisch bleibt.
   - **Warum ein Hash und kein Zufall:** Der Build bleibt rein und ohne injizierte Zufallsquelle testbar. Ein Angebot, das nach einer Lücke mit demselben Schlüssel zurückkommt, bekommt seine alte ID zurück. Das gilt auch für Angebote, die schon vor dem Umstieg verschwunden waren: Ihr Schlüssel ist ihre alte lange ID, und die App rechnet diese genauso um (E15).
-  - **Warum 8 Zeichen base36 (41 Bit):** Bei 1 000 IDs liegt die Kollisionswahrscheinlichkeit bei etwa 2 · 10⁻⁷, und die Vergabe weicht ohnehin aus. Links bleiben kurz (`angebot/4tpu5qaq/`), und das Fragment braucht 8 Zeichen je Angebot ohne Trenner.
+  - **Warum 8 Zeichen base36 (41 Bit):** Bei 1 000 IDs liegt die Kollisionswahrscheinlichkeit bei etwa 2 · 10⁻⁷, und die Vergabe weicht ohnehin aus. Links bleiben kurz (`a/4tpu5qaq/`, E19), und das Fragment braucht 8 Zeichen je Angebot ohne Trenner.
   - **Keine Wiedervergabe:** Eine ID aus dem Vorstand wird nie an ein anderes Angebot vergeben. Längst verschwundene IDs verfolgt niemand; eine Wiedervergabe an ein anderes Angebot setzte eine Hash-Kollision voraus (R10).
 - **Sortierung** von `data/offers.json`: nach `providerId`, `title` (`localeCompare(…, "de")`), Beginn des ersten Termins und zuletzt `id`. Bisher war es die ID, die mit `providerId` begann. Diffs bleiben so lesbar.
 - **`site.json`** sortiert weiter nach erstem Termin; bei gleichem Beginn entscheidet künftig der Titel und erst dann die ID (`src/domain/site-data.ts:89–92`). Sonst bestimmte bei gleichem Beginn eine zufällig wirkende ID die Reihenfolge in Liste und Wochen-Nachricht.
-- **Schema** (`src/domain/schema.ts`), danach `pnpm schema:export`: `id: z.string().regex(OFFER_ID_PATTERN)`; die Prüfung „id beginnt mit `providerId--` und endet mit `--venueId`“ entfällt. Ein Feld für Aliasse gibt es nicht (E15).
+- **Schema** (`src/domain/schema.ts`), danach `pnpm schema:export`: `id: z.string().regex(SHORT_ID_PATTERN)`; die Prüfung „id beginnt mit `providerId--` und endet mit `--venueId`“ entfällt. Ein Feld für Aliasse gibt es nicht (E15). `offers.providerId` bleibt die Katalog-ID (E16).
 - **`validateDataset`:** Statt `id === offerId(offer)` bleibt nur „IDs eindeutig“ (wie bisher) mit der neuen Form aus dem Schema.
 
 ### E14 – Zuordnung gegen den Vorstand
@@ -876,32 +888,67 @@ export function checkIdContinuity(previous: OffersFile | undefined, next: readon
 - Die Alias-Liste aus dem Auftrag braucht keine Daten: **Die neue ID einer alten ID ist `shortId(alteId, 0)`.** Genau das vergibt die Migration (E17), und für Angebote, die schon vor dem Umstieg verschwunden waren, vergäbe die Pipeline bei einer Rückkehr dieselbe ID (E13).
 - Danach entstehen keine Aliasse mehr: Die Zuordnung hält die ID, eine Teilung erzeugt eine neue, und Zusammenlegungen gibt es nicht.
 - **`resolveOfferId(id)`** (rein, `src/domain/ids.ts`): IDs der alten Form werden `shortId(id, 0)`, IDs der neuen Form bleiben, alles andere ist `undefined`.
+- **`resolveProviderId(id)`** (rein, `src/domain/ids.ts`, nach N-I2): IDs auf `SHORT_ID_PATTERN` bleiben, sonst wird eine Katalog-ID (`KEBAB_ID_PATTERN`, höchstens `MAX_KEBAB_ID`) zu `shortId(id, 0)`, alles andere ist `undefined`.
+  - Die Rechenregel gilt, weil die Migration jedem heutigen Anbieter genau `shortId(katalogId, 0)` gibt und bei einer Kollision abbricht (E17). Anbieter, die erst nach dem Umstieg in den Katalog kommen, hatten nie einen öffentlichen Link mit Katalog-ID; für sie braucht es keine Umrechnung.
+  - Eindeutig ist die Unterscheidung, weil keine heutige Katalog-ID auf `^[0-9a-z]{8}$` passt (Befund); die Migration bricht sonst ab. Spätere Katalog-IDs dürfen so aussehen, denn sie werden nie öffentlich.
 - **Anwendungen:**
-  - **`?angebot=`:** `parseRoute` nimmt beide Formen an (`OFFER_ID_PATTERN` oder `LEGACY_OFFER_ID_PATTERN` bis 240 Zeichen) und gibt die ID unverändert weiter. `App.tsx` (heute `:140–143`, `OFFER_GONE`) löst sie vor dem Hinweis „nicht mehr im Zwergenplan“ (Plan 0026, E7) über `resolveOfferId` auf und ersetzt die Query per `replace`, wenn sie sich ändert.
-  - **Alte Links aus Chats:** Für `angebot/<lange-id>/` gibt es keine Seite mehr. GitHub Pages liefert `404.html`, deren Skript nach `?angebot=<lange-id>` weiterleitet (`notFoundPage` in `scripts/lib/share-pages.ts:288`, unverändert bis auf `MAX_LEGACY_OFFER_ID`), und die App öffnet das Angebot. Verloren geht nur die Vorschau, wenn jemand einen alten Link **erneut** teilt (N-I4).
-  - **Merkliste:** Der Initialwert in `useSaved` (`src/ui/use-app-state.ts:133`) wird `migrateSavedIds(loadSaved())`; nur wenn sich etwas ändert, folgt `saveSaved`. `migrateSavedIds` (rein, `src/domain/saved.ts`) bildet IDs der alten Form ab, entfernt Dubletten und hält die Reihenfolge. Unter `<StrictMode>` läuft der Initialisierer doppelt; das ist unschädlich, denn der zweite Lauf liest schon die umgeschriebene Liste. **`src/data/preferences.ts` bleibt unverändert** (Review B1): `src/data` darf zur Laufzeit nur `src/domain/geo.ts` importieren (`data-domain-runtime-allowlist`, ADR 0010), und die Prüfung gespeicherter Werte gehört in die UI-Zustandsschicht.
-  - **Wochen-Nachricht:** `tailorPush` bildet `seenIds` der alten Form über `resolveOfferId` ab, bevor `newOfferIds` rechnet. Sonst meldete die erste Nachricht nach dem Umstieg alle Angebote als neu.
-  - **Plan 0026, Stufe 2:** Das Fragment enthält nur IDs der neuen Form (E20).
+  - **`?angebot=` und `?anbieter=`:** `parseRoute` nimmt für Angebote beide Formen an (`SHORT_ID_PATTERN` oder `LEGACY_OFFER_ID_PATTERN` bis 240 Zeichen); für Anbieter bleibt es, wie es ist, denn `SHORT_ID_PATTERN` ist eine Teilmenge von `KEBAB_ID_PATTERN`. `parseRoute` gibt die IDs unverändert weiter.
+    - Aufgelöst wird **synchron in `useRoute`** (`src/ui/use-app-state.ts:55–73`, Review m6): Der Initialisierer und `onPop` wenden `resolveOfferId` und `resolveProviderId` auf die geparste Route an. Ändert sich dabei eine ID, folgt genau ein `history.replaceState` mit `routeToSearch`, und zwar außerhalb des `setState`-Updaters (StrictMode, Kommentar `:63`). Unter StrictMode läuft der Initialisierer doppelt; der zweite Lauf liest schon die umgeschriebene Adresse und ersetzt nichts mehr.
+    - Damit sehen der Hinweis „nicht mehr im Zwergenplan“ (`App.tsx:150–157`, `OFFER_GONE`, Plan 0026, E7), `preloadProviderUi` (`:59`) und die Unbekannt-Prüfung des Anbieter-Sheets (`dropProvider`, `App.tsx:159–163`; `ProviderPanel.tsx:135`) von Anfang an nur Kurz-IDs. Eigene Effekte in `App.tsx` gibt es nicht; sie könnten sich mit diesen Prüfungen überholen.
+  - **Alte Links aus Chats:** Für `angebot/<lange-id>/` und `anbieter/<katalog-id>/` gibt es keine Seite mehr. GitHub Pages liefert `404.html`, deren Skript nach `?angebot=<lange-id>` bzw. `?anbieter=<katalog-id>` weiterleitet (`notFoundPage`, E19), und die App rechnet um. Verloren geht nur die Vorschau, wenn jemand einen alten Link **erneut** teilt (N-I4).
+  - **Merkliste:** Der Initialwert in `useSaved` (`src/ui/use-app-state.ts:135`) wird `migrateSavedIds(loadSaved())`; nur wenn sich etwas ändert, folgt `saveSaved`. `migrateSavedIds` (rein, `src/domain/saved.ts`) bildet IDs der alten Form ab, entfernt Dubletten und hält die Reihenfolge. Unter `<StrictMode>` läuft der Initialisierer doppelt; das ist unschädlich, denn der zweite Lauf liest schon die umgeschriebene Liste. **`src/data/preferences.ts` bleibt unverändert** (Review B1): `src/data` darf zur Laufzeit nur `src/domain/geo.ts` importieren (`data-domain-runtime-allowlist`, ADR 0010), und die Prüfung gespeicherter Werte gehört in die UI-Zustandsschicht.
+  - **Gemerkte Anbieter** (`zwergenplan.anbieter-merkliste`, Plan 0025): `cleanSavedProviders` (`src/domain/saved.ts`) nimmt beide Formen an, bildet Katalog-IDs über `resolveProviderId` ab, entfernt Dubletten (stehen Katalog-ID und Kurz-ID desselben Anbieters beide in der Liste, bleibt die erste Stelle) und hält die Reihenfolge. `useSavedProviders` (`src/ui/use-app-state.ts:154`) schreibt nur bei einer Änderung mit `saveSavedProviders` zurück, wie `useSaved`. `src/data/preferences.ts` bleibt unverändert (ADR 0010).
+  - **Wochen-Nachricht im Browser:** `tailorPush` bildet `seenIds` der alten Form über `resolveOfferId` ab, bevor `newOfferIds` rechnet. Sonst meldete die erste Nachricht nach dem Umstieg alle Angebote als neu.
+  - **Wochen-Nachricht vom Server** (Review M2): `runWeekly` (`scripts/lib/push-weekly-core.ts:104–106`) bildet die IDs aus `previousIds` (`scripts/push-weekly.ts:53–63`, `data/offers.json` aus der Git-Historie vor 7 Tagen) über `resolveOfferId` ab, bevor `newOfferIds` rechnet. Sonst nennte die erste Nachricht nach dem Umstieg rund 333 neue Angebote. Die Abbildung steht in `runWeekly`, nicht in `previousIds`, damit der Test ohne Git auskommt.
+  - **Plan 0026, Stufe 2:** Das Fragment enthält nur Kurz-IDs, für Angebote wie für Anbieter (E20).
 - **ICS** braucht keine Abbildung (E18).
-- **Wann die Altform-Logik entfällt:** frühestens, wenn kein Gerät mehr alte IDs gespeichert hat. Das lässt sich nicht messen. Ein Restpunkt in `docs/ideas.md` schlägt vor, sie nach 12 Monaten zu entfernen (`LEGACY_OFFER_ID_PATTERN`, `resolveOfferId`-Zweig, `migrateSavedIds`, Abbildung in `tailorPush`).
+- **Wann die Altform-Logik entfällt:**
+  - Die Umschreibung gespeicherter Werte (`migrateSavedIds`, der Altform-Zweig in `cleanSavedProviders`, die Abbildung in `tailorPush`; die in `runWeekly` schon nach der ersten Woche) frühestens, wenn kein Gerät mehr alte IDs gespeichert hat. Das lässt sich nicht messen. Ein Restpunkt in `docs/ideas.md` schlägt vor, sie nach 12 Monaten zu entfernen.
+  - Die Umrechnung von Links (`LEGACY_OFFER_ID_PATTERN`, die Altform-Zweige von `resolveOfferId` und `resolveProviderId`, die Regeln für `angebot/` und `anbieter/` in `404.html`) bleibt, solange alte Links in Chats leben, also auf Dauer (ADR 0020, Punkt 1).
 
-### E16 – Anbieter: Die Katalog-ID bleibt öffentlich
+### E16 – Anbieter: feste Kurz-ID `publicId`, die Katalog-ID bleibt intern (Nutzerentscheid N-I2 = ja, 2026-10-08)
 
-- **Standard (Nutzerentscheid N-I2 offen): keine Kurz-ID für Anbieter.** Begründung:
-  - Das Problem der Angebote, eine aus Recherchetext abgeleitete ID, gibt es bei Anbietern nicht. Ihre ID vergibt ein Mensch im Katalog.
-  - Eine zweite ID je Anbieter müsste die Wartung bei jedem neuen Eintrag vergeben, die App müsste zwischen beiden übersetzen (`offer.providerId` ist kebab), und `?anbieter=` hätte zwei Formen.
-  - Für die Merkliste im Fragment reichen die Katalog-IDs mit Trenner (E20).
-- **Regel:** Katalog-IDs werden nicht umbenannt. Sie stehen in geteilten Links (ADR 0020), und die Zuordnung (E14) verlangt den gleichen Anbieter. Die Regel kommt in den Skill `babyevents-nuernberg` (Abschnitt Katalogpflege) und in `CLAUDE.md` (S4). Muss es doch einmal sein, kommt vorher ein Feld `formerIds` für Anbieter mit Aliasseite und Abbildung in der Zuordnung (Idee in `docs/ideas.md`).
+- **Feld:** Jeder Katalog-Eintrag mit `role: anbieter` bekommt `publicId`, 8 Zeichen auf `SHORT_ID_PATTERN` (E13), gespeichert in `data/providers.yaml` direkt nach `id`. Schema (`src/domain/schema.ts`, Zweig `anbieter` von `Provider`): `publicId: z.string().regex(SHORT_ID_PATTERN)`, Pflicht; danach `pnpm schema:export` (`schema/providers.schema.json`). `aggregator` und `verzeichnis` haben keine Seite und keine Angebote und bekommen kein Feld; wechselt ein Eintrag zu `anbieter`, bekommt er eins wie ein neuer.
+- **Vergabe wie bei Angeboten:** `shortId(katalogId, seed)` mit dem kleinsten `seed`, dessen Ergebnis keine andere `publicId` im Katalog trägt (`nextPublicId(id, usedIds)`, rein, `src/domain/ids.ts`). Ab `seed` 10 wirft sie, passend zur Prüfung unten (Review m3); bei 41 Bit tritt das praktisch nie ein.
+  - Die Migration vergibt einmalig `shortId(katalogId, 0)` (E17).
+  - Neue Anbieter: `pnpm pipeline candidates add-provider` setzt das Feld selbst. `providerFromCandidate` (`scripts/pipeline/lib/draft.ts`) legt es als zweiten Schlüssel nach `id` an, damit es im YAML direkt darunter steht.
+  - Von Hand ergänzter Eintrag (Wartungslauf, `references/catalog.md` des Skills): `pnpm data:validate` meldet das fehlende Feld samt freiem Wert, „`<id>`: `publicId` fehlt – frei ist `<wert>`“. Ein Mensch tippt also nie eine selbst ausgedachte ID.
+  - **Mechanismus der Meldung** (Review M4): Ist `publicId` im Zod-Schema Pflicht, endet `validateDataset` (`src/domain/dataset.ts:26`) schon beim Parse-Fehler, und die Zod-Meldung kennt den Katalog nicht. Deshalb läuft vor `safeParse` eine Vorprüfung `missingPublicIds(raw)` (rein, `src/domain/dataset.ts`) auf den Rohdaten des Katalogs. Sie sucht Einträge mit `role: "anbieter"` ohne `publicId` und rechnet den freien Wert mit `nextPublicId` gegen die `publicId` der übrigen Roheinträge. Ihre Meldungen stehen in `errors` vor denen von Zod.
+- **Übernahme:** Die `publicId` steht im Katalog und ändert sich nie. Das prüft `validateDataset`:
+  - eindeutig über alle Anbieter,
+  - `publicId === shortId(id, s)` für ein `s` von 0 bis 9.
+
+  Die zweite Prüfung fängt Tippfehler und eine aus einem anderen Eintrag kopierte ID ab, ohne einen Vorstand zu brauchen. Sie bindet die `publicId` an die Katalog-ID; das passt zur Regel unten, dass Katalog-IDs nicht umbenannt werden.
+- **Warum gespeichert und nicht nur gerechnet** (Nutzerentscheid): Die öffentliche ID steht sichtbar im Katalog, Build und App rechnen sie nicht nach, und bei einer Kollision weicht die Vergabe auf einen anderen `seed` aus, was eine reine Rechenregel nicht könnte.
+- **Die Katalog-ID bleibt der interne Schlüssel:** `id` im Katalog, `offers.providerId`, `coveredBy`, die Orte (`dataset.ts:64`), die Rohdaten der Subagenten, `data/raw/<id>.json` (ab Stufe A), die Zuordnung (E14, „gleicher Anbieter“) und `offerKey` (Saat der Angebots-IDs).
+  - Begründung:
+    - Pipeline, Subagenten und Wartung arbeiten mit lesbaren Namen; Hash-IDs in Rohdaten und Berichten wären fehleranfällig.
+    - `offerKey` und damit jede neue Angebots-ID und die Rechenregel alt → neu (E15) hängen an der Katalog-ID. Eine Umstellung von `offers.providerId` änderte daran nichts, kostete aber eine zweite Migration von `data/offers.json`.
+  - **Pakete der Subagenten** (Review M3): `select` (`scripts/pipeline/cli.ts:124`) schreibt Katalog-Einträge in die Pakete `batch-<n>.json`. Es lässt `publicId` dort weg; Subagenten brauchen nur die Katalog-ID. `batchProviders` (`scripts/pipeline/io/files.ts:80–82`) liest nur noch `id` über ein lockeres Schema (`z.array(z.looseObject({ id: z.string() }))`) statt `ProvidersFile`. So scheitern `build` und `validate-raw` nicht an Paketen, die vor der Migration entstanden sind (Probelauf in S1, Rebase nach E6).
+- **Jede Anbieter-ID im Browser ist die `publicId`:** Die Übersetzung geschieht an genau zwei Stellen im Build:
+  - `toSiteData` (`src/domain/site-data.ts:69`) schreibt `providerId: provider.publicId` in jedes `SiteOffer`. Das Feld heißt weiter `providerId`; sein Kommentar sagt, dass es in `site.json` die öffentliche ID ist.
+  - `toProviderDirectory` (`:100`) schreibt `id: provider.publicId` in `anbieter.json`.
+
+  Alles danach (`directory.ts`, `provider-count.ts`, `share-pages.ts`, Anbieter-Sheet, Merkliste, `?anbieter=`, `p/<id>/`) vergleicht nur noch öffentliche IDs untereinander und ändert sich nicht. Tests 5 hält beide Felder fest.
+  - **Grenze der Zusage** (Review B1): `SiteOffer` übernimmt mit `...offer` (`site-data.ts:77`) auch `venueId`. Die Orts-ID des Hauptorts ist meist gleich der Katalog-ID (`babykonzert-nuernberg`), weitere Orte beginnen mit ihr. Katalog-IDs stehen also weiter als Text in `site.json`, aber nie in einem Feld, das eine Anbieter-ID meint. `venueId` bleibt die interne Orts-ID; die UI liest sie nicht als Anbieter-ID. `venueId` aus `SiteOffer` zu entfernen, ist eine Idee für `docs/ideas.md` (S5), kein Teil von Stufe 0.
+- **Regel:** Katalog-IDs werden weiter nicht umbenannt. Links hängen nicht mehr an ihnen, wohl aber die Zuordnung, die Angebots-IDs und die Prüfung der `publicId`. Die Regel kommt in den Skill `babyevents-nuernberg` (Abschnitt Katalogpflege) und in `CLAUDE.md` (S4). Muss es doch einmal sein (Review M5), braucht es vorher zweierlei, beides als Idee in `docs/ideas.md`:
+  - eine Abbildung alt → neu für die Zuordnung,
+  - ein Feld mit der früheren Katalog-ID, gegen das die Prüfung `publicId === shortId(…, s)` statt gegen die neue `id` rechnet. Sonst verlangte die Prüfung eine neue `publicId`, und Links und gemerkte Anbieter brächen. Eine Aliasseite braucht es dann nicht, denn die `publicId` bleibt.
 
 ### E17 – Migration, einmalig
 
-- Neuer Befehl **`pnpm pipeline migrate-ids <datei>`** (ein `case` in `scripts/pipeline/cli.ts`, Logik als reine Funktion `migrateOfferIds(file)` in `scripts/pipeline/lib/stable-ids.ts`). Ein Befehl statt eines losen Skripts, damit knip ihn über `cli.ts` erreicht und er nach einem Rebase erneut laufen kann (Review m4).
-  - Er liest ein `OffersFile`, setzt je Angebot `id = shortId(id, 0)`, sortiert nach E13, prüft mit `validateDataset` und schreibt die Datei mit `writeJson`.
-  - Er bricht bei **jeder** Kollision ab und weicht nicht auf einen anderen `seed` aus, denn die App rechnet alte IDs mit `seed` 0 um (E15). Heute gibt es keine Kollision (Befund). Entstünde bis zur Umsetzung eine, entscheidet der Nutzer, bevor es weitergeht.
-  - Er bricht ab, wenn eine ID schon die neue Form hat (zweiter Lauf).
-- Er läuft einmal auf `data/offers.json` und auf `tests/fixtures/offers.json`. Das ist eine benannte Ausnahme von „`data/offers.json` wird nie von Hand bearbeitet“: eine deterministische Umformung per Pipeline-Befehl, im Commit genannt.
-- Migration und Code gehen im selben Push nach `main`. Kommt vorher ein Daten-Commit auf `main`, nimmt der Rebase dessen `data/offers.json` (upstream, E6), und `migrate-ids` läuft darauf erneut.
-- S5 entfernt Befehl und Funktion wieder (knip grün).
+- Neuer Befehl **`pnpm pipeline migrate-ids <offers.json> <providers.yaml>`** (ein `case` in `scripts/pipeline/cli.ts`, Logik als reine Funktionen `migrateOfferIds(file)` und `migrateCatalogIds(yamlText)` in `scripts/pipeline/lib/stable-ids.ts`). Ein Befehl statt eines losen Skripts, damit knip ihn über `cli.ts` erreicht und er nach einem Rebase erneut laufen kann (Review m4).
+  - **Angebote:** Er liest ein `OffersFile`, setzt je Angebot `id = shortId(id, 0)` und sortiert nach E13.
+  - **Katalog** (nach N-I2): Er setzt bei jedem Eintrag mit `role: anbieter` `publicId: shortId(id, 0)` direkt nach `id`. Er arbeitet auf dem YAML-Dokument (`parseDocument` aus `yaml`, wie `appendToCatalog` in `scripts/pipeline/io/files.ts:38`) und fügt das Paar per `map.items.splice(1, 0, doc.createPair("publicId", wert))` ein, damit Kommentare, Reihenfolge und Formatierung der übrigen Zeilen bleiben.
+    - Den `visit`-Block aus `appendToCatalog` (`files.ts:41–47`) übernimmt er nicht (Review m4): Er setzte jede Liste aus Skalaren im ganzen Dokument auf Flow-Stil.
+    - Vor dem Schreiben prüft er selbst: Die Ausgabe ohne die `publicId`-Zeilen ist zeichengleich mit der Eingabe. Sonst bricht er ab.
+  - Danach prüft er beide zusammen mit `validateDataset` und schreibt erst dann, `offers.json` mit `writeJson`, den Katalog als Text.
+  - Er bricht bei **jeder** Kollision ab, unter Angebots-IDs wie unter `publicId`, und weicht nicht auf einen anderen `seed` aus, denn die App rechnet alte IDs mit `seed` 0 um (E15). Heute gibt es keine Kollision (Befund). Entstünde bis zur Umsetzung eine, entscheidet der Nutzer, bevor es weitergeht.
+  - Er bricht ab, wenn eine Katalog-ID mit `role: anbieter` auf `SHORT_ID_PATTERN` passt (alte und neue Form wären nicht mehr unterscheidbar, E15; heute keine).
+  - Er bricht ab, wenn eine Angebots-ID schon die neue Form hat oder ein Anbieter schon eine `publicId` trägt (zweiter Lauf).
+- Er läuft einmal auf `data/offers.json` mit `data/providers.yaml` und auf `tests/fixtures/offers.json` mit `tests/fixtures/providers.yaml`. Das ist eine benannte Ausnahme von „`data/offers.json` wird nie von Hand bearbeitet“: eine deterministische Umformung per Pipeline-Befehl, im Commit genannt.
+- Migration und Code gehen im selben Push nach `main`. Kommt vorher ein Daten-Commit auf `main`, nimmt der Rebase dessen `data/offers.json` und `data/providers.yaml` (upstream, E6), und `migrate-ids` läuft darauf erneut.
+- S5 entfernt Befehl und Funktionen wieder (knip grün).
 
 ### E18 – Kalender: UID und Pfade folgen der neuen ID (Nutzerentscheid N-I3 offen, Empfehlung ja)
 
@@ -912,29 +959,54 @@ export function checkIdContinuity(previous: OffersFile | undefined, next: readon
   - Die heutige UID ist ohnehin nicht stabil: Jede Titeländerung erzeugt schon heute Duplikate.
 - **Alternative: alte UID-Basis behalten.** Abgelehnt: Die Merklisten-ICS entsteht im Browser und muss dieselben UIDs haben wie die statischen Dateien (ADR 0007). Die lange ID ist aber nicht aus der kurzen rückrechenbar; `site.json` bräuchte sie je Angebot, rund 32 kB roh bei jedem Start, und es gäbe auf Dauer zwei UID-Regeln.
 
-### E19 – Pfade: Ordner bleiben, die Kurz-ID steht darin (Nutzerentscheide N-I1 und N-I4 offen)
+### E19 – Pfade: `a/<id>/` und `p/<id>/`, alte Ordner leiten weiter (Nutzerentscheid N-I1 = ja, 2026-10-08; N-I4 offen)
 
-- `angebot/<id>/` mit der neuen ID, `anbieter/<id>/` unverändert. Der Pfadvertrag aus ADR 0020, Punkt 1 bleibt, nur die Form der Angebots-ID ändert sich. `checkedOfferId` in `src/domain/share.ts` prüft die neue Form.
-- **Warum nicht `/a/<id>/` und `/p/<id>/` (N-I1):**
-  - Der Gewinn sind 6 Zeichen je Link. Messenger zeigen ohnehin die Vorschaukarte, nicht die URL.
-  - Die bestehenden Ordner sind seit 2026-10-08 öffentlicher Vertrag und müssen sowieso weiterleben. Ein zweiter Vertrag hieße doppelte Seiten, zwei Muster in `404.html` und zwei Pfadregeln auf Dauer.
-  - Anbieter hätten ohne Kurz-ID (E16) nichts davon.
-  - Falls N-I1 = ja: `SHARE_DIRS` wird `{ offer: "a", provider: "p" }`, `anbieter/<id>/` bekommt für jede ID eine Weiterleitungsseite, `404.html` kennt beide Muster, ADR 0022 nennt beide Verträge.
-- **Warum keine Aliasseiten für alte lange Links (N-I4, Review M4):**
+- **Neuer Pfadvertrag** (ersetzt ADR 0020, Punkt 1, mit ADR 0022):
+  - Angebot: `a/<id>/index.html` und das Kachelbild `a/<id>/vorschau.jpg` (bisher `angebot/<id>/vorschau.jpg`, Plan 0026, Nachtrag A).
+  - Anbieter: `p/<publicId>/index.html`.
+  - `og:url` und `og:image` folgen, z. B. `https://zwergenplan.app/a/4tpu5qaq/` und `…/a/4tpu5qaq/vorschau.jpg?v=<hash>`.
+  - Unter `angebot/` und `anbieter/` schreibt der Build keine Seiten mehr.
+- **`src/domain/share.ts` bleibt die einzige Quelle der Pfade:**
+  - `SHARE_DIRS = { offer: "a", provider: "p" }`.
+  - `LEGACY_SHARE_DIRS = { offer: "angebot", provider: "anbieter" }` (neu), nur für `404.html`.
+  - `checkedOfferId` und `checkedProviderId` prüfen `SHORT_ID_PATTERN`; die Pfadfunktionen werfen also bei jeder langen ID.
+  - `offerSharePath`, `offerImagePath` und `providerSharePath` liefern die neuen Pfade. `offerAppSearch` und `providerAppSearch` bleiben (`?angebot=`, `?anbieter=`).
+  - Der Kopfkommentar und der Kommentar „Ordnernamen wie die Query-Namen“ an `SHARE_DIRS` werden neu gefasst: Ordner und Query-Namen sind ab jetzt verschieden.
+  - Die Nutzer folgen ohne eigene Pfadlogik: `scripts/lib/share-pages.ts` (Seiten), `scripts/og-images.ts` (Bilder über `offerImagePath`, Kopfkommentar `:2`), `scripts/build-data.ts` (Kopfkommentar `:7`), der Knopf „Teilen“ in der App.
+- **`404.html`** (`notFoundPage`, `scripts/lib/share-pages.ts:288`) kennt vier Regeln. Jede leitet nach `BASE + "?" + <Query-Name> + "=" + <ID>` weiter:
+
+  | Pfad | ID-Muster | Ziel |
+  |---|---|---|
+  | `a/<id>/` | `[0-9a-z]{8}` | `?angebot=` |
+  | `p/<id>/` | `[0-9a-z]{8}` | `?anbieter=` |
+  | `angebot/<id>/` (alt) | `[a-z0-9-]{1,240}` (`MAX_LEGACY_OFFER_ID`) | `?angebot=` |
+  | `anbieter/<id>/` (alt) | `[a-z0-9-]{1,80}` (`MAX_KEBAB_ID`) | `?anbieter=` |
+
+  - Die Query-Namen kommen aus `src/domain/route.ts`: `OFFER_PARAM = "angebot"` und `PROVIDER_PARAM = "anbieter"` (neu exportiert, genutzt von `parseRoute` und `routeToSearch`). Bisher war der Ordnername zugleich der Query-Name (`share-pages.ts:290–294`); das geht nicht mehr.
+  - Die Regeln für `a/` und `p/` greifen bei verschwundenen Angeboten und Anbietern: Die App meldet dann wie bisher „nicht mehr im Zwergenplan“ bzw. das Sheet „unbekannt“.
+  - Die alten Regeln führen alte Links in die App, die dort umgerechnet werden (E15). Damit lebt der Vertrag aus ADR 0020 als Weiterleitung weiter, wie ADR 0020, Punkt 1 es für eine Änderung verlangt.
+- **Service Worker** (`src/sw/routes.ts`): keine Regeländerung. `a/…` und `p/…` treffen keine Pfadregel, und die Regel `schale` greift nur für `""` und `index.html`. Sie fallen also unter „sonst nur Netz“, wie bisher `angebot/` und `anbieter/` (ADR 0020, Punkt 5). `src/sw/routes.test.ts:46–48` bekommt Zeilen für `a/<id>/` (Navigation), `a/<id>/vorschau.jpg?v=…` und `p/<id>/`, jeweils `"netz"`; die alten Zeilen bleiben, denn alte Links kommen weiter an.
+- **Kein Konflikt mit bestehenden Ordnern:** Im Artefakt liegen auf oberster Ebene `assets/`, `data/`, `ics/`, `icons/`, `og/` und einzelne Dateien; `a/` und `p/` sind frei. Die Regel `asset` prüft `assets/` mit Schrägstrich, `a/` trifft sie nicht.
+- **Query bleibt `?angebot=` und `?anbieter=`** (Auftrag: entscheiden und begründen):
+  - Geteilt wird der Pfad, nicht die Query. Die Query sieht man nur in der Adresszeile der App, nachdem die Vorschauseite weitergeleitet hat.
+  - Die übrigen Query-Namen sind deutsche Wörter (`ansicht=`, aus `src/domain/filter.ts:33–43` `von=`, `bis=`, `wegzeit=`, `format=`, `anmeldung=`, `kosten=`; nur `kat=` ist abgekürzt). `?a=` und `?p=` fielen heraus und wären ohne Kontext unlesbar.
+  - Die alten Namen müssten ohnehin auf Dauer gelesen werden: aus `404.html` für alte Links, aus Lesezeichen und Startbildschirm-Verknüpfungen. Kurze Namen hießen zwei Namen je Parameter in `parseRoute`, im Start-JS und in den Tests, für etwa 12 Zeichen weniger in einer Adresse, die niemand teilt.
+- **Warum alte Ordner nur über `404.html`** und nicht über eigene Weiterleitungsseiten: Für alte lange Angebots-IDs gibt es keine Daten mehr (N-I4), und für Anbieter wäre es eine zweite Mechanik neben derselben `404.html`. Verloren geht in beiden Fällen nur die Vorschaukarte beim erneuten Teilen eines alten Links (R14).
+- **Aliasseiten für alte Links (N-I4, offen, Empfehlung nein, Review M4):**
   - Alte Links funktionieren auch ohne sie: `404.html` leitet in die App, und die App rechnet um (E15).
-  - Aliasseiten bräuchten die langen IDs als Daten (ein Feld `formerIds` an jedem Angebot, gepflegt über alle Läufe) und 333 weitere Seiten im Artefakt.
+  - Aliasseiten bräuchten für Angebote die langen IDs als Daten (ein Feld `formerIds` an jedem Angebot, gepflegt über alle Läufe) und 333 weitere Seiten im Artefakt.
   - Sie brächten nur eins: die Vorschaukarte, wenn jemand einen vor dem Umstieg geteilten Link erneut teilt. Das betrifft Links aus wenigen Tagen.
-  - Falls N-I4 = ja: `formerIds?: string[]` am Angebot (lange ID aus der Migration, bei Treffern geerbt, nie in `site.json`), `validateDataset` prüft `shortId(alias, 0) === id`, `build-data` schreibt je Alias eine Seite `angebot/<alias>/` mit dem Inhalt der kanonischen Seite (`og:url`, `og:image` und Weiterleitung auf die neue ID), plus Test in `scripts/lib/share-pages.test.ts`.
+  - Falls N-I4 = ja: `formerIds?: string[]` am Angebot (lange ID aus der Migration, bei Treffern geerbt, nie in `site.json`), `validateDataset` prüft `shortId(alias, 0) === id`, `build-data` schreibt je Alias eine Seite `angebot/<alias>/` mit dem Inhalt der kanonischen Seite (`og:url`, `og:image` und Weiterleitung auf die neue ID), plus Test in `scripts/lib/share-pages.test.ts`. Für Anbieter ginge dasselbe ohne neues Feld, denn die Katalog-ID ist bekannt: je Anbieter eine Seite `anbieter/<katalog-id>/` mit dem Inhalt von `p/<publicId>/`.
 
 ### E20 – Plan 0026, Stufe 2: Die Kurz-IDs sind die IDs
 
-- **Fragment v1:** `#merkliste=1.{A}` bzw. `#merkliste=1.{A}.{p1}.{p2}…`.
-  - `{A}` sind die gespeicherten Angebots-IDs ohne Trenner (je genau 8 Zeichen). `{A}` darf leer sein, wenn nur Anbieter geteilt werden (`1..{p1}`).
-  - Danach folgen die Katalog-IDs der Anbieter, je durch `.` getrennt.
-  - Der Zeichensatz ist `[0-9a-z.-]`. Das letzte Zeichen ist nie `-`, denn Katalog-IDs enden auf Buchstabe oder Ziffer.
-- **Es entfallen:** der Hash im Browser für die Merkliste, `findShortIdCollisions`, die Build-Warnung „Kurz-ID-Kollision“ und das Verwerfen mehrdeutiger Kurz-IDs. Die IDs sind eindeutig, das prüft schon `validateDataset`.
-- **Empfang:** Angebote und Anbieter per Nachschlagen der ID.
-- **Länge:** 30 Angebote wie bisher geplant 277 Zeichen. Jeder gemerkte Anbieter kostet seine ID plus Trenner (höchstens 39 Zeichen). Der Parser lehnt weiter mehr als 200 Einträge je Gruppe ab.
+- **Fragment v1:** `#merkliste=1.{A}` bzw. `#merkliste=1.{A}.{P}`, wie ursprünglich in Plan 0026, E10 vorgesehen.
+  - `{A}` sind die gespeicherten Angebots-IDs, `{P}` die `publicId` der gemerkten Anbieter (N-I2), jeweils ohne Trenner aneinandergereiht (je genau 8 Zeichen).
+  - `{A}` darf leer sein, wenn nur Anbieter geteilt werden (`1..{P}`).
+  - Der Zeichensatz ist `[0-9a-z.]`.
+- **Es entfallen:** der Hash im Browser, `findShortIdCollisions`, die Build-Warnung „Kurz-ID-Kollision“ und das Verwerfen mehrdeutiger Kurz-IDs. Die IDs sind eindeutig; das prüft `validateDataset` für Angebote und für `publicId`.
+- **Empfang:** Angebote per Nachschlagen in `site.json`, Anbieter in `anbieter.json` (Plan 0026, Hinweis aus Plan 0025 vor E10). Das Fragment enthält nie eine Katalog-ID oder lange Angebots-ID; der Parser lehnt Gruppen ab, deren Länge kein Vielfaches von 8 ist.
+- **Länge:** 30 Angebote wie bisher geplant 277 Zeichen, jeder gemerkte Anbieter 8 Zeichen mehr. Der Parser lehnt weiter mehr als 200 Einträge je Gruppe ab.
 - **Budget:** `shortId` liegt ab Stufe 0 schon im Start-JS (E15). Die Schätzung von Stufe 2 (+0,6–0,9 kB) sinkt entsprechend.
 - Plan 0026, E10 hat dazu einen Hinweis. E10–E12 werden vor Beginn von Stufe 2 angepasst; das sieht Plan 0026 dort ohnehin vor.
 
@@ -946,24 +1018,31 @@ export function checkIdContinuity(previous: OffersFile | undefined, next: readon
 
 ### E22 – ADR und Doku
 
-- **ADR-Entwurf 0022** `docs/adr/0022-stabile-ids.md` liegt im selben Commit. Er ersetzt die ID-Regeln von ADR 0003 („Stabile IDs“, UID) und ADR 0006 („ID-Regel“) und ergänzt ADR 0007 (UID-Form), ADR 0016 (Titel-Anker) und ADR 0020 (ID-Form in Punkt 1, Höchstlängen in Punkt 2, `404.html` in Punkt 4, Kurz-IDs in Punkt 8).
+- **ADR-Entwurf 0022** `docs/adr/0022-stabile-ids.md` liegt im selben Commit. Er ersetzt die ID-Regeln von ADR 0003 („Stabile IDs“, UID) und ADR 0006 („ID-Regel“) und ergänzt ADR 0003 (Feld `publicId` am Anbieter), ADR 0007 (UID-Form) und ADR 0016 (Titel-Anker). In ADR 0020 ersetzt er den Pfadvertrag aus Punkt 1 (`a/`, `p/`, alte Ordner als Weiterleitung) und ergänzt Punkt 2 (Kachelbild-Pfad, Höchstlängen), Punkt 3 (Ziel bleibt die Query), Punkt 4 (`404.html` mit vier Regeln), Punkt 5 (gilt für `a/` und `p/`) und Punkt 8 (Kurz-IDs für beides).
 - **Bei Annahme (S4):**
   - ADR 0003, 0006, 0007, 0016 und 0020 bekommen an den betroffenen Stellen den Verweis „ersetzt bzw. ergänzt durch ADR 0022“.
-  - `docs/architecture.md`: Invariante „Stabile IDs“ neu gefasst (gespeicherte Kurz-ID, Zuordnung in `build`, Rechenregel alt → neu, UID); Schichtentabelle mit `scripts/pipeline/lib/stable-ids.ts`.
-  - `CLAUDE.md`, Stolperfallen/Daten: IDs vergibt nur `pipeline build`, nie ein Mensch; Katalog-IDs werden nicht umbenannt; die einmalige Migration ist als Ausnahme genannt.
-  - Skill `babyevents-nuernberg`: Katalog-IDs nicht umbenennen (E16).
+  - `docs/architecture.md`: Invariante „Stabile IDs“ neu gefasst (gespeicherte Kurz-ID, Zuordnung in `build`, Rechenregel alt → neu, UID; `publicId` als einzige Anbieter-ID im Browser, Übersetzung nur in `toSiteData` und `toProviderDirectory`); Pfadvertrag `a/`, `p/` mit den alten Ordnern als Weiterleitung; Schichtentabelle mit `scripts/pipeline/lib/stable-ids.ts`.
+  - `CLAUDE.md`, Stolperfallen/Daten: Angebots-IDs vergibt nur `pipeline build`, `publicId` nur `add-provider` bzw. der Wert aus der Meldung von `data:validate`, nie ein Mensch nach Gutdünken; Katalog-IDs werden nicht umbenannt; die einmalige Migration ist als Ausnahme genannt.
+  - Skill `babyevents-nuernberg` samt `references/catalog.md`: Katalog-IDs nicht umbenennen, `publicId` nie ändern, bei neuen Einträgen den gemeldeten Wert übernehmen (E16).
   - Kopfkommentar von `src/domain/ids.ts`.
 
 ### Budget
 
-- **Start-JS** (`JS (initial)`, 100 kB): `shortId` (cyrb53), `LEGACY_OFFER_ID_PATTERN`, `resolveOfferId`, `migrateSavedIds` und die Verdrahtung in `App.tsx` und `useSaved`. Geschätzt +0,25–0,35 kB. Vorher und nachher messen, Zeile in die Delta-Tabelle von ADR 0012. Liegt es über 0,6 kB, wird vor dem Merge geprüft, was entfallen kann.
-- **Service Worker** (9 kB): `resolveOfferId` samt `shortId`, geschätzt +0,2 kB. Messen.
-- **`site.json`** wird kleiner: IDs schrumpfen im Median von 95 auf 8 Zeichen, bei 333 Angeboten rund 29 kB roh weniger. Messen und im Plan festhalten.
-- **`anbieter.json`**, **Anbieter-Chunk**, **Artefakt:** unverändert (keine Aliasseiten, keine Anbieter-Felder).
+- **Start-JS** (`JS (initial)`, 100 kB): `shortId` (cyrb53), `SHORT_ID_PATTERN`, `LEGACY_OFFER_ID_PATTERN`, `resolveOfferId`, `resolveProviderId`, `migrateSavedIds`, der Altform-Zweig in `cleanSavedProviders` und die Verdrahtung in `useRoute`, `useSaved` und `useSavedProviders`. Geschätzt +0,3–0,45 kB. Vorher und nachher messen, Zeile in die Delta-Tabelle von ADR 0012. Liegt es über 0,6 kB, wird vor dem Merge geprüft, was entfallen kann.
+- **Service Worker** (9 kB): `resolveOfferId` samt `shortId`, geschätzt +0,2 kB. Anbieter-IDs kennt er nicht. Messen.
+- **`site.json`** wird kleiner:
+  - Angebots-IDs schrumpfen im Median von 95 auf 8 Zeichen, bei 333 Angeboten rund 29 kB roh weniger.
+  - `providerId` je Angebot von im Median 16 auf 8 Zeichen, rund 3,2 kB roh weniger (Befund).
+  - Messen und im Plan festhalten.
+- **`anbieter.json`** wird um rund 0,9 kB roh kleiner (`id` als `publicId`, Befund).
+- **Anbieter-Chunk:** praktisch unverändert; `providerSharePath` prüft nur ein anderes Muster.
+- **Artefakt:** gleich viele Seiten und Bilder, nur unter `a/` und `p/` statt `angebot/` und `anbieter/`. `404.html` wächst um zwei Regeln.
 
 ### Tests zu Nachtrag A (test-first)
 
 1. **`src/domain/ids.test.ts`:** `shortId` mit den drei Testvektoren aus E13, `seed` ändert das Ergebnis, immer 8 Zeichen `[0-9a-z]`; `offerKey` mit den bisherigen Fällen von `offerId`; beide Muster; `resolveOfferId` für neue Form, alte Form, Unfug.
+   - `resolveProviderId`: Kurz-ID bleibt; Katalog-IDs mit den Vektoren `babykonzert-nuernberg` → `gl1sfqim`, `atv-1873-frankonia` → `2i1objpq`, `familientreff-beispiel` (Fixture) → `b5nuus36`; über `MAX_KEBAB_ID` oder kein kebab-case → `undefined`.
+   - `nextPublicId`: ohne Kollision `seed` 0; ist `shortId(id, 0)` belegt, der nächste freie `seed`; sind die `seed` 0–9 alle belegt (künstlich), wirft sie.
 2. **`scripts/pipeline/lib/stable-ids.test.ts`:**
    - Stufe 0: unveränderter Bestand behält alle IDs.
    - Stufe 1: Titeländerung bei gleichen Terminen; Wechsel `kurs` → `regelmaessig`; alter Ort fehlt im Katalog; vorhandener anderer Ort verhindert den Treffer.
@@ -979,41 +1058,63 @@ export function checkIdContinuity(previous: OffersFile | undefined, next: readon
    - Neue ID: Kollision mit belegter `id` → nächster `seed`; deterministisch bei vertauschter Eingabereihenfolge.
    - `checkIdContinuity`: eine ID, die den Anbieter wechselt, ist ein Fehler.
    - `migrateOfferIds`: Ergebnis gleich `shortId(alt, 0)` je Angebot, Abbruch bei künstlicher Kollision (injizierte Hashfunktion) und bei schon migrierter Datei.
+   - `migrateCatalogIds`: `publicId = shortId(id, 0)` direkt nach `id`, nur bei `role: anbieter`; Kommentare, Flow- und Blockstil der übrigen Zeilen bleiben (Text vorher und nachher unterscheidet sich nur um die neuen Zeilen; Testkatalog mit Kommentar, Flow-Liste und Block-Liste); Abbruch bei künstlicher Kollision, bei schon vorhandener `publicId` und bei einer Katalog-ID auf `SHORT_ID_PATTERN`.
+   - `batchProviders` liest ein Paket mit und ohne `publicId`; die Pakete aus `select` enthalten keine `publicId` (Test in `scripts/pipeline/io/files.test.ts`, neu, bzw. in der bestehenden Testdatei von `selectBatches`).
 3. **`scripts/pipeline/lib/build-offers.test.ts`:** Die bestehenden Fälle laufen mit der neuen Reihenfolge; Kursfortschreibung über die Zuordnung; zwei Kandidaten desselben laufenden Kurses aus gleichrangigen Quellen, einer mit und einer ohne vergangene Termine, werden über den Fensterschlüssel ein Angebot; Sortierung nach E13; übernommene Angebote (Altbestand) behalten ihre ID; `crossProviderDuplicates` meldet weiter mit IDs.
 4. **`src/domain/dataset.test.ts`, Schema:** ID-Form, doppelte ID; die alte Regel „ID entspricht der Formel“ ist weg.
-5. **`src/domain/site-data.test.ts`:** gleicher Beginn → Reihenfolge nach Titel.
-6. **`src/domain/route.test.ts`:** `?angebot=` in beiden Formen; Unfug abgelehnt.
+   - `publicId`: Pflicht bei `role: anbieter`, die Meldung aus `missingPublicIds` nennt den freien Wert und steht vor den Zod-Meldungen; falsche Form, doppelt, nicht `shortId(id, s)` für `s` 0–9 (Tippfehler, aus einem anderen Eintrag kopiert); `aggregator` mit `publicId` lehnt das Schema ab (`strictObject`).
+5. **`src/domain/site-data.test.ts`:** gleicher Beginn → Reihenfolge nach Titel. Für jedes Angebot aus `toSiteData` ist `providerId` die `publicId` seines Anbieters und passt auf `SHORT_ID_PATTERN`; für jeden Eintrag aus `toProviderDirectory` gilt dasselbe für `id`. Geprüft werden diese Felder, nicht der ganze Text, denn `venueId` enthält weiter Katalog-IDs (E16, Review B1).
+6. **`src/domain/route.test.ts`:** `?angebot=` in beiden Formen; `?anbieter=` mit Kurz-ID und mit Katalog-ID; Unfug abgelehnt; `routeToSearch` nutzt `OFFER_PARAM` und `PROVIDER_PARAM`.
 7. **`src/domain/saved.test.ts`, `src/ui/use-app-state.test.ts`:** `migrateSavedIds` (alte Form → Kurz-ID, Dubletten weg, Reihenfolge bleibt); `useSaved` schreibt nur bei einer Änderung zurück.
-8. **`src/sw/push-tailor.test.ts`:** `seenIds` in alter Form ergeben nach dem Umstieg keine „neuen“ Angebote.
-9. **`src/domain/ics.test.ts`, `scripts/lib/share-pages.test.ts`, `src/domain/share.test.ts`:** UID, Pfade, Vorschauseiten und `404.html`-Muster mit der neuen ID bzw. `MAX_LEGACY_OFFER_ID` (Testdaten angepasst).
+   - `useRoute`: Adresse mit langer Angebots-ID und Katalog-ID ergibt eine Route mit beiden Kurz-IDs und genau einen `replaceState`; eine Adresse mit Kurz-IDs ruft `replaceState` nicht auf; `popstate` auf eine alte Adresse löst ebenso auf.
+   - `cleanSavedProviders`: Katalog-ID → `publicId`, Katalog-ID und Kurz-ID desselben Anbieters ergeben einen Eintrag an der ersten Stelle, Reihenfolge bleibt, Unfug fällt weg; `useSavedProviders` schreibt nur bei einer Änderung zurück.
+   - **`scripts/pipeline/lib/draft.test.ts`** (`providerFromCandidate`, `scripts/pipeline/lib/draft.ts`): Der neue Eintrag trägt `nextPublicId(id, catalog)`.
+8. **`src/sw/push-tailor.test.ts`:** `seenIds` in alter Form ergeben nach dem Umstieg keine „neuen“ Angebote. **`scripts/lib/push-weekly-core.test.ts`:** Ein alter Stand mit langen IDs und ein neuer mit den Kurz-IDs derselben Angebote ergeben `news = 0` (Review M2).
+9. **`src/domain/ics.test.ts`, `scripts/lib/share-pages.test.ts`, `src/domain/share.test.ts`, `src/sw/routes.test.ts`:** UID und ICS-Pfade mit der neuen ID (Testdaten angepasst).
+   - `share.test.ts`: `SHARE_DIRS` ist `{ offer: "a", provider: "p" }`, `LEGACY_SHARE_DIRS` die alten Ordner; `offerSharePath` → `a/<id>/`, `offerImagePath` → `a/<id>/vorschau.jpg`, `providerSharePath` → `p/<id>/`; lange Angebots-ID und Katalog-ID werfen; `offerAppSearch` und `providerAppSearch` liefern weiter `?angebot=` bzw. `?anbieter=`.
+   - `share-pages.test.ts`: `og:url` und `og:image` unter `a/` bzw. `p/`. `notFoundPage`: Das erzeugte Skript läuft gegen eine Liste von Pfaden. `/a/4tpu5qaq/` → `?angebot=4tpu5qaq`, `/p/gl1sfqim/` → `?anbieter=gl1sfqim`, `/angebot/<lange-id>/` → `?angebot=<lange-id>`, `/anbieter/babykonzert-nuernberg/` → `?anbieter=babykonzert-nuernberg`, jeweils auch ohne Schrägstrich am Ende und mit `index.html`; `/a/zu-lang-123/`, `/p/ABCDEFGH/` und `/x/4tpu5qaq/` leiten nicht weiter.
+   - `routes.test.ts`: `a/<id>/` (Navigation), `a/<id>/vorschau.jpg?v=…` und `p/<id>/` ergeben `"netz"`; die Zeilen für `angebot/` und `anbieter/` bleiben.
 10. **E2E** (Fixtures nach E17):
-    - `e2e/teilen.spec.ts`: Teilen-Link mit Kurz-ID; ein alter langer Link `angebot/<lang>/` landet über `404.html` im Detail, die Adresszeile zeigt danach die Kurz-ID.
+    - **Muster für alte und unbekannte Pfade** (Review m1): `vite preview` liefert für unbekannte Pfade die Startseite (`e2e/smoke.spec.ts:373`), nicht `404.html`. Die Tests für alte Links und für unbekannte `a/`/`p/` nutzen deshalb das Muster aus `e2e/teilen.spec.ts:222–227`: `page.route` liefert `404.html` mit Status 404, dazu `allowedConsoleErrors` für die 404-Meldung.
+    - `e2e/teilen.spec.ts`: Teilen-Link `a/<id>/` bzw. `p/<publicId>/`. Ein alter langer Link `angebot/<lang>/` landet über `404.html` im Detail, die Adresszeile zeigt danach `?angebot=<kurz-id>`. Ein alter Link `anbieter/familientreff-beispiel/` öffnet das Anbieter-Sheet, die Adresszeile zeigt danach `?anbieter=b5nuus36`. Unbekannte `a/<id>/` und `p/<id>/` führen zum Hinweis bzw. zur Meldung des Sheets. Anzupassen sind dort `:5`, `:89`, `:100`, `:114`, `:152` und `:161–273` samt `:222`.
     - `e2e/saved.spec.ts`: Merkliste mit langer ID im `localStorage` zeigt das Angebot und ist danach umgeschrieben.
-    - Angepasste IDs: `e2e/detail.spec.ts`, `e2e/anbieter.spec.ts`, `e2e/pwa.spec.ts`, `e2e/mobile-ux.spec.ts`.
+    - `e2e/merkliste-anbieter.spec.ts`: `zwergenplan.anbieter-merkliste` mit Katalog-ID zeigt den gemerkten Anbieter und ist danach auf `publicId` umgeschrieben. `:125` prüft „gemerkte ID nie in der URL“ künftig mit der `publicId` (mit der Katalog-ID wäre die Prüfung immer grün), `:157–158` vergleicht den Speicher mit `publicId`.
+    - `e2e/anbieter.spec.ts`: `?anbieter=<publicId>` und `?anbieter=<katalog-id>` öffnen dasselbe Sheet; die Vergleiche von `search` mit Katalog-IDs (`:171`, `:198`, `:205`, `:248`, `:272`, `:299`, `:328`) erwarten die `publicId`.
+    - `e2e/smoke.spec.ts` (echte Daten, `dist/`): Seiten und Kachelbild unter `a/`, Anbieterseite unter `p/`, `og:url` entsprechend; `dist/angebot/` und `dist/anbieter/` gibt es nicht; die Prüfung „keine Fixture-Seite“ sucht unter `dist/a/<id>` und `dist/p/<publicId>` (Review m5).
+    - Angepasste IDs und Pfade: `e2e/detail.spec.ts`, `e2e/pwa.spec.ts` (`a/<id>/` statt `angebot/<id>/`, `:136`), `e2e/mobile-ux.spec.ts` (`:138`, `SHARE_PAGE` unter `a/` statt `angebot/`, `:505`).
 
 ### Schritte zu Nachtrag A (Stufe 0)
 
 Stufe 0 geht als Ganzes in einem Push nach `main`; die Zwischenstände liegen nur auf ihrem Branch. Jeder Schritt ist ein Commit mit grünem `pnpm verify`. Domänenlogik entsteht test-first. Schema, Daten und Pipeline müssen zusammen wechseln, deshalb ist S1 der große Schritt.
 
 - **S1 – Umstellung (Domäne, Schema, Zuordnung, Migration).**
-  - `src/domain/ids.ts`: `OFFER_ID_PATTERN` neu, `LEGACY_OFFER_ID_PATTERN`, `MAX_LEGACY_OFFER_ID`, `shortId`, `offerKey` (Umbenennung von `offerId`), `resolveOfferId`; alle Nutzer von `MAX_OFFER_ID` umstellen (E13).
-  - Schema, `validateDataset`, `pnpm schema:export`; Sortierung in `site-data.ts`.
-  - `scripts/pipeline/lib/stable-ids.ts`, neue Reihenfolge in `buildOffers`, Befehl `migrate-ids`.
-  - Migration auf `data/offers.json` und `tests/fixtures/offers.json`.
-  - Unit-Tests mit langen IDs (heute 16 Dateien, `grep -rlE "[a-z0-9]+--[a-z0-9-]+--[a-z0-9]+" src scripts e2e`) auf die neue Form umstellen.
+  - `src/domain/ids.ts`: `SHORT_ID_PATTERN`, `LEGACY_OFFER_ID_PATTERN`, `MAX_LEGACY_OFFER_ID`, `shortId`, `offerKey` (Umbenennung von `offerId`), `resolveOfferId`, `resolveProviderId`, `nextPublicId`; alle Nutzer von `OFFER_ID_PATTERN` und `MAX_OFFER_ID` umstellen (E13).
+  - Schema (Angebots-ID, `publicId` am Anbieter), `validateDataset` (E13, E16), `pnpm schema:export`; Sortierung in `site-data.ts`; `toSiteData` und `toProviderDirectory` geben `publicId` aus (E16).
+  - `scripts/pipeline/lib/stable-ids.ts`, neue Reihenfolge in `buildOffers`, Befehl `migrate-ids` für Angebote und Katalog; `providerFromCandidate` setzt `publicId`.
+  - Migration auf `data/offers.json` mit `data/providers.yaml` und auf `tests/fixtures/offers.json` mit `tests/fixtures/providers.yaml`.
+  - `select` lässt `publicId` aus den Paketen weg, `batchProviders` liest lockerer (E16, Review M3).
+  - Unit-Tests mit langen IDs (heute 16 Dateien, `grep -rlE "[a-z0-9]+--[a-z0-9-]+--[a-z0-9]+" src scripts e2e`) auf die neue Form umstellen. Katalog-IDs als öffentliche ID stehen in Tests, deren Code die Form prüft oder die Übersetzung durchläuft: `src/domain/share.test.ts`, `src/domain/saved.test.ts`, `src/domain/route.test.ts`, `src/domain/site-data.test.ts`, `src/ui/use-app-state.test.ts`, `src/data/providers.test.ts`, `scripts/lib/share-pages.test.ts` (`:187`, `anbieter/familientreff-beispiel/` wirft künftig). `src/domain/directory.test.ts` braucht keine Umstellung, denn `directory.ts` prüft keine ID-Form (Review m2).
   - **Probelauf** (Review M3): ein Wegwerf-Skript unter `runs/` (gitignored) ruft `buildOffers` direkt auf, mit den Rohdaten vom 04.10. (`runs/2026-10-04/raw/`, liegt im Haupt-Checkout), dem migrierten `data/offers.json` als `previous` und `generatedAt` und `horizon` aus diesem Vorstand. Es schreibt nichts ins Repo.
     - Durchgang 1: Alle 333 IDs bleiben (Stufe 0 trifft jedes Angebot).
     - Durchgang 2 mit gestörten Titeln: In jedem Rohevent wird ein Klammerzusatz am Titelende entfernt (Uhrzeit, Wochentag, Datum, z. B. „(Babys geb. Jan.–Feb. 2026, Di 9:30)“). Treffer je Stufe, Mehrdeutigkeiten und neue IDs kommen in den Plan, mit Stichprobe der Zuordnungen aus Stufe 1 und 2.
-  - Fertig, wenn Tests 1–7 und 9 (Unit-Teil) grün sind, Durchgang 1 alle IDs behält und Durchgang 2 im Plan steht. Zeigt Durchgang 2 eine falsche Zuordnung, wird vor S2 nachgeschärft.
-- **S2 – App und Service Worker.** `parseRoute`, Auflösung in `App.tsx`, `migrateSavedIds` in `useSaved`, `tailorPush`. Fertig, wenn Tests 6–8 grün sind.
-- **S3 – E2E und Budget.** Lokal: `pnpm e2e:local e2e/teilen.spec.ts e2e/saved.spec.ts e2e/detail.spec.ts e2e/anbieter.spec.ts e2e/pwa.spec.ts e2e/mobile-ux.spec.ts` mit `run_in_background`. Die Fixtures ändern sich, die volle Suite fährt die CI auf dem Branch. Start-JS, Service Worker und `site.json` messen, Zeile in ADR 0012. Fertig, wenn die Specs lokal und die CI auf dem Branch grün sind und die Messwerte im Plan stehen.
-- **S4 – ADR und Doku.** ADR 0022 auf „angenommen“, Verweise in ADR 0003, 0006, 0007, 0016 und 0020, `docs/architecture.md`, `CLAUDE.md`, Skill (E22). Fertig, wenn `pnpm docs:check` grün ist.
+  - Fertig, wenn Tests 1–5 und 7 (Unit-Teil, ohne `useSaved`/`useSavedProviders`) grün sind, `pnpm data:validate` auf dem migrierten Katalog grün ist, Durchgang 1 alle IDs behält und Durchgang 2 im Plan steht. Zeigt Durchgang 2 eine falsche Zuordnung, wird vor S2 nachgeschärft.
+- **S2 – App, Service Worker, Pfade.**
+  - `parseRoute` mit `OFFER_PARAM`/`PROVIDER_PARAM`, Auflösung beider IDs in `useRoute` (E15), `migrateSavedIds` in `useSaved`, `cleanSavedProviders` in `useSavedProviders`, `tailorPush`.
+  - `src/domain/share.ts` (`SHARE_DIRS`, `LEGACY_SHARE_DIRS`, Prüfung auf `SHORT_ID_PATTERN`), `notFoundPage` mit vier Regeln, Kommentare in `share-pages.ts` (`MAX_PAGE_BYTES`: ID jetzt 8 statt 240 Zeichen, der Wert bleibt), `og-images.ts` und `build-data.ts` (E19).
+  - Erzeugte Ordner (Review M1): Die Löschliste in `scripts/build-data.ts:41` wird `["data", "ics", "a", "p", "angebot", "anbieter", "404.html"]`. `angebot` und `anbieter` bleiben darin, damit ein bestehender Checkout keine veralteten Seiten behält; sonst lieferte `vite preview` sie aus, und Smoke- und E2E-Tests für alte Links liefen über eine alte Seite statt über `404.html`. `.gitignore` (`:9–10`) bekommt `public/a/` und `public/p/`; die alten Zeilen bleiben aus demselben Grund.
+  - `runWeekly` bildet die IDs des alten Stands ab (E15, Review M2).
+  - Fertig, wenn Tests 6–9 grün sind und `scripts/lib/push-weekly-core.test.ts` den Fall aus Tests 8 abdeckt.
+- **S3 – E2E und Budget.** Lokal: `pnpm e2e:local e2e/teilen.spec.ts e2e/saved.spec.ts e2e/merkliste-anbieter.spec.ts e2e/detail.spec.ts e2e/anbieter.spec.ts e2e/pwa.spec.ts e2e/mobile-ux.spec.ts` mit `run_in_background`, dazu `e2e/theme.spec.ts` nur, falls `e2e/fixtures.ts` oder `e2e/mobile-ux.ts` sich ändern. Die Smoke-Suite mit echten Daten (Tests 10, `e2e/smoke.spec.ts`) fährt die CI auf dem Branch; lokal läuft sie nur, um einen roten CI-Job nachzustellen (CLAUDE.md, Review m5). Die Fixtures ändern sich, die volle Suite fährt die CI auf dem Branch. Start-JS, Service Worker, `site.json` und `anbieter.json` messen, Zeile in ADR 0012. Fertig, wenn die Specs lokal und die CI auf dem Branch grün sind und die Messwerte im Plan stehen.
+- **S4 – ADR und Doku.** ADR 0022 auf „angenommen“, Verweise in ADR 0003, 0006, 0007, 0016 und 0020 (dort Punkt 1: neuer Pfadvertrag laut ADR 0022), `docs/architecture.md`, `CLAUDE.md`, Skill samt `references/catalog.md` (E22). Fertig, wenn `pnpm docs:check` grün ist.
 - **S5 – Prüfen, ausliefern, aufräumen.**
   - `/arch-review` (Schemaänderung, neues Modul, mehr als 200 Zeilen) vor dem Push nach `main`.
-  - Nach dem Deploy `/browser-review live`: Teilen-Link, alter Link, Merkliste, auf Pixel 7 und iPhone, hell und dunkel.
-  - Live-Probe: Ein am 2026-10-08 geteilter langer Link, z. B. `https://zwergenplan.app/angebot/atv-1873-frankonia--riesen-zwerge-turnen-fuer-2-bis-3-jaehrige-mo--atv-1873-frankonia/`, öffnet das Detail, und die Adresszeile zeigt danach `?angebot=d4qshjw0`.
-  - Danach `migrate-ids` und `migrateOfferIds` entfernen (knip grün), eigener Commit.
-  - Restpunkte nach `docs/ideas.md`: verlegte Einzeltermine, Zusammenlegung, `formerIds` für Anbieter vor einer Umbenennung, Altform-Logik nach 12 Monaten entfernen (E15).
+  - Nach dem Deploy `/browser-review live`: Teilen-Link (Angebot und Anbieter), alter Link (Angebot und Anbieter), Merkliste und gemerkte Anbieter, auf Pixel 7 und iPhone, hell und dunkel.
+  - Live-Proben:
+    - Ein am 2026-10-08 geteilter langer Link, z. B. `https://zwergenplan.app/angebot/atv-1873-frankonia--riesen-zwerge-turnen-fuer-2-bis-3-jaehrige-mo--atv-1873-frankonia/`, öffnet das Detail, und die Adresszeile zeigt danach `?angebot=d4qshjw0`.
+    - `https://zwergenplan.app/anbieter/atv-1873-frankonia/` öffnet das Anbieter-Sheet, die Adresszeile zeigt danach `?anbieter=2i1objpq`.
+    - `https://zwergenplan.app/a/<id>/` und `https://zwergenplan.app/p/2i1objpq/` liefern 200 mit `og:url` auf sich selbst; ein WhatsApp-Test zeigt die Vorschaukarte mit Kachelbild.
+  - Danach `migrate-ids`, `migrateOfferIds` und `migrateCatalogIds` entfernen (knip grün), eigener Commit.
+  - Restpunkte nach `docs/ideas.md`: verlegte Einzeltermine, Zusammenlegung, vor einer Umbenennung einer Katalog-ID die Abbildung für die Zuordnung und das Feld mit der früheren Katalog-ID (E16), `venueId` aus `SiteOffer` entfernen (E16), Umschreibung gespeicherter Werte nach 12 Monaten entfernen (E15).
   - Fertig, wenn die CI auf `main` grün ist und `meta.json` den Commit zeigt.
 
 ### Risiken zu Nachtrag A
@@ -1021,18 +1122,23 @@ Stufe 0 geht als Ganzes in einem Push nach `main`; die Zwischenstände liegen nu
 - **R9 – Falsche Zuordnung:** Zwei verschiedene Angebote bekommen über zwei Läufe dieselbe ID. Dann zeigt ein alter Link oder ein Merklisten-Eintrag auf ein anderes Angebot. Dagegen: gleicher Anbieter (und außer bei verschwundenem Ort gleicher Ort) als Pflicht, strikte Eindeutigkeit in Stufe 1, einziger Kandidat in Stufe 2, keine Zusammenlegung, `checkIdContinuity`, der Probelauf mit gestörten Titeln, und jede Zuordnung aus Stufe 1 und 2 steht mit beiden Titeln im Bericht.
 - **R10 – Verpasste Zuordnung:** Ein Angebot bekommt trotzdem eine neue ID, z. B. bei neuem Titel **und** neuer Uhrzeit oder bei zwei Schwestergruppen, die sich zugleich ändern. Das ist der heutige Zustand, nur seltener. Der Bericht zeigt neue und weggefallene IDs je Anbieter.
 - **R11 – Einmalige Kalender-Duplikate** durch den UID-Wechsel (E18).
-- **R12 – Kein einfaches Zurück:** Nach dem Deploy schreibt die App Merklisten in Kurz-IDs um. Ein Revert brächte lange IDs zurück, und die Merklisten wären leer. Ein Rückweg wäre ein Fix nach vorn. Deshalb gehören Tests 7 und 10 zur Pflicht vor dem Merge.
+- **R12 – Kein einfaches Zurück:** Nach dem Deploy schreibt die App Merklisten und gemerkte Anbieter in Kurz-IDs um. Ein Revert brächte lange IDs und Katalog-IDs zurück, und beide Listen wären leer. Dazu verschwänden die Seiten unter `a/` und `p/`, und `404.html` kennte sie nicht mehr; seit dem Deploy geteilte Links führten dann auf „gibt es nicht“. Ein Rückweg wäre ein Fix nach vorn. Deshalb gehören Tests 7, 9 und 10 zur Pflicht vor dem Merge.
 - **R13 – Hash-Kollision bei der Migration:** Der Befehl bricht ab (E17). Heute gibt es keine.
-- **R14 – Erneut geteilte alte Links ohne Vorschau** (N-I4): Der Link funktioniert, die Karte im Chat fehlt.
+- **R14 – Erneut geteilte alte Links ohne Vorschau** (N-I4): Der Link funktioniert, die Karte im Chat fehlt. Das gilt nach N-I1 auch für alte Anbieter-Links, denn `anbieter/<katalog-id>/` hat keine Seite mehr.
+- **R15 – Zwei IDs je Anbieter verwechselt:** Code im Build schlägt mit einer `publicId` im Katalog nach oder vergleicht sie mit `offers.providerId`; dann fehlt ein Anbieter still oder eine Seite zeigt keine Angebote. Dagegen: Übersetzung nur in `toSiteData` und `toProviderDirectory` (E16), Test der Felder `providerId` und `id` (Tests 5), Smoke-Test mit echten Daten über Anbieterseite und Angebote (Tests 10). `venueId` sieht der Katalog-ID ähnlich, ist aber keine Anbieter-ID (E16).
+- **R16 – `publicId` von Hand geändert:** Alte Links und gemerkte Anbieter zeigten ins Leere. Dagegen: `validateDataset` verlangt `publicId === shortId(id, s)` mit `s` 0–9 (E16), die Regel steht im Skill.
+- **R17 – Zwei Pfadverträge auf Dauer:** `a/`, `p/` als Seiten und `angebot/`, `anbieter/` als Regeln in `404.html`. Das ist der Preis von N-I1; die alten Regeln sind vier Zeilen in `notFoundPage` mit eigenem Test (Tests 9).
 
-### Nutzerentscheide (offen; umgesetzt wird mit der Empfehlung, solange nichts anderes entschieden ist)
+### Nutzerentscheide
 
-| Nr. | Frage | Empfehlung | Abschnitt |
+N-I1 und N-I2 hat der Nutzer am 2026-10-08 entschieden, wörtlich „NI1 Und 2: doch“, also gegen die bisherige Empfehlung. N-I3 und N-I4 sind offen; umgesetzt wird mit der Empfehlung, solange nichts anderes entschieden ist.
+
+| Nr. | Frage | Stand | Abschnitt |
 |---|---|---|---|
-| N-I1 | Neue kurze Pfade `/a/<id>/` und `/p/<id>/`? | nein, Ordner `angebot/` und `anbieter/` bleiben, die Kurz-ID steht darin | E19 |
-| N-I2 | Feste Kurz-ID auch für Anbieter? | nein, Katalog-ID bleibt öffentlich und wird nicht umbenannt | E16 |
-| N-I3 | ICS-UID auf die Kurz-ID umstellen (einmalig Duplikate bei erneutem Import)? | ja | E18 |
-| N-I4 | Aliasseiten mit Vorschau für alte lange Links (Feld `formerIds`)? | nein, `404.html` und die Rechenregel reichen | E19 |
+| N-I1 | Neue kurze Pfade `/a/<id>/` und `/p/<id>/`? | **entschieden 2026-10-08: ja** („NI1 Und 2: doch“). Alte Ordner `angebot/` und `anbieter/` leiten über `404.html` weiter; die Query bleibt `?angebot=`/`?anbieter=` (Begründung in E19). Bisherige Empfehlung war nein. | E19 |
+| N-I2 | Feste Kurz-ID auch für Anbieter? | **entschieden 2026-10-08: ja** („NI1 Und 2: doch“). `publicId` im Katalog, die Katalog-ID bleibt interner Schlüssel. Bisherige Empfehlung war nein. | E16 |
+| N-I3 | ICS-UID auf die Kurz-ID umstellen (einmalig Duplikate bei erneutem Import)? | offen, Empfehlung ja | E18 |
+| N-I4 | Aliasseiten mit Vorschau für alte lange Links (Feld `formerIds`)? | offen, Empfehlung nein, `404.html` und die Rechenregel reichen | E19 |
 
 ### Review zu Nachtrag A (2026-10-08) – Verdict: Freigabe mit Änderungen → eingearbeitet
 
@@ -1059,3 +1165,25 @@ Unabhängiger `plan-reviewer` auf Nachtrag A, ADR-Entwurf 0022 und die Folgeänd
 
 **Abgelehnt**
 - **m7, Statuszeile „Entwurf“:** Die Statuszeile wurde vor dem Review gesetzt; nach der Einarbeitung ist „Review eingearbeitet“ richtig.
+
+### Review zu Nachtrag A, Nutzerentscheide N-I1 und N-I2 (2026-10-08) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Unabhängiger `plan-reviewer` nur auf die Teile, die N-I1 (kurze Pfade) und N-I2 (Kurz-ID für Anbieter) geändert haben, samt ADR-Entwurf 0022 und den Hinweisen in Plan 0026, geprüft gegen den Code. Die Zeilenangaben hat er bestätigt, die Query-Entscheidung für tragfähig befunden. Die Testvektoren der Anbieter (`gl1sfqim`, `2i1objpq`, `b5nuus36`) hat er nicht nachgerechnet; sie stammen aus demselben Skript mit dem Code aus E13, das den Vektor `d4qshjw0` reproduziert. Alle Befunde sind eingearbeitet, offene Blocker gibt es keine.
+
+| Befund | Einarbeitung |
+|---|---|
+| **B1** „Der Browser sieht nur die `publicId`“ ist falsch: `venueId` in `site.json` enthält Katalog-IDs; Test 5 als Textsuche wäre immer rot | Zusage auf die Anbieter-Felder `providerId` und `id` eingeengt, `venueId` als interne Orts-ID benannt, Entfernen als Idee (E16, Tests 5, R15, ADR 0022 Punkt 5) |
+| **M1** Löschliste `build-data.ts:41` und `.gitignore` kennen `a/`, `p/` nicht | beide in S2, alte Einträge bleiben gegen veraltete Seiten in bestehenden Checkouts |
+| **M2** Wochen-Nachricht vom Server (`push-weekly`) meldete alle Angebote als neu | Abbildung in `runWeekly`, Test in `push-weekly-core.test.ts` (E15, Tests 8, S2) |
+| **M3** Pakete aus Läufen vor der Migration scheitern an Pflichtfeld `publicId` | `select` ohne `publicId`, `batchProviders` mit lockerem Schema, Test (E16, Tests 2, S1) |
+| **M4** Meldung mit freiem Wert lässt sich aus Zod nicht erzeugen | Vorprüfung `missingPublicIds(raw)` vor `safeParse` (E16, Tests 4) |
+| **M5** Bindung `publicId === shortId(id, s)` widerspricht dem Umbenennungsweg | Satz korrigiert: vor einer Umbenennung ein Feld mit der früheren Katalog-ID, Idee (E16, S5, ADR 0022) |
+| **M6** E2E-Fundstellen unvollständig, eine Prüfung würde still wirkungslos | Fundstellen in Tests 10, `merkliste-anbieter.spec.ts:125` prüft mit `publicId` |
+| **m1** `vite preview` liefert für unbekannte Pfade die Startseite | Muster `page.route` mit `404.html` aus `teilen.spec.ts:222–227` (Tests 10) |
+| **m2** Liste der Unit-Tests in S1 | korrigiert (S1) |
+| **m3** Obergrenze für `nextPublicId` | wirft ab `seed` 10 (E16, Tests 1) |
+| **m4** YAML-Migration: `visit`-Block nicht übernehmen, Selbstprüfung, Schlüsselreihenfolge | E17, Tests 2, E16 (`providerFromCandidate`) |
+| **m5** `PW_SUITE=smoke` lokal widerspricht CLAUDE.md; Fixture-Prüfung auch unter `p/` | Smoke nur in der CI (S3); Prüfung unter `dist/a/` und `dist/p/` (Tests 10) |
+| **m6** Auflösen in `useRoute` statt in Effekten von `App.tsx` | übernommen: synchron im Initialisierer und in `onPop`, ein `replaceState` (E15, Tests 7, S2, Budget) |
+| **m7** ADR 0022, Punkt 6: 80 Zeichen gelten weiter im Schema | Wortlaut korrigiert |
+| **m8** Plan 0026, E1–E7 beschreiben weiter `angebot/`, `anbieter/` | Hinweis vor E1 in Plan 0026 |

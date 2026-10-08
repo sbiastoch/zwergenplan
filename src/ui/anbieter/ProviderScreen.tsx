@@ -80,7 +80,7 @@ export function ProviderScreen({
         </button>
         <button
           type="button"
-          className="heart inline"
+          className="heart"
           aria-pressed={isSaved}
           aria-label={`${r.provider.name} merken`}
           onClick={(event) => toggle(event, r.provider.id)}
