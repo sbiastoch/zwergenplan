@@ -4,8 +4,8 @@ Status: freigegeben (Review eingearbeitet, Nutzerentscheide getroffen)
 Datum: 2026-10-08
 Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
 Abhängigkeiten: **alle erfüllt**, seit `main` `d5fab1b` (Plan 0022–0024 umgesetzt; geprüft am 2026-10-08, Abschnitt „Abgleich mit `main`“). Der Plan ist gegen diesen Stand geschrieben.
-- **Plan 0022** (`docs/plans/0022-feedback-kleinigkeiten.md`): „Sticker/Stickerheft“ ist aus der UI verschwunden. Die Merkliste heißt „Meine Merkliste“ (`SavedView.tsx:92`), der Leerzustand „Noch nichts gemerkt“ (`:94`), die Toasts „Gemerkt – liegt jetzt auf deiner Merkliste“ und „Nicht mehr gemerkt“ (`App.tsx:162`).
-- **Plan 0023** (`docs/plans/0023-zeitraumfilter.md`): Das reine Modul `src/domain/date-range.ts` liefert
+- **Plan 0022** (`docs/plans/archiv/0022-feedback-kleinigkeiten.md`): „Sticker/Stickerheft“ ist aus der UI verschwunden. Die Merkliste heißt „Meine Merkliste“ (`SavedView.tsx:92`), der Leerzustand „Noch nichts gemerkt“ (`:94`), die Toasts „Gemerkt – liegt jetzt auf deiner Merkliste“ und „Nicht mehr gemerkt“ (`App.tsx:162`).
+- **Plan 0023** (`docs/plans/archiv/0023-zeitraumfilter.md`): Das reine Modul `src/domain/date-range.ts` liefert
   - `type DateRange = { from: string; to?: string } | { from?: string; to: string }` (`:9`, Union: mindestens eine Grenze),
   - `notEnded(now)` (`:12`), `dateRange(a, b)` (`:18`, normalisiert, tauscht, verwirft Ungültiges),
   - `fieldLimits(range, today)` (`:38`) und `checkBound(value, limits)` (`:53`) für die Datumsfelder,
@@ -13,7 +13,7 @@ Abhängigkeiten: **alle erfüllt**, seit `main` `d5fab1b` (Plan 0022–0024 umge
   - `inDateRange(offer, range, now)` (`:79`): Kurs passt mit erstem Termin im Zeitraum, regelmäßig/einmalig mit irgendeinem Termin.
 
   `FilterState.range?: DateRange` (`filter.ts:26`) steht in der URL als `von=`/`bis=` (`filterFromSearch` `:62`, `filterToSearch` `:83–84`). `withDateRange(state, from, to)` (`:128`) setzt ihn. `applyFilters` prüft ihn mit `inDateRange` (`:163–168`), `activeFilterCount` zählt ihn als 1 (`:105`). `searchOf` in `src/domain/searches.ts:16` lässt den Zeitraum für Such-Abos weg. Die Liste gruppiert über `groupByNextSession(visible, now, range)` (`agenda.ts:62–65`, `use-offer-views.ts:124–125`). Die Datumsfelder stehen im `FilterSheet` (`Sheets.tsx:108ff.`).
-- **Plan 0024** (`docs/plans/0024-karte-im-app-look.md`): Kategorie-Symbole als Marker (`src/ui/map/marker-images.ts`, Kreis in `layers.ts`), Grundkarte in App-Farben (`src/ui/map/basemap.ts`). Die Kategorie eines Ortes ist die häufigste unter den übergebenen Angeboten (`src/ui/map/geojson.ts:45–49`), auf der Merkliste also die der gemerkten. Die Merkliste erbt das ohne eigenen Code.
+- **Plan 0024** (`docs/plans/archiv/0024-karte-im-app-look.md`): Kategorie-Symbole als Marker (`src/ui/map/marker-images.ts`, Kreis in `layers.ts`), Grundkarte in App-Farben (`src/ui/map/basemap.ts`). Die Kategorie eines Ortes ist die häufigste unter den übergebenen Angeboten (`src/ui/map/geojson.ts:45–49`), auf der Merkliste also die der gemerkten. Die Merkliste erbt das ohne eigenen Code.
 
 ## Ziel
 

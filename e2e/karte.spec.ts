@@ -71,6 +71,41 @@ async function camera(page: Page) {
   });
 }
 
+/** Kein Marker des Startausschnitts liegt unter dem Bedienelement `selector` (Zoom-Knöpfe, Attribution). */
+async function expectMarkersClear(page: Page, selector: string) {
+  const { control, markers } = await page.evaluate((sel) => {
+    const map = window.__zpMap;
+    const canvas = document.querySelector(".map-box .map-canvas")?.getBoundingClientRect();
+    const ctrl = document.querySelector(sel)?.getBoundingClientRect();
+    if (!map || !canvas || !ctrl) throw new Error(`keine Karte oder kein ${sel}`);
+    // Kreisradius plus Rand und Schatten (layers.ts: Cluster 18, Ort 15, Rand 2, Schatten +1 um 2/2 versetzt);
+    // beim Ort reicht das Badge (r 9 + Rand 2, um 12/−12 versetzt) bis hypot(12, 12) + 11 ≈ 28 px.
+    const radius: Record<string, number> = { "orte-cluster": 23, "orte-punkt": 28 };
+    const control = {
+      left: ctrl.left - canvas.left,
+      right: ctrl.right - canvas.left,
+      top: ctrl.top - canvas.top,
+      bottom: ctrl.bottom - canvas.top,
+    };
+    const markers = Object.keys(radius).flatMap((layer) =>
+      map.queryRenderedFeatures({ layers: [layer] }).map((f) => {
+        const { x, y } = map.project(f.geometry.coordinates);
+        const dx = Math.max(control.left - x, 0, x - control.right);
+        const dy = Math.max(control.top - y, 0, y - control.bottom);
+        return { layer, x, y, r: radius[layer] ?? 0, distance: Math.hypot(dx, dy) };
+      }),
+    );
+    return { control, markers };
+  }, selector);
+  expect(markers.length, "Marker im Startausschnitt").toBeGreaterThan(0);
+  for (const m of markers) {
+    expect(
+      m.distance,
+      `${m.layer} bei ${Math.round(m.x)}/${Math.round(m.y)} unter ${selector} ${JSON.stringify(control)}`,
+    ).toBeGreaterThan(m.r);
+  }
+}
+
 /** Darstellung über das Kind-Sheet, dem einzigen Ort dafür (Plan 0020, E2). */
 async function switchTheme(page: Page, button: "Hell" | "Dunkel", style: string) {
   const request = page.waitForRequest((req) => req.url().endsWith(style));
@@ -490,37 +525,23 @@ test.describe("mit gemockten Kacheln", () => {
 
   test("Startausschnitt hält die Ecke der Zoom-Knöpfe frei (Plan 0008, E20)", async ({ page }) => {
     await openMap(page);
-    const { zoom, markers } = await page.evaluate(() => {
-      const map = window.__zpMap;
-      const canvas = document.querySelector(".map-box .map-canvas")?.getBoundingClientRect();
-      const ctrl = document.querySelector(".maplibregl-ctrl-top-right .maplibregl-ctrl-group")?.getBoundingClientRect();
-      if (!map || !canvas || !ctrl) throw new Error("keine Karte oder keine Zoom-Knöpfe");
-      // Kreisradius plus Rand und Schatten (layers.ts: Cluster 18, Ort 15, Rand 2, Schatten +1 um 2/2 versetzt);
-      // beim Ort reicht das Badge (r 9 + Rand 2, um 12/−12 versetzt) bis hypot(12, 12) + 11 ≈ 28 px.
-      const radius: Record<string, number> = { "orte-cluster": 23, "orte-punkt": 28 };
-      const zoom = {
-        left: ctrl.left - canvas.left,
-        right: ctrl.right - canvas.left,
-        top: ctrl.top - canvas.top,
-        bottom: ctrl.bottom - canvas.top,
-      };
-      const markers = Object.keys(radius).flatMap((layer) =>
-        map.queryRenderedFeatures({ layers: [layer] }).map((f) => {
-          const { x, y } = map.project(f.geometry.coordinates);
-          const dx = Math.max(zoom.left - x, 0, x - zoom.right);
-          const dy = Math.max(zoom.top - y, 0, y - zoom.bottom);
-          return { layer, x, y, r: radius[layer] ?? 0, distance: Math.hypot(dx, dy) };
-        }),
-      );
-      return { zoom, markers };
+    await expectMarkersClear(page, ".maplibregl-ctrl-top-right .maplibregl-ctrl-group");
+  });
+
+  test.describe("320 × 640 (Browser-Review 0024, m4)", () => {
+    test.use({ viewport: { width: 320, height: 640 } });
+
+    test("Attribution beim Öffnen ganz über der Tab-Leiste, kein Marker unter ihr oder den Zoom-Knöpfen", async ({
+      page,
+    }) => {
+      await openMap(page);
+      const attribution = await page.locator(".map-box .maplibregl-ctrl-attrib").boundingBox();
+      const tabs = await page.locator(".tabs").boundingBox();
+      if (!attribution || !tabs) throw new Error("keine Attribution oder Tab-Leiste");
+      expect(attribution.y + attribution.height, "Attribution unten über der Tab-Leiste").toBeLessThanOrEqual(tabs.y);
+      await expectMarkersClear(page, ".maplibregl-ctrl-top-right .maplibregl-ctrl-group");
+      await expectMarkersClear(page, ".maplibregl-ctrl-attrib");
     });
-    expect(markers.length, "Marker im Startausschnitt").toBeGreaterThan(0);
-    for (const m of markers) {
-      expect(
-        m.distance,
-        `${m.layer} bei ${Math.round(m.x)}/${Math.round(m.y)} unter den Zoom-Knöpfen ${JSON.stringify(zoom)}`,
-      ).toBeGreaterThan(m.r);
-    }
   });
 
   test("Kamera-Regel: Standort und Kartenmitte bewegen die Karte nicht und laden keine Kacheln", async ({

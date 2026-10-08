@@ -1,6 +1,6 @@
 # Plan 0023 – Zeitraumfilter „von / bis“
 
-Status: in Umsetzung – umgesetzt und live seit d5fab1b; ins Archiv nach dem Browser-Review live (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Branch `zeitraumfilter-0023`)
+Status: abgeschlossen, live seit 1e0ced7 (2026-10-08), mit dem Nachschliff zum Browser-Review. Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Branch `zeitraumfilter-0023`)
 Datum: 2026-10-08
 Review: **kein Plan-Review**, Nutzerentscheid „pragmatisch“ (kurzer Plan, Umsetzung direkt). Arch-Review 2026-10-08 eingearbeitet (Abschnitt unten); das Browser-Review macht der Orchestrator.
 Bezug: Plan 0003 (Filter-Sheet, URL-Filter), Plan 0009 (Wegzeit als Einfachwahl), Plan 0021 (Filter-Sheet), ADR 0012 (Startbudget)
@@ -66,3 +66,11 @@ Urteil: kein Blocker, Nacharbeit nötig. Befund → Umgang:
 ## Status
 
 Umgesetzt. Ergebnisse (Gates, Start-JS) stehen im Commit und in ADR 0012.
+
+## Browser-Review live (2026-10-08)
+
+Ergebnis: **bestanden** mit einem geringen Befund. Restpunkt iPhone siehe Plan 0022.
+
+| Befund | Umgang |
+|---|---|
+| m1: Bei gesetztem Zeitraum stand in der Zählzeile weiter „3 Angebote ab heute“ | Umgesetzt (Branch `nachschliff-review-0022-0024`): `listStatusParts` in `src/ui/format.ts` baut den ganzen Satz der Live-Region, „3 Angebote vom 17.–18.10.“, „ab Sa 17.10.“, „bis So 18.10.“, ein Tag „am Sa 17.10.“, über Monats- und Jahreswechsel „vom 30.10.–2.11.“ bzw. mit Jahr. Unit-Test in `format.test.ts`, E2E in `zeitraum.spec.ts`. Start-JS +0,156 kB (zusammen mit 0024 m3/m4, ADR 0012). |

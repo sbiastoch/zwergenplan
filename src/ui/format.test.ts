@@ -19,6 +19,7 @@ import {
   hiddenNote,
   limitHint,
   limitReason,
+  listStatusParts,
   loadErrorText,
   mapStatusParts,
   originHint,
@@ -540,6 +541,27 @@ describe("Karte und Orte (Plan 0005, E7)", () => {
     expect(mapStatusParts(8, 5)).toEqual([8, " Angebote an ", 5, " Orten"]);
     expect(mapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort");
     expect(mapStatusParts(0, 0).join("")).toBe("0 Angebote an 0 Orten");
+  });
+});
+
+describe("Statuszeile der Liste mit Zeitraum (Browser-Review 0023, m1)", () => {
+  it("ohne Zeitraum „ab heute“, die Zahl getrennt", () => {
+    expect(listStatusParts(3, undefined)).toEqual([3, " Angebote ab heute"]);
+    expect(listStatusParts(1, undefined).join("")).toBe("1 Angebot ab heute");
+  });
+
+  it("nennt den Zeitraum als ganzen Satz: von–bis, nur von, nur bis", () => {
+    expect(listStatusParts(3, { from: "2026-10-17", to: "2026-10-18" }).join("")).toBe("3 Angebote vom 17.–18.10.");
+    expect(listStatusParts(3, { from: "2026-10-17" }).join("")).toBe("3 Angebote ab Sa 17.10.");
+    expect(listStatusParts(1, { to: "2026-10-18" }).join("")).toBe("1 Angebot bis So 18.10.");
+  });
+
+  it("ein Tag, Monats- und Jahreswechsel", () => {
+    expect(listStatusParts(2, { from: "2026-10-17", to: "2026-10-17" }).join("")).toBe("2 Angebote am Sa 17.10.");
+    expect(listStatusParts(2, { from: "2026-10-30", to: "2026-11-02" }).join("")).toBe("2 Angebote vom 30.10.–2.11.");
+    expect(listStatusParts(0, { from: "2026-12-28", to: "2027-01-03" }).join("")).toBe(
+      "0 Angebote vom 28.12.2026–3.1.2027",
+    );
   });
 });
 

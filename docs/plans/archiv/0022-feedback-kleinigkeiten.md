@@ -1,6 +1,6 @@
 # Plan 0022 – Kleinigkeiten aus dem Nutzer-Feedback
 
-Status: in Umsetzung – umgesetzt und live seit d5fab1b; ins Archiv nach dem Browser-Review live (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Branch `feedback-0022-kleinigkeiten`)
+Status: abgeschlossen, live seit 1e0ced7 (2026-10-08), mit dem Nachschliff zum Browser-Review. Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Branch `feedback-0022-kleinigkeiten`)
 Datum: 2026-10-08
 Review: **kein Plan-Review**, Nutzerentscheid „pragmatisch, ohne großen Plan“. Arch-Review nach der Umsetzung (unten). Die Gates (`pnpm check`, Budgets, Browser-Review nach dem Deploy) gelten unverändert.
 Bezug: Plan 0004/0009/0016 (Startpunkt), Plan 0011 (App-Extras, ADR 0012 Startbudget), Plan 0003 (Merkliste)
@@ -58,3 +58,12 @@ Kein Blocker.
 | m6: `appinstalled` von außen | umgesetzt: Effekt im Fuß fokussiert „Fertig“, wenn der Knopf mit dem Fokus verschwindet; ersetzt `promptThenFocus`; E2E |
 | m7: `prompt()` ohne Absicherung | `try/catch/finally`, gemeldet wird immer, kein Fehler nach außen; Unit-Test |
 | Nits | Klasse `single` und Keys entfernt (Objekt statt Tupel) |
+
+## Browser-Review live (2026-10-08)
+
+Ergebnis: **bestanden, keine Befunde** (https://zwergenplan.app/, gemeinsam mit den Plänen 0023 und 0024).
+
+Restpunkte, headless nicht prüfbar, bleiben offen:
+
+- **Installationsknopf auf Android:** Chrome liefert headless kein `beforeinstallprompt`, Knopf und Ablauf ließen sich deshalb nicht live sehen. Prüfen auf einem echten Android-Gerät mit Chrome: Knopf im Fuß des Kind-Sheets, Dialog, nach `appinstalled` Fokus auf „Fertig“.
+- **iOS-Zeile der Checkliste auf einem echten iPhone** (Safari und Home-Bildschirm-App) steht für alle drei Pläne noch aus. WebKit in Playwright deckt das nur teilweise ab.

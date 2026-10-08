@@ -6,6 +6,7 @@ import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
 import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
+import type { DateRange } from "../domain/date-range.ts";
 import {
   type Origin,
   type Reach,
@@ -439,6 +440,35 @@ export function transitSourceNote(source: TransitSource | undefined): NotePart[]
 /** Statuszeile der Karte „8 Angebote an 5 Orten“; die Zahlen getrennt, damit sie fett stehen. */
 export function mapStatusParts(offers: number, places: number): [number, string, number, string] {
   return [offers, offers === 1 ? " Angebot an " : " Angebote an ", places, places === 1 ? " Ort" : " Orten"];
+}
+
+/** „17.10.“, mit `year` „17.10.2026“ */
+function dayDot(day: string, year = false): string {
+  const { year: y, month, day: d } = parseIsoDate(day);
+  return year ? `${d}.${month}.${y}` : `${d}.${month}.`;
+}
+
+/** „vom 17.–18.10.“, „ab Sa 17.10.“, „bis So 18.10.“, „am Sa 17.10.“ (Plan 0023); ohne Zeitraum „ab heute“ */
+function rangePhrase(range: DateRange | undefined): string {
+  const { from, to } = range ?? {};
+  if (from && to) {
+    if (from === to) return `am ${shortDate(from)}`;
+    const a = parseIsoDate(from);
+    const b = parseIsoDate(to);
+    if (a.year !== b.year) return `vom ${dayDot(from, true)}–${dayDot(to, true)}`;
+    return a.month === b.month ? `vom ${a.day}.–${dayDot(to)}` : `vom ${dayDot(from)}–${dayDot(to)}`;
+  }
+  if (from) return `ab ${shortDate(from)}`;
+  if (to) return `bis ${shortDate(to)}`;
+  return "ab heute";
+}
+
+/**
+ * Statuszeile der Liste „3 Angebote vom 17.–18.10.“ (Browser-Review 0023, m1): ein ganzer Satz, denn die Zeile ist
+ * eine Live-Region. Die Zahl getrennt, damit sie fett steht.
+ */
+export function listStatusParts(count: number, range: DateRange | undefined): [number, string] {
+  return [count, ` ${count === 1 ? "Angebot" : "Angebote"} ${rangePhrase(range)}`];
 }
 
 /** Statuszeile im Tab „Anbieter“ „5 Anbieter mit 8 Angeboten“ (Plan 0010, E4); die Zahlen getrennt, fett. */

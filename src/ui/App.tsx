@@ -16,6 +16,7 @@ import {
   ageChipLabel,
   ageWarnText,
   limitHint,
+  listStatusParts,
   loadErrorText,
   mapStatusParts,
   providerStatusParts,
@@ -177,6 +178,7 @@ export function App() {
       openDetail(offer.id);
     },
   };
+  const [listCount, listWords] = listStatusParts(visible.length, route.filter.range);
   const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.map?.placeCount ?? 0);
   // „5 Anbieter mit 8 Angeboten“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4)
   const [providerCount, providersWord, providerOffers, providerOffersWord] = providerStatusParts(
@@ -298,7 +300,8 @@ export function App() {
                   </span>
                 ) : (
                   <span>
-                    <b>{visible.length}</b> {visible.length === 1 ? "Angebot" : "Angebote"} ab heute
+                    <b>{listCount}</b>
+                    {listWords}
                     {reachSuffix}
                   </span>
                 )}

@@ -41,7 +41,19 @@ const TAP_PX = 22;
  * Abstand von MapLibre. Gilt für jeden Startausschnitt gleich, hängt also an nichts Privatem (ADR 0008).
  */
 const ZOOM_CONTROL_INSET = 58;
-const START_PADDING = { top: 32, right: 32 + ZOOM_CONTROL_INSET, bottom: 32, left: 32 };
+/**
+ * Freiraum unten für die beim Öffnen ausgeschriebene Attribution (Browser-Review 0024, m4): auf schmalen Karten
+ * zwei Zeilen, 56 px hoch, 10 px Abstand von MapLibre (map-overrides.css). Sonst lägen untere Marker darunter.
+ */
+const ATTRIBUTION_INSET = 66;
+/** Rand um die Marker; reicht für Cluster (18 + 2 px) und Zahl-Badge (bis ≈ 28 px vom Mittelpunkt) */
+const MARKER_INSET = 32;
+const START_PADDING = {
+  top: MARKER_INSET,
+  right: MARKER_INSET + ZOOM_CONTROL_INSET,
+  bottom: MARKER_INSET + ATTRIBUTION_INSET,
+  left: MARKER_INSET,
+};
 
 /** Zuletzt gesehener Ausschnitt dieser Sitzung; nie in URL oder Speicher (E9). */
 let lastCamera: { center: LngLatLike; zoom: number } | undefined;
@@ -74,10 +86,11 @@ function germanLabels(map: MapLibre) {
 }
 
 /**
- * Grundkarte in App-Farben (Plan 0024, E1–E3); nach jedem `style.load`, vor den eigenen Layern. Nur Paint und
- * Sichtbarkeit, kein Request. Rein optisch: Ist ein Token kein Hex (`mixHex` wirft), bleibt die Grundkarte von
+ * Grundkarte in App-Farben (Plan 0024, E1–E3); nach jedem `style.load`, vor den eigenen Layern. Nur Paint,
+ * Sichtbarkeit sowie Layout und Filter der Beschriftung (Browser-Review 0024, m3), kein Request. Rein optisch: Ist ein Token kein Hex (`mixHex` wirft), bleibt die Grundkarte von
  * OpenFreeMap, statt die Karte in den Fehlerzustand zu schicken. Einen Wert, den MapLibre ablehnt, meldet es als
- * `error`-Ereignis; vor `load` zeigte das den Kachel-Hinweis. Die Werte sind Hex-Farben (basemap.test.ts, E2E).
+ * `error`-Ereignis; vor `load` zeigte das den Kachel-Hinweis. Die Werte sind Hex-Farben (basemap.test.ts, E2E);
+ * Layout und Filter gegen die echten OpenFreeMap-Stile mit `validateStyleMin` geprüft (2026-10-08).
  */
 function tintBasemap(map: MapLibre, tokens: MapTokens, dark: boolean) {
   let palette: ReturnType<typeof basemapPalette>;
@@ -94,6 +107,14 @@ function tintBasemap(map: MapLibre, tokens: MapTokens, dark: boolean) {
     for (const name of BASEMAP_PAINT) {
       const color = change.paint[name];
       if (color) map.setPaintProperty(change.id, name, color);
+    }
+    // `undefined` setzt auf den Standard zurück: durchgezogen
+    if (change.solid) map.setPaintProperty(change.id, "line-dasharray", undefined);
+    if (change.mixedCase) map.setLayoutProperty(change.id, "text-transform", "none");
+    if (change.street) {
+      map.setLayoutProperty(change.id, "text-transform", change.street.layout["text-transform"]);
+      map.setLayoutProperty(change.id, "text-size", change.street.layout["text-size"]);
+      if (change.street.filter) map.setFilter(change.id, change.street.filter);
     }
   }
 }

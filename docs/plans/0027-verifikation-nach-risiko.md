@@ -681,7 +681,7 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
   |---|---|
   | 0015, 0018 | freigegeben, nicht umgesetzt |
   | 0017 | live, aber Nutzerentscheid zu den Mittel-Befunden und Geräteprüfung offen |
-  | 0022–0024 | live; Archiv nach dem Browser-Review-OK des Orchestrators, als kleiner Folge-Commit |
+  | 0022–0024 | live; archiviert nach dem Browser-Review-OK des Orchestrators im Merge mit `main` `1e0ced7` (Nachschliff), live seit `1e0ced7` (2026-10-08). Die Restpunkte Android-Installationsknopf, iPhone und Marker-Kategorie stehen in `docs/ideas.md`, die drei Pfadverweise in 0025 zeigen ins Archiv. |
   | 0025, 0026 | freigegeben, nicht umgesetzt |
   | 0027 | dieser Plan |
 

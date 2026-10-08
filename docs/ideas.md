@@ -106,4 +106,8 @@ Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Ein
 - **Plan 0012** (Browser-Review live, „Offene Gerätepunkte“): Mit VoiceOver und TalkBack prüfen, ob „mit U2, dann Bus 61“ als eine Ansage gelesen und der Pfeil übersprungen wird.
 - **Plan 0019** (E8, Review 1 M3): die Gerätematrix für den Sprung aus der installierten App nach Google Maps (Nutzer).
 - **Plan 0021** (Offene Punkte): Wünscht der Nutzer, dass das Abwählen von „nur altersgerecht“ dauerhaft gespeichert wird, ändert sich nur E1.
-- Plan 0002, 0013, 0014, 0016 und 0020 haben keine Restpunkte.
+- **Plan 0022** (Browser-Review live 2026-10-08), gilt auch für 0023 und 0024:
+  - **Installationsknopf auf einem echten Android-Gerät mit Chrome prüfen:** Knopf im Fuß des Kind-Sheets, Dialog, nach `appinstalled` Fokus auf „Fertig“. Headless liefert Chrome kein `beforeinstallprompt`.
+  - **iOS-Zeile der Checkliste auf einem echten iPhone abarbeiten** (Safari und Home-Bildschirm-App). Playwright-WebKit deckt das nur teilweise ab.
+- **Plan 0024** (Offene Fragen): Soll ein gewählter Kategoriefilter die Marker-Kategorie bestimmen (wie `leadCategory` mit `focus`)? Heute zählt nur die Häufigkeit.
+- Plan 0002, 0013, 0014, 0016, 0020 und 0023 haben darüber hinaus keine Restpunkte.
