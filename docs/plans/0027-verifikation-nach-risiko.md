@@ -364,6 +364,25 @@ Warum diese Grenze trägt:
   - ADR 0002 bekommt einen Verweis auf ADR 0021, Teil B (Etappe 7).
   - Der Status von ADR 0021 hat zwei feste Zeitpunkte: Teil A gilt als angenommen mit Etappe 5, Teil B mit Etappe 7.
 
+### E13 – CI beobachten, ohne das API-Limit zu reißen (Nachtrag 2026-10-08)
+
+**Befund:** Am 2026-10-08 ist das Rate-Limit der GitHub-API gerissen, das primäre wie das sekundäre.
+- `gh run watch` fragt standardmäßig alle 3 s Lauf und Jobs ab. Das sind etwa 2 400 Anfragen pro Stunde je Watch.
+- Mehrere Watches liefen parallel, vom Orchestrator und von Agents, alle über dasselbe Token. Das Limit liegt bei 5 000 Anfragen pro Stunde.
+- Folge: `gh` antwortete mit „HTTP 403: API rate limit exceeded“, auch für Abfragen, die nichts mit dem Beobachten zu tun hatten.
+
+**Regel:**
+1. **Wer beobachtet:** nur der Orchestrator bzw. die Haupt-Session. Subagents beobachten die CI nicht. Sie pushen und berichten.
+2. **Wie:** `gh run watch <id> -i 120 --exit-status` oder einzelne `gh run view <id>` mit mindestens 2 min Abstand. Nie in einer Schleife ohne Pause.
+3. **Deploy prüfen ohne API:** `curl -s https://zwergenplan.app/data/meta.json` und das Feld `commit` mit `git rev-parse --short HEAD` vergleichen. Der Skill `babyevents-nuernberg` macht es schon so (Schritt 5, „Fertig, wenn …“).
+4. **Folgen für E10:** Der Job `scope` fragt die API höchstens zweimal je Lauf ab (Deployments und Statuses bzw. die Läufe von `before`), mit dem `GITHUB_TOKEN` des Laufs, nicht mit dem Token der Sessions. Das Limit der Sessions berührt das nicht.
+
+**Betroffene Stellen** (Etappe 5):
+- `CLAUDE.md:17`, Arbeitsweise, Schritt 6: „(`gh run watch`)“ wird zu „(`gh run watch <id> -i 120 --exit-status`, nur die Haupt-Session; Subagents beobachten die CI nicht)“. Für „Live zeigt den neuen Stand“ kommt der Weg über `meta.json` dazu.
+- `.claude/skills/babyevents-nuernberg/SKILL.md:73, 78`: `gh run watch` → `gh run watch <id> -i 120 --exit-status`. Läuft der Skill als Subagent, beobachtet er die CI nicht und meldet stattdessen SHA und Lauf-ID.
+- `.claude/skills/browser-review/SKILL.md`: nutzt keine `gh`-Abfragen. Ergänzt wird nur, dass `live` erst nach dem Deploy sinnvoll ist, geprüft über `meta.json.commit`.
+- `.claude/agents/*.md`: haben keine Bash-Rechte, sind also nicht betroffen.
+
 ## Tests (wie das Harness selbst getestet wird)
 
 Für die reinen Module zuerst die Tests. Für jedes Gate gibt es einen Kanarienvogel (ADR 0004).
@@ -492,6 +511,7 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
    Fertig, wenn K5 und K6 belegt sind und die CI grün ist. Summe aus passed, skipped und flaky über alle Jobs = 2 422.
 5. **Doku** (E12):
    - CLAUDE.md, Skills und Agents. `browser-review` nutzt `free-ports.ts`.
+   - Regel zum Beobachten der CI aus E13: in `CLAUDE.md` (Schritt 6, mit Intervall) und im Skill `babyevents-nuernberg`, dazu der Hinweis in `browser-review`.
    - ADR 0004, Nachtrag. ADR 0021, Teil A, auf „angenommen“.
    - `docs/ideas.md`: SHA-Wiederverwendung, lefthook im Worktree, 5. Chromium-Shard.
 
@@ -520,6 +540,30 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
    - ADR 0021, Teil B, auf „angenommen“; Verweis in ADR 0002.
 
    Fertig, wenn K9 mit verlinkten Läufen belegt ist.
+
+## Ergebnis
+
+### Etappe 1 (Branch `harness-0027-e1`, `72fab74`)
+
+| Messung | vorher | nachher |
+|---|---|---|
+| `check:fast`, lokal (16 Kerne) | 5,3 s bei Last 2,9, 8 Schritte | 5,7 s bei Last 5,6, 10 Schritte (mit knip und Schema-Drift) |
+| pre-commit (lefthook, gesamt) | 5,6 s | 6,1 s |
+| CI, `check:fast` im Job „Statische Gates“ | 9 s, dazu knip < 4 s und Schema-Drift als eigene Schritte (Lauf 37474075714) | nach dem ersten Lauf auf `main` eintragen |
+| `profile-csa`, 12 Endlosschleifen auf CPU 0, Vitest auf demselben Kern | 2× „Test timed out in 5000ms“ (Stand `origin/main`) | grün |
+
+- K4: Eine Leerzeile im Lockfile ergibt „node_modules passt nicht zu pnpm-lock.yaml …“ mit Exit 1, ohne einen einzigen Schritt.
+- K8: siehe die Zeile `profile-csa` in der Tabelle.
+
+### Etappe 2 (Branch `harness-0027-e2`, `821018d`)
+
+- `check:fast` mit 11 Schritten (dazu Doku): 5,9 s bei Last 1,0.
+- `check-docs` auf dem Repo: 0,15 s, grün, 402 Dateien.
+- K1: Ein Doku-Commit mit totem Pfadverweis ist im pre-commit nach **0,29 s** rot. Vorher lief `check:fast` mit 5,6 s.
+- K2: Doku plus ein Typfehler in `src/domain/age.ts` ergibt Stufe C, „Typen“ ist rot.
+- K3: `neu/x.txt` ergibt „Stufe C (neu/x.txt, Index)“.
+- Kanarienvogel für „Doku liest niemand“: `readdirSync(...).endsWith(".md")` in `scripts/icons.ts` macht den Test rot.
+- **Abweichung vom Plan:** Test 3 (`check-docs`) arbeitet mit einem Repo im Speicher statt mit `tests/fixtures/docs/`. Das ist einfacher und braucht keine Fixture-Ausnahme. Die Ausnahme für `tests/fixtures/docs/` bleibt trotzdem in `check-docs.ts`. `*.test.ts` sind von Regel 4 ausgenommen, weil Tests Pfade als Testdaten nennen.
 
 ## Entschieden (Nutzer, 2026-10-08)
 

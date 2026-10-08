@@ -35,18 +35,19 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
    - Lokal läuft Playwright mit 25 % der Kerne als Worker.
    - Ein `globalSetup` bricht lokale Läufe ohne Sperre ab. Beim Laden der Konfiguration wirft es nicht, damit knip und `--list` weiter funktionieren.
    - Die volle Suite fährt kein Agent lokal.
-6. **Lange Unit-Tests.** Ein CPU-gebundener Unit-Test über 1 s bekommt ein eigenes, begründetes Zeitlimit. Die globale Grenze bleibt.
+6. **Lange Unit-Tests.** Ein CPU-gebundener Unit-Test, der ohne Last länger als 1 s läuft, bekommt ein eigenes Zeitlimit mit Begründung im Code. Vorbild ist `REFERENCE_TIMEOUT_MS = 30_000` in `scripts/transit/profile-csa.test.ts`: Der Test prüft Gleichheit, nicht Tempo, und lief ohne Last 1,6 s, unter Last über 5 s. Die globale Grenze von 5 s bleibt, damit Hänger in den übrigen Tests (alle unter 230 ms) auffallen.
+7. **CI beobachten** (Plan 0027, E13): nur die Haupt-Session, mit `gh run watch <id> -i 120` oder `gh run view` im Abstand von mindestens 2 min. Den Deploy prüft man ohne API über `https://zwergenplan.app/data/meta.json` (`commit`). Anlass: Am 2026-10-08 haben parallele Watches mit dem Standardintervall von 3 s das API-Limit von 5 000 Anfragen pro Stunde gerissen.
 
 ### Teil B: CI-Doku-Pfad
 
-7. **Der Job `scope` entscheidet `full`.**
+8. **Der Job `scope` entscheidet `full`.**
    - Auf `main` gilt `full=false` nur, wenn der live ausgelieferte Commit ein Vorfahre ist und der Diff von dort bis zum Push nur Stufe 0 enthält. Den Live-Commit liefert die Deployments-API von GitHub: der volle SHA (40 Hex-Zeichen) des neuesten Deployments in `github-pages` mit Status `success`. `https://zwergenplan.app/data/meta.json` scheidet dafür aus, weil es nur einen Kurz-SHA oder `"unbekannt"` enthält und aus einem CDN-Cache kommen kann.
    - Auf anderen Branches gilt `full=false` nur, wenn der Vorgänger einen grünen Lauf mit `event: push` auf derselben Ref hat und der Diff nur Stufe 0 enthält.
    - In jedem anderen Fall gilt `full=true`, auch wenn eine Abfrage fehlschlägt, bei neuen Branches, bei Pull Requests und bei `workflow_dispatch`. Ein Fehler in `scope` macht den Lauf nie rot, er führt nur zu `full=true`. Der Job `scope` braucht die Rechte `contents: read`, `actions: read` und `deployments: read`.
-8. **Bei `full=false`** laufen nur `scope`, `check` und `gates`, ohne E2E, Smoke und Deploy.
+9. **Bei `full=false`** laufen nur `scope`, `check` und `gates`, ohne E2E, Smoke und Deploy.
    - `gates` läuft mit `!cancelled()` und prüft alle Ergebnisse.
    - `deploy` hängt an `gates` und `scope` und läuft nur bei `full == 'true'`.
-9. **Garantie.**
+10. **Garantie.**
    - Jeder ausgelieferte Stand ist voll grün geprüft.
    - Ein Stand auf `main` ohne vollen Lauf unterscheidet sich vom ausgelieferten, voll geprüften Stand nur in Dateien, die kein Build, kein Test und kein Skript liest. Er führt also keinen neuen roten Befund ein.
    - Dass `origin/main` immer grün ist, behauptet das ADR nicht. Das war schon vorher nicht so: Am 2026-10-05 war `main` dreimal rot.
