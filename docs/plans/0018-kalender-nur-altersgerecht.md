@@ -1,6 +1,6 @@
 # Plan 0018 – Kalender-Export regelmäßiger Termine nur, solange das Alter passt
 
-Status: freigegeben nach Plan-Review (3 Durchgänge, zuletzt „Freigeben mit Auflagen“, eingearbeitet); Schritt 0 erledigt (Fall A, 2026-10-06). Umsetzung beginnt, sobald das Budget 100 kB aus Plan 0019 auf `main` ist.
+Status: in Umsetzung seit 2026-10-08 (Branch `kalender-alter-0018`); freigegeben nach Plan-Review (3 Durchgänge, zuletzt „Freigeben mit Auflagen“, eingearbeitet); Schritt 0 erledigt (Fall A, 2026-10-06). Das Budget 100 kB aus Plan 0019 ist auf `main` (zuletzt 94,4 kB).
 Datum: 2026-10-06
 
 (ADR 0003 Datenmodell und ICS, ADR 0007 Merklisten-ICS im Browser, ADR 0012 Startbudget mit Nachtrag aus Plan 0019 (100 kB), Plan 0003 Risiko „iOS und Blob“, Plan 0010 E8 A Export-Chunk, Plan 0015 E2 Datenhorizont 12 Monate; neu: ADR-Entwurf 0018.)
@@ -203,6 +203,23 @@ Formatiert in `src/ui/format.ts` mit den vorhandenen Helfern (`plural`, Datum oh
 - **R1 – Download aus dem Dialog auf iOS:** In der Merkliste belegt, im Detail nicht. Schritt 6 prüft das, der Ausweg ist benannt.
 - **R2 – Uhr und Zeitzone:** Das Alter zählt nach Berliner Kalendertag. Die Grenztag-Tests laufen in `America/Los_Angeles`.
 - **R3 – Budget nicht auf `main`:** Die Umsetzung beginnt erst, wenn Plan 0019 (Budget 100 kB) auf `main` ist. Dann wird neu gemessen (Plan 0017 Wochen-Push und Plan 0011 Stufe 2 brauchen ebenfalls Platz).
+
+## Umsetzung (2026-10-08)
+
+Basis `5701141`. `JS (initial)` vorher 94,41 kB von 100 kB, Export-Chunk 1,15 kB von 2 kB.
+
+- **Abweichung durch spätere Pläne:** Seit Plan 0022 heißt es unter dem Merklisten-Knopf „N gemerkt“ statt „N Sticker“. Die Texte aus E3 gelten mit „gemerkt“, z. B. „2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter“.
+- **Schritt 1:** `exportSessions`/`seriesExport` in `src/domain/saved.ts`, `seriesToast`/`collectionToast`/`ageWindowLabel` in `src/ui/format.ts`. Die Fixture-Zahlen aus Schritt 4 (2 / 3 / 0 / 4 / 8) stimmen. Der Gegenleser `design:ux-copy` hat die Toasts ohne Änderung bestätigt.
+- **Schritt 2:** `src/ui/ics-export.ts` ist der einzige Lader. Der Chunk bleibt unter `assets/export/`, weil `vite.config.ts` ihn nach dem Modulpfad `src/domain/ics.ts` zuordnet. Kanarienvögel, je temporär eingefügt und zurückgenommen:
+
+  | Eingriff | `pnpm arch` |
+  |---|---|
+  | statischer Import von `../domain/ics.ts` in `ics-export.ts` | rot: `ics-only-lazy` |
+  | dasselbe, `ics-only-lazy` vorübergehend aus | rot: `lazy-loader-static` (`LAZY_LOADERS`) |
+  | `import("../domain/ics.ts")` aus `SavedView.tsx` | rot: `ics-entry-only` |
+  | `import type * as Ics from "../domain/ics.ts"` im Lader | rot: `ics-only-lazy` |
+
+- **Offen für den Browser-Review:** Die Alterszeile nennt den Bezugstermin aus `ageCheck`, beim Fall „zu jung“ ist das der erste passende Termin. Mit Zusatz steht dort z. B. „Passt: am Mi 21.10. 6 Monate alt · passt ab 21.10.“, also das Datum doppelt. Umgesetzt wie in E4. Der `/browser-review` entscheidet, ob der Text nachgeschärft wird.
 
 ## Review (2026-10-06) – Verdict: Überarbeiten (1. Durchgang)
 
