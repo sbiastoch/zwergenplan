@@ -421,7 +421,9 @@ const MATRIX: Record<MatrixState, { title: string; project?: string; expect: (pa
   angebot: {
     title: "Browser bietet die Installation an: Knopf und Push-Teil",
     expect: async (page) => {
-      await expect(section(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" })).toBeVisible();
+      // Plan 0022: Der Knopf steht im Fuß des Kind-Sheets über „Fertig“, nicht mehr im Abschnitt
+      const sheetFoot = page.getByRole("dialog", { name: "Kind und Einstellungen" }).locator(".sheetfoot");
+      await expect(sheetFoot.getByRole("button", { name: "Zum Startbildschirm hinzufügen" })).toBeVisible();
       await expect(pushSwitch(page)).toBeVisible();
     },
   },

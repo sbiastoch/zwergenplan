@@ -1,4 +1,4 @@
-/** Merkliste „Mein Stickerheft“ (Plan 0003, E12) mit Sammel-ICS aus dem Browser (ADR 0007). */
+/** „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007). */
 import { nextSession } from "../domain/agenda.ts";
 import type { CollectionItem, IcsContext, IcsSource } from "../domain/ics-types.ts";
 import { collectionSessions } from "../domain/saved.ts";
@@ -89,9 +89,9 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
 
   return (
     <>
-      <h2 className="ptitle">Mein Stickerheft</h2>
+      <h2 className="ptitle">Meine Merkliste</h2>
       {offers.length === 0 ? (
-        <EmptyState icon="heart" title="Hier klebt noch nichts">
+        <EmptyState icon="heart" title="Noch nichts gemerkt">
           Tipp auf das Herz bei einem Angebot. Hier sammelst du deine Favoriten und holst sie mit einem Tipp in deinen
           Kalender.
           <br />
@@ -106,8 +106,8 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
             Alle in den Kalender
           </button>
           <p className="small">
-            {plural(offers.length, "Sticker", "Sticker")} · {plural(sessionCount, "Termin", "Termine")} in einer
-            .ics-Datei · Kurse immer komplett
+            {offers.length} gemerkt · {plural(sessionCount, "Termin", "Termine")} in einer .ics-Datei · Kurse immer
+            komplett
           </p>
           {offers.map((offer) => {
             const session = nextSession(offer, ctx.now);

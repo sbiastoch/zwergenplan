@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 
 test("Leerzustand führt zurück zum Entdecken", async ({ page }) => {
   await page.getByRole("button", { name: /^Merkliste/ }).click();
-  await expect(page.getByText("Hier klebt noch nichts")).toBeVisible();
+  await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();
   await page.getByRole("button", { name: "Angebote entdecken" }).click();
   await expect(page.getByTestId("offer").first()).toBeVisible();
 });
@@ -22,20 +22,20 @@ test("Herz merkt, Badge zählt, Merkliste überlebt das Neuladen und steht nicht
     "aria-pressed",
     "true",
   );
-  await expect(page.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toBeVisible();
+  await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
   await page.getByRole("button", { name: `${PEKIP} merken` }).click();
   await expect(page.getByRole("button", { name: /^Merkliste/ })).toContainText("2");
 
   await page.reload();
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   await expect(page).toHaveURL(/ansicht=merkliste$/);
-  await expect(page.getByRole("heading", { level: 2, name: "Mein Stickerheft" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Meine Merkliste" })).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(2);
   await expect(page.getByTestId("offer").first()).toContainText("Mi 7.10. · 10:00 Uhr");
-  await expect(page.getByText("2 Sticker · 13 Termine in einer .ics-Datei")).toBeVisible();
+  await expect(page.getByText("2 gemerkt · 13 Termine in einer .ics-Datei")).toBeVisible();
 
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await expect(page.getByText("Sticker abgelöst – nicht mehr gemerkt")).toBeVisible();
+  await expect(page.getByText("Nicht mehr gemerkt")).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(1);
 });
 
