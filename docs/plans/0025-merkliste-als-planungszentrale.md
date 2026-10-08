@@ -1,6 +1,6 @@
 # Plan 0025 – Merkliste als Planungszentrale: Anbieter merken, Karte, Kalender, Filter
 
-Status: Review eingearbeitet, wartet auf Nutzerentscheide N2–N6
+Status: freigegeben (Review eingearbeitet, Nutzerentscheide getroffen)
 Datum: 2026-10-08
 Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
 Abhängigkeiten (parallel in Arbeit, beim Schreiben nicht gepusht, geplant gegen die Beschreibung):
@@ -781,6 +781,15 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 
 ## Offene Punkte (Nutzerentscheid)
 
+**Entschieden (Nutzer, 2026-10-08):** Alle Empfehlungen sind angenommen.
+- N2: nein, die Karte zeigt nur Orte gemerkter Angebote.
+- N3: nein, der Export nimmt weiter alle gemerkten Angebote.
+- N4: vorerst keine weiteren Filter.
+- N5: Reißt das Budget, wird zuerst die Grenze geprüft, erst danach ein Lazy-Chunk geplant.
+- N6: Die Woche bleibt Mo–So.
+
+Die Punkte unten bleiben zur Nachvollziehbarkeit stehen.
+
 - **N1 – Angebote gemerkter Anbieter in der Merkliste?** Das Review hat entschieden: aus dem Plan genommen, steht als Idee in `docs/ideas.md` (E13). Wer es später will, schreibt einen eigenen Plan.
 - **N2 – Orte gemerkter Anbieter auf der Karte?**
   - Ohne N1 gibt es Anbieter-Orte nur für Anbieter mit kommenden Angeboten, und das sind dann nicht gemerkte Angebote.
@@ -845,4 +854,4 @@ Abgelehnt wurde nichts.
 
 ## Status
 
-Review eingearbeitet, wartet auf die Nutzerentscheide N2–N6. Danach beginnt Etappe 1 (nach dem Merge von Plan 0022).
+Freigegeben (Review eingearbeitet, Nutzerentscheide vom 2026-10-08 getroffen). Etappe 1 beginnt nach dem Merge von Plan 0022.
