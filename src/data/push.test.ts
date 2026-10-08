@@ -244,7 +244,11 @@ describe("mirror", () => {
       writes.push(key);
       await set(key, value);
     };
+    f.setSub("https://web.push.apple.com/a");
+    f.store.set("endpoint", "https://web.push.apple.com/a");
     const push = createPush(f.env);
+    await push.reconcile({ birthDate: undefined, searches: null, origin: undefined });
+    writes.length = 0;
     await push.mirror(DATA);
     expect(writes.sort()).toEqual(["birthDate", "origin", "searches"]);
     writes.length = 0;
@@ -254,6 +258,67 @@ describe("mirror", () => {
     expect(writes.sort()).toEqual(["birthDate", "origin"]);
     expect(f.store.has("birthDate")).toBe(false);
     expect(f.store.get("origin")).toEqual({ source: "standort", lat: 49.452, lon: 11.077 });
+  });
+});
+
+describe("mirror nach dem Ausschalten (E6: geleert heißt geleert)", () => {
+  it("schreibt nichts, solange kein Abgleich oder Einschalten Push als an bestätigt hat", async () => {
+    const f = fake();
+    await createPush(f.env).mirror(DATA);
+    expect(f.store.size).toBe(0);
+  });
+
+  it("ein Spiegeln, das während des Leerens startet, füllt den Speicher nicht wieder", async () => {
+    const f = fake();
+    const push = createPush(f.env);
+    await push.enable(DATA);
+    const clear = f.env.store.clear;
+    let late: Promise<void> | undefined;
+    f.env.store.clear = async () => {
+      // Ein Rendern mit noch eingeschaltetem Schalter, während das Leeren läuft (CI-Lauf 37765545767)
+      late = push.mirror({ ...DATA, origin: "st-johannis" });
+      await clear();
+    };
+    await push.disable();
+    await late;
+    expect(f.store.size).toBe(0);
+  });
+
+  it("ein Spiegeln, das vor dem Ausschalten begann, schreibt danach keine weiteren Schlüssel", async () => {
+    const f = fake();
+    const push = createPush(f.env);
+    await push.enable(DATA);
+    const set = f.env.store.set;
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    // wie IndexedDB: Der Auftrag steht sofort in der Reihe, die Bestätigung kommt erst nach dem Leeren
+    f.env.store.set = async (key, value) => {
+      await set(key, value);
+      await gate;
+    };
+    const clear = f.env.store.clear;
+    f.env.store.clear = async () => {
+      await clear();
+      release();
+    };
+    const inFlight = push.mirror({ birthDate: undefined, searches: '["kat=natur"]', origin: "st-johannis" });
+    await push.disable();
+    await inFlight;
+    expect(f.store.size).toBe(0);
+  });
+
+  it("nach erneutem Einschalten spiegelt es wieder", async () => {
+    const f = fake();
+    const push = createPush(f.env);
+    await push.enable(DATA);
+    await push.disable();
+    await push.mirror(DATA);
+    expect(f.store.size).toBe(0);
+    await push.enable(DATA);
+    await push.mirror({ ...DATA, origin: "st-johannis" });
+    expect(f.store.get("origin")).toBe("st-johannis");
   });
 });
 
