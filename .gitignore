@@ -5,6 +5,10 @@ coverage/
 # generiert von scripts/build-data.ts
 public/data/
 public/ics/
+# generiert von scripts/build-data.ts (Plan 0026)
+public/angebot/
+public/anbieter/
+public/404.html
 # Playwright
 test-results/
 playwright-report/

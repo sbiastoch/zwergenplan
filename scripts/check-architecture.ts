@@ -56,8 +56,9 @@ const LAZY_LOADERS: Array<[file: string, target: string]> = [
   ["src/ui/MapPanel.tsx", "./karte/"],
   ["src/ui/karte/MapScreen.tsx", "../map/"],
   ["src/ui/use-transit.ts", "../domain/transit.ts"],
-  // ICS-Code der Merkliste (Plan 0010, E8 A); mit Endung, damit es nicht `../domain/ics-paths.ts` trifft
-  ["src/ui/SavedView.tsx", "../domain/ics.ts"],
+  // ICS-Code der Merkliste und gekürzter Reihen (Plan 0010, E8 A; Plan 0018); mit Endung, damit es nicht
+  // `../domain/ics-paths.ts` oder `../domain/ics-types.ts` trifft
+  ["src/ui/ics-export.ts", "../domain/ics.ts"],
   // Anbieterübersicht (Plan 0010, E7)
   ["src/ui/ProviderPanel.tsx", "./anbieter/"],
   // PWA-Kern nach `load` (Plan 0011, E5); mit Endung, damit es nicht `./pwa-start.ts` trifft

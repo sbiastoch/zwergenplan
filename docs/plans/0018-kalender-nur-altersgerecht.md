@@ -1,6 +1,6 @@
 # Plan 0018 – Kalender-Export regelmäßiger Termine nur, solange das Alter passt
 
-Status: freigegeben nach Plan-Review (3 Durchgänge, zuletzt „Freigeben mit Auflagen“, eingearbeitet); Schritt 0 erledigt (Fall A, 2026-10-06). Umsetzung beginnt, sobald das Budget 100 kB aus Plan 0019 auf `main` ist.
+Status: in Umsetzung seit 2026-10-08 (Branch `kalender-alter-0018`); freigegeben nach Plan-Review (3 Durchgänge, zuletzt „Freigeben mit Auflagen“, eingearbeitet); Schritt 0 erledigt (Fall A, 2026-10-06). Das Budget 100 kB aus Plan 0019 ist auf `main` (zuletzt 94,4 kB).
 Datum: 2026-10-06
 
 (ADR 0003 Datenmodell und ICS, ADR 0007 Merklisten-ICS im Browser, ADR 0012 Startbudget mit Nachtrag aus Plan 0019 (100 kB), Plan 0003 Risiko „iOS und Blob“, Plan 0010 E8 A Export-Chunk, Plan 0015 E2 Datenhorizont 12 Monate; neu: ADR-Entwurf 0018.)
@@ -203,6 +203,40 @@ Formatiert in `src/ui/format.ts` mit den vorhandenen Helfern (`plural`, Datum oh
 - **R1 – Download aus dem Dialog auf iOS:** In der Merkliste belegt, im Detail nicht. Schritt 6 prüft das, der Ausweg ist benannt.
 - **R2 – Uhr und Zeitzone:** Das Alter zählt nach Berliner Kalendertag. Die Grenztag-Tests laufen in `America/Los_Angeles`.
 - **R3 – Budget nicht auf `main`:** Die Umsetzung beginnt erst, wenn Plan 0019 (Budget 100 kB) auf `main` ist. Dann wird neu gemessen (Plan 0017 Wochen-Push und Plan 0011 Stufe 2 brauchen ebenfalls Platz).
+
+## Umsetzung (2026-10-08)
+
+Basis `5701141`. `JS (initial)` vorher 94,41 kB von 100 kB, Export-Chunk 1,15 kB von 2 kB.
+
+- **Abweichung durch spätere Pläne:** Seit Plan 0022 heißt es unter dem Merklisten-Knopf „N gemerkt“ statt „N Sticker“. Die Texte aus E3 gelten mit „gemerkt“, z. B. „2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter“.
+- **Schritt 1:** `exportSessions`/`seriesExport` in `src/domain/saved.ts`, `seriesToast`/`collectionToast`/`ageWindowLabel` in `src/ui/format.ts`. Die Fixture-Zahlen aus Schritt 4 (2 / 3 / 0 / 4 / 8) stimmen. Der Gegenleser `design:ux-copy` hat die Toasts ohne Änderung bestätigt.
+- **Schritt 2:** `src/ui/ics-export.ts` ist der einzige Lader. Der Chunk bleibt unter `assets/export/`, weil `vite.config.ts` ihn nach dem Modulpfad `src/domain/ics.ts` zuordnet. Kanarienvögel, je temporär eingefügt und zurückgenommen:
+
+  | Eingriff | `pnpm arch` |
+  |---|---|
+  | statischer Import von `../domain/ics.ts` in `ics-export.ts` | rot: `ics-only-lazy` |
+  | dasselbe, `ics-only-lazy` vorübergehend aus | rot: `lazy-loader-static` (`LAZY_LOADERS`) |
+  | `import("../domain/ics.ts")` aus `SavedView.tsx` | rot: `ics-entry-only` |
+  | `import type * as Ics from "../domain/ics.ts"` im Lader | rot: `ics-only-lazy` |
+
+- **Schritt 3:**
+  - `say(message, ms?)` mit `LONG_TOAST_MS = 6000` in `src/ui/use-app-state.ts`, mit Unit-Test. 6 s stehen die Toasts mit `from`/`until`, mit fehlenden Angeboten und die beiden „nichts passt“. „Export gerade nicht möglich – …“ bleibt bei 2,8 s wie bisher. Der Text liegt als `EXPORT_UNAVAILABLE` in `format.ts`, Detail und Merkliste teilen ihn.
+  - Merkliste: Auswahl und Zählung macht `collectionExport` in `saved.ts` (unit-getestet), den Text unter dem Knopf `savedExportNote` in `format.ts`. `collectionSessions` ist entfernt. Der Test, der beide verglich, prüft jetzt gegen ein Orakel im Test (Kurs → alle Termine, sonst `upcomingSessions`).
+  - Detail: Ein Handler `onSeries` bedient beide Knöpfe (`.two` und `wide`), für Kurse und Einzeltermine liefert `seriesExport` `static`. `generatedAt` ist in `Overlays` `string | undefined`, solange `site.json` lädt. Ohne ihn läuft der statische Link.
+  - Für Plan 0025, E9: Statt eines neuen `exportNote(savedCount, sessionCount, filtered)` bekommt `savedExportNote(saved, sessions, byAge)` den Merklisten-Filter dazu.
+- **Schritt 4:** E2E auf `pixel-7`. Die Zahlen stimmen mit der Fixture: Detail 2 / 3 / 4 / kein Download, ohne Geburtsdatum die statische Datei mit 5; Merkliste 10 / kein Download / 4.
+  - Zusätzlich geprüft: Blob-Weg und „keiner passt“ lösen keinen Request auf `ics/` aus (ADR 0018). Dateiname und VEVENTs samt Titel und `DTSTAMP` sind die der statischen Datei, nicht nur die UIDs. Die langen Toasts (Detail gekürzt, Merkliste mit fehlendem Angebot) stehen nach 5,5 s noch und sind nach 6,5 s weg.
+  - Kanarienvögel, je temporär: ohne `LONG_TOAST_MS` im Detail und mit `birthDate` `undefined` in der Merkliste wurden die betroffenen Tests rot.
+  - Mobile-UX: Ansichten `merkliste-mit-geburtsdatum` und `detail-mit-geburtsdatum`. Dazu kommen die längsten Toasts bei 320 px, je bei 100 % und 200 %: im Detail „… bis 14.10., danach passt es nicht mehr zum Alter“ (87 Zeichen), in der Merkliste „… – 1 Angebot passt nicht zum Alter“. Den Fall „vom … bis …“ hat die Fixture nicht, er ist mit 82 Zeichen kürzer.
+- **Schritt 5 (Budget):** `JS (initial)` 94,412 → 95,260 kB (+0,848 kB) von 100 kB, Export-Chunk 1,151 → 1,152 kB, eingetragen in ADR 0012. Geschätzt waren +0,3 kB. Nach Schritt 2 waren es +0,026 kB, die Domäne aus Schritt 1 war bis zur UI ungenutzt und fiel weg. Die Sourcemap ordnet die minifizierten Zeichen so zu: `format.ts` +0,98 kB (vor allem die Texte), `saved.ts` +0,60, `DetailDialog.tsx` +0,39, `ics-paths.ts` +0,03, `use-app-state.ts` +0,03, `SavedView.tsx` −0,13 kB. `VCALENDAR`/`VEVENT` stehen nur im Export-Chunk, aus `ics.ts` ist also nichts in den Start gerutscht. Nach dem Merge mit Plan 0026, Stufe 1 (`ca60ec9`, 95,33 kB): 96,157 kB, also +0,83 kB.
+- **Schritt 6, `/arch-review`:** Verdict OK, kein Blocker, kein Major. Die sieben Minors sind eingearbeitet:
+  - Ohne `generatedAt` fällt das Detail nicht mehr still auf die ungekürzte statische Datei zurück, sondern meldet `EXPORT_UNAVAILABLE` (ADR 0018).
+  - Bei „keiner passt“ (Detail) und „nichts passt“ (Merkliste) wird der Export-Chunk trotzdem angefordert, damit sein Request nichts über das Alter verrät (ADR 0018, Konsequenzen).
+  - Neuer E2E-Test für den Fehlerzweig im Detail: Chunk nicht ladbar → Toast, kein Download, kein Request auf `ics/`.
+  - `seriesIcsFileName` in `src/domain/ics-paths.ts` mit Unit-Test, der statische Toast nutzt `calendarLoaded` aus `format.ts`.
+  - ADR 0018 angenommen. Doku-Drift nachgezogen: `docs/architecture.md` (`collectionExport`), Kommentare in `ics.ts` und `saved.ts`, Kommentar am Knopf „Alle Termine“, ADR 0003 (Statuszeile), Plan 0025 (Nachtrag in „Ausgangslage“).
+  - Nicht geändert: der Kommentar in `vite.config.ts:36` („Merkliste“). Eine Änderung dort löst die E2E-Pflicht für die Vite-Konfiguration aus, für einen Kommentar lohnt das nicht. Restpunkt fürs Archivieren (`docs/ideas.md`).
+- **Offen für den Browser-Review:** Die Alterszeile nennt den Bezugstermin aus `ageCheck`, beim Fall „zu jung“ ist das der erste passende Termin. Mit Zusatz steht dort z. B. „Passt: am Mi 21.10. 6 Monate alt · passt ab 21.10.“, also das Datum doppelt. Umgesetzt wie in E4. Der `/browser-review` entscheidet, ob der Text nachgeschärft wird.
 
 ## Review (2026-10-06) – Verdict: Überarbeiten (1. Durchgang)
 

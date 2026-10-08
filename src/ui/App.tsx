@@ -19,18 +19,20 @@ import {
   listStatusParts,
   loadErrorText,
   mapStatusParts,
+  OFFER_GONE,
   providerStatusParts,
   reachNote,
   standDate,
 } from "./format.ts";
 import { Icon } from "./icons.tsx";
+import { preloadExportWhenIdle } from "./ics-export.ts";
 import { type AgeEscape, ListPending, ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import { ProviderPanel } from "./ProviderPanel.tsx";
 import { ProviderSearch } from "./ProviderSearch.tsx";
-import { preloadExportWhenIdle, SavedView } from "./SavedView.tsx";
+import { SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
 import {
@@ -95,7 +97,7 @@ export function App() {
   useEffect(() => {
     if (load.kind === "ready") setAnimate(true);
   }, [load.kind]);
-  // Export-Code der Merkliste erst nach dem ersten Rendern mit Daten im Leerlauf vorladen (Plan 0010, E8 A)
+  // Export-Code (Merkliste, Reihen im Detail) nach dem ersten Rendern mit Daten im Leerlauf vorladen (Plan 0010, E8 A)
   const dataReady = load.kind === "ready";
   useEffect(() => (dataReady ? preloadExportWhenIdle() : undefined), [dataReady]);
 
@@ -145,10 +147,14 @@ export function App() {
     [want],
   );
 
-  // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler): Parameter entfernen.
+  // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler, alter geteilter Link): Parameter entfernen und sagen,
+  // warum nichts aufgeht (Plan 0026, E7).
   useEffect(() => {
-    if (load.kind === "ready" && route.offerId && !detailOffer) closeDetail();
-  }, [load.kind, route.offerId, detailOffer, closeDetail]);
+    if (load.kind === "ready" && route.offerId && !detailOffer) {
+      say(OFFER_GONE);
+      closeDetail();
+    }
+  }, [load.kind, route.offerId, detailOffer, closeDetail, say]);
 
   // Unbekannte Anbieter-ID (Tippfehler, aus dem Katalog verschwunden): Das Sheet meldet es nach dem Laden (E3).
   const dropProvider = useCallback(() => {
@@ -440,6 +446,7 @@ export function App() {
           <SavedView
             offers={saved}
             generatedAt={load.data.generatedAt}
+            birthDate={birthDate}
             ctx={ctx}
             onDiscover={() => onTab("entdecken")}
             onExported={say}

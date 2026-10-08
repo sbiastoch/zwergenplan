@@ -2,6 +2,7 @@
  * Deploy-Build mit echten Daten. Die Uhr steht auf `generatedAt` des Datenstands (nicht auf der Echtzeit):
  * Ein alter Datenstand ist laut ADR 0002 nur eine Warnung und darf Code-Commits nicht rot machen.
  */
+import { existsSync, readFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
 import { expect, MAP_READY, test } from "./fixtures.ts";
 import {
@@ -318,5 +319,70 @@ test.describe("Anbieter mit echten Daten (Plan 0010)", () => {
     if (m.label.width > 2) {
       expect(overlap(m.badge, m.label), "Seitenleiste: Badge über dem Label").toBeLessThanOrEqual(0.5);
     }
+  });
+});
+
+/** Felder eines Eintrags aus site.json bzw. anbieter.json, geprüft statt per Cast angenommen (e2e/ importiert nichts aus src/) */
+function idTitle(entry: unknown, title: "title" | "name"): { id: string; text: string } {
+  if (typeof entry === "object" && entry !== null && "id" in entry && typeof entry.id === "string" && title in entry) {
+    const text: unknown = Reflect.get(entry, title);
+    if (typeof text === "string") return { id: entry.id, text };
+  }
+  throw new Error(`Eintrag ohne id/${title}: ${JSON.stringify(entry).slice(0, 200)}`);
+}
+
+async function list(page: Page, file: string, key: "offers" | "providers"): Promise<unknown[]> {
+  const json: unknown = await (await page.request.get(file)).json();
+  const items: unknown = typeof json === "object" && json !== null ? Reflect.get(json, key) : undefined;
+  if (!Array.isArray(items)) throw new Error(`${file} ohne ${key}`);
+  return items;
+}
+
+const escapeHtml = (text: string) =>
+  text.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c);
+
+test.describe("Teilen mit echten Daten (Plan 0026, Tests 9; Nachtrag A)", () => {
+  test("Vorschauseiten und Kachelbilder für erstes und letztes Angebot, ein Anbieter, 404.html", async ({ page }) => {
+    const offers = await list(page, "./data/site.json", "offers");
+    test.skip(offers.length === 0, "keine Daten");
+    for (const offer of [offers[0], offers.at(-1)].map((o) => idTitle(o, "title"))) {
+      const res = await page.request.get(`./angebot/${offer.id}/`);
+      expect(res.status(), offer.id).toBe(200);
+      const html = await res.text();
+      // Titel stehen im og:title gekürzt (110 Zeichen), die ersten 30 Zeichen immer
+      expect(html).toContain(`<h1>${escapeHtml(offer.text.slice(0, 30))}`);
+      expect(html).toContain(`og:url" content="https://zwergenplan.app/angebot/${offer.id}/"`);
+      const image = await page.request.get(`./angebot/${offer.id}/vorschau.jpg`);
+      expect(image.status(), `${offer.id}/vorschau.jpg`).toBe(200);
+      expect(image.headers()["content-type"]).toContain("image/jpeg");
+    }
+    const [first] = await list(page, "./data/anbieter.json", "providers");
+    const provider = idTitle(first, "name");
+    const res = await page.request.get(`./anbieter/${provider.id}/`);
+    expect(res.status()).toBe(200);
+    expect(await res.text()).toContain(`<h1>${escapeHtml(provider.text.slice(0, 30))}`);
+    expect(existsSync("dist/404.html"), "dist/404.html").toBe(true);
+  });
+
+  test("keine Fixture-Seite im Deploy-Build (Review m11)", async ({ page }) => {
+    const fixture: unknown = JSON.parse(readFileSync("tests/fixtures/offers.json", "utf8"));
+    const offers: unknown = typeof fixture === "object" && fixture !== null ? Reflect.get(fixture, "offers") : [];
+    if (!Array.isArray(offers) || offers.length === 0) throw new Error("tests/fixtures/offers.json ohne offers");
+    for (const { id } of offers.map((o) => idTitle(o, "title"))) {
+      expect(existsSync(`dist/angebot/${id}`), `dist/angebot/${id}`).toBe(false);
+      // `vite preview` liefert für unbekannte Pfade die Startseite (SPA-Rückfall), nie die Vorschauseite
+      const html = await (await page.request.get(`./angebot/${id}/`)).text();
+      expect(html).not.toContain(`og:url" content="https://zwergenplan.app/angebot/${id}/"`);
+    }
+  });
+
+  test("ein Tipp auf den Link öffnet das Detail", async ({ page }) => {
+    const meta = await dataMeta(page);
+    await page.clock.setFixedTime(new Date(meta.generatedAt));
+    const [first] = await list(page, "./data/site.json", "offers");
+    test.skip(first === undefined, "keine Daten");
+    const offer = idTitle(first, "title");
+    await page.goto(`./angebot/${offer.id}/`);
+    await expect(page.getByRole("dialog", { name: offer.text })).toBeVisible();
   });
 });

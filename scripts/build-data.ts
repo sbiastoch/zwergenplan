@@ -3,7 +3,8 @@
  *   public/data/site.json, public/data/meta.json, public/ics/**.ics,
  *   public/data/anbieter.json (Anbieterübersicht, lädt erst beim Öffnen; Plan 0010, E6),
  *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7),
- *   public/data/linien.json (Linien je Zelle der Tabelle, Plan 0012, E7)
+ *   public/data/linien.json (Linien je Zelle der Tabelle, Plan 0012, E7),
+ *   public/angebot/<id>/, public/anbieter/<id>/, public/404.html (Vorschauseiten zum Teilen, Plan 0026, ADR 0020)
  * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
  * (`TIMETABLE_REQUIRED`, seit Plan 0009, Schritt 5).
  */
@@ -17,6 +18,7 @@ import { seriesIcsPath, sessionIcsPath } from "../src/domain/ics-paths.ts";
 import { type SiteMeta, toProviderDirectory, toSiteData } from "../src/domain/site-data.ts";
 import { decodeTransitTable, INSIDE_METERS } from "../src/domain/transit.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
+import { checkSharePages, notFoundPage, offerSharePage, providerSharePage } from "./lib/share-pages.ts";
 import { buildTransitTables, withoutAccess } from "./transit/table.ts";
 
 /** Ab hier warnt der Build: Die Profil-CSA läuft in jedem data:build (Plan 0009, Backpressure). */
@@ -36,7 +38,9 @@ if (!result.ok) {
 }
 
 const publicDir = fileURLToPath(new URL("public/", ROOT));
-for (const dir of ["data", "ics"]) rmSync(`${publicDir}${dir}`, { recursive: true, force: true });
+for (const dir of ["data", "ics", "angebot", "anbieter", "404.html"]) {
+  rmSync(`${publicDir}${dir}`, { recursive: true, force: true });
+}
 
 function write(relPath: string, content: string) {
   const file = `${publicDir}${relPath}`;
@@ -71,8 +75,25 @@ for (const offer of site.offers) {
   }
 }
 
+// Vorschauseiten zum Teilen (Plan 0026, E2): aus denselben Daten, „jetzt“ = generatedAt
+const pages = [
+  ...site.offers.map((offer) => offerSharePage(offer, site.generatedAt)),
+  ...directory.providers.map((provider) => providerSharePage(provider, site.offers, site.generatedAt)),
+];
+const pageErrors = checkSharePages(pages);
+if (pageErrors.length > 0) {
+  console.error(`✗ Vorschauseiten (Fehler im Generator, Plan 0026, E4):\n  ${pageErrors.join("\n  ")}`);
+  process.exit(1);
+}
+for (const page of pages) write(page.path, page.html);
+write("404.html", notFoundPage());
+const largest = Math.max(...pages.map((p) => new TextEncoder().encode(p.html).length));
+
 console.log(
   `✓ Daten (${source}): ${meta.offers} Angebote, ${meta.providers} Katalog-Einträge (${directory.providers.length} Anbieter), ${files} ICS-Dateien`,
+);
+console.log(
+  `✓ Vorschauseiten: ${site.offers.length} Angebote, ${directory.providers.length} Anbieter, größte ${(largest / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} kB`,
 );
 
 const timetable = loadTimetable(source);

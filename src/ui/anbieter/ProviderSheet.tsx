@@ -30,6 +30,7 @@ export function ProviderSheet({
   ctx,
   saved,
   onToggleSaved,
+  onShare,
   onClose,
 }: ProviderSheetProps) {
   const { now } = ctx;
@@ -112,7 +113,11 @@ export function ProviderSheet({
         )}
       </div>
       <div className="sheetfoot">
-        <button type="button" className="btn primary wide" onClick={onClose}>
+        <button type="button" className="btn" onClick={() => onShare(provider)}>
+          <Icon name="share" size={20} />
+          Teilen
+        </button>
+        <button type="button" className="btn primary" onClick={onClose}>
           Schließen
         </button>
       </div>

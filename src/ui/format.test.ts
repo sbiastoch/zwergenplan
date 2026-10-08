@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Origin, Reach } from "../domain/reach.ts";
+import type { ExportSelection } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, fromBerlinLocal } from "../domain/time.ts";
 // nur im Test: Konstanten der Rechnung gegen den Text (src/ui importiert transit.ts sonst nur per import())
@@ -12,8 +13,10 @@ import {
   ageOnlyNote,
   ageRangeLabel,
   ageWarnText,
+  ageWindowLabel,
   availabilityLabel,
   clock,
+  collectionToast,
   dayHeading,
   formatFact,
   hiddenNote,
@@ -31,6 +34,8 @@ import {
   reachNote,
   reachShort,
   registrationNote,
+  savedExportNote,
+  seriesToast,
   shortDate,
   standDate,
   timeRange,
@@ -107,6 +112,8 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
     expect(shortDate("2026-10-06")).toBe("Di 6.10.");
     expect(weekTitle(["2026-10-05", "2026-10-11"])).toBe("5.–11. Oktober");
     expect(weekTitle(["2026-10-26", "2026-11-01"])).toBe("26. Okt. – 1. Nov.");
+    // Juni und Juli bleiben ganz (Plan 0026, E3, Review m8)
+    expect(weekTitle(["2026-06-29", "2026-07-05"])).toBe("29. Juni – 5. Juli");
     expect(standDate("2026-10-03T23:30:00Z")).toBe("4.10.2026");
   });
 });
@@ -662,5 +669,70 @@ describe("Altersfilter (Plan 0021, E2/E3)", () => {
   it("Leerzustand nennt das Alter ohne doppelten Punkt (Browser-Review live)", () => {
     expect(ageEmptyText("3 J.", false)).toBe("Nichts davon passt zu 3\u00a0J.");
     expect(ageEmptyText("7 Mon.", true)).toBe("Mit diesen Filtern passt nichts zu 7\u00a0Mon.");
+  });
+});
+
+describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
+  /** Auswahl mit `count` wöchentlichen Terminen ab `firstDay` und den Grenzen als Berliner Tage */
+  function selection(firstDay: string, count: number, bounds: { from?: string; until?: string } = {}): ExportSelection {
+    const at = (day: string) => fromBerlinLocal(`${day}T10:00`);
+    return {
+      sessions: sessions(firstDay, count, 7),
+      ...(bounds.from && { from: at(bounds.from) }),
+      ...(bounds.until && { until: at(bounds.until) }),
+    };
+  }
+
+  it("Toast im Detail: ungekürzt in der Grundform", () => {
+    expect(seriesToast(selection("2026-10-09", 4), FIXTURE_NOW)).toBe("Kalenderdatei mit 4 Terminen geladen");
+    expect(seriesToast(selection("2026-10-09", 1), FIXTURE_NOW)).toBe("Kalenderdatei mit 1 Termin geladen");
+  });
+
+  it("Toast im Detail nennt die Grenze", () => {
+    expect(seriesToast(selection("2026-10-07", 2, { until: "2026-10-14" }), FIXTURE_NOW)).toBe(
+      "Kalenderdatei mit 2 Terminen geladen – bis 14.10., danach passt es nicht mehr zum Alter",
+    );
+    expect(seriesToast(selection("2026-10-21", 3, { from: "2026-10-21" }), FIXTURE_NOW)).toBe(
+      "Kalenderdatei mit 3 Terminen geladen – ab 21.10., vorher passt es noch nicht zum Alter",
+    );
+    expect(seriesToast(selection("2026-10-21", 8, { from: "2026-10-21", until: "2027-03-14" }), FIXTURE_NOW)).toBe(
+      "Kalenderdatei mit 8 Terminen geladen – vom 21.10. bis 14.3.2027 passt es zum Alter",
+    );
+  });
+
+  it("Text unter „Alle in den Kalender“ nennt die Auswahl (E3, mit „gemerkt“ seit Plan 0022)", () => {
+    expect(savedExportNote(2, 13, false)).toBe("2 gemerkt · 13 Termine in einer .ics-Datei · Kurse immer komplett");
+    expect(savedExportNote(1, 1, false)).toBe("1 gemerkt · 1 Termin in einer .ics-Datei · Kurse immer komplett");
+    expect(savedExportNote(2, 10, true)).toBe(
+      "2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter",
+    );
+    expect(savedExportNote(2, 0, true)).toBe("2 gemerkt · keiner passt gerade zum Alter");
+  });
+
+  it("Toast der Merkliste zählt fehlende Angebote", () => {
+    expect(collectionToast(13, 0)).toBe("Kalenderdatei mit 13 Terminen geladen");
+    expect(collectionToast(1, 0)).toBe("Kalenderdatei mit 1 Termin geladen");
+    expect(collectionToast(8, 1)).toBe("Kalenderdatei mit 8 Terminen geladen – 1 Angebot passt nicht zum Alter");
+    expect(collectionToast(8, 2)).toBe("Kalenderdatei mit 8 Terminen geladen – 2 Angebote passen nicht zum Alter");
+  });
+
+  it("Alterszeile im Detail nennt die Grenze nur bei Kürzung", () => {
+    expect(ageWindowLabel(selection("2026-10-07", 2, { until: "2026-10-14" }), FIXTURE_NOW)).toBe("passt bis 14.10.");
+    expect(ageWindowLabel(selection("2026-10-21", 3, { from: "2026-10-21" }), FIXTURE_NOW)).toBe("passt ab 21.10.");
+    expect(ageWindowLabel(selection("2026-10-21", 8, { from: "2026-10-21", until: "2027-03-14" }), FIXTURE_NOW)).toBe(
+      "passt 21.10.–14.3.2027",
+    );
+    expect(ageWindowLabel(selection("2026-10-09", 4), FIXTURE_NOW)).toBeUndefined();
+    expect(ageWindowLabel({ sessions: [] }, FIXTURE_NOW)).toBeUndefined();
+  });
+
+  it("nennt das Jahr nur außerhalb des laufenden Berliner Jahres", () => {
+    const sel = selection("2026-12-30", 3, { until: "2027-01-13" });
+    expect(ageWindowLabel(sel, new Date("2026-12-31T12:00:00+01:00"))).toBe("passt bis 13.1.2027");
+    // 0:30 Berlin am 1.1.2027 ist in Los Angeles noch der 31.12.2026
+    expect(ageWindowLabel(sel, new Date("2027-01-01T00:30:00+01:00"))).toBe("passt bis 13.1.");
+    // Grenze um 0:30 Berlin am 1.1.2027 (UTC und Los Angeles: 31.12.2026) zählt als Berliner Tag
+    const midnight = { sessions: sessions("2026-12-25", 2, 7, "00:30", "01:30"), until: "2027-01-01T00:30:00+01:00" };
+    expect(ageWindowLabel(midnight, FIXTURE_NOW)).toBe("passt bis 1.1.2027");
   });
 });

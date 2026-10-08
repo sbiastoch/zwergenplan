@@ -42,6 +42,10 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Mehrere Verbindungen ab demselben Halt**: Der Build speichert je Halt-Ort-Paar eine Verbindung, andere Wege gibt es nur über andere Zugangshalte (Plan 0019, E4).
 - **Andere Wege im Orts-Sheet der Karte**: Heute nur im Detail (Plan 0019, Nicht-Ziel).
 - **Apple Karten oder Wahl der Karten-App** für die Routen-Links (Plan 0019, Nicht-Ziel: der Nutzer will Google Maps).
+- **Bild je Anbieter und je Kategorie** in der Link-Vorschau: Angebote haben seit Plan 0026 (Nachtrag A) ein Kachelbild, Anbieter, Startseite und Merkliste das generische Bild.
+- **Teilen-Knopf auf den Kacheln** in Liste, Kalender und Karte: geteilt wird heute aus dem Detail und dem Anbieter-Sheet (Plan 0026, Nicht-Ziel).
+- **Filter oder Suchen mit eigener Link-Vorschau teilen** (`?kat=…`): Das geht mit der Adresszeile, nur mit der generischen Vorschau (Plan 0026, Nicht-Ziel).
+- **Toast mit passendem Symbol**: Der Toast zeigt immer ein Häkchen, auch bei Hinweisen wie „Dieses Angebot ist nicht mehr im Zwergenplan.“ (Browser-Review live 0026).
 - **Adresssuche als Startpunkt**: bräuchte einen Geocoder, also einen weiteren Drittanbieter oder eigene Daten (Plan 0005, Nicht-Ziel).
 - **Karte im Kalender oder in der Merkliste** (Plan 0005, Nicht-Ziel).
 - **Offline-Karte**: Service Worker, Vorab-Laden des Karten-Codes, gecachte Kacheln. ADR 0008 schließt das Cachen fremder Kacheln heute aus.
@@ -77,6 +81,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Nachschliff 0022–0024** (Browser-Review live, 2026-10-08, `5701141`):
+  - Startausschnitt der Karte bei niedriger Karte (< ~300 px, z. B. 320×640, iPhone SE 375×667, iPhone mit Safari-Leiste 390×664): Kachelstufe z8 statt z9, nur 2 Cluster („42“, „290“) statt 7. Ursache ist die Reserve unten für die Attribution (66 px). Idee: Attribution auf niedrigen Karten kompakt („i“) starten oder die Reserve nur ab 300 px Kartenhöhe voll nehmen. Mit Startpunkt tritt es nicht auf.
+  - Kalender dunkel: Der orange Punkt unter „heute“ auf dem gelben Kreis hat wenig Kontrast.
 - **Plan 0027** (Ergebnis, K9):
   - Die K9-Fälle 2, 4, 7 und 8 (Doku nach rotem Vorgänger, wartender Lauf auf `main` abgebrochen, toter Pfad im Doku-Pfad, Absturz von `scope`) bei Gelegenheit einmal an echten Läufen belegen.
   - `check:fast` schwankt zwischen 7 und 10,7 s, Ziel war ≤ 7,5 s.

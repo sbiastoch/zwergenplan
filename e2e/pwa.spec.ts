@@ -3,6 +3,7 @@
  * WebKit prüft der Browser-Review auf einem echten iPhone (Schritt 6). Global blockiert `playwright.config.ts` den
  * Service Worker, diese Datei erlaubt ihn.
  */
+import { readFileSync } from "node:fs";
 import type { BrowserContext, Page } from "@playwright/test";
 import { expect, MAP_READY, test } from "./fixtures.ts";
 import { expectMobileUx } from "./mobile-ux.ts";
@@ -127,6 +128,16 @@ test("3 Kanarienvogel: offline scheitert auch ein fetch aus dem Service Worker (
   expect(await probe(), "offline").toBe("fehler");
 });
 
+test("Vorschauseite zum Teilen mit aktivem Service Worker: Weiterleitung ins Detail, keine Fehler (Plan 0026, Tests 8)", async ({
+  page,
+}) => {
+  await installed(page);
+  const id = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+  await page.goto(`angebot/${id}/`);
+  await expect(page).toHaveURL(new RegExp(`/\\?angebot=${id}$`));
+  await expect(page.getByRole("dialog", { name: "Offener Krabbeltreff" })).toBeVisible();
+});
+
 // Ohne erlaubte Konsolenfehler: Auch der Export-Code, den die App im Leerlauf vorlädt, liegt im Precache (Arch-Review
 // Stufe 1, H7). Ein Ladefehler offline wäre rot.
 test.describe("offline", () => {
@@ -144,6 +155,31 @@ test.describe("offline", () => {
       await page.emulateMedia({ colorScheme });
       await expectMobileUx(page);
     }
+  });
+
+  // Plan 0018, E2: Mit Geburtsdatum entsteht „Alle Termine“ einer regelmäßigen Reihe im Browser, der Export-Code liegt
+  // im Precache. Offline neu geladen, kommt er also aus dem Service Worker; der statische Link gäbe 204 (Test 5).
+  test("„Alle Termine“ mit Geburtsdatum klappt offline: Datei aus dem Browser (Plan 0018, E2)", async ({
+    page,
+    context,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.geburtsdatum", "2024-09-18"));
+    await installed(page);
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
+    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      detail.getByRole("link", { name: "Alle Termine", exact: true }).click(),
+    ]);
+    expect(download.url()).toMatch(/^blob:/);
+    const ics = readFileSync((await download.path()) ?? "", "utf8");
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(2);
+    await expect(detail.locator(".toast")).toHaveText(
+      "Kalenderdatei mit 2 Terminen geladen – bis 14.10., danach passt es nicht mehr zum Alter",
+    );
   });
 
   test("7 wieder online: Die Statuszeile verliert „Offline“ ohne Neustart (E4a)", async ({ page, context }) => {

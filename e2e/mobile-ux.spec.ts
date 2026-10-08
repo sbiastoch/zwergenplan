@@ -58,6 +58,27 @@ async function openProviders(page: Page) {
   await expect(page.locator(".place.idle")).toHaveCount(1);
 }
 
+/** IDs der Fixture-Angebote für Merkliste und Deep-Link (Plan 0018) */
+const PEKIP_ID =
+  "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus";
+const TREFF_ID = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+const REIME_ID = "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum";
+
+/**
+ * Geburtsdatum (ISO) und Merkliste vor dem Laden speichern und `path` laden (Plan 0018): `VIEWS` startet nach
+ * `ready()`, und der Altersfilter blendet in „Entdecken“ Unpassendes aus.
+ */
+async function loadAged(page: Page, path: string, birthDate: string, saved: string[] = []) {
+  await page.addInitScript(
+    ([born, ids]) => {
+      localStorage.setItem("zwergenplan.geburtsdatum", born);
+      localStorage.setItem("zwergenplan.merkliste", ids);
+    },
+    [birthDate, JSON.stringify(saved)] as const,
+  );
+  await page.goto(path);
+}
+
 async function setBirthDate(page: Page, text: string) {
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await page.getByLabel("Geburtsdatum").fill(text);
@@ -123,6 +144,32 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   detail: async (page) => {
     await page.getByRole("heading", { level: 3, name: /PEKiP/ }).getByRole("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
+  },
+  // Plan 0018, E3: längster Text unter „Alle in den Kalender“ (Kurs komplett, Treff nur passend zum Alter)
+  "merkliste-mit-geburtsdatum": async (page) => {
+    await loadAged(page, "./?ansicht=merkliste", "2024-09-18", [PEKIP_ID, TREFF_ID]);
+    await expect(
+      page.getByText("2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter"),
+    ).toBeVisible();
+  },
+  // Plan 0018, E4: Alterszeile mit Grenze „· passt bis 14.10.“
+  "detail-mit-geburtsdatum": async (page) => {
+    await loadAged(page, `./?angebot=${TREFF_ID}`, "2024-09-18");
+    await expect(
+      page.getByRole("dialog").getByText("Passt: am Mi 7.10. 24 Monate alt · passt bis 14.10."),
+    ).toBeVisible();
+  },
+  // Plan 0026, E6 (Review M2): Teilen und Kopieren scheitern, Sheet „Link zum Teilen“ über dem Detail mit langer URL
+  "link-zum-teilen": async (page) => {
+    await page.addInitScript(() => {
+      const fail = () => Promise.reject(new DOMException("Test", "NotAllowedError"));
+      Object.defineProperty(navigator, "share", { value: fail, configurable: true });
+      Object.defineProperty(navigator, "clipboard", { value: { writeText: fail }, configurable: true });
+    });
+    await page.reload();
+    await page.getByRole("heading", { level: 3, name: /PEKiP/ }).getByRole("button").click();
+    await page.getByRole("dialog").getByRole("button", { name: "Teilen" }).click();
+    await expect(page.getByRole("dialog", { name: "Link zum Teilen" }).locator("input.share-link")).toBeFocused();
   },
   // Regelmäßige Reihe: zwei ICS-Knöpfe nebeneinander (`.two`), die der Kurs oben nicht hat.
   "detail-regelmaessig": async (page) => {
@@ -445,6 +492,91 @@ for (const [name, go] of Object.entries(VIEWS)) {
   });
 }
 
+/**
+ * Vorschauseite ohne JavaScript (Plan 0026, E4, Tests 7): eigenes Dokument mit eigenem `<style>`, Darstellung nur nach
+ * System. Bewusste Ausnahme von „dunkel auch per `data-theme`“: Die Seite liest die gewählte Darstellung nicht, denn
+ * dafür bräuchte sie ein Skript mit `localStorage` auf einer Seite, die man meist nur Millisekunden sieht (E4, Review m6).
+ *
+ * „Ohne JavaScript“ heißt hier: ohne das eine Inline-Skript der Seite (die Weiterleitung), denn sonst hat sie keins.
+ * `javaScriptEnabled: false` ginge nicht: axe läuft im Seitenkontext und hängt dann (Zeitlimit). Dass die Seite mit
+ * abgeschaltetem JavaScript wirklich so aussieht, prüft `e2e/teilen.spec.ts` („ohne JavaScript“).
+ */
+test.describe("vorschauseite-ohne-js", () => {
+  const SHARE_PAGE = "angebot/familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus/";
+  test.beforeEach(async ({ page }) => {
+    await page.route(`**/${SHARE_PAGE}`, async (route) => {
+      const response = await route.fetch();
+      const body = (await response.text()).replace(/<script>[\s\S]*?<\/script>/, "");
+      expect(body).not.toContain("<script");
+      await route.fulfill({ response, body });
+    });
+  });
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`vorschauseite-ohne-js besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto(SHARE_PAGE);
+      await expect(page.getByRole("link", { name: "Im Zwergenplan öffnen" })).toBeVisible();
+      await expectReducedMotion(page);
+      await expectMobileUx(page);
+      if (colorScheme === "dark") await expectNoBrightIslands(page);
+    });
+  }
+  test("vorschauseite-ohne-js bricht bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(SHARE_PAGE);
+    await expectNoHorizontalScroll(page);
+    await expectTouchTargets(page);
+    await expectTextFits(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
+    await expectAccessible(page);
+  });
+});
+
+/**
+ * 404-Seite (Plan 0026, E7, Arch-Review m7): eigenes Dokument wie die Vorschauseite, Darstellung nur nach System. Der
+ * Vite-Server liefert für unbekannte Pfade die SPA-Rückfallseite, deshalb stellt `page.route` die 404-Antwort von
+ * GitHub Pages mit der gebauten `dist-e2e/404.html` nach (wie `e2e/teilen.spec.ts`). Für `irgendwas/` springt ihr
+ * Skript nicht, die Seite bleibt stehen.
+ */
+test.describe("404-seite", () => {
+  const MISSING = "irgendwas/";
+  // Chromium meldet die 404-Antwort des Dokuments selbst in der Konsole; erlaubt nur für diesen Pfad.
+  test.use({ allowedConsoleErrors: [/\/irgendwas\/ Failed to load resource: .* 404/] });
+  test.beforeEach(async ({ page }) => {
+    await page.route(`**/${MISSING}`, (route) => route.fulfill({ status: 404, path: "dist-e2e/404.html" }));
+  });
+  const heading = (page: Page) =>
+    page.getByRole("heading", { name: "Diese Seite gibt es im Zwergenplan nicht (mehr)." });
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`404-seite besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto(MISSING);
+      await expect(heading(page)).toBeVisible();
+      await expectReducedMotion(page);
+      await expectMobileUx(page);
+      if (colorScheme === "dark") await expectNoBrightIslands(page);
+    });
+  }
+  test("404-seite bricht bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(MISSING);
+    await expect(heading(page)).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await expectTouchTargets(page);
+    await expectTextFits(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
+    await expectAccessible(page);
+  });
+});
+
 for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
   test(`Toast im Dunkeln ist keine helle Insel (${scheme.label})`, async ({ page }) => {
     await useScheme(page, scheme);
@@ -459,6 +591,48 @@ for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
     await page.clock.runFor(3000);
     await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toHaveCount(0);
   });
+}
+
+// Plan 0018, E4: die längsten Kalender-Toasts aus Detail und Merkliste bei 320 px, auch bei 200 %. Die Uhr hält den
+// Toast; vorher die Textgröße setzen, denn `setTextScale` wartet auf Frames.
+const LONG_TOASTS = [
+  {
+    name: "Detail, gekürzt",
+    path: `./?angebot=${TREFF_ID}`,
+    birthDate: "2024-09-18",
+    saved: [],
+    trigger: (page: Page) => page.getByRole("dialog").getByRole("link", { name: "Alle Termine", exact: true }),
+    toast: "Kalenderdatei mit 2 Terminen geladen – bis 14.10., danach passt es nicht mehr zum Alter",
+  },
+  {
+    name: "Merkliste, ein Angebot passt nicht",
+    path: "./?ansicht=merkliste",
+    birthDate: "2026-08-01",
+    saved: [TREFF_ID, REIME_ID],
+    trigger: (page: Page) => page.getByRole("button", { name: "Alle in den Kalender" }),
+    toast: "Kalenderdatei mit 4 Terminen geladen – 1 Angebot passt nicht zum Alter",
+  },
+];
+
+for (const item of LONG_TOASTS) {
+  for (const scale of [1, 2]) {
+    test(`langer Kalender-Toast passt bei 320 px und ${scale * 100} % (${item.name})`, async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await ready(page);
+      await loadAged(page, item.path, item.birthDate, item.saved);
+      const trigger = item.trigger(page);
+      await expect(trigger).toBeVisible();
+      await setTextScale(page, scale);
+      await page.clock.pauseAt(FIXTURE_NOW);
+      await Promise.all([page.waitForEvent("download"), trigger.click()]);
+      const toast = page.locator(".toast").filter({ hasText: item.toast });
+      await expect(toast).toHaveText(item.toast);
+      await expect(toast).toBeInViewport({ ratio: 1 });
+      await expectNoHorizontalScroll(page);
+      await expectTextFits(page, { scale });
+    });
+  }
 }
 
 test("Text-Gate erkennt Überlappung", async ({ page }) => {

@@ -79,10 +79,11 @@ Stand `main` `d5fab1b` (nach Plan 0022–0024).
   - Je gemerktem Angebot eine `OfferCard` (`dated`) mit dem nächsten Termin.
   - Es gibt keinen Filter, keinen Umschalter und keine Statuszeile.
 - `src/ui/SavedView.tsx:29–57` ist der einzige Lader des Export-Chunks `src/domain/ics.ts` (`ics-entry-only`, `LAZY_LOADERS` in `scripts/check-architecture.ts:60`). `preloadExportWhenIdle` startet in `App.tsx:88`. Plan 0018 (freigegeben, noch nicht umgesetzt) verlegt den Lader nach `src/ui/ics-export.ts`.
+- **Nachtrag (2026-10-08):** Plan 0018 ist umgesetzt. Der Lader liegt jetzt in `src/ui/ics-export.ts`, `SavedView` importiert ihn von dort (E9, zweiter Fall). Die Auswahl der Merkliste trifft `collectionExport`, den Text unter dem Knopf `savedExportNote` in `src/ui/format.ts`. E9 erweitert `savedExportNote` um den Filter, statt ein neues `exportNote` anzulegen. Zeilenangaben zu `SavedView.tsx` und `saved.ts` in diesem Abschnitt sind vor Etappe 1 neu zu prüfen.
 - `src/domain/saved.ts:9–29`:
   - `toggleId`,
   - `savedOffers(offers, ids, now)`: nur mit kommendem Termin, sortiert nach dem nächsten Termin,
-  - `collectionSessions`: die Auswahl für den Export.
+  - `collectionSessions`: die Auswahl für den Export (seit Plan 0018 `exportSessions` je Angebot und `collectionExport` für die Merkliste).
 - `src/data/preferences.ts:7–13, 41–52`: Schlüssel `zwergenplan.merkliste`, `loadSaved()`/`saveSaved()` als JSON-Array von IDs.
 - `src/ui/use-app-state.ts:130–143`: `useSaved()` liefert `[ids, toggle]`. `toggle` meldet, ob das Angebot danach gemerkt ist.
 - `src/ui/App.tsx`:
@@ -189,12 +190,13 @@ Stand `main` `d5fab1b` (nach Plan 0022–0024).
   - `saveSavedProviders(ids)` speichert wie `saveSaved`. Bei leerer Liste entfernt es den Schlüssel.
   - Die inhaltliche Prüfung ist eine reine Funktion in `src/domain/saved.ts`:
     ```ts
-    /** Gemerkte Anbieter aus dem Speicher bereinigen (Plan 0025, E1): gültige ID, höchstens MAX_PROVIDER_ID, keine Dubletten. */
+    /** Gemerkte Anbieter aus dem Speicher bereinigen (Plan 0025, E1): gültige ID, höchstens MAX_KEBAB_ID, keine Dubletten. */
     export function cleanSavedProviders(raw: readonly string[]): string[];
     ```
-    Sie prüft die ID gegen `KEBAB_ID_PATTERN` und `MAX_PROVIDER_ID`. Bei Dubletten gilt der erste Eintrag.
+    Sie prüft die ID gegen `KEBAB_ID_PATTERN` und `MAX_KEBAB_ID`. Bei Dubletten gilt der erste Eintrag.
   - `useSavedProviders()` ruft `cleanSavedProviders(loadSavedProviders())` im Initializer auf, wie `useOrigin` die Rohwerte aus `preferences.ts` prüft (ADR 0017, Punkt 5).
   - `MAX_PROVIDER_ID` zieht von `src/domain/route.ts:9` nach `src/domain/ids.ts` und wird von dort exportiert. `route.ts` importiert ihn.
+  - Nachtrag beim Merge mit `main`: Plan 0026 brachte `MAX_KEBAB_ID` (80) in `src/domain/ids.ts` als Höchstlänge aller Katalog-IDs im Schema, deshalb entfällt `MAX_PROVIDER_ID`, und `cleanSavedProviders` wie `route.ts` nutzen `MAX_KEBAB_ID` als einzige Quelle.
 - Merken und Entfernen nutzt das bestehende `toggleId` aus `saved.ts`.
 - Hook `useSavedProviders()` in `src/ui/use-app-state.ts`, gebaut wie `useSaved()`. Er liefert `[ids, toggle]`, und `toggle(id)` meldet, ob danach gemerkt.
 - **Privatsphäre**: Der Abschnitt „Privatsphäre“ in `docs/architecture.md` wird ergänzt.
@@ -653,7 +655,7 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
    - `ansicht=kalender` ergibt `entdecken` mit erhaltenen Filtern,
    - `isLegacyView`.
 
-   `src/domain/ids.test.ts`: `MAX_PROVIDER_ID` ist 80.
+   `src/domain/ids.test.ts`: `MAX_PROVIDER_ID` ist 80 (nach dem Merge entfallen, `MAX_KEBAB_ID` prüft Plan 0026 dort schon an der Grenze).
 
    **`src/domain/directory.test.ts`**: `providerRows` mit `saved`
    - Ein gemerkter aktiver Anbieter steht nur in `saved`, nicht in `active`; ohne Suchtext ergibt `active.length` plus aktive in `saved` die Zahl aus `countProviders`.

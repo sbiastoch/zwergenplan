@@ -1,90 +1,45 @@
 /** „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007). */
 import { nextSession } from "../domain/agenda.ts";
-import type { CollectionItem, IcsContext, IcsSource } from "../domain/ics-types.ts";
-import { collectionSessions } from "../domain/saved.ts";
+import { collectionExport } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
-import { plural } from "./format.ts";
+import { collectionToast, EXPORT_UNAVAILABLE, savedExportNote } from "./format.ts";
 import { Icon } from "./icons.tsx";
+import { download, type IcsExport, loadExport } from "./ics-export.ts";
 import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
+import { LONG_TOAST_MS } from "./use-app-state.ts";
 
 interface SavedViewProps {
   offers: SiteOffer[];
   generatedAt: SiteData["generatedAt"];
+  /** mit Geburtsdatum kommen regelmäßige Angebote nur passend zum Alter in die Datei (Plan 0018, E3) */
+  birthDate: string | undefined;
   ctx: CardContext;
   onDiscover: () => void;
-  onExported: (message: string) => void;
+  /** Toast nach dem Export; `ms` für lange Meldungen (Plan 0018, E4) */
+  onExported: (message: string, ms?: number) => void;
 }
 
-/**
- * ICS-Code aus `src/domain/ics.ts`, strukturell beschrieben: Das Modul ist ein Lazy-Chunk (assets/export/, Plan 0010,
- * E8 A), auch Typen kommen nicht statisch von dort (`ics-only-lazy`); sie stehen in `ics-types.ts`.
- */
-interface IcsExport {
-  // Property-Syntax: Parameter werden streng geprüft, eine Änderung in ics-types.ts fällt hier auf
-  icsContextFor: (offer: IcsSource, generatedAt: string) => IcsContext;
-  icsForCollection: (items: readonly CollectionItem[], name: string) => string;
-}
-
-/** Einziger Lader von `src/domain/ics.ts` (`ics-entry-only`); async mit `await import(…)` wie in Lazy.tsx. */
-async function importExport(): Promise<IcsExport> {
-  return await import("../domain/ics.ts");
-}
-
-let pending: Promise<IcsExport> | undefined;
-/** Ein Ladevorgang für Vorladen und Export; nach einem Fehlschlag versucht der nächste Aufruf es neu. */
-function loadExport(): Promise<IcsExport> {
-  pending ??= importExport().catch((e: unknown) => {
-    pending = undefined;
-    throw e;
-  });
-  return pending;
-}
-
-/**
- * Lädt den Export-Code nach dem ersten Rendern im Leerlauf vor (App), für alle gleich: Ohne Service Worker wäre der
- * Export offline sonst weg, und das `await` im Tipp löst so praktisch sofort auf (iOS lässt den Download dann noch
- * als Folge des Tipps gelten; prüft der Browser-Review). Gibt das Aufräumen für `useEffect` zurück.
- */
-export function preloadExportWhenIdle(): () => void {
-  const run = () => void loadExport().catch(() => {});
-  if (typeof requestIdleCallback === "function") {
-    const id = requestIdleCallback(run, { timeout: 3000 });
-    return () => cancelIdleCallback(id);
-  }
-  const id = setTimeout(run, 1000);
-  return () => clearTimeout(id);
-}
-
-function download(ics: string) {
-  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "zwergenplan-merkliste.ics";
-  document.body.append(a);
-  a.click();
-  a.remove();
-  // Erst später freigeben: Manche Browser lesen die Datei asynchron.
-  setTimeout(() => URL.revokeObjectURL(url), 10_000);
-}
-
-export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: SavedViewProps) {
-  const items = offers.map((offer) => ({ offer, sessions: collectionSessions(offer, ctx.now) }));
-  const sessionCount = items.reduce((sum, i) => sum + i.sessions.length, 0);
+export function SavedView({ offers, generatedAt, birthDate, ctx, onDiscover, onExported }: SavedViewProps) {
+  const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
+    if (count === 0) {
+      // Chunk trotzdem anfordern: Sein Request soll nicht verraten, ob etwas zum Alter passt (ADR 0018)
+      void loadExport().catch(() => {});
+      onExported("Keins der gemerkten Angebote passt zum Alter.", LONG_TOAST_MS);
+      return;
+    }
     let ics: IcsExport;
     try {
       ics = await loadExport();
     } catch {
-      // Chromium behält einen gescheiterten import() (auch des Vorladens): Nur ein Neuladen hilft sicher, die
-      // Merkliste liegt im localStorage und übersteht es (Arch-Review Paket 0, Befund 1).
-      onExported("Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.");
+      onExported(EXPORT_UNAVAILABLE);
       return;
     }
     const withCtx = items.map((i) => ({ ...i, ctx: ics.icsContextFor(i.offer, generatedAt) }));
-    download(ics.icsForCollection(withCtx, "Zwergenplan – Merkliste"));
-    onExported(`Kalenderdatei mit ${plural(sessionCount, "Termin", "Terminen")} geladen`);
+    download(ics.icsForCollection(withCtx, "Zwergenplan – Merkliste"), "zwergenplan-merkliste.ics");
+    onExported(collectionToast(count, missing), missing > 0 ? LONG_TOAST_MS : undefined);
   };
 
   return (
@@ -105,10 +60,7 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
             <Icon name="calendarPlus" />
             Alle in den Kalender
           </button>
-          <p className="small">
-            {offers.length} gemerkt · {plural(sessionCount, "Termin", "Termine")} in einer .ics-Datei · Kurse immer
-            komplett
-          </p>
+          <p className="small">{savedExportNote(offers.length, count, birthDate !== undefined)}</p>
           {offers.map((offer) => {
             const session = nextSession(offer, ctx.now);
             return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;

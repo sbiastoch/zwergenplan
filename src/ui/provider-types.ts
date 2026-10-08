@@ -52,6 +52,8 @@ export interface ProviderSheetProps {
   saved: boolean;
   /** merkt bzw. entfernt den Anbieter, mit Toast */
   onToggleSaved: (providerId: string) => void;
+  /** Teilen per Link (Plan 0026, E6): synchron im Tipp */
+  onShare: (provider: { id: string; name: string }) => void;
   onClose: () => void;
 }
 

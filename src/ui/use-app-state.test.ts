@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type OriginApi, type RouteApi, useOrigin, useRoute } from "./use-app-state.ts";
+import { LONG_TOAST_MS, type OriginApi, type RouteApi, useOrigin, useRoute, useToast } from "./use-app-state.ts";
 
 const preloadProviderUi = vi.hoisted(() => vi.fn());
 vi.mock("./ProviderPanel.tsx", () => ({ preloadProviderUi }));
@@ -340,5 +340,49 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
       renderRoute();
       expect(preloadProviderUi, search).not.toHaveBeenCalled();
     }
+  });
+});
+
+describe("useToast (Plan 0018, E4)", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  /** Ruft `say` beim ersten Rendern; liefert die gezeigte Meldung und die Dauer ihres Timers. */
+  function sayOnce(...args: Parameters<ReturnType<typeof useToast>[1]>) {
+    const timeout = vi.spyOn(globalThis, "setTimeout");
+    let shown = "";
+    let done = false;
+    function Probe() {
+      const [message, say] = useToast();
+      shown = message;
+      if (!done) {
+        done = true;
+        say(...args);
+      }
+      return null;
+    }
+    renderToStaticMarkup(createElement(Probe));
+    return { shown, delays: timeout.mock.calls.map((call) => call[1]) };
+  }
+
+  it("zeigt eine Meldung standardmäßig 2,8 s", () => {
+    expect(sayOnce("Gemerkt – liegt jetzt auf deiner Merkliste")).toEqual({
+      shown: "Gemerkt – liegt jetzt auf deiner Merkliste",
+      delays: [2800],
+    });
+  });
+
+  it("zeigt lange Meldungen so lange wie verlangt (6 s für Kürzung und „nichts passt“)", () => {
+    expect(LONG_TOAST_MS).toBe(6000);
+    expect(sayOnce("Keiner der kommenden Termine passt zum Alter.", LONG_TOAST_MS)).toEqual({
+      shown: "Keiner der kommenden Termine passt zum Alter.",
+      delays: [6000],
+    });
   });
 });

@@ -15,12 +15,14 @@ import {
   saveTheme,
   type ThemeChoice,
 } from "../data/preferences.ts";
+import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { cleanSavedProviders, toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
+import { SHARE_COPIED } from "./format.ts";
 import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
 import { preloadProviderUi } from "./ProviderPanel.tsx";
 
@@ -194,17 +196,54 @@ export function useTheme(): { choice: ThemeChoice; dark: boolean; setChoice: (c:
   return { choice, dark, setChoice };
 }
 
-/** Kurzmeldung, 2,8 s sichtbar. */
-export function useToast(): [string, (message: string) => void] {
+/** Standarddauer einer Kurzmeldung */
+const TOAST_MS = 2800;
+
+/**
+ * Dauer der langen Kalender-Toasts (Plan 0018, E4): mit Altersgrenze, mit fehlenden Angeboten und „nichts passt“. Sie
+ * sind bis knapp 90 Zeichen lang, nach der Faustregel etwa 1 s je 15 Zeichen.
+ */
+export const LONG_TOAST_MS = 6000;
+
+/** Kurzmeldung, 2,8 s sichtbar oder `ms` lang. */
+export function useToast(): [string, (message: string, ms?: number) => void] {
   const [message, setMessage] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const say = useCallback((next: string) => {
+  const say = useCallback((next: string, ms = TOAST_MS) => {
     clearTimeout(timer.current);
     setMessage(next);
-    timer.current = setTimeout(() => setMessage(""), 2800);
+    timer.current = setTimeout(() => setMessage(""), ms);
   }, []);
   return [message, say];
+}
+
+export interface ShareState {
+  /** im Tipp-Handler aufrufen, synchron (Safari verlangt die Nutzer-Aktivierung) */
+  share: (target: { title: string; path: string }) => void;
+  /** Link für das Sheet „Link zum Teilen“, wenn Teilen und Kopieren scheiterten (Review M2) */
+  manualLink: string | undefined;
+  closeManualLink: () => void;
+}
+
+/**
+ * Teilen per Link (Plan 0026, E6): System-Teilen, sonst kopieren mit Toast, sonst den Link zum Markieren zeigen.
+ * Geteilt wird nur der Pfad aus der ID, nie `location` – Filter, Ansicht, Geburtsdatum und Startpunkt bleiben draußen.
+ */
+export function useShare(say: (message: string) => void): ShareState {
+  const [manualLink, setManualLink] = useState<string>();
+  const share = useCallback(
+    ({ title, path }: { title: string; path: string }) => {
+      const url = absoluteUrl(path);
+      void shareLink({ title, url }).then((outcome) => {
+        if (outcome === "kopiert") say(SHARE_COPIED);
+        if (outcome === "fehler") setManualLink(url);
+      });
+    },
+    [say],
+  );
+  const closeManualLink = useCallback(() => setManualLink(undefined), []);
+  return { share, manualLink, closeManualLink };
 }
 
 /** Wie oft „jetzt“ geprüft wird. Der Zustand ändert sich trotzdem höchstens einmal pro Minute. */

@@ -111,7 +111,7 @@ module.exports = {
       name: "ics-only-lazy",
       severity: "error",
       comment:
-        "Der ICS-Code src/domain/ics.ts ist ein Lazy-Chunk (assets/export/, Plan 0010, E8 A: Export der Merkliste ist eine seltene, ausdrückliche Handlung). Von src/ aus nur per import(), auch Typen nicht statisch; Pfade und Termin-Schlüssel stehen in src/domain/ics-paths.ts. Tests ausgenommen.",
+        "Der ICS-Code src/domain/ics.ts ist ein Lazy-Chunk (assets/export/, Plan 0010, E8 A: Export der Merkliste ist eine seltene, ausdrückliche Handlung; seit Plan 0018 auch regelmäßige Reihen im Detail, passend zum Alter, ADR 0018). Von src/ aus nur per import(), auch Typen nicht statisch; Typen stehen in src/domain/ics-types.ts, Pfade und Termin-Schlüssel in src/domain/ics-paths.ts. Tests ausgenommen.",
       from: { path: "^src/", pathNot: "\\.test\\.ts$" },
       to: { path: "^src/domain/ics\\.ts$", dependencyTypesNot: ["dynamic-import"] },
     },
@@ -119,8 +119,8 @@ module.exports = {
       name: "ics-entry-only",
       severity: "error",
       comment:
-        "Nur der Lader src/ui/SavedView.tsx greift auf src/domain/ics.ts zu (Plan 0010, E8 A), wie transit-entry-only. Den Lader selbst prüft scripts/check-architecture.ts. Tests ausgenommen.",
-      from: { path: "^src/", pathNot: ["^src/ui/SavedView\\.tsx$", "^src/domain/ics\\.ts$", "\\.test\\.ts$"] },
+        "Nur der Lader src/ui/ics-export.ts greift auf src/domain/ics.ts zu (Plan 0010, E8 A), wie transit-entry-only. Bis Plan 0018 lag er in SavedView.tsx; seither nutzen ihn Merkliste und Detail (ADR 0018). Den Lader selbst prüft scripts/check-architecture.ts. Tests ausgenommen.",
+      from: { path: "^src/", pathNot: ["^src/ui/ics-export\\.ts$", "^src/domain/ics\\.ts$", "\\.test\\.ts$"] },
       to: { path: "^src/domain/ics\\.ts$" },
     },
     {

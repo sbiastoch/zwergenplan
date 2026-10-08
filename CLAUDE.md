@@ -41,6 +41,7 @@ E2E läuft lokal **gezielt**, die volle Suite fährt die CI auf jedem Branch (et
 | nur Doku; Domänenlogik ohne sichtbare Folge; Daten, Pipeline | keine |
 | sichtbares Verhalten, UI, geänderte Specs | die betroffenen Specs: `pnpm e2e:local e2e/detail.spec.ts`, danach bei UI `/browser-review` |
 | `e2e/fixtures.ts`, `e2e/mobile-ux.ts` | zusätzlich `e2e/theme.spec.ts` |
+| Vorschauseiten, Kachelbilder (`scripts/lib/share-pages.ts`, `scripts/lib/og-card.ts`, `scripts/og-images.ts`) | `e2e/teilen.spec.ts` und `PW_SUITE=smoke pnpm e2e` |
 | Service Worker, Vite-, Playwright-Konfiguration | die im Plan genannten Specs, z. B. `e2e/pwa.spec.ts`; bei der Playwright-Konfiguration die `--list`-Summen aus Plan 0013, Test 1 |
 
 - `pnpm e2e:local <spec …>` und `pnpm e2e` laufen immer mit `run_in_background`. `e2e:local` testet auf `pixel-7`, ein anderes Gerät wählt `-- --project=iphone-15`. Es nimmt eine maschinenweite Sperre (`scripts/heavy.ts`), wählt freie Ports und baut `dist-e2e/`. Bricht das Tool den Lauf ab, beendet der Wächter `scripts/heavy-watchdog.ts` die Gruppe des Laufs (Playwright räumt Browser und Server ab), und die Sperre wird frei.
@@ -70,3 +71,4 @@ E2E läuft lokal **gezielt**, die volle Suite fährt die CI auf jedem Branch (et
   - Nur um einen roten CI-Job nachzustellen, läuft `pnpm e2e` mit `PW_SUITE` und Shard (unter der Sperre, freie Ports, `run_in_background`): `PW_SUITE=webkit pnpm e2e -- --shard=1/2`, für Smoke `PW_SUITE=smoke pnpm e2e`.
   - Ein Gerät mit neuer Engine oder mit `dependencies` lässt die Konfiguration beim Laden werfen.
 - WebKit lokal braucht die Systembibliothek `libavif16`. Fehlt sie, bleibt es bei `pixel-7`. CI testet WebKit immer.
+- `pnpm build` rendert die Kachelbilder (Plan 0026) mit Playwright und braucht lokal Chromium (`pnpm exec playwright install chromium`). Der Fixture-Build weicht ohne Chromium auf WebKit aus.

@@ -2,7 +2,8 @@
  * Detail (Plan 0003, E3, E4, E13; Plan 0007, E1, E3, E4): Dialog, History, Deep-Link, ICS, Texte.
  * Fixtures, Uhr Mo 5.10.2026 12:00, sonst per `reloadAt`.
  */
-import type { Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import type { Download, Locator, Page, Request } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
 
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
@@ -169,4 +170,151 @@ test("Adresse mit Klammerzusatz: Ziel nur „Straße, PLZ Ort“ (Plan 0019, E2)
     "href",
     `${MAPS}Kirchengemeindehausstra%C3%9Fe+128a%2C+90461+N%C3%BCrnberg&travelmode=transit`,
   );
+});
+
+// Plan 0018, E2–E4: Mit Geburtsdatum kommt „Alle Termine“ einer regelmäßigen Reihe aus dem Browser, nur mit den
+// Terminen, an denen sie zum Alter passt. Das Detail öffnet per Deep-Link: Der Altersfilter blendet in „Entdecken“
+// Unpassendes aus.
+test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
+  const TREFF = {
+    id: "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
+    title: "Offener Krabbeltreff",
+  };
+  const REIME = {
+    id: "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
+    title: "Krabbelreime & Fingerspiele",
+  };
+
+  /** Geburtsdatum vor dem Laden speichern, Detail öffnen; zählt Requests auf `ics/` (ADR 0018: keiner mit Blob). */
+  async function openAged(page: Page, offer: { id: string; title: string }, birthDate: string) {
+    await page.addInitScript((born) => localStorage.setItem("zwergenplan.geburtsdatum", born), birthDate);
+    await page.goto(`./?angebot=${offer.id}`);
+    const dialog = page.getByRole("dialog", { name: offer.title });
+    await expect(dialog).toBeVisible();
+    const icsRequests: string[] = [];
+    page.on("request", (req: Request) => {
+      if (new URL(req.url()).pathname.includes("/ics/")) icsRequests.push(req.url());
+    });
+    return { dialog, all: dialog.getByRole("link", { name: "Alle Termine", exact: true }), icsRequests };
+  }
+
+  /** Satz unter der Altersspanne in der Kachel „Alter“ */
+  const ageLine = (dialog: Locator) =>
+    dialog
+      .locator(".label")
+      .filter({ hasText: /^Alter/ })
+      .locator("span.ok");
+
+  async function text(download: Download) {
+    return readFileSync((await download.path()) ?? "", "utf8");
+  }
+
+  /** UIDs bzw. ganze VEVENTs einer ICS-Datei, gefaltete Zeilen (RFC 5545) entfaltet */
+  const uids = (ics: string) => ics.replaceAll("\r\n ", "").match(/^UID:.+$/gm) ?? [];
+  const events = (ics: string) => ics.replaceAll("\r\n ", "").match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g) ?? [];
+
+  test("zu alt ab 21.10.: 2 Termine bis 14.10., UIDs wie in der statischen Datei, Toast 6 s", async ({ page }) => {
+    const { dialog, all, icsRequests } = await openAged(page, TREFF, "2024-09-18");
+    await expect(ageLine(dialog)).toHaveText("Passt: am Mi 7.10. 24 Monate alt · passt bis 14.10.");
+    // Hält die Timer an: Die Anzeigedauer des Toasts wird gezielt vorgespult.
+    await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
+    const [download] = await Promise.all([page.waitForEvent("download"), all.click()]);
+    expect(download.url()).toMatch(/^blob:/);
+    expect(download.suggestedFilename()).toBe(`${TREFF.id}.ics`);
+    const ics = await text(download);
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(2);
+    expect(ics).toContain("DTSTART:20261007T080000Z");
+    expect(ics).toContain("DTSTART:20261014T080000Z");
+    expect(ics).toContain("X-WR-CALNAME:Offener Krabbeltreff");
+    const toast = dialog.locator(".toast");
+    await expect(toast).toHaveText(
+      "Kalenderdatei mit 2 Terminen geladen – bis 14.10., danach passt es nicht mehr zum Alter",
+    );
+    expect(icsRequests, "kein Request auf ics/ (ADR 0018)").toEqual([]);
+
+    const res = await page.request.get(new URL((await all.getAttribute("href")) ?? "", page.url()).toString());
+    const full = await res.text();
+    expect(uids(full)).toHaveLength(5);
+    expect(uids(ics)).toHaveLength(2);
+    expect(uids(full)).toEqual(expect.arrayContaining(uids(ics)));
+    // ADR 0018: dieselben VEVENTs wie in der statischen Datei, mit Titel und DTSTAMP
+    expect(events(full)).toEqual(expect.arrayContaining(events(ics)));
+
+    await page.clock.runFor(5_500);
+    await expect(toast, "nach 5,5 s noch sichtbar").toBeVisible();
+    await page.clock.runFor(1_000);
+    await expect(toast).toHaveCount(0);
+  });
+
+  test("zu jung bis 20.10.: 3 Termine ab 21.10.", async ({ page }) => {
+    const { dialog, all, icsRequests } = await openAged(page, TREFF, "2026-04-20");
+    await expect(ageLine(dialog)).toHaveText("Passt: am Mi 21.10. 6 Monate alt · passt ab 21.10.");
+    const [download] = await Promise.all([page.waitForEvent("download"), all.click()]);
+    const ics = await text(download);
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(3);
+    expect(ics).not.toContain("DTSTART:20261014T080000Z");
+    for (const start of ["20261021T080000Z", "20261028T090000Z", "20261104T090000Z"]) {
+      expect(ics).toContain(`DTSTART:${start}`);
+    }
+    await expect(dialog.locator(".toast")).toHaveText(
+      "Kalenderdatei mit 3 Terminen geladen – ab 21.10., vorher passt es noch nicht zum Alter",
+    );
+    expect(icsRequests).toEqual([]);
+  });
+
+  test("passt über die ganze Reihe: trotzdem aus dem Browser, ohne Zusatz (Review 3, W2)", async ({ page }) => {
+    const { dialog, all, icsRequests } = await openAged(page, REIME, "2024-09-18");
+    await expect(ageLine(dialog)).toHaveText("Passt: am Fr 9.10. 24 Monate alt");
+    const [download] = await Promise.all([page.waitForEvent("download"), all.click()]);
+    expect(download.url()).toMatch(/^blob:/);
+    expect((await text(download)).match(/BEGIN:VEVENT/g)).toHaveLength(4);
+    await expect(dialog.locator(".toast")).toHaveText("Kalenderdatei mit 4 Terminen geladen");
+    expect(icsRequests, "der Request verriete sonst, dass die ganze Reihe passt").toEqual([]);
+  });
+
+  test("kein kommender Termin passt: kein Download, Toast", async ({ page }) => {
+    const { dialog, all, icsRequests } = await openAged(page, TREFF, "2026-08-01");
+    let downloaded = false;
+    page.on("download", () => {
+      downloaded = true;
+    });
+    const url = page.url();
+    await all.click();
+    await expect(dialog.locator(".toast")).toHaveText("Keiner der kommenden Termine passt zum Alter.");
+    expect(downloaded).toBe(false);
+    expect(icsRequests).toEqual([]);
+    expect(page.url()).toBe(url);
+    await expect(dialog).toBeVisible();
+  });
+
+  test.describe("Export-Code nicht ladbar", () => {
+    test.use({ allowedConsoleErrors: [/\/assets\/export\/\S+/] });
+
+    test("Toast, kein Download, kein Rückfall auf die statische Datei (ADR 0018)", async ({ page }) => {
+      await page.route("**/assets/export/*.js", (route) => route.abort());
+      const { dialog, all, icsRequests } = await openAged(page, TREFF, "2024-09-18");
+      let downloaded = false;
+      page.on("download", () => {
+        downloaded = true;
+      });
+      await all.click();
+      await expect(dialog.locator(".toast")).toHaveText(
+        "Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.",
+      );
+      expect(downloaded).toBe(false);
+      expect(icsRequests).toEqual([]);
+      await expect(dialog).toBeVisible();
+    });
+  });
+
+  test("ohne Geburtsdatum: die statische Datei wie bisher", async ({ page }) => {
+    const dialog = await openDetail(page, TREFF.title);
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      dialog.getByRole("link", { name: "Alle Termine", exact: true }).click(),
+    ]);
+    expect(new URL(download.url()).pathname).toMatch(new RegExp(`/ics/${TREFF.id}\\.ics$`));
+    expect((await text(download)).match(/BEGIN:VEVENT/g)).toHaveLength(5);
+    await expect(dialog.locator(".toast")).toHaveText("Kalenderdatei mit 5 Terminen geladen");
+  });
 });
