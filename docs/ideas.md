@@ -76,6 +76,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Nachschliff 0022–0024** (Browser-Review live, 2026-10-08, `5701141`):
+  - Startausschnitt der Karte bei niedriger Karte (< ~300 px, z. B. 320×640, iPhone SE 375×667, iPhone mit Safari-Leiste 390×664): Kachelstufe z8 statt z9, nur 2 Cluster („42“, „290“) statt 7. Ursache ist die Reserve unten für die Attribution (66 px). Idee: Attribution auf niedrigen Karten kompakt („i“) starten oder die Reserve nur ab 300 px Kartenhöhe voll nehmen. Mit Startpunkt tritt es nicht auf.
+  - Kalender dunkel: Der orange Punkt unter „heute“ auf dem gelben Kreis hat wenig Kontrast.
 - **Plan 0027** (Ergebnis, K9):
   - Die K9-Fälle 2, 4, 7 und 8 (Doku nach rotem Vorgänger, wartender Lauf auf `main` abgebrochen, toter Pfad im Doku-Pfad, Absturz von `scope`) bei Gelegenheit einmal an echten Läufen belegen.
   - `check:fast` schwankt zwischen 7 und 10,7 s, Ziel war ≤ 7,5 s.
