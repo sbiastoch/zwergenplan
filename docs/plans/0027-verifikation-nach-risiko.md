@@ -649,6 +649,25 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
 - **CLAUDE.md:** Die lokalen Beispiele nutzen `pnpm e2e:local`. Die Nachstellung eines CI-Jobs läuft unter `heavy.ts`.
 - `browser-review` startet nur `vite preview` und `scripts/screenshots.ts` (Playwright als Bibliothek) und ist vom Wächter nicht betroffen. Den freien Port dort bekommt es mit Etappe 5.
 
+### Etappe 5 (Branch `harness-0027-e5`)
+
+- **`CLAUDE.md`:**
+  - Neuer Abschnitt „Lokal prüfen“ mit den Stufen 0 und C, den Stempeln des Stop-Gates und einer E2E-Tabelle je Änderung. Er ist die einzige Quelle; die verstreuten Sätze aus Etappe 1 bis 4 in den Stolperfallen sind entfernt.
+  - Arbeitsweise, Schritt 3: `pnpm verify`.
+  - Schritt 6 mit E13: Nur die Haupt-Session beobachtet die CI, mit `gh run watch <id> -i 120 --exit-status`; der Deploy wird über `meta.json` geprüft.
+  - Stolperfallen um die Git-Regel für Tests gekürzt.
+- **Skills:**
+  - `browser-review`: freier Port über `node scripts/free-port.ts` (neu, nutzt `free-ports.ts`); vor `live` die Prüfung über `meta.json`.
+  - `babyevents-nuernberg`: `gh run watch` mit Intervall; als Subagent nur SHA und Lauf-ID melden.
+  - `arch-review`: `pnpm verify`.
+  - `plan-review`: unverändert, das Archiv kommt mit Etappe 6.
+- **Agents:** `plan-reviewer` fragt nach der lokalen Prüfung je Schritt. `arch-reviewer` hat keine Bash-Rechte und bleibt unverändert.
+- **ADRs und Ideen:**
+  - ADR 0004 hat einen Nachtrag.
+  - ADR 0021, Teil A, ist angenommen.
+  - `docs/ideas.md` hat drei Einträge: SHA-Wiederverwendung, lefthook im Worktree, 5. Chromium-Shard.
+- **Abnahme:** Ein frischer Subagent hat nur CLAUDE.md gelesen und die Frage „Welche Prüfung genügt für `src/ui/Detail.tsx`, und wie beobachte ich als Subagent die CI?“ so beantwortet: „`pnpm verify` (Stufe C) plus `pnpm e2e:local e2e/detail.spec.ts` mit `run_in_background`, danach `/browser-review`; die CI beobachtest du als Subagent nicht, du meldest Branch und SHA.“
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.

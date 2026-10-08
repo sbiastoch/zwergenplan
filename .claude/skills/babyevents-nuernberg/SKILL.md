@@ -70,12 +70,14 @@ Jede Drift-Meldung aus dem Bericht wird in `data/providers.yaml` umgesetzt (tote
 
 ```
 pnpm pipeline publish runs/<from>
-gh run watch
+gh run watch <id> -i 120 --exit-status
 ```
+
+Die Lauf-ID nennt `gh run list --branch main --limit 1`. Ein Intervall unter 2 Minuten reißt mit parallelen Sessions das API-Limit (Plan 0027, E13). Läuft der Skill als Subagent, beobachtet er die CI nicht: Er meldet SHA und Lauf-ID, und die Haupt-Session beobachtet.
 
 `publish` bricht ab, wenn es Änderungen außerhalb von `data/` gibt. Code-Änderungen gehören in einen eigenen Commit. Danach prüft `publish` gegen den deployten Stand, committet `data/` auf `main` und pusht. Ist CI rot, bleibt die alte Version live: Ursache reparieren, neu bauen, neu veröffentlichen.
 
-Fertig, wenn `gh run watch` grün endet und `https://zwergenplan.app/data/meta.json` den neuen Commit zeigt.
+Fertig, wenn der CI-Lauf grün ist und `curl -s https://zwergenplan.app/data/meta.json` in `commit` den neuen Kurz-SHA zeigt. Als Subagent: fertig, wenn SHA und Lauf-ID gemeldet sind.
 
 ## Abschlussbericht im Chat
 

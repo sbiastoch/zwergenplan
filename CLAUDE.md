@@ -8,15 +8,38 @@ UI-Texte und Doku sind auf Deutsch, Code-Identifier auf Englisch. Die Kommandos 
 
 1. **Plan**: Für jede nicht-triviale Änderung zuerst `docs/plans/NNNN-<thema>.md` schreiben. Fertig ist der Plan, wenn ein Fremder ihn ohne den Chat umsetzen könnte.
 2. **`/plan-review`**: Fertig, wenn der Plan einen Review-Abschnitt hat und kein Blocker mehr offen ist.
-3. **Umsetzen, test-first** für Domänenlogik. Fertig, wenn `pnpm check:fast` **grün** ist und jede neue Logik bzw. Ansicht einen Test hat.
+3. **Umsetzen, test-first** für Domänenlogik. Fertig, wenn `pnpm verify` **grün** ist, die E2E-Pflicht aus „Lokal prüfen“ erfüllt ist und jede neue Logik bzw. Ansicht einen Test hat.
 4. **`/arch-review`** bei größeren Änderungen: neues Modul, neue Abhängigkeit, Schemaänderung oder mehr als 200 Zeilen. Fertig, wenn kein Blocker mehr offen ist.
 5. **`/browser-review`** bei jeder UI-Änderung, nach dem Deploy auf der Live-URL. Fertig, wenn jede Zeile der Checkliste beantwortet ist.
 6. **Commit und Push.**
    - Wer allein im Haupt-Checkout arbeitet, committet direkt auf `main`.
    - Wer in einem Worktree oder parallel zu einer anderen Session arbeitet, nutzt einen eigenen Branch. Der wird gepusht (CI läuft auf jedem Branch, ohne Deploy) und dann per Fast-Forward nach `main` gebracht.
-   - CI ist das einzige Gate vor dem Deploy. Fertig erst, wenn der CI-Lauf auf `main` **grün** ist (`gh run watch`) und die Live-Seite den neuen Stand zeigt.
+   - CI ist das einzige Gate vor dem Deploy. Fertig erst, wenn der CI-Lauf auf `main` **grün** ist und die Live-Seite den neuen Stand zeigt: `commit` in https://zwergenplan.app/data/meta.json ist `git rev-parse --short HEAD`. Sobald Plan 0027, Etappe 7, umgesetzt ist, deployt ein reiner Doku-Commit nicht mehr. `meta.json` zeigt dann den letzten Commit mit Build-Eingaben.
+   - **Die CI beobachtet nur die Haupt-Session**, mit `gh run watch <id> -i 120 --exit-status` oder einzelnen `gh run view` im Abstand von mindestens 2 Minuten. Ein Subagent pusht und meldet Branch und SHA. Grund: Parallele Watches mit dem Standardintervall von 3 s haben das API-Limit von 5 000 Anfragen pro Stunde gerissen (Plan 0027, E13).
 
 Die Hooks erzwingen einen Teil davon. Bei Rot meldet das Stop-Gate kein „fertig“. Die Gates sind die **Backpressure** des Projekts: Wird eins rot, reparierst du die Ursache. Eine Schwelle zu senken, eine Regel abzuschalten oder `skip`/`biome-ignore`/`as`-Casts zu setzen braucht eine schriftliche Begründung im Code und im Commit, bei Architekturregeln ein ADR.
+
+## Lokal prüfen (Plan 0027, ADR 0021)
+
+Der Diff bestimmt die Stufe. `pnpm verify`, der pre-commit-Hook und das Stop-Gate wählen sie selbst:
+
+- **Stufe 0**: Jeder geänderte Pfad ist Doku (`docs/**/*.md` außer `docs/design/`, `*.md` im Wurzelverzeichnis, `.claude/skills|agents/**/*.md`). Es läuft nur `check-docs`: eindeutige Plan- und ADR-Nummern, keine toten Pfadverweise.
+- **Stufe C**: alles andere, auch Unbekanntes. Es läuft `check:fast` (Typen, Biome, Architektur, Daten, Vitest, knip, Schema-Drift, Doku), etwa 7 s.
+- Das Stop-Gate prüft einen Inhalt (Tree-ID) nur einmal: Ist er in den letzten 12 h grün geprüft, auch in einem anderen Worktree oder vor einem Commit, läuft nichts. Ein Zeitlimit zählt als Rot.
+
+E2E läuft lokal **gezielt**, die volle Suite fährt die CI auf jedem Branch (etwa 9 Minuten):
+
+| Änderung | E2E lokal |
+|---|---|
+| nur Doku; Domänenlogik ohne sichtbare Folge; Daten, Pipeline | keine |
+| sichtbares Verhalten, UI, geänderte Specs | die betroffenen Specs: `pnpm e2e:local e2e/detail.spec.ts`, danach bei UI `/browser-review` |
+| `e2e/fixtures.ts`, `e2e/mobile-ux.ts` | zusätzlich `e2e/theme.spec.ts` |
+| Service Worker, Vite-, Playwright-Konfiguration | die im Plan genannten Specs, z. B. `e2e/pwa.spec.ts`; bei der Playwright-Konfiguration die `--list`-Summen aus Plan 0013, Test 1 |
+
+- `pnpm e2e:local <spec …>` läuft immer mit `run_in_background`. Es testet auf `pixel-7`, ein anderes Gerät wählt `-- --project=iphone-15`. Es nimmt eine maschinenweite Sperre (`scripts/heavy.ts`), wählt freie Ports und baut `dist-e2e/`.
+- Ist die Sperre belegt, endet es nach 30 s mit Exit 75 und nennt den Halter. Länger warten geht mit `ZP_LOCK_WAIT=1800`.
+- `pnpm exec playwright test` bricht lokal ohne Sperre ab (`e2e/global-setup.ts`). `--list` geht immer.
+- Ist ein Test lokal nur unter Last rot, wird er erst zum Befund, wenn er auch in der CI rot oder „flaky“ ist.
 
 ## Wo was steht
 
@@ -31,12 +54,10 @@ Die Hooks erzwingen einen Teil davon. Bei Rot meldet das Stop-Gate kein „ferti
 - Zeiten haben immer einen Offset (`2026-10-25T10:00:00+01:00`). Kalenderlogik läuft in Europe/Berlin über `src/domain/time.ts`. Die Unit-Tests laufen absichtlich in `America/Los_Angeles`.
 - E2E nutzt Fixture-Daten (`tests/fixtures/`, fiktiv) mit eingefrorener Uhr (`e2e/fixtures.ts`). Der Deploy-Build (`dist/`) enthält nie Fixtures, der E2E-Build liegt in `dist-e2e/`.
 - **Daten**: `data/providers.yaml` (Katalog) und `data/offers.json` entstehen über den Skill `babyevents-nuernberg` und `pnpm pipeline` (ADR 0006). `data/offers.json` wird nie von Hand bearbeitet, Korrekturen laufen über die Rohdaten eines Laufs und `pipeline build`. Der Fahrplanauszug `data/oepnv/fahrplan.json` (ADR 0011) entsteht nur über `pnpm pipeline oepnv`, nie von Hand; Biome nimmt ihn aus, `pnpm data:validate` prüft ihn per Zod.
-- Hooks brauchen `node_modules`. In einem frischen Checkout zuerst `pnpm install` ausführen, das installiert auch den lefthook-pre-commit. Ohne `node_modules` melden sich die Claude-Hooks nur mit einem Hinweis und blockieren nichts.
-- **E2E lokal nur gezielt** (Plan 0027): Lokal laufen nur die Specs, die die Änderung betreffen, auf `pixel-7`: `pnpm e2e:local e2e/detail.spec.ts` (immer mit `run_in_background`; anderes Gerät mit `-- --project=iphone-15`). Das Skript nimmt eine maschinenweite Sperre (`scripts/heavy.ts`, `flock`), wählt freie Ports und baut `dist-e2e/`. Ist die Sperre belegt, endet es nach 30 s mit Exit 75 und nennt den Halter; länger warten mit `ZP_LOCK_WAIT=1800`. Direkt `pnpm exec playwright test` bricht lokal ab (Wächter in `e2e/global-setup.ts`), `--list` geht immer. Die volle Suite mit allen Geräten fährt kein Agent lokal. Das übernimmt die CI auf jedem Branch, parallel: Ein Lauf auf `main` dauert vom Push bis zum Deploy 9–10,6 min (gemessen 2026-10-08, Plan 0027), der längste E2E-Job 8,8 min. Ist ein Test lokal nur unter Last rot, jagt man ihn nicht mit `--last-failed`; ein Befund ist er erst, wenn er auch in der CI rot oder „flaky“ ist.
-- Das Stop-Gate ruft `node scripts/verify.ts --stop` auf (Plan 0027, E5). Ein Inhalt (Tree-ID), der in den letzten 12 h grün geprüft wurde, wird nicht erneut geprüft, auch nicht nach einem Commit oder in einem anderen Worktree. Die Stempel liegen in `~/.cache/zwergenplan/green/`. Ein Zeitlimit zählt als Rot.
-- **git in Tests und Skripten:** In Hooks setzt git `GIT_DIR` und `GIT_INDEX_FILE`. Ein Kindprozess erbt sie und arbeitet dann auf dem echten Repo, auch mit fremdem `cwd`. Deshalb laufen Tests, die git schreibend nutzen, nur in `tempRepo()` aus `scripts/lib/temp-repo.ts`: Temp-Ordner, explizites `GIT_DIR`, Identität per `-c`, nie `git config`. Jeder andere git-Aufruf mit eigenem `cwd` nutzt `withoutGitEnv()` aus `scripts/lib/git-env.ts`. Am 2026-10-08 hat ein Test im pre-commit-Hook das gemeinsame `.git/config` auf `core.bare = true` gesetzt. Der Kanarienvogel dagegen ist `scripts/lib/git-isolation.test.ts`.
-- Der pre-commit-Hook ruft `node scripts/verify.ts --staged` auf (Plan 0027). Ändert ein Commit nur Doku (`docs/**/*.md` außer `docs/design/`, `*.md` im Wurzelverzeichnis, `.claude/skills|agents/**/*.md`), läuft nur `check-docs`: eindeutige Plan- und ADR-Nummern, keine toten Pfadverweise. Alles andere fährt `check:fast`. `pnpm verify` macht von Hand dasselbe für den Diff zu `origin/main`.
-- `check:fast` prüft zuerst, ob `node_modules` zum Lockfile passt. Meldet es „node_modules passt nicht zu pnpm-lock.yaml“ oder „node_modules fehlt“, hilft `pnpm install --frozen-lockfile`. Seit Plan 0027 enthält `check:fast` auch knip und die Schema-Drift.
-- Ein CPU-gebundener Unit-Test über 1 s bekommt ein eigenes Zeitlimit mit Begründung im Code, etwa `{ timeout: 30_000 }` wie in `scripts/transit/profile-csa.test.ts`. Unter der Last paralleler Sessions reißt er sonst die Standardgrenze von 5 s. Die globale Grenze bleibt.
-- CI teilt E2E über `PW_SUITE` (`chromium`, `webkit`, `smoke`) in parallele Jobs und Shards (Plan 0013). Lokal ohne `PW_SUITE` läuft alles. Einen CI-Job stellt man unter der Sperre so nach: `node scripts/heavy.ts sh -c "pnpm build:e2e && PW_PORT=4373 PW_SUITE=webkit pnpm exec playwright test --shard=1/2"` (Smoke: `pnpm build`, dann `PW_SUITE=smoke`). Einen eigenen `PW_PORT` braucht nur dieser Weg; `e2e:local` wählt die Ports selbst. Ein Gerät mit neuer Engine oder mit `dependencies` lässt die Konfiguration beim Laden werfen.
-- WebKit lokal braucht die Systembibliothek `libavif16`. Fehlt sie, bleibt es bei `pixel-7` (Standard von `pnpm e2e:local`). CI testet WebKit immer.
+- Hooks brauchen `node_modules`. In einem frischen Checkout zuerst `pnpm install` ausführen, das installiert auch den lefthook-pre-commit. Ohne `node_modules` melden sich die Claude-Hooks nur mit einem Hinweis und blockieren nichts. Meldet `check:fast` „node_modules passt nicht zu pnpm-lock.yaml“ oder „node_modules fehlt“, hilft `pnpm install --frozen-lockfile`.
+- **git in Tests**: In Hooks setzt git `GIT_DIR` und `GIT_INDEX_FILE`, und ein Kindprozess mit fremdem `cwd` arbeitet dann auf dem echten Repo. Am 2026-10-08 hat so ein Test `core.bare = true` gesetzt. Tests nutzen git schreibend nur über `tempRepo()` (`scripts/lib/temp-repo.ts`), mit Identität per `-c`. Andere git-Aufrufe mit eigenem `cwd` nutzen `withoutGitEnv()` (`scripts/lib/git-env.ts`). Den Kanarienvogel dafür hält `scripts/lib/git-isolation.test.ts`.
+- Ein CPU-gebundener Unit-Test über 1 s bekommt ein eigenes Zeitlimit mit Begründung im Code, wie `REFERENCE_TIMEOUT_MS` in `scripts/transit/profile-csa.test.ts`. Unter der Last paralleler Sessions reißt er sonst die Standardgrenze von 5 s.
+- CI teilt E2E über `PW_SUITE` (`chromium`, `webkit`, `smoke`) in parallele Jobs und Shards (Plan 0013).
+  - Einen CI-Job stellt man unter der Sperre so nach: `node scripts/heavy.ts sh -c "pnpm build:e2e && PW_PORT=4373 PW_SUITE=webkit pnpm exec playwright test --shard=1/2"`. Für Smoke: `pnpm build`, dann `PW_SUITE=smoke`.
+  - Ein Gerät mit neuer Engine oder mit `dependencies` lässt die Konfiguration beim Laden werfen.
+- WebKit lokal braucht die Systembibliothek `libavif16`. Fehlt sie, bleibt es bei `pixel-7`. CI testet WebKit immer.

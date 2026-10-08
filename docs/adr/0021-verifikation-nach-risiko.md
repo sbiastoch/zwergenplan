@@ -1,6 +1,6 @@
 # ADR 0021 – Verifikation nach Risiko
 
-Status: Entwurf (2026-10-08). Plan 0027 ist nach zwei Review-Runden freigegeben. Teil A gilt als angenommen mit Plan 0027, Etappe 5, Teil B mit Etappe 7. Der Nutzer hat Teil B am 2026-10-08 zugestimmt. Dieses ADR ergänzt ADR 0004 (Backpressure). Teil B ändert für Doku-Commits ADR 0002 („check → E2E → Deploy“).
+Status: **Teil A angenommen** (2026-10-08, umgesetzt mit Plan 0027, Etappen 1 bis 5). **Teil B ist Entwurf** und gilt als angenommen mit Etappe 7. Der Nutzer hat Teil B am 2026-10-08 zugestimmt. Dieses ADR ergänzt ADR 0004 (Backpressure). Teil B ändert für Doku-Commits ADR 0002 („check → E2E → Deploy“).
 
 ## Kontext
 

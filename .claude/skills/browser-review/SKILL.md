@@ -8,8 +8,8 @@ description: Pflicht-Sichtprüfung im Browser vor „fertig“ bei jeder UI-Änd
 Automatische Gates prüfen Regeln. Dieser Schritt prüft, ob es **gut** ist.
 
 ## 1. Ziel festlegen
-- **lokal** (Standard): `pnpm build:e2e`, dann `pnpm exec vite preview --strictPort --port 4173 --outDir dist-e2e` im Hintergrund starten. Die URL ist `http://localhost:4173/` und nutzt Fixture-Daten.
-- **live**: `https://zwergenplan.app/` mit echten Daten.
+- **lokal** (Standard): `pnpm build:e2e`, dann `PORT=$(node scripts/free-port.ts)` und `pnpm exec vite preview --strictPort --port $PORT --outDir dist-e2e` im Hintergrund starten. Die URL ist `http://localhost:$PORT/` (Port ausgeben und merken), sie nutzt Fixture-Daten. Ein fester Port kollidiert mit parallelen Sessions.
+- **live**: `https://zwergenplan.app/` mit echten Daten. Erst prüfen, ob der Deploy angekommen ist: `curl -s https://zwergenplan.app/data/meta.json` zeigt in `commit` denselben Kurz-SHA wie `git rev-parse --short HEAD`. Ohne GitHub-API (Plan 0027, E13).
 
 ## 2. Screenshots
 `node scripts/screenshots.ts <URL>` erzeugt `e2e/.artifacts/screens/*.png`. Die Matrix umfasst

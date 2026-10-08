@@ -30,3 +30,14 @@ Die Prüfungen sind in Schichten organisiert. Jede fängt eine Fehlerklasse so f
 
 ## Konsequenzen
 - Mit Absicht zurückgestellt: visuelle Regression (bis das Design steht), Lighthouse CI (veraltetes Paket), Architektur-Review in CI (API-Kosten). Siehe `docs/ideas.md`.
+
+## Nachtrag (2026-10-08): Verifikation nach Risiko, ADR 0021
+
+ADR 0021, Teil A, ergänzt diese Entscheidung (Plan 0027, Etappen 1 bis 5). Kein Gate wird schwächer, und vor jedem Deploy fährt die CI weiter alles.
+
+- **Hooks nach Stufe:**
+  - pre-commit (`verify --staged`) und Stop-Gate (`verify --stop`) prüfen nach der Stufe des Diffs. Bei reiner Doku (Stufe 0) läuft `check-docs`, sonst `check:fast` (Stufe C).
+  - Das Stop-Gate prüft einen Inhalt (Tree-ID) nur einmal je 12 h. Ein Zeitlimit oder ein Fehler im Gate zählt als Rot.
+- **`check:fast`** enthält knip, Schema-Drift und `check-docs` und erkennt ein veraltetes `node_modules`.
+- **E2E lokal** läuft nur gezielt (`pnpm e2e:local`), unter einer maschinenweiten Sperre (`scripts/heavy.ts`). Die volle Suite fährt die CI auf jedem Branch.
+- **Mehrere Checkouts:** Tests nutzen git schreibend nur in isolierten Temp-Repos (`scripts/lib/temp-repo.ts`). `vitest.setup.ts` löscht alle GIT_*-Variablen. Anlass war ein Test im pre-commit-Hook, der am 2026-10-08 das gemeinsame `.git/config` umgeschrieben hat.

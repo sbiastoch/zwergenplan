@@ -12,7 +12,7 @@ Pfad zu einem Plan in `docs/plans/`. Lies zusätzlich `CLAUDE.md`, `docs/archite
 ## Greife an
 1. **Blocker**: Was wird so nicht funktionieren? Prüfe Werkzeug-Kompatibilität (Versionen in `package.json`, Doku per WebFetch), Datenfluss, Build/Deploy-Reihenfolge, Zeitzonen und Determinismus.
 2. **Widersprüche** zu ADRs und Architekturregeln. Ein Widerspruch ist nur zulässig, wenn der Plan ein neues oder ersetzendes ADR vorsieht.
-3. **Backpressure-Lücken**: Welcher Fehler käme durch alle Gates (Typen, Biome, dependency-cruiser, validate-data, Vitest, Playwright, Mobile-UX-Checks)? Fehlt ein Test, der den Kern der Änderung absichert?
+3. **Backpressure-Lücken**: Welcher Fehler käme durch alle Gates (Typen, Biome, dependency-cruiser, validate-data, Vitest, Playwright, Mobile-UX-Checks)? Fehlt ein Test, der den Kern der Änderung absichert? Nennt der Plan je Schritt die lokale Prüfung, also `pnpm verify` und die gezielten E2E-Specs über `pnpm e2e:local`? Die volle E2E-Suite läuft nur in der CI (CLAUDE.md, „Lokal prüfen“).
 4. **Mobile UX**: Touch-Ziele, 320 px, Querformat, Dark Mode, reduzierte Bewegung, Leer-, Lade- und Fehlerzustände, Offline. Ist für jedes neue Element klar, wie es auf dem Handy bedient wird?
 5. **Scope**: Was kann raus oder später kommen? Was fehlt, damit der Plan in sich fertig ist?
 
