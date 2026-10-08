@@ -271,6 +271,32 @@ describe("useOfferViews", () => {
       expect(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }).map?.placeCount).toBe(1);
     });
 
+    it("Karte der Merkliste: Orte der gemerkten Angebote, Startausschnitt wie in „Entdecken“ (Plan 0025, E4)", () => {
+      const merklisteKarte: Route = { tab: "merkliste-karte", filter: EMPTY_FILTER };
+      const gross = at(GROSS, 49.46, 11.1);
+      const all = [nah, nahZwei, fern, gross, VORBEI];
+      // nur gemerkte mit kommendem Termin; nah und nahZwei teilen sich einen Ort
+      const v = render({ offers: all, route: merklisteKarte, savedIds: [nah.id, nahZwei.id, VORBEI.id] });
+      expect(v.map?.placeCount).toBe(1);
+      // Startseiten-Filter, Wegzeit und Alter wirken auf der Merkliste nicht
+      const filtered = render({
+        offers: all,
+        route: { ...within20, tab: "merkliste-karte", filter: { ...within20.filter, formats: ["kurs"] } },
+        reach: wegzeit,
+        birthDate: "2026-05-01",
+        savedIds: [fern.id, gross.id],
+      });
+      expect(filtered.map?.placeCount).toBe(2);
+      // Kamera-Regel (ADR 0008): dieselbe Datenbasis wie die Karte in „Entdecken“, nie die Merkliste
+      const plain = render({ offers: all, route: { tab: "karte", filter: EMPTY_FILTER } }).map?.cameraOffers;
+      expect(v.map?.cameraOffers).toEqual(plain);
+      expect(filtered.map?.cameraOffers).toEqual(plain);
+      // Liste der Merkliste: keine Karte
+      expect(render({ offers: all, route: { tab: "merkliste", filter: EMPTY_FILTER }, savedIds: [nah.id] }).map).toBe(
+        undefined,
+      );
+    });
+
     it("Datenbasis des Startausschnitts: alle kommenden Angebote, unabhängig von Filtern, Alter, Startpunkt und Tabelle (Arch-Review B1, m1)", () => {
       const standort: Origin = { source: "standort", point: { lat: 49.4495, lon: 11.0601 }, label: "Mein Standort" };
       const gross = at(GROSS, 49.4301, 11.0892);

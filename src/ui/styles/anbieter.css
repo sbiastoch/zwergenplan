@@ -8,7 +8,9 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-top: 10px;
+    /* unten wie oben zu den Schnellfiltern: Die Statuszeile klebte sonst am Schatten der Eingabe (Browser-Review
+       Etappe 1 zu Plan 0025, Minor 1) */
+    margin: 10px 0;
     font-weight: 800;
   }
   /* 16 px Mindestschrift, sonst zoomt iOS beim Fokus */

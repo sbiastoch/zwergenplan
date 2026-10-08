@@ -88,7 +88,7 @@ async function setBirthDate(page: Page, text: string) {
 }
 
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
-const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-fehler"]);
+const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-fehler", "merkliste-karte"]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
 const CONSOLE_ERRORS: Record<string, RegExp[]> = {
@@ -111,11 +111,23 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
   },
+  // Plan 0025, E3a: Kopf mit Umschalter über die ganze Breite, Statuszeile und rundem Export-Knopf
   merkliste: async (page) => {
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
     await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
     await page.getByRole("button", { name: /^Merkliste/ }).click();
     await expect(page.getByTestId("offer")).toHaveCount(2);
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+  },
+  // Plan 0025, E4: Karte der Merkliste mit drei gemerkten Angeboten an zwei Orten
+  "merkliste-karte": async (page) => {
+    await page.evaluate(
+      (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+      JSON.stringify([PEKIP_ID, TREFF_ID, REIME_ID]),
+    );
+    await page.goto("./?ansicht=merkliste-karte");
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await expect(page.getByRole("status")).toHaveText("3 Angebote an 2 Orten gemerkt");
   },
   // Plan 0025, E2: Anbieter-Sheet mit gedrücktem Herz neben dem längsten Namen (Kirchengemeinde, mehrzeilig)
   "anbieter-sheet-gemerkt": async (page) => {
@@ -145,12 +157,11 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("heading", { level: 3, name: /PEKiP/ }).getByRole("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
   },
-  // Plan 0018, E3: längster Text unter „Alle in den Kalender“ (Kurs komplett, Treff nur passend zum Alter)
+  // Plan 0018, E3: Merkliste mit Geburtsdatum. Die Zeile unter dem Export-Knopf entfiel mit Plan 0025 (E3a), die
+  // Statuszeile zählt alle kommenden Termine.
   "merkliste-mit-geburtsdatum": async (page) => {
     await loadAged(page, "./?ansicht=merkliste", "2024-09-18", [PEKIP_ID, TREFF_ID]);
-    await expect(
-      page.getByText("2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter"),
-    ).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
   },
   // Plan 0018, E4: Alterszeile mit Grenze „· passt bis 14.10.“
   "detail-mit-geburtsdatum": async (page) => {

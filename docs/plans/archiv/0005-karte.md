@@ -24,6 +24,8 @@ Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR
 - ÖPNV-Fahrzeit (ADR 0005), Haltestellen als Startpunkt.
 - Service Worker, Offline-Kacheln, Vorab-Laden der Karte, selbst gehostete Kacheln (ADR 0008, „Alternativen“: als Ausweichweg festgehalten).
 - Karte im Kalender oder in der Merkliste.
+
+  > **Geändert durch Plan 0025:** Die Merkliste hat eine eigene Karte (`?ansicht=merkliste-karte`, E4) mit den Orten der gemerkten Angebote. Der Startausschnitt ist derselbe wie in „Entdecken“ (alle kommenden Angebote, ADR 0008).
 - Diese Punkte kommen nach `docs/ideas.md`: Umkreis-Kreis auf der Karte, „Auf der Karte zeigen“ im Detail, Link „Route in Karten-App öffnen“, Adresssuche.
 - Sortierung der Tagesliste nach Entfernung (Plan 0004, Nicht-Ziele).
 
@@ -129,6 +131,8 @@ Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR
   - Ein Tipp auf „Entdecken“ aus Kalender oder Merkliste führt immer zur Liste. Es gibt kein Gedächtnis für die letzte Darstellung, weder im Speicher noch in `localStorage`.
   - `?ansicht=karte` in der URL (Neuladen, geteilter Link) öffnet die Karte, weil die URL der Zustand ist.
 - **Umschalter Liste | Karte**: Segment `.seg seg2` mit `aria-pressed`, in einem `fieldset` mit versteckter Legende „Darstellung der Angebote“. Er steht unter den Schnellfiltern, über der Statuszeile. Sticker-Leiste und Schnellfilter stehen auch auf der Karte.
+
+  > **Geändert durch Plan 0025:** `ViewToggle` ist allgemein (`options`, `current`, `onChange`, `legend`), die Klasse heißt `seg`, die Daumenbreite folgt `--n`. In „Entdecken“ steht er wie bisher neben der Statuszeile; auf der Merkliste steht er allein über die ganze Breite (`.view-toggle.full`, Legende „Darstellung der Merkliste“), ohne Sticker und Schnellfilter.
 - Das Detail öffnet aus der Karte wie überall (`pushState`, `angebot=`).
 - Das Orts-Sheet ist Sitzungszustand (`placeKey` im Speicher), nicht in der URL.
 - Nie in der URL: Startpunkt, Kartenausschnitt, Ort.

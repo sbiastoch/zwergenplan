@@ -1,7 +1,7 @@
 /** Kopf, Kategorie-Sticker, Schnellfilter und Tab-Leiste (Plan 0003, E10, E15, E16). */
-import type { Ref } from "react";
+import type { CSSProperties, Ref } from "react";
 import { activeFilterCount, type FilterState, toggleIn } from "../domain/filter.ts";
-import type { Tab } from "../domain/route.ts";
+import type { Section, Tab } from "../domain/route.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { CATEGORY_UI } from "./categories.ts";
 import { Icon, Logo } from "./icons.tsx";
@@ -141,7 +141,7 @@ export function TabBar({
   onTab,
   currentRef,
 }: {
-  tab: Tab;
+  tab: Section;
   savedCount: number;
   onTab: (t: Tab) => void;
   /** hängt nur am Knopf des aktiven Tabs: Fokus-Rückweg des Details (Plan 0008, E11) */
@@ -175,22 +175,50 @@ export function TabBar({
   );
 }
 
-/** Umschalter Liste | Karte (Plan 0005, E5): beide Darstellungen gehören zu „Entdecken“. */
-export function ViewToggle({ map, onMap }: { map: boolean; onMap: (map: boolean) => void }) {
+/** Eine Darstellung im Umschalter */
+export interface ViewOption<V extends string> {
+  value: V;
+  label: string;
+}
+
+/**
+ * Umschalter der Darstellung (Plan 0005, E5; allgemein seit Plan 0025, E4): Liste | Karte in „Entdecken“ neben der
+ * Statuszeile, auf der Merkliste mit `full` allein über die ganze Breite. Der Daumen ist `1 / --n` breit (map.css).
+ * Beim Wechsel bleibt der Umschalter dasselbe Element, der Fokus bleibt auf dem gedrückten Segment.
+ */
+export function ViewToggle<V extends string>({
+  options,
+  current,
+  onChange,
+  legend,
+  full = false,
+}: {
+  options: readonly ViewOption<V>[];
+  current: V;
+  onChange: (value: V) => void;
+  legend: string;
+  full?: boolean;
+}) {
+  const index = Math.max(
+    0,
+    options.findIndex((o) => o.value === current),
+  );
+  // Zahl der Segmente als CSS-Variable: Spalten und Daumenbreite (chrome.css, map.css); ohne Typ-Cast
+  const segments: CSSProperties & { "--n": number } = { "--n": options.length };
   return (
-    <fieldset className="plain view-toggle">
-      <legend className="sr-only">Darstellung der Angebote</legend>
-      <div className="seg seg2">
-        <span className="seg-thumb" style={{ transform: `translateX(${map ? 100 : 0}%)` }} />
-        {["Liste", "Karte"].map((label, i) => (
+    <fieldset className={full ? "plain view-toggle full" : "plain view-toggle"}>
+      <legend className="sr-only">{legend}</legend>
+      <div className="seg" style={segments}>
+        <span className="seg-thumb" style={{ transform: `translateX(${index * 100}%)` }} />
+        {options.map((option) => (
           <button
-            key={label}
+            key={option.value}
             type="button"
             className="seg-btn"
-            aria-pressed={map === (i === 1)}
-            onClick={() => onMap(i === 1)}
+            aria-pressed={option.value === current}
+            onClick={() => onChange(option.value)}
           >
-            {label}
+            {option.label}
           </button>
         ))}
       </div>

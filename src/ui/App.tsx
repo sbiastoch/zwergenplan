@@ -11,7 +11,7 @@ import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { leadCategory } from "../domain/topics.ts";
 import { CalendarView } from "./CalendarView.tsx";
-import { Header, QuickFilters, Stickers, TabBar, ViewToggle } from "./Chrome.tsx";
+import { Header, QuickFilters, Stickers, TabBar, type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
   ageChipLabel,
   ageWarnText,
@@ -51,6 +51,10 @@ import { limitActive, useTransit } from "./use-transit.ts";
 type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
 
 const NO_OFFERS: SiteOffer[] = [];
+const DISCOVER_VIEWS: readonly ViewOption<"entdecken" | "karte">[] = [
+  { value: "entdecken", label: "Liste" },
+  { value: "karte", label: "Karte" },
+];
 
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
@@ -135,8 +139,9 @@ export function App() {
   const { visible, unfitCount, ageOnly, page, calendar, saved, detailOffer } = views;
 
   // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
+  // Die Karte der Merkliste ebenso (Plan 0025, E4); Liste und Kalender der Merkliste sind kein Anlass.
   useEffect(() => {
-    if (route.tab === "karte") want();
+    if (route.tab === "karte" || route.tab === "merkliste-karte") want();
   }, [route.tab, want]);
   // Das Kind-Sheet auch (Auslöser 2). Nie die Wahl selbst: Ab da entsteht kein Request.
   const setSheet = useCallback(
@@ -224,11 +229,18 @@ export function App() {
     </span>
   );
   const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
-  // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5)
+  // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5) bzw. zur Merkliste (Plan 0025, E4). Alle Weichen nach
+  // Tab-Leisten-Eintrag laufen über `section`, sonst griffen sie auf der Merklisten-Karte falsch (Review M1).
   const section = tabSection(route.tab);
-  // Liste | Karte steht rechts neben der Statuszeile und bricht bei wenig Platz darunter (Plan 0005, E5).
+  // Liste | Karte steht rechts neben der Statuszeile und bricht bei wenig Platz darunter (Plan 0005, E5). Kein
+  // Scroll nach oben: Das gibt es nur beim Tab-Wechsel (Plan 0025, E4).
   const toggle = section === "entdecken" && (
-    <ViewToggle map={route.tab === "karte"} onMap={(map) => replace({ ...route, tab: map ? "karte" : "entdecken" })} />
+    <ViewToggle
+      options={DISCOVER_VIEWS}
+      current={route.tab === "karte" ? "karte" : "entdecken"}
+      onChange={(tab) => replace({ ...route, tab })}
+      legend="Darstellung der Angebote"
+    />
   );
   // Ohne site.json bliebe das Anbieter-Sheet beim Laden stehen, modal über der Fehlerseite (Arch-Review m3). Es öffnet
   // erst mit den Daten; `anbieter=` bleibt in der URL, „Nochmal versuchen“ öffnet es dann.
@@ -257,6 +269,30 @@ export function App() {
   };
   const ageEscape: AgeEscape | undefined =
     birthDate && ageOnly && unfitCount > 0 ? { label: ageLabel, onShow: () => setAgeOnlyKeepFocus(false) } : undefined;
+  /*
+   * Karte in „Entdecken“ (sichtbare Angebote) und auf der Merkliste (gemerkte, Plan 0025, E4). Der Startausschnitt
+   * kommt in beiden Fällen aus allen kommenden Angeboten (`views.map.cameraOffers`, ADR 0008), nie aus der Merkliste.
+   */
+  const mapPanel = (shown: readonly SiteOffer[], onResetFilter: (() => void) | undefined, age: AgeEscape | undefined) =>
+    views.map && (
+      <MapPanel
+        offers={shown}
+        cameraOffers={views.map.cameraOffers}
+        origin={origin}
+        reach={transit.reach}
+        dark={theme.dark}
+        hasData={offers.length > 0}
+        ctx={ctx}
+        toast={toast}
+        onSheetOpen={setPlaceSheet}
+        onPickOrigin={() => setSheet("origin")}
+        onMapCenter={(center) => {
+          if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.");
+        }}
+        onResetFilter={onResetFilter}
+        age={age}
+      />
+    );
   const limitAction: LimitActionFor = (focusTarget) => (
     <LimitAction
       mode={reachMode}
@@ -271,7 +307,7 @@ export function App() {
       <Header ageLabel={ageLabel} onKid={() => setSheet("kid")} />
       {/* Sticker wirken auch in der Anbieterliste (Plan 0010, E2, E4) */}
       {(section === "entdecken" || section === "anbieter") && <Stickers filter={route.filter} onChange={setFilter} />}
-      {route.tab !== "merkliste" && (
+      {section !== "merkliste" && (
         <QuickFilters
           filter={route.filter}
           limitActive={limitOn}
@@ -309,7 +345,7 @@ export function App() {
             </button>
           </div>
         )}
-        {load.kind === "ready" && route.tab !== "merkliste" && (
+        {load.kind === "ready" && section !== "merkliste" && (
           <>
             <div className="status-row">
               {/* Lädt die Wegzeit zur Grenze, wäre die Zahl ungefiltert: unsichtbar, keine Ansage (M7). */}
@@ -387,25 +423,7 @@ export function App() {
             {!listPending && <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>}
           </>
         )}
-        {load.kind === "ready" && views.map && (
-          <MapPanel
-            offers={visible}
-            cameraOffers={views.map.cameraOffers}
-            origin={origin}
-            reach={transit.reach}
-            dark={theme.dark}
-            hasData={offers.length > 0}
-            ctx={ctx}
-            toast={toast}
-            onSheetOpen={setPlaceSheet}
-            onPickOrigin={() => setSheet("origin")}
-            onMapCenter={(center) => {
-              if (!originApi.setMapCenter(center)) say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.");
-            }}
-            onResetFilter={resetIfActive}
-            age={ageEscape}
-          />
-        )}
+        {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, resetIfActive, ageEscape)}
         {load.kind === "ready" && route.tab === "kalender" && listPending && <ListPending />}
         {load.kind === "ready" && route.tab === "kalender" && !listPending && (
           <CalendarView
@@ -442,9 +460,14 @@ export function App() {
             onToggleSaved={onToggleProvider}
           />
         )}
-        {load.kind === "ready" && route.tab === "merkliste" && (
+        {load.kind === "ready" && section === "merkliste" && (
           <SavedView
             offers={saved}
+            tab={route.tab === "merkliste-karte" ? "merkliste-karte" : "merkliste"}
+            onTab={(tab) => replace({ ...route, tab })}
+            placeCount={views.map?.placeCount ?? 0}
+            // Startseiten-Filter und Alter wirken auf der Merkliste nicht: kein Zurücksetzen, kein Altersausweg
+            renderMap={(savedOffers) => mapPanel(savedOffers, undefined, undefined)}
             generatedAt={load.data.generatedAt}
             birthDate={birthDate}
             ctx={ctx}

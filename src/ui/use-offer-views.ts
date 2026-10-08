@@ -80,9 +80,10 @@ export interface OfferViews {
   /** Angebot aus der URL, falls es im Datenstand existiert */
   detailOffer: SiteOffer | undefined;
   /**
-   * Nur in der Kartenansicht (Plan 0005): Zahl der Orte für die Statuszeile und die Datenbasis des
-   * Startausschnitts – alle kommenden Angebote, unabhängig von Filtern, Alter und Startpunkt, damit die
-   * Kachel-Requests weder Standort noch Alter verraten (Kamera-Regel, ADR 0008; Arch-Review B1, m1).
+   * Nur in den Kartenansichten von „Entdecken“ und Merkliste (Plan 0005; Plan 0025, E4): Zahl der Orte für die
+   * Statuszeile und die Datenbasis des Startausschnitts – alle kommenden Angebote, unabhängig von Filtern, Alter,
+   * Startpunkt und Merkliste, damit die Kachel-Requests weder Standort, Alter noch Gemerktes verraten (Kamera-Regel,
+   * ADR 0008; Arch-Review B1, m1).
    */
   map: { placeCount: number; cameraOffers: readonly SiteOffer[] } | undefined;
   /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
@@ -145,11 +146,13 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
   const reachOf = useMemo(() => reachCache(reach), [reach]);
   // Startausschnitt nur aus öffentlichen Daten: alle kommenden Angebote, ohne Filter, Alter und Startpunkt
   // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
-  const map = useMemo(
-    () => (route.tab === "karte" ? { placeCount: countPlaces(visible), cameraOffers: upcoming } : undefined),
-    [route.tab, visible, upcoming],
-  );
+  // Die Karte der Merkliste zählt die Orte der gemerkten Angebote, ihr Startausschnitt ist derselbe (Plan 0025, E4).
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
+  const map = useMemo(() => {
+    if (route.tab === "karte") return { placeCount: countPlaces(visible), cameraOffers: upcoming };
+    if (route.tab === "merkliste-karte") return { placeCount: countPlaces(saved), cameraOffers: upcoming };
+    return undefined;
+  }, [route.tab, visible, saved, upcoming]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
   const setAgeOnly = useCallback((on: boolean) => {

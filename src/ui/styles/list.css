@@ -17,6 +17,13 @@
   .status b {
     color: var(--ink);
   }
+  /* runder Export-Knopf der Merkliste rechts neben der Statuszeile, nur Icon (Plan 0025, E9) */
+  .exportbtn {
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    color: var(--on-primary);
+  }
   /* „Offline – Stand vom …“ immer in eigener Zeile unter Zahl und Startpunkt (Plan 0011, E4; Plan 0020, E1) */
   .status-note {
     flex-basis: 100%;

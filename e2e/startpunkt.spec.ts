@@ -31,6 +31,8 @@ const LINES = "**/data/linien.json";
 const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.json");
 const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof";
 const NB = "\u00a0";
+/** Offener Krabbeltreff (Fixture), für die vorbelegte Merkliste (Plan 0025) */
+const TREFF_ID = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
 
 const offers = (page: Page) => page.getByTestId("offer");
 const card = (page: Page, title: string) => offers(page).filter({ hasText: title });
@@ -243,16 +245,52 @@ test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request 
   page,
 }) => {
   const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
+  await page.addInitScript((ids) => localStorage.setItem("zwergenplan.merkliste", ids), JSON.stringify([TREFF_ID]));
   await ready(page);
-  // Filter-Sheet und Kalender sind kein Anlass
+  // Filter-Sheet, Kalender und die Merkliste als Liste sind kein Anlass (Plan 0025, E4)
   await page.getByRole("button", { name: /^Alle Filter/ }).click();
   await page
     .getByRole("dialog", { name: "Filter" })
     .getByRole("button", { name: /Angebote zeigen$/ })
     .click();
   await page.getByRole("button", { name: "Kalender" }).click();
+  await page
+    .getByRole("navigation", { name: "Hauptnavigation" })
+    .getByRole("button", { name: /^Merkliste/ })
+    .click();
+  await expect(offers(page)).toHaveCount(1);
   await page.waitForTimeout(500);
   expect(requests).toEqual([]);
+});
+
+test.describe("Karte der Merkliste (Plan 0025, E4)", () => {
+  test.use({ tiles: "mock" });
+
+  test("ist ein Anlass wie die Karte in „Entdecken“: Öffnen lädt die Tabelle genau einmal", async ({ page }) => {
+    const requests = tableRequests(page);
+    await page.addInitScript((ids) => localStorage.setItem("zwergenplan.merkliste", ids), JSON.stringify([TREFF_ID]));
+    await ready(page, "./?ansicht=merkliste");
+    await page.waitForTimeout(300);
+    expect(requests).toEqual([]);
+    await page
+      .getByRole("group", { name: "Darstellung der Merkliste" })
+      .getByRole("button", { name: "Karte", exact: true })
+      .click();
+    await expect(page.locator(".places")).toBeVisible();
+    await expect.poll(() => requests.length).toBe(1);
+    // zurück zur Liste und wieder zur Karte: kein zweiter Request
+    await page
+      .getByRole("group", { name: "Darstellung der Merkliste" })
+      .getByRole("button", { name: "Liste", exact: true })
+      .click();
+    await page
+      .getByRole("group", { name: "Darstellung der Merkliste" })
+      .getByRole("button", { name: "Karte", exact: true })
+      .click();
+    await expect(page.locator(".places")).toBeVisible();
+    await page.waitForTimeout(300);
+    expect(requests).toHaveLength(1);
+  });
 });
 
 test.describe("Gespeicherter Stadtteil", () => {

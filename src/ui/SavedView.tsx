@@ -1,16 +1,37 @@
-/** „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007). */
-import { nextSession } from "../domain/agenda.ts";
+/**
+ * „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007).
+ * Kopf nach Plan 0025, E3a: Umschalter Liste | Karte über die ganze Breite, Statuszeile mit rundem Export-Knopf (nur
+ * in der Liste). Die Karte rendert App über `renderMap`, mit denselben Props wie in „Entdecken“.
+ */
+import type { ReactNode } from "react";
+import { nextSession, upcomingSessions } from "../domain/agenda.ts";
 import { collectionExport } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
-import { collectionToast, EXPORT_UNAVAILABLE, savedExportNote } from "./format.ts";
+import { type ViewOption, ViewToggle } from "./Chrome.tsx";
+import { collectionToast, EXPORT_UNAVAILABLE, exportLabel, savedMapStatusParts, savedStatusParts } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { download, type IcsExport, loadExport } from "./ics-export.ts";
 import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 import { LONG_TOAST_MS } from "./use-app-state.ts";
 
+/** Darstellungen der Merkliste: Routenwerte (Plan 0025, E4) */
+type SavedTab = "merkliste" | "merkliste-karte";
+
+const VIEW_OPTIONS: readonly ViewOption<SavedTab>[] = [
+  { value: "merkliste", label: "Liste" },
+  { value: "merkliste-karte", label: "Karte" },
+];
+
 interface SavedViewProps {
+  /** gemerkte Angebote mit kommendem Termin, nach dem nächsten Termin sortiert */
   offers: SiteOffer[];
+  tab: SavedTab;
+  onTab: (tab: SavedTab) => void;
+  /** Orte der gemerkten Angebote (`views.map`), nur auf der Karte gebraucht */
+  placeCount: number;
+  /** Karte mit diesen Angeboten; nur aufgerufen, wenn mindestens eins da ist (keine Kacheln ohne Gemerktes, E5a) */
+  renderMap: (offers: readonly SiteOffer[]) => ReactNode;
   generatedAt: SiteData["generatedAt"];
   /** mit Geburtsdatum kommen regelmäßige Angebote nur passend zum Alter in die Datei (Plan 0018, E3) */
   birthDate: string | undefined;
@@ -20,7 +41,18 @@ interface SavedViewProps {
   onExported: (message: string, ms?: number) => void;
 }
 
-export function SavedView({ offers, generatedAt, birthDate, ctx, onDiscover, onExported }: SavedViewProps) {
+export function SavedView({
+  offers,
+  tab,
+  onTab,
+  placeCount,
+  renderMap,
+  generatedAt,
+  birthDate,
+  ctx,
+  onDiscover,
+  onExported,
+}: SavedViewProps) {
   const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
@@ -56,17 +88,60 @@ export function SavedView({ offers, generatedAt, birthDate, ctx, onDiscover, onE
         </EmptyState>
       ) : (
         <>
-          <button type="button" className="btn primary wide" onClick={() => void exportAll()}>
-            <Icon name="calendarPlus" />
-            Alle in den Kalender
-          </button>
-          <p className="small">{savedExportNote(offers.length, count, birthDate !== undefined)}</p>
-          {offers.map((offer) => {
-            const session = nextSession(offer, ctx.now);
-            return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
-          })}
+          <ViewToggle options={VIEW_OPTIONS} current={tab} onChange={onTab} legend="Darstellung der Merkliste" full />
+          <div className="status-row">
+            <p className="status" role="status" tabIndex={-1}>
+              <StatusText offers={offers} tab={tab} placeCount={placeCount} now={ctx.now} />
+            </p>
+            {tab === "merkliste" && (
+              <button
+                type="button"
+                className="iconbtn exportbtn"
+                aria-label={exportLabel(offers.length, false)}
+                title={exportLabel(offers.length, false)}
+                onClick={() => void exportAll()}
+              >
+                <Icon name="calendarPlus" />
+              </button>
+            )}
+          </div>
+          {tab === "merkliste-karte"
+            ? renderMap(offers)
+            : offers.map((offer) => {
+                const session = nextSession(offer, ctx.now);
+                return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
+              })}
         </>
       )}
     </>
+  );
+}
+
+/** „5 Angebote mit insgesamt 28 Terminen gemerkt“ bzw. auf der Karte „5 Angebote an 5 Orten gemerkt“ (E3a) */
+function StatusText({
+  offers,
+  tab,
+  placeCount,
+  now,
+}: {
+  offers: readonly SiteOffer[];
+  tab: SavedTab;
+  placeCount: number;
+  now: Date;
+}) {
+  const [a, aWords, b, bWords] =
+    tab === "merkliste-karte"
+      ? savedMapStatusParts(offers.length, placeCount)
+      : savedStatusParts(
+          offers.length,
+          offers.reduce((sum, offer) => sum + upcomingSessions(offer, now).length, 0),
+        );
+  return (
+    <span>
+      <b>{a}</b>
+      {aWords}
+      <b>{b}</b>
+      {bWords}
+    </span>
   );
 }

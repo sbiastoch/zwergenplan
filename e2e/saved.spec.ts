@@ -1,4 +1,4 @@
-/** Merkliste (Plan 0003, E12, ADR 0007). Fixtures, Uhr Mo 5.10.2026 12:00. */
+/** Merkliste (Plan 0003, E12, ADR 0007; Kopf, Umschalter und Karte nach Plan 0025, E3a/E4). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import { readFileSync } from "node:fs";
 import type { Download, Page } from "@playwright/test";
 import { expect, startPreloads, test } from "./fixtures.ts";
@@ -33,7 +33,7 @@ test("Herz merkt, Badge zählt, Merkliste überlebt das Neuladen und steht nicht
   await expect(page.getByRole("heading", { level: 2, name: "Meine Merkliste" })).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(2);
   await expect(page.getByTestId("offer").first()).toContainText("Mi 7.10. · 10:00 Uhr");
-  await expect(page.getByText("2 gemerkt · 13 Termine in einer .ics-Datei")).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
 
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
   await expect(page.getByText("Nicht mehr gemerkt")).toBeVisible();
@@ -160,11 +160,8 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("Kurs komplett, Treff nur bis 14.10.: 8 + 2 Termine", async ({ page }) => {
     const button = await openSaved(page, [IDS.pekip, IDS.treff], "2024-09-18");
-    await expect(
-      page.getByText("2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter", {
-        exact: true,
-      }),
-    ).toBeVisible();
+    // Die Statuszeile zählt alle kommenden Termine; was zum Alter passt, sagt der Toast (Plan 0025, E3a)
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
     expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
     expect(await vevents(download)).toBe(10);
@@ -173,7 +170,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("nichts passt: kein Download, Toast", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff], "2026-08-01");
-    await expect(page.getByText("1 gemerkt · keiner passt gerade zum Alter", { exact: true })).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("1 Angebot mit insgesamt 5 Terminen gemerkt");
     let downloaded = false;
     page.on("download", () => {
       downloaded = true;
@@ -185,11 +182,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("ein Angebot passt nicht: nur die anderen in der Datei, Toast nennt es 6 s lang", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff, IDS.reime], "2026-08-01");
-    await expect(
-      page.getByText("2 gemerkt · 4 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter", {
-        exact: true,
-      }),
-    ).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 9 Terminen gemerkt");
     // Hält die Timer an: Die Anzeigedauer des Toasts wird gezielt vorgespult.
     await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
@@ -204,4 +197,137 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     await page.clock.runFor(1_000);
     await expect(toast).toHaveCount(0);
   });
+});
+
+/** Fünf gemerkte Fixture-Angebote an vier Orten (Plan 0025, Test 9): 8 + 5 + 6 + 4 + 1 = 24 kommende Termine. */
+const FIVE = [
+  "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
+  "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
+  "musikschule-beispiel--musikgarten-1-1-2-jahre-20261105t1600--musikschule-beispiel-sued",
+  "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
+  "theater-beispiel--kuckuck-im-nest-theater-ab-18-monaten-20261115t1100--theater-beispiel-buehne",
+];
+
+/** Merkliste vor dem Laden im localStorage (Plan 0025, Tests): nicht per Herz-Tipp */
+async function preset(page: Page, ids: readonly string[], providers: readonly string[] = []) {
+  await page.addInitScript(
+    ([saved, savedProviders]) => {
+      localStorage.setItem("zwergenplan.merkliste", saved);
+      if (savedProviders !== "[]") localStorage.setItem("zwergenplan.anbieter-merkliste", savedProviders);
+    },
+    [JSON.stringify(ids), JSON.stringify(providers)] as const,
+  );
+}
+
+const tabButton = (page: Page, name: string) =>
+  page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
+const segment = (page: Page, name: "Liste" | "Karte") =>
+  page.getByRole("group", { name: "Darstellung der Merkliste" }).getByRole("button", { name, exact: true });
+
+test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
+  test("Statuszeile zählt Angebote und kommende Termine, der runde Export-Knopf nimmt alle", async ({ page }) => {
+    await preset(page, FIVE);
+    await page.goto("./?ansicht=merkliste");
+    await expect(page.getByTestId("offer")).toHaveCount(5);
+    await expect(page.getByRole("status")).toHaveText("5 Angebote mit insgesamt 24 Terminen gemerkt");
+    // der breite Knopf und die Zeile „… · Kurse immer komplett“ sind weg
+    await expect(page.getByText(/Kurse immer komplett|in einer \.ics-Datei/)).toHaveCount(0);
+    const button = page.getByRole("button", { name: "Alle in den Kalender" });
+    await expect(button).toHaveAttribute("title", "Alle in den Kalender");
+    await expect(button).toHaveText("");
+    const box = await button.boundingBox();
+    expect(box && [Math.round(box.width), Math.round(box.height)]).toEqual([48, 48]);
+    // rechts neben der Statuszeile, auf ihrer Höhe
+    const status = await page.getByRole("status").boundingBox();
+    expect(box && status && box.x).toBeGreaterThan((status?.x ?? 0) + 100);
+    const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
+    const ics = readFileSync((await download.path()) ?? "", "utf8");
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(24);
+  });
+
+  for (const width of [320, 412]) {
+    test(`Umschalter über die ganze Breite des Inhalts bei ${width} px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await preset(page, FIVE.slice(0, 2));
+      await page.goto("./?ansicht=merkliste");
+      await expect(segment(page, "Liste")).toHaveAttribute("aria-pressed", "true");
+      const widths = await page.evaluate(() => {
+        const body = document.querySelector("main.body");
+        const toggle = document.querySelector("fieldset.view-toggle.full");
+        if (!body || !toggle) throw new Error("kein Inhalt oder kein Umschalter");
+        const style = getComputedStyle(body);
+        return {
+          content: body.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight),
+          toggle: toggle.getBoundingClientRect().width,
+        };
+      });
+      expect(Math.abs(widths.toggle - widths.content), JSON.stringify(widths)).toBeLessThanOrEqual(1);
+    });
+  }
+
+  test("ohne gemerktes Angebot: Leerzustand auch auf der Karte, kein Umschalter, keine Kacheln", async ({ page }) => {
+    // nur ein Anbieter gemerkt: Der zählt auf der Merkliste nicht (E5a); Kacheln sind ohne Mock verboten (fixtures.ts)
+    await preset(page, [], ["theater-beispiel"]);
+    await page.goto("./?ansicht=merkliste-karte");
+    await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();
+    await expect(page).toHaveURL(/ansicht=merkliste-karte$/);
+    await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
+    await expect(page.locator(".map-box")).toHaveCount(0);
+    await expect(page.getByRole("group", { name: "Darstellung der Merkliste" })).toHaveCount(0);
+    await expect(page.getByRole("status")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
+  });
+});
+
+test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () => {
+  test.use({ tiles: "mock" });
+
+  test("Liste | Karte setzt die Ansicht, der Fokus bleibt auf dem Segment, Export nur in der Liste", async ({
+    page,
+  }) => {
+    await preset(page, FIVE);
+    await page.goto("./?ansicht=merkliste");
+    await expect(page.getByTestId("offer")).toHaveCount(5);
+    const karte = segment(page, "Karte");
+    await karte.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\?ansicht=merkliste-karte$/);
+    await expect(karte).toHaveAttribute("aria-pressed", "true");
+    await expect(karte).toBeFocused();
+    await expect(page.getByRole("status")).toHaveText("5 Angebote an 4 Orten gemerkt");
+    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
+    await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
+    await expect(page.locator(".map-box")).toBeVisible();
+
+    const liste = segment(page, "Liste");
+    await liste.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\?ansicht=merkliste$/);
+    await expect(liste).toBeFocused();
+    await expect(page.getByTestId("offer")).toHaveCount(5);
+    await expect(page.locator(".map-box")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toBeVisible();
+  });
+
+  for (const [path, pressed] of [
+    ["./?ansicht=merkliste", "Liste"],
+    ["./?ansicht=merkliste-karte", "Karte"],
+  ] as const) {
+    test(`Deep-Link ${path}: Tab „Merkliste“ aktiv, keine Sticker und Schnellfilter der Startseite (M1)`, async ({
+      page,
+    }) => {
+      await preset(page, FIVE.slice(0, 2));
+      // Gegenprobe: Auf der Startseite stehen beide
+      await expect(page.getByRole("group", { name: "Kategorien" })).toBeVisible();
+      await expect(page.getByRole("group", { name: "Schnellfilter" })).toBeVisible();
+      await page.goto(path);
+      await expect(segment(page, pressed)).toHaveAttribute("aria-pressed", "true");
+      await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
+      await expect(page.getByRole("group", { name: "Kategorien" })).toHaveCount(0);
+      await expect(page.getByRole("group", { name: "Schnellfilter" })).toHaveCount(0);
+      // Startseiten-Filter in der URL wirken nicht
+      await page.goto(`${path}&format=einmalig`);
+      await expect(page.getByRole("status")).toContainText("2 Angebote");
+    });
+  }
 });

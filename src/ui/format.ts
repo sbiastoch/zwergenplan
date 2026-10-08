@@ -228,14 +228,11 @@ export function collectionToast(count: number, missing: number): string {
 }
 
 /**
- * Text unter „Alle in den Kalender“ (Plan 0018, E3; „gemerkt“ seit Plan 0022): `sessions` Termine in der Datei,
- * `byAge` mit Geburtsdatum, dann kommen regelmäßige Angebote nur passend zum Alter hinein.
+ * Name und Tooltip des runden Export-Knopfs der Merkliste (Plan 0025, E9). Der Export nimmt immer alle gemerkten
+ * Angebote (ADR 0007, ADR 0018); mit aktivem Merklisten-Filter sagt der Name es, auch dem Screenreader.
  */
-export function savedExportNote(saved: number, sessions: number, byAge: boolean): string {
-  const head = `${saved} gemerkt`;
-  if (byAge && sessions === 0) return `${head} · keiner passt gerade zum Alter`;
-  const file = `${plural(sessions, "Termin", "Termine")} in einer .ics-Datei`;
-  return `${head} · ${file} · ${byAge ? "Kurse komplett, regelmäßige nur passend zum Alter" : "Kurse immer komplett"}`;
+export function exportLabel(savedCount: number, filtered: boolean): string {
+  return filtered ? `Alle ${savedCount} gemerkten in den Kalender, auch ausgeblendete` : "Alle in den Kalender";
 }
 
 /**
@@ -455,6 +452,25 @@ export const OFFER_GONE = "Dieses Angebot ist nicht mehr im Zwergenplan.";
 /** Statuszeile der Karte „8 Angebote an 5 Orten“; die Zahlen getrennt, damit sie fett stehen. */
 export function mapStatusParts(offers: number, places: number): [number, string, number, string] {
   return [offers, offers === 1 ? " Angebot an " : " Angebote an ", places, places === 1 ? " Ort" : " Orten"];
+}
+
+/**
+ * Statuszeile der Merkliste als Liste (Plan 0025, E3a): „5 Angebote mit insgesamt 28 Terminen gemerkt“. `sessions`
+ * zählt die kommenden Termine, wie der Kalender sie zeigt; die Zahlen getrennt, damit sie fett stehen.
+ */
+export function savedStatusParts(offers: number, sessions: number): [number, string, number, string] {
+  return [
+    offers,
+    offers === 1 ? " Angebot mit insgesamt " : " Angebote mit insgesamt ",
+    sessions,
+    sessions === 1 ? " Termin gemerkt" : " Terminen gemerkt",
+  ];
+}
+
+/** Statuszeile der Merklisten-Karte (Plan 0025, E3a): „5 Angebote an 5 Orten gemerkt“, Muster wie `mapStatusParts`. */
+export function savedMapStatusParts(offers: number, places: number): [number, string, number, string] {
+  const [a, offersWord, b, placesWord] = mapStatusParts(offers, places);
+  return [a, offersWord, b, `${placesWord} gemerkt`];
 }
 
 /** „17.10.“, mit `year` „17.10.2026“ */

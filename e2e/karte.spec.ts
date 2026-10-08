@@ -606,6 +606,37 @@ test.describe("mit gemockten Kacheln", () => {
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
   });
 
+  test("Karte der Merkliste: nur gemerkte Orte, Statuszeile, derselbe Startausschnitt wie in „Entdecken“ (Plan 0025, E4)", async ({
+    page,
+    tileLog,
+  }) => {
+    const tilesSince = (index: number) => [...new Set(tileLog.slice(index).map((t) => t.path))].sort();
+    // frische Sitzung, Karte in „Entdecken“
+    await openMap(page);
+    const plain = await camera(page);
+    const plainTiles = tilesSince(0);
+
+    // neue Sitzung mit drei gemerkten Angeboten an drei Orten: Der Ausschnitt hängt nicht von der Merkliste ab
+    await page.addInitScript(
+      (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+      JSON.stringify([
+        "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
+        "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
+        "theater-beispiel--kuckuck-im-nest-theater-ab-18-monaten-20261115t1100--theater-beispiel-buehne",
+      ]),
+    );
+    const before = tileLog.length;
+    await openMap(page, "./?ansicht=merkliste-karte");
+    await expect(page.getByRole("status")).toHaveText("3 Angebote an 2 Orten gemerkt");
+    await expect(places(page)).toHaveCount(2);
+    await expect(places(page).filter({ hasText: "Familientreff Beispielhof" })).toHaveCount(1);
+    await expect(
+      page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: /^Merkliste/ }),
+    ).toHaveAttribute("aria-current", "page");
+    expect(await camera(page)).toEqual(plain);
+    expect(tilesSince(before)).toEqual(plainTiles);
+  });
+
   test("Startausschnitt verrät weder Standort noch Alter: Standort, Geburtsdatum, „Kurse“ und „bis 20 Min.“ in der Liste, dann Karte (Arch-Review B1, m1; Plan 0009)", async ({
     page,
     context,

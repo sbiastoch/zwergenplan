@@ -18,6 +18,7 @@ import {
   clock,
   collectionToast,
   dayHeading,
+  exportLabel,
   formatFact,
   hiddenNote,
   limitHint,
@@ -34,7 +35,8 @@ import {
   reachNote,
   reachShort,
   registrationNote,
-  savedExportNote,
+  savedMapStatusParts,
+  savedStatusParts,
   seriesToast,
   shortDate,
   standDate,
@@ -551,6 +553,20 @@ describe("Karte und Orte (Plan 0005, E7)", () => {
   });
 });
 
+describe("Statuszeile der Merkliste (Plan 0025, E3a)", () => {
+  it("Liste: Angebote und kommende Termine, die Zahlen getrennt", () => {
+    expect(savedStatusParts(5, 28)).toEqual([5, " Angebote mit insgesamt ", 28, " Terminen gemerkt"]);
+    expect(savedStatusParts(1, 1).join("")).toBe("1 Angebot mit insgesamt 1 Termin gemerkt");
+    expect(savedStatusParts(2, 13).join("")).toBe("2 Angebote mit insgesamt 13 Terminen gemerkt");
+  });
+
+  it("Karte: Angebote und Orte", () => {
+    expect(savedMapStatusParts(5, 5)).toEqual([5, " Angebote an ", 5, " Orten gemerkt"]);
+    expect(savedMapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort gemerkt");
+    expect(savedMapStatusParts(3, 2).join("")).toBe("3 Angebote an 2 Orten gemerkt");
+  });
+});
+
 describe("Statuszeile der Liste mit Zeitraum (Browser-Review 0023, m1)", () => {
   it("ohne Zeitraum „ab heute“, die Zahl getrennt", () => {
     expect(listStatusParts(3, undefined)).toEqual([3, " Angebote ab heute"]);
@@ -700,13 +716,9 @@ describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
     );
   });
 
-  it("Text unter „Alle in den Kalender“ nennt die Auswahl (E3, mit „gemerkt“ seit Plan 0022)", () => {
-    expect(savedExportNote(2, 13, false)).toBe("2 gemerkt · 13 Termine in einer .ics-Datei · Kurse immer komplett");
-    expect(savedExportNote(1, 1, false)).toBe("1 gemerkt · 1 Termin in einer .ics-Datei · Kurse immer komplett");
-    expect(savedExportNote(2, 10, true)).toBe(
-      "2 gemerkt · 10 Termine in einer .ics-Datei · Kurse komplett, regelmäßige nur passend zum Alter",
-    );
-    expect(savedExportNote(2, 0, true)).toBe("2 gemerkt · keiner passt gerade zum Alter");
+  it("Name des Export-Knopfs der Merkliste (Plan 0025, E9)", () => {
+    expect(exportLabel(5, false)).toBe("Alle in den Kalender");
+    expect(exportLabel(5, true)).toBe("Alle 5 gemerkten in den Kalender, auch ausgeblendete");
   });
 
   it("Toast der Merkliste zählt fehlende Angebote", () => {

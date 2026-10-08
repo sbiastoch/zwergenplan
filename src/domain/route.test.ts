@@ -49,6 +49,17 @@ describe("URL-Route", () => {
     expect(parseRoute(`?ansicht=karte&angebot=${offerId}`)).toEqual({ tab: "karte", offerId, filter: EMPTY_FILTER });
   });
 
+  it("kennt die Karte der Merkliste: ansicht=merkliste-karte überlebt den Roundtrip (Plan 0025, E4)", () => {
+    const route = { tab: "merkliste-karte" as const, filter: { ...EMPTY_FILTER, categories: ["musik" as const] } };
+    expect(routeToSearch(route)).toBe("kat=musik&ansicht=merkliste-karte");
+    expect(parseRoute("?kat=musik&ansicht=merkliste-karte")).toEqual(route);
+    expect(parseRoute(`?ansicht=merkliste-karte&angebot=${offerId}`)).toEqual({
+      tab: "merkliste-karte",
+      offerId,
+      filter: EMPTY_FILTER,
+    });
+  });
+
   it("kennt den Tab „Anbieter“: ansicht=anbieter überlebt den Roundtrip (Plan 0010, E2)", () => {
     const route = { tab: "anbieter" as const, filter: { ...EMPTY_FILTER, categories: ["musik" as const] } };
     expect(routeToSearch(route)).toBe("kat=musik&ansicht=anbieter");
@@ -112,7 +123,7 @@ describe("URL-Route", () => {
     ]);
     const names = DISTRICTS.flatMap((d) => [d.id, d.name.toLowerCase()]);
     for (const filter of filters) {
-      for (const tab of ["entdecken", "karte", "kalender", "anbieter", "merkliste"] as const) {
+      for (const tab of ["entdecken", "karte", "kalender", "anbieter", "merkliste", "merkliste-karte"] as const) {
         const search = routeToSearch({ tab, offerId, providerId: "theater-beispiel", filter });
         expect(search).toContain(`wegzeit=${filter.reachLimit?.value}`);
         expect(search).not.toContain("umkreis");
@@ -130,5 +141,9 @@ describe("tabSection", () => {
     expect(tabSection("kalender")).toBe("kalender");
     expect(tabSection("anbieter")).toBe("anbieter");
     expect(tabSection("merkliste")).toBe("merkliste");
+  });
+
+  it("ordnet die Karte der Merkliste dem Tab „Merkliste“ zu (Plan 0025, E4)", () => {
+    expect(tabSection("merkliste-karte")).toBe("merkliste");
   });
 });

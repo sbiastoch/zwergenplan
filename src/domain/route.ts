@@ -7,14 +7,19 @@ import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, OFFER_ID_PATTERN } from "./ids.ts";
 
 /**
  * „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5), kein eigener Tab in der Leiste. „anbieter“ ist der
- * vierte Tab (Plan 0010, E2), vor der Merkliste.
+ * vierte Tab (Plan 0010, E2), vor der Merkliste. „merkliste-karte“ ist die Karte der Merkliste (Plan 0025, E4); die
+ * Wahl Liste | Karte verrät nichts über das Gemerkte und darf deshalb in die URL.
  */
-const TABS = ["entdecken", "karte", "kalender", "anbieter", "merkliste"] as const;
+const TABS = ["entdecken", "karte", "kalender", "anbieter", "merkliste", "merkliste-karte"] as const;
 export type Tab = (typeof TABS)[number];
+/** Eintrag der Tab-Leiste */
+export type Section = Exclude<Tab, "karte" | "merkliste-karte">;
 
-/** Welcher Eintrag der Tab-Leiste aktiv ist: Liste und Karte gehören beide zu „Entdecken“. */
-export function tabSection(tab: Tab): Exclude<Tab, "karte"> {
-  return tab === "karte" ? "entdecken" : tab;
+/** Welcher Eintrag der Tab-Leiste aktiv ist: Liste und Karte gehören zu „Entdecken“ bzw. zur Merkliste. */
+export function tabSection(tab: Tab): Section {
+  if (tab === "karte") return "entdecken";
+  if (tab === "merkliste-karte") return "merkliste";
+  return tab;
 }
 
 export interface Route {
