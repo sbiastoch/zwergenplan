@@ -29,12 +29,15 @@ import {
   originPhrase,
   plural,
   providerStatusParts,
+  quickRangeLabel,
   rangeEmptyTexts,
   reachLimitLabel,
   reachLong,
   reachNote,
   reachShort,
   registrationNote,
+  savedFilteredEmpty,
+  savedFilterStatusParts,
   savedHiddenNote,
   savedMapStatusParts,
   savedStatusParts,
@@ -591,6 +594,34 @@ describe("Statuszeile der Merkliste (Plan 0025, E3a)", () => {
     expect(savedMapStatusParts(5, 5)).toEqual([5, " Angebote an ", 5, " Orten gemerkt"]);
     expect(savedMapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort gemerkt");
     expect(savedMapStatusParts(3, 2).join("")).toBe("3 Angebote an 2 Orten gemerkt");
+  });
+});
+
+describe("Merkliste mit Filter (Plan 0025, E3a, E5a, E7)", () => {
+  it("Liste und Kalender: wie viele der gemerkten passen, die Zahl getrennt", () => {
+    expect(savedFilterStatusParts(2, 5)).toEqual([2, " von 5 gemerkten Angeboten passen"]);
+    expect(savedFilterStatusParts(1, 5).join("")).toBe("1 von 5 gemerkten Angeboten passt");
+    expect(savedFilterStatusParts(0, 3).join("")).toBe("0 von 3 gemerkten Angeboten passen");
+    expect(savedFilterStatusParts(1, 1).join("")).toBe("1 von 1 gemerkten Angebot passt");
+  });
+
+  it("Karte: passende Angebote und ihre Orte", () => {
+    expect(savedMapStatusParts(2, 2, 5)).toEqual([2, " von 5 gemerkten Angeboten an ", 2, " Orten"]);
+    expect(savedMapStatusParts(1, 1, 5).join("")).toBe("1 von 5 gemerkten Angeboten an 1 Ort");
+    expect(savedMapStatusParts(1, 1, 1).join("")).toBe("1 von 1 gemerkten Angebot an 1 Ort");
+  });
+
+  it("Leerzustand, wenn der Filter alle gemerkten ausblendet", () => {
+    expect(savedFilteredEmpty(5)).toBe("Von deinen 5 gemerkten Angeboten passt keins.");
+    expect(savedFilteredEmpty(1)).toBe("Dein gemerktes Angebot passt nicht.");
+  });
+
+  it("Schnellwahlen „ab …“: Monat abgekürzt, Mai, Juni und Juli ohne Punkt", () => {
+    expect(quickRangeLabel("2026-11")).toBe("ab Nov.");
+    expect(quickRangeLabel("2027-01")).toBe("ab Jan.");
+    expect(quickRangeLabel("2027-05")).toBe("ab Mai");
+    expect(quickRangeLabel("2027-06")).toBe("ab Juni");
+    expect(quickRangeLabel("2027-07")).toBe("ab Juli");
   });
 });
 

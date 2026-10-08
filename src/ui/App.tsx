@@ -7,6 +7,7 @@ import { activeFilterCount, EMPTY_FILTER, type FilterState, withDateRange } from
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
+import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { leadCategory } from "../domain/topics.ts";
@@ -79,6 +80,9 @@ export function App() {
   const [animate, setAnimate] = useState(false);
   // Suchtext der Anbieterliste: übersteht den Tab-Wechsel, nie in der URL (Plan 0010, E5)
   const [providerQuery, setProviderQuery] = useState("");
+  // Filter der Merkliste: getrennt vom Startseiten-Filter, nie in der URL, übersteht Tab- und Darstellungswechsel,
+  // nicht das Neuladen (Plan 0025, E6)
+  const [savedFilter, setSavedFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER);
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl.
   const filterButton = useRef<HTMLButtonElement>(null);
   // Fokus-Rückweg des Details: Die Kachel, die es geöffnet hat, kann beim Schließen fehlen (Plan 0008, E11).
@@ -135,7 +139,7 @@ export function App() {
       }),
     [refreshTransit, say],
   );
-  const views = useOfferViews({ offers, route, birthDate, savedIds, now, reach: transit.reach });
+  const views = useOfferViews({ offers, route, birthDate, savedIds, savedFilter, now, reach: transit.reach });
   const { visible, unfitCount, ageOnly, page, saved, detailOffer } = views;
 
   // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
@@ -454,12 +458,18 @@ export function App() {
         {load.kind === "ready" && section === "merkliste" && (
           <SavedView
             items={saved}
+            visible={views.savedVisible}
+            filter={savedFilter}
+            filtered={views.savedFiltered}
+            onFilter={setSavedFilter}
+            quick={views.savedQuick}
             tab={route.tab === "merkliste-karte" || route.tab === "merkliste-kalender" ? route.tab : "merkliste"}
             onTab={(tab) => replace({ ...route, tab })}
             placeCount={views.map?.placeCount ?? 0}
-            // Startseiten-Filter und Alter wirken auf der Merkliste nicht: kein Zurücksetzen, kein Altersausweg
-            renderMap={(savedOffers) => mapPanel(savedOffers, undefined, undefined)}
-            renderCalendar={() =>
+            // Startseiten-Filter und Alter wirken auf der Merkliste nicht: Zurücksetzen meint den Merklisten-Filter,
+            // einen Altersausweg gibt es nicht
+            renderMap={(savedOffers, onResetSaved) => mapPanel(savedOffers, onResetSaved, undefined)}
+            renderCalendar={(onResetSaved) =>
               views.savedCalendar && (
                 <SavedCalendar
                   calendar={views.savedCalendar}
@@ -467,6 +477,7 @@ export function App() {
                   today={today}
                   ctx={ctx}
                   onDiscover={discoverRange}
+                  onResetFilter={onResetSaved}
                 />
               )
             }

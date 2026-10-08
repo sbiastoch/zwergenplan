@@ -1,9 +1,9 @@
 /**
  * Zeitraum aus ganzen Berliner Kalendertagen, beide Grenzen inklusive (Plan 0023). Rein und ohne Bezug zur
- * Startseite: Der Filter „von / bis“ nutzt ihn, später auch die Merkliste („Beginn ab“, docs/ideas.md).
+ * Startseite: Der Filter „von / bis“ nutzt ihn, die Merkliste ihre Schnellwahlen „ab …“ (Plan 0025, E7).
  */
 import type { Offer, Session } from "./schema.ts";
-import { berlinIsoDate, isIsoDate } from "./time.ts";
+import { addMonths, berlinIsoDate, isIsoDate } from "./time.ts";
 
 /** Mindestens eine Grenze ist gesetzt (der Typ erzwingt es); ISO-Tage, `from` ≤ `to` (siehe `dateRange`). */
 export type DateRange = { from: string; to?: string } | { from?: string; to: string };
@@ -22,6 +22,22 @@ export function dateRange(a: string | undefined, b: string | undefined): DateRan
   if (from) return { from };
   if (to) return { to };
   return undefined;
+}
+
+/** So viele Schnellwahlen „ab …“ gibt es höchstens; die Daten reichen etwa 4 Monate (Plan 0025, Entscheidung b). */
+const QUICK_MONTHS = 3;
+
+/**
+ * Schnellwahlen „Beginn ab“ der Merkliste (Plan 0025, E7): die Monatsersten der nächsten drei Monate, je nur mit
+ * `from`. Eine Schnellwahl nach dem letzten Tag des Datenstands fehlt, sie zeigte immer nichts; ohne Datenstand keine.
+ * `month` ist `YYYY-MM`, die Beschriftung macht die Oberfläche.
+ */
+export function quickRanges(today: string, dataEnd: string | undefined): Array<{ month: string; range: DateRange }> {
+  if (!dataEnd) return [];
+  const firstOfMonth = `${today.slice(0, 7)}-01`;
+  return Array.from({ length: QUICK_MONTHS }, (_, i) => addMonths(firstOfMonth, i + 1))
+    .filter((from) => from <= dataEnd)
+    .map((from) => ({ month: from.slice(0, 7), range: { from } }));
 }
 
 /** Grenzen eines Datumsfelds: frühester und spätester übernehmbarer Tag */

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { checkBound, type DateRange, dateRange, fieldLimits, inDateRange, rangeSession } from "./date-range.ts";
+import {
+  checkBound,
+  type DateRange,
+  dateRange,
+  fieldLimits,
+  inDateRange,
+  quickRanges,
+  rangeSession,
+} from "./date-range.ts";
 import type { Format, Offer, Session } from "./schema.ts";
 import { FIXTURE_NOW, fixtureOffer } from "./test-fixtures.ts";
 
@@ -131,6 +139,32 @@ describe("fieldLimits und checkBound (Plan 0023, E9, E4)", () => {
     expect(checkBound("2026-11-01", limits)).toBe("zu-spaet");
     expect(checkBound("2027-01-31", { min: today })).toBe("ok");
     expect(checkBound("2026-02-30", limits)).toBe("ungueltig");
+  });
+});
+
+describe("quickRanges (Plan 0025, E7)", () => {
+  const months = (today: string, dataEnd: string | undefined) => quickRanges(today, dataEnd).map((q) => q.month);
+
+  it("die Monatsersten der nächsten drei Monate, nur mit `from`", () => {
+    expect(quickRanges("2026-10-08", "2027-02-28")).toEqual([
+      { month: "2026-11", range: { from: "2026-11-01" } },
+      { month: "2026-12", range: { from: "2026-12-01" } },
+      { month: "2027-01", range: { from: "2027-01-01" } },
+    ]);
+  });
+
+  it("am 31.1. ist der Folgemonat der Februar", () => {
+    expect(months("2027-01-31", "2027-12-31")).toEqual(["2027-02", "2027-03", "2027-04"]);
+  });
+
+  it("ohne Daten ab dem Monatsersten fehlt die Schnellwahl", () => {
+    expect(months("2026-10-08", "2026-12-20")).toEqual(["2026-11", "2026-12"]);
+    expect(months("2026-10-08", "2026-12-01")).toEqual(["2026-11", "2026-12"]);
+    expect(months("2026-10-08", "2026-10-31")).toEqual([]);
+  });
+
+  it("ohne Datenstand gibt es keine", () => {
+    expect(quickRanges("2026-10-08", undefined)).toEqual([]);
   });
 });
 

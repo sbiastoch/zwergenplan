@@ -17,6 +17,10 @@
   .status b {
     color: var(--ink);
   }
+  /* Filterzeile der Merkliste (Plan 0025, E6): scrollt wie die Schnellfilter bis an den Rand des Inhalts */
+  .saved-filters .chips {
+    margin-inline: -16px;
+  }
   /* runder Export-Knopf der Merkliste rechts neben der Statuszeile, nur Icon (Plan 0025, E9) */
   .exportbtn {
     width: 48px;

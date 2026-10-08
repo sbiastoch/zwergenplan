@@ -1,6 +1,6 @@
 # Plan 0025 – Merkliste als Planungszentrale: Anbieter merken, Karte, Kalender, Filter
 
-Status: in Umsetzung (Etappe 3; Nachtrag aus dem Mockup vom 2026-10-08, Review eingearbeitet)
+Status: in Umsetzung (Etappe 4; Nachtrag aus dem Mockup vom 2026-10-08, Review eingearbeitet)
 Datum: 2026-10-08
 Mockup: https://claude.ai/artifact/QMwK1e16a2GQPKbVtMwMx9 (Design-Canvas, Stand „Feedback 2“, vom Nutzer am 2026-10-08 freigegeben)
 Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
@@ -856,6 +856,19 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
    - „Filter zurücksetzen“ in den Leerzuständen des Kalenders.
 4. E2E: Test 9 (Filter, Export) und Test 10 (Filter im Kalender). Mobile-UX: `merkliste-liste`, `merkliste-gefiltert-leer`.
 5. Doku: Die `ideas.md`-Einträge aus E13 (auch `:69` „Merkliste ‚Beginn ab‘“ streichen). Das Delta in ADR 0012 eintragen. Gates: `pnpm verify`, gezielt `e2e/saved.spec.ts`, `e2e/merkliste-kalender.spec.ts`, `e2e/mobile-ux.spec.ts`, `pnpm size`. Dann Review, Merge, Browser-Review.
+
+**Stand Etappe 4:** committet (2026-10-09), noch nicht gemergt und nicht live. Start-JS +0,940 kB (97,770 → 98,710 kB, gemessen gegen `ca6d80d`), CSS +0,020 kB (ADR 0012). Summe Etappen 1–4: +2,167 kB, unter dem Entscheidungspunkt von +2,5 kB (E11); der Merge von Plan 0028 (+0,214 kB) und die übrigen Merges von `main` zählen nicht mit. Gates lokal grün: `pnpm verify`, gezielt `saved`, `merkliste-kalender`, `mobile-ux`, `layout`, `merkliste-anbieter`, `zeitraum`, `detail` (pixel-7). `/arch-review` und `/browser-review` stehen noch aus. Abweichungen vom Plan:
+- **`toggleSavedFilter(filter, chip)`** mit dem Typ `SavedFilterChip` in `saved.ts` (nicht im Plan): Was ein Tipp auf einen Chip bewirkt (Format Mehrfachwahl, Anmeldung Einfachwahl, Schnellwahl Einfachwahl mit Aufheben), ist Filterlogik und gehört in die Domäne, nicht in `SavedFilters.tsx`. `toggleId` ist dafür generisch (`<T extends string>`), ohne Cast.
+- **`matchesSavedFilter(offer, filter)`** in `saved.ts` (nicht im Plan): `endedToday` braucht Format und Anmeldung ohne Zeitbezug, denn `applySavedFilter` (über `applyFilters`) verwirft Angebote ohne kommenden Termin, und genau die zählen für „heute schon vorbei“ (M7).
+- **Statuszeile mit Filter als eigene Funktion** `savedFilterStatusParts(shown, total)` statt einer Variante von `savedStatusParts`: Sie hat nur eine fette Zahl. Die Karte bekommt `savedMapStatusParts(offers, places, total?)`. Singular über `total` mit „von 1 gemerkten Angebot“. Mit Filter entfällt der Zusatz „– 1 Angebot passt nicht zum Alter“ (Plan 0028, B2): Er gilt allen gemerkten, nicht den passenden; der Export-Toast nennt ihn weiter.
+- **Karte ohne passendes Angebot**: Die Statuszeile bleibt stehen („0 von 3 gemerkten Angeboten an 0 Orten“), darunter der Leerzustand aus E5a. Ebenso in der Liste („0 von 3 … passen“).
+- **`savedOffers(…, range?)`**: Mit Schnellwahl stellt die Merkliste ein Angebot an den Termin im Zeitraum (`shownSession` mit `range`, E3a) und sortiert danach; ohne Filter bleibt `views.saved` die Quelle.
+- **`useOfferViews`**: Eingabe `savedFilter` ist optional (Standard leer), damit die Bestandstests unverändert bleiben. Neu sind `savedVisible` (gefiltert für die aktuelle Darstellung, im Kalender ohne Zeitraum), `savedFiltered` und `savedQuick` (`quickRanges` mit dem ganzen Datenstand). `allIndex` ist jetzt ungefiltert, `index` gefiltert; Fall 1 („… blendet der Filter aus“) greift.
+- **Fokus nach „Zurücksetzen“**: Chip „Zurücksetzen“, „Filter zurücksetzen“ im Leerzustand und im Kalender verschwinden nach dem Tipp. Der Fokus geht vorher auf die Statuszeile (`tabIndex=-1`), sie meldet die neue Zahl (Muster aus Plan 0021, E3). Der Plan sagte dazu nichts.
+- **Kalender, Fall 1**: Der Knopf heißt wie in den übrigen Leerzuständen „Filter zurücksetzen“, nicht „Zurücksetzen“ (Test 10).
+- **Filterzeile im Inhalt**: `.saved-filters .chips { margin-inline: -16px }` (`list.css`), damit sie wie die Schnellfilter bis an den Rand scrollt, obwohl sie in `main.body` steht.
+- **E2E**: Test 9 (Filter, Export) in `e2e/saved.spec.ts`, dazu die Statuszeile der Merklisten-Karte mit Filter und der Leerzustand der Karte mit `expectMobileUx`. Test 10 (Filter im Kalender, Schnellwahl im Kalender ausgeblendet) in `e2e/merkliste-kalender.spec.ts`, Fall 1 mit `expectMobileUx`. Mobile-UX-Zustände `merkliste-liste` und `merkliste-gefiltert-leer` in `e2e/mobile-ux.spec.ts`; `e2e/mobile-ux.ts` ist unverändert.
+- `docs/ideas.md`: „Merkliste ‚Beginn ab‘“ gestrichen; neu „Merklisten-Filter in der URL“, „Freie Datumseingabe auf der Merkliste“ und „Weitere Filter auf der Merkliste“ (N4).
 
 ## Offene Punkte (Nutzerentscheid)
 

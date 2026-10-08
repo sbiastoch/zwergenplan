@@ -267,6 +267,60 @@ test.describe("mit Fixture-Uhr", () => {
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
     await expectAgenda(page, "Diese Woche", "1 Termin");
   });
+
+  test("Merklisten-Filter: „Kurse“ blendet den Treff aus, die leere Woche sagt es und setzt zurück (E5, E6)", async ({
+    page,
+  }) => {
+    const filters = page.getByRole("group", { name: "Merkliste filtern" });
+    await filters.getByRole("button", { name: "Kurse", exact: true }).click();
+    // Die Statuszeile zählt die passenden gemerkten Angebote, ohne Zeitraum
+    await expect(page.getByRole("status")).toHaveText("1 von 2 gemerkten Angeboten passt");
+    // Woche 5.–11.: nur der Treff, und den blendet der Filter aus (Fall 1)
+    await expectAgenda(page, "Diese Woche", "0 Termine");
+    await expect(page.getByText("Nichts, was zu deinem Filter passt")).toBeVisible();
+    await expect(page.getByText("1 gemerkter Termin blendet der Filter aus.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Termine" })).toBeVisible();
+    await expectMobileUx(page);
+
+    // Woche 12.–18.: PEKiP am Di, der Treff am Mi fehlt
+    await page.getByRole("button", { name: "Nächste Woche" }).click();
+    await expectAgenda(page, "Woche 12.–18. Okt.", "1 Termin");
+    await expect(offers(page)).toHaveCount(1);
+    await expect(offers(page)).toContainText(PEKIP);
+
+    await page.getByRole("button", { name: "Vorherige Woche" }).click();
+    const reset = page.getByRole("button", { name: "Filter zurücksetzen" });
+    await reset.click();
+    // Der Knopf verschwindet: Der Fokus liegt auf der Statuszeile, nicht auf <body>
+    await expect(page.getByRole("status")).toBeFocused();
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    await expectAgenda(page, "Diese Woche", "1 Termin");
+    await expect(filters.getByRole("button", { name: "Kurse", exact: true })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("Schnellwahl „ab …“: im Kalender ausgeblendet und ohne Wirkung, in der Liste gilt sie wieder (E5, E7)", async ({
+    page,
+  }) => {
+    const filters = page.getByRole("group", { name: "Merkliste filtern" });
+    const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
+    await expect(filters.getByRole("button", { name: /^ab / })).toHaveCount(0);
+    await views.getByRole("button", { name: "Liste", exact: true }).click();
+    await filters.getByRole("button", { name: "ab Nov.", exact: true }).click();
+    // PEKiP beginnt im Oktober (Kurs-Regel), der Treff hat noch Termine im November
+    await expect(offers(page)).toHaveCount(1);
+    await expect(page.getByRole("status")).toHaveText("1 von 2 gemerkten Angeboten passt");
+
+    await views.getByRole("button", { name: "Kalender", exact: true }).click();
+    await expect(filters.getByRole("button", { name: /^ab / })).toHaveCount(0);
+    // Kein „Zurücksetzen“: Im Kalender wirkt kein Filter, die Statuszeile zählt wie ohne
+    await expect(filters.getByRole("button", { name: "Zurücksetzen" })).toHaveCount(0);
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    await expectAgenda(page, "Diese Woche", "1 Termin");
+
+    await views.getByRole("button", { name: "Liste", exact: true }).click();
+    await expect(filters.getByRole("button", { name: "ab Nov.", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(offers(page)).toHaveCount(1);
+  });
 });
 
 test("regelmäßig gemerkt, Kind wächst erst hinein: nur Tage, an denen es zum Alter passt (Plan 0028, E3)", async ({

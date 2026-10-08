@@ -64,6 +64,7 @@ const PEKIP_ID =
   "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus";
 const TREFF_ID = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
 const REIME_ID = "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum";
+const MUSIK_ID = "musikschule-beispiel--musikgarten-1-1-2-jahre-20261105t1600--musikschule-beispiel-sued";
 
 /**
  * Geburtsdatum (ISO) und Merkliste vor dem Laden speichern und `path` laden (Plan 0018): `VIEWS` startet nach
@@ -109,6 +110,16 @@ async function openSavedCalendar(page: Page) {
   await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
 }
 
+/** Liste der Merkliste mit PEKiP, Krabbeltreff und Musikgarten (Plan 0025, E6), Merkliste per localStorage */
+async function openSavedList(page: Page) {
+  await page.evaluate(
+    (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+    JSON.stringify([PEKIP_ID, TREFF_ID, MUSIK_ID]),
+  );
+  await page.goto("./?ansicht=merkliste");
+  await expect(page.getByTestId("offer")).toHaveCount(3);
+}
+
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   entdecken: async () => {},
@@ -142,6 +153,21 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: /^Merkliste/ }).click();
     await expect(page.getByTestId("offer")).toHaveCount(2);
     await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+  },
+  // Plan 0025, E6 (Test 15): Liste mit drei gemerkten, Filter „Kurse“ aktiv; Filterzeile mit „ab …“ und „Zurücksetzen“
+  "merkliste-liste": async (page) => {
+    await openSavedList(page);
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Kurse" }).click();
+    await expect(page.getByTestId("offer")).toHaveCount(2);
+    await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten passen");
+  },
+  // Plan 0025, E5a: Der Filter blendet alle gemerkten aus
+  "merkliste-gefiltert-leer": async (page) => {
+    await openSavedList(page);
+    const filters = page.getByRole("group", { name: "Merkliste filtern" });
+    await filters.getByRole("button", { name: "Kurse" }).click();
+    await filters.getByRole("button", { name: "Ohne Anmeldung" }).click();
+    await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();
   },
   // Plan 0025, E4: Karte der Merkliste mit drei gemerkten Angeboten an zwei Orten
   "merkliste-karte": async (page) => {

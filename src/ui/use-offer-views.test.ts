@@ -5,6 +5,7 @@ import { EMPTY_FILTER } from "../domain/filter.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
+import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { fromBerlinLocal } from "../domain/time.ts";
 import { type OfferViews, type OfferViewsInput, useOfferViews } from "./use-offer-views.ts";
@@ -415,6 +416,73 @@ describe("useOfferViews", () => {
       const savedIds = [treff.id, BABY.id];
       expect(savedTitles(render({ ...input, birthDate: undefined, savedIds }))).toEqual(["treff", "baby"]);
       expect(savedTitles(render({ ...input, savedIds }))).toEqual(["baby", "treff"]);
+    });
+  });
+
+  describe("Filter der Merkliste (Plan 0025, E6)", () => {
+    // Kurs am 12.10., regelmäßig am 7.10. und 4.11., einmalig heute 10–11 Uhr (um 12 Uhr vorbei)
+    const kurs = offer("kurs", "2026-10-12", undefined, "kurs");
+    const treff: SiteOffer = {
+      ...offer("treff", "2026-10-07", undefined, "regelmaessig"),
+      sessions: ["2026-10-07", "2026-11-04"].map((d) => ({
+        start: fromBerlinLocal(`${d}T10:00`),
+        end: fromBerlinLocal(`${d}T11:00`),
+      })),
+    };
+    const heute = offer("heute", "2026-10-05");
+    const offers = [kurs, treff, heute];
+    const savedIds = [kurs.id, treff.id, heute.id];
+    const kurse: SavedFilter = { ...EMPTY_SAVED_FILTER, formats: ["kurs"] };
+    const abNov: SavedFilter = { ...EMPTY_SAVED_FILTER, range: { from: "2026-11-01" } };
+    const visibleTitles = (v: OfferViews) => ids(v.savedVisible.map((o) => o.offer));
+
+    it("ohne Filter sind alle gemerkten sichtbar, nichts gilt als gefiltert", () => {
+      const v = render({ offers, savedIds, route: { tab: "merkliste", filter: EMPTY_FILTER } });
+      expect(visibleTitles(v)).toEqual(["treff", "kurs"]);
+      expect(v.savedFiltered).toBe(false);
+    });
+
+    it("Schnellwahlen bis zum Ende des ganzen Datenstands (E7)", () => {
+      const route: Route = { tab: "merkliste", filter: EMPTY_FILTER };
+      // letzter Termin im Datenstand am 4.11.: nur „ab Nov.“
+      expect(render({ offers, savedIds, route }).savedQuick.map((q) => q.month)).toEqual(["2026-11"]);
+      expect(render({ offers: [kurs], savedIds, route }).savedQuick).toEqual([]);
+    });
+
+    it("Liste: Format und Zeitraum wirken, der Termin ist der im Zeitraum", () => {
+      const route: Route = { tab: "merkliste", filter: EMPTY_FILTER };
+      const v = render({ offers, savedIds, route, savedFilter: kurse });
+      expect(visibleTitles(v)).toEqual(["kurs"]);
+      expect(v.savedFiltered).toBe(true);
+      // die Merkliste selbst (Badge, Export) bleibt ungefiltert
+      expect(savedTitles(v)).toEqual(["treff", "kurs"]);
+      const nov = render({ offers, savedIds, route, savedFilter: abNov });
+      expect(visibleTitles(nov)).toEqual(["treff"]);
+      expect(nov.savedVisible[0]?.session.start).toBe(fromBerlinLocal("2026-11-04T10:00"));
+    });
+
+    it("Karte: Orte nur der passenden", () => {
+      const fern: SiteOffer = { ...kurs, venue: { ...kurs.venue, geo: { lat: 49.5, lon: 11.2 } } };
+      const route: Route = { tab: "merkliste-karte", filter: EMPTY_FILTER };
+      const input = { offers: [fern, treff], savedIds: [fern.id, treff.id], route };
+      expect(render(input).map?.placeCount).toBe(2);
+      expect(render({ ...input, savedFilter: kurse }).map?.placeCount).toBe(1);
+    });
+
+    it("Kalender: Format wirkt, der Zeitraum nicht; `allIndex` bleibt ungefiltert", () => {
+      const route: Route = { tab: "merkliste-kalender", filter: EMPTY_FILTER };
+      const v = render({ offers, savedIds, route, savedFilter: kurse });
+      expect([...(v.savedCalendar?.index.keys() ?? [])]).toEqual(["2026-10-12"]);
+      // „heute“ hat keinen kommenden Termin mehr und steht deshalb in keinem Index
+      expect([...(v.savedCalendar?.allIndex.keys() ?? [])].sort()).toEqual(["2026-10-07", "2026-10-12", "2026-11-04"]);
+      // „heute schon vorbei“ nur, was zum Filter passt (M7 plus Filter)
+      expect(v.savedCalendar?.endedToday).toBe(0);
+      expect(render({ offers, savedIds, route }).savedCalendar?.endedToday).toBe(1);
+      // der Zeitraum gilt im Kalender nicht, also auch nicht als Filter
+      const nov = render({ offers, savedIds, route, savedFilter: abNov });
+      expect(visibleTitles(nov)).toEqual(["treff", "kurs"]);
+      expect(nov.savedFiltered).toBe(false);
+      expect(nov.savedCalendar?.index).toEqual(nov.savedCalendar?.allIndex);
     });
   });
 

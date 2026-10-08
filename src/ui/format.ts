@@ -504,10 +504,32 @@ export function savedStatusParts(offers: number, sessions: number, missing = 0):
   ];
 }
 
-/** Statuszeile der Merklisten-Karte (Plan 0025, E3a): „5 Angebote an 5 Orten gemerkt“, Muster wie `mapStatusParts`. */
-export function savedMapStatusParts(offers: number, places: number): [number, string, number, string] {
+/** „von 5 gemerkten Angeboten“, Singular „von 1 gemerkten Angebot“ */
+const ofSaved = (total: number) => ` von ${total} gemerkten ${total === 1 ? "Angebot" : "Angeboten"}`;
+
+/**
+ * Statuszeile der Merklisten-Karte (Plan 0025, E3a): „5 Angebote an 5 Orten gemerkt“, Muster wie `mapStatusParts`.
+ * Mit aktivem Merklisten-Filter `total` gemerkte: „2 von 5 gemerkten Angeboten an 2 Orten“.
+ */
+export function savedMapStatusParts(offers: number, places: number, total?: number): [number, string, number, string] {
   const [a, offersWord, b, placesWord] = mapStatusParts(offers, places);
-  return [a, offersWord, b, `${placesWord} gemerkt`];
+  if (total === undefined) return [a, offersWord, b, `${placesWord} gemerkt`];
+  return [a, `${ofSaved(total)} an `, b, placesWord];
+}
+
+/** Statuszeile von Liste und Kalender mit aktivem Merklisten-Filter: „2 von 5 gemerkten Angeboten passen“ (E3a) */
+export function savedFilterStatusParts(shown: number, total: number): [number, string] {
+  return [shown, `${ofSaved(total)} ${shown === 1 ? "passt" : "passen"}`];
+}
+
+/** Leerzustand, wenn der Merklisten-Filter alle gemerkten ausblendet (E5a) */
+export function savedFilteredEmpty(total: number): string {
+  return total === 1 ? "Dein gemerktes Angebot passt nicht." : `Von deinen ${total} gemerkten Angeboten passt keins.`;
+}
+
+/** Schnellwahl „ab Nov.“ zu `YYYY-MM` (E7); Mai, Juni und Juli ohne Punkt */
+export function quickRangeLabel(month: string): string {
+  return `ab ${monthShort(Number(month.slice(5, 7)))}`;
 }
 
 /** „17.10.“, mit `year` „17.10.2026“ */
