@@ -1,6 +1,6 @@
 # ADR 0021 – Verifikation nach Risiko
 
-Status: Entwurf (2026-10-08), Plan 0027 hat das Review eingearbeitet, die Nachprüfung steht aus. Teil A gilt als angenommen mit Plan 0027, Etappe 5, Teil B mit Etappe 7. Der Nutzer hat Teil B am 2026-10-08 zugestimmt. Dieses ADR ergänzt ADR 0004 (Backpressure). Teil B ändert für Doku-Commits ADR 0002 („check → E2E → Deploy“).
+Status: Entwurf (2026-10-08). Plan 0027 ist nach zwei Review-Runden freigegeben. Teil A gilt als angenommen mit Plan 0027, Etappe 5, Teil B mit Etappe 7. Der Nutzer hat Teil B am 2026-10-08 zugestimmt. Dieses ADR ergänzt ADR 0004 (Backpressure). Teil B ändert für Doku-Commits ADR 0002 („check → E2E → Deploy“).
 
 ## Kontext
 
@@ -15,15 +15,18 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
 
 ### Teil A: lokal
 
-1. **Zwei Stufen aus dem Diff.** `scripts/lib/change-class.ts` vergibt Stufe 0, wenn jeder geänderte Pfad auf der Doku-Positivliste steht. Die Liste umfasst `docs/**/*.md`, `*.md` im Wurzelverzeichnis, `.claude/skills/**/*.md` und `.claude/agents/*.md`. Jeder andere Diff bekommt Stufe C. Ein Test hält fest, dass kein Build, kein Test, kein Skript und keine Werkzeugkonfiguration Markdown liest.
+1. **Zwei Stufen aus dem Diff.** `scripts/lib/change-class.ts` vergibt Stufe 0, wenn jeder geänderte Pfad auf der Doku-Positivliste steht. Die Liste umfasst `docs/**/*.md` außer `docs/design/**`, `*.md` im Wurzelverzeichnis, `.claude/skills/**/*.md` und `.claude/agents/*.md`. Jeder andere Diff bekommt Stufe C. Ein Test hält fest, dass kein Build, kein Test, kein Skript und keine Werkzeugkonfiguration Markdown liest. **Grenze:** In der Frontmatter von Skills und Agents könnten `hooks:`, `permissionMode:`, `allowed-tools:` oder `model:` Prozessregeln ändern. Solche Änderungen sichert nur das Review, kein Gate.
 2. **Was jede Stufe prüft.**
    - Stufe 0 prüft nur `check-docs`: Planstatus, eindeutige Plan- und ADR-Nummern, Pfadverweise.
    - Stufe C ist `check:fast` mit knip, `schema:check` und `check-docs`.
    - Coverage, Builds, `size` und die volle E2E-Suite laufen lokal nur auf ausdrücklichen Aufruf. Sonst laufen sie in der CI.
 3. **Die Hooks prüfen nach Stufe.**
    - Der pre-commit-Hook ruft `verify --staged` auf.
-   - Das Stop-Gate prüft nur einen Inhalt (Tree-ID des Arbeitsbaums), der noch keinen grünen Stempel hat. Die Stempel liegen maschinenweit unter `~/.cache/zwergenplan/green/<tree-id>`, gelten 12 h und werden nur geschrieben, wenn der Baum vor und nach dem Lauf gleich ist.
-   - Das Stop-Gate prüft höchstens Stufe C und hat ein eigenes Zeitlimit unter dem Hook-Timeout.
+   - Das Stop-Gate ruft `verify --stop` auf. Geprüft wird nur ein Inhalt (Tree-ID des Arbeitsbaums), der noch keinen frischen grünen Stempel hat.
+   - Die Stempel schreibt nur `verify`. Sie liegen maschinenweit unter `~/.cache/zwergenplan/green/<tree-id>`. Geschrieben wird ein Stempel nur, wenn der Baum vor und nach dem Lauf gleich ist.
+   - Frisch ist ein Stempel, solange der letzte Lauf der Stufe C (`cAt`) weniger als 12 h zurückliegt. Läufe der Stufe 0 übernehmen `cAt` und verlängern die Frist nicht.
+   - Ein Stempel deckt nur den Inhalt ab, nicht `node_modules`.
+   - Das Stop-Gate prüft höchstens Stufe C. Es hat ein eigenes Zeitlimit unter dem Hook-Timeout und beendet dann die ganze Prozessgruppe. Ein Zeitlimit zählt als Rot.
    - Rot blockiert weiterhin höchstens 3× je Arbeitsstand.
 4. **Veraltetes `node_modules` wird vor allen Schritten erkannt.** Weicht `pnpm-lock.yaml` von `node_modules/.pnpm/lock.yaml` ab, kommt eine einzige Meldung mit Abhilfe statt Typfehlern.
 5. **E2E lokal läuft nur gezielt.**
@@ -37,9 +40,9 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
 ### Teil B: CI-Doku-Pfad
 
 7. **Der Job `scope` entscheidet `full`.**
-   - Auf `main` gilt `full=false` nur, wenn der live ausgelieferte Commit (`meta.json` von zwergenplan.app) ein Vorfahre ist und der Diff von dort bis zum Push nur Stufe 0 enthält.
+   - Auf `main` gilt `full=false` nur, wenn der live ausgelieferte Commit ein Vorfahre ist und der Diff von dort bis zum Push nur Stufe 0 enthält. Den Live-Commit liefert die Deployments-API von GitHub: der volle SHA (40 Hex-Zeichen) des neuesten Deployments in `github-pages` mit Status `success`. `https://zwergenplan.app/data/meta.json` scheidet dafür aus, weil es nur einen Kurz-SHA oder `"unbekannt"` enthält und aus einem CDN-Cache kommen kann.
    - Auf anderen Branches gilt `full=false` nur, wenn der Vorgänger einen grünen Lauf mit `event: push` auf derselben Ref hat und der Diff nur Stufe 0 enthält.
-   - In jedem anderen Fall gilt `full=true`, auch wenn eine Abfrage fehlschlägt, bei neuen Branches, bei Pull Requests und bei `workflow_dispatch`.
+   - In jedem anderen Fall gilt `full=true`, auch wenn eine Abfrage fehlschlägt, bei neuen Branches, bei Pull Requests und bei `workflow_dispatch`. Ein Fehler in `scope` macht den Lauf nie rot, er führt nur zu `full=true`. Der Job `scope` braucht die Rechte `contents: read`, `actions: read` und `deployments: read`.
 8. **Bei `full=false`** laufen nur `scope`, `check` und `gates`, ohne E2E, Smoke und Deploy.
    - `gates` läuft mit `!cancelled()` und prüft alle Ergebnisse.
    - `deploy` hängt an `gates` und `scope` und läuft nur bei `full == 'true'`.

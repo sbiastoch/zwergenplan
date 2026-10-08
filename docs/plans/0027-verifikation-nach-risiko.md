@@ -1,6 +1,6 @@
 # Plan 0027 – Verifikation nach Risiko
 
-Status: Review eingearbeitet, Nachprüfung ausstehend
+Status: freigegeben (2 Review-Runden, Nutzerentscheide getroffen)
 Datum: 2026-10-08
 Bezug: ADR 0004 (Backpressure, ergänzt durch ADR 0021), ADR 0002 (Hosting, „check → E2E → Deploy“, Teil B von ADR 0021 ändert das für Doku-Commits), ADR 0012 (Budgets, unverändert), Plan 0013 (CI-Sharding, `PW_SUITE`), `docs/architecture.md` (Schicht `.claude/hooks/`: nur Node-Builtins)
 
@@ -128,7 +128,7 @@ Lauf 37474075714 (`a666dbe`) brauchte vom Push bis zum Deploy 9,5 min:
 
 | Klasse | Pfade | Stufe |
 |---|---|---|
-| Doku und Agent-Texte | `docs/**/*.md`, `*.md` im Wurzelverzeichnis (`README.md`, `CLAUDE.md`), `.claude/skills/**/*.md`, `.claude/agents/*.md` | **0** |
+| Doku und Agent-Texte | `docs/**/*.md` **außer `docs/design/**`**, `*.md` im Wurzelverzeichnis (`README.md`, `CLAUDE.md`), `.claude/skills/**/*.md`, `.claude/agents/*.md` | **0** |
 | alles andere | z. B. `src/**`, `public/**` (auch `public/**/*.md`), `docs/design/**`, Konfiguration, Lockfile, unbekannte Ordner | **C** |
 
 Warum diese Grenze trägt:
@@ -141,7 +141,7 @@ Warum diese Grenze trägt:
 
 | Stufe | Inhalt | Dauer ohne Last |
 |---|---|---|
-| **0** Doku | `check-docs` (E11). Nur Node-Builtins, läuft auch ohne `node_modules`. | < 1 s |
+| **0** Doku | `check-docs` (E11). Nur Node-Builtins; als Hook nur mit `node_modules` (E6). | < 1 s |
 | **C** alles andere | `check:fast` mit **knip** und **`schema:check`** als neuen parallelen Schritten, dazu `check-docs` | ≈ 7 s |
 
 - **knip und `schema:check` in `check:fast`:** Damit fällt lokal auf, was bisher erst in der CI rot wurde (8 von 11 nicht absichtlich roten Läufen waren knip). Die eigenen CI-Schritte „Tote Pfade (knip)“ und „Schema-Drift“ (`ci.yml:31–34`) entfallen, weil `check:fast` sie enthält.
@@ -208,22 +208,30 @@ Warum diese Grenze trägt:
    - Gleicher Inhalt ergibt dieselbe ID, vor oder nach einem Commit, nach einem Rebase und in jedem Worktree.
    - `mark-reviewed.ts` und die Review-Erinnerung nutzen dieselbe Funktion.
 2. **Gemeinsame grüne Stempel.**
-   - Nach einem grünen Lauf schreibt das Gate `~/.cache/zwergenplan/green/<tree-id>` mit Stufe und Zeit, dazu `.claude/state/last-green.json` mit `{ tree }`.
-   - Beide Dateien werden atomar geschrieben: erst in eine temporäre Datei, dann `rename`.
-   - Gestempelt wird nur, wenn die Tree-ID **vor und nach** dem Lauf gleich ist. Hat sich der Baum während des Laufs geändert (Race), gibt es keinen Stempel, und das nächste Stop-Gate prüft erneut.
-   - Ist für die aktuelle ID ein Stempel jünger als **12 h**, lässt das Gate sofort durch. Das gilt auch für Stempel aus einem anderen Worktree.
-   - Die 12 h haben einen Grund: `validate-data` hängt am Datum (z. B. die Warnung zum Fahrplanwechsel). Ein alter Stempel soll das nicht überdecken.
-   - **Ohne Änderung kein Lauf:** Ein Turn ohne Änderung an einem schon grün geprüften Inhalt prüft also nichts. Einen eigenen Hook für den Turn-Start gibt es nicht. Er hätte rote oder nie geprüfte Bäume durchgelassen (Review M4).
-3. **Nur die Änderung prüfen.**
-   - **Basis:** der letzte grüne Baum dieses Worktrees. Bedingungen: Sein Stempel ist jünger als 12 h, und sein Tree-Objekt existiert noch (`git cat-file -e`). Sonst gibt es keine Basis.
-   - **Aufruf:** Das Gate startet `node scripts/verify.ts --base <tree> --tree <tree>`. `verify` holt die geänderten Pfade mit `git diff --name-only --no-renames <base> <tree>` und bestimmt daraus die Stufe nach E1.
-   - **Ohne Basis** gilt Stufe C für den ganzen Baum.
-   - **Folge:** Ein reiner Doku-Turn auf einem grün gestempelten Stand prüft nur Stufe 0.
-4. **Höchstens Stufe C, mit eigenem Zeitlimit.**
-   - Das Gate baut nichts und startet kein E2E. So kollidiert es nicht mit einem `e2e:local`, das gerade `dist-e2e/` nutzt.
-   - `verify` hat ein eigenes Zeitlimit von 150 s, unter dem Hook-Timeout von 180 s. Läuft es ab, meldet es **Rot** („Zeitlimit, Last zu hoch?“) und blockiert damit, statt still über das Hook-Timeout durchzulassen.
+   - **Wer stempelt:** nur `verify.ts`, in jedem Modus (E9 und Punkt 3). Das Gate und der pre-commit-Hook werten nur den Exit-Code aus und schreiben selbst nichts.
+   - **Was gespeichert wird:** Nach einem grünen Lauf schreibt `verify` die Datei `~/.cache/zwergenplan/green/<tree-id>` mit `{ stufe, at, cAt }`. Dazu kommt `.claude/state/last-green.json` mit `{ tree }`.
+     - `cAt` ist der Zeitpunkt des letzten Laufs der Stufe C, der diesen Inhalt abdeckt.
+     - Ein Lauf der Stufe C setzt `cAt = at`.
+     - Ein Lauf der Stufe 0 erbt `cAt` vom Stempel seiner Basis (Review 2, M-B).
+   - **Atomar:** Beide Dateien werden atomar geschrieben, erst in eine temporäre Datei, dann `rename`.
+   - **Nur bei gleichem Baum:** `verify` stempelt nur, wenn die Tree-ID **vor und nach** dem Lauf gleich ist. Hat sich der Baum während des Laufs geändert, gibt es keinen Stempel, und das nächste Stop-Gate prüft erneut.
+   - **Frische:** Ein Stempel gilt als frisch, wenn sein **`cAt` jünger als 12 h** ist. Dann lässt das Gate sofort durch, auch wenn der Stempel aus einem anderen Worktree stammt. Gemessen wird an `cAt`, nicht an `at`. So kann eine Kette reiner Doku-Turns die Frist nicht beliebig verlängern.
+   - **Warum 12 h:** `validate-data` hängt am Datum, etwa bei der Warnung zum Fahrplanwechsel. Ein alter Stempel soll das nicht überdecken.
+   - **Ohne Änderung kein Lauf:** Ein Turn, der einen schon grün geprüften Inhalt nicht ändert, prüft also nichts. Einen eigenen Hook für den Turn-Start gibt es nicht. Er hätte rote oder nie geprüfte Bäume durchgelassen (Review M4).
+   - **Grenze des Stempels:** Er deckt nur den Inhalt ab. Bei einem Treffer läuft auch die Prüfung des Lockfiles (E6) nicht. Ein `node_modules`, das seit dem Stempel veraltet ist, fällt erst beim nächsten Lauf der Stufe C auf, spätestens aber in der CI.
+3. **Eine Schnittstelle: `verify.ts --stop`** (Review 2, Minor 6).
+   - **Was der Aufruf erledigt:** `verify --stop` berechnet selbst die Tree-ID, liest Stempel und Basis, entscheidet über `stop-decision.ts`, prüft und stempelt. Der Exit-Code sagt dem Gate: 0 heißt durchlassen, 1 heißt rot, 3 heißt Zeitlimit.
+   - **Basis:** der letzte grüne Baum dieses Worktrees, sofern dessen Stempel frisch ist (`cAt` < 12 h) und das Tree-Objekt noch existiert (`git cat-file -e`). Sonst gibt es keine Basis.
+   - **Stufe:** Die geänderten Pfade liefert `git diff --name-only --no-renames <base> <tree>`, daraus folgt die Stufe nach E1. Ohne Basis gilt Stufe C für den ganzen Baum.
+   - **Folge:** Ein reiner Doku-Turn auf einem frisch gestempelten Stand prüft nur Stufe 0.
+   - **Weitere Modi:** `--staged` für den pre-commit-Hook (E9), ohne Argument für den Aufruf von Hand (Diff gegen `merge-base origin/main` plus Arbeitsbaum). Weitere Optionen gibt es nicht.
+4. **Höchstens Stufe C, Zeitlimit mit ganzer Prozessgruppe** (Review 2, M-A).
+   - Das Gate baut nichts und startet kein E2E. So stört es kein `e2e:local`, das gerade `dist-e2e/` nutzt.
+   - **Prozessgruppe:** `verify.ts` und `check-fast.ts` starten jeden Schritt mit `spawn(…, { detached: true })` in einer eigenen Prozessgruppe. Heute geschieht das ohne Gruppe (`check-fast.ts:24–36`). Bei Zeitablauf beenden sie jede Gruppe mit `process.kill(-pid, "SIGTERM")` und nach 2 s mit `SIGKILL`. So bleiben keine `tsc`- oder Vitest-Worker übrig.
+   - **Zeitlimit von `verify`:** 150 s, danach Exit 3 mit der Meldung „Zeitlimit (150 s), Last zu hoch?“.
+   - **Zeitlimit im Gate:** `run()` in `.claude/hooks/lib.ts:28–35` bekommt `timeout: 165_000` und `killSignal: "SIGKILL"`. Damit bleibt der Hook sicher unter seinem eigenen Timeout von 180 s (`.claude/settings.json:38`). Endet der Prozess durch ein Signal oder mit `ETIMEDOUT`, zählt das als Rot mit der Meldung „Zeitlimit“. Das Gate blockiert dann, statt über das Hook-Timeout still durchzulassen.
 5. **Unverändert:**
-   - Rot blockiert mit Exit 2, höchstens 3× je Arbeitsstand (`MAX_BLOCKS`), danach Freigabe mit Warnung.
+   - Rot blockiert mit Exit 2, höchstens 3× je Arbeitsstand (`MAX_BLOCKS`), danach Freigabe mit Warnung. Die Warnung nennt den Grund: „check:fast ist weiterhin ROT“ bzw. „Zeitlimit, nicht geprüft“ (`stop-gate.ts:45`, Review 2, Minor 11).
    - Die Erinnerung an `/arch-review` ab 200 Zeilen bleibt.
    - Die Hooks importieren nur Node-Builtins. Die Klassifizierung liegt in `scripts/`, das Gate ruft sie als Prozess auf.
 
@@ -231,7 +239,7 @@ Warum diese Grenze trägt:
 
 - **Vergleich:** `verify.ts` und `check-fast.ts` vergleichen zuerst `pnpm-lock.yaml` byte-genau mit `node_modules/.pnpm/lock.yaml`. Diese Kopie legt pnpm bei jeder Installation an. Nach `pnpm install --frozen-lockfile` waren beide identisch (geprüft am 2026-10-08).
 - **Bei Abweichung** (oder fehlender Kopie) bricht Stufe C vor allen Schritten ab, mit genau einer Meldung: `node_modules passt nicht zu pnpm-lock.yaml. Abhilfe: pnpm install --frozen-lockfile`.
-- **Stufe 0** braucht kein `node_modules`.
+- **Stufe 0** prüft das Lockfile nicht. `check-docs` selbst braucht nur Node-Builtins. Die Hooks laufen aber nur mit `node_modules`: Ohne `node_modules/.bin/tsc` geben die Claude-Hooks nur einen Hinweis (`lib.ts:14–20`), und lefthook braucht sein Binary aus `node_modules`. Ohne Installation bleibt also nur der Aufruf von Hand `node scripts/check-docs.ts`.
 - **Stop-Gate:** Es gibt die Meldung unverändert weiter.
 - **CI:** Dort ist die Prüfung immer grün, denn der Job installiert vorher.
 - **Kein automatisches `pnpm install`:** Es würde über `prepare` die gemeinsamen Git-Hooks umschreiben und braucht Netz.
@@ -249,6 +257,7 @@ Warum diese Grenze trägt:
   - Ist die Sperre belegt, endet das Skript mit Exit 75 und der Meldung: „E2E-Sperre belegt von <Worktree>, <Kommando>, seit <Zeit>. Später erneut, oder warten mit ZP_LOCK_WAIT=1800 und run_in_background.“ Diese Angaben schreibt der Halter nach dem Erwerb in eine Begleitdatei.
   - CLAUDE.md schreibt vor: `pnpm e2e:local` immer mit `run_in_background`.
 - **Ohne `flock`** (macOS) läuft das Kommando mit Warnung ohne Sperre.
+- **Bekannte Grenze, `SIGKILL` auf `heavy.ts`** (Review 2, Minor 10): `heavy.ts` kann dieses Signal nicht abfangen. `flock` und das Kommando laufen dann weiter und halten die Sperre, bis sie von selbst enden; die Wartezeit ist durch Playwright begrenzt. Die Begleitdatei nennt PID und Kommando, damit man von Hand aufräumen kann. Ein Wächter, der den Elternprozess beobachtet, kommt nicht dazu. Er wäre die einzige Mechanik für einen seltenen Fall.
 - **Ein Platz.** Maschinenweit läuft also ein E2E-Lauf mit 4 Workern, statt bis zu 24 Browser. Ein zweiter Platz brächte unter Last wieder Flakes.
 - **Unter der Sperre:** `pnpm e2e:local`, `pnpm e2e` und damit `pnpm check`.
 - **Ohne Sperre:** `check:fast`, `verify` und der pre-commit-Hook. Ein Commit soll nie hinter einem fremden E2E-Lauf warten.
@@ -276,12 +285,15 @@ Warum diese Grenze trägt:
 - **Job `scope`:** Er läuft vor allem anderen. Er braucht `actions/checkout` mit `fetch-depth: 0` und Node, aber kein `pnpm install`, und ruft `node scripts/ci-scope.ts` auf (nutzt `change-class.ts`). Ergebnis ist `full=true|false`, im Zweifel `true`.
 - **Wann `full=false` gilt:**
   - **Auf `main`:** Verglichen wird mit dem **ausgelieferten** Stand, nicht mit dem Vorgänger.
-    - `ci-scope` liest `commit` aus `https://zwergenplan.app/data/meta.json` (mit 10 s Zeitlimit).
+    - **Live-Commit über die Deployments-API, mit vollem SHA** (Review 2, Minor 1). Der Aufruf `gh api "repos/{owner}/{repo}/deployments?environment=github-pages&per_page=10"` liefert die Deployments, das neueste zuerst. Maßgeblich ist das neueste, dessen letzter Status (`…/deployments/<id>/statuses`) `success` ist. Am 2026-10-08 geprüft: Die API liefert `sha` voll (z. B. `3f57669…`) und die Statusfolge `waiting → queued → in_progress → success`.
+    - **Warum nicht `meta.json`:** `https://zwergenplan.app/data/meta.json` trägt nur einen Kurz-SHA oder `"unbekannt"` (`build-data.ts:48–50`) und kann aus einem CDN-Cache kommen.
+    - **Prüfung des Werts:** Der SHA muss `^[0-9a-f]{40}$` erfüllen. Andernfalls gilt `full=true`.
     - `full=false` nur, wenn dieser Commit Vorfahre von `github.sha` ist (`git merge-base --is-ancestor`) **und** `git diff --name-only --no-renames <live>..<sha>` nur Stufe 0 enthält.
-    - Schlägt der Abruf fehl oder ist der Commit unbekannt, gilt `full=true`.
+    - **Jede Ausnahme in `ci-scope` ergibt `full=true` und kein Rot** (Review 2, Minor 2). Das gilt bei API-Fehlern, fehlendem oder ungültigem SHA, unbekanntem Objekt und Zeitüberschreitung (10 s je Aufruf). Der Grund steht im Log.
+    - **Rechte des Jobs:** `permissions: { contents: read, actions: read, deployments: read }`.
     - Warum: Ein wartender Code-Lauf C0, den ein Doku-Commit D1 abbricht, ist nie live gegangen. Der Diff von „live“ nach D1 enthält dann C0, also gilt `full=true`, und C0 wird mitgeprüft und deployt (Review B2).
   - **Auf anderen Branches:**
-    - `full=false` nur, wenn `github.event.before` Vorfahre ist, `before..sha` nur Stufe 0 enthält **und** es für `before` einen Lauf von `ci.yml` gibt mit `event: push`, gleicher Ref (`head_branch`) und `conclusion: success`. Abgefragt wird per `gh api`, mit `permissions: actions: read`.
+    - `full=false` nur, wenn `github.event.before` Vorfahre ist, `before..sha` nur Stufe 0 enthält **und** es für `before` einen Lauf von `ci.yml` gibt mit `event: push`, gleicher Ref (`head_branch`) und `conclusion: success`. Abgefragt wird per `gh api` (Rechte siehe oben).
     - Ein abgebrochener wartender Lauf erfüllt das nicht, ebenso wenig ein grüner Lauf auf einer anderen Ref.
   - **Neue Branches** (`before` aus Nullen), **`pull_request` und `workflow_dispatch`:** immer `full=true`.
 - **Bei `full=false`:**
@@ -321,9 +333,10 @@ Warum diese Grenze trägt:
   1. Jede `docs/plans/*.md` und jede `docs/plans/archiv/*.md` hat eine gültige Statuszeile.
   2. `abgeschlossen` und `ersetzt` stehen nur in `archiv/`, alle anderen Status nur in `docs/plans/`. Wer den Status setzt, muss also auch verschieben.
   3. Plan-Nummern sind über `docs/plans/` und `archiv/` eindeutig, ADR-Nummern in `docs/adr/`.
-  4. **Pfadverweise:** Jeder Treffer eines Pfads auf eine Plan- oder ADR-Datei (vierstellige Nummer, Thema, `.md`, optional mit `archiv/`) in getrackten `*.md`, `*.ts`, `*.tsx`, `*.yml`, `*.json` und `*.cjs` muss als Datei existieren. Jeder relative Markdown-Link auf eine `.md`-Datei in `docs/`, `CLAUDE.md` und `README.md` muss auflösen. Externe Links prüft das Gate nicht, denn Netz in einem Gate flackert.
+  4. **Pfadverweise:** Jeder Treffer eines Pfads auf eine Plan- oder ADR-Datei (vierstellige Nummer, Thema, `.md`, optional mit `archiv/`) in getrackten `*.md`, `*.ts`, `*.tsx`, `*.yml`, `*.json` und `*.cjs` muss als Datei existieren. Ausgenommen sind `data/` und `tests/fixtures/`, denn das sind Rohdaten und Testmaterial (Review 2, Minor 9). Jeder relative Markdown-Link auf eine `.md`-Datei in `docs/`, `CLAUDE.md` und `README.md` muss auflösen. Externe Links prüft das Gate nicht, denn Netz in einem Gate flackert.
 - **Querverweise:** „Plan 00NN“ als Text bleibt gültig, die Nummer ist eindeutig. Beim Archivieren werden nur die Pfadverweise umgeschrieben (heute 11, siehe Ausgangslage). Regel 4 hält das danach dicht. CLAUDE.md sagt: „Plan NNNN liegt in `docs/plans/` oder, wenn abgeschlossen, in `docs/plans/archiv/`.“
 - **Agents:** `ls docs/plans` zeigt nur aktive Pläne und den Ordner `archiv/`. Der `plan-reviewer` liest Pläne aus dem Archiv nur, wenn ein Verweis darauf zeigt.
+- **Frontmatter von Skills und Agents** (Review 2, Minor 3): Diese Dateien gehören zur Klasse 0, aber in der Frontmatter können `hooks:`, `permissionMode:`, `allowed-tools:` und `model:` Verhalten ändern. Ein Prüfskript dafür wäre neue Mechanik für einen Fall, den es heute nicht gibt: Die vorhandenen Dateien nutzen nur `name`, `description` und `tools`. Deshalb die einfachere Lösung: ADR 0021 hält fest, dass Prozessregeln in dieser Frontmatter nur durch Review gesichert sind und nicht durch ein Gate.
 
 ### E12 – Doku sagt, welche Stufe wann genügt
 
@@ -359,25 +372,31 @@ Für die reinen Module zuerst die Tests. Für jedes Gate gibt es einen Kanarienv
    - Jedes Muster der Positivliste.
    - `public/x.md` → C.
    - `docs/design/x.png` → C.
+   - `docs/design/x.md` → C (Review 2, Minor 5).
    - unbekannter Pfad → C.
    - Doku plus `src/domain/x.ts` → C.
    - leere Liste → 0.
    - Umbenennung `src/ui/a.tsx` nach `docs/a.md` (beide Pfade) → C.
-   - **„Doku liest niemand“:** Der Test sucht in `src/`, `scripts/`, `e2e/`, `push-worker/`, `vite.config.ts`, `vitest.config.ts`, `playwright.config.ts`, `biome.json` und `knip.jsonc`.
+   - **„Doku liest niemand“:** Der Test sucht in `src/`, `scripts/`, `e2e/`, `push-worker/`, `vite.config.ts`, `vitest.config.ts`, `playwright.config.ts`, `biome.json`, `knip.jsonc`, `.github/workflows/`, `.claude/hooks/`, `.claude/settings.json`, `lefthook.yml`, `.dependency-cruiser.cjs` und in den `scripts` von `package.json` (Review 2, Minor 4).
      - Er sucht nach einem `.md`-String in der Nähe von `readFileSync`, `readFile`, `import`, `fetch` oder `glob`.
      - Er sucht nach `readdirSync`/`readdir` mit `.endsWith(".md")` und nach Mustern wie `**/*.md`.
      - Er prüft, dass `biome check docs CLAUDE.md` 0 Dateien verarbeitet.
      - Ausnahmeliste: nur `scripts/check-docs.ts`.
      - Ein Treffer außerhalb davon macht den Test rot.
 2. **`scripts/lib/stop-decision.test.ts`.** Die Entscheidung des Gates ist eine reine Funktion `decide({ treeBefore, treeAfter, stamp, lastGreen, blocks, … })` mit den Ergebnissen `pass`, `check(stufe, base)`, `stamp` und `block`. Fälle:
-   - Stempel frisch → `pass`.
-   - Stempel 13 h alt → `check`.
-   - Basis 13 h alt oder Objekt fehlt → `check(C, keine Basis)`.
-   - Basis gültig, Diff nur Doku → `check(0)`.
+   - Stempel frisch (`cAt` < 12 h) → `pass`.
+   - `cAt` 13 h alt → `check`.
+   - Basis mit `cAt` 13 h alt oder Objekt fehlt → `check(C, keine Basis)`.
+   - Basis gültig, Diff nur Doku → `check(0)`; der neue Stempel erbt `cAt` der Basis.
+   - **Doku-Kette über mehr als 12 h** (C-Lauf um 0 h, dann Doku-Turns bei 4 h, 8 h und 13 h) → beim Turn nach 13 h `check(C)` (Review 2, M-B).
    - Tree vor ≠ nach → kein `stamp`.
-   - dreimal rot → Freigabe mit Warnung.
+   - dreimal rot → Freigabe mit Warnung; Grund „ROT“ bzw. „Zeitlimit“.
 
    Die Funktion liegt in `scripts/lib/`. Das Gate ruft `verify.ts --stop` als Prozess auf, wegen der Regel „Hooks nur mit Builtins“.
+2a. **Zeitlimit mit Prozessgruppe** (`scripts/lib/run-steps.test.ts`, Review 2, M-A):
+   - Ein Schritt `sh -c 'sleep 999 & sleep 999; wait'` mit Limit 1 s → Ergebnis rot mit der Meldung „Zeitlimit“.
+   - Danach läuft kein Prozess der Gruppe mehr (`process.kill(-pid, 0)` wirft `ESRCH`).
+   - Ein Hook-`run()` mit `timeout` gegen einen hängenden Prozess → Ergebnis rot, Meldung „Zeitlimit“.
 3. **`scripts/check-docs.test.ts`** mit Fixture-Ordner `tests/fixtures/docs/`, den das echte Gate auslässt:
    - gültiger und fehlender Status;
    - Status erst nach einer Leerzeile (gültig);
@@ -395,7 +414,9 @@ Für die reinen Module zuerst die Tests. Für jedes Gate gibt es einen Kanarienv
 6. **`scripts/ci-scope.test.ts`** (reine Entscheidung, Git und HTTP als Eingaben). Fälle:
    - `main`: Live-Commit ist Vorfahre und der Diff ist nur Doku → `false`.
    - `main`: Der Diff enthält einen Code-Commit, der nie live war (wartender Lauf abgebrochen) → `true`.
-   - Abruf fehlgeschlagen → `true`.
+   - Abruf fehlgeschlagen (Netz, 404, Zeitüberschreitung) → `true`.
+   - Antwort kein JSON, kein Deployment mit Status `success`, `sha` fehlt, `sha` = `"unbekannt"` oder ein Kurz-SHA → `true` (Review 2, Minor 1).
+   - Ausnahme im Skript → `true` und Exit 0 (Review 2, Minor 2).
    - Live-Commit kein Vorfahre → `true`.
    - Branch: Vorgänger ohne grünen Push-Lauf auf derselben Ref → `true`.
    - neuer Branch, `pull_request` → `true`.
@@ -435,7 +456,7 @@ Mehr rote E2E-Läufe auf Branches sind Absicht und kein QS-Verlust. Die volle Su
 
 ## Schritte (einzeln mergebare Etappen, nach Gewinn je Risiko)
 
-Jede Etappe bekommt einen eigenen Branch `verify-0027-<n>`, eigene CI und einen Fast-Forward nach `main`. Bis Etappe 2 gilt noch der alte pre-commit.
+Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und einen Fast-Forward nach `main`. Bis Etappe 2 gilt noch der alte pre-commit.
 
 1. **Sofortmaßnahmen** (kein neues Modul):
    - E8: Zeitlimit für `profile-csa`, belegt mit K8.
@@ -447,7 +468,8 @@ Jede Etappe bekommt einen eigenen Branch `verify-0027-<n>`, eigene CI und einen 
 2. **pre-commit mit Doku-Kurzschluss** (E1, E2, E9):
    - Zuerst `change-class.ts` mit Test 1.
    - `check-docs.ts` mit Test 3, anfangs **nur Regel 3 und 4**. Die Statusregeln kommen mit Etappe 6, sonst wären heute 21 Pläne rot.
-   - `verify.ts` mit `--staged`, mit `--base/--tree` und ohne Argument (Diff gegen `merge-base origin/main` plus Arbeitsbaum).
+   - `verify.ts` mit `--staged` und ohne Argument (Diff gegen `merge-base origin/main` plus Arbeitsbaum). `--stop` kommt mit Etappe 3 (E5.3).
+   - `run-steps.ts`: Schritte in eigener Prozessgruppe mit Zeitlimit (E5.4), mit Test 2a, gemeinsam für `verify.ts` und `check-fast.ts`.
    - `lefthook.yml`, in `package.json` der Eintrag `verify`, `check-docs` in `check:fast`.
    - Vor dem Merge `check-docs` auf dem ganzen Repo laufen lassen. Erwartung: grün, denn alle 30 Pfadverweise zeigen heute auf vorhandene Dateien.
 
@@ -455,9 +477,11 @@ Jede Etappe bekommt einen eigenen Branch `verify-0027-<n>`, eigene CI und einen 
 3. **Inhalts-Hash mit Stempeln** (E5):
    - `lib.ts` `treeHash()` neu, Stempel unter `~/.cache/zwergenplan/green/`.
    - `stop-decision.ts` mit Test 2.
-   - `stop-gate.ts` ruft `verify.ts --stop` (Zeitlimit 150 s).
+   - `verify.ts --stop` (E5.3), schreibt Stempel mit `cAt`.
+   - `stop-gate.ts` ruft `verify.ts --stop`. `run()` in `lib.ts` bekommt `timeout: 165_000` und `killSignal: "SIGKILL"`. Die Freigabe nach drei Blocks nennt „Zeitlimit“, wenn das der Grund war.
+   - **Pflicht vor dem Merge:** Test 2a (Zeitlimit beendet die ganze Prozessgruppe) muss grün sein, sonst greift wieder das Hook-Timeout (Review 2, M-A).
 
-   Fertig, wenn Test 2 grün ist und K7 belegt ist.
+   Fertig, wenn Test 2 und 2a grün sind und K7 belegt ist.
 4. **Sperre und Worker** (E4, E7):
    - `heavy.ts` mit Test 4.
    - `free-ports.ts`, `e2e-local.ts`.
@@ -491,7 +515,7 @@ Jede Etappe bekommt einen eigenen Branch `verify-0027-<n>`, eigene CI und einen 
    Fertig, wenn `check-docs` mit allen Regeln grün ist und `ls docs/plans` nur aktive Pläne zeigt.
 7. **CI-Doku-Pfad** (E10, Nutzerentscheid 1):
    - `scripts/ci-scope.ts` mit Test 6.
-   - `ci.yml`: Job `scope`, Bedingungen an `e2e`, `smoke`, `gates` (`!cancelled()`) und `deploy` (`needs: [gates, scope]`), `permissions: actions: read`.
+   - `ci.yml`: Job `scope`, Bedingungen an `e2e`, `smoke`, `gates` (`!cancelled()`) und `deploy` (`needs: [gates, scope]`), am Job `scope` `permissions: { contents: read, actions: read, deployments: read }`.
    - K9 mit allen vier Fällen.
    - ADR 0021, Teil B, auf „angenommen“; Verweis in ADR 0002.
 
@@ -514,8 +538,12 @@ Keine.
 | Risiko | Abfangen |
 |---|---|
 | Eine Datei wird fälschlich als Doku eingestuft, und ein Fehler rutscht lokal durch | enge Positivliste, alles andere ist C; Test „Doku liest niemand“ (auch dynamische Pfade, Biome-Probe); die CI fährt auf jedem Branch alles, außer nach einem grünen Push-Lauf derselben Ref |
-| Doku-Commit überdeckt einen nie ausgelieferten Code-Commit | auf `main` Diff gegen den Live-Commit aus `meta.json`; Abruf fehlgeschlagen → voll (E10, K9) |
-| Stempel aus einem anderen Worktree täuscht grün vor | Stempel nur für identische Tree-ID (gleicher Inhalt einschließlich Lockfile); 12 h; `node_modules` per E6 geprüft; nur gestempelt, wenn der Baum vor und nach dem Lauf gleich ist |
+| Doku-Commit überdeckt einen nie ausgelieferten Code-Commit | auf `main` Diff gegen den vollen SHA des letzten erfolgreichen Pages-Deployments (Deployments-API); jeder Fehler → voll (E10, Test 6, K9) |
+| Stempel aus einem anderen Worktree täuscht grün vor | Ein Stempel gilt nur für eine identische Tree-ID, also gleichen Inhalt einschließlich Lockfile, und nur, wenn der letzte Lauf der Stufe C keine 12 h zurückliegt (`cAt`). Gestempelt wird nur, wenn der Baum vor und nach dem Lauf gleich war. Der Stempel deckt **nur den Inhalt** ab: Bei einem Treffer läuft auch E6 nicht. Ein `node_modules`, das in diesem Worktree veraltet ist, fällt dann erst beim nächsten Lauf der Stufe C oder in der CI auf. Das ist hinnehmbar, weil der Inhalt schon anderswo grün war. |
+| Kette reiner Doku-Turns hält einen alten Stempel frisch | Frische nach `cAt`, nicht nach `at`; Test 2, Doku-Kette (Review 2, M-B) |
+| Zeitlimit lässt Kindprozesse weiterlaufen, und das Hook-Timeout greift doch | eigene Prozessgruppe je Schritt, `process.kill(-pid)`; `run()` mit `timeout` und `SIGKILL`; Test 2a (Review 2, M-A) |
+| `SIGKILL` auf `heavy.ts` hält die Sperre bis zum Ende des Kommandos | bekannte Grenze (E7); die Begleitdatei nennt PID und Kommando |
+| Frontmatter von Skills und Agents ändert Prozessregeln an der Doku-Stufe vorbei | nur durch Review gesichert, festgehalten in ADR 0021 (E11, Review 2, Minor 3) |
 | Tree-Objekt des letzten grünen Stands entfernt (`git gc`) | `git cat-file -e`, sonst keine Basis → Stufe C (prüft mehr, nie weniger) |
 | Stop-Gate läuft ins Hook-Timeout und lässt still durch | höchstens Stufe C (≈ 7 s), eigenes Zeitlimit 150 s mit roter Meldung |
 | Die Sperre bleibt hängen oder Server bleiben übrig | `flock -o`: nur der `flock`-Prozess hält sie; eigene Prozessgruppe, die bei Ende und Signal ganz beendet wird; Test 4 mit Enkelprozess; K6 prüft auf übrige `vite preview` |
@@ -547,3 +575,23 @@ Keine.
 | Minor: ADR-Nummern eindeutig | übernommen: Regel 3 gilt auch für `docs/adr/` (E11) |
 | Minor: Zeitpunkt des ADR-Status | übernommen: Teil A angenommen mit Etappe 5, Teil B mit Etappe 7 (E12, ADR 0021) |
 | Minor: `gates` und `deploy` in Teil B | übernommen: `!cancelled()`, Ergebnis von `scope` prüfen, `deploy` mit `needs: [gates, scope]` und `full == 'true'` (E10) |
+
+## Review Runde 2 (2026-10-08, auf `85cd480`) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Es gab keinen Blocker. Alle Befunde sind übernommen.
+
+| Befund | Umgang |
+|---|---|
+| **M-A** Das Zeitlimit beendet keine Enkelprozesse. `check-fast.ts:24–36` startet ohne Prozessgruppe, und `run()` in `lib.ts:28–35` hat kein `timeout` | übernommen: Jeder Schritt läuft mit `detached: true`, bei Zeitablauf wird die ganze Gruppe mit `process.kill(-pid)` beendet. `run()` bekommt `timeout: 165_000` und `SIGKILL`; ein Signal oder `ETIMEDOUT` zählt als Rot mit „Zeitlimit“ (E5.4). Neuer Test 2a mit `sleep 999`. Pflicht vor dem Merge von Etappe 3 |
+| **M-B** Reine Doku-Turns verlängern die 12-h-Frist | übernommen: Der Stempel trägt `cAt`, Stufe 0 erbt es, gemessen wird an `cAt` (E5.2). Test 2 enthält eine Doku-Kette über mehr als 12 h |
+| Minor 1: `meta.json` hat nur einen Kurz-SHA oder `"unbekannt"` und liegt im CDN-Cache | übernommen: Der Live-Commit kommt aus der Deployments-API (`environment=github-pages`, neuestes mit Status `success`), mit vollem SHA. Am 2026-10-08 geprüft. Der Wert wird gegen `^[0-9a-f]{40}$` geprüft; Test 6 deckt die Fehlerfälle ab (E10) |
+| Minor 2: Fehler in `ci-scope`; Rechte | übernommen: Jede Ausnahme ergibt `full=true` und Exit 0. Rechte `{ contents: read, actions: read, deployments: read }`; `deployments` ist wegen der API dazugekommen (E10, Etappe 7) |
+| Minor 3: Frontmatter von Skills und Agents (`hooks:`, `permissionMode:`, `allowed-tools:`, `model:`) | einfachere Variante gewählt: ADR 0021 hält fest, dass Prozessregeln dort nur durch Review gesichert sind (E11, Risiken) |
+| Minor 4: Test „Doku liest niemand“ zu eng | übernommen: auch `.github/workflows/`, `.claude/hooks/`, `.claude/settings.json`, `lefthook.yml`, die `scripts` aus `package.json` und `.dependency-cruiser.cjs` (Tests, Nr. 1) |
+| Minor 5: `docs/**/*.md` trifft auch `docs/design/` | übernommen: `docs/design/**` ist ausgenommen; neuer Testfall `docs/design/x.md` → C (E1, Test 1) |
+| Minor 6: keine eindeutige Schnittstelle für `verify` | übernommen: drei Modi, `--stop`, `--staged` und ohne Argument; `--base/--tree` entfällt. Stempel schreibt nur `verify.ts` (E5.2, E5.3) |
+| Minor 7: „Stufe 0 auch ohne `node_modules`“ war falsch | korrigiert: `check-docs` braucht nur Builtins, die Hooks aber `node_modules` (E2, E6) |
+| Minor 8: Risiko „Stempel aus anderem Worktree“ ungenau | umformuliert: Der Stempel deckt nur den Inhalt ab, E6 läuft bei einem Treffer nicht (E5.2, Risiken) |
+| Minor 9: Regel 4 und Rohdaten | übernommen: `data/` und `tests/fixtures/` sind ausgenommen (E11) |
+| Minor 10: `SIGKILL` auf `heavy.ts` | als bekannte Grenze notiert; die Begleitdatei nennt PID und Kommando. Einen Wächter auf den Elternprozess gibt es bewusst nicht (E7, Risiken) |
+| Minor 11: Meldung bei Zeitlimit nach drei Blocks | übernommen: Die Freigabe nennt „Zeitlimit, nicht geprüft“ statt „ROT“ (E5.5, Etappe 3) |
