@@ -152,3 +152,4 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 | 0019 Teil A (Link nach Google Maps) | 91,95 kB | 92,28 kB | +0,33 kB |
 | 0019 Teil B (Karte „Wege ab …“; Lazy-Chunk `Wegzeit JS` 1,66 → 2,30 kB von 3 kB) | 92,28 kB | 92,82 kB | +0,54 kB |
 | 0017 (Wochen-Push; Push-Code nur im Lazy-Chunk „Als App“, gemessen gegen b2023c1 +0,03 kB für Exporte des Einstiegs) | 92,82 kB | 92,78 kB (nach Rebase auf f317505) | ≈ 0 |
+| 0023 (Zeitraumfilter „von / bis“; gemessen gegen a666dbe, das schon die nicht eingetragenen Pläne 0020/0021 enthält) | 93,24 kB | 93,79 kB | +0,55 kB |

@@ -1,10 +1,11 @@
 /**
- * Filter-Sheet (Plan 0003, E16; Plan 0004, E7; Plan 0009, E11; Plan 0021, E2: Altersschalter oben). Inhalt des Dialogs, die Hülle ist Dialog.tsx.
+ * Filter-Sheet (Plan 0003, E16; Plan 0004, E7; Plan 0009, E11; Plan 0021, E2: Altersschalter oben; Plan 0023: Zeitraum). Inhalt des Dialogs, die Hülle ist Dialog.tsx.
  * Kind-Sheet: KidSheet.tsx.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
-import { type ReactNode, type RefObject, useId, useRef } from "react";
-import { type FilterState, FORMATS, toggleIn, withReachLimit } from "../domain/filter.ts";
+import { type ReactNode, type RefObject, useId, useRef, useState } from "react";
+import { usableBound } from "../domain/date-range.ts";
+import { type FilterState, FORMATS, toggleIn, withDateRange, withReachLimit } from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
@@ -99,6 +100,45 @@ function Chip({
   );
 }
 
+/**
+ * Natives Datumsfeld einer Zeitraum-Grenze (Plan 0023, E9). Der Text bleibt lokal, bis die Eingabe übernommen werden
+ * darf (`usableBound`); ändert sich die Grenze von außen (Tauschen, Zurücksetzen), folgt das Feld.
+ */
+function DateField({
+  label,
+  value,
+  today,
+  onCommit,
+}: {
+  label: string;
+  value: string;
+  today: string;
+  onCommit: (value: string) => void;
+}) {
+  const [text, setText] = useState(value);
+  const [shown, setShown] = useState(value);
+  if (value !== shown) {
+    setShown(value);
+    setText(value);
+  }
+  return (
+    <label className="field">
+      {label}
+      <input
+        className="input date"
+        type="date"
+        min={today}
+        value={text}
+        onChange={(e) => {
+          const next = e.target.value;
+          setText(next);
+          if (usableBound(next, today)) onCommit(next);
+        }}
+      />
+    </label>
+  );
+}
+
 export function FilterSheet({
   filter,
   onChange,
@@ -107,6 +147,7 @@ export function FilterSheet({
   resultCount,
   mode,
   limitAction,
+  today,
   onClose,
 }: {
   filter: FilterState;
@@ -119,6 +160,8 @@ export function FilterSheet({
   mode: ReachMode | undefined;
   /** Knopf zur Begründung (`LimitAction`), Fokus-Ziel ist die Überschrift „Wegzeit“ (N2) */
   limitAction: LimitActionFor;
+  /** Berliner „heute“: frühester Tag im Zeitraum */
+  today: string;
   onClose: () => void;
 }) {
   const reachHeading = useRef<HTMLHeadingElement>(null);
@@ -203,6 +246,30 @@ export function FilterSheet({
             </Chip>
           ))}
         </div>
+        <h3>Zeitraum</h3>
+        <div className="daterange">
+          <DateField
+            label="von"
+            value={filter.range?.from ?? ""}
+            today={today}
+            onCommit={(from) => onChange(withDateRange(filter, from, filter.range?.to))}
+          />
+          <DateField
+            label="bis"
+            value={filter.range?.to ?? ""}
+            today={today}
+            onCommit={(to) => onChange(withDateRange(filter, filter.range?.from, to))}
+          />
+        </div>
+        {filter.range && (
+          <button
+            type="button"
+            className="linkbtn"
+            onClick={() => onChange(withDateRange(filter, undefined, undefined))}
+          >
+            Zeitraum entfernen
+          </button>
+        )}
         <h3 ref={reachHeading} tabIndex={-1}>
           Wegzeit
         </h3>

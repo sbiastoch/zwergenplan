@@ -349,6 +349,7 @@ export function App() {
                 hasData={offers.length > 0}
                 onResetFilter={resetIfActive}
                 age={ageEscape}
+                openOnDay={route.filter.range !== undefined}
               />
             )}
             {/* erst mit der Liste: Sonst rutschte er beim Ersetzen des Platzhalters (CLS) */}

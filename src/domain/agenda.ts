@@ -2,6 +2,7 @@
  * Kalender- und Listenlogik der Oberfläche: Welcher Termin eines Angebots zählt, wie Tage
  * gruppiert und Raster gebaut werden. Alle Kalendertage sind Berliner Tage (time.ts).
  */
+import { type DateRange, rangeSession } from "./date-range.ts";
 import type { Offer, Session } from "./schema.ts";
 import { addDays, berlinIsoDate, berlinKey, daysInMonth, isoWeekday, parseIsoDate } from "./time.ts";
 
@@ -57,11 +58,18 @@ function groupByDay<T extends Offer>(occurrences: Occurrence<T>[]): DayGroup<Occ
   return groups;
 }
 
-/** Liste „Entdecken“: jedes Angebot genau einmal, am nächsten nicht beendeten Termin. */
-export function groupByNextSession<T extends Offer>(offers: readonly T[], now: Date): DayGroup<Occurrence<T>>[] {
+/**
+ * Liste „Entdecken“: jedes Angebot genau einmal, am nächsten nicht beendeten Termin. Mit Zeitraum am Termin, für
+ * den es im Zeitraum steht (`rangeSession`: Kurse am Beginn, sonst der erste Termin darin; Plan 0023, E6).
+ */
+export function groupByNextSession<T extends Offer>(
+  offers: readonly T[],
+  now: Date,
+  range?: DateRange,
+): DayGroup<Occurrence<T>>[] {
   const occurrences: Occurrence<T>[] = [];
   for (const offer of offers) {
-    const session = nextSession(offer, now);
+    const session = range ? rangeSession(offer, range, now) : nextSession(offer, now);
     if (session) occurrences.push({ offer, session });
   }
   return groupByDay(occurrences.sort(byStartThenTitle));

@@ -70,6 +70,20 @@ describe("useOfferViews", () => {
     expect(v.ageOnly).toBe(true);
   });
 
+  it("filtert nach Zeitraum und stellt Regelmäßiges an den ersten Termin darin (Plan 0023, E6)", () => {
+    const weekly: SiteOffer = {
+      ...offer("woche", "2026-10-07", undefined, "regelmaessig"),
+      sessions: ["2026-10-07", "2026-10-14", "2026-10-21"].map((d) => ({
+        start: fromBerlinLocal(`${d}T10:00`),
+        end: fromBerlinLocal(`${d}T11:00`),
+      })),
+    };
+    const route: Route = { ...ENTDECKEN, filter: { ...EMPTY_FILTER, range: { from: "2026-10-11", to: "2026-10-20" } } };
+    const v = render({ offers: [...OFFERS, weekly], route });
+    expect(ids(v.visible)).toEqual(["gross", "woche"]);
+    expect(v.page.groups.map((g) => g.day)).toEqual(["2026-10-12", "2026-10-14"]);
+  });
+
   it("blendet mit Geburtsdatum unpassende Angebote aus und markiert sie", () => {
     const v = render({ birthDate: "2026-05-01" });
     expect(ids(v.visible)).toEqual(["baby"]);

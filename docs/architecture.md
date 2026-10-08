@@ -29,7 +29,7 @@ data/providers.yaml + data/offers.json + data/oepnv/fahrplan.json   (Commit auf 
 
 | Ordner | Aufgabe | darf importieren |
 |---|---|---|
-| `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit, Geometrie, Entfernung und Wegzeit (`geo`, `reach`, `districts`, `transit`), Routen-Link (`maps-link`, Plan 0019) | nur `src/domain`, `zod` (nur schema/dataset) |
+| `src/domain/` | reine Logik: Schema, Kategorien, Alter, Filter, ICS, Zeit, Geometrie, Entfernung und Wegzeit (`geo`, `reach`, `districts`, `transit`), Routen-Link (`maps-link`, Plan 0019), Zeitraum (`date-range`, Plan 0023) | nur `src/domain`, `zod` (nur schema/dataset) |
 | `src/data/` | einziger Datenzugriff der App (fetch, localStorage, Geolocation; Ausnahme: Bootstrap in `index.html`, siehe Regeln) | `src/domain`: Typen, zur Laufzeit nur reine Hilfen ohne Zod, heute `geo` (ADR 0010, `data-domain-runtime-allowlist`) |
 | `src/ui/` | React-Komponenten, Darstellung, Interaktion | `src/domain`, `src/data` |
 | `src/sw/` | Service Worker (ADR 0013, Plan 0011, Plan 0017): reine Regeln `routes.ts`, Push `push-tailor.ts`/`push-decision.ts`, Verdrahtung `sw.ts`; eigener Typkontext (`lib: webworker`, „Typen SW“) | nur `src/sw`, reine Domänenhilfen ohne Zod (auch `transit.ts`, ADR 0014), `src/data/device-store.ts`, `site.config.ts` (`sw-isolated`, `no-zod-in-sw`); erreicht wird er nur über `scripts/vite-sw.ts` (`sw-not-imported`) |

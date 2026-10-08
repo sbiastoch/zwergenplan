@@ -90,6 +90,20 @@
     letter-spacing: 0.08em;
     color: var(--ink);
   }
+  /* Zeitraum (Plan 0023, E9): zwei Spalten, bei wenig Platz oder großer Schrift untereinander */
+  .daterange {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 10px;
+  }
+  .input.date {
+    font-size: 1.0625rem;
+    letter-spacing: 0;
+  }
+  /* iOS zentriert den Wert sonst */
+  .input.date::-webkit-date-and-time-value {
+    text-align: start;
+  }
   .input::placeholder {
     color: var(--muted);
   }
