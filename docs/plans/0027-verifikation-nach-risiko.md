@@ -623,6 +623,32 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
     - Gegenprobe: Mit geerbter Umgebung im Temp-Repo wird er rot.
 - **Ergänzung zum Plan:** `--staged` und der Aufruf von Hand stempeln nur nach Stufe C. Ein Lauf der Stufe 0 im pre-commit prüft nur den Index-Diff und ist deshalb kein Beleg für den ganzen Arbeitsbaum.
 
+### Etappe 4 (Branch `harness-0027-e4`)
+
+- **`scripts/heavy.ts`** (Test 4, mit eigenem `ZP_LOCK_DIR`):
+  - `flock -o -E 75 -w <ZP_LOCK_WAIT, Standard 30>`, eigene Prozessgruppe.
+  - Bei SIGINT, SIGTERM und SIGHUP sowie nach dem Ende beendet `heavy.ts` die ganze Gruppe.
+  - Der Halter schreibt Worktree, Kommando, Zeit und Prozessgruppe in `heavy.holder`.
+  - Getestet: Exit-Code und `ZP_HEAVY_LOCK=1` werden durchgereicht. Ein zweiter Lauf endet mit Exit 75 und nennt den Halter; mit Wartezeit startet er erst nach dem ersten. SIGTERM beendet auch den Enkel (`sleep 30 & wait`) und gibt die Sperre frei. Werden `heavy.ts` und `flock` per SIGKILL beendet, ist die Sperre trotzdem frei, während der Enkel weiterläuft (die bekannte Grenze aus E7).
+- **`scripts/lib/free-ports.ts`** (mit Test): zwei aufeinanderfolgende freie Ports.
+- **`scripts/e2e-local.ts`** (`pnpm e2e:local <spec …> [-- …]`): ohne Spec bricht es ab; es läuft unter `heavy.ts`, nimmt pixel-7 und `PW_SUITE` passend zur Engine. `pnpm e2e` läuft unter `heavy.ts`.
+- **`playwright.config.ts`:**
+  - lokal `workers: "25%"`;
+  - `reuseExistingServer: false`;
+  - Wächter `e2e/global-setup.ts` (Review B1).
+  - **Ergänzung zum Plan:** Lokal ohne Sperre startet die Konfiguration keine Server. Playwright startet Server vor `globalSetup`, ohne `dist-e2e/` hätte sonst die Meldung „dist-e2e does not exist“ den Wächter verdeckt.
+  - In CI bleibt alles wie bisher: `CI=true` setzt den Wächter außer Kraft, und `ci.yml` gibt die Worker vor.
+- **Messung:**
+  - Plan 0013, Test 1: `--list` lokal ohne Sperre ergibt 2 512 Tests. Mit `CI=true` sind es 1 992 (chromium) + 498 (webkit) + 22 (smoke) = 2 512. `--list` startet keinen Server und kein globalSetup.
+  - `pnpm knip` ist grün; `flock` steht als Systemprogramm in `ignoreBinaries`.
+- **K5:** `pnpm exec playwright test e2e/theme.spec.ts` ohne Sperre bricht im globalSetup mit dem Hinweis auf `pnpm e2e:local` ab.
+- **K6:** zwei `e2e:local e2e/theme.spec.ts` gleichzeitig:
+  - Der zweite (`ZP_LOCK_WAIT=0`) endet mit Exit 75: „E2E-Sperre belegt von <Worktree>, Kommando …“.
+  - Der erste läuft grün durch: 4 passed, **12 s** mit Build.
+  - Danach ist kein `vite preview` übrig, und die Sperre ist frei.
+- **CLAUDE.md:** Die lokalen Beispiele nutzen `pnpm e2e:local`. Die Nachstellung eines CI-Jobs läuft unter `heavy.ts`.
+- `browser-review` startet nur `vite preview` und `scripts/screenshots.ts` (Playwright als Bibliothek) und ist vom Wächter nicht betroffen. Den freien Port dort bekommt es mit Etappe 5.
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.

@@ -64,15 +64,19 @@ function selectProjects(): Project[] {
 }
 
 const projects = selectProjects();
+// Lokal ohne maschinenweite Sperre (scripts/heavy.ts setzt ZP_HEAVY_LOCK=1): kein Server, e2e/global-setup.ts bricht
+// ab (Plan 0027, E4). Mit Sperre und in CI startet immer ein eigener Server (reuseExistingServer: false). Ist der
+// Port belegt, wird der Lauf über --strictPort laut rot, statt still den Build eines anderen Worktrees zu testen.
+const UNLOCKED_LOCAL = !process.env["CI"] && process.env["ZP_HEAVY_LOCK"] !== "1";
 const fixtureServer = {
   command: `pnpm exec vite preview --strictPort --port ${FIXTURE_PORT} --outDir dist-e2e`,
   url: `http://localhost:${FIXTURE_PORT}${BASE}`,
-  reuseExistingServer: !process.env["CI"],
+  reuseExistingServer: false,
 };
 const realServer = {
   command: `pnpm exec vite preview --strictPort --port ${REAL_PORT} --outDir dist`,
   url: `http://localhost:${REAL_PORT}${BASE}`,
-  reuseExistingServer: !process.env["CI"],
+  reuseExistingServer: false,
 };
 
 export default defineConfig({
@@ -80,6 +84,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env["CI"],
   retries: process.env["CI"] ? 1 : 0,
+  // Lokal 25 % der Kerne (4 von 16): Unter der Sperre läuft maschinenweit nur ein Lauf. Feste Worker statt Worker nach
+  // Last, damit Laufzeit und Flake-Bild reproduzierbar sind (Plan 0027, E7). CI setzt --workers=2 (ci.yml).
+  ...(process.env["CI"] ? {} : { workers: "25%" }),
+  // Wächter: lokal nur unter der Sperre (Plan 0027, E4). Als globalSetup, damit knip und --list ihn nicht auslösen.
+  globalSetup: "./e2e/global-setup.ts",
   reporter: process.env["CI"] ? [["github"], ["html", { open: "never" }]] : [["list"]],
   outputDir: "test-results",
   use: {
@@ -94,8 +103,12 @@ export default defineConfig({
   // smoke.spec.ts läuft nur im Projekt mit echten Daten (überschreibt dort testIgnore).
   testIgnore: /smoke\.spec\.ts/,
   // Nur die Server, die die gewählte Suite braucht: Geräte nutzen dist-e2e/, Smoke nutzt dist/.
-  webServer: [
-    ...(SUITE === "smoke" ? [] : [fixtureServer]),
-    ...(SUITE === undefined || SUITE === "smoke" ? [realServer] : []),
-  ],
+  // Lokal ohne Sperre keine Server: Playwright startet sie vor globalSetup, und der Wächter dort soll als Erstes und
+  // mit klarer Meldung greifen, nicht ein Server mit „dist-e2e does not exist“ (Plan 0027, E4).
+  webServer: UNLOCKED_LOCAL
+    ? []
+    : [
+        ...(SUITE === "smoke" ? [] : [fixtureServer]),
+        ...(SUITE === undefined || SUITE === "smoke" ? [realServer] : []),
+      ],
 });

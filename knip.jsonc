@@ -23,5 +23,7 @@
   ],
   // @fontsource-variable/roboto: Schriftdatei, nur per require.resolve gelesen (e2e/vitals.ts,
   // scripts/font-fallback.ts); knip erkennt das nicht (Plan 0007, E12)
+  // flock: Systemprogramm aus util-linux für die maschinenweite E2E-Sperre (scripts/heavy.ts, Plan 0027, E7)
+  "ignoreBinaries": ["flock"],
   "ignoreDependencies": ["tailwindcss", "@swc/core", "@fontsource-variable/roboto"]
 }
