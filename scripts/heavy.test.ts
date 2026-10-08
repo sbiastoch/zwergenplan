@@ -102,19 +102,16 @@ describe("heavy.ts", () => {
 
   it("mit Wartezeit startet der zweite erst nach dem ersten", async () => {
     const dir = lockDir();
-    const first = holder(dir, "sleep 0.2");
+    // Die Reihenfolge prüfen die Kommandos selbst: Der zweite endet nur mit 0, wenn die Marke des ersten schon steht.
+    // Das exit-Ereignis des äußeren Prozesses taugt dafür nicht, es kann nach dem Ende des zweiten ankommen (CI-Flake).
+    const done = join(dir, "first-done");
+    holder(dir, `sleep 0.2; touch '${done}'`);
     await until(() => existsSync(holderFile(dir)));
-    let firstEnded = 0;
-    first.on("exit", () => {
-      firstEnded = Date.now();
+    const code = await new Promise<number | null>((resolve) => {
+      const c = spawn("node", [HEAVY, "sh", "-c", `test -f '${done}'`], { env: env(dir, "10"), stdio: "ignore" });
+      c.on("exit", resolve);
     });
-    const r = await new Promise<{ code: number | null; at: number }>((resolve) => {
-      const c = spawn("node", [HEAVY, "sh", "-c", "exit 0"], { env: env(dir, "10"), stdio: "ignore" });
-      c.on("exit", (code) => resolve({ code, at: Date.now() }));
-    });
-    expect(r.code).toBe(0);
-    expect(firstEnded).toBeGreaterThan(0);
-    expect(r.at).toBeGreaterThanOrEqual(firstEnded);
+    expect(code).toBe(0);
   });
 
   it("SIGTERM an heavy.ts beendet die ganze Gruppe samt Enkel und gibt die Sperre frei", async () => {
