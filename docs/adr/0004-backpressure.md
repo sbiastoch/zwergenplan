@@ -15,13 +15,14 @@ Die Prüfungen sind in Schichten organisiert. Jede fängt eine Fehlerklasse so f
 | Architektur | dependency-cruiser (swc) + Modulzahl-Wächter | `check:fast` |
 | Daten | Zod + Invarianten + Plausibilität gegen Live | `check:fast`, Hook bei `data/*`, CI |
 | Logik | Vitest, 90 % Coverage in `src/domain`, TZ=America/Los_Angeles | `check:fast`, CI |
-| Tote Pfade | knip | CI |
+| Tote Pfade | knip | `check:fast` (lokal und CI), geändert durch ADR 0021 |
+| Schema-Drift | `schema/*.json` gegen `src/domain/schema.ts` | `check:fast` (lokal und CI), geändert durch ADR 0021 |
 | Browser | Playwright: Funktion, Mobile-UX-Gates, Web-Vitals, Konsolenfehler | CI (vor Deploy) |
 | Bundle | size-limit | CI |
 | Architektur-Urteil | `/arch-review` (adversarialer Subagent) | vor „fertig“ bei großen Änderungen |
 | Sichtprüfung | `/browser-review` | vor „fertig“ bei UI-Änderungen, nach Deploy |
 
-- `check:fast` (< 5 s) läuft im Stop-Hook, im pre-commit-Hook (lefthook) und in CI.
+- `check:fast` läuft im Stop-Hook, im pre-commit-Hook (lefthook) und in CI. Gemessen am 2026-10-08 (Plan 0027, Ergebnis): lokal etwa 6 s auf 16 Kernen, in CI 9 s. **Geändert durch ADR 0021:** Seit Plan 0027, Etappe 1, gehören knip und die Schema-Drift dazu. Ab Etappe 2 prüft der pre-commit-Hook nach Stufe, ein reiner Doku-Commit fährt dann nur `check-docs`.
 - Das Stop-Gate blockiert höchstens 3× pro Arbeitsstand und lässt einen unveränderten grünen Stand sofort durch. Das begrenzt Kosten und Schleifen.
 - Für jedes Gate gilt der **Kanarienvogel**: Beim Aufsetzen wird ein absichtlicher Verstoß eingebaut und muss rot werden. Beim Aufsetzen gefunden: Ein `exclude` auf `node_modules` hatte alle npm-Regeln still deaktiviert.
 

@@ -26,12 +26,10 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: check:fast (Typen, Lint, Architektur, Daten, Unit)
+      # Enthält seit Plan 0027 (E2) auch knip und die Schema-Drift. Sie laufen in der CI NUR über check:fast,
+      # deshalb nicht aus check-fast.ts entfernen, ohne hier wieder eigene Schritte anzulegen.
+      - name: check:fast (Typen, Lint, Architektur, Daten, Unit, tote Pfade, Schema-Drift)
         run: pnpm check:fast
-      - name: Tote Pfade (knip)
-        run: pnpm knip
-      - name: Schema-Drift
-        run: pnpm schema:check
       - name: Coverage (src/domain)
         run: pnpm test:coverage
       - name: Plausibilität gegen deployten Stand
@@ -44,6 +42,8 @@ jobs:
   # Gemessen (Plan 0013, Ergebnis): 4 + 2 Shards mit je 2 Workern 6,2–6,4 Min. vom ersten Start bis gates,
   # langsamster Job webkit 2/2 mit 6,1–6,2 Min. 2 + 1 Shards mit je 4 Workern waren bis zu 29 % langsamer
   # und drückten den LCP von pixel-7 auf 2044 ms (sonst ≈ 1430 ms, Budget 2500 ms).
+  # Stand 2026-10-08 (Plan 0027, Ausgangslage): 2 422 statt 1 911 Tests, 9–10,6 Min. vom Push bis zum Deploy,
+  # langsamster Job chromium 2/4 (pixel-7) mit 8,8 Min. – immer noch unter dem Timeout von 15 Min.
   e2e:
     name: E2E ${{ matrix.engine }} ${{ matrix.shard }}/${{ matrix.total }}
     runs-on: ubuntu-latest
