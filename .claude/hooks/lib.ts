@@ -1,7 +1,7 @@
 /** Gemeinsame Helfer für Claude-Code-Hooks (nur Node-Builtins, kein node_modules nötig). */
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const PROJECT_DIR = process.env["CLAUDE_PROJECT_DIR"] ?? process.cwd();
@@ -25,14 +25,37 @@ export async function readInput<T>(): Promise<T> {
   return JSON.parse(raw || "{}") as T;
 }
 
-export function run(cmd: string, args: string[]): { ok: boolean; output: string } {
+export interface RunResult {
+  ok: boolean;
+  output: string;
+  /** Exit-Code; `null`, wenn der Prozess durch ein Signal oder das Zeitlimit endete */
+  status: number | null;
+  /** Zeitlimit abgelaufen oder durch ein Signal beendet (Plan 0027, E5.4) */
+  timedOut: boolean;
+}
+
+/**
+ * Startet ein Kommando synchron. Mit `timeoutMs` wird es danach per SIGKILL beendet. Das zählt als Rot
+ * (`timedOut`), nie als Durchlassen. Wer Kindprozesse startet, beendet deren Prozessgruppen mit einem eigenen,
+ * kürzeren Zeitlimit selbst (verify 150 s, check:fast 140 s). Dieses Limit ist nur die letzte Sicherung unter dem
+ * Hook-Timeout.
+ */
+export function run(cmd: string, args: string[], { timeoutMs }: { timeoutMs?: number } = {}): RunResult {
   const r = spawnSync(cmd, args, {
     cwd: PROJECT_DIR,
     encoding: "utf8",
     env: { ...process.env, FORCE_COLOR: "0" },
     maxBuffer: 16 * 1024 * 1024,
+    ...(timeoutMs === undefined ? {} : { timeout: timeoutMs, killSignal: "SIGKILL" as const }),
   });
-  return { ok: r.status === 0, output: `${r.stdout ?? ""}${r.stderr ?? ""}`.trim() };
+  const timedOut = r.signal !== null || (r.error !== undefined && "code" in r.error && r.error.code === "ETIMEDOUT");
+  const note = timedOut ? `\nZeitlimit: ${cmd} ${args.join(" ")} wurde beendet (${r.signal ?? "ETIMEDOUT"}).` : "";
+  return {
+    ok: r.status === 0 && !timedOut,
+    output: `${r.stdout ?? ""}${r.stderr ?? ""}${note}`.trim(),
+    status: r.status,
+    timedOut,
+  };
 }
 
 export function tail(text: string, lines = 30): string {
@@ -66,23 +89,32 @@ export function changedLines(): { ref: string; lines: number } {
   return { ref, lines };
 }
 
-/** Fingerabdruck des Arbeitsstands (HEAD + uncommittete Änderungen inkl. neuer Dateien). */
+/**
+ * Fingerabdruck des Arbeitsstands: die Tree-ID des Inhalts (getrackt plus neu, ohne Ignoriertes), unabhängig vom
+ * Commit (Plan 0027, E5.1). Kopie von `treeId` aus `scripts/lib/tree-id.ts`, weil Hooks nur Builtins importieren;
+ * `scripts/lib/tree-id-hooks.test.ts` hält beide gleich.
+ */
 export function treeHash(): string {
-  const head = run("git", ["rev-parse", "HEAD"]).output;
-  const status = run("git", ["status", "--porcelain=v1", "-uall"]).output;
-  const diff = run("git", ["diff", "HEAD"]).output;
-  const untracked = status
-    .split("\n")
-    .filter((l) => l.startsWith("?? "))
-    .map((l) => l.slice(3));
-  const content = untracked.map((f) => {
-    try {
-      return readFileSync(join(PROJECT_DIR, f), "utf8");
-    } catch {
-      return "";
-    }
-  });
-  return createHash("sha256")
-    .update([head, status, diff, ...content].join("\0"))
-    .digest("hex");
+  mkdirSync(STATE_DIR, { recursive: true });
+  const index = join(STATE_DIR, `idx-${process.pid}-${randomBytes(4).toString("hex")}`);
+  // Ohne geerbte GIT_*-Variablen, damit nur PROJECT_DIR zählt (Vorfall 2026-10-08, scripts/lib/git-env.ts).
+  // Geschrieben werden nur der Wegwerf-Index und Objekte, nie Konfiguration, HEAD oder Refs.
+  const clean = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("GIT_")));
+  try {
+    const real = spawnSync("git", ["rev-parse", "--path-format=absolute", "--git-path", "index"], {
+      cwd: PROJECT_DIR,
+      env: clean,
+      encoding: "utf8",
+    }).stdout.trim();
+    copyFileSync(real, index);
+  } catch {
+    // noch kein Index: leer anfangen
+  }
+  const env = { ...clean, GIT_INDEX_FILE: index };
+  try {
+    spawnSync("git", ["add", "-A"], { cwd: PROJECT_DIR, env });
+    return spawnSync("git", ["write-tree"], { cwd: PROJECT_DIR, env, encoding: "utf8" }).stdout.trim();
+  } finally {
+    rmSync(index, { force: true });
+  }
 }

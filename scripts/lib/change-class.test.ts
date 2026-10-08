@@ -2,6 +2,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { classify, isDocPath } from "./change-class.ts";
+import { withoutGitEnv } from "./git-env.ts";
 
 describe("isDocPath: Positivliste der Doku (Plan 0027, E1)", () => {
   it.each([
@@ -101,7 +102,8 @@ describe("Doku liest niemand", () => {
   const READS = /readFileSync|readFile\b|readdirSync|readdir\b|import\b|fetch\(|glob|endsWith|include|entry|project/;
 
   it("keine eingecheckte Code- oder Konfigurationsdatei liest .md", () => {
-    const files = execFileSync("git", ["ls-files", "--", ...SCANNED], { encoding: "utf8" })
+    // nur lesend, im Projekt, ohne geerbte GIT_*-Variablen (git-env.ts)
+    const files = execFileSync("git", ["ls-files", "--", ...SCANNED], { encoding: "utf8", env: withoutGitEnv() })
       .split("\n")
       .filter((f) => f !== "" && !ALLOWED.has(f) && !f.startsWith("tests/"));
     expect(files.length).toBeGreaterThan(50);

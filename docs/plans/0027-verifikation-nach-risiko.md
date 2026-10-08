@@ -565,6 +565,46 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
 - Kanarienvogel für „Doku liest niemand“: `readdirSync(...).endsWith(".md")` in `scripts/icons.ts` macht den Test rot.
 - **Abweichung vom Plan:** Test 3 (`check-docs`) arbeitet mit einem Repo im Speicher statt mit `tests/fixtures/docs/`. Das ist einfacher und braucht keine Fixture-Ausnahme. Die Ausnahme für `tests/fixtures/docs/` bleibt trotzdem in `check-docs.ts`. `*.test.ts` sind von Regel 4 ausgenommen, weil Tests Pfade als Testdaten nennen.
 
+### Etappe 3 (Branch `harness-0027-e3b`, siehe Vorfall unten)
+
+- **Neue Module, jeweils mit Test vorab:**
+  - `scripts/lib/stop-decision.ts` (Test 2, auch die Doku-Kette über mehr als 12 h);
+  - `scripts/lib/tree-id.ts` (Tree-ID gleich vor und nach einem Commit, Ignoriertes zählt nicht, der echte Index bleibt unberührt, Wegwerf-Index je Prozess, atomares Schreiben);
+  - `tree-id-hooks.test.ts` hält die Kopie in `.claude/hooks/lib.ts` gleich.
+- **`verify.ts --stop`:** stempelt nach E5.2. `stop-gate.ts` ruft es mit `timeout: 165_000` und `SIGKILL` auf. Ein Zeitlimit zählt als Rot, die Meldung lautet „Zeitlimit, nicht geprüft“.
+- **K7** gegen das echte Gate (`echo '{…}' | node .claude/hooks/stop-gate.ts`), mit eigenem Cache (`ZP_CACHE_DIR`):
+
+  | Fall | Ergebnis |
+  |---|---|
+  | erster Lauf, kein Stempel | Stufe C, 6,3 s |
+  | unverändert | kein Lauf, 0,3 s |
+  | `last-green.json` gelöscht (wie frischer Worktree) | Stempel greift, 0,3 s |
+  | Doku-Änderung auf grünem Stand | Stufe 0 „seit grünem Stand …“, `check-docs` |
+  | Stempel der Stufe 0 | erbt `cAt` der Basis |
+  | Datei zurück auf den gestempelten Inhalt | kein Lauf, 0,3 s |
+  | roter Baum | dreimal Block (Exit 2), danach Freigabe mit „Prüfung weiterhin: ROT“ |
+  | Zeitlimit in `verify` (1 s) | Block „Zeitlimit, nicht geprüft“, Exit 3; danach kein `check-fast`, `tsc` oder Vitest übrig |
+  | Zeitlimit im Gate (0,5 s, SIGKILL) | Block „Zeitlimit, nicht geprüft“ |
+  | Datei während der Prüfung geändert | „Baum hat sich während der Prüfung geändert → kein Stempel“; Gegenprobe ohne Änderung stempelt |
+  | `node_modules` fehlt | Hinweis „Hooks inaktiv“, Exit 0, kein Block (wie bisher) |
+
+- **Bekannte Grenze:** Beendet das Gate `verify` per SIGKILL (die letzte Sicherung, 165 s), läuft das `check:fast` darunter in seiner eigenen Prozessgruppe weiter. Es endet nach höchstens 140 s an seinem eigenen Zeitlimit. Im Normalfall greift vorher das Zeitlimit von `verify` (150 s), und dann bleibt nichts übrig (Zeile „Zeitlimit in `verify`“ in der Tabelle).
+- **Ergänzung zum Plan:** Greift ein Stempel, setzt `verify --stop` den gestempelten Baum als `last-green.json` dieses Worktrees. Ein frischer Checkout auf grünem Inhalt hat damit sofort eine Basis für den Doku-Kurzschluss.
+- **Vorfall beim ersten Commit (2026-10-08, 12:43):**
+  - **Was geschah:** Die neuen Tests `tree-id.test.ts` und `tree-id-hooks.test.ts` liefen im pre-commit-Hook. Dort setzt git `GIT_DIR` und `GIT_INDEX_FILE`. Die Tests erbten beide, und ihr `git init`, `git config` und `git commit` im Temp-Ordner trafen das echte Repo.
+  - **Schaden:**
+    - `core.bare = true` im gemeinsamen `.git/config`: Haupt-Checkout und alle Worktrees waren kaputt. Der Orchestrator hat den Wert zurückgesetzt.
+    - `user.email = t@example.org` und `user.name = Test` lokal im gemeinsamen `.git/config`: entfernt. In der halben Stunde danach hat kein Commit diese Identität getragen.
+    - Zwei Commits „start“ auf `harness-0027-e3`, sie leeren den Baum. Der Branch ist mit ihnen gepusht und wird nicht weiter genutzt. Die Arbeit liegt auf `harness-0027-e3b`.
+  - **Behebung:**
+    - `scripts/lib/git-env.ts` (`withoutGitEnv`): Produktivcode ruft git mit eigenem `cwd` nur ohne geerbte GIT_*-Variablen auf, ebenso die Kopie in `.claude/hooks/lib.ts`.
+    - `scripts/lib/temp-repo.ts`: Tests nutzen git schreibend nur dort. Temp-Ordner, explizites `GIT_DIR` und `GIT_WORK_TREE`, keine globale Konfiguration, Identität per `-c`, nie `git config`.
+  - **Kanarienvogel `scripts/lib/git-isolation.test.ts`:**
+    - Er stellt die Lage im Hook mit einem Köder-Repo nach: Konfiguration, HEAD und Index des Köders bleiben unverändert.
+    - Danach prüft er am echten Projekt: `core.bare` ist `false`, es gibt kein lokales `user.email`, HEAD ist unverändert.
+    - Gegenprobe: Mit geerbter Umgebung im Temp-Repo wird er rot.
+- **Ergänzung zum Plan:** `--staged` und der Aufruf von Hand stempeln nur nach Stufe C. Ein Lauf der Stufe 0 im pre-commit prüft nur den Index-Diff und ist deshalb kein Beleg für den ganzen Arbeitsbaum.
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.

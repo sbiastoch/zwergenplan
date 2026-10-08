@@ -34,7 +34,7 @@
           {
             "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/stop-gate.ts"],
             "command": "node",
-            "statusMessage": "Stop-Gate: check:fast",
+            "statusMessage": "Stop-Gate: verify",
             "timeout": 180,
             "type": "command"
           }

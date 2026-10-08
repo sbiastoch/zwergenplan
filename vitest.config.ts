@@ -23,6 +23,8 @@ export default defineConfig({
         // Stufe des Diffs und Doku-Gate (Plan 0027, E1, E11)
         "scripts/lib/change-class.ts",
         "scripts/lib/doc-check.ts",
+        // Entscheidung des Stop-Gates über Stempel (Plan 0027, E5)
+        "scripts/lib/stop-decision.ts",
         "src/sw/routes.ts",
         "src/sw/retire.ts",
         // Push im Service Worker (Plan 0017, E10)
