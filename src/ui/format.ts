@@ -4,9 +4,9 @@
  */
 import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
-import { DEFAULT_AGE } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
 import type { DateRange } from "../domain/date-range.ts";
+import { MONTHS, monthShort, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
 import {
   type Origin,
   type Reach,
@@ -16,32 +16,21 @@ import {
   stopMinutes,
 } from "../domain/reach.ts";
 import { registrationPhase } from "../domain/registration.ts";
-import type { AgeRange, Session } from "../domain/schema.ts";
+import type { Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { addDays, berlinIsoDate, berlinKey, isoWeekday, parseIsoDate } from "../domain/time.ts";
+import { addDays, berlinIsoDate, isoWeekday, parseIsoDate } from "../domain/time.ts";
 import type { TransitLineNames, TransitOther, TransitSource } from "../domain/transit-types.ts";
 import type { ReachMode } from "./use-transit.ts";
 
-const WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"] as const;
-const WD_SHORT = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] as const;
-const MONTHS = [
-  "Januar",
-  "Februar",
-  "März",
-  "April",
-  "Mai",
-  "Juni",
-  "Juli",
-  "August",
-  "September",
-  "Oktober",
-  "November",
-  "Dezember",
-] as const;
-
-function weekdayName(isoWeekdayNumber: number): string {
-  return WEEKDAYS[isoWeekdayNumber - 1] ?? "";
-}
+// Texte aus der Domäne (Plan 0026, E3): dieselben Schreibweisen wie auf den Vorschauseiten des Builds
+export {
+  ageRangeLabel,
+  availabilityLabel,
+  clock,
+  costLabel,
+  registrationLabel,
+  timeRange,
+} from "../domain/labels.ts";
 
 /** „Mo“ für einen Kalendertag */
 export function weekdayShort(day: string): string {
@@ -71,24 +60,12 @@ export function monthTitle(day: string): string {
   return `${MONTHS[month - 1]} ${year}`;
 }
 
-/** „5.–11. Oktober“ bzw. „26. Okt. – 1. Nov.“ */
+/** „5.–11. Oktober“ bzw. „26. Okt. – 1. Nov.“, „29. Juni – 5. Juli“ */
 export function weekTitle(days: readonly string[]): string {
   const first = parseIsoDate(days[0] ?? "");
   const last = parseIsoDate(days.at(-1) ?? "");
   if (first.month === last.month) return `${first.day}.–${last.day}. ${MONTHS[last.month - 1]}`;
-  const abbr = (m: number) => (MONTHS[m - 1] ?? "").slice(0, 3);
-  return `${first.day}. ${abbr(first.month)}. – ${last.day}. ${abbr(last.month)}.`;
-}
-
-/** Berliner Uhrzeit „9:30“ */
-export function clock(instant: string): string {
-  const key = berlinKey(instant);
-  return `${Number(key.slice(9, 11))}:${key.slice(11, 13)}`;
-}
-
-/** „10:00–11:30“ */
-export function timeRange(session: Session): string {
-  return `${clock(session.start)}–${clock(session.end)}`;
+  return `${first.day}. ${monthShort(first.month)} – ${last.day}. ${monthShort(last.month)}`;
 }
 
 /** Kalendertag eines Termins (Berlin) */
@@ -201,31 +178,6 @@ export function registrationNote(offer: SiteOffer, now: Date): string {
   // „bald“ (mit oder ohne Schluss) und „offen“ ohne Schluss
   if (phase && opens) return `Anmeldung ab ${dayDots(opens)}${deadline ? `, bis ${dayDots(deadline)}` : ""}`;
   return offer.registration === "mit-anmeldung" ? "Beim Anbieter" : "Einfach vorbeikommen";
-}
-
-export function costLabel(offer: SiteOffer): string {
-  return offer.cost === "kostenlos" ? "Kostenlos" : (offer.price ?? "Kostenpflichtig");
-}
-
-export function registrationLabel(offer: SiteOffer): string {
-  return offer.registration === "mit-anmeldung" ? "Anmeldung nötig" : "Ohne Anmeldung";
-}
-
-const AVAILABILITY: Partial<Record<SiteOffer["availability"]["status"], string>> = {
-  frei: "Plätze frei",
-  wenige: "Wenige Plätze",
-  ausgebucht: "Ausgebucht",
-  warteliste: "Warteliste",
-};
-
-/** Nur aussagekräftige Status bekommen einen Chip bzw. Stempel. */
-export function availabilityLabel(offer: SiteOffer): string | undefined {
-  return AVAILABILITY[offer.availability.status];
-}
-
-export function ageRangeLabel(age: AgeRange | undefined): string {
-  const { minMonths, maxMonths } = age ?? DEFAULT_AGE;
-  return `${minMonths}–${maxMonths} Monate`;
 }
 
 /** Kind-Chip im Kopf: „11 Mon.“, ab 2 Jahren „2 J.“ */

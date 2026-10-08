@@ -6,7 +6,7 @@ import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts"
 import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN } from "./ids.ts";
 
 /** Längste echte Anbieter-ID: 47 Zeichen (Plan 0010, E2). Mehr ist kein Link aus der App. */
-const MAX_PROVIDER_ID = 80;
+export const MAX_PROVIDER_ID = 80;
 
 /**
  * „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5), kein eigener Tab in der Leiste. „anbieter“ ist der

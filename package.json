@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "pnpm data:build && vite",
-    "build": "pnpm data:build && vite build",
+    "build": "pnpm data:build && vite build && node scripts/og-images.ts",
     "preview": "vite preview --strictPort",
     "data:build": "node scripts/build-data.ts",
     "data:validate": "node scripts/validate-data.ts",
