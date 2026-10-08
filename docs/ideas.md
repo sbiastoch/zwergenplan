@@ -70,6 +70,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **CI-Ergebnis nach einem Fast-Forward wiederverwenden** (Plan 0027, E10, verworfen): Derselbe Commit hat auf dem Branch schon voll bestanden. Dafür müsste das Pages-Artefakt aus einem fremden Lauf kommen, `--against-deployed` läuft nur auf `main`, und ein Fehler in der Verdrahtung deployte ungeprüft.
 - **lefthook im Worktree** (Plan 0027, Nicht-Ziele): `pnpm install` in einem Worktree schreibt über `prepare` den eigenen lefthook-Pfad in das gemeinsame `.git/hooks/pre-commit`. Fehlt der Worktree später, greift der Fallback auf das lefthook des jeweiligen Checkouts. Sauberer wäre `prepare` nur im Haupt-Checkout.
 - **5. Chromium-Shard in CI** (Plan 0027, Ausgangslage): Der Pixel-7-Shard liegt mit 486 s um 24 % über dem Chromium-Schnitt. Plan 0013 nennt eine Schwelle von 30 %; über ihr bekäme `pixel-7` zwei Shards.
+- **Browser-Installation in CI robuster** (Plan 0027, Ergebnis): Ein Retry mit `timeout` scheitert am verwaisten `apt-get` (dpkg-Lock). Besser `playwright install` und `install-deps` trennen oder einen Container mit vorinstallierten Browsern nutzen. Bis dahin den Job bei einem Hänger neu starten.
 
 ## Offen aus abgeschlossenen Plänen
 

@@ -756,6 +756,7 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
   - Ein gescheiterter Versuch erzeugt eine Warnung im Lauf.
   - Gemessen dauert die Installation sonst 22–37 s.
 - **Verworfen:** ein Cache für `~/.cache/ms-playwright`. Er hilft nur bei einem Treffer, nach jedem Playwright-Update gar nicht. Außerdem müsste der Schritt in Cache, `install` und `install-deps` zerfallen.
+- **Zurückgenommen (2026-10-08):** Auf `main` (`8a75abb`, Lauf 37780913534) wurde der Smoke-Job rot. `timeout` beendete nur `pnpm`, das als root laufende `apt-get` blieb übrig und hielt den dpkg-Lock, also scheiterten Versuch 2 und 3 sofort. Die Schritte stehen wieder wie vor `8a75abb`. Die Alternativen stehen in `docs/ideas.md`.
 
 ### `check:fast` wieder unter 7,5 s (2026-10-08)
 
