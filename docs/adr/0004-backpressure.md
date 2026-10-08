@@ -41,3 +41,9 @@ ADR 0021, Teil A, ergänzt diese Entscheidung (Plan 0027, Etappen 1 bis 5). Kein
 - **`check:fast`** enthält knip, Schema-Drift und `check-docs` und erkennt ein veraltetes `node_modules`.
 - **E2E lokal** läuft nur gezielt (`pnpm e2e:local`), unter einer maschinenweiten Sperre (`scripts/heavy.ts`). Die volle Suite fährt die CI auf jedem Branch.
 - **Mehrere Checkouts:** Tests nutzen git schreibend nur in isolierten Temp-Repos (`scripts/lib/temp-repo.ts`). `vitest.setup.ts` löscht alle GIT_*-Variablen. Anlass war ein Test im pre-commit-Hook, der am 2026-10-08 das gemeinsame `.git/config` umgeschrieben hat.
+
+## Nachtrag (2026-10-09): Zeremonie nach Größe, E2E nach Diff, ADR 0023
+
+- **Sichtprüfung:** `/browser-review` läuft lokal vor dem Commit, nach dem Deploy nur als Kurzcheck auf der Live-URL.
+- **Browser:** Die volle Suite fährt die CI nur noch auf `main` vor dem Deploy, auf anderen Branches nur die aus dem Diff gewählten Specs.
+- Kleinänderungen brauchen kein Plan-Dokument. Kein Gate wird schwächer.

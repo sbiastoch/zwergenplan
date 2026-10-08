@@ -8,10 +8,11 @@ UI-Texte und Doku sind auf Deutsch, Code-Identifier auf Englisch. Die Kommandos 
 
 1. **Plan**: Für jede nicht-triviale Änderung zuerst `docs/plans/NNNN-<thema>.md` schreiben. Fertig ist der Plan, wenn ein Fremder ihn ohne den Chat umsetzen könnte.
    - **Mockup**: Ist ein Mockup verlangt, wird es dem Nutzer gezeigt. Umgesetzt wird erst nach seinem Feedback, auch bei einem freigegebenen Plan.
-2. **`/plan-review`**: Fertig, wenn der Plan einen Review-Abschnitt hat und kein Blocker mehr offen ist.
+   - **Kleinänderung** (Plan 0029, A1; ADR 0023): höchstens 60 Zeilen ohne Tests und Doku, keine neue Datei außer Tests, keine Sperrliste (Abhängigkeiten, Schema, Gates, E2E-Helfer, ADRs), kein Mockup. Sie braucht kein Plan-Dokument und kein `/plan-review`. Der Plan steht als Abschnitt `Plan:` im Commit-Text (Anlass, Änderung, Test, 3–6 Zeilen). Vor dem Commit bestätigt `node scripts/change-size.ts` die Einschätzung. Lautet sie „nein“, kommen Plan und `/plan-review` vor den Commit.
+2. **`/plan-review`** (nicht bei Kleinänderungen): Fertig, wenn der Plan einen Review-Abschnitt hat und kein Blocker mehr offen ist.
 3. **Umsetzen, test-first** für Domänenlogik. Fertig, wenn `pnpm verify` **grün** ist, die E2E-Pflicht aus „Lokal prüfen“ erfüllt ist und jede neue Logik bzw. Ansicht einen Test hat.
 4. **`/arch-review`** bei größeren Änderungen: neues Modul, neue Abhängigkeit, Schemaänderung oder mehr als 200 Zeilen. Fertig, wenn kein Blocker mehr offen ist.
-5. **`/browser-review`** bei jeder UI-Änderung, nach dem Deploy auf der Live-URL. Fertig, wenn jede Zeile der Checkliste beantwortet ist.
+5. **`/browser-review`** bei jeder UI-Änderung **lokal vor dem Commit** (Fixture-Build, volle Checkliste; bei Kleinänderungen nur die betroffenen Ansichten). Fertig, wenn jede Zeile der Checkliste beantwortet ist. Nach dem Deploy folgt `/browser-review live` als Kurzcheck (Plan 0029, A3).
 6. **Commit und Push.**
    - Wer allein im Haupt-Checkout arbeitet, committet direkt auf `main`.
    - Wer in einem Worktree oder parallel zu einer anderen Session arbeitet, nutzt einen eigenen Branch. Der wird gepusht (CI läuft auf jedem Branch, ohne Deploy) und dann per Fast-Forward nach `main` gebracht.
