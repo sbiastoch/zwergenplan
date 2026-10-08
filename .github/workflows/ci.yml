@@ -67,13 +67,15 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Der Download hing am 2026-10-08 zweimal 15 min (Job-Timeout). Gemessen dauert er 22–37 s: Jeder Versuch hat
-      # deshalb 180 s, es gibt bis zu drei, und der Schritt ist auf 10 min begrenzt (Plan 0027, Ergebnis).
+      # Der Download hing am 2026-10-08 zweimal 15 min (Job-Timeout). Gemessen dauert er 22–37 s. Jeder Versuch hat
+      # 300 s (apt lädt vom Mirror teils langsam), es gibt bis zu drei, der Schritt ist auf 15 min begrenzt (Plan 0027).
       - name: Playwright-Browser
-        timeout-minutes: 10
+        timeout-minutes: 15
         run: |
+          # Ein abgebrochener Versuch kann ein apt-get mit dpkg-Lock hinterlassen: Der nächste wartet darauf.
+          echo 'DPkg::Lock::Timeout "300";' | sudo tee /etc/apt/apt.conf.d/99-lock-timeout >/dev/null
           for i in 1 2 3; do
-            timeout 180 pnpm exec playwright install --with-deps ${{ matrix.engine }} && exit 0
+            timeout 300 pnpm exec playwright install --with-deps ${{ matrix.engine }} && exit 0
             echo "::warning::Browser-Installation Versuch $i hing oder schlug fehl, neuer Versuch"
           done
           exit 1
@@ -105,12 +107,14 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # wie im E2E-Job: 180 s je Versuch, bis zu drei, Schritt höchstens 10 min (Plan 0027, Ergebnis)
+      # wie im E2E-Job: 300 s je Versuch, bis zu drei, Schritt höchstens 15 min (Plan 0027)
       - name: Playwright-Browser
-        timeout-minutes: 10
+        timeout-minutes: 15
         run: |
+          # Ein abgebrochener Versuch kann ein apt-get mit dpkg-Lock hinterlassen: Der nächste wartet darauf.
+          echo 'DPkg::Lock::Timeout "300";' | sudo tee /etc/apt/apt.conf.d/99-lock-timeout >/dev/null
           for i in 1 2 3; do
-            timeout 180 pnpm exec playwright install --with-deps chromium && exit 0
+            timeout 300 pnpm exec playwright install --with-deps chromium && exit 0
             echo "::warning::Browser-Installation Versuch $i hing oder schlug fehl, neuer Versuch"
           done
           exit 1
