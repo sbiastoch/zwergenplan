@@ -67,6 +67,8 @@ Leitlinien:
 
 ### E1 – Geteilt wird die Vorschauseite, nicht die Query-URL
 
+> **Hinweis (2026-10-08):** Mit Plan 0015, Nachtrag A (Stufe 0, Nutzerentscheide N-I1 und N-I2) liegen die Vorschauseiten unter `a/<id>/` und `p/<publicId>/`. `angebot/` und `anbieter/` aus E1 bis E7 bleiben nur als Weiterleitung über `404.html` (dort E19, ADR-Entwurf 0022). Die Query-Namen `?angebot=` und `?anbieter=` bleiben.
+
 - Der Knopf teilt `https://zwergenplan.app/angebot/<offerId>/` bzw. `…/anbieter/<providerId>/`. Nur diese URL hat eigene `og:`-Tags, `/?angebot=` liefert immer die generische `index.html`.
 - **Pfade**: `angebot/` und `anbieter/`, genau wie die Query-Namen. Sie sind lesbar, und die Länge spielt bei 95 Zeichen ID keine Rolle. Abschließender Schrägstrich, damit Pages `index.html` ohne 301 liefert.
 - Einzige Quelle ist `src/domain/share.ts` (rein, im Start-Bundle):
@@ -274,7 +276,7 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 
 ### E10 – Kodierung v1: Kurz-IDs im Fragment
 
-> **Hinweis (2026-10-08):** Plan 0015, Nachtrag A (Stufe 0, ADR-Entwurf 0022) macht die Angebots-ID selbst zur gespeicherten 8-Zeichen-Kurz-ID. Dann entfallen Hash, Kollisionsprüfung und Verwerfen mehrdeutiger Kurz-IDs; Anbieter stehen mit ihrer Katalog-ID im Fragment (dort E20). E10–E12 werden vor Beginn von Stufe 2 daran angepasst. Stufe 2 setzt Stufe 0 von Plan 0015 voraus.
+> **Hinweis (2026-10-08, ergänzt nach den Nutzerentscheiden N-I1 und N-I2 vom selben Tag):** Plan 0015, Nachtrag A (Stufe 0, ADR-Entwurf 0022) macht die Angebots-ID selbst zur gespeicherten 8-Zeichen-Kurz-ID, und Anbieter bekommen eine feste Kurz-ID `publicId` im Katalog. Im Browser (`site.json`, `anbieter.json`, `zwergenplan.anbieter-merkliste`) steht nur noch sie, die Katalog-ID bleibt intern. Damit gilt die Form dieses Abschnitts wieder: `#merkliste=1.{A}.{P}`, beide Gruppen aus 8-Zeichen-IDs ohne Trenner (dort E20). Es entfallen der Hash `shortId(id)` im Browser, `findShortIdCollisions`, die Build-Warnung und das Verwerfen mehrdeutiger Kurz-IDs; `resolveShared` schlägt die IDs direkt nach. Die Vorschauseiten liegen ab Stufe 0 unter `a/<id>/` und `p/<publicId>/`, das Kachelbild unter `a/<id>/vorschau.jpg`; `angebot/` und `anbieter/` leiten nur noch über `404.html` weiter (dort E19). E10–E12 werden vor Beginn von Stufe 2 daran angepasst. Stufe 2 setzt Stufe 0 von Plan 0015 voraus.
 
 - Form: `{SITE_URL}#merkliste=1.{A}` bzw. mit Anbietern `…#merkliste=1.{A}.{P}`.
   - `1` ist die Formatversion.
@@ -481,6 +483,8 @@ Die Begründungen zu den einzelnen Punkten:
 - **N4 – Vorschaubild.** **Empfehlung: ein generisches Bild** (Icon und Schriftzug, E5). Bilder je Kategorie wären hübscher, kosten aber 12 Motive, Pflege und Gestaltung. Sie kommen nach `docs/ideas.md`.
 
 ## Nachtrag A (2026-10-08): Kachelbild je Angebot
+
+> **Hinweis (2026-10-08):** Mit Plan 0015, Nachtrag A (Stufe 0, Nutzerentscheid N-I1) zieht das Kachelbild von `angebot/<id>/vorschau.jpg` nach `a/<id>/vorschau.jpg`. Der Pfad kommt weiter nur aus `offerImagePath` in `src/domain/share.ts`; Erzeugung und Gates bleiben.
 
 Nutzerwunsch beim Start der Umsetzung, wörtlich:
 
