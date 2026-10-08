@@ -1,49 +1,64 @@
 # ADR 0021 – Verifikation nach Risiko
 
-Status: Entwurf (2026-10-08), wartet auf das Plan-Review von Plan 0027. Teil B braucht zusätzlich eine Nutzerentscheidung. Ergänzt ADR 0004 (Backpressure). Teil B ändert ADR 0002 („check → E2E → Deploy“ für jeden Stand).
+Status: Entwurf (2026-10-08), Plan 0027 hat das Review eingearbeitet, die Nachprüfung steht aus. Teil A gilt als angenommen mit Plan 0027, Etappe 5, Teil B mit Etappe 7. Der Nutzer hat Teil B am 2026-10-08 zugestimmt. Dieses ADR ergänzt ADR 0004 (Backpressure). Teil B ändert für Doku-Commits ADR 0002 („check → E2E → Deploy“).
 
 ## Kontext
 
-ADR 0004 sagt: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in CI. Die volle E2E-Suite läuft in CI vor dem Deploy. Wann lokal wie viel geprüft wird, regelt ADR 0004 nicht. Messwerte und Belege stehen in Plan 0027, Ausgangslage.
+ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in CI, und die volle E2E-Suite läuft in CI vor dem Deploy. Wann lokal wie viel geprüft wird, regelt ADR 0004 nicht. Messwerte und Belege stehen in Plan 0027, Abschnitt Ausgangslage.
 
-- Agents fuhren lokal die volle E2E-Suite: 2 422 Tests, 5 Geräte, ohne Last etwa 19 min. Mehrere Worktrees taten das parallel. Die Last stieg auf 46–116 bei 16 Kernen, Läufe dauerten über 40 min, und Tests flackerten. Die CI fährt dieselbe Suite auf jedem Branch in etwa 9 min.
-- Der pre-commit-Hook und das Stop-Gate fuhren `check:fast` auch bei reinen Doku-Änderungen. Das Stop-Gate prüfte auch dann, wenn sich nur der Commit, nicht aber der Inhalt geändert hatte. Unter Last wurden diese Läufe rot: `profile-csa.test.ts` riss das Zeitlimit von 5 s.
-- 8 von 11 nicht absichtlich roten CI-Läufen scheiterten an knip, und knip lief lokal nicht.
-- 17 von 40 Commits auf `main` ändern nur Markdown. Jeder davon fährt 9 Jobs und deployt.
+- Agents fuhren die volle E2E-Suite lokal (2 422 Tests, 5 Geräte, ohne Last etwa 19 min), mehrere Worktrees gleichzeitig. Die Last stieg auf 46–116 bei 16 Kernen, Läufe dauerten über 40 min, und Tests flackerten. Die CI fährt dieselbe Suite auf jedem Branch in etwa 9 min.
+- pre-commit und Stop-Gate fuhren `check:fast` auch bei reinen Doku-Änderungen. Das Stop-Gate prüfte auch dann, wenn sich nur der Commit geändert hatte, nicht der Inhalt. Unter Last wurden diese Läufe rot, weil `profile-csa.test.ts` das Zeitlimit von 5 s riss.
+- 8 von 11 CI-Läufen, die nicht absichtlich rot waren, scheiterten an knip. knip lief lokal nicht.
+- 17 von 40 Commits auf `main` änderten nur Markdown. Jeder davon fuhr 9 Jobs und deployte.
 
 ## Entscheidung
 
-### Teil A – lokal (mit Plan 0027 angenommen, sobald das Plan-Review freigibt)
+### Teil A: lokal
 
-1. **Stufe aus dem Diff.**
-   - `scripts/lib/change-class.ts` ordnet jedem geänderten Pfad eine Stufe zu: 0 (Doku), C (Code), D (Daten) oder V (voll). Es gilt das Maximum über alle Pfade.
-   - Die Doku-Klasse ist eine enge Positivliste. Jeder unbekannte Pfad bekommt V.
-   - Ein Test hält fest, dass kein Build, Test oder Skript Markdown liest.
-2. **Hooks nach Stufe.** pre-commit (`verify --staged`) und Stop-Gate (`verify --base … --tree …`) prüfen die Stufe des Diffs.
-   - Das Stop-Gate prüft nur, wenn sich der **Inhalt** im Turn geändert hat und dieser Inhalt noch keinen grünen Stempel hat.
-   - Die Stempel liegen maschinenweit unter `~/.cache/zwergenplan/green/<tree-id>` und gelten 12 h.
+1. **Zwei Stufen aus dem Diff.** `scripts/lib/change-class.ts` vergibt Stufe 0, wenn jeder geänderte Pfad auf der Doku-Positivliste steht. Die Liste umfasst `docs/**/*.md`, `*.md` im Wurzelverzeichnis, `.claude/skills/**/*.md` und `.claude/agents/*.md`. Jeder andere Diff bekommt Stufe C. Ein Test hält fest, dass kein Build, kein Test, kein Skript und keine Werkzeugkonfiguration Markdown liest.
+2. **Was jede Stufe prüft.**
+   - Stufe 0 prüft nur `check-docs`: Planstatus, eindeutige Plan- und ADR-Nummern, Pfadverweise.
+   - Stufe C ist `check:fast` mit knip, `schema:check` und `check-docs`.
+   - Coverage, Builds, `size` und die volle E2E-Suite laufen lokal nur auf ausdrücklichen Aufruf. Sonst laufen sie in der CI.
+3. **Die Hooks prüfen nach Stufe.**
+   - Der pre-commit-Hook ruft `verify --staged` auf.
+   - Das Stop-Gate prüft nur einen Inhalt (Tree-ID des Arbeitsbaums), der noch keinen grünen Stempel hat. Die Stempel liegen maschinenweit unter `~/.cache/zwergenplan/green/<tree-id>`, gelten 12 h und werden nur geschrieben, wenn der Baum vor und nach dem Lauf gleich ist.
+   - Das Stop-Gate prüft höchstens Stufe C und hat ein eigenes Zeitlimit unter dem Hook-Timeout.
    - Rot blockiert weiterhin höchstens 3× je Arbeitsstand.
-3. **knip gehört zu `check:fast`.** Die Tabelle in ADR 0004 lautet für „Tote Pfade“ damit `check:fast`, CI.
-4. **Veraltetes `node_modules`** wird vor allen Schritten erkannt: `pnpm-lock.yaml` ≠ `node_modules/.pnpm/lock.yaml`. Es erscheint als eine Meldung mit Abhilfe, nicht als Typfehler.
-5. **E2E lokal nur gezielt.**
-   - `pnpm e2e:local <spec …>` lässt nur genannte Specs laufen, standardmäßig auf `pixel-7`.
-   - Jeder lokale E2E-Lauf nimmt eine maschinenweite Sperre (`flock`, ein Platz) und läuft mit 25 % der Kerne als Worker.
-   - `playwright.config.ts` wirft lokal ohne Sperre.
-   - Die volle Suite fährt die CI auf jedem Branch. Lokal fährt sie kein Agent.
-6. **CPU-gebundene Unit-Tests über 1 s** bekommen ein eigenes, begründetes Zeitlimit. Die globale Grenze bleibt.
+4. **Veraltetes `node_modules` wird vor allen Schritten erkannt.** Weicht `pnpm-lock.yaml` von `node_modules/.pnpm/lock.yaml` ab, kommt eine einzige Meldung mit Abhilfe statt Typfehlern.
+5. **E2E lokal läuft nur gezielt.**
+   - `pnpm e2e:local <spec …>` testet genannte Specs auf `pixel-7`, mit zwei freien Ports, die das Skript selbst wählt.
+   - Jeder lokale E2E-Lauf nimmt eine maschinenweite Sperre: `flock -o`, ein Platz, eigene Prozessgruppe, kurze Wartezeit.
+   - Lokal läuft Playwright mit 25 % der Kerne als Worker.
+   - Ein `globalSetup` bricht lokale Läufe ohne Sperre ab. Beim Laden der Konfiguration wirft es nicht, damit knip und `--list` weiter funktionieren.
+   - Die volle Suite fährt kein Agent lokal.
+6. **Lange Unit-Tests.** Ein CPU-gebundener Unit-Test über 1 s bekommt ein eigenes, begründetes Zeitlimit. Die globale Grenze bleibt.
 
-### Teil B – CI-Doku-Pfad (nur auf Nutzerentscheid, Plan 0027, E10)
+### Teil B: CI-Doku-Pfad
 
-7. Ein Push, dessen Diff zum Vorgänger nur Stufe 0 ist, fährt nur den Job `check` und keinen Deploy. Voraussetzung ist, dass der Vorgänger sein Vorfahre ist und einen voll grünen CI-Lauf hat. In jedem anderen Fall, auch bei neuen Branches und Pull Requests, fährt die volle Matrix.
-8. Die Garantie für `main` lautet dann: Jeder Stand ist voll grün geprüft, **oder** er unterscheidet sich von einem voll grün geprüften Vorgänger nur in Dateien, die kein Build, Test oder Skript liest.
+7. **Der Job `scope` entscheidet `full`.**
+   - Auf `main` gilt `full=false` nur, wenn der live ausgelieferte Commit (`meta.json` von zwergenplan.app) ein Vorfahre ist und der Diff von dort bis zum Push nur Stufe 0 enthält.
+   - Auf anderen Branches gilt `full=false` nur, wenn der Vorgänger einen grünen Lauf mit `event: push` auf derselben Ref hat und der Diff nur Stufe 0 enthält.
+   - In jedem anderen Fall gilt `full=true`, auch wenn eine Abfrage fehlschlägt, bei neuen Branches, bei Pull Requests und bei `workflow_dispatch`.
+8. **Bei `full=false`** laufen nur `scope`, `check` und `gates`, ohne E2E, Smoke und Deploy.
+   - `gates` läuft mit `!cancelled()` und prüft alle Ergebnisse.
+   - `deploy` hängt an `gates` und `scope` und läuft nur bei `full == 'true'`.
+9. **Garantie.**
+   - Jeder ausgelieferte Stand ist voll grün geprüft.
+   - Ein Stand auf `main` ohne vollen Lauf unterscheidet sich vom ausgelieferten, voll geprüften Stand nur in Dateien, die kein Build, kein Test und kein Skript liest. Er führt also keinen neuen roten Befund ein.
+   - Dass `origin/main` immer grün ist, behauptet das ADR nicht. Das war schon vorher nicht so: Am 2026-10-05 war `main` dreimal rot.
 
 ## Konsequenzen
 
-- **ADR 0004 bleibt in Kraft.** Kein Gate wird abgeschwächt, keine Schwelle sinkt, und die CI fährt vor jedem Deploy einer Build-Eingabe alles. ADR 0004 bekommt einen Nachtrag mit Verweis hierher. Der Satz „`check:fast` läuft im Stop-Hook und im pre-commit-Hook“ gilt nur noch für Diffs ab Stufe C.
-- **Mehr rote Branch-Läufe in E2E sind beabsichtigt.** Gemessen wird der Erfolg an roten `gates` auf `main` und an Hotfixes, nicht an roten Branches (Plan 0027, Erfolgskriterien).
-- **Mit Teil B** zeigt `meta.json` live für Doku-Commits nicht deren SHA. „Live zeigt den neuen Stand“ (CLAUDE.md) gilt dann nur für Commits mit Build-Eingaben.
+- **ADR 0004 bleibt in Kraft.** Kein Gate wird schwächer, keine Schwelle sinkt, und vor jedem Deploy fährt die CI alles. ADR 0004 bekommt einen Nachtrag mit Verweis hierher:
+  - In der Zeile „Tote Pfade“ steht künftig `check:fast`, CI.
+  - Die Hooks prüfen nach Stufe.
+- **Mehr rote E2E-Läufe auf Branches sind beabsichtigt.** Der Erfolg zeigt sich daran, dass nichts Kaputtes live geht und keine Hotfixes nötig werden, nicht an der Zahl roter Branches (Plan 0027, Erfolgskriterien).
+- **Für Doku-Commits zeigt `meta.json` live nicht deren SHA.** „Live zeigt den neuen Stand“ (CLAUDE.md) gilt nur für Commits, die Build-Eingaben ändern.
 - **Verworfen:**
   - automatische Auswahl von E2E-Specs: E2E ist Black-Box, es gibt keinen Import-Graphen, und eine Zuordnung veraltet;
-  - `vitest related` als Gate: es übersieht Fixture-Dateien und spart höchstens 3 s;
-  - Worker nach Last;
-  - Wiederverwendung des CI-Ergebnisses über die SHA nach einem Fast-Forward: Das Artefakt käme aus einem fremden Lauf, und ein Fehler deployte ungeprüft.
+  - `vitest related` als Gate: Es übersieht Fixture-Dateien und spart höchstens 3 s;
+  - weitere lokale Stufen für Daten oder Build;
+  - ein Hook zum Turn-Start;
+  - Worker abhängig von der Last;
+  - das CI-Ergebnis nach einem Fast-Forward über die SHA wiederverwenden.
