@@ -827,6 +827,12 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
   8. **Absturz von `scope`**: Das Skript endet absichtlich vor der Ausgabe mit `exit 1` → Schritt rot, Job grün (`continue-on-error`), `full=true`, volle Matrix.
   9. **Dauer von `scope`** in einem vollen Lauf messen. Verzögert der volle Klon E2E und Smoke spürbar, bekommt der Checkout `filter: blob:none`; `merge-base` und `diff --name-only` brauchen nur Commits und Trees.
 
+### K9, Läufe (2026-10-08)
+
+- Erster Lauf `1de5c79` (neuer Branch, voll): [37788387911](https://github.com/sbiastoch/zwergenplan/actions/runs/37788387911), alle Jobs grün, kein Deploy (Branch).
+- Fall 9: `scope` braucht 6 s; E2E und Smoke starten 8 s nach `check`. Kein `filter: blob:none` nötig.
+- Fall 1: dieser Commit (reine Doku nach grünem Lauf).
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.
