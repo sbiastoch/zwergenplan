@@ -1,6 +1,6 @@
 # ADR 0023 – Zeremonie nach Größe, E2E nach Diff
 
-Status: **angenommen** (2026-10-09). Teil A ist umgesetzt mit Plan 0029, Teil A. Teil B ist umgesetzt mit Plan 0029, Teil B. Dieses ADR ändert ADR 0004 (Sichtprüfung „nach Deploy“, „volle Suite auf jedem Branch“) und hebt in ADR 0021 den Verworfen-Punkt „automatische Auswahl von E2E-Specs“ auf.
+Status: **angenommen** (2026-10-09). Teil A ist umgesetzt mit Plan 0029, Teil A. Teil B ist umgesetzt mit Plan 0029, Teil B, die Abnahme in CI ist offen. Dieses ADR ändert ADR 0004 (Sichtprüfung „nach Deploy“, „volle Suite auf jedem Branch“) und hebt in ADR 0021 den Verworfen-Punkt „automatische Auswahl von E2E-Specs“ auf.
 
 ## Kontext
 

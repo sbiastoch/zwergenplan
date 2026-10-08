@@ -295,6 +295,12 @@ Die Dauer der Läufe 1 und 4 kommt in den Abschnitt Ergebnis.
 - **`playwright test --list`** vor und nach der Umsetzung: 2940 Tests in 22 Dateien, `PW_SUITE=chromium` 2332, `webkit` 583, `smoke` 25. `playwright.config.ts` ist unverändert.
 - **Lokale Abnahme (Etappe 3)**: Mit einer Kommentarzeile in `src/ui/karte/place-format.ts` wählte `pnpm e2e:local --affected --base HEAD` app, karte und saved (saved über `MapPanel.tsx`, die Karte der Merkliste). 65 Tests auf `pixel-7` waren grün, in 49 s. Bei reiner Doku endet `--affected` mit „keine Spec lokal zu fahren“, ohne die Sperre zu nehmen.
 
+- **Nacharbeit aus dem Arch-Review**:
+  - M1: `--pass-with-no-tests` steht nur noch mit Auswahl (`${SPECS:+--pass-with-no-tests}`). Auf `main` wäre ein leerer Lauf der vollen Suite sonst grün. Der Textabgleich hält fest, dass die Option nie ohne `SPECS` steht.
+  - m1, m2: Es gibt nur noch ein `mergeBase` (`scopeGit`). `--affected` und `e2e-select.ts` melden ein fehlendes `origin/main` mit Exit 2 („--base <ref> angeben oder git fetch“), über `resolveBase`. `localChanges` hat einen Test über `tempRepo()`.
+  - m4: Die Wächter sehen neue, nicht ignorierte Dateien mit, wie `--affected`. Die Begründung steht in `e2e-map.test.ts`.
+  - Neuer Wächter 5: Jedes Modul, das ein Build-Einstieg erreicht (`build-data.ts`, `vite.config.ts`, `og-images.ts`, `site.config.ts`, `src/main.tsx`, `src/sw/sw.ts`, `src/sw/kill.ts`), wählt Specs oder `full`. Heute ist er grün. Ein Modul, das nur `vite.config.ts` importiert, macht ihn rot (Probe).
+
 Auswahl mit dem echten Graphen (`node scripts/e2e-select.ts <pfad>`). Die Testzahl gilt für alle Geräte (Summe ohne Smoke 2915).
 
 | geänderte Datei | Art | Geräte-Specs in der CI | Smoke | lokal mit `--affected` |

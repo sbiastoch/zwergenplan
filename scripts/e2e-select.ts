@@ -7,7 +7,7 @@
 import { fileURLToPath } from "node:url";
 import { E2E_MAP } from "./lib/e2e-map.ts";
 import { LOCAL_LIMIT, localSpecs, selectSpecs } from "./lib/e2e-select.ts";
-import { listFiles, localChanges, mergeBase, readGraph } from "./lib/import-graph-io.ts";
+import { listFiles, localChanges, readGraph, resolveBase } from "./lib/import-graph-io.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const argv = process.argv.slice(2);
@@ -19,7 +19,15 @@ const paths = argv.filter((a, i) => !a.startsWith("--") && !(baseAt >= 0 && i ==
 const files = listFiles(ROOT, { untracked: true });
 const graph = readGraph(ROOT, files);
 const specFiles = files.filter((f) => /^e2e\/[^/]+\.spec\.ts$/.test(f));
-const base = paths.length > 0 ? undefined : (baseArg ?? mergeBase(ROOT, "HEAD", "origin/main"));
+let base: string | undefined;
+if (paths.length === 0) {
+  const resolved = resolveBase(ROOT, baseArg);
+  if ("error" in resolved) {
+    console.error(`e2e-select: ${resolved.error}`);
+    process.exit(2);
+  }
+  base = resolved.base;
+}
 const changed = base === undefined ? paths : localChanges(ROOT, base);
 const selection = selectSpecs(changed, graph, E2E_MAP, specFiles);
 const local = localSpecs(selection, changed, E2E_MAP);

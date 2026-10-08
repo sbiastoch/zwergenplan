@@ -86,7 +86,9 @@ jobs:
   # Stand 2026-10-08 (Plan 0027, Ausgangslage): 2 422 statt 1 911 Tests, 9–10,6 Min. vom Push bis zum Deploy,
   # langsamster Job chromium 2/4 (pixel-7) mit 8,8 Min. – immer noch unter dem Timeout von 15 Min.
   # Auswahl (Plan 0029, B5): Die Matrix bleibt statisch, Playwright shardet nach dem Spec-Filter, ein leerer Shard
-  # endet dank --pass-with-no-tests grün. Auf main läuft der Job immer, auf Branches nur mit Geräte-Specs.
+  # endet grün, weil nur bei gesetzter Auswahl ${SPECS:+--pass-with-no-tests} dazukommt; die volle Suite auf main
+  # bleibt ohne diese Option, ein leerer Lauf wäre dort rot (Arch-Review M1). Auf main läuft der Job immer, auf
+  # Branches nur mit Geräte-Specs.
   e2e:
     name: E2E ${{ matrix.engine }} ${{ matrix.shard }}/${{ matrix.total }}
     needs: scope
@@ -123,7 +125,7 @@ jobs:
       # ^e2e/[a-z0-9.-]+\.spec\.ts$. $SPECS steht absichtlich ohne Anführungszeichen, damit es in Wörter zerfällt.
       # Auf main ist SPECS immer leer, auch wenn scope sich irrt: volle Suite.
       - name: E2E
-        run: pnpm exec playwright test $SPECS --shard=${{ matrix.shard }}/${{ matrix.total }} --workers=2 --pass-with-no-tests
+        run: pnpm exec playwright test $SPECS ${SPECS:+--pass-with-no-tests} --shard=${{ matrix.shard }}/${{ matrix.total }} --workers=2
         env:
           CI: "true"
           PW_SUITE: ${{ matrix.engine }}

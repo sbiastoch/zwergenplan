@@ -23,7 +23,7 @@ import { affectedArgs, type E2eArgs, parseE2eArgs, runPlan } from "./lib/e2e-arg
 import { E2E_MAP } from "./lib/e2e-map.ts";
 import { LOCAL_LIMIT, localSpecs, selectSpecs } from "./lib/e2e-select.ts";
 import { findFreePortPair } from "./lib/free-ports.ts";
-import { listFiles, localChanges, mergeBase, readGraph } from "./lib/import-graph-io.ts";
+import { listFiles, localChanges, readGraph, resolveBase } from "./lib/import-graph-io.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const argv = process.argv.slice(2);
@@ -36,7 +36,12 @@ const locked = process.env["ZP_HEAVY_LOCK"] === "1";
 
 /** `--affected`: Auswahl berechnen; ohne Spec endet der Lauf hier, noch ohne Sperre. */
 function resolveAffected(a: Extract<E2eArgs, { mode: "affected" }>) {
-  const base = a.base ?? mergeBase(ROOT, "HEAD", "origin/main");
+  const resolved = resolveBase(ROOT, a.base);
+  if ("error" in resolved) {
+    console.error(`e2e:local --affected: ${resolved.error}`);
+    process.exit(2);
+  }
+  const { base } = resolved;
   const files = listFiles(ROOT, { untracked: true });
   const changed = localChanges(ROOT, base);
   const specFiles = files.filter((f) => /^e2e\/[^/]+\.spec\.ts$/.test(f));

@@ -6,6 +6,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { scopeGit } from "./ci-scope-git.ts";
 import { withoutGitEnv } from "./git-env.ts";
 import { buildGraph, type ImportGraph } from "./import-graph.ts";
 
@@ -55,9 +56,22 @@ export function readGraph(root: string, files: readonly string[]): ImportGraph {
   return buildGraph(entries);
 }
 
-/** `git merge-base <a> <b>`; wirft, wenn es einen der beiden nicht gibt. */
-export function mergeBase(root: string, a: string, b: string): string {
-  return git(root, ["merge-base", a, b]).trim();
+/**
+ * Basis des lokalen Diffs: `base`, sonst `merge-base origin/main HEAD` (scopeGit, wie der CI-Job). Fehlt
+ * `origin/main` oder die Basis, kommt ein Hinweis statt einer Ausnahme (Arch-Review m2).
+ */
+export function resolveBase(root: string, base: string | undefined): { base: string } | { error: string } {
+  const ref = base ?? "origin/main";
+  try {
+    return {
+      base:
+        base === undefined
+          ? scopeGit(root).mergeBase("origin/main", "HEAD")
+          : git(root, ["rev-parse", "--verify", "--quiet", `${base}^{commit}`]).trim(),
+    };
+  } catch {
+    return { error: `${ref} fehlt: --base <ref> angeben oder git fetch` };
+  }
 }
 
 /** Lokal: geändert gegen `base` samt Arbeitsbaum, dazu neue, nicht ignorierte Dateien (Plan 0029, B1). */

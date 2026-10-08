@@ -392,7 +392,9 @@ describe("ci.yml: Bedingungen von scope, e2e, smoke, gates und deploy (Plan 0029
     expect(e2e).toContain(
       `SPECS: ${gh("needs.scope.outputs.e2e == 'select' && github.ref != 'refs/heads/main' && needs.scope.outputs.specs || ''")}`,
     );
-    expect(e2e).toMatch(/run: pnpm exec playwright test \$SPECS --shard=[^\n]*--pass-with-no-tests/);
+    // --pass-with-no-tests nur mit Auswahl: Bei voller Suite (main) wäre ein leerer Lauf sonst grün (Arch-Review M1)
+    expect(e2e).toContain("run: pnpm exec playwright test $SPECS ${SPECS:+--pass-with-no-tests} --shard=");
+    expect(yml.replaceAll("${SPECS:+--pass-with-no-tests}", "")).not.toContain("--pass-with-no-tests");
     // kein Ausdruck mit der Spec-Liste direkt in run (Review m3)
     expect(e2e).not.toMatch(/run:[^\n]*outputs\.specs/);
   });
