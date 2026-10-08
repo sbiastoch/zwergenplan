@@ -41,7 +41,10 @@ describe("Datumswörter und Uhrzeit in Berlin (Test läuft in America/Los_Angele
 describe("Fakten wie im Detail (aus src/ui/format.ts verschoben)", () => {
   it("Kosten, Anmeldung, Alter, Plätze", () => {
     const krabbeltreff = byTitle("Offener Krabbeltreff");
-    expect(costLabel(krabbeltreff)).toBe(krabbeltreff.cost === "kostenlos" ? "Kostenlos" : krabbeltreff.price);
+    expect(costLabel(krabbeltreff)).toBe("Kostenlos");
+    expect(costLabel({ ...krabbeltreff, cost: "kostenpflichtig", price: "8 €" })).toBe("8 €");
+    const { price: _, ...ohnePreis } = { ...krabbeltreff, cost: "kostenpflichtig" as const, price: "x" };
+    expect(costLabel(ohnePreis)).toBe("Kostenpflichtig");
     expect(registrationLabel(krabbeltreff)).toBe("Ohne Anmeldung");
     expect(registrationLabel(byTitle("PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)"))).toBe("Anmeldung nötig");
     expect(ageRangeLabel(undefined)).toBe("0–36 Monate");

@@ -5,7 +5,9 @@
  */
 
 import { BASE, SITE_URL } from "../../site.config.ts";
-import { nextSession, rhythm, uniformTimes, upcomingSessions } from "../../src/domain/agenda.ts";
+import { rhythm, uniformTimes, upcomingSessions } from "../../src/domain/agenda.ts";
+import { providerCategories, providerOffers } from "../../src/domain/directory.ts";
+import { MAX_KEBAB_ID, MAX_OFFER_ID } from "../../src/domain/ids.ts";
 import {
   ageRangeLabel,
   availabilityLabel,
@@ -26,7 +28,7 @@ import {
 } from "../../src/domain/share.ts";
 import type { SiteOffer, SiteProvider } from "../../src/domain/site-data.ts";
 import { berlinIsoDate, isoWeekday, parseIsoDate } from "../../src/domain/time.ts";
-import { CATEGORY_LABELS, type Category, categoriesOf, leadCategory } from "../../src/domain/topics.ts";
+import { CATEGORY_LABELS, type Category, leadCategory } from "../../src/domain/topics.ts";
 
 export interface SharePage {
   /** relativ zum Ausgabeordner, z. B. „angebot/<id>/index.html“ */
@@ -65,9 +67,9 @@ const MAX_FACT = 40;
  * Wächter gegen Fehler im Generator (Schleife, doppelter Block), nie gegen Daten (E4, Review M4). Gemessen am
  * 2026-10-08: Median 3,2 kB, größte 3,5 kB – die geplanten 4 kB hätte ein Titel voller „&“ reißen können. Strenge
  * Obergrenze aus den Kürzungen: Titel 110 Zeichen viermal, Beschreibung 200 Zeichen dreimal, je höchstens 6 Byte
- * escaped („&quot;“), dazu ID (≤ 200) viermal und rund 1,6 kB fester Text ≈ 8,6 kB. Darüber liegt nur ein Bug.
+ * escaped („&quot;“), dazu ID (≤ 240, `MAX_OFFER_ID`) viermal und rund 1,6 kB fester Text ≈ 8,8 kB. Darüber liegt nur ein Bug.
  */
-const MAX_PAGE_BYTES = 10 * 1024;
+const MAX_PAGE_BYTES = 10_000;
 const GENERIC_IMAGE = "og/vorschau-v1.jpg";
 const GENERIC_ALT = "Zwergenplan – Angebote für Kinder unter 3 in Nürnberg";
 /** fest statt Titel: der stünde sonst ein weiteres Mal escaped in der Seite (Review A, m5) */
@@ -253,13 +255,13 @@ export function providerSharePage(
   generatedAt: string,
 ): SharePage {
   const ref = new Date(generatedAt);
-  // wie das Anbieter-Sheet (`providerOffers` in directory.ts, dort nur lazy erreichbar): kommende Angebote
-  const upcoming = offers.filter((o) => o.providerId === provider.id && nextSession(o, ref) !== undefined).length;
+  // wie das Anbieter-Sheet: kommende Angebote und Kategorien aus Katalog und Angeboten (directory.ts)
+  const upcoming = providerOffers(offers, provider.id, ref).length;
   const count =
     upcoming === 0
       ? "Im Zwergenplan"
       : `${upcoming} ${upcoming === 1 ? "kommendes Angebot" : "kommende Angebote"} im Zwergenplan`;
-  const categories = categoriesOf(provider.topics)
+  const categories = providerCategories(provider, offers)
     .slice(0, MAX_LISTED)
     .map((c) => CATEGORY_LABELS[c]);
   const districts = [...new Set(provider.venues.flatMap((v) => (v.district ? [v.district] : [])))].slice(0, MAX_LISTED);
@@ -287,7 +289,7 @@ export function notFoundPage(): string {
   const base = regexEscape(BASE);
   const rule = (dir: string, max: number) =>
     `[/^${base}${dir}\\/([a-z0-9-]{1,${max}})\\/?(?:index\\.html)?$/, "${dir}"]`;
-  const script = `for (const [re, key] of [${rule(SHARE_DIRS.offer, 200)}, ${rule(SHARE_DIRS.provider, 80)}]) {
+  const script = `for (const [re, key] of [${rule(SHARE_DIRS.offer, MAX_OFFER_ID)}, ${rule(SHARE_DIRS.provider, MAX_KEBAB_ID)}]) {
   const m = re.exec(location.pathname);
   if (m) { location.replace(${JSON.stringify(BASE)} + "?" + key + "=" + m[1]); break; }
 }`;
@@ -314,12 +316,12 @@ export function notFoundPage(): string {
 `;
 }
 
-/** Fehler je Seite über 4 kB (Tests 10); `build-data` bricht dann ab. */
+/** Fehler je Seite über `MAX_PAGE_BYTES` (Tests 10); `build-data` bricht dann ab. */
 export function checkSharePages(pages: readonly SharePage[]): string[] {
   return pages.flatMap(({ path, html }) => {
     const bytes = new TextEncoder().encode(html).length;
     if (bytes <= MAX_PAGE_BYTES) return [];
-    const kb = (bytes / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 });
-    return [`${path}: ${kb} kB (höchstens ${MAX_PAGE_BYTES / 1024} kB)`];
+    const fmt = (n: number) => n.toLocaleString("de-DE");
+    return [`${path}: ${fmt(bytes)} Byte (höchstens ${fmt(MAX_PAGE_BYTES)})`];
   });
 }

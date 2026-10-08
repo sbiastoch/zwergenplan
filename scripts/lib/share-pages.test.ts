@@ -211,10 +211,10 @@ describe("404.html (Plan 0026, E7)", () => {
 });
 
 describe("Wächter gegen Fehler im Generator (Tests 10)", () => {
-  it("meldet Seiten über 10 kB", () => {
-    expect(checkSharePages([{ path: "angebot/x/index.html", html: "x".repeat(10 * 1024) }])).toEqual([]);
-    expect(checkSharePages([{ path: "angebot/x/index.html", html: "x".repeat(10 * 1024 + 1) }])).toEqual([
-      "angebot/x/index.html: 10,2 kB (höchstens 10 kB)",
+  it("meldet Seiten über 10 000 Byte", () => {
+    expect(checkSharePages([{ path: "angebot/x/index.html", html: "x".repeat(10_000) }])).toEqual([]);
+    expect(checkSharePages([{ path: "angebot/x/index.html", html: "x".repeat(10_001) }])).toEqual([
+      "angebot/x/index.html: 10.001 Byte (höchstens 10.000)",
     ]);
   });
 
@@ -222,7 +222,8 @@ describe("Wächter gegen Fehler im Generator (Tests 10)", () => {
     const offer = byTitle("Offener Krabbeltreff");
     const worst = {
       ...offer,
-      id: `${"a".repeat(60)}--${"b".repeat(80)}--${"c".repeat(58)}`,
+      // längste erlaubte ID (MAX_OFFER_ID = 240)
+      id: `${"a".repeat(80)}--${"b".repeat(76)}--${"c".repeat(80)}`,
       title: '"'.repeat(300),
       providerName: '"'.repeat(300),
     };

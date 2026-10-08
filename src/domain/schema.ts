@@ -4,11 +4,11 @@
  */
 import { z } from "zod";
 import { inBounds, NUERNBERG_BBOX } from "./geo.ts";
-import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN } from "./ids.ts";
+import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, MAX_OFFER_ID, OFFER_ID_PATTERN } from "./ids.ts";
 import { isoWeekday } from "./time.ts";
 import { categoriesOf, TOPICS } from "./topics.ts";
 
-const kebab = z.string().regex(KEBAB_ID_PATTERN, "kebab-case erwartet");
+const kebab = z.string().max(MAX_KEBAB_ID).regex(KEBAB_ID_PATTERN, "kebab-case erwartet");
 /** Zeitpunkt mit Offset, z. B. 2026-10-25T10:00:00+01:00 (Zeitumstellung eindeutig). */
 const Instant = z.iso.datetime({ offset: true, local: false });
 const IsoDate = z.iso.date();
@@ -117,7 +117,7 @@ export const AgeRange = z
 /** Felder eines Angebots ohne Querprüfungen – Basis für Offer und das Rohformat der Pipeline (ADR 0006). */
 export const OfferFields = z.strictObject({
   /** deterministisch, siehe ids.ts (ADR 0003, ADR 0006) */
-  id: z.string().regex(OFFER_ID_PATTERN),
+  id: z.string().max(MAX_OFFER_ID).regex(OFFER_ID_PATTERN),
   providerId: kebab,
   venueId: kebab,
   title: z.string().min(1).max(140),

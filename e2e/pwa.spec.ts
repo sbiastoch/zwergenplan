@@ -127,8 +127,6 @@ test("3 Kanarienvogel: offline scheitert auch ein fetch aus dem Service Worker (
   expect(await probe(), "offline").toBe("fehler");
 });
 
-// Ohne erlaubte Konsolenfehler: Auch der Export-Code, den die App im Leerlauf vorlädt, liegt im Precache (Arch-Review
-// Stufe 1, H7). Ein Ladefehler offline wäre rot.
 test("Vorschauseite zum Teilen mit aktivem Service Worker: Weiterleitung ins Detail, keine Fehler (Plan 0026, Tests 8)", async ({
   page,
 }) => {
@@ -139,6 +137,8 @@ test("Vorschauseite zum Teilen mit aktivem Service Worker: Weiterleitung ins Det
   await expect(page.getByRole("dialog", { name: "Offener Krabbeltreff" })).toBeVisible();
 });
 
+// Ohne erlaubte Konsolenfehler: Auch der Export-Code, den die App im Leerlauf vorlädt, liegt im Precache (Arch-Review
+// Stufe 1, H7). Ein Ladefehler offline wäre rot.
 test.describe("offline", () => {
   test("4 offline nach dem ersten Besuch: Liste und „Offline – Stand vom …“ aus dem Precache (E4)", async ({
     page,

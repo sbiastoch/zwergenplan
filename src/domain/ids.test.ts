@@ -1,5 +1,13 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN, type OfferIdInput, offerId, slug } from "./ids.ts";
+import {
+  KEBAB_ID_PATTERN,
+  MAX_KEBAB_ID,
+  MAX_OFFER_ID,
+  OFFER_ID_PATTERN,
+  type OfferIdInput,
+  offerId,
+  slug,
+} from "./ids.ts";
 import { type Format, Venue } from "./schema.ts";
 import { rawFixtures } from "./test-fixtures.ts";
 
@@ -83,5 +91,20 @@ describe("KEBAB_ID_PATTERN (Plan 0010, E2)", () => {
     const bad = Venue.safeParse({ ...venue, id: "Ort--Eins" });
     expect(bad.success).toBe(false);
     expect(bad.error?.issues.map((i) => i.message)).toEqual(["kebab-case erwartet"]);
+  });
+
+  it("begrenzt die Länge, weil IDs in geteilten Links stehen (Plan 0026, Arch-Review M1)", () => {
+    const venue = { name: "Ort", address: "Weg 1, 90402 Nürnberg", ring: "innen", geo: { lat: 49.45, lon: 11.07 } };
+    expect(Venue.safeParse({ ...venue, id: "a".repeat(MAX_KEBAB_ID) }).success).toBe(true);
+    expect(Venue.safeParse({ ...venue, id: "a".repeat(MAX_KEBAB_ID + 1) }).success).toBe(false);
+    // die längste mögliche Offer-ID aus zwei Katalog-IDs passt in MAX_OFFER_ID
+    const longest = offerId({
+      providerId: "p".repeat(MAX_KEBAB_ID),
+      venueId: "v".repeat(MAX_KEBAB_ID),
+      title: "wort ".repeat(40),
+      format: "kurs",
+      firstStart: "2026-10-13T09:30:00+02:00",
+    });
+    expect(longest.length).toBeLessThanOrEqual(MAX_OFFER_ID);
   });
 });

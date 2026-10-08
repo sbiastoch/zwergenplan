@@ -7,13 +7,14 @@
  * alles andere wird abgebrochen. Gates (Exit 1): Schrift und CSS geladen, Kanarienvogel passt, jede Kachel passt,
  * Zahl der Bilder = Zahl der Angebote, jedes Bild < 300 kB.
  */
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, extname, join, normalize } from "node:path";
+import { fileURLToPath } from "node:url";
 import { type Browser, type BrowserContext, chromium, type Page, webkit } from "@playwright/test";
-import { BASE } from "../site.config.ts";
+import { BASE, OUT_DIR } from "../site.config.ts";
 import { offerImagePath } from "../src/domain/share.ts";
 import type { SiteData } from "../src/domain/site-data.ts";
-import { dataSource } from "./lib/load-data.ts";
+import { dataSource, ROOT } from "./lib/load-data.ts";
 import { type CardContent, OG_CANARY, OG_HEIGHT, OG_WIDTH, OG_ZOOM, offerCardHtml, ogDocument } from "./lib/og-card.ts";
 import { pickEngine } from "./lib/og-engine.ts";
 import { offerPreview } from "./lib/share-pages.ts";
@@ -36,7 +37,7 @@ const MIME: Record<string, string> = {
 };
 
 const source = dataSource();
-const out = source === "fixture" ? "dist-e2e" : "dist";
+const out = fileURLToPath(new URL(`${OUT_DIR[source]}/`, ROOT));
 // Cast begründet: eigene Build-Ausgabe von build-data, dort per Zod geprüft (ADR 0001); kein zweites Prüfen hier.
 const site = JSON.parse(readFileSync(join(out, "data/site.json"), "utf8")) as SiteData;
 const indexHtml = readFileSync(join(out, "index.html"), "utf8");
@@ -108,6 +109,15 @@ async function place(page: Page, card: CardContent): Promise<number | undefined>
   );
 }
 
+/** Zeitlimit für das ganze Bild: Platzieren (samt Schrift) und Screenshot (Plan 0026, E17, Review A m3) */
+function withTimeout<T>(work: Promise<T>, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const limit = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label}: über ${IMAGE_TIMEOUT_MS / 1000} s`)), IMAGE_TIMEOUT_MS);
+  });
+  return Promise.race([work, limit]).finally(() => clearTimeout(timer));
+}
+
 async function render(page: Page, card: CardContent, file: string) {
   const zoom = await place(page, card);
   if (zoom === undefined) fail(`„${card.title}“ passt auch bei Zoom ${OG_ZOOM.min} nicht ins Bild`);
@@ -157,14 +167,17 @@ try {
         const file = join(out, offerImagePath(offer.id));
         const card = offerPreview(offer, site.generatedAt);
         // eine Wiederholung bei einem Aussetzer des Browsers (Review A, m3), dann Exit 1
-        const zoom = await render(page, card, file).catch(() => render(page, card, file));
+        const once = () => withTimeout(render(page, card, file), offer.id);
+        const zoom = await once().catch(once);
         zooms.push(zoom);
       }
     }),
   );
 
+  // Gate: so viele Bilder auf der Platte wie Angebote (Arch-Review m1), nicht nur so viele Schleifendurchläufe
+  const written = readdirSync(join(out, "angebot")).filter((d) => existsSync(join(out, "angebot", d, "vorschau.jpg")));
+  if (written.length !== site.offers.length) fail(`${written.length} Bilder für ${site.offers.length} Angebote`);
   const sizes = site.offers.map((o) => statSync(join(out, offerImagePath(o.id))).size);
-  if (sizes.length !== site.offers.length) fail(`${sizes.length} Bilder für ${site.offers.length} Angebote`);
   const seconds = (performance.now() - started) / 1000;
   const took = seconds.toLocaleString("de-DE", { maximumFractionDigits: 1 });
   const largest = Math.round(Math.max(0, ...sizes) / 1000);

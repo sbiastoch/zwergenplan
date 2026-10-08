@@ -26,7 +26,8 @@ export function absoluteUrl(path: string, origin = window.location.origin): stri
   return `${origin}${assetUrl(path)}`;
 }
 
-const errorName = (error: unknown) => (error as { name?: unknown } | null)?.name;
+const errorName = (error: unknown) =>
+  typeof error === "object" && error !== null && "name" in error ? error.name : undefined;
 
 /**
  * System-Teilen mit Titel und URL, **ohne Text** (WhatsApp setzte sonst Text und URL doppelt; die Vorschaukarte trägt

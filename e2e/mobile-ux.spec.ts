@@ -478,6 +478,46 @@ test.describe("vorschauseite-ohne-js", () => {
   });
 });
 
+/**
+ * 404-Seite (Plan 0026, E7, Arch-Review m7): eigenes Dokument wie die Vorschauseite, Darstellung nur nach System. Der
+ * Vite-Server liefert für unbekannte Pfade die SPA-Rückfallseite, deshalb stellt `page.route` die 404-Antwort von
+ * GitHub Pages mit der gebauten `dist-e2e/404.html` nach (wie `e2e/teilen.spec.ts`). Für `irgendwas/` springt ihr
+ * Skript nicht, die Seite bleibt stehen.
+ */
+test.describe("404-seite", () => {
+  const MISSING = "irgendwas/";
+  // Chromium meldet die 404-Antwort des Dokuments selbst in der Konsole; erlaubt nur für diesen Pfad.
+  test.use({ allowedConsoleErrors: [/\/irgendwas\/ Failed to load resource: .* 404/] });
+  test.beforeEach(async ({ page }) => {
+    await page.route(`**/${MISSING}`, (route) => route.fulfill({ status: 404, path: "dist-e2e/404.html" }));
+  });
+  const heading = (page: Page) =>
+    page.getByRole("heading", { name: "Diese Seite gibt es im Zwergenplan nicht (mehr)." });
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`404-seite besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto(MISSING);
+      await expect(heading(page)).toBeVisible();
+      await expectReducedMotion(page);
+      await expectMobileUx(page);
+      if (colorScheme === "dark") await expectNoBrightIslands(page);
+    });
+  }
+  test("404-seite bricht bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(MISSING);
+    await expect(heading(page)).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await expectTouchTargets(page);
+    await expectTextFits(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
+    await expectAccessible(page);
+  });
+});
+
 for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
   test(`Toast im Dunkeln ist keine helle Insel (${scheme.label})`, async ({ page }) => {
     await useScheme(page, scheme);

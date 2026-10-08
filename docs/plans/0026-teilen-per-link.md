@@ -551,7 +551,7 @@ Unabhängiger `plan-reviewer`, kein Blocker. Alle Befunde übernommen:
 
 ### Umsetzung zu E4: Seitengröße gemessen
 
-Die Vorschauseiten mit echten Daten (2026-10-08) wiegen im Median 3,2 kB, die größte 3,5 kB, nicht die geschätzten 2,5 kB. Die geplante Grenze von 4 kB hätte ein Titel voller „&“ reißen können, das widerspricht Review M4. Der Wächter `checkSharePages` liegt deshalb bei **10 kB**: Die strenge Obergrenze aus den Kürzungen (jedes Zeichen escaped höchstens 6 Byte, Titel und Beschreibung je mehrfach in der Seite, ID ≤ 200 Zeichen, fester Text) liegt bei etwa 8,6 kB; darüber liegt nur ein Generatorfehler. Ein Unit-Test belegt, dass Titel und Anbietername aus 300 Anführungszeichen ihn nicht reißen.
+Die Vorschauseiten mit echten Daten (2026-10-08) wiegen im Median 3,2 kB, die größte 3,5 kB, nicht die geschätzten 2,5 kB. Die geplante Grenze von 4 kB hätte ein Titel voller „&“ reißen können, das widerspricht Review M4. Der Wächter `checkSharePages` liegt deshalb bei **10 000 Byte** (nach Arch-Review m5, vorher 10 KiB): Die strenge Obergrenze aus den Kürzungen (jedes Zeichen escaped höchstens 6 Byte, Titel und Beschreibung je mehrfach in der Seite, ID ≤ 240 Zeichen, fester Text) liegt bei etwa 8,8 kB; darüber liegt nur ein Generatorfehler. Ein Unit-Test belegt, dass Titel und Anbietername aus 300 Anführungszeichen ihn nicht reißen.
 
 ### Umsetzung Stufe 1: Abweichungen und Messwerte
 
@@ -561,10 +561,32 @@ Die Vorschauseiten mit echten Daten (2026-10-08) wiegen im Median 3,2 kB, die gr
 - **Kürzen**: Eine angeschnittene Klammer („41,36 € (2…“) fällt ganz weg, solange mehr als die Hälfte bleibt.
 - **Kachelbilder** (lokal, 2026-10-08, echte Daten): 333 Bilder in 7,4 s, 72–109 kB (Median 93 kB), zusammen 31 MB; 156 Kacheln mit kleinerem Zoom als 2,4. Qualität 75 statt 82 spart nur etwa 12 kB je Bild, das Punktraster etwa 3 kB; die Größe kommt von den Textkanten. Es bleibt bei Qualität 82 für scharfe Schrift.
 - **Generisches Bild** `public/og/vorschau-v1.jpg`: 48 kB. `scripts/icons.ts` erzeugt die Icons dabei byte-gleich neu.
+- **Schemaänderung** (Arch-Review M1, entgegen E8): Die ID-Höchstlängen stehen jetzt im Schema, als `MAX_KEBAB_ID` und `MAX_OFFER_ID` in `src/domain/ids.ts`. Katalog-IDs haben höchstens 80 Zeichen (längste echte 38), Offer-IDs höchstens 240 (längste echte 167). `route.ts`, `share.ts` und das Muster in `404.html` nutzen dieselben Konstanten, `schema/*.json` ist neu exportiert. So kann kein Datenstand, den Zod durchlässt, `build-data` an `providerSharePath` abbrechen lassen.
+- **Wächter** `checkSharePages`: 10 000 Byte, Meldung in Byte (siehe „Umsetzung zu E4“).
+- **Start-JS** 94,41 → 95,33 kB (+0,92 kB, geschätzt +0,4–0,5). Die Aufschlüsselung steht in ADR 0012; nichts davon ließ sich leicht vermeiden.
+
+## Arch-Review (2026-10-08) – Stufe 1
+
+Unabhängiger `arch-reviewer` über Stufe 1 samt Nachtrag A, Verdict „Nacharbeit nötig“, kein Blocker. Alle Befunde sind übernommen.
+
+| Befund | Umgang |
+|---|---|
+| **M1** Länge der Anbieter-ID nicht im Schema; eine ID, die Zod durchlässt, bricht `build-data` ab. Ebenso die Grenze 200 der Offer-ID (Wächter, `404.html`) | `MAX_KEBAB_ID` (80) und `MAX_OFFER_ID` (240) in `src/domain/ids.ts`, per `.max()` im Schema; `route.ts`, `share.ts` und `404.html` nutzen sie; `schema/*.json` neu exportiert, mit Unit-Test (Schemaänderung) |
+| **M2** `as`-Cast ohne Begründung in `src/data/share.ts` | Type Guard statt Cast |
+| **m1** Gate „Zahl der Bilder = Zahl der Angebote“ wirkungslos | zählt `vorschau.jpg` auf der Platte (`scripts/og-images.ts`) |
+| **m2** Zeitlimit je Bild nur für den Screenshot | `withTimeout` über Platzieren und Screenshot |
+| **m3** Ausgabeordner doppelt und relativ zum cwd | `OUT_DIR` in `site.config.ts` für Vite und `og-images.ts`, dort über `ROOT` aufgelöst |
+| **m4** Anbieter-Vorschau kopiert `providerOffers`, Kategorien weichen vom Sheet ab | `providerOffers` und `providerCategories` aus `src/domain/directory.ts` |
+| **m5** veralteter Kommentar „4 kB“, gemischte Einheiten im Wächter | 10 000 Byte, Meldung in Byte, Kommentar korrigiert |
+| **m6** Test in `e2e/pwa.spec.ts` unter dem falschen Kommentar | über den Kommentar verschoben |
+| **m7** `404.html` ohne Mobile-UX-Gates | Block `404-seite` in `e2e/mobile-ux.spec.ts`: hell, dunkel, 320 px mit 200 % |
+| **m8** Start-JS +0,90 statt +0,4–0,5 kB, ohne Ursache | Builds je Commit verglichen, Aufschlüsselung in ADR 0012; nichts leicht vermeidbar |
+| **m9** Doku-Drift: Bildgröße unter „Risiken“, keine E2E-Pflicht für Vorschauseiten, Chromium für `pnpm build` | „Risiken“ korrigiert; CLAUDE.md: Zeile in „Lokal prüfen“ und Punkt unter „Stolperfallen“ |
+| **m10** Kostentest tautologisch | feste Erwartungswerte für alle drei Zweige (`src/domain/labels.test.ts`) |
 
 ## Risiken
 
-- **Messenger-Verhalten ist nicht spezifiziert.** Wann WhatsApp große oder kleine Vorschauen zeigt, wie lange es cacht und ob iMessage JavaScript ausführt, ist nur empirisch bekannt. Abgesichert durch Standard-Tags, ein Bild in 1,91 : 1 unter 100 kB, die Bot-Ausnahme, kein `meta refresh` und den Gerätetest (Schritt 9).
+- **Messenger-Verhalten ist nicht spezifiziert.** Wann WhatsApp große oder kleine Vorschauen zeigt, wie lange es cacht und ob iMessage JavaScript ausführt, ist nur empirisch bekannt. Abgesichert durch Standard-Tags, Bilder in 1,91 : 1 (generisch 48 kB, Kachelbilder 72–109 kB, Gate 300 kB, Meta erlaubt 600 kB), die Bot-Ausnahme, kein `meta refresh` und den Gerätetest (Schritt 9).
 - **Pfadvertrag**: Wer später `angebot/` umbenennt, bricht alle geteilten Links. ADR 0020 hält ihn fest.
 - **Bot-Muster trifft einen Menschen**: Ein In-App-Browser mit „bot“ als eigenem Wort im User-Agent bliebe auf der Seite und müsste den Link tippen. Das ist unschön, aber keine Sackgasse. Nach dem Review ist die Liste auf JS-fähige Abrufer beschränkt (E4).
 - **ADR-Nummer**: Kollision mit parallelen Plänen möglich (Schritt 1).

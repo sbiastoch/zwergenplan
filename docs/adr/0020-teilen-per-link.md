@@ -20,7 +20,7 @@ Status: angenommen (2026-10-08), mit Plan 0026 (Plan-Review eingearbeitet, Nutze
    - `og:image` eines Angebots ist sein **Kachelbild** `angebot/<id>/vorschau.jpg?v=<hash>` (Punkt 9), das eines Anbieters das generische Bild (Punkt 6),
    - `<meta name="robots" content="noindex, nofollow">`, wie in ADR 0009,
    - nur öffentliche Felder aus `site.json` bzw. `anbieter.json`, alles HTML-escaped,
-   - Titel und Beschreibung deterministisch gekürzt (110 bzw. 200 Zeichen), damit kein Datenstand den Build bricht (Nachtlauf, ADR 0016). Eine Grenze je Seite bleibt als Wächter gegen Fehler im Generator: **10 kB**, nicht die geplanten 4 kB. Gemessen sind die Seiten 3,2 kB im Median und höchstens 3,5 kB; die strenge Obergrenze aus den Kürzungen liegt bei etwa 8,6 kB (Plan 0026, „Umsetzung zu E4“).
+   - Titel und Beschreibung deterministisch gekürzt (110 bzw. 200 Zeichen), damit kein Datenstand den Build bricht (Nachtlauf, ADR 0016). Eine Grenze je Seite bleibt als Wächter gegen Fehler im Generator: **10 000 Byte**, nicht die geplanten 4 kB. Gemessen sind die Seiten 3,2 kB im Median und höchstens 3,5 kB; die strenge Obergrenze aus den Kürzungen liegt bei etwa 8,8 kB (Plan 0026, „Umsetzung zu E4“). Die ID-Höchstlängen (Katalog 80, Angebot 240 Zeichen) prüft das Schema (Arch-Review M1).
 
    Die Texte hängen nur an den Daten und an `generatedAt`, nie an der Build-Uhr. Der Build ist damit deterministisch.
 3. **Weiterleitung in die App per JavaScript, ohne `meta refresh`.** Ein gleiches Inline-Skript auf jeder Seite ruft `location.replace(<href des Links „Im Zwergenplan öffnen“>)` auf. Das Ziel ist `/?angebot=<id>` bzw. `/?anbieter=<id>`. Daten werden nicht in das Skript interpoliert.

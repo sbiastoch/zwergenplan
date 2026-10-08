@@ -4,19 +4,21 @@
  * Links leben in Chats weiter. Einzige Quelle für Build (scripts/lib/share-pages.ts) und App (Knopf „Teilen“).
  */
 import { EMPTY_FILTER } from "./filter.ts";
-import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN } from "./ids.ts";
-import { MAX_PROVIDER_ID, routeToSearch } from "./route.ts";
+import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, MAX_OFFER_ID, OFFER_ID_PATTERN } from "./ids.ts";
+import { routeToSearch } from "./route.ts";
 
 /** Ordnernamen wie die Query-Namen (`?angebot=`, `?anbieter=`) */
 export const SHARE_DIRS = { offer: "angebot", provider: "anbieter" } as const;
 
+/** Das Schema garantiert Form und Länge (`MAX_OFFER_ID`, `MAX_KEBAB_ID`); der Wurf ist die zweite Linie gegen `..`. */
 function checkedOfferId(offerId: string): string {
-  if (!OFFER_ID_PATTERN.test(offerId)) throw new Error(`Keine Angebots-ID: ${JSON.stringify(offerId)}`);
+  if (offerId.length > MAX_OFFER_ID || !OFFER_ID_PATTERN.test(offerId))
+    throw new Error(`Keine Angebots-ID: ${JSON.stringify(offerId)}`);
   return offerId;
 }
 
 function checkedProviderId(providerId: string): string {
-  if (providerId.length > MAX_PROVIDER_ID || !KEBAB_ID_PATTERN.test(providerId)) {
+  if (providerId.length > MAX_KEBAB_ID || !KEBAB_ID_PATTERN.test(providerId)) {
     throw new Error(`Keine Anbieter-ID: ${JSON.stringify(providerId)}`);
   }
   return providerId;

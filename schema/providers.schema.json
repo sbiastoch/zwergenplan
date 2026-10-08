@@ -8,6 +8,7 @@
         "properties": {
           "id": {
             "type": "string",
+            "maxLength": 80,
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "role": {
@@ -194,6 +195,7 @@
               "properties": {
                 "id": {
                   "type": "string",
+                  "maxLength": 80,
                   "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                 },
                 "name": {
@@ -247,6 +249,7 @@
           },
           "coveredBy": {
             "type": "string",
+            "maxLength": 80,
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           }
         },
@@ -271,6 +274,7 @@
         "properties": {
           "id": {
             "type": "string",
+            "maxLength": 80,
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "role": {
@@ -456,6 +460,7 @@
               "properties": {
                 "id": {
                   "type": "string",
+                  "maxLength": 80,
                   "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                 },
                 "name": {
@@ -537,6 +542,7 @@
         "properties": {
           "id": {
             "type": "string",
+            "maxLength": 80,
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "role": {
@@ -722,6 +728,7 @@
               "properties": {
                 "id": {
                   "type": "string",
+                  "maxLength": 80,
                   "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                 },
                 "name": {

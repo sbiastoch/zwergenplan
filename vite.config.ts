@@ -2,7 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 import { serviceWorker } from "./scripts/vite-sw.ts";
-import { BASE, SITE_URL } from "./site.config.ts";
+import { BASE, OUT_DIR, SITE_URL } from "./site.config.ts";
 
 const E2E = process.env["ZWERGENPLAN_DATA"] === "fixture";
 /**
@@ -98,7 +98,7 @@ export default defineConfig({
   build: {
     target: "es2023",
     sourcemap: true,
-    outDir: E2E ? "dist-e2e" : "dist",
+    outDir: OUT_DIR[E2E ? "fixture" : "real"],
     // Der Karten-Chunk (MapLibre, ca. 1 MB roh) ist absichtlich groß und lazy; das Gate sind die Budgets in .size-limit.json.
     chunkSizeWarningLimit: 1100,
     // Ziel es2023: Ohne natives modulepreload lädt ein Browser die Chunks nur nicht vorab. Spart ca. 0,25 kB Start-JS (Plan 0005).
