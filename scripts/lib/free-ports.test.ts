@@ -7,12 +7,12 @@ afterEach(async () => {
   await Promise.all(servers.splice(0).map((s) => new Promise((r) => s.close(r))));
 });
 
-function occupy(port: number): Promise<void> {
+function occupy(port: number, host = "127.0.0.1"): Promise<void> {
   return new Promise((resolve, reject) => {
     const s = createServer();
     servers.push(s);
     s.once("error", reject);
-    s.listen(port, "127.0.0.1", () => resolve());
+    s.listen(port, host, () => resolve());
   });
 }
 
@@ -29,6 +29,16 @@ describe("free-ports (Plan 0027, E4)", () => {
     const p = await findFreePortPair();
     await occupy(p + 1);
     expect(await isPortFree(p + 1)).toBe(false);
+  });
+
+  it("erkennt einen nur auf IPv6 (::1) belegten Port, wenn es IPv6 gibt", async () => {
+    const p = await findFreePortPair();
+    try {
+      await occupy(p, "::1");
+    } catch {
+      return; // kein IPv6 auf dieser Maschine
+    }
+    expect(await isPortFree(p)).toBe(false);
   });
 
   it("überspringt ein Paar, dessen zweiter Port belegt ist", async () => {

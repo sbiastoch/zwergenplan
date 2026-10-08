@@ -692,6 +692,29 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
   - `plan-review`: Statuszeile und Archiv.
 - **Panne beim Umschreiben:** Das einmalige Hilfsskript hat auch die Testdaten in `scripts/lib/doc-check.test.ts` umgeschrieben. Ich habe es bemerkt und von Hand zurückgesetzt. Der Diff gegen HEAD enthält nur die beabsichtigten Änderungen.
 
+### Nacharbeit zum Arch-Review von Etappe 4 (als Fix-Commit auf `harness-0027-e6`)
+
+Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachziehen von e5 und e6. Alle Etappen gehen ohnehin gemeinsam nach `main`.
+
+- **M1:** `pnpm e2e` ist jetzt `node scripts/e2e-local.ts --all`. Argumente gehen unverändert an Playwright, Ports sind frei. Damit lässt sich auch ein CI-Job nachstellen: `PW_SUITE=webkit pnpm e2e -- --shard=1/2`. Tests: Argumente über `heavy.ts` und `sh -c "$@"`; Parser `scripts/lib/e2e-args.ts`.
+- **M2:**
+  - `heavy.ts` beendet die Gruppe in Stufen: SIGINT, nach 7 s SIGTERM, nach weiteren 3 s SIGKILL. Es pollt, bis die Gruppe leer ist, und endet erst danach.
+  - Warum SIGINT zuerst: Bei der Abnahme mit Ctrl+C blieb mit SIGTERM der `vite preview` von Playwright übrig, denn Playwright startet ihn in einer eigenen Gruppe und räumt nur bei SIGINT ab.
+  - `e2e-local.ts` ruft Playwright direkt über `node_modules/.bin/playwright` auf statt über `pnpm exec`, damit das Signal Playwright selbst erreicht.
+  - Test mit `trap "" INT TERM; sleep 30`: Danach ist die Gruppe leer.
+  - Die Fristen lassen sich für Tests über `ZP_INT_GRACE_MS` und `ZP_TERM_GRACE_MS` verkürzen.
+  - Die Grenze „Sperre frei, während die Kinder abbauen“ steht in ADR 0021.
+- **M3:** Ein verschachtelter Aufruf mit `ZP_HEAVY_LOCK=1` läuft direkt, mit Test.
+- **Minor:**
+  - **m1:** „belegt“ meldet `heavy.ts` nur, wenn ein anderer Halter eingetragen ist. Die Meldung nennt `kill -- -<pgid>`.
+  - **m2:** freie Ports auch für `pnpm e2e`. Die Meldung „already used … reuseExistingServer“ ist in CLAUDE.md eingeordnet.
+  - **m3:** `free-ports` prüft auch `::1`.
+  - **m4:** Abnahme: `kill -INT` an die Gruppe mitten in `e2e:local e2e/layout.spec.ts`, danach ist kein Preview-Server auf dem Port des Laufs mehr da, keine Browser des Laufs, und die Sperre ist frei. Der erste Versuch ohne die M2-Stufen ließ den Preview-Server übrig.
+  - **m5:** Der Parser liegt in `scripts/lib/e2e-args.ts` (mit Test). Die Geräteprojekte liegen nur noch in `playwright.devices.ts`, und `engineOf` leitet die Engine daraus ab.
+  - **m6:** Die Kommentare in `playwright.config.ts` sind aktualisiert.
+  - **m7:** `flock` wird mit `-o -E 75 -w 0` auf eine eigene Probedatei geprüft; scheitert das, läuft das Kommando ohne Sperre.
+- **Kontrolle:** `--list` ergibt weiter 2 512 bzw. 1 992 + 498 + 22, `pnpm knip` ist grün.
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.

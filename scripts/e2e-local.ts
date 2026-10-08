@@ -1,70 +1,64 @@
 /**
- * E2E lokal, gezielt (Plan 0027, E4): nur genannte Specs, standardmäßig auf pixel-7, unter der maschinenweiten Sperre.
+ * E2E lokal unter der maschinenweiten Sperre (Plan 0027, E4, E7).
  *
- *   pnpm e2e:local e2e/detail.spec.ts [weitere Specs …] [-- <playwright-args>]
+ *   pnpm e2e:local e2e/detail.spec.ts [weitere Specs …] [-- <playwright-args>]   gezielt, Standard pixel-7
  *   pnpm e2e:local e2e/theme.spec.ts -- --project=iphone-15
+ *   pnpm e2e [-- <playwright-args>]                                              alles (= e2e-local --all)
+ *   PW_SUITE=webkit pnpm e2e -- --shard=1/2                                      einen CI-Job nachstellen
  *
- * Ablauf: Sperre nehmen (scripts/heavy.ts), freies Portpaar suchen, `pnpm build:e2e`, dann `playwright test` mit
- * PW_PORT, PW_SUITE (nur der Fixture-Server) und dem Projekt. Die volle Suite fährt die CI auf jedem Branch.
- * Agents starten das Skript mit run_in_background (CLAUDE.md, Stolperfallen).
+ * Ablauf: Sperre nehmen (scripts/heavy.ts), freies Portpaar suchen (PW_PORT, PW_PORT + 1), bauen, dann
+ * `playwright test`. Gezielt: nur `build:e2e` und PW_SUITE der Engine des Projekts (nur der Fixture-Server).
+ * Alles: beide Builds, PW_SUITE aus der Umgebung oder keine. Agents starten das mit run_in_background.
  */
 import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { engineOf } from "../playwright.devices.ts";
+import { parseE2eArgs } from "./lib/e2e-args.ts";
 import { findFreePortPair } from "./lib/free-ports.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-// Geräte mit WebKit; alle anderen sind Chromium. Ein falscher Name lässt Playwright laut abbrechen
-// („Project(s) … not found“), weil PW_SUITE dann ein anderes Projekt auswählt.
-const WEBKIT_PROJECTS = new Set(["iphone-15"]);
-
 const argv = process.argv.slice(2);
-const split = argv.indexOf("--");
-const specs = split === -1 ? argv : argv.slice(0, split);
-const extra = split === -1 ? [] : argv.slice(split + 1);
-
-if (specs.length === 0 || specs.some((s) => s.startsWith("-"))) {
-  console.error(
-    "Aufruf: pnpm e2e:local <spec …> [-- <playwright-args>]\n" +
-      "Lokal laufen nur genannte Specs. Die volle Suite fährt die CI auf jedem Branch (Plan 0027, E4).",
-  );
+const args = parseE2eArgs(argv);
+if (args.mode === "error") {
+  console.error(args.message);
   process.exit(2);
 }
 
 if (process.env["ZP_HEAVY_LOCK"] !== "1") {
   // Unter die Sperre stellen und sich selbst darin noch einmal starten
-  const r = spawnSync(
-    "node",
-    [fileURLToPath(new URL("./heavy.ts", import.meta.url)), "node", fileURLToPath(import.meta.url), ...argv],
-    {
-      cwd: ROOT,
-      stdio: "inherit",
-    },
-  );
+  const heavy = fileURLToPath(new URL("./heavy.ts", import.meta.url));
+  const r = spawnSync("node", [heavy, "node", fileURLToPath(import.meta.url), ...argv], {
+    cwd: ROOT,
+    stdio: "inherit",
+  });
   process.exit(r.status ?? 1);
 }
 
-const projectArg = extra.find((a) => a.startsWith("--project"));
-const project =
-  projectArg === undefined
-    ? "pixel-7"
-    : projectArg.includes("=")
-      ? projectArg.slice(projectArg.indexOf("=") + 1)
-      : (extra[extra.indexOf(projectArg) + 1] ?? "pixel-7");
-const suite = WEBKIT_PROJECTS.has(project) ? "webkit" : "chromium";
+let suite = process.env["PW_SUITE"];
+if (args.mode === "specs") {
+  suite = engineOf(args.project);
+  if (suite === undefined) {
+    console.error(`Unbekanntes Projekt „${args.project}“ (Geräte: playwright.devices.ts)`);
+    process.exit(2);
+  }
+}
 const port = await findFreePortPair();
-const env = { ...process.env, PW_PORT: String(port), PW_SUITE: suite };
-console.log(`e2e:local: ${specs.join(" ")} auf ${project} (PW_SUITE=${suite}, Port ${port})`);
+const env = { ...process.env, PW_PORT: String(port), ...(suite === undefined ? {} : { PW_SUITE: suite }) };
+const what = args.mode === "specs" ? `${args.specs.join(" ")} auf ${args.project}` : "alle Specs";
+console.log(`e2e:local: ${what} (PW_SUITE=${suite ?? "alle"}, Ports ${port}/${port + 1})`);
 
-const build = spawnSync("pnpm", ["build:e2e"], { cwd: ROOT, stdio: "inherit", env });
-if (build.status !== 0) process.exit(build.status ?? 1);
-
-const args = [
-  "exec",
-  "playwright",
-  "test",
-  ...specs,
-  ...(projectArg === undefined ? ["--project=pixel-7"] : []),
-  ...extra,
-];
-const test = spawnSync("pnpm", args, { cwd: ROOT, stdio: "inherit", env });
+const builds =
+  args.mode === "specs" || suite === "chromium" || suite === "webkit" ? ["build:e2e"] : ["build:e2e", "build"];
+for (const build of builds) {
+  const r = spawnSync("pnpm", [build], { cwd: ROOT, stdio: "inherit", env });
+  if (r.status !== 0) process.exit(r.status ?? 1);
+}
+// Direkt das Playwright-Binary (ein exec-Wrapper), ohne pnpm dazwischen: So erreicht ein SIGINT von heavy.ts
+// Playwright selbst, und es räumt Browser und webServer ab (Arch-Review Etappe 4, m4).
+const test = spawnSync(join(ROOT, "node_modules", ".bin", "playwright"), ["test", ...args.playwright], {
+  cwd: ROOT,
+  stdio: "inherit",
+  env,
+});
 process.exit(test.status ?? 1);

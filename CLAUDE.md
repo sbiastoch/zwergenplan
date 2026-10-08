@@ -40,7 +40,7 @@ E2E läuft lokal **gezielt**, die volle Suite fährt die CI auf jedem Branch (et
 
 - `pnpm e2e:local <spec …>` läuft immer mit `run_in_background`. Es testet auf `pixel-7`, ein anderes Gerät wählt `-- --project=iphone-15`. Es nimmt eine maschinenweite Sperre (`scripts/heavy.ts`), wählt freie Ports und baut `dist-e2e/`.
 - Ist die Sperre belegt, endet es nach 30 s mit Exit 75 und nennt den Halter. Länger warten geht mit `ZP_LOCK_WAIT=1800`.
-- `pnpm exec playwright test` bricht lokal ohne Sperre ab (`e2e/global-setup.ts`). `--list` geht immer.
+- `pnpm exec playwright test` bricht lokal ohne Sperre ab (`e2e/global-setup.ts`). `--list` geht immer. Meldet Playwright „… is already used … set reuseExistingServer:true“, ist ein Port belegt. Dann den Lauf neu starten (er wählt neue Ports) und `reuseExistingServer` nicht ändern, sonst testet der Lauf den Build eines anderen Worktrees.
 - Ist ein Test lokal nur unter Last rot, wird er erst zum Befund, wenn er auch in der CI rot oder „flaky“ ist.
 
 ## Wo was steht
@@ -61,6 +61,6 @@ E2E läuft lokal **gezielt**, die volle Suite fährt die CI auf jedem Branch (et
 - **git in Tests**: In Hooks setzt git `GIT_DIR` und `GIT_INDEX_FILE`, und ein Kindprozess mit fremdem `cwd` arbeitet dann auf dem echten Repo. Am 2026-10-08 hat so ein Test `core.bare = true` gesetzt. Tests nutzen git schreibend nur über `tempRepo()` (`scripts/lib/temp-repo.ts`), mit Identität per `-c`. Andere git-Aufrufe mit eigenem `cwd` nutzen `withoutGitEnv()` (`scripts/lib/git-env.ts`). Den Kanarienvogel dafür hält `scripts/lib/git-isolation.test.ts`.
 - Ein CPU-gebundener Unit-Test über 1 s bekommt ein eigenes Zeitlimit mit Begründung im Code, wie `REFERENCE_TIMEOUT_MS` in `scripts/transit/profile-csa.test.ts`. Unter der Last paralleler Sessions reißt er sonst die Standardgrenze von 5 s.
 - CI teilt E2E über `PW_SUITE` (`chromium`, `webkit`, `smoke`) in parallele Jobs und Shards (Plan 0013).
-  - Einen CI-Job stellt man unter der Sperre so nach: `node scripts/heavy.ts sh -c "pnpm build:e2e && PW_PORT=4373 PW_SUITE=webkit pnpm exec playwright test --shard=1/2"`. Für Smoke: `pnpm build`, dann `PW_SUITE=smoke`.
+  - Einen CI-Job stellt man unter der Sperre und mit freien Ports so nach: `PW_SUITE=webkit pnpm e2e -- --shard=1/2`, für Smoke `PW_SUITE=smoke pnpm e2e`.
   - Ein Gerät mit neuer Engine oder mit `dependencies` lässt die Konfiguration beim Laden werfen.
 - WebKit lokal braucht die Systembibliothek `libavif16`. Fehlt sie, bleibt es bei `pixel-7`. CI testet WebKit immer.

@@ -30,7 +30,8 @@ function lockDir(): string {
 }
 
 function env(dir: string, wait: string): NodeJS.ProcessEnv {
-  return { ...process.env, ZP_LOCK_DIR: dir, ZP_LOCK_WAIT: wait };
+  // kurze Fristen, damit der Test schnell bleibt; die Stufen (SIGINT, SIGTERM, SIGKILL) bleiben dieselben
+  return { ...process.env, ZP_LOCK_DIR: dir, ZP_LOCK_WAIT: wait, ZP_INT_GRACE_MS: "300", ZP_TERM_GRACE_MS: "300" };
 }
 
 function holder(dir: string, script: string): ChildProcess {
@@ -104,9 +105,10 @@ describe("heavy.ts", () => {
     const pgid = pgidOf(dir);
     expect(alive(pgid)).toBe(true);
     h.kill("SIGTERM");
+    // Der Hintergrund-sleep ignoriert SIGINT (nicht-interaktive Shell), also greift erst SIGTERM
     await until(() => !alive(pgid));
     expect(tryLock(dir).status).toBe(0);
-  });
+  }, 15_000);
 
   it("SIGKILL an heavy.ts und flock gibt die Sperre frei, auch wenn der Enkel weiterläuft (flock -o)", async () => {
     const dir = lockDir();
@@ -118,5 +120,46 @@ describe("heavy.ts", () => {
     await until(() => tryLock(dir).status === 0);
     expect(alive(pgid)).toBe(true); // der Enkel lebt noch, hält die Sperre aber nicht
     process.kill(-pgid, "SIGKILL");
+  });
+
+  it("reicht Argumente an `sh -c` unverändert durch (Arch-Review Etappe 4, M1)", () => {
+    const r = spawnSync("node", [HEAVY, "sh", "-c", 'printf "%s|" "$@"', "e2e", "--project=pixel-7", "a b"], {
+      env: env(lockDir(), "0"),
+      encoding: "utf8",
+    });
+    expect(r.stdout).toBe("--project=pixel-7|a b|");
+  });
+
+  it("ignoriert die Gruppe SIGINT und SIGTERM: nach der Frist SIGKILL, danach ist die Gruppe leer (M2)", async () => {
+    const dir = lockDir();
+    const h = holder(dir, 'trap "" INT TERM; sleep 30');
+    await until(() => existsSync(holderFile(dir)));
+    const pgid = pgidOf(dir);
+    const exited = new Promise<number>((resolve) => h.on("exit", () => resolve(Date.now())));
+    h.kill("SIGTERM");
+    await exited;
+    // heavy.ts endet erst, wenn die Gruppe leer ist
+    expect(alive(pgid)).toBe(false);
+  }, 15_000);
+
+  it("ein verschachtelter Aufruf unter der Sperre läuft direkt, ohne sich auszusperren (M3)", () => {
+    const r = spawnSync("node", [HEAVY, "node", HEAVY, "sh", "-c", "exit 0"], {
+      env: env(lockDir(), "0"),
+      encoding: "utf8",
+    });
+    expect(r.status).toBe(0);
+  });
+
+  it("Exit 75 des Kommandos selbst meldet keine belegte Sperre (m1)", () => {
+    const r = spawnSync("node", [HEAVY, "sh", "-c", "exit 75"], { env: env(lockDir(), "0"), encoding: "utf8" });
+    expect(r.status).toBe(75);
+    expect(r.stderr).not.toContain("E2E-Sperre belegt");
+  });
+
+  it("die Meldung bei belegter Sperre nennt, wie man einen hängenden Halter beendet (m1)", async () => {
+    const dir = lockDir();
+    holder(dir, "sleep 3");
+    await until(() => existsSync(holderFile(dir)));
+    expect(tryLock(dir).stderr).toContain(`kill -- -${pgidOf(dir)}`);
   });
 });

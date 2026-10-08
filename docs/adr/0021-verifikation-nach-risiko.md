@@ -31,7 +31,10 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
 4. **Veraltetes `node_modules` wird vor allen Schritten erkannt.** Weicht `pnpm-lock.yaml` von `node_modules/.pnpm/lock.yaml` ab, kommt eine einzige Meldung mit Abhilfe statt Typfehlern.
 5. **E2E lokal läuft nur gezielt.**
    - `pnpm e2e:local <spec …>` testet genannte Specs auf `pixel-7`, mit zwei freien Ports, die das Skript selbst wählt.
-   - Jeder lokale E2E-Lauf nimmt eine maschinenweite Sperre: `flock -o`, ein Platz, eigene Prozessgruppe, kurze Wartezeit.
+   - Jeder lokale E2E-Lauf nimmt eine maschinenweite Sperre: `flock -o`, ein Platz, eigene Prozessgruppe, kurze Wartezeit. Ein verschachtelter Aufruf unter der Sperre läuft direkt.
+   - **Grenzen:**
+     - SIGTERM beendet auch `flock`. Die Sperre ist dann bis zu 5 s frei, während die Kinder noch abbauen. Danach folgt SIGKILL an die Gruppe.
+     - Wird `heavy.ts` selbst per SIGKILL beendet, laufen `flock` und das Kommando weiter, bis sie enden.
    - Lokal läuft Playwright mit 25 % der Kerne als Worker.
    - Ein `globalSetup` bricht lokale Läufe ohne Sperre ab. Beim Laden der Konfiguration wirft es nicht, damit knip und `--list` weiter funktionieren.
    - Die volle Suite fährt kein Agent lokal.

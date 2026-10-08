@@ -1,25 +1,16 @@
 import { defineConfig, devices, type PlaywrightTestProject as Project } from "@playwright/test";
+import { common, deviceProjects } from "./playwright.devices.ts";
 import { BASE } from "./site.config.ts";
 
-// Eigener Port je Worktree (PW_PORT=4273 …), damit parallele Läufe nicht per reuseExistingServer
-// den Server – und damit den Build – eines anderen Worktrees testen.
+// Port des Fixture-Servers, der Server mit echten Daten nimmt PW_PORT + 1. Lokal vergibt scripts/e2e-local.ts freie
+// Ports (Plan 0027, E4); 4173 ist nur der Standard für CI, wo jeder Job eine eigene Maschine hat.
 const FIXTURE_PORT = Number(process.env["PW_PORT"] ?? 4173);
 const REAL_PORT = FIXTURE_PORT + 1;
-const common = { locale: "de-DE", timezoneId: "Europe/Berlin" } as const;
 
 /** CI teilt E2E nach Engine (Plan 0013). Ohne PW_SUITE läuft alles, wie lokal üblich. */
 const SUITE = process.env["PW_SUITE"] || undefined; // undefined | "chromium" | "webkit" | "smoke"
 /** Engines mit eigener, geshardeter Suite und Matrix-Einträgen in .github/workflows/ci.yml. */
 const ENGINES: readonly string[] = ["chromium", "webkit"];
-
-const deviceProjects: Project[] = [
-  // Mobile zuerst: das sind die maßgeblichen Geräte.
-  { name: "android-klein", use: { ...devices["Galaxy S9+"], viewport: { width: 360, height: 640 }, ...common } },
-  { name: "pixel-7", use: { ...devices["Pixel 7"], ...common } },
-  { name: "iphone-15", use: { ...devices["iPhone 15"], ...common } },
-  { name: "pixel-7-quer", use: { ...devices["Pixel 7 landscape"], ...common } },
-  { name: "desktop", use: { ...devices["Desktop Chrome"], ...common } },
-];
 
 // Wächter (Plan 0013, E2), immer, auch lokal: Ein Gerät ohne CI-Suite fiele dort still heraus, und
 // Abhängigkeiten liefen in jedem Shard komplett mit (Playwright shardet nur die Projekte selbst).
@@ -40,7 +31,7 @@ for (const project of deviceProjects) {
 // Echte Daten gegen den Deploy-Build. Läuft allein und seriell, sonst misst der LCP-Check mit 4× gedrosselter CPU
 // die Konkurrenz paralleler Worker statt der Seite (Plan 0003, E8). workers: 1 hält auch smoke.spec.ts und
 // font-swap.smoke.spec.ts auseinander. Lokal (ohne PW_SUITE) läuft es über dependencies nach allen Geräten,
-// in CI im eigenen Job über PW_SUITE=smoke (Plan 0013). Einzeln: PW_SUITE=smoke pnpm exec playwright test
+// in CI im eigenen Job über PW_SUITE=smoke (Plan 0013). Einzeln lokal: PW_SUITE=smoke pnpm e2e (unter der Sperre).
 const smokeProject: Project = {
   name: "smoke-echte-daten",
   testMatch: /smoke\.spec\.ts/,
