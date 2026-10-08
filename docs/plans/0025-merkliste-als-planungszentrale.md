@@ -1,12 +1,12 @@
 # Plan 0025 – Merkliste als Planungszentrale: Anbieter merken, Karte, Kalender, Filter
 
-Status: Entwurf, wartet auf `/plan-review`
+Status: Review eingearbeitet, wartet auf Nutzerentscheide N2–N6
 Datum: 2026-10-08
-Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0012, ADR 0013, ADR 0018
+Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
 Abhängigkeiten (parallel in Arbeit, beim Schreiben nicht gepusht, geplant gegen die Beschreibung):
-- **Plan 0022** (Branch `feedback-0022-kleinigkeiten`): „Sticker/Stickerheft“ verschwindet aus der UI, die Merkliste heißt „Meine Merkliste“, Toasts sagen „gemerkt“. Dieser Plan nutzt die neuen Begriffe, alle Texte unten sind schon so geschrieben. **Muss vor Etappe 1 auf `main` sein.**
-- **Plan 0023** (Branch `zeitraumfilter-0023`): Zeitraum von/bis im `FilterState` (URL `von=`/`bis=`, Berliner Tage inklusive), reine Domänenfunktion in `src/domain/filter.ts`. Kurs passt, wenn sein erster Termin im Zeitraum liegt; regelmäßig/einmalig, wenn irgendein Termin im Zeitraum liegt. Bei aktivem Zeitraum gruppiert die Liste nach dem ersten Termin im Zeitraum. **Muss vor Etappe 4 auf `main` sein.**
-- **Plan 0024** (Branch `karte-look-0024`): Kategorie-Symbole als Marker, Grundkarte in App-Farben. Keine harte Abhängigkeit: Die Merkliste nutzt dieselbe Karte (`MapPanel`) und erbt den Look. Wer zuletzt merged, löst Konflikte in `MapScreen.tsx`.
+- **Plan 0022** (Branch `feedback-0022-kleinigkeiten`): „Sticker/Stickerheft“ verschwindet aus der UI, die Merkliste heißt „Meine Merkliste“, Toasts sagen „gemerkt“. Alle Texte unten nutzen schon diese Begriffe. **Muss vor Etappe 1 auf `main` sein.**
+- **Plan 0023** (Branch `zeitraumfilter-0023`): Zeitraum von/bis im `FilterState` (URL `von=`/`bis=`, Berliner Tage inklusive), reine Domänenfunktion in `src/domain/filter.ts`. Ein Kurs passt, wenn sein erster Termin im Zeitraum liegt. Regelmäßige und einmalige Angebote passen, wenn irgendein Termin im Zeitraum liegt. Bei aktivem Zeitraum gruppiert die Liste nach dem ersten Termin im Zeitraum. **Muss vor Etappe 3 auf `main` sein.** Erst mit ihm gibt es eine Suche nach Datum, die den Kalender-Tab ersetzt (Entscheidung a), und den Knopf „Für diese Woche entdecken“ (E5).
+- **Plan 0024** (Branch `karte-look-0024`): Kategorie-Symbole als Marker, Grundkarte in App-Farben. Das ist keine harte Abhängigkeit. Die Merkliste nutzt dieselbe Karte (`MapPanel`) und erbt den Look. Wer zuletzt merged, löst Konflikte in `MapScreen.tsx` und `map.css`.
 
 ## Ziel
 
@@ -20,9 +20,13 @@ Nutzerwünsche vom 2026-10-08 (Nummern aus der Feedback-Liste):
 Verbindliche Nutzerentscheidungen (2026-10-08):
 
 - **a)** Der eigene Tab „Kalender“ entfällt. Die Merkliste bekommt wie „Entdecken“ einen Umschalter **Liste | Karte | Kalender**. Alle Angebote nach Datum durchsuchen geht künftig über den Zeitraumfilter (Plan 0023).
-- **b)** „Beginn ab“ ist kein eigener Regler, sondern derselbe Zeitraumfilter wie auf der Startseite, ergänzt um Schnellwahlen „ab nächstem Monat“, „in 2 Monaten“, „in 3 Monaten“ (die Daten reichen ca. 4 Monate).
+- **b)** „Beginn ab“ ist kein eigener Regler. Es nutzt dieselbe Zeitraumlogik wie die Startseite, ergänzt um Schnellwahlen „ab nächstem Monat“, „in 2 Monaten“, „in 3 Monaten“ (die Daten reichen ca. 4 Monate). Nach dem Review (Simplicity) gibt es auf der Merkliste **nur** diese Schnellwahlen, direkt als Chips. Die freie Datumseingabe bleibt der Startseite vorbehalten (E7).
 
-Die Merkliste wird damit vom Sammelkorb zur Planungszentrale: Was ich vorhabe (gemerkte Angebote), wo es ist (Karte), wann es ist (Kalender als Wochenplaner), und bei wem ich weitersuchen will (gemerkte Anbieter).
+Die Merkliste wird damit vom Sammelkorb zur Planungszentrale:
+- was ich vorhabe (gemerkte Angebote),
+- wo es ist (Karte),
+- wann es ist (Kalender als Wochenplaner),
+- bei wem ich weitersuchen will (gemerkte Anbieter).
 
 UX-Leitlinien:
 
@@ -31,191 +35,308 @@ UX-Leitlinien:
 3. **Der Kalender ist der Wochenplaner.** Er zeigt nur Gemerktes. Tag, Woche oder Monat im Kalender bestimmen, was darunter steht.
 4. **Nichts Gemerktes verlässt das Gerät.** Gemerkte Anbieter liegen wie gemerkte Angebote nur im `localStorage`, nie in URL oder Request.
 5. **Keine Sackgasse.** Jeder Leerzustand sagt, warum er leer ist, und bietet den nächsten Schritt an.
+6. **Einfach.** Je Aufgabe genau eine Bedienung, kein zusätzliches Sheet.
 
 ## Nicht-Ziele
 
 - **Kein Kalender in „Entdecken“.** Der Umschalter dort bleibt Liste | Karte. Wer alle Angebote nach Datum sucht, nutzt den Zeitraumfilter (Entscheidung a).
-- **Keine weiteren Filter-Dimensionen auf der Merkliste** außer Format, Anmeldung und Zeitraum (siehe Offene Punkte, N4). Kategorie, Kosten, Wegzeit und Alter gibt es dort nicht.
+- **Keine weiteren Filter auf der Merkliste** außer Format, Anmeldung und den drei Schnellwahlen „ab …“. Kategorie, Kosten, Wegzeit, Alter und eine freie Datumseingabe gibt es dort nicht (N4).
+- **Keine Schnellwahlen auf der Startseite** durch diesen Plan. Ob das Filter-Sheet der Startseite sie bekommt, entscheidet Plan 0023 bzw. ein Folgeplan.
 - **Der Altersfilter gilt auf der Merkliste weiterhin nicht** (Plan 0021, Nicht-Ziele). Unpassende gemerkte Angebote bleiben markiert sichtbar, auch im Kalender.
-- **Der Merklisten-ICS-Export bleibt, wie er ist** (ADR 0007, ADR 0018): alle gemerkten Angebote, unabhängig vom Merklisten-Filter (E9; Alternative in N3).
-- **Kein Herz in der Anbieterliste** (Tab „Anbieter“) und keine Sortierung „gemerkte zuerst“. Gemerkt wird im Anbieter-Sheet (E2). Steht in `docs/ideas.md`.
-- **Keine Benachrichtigung über neue Angebote gemerkter Anbieter** (Wochen-Push, Plan 0017). Steht in `docs/ideas.md`.
+- **Der Merklisten-ICS-Export bleibt, wie er ist** (ADR 0007, ADR 0018). Er nimmt alle gemerkten Angebote, unabhängig vom Merklisten-Filter (E9; Alternative in N3).
+- **Keine Angebote gemerkter Anbieter in Liste, Karte oder Kalender der Merkliste.** Gemerkte Anbieter sind eine Adressliste (E3). Die Erweiterung steht in `docs/ideas.md` (N1).
+- **Kein Herz in der Anbieterliste** (Tab „Anbieter“) und keine Sortierung „gemerkte zuerst“. Gemerkt wird im Anbieter-Sheet (E2).
+- **Keine Benachrichtigung über neue Angebote gemerkter Anbieter** (Wochen-Push, Plan 0017).
 - **Merklisten-Filter stehen nicht in der URL** und überstehen kein Neuladen (E6).
-- **Keine Orte gemerkter Anbieter ohne kommende Angebote auf der Karte.** Katalog-Orte in `anbieter.json` haben kein `geo` (Plan 0019, Nicht-Ziel), und `anbieter.json` lädt nur mit Tab bzw. Sheet „Anbieter“.
 - **Keine rollende Kalenderwoche** (`docs/ideas.md`, Befund H2): Die Woche bleibt Mo–So.
 - **Kein Lazy-Chunk für die Merkliste**, solange das Start-Budget es nicht verlangt (E11).
-- **Kein Merken von Orten** (nur Angebote und Anbieter).
+- **Kein Merken von Orten**, nur von Angeboten und Anbietern.
 
 ## Ausgangslage
 
 Stand `main` `a666dbe`.
 
 **Merkliste**
-- `src/ui/SavedView.tsx:71–120`: Überschrift „Mein Stickerheft“ (Plan 0022 ändert sie), Leerzustand mit „Angebote entdecken“, Knopf „Alle in den Kalender“ (Sammel-ICS, ADR 0007), Zeile „N Sticker · M Termine in einer .ics-Datei · Kurse immer komplett“, dann je gemerktem Angebot eine `OfferCard` (`dated`) mit dem nächsten Termin. Kein Filter, kein Umschalter, keine Statuszeile.
-- `src/ui/SavedView.tsx:29–57`: einziger Lader des Export-Chunks `src/domain/ics.ts` (`ics-entry-only`, `LAZY_LOADERS` in `scripts/check-architecture.ts:60`), `preloadExportWhenIdle` startet `App.tsx:88`. Plan 0018 (freigegeben, noch nicht umgesetzt) verlegt den Lader nach `src/ui/ics-export.ts`.
-- `src/domain/saved.ts:9–29`: `toggleId`, `savedOffers(offers, ids, now)` (nur mit kommendem Termin, sortiert nach dem nächsten Termin), `collectionSessions` (Export-Auswahl).
+- `src/ui/SavedView.tsx:71–120`:
+  - Überschrift „Mein Stickerheft“ (Plan 0022 ändert sie).
+  - Leerzustand mit „Angebote entdecken“.
+  - Knopf „Alle in den Kalender“ (Sammel-ICS, ADR 0007).
+  - Zeile „N Sticker · M Termine in einer .ics-Datei · Kurse immer komplett“.
+  - Je gemerktem Angebot eine `OfferCard` (`dated`) mit dem nächsten Termin.
+  - Es gibt keinen Filter, keinen Umschalter und keine Statuszeile.
+- `src/ui/SavedView.tsx:29–57` ist der einzige Lader des Export-Chunks `src/domain/ics.ts` (`ics-entry-only`, `LAZY_LOADERS` in `scripts/check-architecture.ts:60`). `preloadExportWhenIdle` startet in `App.tsx:88`. Plan 0018 (freigegeben, noch nicht umgesetzt) verlegt den Lader nach `src/ui/ics-export.ts`.
+- `src/domain/saved.ts:9–29`:
+  - `toggleId`,
+  - `savedOffers(offers, ids, now)`: nur mit kommendem Termin, sortiert nach dem nächsten Termin,
+  - `collectionSessions`: die Auswahl für den Export.
 - `src/data/preferences.ts:7–13, 41–52`: Schlüssel `zwergenplan.merkliste`, `loadSaved()`/`saveSaved()` als JSON-Array von IDs.
-- `src/ui/use-app-state.ts:130–143`: `useSaved()` liefert `[ids, toggle]`, `toggle` meldet, ob danach gemerkt.
-- `src/ui/App.tsx:160–168`: `onToggleSave` mit Toast. `App.tsx:249` blendet die Schnellfilter auf der Merkliste aus, `App.tsx:248` die Kategorie-Sticker. `App.tsx:282` zeigt Statuszeile und Hinweise auf allen Tabs außer der Merkliste. `App.tsx:411–419` rendert `SavedView`.
-- `src/ui/use-offer-views.ts:204`: `saved = savedOffers(offers, savedIds, now)`; `App.tsx:421` zeigt `saved.length` als Badge.
+- `src/ui/use-app-state.ts:130–143`: `useSaved()` liefert `[ids, toggle]`. `toggle` meldet, ob das Angebot danach gemerkt ist.
+- `src/ui/App.tsx`:
+  - `:160–168` `onToggleSave` mit Toast.
+  - `:248` blendet die Kategorie-Sticker auf der Merkliste aus, `:249` die Schnellfilter.
+  - `:282` zeigt Statuszeile und Hinweise auf allen Tabs außer der Merkliste.
+  - `:411–419` rendert `SavedView`.
+- `src/ui/use-offer-views.ts:151`: `saved = savedOffers(offers, savedIds, now)`. `App.tsx:421` zeigt `saved.length` als Badge.
+- **ADR 0010** (`.dependency-cruiser.cjs:221–226`, `data-domain-runtime-allowlist`): `src/data` darf zur Laufzeit aus `src/domain` nur `geo.ts` importieren. Eine Formprüfung mit `KEBAB_ID_PATTERN` gehört deshalb nicht nach `preferences.ts` (Review B1).
 
 **Kalender (Tab, entfällt)**
-- `src/domain/route.ts:15`: `TABS = ["entdecken", "karte", "kalender", "anbieter", "merkliste"]`; unbekanntes `ansicht=` ergibt „entdecken“ (`parseRoute`, Zeile 34). `tabSection` (Zeile 19) macht aus „karte“ „entdecken“.
-- `src/ui/Chrome.tsx:130–136`: `TAB_ITEMS` mit vier Tabs. `tabs.css` positioniert den Daumen per `at-0` … `at-3`. `docs/architecture.md:117` (Mobile-UX, „Tab-Leiste“): „vier Spalten“.
-- `src/ui/Chrome.tsx:178–199`: `ViewToggle({ map, onMap })`, fest zwei Segmente (`seg seg2`, Daumen per `translateX`).
-- `src/ui/CalendarView.tsx` (355 Zeilen): `WeekStrip`, `MonthGrid`, `AgendaEmpty`, Agenda eines Tages. Monat klappt beim Tipp auf einen Tag zu (`CalendarView.tsx:123–126`); der Monatsknopf hält seine Lage (`useLayoutEffect`, E5 aus Plan 0007).
-- `src/ui/use-offer-views.ts:112–131, 165–196, 221–231`: `calendar.{index, allIndex, lastDay, dataEnd, endedToday, day, setDay, monthOpen, setMonthOpen}`, nur bei `route.tab === "kalender"` gefüllt.
-- `src/domain/calendar.ts`: `clampDay`, `calendarNav(day, today, lastDay)` (Woche/Monat vor und zurück). `src/domain/agenda.ts:94–175`: `sessionsByDay`, `DayAgenda`, `dayAgenda`, `endedOnDay`, `weekDays`, `monthDays`, `lastSessionDay`.
-- `src/ui/App.tsx:377–395`: Kalender-Zweig samt `ListPending` bei `wegzeit=` (Plan 0009, M7).
+- `src/domain/route.ts`:
+  - `:9` `MAX_PROVIDER_ID = 80` (nicht exportiert).
+  - `:15` `TABS = ["entdecken", "karte", "kalender", "anbieter", "merkliste"]`. Ein unbekanntes `ansicht=` ergibt „entdecken“ (`parseRoute`, `:34`).
+  - `:19` `tabSection` macht aus „karte“ „entdecken“.
+- `src/ui/Chrome.tsx:130–136`: `TAB_ITEMS` mit vier Tabs.
+- `src/ui/styles/tabs.css` ist fest auf vier gestellt: Kopfkommentar `:1`, `repeat(4, …)` `:13`, Daumenbreite `/ 4` `:49`, Seitenleiste `/ 4` `:187`, Kommentar `:197`. `docs/architecture.md:117` (Mobile-UX, „Tab-Leiste“) sagt „vier Spalten“.
+- `src/ui/Chrome.tsx:178–199`: `ViewToggle({ map, onMap })` hat fest zwei Segmente (Klasse `seg seg2`, Daumen per `translateX`).
+  - **`.seg2` hat kein eigenes CSS.** Die Breite des Daumens steht in `src/ui/styles/map.css:33–38` (`.view-toggle .seg-thumb { width: 50% }`).
+  - `fieldset.view-toggle` ist auf `flex: 0 1 12rem` gedeckelt.
+  - **`.seg3` gibt es schon** (`chrome.css:319–349`): Das ist der Darstellungs-Umschalter Hell/Dunkel/Auto im Kind-Sheet, mit `overflow-wrap: break-word` und einer Container-Query, die ihn im schmalen Sheet einspaltig macht. Er passt nicht für den Umschalter in der Statuszeile (Review M2).
+- `src/ui/CalendarView.tsx` (355 Zeilen) enthält `WeekStrip`, `MonthGrid`, `AgendaEmpty` und die Agenda eines Tages.
+  - Das Monatsraster klappt beim Tipp auf einen Tag zu (`CalendarView.tsx:123–126`).
+  - Der Monatsknopf hält beim Auf- und Zuklappen seine Lage (`useLayoutEffect`, Plan 0007, E5).
+- `src/ui/use-offer-views.ts`:
+  - `:110–143` Schnittstelle `calendar.{index, allIndex, lastDay, dataEnd, endedToday, day, setDay, monthOpen, setMonthOpen}` und `map`,
+  - `:125–140` die Rechnungen, nur bei `route.tab === "kalender"` bzw. `"karte"` gefüllt,
+  - `:147–150` `map` mit `placeCount: countPlaces(visible)` und `cameraOffers: upcoming`, nur bei `route.tab === "karte"`,
+  - `:168–178` Rückgabe `calendar`.
+- `src/domain/calendar.ts`: `clampDay`, `calendarNav(day, today, lastDay)` mit Woche/Monat vor und zurück.
+- `src/domain/agenda.ts:94–175`: `sessionsByDay`, `DayAgenda`, `dayAgenda`, `endedOnDay`, `weekDays`, `monthDays`, `lastSessionDay`.
+- `src/ui/App.tsx`:
+  - `:124–126` Öffnen der Karte ist ein Wegzeit-Anlass (`want()`), weil dort „Kartenmitte als Startpunkt“ steht.
+  - `:358–376` `MapPanel` mit `offers={visible}` (Startseiten-Filter), sobald `views.map` gesetzt ist.
+  - `:377–395` Kalender-Zweig samt `ListPending` bei `wegzeit=` (Plan 0009, M7).
 - `src/ui/OfferCard.tsx:45, 76`: `calendarDay` geht ans Detail (`referenceSession`, `agenda.ts:36`).
-- Kein Push-, Service-Worker- oder ICS-Pfad kennt `ansicht=kalender` (grep in `src/sw`, `scripts/push-weekly.ts`, `public/manifest.webmanifest`: `start_url` ist `./`). Nur `scripts/screenshots.ts:77` (Ansicht `kalender`) und `scripts/font-fallback.ts:139` (Wort „Kalender“ als Probe; bleibt, weil der Umschalter es trägt) nennen ihn.
+- Kein Push-, Service-Worker- oder ICS-Pfad kennt `ansicht=kalender`. Geprüft per grep in `src/sw`, `scripts/push-weekly.ts` und `public/manifest.webmanifest`; `start_url` ist `./`. Nur diese Skripte nennen ihn:
+  - `scripts/screenshots.ts:77` (Ansicht `kalender`),
+  - `scripts/font-fallback.ts:139` (das Wort „Kalender“ als Probe; bleibt, weil der Umschalter es trägt).
 
 **Karte**
-- `src/ui/MapPanel.tsx` (Start) → `src/ui/karte/MapScreen.tsx` (Lazy) → `src/ui/map/MapView.tsx` (MapLibre). Props `MapScreenProps` in `src/ui/map-types.ts`: `offers`, `cameraOffers` (alle kommenden, Kamera-Regel ADR 0008), `origin`, `reach`, `ctx`, `onResetFilter`, `age` u. a.
-- `src/ui/App.tsx:124–126`: Öffnen der Karte ist ein Wegzeit-Anlass (`want()`), weil „Kartenmitte als Startpunkt“ dort steht.
-- `src/ui/map/MapView.tsx:44–52`: `lastCamera` gilt für die ganze Sitzung, nie gespeichert.
+- Ladekette: `src/ui/MapPanel.tsx` (Start) → `src/ui/karte/MapScreen.tsx` (Lazy) → `src/ui/map/MapView.tsx` (MapLibre).
+- Props `MapScreenProps` in `src/ui/map-types.ts`: `offers`, `cameraOffers` (alle kommenden, Kamera-Regel ADR 0008), `origin`, `reach`, `ctx`, `onResetFilter`, `age` u. a.
+- `MapScreen.tsx:111–115` zeigt bei null Orten `NoOffers` mit dem Text der Startseite („Mit diesen Filtern gibt es keine Angebote.“). Die Karte selbst lädt trotzdem Kacheln.
+- `src/ui/map/MapView.tsx:44–52`: `lastCamera` gilt für die ganze Sitzung und wird nie gespeichert.
 
 **Anbieter**
-- `src/ui/anbieter/ProviderSheet.tsx` (Lazy-Chunk `anbieter/`): Name, Kategorien, „Website & Programm“, Orte, kommende Angebote. Props `ProviderSheetProps` in `src/ui/provider-types.ts:37–48`. Den Dialog rendert `Overlays.tsx` immer, mit `toast`.
-- `src/domain/site-data.ts:8–11`: Jedes `SiteOffer` trägt `providerId` und `providerName`. Den Katalog (`anbieter.json`) lädt nur `src/data/providers.ts`, und nur mit Tab oder Sheet „Anbieter“ (Invariante in `docs/architecture.md:101`, E2E in `e2e/anbieter.spec.ts`, Privatsphäre).
+- `src/ui/anbieter/ProviderSheet.tsx` (Lazy-Chunk `anbieter/`) zeigt Name, Kategorien, „Website & Programm“, Orte und kommende Angebote. Props `ProviderSheetProps` stehen in `src/ui/provider-types.ts:37–48`. Den Dialog rendert `Overlays.tsx` immer, mit `toast`.
+- `src/domain/site-data.ts:8–11`: Jedes `SiteOffer` trägt `providerId` und `providerName`.
+- Den Katalog (`anbieter.json`) lädt nur `src/data/providers.ts`, und nur mit Tab oder Sheet „Anbieter“. Das ist eine Invariante in `docs/architecture.md:101`, belegt per E2E in `e2e/anbieter.spec.ts` (Privatsphäre).
 - `src/domain/provider-count.ts`: `isKnownProvider` (Katalog oder Angebote).
-- `docs/ideas.md:197`: „Anbieter merken oder ‚folgen‘ … (Plan 0010, Nicht-Ziele)“ – wird mit diesem Plan umgesetzt.
+- `docs/ideas.md:61`: „Anbieter merken oder ‚folgen‘ … (Plan 0010, Nicht-Ziele)“. Wird mit diesem Plan umgesetzt.
 
-**Start-Budget** (ADR 0012, Nachtrag „Budget 100 kB“): zuletzt 92,78 kB von 100 kB (nach Plan 0017). Pläne 0022–0024 und 0018 kommen davor dazu; gemessen wird vor Etappe 1 neu.
+**Start-Budget** (ADR 0012, Nachtrag „Budget 100 kB“): zuletzt 92,78 kB von 100 kB (nach Plan 0017). Die Pläne 0022–0024 und 0018 kommen davor dazu. Vor Etappe 1 wird neu gemessen.
 
-**E2E, die den Kalender-Tab oder `ansicht=kalender` benutzen** (grep `Kalender` in `e2e/`, ohne „in den Kalender“/„Kalender-Datei“):
+**Tests, die den Kalender-Tab, `ansicht=kalender` oder den `calendar`-Block benutzen** (grep `kalender` in `e2e/`, `src/`, `scripts/`, ohne „in den Kalender“/„Kalender-Datei“):
 
 | Datei:Zeile | Inhalt | Umgang (Etappe 3) |
 |---|---|---|
-| `e2e/calendar.spec.ts` (ganz) | Woche, Agenda, B2, E12, Blättern, Monat, B8, H2, Detail-Termin, „jetzt“ (5 Tests) | wird zu `e2e/merkliste-kalender.spec.ts` mit gemerkten Fixtures; „Monat klappt zu“ ändert sich (E5) |
-| `e2e/timezone.spec.ts:19–20` | Berliner Tag als heute markiert | im Merklisten-Kalender, vorher ein Angebot merken |
-| `e2e/anbieter.spec.ts:214–229` | Deep-Link Sheet über Tab „Kalender“ | über `?ansicht=merkliste-kalender` |
+| `e2e/calendar.spec.ts` (ganz) | Woche, Agenda, B2, E12, Blättern, Monat, B8, H2, Detail-Termin, „jetzt“ (5 Tests) | wird zu `e2e/merkliste-kalender.spec.ts` mit vorbelegter Merkliste; „Monat klappt zu“ ändert sich (E5) |
+| `e2e/timezone.spec.ts:19–20` | Berliner Tag als heute markiert | im Merklisten-Kalender, Merkliste vorbelegt |
+| `e2e/anbieter.spec.ts:214–229` | Deep-Link: Sheet über Tab „Kalender“ | über `?ansicht=merkliste-kalender` |
 | `e2e/anbieter.spec.ts:279` | `pushState("?ansicht=kalender")` | `?ansicht=merkliste` |
-| `e2e/anbieter.spec.ts:464–467` | „ohne Anlass (Kalender, Startpunkt gespeichert)“ | Merkliste-Kalender |
+| `e2e/anbieter.spec.ts:464–467` | „ohne Anlass (Kalender, Startpunkt gespeichert)“ | Merklisten-Kalender |
 | `e2e/smoke.spec.ts:39–40` | Ansicht „Kalender“ bei 320 px/200 % mit echten Daten | Merklisten-Kalender, vorher drei Herzen tippen |
 | `e2e/layout.spec.ts:186–187, 307` | Kalender-Ansicht im Layout-Gate | Merklisten-Kalender |
 | `e2e/layout.spec.ts:566–629` | Tab-Leiste mit vier Tabs, `TAB_NAMES` | drei Tabs (E8) |
-| `e2e/mobile-ux.spec.ts:83–90, 408, 455–460` | Zustände `kalender`, `kalender-woche`, Touch-Ziele, 320 px + reduzierte Bewegung | Merklisten-Zustände (Tests, Punkt 8) |
+| `e2e/mobile-ux.spec.ts:83–90, 408, 455–460` | Zustände `kalender`, `kalender-woche`, Touch-Ziele, 320 px mit reduzierter Bewegung | Merklisten-Zustände (Tests, Punkt 15) |
+| `e2e/mobile-ux.spec.ts:466–490` | Hilfen `calendarAt320`, `weekWithTwoDigitMonday` | auf den Merklisten-Kalender umstellen, Merkliste vorbelegt |
 | `e2e/startpunkt.spec.ts:186–196` | Statuszeile „Kalender, Gostenhof“ | entfällt; dieselbe Prüfung gibt es für Liste, Karte und Anbieter |
-| `e2e/startpunkt.spec.ts:233–239` | „Filter-Sheet und Kalender sind kein Anlass“ | „Filter-Sheet und Merkliste (Liste, Kalender) sind kein Anlass“; Merkliste-Karte ist einer |
+| `e2e/startpunkt.spec.ts:233–239` | „Filter-Sheet und Kalender sind kein Anlass“ | „Filter-Sheet und Merkliste (Liste, Kalender) sind kein Anlass“; die Merklisten-Karte ist einer |
 | `e2e/startpunkt.spec.ts:784–788` | Kalender mit `?wegzeit=20`: Platzhalter | entfällt; neu: „Merkliste ignoriert `wegzeit=`“ |
 | `e2e/karte.spec.ts:142` | Wechsel Karte → Kalender → Entdecken | Karte → Merkliste → Entdecken |
 | `e2e/app.spec.ts:133` | Alters-Warnhinweis auf Tab „Kalender“ | auf Tab „Anbieter“ |
-| `e2e/app.spec.ts:179–196` | Leerzustände inkl. Kalender | Kalender-Teil entfällt (Merkliste ignoriert das Alter) |
-| `e2e/app.spec.ts:267–269` | Monatspunkt trägt gewählte Kategorie | im Merklisten-Kalender mit `?kat=` |
-| `e2e/saved.spec.ts` (ganz) | Merkliste | erweitert (Tests 5–7) |
+| `e2e/app.spec.ts:179–196` | Leerzustände inkl. Kalender | Kalender-Teil entfällt (die Merkliste ignoriert das Alter) |
+| `e2e/app.spec.ts:267–269` | Monatspunkt trägt die gewählte Kategorie | im Merklisten-Kalender mit `?kat=` |
+| `e2e/saved.spec.ts` (ganz) | Merkliste | erweitert (Tests 9–11) |
+| `src/ui/use-app-state.test.ts:328` | `closeProvider` nach Deep-Link `?ansicht=kalender&anbieter=…` | `?ansicht=merkliste&anbieter=…` |
+| `src/domain/route.test.ts` | Parsen/Serialisieren von `kalender` | neue Ansichten, Altlast `kalender` (Test 4) |
+| `src/ui/use-offer-views.test.ts:121–177, 239–240` | `calendar.index`, `endedToday`, Wegzeit im Kalender | auf `savedCalendar` umschreiben bzw. streichen (Test 8) |
+| `src/domain/calendar.test.ts`, `src/domain/agenda.test.ts` | `calendarNav`, `dayAgenda` | `calendarNav` bleibt; `dayAgenda` → `rangeAgenda` (Test 3) |
+| `scripts/font-fallback.ts:139` | „Kalender“ als Probe | bleibt (Umschalter), Werte prüfen (E8) |
 
 ## Entscheidungen
 
 ### E1 – Speicher für gemerkte Anbieter
 
 - Neuer Schlüssel in `src/data/preferences.ts`: `KEYS.savedProviders = "zwergenplan.anbieter-merkliste"`.
-- Wert: JSON-Array von `{ "id": string, "name": string }`, in der Reihenfolge des Merkens. Der Name ist ein Schnappschuss beim Merken. Er wird gebraucht, wenn ein Anbieter gerade keine kommenden Angebote hat: Dann kennt `site.json` ihn nicht, und `anbieter.json` darf die Merkliste nicht laden (Invariante „`anbieter.json` nur mit Tab bzw. Sheet“).
-  - Verworfen: nur IDs speichern und den Namen aus `anbieter.json` holen. Das wäre ein Request, der verrät, dass jemand Anbieter gemerkt hat, und bräche die Invariante.
-  - Verworfen: nur IDs und ohne kommende Angebote die ID als Namen zeigen (`familientreff-beispiel`). Unlesbar.
-- `loadSavedProviders(): SavedProvider[]` prüft nur die Form (Array, je Eintrag `id` und `name` als String, `id` passt auf `KEBAB_ID_PATTERN`, höchstens 80 Zeichen wie `MAX_PROVIDER_ID` in `route.ts`; Doppelte fallen weg). Kaputte Werte ergeben `[]`, wie `loadSaved`. `saveSavedProviders(list)` schreibt bei leerer Liste nichts (Schlüssel entfernen), baut jeden Eintrag neu (nur `id`, `name`).
-- `SavedProvider` ist ein Typ in `src/domain/saved.ts` (`{ id: string; name: string }`), damit Domäne und `src/data` ihn teilen, ohne dass `src/data` Laufzeit-Code aus der Domäne braucht.
-- Reine Logik in `src/domain/saved.ts`:
-  - `toggleProvider(list, entry): SavedProvider[]` – entfernt per ID oder hängt an.
-  - `savedProviderRows(list, offers, now): SavedProviderRow[]` mit `{ id, name, upcoming: number, next?: Session }`. `name` kommt aus dem ersten kommenden Angebot (`providerName`, aktueller Datenstand), sonst aus dem Schnappschuss. `upcoming` zählt kommende Angebote des Anbieters (`nextSession !== undefined`). Sortiert nach Name (`localeCompare(…, "de")`).
-- Hook `useSavedProviders()` in `src/ui/use-app-state.ts`, gebaut wie `useSaved()`: `[list, toggle]`, `toggle(entry)` meldet, ob danach gemerkt.
-- **Privatsphäre** (Invariante in `docs/architecture.md`, Abschnitt „Privatsphäre“, wird ergänzt): Gemerkte Anbieter bleiben im `localStorage`, nie in URL, Logs, Requests oder IndexedDB. Der Push (ADR 0014) liest sie nicht. `route.ts:1–3` nennt sie im Kopfkommentar neben Geburtsdatum und Merkliste. Kein Request hängt davon ab, ob oder welche Anbieter gemerkt sind (E2E, Tests 6).
-- Gelöscht wird nie automatisch. Wie bei `savedOffers` bleiben Einträge auch dann stehen, wenn ein Anbieter im aktuellen Datenstand fehlt (ein lückenhafter Pipeline-Lauf soll keine Merkliste leeren, `saved.ts:1–4`).
+- Wert: JSON-Array von `{ "id": string, "name": string }` in der Reihenfolge des Merkens.
+- Der Name ist ein Schnappschuss beim Merken. Er wird gebraucht, wenn ein Anbieter gerade keine kommenden Angebote hat. Dann kennt `site.json` ihn nicht, und `anbieter.json` darf die Merkliste nicht laden (Invariante „`anbieter.json` nur mit Tab bzw. Sheet“).
+  - Verworfen: nur IDs speichern und den Namen aus `anbieter.json` holen. Das wäre ein Request, der verrät, dass jemand Anbieter gemerkt hat. Er bräche die Invariante.
+  - Verworfen: nur IDs und ohne kommende Angebote die ID als Namen zeigen (`familientreff-beispiel`). Das ist unlesbar.
+- **Aufteilung nach ADR 0010** (Review B1):
+  - `src/data/preferences.ts` liefert nur die **Rohform**. `loadSavedProviders(): { id: string; name: string }[]` prüft wie `loadSaved` nur JSON und Typen: Array, je Eintrag `id` und `name` als String. Einträge mit anderer Form fallen weg, kaputtes JSON ergibt `[]`. Ein Laufzeit-Import aus `src/domain` gibt es dort nicht.
+  - `saveSavedProviders(list)` baut jeden Eintrag neu (nur `id`, `name`). Bei leerer Liste entfernt es den Schlüssel.
+  - Die inhaltliche Prüfung ist eine reine Funktion in `src/domain/saved.ts`:
+    ```ts
+    /** Gemerkte Anbieter aus dem Speicher bereinigen (Plan 0025, E1): gültige ID, höchstens MAX_PROVIDER_ID, keine Dubletten. */
+    export function cleanSavedProviders(raw: readonly { id: string; name: string }[]): SavedProvider[];
+    ```
+    Sie prüft die ID gegen `KEBAB_ID_PATTERN` und `MAX_PROVIDER_ID`. Bei Dubletten gilt der erste Eintrag.
+  - `useSavedProviders()` ruft `cleanSavedProviders(loadSavedProviders())` im Initializer auf, wie `useOrigin` die Rohwerte aus `preferences.ts` prüft (ADR 0017, Punkt 5).
+  - `MAX_PROVIDER_ID` zieht von `src/domain/route.ts:9` nach `src/domain/ids.ts` und wird von dort exportiert. `route.ts` importiert ihn.
+- `SavedProvider` ist ein Typ in `src/domain/saved.ts` (`{ id: string; name: string }`).
+- Weitere reine Logik in `src/domain/saved.ts`:
+  - `toggleProvider(list, entry): SavedProvider[]` entfernt per ID oder hängt an.
+  - `savedProviderRows(list, offers, now): SavedProviderRow[]` liefert `{ id, name, upcoming: number, next?: Session }`.
+    - `name` kommt aus dem ersten kommenden Angebot (`providerName`, aktueller Datenstand), sonst aus dem Schnappschuss.
+    - `upcoming` zählt die kommenden Angebote des Anbieters (`nextSession !== undefined`).
+    - Sortiert nach Name (`localeCompare(…, "de")`).
+- Hook `useSavedProviders()` in `src/ui/use-app-state.ts`, gebaut wie `useSaved()`. Er liefert `[list, toggle]`, und `toggle(entry)` meldet, ob danach gemerkt.
+- **Privatsphäre**: Der Abschnitt „Privatsphäre“ in `docs/architecture.md` wird ergänzt.
+  - Gemerkte Anbieter bleiben im `localStorage`. Sie stehen nie in URL, Logs, Requests oder IndexedDB.
+  - Der Push (ADR 0014) liest sie nicht.
+  - `route.ts:1–3` nennt sie im Kopfkommentar neben Geburtsdatum und Merkliste.
+  - Kein Request hängt davon ab, ob oder welche Anbieter gemerkt sind (E2E, Test 9).
+- Gelöscht wird nie automatisch. Wie bei `savedOffers` bleiben Einträge stehen, auch wenn ein Anbieter im aktuellen Datenstand fehlt. Ein lückenhafter Pipeline-Lauf soll keine Merkliste leeren (`saved.ts:1–4`).
 
 ### E2 – Merken im Anbieter-Sheet
 
-- Im Kopf von `ProviderSheet` steht neben dem Namen (`h2`) ein Herz-Knopf wie auf der Kachel: `<button type="button" className="heart" aria-pressed={saved} aria-label={`${name} merken`}>`. Gleiches Icon (`heart`), gleiche Animation (`slap`), gleiche Klasse, damit Touch-Ziel (≥ 44 px), Fokusring und reduzierte Bewegung schon geprüft sind. Kopf als Flex-Zeile: Name links (`flex: 1`, darf umbrechen, `hyphens: auto`), Herz rechts oben (`align-self: start`).
-  - Der Name des Knopfs folgt dem Muster der Kachel („… merken“ mit `aria-pressed`), nicht „Anbieter merken/entfernen“: ein Muster für alles Merkbare.
-- Toasts (im Dialog, `toast` aus `Overlays.tsx`): „Anbieter gemerkt – steht jetzt in deiner Merkliste“ bzw. „Anbieter nicht mehr gemerkt“. Wortlaut passend zu Plan 0022; liefert 0022 andere Toast-Muster, gilt dessen Muster.
-- `ProviderSheetProps` (`src/ui/provider-types.ts`) bekommt `saved: boolean` und `onToggleSaved: (entry: SavedProvider) => void`. `Overlays.tsx` reicht beides durch, `App.tsx` baut sie aus `useSavedProviders()`. Der Name im Eintrag ist `provider.name` (Katalog bzw. Rückfall-Zeile, `findProvider`).
+- Im Kopf von `ProviderSheet` steht neben dem Namen (`h2`) ein Herz-Knopf wie auf der Kachel: `<button type="button" className="heart" aria-pressed={saved} aria-label={`${name} merken`}>`.
+  - Icon (`heart`), Animation (`slap`) und Klasse sind dieselben wie auf der Kachel. Touch-Ziel (≥ 44 px), Fokusring und reduzierte Bewegung sind damit schon geprüft.
+  - Der Kopf ist eine Flex-Zeile. Links steht der Name (`flex: 1`, darf umbrechen, `hyphens: auto`), rechts oben das Herz (`align-self: start`).
+  - Der Name des Knopfs folgt dem Muster der Kachel („… merken“ mit `aria-pressed`), nicht „Anbieter merken/entfernen“. So gibt es ein Muster für alles Merkbare.
+- Toasts im Dialog (`toast` aus `Overlays.tsx`): „Anbieter gemerkt – steht jetzt in deiner Merkliste“ bzw. „Anbieter nicht mehr gemerkt“. Liefert Plan 0022 andere Toast-Muster, gilt dessen Muster.
+- `ProviderSheetProps` (`src/ui/provider-types.ts`) bekommt `saved: boolean` und `onToggleSaved: (entry: SavedProvider) => void`.
+  - `Overlays.tsx` reicht beides durch, `App.tsx` baut es aus `useSavedProviders()`.
+  - Der Name im Eintrag ist `provider.name` (Katalog bzw. Rückfall-Zeile, `findProvider`).
 - Der Ladezustand des Sheets (`ProviderSheetLoader`, noch ohne Chunk) zeigt kein Herz. Gemerkt werden kann erst, wenn der Name feststeht.
 
 ### E3 – Merkliste: Aufbau und Abschnitt „Gemerkte Anbieter“
 
-Aufbau von oben nach unten (Liste):
+Aufbau von oben nach unten:
 
 1. `h2.ptitle` „Meine Merkliste“ (Plan 0022).
-2. **Statuszeile** wie auf den anderen Tabs (`.status-row` mit `p.status[role=status][tabIndex=-1]`): „**5** gemerkt“, mit gemerkten Anbietern „**5** gemerkt · **2** Anbieter“. Bei aktivem Merklisten-Filter zählt die erste Zahl die sichtbaren gemerkten Angebote („**2** von 5 gemerkt“). Rechts der Umschalter Liste | Karte | Kalender (E4). Ohne Wegzeit-Zusatz (die Merkliste kennt keine Wegzeit-Grenze) und ohne `pwaNote` (die steht schon auf den anderen Tabs; bleibt wie heute).
+2. **Statuszeile** wie auf den anderen Tabs: `.status-row` mit `p.status[role=status][tabIndex=-1]`, rechts der Umschalter Liste | Karte | Kalender (E4).
+   - Text: „**5** gemerkt“, mit gemerkten Anbietern „**5** gemerkt · **2** Anbieter“.
+   - Bei aktivem Merklisten-Filter zählt die erste Zahl die sichtbaren gemerkten Angebote: „**2** von 5 gemerkt“. In der Darstellung Kalender zählt der Zeitraum nicht mit (`useRange: false`, E6).
+   - Die Statuszeile hat keinen Wegzeit-Zusatz, weil die Merkliste keine Wegzeit-Grenze kennt, und kein `pwaNote` (wie heute).
 3. **Filterzeile** (E6), horizontal scrollend wie die Schnellfilter.
-4. Knopf „Alle in den Kalender“ und die Zeile darunter (E9).
-5. Gemerkte Angebote (gefiltert), je eine `OfferCard` mit Datum. Ohne Zeitraum der nächste Termin (wie heute), mit Zeitraum der erste Termin im Zeitraum (Funktion aus Plan 0023), sortiert danach.
-6. Abschnitt **„Gemerkte Anbieter“** (`h3`), nur wenn mindestens einer gemerkt ist. Er steht in der Liste **unter** den Angeboten: Die Angebote sind das, was man plant; die Anbieter sind der Ort zum Weitersuchen.
+4. Nur in der Darstellung **Liste**: der Knopf „Alle in den Kalender“ und die Zeile darunter (E9).
+5. Gemerkte Angebote (gefiltert), je eine `OfferCard` mit Datum. Ohne Zeitraum gilt der nächste Termin (wie heute). Mit Zeitraum gilt der erste Termin im Zeitraum (Funktion aus Plan 0023), und danach wird sortiert.
+6. Abschnitt **„Gemerkte Anbieter“** als `h3` mit `tabIndex={-1}`, nur wenn mindestens ein Anbieter gemerkt ist und nur in der Darstellung Liste.
+   - Er steht **unter** den Angeboten. Die Angebote sind das, was man plant. Die Anbieter sind der Ort zum Weitersuchen.
 
 Zeile je gemerktem Anbieter (`savedProviderRows`), als Liste `ul.saved-providers`:
 
-- Ein Knopf über die ganze Zeile außer dem Herz: Name (fett), darunter „3 kommende Angebote · nächster Mi 7.10.“ bzw. „Gerade keine Termine im Zwergenplan“ (Zeile dann blass wie „ohne Termine“ im Tab „Anbieter“, `anbieter.css`). Tipp öffnet das Anbieter-Sheet (`openProvider(id)`, `anbieter=<id>` in der URL wie überall). Erst **dieser Tipp** lädt Chunk und `anbieter.json` (zulässig: Sheet „Anbieter“).
-- Rechts das Herz (`aria-pressed="true"`, „{Name} merken“). Tipp entfernt den Anbieter sofort, Toast „Anbieter nicht mehr gemerkt“. Der Fokus geht danach auf die Überschrift „Gemerkte Anbieter“ bzw., wenn der Abschnitt verschwindet, auf die Statuszeile (Muster wie Plan 0021, E3: vorher fokussieren, dann entfernen).
-- Unbekannte ID beim Öffnen (Anbieter nicht mehr im Katalog und ohne Angebote): Das Sheet entfernt `anbieter=` wie heute (`onUnknown`, Plan 0010, E3). Die Zeile bleibt, bis man das Herz tippt; ihr Text sagt schon „Gerade keine Termine im Zwergenplan“.
-- Die Merklisten-Filter wirken auf den Anbieter-Abschnitt **nicht**. Er ist eine Adressliste, keine Terminliste. Die Zahl „3 kommende Angebote“ zählt ungefiltert.
-- Karte und Kalender zeigen den Abschnitt nicht (E4, E5). Ob kommende Angebote gemerkter Anbieter zusätzlich in Liste und Karte erscheinen, ist Offener Punkt N1 (Empfehlung: als Schalter, Etappe 5).
-- Badge der Tab-Leiste: zählt wie heute nur gemerkte Angebote mit kommendem Termin. Begründung: Das Badge steht für das, was geplant ist und in den Kalender geht; Anbieter sind keine Termine.
+- Ein Knopf über die ganze Zeile außer dem Herz.
+  - Er zeigt den Namen (fett) und darunter „3 kommende Angebote · nächster Mi 7.10.“ bzw. „Gerade keine Termine im Zwergenplan“. Die Zeile ist dann blass wie „ohne Termine“ im Tab „Anbieter“ (`anbieter.css`).
+  - Ein Tipp öffnet das Anbieter-Sheet (`openProvider(id)`, `anbieter=<id>` in der URL wie überall). Erst **dieser Tipp** lädt Chunk und `anbieter.json`. Das ist zulässig, denn es ist das Sheet „Anbieter“.
+- Rechts das Herz (`aria-pressed="true"`, „{Name} merken“). Ein Tipp entfernt den Anbieter sofort, mit dem Toast „Anbieter nicht mehr gemerkt“.
+  - Der Fokus geht vorher auf die Überschrift „Gemerkte Anbieter“. Verschwindet der Abschnitt mit dem letzten Anbieter, geht er auf die Statuszeile. Das Muster stammt aus Plan 0021, E3: erst fokussieren, dann entfernen.
+- Unbekannte ID beim Öffnen (Anbieter nicht mehr im Katalog und ohne Angebote): Das Sheet entfernt `anbieter=` wie heute (`onUnknown`, Plan 0010, E3). Die Zeile bleibt, bis man das Herz tippt. Ihr Text sagt schon „Gerade keine Termine im Zwergenplan“.
+- Die Merklisten-Filter wirken auf den Anbieter-Abschnitt **nicht**. Er ist eine Adressliste, keine Terminliste, und „3 kommende Angebote“ zählt ungefiltert.
+- Das Badge der Tab-Leiste zählt wie heute nur gemerkte Angebote mit kommendem Termin. Das Badge steht für das, was geplant ist und in den Kalender geht; Anbieter sind keine Termine.
 
 ### E4 – Umschalter Liste | Karte | Kalender
 
-- **Route:** `TABS` in `src/domain/route.ts` wird `["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte", "merkliste-kalender"]`. URL `ansicht=merkliste-karte` bzw. `ansicht=merkliste-kalender`, analog zu `ansicht=karte` für „Entdecken“ (Plan 0005, E5). `tabSection` bildet beide auf „merkliste“ ab.
-  - Verworfen: eigener Parameter `darstellung=`. Ein zweiter Parameter für dieselbe Sache, die „karte“ heute schon über `ansicht` löst.
-  - Die Darstellung ist keine private Information (sie verrät nichts über das Gemerkte), darf also in die URL. Ein geteilter Link `?ansicht=merkliste-kalender` öffnet beim Empfänger dessen eigene Merkliste.
-- **`ViewToggle`** (`Chrome.tsx`) wird allgemein: `ViewToggle<V extends string>({ options: readonly { value: V; label: string }[]; current: V; onChange: (v: V) => void; legend: string })`. Klasse `seg seg${options.length}`, Daumen `translateX(${index * 100}%)`. `styles/chrome.css` bekommt `.seg3` (drei gleich breite Spalten) neben `.seg2`. „Entdecken“ nutzt zwei Optionen, die Merkliste drei. Legende „Darstellung der Angebote“ bzw. „Darstellung der Merkliste“.
-  - Bei wenig Platz bricht der Umschalter unter die Statuszeile (wie heute, Plan 0005, E5). Das Layout-Gate prüft 320 px/200 % (Tests, Punkt 8).
-- **Karte der Merkliste:** `MapPanel` mit
-  - `offers` = die gefilterten gemerkten Angebote (ggf. plus Anbieter-Angebote, N1),
-  - `cameraOffers` = **alle kommenden Angebote** (wie „Entdecken“). Der Startausschnitt darf nicht von der Merkliste abhängen, sonst verrieten die Kachel-Requests, wo die gemerkten Angebote liegen (Kamera-Regel, ADR 0008). Keine Abweichung von ADR 0008.
-  - `onResetFilter` = Merklisten-Filter zurücksetzen (nur bei aktivem Merklisten-Filter), `age` = `undefined` (Merkliste ignoriert das Alter).
-  - Statuszeile: „**3** gemerkt an **2** Orten“ (`mapStatusParts`-Muster, neuer Text in `format.ts`: `savedMapStatusParts`).
-  - Orts-Sheet, Orts-Liste und „Kartenmitte als Startpunkt“ wie in „Entdecken“. `lastCamera` (Sitzung) teilen sich beide Karten; das ist gewollt.
-  - **Wegzeit-Anlass:** Öffnen der Merklisten-Karte ruft `want()` wie die Karte von „Entdecken“ (`App.tsx:124–126` prüft künftig `route.tab === "karte" || route.tab === "merkliste-karte"`). Liste und Kalender der Merkliste sind kein Anlass.
-- **Fokus:** Der Umschalter bleibt beim Wechsel dasselbe Element an derselben Stelle; der Fokus bleibt auf dem gedrückten Segment. `window.scrollTo({ top: 0 })` nur beim Tab-Wechsel, nicht beim Wechsel der Darstellung (wie heute bei Liste | Karte).
-- **Leere Merkliste:** Ist weder ein Angebot noch ein Anbieter gemerkt, gibt es weder Statuszeile noch Umschalter noch Filter, nur den Leerzustand (Text aus Plan 0022). Eine Karte ohne Inhalt lädt so keine Kacheln. Steht die URL auf `merkliste-karte`/`-kalender`, bleibt sie stehen; der Leerzustand ist derselbe.
+**Route**
+- `TABS` in `src/domain/route.ts` wird zu `["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte", "merkliste-kalender"]`.
+- Die URL heißt `ansicht=merkliste-karte` bzw. `ansicht=merkliste-kalender`, analog zu `ansicht=karte` für „Entdecken“ (Plan 0005, E5). `tabSection` bildet beide auf „merkliste“ ab.
+- Verworfen: ein eigener Parameter `darstellung=`. Das wäre ein zweiter Parameter für dieselbe Sache, die `ansicht=karte` heute schon löst.
+- Die Darstellung ist keine private Information, denn sie verrät nichts über das Gemerkte. Sie darf also in die URL. Ein geteilter Link `?ansicht=merkliste-kalender` öffnet beim Empfänger dessen eigene Merkliste.
+
+**Weichen in `App.tsx` auf `section` umstellen** (Review M1). Heute fragen mehrere Stellen `route.tab` direkt ab. Mit den neuen Ansichten griffen sie falsch:
+- `:248` Sticker und `:249` Schnellfilter: beide `section === "entdecken" || section === "anbieter"`. Auf allen Merklisten-Ansichten bleiben sie aus.
+- `:282` Statuszeile der anderen Tabs: `section !== "merkliste"` statt `route.tab !== "merkliste"`. Die Merkliste rendert ihre eigene Statuszeile in `SavedView`.
+- `:338` Liste „Entdecken“: bleibt `route.tab === "entdecken"`.
+- `:358` `MapPanel`: Es gibt je Abschnitt genau einen Aufruf.
+  - In „Entdecken“ (`route.tab === "karte"`) wie heute mit `offers={visible}`.
+  - Auf der Merkliste (`route.tab === "merkliste-karte"`) rendert `SavedView` die Karte selbst, mit den gefilterten gemerkten Angeboten.
+- `:124–126` Wegzeit-Anlass: `route.tab === "karte" || route.tab === "merkliste-karte"`. Liste und Kalender der Merkliste sind kein Anlass.
+- `views.map` (`use-offer-views.ts:147–150`) wird für beide Karten berechnet.
+  - Für `karte` gilt `placeCount: countPlaces(visible)`.
+  - Für `merkliste-karte` gilt `placeCount: countPlaces(savedVisible)`, also die gefilterten gemerkten Angebote (E6).
+  - `cameraOffers` ist in beiden Fällen `upcoming`. Sonst ist `map` `undefined`.
+  - Der Unit-Test steht unter Test 8.
+
+**`ViewToggle`** (`Chrome.tsx`, Review M2)
+- Signatur: `ViewToggle<V extends string>({ options: readonly { value: V; label: string }[]; current: V; onChange: (v: V) => void; legend: string })`.
+- Die Klasse bleibt `seg`, **nicht** `seg3`. `.seg3` gehört dem Darstellungs-Umschalter im Kind-Sheet, mit Umbruch und einspaltiger Container-Query.
+- Das Element setzt `style={{ "--n": options.length }}` und den Daumen per `translateX(${index * 100}%)`.
+- `map.css:33–38`: Die Daumenbreite wird `calc(100% / var(--n, 2))` statt `50%`.
+- Neue Klasse `.view-toggle.three` (in `map.css` neben `.view-toggle`, weil der Umschalter dort schon steht):
+  - `flex: 0 1 16rem; min-width: 13.5rem`, sonst würde der Deckel `12rem` die drei Wörter quetschen,
+  - `.seg-btn { white-space: nowrap }`, „Kalender“ bricht nie.
+  - Reicht die Zeile nicht, bricht der ganze Umschalter unter die Statuszeile, wie heute (Plan 0005, E5). Das Layout-Gate prüft 320 px bei 200 % (Test 15).
+- Die Legende lautet „Darstellung der Angebote“ bzw. „Darstellung der Merkliste“.
+
+**Karte der Merkliste**
+- `MapPanel` erhält:
+  - `offers` = die gefilterten gemerkten Angebote,
+  - `cameraOffers` = **alle kommenden Angebote** (`views.map.cameraOffers`, wie „Entdecken“). Der Startausschnitt darf nicht von der Merkliste abhängen, sonst verrieten die Kachel-Requests, wo die gemerkten Angebote liegen (Kamera-Regel, ADR 0008). Das ist keine Abweichung von ADR 0008.
+  - `onResetFilter` setzt die Merklisten-Filter zurück. `age` ist `undefined`, weil die Merkliste das Alter ignoriert.
+- Die Karte wird **nur gerendert, wenn mindestens ein gemerktes Angebot zum Filter passt**. Sonst zeigt `SavedView` einen eigenen Leerzustand (E5a), ohne `MapPanel` und damit ohne Kacheln. `NoOffers` in `MapScreen.tsx:111–115` wird auf der Merkliste so nie erreicht.
+- Statuszeile: „**3** gemerkt an **2** Orten“. Der neue Text `savedMapStatusParts` in `format.ts` folgt dem Muster von `mapStatusParts`.
+- Orts-Sheet, Orts-Liste und „Kartenmitte als Startpunkt“ funktionieren wie in „Entdecken“. `lastCamera` (Sitzung) teilen sich beide Karten, und das ist gewollt.
+
+**Fokus**
+- Der Umschalter bleibt beim Wechsel dasselbe Element an derselben Stelle, und der Fokus bleibt auf dem gedrückten Segment.
+- `window.scrollTo({ top: 0 })` gibt es nur beim Tab-Wechsel, nicht beim Wechsel der Darstellung (wie heute bei Liste | Karte).
 
 ### E5 – Kalender der Merkliste: Tag, Woche oder Monat als Filter der Liste darunter
 
-**Inhalt:** nur Termine gemerkter Angebote, nach den Merklisten-Filtern Format und Anmeldung (E6), **jeder** nicht beendete Termin (bei einem Kurs also jede Kursstunde, bei einer regelmäßigen Gruppe jedes Treffen). Grundlage ist `sessionsByDay(savedFiltered)`; `allIndex` ist `sessionsByDay(savedAll)` (ungefiltert, für „ausgeblendet“).
+**Inhalt**
+- Der Kalender zeigt nur Termine gemerkter Angebote, gefiltert nach den Merklisten-Filtern Format und Anmeldung (E6).
+- Er zeigt **jeden** nicht beendeten Termin, bei einem Kurs also jede Kursstunde und bei einer regelmäßigen Gruppe jedes Treffen.
+- Grundlage ist `sessionsByDay(savedFiltered)`. `allIndex` ist `sessionsByDay(savedAll)`, ungefiltert, für „ausgeblendet“.
+- `endedToday` (Review M7): `endedOnDay` über `offers.filter((o) => savedIds.includes(o.id))` **plus** Merklisten-Filter. Bewusst nicht über `savedOffers`, das nur Angebote mit kommendem Termin kennt. Ein gemerktes Angebot, dessen einziger Termin heute schon vorbei ist, zählt sonst nicht (B2).
 
-**Auswahl** – neuer reiner Typ in `src/domain/calendar.ts`:
+**Zustand** (Review M4), fest im Sitzungszustand von `useOfferViews`:
 
 ```ts
 /** Was der Kalender der Merkliste auswählt (Plan 0025, E5). `day` ist ein Berliner Tag, nie vor heute. */
 export interface CalendarSelection {
   unit: "tag" | "woche" | "monat";
-  /** Anker: der gewählte Tag; bei Woche/Monat ein Tag darin (für Woche: Mo–So um ihn, Monat: sein Monat) */
+  /** Anker: der gewählte Tag; bei Woche ein Tag darin (Mo–So um ihn), bei Monat ein Tag darin */
   day: string;
+}
+/** Zustand des Merklisten-Kalenders in useOfferViews */
+interface SavedCalendarState {
+  selection: CalendarSelection;
+  /** Monatsraster offen; unabhängig von `selection.unit` (offenes Raster mit gewähltem Tag ist erlaubt) */
+  monthOpen: boolean;
 }
 /** Erster und letzter Berliner Tag der Auswahl, inklusive; nie vor `today`. */
 export function selectionRange(sel: CalendarSelection, today: string): { from: string; to: string };
-/** Ziele der Pfeile je Einheit; `undefined` = gesperrt (Grenzen wie `calendarNav`). */
-export function selectionNav(sel: CalendarSelection, today: string, lastDay: string | undefined): {
-  prev: CalendarSelection | undefined;
-  next: CalendarSelection | undefined;
-};
 ```
 
-- Startwert: `{ unit: "woche", day: today }` – „seine Woche planen“ (Wunsch 11). Liegt im Sitzungszustand von `useOfferViews` (wie heute `calendarDay`/`monthOpen`), übersteht Tab- und Darstellungswechsel, nicht das Neuladen. `day` wird beim Lesen mit `clampDay` auf heute gezogen (nach Mitternacht im offenen Tab).
-- Navigationsgrenze `lastDay` ist der letzte Tag des **ganzen Datenstands** (`lastSessionDay(upcoming)`), nicht der letzten gemerkten Termine. So kann man auch in leere Wochen blättern und von dort „Für diese Woche entdecken“ (unten) nutzen.
+- Der Startwert ist `{ selection: { unit: "woche", day: today }, monthOpen: false }`. Das entspricht „seine Woche planen“ (Wunsch 11).
+- Der Zustand übersteht Tab- und Darstellungswechsel, aber nicht das Neuladen. `day` wird beim Lesen mit `clampDay` auf heute gezogen, etwa nach Mitternacht im offenen Tab.
+- **Pfeile über das bestehende `calendarNav`** (`src/domain/calendar.ts`). Es gibt keine eigene Navigationsfunktion; `selectionNav` aus dem Entwurf entfällt.
+  - Woche: `nav.prevWeek`/`nav.nextWeek` → `{ unit: "woche", day: ziel }`.
+  - Monat: `nav.prevMonth`/`nav.nextMonth` → `{ unit: "monat", day: ziel }`.
+  - `calendarNav` sperrt wie heute vor heute und nach `lastDay`.
+- Die Navigationsgrenze `lastDay` ist der letzte Tag des **ganzen Datenstands** (`lastSessionDay(upcoming)`), nicht der letzte gemerkte Termin. So kann man auch in leere Wochen blättern und von dort „Für diese Woche entdecken“ nutzen.
 
-**Interaktion:**
+**Interaktion** (Simplicity: Ein erneuter Tipp auf den gewählten Tag ändert nichts mehr; zurück zur ganzen Woche oder zum ganzen Monat geht es nur über den Titel):
 
-| Ansicht | Geste | Auswahl danach |
+| Ansicht | Geste | Zustand danach |
 |---|---|---|
 | Woche (Standard) | Tipp auf einen Tag | `tag` = dieser Tag |
-| Woche | Tipp auf den schon gewählten Tag | `woche` (zurück zur ganzen Woche) |
 | Woche | Tipp auf den Wochentitel „5.–11. Okt.“ (jetzt ein Knopf, `aria-pressed` bei `woche`) | `woche` |
-| Woche | Pfeil ‹ / › | `woche` der vorigen/nächsten Woche (blättern zeigt immer die ganze neue Woche) |
-| Woche | „Ganzen Monat zeigen“ | Monatsraster auf, `monat` des Ankertags |
-| Monat | Tipp auf einen Tag | `tag` = dieser Tag, **Raster bleibt offen** (Änderung zu heute, `CalendarView.tsx:123–126`: Der Monat ist jetzt ein Filter, kein Datumswähler) |
-| Monat | Tipp auf den gewählten Tag | `monat` |
+| Woche | Pfeil ‹ / › | `woche` der vorigen/nächsten Woche (Blättern zeigt immer die ganze neue Woche) |
+| Woche | „Ganzen Monat zeigen“ | `monthOpen: true`, `monat` des Ankertags |
+| Monat | Tipp auf einen Tag | `tag` = dieser Tag, **Raster bleibt offen**, Überschrift der Liste wird sichtbar (unten) |
 | Monat | Tipp auf den Monatstitel „Oktober 2026“ (Knopf, `aria-pressed` bei `monat`) | `monat` |
 | Monat | Pfeil ‹ / › | `monat` des vorigen/nächsten Monats (Anker: der 1., nie vor heute) |
-| Monat | „Monat zuklappen“ | `woche` um den Ankertag |
+| Monat | „Monat zuklappen“ | `monthOpen: false`, `woche` um den Ankertag |
 
+- Dass das Raster beim Tipp auf einen Tag offen bleibt, ist eine Änderung gegenüber heute (`CalendarView.tsx:123–126`). Der Monat ist jetzt ein Filter, kein Datumswähler.
+- **Sichtbarkeit nach dem Tipp im Monat** (Review M3): Das offene Raster schiebt die Liste bei 320×640 unter den Falz.
+  - Nach dem Tipp auf einen Tag ruft ein `useLayoutEffect` `daylabel.scrollIntoView({ block: "nearest" })` auf, ohne `behavior: "smooth"`. Damit gilt die reduzierte Bewegung von selbst.
+  - Der Fokus bleibt auf dem Tag. Die Statuszeile meldet die neue Zahl nicht (sie zählt nicht die Auswahl). Die Überschrift `h2.daylabel` mit „3 Termine“ ist deshalb zugleich sichtbar und per `aria-live="polite"` angesagt; die Region umfasst nur Überschrift und Zahl.
+  - E2E: Nach dem Tipp liegt die Überschrift im Viewport (Test 10).
 - Vergangene Tage bleiben gesperrt (`disabled`, wie heute). Der Monatsknopf hält seine Lage beim Auf- und Zuklappen (bestehender `useLayoutEffect`, Plan 0007, E5).
-- Die Punkte in Woche und Monat (`dots`, Kategorie-Formen) zeigen nur gemerkte Termine. Sie folgen `ctx.categoryOf` wie heute (Plan 0014: gewählte Kategorie der Startseite zuerst).
-- `aria-label` je Tag: „Mittwoch, 7. Oktober, 1 Termin“ (heute „… Angebote“; im Merklisten-Kalender zählen Termine). Wochentitel: „Ganze Woche, 5. bis 11. Oktober, 3 Termine“; Monatstitel analog.
+- Die Punkte in Woche und Monat (`dots`, Kategorie-Formen) zeigen nur gemerkte Termine. Sie folgen `ctx.categoryOf` wie heute (Plan 0014: die gewählte Kategorie der Startseite zuerst).
+- **Namen** (WCAG 2.5.3, Label im Namen):
+  - Je Tag: „Mittwoch, 7. Oktober, 1 Termin“. Heute steht dort „… Angebote“; im Merklisten-Kalender zählen Termine.
+  - Wochentitel: Der sichtbare Text „5.–11. Okt.“ steht am Anfang des zugänglichen Namens. Der Zusatz kommt als `span.sr-only` in den Knopf: „ · ganze Woche, 3 Termine“. Kein `aria-label`, das den sichtbaren Text umformuliert.
+  - Monatstitel analog: „Oktober 2026“ plus `sr-only` „ · ganzer Monat, 7 Termine“.
 
-**Liste darunter** (`h2.daylabel` + Karten):
-
-- Überschrift nach Auswahl: „Heute, 5. Oktober“ / „Mittwoch, 7. Oktober“ (wie `agendaHeading`), „Diese Woche“ / „Woche 12.–18. Okt.“, „Oktober 2026“; rechts `small` „3 Termine“. Neue reine Texte in `src/ui/format.ts`: `selectionHeading(sel, today)`, Wortlaute test-first.
-- Bei `woche` und `monat` gruppiert nach Tag mit `h3` je Tag („Mi 7.10.“), nur Tage mit Terminen. Je Termin eine `OfferCard` mit `calendarDay` = dieser Tag (Detail nimmt den Termin, `referenceSession`).
-- Reine Domänenfunktion in `src/domain/agenda.ts`, ersetzt `dayAgenda`:
+**Liste darunter** (`h2.daylabel` mit Karten)
+- Die Überschrift richtet sich nach der Auswahl: „Heute, 5. Oktober“ / „Mittwoch, 7. Oktober“ (wie `agendaHeading`), „Diese Woche“ / „Woche 12.–18. Okt.“, „Oktober 2026“. Rechts steht `small` „3 Termine“.
+  - Neue reine Texte in `src/ui/format.ts`: `selectionHeading(sel, today)`. Die Wortlaute werden zuerst im Test festgelegt.
+- Bei `woche` und `monat` wird nach Tag gruppiert, mit `h3` je Tag („Mi 7.10.“) und nur für Tage mit Terminen.
+- Je Termin gibt es eine `OfferCard` mit `calendarDay` = dieser Tag. So nimmt das Detail diesen Termin (`referenceSession`).
+- Reine Domänenfunktion in `src/domain/agenda.ts`, sie ersetzt `dayAgenda`:
 
 ```ts
 export interface RangeAgenda<T extends Offer> {
@@ -237,230 +358,491 @@ export function rangeAgenda<T extends Offer>(
 ): RangeAgenda<T>;
 ```
 
-  Iteriert die Tage von `from` bis `to` (höchstens 31) per `addDays`, nicht die Map. `dayAgenda` entfällt, `endedOnDay` bleibt (jetzt über die gefilterten gemerkten Angebote).
+  - Sie iteriert die Tage von `from` bis `to` (höchstens 31) per `addDays`, nicht die Map.
+  - `dayAgenda` entfällt. `endedOnDay` bleibt, jetzt über die gemerkten Angebote (siehe oben).
 
-**Leerzustände** der Liste, in dieser Reihenfolge (Muster aus `AgendaEmpty`, Plan 0008, E12):
+**Leerzustände des Kalenders**, in dieser Reihenfolge (Muster aus `AgendaEmpty`, Plan 0008, E12):
 
-1. `hidden > 0`: „Nichts, was zu deinem Filter passt“ / „2 gemerkte Termine blendet der Filter aus.“ / Knopf „Filter zurücksetzen“ (setzt nur die Merklisten-Filter zurück). Kein „Auch unpassende zeigen“ (das Alter wirkt hier nicht).
+1. `hidden > 0`: Titel „Nichts, was zu deinem Filter passt“, Text „2 gemerkte Termine blendet der Filter aus.“, Knopf „Filter zurücksetzen“. Es gibt kein „Auch unpassende zeigen“, weil das Alter hier nicht wirkt.
 2. `ended > 0` (nur bei `tag` = heute): „Für heute ist alles vorbei“ wie heute.
 3. `afterData`: „Weiter reicht der Plan noch nicht“ wie heute.
-4. sonst: „Nichts gemerkt“ / „Für diesen Tag (diese Woche, diesen Monat) hast du nichts gemerkt.“ / Knopf „Für diesen Tag entdecken“ bzw. „… diese Woche …“/„… diesen Monat …“ (Etappe 4, braucht Plan 0023): wechselt zu „Entdecken“ und setzt dort den Zeitraum auf die Auswahl (`von=`/`bis=`, alle übrigen Startseiten-Filter bleiben). Vor Etappe 4 steht stattdessen „Angebote entdecken“ ohne Zeitraum.
+4. Sonst: Titel „Nichts gemerkt“, Text „Für diesen Tag hast du nichts gemerkt.“ (bzw. „diese Woche“, „diesen Monat“), Knopf „Für diesen Tag entdecken“ (bzw. „… diese Woche …“, „… diesen Monat …“).
+   - Der Knopf wechselt zu „Entdecken“ und setzt dort den Zeitraum auf die Auswahl (`von=`/`bis=` aus Plan 0023). Alle übrigen Startseiten-Filter bleiben.
 
-**Zeitraum-Filter im Kalender:** Die Kalenderauswahl **ist** der Zeitraum. In der Darstellung Kalender ist der Zeitraum-Chip der Merkliste ausgeblendet; sein Wert bleibt erhalten und gilt wieder in Liste und Karte. Verworfen: beide kombinieren (Kurs-Regel „erster Termin im Zeitraum“ widerspricht „jeder Termin“ im Kalender, und zwei Zeitfilter übereinander wären schwer zu verstehen).
+**Zeitraum im Kalender**: Die Kalenderauswahl **ist** der Zeitraum.
+- In der Darstellung Kalender sind die Chips „ab …“ der Merkliste ausgeblendet. Ihr Wert bleibt erhalten und gilt wieder in Liste und Karte.
+- Verworfen: beides kombinieren. Die Kurs-Regel „erster Termin im Zeitraum“ widerspricht „jeder Termin“ im Kalender, und zwei Zeitfilter übereinander wären schwer zu verstehen.
 
-**Wiederverwendung:** `CalendarView.tsx` wird zu `src/ui/SavedCalendar.tsx` umgebaut (Datei umbenannt, `git mv`): `WeekStrip` und `MonthGrid` bleiben, bekommen `selection` statt `day` und die Titelknöpfe; `AgendaEmpty` wird zu `RangeEmpty`. Kein zweiter Kalender bleibt zurück. `styles/calendar.css` bleibt, ergänzt um den Titelknopf (`.cal-nav .cal-title`, ≥ 44 px hoch, sieht aus wie der heutige `<b>`-Titel, mit `aria-pressed`-Zustand über `--sel`/`--on-sel`).
+**Wiederverwendung**
+- `CalendarView.tsx` wird per `git mv` zu `src/ui/SavedCalendar.tsx` umgebaut.
+  - `WeekStrip` und `MonthGrid` bleiben. Sie bekommen `selection` statt `day` und die Titelknöpfe.
+  - `AgendaEmpty` wird zu `RangeEmpty`.
+  - Es bleibt kein zweiter Kalender zurück.
+- `styles/calendar.css` bleibt und wird um den Titelknopf ergänzt (`.cal-nav .cal-title`): ≥ 44 px hoch, sieht aus wie der heutige `<b>`-Titel, gewählt über `--sel`/`--on-sel`.
+
+### E5a – Leerzustände der Merkliste (Review M5)
+
+| Lage | Liste | Karte | Kalender |
+|---|---|---|---|
+| nichts gemerkt (weder Angebot noch Anbieter) | Leerzustand aus Plan 0022 mit „Angebote entdecken“; **keine** Statuszeile, kein Umschalter, keine Filter | wie Liste | wie Liste |
+| nur Anbieter gemerkt, kein Angebot mit kommendem Termin | Hinweis „Noch keine Angebote gemerkt – tipp auf das Herz bei einem Angebot.“, darunter der Abschnitt „Gemerkte Anbieter“ | `EmptyState` „Noch keine Angebote gemerkt“ / „Auf der Karte stehen die Orte deiner gemerkten Angebote.“ mit „Angebote entdecken“; **kein** `MapPanel`, keine Kacheln | `EmptyState` „Noch keine Angebote gemerkt“ / „Hier planst du deine Woche mit den gemerkten Terminen.“ mit „Angebote entdecken“; kein Wochenstreifen |
+| Filter blendet alle gemerkten Angebote aus | `EmptyState` „Nichts, was zu deinem Filter passt“ / „Von deinen 5 gemerkten Angeboten passt keins.“ mit „Filter zurücksetzen“; darunter der Anbieter-Abschnitt | derselbe `EmptyState`, kein `MapPanel` | Kalender bleibt; je Auswahl `RangeEmpty` Fall 1 |
+
+- Der Leerzustand ohne Gemerktes gilt auch, wenn die URL auf `merkliste-karte`/`-kalender` steht. Die URL bleibt stehen.
+- Neue reine Texte in `format.ts`: `savedFilteredEmpty(total)` („Von deinen 5 gemerkten Angeboten passt keins.“, Singular „Dein gemerktes Angebot passt nicht.“).
 
 ### E6 – Filter auf der Merkliste: eigener Zustand, nicht in der URL
 
-- Typ in `src/domain/saved.ts`:
+- Typ und Funktionen in `src/domain/saved.ts`:
 
 ```ts
 /** Filter der Merkliste (Plan 0025, E6): getrennt vom Startseiten-Filter, nie in der URL. */
 export interface SavedFilter {
   formats: Format[];
   registration: Registration[];
-  /** Zeitraum aus Plan 0023 (Berliner Tage, inklusive); nur Liste und Karte */
+  /** eine der Schnellwahlen „ab …“ (E7); nur Liste und Karte */
   range?: DateRange;
 }
 export const EMPTY_SAVED_FILTER: SavedFilter;
-export function applySavedFilter<T extends Offer>(offers: readonly T[], filter: SavedFilter, now: Date, opts: { useRange: boolean }): T[];
+export function applySavedFilter<T extends Offer & { venue: ReachTarget }>(
+  offers: readonly T[],
+  filter: SavedFilter,
+  now: Date,
+  opts: { useRange: boolean },
+): T[];
 export function savedFilterCount(filter: SavedFilter, opts: { useRange: boolean }): number;
 ```
 
-  `applySavedFilter` nutzt `matchesFilter` (`filter.ts`) für Format und Anmeldung, indem es einen `FilterState` mit leeren übrigen Dimensionen baut, und für den Zeitraum die Funktion aus Plan 0023. Keine eigene Format-, Anmelde- oder Zeitraumlogik. `DateRange` ist der Typ aus Plan 0023 (Name dort nachsehen, siehe Schritt 0).
+  - Die Typgrenze `Offer & { venue: ReachTarget }` stammt aus `matchesFilter` (`filter.ts:120`).
+  - `applySavedFilter` nutzt `matchesFilter` für Format und Anmeldung. Dazu baut es einen `FilterState` mit leeren übrigen Dimensionen. Für den Zeitraum nimmt es die Funktion aus Plan 0023.
+  - Es gibt keine eigene Format-, Anmelde- oder Zeitraumlogik. `DateRange` ist der Typ aus Plan 0023 (den Namen dort nachsehen, Schritt 0).
 - **Zustand:** `useState<SavedFilter>(EMPTY_SAVED_FILTER)` in `App.tsx`, neben `providerQuery`. Er übersteht Tab- und Darstellungswechsel, nicht das Neuladen.
-  - **Nicht in der URL.** Die URL-Parameter `format=`, `anmeldung=`, `von=`, `bis=` gehören der Startseite und gelten auf allen Tabs außer der Merkliste. Eigene Parameter (`m-format=` o. ä.) würden die URL-Logik verdoppeln und sind beim Teilen wertlos: Der Empfänger hat eine andere Merkliste. Leitlinie 2: nicht vermischen.
-  - Verworfen: `sessionStorage` (wie Plan 0021, E1: wenig Nutzen, eine weitere Stelle mit try/catch).
-- **Bedienung:** Filterzeile `SavedFilters` (neue Komponente in `src/ui/SavedFilters.tsx`), gebaut wie `QuickFilters` (`fieldset.plain` > `.chips`, horizontal scrollend), Legende „Merkliste filtern“:
-  - Chips: „Kurse“, „Regelmäßig“, „Einmalig“ (Mehrfachwahl, wie `QuickFilters`), „Mit Anmeldung“, „Ohne Anmeldung“ (**Einfachwahl** wie im Filter-Sheet: der eine schaltet den anderen ab), „Zeitraum“ (öffnet das Zeitraum-Sheet, E7; mit aktivem Zeitraum trägt der Chip den Wert, z. B. „ab 1. Nov.“, `aria-pressed="true"`).
+  - **Nicht in der URL.** Die URL-Parameter `format=`, `anmeldung=`, `von=`, `bis=` gehören der Startseite und gelten auf allen Tabs außer der Merkliste.
+  - Eigene Parameter (`m-format=` o. ä.) würden die URL-Logik verdoppeln und wären beim Teilen wertlos, denn der Empfänger hat eine andere Merkliste. Leitlinie 2: nicht vermischen.
+  - Verworfen: `sessionStorage` (wie Plan 0021, E1). Wenig Nutzen und eine weitere Stelle mit try/catch.
+- **Bedienung:** Filterzeile `SavedFilters` (neue Komponente `src/ui/SavedFilters.tsx`), gebaut wie `QuickFilters` (`fieldset.plain` > `.chips`, horizontal scrollend). Die Legende lautet „Merkliste filtern“. Die Chips:
+  - „Kurse“, „Regelmäßig“, „Einmalig“: Mehrfachwahl, wie in `QuickFilters`.
+  - „Mit Anmeldung“, „Ohne Anmeldung“: **Einfachwahl** wie im Filter-Sheet. Der eine schaltet den anderen ab.
+  - Die drei Schnellwahlen „ab Nov.“, „ab Dez.“, „ab Jan.“ (E7): Einfachwahl untereinander, ein zweiter Tipp auf den gewählten hebt ihn auf. Nur in Liste und Karte.
   - Mit aktivem Filter steht am Ende ein Chip „Zurücksetzen“.
-  - Kein Badge-Knopf „Filter“: Es gibt kein Sheet mit weiteren Dimensionen (Nicht-Ziel).
-- **Wo der Filter wirkt:** Liste (gemerkte Angebote) und Karte mit Format, Anmeldung und Zeitraum; Kalender mit Format und Anmeldung (E5). Anbieter-Abschnitt nie (E3). Export nie (E9).
-- **Startseiten-Filter auf der Merkliste:** wirken nicht, wie heute (Schnellfilter und Sticker sind dort ausgeblendet, `App.tsx:248–249`; die Bedingung wird zu `section !== "merkliste"`). Einzige Ausnahme bleibt `ctx.categoryOf`, das die Kategorie-Pille wählt (Plan 0014); es filtert nichts.
+    - Er setzt den **ganzen** Merklisten-Filter zurück, auch den Zeitraum. Ein Knopf hat eine Bedeutung.
+    - In der Darstellung Kalender erscheint er nur, wenn Format oder Anmeldung aktiv ist (`savedFilterCount(…, { useRange: false }) > 0`). Er löscht dann auch einen dort ausgeblendeten Zeitraum. Das ist bewusst: Wer zurücksetzt, will alles sehen.
+  - Es gibt keinen Badge-Knopf „Filter“ und kein Sheet.
+- **Wo der Filter wirkt:**
+  - Liste und Karte: Format, Anmeldung, Zeitraum.
+  - Kalender: Format und Anmeldung (E5).
+  - Anbieter-Abschnitt (E3) und Export (E9): nie.
+- **Startseiten-Filter auf der Merkliste** wirken nicht, wie heute (E4, Weichen über `section`). Einzige Ausnahme bleibt `ctx.categoryOf`, das die Kategorie-Pille wählt (Plan 0014). Es filtert nichts.
 
-### E7 – Zeitraum mit Schnellwahlen
+### E7 – Schnellwahlen „ab …“ als Chips
 
-- Die Merkliste nutzt **dieselbe Zeitraum-Bedienung** wie die Startseite aus Plan 0023 (Komponente und Texte von dort), in einem eigenen kleinen Sheet „Zeitraum“ (`Overlays.tsx`, neue `SheetKind` `"saved-range"`), Fuß „N gemerkte zeigen“ und „Zurücksetzen“.
-- Ergänzt um **Schnellwahlen** als Chips über den Datumsfeldern (Entscheidung b). Reine Funktion in `src/domain/filter.ts` (bzw. in dem Modul, in das Plan 0023 den Zeitraum legt):
+- Simplicity (Review): Es gibt kein Zeitraum-Sheet und keine freie Datumseingabe auf der Merkliste. Die drei Schnellwahlen der Nutzerentscheidung b stehen als Chips direkt in der Filterzeile.
+- Reine Funktion in `src/domain/filter.ts` (bzw. in dem Modul, in das Plan 0023 den Zeitraum legt):
 
 ```ts
-/** Schnellwahlen „Beginn ab“ (Plan 0025, E7): Monatserste ab heute; nur solche vor dem Ende des Datenstands. */
-export function quickRanges(today: string, dataEnd: string | undefined): Array<{ label: string; range: DateRange }>;
+/** Schnellwahlen „Beginn ab“ (Plan 0025, E7): Monatserste nach heute; nur solche bis zum Ende des Datenstands. */
+export function quickRanges(today: string, dataEnd: string | undefined): Array<{ month: string; range: DateRange }>;
 ```
 
-  - „ab nächstem Monat“ → `{ from: 1. des Folgemonats }` (ohne `to`),
-  - „in 2 Monaten“ → `{ from: 1. des Monats in 2 Monaten }`,
-  - „in 3 Monaten“ → `{ from: 1. des Monats in 3 Monaten }`.
-  - Eine Schnellwahl, deren `from` nach `dataEnd` liegt, fehlt (sie zeigte immer nichts). Ohne `dataEnd` keine.
-  - Beispiel heute (8.10.2026): ab 1.11., ab 1.12., ab 1.1.2027.
-  - Gedeutet als „Beginn ab“, wie der Wunsch es beschreibt („ab wann ein möglicher Beginn …“). Für Kurse heißt das mit der Regel aus Plan 0023: Kurse, deren **erster** Termin ab dann liegt. Genau das braucht die Suche nach einem Ersatzkurs. Regelmäßige Gruppen passen, wenn sie dann noch Termine haben.
-- **Auch auf der Startseite:** Die Schnellwahlen stecken in der gemeinsamen Zeitraum-Komponente, erscheinen also auch im Filter-Sheet der Startseite. Bringt Plan 0023 schon Schnellwahlen mit, werden diese drei dort ergänzt statt doppelt gebaut.
-- Eine gewählte Schnellwahl ist danach einfach ein Zeitraum; der Chip zeigt den Wert („ab 1. Nov.“), nicht den Namen der Schnellwahl.
+  - Die Schnellwahlen sind die Monatsersten der nächsten drei Monate, je `{ from: YYYY-MM-01 }` ohne `to`. „ab nächstem Monat“ ist der 1. des Folgemonats, „in 2 Monaten“ der 1. des übernächsten, „in 3 Monaten“ der 1. des dritten Monats.
+  - `month` ist der Monat (`YYYY-MM`). Die Beschriftung macht `format.ts`: `quickRangeLabel(month)` → „ab Nov.“, „ab Dez.“, „ab Jan.“. Die Monatsnamen sind abgekürzt, Mai, Juni und Juli ohne Punkt („ab Mai“, „ab Juni“, „ab Juli“).
+  - Eine Schnellwahl, deren `from` nach `dataEnd` liegt, fehlt, denn sie zeigte immer nichts. Ohne `dataEnd` gibt es keine.
+  - Beispiel heute (8.10.2026): „ab Nov.“, „ab Dez.“, „ab Jan.“.
+- Gedeutet wird das als „Beginn ab“, wie der Wunsch es beschreibt („ab wann ein möglicher Beginn …“).
+  - Für Kurse heißt das mit der Regel aus Plan 0023: Kurse, deren **erster** Termin ab dann liegt. Genau das braucht die Suche nach einem Ersatzkurs.
+  - Regelmäßige Gruppen passen, wenn sie dann noch Termine haben.
+- Ein gewählter Chip hat `aria-pressed="true"`. Der zugängliche Name ist der sichtbare Text „ab Nov.“, ohne `aria-label` und ohne `<abbr>`. Mit der Legende „Merkliste filtern“ ist er verständlich.
 
 ### E8 – Tab „Kalender“ entfällt
 
-- `TAB_ITEMS` (`Chrome.tsx:130–136`): Entdecken · Anbieter · Merkliste. Reihenfolge sonst unverändert (Merkliste ganz rechts, Plan 0010, E2).
-- `styles/tabs.css`: Daumen `at-0` … `at-2` für drei Spalten. Die Regeln aus `docs/architecture.md:117` gelten weiter (Rand, Label 12 px, Nur-Icon unter `4.25rem` Spaltenbreite, Seitenleiste quer, kompakt quer). Die Seitenleiste quer wird mit drei Tabs niedriger; die Höhenrechnung aus Plan 0010 (E2) wird im Layout-Test mit drei Tabs neu belegt. `docs/architecture.md` bekommt „drei Spalten“.
-- **Alte Links `?ansicht=kalender`:** `parseRoute` liest `kalender` als `entdecken` (passiert durch `TABS.find(…) ?? "entdecken"` schon von selbst). Neu: `useRoute` ersetzt beim Start die URL einmal per `replaceState` durch die kanonische (`routeToSearch`), wenn `ansicht=kalender` darin stand, damit der Parameter nicht stehen bleibt. Reine Hilfe in `route.ts`: `isLegacyView(search): boolean`. Filter (`kat=`, `wegzeit=` …), `anbieter=` und `angebot=` bleiben erhalten.
-  - Ziel „Entdecken“ statt „Merkliste“: Der alte Kalender zeigte **alle** Angebote nach Datum. Das gibt es jetzt in „Entdecken“ mit Zeitraum (Entscheidung a). Ein geteilter Link meinte nie die Merkliste des Empfängers.
-- **Push, Service Worker, ICS:** keine Änderung. Die Wochen-Nachricht öffnet die Startseite (`docs/architecture.md:86`), der Service Worker kennt keine Ansichten, ICS-Links und der Toast „Kalender-Datei braucht Netz“ hängen nicht am Tab.
-- **Wegzeit-Platzhalter** (`App.tsx:377`): Der Zweig für den Kalender fällt weg. Die Merkliste wartet nie auf die Wegzeit (keine Grenze). `docs/architecture.md:65` („ersetzt ein Platzhalter-Block Liste und Kalender“) wird zu „die Liste“.
-- **`use-offer-views.ts`:** der Block `calendar` für „Entdecken“ entfällt (`index`, `allIndex`, `endedToday` über `route.filter`), stattdessen `savedCalendar` (E5) mit `index`/`allIndex` über die gemerkten Angebote, nur bei `route.tab === "merkliste-kalender"` berechnet.
-- **Skripte:** `scripts/screenshots.ts` Ansicht `kalender` → `merkliste-kalender` (merkt vorher zwei Fixtures). `scripts/font-fallback.ts` behält „Kalender“ als Probe (Umschalter). Ändern sich dadurch die `size-adjust`-Werte nicht, bleibt `tokens.css` unberührt; sonst Skript laufen lassen und übernehmen (`docs/architecture.md:122–123`).
+- `TAB_ITEMS` (`Chrome.tsx:130–136`) wird zu Entdecken · Anbieter · Merkliste. Die Reihenfolge bleibt sonst gleich (Merkliste ganz rechts, Plan 0010, E2).
+- `styles/tabs.css` wird über eine Variable gesteuert. `.tabs` setzt `--n: 3`, und diese Stellen nutzen sie:
+  - `repeat(var(--n), minmax(0, 1fr))` statt `repeat(4, …)` (`:13`),
+  - `/ var(--n)` statt `/ 4` (`:49`, `:187`),
+  - der Daumen `at-0` … `at-2`,
+  - Kopfkommentar `:1` und Kommentar `:197` werden angepasst.
+- Die Regeln aus `docs/architecture.md:117` gelten weiter: Rand, Label 12 px, Nur-Icon unter `4.25rem` Spaltenbreite, Seitenleiste quer, kompakt quer.
+  - Die Seitenleiste quer wird mit drei Tabs niedriger. Die Höhenrechnung aus Plan 0010 (E2) belegt der Layout-Test mit drei Tabs neu.
+  - `docs/architecture.md` bekommt „drei Spalten“.
+- **Alte Links `?ansicht=kalender`:**
+  - `parseRoute` liest `kalender` als `entdecken`. Das passiert durch `TABS.find(…) ?? "entdecken"` schon von selbst.
+  - Neu: `useRoute` ersetzt beim Start die URL einmal per `replaceState` durch die kanonische (`routeToSearch`), wenn `ansicht=kalender` darin stand. Sonst bliebe der Parameter stehen. Die reine Hilfe dafür ist `isLegacyView(search): boolean` in `route.ts`.
+  - Filter (`kat=`, `wegzeit=` …), `anbieter=` und `angebot=` bleiben erhalten.
+  - Ziel ist „Entdecken“, nicht „Merkliste“. Der alte Kalender zeigte **alle** Angebote nach Datum, und das gibt es jetzt in „Entdecken“ mit Zeitraum (Entscheidung a). Ein geteilter Link meinte nie die Merkliste des Empfängers.
+- **Push, Service Worker, ICS:** keine Änderung.
+  - Die Wochen-Nachricht öffnet die Startseite (`docs/architecture.md:86`).
+  - Der Service Worker kennt keine Ansichten.
+  - ICS-Links und der Toast „Kalender-Datei braucht Netz“ hängen nicht am Tab.
+- **Wegzeit-Platzhalter** (`App.tsx:377`): Der Zweig für den Kalender fällt weg. Die Merkliste wartet nie auf die Wegzeit, denn sie hat keine Grenze. `docs/architecture.md:65` („ersetzt ein Platzhalter-Block Liste und Kalender“) wird zu „die Liste“.
+- **`use-offer-views.ts`:** Der Block `calendar` für „Entdecken“ entfällt (`index`, `allIndex`, `endedToday` über `route.filter`). An seine Stelle treten:
+  - `savedVisible`: die gemerkten Angebote nach dem Merklisten-Filter, als neue Eingabe `savedFilter`,
+  - `savedCalendar`: `index`, `allIndex`, `endedToday`, `dataEnd`, `lastDay` sowie Zustand und Setter aus E5. Berechnet wird das nur bei `route.tab === "merkliste-kalender"`.
+- **Skripte:**
+  - `scripts/screenshots.ts`: Die Ansicht `kalender` wird zu `merkliste-kalender` und belegt die Merkliste vorher per `localStorage` vor.
+  - `scripts/font-fallback.ts` behält „Kalender“ als Probe (Umschalter). Ändern sich die `size-adjust`-Werte nicht, bleibt `tokens.css` unberührt. Sonst das Skript laufen lassen und die Werte übernehmen (`docs/architecture.md:122–123`).
 
-### E9 – Merklisten-ICS bleibt korrekt (ADR 0007, ADR 0018)
+### E9 – Der Merklisten-ICS bleibt korrekt (ADR 0007, ADR 0018)
 
-- „Alle in den Kalender“ exportiert **alle** gemerkten Angebote mit kommendem Termin, wie heute: Auswahl `collectionSessions` bzw. nach Plan 0018 `exportSessions`, dieselben VEVENTs und UIDs. Der Merklisten-Filter, die Kalenderauswahl und gemerkte Anbieter ändern daran nichts. ADR 0007 und ADR 0018 bleiben unverändert.
-- Die Zeile darunter (heute `SavedView.tsx:108–111`, Begriffe nach Plan 0022) nennt mit aktivem Merklisten-Filter ausdrücklich „alle 5 gemerkten, auch ausgeblendete“, damit niemand annimmt, nur die sichtbaren gingen in den Kalender. Neuer reiner Text `exportNote(savedCount, sessionCount, filtered: boolean)` in `format.ts`.
-- Der Knopf steht in allen drei Darstellungen an derselben Stelle unter der Filterzeile (auch im Kalender: dort plant man).
-- Der Lader des Export-Chunks bleibt in `SavedView.tsx` (`LAZY_LOADERS`, `ics-entry-only`). Ist Plan 0018 vorher umgesetzt, liegt er in `src/ui/ics-export.ts`, und `SavedView` importiert den Lader von dort. In beiden Fällen kein neuer Lader.
+- „Alle in den Kalender“ exportiert wie heute **alle** gemerkten Angebote mit kommendem Termin.
+  - Die Auswahl trifft `collectionSessions` bzw. nach Plan 0018 `exportSessions`, mit denselben VEVENTs und UIDs.
+  - Merklisten-Filter, Kalenderauswahl und gemerkte Anbieter ändern daran nichts. ADR 0007 und ADR 0018 bleiben unverändert.
+- Der Knopf steht **nur in der Darstellung Liste** (Simplicity). Karte und Kalender bleiben ruhig. Wer exportieren will, ist mit einem Tipp in der Liste.
+- Ist ein Merklisten-Filter aktiv, sagt die Zeile darunter ausdrücklich „alle 5 gemerkten, auch ausgeblendete“. Sonst könnte man annehmen, nur die sichtbaren gingen in den Kalender. Die Begriffe folgen Plan 0022 (heute `SavedView.tsx:108–111`). Der neue reine Text ist `exportNote(savedCount, sessionCount, filtered: boolean)` in `format.ts`.
+- Der Lader des Export-Chunks bleibt in `SavedView.tsx` (`LAZY_LOADERS`, `ics-entry-only`). Ist Plan 0018 vorher umgesetzt, liegt er in `src/ui/ics-export.ts`, und `SavedView` importiert ihn von dort. In beiden Fällen gibt es keinen neuen Lader.
 
 ### E10 – Mobile-UX und Barrierefreiheit
 
-- Neue Ansichten und Overlays bekommen `expectMobileUx` hell und dunkel (`docs/architecture.md:126`): Merkliste Liste (mit Filtern und Anbietern), Karte, Kalender Woche, Kalender Monat mit gewähltem Tag, Zeitraum-Sheet, Anbieter-Sheet mit gemerktem Herz, Leerzustände.
-- Touch-Ziele ≥ 44 px: Herz im Anbieter-Sheet und in der Anbieterzeile, Wochen- und Monatstitel-Knopf, Chips, drei Segmente des Umschalters bei 320 px.
-- Text passt: Anbietername neben dem Herz bricht um (`hyphens: auto`, kein Bruch mitten in kurzen Wörtern), Segmente „Kalender“ einzeilig bei 100 % (Fixture), Statuszeile „**2** von 5 gemerkt · **2** Anbieter“ bei 320 px/200 %.
-- Dunkelmodus: gewählter Wochen-/Monatstitel nutzt `--sel`/`--on-sel` (keine hellen Inseln).
-- Reduzierte Bewegung: Daumen des dreiteiligen Umschalters ohne Transition (über `motion.css`, wie `.seg2`).
-- Screenreader: Statuszeile ist die Live-Region (meldet „2 von 5 gemerkt“ nach Filterwechsel), Titelknöpfe mit `aria-pressed`, `h2.daylabel` für die Auswahl, `h3` je Tag.
+- Neue Ansichten und Overlays bekommen `expectMobileUx`, hell und dunkel (`docs/architecture.md:126`):
+  - Merkliste als Liste, mit Filtern und Anbietern,
+  - Karte,
+  - Kalender in der Woche,
+  - Kalender im Monat mit gewähltem Tag,
+  - Anbieter-Sheet mit gemerktem Herz,
+  - Leerzustände.
+- Touch-Ziele ≥ 44 px: das Herz im Anbieter-Sheet und in der Anbieterzeile, die Titelknöpfe von Woche und Monat, die Chips und die drei Segmente des Umschalters bei 320 px.
+- Text passt:
+  - Der Anbietername neben dem Herz bricht um (`hyphens: auto`, kein Bruch mitten in kurzen Wörtern).
+  - Die Segmente „Liste“, „Karte“ und „Kalender“ bleiben einzeilig (`nowrap`, E4). Zu eng heißt: Der Umschalter bricht als Ganzes in die nächste Zeile.
+  - Die Statuszeile „**2** von 5 gemerkt · **2** Anbieter“ passt bei 320 px/200 %.
+- Dunkelmodus: Ein gewählter Wochen- oder Monatstitel nutzt `--sel`/`--on-sel`, ohne helle Inseln.
+- Reduzierte Bewegung: Der Daumen des dreiteiligen Umschalters hat keine Transition (über `motion.css`, wie der zweiteilige). `scrollIntoView` ist ohne `smooth` (E5).
+- Screenreader:
+  - Die Statuszeile ist die Live-Region und meldet nach einem Filterwechsel „2 von 5 gemerkt“.
+  - Die Titelknöpfe haben `aria-pressed`, der sichtbare Text steht am Anfang des Namens (E5).
+  - `h2.daylabel` bildet die Auswahl ab und sagt die Zahl an; `h3` je Tag.
 
 ### E11 – Start-Budget: im Start-Bundle bleiben, messen
 
-- Die Merkliste bleibt im Start-Bundle. Kalender-Code zieht nur um (`CalendarView` → `SavedCalendar`), der Entdecken-Kalender in `use-offer-views.ts` fällt weg. Neu dazu kommen Anbieter-Abschnitt, Filterzeile, Auswahl-Logik und Texte. Schätzung: +1,0 bis +1,8 kB gzip über alle Etappen.
-- Jede Etappe misst `JS (initial)` und trägt ihr Delta in die Tabelle von ADR 0012 („Nachtrag 2026-10-06: Budget 100 kB“) ein.
-- **Entscheidungspunkt:** Liegt die Summe aller Etappen über +2,5 kB, wird vor dem Merge der nächsten Etappe die Merkliste als Lazy-Chunk geplant (`src/ui/merkliste/`, Vorladen im Leerlauf wie der Export, Eintrag in `startChunks` des Service Workers für offline, Regeln `merkliste-ui-only-lazy`/`-entry-only`, `LAZY_LOADERS`). Das ist ADR 0012 Option (d) für die Merkliste und bekäme ein eigenes ADR. Mit dem Wegfall des Kalender-Tabs trifft der Einwand aus ADR 0012 („Haupt-Tab offline am Vorladen“) nur noch die Merkliste, und die läge im Precache. Siehe N5.
+- Die Merkliste bleibt im Start-Bundle.
+  - Der Kalender-Code zieht nur um (`CalendarView` → `SavedCalendar`), und der Entdecken-Kalender in `use-offer-views.ts` fällt weg.
+  - Dazu kommen Anbieter-Abschnitt, Filterzeile, Auswahl-Logik und Texte.
+  - Schätzung: +1,0 bis +1,5 kB gzip über alle Etappen. Ohne Zeitraum-Sheet ist das weniger als im Entwurf.
+- Jede Etappe misst `JS (initial)` und trägt ihr Delta in die Tabelle von ADR 0012 ein („Nachtrag 2026-10-06: Budget 100 kB“).
+- **Entscheidungspunkt:** Liegt die Summe aller Etappen über +2,5 kB, entscheidet der Nutzer vor dem Merge der nächsten Etappe (N5).
 
 ### E12 – ADR-Prüfung
 
 | ADR | Berührt? | Ergebnis |
 |---|---|---|
 | 0003 Datenmodell | nein | kein Schemafeld, keine ID-Änderung |
-| 0007 Merklisten-ICS | ja, Export | unverändert, E9 |
+| 0007 Merklisten-ICS | ja, Export | unverändert (E9) |
 | 0008 Karte/Kamera-Regel | ja, Merklisten-Karte | `cameraOffers` = alle kommenden; keine Abweichung (E4) |
-| 0011/0017 Wegzeit, Startpunkt | ja, Anlass | Merklisten-Karte ist Anlass wie die Karte; Request gleich für alle |
-| 0012 Startbudget | ja | Delta je Etappe in der Tabelle; Lazy erst am Entscheidungspunkt (E11), dann eigenes ADR |
+| 0010 `src/data` nutzt nur reine Hilfen | ja, Speicher | `preferences.ts` liefert die Rohform, geprüft wird in der Domäne (E1); keine Abweichung |
+| 0011/0017 Wegzeit, Startpunkt | ja, Anlass | Die Merklisten-Karte ist ein Anlass wie die Karte, der Request bleibt für alle gleich |
+| 0012 Startbudget | ja | Delta je Etappe in der Tabelle; ein Lazy-Chunk erst am Entscheidungspunkt (E11), dann mit eigenem ADR |
 | 0013 Service Worker | nein | keine neue Route, kein neuer Start-Chunk |
 | 0014 Push | nein | liest gemerkte Anbieter nicht |
 | 0018 ICS altersgerecht | ja, Export | unverändert |
+| 0019 Statuszeile nur Startpunkt | ja, Statuszeile der Merkliste | Die Merkliste hat eine eigene Statuszeile mit Zahlen und ohne Startpunkt (E3). Die anderen Statuszeilen bleiben wie in ADR 0019; keine Abweichung |
 
-**Ergebnis: kein neues ADR.** Geändert werden Regeln in `docs/architecture.md` (Tab-Leiste drei Spalten, Privatsphäre um gemerkte Anbieter, Wegzeit-Platzhalter nur Liste, Karte der Merkliste als Wegzeit-Anlass) und Pläne per Vermerk (E13). Kommt es zum Lazy-Chunk (E11), wird das ein ADR.
+**Ergebnis: kein neues ADR.** Geändert werden Regeln in `docs/architecture.md`: Tab-Leiste mit drei Spalten, Privatsphäre um gemerkte Anbieter ergänzt, Wegzeit-Platzhalter nur noch für die Liste, Karte der Merkliste als Wegzeit-Anlass. Pläne bekommen Vermerke (E13). Kommt es zum Lazy-Chunk (E11), wird das ein ADR.
 
 ### E13 – Doku
 
 - `docs/architecture.md`: wie in E12, dazu im Datenfluss-Block „wegzeit.json nur auf Anlass (Kind-Sheet, Karte **auch auf der Merkliste**, …)“.
-- `docs/ideas.md`: „Anbieter merken oder ‚folgen‘“ und „Karte im Kalender oder in der Merkliste“ entfallen (umgesetzt). „Kalender und Merkliste als Lazy-Chunks“ wird zu „Merkliste als Lazy-Chunk“ mit Verweis auf E11. Neu: „Herz in der Anbieterliste“, „Neue Angebote gemerkter Anbieter in der Wochen-Nachricht“, „Merklisten-Filter in der URL“; je nach N1 „Angebote gemerkter Anbieter in der Merkliste“.
-- Vermerke `> **Geändert durch Plan 0025:** …` in Plan 0003 (Z. 10 drei Bereiche, Z. 71 `ansicht=kalender`, E14 Kalender), Plan 0005 (Nicht-Ziel „Karte in der Merkliste“, E5 Umschalter), Plan 0007 (E5 Monat klappt zu), Plan 0008 (E12 Leerzustand Kalender), Plan 0010 (Z. 11 und E2 vier Tabs, Nicht-Ziel „Anbieter merken“), Plan 0021 (Test „Hinweis auf Tab Kalender“).
-- `README.md`: falls es Tabs aufzählt, anpassen (grep in Schritt 0).
+- `docs/ideas.md`:
+  - entfallen, weil umgesetzt: „Anbieter merken oder ‚folgen‘“ (`:61`) und „Karte im Kalender oder in der Merkliste“,
+  - „Kalender und Merkliste als Lazy-Chunks“ wird zu „Merkliste als Lazy-Chunk“, mit Verweis auf E11,
+  - neu:
+    - **„Angebote gemerkter Anbieter in der Merkliste“** (früher Etappe 5, N1): ein Chip „+ von meinen Anbietern“ in Liste und Karte, Standard aus, eigener Abschnitt „Von deinen Anbietern“, auf der Karte auch ihre Orte; Kalender, Export und Badge zählen sie nie. Stärkt die Suche nach einem Ersatzkurs. Logik als reine Funktion in `saved.ts`, nicht aus `directory.ts` (nur Lazy-Chunk).
+    - „Herz in der Anbieterliste“,
+    - „Neue Angebote gemerkter Anbieter in der Wochen-Nachricht“,
+    - „Merklisten-Filter in der URL“,
+    - „Freie Datumseingabe auf der Merkliste“.
+- Vermerke `> **Geändert durch Plan 0025:** …` in:
+  - Plan 0003: Z. 10 (drei Bereiche), Z. 71 (`ansicht=kalender`), E14 (Kalender),
+  - Plan 0005: Nicht-Ziel „Karte in der Merkliste“, E5 (Umschalter),
+  - Plan 0007: E5 (Monat klappt zu),
+  - Plan 0008: E12 (Leerzustand Kalender),
+  - Plan 0010: Z. 11 und E2 (vier Tabs), Nicht-Ziel „Anbieter merken“,
+  - Plan 0021: Test „Hinweis auf Tab Kalender“.
+- `README.md`: anpassen, falls es Tabs aufzählt (grep in Schritt 0).
 
 ## Tests (test-first)
 
-Domäne zuerst rot, dann Code. Unit-Tests laufen in `America/Los_Angeles`.
+Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angeles`.
 
 1. **`src/domain/saved.test.ts`**
-   - `toggleProvider`: hinzufügen, entfernen per ID, Name eines erneut gemerkten Eintrags wird aktualisiert.
-   - `savedProviderRows`: Name aus `providerName` des aktuellen Datenstands schlägt den Schnappschuss; ohne kommende Angebote Schnappschuss, `upcoming: 0`, kein `next`; vergangene Angebote zählen nicht; Sortierung `de`.
-   - `applySavedFilter`: Format (ODER), Anmeldung, Zeitraum mit `useRange: true` (Kurs mit erstem Termin im Zeitraum passt, mit erstem Termin davor nicht; regelmäßig passt mit irgendeinem Termin), `useRange: false` ignoriert den Zeitraum; leerer Filter = alle.
-   - `savedFilterCount`.
-2. **`src/domain/calendar.test.ts`**: `selectionRange` für Tag, Woche (Mo–So, Beginn nie vor heute), Monat (1. bis Letzter, Beginn nie vor heute), Monatswechsel Dez → Jan, Zeitumstellung 25.10.2026; `selectionNav` je Einheit inkl. Grenzen (heute, `lastDay`, ohne `lastDay`).
-3. **`src/domain/agenda.test.ts`**: `rangeAgenda` – Gruppen nur für Tage mit Terminen, beendete Termine fallen weg, `ended` nur wenn heute im Bereich, `hidden` = allIndex minus index im Bereich, `afterData`, Termin um 0:30 Berliner Zeit landet am Berliner Tag (LA-Zeitzone). Tests für `dayAgenda` werden zu `rangeAgenda` umgeschrieben.
-4. **`src/domain/route.test.ts`**: `merkliste-karte`/`merkliste-kalender` hin und zurück, `tabSection` beider → `merkliste`, `ansicht=kalender` → `entdecken` mit erhaltenen Filtern, `isLegacyView`.
-5. **`src/domain/filter.test.ts`** (bzw. Modul aus Plan 0023): `quickRanges` am 8.10.2026 (1.11., 1.12., 1.1.2027), am 31.1. (Folgemonat Februar), mit `dataEnd` 20.12. (nur zwei), ohne `dataEnd` (keine).
-6. **`src/data/preferences.test.ts`**: `loadSavedProviders` mit kaputtem JSON, falschen Typen, ungültiger ID, Duplikat, zu langer ID → bereinigt; `saveSavedProviders([])` entfernt den Schlüssel; gespeichert werden nur `id` und `name` (Zusatzfelder fallen weg).
-7. **`src/ui/format.test.ts`**: `selectionHeading`, `savedStatusParts` („5 gemerkt“, „2 von 5 gemerkt · 2 Anbieter“, Singular „1 Anbieter“), `savedMapStatusParts`, `exportNote` mit/ohne Filter, Anbieterzeile („3 kommende Angebote · nächster Mi 7.10.“, „1 kommendes Angebot …“, „Gerade keine Termine im Zwergenplan“).
-8. **`src/ui/use-offer-views.test.ts`**: `savedCalendar` nur bei `merkliste-kalender` gefüllt; Startauswahl Woche von heute; kein `calendar`-Block mehr.
+   - `cleanSavedProviders`:
+     - verwirft eine ungültige ID (Großbuchstaben, Leerzeichen),
+     - verwirft eine zu lange ID (81 Zeichen),
+     - bei Dubletten gilt der erste Eintrag,
+     - die Reihenfolge bleibt erhalten.
+   - `toggleProvider`:
+     - hinzufügen,
+     - entfernen per ID,
+     - erneut gemerkt aktualisiert den Namen.
+   - `savedProviderRows`:
+     - Der Name aus `providerName` des aktuellen Datenstands schlägt den Schnappschuss.
+     - Ohne kommende Angebote gilt der Schnappschuss, mit `upcoming: 0` und ohne `next`.
+     - Vergangene Angebote zählen nicht.
+     - Sortiert wird nach `de`.
+   - `applySavedFilter`:
+     - Format wirkt als ODER, dazu Anmeldung.
+     - Zeitraum mit `useRange: true`: Ein Kurs mit erstem Termin im Zeitraum passt, mit erstem Termin davor nicht. Ein regelmäßiges Angebot passt mit irgendeinem Termin.
+     - `useRange: false` ignoriert den Zeitraum.
+     - Ein leerer Filter ergibt alle.
+   - `savedFilterCount` mit und ohne Zeitraum.
+2. **`src/domain/calendar.test.ts`**: `selectionRange`
+   - für den Tag,
+   - für die Woche: Mo–So, Beginn nie vor heute,
+   - für den Monat: 1. bis Letzter, Beginn nie vor heute,
+   - Monatswechsel Dez → Jan,
+   - Zeitumstellung am 25.10.2026.
 
-**E2E** (Fixtures, Uhr Mo 5.10.2026 12:00; Zahlen in Schritt 0 gegen `tests/fixtures/offers.json` nachrechnen):
+   `calendarNav` bleibt mit seinen Tests.
+3. **`src/domain/agenda.test.ts`**: `rangeAgenda`
+   - Gruppen nur für Tage mit Terminen,
+   - beendete Termine fallen weg,
+   - `ended` nur, wenn heute im Bereich liegt,
+   - `hidden` = `allIndex` minus `index` im Bereich,
+   - `afterData`,
+   - ein Termin um 0:30 Berliner Zeit landet am Berliner Tag (LA-Zeitzone).
+
+   Die Tests für `dayAgenda` werden auf `rangeAgenda` umgeschrieben.
+4. **`src/domain/route.test.ts`**:
+   - `merkliste-karte`/`merkliste-kalender` hin und zurück,
+   - `tabSection` beider ergibt `merkliste`,
+   - `ansicht=kalender` ergibt `entdecken` mit erhaltenen Filtern,
+   - `isLegacyView`.
+
+   `src/domain/ids.test.ts`: `MAX_PROVIDER_ID` ist 80.
+5. **`src/domain/filter.test.ts`** (bzw. das Modul aus Plan 0023): `quickRanges`
+   - am 8.10.2026: 2026-11, 2026-12, 2027-01,
+   - am 31.1.: der Folgemonat ist der Februar,
+   - mit `dataEnd` 20.12.: nur zwei,
+   - ohne `dataEnd`: keine.
+6. **`src/data/preferences.test.ts`** (nur die Form):
+   - kaputtes JSON → `[]`,
+   - kein Array → `[]`,
+   - Einträge mit falschen Typen fallen weg,
+   - `saveSavedProviders([])` entfernt den Schlüssel,
+   - gespeichert werden nur `id` und `name` (Zusatzfelder fallen weg).
+
+   Ungültige ID, Länge und Dubletten prüft Test 1.
+7. **`src/ui/format.test.ts`**:
+   - `selectionHeading`,
+   - `savedStatusParts`: „5 gemerkt“, „2 von 5 gemerkt · 2 Anbieter“, Singular „1 Anbieter“,
+   - `savedMapStatusParts`,
+   - `exportNote` mit und ohne Filter,
+   - `savedFilteredEmpty` im Singular und Plural,
+   - `quickRangeLabel`: „ab Nov.“, „ab Jan.“, „ab Mai“, „ab Juni“,
+   - die Anbieterzeile: „3 kommende Angebote · nächster Mi 7.10.“, „1 kommendes Angebot …“, „Gerade keine Termine im Zwergenplan“.
+8. **`src/ui/use-offer-views.test.ts`**:
+   - `views.map` ist bei `karte` gesetzt (`placeCount` aus `visible`), ebenso bei `merkliste-karte` (`placeCount` aus den gefilterten gemerkten Angeboten). Beide Male ist `cameraOffers` gleich `upcoming`. Sonst ist es `undefined`.
+   - `savedCalendar` ist nur bei `merkliste-kalender` gefüllt.
+   - Die Startauswahl ist die Woche von heute, mit `monthOpen` aus.
+   - `endedToday` zählt ein gemerktes Angebot, dessen einziger Termin heute schon vorbei ist (M7).
+   - Es gibt keinen `calendar`-Block mehr. Die alten Fälle `:121–177, 239–240` werden umgeschrieben oder gestrichen.
+
+**E2E** (Fixtures, Uhr Mo 5.10.2026 12:00). Die Merkliste wird per `localStorage` vorbelegt (`zwergenplan.merkliste`, `zwergenplan.anbieter-merkliste`, über `page.addInitScript`), nicht per Herz-Tipp. Ausnahme sind die Tests, die das Merken selbst prüfen. Die Zahlen werden in Schritt 0 gegen `tests/fixtures/offers.json` nachgerechnet.
 
 9. **`e2e/saved.spec.ts`**, erweitert:
-   - Anbieter merken: Detail „Offener Krabbeltreff“ → „Mehr von diesem Anbieter“ → Herz im Sheet → Toast, `aria-pressed="true"`; Merkliste zeigt Abschnitt „Gemerkte Anbieter“ mit „3 kommende Angebote · nächster Mi 7.10.“; übersteht Neuladen; URL enthält keine Anbieter-ID außer beim offenen Sheet.
-   - Herz in der Anbieterzeile entfernt den Anbieter, Fokus auf der Überschrift bzw. der Statuszeile.
-   - Nur ein Anbieter gemerkt (kein Angebot): kein globaler Leerzustand, Hinweis „Noch keine Angebote gemerkt“, Abschnitt sichtbar.
-   - **Privatsphäre:** Mit gemerktem Anbieter Merkliste öffnen (Liste, Karte mit Kachel-Mock, Kalender): kein Request auf `anbieter.json` und kein Anbieter-Chunk; erst der Tipp auf die Zeile lädt beides genau einmal. Gezählt nach `startPreloads`.
-   - Filter: PEKiP (Kurs, mit Anmeldung, erster Termin 13.10.), Musikgarten (Kurs, mit Anmeldung, erster Termin 5.11.) und Krabbeltreff (regelmäßig, ohne Anmeldung, letzter Termin 4.11.) merken.
-     - „Kurse“ → 2 Karten; dazu „Ohne Anmeldung“ → 0 und Leerzustand mit „Filter zurücksetzen“; Zurücksetzen → 3.
-     - Nur Zeitraum „ab nächstem Monat“ (ab 1.11.) → Musikgarten und Krabbeltreff, nicht PEKiP (Kurs-Regel: erster Termin im Oktober). Statuszeile „**2** von 3 gemerkt“.
-     - Tab-Wechsel und zurück: Filter bleibt. Neuladen: Filter weg. Die URL enthält nie `format=`, `anmeldung=`, `von=` aus der Merkliste; der Startseiten-Filter bleibt unberührt (in „Entdecken“ keine Chips aktiv).
-   - Export mit aktivem Filter enthält weiter alle Termine (Zahl wie ohne Filter), Zeile nennt „auch ausgeblendete“.
-10. **`e2e/merkliste-kalender.spec.ts`** (ersetzt `calendar.spec.ts`), Krabbeltreff und PEKiP gemerkt:
-    - Start: Woche 5.–11. Okt. gewählt (`aria-pressed` am Wochentitel), Liste „Diese Woche“ mit 1 Termin (Krabbeltreff Mi 7.10.).
-    - Tipp auf Mi → „Mittwoch, 7. Oktober“, 1 Termin; erneuter Tipp → zurück zur Woche.
-    - Pfeil › → Woche 12.–18. Okt. mit 2 Terminen (PEKiP Di 13., Krabbeltreff Mi 14.), gruppiert mit `h3` je Tag.
-    - „Ganzen Monat zeigen“ → „Oktober 2026“, 7 Termine; Tipp auf den 20. → Tag gewählt, Raster bleibt offen; Monatstitel → wieder Monat; „Monat zuklappen“ → Woche um den Anker; der Monatsknopf behält den Fokus und seine Lage (H2).
-    - Nicht gemerkte Angebote erscheinen nie (z. B. „Krabbelreime & Fingerspiele“ am Fr 9.10.).
-    - Filter „Kurse“ → Woche 12.–18.: 1 Termin; leere Woche 5.–11.: „1 gemerkter Termin blendet der Filter aus“ + Zurücksetzen.
-    - Leere Auswahl ohne Filter: „Für diese Woche hast du nichts gemerkt“ + „Für diese Woche entdecken“ → „Entdecken“ mit `von=`/`bis=` der Woche (ab Etappe 4).
-    - Übernommen aus `calendar.spec.ts`: heute schon vorbei (B2, Elterncafé gemerkt), nach dem Datenhorizont (B8), Detail nimmt den gewählten Termin, „jetzt“ erneuert sich (Timer, `visibilitychange`, Tageswechsel).
-    - Zeitraum-Chip ist im Kalender ausgeblendet, sein Wert gilt wieder in der Liste.
-11. **Umschalter und Route** (`e2e/saved.spec.ts`): Liste | Karte | Kalender setzt `ansicht=merkliste`, `merkliste-karte`, `merkliste-kalender`; Deep-Link auf jede Darstellung; Tab „Merkliste“ aktiv; Fokus bleibt auf dem Segment.
-12. **Merklisten-Karte** (`e2e/karte.spec.ts`, `tiles: "mock"`): Orts-Liste nur mit gemerkten Orten; Startausschnitt gleich dem von „Entdecken“ (Kamera-Regel: gleiche Kachel-Requests beim ersten Öffnen); Öffnen lädt die Wegzeit-Tabelle (Anlass), Liste und Kalender der Merkliste nicht (`e2e/startpunkt.spec.ts`).
-13. **Alte URL** (`e2e/app.spec.ts`): `?ansicht=kalender&kat=musik` → URL wird `?kat=musik`, Tab „Entdecken“ aktiv, Musik-Filter aktiv; `?ansicht=kalender&anbieter=theater-beispiel` → Sheet offen über „Entdecken“.
-14. **Tab-Leiste** (`e2e/layout.spec.ts`): drei Tabs (`TAB_NAMES = ["Entdecken", "Anbieter", "Merkliste"]`), Spalten, Badge, Seitenleiste quer, kompakt quer, 320–412 px, 100–200 %.
-15. **Mobile-UX-Matrix** (`e2e/mobile-ux.spec.ts`), neue Zustände statt `kalender`/`kalender-woche`: `merkliste-liste` (3 gemerkt, 1 Anbieter, Filter „Kurse“ aktiv), `merkliste-karte`, `merkliste-kalender-woche`, `merkliste-kalender-monat` (Tag gewählt), `merkliste-zeitraum-sheet`, `anbieter-sheet-gemerkt`, `merkliste-nur-anbieter`. Der Test „Kalender bei 320 px, reduzierte Bewegung“ (`:455–460`) läuft im Merklisten-Kalender.
+   - **Anbieter merken:**
+     - Detail „Offener Krabbeltreff“ → „Mehr von diesem Anbieter“ → Herz im Sheet. Erwartet: Toast und `aria-pressed="true"`.
+     - Die Merkliste zeigt den Abschnitt „Gemerkte Anbieter“ mit „3 kommende Angebote · nächster Mi 7.10.“.
+     - Das übersteht ein Neuladen.
+     - Die URL enthält keine Anbieter-ID, außer bei offenem Sheet.
+   - Das Herz in der Anbieterzeile entfernt den Anbieter. Der Fokus landet auf der Überschrift bzw. der Statuszeile.
+   - **Nur ein Anbieter gemerkt** (vorbelegt):
+     - Liste mit Hinweis und Abschnitt.
+     - Karte: „Noch keine Angebote gemerkt“, `.map-box` hat die Anzahl 0, kein Kachel-Request.
+     - Kalender: Leerzustand ohne Wochenstreifen.
+   - **Privatsphäre:** Merkliste mit gemerktem Anbieter öffnen, nacheinander Liste, Karte (Kachel-Mock) und Kalender. Es gibt keinen Request auf `anbieter.json` und keinen Anbieter-Chunk. Erst der Tipp auf die Zeile lädt beides, je genau einmal. Gezählt wird nach `startPreloads`.
+   - **Filter:** PEKiP (Kurs, mit Anmeldung, erster Termin 13.10.), Musikgarten (Kurs, mit Anmeldung, erster Termin 5.11.) und Krabbeltreff (regelmäßig, ohne Anmeldung, letzter Termin 4.11.) vorbelegen.
+     - „Kurse“ ergibt 2 Karten. Mit zusätzlich „Ohne Anmeldung“ ergibt es 0, mit „Nichts, was zu deinem Filter passt“ / „Von deinen 3 gemerkten Angeboten passt keins.“ und „Filter zurücksetzen“. Zurücksetzen ergibt 3.
+     - Nur „ab Nov.“ ergibt Musikgarten und Krabbeltreff, nicht PEKiP (Kurs-Regel: erster Termin im Oktober). Die Statuszeile zeigt „**2** von 3 gemerkt“.
+     - Es stehen genau „ab Nov.“ und „ab Dez.“ da. „ab Jan.“ fehlt, weil der letzte Fixture-Termin am 10.12. liegt (Musikgarten; in Schritt 0 nachprüfen).
+     - Tab-Wechsel und zurück: Der Filter bleibt. Neuladen: Der Filter ist weg.
+     - Die URL enthält nie `format=`, `anmeldung=` oder `von=` aus der Merkliste. Der Startseiten-Filter bleibt unberührt, in „Entdecken“ ist kein Chip aktiv.
+   - **Export:** Er steht nur in der Liste, nicht in Karte und Kalender. Mit aktivem Filter enthält er weiter alle Termine (dieselbe Zahl wie ohne Filter), und die Zeile nennt „auch ausgeblendete“.
+10. **`e2e/merkliste-kalender.spec.ts`** (ersetzt `calendar.spec.ts`), mit Krabbeltreff und PEKiP vorbelegt:
+    - **Start:** Die Woche 5.–11. Okt. ist gewählt (`aria-pressed` am Wochentitel). Die Liste „Diese Woche“ hat 1 Termin (Krabbeltreff Mi 7.10.).
+    - **Tag und Woche:**
+      - Tipp auf Mi ergibt „Mittwoch, 7. Oktober“ mit 1 Termin.
+      - Tipp auf den Wochentitel führt zurück zur Woche.
+      - Ein zweiter Tipp auf Mi lässt den Tag gewählt.
+    - **Blättern:** Pfeil › ergibt die Woche 12.–18. Okt. mit 2 Terminen (PEKiP Di 13., Krabbeltreff Mi 14.), gruppiert mit `h3` je Tag.
+    - **Monat:**
+      - „Ganzen Monat zeigen“ ergibt „Oktober 2026“ mit 7 Terminen.
+      - Tipp auf den 20.: Der Tag ist gewählt, das Raster bleibt offen, und bei 320×640 liegt `h2.daylabel` danach im Viewport (M3).
+      - Der Monatstitel wählt wieder den Monat.
+      - „Monat zuklappen“ ergibt die Woche um den Anker. Der Monatsknopf behält Fokus und Lage (H2).
+    - **Nur Gemerktes:** Nicht gemerkte Angebote erscheinen nie, z. B. „Krabbelreime & Fingerspiele“ am Fr 9.10.
+    - **Filter im Kalender:**
+      - Filter „Kurse“ in der Woche 12.–18. ergibt 1 Termin.
+      - In der Woche 5.–11. ergibt er „1 gemerkter Termin blendet der Filter aus“ mit „Zurücksetzen“.
+      - Die Statuszeile zählt ohne Zeitraum.
+    - **Leere Auswahl ohne Filter:** „Für diese Woche hast du nichts gemerkt“ mit „Für diese Woche entdecken“. Der Knopf führt zu „Entdecken“ mit `von=`/`bis=` dieser Woche.
+    - **Übernommen aus `calendar.spec.ts`:**
+      - heute schon vorbei (B2, Elterncafé gemerkt; zählt trotz fehlendem kommenden Termin, M7),
+      - nach dem Datenhorizont (B8),
+      - das Detail nimmt den gewählten Termin,
+      - „jetzt“ erneuert sich (Timer, `visibilitychange`, Tageswechsel).
+    - **Zeitraum:** Die Chips „ab …“ sind im Kalender ausgeblendet. Ihr Wert gilt wieder in der Liste.
+11. **Umschalter und Route** (`e2e/saved.spec.ts`):
+    - Liste | Karte | Kalender setzt `ansicht=merkliste`, `merkliste-karte` bzw. `merkliste-kalender`.
+    - Ein Deep-Link auf jede Darstellung funktioniert, und der Tab „Merkliste“ ist aktiv.
+    - Der Fokus bleibt auf dem Segment.
+    - Auf keiner Merklisten-Ansicht stehen Sticker oder Schnellfilter der Startseite (M1).
+12. **Merklisten-Karte** (`e2e/karte.spec.ts`, `tiles: "mock"`):
+    - Die Orts-Liste enthält nur gemerkte Orte. Die Statuszeile zeigt „N gemerkt an M Orten“.
+    - Der Startausschnitt ist gleich dem von „Entdecken“ (Kamera-Regel: dieselben Kachel-Requests beim ersten Öffnen einer frischen Sitzung).
+    - Das Öffnen lädt die Wegzeit-Tabelle (Anlass), Liste und Kalender der Merkliste nicht (`e2e/startpunkt.spec.ts`).
+13. **Alte URL** (`e2e/app.spec.ts`):
+    - `?ansicht=kalender&kat=musik` → URL wird `?kat=musik`, Tab „Entdecken“ aktiv, Musik-Filter aktiv.
+    - `?ansicht=kalender&anbieter=theater-beispiel` → Sheet offen über „Entdecken“.
+14. **Tab-Leiste** (`e2e/layout.spec.ts`): drei Tabs (`TAB_NAMES = ["Entdecken", "Anbieter", "Merkliste"]`). Geprüft werden Spalten, Badge, Seitenleiste quer und kompakt quer, bei 320–412 px und 100–200 %.
+15. **Mobile-UX-Matrix** (`e2e/mobile-ux.spec.ts`). Neue Zustände statt `kalender`/`kalender-woche`:
+    - `merkliste-liste`: 3 gemerkt, 1 Anbieter, Filter „Kurse“ aktiv,
+    - `merkliste-karte`,
+    - `merkliste-kalender-woche`,
+    - `merkliste-kalender-monat`: Tag gewählt,
+    - `anbieter-sheet-gemerkt`,
+    - `merkliste-nur-anbieter`,
+    - `merkliste-gefiltert-leer`.
+
+    Die Hilfen `calendarAt320`/`weekWithTwoDigitMonday` (`:466–490`) und der Test bei 320 px mit reduzierter Bewegung (`:455–460`) laufen im Merklisten-Kalender. Der Umschalter mit drei Segmenten wird bei 320 px und 200 % geprüft.
 16. **Smoke** (`e2e/smoke.spec.ts:39–40`): Ansicht „Merkliste Kalender“ mit drei gemerkten echten Angeboten bei 320 px/200 %.
 17. **Angepasste Bestandstests**: alle Zeilen der Tabelle in „Ausgangslage“.
 
 ## Schritte
 
 **Schritt 0 – Vorbereitung** (vor jeder Etappe)
-- `git fetch` und prüfen, ob Plan 0022 und (ab Etappe 4) Plan 0023 auf `main` sind. Namen aus Plan 0023 übernehmen (`DateRange`, Zeitraum-Funktion, Zeitraum-Komponente) und in diesem Plan per Vermerk nachtragen.
+- `git fetch` und prüfen, ob Plan 0022 auf `main` ist (Vorbedingung für Etappe 1). Vor Etappe 3 muss auch Plan 0023 dort sein.
+- Namen aus Plan 0023 übernehmen (`DateRange`, Zeitraum-Funktion, Modul) und in diesem Plan per Vermerk nachtragen.
 - `grep -rni "kalender" src e2e scripts docs README.md` und `grep -rn "Stickerheft\|Sticker" src e2e` als Inventar.
-- Fixture-Zahlen der E2E-Fälle nachrechnen; Start-JS auf `main` messen (`pnpm size`).
+- Die Fixture-Zahlen der E2E-Fälle nachrechnen. Das Start-JS auf `main` messen (`pnpm size`).
 
-**Etappe 1 – Anbieter merken** (unabhängig von 0023; einzeln mergebar)
-1. Tests 1 (Teil Anbieter), 6, 7 (Anbieterzeile) rot.
-2. `SavedProvider`, `toggleProvider`, `savedProviderRows` (`saved.ts`); `loadSavedProviders`/`saveSavedProviders` (`preferences.ts`); `useSavedProviders` (`use-app-state.ts`).
-3. Herz im `ProviderSheet` (E2), Props durch `provider-types.ts`, `Overlays.tsx`, `App.tsx`.
-4. Abschnitt „Gemerkte Anbieter“ in `SavedView` (E3), Leerzustände „nur Anbieter“, Statuszeile der Merkliste mit Anbieterzahl.
-5. E2E Test 9 (Anbieter, Privatsphäre), Mobile-UX `anbieter-sheet-gemerkt`, `merkliste-nur-anbieter`.
-6. Doku: Privatsphäre-Invariante, `ideas.md`, Plan 0010 Vermerk. Delta in ADR 0012.
-7. `PW_PORT=4273 pnpm check`, `/arch-review` (Schema des Speichers, > 200 Zeilen wahrscheinlich), Branch, CI, Fast-Forward, `/browser-review live`.
+**Etappe 1 – Anbieter merken** (unabhängig von 0023, einzeln mergebar)
+1. Die Tests 1 (Anbieter-Teil), 4 (`MAX_PROVIDER_ID`), 6 und 7 (Anbieterzeile) rot schreiben.
+2. Logik umsetzen:
+   - `MAX_PROVIDER_ID` nach `ids.ts` verschieben,
+   - `SavedProvider`, `cleanSavedProviders`, `toggleProvider`, `savedProviderRows` in `saved.ts`,
+   - `loadSavedProviders`/`saveSavedProviders` in `preferences.ts` (Rohform),
+   - `useSavedProviders` in `use-app-state.ts`.
+3. Herz im `ProviderSheet` (E2). Die Props laufen durch `provider-types.ts`, `Overlays.tsx` und `App.tsx`.
+4. In `SavedView`:
+   - Abschnitt „Gemerkte Anbieter“ (E3),
+   - Leerzustand „nur Anbieter“ (E5a, nur Liste),
+   - Statuszeile der Merkliste mit Anbieterzahl.
+5. E2E: Test 9 (Anbieter, Privatsphäre, nur Liste). Mobile-UX: `anbieter-sheet-gemerkt`, `merkliste-nur-anbieter`.
+6. Doku: Privatsphäre-Invariante, `ideas.md`, Vermerk in Plan 0010. Das Delta in ADR 0012 eintragen.
+7. `PW_PORT=4273 pnpm check`, `/arch-review` (Speicherformat, wahrscheinlich > 200 Zeilen), Branch, CI, Fast-Forward, `/browser-review live`.
 
-**Etappe 2 – Umschalter und Karte auf der Merkliste**
-1. Test 4 (nur `merkliste-karte`), Test 7 (`savedMapStatusParts`) rot.
-2. `TABS` um `merkliste-karte` erweitern, `tabSection`; `ViewToggle` allgemein (E4), `.seg3`; vorerst zwei Segmente Liste | Karte auf der Merkliste, wenn Etappe 3 noch nicht gemerged ist, sonst gleich drei.
-3. `MapPanel` in der Merkliste mit `cameraOffers = upcoming`, Wegzeit-Anlass.
-4. E2E Tests 11, 12; Mobile-UX `merkliste-karte`.
-5. Doku: `architecture.md` (Anlass), Plan 0005 Vermerk. Delta in ADR 0012. Gates, Review, Merge, Browser-Review.
+**Etappe 2 – Umschalter und Karte auf der Merkliste** (zwei Segmente Liste | Karte)
+1. Rot schreiben:
+   - Test 4 (nur `merkliste-karte`),
+   - Test 7 (`savedMapStatusParts`),
+   - Test 8 (`views.map` für beide Karten).
+2. `TABS` um `merkliste-karte` erweitern, `tabSection` anpassen. `ViewToggle` wird allgemein, mit `--n` und der Daumenbreite in `map.css` (E4).
+3. Die Weichen in `App.tsx` auf `section` umstellen (E4, M1). `views.map` für beide Karten berechnen.
+4. `MapPanel` in der Merkliste mit `cameraOffers = upcoming` und Wegzeit-Anlass. Leerzustände der Karte (E5a).
+5. E2E: Tests 11 und 12 sowie der Karten-Teil von Test 9. Mobile-UX: `merkliste-karte`.
+6. Doku: `architecture.md` (Anlass), Vermerk in Plan 0005. Das Delta in ADR 0012 eintragen. Dann Gates, Review, Merge, Browser-Review.
 
-**Etappe 3 – Merklisten-Kalender, Tab „Kalender“ entfällt**
-1. Tests 2, 3, 4 (Rest), 7 (`selectionHeading`), 8 rot.
-2. `CalendarSelection`, `selectionRange`, `selectionNav` (`calendar.ts`); `rangeAgenda` (`agenda.ts`), `dayAgenda` entfernen.
-3. `git mv src/ui/CalendarView.tsx src/ui/SavedCalendar.tsx`, Umbau nach E5; dritte Option im Umschalter; `use-offer-views.ts` (E8).
-4. Tab entfernen (`TAB_ITEMS`, `tabs.css`), `isLegacyView` + `replaceState` in `useRoute`, Kalender-Zweige in `App.tsx` entfernen.
-5. E2E: Tests 10, 13, 14, 15 (Kalender-Zustände), 16; alle Bestandstests aus der Tabelle anpassen, `calendar.spec.ts` löschen.
-6. `scripts/screenshots.ts`; `node scripts/font-fallback.ts` prüfen.
-7. Doku: `architecture.md` (Tab-Leiste, Wegzeit-Platzhalter), Vermerke Plan 0003, 0007, 0008, 0010, 0021. Delta in ADR 0012.
+**Etappe 3 – Merklisten-Kalender, der Tab „Kalender“ entfällt** (braucht Plan 0023 auf `main`)
+1. Rot schreiben: Tests 2, 3, 4 (Rest), 7 (`selectionHeading`) und 8 (`savedCalendar`, `endedToday`).
+2. Domäne: `CalendarSelection` und `selectionRange` in `calendar.ts`, `rangeAgenda` in `agenda.ts`. `dayAgenda` entfernen.
+3. UI:
+   - `git mv src/ui/CalendarView.tsx src/ui/SavedCalendar.tsx` und nach E5 umbauen,
+   - `scrollIntoView` nach dem Tipp im Monat,
+   - dritte Option `.view-toggle.three` im Umschalter,
+   - Umbau in `use-offer-views.ts` (E8),
+   - Leerzustände des Kalenders.
+4. Den Tab entfernen:
+   - `TAB_ITEMS`,
+   - `tabs.css` über `--n`,
+   - `isLegacyView` mit `replaceState` in `useRoute`,
+   - die Kalender-Zweige in `App.tsx`.
+5. E2E: Tests 10, 13, 14, 15 (Kalender-Zustände) und 16. Alle Bestandstests aus der Tabelle anpassen, `calendar.spec.ts` löschen.
+6. `scripts/screenshots.ts` umstellen, `node scripts/font-fallback.ts` prüfen.
+7. Doku:
+   - `architecture.md`: Tab-Leiste, Wegzeit-Platzhalter,
+   - Vermerke in den Plänen 0003, 0007, 0008, 0010 und 0021,
+   - das Delta in ADR 0012.
 8. Gates, `/arch-review`, Merge, `/browser-review live`.
 
 **Etappe 4 – Filter auf der Merkliste** (braucht Plan 0023 auf `main`)
-1. Tests 1 (`applySavedFilter`, `savedFilterCount`), 5, 7 (`savedStatusParts`, `exportNote`) rot.
-2. `SavedFilter` und Funktionen (`saved.ts`), `quickRanges` (Modul aus 0023).
-3. `SavedFilters.tsx`, Zeitraum-Sheet (`Overlays.tsx`, `SheetKind "saved-range"`), Schnellwahlen in der gemeinsamen Zeitraum-Komponente (auch Startseite), Zustand in `App.tsx`, Statuszeile „N von M gemerkt“, Export-Zeile (E9), Leerzustände mit „Filter zurücksetzen“, Kalender-Leerzustand „Für diese Woche entdecken“.
-4. E2E Test 9 (Filter, Export), Test 10 (Filter im Kalender, „entdecken“-Knopf), Mobile-UX `merkliste-liste`, `merkliste-zeitraum-sheet`.
-5. Doku: `ideas.md` („Merklisten-Filter in der URL“). Delta in ADR 0012. Gates, Review, Merge, Browser-Review.
-
-**Etappe 5 – nur nach Nutzerentscheid N1: Angebote gemerkter Anbieter einbeziehen**
-- Chip „+ von meinen Anbietern“ in der Filterzeile (nur Liste und Karte, Standard aus). An: unter den gemerkten Angeboten ein Abschnitt „Von deinen Anbietern“ mit kommenden, nicht gemerkten Angeboten gemerkter Anbieter, nach denselben Merklisten-Filtern; auf der Karte zusätzlich ihre Orte. Kalender, Export und Badge zählen sie nie. Reine Funktion `providerOffers`-artig in `saved.ts` (nicht aus `directory.ts`, das ist Lazy-Chunk-only). Tests analog zu Etappe 4.
+1. Rot schreiben:
+   - Test 1 (`applySavedFilter`, `savedFilterCount`),
+   - Test 5,
+   - Test 7 (`savedStatusParts`, `exportNote`, `savedFilteredEmpty`, `quickRangeLabel`).
+2. `SavedFilter` und seine Funktionen in `saved.ts`, `quickRanges` im Modul aus 0023.
+3. UI:
+   - `SavedFilters.tsx` mit Chips für Format, Anmeldung und „ab …“,
+   - der Zustand in `App.tsx`,
+   - die Statuszeile „N von M gemerkt“,
+   - die Export-Zeile, nur in der Liste (E9),
+   - die gefilterten Leerzustände (E5a),
+   - „Filter zurücksetzen“ in den Leerzuständen des Kalenders.
+4. E2E: Test 9 (Filter, Export) und Test 10 (Filter im Kalender). Mobile-UX: `merkliste-liste`, `merkliste-gefiltert-leer`.
+5. Doku: Die `ideas.md`-Einträge aus E13. Das Delta in ADR 0012 eintragen. Dann Gates, Review, Merge, Browser-Review.
 
 ## Offene Punkte (Nutzerentscheid)
 
-- **N1 – Angebote gemerkter Anbieter in der Merkliste?** Der Ersatzkurs-Fall (Wunsch 10) wird am stärksten, wenn man „Kurse · mit Anmeldung · ab nächstem Monat“ auch über die Angebote seiner gemerkten Anbieter legen kann – die Kurse, die man noch nicht gemerkt hat, sind ja genau die gesuchten.
-  - (a) Nein, Anbieter sind nur eine Adressliste; zum Suchen öffnet man das Anbieter-Sheet.
-  - (b) **Empfehlung:** Ja, als Schalter-Chip „+ von meinen Anbietern“ in Liste und Karte, Standard aus, eigener Abschnitt „Von deinen Anbietern“; Kalender, Export und Badge bleiben bei gemerkten Angeboten (Etappe 5).
-  - (c) Immer einbeziehen. Dann wäre der Kalender kein Plan mehr, sondern wieder ein Angebotskalender.
-- **N2 – Karte: Orte gemerkter Anbieter zeigen?** Folgt aus N1. **Empfehlung:** nur mit eingeschaltetem Chip aus N1 (Orte ihrer kommenden Angebote), sonst nur Orte gemerkter Angebote. Ohne N1 (b) gibt es keine Anbieter-Orte auf der Karte.
-- **N3 – Export nur der gefilterten Angebote?** Heute (und laut E9) gehen alle gemerkten in die ICS-Datei. Alternative: Mit aktivem Filter exportiert der Knopf nur die sichtbaren („3 in den Kalender“). **Empfehlung:** alle, wie bisher. Der Filter ist zum Suchen gedacht; ein Export, der still vom Filter abhängt, verliert Termine. Die Zeile sagt es (E9). Wer nur einen Teil will, kann im Detail einzeln exportieren.
-- **N4 – Weitere Filter auf der Merkliste?** Der Wunsch nennt „vor allem“ Format und Anmeldung. Kategorie und Kosten wären mit `matchesFilter` billig, kosten aber Platz in der Chipzeile. **Empfehlung:** vorerst nein, nach zwei Wochen Nutzung fragen.
-- **N5 – Falls das Budget reißt (E11): Merkliste lazy?** Nur relevant, wenn die Etappen zusammen mehr als +2,5 kB bringen. **Empfehlung:** dann zuerst die Budgetgrenze prüfen (wie bei Plan 0019: Nutzer hob auf 100 kB) und erst danach einen Lazy-Chunk mit eigenem ADR planen.
-- **N6 – Wochenstart des Kalenders.** Die Woche bleibt Mo–So (Nicht-Ziel „rollende Woche“). Für „seine Woche planen“ ist am Sonntag die neue Woche oft interessanter. **Empfehlung:** so lassen; am Sonntag ist die nächste Woche einen Pfeil entfernt.
+- **N1 – Angebote gemerkter Anbieter in der Merkliste?** Das Review hat entschieden: aus dem Plan genommen, steht als Idee in `docs/ideas.md` (E13). Wer es später will, schreibt einen eigenen Plan.
+- **N2 – Orte gemerkter Anbieter auf der Karte?**
+  - Ohne N1 gibt es Anbieter-Orte nur für Anbieter mit kommenden Angeboten, und das sind dann nicht gemerkte Angebote.
+  - **Empfehlung:** nein. Die Karte zeigt nur Orte gemerkter Angebote, damit jeder Marker dasselbe bedeutet. Wer bei einem Anbieter schauen will, öffnet sein Sheet.
+- **N3 – Nur die gefilterten Angebote exportieren?**
+  - Heute (und laut E9) gehen alle gemerkten in die ICS-Datei.
+  - Die Alternative: Mit aktivem Filter exportiert der Knopf nur die sichtbaren („3 in den Kalender“).
+  - **Empfehlung:** alle, wie bisher. Der Filter dient dem Suchen, und ein Export, der still vom Filter abhängt, verliert Termine. Die Zeile sagt es (E9). Wer nur einen Teil will, exportiert im Detail einzeln.
+- **N4 – Weitere Filter auf der Merkliste?**
+  - Der Wunsch nennt „vor allem“ Format und Anmeldung. Kategorie und Kosten wären mit `matchesFilter` billig, kosten aber Platz in der Chipzeile.
+  - **Empfehlung:** vorerst nein und nach zwei Wochen Nutzung fragen.
+- **N5 – Falls das Budget reißt (E11):** Nur relevant, wenn die Etappen zusammen mehr als +2,5 kB bringen.
+  - **Empfehlung:** zuerst die Budgetgrenze prüfen (wie bei Plan 0019: Der Nutzer hob auf 100 kB). Erst danach einen Lazy-Chunk für die Merkliste mit eigenem ADR planen.
+- **N6 – Wochenstart des Kalenders.**
+  - Die Woche bleibt Mo–So (Nicht-Ziel „rollende Woche“). Für „seine Woche planen“ ist am Sonntag die neue Woche oft interessanter.
+  - **Empfehlung:** so lassen. Am Sonntag ist die nächste Woche einen Pfeil entfernt.
 
 ## Risiken
 
-- **Viele E2E-Änderungen in Etappe 3** (Tabelle oben). Gegenmittel: die Tabelle als Checkliste abarbeiten, `calendar.spec.ts` erst löschen, wenn jeder Test eine Entsprechung oder eine begründete Streichung hat.
-- **Plan 0023 verzögert sich.** Etappen 1–3 brauchen ihn nicht; Etappe 4 wartet.
-- **Mergekonflikte mit 0022/0024** in `SavedView.tsx`, `MapScreen.tsx`, Texten. Gegenmittel: Etappe 1 erst nach 0022; 0024 berührt nur die Karte.
-- **Seitenleiste quer mit drei Tabs** sieht leerer aus. Der Browser-Review prüft das (Etappe 3).
+- **Viele E2E-Änderungen in Etappe 3** (siehe die Tabelle oben).
+  - Gegenmittel: die Tabelle als Checkliste abarbeiten.
+  - `calendar.spec.ts` erst löschen, wenn jeder Test eine Entsprechung oder eine begründete Streichung hat.
+- **Plan 0023 verzögert sich.** Die Etappen 1 und 2 brauchen ihn nicht. Die Etappen 3 und 4 warten. Der Kalender-Tab bleibt so lange bestehen, damit es immer eine Suche nach Datum gibt.
+- **Mergekonflikte mit 0022/0024** in `SavedView.tsx`, `MapScreen.tsx`, `map.css` und den Texten.
+  - Gegenmittel: Etappe 1 erst nach 0022 beginnen.
+  - 0024 berührt nur die Karte.
+- **Die Seitenleiste quer wirkt mit drei Tabs leerer.** Der Browser-Review prüft das (Etappe 3).
+
+## Review (2026-10-08) – Urteil: freigabefähig nach Einarbeitung → eingearbeitet
+
+Unabhängiger `plan-reviewer`. Alle Befunde sind übernommen.
+
+**Blocker**
+- **B1** Formprüfung mit `KEBAB_ID_PATTERN` in `preferences.ts` verletzt ADR 0010. → `preferences.ts` liefert die Rohform, `cleanSavedProviders` steht in `saved.ts` und wird in `useSavedProviders` aufgerufen. `MAX_PROVIDER_ID` zieht nach `ids.ts`. Test 6 ist auf `saved.test.ts` (Test 1) und `preferences.test.ts` (Test 6) aufgeteilt (E1).
+
+**Major**
+- **M1** `route.tab`-Weichen in `App.tsx` (`:248–249`, `:282`, `:358`). → Sie laufen über `section`, `views.map` gilt für beide Karten, mit Unit-Test (E4, Test 8).
+- **M2** `.seg3` existiert schon für einen anderen Zweck, `.seg2` hat kein CSS, und der Daumen ist auf 50 % fest. → `--n` und `calc(100% / var(--n))`, eigene Klasse `.view-toggle.three` mit `nowrap` und Mindestbreite (E4, E10).
+- **M3** Das offene Monatsraster schiebt die Liste unter den Falz. → `scrollIntoView({ block: "nearest" })` ohne `smooth`, Ansage der Zahl, E2E-Prüfung im Viewport (E5, Test 10).
+- **M4** Die Auswahl-API war mehrdeutig. → Zustand `{ selection, monthOpen }` ist festgeschrieben. Die Pfeile laufen über `calendarNav`, `selectionNav` ist gestrichen (E5).
+- **M5** Leerzustände fehlten; eine Karte nur mit Anbietern lud Kacheln. → Tabelle E5a, ohne `MapPanel` bei 0 Treffern, mit Wortlaut.
+- **M6** Plan 0023 ist Vorbedingung für Etappe 3. → Abhängigkeiten, Schritt 0, Etappe 3 und Risiken angepasst.
+- **M7** `endedToday` über `savedOffers` verliert heute beendete Termine. → `endedOnDay` über alle gemerkten Angebote plus Filter (E5, Test 8). Die E2E-Merkliste wird per `localStorage` vorbelegt.
+
+**Minor**
+- Zeilenangaben korrigiert (`use-offer-views.ts:151`, `:110–143`, `:168–178`, `ideas.md:61`). ADR 0019 steht in der Tabelle E12.
+- Das Inventar ist ergänzt: `use-app-state.test.ts:328`, `route.test.ts`, `use-offer-views.test.ts`, `calendar.test.ts`/`agenda.test.ts`, `mobile-ux.spec.ts:466–490`, `scripts/font-fallback.ts:139`.
+- `tabs.css` über `--n` (Z. 1, 13, 49, 187, 197) (E8).
+- Typgrenze `Offer & { venue: ReachTarget }` für `applySavedFilter` (E6).
+- WCAG 2.5.3: Der sichtbare Titeltext steht am Anfang des Namens, der Zusatz als `sr-only` (E5).
+- `h3` „Gemerkte Anbieter“ bekommt `tabIndex={-1}` (E3).
+- Statuszeile im Kalender mit `useRange: false`. „Zurücksetzen“ löscht auch den Zeitraum (E3, E6).
+- In Etappe 2 ist „sonst gleich drei“ gestrichen.
+
+**Simplicity** (alle übernommen)
+- Kein Sheet `saved-range`: Die Schnellwahlen stehen als Chips „ab Nov./Dez./Jan.“ in der Filterzeile, die freie Datumseingabe gibt es nur auf der Startseite (E7).
+- Die Geste „gewählten Tag nochmal antippen → Woche“ ist gestrichen, der Titelknopf bleibt (E5).
+- Etappe 5 (N1) ist aus dem Plan genommen und steht als Eintrag in `docs/ideas.md` (E13).
+- „Alle in den Kalender“ steht nur in der Darstellung Liste (E9).
+
+Abgelehnt wurde nichts.
 
 ## Status
 
-Entwurf. Nächster Schritt: `/plan-review`, danach Nutzerentscheid zu N1–N6.
+Review eingearbeitet, wartet auf die Nutzerentscheide N2–N6. Danach beginnt Etappe 1 (nach dem Merge von Plan 0022).
