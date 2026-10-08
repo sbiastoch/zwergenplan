@@ -614,3 +614,15 @@ Unabhängiger `plan-reviewer`, kein Blocker. Quellen des Reviewers: [Meta, Whats
 | Zusatz: Budget in N1 | Plan 0018 und der Entscheidungspunkt von Plan 0025 genannt (N1) |
 
 Abgelehnt wurde nichts. ADR-Nummer geprüft (Schritt 1): 0020 ist frei und bleibt.
+
+## Browser-Review live (2026-10-08, ca60ec9) – Stufe 1
+
+Geprüft auf https://zwergenplan.app/ (Screenshots Detail und Anbieter-Sheet in sechs Größen, hell und dunkel; Weiterleitung, Bot-User-Agent, ohne JavaScript, Kopieren, Rückfall-Sheet, verschwundenes Angebot, 404, Kachelbilder in voller Größe, in 300 px und als mittlerer 630 × 630-Ausschnitt). Kein blockierender Befund; Konsole ohne Fehler außer der gewollten 404-Antwort.
+
+| Befund | Umgang |
+|---|---|
+| **Mittel**: Im quadratischen Ausschnitt der Bildmitte fehlen Pille und Titelanfang (Kriterium aus E18 nicht erfüllt). In 1,91 : 1 und auf 300 px ist alles lesbar. | Offen für den **Gerätetest (Schritt 9)**: Zeigt WhatsApp oder ein anderer genutzter Messenger die Vorschau quadratisch, bekommt die Kachel eine sichere Zone in der Bildmitte (Inhalt ≈ 630 px breit, links bündig). Nicht auf Verdacht umgebaut. |
+| Niedrig: Der Toast zeigt immer ein Häkchen, auch bei „Dieses Angebot ist nicht mehr im Zwergenplan.“ | nach `docs/ideas.md` |
+| Niedrig: Anbieterseite zählt „43 kommende Angebote“, das Sheet am selben Tag 42; ein Kurs, der vorbei ist, heißt in der Vorschau noch „Kurs ab …“ | erwartbar: Die Vorschau zeigt den Datenstand des Deploys (E3, ADR 0020, Konsequenzen) |
+
+Restpunkte von Stufe 1: Gerätetest durch den Nutzer (Schritt 9, mit dem Kriterium oben). Stufe 2 folgt nach Plan 0025. Der Plan bleibt deshalb `in Umsetzung`.
