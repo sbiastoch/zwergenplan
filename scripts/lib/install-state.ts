@@ -8,15 +8,26 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const STALE_MESSAGE =
-  "node_modules passt nicht zu pnpm-lock.yaml. Abhilfe: pnpm install --frozen-lockfile (Plan 0027, E6)";
+  "node_modules passt nicht zu pnpm-lock.yaml. Abhilfe: pnpm install --frozen-lockfile. " +
+  "Bleibt die Meldung nach der Installation: pnpm-Version mit packageManager in package.json abgleichen (corepack) " +
+  "(Plan 0027, E6)";
+
+export const MISSING_MESSAGE =
+  "node_modules fehlt oder ist nicht mit pnpm (isolated) installiert: node_modules/.pnpm/lock.yaml oder " +
+  "pnpm-lock.yaml fehlt. Abhilfe: pnpm install --frozen-lockfile (Plan 0027, E6)";
+
+function read(path: string): Buffer | undefined {
+  try {
+    return readFileSync(path);
+  } catch {
+    return undefined;
+  }
+}
 
 /** Meldung, wenn die Installation in `root` nicht zum Lockfile passt, sonst `undefined`. */
 export function staleInstall(root: string): string | undefined {
-  try {
-    const lock = readFileSync(join(root, "pnpm-lock.yaml"));
-    const installed = readFileSync(join(root, "node_modules", ".pnpm", "lock.yaml"));
-    return lock.equals(installed) ? undefined : STALE_MESSAGE;
-  } catch {
-    return STALE_MESSAGE;
-  }
+  const lock = read(join(root, "pnpm-lock.yaml"));
+  const installed = read(join(root, "node_modules", ".pnpm", "lock.yaml"));
+  if (lock === undefined || installed === undefined) return MISSING_MESSAGE;
+  return lock.equals(installed) ? undefined : STALE_MESSAGE;
 }
