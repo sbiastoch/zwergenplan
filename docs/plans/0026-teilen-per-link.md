@@ -4,7 +4,7 @@ Status: freigegeben (Stufe 1 umsetzbar; Stufe 2 nach Plan 0025). Review eingearb
 Datum: 2026-10-08
 Bezug:
 - ADR 0002 (Datenfluss), ADR 0003 (stabile IDs), ADR 0009 (`noindex`), ADR 0012 (Startbudget), ADR 0013 (Service Worker), ADR 0016 (nächtlicher Deploy), **neu ADR 0020** (Entwurf, im selben Commit)
-- Plan 0003 (Merkliste nie in der URL), Plan 0010 (Anbieter-Sheet), Plan 0022 (keine „Sticker“-Begriffe), Plan 0025 (Merkliste als Planungszentrale, „Anbieter merken“)
+- Plan 0003 (Merkliste nie in der URL), Plan 0010 (Anbieter-Sheet), Plan 0022 (keine „Sticker“-Begriffe, umgesetzt), Plan 0023 (Zeitraumfilter `von=`/`bis=`, umgesetzt), Plan 0024 (Karte, umgesetzt), Plan 0025 (Merkliste als Planungszentrale, „Anbieter merken“)
 
 ## Ziel
 
@@ -34,8 +34,8 @@ Leitlinien:
 
 ## Ausgangslage
 
-- **Deep Links**: `src/domain/route.ts:28–40` liest `?angebot=` (geprüft mit `OFFER_ID_PATTERN`) und `?anbieter=` (`KEBAB_ID_PATTERN`, höchstens 80 Zeichen). Der Kopfkommentar `route.ts:1–4` sagt: „Links werden geteilt – Geburtsdatum, Merkliste und Darstellung gehören deshalb nie hierher.“ Das steht auch in Plan 0003, Zeile 75.
-- **URL-Pflege**: `src/ui/use-app-state.ts:35` (`urlFor`) baut `pathname + search`, **ohne Fragment**. Jedes `replace` würde ein `#…` also verwerfen. Das ist für Stufe 2 wichtig (E12).
+- **Deep Links**: `src/domain/route.ts:32–44` (`parseRoute`) liest `?angebot=` (geprüft mit `OFFER_ID_PATTERN`) und `?anbieter=` (`KEBAB_ID_PATTERN`, höchstens 80 Zeichen). Der Kopfkommentar `route.ts:1–4` sagt: „Links werden geteilt – Geburtsdatum, Merkliste und Darstellung gehören deshalb nie hierher.“ Das steht auch in Plan 0003, Zeile 75. `routeToSearch` (`route.ts:47–53`) baut die kanonische Query, seit Plan 0023 samt `von=`/`bis=` aus `filterToSearch`.
+- **URL-Pflege**: `src/ui/use-app-state.ts:33–36` (`urlFor`) baut `pathname + search`, **ohne Fragment**. Jedes `replace` würde ein `#…` also verwerfen. Das ist für Stufe 2 wichtig (E12).
 - **Unbekanntes Angebot**: `src/ui/App.tsx:136–139` entfernt `?angebot=` still, wenn es das Angebot nicht gibt, ohne jeden Hinweis. Ein unbekannter Anbieter meldet sich im Sheet (`src/ui/ProviderPanel.tsx:135–138`, `isKnownProvider` in `src/domain/provider-count.ts:14`).
 - **`index.html`**: hat `robots noindex, nofollow` (Zeile 6), `description` (Zeile 10) und genau zwei Inline-Skripte (Bootstrap-Regel, `docs/architecture.md`). `og:`-Tags gibt es nicht.
 - **Build**:
@@ -49,12 +49,12 @@ Leitlinien:
   - Der Horizont beträgt seit ADR 0016 12 Monate, der Bestand wächst also eher.
 - **Service Worker**: `src/sw/routes.ts:45–52` (`RULES`), verdrahtet in `src/sw/sw.ts:66–77`. Die Navigation greift nur für `""` und `index.html` („schale“), alles andere ist `netz`. `scripts/vite-sw.ts:45–56` liest für den Precache nur `<script>` und `<link rel=stylesheet|modulepreload>`. `meta`-Tags stören also nicht.
 - **Detail**: Im Kopf `src/ui/DetailDialog.tsx:83–88` (`.dhead`, `justify-content: space-between`, `dialog.css:64`) stehen „Zurück“ und das Herz (`HeartButton inline`). Das Detail liegt im Start-Bundle.
-- **Anbieter-Sheet**: `src/ui/anbieter/ProviderSheet.tsx` liegt im Lazy-Chunk `assets/anbieter/`. Sein Fuß `:77–83` hat nur „Schließen“. Die Props stehen in `src/ui/provider-types.ts:38–48`.
-- **Toast**: `useToast` steht in `src/ui/use-app-state.ts:178`. Dialoge bekommen ihn als Prop (`Overlays.tsx`), damit er im Top-Layer steht. Die Texte zum Merken nennen noch „Stickerheft“ (`App.tsx:160–168`); Plan 0022 ersetzt sie.
+- **Anbieter-Sheet**: `src/ui/anbieter/ProviderSheet.tsx` liegt im Lazy-Chunk `assets/anbieter/`. Sein Fuß `:77–81` hat nur „Schließen“. Die Props stehen in `src/ui/provider-types.ts:38–48`.
+- **Toast**: `useToast` steht in `src/ui/use-app-state.ts:178`. Dialoge bekommen ihn als Prop (`Overlays.tsx`), damit er im Top-Layer steht. Die Texte zum Merken lauten seit Plan 0022 „Gemerkt – liegt jetzt auf deiner Merkliste“ bzw. „Nicht mehr gemerkt“ (`App.tsx:162`). Neue Texte dieses Plans nennen ebenfalls keine „Sticker“.
 - **Geräte-APIs**: Biome sperrt `navigator` in `src/ui` (`noRestrictedGlobals`). `src/data/geolocation.ts` ist das Muster mit injizierbarer API.
-- **Texte**: Datumswörter (`WEEKDAYS`, `WD_SHORT`, `MONTHS`, `src/ui/format.ts:24–40`) liegen in `src/ui`, und `scripts/` darf `src/ui` nicht importieren (`docs/architecture.md`, Schichten). `rhythm`, `uniformTimes` (`src/domain/agenda.ts:201–217`), `berlinKey`, `berlinIsoDate` und `isoWeekday` (`time.ts`) sind schon in der Domäne.
+- **Texte**: Datumswörter (`WEEKDAYS`, `WD_SHORT`, `MONTHS`, `src/ui/format.ts:24–40`) liegen in `src/ui`, und `scripts/` darf `src/ui` nicht importieren (`docs/architecture.md`, Schichten). `rhythm`, `uniformTimes` (`src/domain/agenda.ts:206–222`), `berlinKey`, `berlinIsoDate` und `isoWeekday` (`time.ts`) sind schon in der Domäne.
 - **Icons**: `scripts/icons.ts` rendert PNGs aus `design/icon.svg` mit Playwright-Chromium, ohne neues Paket, und schreibt nach `public/icons/` (committet).
-- **Budget**: `JS (initial)` 100 kB. Den letzten Stand führt die Delta-Tabelle in ADR 0012 (92,78 kB nach Plan 0017, danach Pläne 0020/0021 ohne Eintrag): **vorher neu messen.** `dist/angebot/**` fällt nicht unter ein Budget, denn die Muster in `.size-limit.json` greifen nur in `dist/assets/` und `dist/data/`.
+- **Budget**: `JS (initial)` 100 kB. Den letzten Stand führt die Delta-Tabelle in ADR 0012: **94,26 kB** nach den Plänen 0022–0024 (Stand `main` d5fab1b), Rest 5,74 kB. **Vor der Umsetzung neu messen**, falls inzwischen weitere Pläne gemergt sind. `dist/angebot/**` fällt nicht unter ein Budget, denn die Muster in `.size-limit.json` greifen nur in `dist/assets/` und `dist/data/`.
 - **Merkliste**: `src/data/preferences.ts:9, 44, 52` (`zwergenplan.merkliste`, JSON-Array von IDs). `src/domain/saved.ts:1–4`: Unbekannte IDs werden nur ausgeblendet, nie gelöscht.
 - **Plan 0025** (Branch `origin/plan-0025-merkliste`, `docs/plans/0025-merkliste-als-planungszentrale.md`):
   - baut `SavedView` um: Liste, Karte und Kalender, der Tab „Kalender“ entfällt,
@@ -132,7 +132,7 @@ Deshalb gilt je Format (alle Zeiten in Berlin, über `time.ts`):
 - `og:description` (höchstens 200 Zeichen, gekürzt am Wortende mit „…“): `{Ort}, {Stadtteil} · {Alter} · {Kosten} · {Anmeldung} – {Anbieter}`.
   - Beispiel: „Familientreff Beispielhaus, Gostenhof · 0–12 Monate · Kostenlos · Ohne Anmeldung – Familientreff Beispiel“.
   - Die Bausteine sind dieselben Texte wie im Detail (`costLabel`, `registrationLabel`, `ageRangeLabel`).
-- **Anbieter**: `og:title` = Name. `og:description` = `{n} kommende Angebote im Zwergenplan · {Kategorien, höchstens 3} · {Stadtteile, höchstens 3}`. „Kommend“ zählt wie das Sheet, relativ zu `generatedAt`. Bei 0 Angeboten steht nur „Im Zwergenplan“ davor.
+- **Anbieter**: `og:title` = Name. `og:description` = `{n} kommende Angebote im Zwergenplan · {Kategorien, höchstens 3} · {Stadtteile, höchstens 3}`. „Kommend“ zählt wie das Sheet (`providerOffers` in `src/domain/directory.ts:149–151`: `nextSession(o, ref) !== undefined`), relativ zu `ref = new Date(generatedAt)`. Der Generator importiert dafür `nextSession` aus `agenda.ts` direkt, nicht `directory.ts` (Regel `directory-only-lazy`). Bei 0 Angeboten steht nur „Im Zwergenplan“ davor.
 - `<title>` = `og:title` + „ – Zwergenplan“. Dazu kommt `<meta name="description">` mit dem Text von `og:description`.
 - **Wo die Texte liegen**: Datumswörter (samt `MONTHS_SHORT`) und die drei Label-Funktionen ziehen aus `src/ui/format.ts` nach **`src/domain/labels.ts`** (rein). `format.ts` re-exportiert sie, damit keine Aufrufer wandern; das Bundle bleibt gleich (Tree-Shaking). So gibt es keine zweite Schreibweise. Die Kombination für die Vorschau steht in `scripts/lib/share-pages.ts`, denn nur der Build braucht sie.
 
@@ -232,9 +232,9 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
   - `"geteilt"` / `"abgebrochen"` → nichts (das System hat schon Rückmeldung gegeben).
   - Texte als Konstanten in `src/ui/format.ts` (`SHARE_COPIED`, `SHARE_MANUAL_HINT`).
 - **Detail** (`DetailDialog.tsx:83–88`): Rechts im Kopf steht eine Gruppe `<div className="dhead-actions">` mit `iconbtn` „Teilen“ (Icon `share`, `aria-label="Teilen"`, 44 × 44) und danach dem Herz. Neue Prop `onShare: (offer: SiteOffer) => void`, verdrahtet in `Overlays.tsx`/`App.tsx` mit `share({ title: offer.title, path: offerSharePath(offer.id) })`.
-- **Anbieter-Sheet** (`ProviderSheet.tsx:77–83`): Der Fuß wird zu `Teilen` (`btn`, Icon `share`) + `Schließen` (`btn primary`), im vorhandenen `.sheetfoot` (Flex-Wrap, bricht bei 200 % Schrift um). Neue Prop `onShare: (provider: { id: string; name: string }) => void` in `ProviderSheetProps` (`provider-types.ts`), gesetzt in `Overlays.tsx`. Das Sheet ruft sie synchron im Klick.
+- **Anbieter-Sheet** (`ProviderSheet.tsx:77–81`): Der Fuß wird zu `Teilen` (`btn`, Icon `share`) + `Schließen` (`btn primary`), im vorhandenen `.sheetfoot` (Flex-Wrap, bricht bei 200 % Schrift um). Neue Prop `onShare: (provider: { id: string; name: string }) => void` in `ProviderSheetProps` (`provider-types.ts`), gesetzt in `Overlays.tsx`. Das Sheet ruft sie synchron im Klick.
 - **Icon** `share` in `icons.tsx`: Strich-Icon „Kasten mit Pfeil nach oben“, kennen beide Plattformen. `PATHS.share = "M12 3v12M8 7l4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"`.
-- **Privatsphäre**: Der Pfad entsteht nur aus der ID, nie aus `location`. Aktive Filter, Ansicht, Geburtsdatum und Startpunkt können also nicht hineingeraten (E2E, Tests 5).
+- **Privatsphäre**: Der Pfad entsteht nur aus der ID, nie aus `location`. Aktive Filter (auch der Zeitraum `von=`/`bis=` aus Plan 0023), Ansicht, Geburtsdatum und Startpunkt können also nicht hineingeraten (E2E, Tests 6).
 
 ### E7 – Weg verschwundener Angebote: `404.html` und Hinweis in der App
 
@@ -378,7 +378,7 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
    - `share` bekommt kein `text`.
 5. **Unit `src/sw/routes.test.ts`**: Navigation auf `angebot/x/`, `anbieter/y/` und `404.html` → `"netz"`.
 6. **E2E `e2e/teilen.spec.ts`** (neu, Fixture-Build):
-   - **Detail**: Stub `navigator.share` per `addInitScript` (zeichnet Aufrufe auf). Detail öffnen, mit aktivem Filter `?kat=…`, Geburtsdatum und Startpunkt gesetzt, „Teilen“ tippen.
+   - **Detail**: Stub `navigator.share` per `addInitScript` (zeichnet Aufrufe auf). Detail öffnen, mit aktiven Filtern `?kat=…&von=…&bis=…` (Plan 0023), Geburtsdatum und Startpunkt gesetzt, „Teilen“ tippen.
      - Aufgerufen genau einmal mit `url` = `{origin}/angebot/<id>/`, ohne `?`, ohne Geburtsdatum, ohne `kat`.
      - `title` = Angebotstitel. Kein Toast.
    - **Fallback**: `navigator.share` auf `undefined`, `navigator.clipboard.writeText` gestubbt → Toast „Link kopiert …“ im Detail sichtbar, kopierter Text = URL.
@@ -434,10 +434,10 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 **Stufe 1** (Branch `teilen-0026-s1`)
 
 1. Inventar und Probe:
-   - `grep -rn "angebot=\|anbieter=\|og:\|Stickerheft" src e2e scripts`.
+   - `grep -rn "angebot=\|anbieter=\|og:" src e2e scripts`.
    - Start-JS auf aktuellem `main` messen (`pnpm build && pnpm size`).
    - Prüfen, ob `vite preview` Verzeichnis-Indizes ausliefert (Tests 6).
-   - Prüfen, ob die Pläne 0022–0025 inzwischen eine ADR-Nummer ≥ 0020 belegen; dann ADR 0020 umnummerieren. Stand 2026-10-08 nach `git fetch`: `origin/main`, `feedback-0022-kleinigkeiten`, `zeitraumfilter-0023`, `karte-look-0024` und `origin/plan-0025-merkliste` enden alle bei ADR 0019. Plan 0025 sieht nur bedingt ein ADR vor (Lazy-Merkliste, dort E11/E12).
+   - Prüfen, ob die Pläne 0022–0025 inzwischen eine ADR-Nummer ≥ 0020 belegen; dann ADR 0020 umnummerieren. Stand 2026-10-08 nach `git fetch`: `origin/main`, `feedback-0022-kleinigkeiten`, `zeitraumfilter-0023`, `karte-look-0024` und `origin/plan-0025-merkliste` enden alle bei ADR 0019. Plan 0025 sieht nur bedingt ein ADR vor (Lazy-Merkliste, dort E11/E12). Nachtrag nach dem Merge von `main` d5fab1b (Pläne 0022–0024): ADR 0021 ist durch Plan 0027 belegt (Branch `plan-0027-verifikation`), 0020 bleibt bei diesem Plan. Ein ADR für Plan 0025 bekäme 0022 oder höher.
 2. `src/domain/labels.ts` herauslösen (Tests 3), `format.ts` re-exportiert. `pnpm check:fast` grün, Bundle-Hash unverändert oder Start-JS ±0.
 3. `src/domain/share.ts` (Pfade) test-first (Tests 2).
 4. `scripts/lib/share-pages.ts` test-first (Tests 1, 10). Danach die Verdrahtung in `build-data.ts`, `.gitignore`, Log-Zeile.

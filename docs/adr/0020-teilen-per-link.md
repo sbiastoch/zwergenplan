@@ -1,6 +1,6 @@
 # ADR 0020 – Teilen per Link: statische Vorschauseiten und Merkliste im Fragment
 
-Status: angenommen (2026-10-08), mit Plan 0026 (Plan-Review eingearbeitet, Nutzerentscheide N1–N4). Punkt 8 (Merkliste im Fragment) gilt erst mit Stufe 2, nach Plan 0025. Ergänzt ADR 0002 (Datenfluss), ADR 0009 (`noindex`) und ADR 0013 (Service Worker, ohne Regeländerung). Ändert die Regel „Merkliste nie in der URL“ (Plan 0003, Zeile 75; Kommentar in `src/domain/route.ts`), aber erst mit Stufe 2. Die Nummer ist am 2026-10-08 gegen `origin/main` und die Branches der Pläne 0022–0025 geprüft (alle enden bei 0019); beim Merge erneut prüfen.
+Status: angenommen (2026-10-08), mit Plan 0026 (Plan-Review eingearbeitet, Nutzerentscheide N1–N4). Punkt 8 (Merkliste im Fragment) gilt erst mit Stufe 2, nach Plan 0025. Ergänzt ADR 0002 (Datenfluss), ADR 0009 (`noindex`) und ADR 0013 (Service Worker, ohne Regeländerung). Ändert die Regel „Merkliste nie in der URL“ (Plan 0003, Zeile 75; Kommentar in `src/domain/route.ts`), aber erst mit Stufe 2. Die Nummer ist am 2026-10-08 gegen `origin/main` und die Branches der Pläne 0022–0025 geprüft (alle endeten bei 0019); nach dem Merge von `main` d5fab1b ist 0021 durch Plan 0027 belegt, 0020 bleibt hier. Beim Merge erneut prüfen.
 
 ## Kontext
 
