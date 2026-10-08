@@ -15,7 +15,7 @@ UI-Texte und Doku sind auf Deutsch, Code-Identifier auf Englisch. Die Kommandos 
 5. **`/browser-review`** bei jeder UI-Änderung **lokal vor dem Commit** (Fixture-Build, volle Checkliste; bei Kleinänderungen nur die betroffenen Ansichten). Fertig, wenn jede Zeile der Checkliste beantwortet ist. Nach dem Deploy folgt `/browser-review live` als Kurzcheck (Plan 0029, A3).
 6. **Commit und Push.**
    - Wer allein im Haupt-Checkout arbeitet, committet direkt auf `main`.
-   - Wer in einem Worktree oder parallel zu einer anderen Session arbeitet, nutzt einen eigenen Branch. Der wird gepusht (CI läuft auf jedem Branch, ohne Deploy) und dann per Fast-Forward nach `main` gebracht.
+   - Wer in einem Worktree oder parallel zu einer anderen Session arbeitet, nutzt einen eigenen Branch. Der wird gepusht (CI läuft auf jedem Branch, ohne Deploy, mit den gewählten E2E-Specs) und dann per Fast-Forward nach `main` gebracht. Auf `main` fährt die CI vor dem Deploy die volle Suite (ADR 0023). Ein grüner Branch-Lauf ist also nicht voll geprüft; welche Specs er fuhr, zeigt der Hinweis „E2E-Auswahl“ des Jobs `scope`.
    - CI ist das einzige Gate vor dem Deploy. Fertig erst, wenn der CI-Lauf auf `main` **grün** ist und die Live-Seite den neuen Stand zeigt: `commit` in https://zwergenplan.app/data/meta.json ist `git rev-parse --short HEAD`. Ausnahme Doku-Pfad (ADR 0021, Teil B): Kam seit dem live ausgelieferten Commit nur Doku dazu (Positivliste wie Stufe 0), fährt die CI nur `check`, ohne E2E und ohne Deploy. Fertig ist ein solcher Commit mit grünem Lauf; `meta.json` zeigt weiter den letzten ausgelieferten Commit. Ob ein Lauf diesen Pfad nahm, zeigt der Hinweis des Jobs „Umfang (Doku-Pfad)“ (`full=false`).
    - **Die CI beobachtet nur die Haupt-Session**, mit `gh run watch <id> -i 120 --exit-status` oder einzelnen `gh run view` im Abstand von mindestens 2 Minuten. Ein Subagent pusht und meldet Branch und SHA. Grund: Parallele Watches mit dem Standardintervall von 3 s haben das API-Limit von 5 000 Anfragen pro Stunde gerissen (Plan 0027, E13).
 
@@ -35,17 +35,18 @@ Der Diff bestimmt die Stufe. `pnpm verify`, der pre-commit-Hook und das Stop-Gat
 - **Stufe C**: alles andere, auch Unbekanntes. Es läuft `check:fast` (Typen, Biome, Architektur, Daten, Vitest, knip, Schema-Drift, Doku), etwa 7 s.
 - Das Stop-Gate prüft einen Inhalt (Tree-ID) nur einmal: Ist er in den letzten 12 h grün geprüft, auch in einem anderen Worktree oder vor einem Commit, läuft nichts. Ein Zeitlimit zählt als Rot.
 
-E2E läuft lokal **gezielt**, die volle Suite fährt die CI auf jedem Branch (etwa 9 Minuten):
+E2E läuft lokal **gezielt**. Die CI fährt auf Branches die gewählten Specs und auf `main` vor dem Deploy die volle Suite, etwa 10 Minuten (ADR 0023):
 
 | Änderung | E2E lokal |
 |---|---|
-| nur Doku; Domänenlogik ohne sichtbare Folge; Daten, Pipeline | keine |
-| sichtbares Verhalten, UI, geänderte Specs | die betroffenen Specs: `pnpm e2e:local e2e/detail.spec.ts`, danach bei UI `/browser-review` |
-| `e2e/fixtures.ts`, `e2e/mobile-ux.ts` | zusätzlich `e2e/theme.spec.ts` |
-| Vorschauseiten, Kachelbilder (`scripts/lib/share-pages.ts`, `scripts/lib/og-card.ts`, `scripts/og-images.ts`) | `e2e/teilen.spec.ts` und `PW_SUITE=smoke pnpm e2e` |
-| Service Worker, Vite-, Playwright-Konfiguration | die im Plan genannten Specs, z. B. `e2e/pwa.spec.ts`; bei der Playwright-Konfiguration die `--list`-Summen aus Plan 0013, Test 1 |
+| nur Doku, Unit-Tests, Pipeline, Daten | keine; `--affected` meldet das selbst |
+| alles andere (UI, Domäne, Specs, E2E-Helfer, Build) | `pnpm e2e:local --affected`, danach bei UI `/browser-review` |
+| Vorschauseiten, Kachelbilder, Daten (die Auswahl nennt Smoke-Specs) | zusätzlich `pnpm e2e:local --affected --smoke` |
+| Playwright-Konfiguration | zusätzlich die `--list`-Summen aus Plan 0013, Test 1 |
 
-- `pnpm e2e:local <spec …>` und `pnpm e2e` laufen immer mit `run_in_background`. `e2e:local` testet auf `pixel-7`, ein anderes Gerät wählt `-- --project=iphone-15`. Es nimmt eine maschinenweite Sperre (`scripts/heavy.ts`), wählt freie Ports und baut `dist-e2e/`. Bricht das Tool den Lauf ab, beendet der Wächter `scripts/heavy-watchdog.ts` die Gruppe des Laufs (Playwright räumt Browser und Server ab), und die Sperre wird frei.
+- `--affected` wählt die Specs aus dem Diff gegen `merge-base HEAD origin/main` samt Arbeitsbaum (Importgraph plus Zuordnung `scripts/lib/e2e-map.ts`, Plan 0029, B4). Lokal laufen höchstens 8 Specs; bei mehr oder bei einer vollen Auswahl (Fixtures, Konfiguration, Styles) laufen die direkt getroffenen Specs plus `app` und `theme`, den Rest prüft die CI. Nachsehen ohne Lauf: `node scripts/e2e-select.ts`, für einzelne Pfade `node scripts/e2e-select.ts <pfad …>`. Specs von Hand zu nennen geht weiter: `pnpm e2e:local e2e/detail.spec.ts`.
+- Eine neue Spec braucht einen Eintrag in `SPEC_COVERS` (`scripts/lib/e2e-map.ts`), ein neues Modul unter `src/ui/` oder `src/sw/` eine Spec dort. Sonst wird `e2e-map.test.ts` rot.
+- `pnpm e2e:local …` und `pnpm e2e` laufen immer mit `run_in_background`. `e2e:local` testet auf `pixel-7`, ein anderes Gerät wählt `-- --project=iphone-15`. Es nimmt eine maschinenweite Sperre (`scripts/heavy.ts`), wählt freie Ports und baut `dist-e2e/`. Bricht das Tool den Lauf ab, beendet der Wächter `scripts/heavy-watchdog.ts` die Gruppe des Laufs (Playwright räumt Browser und Server ab), und die Sperre wird frei.
 - Ist die Sperre belegt, endet es nach 30 s mit Exit 75 und nennt den Halter. Länger warten geht mit `ZP_LOCK_WAIT=1800`.
 - `pnpm exec playwright test` bricht lokal ohne Sperre ab (`e2e/global-setup.ts`). `--list` geht immer. Meldet Playwright „… is already used … set reuseExistingServer:true“, ist ein Port belegt. Dann den Lauf neu starten (er wählt neue Ports) und `reuseExistingServer` nicht ändern, sonst testet der Lauf den Build eines anderen Worktrees.
 - In der inneren Schleife darf `pnpm exec vitest related <datei>` nur die betroffenen Unit-Tests laufen lassen. Für „fertig“ zählt `pnpm verify` mit der ganzen Suite, denn `related` übersieht Tests, die Fixture-Dateien lesen.
