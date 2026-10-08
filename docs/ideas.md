@@ -131,4 +131,10 @@ Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Ein
   - **Installationsknopf auf einem echten Android-Gerät mit Chrome prüfen:** Knopf im Fuß des Kind-Sheets, Dialog, nach `appinstalled` Fokus auf „Fertig“. Headless liefert Chrome kein `beforeinstallprompt`.
   - **iOS-Zeile der Checkliste auf einem echten iPhone abarbeiten** (Safari und Home-Bildschirm-App). Playwright-WebKit deckt das nur teilweise ab.
 - **Plan 0024** (Offene Fragen): Soll ein gewählter Kategoriefilter die Marker-Kategorie bestimmen (wie `leadCategory` mit `focus`)? Heute zählt nur die Häufigkeit.
+- **Plan 0025** (Browser-Review live Etappe 3 mit Plan 0028, 2026-10-09):
+  - Seitenleiste quer: Label und Badge füllen die Pille ganz aus, es bleibt kein Rand. Etwas mehr Innenabstand oder ein kleineres Badge in der Seitenleiste prüfen.
+  - Monatsraster bei 320 px und 200 %: Zweistellige Tage berühren sich. Kleinere Ziffern ab großer Schrift oder ein einspaltiges Wochenraster prüfen.
+  - N5 (Nutzerentscheid): Die Etappen samt Abschlussrunde liegen bei höchstens +2,520 kB Start-JS, über dem Entscheidungspunkt von +2,5 kB (ADR 0012). Erst die Budgetgrenze prüfen, danach erst „Merkliste als Lazy-Chunk“ (oben).
+  - Browser-Review live von Etappe 4 und der Abschlussrunde (Terminliste mit angehängtem Bezugstermin, Leerzustand „Nichts passt zum Alter“, Abstand unter dem Umschalter) nach dem Deploy.
+- **Plan 0028** (Nicht geändert): Der Zeitraumfilter prüft das Alter nicht. Ein regelmäßiges Angebot, das im Zeitraum nur unpassende Termine hat, aber später passt, steht im Zeitraum weiter am ersten Termin darin.
 - Plan 0002, 0013, 0014, 0016, 0020 und 0023 haben darüber hinaus keine Restpunkte.

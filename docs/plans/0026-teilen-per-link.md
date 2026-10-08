@@ -56,7 +56,7 @@ Leitlinien:
 - **Icons**: `scripts/icons.ts` rendert PNGs aus `design/icon.svg` mit Playwright-Chromium, ohne neues Paket, und schreibt nach `public/icons/` (committet).
 - **Budget**: `JS (initial)` 100 kB. Den letzten Stand führt die Delta-Tabelle in ADR 0012: **94,26 kB** nach den Plänen 0022–0024 (Stand `main` d5fab1b), Rest 5,74 kB. **Vor der Umsetzung neu messen**, falls inzwischen weitere Pläne gemergt sind. `dist/angebot/**` fällt nicht unter ein Budget, denn die Muster in `.size-limit.json` greifen nur in `dist/assets/` und `dist/data/`.
 - **Merkliste**: `src/data/preferences.ts:9, 44, 52` (`zwergenplan.merkliste`, JSON-Array von IDs). `src/domain/saved.ts:1–4`: Unbekannte IDs werden nur ausgeblendet, nie gelöscht.
-- **Plan 0025** (Branch `origin/plan-0025-merkliste`, `docs/plans/0025-merkliste-als-planungszentrale.md`):
+- **Plan 0025** (Branch `origin/plan-0025-merkliste`, `docs/plans/archiv/0025-merkliste-als-planungszentrale.md`):
   - baut `SavedView` um: Liste, Karte und Kalender, der Tab „Kalender“ entfällt,
   - bringt „Anbieter merken“ mit dem Schlüssel `zwergenplan.anbieter-merkliste` (Zeile 112),
   - legt fest, dass gemerkte Anbieter „nie in URL“ stehen (Zeile 122). Stufe 2 ändert das für das Fragment ebenso wie für die Merkliste (ADR 0020).

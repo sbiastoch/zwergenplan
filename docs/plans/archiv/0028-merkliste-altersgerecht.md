@@ -1,6 +1,6 @@
 # Plan 0028 – Merkliste und Entdecken nur mit altersgerechten Terminen
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 00b7ec7 (2026-10-09)
 Datum: 2026-10-08
 Bezug: Plan 0018 (ICS nur altersgerecht, archiviert), ADR 0007 (Kurse komplett), ADR 0018, Plan 0021 (Altersfilter), Plan 0025, E3a (Statuszeile der Merkliste)
 
@@ -50,5 +50,6 @@ Plan 0025 (Etappe 3) ersetzt den Kalender in „Entdecken“ durch den Kalender 
 
 ## Restpunkte
 
-- Zeitraumfilter mit Alter, siehe oben.
+- Zeitraumfilter mit Alter, siehe oben; steht in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“.
+- Detail: Der passende Termin lag in der eingeklappten Terminliste manchmal hinter den ersten vier; behoben in der Abschlussrunde von Plan 0025 (`collapsedSessions`).
 - ~~Wortlaut „1 Angebot mit insgesamt 0 Terminen gemerkt“, wenn nichts passt.~~ Erledigt mit B2.
