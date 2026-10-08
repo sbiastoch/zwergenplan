@@ -183,7 +183,10 @@ test("Hochformat 412×915: Tab-Leiste unverändert unten", async ({ page }) => {
 /** Engste Kombination: Seitenleiste plus große Schrift bei geringer Höhe (Pixel 7 quer, Plan 0007, E14). */
 const LANDSCAPE_200: Record<string, (page: Page) => Promise<void>> = {
   Start: async () => {},
-  Kalender: async (page) => {
+  // Seit Plan 0025 (E8) der Kalender der Merkliste
+  "Merkliste Kalender": async (page) => {
+    await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
     await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
   },
@@ -191,7 +194,7 @@ const LANDSCAPE_200: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
   },
-  // Plan 0010, E2: vierter Tab und Merkliste mit Badge in der Seitenleiste
+  // Plan 0010, E2: Tab „Anbieter“ und Merkliste mit Badge in der Seitenleiste
   Anbieter: async (page) => {
     await page.getByRole("button", { name: "Anbieter", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("Anbieter mit");
@@ -300,13 +303,22 @@ test.describe("ICS-Fuß im Detail", () => {
   });
 });
 
-/** Monatsraster 320 × 640 mit offenem Monat */
-async function openMonth(page: Page) {
+/**
+ * Monatsraster 320 × 640 im Kalender der Merkliste (Plan 0025, E5), ein Angebot gemerkt. `day`: ein Tag gewählt statt
+ * des ganzen Monats (dann tragen alle wählbaren Tage ein zartes Feld, `.mgrid.inmonth`).
+ */
+async function openMonth(page: Page, { day = true } = {}) {
   await page.setViewportSize({ width: 320, height: 640 });
-  await ready(page);
-  await page.getByRole("button", { name: "Kalender", exact: true }).click();
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "zwergenplan.merkliste",
+      JSON.stringify(["familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus"]),
+    ),
+  );
+  await page.goto("./?ansicht=merkliste-kalender", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
-  await expect(page.getByText("Oktober 2026")).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Oktober 2026 · / })).toBeVisible();
+  if (day) await page.getByRole("button", { name: "Mittwoch, 14. Oktober, 1 Termin" }).click();
 }
 
 /** Je Zeile des Monatsrasters: Alpha des Hintergrunds je freigegebenem Tag und Lücken zwischen den Feldern. */
@@ -361,6 +373,14 @@ test.describe("Monatsraster", () => {
     const unpressed = await page.locator(".mgrid .mday:not(:disabled):not([aria-pressed='true'])").count();
     expect(f.transparent).toHaveLength(unpressed);
     await expectTouchTargets(page);
+  });
+
+  test("bei 100 % mit gewähltem Monat trägt jeder wählbare Tag ein Feld (Plan 0025, E5)", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await openMonth(page, { day: false });
+    const f = await monthFields(page);
+    expect(f.count, "freigegebene Tage").toBeGreaterThan(20);
+    expect(f.transparent, "Tage ohne Feld").toEqual([]);
   });
 
   for (const dark of DARK) {
@@ -563,7 +583,7 @@ test("Anbietername in Kachel und Detail mit hyphens: auto", async ({ page }) => 
 });
 
 /**
- * Plan 0010, E2: Tab-Leiste mit vier Tabs (Entdecken · Kalender · Anbieter · Merkliste). Gemessen werden Spalten,
+ * Plan 0010, E2; seit Plan 0025 (E8) drei Tabs (Angebote · Anbieter · Merkliste). Gemessen werden Spalten,
  * Labels, Icons, Badge, Daumen und die sichtbare Pille (`.tab-thumb::before`) als Rechtecke im Viewport.
  */
 type Box = { left: number; right: number; top: number; bottom: number; width: number; height: number };
@@ -626,7 +646,12 @@ const inside = (inner: Box, outer: Box, tolerance = 0.5) =>
   inner.top >= outer.top - tolerance &&
   inner.bottom <= outer.bottom + tolerance;
 
-const TAB_NAMES = ["Entdecken", "Kalender", "Anbieter", "Merkliste"];
+const TAB_NAMES = ["Angebote", "Anbieter", "Merkliste"];
+/** Knopf eines Tabs, nur in der Leiste: „Angebote“ träfe sonst auch „Angebote entdecken“ */
+const tabButton = (page: Page, name: string) =>
+  page
+    .getByRole("navigation", { name: "Hauptnavigation" })
+    .getByRole("button", { name: new RegExp(`^${name}(\\s|$)`) });
 
 /** Startseite, `count` Angebote gemerkt (Badge an der Merkliste), Bewegung aus */
 async function withBadge(page: Page, viewport: { width: number; height: number }, count: number) {
@@ -638,14 +663,14 @@ async function withBadge(page: Page, viewport: { width: number; height: number }
   await expect(page.locator(".tab .badge")).toHaveText(String(count));
 }
 
-test.describe("Tab-Leiste mit vier Tabs (Plan 0010, E2)", () => {
+test.describe("Tab-Leiste mit drei Tabs (Plan 0010, E2; Plan 0025, E8)", () => {
   for (const width of [320, 360, 390, 412]) {
-    test(`hochkant ${width} px bei 100 %: vier Labels einzeilig, aktives Label auf der Pille, Badge in der Spalte`, async ({
+    test(`hochkant ${width} px bei 100 %: drei Labels einzeilig, aktives Label auf der Pille, Badge in der Spalte`, async ({
       page,
     }) => {
       await withBadge(page, { width, height: 800 }, 1);
       for (const name of TAB_NAMES) {
-        await page.getByRole("button", { name: new RegExp(`^${name}(\\s|$)`) }).click();
+        await tabButton(page, name).click();
         const m = await tabBar(page);
         expect(m.tabs.map((t) => t.name)).toEqual(TAB_NAMES);
         const at = `${width} px, ${name} aktiv`;
@@ -662,7 +687,7 @@ test.describe("Tab-Leiste mit vier Tabs (Plan 0010, E2)", () => {
         if (!active) continue;
         expect(active.label.left, `${at}: aktives Label links auf der Pille`).toBeGreaterThanOrEqual(m.pill.left - 1);
         expect(active.label.right, `${at}: aktives Label rechts auf der Pille`).toBeLessThanOrEqual(m.pill.right + 1);
-        const saved = m.tabs[3];
+        const saved = m.tabs.at(-1);
         if (!saved?.badge) throw new Error("Badge fehlt");
         expect(inside(saved.badge, saved.box), `${at}: Badge in der eigenen Spalte`).toBe(true);
         expect(inside(saved.badge, m.bar), `${at}: Badge in der Leiste`).toBe(true);
@@ -672,6 +697,7 @@ test.describe("Tab-Leiste mit vier Tabs (Plan 0010, E2)", () => {
 
   for (const [width, scale, labels] of [
     [412, 1.25, true],
+    // drei Tabs (Plan 0025, E8): Schwelle 5,5 rem (tabs.css), Labels weiter bis 125 %
     [412, 1.5, false],
     [412, 1.75, false],
     [320, 2, false],
@@ -692,8 +718,8 @@ test.describe("Tab-Leiste mit vier Tabs (Plan 0010, E2)", () => {
           }
           expect(inside(t.icon, t.box), `${at}: Icon „${t.name}“ in der Spalte`).toBe(true);
         }
-        const saved = m.tabs[3];
-        const neighbour = m.tabs[2];
+        const saved = m.tabs.at(-1);
+        const neighbour = m.tabs.at(-2);
         if (!saved?.badge || !neighbour) throw new Error("Badge fehlt");
         expect(inside(saved.badge, saved.box), `${at}: Badge in der eigenen Spalte`).toBe(true);
         expect(inside(saved.badge, m.bar), `${at}: Badge in der Leiste`).toBe(true);
@@ -716,12 +742,12 @@ test.describe("Tab-Leiste mit vier Tabs (Plan 0010, E2)", () => {
         await withBadge(page, viewport, 1);
         await setTextScale(page, scale);
         for (const name of TAB_NAMES) {
-          await page.getByRole("button", { name: new RegExp(`^${name}(\\s|$)`) }).click();
+          await tabButton(page, name).click();
           const m = await tabBar(page);
           const where = `${at}, ${name} aktiv`;
           expect(m.bar.top, `${where}: Leiste oben mit 8 px Rand`).toBeGreaterThanOrEqual(8);
           expect(m.bar.bottom, `${where}: Leiste unten mit 8 px Rand`).toBeLessThanOrEqual(m.viewport.height - 8);
-          const saved = m.tabs[3];
+          const saved = m.tabs.at(-1);
           if (!saved?.badge) throw new Error("Badge fehlt");
           if (saved.label.width > HIDDEN) {
             expect(overlap(saved.badge, saved.label), `${where}: Badge über dem Label`).toBeLessThanOrEqual(0.5);
@@ -741,21 +767,21 @@ test.describe("Tab-Leiste mit vier Tabs (Plan 0010, E2)", () => {
 
   for (const scale of [1, 1.25, 1.5, 1.75, 2]) {
     const at = `kompakt 568×320 bei ${scale * 100} %`;
-    test(`${at}: höchstens 56 px, ${scale === 1 ? "mit Labels" : "nur Icons"}, nichts ragt heraus`, async ({
-      page,
-    }) => {
+    // drei Tabs (Plan 0025, E8): Spalten 177 px, Labels bis 125 % (tabs.css)
+    const labels = scale <= 1.25;
+    test(`${at}: höchstens 56 px, ${labels ? "mit Labels" : "nur Icons"}, nichts ragt heraus`, async ({ page }) => {
       await withBadge(page, { width: 568, height: 320 }, 1);
       await setTextScale(page, scale);
       const m = await tabBar(page);
       expect(m.barHeight, `${at}: Leiste höchstens 56 px hoch`).toBeLessThanOrEqual(56);
       for (const t of m.tabs) {
-        if (scale === 1) expect(t.label.width, `${at}: Label „${t.name}“ sichtbar`).toBeGreaterThan(HIDDEN);
+        if (labels) expect(t.label.width, `${at}: Label „${t.name}“ sichtbar`).toBeGreaterThan(HIDDEN);
         else expect(t.label.width, `${at}: Label „${t.name}“ nur für Screenreader`).toBeLessThanOrEqual(HIDDEN);
         expect(t.scrollWidth, `${at}: Inhalt von „${t.name}“ ragt nicht heraus`).toBeLessThanOrEqual(t.clientWidth);
         expect(inside(t.icon, t.box), `${at}: Icon „${t.name}“ in der Spalte`).toBe(true);
         if (t.label.width > HIDDEN) expect(inside(t.label, t.box), `${at}: Label „${t.name}“ in der Spalte`).toBe(true);
       }
-      const saved = m.tabs[3];
+      const saved = m.tabs.at(-1);
       if (!saved?.badge) throw new Error("Badge fehlt");
       expect(inside(saved.badge, saved.box), `${at}: Badge in der Spalte`).toBe(true);
       expect(overlap(saved.badge, saved.icon), `${at}: Badge über dem Herz`).toBeLessThanOrEqual(0.5);

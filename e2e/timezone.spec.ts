@@ -16,8 +16,18 @@ test("die Liste rechnet Heute/Morgen in Berlin", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/Morgen\s*Mittwoch, 7\. Oktober/);
 });
 
-test("der Kalender markiert den Berliner Tag als heute", async ({ page }) => {
-  await page.getByRole("button", { name: "Kalender", exact: true }).click();
-  await expect(page.getByRole("heading", { level: 2, name: /Heute, 6\. Oktober/ })).toBeVisible();
+// Seit Plan 0025 (E8) der Kalender der Merkliste, mit vorbelegter Merkliste
+test("der Kalender der Merkliste markiert den Berliner Tag als heute", async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "zwergenplan.merkliste",
+      JSON.stringify(["familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus"]),
+    ),
+  );
+  await page.goto("./?ansicht=merkliste-kalender");
+  const tuesday = page.getByRole("button", { name: /^Dienstag, 6\. Oktober/ });
+  await expect(tuesday).toHaveClass(/\btoday\b/);
   await expect(page.getByRole("button", { name: /^Montag, 5\. Oktober/ })).toBeDisabled();
+  await tuesday.click();
+  await expect(page.getByRole("heading", { level: 2, name: /Heute, 6\. Oktober/ })).toBeVisible();
 });

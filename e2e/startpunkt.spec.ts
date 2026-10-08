@@ -200,18 +200,12 @@ test("Statuszeile: Startpunkt hinter der Zahl, Punkt nie verwaist, kein Überlau
   await page.evaluate((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);
   await expect(page.getByRole("status")).toContainText(`8 Angebote ab heute · ${WEGZEIT_GOSTENHOF}`);
+  // Bis Plan 0025 (E8) lief das auch im Tab „Kalender“ (dort ohne Umschalter, deshalb ab 390 px einzeilig); die
+  // Statuszeile war dieselbe wie in der Liste, und die prüft dieser Test weiter, auch bei 320 px und 200 %.
   await check("Liste, Gostenhof");
-  await page.locator(".tabs").getByRole("button", { name: "Kalender" }).click();
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
-  const calendar = await check("Kalender, Gostenhof");
-  if (width >= 390) {
-    expect(calendar.height, "Kalender ab 390 px: Zahl und Startpunkt in einer Zeile").toBeLessThan(
-      1.5 * calendar.lineHeight,
-    );
-  }
   await page.setViewportSize({ width: 320, height: 640 });
   await setTextScale(page, 2);
-  await check("Kalender, Gostenhof, 320 px, 200 %");
+  await check("Liste, Gostenhof, 320 px, 200 %");
 
   // längster Stadtteil, in der Fixture außerhalb: der längste Zusatz „Luftlinie ab … (außerhalb des Stadtgebiets)“
   await page.evaluate((key) => localStorage.setItem(key, "roethenbach"), KEY);
@@ -263,18 +257,22 @@ test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request 
   const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
   await page.addInitScript((ids) => localStorage.setItem("zwergenplan.merkliste", ids), JSON.stringify([TREFF_ID]));
   await ready(page);
-  // Filter-Sheet, Kalender und die Merkliste als Liste sind kein Anlass (Plan 0025, E4)
+  // Filter-Sheet und die Merkliste als Liste und Kalender sind kein Anlass (Plan 0025, E4, E8)
   await page.getByRole("button", { name: /^Alle Filter/ }).click();
   await page
     .getByRole("dialog", { name: "Filter" })
     .getByRole("button", { name: /Angebote zeigen$/ })
     .click();
-  await page.getByRole("button", { name: "Kalender" }).click();
   await page
     .getByRole("navigation", { name: "Hauptnavigation" })
     .getByRole("button", { name: /^Merkliste/ })
     .click();
   await expect(offers(page)).toHaveCount(1);
+  await page
+    .getByRole("group", { name: "Darstellung der Merkliste" })
+    .getByRole("button", { name: "Kalender", exact: true })
+    .click();
+  await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
   await page.waitForTimeout(500);
   expect(requests).toEqual([]);
 });
@@ -894,23 +892,25 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
   });
 
-  // Arch-Review 0009, Befund 4: auch der Kalender springt nicht von ungefiltert auf gefiltert
-  test("Kalender mit ?wegzeit=20: Platzhalter-Block statt ungefiltertem Kalender", async ({ page }) => {
-    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+  // Bis Plan 0025 (E8) wartete hier der Tab „Kalender“ (Arch-Review 0009, Befund 4). Der Kalender der Merkliste kennt
+  // keine Wegzeit-Grenze und wartet deshalb nie.
+  test("Merkliste ignoriert ?wegzeit=20: Kalender sofort, kein Platzhalter", async ({ page }) => {
+    await page.addInitScript(
+      ([key, ids]) => {
+        localStorage.setItem(key, "gostenhof");
+        localStorage.setItem("zwergenplan.merkliste", ids);
+      },
+      [KEY, JSON.stringify([TREFF_ID])] as const,
+    );
     const release = await holdTable(page);
-    await page.goto("./?ansicht=kalender&wegzeit=20");
-    const pending = page.locator(".list-pending");
-    await expect(pending).toBeVisible();
-    await expect(pending).toHaveText("Wegzeiten werden geladen …");
-    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toHaveCount(0);
-    await expect(offers(page)).toHaveCount(0);
-    await expectStatusHidden(page);
-    await expect(page.getByText(/wirkt|braucht einen Startpunkt/)).toHaveCount(0);
-    release();
+    await page.goto("./?ansicht=merkliste-kalender&wegzeit=20");
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
-    await expect(pending).toHaveCount(0);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
-    await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
+    await expect(offers(page)).toHaveCount(1);
+    await expect(page.locator(".list-pending")).toHaveCount(0);
+    await expect(page.getByRole("status")).toHaveText("1 Angebot mit insgesamt 5 Terminen gemerkt");
+    release();
+    await expect(offers(page)).toHaveCount(1);
+    await expect(page.locator(".list-pending")).toHaveCount(0);
   });
 });
 

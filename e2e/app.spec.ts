@@ -129,10 +129,10 @@ test.describe("Altersfilter im Filter-Sheet (Plan 0021)", () => {
     await expectAccessible(page);
     expect(page.url()).not.toMatch(/2026-09-01|01\.09|alter|passend/);
 
-    // Der Zustand überlebt den Tab-Wechsel
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+    // Der Zustand überlebt den Tab-Wechsel (bis Plan 0025 über den Tab „Kalender“)
+    await page.getByRole("button", { name: "Anbieter", exact: true }).click();
     await expect(warn(page)).toBeVisible();
-    await page.getByRole("button", { name: "Entdecken", exact: true }).click();
+    await page.getByRole("button", { name: "Angebote", exact: true }).click();
 
     await page.getByRole("button", { name: "ausblenden" }).click();
     await expect(offers(page)).toHaveCount(4);
@@ -176,9 +176,8 @@ test.describe("Altersfilter im Filter-Sheet (Plan 0021)", () => {
     await expect(page.getByRole("status")).toBeFocused();
   });
 
-  test("passt gar nichts, bieten Liste, Anbieter und Kalender „Auch unpassende zeigen“ (Karte: karte.spec)", async ({
-    page,
-  }) => {
+  // Den Kalender gibt es nur noch auf der Merkliste, und die ignoriert das Alter (Plan 0025, E8)
+  test("passt gar nichts, bieten Liste und Anbieter „Auch unpassende zeigen“ (Karte: karte.spec)", async ({ page }) => {
     await setBirthDate(page, "01.01.2023");
     const show = page.getByRole("button", { name: "Auch unpassende zeigen" });
 
@@ -190,13 +189,9 @@ test.describe("Altersfilter im Filter-Sheet (Plan 0021)", () => {
     await show.click();
     await expect(page.locator(".place:not(.idle)")).not.toHaveCount(0);
     await expect(page.getByRole("status")).toBeFocused();
-    // wieder an für den Kalender: Der Altersfilter gilt für alle Tabs
-    await page.getByRole("button", { name: "ausblenden" }).click();
-
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
-    await page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Angebote" }).click();
-    await show.click();
-    await expect(offers(page)).toHaveCount(1);
+    // Der Altersfilter gilt für alle Tabs: zurück in „Angebote“ ist er weiter aus
+    await page.getByRole("button", { name: "Angebote", exact: true }).click();
+    await expect(offers(page)).toHaveCount(8);
     await expect(page.getByText(/^Zeigt auch 8 Angebote/)).toBeVisible();
   });
 });
@@ -264,15 +259,51 @@ test.describe("Kategorie-Etikett folgt dem Filter (Plan 0014)", () => {
     });
   }
 
+  // Seit Plan 0025 (E8) im Kalender der Merkliste: Die Kategorie der Startseite wählt nur die Form (Plan 0014)
   test("Kalender: der Punkt im Monatsraster trägt die gewählte Kategorie", async ({ page }) => {
-    await page.goto("./?kat=buehne");
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+    await page.addInitScript(() =>
+      localStorage.setItem(
+        "zwergenplan.merkliste",
+        JSON.stringify(["theater-beispiel--babykonzert-im-advent-20261206t1000--theater-beispiel-buehne"]),
+      ),
+    );
+    await page.goto("./?kat=buehne&ansicht=merkliste-kalender");
     await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
     await page.getByRole("button", { name: "Nächster Monat" }).click();
     await page.getByRole("button", { name: "Nächster Monat" }).click();
-    const day = page.getByRole("button", { name: /^Sonntag, 6\. Dezember, 1 Angebot$/ });
+    const day = page.getByRole("button", { name: /^Sonntag, 6\. Dezember, 1 Termin$/ });
     await expect(day.locator("span.k-buehne")).toHaveCount(1);
     await expect(day.locator("span.k-musik")).toHaveCount(0);
+  });
+});
+
+/** Alte Links auf den entfallenen Tab „Kalender“ landen in „Angebote“, die URL wird kanonisch (Plan 0025, E8, Test 13) */
+test.describe("alte URL ?ansicht=kalender", () => {
+  const tabBar = (page: Page) => page.getByRole("navigation", { name: "Hauptnavigation" });
+
+  test("mit Kategorie: URL ohne ansicht=, Tab „Angebote“, Musik-Filter aktiv", async ({ page }) => {
+    await page.goto("./?ansicht=kalender&kat=musik");
+    await expect(page).toHaveURL((url) => url.search === "?kat=musik");
+    await expect(tabBar(page).getByRole("button", { name: /^Angebote/ })).toHaveAttribute("aria-current", "page");
+    const musik = page.getByRole("group", { name: "Kategorien" }).getByRole("button", { name: /^Musik/ });
+    await expect(musik).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toHaveCount(0);
+  });
+
+  test("mit Anbieter: das Sheet öffnet über „Angebote“", async ({ page }) => {
+    await page.goto("./?ansicht=kalender&anbieter=theater-beispiel");
+    await expect(page.getByRole("dialog", { name: "Anbieter" })).toBeVisible();
+    await expect(page).toHaveURL((url) => url.search === "?anbieter=theater-beispiel");
+    await page.keyboard.press("Escape");
+    await expect(tabBar(page).getByRole("button", { name: /^Angebote/ })).toHaveAttribute("aria-current", "page");
+  });
+
+  // ersetzt e2e/zeitraum.spec.ts „der Kalender zeigt die gefilterten Angebote …“ (Plan 0023, E8)
+  test("mit Zeitraum: „Angebote“ mit Zeitraum, die URL behält von=", async ({ page }) => {
+    await page.goto("./?von=2026-11-06&ansicht=kalender");
+    await expect(page).toHaveURL((url) => url.search === "?von=2026-11-06");
+    await expect(page.getByRole("status")).toContainText("4 Angebote ab");
+    await expect(offers(page).filter({ hasText: "Krabbelreime & Fingerspiele" })).toHaveCount(1);
   });
 });
 

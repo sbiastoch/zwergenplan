@@ -159,7 +159,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(page).toHaveURL(/\?ansicht=karte$/);
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
     await expect(page.getByRole("button", { name: "Karte", exact: true })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByRole("button", { name: "Entdecken" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("button", { name: "Angebote", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("status")).toHaveText("8 Angebote an 5 Orten");
     await expect(places(page)).toHaveCount(5);
     const attribution = page.locator(".maplibregl-ctrl-attrib");
@@ -185,8 +185,9 @@ test.describe("mit gemockten Kacheln", () => {
     await page.reload();
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
 
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
-    await page.getByRole("button", { name: "Entdecken" }).click();
+    // Tab-Wechsel weg von der Karte und zurück (bis Plan 0025 über den Tab „Kalender“)
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("button", { name: "Angebote", exact: true }).click();
     await expect(page).not.toHaveURL(/ansicht/);
     await expect(page.getByRole("button", { name: "Liste", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("offer").first()).toBeVisible();

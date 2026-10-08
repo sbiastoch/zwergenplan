@@ -162,11 +162,5 @@ test("nur „bis“ aus der URL, ungültiges „von“ wird verworfen", async ({
   await expect(sheet.getByLabel("bis")).toHaveValue("2026-10-12");
 });
 
-test("der Kalender zeigt die gefilterten Angebote mit allen ihren Terminen (E8)", async ({ page }) => {
-  // Ab 6.11.: Der Krabbeltreff (letzter Termin 4.11.) fällt heraus, Krabbelreime (6.11., 20.11.) passt und steht
-  // auch an seinem Termin am 9.10., also vor dem Zeitraum.
-  await page.goto("./?von=2026-11-06&ansicht=kalender");
-  await expect(page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Angebote" })).toBeVisible();
-  await page.getByRole("button", { name: "Freitag, 9. Oktober, 1 Angebot" }).click();
-  await expect(page.getByTestId("offer")).toContainText("Krabbelreime & Fingerspiele");
-});
+// „der Kalender zeigt die gefilterten Angebote …“ (E8) entfiel mit dem Tab „Kalender“ (Plan 0025, E8): Der Zeitraum gilt im
+// Kalender der Merkliste nicht, und `?von=…&ansicht=kalender` landet in „Angebote“ mit Zeitraum (e2e/app.spec.ts).

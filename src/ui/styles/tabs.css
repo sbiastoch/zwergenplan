@@ -115,8 +115,11 @@
     grid-row: 2;
     white-space: nowrap;
   }
-  /* Schwelle: längstes Label (4,06 rem) plus 0,2 rem Reserve, in rem, damit sie mit der Schrift wandert */
-  @container (width < 4.25rem) {
+  /* Schwelle in rem, damit sie mit der Schrift wandert. Sie war das längste Label (4,06 rem) plus 0,2 rem Reserve. Mit
+     drei Tabs (Plan 0025, E8) sind die Spalten so breit, dass Labels auch ab 150 % passten; dann wächst aber das Badge
+     am Herz (0,75 rem) in die Label-Zeile. 5,5 rem hält Labels wie bisher bis 125 % (412 px: Spalte 125 px), bei
+     320 px und 100 % bleiben sie (98 px ≥ 88 px). */
+  @container (width < 5.5rem) {
     .tab-label {
       /* wie sr-only */
       position: absolute;
@@ -236,10 +239,13 @@
     :root {
       --tabbar-space: calc(4.5rem + env(safe-area-inset-bottom));
     }
-    /* Herz, Label und Badge stehen hier nebeneinander. Eigene Schwelle (E2, Review 2 M2): Label plus Icon, zwei
-       Abstände und Badge (60 px = 24 + 2 · 6 + 22 + 2). Bei 568 px (Spalte 133 px) mit Labels nur bei 100 %, ab
-       125 % nur Herz und Zähler, der Name nur für Screenreader (wie B7). */
-    @container (width < calc(4.25rem + 60px)) {
+    /* Herz, Label und Badge stehen hier nebeneinander. Eigene Schwelle (E2, Review 2 M2): Label (4,06 rem) und ein
+       dreistelliges Badge (≈ 1,35 rem + 12 px Innenabstand) wachsen mit der Schrift, Icon, zwei Abstände und der
+       Einzug der Karte nicht (24 + 2 · 6 + 4 px). Mit drei Tabs (Plan 0025, E8) ist die Spalte bei 568 px 177 px
+       breit: Labels bis 125 %, ab 150 % nur Herz und Zähler, der Name nur für Screenreader (wie B7). Die frühere
+       Schwelle `4.25rem + 60px` rechnete das Badge fest mit 22 px; bei 639 × 320 und 200 % ragte „100“ dann über
+       die Karte. */
+    @container (width < calc(5.6rem + 52px)) {
       .tab-label {
         position: absolute;
         width: 1px;

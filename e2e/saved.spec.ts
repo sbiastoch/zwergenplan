@@ -1,4 +1,7 @@
-/** Merkliste (Plan 0003, E12, ADR 0007; Kopf, Umschalter und Karte nach Plan 0025, E3a/E4). Fixtures, Uhr Mo 5.10.2026 12:00. */
+/**
+ * Merkliste (Plan 0003, E12, ADR 0007; Kopf, Umschalter, Karte und Kalender nach Plan 0025, E3a/E4/E5). Fixtures, Uhr
+ * Mo 5.10.2026 12:00. Den Kalender selbst prüft e2e/merkliste-kalender.spec.ts.
+ */
 import { readFileSync } from "node:fs";
 import type { Download, Page } from "@playwright/test";
 import { expect, MAP_READY, startPreloads, test } from "./fixtures.ts";
@@ -247,7 +250,7 @@ function tableRequests(page: Page): string[] {
 
 const tabButton = (page: Page, name: string) =>
   page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
-const segment = (page: Page, name: "Liste" | "Karte") =>
+const segment = (page: Page, name: "Liste" | "Karte" | "Kalender") =>
   page.getByRole("group", { name: "Darstellung der Merkliste" }).getByRole("button", { name, exact: true });
 
 test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
@@ -292,7 +295,7 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
   }
 
   for (const scale of [1, 2]) {
-    test(`Umschalter bei 320 px und ${scale * 100} % Text: ${scale === 2 ? "einspaltig ohne Daumen" : "zweispaltig mit Daumen"}`, async ({
+    test(`Umschalter bei 320 px und ${scale * 100} % Text: ${scale === 2 ? "einspaltig ohne Daumen" : "dreispaltig mit Daumen"}`, async ({
       page,
     }) => {
       await page.setViewportSize({ width: 320, height: 800 });
@@ -313,12 +316,17 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
         return {
           columns: getComputedStyle(seg).gridTemplateColumns.trim().split(/\s+/).length,
           thumb: getComputedStyle(thumb).display,
+          // „Kalender“ ist das längste Segment: einzeilig (nowrap) und nicht abgeschnitten (Plan 0025, E4, Test 15)
+          clipped: [...seg.querySelectorAll<HTMLElement>(".seg-btn")]
+            .filter((b) => b.scrollWidth > b.clientWidth + 0.5 || b.getBoundingClientRect().height > 48)
+            .map((b) => b.textContent),
         };
       });
-      if (scale === 2) expect(layout).toEqual({ columns: 1, thumb: "none" });
+      if (scale === 2) expect(layout).toEqual({ columns: 1, thumb: "none", clipped: [] });
       else {
-        expect(layout.columns).toBe(2);
+        expect(layout.columns).toBe(3);
         expect(layout.thumb).not.toBe("none");
+        expect(layout.clipped).toEqual([]);
       }
     });
   }
@@ -340,12 +348,27 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
     await page.waitForTimeout(300);
     expect(requests).toHaveLength(1);
   });
+
+  test("ohne gemerktes Angebot: Leerzustand auch im Kalender, kein Kalender, kein Anlass (Plan 0025, E5a)", async ({
+    page,
+  }) => {
+    await preset(page, [], ["theater-beispiel"]);
+    const requests = tableRequests(page);
+    await page.goto("./?ansicht=merkliste-kalender");
+    await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();
+    await expect(page).toHaveURL(/ansicht=merkliste-kalender$/);
+    await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toHaveCount(0);
+    await expect(page.getByRole("group", { name: "Darstellung der Merkliste" })).toHaveCount(0);
+    await page.waitForTimeout(300);
+    expect(requests).toHaveLength(0);
+  });
 });
 
 test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () => {
   test.use({ tiles: "mock" });
 
-  test("Liste | Karte setzt die Ansicht, der Fokus bleibt auf dem Segment, Export nur in der Liste", async ({
+  test("Liste | Karte | Kalender setzt die Ansicht, der Fokus bleibt auf dem Segment, Export nur in der Liste", async ({
     page,
   }) => {
     await preset(page, FIVE);
@@ -371,11 +394,24 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(page.getByTestId("offer")).toHaveCount(5);
     await expect(page.locator(".map-box")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toBeVisible();
+
+    // dritte Darstellung (Etappe 3): Kalender, Statuszeile wie in der Liste, kein Export-Knopf
+    const kalender = segment(page, "Kalender");
+    await kalender.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\?ansicht=merkliste-kalender$/);
+    await expect(kalender).toHaveAttribute("aria-pressed", "true");
+    await expect(kalender).toBeFocused();
+    await expect(page.getByRole("status")).toHaveText("5 Angebote mit insgesamt 24 Terminen gemerkt");
+    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
+    await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
   });
 
   for (const [path, pressed] of [
     ["./?ansicht=merkliste", "Liste"],
     ["./?ansicht=merkliste-karte", "Karte"],
+    ["./?ansicht=merkliste-kalender", "Kalender"],
   ] as const) {
     test(`Deep-Link ${path}: Tab „Merkliste“ aktiv, keine Sticker und Schnellfilter der Startseite (M1)`, async ({
       page,

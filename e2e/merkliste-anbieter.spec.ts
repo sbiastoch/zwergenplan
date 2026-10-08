@@ -59,7 +59,7 @@ function collect(page: Page, filter: (url: string) => boolean): Request[] {
   return seen;
 }
 
-/** Pfade (ohne Query) aller Requests im Ablauf Start → Merkliste → „Entdecken“ → Tab „Anbieter“ */
+/** Pfade (ohne Query) aller Requests im Ablauf Start → Merkliste → „Angebote“ → Tab „Anbieter“ */
 async function flowPaths(page: Page): Promise<string[]> {
   const preloaded = startPreloads(page);
   const paths = new Set<string>();
@@ -69,7 +69,7 @@ async function flowPaths(page: Page): Promise<string[]> {
   await preloaded;
   await tab(page, "Merkliste").click();
   await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();
-  await tab(page, "Entdecken").click();
+  await tab(page, "Angebote").click();
   await expect(page.getByTestId("offer").first()).toBeVisible();
   await tab(page, "Anbieter").click();
   await expect(restRows(page).first()).toBeVisible();
@@ -199,7 +199,7 @@ test("Privatsphäre: Gemerkte Anbieter ändern keinen Request; nur der Tab „An
   await tab(page, "Merkliste").click();
   // die Merkliste zeigt keine Anbieter (E3)
   await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();
-  await tab(page, "Entdecken").click();
+  await tab(page, "Angebote").click();
   await expect(page.getByTestId("offer").first()).toBeVisible();
   expect(directory, "kein anbieter.json außerhalb des Tabs").toHaveLength(0);
   expect(chunks, "kein Anbieter-Chunk außerhalb des Tabs").toHaveLength(0);

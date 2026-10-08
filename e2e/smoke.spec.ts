@@ -11,6 +11,7 @@ import {
   expectNoHorizontalScroll,
   expectTextFits,
   setTextScale,
+  setTextScaleRelayout,
 } from "./mobile-ux.ts";
 import { dataMeta } from "./real-data.ts";
 import { clsFrom, observeVitals, readVitals, throttleMobile } from "./vitals.ts";
@@ -37,9 +38,19 @@ test("echter Build lädt und ist bedienbar", async ({ page }) => {
 /** Weg zu den Ansichten mit echten Daten, ausgehend von der geladenen Startseite (Plan 0003, Arch-Hinweis 16). */
 const REAL_VIEWS: Record<string, (page: Page) => Promise<void>> = {
   Start: async () => {},
-  Kalender: async (page) => {
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+  // Seit Plan 0025 (E8, Test 16) der Kalender der Merkliste: drei echte Angebote per Herz merken
+  "Merkliste Kalender": async (page) => {
+    for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
+    await page
+      .getByRole("navigation", { name: "Hauptnavigation" })
+      .getByRole("button", { name: /^Merkliste/ })
+      .click();
+    await page
+      .getByRole("group", { name: "Darstellung der Merkliste" })
+      .getByRole("button", { name: "Kalender", exact: true })
+      .click();
     await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
+    await expect(page.getByRole("button", { name: "Monat zuklappen" })).toBeVisible();
   },
   Detail: async (page) => {
     await page.getByTestId("offer").first().getByRole("heading").getByRole("button").click();
@@ -54,7 +65,9 @@ for (const [name, go] of Object.entries(REAL_VIEWS)) {
     test.skip(meta.offers === 0 && name !== "Start", "keine Daten");
     await go(page);
     await expectNoHorizontalScroll(page);
-    await setTextScale(page, 2);
+    // Der Umschalter der Merkliste wird bei 200 % per Container-Query einspaltig; die wertet Chromium erst nach einem
+    // Breitenwechsel neu aus (setTextScaleRelayout). Die übrigen Ansichten bleiben beim bisherigen Ablauf.
+    await (name === "Merkliste Kalender" ? setTextScaleRelayout : setTextScale)(page, 2);
     await expectNoHorizontalScroll(page);
     await expectTextFits(page, { scale: 2, buttons: false });
     await expectAccessible(page);
@@ -283,7 +296,7 @@ test.describe("Anbieter mit echten Daten (Plan 0010)", () => {
         const r = el.getBoundingClientRect();
         return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width };
       };
-      const tab = document.querySelectorAll(".tabs .tab")[3];
+      const tab = [...document.querySelectorAll(".tabs .tab")].at(-1);
       return {
         viewport: window.innerHeight,
         bar: box(document.querySelector(".tabs")),

@@ -30,6 +30,11 @@ const row = (page: Page, name: string) =>
 const websiteLink = (page: Page) => providerSheet(page).getByRole("link", { name: "Website & Programm" });
 
 /** Seite bereit, auch Export-Code und PWA-Kern sind nachgeladen: Danach entsteht kein Request ohne Anlass (Plan 0010, E8 A; Plan 0011, E5). */
+/** Ein Angebot vor dem Laden merken (localStorage, wie in saved.spec.ts) */
+async function saveOffer(page: Page, id: string) {
+  await page.addInitScript((saved) => localStorage.setItem("zwergenplan.merkliste", saved), JSON.stringify([id]));
+}
+
 async function ready(page: Page, path = "./") {
   const preloaded = startPreloads(page);
   await page.goto(path);
@@ -104,8 +109,9 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
     await tab(page, "Anbieter").click();
     await expect(page).toHaveURL(/[?&]ansicht=anbieter(&|$)/);
     const tabs = page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button");
-    await expect(tabs).toHaveCount(4);
-    await expect(tabs.nth(2)).toHaveAttribute("aria-current", "page");
+    // drei Tabs seit Plan 0025 (E8): Angebote · Anbieter · Merkliste
+    await expect(tabs).toHaveCount(3);
+    await expect(tabs.nth(1)).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
     await expect(page.getByRole("group", { name: "Kategorien" })).toBeVisible();
     await expect(page.getByRole("button", { name: /^Alle Filter/ })).toBeVisible();
@@ -141,7 +147,7 @@ test.describe("Lazy-Laden (E7, E9)", () => {
     expect(new Set(chunks).size, "jede Chunk-Datei genau einmal").toBe(chunks.length);
 
     const before = requests.length;
-    await tab(page, "Entdecken").click();
+    await tab(page, "Angebote").click();
     await expect(offers(page).first()).toBeVisible();
     await tab(page, "Anbieter").click();
     await listReady(page);
@@ -215,22 +221,26 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await expect(link).toHaveAttribute("rel", "noopener");
   });
 
-  test("Deep-Link öffnet das Sheet über dem Tab „Kalender“, ohne Tabwechsel; Schließen entfernt den Parameter", async ({
+  // Seit Plan 0025 (E8) ohne Tab „Kalender“: über dem Kalender der Merkliste, mit einem gemerkten Angebot (ohne gäbe
+  // es auf der Merkliste keine Statuszeile, auf die `ready` wartet)
+  test("Deep-Link öffnet das Sheet über dem Kalender der Merkliste, ohne Tabwechsel; Schließen entfernt den Parameter", async ({
     page,
   }) => {
-    await ready(page, "./?ansicht=kalender&anbieter=theater-beispiel");
+    await saveOffer(page, KRABBELTREFF);
+    await ready(page, "./?ansicht=merkliste-kalender&anbieter=theater-beispiel");
     const sheet = providerSheet(page);
     await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
-    await expect(tab(page, "Kalender")).toHaveAttribute("aria-current", "page");
+    await expect(tab(page, "Merkliste")).toHaveAttribute("aria-current", "page");
     await page.keyboard.press("Escape");
     await expect(sheet).toBeHidden();
-    await expect(page).toHaveURL(/\?ansicht=kalender$/);
-    await expect(tab(page, "Kalender")).toBeFocused();
+    await expect(page).toHaveURL(/\?ansicht=merkliste-kalender$/);
+    await expect(tab(page, "Merkliste")).toBeFocused();
   });
 
   test("unbekannte ID: Parameter weg, kein Sheet", async ({ page }) => {
-    await ready(page, "./?ansicht=kalender&anbieter=gibt-es-nicht");
-    await expect(page).toHaveURL(/\?ansicht=kalender$/);
+    await saveOffer(page, KRABBELTREFF);
+    await ready(page, "./?ansicht=merkliste-kalender&anbieter=gibt-es-nicht");
+    await expect(page).toHaveURL(/\?ansicht=merkliste-kalender$/);
     await expect(providerSheet(page)).toBeHidden();
   });
 
@@ -280,7 +290,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     // Eintrag mit beiden Parametern, darüber einer ohne; Zurück löst popstate aus (wie ein Tipp auf „Zurück“)
     await page.evaluate((id) => {
       window.history.pushState(null, "", `?anbieter=familientreff-beispiel&angebot=${id}`);
-      window.history.pushState(null, "", "?ansicht=kalender");
+      window.history.pushState(null, "", "?ansicht=merkliste");
     }, KRABBELTREFF);
     await page.evaluate(() => window.history.back());
     const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
@@ -379,7 +389,7 @@ test.describe("Datenstand (E6, M4)", () => {
 
     // Wechsel und Rückkehr fragen nicht noch einmal nach und zeigen den Katalog sofort, ohne einen Frame mit dem
     // Ladekasten (Arch-Review m4)
-    await tab(page, "Entdecken").click();
+    await tab(page, "Angebote").click();
     await page.evaluate(() => {
       new MutationObserver(() => {
         if (document.querySelector(".lazy-box")) document.documentElement.dataset["sahLazyBox"] = "ja";
@@ -465,11 +475,12 @@ test.describe("Privatsphäre (E9)", () => {
     expect(page.url()).not.toContain("gostenhof");
   });
 
-  test("ohne Anlass (Kalender, Startpunkt gespeichert) weder Chunk noch Katalog", async ({ page }) => {
+  test("ohne Anlass (Kalender der Merkliste, Startpunkt gespeichert) weder Chunk noch Katalog", async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await saveOffer(page, KRABBELTREFF);
     const requests = collect(page, (url) => isDirectory(url) || isChunk(url));
-    await ready(page, "./?ansicht=kalender");
-    await expect(page.getByRole("status")).toContainText("Gostenhof");
+    await ready(page, "./?ansicht=merkliste-kalender");
+    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
     expect(urls(requests)).toEqual([]);
   });
 });

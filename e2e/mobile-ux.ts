@@ -175,6 +175,21 @@ export async function setTextScale(page: Page, scale: number) {
   );
 }
 
+/**
+ * Wie `setTextScale`, danach kurz eine andere Breite: Chromium wertet manche Container-Queries in rem (etwa den
+ * einspaltigen Umschalter der Merkliste, `.view-toggle.full` in map.css) nicht neu aus, wenn sich nur die Schriftgröße
+ * ändert. Eine echte Schrift-Einstellung gilt ab dem Laden; der Breitenwechsel holt das nach (Plan 0025, Etappe 2).
+ */
+export async function setTextScaleRelayout(page: Page, scale: number) {
+  await setTextScale(page, scale);
+  const size = page.viewportSize();
+  if (size) {
+    await page.setViewportSize({ ...size, width: size.width + 10 });
+    await page.setViewportSize(size);
+  }
+  await setTextScale(page, scale);
+}
+
 /** Leisten, deren Kinder nebeneinander bzw. untereinander stehen und sich nie überlappen dürfen (Prüfung 4). */
 const BARS = [
   ".hdr",

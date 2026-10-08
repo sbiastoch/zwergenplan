@@ -12,6 +12,7 @@ import {
   expectTouchTargets,
   expectVisibleFocus,
   setTextScale,
+  setTextScaleRelayout,
 } from "./mobile-ux.ts";
 
 /** wie FIXTURE_NOW in fixtures.ts: Mo 5.10.2026 12:00 Berlin */
@@ -98,18 +99,41 @@ const CONSOLE_ERRORS: Record<string, RegExp[]> = {
   "anbieter-sheet-fehler": [/\/data\/anbieter\.json\b/],
 };
 
+/** Kalender der Merkliste mit PEKiP und Krabbeltreff (Plan 0025, E5), Merkliste per localStorage */
+async function openSavedCalendar(page: Page) {
+  await page.evaluate(
+    (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+    JSON.stringify([PEKIP_ID, TREFF_ID]),
+  );
+  await page.goto("./?ansicht=merkliste-kalender");
+  await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+}
+
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   entdecken: async () => {},
-  kalender: async (page) => {
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
-    await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
-    await expect(page.getByText("Oktober 2026")).toBeVisible();
+  // Plan 0025, E5 (Test 15): Kalender der Merkliste, Woche mit Titelknopf und Tagen gruppiert. Bei offenem Monat ist
+  // die Wochenleiste ausgeblendet (Plan 0007, E5), B3 misst aber beide Raster.
+  "merkliste-kalender-woche": async (page) => {
+    await openSavedCalendar(page);
+    await page.getByRole("button", { name: "Nächste Woche" }).click();
+    await expect(page.locator("h3.dayh")).toHaveCount(2);
   },
-  // Wochenleiste allein: Bei offenem Monat ist sie ausgeblendet (Plan 0007, E5), B3 misst aber beide Raster.
-  "kalender-woche": async (page) => {
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+  // Monat offen, ein Tag gewählt: Raster und Liste darunter zugleich
+  "merkliste-kalender-monat": async (page) => {
+    await openSavedCalendar(page);
+    await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
+    await page.getByRole("button", { name: "Dienstag, 20. Oktober, 1 Termin" }).click();
+    await expect(page.getByRole("button", { name: "Dienstag, 20. Oktober, 1 Termin" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  },
+  // Leerzustand „Nichts gemerkt“ mit dem Knopf nach „Angebote“
+  "merkliste-kalender-leer": async (page) => {
+    await openSavedCalendar(page);
+    await page.getByRole("button", { name: "Freitag, 9. Oktober, 0 Termine" }).click();
+    await expect(page.getByRole("button", { name: "Für diesen Tag entdecken" })).toBeVisible();
   },
   // Plan 0025, E3a: Kopf mit Umschalter über die ganze Breite, Statuszeile und rundem Export-Knopf
   merkliste: async (page) => {
@@ -495,7 +519,9 @@ for (const [name, go] of Object.entries(VIEWS)) {
       await expectNoHorizontalScroll(page);
       await expectTouchTargets(page); // B3: Kalendertage ≥ 44 px auch bei 320 px
       await expectTextFits(page); // inkl. einzeiliger Knopf-Beschriftungen bei 100 %
-      await setTextScale(page, 2);
+      // Der Umschalter der Merkliste wird bei 200 % per Container-Query einspaltig; die wertet Chromium erst nach einem
+      // Breitenwechsel neu aus (setTextScaleRelayout, Plan 0025). Die übrigen Ansichten bleiben beim bisherigen Ablauf.
+      await (name.startsWith("merkliste") ? setTextScaleRelayout : setTextScale)(page, 2);
       await expectNoHorizontalScroll(page);
       await expectTextFits(page, { scale: 2 });
       await expectAccessible(page);
@@ -634,7 +660,8 @@ for (const item of LONG_TOASTS) {
       await loadAged(page, item.path, item.birthDate, item.saved);
       const trigger = item.trigger(page);
       await expect(trigger).toBeVisible();
-      await setTextScale(page, scale);
+      // Merkliste: Der Umschalter braucht den Breitenwechsel, damit die Container-Query greift (setTextScaleRelayout)
+      await (item.path.includes("merkliste") ? setTextScaleRelayout : setTextScale)(page, scale);
       await page.clock.pauseAt(FIXTURE_NOW);
       await Promise.all([page.waitForEvent("download"), trigger.click()]);
       const toast = page.locator(".toast").filter({ hasText: item.toast });
@@ -667,13 +694,15 @@ test("Text-Gate erkennt Text in der Rundung, auch im Scroll-Container des Sheets
   );
 });
 
-/** Kalender bei 320 px (Wochenleiste dehnt sich in den Seitenrand, calendar.css), reduzierte Bewegung */
+/**
+ * Kalender der Merkliste bei 320 px (Wochenleiste dehnt sich in den Seitenrand, calendar.css), reduzierte Bewegung
+ * (Plan 0025, E8: früher der Tab „Kalender“)
+ */
 async function calendarAt320(page: Page) {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await ready(page);
-  await page.getByRole("button", { name: "Kalender", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+  await openSavedCalendar(page);
 }
 
 // Plan 0008, E2: Die Woche 26.10.–1.11. beginnt mit „26“. Die Tageszahl steckt sichtbar in button.day, das per
