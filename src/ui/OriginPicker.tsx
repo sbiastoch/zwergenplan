@@ -1,7 +1,8 @@
 /**
  * Kind-Sheet, Abschnitt „Wegzeit ab“ (Plan 0004, E5; Plan 0009, E1/E3): Startpunkt per Standort oder Stadtteil,
- * darunter der Quellenhinweis der Wegzeit. Ist der Standort aktiv, fehlt die Stadtteil-Auswahl; zurück geht es über
- * „Startpunkt entfernen“ (Plan 0022). Der Zustand kommt aus `useOrigin` (use-app-state.ts); hier wird nur
+ * darunter der Quellenhinweis der Wegzeit. Wirkt der Standort, fehlt die Stadtteil-Auswahl; zurück geht es über
+ * „Startpunkt entfernen“ (Plan 0022). Liegt er außerhalb des Stadtgebiets oder scheitert eine neue Abfrage, steht sie
+ * da, denn dann rät der Hinweis zum Stadtteil (Arch-Review 0022, M1). Der Zustand kommt aus `useOrigin` (use-app-state.ts); hier wird nur
  * angezeigt und gewählt.
  */
 import { useId, useRef } from "react";
@@ -30,10 +31,9 @@ export function OriginPicker({
   const selectId = useId();
   const hint = originHint(api.problem, origin, mode);
   const located = origin?.source === "standort";
+  const outside = mode?.kind === "luftlinie" && mode.reason === "ausserhalb";
+  const hideDistricts = located && !api.problem && !outside;
   const select = useRef<HTMLSelectElement>(null);
-  // Autofokus beim Öffnen über „Startpunkt wählen“: die Auswahl, bei aktivem Standort der Standort-Knopf, ohne ihn
-  // „Startpunkt entfernen“ (Plan 0022). Sonst nähme `showModal()` das erste fokussierbare Element.
-  const focusOn = !focus ? undefined : !located ? "select" : api.canLocate ? "locate" : "clear";
 
   return (
     <section className="origin" aria-labelledby={`${selectId}-h`}>
@@ -50,18 +50,12 @@ export function OriginPicker({
       {api.canLocate && (
         // `aria-busy` statt `disabled`: Ein gesperrter Knopf verlöre den Fokus an <body>. Ein Tipp während der
         // Suche tut nichts; die Abfrage endet spätestens nach 15 s (geolocation.ts).
-        <button
-          type="button"
-          className="btn wide"
-          ref={focusOn === "locate" ? markAutofocus : undefined}
-          aria-busy={locating}
-          onClick={locating ? undefined : api.locateMe}
-        >
+        <button type="button" className="btn wide" aria-busy={locating} onClick={locating ? undefined : api.locateMe}>
           <Icon name="compass" size={20} />
           {locating ? "Suche Standort …" : located ? "Standort aktualisieren" : "Meinen Standort nutzen"}
         </button>
       )}
-      {!located && (
+      {!hideDistricts && (
         <>
           <label className="field" htmlFor={selectId}>
             Stadtteil
@@ -71,10 +65,12 @@ export function OriginPicker({
               id={selectId}
               ref={(el) => {
                 select.current = el;
-                if (focusOn === "select") markAutofocus(el);
+                // Autofokus beim Öffnen über „Startpunkt wählen“. Den Knopf gibt es nur ohne Startpunkt oder außerhalb
+                // des Stadtgebiets, also steht die Auswahl dann immer da (Arch-Review 0022, M1/m5).
+                if (focus) markAutofocus(el);
               }}
               className="input"
-              // Bei der Kartenmitte steht die Auswahl auf der leeren Option.
+              // Bei Kartenmitte und Standort steht die Auswahl auf der leeren Option.
               value={origin?.districtId ?? ""}
               onChange={(e) => api.setDistrict(e.target.value)}
             >
@@ -95,7 +91,6 @@ export function OriginPicker({
         <button
           type="button"
           className="linkbtn"
-          ref={focusOn === "clear" ? markAutofocus : undefined}
           // Der Knopf verschwindet mit dem Fokus (im Modal sonst <body>); die Auswahl steht danach wieder da und
           // übernimmt ihn (Plan 0022). `flushSync`, damit sie beim Fokussieren schon im DOM ist.
           onClick={() => {

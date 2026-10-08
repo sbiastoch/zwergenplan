@@ -49,12 +49,12 @@ describe("installFoot: Fuß des Kind-Sheets über „Fertig“ (Plan 0022)", () 
     expect(installFoot("angebot")).toEqual({ kind: "knopf", button: "Zum Startbildschirm hinzufügen" });
   });
 
-  it("iPhone/iPad: kompakte Zeile mit Teilen-Symbol zwischen `before` und `share`", () => {
+  it("iPhone/iPad: kompakte Zeile, Teilen-Symbol und Pfeil setzt die Oberfläche (Arch-Review 0022, m2)", () => {
     expect(installFoot("ios")).toEqual({
       kind: "ios",
       before: "Als App:",
       share: "Teilen",
-      after: "→ Zum Home-Bildschirm",
+      after: "Zum Home-Bildschirm",
     });
   });
 

@@ -27,6 +27,15 @@ const section = (page: Page) => sheet(page).getByRole("region", { name: "Als App
 /** fester Fuß des Kind-Sheets: Installationsknopf bzw. iOS-Zeile über „Fertig“ (Plan 0022) */
 const foot = (page: Page) => sheet(page).locator(".sheetfoot");
 const installButton = (page: Page) => foot(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" });
+const doneButton = (page: Page) => foot(page).getByRole("button", { name: "Fertig" });
+const background = (el: Element) => getComputedStyle(el).backgroundColor;
+
+/** Fuß ohne Zusatz: genau „Fertig“, primär (Plan 0022; Zustände ohne Angebot und iOS, Lade- und Fehlerzustand) */
+async function expectPlainFoot(page: Page) {
+  await expect(foot(page).getByRole("button")).toHaveText(["Fertig"]);
+  await expect(doneButton(page)).toHaveClass(/\bprimary\b/);
+  await expect(foot(page).locator(".foot-hint")).toHaveCount(0);
+}
 
 /** Startseite, PWA-Kern geladen (Listener für beforeinstallprompt hängt) */
 async function ready(page: Page) {
@@ -138,22 +147,24 @@ for (const state of ["app", "angebot", "installiert", "menue", "ios"] as const) 
       if (state === "ios") await expect(section(page).locator(".share svg")).toBeVisible();
       // Plan 0022: kein Installationsknopf mehr im Abschnitt, sondern im Fuß über „Fertig“
       await expect(section(page).getByRole("button")).toHaveCount(0);
-      const buttons = foot(page).getByRole("button");
-      await expect(buttons).toHaveText(state === "angebot" ? ["Zum Startbildschirm hinzufügen", "Fertig"] : ["Fertig"]);
       if (state === "angebot") {
-        // ohne Scrollen sichtbar; der Installationsknopf ist primär, „Fertig“ sekundär
+        await expect(foot(page).getByRole("button")).toHaveText(["Zum Startbildschirm hinzufügen", "Fertig"]);
+        // ohne Scrollen sichtbar; der Installationsknopf ist primär, „Fertig“ sekundär (per CSS, gleiche Klasse)
         await expect(installButton(page)).toBeInViewport();
         await expect(installButton(page)).toHaveClass(/\bprimary\b/);
-        await expect(foot(page).getByRole("button", { name: "Fertig" })).not.toHaveClass(/\bprimary\b/);
+        expect(await doneButton(page).evaluate(background)).not.toBe(await installButton(page).evaluate(background));
+      } else if (state === "ios") {
+        await expect(foot(page).getByRole("button")).toHaveText(["Fertig"]);
+        const hint = foot(page).locator(".foot-hint");
+        await expect(hint).toBeInViewport();
+        await expect(hint).toContainText("Als App:");
+        await expect(hint).toContainText("Zum Home-Bildschirm");
+        await expect(hint.locator(".share svg")).toBeVisible();
+        // Pfeil verborgen, vorgelesen „, dann“ (Arch-Review 0022, m2)
+        await expect(hint.locator('[aria-hidden="true"]', { hasText: "→" })).toHaveCount(1);
+        await expect(hint.locator(".sr-only")).toHaveText(", dann");
       } else {
-        await expect(foot(page).getByRole("button", { name: "Fertig" })).toHaveClass(/\bprimary\b/);
-      }
-      if (state === "ios") {
-        await expect(foot(page).locator(".foot-hint")).toHaveText("Als App: Teilen → Zum Home-Bildschirm");
-        await expect(foot(page).locator(".share svg")).toBeVisible();
-        await expect(foot(page).locator(".foot-hint")).toBeInViewport();
-      } else {
-        await expect(foot(page).locator(".foot-hint")).toHaveCount(0);
+        await expectPlainFoot(page);
       }
       await expectMobileUx(page);
     });
@@ -179,11 +190,45 @@ test("Browser bietet die Installation an: Knopf im Fuß ruft prompt(), danach �
   await expect(section(page).getByText("Installiert. Öffne den Zwergenplan jetzt über das Symbol")).toBeAttached();
   await expect(installButton(page)).toHaveCount(0);
   // Der Knopf verschwindet mit dem Fokus: Er geht auf „Fertig“ direkt darunter, nicht auf <body> (im Modal)
-  const done = foot(page).getByRole("button", { name: "Fertig" });
-  await expect(done).toBeFocused();
-  await expect(done).toHaveClass(/\bprimary\b/);
-  await done.click();
+  await expect(doneButton(page)).toBeFocused();
+  await expectPlainFoot(page);
+  await doneButton(page).click();
   await expect(sheet(page)).toBeHidden();
+});
+
+test("Installiert über das Browser-Menü (appinstalled), während der Knopf den Fokus hat: Fokus auf „Fertig“ (Arch-Review 0022, m6)", async ({
+  page,
+}) => {
+  await openIn(page, "angebot");
+  await installButton(page).focus();
+  await page.evaluate(() => window.dispatchEvent(new Event("appinstalled")));
+  await expect(installButton(page)).toHaveCount(0);
+  await expect(doneButton(page)).toBeFocused();
+});
+
+test.describe("Abschnitt „Als App“ nicht ladbar (Arch-Review 0022, M2)", () => {
+  test.use({
+    allowedConsoleErrors: [
+      /\/assets\/app\/\S+ .*(ERR_FAILED|Failed to load|Failed to fetch dynamically imported module)/,
+    ],
+  });
+
+  test("Fuß nur mit „Fertig“ (primär, schließt), im Sheet „Nochmal versuchen“; Gates", async ({ page, context }) => {
+    await context.route("**/assets/app/AppSection-*", (route) => route.abort());
+    await page.goto("./");
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    await expect(sheet(page)).toBeVisible();
+    await sheet(page).evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+    await expect(sheet(page).locator(".lazy-note")).toContainText(
+      "Der Abschnitt „Als App“ konnte nicht geladen werden.",
+    );
+    await expect(sheet(page).getByRole("button", { name: "Nochmal versuchen" })).toBeVisible();
+    await expectPlainFoot(page);
+    await expectMobileUx(page);
+    await doneButton(page).click();
+    await expect(sheet(page)).toBeHidden();
+  });
 });
 
 test("ohne Angebot: Android zeigt das Browser-Menü, sonst bleibt der Abschnitt weg (E5, E7)", async ({ page }) => {
@@ -195,4 +240,6 @@ test("ohne Angebot: Android zeigt das Browser-Menü, sonst bleibt der Abschnitt 
   else if (!ios) await expect(section(page)).toHaveCount(0);
   // Abschnitt am Ende des Sheets: „Darstellung“ bleibt darüber, „Fertig“ im Fuß
   await expect(sheet(page).getByRole("button", { name: "Fertig" })).toBeVisible();
+  // Zustand „keine“ bzw. „menue“: Fuß ohne Installationsknopf und ohne iOS-Zeile (Arch-Review 0022, m5)
+  if (!ios) await expectPlainFoot(page);
 });

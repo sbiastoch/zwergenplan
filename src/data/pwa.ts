@@ -239,7 +239,7 @@ export function createInstallStore(env: InstallEnv) {
     for (const fn of listeners) fn();
   };
   env.onPrompt((event) => {
-    // Kein Mini-Infobar: Der Knopf im Abschnitt „Als App“ bietet die Installation an.
+    // Kein Mini-Infobar: Der Knopf im Fuß des Kind-Sheets bietet die Installation an (Plan 0022).
     event.preventDefault();
     offer = event;
     changed();
@@ -266,9 +266,16 @@ export function createInstallStore(env: InstallEnv) {
       const event = offer;
       if (!event) return;
       offer = undefined;
-      await event.prompt();
-      if ((await event.userChoice).outcome === "accepted") installed = true;
-      changed();
+      // Scheitert prompt() (z. B. ohne Nutzergeste), ist das Angebot trotzdem verbraucht: Browser-Menü. Kein Fehler
+      // nach außen, die Oberfläche ruft ohne catch auf; gemeldet wird in jedem Fall (Arch-Review 0022, m7).
+      try {
+        await event.prompt();
+        if ((await event.userChoice).outcome === "accepted") installed = true;
+      } catch {
+        // bewusst leer, siehe oben
+      } finally {
+        changed();
+      }
     },
   };
 }
@@ -292,7 +299,7 @@ function browserInstallEnv(): InstallEnv {
  */
 const store = typeof window === "undefined" ? undefined : createInstallStore(browserInstallEnv());
 
-/** Installationszustand für den Abschnitt „Als App“ (`useSyncExternalStore`, Tipp auf den Knopf) */
+/** Installationszustand für den Abschnitt „Als App“ und den Fuß des Kind-Sheets (`useSyncExternalStore`, Tipp auf den Knopf) */
 export interface InstallApi {
   state: () => InstallState;
   subscribe: (onChange: () => void) => () => void;

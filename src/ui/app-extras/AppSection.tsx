@@ -9,7 +9,7 @@
  * schreiben (+0,11 kB Start-JS, gemessen in Plan 0011, „Umsetzung“, Schritt 4). Der Push-Code (`push.ts` und was
  * `PushControls` importiert) importiert nur dieser Chunk, also liegt er mit darin (Plan 0017, E9).
  */
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { type RefObject, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { createPush } from "../../data/push.ts";
 import type { InstallApi } from "../../data/pwa.ts";
 import { installFoot, installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
@@ -24,9 +24,20 @@ function ShareIcon() {
   );
 }
 
-export function AppSection({ install }: { install: InstallApi }) {
+export function AppSection({
+  install,
+  done,
+  retried,
+}: {
+  install: InstallApi;
+  /** „Fertig“ im Fuß: Fokus-Ziel nach einem geglückten neuen Versuch, wenn der Abschnitt leer bleibt */
+  done: RefObject<HTMLButtonElement | null>;
+  /** geladen erst nach „Nochmal versuchen“: Der Knopf ist mit dem Fokus verschwunden (Arch-Review 0022, m1) */
+  retried: boolean;
+}) {
   const state = useSyncExternalStore(install.subscribe, install.state);
   const heading = useId();
+  const title = useRef<HTMLHeadingElement>(null);
   const [push] = useState(() => createPush());
   /** `undefined`, solange `pushSupport()` läuft (sofort, `getRegistration`); so lange steht der Platzhalter */
   const [support, setSupport] = useState<PushSupport>();
@@ -53,12 +64,18 @@ export function AppSection({ install }: { install: InstallApi }) {
     };
   }, [support]);
 
+  useEffect(() => {
+    if (retried && support) (title.current ?? done.current)?.focus({ preventScroll: true });
+  }, [retried, support, done]);
+
   if (!support) return <div className="app-pending" aria-hidden="true" />;
   const view = pushView(state, support);
   if (!help && view.kind === "nichts") return null;
   return (
     <section className="app-section" aria-labelledby={heading}>
-      <h3 id={heading}>Als App</h3>
+      <h3 id={heading} ref={title} tabIndex={-1}>
+        Als App
+      </h3>
       {help?.kind === "ios" ? (
         <>
           <p className="app-text">
@@ -83,45 +100,41 @@ export function AppSection({ install }: { install: InstallApi }) {
 }
 
 /**
- * Fuß des Kind-Sheets (Plan 0022): „Fertig“, darüber im Zustand „angebot“ der Installationsknopf (dann primär, „Fertig“
- * sekundär), auf iOS eine kompakte Zeile mit dem Teilen-Symbol. Bis der Chunk da ist, zeigt `KidSheet` nur „Fertig“.
+ * Zusatz im Fuß des Kind-Sheets vor „Fertig“ (Plan 0022): im Zustand „angebot“ der Installationsknopf (dann primär,
+ * „Fertig“ per CSS sekundär, `sheet.css`), auf iOS eine kompakte Zeile mit dem Teilen-Symbol, sonst nichts.
  */
-export function AppFoot({ install, onClose }: { install: InstallApi; onClose: () => void }) {
-  const state = useSyncExternalStore(install.subscribe, install.state);
-  const done = useRef<HTMLButtonElement>(null);
-  const foot = installFoot(state);
-  // Nach dem Tipp verschwindet der Knopf mit dem Fokus. Ohne Ziel fiele der Fokus im Modal auf <body>; „Fertig“ steht
-  // direkt darunter und bleibt (Arch-Review 0011 Stufe 1; Plan 0022). `preventScroll` wie zuvor im Abschnitt: Ein
-  // Scrollen in den Blick verschöbe sonst auch das Sheet selbst (`overflow: hidden`).
-  const promptThenFocus = async () => {
-    await install.prompt();
-    done.current?.focus({ preventScroll: true });
-  };
-  return (
-    <div className="sheetfoot single">
-      {foot?.kind === "ios" && (
-        <p className="foot-hint">
-          {foot.before}{" "}
-          <span className="share">
-            <ShareIcon />
-            {foot.share}
-          </span>{" "}
-          {foot.after}
-        </p>
-      )}
-      {foot?.kind === "knopf" && (
-        <button type="button" className="btn primary wide" onClick={() => void promptThenFocus()}>
-          {foot.button}
-        </button>
-      )}
-      <button
-        ref={done}
-        type="button"
-        className={foot?.kind === "knopf" ? "btn wide" : "btn primary wide"}
-        onClick={onClose}
-      >
-        Fertig
+export function AppFoot({ install, done }: { install: InstallApi; done: RefObject<HTMLButtonElement | null> }) {
+  const foot = installFoot(useSyncExternalStore(install.subscribe, install.state));
+  const kind = foot?.kind;
+  // Verschwindet der Knopf mit dem Fokus (Tipp, aber auch `appinstalled` über das Browser-Menü), fiele der Fokus im
+  // Modal auf <body>; „Fertig“ steht direkt darunter und bleibt (Arch-Review 0011 Stufe 1; Plan 0022, m6).
+  // `preventScroll` wie zuvor im Abschnitt: Ein Scrollen in den Blick verschöbe sonst auch das Sheet selbst.
+  const hadButton = useRef(false);
+  useEffect(() => {
+    if (hadButton.current && kind !== "knopf" && document.activeElement === document.body) {
+      done.current?.focus({ preventScroll: true });
+    }
+    hadButton.current = kind === "knopf";
+  }, [kind, done]);
+  if (foot?.kind === "knopf") {
+    return (
+      <button type="button" className="btn primary wide foot-install" onClick={() => void install.prompt()}>
+        {foot.button}
       </button>
-    </div>
+    );
+  }
+  if (foot?.kind !== "ios") return null;
+  // Pfeil verborgen und als „, dann“ vorgelesen wie in ReachLong.tsx (Arch-Review 0022, m2)
+  return (
+    <p className="foot-hint">
+      {foot.before}{" "}
+      <span className="share">
+        <ShareIcon />
+        {foot.share}
+      </span>
+      <span aria-hidden="true">{" → "}</span>
+      <span className="sr-only">, dann </span>
+      {foot.after}
+    </p>
   );
 }

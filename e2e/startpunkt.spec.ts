@@ -443,6 +443,28 @@ test("Standort verweigert: Hinweis, kein Startpunkt", async ({ page }) => {
   await expect(sheet.getByRole("button", { name: "Meinen Standort nutzen" })).toBeEnabled();
 });
 
+test("Standort aktualisieren verweigert: Der alte Standort bleibt, die Stadtteil-Auswahl erscheint (Arch-Review 0022, M1)", async ({
+  page,
+}) => {
+  await page.addInitScript(
+    ({ key, value }) => {
+      localStorage.setItem(key, value);
+      Object.defineProperty(navigator.geolocation, "getCurrentPosition", {
+        value: (_ok: unknown, fail: (error: { code: number }) => void) => setTimeout(() => fail({ code: 1 }), 0),
+      });
+    },
+    { key: POINT_KEY, value: STORED_HERE },
+  );
+  await ready(page);
+  const sheet = await openKidSheet(page);
+  await expect(sheet.getByLabel("Stadtteil", { exact: true })).toHaveCount(0);
+  await sheet.getByRole("button", { name: "Standort aktualisieren" }).click();
+  await expect(sheet.getByText("Standort nicht freigegeben. Wähle stattdessen einen Stadtteil.")).toBeVisible();
+  await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
+  await expect(sheet.getByLabel("Stadtteil", { exact: true })).toBeVisible();
+  await expect(sheet.getByRole("button", { name: "Standort aktualisieren" })).toBeFocused();
+});
+
 test("Standort antwortet nie: Knopf bleibt fokussiert und „busy“, nach 15 s Hinweis", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator.geolocation, "getCurrentPosition", { value: () => undefined });
@@ -657,9 +679,11 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
   await filter.getByRole("button", { name: "Startpunkt wählen" }).click();
   const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
   await expect(kid).toBeVisible();
-  // Plan 0022: Bei aktivem Standort fehlt die Stadtteil-Auswahl, der Autofokus geht auf den Standort-Knopf
-  await expect(kid.getByLabel("Stadtteil", { exact: true })).toHaveCount(0);
-  await expect(kid.getByRole("button", { name: "Standort aktualisieren" })).toBeFocused();
+  // Arch-Review 0022, M1: Außerhalb des Stadtgebiets rät der Hinweis zum Stadtteil, also steht die Auswahl da und
+  // bekommt den Autofokus
+  await expect(kid.getByText("Wähle einen Stadtteil.", { exact: false })).toBeVisible();
+  await expect(kid.getByLabel("Stadtteil", { exact: true })).toBeFocused();
+  await expect(kid.getByRole("button", { name: "Standort aktualisieren" })).toBeVisible();
 });
 
 // N4 (H6): Die kurze Lizenz bricht nie um (live stand „DE“ allein in der zweiten Zeile); der Titel darf umbrechen.

@@ -49,7 +49,7 @@ export function installHelp(state: InstallState): InstallHelp | undefined {
 
 export type InstallFoot =
   | { kind: "knopf"; button: string }
-  /** kompakte Zeile; das Teilen-Symbol setzt die Oberfläche zwischen `before` und `share` */
+  /** kompakte Zeile; Teilen-Symbol und Pfeil („→“, vorgelesen „, dann“) setzt die Oberfläche */
   | { kind: "ios"; before: string; share: string; after: string };
 
 /**
@@ -58,7 +58,7 @@ export type InstallFoot =
  */
 export function installFoot(state: InstallState): InstallFoot | undefined {
   if (state === "angebot") return { kind: "knopf", button: "Zum Startbildschirm hinzufügen" };
-  if (state === "ios") return { kind: "ios", before: "Als App:", share: "Teilen", after: "→ Zum Home-Bildschirm" };
+  if (state === "ios") return { kind: "ios", before: "Als App:", share: "Teilen", after: "Zum Home-Bildschirm" };
   return undefined;
 }
 

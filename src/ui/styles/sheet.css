@@ -307,6 +307,12 @@
   .push-list .push-label {
     flex: 1 1 12rem;
   }
+  /* Fuß des Kind-Sheets (Plan 0022): Mit dem Installationsknopf davor ist „Fertig“ sekundär. Die Klasse bleibt, damit
+     „Fertig“ dasselbe Element bleibt, wenn der Chunk lädt (Arch-Review 0022, m1). */
+  .sheetfoot .foot-install ~ .btn.primary {
+    background: var(--surface);
+    color: var(--ink);
+  }
   /* iOS-Zeile im Fuß des Kind-Sheets (Plan 0022): volle Breite über „Fertig“ */
   .foot-hint {
     flex: 1 1 100%;
