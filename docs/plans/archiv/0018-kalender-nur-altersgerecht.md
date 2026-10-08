@@ -1,6 +1,6 @@
 # Plan 0018 – Kalender-Export regelmäßiger Termine nur, solange das Alter passt
 
-Status: in Umsetzung seit 2026-10-08 (Branch `kalender-alter-0018`); freigegeben nach Plan-Review (3 Durchgänge, zuletzt „Freigeben mit Auflagen“, eingearbeitet); Schritt 0 erledigt (Fall A, 2026-10-06). Das Budget 100 kB aus Plan 0019 ist auf `main` (zuletzt 94,4 kB).
+Status: abgeschlossen, live seit 3ba9ef0 (2026-10-08). Freigegeben nach Plan-Review (3 Durchgänge), Schritt 0 (Fall A) und Schritt 6 (iPhone, Download aus dem Detail) bestätigt. Restpunkte in `docs/ideas.md`.
 Datum: 2026-10-06
 
 (ADR 0003 Datenmodell und ICS, ADR 0007 Merklisten-ICS im Browser, ADR 0012 Startbudget mit Nachtrag aus Plan 0019 (100 kB), Plan 0003 Risiko „iOS und Blob“, Plan 0010 E8 A Export-Chunk, Plan 0015 E2 Datenhorizont 12 Monate; neu: ADR-Entwurf 0018.)
@@ -239,17 +239,17 @@ Basis `5701141`. `JS (initial)` vorher 94,41 kB von 100 kB, Export-Chunk 1,15 kB
   - Neuer E2E-Test für den Fehlerzweig im Detail: Chunk nicht ladbar → Toast, kein Download, kein Request auf `ics/`.
   - `seriesIcsFileName` in `src/domain/ics-paths.ts` mit Unit-Test, der statische Toast nutzt `calendarLoaded` aus `format.ts`.
   - ADR 0018 angenommen. Doku-Drift nachgezogen: `docs/architecture.md` (`collectionExport`), Kommentare in `ics.ts` und `saved.ts`, Kommentar am Knopf „Alle Termine“, ADR 0003 (Statuszeile), Plan 0025 (Nachtrag in „Ausgangslage“).
-  - Nicht geändert: der Kommentar in `vite.config.ts:36` („Merkliste“). Eine Änderung dort löst die E2E-Pflicht für die Vite-Konfiguration aus, für einen Kommentar lohnt das nicht. Restpunkt fürs Archivieren (`docs/ideas.md`).
+  - Nicht geändert: der Kommentar in `vite.config.ts:36` („Merkliste“). Eine Änderung dort löst die E2E-Pflicht für die Vite-Konfiguration aus, für einen Kommentar lohnt das nicht. Restpunkt in `docs/ideas.md`.
 - **Live seit `3ba9ef0` (2026-10-08)**, CI auf `main` grün, `meta.json` zeigt den Stand.
 - **`/browser-review live` (2026-10-08):** kein Blocker, kein Mittel-Befund. Geprüft mit echten Daten (Babyturnen nach Pikler, 8–15 Monate, 14 kommende Termine; PEKiP-plus-Kurs) bei 320 und 390 px, hell und dunkel:
   - Herauswachsen: 5 Termine bis 16.11., Alterszeile „… · passt bis 16.11.“, Toast mit Grenze. Zu jung: 11 Termine ab 9.11. Keiner passt: kein Download, Toast. Ohne Geburtsdatum: die statische Datei mit 15 Terminen.
   - Merkliste: Zahl unter dem Knopf = Termine in der Datei = Zahl im Toast (22 / 13 / 8), „nichts passt“ ohne Download.
   - Mit Geburtsdatum kein Request auf `/ics/`, in 30 Läufen keine Konsolenfehler. Der längste Toast hat bei 320 px 4 Zeilen und verdeckt „Alle Termine“ nicht.
   - Von der Standard-Matrix sind die Ansichten `detail-*` und `merkliste-*` vollständig angesehen, die übrigen (von Plan 0018 nicht berührt) nur stichprobenartig.
-- **Restpunkte (klein, Texte), fürs Archivieren nach `docs/ideas.md`:**
+- **Restpunkte (klein, Texte), stehen in `docs/ideas.md`:**
   - Alterszeile bei „zu jung“ doppelt („Passt: am Mo 9.11. 8 Monate alt · passt ab 9.11.“). Vorschlag: „Passt ab Mo 9.11. (dann 8 Monate alt)“. Bei „wächst heraus“: „… · nur bis 16.11.“, bei beiden Grenzen: „Passt nur 21.10.–14.3.2027“.
   - Unter dem Merklisten-Knopf „keiner passt gerade zum Alter“, gemeint ist „keins“ (Angebote), wie im Toast.
-- **Offen, Schritt 6:** Der Nutzer testet am iPhone den gekürzten Download **aus dem Detail**, in der App und im Safari-Tab. Erscheint der Kalender-Dialog bzw. das Banner, und kommt man ohne Neustart zurück? Scheitert es, greift der Rückfall aus Schritt 6. Bis dahin bleibt der Plan `in Umsetzung`.
+- **Schritt 6, iPhone (2026-10-08, Nutzer):** Der ICS-Download aus dem Detail funktioniert korrekt auf dem iPhone. Der Rückfall auf die statische Datei wird nicht gebraucht, das Detail bleibt beim Blob-Weg (R1 erledigt).
 - **Offen für den Browser-Review (erledigt, siehe oben):** Die Alterszeile nennt den Bezugstermin aus `ageCheck`, beim Fall „zu jung“ ist das der erste passende Termin. Mit Zusatz steht dort z. B. „Passt: am Mi 21.10. 6 Monate alt · passt ab 21.10.“, also das Datum doppelt. Umgesetzt wie in E4. Der `/browser-review` entscheidet, ob der Text nachgeschärft wird.
 
 ## Review (2026-10-06) – Verdict: Überarbeiten (1. Durchgang)

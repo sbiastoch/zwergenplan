@@ -182,10 +182,10 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByRole("dialog")).toBeVisible();
   },
   // Plan 0018, E3: Merkliste mit Geburtsdatum. Die Zeile unter dem Export-Knopf entfiel mit Plan 0025 (E3a), die
-  // Statuszeile zählt alle kommenden Termine.
+  // Statuszeile zählt die kommenden Termine, regelmäßige nur passend zum Alter (Plan 0028): 8 + 2.
   "merkliste-mit-geburtsdatum": async (page) => {
     await loadAged(page, "./?ansicht=merkliste", "2024-09-18", [PEKIP_ID, TREFF_ID]);
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 10 Terminen gemerkt");
   },
   // Plan 0018, E4: Alterszeile mit Grenze „· passt bis 14.10.“
   "detail-mit-geburtsdatum": async (page) => {

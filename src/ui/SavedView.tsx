@@ -4,7 +4,8 @@
  * Export-Knopf (nur in der Liste). Karte und Kalender rendert App über `renderMap` bzw. `renderCalendar`.
  */
 import type { ReactNode } from "react";
-import { nextSession } from "../domain/agenda.ts";
+import { sessionFit } from "../domain/age.ts";
+import { shownSession } from "../domain/agenda.ts";
 import { collectionExport, upcomingSessionCount } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
@@ -25,7 +26,7 @@ const VIEW_OPTIONS: readonly ViewOption<SavedTab>[] = [
 ];
 
 interface SavedViewProps {
-  /** gemerkte Angebote mit kommendem Termin, nach dem nächsten Termin sortiert */
+  /** gemerkte Angebote mit kommendem Termin, nach dem angezeigten Termin sortiert (`savedOffers`) */
   offers: SiteOffer[];
   tab: SavedTab;
   onTab: (tab: SavedTab) => void;
@@ -36,7 +37,10 @@ interface SavedViewProps {
   /** Kalender der gemerkten Termine (E5); wie die Karte nur mit mindestens einem gemerkten Angebot */
   renderCalendar: () => ReactNode;
   generatedAt: SiteData["generatedAt"];
-  /** mit Geburtsdatum kommen regelmäßige Angebote nur passend zum Alter in die Datei (Plan 0018, E3) */
+  /**
+   * mit Geburtsdatum zählen bei regelmäßigen Angeboten nur die Termine, die zum Alter passen: in der Datei (Plan 0018,
+   * E3), in der Statuszeile und am Termin der Karte (Plan 0028)
+   */
   birthDate: string | undefined;
   ctx: CardContext;
   onDiscover: () => void;
@@ -58,6 +62,7 @@ export function SavedView({
   onExported,
 }: SavedViewProps) {
   const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
+  const fits = sessionFit(birthDate);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
     if (count === 0) {
@@ -95,7 +100,7 @@ export function SavedView({
           <ViewToggle options={VIEW_OPTIONS} current={tab} onChange={onTab} legend="Darstellung der Merkliste" full />
           <div className="status-row">
             <p className="status" role="status" tabIndex={-1}>
-              <StatusText offers={offers} tab={tab} placeCount={placeCount} now={ctx.now} />
+              <StatusText offers={offers} tab={tab} placeCount={placeCount} now={ctx.now} birthDate={birthDate} />
             </p>
             {tab === "merkliste" && (
               <button
@@ -113,7 +118,7 @@ export function SavedView({
           {tab === "merkliste-kalender" && renderCalendar()}
           {tab === "merkliste" &&
             offers.map((offer) => {
-              const session = nextSession(offer, ctx.now);
+              const session = shownSession(offer, ctx.now, undefined, fits);
               return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
             })}
         </>
@@ -128,16 +133,18 @@ function StatusText({
   tab,
   placeCount,
   now,
+  birthDate,
 }: {
   offers: readonly SiteOffer[];
   tab: SavedTab;
   placeCount: number;
   now: Date;
+  birthDate: string | undefined;
 }) {
   const [a, aWords, b, bWords] =
     tab === "merkliste-karte"
       ? savedMapStatusParts(offers.length, placeCount)
-      : savedStatusParts(offers.length, upcomingSessionCount(offers, now));
+      : savedStatusParts(offers.length, upcomingSessionCount(offers, now, birthDate));
   return (
     <span>
       <b>{a}</b>

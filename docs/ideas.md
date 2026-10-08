@@ -81,6 +81,10 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0018** (Browser-Review live, 2026-10-08, `3ba9ef0`):
+  - Alterszeile im Detail bei „zu jung“ nennt das Datum doppelt („Passt: am Mo 9.11. 8 Monate alt · passt ab 9.11.“). Vorschlag: „Passt ab Mo 9.11. (dann 8 Monate alt)“; bei „wächst heraus“ „… · nur bis 16.11.“, bei beiden Grenzen „Passt nur 21.10.–14.3.2027“.
+  - Unter dem Merklisten-Knopf steht „keiner passt gerade zum Alter“, gemeint sind Angebote: „keins passt gerade zum Alter“, wie im Toast.
+  - Kommentar in `vite.config.ts` (Export-Chunk) nennt nur die Merkliste; bei der nächsten Änderung an der Vite-Konfiguration um „Reihen im Detail (ADR 0018)“ ergänzen.
 - **Nachschliff 0022–0024** (Browser-Review live, 2026-10-08, `5701141`):
   - Startausschnitt der Karte bei niedriger Karte (< ~300 px, z. B. 320×640, iPhone SE 375×667, iPhone mit Safari-Leiste 390×664): Kachelstufe z8 statt z9, nur 2 Cluster („42“, „290“) statt 7. Ursache ist die Reserve unten für die Attribution (66 px). Idee: Attribution auf niedrigen Karten kompakt („i“) starten oder die Reserve nur ab 300 px Kartenhöhe voll nehmen. Mit Startpunkt tritt es nicht auf.
   - Kalender dunkel: Der orange Punkt unter „heute“ auf dem gelben Kreis hat wenig Kontrast.

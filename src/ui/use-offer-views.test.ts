@@ -349,6 +349,56 @@ describe("useOfferViews", () => {
     });
   });
 
+  describe("regelmäßig, Kind wächst erst hinein (Plan 0028)", () => {
+    // 6–24 Monate; geboren am 20.4.: am 7.10. und 14.10. 5 Monate, am 21.10. 6
+    const treff: SiteOffer = {
+      ...offer("treff", "2026-10-07", { minMonths: 6, maxMonths: 24 }, "regelmaessig"),
+      sessions: ["2026-10-07", "2026-10-14", "2026-10-21"].map((d) => ({
+        start: fromBerlinLocal(`${d}T10:00`),
+        end: fromBerlinLocal(`${d}T11:00`),
+      })),
+    };
+    const input = { offers: [BABY, treff], birthDate: "2026-04-20" };
+
+    it("steht in der Liste erst am ersten passenden Termin", () => {
+      expect(render(input).page.groups.map((g) => g.day)).toEqual(["2026-10-10", "2026-10-21"]);
+    });
+
+    it("steht im Kalender der Merkliste nur an Tagen, an denen es zum Alter passt (Plan 0025, E5; Plan 0028, E3)", () => {
+      const route: Route = { tab: "merkliste-kalender", filter: EMPTY_FILTER };
+      const savedIds = [treff.id, BABY.id];
+      const kalender = render({ ...input, route, savedIds }).savedCalendar;
+      expect([...(kalender?.index.keys() ?? [])]).toEqual(["2026-10-10", "2026-10-21"]);
+      // Unpassende Termine zählen nicht als „blendet der Filter aus“: Das meint erst den Merklisten-Filter (Etappe 4).
+      expect([...(kalender?.allIndex.keys() ?? [])]).toEqual(["2026-10-10", "2026-10-21"]);
+      // ohne Geburtsdatum alle Termine
+      const ohneKind = render({ ...input, birthDate: undefined, route, savedIds }).savedCalendar;
+      expect([...(ohneKind?.index.keys() ?? [])].sort()).toEqual([
+        "2026-10-07",
+        "2026-10-10",
+        "2026-10-14",
+        "2026-10-21",
+      ]);
+    });
+
+    it("Altersfilter aus: am nächsten Termin, wie ohne Kind", () => {
+      let result: OfferViews | undefined;
+      function Probe() {
+        result = useOfferViews({ ...input, route: ENTDECKEN, savedIds: [], now: NOW });
+        if (result.ageOnly) result.setAgeOnly(false);
+        return null;
+      }
+      renderToStaticMarkup(createElement(Probe));
+      expect(result?.page.groups.map((g) => g.day)).toEqual(["2026-10-07", "2026-10-10"]);
+    });
+
+    it("sortiert die Merkliste nach dem ersten passenden Termin", () => {
+      const savedIds = [treff.id, BABY.id];
+      expect(ids(render({ ...input, birthDate: undefined, savedIds }).saved)).toEqual(["treff", "baby"]);
+      expect(ids(render({ ...input, savedIds }).saved)).toEqual(["baby", "treff"]);
+    });
+  });
+
   it("liefert Merkliste und offenes Angebot aus den Daten", () => {
     const v = render({ savedIds: [GROSS.id, "weg--weg--weg"], route: { ...ENTDECKEN, offerId: BABY.id } });
     expect(ids(v.saved)).toEqual(["gross"]);

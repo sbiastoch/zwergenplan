@@ -20,9 +20,18 @@ const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
 const ALL_OVER = "Für heute ist alles vorbei";
 
 /** Merkliste vorbelegen, optional die Uhr stellen, dann den Kalender der Merkliste öffnen. */
-async function openCalendar(page: Page, { ids = [IDS.treff, IDS.pekip], at }: { ids?: string[]; at?: Date } = {}) {
+async function openCalendar(
+  page: Page,
+  { ids = [IDS.treff, IDS.pekip], at, birthDate }: { ids?: string[]; at?: Date; birthDate?: string } = {},
+) {
   if (at) await page.clock.setFixedTime(at);
-  await page.addInitScript((saved) => localStorage.setItem("zwergenplan.merkliste", saved), JSON.stringify(ids));
+  await page.addInitScript(
+    ([saved, born]) => {
+      localStorage.setItem("zwergenplan.merkliste", saved);
+      if (born) localStorage.setItem("zwergenplan.geburtsdatum", born);
+    },
+    [JSON.stringify(ids), birthDate ?? ""] as const,
+  );
   await page.goto("./?ansicht=merkliste-kalender");
   await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
 }
@@ -258,6 +267,21 @@ test.describe("mit Fixture-Uhr", () => {
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
     await expectAgenda(page, "Diese Woche", "1 Termin");
   });
+});
+
+test("regelmäßig gemerkt, Kind wächst erst hinein: nur Tage, an denen es zum Alter passt (Plan 0028, E3)", async ({
+  page,
+}) => {
+  // Treff 6–24 Monate; geboren am 20.4.: am 7.10. und 14.10. 5 Monate, ab 21.10. 6
+  await openCalendar(page, { ids: [IDS.treff], birthDate: "2026-04-20" });
+  await expect(page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Termine" })).toBeVisible();
+  await expect(offers(page)).toHaveCount(0);
+  await page.getByRole("button", { name: "Nächste Woche" }).click();
+  await expect(page.getByRole("button", { name: "Mittwoch, 14. Oktober, 0 Termine" })).toBeVisible();
+  await page.getByRole("button", { name: "Nächste Woche" }).click();
+  await expect(page.getByRole("button", { name: "Mittwoch, 21. Oktober, 1 Termin" })).toBeVisible();
+  await expectAgenda(page, "Woche 19.–25. Okt.", "1 Termin");
+  await expect(offers(page)).toContainText("Offener Krabbeltreff");
 });
 
 test.describe("„Heute“ hängt an „jetzt“ (B2)", () => {

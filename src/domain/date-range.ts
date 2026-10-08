@@ -58,7 +58,8 @@ export function checkBound(value: string, limits: BoundLimits): BoundCheck {
   return "ok";
 }
 
-function contains(range: DateRange, session: Session): boolean {
+/** Beginnt der Termin an einem Berliner Tag im Zeitraum? */
+export function inRangeDay(range: DateRange, session: Session): boolean {
   const day = berlinIsoDate(session.start);
   return (!range.from || day >= range.from) && (!range.to || day <= range.to);
 }
@@ -70,10 +71,10 @@ function contains(range: DateRange, session: Session): boolean {
 export function rangeSession(offer: Offer, range: DateRange, now: Date): Session | undefined {
   if (offer.format === "kurs") {
     const [first] = offer.sessions;
-    return first && contains(range, first) ? first : undefined;
+    return first && inRangeDay(range, first) ? first : undefined;
   }
   const isNotEnded = notEnded(now);
-  return offer.sessions.find((s) => isNotEnded(s) && contains(range, s));
+  return offer.sessions.find((s) => isNotEnded(s) && inRangeDay(range, s));
 }
 
 export function inDateRange(offer: Offer, range: DateRange, now: Date): boolean {
