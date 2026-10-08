@@ -1,6 +1,6 @@
 # Plan 0026 – Teilen per Link: Angebote, Anbieter und Merkliste
 
-Status: Entwurf (2026-10-08), noch ohne Review. Zwei Etappen: **Stufe 1** (Angebote und Anbieter) ist unabhängig umsetzbar. **Stufe 2** (Merkliste) wird eigens gemergt, nach Plan 0025 (Nutzerentscheid N1).
+Status: Review eingearbeitet, wartet auf Nutzerentscheide (N1–N4). Zwei Etappen: **Stufe 1** (Angebote und Anbieter) ist unabhängig umsetzbar. **Stufe 2** (Merkliste) wird eigens gemergt, nach Plan 0025 (Nutzerentscheid N1).
 Datum: 2026-10-08
 Bezug:
 - ADR 0002 (Datenfluss), ADR 0003 (stabile IDs), ADR 0009 (`noindex`), ADR 0012 (Startbudget), ADR 0013 (Service Worker), ADR 0016 (nächtlicher Deploy), **neu ADR 0020** (Entwurf, im selben Commit)
@@ -47,15 +47,20 @@ Leitlinien:
   - 333 Angebote (117 regelmäßig, 170 Kurse, 46 einmalig), 74 Katalog-Einträge mit `role: anbieter`, davon 64 mit Angeboten.
   - Offer-IDs sind 48–167 Zeichen lang, im Median 95. Titel sind bis 83 Zeichen lang und enthalten `&` und `'`.
   - Der Horizont beträgt seit ADR 0016 12 Monate, der Bestand wächst also eher.
-- **Service Worker**: `src/sw/routes.ts:223–230`. Die Navigation greift nur für `""` und `index.html` („schale“), alles andere ist `netz`. `scripts/vite-sw.ts:45–56` liest für den Precache nur `<script>` und `<link rel=stylesheet|modulepreload>`. `meta`-Tags stören also nicht.
-- **Detail**: Im Kopf `src/ui/DetailDialog.tsx:83–88` (`.dhead`, `justify-content: space-between`, `dialog.css:61`) stehen „Zurück“ und das Herz (`HeartButton inline`). Das Detail liegt im Start-Bundle.
+- **Service Worker**: `src/sw/routes.ts:45–52` (`RULES`), verdrahtet in `src/sw/sw.ts:66–77`. Die Navigation greift nur für `""` und `index.html` („schale“), alles andere ist `netz`. `scripts/vite-sw.ts:45–56` liest für den Precache nur `<script>` und `<link rel=stylesheet|modulepreload>`. `meta`-Tags stören also nicht.
+- **Detail**: Im Kopf `src/ui/DetailDialog.tsx:83–88` (`.dhead`, `justify-content: space-between`, `dialog.css:64`) stehen „Zurück“ und das Herz (`HeartButton inline`). Das Detail liegt im Start-Bundle.
 - **Anbieter-Sheet**: `src/ui/anbieter/ProviderSheet.tsx` liegt im Lazy-Chunk `assets/anbieter/`. Sein Fuß `:77–83` hat nur „Schließen“. Die Props stehen in `src/ui/provider-types.ts:38–48`.
 - **Toast**: `useToast` steht in `src/ui/use-app-state.ts:178`. Dialoge bekommen ihn als Prop (`Overlays.tsx`), damit er im Top-Layer steht. Die Texte zum Merken nennen noch „Stickerheft“ (`App.tsx:160–168`); Plan 0022 ersetzt sie.
 - **Geräte-APIs**: Biome sperrt `navigator` in `src/ui` (`noRestrictedGlobals`). `src/data/geolocation.ts` ist das Muster mit injizierbarer API.
 - **Texte**: Datumswörter (`WEEKDAYS`, `WD_SHORT`, `MONTHS`, `src/ui/format.ts:24–40`) liegen in `src/ui`, und `scripts/` darf `src/ui` nicht importieren (`docs/architecture.md`, Schichten). `rhythm`, `uniformTimes` (`src/domain/agenda.ts:201–217`), `berlinKey`, `berlinIsoDate` und `isoWeekday` (`time.ts`) sind schon in der Domäne.
 - **Icons**: `scripts/icons.ts` rendert PNGs aus `design/icon.svg` mit Playwright-Chromium, ohne neues Paket, und schreibt nach `public/icons/` (committet).
 - **Budget**: `JS (initial)` 100 kB. Den letzten Stand führt die Delta-Tabelle in ADR 0012 (92,78 kB nach Plan 0017, danach Pläne 0020/0021 ohne Eintrag): **vorher neu messen.** `dist/angebot/**` fällt nicht unter ein Budget, denn die Muster in `.size-limit.json` greifen nur in `dist/assets/` und `dist/data/`.
-- **Merkliste**: `src/data/preferences.ts:9, 44, 52` (`zwergenplan.merkliste`, JSON-Array von IDs). `src/domain/saved.ts:1–4`: Unbekannte IDs werden nur ausgeblendet, nie gelöscht. Plan 0025 (parallel, Branch `plan-0025-merkliste`, beim Schreiben noch nicht gepusht) bringt „Anbieter merken“ mit eigenem Schlüssel und baut `SavedView` um: Liste, Karte und Kalender, der Tab „Kalender“ entfällt.
+- **Merkliste**: `src/data/preferences.ts:9, 44, 52` (`zwergenplan.merkliste`, JSON-Array von IDs). `src/domain/saved.ts:1–4`: Unbekannte IDs werden nur ausgeblendet, nie gelöscht.
+- **Plan 0025** (Branch `origin/plan-0025-merkliste`, `docs/plans/0025-merkliste-als-planungszentrale.md`):
+  - baut `SavedView` um: Liste, Karte und Kalender, der Tab „Kalender“ entfällt,
+  - bringt „Anbieter merken“ mit dem Schlüssel `zwergenplan.anbieter-merkliste` (Zeile 112),
+  - legt fest, dass gemerkte Anbieter „nie in URL“ stehen (Zeile 122). Stufe 2 ändert das für das Fragment ebenso wie für die Merkliste (ADR 0020).
+- **StrictMode**: `src/main.tsx:11` rendert in `<StrictMode>`, `useState`-Initialisierer laufen in der Entwicklung also doppelt. `use-app-state.ts:53–54` verlässt sich deshalb auf einen Lader, der sich das Ergebnis merkt. Das ist das Muster für Stufe 2 (E12).
 - **ADR-Nummer**: Auf `main` und allen Branches ist 0019 die letzte. 0020 ist frei, die Pläne 0022–0025 könnten sie aber ebenfalls beanspruchen.
 
 ## Entscheidungen – Stufe 1 (Angebote und Anbieter)
@@ -66,7 +71,7 @@ Leitlinien:
 - **Pfade**: `angebot/` und `anbieter/`, genau wie die Query-Namen. Sie sind lesbar, und die Länge spielt bei 95 Zeichen ID keine Rolle. Abschließender Schrägstrich, damit Pages `index.html` ohne 301 liefert.
 - Einzige Quelle ist `src/domain/share.ts` (rein, im Start-Bundle):
   ```ts
-  export const SHARE_DIRS = { offer: "angebot", provider: "anbieter" } as const;
+  const SHARE_DIRS = { offer: "angebot", provider: "anbieter" } as const; // nicht exportiert (knip)
   /** relativ zur Basis, z. B. „angebot/<id>/“ */
   export function offerSharePath(offerId: string): string;
   export function providerSharePath(providerId: string): string;
@@ -89,8 +94,10 @@ Leitlinien:
   export function offerSharePage(offer: SiteOffer, generatedAt: string): SharePage;
   export function providerSharePage(provider: SiteProvider, offers: readonly SiteOffer[], generatedAt: string): SharePage;
   export function notFoundPage(): string;           // 404.html, E7
-  export function escapeHtml(text: string): string;  // & < > " '
+  export function checkSharePages(pages: readonly SharePage[]): string[]; // Fehler, E4
+  // escapeHtml (& < > " ') bleibt modulintern; getestet wird es über die Ausgabe der Seiten (knip, Review m12)
   ```
+  `notFoundPage` braucht die Muster aus `src/domain/share.ts`. Dafür exportiert `share.ts` höchstens eine Funktion `sharePathPattern(kind)`, und nur, wenn die Umsetzung sie wirklich von außen braucht. Exportiert wird nur, was ein anderes Modul importiert.
 - `scripts/build-data.ts`:
   - löscht zusätzlich `public/angebot`, `public/anbieter` und `public/404.html` (Zeile 39),
   - schreibt nach den ICS-Dateien für jedes `site.offers` und jeden Eintrag von `directory.providers` eine Seite,
@@ -114,18 +121,20 @@ Deshalb gilt je Format (alle Zeiten in Berlin, über `time.ts`):
 |---|---|---|
 | einmalig | `{title} · {Wd} {T}. {Monat kurz} {Jahr}, {Uhr}` | „Babykonzert im Advent · So 6. Dez. 2026, 10:00“ |
 | kurs | `{title} · Kurs ab {Wd} {T}. {Monat kurz}, {n} Termine` | „PEKiP-Gruppe Herbst-Babys · Kurs ab Di 13. Okt., 8 Termine“ |
-| regelmäßig, `rhythm(offer, generatedAt).weekly` | `{title} · jeden {Wochentag}, {Uhr}` (Uhr nur bei `uniformTimes`) | „Offener Krabbeltreff · jeden Mittwoch, 9:30“ |
+| regelmäßig, `rhythm(offer, ref)?.weekly` | `{title} · jeden {Wochentag}, {Uhr}` (Uhr nur bei `uniformTimes(upcomingSessions(offer, ref))`) | „Offener Krabbeltreff · jeden Mittwoch, 9:30“ |
 | regelmäßig, gleicher Wochentag, nicht wöchentlich | `{title} · {Wochentag}s` | „… · Samstags“ |
 | regelmäßig, sonst | `{title} · regelmäßig` | |
 
 - Einmalig und Kurs: Das Datum ist ein fester Teil der ID (ADR 0006) und veraltet nicht. Ist der Termin vorbei, solange das Angebot noch in den Daten steht, zeigt die App das Ende.
-- „Jetzt“ für `rhythm` ist `generatedAt` des Datenstands, wie bei den ICS-Dateien (`icsContextFor`).
+- „Jetzt“ ist `const ref = new Date(generatedAt)` des Datenstands, wie bei den ICS-Dateien (`icsContextFor`). `rhythm(offer, ref)` und `uniformTimes(upcomingSessions(offer, ref))` bekommen genau dieses `Date`, nie `new Date()`.
+- **Monatsnamen kurz**: „Jan.“, „Feb.“, „März“, „Apr.“, „Mai“, „Juni“, „Juli“, „Aug.“, „Sept.“, „Okt.“, „Nov.“, „Dez.“. Das bloße Abschneiden auf drei Zeichen wie in `weekTitle` (`format.ts:78`) ergäbe „Mai.“, „Jun.“ und „Jul.“. `labels.ts` bekommt deshalb eine eigene Liste `MONTHS_SHORT`, mit Testfall für Mai, Juni und Juli. `weekTitle` stellt bei der Gelegenheit darauf um; das ändert dort „Jun.“ zu „Juni“, ein bewusster Nebeneffekt, und der Test in `format.test.ts` wird angepasst.
+- **Länge**: `og:title` wird deterministisch auf höchstens 110 Zeichen gekürzt: Ist er länger, wird der Titelteil am Wortende gekürzt und endet mit „…“, der Teil „ · {wann}“ bleibt stehen. Ein ungewöhnlich langer Titel aus dem Nachtlauf (ADR 0016) bricht den Build also nie.
 - `og:description` (höchstens 200 Zeichen, gekürzt am Wortende mit „…“): `{Ort}, {Stadtteil} · {Alter} · {Kosten} · {Anmeldung} – {Anbieter}`.
   - Beispiel: „Familientreff Beispielhaus, Gostenhof · 0–12 Monate · Kostenlos · Ohne Anmeldung – Familientreff Beispiel“.
   - Die Bausteine sind dieselben Texte wie im Detail (`costLabel`, `registrationLabel`, `ageRangeLabel`).
 - **Anbieter**: `og:title` = Name. `og:description` = `{n} kommende Angebote im Zwergenplan · {Kategorien, höchstens 3} · {Stadtteile, höchstens 3}`. „Kommend“ zählt wie das Sheet, relativ zu `generatedAt`. Bei 0 Angeboten steht nur „Im Zwergenplan“ davor.
 - `<title>` = `og:title` + „ – Zwergenplan“. Dazu kommt `<meta name="description">` mit dem Text von `og:description`.
-- **Wo die Texte liegen**: Datumswörter und die drei Label-Funktionen ziehen aus `src/ui/format.ts` nach **`src/domain/labels.ts`** (rein). `format.ts` re-exportiert sie, damit keine Aufrufer wandern; das Bundle bleibt gleich (Tree-Shaking). So gibt es keine zweite Schreibweise. Die Kombination für die Vorschau steht in `scripts/lib/share-pages.ts`, denn nur der Build braucht sie.
+- **Wo die Texte liegen**: Datumswörter (samt `MONTHS_SHORT`) und die drei Label-Funktionen ziehen aus `src/ui/format.ts` nach **`src/domain/labels.ts`** (rein). `format.ts` re-exportiert sie, damit keine Aufrufer wandern; das Bundle bleibt gleich (Tree-Shaking). So gibt es keine zweite Schreibweise. Die Kombination für die Vorschau steht in `scripts/lib/share-pages.ts`, denn nur der Build braucht sie.
 
 ### E4 – Aufbau der Seite, Weiterleitung, Bots
 
@@ -152,7 +161,8 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Zwergenplan – Angebote für Kinder unter 3 in Nürnberg">
 <meta name="twitter:card" content="summary_large_image">
-<style>/* ≈ 10 Zeilen: Systemschrift, zentriert, hell/dunkel per color-scheme, Link ≥ 44 px */</style>
+<style>/* ≈ 15 Zeilen: Systemschrift, zentriert, Hintergrund, Text- und Linkfarbe für hell und
+   @media (prefers-color-scheme: dark) selbst gesetzt, Link ≥ 44 px hoch */</style>
 </head>
 <body>
 <main>
@@ -168,21 +178,29 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 
 - **`SHARE_REDIRECT`** ist eine Konstante in `share-pages.ts` (für alle Seiten byte-gleich, getestet):
   ```js
-  if (!/facebookexternalhit|Facebot|Twitterbot|WhatsApp|TelegramBot|Slackbot|Discordbot|SkypeUriPreview|LinkedInBot|Signal/i.test(navigator.userAgent)) location.replace(document.getElementById("go").href);
+  if (!/facebookexternalhit|Facebot|Twitterbot|bot\b|crawler|spider/i.test(navigator.userAgent)) location.replace(document.getElementById("go").href);
   ```
   - Keine Daten im Skript, also kein Escaping-Risiko in JS.
   - Das Ziel ist das `href` des sichtbaren Links, eine Quelle für Mensch und Skript.
-  - Die Bot-Liste ist ein Schutz für Abrufer, die JavaScript ausführen könnten. iMessage sendet `facebookexternalhit … Twitterbot`. WhatsApp, Signal und Telegram führen nach heutigem Wissen kein JavaScript aus, die Liste schadet dort nicht. Ob die Vorschauen wirklich ankommen, prüft der Browser-Review am Gerät (Schritt 9).
+  - **Die Bot-Ausnahme gilt nur für Abrufer, die JavaScript ausführen** (Review M1).
+    - WhatsApp holt die Vorschau per einfachem GET (User-Agent `WhatsApp/2.x`) und führt kein JavaScript aus ([Meta: Link-Vorschauen](https://developers.facebook.com/documentation/business-messaging/whatsapp/link-previews/)). `location.replace` wirkt dort ohnehin nicht, „WhatsApp“ gehört deshalb nicht in die Liste.
+    - In-App-Browser mit „WhatsApp“ oder „Signal“ im User-Agent würden sonst nicht weitergeleitet.
+    - iMessage rendert die Vorschau mit JavaScript und sendet einen User-Agent mit `facebookexternalhit … Twitterbot` ([Erfahrungsbericht Netlify-Forum](https://answers.netlify.com/t/cant-get-open-graph-previews-working-in-imessage-with-netlify-prerendering/87487)). Ohne Ausnahme sähe iMessage nach der Weiterleitung die generische `index.html`.
+    - `bot\b`, `crawler` und `spider` fangen weitere JS-fähige Abrufer wie `Googlebot`. Dass dabei auch `TelegramBot` passt, schadet nicht, denn der führt ohnehin kein JavaScript aus.
+  - Ob die Vorschauen wirklich ankommen, prüft der Gerätetest (Schritt 9).
   - `href` ist bei `BASE = "/"` absolut-pfadig (`/?angebot=…`). Der Generator setzt `BASE` aus `site.config.ts` davor, nicht fest `/`.
 - **Kein `meta refresh`** (ADR 0020, Alternativen): Ein Abrufer, der ihm folgt, läse die Tags der generischen `index.html`.
 - **`og:url` ist die Seite selbst.** Zeigte sie auf `/?angebot=`, holte Facebooks Abrufer dort die generische Vorschau.
-- **Ohne JavaScript** (selten, z. B. Lesemodus oder blockiertes JS) sieht man Titel, Beschreibung und einen deutlichen Link. Das ist eine eigene „Ansicht“, deshalb mit Mobile-UX-Gate (Tests 6).
-- **Größe**: Ziel ≤ 2,5 kB je Seite. Der Build bricht ab, wenn eine Seite 4 kB übersteigt (Backpressure gegen ausufernde Texte; Beschreibung ist auf 200, Titel auf 83 + 40 Zeichen begrenzt).
+- **Ohne JavaScript** (selten, z. B. Lesemodus oder blockiertes JS) sieht man Titel, Beschreibung und einen deutlichen Link. Das ist eine eigene „Ansicht“, deshalb mit Mobile-UX-Gate (Tests 7).
+- **Darstellung nur nach System** (Review m6): Die Seite folgt allein `prefers-color-scheme`. Die gewählte Darstellung (`zwergenplan.darstellung`, `data-theme`) liest sie nicht. Das hieße ein zweites Skript mit `localStorage` auf einer Seite, die man meist nur Millisekunden sieht. Die Farben für Hintergrund, Text und Link stehen für beide Schemata ausdrücklich im `<style>` (Kontrast ≥ 4,5 : 1, axe), nicht als Browser-Standard.
+- **Größe**: Ziel ≤ 2,5 kB je Seite. Titel (110 Zeichen, E3) und Beschreibung (200 Zeichen) werden deterministisch gekürzt, die Seite hat also eine feste Obergrenze. `checkSharePages` meldet trotzdem jede Seite über 4 kB. Das ist ein Wächter gegen Bugs im Generator, nicht gegen Daten, und darf den Build abbrechen (Exit 1).
 
 ### E5 – Vorschaubild und `og:`-Tags in `index.html`
 
-- **Bild** `public/og/vorschau-v1.jpg`: 1200 × 630 (1,91 : 1, das Format, in dem WhatsApp das große Vorschaubild zeigt), JPEG, Ziel < 100 kB (WhatsApp zeigt Bilder über etwa 300 kB oft nicht). Motiv: App-Icon links auf Papierfläche, rechts „Zwergenplan“ und „Angebote für Kinder unter 3 in Nürnberg“.
+- **Bild** `public/og/vorschau-v1.jpg`: 1200 × 630 (1,91 : 1), JPEG, Ziel < 100 kB. Motiv: App-Icon links auf Papierfläche, rechts „Zwergenplan“ und „Angebote für Kinder unter 3 in Nürnberg“.
+  - Vorgaben von Meta für WhatsApp ([Link-Vorschauen](https://developers.facebook.com/documentation/business-messaging/whatsapp/link-previews/)): unter 600 kB, mindestens 300 px breit, Seitenverhältnis höchstens 4 : 1. 1200 × 630 unter 100 kB erfüllt das mit Abstand.
   - Es entsteht reproduzierbar in `scripts/icons.ts` als weitere Variante (`page.screenshot({ type: "jpeg", quality: 85 })`) und wird committet wie die Icons.
+  - **Schrift reproduzierbar**: Die Seite für den Screenshot lädt die gebündelte Bricolage-woff2 aus `node_modules/@fontsource-variable/bricolage-grotesque/files/` per `@font-face` (als `data:`-URL eingebettet) und wartet auf `document.fonts.ready`. Ohne das hinge der Schriftzug an den Systemschriften des Rechners.
   - Das `-v1` im Namen umgeht Caches bei einem späteren Wechsel.
 - **`index.html`** bekommt dieselben generischen Tags: `og:title` „Zwergenplan“, `og:description` = bisherige `description`, `og:url` = `SITE_URL`, `og:image` samt Maßen, `twitter:card`. Davon profitieren Links auf die Startseite und die Merkliste (Stufe 2).
   - `SITE_URL` steht nur in `site.config.ts`. `index.html` bekommt den Platzhalter `%ZP_SITE_URL%`, den ein kleines Inline-Plugin in `vite.config.ts` per `transformIndexHtml` ersetzt (`{ name: "zp-site-url", transformIndexHtml: (h) => h.replaceAll("%ZP_SITE_URL%", SITE_URL) }`).
@@ -201,15 +219,18 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
   ```
   - Mit `share`: `share({ title, url })`, **ohne `text`**. WhatsApp setzt sonst Text und URL doppelt; die Vorschaukarte trägt den Inhalt.
     - `AbortError` → `"abgebrochen"` (kein Toast).
+    - `InvalidStateError` (ein Teilen-Menü ist schon offen, etwa nach Doppeltipp) → `"abgebrochen"`, still, kein Kopieren (Review M2, eigener Unit-Test).
     - `NotAllowedError`/`TypeError` → weiter zum Kopieren.
   - Ohne `share` oder nach dem Fehler: `writeText(url)` → `"kopiert"`, scheitert das → `"fehler"`.
   - `browserShareApi()` bindet `navigator.share` und `navigator.clipboard.writeText` nur, wenn sie da sind (`canShare` wird nicht gebraucht, bei URLs ist es immer wahr).
   - **Synchroner Aufruf im Tipp-Handler**: Safari verlangt eine Nutzer-Aktivierung. Deshalb gibt es kein `import()` und kein `await` vor `share`; das Modul liegt im Start-Bundle (Budget: E9).
-- **UI-Hilfe** `useShare(say)` in `src/ui/use-app-state.ts`, gibt `(target: { title: string; path: string }) => void` zurück. Sie ruft `shareLink` und meldet:
-  - `"kopiert"` → „Link kopiert – zum Einfügen in WhatsApp & Co.“
-  - `"fehler"` → „Teilen ging hier nicht. Die Adresse oben öffnet das Angebot auch.“
+- **UI-Hilfe** `useShare(say)` in `src/ui/use-app-state.ts`, gibt `share: (target: { title: string; path: string }) => void` und den Zustand `manualLink: string | undefined` samt `closeManualLink` zurück. Sie ruft `shareLink` und reagiert so:
+  - `"kopiert"` → Toast „Link kopiert – zum Einfügen in WhatsApp & Co.“
+  - `"fehler"` → **Sheet „Link zum Teilen“** (Review M2). Ein Toast mit „Adresse oben“ trüge nicht: In der installierten App gibt es keine Adresszeile, und nach einem abgelehnten `share()` scheitert auf iOS wahrscheinlich auch `writeText`.
+    - Inhalt: Satz „Halte den Link gedrückt, um ihn zu kopieren.“, darunter ein `<input type="url" readOnly>` (≥ 16 px Schrift, volle Breite) mit der Vorschau-URL. Beim Öffnen ist der Text markiert (`select()` im Effekt nach `showModal`). Fuß: „Fertig“.
+    - Komponente `ManualLinkSheet` in `src/ui/Sheets.tsx`, gerendert in `Overlays.tsx` wie die anderen Sheets. Das Sheet liegt über einem offenen Detail bzw. Anbieter-Sheet (Top-Layer, späterer `showModal` liegt oben).
   - `"geteilt"` / `"abgebrochen"` → nichts (das System hat schon Rückmeldung gegeben).
-  - Texte als Konstanten in `src/ui/format.ts` (`SHARE_COPIED`, `SHARE_FAILED`).
+  - Texte als Konstanten in `src/ui/format.ts` (`SHARE_COPIED`, `SHARE_MANUAL_HINT`).
 - **Detail** (`DetailDialog.tsx:83–88`): Rechts im Kopf steht eine Gruppe `<div className="dhead-actions">` mit `iconbtn` „Teilen“ (Icon `share`, `aria-label="Teilen"`, 44 × 44) und danach dem Herz. Neue Prop `onShare: (offer: SiteOffer) => void`, verdrahtet in `Overlays.tsx`/`App.tsx` mit `share({ title: offer.title, path: offerSharePath(offer.id) })`.
 - **Anbieter-Sheet** (`ProviderSheet.tsx:77–83`): Der Fuß wird zu `Teilen` (`btn`, Icon `share`) + `Schließen` (`btn primary`), im vorhandenen `.sheetfoot` (Flex-Wrap, bricht bei 200 % Schrift um). Neue Prop `onShare: (provider: { id: string; name: string }) => void` in `ProviderSheetProps` (`provider-types.ts`), gesetzt in `Overlays.tsx`. Das Sheet ruft sie synchron im Klick.
 - **Icon** `share` in `icons.tsx`: Strich-Icon „Kasten mit Pfeil nach oben“, kennen beide Plattformen. `PATHS.share = "M12 3v12M8 7l4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"`.
@@ -219,7 +240,7 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 
 - `notFoundPage()` erzeugt `public/404.html` (Pages liefert sie für jeden unbekannten Pfad mit Status 404):
   - `noindex`, kein `og:` (eine Vorschau für „gibt es nicht“ wäre irreführend; der Messenger zeigt dann den Link ohne Karte).
-  - Ein Skript ordnet `^{BASE}angebot/([a-z0-9-]{1,200})/?$` → `{BASE}?angebot=$1` und `^{BASE}anbieter/([a-z0-9-]{1,80})/?$` → `{BASE}?anbieter=$1` zu, sonst kein Sprung. Die App prüft die IDs danach noch einmal (`parseRoute`).
+  - Ein eigenes Inline-Skript (die Regel „genau zwei Inline-Skripte“ gilt nur für `index.html`, E8) ordnet `^{BASE}angebot/([a-z0-9-]{1,200})/?$` → `{BASE}?angebot=$1` und `^{BASE}anbieter/([a-z0-9-]{1,80})/?$` → `{BASE}?anbieter=$1` zu, sonst kein Sprung. Die App prüft die IDs danach noch einmal (`parseRoute`).
   - Sichtbar: „Diese Seite gibt es im Zwergenplan nicht (mehr).“ und der Link „Zum Zwergenplan“ (ohne JavaScript).
 - **Hinweis in der App**: `App.tsx:136–139` ruft vor `closeDetail()` zusätzlich `say("Dieses Angebot ist nicht mehr im Zwergenplan.")`. Das gilt für jede unbekannte `?angebot=`, auch für alte Lesezeichen. Ein unbekannter Anbieter meldet sich wie bisher im Sheet.
 - **Service Worker**: Die Navigation auf `angebot/…`/`anbieter/…` ist `netz` (ADR 0013, Regel „sonst nur Netz“). Offline zeigt der Browser seinen Fehler. Eine Schalen-Antwort hülfe nicht, denn die App liest nur die Query. Bewusst so (Nicht-Ziel).
@@ -236,11 +257,12 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
   - Datenfluss: neue Zeile `public/angebot/<id>/, public/anbieter/<id>/, public/404.html (Vorschauseiten, Plan 0026, ADR 0020)`.
   - Schichten: `scripts/lib/share-pages.ts` rein, `src/data/share.ts` als Geräte-API, `src/domain/share.ts` und `labels.ts`.
   - Service Worker: ein Satz, dass die Vorschauseiten unter „sonst nur Netz“ fallen.
+  - Bootstrap: Die Regel „genau zwei Inline-Skripte“ gilt nur für `index.html`. Vorschauseiten und `404.html` sind eigene Dokumente mit je einem eigenen, festen Inline-Skript ohne Daten- oder Gerätezugriff (nur `navigator.userAgent` und `location`).
   - Privatsphäre: Ein geteilter Link enthält nur eine öffentliche ID (Stufe 2: Fragment).
 
 ### E9 – Budget und Größen
 
-- **Start-JS**: `src/domain/share.ts` (Pfade), `src/data/share.ts`, `useShare`, Icon, zwei Toast-Texte, Hinweis bei unbekanntem Angebot. Geschätzt +0,3–0,4 kB. Messen vorher und nachher, Zeile in der Delta-Tabelle von ADR 0012. Der Anbieter-Teil liegt im Lazy-Chunk `Anbieter JS` (6 kB, +≈ 0,05 kB).
+- **Start-JS**: `src/domain/share.ts` (Pfade), `src/data/share.ts`, `useShare`, `ManualLinkSheet`, Icon, Texte, Hinweis bei unbekanntem Angebot. Geschätzt +0,4–0,5 kB. Messen vorher und nachher, Zeile in der Delta-Tabelle von ADR 0012. Der Anbieter-Teil liegt im Lazy-Chunk `Anbieter JS` (6 kB, +≈ 0,05 kB).
 - **Artefakt**: etwa 410 Seiten × ≈ 2 kB ≈ 0,8 MB roh, dazu das Bild < 100 kB. Die ICS-Dateien sind schon heute ein Vielfaches. Kein neues size-limit, dafür die harte 4-kB-Grenze je Seite (E4) und die Zählzeile im Build-Log.
 - **Build-Zeit**: Strings bauen und rund 410 `writeFileSync`, gemessen erwartet unter 0,2 s. Läge es über 2 s, schreibt der Build eine `::warning::` wie bei der Wegzeit.
 
@@ -257,10 +279,11 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 - **Kurz-ID** `shortId(id)`: cyrb53 (53-Bit-Hash, Seed 0) über die UTF-16-Zeichen der ID, dann `(h % 36 ** 8).toString(36).padStart(8, "0")`. Das sind 41 Bit, rein und synchron, etwa 15 Zeilen in `src/domain/share.ts`. Feste Testvektoren werden test-first ermittelt und eingefroren.
 - **Kollisionen**:
   - Bei 1 000 IDs ist die Wahrscheinlichkeit etwa 2 · 10⁻⁷.
-  - Trotzdem prüft `build-data` alle aktuellen Angebots-IDs und getrennt alle Anbieter-IDs: Gleiche Kurz-IDs → Exit 1 mit „Kurz-ID-Kollision (Plan 0026, E10): … – Format v2 nötig“.
-  - v2 hieße dann z. B. 10 Zeichen. Der Parser kennt die Version und lehnt Unbekanntes ab.
-- **Länge**: 30 Angebote → `https://zwergenplan.app/#merkliste=1.` (37 Zeichen) + 240 = **277 Zeichen**, 60 Angebote ≈ 520. WhatsApp erlaubt etwa 65 000 Zeichen je Nachricht, die Link-Erkennung kommt mit 277 Zeichen ohne Sonderzeichen zurecht.
-- **Obergrenzen**: höchstens 60 Angebote und 60 Anbieter. Der Parser lehnt längere Fragmente ab, kein Aufwand für Riesenlisten. Beim Senden mit mehr als 60 gehen die 60 nächsten (nach Termin), und der Toast sagt „Die nächsten 60 Angebote geteilt“.
+  - Trotzdem prüft `build-data` alle aktuellen Angebots-IDs und getrennt alle Anbieter-IDs (`findShortIdCollisions`). Gleiche Kurz-IDs ergeben **nur eine `::warning::`** „Kurz-ID-Kollision (Plan 0026, E10): … – Format v2 erwägen“, kein Exit 1. Ein harter Abbruch blockierte sonst den Nachtlauf (ADR 0016) wegen eines Komfort-Features (Review M4).
+  - **Mehrdeutigkeit beim Empfang**: Passt eine Kurz-ID auf mehr als ein Element, verwirft `resolveShared` sie ganz. Sie zählt dann zu den „nicht mehr im Zwergenplan“. Es wird nie ein falsches Angebot gemerkt.
+  - Ein späteres v2 hieße z. B. 10 Zeichen. Der Parser kennt die Version und lehnt Unbekanntes ab.
+- **Länge**: 30 Angebote → `https://zwergenplan.app/#merkliste=1.` (37 Zeichen) + 240 = **277 Zeichen**, 100 Angebote ≈ 840. WhatsApp erlaubt etwa 65 000 Zeichen je Nachricht, die Link-Erkennung kommt mit Links ohne Sonderzeichen in dieser Länge zurecht.
+- **Keine Kappung beim Senden** (Review m13, Simplicity): Geteilt wird die ganze Liste. Nur der Parser lehnt Fragmente mit mehr als 200 Einträgen je Gruppe ab (≈ 1 600 Zeichen), als Schutz gegen Unfug, nicht als Produktgrenze.
 - Reine API in `src/domain/share.ts`:
   ```ts
   export interface SharedList { offers: string[]; providers: string[] } // Kurz-IDs
@@ -279,10 +302,17 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 
 ### E12 – Empfangen: Fragment einmal lesen, sofort entfernen
 
-- `useSharedList()` in `src/ui/use-app-state.ts`:
-  - liest im `useState`-Initialisierer **einmal** `window.location.hash` und parst ihn mit `parseSharedList`,
-  - entfernt das Fragment danach per `history.replaceState(history.state, "", pathname + search)`.
-  - Das läuft **vor** dem ersten `replace` aus `useRoute`, sonst verwirft `urlFor` das Fragment (Ausgangslage). Die Reihenfolge sichert ein Aufruf in `App` vor `useRoute` und ein E2E-Test.
+- **`takeSharedFragment()`** in `src/data/shared-fragment.ts`, nach dem Muster von `takeEarlyRequest` (`src/data/site.ts`):
+  ```ts
+  /** Liest `#merkliste=…` beim ersten Aufruf, entfernt das Fragment und merkt sich das Ergebnis; jeder weitere Aufruf liefert dasselbe. */
+  export function takeSharedFragment(loc: Pick<Location, "hash" | "pathname" | "search"> = window.location,
+                                     hist: Pick<History, "state" | "replaceState"> = window.history): SharedList | "ungueltig" | undefined;
+  ```
+  - Erster Aufruf: liest `loc.hash`. Beginnt es mit `#merkliste=`, parst es mit `parseSharedList` und entfernt das Fragment per `hist.replaceState(hist.state, "", pathname + search)`. Ergebnis im Modul gemerkt.
+  - Weitere Aufrufe: das gemerkte Ergebnis, kein zweites Lesen, kein zweites `replaceState`.
+  - Grund (Review M3): Ein `useState`-Initialisierer mit Seiteneffekt läuft unter `<StrictMode>` (`main.tsx:11`) doppelt. Beim zweiten Mal wäre das Fragment schon weg, und der Zustand hinge davon ab, welcher Lauf zählt.
+  - Aufruf: `App` ruft `useState(() => takeSharedFragment())` **vor** `useRoute()` auf. Sonst verwirft das erste `replace` aus `useRoute` (`urlFor`) das Fragment (Ausgangslage). Die Reihenfolge sichert ein E2E-Test.
+  - Fehlt `#merkliste=` (auch bei anderen Fragmenten), bleibt die URL unberührt.
 - Das Fragment geht in keinen Request, kein `site.json`-URL-Parameter, keinen Log. E2E prüft: Kein Request enthält `merkliste`.
 - Ungültig oder unbekannte Version → kein Sheet, Toast „Dieser Merklisten-Link ist unvollständig.“.
 
@@ -298,13 +328,15 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 - Alle Angebote unbekannt → statt Sheet ein Toast „Die geteilten Angebote sind alle vorbei.“.
 - **Budget**: Das Sheet liegt statisch im Start-Bundle, geschätzt +0,6–0,9 kB (Parser, Hash, Sheet, Texte). Messen und in ADR 0012 eintragen. Liegt es über 1,2 kB, wird das Sheet ein Lazy-Chunk `assets/merkliste/` nach dem Muster der Anbieter-UI (Lader, `…-only-lazy`, `…-entry-only`). Der Parser bleibt im Start, denn er muss vor `useRoute` laufen.
 
-### E14 – iOS-App: Link einfügen
+### E14 – iOS-App: bewusst nicht in Stufe 2 (offener Punkt N3)
 
-- Auf iOS öffnet ein Link aus WhatsApp in Safari, nicht in der Home-Bildschirm-App, und Safari hat einen anderen `localStorage`. „Alle übernehmen“ landete dann in Safari, die App bliebe leer.
-- Gegenmittel (Nutzerentscheid N3, Empfehlung ja):
-  - Die Merkliste bekommt unten den Textknopf „Geteilte Liste öffnen“. Er öffnet ein Feld „Link hier einfügen“ (Eingabe ≥ 16 px, `inputmode="url"`). Ein gültiger Link öffnet dasselbe Sheet (E13).
-  - Im Sheet steht in Safari außerhalb der App (`display-mode` nicht `standalone`, gelesen über `src/data/pwa.ts`, lazy) der Hinweis: „Nutzt du den Zwergenplan als App? Dann kopiere den Link und füge ihn dort in der Merkliste ein.“ Daneben steht der Knopf „Link kopieren“.
-  - Kein `clipboard.readText`: Das braucht auf iOS eine Rückfrage und auf Android eine Berechtigung, das Feld ist einfacher.
+- Auf iOS öffnet ein Link aus WhatsApp in Safari, nicht in der Home-Bildschirm-App, und Safari hat einen anderen `localStorage`. „Alle übernehmen“ landet dann in Safari, die App bleibt leer.
+- Stufe 2 baut dafür **nichts** (Review m13, Simplicity). Erst der Gerätetest von Stufe 2 (Schritt 14) zeigt, ob es im Alltag stört. Danach entscheidet der Nutzer (N3).
+- Skizze für den Fall „ja“, damit ein Folgeplan nicht bei null beginnt:
+  - Textknopf „Geteilte Liste öffnen“ in der Merkliste mit dem Feld „Link hier einfügen“ (≥ 16 px, `inputmode="url"`). Ein gültiger Link öffnet das Sheet aus E13.
+  - Im Sheet in Safari außerhalb der App ein Hinweis mit Knopf „Link kopieren“.
+  - Kein `clipboard.readText` (Rückfrage auf iOS, Berechtigung auf Android).
+  - Geschätzt +0,2 kB.
 
 ### E15 – Senden
 
@@ -324,6 +356,8 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
      - nicht wöchentlich, gemischt.
    - Die Zeitzone stimmt über den Wechsel auf Winterzeit (Termin 26.10.).
    - Beschreibung: Reihenfolge der Bausteine, ohne Stadtteil, Kürzung bei 200 Zeichen am Wortende mit „…“.
+   - Titel: ein künstlicher Titel mit 150 Zeichen ergibt einen `og:title` ≤ 110 Zeichen, der Titelteil endet auf „…“, „ · {wann}“ bleibt erhalten.
+   - `rhythm` und `uniformTimes` bekommen `new Date(generatedAt)` (ein Angebot, dessen Rhythmus sich nach `generatedAt` ändert, zeigt den Rhythmus ab `generatedAt`).
    - **Escaping**: Titel `Tom & Jerry's "<script>"` steht als `Tom &amp; Jerry&#39;s &quot;&lt;script&gt;&quot;` in `<title>`, `og:title` und `h1`. Kein `<script>` außer dem einen festen.
    - Ungültige ID (`../x`) → Wurf.
    - `og:url` = `SITE_URL + "angebot/<id>/"`, `href` von `#go` = `BASE + "?angebot=<id>"`.
@@ -333,10 +367,11 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
    - Anbieter: Zählung relativ zu `generatedAt`, höchstens 3 Kategorien und Stadtteile, Text bei 0 Angeboten.
    - `notFoundPage()`: enthält `noindex`, kein `og:`, beide Muster.
 2. **Unit `src/domain/share.test.ts`**: Pfade, `offerAppSearch` stimmt mit `routeToSearch` überein, `parseRoute(offerAppSearch(id)).offerId === id`.
-3. **Unit `src/domain/labels.test.ts`**: Die verschobenen Funktionen liefern dieselben Texte (bestehende Fälle aus `format.test.ts` ziehen mit).
+3. **Unit `src/domain/labels.test.ts`**: Die verschobenen Funktionen liefern dieselben Texte (bestehende Fälle aus `format.test.ts` ziehen mit). `MONTHS_SHORT`: Mai → „Mai“, Juni → „Juni“, Juli → „Juli“, September → „Sept.“, Oktober → „Okt.“. `weekTitle` über den Monatswechsel Juni/Juli ergibt „29. Juni – 5. Juli“.
 4. **Unit `src/data/share.test.ts`** mit injizierter API:
    - `share` ok → „geteilt“,
    - `AbortError` → „abgebrochen“, `writeText` nicht gerufen,
+   - `InvalidStateError` → „abgebrochen“, `writeText` nicht gerufen,
    - `NotAllowedError` → `writeText` → „kopiert“,
    - kein `share` → „kopiert“,
    - beides scheitert → „fehler“,
@@ -346,31 +381,44 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
    - **Detail**: Stub `navigator.share` per `addInitScript` (zeichnet Aufrufe auf). Detail öffnen, mit aktivem Filter `?kat=…`, Geburtsdatum und Startpunkt gesetzt, „Teilen“ tippen.
      - Aufgerufen genau einmal mit `url` = `{origin}/angebot/<id>/`, ohne `?`, ohne Geburtsdatum, ohne `kat`.
      - `title` = Angebotstitel. Kein Toast.
-   - **Fallback**: `navigator.share` auf `undefined`, `navigator.clipboard.writeText` gestubbt → Toast „Link kopiert …“ im Detail sichtbar, kopierter Text = URL. Ein gestubbtes Scheitern → Toast „Teilen ging hier nicht …“.
-   - **Abbruch**: Stub wirft `AbortError` → kein Toast.
+   - **Fallback**: `navigator.share` auf `undefined`, `navigator.clipboard.writeText` gestubbt → Toast „Link kopiert …“ im Detail sichtbar, kopierter Text = URL.
+   - **Beides scheitert**: `share` wirft `NotAllowedError`, `writeText` wirft → Sheet „Link zum Teilen“ über dem Detail. Das Feld ist `readonly`, enthält `{origin}/angebot/<id>/`, und sein Text ist markiert (`selectionStart === 0`, `selectionEnd === value.length`). „Fertig“ schließt nur das Sheet, das Detail bleibt offen.
+   - **Abbruch**: Stub wirft `AbortError` bzw. `InvalidStateError` → kein Toast, kein Sheet.
    - **Anbieter-Sheet**: „Teilen“ im Fuß → URL `{origin}/anbieter/<id>/`.
    - **Vorschauseite**: `request.get("/angebot/<id>/")` → 200, `og:title`, `og:description`, `og:image`, `og:url`, `robots noindex` vorhanden, Werte wie Unit-Test.
-   - **Weiterleitung**: `page.goto("/angebot/<id>/")` → URL wird `/?angebot=<id>`, das Detail ist offen, `history.length` steigt nicht (Zurück schließt das Detail, landet nicht auf der Vorschauseite).
-   - **Bot**: Kontext mit `userAgent: "WhatsApp/2.23.20 A"` → bleibt auf der Seite, Link sichtbar.
+   - **Weiterleitung** (Review m7): `page.goto("/angebot/<id>/")` → URL wird `/?angebot=<id>`, das Detail ist offen.
+     - `history.length` ist danach gleich wie direkt nach dem `goto` (`location.replace` legt keinen Eintrag an).
+     - Der In-App-Knopf „Zurück“ im Detail schließt es und zeigt die Liste (URL ohne `angebot=`).
+     - `page.goBack()` landet danach nicht auf `/angebot/…` (URL enthält kein `/angebot/`).
+   - **Bot** (Review M1): Kontext mit dem iMessage-User-Agent `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0` → bleibt auf der Seite, Link sichtbar.
+   - **Kein Bot**: Kontext mit `userAgent: "WhatsApp/2.23.20 A"` (ohne „bot“) → wird weitergeleitet, Detail offen.
    - **Ohne JavaScript** (`javaScriptEnabled: false`): Titel und Link sichtbar, Link führt ins Detail.
    - **Verschwundenes Angebot**: `page.route("**/angebot/gibt-es-nicht--x--y/", r => r.fulfill({ status: 404, path: "dist-e2e/404.html" }))` → Sprung nach `/?angebot=gibt-es-nicht--x--y` → Startseite, Toast „Dieses Angebot ist nicht mehr im Zwergenplan.“, kein `angebot=` in der URL.
    - Prüfen in Schritt 1, ob `vite preview` `/angebot/<id>/` als `angebot/<id>/index.html` ausliefert. Falls nicht: Tests auf `…/index.html` und ein Satz im Test, warum.
 7. **E2E Mobile-UX** (`e2e/mobile-ux.spec.ts`): Zustände
    - `detail` (vorhanden) prüft jetzt den Kopf mit drei Knöpfen bei 320 px und 200 %,
    - `anbieter-sheet` (vorhanden) den zweiteiligen Fuß,
-   - neu `vorschauseite-ohne-js` (eigener Kontext ohne JavaScript, hell und dunkel).
+   - neu `link-zum-teilen` (Sheet aus E6 über dem Detail, hell und dunkel),
+   - neu `vorschauseite-ohne-js` (eigener Kontext ohne JavaScript). Dunkel nur über `colorScheme: "dark"` (System). Die Variante `data-theme="dark"` entfällt hier bewusst, denn die Seite liest die gewählte Darstellung nicht (E4). Das wird im Test als Ausnahme mit Verweis auf Plan 0026, E4 begründet.
 8. **E2E PWA** (`e2e/pwa.spec.ts`, Chromium mit Service Worker): Nach der Registrierung `goto("/angebot/<id>/")` → Detail offen, keine Konsolenfehler. Der Navigation-Preload-Hinweis ist nur eine Warnung; falls doch ein Fehler kommt: Ursache beheben, nicht freischalten.
-9. **Smoke** (echte Daten, `dist/`): Für das erste und das letzte Angebot aus `site.json` und einen Anbieter aus `anbieter.json` antwortet die Seite mit 200 und enthält den escapten Titel. `dist/404.html` ist vorhanden. `__zpMap` fehlt wie bisher.
-10. **Build-Gate**: `build-data` schreibt so viele Seiten, wie es Angebote und Anbieter gibt. Wirft bei einer Seite > 4 kB (Unit für die Prüffunktion `checkSharePages(pages)` in `share-pages.ts`).
+9. **Smoke** (echte Daten, `dist/`): Für das erste und das letzte Angebot aus `site.json` und einen Anbieter aus `anbieter.json` antwortet die Seite mit 200 und enthält den escapten Titel. `dist/404.html` ist vorhanden. `__zpMap` fehlt wie bisher. **Keine Fixture-Seite im Deploy-Build** (Review m11): Für jede Angebots-ID aus `tests/fixtures/offers.json` antwortet `/angebot/<id>/` nicht mit der Vorschauseite (Status 404 bzw. kein `og:title`). Dazu prüft ein Node-Schritt im Smoke-Test, dass `dist/angebot/` kein Verzeichnis mit diesen IDs enthält.
+10. **Build-Gate**: `build-data` schreibt so viele Seiten, wie es Angebote und Anbieter gibt. `checkSharePages(pages)` meldet jede Seite > 4 kB (Unit in `share-pages.test.ts`), `build-data` bricht dann ab. Das ist ein Wächter gegen Bugs im Generator, Daten allein können ihn wegen der Kürzungen nicht auslösen (E4).
 
 **Stufe 2**
 
 11. **Unit `src/domain/share.test.ts`**:
     - `shortId`-Testvektoren (eingefroren), `encodeSharedList`/`parseSharedList` hin und zurück, Duplikate, Reihenfolge,
-    - ungültig: Version 2, Länge nicht durch 8 teilbar, Großbuchstaben, > 60, leer,
-    - `resolveShared` ignoriert Unbekanntes,
-    - Kollisionsprüfung `findShortIdCollisions(ids)` (künstliche Kollision über eine injizierte Hashfunktion).
+    - 200 Einträge je Gruppe gültig, 201 ungültig,
+    - ungültig: Version 2, Länge nicht durch 8 teilbar, Großbuchstaben, leer,
+    - `resolveShared` ignoriert Unbekanntes und **verwirft mehrdeutige Kurz-IDs ganz** (künstliche Kollision über eine injizierte Hashfunktion),
+    - Kollisionsprüfung `findShortIdCollisions(ids)` liefert die Paare. `build-data` macht daraus eine `::warning::`, keinen Abbruch.
 12. **Unit `src/domain/saved.test.ts`**: `mergeSaved` hängt nur Neues an und entfernt nichts.
+12a. **Unit `src/data/shared-fragment.test.ts`** (Review M3), mit injiziertem `loc`/`hist`:
+    - erster Aufruf mit `#merkliste=1.…` → Liste, `replaceState` genau einmal mit `pathname + search` (Query bleibt, `history.state` bleibt),
+    - zweiter Aufruf → dasselbe Ergebnis, `replaceState` nicht noch einmal,
+    - ungültiges Fragment → `"ungueltig"`, Fragment trotzdem entfernt,
+    - anderes Fragment (`#oben`) → `undefined`, URL unberührt.
+    - Zwischen den Tests wird der Modulzustand über `vi.resetModules()` zurückgesetzt.
 13. **E2E `e2e/teilen.spec.ts`, Merkliste**:
     - Senden: zwei Angebote merken, „Liste teilen“ (Stub) → `url` matcht `/#merkliste=1\.[0-9a-z]{16}$/`, `text` „2 Angebote aus meiner Zwergenplan-Merkliste“. Kein Geburtsdatum, keine Query.
     - Empfangen in neuem Kontext mit einem schon gemerkten dritten Angebot:
@@ -378,8 +426,8 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
       - Fragment aus der URL entfernt, kein Request enthält `merkliste`.
     - Teilweise: Herz auf einer Kachel → genau dieses gemerkt.
     - Kaputter Link → Toast, kein Sheet.
-    - Einfügefeld (E14): Link einfügen → dasselbe Sheet.
-14. **E2E Mobile-UX**: Zustand `geteilte-merkliste` (Sheet mit 2 Kacheln und Hinweis auf fehlende Einträge) und `merkliste-link-einfuegen`.
+    - Mit Query und Fragment (`/?ansicht=kalender#merkliste=…`): Sheet erscheint, die Query bleibt (Reihenfolge vor `useRoute`).
+14. **E2E Mobile-UX**: Zustand `geteilte-merkliste` (Sheet mit 2 Kacheln und Hinweis auf fehlende Einträge).
 
 ## Schritte
 
@@ -389,12 +437,12 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
    - `grep -rn "angebot=\|anbieter=\|og:\|Stickerheft" src e2e scripts`.
    - Start-JS auf aktuellem `main` messen (`pnpm build && pnpm size`).
    - Prüfen, ob `vite preview` Verzeichnis-Indizes ausliefert (Tests 6).
-   - Prüfen, ob die Pläne 0022–0025 inzwischen eine ADR-Nummer ≥ 0020 belegen; dann ADR 0020 umnummerieren.
+   - Prüfen, ob die Pläne 0022–0025 inzwischen eine ADR-Nummer ≥ 0020 belegen; dann ADR 0020 umnummerieren. Stand 2026-10-08 nach `git fetch`: `origin/main`, `feedback-0022-kleinigkeiten`, `zeitraumfilter-0023`, `karte-look-0024` und `origin/plan-0025-merkliste` enden alle bei ADR 0019. Plan 0025 sieht nur bedingt ein ADR vor (Lazy-Merkliste, dort E11/E12).
 2. `src/domain/labels.ts` herauslösen (Tests 3), `format.ts` re-exportiert. `pnpm check:fast` grün, Bundle-Hash unverändert oder Start-JS ±0.
 3. `src/domain/share.ts` (Pfade) test-first (Tests 2).
 4. `scripts/lib/share-pages.ts` test-first (Tests 1, 10). Danach die Verdrahtung in `build-data.ts`, `.gitignore`, Log-Zeile.
 5. Vorschaubild in `scripts/icons.ts`, `public/og/vorschau-v1.jpg` erzeugen und committen. `index.html` und das Plugin `zp-site-url` (E5).
-6. `src/data/share.ts` test-first (Tests 4), `useShare`, Icon, Knopf im Detail und im Anbieter-Sheet, Toast bei unbekanntem Angebot (E6, E7). `src/sw/routes.test.ts` ergänzen (Tests 5).
+6. `src/data/share.ts` test-first (Tests 4), `useShare`, `ManualLinkSheet`, Icon, Knopf im Detail und im Anbieter-Sheet, Toast bei unbekanntem Angebot (E6, E7). `src/sw/routes.test.ts` ergänzen (Tests 5).
 7. E2E und Smoke (Tests 6–9). `PW_PORT=4273 pnpm check:fast`, dann `PW_PORT=4273 pnpm check`.
 8. Doku: `docs/architecture.md` (E8), ADR 0020 auf „angenommen (Stufe 1)“, Delta in ADR 0012, `docs/ideas.md` („Vorschaubild je Kategorie“, „Teilen auf der Kachel“). `/arch-review` (neues Modul, mehr als 200 Zeilen), Branch pushen, CI grün, Fast-Forward nach `main`, CI auf `main` grün.
 9. `/browser-review live` und **Gerätetest** durch den Nutzer:
@@ -405,27 +453,48 @@ Vorlage (Platzhalter in `{}` sind escaped, `SITE_URL` aus `site.config.ts`):
 **Stufe 2** (Branch `teilen-0026-s2`, erst nach dem Merge von Plan 0025 und mit Entscheidung N1)
 
 10. E10–E15 an den Stand von Plan 0025 anpassen (Ort des Knopfs, Schlüssel gemerkter Anbieter, Kachel für Anbieter), kurzer Nachtrag hier und ein `/plan-review` nur für Stufe 2.
-11. `shortId`, Kodierung und `mergeSaved` test-first (Tests 11, 12). Kollisionsprüfung in `build-data`.
-12. `useSharedList` (Reihenfolge vor `useRoute`), Sheet, Senden, Einfügefeld (E12–E15). Budget messen (E13, ggf. lazy).
+11. `shortId`, Kodierung, `mergeSaved` und `takeSharedFragment` test-first (Tests 11, 12, 12a). Kollisionswarnung in `build-data`.
+12. Aufruf in `App` vor `useRoute`, Sheet, Senden (E12, E13, E15). Budget messen (E13, ggf. lazy).
 13. E2E und Mobile-UX (Tests 13, 14), `pnpm check`.
-14. Doku: Vermerk in Plan 0003, Zeile 75, und im Kopfkommentar von `route.ts`; `docs/architecture.md`, Privatsphäre (Fragment-Ausnahme); ADR 0020 auf „angenommen“; Delta in ADR 0012. `/arch-review`, CI, Fast-Forward, `/browser-review live`, Gerätetest iOS Safari → App (E14).
+14. Doku: Vermerk in Plan 0003, Zeile 75, in Plan 0025 (gemerkte Anbieter „nie in URL“, Zeile 122) und im Kopfkommentar von `route.ts`; `docs/architecture.md`, Privatsphäre (Fragment-Ausnahme); ADR 0020 auf „angenommen“; Delta in ADR 0012. `/arch-review`, CI, Fast-Forward, `/browser-review live`. **Gerätetest iOS**: Link aus WhatsApp in Safari öffnen, während der Zwergenplan als App installiert ist. Ergebnis hier eintragen, dann N3 entscheiden.
 
 ## Offene Punkte (Nutzerentscheid)
 
 - **N1 – Stufe 2 jetzt oder später?** **Empfehlung: später**, als eigene Etappe direkt nach dem Merge von Plan 0025.
   - Plan 0025 baut `SavedView` um (Liste, Karte, Kalender) und führt „Anbieter merken“ ein. Stufe 2 hängt an beidem: am Ort des Knopfs, am Speicherschlüssel und an der Kachel für Anbieter. Parallel gebaut gäbe es Konflikte und doppelte Arbeit.
   - Stufe 1 bringt den größten Nutzen (einzelne Angebote in WhatsApp) und ist davon unabhängig.
+  - **Budget**: Stufe 2 kostet geschätzt +0,6–0,9 kB Start-JS (E13), Stufe 1 +0,4–0,5 kB (E9). Plan 0018 (ICS nur altersgerecht) wartet ebenfalls auf Reserve im Startbudget, und Plan 0025 hat einen eigenen Entscheidungspunkt bei +2,5 kB. Wer Stufe 2 später baut, misst nach 0018 und 0025 neu und entscheidet dann, ob das Sheet statisch bleibt oder lazy wird (E13).
 - **N2 – Datum in der Vorschau regelmäßiger Angebote.** **Empfehlung: Rhythmus** („jeden Mittwoch, 9:30“) statt „nächster Termin Mi 14. Okt.“ (E3). Der nächste Termin veraltet zwischen zwei Deploys und im Cache des Messengers, und der Build hinge an der Uhr. Einmalige Termine und Kurse zeigen ihr festes Datum.
-- **N3 – Einfügefeld für iOS-App-Nutzer (Stufe 2, E14).** **Empfehlung: ja.** Ohne Feld können Empfänger, die den Zwergenplan als iOS-App nutzen, eine geteilte Liste nur in Safari übernehmen, nicht in ihrer App. Kosten: ein Textknopf, ein Feld und ein Hinweis, geschätzt +0,2 kB.
+- **N3 – Einfügefeld für iOS-App-Nutzer (E14), erst nach dem Gerätetest von Stufe 2.** Nicht Teil von Stufe 2 (Review m13). **Empfehlung: nach dem Gerätetest (Schritt 14) entscheiden.** Landet eine geteilte Liste bei iOS-App-Nutzern spürbar in Safari statt in der App, wird die Skizze aus E14 ein kleiner Folgeplan (geschätzt +0,2 kB). Sonst bleibt es bei einem Eintrag in `docs/ideas.md`.
 - **N4 – Vorschaubild.** **Empfehlung: ein generisches Bild** (Icon und Schriftzug, E5). Bilder je Kategorie wären hübscher, kosten aber 12 Motive, Pflege und Gestaltung. Sie kommen nach `docs/ideas.md`.
 
 ## Risiken
 
 - **Messenger-Verhalten ist nicht spezifiziert.** Wann WhatsApp große oder kleine Vorschauen zeigt, wie lange es cacht und ob iMessage JavaScript ausführt, ist nur empirisch bekannt. Abgesichert durch Standard-Tags, ein Bild in 1,91 : 1 unter 100 kB, die Bot-Ausnahme, kein `meta refresh` und den Gerätetest (Schritt 9).
 - **Pfadvertrag**: Wer später `angebot/` umbenennt, bricht alle geteilten Links. ADR 0020 hält ihn fest.
-- **Bot-Liste zu breit**: Ein Mensch mit „Signal“ oder „WhatsApp“ im User-Agent (In-App-Browser) bliebe auf der Seite und müsste den Link tippen. Das ist unschön, aber keine Sackgasse. Fällt es im Gerätetest auf, wird die Liste enger.
+- **Bot-Muster trifft einen Menschen**: Ein In-App-Browser mit „bot“ als eigenem Wort im User-Agent bliebe auf der Seite und müsste den Link tippen. Das ist unschön, aber keine Sackgasse. Nach dem Review ist die Liste auf JS-fähige Abrufer beschränkt (E4).
 - **ADR-Nummer**: Kollision mit parallelen Plänen möglich (Schritt 1).
 
-## Review
+## Review (2026-10-08) – Verdict: freigabefähig nach Einarbeitung → eingearbeitet
 
-Noch keiner. Nächster Schritt: `/plan-review docs/plans/0026-teilen-per-link.md`.
+Unabhängiger `plan-reviewer`, kein Blocker. Quellen des Reviewers: [Meta, WhatsApp-Link-Vorschauen](https://developers.facebook.com/documentation/business-messaging/whatsapp/link-previews/), [Netlify-Forum zu iMessage-Vorschauen](https://answers.netlify.com/t/cant-get-open-graph-previews-working-in-imessage-with-netlify-prerendering/87487).
+
+| Befund | Umgang |
+|---|---|
+| **M1** Bot-Liste zu breit: WhatsApp holt per GET ohne JavaScript, `location.replace` wirkt dort nicht; „WhatsApp“/„Signal“ in der Liste träfe In-App-Browser | Liste auf `facebookexternalhit\|Facebot\|Twitterbot\|bot\b\|crawler\|spider` reduziert, Quellen zitiert (E4). Bot-Test mit iMessage-User-Agent, neuer Test „WhatsApp ohne bot wird weitergeleitet“ (Tests 6) |
+| **M2** Fallback-Text „Adresse oben“ trägt nicht (keine Adresszeile in der App, `writeText` nach abgelehntem `share()` auf iOS unsicher) | Bei `"fehler"` Sheet „Link zum Teilen“ mit schreibgeschütztem, markiertem Feld (E6). `InvalidStateError` wird still ignoriert, mit Unit-Test (Tests 4) und E2E (Tests 6), Mobile-UX-Zustand `link-zum-teilen` (Tests 7) |
+| **M3** Initialisierer mit Seiteneffekt bricht unter StrictMode | `takeSharedFragment()` in `src/data/shared-fragment.ts` nach dem Muster von `takeEarlyRequest`, Aufruf vor `useRoute` (E12), Unit-Test für den zweiten Aufruf (Tests 12a) |
+| **M4** Harte Exit-1-Gates blockieren den Nachtlauf | `og:title` deterministisch auf 110 Zeichen gekürzt (E3), 4 kB bleibt nur als Bug-Wächter (E4, Tests 10). Kurz-ID-Kollision ist nur `::warning::`, `resolveShared` verwirft mehrdeutige IDs (E10, Tests 11) |
+| **m5** Fundstellen | `routes.ts:45–52` und `sw.ts:66–77`, `dialog.css:64` (Ausgangslage) |
+| **m6** Mobile-UX der Vorschauseite | nur System-Dunkel, begründet; Farben für Hintergrund, Text und Link in beiden Schemata gesetzt (E4, Tests 7) |
+| **m7** History-Test unscharf | `history.length` gleich, In-App-„Zurück“ zur Liste, `goBack()` nicht auf `/angebot/` (Tests 6) |
+| **m8** „Mai.“, „Jun.“, „Jul.“ | eigene Liste `MONTHS_SHORT` mit Testfall, `weekTitle` stellt um (E3, Tests 3) |
+| **m9** `rhythm` nimmt ein `Date` | `ref = new Date(generatedAt)` für `rhythm` und `uniformTimes(upcomingSessions(offer, ref))` (E3, Tests 1) |
+| **m10** Vorschaubild reproduzierbar, Meta-Grenzen | Bricolage-woff2 per `@font-face`, `document.fonts.ready`; Grenzen < 600 kB, ≥ 300 px, ≤ 4 : 1 zitiert, Ziel < 100 kB bleibt (E5) |
+| **m11** Smoke: keine Fixture-Seite in `dist/` | Prüfung im Smoke-Test (Tests 9) |
+| **m12** knip | `SHARE_DIRS` und `escapeHtml` modulintern, Export nur bei externem Bedarf (E1, E2) |
+| **m13** Simplicity Stufe 2 | Kappung bei 60 gestrichen, Parser lehnt erst über 200 Einträge ab (E10, E11); Einfügefeld aus Stufe 2 genommen, offener Punkt N3 nach dem Gerätetest (E14) |
+| **m14** Inline-Skript-Regel | in `docs/architecture.md` klargestellt: gilt nur für `index.html` (E7, E8) |
+| Zusatz: Budget in N1 | Plan 0018 und der Entscheidungspunkt von Plan 0025 genannt (N1) |
+
+Abgelehnt wurde nichts. ADR-Nummer geprüft (Schritt 1): 0020 ist frei und bleibt.
