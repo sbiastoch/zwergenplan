@@ -94,6 +94,14 @@
       height: clamp(240px, 60dvh, 544px);
     }
   }
+  /*
+   * Platzhalter unter der Karte, solange ihr Chunk lädt (MapPanel.tsx): so hoch wie Werkzeugzeile, Hinweis und Anfang
+   * der Orts-Liste mindestens sind (bei 390 px zusammen etwa 14 rem), damit die Scroll-Position den Wechsel
+   * Liste → Karte übersteht (Browser-Review 0025, M1).
+   */
+  .map-rest {
+    min-height: 12rem;
+  }
   .map-note {
     position: absolute;
     inset: 0;

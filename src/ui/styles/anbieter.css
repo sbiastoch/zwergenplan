@@ -34,7 +34,6 @@
     color: var(--muted);
     font-weight: 400;
   }
-  /* Zeile mit Herz daneben (Plan 0025, E3): der Knopf zum Sheet nimmt den Rest, das Herz bleibt 44 px */
   /* Herz in der Kachel, rechts innen wie auf der Angebotskarte (card.css: .heart absolut); der Knopf zum Sheet läuft
      unter ihm durch und hält rechts Platz frei, damit der Text nie darunter liegt */
   .provider-row {

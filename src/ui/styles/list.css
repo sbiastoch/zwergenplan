@@ -24,6 +24,13 @@
     background: var(--primary);
     color: var(--on-primary);
   }
+  /*
+   * Abstand unter der Zeile mit dem Export-Knopf: Sein Schatten (2 px) und die gedrehte erste Kachel (−0,6° hebt ihre
+   * rechte obere Ecke um etwa 2 px) stießen sonst zusammen (Browser-Review live 0025, Etappe 2, M2).
+   */
+  .status-row:has(> .exportbtn) {
+    margin-bottom: 8px;
+  }
   /* „Offline – Stand vom …“ immer in eigener Zeile unter Zahl und Startpunkt (Plan 0011, E4; Plan 0020, E1) */
   .status-note {
     flex-basis: 100%;

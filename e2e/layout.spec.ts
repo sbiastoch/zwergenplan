@@ -791,3 +791,32 @@ test.describe("Tab-Leiste mit drei Tabs (Plan 0010, E2; Plan 0025, E8)", () => {
     });
   }
 });
+
+/*
+ * Browser-Review live Plan 0025, Etappe 2, M2: Der runde Export-Knopf (48 px, 2 px Schatten) im Kopf der Merkliste ragte
+ * etwa 2 px in die erste Kachel; deren rechte obere Ecke hebt die Drehung (−0,6°) zusätzlich an. Gemessen wird mit dem
+ * Bounding-Rect, das die gedrehte Ecke einschließt.
+ */
+test.describe("Export-Knopf der Merkliste über der ersten Kachel", () => {
+  for (const width of [320, 390, 412]) {
+    for (const scale of [1, 2]) {
+      test(`${width} px bei ${scale * 100} %: Knopf samt Schatten endet über der Kachel`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 800 });
+        await page.addInitScript(
+          (saved) => localStorage.setItem("zwergenplan.merkliste", saved),
+          JSON.stringify([
+            "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
+            "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
+          ]),
+        );
+        await page.goto("./?ansicht=merkliste");
+        await expect(page.getByTestId("offer")).toHaveCount(2);
+        await setTextScale(page, scale);
+        const button = await page.locator(".exportbtn").boundingBox();
+        const card = await page.getByTestId("offer").first().boundingBox();
+        if (!button || !card) throw new Error("Knopf oder Kachel fehlt");
+        expect(button.y + button.height + 2).toBeLessThanOrEqual(card.y);
+      });
+    }
+  }
+});

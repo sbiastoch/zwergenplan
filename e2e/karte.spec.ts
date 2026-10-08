@@ -38,6 +38,8 @@ interface TestMap {
 declare global {
   interface Window {
     __zpMap?: TestMap;
+    /** kleinste Scroll-Position seit dem Start der Messung (Browser-Review 0025, M1) */
+    __minScrollY?: number;
   }
 }
 
@@ -680,6 +682,42 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(page.getByRole("status")).not.toContainText("an 5 Orten");
     expect(withOrigin).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);
+  });
+
+  /*
+   * Browser-Review live Plan 0025, Etappe 2, M1: Auf der Merkliste sprang die Seite beim Wechsel Liste → Karte nach
+   * oben (scrollY 90 → 0 bei 390 × 844). Beim Einhängen schrumpfte das Dokument kurz auf die Viewport-Höhe, weil unter
+   * dem Platzhalter der Karte nichts stand (MapPanel.tsx, `.map-rest`). Der Kalender lädt nichts nach; mit zwei
+   * gemerkten Angeboten ist er nur kürzer als die Liste, dort gibt es nichts zu halten.
+   */
+  test("Merkliste: Wechsel Liste → Karte behält die Scroll-Position (Browser-Review 0025, M1)", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(
+      (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+      JSON.stringify([
+        "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
+        "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
+        "theater-beispiel--kuckuck-im-nest-theater-ab-18-monaten-20261115t1100--theater-beispiel-buehne",
+      ]),
+    );
+    await page.goto("./?ansicht=merkliste");
+    await expect(page.getByTestId("offer")).toHaveCount(3);
+    await page.evaluate(() => window.scrollTo(0, 90));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(90);
+    // kleinste Scroll-Position je Frame, auch im Zwischenzustand, solange der Karten-Chunk lädt
+    await page.evaluate(() => {
+      window.__minScrollY = window.scrollY;
+      const tick = () => {
+        window.__minScrollY = Math.min(window.__minScrollY ?? 0, window.scrollY);
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await idle(page);
+    expect(await page.evaluate(() => window.__minScrollY)).toBe(90);
+    expect(await page.evaluate(() => window.scrollY)).toBe(90);
   });
 
   test("ohne WebGL: Hinweis, Orts-Liste da, keine Kartenmitte", async ({ page }) => {
