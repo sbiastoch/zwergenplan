@@ -747,6 +747,33 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
 - **m6:** Der Test nutzt `alive` aus `process-group.ts`.
 - **Abnahme erneut:** TaskStop mitten in `e2e:local e2e/layout.spec.ts`. Danach liefen kein Preview-Server, kein `e2e-local` und kein Wächter, und die Sperre war frei.
 
+### CI: Browser-Installation mit Zeitlimit und Wiederholung (2026-10-08)
+
+- **Befund:** Der Schritt „Playwright-Browser“ hing am 2026-10-08 zweimal 15 min beim WebKit-Download, bis zum Job-Timeout. Der Lauf wurde abgebrochen.
+- **Lösung** in `ci.yml`, in allen E2E-Jobs und im Smoke-Job:
+  - Jeder Versuch ist mit `timeout 180` begrenzt, es gibt bis zu drei.
+  - Der ganze Schritt hat `timeout-minutes: 10`.
+  - Ein gescheiterter Versuch erzeugt eine Warnung im Lauf.
+  - Gemessen dauert die Installation sonst 22–37 s.
+- **Verworfen:** ein Cache für `~/.cache/ms-playwright`. Er hilft nur bei einem Treffer, nach jedem Playwright-Update gar nicht. Außerdem müsste der Schritt in Cache, `install` und `install-deps` zerfallen.
+
+### `check:fast` wieder unter 7,5 s (2026-10-08)
+
+- **Messung:** Laufzeit je Testdatei mit dem JSON-Reporter, Last 2,7.
+  - `scripts/heavy.test.ts` brauchte **6,8 s** und bestimmte die Dauer der Vitest-Suite. Mit Abstand folgten `profile-csa.test.ts` (2,7 s), `change-class.test.ts` (1,4 s) und `run-steps.test.ts` (1,0 s).
+  - `check:fast` lag dadurch bei 8,9–9,2 s.
+- **Ursache:** reale Wartezeiten in `heavy.test.ts`:
+  - zwei Halter mit `sleep 1`;
+  - Fristen von 300 ms je Stufe (SIGINT, SIGTERM) in den Tests zum Beenden der Gruppe;
+  - dazu Prozessstarts, etwa 0,15 s je Aufruf von `heavy.ts`.
+- **Änderung:**
+  - Die Halter schlafen 0,2 s statt 1 s.
+  - `ZP_INT_GRACE_MS` und `ZP_TERM_GRACE_MS` sind in den Tests auf 100 ms gesetzt.
+  - Die Aussagen bleiben gleich: Reihenfolge der Läufe, Selbstende des Wächters, Stufen bis SIGKILL.
+- **Ergebnis:**
+  - `heavy.test.ts` braucht 3,6 s, und fünf Läufe nacheinander waren grün.
+  - `check:fast` braucht **6,8 / 7,1 / 7,0 s** bei Last 4,9.
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.

@@ -67,8 +67,16 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Der Download hing am 2026-10-08 zweimal 15 min (Job-Timeout). Gemessen dauert er 22–37 s: Jeder Versuch hat
+      # deshalb 180 s, es gibt bis zu drei, und der Schritt ist auf 10 min begrenzt (Plan 0027, Ergebnis).
       - name: Playwright-Browser
-        run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
+        timeout-minutes: 10
+        run: |
+          for i in 1 2 3; do
+            timeout 180 pnpm exec playwright install --with-deps ${{ matrix.engine }} && exit 0
+            echo "::warning::Browser-Installation Versuch $i hing oder schlug fehl, neuer Versuch"
+          done
+          exit 1
       - name: Fixture-Build
         run: pnpm build:e2e
       - name: E2E
@@ -97,8 +105,15 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # wie im E2E-Job: 180 s je Versuch, bis zu drei, Schritt höchstens 10 min (Plan 0027, Ergebnis)
       - name: Playwright-Browser
-        run: pnpm exec playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: |
+          for i in 1 2 3; do
+            timeout 180 pnpm exec playwright install --with-deps chromium && exit 0
+            echo "::warning::Browser-Installation Versuch $i hing oder schlug fehl, neuer Versuch"
+          done
+          exit 1
       - name: Deploy-Build
         run: pnpm build
       - name: Smoke mit echten Daten

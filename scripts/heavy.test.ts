@@ -51,8 +51,8 @@ function env(dir: string, wait: string, extra: NodeJS.ProcessEnv = {}): NodeJS.P
     ZP_HEAVY_LOCK: "",
     ZP_LOCK_DIR: dir,
     ZP_LOCK_WAIT: wait,
-    ZP_INT_GRACE_MS: "300",
-    ZP_TERM_GRACE_MS: "300",
+    ZP_INT_GRACE_MS: "100",
+    ZP_TERM_GRACE_MS: "100",
     ...extra,
   };
 }
@@ -102,7 +102,7 @@ describe("heavy.ts", () => {
 
   it("mit Wartezeit startet der zweite erst nach dem ersten", async () => {
     const dir = lockDir();
-    const first = holder(dir, "sleep 1");
+    const first = holder(dir, "sleep 0.2");
     await until(() => existsSync(holderFile(dir)));
     let firstEnded = 0;
     first.on("exit", () => {
@@ -158,7 +158,7 @@ describe("heavy.ts", () => {
 
   it("nach normalem Ende beendet sich der Wächter selbst (Review ef36c19, m4)", async () => {
     const dir = lockDir();
-    const h = holder(dir, "sleep 1");
+    const h = holder(dir, "sleep 0.2");
     await until(() => existsSync(holderFile(dir)));
     const pgid = pgidOf(dir);
     await until(() => existsSync(watchdogFile(dir, pgid)));
