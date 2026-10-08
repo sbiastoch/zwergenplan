@@ -160,6 +160,8 @@ Die Kachel bekommt keinen neuen Chip, das Detail reicht. Eine eigene Datei statt
 
 ### E5 – H2: doppelte Wochenleiste
 
+> **Geändert durch Plan 0025:** Der Kalender gehört zur Merkliste (`src/ui/SavedCalendar.tsx`). Wochenleiste und Monatsraster sind weiter nie zugleich sichtbar, und der Monatsknopf hält seine Lage. Neu: Beim Tipp auf einen Tag im Monat klappt das Raster nicht mehr zu, der Monat ist ein Filter, kein Datumswähler (E5).
+
 - **Umsetzen:** Bei offenem Monatsraster blendet `CalendarView` die Wochenleiste samt Wochen-Navigation aus. Das Raster zeigt denselben Zeitraum und hat eigene Pfeile, die Agenda bleibt darunter.
 - **Kein Springen des Knopfs:** Wochen-Navigation und Wochenleiste sind zusammen ≈ 130 px hoch (44 + 12 + 72). Ohne Gegenmaßnahme rutscht „Ganzen Monat zeigen“ beim Öffnen um diese Höhe nach oben, unter dem Finger weg. Deshalb:
   - Der Knopf bleibt dasselbe DOM-Element: Die Woche wird als `{!monthOpen && …}` *vor* ihm ausgeblendet, er selbst wird nicht neu gemountet. So bleibt der Fokus auf ihm (Tastatur, Screenreader).

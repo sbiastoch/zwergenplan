@@ -189,6 +189,8 @@ UX-Leitlinien:
    - Filter-Sheet öffnen. Der Schalter „Nur passend für 1 Mon.“ ist `aria-checked="true"`, der Untertitel lautet „4 weitere passen nicht · geprüft zum Kursstart“, im Fuß steht „4 Angebote zeigen“.
    - Schalter tippen. Der Fuß zeigt „8 Angebote zeigen“, der Untertitel „4 unpassende sind markiert · …“. Sheet schließen: 8 Karten, davon 4 `.card.unfit`. „Zeigt auch 4 Angebote, die nicht zu 1 Mon. passen“ ist sichtbar.
    - Tab „Kalender“: Der Hinweis steht dort auch (der Zustand überlebt den Tab-Wechsel).
+
+     > **Geändert durch Plan 0025:** Den Tab „Kalender“ gibt es nicht mehr (E8); die Prüfung läuft über den Tab „Anbieter“.
    - „ausblenden“: 4 Karten, kein Hinweis, Fokus auf der Statuszeile.
    - Abschalten, dann neu laden: 4 Karten, kein Hinweis (Standard an).
    - Abschalten, im Filter-Sheet „Zurücksetzen“: Der Schalter ist wieder an.
@@ -202,6 +204,8 @@ UX-Leitlinien:
      - Liste: „Nichts davon passt zu …“ mit „Auch unpassende zeigen“, kein „Filter zurücksetzen“.
      - Anbieter-Tab: derselbe Leerzustand, Tipp bringt die Anbieter.
      - Kalender: Mi 7.10. im Wochenstreifen antippen (Offener Krabbeltreff; der Standardtag Mo 5.10. hat nur das schon beendete Elterncafé und zeigt „Für heute ist alles vorbei“). „Auch unpassende zeigen“ ist da, nach dem Tipp steht 1 Termin da.
+
+       > **Geändert durch Plan 0025:** Entfällt mit dem Tab „Kalender“ (E8). Der Kalender der Merkliste ignoriert das Alter.
      - Karte: Leerzustand der Ortsliste mit „Auch unpassende zeigen“.
 6. **E2E Mobile-UX** (`e2e/mobile-ux.spec.ts`), zwei neue Zustände in der Matrix, damit `expectMobileUx` alle Gates prüft (320 px, Schrift 200 %, Touch-Ziele, Querformat, Hell/Dunkel, axe):
    - `filter-sheet-alter`: Geburtsdatum 01.09.2026, Filter-Sheet offen, Schalter aus.

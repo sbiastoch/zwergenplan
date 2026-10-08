@@ -9,6 +9,8 @@ Bezug: `docs/ideas.md` („Anbieterverzeichnis auf der Website, ersetzt das frü
 Eltern sehen auf einen Blick, **wer** in Nürnberg etwas für Kinder unter 3 Jahren anbietet, und kommen von dort zum ganzen Programm eines Anbieters. Am Ende gilt:
 
 - Die Tab-Leiste hat einen **vierten Tab „Anbieter“** (`?ansicht=anbieter`), Reihenfolge Entdecken · Kalender · Anbieter · Merkliste (Nutzerentscheidung N2). Die Leiste ist dafür neu ausgelegt: hochkant 320–412 px, 200 %, Seitenleiste quer und kompakte Querleiste (E2).
+
+  > **Geändert durch Plan 0025:** Die Tab-Leiste hat drei Tabs, Angebote · Anbieter · Merkliste. Der Tab „Kalender“ entfiel, „Entdecken“ heißt „Angebote“; `tabs.css` rechnet über `--n` (E8).
 - Die **Anbieterliste** zeigt alle Anbieter des Katalogs:
   - Jede Zeile nennt die Zahl der kommenden Angebote, Stadtteil(e) bzw. Ort und, mit Startpunkt, die Wegzeit bzw. Entfernung zum nächsten Ort.
   - Ohne Startpunkt ist sie alphabetisch sortiert, mit Startpunkt nach Wegzeit (N4).
@@ -113,6 +115,8 @@ Typische Fragen:
 - **„Nach Art“ heißt nach Kategorie**: Die 12 Kategorien kennen Eltern von den Stickern, eine Einrichtungsart fehlt in den Daten.
 
 ### E2 – Navigation: vierter Tab „Anbieter“ und die neu ausgelegte Tab-Leiste (N2)
+
+> **Geändert durch Plan 0025:** Drei Tabs statt vier (E8): `TABS` ohne `kalender`, dafür `merkliste-karte` und `merkliste-kalender`. Spalten, Daumen und Seitenleiste rechnen in `tabs.css` mit `--n: 3`; `e2e/layout.spec.ts` prüft die Leiste mit drei Tabs.
 
 **Route** (`src/domain/route.ts`):
 - `TABS = ["entdecken", "karte", "kalender", "anbieter", "merkliste"]`. `tabSection("anbieter") === "anbieter"`, es ist ein eigener Tab. Der Rückgabetyp bleibt `Exclude<Tab, "karte">`.

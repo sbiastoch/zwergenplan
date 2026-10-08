@@ -8,6 +8,8 @@ Datum: 2026-10-04
 Die Platzhalter-UI wird durch das freigegebene Design ersetzt. Das ist die Mockup-Variante „C + A · Mix“: Stickerheft-Gesamtdesign mit den harten Schatten und dem Kachelaufbau der Variante „Knete“. Am Ende gilt:
 
 - Die Seite hat drei Bereiche in einer Washi-Tape-Tab-Leiste unten: **Entdecken** (Liste nach Tagen), **Kalender** (Woche, Monat, Tagesagenda) und **Merkliste** („Mein Stickerheft“).
+
+  > **Geändert durch Plan 0025:** Die drei Tabs heißen heute **Angebote** · Anbieter · Merkliste („Entdecken“ heißt „Angebote“, „Anbieter“ kam mit Plan 0010). Den Tab „Kalender“ gibt es nicht mehr: Der Kalender ist eine Darstellung der Merkliste und zeigt nur Gemerktes (`?ansicht=merkliste-kalender`, E5, E8).
 - Jedes Angebot öffnet ein **Detail** mit Etiketten (Wann/Wo/Alter/Kosten/Anmeldung), Verfügbarkeits-Stempel, Terminliste und ICS-Export.
 - Filter gibt es als Sticker-Leiste (Kategorien), Schnellfilter-Chips und Filter-Sheet. Ein **Kind-Sheet** enthält das Geburtsdatum (TT.MM.JJJJ), „Nur passende Angebote“ und die Darstellung (Automatisch/Hell/Dunkel).
 
@@ -69,6 +71,8 @@ Detail, Filter-Sheet und Kind-Sheet sind `<dialog>` mit `showModal()`. Das bring
 
 - Filter bleiben wie bisher in der URL (`kat`, `format`, `anmeldung`, `kosten`, `replaceState`).
 - Neu: `ansicht=kalender|merkliste` (fehlt = Entdecken, `replaceState`) und `angebot=<offerId>` für das Detail.
+
+  > **Geändert durch Plan 0025:** `ansicht=kalender` gibt es nicht mehr. Alte Links landen in „Angebote“, `useRoute` ersetzt die URL beim Start per `replaceState` durch die kanonische; Filter, `anbieter=` und `angebot=` bleiben (`isLegacyView`, E8).
   - Das Öffnen eines Details nutzt `pushState` mit `history.state = { zpDetail: true }`. Die Zurück-Geste von Android/iOS schließt das Detail, statt die Seite zu verlassen. `popstate` liest den Zustand neu.
   - Das Schließen (Zurück-Button, Esc, Backdrop) ruft `history.back()` auf, wenn `history.state?.zpDetail` gesetzt ist. Das Flag steht in `history.state` und übersteht damit ein Neuladen. Bei einem Deep-Link (direkt mit `?angebot=`) ersetzt das Schließen den Eintrag per `replaceState`.
   - Ein unbekanntes `angebot` (abgelaufen, falsche ID) zeigt kein Detail und entfernt den Parameter.
@@ -205,6 +209,8 @@ Inhalt wie im Mockup:
 > **Geändert durch Plan 0007** (E1, E3, E4): „Wann“ nennt bei regelmäßigen Angeboten die Uhrzeit, sobald alle kommenden Termine dieselbe haben („Freitags, 10:30–11:00“, B1). Ein laufender Kurs heißt „Kurs · noch 6 von 8 Terminen“, ein beendeter „Kurs mit 8 Terminen – vorbei“ (H8). Nach Ablauf der Frist steht „Anmeldeschluss war am 9.10.“ (B4, `registrationPhase`). Die ICS-Knöpfe heißen „Alle Termine“ (ohne Zahl, H5) und „Alle 8 Kurstermine“. Die Adresse unter „Wo“ wiederholt den Ortsnamen nicht (`venueAddress`, H6).
 
 ### E14 – Kalender
+
+> **Geändert durch Plan 0025:** Der Kalender ist seit Plan 0025 der Kalender der Merkliste (`src/ui/SavedCalendar.tsx`): Er zeigt nur gemerkte Termine, und Tag, Woche oder Monat filtern die Liste darunter. Beim Tipp auf einen Tag im Monat bleibt das Raster offen (E5).
 
 - Wochenleiste (Mo–So) mit Navigation. Vergangene Tage sind `disabled` (axe ignoriert so den gedimmten Kontrast). Unter jedem Tag bis zu 3 Kategorie-Formen der Angebote des Tages.
 - „Ganzen Monat zeigen“ klappt ein Monatsraster auf (Mo-erste Spalte, Formpunkt der ersten Kategorie; geändert durch Plan 0014, E1). Ein Tag dort wählt den Tag und klappt zu.

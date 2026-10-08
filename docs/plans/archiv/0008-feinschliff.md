@@ -354,6 +354,8 @@ Kommentar im Code mit dieser Begründung. Keine Ausnahme per Selektor.
 
 ### E12 – „Freier Tag“ sagt, wenn die Auswahl Angebote ausblendet (Paket A)
 
+> **Geändert durch Plan 0025:** „Freier Tag“ und `dayAgenda` gibt es nicht mehr. Der Kalender der Merkliste hat eigene Leerzustände (`RangeEmpty`, `rangeAgenda`, E5): vom Merklisten-Filter ausgeblendet, heute schon vorbei, nach dem Datenstand und „Nichts gemerkt“ mit „Für diese Woche entdecken“. Startseiten-Filter, Wegzeit und Alter wirken dort nicht.
+
 **Domäne** (`src/domain/agenda.ts`, test-first):
 - `DayAgenda` bekommt `hidden: number`. Das sind die nicht beendeten Termine des Tages im ungefilterten Index minus `items.length`, nie negativ.
 - `dayAgenda(index, day, now, context)` bekommt `context.allIndex` (Index aller kommenden Angebote ohne Filter, Alter und Umkreis).

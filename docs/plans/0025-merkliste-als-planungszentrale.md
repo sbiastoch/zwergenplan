@@ -1,6 +1,6 @@
 # Plan 0025 – Merkliste als Planungszentrale: Anbieter merken, Karte, Kalender, Filter
 
-Status: in Umsetzung (Etappe 2; Nachtrag aus dem Mockup vom 2026-10-08, Review eingearbeitet)
+Status: in Umsetzung (Etappe 3; Nachtrag aus dem Mockup vom 2026-10-08, Review eingearbeitet)
 Datum: 2026-10-08
 Mockup: https://claude.ai/artifact/QMwK1e16a2GQPKbVtMwMx9 (Design-Canvas, Stand „Feedback 2“, vom Nutzer am 2026-10-08 freigegeben)
 Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
@@ -301,6 +301,7 @@ Die heutige Zeile „N gemerkt · M Termine in einer .ics-Datei · Kurse immer k
   - `flex: none; width: 100%; min-width: 0` statt des Deckels `0 1 12rem`,
   - `.seg-btn { white-space: nowrap }`, „Kalender“ bricht nie.
   - **Schmal einspaltig** (Review Nachtrag B1): Bei 320 px und 200 % bleiben je Segment etwa 84 px, „Kalender“ braucht in 32 px gut 120 px. `.view-toggle.full` bekommt deshalb `container: seg-full / inline-size` und unter `17rem` dasselbe Muster wie `.seg3` (`chrome.css:332–349`): eine Spalte, kein Daumen, der gewählte Knopf trägt die Fläche selbst (`--surface`, Rahmen, Schatten). Zuerst stand hier `19rem`; das Arch-Review zu Etappe 2 hat gezeigt, dass dann schon 320 px bei 100 % (288 px Inhalt, 18rem) einspaltig sind. Test 15 prüft 320 px bei 100 % (drei Spalten) und 200 % (eine Spalte).
+  - Nachtrag Etappe 3: Mit drei Segmenten bleibt es bei `17rem`. Bei 320 px und 100 % (288 px Inhalt) stehen „Liste | Karte | Kalender“ dreispaltig, keines wird abgeschnitten; bei 200 % ist der Umschalter einspaltig. `e2e/saved.spec.ts` prüft beides (Test 15). Chromium wertet die Container-Query nach einer reinen Schriftänderung erst nach einem Breitenwechsel aus; die Gates nutzen dafür `setTextScaleRelayout` (`e2e/mobile-ux.ts`).
 - In „Angebote“ bleibt der Umschalter Liste | Karte in der Statuszeile wie heute (Plan 0005, E5).
 - Die Legende lautet „Darstellung der Angebote“ bzw. „Darstellung der Merkliste“.
 
@@ -827,6 +828,17 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
    - Vermerke in den Plänen 0003, 0007, 0008, 0010 und 0021,
    - das Delta in ADR 0012.
 8. Gates: `pnpm verify`, gezielt alle Specs der Inventar-Tabelle plus `e2e/merkliste-kalender.spec.ts`, `e2e/layout.spec.ts`, `e2e/smoke.spec.ts` (`PW_SUITE=smoke`), bei Änderungen an `e2e/fixtures.ts` oder `e2e/mobile-ux.ts` auch `e2e/theme.spec.ts`; `pnpm size`. Dann `/arch-review`, Merge, `/browser-review live`.
+
+**Stand Etappe 3:** committet (2026-10-08), noch nicht gemergt und nicht live. Start-JS +0,575 kB (96,812 → 97,387 kB), CSS +0,085 kB (ADR 0012). Summe Etappen 1–3: +1,227 kB, unter dem Entscheidungspunkt von +2,5 kB (E11). Gates lokal grün: `pnpm verify`, alle Specs der Inventar-Tabelle plus `e2e/merkliste-kalender.spec.ts`, `layout`, `mobile-ux`, `theme` (pixel-7), Smoke. Abweichungen vom Plan:
+- **„Für heute ist alles vorbei“ auch in Woche und Monat**: Plan E5 nennt Fall 2 nur für `tag` = heute. Steht in der Woche heute nur ein schon beendeter gemerkter Termin und sonst nichts, sagte Fall 4 „Für diese Woche hast du nichts gemerkt“, und das wäre falsch. `rangeAgenda` liefert `ended` ohnehin nur, wenn heute im Bereich liegt; in Woche und Monat steht zusätzlich der Knopf „Für diese Woche entdecken“.
+- **Wochentitel kurz**: `weekTitle` schreibt wie im Mockup „5.–11. Okt.“ statt „5.–11. Oktober“.
+- **`savedCalendar` ohne `lastDay`**: Die Grenze der Pfeile ist der ganze Datenstand (E5), also gleich `dataEnd`; ein zweites Feld entfällt. `allIndex` ist bis zum Merklisten-Filter (Etappe 4) gleich `index`, Fall 1 („… blendet der Filter aus“) ist gebaut, greift aber erst mit Etappe 4; ebenso „Filter im Kalender“ und die Chips „ab …“ (Test 10).
+- **Tab-Leiste mit drei Tabs, zwei Schwellen neu** (`tabs.css`, `docs/architecture.md`): Nur-Icon hochkant unter `5.5rem` statt `4.25rem` (sonst wuchs das Badge ab 150 % in die Label-Zeile), kompakt quer `calc(5.6rem + 52px)` statt `calc(4.25rem + 60px)` (das dreistellige Badge wächst mit der Schrift; bei 639 × 320 und 200 % ragte „100“ über die Karte). Labels stehen damit wie bisher hochkant bis 125 %, kompakt quer jetzt bis 125 % statt nur bei 100 %.
+- **`.mgrid.inmonth` und `.week.inweek`** (Mockup): Ist der ganze Monat bzw. die ganze Woche gewählt, tragen die wählbaren Tage ein Feld bzw. einen festen Rand. Der Layout-Test „bei 100 % bleiben nicht gewählte Tage ohne Hintergrund“ läuft deshalb mit gewähltem Tag, ein neuer prüft den gewählten Monat.
+- **E2E-Streichungen aus `calendar.spec.ts`**: „ausgeblendete Angebote statt ‚Freier Tag‘“ (Plan 0008, E12) entfällt, denn Startseiten-Filter und Alter wirken im Kalender der Merkliste nicht; den Merklisten-Filter prüft Etappe 4. „Monat klappt zu“ ist durch „Raster bleibt offen“ ersetzt. Alle übrigen Fälle stehen in `e2e/merkliste-kalender.spec.ts`. `e2e/startpunkt.spec.ts` prüft die Statuszeile mit Startpunkt jetzt in der Liste (die hat den Umschalter daneben, die Prüfung „ab 390 px einzeilig“ galt nur dem Kalender ohne Umschalter).
+- **`scripts/screenshots.ts`**: Die Ansicht `merkliste-kalender` merkt per Herz statt per `localStorage`, damit sie auch live mit echten IDs läuft. `scripts/font-fallback.ts` probt „Angebote“; die `size-adjust`-Werte bleiben gleich (Tabs sind `fit: false`), `tokens.css` unverändert.
+- `docs/ideas.md`: „Karte im Kalender oder in der Merkliste“ gestrichen, „Kalender und Merkliste als Lazy-Chunks“ wird „Merkliste als Lazy-Chunk“ (E13).
+- Offen für die Haupt-Session: Plan 0028 (Merge mit `main`) bringt `sessionFit(birthDate)`; der Kalender der Merkliste soll dann `sessionsByDay(saved, sessionFit(birthDate))` nutzen (`use-offer-views.ts`, `savedIndex`).
 
 **Etappe 4 – Filter auf der Merkliste** (braucht Plan 0023, auf `main` seit `d5fab1b`)
 1. Rot schreiben:
