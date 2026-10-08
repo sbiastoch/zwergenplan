@@ -1,7 +1,7 @@
 /**
  * „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007).
- * Kopf nach Plan 0025, E3a: Umschalter Liste | Karte über die ganze Breite, Statuszeile mit rundem Export-Knopf (nur
- * in der Liste). Die Karte rendert App über `renderMap`, mit denselben Props wie in „Entdecken“.
+ * Kopf nach Plan 0025, E3a: Umschalter Liste | Karte | Kalender über die ganze Breite, Statuszeile mit rundem
+ * Export-Knopf (nur in der Liste). Karte und Kalender rendert App über `renderMap` bzw. `renderCalendar`.
  */
 import type { ReactNode } from "react";
 import { nextSession } from "../domain/agenda.ts";
@@ -16,11 +16,12 @@ import { type CardContext, OfferCard } from "./OfferCard.tsx";
 import { LONG_TOAST_MS } from "./use-app-state.ts";
 
 /** Darstellungen der Merkliste: Routenwerte (Plan 0025, E4) */
-type SavedTab = "merkliste" | "merkliste-karte";
+type SavedTab = "merkliste" | "merkliste-karte" | "merkliste-kalender";
 
 const VIEW_OPTIONS: readonly ViewOption<SavedTab>[] = [
   { value: "merkliste", label: "Liste" },
   { value: "merkliste-karte", label: "Karte" },
+  { value: "merkliste-kalender", label: "Kalender" },
 ];
 
 interface SavedViewProps {
@@ -32,6 +33,8 @@ interface SavedViewProps {
   placeCount: number;
   /** Karte mit diesen Angeboten; nur aufgerufen, wenn mindestens eins da ist (keine Kacheln ohne Gemerktes, E5a) */
   renderMap: (offers: readonly SiteOffer[]) => ReactNode;
+  /** Kalender der gemerkten Termine (E5); wie die Karte nur mit mindestens einem gemerkten Angebot */
+  renderCalendar: () => ReactNode;
   generatedAt: SiteData["generatedAt"];
   /** mit Geburtsdatum kommen regelmäßige Angebote nur passend zum Alter in die Datei (Plan 0018, E3) */
   birthDate: string | undefined;
@@ -47,6 +50,7 @@ export function SavedView({
   onTab,
   placeCount,
   renderMap,
+  renderCalendar,
   generatedAt,
   birthDate,
   ctx,
@@ -105,12 +109,13 @@ export function SavedView({
               </button>
             )}
           </div>
-          {tab === "merkliste-karte"
-            ? renderMap(offers)
-            : offers.map((offer) => {
-                const session = nextSession(offer, ctx.now);
-                return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
-              })}
+          {tab === "merkliste-karte" && renderMap(offers)}
+          {tab === "merkliste-kalender" && renderCalendar()}
+          {tab === "merkliste" &&
+            offers.map((offer) => {
+              const session = nextSession(offer, ctx.now);
+              return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
+            })}
         </>
       )}
     </>

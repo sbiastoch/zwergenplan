@@ -1,6 +1,6 @@
 /**
  * Abgeleitete Ansichten der Angebote (Plan 0003, Arch-Review 7): Filter, Alters-Sichtbarkeit,
- * Liste in Schritten, Kalender, Merkliste, offenes Detail – plus der Ansichts-Zustand dazu.
+ * Liste in Schritten, Merkliste mit Kalender, offenes Detail – plus der Ansichts-Zustand dazu.
  * „Jetzt“ kommt von außen (entsteht nur in `useNow`, use-app-state.ts), ebenso der Startpunkt
  * als Entfernungs-Funktion (`useTransit`: Wegzeit oder Luftlinie). Die Entfernung entsteht hier einmal je
  * Koordinate, nicht je Render (Plan 0004, E6; Plan 0009, E8).
@@ -16,8 +16,8 @@ import {
   sessionsByDay,
   takeGroups,
 } from "../domain/agenda.ts";
-import { clampDay } from "../domain/calendar.ts";
-import { applyFilters, EMPTY_FILTER, matchesFilter } from "../domain/filter.ts";
+import { type CalendarSelection, clampDay } from "../domain/calendar.ts";
+import { applyFilters, EMPTY_FILTER } from "../domain/filter.ts";
 import { countPlaces, placeKey } from "../domain/place-key.ts";
 import type { Reach, ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
@@ -27,7 +27,6 @@ import { berlinIsoDate } from "../domain/time.ts";
 
 /** Angebote je Schritt in der Liste (Plan 0003, E8) */
 const PAGE = 40;
-const NO_INDEX: Map<string, Occurrence<SiteOffer>[]> = new Map();
 
 export interface OfferViewsInput {
   offers: readonly SiteOffer[];
@@ -56,26 +55,11 @@ export interface OfferViews {
   showMore: () => void;
   /** nach Filterwechsel wieder mit dem ersten Schritt beginnen */
   resetPage: () => void;
-  calendar: {
-    /** nur in der Kalenderansicht gefüllt */
-    index: Map<string, Occurrence<SiteOffer>[]>;
-    /**
-     * alle kommenden Angebote ohne Filter, Alter und Wegzeit, nur in der Kalenderansicht gefüllt: Daraus
-     * zählt `dayAgenda`, was die Auswahl an einem Tag ausblendet (Plan 0008, E12)
-     */
-    allIndex: Map<string, Occurrence<SiteOffer>[]>;
-    /** letzter Tag mit passenden Terminen (Grenze der Navigation) */
-    lastDay: string | undefined;
-    /** letzter Tag mit Terminen im ganzen Datenstand, ohne Filter (B8) */
-    dataEnd: string | undefined;
-    /** heute schon beendete Termine aller filterpassenden Angebote, auch ohne kommenden Termin (B2) */
-    endedToday: number;
-    /** gewählter Tag, nie vor heute (auch nach Mitternacht im offenen Tab) */
-    day: string;
-    setDay: (day: string) => void;
-    monthOpen: boolean;
-    setMonthOpen: (open: boolean) => void;
-  };
+  /**
+   * Kalender der Merkliste (Plan 0025, E5, E8), nur in der Darstellung Kalender gefüllt. Auswahl und Monat leben im
+   * Hook: Sie überstehen Tab- und Darstellungswechsel, nicht das Neuladen.
+   */
+  savedCalendar: SavedCalendarData | undefined;
   saved: SiteOffer[];
   /** Angebot aus der URL, falls es im Datenstand existiert */
   detailOffer: SiteOffer | undefined;
@@ -88,6 +72,30 @@ export interface OfferViews {
   map: { placeCount: number; cameraOffers: readonly SiteOffer[] } | undefined;
   /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
   reachOf: (offer: SiteOffer) => Reach | undefined;
+}
+
+/** Kalender der Merkliste (Plan 0025, E5): Termine der gemerkten Angebote und der Zustand der Auswahl */
+export interface SavedCalendarData {
+  /** nicht beendete Termine der gemerkten Angebote je Berliner Tag (`sessionsByDay`) */
+  index: Map<string, Occurrence<SiteOffer>[]>;
+  /**
+   * dieselben ohne Merklisten-Filter: Daraus zählt `rangeAgenda`, was der Filter ausblendet. Bis zum Merklisten-Filter
+   * (Etappe 4) gleich `index`.
+   */
+  allIndex: Map<string, Occurrence<SiteOffer>[]>;
+  /**
+   * letzter Tag mit Terminen im ganzen Datenstand (B8), zugleich die Grenze der Pfeile: So kann man auch in Wochen ohne
+   * Gemerktes blättern und von dort „Für diese Woche entdecken“ nutzen (E5)
+   */
+  dataEnd: string | undefined;
+  /** heute schon beendete Termine aller gemerkten Angebote, auch ohne kommenden Termin (M7, B2) */
+  endedToday: number;
+  /** Auswahl; `day` nie vor heute (auch nach Mitternacht im offenen Tab) */
+  selection: CalendarSelection;
+  setSelection: (selection: CalendarSelection) => void;
+  /** Monatsraster offen; unabhängig von `selection.unit` (offenes Raster mit gewähltem Tag ist erlaubt) */
+  monthOpen: boolean;
+  setMonthOpen: (open: boolean) => void;
 }
 
 const NO_REACH = (): undefined => undefined;
@@ -110,7 +118,8 @@ function reachCache(reachFn: ReachFn | undefined): (offer: SiteOffer) => Reach |
 export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }: OfferViewsInput): OfferViews {
   const [ageOnly, setAgeOnlyState] = useState(true);
   const [limit, setLimit] = useState(PAGE);
-  const [calendarDay, setCalendarDay] = useState(() => berlinIsoDate(now));
+  // Startwert: die Woche von heute, Monat zu („seine Woche planen“, Plan 0025, E5)
+  const [selection, setSelection] = useState<CalendarSelection>(() => ({ unit: "woche", day: berlinIsoDate(now) }));
   const [monthOpen, setMonthOpen] = useState(false);
 
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
@@ -124,30 +133,28 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
   );
   const range = route.filter.range;
   const groups = useMemo(() => groupByNextSession(visible, now, range), [visible, now, range]);
-  const index = useMemo(() => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX), [visible, route.tab]);
-  const allIndex = useMemo(
-    () => (route.tab === "kalender" ? sessionsByDay(upcoming) : NO_INDEX),
-    [upcoming, route.tab],
-  );
-  const lastDay = useMemo(() => lastSessionDay(visible), [visible]);
   const dataEnd = useMemo(() => lastSessionDay(upcoming), [upcoming]);
   const today = berlinIsoDate(now);
-  const endedToday = useMemo(
-    () =>
-      route.tab === "kalender"
-        ? endedOnDay(
-            offers.filter((o) => matchesFilter(o, route.filter, reach)),
-            today,
-            now,
-          )
-        : 0,
-    [offers, route.filter, route.tab, today, now, reach],
-  );
   const reachOf = useMemo(() => reachCache(reach), [reach]);
   // Startausschnitt nur aus öffentlichen Daten: alle kommenden Angebote, ohne Filter, Alter und Startpunkt
   // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
   // Die Karte der Merkliste zählt die Orte der gemerkten Angebote, ihr Startausschnitt ist derselbe (Plan 0025, E4).
   const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
+  const onCalendar = route.tab === "merkliste-kalender";
+  const savedIndex = useMemo(() => (onCalendar ? sessionsByDay(saved) : undefined), [onCalendar, saved]);
+  // Bewusst nicht über `saved`: Das kennt nur Angebote mit kommendem Termin. Ein gemerktes Angebot, dessen einziger
+  // Termin heute schon vorbei ist, zählt sonst nicht (Review M7, B2).
+  const endedToday = useMemo(
+    () =>
+      onCalendar
+        ? endedOnDay(
+            offers.filter((o) => savedIds.includes(o.id)),
+            today,
+            now,
+          )
+        : 0,
+    [onCalendar, offers, savedIds, today, now],
+  );
   const map = useMemo(() => {
     if (route.tab === "karte") return { placeCount: countPlaces(visible), cameraOffers: upcoming };
     if (route.tab === "merkliste-karte") return { placeCount: countPlaces(saved), cameraOffers: upcoming };
@@ -169,14 +176,13 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
     page: takeGroups(groups, limit),
     showMore,
     resetPage,
-    calendar: {
-      index,
-      allIndex,
-      lastDay,
+    savedCalendar: savedIndex && {
+      index: savedIndex,
+      allIndex: savedIndex,
       dataEnd,
       endedToday,
-      day: clampDay(calendarDay, today),
-      setDay: setCalendarDay,
+      selection: { ...selection, day: clampDay(selection.day, today) },
+      setSelection,
       monthOpen,
       setMonthOpen,
     },

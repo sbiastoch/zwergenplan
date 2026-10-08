@@ -3,14 +3,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
-import { activeFilterCount, EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
+import { activeFilterCount, EMPTY_FILTER, type FilterState, withDateRange } from "../domain/filter.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { leadCategory } from "../domain/topics.ts";
-import { CalendarView } from "./CalendarView.tsx";
 import { Header, QuickFilters, Stickers, TabBar, type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
   ageChipLabel,
@@ -32,6 +31,7 @@ import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import { ProviderPanel } from "./ProviderPanel.tsx";
 import { ProviderSearch } from "./ProviderSearch.tsx";
+import { SavedCalendar } from "./SavedCalendar.tsx";
 import { SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
@@ -136,7 +136,7 @@ export function App() {
     [refreshTransit, say],
   );
   const views = useOfferViews({ offers, route, birthDate, savedIds, now, reach: transit.reach });
-  const { visible, unfitCount, ageOnly, page, calendar, saved, detailOffer } = views;
+  const { visible, unfitCount, ageOnly, page, saved, detailOffer } = views;
 
   // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
   // Die Karte der Merkliste ebenso (Plan 0025, E4); Liste und Kalender der Merkliste sind kein Anlass. Das gilt auch
@@ -179,6 +179,13 @@ export function App() {
   };
   const onTab = (tab: Tab) => {
     replace({ ...route, tab });
+    window.scrollTo({ top: 0 });
+  };
+  // „Für diese Woche entdecken“ (Plan 0025, E5): zu „Angebote“ mit der Kalenderauswahl als Zeitraum (von=/bis=), die
+  // übrigen Startseiten-Filter bleiben.
+  const discoverRange = ({ from, to }: { from: string; to: string }) => {
+    replace({ ...route, tab: "entdecken", filter: withDateRange(route.filter, from, to) });
+    views.resetPage();
     window.scrollTo({ top: 0 });
   };
   const onToggleSave = useCallback(
@@ -250,8 +257,9 @@ export function App() {
   const limit = route.filter.reachLimit;
   const limitOn = limitActive(reachMode);
   const hint = limit && limitHint(limit, reachMode);
-  // gespeicherter Startpunkt + wegzeit=: Platzhalter statt ungefilterter Liste bzw. ungefiltertem Kalender, bis die
-  // Wegzeit da ist (M7, Arch-Review 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11).
+  // gespeicherter Startpunkt + wegzeit=: Platzhalter statt ungefilterter Liste, bis die Wegzeit da ist (M7, Arch-Review
+  // 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11). Die Merkliste kennt keine Wegzeit-Grenze
+  // und wartet nie (Plan 0025, E8).
   const listPending = reachMode?.kind === "laedt" && limit !== undefined;
   /** „Zurücksetzen“: URL-Filter leer, Altersfilter wieder an – zurück auf den Standard (Plan 0021, E2) */
   const resetFilters = () => {
@@ -425,25 +433,6 @@ export function App() {
           </>
         )}
         {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, resetIfActive, ageEscape)}
-        {load.kind === "ready" && route.tab === "kalender" && listPending && <ListPending />}
-        {load.kind === "ready" && route.tab === "kalender" && !listPending && (
-          <CalendarView
-            index={calendar.index}
-            allIndex={calendar.allIndex}
-            now={now}
-            today={today}
-            lastDay={calendar.lastDay}
-            dataEnd={calendar.dataEnd}
-            endedToday={calendar.endedToday}
-            day={calendar.day}
-            onDay={calendar.setDay}
-            monthOpen={calendar.monthOpen}
-            onMonthOpen={calendar.setMonthOpen}
-            ctx={ctx}
-            onResetFilter={resetIfActive}
-            onShowUnfit={ageEscape?.onShow}
-          />
-        )}
         {load.kind === "ready" && route.tab === "anbieter" && (
           <ProviderPanel
             generatedAt={load.data.generatedAt}
@@ -464,11 +453,22 @@ export function App() {
         {load.kind === "ready" && section === "merkliste" && (
           <SavedView
             offers={saved}
-            tab={route.tab === "merkliste-karte" ? "merkliste-karte" : "merkliste"}
+            tab={route.tab === "merkliste-karte" || route.tab === "merkliste-kalender" ? route.tab : "merkliste"}
             onTab={(tab) => replace({ ...route, tab })}
             placeCount={views.map?.placeCount ?? 0}
             // Startseiten-Filter und Alter wirken auf der Merkliste nicht: kein Zurücksetzen, kein Altersausweg
             renderMap={(savedOffers) => mapPanel(savedOffers, undefined, undefined)}
+            renderCalendar={() =>
+              views.savedCalendar && (
+                <SavedCalendar
+                  calendar={views.savedCalendar}
+                  now={now}
+                  today={today}
+                  ctx={ctx}
+                  onDiscover={discoverRange}
+                />
+              )
+            }
             generatedAt={load.data.generatedAt}
             birthDate={birthDate}
             ctx={ctx}

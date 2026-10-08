@@ -1,8 +1,9 @@
 /**
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
- *   node scripts/screenshots.ts [URL] [--views=start,kalender,…] [--text=200]   Standard: lokale Preview mit Fixtures
- * Ansichten: start, kalender, merkliste, detail, filter, kind (Plan 0003), start-startpunkt (Plan 0004), karte, ort
- * (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
+ *   node scripts/screenshots.ts [URL] [--views=start,merkliste-kalender,…] [--text=200]   Standard: lokale Preview mit
+ * Fixtures
+ * Ansichten: start, merkliste, detail, filter, kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
+ * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
  * (Plan 0017: Push-Teil im Kind-Sheet mit langem Such-Abo).
  * Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
@@ -74,8 +75,11 @@ async function openMap(page: Page) {
 /** Jede Ansicht: Weg dorthin, ausgehend von der geladenen Startseite. */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   start: async () => {},
-  kalender: async (page) => {
-    await page.getByRole("button", { name: "Kalender" }).click();
+  // Kalender der Merkliste (Plan 0025, E8): Herzen statt localStorage, damit es auch live mit echten IDs geht
+  "merkliste-kalender": async (page) => {
+    for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
   },
   merkliste: async (page) => {

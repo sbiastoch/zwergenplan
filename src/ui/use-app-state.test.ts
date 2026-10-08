@@ -289,13 +289,13 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
   });
 
   it("openProvider pusht einen eigenen Eintrag und schließt das Detail", () => {
-    const win = fakeWindow(`?ansicht=kalender&angebot=${offerId}`);
+    const win = fakeWindow(`?ansicht=merkliste-kalender&angebot=${offerId}`);
     vi.stubGlobal("window", win);
     renderRoute().openProvider("theater-beispiel");
     expect(win.history.pushState).toHaveBeenCalledWith(
       { zpProvider: true },
       "",
-      "/?ansicht=kalender&anbieter=theater-beispiel",
+      "/?ansicht=merkliste-kalender&anbieter=theater-beispiel",
     );
   });
 
@@ -321,11 +321,11 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
   });
 
   it("closeProvider ersetzt den Eintrag nach einem Deep-Link", () => {
-    const win = fakeWindow("?ansicht=kalender&anbieter=theater-beispiel");
+    const win = fakeWindow("?ansicht=merkliste-kalender&anbieter=theater-beispiel");
     vi.stubGlobal("window", win);
     renderRoute().closeProvider();
     expect(win.history.back).not.toHaveBeenCalled();
-    expect(win.history.replaceState).toHaveBeenCalledWith(null, "", "/?ansicht=kalender");
+    expect(win.history.replaceState).toHaveBeenCalledWith(null, "", "/?ansicht=merkliste-kalender");
   });
 
   it("lädt beim Start mit anbieter= oder ansicht=anbieter Chunk und Katalog vor, genau einmal", () => {
@@ -335,10 +335,39 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
       expect(preloadProviderUi, search).toHaveBeenCalledTimes(1);
       preloadProviderUi.mockClear();
     }
-    for (const search of ["", "?ansicht=kalender", "?anbieter=../x"]) {
+    // `?ansicht=kalender` ist eine Altlast (Plan 0025, E8): Sie landet in „Entdecken“ und lädt nichts vor.
+    for (const search of ["", "?ansicht=kalender", "?ansicht=merkliste-kalender", "?anbieter=../x"]) {
       vi.stubGlobal("window", fakeWindow(search));
       renderRoute();
       expect(preloadProviderUi, search).not.toHaveBeenCalled();
+    }
+  });
+});
+
+describe("useRoute: alter Tab „Kalender“ (Plan 0025, E8)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("ersetzt ?ansicht=kalender beim Start einmal durch die kanonische URL, Filter und Sheet bleiben", () => {
+    const win = fakeWindow("?ansicht=kalender&kat=musik&anbieter=theater-beispiel", { zpProvider: true });
+    vi.stubGlobal("window", win);
+    const { route } = renderRoute();
+    expect(route.tab).toBe("entdecken");
+    expect(win.history.replaceState).toHaveBeenCalledTimes(1);
+    expect(win.history.replaceState).toHaveBeenCalledWith(
+      { zpProvider: true },
+      "",
+      "/?kat=musik&anbieter=theater-beispiel",
+    );
+  });
+
+  it("lässt andere URLs unberührt", () => {
+    for (const search of ["", "?ansicht=merkliste-kalender", "?kat=musik&ansicht=karte", "?ansicht=landkarte"]) {
+      const win = fakeWindow(search);
+      vi.stubGlobal("window", win);
+      renderRoute();
+      expect(win.history.replaceState, search).not.toHaveBeenCalled();
     }
   });
 });

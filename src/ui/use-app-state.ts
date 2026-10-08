@@ -19,7 +19,7 @@ import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
-import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
+import { isLegacyView, parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { cleanSavedProviders, toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
 import { SHARE_COPIED } from "./format.ts";
@@ -57,6 +57,11 @@ export function useRoute(): RouteApi {
     // Deep-Link: Chunk und Katalog starten, bevor site.json da ist (Plan 0010, E3). Gemerkt im Lader, also auch unter
     // StrictMode (doppelter Initializer) nur ein Request.
     if (parsed.providerId !== undefined || parsed.tab === "anbieter") preloadProviderUi();
+    // Alter Link auf den Tab „Kalender“ (Plan 0025, E8): Er landet in „Entdecken“, die URL wird kanonisch. Im
+    // Initializer statt im Effekt, damit der erste Render schon zur URL passt; zweimal (StrictMode) schadet nicht.
+    if (isLegacyView(window.location.search)) {
+      window.history.replaceState(window.history.state, "", urlFor(parsed));
+    }
     return parsed;
   });
   // Aktueller Stand für Callbacks – History-Aufrufe gehören nicht in setState-Updater (StrictMode ruft die doppelt).

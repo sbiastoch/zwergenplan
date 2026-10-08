@@ -127,9 +127,12 @@ export function QuickFilters({
   );
 }
 
+/**
+ * Drei Tabs (Plan 0025, E8): „Entdecken“ heißt „Angebote“, nur die Beschriftung, der Routenwert bleibt. Den Tab
+ * „Kalender“ gibt es nicht mehr, der Kalender ist eine Darstellung der Merkliste.
+ */
 const TAB_ITEMS = [
-  { tab: "entdecken", label: "Entdecken", icon: "compass" },
-  { tab: "kalender", label: "Kalender", icon: "calendar" },
+  { tab: "entdecken", label: "Angebote", icon: "compass" },
   // Plan 0010, E2: vor der Merkliste, die bleibt ganz rechts
   { tab: "anbieter", label: "Anbieter", icon: "store" },
   { tab: "merkliste", label: "Merkliste", icon: "heart" },

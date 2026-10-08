@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calendarNav, clampDay } from "./calendar.ts";
+import { calendarNav, clampDay, selectionRange } from "./calendar.ts";
 
 // Reine Kalendertage (ISO-Datum): unabhängig von der Geräte-Zeitzone (Test läuft in America/Los_Angeles).
 
@@ -91,5 +91,37 @@ describe("calendarNav", () => {
     it("zurück aus dem Januar auf den 1.12., wenn heute davor liegt", () => {
       expect(calendarNav("2027-01-15", "2026-11-20", "2027-01-20").prevMonth).toBe("2026-12-01");
     });
+  });
+});
+
+describe("selectionRange (Plan 0025, E5)", () => {
+  const today = "2026-10-07"; // Mi
+  const range = (from: string, to: string) => ({ from, to });
+
+  it("ein Tag reicht von bis zu diesem Tag, nie vor heute", () => {
+    expect(selectionRange({ unit: "tag", day: "2026-10-09" }, today)).toEqual(range("2026-10-09", "2026-10-09"));
+    expect(selectionRange({ unit: "tag", day: "2026-10-05" }, today)).toEqual(range(today, today));
+  });
+
+  it("eine Woche ist Mo–So um den Anker, Beginn nie vor heute", () => {
+    expect(selectionRange({ unit: "woche", day: "2026-10-14" }, today)).toEqual(range("2026-10-12", "2026-10-18"));
+    expect(selectionRange({ unit: "woche", day: today }, today)).toEqual(range(today, "2026-10-11"));
+    expect(selectionRange({ unit: "woche", day: "2026-10-05" }, today)).toEqual(range(today, "2026-10-11"));
+  });
+
+  it("ein Monat reicht vom 1. bis zum Letzten, Beginn nie vor heute", () => {
+    expect(selectionRange({ unit: "monat", day: "2026-11-20" }, today)).toEqual(range("2026-11-01", "2026-11-30"));
+    expect(selectionRange({ unit: "monat", day: "2026-10-20" }, today)).toEqual(range(today, "2026-10-31"));
+    expect(selectionRange({ unit: "monat", day: "2027-02-03" }, today)).toEqual(range("2027-02-01", "2027-02-28"));
+  });
+
+  it("läuft von Dezember in den Januar", () => {
+    expect(selectionRange({ unit: "woche", day: "2026-12-30" }, today)).toEqual(range("2026-12-28", "2027-01-03"));
+    expect(selectionRange({ unit: "monat", day: "2026-12-30" }, today)).toEqual(range("2026-12-01", "2026-12-31"));
+  });
+
+  it("zählt Kalendertage, auch über die Zeitumstellung am 25.10.2026", () => {
+    expect(selectionRange({ unit: "woche", day: "2026-10-25" }, today)).toEqual(range("2026-10-19", "2026-10-25"));
+    expect(selectionRange({ unit: "woche", day: "2026-10-26" }, today)).toEqual(range("2026-10-26", "2026-11-01"));
   });
 });

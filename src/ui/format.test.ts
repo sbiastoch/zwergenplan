@@ -20,7 +20,6 @@ import {
   dayHeading,
   exportLabel,
   formatFact,
-  hiddenNote,
   limitHint,
   limitReason,
   listStatusParts,
@@ -30,13 +29,16 @@ import {
   originPhrase,
   plural,
   providerStatusParts,
+  rangeEmptyTexts,
   reachLimitLabel,
   reachLong,
   reachNote,
   reachShort,
   registrationNote,
+  savedHiddenNote,
   savedMapStatusParts,
   savedStatusParts,
+  selectionHeading,
   seriesToast,
   shortDate,
   standDate,
@@ -112,7 +114,8 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
 
   it("schreibt Kurzdaten, Wochen und den Datenstand", () => {
     expect(shortDate("2026-10-06")).toBe("Di 6.10.");
-    expect(weekTitle(["2026-10-05", "2026-10-11"])).toBe("5.–11. Oktober");
+    expect(weekTitle(["2026-10-05", "2026-10-11"])).toBe("5.–11. Okt.");
+    expect(weekTitle(["2026-06-01", "2026-06-07"])).toBe("1.–7. Juni");
     expect(weekTitle(["2026-10-26", "2026-11-01"])).toBe("26. Okt. – 1. Nov.");
     // Juni und Juli bleiben ganz (Plan 0026, E3, Review m8)
     expect(weekTitle(["2026-06-29", "2026-07-05"])).toBe("29. Juni – 5. Juli");
@@ -609,17 +612,39 @@ describe("Fehlerzustand (Plan 0008, E5)", () => {
   });
 });
 
-describe("Kalender: ausgeblendete Angebote (Plan 0008, E12)", () => {
-  it("nennt die Zahl im Singular und Plural", () => {
-    expect(hiddenNote(1, 0)).toBe("1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Wegzeit oder Alter.");
-    expect(hiddenNote(3, 0)).toBe("3 Angebote an diesem Tag sind ausgeblendet – durch Filter, Wegzeit oder Alter.");
+describe("Kalender der Merkliste (Plan 0025, E5)", () => {
+  const today = "2026-10-05";
+
+  it("überschreibt die Liste nach der Auswahl", () => {
+    expect(selectionHeading({ unit: "tag", day: today }, today)).toBe("Heute, 5. Oktober");
+    expect(selectionHeading({ unit: "tag", day: "2026-10-06" }, today)).toBe("Morgen, 6. Oktober");
+    expect(selectionHeading({ unit: "tag", day: "2026-10-07" }, today)).toBe("Mittwoch, 7. Oktober");
+    expect(selectionHeading({ unit: "woche", day: today }, today)).toBe("Diese Woche");
+    expect(selectionHeading({ unit: "woche", day: "2026-10-11" }, today)).toBe("Diese Woche");
+    expect(selectionHeading({ unit: "woche", day: "2026-10-14" }, today)).toBe("Woche 12.–18. Okt.");
+    expect(selectionHeading({ unit: "woche", day: "2026-10-28" }, today)).toBe("Woche 26. Okt. – 1. Nov.");
+    expect(selectionHeading({ unit: "monat", day: "2026-10-20" }, today)).toBe("Oktober 2026");
+    expect(selectionHeading({ unit: "monat", day: "2027-01-01" }, today)).toBe("Januar 2027");
   });
 
-  it("sagt dazu, wenn heute Passendes schon vorbei ist", () => {
-    expect(hiddenNote(1, 2)).toBe(
-      "1 Angebot an diesem Tag ist ausgeblendet – durch Filter, Wegzeit oder Alter. " +
-        "Was zu deiner Auswahl passt, ist heute schon vorbei.",
-    );
+  it("nennt den leeren Zeitraum und den Weg zu „Angebote“", () => {
+    expect(rangeEmptyTexts("tag")).toEqual({
+      text: "Für diesen Tag hast du nichts gemerkt.",
+      action: "Für diesen Tag entdecken",
+    });
+    expect(rangeEmptyTexts("woche")).toEqual({
+      text: "Für diese Woche hast du nichts gemerkt.",
+      action: "Für diese Woche entdecken",
+    });
+    expect(rangeEmptyTexts("monat")).toEqual({
+      text: "Für diesen Monat hast du nichts gemerkt.",
+      action: "Für diesen Monat entdecken",
+    });
+  });
+
+  it("zählt ausgeblendete gemerkte Termine im Singular und Plural", () => {
+    expect(savedHiddenNote(1)).toBe("1 gemerkter Termin blendet der Filter aus.");
+    expect(savedHiddenNote(2)).toBe("2 gemerkte Termine blendet der Filter aus.");
   });
 });
 

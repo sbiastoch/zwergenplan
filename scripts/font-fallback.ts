@@ -136,7 +136,7 @@ const CLASSES: TextClass[] = [
     fit: false,
     px: 12,
     weight: 600,
-    samples: ["Entdecken", "Kalender", "Anbieter", "Merkliste", "Liste", "Karte"],
+    samples: ["Angebote", "Kalender", "Anbieter", "Merkliste", "Liste", "Karte"],
   },
   {
     name: "Meta 14/450",

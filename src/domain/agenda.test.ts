@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   courseProgress,
-  dayAgenda,
   endedOnDay,
   groupByNextSession,
   lastSessionDay,
   monthDays,
   nextSession,
   type Occurrence,
+  rangeAgenda,
   referenceSession,
   rhythm,
   sessionsByDay,
@@ -276,47 +276,76 @@ describe("endedOnDay", () => {
   });
 });
 
-describe("dayAgenda", () => {
-  const treff = fixtureOffer("krabbeltreff");
-  const index = sessionsByDay([treff]);
+describe("rangeAgenda (Plan 0025, E5)", () => {
+  const treff = fixtureOffer("krabbeltreff"); // Mi 7.10. 10:00–11:30, dann wöchentlich bis 4.11.
+  const pekip = fixtureOffer("pekip-herbst"); // Di 13.10. 9:30, dann wöchentlich bis 1.12.
+  const index = sessionsByDay([treff, pekip]);
   const at = (iso: string) => new Date(iso);
-  const context = (endedToday = 0, dataEnd: string | undefined = "2026-11-04") => ({
+  const context = (endedToday = 0, dataEnd: string | undefined = "2026-12-10") => ({
     dataEnd,
     endedToday,
     allIndex: index,
   });
-  const noDataEnd = { dataEnd: undefined, endedToday: 0, allIndex: index };
+  const span = (from: string, to: string) => ({ from, to });
+  const days = (agenda: { groups: { day: string; items: Occurrence[] }[] }) =>
+    agenda.groups.map((g) => [g.day, g.items.map((i) => i.offer.title)]);
 
-  it("lässt abends beendete Termine von heute weg und zählt sie", () => {
+  it("gruppiert nur Tage mit Terminen, Tage aufsteigend, je Tag nach Beginn", () => {
+    const agenda = rangeAgenda(index, span("2026-10-12", "2026-10-18"), FIXTURE_NOW, context());
+    expect(days(agenda)).toEqual([
+      ["2026-10-13", [pekip.title]],
+      ["2026-10-14", [treff.title]],
+    ]);
+    expect(agenda.count).toBe(2);
+    expect(rangeAgenda(index, span("2026-10-05", "2026-10-11"), FIXTURE_NOW, context()).count).toBe(1);
+    // ganzer Oktober ab heute: PEKiP 13., 20., 27., Treff 7., 14., 21., 28.
+    expect(rangeAgenda(index, span("2026-10-05", "2026-10-31"), FIXTURE_NOW, context()).count).toBe(7);
+  });
+
+  it("ein Tag ist ein Bereich mit from = to", () => {
+    const agenda = rangeAgenda(index, span("2026-10-07", "2026-10-07"), FIXTURE_NOW, context());
+    expect(days(agenda)).toEqual([["2026-10-07", [treff.title]]]);
+    expect(rangeAgenda(index, span("2026-10-08", "2026-10-08"), FIXTURE_NOW, context())).toEqual({
+      groups: [],
+      count: 0,
+      ended: 0,
+      hidden: 0,
+      afterData: false,
+    });
+  });
+
+  it("lässt beendete Termine weg, ein laufender und ein genau jetzt endender bleiben", () => {
+    const range = span("2026-10-07", "2026-10-11");
+    expect(rangeAgenda(index, range, at("2026-10-07T20:00:00+02:00"), context()).count).toBe(0);
+    expect(rangeAgenda(index, range, at("2026-10-07T11:00:00+02:00"), context()).count).toBe(1);
+    expect(rangeAgenda(index, range, at("2026-10-07T11:30:00+02:00"), context()).count).toBe(1);
+  });
+
+  it("nennt heute Beendetes nur, wenn heute im Bereich liegt", () => {
     const now = at("2026-10-07T20:00:00+02:00");
-    const agenda = dayAgenda(index, "2026-10-07", now, context(endedOnDay([treff], "2026-10-07", now)));
-    expect(agenda).toEqual({ items: [], ended: 1, afterData: false, hidden: 0 });
+    expect(rangeAgenda(index, span("2026-10-07", "2026-10-11"), now, context(2)).ended).toBe(2);
+    expect(rangeAgenda(index, span("2026-10-05", "2026-10-07"), now, context(2)).ended).toBe(2);
+    expect(rangeAgenda(index, span("2026-10-12", "2026-10-18"), now, context(2)).ended).toBe(0);
   });
 
-  it("behält einen laufenden Termin", () => {
-    const agenda = dayAgenda(index, "2026-10-07", at("2026-10-07T11:00:00+02:00"), context());
-    expect(agenda.items.map((o) => o.session.start)).toEqual(["2026-10-07T10:00:00+02:00"]);
-    expect(agenda.ended).toBe(0);
+  it("zählt Ausgeblendetes als allIndex minus index im Bereich, nie unter 0", () => {
+    const onlyPekip = sessionsByDay([pekip]);
+    const range = span("2026-10-12", "2026-10-18");
+    expect(rangeAgenda(onlyPekip, range, FIXTURE_NOW, context()).hidden).toBe(1);
+    expect(rangeAgenda(new Map(), range, FIXTURE_NOW, context()).hidden).toBe(2);
+    expect(rangeAgenda(index, range, FIXTURE_NOW, context()).hidden).toBe(0);
+    // Index größer als allIndex (darf nicht vorkommen): trotzdem nie negativ
+    expect(rangeAgenda(index, range, FIXTURE_NOW, { ...context(), allIndex: onlyPekip }).hidden).toBe(0);
+    // Beendetes zählt nicht als ausgeblendet
+    const evening = at("2026-10-07T20:00:00+02:00");
+    expect(rangeAgenda(new Map(), span("2026-10-07", "2026-10-07"), evening, context()).hidden).toBe(0);
   });
 
-  it("behält einen Termin, der genau jetzt endet", () => {
-    expect(dayAgenda(index, "2026-10-07", at("2026-10-07T11:30:00+02:00"), context()).items).toHaveLength(1);
-  });
-
-  it("nennt Beendetes nur für heute, nie für künftige Tage", () => {
-    const now = at("2026-10-07T20:00:00+02:00");
-    expect(dayAgenda(index, "2026-10-07", now, context(3)).ended).toBe(3);
-    const future = dayAgenda(index, "2026-10-14", now, context(3));
-    expect(future.ended).toBe(0);
-    expect(future.items).toHaveLength(1);
-  });
-
-  it("erkennt Tage nach dem letzten Termin des Datenstands", () => {
-    const now = at("2026-10-07T12:00:00+02:00");
-    expect(dayAgenda(index, "2026-11-05", now, context(0, "2026-11-04")).afterData).toBe(true);
-    expect(dayAgenda(index, "2026-11-04", now, context(0, "2026-11-04")).afterData).toBe(false);
-    expect(dayAgenda(index, "2026-11-05", now, noDataEnd).afterData).toBe(false);
-    expect(dayAgenda(new Map(), "2026-11-05", now, context(0, "2026-11-04")).items).toEqual([]);
+  it("erkennt einen Bereich nach dem Ende des Datenstands", () => {
+    expect(rangeAgenda(index, span("2026-12-11", "2026-12-11"), FIXTURE_NOW, context()).afterData).toBe(true);
+    expect(rangeAgenda(index, span("2026-12-07", "2026-12-13"), FIXTURE_NOW, context()).afterData).toBe(false);
+    const noEnd = { ...context(), dataEnd: undefined };
+    expect(rangeAgenda(index, span("2026-12-11", "2026-12-11"), FIXTURE_NOW, noEnd).afterData).toBe(false);
   });
 
   it("ordnet einen Termin um 00:30 Berlin dem Berliner Tag zu (Test läuft in LA)", () => {
@@ -325,64 +354,26 @@ describe("dayAgenda", () => {
     // 7.10. 20:00 Berlin = 7.10. 11:00 in LA; „heute“ ist trotzdem der Berliner 7.10.
     const now = at("2026-10-07T20:00:00+02:00");
     const nightContext = { ...context(5), allIndex: nightIndex };
-    expect(dayAgenda(nightIndex, "2026-10-08", now, nightContext).items).toHaveLength(1);
-    expect(dayAgenda(nightIndex, "2026-10-08", now, nightContext).ended).toBe(0);
-    expect(dayAgenda(nightIndex, "2026-10-07", now, nightContext)).toEqual({
-      items: [],
+    expect(days(rangeAgenda(nightIndex, span("2026-10-08", "2026-10-08"), now, nightContext))).toEqual([
+      ["2026-10-08", ["Nachts"]],
+    ]);
+    expect(rangeAgenda(nightIndex, span("2026-10-08", "2026-10-08"), now, nightContext).ended).toBe(0);
+    expect(rangeAgenda(nightIndex, span("2026-10-07", "2026-10-07"), now, nightContext)).toEqual({
+      groups: [],
+      count: 0,
       ended: 5,
-      afterData: false,
       hidden: 0,
+      afterData: false,
     });
   });
 
-  describe("ausgeblendete Termine (Plan 0008, E12)", () => {
-    // Index der sichtbaren Angebote: leer, als blendeten Filter, Umkreis oder Alter den Treff aus.
-    const none = new Map<string, Occurrence[]>();
+  it("geht über den Monatswechsel und die Zeitumstellung am 25.10.", () => {
+    const agenda = rangeAgenda(index, span("2026-10-24", "2026-11-08"), FIXTURE_NOW, context());
+    expect(agenda.groups.map((g) => g.day)).toEqual(["2026-10-27", "2026-10-28", "2026-11-03", "2026-11-04"]);
+  });
 
-    it("zählt die Termine des Tages, die die Auswahl ausblendet", () => {
-      const now = at("2026-10-05T12:00:00+02:00");
-      const agenda = dayAgenda(none, "2026-10-07", now, context());
-      expect(agenda.items).toEqual([]);
-      expect(agenda.hidden).toBe(1);
-      // nichts ausgeblendet, wenn der Treff sichtbar ist
-      expect(dayAgenda(index, "2026-10-07", now, context()).hidden).toBe(0);
-    });
-
-    it("zählt die Differenz, nie weniger als 0", () => {
-      const other = withSessions("Anderes", [s("2026-10-07T15:00:00+02:00", "2026-10-07T16:00:00+02:00")]);
-      const allIndex = sessionsByDay([treff, other]);
-      const now = at("2026-10-05T12:00:00+02:00");
-      expect(dayAgenda(index, "2026-10-07", now, { ...context(), allIndex }).hidden).toBe(1);
-      expect(dayAgenda(none, "2026-10-07", now, { ...context(), allIndex }).hidden).toBe(2);
-      // Index größer als allIndex (darf nicht vorkommen): trotzdem nie negativ
-      expect(dayAgenda(allIndex, "2026-10-07", now, context()).hidden).toBe(0);
-    });
-
-    it("zählt beendete Termine nicht mit", () => {
-      const evening = at("2026-10-07T20:00:00+02:00");
-      expect(dayAgenda(none, "2026-10-07", evening, context()).hidden).toBe(0);
-    });
-
-    it("ist 0, wenn der ungefilterte Index den Tag nicht kennt", () => {
-      const now = at("2026-10-05T12:00:00+02:00");
-      expect(dayAgenda(none, "2026-10-08", now, context()).hidden).toBe(0);
-      expect(dayAgenda(none, "2026-10-07", now, { ...context(), allIndex: new Map() }).hidden).toBe(0);
-    });
-
-    it("nennt heute Beendetes und Ausgeblendetes zugleich", () => {
-      // heute: ein passender Termin ist vorbei (endedToday 1), ein ausgeblendeter kommt noch
-      const later = withSessions("Später", [s("2026-10-07T15:00:00+02:00", "2026-10-07T16:00:00+02:00")]);
-      const now = at("2026-10-07T12:00:00+02:00");
-      const agenda = dayAgenda(none, "2026-10-07", now, { ...context(1), allIndex: sessionsByDay([treff, later]) });
-      expect(agenda).toEqual({ items: [], ended: 1, afterData: false, hidden: 1 });
-    });
-
-    it("ordnet einen ausgeblendeten Termin um 00:30 Berlin dem Berliner Tag zu (Test läuft in LA)", () => {
-      const night = withSessions("Nachts", [s("2026-10-08T00:30:00+02:00", "2026-10-08T01:00:00+02:00")]);
-      const allIndex = sessionsByDay([night]);
-      const now = at("2026-10-07T20:00:00+02:00");
-      expect(dayAgenda(none, "2026-10-08", now, { ...context(), allIndex }).hidden).toBe(1);
-      expect(dayAgenda(none, "2026-10-07", now, { ...context(), allIndex }).hidden).toBe(0);
-    });
+  it("liest höchstens 31 Tage, auch bei einem längeren Bereich", () => {
+    const agenda = rangeAgenda(index, span("2026-10-05", "2026-12-31"), FIXTURE_NOW, context());
+    expect(agenda.groups.at(-1)?.day).toBe("2026-11-04");
   });
 });

@@ -1,4 +1,4 @@
-/* Kalender: Woche und Monat (CalendarView.tsx). */
+/* Kalender der Merkliste: Woche und Monat (SavedCalendar.tsx, Plan 0025, E5). */
 
 @layer components {
   /* Kalender */
@@ -11,17 +11,31 @@
     gap: 8px;
     margin: 4px 0 8px;
   }
-  .cal-nav b {
+  /* Titel als Knopf (Plan 0025, E5): wählt die ganze Woche bzw. den ganzen Monat; sieht aus wie der frühere
+     `<b>`-Titel, gewählt über --sel/--on-sel (auch dunkel ohne helle Insel). ≥ 44 px hoch. */
+  .cal-title {
     flex: 1;
+    min-height: 44px;
+    min-width: 0;
+    border: 0;
+    border-radius: 22px;
+    padding: 2px 10px;
+    background: none;
+    color: inherit;
     text-align: center;
     font-weight: 800;
     font-size: 1.25rem;
     letter-spacing: -0.03em;
   }
-  /* Steht nach `.cal-nav b` (gleiche Spezifität, dessen `flex: 1` setzte sonst die Basis zurück). 14 rem: auf
+  .cal-title[aria-pressed="true"] {
+    background: var(--sel);
+    color: var(--on-sel);
+    transform: rotate(-1.5deg);
+  }
+  /* Steht nach `.cal-title` (gleiche Spezifität, dessen `flex: 1` setzte sonst die Basis zurück). 14 rem: auf
      Telefonen nie bei 100 % (Spalte ≥ 18 rem), bei 200 % immer (neben den Pfeilen bleiben < 6 rem). */
   @container (width < 14rem) {
-    .cal-nav > b {
+    .cal-nav > .cal-title {
       order: -1;
       flex-basis: 100%;
     }
@@ -81,6 +95,11 @@
   }
   .day[aria-pressed="true"] .wd {
     color: var(--on-sel);
+  }
+  /* ganze Woche gewählt: Die wählbaren Tage bekommen einen festen Rand, wie ein Block (Mockup Plan 0025) */
+  .week.inweek .day:not(:disabled) {
+    border-style: solid;
+    border-color: var(--line);
   }
   @keyframes stamp {
     0% {
@@ -170,6 +189,13 @@
     background: var(--sel);
     color: var(--on-sel);
   }
+  /* ganzer Monat gewählt: jeder wählbare Tag mit zartem Feld (Mockup Plan 0025) */
+  .mgrid.inmonth .mday:not(:disabled) {
+    background: var(--soft);
+  }
+  .mgrid.inmonth .mday[aria-pressed="true"] {
+    background: var(--sel);
+  }
   .mday .mini {
     width: 9px;
     height: 9px;
@@ -192,6 +218,16 @@
     .mday[aria-pressed="true"] {
       background: var(--sel) padding-box;
     }
+  }
+
+  /* Tag in der Liste unter Woche und Monat (Plan 0025, E5) */
+  .dayh {
+    margin: 4px 0 8px;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 
   /* Kalendertage ≥ 44 px auch bei 320 px (B3): Beide Raster dehnen sich in den Seitenrand. Media-Query in px,

@@ -4,7 +4,8 @@
  */
 import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
-import { courseProgress, rhythm, uniformTimes, upcomingSessions } from "../domain/agenda.ts";
+import { courseProgress, rhythm, uniformTimes, upcomingSessions, weekDays } from "../domain/agenda.ts";
+import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange } from "../domain/date-range.ts";
 import { MONTHS, monthShort, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
 import {
@@ -61,11 +62,11 @@ export function monthTitle(day: string): string {
   return `${MONTHS[month - 1]} ${year}`;
 }
 
-/** „5.–11. Oktober“ bzw. „26. Okt. – 1. Nov.“, „29. Juni – 5. Juli“ */
+/** „5.–11. Okt.“ bzw. „26. Okt. – 1. Nov.“, „29. Juni – 5. Juli“ (Mockup Plan 0025: auch im selben Monat kurz) */
 export function weekTitle(days: readonly string[]): string {
   const first = parseIsoDate(days[0] ?? "");
   const last = parseIsoDate(days.at(-1) ?? "");
-  if (first.month === last.month) return `${first.day}.–${last.day}. ${MONTHS[last.month - 1]}`;
+  if (first.month === last.month) return `${first.day}.–${last.day}. ${monthShort(last.month)}`;
   return `${first.day}. ${monthShort(first.month)} – ${last.day}. ${monthShort(last.month)}`;
 }
 
@@ -85,6 +86,33 @@ export function dayHeading(day: string, today: string): { title: string; sub: st
 export function agendaHeading(day: string, today: string): string {
   const { title } = dayHeading(day, today);
   return title === "Heute" || title === "Morgen" ? `${title}, ${dayMonth(day)}` : longDate(day);
+}
+
+/**
+ * Überschrift der Liste unter dem Kalender der Merkliste (Plan 0025, E5): „Heute, 5. Oktober“ / „Mittwoch, 7. Oktober“,
+ * „Diese Woche“ / „Woche 12.–18. Okt.“, „Oktober 2026“.
+ */
+export function selectionHeading(sel: CalendarSelection, today: string): string {
+  if (sel.unit === "tag") return agendaHeading(sel.day, today);
+  if (sel.unit === "monat") return monthTitle(sel.day);
+  const week = weekDays(sel.day);
+  return week.includes(today) ? "Diese Woche" : `Woche ${weekTitle(week)}`;
+}
+
+const UNIT_WORDS: Record<CalendarSelection["unit"], string> = {
+  tag: "diesen Tag",
+  woche: "diese Woche",
+  monat: "diesen Monat",
+};
+
+/** Leerzustand „Nichts gemerkt“ im Kalender der Merkliste und sein Knopf nach „Angebote“ (Plan 0025, E5, Fall 4) */
+export function rangeEmptyTexts(unit: CalendarSelection["unit"]): { text: string; action: string } {
+  return { text: `Für ${UNIT_WORDS[unit]} hast du nichts gemerkt.`, action: `Für ${UNIT_WORDS[unit]} entdecken` };
+}
+
+/** „2 gemerkte Termine blendet der Filter aus.“ (Plan 0025, E5, Fall 1) */
+export function savedHiddenNote(hidden: number): string {
+  return `${plural(hidden, "gemerkter Termin", "gemerkte Termine")} blendet der Filter aus.`;
 }
 
 /** „1 Angebot“ / „3 Angebote“ */
@@ -517,13 +545,4 @@ const LOAD_ERRORS: Record<LoadFailure, string> = {
 /** Fehlerzustand (Plan 0008, E5): ein deutscher Satz je Fehlerart statt „Failed to fetch“. */
 export function loadErrorText(reason: LoadFailure): string {
   return LOAD_ERRORS[reason];
-}
-
-/**
- * Kalender-Leerzustand, wenn die Auswahl Termine des Tages ausblendet (Plan 0008, E12). Ist heute
- * zusätzlich Passendes schon beendet, sagt der zweite Satz das.
- */
-export function hiddenNote(hidden: number, ended: number): string {
-  const note = `${plural(hidden, "Angebot", "Angebote")} an diesem Tag ${hidden === 1 ? "ist" : "sind"} ausgeblendet – durch Filter, Wegzeit oder Alter.`;
-  return ended > 0 ? `${note} Was zu deiner Auswahl passt, ist heute schon vorbei.` : note;
 }

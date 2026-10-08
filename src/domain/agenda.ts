@@ -110,44 +110,58 @@ export function sessionsByDay<T extends Offer>(offers: readonly T[]): Map<string
   return index;
 }
 
-/** Agenda eines Kalendertags (Plan 0007, E2): was noch kommt, und warum der Tag sonst leer ist. */
-export interface DayAgenda<T extends Offer> {
-  /** nicht beendete Termine des Tages, nach Beginn */
-  items: Occurrence<T>[];
-  /** wie viele passende Termine dieses Tages schon beendet sind (nur heute > 0) */
+/** Höchstens so viele Tage liest `rangeAgenda`: ein Monat (Plan 0025, E5). */
+const MAX_RANGE_DAYS = 31;
+
+/**
+ * Agenda eines Zeitraums im Kalender der Merkliste (Plan 0025, E5; ersetzt `dayAgenda` aus Plan 0007, E2): was noch
+ * kommt, und warum der Zeitraum sonst leer ist.
+ */
+export interface RangeAgenda<T extends Offer> {
+  /** nicht beendete Termine je Tag in [from, to], Tage aufsteigend, je Tag nach Beginn */
+  groups: DayGroup<Occurrence<T>>[];
+  count: number;
+  /** heute schon beendete passende Termine, wenn `today` in [from, to] liegt */
   ended: number;
-  /** Tag liegt nach dem letzten Termin des gesamten Datenstands */
-  afterData: boolean;
-  /**
-   * nicht beendete Termine des Tages, die Filter, Umkreis oder Alter ausblenden (Plan 0008, E12):
-   * ungefilterter Index minus `items`, nie negativ
-   */
+  /** nicht beendete Termine in [from, to], die der Merklisten-Filter ausblendet (allIndex minus index, nie < 0) */
   hidden: number;
+  /** `from` liegt nach dem letzten Tag des Datenstands */
+  afterData: boolean;
 }
 
 /**
- * Agenda des Berliner Tages `day` aus dem Index von `sessionsByDay`. Beendete Termine fallen weg
- * (gleiche Regel wie überall: ein Termin zählt, bis er beendet ist).
- * `endedToday` zählt der Aufrufer mit `endedOnDay` über alle filterpassenden Angebote – auch
- * solche ohne kommenden Termin, die gar nicht im Index stehen. `dataEnd` ist der letzte Tag des
- * ungefilterten Datenstands. `allIndex` ist der Index aller kommenden Angebote ohne Filter, Alter und
- * Umkreis; `index` ist eine Teilmenge davon, die Differenz also genau das Ausgeblendete.
+ * Agenda der Berliner Tage `from` bis `to` (inklusive, höchstens 31 Tage) aus dem Index von `sessionsByDay`. Beendete
+ * Termine fallen weg (gleiche Regel wie überall: ein Termin zählt, bis er beendet ist). `endedToday` zählt der
+ * Aufrufer mit `endedOnDay` über alle passenden Angebote – auch solche ohne kommenden Termin, die gar nicht im Index
+ * stehen. `dataEnd` ist der letzte Tag des ganzen Datenstands. `allIndex` ist der Index ohne Merklisten-Filter;
+ * `index` ist eine Teilmenge davon, die Differenz also genau das Ausgeblendete.
  */
-export function dayAgenda<T extends Offer>(
+export function rangeAgenda<T extends Offer>(
   index: ReadonlyMap<string, Occurrence<T>[]>,
-  day: string,
+  range: { from: string; to: string },
   now: Date,
   context: { dataEnd: string | undefined; endedToday: number; allIndex: ReadonlyMap<string, Occurrence<T>[]> },
-): DayAgenda<T> {
+): RangeAgenda<T> {
   const isNotEnded = notEnded(now);
-  const items = (index.get(day) ?? []).filter((o) => isNotEnded(o.session));
-  // Beendetes zählt nicht: „ausgeblendet“ heißt nur, was man noch besuchen könnte.
-  const all = (context.allIndex.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
+  const today = berlinIsoDate(now);
+  const groups: DayGroup<Occurrence<T>>[] = [];
+  let count = 0;
+  let all = 0;
+  // Die Tage zählen, nicht die Map: Sie kennt jeden Tag des Datenstands.
+  let day = range.from;
+  for (let i = 0; i < MAX_RANGE_DAYS && day <= range.to; i += 1, day = addDays(day, 1)) {
+    const items = (index.get(day) ?? []).filter((o) => isNotEnded(o.session));
+    // Beendetes zählt nicht: „ausgeblendet“ heißt nur, was man noch besuchen könnte.
+    all += (context.allIndex.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
+    count += items.length;
+    if (items.length > 0) groups.push({ day, items });
+  }
   return {
-    items,
-    ended: day === berlinIsoDate(now) ? context.endedToday : 0,
-    afterData: context.dataEnd !== undefined && day > context.dataEnd,
-    hidden: Math.max(0, all - items.length),
+    groups,
+    count,
+    ended: range.from <= today && today <= range.to ? context.endedToday : 0,
+    hidden: Math.max(0, all - count),
+    afterData: context.dataEnd !== undefined && range.from > context.dataEnd,
   };
 }
 

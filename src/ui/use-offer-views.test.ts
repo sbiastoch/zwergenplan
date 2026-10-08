@@ -130,75 +130,97 @@ describe("useOfferViews", () => {
     expect(result?.page.remaining).toBe(5);
   });
 
-  it("baut den Kalender-Index nur in der Kalenderansicht, startet heute", () => {
-    expect(render({}).calendar.index.size).toBe(0);
-    const v = render({ route: { tab: "kalender", filter: EMPTY_FILTER } });
-    expect([...v.calendar.index.keys()]).toEqual(["2026-10-10", "2026-10-12"]);
-    expect(v.calendar.lastDay).toBe("2026-10-12");
-    expect(v.calendar.day).toBe("2026-10-05");
-    expect(v.calendar.monthOpen).toBe(false);
-  });
+  describe("Kalender der Merkliste (Plan 0025, E5, E8)", () => {
+    const kalender: Route = { tab: "merkliste-kalender", filter: EMPTY_FILTER };
 
-  it("baut den ungefilterten Kalender-Index nur in der Kalenderansicht (Plan 0008, E12)", () => {
-    expect(render({}).calendar.allIndex.size).toBe(0);
-    const v = render({
-      birthDate: "2026-05-01",
-      route: { tab: "kalender", filter: { ...EMPTY_FILTER, formats: ["kurs"] } },
+    it("ist nur in der Darstellung Kalender der Merkliste gefüllt", () => {
+      for (const tab of ["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte"] as const) {
+        expect(render({ route: { tab, filter: EMPTY_FILTER }, savedIds: [BABY.id] }).savedCalendar, tab).toBe(
+          undefined,
+        );
+      }
+      expect(render({ route: kalender, savedIds: [BABY.id] }).savedCalendar).toBeDefined();
     });
-    // Filter und Alter blenden beide aus: nur im ungefilterten Index stehen sie
-    expect(v.calendar.index.size).toBe(0);
-    expect([...v.calendar.allIndex.keys()]).toEqual(["2026-10-10", "2026-10-12"]);
-    expect(v.calendar.allIndex.get("2026-10-12")?.map((o) => o.offer.title)).toEqual(["gross"]);
-    // Vergangenes fehlt auch dort
-    expect(v.calendar.allIndex.has("2026-10-01")).toBe(false);
-  });
 
-  it("kennt den Datenhorizont ungefiltert, die Navigationsgrenze gefiltert (B8)", () => {
-    const kurs = offer("kurs", "2026-10-20", undefined, "kurs");
-    const v = render({
-      offers: [...OFFERS, kurs],
-      route: { tab: "kalender", filter: { ...EMPTY_FILTER, formats: ["einmalig"] } },
-    });
-    expect(v.calendar.lastDay).toBe("2026-10-12");
-    expect(v.calendar.dataEnd).toBe("2026-10-20");
-  });
-
-  it("zählt heute beendete Termine aller filterpassenden Angebote, auch ohne kommenden Termin (B2)", () => {
-    const heute = offer("heute", "2026-10-05"); // 10–11 Uhr, um 12 Uhr vorbei
-    const kalender: Route = { tab: "kalender", filter: EMPTY_FILTER };
-    const v = render({ offers: [...OFFERS, heute], route: kalender });
-    expect(ids(v.visible)).not.toContain("heute");
-    expect(v.calendar.endedToday).toBe(1);
-    const nurKurse = render({
-      offers: [...OFFERS, heute],
-      route: { tab: "kalender", filter: { ...EMPTY_FILTER, formats: ["kurs"] } },
-    });
-    expect(nurKurse.calendar.endedToday).toBe(0);
-    // Mittags um 10:30 läuft der Termin noch
-    expect(
-      render({ offers: [heute], route: kalender, now: new Date("2026-10-05T10:30:00+02:00") }).calendar.endedToday,
-    ).toBe(0);
-  });
-
-  it("klemmt den Kalendertag auf heute, wenn „jetzt“ über Mitternacht springt", () => {
-    const before = new Date("2026-10-05T23:59:40+02:00");
-    const after = new Date("2026-10-06T00:00:10+02:00");
-    let result: OfferViews | undefined;
-    function Probe() {
-      const [now, setNow] = useState(before);
-      result = useOfferViews({
-        offers: OFFERS,
-        route: { tab: "kalender", filter: EMPTY_FILTER },
-        birthDate: undefined,
-        savedIds: [],
-        now,
+    it("zeigt nur gemerkte Termine; die Startseiten-Filter, Wegzeit und Alter wirken nicht", () => {
+      const v = render({
+        route: { ...kalender, filter: { ...EMPTY_FILTER, formats: ["kurs"] } },
+        birthDate: "2026-05-01",
+        savedIds: [GROSS.id, VORBEI.id],
       });
-      // Update während des Renderns: React rendert sofort neu, der Kalender-Zustand bleibt erhalten.
-      if (now === before) setNow(after);
-      return null;
-    }
-    renderToStaticMarkup(createElement(Probe));
-    expect(result?.calendar.day).toBe("2026-10-06");
+      expect([...(v.savedCalendar?.index.keys() ?? [])]).toEqual(["2026-10-12"]);
+      // ohne Merklisten-Filter (Etappe 4) blendet nichts aus
+      expect(v.savedCalendar?.allIndex).toEqual(v.savedCalendar?.index);
+    });
+
+    it("startet mit der Woche von heute und zugeklapptem Monat", () => {
+      const cal = render({ route: kalender, savedIds: [BABY.id] }).savedCalendar;
+      expect(cal?.selection).toEqual({ unit: "woche", day: "2026-10-05" });
+      expect(cal?.monthOpen).toBe(false);
+    });
+
+    it("kennt den Datenhorizont des ganzen Datenstands, nicht nur des Gemerkten (E5, B8)", () => {
+      const kurs = offer("kurs", "2026-10-20", undefined, "kurs");
+      const v = render({ offers: [...OFFERS, kurs], route: kalender, savedIds: [BABY.id] });
+      expect(v.savedCalendar?.dataEnd).toBe("2026-10-20");
+    });
+
+    it("zählt ein gemerktes Angebot, dessen einziger Termin heute schon vorbei ist (M7, B2)", () => {
+      const heute = offer("heute", "2026-10-05"); // 10–11 Uhr, um 12 Uhr vorbei
+      const v = render({ offers: [...OFFERS, heute], route: kalender, savedIds: [heute.id, BABY.id] });
+      expect(ids(v.saved)).toEqual(["baby"]);
+      expect(v.savedCalendar?.endedToday).toBe(1);
+      // nicht gemerkt: zählt nicht
+      expect(
+        render({ offers: [...OFFERS, heute], route: kalender, savedIds: [BABY.id] }).savedCalendar?.endedToday,
+      ).toBe(0);
+      // um 10:30 läuft der Termin noch
+      const running = render({
+        offers: [heute],
+        route: kalender,
+        savedIds: [heute.id],
+        now: new Date("2026-10-05T10:30:00+02:00"),
+      });
+      expect(running.savedCalendar?.endedToday).toBe(0);
+    });
+
+    it("klemmt die Auswahl auf heute, wenn „jetzt“ über Mitternacht springt", () => {
+      const before = new Date("2026-10-05T23:59:40+02:00");
+      const after = new Date("2026-10-06T00:00:10+02:00");
+      let result: OfferViews | undefined;
+      function Probe() {
+        const [now, setNow] = useState(before);
+        result = useOfferViews({ offers: OFFERS, route: kalender, birthDate: undefined, savedIds: [BABY.id], now });
+        // Update während des Renderns: React rendert sofort neu, der Kalender-Zustand bleibt erhalten.
+        if (now === before) setNow(after);
+        return null;
+      }
+      renderToStaticMarkup(createElement(Probe));
+      expect(result?.savedCalendar?.selection).toEqual({ unit: "woche", day: "2026-10-06" });
+    });
+
+    it("behält Auswahl und Monat beim Wechsel der Darstellung", () => {
+      let result: OfferViews | undefined;
+      let step = 0;
+      function Probe() {
+        const [route, setRoute] = useState<Route>(kalender);
+        result = useOfferViews({ offers: OFFERS, route, birthDate: undefined, savedIds: [BABY.id], now: NOW });
+        if (step === 0) {
+          step = 1;
+          result.savedCalendar?.setSelection({ unit: "tag", day: "2026-10-10" });
+          result.savedCalendar?.setMonthOpen(true);
+          setRoute({ tab: "merkliste", filter: EMPTY_FILTER });
+        } else if (step === 1) {
+          step = 2;
+          setRoute(kalender);
+        }
+        return null;
+      }
+      renderToStaticMarkup(createElement(Probe));
+      expect(step).toBe(2);
+      expect(result?.savedCalendar?.selection).toEqual({ unit: "tag", day: "2026-10-10" });
+      expect(result?.savedCalendar?.monthOpen).toBe(true);
+    });
   });
 
   describe("Entfernung und Wegzeit (Plan 0004, E6/E7; Plan 0009, E8/E11)", () => {
@@ -243,18 +265,13 @@ describe("useOfferViews", () => {
       expect(reach?.kind === "luftlinie" && Math.round(reach.meters)).toBe(226);
     });
 
-    it("wendet die Wegzeit-Grenze nur mit Wegzeit an, auch im Kalender", () => {
+    it("wendet die Wegzeit-Grenze nur mit Wegzeit an", () => {
       expect(ids(render({ offers: [nah, fern], route: within20 }).visible)).toEqual(["nah", "fern"]);
       expect(ids(render({ offers: [nah, fern], route: within20, reach: airlineReach(origin) }).visible)).toEqual([
         "nah",
         "fern",
       ]);
       expect(ids(render({ offers: [nah, fern], route: within20, reach: wegzeit }).visible)).toEqual(["nah"]);
-      const kalender = render({ offers: [nah, fern], route: { ...within20, tab: "kalender" }, reach: wegzeit });
-      expect([...kalender.calendar.index.keys()]).toEqual(["2026-10-10"]);
-      expect(kalender.calendar.lastDay).toBe("2026-10-10");
-      // Der Datenhorizont bleibt ungefiltert
-      expect(kalender.calendar.dataEnd).toBe("2026-10-12");
     });
 
     it("Kartenansicht: Zahl der Orte folgt den sichtbaren Angeboten (Plan 0005, E7)", () => {
@@ -323,11 +340,12 @@ describe("useOfferViews", () => {
       expect(render({ offers: all, ...variants[0] }).map?.placeCount).toBe(1);
     });
 
-    it("zählt heute beendete Termine nur bis zur Wegzeit-Grenze (B2)", () => {
+    it("der Kalender der Merkliste kennt keine Wegzeit-Grenze (Plan 0025, E8)", () => {
       const heuteFern = at(offer("heute-fern", "2026-10-05"), 49.4301, 11.0892);
-      const route: Route = { ...within20, tab: "kalender" };
-      expect(render({ offers: [nah, heuteFern], route }).calendar.endedToday).toBe(1);
-      expect(render({ offers: [nah, heuteFern], route, reach: wegzeit }).calendar.endedToday).toBe(0);
+      const route: Route = { ...within20, tab: "merkliste-kalender" };
+      const v = render({ offers: [nah, fern, heuteFern], route, reach: wegzeit, savedIds: [fern.id, heuteFern.id] });
+      expect([...(v.savedCalendar?.index.keys() ?? [])]).toEqual(["2026-10-12"]);
+      expect(v.savedCalendar?.endedToday).toBe(1);
     });
   });
 

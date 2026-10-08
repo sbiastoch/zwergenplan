@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { DISTRICTS } from "./districts.ts";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { LIMIT_MINUTES } from "./reach.ts";
-import { parseRoute, routeToSearch, tabSection } from "./route.ts";
+import { isLegacyView, parseRoute, routeToSearch, tabSection } from "./route.ts";
 
 const offerId = "familientreff--offener-krabbeltreff--beispielhof";
+const TABS = ["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte", "merkliste-kalender"] as const;
 
 describe("URL-Route", () => {
   it("ist ohne Parameter die Startseite", () => {
@@ -14,27 +15,25 @@ describe("URL-Route", () => {
 
   it("überlebt den Roundtrip mit Filter, Ansicht und Angebot", () => {
     const route = {
-      tab: "kalender" as const,
+      tab: "merkliste-kalender" as const,
       offerId,
       filter: { ...EMPTY_FILTER, formats: ["kurs" as const], categories: ["musik" as const] },
     };
     const search = routeToSearch(route);
-    expect(search).toBe(`kat=musik&format=kurs&ansicht=kalender&angebot=${offerId}`);
+    expect(search).toBe(`kat=musik&format=kurs&ansicht=merkliste-kalender&angebot=${offerId}`);
     expect(parseRoute(`?${search}`)).toEqual(route);
   });
 
   it("überlebt den Roundtrip mit Zeitraum, Ansicht und Angebot (Plan 0023, E4)", () => {
     const route = {
-      tab: "kalender" as const,
+      tab: "karte" as const,
       offerId,
       filter: { ...EMPTY_FILTER, range: { from: "2026-10-20", to: "2026-10-31" } },
     };
     const search = routeToSearch(route);
-    expect(search).toBe(`von=2026-10-20&bis=2026-10-31&ansicht=kalender&angebot=${offerId}`);
+    expect(search).toBe(`von=2026-10-20&bis=2026-10-31&ansicht=karte&angebot=${offerId}`);
     expect(parseRoute(`?${search}`)).toEqual(route);
-    expect(routeToSearch(parseRoute(`?angebot=${offerId}&bis=2026-10-20&von=2026-10-31&ansicht=kalender`))).toBe(
-      search,
-    );
+    expect(routeToSearch(parseRoute(`?angebot=${offerId}&bis=2026-10-20&von=2026-10-31&ansicht=karte`))).toBe(search);
   });
 
   it("verwirft unbekannte Ansichten und kaputte Angebots-IDs", () => {
@@ -58,6 +57,34 @@ describe("URL-Route", () => {
       offerId,
       filter: EMPTY_FILTER,
     });
+  });
+
+  it("kennt den Kalender der Merkliste: ansicht=merkliste-kalender überlebt den Roundtrip (Plan 0025, E4)", () => {
+    const route = { tab: "merkliste-kalender" as const, filter: { ...EMPTY_FILTER, categories: ["musik" as const] } };
+    expect(routeToSearch(route)).toBe("kat=musik&ansicht=merkliste-kalender");
+    expect(parseRoute("?kat=musik&ansicht=merkliste-kalender")).toEqual(route);
+  });
+
+  it("liest den alten Tab ansicht=kalender als „Entdecken“, Filter, Anbieter und Angebot bleiben (Plan 0025, E8)", () => {
+    const providerId = "theater-beispiel";
+    const search = `?kat=musik&von=2026-11-06&ansicht=kalender&anbieter=${providerId}&angebot=${offerId}`;
+    expect(parseRoute(search)).toEqual({
+      tab: "entdecken",
+      providerId,
+      offerId,
+      filter: { ...EMPTY_FILTER, categories: ["musik"], range: { from: "2026-11-06" } },
+    });
+    expect(routeToSearch(parseRoute(search))).toBe(
+      `kat=musik&von=2026-11-06&anbieter=${providerId}&angebot=${offerId}`,
+    );
+  });
+
+  it("isLegacyView erkennt nur ansicht=kalender (Plan 0025, E8)", () => {
+    expect(isLegacyView("?ansicht=kalender")).toBe(true);
+    expect(isLegacyView("?kat=musik&ansicht=kalender&wegzeit=20")).toBe(true);
+    for (const search of ["", "?ansicht=merkliste-kalender", "?ansicht=karte", "?kat=kalender", "?ansicht=Kalender"]) {
+      expect(isLegacyView(search), search).toBe(false);
+    }
   });
 
   it("kennt den Tab „Anbieter“: ansicht=anbieter überlebt den Roundtrip (Plan 0010, E2)", () => {
@@ -85,8 +112,8 @@ describe("URL-Route", () => {
     expect(search).toBe(`kat=musik&ansicht=anbieter&anbieter=${providerId}&angebot=${offerId}`);
     expect(parseRoute(`?${search}`)).toEqual(full);
     // gleiche Bedeutung in anderer Reihenfolge, kanonisch zurück
-    expect(routeToSearch(parseRoute(`?angebot=${offerId}&anbieter=${providerId}&ansicht=kalender`))).toBe(
-      `ansicht=kalender&anbieter=${providerId}&angebot=${offerId}`,
+    expect(routeToSearch(parseRoute(`?angebot=${offerId}&anbieter=${providerId}&ansicht=merkliste`))).toBe(
+      `ansicht=merkliste&anbieter=${providerId}&angebot=${offerId}`,
     );
   });
 
@@ -123,7 +150,7 @@ describe("URL-Route", () => {
     ]);
     const names = DISTRICTS.flatMap((d) => [d.id, d.name.toLowerCase()]);
     for (const filter of filters) {
-      for (const tab of ["entdecken", "karte", "kalender", "anbieter", "merkliste", "merkliste-karte"] as const) {
+      for (const tab of TABS) {
         const search = routeToSearch({ tab, offerId, providerId: "theater-beispiel", filter });
         expect(search).toContain(`wegzeit=${filter.reachLimit?.value}`);
         expect(search).not.toContain("umkreis");
@@ -138,12 +165,12 @@ describe("tabSection", () => {
   it("ordnet Liste und Karte dem Tab „Entdecken“ zu (Plan 0005, E5)", () => {
     expect(tabSection("entdecken")).toBe("entdecken");
     expect(tabSection("karte")).toBe("entdecken");
-    expect(tabSection("kalender")).toBe("kalender");
     expect(tabSection("anbieter")).toBe("anbieter");
     expect(tabSection("merkliste")).toBe("merkliste");
   });
 
-  it("ordnet die Karte der Merkliste dem Tab „Merkliste“ zu (Plan 0025, E4)", () => {
+  it("ordnet Karte und Kalender der Merkliste dem Tab „Merkliste“ zu (Plan 0025, E4)", () => {
     expect(tabSection("merkliste-karte")).toBe("merkliste");
+    expect(tabSection("merkliste-kalender")).toBe("merkliste");
   });
 });

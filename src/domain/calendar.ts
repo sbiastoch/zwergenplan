@@ -1,6 +1,16 @@
-/** Kalender-Navigation (Plan 0003, E14): Grenzen heute bzw. letzter Tag mit Terminen. Reine Kalendertage. */
+/**
+ * Kalender-Navigation (Plan 0003, E14): Grenzen heute bzw. letzter Tag mit Terminen. Reine Kalendertage. Seit Plan 0025
+ * (E5) der Kalender der Merkliste: Tag, Woche oder Monat sind die Auswahl, die die Liste darunter filtert.
+ */
 import { weekDays } from "./agenda.ts";
-import { addDays, addMonths, isoWeekday } from "./time.ts";
+import { addDays, addMonths, daysInMonth, isoWeekday, parseIsoDate } from "./time.ts";
+
+/** Was der Kalender der Merkliste auswählt (Plan 0025, E5). `day` ist ein Berliner Tag, nie vor heute. */
+export interface CalendarSelection {
+  unit: "tag" | "woche" | "monat";
+  /** Anker: der gewählte Tag; bei Woche ein Tag darin (Mo–So um ihn), bei Monat ein Tag darin */
+  day: string;
+}
 
 /** Ziele der Pfeile; `undefined` = Pfeil gesperrt. */
 export interface CalendarNav {
@@ -38,4 +48,17 @@ export function calendarNav(day: string, today: string, lastDay: string | undefi
     prevMonth: first > firstOfMonth(today) ? clampDay(addMonths(first, -1), today) : undefined,
     nextMonth: nextFirst <= end ? nextFirst : undefined,
   };
+}
+
+/** Erster und letzter Berliner Tag der Auswahl, inklusive; nie vor `today` (Plan 0025, E5). */
+export function selectionRange(sel: CalendarSelection, today: string): { from: string; to: string } {
+  const day = clampDay(sel.day, today);
+  if (sel.unit === "tag") return { from: day, to: day };
+  if (sel.unit === "woche") {
+    const monday = mondayOf(day);
+    return { from: clampDay(monday, today), to: addDays(monday, 6) };
+  }
+  const { year, month } = parseIsoDate(day);
+  const first = firstOfMonth(day);
+  return { from: clampDay(first, today), to: addDays(first, daysInMonth(year, month) - 1) };
 }

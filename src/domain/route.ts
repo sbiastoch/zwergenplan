@@ -6,20 +6,30 @@ import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts"
 import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, OFFER_ID_PATTERN } from "./ids.ts";
 
 /**
- * „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5), kein eigener Tab in der Leiste. „anbieter“ ist der
- * vierte Tab (Plan 0010, E2), vor der Merkliste. „merkliste-karte“ ist die Karte der Merkliste (Plan 0025, E4); die
- * Wahl Liste | Karte verrät nichts über das Gemerkte und darf deshalb in die URL.
+ * „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5; Tab „Angebote“ seit Plan 0025, E8), kein eigener Tab
+ * in der Leiste. „anbieter“ steht vor der Merkliste (Plan 0010, E2). „merkliste-karte“ und „merkliste-kalender“ sind
+ * Karte und Kalender der Merkliste (Plan 0025, E4); die Wahl Liste | Karte | Kalender verrät nichts über das Gemerkte
+ * und darf deshalb in die URL. Den Tab „Kalender“ gibt es nicht mehr (Plan 0025, E8): `ansicht=kalender` ist unbekannt
+ * und ergibt „entdecken“.
  */
-const TABS = ["entdecken", "karte", "kalender", "anbieter", "merkliste", "merkliste-karte"] as const;
+const TABS = ["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte", "merkliste-kalender"] as const;
 export type Tab = (typeof TABS)[number];
 /** Eintrag der Tab-Leiste */
-export type Section = Exclude<Tab, "karte" | "merkliste-karte">;
+export type Section = Exclude<Tab, "karte" | "merkliste-karte" | "merkliste-kalender">;
 
-/** Welcher Eintrag der Tab-Leiste aktiv ist: Liste und Karte gehören zu „Entdecken“ bzw. zur Merkliste. */
+/** Welcher Eintrag der Tab-Leiste aktiv ist: Die Darstellungen gehören zu „Entdecken“ bzw. zur Merkliste. */
 export function tabSection(tab: Tab): Section {
   if (tab === "karte") return "entdecken";
-  if (tab === "merkliste-karte") return "merkliste";
+  if (tab === "merkliste-karte" || tab === "merkliste-kalender") return "merkliste";
   return tab;
+}
+
+/**
+ * Alter Link auf den entfallenen Tab „Kalender“ (Plan 0025, E8)? Dann ersetzt `useRoute` die URL beim Start einmal
+ * durch die kanonische, sonst bliebe `ansicht=kalender` stehen.
+ */
+export function isLegacyView(search: string): boolean {
+  return new URLSearchParams(search).get("ansicht") === "kalender";
 }
 
 export interface Route {

@@ -362,7 +362,7 @@
  * stünde sie sonst über allen Ebenen.
  */
 @layer base {
-  :where(.brand, .ctitle, .dtitle, .daylabel, .ptitle, .sheet h2, .h3, .empty b, .cal-nav b, .label b) {
+  :where(.brand, .ctitle, .dtitle, .daylabel, .ptitle, .sheet h2, .h3, .empty b, .cal-title, .label b) {
     font-family: var(--font-display);
   }
 }
