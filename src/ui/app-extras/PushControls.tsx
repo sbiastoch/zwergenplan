@@ -11,9 +11,9 @@ import { useEffect, useId, useRef, useState } from "react";
 import { loadBirthDate, loadOriginDistrict, loadOriginPoint } from "../../data/preferences.ts";
 import { type MirrorData, type PushApi, PushError } from "../../data/push.ts";
 import { loadSearchesRaw, saveSearches } from "../../data/searches-store.ts";
-import { filterFromSearch, filterToSearch } from "../../domain/filter.ts";
+import { filterFromSearch } from "../../domain/filter.ts";
 import type { PushSupport } from "../../domain/pwa.ts";
-import { addSearch, parseSearches, removeSearch } from "../../domain/searches.ts";
+import { addSearch, parseSearches, removeSearch, searchOf } from "../../domain/searches.ts";
 import { originFromStored } from "../../domain/stored-origin.ts";
 import { problemText, searchLabel, PUSH_TEXTS as T } from "./push-texts.ts";
 
@@ -36,7 +36,8 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
   const [list, setList] = useState(() => parseSearches(loadSearchesRaw()));
   const [status, setStatus] = useState("");
 
-  const current = filterToSearch(filterFromSearch(location.search));
+  // ohne Zeitraum: Such-Abos lassen ihn weg (Plan 0023, E12)
+  const current = searchOf(filterFromSearch(location.search));
   const pressed = current !== "" && list.includes(current);
   // dieselbe Prüfung wie im Service Worker: ein Punkt außerhalb der Stadt zählt nicht (Arch-Review N1)
   const hasOrigin = originFromStored(loadOriginPoint() ?? loadOriginDistrict()) !== undefined;

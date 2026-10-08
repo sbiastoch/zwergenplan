@@ -9,6 +9,7 @@ import {
   filterToSearch,
   matchesFilter,
   toggleIn,
+  withDateRange,
   withReachLimit,
 } from "./filter.ts";
 import { placeKey } from "./place-key.ts";
@@ -244,5 +245,50 @@ describe("Filter bedienen", () => {
     expect(on).toEqual({ ...EMPTY_FILTER, formats: ["kurs"] });
     expect(toggleIn(on, "formats", "kurs")).toEqual(EMPTY_FILTER);
     expect(toggleIn(on, "categories", "musik")).toEqual({ ...EMPTY_FILTER, formats: ["kurs"], categories: ["musik"] });
+  });
+});
+
+describe("Zeitraum (Plan 0023)", () => {
+  const autumn = { ...EMPTY_FILTER, range: { from: "2026-10-20", to: "2026-10-31" } } satisfies FilterState;
+
+  it("steht kanonisch als von/bis nach der Wegzeit in der URL", () => {
+    const state: FilterState = { ...autumn, reachLimit: { kind: "minuten", value: 30 } };
+    expect(filterToSearch(state)).toBe("wegzeit=30&von=2026-10-20&bis=2026-10-31");
+    expect(filterFromSearch("?bis=2026-10-31&wegzeit=30&von=2026-10-20")).toEqual(state);
+    expect(filterToSearch({ ...EMPTY_FILTER, range: { to: "2026-10-31" } })).toBe("bis=2026-10-31");
+  });
+
+  it("tauscht vertauschte Grenzen und verwirft ungültige", () => {
+    expect(filterFromSearch("?von=2026-10-31&bis=2026-10-20")).toEqual(autumn);
+    expect(filterFromSearch("?von=2026-10-32&bis=2026-10-31").range).toEqual({ to: "2026-10-31" });
+    const none = filterFromSearch("?von=heute&bis=");
+    expect(none).toEqual(EMPTY_FILTER);
+    expect("range" in none).toBe(false);
+  });
+
+  it("zählt als ein Filter im Badge", () => {
+    expect(activeFilterCount(autumn, { limitActive: false })).toBe(1);
+    expect(activeFilterCount({ ...EMPTY_FILTER, range: { from: "2026-10-20" } }, { limitActive: false })).toBe(1);
+  });
+
+  it("setzt und entfernt den Zeitraum, vertauscht wird still getauscht", () => {
+    expect(withDateRange(EMPTY_FILTER, "2026-10-31", "2026-10-20")).toEqual(autumn);
+    const cleared = withDateRange(autumn, undefined, undefined);
+    expect(cleared).toEqual(EMPTY_FILTER);
+    expect("range" in cleared).toBe(false);
+  });
+
+  it("Kurse nur mit Beginn im Zeitraum, regelmäßige mit einem Termin darin", () => {
+    // PEKiP beginnt am 13.10. und fällt heraus; Krabbeltreff (21., 28.10.), Krabbelreime (23.10.) und die
+    // Bewegungslandschaft (ab 20.10., ohne Testschlüssel) passen, der Workshop am 17.10. nicht.
+    expect(ids(autumn).sort()).toEqual(["krabbelreime", "krabbeltreff", undefined]);
+    expect(ids({ ...EMPTY_FILTER, range: { from: "2026-11-01" } }).sort()).toEqual([
+      "babykonzert-advent",
+      "krabbelreime",
+      "krabbeltreff",
+      "kuckuck-im-nest",
+      "musikgarten-1",
+      undefined,
+    ]);
   });
 });

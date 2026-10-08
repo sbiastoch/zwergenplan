@@ -103,7 +103,7 @@ test("zeigt Verfügbarkeit als Momentaufnahme und erklärt das Alter", async ({ 
 test("merkt aus dem Detail, Meldung im Dialog sichtbar", async ({ page }) => {
   const dialog = await openDetail(page, PEKIP);
   await dialog.getByRole("button", { name: `${PEKIP} merken` }).click();
-  await expect(dialog.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toBeVisible();
+  await expect(dialog.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
   await expect(dialog.getByRole("button", { name: `${PEKIP} merken` })).toHaveAttribute("aria-pressed", "true");
 });
 

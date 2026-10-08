@@ -153,7 +153,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       .first()
       .click();
     await openProviders(page);
-    // Der Toast „Eingeklebt …“ (2,8 s) läge sonst über der Liste
+    // Der Toast „Gemerkt …“ (2,8 s) läge sonst über der Liste
     await page.locator(".toast").waitFor({ state: "detached" });
   },
 };

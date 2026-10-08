@@ -23,6 +23,20 @@ describe("URL-Route", () => {
     expect(parseRoute(`?${search}`)).toEqual(route);
   });
 
+  it("überlebt den Roundtrip mit Zeitraum, Ansicht und Angebot (Plan 0023, E4)", () => {
+    const route = {
+      tab: "kalender" as const,
+      offerId,
+      filter: { ...EMPTY_FILTER, range: { from: "2026-10-20", to: "2026-10-31" } },
+    };
+    const search = routeToSearch(route);
+    expect(search).toBe(`von=2026-10-20&bis=2026-10-31&ansicht=kalender&angebot=${offerId}`);
+    expect(parseRoute(`?${search}`)).toEqual(route);
+    expect(routeToSearch(parseRoute(`?angebot=${offerId}&bis=2026-10-20&von=2026-10-31&ansicht=kalender`))).toBe(
+      search,
+    );
+  });
+
   it("verwirft unbekannte Ansichten und kaputte Angebots-IDs", () => {
     expect(parseRoute("?ansicht=landkarte&angebot=../../etc")).toEqual({ tab: "entdecken", filter: EMPTY_FILTER });
     expect(parseRoute("?ansicht=merkliste").tab).toBe("merkliste");

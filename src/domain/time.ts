@@ -50,6 +50,14 @@ export function formatGermanDate(iso: string): string {
   return `${pad2(day)}.${pad2(month)}.${year}`;
 }
 
+/** Ist `text` ein echter Kalendertag als „YYYY-MM-DD“? (URL-Werte, Plan 0023) */
+export function isIsoDate(text: string): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  if (!m) return false;
+  const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  return month >= 1 && month <= 12 && day >= 1 && day <= daysInMonth(year, month);
+}
+
 export function parseIsoDate(iso: string): CivilDate {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   if (!m) throw new Error(`Kein ISO-Datum: ${iso}`);

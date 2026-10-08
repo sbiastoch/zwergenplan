@@ -121,7 +121,8 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
     () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly }),
     [filtered, upcoming, birthDate, now, ageOnly],
   );
-  const groups = useMemo(() => groupByNextSession(visible, now), [visible, now]);
+  const range = route.filter.range;
+  const groups = useMemo(() => groupByNextSession(visible, now, range), [visible, now, range]);
   const index = useMemo(() => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX), [visible, route.tab]);
   const allIndex = useMemo(
     () => (route.tab === "kalender" ? sessionsByDay(upcoming) : NO_INDEX),

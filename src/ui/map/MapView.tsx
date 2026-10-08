@@ -20,9 +20,11 @@ import { guardTileRequest, styleUrl } from "../../data/tiles.ts";
 import { DISTRICT_ZOOM, type StartCamera } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
 import type { MapViewProps } from "../map-types.ts";
+import { BASEMAP_PAINT, basemapChanges, basemapPalette, type MapTokens } from "./basemap.ts";
 import { nearestHit, originToFeatures, placesToFeatures } from "./geojson.ts";
 import { germanTextField } from "./labels.ts";
-import { addOwnLayers, LOCALE, PLACE_LAYERS, readMapColors } from "./layers.ts";
+import { addOwnLayers, LOCALE, PLACE_LAYERS, readMapTokens } from "./layers.ts";
+import { addCategoryImages } from "./marker-images.ts";
 
 // Die Worker-URL aus import.meta.url stimmt nach dem Bündeln nicht mehr (Spike, E2).
 setWorkerUrl(workerUrl);
@@ -68,6 +70,31 @@ function germanLabels(map: MapLibre) {
     // coalesce-Ausdruck aus `get`-Zeichenketten ein; das Ergebnis ist wieder ein text-field (labels.test.ts).
     // MapLibre validiert den Wert zur Laufzeit zusätzlich; ein ungültiger käme als `error`-Ereignis.
     map.setLayoutProperty(layer.id, "text-field", german as TextField);
+  }
+}
+
+/**
+ * Grundkarte in App-Farben (Plan 0024, E1–E3); nach jedem `style.load`, vor den eigenen Layern. Nur Paint und
+ * Sichtbarkeit, kein Request. Rein optisch: Ist ein Token kein Hex (`mixHex` wirft), bleibt die Grundkarte von
+ * OpenFreeMap, statt die Karte in den Fehlerzustand zu schicken. Einen Wert, den MapLibre ablehnt, meldet es als
+ * `error`-Ereignis; vor `load` zeigte das den Kachel-Hinweis. Die Werte sind Hex-Farben (basemap.test.ts, E2E).
+ */
+function tintBasemap(map: MapLibre, tokens: MapTokens, dark: boolean) {
+  let palette: ReturnType<typeof basemapPalette>;
+  try {
+    palette = basemapPalette(tokens, dark);
+  } catch {
+    return;
+  }
+  for (const change of basemapChanges(map.getStyle().layers, palette)) {
+    if ("hide" in change) {
+      map.setLayoutProperty(change.id, "visibility", "none");
+      continue;
+    }
+    for (const name of BASEMAP_PAINT) {
+      const color = change.paint[name];
+      if (color) map.setPaintProperty(change.id, name, color);
+    }
   }
 }
 
@@ -156,10 +183,14 @@ export function MapView(props: MapViewProps) {
     // Dauerhaft, nicht `once`: Auch nach jedem Stilwechsel kommen deutsche Beschriftung und eigene Layer neu dazu (E10).
     map.on("style.load", () => {
       germanLabels(map);
-      addOwnLayers(map, readMapColors(), {
+      const tokens = readMapTokens();
+      addCategoryImages(map, tokens.onColor);
+      addOwnLayers(map, tokens, {
         places: placesToFeatures(latest.current.places),
         origin: originToFeatures(latest.current.origin),
       });
+      // Nach den eigenen Layern: Paint ändert die Reihenfolge nicht, und ein Fehler hier kostet nur die Farben.
+      tintBasemap(map, tokens, latest.current.dark);
     });
     map.once("idle", () =>
       latest.current.onReady(() => {
