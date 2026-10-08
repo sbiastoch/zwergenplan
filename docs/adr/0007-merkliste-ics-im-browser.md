@@ -1,6 +1,6 @@
 # ADR 0007 – Merklisten-ICS entsteht im Browser
 
-Status: angenommen (2026-10-04), ergänzt ADR 0003. Details in Plan 0003 (E12).
+Status: angenommen (2026-10-04), ergänzt ADR 0003; ergänzt durch ADR 0018 (Plan 0018: regelmäßige Reihen passend zum Alter, ebenfalls im Browser). Details in Plan 0003 (E12).
 
 ## Kontext
 ADR 0003 und `docs/architecture.md` legen fest, dass ICS-Dateien statisch zur Build-Zeit entstehen: eine Datei je Reihe, eine je Einzeltermin einer regelmäßigen Reihe. Die Merkliste („Mein Stickerheft“) soll alle gemerkten Angebote mit einem Tipp in den Kalender bringen. Welche Angebote gemerkt sind, steht nur im `localStorage` des Geräts (Privatsphäre). Der Build kann diese Datei also nicht vorab erzeugen. Die Alternative wäre, alle Einzeldateien nacheinander zu öffnen; das sind bei fünf Angeboten fünf Kalender-Dialoge.
@@ -9,7 +9,7 @@ ADR 0003 und `docs/architecture.md` legen fest, dass ICS-Dateien statisch zur Bu
 - Die Sammeldatei der Merkliste wird **im Browser** erzeugt (`icsForCollection` in `src/domain/ics.ts`) und als Blob mit `download="zwergenplan-merkliste.ics"` geladen.
 - Sie nutzt **dieselben VEVENTs** wie die statischen Dateien: gleiche UIDs (`offerId--YYYYMMDDTHHmm@zwergenplan`), gleiche Titel inklusive Kursnummerierung, Zeiten in UTC, keine RRULE/RDATE. Ein späterer Import einer Einzeldatei aktualisiert also denselben Termin.
 - `DTSTAMP` kommt aus `generatedAt` des Datenstands (deterministisch, wie beim Build). `X-WR-CALNAME` ist „Zwergenplan – Merkliste“.
-- Auswahl der Termine: Kurse komplett, regelmäßige und einmalige Angebote nur nicht beendete Termine (`collectionSessions` in `src/domain/saved.ts`).
+- Auswahl der Termine: Kurse komplett, regelmäßige und einmalige Angebote nur nicht beendete Termine (`exportSessions` in `src/domain/saved.ts`; bis Plan 0018 `collectionSessions`). Mit Geburtsdatum nimmt sie von regelmäßigen Angeboten nur die Termine, an denen sie zum Alter passen (ADR 0018).
 - Alle übrigen ICS-Dateien bleiben statisch. `ics.ts` importiert Zod nur als Typ, das Modul darf deshalb in den Client (`no-zod-in-client-transitive`).
 
 ## Konsequenzen

@@ -24,12 +24,13 @@ import {
   standDate,
 } from "./format.ts";
 import { Icon } from "./icons.tsx";
+import { preloadExportWhenIdle } from "./ics-export.ts";
 import { type AgeEscape, ListPending, ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import { ProviderPanel } from "./ProviderPanel.tsx";
-import { preloadExportWhenIdle, SavedView } from "./SavedView.tsx";
+import { SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
 import { useBirthDate, useNow, useOrigin, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
@@ -84,7 +85,7 @@ export function App() {
   useEffect(() => {
     if (load.kind === "ready") setAnimate(true);
   }, [load.kind]);
-  // Export-Code der Merkliste erst nach dem ersten Rendern mit Daten im Leerlauf vorladen (Plan 0010, E8 A)
+  // Export-Code (Merkliste, Reihen im Detail) nach dem ersten Rendern mit Daten im Leerlauf vorladen (Plan 0010, E8 A)
   const dataReady = load.kind === "ready";
   useEffect(() => (dataReady ? preloadExportWhenIdle() : undefined), [dataReady]);
 
