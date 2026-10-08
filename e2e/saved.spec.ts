@@ -1,7 +1,8 @@
 /** Merkliste (Plan 0003, E12, ADR 0007; Kopf, Umschalter und Karte nach Plan 0025, E3a/E4). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import { readFileSync } from "node:fs";
 import type { Download, Page } from "@playwright/test";
-import { expect, startPreloads, test } from "./fixtures.ts";
+import { expect, MAP_READY, startPreloads, test } from "./fixtures.ts";
+import { setTextScale } from "./mobile-ux.ts";
 
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
 
@@ -219,6 +220,31 @@ async function preset(page: Page, ids: readonly string[], providers: readonly st
   );
 }
 
+/**
+ * Wartet, bis die Karte bereit ist und nichts mehr lädt (wie `openMap` in karte.spec.ts). Erst dann zurück zur Liste:
+ * Sonst prüft der Kachel-Wächter (fixtures.ts) einen noch laufenden Request, wenn die Karte schon aus dem DOM ist.
+ */
+async function mapSettled(page: Page) {
+  await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.__zpMap;
+        if (!map || map.loaded()) resolve();
+        else map.once("idle", () => resolve());
+      }),
+  );
+}
+
+/** Zählt die Requests auf die Wegzeit-Tabelle ab jetzt (wie in startpunkt.spec.ts). */
+function tableRequests(page: Page): string[] {
+  const requests: string[] = [];
+  page.on("request", (req) => {
+    if (new URL(req.url()).pathname.endsWith("/data/wegzeit.json")) requests.push(req.url());
+  });
+  return requests;
+}
+
 const tabButton = (page: Page, name: string) =>
   page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
 const segment = (page: Page, name: "Liste" | "Karte") =>
@@ -265,17 +291,54 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
     });
   }
 
+  for (const scale of [1, 2]) {
+    test(`Umschalter bei 320 px und ${scale * 100} % Text: ${scale === 2 ? "einspaltig ohne Daumen" : "zweispaltig mit Daumen"}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 320, height: 800 });
+      await preset(page, FIVE.slice(0, 2));
+      await page.goto("./?ansicht=merkliste");
+      await expect(segment(page, "Liste")).toHaveAttribute("aria-pressed", "true");
+      await setTextScale(page, scale);
+      // Chromium wertet die Container-Query (17rem) nicht neu aus, wenn sich nur die Schriftgröße ändert und die Breite
+      // des Containers gleich bleibt. Eine echte Schrift-Einstellung gilt ab dem Laden; kurz die Breite ändern holt das
+      // nach. Ohne diesen Schritt stünde bei 200 % noch das Layout von 100 % (Arch-Review Plan 0025, Etappe 2).
+      await page.setViewportSize({ width: 330, height: 800 });
+      await page.setViewportSize({ width: 320, height: 800 });
+      await setTextScale(page, scale);
+      const layout = await page.evaluate(() => {
+        const seg = document.querySelector(".view-toggle.full .seg");
+        const thumb = document.querySelector(".view-toggle.full .seg-thumb");
+        if (!seg || !thumb) throw new Error("kein Umschalter oder kein Daumen");
+        return {
+          columns: getComputedStyle(seg).gridTemplateColumns.trim().split(/\s+/).length,
+          thumb: getComputedStyle(thumb).display,
+        };
+      });
+      if (scale === 2) expect(layout).toEqual({ columns: 1, thumb: "none" });
+      else {
+        expect(layout.columns).toBe(2);
+        expect(layout.thumb).not.toBe("none");
+      }
+    });
+  }
+
   test("ohne gemerktes Angebot: Leerzustand auch auf der Karte, kein Umschalter, keine Kacheln", async ({ page }) => {
     // nur ein Anbieter gemerkt: Der zählt auf der Merkliste nicht (E5a); Kacheln sind ohne Mock verboten (fixtures.ts)
     await preset(page, [], ["theater-beispiel"]);
+    const requests = tableRequests(page);
     await page.goto("./?ansicht=merkliste-karte");
     await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();
+    // Anlass auch ohne Gemerktes (App.tsx): Sonst verriete der Request, ob etwas gemerkt ist
+    await expect.poll(() => requests.length).toBe(1);
     await expect(page).toHaveURL(/ansicht=merkliste-karte$/);
     await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
     await expect(page.locator(".map-box")).toHaveCount(0);
     await expect(page.getByRole("group", { name: "Darstellung der Merkliste" })).toHaveCount(0);
     await expect(page.getByRole("status")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
+    await page.waitForTimeout(300);
+    expect(requests).toHaveLength(1);
   });
 });
 
@@ -298,6 +361,7 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
     await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
     await expect(page.locator(".map-box")).toBeVisible();
+    await mapSettled(page);
 
     const liste = segment(page, "Liste");
     await liste.focus();

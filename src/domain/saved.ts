@@ -25,6 +25,11 @@ export function savedOffers<T extends Offer>(offers: readonly T[], ids: readonly
     .map((x) => x.offer);
 }
 
+/** Kommende Termine aller Angebote zusammen, für die Statuszeile der Merkliste (Plan 0025, E3a). */
+export function upcomingSessionCount(offers: readonly Offer[], now: Date): number {
+  return offers.reduce((sum, offer) => sum + upcomingSessions(offer, now).length, 0);
+}
+
 /** Auswahl für den ICS-Export einer Reihe bzw. der Merkliste (Plan 0018). */
 export interface ExportSelection {
   sessions: Session[];
@@ -85,8 +90,8 @@ export interface CollectionExport<T extends Offer> {
 }
 
 /**
- * Auswahl für „Alle in den Kalender“ (Plan 0018, E3) mit `exportSessions` je gemerktem Angebot. Der Text unter dem
- * Knopf zählt mit derselben Auswahl, Datei und Zahl stimmen also überein.
+ * Auswahl für „Alle in den Kalender“ (Plan 0018, E3) mit `exportSessions` je gemerktem Angebot. Toast und Datei
+ * zählen mit derselben Auswahl, Datei und Zahl stimmen also überein.
  */
 export function collectionExport<T extends Offer>(
   offers: readonly T[],

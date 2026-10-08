@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { offerFitsAge } from "./age.ts";
 import { upcomingSessions } from "./agenda.ts";
-import { cleanSavedProviders, collectionExport, exportSessions, savedOffers, seriesExport, toggleId } from "./saved.ts";
+import {
+  cleanSavedProviders,
+  collectionExport,
+  exportSessions,
+  savedOffers,
+  seriesExport,
+  toggleId,
+  upcomingSessionCount,
+} from "./saved.ts";
 import type { Offer } from "./schema.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 import { addDays, berlinIsoDate, fromBerlinLocal } from "./time.ts";
@@ -243,6 +251,35 @@ describe("collectionExport (Plan 0018, E3)", () => {
     const [first, second] = collectionExport(offers, FIXTURE_NOW, undefined).items;
     expect(first?.offer).toBe(offers[0]);
     expect(second?.offer).toBe(offers[1]);
+  });
+});
+
+describe("upcomingSessionCount (Plan 0025, E3a)", () => {
+  const today = berlinIsoDate(FIXTURE_NOW);
+  const at = (day: string, from: string, to: string) => ({
+    start: fromBerlinLocal(`${day}T${from}`),
+    end: fromBerlinLocal(`${day}T${to}`),
+  });
+
+  it("summiert die kommenden Termine über mehrere Angebote", () => {
+    const offers = [
+      { ...fixtureOffer("krabbeltreff"), sessions: weeklySessions(addDays(today, 1), 3) },
+      { ...fixtureOffer("pekip-herbst"), sessions: weeklySessions(addDays(today, 2), 4) },
+    ];
+    expect(upcomingSessionCount(offers, FIXTURE_NOW)).toBe(7);
+  });
+
+  it("zählt heute schon beendete Termine nicht, laufende und spätere von heute schon", () => {
+    // FIXTURE_NOW ist 12:00 Berliner Zeit, in Los Angeles noch Vormittag desselben Tages
+    const offer = {
+      ...fixtureOffer("krabbeltreff"),
+      sessions: [at(today, "08:30", "09:30"), at(today, "11:30", "12:30"), at(today, "15:00", "16:00")],
+    };
+    expect(upcomingSessionCount([offer], FIXTURE_NOW)).toBe(2);
+  });
+
+  it("ergibt 0 für eine leere Liste", () => {
+    expect(upcomingSessionCount([], FIXTURE_NOW)).toBe(0);
   });
 });
 

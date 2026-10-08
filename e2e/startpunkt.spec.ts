@@ -12,7 +12,7 @@
  * Luftlinie: Theater 226 m, Beispielhof 1 427 m, Bibliothek 1 689 m, Musikschule 2 358 m, Gemeinde 3 008 m.
  */
 import type { Page } from "@playwright/test";
-import { expect, expectTwoLines, startPreloads, test } from "./fixtures.ts";
+import { expect, expectTwoLines, MAP_READY, startPreloads, test } from "./fixtures.ts";
 import { setTextScale } from "./mobile-ux.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
@@ -73,6 +73,22 @@ function collectRequests(page: Page): string[] {
   const requests: string[] = [];
   page.on("request", (req) => requests.push(req.url()));
   return requests;
+}
+
+/**
+ * Wartet, bis die Karte bereit ist und nichts mehr lädt (wie `openMap` in karte.spec.ts). Erst dann zurück zur Liste:
+ * Sonst prüft der Kachel-Wächter (fixtures.ts) einen noch laufenden Request, wenn die Karte schon aus dem DOM ist.
+ */
+async function mapSettled(page: Page) {
+  await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.__zpMap;
+        if (!map || map.loaded()) resolve();
+        else map.once("idle", () => resolve());
+      }),
+  );
 }
 
 /** Zählt die Requests auf eine Datei ab jetzt (Standard: die Wegzeit-Tabelle). */
@@ -278,6 +294,7 @@ test.describe("Karte der Merkliste (Plan 0025, E4)", () => {
       .click();
     await expect(page.locator(".places")).toBeVisible();
     await expect.poll(() => requests.length).toBe(1);
+    await mapSettled(page);
     // zurück zur Liste und wieder zur Karte: kein zweiter Request
     await page
       .getByRole("group", { name: "Darstellung der Merkliste" })

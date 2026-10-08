@@ -300,7 +300,7 @@ Die heutige Zeile „N gemerkt · M Termine in einer .ics-Datei · Kurse immer k
 - **Auf der Merkliste steht der Umschalter allein über die ganze Breite** (Entscheidung e), direkt unter „Meine Merkliste“ und nicht in der Statuszeile. Neue Klasse `.view-toggle.full` (in `map.css` neben `.view-toggle`, weil der Umschalter dort schon steht):
   - `flex: none; width: 100%; min-width: 0` statt des Deckels `0 1 12rem`,
   - `.seg-btn { white-space: nowrap }`, „Kalender“ bricht nie.
-  - **Schmal einspaltig** (Review Nachtrag B1): Bei 320 px und 200 % bleiben je Segment etwa 84 px, „Kalender“ braucht in 32 px gut 120 px. `.view-toggle.full` bekommt deshalb `container: seg-full / inline-size` und unter `19rem` dasselbe Muster wie `.seg3` (`chrome.css:332–349`): eine Spalte, kein Daumen, der gewählte Knopf trägt die Fläche selbst (`--surface`, Rahmen, Schatten). Test 15 prüft 320 px bei 100 % (drei Spalten) und 200 % (eine Spalte).
+  - **Schmal einspaltig** (Review Nachtrag B1): Bei 320 px und 200 % bleiben je Segment etwa 84 px, „Kalender“ braucht in 32 px gut 120 px. `.view-toggle.full` bekommt deshalb `container: seg-full / inline-size` und unter `17rem` dasselbe Muster wie `.seg3` (`chrome.css:332–349`): eine Spalte, kein Daumen, der gewählte Knopf trägt die Fläche selbst (`--surface`, Rahmen, Schatten). Zuerst stand hier `19rem`; das Arch-Review zu Etappe 2 hat gezeigt, dass dann schon 320 px bei 100 % (288 px Inhalt, 18rem) einspaltig sind. Test 15 prüft 320 px bei 100 % (drei Spalten) und 200 % (eine Spalte).
 - In „Angebote“ bleibt der Umschalter Liste | Karte in der Statuszeile wie heute (Plan 0005, E5).
 - Die Legende lautet „Darstellung der Angebote“ bzw. „Darstellung der Merkliste“.
 

@@ -139,7 +139,8 @@ export function App() {
   const { visible, unfitCount, ageOnly, page, calendar, saved, detailOffer } = views;
 
   // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
-  // Die Karte der Merkliste ebenso (Plan 0025, E4); Liste und Kalender der Merkliste sind kein Anlass.
+  // Die Karte der Merkliste ebenso (Plan 0025, E4); Liste und Kalender der Merkliste sind kein Anlass. Das gilt auch
+  // ohne gemerktes Angebot: Hinge der Request am Inhalt der Merkliste, verriete er, ob etwas gemerkt ist.
   useEffect(() => {
     if (route.tab === "karte" || route.tab === "merkliste-karte") want();
   }, [route.tab, want]);

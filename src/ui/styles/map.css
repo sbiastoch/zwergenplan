@@ -40,7 +40,8 @@
   /*
    * Merkliste (Plan 0025, E4): allein über die ganze Breite unter der Überschrift, die Segmente einzeilig. Zu schmal
    * (320 px bei 200 %) wird er einspaltig wie der Darstellungs-Umschalter im Kind-Sheet (.seg3, chrome.css): kein
-   * Daumen, der gewählte Knopf trägt die Fläche selbst (Review Nachtrag B1).
+   * Daumen, der gewählte Knopf trägt die Fläche selbst (Review Nachtrag B1). Die Schwelle liegt unter 18rem: Bei
+   * 320 px und 100 % ist der Inhalt 288 px breit und bleibt zweispaltig, bei 200 % sind es nur 9rem.
    */
   fieldset.view-toggle.full {
     flex: none;
@@ -52,7 +53,7 @@
   .view-toggle.full .seg-btn {
     white-space: nowrap;
   }
-  @container seg-full (width < 19rem) {
+  @container seg-full (width < 17rem) {
     .view-toggle.full .seg {
       grid-template-columns: minmax(0, 1fr);
       border-radius: 22px;

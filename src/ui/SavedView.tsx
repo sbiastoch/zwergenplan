@@ -4,8 +4,8 @@
  * in der Liste). Die Karte rendert App über `renderMap`, mit denselben Props wie in „Entdecken“.
  */
 import type { ReactNode } from "react";
-import { nextSession, upcomingSessions } from "../domain/agenda.ts";
-import { collectionExport } from "../domain/saved.ts";
+import { nextSession } from "../domain/agenda.ts";
+import { collectionExport, upcomingSessionCount } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
 import { collectionToast, EXPORT_UNAVAILABLE, exportLabel, savedMapStatusParts, savedStatusParts } from "./format.ts";
@@ -132,10 +132,7 @@ function StatusText({
   const [a, aWords, b, bWords] =
     tab === "merkliste-karte"
       ? savedMapStatusParts(offers.length, placeCount)
-      : savedStatusParts(
-          offers.length,
-          offers.reduce((sum, offer) => sum + upcomingSessions(offer, now).length, 0),
-        );
+      : savedStatusParts(offers.length, upcomingSessionCount(offers, now));
   return (
     <span>
       <b>{a}</b>

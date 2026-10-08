@@ -120,6 +120,8 @@ Begründung (Review 3, W2): Hinge der Request auf `ics/<id>.ics` daran, ob gekü
   - mit Geburtsdatum und 0 passenden Terminen: „2 Sticker · keiner passt gerade zum Alter“
   - Der Text bricht als `<p class="small">` normal um. Geprüft wird er im Mobile-UX-Gate (Ansicht unten), nicht auf Einzeiligkeit.
 
+> **Geändert durch Plan 0025:** Der Text unter dem Knopf, also auch die Zeile „… Kurse komplett, regelmäßige nur passend zum Alter“, ist mit Plan 0025, Etappe 2 entfallen (Entscheidung e, kompakter Export-Knopf). Den Altershinweis gibt nur noch der Toast nach dem Export.
+
 ### E4 – Texte (Toasts)
 
 Formatiert in `src/ui/format.ts` mit den vorhandenen Helfern (`plural`, Datum ohne führende Null wie `shortDate`). Das Jahr steht nur, wenn es nicht das laufende in Berliner Zeit ist (`now`). Gleiche Grundform wie heute („Kalenderdatei mit N Terminen geladen“):
@@ -224,6 +226,8 @@ Basis `5701141`. `JS (initial)` vorher 94,41 kB von 100 kB, Export-Chunk 1,15 kB
   - Merkliste: Auswahl und Zählung macht `collectionExport` in `saved.ts` (unit-getestet), den Text unter dem Knopf `savedExportNote` in `format.ts`. `collectionSessions` ist entfernt. Der Test, der beide verglich, prüft jetzt gegen ein Orakel im Test (Kurs → alle Termine, sonst `upcomingSessions`).
   - Detail: Ein Handler `onSeries` bedient beide Knöpfe (`.two` und `wide`), für Kurse und Einzeltermine liefert `seriesExport` `static`. `generatedAt` ist in `Overlays` `string | undefined`, solange `site.json` lädt. Ohne ihn läuft der statische Link.
   - Für Plan 0025, E9: Statt eines neuen `exportNote(savedCount, sessionCount, filtered)` bekommt `savedExportNote(saved, sessions, byAge)` den Merklisten-Filter dazu.
+
+  > **Geändert durch Plan 0025:** `savedExportNote` ist mit Plan 0025, Etappe 2 entfallen (Entscheidung e, kompakter Export-Knopf), ebenso die Zeile unter dem Knopf samt Abweichung „N gemerkt · …“ oben. Den Altershinweis gibt nur noch der Toast nach dem Export.
 - **Schritt 4:** E2E auf `pixel-7`. Die Zahlen stimmen mit der Fixture: Detail 2 / 3 / 4 / kein Download, ohne Geburtsdatum die statische Datei mit 5; Merkliste 10 / kein Download / 4.
   - Zusätzlich geprüft: Blob-Weg und „keiner passt“ lösen keinen Request auf `ics/` aus (ADR 0018). Dateiname und VEVENTs samt Titel und `DTSTAMP` sind die der statischen Datei, nicht nur die UIDs. Die langen Toasts (Detail gekürzt, Merkliste mit fehlendem Angebot) stehen nach 5,5 s noch und sind nach 6,5 s weg.
   - Kanarienvögel, je temporär: ohne `LONG_TOAST_MS` im Detail und mit `birthDate` `undefined` in der Merkliste wurden die betroffenen Tests rot.
