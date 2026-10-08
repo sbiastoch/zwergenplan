@@ -1,5 +1,6 @@
 /**
- * Doku-Gate (Plan 0027, E11): eindeutige Plan- und ADR-Nummern, keine toten Pfadverweise und Markdown-Links.
+ * Doku-Gate (Plan 0027, E11): Statuszeile und Ablageort der Pläne, eindeutige Plan- und ADR-Nummern, keine toten
+ * Pfadverweise und Markdown-Links.
  * Nur Node-Builtins. Läuft als Stufe 0 von verify und als Schritt von check:fast.
  * Geprüft werden getrackte und neue, nicht ignorierte Dateien (`git ls-files`); ignorierte wie .claude/worktrees/
  * nie. tests/fixtures/docs/ ist Testmaterial und bleibt außen vor.

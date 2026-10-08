@@ -13,14 +13,19 @@ const HEAVY = fileURLToPath(new URL("./heavy.ts", import.meta.url));
 const dirs: string[] = [];
 const children: ChildProcess[] = [];
 afterEach(() => {
-  for (const c of children.splice(0)) {
+  const kill = (pgid: number) => {
     try {
-      if (c.pid) process.kill(-c.pid, "SIGKILL");
+      process.kill(-pgid, "SIGKILL");
     } catch {
       // schon beendet
     }
+  };
+  for (const c of children.splice(0)) if (c.pid) kill(c.pid);
+  // auch die Gruppe des Laufs (flock), die heavy.holder nennt (Arch-Review e6, m7)
+  for (const d of dirs.splice(0)) {
+    if (existsSync(holderFile(d))) kill(pgidOf(d));
+    rmSync(d, { recursive: true, force: true });
   }
-  for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
 });
 
 function lockDir(): string {
@@ -29,13 +34,22 @@ function lockDir(): string {
   return dir;
 }
 
-function env(dir: string, wait: string): NodeJS.ProcessEnv {
-  // kurze Fristen, damit der Test schnell bleibt; die Stufen (SIGINT, SIGTERM, SIGKILL) bleiben dieselben
-  return { ...process.env, ZP_LOCK_DIR: dir, ZP_LOCK_WAIT: wait, ZP_INT_GRACE_MS: "300", ZP_TERM_GRACE_MS: "300" };
+function env(dir: string, wait: string, extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+  // kurze Fristen, damit der Test schnell bleibt; die Stufen (SIGINT, SIGTERM, SIGKILL) bleiben dieselben.
+  // ZP_HEAVY_LOCK leer: Der Test darf nicht als verschachtelter Aufruf laufen, auch wenn Vitest unter heavy.ts läuft.
+  return {
+    ...process.env,
+    ZP_HEAVY_LOCK: "",
+    ZP_LOCK_DIR: dir,
+    ZP_LOCK_WAIT: wait,
+    ZP_INT_GRACE_MS: "300",
+    ZP_TERM_GRACE_MS: "300",
+    ...extra,
+  };
 }
 
-function holder(dir: string, script: string): ChildProcess {
-  const c = spawn("node", [HEAVY, "sh", "-c", script], { env: env(dir, "0"), stdio: "ignore", detached: true });
+function holder(dir: string, script: string, extra: NodeJS.ProcessEnv = {}): ChildProcess {
+  const c = spawn("node", [HEAVY, "sh", "-c", script], { env: env(dir, "0", extra), stdio: "ignore", detached: true });
   children.push(c);
   return c;
 }
@@ -112,14 +126,25 @@ describe("heavy.ts", () => {
 
   it("SIGKILL an heavy.ts und flock gibt die Sperre frei, auch wenn der Enkel weiterläuft (flock -o)", async () => {
     const dir = lockDir();
-    const h = holder(dir, "sleep 30 & wait");
+    // ohne Wächter, damit nur flock -o die Sperre freigeben kann
+    const h = holder(dir, "sleep 30 & wait", { ZP_NO_WATCHDOG: "1" });
     await until(() => existsSync(holderFile(dir)));
     const pgid = pgidOf(dir);
-    h.kill("SIGKILL"); // heavy.ts kann nicht mehr aufräumen (bekannte Grenze, E7)
+    h.kill("SIGKILL"); // heavy.ts kann nicht mehr aufräumen
     process.kill(pgid, "SIGKILL"); // der Gruppenleiter ist flock
     await until(() => tryLock(dir).status === 0);
     expect(alive(pgid)).toBe(true); // der Enkel lebt noch, hält die Sperre aber nicht
     process.kill(-pgid, "SIGKILL");
+  });
+
+  it("SIGKILL nur an heavy.ts (Bash-Tool bricht ab): der Wächter räumt die Gruppe ab, die Sperre wird frei (M2)", async () => {
+    const dir = lockDir();
+    const h = holder(dir, "sleep 30 & wait");
+    await until(() => existsSync(holderFile(dir)));
+    const pgid = pgidOf(dir);
+    h.kill("SIGKILL");
+    await until(() => !alive(pgid));
+    expect(tryLock(dir).status).toBe(0);
   });
 
   it("reicht Argumente an `sh -c` unverändert durch (Arch-Review Etappe 4, M1)", () => {

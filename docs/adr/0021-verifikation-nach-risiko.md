@@ -33,8 +33,9 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
    - `pnpm e2e:local <spec …>` testet genannte Specs auf `pixel-7`, mit zwei freien Ports, die das Skript selbst wählt.
    - Jeder lokale E2E-Lauf nimmt eine maschinenweite Sperre: `flock -o`, ein Platz, eigene Prozessgruppe, kurze Wartezeit. Ein verschachtelter Aufruf unter der Sperre läuft direkt.
    - **Grenzen:**
-     - SIGTERM beendet auch `flock`. Die Sperre ist dann bis zu 5 s frei, während die Kinder noch abbauen. Danach folgt SIGKILL an die Gruppe.
-     - Wird `heavy.ts` selbst per SIGKILL beendet, laufen `flock` und das Kommando weiter, bis sie enden.
+     - Beim Beenden kommt zuerst SIGINT an die Gruppe des Laufs, denn nur darauf räumt Playwright seine Browser und den webServer ab. Die laufen in eigenen Prozessgruppen. Bei der Abnahme (Plan 0027, Etappe 4, m4) blieb mit SIGTERM der `vite preview` übrig.
+     - SIGINT beendet auch `flock`. Die Sperre ist dann bis zu 10 s frei, während die Kinder abbauen. Danach folgen SIGTERM und SIGKILL an die Gruppe.
+     - Wird `heavy.ts` selbst per SIGKILL beendet, etwa wenn das Bash-Tool einen Hintergrundlauf abbricht, räumt der Wächter `scripts/heavy-watchdog.ts` in eigener Prozessgruppe die Gruppe des Laufs ab. Abnahme: TaskStop mitten in `e2e:local`, danach kein Preview-Server, Sperre frei.
    - Lokal läuft Playwright mit 25 % der Kerne als Worker.
    - Ein `globalSetup` bricht lokale Läufe ohne Sperre ab. Beim Laden der Konfiguration wirft es nicht, damit knip und `--list` weiter funktionieren.
    - Die volle Suite fährt kein Agent lokal.

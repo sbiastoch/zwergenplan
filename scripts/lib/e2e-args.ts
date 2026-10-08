@@ -12,6 +12,25 @@ const USAGE =
   "Aufruf: pnpm e2e:local <spec …> [-- <playwright-args>]\n" +
   "Lokal laufen nur genannte Specs. Die volle Suite fährt die CI auf jedem Branch (Plan 0027, E4).";
 
+/**
+ * Suite und Builds eines Laufs (Arch-Review e6, m8). Gezielt: PW_SUITE ist die Engine des Projekts, gebaut wird nur
+ * `build:e2e` (nur Fixture-Server). Alles: PW_SUITE aus der Umgebung; chromium/webkit brauchen nur `build:e2e`,
+ * ohne Suite oder mit `smoke` braucht es auch den Deploy-Build (`build`).
+ */
+export function runPlan(
+  args: Exclude<E2eArgs, { mode: "error" }>,
+  envSuite: string | undefined,
+  engineOf: (project: string) => string | undefined,
+): { suite: string | undefined; builds: string[] } | { error: string } {
+  if (args.mode === "specs") {
+    const suite = engineOf(args.project);
+    if (suite === undefined) return { error: `Unbekanntes Projekt „${args.project}“ (Geräte: playwright.devices.ts)` };
+    return { suite, builds: ["build:e2e"] };
+  }
+  const suite = envSuite || undefined;
+  return { suite, builds: suite === "chromium" || suite === "webkit" ? ["build:e2e"] : ["build:e2e", "build"] };
+}
+
 export function parseE2eArgs(argv: readonly string[]): E2eArgs {
   if (argv[0] === "--all") {
     const rest = argv.slice(1);

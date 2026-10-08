@@ -715,6 +715,24 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
   - **m7:** `flock` wird mit `-o -E 75 -w 0` auf eine eigene Probedatei geprüft; scheitert das, läuft das Kommando ohne Sperre.
 - **Kontrolle:** `--list` ergibt weiter 2 512 bzw. 1 992 + 498 + 22, `pnpm knip` ist grün.
 
+### Nacharbeit zum Arch-Review von `harness-0027-e6` (`227a1f0`)
+
+- **M1:** ADR 0021 beschreibt die Beendigung jetzt wie umgesetzt: zuerst SIGINT, mit Begründung aus der Abnahme m4. Die Sperre ist bis zu 10 s frei, dann folgen SIGTERM und SIGKILL.
+- **M2:**
+  - Neu ist der Wächter `scripts/heavy-watchdog.ts` in eigener Prozessgruppe. Endet `heavy.ts` per SIGKILL, räumt er die Gruppe des Laufs in Stufen ab, und die Sperre wird frei.
+  - Die Logik zum Beenden der Gruppe liegt gemeinsam in `scripts/lib/process-group.ts`.
+  - Test: SIGKILL nur an `heavy.ts`, danach ist die Gruppe leer und die Sperre frei. Der Test für `flock -o` läuft ohne Wächter (`ZP_NO_WATCHDOG=1`).
+  - **Abnahme:** `pnpm e2e:local e2e/layout.spec.ts` als Hintergrundlauf des Bash-Tools, mitten im Lauf per TaskStop beendet. Danach lief kein Preview-Server auf dem Port des Laufs, kein `e2e-local`-Prozess und kein Wächter, und die Sperre war sofort frei.
+  - CLAUDE.md: `pnpm e2e` nur, um einen roten CI-Job nachzustellen, und immer mit `run_in_background`.
+- **Minor:**
+  - **m1:** `docs/architecture.md`: `scripts/e2e-local.ts` darf `playwright.devices.ts` importieren.
+  - **m2:** CLAUDE.md und `check-docs.ts` nennen für Stufe 0 auch Statuszeile und Ablageort. Für Agents gilt `.claude/agents/*.md`.
+  - **m3:** CLAUDE.md, Schritt 7, nennt alle sechs Statuswerte und die Regel „live mit Restpunkten = in Umsetzung“.
+  - **m5:** Die Statuszeilen von 0022–0024 bleiben in diesem Branch. Ohne sie wäre `check-docs` rot, weil „umgesetzt (Branch …)“ kein gültiger Status ist. Die Änderung betrifft nur Zeile 3; ein Konflikt mit `nachschliff-review-0022-0024` ist dort leicht aufzulösen. Beim späteren Archivieren kommen die Pfadverweise in 0025 (Zeilen 7, 8, 16) mit.
+  - **m6:** `vitest related` steht in CLAUDE.md. `plan-reviewer` hat den Hinweis auf das Archiv.
+  - **m7:** Ungültige Fristen fallen auf den Standard zurück (`graceMs`). Die Tests setzen `ZP_HEAVY_LOCK` leer; `afterEach` beendet auch die Gruppe aus `heavy.holder`.
+  - **m8:** Neue Tests für „ersetzt“ außerhalb von `archiv/` und für eine Plandatei ohne Titel. Die Auswahl von Suite und Builds ist die reine Funktion `runPlan` mit Test; `--all` mit `PW_SUITE=smoke` baut beide.
+
 ## Entschieden (Nutzer, 2026-10-08)
 
 Alle Empfehlungen sind angenommen.

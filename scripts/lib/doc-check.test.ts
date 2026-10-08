@@ -139,6 +139,18 @@ describe("checkDocs, Regeln 1 und 2: Planstatus und Archiv (Plan 0027, E11, Etap
     ).toEqual(["docs/plans/0001-a.md: Status „abgeschlossen“ gehört nach docs/plans/archiv/ (verschieben)"]);
   });
 
+  it("ein ersetzter Plan außerhalb des Archivs ist rot (Arch-Review e6, m8)", () => {
+    expect(repo({ "docs/plans/0001-a.md": "# Plan\n\nStatus: ersetzt durch Plan 0017\n" })).toEqual([
+      "docs/plans/0001-a.md: Status „ersetzt“ gehört nach docs/plans/archiv/ (verschieben)",
+    ]);
+  });
+
+  it("ein Plan ohne `# `-Titel ist rot (Arch-Review e6, m8)", () => {
+    expect(repo({ "docs/plans/0001-a.md": "Status: Entwurf\n" })).toEqual([
+      "docs/plans/0001-a.md: kein Titel („# Plan NNNN – …“) vor der Statuszeile",
+    ]);
+  });
+
   it("ein aktiver Plan im Archiv ist rot", () => {
     expect(repo({ "docs/plans/archiv/0001-a.md": "# Plan\n\nStatus: freigegeben\n" })).toEqual([
       "docs/plans/archiv/0001-a.md: im Archiv liegen nur Pläne mit Status „abgeschlossen“ oder „ersetzt“",

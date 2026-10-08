@@ -17,18 +17,21 @@
  * - Das Kommando bekommt ZP_HEAVY_LOCK=1. Daran erkennt e2e/global-setup.ts die Sperre. Ein verschachtelter Aufruf
  *   mit ZP_HEAVY_LOCK=1 führt das Kommando direkt aus, sonst sperrte er sich selbst aus (M3).
  * - Ohne nutzbares flock (fehlt oder kann -o/-E/-w nicht, etwa auf macOS) läuft das Kommando mit Warnung ohne Sperre.
- * - Bekannte Grenze: Wird heavy.ts selbst per SIGKILL beendet, laufen flock und das Kommando weiter, bis sie enden.
+ * - Wird heavy.ts selbst per SIGKILL beendet (etwa wenn das Bash-Tool einen Hintergrundlauf abbricht), räumt der
+ *   Wächter scripts/heavy-watchdog.ts in eigener Prozessgruppe die Gruppe des Laufs ab, und die Sperre wird frei.
  * Nur Node-Builtins.
  */
 import { spawn, spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, rmSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { graceMs, stopGroup } from "./lib/process-group.ts";
 
 const EXIT_BUSY = 75;
-// Fristen nur für Tests überschreibbar, damit check:fast schnell bleibt
-const INT_GRACE_MS = Number(process.env["ZP_INT_GRACE_MS"] ?? 7_000);
-const TERM_GRACE_MS = Number(process.env["ZP_TERM_GRACE_MS"] ?? 3_000);
+// Fristen nur für Tests überschreibbar, damit check:fast schnell bleibt; ungültig → Standard
+const INT_GRACE_MS = graceMs(process.env["ZP_INT_GRACE_MS"], 7_000);
+const TERM_GRACE_MS = graceMs(process.env["ZP_TERM_GRACE_MS"], 3_000);
 
 const command = process.argv.slice(2);
 if (command.length === 0) {
@@ -71,42 +74,18 @@ if (!hasFlock) console.error("⚠ flock fehlt oder ist zu alt: schwerer Lauf ohn
 const child = spawn(cmd ?? "sh", args, { detached: true, stdio: "inherit", env });
 const pgid = child.pid ?? 0;
 
-function groupAlive(): boolean {
-  try {
-    process.kill(-pgid, 0);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/** Signal an die Gruppe und bis zu `ms` warten, bis sie leer ist; true, wenn sie leer ist. */
-async function signalAndWait(signal: NodeJS.Signals, ms: number): Promise<boolean> {
-  try {
-    process.kill(-pgid, signal);
-  } catch {
-    return true; // Gruppe schon leer
-  }
-  const end = Date.now() + ms;
-  while (groupAlive() && Date.now() < end) await new Promise((r) => setTimeout(r, 50));
-  return !groupAlive();
-}
-
-/**
- * Stufen: SIGINT (Playwright räumt Browser und webServer ab), dann SIGTERM (Hintergrundprozesse einer
- * nicht-interaktiven Shell ignorieren SIGINT), nach 7 bzw. 3 s, zuletzt SIGKILL.
- */
-async function stopGroup(): Promise<void> {
-  if (await signalAndWait("SIGINT", INT_GRACE_MS)) return;
-  if (await signalAndWait("SIGTERM", TERM_GRACE_MS)) return;
-  await signalAndWait("SIGKILL", 0);
+// Wächter in eigener Gruppe: räumt ab, falls heavy.ts selbst per SIGKILL endet (Arch-Review e6, M2).
+// ZP_NO_WATCHDOG=1 nur für den Test, der zeigt, dass flock -o die Sperre auch ohne Aufräumen freigibt.
+if (pgid > 0 && process.env["ZP_NO_WATCHDOG"] !== "1") {
+  const watchdog = fileURLToPath(new URL("./heavy-watchdog.ts", import.meta.url));
+  spawn("node", [watchdog, String(process.pid), String(pgid)], { detached: true, stdio: "ignore" }).unref();
 }
 
 let exitCode: number | undefined;
 let stopping: Promise<void> | undefined;
 async function finish(code: number): Promise<void> {
   exitCode ??= code;
-  stopping ??= stopGroup();
+  stopping ??= stopGroup(pgid, INT_GRACE_MS, TERM_GRACE_MS);
   await stopping;
   process.exit(exitCode);
 }

@@ -43,6 +43,10 @@ function planStatus(repo: DocRepo): string[] {
     const archived = match[1] !== undefined;
     const lines = repo.read(file).split("\n");
     const title = lines.findIndex((l) => l.startsWith("# "));
+    if (title === -1) {
+      errors.push(`${file}: kein Titel („# Plan NNNN – …“) vor der Statuszeile`);
+      continue;
+    }
     const status = lines.slice(title + 1).find((l) => l.trim() !== "") ?? "";
     if (CLOSED.test(status)) {
       if (!archived)

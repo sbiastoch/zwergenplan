@@ -14,7 +14,7 @@ import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { engineOf } from "../playwright.devices.ts";
-import { parseE2eArgs } from "./lib/e2e-args.ts";
+import { parseE2eArgs, runPlan } from "./lib/e2e-args.ts";
 import { findFreePortPair } from "./lib/free-ports.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -35,21 +35,17 @@ if (process.env["ZP_HEAVY_LOCK"] !== "1") {
   process.exit(r.status ?? 1);
 }
 
-let suite = process.env["PW_SUITE"];
-if (args.mode === "specs") {
-  suite = engineOf(args.project);
-  if (suite === undefined) {
-    console.error(`Unbekanntes Projekt „${args.project}“ (Geräte: playwright.devices.ts)`);
-    process.exit(2);
-  }
+const plan = runPlan(args, process.env["PW_SUITE"], engineOf);
+if ("error" in plan) {
+  console.error(plan.error);
+  process.exit(2);
 }
+const { suite, builds } = plan;
 const port = await findFreePortPair();
-const env = { ...process.env, PW_PORT: String(port), ...(suite === undefined ? {} : { PW_SUITE: suite }) };
+const env = { ...process.env, PW_PORT: String(port), PW_SUITE: suite ?? "" };
 const what = args.mode === "specs" ? `${args.specs.join(" ")} auf ${args.project}` : "alle Specs";
 console.log(`e2e:local: ${what} (PW_SUITE=${suite ?? "alle"}, Ports ${port}/${port + 1})`);
 
-const builds =
-  args.mode === "specs" || suite === "chromium" || suite === "webkit" ? ["build:e2e"] : ["build:e2e", "build"];
 for (const build of builds) {
   const r = spawnSync("pnpm", [build], { cwd: ROOT, stdio: "inherit", env });
   if (r.status !== 0) process.exit(r.status ?? 1);

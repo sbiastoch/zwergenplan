@@ -1,5 +1,33 @@
 import { describe, expect, it } from "vitest";
-import { parseE2eArgs } from "./e2e-args.ts";
+import { type E2eArgs, parseE2eArgs, runPlan } from "./e2e-args.ts";
+
+describe("runPlan: Suite und Builds (Arch-Review e6, m8)", () => {
+  const engines: Record<string, string> = { "pixel-7": "chromium", "iphone-15": "webkit" };
+  const engine = (p: string): string | undefined => engines[p];
+  const specs = (project: string): E2eArgs & { mode: "specs" } => ({
+    mode: "specs",
+    specs: ["a.spec.ts"],
+    project,
+    playwright: [],
+  });
+  const all: E2eArgs & { mode: "all" } = { mode: "all", playwright: [] };
+
+  it("gezielt: Engine des Projekts, nur build:e2e", () => {
+    expect(runPlan(specs("pixel-7"), "smoke", engine)).toEqual({ suite: "chromium", builds: ["build:e2e"] });
+    expect(runPlan(specs("iphone-15"), undefined, engine)).toEqual({ suite: "webkit", builds: ["build:e2e"] });
+  });
+
+  it("gezielt mit unbekanntem Projekt → Fehler", () => {
+    expect(runPlan(specs("gibtsnicht"), undefined, engine)).toHaveProperty("error");
+  });
+
+  it("--all: ohne Suite und mit smoke beide Builds, mit chromium/webkit nur build:e2e", () => {
+    expect(runPlan(all, undefined, engine)).toEqual({ suite: undefined, builds: ["build:e2e", "build"] });
+    expect(runPlan(all, "", engine)).toEqual({ suite: undefined, builds: ["build:e2e", "build"] });
+    expect(runPlan(all, "smoke", engine)).toEqual({ suite: "smoke", builds: ["build:e2e", "build"] });
+    expect(runPlan(all, "webkit", engine)).toEqual({ suite: "webkit", builds: ["build:e2e"] });
+  });
+});
 
 describe("parseE2eArgs (Plan 0027, E4; Arch-Review Etappe 4, m5)", () => {
   it("genannte Specs ohne weitere Argumente → pixel-7", () => {
