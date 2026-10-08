@@ -11,7 +11,10 @@ const NB = "\u00a0";
 /** Nur das, was die Tests von MapLibre brauchen (ohne Abhängigkeit von src/). */
 interface TestMap {
   project: (lngLat: [number, number]) => { x: number; y: number };
-  queryRenderedFeatures: (options: { layers: string[] }) => Array<{
+  queryRenderedFeatures: (
+    geometryOrOptions: { layers: string[] } | [[number, number], [number, number]],
+    options?: { layers: string[] },
+  ) => Array<{
     geometry: { type: string; coordinates: [number, number] };
     properties: Record<string, unknown>;
   }>;
@@ -19,6 +22,14 @@ interface TestMap {
   getZoom: () => number;
   jumpTo: (options: { zoom?: number; center?: [number, number] }) => void;
   getLayer: (id: string) => unknown;
+  hasImage: (id: string) => boolean;
+  getSource: (id: string) =>
+    | {
+        getData: () => Promise<{
+          features: Array<{ geometry: { coordinates: [number, number] }; properties: Record<string, unknown> }>;
+        }>;
+      }
+    | undefined;
   getPaintProperty: (layer: string, name: string) => unknown;
   getLayoutProperty: (layer: string, name: string) => unknown;
   loaded: () => boolean;
@@ -329,16 +340,124 @@ test.describe("mit gemockten Kacheln", () => {
         .toBe(true);
       const colors = await page.evaluate(() => ({
         token: getComputedStyle(document.documentElement).getPropertyValue("--primary").trim(),
-        circle: window.__zpMap?.getPaintProperty("orte-punkt", "circle-color"),
+        cluster: window.__zpMap?.getPaintProperty("orte-cluster", "circle-color"),
       }));
       expect(colors.token).not.toBe("");
-      expect(colors.circle).toBe(colors.token);
+      expect(colors.cluster).toBe(colors.token);
       await idle(page);
       await tapMarker(page, "orte-punkt", 2);
       const sheet = page.getByRole("dialog", { name: "Kleines Theater Beispiel" });
       await expect(sheet).toBeVisible();
       await sheet.getByRole("button", { name: "Schließen" }).click();
     }
+  });
+
+  test("Marker mit Kategorie-Symbol und Grundkarte in App-Farben, auch nach dem Stilwechsel (Plan 0024)", async ({
+    page,
+  }) => {
+    await openMap(page);
+    const state = (background: string) =>
+      page.evaluate((bg) => {
+        const map = window.__zpMap;
+        if (!map) throw new Error("keine Karte");
+        const categories = [
+          "babykurse",
+          "krabbel-spielgruppen",
+          "treffs-cafes",
+          "bewegung",
+          "wasser",
+          "musik",
+          "kreativ",
+          "buecher",
+          "museum",
+          "buehne",
+          "natur",
+          "beratung",
+        ];
+        const probe = document.createElement("span");
+        document.body.append(probe);
+        const tokens = Object.fromEntries(
+          categories.map((c) => {
+            probe.className = `k-${c}`;
+            return [c, getComputedStyle(probe).getPropertyValue("--k").trim()];
+          }),
+        );
+        probe.remove();
+        return {
+          images: categories.filter((c) => map.hasImage(`kategorie-${c}`)).length,
+          kinds: map.queryRenderedFeatures({ layers: ["orte-punkt"] }).map((f) => f.properties["kategorie"]),
+          symbols: map.queryRenderedFeatures({ layers: ["orte-punkt-symbol"] }).length,
+          places: map.queryRenderedFeatures({ layers: ["orte-punkt"] }).length,
+          several: map
+            .queryRenderedFeatures({ layers: ["orte-punkt"] })
+            .filter((f) => Number(f.properties["angebote"]) > 1).length,
+          badges: map.queryRenderedFeatures({ layers: ["orte-punkt-badge"] }).length,
+          // MapLibre gibt den Ausdruck zurück: ["match", ["get", "kategorie"], kat, farbe, …, rückfall]
+          match: JSON.stringify(map.getPaintProperty("orte-punkt", "circle-color")),
+          tokens,
+          background: map.getPaintProperty(bg, "background-color"),
+          labelColor: map.getPaintProperty("label-stadt", "text-color"),
+        };
+      }, background);
+
+    const light = await state("bg-hell");
+    expect(light.images).toBe(12);
+    expect(light.places).toBeGreaterThan(0);
+    expect(light.symbols).toBe(light.places);
+    // im Ausschnitt: Badge genau an den Orten mit mehr als einem Angebot
+    expect(light.badges).toBe(light.several);
+    for (const kind of light.kinds) expect(Object.keys(light.tokens)).toContain(kind);
+    for (const [category, color] of Object.entries(light.tokens)) {
+      expect(color).not.toBe("");
+      expect(light.match).toContain(`"${category}","${color}"`);
+    }
+    // Fixture-Stil: Hintergrund #e8f1ff, Beschriftung ohne Farbe – beides jetzt aus den Tokens gemischt
+    expect(light.background).not.toBe("#e8f1ff");
+    expect(light.labelColor).toBe(
+      await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--ink").trim()),
+    );
+
+    // Unabhängig vom Ausschnitt des Geräts: je ein Ort mit einem und mit mehreren Angeboten aus der Quelle,
+    // ohne Cluster (Zoom über clusterMaxZoom 14) mittig angefahren; Badge nur beim zweiten.
+    const sample = await page.evaluate(async () => {
+      const data = await window.__zpMap?.getSource("orte")?.getData();
+      const features = data?.features ?? [];
+      const at = (several: boolean) =>
+        features.find((f) => Number(f.properties["angebote"]) > 1 === several)?.geometry.coordinates;
+      return { single: at(false), several: at(true) };
+    });
+    for (const [center, badge] of [
+      [sample.single, 0],
+      [sample.several, 1],
+    ] as const) {
+      if (!center) throw new Error("Fixture-Ort mit einem bzw. mehreren Angeboten fehlt");
+      await page.evaluate((c) => window.__zpMap?.jumpTo({ center: c, zoom: 16 }), center);
+      await idle(page);
+      const hits = await page.evaluate(() => {
+        const map = window.__zpMap;
+        if (!map) throw new Error("keine Karte");
+        const { x, y } = map.project([map.getCenter().lng, map.getCenter().lat]);
+        const box: [[number, number], [number, number]] = [
+          [x - 4, y - 20],
+          [x + 20, y + 4],
+        ];
+        return {
+          places: map.queryRenderedFeatures(box, { layers: ["orte-punkt"] }).length,
+          badges: map.queryRenderedFeatures(box, { layers: ["orte-punkt-badge"] }).length,
+        };
+      });
+      expect(hits.places).toBe(1);
+      expect(hits.badges).toBe(badge);
+    }
+
+    await switchTheme(page, "Dunkel", "/styles/dark");
+    await expect.poll(() => page.evaluate(() => !!window.__zpMap?.getLayer("bg-dunkel"))).toBe(true);
+    await idle(page);
+    const dark = await state("bg-dunkel");
+    expect(dark.images).toBe(12);
+    expect(dark.symbols).toBe(dark.places);
+    expect(dark.background).not.toBe(light.background);
+    expect(dark.labelColor).not.toBe(light.labelColor);
   });
 
   test("Ortsnamen auf Deutsch, auch nach dem Stilwechsel (Plan 0008, E16)", async ({ page }) => {
@@ -376,8 +495,9 @@ test.describe("mit gemockten Kacheln", () => {
       const canvas = document.querySelector(".map-box .map-canvas")?.getBoundingClientRect();
       const ctrl = document.querySelector(".maplibregl-ctrl-top-right .maplibregl-ctrl-group")?.getBoundingClientRect();
       if (!map || !canvas || !ctrl) throw new Error("keine Karte oder keine Zoom-Knöpfe");
-      // Kreisradius plus Rand (layers.ts: Cluster 18, Ort 14, Rand 2)
-      const radius: Record<string, number> = { "orte-cluster": 20, "orte-punkt": 16 };
+      // Kreisradius plus Rand und Schatten (layers.ts: Cluster 18, Ort 15, Rand 2, Schatten +1 um 2/2 versetzt);
+      // beim Ort reicht das Badge (r 9 + Rand 2, um 12/−12 versetzt) bis hypot(12, 12) + 11 ≈ 28 px.
+      const radius: Record<string, number> = { "orte-cluster": 23, "orte-punkt": 28 };
       const zoom = {
         left: ctrl.left - canvas.left,
         right: ctrl.right - canvas.left,
