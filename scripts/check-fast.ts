@@ -1,9 +1,18 @@
 /**
- * Schnelle Gates (< 15 s): Typen, Lint, Architektur, Daten, Unit-Tests.
+ * Schnelle Gates (< 15 s): Typen, Lint, Architektur, Daten, Unit-Tests, tote Pfade, Schema-Drift.
  * Läuft im Stop-Hook, im pre-commit-Hook und als erster CI-Schritt.
  * Alle Schritte laufen parallel; Ausgabe nur für fehlgeschlagene Schritte.
  */
 import { spawn } from "node:child_process";
+import { staleInstall } from "./lib/install-state.ts";
+
+// Veraltetes node_modules zuerst: sonst stünden hier nur Folgefehler wie „Cannot find module“ (Plan 0027, E6).
+const stale = staleInstall(process.cwd());
+if (stale !== undefined) {
+  console.error(`✗ ${stale}`);
+  console.log("check:fast ROT (Installation veraltet, keine Schritte ausgeführt)");
+  process.exit(1);
+}
 
 const STEPS: Array<[name: string, cmd: string[]]> = [
   ["Typen", ["pnpm", "exec", "tsc", "--noEmit", "-p", "."]],
@@ -17,6 +26,9 @@ const STEPS: Array<[name: string, cmd: string[]]> = [
   ["Architektur", ["node", "scripts/check-architecture.ts"]],
   ["Daten", ["node", "scripts/validate-data.ts"]],
   ["Unit-Tests", ["pnpm", "exec", "vitest", "run", "--reporter=dot"]],
+  // Bis Plan 0027 nur in CI: 8 von 11 nicht absichtlich roten CI-Läufen waren knip (Plan 0027, E2)
+  ["Tote Pfade", ["pnpm", "exec", "knip"]],
+  ["Schema-Drift", ["node", "scripts/export-schema.ts", "--check"]],
 ];
 
 const started = performance.now();

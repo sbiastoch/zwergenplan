@@ -18,6 +18,8 @@ export default defineConfig({
         // Zeitplan der Wochen-Nachricht (Plan 0017, E1)
         "scripts/lib/push-schedule.ts",
         "scripts/lib/push-weekly-core.ts",
+        // Vorprüfung der Installation in check:fast (Plan 0027, E6)
+        "scripts/lib/install-state.ts",
         "src/sw/routes.ts",
         "src/sw/retire.ts",
         // Push im Service Worker (Plan 0017, E10)

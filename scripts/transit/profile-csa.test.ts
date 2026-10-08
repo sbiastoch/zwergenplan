@@ -628,8 +628,16 @@ describe("Gleichstand (T5)", () => {
   });
 });
 
+/**
+ * Zeitlimit der beiden Referenzvergleiche (Plan 0027, E8). Sie prüfen Gleichheit mit der Referenz, kein Tempo.
+ * Ohne Last brauchen sie 1,6 s bzw. 0,95 s (gemessen 2026-10-08). Bei einer Last von 46–116 auf 16 Kernen rissen sie
+ * die Standardgrenze von 5 s und machten den pre-commit-Hook rot. 30 s halten eine etwa 15-fache Überbuchung aus und
+ * fangen trotzdem eine Endlosschleife ab. Assertions, Netz und Startwert bleiben unverändert.
+ */
+const REFERENCE_TIMEOUT_MS = 30_000;
+
 describe("Referenz in zwei Ebenen und Rückverfolgung (T2, T3)", () => {
-  it("gleicht der Referenz für jeden Steig und jede Minute (Fixture-Netz)", () => {
+  it("gleicht der Referenz für jeden Steig und jede Minute (Fixture-Netz)", { timeout: REFERENCE_TIMEOUT_MS }, () => {
     const fixture = Timetable.parse(
       JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/fahrplan.json", import.meta.url), "utf8")),
     );
@@ -679,7 +687,9 @@ describe("Referenz in zwei Ebenen und Rückverfolgung (T2, T3)", () => {
     const inp = input(stops, trips);
 
     // Bei 1 500 m reicht fast jeder Ausstieg (Review 2, W6): die Grenze üben zusätzlich 300 m und 800 m.
-    it("gleicht der Referenz bei Abgang 300, 800 und 1 500 m; Zähler über alle drei mit Untergrenze", () => {
+    it("gleicht der Referenz bei Abgang 300, 800 und 1 500 m; Zähler über alle drei mit Untergrenze", {
+      timeout: REFERENCE_TIMEOUT_MS,
+    }, () => {
       const sum: Counters = { compared: 0, finite: 0, transfer: 0, unboundedFaster: 0, penaltyMatters: 0 };
       for (const meters of [300, 800, 1500]) {
         const c = compareWithReference(inp, places, meters);

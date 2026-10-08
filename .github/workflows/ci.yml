@@ -26,12 +26,9 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: check:fast (Typen, Lint, Architektur, Daten, Unit)
+      # enthält seit Plan 0027 (E2) auch knip und Schema-Drift, die vorher eigene Schritte waren
+      - name: check:fast (Typen, Lint, Architektur, Daten, Unit, tote Pfade, Schema-Drift)
         run: pnpm check:fast
-      - name: Tote Pfade (knip)
-        run: pnpm knip
-      - name: Schema-Drift
-        run: pnpm schema:check
       - name: Coverage (src/domain)
         run: pnpm test:coverage
       - name: Plausibilität gegen deployten Stand
