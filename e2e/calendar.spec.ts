@@ -40,6 +40,8 @@ test.describe("mit Fixture-Uhr", () => {
 
     await page.getByRole("button", { name: "Donnerstag, 8. Oktober, 0 Angebote" }).click();
     await expect(page.getByText("Freier Tag")).toBeVisible();
+    // Plan 0022: ohne „Sticker“
+    await expect(page.getByText("Nichts für diesen Tag – Zeit für den Spielplatz.")).toBeVisible();
   });
 
   test("heute schon vorbei, ohne kommende Termine (B2)", async ({ page }) => {

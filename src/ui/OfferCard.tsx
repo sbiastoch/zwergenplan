@@ -41,8 +41,8 @@ interface OfferCardProps {
   ctx: CardContext;
   /** Datum mit anzeigen (Merkliste) statt nur der Uhrzeit (Liste/Agenda unter Tagesüberschrift) */
   dated?: boolean;
-  /** Termin gehört zu einem gewählten Kalendertag */
-  calendarDay?: string;
+  /** Termin gehört zu einem gewählten Kalendertag (Kalender; Liste mit Zeitraum, Plan 0023, E7) */
+  calendarDay?: string | undefined;
   /**
    * Sheet, dessen Kopf schon etwas nennt (Plan 0010, E10; ersetzt `atPlace` aus Plan 0008, E19): im Orts-Sheet
    * („place“) fehlen Ort und Entfernung in der Meta-Zeile, im Anbieter-Sheet („provider“) der Anbietername.

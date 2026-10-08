@@ -377,6 +377,21 @@ describe("Installationszustand (Plan 0011, E7)", () => {
     expect(store.state()).toBe("menue");
   });
 
+  it("prompt() scheitert: kein Fehler nach außen, das Angebot ist weg, die Oberfläche erfährt es (Arch-Review 0022, m7)", async () => {
+    const { env, offer } = installEnv({ userAgent: UA.pixel });
+    const store = createInstallStore(env);
+    const seen: string[] = [];
+    offer({
+      preventDefault: () => {},
+      prompt: () => Promise.reject(new Error("NotAllowedError")),
+      userChoice: new Promise(() => {}),
+    });
+    store.subscribe(() => seen.push(store.state()));
+    await expect(store.prompt()).resolves.toBeUndefined();
+    expect(store.state()).toBe("menue");
+    expect(seen).toEqual(["menue"]);
+  });
+
   it("appinstalled (auch über das Browser-Menü) → installiert, Abmelden beendet die Meldungen", () => {
     const { env, offer, installed } = installEnv({ userAgent: UA.pixel });
     const store = createInstallStore(env);

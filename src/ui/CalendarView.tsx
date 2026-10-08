@@ -194,7 +194,7 @@ function AgendaEmpty({
   }
   return (
     <EmptyState icon="swing" title="Freier Tag">
-      Kein Sticker für diesen Tag – Zeit für den Spielplatz.
+      Nichts für diesen Tag – Zeit für den Spielplatz.
     </EmptyState>
   );
 }

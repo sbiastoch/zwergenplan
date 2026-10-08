@@ -109,6 +109,12 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     await expect(page.getByRole("dialog", { name: "Filter" })).toBeVisible();
   },
+  // Plan 0023: Zeitraum gesetzt, beide Datumsfelder gefüllt, „Zeitraum entfernen“ sichtbar
+  "filter-sheet-zeitraum": async (page) => {
+    await page.goto("./?von=2026-10-20&bis=2026-10-31");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await expect(page.getByRole("button", { name: "Zeitraum entfernen" })).toBeVisible();
+  },
   // Plan 0021: Altersschalter im Filter-Sheet (aus), Warnhinweis und Leerzustand mit zwei Textknöpfen
   "filter-sheet-alter": async (page) => {
     await setBirthDate(page, "01.09.2026");
@@ -423,11 +429,11 @@ for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
     // Hält auch die Timer an: Der Toast (2,8 s) bleibt stehen, bis die Uhr weiterläuft (Plan 0007, E15).
     await page.clock.pauseAt(FIXTURE_NOW);
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-    await expect(page.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toBeVisible();
+    await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
     await expectNoBrightIslands(page);
     await expectTextFits(page);
     await page.clock.runFor(3000);
-    await expect(page.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toHaveCount(0);
+    await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toHaveCount(0);
   });
 }
 

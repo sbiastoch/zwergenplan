@@ -90,6 +90,24 @@
     letter-spacing: 0.08em;
     color: var(--ink);
   }
+  /* Zeitraum (Plan 0023, E9): zwei Spalten, bei wenig Platz oder großer Schrift untereinander */
+  .daterange {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 10px;
+  }
+  .input.date {
+    font-size: 1.0625rem;
+    letter-spacing: 0;
+  }
+  .bound-hint {
+    margin: 6px 0 0;
+    font-weight: 800;
+  }
+  /* iOS zentriert den Wert sonst */
+  .input.date::-webkit-date-and-time-value {
+    text-align: start;
+  }
   .input::placeholder {
     color: var(--muted);
   }
@@ -307,7 +325,20 @@
   .push-list .push-label {
     flex: 1 1 12rem;
   }
-  .app-section .share {
+  /* Fuß des Kind-Sheets (Plan 0022): Mit dem Installationsknopf davor ist „Fertig“ sekundär. Die Klasse bleibt, damit
+     „Fertig“ dasselbe Element bleibt, wenn der Chunk lädt (Arch-Review 0022, m1). */
+  .sheetfoot .foot-install ~ .btn.primary {
+    background: var(--surface);
+    color: var(--ink);
+  }
+  /* iOS-Zeile im Fuß des Kind-Sheets (Plan 0022): volle Breite über „Fertig“ */
+  .foot-hint {
+    flex: 1 1 100%;
+    margin: 0;
+    text-align: center;
+  }
+  .app-section .share,
+  .foot-hint .share {
     display: inline-flex;
     align-items: center;
     gap: 4px;

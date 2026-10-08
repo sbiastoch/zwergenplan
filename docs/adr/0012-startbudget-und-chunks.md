@@ -152,3 +152,6 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 | 0019 Teil A (Link nach Google Maps) | 91,95 kB | 92,28 kB | +0,33 kB |
 | 0019 Teil B (Karte „Wege ab …“; Lazy-Chunk `Wegzeit JS` 1,66 → 2,30 kB von 3 kB) | 92,28 kB | 92,82 kB | +0,54 kB |
 | 0017 (Wochen-Push; Push-Code nur im Lazy-Chunk „Als App“, gemessen gegen b2023c1 +0,03 kB für Exporte des Einstiegs) | 92,82 kB | 92,78 kB (nach Rebase auf f317505) | ≈ 0 |
+| 0022 (Stadtteil-Auswahl bei Standort aus; Installationsknopf im Fuß des Kind-Sheets, Logik im Lazy-Chunk „Als App“ 6,27 → 6,49 kB; gemessen nach 0023/0024 gegen 91663f6, vorher gegen a666dbe 93,24 → 93,37 kB) | 94,119 kB | 94,259 kB | +0,140 kB |
+| 0023 (Zeitraumfilter „von / bis“ samt Arch-Review-Nacharbeit: Feldgrenzen, Hinweise, Fokus; gemessen nach 0024 gegen 3f57669, dessen Basis a666dbe schon die nicht eingetragenen Pläne 0020/0021 enthält) | 93,252 kB | 94,119 kB | +0,867 kB |
+| 0024 (Karte im App-Look; kein neuer Start-Code, zwei zusätzliche Exporte des Einstiegs für den Karten-Chunk; Lazy-Chunk `Karte JS` 425,45 → 427,19 kB von 450 kB) | 93,244 kB | 93,252 kB | +0,008 kB |

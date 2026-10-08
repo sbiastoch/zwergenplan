@@ -1,14 +1,14 @@
 /**
  * Kind-Sheet (Plan 0003, E11, E15; Plan 0004, E5; Plan 0009, E3): Geburtsdatum, Startpunkt mit
  * Quellenhinweis der Wegzeit, Darstellung.
- * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7).
+ * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7), mit dem Installationsknopf über „Fertig“ (Plan 0022).
  */
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { formatGermanDate, parseGermanDate } from "../domain/time.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
-import { AppExtrasSection } from "./AppExtras.tsx";
+import { useAppExtras } from "./AppExtras.tsx";
 import { markAutofocus } from "./Dialog.tsx";
 import { plural } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
@@ -59,6 +59,9 @@ export function KidSheet({
     ["dunkel", "Dunkel"],
   ];
   const themeIndex = themes.findIndex(([t]) => t === theme);
+  // Abschnitt „Als App“ und Fuß (Installationsknopf über „Fertig“, Plan 0022) aus der Lazy-Kette App-Extras
+  const done = useRef<HTMLButtonElement>(null);
+  const extras = useAppExtras(done);
 
   return (
     <div className="sheet-body">
@@ -112,10 +115,11 @@ export function KidSheet({
             ))}
           </div>
         </fieldset>
-        <AppExtrasSection />
+        {extras.section}
       </div>
-      <div className="sheetfoot single">
-        <button type="button" className="btn primary wide" onClick={onClose}>
+      <div className="sheetfoot">
+        {extras.foot}
+        <button ref={done} type="button" className="btn primary wide" onClick={onClose}>
           Fertig
         </button>
       </div>

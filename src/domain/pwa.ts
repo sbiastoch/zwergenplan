@@ -1,6 +1,7 @@
 /**
- * Installationshilfe im Abschnitt „Als App“ (Plan 0011, E7): Zustand → Text, rein. Den Zustand ermittelt
- * `installState()` in `src/data/pwa.ts` (Geräte-APIs), angezeigt wird er in `src/ui/app-extras/AppSection.tsx`.
+ * Installationshilfe im Abschnitt „Als App“ (Plan 0011, E7) und im Fuß des Kind-Sheets (Plan 0022): Zustand → Text,
+ * rein. Den Zustand ermittelt `installState()` in `src/data/pwa.ts` (Geräte-APIs), angezeigt wird er in
+ * `src/ui/app-extras/AppSection.tsx` (`AppSection`, `AppFoot`).
  */
 
 /**
@@ -15,7 +16,6 @@ export type InstallState = "app" | "angebot" | "installiert" | "menue" | "ios" |
 
 export type InstallHelp =
   | { kind: "text"; text: string }
-  | { kind: "knopf"; text: string; button: string }
   /** „Tippe auf [Teilen-Symbol] Teilen und dann auf …“; das Symbol setzt die Oberfläche zwischen `before` und `share` */
   | { kind: "ios"; before: string; share: string; after: string; note: string };
 
@@ -24,11 +24,8 @@ export function installHelp(state: InstallState): InstallHelp | undefined {
     case "app":
       return { kind: "text", text: "Läuft als App." };
     case "angebot":
-      return {
-        kind: "knopf",
-        text: "Mit eigenem Symbol auf dem Startbildschirm, ohne Browserleiste.",
-        button: "Zum Startbildschirm hinzufügen",
-      };
+      // Der Knopf steht im Fuß des Kind-Sheets (`installFoot`, Plan 0022), ohne Scrollen sichtbar.
+      return { kind: "text", text: "Mit eigenem Symbol auf dem Startbildschirm, ohne Browserleiste." };
     case "installiert":
       return {
         kind: "text",
@@ -48,6 +45,21 @@ export function installHelp(state: InstallState): InstallHelp | undefined {
     case "keine":
       return undefined;
   }
+}
+
+export type InstallFoot =
+  | { kind: "knopf"; button: string }
+  /** kompakte Zeile; Teilen-Symbol und Pfeil („→“, vorgelesen „, dann“) setzt die Oberfläche */
+  | { kind: "ios"; before: string; share: string; after: string };
+
+/**
+ * Fuß des Kind-Sheets über „Fertig“ (Plan 0022): nur wenn der Browser die Installation anbietet ein Knopf, auf iOS
+ * eine kompakte Zeile. Sonst nichts, die ausführliche Hilfe steht im Abschnitt „Als App“ (`installHelp`).
+ */
+export function installFoot(state: InstallState): InstallFoot | undefined {
+  if (state === "angebot") return { kind: "knopf", button: "Zum Startbildschirm hinzufügen" };
+  if (state === "ios") return { kind: "ios", before: "Als App:", share: "Teilen", after: "Zum Home-Bildschirm" };
+  return undefined;
 }
 
 /**

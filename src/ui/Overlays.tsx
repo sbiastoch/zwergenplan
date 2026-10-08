@@ -135,6 +135,7 @@ export function Overlays(props: OverlaysProps) {
           resultCount={props.resultCount}
           mode={transit.mode}
           limitAction={props.limitAction}
+          today={today}
           onClose={() => setSheet(null)}
         />
       </Dialog>

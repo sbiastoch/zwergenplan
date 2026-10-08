@@ -5,6 +5,7 @@ import {
   berlinIsoDate,
   formatGermanDate,
   fromBerlinLocal,
+  isIsoDate,
   isoWeekday,
   parseGermanDate,
   sameMinute,
@@ -125,5 +126,15 @@ describe("sameMinute", () => {
     // derselbe Zeitpunkt in zwei Schreibweisen
     expect(sameMinute(at("2026-10-25T02:59:30+02:00"), at("2026-10-25T00:59:45Z"))).toBe(true);
     expect(sameMinute(at("2026-10-25T02:59:30+02:00"), at("2026-10-25T02:00:30+01:00"))).toBe(false);
+  });
+});
+
+describe("isIsoDate", () => {
+  it("nimmt nur echte Kalendertage als YYYY-MM-DD", () => {
+    expect(isIsoDate("2026-10-25")).toBe(true);
+    expect(isIsoDate("2028-02-29")).toBe(true);
+    for (const raw of ["2026-02-29", "2026-13-01", "2026-10-00", "2026-1-05", "05.10.2026", "2026-10-05T00:00", ""]) {
+      expect(isIsoDate(raw)).toBe(false);
+    }
   });
 });

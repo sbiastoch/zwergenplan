@@ -1,16 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { type InstallState, installHelp, pushView } from "./pwa.ts";
+import { type InstallState, installFoot, installHelp, pushView } from "./pwa.ts";
 
 describe("installHelp: Texte der Installationshilfe je Zustand (Plan 0011, E7)", () => {
   it("läuft schon als App", () => {
     expect(installHelp("app")).toEqual({ kind: "text", text: "Läuft als App." });
   });
 
-  it("Browser bietet die Installation an: Knopf", () => {
+  it("Browser bietet die Installation an: nur der Text, der Knopf steht im Fuß (Plan 0022)", () => {
     expect(installHelp("angebot")).toEqual({
-      kind: "knopf",
+      kind: "text",
       text: "Mit eigenem Symbol auf dem Startbildschirm, ohne Browserleiste.",
-      button: "Zum Startbildschirm hinzufügen",
     });
   });
 
@@ -42,6 +41,26 @@ describe("installHelp: Texte der Installationshilfe je Zustand (Plan 0011, E7)",
   it("jeder Zustand ist abgedeckt", () => {
     const all: InstallState[] = ["app", "angebot", "installiert", "menue", "ios", "keine"];
     expect(all.filter((s) => installHelp(s) !== undefined)).toHaveLength(5);
+  });
+});
+
+describe("installFoot: Fuß des Kind-Sheets über „Fertig“ (Plan 0022)", () => {
+  it("Browser bietet die Installation an: Knopf", () => {
+    expect(installFoot("angebot")).toEqual({ kind: "knopf", button: "Zum Startbildschirm hinzufügen" });
+  });
+
+  it("iPhone/iPad: kompakte Zeile, Teilen-Symbol und Pfeil setzt die Oberfläche (Arch-Review 0022, m2)", () => {
+    expect(installFoot("ios")).toEqual({
+      kind: "ios",
+      before: "Als App:",
+      share: "Teilen",
+      after: "Zum Home-Bildschirm",
+    });
+  });
+
+  it("sonst nichts: der Fuß zeigt nur „Fertig“", () => {
+    for (const state of ["app", "installiert", "menue", "keine"] as const)
+      expect(installFoot(state), state).toBeUndefined();
   });
 });
 

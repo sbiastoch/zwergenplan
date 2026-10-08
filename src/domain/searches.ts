@@ -1,6 +1,6 @@
 /**
  * Such-Abos (Plan 0017, E6): Sucheinstellungen der Liste, die die Wochen-Nachricht zuschneiden. Ein Abo ist der
- * kanonische Filter-Querystring (`filterToSearch`), kein eigenes Format. Rein; gespeichert wird die Liste roh in
+ * kanonische Filter-Querystring ohne Zeitraum (`searchOf`), kein eigenes Format. Rein; gespeichert wird die Liste roh in
  * `src/data/searches-store.ts`, nur auf dem Gerät. Nicht im Start-Bundle (`push-domain-not-in-start`).
  */
 import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts";
@@ -9,9 +9,18 @@ export const MAX_SEARCHES = 5;
 
 export type SearchOutcome = "neu" | "schon-da" | "leer" | "voll";
 
+/**
+ * Kanonische Form eines Abos: der Filter ohne Zeitraum (Plan 0023, E12). Die Wochen-Nachricht schaut immer auf die
+ * kommende Woche; ein fester Zeitraum veraltete im Abo und träfe ohne Label alles.
+ */
+export function searchOf(filter: FilterState): string {
+  const { range: _range, ...rest } = filter;
+  return filterToSearch(rest);
+}
+
 /** Hängt die Suche an, wenn sie nicht leer, noch nicht da und noch Platz ist. Die Eingabe bleibt unverändert. */
 export function addSearch(list: readonly string[], filter: FilterState): { list: string[]; outcome: SearchOutcome } {
-  const search = filterToSearch(filter);
+  const search = searchOf(filter);
   const outcome: SearchOutcome = !search
     ? "leer"
     : list.includes(search)
@@ -27,7 +36,7 @@ export function removeSearch(list: readonly string[], search: string): string[] 
 }
 
 export function hasSearch(list: readonly string[], filter: FilterState): boolean {
-  const search = filterToSearch(filter);
+  const search = searchOf(filter);
   return search !== "" && list.includes(search);
 }
 
@@ -46,7 +55,7 @@ export function parseSearches(raw: string | null): string[] {
   const out: string[] = [];
   for (const entry of value) {
     if (typeof entry !== "string") continue;
-    const search = filterToSearch(filterFromSearch(entry));
+    const search = searchOf(filterFromSearch(entry));
     if (search && !out.includes(search)) out.push(search);
   }
   return out.slice(0, MAX_SEARCHES);
