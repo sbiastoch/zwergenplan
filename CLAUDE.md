@@ -7,6 +7,7 @@ UI-Texte und Doku sind auf Deutsch, Code-Identifier auf Englisch. Die Kommandos 
 ## Arbeitsweise (Pflicht)
 
 1. **Plan**: Für jede nicht-triviale Änderung zuerst `docs/plans/NNNN-<thema>.md` schreiben. Fertig ist der Plan, wenn ein Fremder ihn ohne den Chat umsetzen könnte.
+   - **Mockup**: Ist ein Mockup verlangt, wird es dem Nutzer gezeigt. Umgesetzt wird erst nach seinem Feedback, auch bei einem freigegebenen Plan.
 2. **`/plan-review`**: Fertig, wenn der Plan einen Review-Abschnitt hat und kein Blocker mehr offen ist.
 3. **Umsetzen, test-first** für Domänenlogik. Fertig, wenn `pnpm verify` **grün** ist, die E2E-Pflicht aus „Lokal prüfen“ erfüllt ist und jede neue Logik bzw. Ansicht einen Test hat.
 4. **`/arch-review`** bei größeren Änderungen: neues Modul, neue Abhängigkeit, Schemaänderung oder mehr als 200 Zeilen. Fertig, wenn kein Blocker mehr offen ist.
