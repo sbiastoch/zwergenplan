@@ -253,7 +253,7 @@ function dayDotsInYear(instant: string, now: Date): string {
 }
 
 /** Grundform des Kalender-Toasts: „Kalenderdatei mit 4 Terminen geladen“ */
-function calendarLoaded(count: number): string {
+export function calendarLoaded(count: number): string {
   return `Kalenderdatei mit ${plural(count, "Termin", "Terminen")} geladen`;
 }
 

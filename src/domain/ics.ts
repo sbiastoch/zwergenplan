@@ -10,8 +10,9 @@ import type { Offer, Session } from "./schema.ts";
 import { toIcsUtc } from "./time.ts";
 
 /**
- * Der eine Weg zum ICS-Kontext – für die statischen Dateien (scripts/build-data.ts) und die
- * Sammeldatei der Merkliste (ADR 0007). Nur so entstehen in beiden dieselben VEVENTs.
+ * Der eine Weg zum ICS-Kontext – für die statischen Dateien (scripts/build-data.ts) und die Dateien aus dem
+ * Browser: Merkliste (ADR 0007) und regelmäßige Reihen mit Geburtsdatum (ADR 0018). Nur so entstehen überall
+ * dieselben VEVENTs.
  */
 export function icsContextFor(offer: IcsSource, generatedAt: string): IcsContext {
   const { name, address, geo } = offer.venue;
@@ -124,7 +125,10 @@ export function icsForSeries(offer: Offer, ctx: IcsContext): string {
   );
 }
 
-/** Mehrere Angebote in einem Kalender (Merkliste) – im Browser erzeugt, gleiche UIDs wie die statischen Dateien. */
+/**
+ * Ein Kalender aus ausgewählten Terminen eines oder mehrerer Angebote (Merkliste, ADR 0007; Reihe im Detail,
+ * ADR 0018) – im Browser erzeugt, gleiche UIDs wie die statischen Dateien.
+ */
 export function icsForCollection(items: readonly CollectionItem[], name: string): string {
   return calendar(
     items.flatMap(({ offer, sessions, ctx }) => sessions.map((s) => vevent(offer, s, sessionIndex(offer, s), ctx))),

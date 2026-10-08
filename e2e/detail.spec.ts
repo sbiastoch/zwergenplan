@@ -287,6 +287,26 @@ test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
     await expect(dialog).toBeVisible();
   });
 
+  test.describe("Export-Code nicht ladbar", () => {
+    test.use({ allowedConsoleErrors: [/\/assets\/export\/\S+/] });
+
+    test("Toast, kein Download, kein Rückfall auf die statische Datei (ADR 0018)", async ({ page }) => {
+      await page.route("**/assets/export/*.js", (route) => route.abort());
+      const { dialog, all, icsRequests } = await openAged(page, TREFF, "2024-09-18");
+      let downloaded = false;
+      page.on("download", () => {
+        downloaded = true;
+      });
+      await all.click();
+      await expect(dialog.locator(".toast")).toHaveText(
+        "Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen.",
+      );
+      expect(downloaded).toBe(false);
+      expect(icsRequests).toEqual([]);
+      await expect(dialog).toBeVisible();
+    });
+  });
+
   test("ohne Geburtsdatum: die statische Datei wie bisher", async ({ page }) => {
     const dialog = await openDetail(page, TREFF.title);
     const [download] = await Promise.all([

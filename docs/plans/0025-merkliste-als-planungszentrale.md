@@ -72,6 +72,7 @@ Stand `main` `d5fab1b` (nach Plan 0022–0024).
   - Je gemerktem Angebot eine `OfferCard` (`dated`) mit dem nächsten Termin.
   - Es gibt keinen Filter, keinen Umschalter und keine Statuszeile.
 - `src/ui/SavedView.tsx:29–57` ist der einzige Lader des Export-Chunks `src/domain/ics.ts` (`ics-entry-only`, `LAZY_LOADERS` in `scripts/check-architecture.ts:60`). `preloadExportWhenIdle` startet in `App.tsx:88`. Plan 0018 (freigegeben, noch nicht umgesetzt) verlegt den Lader nach `src/ui/ics-export.ts`.
+- **Nachtrag (2026-10-08):** Plan 0018 ist umgesetzt. Der Lader liegt jetzt in `src/ui/ics-export.ts`, `SavedView` importiert ihn von dort (E9, zweiter Fall). Die Auswahl der Merkliste trifft `collectionExport`, den Text unter dem Knopf `savedExportNote` in `src/ui/format.ts`. E9 erweitert `savedExportNote` um den Filter, statt ein neues `exportNote` anzulegen. Zeilenangaben zu `SavedView.tsx` und `saved.ts` in diesem Abschnitt sind vor Etappe 1 neu zu prüfen.
 - `src/domain/saved.ts:9–29`:
   - `toggleId`,
   - `savedOffers(offers, ids, now)`: nur mit kommendem Termin, sortiert nach dem nächsten Termin,

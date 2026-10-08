@@ -1,6 +1,6 @@
 # ADR 0003 – Datenmodell: Angebote mit materialisierten Terminen
 
-Status: angenommen (2026-10-04), ID-Regel ergänzt durch ADR 0006; Schema `Timetable` (Fahrplanauszug) ergänzt durch ADR 0015 (Verkehrsmittel `mode` je Fahrt)
+Status: angenommen (2026-10-04), ID-Regel ergänzt durch ADR 0006; Schema `Timetable` (Fahrplanauszug) ergänzt durch ADR 0015 (Verkehrsmittel `mode` je Fahrt); ICS-Dateien aus dem Browser ergänzt durch ADR 0007 (Merkliste) und ADR 0018 (regelmäßige Reihen nach Alter)
 
 ## Entscheidung
 - Ein **Offer** ist ein Kurs, ein regelmäßiger Termin oder ein einmaliger Termin (`format: kurs | regelmaessig | einmalig`). Anmeldung (`mit-/ohne-anmeldung`) und Kosten (`kostenlos/kostenpflichtig`) sind eigene, unabhängige Dimensionen. „Offener Treff“ heißt `regelmaessig` + `ohne-anmeldung`.

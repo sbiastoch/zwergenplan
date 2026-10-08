@@ -1,5 +1,6 @@
 /**
- * Merkliste: reine Logik. Gespeichert wird in src/data/preferences.ts (nur localStorage).
+ * Merkliste und Auswahl für den ICS-Export (Merkliste und Reihe im Detail, Plan 0018): reine Logik. Gespeichert wird
+ * in src/data/preferences.ts (nur localStorage).
  * IDs, die im aktuellen Datenstand fehlen, werden nur ausgeblendet, nie gelöscht: Ein lückenhafter
  * Pipeline-Lauf soll keine Merkliste leeren.
  */

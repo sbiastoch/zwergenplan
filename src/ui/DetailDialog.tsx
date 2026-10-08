@@ -3,7 +3,7 @@ import { type MouseEvent, useState } from "react";
 import { assetUrl } from "../data/site.ts";
 import { ageCheck } from "../domain/age.ts";
 import { referenceSession, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
-import { seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
+import { seriesIcsFileName, seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
 import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -13,6 +13,7 @@ import {
   ageRangeLabel,
   ageWindowLabel,
   availabilityLabel,
+  calendarLoaded,
   costLabel,
   dayDots,
   EXPORT_UNAVAILABLE,
@@ -98,8 +99,7 @@ export function DetailContent({
       return;
     }
     const item = { offer, sessions: selection.sessions, ctx: ics.icsContextFor(offer, stamp) };
-    const path = seriesIcsPath(offer);
-    download(ics.icsForCollection([item], offer.title), path.slice(path.lastIndexOf("/") + 1), container);
+    download(ics.icsForCollection([item], offer.title), seriesIcsFileName(offer), container);
     onIcs(seriesToast(selection, now), selection.from || selection.until ? LONG_TOAST_MS : undefined);
   };
 
@@ -109,13 +109,21 @@ export function DetailContent({
    */
   const onSeries = (e: MouseEvent<HTMLAnchorElement>) => {
     const plan = seriesExport(offer, now, birthDate);
-    if (plan.kind === "static" || generatedAt === undefined) {
-      onIcs(`Kalenderdatei mit ${plural(offer.sessions.length, "Termin", "Terminen")} geladen`);
+    if (plan.kind === "static") {
+      onIcs(calendarLoaded(offer.sessions.length));
       return;
     }
+    // Ab hier nie die statische Datei: kein stiller Rückfall auf die ungekürzte Reihe (ADR 0018)
     e.preventDefault();
     if (plan.kind === "none") {
+      // Chunk trotzdem anfordern: Sein Request soll nicht verraten, ob ein Termin zum Alter passt (ADR 0018)
+      void loadExport().catch(() => {});
       onIcs("Keiner der kommenden Termine passt zum Alter.", LONG_TOAST_MS);
+      return;
+    }
+    // Ohne Datenstand fehlt der ICS-Kontext. Das Detail öffnet nur mit geladenen Daten, der Typ belegt es aber nicht.
+    if (generatedAt === undefined) {
+      onIcs(EXPORT_UNAVAILABLE);
       return;
     }
     // vor dem ersten `await`: Danach ist `currentTarget` null. Im Dialog, denn `body` ist dann inert (E2).
@@ -231,7 +239,8 @@ export function DetailContent({
               </a>
               <a className="btn primary" href={assetUrl(seriesIcsPath(offer))} onClick={onSeries}>
                 <Icon name="calendarPlus" size={20} />
-                {/* Ohne Zahl (H5): Die Datei enthält auch vergangene Termine, die Zahl nennt der Toast. */}
+                {/* Ohne Zahl (H5): Die Zahl nennt der Toast. Die statische Datei (ohne Geburtsdatum) enthält auch
+                    vergangene Termine, die aus dem Browser nur kommende, passend zum Alter (Plan 0018). */}
                 Alle Termine
               </a>
             </div>

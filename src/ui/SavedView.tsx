@@ -25,6 +25,8 @@ export function SavedView({ offers, generatedAt, birthDate, ctx, onDiscover, onE
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
     if (count === 0) {
+      // Chunk trotzdem anfordern: Sein Request soll nicht verraten, ob etwas zum Alter passt (ADR 0018)
+      void loadExport().catch(() => {});
       onExported("Keins der gemerkten Angebote passt zum Alter.", LONG_TOAST_MS);
       return;
     }
