@@ -109,6 +109,12 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     await expect(page.getByRole("dialog", { name: "Filter" })).toBeVisible();
   },
+  // Plan 0023: Zeitraum gesetzt, beide Datumsfelder gefüllt, „Zeitraum entfernen“ sichtbar
+  "filter-sheet-zeitraum": async (page) => {
+    await page.goto("./?von=2026-10-20&bis=2026-10-31");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await expect(page.getByRole("button", { name: "Zeitraum entfernen" })).toBeVisible();
+  },
   // Plan 0021: Altersschalter im Filter-Sheet (aus), Warnhinweis und Leerzustand mit zwei Textknöpfen
   "filter-sheet-alter": async (page) => {
     await setBirthDate(page, "01.09.2026");

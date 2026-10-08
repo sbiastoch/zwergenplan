@@ -1,4 +1,5 @@
 import { nextSession } from "./agenda.ts";
+import { type DateRange, dateRange, inDateRange } from "./date-range.ts";
 import { LIMIT_MINUTES, type ReachFn, type ReachLimit, type ReachTarget, withinLimit } from "./reach.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
 import { CATEGORIES, type Category, categoriesOf } from "./topics.ts";
@@ -12,7 +13,7 @@ const COSTS = ["kostenlos", "kostenpflichtig"] as const satisfies readonly Cost[
  * Eine leere Liste heißt „egal“. Das Geburtsdatum ist bewusst NICHT Teil der URL
  * (Links werden geteilt – das Geburtsdatum des Kindes gehört nicht hinein).
  * Die Wegzeit-Grenze darf in die URL, weil sie ohne Startpunkt nichts verrät; der Startpunkt selbst nie
- * (Plan 0004, E7; Plan 0009, E8).
+ * (Plan 0004, E7; Plan 0009, E8). Der Zeitraum steht als `von`/`bis` darin (Plan 0023, E4).
  */
 export interface FilterState {
   categories: Category[];
@@ -21,6 +22,8 @@ export interface FilterState {
   cost: Cost[];
   /** wirkt nur mit Wegzeit (`FilterContext.reach`, Art „oepnv“) */
   reachLimit?: ReachLimit;
+  /** Zeitraum „von / bis“ (Plan 0023); wirkt in `applyFilters`, nicht in `matchesFilter` (E11) */
+  range?: DateRange;
 }
 
 /** die Mehrfachwahl-Dimensionen; die Wegzeit ist eine Einfachwahl */
@@ -28,6 +31,8 @@ const LIST_DIMENSIONS = ["categories", "formats", "registration", "cost"] as con
 type Dimension = (typeof LIST_DIMENSIONS)[number];
 /** `umkreis=` (km, Plan 0004) wird nicht mehr gelesen (Plan 0009, E8). */
 const REACH_KEY = "wegzeit";
+const FROM_KEY = "von";
+const TO_KEY = "bis";
 
 export const EMPTY_FILTER: FilterState = { categories: [], formats: [], registration: [], cost: [] };
 
@@ -54,12 +59,14 @@ function parseReachLimit(raw: string | null): ReachLimit | undefined {
 export function filterFromSearch(search: string): FilterState {
   const p = new URLSearchParams(search);
   const reachLimit = parseReachLimit(p.get(REACH_KEY));
+  const range = dateRange(p.get(FROM_KEY) ?? undefined, p.get(TO_KEY) ?? undefined);
   return {
     categories: parseList(p.get(PARAMS.categories.key), PARAMS.categories.values),
     formats: parseList(p.get(PARAMS.formats.key), PARAMS.formats.values),
     registration: parseList(p.get(PARAMS.registration.key), PARAMS.registration.values),
     cost: parseList(p.get(PARAMS.cost.key), PARAMS.cost.values),
     ...(reachLimit ? { reachLimit } : {}),
+    ...(range ? { range } : {}),
   };
 }
 
@@ -73,6 +80,8 @@ export function filterToSearch(state: FilterState): string {
     if (list.length > 0) p.set(key, list.join(","));
   }
   if (state.reachLimit) p.set(REACH_KEY, String(state.reachLimit.value));
+  if (state.range?.from) p.set(FROM_KEY, state.range.from);
+  if (state.range?.to) p.set(TO_KEY, state.range.to);
   return p.toString().replaceAll("%2C", ",");
 }
 
@@ -89,11 +98,11 @@ export interface FilterContext {
 
 /**
  * Anzahl gewählter Werte über alle Dimensionen (Badge am Filter-Knopf). Die Wegzeit zählt nur, wenn sie
- * wirkt (`limitActive`, Plan 0009, E8).
+ * wirkt (`limitActive`, Plan 0009, E8). Ein Zeitraum zählt als einer, auch mit beiden Grenzen (Plan 0023, E5).
  */
 export function activeFilterCount(state: FilterState, { limitActive }: { limitActive: boolean }): number {
   const lists = state.categories.length + state.formats.length + state.registration.length + state.cost.length;
-  return lists + (limitActive && state.reachLimit ? 1 : 0);
+  return lists + (limitActive && state.reachLimit ? 1 : 0) + (state.range ? 1 : 0);
 }
 
 /** Schaltet einen Wert einer Dimension um und lässt alles andere unverändert. */
@@ -110,6 +119,16 @@ export function toggleIn<D extends Dimension>(state: FilterState, dim: D, value:
 export function withReachLimit(state: FilterState, limit: ReachLimit | undefined): FilterState {
   const { reachLimit: _old, ...rest } = state;
   return limit ? { ...rest, reachLimit: limit } : rest;
+}
+
+/**
+ * Setzt den Zeitraum oder entfernt ihn, wenn keine Grenze gültig ist. Vertauschte Grenzen werden still getauscht
+ * (Plan 0023, E1); ohne Zeitraum fehlt der Schlüssel wie bei `withReachLimit`.
+ */
+export function withDateRange(state: FilterState, from: string | undefined, to: string | undefined): FilterState {
+  const { range: _old, ...rest } = state;
+  const range = dateRange(from, to);
+  return range ? { ...rest, range } : rest;
 }
 
 /**
@@ -133,12 +152,19 @@ export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: Filt
 /**
  * Angebote, deren letzter Termin vorbei ist, fallen immer heraus.
  * Das Alter filtert hier bewusst nicht: Die Oberfläche zeigt unpassende Angebote auf Wunsch
- * markiert an (`splitByAge` in age.ts). Die Wegzeit-Grenze wirkt nur mit Wegzeit.
+ * markiert an (`splitByAge` in age.ts). Die Wegzeit-Grenze wirkt nur mit Wegzeit. Der Zeitraum braucht „jetzt“
+ * (`inDateRange`, Plan 0023, E2) und wirkt deshalb hier.
  */
 export function applyFilters<T extends Offer & { venue: ReachTarget }>(
   offers: readonly T[],
   state: FilterState,
   ctx: FilterContext,
 ): T[] {
-  return offers.filter((o) => nextSession(o, ctx.now) !== undefined && matchesFilter(o, state, ctx.reach));
+  const { range } = state;
+  return offers.filter(
+    (o) =>
+      nextSession(o, ctx.now) !== undefined &&
+      matchesFilter(o, state, ctx.reach) &&
+      (!range || inDateRange(o, range, ctx.now)),
+  );
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
-import { addSearch, hasSearch, MAX_SEARCHES, parseSearches, removeSearch } from "./searches.ts";
+import { addSearch, hasSearch, MAX_SEARCHES, parseSearches, removeSearch, searchOf } from "./searches.ts";
 
 const f = (state: Partial<FilterState>): FilterState => ({ ...EMPTY_FILTER, ...state });
 const MUSIK_NATUR = f({ categories: ["natur", "musik"], reachLimit: { kind: "minuten", value: 20 } });
@@ -32,6 +32,22 @@ describe("addSearch", () => {
     const list = ["kat=musik"];
     addSearch(list, f({ categories: ["natur"] }));
     expect(list).toEqual(["kat=musik"]);
+  });
+});
+
+describe("Zeitraum (Plan 0023, E12)", () => {
+  const range = { from: "2026-10-20", to: "2026-10-31" };
+
+  it("lässt den Zeitraum weg: allein ist die Suche leer", () => {
+    expect(searchOf(f({ range }))).toBe("");
+    expect(addSearch([], f({ range }))).toEqual({ list: [], outcome: "leer" });
+    expect(hasSearch([""], f({ range }))).toBe(false);
+  });
+
+  it("behält die übrigen Filter", () => {
+    expect(addSearch([], f({ categories: ["musik"], range }))).toEqual({ list: ["kat=musik"], outcome: "neu" });
+    expect(hasSearch(["kat=musik"], f({ categories: ["musik"], range }))).toBe(true);
+    expect(parseSearches('["kat=musik&von=2026-10-20","von=2026-10-20"]')).toEqual(["kat=musik"]);
   });
 });
 

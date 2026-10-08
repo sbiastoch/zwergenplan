@@ -39,7 +39,7 @@ Drei kleine Rückmeldungen aus der Nutzung: Die Stadtteil-Auswahl stört, wenn d
 
 ## Umsetzung
 
-- Start-JS (gzip, `pnpm size`): 93,24 kB vorher, 93,37 kB nach der Nacharbeit (ADR 0012, Delta-Tabelle). Etwa 0,1 kB entfallen auf `OriginPicker`, der Rest auf Lader und Fuß; die Installationslogik liegt weiter im Chunk `assets/app/` (App-Extras JS 6,27 → 6,48 kB, Budget 7,1 kB), kein `__vite__mapDeps` im Einstieg.
+- Start-JS (gzip, `pnpm size`): 93,24 kB vorher, 93,37 kB nach der Nacharbeit; nach dem Merge von 0023/0024 gegen 91663f6 94,119 → 94,259 kB, +0,14 kB (ADR 0012, Delta-Tabelle). Etwa 0,1 kB entfallen auf `OriginPicker`, der Rest auf Lader und Fuß; die Installationslogik liegt weiter im Chunk `assets/app/` (App-Extras JS 6,27 → 6,48 kB, Budget 7,1 kB), kein `__vite__mapDeps` im Einstieg.
 - Lokal (Rechner überlastet, Vorgabe des Koordinators): `pnpm check:fast` grün; nach der Nacharbeit auf `pixel-7` grün: installieren, startpunkt, push (74 bestanden, 3 übersprungen), mobile-ux `-g kind-sheet` (12). Den vollen Lauf mit WebKit macht die CI auf dem Branch.
 
 ## Review (Arch-Review 2026-10-08)

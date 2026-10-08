@@ -1,4 +1,7 @@
-/** „Entdecken“ als Liste (Plan 0003, E7/E8): jedes Angebot einmal am nächsten Termin, nach Tagen gruppiert. */
+/**
+ * „Entdecken“ als Liste (Plan 0003, E7/E8): jedes Angebot einmal am nächsten Termin, nach Tagen gruppiert; mit
+ * Zeitraum am Termin darin (Plan 0023, E6).
+ */
 import type { ReactNode } from "react";
 import type { DayGroup, Occurrence } from "../domain/agenda.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -17,9 +20,21 @@ interface ListViewProps {
   onResetFilter?: (() => void) | undefined;
   /** nur, wenn der Altersfilter etwas ausblendet (Plan 0021, E4) */
   age?: AgeEscape | undefined;
+  /** Zeitraum aktiv: Das Detail bezieht sich auf den Termin am Tag der Gruppe, wie im Kalender (Plan 0023, E7) */
+  openOnDay: boolean;
 }
 
-export function ListView({ groups, remaining, onMore, today, ctx, hasData, onResetFilter, age }: ListViewProps) {
+export function ListView({
+  groups,
+  remaining,
+  onMore,
+  today,
+  ctx,
+  hasData,
+  onResetFilter,
+  age,
+  openOnDay,
+}: ListViewProps) {
   if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} age={age} />;
   return (
     <>
@@ -32,7 +47,7 @@ export function ListView({ groups, remaining, onMore, today, ctx, hasData, onRes
               <small>{sub}</small>
             </h2>
             {group.items.map((item) => (
-              <OfferCard key={item.offer.id} item={item} ctx={ctx} />
+              <OfferCard key={item.offer.id} item={item} ctx={ctx} calendarDay={openOnDay ? group.day : undefined} />
             ))}
           </section>
         );

@@ -29,6 +29,18 @@ const withSessions = (title: string, sessions: Session[]): Offer => ({
 const s = (start: string, end: string): Session => ({ start, end });
 
 describe("groupByNextSession", () => {
+  it("stellt bei Zeitraum regelmäßige an den ersten Termin darin, Kurse an den Beginn (Plan 0023, E6)", () => {
+    const treff = fixtureOffer("krabbeltreff");
+    const musikgarten = fixtureOffer("musikgarten-1"); // Beginn 5.11.
+    const groups = groupByNextSession([treff, musikgarten], FIXTURE_NOW, { from: "2026-10-27" });
+    expect(groups.map((g) => [g.day, g.items.map((i) => fixtureKey(i.offer))])).toEqual([
+      ["2026-10-28", ["krabbeltreff"]],
+      ["2026-11-05", ["musikgarten-1"]],
+    ]);
+    // Ein Kurs, der vor dem Zeitraum begonnen hat, fehlt.
+    expect(groupByNextSession([fixtureOffer("pekip-herbst")], FIXTURE_NOW, { from: "2026-10-20" })).toEqual([]);
+  });
+
   it("zeigt jedes Angebot einmal am nächsten Termin, nach Berliner Tag gruppiert", () => {
     const groups = groupByNextSession(file.offers, FIXTURE_NOW);
     expect(groups.map((g) => g.day)).toEqual([
