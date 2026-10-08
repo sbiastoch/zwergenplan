@@ -775,6 +775,11 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
   - `heavy.test.ts` braucht 3,6 s, und fünf Läufe nacheinander waren grün.
   - `check:fast` braucht **6,8 / 7,1 / 7,0 s** bei Last 4,9.
 
+- **Ursache und Fix (2026-10-08, später):** Auch nach der Rücknahme hing der Schritt auf `main` (`c0b3217`, Lauf [37787936251](https://github.com/sbiastoch/zwergenplan/actions/runs/37787936251)) in drei Jobs gleichzeitig, auch bei chromium. Es hing nicht der Browser-Download, sondern `apt-get update` aus `--with-deps`: `azure.archive.ubuntu.com` antwortete nicht („Ign“), danach stand der Abruf. Fix in `.github/install-browsers.sh` für E2E und Smoke:
+  - apt mit `Acquire::http(s)::Timeout "20"`, `Acquire::Retries "3"` und `DPkg::Lock::Timeout "60"`;
+  - bis zu drei Versuche mit `timeout -k 10 150`, dazwischen verwaistes `apt-get` beenden (`pkill`) und `dpkg --configure -a`;
+  - Schritt höchstens 9 min, Job-Limits E2E 20 und Smoke 15 min.
+
 ### Etappe 7 (Branch `harness-0027-e7`, auf `ci-apt-lock` `c0b3217`)
 
 - **`scripts/lib/ci-scope.ts`**, rein, mit Test 6 vorab (`scripts/lib/ci-scope.test.ts`, 48 Fälle):

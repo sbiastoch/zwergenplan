@@ -82,8 +82,9 @@ jobs:
     needs: scope
     if: needs.scope.outputs.full == 'true'
     runs-on: ubuntu-latest
-    # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (6,2 Min.), aufgerundet (Plan 0013, E5).
-    timeout-minutes: 15
+    # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (6,2 Min.), aufgerundet (Plan 0013, E5),
+    # plus Puffer für Wiederholungen der Browser-Installation (.github/install-browsers.sh).
+    timeout-minutes: 20
     strategy:
       fail-fast: false # alle Fehler eines Laufs auf einmal sehen; gates sperrt den Deploy trotzdem
       matrix:
@@ -102,8 +103,10 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Zeitlimits und Wiederholung gegen hängendes apt (2026-10-08), siehe Skript.
       - name: Playwright-Browser
-        run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
+        timeout-minutes: 9
+        run: .github/install-browsers.sh ${{ matrix.engine }}
       - name: Fixture-Build
         run: pnpm build:e2e
       - name: E2E
@@ -124,8 +127,9 @@ jobs:
     needs: scope
     if: needs.scope.outputs.full == 'true'
     runs-on: ubuntu-latest
-    # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (2,6 Min.), aufgerundet (Plan 0013, E5).
-    timeout-minutes: 10
+    # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (2,6 Min.), aufgerundet (Plan 0013, E5),
+    # plus Puffer für Wiederholungen der Browser-Installation (.github/install-browsers.sh).
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -135,7 +139,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Playwright-Browser
-        run: pnpm exec playwright install --with-deps chromium
+        timeout-minutes: 9
+        run: .github/install-browsers.sh chromium
       - name: Deploy-Build
         run: pnpm build
       - name: Smoke mit echten Daten
