@@ -1,6 +1,6 @@
 # Plan 0027 – Verifikation nach Risiko
 
-Status: in Umsetzung – Etappen 1–6 umgesetzt (Branches harness-0027-e1 … e6), Etappe 7 umgesetzt auf `harness-0027-e7`, K9 offen; freigegeben nach 2 Review-Runden, Nutzerentscheide getroffen. Früherer Status: freigegeben (2 Review-Runden, Nutzerentscheide getroffen)
+Status: abgeschlossen, live seit 5701141 (2026-10-08)
 Datum: 2026-10-08
 Bezug: ADR 0004 (Backpressure, ergänzt durch ADR 0021), ADR 0002 (Hosting, „check → E2E → Deploy“, Teil B von ADR 0021 ändert das für Doku-Commits), ADR 0012 (Budgets, unverändert), Plan 0013 (CI-Sharding, `PW_SUITE`), `docs/architecture.md` (Schicht `.claude/hooks/`: nur Node-Builtins)
 
@@ -836,7 +836,12 @@ Der Weg: ein Fix-Commit oben auf e6 statt Fixes auf e4 mit anschließendem Nachz
 
 - Erster Lauf `1de5c79` (neuer Branch, voll): [37788387911](https://github.com/sbiastoch/zwergenplan/actions/runs/37788387911), alle Jobs grün, kein Deploy (Branch).
 - Fall 9: `scope` braucht 6 s; E2E und Smoke starten 8 s nach `check`. Kein `filter: blob:none` nötig.
-- Fall 1: dieser Commit (reine Doku nach grünem Lauf).
+- Fall 1: `da32dc1`, reine Doku nach grünem Lauf: [37790008217](https://github.com/sbiastoch/zwergenplan/actions/runs/37790008217), `scope` und `check` grün, E2E und Smoke übersprungen, `gates` grün, kein Deploy. ✓
+- Fall 3 (Code-Diff → voll): `117767b` (`.github/install-browsers.sh`): [37790535227](https://github.com/sbiastoch/zwergenplan/actions/runs/37790535227), volle Matrix. ✓
+- Fall 6 sinngemäß (`gates` sperrt einen roten Job): im selben Lauf war ein Unit-Test rot (Flake in `heavy.test.ts`, behoben in `5701141`), E2E und Smoke grün; `gates` rot, kein Deploy. ✓
+- Auf `main`: `5701141` (Diff zum ausgelieferten `8113cd3` enthält Code) fuhr voll und deployte: [37792431624](https://github.com/sbiastoch/zwergenplan/actions/runs/37792431624), `meta.json` zeigt `5701141`. ✓
+- Fall 5: der Archiv-Commit dieses Plans, reine Doku auf `main`. Erwartet: nur `check`, kein Deploy, `meta.json` bleibt `5701141`.
+- **Nicht von Hand gefahren** (Nutzerwunsch: pragmatisch abschließen): Fall 2, 4, 7 und 8. Ihre Entscheidungen decken `scripts/lib/ci-scope.test.ts` (roter oder abgebrochener Vorgänger, Diff gegen das Deployment) und `scripts/ci-scope.test.ts` (Absturz ergibt `full=true`) ab. Restpunkt in `docs/ideas.md`.
 
 ## Entschieden (Nutzer, 2026-10-08)
 

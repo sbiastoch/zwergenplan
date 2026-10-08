@@ -76,6 +76,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0027** (Ergebnis, K9):
+  - Die K9-Fälle 2, 4, 7 und 8 (Doku nach rotem Vorgänger, wartender Lauf auf `main` abgebrochen, toter Pfad im Doku-Pfad, Absturz von `scope`) bei Gelegenheit einmal an echten Läufen belegen.
+  - `check:fast` schwankt zwischen 7 und 10,7 s, Ziel war ≤ 7,5 s.
 - **Plan 0001** (Browser-Review lokal): Das native Datumsfeld zeigt das Format der Browsersprache. Eine eigene, klar deutsche Eingabe erwägen.
 - **Plan 0003** (Browser-Review live): Den Merklisten-Export (ICS) am echten iPhone testen.
 - **Plan 0004** (Browser-Review live, W1, H1–H5):
