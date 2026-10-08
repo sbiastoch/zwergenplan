@@ -161,17 +161,30 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("Kurs komplett, Treff nur bis 14.10.: 8 + 2 Termine", async ({ page }) => {
     const button = await openSaved(page, [IDS.pekip, IDS.treff], "2024-09-18");
-    // Die Statuszeile zählt alle kommenden Termine; was zum Alter passt, sagt der Toast (Plan 0025, E3a)
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    // Die Statuszeile zählt die kommenden Termine, regelmäßige nur passend zum Alter wie die Datei (Plan 0028)
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 10 Terminen gemerkt");
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
     expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
     expect(await vevents(download)).toBe(10);
     await expect(page.locator(".toast")).toHaveText("Kalenderdatei mit 10 Terminen geladen");
   });
 
+  test("zu jung bis 20.10.: Treff steht am 21.10. hinter PEKiP, Statuszeile und Datei 8 + 3 (Plan 0028)", async ({
+    page,
+  }) => {
+    const button = await openSaved(page, [IDS.treff, IDS.pekip], "2026-04-20");
+    const cards = page.getByTestId("offer");
+    await expect(cards.nth(0)).toContainText("PEKiP");
+    await expect(cards.nth(1)).toContainText("Offener Krabbeltreff");
+    await expect(cards.nth(1)).toContainText("Mi 21.10. · 10:00 Uhr");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 11 Terminen gemerkt");
+    const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
+    expect(await vevents(download)).toBe(11);
+  });
+
   test("nichts passt: kein Download, Toast", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff], "2026-08-01");
-    await expect(page.getByRole("status")).toHaveText("1 Angebot mit insgesamt 5 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("1 Angebot mit insgesamt 0 Terminen gemerkt");
     let downloaded = false;
     page.on("download", () => {
       downloaded = true;
@@ -183,7 +196,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("ein Angebot passt nicht: nur die anderen in der Datei, Toast nennt es 6 s lang", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff, IDS.reime], "2026-08-01");
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 9 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 4 Terminen gemerkt");
     // Hält die Timer an: Die Anzeigedauer des Toasts wird gezielt vorgespult.
     await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);

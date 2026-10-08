@@ -10,7 +10,9 @@ import {
   type Occurrence,
   referenceSession,
   rhythm,
+  type SessionFit,
   sessionsByDay,
+  shownSession,
   takeGroups,
   uniformTimes,
   upcomingSessions,
@@ -104,6 +106,42 @@ describe("takeGroups", () => {
   it("gibt alles zurück, wenn das Limit reicht", () => {
     expect(takeGroups(groups, 6)).toEqual({ groups, remaining: 0 });
     expect(takeGroups([], 40)).toEqual({ groups: [], remaining: 0 });
+  });
+});
+
+describe("shownSession und SessionFit (Plan 0028)", () => {
+  const treff = fixtureOffer("krabbeltreff"); // mittwochs 7.10.–4.11.
+  const fromOct21: SessionFit = (_offer, session) => session.start >= "2026-10-21";
+  const never: SessionFit = () => false;
+
+  it("nimmt ohne Prädikat den nächsten Termin bzw. den Termin im Zeitraum", () => {
+    expect(shownSession(treff, FIXTURE_NOW)).toEqual(nextSession(treff, FIXTURE_NOW));
+    expect(shownSession(treff, FIXTURE_NOW, { from: "2026-10-13" })?.start).toBe("2026-10-14T10:00:00+02:00");
+  });
+
+  it("nimmt mit Prädikat den ersten passenden kommenden Termin, auch im Zeitraum", () => {
+    expect(shownSession(treff, FIXTURE_NOW, undefined, fromOct21)?.start).toBe("2026-10-21T10:00:00+02:00");
+    expect(shownSession(treff, FIXTURE_NOW, { to: "2026-10-28" }, fromOct21)?.start).toBe("2026-10-21T10:00:00+02:00");
+  });
+
+  it("fällt ohne passenden Termin auf den nächsten bzw. den im Zeitraum zurück", () => {
+    expect(shownSession(treff, FIXTURE_NOW, undefined, never)).toEqual(treff.sessions[0]);
+    expect(shownSession(treff, FIXTURE_NOW, { to: "2026-10-14" }, fromOct21)).toEqual(treff.sessions[0]);
+    expect(shownSession(treff, FIXTURE_NOW, { from: "2026-12-01" }, fromOct21)).toBeUndefined();
+  });
+
+  it("stellt Angebote in der Liste an den passenden Termin", () => {
+    const reime = fixtureOffer("krabbelreime"); // ab 9.10.
+    const groups = groupByNextSession([treff, reime], FIXTURE_NOW, undefined, (o, s) => o !== treff || fromOct21(o, s));
+    expect(groups.map((g) => [g.day, g.items.map((i) => fixtureKey(i.offer))])).toEqual([
+      ["2026-10-09", ["krabbelreime"]],
+      ["2026-10-21", ["krabbeltreff"]],
+    ]);
+  });
+
+  it("lässt im Kalender-Index nur passende Termine", () => {
+    const index = sessionsByDay([treff], fromOct21);
+    expect([...index.keys()]).toEqual(["2026-10-21", "2026-10-28", "2026-11-04"]);
   });
 });
 

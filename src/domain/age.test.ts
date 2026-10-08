@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { ageCheck, ageInMonths, ageVisibility, DEFAULT_AGE, fitsAgeAt, offerFitsAge, splitByAge } from "./age.ts";
+import {
+  ageCheck,
+  ageInMonths,
+  ageVisibility,
+  DEFAULT_AGE,
+  fitsAgeAt,
+  fittingSessions,
+  offerFitsAge,
+  sessionFit,
+  splitByAge,
+} from "./age.ts";
 import { applyFilters, EMPTY_FILTER } from "./filter.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, fixtureSiteOffers } from "./test-fixtures.ts";
 
@@ -158,5 +168,27 @@ describe("ageCheck", () => {
       at: "2026-10-07T10:00:00+02:00",
       months: 5,
     });
+  });
+});
+
+describe("sessionFit und fittingSessions (Plan 0028)", () => {
+  const treff = fixtureOffer("krabbeltreff"); // regelmäßig, 6–24 Monate, mittwochs 7.10.–4.11.
+  const pekip = fixtureOffer("pekip-herbst"); // Kurs, 1–5 Monate
+
+  it("gibt es ohne Geburtsdatum nicht", () => {
+    expect(sessionFit(undefined)).toBeUndefined();
+    expect(fittingSessions(treff, FIXTURE_NOW, undefined)).toEqual(treff.sessions);
+  });
+
+  it("prüft regelmäßige je Termin, Kurse und Einzeltermine gar nicht", () => {
+    const fits = sessionFit("2026-04-20"); // 5 Monate am 14.10., 6 am 21.10.
+    expect(treff.sessions.map((s) => fits?.(treff, s))).toEqual([false, false, true, true, true]);
+    expect(pekip.sessions.every((s) => sessionFit("2023-01-01")?.(pekip, s))).toBe(true);
+  });
+
+  it("lässt bei regelmäßigen nur kommende, passende Termine", () => {
+    expect(fittingSessions(treff, FIXTURE_NOW, "2026-04-20")).toEqual(treff.sessions.slice(2));
+    expect(fittingSessions(treff, FIXTURE_NOW, "2026-08-01")).toEqual([]);
+    expect(fittingSessions(pekip, FIXTURE_NOW, "2023-01-01")).toEqual(pekip.sessions);
   });
 });

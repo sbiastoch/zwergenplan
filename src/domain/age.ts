@@ -1,4 +1,4 @@
-import { upcomingSessions } from "./agenda.ts";
+import { type SessionFit, shownSession, upcomingSessions } from "./agenda.ts";
 import type { AgeRange, Offer, Session } from "./schema.ts";
 import { berlinDate, daysInMonth, parseIsoDate } from "./time.ts";
 
@@ -26,6 +26,23 @@ export function fitsAgeAt(range: AgeRange | undefined, birthDate: string, at: st
 }
 
 /**
+ * Prädikat „Termin passt zum Alter“ für Liste, Kalender, Merkliste und Export (Plan 0018, E1; Plan 0028): Regelmäßige
+ * Angebote prüft es je Termin, Kurse und Einzeltermine gar nicht (für sie zählt `offerFitsAge`, ein Kurs wird nicht
+ * mittendrin abgeschnitten, ADR 0007). Ohne Geburtsdatum gibt es kein Prädikat.
+ */
+export function sessionFit(birthDate: string | undefined): SessionFit | undefined {
+  if (birthDate === undefined) return undefined;
+  return (offer, session) => offer.format !== "regelmaessig" || fitsAgeAt(offer.age, birthDate, session.start);
+}
+
+/** Kommende Termine, die nach `sessionFit` zählen; dieselbe Auswahl zeigen Merkliste und Export (Plan 0028). */
+export function fittingSessions(offer: Offer, now: Date, birthDate: string | undefined): Session[] {
+  const upcoming = upcomingSessions(offer, now);
+  const fits = sessionFit(birthDate);
+  return fits ? upcoming.filter((s) => fits(offer, s)) : upcoming;
+}
+
+/**
  * Kurs/einmalig: entscheidend ist das Alter zum (ersten) Termin.
  * Regelmäßig: passt, sobald mindestens ein noch nicht beendeter Termin altersgerecht ist –
  * vergangene Termine bleiben bis zum nächsten Pipeline-Lauf in den Daten und zählen nicht.
@@ -34,7 +51,7 @@ export function offerFitsAge(offer: Offer, birthDate: string, now: Date): boolea
   const [first] = offer.sessions;
   if (!first) return false;
   if (offer.format === "regelmaessig") {
-    return upcomingSessions(offer, now).some((s) => fitsAgeAt(offer.age, birthDate, s.start));
+    return fittingSessions(offer, now, birthDate).length > 0;
   }
   return fitsAgeAt(offer.age, birthDate, first.start);
 }
@@ -69,10 +86,7 @@ export function ageCheck(offer: Offer, birthDate: string, now: Date, session?: S
   let ref: Session | undefined;
   if (offer.format !== "regelmaessig") ref = offer.sessions[0];
   else if (session) ref = session;
-  else {
-    const upcoming = upcomingSessions(offer, now);
-    ref = upcoming.find(fitsAt) ?? upcoming[0];
-  }
+  else ref = shownSession(offer, now, undefined, sessionFit(birthDate));
   if (!ref) return undefined;
   return { fits: fitsAt(ref), at: ref.start, months: ageInMonths(birthDate, ref.start) };
 }

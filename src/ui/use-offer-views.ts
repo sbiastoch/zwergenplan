@@ -6,7 +6,7 @@
  * Koordinate, nicht je Render (Plan 0004, E6; Plan 0009, E8).
  */
 import { useCallback, useMemo, useState } from "react";
-import { ageVisibility } from "../domain/age.ts";
+import { ageVisibility, sessionFit } from "../domain/age.ts";
 import {
   type DayGroup,
   endedOnDay,
@@ -123,8 +123,14 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
     [filtered, upcoming, birthDate, now, ageOnly],
   );
   const range = route.filter.range;
-  const groups = useMemo(() => groupByNextSession(visible, now, range), [visible, now, range]);
-  const index = useMemo(() => (route.tab === "kalender" ? sessionsByDay(visible) : NO_INDEX), [visible, route.tab]);
+  // Mit „nur altersgerecht“ stehen regelmäßige Angebote am ersten passenden Termin, und der Kalender zeigt nur passende
+  // Termine (Plan 0028). Ohne Altersfilter erscheinen sie wie alle anderen, unpassende sind markiert.
+  const fits = useMemo(() => (ageOnly ? sessionFit(birthDate) : undefined), [ageOnly, birthDate]);
+  const groups = useMemo(() => groupByNextSession(visible, now, range, fits), [visible, now, range, fits]);
+  const index = useMemo(
+    () => (route.tab === "kalender" ? sessionsByDay(visible, fits) : NO_INDEX),
+    [visible, route.tab, fits],
+  );
   const allIndex = useMemo(
     () => (route.tab === "kalender" ? sessionsByDay(upcoming) : NO_INDEX),
     [upcoming, route.tab],
@@ -147,7 +153,7 @@ export function useOfferViews({ offers, route, birthDate, savedIds, now, reach }
   // Startausschnitt nur aus öffentlichen Daten: alle kommenden Angebote, ohne Filter, Alter und Startpunkt
   // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
   // Die Karte der Merkliste zählt die Orte der gemerkten Angebote, ihr Startausschnitt ist derselbe (Plan 0025, E4).
-  const saved = useMemo(() => savedOffers(offers, savedIds, now), [offers, savedIds, now]);
+  const saved = useMemo(() => savedOffers(offers, savedIds, now, birthDate), [offers, savedIds, now, birthDate]);
   const map = useMemo(() => {
     if (route.tab === "karte") return { placeCount: countPlaces(visible), cameraOffers: upcoming };
     if (route.tab === "merkliste-karte") return { placeCount: countPlaces(saved), cameraOffers: upcoming };
