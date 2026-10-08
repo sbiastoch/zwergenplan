@@ -785,6 +785,10 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 6. Doku: Privatsphäre-Invariante, `ideas.md`, Vermerk in Plan 0010. Das Delta in ADR 0012 eintragen.
 7. Gates nach CLAUDE.md („Lokal prüfen“, Review Nachtrag M4): `pnpm verify`, dazu gezielt `pnpm e2e:local e2e/merkliste-anbieter.spec.ts e2e/anbieter.spec.ts e2e/anbieter-inhalt.spec.ts e2e/mobile-ux.spec.ts e2e/layout.spec.ts` (`run_in_background`) und `pnpm size` für ADR 0012. Dann `/arch-review` (Speicherformat, > 200 Zeilen), Branch, CI, Fast-Forward, `/browser-review live`.
 
+**Stand Etappe 1:** live seit `83da3b0` (2026-10-08), CI auf `main` grün, `/browser-review live` ohne Blocker und Major. Start-JS +0,336 kB (ADR 0012). Befunde:
+- Minor 1: Im Tab „Anbieter“ klebt die Statuszeile rund 4 px unter dem Schatten des Suchfelds. → Etappe 2, Schritt 5 (Abstand unter `.provider-search`).
+- Minor 2: Bei 320 px und 200 % werden Anbieterzeilen neben dem Herz bis zu 760 px hoch; kein WCAG-Verstoß. → `docs/ideas.md`.
+
 **Etappe 2 – Umschalter und Karte auf der Merkliste** (zwei Segmente Liste | Karte)
 1. Rot schreiben:
    - Test 4 (nur `merkliste-karte`),
@@ -793,7 +797,7 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 2. `TABS` um `merkliste-karte` erweitern, `tabSection` anpassen. `ViewToggle` wird allgemein, mit `--n` und der Daumenbreite in `map.css` (E4).
 3. Die Weichen in `App.tsx` auf `section` umstellen (E4, M1). `views.map` für beide Karten berechnen.
 4. `MapPanel` in der Merkliste mit `cameraOffers = upcoming` und Wegzeit-Anlass. Leerzustände der Karte (E5a).
-5. Kopf der Merkliste nach E3a: Umschalter `.view-toggle.full` unter der Überschrift, Statuszeile `savedStatusParts`/`savedMapStatusParts` (ohne Filter-Varianten), runder Export-Knopf mit `exportLabel` nur in der Liste (E9). Der breite Knopf und die Export-Zeile entfallen. Test 7 (`savedStatusParts` ohne Filter, `exportLabel` ohne Filter) zuerst rot.
+5. Abstand unter dem Suchfeld im Tab „Anbieter“ (Browser-Review Etappe 1, Minor 1). Kopf der Merkliste nach E3a: Umschalter `.view-toggle.full` unter der Überschrift, Statuszeile `savedStatusParts`/`savedMapStatusParts` (ohne Filter-Varianten), runder Export-Knopf mit `exportLabel` nur in der Liste (E9). Der breite Knopf und die Export-Zeile entfallen. Test 7 (`savedStatusParts` ohne Filter, `exportLabel` ohne Filter) zuerst rot.
 6. E2E: Tests 11 und 12 sowie Statuszeile, Export und Umschalterbreite aus Test 9. Mobile-UX: `merkliste-karte`, Merkliste als Liste.
 7. Doku: `architecture.md` (Anlass), Vermerk in Plan 0005. Das Delta in ADR 0012 eintragen. Gates: `pnpm verify`, gezielt `e2e/saved.spec.ts`, `e2e/karte.spec.ts`, `e2e/startpunkt.spec.ts`, `e2e/mobile-ux.spec.ts`, `e2e/layout.spec.ts`, `pnpm size`. Dann Review, Merge, Browser-Review.
 
