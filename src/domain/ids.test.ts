@@ -1,5 +1,13 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN, type OfferIdInput, offerId, slug } from "./ids.ts";
+import {
+  isProviderId,
+  KEBAB_ID_PATTERN,
+  MAX_PROVIDER_ID,
+  OFFER_ID_PATTERN,
+  type OfferIdInput,
+  offerId,
+  slug,
+} from "./ids.ts";
 import { type Format, Venue } from "./schema.ts";
 import { rawFixtures } from "./test-fixtures.ts";
 
@@ -83,5 +91,18 @@ describe("KEBAB_ID_PATTERN (Plan 0010, E2)", () => {
     const bad = Venue.safeParse({ ...venue, id: "Ort--Eins" });
     expect(bad.success).toBe(false);
     expect(bad.error?.issues.map((i) => i.message)).toEqual(["kebab-case erwartet"]);
+  });
+});
+
+describe("MAX_PROVIDER_ID und isProviderId (Plan 0025, E1)", () => {
+  it("ist 80: gilt für anbieter= in der URL und für gemerkte Anbieter", () => {
+    expect(MAX_PROVIDER_ID).toBe(80);
+  });
+
+  it("isProviderId: Katalog-Form und höchstens 80 Zeichen", () => {
+    expect(isProviderId("theater-beispiel")).toBe(true);
+    expect(isProviderId("a".repeat(80))).toBe(true);
+    expect(isProviderId("a".repeat(81))).toBe(false);
+    for (const bad of ["../x", "A-b", "a b", ""]) expect(isProviderId(bad), JSON.stringify(bad)).toBe(false);
   });
 });

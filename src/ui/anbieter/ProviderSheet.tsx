@@ -1,17 +1,28 @@
 /**
- * Anbieter-Sheet (Plan 0010, E10): Name, Kategorien, „Website & Programm“, Orte und alle kommenden Angebote als
- * Kacheln, unabhängig von Filtern und Alter (E4). Inhalt des Dialogs, die Hülle rendert Overlays.tsx (E3).
+ * Anbieter-Sheet (Plan 0010, E10): Name mit Herz (Plan 0025, E2), Kategorien, „Website & Programm“, Orte und alle
+ * kommenden Angebote als Kacheln, unabhängig von Filtern und Alter (E4). Inhalt des Dialogs, die Hülle rendert
+ * Overlays.tsx (E3).
  */
 import { useMemo } from "react";
 import { groupByNextSession } from "../../domain/agenda.ts";
 import { findProvider, hasOffersOutside, providerCategories, providerOffers } from "../../domain/directory.ts";
 import { CATEGORY_LABELS } from "../../domain/topics.ts";
+import { markAutofocus } from "../Dialog.tsx";
 import { Icon } from "../icons.tsx";
-import { OfferCard } from "../OfferCard.tsx";
+import { HeartButton, OfferCard } from "../OfferCard.tsx";
 import type { ProviderSheetProps } from "../provider-types.ts";
 import { RouteHint, routeLink } from "../Ways.tsx";
 
-export function ProviderSheet({ directory, providerId, offers, visible, ctx, onClose }: ProviderSheetProps) {
+export function ProviderSheet({
+  directory,
+  providerId,
+  offers,
+  visible,
+  ctx,
+  saved,
+  onToggleSaved,
+  onClose,
+}: ProviderSheetProps) {
   const { now } = ctx;
   const provider = useMemo(
     () => findProvider(directory.providers, offers, providerId),
@@ -29,7 +40,21 @@ export function ProviderSheet({ directory, providerId, offers, visible, ctx, onC
     <div className="sheet-body provider-sheet">
       <div className="sheet-scroll">
         <div className="grab" />
-        <h2 lang="de">{provider.name}</h2>
+        {/*
+          Kopf: Name bricht um, das Herz bleibt oben rechts (Plan 0025, E2). Der Name bekommt den ersten Fokus, sonst
+          fiele er auf das Herz, und Enter direkt nach dem Öffnen merkte den Anbieter (Arch-Review Etappe 1, K3).
+        */}
+        <div className="provider-head">
+          <h2 lang="de" ref={markAutofocus} tabIndex={-1}>
+            {provider.name}
+          </h2>
+          <HeartButton
+            name={provider.name}
+            saved={saved}
+            onToggle={() => onToggleSaved({ id: provider.id, name: provider.name })}
+            inline
+          />
+        </div>
         {categories.length > 0 && (
           <p className="provider-cats">{categories.map((c) => CATEGORY_LABELS[c]).join(" · ")}</p>
         )}

@@ -1,12 +1,10 @@
 /**
  * Was in der URL steht: Filter, Ansicht, das offene Anbieter-Sheet und das offene Angebot. Links werden geteilt –
- * Geburtsdatum, Merkliste und Darstellung gehören deshalb nie hierher (docs/architecture.md).
+ * Geburtsdatum, Merkliste, gemerkte Anbieter (Plan 0025, E1) und Darstellung gehören deshalb nie hierher
+ * (docs/architecture.md).
  */
 import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts";
-import { KEBAB_ID_PATTERN, OFFER_ID_PATTERN } from "./ids.ts";
-
-/** Längste echte Anbieter-ID: 47 Zeichen (Plan 0010, E2). Mehr ist kein Link aus der App. */
-const MAX_PROVIDER_ID = 80;
+import { isProviderId, OFFER_ID_PATTERN } from "./ids.ts";
 
 /**
  * „karte“ ist die Kartenansicht von „Entdecken“ (Plan 0005, E5), kein eigener Tab in der Leiste. „anbieter“ ist der
@@ -34,7 +32,7 @@ export function parseRoute(search: string): Route {
   const tab = TABS.find((t) => t === p.get("ansicht")) ?? "entdecken";
   const offerId = p.get("angebot") ?? "";
   const providerId = p.get("anbieter") ?? "";
-  const validProvider = providerId.length <= MAX_PROVIDER_ID && KEBAB_ID_PATTERN.test(providerId);
+  const validProvider = isProviderId(providerId);
   return {
     tab,
     ...(OFFER_ID_PATTERN.test(offerId) ? { offerId } : {}),

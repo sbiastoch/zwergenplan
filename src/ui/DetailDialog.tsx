@@ -84,7 +84,7 @@ export function DetailContent({
         <button type="button" className="iconbtn" onClick={onClose} aria-label="Zurück">
           <Icon name="back" />
         </button>
-        <HeartButton offer={offer} saved={saved} onToggle={onToggleSave} inline />
+        <HeartButton name={offer.title} saved={saved} onToggle={() => onToggleSave(offer)} inline />
       </div>
       <div className="dscroll">
         <div className="detail-col">

@@ -1,6 +1,6 @@
 # Plan 0025 – Merkliste als Planungszentrale: Anbieter merken, Karte, Kalender, Filter
 
-Status: freigegeben (Review eingearbeitet, Nutzerentscheide getroffen)
+Status: in Umsetzung (Etappe 1 umgesetzt auf Branch `plan-0025-e1`, siehe „Ergebnis Etappe 1“; Etappen 2–4 offen)
 Datum: 2026-10-08
 Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
 Abhängigkeiten: **alle erfüllt**, seit `main` `d5fab1b` (Plan 0022–0024 umgesetzt; geprüft am 2026-10-08, Abschnitt „Abgleich mit `main`“). Der Plan ist gegen diesen Stand geschrieben.
@@ -877,6 +877,38 @@ Unabhängiger `plan-reviewer`. Alle Befunde sind übernommen.
 
 Abgelehnt wurde nichts.
 
+## Ergebnis Etappe 1 (2026-10-08, Branch `plan-0025-e1` auf `4054342`)
+
+Umgesetzt nach E1–E3 und E5a (nur Liste), test-first:
+- Domäne: `MAX_PROVIDER_ID` in `ids.ts`; `SavedProvider`, `cleanSavedProviders`, `toggleProvider`, `SavedProviderRow`, `savedProviderRows` in `saved.ts`.
+- Speicher: `loadSavedProviders`/`saveSavedProviders` (Rohform, Schlüssel `zwergenplan.anbieter-merkliste`) in `preferences.ts`; `useSavedProviders` bereinigt mit `cleanSavedProviders` (eigener Unit-Test in `use-app-state.test.ts`).
+- UI: Herz im Kopf des Anbieter-Sheets (`.provider-head`), Abschnitt „Gemerkte Anbieter“ unter den Angeboten, Statuszeile der Merkliste, Hinweis „nur Anbieter“, Texte `savedStatusParts`/`savedProviderLine` in `format.ts`.
+- E2E: Test 9 (Anbieter, Fokus, nur Anbieter, ungültiger Speicher, Privatsphäre) in `e2e/saved.spec.ts`; Mobile-UX-Zustände `anbieter-sheet-gemerkt`, `merkliste-nur-anbieter`.
+- Doku: Privatsphäre in `docs/architecture.md`, `docs/ideas.md`, Vermerk in Plan 0010, Delta in ADR 0012.
+
+Abweichungen und Entscheidungen bei der Umsetzung:
+- **Schritt 7** (`PW_PORT=4273 pnpm check`) ist seit Plan 0027 veraltet. Es gilt CLAUDE.md: `pnpm verify` und gezielte Specs mit `pnpm e2e:local`. Für die übrigen Etappen gilt dasselbe.
+- **`savedStatusParts`** steht schon in Etappe 1, mit der vollen Signatur `(shown, total, providers)` aus Test 7, denn Schritt 4 braucht die Statuszeile mit Anbieterzahl. Etappe 4 nutzt sie nur noch.
+- **Nur Anbieter gemerkt:** Die Statuszeile lautet „**0** gemerkt · **1** Anbieter“ (E3-Formel, E5a nennt keine eigene).
+- **Fokus beim Entfernen des letzten Anbieters ohne gemerktes Angebot:** Danach gibt es keine Statuszeile mehr (Leerzustand, E5a). Der Fokus geht dann auf den Seitentitel „Meine Merkliste“ (`tabIndex={-1}`).
+- **`HeartButton`** (`OfferCard.tsx`) ist allgemein (`name`, `onToggle()`): ein Herz für Kachel, Detail, Anbieter-Sheet und Anbieterzeile (E2, „ein Muster für alles Merkbare“).
+- **Anbieterzeile:** Das Herz sitzt wie auf der Kachel absolut in der Zeile (rechts, senkrecht mittig), der Zeilenknopf hält ihm rechts Platz frei. Die Stile stehen in `anbieter.css` (Start-CSS, nutzt `.place`/`.place.idle`).
+- **`docs/ideas.md`:** In Etappe 1 entfällt „Anbieter merken“, dazu kommen die drei Anbieter-Ideen aus E13 (N1, Herz in der Anbieterliste, Wochen-Nachricht). Die übrigen Einträge aus E13 folgen mit Etappe 4.
+
+Schritt 0: Inventar `grep -rni kalender src e2e scripts docs README.md` ergibt 686 Treffer (relevant ab Etappe 3). `README.md` zählt keine Tabs auf. Fixture-Zahlen für Test 9 bestätigt: Familientreff hat 3 kommende Angebote, der nächste Termin ist Mi 7.10.; das Elterncafé ist um 12 Uhr vorbei.
+
+Start-JS (`pnpm size`, gzip): 94,415 → 95,131 kB (+0,716 kB, Tabelle in ADR 0012). Das liegt über dem Anteil, den die Schätzung in E11 (+1,0 bis +1,5 kB für alle Etappen) für eine Etappe erwarten ließ. Bis zum Entscheidungspunkt (+2,5 kB) bleiben 1,78 kB für die Etappen 2–4.
+
+Arch-Review (`arch-reviewer`, 2026-10-08): kein Blocker. M1 (Start-JS messen und in ADR 0012 eintragen) ist erledigt. Von den kleinen Befunden sind eingearbeitet:
+- K1: Eine unbekannte ID schließt das Sheet über `closeProvider` statt `replace`, ohne doppelten History-Eintrag; E2E dazu.
+- K2: E2E belegt, dass das Herz im Sheet keinen Request auslöst.
+- K3: Der Name im Sheet bekommt den ersten Fokus (`markAutofocus`), nicht das Herz; E2E dazu.
+- K4: `isProviderId` in `ids.ts` für Route und Speicher; ein Unit-Test hält fest, dass Zeile und Sheet gleich zählen (`directory.test.ts`).
+- K5: `cleanSavedProviders` verwirft leere Namen.
+- K6: Die Zeilen entstehen per `useMemo` in `App`.
+- K7: Halbsatz in `docs/architecture.md`.
+- K8: Der Mobile-UX-Zustand `merkliste` hat zusätzlich einen gemerkten Anbieter.
+
 ## Status
 
-Freigegeben (Review eingearbeitet, Nutzerentscheide vom 2026-10-08 getroffen). Plan 0022–0024 sind auf `main` (`d5fab1b`), Etappe 1 kann beginnen.
+In Umsetzung: Etappe 1 umgesetzt (Branch `plan-0025-e1`), Etappen 2–4 offen. Plan 0022–0024 sind auf `main` (`d5fab1b`).

@@ -90,11 +90,19 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
   },
+  // mit einem gemerkten Anbieter (Plan 0025, E3): Statuszeile „2 gemerkt · 1 Anbieter“, Export und Abschnitt zusammen
   merkliste: async (page) => {
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
     await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
-    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.evaluate(() =>
+      localStorage.setItem(
+        "zwergenplan.anbieter-merkliste",
+        JSON.stringify([{ id: "familientreff-beispiel", name: "Familientreff Beispielhof (fiktiv)" }]),
+      ),
+    );
+    await page.goto("./?ansicht=merkliste");
     await expect(page.getByTestId("offer")).toHaveCount(2);
+    await expect(page.getByRole("status")).toHaveText("2 gemerkt · 1 Anbieter");
   },
   detail: async (page) => {
     await page.getByRole("heading", { level: 3, name: /PEKiP/ }).getByRole("button").click();
@@ -314,6 +322,31 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await openProviders(page);
     await providerRow(page, "Ev.-Luth. Kirchengemeinde").click();
     await expect(page.getByRole("dialog", { name: "Anbieter" }).getByTestId("offer")).toHaveCount(1);
+  },
+  // Plan 0025, E2: gedrücktes Herz im Kopf neben dem längsten Namen (111 Zeichen), Toast im Dialog
+  "anbieter-sheet-gemerkt": async (page) => {
+    await openProviders(page);
+    await providerRow(page, "Ev.-Luth. Kirchengemeinde").click();
+    const heart = page
+      .getByRole("dialog", { name: "Anbieter" })
+      .getByRole("button", { name: /^Ev\.-Luth\..* merken$/ });
+    await heart.click();
+    await expect(heart).toHaveAttribute("aria-pressed", "true");
+  },
+  // Plan 0025, E3/E5a: nur Anbieter gemerkt (Hinweis statt Export), der längste Name und einer ohne Termine (blass)
+  "merkliste-nur-anbieter": async (page) => {
+    await page.evaluate(() =>
+      localStorage.setItem(
+        "zwergenplan.anbieter-merkliste",
+        JSON.stringify([
+          { id: "gemeinde-beispiel", name: "Gemeinde (gemerkt)" },
+          { id: "turnverein-beispiel", name: "Turnverein Beispiel (fiktiv)" },
+        ]),
+      ),
+    );
+    await page.goto("./?ansicht=merkliste");
+    await expect(page.locator("ul.saved-providers > li")).toHaveCount(2);
+    await expect(page.getByText("Gerade keine Termine im Zwergenplan")).toBeVisible();
   },
   "anbieter-sheet-leer": async (page) => {
     await openProviders(page);

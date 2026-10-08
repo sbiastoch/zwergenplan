@@ -104,7 +104,7 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, context }: Of
           {unfit && <span className="fact warn">{ageRangeLabel(offer.age)}</span>}
         </div>
       </div>
-      <HeartButton offer={offer} saved={saved} onToggle={ctx.onToggleSave} />
+      <HeartButton name={offer.title} saved={saved} onToggle={() => ctx.onToggleSave(offer)} />
     </article>
   );
 }
@@ -118,15 +118,19 @@ export function DistPending() {
   );
 }
 
+/**
+ * Herz für alles Merkbare: Angebote (Kachel, Detail) und Anbieter (Sheet, Merkliste; Plan 0025, E2). Ein Muster:
+ * „{name} merken“ mit `aria-pressed`.
+ */
 export function HeartButton({
-  offer,
+  name,
   saved,
   onToggle,
   inline = false,
 }: {
-  offer: SiteOffer;
+  name: string;
   saved: boolean;
-  onToggle: (offer: SiteOffer) => void;
+  onToggle: () => void;
   inline?: boolean;
 }) {
   return (
@@ -134,8 +138,8 @@ export function HeartButton({
       type="button"
       className={inline ? "heart inline" : "heart"}
       aria-pressed={saved}
-      aria-label={`${offer.title} merken`}
-      onClick={() => onToggle(offer)}
+      aria-label={`${name} merken`}
+      onClick={onToggle}
     >
       <span className="hs">
         <Icon name="heart" size={20} />

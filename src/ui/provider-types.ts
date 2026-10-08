@@ -5,6 +5,7 @@
  */
 import type { ComponentType } from "react";
 import type { Reach } from "../domain/reach.ts";
+import type { SavedProvider } from "../domain/saved.ts";
 import type { ProviderDirectoryData, SiteOffer } from "../domain/site-data.ts";
 import type { AgeEscape } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
@@ -44,6 +45,10 @@ export interface ProviderSheetProps {
   visible: readonly SiteOffer[];
   /** Kacheln: merken, Detail über dem Sheet öffnen, unpassende markieren (E3, E4) */
   ctx: CardContext;
+  /** Anbieter gemerkt: Herz im Kopf gedrückt (Plan 0025, E2) */
+  saved: boolean;
+  /** Herz im Kopf: merkt bzw. entfernt den Anbieter, mit dem Namen als Schnappschuss (Plan 0025, E1, E2) */
+  onToggleSaved: (entry: SavedProvider) => void;
   onClose: () => void;
 }
 

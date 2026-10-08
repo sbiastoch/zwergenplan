@@ -1,6 +1,7 @@
 /*
  * Anbieterübersicht (Plan 0010, E7, E10): Suche, blasse Zeilen, Lade- und Fehlerkasten, Sheet-Kopf. Im Start-CSS,
- * damit Platzhalter und Fehler schon vor dem Chunk gestylt sind. Die Zeilen nutzen .places/.place (map.css).
+ * damit Platzhalter und Fehler schon vor dem Chunk gestylt sind. Die Zeilen nutzen .places/.place (map.css). Dazu der
+ * Abschnitt „Gemerkte Anbieter“ der Merkliste (Plan 0025, E3), der dieselben Zeilen nutzt.
  */
 
 @layer components {
@@ -83,6 +84,52 @@
   .provider-sheet h2 {
     font-size: 1.375rem;
     hyphens: auto;
+  }
+  /* Name links (bricht um), Herz oben rechts (Plan 0025, E2) */
+  .provider-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .provider-head h2 {
+    flex: 1;
+    min-width: 0;
+  }
+  .provider-head .heart {
+    flex: none;
+  }
+
+  /*
+   * Gemerkte Anbieter auf der Merkliste (Plan 0025, E3): Zeilen wie im Tab „Anbieter“, das Herz oben rechts in der
+   * Zeile wie auf der Kachel (`.heart` ist absolut); der Zeilenknopf hält ihm rechts Platz frei.
+   */
+  .saved-hint {
+    margin: 12px 0;
+    color: var(--muted);
+  }
+  .saved-providers-title {
+    font-weight: 800;
+    font-size: 1.375rem;
+    letter-spacing: -0.03em;
+    margin: 22px 0 8px;
+  }
+  .saved-providers {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .saved-providers li {
+    position: relative;
+  }
+  .saved-providers .place {
+    min-height: 64px;
+    padding-right: 62px;
+  }
+  .saved-providers .heart {
+    top: 50%;
+    margin-top: -22px;
   }
   .provider-cats {
     margin: 0;

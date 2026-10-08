@@ -1,19 +1,30 @@
-/** „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007). */
+/**
+ * „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007) und
+ * dem Abschnitt „Gemerkte Anbieter“ (Plan 0025, E3).
+ */
+import { useRef } from "react";
 import { nextSession } from "../domain/agenda.ts";
 import type { CollectionItem, IcsContext, IcsSource } from "../domain/ics-types.ts";
-import { collectionSessions } from "../domain/saved.ts";
+import { collectionSessions, type SavedProvider, type SavedProviderRow } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
-import { plural } from "./format.ts";
+import { plural, savedProviderLine, savedStatusParts } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { EmptyState } from "./ListView.tsx";
-import { type CardContext, OfferCard } from "./OfferCard.tsx";
+import { type CardContext, HeartButton, OfferCard } from "./OfferCard.tsx";
 
 interface SavedViewProps {
+  /** gemerkte Angebote mit kommendem Termin */
   offers: SiteOffer[];
+  /** gemerkte Anbieter als Zeilen (`savedProviderRows`), ungefiltert (Plan 0025, E3) */
+  providers: SavedProviderRow[];
   generatedAt: SiteData["generatedAt"];
   ctx: CardContext;
   onDiscover: () => void;
   onExported: (message: string) => void;
+  /** öffnet das Anbieter-Sheet (`anbieter=<id>`); erst das lädt Chunk und Katalog (Plan 0025, E3) */
+  onOpenProvider: (providerId: string) => void;
+  /** Herz in der Anbieterzeile: entfernt den Anbieter (Toast in der App) */
+  onToggleProvider: (entry: SavedProvider) => void;
 }
 
 /**
@@ -68,7 +79,11 @@ function download(ics: string) {
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
-export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: SavedViewProps) {
+export function SavedView(props: SavedViewProps) {
+  const { offers, providers, generatedAt, ctx, onDiscover, onExported, onOpenProvider, onToggleProvider } = props;
+  const title = useRef<HTMLHeadingElement>(null);
+  const status = useRef<HTMLParagraphElement>(null);
+  const providersTitle = useRef<HTMLHeadingElement>(null);
   const items = offers.map((offer) => ({ offer, sessions: collectionSessions(offer, ctx.now) }));
   const sessionCount = items.reduce((sum, i) => sum + i.sessions.length, 0);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
@@ -87,10 +102,28 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
     onExported(`Kalenderdatei mit ${plural(sessionCount, "Termin", "Terminen")} geladen`);
   };
 
+  /*
+   * Erst fokussieren, dann entfernen (Muster aus Plan 0021, E3): Die Zeile mit dem Herz verschwindet. Ziel ist die
+   * Überschrift des Abschnitts; geht der letzte Anbieter, die Statuszeile; ist danach gar nichts mehr gemerkt (kein
+   * Angebot, Leerzustand ohne Statuszeile), der Seitentitel.
+   */
+  const removeProvider = (entry: SavedProvider) => {
+    const target = providers.length > 1 ? providersTitle : offers.length > 0 ? status : title;
+    target.current?.focus();
+    onToggleProvider(entry);
+  };
+  const [count, offersWords, providerCount, providerWord] = savedStatusParts(
+    offers.length,
+    offers.length,
+    providers.length,
+  );
+
   return (
     <>
-      <h2 className="ptitle">Meine Merkliste</h2>
-      {offers.length === 0 ? (
+      <h2 ref={title} className="ptitle" tabIndex={-1}>
+        Meine Merkliste
+      </h2>
+      {offers.length === 0 && providers.length === 0 ? (
         <EmptyState icon="heart" title="Noch nichts gemerkt">
           Tipp auf das Herz bei einem Angebot. Hier sammelst du deine Favoriten und holst sie mit einem Tipp in deinen
           Kalender.
@@ -101,18 +134,64 @@ export function SavedView({ offers, generatedAt, ctx, onDiscover, onExported }: 
         </EmptyState>
       ) : (
         <>
-          <button type="button" className="btn primary wide" onClick={() => void exportAll()}>
-            <Icon name="calendarPlus" />
-            Alle in den Kalender
-          </button>
-          <p className="small">
-            {offers.length} gemerkt · {plural(sessionCount, "Termin", "Termine")} in einer .ics-Datei · Kurse immer
-            komplett
-          </p>
-          {offers.map((offer) => {
-            const session = nextSession(offer, ctx.now);
-            return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
-          })}
+          <div className="status-row">
+            <p ref={status} className="status" role="status" tabIndex={-1}>
+              <span>
+                <b>{count}</b>
+                {offersWords}
+                {providerCount !== undefined && (
+                  <>
+                    <b>{providerCount}</b>
+                    {providerWord}
+                  </>
+                )}
+              </span>
+            </p>
+          </div>
+          {offers.length === 0 ? (
+            // nur Anbieter gemerkt (Plan 0025, E5a)
+            <p className="saved-hint">Noch keine Angebote gemerkt – tipp auf das Herz bei einem Angebot.</p>
+          ) : (
+            <>
+              <button type="button" className="btn primary wide" onClick={() => void exportAll()}>
+                <Icon name="calendarPlus" />
+                Alle in den Kalender
+              </button>
+              <p className="small">
+                {offers.length} gemerkt · {plural(sessionCount, "Termin", "Termine")} in einer .ics-Datei · Kurse immer
+                komplett
+              </p>
+              {offers.map((offer) => {
+                const session = nextSession(offer, ctx.now);
+                return session && <OfferCard key={offer.id} item={{ offer, session }} ctx={ctx} dated />;
+              })}
+            </>
+          )}
+          {providers.length > 0 && (
+            // unter den Angeboten: eine Adressliste zum Weitersuchen, keine Terminliste (E3)
+            <>
+              <h3 ref={providersTitle} className="saved-providers-title" tabIndex={-1}>
+                Gemerkte Anbieter
+              </h3>
+              <ul className="saved-providers">
+                {providers.map((row) => (
+                  <li key={row.id}>
+                    <button
+                      type="button"
+                      className={row.upcoming > 0 ? "place" : "place idle"}
+                      onClick={() => onOpenProvider(row.id)}
+                    >
+                      <b className="provider-name" lang="de">
+                        {row.name}
+                      </b>
+                      <span>{savedProviderLine(row)}</span>
+                    </button>
+                    <HeartButton name={row.name} saved onToggle={() => removeProvider(row)} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </>
       )}
     </>

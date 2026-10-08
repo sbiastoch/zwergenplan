@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { loadOriginDistrict, loadOriginPoint, saveOrigin } from "./preferences.ts";
+import {
+  loadOriginDistrict,
+  loadOriginPoint,
+  loadSavedProviders,
+  saveOrigin,
+  saveSavedProviders,
+} from "./preferences.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
 const POINT_KEY = "zwergenplan.startpunkt";
@@ -133,5 +139,66 @@ describe("Startpunkt-Punkt (Plan 0016, E1)", () => {
     expect(loadOriginPoint()).toBeUndefined();
     expect(() => saveOrigin({ source: "standort", lat: 49.452, lon: 11.077 })).not.toThrow();
     expect(() => saveOrigin(undefined)).not.toThrow();
+  });
+});
+
+describe("Gemerkte Anbieter (Plan 0025, E1): nur die Form, ID-Regeln prüft cleanSavedProviders", () => {
+  const PROVIDERS_KEY = "zwergenplan.anbieter-merkliste";
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("speichert ein JSON-Array aus id und name unter zwergenplan.anbieter-merkliste", () => {
+    saveSavedProviders([{ id: "theater-beispiel", name: "Theater" }]);
+    expect([...storage.data]).toEqual([[PROVIDERS_KEY, '[{"id":"theater-beispiel","name":"Theater"}]']]);
+    expect(loadSavedProviders()).toEqual([{ id: "theater-beispiel", name: "Theater" }]);
+  });
+
+  it("kaputtes JSON, kein Eintrag und kein Array ergeben []", () => {
+    expect(loadSavedProviders()).toEqual([]);
+    for (const raw of ["[{", "kein json", '{"id":"a","name":"A"}', "null", "0", '"a"']) {
+      storage.data.set(PROVIDERS_KEY, raw);
+      expect(loadSavedProviders(), raw).toEqual([]);
+    }
+  });
+
+  it("Einträge mit falschen Typen fallen weg, Zusatzfelder auch", () => {
+    const raw = [
+      { id: "a", name: "A", extra: 1 },
+      { id: 2, name: "B" },
+      { id: "c" },
+      "d",
+      null,
+      { id: "e", name: "E" },
+    ];
+    storage.data.set(PROVIDERS_KEY, JSON.stringify(raw));
+    expect(loadSavedProviders()).toEqual([
+      { id: "a", name: "A" },
+      { id: "e", name: "E" },
+    ]);
+  });
+
+  it("speichert nur id und name; eine leere Liste entfernt den Schlüssel", () => {
+    const withExtra = { id: "a", name: "A", secret: "x" };
+    saveSavedProviders([withExtra]);
+    expect(storage.data.get(PROVIDERS_KEY)).toBe('[{"id":"a","name":"A"}]');
+    saveSavedProviders([]);
+    expect(storage.data.has(PROVIDERS_KEY)).toBe(false);
+  });
+
+  it("übersteht einen gesperrten Speicher (privater Modus)", () => {
+    const fail = () => {
+      throw new Error("SecurityError");
+    };
+    vi.stubGlobal("localStorage", { getItem: fail, setItem: fail, removeItem: fail });
+    expect(loadSavedProviders()).toEqual([]);
+    expect(() => saveSavedProviders([{ id: "a", name: "A" }])).not.toThrow();
   });
 });

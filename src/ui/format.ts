@@ -476,6 +476,25 @@ export function providerStatusParts(providers: number, offers: number): [number,
   return [providers, " Anbieter mit ", offers, offers === 1 ? " Angebot" : " Angeboten"];
 }
 
+/**
+ * Statuszeile der Merkliste (Plan 0025, E3): „5 gemerkt“, mit Filter „2 von 5 gemerkt“, mit gemerkten Anbietern
+ * „… · 2 Anbieter“. Die Zahlen getrennt, damit sie fett stehen.
+ */
+export function savedStatusParts(
+  shown: number,
+  total: number,
+  providers: number,
+): [number, string] | [number, string, number, string] {
+  const offers = shown === total ? " gemerkt" : ` von ${total} gemerkt`;
+  return providers > 0 ? [shown, `${offers} · `, providers, " Anbieter"] : [shown, offers];
+}
+
+/** Zeile eines gemerkten Anbieters (Plan 0025, E3): „3 kommende Angebote · nächster Mi 7.10.“ */
+export function savedProviderLine({ upcoming, next }: { upcoming: number; next?: Session }): string {
+  if (upcoming === 0 || !next) return "Gerade keine Termine im Zwergenplan";
+  return `${plural(upcoming, "kommendes Angebot", "kommende Angebote")} · nächster ${shortDate(sessionDay(next))}`;
+}
+
 const LOAD_ERRORS: Record<LoadFailure, string> = {
   // kein automatisches Neuladen, der Text verspricht also keins (Plan-Review 0008, m1)
   offline: "Du bist gerade offline. Sobald das Netz wieder da ist, tippe auf ‚Nochmal versuchen‘.",

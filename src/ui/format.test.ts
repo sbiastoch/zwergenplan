@@ -31,6 +31,8 @@ import {
   reachNote,
   reachShort,
   registrationNote,
+  savedProviderLine,
+  savedStatusParts,
   shortDate,
   standDate,
   timeRange,
@@ -662,5 +664,32 @@ describe("Altersfilter (Plan 0021, E2/E3)", () => {
   it("Leerzustand nennt das Alter ohne doppelten Punkt (Browser-Review live)", () => {
     expect(ageEmptyText("3 J.", false)).toBe("Nichts davon passt zu 3\u00a0J.");
     expect(ageEmptyText("7 Mon.", true)).toBe("Mit diesen Filtern passt nichts zu 7\u00a0Mon.");
+  });
+});
+
+describe("Merkliste mit gemerkten Anbietern (Plan 0025, E3)", () => {
+  const wednesday = { start: "2026-10-07T10:00:00+02:00", end: "2026-10-07T11:30:00+02:00" };
+
+  it("Anbieterzeile: kommende Angebote und n\u00e4chster Termin, sonst \u201ekeine Termine\u201c", () => {
+    expect(savedProviderLine({ upcoming: 3, next: wednesday })).toBe(
+      "3 kommende Angebote \u00b7 n\u00e4chster Mi 7.10.",
+    );
+    expect(savedProviderLine({ upcoming: 1, next: wednesday })).toBe(
+      "1 kommendes Angebot \u00b7 n\u00e4chster Mi 7.10.",
+    );
+    expect(savedProviderLine({ upcoming: 0 })).toBe("Gerade keine Termine im Zwergenplan");
+  });
+
+  it("Anbieterzeile nimmt den Berliner Tag, auch kurz nach Mitternacht (Tests laufen in Los Angeles)", () => {
+    const night = { start: "2026-10-08T00:30:00+02:00", end: "2026-10-08T01:00:00+02:00" };
+    expect(savedProviderLine({ upcoming: 2, next: night })).toBe("2 kommende Angebote \u00b7 n\u00e4chster Do 8.10.");
+  });
+
+  it("Statuszeile: Zahlen getrennt, damit sie fett stehen; Anbieter nur, wenn welche gemerkt sind", () => {
+    expect(savedStatusParts(5, 5, 0)).toEqual([5, " gemerkt"]);
+    expect(savedStatusParts(5, 5, 2)).toEqual([5, " gemerkt \u00b7 ", 2, " Anbieter"]);
+    expect(savedStatusParts(2, 5, 2).join("")).toBe("2 von 5 gemerkt \u00b7 2 Anbieter");
+    expect(savedStatusParts(1, 1, 1).join("")).toBe("1 gemerkt \u00b7 1 Anbieter");
+    expect(savedStatusParts(0, 0, 1).join("")).toBe("0 gemerkt \u00b7 1 Anbieter");
   });
 });

@@ -1,5 +1,5 @@
 /**
- * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, Darstellung,
+ * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, gemerkte Anbieter, Darstellung,
  * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017). Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
@@ -7,6 +7,7 @@
 const KEYS = {
   birthDate: "zwergenplan.geburtsdatum",
   saved: "zwergenplan.merkliste",
+  savedProviders: "zwergenplan.anbieter-merkliste",
   theme: "zwergenplan.darstellung",
   originDistrict: "zwergenplan.entfernung-ab",
   originPoint: "zwergenplan.startpunkt",
@@ -50,6 +51,35 @@ export function loadSaved(): string[] {
 
 export function saveSaved(ids: readonly string[]): void {
   write(KEYS.saved, ids.length > 0 ? JSON.stringify(ids) : undefined);
+}
+
+/** Gemerkter Anbieter in Rohform: Name als Schnappschuss beim Merken (Plan 0025, E1) */
+interface StoredProvider {
+  id: string;
+  name: string;
+}
+
+/**
+ * Gemerkte Anbieter (Plan 0025, E1), in der Reihenfolge des Merkens. Geprüft wird nur die Form (Array, je Eintrag `id`
+ * und `name` als String); ID-Regeln und Dubletten prüft `cleanSavedProviders` in der Domäne (ADR 0010).
+ */
+export function loadSavedProviders(): StoredProvider[] {
+  try {
+    const parsed: unknown = JSON.parse(read(KEYS.savedProviders) ?? "[]");
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((entry) => {
+      // `Object(…)` macht aus `null`, Zahlen usw. ein Objekt ohne diese Felder (wie `loadOriginPoint`)
+      const { id, name } = Object(entry);
+      return typeof id === "string" && typeof name === "string" ? [{ id, name }] : [];
+    });
+  } catch {
+    return [];
+  }
+}
+
+/** Baut jeden Eintrag neu (nur `id`, `name`); eine leere Liste entfernt den Schlüssel. */
+export function saveSavedProviders(list: readonly StoredProvider[]): void {
+  write(KEYS.savedProviders, list.length > 0 ? JSON.stringify(list.map(({ id, name }) => ({ id, name }))) : undefined);
 }
 
 export type ThemeChoice = "hell" | "dunkel" | "auto";

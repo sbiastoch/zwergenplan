@@ -7,6 +7,7 @@ import { activeFilterCount, EMPTY_FILTER, type FilterState } from "../domain/fil
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
+import { type SavedProvider, savedProviderRows } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { leadCategory } from "../domain/topics.ts";
@@ -32,7 +33,16 @@ import { ProviderPanel } from "./ProviderPanel.tsx";
 import { preloadExportWhenIdle, SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { Toast } from "./Toast.tsx";
-import { useBirthDate, useNow, useOrigin, useRoute, useSaved, useTheme, useToast } from "./use-app-state.ts";
+import {
+  useBirthDate,
+  useNow,
+  useOrigin,
+  useRoute,
+  useSaved,
+  useSavedProviders,
+  useTheme,
+  useToast,
+} from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
@@ -46,6 +56,8 @@ export function App() {
   const { route, replace, openDetail, closeDetail, openProvider, closeProvider } = useRoute();
   const [birthDate, setBirthDateStored] = useBirthDate();
   const [savedIds, toggleSaved] = useSaved();
+  // gemerkte Anbieter: nur im localStorage, nie in URL oder Request (Plan 0025, E1)
+  const [savedProviders, toggleSavedProvider] = useSavedProviders();
   const theme = useTheme();
   const [toast, say] = useToast();
   // erneuert sich im offenen Tab, höchstens einmal pro Minute (Plan 0007, E2)
@@ -120,6 +132,8 @@ export function App() {
   );
   const views = useOfferViews({ offers, route, birthDate, savedIds, now, reach: transit.reach });
   const { visible, unfitCount, ageOnly, page, calendar, saved, detailOffer } = views;
+  // Zeilen „Gemerkte Anbieter“ (Plan 0025, E3): ungefiltert, aus site.json und dem Namens-Schnappschuss
+  const providerRows = useMemo(() => savedProviderRows(savedProviders, offers, now), [savedProviders, offers, now]);
 
   // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
   useEffect(() => {
@@ -139,12 +153,6 @@ export function App() {
     if (load.kind === "ready" && route.offerId && !detailOffer) closeDetail();
   }, [load.kind, route.offerId, detailOffer, closeDetail]);
 
-  // Unbekannte Anbieter-ID (Tippfehler, aus dem Katalog verschwunden): Das Sheet meldet es nach dem Laden (E3).
-  const dropProvider = useCallback(() => {
-    const { providerId: _unknown, ...rest } = route;
-    replace(rest);
-  }, [route, replace]);
-
   const setFilter = (filter: FilterState) => {
     replace({ ...route, filter });
     views.resetPage();
@@ -162,6 +170,16 @@ export function App() {
     (offer: SiteOffer) =>
       say(toggleSaved(offer.id) ? "Gemerkt – liegt jetzt auf deiner Merkliste" : "Nicht mehr gemerkt"),
     [say, toggleSaved],
+  );
+  // Herz im Anbieter-Sheet und in der Zeile der Merkliste (Plan 0025, E2, E3)
+  const onToggleProvider = useCallback(
+    (entry: SavedProvider) =>
+      say(
+        toggleSavedProvider(entry)
+          ? "Anbieter gemerkt – liegt jetzt auf deiner Merkliste"
+          : "Anbieter nicht mehr gemerkt",
+      ),
+    [say, toggleSavedProvider],
   );
 
   const ctx: CardContext = {
@@ -411,10 +429,13 @@ export function App() {
         {load.kind === "ready" && route.tab === "merkliste" && (
           <SavedView
             offers={saved}
+            providers={providerRows}
             generatedAt={load.data.generatedAt}
             ctx={ctx}
             onDiscover={() => onTab("entdecken")}
             onExported={say}
+            onOpenProvider={openProvider}
+            onToggleProvider={onToggleProvider}
           />
         )}
       </main>
@@ -431,7 +452,12 @@ export function App() {
         providerId={sheetProviderId}
         openProvider={openProvider}
         closeProvider={closeProvider}
-        onUnknownProvider={dropProvider}
+        // Unbekannte Anbieter-ID (Tippfehler, aus dem Katalog verschwunden; Plan 0010, E3): `anbieter=` entfernen wie
+        // „Schließen“. Aus der App geöffnet (gemerkter Anbieter, Plan 0025, E3) geht das zurück, ohne doppelten
+        // History-Eintrag; beim Deep-Link ersetzt es die URL.
+        onUnknownProvider={closeProvider}
+        isProviderSaved={(id) => savedProviders.some((p) => p.id === id)}
+        onToggleProvider={onToggleProvider}
         generatedAt={load.kind === "ready" ? load.data.generatedAt : undefined}
         offers={offers}
         visible={visible}

@@ -5,6 +5,7 @@
 import type { RefObject } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import type { FilterState } from "../domain/filter.ts";
+import type { SavedProvider } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
@@ -31,6 +32,9 @@ interface OverlaysProps {
   closeProvider: () => void;
   /** ID weder im Katalog noch in den Angeboten: `anbieter=` entfernen */
   onUnknownProvider: () => void;
+  /** gemerkte Anbieter: Herz im Kopf des Anbieter-Sheets, Toast im Dialog (Plan 0025, E2) */
+  isProviderSaved: (providerId: string) => boolean;
+  onToggleProvider: (entry: SavedProvider) => void;
   /** Datenstand von site.json; `undefined`, solange sie lädt */
   generatedAt: string | undefined;
   /** alle Angebote und die sichtbaren (Filter, Alter) für das Anbieter-Sheet */
@@ -94,6 +98,8 @@ export function Overlays(props: OverlaysProps) {
             offers={props.offers}
             visible={props.visible}
             ctx={ctx}
+            saved={props.isProviderSaved(providerId)}
+            onToggleSaved={props.onToggleProvider}
             onUnknown={props.onUnknownProvider}
             onClose={closeProvider}
           />

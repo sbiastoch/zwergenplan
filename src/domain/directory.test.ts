@@ -10,6 +10,7 @@ import {
 } from "./directory.ts";
 import { applyFilters, EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { airlineReach, type Origin, type Reach } from "./reach.ts";
+import { savedProviderRows } from "./saved.ts";
 import { type SiteOffer, type SiteProvider, toProviderDirectory } from "./site-data.ts";
 import { FIXTURE_NOW, fixtureSiteOffers, loadFixtures } from "./test-fixtures.ts";
 
@@ -311,4 +312,20 @@ describe("matchesProviderQuery", () => {
     expect(matchesProviderQuery("Bibliothek", "   ")).toBe(true);
     expect(matchesProviderQuery("Bibliothek", "xyz")).toBe(false);
   });
+});
+
+// Die Merkliste zählt im Start (`saved.ts`), das Sheet im Lazy-Chunk (`directory.ts`): „3 kommende Angebote“ in der
+// Zeile und „Kommende Angebote (3)“ im Sheet dürfen nicht auseinanderlaufen (Plan 0025, Arch-Review Etappe 1, K4).
+describe("gemerkte Anbieter zählen wie das Sheet", () => {
+  const offers = fixtureSiteOffers();
+  for (const now of [FIXTURE_NOW, new Date("2026-11-05T12:00:00+01:00")]) {
+    it(`gleiche Zahl kommender Angebote je Anbieter (${now.toISOString()})`, () => {
+      const rows = savedProviderRows(
+        catalog.map(({ id, name }) => ({ id, name })),
+        offers,
+        now,
+      );
+      for (const row of rows) expect(row.upcoming, row.id).toBe(providerOffers(offers, row.id, now).length);
+    });
+  }
 });

@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type OriginApi, type RouteApi, useOrigin, useRoute } from "./use-app-state.ts";
+import { type OriginApi, type RouteApi, useOrigin, useRoute, useSavedProviders } from "./use-app-state.ts";
 
 const preloadProviderUi = vi.hoisted(() => vi.fn());
 vi.mock("./ProviderPanel.tsx", () => ({ preloadProviderUi }));
@@ -340,5 +340,62 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
       renderRoute();
       expect(preloadProviderUi, search).not.toHaveBeenCalled();
     }
+  });
+});
+
+describe("useSavedProviders (Plan 0025, E1)", () => {
+  const PROVIDERS_KEY = "zwergenplan.anbieter-merkliste";
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  /** wie renderOrigin: `step` darf beim ersten Rendern umschalten, der letzte Stand zählt */
+  function renderSavedProviders(step?: (toggle: ReturnType<typeof useSavedProviders>[1]) => void) {
+    let result: ReturnType<typeof useSavedProviders> | undefined;
+    let done = false;
+    function Probe() {
+      result = useSavedProviders();
+      if (step && !done) {
+        done = true;
+        step(result[1]);
+      }
+      return null;
+    }
+    renderToStaticMarkup(createElement(Probe));
+    if (!result) throw new Error("Hook nicht gerendert");
+    return result;
+  }
+
+  it("bereinigt den Speicher beim Start mit der Domänenregel: ungültige IDs und Dubletten fallen weg", () => {
+    const raw = [
+      { id: "theater-beispiel", name: "Theater" },
+      { id: "Theater Beispiel", name: "ungültig" },
+      { id: "theater-beispiel", name: "Dublette" },
+    ];
+    storage.data.set(PROVIDERS_KEY, JSON.stringify(raw));
+    expect(renderSavedProviders()[0]).toEqual([{ id: "theater-beispiel", name: "Theater" }]);
+  });
+
+  it("toggle merkt, speichert und meldet „gemerkt“; ein zweiter Tipp entfernt und leert den Speicher", () => {
+    const answers: boolean[] = [];
+    const [list] = renderSavedProviders((toggle) => {
+      answers.push(toggle({ id: "theater-beispiel", name: "Theater" }));
+    });
+    expect(answers).toEqual([true]);
+    expect(list).toEqual([{ id: "theater-beispiel", name: "Theater" }]);
+    expect(storage.data.get(PROVIDERS_KEY)).toBe('[{"id":"theater-beispiel","name":"Theater"}]');
+
+    renderSavedProviders((toggle) => {
+      answers.push(toggle({ id: "theater-beispiel", name: "Theater" }));
+    });
+    expect(answers).toEqual([true, false]);
+    expect(storage.data.has(PROVIDERS_KEY)).toBe(false);
   });
 });
