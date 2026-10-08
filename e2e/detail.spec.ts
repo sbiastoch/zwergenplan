@@ -184,9 +184,13 @@ test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
     id: "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
     title: "Krabbelreime & Fingerspiele",
   };
+  const BEWEGUNG = {
+    id: "gemeinde-beispiel--eltern-kind-bewegungslandschaftsnachmittag-fuer--gemeinde-beispiel-gemeindehaus",
+    title: /^Eltern-Kind-Bewegungslandschaft/,
+  };
 
   /** Geburtsdatum vor dem Laden speichern, Detail öffnen; zählt Requests auf `ics/` (ADR 0018: keiner mit Blob). */
-  async function openAged(page: Page, offer: { id: string; title: string }, birthDate: string) {
+  async function openAged(page: Page, offer: { id: string; title: string | RegExp }, birthDate: string) {
     await page.addInitScript((born) => localStorage.setItem("zwergenplan.geburtsdatum", born), birthDate);
     await page.goto(`./?angebot=${offer.id}`);
     const dialog = page.getByRole("dialog", { name: offer.title });
@@ -249,6 +253,9 @@ test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
   test("zu jung bis 20.10.: 3 Termine ab 21.10.", async ({ page }) => {
     const { dialog, all, icsRequests } = await openAged(page, TREFF, "2026-04-20");
     await expect(ageLine(dialog)).toHaveText("Passt: am Mi 21.10. 6 Monate alt · passt ab 21.10.");
+    // Terminliste und „Nur …“ am ersten passenden Termin wie die Alters-Kachel (Browser-Review Plan 0028)
+    await expect(dialog.locator(".dates li.sel")).toHaveText(/^Mittwoch, 21\. Oktober/);
+    await expect(dialog.getByRole("link", { name: "Nur Mi 21.10." })).toBeVisible();
     const [download] = await Promise.all([page.waitForEvent("download"), all.click()]);
     const ics = await text(download);
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(3);
@@ -260,6 +267,21 @@ test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
       "Kalenderdatei mit 3 Terminen geladen – ab 21.10., vorher passt es noch nicht zum Alter",
     );
     expect(icsRequests).toEqual([]);
+  });
+
+  test("zu jung bis 2.11.: Detail zählt 2 passende von 4 Terminen, „Nur“ lädt den 3.11. (Browser-Review 0028)", async ({
+    page,
+  }) => {
+    // 24–36 Monate, mit Anmeldung, dienstags 20.10.–10.11.; das Kind wird am 28.10. 24 Monate alt
+    const { dialog } = await openAged(page, BEWEGUNG, "2024-10-28");
+    await expect(ageLine(dialog)).toHaveText("Passt: am Di 3.11. 24 Monate alt · passt ab 3.11.");
+    await expect(dialog.getByText("2 passende von 4 Terminen")).toBeVisible();
+    await expect(dialog.locator(".dates li.sel")).toHaveText(/^Dienstag, 3\. November/);
+    const one = dialog.getByRole("link", { name: "Nur Di 3.11." });
+    const res = await page.request.get(new URL((await one.getAttribute("href")) ?? "", page.url()).toString());
+    const ics = await res.text();
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(1);
+    expect(ics).toContain("DTSTART:20261103T140000Z");
   });
 
   test("passt über die ganze Reihe: trotzdem aus dem Browser, ohne Zusatz (Review 3, W2)", async ({ page }) => {
@@ -281,6 +303,10 @@ test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
     const url = page.url();
     await all.click();
     await expect(dialog.locator(".toast")).toHaveText("Keiner der kommenden Termine passt zum Alter.");
+    await expect(dialog.locator(".toast")).toHaveClass(/\bhint\b/);
+    // nichts passt: Terminliste und „Nur …“ bleiben am nächsten Termin
+    await expect(dialog.locator(".dates li.sel")).toHaveText(/^Mittwoch, 7\. Oktober/);
+    await expect(dialog.getByRole("link", { name: "Nur Mi 7.10." })).toBeVisible();
     expect(downloaded).toBe(false);
     expect(icsRequests).toEqual([]);
     expect(page.url()).toBe(url);

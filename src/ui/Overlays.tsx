@@ -13,14 +13,15 @@ import { KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { ProviderSheetLoader } from "./ProviderPanel.tsx";
 import { type AgeFilter, FilterSheet, type LimitActionFor, ManualLinkSheet } from "./Sheets.tsx";
-import { type OriginApi, useShare } from "./use-app-state.ts";
+import type { ToastMessage } from "./Toast.tsx";
+import { type OriginApi, type Say, useShare } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
 
 /** „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl) */
 export type SheetKind = "filter" | "kid" | "origin" | null;
 
 interface OverlaysProps {
-  toast: string;
+  toast: ToastMessage;
   sheet: SheetKind;
   setSheet: (sheet: SheetKind) => void;
   detailOffer: SiteOffer | undefined;
@@ -43,7 +44,7 @@ interface OverlaysProps {
   /** Merken, Wegzeit und „jetzt“ wie auf den Kacheln */
   ctx: CardContext;
   /** Toast; `ms` für lange Meldungen (Plan 0018, E4) */
-  say: (message: string, ms?: number) => void;
+  say: Say;
   filter: FilterState;
   setFilter: (filter: FilterState) => void;
   resultCount: number;

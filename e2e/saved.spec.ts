@@ -187,19 +187,27 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("nichts passt: kein Download, Toast", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff], "2026-08-01");
-    await expect(page.getByRole("status")).toHaveText("1 Angebot mit insgesamt 0 Terminen gemerkt");
+    // Die Statuszeile nennt das unpassende Angebot wie der Export-Toast (Browser-Review Plan 0028)
+    await expect(page.getByRole("status")).toHaveText(
+      "1 Angebot mit insgesamt 0 Terminen gemerkt – 1 Angebot passt nicht zum Alter",
+    );
     let downloaded = false;
     page.on("download", () => {
       downloaded = true;
     });
     await button.click();
-    await expect(page.locator(".toast")).toHaveText("Keins der gemerkten Angebote passt zum Alter.");
+    const toast = page.locator(".toast");
+    await expect(toast).toHaveText("Keins der gemerkten Angebote passt zum Alter.");
+    // Hinweis, kein Erfolg: Es wurde nichts geladen (Browser-Review Plan 0028)
+    await expect(toast).toHaveClass(/\bhint\b/);
     expect(downloaded).toBe(false);
   });
 
   test("ein Angebot passt nicht: nur die anderen in der Datei, Toast nennt es 6 s lang", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff, IDS.reime], "2026-08-01");
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 4 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText(
+      "2 Angebote mit insgesamt 4 Terminen gemerkt – 1 Angebot passt nicht zum Alter",
+    );
     // Hält die Timer an: Die Anzeigedauer des Toasts wird gezielt vorgespult.
     await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
@@ -209,6 +217,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     for (const uid of uids) expect(uid).toContain(IDS.reime);
     const toast = page.locator(".toast");
     await expect(toast).toHaveText("Kalenderdatei mit 4 Terminen geladen – 1 Angebot passt nicht zum Alter");
+    await expect(toast).not.toHaveClass(/\bhint\b/);
     await page.clock.runFor(5_500);
     await expect(toast, "nach 5,5 s noch sichtbar").toBeVisible();
     await page.clock.runFor(1_000);

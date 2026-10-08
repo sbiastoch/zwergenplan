@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { NO_TOAST, type ToastMessage } from "./Toast.tsx";
 import { LONG_TOAST_MS, type OriginApi, type RouteApi, useOrigin, useRoute, useToast } from "./use-app-state.ts";
 
 const preloadProviderUi = vi.hoisted(() => vi.fn());
@@ -385,7 +386,7 @@ describe("useToast (Plan 0018, E4)", () => {
   /** Ruft `say` beim ersten Rendern; liefert die gezeigte Meldung und die Dauer ihres Timers. */
   function sayOnce(...args: Parameters<ReturnType<typeof useToast>[1]>) {
     const timeout = vi.spyOn(globalThis, "setTimeout");
-    let shown = "";
+    let shown: ToastMessage = NO_TOAST;
     let done = false;
     function Probe() {
       const [message, say] = useToast();
@@ -402,16 +403,23 @@ describe("useToast (Plan 0018, E4)", () => {
 
   it("zeigt eine Meldung standardmäßig 2,8 s", () => {
     expect(sayOnce("Gemerkt – liegt jetzt auf deiner Merkliste")).toEqual({
-      shown: "Gemerkt – liegt jetzt auf deiner Merkliste",
+      shown: { text: "Gemerkt – liegt jetzt auf deiner Merkliste", tone: "ok" },
       delays: [2800],
     });
   });
 
   it("zeigt lange Meldungen so lange wie verlangt (6 s für Kürzung und „nichts passt“)", () => {
     expect(LONG_TOAST_MS).toBe(6000);
-    expect(sayOnce("Keiner der kommenden Termine passt zum Alter.", LONG_TOAST_MS)).toEqual({
-      shown: "Keiner der kommenden Termine passt zum Alter.",
+    expect(sayOnce("Keiner der kommenden Termine passt zum Alter.", LONG_TOAST_MS, "hint")).toEqual({
+      shown: { text: "Keiner der kommenden Termine passt zum Alter.", tone: "hint" },
       delays: [6000],
+    });
+  });
+
+  it("kennt neben der Erfolgsmeldung einen Hinweis ohne Häkchen (Browser-Review 0028)", () => {
+    expect(sayOnce("Export gerade nicht möglich", undefined, "hint")).toEqual({
+      shown: { text: "Export gerade nicht möglich", tone: "hint" },
+      delays: [2800],
     });
   });
 });

@@ -1,8 +1,8 @@
 /** Detail eines Angebots (Plan 0003, E13) – Inhalt des Vollbild-Dialogs. */
 import { type MouseEvent, useState } from "react";
 import { assetUrl } from "../data/site.ts";
-import { ageCheck } from "../domain/age.ts";
-import { referenceSession, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
+import { ageCheck, detailSession } from "../domain/age.ts";
+import { sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
 import { seriesIcsFileName, seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
 import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
@@ -31,7 +31,7 @@ import { Icon, Shape } from "./icons.tsx";
 import { download, type IcsExport, loadExport } from "./ics-export.ts";
 import { DistPending, HeartButton } from "./OfferCard.tsx";
 import { ReachLong } from "./ReachLong.tsx";
-import { LONG_TOAST_MS } from "./use-app-state.ts";
+import { LONG_TOAST_MS, type Say } from "./use-app-state.ts";
 import { WhereTile } from "./Ways.tsx";
 
 interface DetailProps {
@@ -60,7 +60,7 @@ interface DetailProps {
    */
   onProvider: (providerId: string) => void;
   /** Toast nach dem Tipp auf einen ICS-Knopf; `ms` für lange Meldungen (Plan 0018, E4) */
-  onIcs: (message: string, ms?: number) => void;
+  onIcs: Say;
 }
 
 export function DetailContent({
@@ -82,10 +82,11 @@ export function DetailContent({
 }: DetailProps) {
   const [allDates, setAllDates] = useState(false);
   const fromCalendar = day ? sessionOnDay(offer, day) : undefined;
-  const ref = referenceSession(offer, now, day);
+  // Ohne Kalendertag der erste passende Termin, wie in der Alters-Kachel (Browser-Review Plan 0028)
+  const ref = detailSession(offer, now, day, birthDate);
   const upcoming = upcomingSessions(offer, now);
   const shown = allDates ? upcoming : upcoming.slice(0, 4);
-  const when = whenLabels(offer, now);
+  const when = whenLabels(offer, now, birthDate);
   const check = birthDate ? ageCheck(offer, birthDate, now, fromCalendar) : undefined;
   const availability = availabilityLabel(offer);
   const regular = offer.format === "regelmaessig";
@@ -98,7 +99,7 @@ export function DetailContent({
     try {
       ics = await loadExport();
     } catch {
-      onIcs(EXPORT_UNAVAILABLE);
+      onIcs(EXPORT_UNAVAILABLE, undefined, "hint");
       return;
     }
     const item = { offer, sessions: selection.sessions, ctx: ics.icsContextFor(offer, stamp) };
@@ -121,12 +122,12 @@ export function DetailContent({
     if (plan.kind === "none") {
       // Chunk trotzdem anfordern: Sein Request soll nicht verraten, ob ein Termin zum Alter passt (ADR 0018)
       void loadExport().catch(() => {});
-      onIcs("Keiner der kommenden Termine passt zum Alter.", LONG_TOAST_MS);
+      onIcs("Keiner der kommenden Termine passt zum Alter.", LONG_TOAST_MS, "hint");
       return;
     }
     // Ohne Datenstand fehlt der ICS-Kontext. Das Detail öffnet nur mit geladenen Daten, der Typ belegt es aber nicht.
     if (generatedAt === undefined) {
-      onIcs(EXPORT_UNAVAILABLE);
+      onIcs(EXPORT_UNAVAILABLE, undefined, "hint");
       return;
     }
     // vor dem ersten `await`: Danach ist `currentTarget` null. Im Dialog, denn `body` ist dann inert (E2).

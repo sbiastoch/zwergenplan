@@ -11,6 +11,7 @@ import { Dialog } from "./Dialog.tsx";
 import { wayParts } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { LineChain } from "./ReachLong.tsx";
+import { NO_TOAST } from "./Toast.tsx";
 
 /** Attribute eines Routen-Links: neuer Tab bzw. die Maps-App, ohne Referrer (E3) */
 export function routeLink(address: string): { href: string; target: string; rel: string } {
@@ -55,7 +56,7 @@ export function WhereTile({
         {children}
         <RouteHint text={`${parts.rows.length} Wege & Route in Google Maps`} />
       </button>
-      <Dialog open={open} onClose={() => setOpen(false)} label={parts.title} className="sheet" toast="">
+      <Dialog open={open} onClose={() => setOpen(false)} label={parts.title} className="sheet" toast={NO_TOAST}>
         <div className="sheet-body">
           {/* biome-ignore lint/a11y/noNoninteractiveTabindex: Bei großer Schrift scrollt die Liste, ohne selbst ein Bedienelement zu enthalten; ohne Fokus erreicht die Tastatur sie nicht (axe scrollable-region-focusable, WCAG 2.1.1). */}
           <section className="sheet-scroll ways" tabIndex={0} aria-label={parts.title}>

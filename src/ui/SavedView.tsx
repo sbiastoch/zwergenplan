@@ -14,7 +14,7 @@ import { Icon } from "./icons.tsx";
 import { download, type IcsExport, loadExport } from "./ics-export.ts";
 import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
-import { LONG_TOAST_MS } from "./use-app-state.ts";
+import { LONG_TOAST_MS, type Say } from "./use-app-state.ts";
 
 /** Darstellungen der Merkliste: Routenwerte (Plan 0025, E4) */
 type SavedTab = "merkliste" | "merkliste-karte" | "merkliste-kalender";
@@ -45,7 +45,7 @@ interface SavedViewProps {
   ctx: CardContext;
   onDiscover: () => void;
   /** Toast nach dem Export; `ms` für lange Meldungen (Plan 0018, E4) */
-  onExported: (message: string, ms?: number) => void;
+  onExported: Say;
 }
 
 export function SavedView({
@@ -68,14 +68,14 @@ export function SavedView({
     if (count === 0) {
       // Chunk trotzdem anfordern: Sein Request soll nicht verraten, ob etwas zum Alter passt (ADR 0018)
       void loadExport().catch(() => {});
-      onExported("Keins der gemerkten Angebote passt zum Alter.", LONG_TOAST_MS);
+      onExported("Keins der gemerkten Angebote passt zum Alter.", LONG_TOAST_MS, "hint");
       return;
     }
     let ics: IcsExport;
     try {
       ics = await loadExport();
     } catch {
-      onExported(EXPORT_UNAVAILABLE);
+      onExported(EXPORT_UNAVAILABLE, undefined, "hint");
       return;
     }
     const withCtx = items.map((i) => ({ ...i, ctx: ics.icsContextFor(i.offer, generatedAt) }));
@@ -100,7 +100,14 @@ export function SavedView({
           <ViewToggle options={VIEW_OPTIONS} current={tab} onChange={onTab} legend="Darstellung der Merkliste" full />
           <div className="status-row">
             <p className="status" role="status" tabIndex={-1}>
-              <StatusText offers={offers} tab={tab} placeCount={placeCount} now={ctx.now} birthDate={birthDate} />
+              <StatusText
+                offers={offers}
+                tab={tab}
+                placeCount={placeCount}
+                now={ctx.now}
+                birthDate={birthDate}
+                missing={missing}
+              />
             </p>
             {tab === "merkliste" && (
               <button
@@ -134,17 +141,20 @@ function StatusText({
   placeCount,
   now,
   birthDate,
+  missing,
 }: {
   offers: readonly SiteOffer[];
   tab: SavedTab;
   placeCount: number;
   now: Date;
   birthDate: string | undefined;
+  /** gemerkte Angebote ohne passenden Termin (`collectionExport`), wie im Export-Toast genannt */
+  missing: number;
 }) {
   const [a, aWords, b, bWords] =
     tab === "merkliste-karte"
       ? savedMapStatusParts(offers.length, placeCount)
-      : savedStatusParts(offers.length, upcomingSessionCount(offers, now, birthDate));
+      : savedStatusParts(offers.length, upcomingSessionCount(offers, now, birthDate), missing);
   return (
     <span>
       <b>{a}</b>

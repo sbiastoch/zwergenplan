@@ -198,6 +198,18 @@ describe("Detail: Wann und Anmeldung", () => {
     expect(whenLabels(offen, FIXTURE_NOW).sub).toBe("Einzeln besuchbar");
   });
 
+  it("zählt mit Geburtsdatum die passenden von den kommenden Terminen (Browser-Review 0028)", () => {
+    const ab24 = offer({ ...OFFERS.woechentlich, age: { minMonths: 24, maxMonths: 36 } }); // 7.10.–4.11.
+    expect(whenLabels(ab24, FIXTURE_NOW, "2024-10-20").sub).toBe("3 passende von 5 Terminen");
+    expect(whenLabels(ab24, FIXTURE_NOW, "2024-11-04").sub).toBe("1 passender von 5 Terminen");
+    // alle oder keiner passt: wie ohne Geburtsdatum
+    expect(whenLabels(ab24, FIXTURE_NOW, "2024-01-01").sub).toBe("5 kommende Termine");
+    expect(whenLabels(ab24, FIXTURE_NOW, "2025-06-01").sub).toBe("5 kommende Termine");
+    expect(whenLabels(ab24, FIXTURE_NOW, undefined).sub).toBe("5 kommende Termine");
+    // Kurse bleiben unverändert (ADR 0007)
+    expect(whenLabels(OFFERS.kurs, FIXTURE_NOW, "2024-10-20").main).toBe("Kurs mit 8 Terminen");
+  });
+
   it("nennt die Uhrzeit, wenn alle kommenden Termine dieselbe haben (B1)", () => {
     const gemischt = offer({
       format: "regelmaessig",
@@ -561,6 +573,18 @@ describe("Statuszeile der Merkliste (Plan 0025, E3a)", () => {
     expect(savedStatusParts(5, 28)).toEqual([5, " Angebote mit insgesamt ", 28, " Terminen gemerkt"]);
     expect(savedStatusParts(1, 1).join("")).toBe("1 Angebot mit insgesamt 1 Termin gemerkt");
     expect(savedStatusParts(2, 13).join("")).toBe("2 Angebote mit insgesamt 13 Terminen gemerkt");
+  });
+
+  it("Liste: nennt Angebote ohne passenden Termin wie der Export-Toast (Browser-Review 0028)", () => {
+    expect(savedStatusParts(2, 13, 0).join("")).toBe("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    expect(savedStatusParts(1, 0, 1).join("")).toBe(
+      "1 Angebot mit insgesamt 0 Terminen gemerkt – 1 Angebot passt nicht zum Alter",
+    );
+    expect(savedStatusParts(3, 4, 2).join("")).toBe(
+      "3 Angebote mit insgesamt 4 Terminen gemerkt – 2 Angebote passen nicht zum Alter",
+    );
+    // gleicher Wortlaut wie im Toast
+    expect(collectionToast(4, 2).endsWith(" – 2 Angebote passen nicht zum Alter")).toBe(true);
   });
 
   it("Karte: Angebote und Orte", () => {
