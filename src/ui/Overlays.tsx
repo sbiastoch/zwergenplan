@@ -5,14 +5,15 @@
 import type { RefObject } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import type { FilterState } from "../domain/filter.ts";
+import { offerSharePath, providerSharePath } from "../domain/share.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
 import { KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { ProviderSheetLoader } from "./ProviderPanel.tsx";
-import { type AgeFilter, FilterSheet, type LimitActionFor } from "./Sheets.tsx";
-import type { OriginApi } from "./use-app-state.ts";
+import { type AgeFilter, FilterSheet, type LimitActionFor, ManualLinkSheet } from "./Sheets.tsx";
+import { type OriginApi, useShare } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
 
 /** „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl) */
@@ -71,6 +72,11 @@ export function Overlays(props: OverlaysProps) {
   const { transit, providerId, openProvider, closeProvider } = props;
   const { origin } = originApi;
   const { now, onToggleSave } = ctx;
+  // Teilen (Plan 0026, E6): Pfad nur aus der ID, nie aus `location`
+  const { share, manualLink, closeManualLink } = useShare(say);
+  const shareOffer = (offer: SiteOffer) => share({ title: offer.title, path: offerSharePath(offer.id) });
+  const shareProvider = (provider: { id: string; name: string }) =>
+    share({ title: provider.name, path: providerSharePath(provider.id) });
   // Das Sheet dieses Anbieters liegt schon unter dem Detail: zurück dorthin, ohne neuen History-Eintrag (E3).
   const onProvider = (id: string) => (id === providerId ? closeDetail() : openProvider(id));
   return (
@@ -96,6 +102,7 @@ export function Overlays(props: OverlaysProps) {
             visible={props.visible}
             ctx={ctx}
             onUnknown={props.onUnknownProvider}
+            onShare={shareProvider}
             onClose={closeProvider}
           />
         )}
@@ -122,6 +129,7 @@ export function Overlays(props: OverlaysProps) {
             category={ctx.categoryOf(detailOffer)}
             saved={ctx.isSaved(detailOffer.id)}
             onToggleSave={onToggleSave}
+            onShare={shareOffer}
             onClose={closeDetail}
             onProvider={onProvider}
             onIcs={say}
@@ -161,6 +169,17 @@ export function Overlays(props: OverlaysProps) {
           focusOrigin={sheet === "origin"}
           onClose={() => setSheet(null)}
         />
+      </Dialog>
+      {/* Zuletzt: liegt über Detail bzw. Anbieter-Sheet (späteres showModal oben, Plan 0026, E6) */}
+      <Dialog
+        open={manualLink !== undefined}
+        onClose={closeManualLink}
+        label="Link zum Teilen"
+        className="sheet"
+        toast={toast}
+        fallbackFocus={activeTab}
+      >
+        {manualLink !== undefined && <ManualLinkSheet url={manualLink} onClose={closeManualLink} />}
       </Dialog>
     </>
   );

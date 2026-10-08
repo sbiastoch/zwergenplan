@@ -112,6 +112,8 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
     expect(shortDate("2026-10-06")).toBe("Di 6.10.");
     expect(weekTitle(["2026-10-05", "2026-10-11"])).toBe("5.–11. Oktober");
     expect(weekTitle(["2026-10-26", "2026-11-01"])).toBe("26. Okt. – 1. Nov.");
+    // Juni und Juli bleiben ganz (Plan 0026, E3, Review m8)
+    expect(weekTitle(["2026-06-29", "2026-07-05"])).toBe("29. Juni – 5. Juli");
     expect(standDate("2026-10-03T23:30:00Z")).toBe("4.10.2026");
   });
 });

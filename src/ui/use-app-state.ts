@@ -13,12 +13,14 @@ import {
   saveTheme,
   type ThemeChoice,
 } from "../data/preferences.ts";
+import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
 import { parseRoute, type Route, routeToSearch } from "../domain/route.ts";
 import { toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
+import { SHARE_COPIED } from "./format.ts";
 import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
 import { preloadProviderUi } from "./ProviderPanel.tsx";
 
@@ -194,6 +196,34 @@ export function useToast(): [string, (message: string, ms?: number) => void] {
     timer.current = setTimeout(() => setMessage(""), ms);
   }, []);
   return [message, say];
+}
+
+export interface ShareState {
+  /** im Tipp-Handler aufrufen, synchron (Safari verlangt die Nutzer-Aktivierung) */
+  share: (target: { title: string; path: string }) => void;
+  /** Link für das Sheet „Link zum Teilen“, wenn Teilen und Kopieren scheiterten (Review M2) */
+  manualLink: string | undefined;
+  closeManualLink: () => void;
+}
+
+/**
+ * Teilen per Link (Plan 0026, E6): System-Teilen, sonst kopieren mit Toast, sonst den Link zum Markieren zeigen.
+ * Geteilt wird nur der Pfad aus der ID, nie `location` – Filter, Ansicht, Geburtsdatum und Startpunkt bleiben draußen.
+ */
+export function useShare(say: (message: string) => void): ShareState {
+  const [manualLink, setManualLink] = useState<string>();
+  const share = useCallback(
+    ({ title, path }: { title: string; path: string }) => {
+      const url = absoluteUrl(path);
+      void shareLink({ title, url }).then((outcome) => {
+        if (outcome === "kopiert") say(SHARE_COPIED);
+        if (outcome === "fehler") setManualLink(url);
+      });
+    },
+    [say],
+  );
+  const closeManualLink = useCallback(() => setManualLink(undefined), []);
+  return { share, manualLink, closeManualLink };
 }
 
 /** Wie oft „jetzt“ geprüft wird. Der Zustand ändert sich trotzdem höchstens einmal pro Minute. */

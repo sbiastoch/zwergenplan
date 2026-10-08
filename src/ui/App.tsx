@@ -19,6 +19,7 @@ import {
   listStatusParts,
   loadErrorText,
   mapStatusParts,
+  OFFER_GONE,
   providerStatusParts,
   reachNote,
   standDate,
@@ -135,10 +136,14 @@ export function App() {
     [want],
   );
 
-  // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler): Parameter entfernen.
+  // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler, alter geteilter Link): Parameter entfernen und sagen,
+  // warum nichts aufgeht (Plan 0026, E7).
   useEffect(() => {
-    if (load.kind === "ready" && route.offerId && !detailOffer) closeDetail();
-  }, [load.kind, route.offerId, detailOffer, closeDetail]);
+    if (load.kind === "ready" && route.offerId && !detailOffer) {
+      say(OFFER_GONE);
+      closeDetail();
+    }
+  }, [load.kind, route.offerId, detailOffer, closeDetail, say]);
 
   // Unbekannte Anbieter-ID (Tippfehler, aus dem Katalog verschwunden): Das Sheet meldet es nach dem Laden (E3).
   const dropProvider = useCallback(() => {

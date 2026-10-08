@@ -1,8 +1,8 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { serviceWorker } from "./scripts/vite-sw.ts";
-import { BASE } from "./site.config.ts";
+import { BASE, OUT_DIR, SITE_URL } from "./site.config.ts";
 
 const E2E = process.env["ZWERGENPLAN_DATA"] === "fixture";
 /**
@@ -58,11 +58,25 @@ const isAppExtrasModule = (id: string) =>
     id,
   );
 
+/**
+ * Öffentliche URL in den og:-Tags von index.html (Plan 0026, E5): einzige Quelle site.config.ts. Ein stehen
+ * gebliebener Platzhalter `%ZP_…` bricht den Build.
+ */
+const siteUrl: Plugin = {
+  name: "zp-site-url",
+  transformIndexHtml(html) {
+    const out = html.replaceAll("%ZP_SITE_URL%", SITE_URL);
+    if (out.includes("%ZP_")) throw new Error("index.html: Platzhalter %ZP_… nicht ersetzt");
+    return out;
+  },
+};
+
 export default defineConfig({
   base: BASE,
   plugins: [
     react(),
     tailwindcss(),
+    siteUrl,
     // Service Worker als dist/sw.js mit Precache-Liste (Plan 0011, E3; ADR 0013). Vorgehalten werden die Start-Assets,
     // die Latin-Schrift und die Lazy-Chunks, die jeder Start lädt: PWA-Kern und Export-Code (Plan 0011, „Umsetzung“).
     serviceWorker({
@@ -84,7 +98,7 @@ export default defineConfig({
   build: {
     target: "es2023",
     sourcemap: true,
-    outDir: E2E ? "dist-e2e" : "dist",
+    outDir: OUT_DIR[E2E ? "fixture" : "real"],
     // Der Karten-Chunk (MapLibre, ca. 1 MB roh) ist absichtlich groß und lazy; das Gate sind die Budgets in .size-limit.json.
     chunkSizeWarningLimit: 1100,
     // Ziel es2023: Ohne natives modulepreload lädt ein Browser die Chunks nur nicht vorab. Spart ca. 0,25 kB Start-JS (Plan 0005).

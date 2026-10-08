@@ -100,6 +100,12 @@
     font-size: 1.0625rem;
     letter-spacing: 0;
   }
+  /* Link zum Teilen (Plan 0026, E6): lange URL, möglichst viel davon sichtbar; 16 px, sonst zoomt iOS */
+  .input.share-link {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
   .bound-hint {
     margin: 6px 0 0;
     font-weight: 800;

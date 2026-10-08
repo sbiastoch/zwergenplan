@@ -135,6 +135,18 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       page.getByRole("dialog").getByText("Passt: am Mi 7.10. 24 Monate alt · passt bis 14.10."),
     ).toBeVisible();
   },
+  // Plan 0026, E6 (Review M2): Teilen und Kopieren scheitern, Sheet „Link zum Teilen“ über dem Detail mit langer URL
+  "link-zum-teilen": async (page) => {
+    await page.addInitScript(() => {
+      const fail = () => Promise.reject(new DOMException("Test", "NotAllowedError"));
+      Object.defineProperty(navigator, "share", { value: fail, configurable: true });
+      Object.defineProperty(navigator, "clipboard", { value: { writeText: fail }, configurable: true });
+    });
+    await page.reload();
+    await page.getByRole("heading", { level: 3, name: /PEKiP/ }).getByRole("button").click();
+    await page.getByRole("dialog").getByRole("button", { name: "Teilen" }).click();
+    await expect(page.getByRole("dialog", { name: "Link zum Teilen" }).locator("input.share-link")).toBeFocused();
+  },
   // Regelmäßige Reihe: zwei ICS-Knöpfe nebeneinander (`.two`), die der Kurs oben nicht hat.
   "detail-regelmaessig": async (page) => {
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
@@ -455,6 +467,91 @@ for (const [name, go] of Object.entries(VIEWS)) {
     });
   });
 }
+
+/**
+ * Vorschauseite ohne JavaScript (Plan 0026, E4, Tests 7): eigenes Dokument mit eigenem `<style>`, Darstellung nur nach
+ * System. Bewusste Ausnahme von „dunkel auch per `data-theme`“: Die Seite liest die gewählte Darstellung nicht, denn
+ * dafür bräuchte sie ein Skript mit `localStorage` auf einer Seite, die man meist nur Millisekunden sieht (E4, Review m6).
+ *
+ * „Ohne JavaScript“ heißt hier: ohne das eine Inline-Skript der Seite (die Weiterleitung), denn sonst hat sie keins.
+ * `javaScriptEnabled: false` ginge nicht: axe läuft im Seitenkontext und hängt dann (Zeitlimit). Dass die Seite mit
+ * abgeschaltetem JavaScript wirklich so aussieht, prüft `e2e/teilen.spec.ts` („ohne JavaScript“).
+ */
+test.describe("vorschauseite-ohne-js", () => {
+  const SHARE_PAGE = "angebot/familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus/";
+  test.beforeEach(async ({ page }) => {
+    await page.route(`**/${SHARE_PAGE}`, async (route) => {
+      const response = await route.fetch();
+      const body = (await response.text()).replace(/<script>[\s\S]*?<\/script>/, "");
+      expect(body).not.toContain("<script");
+      await route.fulfill({ response, body });
+    });
+  });
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`vorschauseite-ohne-js besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto(SHARE_PAGE);
+      await expect(page.getByRole("link", { name: "Im Zwergenplan öffnen" })).toBeVisible();
+      await expectReducedMotion(page);
+      await expectMobileUx(page);
+      if (colorScheme === "dark") await expectNoBrightIslands(page);
+    });
+  }
+  test("vorschauseite-ohne-js bricht bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(SHARE_PAGE);
+    await expectNoHorizontalScroll(page);
+    await expectTouchTargets(page);
+    await expectTextFits(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
+    await expectAccessible(page);
+  });
+});
+
+/**
+ * 404-Seite (Plan 0026, E7, Arch-Review m7): eigenes Dokument wie die Vorschauseite, Darstellung nur nach System. Der
+ * Vite-Server liefert für unbekannte Pfade die SPA-Rückfallseite, deshalb stellt `page.route` die 404-Antwort von
+ * GitHub Pages mit der gebauten `dist-e2e/404.html` nach (wie `e2e/teilen.spec.ts`). Für `irgendwas/` springt ihr
+ * Skript nicht, die Seite bleibt stehen.
+ */
+test.describe("404-seite", () => {
+  const MISSING = "irgendwas/";
+  // Chromium meldet die 404-Antwort des Dokuments selbst in der Konsole; erlaubt nur für diesen Pfad.
+  test.use({ allowedConsoleErrors: [/\/irgendwas\/ Failed to load resource: .* 404/] });
+  test.beforeEach(async ({ page }) => {
+    await page.route(`**/${MISSING}`, (route) => route.fulfill({ status: 404, path: "dist-e2e/404.html" }));
+  });
+  const heading = (page: Page) =>
+    page.getByRole("heading", { name: "Diese Seite gibt es im Zwergenplan nicht (mehr)." });
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`404-seite besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto(MISSING);
+      await expect(heading(page)).toBeVisible();
+      await expectReducedMotion(page);
+      await expectMobileUx(page);
+      if (colorScheme === "dark") await expectNoBrightIslands(page);
+    });
+  }
+  test("404-seite bricht bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(MISSING);
+    await expect(heading(page)).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await expectTouchTargets(page);
+    await expectTextFits(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
+    await expectAccessible(page);
+  });
+});
 
 for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
   test(`Toast im Dunkeln ist keine helle Insel (${scheme.label})`, async ({ page }) => {

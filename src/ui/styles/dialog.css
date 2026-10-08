@@ -64,6 +64,12 @@
     justify-content: space-between;
     padding: 14px 16px 4px;
   }
+  /* Teilen und Herz rechts im Kopf (Plan 0026, E6) */
+  .dhead-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
   .dscroll {
     flex: 1;
     min-height: 0;

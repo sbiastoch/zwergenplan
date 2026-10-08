@@ -1,6 +1,6 @@
 # Plan 0026 – Teilen per Link: Angebote, Anbieter und Merkliste
 
-Status: freigegeben (Stufe 1 umsetzbar; Stufe 2 nach Plan 0025). Review eingearbeitet, Nutzerentscheide N1–N4 vom 2026-10-08 siehe „Offene Punkte“. Zwei Etappen: **Stufe 1** (Angebote und Anbieter) ist unabhängig umsetzbar. **Stufe 2** (Merkliste) wird eigens gemergt, nach Plan 0025 (Nutzerentscheid N1).
+Status: in Umsetzung (Stufe 1, Branch `teilen-0026-s1`; Stufe 2 nach Plan 0025). Review eingearbeitet, Nutzerentscheide N1–N4 vom 2026-10-08 siehe „Offene Punkte“, N4 für Angebote ersetzt durch Nachtrag A (Kachelbild je Angebot). Zwei Etappen: **Stufe 1** (Angebote und Anbieter) ist unabhängig umsetzbar. **Stufe 2** (Merkliste) wird eigens gemergt, nach Plan 0025 (Nutzerentscheid N1).
 Datum: 2026-10-08
 Bezug:
 - ADR 0002 (Datenfluss), ADR 0003 (stabile IDs), ADR 0009 (`noindex`), ADR 0012 (Startbudget), ADR 0013 (Service Worker), ADR 0016 (nächtlicher Deploy), **neu ADR 0020** (Entwurf, im selben Commit)
@@ -23,7 +23,7 @@ Leitlinien:
 
 ## Nicht-Ziele
 
-- **Bild je Angebot oder Kategorie** in der Vorschau. Alle Seiten nutzen ein generisches Bild (E5). Kategorie-Bilder kommen nach `docs/ideas.md`.
+- **Bild je Kategorie** und **Bild je Anbieter** in der Vorschau: Anbieter, Startseite und Merkliste nutzen das generische Bild (E5). Angebote bekommen seit Nachtrag A ein eigenes Kachelbild (E16).
 - **Umzug per QR-Code** auf ein anderes Gerät: zurückgestellt, steht in `docs/ideas.md` (Plan 0022). Die Kodierung aus Stufe 2 ist so gebaut, dass sie wiederverwendbar wäre (Versionsfeld).
 - **Teilen-Knopf auf den Kacheln** in Liste, Kalender und Karte. Geteilt wird aus dem Detail und dem Anbieter-Sheet.
 - **Filter oder Suchen teilen** (`?kat=…`): Das geht schon heute mit der Adresszeile, nur ohne eigene Vorschau.
@@ -476,9 +476,117 @@ Die Begründungen zu den einzelnen Punkten:
 - **N3 – Einfügefeld für iOS-App-Nutzer (E14), erst nach dem Gerätetest von Stufe 2.** Nicht Teil von Stufe 2 (Review m13). **Empfehlung: nach dem Gerätetest (Schritt 14) entscheiden.** Landet eine geteilte Liste bei iOS-App-Nutzern spürbar in Safari statt in der App, wird die Skizze aus E14 ein kleiner Folgeplan (geschätzt +0,2 kB). Sonst bleibt es bei einem Eintrag in `docs/ideas.md`.
 - **N4 – Vorschaubild.** **Empfehlung: ein generisches Bild** (Icon und Schriftzug, E5). Bilder je Kategorie wären hübscher, kosten aber 12 Motive, Pflege und Gestaltung. Sie kommen nach `docs/ideas.md`.
 
+## Nachtrag A (2026-10-08): Kachelbild je Angebot
+
+Nutzerwunsch beim Start der Umsetzung, wörtlich:
+
+> „Wichtig ist mir, dass in der Vorschau, die zB dann in Whatsapp gerendert wird, das Event vollständig identifizierbar ist, also quasi so aussieht wie in der App in der Übersicht.“
+
+Das ersetzt N4 für Angebote. Ein generisches Bild sieht in jedem Chat gleich aus, und WhatsApp zeigt das Bild groß über Titel und Beschreibung. Erkennbar „wie in der App“ ist nur ein Bild der Kachel. Anbieter, `index.html` und Stufe 2 bleiben beim generischen Bild aus E5.
+
+### E16 – Was das Bild zeigt
+
+- **Eine Datei je Angebot**: `angebot/<offerId>/vorschau.jpg`, 1200 × 630 (1,91 : 1), JPEG Qualität 82, also neben der Vorschauseite im selben Ordner. Den Pfad liefert `offerImagePath(offerId)` aus `src/domain/share.ts`.
+- **Motiv**: die Kachel der Übersicht, vergrößert, auf dem Punktraster-Papier der App, immer hell.
+  - Kopfzeile: Kategorie-Pille mit Farbe, Form und Etikett der Leitkategorie (`leadCategory(offer.topics, [])`), daneben **wann**. Das ist derselbe Text wie im `og:title` (E3), also Rhythmus bzw. festes Datum, nie „nächster Termin“.
+  - Titel (höchstens 3 Zeilen, danach „…“ per `line-clamp`).
+  - Meta: `{Anbieter} · {Ort}, {Stadtteil}` (höchstens 2 Zeilen). Die Kachel der App zeigt nur den Stadtteil, das Bild nennt auch den Ort, denn im Chat fehlt der Kontext.
+  - Fakten wie auf der Kachel: **Alter** (immer, die Kachel zeigt es nur bei „passt nicht“), Kosten, Anmeldung (Rahmen bei „Anmeldung nötig“ wie `.fact.reg`), Plätze (nur mit aussagekräftigem Status, `availabilityLabel`). Der Kosten-Fakt wird im Bild deterministisch auf 40 Zeichen gekürzt (Wortende, „…“), denn `price` ist Freitext (Review A, M1).
+  - Ohne Herz (kein Bedienelement im Bild); der Platz, den `card.css` dafür freihält (`margin-right: 47px` an `.card-top` und `.ctitle`), entfällt per Bild-Regel. Die leichte Drehung der Kachel (−0,6°) bleibt wie in der App. Unten rechts das App-Icon und „zwergenplan.app“.
+  - **Geometrie** (Review A, M1): Viewport 1200 × 630, `deviceScaleFactor: 1`. Die Kachel ist 460 CSS-px breit und per CSS `zoom` vergrößert, Start-Zoom 2,4 (≈ 1 100 px breit). Bild-eigene Schriftgrößen: Meta und Fakten 16 px statt 14/13 px, damit sie in einer Chat-Blase (≈ 0,24 pt je Bildpixel) noch lesbar sind. Kein DPR-Trick: Der kleine Viewport würde die Querformat-Media-Queries der App auslösen (`tabs.css`, `body { padding-left: 8rem }`).
+  - **Passregel**: Ist Kachel samt Markenzeile höher als 630 px, sinkt der Zoom in Schritten von 0,1 bis 1,6. Passt es auch dann nicht, bricht der Build ab; das kann nur ein Generatorfehler sein, denn Titel (3 Zeilen), Meta (2 Zeilen) und Kosten (40 Zeichen) sind begrenzt. Ein **Kanarienvogel** rendert bei jedem Lauf zuerst eine synthetische schlimmste Kachel (150 Zeichen Titel, 40 Zeichen Kosten, alle Fakten, lange Meta) und bricht ab, wenn sie bei Zoom 1,6 nicht passt. So hängt das Gate nicht an den Daten (ADR 0016).
+- **Eine Quelle für die Texte**: `offerPreview(offer, generatedAt)` in `scripts/lib/share-pages.ts` liefert `{ category, when, title, meta, facts }`. Daraus entstehen `og:title`, `og:description` **und** das Bild.
+- **Kategorieformen**: nur die Form je Kategorie (`CATEGORY_SHAPES`, SVG-Pfade) zieht aus `src/ui/categories.ts` nach `src/domain/category-look.ts` (reine Darstellungsdaten). `CATEGORY_UI` in `src/ui/categories.ts` nutzt sie weiter, `short` bleibt dort (Review A, m7). Grund wie in E3: `scripts/` darf `src/ui` nicht importieren (`scripts-not-ui`).
+
+### E17 – Wie das Bild entsteht
+
+- **Neues Skript `scripts/og-images.ts`** nach dem Vite-Build: `"build": "pnpm data:build && vite build && node scripts/og-images.ts"`. Das Ausgabeverzeichnis folgt `ZWERGENPLAN_DATA` wie in `vite.config.ts` (`dist/` bzw. `dist-e2e/`).
+- **Echte App-Styles**: Das Skript liest `<out>/data/site.json` und das Start-CSS samt Bricolage-woff2 aus `<out>/`, also genau den Stand, der ausgeliefert wird. Das Markup baut die reine Funktion `offerCardHtml(preview)` in **`scripts/lib/og-card.ts`** mit den Klassen der Kachel (`card k-<kategorie>`, `card-top`, `pill`, `when`, `ctitle`, `meta`, `facts`, `fact`), alles escaped. Ändert sich das CSS der Kachel, folgt das Bild beim nächsten Deploy; benennt `OfferCard.tsx` Klassen um, wird der Unit-Test rot (jede genutzte Klasse muss als Selektor in `src/ui/styles/card.css` stehen, Review A, M2). Bild-eigene Regeln (Größe, Papier, Zeilenbegrenzung, Marke) stehen in einem `<style>` in `og-card.ts`. Die Seite hat `<html lang="de">` (Silbentrennung wie in der App) und wird mit `colorScheme: "light"` gerendert.
+- **Kein Server, kein Port**: Eine Seite unter einer festen Schein-Origin (`https://og.zwergenplan.invalid/`), `page.route` beantwortet jede Anfrage aus `<out>/`, alles andere wird abgebrochen. Je Angebot: Inhalt tauschen, Passregel anwenden, `screenshot({ type: "jpeg", quality: 82, clip })`. Vier Seiten parallel; je Bild ein Zeitlimit von 15 s und eine Wiederholung, erst dann Exit 1 (Review A, m3).
+- **Styles und Schrift sind wirklich da** (Review A, M2): Je Seite einmal `document.fonts.load()` für Bricolage in den Gewichten 450, 700 und 800, danach als Gate `document.fonts.check(…)` und ein CSS-Wächter (`getComputedStyle(.card).borderTopLeftRadius === "22px"`). Sonst Exit 1: Ein Bild in Rückfallschrift oder ohne CSS ginge sonst still live. `document.fonts.ready` allein reicht nicht, es ist nach einem Tausch per `innerHTML` oft schon aufgelöst.
+- **Engine**: Chromium. Im Fixture-Build (`dist-e2e/`) darf es auf WebKit ausweichen, wenn Chromium fehlt, denn die WebKit-Jobs der CI installieren nur WebKit (`.github/install-browsers.sh`). Der Deploy-Build verlangt Chromium, sonst Exit 1. „Fehlt“ heißt `!existsSync(chromium.executablePath())`; die Entscheidung `pickEngine(source, hasChromium)` steht rein in `scripts/lib/og-engine.ts` mit Unit-Test, das Log nennt die Engine. Quelle und Ausgabeordner kommen aus `dataSource()` (`scripts/lib/load-data.ts`), nicht aus einer Kopie der Logik von `vite.config.ts` (Review A, m4).
+- **Gates** (Exit 1, wie `build-data`): Zahl der Bilder = Zahl der Angebote; jedes Bild unter 300 kB (Meta erlaubt 600 kB). Log „✓ Vorschaubilder: N in X s, größtes Y kB“. Über 60 s gibt es eine `::warning::`.
+- **Service Worker**: `angebot/<id>/vorschau.jpg` fällt unter „sonst nur Netz“ (ADR 0013), wie die Seite selbst (Tests 5 bekommt den Fall).
+
+### E18 – Tags und Kosten
+
+- Vorschauseite eines Angebots: `og:image` = `{SITE_URL}angebot/<id>/vorschau.jpg?v=<hash>`, `og:image:width` 1200, `og:image:height` 630, `og:image:alt` fest „Kachel des Angebots im Zwergenplan“ (der Titel stünde sonst ein weiteres Mal escaped in der Seite, Review A, m5), `twitter:card` `summary_large_image`. Anbieter und `index.html`: generisch (E5).
+- **`?v=<hash>`** (Review A, m6): 8 Hex-Zeichen FNV-1a über die Texte von `offerPreview` (Kategorie, wann, Titel, Meta, Fakten). Ändern sich Plätze oder Preis, ändert sich die Bild-URL, und Abrufer, die nach Bild-URL cachen, holen neu. Deterministisch, GitHub Pages ignoriert die Query.
+- **Artefakt**: geschätzt 333 Bilder × 30–60 kB ≈ 10–20 MB. GitHub Pages erlaubt 1 GB je Seite. `dist/angebot/**` fällt unter kein size-limit (E9), die Grenze je Bild (300 kB) ist das Gate.
+- **Build-Zeit**: geschätzt 10–30 s im Smoke-Job und lokal bei `pnpm build`; Fixture-Builds haben wenige Angebote. `pnpm dev` rendert keine Bilder.
+- **Keine neue Abhängigkeit**: Playwright ist schon Dev-Abhängigkeit und rendert die Icons (`scripts/icons.ts`).
+- **Grenze**: Zeigt ein Messenger nur ein kleines quadratisches Vorschaubild (Mitte des Bildes), ist die Kachel beschnitten. Titel und Beschreibung tragen den Inhalt dann allein (E3). Der Gerätetest (Schritt 9) bekommt dafür ein Kriterium: Sind Pille und Titelanfang im mittleren 630 × 630-Ausschnitt noch erkennbar? (Review A, m10)
+
+### Tests zu Nachtrag A
+
+- **Unit `scripts/lib/og-card.test.ts`**: Klassen und Kategorie stimmen, Reihenfolge der Fakten, Alter immer dabei, `.fact.reg` nur bei Anmeldung, Plätze nur mit Status; Escaping (`Tom & Jerry's "<script>"`), kein `<script>` im Markup; jede genutzte Kachel-Klasse steht als Selektor in `src/ui/styles/card.css` (M2); die Form je Kategorie kommt aus `CATEGORY_SHAPES`.
+- **Unit `scripts/lib/og-engine.test.ts`**: `pickEngine` – echt mit Chromium → chromium, echt ohne → Fehler, Fixture ohne Chromium → webkit (m4).
+- **Unit `scripts/lib/share-pages.test.ts`** (zusätzlich): `offerPreview` liefert dieselben Texte für Seite und Bild; `og:image` der Angebotsseite zeigt auf `angebot/<id>/vorschau.jpg`, der Anbieterseite auf das generische Bild.
+- **E2E `e2e/teilen.spec.ts`** (zusätzlich): `request.get("/angebot/<id>/vorschau.jpg")` → 200, `image/jpeg`, unter 300 kB; Maße 1200 × 630 über `naturalWidth/naturalHeight` nach `page.goto` (m9); die Bilder zweier Angebote unterscheiden sich in den Bytes (M2).
+- **Smoke**: Für das erste und das letzte Angebot aus `site.json` liefert `vorschau.jpg` 200 mit `image/jpeg`.
+- **Sichtprüfung** (`/browser-review`): je ein Bild für einmalig, Kurs, regelmäßig, langen Titel und „Ausgebucht“ ansehen, zusätzlich in 300 px Breite (Größe in der Chat-Blase) und als mittlerer 630 × 630-Ausschnitt; Bilder dem Nutzer schicken.
+
+### Schritte zu Nachtrag A
+
+Zwischen Schritt 5 und 6: `category-look.ts` herauslösen, `og-card.ts` und `og-engine.ts` test-first, `scripts/og-images.ts`, `build`-Skript, Gates. Nach jedem Schritt `pnpm verify`. Danach lokal `pnpm e2e:local e2e/teilen.spec.ts` (Bilder in `dist-e2e/`) und `PW_SUITE=smoke pnpm e2e` (Deploy-Build mit echten Bildern), beide mit `run_in_background`; die volle Suite fährt die CI (CLAUDE.md, „Lokal prüfen“; ersetzt `pnpm check` aus Schritt 7). Doku: ADR 0020 Punkt 2, 6 und „Konsequenzen“ (Bild je Angebot, Build-Zeit, Headless-Browser im Deploy-Build Pflicht), `docs/architecture.md` (Datenfluss mit dem Schritt nach Vite, Schichten mit `category-look`), `docs/ideas.md` („Bild je Anbieter“) (m7, m8).
+
+### Review zu Nachtrag A (2026-10-08) – Verdict: freigabefähig nach Einarbeitung → eingearbeitet
+
+Unabhängiger `plan-reviewer`, kein Blocker. Alle Befunde übernommen:
+
+| Befund | Umgang |
+|---|---|
+| **M1** Geometrie fehlt, abgeschnittener Inhalt unbemerkt, Fakten klein | feste Geometrie, Bild-Schriftgrößen 16 px, Kosten auf 40 Zeichen, Passregel (Zoom 2,4 → 1,6), Kanarienvogel mit schlimmster Kachel (E16) |
+| **M2** ungestyltes Bild käme durch, Markup-Drift | `fonts.load` + `fonts.check`, CSS-Wächter, Klassen-Test gegen `card.css`, E2E „Bilder unterscheiden sich“ (E17, Tests) |
+| m1 Media-Queries, `lang`, hell | Begründung „kein DPR-Trick“, `lang="de"`, `colorScheme: "light"` (E16, E17) |
+| m2 Herz-Rand, Drehung | Bild-Regel ohne 47 px, Drehung bleibt (E16) |
+| m3 Absturz bremst Deploy | Zeitlimit und eine Wiederholung je Bild (E17) |
+| m4 Rückfall unklar | `pickEngine` rein mit Test, `existsSync`, `dataSource()` (E17, Tests) |
+| m5 Alt-Text vergrößert die Seite | fester Alt-Text (E18); der Wächter je Seite liegt nach der Messung ohnehin bei 10 kB (Umsetzung zu E4) |
+| m6 Cache | `?v=<hash>` (E18) |
+| m7 Doku | ADR-Konsequenzen, Datenfluss, Schichten, nur Formen umziehen (E16, Schritte) |
+| m8 lokale Prüfung | `pnpm verify`, gezielte E2E und Smoke statt `pnpm check` (Schritte) |
+| m9 SOF-Parser | `naturalWidth/Height` (Tests) |
+| m10 quadratischer Ausschnitt | Kriterium im Gerätetest, Sichtprüfung in 300 px und als Ausschnitt (E18, Tests) |
+
+### Umsetzung zu E4: Seitengröße gemessen
+
+Die Vorschauseiten mit echten Daten (2026-10-08) wiegen im Median 3,2 kB, die größte 3,5 kB, nicht die geschätzten 2,5 kB. Die geplante Grenze von 4 kB hätte ein Titel voller „&“ reißen können, das widerspricht Review M4. Der Wächter `checkSharePages` liegt deshalb bei **10 000 Byte** (nach Arch-Review m5, vorher 10 KiB): Die strenge Obergrenze aus den Kürzungen (jedes Zeichen escaped höchstens 6 Byte, Titel und Beschreibung je mehrfach in der Seite, ID ≤ 240 Zeichen, fester Text) liegt bei etwa 8,8 kB; darüber liegt nur ein Generatorfehler. Ein Unit-Test belegt, dass Titel und Anbietername aus 300 Anführungszeichen ihn nicht reißen.
+
+### Umsetzung Stufe 1: Abweichungen und Messwerte
+
+- **`labels.ts`** enthält zusätzlich `clock`, `timeRange` und `availabilityLabel`: Vorschauseite und Kachelbild brauchen sie, `format.ts` re-exportiert alle.
+- **Meta-Zeile des Bildes**: Ort zuerst, `{Ort}, {Stadtteil} · {Anbieter}` (E16 nannte den Anbieter zuerst). Mit echten Daten verdrängten lange Anbieternamen („Post SV Nürnberg – Babyschwimmen, Kleinkindschwimmen, …“) sonst das „Wo“ aus den zwei Zeilen. Heißt der Ort ohne Klammerzusatz wie der Anbieter („Studio X (ehem. Y)“), steht der Name nur einmal da, in Meta und Beschreibung (dort entfällt dann „– {Anbieter}“).
+- **Wann bei „Montags“**: Haben alle kommenden Termine dieselbe Uhrzeit, steht sie auch bei gleichem Wochentag ohne wöchentlichen Takt dabei („Montags, 9:30“); E3 sah sie nur für „jeden …“ vor.
+- **Kürzen**: Eine angeschnittene Klammer („41,36 € (2…“) fällt ganz weg, solange mehr als die Hälfte bleibt.
+- **Kachelbilder** (lokal, 2026-10-08, echte Daten): 333 Bilder in 7,4 s, 72–109 kB (Median 93 kB), zusammen 31 MB; 156 Kacheln mit kleinerem Zoom als 2,4. Qualität 75 statt 82 spart nur etwa 12 kB je Bild, das Punktraster etwa 3 kB; die Größe kommt von den Textkanten. Es bleibt bei Qualität 82 für scharfe Schrift.
+- **Generisches Bild** `public/og/vorschau-v1.jpg`: 48 kB. `scripts/icons.ts` erzeugt die Icons dabei byte-gleich neu.
+- **Schemaänderung** (Arch-Review M1, entgegen E8): Die ID-Höchstlängen stehen jetzt im Schema, als `MAX_KEBAB_ID` und `MAX_OFFER_ID` in `src/domain/ids.ts`. Katalog-IDs haben höchstens 80 Zeichen (längste echte 38), Offer-IDs höchstens 240 (längste echte 167). `route.ts`, `share.ts` und das Muster in `404.html` nutzen dieselben Konstanten, `schema/*.json` ist neu exportiert. So kann kein Datenstand, den Zod durchlässt, `build-data` an `providerSharePath` abbrechen lassen.
+- **Wächter** `checkSharePages`: 10 000 Byte, Meldung in Byte (siehe „Umsetzung zu E4“).
+- **Start-JS** 94,41 → 95,33 kB (+0,92 kB, geschätzt +0,4–0,5). Die Aufschlüsselung steht in ADR 0012; nichts davon ließ sich leicht vermeiden.
+
+## Arch-Review (2026-10-08) – Stufe 1
+
+Unabhängiger `arch-reviewer` über Stufe 1 samt Nachtrag A, Verdict „Nacharbeit nötig“, kein Blocker. Alle Befunde sind übernommen.
+
+| Befund | Umgang |
+|---|---|
+| **M1** Länge der Anbieter-ID nicht im Schema; eine ID, die Zod durchlässt, bricht `build-data` ab. Ebenso die Grenze 200 der Offer-ID (Wächter, `404.html`) | `MAX_KEBAB_ID` (80) und `MAX_OFFER_ID` (240) in `src/domain/ids.ts`, per `.max()` im Schema; `route.ts`, `share.ts` und `404.html` nutzen sie; `schema/*.json` neu exportiert, mit Unit-Test (Schemaänderung) |
+| **M2** `as`-Cast ohne Begründung in `src/data/share.ts` | Type Guard statt Cast |
+| **m1** Gate „Zahl der Bilder = Zahl der Angebote“ wirkungslos | zählt `vorschau.jpg` auf der Platte (`scripts/og-images.ts`) |
+| **m2** Zeitlimit je Bild nur für den Screenshot | `withTimeout` über Platzieren und Screenshot |
+| **m3** Ausgabeordner doppelt und relativ zum cwd | `OUT_DIR` in `site.config.ts` für Vite und `og-images.ts`, dort über `ROOT` aufgelöst |
+| **m4** Anbieter-Vorschau kopiert `providerOffers`, Kategorien weichen vom Sheet ab | `providerOffers` und `providerCategories` aus `src/domain/directory.ts` |
+| **m5** veralteter Kommentar „4 kB“, gemischte Einheiten im Wächter | 10 000 Byte, Meldung in Byte, Kommentar korrigiert |
+| **m6** Test in `e2e/pwa.spec.ts` unter dem falschen Kommentar | über den Kommentar verschoben |
+| **m7** `404.html` ohne Mobile-UX-Gates | Block `404-seite` in `e2e/mobile-ux.spec.ts`: hell, dunkel, 320 px mit 200 % |
+| **m8** Start-JS +0,90 statt +0,4–0,5 kB, ohne Ursache | Builds je Commit verglichen, Aufschlüsselung in ADR 0012; nichts leicht vermeidbar |
+| **m9** Doku-Drift: Bildgröße unter „Risiken“, keine E2E-Pflicht für Vorschauseiten, Chromium für `pnpm build` | „Risiken“ korrigiert; CLAUDE.md: Zeile in „Lokal prüfen“ und Punkt unter „Stolperfallen“ |
+| **m10** Kostentest tautologisch | feste Erwartungswerte für alle drei Zweige (`src/domain/labels.test.ts`) |
+
 ## Risiken
 
-- **Messenger-Verhalten ist nicht spezifiziert.** Wann WhatsApp große oder kleine Vorschauen zeigt, wie lange es cacht und ob iMessage JavaScript ausführt, ist nur empirisch bekannt. Abgesichert durch Standard-Tags, ein Bild in 1,91 : 1 unter 100 kB, die Bot-Ausnahme, kein `meta refresh` und den Gerätetest (Schritt 9).
+- **Messenger-Verhalten ist nicht spezifiziert.** Wann WhatsApp große oder kleine Vorschauen zeigt, wie lange es cacht und ob iMessage JavaScript ausführt, ist nur empirisch bekannt. Abgesichert durch Standard-Tags, Bilder in 1,91 : 1 (generisch 48 kB, Kachelbilder 72–109 kB, Gate 300 kB, Meta erlaubt 600 kB), die Bot-Ausnahme, kein `meta refresh` und den Gerätetest (Schritt 9).
 - **Pfadvertrag**: Wer später `angebot/` umbenennt, bricht alle geteilten Links. ADR 0020 hält ihn fest.
 - **Bot-Muster trifft einen Menschen**: Ein In-App-Browser mit „bot“ als eigenem Wort im User-Agent bliebe auf der Seite und müsste den Link tippen. Das ist unschön, aber keine Sackgasse. Nach dem Review ist die Liste auf JS-fähige Abrufer beschränkt (E4).
 - **ADR-Nummer**: Kollision mit parallelen Plänen möglich (Schritt 1).

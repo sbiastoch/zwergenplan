@@ -44,6 +44,8 @@ export interface ProviderSheetProps {
   visible: readonly SiteOffer[];
   /** Kacheln: merken, Detail über dem Sheet öffnen, unpassende markieren (E3, E4) */
   ctx: CardContext;
+  /** Teilen per Link (Plan 0026, E6): synchron im Tipp */
+  onShare: (provider: { id: string; name: string }) => void;
   onClose: () => void;
 }
 

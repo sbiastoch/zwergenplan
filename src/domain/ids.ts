@@ -16,6 +16,15 @@ export const OFFER_ID_PATTERN = /^[a-z0-9-]+--[a-z0-9-]+--[a-z0-9-]+$/;
  */
 export const KEBAB_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+/**
+ * Höchstlängen der IDs (Plan 0026, Arch-Review M1): Sie stehen in geteilten Links und in Pfaden der Vorschauseiten,
+ * deshalb prüft sie das Schema, nicht erst der Build. Katalog-IDs: längste echte 38 Zeichen (2026-10-08), die Route
+ * nahm schon seit Plan 0010 höchstens 80. Offer-IDs: zwei Katalog-IDs, Titel-Slug (60) mit Beginn (14) und zwei
+ * Trenner ergeben höchstens 238; längste echte 167.
+ */
+export const MAX_KEBAB_ID = 80;
+export const MAX_OFFER_ID = 240;
+
 const TRANSLIT: Record<string, string> = { ä: "ae", ö: "oe", ü: "ue", ß: "ss" };
 
 /** kebab-case aus Freitext: Umlaute transliteriert, höchstens `max` Zeichen, an Wortgrenze gekürzt. */

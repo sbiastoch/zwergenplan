@@ -7,6 +7,10 @@
  * - icon-192.png, icon-512.png (`purpose: "any"`) und icon.svg (Favicon): abgerundetes Quadrat, Ecken transparent;
  * - maskable-512.png: randlos, Motiv auf 80 % verkleinert (10 % Schutzzone je Seite);
  * - apple-touch-180.png: randlos und **deckend** (iOS rundet selbst und setzt sonst Schwarz hinter Transparenz).
+ *
+ * Dazu das generische Vorschaubild für Link-Vorschauen (Plan 0026, E5): public/og/vorschau-v1.jpg, 1200 × 630, Icon
+ * links, Schriftzug rechts, in der gebündelten Bricolage (per `@font-face` als data-URL, unabhängig von den
+ * Systemschriften). Das `-v1` umgeht Caches bei einem späteren Wechsel.
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -14,6 +18,8 @@ import { chromium, type Page } from "@playwright/test";
 
 const SOURCE = "design/icon.svg";
 const OUT = "public/icons";
+const OG_OUT = "public/og/vorschau-v1.jpg";
+const FONT = "node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-opsz-normal.woff2";
 /** Ecken des „any“-Icons: 22 % wie die üblichen Launcher-Formen */
 const RADIUS = 112;
 
@@ -39,6 +45,27 @@ async function render(page: Page, svg: string, size: number, file: string, trans
   await page.screenshot({ path: file, omitBackground: transparent, clip: { x: 0, y: 0, width: size, height: size } });
 }
 
+/** Generisches Vorschaubild (Plan 0026, E5): Meta verlangt < 600 kB, ≥ 300 px Breite, Seitenverhältnis ≤ 4 : 1 */
+async function renderPreview(page: Page) {
+  const font = `data:font/woff2;base64,${readFileSync(FONT).toString("base64")}`;
+  await page.setViewportSize({ width: 1200, height: 630 });
+  await page.setContent(`<!doctype html><html lang="de"><head><style>
+    @font-face{font-family:"Bricolage";src:url(${font}) format("woff2");font-weight:200 800}
+    body{margin:0;width:1200px;height:630px;display:flex;align-items:center;gap:64px;padding:0 96px;box-sizing:border-box;
+      background:#e8f1ff radial-gradient(rgba(19,33,46,.13) 2.8px,transparent 3.4px) 0 0/40px 40px;color:#13212e;
+      font-family:"Bricolage",sans-serif}
+    svg{flex:none;width:300px;height:300px;border-radius:66px;box-shadow:10px 10px 0 #13212e;border:4px solid #13212e}
+    h1{margin:0 0 18px;font-size:104px;font-weight:800;letter-spacing:-.045em;line-height:1}
+    p{margin:0;font-size:46px;font-weight:600;line-height:1.15;letter-spacing:-.02em}
+  </style></head><body>${rounded.replace('width="512" height="512"', 'width="300" height="300"')}
+    <div><h1>Zwergenplan</h1><p>Angebote für Kinder unter&nbsp;3 in&nbsp;Nürnberg</p></div></body></html>`);
+  await page.evaluate(() => document.fonts.ready);
+  const ok = await page.evaluate(() => document.fonts.check('800 104px "Bricolage"'));
+  if (!ok) throw new Error("Vorschaubild: Bricolage nicht geladen");
+  mkdirSync("public/og", { recursive: true });
+  await page.screenshot({ path: OG_OUT, type: "jpeg", quality: 85, clip: { x: 0, y: 0, width: 1200, height: 630 } });
+}
+
 const previewArg = process.argv.find((a) => a.startsWith("--preview="))?.slice("--preview=".length);
 
 const browser = await chromium.launch();
@@ -51,6 +78,8 @@ try {
   await render(page, maskable, 512, join(OUT, "maskable-512.png"), false);
   await render(page, plain, 180, join(OUT, "apple-touch-180.png"), false);
   console.log(`✓ Icons in ${OUT}/`);
+  await renderPreview(page);
+  console.log(`✓ Vorschaubild ${OG_OUT}`);
 
   if (previewArg) {
     mkdirSync(previewArg, { recursive: true });

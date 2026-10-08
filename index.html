@@ -9,6 +9,20 @@
     <meta name="theme-color" content="#0e1620" media="(prefers-color-scheme: dark)" />
     <meta name="description" content="Babykurse, Krabbelgruppen und Ausflüge für Kinder unter 3 Jahren in Nürnberg." />
     <title>Zwergenplan</title>
+    <!-- Link-Vorschau (Plan 0026, E5; ADR 0020): generisch; Angebote und Anbieter haben eigene Vorschauseiten.
+         %ZP_SITE_URL% ersetzt das Plugin zp-site-url in vite.config.ts aus site.config.ts. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Zwergenplan" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:title" content="Zwergenplan" />
+    <meta property="og:description" content="Babykurse, Krabbelgruppen und Ausflüge für Kinder unter 3 Jahren in Nürnberg." />
+    <meta property="og:url" content="%ZP_SITE_URL%" />
+    <meta property="og:image" content="%ZP_SITE_URL%og/vorschau-v1.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Zwergenplan – Angebote für Kinder unter 3 in Nürnberg" />
+    <meta name="twitter:card" content="summary_large_image" />
     <!-- Installierbare App (Plan 0011, E2): Pfade mit der Basis wie der Frühstart; Icons aus design/icon.svg
          (node scripts/icons.ts). Das apple-touch-icon ist deckend, sonst setzt iOS Schwarz dahinter. -->
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
