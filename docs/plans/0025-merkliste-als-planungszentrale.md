@@ -801,6 +801,11 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 6. E2E: Tests 11 und 12 sowie Statuszeile, Export und Umschalterbreite aus Test 9. Mobile-UX: `merkliste-karte`, Merkliste als Liste.
 7. Doku: `architecture.md` (Anlass), Vermerk in Plan 0005. Das Delta in ADR 0012 eintragen. Gates: `pnpm verify`, gezielt `e2e/saved.spec.ts`, `e2e/karte.spec.ts`, `e2e/startpunkt.spec.ts`, `e2e/mobile-ux.spec.ts`, `e2e/layout.spec.ts`, `pnpm size`. Dann Review, Merge, Browser-Review.
 
+**Stand Etappe 2:** committet in `7850b53` (2026-10-08), mit `origin/main` (`2cce4ea`, Herz in der Anbieterkachel) zusammengeführt, noch nicht live. Start-JS +0,316 kB (96,493 → 96,809 kB), CSS +0,092 kB (ADR 0012). Summe Etappen 1 und 2: +0,652 kB, unter dem Entscheidungspunkt von +2,5 kB (E11). Abweichungen vom Plan:
+- Keine Icons im Umschalter: Der Plan nennt keine, im Icon-Set fehlen passende, und bei 320 px und 200 % wird es eng.
+- `exportLabel` hat die Filtervariante schon (`exportLabel(savedCount, filtered)`); Etappe 4 muss sie nur noch verdrahten.
+- Die Zeile „Kurse komplett, regelmäßige nur passend zum Alter“ entfällt, den Hinweis gibt nur noch der Toast nach dem Export.
+
 **Etappe 3 – Merklisten-Kalender, der Tab „Kalender“ entfällt** (braucht Plan 0023, auf `main` seit `d5fab1b`)
 1. Rot schreiben: Tests 2, 3, 4 (Rest), 7 (`selectionHeading`) und 8 (`savedCalendar`, `endedToday`).
 2. Domäne: `CalendarSelection` und `selectionRange` in `calendar.ts`, `rangeAgenda` in `agenda.ts`. `dayAgenda` entfernen.
