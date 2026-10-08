@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dateRange, inDateRange, rangeSession, usableBound } from "./date-range.ts";
+import { checkBound, type DateRange, dateRange, fieldLimits, inDateRange, rangeSession } from "./date-range.ts";
 import type { Format, Offer, Session } from "./schema.ts";
 import { FIXTURE_NOW, fixtureOffer } from "./test-fixtures.ts";
 
@@ -98,13 +98,46 @@ describe("rangeSession und inDateRange (Plan 0023, E2)", () => {
   });
 });
 
-describe("usableBound (Plan 0023, E9)", () => {
-  it("übernimmt leere Felder und Tage ab heute, nicht halb getippte Jahre", () => {
-    expect(usableBound("", "2026-10-05")).toBe(true);
-    expect(usableBound("2026-10-05", "2026-10-05")).toBe(true);
-    expect(usableBound("2027-01-31", "2026-10-05")).toBe(true);
-    expect(usableBound("2026-10-04", "2026-10-05")).toBe(false);
-    expect(usableBound("0002-10-20", "2026-10-05")).toBe(false);
-    expect(usableBound("2026-02-30", "2026-01-01")).toBe(false);
+describe("fieldLimits und checkBound (Plan 0023, E9, E4)", () => {
+  const today = "2026-10-05";
+
+  it("„von“ ab heute bis „bis“, „bis“ ab „von“ oder ab heute", () => {
+    expect(fieldLimits(undefined, today)).toEqual({ from: { min: today }, to: { min: today } });
+    expect(fieldLimits({ from: "2026-10-20", to: "2026-10-31" }, today)).toEqual({
+      from: { min: today, max: "2026-10-31" },
+      to: { min: "2026-10-20" },
+    });
+    expect(fieldLimits({ to: "2026-10-31" }, today)).toEqual({
+      from: { min: today, max: "2026-10-31" },
+      to: { min: today },
+    });
+  });
+
+  it("ein alter Wert vor heute bleibt gültig, das Feld beginnt dort", () => {
+    expect(fieldLimits({ from: "2026-10-01" }, today)).toEqual({
+      from: { min: "2026-10-01" },
+      to: { min: "2026-10-01" },
+    });
+    expect(fieldLimits({ to: "2026-10-01" }, today).to).toEqual({ min: "2026-10-01" });
+  });
+
+  it("übernimmt leere Felder und Tage in den Grenzen, nicht halb getippte Jahre", () => {
+    const limits = { min: today, max: "2026-10-31" };
+    expect(checkBound("", limits)).toBe("ok");
+    expect(checkBound(today, limits)).toBe("ok");
+    expect(checkBound("2026-10-31", limits)).toBe("ok");
+    expect(checkBound("2026-10-04", limits)).toBe("zu-frueh");
+    expect(checkBound("0002-10-20", limits)).toBe("zu-frueh");
+    expect(checkBound("2026-11-01", limits)).toBe("zu-spaet");
+    expect(checkBound("2027-01-31", { min: today })).toBe("ok");
+    expect(checkBound("2026-02-30", limits)).toBe("ungueltig");
+  });
+});
+
+describe("DateRange (Plan 0023, Arch-Review m5)", () => {
+  it("braucht mindestens eine Grenze", () => {
+    // @ts-expect-error – ein Zeitraum ohne Grenze ist kein Zeitraum; der Typ verbietet ihn (Absicht des Tests)
+    const empty: DateRange = {};
+    expect(dateRange(empty.from, empty.to)).toBeUndefined();
   });
 });

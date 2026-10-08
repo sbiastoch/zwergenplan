@@ -4,7 +4,7 @@
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
 import { type ReactNode, type RefObject, useId, useRef, useState } from "react";
-import { usableBound } from "../domain/date-range.ts";
+import { type BoundCheck, type BoundLimits, checkBound, fieldLimits } from "../domain/date-range.ts";
 import { type FilterState, FORMATS, toggleIn, withDateRange, withReachLimit } from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
@@ -100,42 +100,61 @@ function Chip({
   );
 }
 
+/** Rückmeldung zu einer nicht übernommenen Eingabe (Arch-Review 0023, m1) */
+type BoundHints = Record<Exclude<BoundCheck, "ok">, string>;
+const PICK_DATE = "Bitte ein Datum wählen";
+
 /**
- * Natives Datumsfeld einer Zeitraum-Grenze (Plan 0023, E9). Der Text bleibt lokal, bis die Eingabe übernommen werden
- * darf (`usableBound`); ändert sich die Grenze von außen (Tauschen, Zurücksetzen), folgt das Feld.
+ * Natives Datumsfeld einer Zeitraum-Grenze (Plan 0023, E9). Der Text bleibt lokal, bis die Eingabe in die Grenzen
+ * passt (`checkBound`); sonst steht eine kurze Zeile darunter. Ändert sich die Grenze von außen (Zurücksetzen), folgt
+ * das Feld.
  */
 function DateField({
   label,
   value,
-  today,
+  limits,
+  hints,
   onCommit,
 }: {
   label: string;
   value: string;
-  today: string;
+  limits: BoundLimits;
+  hints: BoundHints;
   onCommit: (value: string) => void;
 }) {
+  const hintId = useId();
   const [text, setText] = useState(value);
   const [shown, setShown] = useState(value);
   if (value !== shown) {
     setShown(value);
     setText(value);
   }
+  const check = text === value ? "ok" : checkBound(text, limits);
   return (
-    <label className="field">
-      {label}
-      <input
-        className="input date"
-        type="date"
-        min={today}
-        value={text}
-        onChange={(e) => {
-          const next = e.target.value;
-          setText(next);
-          if (usableBound(next, today)) onCommit(next);
-        }}
-      />
-    </label>
+    <div>
+      <label className="field">
+        {label}
+        <input
+          className="input date"
+          type="date"
+          min={limits.min}
+          max={limits.max}
+          value={text}
+          aria-invalid={check !== "ok"}
+          aria-describedby={check !== "ok" ? hintId : undefined}
+          onChange={(e) => {
+            const next = e.target.value;
+            setText(next);
+            if (checkBound(next, limits) === "ok") onCommit(next);
+          }}
+        />
+      </label>
+      {check !== "ok" && (
+        <p id={hintId} className="small bound-hint">
+          {hints[check]}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -160,11 +179,14 @@ export function FilterSheet({
   mode: ReachMode | undefined;
   /** Knopf zur Begründung (`LimitAction`), Fokus-Ziel ist die Überschrift „Wegzeit“ (N2) */
   limitAction: LimitActionFor;
-  /** Berliner „heute“: frühester Tag im Zeitraum */
+  /** Berliner „heute“: frühester Tag im Zeitraum (außer ein alter Link nennt einen früheren, E4) */
   today: string;
   onClose: () => void;
 }) {
   const reachHeading = useRef<HTMLHeadingElement>(null);
+  const rangeHeading = useRef<HTMLHeadingElement>(null);
+  const rangeHeadingId = useId();
+  const limits = fieldLimits(filter.range, today);
   const ageLabelId = useId();
   const ageNoteId = useId();
   const reason = limitReason(mode);
@@ -246,26 +268,40 @@ export function FilterSheet({
             </Chip>
           ))}
         </div>
-        <h3>Zeitraum</h3>
-        <div className="daterange">
-          <DateField
-            label="von"
-            value={filter.range?.from ?? ""}
-            today={today}
-            onCommit={(from) => onChange(withDateRange(filter, from, filter.range?.to))}
-          />
-          <DateField
-            label="bis"
-            value={filter.range?.to ?? ""}
-            today={today}
-            onCommit={(to) => onChange(withDateRange(filter, filter.range?.from, to))}
-          />
-        </div>
+        <h3 ref={rangeHeading} id={rangeHeadingId} tabIndex={-1}>
+          Zeitraum
+        </h3>
+        <fieldset className="plain" aria-labelledby={rangeHeadingId}>
+          <div className="daterange">
+            <DateField
+              label="von"
+              value={filter.range?.from ?? ""}
+              limits={limits.from}
+              hints={{ "zu-frueh": "Frühestens heute", "zu-spaet": "Nicht nach „bis“", ungueltig: PICK_DATE }}
+              onCommit={(from) => onChange(withDateRange(filter, from, filter.range?.to))}
+            />
+            <DateField
+              label="bis"
+              value={filter.range?.to ?? ""}
+              limits={limits.to}
+              hints={{
+                "zu-frueh": filter.range?.from ? "Nicht vor „von“" : "Frühestens heute",
+                "zu-spaet": PICK_DATE,
+                ungueltig: PICK_DATE,
+              }}
+              onCommit={(to) => onChange(withDateRange(filter, filter.range?.from, to))}
+            />
+          </div>
+        </fieldset>
         {filter.range && (
           <button
             type="button"
             className="linkbtn"
-            onClick={() => onChange(withDateRange(filter, undefined, undefined))}
+            onClick={() => {
+              // Der Knopf verschwindet: vorher den Fokus auf die Überschrift, sonst fiele er auf <body> (wie LimitAction)
+              rangeHeading.current?.focus();
+              onChange(withDateRange(filter, undefined, undefined));
+            }}
           >
             Zeitraum entfernen
           </button>

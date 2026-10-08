@@ -5,11 +5,11 @@
 import type { Offer, Session } from "./schema.ts";
 import { berlinIsoDate, isIsoDate } from "./time.ts";
 
-/** Mindestens eine Grenze ist gesetzt; ISO-Tage, `from` ≤ `to` (siehe `dateRange`). */
-export interface DateRange {
-  from?: string;
-  to?: string;
-}
+/** Mindestens eine Grenze ist gesetzt (der Typ erzwingt es); ISO-Tage, `from` ≤ `to` (siehe `dateRange`). */
+export type DateRange = { from: string; to?: string } | { from?: string; to: string };
+
+/** Ein Termin zählt als kommend, bis er beendet ist – ein laufender Termin zählt also mit (auch agenda.ts). */
+export const notEnded = (now: Date) => (session: Session) => Date.parse(session.end) >= now.getTime();
 
 /**
  * Normalisierter Zeitraum: Ungültige Grenzen fallen einzeln weg, vertauschte werden still getauscht (E1, E4).
@@ -24,12 +24,38 @@ export function dateRange(a: string | undefined, b: string | undefined): DateRan
   return undefined;
 }
 
+/** Grenzen eines Datumsfelds: frühester und spätester übernehmbarer Tag */
+export interface BoundLimits {
+  min: string;
+  max?: string;
+}
+
 /**
- * Darf eine Eingabe im Datumsfeld übernommen werden? Leer (Grenze entfernen) oder ein Tag ab heute. So landet ein
- * halb getipptes Jahr („0002-10-20“) nicht im Filter und tauscht keine Grenzen (Plan 0023, E9).
+ * Grenzen der beiden Datumsfelder (E9): „von“ ab heute bis „bis“, „bis“ ab „von“ (sonst ab heute). So entsteht
+ * beim Tippen nie ein vertauschter Zeitraum. Liegt ein Wert aus einem alten Link vor heute, beginnt das Feld dort,
+ * damit es nicht dauerhaft ungültig erscheint (E4).
  */
-export function usableBound(value: string, today: string): boolean {
-  return value === "" || (isIsoDate(value) && value >= today);
+export function fieldLimits(range: DateRange | undefined, today: string): { from: BoundLimits; to: BoundLimits } {
+  const earliest = (value: string | undefined) => (value && value < today ? value : today);
+  const to = range?.to;
+  return {
+    from: { min: earliest(range?.from), ...(to ? { max: to } : {}) },
+    to: { min: range?.from ?? earliest(to) },
+  };
+}
+
+export type BoundCheck = "ok" | "zu-frueh" | "zu-spaet" | "ungueltig";
+
+/**
+ * Darf eine Eingabe im Datumsfeld übernommen werden? Leer (Grenze entfernen) oder ein Tag in den Grenzen. So landet
+ * ein halb getipptes Jahr („0002-10-20“) nicht im Filter (E9).
+ */
+export function checkBound(value: string, limits: BoundLimits): BoundCheck {
+  if (value === "") return "ok";
+  if (!isIsoDate(value)) return "ungueltig";
+  if (value < limits.min) return "zu-frueh";
+  if (limits.max !== undefined && value > limits.max) return "zu-spaet";
+  return "ok";
 }
 
 function contains(range: DateRange, session: Session): boolean {
@@ -46,7 +72,8 @@ export function rangeSession(offer: Offer, range: DateRange, now: Date): Session
     const [first] = offer.sessions;
     return first && contains(range, first) ? first : undefined;
   }
-  return offer.sessions.find((s) => Date.parse(s.end) >= now.getTime() && contains(range, s));
+  const isNotEnded = notEnded(now);
+  return offer.sessions.find((s) => isNotEnded(s) && contains(range, s));
 }
 
 export function inDateRange(offer: Offer, range: DateRange, now: Date): boolean {

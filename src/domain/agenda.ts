@@ -2,7 +2,7 @@
  * Kalender- und Listenlogik der Oberfläche: Welcher Termin eines Angebots zählt, wie Tage
  * gruppiert und Raster gebaut werden. Alle Kalendertage sind Berliner Tage (time.ts).
  */
-import { type DateRange, rangeSession } from "./date-range.ts";
+import { type DateRange, notEnded, rangeSession } from "./date-range.ts";
 import type { Offer, Session } from "./schema.ts";
 import { addDays, berlinIsoDate, berlinKey, daysInMonth, isoWeekday, parseIsoDate } from "./time.ts";
 
@@ -16,9 +16,6 @@ export interface DayGroup<I> {
   day: string;
   items: I[];
 }
-
-/** Ein Termin zählt als kommend, bis er beendet ist – ein laufender Termin zählt also mit. */
-const notEnded = (now: Date) => (session: Session) => Date.parse(session.end) >= now.getTime();
 
 /** Alle noch nicht beendeten Termine, in der Reihenfolge der Daten (chronologisch). */
 export function upcomingSessions(offer: Offer, now: Date): Session[] {

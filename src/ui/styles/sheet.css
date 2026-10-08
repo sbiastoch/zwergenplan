@@ -100,6 +100,10 @@
     font-size: 1.0625rem;
     letter-spacing: 0;
   }
+  .bound-hint {
+    margin: 6px 0 0;
+    font-weight: 800;
+  }
   /* iOS zentriert den Wert sonst */
   .input.date::-webkit-date-and-time-value {
     text-align: start;
