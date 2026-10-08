@@ -33,17 +33,17 @@
     font-weight: 400;
   }
   /* Zeile mit Herz daneben (Plan 0025, E3): der Knopf zum Sheet nimmt den Rest, das Herz bleibt 44 px */
+  /* Herz in der Kachel, rechts innen wie auf der Angebotskarte (card.css: .heart absolut); der Knopf zum Sheet läuft
+     unter ihm durch und hält rechts Platz frei, damit der Text nie darunter liegt */
   .provider-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    position: relative;
   }
   .provider-row .place {
-    flex: 1;
-    min-width: 0;
+    padding-right: 60px;
   }
   .provider-row .heart {
-    flex: none;
+    top: calc(50% - 22px);
+    right: 8px;
   }
   .provider-name {
     hyphens: auto;
