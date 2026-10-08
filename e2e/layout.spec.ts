@@ -144,7 +144,7 @@ test("Querformat 915×412: Toast steht über der Inhaltsspalte, nicht über der 
   await ready(page);
   await page.clock.pauseAt(FIXTURE_NOW); // Toast bleibt stehen (Plan 0007, E15)
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await expect(page.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toBeVisible();
+  await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
   const t = await page.evaluate(() => {
     const toast = document.querySelector<HTMLElement>(".toast");
     const main = document.querySelector("main")?.getBoundingClientRect();
@@ -490,7 +490,7 @@ test("Toast lässt Tipps durch (320 px, 200 %)", async ({ page }) => {
   await setTextScale(page, 2);
   await page.clock.pauseAt(FIXTURE_NOW); // Toast bleibt stehen (Plan 0007, E15)
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  const toast = page.locator(".toast").filter({ hasText: "Sticker abgelöst" });
+  const toast = page.locator(".toast").filter({ hasText: "Nicht mehr gemerkt" });
   await expect(toast).toBeVisible();
   const inside = await toast.evaluate((el) => {
     const r = el.getBoundingClientRect();
