@@ -11,7 +11,10 @@ const NB = "\u00a0";
 /** Nur das, was die Tests von MapLibre brauchen (ohne Abhängigkeit von src/). */
 interface TestMap {
   project: (lngLat: [number, number]) => { x: number; y: number };
-  queryRenderedFeatures: (options: { layers: string[] }) => Array<{
+  queryRenderedFeatures: (
+    geometryOrOptions: { layers: string[] } | [[number, number], [number, number]],
+    options?: { layers: string[] },
+  ) => Array<{
     geometry: { type: string; coordinates: [number, number] };
     properties: Record<string, unknown>;
   }>;
@@ -20,6 +23,13 @@ interface TestMap {
   jumpTo: (options: { zoom?: number; center?: [number, number] }) => void;
   getLayer: (id: string) => unknown;
   hasImage: (id: string) => boolean;
+  getSource: (id: string) =>
+    | {
+        getData: () => Promise<{
+          features: Array<{ geometry: { coordinates: [number, number] }; properties: Record<string, unknown> }>;
+        }>;
+      }
+    | undefined;
   getPaintProperty: (layer: string, name: string) => unknown;
   getLayoutProperty: (layer: string, name: string) => unknown;
   loaded: () => boolean;
@@ -394,9 +404,7 @@ test.describe("mit gemockten Kacheln", () => {
     expect(light.images).toBe(12);
     expect(light.places).toBeGreaterThan(0);
     expect(light.symbols).toBe(light.places);
-    // Badge mit Zahl nur bei mehr als einem Angebot; die Fixtures haben beides
-    expect(light.several).toBeGreaterThan(0);
-    expect(light.several).toBeLessThan(light.places);
+    // im Ausschnitt: Badge genau an den Orten mit mehr als einem Angebot
     expect(light.badges).toBe(light.several);
     for (const kind of light.kinds) expect(Object.keys(light.tokens)).toContain(kind);
     for (const [category, color] of Object.entries(light.tokens)) {
@@ -408,6 +416,39 @@ test.describe("mit gemockten Kacheln", () => {
     expect(light.labelColor).toBe(
       await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--ink").trim()),
     );
+
+    // Unabhängig vom Ausschnitt des Geräts: je ein Ort mit einem und mit mehreren Angeboten aus der Quelle,
+    // ohne Cluster (Zoom über clusterMaxZoom 14) mittig angefahren; Badge nur beim zweiten.
+    const sample = await page.evaluate(async () => {
+      const data = await window.__zpMap?.getSource("orte")?.getData();
+      const features = data?.features ?? [];
+      const at = (several: boolean) =>
+        features.find((f) => Number(f.properties["angebote"]) > 1 === several)?.geometry.coordinates;
+      return { single: at(false), several: at(true) };
+    });
+    for (const [center, badge] of [
+      [sample.single, 0],
+      [sample.several, 1],
+    ] as const) {
+      if (!center) throw new Error("Fixture-Ort mit einem bzw. mehreren Angeboten fehlt");
+      await page.evaluate((c) => window.__zpMap?.jumpTo({ center: c, zoom: 16 }), center);
+      await idle(page);
+      const hits = await page.evaluate(() => {
+        const map = window.__zpMap;
+        if (!map) throw new Error("keine Karte");
+        const { x, y } = map.project([map.getCenter().lng, map.getCenter().lat]);
+        const box: [[number, number], [number, number]] = [
+          [x - 4, y - 20],
+          [x + 20, y + 4],
+        ];
+        return {
+          places: map.queryRenderedFeatures(box, { layers: ["orte-punkt"] }).length,
+          badges: map.queryRenderedFeatures(box, { layers: ["orte-punkt-badge"] }).length,
+        };
+      });
+      expect(hits.places).toBe(1);
+      expect(hits.badges).toBe(badge);
+    }
 
     await switchTheme(page, "Dunkel", "/styles/dark");
     await expect.poll(() => page.evaluate(() => !!window.__zpMap?.getLayer("bg-dunkel"))).toBe(true);
