@@ -1,6 +1,6 @@
 # ADR 0018 – Regelmäßige Reihen altersgerecht als ICS, im Browser erzeugt
 
-Status: angenommen (2026-10-08), ergänzt ADR 0007. Details in Plan 0018. Offen ist nur der Gerätetest des Downloads aus dem Detail-Dialog am iPhone (Plan 0018, Schritt 6); der Rückfall dafür steht unter „Entscheidung“.
+Status: angenommen (2026-10-08), ergänzt ADR 0007. Details in Plan 0018. Der Download aus dem Detail-Dialog funktioniert am iPhone (Plan 0018, Schritt 6, 2026-10-08); der Rückfall unter „Entscheidung“ wird nicht gebraucht.
 
 ## Kontext
 ADR 0007 erzeugt nur die Sammeldatei der Merkliste im Browser, alle übrigen ICS-Dateien bleiben statisch. Regelmäßige Gruppen werden mit Plan 0015 12 Monate fortgeschrieben. Eine statische Reihen-Datei brächte damit etwa 50 Termine in den Kalender, auch nachdem das Kind aus dem Angebot herausgewachsen ist. Das Geburtsdatum steht nur im `localStorage` des Geräts.
