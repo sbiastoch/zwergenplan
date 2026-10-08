@@ -3,6 +3,7 @@
  * IDs, die im aktuellen Datenstand fehlen, werden nur ausgeblendet, nie gelöscht: Ein lückenhafter
  * Pipeline-Lauf soll keine Merkliste leeren.
  */
+import { fitsAgeAt } from "./age.ts";
 import { nextSession, upcomingSessions } from "./agenda.ts";
 import type { Offer, Session } from "./schema.ts";
 
@@ -22,8 +23,60 @@ export function savedOffers<T extends Offer>(offers: readonly T[], ids: readonly
     .map((x) => x.offer);
 }
 
-/** Termine für den Sammel-Export: Kurse immer komplett, sonst nur nicht beendete. */
+/**
+ * Termine für den Sammel-Export: Kurse immer komplett, sonst nur nicht beendete.
+ * Entfällt mit Plan 0018, Schritt 3 (exportSessions).
+ */
 export function collectionSessions(offer: Offer, now: Date): Session[] {
   if (offer.format === "kurs") return offer.sessions;
   return upcomingSessions(offer, now);
+}
+
+/** Auswahl für den ICS-Export einer Reihe bzw. der Merkliste (Plan 0018). */
+export interface ExportSelection {
+  sessions: Session[];
+  /** Beginn des ersten passenden Termins, wenn davor kommende Termine wegfallen (zu jung) */
+  from?: string;
+  /** Beginn des letzten passenden Termins, wenn danach Termine wegfallen (zu alt) */
+  until?: string;
+}
+
+/**
+ * Termine für den ICS-Export (Plan 0018, E1): Kurse immer komplett, sonst nur nicht beendete. Regelmäßige Angebote
+ * mit Geburtsdatum nur, solange sie zum Alter passen (`fitsAgeAt` je Termin). Weil das Alter nur steigt, fallen dabei
+ * nur vorn oder hinten Termine weg; `from`/`until` nennen dann die Grenze.
+ */
+export function exportSessions(offer: Offer, now: Date, birthDate: string | undefined): ExportSelection {
+  if (offer.format === "kurs") return { sessions: offer.sessions };
+  const upcoming = upcomingSessions(offer, now);
+  if (offer.format !== "regelmaessig" || birthDate === undefined) return { sessions: upcoming };
+  const sessions = upcoming.filter((s) => fitsAgeAt(offer.age, birthDate, s.start));
+  const first = sessions[0];
+  const last = sessions.at(-1);
+  if (!first || !last) return { sessions };
+  return {
+    sessions,
+    ...(first !== upcoming[0] && { from: first.start }),
+    ...(last !== upcoming.at(-1) && { until: last.start }),
+  };
+}
+
+/** Was „Alle Termine“ im Detail tun soll (Plan 0018, E2). */
+export type SeriesExport =
+  /** statische Datei: kein Geburtsdatum oder nicht regelmäßig */
+  | { kind: "static" }
+  /** kein kommender Termin passt zum Alter */
+  | { kind: "none" }
+  /** im Browser erzeugen, gekürzt oder nicht */
+  | { kind: "blob"; selection: ExportSelection };
+
+/**
+ * Entscheidung für „Alle Termine“ (Plan 0018, E1). Mit Geburtsdatum entsteht bei regelmäßigen Angeboten immer eine
+ * Datei im Browser, auch ungekürzt: Sonst verriete der Request auf die statische Datei, ob das Kind über die ganze
+ * Reihe passt (Review 3, W2).
+ */
+export function seriesExport(offer: Offer, now: Date, birthDate: string | undefined): SeriesExport {
+  if (offer.format !== "regelmaessig" || birthDate === undefined) return { kind: "static" };
+  const selection = exportSessions(offer, now, birthDate);
+  return selection.sessions.length === 0 ? { kind: "none" } : { kind: "blob", selection };
 }

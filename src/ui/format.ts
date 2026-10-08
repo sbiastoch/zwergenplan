@@ -16,9 +16,10 @@ import {
   stopMinutes,
 } from "../domain/reach.ts";
 import { registrationPhase } from "../domain/registration.ts";
+import type { ExportSelection } from "../domain/saved.ts";
 import type { AgeRange, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { addDays, berlinIsoDate, berlinKey, isoWeekday, parseIsoDate } from "../domain/time.ts";
+import { addDays, berlinDate, berlinIsoDate, berlinKey, isoWeekday, parseIsoDate } from "../domain/time.ts";
 import type { TransitLineNames, TransitOther, TransitSource } from "../domain/transit-types.ts";
 import type { ReachMode } from "./use-transit.ts";
 
@@ -244,6 +245,45 @@ export function dayDots(instant: string): string {
 export function standDate(instant: string): string {
   const { year, month, day } = parseIsoDate(berlinIsoDate(instant));
   return `${day}.${month}.${year}`;
+}
+
+/** „14.10.“, außerhalb des laufenden Berliner Jahres „14.3.2027“ (Plan 0018, E4) */
+function dayDotsInYear(instant: string, now: Date): string {
+  return berlinDate(instant).year === berlinDate(now).year ? dayDots(instant) : standDate(instant);
+}
+
+/** Grundform des Kalender-Toasts: „Kalenderdatei mit 4 Terminen geladen“ */
+function calendarLoaded(count: number): string {
+  return `Kalenderdatei mit ${plural(count, "Termin", "Terminen")} geladen`;
+}
+
+/** Toast nach „Alle Termine“ im Detail (Plan 0018, E4): nennt die Altersgrenze, wenn die Reihe gekürzt ist. */
+export function seriesToast({ sessions, from, until }: ExportSelection, now: Date): string {
+  const loaded = calendarLoaded(sessions.length);
+  if (from && until) {
+    return `${loaded} – vom ${dayDotsInYear(from, now)} bis ${dayDotsInYear(until, now)} passt es zum Alter`;
+  }
+  if (until) return `${loaded} – bis ${dayDotsInYear(until, now)}, danach passt es nicht mehr zum Alter`;
+  if (from) return `${loaded} – ab ${dayDotsInYear(from, now)}, vorher passt es noch nicht zum Alter`;
+  return loaded;
+}
+
+/** Toast nach dem Export der Merkliste (Plan 0018, E4): `missing` gemerkte Angebote ohne passenden Termin */
+export function collectionToast(count: number, missing: number): string {
+  const loaded = calendarLoaded(count);
+  if (missing === 0) return loaded;
+  return `${loaded} – ${plural(missing, "Angebot passt", "Angebote passen")} nicht zum Alter`;
+}
+
+/**
+ * Zusatz der Alterszeile im Detail (Plan 0018, E4): „passt bis 14.10.“, „passt ab 21.10.“, „passt 21.10.–14.3.2027“.
+ * Ohne Kürzung keiner. Den Trenner davor setzt die Oberfläche.
+ */
+export function ageWindowLabel({ from, until }: ExportSelection, now: Date): string | undefined {
+  if (from && until) return `passt ${dayDotsInYear(from, now)}–${dayDotsInYear(until, now)}`;
+  if (until) return `passt bis ${dayDotsInYear(until, now)}`;
+  if (from) return `passt ab ${dayDotsInYear(from, now)}`;
+  return undefined;
 }
 
 const DISTANCE = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
