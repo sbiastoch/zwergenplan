@@ -17,6 +17,8 @@ UI-Texte und Doku sind auf Deutsch, Code-Identifier auf Englisch. Die Kommandos 
    - CI ist das einzige Gate vor dem Deploy. Fertig erst, wenn der CI-Lauf auf `main` **grün** ist und die Live-Seite den neuen Stand zeigt: `commit` in https://zwergenplan.app/data/meta.json ist `git rev-parse --short HEAD`. Sobald Plan 0027, Etappe 7, umgesetzt ist, deployt ein reiner Doku-Commit nicht mehr. `meta.json` zeigt dann den letzten Commit mit Build-Eingaben.
    - **Die CI beobachtet nur die Haupt-Session**, mit `gh run watch <id> -i 120 --exit-status` oder einzelnen `gh run view` im Abstand von mindestens 2 Minuten. Ein Subagent pusht und meldet Branch und SHA. Grund: Parallele Watches mit dem Standardintervall von 3 s haben das API-Limit von 5 000 Anfragen pro Stunde gerissen (Plan 0027, E13).
 
+7. **Archivieren**: Ist ein Plan vollständig umgesetzt und live (CI grün, wo nötig `/browser-review live`), kommen seine Restpunkte nach `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“. Die Statuszeile wird `Status: abgeschlossen, live seit <sha> (<JJJJ-MM-TT>)`, der Plan wandert per `git mv` nach `docs/plans/archiv/`, und Pfadverweise werden umgeschrieben. Fertig, wenn `check-docs` grün ist; es prüft Statuszeile, Ablageort und Pfadverweise.
+
 Die Hooks erzwingen einen Teil davon. Bei Rot meldet das Stop-Gate kein „fertig“. Die Gates sind die **Backpressure** des Projekts: Wird eins rot, reparierst du die Ursache. Eine Schwelle zu senken, eine Regel abzuschalten oder `skip`/`biome-ignore`/`as`-Casts zu setzen braucht eine schriftliche Begründung im Code und im Commit, bei Architekturregeln ein ADR.
 
 ## Lokal prüfen (Plan 0027, ADR 0021)
@@ -45,6 +47,7 @@ E2E läuft lokal **gezielt**, die volle Suite fährt die CI auf jedem Branch (et
 
 - `docs/architecture.md`: Schichten, Abhängigkeitsregeln, Invarianten, Mobile-UX-Gates. **Lesen, bevor du ein Modul anlegst oder Daten anfasst.**
 - `docs/adr/`: begründete Entscheidungen. **Lesen, bevor du eine Entscheidung infrage stellst.** Eine Abweichung wird ein neues ADR.
+- `docs/plans/`: aktive Pläne. Abgeschlossene liegen in `docs/plans/archiv/`. „Plan NNNN“ findet sich in einem der beiden Ordner, die Nummern sind über beide eindeutig. Eine neue Nummer ist die höchste aus beiden plus eins.
 - `docs/ideas.md`: bewusst außerhalb des Scopes. Neue Ideen landen dort, nicht im Code.
 - `src/domain/schema.ts`: der Datenvertrag, also die **einzige** Quelle. `schema/*.json` ist ein Export davon und wird nie von Hand geändert.
 

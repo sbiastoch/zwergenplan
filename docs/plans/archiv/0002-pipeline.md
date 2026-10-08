@@ -1,6 +1,6 @@
 # Plan 0002 – Recherche-Pipeline in TypeScript und erster echter Datenstand
 
-Status: umgesetzt
+Status: abgeschlossen, live seit e5e3e80 (2026-10-04). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt
 Datum: 2026-10-04
 
 ## Ziel

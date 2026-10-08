@@ -5,7 +5,7 @@ description: Lässt einen Implementierungsplan aus docs/plans/ unabhängig und a
 
 # Plan-Review
 
-1. Stelle sicher, dass der Plan als Datei unter `docs/plans/NNNN-<thema>.md` liegt und für sich allein verständlich ist. Der Reviewer kennt den Chat nicht.
+1. Stelle sicher, dass der Plan als Datei unter `docs/plans/NNNN-<thema>.md` liegt und für sich allein verständlich ist. Der Reviewer kennt den Chat nicht. Die Statuszeile ist die erste nicht-leere Zeile nach dem Titel und beginnt mit `Status: Entwurf`, `Review eingearbeitet`, `freigegeben` oder `in Umsetzung` (`check-docs`). Abgeschlossene Pläne in `docs/plans/archiv/` liest der Reviewer nur, wenn ein Verweis darauf zeigt.
 2. Starte den Subagenten `plan-reviewer` mit dem Plan-Pfad. Gib ihm keine Begründungen aus dem Chat mit; er soll unvoreingenommen urteilen.
 3. Bewerte jedes Finding:
    - **übernehmen**: Plan anpassen.

@@ -1,6 +1,6 @@
 # Plan 0004 – Entfernung als Luftlinie ab einem Startpunkt
 
-Status: umgesetzt auf Branch `entfernung-0004` (Schritte 2–7, Basis `nacharbeit-0007`), Arch-Review eingearbeitet → offen: Schritt 8 (Push, CI, Fast-Forward nach `main`) und 9 (`/browser-review live`)
+Status: abgeschlossen, live seit 7740fd5 (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt auf Branch `entfernung-0004` (Schritte 2–7, Basis `nacharbeit-0007`), Arch-Review eingearbeitet → offen: Schritt 8 (Push, CI, Fast-Forward nach `main`) und 9 (`/browser-review live`)
 Datum: 2026-10-04
 Bezug: Plan 0003 (E1: „Karte und Entfernung kommen in Plan 0004“), ADR 0005 (ÖPNV-Fahrzeit als Ziel). Die Karte folgt in Plan 0005 (ADR 0008) und baut auf diesem Plan auf.
 

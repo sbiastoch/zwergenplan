@@ -1,6 +1,6 @@
 # Plan 0009 – Öffi-Fahrzeit statt Luftlinie
 
-Status: umgesetzt und live (2026-10-05, `97f1216`); Hinweise H1–H8 aus dem Browser-Review offen
+Status: abgeschlossen, live seit 97f1216 (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt und live (2026-10-05, `97f1216`); Hinweise H1–H8 aus dem Browser-Review offen
 Datum: 2026-10-05
 Bezug: ADR 0005 (Öffi-Wegzeit, Stufe 2: hier umgesetzt, mit Abweichungen → **ADR 0011**, Entwurf in `docs/adr/0011-oepnv-wegzeit-tabelle.md`, E14), Plan 0004 (Startpunkt, Luftlinie, Schnittstelle `Reach`, E2/E9), Plan 0005 (Karte, Kamera-Regel, Kartenmitte), ADR 0002 (Datenfluss), ADR 0003 (`nearestStops`), ADR 0006 (Pipeline), ADR 0008 (Privatsphäre der Karte), ADR 0010 (`src/data` und Domänenhilfen).
 
@@ -374,7 +374,7 @@ export const ACCESS_METERS = 800;
   - **Darüber** kommt `transit.ts` **lazy** in `dist/assets/oepnv/` (Vite `chunkFileNames` über den Chunk-Namen, wie `karte/`), mit Budget `Wegzeit JS (lazy)` `dist/assets/oepnv/*.js` **3 kB**, und es gelten die Regeln unten.
   - Die Entscheidung samt Messwert steht in der Commit-Message und wird hier eingetragen.
 - **Nach Schritt 6** wird wieder gemessen. Über 89 kB wird verschlankt (Texte kürzen; im Fall „statisch“ doch lazy). Das Budget von 90 kB bleibt; mehr braucht ein ADR.
-  - Ergebnis (Umsetzung, Paket C): 89,69 kB, Texte gekürzt, weiter über 89 kB. Die restliche Verschlankung ist Pflicht von **Paket 0 aus Plan 0010** (E8 „Paket 0: Verschlankung des Startbundles“, Reihenfolge Plan 0009 → Paket 0). Plan 0010 liegt noch nicht auf `main`, sondern auf Branch `anbieter-0010` (`docs/plans/0010-anbieteruebersicht.md`).
+  - Ergebnis (Umsetzung, Paket C): 89,69 kB, Texte gekürzt, weiter über 89 kB. Die restliche Verschlankung ist Pflicht von **Paket 0 aus Plan 0010** (E8 „Paket 0: Verschlankung des Startbundles“, Reihenfolge Plan 0009 → Paket 0). Plan 0010 liegt noch nicht auf `main`, sondern auf Branch `anbieter-0010` (`docs/plans/archiv/0010-anbieteruebersicht.md`).
 - **Typen getrennt** (M3): `TransitTableFile` und `TransitTable` liegen in `src/domain/transit-types.ts` (wie `src/ui/map-types.ts`). Dieses Modul darf jeder statisch importieren. So braucht `transit-only-lazy` keine Ausnahme für Typ-Importe.
 - **Regeln, nur im Fall „lazy“**, je mit Kanarienvogel (ADR 0004):
   - `transit-only-lazy` (dependency-cruiser): `from: { path: "^src/", pathNot: "\\.test\\.ts$" }` → `to: { path: "^src/domain/transit\\.ts$", dependencyTypesNot: ["dynamic-import"] }` verboten, auch für reine Typ-Importe.
@@ -511,7 +511,7 @@ Danach parallel, je in eigenem Worktree, beide vom Stand nach B1:
 - `src/data/transit.ts` (+Test), `src/ui/use-transit.ts` (+Test), `use-offer-views.ts`, `format.ts`, `OriginPicker.tsx`, `KidSheet.tsx`, `Sheets.tsx`, `Chrome.tsx`, `App.tsx`, `OfferCard.tsx`, `DetailDialog.tsx`, `Overlays.tsx`, `karte/*`, `map-types.ts`;
 - `vite.config.ts` (`assets/oepnv/`, nur im Fall „lazy“), `.size-limit.json`, `.dependency-cruiser.cjs` (`transit-only-lazy`/`transit-entry-only`, nur im Fall „lazy“), `scripts/check-architecture.ts`, `e2e/**`, `scripts/screenshots.ts`, `docs/architecture.md`, `docs/ideas.md`.
 
-Berührungspunkt: `.dependency-cruiser.cjs` gehört zuerst B2, danach C (C startet erst nach dem Zusammenführen von B2). `docs/plans/0009-oepnv-fahrzeit.md` ändert kein Paket, Messwerte stehen in den Commit-Messages, der Koordinator überträgt sie.
+Berührungspunkt: `.dependency-cruiser.cjs` gehört zuerst B2, danach C (C startet erst nach dem Zusammenführen von B2). `docs/plans/archiv/0009-oepnv-fahrzeit.md` ändert kein Paket, Messwerte stehen in den Commit-Messages, der Koordinator überträgt sie.
 
 ## Struktur
 
@@ -787,7 +787,7 @@ Der Koordinator überträgt hier die Messwerte und Entscheidungen der Pakete aus
   - Ausgang 87,95 kB.
   - Statisch wären es 90,52 kB, über der Schwelle (88,6) und über dem Budget. Deshalb **lazy**: 89,70 kB, nach Kürzen der Fehlertexte **89,69 kB**.
   - Die Wegzeit-Texte und -Zustände kosten im Start ≈ 1,7 kB gzip.
-  - Das Ziel ≤ 89,0 kB ist verfehlt. Für Plan 0010 (Branch `anbieter-0010`, `docs/plans/0010-anbieteruebersicht.md`, E8 „Paket 0: Verschlankung des Startbundles“) heißt das: Paket 0 muss X − 87,7 kB einsparen, bei X = 89,69 also ≈ **2,0 kB**. Nach dem Arch-Review liegt X bei 89,81 kB (≈ 2,1 kB, siehe unten).
+  - Das Ziel ≤ 89,0 kB ist verfehlt. Für Plan 0010 (Branch `anbieter-0010`, `docs/plans/archiv/0010-anbieteruebersicht.md`, E8 „Paket 0: Verschlankung des Startbundles“) heißt das: Paket 0 muss X − 87,7 kB einsparen, bei X = 89,69 also ≈ **2,0 kB**. Nach dem Arch-Review liegt X bei 89,81 kB (≈ 2,1 kB, siehe unten).
 - **Budgets:** `JS (initial)` 89,69/90 kB, `Wegzeit JS (lazy)` 1,01/3 kB, `Wegzeit-Daten` 42,03/64 kB, CSS 10,62/15 kB.
 - **Kanarienvögel**, alle wie erwartet:
   - statischer Import und reiner Typ-Import von `transit.ts` in `App.tsx`: rot (`transit-only-lazy`, `transit-entry-only`);

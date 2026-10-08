@@ -1,6 +1,6 @@
 # Plan 0012 – Linien in der Wegzeit („ca. 25 Min. mit Bus 37 → U1“)
 
-Status: **Umgesetzt und live seit `61de0da`** (https://zwergenplan.app/, `data/meta.json`). Schritte 1–10 erledigt; Browser-Review live (Schritt 10, 2026-10-06) **bestanden mit Hinweisen**, siehe Abschnitt „Browser-Review live“. Offen bleibt nur die Stichprobe mit VoiceOver und TalkBack am echten Gerät („, dann“, Wischschritte).
+Status: abgeschlossen, live seit 61de0da (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: **Umgesetzt und live seit `61de0da`** (https://zwergenplan.app/, `data/meta.json`). Schritte 1–10 erledigt; Browser-Review live (Schritt 10, 2026-10-06) **bestanden mit Hinweisen**, siehe Abschnitt „Browser-Review live“. Offen bleibt nur die Stichprobe mit VoiceOver und TalkBack am echten Gerät („, dann“, Wischschritte).
 Datum: 2026-10-05
 Bezug:
 - **ADR 0011** (Wegzeit-Tabelle Halt→Ort). Dieser Plan ändert dort:
@@ -435,7 +435,7 @@ src/ui/DetailDialog.tsx, src/ui/karte/PlaceSheet.tsx   nutzen ReachLong (E10)
 src/ui/styles/map.css                .place-where > span, Wrapper mit overflow-wrap: normal (E10)
 .size-limit.json                     „Linien-Daten“ 40 kB (E7)
 docs/adr/0015-wegzeit-linien.md      neu (E11)
-docs/architecture.md, README.md, docs/ideas.md, docs/plans/0011-pwa-push.md, docs/adr/0013-pwa-service-worker.md, docs/adr/0011-oepnv-wegzeit-tabelle.md (Verweis)
+docs/architecture.md, README.md, docs/ideas.md, docs/plans/archiv/0011-pwa-push.md, docs/adr/0013-pwa-service-worker.md, docs/adr/0011-oepnv-wegzeit-tabelle.md (Verweis)
 ```
 
 `buildTransitTable` wird zu `buildTransitTables(timetable, places, opts?: { egressMeters?: number; penaltySeconds?: number }) → { table: TransitTableFile; lines: TransitLinesFile; stats: { lines: number; combos: number; withoutLines: number; outliers: number; cells: number } }`. Der alte Name verschwindet; Aufrufer sind nur `build-data.ts` und Tests (knip).

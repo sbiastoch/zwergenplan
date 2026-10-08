@@ -1,6 +1,6 @@
 # Plan 0019 – Route in Google Maps und andere Wege
 
-Status: **umgesetzt** (Teil A und Teil B), freigegeben nach drei Reviews, Budget-Entscheidung des Nutzers in E9. Arch-Review ohne Blocker, eingearbeitet (Abschnitt „Arch-Review“). Live seit `9963355` (mit E10). Offen ist nur die Gerätematrix (E8) durch den Nutzer. Nummer 0019, weil 0017 schon doppelt vergeben ist: auf `main` (Kalender) und auf dem Branch `push-0017`.
+Status: abgeschlossen, live seit 9963355 (2026-10-06). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: **umgesetzt** (Teil A und Teil B), freigegeben nach drei Reviews, Budget-Entscheidung des Nutzers in E9. Arch-Review ohne Blocker, eingearbeitet (Abschnitt „Arch-Review“). Live seit `9963355` (mit E10). Offen ist nur die Gerätematrix (E8) durch den Nutzer. Nummer 0019, weil 0017 schon doppelt vergeben ist: auf `main` (Kalender) und auf dem Branch `push-0017`.
 Datum: 2026-10-06
 Bezug: Plan 0005 (Nicht-Ziel „Route in Karten-App öffnen“, `docs/ideas.md`), Plan 0009 und 0012 (Wegzeit, Linien, ADR 0011, ADR 0015), Plan 0010 (Anbieter-Sheet), ADR 0008 (Referrer-Policy), `docs/architecture.md` (Invarianten „Privatsphäre“ und „Startpunkt“)
 
@@ -186,7 +186,7 @@ Die bestehende Rechnung gibt Alternativen her, ohne neue Daten. Nachgemessen mit
 | `src/ui/karte/PlaceSheet.tsx` | Ortszeile als Link |
 | `src/ui/styles/dialog.css`, `anbieter.css`, `map.css` | Stile für `a.label.route` (mit `--tilt`, Drehung `of .label`), `.ways`, `.venue-route`, `.place-route`, `.route-hint` |
 | `.size-limit.json`, `docs/adr/0012-startbudget-und-chunks.md` | `JS (initial)` 100 kB, Status, Entscheidung, Nachtrag (E9) |
-| `docs/plans/0011-pwa-push.md`, `docs/adr/0013-pwa-service-worker.md` | Verweis: Budget jetzt 100 kB (E9) |
+| `docs/plans/archiv/0011-pwa-push.md`, `docs/adr/0013-pwa-service-worker.md` | Verweis: Budget jetzt 100 kB (E9) |
 | `docs/adr/0015-wegzeit-linien.md` | Nachtrag „ergänzt durch Plan 0019“: andere Wege im Detail (E4) |
 | `e2e/detail.spec.ts`, `e2e/anbieter-inhalt.spec.ts`, `e2e/karte.spec.ts`, `e2e/startpunkt.spec.ts` | E2E-Tests (unten) |
 | `docs/architecture.md` | Satz unter „Privatsphäre“ (E3), `maps-link` in der Liste der Domänen-Module, im Absatz „Linien“ ein Satz zu `others` (E4) |

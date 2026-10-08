@@ -1,6 +1,6 @@
 # Plan 0014 – Das Kategorie-Etikett folgt dem Filter
 
-Status: **umgesetzt und live seit `2b8f92a`** (https://zwergenplan.app/). Browser-Review live bestanden, ohne Blocker.
+Status: abgeschlossen, live seit 2b8f92a (2026-10-06). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: **umgesetzt und live seit `2b8f92a`** (https://zwergenplan.app/). Browser-Review live bestanden, ohne Blocker.
 Datum: 2026-10-06
 Bezug: Plan 0003 (E9 Kachel, E10 Kategorien), `src/domain/topics.ts`, `src/ui/categories.ts`
 
@@ -100,7 +100,7 @@ Die Merkliste filtert nicht nach Kategorie, nutzt aber denselben `ctx`. Liegt ei
 | `src/ui/DetailDialog.tsx`, `src/ui/Overlays.tsx` | Prop `category` |
 | `e2e/app.spec.ts` | E2E-Tests (siehe unten) |
 | `docs/ideas.md` | Idee „mehrere Etiketten je Kachel“ |
-| `docs/plans/0003-design-stickerheft.md` | Hinweis „geändert durch Plan 0014, E1“ an E9 (Pille) und E14 (Formpunkte) |
+| `docs/plans/archiv/0003-design-stickerheft.md` | Hinweis „geändert durch Plan 0014, E1“ an E9 (Pille) und E14 (Formpunkte) |
 
 Keine neue Abhängigkeit, kein neues Modul, keine Schemaänderung. Erwartet sind deutlich unter 200 Zeilen, also kein `/arch-review` nötig (CLAUDE.md, Schritt 4).
 

@@ -1,6 +1,6 @@
 # Plan 0005 – Karte der Orte (MapLibre GL + OpenFreeMap)
 
-Status: umgesetzt auf Branch `karte-0005` (Schritte 2–7), Arch-Review eingearbeitet → Push, CI und Browser-Review live offen
+Status: abgeschlossen, live seit ed4e5e4 (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt auf Branch `karte-0005` (Schritte 2–7), Arch-Review eingearbeitet → Push, CI und Browser-Review live offen
 Datum: 2026-10-04
 Bezug: Plan 0004 (Startpunkt, Luftlinie: Voraussetzung), Plan 0003 (E1, E4), ADR 0005 (Startpunkt ohne GPS), **ADR 0008** (angenommen: MapLibre, OpenFreeMap, Kamera-Regel, Alternativen)
 

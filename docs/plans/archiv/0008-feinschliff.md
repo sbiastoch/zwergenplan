@@ -1,6 +1,6 @@
 # Plan 0008 – Feinschliff nach den Live-Reviews
 
-Status: umgesetzt (Pakete A, B, C zusammengeführt auf `feinschliff-0008-int`), Arch-Review eingearbeitet; offen: Fast-Forward nach `main`, `/browser-review live` (Schritt 8), Geräte-Checkliste (Schritt 9)
+Status: abgeschlossen, live seit c228011 (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Pakete A, B, C zusammengeführt auf `feinschliff-0008-int`), Arch-Review eingearbeitet; offen: Fast-Forward nach `main`, `/browser-review live` (Schritt 8), Geräte-Checkliste (Schritt 9)
 Datum: 2026-10-05
 Bezug: Plan 0007, Abschnitt „Offen für die Feinschliff-Runde (Stand 2026-10-05, nach Plan 0005)“ und dessen „Browser-Review live“ (Wichtig 1, Hinweise 1–9); Plan 0004, „Browser-Review live“ (H1–H4, W1); Plan 0005, Abschnitt „Browser-Review live (2026-10-05)“ (H1–H7, W1). Er steht auf `main`, sobald der Attributions-Hotfix gelandet ist (Commit `ffddb46`). Geschrieben auf `a682d4d`. Basis der Umsetzung ist `main` **nach** dem Attributions-Hotfix; der Koordinator rebased diesen Branch darauf (Schritt 0).
 
@@ -508,7 +508,7 @@ Läuft Plan 0007 Paket C gleichzeitig, nutzt es einen vierten Port (z. B. 4473).
 - `tests/fixtures/karte/positron.json`, `tests/fixtures/karte/dark.json`
 - `e2e/karte.spec.ts`
 
-**Nur beim Zusammenführen** (Schritt 5, ein Agent): `docs/architecture.md` und `docs/plans/0008-feinschliff.md`. Jedes Paket nennt in seiner Commit-Message die Zeilen, die es dort braucht:
+**Nur beim Zusammenführen** (Schritt 5, ein Agent): `docs/architecture.md` und `docs/plans/archiv/0008-feinschliff.md`. Jedes Paket nennt in seiner Commit-Message die Zeilen, die es dort braucht:
 - A: Datenfluss, Frühstart.
 - B: reduzierte Bewegung 0 ms, Präzisierungen in Prüfung 2 und 3 des Text-Gates.
 - C: Karte, deutsche Beschriftung über `text-field`.

@@ -1,6 +1,6 @@
 # Plan 0022 – Kleinigkeiten aus dem Nutzer-Feedback
 
-Status: umgesetzt (Branch `feedback-0022-kleinigkeiten`)
+Status: in Umsetzung – umgesetzt und live seit d5fab1b; ins Archiv nach dem Browser-Review live (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Branch `feedback-0022-kleinigkeiten`)
 Datum: 2026-10-08
 Review: **kein Plan-Review**, Nutzerentscheid „pragmatisch, ohne großen Plan“. Arch-Review nach der Umsetzung (unten). Die Gates (`pnpm check`, Budgets, Browser-Review nach dem Deploy) gelten unverändert.
 Bezug: Plan 0004/0009/0016 (Startpunkt), Plan 0011 (App-Extras, ADR 0012 Startbudget), Plan 0003 (Merkliste)

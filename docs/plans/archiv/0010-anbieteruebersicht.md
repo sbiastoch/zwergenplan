@@ -1,6 +1,6 @@
 # Plan 0010 – Anbieterübersicht
 
-Status: live seit `27b7b3b` (2026-10-05), Browser-Review live bestanden; offen: Geräteprüfung am echten iPhone/Android
+Status: abgeschlossen, live seit 27b7b3b (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: live seit `27b7b3b` (2026-10-05), Browser-Review live bestanden; offen: Geräteprüfung am echten iPhone/Android
 Datum: 2026-10-05
 Bezug: `docs/ideas.md` („Anbieterverzeichnis auf der Website, ersetzt das frühere `ANBIETER.md`“), Plan 0004 (Startpunkt, `reachOf`), Plan 0005 (Ladekette der Karte, Orts-Liste und Orts-Sheet als Vorbild), Plan 0007 (Text-Gate, Tab-Leiste quer als Seitenleiste, E14), Plan 0008 (Feinschliff: Badge quer, `atPlace`, `retry`), **Plan 0009** (Öffi-Wegzeit, `ReachMode`, ADR 0011: kommt vor diesem Plan), ADR 0002 (Datenfluss), ADR 0003 (Themen → Kategorien), ADR 0006 (Katalog im Zod-Vertrag), ADR 0008 (Privatsphäre, Lazy-Budgets).
 

@@ -1,6 +1,6 @@
 # Plan 0007 – Nacharbeit zum Browser-Review von Plan 0003
 
-Status: Pakete A, B und C umgesetzt (A+B zusammengeführt in Schritt 5, siehe „Umsetzung“; C siehe „Umsetzung Paket C“, Zusammenführen Schritt 9 offen)
+Status: abgeschlossen, live seit 3469f6a (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: Pakete A, B und C umgesetzt (A+B zusammengeführt in Schritt 5, siehe „Umsetzung“; C siehe „Umsetzung Paket C“, Zusammenführen Schritt 9 offen)
 Datum: 2026-10-04
 Bezug: Plan 0003, Abschnitt „Browser-Review live (2026-10-04)“, Befunde B1–B8 und H1–H8. Dieser Plan ist die Voraussetzung, die Plan 0004 in „Ausgangslage und Voraussetzungen“ nennt. Plan 0006 (eigene Domain) ist schon auf `main` (`e6ea878`).
 
@@ -448,7 +448,7 @@ A und B arbeiten parallel in getrennten Worktrees, **keine Datei gehört beiden*
 - `src/ui/use-app-state.ts` (`useNow`, E2)
 - `src/ui/App.tsx` (`useNow`, `dataEnd` und `endedToday` durchreichen)
 - `e2e/calendar.spec.ts`, `e2e/detail.spec.ts`
-- `docs/ideas.md` (alle Einträge aus E17, auch die für B und C), `docs/plans/0003-design-stickerheft.md` (Verweise „geändert durch Plan 0007“ in E5, E6, E12, E13, E14 und E15 von Plan 0003)
+- `docs/ideas.md` (alle Einträge aus E17, auch die für B und C), `docs/plans/archiv/0003-design-stickerheft.md` (Verweise „geändert durch Plan 0007“ in E5, E6, E12, E13, E14 und E15 von Plan 0003)
 
 **Paket B „Layout + Gates“** (B3, B5, B7, H1, H3, H4, H7, Dunkelmodus, Kachel-Layout aus E11), Branch `nacharbeit-0007-b`:
 - `src/ui/styles/tokens.css`: **nur die Farb-Tokens** (`:root`, beide Dunkel-Blöcke, E15)
@@ -471,7 +471,7 @@ A und B arbeiten parallel in getrennten Worktrees, **keine Datei gehört beiden*
 
 **Gemeinsam genutzte Dateien, nur nacheinander:** `tokens.css`, `smoke.spec.ts` und `architecture.md` ändern B und C. Weil C erst auf dem fertigen B-Stand abzweigt, entsteht kein Konflikt; die Aufteilung oben (welche Blöcke wem gehören) gilt trotzdem, damit ein Review die Änderungen klar zuordnen kann.
 
-`docs/plans/0007-nacharbeit-design.md` ändert kein Paket. Ergebnisse und Messwerte stehen in den Commit-Messages, der Koordinator überträgt sie (Schritte 4 und 8). Berührungspunkt A/B: `CalendarView.tsx` (A) und `calendar.css` (B). A ändert kein Klassen-Markup außer neuen Leerzuständen über die bestehende `EmptyState`-Komponente, B ändert dort nur CSS. Für `DetailDialog.tsx` (A) und `dialog.css` (B) gilt dasselbe.
+`docs/plans/archiv/0007-nacharbeit-design.md` ändert kein Paket. Ergebnisse und Messwerte stehen in den Commit-Messages, der Koordinator überträgt sie (Schritte 4 und 8). Berührungspunkt A/B: `CalendarView.tsx` (A) und `calendar.css` (B). A ändert kein Klassen-Markup außer neuen Leerzuständen über die bestehende `EmptyState`-Komponente, B ändert dort nur CSS. Für `DetailDialog.tsx` (A) und `dialog.css` (B) gilt dasselbe.
 
 ### E17 – Entscheidung je Befund
 

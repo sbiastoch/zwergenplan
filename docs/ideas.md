@@ -70,3 +70,40 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **CI-Ergebnis nach einem Fast-Forward wiederverwenden** (Plan 0027, E10, verworfen): Derselbe Commit hat auf dem Branch schon voll bestanden. Dafür müsste das Pages-Artefakt aus einem fremden Lauf kommen, `--against-deployed` läuft nur auf `main`, und ein Fehler in der Verdrahtung deployte ungeprüft.
 - **lefthook im Worktree** (Plan 0027, Nicht-Ziele): `pnpm install` in einem Worktree schreibt über `prepare` den eigenen lefthook-Pfad in das gemeinsame `.git/hooks/pre-commit`. Fehlt der Worktree später, greift der Fallback auf das lefthook des jeweiligen Checkouts. Sauberer wäre `prepare` nur im Haupt-Checkout.
 - **5. Chromium-Shard in CI** (Plan 0027, Ausgangslage): Der Pixel-7-Shard liegt mit 486 s um 24 % über dem Chromium-Schnitt. Plan 0013 nennt eine Schwelle von 30 %; über ihr bekäme `pixel-7` zwei Shards.
+
+## Offen aus abgeschlossenen Plänen
+
+Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
+
+- **Plan 0001** (Browser-Review lokal): Das native Datumsfeld zeigt das Format der Browsersprache. Eine eigene, klar deutsche Eingabe erwägen.
+- **Plan 0003** (Browser-Review live): Den Merklisten-Export (ICS) am echten iPhone testen.
+- **Plan 0004** (Browser-Review live, W1, H1–H5):
+  - den echten Berechtigungsdialog für den Standort auf iOS Safari und Android Chrome prüfen;
+  - das Text-Gate für teilweise hinausgerollte Zeilen in gescrollten Sheets erweitern;
+  - der Leerzustand „Kein Sticker für diesen Tag“ verschweigt aktive Filter.
+- **Plan 0005** (Browser-Review live, Schritt 10, H6, H7):
+  - Ladezeit und Bedienung der Karte auf einem echten Handy;
+  - das Orts-Sheet wiederholt Ortsangaben;
+  - die Zoom-Knöpfe verdecken gelegentlich einen Marker.
+- **Plan 0006** (Ergebnis): Die Domain im GitHub-Konto verifizieren (Nutzer, nur im Web-UI).
+- **Plan 0007** (Browser-Review live Paket C):
+  - am echten Android prüfen, ob „Bricolage Fallback Roboto“ greift;
+  - am iPhone prüfen, ob Safari den Fettschnitt über `local()` findet;
+  - den erneuten Import in Google- und Apple-Kalender testen.
+- **Plan 0008** (Browser-Review live, Hotfix W1/W1b):
+  - die Geräte-Checkliste aus Schritt 9 abarbeiten (Silbentrennung in Safari, „Bewegung reduzieren“ am iPhone, Kacheln bei großer Schrift);
+  - den Kanarienvogel `font-swap.spec.ts` „Shift direkt nach der Grenze“ beobachten. Fällt er wieder aus, braucht er einen festen Frame zwischen `markShifts` und dem künstlichen Shift.
+- **Plan 0009** (Offene Fragen, Browser-Review live):
+  - die Lizenz mit dem VGN klären (ändert höchstens Texte);
+  - am Gerät „Nochmal laden“ nach veralteter `wegzeit.json` mit echtem HTTP-Cache prüfen;
+  - Stichproben im VGN-Portal von Hand.
+- **Plan 0010** (Browser-Review live, Paket 0 und Gesamt):
+  - am echten iPhone prüfen, ob der Merklisten-Download nach dem `await` noch als Folge des Tipps gilt (ADR 0007);
+  - Tab-Leiste und 12-px-Labels an echten Geräten ansehen, INP des Anbieter-Sheets messen;
+  - H1: Lücke unter dem Suchfeld;
+  - H2: gerade Apostrophe in Anbieternamen (Datenfrage für den nächsten Pipeline-Lauf).
+- **Plan 0011** (Umsetzung Stufe 1): In Playwright-WebKit bricht jede Navigation nach `context.setOffline(true)` ab, Offline-Tests laufen deshalb nur in Chromium (Werkzeug). Stufe 2 ist durch Plan 0017 ersetzt.
+- **Plan 0012** (Browser-Review live, „Offene Gerätepunkte“): Mit VoiceOver und TalkBack prüfen, ob „mit U2, dann Bus 61“ als eine Ansage gelesen und der Pfeil übersprungen wird.
+- **Plan 0019** (E8, Review 1 M3): die Gerätematrix für den Sprung aus der installierten App nach Google Maps (Nutzer).
+- **Plan 0021** (Offene Punkte): Wünscht der Nutzer, dass das Abwählen von „nur altersgerecht“ dauerhaft gespeichert wird, ändert sich nur E1.
+- Plan 0002, 0013, 0014, 0016 und 0020 haben keine Restpunkte.

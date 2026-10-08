@@ -1,6 +1,6 @@
 # Plan 0023 – Zeitraumfilter „von / bis“
 
-Status: umgesetzt (Branch `zeitraumfilter-0023`)
+Status: in Umsetzung – umgesetzt und live seit d5fab1b; ins Archiv nach dem Browser-Review live (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Branch `zeitraumfilter-0023`)
 Datum: 2026-10-08
 Review: **kein Plan-Review**, Nutzerentscheid „pragmatisch“ (kurzer Plan, Umsetzung direkt). Arch-Review 2026-10-08 eingearbeitet (Abschnitt unten); das Browser-Review macht der Orchestrator.
 Bezug: Plan 0003 (Filter-Sheet, URL-Filter), Plan 0009 (Wegzeit als Einfachwahl), Plan 0021 (Filter-Sheet), ADR 0012 (Startbudget)

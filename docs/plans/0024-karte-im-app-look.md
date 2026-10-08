@@ -1,6 +1,6 @@
 # Plan 0024 – Karte im Zwergenplan-Look, Marker mit Kategorie-Symbol
 
-Status: umgesetzt (Branch `karte-look-0024`)
+Status: in Umsetzung – umgesetzt und live seit d5fab1b; ins Archiv nach dem Browser-Review live (Plan 0027, Etappe 6). Früherer Status: umgesetzt (Branch `karte-look-0024`)
 Datum: 2026-10-08
 Bezug: ADR 0008 (Karte, OpenFreeMap, Kamera-Regel), ADR 0012 (Budgets), Plan 0005 (Karte), Plan 0008 (E15 Cluster-Determinismus, E16 deutsche Labels)
 

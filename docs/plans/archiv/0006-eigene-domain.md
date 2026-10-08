@@ -1,6 +1,6 @@
 # Plan 0006 – Umzug auf zwergenplan.app
 
-Status: umgesetzt, live seit 2026-10-04 (e6ea878)
+Status: abgeschlossen, live seit e6ea878 (2026-10-04). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt, live seit 2026-10-04 (e6ea878)
 Datum: 2026-10-04
 
 (Plan 0004 Entfernung, Plan 0005 Karte, ADR 0008 Karte.)

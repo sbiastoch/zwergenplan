@@ -1,6 +1,6 @@
 # Plan 0017 – Wochen-Push mit Such-Abos
 
-Status: **freigegeben** (2026-10-06), Review Runde 1, 2 und 3 eingearbeitet; Nachtrag nach dem Rebase auf `main` (Plan 0016, ADR 0017) mit Nutzerentscheidungen 4–6 eingearbeitet, siehe „Nachtrag“. Umsetzung auf Branch `push-0017`.
+Status: in Umsetzung – live seit a666dbe (2026-10-06); offen: Mittel-Befunde der Nachprüfung (Nutzerentscheid) und Geräteprüfung. Früherer Status: **freigegeben** (2026-10-06), Review Runde 1, 2 und 3 eingearbeitet; Nachtrag nach dem Rebase auf `main` (Plan 0016, ADR 0017) mit Nutzerentscheidungen 4–6 eingearbeitet, siehe „Nachtrag“. Umsetzung auf Branch `push-0017`.
 Datum: 2026-10-06 (zuerst als Plan 0015; die Nummer war auf `main` schon vergeben)
 Bezug:
 - **Ersetzt Stufe 2 von Plan 0011** (Push nach jedem Deploy). Stufe 1 von Plan 0011 (installierbare App, Service Worker, Offline) ist live und am Gerät abgenommen. Was aus Plan 0011 gilt, steht unter „Übernommen aus Plan 0011“.

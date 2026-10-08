@@ -1,6 +1,6 @@
 # Plan 0021 – Altersfilter wandert ins Filter-Sheet
 
-Status: freigegeben nach zwei Review-Runden (siehe unten)
+Status: abgeschlossen, live seit fc39cf7 (2026-10-06). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: freigegeben nach zwei Review-Runden (siehe unten)
 Datum: 2026-10-06
 Bezug: Plan 0003 (Kind-Sheet, „Nur passende“, „trotzdem zeigen“), Plan 0005 (Karte zeigt `views.visible`), Plan 0008 (E12, Leerzustände), Plan 0020 (Startseite entrümpeln)
 

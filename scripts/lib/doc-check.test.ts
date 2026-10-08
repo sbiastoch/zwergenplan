@@ -11,20 +11,21 @@ function repo(files: Record<string, string>): string[] {
 }
 
 const PLAN = "# Plan\n\nStatus: Entwurf\n";
+const DONE = "# Plan\n\nStatus: abgeschlossen, live seit abc1234 (2026-10-05). Restpunkte in docs/ideas.md\n";
 
 describe("checkDocs, Regel 3: Nummern eindeutig (Plan 0027, E11)", () => {
   it("lässt eindeutige Plan- und ADR-Nummern durch", () => {
     expect(
       repo({
         "docs/plans/0001-a.md": PLAN,
-        "docs/plans/archiv/0002-b.md": PLAN,
+        "docs/plans/archiv/0002-b.md": DONE,
         "docs/adr/0001-a.md": "# ADR",
       }),
     ).toEqual([]);
   });
 
   it("meldet eine Plan-Nummer, die aktiv und im Archiv vorkommt", () => {
-    expect(repo({ "docs/plans/0003-a.md": PLAN, "docs/plans/archiv/0003-b.md": PLAN })).toEqual([
+    expect(repo({ "docs/plans/0003-a.md": PLAN, "docs/plans/archiv/0003-b.md": DONE })).toEqual([
       "Plan-Nummer 0003 doppelt: docs/plans/0003-a.md, docs/plans/archiv/0003-b.md",
     ]);
   });
@@ -95,5 +96,56 @@ describe("checkDocs, Regel 4: Pfadverweise", () => {
 
   it("prüft Links nur in Markdown von docs/, CLAUDE.md und README.md", () => {
     expect(repo({ ".claude/skills/x/SKILL.md": "[x](fehlt.md)" })).toEqual([]);
+  });
+});
+
+describe("checkDocs, Regeln 1 und 2: Planstatus und Archiv (Plan 0027, E11, Etappe 6)", () => {
+  it.each([
+    "Status: Entwurf, wartet auf Plan-Review",
+    "Status: Review eingearbeitet, Nachprüfung ausstehend",
+    "Status: freigegeben (2 Review-Runden)",
+    "Status: in Umsetzung – Etappe 3",
+  ])("aktiver Plan mit „%s“ ist gültig", (status) => {
+    expect(repo({ "docs/plans/0001-a.md": `# Plan 0001 – A\n\n${status}\nDatum: x\n` })).toEqual([]);
+  });
+
+  it.each([
+    "Status: abgeschlossen, live seit 61de0da (2026-10-05). Restpunkte in docs/ideas.md",
+    "Status: ersetzt durch Plan 0017",
+  ])("archivierter Plan mit „%s“ ist gültig", (status) => {
+    expect(repo({ "docs/plans/archiv/0001-a.md": `# Plan\n\n${status}\n` })).toEqual([]);
+  });
+
+  it("die erste nicht-leere Zeile nach dem Titel zählt", () => {
+    expect(repo({ "docs/plans/0001-a.md": "# Plan\n\n\n\nStatus: Entwurf\n" })).toEqual([]);
+    expect(repo({ "docs/plans/0001-a.md": "# Plan\n\nDatum: x\nStatus: Entwurf\n" })).toEqual([
+      "docs/plans/0001-a.md: erste Zeile nach dem Titel ist keine gültige Statuszeile („Datum: x“)",
+    ]);
+  });
+
+  it.each([
+    "Status: umgesetzt",
+    "Status: **freigegeben**",
+    "Status: abgeschlossen",
+    "Status: abgeschlossen, live seit irgendwann",
+    "Status: abgeschlossen, live seit 61de0da (5.10.2026)",
+  ])("„%s“ ist keine gültige Statuszeile", (status) => {
+    expect(repo({ "docs/plans/0001-a.md": `# Plan\n\n${status}\n` })).toHaveLength(1);
+  });
+
+  it("ein abgeschlossener Plan außerhalb des Archivs ist rot", () => {
+    expect(
+      repo({ "docs/plans/0001-a.md": "# Plan\n\nStatus: abgeschlossen, live seit abc1234 (2026-10-05)\n" }),
+    ).toEqual(["docs/plans/0001-a.md: Status „abgeschlossen“ gehört nach docs/plans/archiv/ (verschieben)"]);
+  });
+
+  it("ein aktiver Plan im Archiv ist rot", () => {
+    expect(repo({ "docs/plans/archiv/0001-a.md": "# Plan\n\nStatus: freigegeben\n" })).toEqual([
+      "docs/plans/archiv/0001-a.md: im Archiv liegen nur Pläne mit Status „abgeschlossen“ oder „ersetzt“",
+    ]);
+  });
+
+  it("prüft keine Dateien ohne Plannummer und keine ADRs", () => {
+    expect(repo({ "docs/plans/README.md": "x", "docs/adr/0001-a.md": "# ADR\n\nStatus: angenommen\n" })).toEqual([]);
   });
 });

@@ -1,6 +1,6 @@
 # Plan 0013 – Schnellere CI durch parallele E2E-Jobs
 
-Status: umgesetzt (2026-10-05), inklusive Befund F1
+Status: abgeschlossen, live seit 10643e8 (2026-10-05). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt (2026-10-05), inklusive Befund F1
 Datum: 2026-10-05
 
 (ADR 0002 Hosting, ADR 0004 Backpressure, `docs/architecture.md` Mobile-UX-Gates, Plan 0003 E8 Smoke allein und seriell, Plan 0011 ändert dieselben Dateien.)

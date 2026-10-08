@@ -1,6 +1,6 @@
 # Plan 0027 – Verifikation nach Risiko
 
-Status: freigegeben (2 Review-Runden, Nutzerentscheide getroffen)
+Status: in Umsetzung – Etappen 1–6 umgesetzt (Branches harness-0027-e1 … e6), Etappe 7 offen; freigegeben nach 2 Review-Runden, Nutzerentscheide getroffen. Früherer Status: freigegeben (2 Review-Runden, Nutzerentscheide getroffen)
 Datum: 2026-10-08
 Bezug: ADR 0004 (Backpressure, ergänzt durch ADR 0021), ADR 0002 (Hosting, „check → E2E → Deploy“, Teil B von ADR 0021 ändert das für Doku-Commits), ADR 0012 (Budgets, unverändert), Plan 0013 (CI-Sharding, `PW_SUITE`), `docs/architecture.md` (Schicht `.claude/hooks/`: nur Node-Builtins)
 
@@ -667,6 +667,30 @@ Jede Etappe bekommt einen eigenen Branch `harness-0027-e<n>`, eigene CI und eine
   - ADR 0021, Teil A, ist angenommen.
   - `docs/ideas.md` hat drei Einträge: SHA-Wiederverwendung, lefthook im Worktree, 5. Chromium-Shard.
 - **Abnahme:** Ein frischer Subagent hat nur CLAUDE.md gelesen und die Frage „Welche Prüfung genügt für `src/ui/Detail.tsx`, und wie beobachte ich als Subagent die CI?“ so beantwortet: „`pnpm verify` (Stufe C) plus `pnpm e2e:local e2e/detail.spec.ts` mit `run_in_background`, danach `/browser-review`; die CI beobachtest du als Subagent nicht, du meldest Branch und SHA.“
+
+### Etappe 6 (Branch `harness-0027-e6`, mit `origin/main` `bde7685`)
+
+- **`check-docs`, Regeln 1 und 2:** Statuszeile nach Format, und `abgeschlossen`/`ersetzt` nur in `archiv/`. Die Tests laufen vorab, auch für Fettdruck, fehlende SHA oder ein falsches Datumsformat.
+- **Statuszeilen:** Alle 27 Pläne sind ins Format gebracht. Der frühere Status steht jeweils als „Früherer Status: …“ dahinter.
+- **Live-SHA:** Wo der alte Status einen Live-Commit nannte, ist es dieser. Sonst ist es der letzte Commit auf `main`, der den Plan nennt und zum Abschluss gehört (Browser-Review live, Ergebnis oder Hotfix). Bei 0001–0005, 0007, 0008, 0011 und 0013 ist das also kein exakter Deploy-Zeitpunkt.
+- **Restpunkte:** in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“, je Plan mit dem Abschnitt, in dem die Einzelheiten stehen (Nutzerentscheid 3).
+- **Archiviert (18):** 0001–0014, 0016, 0019, 0020, 0021.
+- **Aktiv (9):**
+
+  | Plan | Grund |
+  |---|---|
+  | 0015, 0018 | freigegeben, nicht umgesetzt |
+  | 0017 | live, aber Nutzerentscheid zu den Mittel-Befunden und Geräteprüfung offen |
+  | 0022–0024 | live; Archiv nach dem Browser-Review-OK des Orchestrators, als kleiner Folge-Commit |
+  | 0025, 0026 | freigegeben, nicht umgesetzt |
+  | 0027 | dieser Plan |
+
+- **Pfadverweise:** 10 Verweise in archivierten Plänen zeigen jetzt auf `docs/plans/archiv/`. Verweise auf aktive Pläne (0017) bleiben. `check-docs` ist grün.
+- **Doku:**
+  - `CLAUDE.md`, Arbeitsweise: neuer Schritt 7 „Archivieren“.
+  - `CLAUDE.md`, „Wo was steht“: `docs/plans/` und `archiv/`, Nummernvergabe über beide Ordner.
+  - `plan-review`: Statuszeile und Archiv.
+- **Panne beim Umschreiben:** Das einmalige Hilfsskript hat auch die Testdaten in `scripts/lib/doc-check.test.ts` umgeschrieben. Ich habe es bemerkt und von Hand zurückgesetzt. Der Diff gegen HEAD enthält nur die beabsichtigten Änderungen.
 
 ## Entschieden (Nutzer, 2026-10-08)
 

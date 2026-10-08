@@ -1,6 +1,6 @@
 # Plan 0003 – Design „Stickerheft mit Knete-Kacheln“: Liste, Kalender, Merkliste, Detail
 
-Status: umgesetzt; Nacharbeit in Plan 0007
+Status: abgeschlossen, live seit 2b57e47 (2026-10-04). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: umgesetzt; Nacharbeit in Plan 0007
 Datum: 2026-10-04
 
 ## Ziel

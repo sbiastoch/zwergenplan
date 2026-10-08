@@ -1,6 +1,6 @@
 # Plan 0020 – Startseite entrümpeln
 
-Status: live seit `0e146b9` (2026-10-06), Browser-Review bestanden
+Status: abgeschlossen, live seit 0e146b9 (2026-10-06). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: live seit `0e146b9` (2026-10-06), Browser-Review bestanden
 Nummer: zuerst als Plan 0018 geschrieben; umbenannt, weil 0017 (Push), 0018 (Kalender) und 0019 (Route) parallel vergeben wurden.
 Datum: 2026-10-06
 Bezug: Plan 0003 (E11, E15), Plan 0007 (E6), Plan 0009 (E1, E11), Plan 0012 (E10), ADR 0011 (Punkt 3), ADR 0015 (Kopf, Punkt 7)
@@ -112,7 +112,7 @@ Nutzermeldung (2026-10-06): Die Startseite wirkt überladen.
   - Konsequenzen: siehe E1.
 - ADR 0015 bekommt die Kopfzeile „**Geändert durch ADR 0019 (Plan 0020):** Die Anzeige in der Statuszeile (Kopf, „Di vormittags, höchstens 1 Umstieg, inkl. Warten“) gilt nur noch für die Erklärung im Kind-Sheet.“
 - ADR 0011 bekommt in den Kopfzeilen den Vermerk „**Geändert durch ADR 0019 (Plan 0020):** Wortlaut der Statuszeile. Punkt 9 bleibt erfüllt (‚außerhalb des Stadtgebiets‘ steht weiter dort).“
-- Plan 0003 (E15) und Plan 0007 (E6) bekommen je einen Vermerk nach dem Muster `> **Geändert durch Plan …**` (`docs/plans/0003-design-stickerheft.md:218`): „Der Theme-Knopf im Kopf entfällt, die Darstellung steht nur im Kind-Sheet (Plan 0020, E2).“
+- Plan 0003 (E15) und Plan 0007 (E6) bekommen je einen Vermerk nach dem Muster `> **Geändert durch Plan …**` (`docs/plans/archiv/0003-design-stickerheft.md:218`): „Der Theme-Knopf im Kopf entfällt, die Darstellung steht nur im Kind-Sheet (Plan 0020, E2).“
 - Kommentare in `format.ts` (`reachNote`), `App.tsx` (Statuszeile) und `Chrome.tsx` (Kopf) werden angepasst.
 - `docs/architecture.md` nennt den Knopf und die Statuszeile nicht im Wortlaut, keine Änderung.
 

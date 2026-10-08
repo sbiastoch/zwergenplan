@@ -1,6 +1,6 @@
 # Plan 0016 – Der Startpunkt übersteht das Neuladen
 
-Status: **umgesetzt und live seit `b2023c1`** (https://zwergenplan.app/). Browser-Review live bestanden, ohne Blocker.
+Status: abgeschlossen, live seit b2023c1 (2026-10-06). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: **umgesetzt und live seit `b2023c1`** (https://zwergenplan.app/). Browser-Review live bestanden, ohne Blocker.
 Datum: 2026-10-06
 Bezug: ADR 0017 (neu), Plan 0004 (E3), Plan 0005 (E8), Plan 0009 (E9), ADR 0008 (Kamera-Regel), ADR 0011 (Punkt 6), ADR 0012 (Startbudget)
 
