@@ -223,6 +223,20 @@ test.describe("Statuszeile auf „Karte“", () => {
     await expect(page.getByRole("status")).toContainText("Orten · Wegzeit ab der Kartenmitte");
     await expectReachLayout(page, "Karte, Kartenmitte");
   });
+
+  test("Kartenmitte als Startpunkt: Stadtteil-Auswahl bleibt, Knopf „Meinen Standort nutzen“ (Plan 0022)", async ({
+    page,
+  }) => {
+    await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
+      key: POINT_KEY,
+      value: STORED_MAP_CENTER,
+    });
+    await ready(page);
+    const sheet = await openKidSheet(page);
+    await expect(sheet.getByText("Startpunkt:")).toContainText("Kartenmitte");
+    await expect(sheet.getByLabel("Stadtteil", { exact: true })).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "Meinen Standort nutzen" })).toBeVisible();
+  });
 });
 
 test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request auf wegzeit.json und linien.json (E9)", async ({
@@ -292,6 +306,10 @@ test("Standort mit Freigabe: gerundet gespeichert, Wegzeit, ab dem Tipp kein Req
   await sheet.getByRole("button", { name: "Meinen Standort nutzen" }).click();
   await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
   await expect(sheet.getByText(/Wegzeit ab deinem Standort \(auf ca\. 100 m gerundet\)/)).toBeVisible();
+  // Plan 0022: Stadtteil-Auswahl weg, der Knopf heißt jetzt „Standort aktualisieren“ und behält den Fokus
+  await expect(sheet.getByLabel("Stadtteil", { exact: true })).toHaveCount(0);
+  await expect(sheet.getByText("Stadtteil", { exact: true })).toHaveCount(0);
+  await expect(sheet.getByRole("button", { name: "Standort aktualisieren" })).toBeFocused();
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(page.getByRole("status")).toContainText("Wegzeit ab deinem Standort");
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText(/^\d+ Min\.$/);
@@ -344,13 +362,19 @@ test.describe("Gespeicherter Standort (Plan 0016)", () => {
     await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
     await expect(sheet.getByText(/Wegzeit ab deinem Standort \(auf ca\. 100 m gerundet\)/)).toBeVisible();
     await expect(sheet.getByText(/Dein Startpunkt bleibt nur auf diesem Gerät/)).toBeVisible();
+    // Plan 0022: ohne Stadtteil-Auswahl, Knopf „Standort aktualisieren“
+    await expect(sheet.getByLabel("Stadtteil", { exact: true })).toHaveCount(0);
+    await expect(sheet.getByRole("button", { name: "Meinen Standort nutzen" })).toHaveCount(0);
+    await expect(sheet.getByRole("button", { name: "Standort aktualisieren" })).toBeVisible();
     await sheet.getByRole("button", { name: "Fertig" }).click();
     await page.waitForTimeout(300);
     expect(requests).toHaveLength(1);
     expect(lines).toHaveLength(1);
   });
 
-  test("Stadtteil-Wahl ersetzt den gespeicherten Standort", async ({ page }) => {
+  test("Stadtteil-Wahl ersetzt den gespeicherten Standort: erst „Startpunkt entfernen“, dann die Auswahl (Plan 0022)", async ({
+    page,
+  }) => {
     await page.addInitScript(
       ({ key, value }) => {
         // nur beim ersten Laden setzen, sonst überschriebe das Neuladen die Wahl
@@ -364,7 +388,13 @@ test.describe("Gespeicherter Standort (Plan 0016)", () => {
     await ready(page);
     await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
     const sheet = await openKidSheet(page);
-    await sheet.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+    await expect(sheet.getByLabel("Stadtteil", { exact: true })).toHaveCount(0);
+    await sheet.getByRole("button", { name: "Startpunkt entfernen" }).click();
+    // Der Knopf verschwindet, die Auswahl erscheint wieder und übernimmt den Fokus (nicht <body>)
+    const select = sheet.getByLabel("Stadtteil", { exact: true });
+    await expect(select).toBeFocused();
+    await expect(sheet.getByRole("button", { name: "Meinen Standort nutzen" })).toBeVisible();
+    await select.selectOption("gostenhof");
     await sheet.getByRole("button", { name: "Fertig" }).click();
     expect(await storedValues(page)).toEqual([`${KEY}=gostenhof`]);
     await page.reload();
@@ -625,7 +655,11 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
   await expect(filter.getByRole("button", { name: "bis 20 Min." })).toBeDisabled();
   await expect(filter.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.")).toBeVisible();
   await filter.getByRole("button", { name: "Startpunkt wählen" }).click();
-  await expect(page.getByRole("dialog", { name: "Kind und Einstellungen" })).toBeVisible();
+  const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await expect(kid).toBeVisible();
+  // Plan 0022: Bei aktivem Standort fehlt die Stadtteil-Auswahl, der Autofokus geht auf den Standort-Knopf
+  await expect(kid.getByLabel("Stadtteil", { exact: true })).toHaveCount(0);
+  await expect(kid.getByRole("button", { name: "Standort aktualisieren" })).toBeFocused();
 });
 
 // N4 (H6): Die kurze Lizenz bricht nie um (live stand „DE“ allein in der zweiten Zeile); der Titel darf umbrechen.

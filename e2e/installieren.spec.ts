@@ -24,6 +24,9 @@ declare global {
 
 const sheet = (page: Page) => page.getByRole("dialog", { name: "Kind und Einstellungen" });
 const section = (page: Page) => sheet(page).getByRole("region", { name: "Als App" });
+/** fester Fuß des Kind-Sheets: Installationsknopf bzw. iOS-Zeile über „Fertig“ (Plan 0022) */
+const foot = (page: Page) => sheet(page).locator(".sheetfoot");
+const installButton = (page: Page) => foot(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" });
 
 /** Startseite, PWA-Kern geladen (Listener für beforeinstallprompt hängt) */
 async function ready(page: Page) {
@@ -95,9 +98,9 @@ async function openIn(page: Page, state: Visible) {
   }
   await openKidSheet(page);
   if (state === "installiert") {
-    await section(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" }).click();
+    await installButton(page).click();
     await expect.poll(() => page.evaluate(() => window.__prompted)).toBe(1);
-    await expect(section(page).locator(".app-text")).toBeFocused();
+    await expect(foot(page).getByRole("button", { name: "Fertig" })).toBeFocused();
   }
 }
 
@@ -133,7 +136,25 @@ for (const state of ["app", "angebot", "installiert", "menue", "ios"] as const) 
       await openIn(page, state);
       for (const text of CONTENT[state]) await expect(section(page)).toContainText(text);
       if (state === "ios") await expect(section(page).locator(".share svg")).toBeVisible();
-      await expect(section(page).getByRole("button")).toHaveCount(state === "angebot" ? 1 : 0);
+      // Plan 0022: kein Installationsknopf mehr im Abschnitt, sondern im Fuß über „Fertig“
+      await expect(section(page).getByRole("button")).toHaveCount(0);
+      const buttons = foot(page).getByRole("button");
+      await expect(buttons).toHaveText(state === "angebot" ? ["Zum Startbildschirm hinzufügen", "Fertig"] : ["Fertig"]);
+      if (state === "angebot") {
+        // ohne Scrollen sichtbar; der Installationsknopf ist primär, „Fertig“ sekundär
+        await expect(installButton(page)).toBeInViewport();
+        await expect(installButton(page)).toHaveClass(/\bprimary\b/);
+        await expect(foot(page).getByRole("button", { name: "Fertig" })).not.toHaveClass(/\bprimary\b/);
+      } else {
+        await expect(foot(page).getByRole("button", { name: "Fertig" })).toHaveClass(/\bprimary\b/);
+      }
+      if (state === "ios") {
+        await expect(foot(page).locator(".foot-hint")).toHaveText("Als App: Teilen → Zum Home-Bildschirm");
+        await expect(foot(page).locator(".share svg")).toBeVisible();
+        await expect(foot(page).locator(".foot-hint")).toBeInViewport();
+      } else {
+        await expect(foot(page).locator(".foot-hint")).toHaveCount(0);
+      }
       await expectMobileUx(page);
     });
   }
@@ -149,17 +170,20 @@ for (const state of ["app", "angebot", "installiert", "menue", "ios"] as const) 
   });
 }
 
-test("Browser bietet die Installation an: Knopf ruft prompt(), danach „Installiert“ mit Fokus (E6, E7)", async ({
+test("Browser bietet die Installation an: Knopf im Fuß ruft prompt(), danach „Installiert“, Fokus auf „Fertig“ (E6, E7; Plan 0022)", async ({
   page,
 }) => {
   await openIn(page, "angebot");
-  await section(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" }).click();
+  await installButton(page).click();
   await expect.poll(() => page.evaluate(() => window.__prompted)).toBe(1);
-  const done = section(page).getByText("Installiert. Öffne den Zwergenplan jetzt über das Symbol");
-  await expect(done).toBeVisible();
-  await expect(section(page).getByRole("button")).toHaveCount(0);
-  // Der Knopf verschwindet mit dem Fokus: Er geht auf die neue Zeile, nicht auf <body> (im Modal)
+  await expect(section(page).getByText("Installiert. Öffne den Zwergenplan jetzt über das Symbol")).toBeAttached();
+  await expect(installButton(page)).toHaveCount(0);
+  // Der Knopf verschwindet mit dem Fokus: Er geht auf „Fertig“ direkt darunter, nicht auf <body> (im Modal)
+  const done = foot(page).getByRole("button", { name: "Fertig" });
   await expect(done).toBeFocused();
+  await expect(done).toHaveClass(/\bprimary\b/);
+  await done.click();
+  await expect(sheet(page)).toBeHidden();
 });
 
 test("ohne Angebot: Android zeigt das Browser-Menü, sonst bleibt der Abschnitt weg (E5, E7)", async ({ page }) => {

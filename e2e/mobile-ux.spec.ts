@@ -423,11 +423,11 @@ for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
     // Hält auch die Timer an: Der Toast (2,8 s) bleibt stehen, bis die Uhr weiterläuft (Plan 0007, E15).
     await page.clock.pauseAt(FIXTURE_NOW);
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-    await expect(page.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toBeVisible();
+    await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
     await expectNoBrightIslands(page);
     await expectTextFits(page);
     await page.clock.runFor(3000);
-    await expect(page.getByText("Eingeklebt – liegt jetzt in deinem Stickerheft")).toHaveCount(0);
+    await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toHaveCount(0);
   });
 }
 

@@ -1,5 +1,6 @@
 /**
- * Abschnitt „Als App“ im Kind-Sheet (Plan 0011, E7; Plan 0017, E7), Lazy-Chunk `assets/app/` über den Lader
+ * Abschnitt „Als App“ im Kind-Sheet (Plan 0011, E7; Plan 0017, E7) und der Fuß des Sheets mit dem Installationsknopf
+ * über „Fertig“ (`AppFoot`, Plan 0022), Lazy-Chunk `assets/app/` über den Lader
  * `src/ui/AppExtras.tsx`. Den Zustand liefert `src/data/pwa.ts` (Geräte-APIs), die Texte `src/domain/pwa.ts`.
  * Darunter der Push-Teil (`PushControls`) nach der Matrix `pushView`; ohne Hilfe und ohne Push bleibt der Abschnitt leer.
  *
@@ -11,7 +12,7 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { createPush } from "../../data/push.ts";
 import type { InstallApi } from "../../data/pwa.ts";
-import { installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
+import { installFoot, installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
 import { PushControls } from "./PushControls.tsx";
 
 /** Teilen-Symbol von iOS (Kasten mit Pfeil nach oben). Nur hier gebraucht, deshalb nicht in icons.tsx (Start-Bundle). */
@@ -26,7 +27,6 @@ function ShareIcon() {
 export function AppSection({ install }: { install: InstallApi }) {
   const state = useSyncExternalStore(install.subscribe, install.state);
   const heading = useId();
-  const text = useRef<HTMLParagraphElement>(null);
   const [push] = useState(() => createPush());
   /** `undefined`, solange `pushSupport()` läuft (sofort, `getRegistration`); so lange steht der Platzhalter */
   const [support, setSupport] = useState<PushSupport>();
@@ -53,14 +53,6 @@ export function AppSection({ install }: { install: InstallApi }) {
     };
   }, [support]);
 
-  // Nach dem Tipp verschwindet der Knopf mit dem Fokus. Ohne Ziel fiele der Fokus im Modal auf <body>; die Zeile
-  // darüber sagt jetzt, wie es weitergeht (Arch-Review Stufe 1, gefunden mit den Gates für „installiert“).
-  // `preventScroll`: Die Zeile steht, wo der Knopf war. Ein Scrollen in den Blick verschöbe sonst auch das Sheet selbst
-  // (`overflow: hidden`), und der Kopf des Sheets wäre unerreichbar.
-  const promptThenFocus = async () => {
-    await install.prompt();
-    text.current?.focus({ preventScroll: true });
-  };
   if (!support) return <div className="app-pending" aria-hidden="true" />;
   const view = pushView(state, support);
   if (!help && view.kind === "nichts") return null;
@@ -80,21 +72,56 @@ export function AppSection({ install }: { install: InstallApi }) {
           <p className="small">{help.note}</p>
         </>
       ) : (
-        help && (
-          <p ref={text} className="app-text" tabIndex={-1}>
-            {help.text}
-          </p>
-        )
-      )}
-      {help?.kind === "knopf" && (
-        <button type="button" className="btn primary wide" onClick={() => void promptThenFocus()}>
-          {help.button}
-        </button>
+        help && <p className="app-text">{help.text}</p>
       )}
       {view.kind === "teil" && (support === "ok" || support === "verweigert") && (
         <PushControls push={push} support={support} />
       )}
       {view.kind === "hinweis" && <p className="small">{view.text}</p>}
     </section>
+  );
+}
+
+/**
+ * Fuß des Kind-Sheets (Plan 0022): „Fertig“, darüber im Zustand „angebot“ der Installationsknopf (dann primär, „Fertig“
+ * sekundär), auf iOS eine kompakte Zeile mit dem Teilen-Symbol. Bis der Chunk da ist, zeigt `KidSheet` nur „Fertig“.
+ */
+export function AppFoot({ install, onClose }: { install: InstallApi; onClose: () => void }) {
+  const state = useSyncExternalStore(install.subscribe, install.state);
+  const done = useRef<HTMLButtonElement>(null);
+  const foot = installFoot(state);
+  // Nach dem Tipp verschwindet der Knopf mit dem Fokus. Ohne Ziel fiele der Fokus im Modal auf <body>; „Fertig“ steht
+  // direkt darunter und bleibt (Arch-Review 0011 Stufe 1; Plan 0022). `preventScroll` wie zuvor im Abschnitt: Ein
+  // Scrollen in den Blick verschöbe sonst auch das Sheet selbst (`overflow: hidden`).
+  const promptThenFocus = async () => {
+    await install.prompt();
+    done.current?.focus({ preventScroll: true });
+  };
+  return (
+    <div className="sheetfoot single">
+      {foot?.kind === "ios" && (
+        <p className="foot-hint">
+          {foot.before}{" "}
+          <span className="share">
+            <ShareIcon />
+            {foot.share}
+          </span>{" "}
+          {foot.after}
+        </p>
+      )}
+      {foot?.kind === "knopf" && (
+        <button type="button" className="btn primary wide" onClick={() => void promptThenFocus()}>
+          {foot.button}
+        </button>
+      )}
+      <button
+        ref={done}
+        type="button"
+        className={foot?.kind === "knopf" ? "btn wide" : "btn primary wide"}
+        onClick={onClose}
+      >
+        Fertig
+      </button>
+    </div>
   );
 }

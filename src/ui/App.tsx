@@ -159,11 +159,7 @@ export function App() {
   };
   const onToggleSave = useCallback(
     (offer: SiteOffer) =>
-      say(
-        toggleSaved(offer.id)
-          ? "Eingeklebt – liegt jetzt in deinem Stickerheft"
-          : "Sticker abgelöst – nicht mehr gemerkt",
-      ),
+      say(toggleSaved(offer.id) ? "Gemerkt – liegt jetzt auf deiner Merkliste" : "Nicht mehr gemerkt"),
     [say, toggleSaved],
   );
 

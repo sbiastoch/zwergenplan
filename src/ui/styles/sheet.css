@@ -307,7 +307,14 @@
   .push-list .push-label {
     flex: 1 1 12rem;
   }
-  .app-section .share {
+  /* iOS-Zeile im Fuß des Kind-Sheets (Plan 0022): volle Breite über „Fertig“ */
+  .foot-hint {
+    flex: 1 1 100%;
+    margin: 0;
+    text-align: center;
+  }
+  .app-section .share,
+  .foot-hint .share {
     display: inline-flex;
     align-items: center;
     gap: 4px;
