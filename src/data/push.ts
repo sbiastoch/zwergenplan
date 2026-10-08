@@ -91,6 +91,12 @@ const MIRRORED = ["birthDate", "searches", "origin"] as const;
 export function createPush(env: PushEnv = browserEnv()) {
   /** zuletzt geschriebene Werte als JSON-Text; leer heißt: beim nächsten Mal alles schreiben */
   const written = new Map<DeviceKey, string>();
+  /**
+   * Spiegeln erlaubt? Erst wenn Einschalten oder Abgleich ein Abo bestätigt; beim Ausschalten sofort (synchron) aus.
+   * Sonst füllt ein Spiegeln, das während des Leerens läuft oder startet, den Speicher wieder: `written` ist dann leer,
+   * also schreibt es Startpunkt und Such-Abos neu, obwohl Push aus ist (CI-Lauf 37765545767, E6).
+   */
+  let mirroring = false;
 
   const post = (path: string, method: "POST" | "DELETE", body: unknown) =>
     env.fetch(`${env.workerUrl}${path}`, { method, body: JSON.stringify(body) });
@@ -109,12 +115,15 @@ export function createPush(env: PushEnv = browserEnv()) {
   };
 
   const clearAll = async () => {
+    mirroring = false;
     written.clear();
     await env.store.clear();
   };
 
   async function mirror(data: MirrorData): Promise<void> {
     for (const key of MIRRORED) {
+      // nach jedem `await` neu prüfen: das Ausschalten kann dazwischenkommen
+      if (!mirroring) return;
       const value = data[key] ?? undefined;
       const text = JSON.stringify(value) ?? "";
       if (written.get(key) === text) continue;
@@ -162,6 +171,7 @@ export function createPush(env: PushEnv = browserEnv()) {
         throw new PushError(problem);
       }
       written.clear();
+      mirroring = true;
       try {
         await env.store.set("endpoint", sub.endpoint);
         await mirror(data);
@@ -176,6 +186,8 @@ export function createPush(env: PushEnv = browserEnv()) {
     },
 
     async disable(): Promise<void> {
+      // vor dem ersten `await`: Ab jetzt schreibt kein Spiegeln mehr, auch keins, das schon läuft
+      mirroring = false;
       const sub = await this.subscription();
       if (sub) {
         await sub.unsubscribe().catch(() => false);
@@ -200,6 +212,7 @@ export function createPush(env: PushEnv = browserEnv()) {
         if (typeof stored === "string") await forget(stored);
         await env.store.set("endpoint", sub.endpoint);
       }
+      mirroring = true;
       await mirror(data);
       return true;
     },
