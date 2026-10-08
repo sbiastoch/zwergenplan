@@ -63,13 +63,6 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/data\/site\.ts$/,
     /^src\/domain\/(filter|age|route|topics|category-look)\.ts$/,
   ],
-  // Kalender: Woche, Monatsraster, Agenda des Tages, „jetzt“ per Timer und visibilitychange (useNow), Detail aus dem
-  // Kalender. Für agenda.ts und calendar.ts die maßgebliche Prüfung.
-  "e2e/calendar.spec.ts": [
-    /^src\/ui\/CalendarView\.tsx$/,
-    /^src\/ui\/(use-offer-views|use-app-state)\.ts$/,
-    /^src\/domain\/(agenda|calendar|time)\.ts$/,
-  ],
   // Detail: Dialog, History und Deep-Link (Overlays, use-app-state), ICS aus dem Browser und als statische Datei
   // (build-data.ts), Texte (format.ts), Anmeldefrist, Alter, Route in Google Maps (Ways), Toasts im Dialog.
   "e2e/detail.spec.ts": [
@@ -107,6 +100,15 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(ProviderPanel|ProviderSearch)\.tsx$/,
     /^src\/ui\/use-app-state\.ts$/,
     /^src\/data\/preferences\.ts$/,
+  ],
+  // Kalender der Merkliste (Plan 0025, E5): Woche, Monatsraster, Liste der gemerkten Termine der Auswahl, Umschalter
+  // der Merkliste (SavedView), „jetzt“ per Timer und visibilitychange (useNow), Detail am Tag, passend zum Alter.
+  // Für agenda.ts und calendar.ts die maßgebliche Prüfung.
+  "e2e/merkliste-kalender.spec.ts": [
+    /^src\/ui\/(SavedCalendar|SavedView)\.tsx$/,
+    /^src\/ui\/(use-offer-views|use-app-state)\.ts$/,
+    /^src\/data\/preferences\.ts$/,
+    /^src\/domain\/(agenda|calendar|time|saved|age)\.ts$/,
   ],
   // Querschnitt Mobile-UX-Gates je Ansicht: die globale Hülle (Review 2, M1), dazu die Vorschauseite ohne JS und
   // 404.html, die nur diese Spec durch die Gates schickt (share-pages.ts).
@@ -174,11 +176,12 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   ],
   // Querschnitt Darstellung hell/dunkel: die globale Hülle (Review 2, M1), dazu die Wahl im Kind-Sheet (useTheme).
   "e2e/theme.spec.ts": [...SHELL, /^src\/ui\/KidSheet\.tsx$/, /^src\/ui\/use-app-state\.ts$/],
-  // „Heute“ als Berliner Tag in Liste und Kalender.
-  "e2e/timezone.spec.ts": [/^src\/ui\/(ListView|CalendarView)\.tsx$/, /^src\/domain\/time\.ts$/],
-  // Zeitraumfilter: von/bis im Filter-Sheet, Liste am Termin im Zeitraum, Kalender, Detail eines Kurses.
+  // „Heute“ als Berliner Tag in der Liste und im Kalender der Merkliste.
+  "e2e/timezone.spec.ts": [/^src\/ui\/(ListView|SavedCalendar)\.tsx$/, /^src\/domain\/time\.ts$/],
+  // Zeitraumfilter: von/bis im Filter-Sheet, Liste am Termin im Zeitraum, Detail eines Kurses (den Kalender der
+  // Merkliste betrifft der Zeitraum nicht, Plan 0025, E5).
   "e2e/zeitraum.spec.ts": [
-    /^src\/ui\/(Sheets|ListView|CalendarView)\.tsx$/,
+    /^src\/ui\/(Sheets|ListView)\.tsx$/,
     /^src\/ui\/use-offer-views\.ts$/,
     /^src\/domain\/(date-range|filter)\.ts$/,
   ],

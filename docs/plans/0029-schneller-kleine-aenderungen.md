@@ -292,7 +292,7 @@ Die Dauer der Läufe 1 und 4 kommt in den Abschnitt Ergebnis.
   - `NO_E2E` umfasst über B3 hinaus ganz `scripts/` (statt nur `pipeline/` und `transit/`), `schema/`, `design/`, die Konfiguration der statischen Gates und der Unit-Tests sowie `src/env.d.ts`. Was der Build ausführt, erreicht seine Specs über den Graphen (`build-data.ts`, `og-images.ts` und `vite-sw.ts` stehen in `SPEC_COVERS`). Ein neuer Build-Schritt braucht `package.json` und läuft damit voll. Ohne diese Erweiterung hätte jedes Gate-Skript die volle Suite ausgelöst.
   - `FULL` nennt zusätzlich `e2e/global-setup.ts`. Keine Spec importiert die Datei, sie fiele sonst über B4.4 ohnehin auf `full`.
   - `node scripts/e2e-select.ts <pfad …>` wertet genannte Pfade ohne `git diff` aus. Damit ist die Tabelle unten entstanden.
-- **`playwright test --list`** vor und nach der Umsetzung: 2940 Tests in 22 Dateien, `PW_SUITE=chromium` 2332, `webkit` 583, `smoke` 25. `playwright.config.ts` ist unverändert.
+- **`playwright test --list`** vor und nach der Umsetzung: 2940 Tests in 22 Dateien, `PW_SUITE=chromium` 2332, `webkit` 583, `smoke` 25. `playwright.config.ts` ist unverändert. Nach dem Rebase auf Plan 0025, Etappe 3 (`calendar.spec.ts` wurde zu `merkliste-kalender.spec.ts`, `CalendarView.tsx` zu `SavedCalendar.tsx`; die Wächter haben beides gemeldet): 3050 Tests in 22 Dateien, chromium 2420, webkit 605, smoke 25.
 - **Lokale Abnahme (Etappe 3)**: Mit einer Kommentarzeile in `src/ui/karte/place-format.ts` wählte `pnpm e2e:local --affected --base HEAD` app, karte und saved (saved über `MapPanel.tsx`, die Karte der Merkliste). 65 Tests auf `pixel-7` waren grün, in 49 s. Bei reiner Doku endet `--affected` mit „keine Spec lokal zu fahren“, ohne die Sperre zu nehmen.
 
 - **Nacharbeit aus dem Arch-Review**:
@@ -301,23 +301,23 @@ Die Dauer der Läufe 1 und 4 kommt in den Abschnitt Ergebnis.
   - m4: Die Wächter sehen neue, nicht ignorierte Dateien mit, wie `--affected`. Die Begründung steht in `e2e-map.test.ts`.
   - Neuer Wächter 5: Jedes Modul, das ein Build-Einstieg erreicht (`build-data.ts`, `vite.config.ts`, `og-images.ts`, `site.config.ts`, `src/main.tsx`, `src/sw/sw.ts`, `src/sw/kill.ts`), wählt Specs oder `full`. Heute ist er grün. Ein Modul, das nur `vite.config.ts` importiert, macht ihn rot (Probe).
 
-Auswahl mit dem echten Graphen (`node scripts/e2e-select.ts <pfad>`). Die Testzahl gilt für alle Geräte (Summe ohne Smoke 2915).
+Auswahl mit dem echten Graphen (`node scripts/e2e-select.ts <pfad>`). Stand nach dem Rebase; die Testzahl gilt für alle Geräte (Summe ohne Smoke 3025).
 
 | geänderte Datei | Art | Geräte-Specs in der CI | Smoke | lokal mit `--affected` |
 |---|---|---|---|---|
-| `src/ui/karte/place-format.ts` | specs | 3 (325 Tests) | – | app, karte, saved |
-| `src/ui/CalendarView.tsx` | specs | 4 (220) | – | app, calendar, timezone, zeitraum |
+| `src/ui/karte/place-format.ts` | specs | 3 (355 Tests) | – | app, karte, saved |
+| `src/ui/SavedCalendar.tsx` | specs | 3 (220) | – | app, merkliste-kalender, timezone |
 | `src/sw/routes.ts` | specs | 2 (170) | smoke | push, pwa |
-| `src/ui/DetailDialog.tsx` | specs | 7 (1950) | – | anbieter, app, detail, layout, mobile-ux, teilen, theme |
-| `src/ui/anbieter/ProviderScreen.tsx` | specs | 13 (2525) | – | app, theme, anbieter-inhalt, anbieter, merkliste-anbieter |
-| `scripts/lib/share-pages.ts` | specs | 8 (1700) | beide | anbieter-inhalt, anbieter, detail, mobile-ux, pwa, saved, startpunkt, teilen |
-| `src/domain/agenda.ts` | specs | 20 (2915) | beide | app, theme, calendar |
-| `src/domain/time.ts` | specs | 20 (2915) | beide | app, theme, calendar, timezone |
+| `src/ui/DetailDialog.tsx` | specs | 7 (2020) | – | anbieter, app, detail, layout, mobile-ux, teilen, theme |
+| `src/ui/anbieter/ProviderScreen.tsx` | specs | 13 (2635) | – | app, theme, anbieter-inhalt, anbieter, merkliste-anbieter |
+| `scripts/lib/share-pages.ts` | specs | 8 (1730) | beide | anbieter-inhalt, anbieter, detail, mobile-ux, pwa, saved, startpunkt, teilen |
+| `src/domain/agenda.ts` | specs | 20 (3025) | beide | app, theme, merkliste-kalender |
+| `src/domain/time.ts` | specs | 20 (3025) | beide | app, theme, merkliste-kalender, timezone |
 | `data/offers.json` | specs | 0 | beide | – (Smoke nur mit `--smoke`) |
-| `e2e/fixtures.ts` | specs | 20 (2915) | beide | app, theme |
+| `e2e/fixtures.ts` | specs | 20 (3025) | beide | app, theme |
 | `tests/fixtures/offers.json` | full | – | – | app, theme |
 
-**Beobachtung für die CI-Dauer**: Die Querschnitts-Specs mobile-ux und layout tragen 1540 der 2915 Geräte-Tests. Ihre Zuordnung nennt `Overlays.tsx`, und `Overlays.tsx` importiert fast alle Ansichten. Deshalb liegt es in der Hülle jeder Änderung an Detail, Sheets, Kind-Sheet und Anbieterübersicht, und beide Specs laufen dann mit. Domänenmodule erreichen über `scripts/build-data.ts` und `share-pages.ts` fast jede Spec. Auf Branches sparen also vor allem Änderungen an Karte, Kalender, Service Worker, Merkliste und Daten. Ob die Zuordnung der Querschnitts-Specs enger werden soll (etwa nur geänderte Hüllen-Dateien selbst statt der Hülle), entscheidet die Messung der CI-Abnahme (B7).
+**Beobachtung für die CI-Dauer**: Die Querschnitts-Specs mobile-ux und layout tragen 1595 der 3025 Geräte-Tests. Ihre Zuordnung nennt `Overlays.tsx`, und `Overlays.tsx` importiert fast alle Ansichten. Deshalb liegt es in der Hülle jeder Änderung an Detail, Sheets, Kind-Sheet und Anbieterübersicht, und beide Specs laufen dann mit. Domänenmodule erreichen über `scripts/build-data.ts` und `share-pages.ts` fast jede Spec. Auf Branches sparen also vor allem Änderungen an Karte, Kalender, Service Worker, Merkliste und Daten. Ob die Zuordnung der Querschnitts-Specs enger werden soll (etwa nur geänderte Hüllen-Dateien selbst statt der Hülle), entscheidet die Messung der CI-Abnahme (B7).
 
 ## Review (2026-10-09) – Verdict: Überarbeiten → eingearbeitet
 
