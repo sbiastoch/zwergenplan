@@ -53,3 +53,12 @@ Sichtprüfung (Pixel 7, hell/dunkel, echte OpenFreeMap-Kacheln, Zoom 13 und 15,5
 ## Offene Fragen
 
 - Soll ein gewählter Kategoriefilter die Marker-Kategorie bestimmen (wie `leadCategory` mit `focus`)? Heute zählt nur die Häufigkeit unter den sichtbaren Angeboten.
+
+## Browser-Review live (2026-10-08)
+
+Ergebnis: **bestanden** mit zwei geringen Befunden (m3, m4). Restpunkt iPhone siehe Plan 0022. Umgesetzt auf Branch `nachschliff-review-0022-0024`, Sichtprüfung mit echten OpenFreeMap-Kacheln bei 320 × 640, 390 × 664 und 915 × 412, hell und dunkel.
+
+| Befund | Umgang |
+|---|---|
+| m3: Straßennamen hell gemischt, dunkel in Versalien (`text-transform` aus dem Dark-Stil), dunkel dichter; Wege dunkel gestrichelt | `basemapChanges` setzt für alle Straßennamen-Layer `text-transform: none` und die Schriftgröße von Positron (12–13 px). Ein Straßennamen-Layer ohne `minzoom` (Dark: einer für alle Klassen) bekommt einen Filter mit der Dichte von Positron: Hauptstraßen ab Zoom 12, Neben- und Wege ab 15, Autobahnnummern aus (Positron blendet ihre Schilder schon aus). Orte (Stadt, Ort, Dorf) stehen dunkel jetzt auch gemischt, Stadtteile bleiben in beiden Stilen in Versalien. Wege durchgezogen (`line-dasharray` zurückgesetzt). Unit-Tests in `basemap.test.ts`. |
+| m4: Bei 320 px und auf dem iPhone lag die Attribution unter der Tab-Leiste, Zoom-Knöpfe über Markern am Rand | `.map-box` ist höchstens so hoch, dass sie über der Tab-Leiste endet (`100dvh − 24rem − safe-area`, Untergrenze 240 px; bei großer Schrift mindestens `12rem`, also wie bisher bis 60 dvh, damit Attribution und Zoom-Knöpfe nicht kollidieren; quer mit Seitenleiste wie bisher 60 dvh). Bei 320 × 640 endet die Attribution jetzt 26 px über der Leiste; die Karte war vorher ohnehin nur bis zur Leiste sichtbar. Der Startausschnitt hält zusätzlich unten 66 px für die ausgeschriebene Attribution frei, rechts wie bisher die Zoom-Knöpfe. E2E in `karte.spec.ts` bei 320 × 640: Attribution über der Leiste, kein Marker unter Attribution oder Zoom-Knöpfen. Folge: Der Startausschnitt ist auf kleinen Telefonen etwas weiter herausgezoomt. Das Startpunkt-Kreuz auf einem Label bleibt bewusst. |

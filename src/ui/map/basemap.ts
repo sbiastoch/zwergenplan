@@ -1,8 +1,10 @@
 /**
  * Grundkarte im App-Look (Plan 0024, E1–E4): Die OpenFreeMap-Stile bleiben, wie sie sind (Host, Kacheln,
  * Glyphen, Sprites; ADR 0008). Nach jedem `style.load` färbt MapView.tsx ihre Layer mit Farben aus den Tokens
- * ein und blendet Unruhiges aus. Rein: kein Zugriff auf maplibre-gl oder das DOM.
+ * ein, blendet Unruhiges aus und schreibt Straßen- und Ortsnamen in beiden Stilen gleich. Rein: kein Zugriff auf
+ * maplibre-gl (nur Typen) oder das DOM.
  */
+import type { ExpressionSpecification, FilterSpecification } from "maplibre-gl";
 import type { Category } from "../../domain/topics.ts";
 
 /** Hex-Tokens aus tokens.css, gelesen im `style.load`-Handler (layers.ts, `readMapTokens`). */
@@ -111,6 +113,7 @@ export interface StyleLayerInfo {
   id: string;
   type: string;
   "source-layer"?: string | undefined;
+  minzoom?: number | undefined;
 }
 
 /** Die einzigen Paint-Eigenschaften, die die Grundkarte ändert (MapView.tsx setzt sie in dieser Reihenfolge). */
@@ -125,7 +128,54 @@ export const BASEMAP_PAINT = [
 
 type BasemapPaint = Partial<Record<(typeof BASEMAP_PAINT)[number], string>>;
 
-export type LayerChange = { id: string; hide: true } | { id: string; paint: BasemapPaint };
+/**
+ * Straßennamen in beiden Stilen gleich (Browser-Review 0024, m3): Dark schreibt sie in Versalien und 10 px und
+ * zeigt sie auf jeder Zoomstufe, Positron gemischt in 12–13 px erst ab Zoom 12,2 (Hauptstraßen), 15 (Nebenstraßen)
+ * bzw. 15,5 (Wege), je Klasse ein Layer mit `minzoom`.
+ */
+export const STREET_LABEL_LAYOUT: { "text-transform": "none"; "text-size": ExpressionSpecification } = {
+  "text-transform": "none",
+  "text-size": ["interpolate", ["linear"], ["zoom"], 13, 12, 14, 13],
+};
+
+/**
+ * Dichte wie Positron für einen Straßennamen-Layer **ohne** `minzoom` (Dark: einer für alle Klassen). Ersetzt dessen
+ * Filter ganz, statt ihn per `all` zu erweitern: Ein Filter in alter Syntax ließe sich nicht mit einem Ausdruck
+ * verknüpfen. Autobahnen fehlen wie bisher (dort stehen Nummern). Zoom im Filter wertet MapLibre auf ganzen Stufen aus.
+ */
+export const STREET_LABEL_FILTER: FilterSpecification = [
+  "all",
+  ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
+  [
+    "match",
+    ["get", "class"],
+    ["primary", "secondary", "tertiary", "trunk"],
+    [">=", ["zoom"], 12],
+    ["minor", "service", "track", "path"],
+    [">=", ["zoom"], 15],
+    false,
+  ],
+];
+
+/** Änderung eines Text-Layers mit Straßennamen: Layout und Filter zusätzlich zur Farbe */
+interface StreetLabel {
+  layout: typeof STREET_LABEL_LAYOUT;
+  /** nur für Layer ohne `minzoom` */
+  filter?: FilterSpecification;
+}
+
+export type LayerChange =
+  | { id: string; hide: true }
+  | {
+      id: string;
+      paint: BasemapPaint;
+      /** Straßennamen: Schreibung, Größe, ggf. Dichte */
+      street?: StreetLabel;
+      /** Ortsnamen (Stadt, Ort, Dorf) in gemischter Schreibung wie Positron; Stadtteile bleiben in Versalien */
+      mixedCase?: true;
+      /** Linie durchgezogen statt gestrichelt */
+      solid?: true;
+    };
 
 type Role = keyof BasemapPalette | "hide" | undefined;
 
@@ -135,7 +185,8 @@ function roleOf({ id, type, "source-layer": source }: StyleLayerInfo): Role {
   if (source === "boundary" || source === "aeroway" || source === "aerodrome_label" || source === "poi") return "hide";
   if (type === "symbol") {
     if (source === "transportation") return "hide"; // Einbahnpfeile
-    if (source === "transportation_name") return /shield/.test(id) ? "hide" : "labelMinor";
+    // Autobahnnummern: Positron zeigt sie als Schild, Dark als Text; beide aus (Browser-Review 0024, m3)
+    if (source === "transportation_name") return /shield|motorway/.test(id) ? "hide" : "labelMinor";
     if (source === "water_name" || source === "waterway") return "labelMinor";
     if (source === "place") {
       if (/country|state|continent/.test(id)) return "hide";
@@ -179,11 +230,23 @@ export function basemapChanges(layers: readonly StyleLayerInfo[], palette: Basem
     }
     const color = palette[role];
     if (layer.type === "symbol") {
-      changes.push({ id: layer.id, paint: { "text-color": color, "text-halo-color": palette.halo } });
+      const paint = { "text-color": color, "text-halo-color": palette.halo };
+      if (layer["source-layer"] === "transportation_name") {
+        const street: StreetLabel =
+          layer.minzoom === undefined
+            ? { layout: STREET_LABEL_LAYOUT, filter: STREET_LABEL_FILTER }
+            : { layout: STREET_LABEL_LAYOUT };
+        changes.push({ id: layer.id, paint, street });
+      } else if (layer["source-layer"] === "place" && !/other|suburb|neighbou?rhood/.test(layer.id)) {
+        changes.push({ id: layer.id, paint, mixedCase: true });
+      } else {
+        changes.push({ id: layer.id, paint });
+      }
     } else if (layer.type === "background" || layer.type === "fill" || layer.type === "line") {
       const paint: BasemapPaint = { [COLOR_PROPERTY[layer.type]]: color };
       if (role === "building") paint["fill-outline-color"] = palette.buildingLine;
-      changes.push({ id: layer.id, paint });
+      // Wege durchgezogen wie in Positron; Dark strichelt sie (Browser-Review 0024, m3)
+      changes.push(role === "path" ? { id: layer.id, paint, solid: true } : { id: layer.id, paint });
     }
   }
   return changes;

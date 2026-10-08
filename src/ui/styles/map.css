@@ -37,16 +37,29 @@
     width: 50%;
   }
 
-  /* px und dvh statt rem: Bei 200 % Textgröße füllte eine rem-Karte sonst den Bildschirm (E7). Auch Platzhalter (CLS). */
+  /*
+   * px und dvh statt rem: Bei 200 % Textgröße füllte eine rem-Karte sonst den Bildschirm (E7). Auch Platzhalter (CLS).
+   * Höchstens bis über die Tab-Leiste unten (Browser-Review 0024, m4): Über der Karte stehen bei 320 px etwa 18 rem
+   * (Kopf, Sticker, Schnellfilter, Statuszeile mit Umschalter darunter), die Leiste braucht mit Abstand 5,5 rem. So
+   * liegen Attribution und untere Marker beim Öffnen nicht unter der Leiste. Bei großer Schrift passt das ohnehin
+   * nicht mehr; dort hält `12rem` die Karte so hoch wie vorher (200 %: 60 dvh), sonst überlagerten sich Attribution
+   * und Zoom-Knöpfe auf zu wenig Fläche (axe target-size).
+   */
   .map-box {
     position: relative;
-    height: clamp(240px, 60dvh, 544px);
+    height: clamp(240px, min(60dvh, max(100dvh - 24rem - env(safe-area-inset-bottom), 12rem)), 544px);
     margin-top: 10px;
     border: 2px solid var(--line);
     border-radius: 20px;
     box-shadow: 4px 4px 0 var(--shadow);
     overflow: hidden;
     background: var(--soft);
+  }
+  /* Querformat mit Seitenleiste (tabs.css): unten liegt keine Leiste, die Karte darf 60 dvh hoch werden. */
+  @media (max-height: 500px) and (min-width: 40rem) {
+    .map-box {
+      height: clamp(240px, 60dvh, 544px);
+    }
   }
   .map-note {
     position: absolute;

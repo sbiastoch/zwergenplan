@@ -58,3 +58,12 @@ Kein Blocker.
 | m6: `appinstalled` von außen | umgesetzt: Effekt im Fuß fokussiert „Fertig“, wenn der Knopf mit dem Fokus verschwindet; ersetzt `promptThenFocus`; E2E |
 | m7: `prompt()` ohne Absicherung | `try/catch/finally`, gemeldet wird immer, kein Fehler nach außen; Unit-Test |
 | Nits | Klasse `single` und Keys entfernt (Objekt statt Tupel) |
+
+## Browser-Review live (2026-10-08)
+
+Ergebnis: **bestanden, keine Befunde** (https://zwergenplan.app/, gemeinsam mit den Plänen 0023 und 0024).
+
+Restpunkte, headless nicht prüfbar, bleiben offen:
+
+- **Installationsknopf auf Android:** Chrome liefert headless kein `beforeinstallprompt`, Knopf und Ablauf ließen sich deshalb nicht live sehen. Prüfen auf einem echten Android-Gerät mit Chrome: Knopf im Fuß des Kind-Sheets, Dialog, nach `appinstalled` Fokus auf „Fertig“.
+- **iOS-Zeile der Checkliste auf einem echten iPhone** (Safari und Home-Bildschirm-App) steht für alle drei Pläne noch aus. WebKit in Playwright deckt das nur teilweise ab.

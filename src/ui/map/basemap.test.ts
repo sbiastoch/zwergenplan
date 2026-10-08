@@ -5,10 +5,12 @@ import {
   basemapPalette,
   type MapTokens,
   mixHex,
+  STREET_LABEL_FILTER,
+  STREET_LABEL_LAYOUT,
   type StyleLayerInfo,
 } from "./basemap.ts";
 
-/** Layer-Listen der OpenFreeMap-Stile (id, Typ, source-layer), Stand 2026-10-08 */
+/** Layer-Listen der OpenFreeMap-Stile (id, Typ, source-layer, minzoom), Stand 2026-10-08 */
 const POSITRON = `
   background background -
   park fill park
@@ -49,9 +51,9 @@ const POSITRON = `
   waterway_line_label symbol waterway
   water_name_point_label symbol water_name
   water_name_line_label symbol water_name
-  highway-name-path symbol transportation_name
-  highway-name-minor symbol transportation_name
-  highway-name-major symbol transportation_name
+  highway-name-path symbol transportation_name 15.5
+  highway-name-minor symbol transportation_name 15
+  highway-name-major symbol transportation_name 12.2
   highway-shield-non-us symbol transportation_name
   highway-shield-us-interstate symbol transportation_name
   road_shield_us symbol transportation_name
@@ -121,8 +123,9 @@ const layersOf = (list: string): StyleLayerInfo[] =>
     .trim()
     .split("\n")
     .map((row) => {
-      const [id = "", type = "", source = "-"] = row.trim().split(" ");
-      return source === "-" ? { id, type } : { id, type, "source-layer": source };
+      const [id = "", type = "", source = "-", minzoom] = row.trim().split(" ");
+      const layer: StyleLayerInfo = source === "-" ? { id, type } : { id, type, "source-layer": source };
+      return minzoom ? { ...layer, minzoom: Number(minzoom) } : layer;
     });
 
 /** Werte aus tokens.css (hell, dunkel), Kategorie-Farben gleich in beiden */
@@ -244,15 +247,21 @@ describe("Zuordnung der Stil-Layer (Plan 0024, E2/E3)", () => {
       paint: { "line-color": light.roadCasing },
     });
     expect(changes.get("highway_minor")).toEqual({ id: "highway_minor", paint: { "line-color": light.minorRoad } });
-    expect(changes.get("highway_path")).toEqual({ id: "highway_path", paint: { "line-color": light.path } });
+    expect(changes.get("highway_path")).toEqual({
+      id: "highway_path",
+      paint: { "line-color": light.path },
+      solid: true,
+    });
     expect(changes.get("railway_transit")).toEqual({ id: "railway_transit", paint: { "line-color": light.rail } });
     expect(changes.get("highway-name-minor")).toEqual({
       id: "highway-name-minor",
       paint: { "text-color": light.labelMinor, "text-halo-color": light.halo },
+      street: { layout: STREET_LABEL_LAYOUT },
     });
     expect(changes.get("label_city")).toEqual({
       id: "label_city",
       paint: { "text-color": light.label, "text-halo-color": light.halo },
+      mixedCase: true,
     });
     expect(changes.get("label_other")).toEqual({
       id: "label_other",
@@ -267,6 +276,12 @@ describe("Zuordnung der Stil-Layer (Plan 0024, E2/E3)", () => {
     expect(changes.get("highway_name_other")).toEqual({
       id: "highway_name_other",
       paint: { "text-color": night.labelMinor, "text-halo-color": night.halo },
+      street: { layout: STREET_LABEL_LAYOUT, filter: STREET_LABEL_FILTER },
+    });
+    expect(changes.get("highway_path")).toEqual({
+      id: "highway_path",
+      paint: { "line-color": night.path },
+      solid: true,
     });
     expect(changes.get("place_suburb")).toEqual({
       id: "place_suburb",
@@ -275,8 +290,62 @@ describe("Zuordnung der Stil-Layer (Plan 0024, E2/E3)", () => {
     expect(changes.get("place_city")).toEqual({
       id: "place_city",
       paint: { "text-color": night.label, "text-halo-color": night.halo },
+      mixedCase: true,
     });
     expect(changes.get("railway_minor")).toEqual({ id: "railway_minor", paint: { "line-color": night.rail } });
+  });
+
+  it("Straßennamen in beiden Stilen gleich: gemischte Schreibung, gleiche Größe, Dichte wie Positron (m3)", () => {
+    expect(STREET_LABEL_LAYOUT["text-transform"]).toBe("none");
+    const streets = (list: string, palette: BasemapPalette) =>
+      basemapChanges(layersOf(list), palette).flatMap((change) =>
+        "paint" in change && change.street ? [[change.id, change.street] as const] : [],
+      );
+    // Positron: je Klasse ein Layer mit minzoom, der Filter bleibt
+    expect(streets(POSITRON, light)).toEqual([
+      ["highway-name-path", { layout: STREET_LABEL_LAYOUT }],
+      ["highway-name-minor", { layout: STREET_LABEL_LAYOUT }],
+      ["highway-name-major", { layout: STREET_LABEL_LAYOUT }],
+    ]);
+    // Dark: ein Layer ohne minzoom für alle Klassen, bekommt die Dichte von Positron
+    expect(streets(DARK, night)).toEqual([
+      ["highway_name_other", { layout: STREET_LABEL_LAYOUT, filter: STREET_LABEL_FILTER }],
+    ]);
+    // Hauptstraßen ab Zoom 12, Neben- und Wege ab 15 (Positron: 12,2 / 15 / 15,5), sonst nichts
+    expect(JSON.stringify(STREET_LABEL_FILTER)).toBe(
+      JSON.stringify([
+        "all",
+        ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
+        [
+          "match",
+          ["get", "class"],
+          ["primary", "secondary", "tertiary", "trunk"],
+          [">=", ["zoom"], 12],
+          ["minor", "service", "track", "path"],
+          [">=", ["zoom"], 15],
+          false,
+        ],
+      ]),
+    );
+  });
+
+  it("Orte (Stadt, Ort, Dorf) gemischt geschrieben, Stadtteile in Versalien wie in Positron", () => {
+    const mixed = (list: string, palette: BasemapPalette) =>
+      basemapChanges(layersOf(list), palette)
+        .filter((change) => "mixedCase" in change)
+        .map((change) => change.id);
+    expect(mixed(POSITRON, light)).toEqual(["label_village", "label_town", "label_city", "label_city_capital"]);
+    expect(mixed(DARK, night)).toEqual(["place_village", "place_town", "place_city", "place_city_large"]);
+  });
+
+  it("Wege durchgezogen statt gestrichelt, nur Wege", () => {
+    for (const [list, palette] of [
+      [POSITRON, light],
+      [DARK, night],
+    ] as const) {
+      const solid = basemapChanges(layersOf(list), palette).filter((change) => "solid" in change);
+      expect(solid.map((change) => change.id)).toEqual(["highway_path"]);
+    }
   });
 
   it("blendet Unruhiges aus: Schilder, Einbahnpfeile, Flughafen, Grenzen, Länder und Staaten", () => {
@@ -308,6 +377,7 @@ describe("Zuordnung der Stil-Layer (Plan 0024, E2/E3)", () => {
       "aeroway-runway",
       "road_oneway",
       "road_oneway_opposite",
+      "highway_name_motorway",
       "boundary_state",
       "boundary_country_z0-4",
       "boundary_country_z5-",
@@ -355,7 +425,7 @@ describe("Zuordnung der Stil-Layer (Plan 0024, E2/E3)", () => {
     ).toEqual([
       { id: "bg-hell", paint: { "background-color": light.land } },
       { id: "wasser-hell", paint: { "fill-color": light.water } },
-      { id: "label-stadt", paint: { "text-color": light.label, "text-halo-color": light.halo } },
+      { id: "label-stadt", paint: { "text-color": light.label, "text-halo-color": light.halo }, mixedCase: true },
     ]);
   });
 });
