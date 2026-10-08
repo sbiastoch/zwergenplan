@@ -1,10 +1,10 @@
 /**
- * Schnelle Gates (< 15 s): Typen, Lint, Architektur, Daten, Unit-Tests, tote Pfade, Schema-Drift.
+ * Schnelle Gates (< 15 s): Typen, Lint, Architektur, Daten, Unit-Tests, tote Pfade, Schema-Drift, Doku.
  * Läuft im Stop-Hook, im pre-commit-Hook und als erster CI-Schritt.
- * Alle Schritte laufen parallel; Ausgabe nur für fehlgeschlagene Schritte.
+ * Alle Schritte laufen parallel, jeder in eigener Prozessgruppe mit Zeitlimit; Ausgabe nur für fehlgeschlagene Schritte.
  */
-import { spawn } from "node:child_process";
 import { staleInstall } from "./lib/install-state.ts";
+import { runSteps } from "./lib/run-steps.ts";
 
 // Veraltetes node_modules zuerst: sonst stünden hier nur Folgefehler wie „Cannot find module“ (Plan 0027, E6).
 const stale = staleInstall(process.cwd());
@@ -29,25 +29,16 @@ const STEPS: Array<[name: string, cmd: string[]]> = [
   // Bis Plan 0027 nur in CI: 8 von 11 nicht absichtlich roten CI-Läufen waren knip (Plan 0027, E2)
   ["Tote Pfade", ["pnpm", "exec", "knip"]],
   ["Schema-Drift", ["node", "scripts/export-schema.ts", "--check"]],
+  // Nummern und Pfadverweise der Doku (Plan 0027, E11)
+  ["Doku", ["node", "scripts/check-docs.ts"]],
 ];
 
 const started = performance.now();
-
-function run([name, [cmd, ...args]]: [string, string[]]): Promise<{ name: string; ok: boolean; output: string }> {
-  return new Promise((resolve) => {
-    const child = spawn(cmd ?? "", args, { env: { ...process.env, FORCE_COLOR: "0" } });
-    let output = "";
-    child.stdout.on("data", (d) => {
-      output += d;
-    });
-    child.stderr.on("data", (d) => {
-      output += d;
-    });
-    child.on("close", (code) => resolve({ name, ok: code === 0, output }));
-  });
-}
-
-const results = await Promise.all(STEPS.map(run));
+// Unter dem Zeitlimit von verify (150 s), damit hier der hängende Schritt benannt wird (Plan 0027, E5.4).
+const results = await runSteps(
+  STEPS.map(([name, cmd]) => ({ name, cmd })),
+  { timeoutMs: 140_000 },
+);
 const failed = results.filter((r) => !r.ok);
 const seconds = ((performance.now() - started) / 1000).toFixed(1);
 
@@ -57,5 +48,6 @@ for (const r of failed) {
   const tail = r.output.trim().split("\n").slice(-40).join("\n");
   console.error(`\n── ${r.name} fehlgeschlagen ──\n${tail}`);
 }
-console.log(`check:fast ${failed.length === 0 ? "grün" : "ROT"} in ${seconds}s`);
+const timedOut = failed.some((r) => r.timedOut);
+console.log(`check:fast ${failed.length === 0 ? "grün" : timedOut ? "ROT (Zeitlimit)" : "ROT"} in ${seconds}s`);
 process.exit(failed.length === 0 ? 0 : 1);

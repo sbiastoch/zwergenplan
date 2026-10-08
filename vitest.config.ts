@@ -20,6 +20,9 @@ export default defineConfig({
         "scripts/lib/push-weekly-core.ts",
         // Vorprüfung der Installation in check:fast (Plan 0027, E6)
         "scripts/lib/install-state.ts",
+        // Stufe des Diffs und Doku-Gate (Plan 0027, E1, E11)
+        "scripts/lib/change-class.ts",
+        "scripts/lib/doc-check.ts",
         "src/sw/routes.ts",
         "src/sw/retire.ts",
         // Push im Service Worker (Plan 0017, E10)

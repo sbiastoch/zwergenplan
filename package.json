@@ -26,6 +26,8 @@
     "e2e": "pnpm build:e2e && pnpm build && playwright test",
     "size": "node scripts/check-chunks.ts && size-limit",
     "check:fast": "node scripts/check-fast.ts",
+    "verify": "node scripts/verify.ts",
+    "docs:check": "node scripts/check-docs.ts",
     "check": "pnpm check:fast && pnpm knip && pnpm schema:check && pnpm test:coverage && pnpm e2e && pnpm size",
     "build:e2e": "ZWERGENPLAN_DATA=fixture pnpm build",
     "prepare": "lefthook install"

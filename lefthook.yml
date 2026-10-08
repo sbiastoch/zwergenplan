@@ -1,5 +1,6 @@
 # Git-Hooks: gelten für Menschen, Agenten und den Pipeline-Commit gleichermaßen.
 pre-commit:
   commands:
-    check-fast:
-      run: pnpm -s check:fast
+    # Stufe nach Diff (Plan 0027, E9): nur Doku → check-docs (< 1 s), sonst check:fast
+    verify:
+      run: node scripts/verify.ts --staged
