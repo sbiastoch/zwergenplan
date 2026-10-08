@@ -72,3 +72,9 @@ ADR 0004 legt fest: `check:fast` läuft im Stop-Hook, im pre-commit-Hook und in 
   - ein Hook zum Turn-Start;
   - Worker abhängig von der Last;
   - das CI-Ergebnis nach einem Fast-Forward über die SHA wiederverwenden.
+
+## Nachtrag (2026-10-09): ADR 0023
+
+- **Verworfen:** Der Punkt „automatische Auswahl von E2E-Specs“ ist aufgehoben. Die Auswahl gilt lokal (`--affected`) und auf Branches. Auf `main` fährt die CI vor dem Deploy weiter alles.
+- **Nr. 8:** Ein grüner Push-Lauf auf einem Branch ist nicht mehr voll geprüft.
+- **Nr. 10** gilt unverändert.

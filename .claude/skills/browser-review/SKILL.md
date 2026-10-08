@@ -1,6 +1,6 @@
 ---
 name: browser-review
-description: Pflicht-Sichtprüfung im Browser vor „fertig“ bei jeder UI-Änderung, und nach jedem Deploy auf der Live-URL. Screenshots auf Mobile-Viewports in hell/dunkel ansehen und gegen eine UX-Checkliste prüfen. Argument optional: „live“ für https://zwergenplan.app/.
+description: Pflicht-Sichtprüfung im Browser bei jeder UI-Änderung, lokal vor dem Commit (volle Checkliste), und nach dem Deploy als Kurzcheck auf der Live-URL. Screenshots auf Mobile-Viewports in hell/dunkel ansehen und gegen eine UX-Checkliste prüfen. Argument optional: „live“ für den Kurzcheck auf https://zwergenplan.app/.
 ---
 
 # Browser-Review
@@ -8,8 +8,10 @@ description: Pflicht-Sichtprüfung im Browser vor „fertig“ bei jeder UI-Änd
 Automatische Gates prüfen Regeln. Dieser Schritt prüft, ob es **gut** ist.
 
 ## 1. Ziel festlegen
+Die volle Prüfung (Abschnitte 2–5) läuft **lokal vor dem Commit** und wartet nicht auf CI und Deploy (Plan 0029, A3; ADR 0023). Bei einer Kleinänderung (CLAUDE.md, Schritt 1) genügen die betroffenen Ansichten mit `--views=…`, die Checkliste wird trotzdem ganz beantwortet.
+
 - **lokal** (Standard): `pnpm build:e2e`, dann `PORT=$(node scripts/free-port.ts)` und `pnpm exec vite preview --strictPort --port $PORT --outDir dist-e2e` im Hintergrund starten. Die URL ist `http://localhost:$PORT/` (Port ausgeben und merken), sie nutzt Fixture-Daten. Ein fester Port kollidiert mit parallelen Sessions.
-- **live**: `https://zwergenplan.app/` mit echten Daten. Erst prüfen, ob der Deploy angekommen ist: `curl -s https://zwergenplan.app/data/meta.json` zeigt in `commit` denselben Kurz-SHA wie `git rev-parse --short HEAD`. Ohne GitHub-API (Plan 0027, E13). Liegen nach dem UI-Commit nur noch Doku-Commits, deployt die CI sie nicht (Doku-Pfad, ADR 0021, Teil B). Dann zeigt `commit` den letzten Commit mit Build-Eingaben, und `git diff --name-only <commit> HEAD` listet nur Doku.
+- **live**: `https://zwergenplan.app/` mit echten Daten, nach dem Deploy als **Kurzcheck** (Abschnitt 6 statt 2–5). Erst prüfen, ob der Deploy angekommen ist: `curl -s https://zwergenplan.app/data/meta.json` zeigt in `commit` denselben Kurz-SHA wie `git rev-parse --short HEAD`. Ohne GitHub-API (Plan 0027, E13). Liegen nach dem UI-Commit nur noch Doku-Commits, deployt die CI sie nicht (Doku-Pfad, ADR 0021, Teil B). Dann zeigt `commit` den letzten Commit mit Build-Eingaben, und `git diff --name-only <commit> HEAD` listet nur Doku.
 
 ## 2. Screenshots
 `node scripts/screenshots.ts <URL>` erzeugt `e2e/.artifacts/screens/*.png`. Die Matrix umfasst
@@ -40,3 +42,11 @@ Achte auf Ruckler, Layout-Sprünge und Konsolenfehler (`read_console_messages`).
 
 ## 5. Ergebnis
 Notiere die Befunde mit Screenshot-Namen. Behebe sie oder lege sie als Aufgabe in `docs/ideas.md` bzw. im aktuellen Plan ab. Melde dem Nutzer kurz das Ergebnis und schicke bei Fernzugriff 1–2 aussagekräftige Screenshots mit `SendUserFile`.
+
+## 6. Kurzcheck live (Argument „live“)
+1. `meta.json` zeigt den Commit (Abschnitt 1).
+2. `node scripts/screenshots.ts https://zwergenplan.app/ --views=<betroffene Ansichten>`. Mindestens 390×844 hell und dunkel mit dem Read-Tool ansehen.
+3. Mit claude-in-chrome die geänderte Interaktion auf 390 px Breite einmal ausprobieren. Dabei Konsole (`read_console_messages`) und Service Worker prüfen; den gibt es nur im Deploy-Build, nicht im lokalen Fixture-Build.
+4. Aus der Checkliste nur die Punkte beantworten, die an echten Daten hängen: lange Titel, leere Zustände, Bilder.
+
+Fertig ist der Kurzcheck, wenn jeder dieser vier Punkte beantwortet ist.
