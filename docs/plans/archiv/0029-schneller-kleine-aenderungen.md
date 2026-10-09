@@ -1,6 +1,6 @@
 # Plan 0029 – Kleine Änderungen schneller: Zeremonie nach Größe, E2E nach Diff
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit eaf6169 (2026-10-09)
 Datum: 2026-10-08
 Bezug: ADR 0021 (Verifikation nach Risiko, verwirft unter „Verworfen“ die automatische Spec-Auswahl), ADR 0002 (check → E2E → Deploy), ADR 0004 (Backpressure), Plan 0013 (E2E-Matrix in CI), Plan 0027 (archiviert, Stufen und Doku-Pfad)
 
@@ -318,6 +318,19 @@ Auswahl mit dem echten Graphen (`node scripts/e2e-select.ts <pfad>`). Stand nach
 | `tests/fixtures/offers.json` | full | – | – | app, theme |
 
 **Beobachtung für die CI-Dauer**: Die Querschnitts-Specs mobile-ux und layout tragen 1595 der 3025 Geräte-Tests. Ihre Zuordnung nennt `Overlays.tsx`, und `Overlays.tsx` importiert fast alle Ansichten. Deshalb liegt es in der Hülle jeder Änderung an Detail, Sheets, Kind-Sheet und Anbieterübersicht, und beide Specs laufen dann mit. Domänenmodule erreichen über `scripts/build-data.ts` und `share-pages.ts` fast jede Spec. Auf Branches sparen also vor allem Änderungen an Karte, Kalender, Service Worker, Merkliste und Daten. Ob die Zuordnung der Querschnitts-Specs enger werden soll (etwa nur geänderte Hüllen-Dateien selbst statt der Hülle), entscheidet die Messung der CI-Abnahme (B7).
+
+### Abnahme in CI (2026-10-09, B7)
+
+Alle Probe-Branches zweigen von `eaf6169` ab, also von Teil B auf `main`. Jeder hat genau einen Wegwerf-Commit, keiner kommt nach `main`. Die Laufzeit reicht vom Start des ersten bis zum Ende des letzten Jobs.
+
+| Lauf | Hinweis von `scope` | Ergebnis | Laufzeit |
+|---|---|---|---|
+| 1 `plan-0029-probe-karte` (Kommentar in `src/ui/karte/map-data.ts`) | `e2e=select devices=true smoke=false`, Specs app, karte, saved | grün, alle 6 Shards fuhren nur diese 3 Specs (z. B. WebKit 1/2: 39 Tests) | **3,2 min** (vorher etwa 10) |
+| 2 `plan-0029-probe-daten` (Kommentar in `data/providers.yaml`) | `e2e=select devices=false smoke=true` | grün, E2E-Matrix übersprungen, nur Deploy-Build und Smoke | 6,2 min |
+| 3 `plan-0029-probe-fixtures` (neue Datei in `tests/fixtures/`) | `e2e=full` (`tests/fixtures/probe-0029.txt`, volle Suite) | volle Suite. Rot war nur der bekannte WebKit-Flake `saved.spec.ts:438` (siehe Restpunkte), `gates` meldete „E2E ist failure bei e2e=full“ | 13,3 min |
+| 4 `main` mit `eaf6169` | `e2e=full` („main: volle Suite vor dem Deploy“) | grün, deployt, `meta.json` zeigt `eaf6169` | 12,2 min (davor in der Warteschlange hinter einem Lauf einer anderen Session) |
+
+Teil A ist live seit `df10403` (2026-10-09). Teil A hat keine UI-Änderung, ein `/browser-review` war deshalb nicht nötig.
 
 ## Review (2026-10-09) – Verdict: Überarbeiten → eingearbeitet
 
