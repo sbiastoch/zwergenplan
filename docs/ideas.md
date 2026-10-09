@@ -86,6 +86,11 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0029** (Restpunkte, Ergebnis):
+  - Flakes in CI. Am wichtigsten ist WebKit/iphone-15 `saved.spec.ts` „Deep-Link ./?ansicht=merkliste-karte“: `Worker failed to load` im Konsolenwächter (`e2e/fixtures.ts`). Am 2026-10-08/09 war er in fünf von sechs Läufen rot und wurde erst beim neuen Start grün. Außerdem der OpenFreeMap-Mock-Test (`59de3ef`) und `ENOTEMPTY` in `scripts/heavy.test.ts` (`bbe5830`, `117767b`).
+  - Querschnitts-Specs enger zuordnen: `mobile-ux` und `layout` (etwa die Hälfte der Gerätetests) laufen über `Overlays.tsx` bei fast jeder UI-Änderung mit, Domänenmodule erreichen über `build-data.ts` fast jede Spec.
+  - Cache für den Build von `dist-e2e/` in `e2e:local`.
+  - In `CLAUDE.md` den Hinweis `gh run rerun <id> --failed` statt eines neuen Pushs ergänzen.
 - **Plan 0018** (Browser-Review live, 2026-10-08, `3ba9ef0`):
   - Alterszeile im Detail bei „zu jung“ nennt das Datum doppelt („Passt: am Mo 9.11. 8 Monate alt · passt ab 9.11.“). Vorschlag: „Passt ab Mo 9.11. (dann 8 Monate alt)“; bei „wächst heraus“ „… · nur bis 16.11.“, bei beiden Grenzen „Passt nur 21.10.–14.3.2027“.
   - Unter dem Merklisten-Knopf steht „keiner passt gerade zum Alter“, gemeint sind Angebote: „keins passt gerade zum Alter“, wie im Toast.
