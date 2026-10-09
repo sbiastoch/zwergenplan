@@ -1,6 +1,6 @@
 # Plan 0028 – Merkliste und Entdecken nur mit altersgerechten Terminen
 
-Status: abgeschlossen, live seit 00b7ec7 (2026-10-09)
+Status: abgeschlossen, live seit 3cb0740 (2026-10-09)
 Datum: 2026-10-08
 Bezug: Plan 0018 (ICS nur altersgerecht, archiviert), ADR 0007 (Kurse komplett), ADR 0018, Plan 0021 (Altersfilter), Plan 0025, E3a (Statuszeile der Merkliste)
 

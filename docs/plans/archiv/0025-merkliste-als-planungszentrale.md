@@ -1,6 +1,6 @@
 # Plan 0025 – Merkliste als Planungszentrale: Anbieter merken, Karte, Kalender, Filter
 
-Status: abgeschlossen, live seit 00b7ec7 (2026-10-09)
+Status: abgeschlossen, live seit 3cb0740 (2026-10-09)
 Datum: 2026-10-08
 Mockup: https://claude.ai/artifact/QMwK1e16a2GQPKbVtMwMx9 (Design-Canvas, Stand „Feedback 2“, vom Nutzer am 2026-10-08 freigegeben)
 Bezug: Plan 0003 (E12 Merkliste, E14 Kalender), Plan 0005 (Karte, E5 Umschalter), Plan 0007 (E2 „jetzt“, E5 Monatsknopf), Plan 0008 (E12 Leerzustände), Plan 0010 (E2 Tab-Leiste, E3 Anbieter-Sheet, E6 `anbieter.json`), Plan 0018 (ICS altersgerecht), Plan 0021 (Altersfilter), ADR 0007, ADR 0008, ADR 0010, ADR 0012, ADR 0013, ADR 0018, ADR 0019
@@ -870,7 +870,7 @@ Domänenlogik zuerst rot, dann der Code. Unit-Tests laufen in `America/Los_Angel
 - **E2E**: Test 9 (Filter, Export) in `e2e/saved.spec.ts`, dazu die Statuszeile der Merklisten-Karte mit Filter und der Leerzustand der Karte mit `expectMobileUx`. Test 10 (Filter im Kalender, Schnellwahl im Kalender ausgeblendet) in `e2e/merkliste-kalender.spec.ts`, Fall 1 mit `expectMobileUx`. Mobile-UX-Zustände `merkliste-liste` und `merkliste-gefiltert-leer` in `e2e/mobile-ux.spec.ts`; `e2e/mobile-ux.ts` ist unverändert.
 - `docs/ideas.md`: „Merkliste ‚Beginn ab‘“ gestrichen; neu „Merklisten-Filter in der URL“, „Freie Datumseingabe auf der Merkliste“ und „Weitere Filter auf der Merkliste“ (N4).
 
-**Abschlussrunde** (2026-10-09, Browser-Review live von Etappe 3 mit Plan 0028, Arch-Review von Etappe 4). Start-JS +0,139 kB (98,710 → 98,849 kB), CSS +0,021 kB (ADR 0012). Damit liegt die Summe bei +2,306 kB, mit den Fixes aus Etappe 2 bei höchstens +2,520 kB. Das ist über +2,5 kB, **N5 ist ausgelöst**: Der Nutzer entscheidet über die Budgetgrenze, erst danach käme ein Lazy-Chunk.
+**Abschlussrunde** (2026-10-09, Browser-Review live von Etappe 3 mit Plan 0028, Arch-Review von Etappe 4). Start-JS +0,139 kB (98,710 → 98,849 kB), CSS +0,021 kB (ADR 0012). Damit liegt die Summe bei +2,306 kB, mit den Fixes aus Etappe 2 bei höchstens +2,520 kB. Das ist über +2,5 kB, **N5 ist ausgelöst**. Nutzerentscheid 2026-10-09: akzeptiert, Grenze für Plan 0025 nachträglich +2,6 kB, kein Lazy-Chunk (ADR 0012).
 - **Mittel, eingeklappte Terminliste im Detail:** Sie zeigte nur die ersten vier Termine. Lag der Bezugstermin (`detailSession`) dahinter, war kein Termin hervorgehoben. `collapsedSessions(upcoming, ref, 4)` in `agenda.ts` hängt ihn an, der Knopf „Alle … Termine zeigen“ erscheint nur, wenn dann noch Termine fehlen. Tests: `agenda.test.ts`, `e2e/detail.spec.ts` (Treff mit Geburtsdatum 2026-05-01, passt erst am 5. Termin).
 - **Minor 1, Leerzustand bei nur altersbedingt Ausgeblendetem:** `rangeAgenda` zählt `ageHidden` aus `ageIndex`, dem Index nach Merklisten-Filter ohne Altersprüfung (nur mit Geburtsdatum). Der Kalender sagt dann „Nichts passt zum Alter – Für diese Woche hast du nur Termine gemerkt, die nicht zum Alter passen.“ statt „Nichts gemerkt“. Tests: `agenda.test.ts`, `format.test.ts`, `e2e/merkliste-kalender.spec.ts`.
 - **Minor 2, Abstand unter dem Umschalter:** `fieldset.view-toggle.full` hat unten 4 px Rand; `e2e/layout.spec.ts` prüft bei 320 px und 100/200 % mindestens 8 px vom Umschalter zum ersten Chip und vom Chip zum Export-Knopf bzw. zur Statuszeile. Die Filterzeile aus Etappe 4 steht inzwischen dazwischen.
@@ -992,4 +992,4 @@ Abgelehnt wurde nichts.
 
 ## Status
 
-Abgeschlossen (2026-10-09): Etappen 1–4 und die Abschlussrunde sind umgesetzt. Die Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“; offen bleibt der Nutzerentscheid zu N5 (Start-Budget, ADR 0012). Freigegeben war er mit eingearbeitetem Review und den Nutzerentscheiden vom 2026-10-08. Der Nachtrag aus dem Mockup (Entscheidungen c–e) ist reviewt und eingearbeitet (Abschnitt „Review des Nachtrags“); kein Blocker offen.
+Abgeschlossen (2026-10-09): Etappen 1–4 und die Abschlussrunde sind umgesetzt. Die Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“; N5 ist entschieden: Die Überschreitung ist akzeptiert (ADR 0012). Freigegeben war er mit eingearbeitetem Review und den Nutzerentscheiden vom 2026-10-08. Der Nachtrag aus dem Mockup (Entscheidungen c–e) ist reviewt und eingearbeitet (Abschnitt „Review des Nachtrags“); kein Blocker offen.
