@@ -135,6 +135,10 @@ Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Ein
   - Seitenleiste quer: Label und Badge füllen die Pille ganz aus, es bleibt kein Rand. Etwas mehr Innenabstand oder ein kleineres Badge in der Seitenleiste prüfen.
   - Monatsraster bei 320 px und 200 %: Zweistellige Tage berühren sich. Kleinere Ziffern ab großer Schrift oder ein einspaltiges Wochenraster prüfen.
   - N5 entschieden (2026-10-09): Die Überschreitung (höchstens +2,520 kB statt +2,5 kB, ADR 0012) ist akzeptiert. Das Start-JS steht bei 98,849 von 100 kB; der nächste merkliche Zuwachs braucht „Merkliste als Lazy-Chunk“ (oben).
-  - Browser-Review live von Etappe 4 und der Abschlussrunde (Terminliste mit angehängtem Bezugstermin, Leerzustand „Nichts passt zum Alter“, Abstand unter dem Umschalter) nach dem Deploy.
+- **Plan 0025** (Browser-Review live Etappe 4 und Abschlussrunde, 2026-10-09, `3cb0740`):
+  - Quer (915 px) schneidet die Filterzeile hart im Inhalt ab, ein gescrollter aktiver Chip ist halb verdeckt. Die Schnellfilter in „Angebote“ verhalten sich gleich; ein Ausblendverlauf am Rand oder Zurückscrollen zum aktiven Chip prüfen.
+  - Der Chip „Zurücksetzen“ steht am Ende der Filterzeile und ist bei aktivem Filter erst nach Querwischen sichtbar. Bei aktivem Filter an den Anfang stellen.
+  - 320×640: „Filter zurücksetzen“ im gefilterten Leerzustand liegt ohne Scrollen teils unter der Tab-Leiste.
+  - Eingeklappte Terminliste im Detail: Zwischen den ersten Terminen und dem angehängten Bezugstermin fehlt ein Hinweis auf die Lücke (z. B. „…“ oder „2 Termine dazwischen passen nicht“).
 - **Plan 0028** (Nicht geändert): Der Zeitraumfilter prüft das Alter nicht. Ein regelmäßiges Angebot, das im Zeitraum nur unpassende Termine hat, aber später passt, steht im Zeitraum weiter am ersten Termin darin.
 - Plan 0002, 0013, 0014, 0016, 0020 und 0023 haben darüber hinaus keine Restpunkte.
