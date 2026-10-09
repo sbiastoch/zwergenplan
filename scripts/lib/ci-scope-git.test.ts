@@ -55,6 +55,20 @@ describe("scopeGit", () => {
     expect(git.isAncestor(b, a)).toBe(false);
   });
 
+  it("mergeBase: gemeinsamer Vorfahre zweier Zweige; ohne origin/main wirft es (Plan 0029, B5)", () => {
+    const { repo, write, commit, git } = setup();
+    write(PLAN, "1\n");
+    const a = commit("a");
+    repo.git("checkout", "-q", "-b", "seite");
+    write(PLAN, "2\n");
+    const b = commit("b");
+    repo.git("checkout", "-q", a);
+    write("src/c.ts", "export {};\n");
+    commit("c");
+    expect(git.mergeBase(b, "HEAD")).toBe(a);
+    expect(() => git.mergeBase("origin/main", "HEAD")).toThrow();
+  });
+
   it("unbekanntes Objekt wirft, statt eine leere Liste zu liefern", () => {
     const { write, commit, git } = setup();
     write(PLAN, "1\n");

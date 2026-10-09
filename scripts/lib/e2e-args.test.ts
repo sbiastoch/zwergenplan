@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type E2eArgs, parseE2eArgs, runPlan } from "./e2e-args.ts";
+import { affectedArgs, type E2eArgs, parseE2eArgs, runPlan } from "./e2e-args.ts";
 
 describe("runPlan: Suite und Builds (Arch-Review e6, m8)", () => {
   const engines: Record<string, string> = { "pixel-7": "chromium", "iphone-15": "webkit" };
@@ -55,6 +55,48 @@ describe("parseE2eArgs (Plan 0027, E4; Arch-Review Etappe 4, m5)", () => {
       expect(r.mode).toBe("error");
       if (r.mode === "error") expect(r.message).toContain("Die volle Suite fährt die CI");
     }
+  });
+
+  it("--affected: Auswahl aus dem Diff, Standard pixel-7, optional --smoke und --base (Plan 0029, B5)", () => {
+    expect(parseE2eArgs(["--affected"])).toEqual({
+      mode: "affected",
+      project: "pixel-7",
+      smoke: false,
+      base: undefined,
+      extra: [],
+    });
+    expect(parseE2eArgs(["--affected", "--smoke", "--base", "main~3", "--", "--project=iphone-15", "-g", "x"])).toEqual(
+      {
+        mode: "affected",
+        project: "iphone-15",
+        smoke: true,
+        base: "main~3",
+        extra: ["--project=iphone-15", "-g", "x"],
+      },
+    );
+  });
+
+  it("--affected mit Specs oder unbekannter Option ist ein Fehler", () => {
+    for (const argv of [
+      ["--affected", "e2e/app.spec.ts"],
+      ["e2e/app.spec.ts", "--affected"],
+      ["--affected", "--base"],
+      ["--affected", "--quatsch"],
+    ]) {
+      expect(parseE2eArgs(argv).mode, argv.join(" ")).toBe("error");
+    }
+  });
+
+  it("affectedArgs: gewählte Specs werden zum gezielten Lauf, mit Projekt und Zusatzargumenten", () => {
+    expect(affectedArgs(["e2e/app.spec.ts", "e2e/karte.spec.ts"], { project: "pixel-7", extra: [] })).toEqual({
+      mode: "specs",
+      specs: ["e2e/app.spec.ts", "e2e/karte.spec.ts"],
+      project: "pixel-7",
+      playwright: ["e2e/app.spec.ts", "e2e/karte.spec.ts", "--project=pixel-7"],
+    });
+    expect(
+      affectedArgs(["e2e/app.spec.ts"], { project: "iphone-15", extra: ["--project=iphone-15", "-g", "x"] }),
+    ).toMatchObject({ playwright: ["e2e/app.spec.ts", "--project=iphone-15", "-g", "x"] });
   });
 
   it("--all läuft alles und reicht die restlichen Argumente durch (pnpm e2e, Review M1)", () => {

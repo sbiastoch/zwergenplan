@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { decideScope, type ScopeEvent, type ScopeIo } from "./ci-scope.ts";
+import { decideE2e, decideScope, type E2eIo, type ScopeEvent, type ScopeIo, scopeOutputs } from "./ci-scope.ts";
+import type { Selection } from "./e2e-select.ts";
 
 /**
  * Test 6 aus Plan 0027 (E10): Entscheidung des CI-Jobs `scope`, rein. Git und GitHub-API kommen als Eingaben.
@@ -242,3 +245,179 @@ describe("andere Ereignisse und Eingaben", () => {
 function throwing(message: string): never {
   throw new Error(message);
 }
+
+/** E2E nach Diff (Plan 0029, B5, B7): Auswahl nur bei Push auf einen Branch außer main, sonst volle Suite. */
+describe("decideE2e (Plan 0029, B5)", () => {
+  const BASE = "b0b0b0b0123456789abcdef0123456789abcdef0";
+  const FULL_E2E = { e2e: "full", specs: [], devices: true, smoke: true };
+
+  function e2eFake(selection: Selection | (() => Selection), mergeBase: () => string = () => BASE) {
+    const calls: string[] = [];
+    const io: E2eIo = {
+      mergeBase(a, b) {
+        calls.push(`merge-base ${a} ${b}`);
+        return mergeBase();
+      },
+      changedPaths(from, to) {
+        calls.push(`diff ${from} ${to}`);
+        return ["src/ui/karte/MapScreen.tsx"];
+      },
+      select(changed) {
+        calls.push(`select ${changed.join(" ")}`);
+        return typeof selection === "function" ? selection() : selection;
+      },
+    };
+    return { io, calls };
+  }
+  const specs = (device: string[], smoke: string[] = []): Selection => ({ kind: "specs", device, smoke, why: {} });
+
+  it("Branch-Push mit Auswahl → e2e=select, specs, devices=true; Diff über den ganzen Branch", () => {
+    const { io, calls } = e2eFake(specs(["e2e/app.spec.ts", "e2e/karte.spec.ts"]));
+    expect(decideE2e(branchPush, io)).toMatchObject({
+      e2e: "select",
+      specs: ["e2e/app.spec.ts", "e2e/karte.spec.ts"],
+      devices: true,
+      smoke: false,
+    });
+    expect(calls).toEqual([
+      `merge-base origin/main ${HEAD}`,
+      `diff ${BASE} ${HEAD}`,
+      "select src/ui/karte/MapScreen.tsx",
+    ]);
+  });
+
+  it("Branch-Push nur mit data/ → e2e=select, devices=false, smoke=true", () => {
+    const { io } = e2eFake(specs([], ["e2e/smoke.spec.ts"]));
+    expect(decideE2e(branchPush, io)).toMatchObject({ e2e: "select", specs: [], devices: false, smoke: true });
+  });
+
+  it("keine Spec → e2e=none, devices=false, smoke=false", () => {
+    const { io } = e2eFake({ kind: "none", why: {} });
+    expect(decideE2e(branchPush, io)).toMatchObject({ e2e: "none", specs: [], devices: false, smoke: false });
+  });
+
+  it("Auswahl ergibt full → e2e=full mit Grund", () => {
+    const { io } = e2eFake({
+      kind: "full",
+      reason: "tests/fixtures/x.json (volle Suite)",
+      device: [],
+      smoke: [],
+      why: {},
+    });
+    expect(decideE2e(branchPush, io)).toMatchObject({ ...FULL_E2E, reason: expect.stringContaining("tests/fixtures") });
+  });
+
+  it.each([
+    ["main", mainPush],
+    ["pull_request", { ...branchPush, event: "pull_request" }],
+    ["workflow_dispatch", { ...branchPush, event: "workflow_dispatch" }],
+    ["Tag", { ...branchPush, ref: "refs/tags/v1" }],
+    ["SHA ungültig", { ...branchPush, sha: "HEAD" }],
+  ])("%s → e2e=full, ohne Git", (_, event) => {
+    const { io, calls } = e2eFake(specs(["e2e/app.spec.ts"]));
+    expect(decideE2e(event, io)).toMatchObject(FULL_E2E);
+    expect(calls).toEqual([]);
+  });
+
+  it("fehlendes origin/main (merge-base wirft) → e2e=full, nie Rot", () => {
+    const { io } = e2eFake(specs(["e2e/app.spec.ts"]), () => throwing("fatal: Not a valid object name origin/main"));
+    expect(decideE2e(branchPush, io)).toMatchObject({ ...FULL_E2E, reason: expect.stringContaining("origin/main") });
+  });
+
+  it("Ausnahme in der Auswahl, auch ohne Error-Objekt → e2e=full", () => {
+    expect(decideE2e(branchPush, e2eFake(() => throwing("Graph kaputt")).io)).toMatchObject(FULL_E2E);
+    const raw = e2eFake(() => {
+      throw "kaputt";
+    });
+    expect(decideE2e(branchPush, raw.io)).toMatchObject({ ...FULL_E2E, reason: expect.stringContaining("kaputt") });
+  });
+
+  it.each(["e2e/../x.spec.ts", "e2e/$(rm -rf).spec.ts", "e2e/a b.spec.ts", "src/x.spec.ts", "e2e/X.spec.ts"])(
+    "Spec-Name außerhalb des Musters (%s) → e2e=full (Review m3)",
+    (name) => {
+      const { io } = e2eFake(specs(["e2e/app.spec.ts", name]));
+      expect(decideE2e(branchPush, io)).toMatchObject(FULL_E2E);
+    },
+  );
+});
+
+describe("scopeOutputs: alle Ausgaben in einem Schreibvorgang (Review 2, m4)", () => {
+  it("ein String mit allen fünf Schlüsseln", () => {
+    expect(
+      scopeOutputs(
+        { full: true, reason: "x" },
+        { e2e: "select", specs: ["e2e/app.spec.ts", "e2e/karte.spec.ts"], devices: true, smoke: false, reason: "y" },
+      ),
+    ).toBe("full=true\ne2e=select\nspecs=e2e/app.spec.ts e2e/karte.spec.ts\ndevices=true\nsmoke=false\n");
+  });
+
+  it("scripts/ci-scope.ts schreibt genau einmal nach $GITHUB_OUTPUT", () => {
+    const cli = readFileSync(fileURLToPath(new URL("../ci-scope.ts", import.meta.url)), "utf8");
+    expect(cli.match(/appendFileSync\(/g)).toHaveLength(1);
+    expect(cli).toContain("appendFileSync(output, scopeOutputs(");
+  });
+});
+
+/**
+ * Kanarienvogel der Garantie (ADR 0023, Nr. 7): die Bedingungen in ci.yml als Textabgleich. Auf main ist die
+ * Spec-Liste leer, der Job e2e läuft auf main immer, deploy verlangt e2e == full (Review 2, M2).
+ */
+describe("ci.yml: Bedingungen von scope, e2e, smoke, gates und deploy (Plan 0029, B5)", () => {
+  const yml = readFileSync(fileURLToPath(new URL("../../.github/workflows/ci.yml", import.meta.url)), "utf8");
+  const job = (name: string) => {
+    const start = yml.indexOf(`\n  ${name}:\n`);
+    expect(start, name).toBeGreaterThan(0);
+    const rest = yml.slice(start + 1);
+    const end = rest.slice(1).search(/\n {2}[a-z][\w-]*:\n/);
+    return end === -1 ? rest : rest.slice(0, end + 1);
+  };
+  const SELECT = "github.ref == 'refs/heads/main' || needs.scope.outputs.e2e == 'full'";
+  /** Ausdruck von GitHub Actions, `${{ … }}` */
+  const gh = (expression: string) => `\${{ ${expression} }}`;
+
+  it("scope: Rückfallwerte für jede Ausgabe (Review B2)", () => {
+    const scope = job("scope");
+    expect(scope).toContain(`full: ${gh("steps.scope.outputs.full || 'true'")}`);
+    expect(scope).toContain(`e2e: ${gh("steps.scope.outputs.e2e || 'full'")}`);
+    expect(scope).toContain(`specs: ${gh("steps.scope.outputs.specs || ''")}`);
+    expect(scope).toContain(`devices: ${gh("steps.scope.outputs.devices || 'true'")}`);
+    expect(scope).toContain(`smoke: ${gh("steps.scope.outputs.smoke || 'true'")}`);
+  });
+
+  it("e2e: auf main immer, auf Branches nur mit Geräte-Specs; SPECS über env, auf main leer", () => {
+    const e2e = job("e2e");
+    expect(e2e).toContain(
+      `if: needs.scope.outputs.full == 'true' && (${SELECT} || needs.scope.outputs.devices == 'true')`,
+    );
+    expect(e2e).toContain(
+      `SPECS: ${gh("needs.scope.outputs.e2e == 'select' && github.ref != 'refs/heads/main' && needs.scope.outputs.specs || ''")}`,
+    );
+    // --pass-with-no-tests nur mit Auswahl: Bei voller Suite (main) wäre ein leerer Lauf sonst grün (Arch-Review M1)
+    expect(e2e).toContain("run: pnpm exec playwright test $SPECS ${SPECS:+--pass-with-no-tests} --shard=");
+    expect(yml.replaceAll("${SPECS:+--pass-with-no-tests}", "")).not.toContain("--pass-with-no-tests");
+    // kein Ausdruck mit der Spec-Liste direkt in run (Review m3)
+    expect(e2e).not.toMatch(/run:[^\n]*outputs\.specs/);
+  });
+
+  it("smoke: Smoke-Schritt nur bei Bedarf, Schrift-Swap mit always() unter derselben Bedingung (Review 2, m1)", () => {
+    const smoke = job("smoke");
+    expect(smoke).toContain("if: needs.scope.outputs.full == 'true'\n");
+    const when = `${SELECT} || needs.scope.outputs.smoke == 'true'`;
+    expect(smoke).toContain(`- name: Smoke mit echten Daten\n        if: ${when}\n`);
+    expect(smoke).toContain(`if: always() && (${when})`);
+  });
+
+  it("gates: Entscheidung über scripts/ci-gates.ts mit allen Eingaben", () => {
+    const gates = job("gates");
+    expect(gates).toContain("run: node scripts/ci-gates.ts");
+    for (const key of ["REF", "FULL", "E2E_MODE", "DEVICES", "SMOKE_MODE", "R_SCOPE", "R_CHECK", "R_E2E", "R_SMOKE"]) {
+      expect(gates).toContain(`${key}: `);
+    }
+  });
+
+  it("deploy: nur auf main, voll geprüft und mit e2e == full", () => {
+    expect(job("deploy")).toContain(
+      "if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.scope.outputs.full == 'true' && needs.scope.outputs.e2e == 'full'",
+    );
+  });
+});

@@ -47,7 +47,7 @@ data/providers.yaml + data/offers.json + data/oepnv/fahrplan.json   (Commit auf 
 | `scripts/transit/` | reine Build-Logik der Wegzeit (Plan 0009, Plan 0012): Profil-CSA, Halt→Ort-Tabelle, Linien je Zelle (`lines.ts`), Aktualität des Fahrplans | nur `src/domain` und `scripts/transit` – kein Node-I/O, kein npm-Paket, kein Netz (`transit-build-pure`) |
 | `e2e/` | Black-Box-Tests im Browser | nichts aus `src/` (einzige Hintertür: `window.__zpMap`, siehe unten) |
 | `.claude/hooks/` | Agenten-Hooks | nur Node-Builtins |
-| `scripts/ci-scope.ts` | CI-Job `scope` (Plan 0027, E10; ADR 0021, Teil B), läuft ohne `pnpm install` | nur Node-Builtins und die reinen Module `scripts/lib/ci-scope.ts`, `ci-scope-git.ts`, `change-class.ts`, `git-env.ts`; dasselbe gilt für diese Module (`ci-scope-builtins-only`) |
+| `scripts/ci-scope.ts`, `scripts/ci-gates.ts` | CI-Jobs `scope` (Plan 0027, E10; ADR 0021, Teil B; E2E-Auswahl nach Plan 0029, B5; ADR 0023) und `gates` (Plan 0029, B5), laufen ohne `pnpm install` | nur Node-Builtins und die reinen Module `scripts/lib/ci-scope.ts`, `ci-scope-git.ts`, `change-class.ts`, `git-env.ts`, `ci-gates.ts` sowie für die E2E-Auswahl `import-graph.ts`, `import-graph-io.ts`, `e2e-map.ts`, `e2e-select.ts`; dasselbe gilt für diese Module (`ci-scope-builtins-only`) |
 
 Regeln:
 - `src/domain` ist framework-frei und läuft im Browser: kein React, kein Node-API, keine UI (`domain-is-pure`, `domain-no-node-at-runtime`).
