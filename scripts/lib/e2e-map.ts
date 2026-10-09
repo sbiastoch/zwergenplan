@@ -93,7 +93,8 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/domain\/(camera|places|geo|category-look)\.ts$/,
   ],
   // Querschnitt Layout über Breiten, Lagen und Textgrößen: nur die globale Hülle (Review 2, M1).
-  "e2e/layout.spec.ts": SHELL,
+  // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4)
+  "e2e/layout.spec.ts": [...SHELL, /^src\/ui\/SavedFilters\.tsx$/],
   // Gemerkte Anbieter: Herz in Liste und Sheet, Reihenfolge im Tab, Suche, Privatsphäre (preferences, useSavedProviders).
   "e2e/merkliste-anbieter.spec.ts": [
     /^src\/ui\/anbieter\//,
@@ -143,7 +144,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Merkliste: Herz und Badge (OfferCard, useSaved), Sammel-ICS aus dem Browser, Export-Chunk, Kopf und Umschalter
   // Liste | Karte (MapPanel), passend zum Alter. ICS-Dateien aus build-data.ts.
   "e2e/saved.spec.ts": [
-    /^src\/ui\/(SavedView|OfferCard|MapPanel)\.tsx$/,
+    /^src\/ui\/(SavedView|SavedFilters|OfferCard|MapPanel)\.tsx$/,
     /^src\/ui\/(ics-export|use-app-state|use-offer-views)\.ts$/,
     /^src\/data\/preferences\.ts$/,
     /^src\/domain\/(saved|ics|age)\.ts$/,
