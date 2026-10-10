@@ -6,7 +6,102 @@
   },
   "offers": [
     {
-      "id": "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
+      "id": "fnp2g3xh",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "Babymassage – Schnupper-Workshop",
+      "summary": "Einmaliger Workshop mit Grundgriffen der Babymassage; bitte Handtuch mitbringen.",
+      "topics": ["babymassage"],
+      "format": "einmalig",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "price": "15 €",
+      "age": {
+        "minMonths": 0,
+        "maxMonths": 6
+      },
+      "sessions": [
+        {
+          "start": "2026-10-17T10:00:00+02:00",
+          "end": "2026-10-17T11:30:00+02:00"
+        }
+      ],
+      "availability": {
+        "status": "ausgebucht",
+        "note": "Warteliste per Mail",
+        "checkedAt": "2026-10-05T05:40:00+02:00"
+      },
+      "url": "https://example.org/familientreff/babymassage",
+      "sourceUrl": "https://example.org/familientreff/programm"
+    },
+    {
+      "id": "blk2csz9",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "Elterncafé am Montag",
+      "summary": "Endet in der Fixture-Woche – testet das Ausblenden vergangener Angebote.",
+      "topics": ["elterncafe"],
+      "format": "einmalig",
+      "registration": "ohne-anmeldung",
+      "cost": "kostenlos",
+      "sessions": [
+        {
+          "start": "2026-10-05T09:00:00+02:00",
+          "end": "2026-10-05T10:00:00+02:00"
+        }
+      ],
+      "availability": {
+        "status": "ohne-anmeldung",
+        "checkedAt": "2026-10-05T05:40:00+02:00"
+      },
+      "url": "https://example.org/familientreff/elterncafe",
+      "sourceUrl": "https://example.org/familientreff/programm"
+    },
+    {
+      "id": "lxizt974",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "Offener Krabbeltreff",
+      "summary": "Jeden Mittwoch einfach vorbeikommen: Krabbeln, Spielen und Kaffee für die Großen.",
+      "topics": ["krabbelgruppe", "elterncafe"],
+      "format": "regelmaessig",
+      "registration": "ohne-anmeldung",
+      "cost": "kostenlos",
+      "age": {
+        "minMonths": 6,
+        "maxMonths": 24
+      },
+      "sessions": [
+        {
+          "start": "2026-10-07T10:00:00+02:00",
+          "end": "2026-10-07T11:30:00+02:00"
+        },
+        {
+          "start": "2026-10-14T10:00:00+02:00",
+          "end": "2026-10-14T11:30:00+02:00"
+        },
+        {
+          "start": "2026-10-21T10:00:00+02:00",
+          "end": "2026-10-21T11:30:00+02:00"
+        },
+        {
+          "start": "2026-10-28T10:00:00+01:00",
+          "end": "2026-10-28T11:30:00+01:00"
+        },
+        {
+          "start": "2026-11-04T10:00:00+01:00",
+          "end": "2026-11-04T11:30:00+01:00"
+        }
+      ],
+      "availability": {
+        "status": "ohne-anmeldung",
+        "checkedAt": "2026-10-05T05:40:00+02:00"
+      },
+      "url": "https://example.org/familientreff/krabbeltreff",
+      "sourceUrl": "https://example.org/familientreff/programm"
+    },
+    {
+      "id": "nle21y1x",
       "providerId": "familientreff-beispiel",
       "venueId": "familientreff-beispiel-haus",
       "title": "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)",
@@ -66,79 +161,48 @@
       "sourceUrl": "https://example.org/familientreff/programm"
     },
     {
-      "id": "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
-      "providerId": "familientreff-beispiel",
-      "venueId": "familientreff-beispiel-haus",
-      "title": "Offener Krabbeltreff",
-      "summary": "Jeden Mittwoch einfach vorbeikommen: Krabbeln, Spielen und Kaffee für die Großen.",
-      "topics": ["krabbelgruppe", "elterncafe"],
+      "id": "rv61suun",
+      "providerId": "gemeinde-beispiel",
+      "venueId": "gemeinde-beispiel-gemeindehaus",
+      "title": "Eltern-Kind-Bewegungslandschaftsnachmittag für Krabbelkinder und Laufanfänger mit Kletterparcours, Bällebad und Rhythmusinstrumenten (2–3 J)",
+      "summary": "Worst-Case-Fixture: Bewegungsbaustelle für Zweijährige mit Begleitperson; Stoppersocken mitbringen, Kinderwagenstellplatz im Hof, Anmeldung über das Gemeindebüro.",
+      "topics": ["eltern-kind-turnen", "bewegung", "eltern-kind-gruppe"],
       "format": "regelmaessig",
-      "registration": "ohne-anmeldung",
-      "cost": "kostenlos",
-      "age": {
-        "minMonths": 6,
-        "maxMonths": 24
-      },
-      "sessions": [
-        {
-          "start": "2026-10-07T10:00:00+02:00",
-          "end": "2026-10-07T11:30:00+02:00"
-        },
-        {
-          "start": "2026-10-14T10:00:00+02:00",
-          "end": "2026-10-14T11:30:00+02:00"
-        },
-        {
-          "start": "2026-10-21T10:00:00+02:00",
-          "end": "2026-10-21T11:30:00+02:00"
-        },
-        {
-          "start": "2026-10-28T10:00:00+01:00",
-          "end": "2026-10-28T11:30:00+01:00"
-        },
-        {
-          "start": "2026-11-04T10:00:00+01:00",
-          "end": "2026-11-04T11:30:00+01:00"
-        }
-      ],
-      "availability": {
-        "status": "ohne-anmeldung",
-        "checkedAt": "2026-10-05T05:40:00+02:00"
-      },
-      "url": "https://example.org/familientreff/krabbeltreff",
-      "sourceUrl": "https://example.org/familientreff/programm"
-    },
-    {
-      "id": "familientreff-beispiel--babymassage-schnupper-workshop-20261017t1000--familientreff-beispiel-haus",
-      "providerId": "familientreff-beispiel",
-      "venueId": "familientreff-beispiel-haus",
-      "title": "Babymassage – Schnupper-Workshop",
-      "summary": "Einmaliger Workshop mit Grundgriffen der Babymassage; bitte Handtuch mitbringen.",
-      "topics": ["babymassage"],
-      "format": "einmalig",
       "registration": "mit-anmeldung",
       "cost": "kostenpflichtig",
-      "price": "15 €",
+      "price": "48 € für vier Nachmittage, Geschwisterkinder ermäßigt",
       "age": {
-        "minMonths": 0,
-        "maxMonths": 6
+        "minMonths": 24,
+        "maxMonths": 36
       },
       "sessions": [
         {
-          "start": "2026-10-17T10:00:00+02:00",
-          "end": "2026-10-17T11:30:00+02:00"
+          "start": "2026-10-20T15:00:00+02:00",
+          "end": "2026-10-20T16:30:00+02:00"
+        },
+        {
+          "start": "2026-10-27T15:00:00+01:00",
+          "end": "2026-10-27T16:30:00+01:00"
+        },
+        {
+          "start": "2026-11-03T15:00:00+01:00",
+          "end": "2026-11-03T16:30:00+01:00"
+        },
+        {
+          "start": "2026-11-10T15:00:00+01:00",
+          "end": "2026-11-10T16:30:00+01:00"
         }
       ],
       "availability": {
-        "status": "ausgebucht",
-        "note": "Warteliste per Mail",
-        "checkedAt": "2026-10-05T05:40:00+02:00"
+        "status": "wenige",
+        "note": "Restplätze laut Gemeindebüro",
+        "checkedAt": "2026-10-05T05:30:00+02:00"
       },
-      "url": "https://example.org/familientreff/babymassage",
-      "sourceUrl": "https://example.org/familientreff/programm"
+      "url": "https://example.org/gemeinde/gruppen/bewegungslandschaft",
+      "sourceUrl": "https://example.org/gemeinde/gruppen"
     },
     {
-      "id": "musikschule-beispiel--musikgarten-1-1-2-jahre-20261105t1600--musikschule-beispiel-sued",
+      "id": "qxdibmkc",
       "providerId": "musikschule-beispiel",
       "venueId": "musikschule-beispiel-sued",
       "title": "Musikgarten 1 (1–2 Jahre)",
@@ -191,7 +255,7 @@
       "sourceUrl": "https://example.org/musikschule/kurse"
     },
     {
-      "id": "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
+      "id": "rzzqsvxq",
       "providerId": "stadtbibliothek-beispiel",
       "venueId": "stadtbibliothek-beispiel-zentrum",
       "title": "Krabbelreime & Fingerspiele",
@@ -230,7 +294,7 @@
       "sourceUrl": "https://example.org/bibliothek/termine"
     },
     {
-      "id": "theater-beispiel--kuckuck-im-nest-theater-ab-18-monaten-20261115t1100--theater-beispiel-buehne",
+      "id": "3zemfuzk",
       "providerId": "theater-beispiel",
       "venueId": "theater-beispiel-buehne",
       "title": "„Kuckuck im Nest“ – Theater ab 18 Monaten",
@@ -258,7 +322,7 @@
       "sourceUrl": "https://example.org/theater/spielplan"
     },
     {
-      "id": "theater-beispiel--babykonzert-im-advent-20261206t1000--theater-beispiel-buehne",
+      "id": "kovtez0z",
       "providerId": "theater-beispiel",
       "venueId": "theater-beispiel-buehne",
       "title": "Babykonzert im Advent",
@@ -279,70 +343,6 @@
       },
       "url": "https://example.org/theater/babykonzert",
       "sourceUrl": "https://example.org/theater/spielplan"
-    },
-    {
-      "id": "familientreff-beispiel--elterncafe-am-montag-20261005t0900--familientreff-beispiel-haus",
-      "providerId": "familientreff-beispiel",
-      "venueId": "familientreff-beispiel-haus",
-      "title": "Elterncafé am Montag",
-      "summary": "Endet in der Fixture-Woche – testet das Ausblenden vergangener Angebote.",
-      "topics": ["elterncafe"],
-      "format": "einmalig",
-      "registration": "ohne-anmeldung",
-      "cost": "kostenlos",
-      "sessions": [
-        {
-          "start": "2026-10-05T09:00:00+02:00",
-          "end": "2026-10-05T10:00:00+02:00"
-        }
-      ],
-      "availability": {
-        "status": "ohne-anmeldung",
-        "checkedAt": "2026-10-05T05:40:00+02:00"
-      },
-      "url": "https://example.org/familientreff/elterncafe",
-      "sourceUrl": "https://example.org/familientreff/programm"
-    },
-    {
-      "id": "gemeinde-beispiel--eltern-kind-bewegungslandschaftsnachmittag-fuer--gemeinde-beispiel-gemeindehaus",
-      "providerId": "gemeinde-beispiel",
-      "venueId": "gemeinde-beispiel-gemeindehaus",
-      "title": "Eltern-Kind-Bewegungslandschaftsnachmittag für Krabbelkinder und Laufanfänger mit Kletterparcours, Bällebad und Rhythmusinstrumenten (2–3 J)",
-      "summary": "Worst-Case-Fixture: Bewegungsbaustelle für Zweijährige mit Begleitperson; Stoppersocken mitbringen, Kinderwagenstellplatz im Hof, Anmeldung über das Gemeindebüro.",
-      "topics": ["eltern-kind-turnen", "bewegung", "eltern-kind-gruppe"],
-      "format": "regelmaessig",
-      "registration": "mit-anmeldung",
-      "cost": "kostenpflichtig",
-      "price": "48 € für vier Nachmittage, Geschwisterkinder ermäßigt",
-      "age": {
-        "minMonths": 24,
-        "maxMonths": 36
-      },
-      "sessions": [
-        {
-          "start": "2026-10-20T15:00:00+02:00",
-          "end": "2026-10-20T16:30:00+02:00"
-        },
-        {
-          "start": "2026-10-27T15:00:00+01:00",
-          "end": "2026-10-27T16:30:00+01:00"
-        },
-        {
-          "start": "2026-11-03T15:00:00+01:00",
-          "end": "2026-11-03T16:30:00+01:00"
-        },
-        {
-          "start": "2026-11-10T15:00:00+01:00",
-          "end": "2026-11-10T16:30:00+01:00"
-        }
-      ],
-      "availability": {
-        "status": "wenige",
-        "note": "Restplätze laut Gemeindebüro",
-        "checkedAt": "2026-10-05T05:30:00+02:00"
-      },
-      "url": "https://example.org/gemeinde/gruppen/bewegungslandschaft",
-      "sourceUrl": "https://example.org/gemeinde/gruppen"
     }
   ]
 }

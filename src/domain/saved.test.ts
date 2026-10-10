@@ -9,6 +9,7 @@ import {
   exportSessions,
   isSavedFilterChipOn,
   matchesSavedFilter,
+  migrateSavedIds,
   type SavedFilter,
   savedFilterCount,
   savedOffers,
@@ -338,20 +339,29 @@ describe("upcomingSessionCount (Plan 0025, E3a)", () => {
   });
 });
 
-describe("cleanSavedProviders (Plan 0025, E1)", () => {
+describe("cleanSavedProviders (Plan 0025, E1; ADR 0022)", () => {
   it("verwirft ungültige IDs", () => {
-    expect(cleanSavedProviders(["Familientreff", "mit leerzeichen", "familientreff-beispiel"])).toEqual([
-      "familientreff-beispiel",
-    ]);
+    expect(cleanSavedProviders(["Familientreff", "mit leerzeichen", "b5nuus36"])).toEqual(["b5nuus36"]);
   });
 
-  it("verwirft zu lange IDs", () => {
+  it("rechnet Katalog-IDs auf die publicId um, zu lange fallen weg", () => {
+    expect(cleanSavedProviders(["familientreff-beispiel", "babykonzert-nuernberg"])).toEqual(["b5nuus36", "gl1sfqim"]);
     expect(cleanSavedProviders(["a".repeat(81)])).toEqual([]);
     expect(cleanSavedProviders(["a".repeat(80)])).toHaveLength(1);
   });
 
-  it("bei Dubletten gilt der erste Eintrag, die Reihenfolge bleibt", () => {
-    expect(cleanSavedProviders(["b-anbieter", "a-anbieter", "b-anbieter"])).toEqual(["b-anbieter", "a-anbieter"]);
+  it("Katalog-ID und publicId desselben Anbieters ergeben einen Eintrag an der ersten Stelle", () => {
+    expect(cleanSavedProviders(["gl1sfqim", "b5nuus36", "babykonzert-nuernberg"])).toEqual(["gl1sfqim", "b5nuus36"]);
+    expect(cleanSavedProviders(["un8dc9t4", "familientreff-beispiel", "b5nuus36"])).toEqual(["un8dc9t4", "b5nuus36"]);
+  });
+});
+
+describe("migrateSavedIds (ADR 0022)", () => {
+  const long = "atv-1873-frankonia--riesen-zwerge-turnen-fuer-2-bis-3-jaehrige-mo--atv-1873-frankonia";
+
+  it("bildet alte IDs ab, entfernt Dubletten und hält die Reihenfolge", () => {
+    expect(migrateSavedIds(["4tpu5qaq", long, "d4qshjw0", "zzzzzzzz"])).toEqual(["4tpu5qaq", "d4qshjw0", "zzzzzzzz"]);
+    expect(migrateSavedIds(["4tpu5qaq", "zzzzzzzz"])).toEqual(["4tpu5qaq", "zzzzzzzz"]);
   });
 });
 

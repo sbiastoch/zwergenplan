@@ -23,6 +23,13 @@ export function loadFixtures(): { providers: Provider[]; anbieter: Anbieter[]; f
   return { providers: result.providers, anbieter, file: result.offers };
 }
 
+/** publicId eines Fixture-Anbieters zur Katalog-ID: Tests bleiben lesbar, `site.json` hat nur die publicId (ADR 0022). */
+export function fixturePublicId(catalogId: string): string {
+  const found = loadFixtures().anbieter.find((p) => p.id === catalogId);
+  if (!found) throw new Error(`Fixture-Anbieter ${catalogId} fehlt`);
+  return found.publicId;
+}
+
 /** Die Fixtures so, wie die Oberfläche sie lädt: mit Anbietername und Ort (für Filter mit Umkreis). */
 export function fixtureSiteOffers(): SiteOffer[] {
   const { providers, file } = loadFixtures();

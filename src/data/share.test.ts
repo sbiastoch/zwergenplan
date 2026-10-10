@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { absoluteUrl, type ShareApi, shareLink } from "./share.ts";
 
-const data = { title: "Offener Krabbeltreff", url: "https://zwergenplan.app/angebot/a--b--c/" };
+const data = { title: "Offener Krabbeltreff", url: "https://zwergenplan.app/a/4tpu5qaq/" };
 const fail = (name: string) => () => Promise.reject(new DOMException("nein", name));
 
 function api(share: ShareApi["share"], writeText: ShareApi["writeText"] = vi.fn(() => Promise.resolve())) {
@@ -41,6 +41,6 @@ describe("Teilen und Kopieren (Plan 0026, E6)", () => {
   });
 
   it("absolute URL aus Origin und Basis", () => {
-    expect(absoluteUrl("angebot/a--b--c/", "http://localhost:4173")).toBe("http://localhost:4173/angebot/a--b--c/");
+    expect(absoluteUrl("a/4tpu5qaq/", "http://localhost:4173")).toBe("http://localhost:4173/a/4tpu5qaq/");
   });
 });

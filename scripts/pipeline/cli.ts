@@ -12,14 +12,16 @@
  *   geocode "Adresse"                           Koordinaten, Stadtteil, Ring
  *   build RUN_DIR                               data/offers.json + RUN_DIR/report.json
  *   publish RUN_DIR                             prüfen, committen, pushen (ADR 0002)
+ *   migrate-ids OFFERS.json PROVIDERS.yaml      einmalig: Kurz-IDs für Angebote und publicId (ADR 0022)
  *   oepnv [--force]                             Fahrplanauszug data/oepnv/fahrplan.json aus dem VGN-Feed
  *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
+import { parse } from "yaml";
 import { z } from "zod";
 import { validateDataset } from "../../src/domain/dataset.ts";
 import type { Provider } from "../../src/domain/schema.ts";
@@ -63,6 +65,7 @@ import { fillPlaceholders } from "./lib/placeholders.ts";
 import { RawBatch, validateRaw } from "./lib/raw.ts";
 import type { SourceStatus } from "./lib/run.ts";
 import { nextBatchFiles, selectBatches } from "./lib/select.ts";
+import { migrateIds } from "./lib/stable-ids.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -420,6 +423,15 @@ switch (command) {
   case "publish":
     publish(need(args[0], "RUN_DIR"));
     break;
+  case "migrate-ids": {
+    // Einmalige, deterministische Umformung (Plan 0015 E17) – benannte Ausnahme von „offers.json nie von Hand“
+    const [offersPath, catalogPath] = [need(args[0], "OFFERS.json"), need(args[1], "PROVIDERS.yaml")];
+    const out = migrateIds(readJson(offersPath), readFileSync(catalogPath, "utf8"), parse);
+    writeOffers(out.offers, offersPath);
+    writeFileSync(catalogPath, out.catalog);
+    print(`✓ ${out.offers.offers.length} Angebote und Katalog ${catalogPath} migriert`);
+    break;
+  }
   case "oepnv":
     await oepnv();
     break;

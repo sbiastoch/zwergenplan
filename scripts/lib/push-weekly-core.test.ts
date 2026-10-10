@@ -2,8 +2,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { offerKey } from "../../src/domain/ids.ts";
 import type { SiteOffer } from "../../src/domain/site-data.ts";
-import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers } from "../../src/domain/test-fixtures.ts";
+import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers, loadFixtures } from "../../src/domain/test-fixtures.ts";
 import {
   parseWeeklyArgs,
   runWeekly,
@@ -90,6 +91,13 @@ describe("runWeekly", () => {
     expect(removed).toEqual([["h2abcdef"]]);
     // Ausgabe nur als Zahlen, keine Endpoints
     expect(lines.join("\n")).not.toContain("fcm.googleapis.com");
+  });
+
+  it("ein alter Stand mit langen IDs zählt dieselben Angebote nicht als neu (ADR 0022, Review M2)", async () => {
+    const legacy = loadFixtures().file.offers.map((o) => offerKey({ ...o, firstStart: o.sessions[0]?.start ?? "" }));
+    const { d } = deps({ previousIds: async () => legacy });
+    const result = await runWeekly(d, { force: false, dryRun: true });
+    expect(result).toMatchObject({ news: 0 });
   });
 
   it("die Woche zählt ab dem Lauf (Fixture-Jetzt: Krabbeltreff und Krabbelreime)", async () => {

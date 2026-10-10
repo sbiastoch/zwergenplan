@@ -4,6 +4,7 @@
  */
 import type { Offer, OffersFile, Provider, Venue } from "./schema.ts";
 
+/** `providerId` ist hier die `publicId` des Anbieters, nicht die Katalog-ID (ADR 0022); `venueId` bleibt intern. */
 export interface SiteOffer extends Offer {
   providerName: string;
   venue: Pick<Venue, "name" | "address" | "district" | "geo">;
@@ -19,6 +20,7 @@ export interface SiteData {
  * (kein `programme`, `notes`, `region`, `geo`, kein Orts-`hint`). Nur Katalog-Einträge mit `role: anbieter`.
  */
 export interface SiteProvider {
+  /** `publicId` aus dem Katalog (ADR 0022) */
   id: string;
   name: string;
   /** Website; laut Katalog bei allen Anbietern zugleich eine Programm-URL („Website & Programm“) */
@@ -69,10 +71,12 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
   const offers = file.offers.map((offer): SiteOffer => {
     const provider = byId.get(offer.providerId);
     const venue = provider?.role === "anbieter" ? provider.venues.find((v) => v.id === offer.venueId) : undefined;
-    if (!provider || !venue) throw new Error(`Ungeprüfte Daten: ${offer.id}`);
+    if (provider?.role !== "anbieter" || !venue) throw new Error(`Ungeprüfte Daten: ${offer.id}`);
     const { name, address, district, geo } = venue;
     return {
       ...offer,
+      // die einzige Anbieter-ID im Browser ist die publicId (ADR 0022)
+      providerId: provider.publicId,
       providerName: provider.name,
       venue: {
         name,
@@ -82,10 +86,12 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
       },
     };
   });
-  // Chronologisch nach erstem Termin – stabile Reihenfolge für Liste und Tests.
+  // Chronologisch nach erstem Termin, bei gleichem Beginn nach Titel: Die Kurz-ID wirkt zufällig (Plan 0015 E13).
   offers.sort(
     (a, b) =>
-      Date.parse(a.sessions[0]?.start ?? "") - Date.parse(b.sessions[0]?.start ?? "") || a.id.localeCompare(b.id),
+      Date.parse(a.sessions[0]?.start ?? "") - Date.parse(b.sessions[0]?.start ?? "") ||
+      a.title.localeCompare(b.title, "de") ||
+      a.id.localeCompare(b.id),
   );
   return { generatedAt: file.generatedAt, offers };
 }
@@ -99,7 +105,7 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
     p.role === "anbieter"
       ? [
           {
-            id: p.id,
+            id: p.publicId,
             name: p.name,
             url: p.url,
             venues: p.venues.map(({ name, address, district }) => ({

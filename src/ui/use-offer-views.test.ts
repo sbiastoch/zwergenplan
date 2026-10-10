@@ -487,9 +487,9 @@ describe("useOfferViews", () => {
   });
 
   it("liefert Merkliste und offenes Angebot aus den Daten", () => {
-    const v = render({ savedIds: [GROSS.id, "weg--weg--weg"], route: { ...ENTDECKEN, offerId: BABY.id } });
+    const v = render({ savedIds: [GROSS.id, "wegwegwe"], route: { ...ENTDECKEN, offerId: BABY.id } });
     expect(savedTitles(v)).toEqual(["gross"]);
     expect(v.detailOffer).toBe(BABY);
-    expect(render({ route: { ...ENTDECKEN, offerId: "weg--weg--weg" } }).detailOffer).toBeUndefined();
+    expect(render({ route: { ...ENTDECKEN, offerId: "wegwegwe" } }).detailOffer).toBeUndefined();
   });
 });

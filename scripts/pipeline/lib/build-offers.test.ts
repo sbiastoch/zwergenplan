@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { shortId } from "../../../src/domain/ids.ts";
 import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import { type BuildInput, buildOffers } from "./build-offers.ts";
@@ -78,13 +79,13 @@ const batch = (name: string, events: unknown[], status: Record<string, unknown> 
 const ok = { status: "ok", checked: [] };
 
 describe("buildOffers", () => {
-  it("expandiert Regeln mit Offset, ohne Ferien, und vergibt IDs nach ADR 0006", () => {
+  it("expandiert Regeln mit Offset, ohne Ferien, und vergibt neue IDs aus dem Schlüssel (ADR 0022)", () => {
     const { file, report } = buildOffers(
       base({ batches: [batch("batch-1", [ev()], { "familientreff-beispiel": ok })] }),
     );
     expect(report.errors).toEqual([]);
     const [treff] = file?.offers ?? [];
-    expect(treff?.id).toBe("familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus");
+    expect(treff?.id).toBe(shortId("familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus"));
     expect(treff?.sessions.map((s) => s.start)).toEqual([
       "2026-10-07T10:00:00+02:00",
       "2026-10-14T10:00:00+02:00",
@@ -122,10 +123,12 @@ describe("buildOffers", () => {
       }),
     );
     expect(report.errors).toEqual([]);
-    expect(file?.offers.map((o) => o.id)).toEqual([
-      "familientreff-beispiel--babymassage-schnupperstunde-20261017t1000--familientreff-beispiel-haus",
-      "familientreff-beispiel--babymassage-schnupperstunde-20261024t1000--familientreff-beispiel-haus",
-    ]);
+    expect(file?.offers.map((o) => o.id)).toEqual(
+      [
+        "familientreff-beispiel--babymassage-schnupperstunde-20261017t1000--familientreff-beispiel-haus",
+        "familientreff-beispiel--babymassage-schnupperstunde-20261024t1000--familientreff-beispiel-haus",
+      ].map((key) => shortId(key)),
+    );
     expect(file?.offers[0]?.sessions).toEqual([
       { start: "2026-10-17T10:00:00+02:00", end: "2026-10-17T11:00:00+02:00" },
     ]);
@@ -160,7 +163,9 @@ describe("buildOffers", () => {
     const { file, report } = buildOffers(base({ batches: [batch("batch-1", [kurs, spaet])] }));
     expect(report.errors).toEqual([]);
     expect(file?.offers).toHaveLength(1);
-    expect(file?.offers[0]?.id).toBe("familientreff-beispiel--pekip-20260922t0930--familientreff-beispiel-haus");
+    expect(file?.offers[0]?.id).toBe(
+      shortId("familientreff-beispiel--pekip-20260922t0930--familientreff-beispiel-haus"),
+    );
     expect(file?.offers[0]?.sessions).toHaveLength(4);
     expect(report.notes.join("\n")).toContain("Kurs beginnt nach dem Horizont");
   });
@@ -375,6 +380,50 @@ describe("buildOffers", () => {
     expect(report.failures).toEqual([{ id: "familientreff-beispiel", reason: "503" }]);
     expect(report.notes.join("\n")).toContain("ev-kalender nicht erreichbar");
     expect(report.notes.join("\n")).toContain("in diesem Lauf nicht geprüft");
+    // übernommene Angebote behalten ihre ID aus dem Vorstand (ADR 0022)
+    const before = new Map(prev.offers.map((o) => [o.title, o.id]));
+    for (const o of file?.offers ?? []) expect(o.id).toBe(before.get(o.title));
+  });
+
+  it("fasst einen laufenden Kurs aus zwei gleichrangigen Quellen über den Fensterschlüssel zusammen (Review m3)", () => {
+    const kurs = (dates: string[]) =>
+      ev({
+        title: "PEKiP",
+        format: "kurs",
+        topics: ["pekip"],
+        schedule: { kind: "dates", dates: dates.map((d) => ({ start: `${d}T09:30` })) },
+      });
+    const { file, report } = buildOffers(
+      base({
+        horizon: { from: "2026-10-12", to: "2027-02-12" },
+        generatedAt: "2026-10-12T06:00:00+02:00",
+        batches: [
+          batch("batch-1", [kurs(["2026-09-29", "2026-10-06", "2026-10-13"]), kurs(["2026-10-13", "2026-10-20"])]),
+        ],
+      }),
+    );
+    expect(report.errors).toEqual([]);
+    expect(file?.offers).toHaveLength(1);
+    expect(file?.offers[0]?.sessions).toHaveLength(4);
+  });
+
+  it("sortiert nach Anbieter, Titel und Beginn (Plan 0015 E13) und hält IDs über Läufe", () => {
+    const events = [
+      ev({ title: "Zwergentreff" }),
+      ev({
+        title: "Ärzteinfo",
+        format: "einmalig",
+        schedule: { kind: "dates", dates: [{ start: "2026-10-20T10:00" }] },
+      }),
+      ev({ providerId: "musikschule-beispiel", venueId: "musikschule-beispiel-sued", title: "Anfang" }),
+    ];
+    const first = buildOffers(base({ batches: [batch("batch-1", events)] })).file as OffersFile;
+    expect(first.offers.map((o) => o.title)).toEqual(["Ärzteinfo", "Zwergentreff", "Anfang"]);
+    // zweiter Lauf mit umformulierten Titeln: gleiche Termine, gleiche IDs
+    const renamed = events.map((e) => ({ ...e, title: `${e.title} (neu)` }));
+    const second = buildOffers(base({ previous: first, batches: [batch("batch-1", renamed)] }));
+    expect(second.report.errors).toEqual([]);
+    expect(second.file?.offers.map((o) => o.id).sort()).toEqual(first.offers.map((o) => o.id).sort());
   });
 
   it("meldet Drift, lässt fehlende Stunde und junge-Alter-Grenzen weg und prüft das Ergebnis", () => {

@@ -7,7 +7,7 @@
 import { BASE, SITE_URL } from "../../site.config.ts";
 import { rhythm, uniformTimes, upcomingSessions } from "../../src/domain/agenda.ts";
 import { providerCategories, providerOffers } from "../../src/domain/directory.ts";
-import { MAX_KEBAB_ID, MAX_OFFER_ID } from "../../src/domain/ids.ts";
+import { MAX_KEBAB_ID, MAX_LEGACY_OFFER_ID } from "../../src/domain/ids.ts";
 import {
   ageRangeLabel,
   availabilityLabel,
@@ -18,7 +18,9 @@ import {
   WD_SHORT,
   weekdayName,
 } from "../../src/domain/labels.ts";
+import { OFFER_PARAM, PROVIDER_PARAM } from "../../src/domain/route.ts";
 import {
+  LEGACY_SHARE_DIRS,
   offerAppSearch,
   offerImagePath,
   offerSharePath,
@@ -31,7 +33,7 @@ import { berlinIsoDate, isoWeekday, parseIsoDate } from "../../src/domain/time.t
 import { CATEGORY_LABELS, type Category, leadCategory } from "../../src/domain/topics.ts";
 
 export interface SharePage {
-  /** relativ zum Ausgabeordner, z. B. „angebot/<id>/index.html“ */
+  /** relativ zum Ausgabeordner, z. B. „a/<id>/index.html“ */
   path: string;
   html: string;
 }
@@ -67,7 +69,8 @@ const MAX_FACT = 40;
  * Wächter gegen Fehler im Generator (Schleife, doppelter Block), nie gegen Daten (E4, Review M4). Gemessen am
  * 2026-10-08: Median 3,2 kB, größte 3,5 kB – die geplanten 4 kB hätte ein Titel voller „&“ reißen können. Strenge
  * Obergrenze aus den Kürzungen: Titel 110 Zeichen viermal, Beschreibung 200 Zeichen dreimal, je höchstens 6 Byte
- * escaped („&quot;“), dazu ID (≤ 240, `MAX_OFFER_ID`) viermal und rund 1,6 kB fester Text ≈ 8,8 kB. Darüber liegt nur ein Bug.
+ * escaped („&quot;“), dazu die ID viermal (bis ADR 0022 bis 240 Zeichen, seit ADR 0022 genau 8) und rund 1,6 kB fester
+ * Text ≈ 8,8 kB. Der Wert bleibt, darüber liegt nur ein Bug.
  */
 const MAX_PAGE_BYTES = 10_000;
 const GENERIC_IMAGE = "og/vorschau-v1.jpg";
@@ -282,15 +285,20 @@ export function providerSharePage(
 const regexEscape = (text: string) => text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
 
 /**
- * 404.html (E7): leitet `angebot/<id>/` und `anbieter/<id>/` unbekannter IDs in die App weiter, die dann „nicht mehr
- * im Zwergenplan“ meldet. Kein `og:` – eine Vorschau für „gibt es nicht“ wäre irreführend. Die App prüft die IDs
- * danach noch einmal (`parseRoute`).
+ * 404.html (E7; ADR 0022): leitet `a/<id>/` und `p/<id>/` unbekannter IDs in die App weiter, die dann „nicht mehr im
+ * Zwergenplan“ meldet, dazu alte Links unter `angebot/<lange-id>/` und `anbieter/<katalog-id>/`, die die App umrechnet.
+ * Kein `og:` – eine Vorschau für „gibt es nicht“ wäre irreführend. Die App prüft die IDs danach noch einmal (`parseRoute`).
  */
 export function notFoundPage(): string {
   const base = regexEscape(BASE);
-  const rule = (dir: string, max: number) =>
-    `[/^${base}${dir}\\/([a-z0-9-]{1,${max}})\\/?(?:index\\.html)?$/, "${dir}"]`;
-  const script = `for (const [re, key] of [${rule(SHARE_DIRS.offer, MAX_OFFER_ID)}, ${rule(SHARE_DIRS.provider, MAX_KEBAB_ID)}]) {
+  const rule = (dir: string, id: string, key: string) => `[/^${base}${dir}\\/(${id})\\/?(?:index\\.html)?$/, "${key}"]`;
+  const rules = [
+    rule(SHARE_DIRS.offer, "[0-9a-z]{8}", OFFER_PARAM),
+    rule(SHARE_DIRS.provider, "[0-9a-z]{8}", PROVIDER_PARAM),
+    rule(LEGACY_SHARE_DIRS.offer, `[a-z0-9-]{1,${MAX_LEGACY_OFFER_ID}}`, OFFER_PARAM),
+    rule(LEGACY_SHARE_DIRS.provider, `[a-z0-9-]{1,${MAX_KEBAB_ID}}`, PROVIDER_PARAM),
+  ];
+  const script = `for (const [re, key] of [${rules.join(", ")}]) {
   const m = re.exec(location.pathname);
   if (m) { location.replace(${JSON.stringify(BASE)} + "?" + key + "=" + m[1]); break; }
 }`;

@@ -8,7 +8,7 @@ import { fittingSessions, sessionFit } from "./age.ts";
 import { type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
 import type { DateRange } from "./date-range.ts";
 import { applyFilters, EMPTY_FILTER, type FilterState, matchesFilter } from "./filter.ts";
-import { KEBAB_ID_PATTERN, MAX_KEBAB_ID } from "./ids.ts";
+import { resolveOfferId, resolveProviderId } from "./ids.ts";
 import type { ReachTarget } from "./reach.ts";
 import type { Format, Offer, Registration, Session } from "./schema.ts";
 
@@ -192,14 +192,31 @@ export function savedFilterCount(filter: SavedFilter, { useRange }: { useRange: 
 }
 
 /**
- * Gemerkte Anbieter aus dem Speicher bereinigen (Plan 0025, E1): gültige ID, höchstens MAX_KEBAB_ID, keine
- * Dubletten. Gemerkt und entfernt wird wie bei Angeboten mit `toggleId`.
+ * Gemerkte Angebote aus dem Speicher nach ADR 0022: IDs der alten Form werden zu Kurz-IDs (`resolveOfferId`),
+ * Dubletten fallen weg (die erste Stelle bleibt), die Reihenfolge bleibt. Unbekanntes bleibt stehen wie bisher –
+ * ausgeblendet wird erst gegen die Daten.
+ */
+export function migrateSavedIds(raw: readonly string[]): string[] {
+  const seen = new Set<string>();
+  return raw.flatMap((id) => {
+    const next = resolveOfferId(id) ?? id;
+    if (seen.has(next)) return [];
+    seen.add(next);
+    return [next];
+  });
+}
+
+/**
+ * Gemerkte Anbieter aus dem Speicher bereinigen (Plan 0025, E1; ADR 0022): `publicId` bleibt, eine Katalog-ID aus der
+ * Zeit vor ADR 0022 wird zur `publicId` (`resolveProviderId`), Ungültiges fällt weg. Bei Dubletten gilt die erste
+ * Stelle. Gemerkt und entfernt wird wie bei Angeboten mit `toggleId`.
  */
 export function cleanSavedProviders(raw: readonly string[]): string[] {
   const seen = new Set<string>();
-  return raw.filter((id) => {
-    if (id.length > MAX_KEBAB_ID || !KEBAB_ID_PATTERN.test(id) || seen.has(id)) return false;
-    seen.add(id);
-    return true;
+  return raw.flatMap((id) => {
+    const next = resolveProviderId(id);
+    if (next === undefined || seen.has(next)) return [];
+    seen.add(next);
+    return [next];
   });
 }

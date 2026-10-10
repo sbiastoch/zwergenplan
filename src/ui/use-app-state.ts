@@ -19,8 +19,8 @@ import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
-import { isLegacyView, parseRoute, type Route, routeToSearch } from "../domain/route.ts";
-import { cleanSavedProviders, toggleId } from "../domain/saved.ts";
+import { isLegacyView, parseRoute, type Route, resolveRouteIds, routeToSearch } from "../domain/route.ts";
+import { cleanSavedProviders, migrateSavedIds, toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
 import { SHARE_COPIED } from "./format.ts";
 import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
@@ -52,17 +52,29 @@ export interface RouteApi {
   closeProvider: () => void;
 }
 
+/**
+ * Route aus der Adresse, alte IDs auf Kurz-IDs umgerechnet (ADR 0022). Ändert sich dabei etwas oder ist die Ansicht
+ * veraltet, ersetzt genau ein `replaceState` die Adresse durch die kanonische – außerhalb jedes setState-Updaters.
+ */
+function routeFromLocation(): Route {
+  const raw = parseRoute(window.location.search);
+  const parsed = resolveRouteIds(raw);
+  const renamed = parsed.offerId !== raw.offerId || parsed.providerId !== raw.providerId;
+  // Alter Link auf den Tab „Kalender“ (Plan 0025, E8): Er landet in „Entdecken“, die URL wird kanonisch.
+  if (renamed || isLegacyView(window.location.search)) {
+    window.history.replaceState(window.history.state, "", urlFor(parsed));
+  }
+  return parsed;
+}
+
 export function useRoute(): RouteApi {
   const [route, setRouteState] = useState(() => {
-    const parsed = parseRoute(window.location.search);
+    // Im Initializer statt im Effekt, damit der erste Render schon zur URL passt; zweimal (StrictMode) schadet nicht,
+    // denn der zweite Lauf liest schon die umgeschriebene Adresse.
+    const parsed = routeFromLocation();
     // Deep-Link: Chunk und Katalog starten, bevor site.json da ist (Plan 0010, E3). Gemerkt im Lader, also auch unter
     // StrictMode (doppelter Initializer) nur ein Request.
     if (parsed.providerId !== undefined || parsed.tab === "anbieter") preloadProviderUi();
-    // Alter Link auf den Tab „Kalender“ (Plan 0025, E8): Er landet in „Entdecken“, die URL wird kanonisch. Im
-    // Initializer statt im Effekt, damit der erste Render schon zur URL passt; zweimal (StrictMode) schadet nicht.
-    if (isLegacyView(window.location.search)) {
-      window.history.replaceState(window.history.state, "", urlFor(parsed));
-    }
     return parsed;
   });
   // Aktueller Stand für Callbacks – History-Aufrufe gehören nicht in setState-Updater (StrictMode ruft die doppelt).
@@ -73,7 +85,7 @@ export function useRoute(): RouteApi {
   }, []);
 
   useEffect(() => {
-    const onPop = () => setRoute(parseRoute(window.location.search));
+    const onPop = () => setRoute(routeFromLocation());
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, [setRoute]);
@@ -137,8 +149,14 @@ export function useBirthDate(): [string | undefined, (value: string | undefined)
   return [value, update];
 }
 
+/** Gemerkte Angebote; IDs aus der Zeit vor ADR 0022 schreibt der Initializer einmal auf Kurz-IDs um. */
 export function useSaved(): [string[], (id: string) => boolean] {
-  const [ids, setIds] = useState(loadSaved);
+  const [ids, setIds] = useState(() => {
+    const stored = loadSaved();
+    const migrated = migrateSavedIds(stored);
+    if (migrated.join() !== stored.join()) saveSaved(migrated);
+    return migrated;
+  });
   const idsRef = useRef(ids);
   idsRef.current = ids;
   /** liefert, ob das Angebot danach gemerkt ist */
@@ -157,7 +175,13 @@ export function useSaved(): [string[], (id: string) => boolean] {
  * (wie `useOrigin` die Rohwerte, ADR 0017). `toggle` liefert, ob der Anbieter danach gemerkt ist.
  */
 export function useSavedProviders(): [string[], (id: string) => boolean] {
-  const [ids, setIds] = useState(() => cleanSavedProviders(loadSavedProviders()));
+  const [ids, setIds] = useState(() => {
+    const stored = loadSavedProviders();
+    const cleaned = cleanSavedProviders(stored);
+    // Katalog-IDs aus der Zeit vor ADR 0022 einmal auf die publicId umschreiben
+    if (cleaned.join() !== stored.join()) saveSavedProviders(cleaned);
+    return cleaned;
+  });
   const idsRef = useRef(ids);
   idsRef.current = ids;
   const toggle = useCallback((id: string) => {

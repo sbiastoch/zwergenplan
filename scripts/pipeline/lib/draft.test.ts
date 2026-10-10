@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validateDataset } from "../../../src/domain/dataset.ts";
+import { nextPublicId, shortId } from "../../../src/domain/ids.ts";
 import type { Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import type { Candidate } from "./candidate.ts";
@@ -154,6 +155,19 @@ describe("providerFromCandidate", () => {
       offers: [],
     });
     expect(r.ok ? [] : r.errors).toEqual([]);
+  });
+
+  it("vergibt die publicId gegen den Katalog, als zweiten Schlüssel nach id (ADR 0022)", () => {
+    const c = cand({ location: "IMILUV Studio", organizerUrl: "https://imiluv.de" });
+    const input = { geo: { lat: 49.4677, lon: 11.0895 }, today: "2026-10-04" };
+    const free = providerFromCandidate(c, { ...input, id: "imiluv-studio", catalog: [kalender] });
+    expect(free.publicId).toBe(shortId("imiluv-studio", 0));
+    expect(Object.keys(free).slice(0, 2)).toEqual(["id", "publicId"]);
+    // belegt ein anderer Anbieter shortId(id, 0), weicht die Vergabe auf den nächsten seed aus
+    const taken = { ...free, id: "anderer-anbieter" };
+    const next = providerFromCandidate(c, { ...input, id: "imiluv-studio", catalog: [kalender, taken] });
+    expect(next.publicId).toBe(nextPublicId("imiluv-studio", new Set([free.publicId])));
+    expect(next.publicId).toBe(shortId("imiluv-studio", 1));
   });
 
   it("evangelische-termine: die vid kommt als Programmseite dazu, sonst scheitert coveredBy (Plan 0031)", () => {

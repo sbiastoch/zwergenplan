@@ -1,39 +1,40 @@
 /**
- * Pfade zum Teilen (Plan 0026, E1; ADR 0020): Vorschauseiten `angebot/<id>/` und `anbieter/<id>/` mit eigenen
- * `og:`-Tags, dazu das Kachelbild je Angebot (Nachtrag A, E16). Die Pfade sind ein öffentlicher Vertrag, denn geteilte
- * Links leben in Chats weiter. Einzige Quelle für Build (scripts/lib/share-pages.ts) und App (Knopf „Teilen“).
+ * Pfade zum Teilen (Plan 0026, E1; ADR 0020, Pfadvertrag ersetzt durch ADR 0022): Vorschauseiten `a/<id>/` und
+ * `p/<publicId>/` mit eigenen `og:`-Tags, dazu das Kachelbild je Angebot. Die Pfade sind ein öffentlicher Vertrag, denn
+ * geteilte Links leben in Chats weiter; die alten Ordner `angebot/` und `anbieter/` leiten über `404.html` weiter.
+ * Einzige Quelle für Build (scripts/lib/share-pages.ts) und App (Knopf „Teilen“).
  */
 import { EMPTY_FILTER } from "./filter.ts";
-import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, MAX_OFFER_ID, OFFER_ID_PATTERN } from "./ids.ts";
+import { SHORT_ID_PATTERN } from "./ids.ts";
 import { routeToSearch } from "./route.ts";
 
-/** Ordnernamen wie die Query-Namen (`?angebot=`, `?anbieter=`) */
-export const SHARE_DIRS = { offer: "angebot", provider: "anbieter" } as const;
+/** Ordner der Vorschauseiten; sie heißen anders als die Query-Namen (`?angebot=`, `?anbieter=`, ADR 0022). */
+export const SHARE_DIRS = { offer: "a", provider: "p" } as const;
+/** Ordner bis ADR 0022 – nur noch Weiterleitungsregeln in `404.html` */
+export const LEGACY_SHARE_DIRS = { offer: "angebot", provider: "anbieter" } as const;
 
-/** Das Schema garantiert Form und Länge (`MAX_OFFER_ID`, `MAX_KEBAB_ID`); der Wurf ist die zweite Linie gegen `..`. */
+/** Das Schema garantiert die Form (`SHORT_ID_PATTERN`); der Wurf ist die zweite Linie gegen `..` und lange IDs. */
 function checkedOfferId(offerId: string): string {
-  if (offerId.length > MAX_OFFER_ID || !OFFER_ID_PATTERN.test(offerId))
-    throw new Error(`Keine Angebots-ID: ${JSON.stringify(offerId)}`);
+  if (!SHORT_ID_PATTERN.test(offerId)) throw new Error(`Keine Angebots-ID: ${JSON.stringify(offerId)}`);
   return offerId;
 }
 
 function checkedProviderId(providerId: string): string {
-  if (providerId.length > MAX_KEBAB_ID || !KEBAB_ID_PATTERN.test(providerId)) {
-    throw new Error(`Keine Anbieter-ID: ${JSON.stringify(providerId)}`);
-  }
+  if (!SHORT_ID_PATTERN.test(providerId)) throw new Error(`Keine Anbieter-ID: ${JSON.stringify(providerId)}`);
   return providerId;
 }
 
-/** relativ zur Basis, z. B. „angebot/<id>/“ */
+/** relativ zur Basis, z. B. „a/<id>/“ */
 export function offerSharePath(offerId: string): string {
   return `${SHARE_DIRS.offer}/${checkedOfferId(offerId)}/`;
 }
 
-/** Kachelbild der Vorschau, neben der Seite (Nachtrag A, E16) */
+/** Kachelbild der Vorschau, neben der Seite (Plan 0026, Nachtrag A, E16) */
 export function offerImagePath(offerId: string): string {
   return `${offerSharePath(offerId)}vorschau.jpg`;
 }
 
+/** relativ zur Basis, „p/<publicId>/“ */
 export function providerSharePath(providerId: string): string {
   return `${SHARE_DIRS.provider}/${checkedProviderId(providerId)}/`;
 }

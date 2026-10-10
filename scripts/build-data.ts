@@ -4,7 +4,7 @@
  *   public/data/anbieter.json (Anbieterübersicht, lädt erst beim Öffnen; Plan 0010, E6),
  *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7),
  *   public/data/linien.json (Linien je Zelle der Tabelle, Plan 0012, E7),
- *   public/angebot/<id>/, public/anbieter/<id>/, public/404.html (Vorschauseiten zum Teilen, Plan 0026, ADR 0020)
+ *   public/a/<id>/, public/p/<publicId>/, public/404.html (Vorschauseiten zum Teilen, Plan 0026, ADR 0020/0022)
  * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
  * (`TIMETABLE_REQUIRED`, seit Plan 0009, Schritt 5).
  */
@@ -38,7 +38,9 @@ if (!result.ok) {
 }
 
 const publicDir = fileURLToPath(new URL("public/", ROOT));
-for (const dir of ["data", "ics", "angebot", "anbieter", "404.html"]) {
+// angebot/ und anbieter/ (vor ADR 0022) bleiben in der Liste: Ein bestehender Checkout behielte sonst veraltete Seiten,
+// und vite preview lieferte sie statt 404.html aus.
+for (const dir of ["data", "ics", "a", "p", "angebot", "anbieter", "404.html"]) {
   rmSync(`${publicDir}${dir}`, { recursive: true, force: true });
 }
 

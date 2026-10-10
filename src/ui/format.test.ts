@@ -66,7 +66,7 @@ function sessions(firstDay: string, count: number, step: number, from = "10:00",
 
 function offer(fields: Pick<SiteOffer, "format" | "sessions"> & Partial<SiteOffer>): SiteOffer {
   return {
-    id: "anbieter--titel--ort",
+    id: "abcd1234",
     providerId: "anbieter",
     venueId: "ort",
     title: "Titel",

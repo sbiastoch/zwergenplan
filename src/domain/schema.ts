@@ -4,12 +4,14 @@
  */
 import { z } from "zod";
 import { inBounds } from "./geo.ts";
-import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, MAX_OFFER_ID, OFFER_ID_PATTERN } from "./ids.ts";
+import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, SHORT_ID_PATTERN } from "./ids.ts";
 import { REGION_IDS, REGIONS } from "./regions.ts";
 import { isoWeekday } from "./time.ts";
 import { categoriesOf, TOPICS } from "./topics.ts";
 
 const kebab = z.string().max(MAX_KEBAB_ID).regex(KEBAB_ID_PATTERN, "kebab-case erwartet");
+/** Angebots-ID und `publicId` eines Anbieters (ADR 0022) */
+const shortIdField = z.string().regex(SHORT_ID_PATTERN, "8 Zeichen [0-9a-z] erwartet");
 /** Zeitpunkt mit Offset, z. B. 2026-10-25T10:00:00+01:00 (Zeitumstellung eindeutig). */
 const Instant = z.iso.datetime({ offset: true, local: false });
 const IsoDate = z.iso.date();
@@ -137,7 +139,13 @@ const AGGREGATOR_ADAPTERS = ["stadt-vk", "frankenkids", "evtermine"] as const;
 export const Provider = z.discriminatedUnion("role", [
   z
     .strictObject({
+      /** Katalog-ID: interner Schlüssel für Angebote, Orte und Pipeline; wird nicht umbenannt (ADR 0022) */
       id: kebab,
+      /**
+       * Öffentliche ID in Links, `site.json`, `anbieter.json` und Merkliste (ADR 0022). Nie ändern; `validateDataset`
+       * prüft `shortId(id, s)` mit `s` 0–9, neue Einträge bekommen sie von `add-provider` oder aus `data:validate`.
+       */
+      publicId: shortIdField,
       role: z.literal("anbieter"),
       ...sourceBase,
       age: ProviderAge.optional(),
@@ -204,8 +212,8 @@ export const AgeRange = z
 
 /** Felder eines Angebots ohne Querprüfungen – Basis für Offer und das Rohformat der Pipeline (ADR 0006). */
 export const OfferFields = z.strictObject({
-  /** deterministisch, siehe ids.ts (ADR 0003, ADR 0006) */
-  id: z.string().max(MAX_OFFER_ID).regex(OFFER_ID_PATTERN),
+  /** gespeichert, vergeben und gehalten von `pipeline build` (ADR 0022) */
+  id: shortIdField,
   providerId: kebab,
   venueId: kebab,
   title: z.string().min(1).max(140),
@@ -228,17 +236,10 @@ export const OfferFields = z.strictObject({
   sourceUrl: z.url(),
 });
 
-export const Offer = OfferFields.refine(
-  (o) => o.id.startsWith(`${o.providerId}--`) && o.id.endsWith(`--${o.venueId}`),
-  {
-    message: "id muss mit providerId-- beginnen und mit --venueId enden",
-    path: ["id"],
-  },
-)
-  .refine((o) => categoriesOf(o.topics).length > 0, {
-    message: "mindestens ein Thema muss einer Kategorie zugeordnet sein",
-    path: ["topics"],
-  })
+export const Offer = OfferFields.refine((o) => categoriesOf(o.topics).length > 0, {
+  message: "mindestens ein Thema muss einer Kategorie zugeordnet sein",
+  path: ["topics"],
+})
   .refine((o) => o.format !== "einmalig" || o.sessions.length === 1, {
     message: "einmalig hat genau einen Termin",
     path: ["sessions"],

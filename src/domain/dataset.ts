@@ -2,7 +2,7 @@
  * Prüfungen über einzelne Einträge hinaus. Läuft nur in scripts/ (Build, CI, Hooks),
  * nie im Browser – die Oberfläche bekommt ausschließlich bereits geprüfte Daten.
  */
-import { offerId } from "./ids.ts";
+import { MAX_PUBLIC_ID_SEED, nextPublicId, SHORT_ID_PATTERN, shortId } from "./ids.ts";
 import { type OffersFile, OffersFile as OffersFileSchema, type Provider, ProvidersFile } from "./schema.ts";
 import { vidsIn } from "./vid.ts";
 
@@ -18,8 +18,29 @@ export type ValidationResult =
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * Vorprüfung auf den Rohdaten des Katalogs (ADR 0022, Plan 0015 Review M4): Anbieter ohne `publicId` mit dem freien
+ * Wert, den ein Mensch übernimmt. Zod allein kennt den übrigen Katalog nicht und könnte ihn nicht nennen.
+ */
+function missingPublicIds(rawProviders: unknown): string[] {
+  if (!Array.isArray(rawProviders)) return [];
+  type Entry = { id?: unknown; role?: unknown; publicId?: unknown };
+  const entries = rawProviders.filter((e): e is Entry => typeof e === "object" && e !== null);
+  const used = new Set(
+    entries.flatMap((e) => (typeof e.publicId === "string" && SHORT_ID_PATTERN.test(e.publicId) ? [e.publicId] : [])),
+  );
+  const out: string[] = [];
+  for (const e of entries) {
+    if (e.role !== "anbieter" || e.publicId !== undefined || typeof e.id !== "string") continue;
+    const free = nextPublicId(e.id, used);
+    used.add(free);
+    out.push(`${e.id}: \`publicId\` fehlt – frei ist ${free}`);
+  }
+  return out;
+}
+
 export function validateDataset(rawProviders: unknown, rawOffers: unknown): ValidationResult {
-  const errors: string[] = [];
+  const errors: string[] = [...missingPublicIds(rawProviders)];
   const p = ProvidersFile.safeParse(rawProviders);
   const o = OffersFileSchema.safeParse(rawOffers);
   if (!p.success) errors.push(...p.error.issues.map((i) => `providers.yaml ${i.path.join(".")}: ${i.message}`));
@@ -42,6 +63,18 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
     }
   }
 
+  // publicId: eindeutig und an die Katalog-ID gebunden, gegen Tippfehler und kopierte Werte (ADR 0022)
+  const publicOwner = new Map<string, string>();
+  for (const prov of providers) {
+    if (prov.role !== "anbieter") continue;
+    const owner = publicOwner.get(prov.publicId);
+    if (owner !== undefined) errors.push(`publicId doppelt: ${prov.publicId} (${owner}, ${prov.id})`);
+    publicOwner.set(prov.publicId, prov.id);
+    const seeds = Array.from({ length: MAX_PUBLIC_ID_SEED + 1 }, (_, s) => s);
+    if (!seeds.some((s) => shortId(prov.id, s) === prov.publicId))
+      errors.push(`${prov.id}: publicId ${prov.publicId} ist nicht shortId(${prov.id}, 0–${MAX_PUBLIC_ID_SEED})`);
+  }
+
   for (const prov of providers) {
     if (prov.role !== "anbieter" || prov.coveredBy === undefined) continue;
     const via = providerById.get(prov.coveredBy);
@@ -61,9 +94,6 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
     if (!provider) errors.push(`${where}: unbekannter Anbieter ${offer.providerId}`);
     else if (provider.role !== "anbieter")
       errors.push(`${where}: ${offer.providerId} ist kein Anbieter (${provider.role})`);
-    const first = offer.sessions[0];
-    const expected = first && offerId({ ...offer, firstStart: first.start });
-    if (expected !== offer.id) errors.push(`${where}: ID entspricht nicht der Regel (ADR 0006), erwartet ${expected}`);
     const owner = venueOwner.get(offer.venueId);
     if (owner === undefined) errors.push(`${where}: unbekannter Ort ${offer.venueId}`);
     else if (owner !== offer.providerId) errors.push(`${where}: Ort ${offer.venueId} gehört zu ${owner}`);

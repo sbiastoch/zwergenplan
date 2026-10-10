@@ -11,6 +11,10 @@
             "maxLength": 80,
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
+          "publicId": {
+            "type": "string",
+            "pattern": "^[0-9a-z]{8}$"
+          },
           "role": {
             "type": "string",
             "const": "anbieter"
@@ -261,6 +265,7 @@
         },
         "required": [
           "id",
+          "publicId",
           "role",
           "region",
           "name",

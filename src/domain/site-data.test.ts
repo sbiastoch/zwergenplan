@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { icsContextFor, icsForSeries } from "./ics.ts";
+import { SHORT_ID_PATTERN } from "./ids.ts";
 import { Venue } from "./schema.ts";
 import { MIN_ADDRESS, type SiteProvider, toProviderDirectory, toSiteData, venueAddress } from "./site-data.ts";
 import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
@@ -24,6 +25,26 @@ describe("toSiteData", () => {
     const starts = site.offers.map((o) => Date.parse(o.sessions[0]?.start ?? ""));
     expect(starts).toEqual([...starts].sort((a, b) => a - b));
     expect(site.generatedAt).toBe(file.generatedAt);
+  });
+
+  it("entscheidet bei gleichem Beginn nach Titel, erst dann nach ID (Plan 0015 E13)", () => {
+    const [a, b] = file.offers as [(typeof file.offers)[0], (typeof file.offers)[0]];
+    const same = {
+      ...file,
+      offers: [
+        { ...b, id: "00000000", sessions: a.sessions, title: "Zebra" },
+        { ...a, id: "zzzzzzzz", title: "Affe" },
+      ],
+    };
+    expect(toSiteData(providers, same).offers.map((o) => o.title)).toEqual(["Affe", "Zebra"]);
+  });
+
+  it("gibt als providerId die publicId des Anbieters aus, nie die Katalog-ID (ADR 0022)", () => {
+    const publicIdOf = new Map(anbieter.map((p) => [p.id, p.publicId]));
+    for (const [i, o] of site.offers.entries()) {
+      expect(o.providerId).toBe(publicIdOf.get(file.offers.find((f) => f.id === o.id)?.providerId ?? ""));
+      expect(SHORT_ID_PATTERN.test(o.providerId), `${i}`).toBe(true);
+    }
   });
 
   it("lässt district weg, wenn der Ort keinen hat", () => {
@@ -51,15 +72,19 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
     expect(directory.generatedAt).toBe(toSiteData(providers, file).generatedAt);
   });
 
-  it("enthält nur Anbieter, auch ohne Angebote, nach Name sortiert (de)", () => {
-    expect(directory.providers.map((p) => p.id)).toEqual([
-      "stadtbibliothek-beispiel",
-      "gemeinde-beispiel",
-      "familientreff-beispiel",
-      "theater-beispiel",
-      "musikschule-beispiel",
-      "turnverein-beispiel",
-    ]);
+  it("enthält nur Anbieter, auch ohne Angebote, nach Name sortiert (de), mit publicId als id (ADR 0022)", () => {
+    const publicIdOf = new Map(anbieter.map((p) => [p.id, p.publicId]));
+    expect(directory.providers.map((p) => p.id)).toEqual(
+      [
+        "stadtbibliothek-beispiel",
+        "gemeinde-beispiel",
+        "familientreff-beispiel",
+        "theater-beispiel",
+        "musikschule-beispiel",
+        "turnverein-beispiel",
+      ].map((id) => publicIdOf.get(id)),
+    );
+    for (const p of directory.providers) expect(SHORT_ID_PATTERN.test(p.id), p.name).toBe(true);
     expect(providers.some((p) => p.role === "aggregator")).toBe(true);
   });
 
@@ -103,9 +128,9 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
   });
 
   it("kürzt Adressen per venueAddress und lässt district ohne Wert weg", () => {
-    const turnverein = directory.providers.find((p) => p.id === "turnverein-beispiel");
+    const turnverein = directory.providers.find((p) => p.name === "Turnverein Beispiel (fiktiv)");
     const expected: SiteProvider = {
-      id: "turnverein-beispiel",
+      id: anbieter.find((p) => p.id === "turnverein-beispiel")?.publicId ?? "",
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
       venues: [

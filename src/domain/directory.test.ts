@@ -11,14 +11,14 @@ import {
 import { applyFilters, EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { airlineReach, type Origin, type Reach } from "./reach.ts";
 import { type SiteOffer, type SiteProvider, toProviderDirectory } from "./site-data.ts";
-import { FIXTURE_NOW, fixtureSiteOffers, loadFixtures } from "./test-fixtures.ts";
+import { FIXTURE_NOW, fixtureSiteOffers, loadFixtures, fixturePublicId as pid } from "./test-fixtures.ts";
 
 /** Katalog wie in anbieter.json (Plan 0010, E6): derselbe Weg wie im Build, damit die Tests nicht abdriften. */
 const catalog = toProviderDirectory(loadFixtures().providers, FIXTURE_NOW.toISOString()).providers;
 
 /** Der Anbieter ohne Angebote aus den Fixtures, so wie er in anbieter.json steht (Adresse ohne Ortsnamen) */
 const TURNVEREIN: SiteProvider = {
-  id: "turnverein-beispiel",
+  id: pid("turnverein-beispiel"),
   name: "Turnverein Beispiel (fiktiv)",
   url: "https://example.org/turnverein",
   venues: [
@@ -64,50 +64,50 @@ describe("providerRows", () => {
   it("ohne Filter und Startpunkt: aktive alphabetisch, Turnverein ohne Termine am Ende", () => {
     const result = rows();
     expect(ids(result.active)).toEqual([
-      "stadtbibliothek-beispiel",
-      "gemeinde-beispiel",
-      "familientreff-beispiel",
-      "theater-beispiel",
-      "musikschule-beispiel",
+      pid("stadtbibliothek-beispiel"),
+      pid("gemeinde-beispiel"),
+      pid("familientreff-beispiel"),
+      pid("theater-beispiel"),
+      pid("musikschule-beispiel"),
     ]);
     expect(result.active.every((r) => r.state === "aktiv")).toBe(true);
-    expect(result.idle.map((r) => [r.provider.id, r.state])).toEqual([["turnverein-beispiel", "ohne-termine"]]);
+    expect(result.idle.map((r) => [r.provider.id, r.state])).toEqual([[pid("turnverein-beispiel"), "ohne-termine"]]);
     expect(result.hiddenCount).toBe(0);
-    const treff = result.active.find((r) => r.provider.id === "familientreff-beispiel");
+    const treff = result.active.find((r) => r.provider.id === pid("familientreff-beispiel"));
     expect(treff).toMatchObject({ shown: 3, upcoming: 3, places: ["Altstadt"] });
     expect(treff?.nearest).toBeUndefined();
   });
 
   it("Sticker „Bücher“: nur die Bibliothek aktiv, vier ausgeblendet, Turnverein bleibt", () => {
     const result = rows({ visible: visibleWith(buecher) });
-    expect(ids(result.active)).toEqual(["stadtbibliothek-beispiel"]);
+    expect(ids(result.active)).toEqual([pid("stadtbibliothek-beispiel")]);
     expect(result.hiddenCount).toBe(4);
-    expect(ids(result.idle)).toEqual(["turnverein-beispiel"]);
+    expect(ids(result.idle)).toEqual([pid("turnverein-beispiel")]);
   });
 
   it("Suche „theater“ bei Sticker „Bücher“: das Theater erscheint blass als ausgeblendet", () => {
     const result = rows({ visible: visibleWith(buecher), query: "theater" });
     expect(result.active).toEqual([]);
     expect(result.idle.map((r) => [r.provider.id, r.state, r.shown, r.upcoming])).toEqual([
-      ["theater-beispiel", "ausgeblendet", 0, 2],
+      [pid("theater-beispiel"), "ausgeblendet", 0, 2],
     ]);
     expect(result.hiddenCount).toBe(0);
   });
 
   it("Suche „beispiel“ bei Sticker „Bücher“: erst die vier ausgeblendeten, dann der Turnverein", () => {
     const result = rows({ visible: visibleWith(buecher), query: "beispiel" });
-    expect(ids(result.active)).toEqual(["stadtbibliothek-beispiel"]);
+    expect(ids(result.active)).toEqual([pid("stadtbibliothek-beispiel")]);
     expect(result.idle.map((r) => [r.provider.id, r.state])).toEqual([
-      ["gemeinde-beispiel", "ausgeblendet"],
-      ["familientreff-beispiel", "ausgeblendet"],
-      ["theater-beispiel", "ausgeblendet"],
-      ["musikschule-beispiel", "ausgeblendet"],
-      ["turnverein-beispiel", "ohne-termine"],
+      [pid("gemeinde-beispiel"), "ausgeblendet"],
+      [pid("familientreff-beispiel"), "ausgeblendet"],
+      [pid("theater-beispiel"), "ausgeblendet"],
+      [pid("musikschule-beispiel"), "ausgeblendet"],
+      [pid("turnverein-beispiel"), "ohne-termine"],
     ]);
   });
 
   it("Suche filtert auch die Anbieter ohne Termine", () => {
-    expect(ids(rows({ query: "turnverein" }).idle)).toEqual(["turnverein-beispiel"]);
+    expect(ids(rows({ query: "turnverein" }).idle)).toEqual([pid("turnverein-beispiel")]);
     const none = rows({ query: "xyz" });
     expect([none.active, none.idle, none.hiddenCount]).toEqual([[], [], 0]);
   });
@@ -122,15 +122,15 @@ describe("providerRows", () => {
     const reach = airlineReach(gostenhof);
     const result = rows({ reachOf: (o) => reach(o.venue), byReach: true });
     expect(ids(result.active)).toEqual([
-      "theater-beispiel",
-      "familientreff-beispiel",
-      "stadtbibliothek-beispiel",
-      "musikschule-beispiel",
-      "gemeinde-beispiel",
+      pid("theater-beispiel"),
+      pid("familientreff-beispiel"),
+      pid("stadtbibliothek-beispiel"),
+      pid("musikschule-beispiel"),
+      pid("gemeinde-beispiel"),
     ]);
     const meters = result.active.map((r) => (r.nearest?.kind === "luftlinie" ? Math.round(r.nearest.meters) : 0));
     expect(meters).toEqual([226, 1427, 1689, 2358, 3008]);
-    expect(ids(result.idle)).toEqual(["turnverein-beispiel"]);
+    expect(ids(result.idle)).toEqual([pid("turnverein-beispiel")]);
   });
 
   it("Wegzeit: Gleichstand und Infinity gegen Infinity alphabetisch, Unerreichbare am Ende der aktiven", () => {
@@ -148,47 +148,47 @@ describe("providerRows", () => {
     });
     const result = rows({ reachOf, byReach: true });
     expect(ids(result.active)).toEqual([
-      "gemeinde-beispiel",
-      "stadtbibliothek-beispiel",
-      "theater-beispiel",
-      "familientreff-beispiel",
-      "musikschule-beispiel",
+      pid("gemeinde-beispiel"),
+      pid("stadtbibliothek-beispiel"),
+      pid("theater-beispiel"),
+      pid("familientreff-beispiel"),
+      pid("musikschule-beispiel"),
     ]);
-    expect(ids(result.idle)).toEqual(["turnverein-beispiel"]);
+    expect(ids(result.idle)).toEqual([pid("turnverein-beispiel")]);
   });
 
   it("byReach: Anbieter ohne Wert stehen hinter denen mit Wert, untereinander alphabetisch", () => {
     const reach = airlineReach(gostenhof);
-    const reachOf = (o: SiteOffer) => (o.providerId === "theater-beispiel" ? reach(o.venue) : undefined);
+    const reachOf = (o: SiteOffer) => (o.providerId === pid("theater-beispiel") ? reach(o.venue) : undefined);
     expect(ids(rows({ reachOf, byReach: true }).active)).toEqual([
-      "theater-beispiel",
-      "stadtbibliothek-beispiel",
-      "gemeinde-beispiel",
-      "familientreff-beispiel",
-      "musikschule-beispiel",
+      pid("theater-beispiel"),
+      pid("stadtbibliothek-beispiel"),
+      pid("gemeinde-beispiel"),
+      pid("familientreff-beispiel"),
+      pid("musikschule-beispiel"),
     ]);
   });
 
   it("ohne byReach bleibt es alphabetisch, auch wenn reachOf Werte liefert", () => {
     const reach = airlineReach(gostenhof);
     const result = rows({ reachOf: (o) => reach(o.venue) });
-    expect(ids(result.active)[0]).toBe("stadtbibliothek-beispiel");
+    expect(ids(result.active)[0]).toBe(pid("stadtbibliothek-beispiel"));
     expect(result.active[0]?.nearest?.kind).toBe("luftlinie");
   });
 
   it("„1 von 3“: shown zählt die sichtbaren, upcoming alle kommenden", () => {
     const babykurse: FilterState = { ...EMPTY_FILTER, categories: ["babykurse"] };
     const treff = rows({ visible: visibleWith(babykurse) }).active.find(
-      (r) => r.provider.id === "familientreff-beispiel",
+      (r) => r.provider.id === pid("familientreff-beispiel"),
     );
     expect(treff).toMatchObject({ shown: 2, upcoming: 3, state: "aktiv" });
   });
 
   it("Rückfall (M4): fehlt ein Anbieter im Katalog, entsteht seine Zeile aus den Angeboten, ohne Website", () => {
-    const result = rows({ providers: catalog.filter((p) => p.id !== "theater-beispiel") });
-    const theater = result.active.find((r) => r.provider.id === "theater-beispiel");
+    const result = rows({ providers: catalog.filter((p) => p.id !== pid("theater-beispiel")) });
+    const theater = result.active.find((r) => r.provider.id === pid("theater-beispiel"));
     expect(theater?.provider).toEqual({
-      id: "theater-beispiel",
+      id: pid("theater-beispiel"),
       name: "Kleines Theater Beispiel (fiktiv)",
       venues: [{ name: "Kleines Theater Beispiel", address: "Bühnenplatz 2, 90429 Nürnberg", district: "Gostenhof" }],
     });
@@ -200,7 +200,7 @@ describe("providerRows", () => {
     const cases: Array<[SiteProvider[], SiteOffer[]]> = [
       [catalog, upcoming],
       [catalog, visibleWith(buecher)],
-      [catalog.filter((p) => p.id !== "theater-beispiel"), upcoming],
+      [catalog.filter((p) => p.id !== pid("theater-beispiel")), upcoming],
       [[], visibleWith({ ...EMPTY_FILTER, categories: ["musik"] })],
     ];
     for (const [providers, visible] of cases) {
@@ -240,35 +240,35 @@ describe("providerRows: gemerkte Anbieter (Plan 0025, E3)", () => {
   });
 
   it("ein gemerkter aktiver Anbieter steht nur unter saved; zusammen ergeben sie die Zahl der Statuszeile", () => {
-    const result = rows({ saved: ["theater-beispiel"] });
-    expect(result.saved.map((r) => [r.provider.id, r.state])).toEqual([["theater-beispiel", "aktiv"]]);
-    expect(ids(result.active)).not.toContain("theater-beispiel");
+    const result = rows({ saved: [pid("theater-beispiel")] });
+    expect(result.saved.map((r) => [r.provider.id, r.state])).toEqual([[pid("theater-beispiel"), "aktiv"]]);
+    expect(ids(result.active)).not.toContain(pid("theater-beispiel"));
     const activeSaved = result.saved.filter((r) => r.state === "aktiv").length;
     expect(result.active.length + activeSaved).toBe(distinctProviders(upcoming));
   });
 
   it("ausgeblendet: bleibt unter saved, blass, und zählt nicht in hiddenCount", () => {
-    const result = rows({ visible: visibleWith(buecher), saved: ["theater-beispiel"] });
+    const result = rows({ visible: visibleWith(buecher), saved: [pid("theater-beispiel")] });
     expect(result.saved.map((r) => [r.provider.id, r.state, r.upcoming])).toEqual([
-      ["theater-beispiel", "ausgeblendet", 2],
+      [pid("theater-beispiel"), "ausgeblendet", 2],
     ]);
     expect(result.hiddenCount).toBe(3);
   });
 
   it("ohne Termine: unter saved, nicht in idle", () => {
-    const result = rows({ saved: ["turnverein-beispiel"] });
-    expect(result.saved.map((r) => [r.provider.id, r.state])).toEqual([["turnverein-beispiel", "ohne-termine"]]);
+    const result = rows({ saved: [pid("turnverein-beispiel")] });
+    expect(result.saved.map((r) => [r.provider.id, r.state])).toEqual([[pid("turnverein-beispiel"), "ohne-termine"]]);
     expect(result.idle).toEqual([]);
   });
 
   it("die Suche wirkt auf saved; saved ist nach Name sortiert, auch mit Startpunkt", () => {
     const reach = airlineReach(gostenhof);
-    const saved = ["turnverein-beispiel", "theater-beispiel", "familientreff-beispiel"];
+    const saved = [pid("turnverein-beispiel"), pid("theater-beispiel"), pid("familientreff-beispiel")];
     const all = rows({ saved, reachOf: (o) => reach(o.venue), byReach: true });
     const byName = [...all.saved].sort((a, b) => a.provider.name.localeCompare(b.provider.name, "de"));
     expect(ids(all.saved)).toEqual(ids(byName));
     expect(all.saved).toHaveLength(3);
-    expect(ids(rows({ saved, query: "theater" }).saved)).toEqual(["theater-beispiel"]);
+    expect(ids(rows({ saved, query: "theater" }).saved)).toEqual([pid("theater-beispiel")]);
     expect(rows({ saved, query: "xyz" }).saved).toEqual([]);
   });
 
@@ -279,17 +279,17 @@ describe("providerRows: gemerkte Anbieter (Plan 0025, E3)", () => {
 
 describe("providerOffers", () => {
   it("liefert nur die kommenden Angebote des Anbieters", () => {
-    const own = providerOffers(offers, "familientreff-beispiel", FIXTURE_NOW);
+    const own = providerOffers(offers, pid("familientreff-beispiel"), FIXTURE_NOW);
     expect(own).toHaveLength(3);
-    expect(own.every((o) => o.providerId === "familientreff-beispiel")).toBe(true);
+    expect(own.every((o) => o.providerId === pid("familientreff-beispiel"))).toBe(true);
     expect(own.map((o) => o.title)).not.toContain("Elterncafé am Montag");
-    expect(providerOffers(offers, "turnverein-beispiel", FIXTURE_NOW)).toEqual([]);
+    expect(providerOffers(offers, pid("turnverein-beispiel"), FIXTURE_NOW)).toEqual([]);
   });
 });
 
 describe("hasOffersOutside", () => {
   it("meldet, ob die Auswahl Angebote des Anbieters ausblendet (Hinweis im Sheet, E4)", () => {
-    const own = providerOffers(offers, "theater-beispiel", FIXTURE_NOW);
+    const own = providerOffers(offers, pid("theater-beispiel"), FIXTURE_NOW);
     expect(own.length).toBeGreaterThan(0);
     expect(hasOffersOutside(own, upcoming)).toBe(false);
     expect(hasOffersOutside(own, visibleWith(buecher))).toBe(true);
@@ -299,21 +299,21 @@ describe("hasOffersOutside", () => {
 
 describe("providerCategories", () => {
   it("leitet die Kategorien nur aus den Angeboten ab (Plan 0030, Theater: Musik & Singen, Bühne & Konzert)", () => {
-    const own = providerOffers(offers, "theater-beispiel", FIXTURE_NOW);
-    expect(providerCategories("theater-beispiel", own)).toEqual(["musik", "buehne"]);
-    expect(providerCategories("theater-beispiel", [])).toEqual([]);
+    const own = providerOffers(offers, pid("theater-beispiel"), FIXTURE_NOW);
+    expect(providerCategories(pid("theater-beispiel"), own)).toEqual(["musik", "buehne"]);
+    expect(providerCategories(pid("theater-beispiel"), [])).toEqual([]);
   });
 
   it("zählt nur Angebote dieses Anbieters; ohne eigene Angebote keine Kategorien", () => {
-    expect(providerCategories("turnverein-beispiel", upcoming)).toEqual([]);
-    expect(providerCategories("theater-beispiel", upcoming)).toEqual(["musik", "buehne"]);
+    expect(providerCategories(pid("turnverein-beispiel"), upcoming)).toEqual([]);
+    expect(providerCategories(pid("theater-beispiel"), upcoming)).toEqual(["musik", "buehne"]);
   });
 });
 
 describe("findProvider", () => {
   it("findet den Katalog-Eintrag, sonst den Rückfall aus den Angeboten, sonst nichts", () => {
-    expect(findProvider(catalog, offers, "turnverein-beispiel")?.url).toBe(TURNVEREIN.url);
-    const fallback = findProvider([], offers, "familientreff-beispiel");
+    expect(findProvider(catalog, offers, pid("turnverein-beispiel"))?.url).toBe(TURNVEREIN.url);
+    const fallback = findProvider([], offers, pid("familientreff-beispiel"));
     expect(fallback).toMatchObject({ name: "Familientreff Beispielhof (fiktiv)" });
     expect(fallback?.url).toBeUndefined();
     expect(fallback?.venues).toHaveLength(1);

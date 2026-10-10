@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { DISTRICTS } from "./districts.ts";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { LIMIT_MINUTES } from "./reach.ts";
-import { isLegacyView, parseRoute, routeToSearch, tabSection } from "./route.ts";
+import { isLegacyView, OFFER_PARAM, PROVIDER_PARAM, parseRoute, routeToSearch, tabSection } from "./route.ts";
 
-const offerId = "familientreff--offener-krabbeltreff--beispielhof";
+const offerId = "4tpu5qaq";
 const TABS = ["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte", "merkliste-kalender"] as const;
 
 describe("URL-Route", () => {
@@ -115,6 +115,22 @@ describe("URL-Route", () => {
     expect(routeToSearch(parseRoute(`?angebot=${offerId}&anbieter=${providerId}&ansicht=merkliste`))).toBe(
       `ansicht=merkliste&anbieter=${providerId}&angebot=${offerId}`,
     );
+  });
+
+  it("nimmt Angebots-IDs in beiden Formen an und gibt sie unverändert weiter (ADR 0022)", () => {
+    expect(OFFER_PARAM).toBe("angebot");
+    expect(PROVIDER_PARAM).toBe("anbieter");
+    const legacy = "familientreff--offener-krabbeltreff--beispielhof";
+    expect(parseRoute(`?angebot=${legacy}`).offerId).toBe(legacy);
+    expect(parseRoute(`?angebot=${offerId}`).offerId).toBe(offerId);
+    expect(parseRoute(`?angebot=a--${"b".repeat(240)}--c`).offerId).toBeUndefined();
+    for (const bad of ["4TPU5QAQ", "4tpu5qa", "a--b", "../x"])
+      expect(parseRoute(`?angebot=${bad}`).offerId).toBeUndefined();
+  });
+
+  it("nimmt Anbieter als publicId und als Katalog-ID an", () => {
+    expect(parseRoute("?anbieter=gl1sfqim").providerId).toBe("gl1sfqim");
+    expect(parseRoute("?anbieter=babykonzert-nuernberg").providerId).toBe("babykonzert-nuernberg");
   });
 
   it("verwirft kaputte und überlange Anbieter-IDs", () => {

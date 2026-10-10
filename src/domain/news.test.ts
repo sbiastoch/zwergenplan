@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
+import { offerKey } from "./ids.ts";
 import { newOfferIds, offersInWeek, type WeeklyInput, weeklyText } from "./news.ts";
 import { placeKey } from "./place-key.ts";
 import type { ReachFn } from "./reach.ts";
 import type { SiteOffer } from "./site-data.ts";
-import { FIXTURE_NOW, type FixtureKey, fixtureKey, fixtureSiteOffers } from "./test-fixtures.ts";
+import { FIXTURE_NOW, type FixtureKey, fixtureKey, fixtureSiteOffers, loadFixtures } from "./test-fixtures.ts";
 
 const offers = fixtureSiteOffers();
 const byKey = (key: FixtureKey): SiteOffer => {
@@ -48,6 +49,13 @@ describe("newOfferIds", () => {
   it("liefert alle kommenden Angebote, die vorher unbekannt waren, in der Reihenfolge der Daten", () => {
     const ids = newOfferIds([], offers, FIXTURE_NOW);
     expect(ids).toEqual(offers.filter((o) => fixtureKey(o) !== "vergangen").map((o) => o.id));
+  });
+
+  it("kennt Angebote auch unter ihrer alten langen ID (ADR 0022)", () => {
+    // der Stand vor dem Umstieg: alte IDs aus Katalog-ID, Titel, Ort und erstem Termin
+    const legacy = loadFixtures().file.offers.map((o) => offerKey({ ...o, firstStart: o.sessions[0]?.start ?? "" }));
+    expect(legacy.every((id) => id.includes("--"))).toBe(true);
+    expect(newOfferIds(legacy, offers, FIXTURE_NOW)).toEqual([]);
   });
 
   it("lässt bekannte Angebote weg", () => {

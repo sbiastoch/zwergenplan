@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { shortId } from "../../../src/domain/ids.ts";
 import type { Anbieter, Provider } from "../../../src/domain/schema.ts";
 import type { Candidate } from "./candidate.ts";
 import { addressKey, matchCandidate } from "./match.ts";
@@ -7,6 +8,7 @@ import { addressKey, matchCandidate } from "./match.ts";
 function anbieter(id: string, name: string, venues: Anbieter["venues"], programme: string[] = []): Anbieter {
   return {
     id,
+    publicId: shortId(id),
     role: "anbieter",
     region: "nuernberg",
     name,

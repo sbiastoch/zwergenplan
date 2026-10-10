@@ -29,6 +29,10 @@ describe("selectBatches", () => {
     expect(s.skipped.map((x) => x.id)).toEqual(["theater-beispiel", "liste"]);
   });
 
+  it("lässt die publicId aus den Paketen weg (ADR 0022)", () => {
+    for (const p of selectBatches(catalog, { batchSize: 3 }).batches.flat()) expect(p).not.toHaveProperty("publicId");
+  });
+
   it("--only prüft gezielt einzelne Anbieter, auch abgedeckte", () => {
     const s = selectBatches(catalog, { batchSize: 7, only: ["theater-beispiel"] });
     expect(s.batches.map((b) => b.map((p) => p.id))).toEqual([["theater-beispiel"]]);

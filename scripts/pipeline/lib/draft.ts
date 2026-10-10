@@ -3,6 +3,8 @@
  * deterministisch ableiten lässt; offene Pflichtfelder (immer `summary`) füllt der Orchestrator,
  * `validate-raw` listet sie. Nie raten.
  */
+
+import { nextPublicId } from "../../../src/domain/ids.ts";
 import type { Anbieter, Provider, Registration } from "../../../src/domain/schema.ts";
 import { addDays } from "../../../src/domain/time.ts";
 import { categoriesOf, type Topic } from "../../../src/domain/topics.ts";
@@ -81,7 +83,8 @@ export function draftFromCandidate(c: Candidate, target: { providerId: string; v
 
 /**
  * Katalogeintrag für einen Veranstalter, der bisher fehlt (`candidates add-provider`). Name, URL und Ort stammen
- * aus EINEM Termin – `notes` sagt woher, der Orchestrator prüft sie. Der Hauptort trägt die Anbieter-ID.
+ * aus EINEM Termin – `notes` sagt woher, der Orchestrator prüft sie. Der Hauptort trägt die Anbieter-ID; die
+ * `publicId` steht als zweiter Schlüssel direkt unter `id` (ADR 0022).
  */
 export function providerFromCandidate(
   c: Candidate,
@@ -95,8 +98,10 @@ export function providerFromCandidate(
   const { id, geo } = input;
   const aggregator = input.catalog.find((p) => p.role === "aggregator" && p.adapter === c.source);
   const district = geo.district;
+  const used = new Set(input.catalog.flatMap((p) => (p.role === "anbieter" ? [p.publicId] : [])));
   return {
     id,
+    publicId: nextPublicId(id, used),
     role: "anbieter",
     // die Region des Sammelkalenders, aus dem der Veranstalter kommt (Plan 0031, E1)
     region: aggregator?.region ?? "nuernberg",

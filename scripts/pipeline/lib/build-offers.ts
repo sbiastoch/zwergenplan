@@ -1,15 +1,15 @@
 /**
  * RawBatches + Katalog + Ferien + Altbestand → data/offers.json (Plan 0002, E4–E8).
- * Rein und deterministisch: gleiche Eingabe, gleiche Ausgabe (Sortierung nach ID).
+ * Rein und deterministisch: gleiche Eingabe und gleicher Vorstand, gleiche Ausgabe samt IDs (ADR 0022).
  */
 import { validateDataset } from "../../../src/domain/dataset.ts";
-import { offerId, slug } from "../../../src/domain/ids.ts";
 import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/schema.ts";
 import { berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import type { Source } from "./candidate.ts";
 import { expansionWindow, type ProviderCheck, type RawBatch, type RawEvent } from "./raw.ts";
 import { expandSchedule } from "./schedule.ts";
 import { similarTitle } from "./similar.ts";
+import { assignIds, checkIdContinuity, compareOffers, type Draft, unionSessions, windowKey } from "./stable-ids.ts";
 
 export interface BuildInput {
   /** Rohdateien; die Reihenfolge der Namen bestimmt, wer bei Vereinigungen gewinnt */
@@ -43,7 +43,7 @@ const DEFAULT_MINUTES = 60;
 const DAY_MS = 86_400_000;
 
 interface Candidate {
-  offer: Omit<Offer, "id">;
+  offer: Draft;
   rank: number;
   order: number;
   label: string;
@@ -61,33 +61,16 @@ const berlinDay = (instant: string) => {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 };
 
-const sameAttributes = (a: Omit<Offer, "id">, b: Omit<Offer, "id">) =>
+const sameAttributes = (a: Draft, b: Draft) =>
   a.format === b.format &&
   a.registration === b.registration &&
   a.cost === b.cost &&
   JSON.stringify(a.age ?? null) === JSON.stringify(b.age ?? null);
 
-function unionSessions(...lists: ReadonlyArray<readonly Session[]>): Session[] {
-  const byStart = new Map<number, Session>();
-  for (const s of lists.flat()) if (!byStart.has(Date.parse(s.start))) byStart.set(Date.parse(s.start), s);
-  return [...byStart.entries()].sort(([a], [b]) => a - b).map(([, s]) => s);
-}
-
 const unionTopics = (a: Offer["topics"], b: Offer["topics"]) => [...new Set([...a, ...b])];
 
-const withId = (o: Omit<Offer, "id">): Offer => {
-  const first = o.sessions[0];
-  return { id: offerId({ ...o, firstStart: first?.start ?? "" }), ...o };
-};
-
 /** Ein Rohevent → 0…n Angebote ohne ID (einmalig wird je Termin zerlegt). */
-function fromRaw(
-  e: RawEvent,
-  checkedAt: string,
-  input: BuildInput,
-  label: string,
-  notes: string[],
-): Array<Omit<Offer, "id">> {
+function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: string, notes: string[]): Draft[] {
   const { from, to } = input.horizon;
   const occurrences = expandSchedule(e.schedule, {
     to: expansionWindow(e, to),
@@ -230,36 +213,17 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     });
   }
 
-  // 2. Kursfortschreibung: laufende Kurse behalten ihre vergangenen Termine und damit ihre ID (ADR 0006)
+  // 2. Die Kursfortschreibung hängt an der Zuordnung (Schritt 5, ADR 0022)
   const previous = input.previous?.offers ?? [];
-  for (const c of candidates) {
-    if (c.offer.format !== "kurs") continue;
-    const starts = new Set(c.offer.sessions.map((s) => Date.parse(s.start)));
-    const old = previous.find(
-      (p) =>
-        p.format === "kurs" &&
-        p.providerId === c.offer.providerId &&
-        p.venueId === c.offer.venueId &&
-        slug(p.title) === slug(c.offer.title) &&
-        p.sessions.some((s) => starts.has(Date.parse(s.start))),
-    );
-    if (old && Date.parse(old.sessions[0]?.start ?? "") < Date.parse(c.offer.sessions[0]?.start ?? "")) {
-      // Nur VERGANGENE Termine übernehmen: Künftige alte Termine können verlegt oder abgesagt sein.
-      const firstNew = Date.parse(c.offer.sessions[0]?.start ?? "");
-      const past = old.sessions.filter((s) => Date.parse(s.start) < firstNew);
-      c.offer = { ...c.offer, sessions: unionSessions(past, c.offer.sessions) };
-      notes.push(`${c.label}: Kurs fortgeschrieben, ID bleibt ${old.id}`);
-    }
-  }
 
-  // 3. Gleiche ID: Rang, dann Vereinigung (regelmäßig) bzw. Dublette (Kurs/Einzeltermin)
-  const byId = new Map<string, Candidate[]>();
+  // 3. Gleicher Fensterschlüssel (Plan 0015 E14, m3): Rang, dann Vereinigung (regelmäßig) bzw. Dublette (Kurs/Einzeltermin)
+  const byKey = new Map<string, Candidate[]>();
   for (const c of candidates) {
-    const id = withId(c.offer).id;
-    byId.set(id, [...(byId.get(id) ?? []), c]);
+    const key = windowKey(c.offer, input.horizon.from);
+    byKey.set(key, [...(byKey.get(key) ?? []), c]);
   }
   const merged: Candidate[] = [];
-  for (const [id, group] of byId) {
+  for (const [key, group] of byKey) {
     const sorted = [...group].sort((a, b) => a.rank - b.rank || a.order - b.order);
     const [best, ...rest] = sorted as [Candidate, ...Candidate[]];
     let offer = best.offer;
@@ -269,17 +233,17 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
         notes.push(`${other.label}: Dublette von ${best.label} (ranghöhere Quelle) – entfällt`);
       } else if (offer.format !== "regelmaessig") {
         offer = { ...offer, sessions: unionSessions(offer.sessions, other.offer.sessions) };
-        notes.push(`${other.label}: gleiche ID wie ${best.label} – Termine zusammengeführt`);
+        notes.push(`${other.label}: gleicher Schlüssel wie ${best.label} – Termine zusammengeführt`);
       } else if (offer.title !== other.offer.title) {
         report.errors.push(
-          `ID ${id}: „${offer.title}“ und „${other.offer.title}“ unterscheiden sich erst nach der Kürzung auf 60 Zeichen – Titel vorne unterscheidbar machen`,
+          `Schlüssel ${key}: „${offer.title}“ und „${other.offer.title}“ unterscheiden sich erst nach der Kürzung auf 60 Zeichen – Titel vorne unterscheidbar machen`,
         );
       } else if (sameAttributes(offer, other.offer)) {
         offer = { ...offer, sessions: unionSessions(offer.sessions, other.offer.sessions) };
         notes.push(`${other.label}: Termine mit ${best.label} vereinigt`);
       } else {
         report.errors.push(
-          `ID ${id}: ${best.label} und ${other.label} haben gleichen Titel und Ort, aber andere Merkmale – Titel eindeutig machen, z. B. mit Altersangabe`,
+          `Schlüssel ${key}: ${best.label} und ${other.label} haben gleichen Titel und Ort, aber andere Merkmale – Titel eindeutig machen, z. B. mit Altersangabe`,
         );
       }
     }
@@ -302,10 +266,19 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     notes.push(`${low.label}: Dublette von ${high.label} (ranghöhere Quelle) – entfällt`);
     return false;
   });
-  const offers = kept.map((c) => withId(c.offer));
+  // 5. IDs: Zuordnung gegen den Vorstand samt Kursfortschreibung (ADR 0022)
+  const assigned = assignIds({
+    drafts: kept.map((c) => c.offer),
+    previous: input.previous,
+    providers: input.providers,
+    horizon: input.horizon,
+  });
+  const offers = assigned.offers;
+  notes.push(...assigned.notes);
+  // 6. braucht IDs, deshalb nach der Zuordnung
   notes.push(...crossProviderDuplicates(offers, input.providers));
 
-  // 5. Übernahme aus dem Altbestand (E8): Fehler, ausgefallener Sammelkalender, nicht geprüft
+  // 7. Übernahme aus dem Altbestand (E8): Fehler, ausgefallener Sammelkalender, nicht geprüft
   const providerById = new Map(input.providers.map((p) => [p.id, p] as const));
   const failedSources = new Set(
     input.providers
@@ -338,10 +311,12 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     notes.push(`${old.id}: aus dem Altbestand übernommen (${reason}, Stand ${old.availability.checkedAt})`);
   }
 
-  offers.sort((a, b) => a.id.localeCompare(b.id));
+  // 8. Sortierung (Plan 0015 E13), Prüfung
+  offers.sort(compareOffers);
   const file: OffersFile = { generatedAt: input.generatedAt, horizon: input.horizon, offers };
   const result = validateDataset(input.providers, file);
   if (!result.ok) report.errors.push(...result.errors);
+  report.errors.push(...checkIdContinuity(input.previous, offers));
   report.offers = offers.length;
   report.sessions = offers.reduce((n, o) => n + o.sessions.length, 0);
   return report.errors.length > 0 ? { report } : { file, report };

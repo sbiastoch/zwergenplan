@@ -6,14 +6,19 @@
 import { ageInMonths, offerFitsAge } from "./age.ts";
 import { nextSession } from "./agenda.ts";
 import { type FilterState, matchesFilter } from "./filter.ts";
+import { resolveOfferId } from "./ids.ts";
 import type { ReachFn, ReachTarget } from "./reach.ts";
 import type { Offer } from "./schema.ts";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** IDs aus `after`, die nicht in `before` stehen und noch nicht beendet sind (Regel der Liste), in Datenreihenfolge. */
+/**
+ * IDs aus `after`, die nicht in `before` stehen und noch nicht beendet sind (Regel der Liste), in Datenreihenfolge.
+ * Alte lange IDs in `before` (gespeicherte `seenIds`, Stand vor 7 Tagen) zählen als ihre Kurz-ID (ADR 0022) – sonst
+ * meldete die erste Nachricht nach dem Umstieg alle Angebote als neu.
+ */
 export function newOfferIds(before: readonly string[], after: readonly Offer[], now: Date): string[] {
-  const known = new Set(before);
+  const known = new Set(before.map((id) => resolveOfferId(id) ?? id));
   return after.filter((o) => !known.has(o.id) && nextSession(o, now) !== undefined).map((o) => o.id);
 }
 

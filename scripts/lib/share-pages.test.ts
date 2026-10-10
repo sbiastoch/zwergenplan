@@ -123,13 +123,13 @@ describe("Vorschauseite eines Angebots (Plan 0026, E4)", () => {
   const offer = byTitle("Offener Krabbeltreff");
   const page = offerSharePage(offer, GENERATED_AT);
 
-  it("liegt unter angebot/<id>/index.html und hat alle Tags", () => {
-    expect(page.path).toBe(`angebot/${offer.id}/index.html`);
+  it("liegt unter a/<id>/index.html und hat alle Tags (ADR 0022)", () => {
+    expect(page.path).toBe(`a/${offer.id}/index.html`);
     expect(page.html).toContain('<meta name="robots" content="noindex, nofollow">');
     expect(meta(page.html, "og:title")).toBe("Offener Krabbeltreff · jeden Mittwoch, 10:00");
-    expect(meta(page.html, "og:url")).toBe(`${SITE_URL}angebot/${offer.id}/`);
+    expect(meta(page.html, "og:url")).toBe(`${SITE_URL}a/${offer.id}/`);
     expect(meta(page.html, "og:image")).toMatch(
-      new RegExp(`^${SITE_URL}angebot/${offer.id}/vorschau\\.jpg\\?v=[0-9a-f]{8}$`),
+      new RegExp(`^${SITE_URL}a/${offer.id}/vorschau\\.jpg\\?v=[0-9a-f]{8}$`),
     );
     expect(meta(page.html, "og:image:alt")).toBe("Kachel des Angebots im Zwergenplan");
     expect(meta(page.html, "og:image:width")).toBe("1200");
@@ -175,7 +175,7 @@ describe("Vorschauseite eines Angebots (Plan 0026, E4)", () => {
 
 describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
   const provider: SiteProvider = {
-    id: "familientreff-beispiel",
+    id: "b5nuus36", // publicId von familientreff-beispiel (ADR 0022)
     name: "Familientreff Beispielhof (fiktiv)",
     url: "https://example.org/",
     venues: [{ name: "Familientreff Beispielhof", address: "Beispielweg 1", district: "Altstadt" }],
@@ -183,13 +183,13 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
 
   it("zählt kommende Angebote ab generatedAt, höchstens drei Kategorien", () => {
     const page = providerSharePage(provider, offers, GENERATED_AT);
-    expect(page.path).toBe("anbieter/familientreff-beispiel/index.html");
+    expect(page.path).toBe("p/b5nuus36/index.html");
     expect(meta(page.html, "og:title")).toBe("Familientreff Beispielhof (fiktiv)");
     expect(meta(page.html, "og:description")).toBe(
       "4 kommende Angebote im Zwergenplan · Babykurse · Krabbel- &amp; Spielgruppen · Treffs &amp; Cafés · Altstadt",
     );
     expect(meta(page.html, "og:image")).toBe(`${SITE_URL}og/vorschau-v1.jpg`);
-    expect(page.html).toContain(`href="${BASE}?anbieter=familientreff-beispiel"`);
+    expect(page.html).toContain(`href="${BASE}?anbieter=b5nuus36"`);
   });
 
   it("ohne kommende Angebote", () => {
@@ -200,7 +200,7 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
 
   it("ohne eigene Angebote keine Kategorien, nur Stadtteile (Plan 0030)", () => {
     const turnverein: SiteProvider = {
-      id: "turnverein-beispiel",
+      id: "fkbg3oeb", // publicId von turnverein-beispiel
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
       venues: [{ name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" }],
@@ -213,20 +213,48 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
 
 describe("404.html (Plan 0026, E7)", () => {
   const html = notFoundPage();
-  it("noindex, ohne og:, mit beiden Mustern", () => {
+  it("noindex, ohne og:", () => {
     expect(html).toContain('<meta name="robots" content="noindex, nofollow">');
     expect(html).not.toContain("og:");
-    expect(html).toContain("angebot");
-    expect(html).toContain("anbieter");
     expect(html).toContain("Zum Zwergenplan");
+  });
+
+  it("leitet neue und alte Pfade in die App weiter, sonst nichts (ADR 0022)", () => {
+    const script = html.match(/<script>([\s\S]*)<\/script>/)?.[1] ?? "";
+    const target = (pathname: string) => {
+      let to: string | undefined;
+      new Function("location", script)({ pathname, replace: (url: string) => (to = url) });
+      return to;
+    };
+    const long = "atv-1873-frankonia--riesen-zwerge-turnen-fuer-2-bis-3-jaehrige-mo--atv-1873-frankonia";
+    const cases: Array<[string, string]> = [
+      ["a/4tpu5qaq", "angebot=4tpu5qaq"],
+      ["p/gl1sfqim", "anbieter=gl1sfqim"],
+      [`angebot/${long}`, `angebot=${long}`],
+      ["anbieter/babykonzert-nuernberg", "anbieter=babykonzert-nuernberg"],
+    ];
+    for (const [path, query] of cases) {
+      for (const suffix of ["/", "", "/index.html"])
+        expect(target(`${BASE}${path}${suffix}`), path + suffix).toBe(`${BASE}?${query}`);
+    }
+    for (const path of [
+      "a/zu-lang-123/",
+      "p/ABCDEFGH/",
+      "x/4tpu5qaq/",
+      "a/4tpu5qa/",
+      `angebot/${"a".repeat(241)}/`,
+      "anbieter/../x/",
+    ]) {
+      expect(target(`${BASE}${path}`), path).toBeUndefined();
+    }
   });
 });
 
 describe("Wächter gegen Fehler im Generator (Tests 10)", () => {
   it("meldet Seiten über 10 000 Byte", () => {
-    expect(checkSharePages([{ path: "angebot/x/index.html", html: "x".repeat(10_000) }])).toEqual([]);
-    expect(checkSharePages([{ path: "angebot/x/index.html", html: "x".repeat(10_001) }])).toEqual([
-      "angebot/x/index.html: 10.001 Byte (höchstens 10.000)",
+    expect(checkSharePages([{ path: "a/x/index.html", html: "x".repeat(10_000) }])).toEqual([]);
+    expect(checkSharePages([{ path: "a/x/index.html", html: "x".repeat(10_001) }])).toEqual([
+      "a/x/index.html: 10.001 Byte (höchstens 10.000)",
     ]);
   });
 
@@ -234,8 +262,7 @@ describe("Wächter gegen Fehler im Generator (Tests 10)", () => {
     const offer = byTitle("Offener Krabbeltreff");
     const worst = {
       ...offer,
-      // längste erlaubte ID (MAX_OFFER_ID = 240)
-      id: `${"a".repeat(80)}--${"b".repeat(76)}--${"c".repeat(80)}`,
+      id: "zzzzzzzz",
       title: '"'.repeat(300),
       providerName: '"'.repeat(300),
     };

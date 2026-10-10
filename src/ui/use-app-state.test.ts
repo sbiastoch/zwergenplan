@@ -2,7 +2,16 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NO_TOAST, type ToastMessage } from "./Toast.tsx";
-import { LONG_TOAST_MS, type OriginApi, type RouteApi, useOrigin, useRoute, useToast } from "./use-app-state.ts";
+import {
+  LONG_TOAST_MS,
+  type OriginApi,
+  type RouteApi,
+  useOrigin,
+  useRoute,
+  useSaved,
+  useSavedProviders,
+  useToast,
+} from "./use-app-state.ts";
 
 const preloadProviderUi = vi.hoisted(() => vi.fn());
 vi.mock("./ProviderPanel.tsx", () => ({ preloadProviderUi }));
@@ -281,8 +290,11 @@ function renderRoute(): RouteApi {
   return result;
 }
 
+/** publicId von theater-beispiel in den Fixtures (ADR 0022) */
+const THEATER = "fv3fpfp2";
+
 describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
-  const offerId = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+  const offerId = "lxizt974";
 
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -292,22 +304,22 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
   it("openProvider pusht einen eigenen Eintrag und schließt das Detail", () => {
     const win = fakeWindow(`?ansicht=merkliste-kalender&angebot=${offerId}`);
     vi.stubGlobal("window", win);
-    renderRoute().openProvider("theater-beispiel");
+    renderRoute().openProvider(THEATER);
     expect(win.history.pushState).toHaveBeenCalledWith(
       { zpProvider: true },
       "",
-      "/?ansicht=merkliste-kalender&anbieter=theater-beispiel",
+      `/?ansicht=merkliste-kalender&anbieter=${THEATER}`,
     );
   });
 
   it("openDetail aus dem offenen Sheet behält anbieter", () => {
-    const win = fakeWindow("?anbieter=theater-beispiel");
+    const win = fakeWindow(`?anbieter=${THEATER}`);
     vi.stubGlobal("window", win);
     renderRoute().openDetail(offerId);
     expect(win.history.pushState).toHaveBeenCalledWith(
       { zpDetail: true },
       "",
-      `/?anbieter=theater-beispiel&angebot=${offerId}`,
+      `/?anbieter=${THEATER}&angebot=${offerId}`,
     );
   });
 
@@ -315,14 +327,14 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
     const win = fakeWindow("?ansicht=anbieter");
     vi.stubGlobal("window", win);
     const api = renderRoute();
-    api.openProvider("theater-beispiel");
+    api.openProvider(THEATER);
     api.closeProvider();
     expect(win.history.back).toHaveBeenCalledTimes(1);
     expect(win.history.replaceState).not.toHaveBeenCalled();
   });
 
   it("closeProvider ersetzt den Eintrag nach einem Deep-Link", () => {
-    const win = fakeWindow("?ansicht=merkliste-kalender&anbieter=theater-beispiel");
+    const win = fakeWindow(`?ansicht=merkliste-kalender&anbieter=${THEATER}`);
     vi.stubGlobal("window", win);
     renderRoute().closeProvider();
     expect(win.history.back).not.toHaveBeenCalled();
@@ -330,7 +342,7 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
   });
 
   it("lädt beim Start mit anbieter= oder ansicht=anbieter Chunk und Katalog vor, genau einmal", () => {
-    for (const search of ["?anbieter=theater-beispiel", "?ansicht=anbieter", "?ansicht=anbieter&anbieter=x-y"]) {
+    for (const search of [`?anbieter=${THEATER}`, "?ansicht=anbieter", "?ansicht=anbieter&anbieter=x-y"]) {
       vi.stubGlobal("window", fakeWindow(search));
       renderRoute();
       expect(preloadProviderUi, search).toHaveBeenCalledTimes(1);
@@ -351,16 +363,12 @@ describe("useRoute: alter Tab „Kalender“ (Plan 0025, E8)", () => {
   });
 
   it("ersetzt ?ansicht=kalender beim Start einmal durch die kanonische URL, Filter und Sheet bleiben", () => {
-    const win = fakeWindow("?ansicht=kalender&kat=musik&anbieter=theater-beispiel", { zpProvider: true });
+    const win = fakeWindow(`?ansicht=kalender&kat=musik&anbieter=${THEATER}`, { zpProvider: true });
     vi.stubGlobal("window", win);
     const { route } = renderRoute();
     expect(route.tab).toBe("entdecken");
     expect(win.history.replaceState).toHaveBeenCalledTimes(1);
-    expect(win.history.replaceState).toHaveBeenCalledWith(
-      { zpProvider: true },
-      "",
-      "/?kat=musik&anbieter=theater-beispiel",
-    );
+    expect(win.history.replaceState).toHaveBeenCalledWith({ zpProvider: true }, "", `/?kat=musik&anbieter=${THEATER}`);
   });
 
   it("lässt andere URLs unberührt", () => {
@@ -370,6 +378,72 @@ describe("useRoute: alter Tab „Kalender“ (Plan 0025, E8)", () => {
       renderRoute();
       expect(win.history.replaceState, search).not.toHaveBeenCalled();
     }
+  });
+});
+
+describe("useRoute: alte IDs aus alten Links (ADR 0022)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("rechnet lange Angebots-ID und Katalog-ID um, mit genau einem replaceState", () => {
+    const long = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+    const win = fakeWindow(`?anbieter=theater-beispiel&angebot=${long}`);
+    vi.stubGlobal("window", win);
+    const { route } = renderRoute();
+    expect(route.offerId).toBe("lxizt974");
+    expect(route.providerId).toBe(THEATER);
+    expect(win.history.replaceState).toHaveBeenCalledTimes(1);
+    expect(win.history.replaceState).toHaveBeenCalledWith(null, "", `/?anbieter=${THEATER}&angebot=lxizt974`);
+  });
+
+  it("lässt Adressen mit Kurz-IDs unberührt", () => {
+    const win = fakeWindow(`?anbieter=${THEATER}&angebot=lxizt974`);
+    vi.stubGlobal("window", win);
+    renderRoute();
+    expect(win.history.replaceState).not.toHaveBeenCalled();
+  });
+});
+
+describe("useSaved und useSavedProviders: Umschreiben nach ADR 0022", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function renderSaved<T>(hook: () => T): T {
+    let result: T | undefined;
+    function Probe() {
+      result = hook();
+      return null;
+    }
+    renderToStaticMarkup(createElement(Probe));
+    if (result === undefined) throw new Error("Hook nicht gerendert");
+    return result;
+  }
+
+  it("schreibt alte Angebots-IDs einmal um, sonst nichts", () => {
+    const storage = fakeStorage();
+    const long = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+    storage.setItem("zwergenplan.merkliste", JSON.stringify([long, "nle21y1x"]));
+    const setItem = vi.spyOn(storage, "setItem");
+    vi.stubGlobal("localStorage", storage);
+    expect(renderSaved(useSaved)[0]).toEqual(["lxizt974", "nle21y1x"]);
+    expect(JSON.parse(storage.getItem("zwergenplan.merkliste") ?? "")).toEqual(["lxizt974", "nle21y1x"]);
+    setItem.mockClear();
+    renderSaved(useSaved);
+    expect(setItem).not.toHaveBeenCalled();
+  });
+
+  it("schreibt Katalog-IDs gemerkter Anbieter einmal auf die publicId um, sonst nichts", () => {
+    const storage = fakeStorage();
+    storage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["theater-beispiel", THEATER]));
+    const setItem = vi.spyOn(storage, "setItem");
+    vi.stubGlobal("localStorage", storage);
+    expect(renderSaved(useSavedProviders)[0]).toEqual([THEATER]);
+    expect(JSON.parse(storage.getItem("zwergenplan.anbieter-merkliste") ?? "")).toEqual([THEATER]);
+    setItem.mockClear();
+    renderSaved(useSavedProviders);
+    expect(setItem).not.toHaveBeenCalled();
   });
 });
 

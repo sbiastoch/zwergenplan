@@ -5,7 +5,9 @@ coverage/
 # generiert von scripts/build-data.ts
 public/data/
 public/ics/
-# generiert von scripts/build-data.ts (Plan 0026)
+# generiert von scripts/build-data.ts (Plan 0026; a/ und p/ seit ADR 0022, die alten Ordner bleiben für alte Checkouts)
+public/a/
+public/p/
 public/angebot/
 public/anbieter/
 public/404.html

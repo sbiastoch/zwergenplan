@@ -1,5 +1,5 @@
 /**
- * Kachelbild je Angebot (Plan 0026, Nachtrag A, E16–E18): `<out>/angebot/<id>/vorschau.jpg`, 1200 × 630, nach dem
+ * Kachelbild je Angebot (Plan 0026, Nachtrag A, E16–E18): `<out>/a/<id>/vorschau.jpg` (ADR 0022), 1200 × 630, nach dem
  * Vite-Build (`pnpm build`). Die Kachel ist die der Übersicht, gestylt vom Start-CSS samt Bricolage aus dem Build,
  * also genau dem Stand, der ausgeliefert wird. Texte aus `offerPreview` (dieselben wie im `og:title`).
  *

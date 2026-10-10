@@ -1,5 +1,6 @@
 # FIKTIVE Testdaten – nur für Unit- und E2E-Tests, werden nie deployt.
 - id: familientreff-beispiel
+  publicId: b5nuus36
   role: anbieter
   region: nuernberg
   name: "Familientreff Beispielhof (fiktiv)"
@@ -18,6 +19,7 @@
   availability: { shown: ja, how: "Detailseite zeigt freie Plätze" }
   verified: 2026-10-04
 - id: musikschule-beispiel
+  publicId: un8dc9t4
   role: anbieter
   region: nuernberg
   name: "Musikschule Beispiel (fiktiv)"
@@ -36,6 +38,7 @@
   availability: { shown: teilweise }
   verified: 2026-10-04
 - id: stadtbibliothek-beispiel
+  publicId: kgjeqq3k
   role: anbieter
   region: nuernberg
   name: "Bibliothek Beispiel (fiktiv)"
@@ -53,6 +56,7 @@
   availability: { shown: nein }
   verified: 2026-10-04
 - id: theater-beispiel
+  publicId: fv3fpfp2
   role: anbieter
   region: nuernberg
   name: "Kleines Theater Beispiel (fiktiv)"
@@ -72,6 +76,7 @@
   verified: 2026-10-04
 # Worst Case für die Mobile-UX-Gates: so lang wie der längste echte Anbietername (111 Zeichen), lange Komposita.
 - id: gemeinde-beispiel
+  publicId: fqq3o4y8
   role: anbieter
   region: nuernberg
   name: "Ev.-Luth. Kirchengemeinde Beispielhausen-Südstadt – Mutter/Vater-Kind-Gruppen (Gemeindehaus Beispielkirche, fiktiv)"
@@ -91,6 +96,7 @@
 # Anbieter ohne kommende Angebote (Plan 0010, E6): steht blass am Ende der Anbieterliste. Der erste Ort beginnt mit
 # seinem Namen (venueAddress kürzt), der zweite hat keinen Stadtteil.
 - id: turnverein-beispiel
+  publicId: fkbg3oeb
   role: anbieter
   region: nuernberg
   name: "Turnverein Beispiel (fiktiv)"

@@ -43,6 +43,10 @@ describe("strategyFor: Tabelle aus Plan 0011, E4", () => {
     ["https://zwergenplan.app/icons/icon-192.png", false, "netz"],
     ["https://zwergenplan.app/anderes.html", true, "netz"],
     // Vorschauseiten, Kachelbild und 404.html zum Teilen: nie vorgehalten, nie abgefangen (Plan 0026, E7; ADR 0020)
+    // – unter a/ und p/ (ADR 0022) wie unter den alten Ordnern, deren Links weiter ankommen
+    ["https://zwergenplan.app/a/4tpu5qaq/", true, "netz"],
+    ["https://zwergenplan.app/a/4tpu5qaq/vorschau.jpg?v=0123abcd", false, "netz"],
+    ["https://zwergenplan.app/p/gl1sfqim/", true, "netz"],
     ["https://zwergenplan.app/angebot/a--b--c/", true, "netz"],
     ["https://zwergenplan.app/angebot/a--b--c/vorschau.jpg?v=0123abcd", false, "netz"],
     ["https://zwergenplan.app/anbieter/familientreff-beispiel/", true, "netz"],

@@ -46,11 +46,12 @@ describe("validateDataset", () => {
       "Kategorie",
     ],
     ["unbekanntes Feld", (o: Raw) => Object.assign(o.offers[0] as object, { foo: 1 }), "foo"],
-    ["ID passt nicht zu Anbieter/Ort", (o: Raw) => Object.assign(o.offers[0] as object, { id: "x--y--z" }), "id muss"],
+    ["ID in alter Form (ADR 0022)", (o: Raw) => Object.assign(o.offers[0] as object, { id: "x--y--z" }), "offers.0.id"],
+    ["ID zu kurz", (o: Raw) => Object.assign(o.offers[0] as object, { id: "abc1234" }), "offers.0.id"],
     [
       "einmalig mit zwei Terminen",
       (o: Raw) =>
-        Object.assign(o.offers[5] as object, {
+        Object.assign(o.offers[0] as object, {
           sessions: [
             { start: "2026-11-15T11:00:00+01:00", end: "2026-11-15T11:35:00+01:00" },
             { start: "2026-11-16T11:00:00+01:00", end: "2026-11-16T11:35:00+01:00" },
@@ -61,7 +62,7 @@ describe("validateDataset", () => {
     [
       "unsortierte Termine",
       (o: Raw) => {
-        const s = (o.offers[1] as { sessions: unknown[] }).sessions;
+        const s = (o.offers[2] as { sessions: unknown[] }).sessions;
         s.reverse();
       },
       "aufsteigend",
@@ -84,10 +85,7 @@ describe("validateDataset", () => {
     expect(
       errorsOf(
         mutate((o) => {
-          Object.assign(o.offers[0] as object, {
-            venueId: "musikschule-beispiel-sued",
-            id: "familientreff-beispiel--pekip-herbst--musikschule-beispiel-sued",
-          });
+          Object.assign(o.offers[0] as object, { venueId: "musikschule-beispiel-sued" });
         }),
       ),
     ).toContain("gehört zu musikschule-beispiel");
@@ -100,16 +98,45 @@ describe("validateDataset", () => {
     ).toContain("Anbieter-ID doppelt");
   });
 
-  it("prüft die ID-Regel (ADR 0006)", () => {
-    expect(
-      errorsOf(
-        mutate((o) => {
-          Object.assign(o.offers[0] as object, {
-            id: "familientreff-beispiel--pekip-herbst--familientreff-beispiel-haus",
-          });
-        }),
-      ),
-    ).toContain("erwartet familientreff-beispiel--pekip-gruppe-herbst");
+  it("verlangt keine ID-Formel mehr, nur Form und Eindeutigkeit (ADR 0022)", () => {
+    expect(errorsOf(mutate((o) => Object.assign(o.offers[0] as object, { title: "Ganz anderer Titel" })))).toBe("");
+  });
+
+  describe("publicId der Anbieter (ADR 0022, Plan 0015 E16)", () => {
+    type Entry = { role?: unknown; publicId?: unknown };
+    const anbieter = (p: Array<Record<string, unknown>>) => (p as Entry[]).filter((x) => x.role === "anbieter");
+
+    it("ist Pflicht; die Meldung nennt den freien Wert und steht vor denen von Zod", () => {
+      const r = mutate((_o, p) => {
+        delete (anbieter(p)[0] as Entry).publicId;
+      });
+      expect(r.ok).toBe(false);
+      const errors = r.ok ? [] : r.errors;
+      expect(errors[0]).toBe("familientreff-beispiel: `publicId` fehlt – frei ist b5nuus36");
+      expect(errors.slice(1).join("\n")).toContain("publicId");
+    });
+
+    it("lehnt falsche Form, Dubletten und Werte ab, die nicht shortId(id, s) sind", () => {
+      expect(errorsOf(mutate((_o, p) => Object.assign(anbieter(p)[0] as object, { publicId: "B5NUUS36" })))).toContain(
+        "publicId",
+      );
+      const copied = mutate((_o, p) => {
+        const [a, b] = anbieter(p) as [Entry, Entry];
+        b.publicId = a.publicId;
+      });
+      expect(errorsOf(copied)).toContain("publicId doppelt: b5nuus36");
+      expect(errorsOf(copied)).toContain("publicId b5nuus36 ist nicht shortId(");
+      expect(errorsOf(mutate((_o, p) => Object.assign(anbieter(p)[0] as object, { publicId: "b5nuus37" })))).toContain(
+        "familientreff-beispiel: publicId b5nuus37 ist nicht shortId(",
+      );
+    });
+
+    it("gibt es nur bei Anbietern", () => {
+      const r = mutate((_o, p) => {
+        Object.assign((p as Entry[]).find((x) => x.role === "aggregator") as object, { publicId: "abcdefgh" });
+      });
+      expect(errorsOf(r)).toContain("publicId");
+    });
   });
 
   it("prüft Rollen: Pflichtorte, coveredBy und Angebote nur von Anbietern", () => {
@@ -145,7 +172,7 @@ describe("validateDataset", () => {
     expect(
       errorsOf(
         mutate((_o, p) => {
-          const { venues: _v, age: _a, ...source } = p[0] ?? {};
+          const { venues: _v, age: _a, publicId: _p, ...source } = p[0] ?? {};
           p[0] = { ...source, role: "aggregator", adapter: "frankenkids" };
         }),
       ),
