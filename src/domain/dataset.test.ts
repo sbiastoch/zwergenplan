@@ -131,6 +131,12 @@ describe("validateDataset", () => {
       );
     });
 
+    it("lehnt Katalog-IDs in der Form einer publicId ab (Arch-Review m2)", () => {
+      expect(errorsOf(mutate((_o, p) => Object.assign(anbieter(p)[0] as object, { id: "musikzwg" })))).toContain(
+        "Katalog-ID darf nicht die Form einer publicId haben",
+      );
+    });
+
     it("gibt es nur bei Anbietern", () => {
       const r = mutate((_o, p) => {
         Object.assign((p as Entry[]).find((x) => x.role === "aggregator") as object, { publicId: "abcdefgh" });

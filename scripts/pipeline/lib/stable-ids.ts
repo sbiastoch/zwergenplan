@@ -52,6 +52,13 @@ export function compareOffers(a: Offer, b: Offer): number {
   );
 }
 
+/** Element an einem Index, den die Zuordnung selbst erzeugt hat; fehlt es, ist das ein Fehler im Code. */
+function at<T>(list: readonly T[], i: number): T {
+  const item = list[i];
+  if (item === undefined) throw new Error(`Zuordnung: Index ${i} fehlt`);
+  return item;
+}
+
 function groupBy<T, K>(items: readonly T[], key: (item: T) => K): Map<K, T[]> {
   const out = new Map<K, T[]>();
   for (const item of items) out.set(key(item), [...(out.get(key(item)) ?? []), item]);
@@ -137,32 +144,29 @@ export function assignIds(input: {
   );
   for (const [key, ds] of draftsByKey) {
     const ps = oldsByKey.get(key) ?? [];
-    if (ds.length === 1 && ps.length === 1) match(ps[0] as number, ds[0] as number, 0);
+    if (ds.length === 1 && ps.length === 1) match(at(ps, 0), at(ds, 0), 0);
   }
 
   const sameProvider = (pi: number, di: number) => P[pi]?.offer.providerId === D[di]?.offer.providerId;
   const stage1 = (pi: number, di: number) => {
-    const p = P[pi] as (typeof P)[number];
-    const d = D[di] as (typeof D)[number];
+    const p = at(P, pi);
+    const d = at(D, di);
     if (!sameProvider(pi, di)) return 0;
     if (p.offer.venueId !== d.offer.venueId && venues.has(p.offer.venueId)) return 0;
     const t = jaccard(p.minutes, d.minutes);
     if (t < SAME_SESSIONS) return 0;
-    // Titel-Widerspruch: Ähnelt der neue Titel nicht dem alten, aber einem anderen offenen Angebot desselben Anbieters,
-    // ist eher ein Schwesterangebot auf den frei gewordenen Platz gerückt (Probelauf, Durchgang 3). Dann kein Treffer.
+    // Titel-Widerspruch: Ähnelt der neue Titel nicht dem alten, aber einem anderen Angebot desselben Anbieters im
+    // Vorstand, ist eher ein Schwesterangebot auf den frei gewordenen Platz gerückt (Probelauf, Durchgang 3). Dann kein
+    // Treffer – auch wenn die Schwester schon zugeordnet ist, sonst fiele die Sperre im nächsten Durchlauf (Arch-Review M1).
     if (similarTitle(p.offer.title, d.offer.title)) return t;
     const rival = P.some(
-      (q, qi) =>
-        qi !== pi &&
-        !partnerOfOld.has(qi) &&
-        q.offer.providerId === d.offer.providerId &&
-        similarTitle(q.offer.title, d.offer.title),
+      (q, qi) => qi !== pi && q.offer.providerId === d.offer.providerId && similarTitle(q.offer.title, d.offer.title),
     );
     return rival ? 0 : t;
   };
   const stage2 = (pi: number, di: number) => {
-    const p = P[pi] as (typeof P)[number];
-    const d = D[di] as (typeof D)[number];
+    const p = at(P, pi);
+    const d = at(D, di);
     return (
       sameProvider(pi, di) &&
       p.offer.venueId === d.offer.venueId &&
@@ -222,7 +226,7 @@ export function assignIds(input: {
       fresh.push(di);
       return;
     }
-    const p = P[pi] as (typeof P)[number];
+    const p = at(P, pi);
     const stage = stageOf.get(di) ?? 0;
     counts[stage] = (counts[stage] ?? 0) + 1;
     let sessions = d.sessions;
@@ -239,7 +243,7 @@ export function assignIds(input: {
     offers.push({ id: p.id, ...d, sessions });
   });
   for (const di of fresh) {
-    const { offer: d, key } = D[di] as (typeof D)[number];
+    const { offer: d, key } = at(D, di);
     let seed = 0;
     while (occupied.has(shortId(key, seed))) seed++;
     const id = shortId(key, seed);

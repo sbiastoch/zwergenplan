@@ -133,6 +133,24 @@ describe("assignIds – Stufe 1: gleiche Termine", () => {
     expect(idOf(r, "Zumbini")).toBe("bbbbbbbb");
   });
 
+  it("Titel-Widerspruch gilt auch, wenn die Schwester schon zugeordnet ist (Arch-Review M1)", () => {
+    const days = weekly("2026-10-06", 10);
+    const previous = prev([
+      old("aaaaaaaa", { title: "Zumbini (Di 15:00)", sessions: at(days, "15:00") }),
+      old("bbbbbbbb", { title: "Babyturnen nach Pikler (Di 14:45)", sessions: at(days, "14:45") }),
+    ]);
+    // Zumbini entfällt, eine zweite Pikler-Gruppe übernimmt seinen Platz
+    const r = run(
+      [
+        draft({ title: "Babyturnen nach Pikler", sessions: at(days, "14:45") }),
+        draft({ title: "Babyturnen nach Pikler 2", sessions: at(days, "15:00") }),
+      ],
+      previous,
+    );
+    expect(idOf(r, "Babyturnen nach Pikler")).toBe("bbbbbbbb");
+    expect(idOf(r, "Babyturnen nach Pikler 2")).not.toBe("aaaaaaaa");
+  });
+
   it("gibt die ID eines entfallenen Angebots nicht an seine Schwester mit gleichen Terminen weiter (Review B2)", () => {
     const previous = prev([
       old("aaaaaaaa", { title: "Kleinkindturnen nach Pikler" }),

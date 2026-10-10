@@ -159,6 +159,9 @@ export const Provider = z.discriminatedUnion("role", [
       skipCrawl: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
     })
     .superRefine((p, ctx) => {
+      // Katalog-ID und publicId müssen unterscheidbar bleiben, sonst rechnet resolveProviderId falsch (ADR 0022)
+      if (SHORT_ID_PATTERN.test(p.id))
+        ctx.addIssue({ code: "custom", message: "Katalog-ID darf nicht die Form einer publicId haben", path: ["id"] });
       // ohne coveredBy und skipCrawl holt der Crawler die Termine selbst: eine abrufbare Terminseite (Plan 0031, E3)
       if (p.coveredBy !== undefined && p.skipCrawl !== undefined)
         ctx.addIssue({ code: "custom", message: "skipCrawl und coveredBy schließen sich aus", path: ["skipCrawl"] });

@@ -1192,12 +1192,12 @@ Unabhängiger `plan-reviewer` nur auf die Teile, die N-I1 (kurze Pfade) und N-I2
 
 Umgesetzt auf dem Branch `stufe-0-stabile-ids` nach den Schritten S1–S5. N-I3 und N-I4 mit der Empfehlung: UID mit der Kurz-ID, keine Aliasseiten.
 
-**Abweichungen vom Plan** (alle drei führen im Zweifel zu einer neuen ID, nie zu einer anderen alten):
+**Abweichungen vom Plan** (die beiden ersten führen im Zweifel zu einer neuen ID, nie zu einer anderen alten):
 
 | Stelle | Plan | Umgesetzt | Grund |
 |---|---|---|---|
 | E14, Stufe 0 | `offerKey(p) === offerKey(d)` | Fensterschlüssel (`offerKey` mit dem ersten Termin ab `horizon.from`) auf beiden Seiten | Ein laufender Kurs, dessen Quelle die vergangenen Termine nicht mehr nennt und bei dem ein Termin verlegt wurde, hat einen anderen ersten Termin, T = 1/3 und D = 1/3: Er verlöre seine ID (bestehender Test „verlegter Termin erscheint nicht doppelt“). Die Saat neuer IDs bleibt `offerKey`, damit E15 gilt. |
-| E14, Stufe 1 | gleicher Anbieter, Ort, T ≥ 0,8, strikt bester | dazu **Titel-Widerspruch**: kein Treffer, wenn der neue Titel dem alten nicht ähnelt, aber einem anderen noch offenen Angebot desselben Anbieters | Probelauf, Durchgang 3: Rückt ein Angebot um eine Viertelstunde auf den frei gewordenen Platz der Schwester (Pikler 14:45 → 15:00, Zumbini 15:00 → 15:15), wäre T = 1 mit der falschen Schwester. Test in `stable-ids.test.ts`. |
+| E14, Stufe 1 | gleicher Anbieter, Ort, T ≥ 0,8, strikt bester | dazu **Titel-Widerspruch**: kein Treffer, wenn der neue Titel dem alten nicht ähnelt, aber einem anderen Angebot desselben Anbieters im Vorstand, auch einem schon zugeordneten (Arch-Review M1: sonst fiele die Sperre im nächsten Durchlauf der Stufe weg) | Probelauf, Durchgang 3: Rückt ein Angebot um eine Viertelstunde auf den frei gewordenen Platz der Schwester (Pikler 14:45 → 15:00, Zumbini 15:00 → 15:15), wäre T = 1 mit der falschen Schwester. Test in `stable-ids.test.ts`. |
 | E15, Wochen-Nachricht | Abbildung in `tailorPush` und in `runWeekly` | einmal in `newOfferIds` (`src/domain/news.ts`), das beide nutzen | eine Stelle statt zwei; Tests in `news.test.ts` und `push-weekly-core.test.ts` |
 
 Nebenbei: `src/domain/directory.test.ts` und `src/domain/provider-count.test.ts` brauchten doch eine Umstellung (Review m2 nahm das Gegenteil an): Sie vergleichen Katalog-IDs als Literale mit `site.json`-Daten. Sie nutzen jetzt `fixturePublicId` aus `test-fixtures.ts`. `batchProviders` las schon seit Plan 0031 nur die IDs (Review M3 war erledigt). `og-images.ts` hatte den Ordner `angebot` fest im Zähl-Gate; jetzt `SHARE_DIRS.offer`.
@@ -1216,7 +1216,28 @@ Nebenbei: `src/domain/directory.test.ts` und `src/domain/provider-count.test.ts`
 - Durchgang 3 ist künstlich (alle Angebote wandern zugleich), zeigte aber vor der Regel 4 falsche Zuordnungen. Übrig bleibt ein Fall: zwei Gruppen „Musikgarten 18 Mon.–3 J.“ mittwochs um 15:15 und 15:30 desselben Anbieters; rückt die eine auf den Platz der anderen, sind sie in den Daten nicht unterscheidbar (R9, Restrisiko). Die 124 neuen IDs sind der Zustand vor ADR 0022 (R10).
 - Stichprobe Stufe 1 aus Durchgang 2: „Abenteuerturnen 1–3 J. (Fr 13.11., 15:00)“ → „Abenteuerturnen 1–3 J.“, „Babyschwimmen im Ritterbad (Mo 11:10)“ → „Babyschwimmen im Ritterbad“, „Musikzauber (Herbstzauber 1–2 J., Mi 9:00)“ → „Musikzauber“ – alle richtig.
 
-**Lokale Umgebung:** `scripts/heavy.test.ts` („ignoriert die Gruppe SIGINT und SIGTERM“) ist im Cloud-Container auch ohne diese Änderung rot (PID 1 räumt verwaiste Zombies nicht ab); in der CI grün. Playwright 1.63 erwartet Chromium-Revision 1243, der Container hat 1194; lokal lief E2E über ein eigenes `PLAYWRIGHT_BROWSERS_PATH` mit Symlinks auf das vorhandene Chromium.
+**Budget** (gemessen gegen a590278, `pnpm build` und `size-limit`, Zeile in ADR 0012):
+
+| | vorher | nachher | Delta | Schätzung |
+|---|---|---|---|---|
+| JS (initial), gzip | 98,857 kB | 99,280 kB | +0,423 kB | +0,3–0,45 kB |
+| Service Worker, gzip | 8,263 kB | 8,534 kB | +0,271 kB | +0,2 kB |
+| `site.json` gzip / roh | 79,878 / 591,6 kB | 75,413 / 559,7 kB | −4,47 / −31,8 kB | −32 kB roh |
+| `anbieter.json` gzip / roh | 6,997 / 27,6 kB | 7,111 / 26,7 kB | +0,11 / −0,9 kB | −0,9 kB roh |
+
+Unter der Prüfschwelle von 0,6 kB. `anbieter.json` wird roh kleiner, gzip aber minimal größer, weil Hash-IDs schlechter komprimieren als lesbare Katalog-IDs. Bis 100 kB Start-JS bleiben etwa 0,72 kB.
+
+**Arch-Review (2026-10-10), Verdict: Freigabe mit Änderungen, eingearbeitet:**
+
+| Befund | Einarbeitung |
+|---|---|
+| M1 Titel-Widerspruch zählt nur offene Schwestern; nach deren Zuordnung fällt die Sperre im nächsten Durchlauf | Schwestern unabhängig vom Zuordnungsstand, Test „auch wenn die Schwester schon zugeordnet ist“; Probelauf unverändert (Zahlen oben) |
+| M2 Zeile in ADR 0012 fehlt | gemessen, Zeile eingetragen (Budget oben) |
+| m1 `as`-Casts in `stable-ids.ts` | Helfer `at()`, der bei fehlendem Index wirft |
+| m2 Katalog-IDs in Kurzform nur in der Migration gesperrt | Schema sperrt sie im Anbieter-Zweig, Test in `dataset.test.ts` |
+| m3 „alle drei“ | korrigiert |
+
+**Lokale Umgebung:** `scripts/heavy.test.ts` („ignoriert die Gruppe SIGINT und SIGTERM“) ist im Cloud-Container auch ohne diese Änderung rot (PID 1 räumt verwaiste Zombies nicht ab); in der CI grün. Playwright 1.63 erwartet Chromium-Revision 1243, der Container hat 1194; lokal lief E2E über ein eigenes `PLAYWRIGHT_BROWSERS_PATH` mit Symlinks auf das vorhandene Chromium. Ergebnis der Specs aus S3 (`teilen`, `saved`, `merkliste-anbieter`, `detail`, `anbieter`, `pwa`, `mobile-ux`) auf `pixel-7`: 319 grün, 4 rot – alle vier Offline-Tests in `pwa.spec.ts`; dieselbe Spec ist auf a590278 im Container ebenfalls rot (5 Tests), die Offline-Emulation greift mit dem älteren Chromium nicht. Maßgeblich ist die CI.
 
 ## Nachtrag B (2026-10-10): Katalog crawlbar (Plan 0031, ADR 0025)
 
