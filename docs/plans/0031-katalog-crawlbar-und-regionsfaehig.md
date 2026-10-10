@@ -1,7 +1,8 @@
 # Plan 0031 – Katalog crawlbar und regionsfähig
 
-Status: Entwurf
+Status: Review eingearbeitet (2026-10-10, Durchgang 1: Überarbeiten, eingearbeitet; Durchgang 2 offen)
 Datum: 2026-10-10
+Voraussetzung: Plan 0030 (Katalog entrümpeln, live bzw. auf demselben Branch). Reihenfolge zu Plan 0015, Nachtrag A (stabile IDs, migriert `providers.yaml` ebenfalls um `publicId`): unabhängig; wer zuerst kommt, wird vom anderen gemergt.
 Bezug: ADR 0006 (Katalog im Zod-Vertrag), ADR 0016 (Entwurf, nächtliche Pipeline), ADR 0022 (Entwurf, stabile IDs), ADR 0024 (Katalog beschreibt Quellen), Plan 0015 (nächtliche Pipeline, der Crawler), Plan 0030 (Katalog entrümpeln, Vorgänger); neu: ADR 0025
 
 ## Anlass
@@ -21,11 +22,10 @@ Der Katalog hat 83 Einträge mit 223 Programm-URLs (html 157, js 28, ical 24, js
 | K1 | `programme.note` mischt Abrufhinweise (19 × JS/Browser, 4 × Sperre/403, 4 × Paginierung, 4 × URL-Umbau, 1 × POST/GraphQL), Filteranweisungen (15) und veraltende Inhalte („nächster: So 08.11.2026“). Ein Crawler braucht die Abrufhinweise als Felder; veraltende Inhalte gehören nicht in den Prompt. | Plan 0015, E4 und E5 (`inputHash` über den Katalogauszug samt Notizen) |
 | K2 | `notes` ist Rechercheprotokoll („war am Prüftag nicht erreichbar“, „ab 13.10. neu prüfen“), Ortshinweise (42 × „Ort X: …“), Anmeldefenster (10) und Inhalt. Fließt es in Prompt und Hash, löst jede Pflegeänderung eine neue Extraktion aus und veraltete Angaben widersprechen „Werte werden nie geraten“. | Plan 0015, E5 |
 | K3 | `kind: js` vermischt Format (HTML) und Abrufart (im Browser rendern). Gesperrte Seiten (Eversports 403 × 6, Calendly, Login) stehen nur als Text. | Plan 0015, E4, R3 |
-| K4 | POST-Abfragen (Kursorganizer-GraphQL) stehen als Freitext. | Plan 0015, E4 („Schemaänderung … `request`“) |
+| K4 | POST-Abfragen (Kursorganizer-GraphQL, 2 Einträge: `nuebad-flipper`, `schwimmschule-wassermaeuse`) stehen als Freitext, samt Headern und Filter. | Plan 0015, E4 („Schemaänderung … `request`“) |
 | K5 | 6 URLs tragen feste Daten oder einen Platzhalter `FROM` statt `{von}`/`{bis}`; das Schema kennt keine Platzhalter. | Plan 0015, E4; ADR 0016 |
 | K6 | Seiten ohne Termine (Linkhubs, Erklärseiten, Browser-Ansichten; 7) stehen gleichrangig neben Terminseiten und gingen in Abruf und Prompt. | Plan 0015, E2 (Eingabegrenze), R4 |
 | K7 | 4 von 7 `aggregator` haben keinen `adapter`. Der Nachtlauf ruft nur Adapter ab und fragt das Modell nur je Anbieter, diese 4 crawlt also niemand. | Plan 0015, E1 |
-| K8 | Anbieter mit `coveredBy` (13) müssen `programme` pflegen, obwohl es nie abgerufen wird. | Plan 0015, E4 |
 
 ### Befunde Region
 
@@ -57,14 +57,15 @@ Der Katalog hat 83 Einträge mit 223 Programm-URLs (html 157, js 28, ical 24, js
 
 - Neues Modul `src/domain/regions.ts`, rein, ohne Zod:
   ```ts
-  export const REGIONS = {
+  export const REGION_IDS = ["nuernberg"] as const;
+  export type RegionId = (typeof REGION_IDS)[number];
+  export const REGIONS: Record<RegionId, Region> = {
     nuernberg: { name: "Nürnberg", bbox: NUERNBERG_BBOX, holidaySubdivision: "DE-BY" },
-  } as const satisfies Record<string, Region>;
-  export type RegionId = keyof typeof REGIONS;
-  export const REGION_IDS = Object.keys(REGIONS) as RegionId[];  // Begründung im Code: keyof über ein Literal
+  };
   ```
   `Region` = `{ name: string; bbox: BBox; holidaySubdivision: string }`. Mehr Felder (Zeitzone, ÖPNV-Feed, Startpunkt der Karte) kommen erst mit einer zweiten Region, weil heute nichts sie liest. `NUERNBERG_BBOX` bleibt in `geo.ts` (der Startpunkt-Check in `src/data` nutzt ihn, ADR 0017 und ADR 0010); die Registry verweist darauf.
 - **Pflichtfeld `region`** an jedem Katalog-Eintrag aller drei Rollen, `z.enum(REGION_IDS)`. Auch Sammelkalender und Verzeichnisse sind regional.
+- Kein Cast: `Record<RegionId, Region>` erzwingt, dass jede ID einen Eintrag hat. `holidaySubdivision` liest heute niemand (E8 ist gestrichen); es steht da, weil eine zweite Region ohne Ferienland nicht baubar ist, und `regions.test.ts` prüft die Form.
 - **Geo-Prüfung wandert vom Typ an den Anbieter:** `Geo` prüft nur noch gültige Koordinaten (lat −90…90, lon −180…180). Ein `superRefine` am `anbieter` prüft jeden Ort gegen `REGIONS[region].bbox` („Ort außerhalb der Region nuernberg“). `Timetable` prüft weiter gegen `NUERNBERG_BBOX`; ein Auszug je Region kommt mit R5.
 - **Kein Präfix in IDs** (R4, ADR 0022 Punkt 5).
 
@@ -80,17 +81,19 @@ Neues Schema je Programmeintrag:
 
 | Feld | Typ | Bedeutung |
 |---|---|---|
-| `url` | URL, darf `{von}` und `{bis}` enthalten | Andere `{…}` sind ein Fehler („nur {von} und {bis}“). |
+| `url` | URL, darf `{von}` und `{bis}` enthalten | Andere `{…}` sind ein Fehler („nur {von} und {bis}“). Ersetzt wird durch die reine Funktion `fillPlaceholders(text, window)` in `scripts/pipeline/lib/placeholders.ts`: `{von}` = Monatsanfang des aktuellen Monats, `{bis}` = Monatsanfang 13 Monate später (Plan 0015, E4). `pipeline fetch-page` nutzt sie schon jetzt, damit der Skill die URLs abrufen kann. |
 | `kind` | `html \| pdf \| ical \| json-api` | Format der Antwort. `js` entfällt. |
 | `render` | `"browser"`, optional | Seite braucht JavaScript; der Crawler rendert sie (Plan 0015, E4). Ersetzt `kind: js` (28 Einträge → `kind: html, render: browser`). |
 | `use` | `termine \| verfuegbarkeit \| info` | Wozu die Seite dient. Nur `termine` und `verfuegbarkeit` gehen in Abruf und Prompt; `info` ist Doku für die Katalogpflege (Linkhub, Erklärseite). Pflicht. |
-| `request` | `{ method: "POST", headers?: Record<string,string>, body: string }`, optional | Wie in Plan 0015, E4 vorgesehen. |
-| `blocked` | `{ reason: string, since: IsoDate }`, optional | Seite ist bekannt gesperrt (403, Login, Bot-Schutz). Der Crawler überspringt sie und meldet sie im Bericht, statt jede Nacht `fehler` zu setzen. |
+| `request` | `{ method: "POST", headers?: Record<string,string>, body: string }`, optional | Wie in Plan 0015, E4 vorgesehen. `body` darf `{von}`/`{bis}` enthalten (gleiche Regel wie `url`). |
+| `blocked` | `{ reason: string, since: IsoDate }`, optional | Seite ist **mit Abrufbeleg** gesperrt (Login, Bot-Schutz auch im Browser). Bedeutung für den Crawler: Der Anbieter ist bewusst ohne diese Quelle; der Bericht nennt ihn jede Nacht. Ein 403 „nur per Skript“ ist kein `blocked`, sondern `render: browser` (Eversports, 6 Einträge); ob es auch dort scheitert, klärt Plan 0015, Schritt 5 per `pipeline fetch`. |
 | `hint` | String, optional, höchstens 200 Zeichen, ohne Datumsangaben | Kurzer Extraktionshinweis für das Modell („nur Gruppen ‚ab 0‘ und ‚ab 1‘“, „Termine stehen im Abschnitt Krabbelgruppen“). Ersetzt `note`. Die Prüfung „ohne Datum“ ist ein Regex auf `\d{1,2}\.\d{1,2}\.` und `\d{4}-\d{2}-\d{2}`. |
 
 - `note` entfällt. Ihr Inhalt wandert je nach Art (E6) nach `hint`, nach `notes` des Anbieters (Protokoll, Inhalt) oder in die Felder `render`, `blocked`, `request` und die URL.
-- Paginierung: je Seite ein eigener Programmeintrag (Plan 0015, E4); was heute als Text dasteht, wird bei der Migration zu Einträgen, wo die Seiten-URLs stabil sind, sonst zu `blocked` mit Grund „Paginierung mit Sitzungs-Parametern“.
-- Regel am Eintrag: Ein `anbieter` **ohne** `coveredBy` braucht mindestens einen Eintrag mit `use: termine` (sonst hat der Crawler nichts zu holen). Mit `coveredBy` darf `programme` leer sein (K8).
+- Paginierung mit stabilen URLs: je Seite ein eigener Programmeintrag (Plan 0015, E4).
+- Regel am Eintrag: Ein `anbieter` **ohne** `coveredBy` braucht mindestens einen Eintrag mit `use: termine` **ohne** `blocked` (sonst hat der Crawler nichts zu holen). `programme` bleibt bei allen Anbietern Pflicht (≥ 1): Bei `coveredBy` liest die Pipeline daraus die `vid` für evangelische-termine (`cli.ts` `anbieterVids`, `match.ts` `vidOf`).
+- Neue Prüfung in `validateDataset`: `coveredBy` auf einen Sammelkalender mit `adapter: evtermine` verlangt mindestens eine Programm-URL mit `vid=` (sonst fiele der Anbieter still aus Abfrage und Zuordnung).
+- Paginierung mit Sitzungs-Parametern (TYPO3-`cHash`, `pageindex` mit Komponenten-ID; 2 Einträge): bleibt ein Eintrag für Seite 1, dazu ein Protokolleintrag in `notes` („Folgeseiten nur mit Sitzungs-Parametern, der Crawler liest Seite 1“). Ein Mechanismus „Links folgen“ ist Plan 0015 ausdrücklich nicht.
 
 ### E4 `notes` ist Protokoll
 
@@ -101,6 +104,8 @@ Neues Schema je Programmeintrag:
 
 - `aggregator` verlangt `adapter` (Pflicht). Ein Sammelkalender ohne Adapter ist für die Pipeline eine Quelle zur Katalogpflege, also `verzeichnis`. Die 4 Einträge aus K7 werden `verzeichnis`, ihre Notiz sagt warum.
 - `coveredBy` zeigt weiter nur auf einen `aggregator` (`validateDataset`). Die Regel „aggregator braucht adapter“ macht damit jedes `coveredBy` abrufbar.
+- `scripts/pipeline/lib/select.ts` unterscheidet heute Sammelkalender mit und ohne Adapter; der Zweig „ohne Adapter“ entfällt.
+- Fixture `sammelkalender-beispiel` bekommt `adapter: frankenkids` (bleibt `aggregator`, `site-data.test.ts` braucht den Fall).
 
 ### E6 Migration (mit Subagenten)
 
@@ -112,38 +117,49 @@ Deterministisch, per Skript `scripts/migrate-0031.ts` (wie in Plan 0030 committe
 
 Mit Urteil, per Subagenten: Für jede der 223 Programm-URLs und 186 Notizen ist zu entscheiden, wohin der Inhalt gehört. Ablauf:
 1. Ein Skript schreibt je Anbieter einen Auszug (`id`, `programme`, `notes`) nach `runs/0031/in/<id>.json` (`runs/` ist nicht versioniert).
-2. **4 Subagenten parallel**, je ein Viertel der Einträge, mit einer festen Anleitung (im Plan-Anhang A, wörtlich übergeben). Jeder schreibt je Eintrag `runs/0031/out/<id>.json` mit den neuen Feldern `programme` (nach E3) und `notes` (Liste). Regeln: nichts erfinden, keinen Inhalt verlieren (was nicht in ein Feld passt, wird Notiz), `hint` ohne Datum, `use` begründet aus `note`/URL, im Zweifel `termine`.
-3. Ein Skript (`migrate-0031.ts --apply runs/0031/out`) setzt die Felder per `yaml.parseDocument` ein und prüft je Eintrag: gleiche URLs (außer bewusst durch Platzhalter ersetzte, die das Skript listet), kein Text der alten `note`/`notes` fehlt (jeder alte Teil steht wörtlich oder als Teilstring in `hint`, `notes`, `blocked.reason` oder ist in eine URL eingeflossen; das Skript meldet Abweichungen, der Mensch entscheidet), Schema grün.
+2. **4 Subagenten parallel**, je ein Viertel der Einträge, mit der Anleitung aus Anhang A (wörtlich übergeben). Jeder schreibt je Eintrag `runs/0031/out/<id>.json` mit den neuen Feldern `programme` (nach E3) und `notes` (Liste). Regeln: nichts erfinden, keinen Inhalt verlieren (was nicht in ein Feld passt, wird Notiz), `hint` ohne Datum, `use` begründet aus `note`/URL, im Zweifel `termine`.
+3. Ein Skript (`migrate-0031.ts --apply runs/0031/out`) setzt die Felder per `yaml.parseDocument` ein und prüft je Eintrag:
+   - gleiche URLs, außer bewusst durch Platzhalter ersetzte und neu aufgeteilte Seiten (das Skript listet sie);
+   - kein Inhalt geht verloren: Die alte `note`/`notes` wird in **Teile** zerlegt (Trennung an `;`, ` – `, ` | ` und Satzende `. `), und jeder Teil muss wörtlich als Teilstring in einem der Ziele stehen: `hint`, `notes`, `blocked.reason`, `request.body`, `request.headers`-Werte oder einer URL. Umformulieren ist verboten (Anhang A), ausgenommen das Entfernen eines Datums aus einem `hint`-Kandidaten; dann steht der Teil unverändert in `notes`. Abweichungen meldet das Skript, der Umsetzer entscheidet je Fall;
+   - Schema grün (Phase b, also noch mit erlaubtem `note`/`js`).
 4. Ein **fünfter Subagent** prüft adversarial eine Stichprobe von 20 Einträgen gegen den alten Stand (Inhalt verloren? `use` falsch? Datum in `hint`?).
-5. Ich lese den vollständigen Diff der Einträge mit `blocked`, `request`, Platzhaltern und `use: info` selbst.
+5. Der Umsetzer liest den vollständigen Diff aller Einträge mit `blocked`, `request`, Platzhaltern, `render` und `use: info` selbst (das Skript druckt die Liste der IDs).
 
 ### E7 Plan 0015 nachziehen
 
-Plan 0015 bekommt einen „Nachtrag B (Plan 0031)“: E4 nutzt `render` statt `kind: js`, überspringt `use: info` und `blocked`, liest `hint`, nicht `notes`; E5 nimmt `notes` aus dem `inputHash`; der Anbieter-Ausfall „Seite gesperrt“ wird über `blocked` gemeldet. Ich ändere Plan 0015 nur durch diesen Nachtrag, nicht im Text (er ist freigegeben und gehört einem anderen Arbeitsstrang).
+Plan 0015 bekommt einen „Nachtrag B (Plan 0031)“, ohne den bestehenden Text zu ändern (er ist freigegeben und gehört einem anderen Arbeitsstrang). Er nennt:
+- **E4:** `render: browser` statt `kind: js` (auch im Tag-Namen aus E8); `use: info` wird nicht abgerufen; `blocked` wird nicht abgerufen, der Anbieter geht trotzdem ans Modell (bewusst ohne diese Quelle) und steht im Bericht; Platzhalter über `fillPlaceholders` (gibt es schon); `request` gibt es schon im Schema.
+- **E3 (Eingabe):** Der Prompt bekommt je Seite `hint`, dazu `availability.how`/`system`; `notes` nie.
+- **E5:** Der `inputHash` umfasst den Katalogauszug **ohne** `notes` (ersetzt „samt Orten und Notizen“).
+- **Schritt 4:** Schemafeld `request` und Platzhalter entfallen (erledigt durch Plan 0031).
+- **Schritt 5:** Ausnahmen stehen künftig als `blocked` mit Abrufbeleg, nicht in `notes`.
 
-### E8 Feiertage je Region
+### E8 Feiertage je Region – gestrichen (Review M5)
 
-`fetchHolidays` und `freeDaysFrom` bekommen die Subdivision als Parameter (`REGIONS[region].holidaySubdivision`), der Cache heißt `holidays-<subdivision>-<jahr>.json`. Heute ruft die Pipeline sie mit `nuernberg` auf; das Verhalten bleibt gleich.
+`loadFreeDays` (`io/holidays.ts`) und `freeDays` (`lib/holidays.ts`) bleiben fest auf `DE-BY`. Heute liest nichts die Region; ein umbenannter Cache bräche den Nachtlauf (Plan 0015, E2: ohne Cache Exit 1). Gehört zu R5 und steht in `docs/ideas.md`.
 
 ## Tests (test-first)
 
 1. `dataset.test.ts`: fehlendes `region` → Fehler; unbekannte Region → Fehler; Ort außerhalb der bbox der Region → Fehler mit Region im Text; `ring` am Ort → Fehler (strict).
-2. `dataset.test.ts`, Programm: `{foo}` in URL → Fehler, `{von}`/`{bis}` gültig; `kind: js` → Fehler; `hint` mit „08.11.“ → Fehler; `anbieter` ohne `coveredBy` und ohne `use: termine` → Fehler; mit `coveredBy` und leerem `programme` gültig; `request` ohne `body` → Fehler; `blocked` ohne `since` → Fehler; `note` → Fehler (strict).
-3. `dataset.test.ts`, Rollen: `aggregator` ohne `adapter` → Fehler.
+2. Phase a, `dataset.test.ts`, Programm: `{foo}` in URL oder `request.body` → Fehler, `{von}`/`{bis}` gültig; `hint` mit „08.11.“ → Fehler (Heuristik, siehe unten); `request` ohne `body` → Fehler; `blocked` ohne `since` → Fehler; `coveredBy` auf evtermine-Kalender ohne `vid=`-URL → Fehler.
+3. Phase c, `dataset.test.ts`: `kind: js` → Fehler; `note` → Fehler (strict); Programmeintrag ohne `use` → Fehler; `anbieter` ohne `coveredBy` mit nur `use: info` oder nur gesperrten Terminseiten → Fehler; `aggregator` ohne `adapter` → Fehler.
+   Der Datums-Check in `hint` ist eine Heuristik (`\d{1,2}\.\d{1,2}\.` und ISO-Datum): „8. November“ rutscht durch, „9.30.“ würde rot. Akzeptiert; die Anleitung verbietet Daten ohnehin.
 4. `regions.test.ts`: jede Region hat eine bbox mit min < max und eine Subdivision `DE-XX`.
-5. `holidays.test.ts`: Subdivision aus dem Parameter, nicht fest.
+5. `placeholders.test.ts`: `{von}`/`{bis}` aus einem Stichtag (Monatsanfang, +13 Monate, Jahreswechsel), andere Klammern bleiben unberührt.
 6. `draft.test.ts`: `providerFromCandidate` schreibt `region` (aus dem Sammelkalender, sonst `nuernberg`), kein `ring`, `programme[0].use: termine`.
-7. `site-data.test.ts`: `SiteOffer.venue` ohne `ring`; grep-Test: weder `src/` noch `e2e/` erwähnen `ring` als Feld.
+7. `site-data.test.ts`: Die vorhandene Schlüsselprüfung der Anbieterübersicht bekommt `region`; `SiteOffer.venue` ohne `ring` sichert tsc über `Pick<Venue, …>`.
 8. Migration: Unit-Test für die deterministischen Schritte 1–4 auf einem kleinen YAML-Text (im selben Commit wie das Skript, mit ihm gelöscht).
 
 ## Schritte
 
+Drei Phasen, jede endet grün und mit Commit (Review B1: Erweitern, Migrieren, Verengen).
+
 1. Plan, `/plan-review`, Commit.
-2. Tests 1–7 rot.
-3. Fixtures per Skript (deterministische Schritte), Fixture-Programmeinträge von Hand auf E3 (7 Einträge), dann Schema und Code (E1–E5, E8), bis `pnpm verify` grün.
-4. Echte Daten: deterministische Migration, dann Subagenten-Migration (E6), Prüfung, `pnpm schema:export`, `pnpm data:validate`.
-5. ADR 0025, ADR 0003 (Statuszeile: Geo-Prüfung je Region), ADR 0006, Skill `references/catalog.md` und `references/extraction.md` (Felder `use`, `render`, `hint`, `blocked`, `request`, Platzhalter; `notes` ist Protokoll), Plan 0015 Nachtrag B, `docs/ideas.md` (R5, Kann-warten-Punkte).
-6. `pnpm verify`, `pnpm e2e:local --affected` (`site.json` ändert sich: `ring` fehlt), `/arch-review`. Kein `/browser-review` nötig, wenn die E2E-Auswahl keine Ansicht als geändert meldet; sonst die betroffenen Ansichten.
+2. **Phase a – Erweitern.** Tests 1, 2, 4, 5, 6, 7 rot. Schema: `region` Pflicht, `ring` gestrichen, neue Programmfelder `render`, `use`, `request`, `blocked`, `hint` **optional**, `note` und `kind: js` **noch erlaubt**, Platzhalter-Regel, evtermine-vid-Regel. `regions.ts`, `placeholders.ts`, `fetch-page` mit Platzhaltern. Deterministische Migration (E6, 1–3) auf Fixtures und echte Daten; Schritt 4 (Rolle) erst in Phase c. Fertig: `pnpm verify` grün, `pnpm data:validate` grün. Commit.
+3. **Phase b – Migrieren.** Subagenten-Migration (E6, Ablauf 1–5) auf `data/providers.yaml`; Fixtures von Hand (7 Programmeinträge). Fertig: Prüfskript ohne offene Abweichung, `pnpm data:validate` grün, Diff gelesen. Commit.
+4. **Phase c – Verengen.** Test 3 rot. Schema: `use` Pflicht, `note` und `kind: js` verboten, Regel „Terminseite ohne `blocked`“, `aggregator` verlangt `adapter`; die 4 Sammelkalender ohne Adapter werden `verzeichnis` (E6, Schritt 4); `select.ts` ohne den Zweig. Fertig: `pnpm verify` grün. Commit.
+5. **Doku.** ADR 0025; Statuszeilen von ADR 0003 (Geo-Prüfung je Region), ADR 0006 und ADR 0024 (Punkt 2: `adapter` ist Pflicht); `docs/architecture.md` (Modulliste `src/domain`: `regions.ts`); Skill `references/catalog.md` und `references/extraction.md` (Felder `use`, `render`, `hint`, `blocked`, `request`, Platzhalter; `notes` ist Protokoll, nie mit Datumswerten im `hint`); Plan 0015 Nachtrag B (E7); `docs/ideas.md` (R5 mit Feiertagen je Region, Kann-warten-Punkte). Fertig: `check-docs` grün.
+6. **Prüfen.** `pnpm verify`, `pnpm e2e:local --affected` und `--smoke` (Datenänderung, CLAUDE.md), `/arch-review`. Kein `/browser-review`, solange keine Ansicht sich ändert (nur `ring` fällt aus `site.json`).
 7. Commit, Push.
 
 ## Risiken
@@ -153,6 +169,39 @@ Plan 0015 bekommt einen „Nachtrag B (Plan 0031)“: E4 nutzt `render` statt `k
 - **`site.json` ohne `ring`**: Kein Leser bekannt; Test 7 sichert das.
 - **Platzhalter-URLs**: Bis der Crawler sie ersetzt, sind die 6 URLs im Skill nicht direkt aufrufbar. Der Skill-Text sagt, wie sie zu lesen sind (Monatsanfang bis +13 Monate).
 
-## Anhang A – Anleitung für die Migrations-Subagenten
+## Anhang A – Anleitung für die Migrations-Subagenten (wörtlich übergeben)
 
-(wird vor Schritt 4 aus E3/E4 wörtlich formuliert und hier eingefügt)
+> Du migrierst Programmeinträge und Notizen von Anbietern im Katalog `data/providers.yaml` des Projekts Zwergenplan (Angebote für Kinder unter 3 in Nürnberg). Lies `docs/plans/0031-katalog-crawlbar-und-regionsfaehig.md`, Abschnitte E3 und E4. Deine Eingabe sind die Dateien `runs/0031/in/<id>.json` aus deiner Liste. Schreibe je Datei `runs/0031/out/<id>.json` mit genau zwei Schlüsseln: `programme` (Liste) und `notes` (Liste von Strings, darf leer sein; leer wird beim Einsetzen zu „kein Feld“). Ändere sonst nichts, auch nicht `data/providers.yaml`.
+>
+> **Pro Programmeintrag:**
+> - `url` und `kind` übernimmst du. `kind: js` bleibt `js` (das Skript stellt es um). Ausnahme: Steht in der URL ein fester Zeitraum oder ein Platzhalter wie `FROM`, `START_DATUM=2026-10-01`, setze `{von}` bzw. `{bis}` ein (`{von}` = Beginn, `{bis}` = Ende des Abfragefensters). Nur wenn die `note` das ausdrücklich verlangt oder der Wert offensichtlich ein Datum des Abfragefensters ist.
+> - `use`: `termine`, wenn die Seite Termine oder Gruppen mit Wochentag/Uhrzeit enthält oder die `note` sie dort verortet; `verfuegbarkeit`, wenn die Seite nur freie Plätze zeigt (Buchungswidget ohne eigene Termine); `info` für Linkhubs, Erklärseiten, Standortübersichten, Seiten „keine Termine“. Im Zweifel `termine`.
+> - `render: "browser"` nicht setzen (macht das Skript aus `kind: js`), **außer** die `note` sagt, die Seite sei nur im Browser lesbar, obwohl `kind: html` (dann setze es und lass `kind` stehen). Eversports-Seiten mit „403 per Skript“ bekommen `render: "browser"`, **nicht** `blocked`.
+> - `blocked`: nur, wenn die `note` belegt, dass die Seite auch im Browser nicht lesbar ist (Login nötig, Kalender nur nach Anmeldung). `reason` ist der wörtliche Teil der `note`, `since` das `verified`-Datum des Anbieters.
+> - `request`: nur für POST/GraphQL (bekannt: `nuebad-flipper`, `schwimmschule-wassermaeuse`). `headers` aus der `note` (z. B. `Origin`, `x-application-type`), `body` als JSON-String der GraphQL-Abfrage, soweit die `note` sie hergibt; was fehlt, schreibst du nicht dazu, sondern lässt den Teil der `note` in `notes` stehen.
+> - `hint`: höchstens 200 Zeichen, **ohne jedes Datum**, nur was ein Extraktionsmodell beim Lesen dieser Seite braucht (Filter wie „nur Gruppen ‚ab 0‘ und ‚ab 1‘“, „nach ‚ab 2‘ filtern“, „Termine im Abschnitt Krabbelgruppen“, „enthält auch Röthenbach a. d. Pegnitz (nicht Nürnberg)“).
+> - Alles andere aus der `note` (Inhaltszusammenfassungen, „nächster Termin …“, Preise, Erläuterungen) wandert **wörtlich** als eigener Eintrag nach `notes` des Anbieters, mit vorangestellter URL-Kurzform in eckigen Klammern, z. B. `[eversports.de/widget/…] Eversports-Widget 'Yoga mit Baby' (3-12 Mon.)`.
+>
+> **Regeln:**
+> - **Nichts erfinden, nichts umformulieren.** Jeder Teil der alten `note`/`notes` (Teile trennt ein Prüfskript an `;`, ` – `, ` | ` und Satzende) muss wörtlich in `hint`, `notes`, `blocked.reason`, `request.body`, einem `request.headers`-Wert oder einer URL wieder auftauchen. Ein Teil darf auf mehrere Ziele verteilt werden, aber nicht gekürzt.
+> - **URLs mit `vid=` (evangelische-termine.de) bleiben unverändert**, auch wenn ihr Eintrag `use: info` wäre: Sie sind der Zuordnungsschlüssel der Pipeline. Sie bekommen `use: termine`.
+> - Paginierung: Stehen Folgeseiten mit stabilen URLs in der `note`, lege je Folgeseite einen eigenen Eintrag an (gleiches `kind`, `use: termine`). Brauchen sie Sitzungs-Parameter (`cHash`, „Links aus Seite übernehmen“), bleibt ein Eintrag, und die Erklärung wandert nach `notes`.
+> - Die alten `notes` des Anbieters übernimmst du unverändert in derselben Reihenfolge; neue Einträge aus `note` hängst du hinten an.
+>
+> **Beispiele:**
+> 1. `note: "Übersicht Eltern-Kind-Kurse (…); je Kurs Detailseite /kurs/<slug>/ mit Kursorganizer-iFrame"` → `use: info`, `notes += "[nübad-flipper.de/kurskategorie/…] Übersicht Eltern-Kind-Kurse (…); je Kurs Detailseite /kurs/<slug>/ mit Kursorganizer-iFrame"`.
+> 2. `note: "Alle Sternenhaus-Termine (ortID 6239) inkl. Beschreibung mit Altersangabe; nach 'ab 2' filtern – FROM durch Laufbeginn ersetzen"`, URL mit `START_DATUM=FROM` → URL mit `START_DATUM={von}`, `use: termine`, `hint: "nach 'ab 2' filtern"`, `notes += "[nuernberg.de/cgi-bin/ajax_vk.pl] Alle Sternenhaus-Termine (ortID 6239) inkl. Beschreibung mit Altersangabe"`, `notes += "[nuernberg.de/cgi-bin/ajax_vk.pl] FROM durch Laufbeginn ersetzen"`.
+> 3. `note: "Nürnberg-Seite mit dem nächsten Termin (nächster: So 08.11.2026, 11 Uhr). …"` → `use: termine`, kein `hint`, ganzer Text nach `notes`.
+>
+> Melde am Ende je Datei in einer Zeile, was du unsicher eingeordnet hast.
+
+## Review (2026-10-10, Durchgang 1) – Verdict: Überarbeiten → eingearbeitet
+
+Übernommen:
+- B1 Phasen Erweitern → Migrieren → Verengen mit eigenem Fertig-Kriterium (Schritte 2–4).
+- M1 K8 gestrichen, `programme` bleibt Pflicht; neue Prüfung „evtermine-`coveredBy` braucht `vid=`“; Anleitung schützt vid-URLs.
+- M2 `blocked` nur mit Abrufbeleg und mit festgelegter Bedeutung; Eversports wird `render: browser`; Regel „Terminseite ohne `blocked`“.
+- M3 Anhang A ausgeschrieben, mit Beispielen.
+- M4 Nachtrag B nennt E3, E4, E5, Schritt 4 und 5 von Plan 0015.
+- M5 E8 gestrichen, nach `docs/ideas.md` (R5).
+- m1 Fixture-Sammelkalender bekommt `adapter`; m2 grep-Test weg, `region` in die Schlüsselprüfung; m3 Ziele und „Teil“ im Prüfskript definiert, Umformulieren verboten; m4 Datums-Check als Heuristik benannt; m5 Platzhalter auch in `request.body`, `fillPlaceholders` jetzt; m6 kein Cast in `regions.ts`; m7 Doku-Liste ergänzt (`architecture.md`, ADR 0024, `select.ts`); m8 `--smoke`; m9 Voraussetzung und Reihenfolge genannt; m10 „Der Umsetzer“; m11 K4 zählt 2 Einträge.
