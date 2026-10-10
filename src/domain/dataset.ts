@@ -34,6 +34,7 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
   for (const prov of providers) {
     if (providerById.has(prov.id)) errors.push(`Anbieter-ID doppelt: ${prov.id}`);
     providerById.set(prov.id, prov);
+    if (prov.role !== "anbieter") continue;
     for (const v of prov.venues) {
       if (venueOwner.has(v.id)) errors.push(`Ort-ID doppelt: ${v.id}`);
       venueOwner.set(v.id, prov.id);

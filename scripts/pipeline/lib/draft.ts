@@ -3,7 +3,7 @@
  * deterministisch ableiten lässt; offene Pflichtfelder (immer `summary`) füllt der Orchestrator,
  * `validate-raw` listet sie. Nie raten.
  */
-import type { Provider, Registration } from "../../../src/domain/schema.ts";
+import type { Anbieter, Provider, Registration } from "../../../src/domain/schema.ts";
 import { addDays } from "../../../src/domain/time.ts";
 import { categoriesOf, type Topic } from "../../../src/domain/topics.ts";
 import type { Candidate, Occurrence } from "./candidate.ts";
@@ -32,25 +32,15 @@ export function registrationOf(c: Candidate): Registration | undefined {
   return undefined;
 }
 
-function only<T>(values: readonly T[]): T | undefined {
-  return values.length === 1 ? values[0] : undefined;
-}
-
-export function draftFromCandidate(
-  c: Candidate,
-  target: { providerId: string; venueId: string },
-  provider: Provider,
-): Draft | undefined {
+/** Ohne Rückfall aus dem Katalog (Plan 0030): Was der Kandidat nicht hergibt, bleibt offen. */
+export function draftFromCandidate(c: Candidate, target: { providerId: string; venueId: string }): Draft | undefined {
   if (c.cancelled) return undefined;
   const text = [c.title, c.subtitle, c.description].filter(Boolean).join(" ");
-  const regular =
-    c.weekly ||
-    looksRegular(c.occurrences) ||
-    (provider.formats.length === 1 && provider.formats[0] === "regelmaessig");
+  const regular = c.weekly || looksRegular(c.occurrences);
   const free =
     FREE_RE.test(`${text} ${c.cost ?? ""}`) || ["0", "kostenlos"].includes((c.cost ?? "").trim().toLowerCase());
-  const cost = free ? "kostenlos" : only(provider.costs);
-  const registration = registrationOf(c) ?? only(provider.registrations);
+  const cost = free ? "kostenlos" : undefined;
+  const registration = registrationOf(c);
   const status = c.soldOut
     ? "ausgebucht"
     : c.waitlist
@@ -58,8 +48,7 @@ export function draftFromCandidate(
       : registration === "ohne-anmeldung"
         ? "ohne-anmeldung"
         : "unbekannt";
-  let topics: Topic[] = topicsFromText(text);
-  if (categoriesOf(topics).length === 0) topics = [...new Set([...topics, ...provider.topics])];
+  const topics: Topic[] = topicsFromText(text);
 
   const event: Record<string, unknown> = {
     providerId: target.providerId,
@@ -80,13 +69,20 @@ export function draftFromCandidate(
     schedule: { kind: "dates", dates: c.occurrences },
     via: c.source,
   };
-  const open = ["summary", ...(registration ? [] : ["registration"]), ...(cost ? [] : ["cost"])];
+  const open = [
+    "summary",
+    ...(categoriesOf(topics).length > 0 ? [] : ["topics"]),
+    // ohne Rhythmus nur vermutet: Eine Reihe als Einzeltermine bekäme eine andere ID (ADR 0024)
+    ...(regular ? [] : ["format"]),
+    ...(registration ? [] : ["registration"]),
+    ...(cost ? [] : ["cost"]),
+  ];
   return { event, open };
 }
 
 /**
- * Katalogeintrag für einen Veranstalter, der bisher fehlt (`candidates add-provider`). Die Werte stammen
- * aus EINEM Termin – `notes` sagt das, der Orchestrator prüft sie. Der Hauptort trägt die Anbieter-ID.
+ * Katalogeintrag für einen Veranstalter, der bisher fehlt (`candidates add-provider`). Name, URL und Ort stammen
+ * aus EINEM Termin – `notes` sagt woher, der Orchestrator prüft sie. Der Hauptort trägt die Anbieter-ID.
  */
 export function providerFromCandidate(
   c: Candidate,
@@ -96,11 +92,8 @@ export function providerFromCandidate(
     catalog: readonly Provider[];
     today: string;
   },
-): Provider {
+): Anbieter {
   const { id, geo } = input;
-  let topics: Topic[] = topicsFromText(`${c.title} ${c.description}`);
-  if (categoriesOf(topics).length === 0) topics = [...topics, "eltern-kind-gruppe"];
-  const free = FREE_RE.test(`${c.title} ${c.description} ${c.cost ?? ""}`);
   const aggregator = input.catalog.find((p) => p.role === "aggregator" && p.adapter === c.source);
   const district = geo.district;
   return {
@@ -108,14 +101,10 @@ export function providerFromCandidate(
     role: "anbieter",
     name: c.organizer ?? c.location ?? c.title,
     url: c.organizerUrl ?? c.detailUrl,
-    topics,
-    formats: [c.weekly || looksRegular(c.occurrences) ? "regelmaessig" : "einmalig"],
-    costs: [free ? "kostenlos" : "kostenpflichtig"],
-    registrations: [registrationOf(c) ?? "mit-anmeldung"],
     programme: [{ url: c.organizerUrl ?? c.detailUrl, kind: "html" }],
     availability: { shown: "nein" },
     verified: input.today,
-    notes: `Aus ${c.source} aufgenommen (${c.detailUrl}). Kosten/Anmeldung/Format aus einem Termin abgeleitet – prüfen.`,
+    notes: [`Aus ${c.source} aufgenommen (${c.detailUrl}).`],
     venues: [
       {
         id,

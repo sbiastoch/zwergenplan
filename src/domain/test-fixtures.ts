@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { parse } from "yaml";
 import { validateDataset } from "./dataset.ts";
-import type { Offer, OffersFile, Provider } from "./schema.ts";
+import type { Anbieter, Offer, OffersFile, Provider } from "./schema.ts";
 import { type SiteOffer, toSiteData } from "./site-data.ts";
 
 const root = new URL("../../tests/fixtures/", import.meta.url);
@@ -14,11 +14,13 @@ export function rawFixtures(): { providers: unknown; offers: unknown } {
   };
 }
 
-export function loadFixtures(): { providers: Provider[]; file: OffersFile } {
+/** `anbieter`: nur die Einträge mit Orten und Angeboten (Plan 0030), in Katalog-Reihenfolge */
+export function loadFixtures(): { providers: Provider[]; anbieter: Anbieter[]; file: OffersFile } {
   const raw = rawFixtures();
   const result = validateDataset(raw.providers, raw.offers);
   if (!result.ok) throw new Error(result.errors.join("\n"));
-  return { providers: result.providers, file: result.offers };
+  const anbieter = result.providers.filter((p): p is Anbieter => p.role === "anbieter");
+  return { providers: result.providers, anbieter, file: result.offers };
 }
 
 /** Die Fixtures so, wie die Oberfläche sie lädt: mit Anbietername und Ort (für Filter mit Umkreis). */

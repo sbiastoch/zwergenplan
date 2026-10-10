@@ -11,11 +11,6 @@ const aggregator: Provider = {
   adapter: "evtermine",
   name: "Sammelkalender (fiktiv)",
   url: "https://example.org/kalender",
-  venues: [],
-  topics: ["krabbelgruppe"],
-  formats: ["regelmaessig"],
-  costs: ["kostenlos"],
-  registrations: ["ohne-anmeldung"],
   programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
   availability: { shown: "nein" },
   verified: "2026-10-04",
@@ -310,7 +305,7 @@ describe("buildOffers", () => {
 
   it("meldet mögliche Dubletten über Anbietergrenzen (gleicher Ort, Beginn, ähnlicher Titel)", () => {
     const shared = providers.map((p) =>
-      p.id === "musikschule-beispiel"
+      p.id === "musikschule-beispiel" && p.role === "anbieter"
         ? { ...p, venues: p.venues.map((v) => ({ ...v, geo: { lat: 49.4521, lon: 11.0767 } })) }
         : p,
     );

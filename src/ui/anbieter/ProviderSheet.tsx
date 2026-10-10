@@ -43,7 +43,7 @@ export function ProviderSheet({
   if (!provider) return null;
 
   const outside = hasOffersOutside(own, visible);
-  const categories = providerCategories(provider, own);
+  const categories = providerCategories(provider.id, own);
 
   return (
     // Hülle wie das Orts-Sheet: scrollender Inhalt, Fuß darunter

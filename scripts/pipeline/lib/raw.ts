@@ -7,6 +7,7 @@ import { z } from "zod";
 import { slug } from "../../../src/domain/ids.ts";
 import { OfferFields, type Provider, ProviderAge } from "../../../src/domain/schema.ts";
 import { fromBerlinLocal } from "../../../src/domain/time.ts";
+import { categoriesOf } from "../../../src/domain/topics.ts";
 import { LocalDateTime, SOURCES } from "./candidate.ts";
 import { type ExpandWindow, expandSchedule, Schedule } from "./schedule.ts";
 
@@ -116,6 +117,9 @@ export function validateRaw(input: unknown, ctx: RawContext): RawValidation {
   batch.events.forEach((e, i) => {
     const w = where(i, e);
     const provider = byId.get(e.providerId);
+    // Querprüfung von `Offer`, die `RawEvent` (aus `OfferFields`) nicht mitbringt: sonst fiele es erst im Build auf
+    if (categoriesOf(e.topics).length === 0)
+      errors.push(`${w}.topics: mindestens ein Thema muss einer Kategorie zugeordnet sein`);
     if (!provider) errors.push(`${w}: unbekannter Anbieter ${e.providerId}`);
     else if (provider.role !== "anbieter") errors.push(`${w}: ${e.providerId} ist kein Anbieter (${provider.role})`);
     else if (!provider.venues.some((v) => v.id === e.venueId))

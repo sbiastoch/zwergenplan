@@ -10,10 +10,6 @@
       district: Altstadt
       ring: innen
       geo: { lat: 49.4521, lon: 11.0767 }
-  topics: [pekip, krabbelgruppe, elterncafe, babymassage]
-  formats: [kurs, regelmaessig, einmalig]
-  costs: [kostenlos, kostenpflichtig]
-  registrations: [mit-anmeldung, ohne-anmeldung]
   age: { minMonths: 0, maxMonths: 36 }
   programme:
     - url: "https://example.org/familientreff/programm"
@@ -31,10 +27,6 @@
       district: Südstadt
       ring: aussen
       geo: { lat: 49.4362, lon: 11.0851 }
-  topics: [musik, singen]
-  formats: [kurs]
-  costs: [kostenpflichtig]
-  registrations: [mit-anmeldung]
   age: { minMonths: 4, maxMonths: 72 }
   programme:
     - url: "https://example.org/musikschule/kurse"
@@ -52,10 +44,6 @@
       district: Altstadt
       ring: innen
       geo: { lat: 49.4498, lon: 11.0812 }
-  topics: [vorlesen, bibliothek, singen]
-  formats: [regelmaessig]
-  costs: [kostenlos]
-  registrations: [ohne-anmeldung]
   programme:
     - url: "https://example.org/bibliothek/termine"
       kind: html
@@ -72,10 +60,6 @@
       district: Gostenhof
       ring: knapp-aussen
       geo: { lat: 49.4495, lon: 11.0601 }
-  topics: [theater, konzert]
-  formats: [einmalig]
-  costs: [kostenlos, kostenpflichtig]
-  registrations: [mit-anmeldung, ohne-anmeldung]
   programme:
     - url: "https://example.org/theater/spielplan"
       kind: js
@@ -93,10 +77,6 @@
       district: Südstadt
       ring: aussen
       geo: { lat: 49.4301, lon: 11.0892 }
-  topics: [eltern-kind-turnen, bewegung, eltern-kind-gruppe]
-  formats: [regelmaessig]
-  costs: [kostenpflichtig]
-  registrations: [mit-anmeldung]
   programme:
     - url: "https://example.org/gemeinde/gruppen"
       kind: html
@@ -120,10 +100,6 @@
       address: "Am Beispielpark 7, 90480 Nürnberg"
       ring: aussen
       geo: { lat: 49.4502, lon: 11.1301 }
-  topics: [eltern-kind-turnen, bewegung]
-  formats: [kurs]
-  costs: [kostenpflichtig]
-  registrations: [mit-anmeldung]
   programme:
     - url: "https://example.org/turnverein"
       kind: html
@@ -134,11 +110,6 @@
   role: aggregator
   name: "Sammelkalender Beispiel (fiktiv)"
   url: "https://example.org/sammelkalender"
-  venues: []
-  topics: [krabbelgruppe]
-  formats: [regelmaessig]
-  costs: [kostenlos]
-  registrations: [ohne-anmeldung]
   programme:
     - url: "https://example.org/sammelkalender/termine"
       kind: html

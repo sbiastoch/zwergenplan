@@ -1,6 +1,6 @@
 # Plan 0030 – Katalog entrümpeln: keine Anbieter-Facetten, Felder nach Rolle, Notizen als Liste
 
-Status: Review eingearbeitet (2026-10-10, ein Durchgang, kein Blocker)
+Status: in Umsetzung (2026-10-10; Plan-Review ein Durchgang ohne Blocker, eingearbeitet)
 Datum: 2026-10-10
 Bezug: ADR 0003 (Datenmodell), ADR 0006 (Recherche-Pipeline, ein Katalogformat), ADR 0022 (Entwurf, stabile IDs; wird hier nicht berührt), Plan 0010 (Anbieterübersicht, E6 Kategorien), Plan 0026 (Vorschauseiten der Anbieter); neu: ADR 0024
 
@@ -61,7 +61,7 @@ Gemeinsame Felder aller Rollen (`sourceBase`): `name`, `url`, `programme`, `avai
 - Folge, akzeptiert mit N2: Ein Anbieter ohne kommende Angebote zeigt im Sheet keine Kategorienzeile (die Zeile entfällt bei leerer Liste schon heute, `ProviderSheet.tsx`), und seine Vorschauseite nennt keine Kategorien. Betroffen sind am 2026-10-10 10 der 74 Anbieter. Die Anbieterliste zeigt keine Kategorien und ändert sich nicht.
 - Die Vorschauseite nimmt wie das Sheet nur die **kommenden** Angebote ab `generatedAt` (`providerOffers`), damit beide dasselbe zeigen (Review m1).
 - Alte `anbieter.json` im Cache des Service Workers mit `topics` schadet nicht: Das Feld wird nicht mehr gelesen.
-- **Umgekehrt (Review M1):** Ein offener Tab mit altem Code lädt nach dem Deploy die neue `anbieter.json`. Weil `offers.json` und damit `generatedAt` gleich bleiben, lädt `ensureFresh` nichts nach, und der alte Code rechnet `[...provider.topics]` → Absturz. Deshalb schreibt `scripts/build-data.ts` beim Serialisieren von `anbieter.json` für eine Übergangszeit `topics: []` je Anbieter dazu (Kommentar mit Plan-Verweis). Domänentyp und `toProviderDirectory` kennen das Feld nicht mehr. Das Entfernen steht als Restpunkt in `docs/ideas.md` („nach dem nächsten Datenlauf mit neuem `generatedAt`“).
+- **Umgekehrt (Review M1):** Ein offener Tab mit altem Code lädt nach dem Deploy die neue `anbieter.json`. Weil `offers.json` und damit `generatedAt` gleich bleiben, lädt `ensureFresh` nichts nach, und der alte Code rechnet `[...provider.topics]` → Absturz. Deshalb schreibt `scripts/build-data.ts` beim Serialisieren von `anbieter.json` für eine Übergangszeit `topics: []` je Anbieter dazu (Kommentar mit Plan-Verweis). Domänentyp und `toProviderDirectory` kennen das Feld nicht mehr. Das Entfernen steht als Restpunkt in `docs/ideas.md` (frühestens einen Tag nach dem Deploy; Arch-Review m2).
 
 ### E3 Pipeline ohne Rückfallwerte (`scripts/pipeline/lib/draft.ts`)
 
@@ -69,14 +69,15 @@ Gemeinsame Felder aller Rollen (`sourceBase`): `name`, `url`, `programme`, `avai
   - `format`: regelmäßig nur noch bei `c.weekly` oder `looksRegular(c.occurrences)`; der Rückfall „Anbieter bietet nur `regelmaessig`“ entfällt. Der Skill lässt das abgeleitete Format ohnehin prüfen (`SKILL.md`, Schritt `keep`).
   - `cost`: `kostenlos` bei Freitext-Treffer, sonst offen. `registration`: aus dem Kandidaten, sonst offen. Offene Felder meldet `keep` schon heute.
   - `topics`: aus dem Text. Hat keines eine Kategorie, kommt `topics` in die Liste `open` (Review M2).
+  - Ohne erkannten Rhythmus kommt `format` (`einmalig`) in `open` (Arch-Review m1).
   - Der Parameter `provider` entfällt (Review m7), Aufruf in `cli.ts` anpassen.
 - `validateRaw` (`raw.ts`) prüft zusätzlich die Offer-Regel „mindestens ein Thema mit Kategorie“ als Fehler mit Pfad `topics`. Bisher fiel das erst in `pipeline build` auf, weil `RawEvent` aus `OfferFields` ohne die Querprüfungen gebaut ist (Review M2).
 - `providerFromCandidate` (`candidates add-provider`): ohne Facetten; `notes` als Liste mit einem Eintrag. Der bisherige Text „Kosten/Anmeldung/Format aus einem Termin abgeleitet – prüfen“ entfällt mit den Feldern.
 
 ### E4 Übrige Code-Stellen
 
-- `appendToCatalog` (`scripts/pipeline/io/files.ts`) setzt Listen aus Skalaren im ganzen Dokument auf Flow-Stil; `notes` wird davon ausgenommen, sonst würde der nächste `add-provider` alle Notizlisten in eine Zeile ziehen (Review M4, mit Test).
-- `batchProviders` (`files.ts`) liest aus einem Paket nur noch die `id`s (`z.array(z.object({ id: z.string() }).loose())`), damit Pakete eines vor der Migration begonnenen Laufs lesbar bleiben (Review M5, mit Test).
+- `appendToCatalog` (`scripts/pipeline/io/files.ts`, die Logik wandert als reine Funktion `appendEntries` nach `scripts/pipeline/lib/catalog-yaml.ts`, damit sie ohne Dateizugriff testbar ist) setzt Listen aus Skalaren im ganzen Dokument auf Flow-Stil; `notes` wird davon ausgenommen, sonst würde der nächste `add-provider` alle Notizlisten in eine Zeile ziehen (Review M4, mit Test).
+- `batchProviders` (`files.ts`, Kern `providerIdsOf` ebenfalls in `catalog-yaml.ts`) liest aus einem Paket nur noch die `id`s (`z.array(z.object({ id: z.string() }).loose())`), damit Pakete eines vor der Migration begonnenen Laufs lesbar bleiben (Review M5, mit Test).
 
 Alle Zugriffe auf `venues` setzen `role === "anbieter"` voraus: `validateDataset` (Ort-IDs, Orte gehören dem Anbieter), `toSiteData`, `toProviderDirectory`, `raw.ts` (Ort gehört zum Anbieter), `build-offers.ts` (Geo-Karte, Vorstands-Prüfung), `share-pages.ts` (Stadtteile). Was der Typcheck nach E1 meldet, wird über `Anbieter` verengt, nicht per Cast.
 
@@ -140,3 +141,21 @@ Läuft auf `data/providers.yaml` und `tests/fixtures/providers.yaml`. Danach `pn
 
 Abgelehnt:
 - m6 (Notiz „Adresse = Sitz …“ bei `kath-stadtkirche-familiengottesdienste`): Der Eintrag hatte schon vorher `venues: []`; die Notiz beschreibt den Sitz des Sammelkalenders, nicht einen gelöschten Ort, und bleibt richtig.
+
+## Arch-Review (2026-10-10) – Verdict: OK
+
+Übernommen, alle vier Minor:
+- m1 vermutetes `einmalig` steht in `open`; ADR 0024 und Test angepasst.
+- m2 Begründung und Abbaukriterium für `topics: []`: frühestens einen Tag nach dem Deploy, wegen Tabs mit altem Code (Kommentar, `docs/ideas.md`, ADR).
+- m3 Statuszeile „in Umsetzung“.
+- m4 `Note` verlangt ein Nicht-Leerzeichen, Testfall `[" "]`.
+
+## Browser-Review (2026-10-10, lokal, Fixture-Build)
+
+Ansichten: `anbieter-sheet` (volle Matrix aus `scripts/screenshots.ts`) und das Sheet des Turnvereins ohne Angebote (`?anbieter=turnverein-beispiel`) bei 320×640, 390×844 und 915×412, jeweils hell und dunkel.
+- Lesbarkeit: Ohne Kategorienzeile folgt „Website & Programm“ mit dem üblichen Abstand auf den Namen; nichts rückt zusammen. Mit Angeboten (Bibliothek) steht die Zeile aus den Angeboten wie bisher („Musik & Singen · Bücher & Vorlesen“).
+- Daumen-Erreichbarkeit: unverändert, „Teilen“ und „Schließen“ unten.
+- Zustände: leerer Zustand „Kommende Angebote (0)“ bricht bei 320 px nicht; langer Name umbricht zweizeilig neben dem Herz.
+- Dark Mode: keine hellen Inseln, Kontrast wie hell.
+- Micro-Interactions und Design-System: keine neuen Bedienelemente.
+Befunde: keine.

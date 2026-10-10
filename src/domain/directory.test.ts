@@ -21,7 +21,6 @@ const TURNVEREIN: SiteProvider = {
   id: "turnverein-beispiel",
   name: "Turnverein Beispiel (fiktiv)",
   url: "https://example.org/turnverein",
-  topics: ["eltern-kind-turnen", "bewegung"],
   venues: [
     { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
     { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
@@ -191,7 +190,6 @@ describe("providerRows", () => {
     expect(theater?.provider).toEqual({
       id: "theater-beispiel",
       name: "Kleines Theater Beispiel (fiktiv)",
-      topics: ["theater", "konzert", "musik"],
       venues: [{ name: "Kleines Theater Beispiel", address: "Bühnenplatz 2, 90429 Nürnberg", district: "Gostenhof" }],
     });
     expect(theater?.provider.url).toBeUndefined();
@@ -215,7 +213,6 @@ describe("providerRows", () => {
       id,
       name,
       url: "https://example.org",
-      topics: [],
       venues: [],
     });
     const result = providerRows({
@@ -301,16 +298,15 @@ describe("hasOffersOutside", () => {
 });
 
 describe("providerCategories", () => {
-  it("vereinigt Katalog-Themen und Themen der Angebote (Theater: Musik & Singen, Bühne & Konzert)", () => {
-    const theater = catalog.find((p) => p.id === "theater-beispiel");
-    if (!theater) throw new Error("Theater fehlt");
-    const own = providerOffers(offers, theater.id, FIXTURE_NOW);
-    expect(providerCategories(theater, own)).toEqual(["musik", "buehne"]);
-    expect(providerCategories(theater, [])).toEqual(["buehne"]);
+  it("leitet die Kategorien nur aus den Angeboten ab (Plan 0030, Theater: Musik & Singen, Bühne & Konzert)", () => {
+    const own = providerOffers(offers, "theater-beispiel", FIXTURE_NOW);
+    expect(providerCategories("theater-beispiel", own)).toEqual(["musik", "buehne"]);
+    expect(providerCategories("theater-beispiel", [])).toEqual([]);
   });
 
-  it("zählt nur Angebote dieses Anbieters", () => {
-    expect(providerCategories(TURNVEREIN, upcoming)).toEqual(["bewegung"]);
+  it("zählt nur Angebote dieses Anbieters; ohne eigene Angebote keine Kategorien", () => {
+    expect(providerCategories("turnverein-beispiel", upcoming)).toEqual([]);
+    expect(providerCategories("theater-beispiel", upcoming)).toEqual(["musik", "buehne"]);
   });
 });
 

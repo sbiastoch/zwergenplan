@@ -35,13 +35,6 @@ export const Venue = z.strictObject({
   // `nearestStops` (ADR 0005) entfällt: nächste Halte sind ein abgeleiteter Wert (ADR 0011, Plan 0009 E12).
 });
 
-/** Liste ohne Dubletten */
-const uniqueList = <T extends z.ZodType>(item: T) =>
-  z
-    .array(item)
-    .min(1)
-    .refine((xs) => new Set(xs).size === xs.length, "Werte doppelt");
-
 /** Alter, das ein Anbieter insgesamt bedient (inklusiv, vollendete Monate) – auch über 3 Jahre hinaus. */
 export const ProviderAge = z
   .strictObject({ minMonths: z.int().min(0).max(216), maxMonths: z.int().min(0).max(216) })
@@ -53,24 +46,29 @@ const Programme = z.strictObject({
   note: z.string().optional(),
 });
 
-const providerBase = {
+/** Eine Notiz je Eintrag; „ | “ klebte früher mehrere zusammen (Plan 0030). */
+const Note = z
+  .string()
+  .regex(/\S/, "Notiz ohne Text")
+  .refine((n) => !n.includes(" | "), "eine Notiz je Eintrag, kein „ | “");
+
+/**
+ * Was jeder Katalog-Eintrag als QUELLE hat (Plan 0030, ADR 0024). Inhalte (Themen, Format, Kosten, Anmeldung)
+ * stehen nur an den Angeboten.
+ */
+const sourceBase = {
   name: z.string().min(1),
   url: z.url(),
-  topics: z.array(Topic).min(1),
-  age: ProviderAge.optional(),
-  formats: uniqueList(Format),
-  costs: uniqueList(Cost),
-  registrations: uniqueList(Registration),
   /** ALLE Stellen, an denen Termine stehen */
   programme: z.array(Programme).min(1),
   availability: z.strictObject({
     shown: z.enum(["ja", "teilweise", "nein", "unbekannt"]),
-    how: z.string().optional(),
+    how: z.string().regex(/\p{L}/u, "Text erwartet, kein Platzhalter").optional(),
     system: z.string().optional(),
   }),
   /** Datum der letzten Live-Prüfung */
   verified: IsoDate,
-  notes: z.string().optional(),
+  notes: z.array(Note).min(1).optional(),
 };
 
 /** Sammelkalender mit eigenem Abfrage-Adapter in scripts/pipeline (Plan 0002). */
@@ -86,7 +84,8 @@ export const Provider = z.discriminatedUnion("role", [
   z.strictObject({
     id: kebab,
     role: z.literal("anbieter"),
-    ...providerBase,
+    ...sourceBase,
+    age: ProviderAge.optional(),
     venues: z.array(Venue).min(1),
     /** Termine kommen vollständig über diesen Sammelkalender (eigene Seite wird nicht abgefragt) */
     coveredBy: kebab.optional(),
@@ -94,11 +93,10 @@ export const Provider = z.discriminatedUnion("role", [
   z.strictObject({
     id: kebab,
     role: z.literal("aggregator"),
-    ...providerBase,
-    venues: z.array(Venue),
+    ...sourceBase,
     adapter: z.enum(AGGREGATOR_ADAPTERS).optional(),
   }),
-  z.strictObject({ id: kebab, role: z.literal("verzeichnis"), ...providerBase, venues: z.array(Venue) }),
+  z.strictObject({ id: kebab, role: z.literal("verzeichnis"), ...sourceBase }),
 ]);
 
 export const Session = z
@@ -237,6 +235,8 @@ export const Timetable = z
 
 export type Venue = z.infer<typeof Venue>;
 export type Provider = z.infer<typeof Provider>;
+/** Katalog-Eintrag, der selbst veranstaltet: nur er hat Orte und Angebote */
+export type Anbieter = Extract<Provider, { role: "anbieter" }>;
 export type ProviderAge = z.infer<typeof ProviderAge>;
 export type Session = z.infer<typeof Session>;
 export type AgeRange = z.infer<typeof AgeRange>;

@@ -178,7 +178,6 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
     id: "familientreff-beispiel",
     name: "Familientreff Beispielhof (fiktiv)",
     url: "https://example.org/",
-    topics: ["pekip", "krabbelgruppe", "elterncafe", "babymassage"],
     venues: [{ name: "Familientreff Beispielhof", address: "Beispielweg 1", district: "Altstadt" }],
   };
 
@@ -195,7 +194,20 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
 
   it("ohne kommende Angebote", () => {
     const page = providerSharePage(provider, offers, "2027-06-01T06:00:00+02:00");
-    expect(meta(page.html, "og:description")).toMatch(/^Im Zwergenplan · Babykurse/);
+    // wie das Sheet: Kategorien nur aus kommenden Angeboten (Plan 0030, Review m1)
+    expect(meta(page.html, "og:description")).toBe("Im Zwergenplan · Altstadt");
+  });
+
+  it("ohne eigene Angebote keine Kategorien, nur Stadtteile (Plan 0030)", () => {
+    const turnverein: SiteProvider = {
+      id: "turnverein-beispiel",
+      name: "Turnverein Beispiel (fiktiv)",
+      url: "https://example.org/turnverein",
+      venues: [{ name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" }],
+    };
+    expect(meta(providerSharePage(turnverein, offers, GENERATED_AT).html, "og:description")).toBe(
+      "Im Zwergenplan · Schweinau",
+    );
   });
 });
 

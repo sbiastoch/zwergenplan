@@ -7,6 +7,7 @@ Der Vertrag ist `Provider` in `src/domain/schema.ts`, exportiert als `schema/pro
 - `anbieter` veranstaltet selbst. Er hat mindestens einen Ort und als Einziger Angebote. `coveredBy: <aggregator>` heißt, dass seine Termine vollständig über diesen Sammelkalender kommen und kein Subagent seine Seite prüft.
 - `aggregator` ist ein Sammelkalender fremder Veranstalter. Mit `adapter` fragt ihn `candidates fetch` ab. Ohne Adapter ist er nur eine Quelle für die Pflege.
 - `verzeichnis` ist eine Liste zur Katalogpflege und liefert keine Termine.
+- Der Katalog beschreibt Quellen, nicht Inhalte (ADR 0024). Alle Rollen haben `name`, `url`, `programme`, `availability`, `verified` und `notes`. Nur `anbieter` hat `age`, `venues` und `coveredBy`, nur `aggregator` hat `adapter`. Themen, Format, Kosten und Anmeldung stehen nur an den Angeboten.
 
 ## Orte (`venues`)
 
@@ -27,7 +28,8 @@ Nach jeder Prüfung bekommt `verified` das heutige Datum.
 
 ## Konventionen
 
-- `formats`, `costs` und `registrations` beschreiben, was der Anbieter **insgesamt** anbietet. Ein offener Treff ist `regelmaessig` + `ohne-anmeldung`.
 - `age` gilt in vollendeten Monaten und darf über 36 hinausgehen.
-- Anmeldestart und -schluss stehen in `notes` als `Anmeldestart: … | Anmeldeschluss: …` (Regel, Datum oder Verweis).
+- `notes` ist eine Liste mit einer Notiz je Eintrag. Neue Erkenntnisse kommen als neuer Eintrag dazu, nie mit „ | “ angehängt.
+- Anmeldestart und -schluss stehen je als eigener Eintrag in `notes`: `Anmeldestart: …`, `Anmeldeschluss: …` (Regel, Datum oder Verweis).
+- `availability.how` lässt man weg, wenn es nichts zu sagen gibt; Platzhalter wie „-“ lehnt das Schema ab.
 - `references/excluded.md` listet geprüfte und bewusst nicht aufgenommene Anbieter. Diese kommen nur bei veränderter Lage wieder in den Katalog.

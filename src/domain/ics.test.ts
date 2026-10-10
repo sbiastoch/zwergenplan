@@ -4,10 +4,10 @@ import { escapeText, foldLine, icsContextFor, icsForCollection, icsForSeries, ic
 import { toSiteData } from "./site-data.ts";
 import { fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
-const { providers, file } = loadFixtures();
+const { anbieter, file } = loadFixtures();
 function ctxFor(offerId: string) {
   const offer = file.offers.find((o) => o.id === offerId);
-  const provider = providers.find((p) => p.id === offer?.providerId);
+  const provider = anbieter.find((p) => p.id === offer?.providerId);
   const venue = provider?.venues.find((v) => v.id === offer?.venueId);
   if (!provider || !venue) throw new Error("Fixture unvollständig");
   return { providerName: provider.name, venue, stamp: file.generatedAt };
@@ -110,7 +110,7 @@ function veventBlocks(ics: string): string[] {
 }
 
 describe("ADR 0007: Sammel-ICS und statische Dateien sind dieselben VEVENTs", () => {
-  const site = toSiteData(providers, file);
+  const site = toSiteData(anbieter, file);
 
   it("leitet den Kontext aus dem denormalisierten Angebot und dem Datenstand ab", () => {
     const pekip = site.offers.find((o) => o.id === fixtureOffer("pekip-herbst").id);

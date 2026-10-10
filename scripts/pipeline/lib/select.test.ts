@@ -3,13 +3,17 @@ import type { Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import { nextBatchFiles, selectBatches } from "./select.ts";
 
-const { providers } = loadFixtures();
-const [first] = providers as [Provider];
+const { providers, anbieter } = loadFixtures();
+function fail(): never {
+  throw new Error("Fixture");
+}
+const { name, url, programme, availability, verified } = anbieter[0] ?? fail();
+const source = { name, url, programme, availability, verified };
 const catalog: Provider[] = [
   ...providers.map((p) => (p.id === "theater-beispiel" ? { ...p, coveredBy: "kalender" } : p)),
-  { ...first, id: "kalender", role: "aggregator", adapter: "stadt-vk", venues: [] },
-  { ...first, id: "anderer-kalender", role: "aggregator", venues: [] },
-  { ...first, id: "liste", role: "verzeichnis", venues: [] },
+  { ...source, id: "kalender", role: "aggregator", adapter: "stadt-vk" },
+  { ...source, id: "anderer-kalender", role: "aggregator" },
+  { ...source, id: "liste", role: "verzeichnis" },
 ];
 
 describe("selectBatches", () => {

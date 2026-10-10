@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { isMap, isPair, isScalar, isSeq, parse, parseDocument, visit } from "yaml";
+import { parse } from "yaml";
 import {
   type OffersFile,
   OffersFile as OffersFileSchema,
@@ -12,6 +12,7 @@ import {
 } from "../../../src/domain/schema.ts";
 import { toBerlinIso } from "../../../src/domain/time.ts";
 import { type Candidate, CandidatesFile, SOURCES, type Source } from "../lib/candidate.ts";
+import { appendEntries, providerIdsOf } from "../lib/catalog-yaml.ts";
 import { type RunMeta, RunMeta as RunMetaSchema, type SourceStatus, SourceStatusFile } from "../lib/run.ts";
 
 export const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -36,16 +37,7 @@ export function readCatalog(): Provider[] {
 
 /** Hängt Einträge an den Katalog an, ohne Formatierung und Kommentare der übrigen zu ändern. */
 export function appendToCatalog(entries: readonly Provider[]): void {
-  const doc = parseDocument(readFileSync(CATALOG, "utf8"));
-  for (const e of entries) doc.add(doc.createNode(e));
-  visit(doc, {
-    Pair(_, pair) {
-      if (!isPair(pair) || !isScalar(pair.key)) return;
-      if (pair.key.value === "geo" && isMap(pair.value)) pair.value.flow = true;
-      if (isSeq(pair.value) && pair.value.items.every(isScalar)) pair.value.flow = true;
-    },
-  });
-  writeFileSync(CATALOG, doc.toString({ lineWidth: 0 }));
+  writeFileSync(CATALOG, appendEntries(readFileSync(CATALOG, "utf8"), entries));
 }
 
 export function readPreviousOffers(): OffersFile | undefined {
@@ -78,7 +70,7 @@ export function sourceStatus(runDir: string): Partial<Record<Source, SourceStatu
 
 /** Anbieter-IDs eines Pakets (batch-<n>.json). */
 export function batchProviders(file: string): string[] {
-  return ProvidersFile.parse(readJson(file)).map((p) => p.id);
+  return providerIdsOf(readJson(file));
 }
 
 /** Prüfzeitpunkt einer Rohdatei = ihre Änderungszeit (kein Agent schreibt eine Uhrzeit). */

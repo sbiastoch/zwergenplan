@@ -119,11 +119,6 @@ describe("validateDataset", () => {
       adapter: "evtermine",
       name: "Sammelkalender (fiktiv)",
       url: "https://example.org/kalender",
-      venues: [],
-      topics: ["krabbelgruppe"],
-      formats: ["regelmaessig"],
-      costs: ["kostenlos"],
-      registrations: ["ohne-anmeldung"],
       programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
       availability: { shown: "nein" },
       verified: "2026-10-04",
@@ -149,13 +144,69 @@ describe("validateDataset", () => {
     expect(
       errorsOf(
         mutate((_o, p) => {
-          Object.assign(p[0] as object, { role: "aggregator" });
+          const { venues: _v, age: _a, ...source } = p[0] ?? {};
+          p[0] = { ...source, role: "aggregator" };
         }),
       ),
     ).toContain("ist kein Anbieter (aggregator)");
-    expect(errorsOf(mutate((_o, p) => Object.assign(p[1] as object, { costs: ["kostenlos", "kostenlos"] })))).toContain(
-      "doppelt",
-    );
+  });
+
+  // Plan 0030: Der Katalog beschreibt Quellen, die Angebote Inhalte; jede Rolle nur mit ihren Feldern.
+  it.each([
+    [
+      "Facette am Anbieter",
+      (p: Array<Record<string, unknown>>) => Object.assign(p[0] as object, { topics: ["pekip"] }),
+      "topics",
+    ],
+    [
+      "Facette costs",
+      (p: Array<Record<string, unknown>>) => Object.assign(p[0] as object, { costs: ["kostenlos"] }),
+      "costs",
+    ],
+    [
+      "Orte am Sammelkalender",
+      (p: Array<Record<string, unknown>>) => Object.assign(p.at(-1) as object, { venues: [] }),
+      "venues",
+    ],
+    [
+      "Alter am Sammelkalender",
+      (p: Array<Record<string, unknown>>) =>
+        Object.assign(p.at(-1) as object, { age: { minMonths: 0, maxMonths: 36 } }),
+      "age",
+    ],
+    [
+      "Platzhalter in availability.how",
+      (p: Array<Record<string, unknown>>) =>
+        Object.assign(p[0] as object, { availability: { shown: "nein", how: "-" } }),
+      "Platzhalter",
+    ],
+    [
+      "Notiz als String",
+      (p: Array<Record<string, unknown>>) => Object.assign(p[0] as object, { notes: "a | b" }),
+      "notes",
+    ],
+    ["leere Notizliste", (p: Array<Record<string, unknown>>) => Object.assign(p[0] as object, { notes: [] }), "notes"],
+    ["leere Notiz", (p: Array<Record<string, unknown>>) => Object.assign(p[0] as object, { notes: [""] }), "notes"],
+    [
+      "Notiz nur aus Leerzeichen",
+      (p: Array<Record<string, unknown>>) => Object.assign(p[0] as object, { notes: [" "] }),
+      "notes",
+    ],
+  ])("Katalog: %s → Fehler", (_name, fn, expected) => {
+    expect(errorsOf(mutate((_o, p) => fn(p)))).toContain(expected);
+  });
+
+  it("Katalog: Notizen als Liste, availability.how mit Text", () => {
+    expect(
+      errorsOf(
+        mutate((_o, p) =>
+          Object.assign(p[0] as object, {
+            notes: ["Anmeldestart: Mitte August", "Anmeldeschluss: eine Woche vorher"],
+            availability: { shown: "nein", how: "keine Angabe" },
+          }),
+        ),
+      ),
+    ).toBe("");
   });
 
   it("weist komplett vergangene Angebote und Prüfzeitpunkte nach generatedAt ab", () => {

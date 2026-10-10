@@ -47,6 +47,11 @@ describe("validateRaw", () => {
     expect(errors(r).join("\n")).toContain("events.0 („Offener Krabbeltreff“).format");
   });
 
+  it("verlangt ein Thema mit Kategorie, wie das Angebot (Plan 0030, Review M2)", () => {
+    const r = validateRaw(batch([{ ...treff, topics: ["vaeter"] }]), ctx);
+    expect(errors(r).join("\n")).toContain("events.0 („Offener Krabbeltreff“).topics: mindestens ein Thema");
+  });
+
   it("prüft Katalog-Referenzen", () => {
     const r = validateRaw(
       batch([
@@ -120,7 +125,15 @@ describe("validateRaw", () => {
       ...ctx,
       providers: [
         ...providers,
-        { ...(providers[0] as (typeof providers)[number]), id: "agg", role: "aggregator", venues: [] },
+        {
+          id: "agg",
+          role: "aggregator",
+          name: "Sammelkalender (fiktiv)",
+          url: "https://example.org/agg",
+          programme: [{ url: "https://example.org/agg", kind: "html" }],
+          availability: { shown: "nein" },
+          verified: "2026-10-04",
+        },
       ],
     };
     expect(errors(validateRaw(batch([{ ...treff, providerId: "agg" }]), withAggregator))).toEqual([

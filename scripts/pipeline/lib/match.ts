@@ -3,11 +3,9 @@
  * Nur Orte von Anbietern (role: anbieter) – Aggregatoren und Verzeichnisse haben keine Angebote.
  * Liefert einen VORSCHLAG; der Orchestrator bestätigt oder überschreibt ihn bei `candidates keep`.
  */
-import type { Provider, Venue } from "../../../src/domain/schema.ts";
+import type { Anbieter, Provider, Venue } from "../../../src/domain/schema.ts";
 import type { Candidate } from "./candidate.ts";
 import { ratio } from "./similar.ts";
-
-type Anbieter = Extract<Provider, { role: "anbieter" }>;
 
 export type Match =
   | { kind: "ok"; providerId: string; venueId: string; via: string }

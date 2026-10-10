@@ -6,8 +6,6 @@ import type { Candidate } from "./candidate.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate, registrationOf } from "./draft.ts";
 
 const { providers } = loadFixtures();
-const familientreff = providers.find((p) => p.id === "familientreff-beispiel") as Provider; // alle Formate/Kosten
-const bibliothek = providers.find((p) => p.id === "stadtbibliothek-beispiel") as Provider; // nur regelmäßig, kostenlos, ohne Anmeldung
 const target = { providerId: "familientreff-beispiel", venueId: "familientreff-beispiel-haus" };
 
 const cand = (over: Partial<Candidate>): Candidate => ({
@@ -47,7 +45,6 @@ describe("draftFromCandidate", () => {
         description: "ohne Anmeldung",
       }),
       target,
-      familientreff,
     );
     expect(d?.event).toMatchObject({
       ...target,
@@ -64,11 +61,12 @@ describe("draftFromCandidate", () => {
     expect(d?.open).toEqual(["summary", "cost"]);
   });
 
-  it("nimmt Werte vom Anbieter, wenn er nur einen kennt", () => {
-    const d = draftFromCandidate(cand({ title: "Fingerspiele" }), target, bibliothek);
-    expect(d?.event).toMatchObject({ format: "regelmaessig", cost: "kostenlos", registration: "ohne-anmeldung" });
-    expect(d?.event["topics"]).toEqual(["vorlesen", "bibliothek", "singen"]); // Text ohne Kategorie → Anbieterthemen
-    expect(d?.open).toEqual(["summary"]);
+  it("ohne Rückfall aus dem Katalog: Format, Kosten, Anmeldung und Themen bleiben offen (Plan 0030)", () => {
+    const d = draftFromCandidate(cand({ title: "Fingerspiele" }), target);
+    expect(d?.event).toMatchObject({ format: "einmalig", topics: [] });
+    expect(d?.event["cost"]).toBeUndefined();
+    expect(d?.event["registration"]).toBeUndefined();
+    expect(d?.open).toEqual(["summary", "topics", "format", "registration", "cost"]);
   });
 
   it("Einzeltermin, Preis, Ticketlink, Warteliste, ausverkauft, Anmeldung laut Quelle", () => {
@@ -81,7 +79,6 @@ describe("draftFromCandidate", () => {
         registrationRequired: true,
       }),
       target,
-      familientreff,
     );
     expect(d?.event).toMatchObject({
       format: "einmalig",
@@ -90,24 +87,33 @@ describe("draftFromCandidate", () => {
       url: "https://tickets.example/1",
       availability: { status: "unbekannt", note: "Plätze/Anmeldung: siehe https://tickets.example/1" },
     });
-    expect(draftFromCandidate(cand({ soldOut: true }), target, familientreff)?.event["availability"]).toEqual({
+    expect(draftFromCandidate(cand({ soldOut: true }), target)?.event["availability"]).toEqual({
       status: "ausgebucht",
     });
-    expect(draftFromCandidate(cand({ waitlist: true }), target, familientreff)?.event["availability"]).toEqual({
+    expect(draftFromCandidate(cand({ waitlist: true }), target)?.event["availability"]).toEqual({
       status: "warteliste",
     });
-    expect(draftFromCandidate(cand({ cost: "Eintritt frei" }), target, familientreff)?.event).toMatchObject({
+    expect(draftFromCandidate(cand({ cost: "Eintritt frei" }), target)?.event).toMatchObject({
       cost: "kostenlos",
     });
   });
 
   it("lässt Abgesagtes weg", () => {
-    expect(draftFromCandidate(cand({ cancelled: true }), target, familientreff)).toBeUndefined();
+    expect(draftFromCandidate(cand({ cancelled: true }), target)).toBeUndefined();
   });
 });
 
 describe("providerFromCandidate", () => {
-  const kalender: Provider = { ...familientreff, id: "fk", role: "aggregator", adapter: "frankenkids", venues: [] };
+  const kalender: Provider = {
+    id: "fk",
+    role: "aggregator",
+    adapter: "frankenkids",
+    name: "Sammelkalender (fiktiv)",
+    url: "https://example.org/fk",
+    programme: [{ url: "https://example.org/fk", kind: "html" }],
+    availability: { shown: "nein" },
+    verified: "2026-10-04",
+  };
   it("baut einen gültigen Anbieter mit Hauptort, Ring und coveredBy", () => {
     const p = providerFromCandidate(
       cand({
@@ -131,13 +137,11 @@ describe("providerFromCandidate", () => {
       role: "anbieter",
       name: "IMILUV Studio",
       url: "https://imiluv.de",
-      topics: ["fitness-mit-baby"],
-      formats: ["regelmaessig"],
-      costs: ["kostenpflichtig"],
-      registrations: ["mit-anmeldung"],
       coveredBy: "fk",
       verified: "2026-10-04",
     });
+    for (const facet of ["topics", "formats", "costs", "registrations"]) expect(p).not.toHaveProperty(facet);
+    expect(p.notes).toEqual(["Aus frankenkids aufgenommen (https://example.org/detail)."]);
     expect(p.venues[0]).toMatchObject({ id: "imiluv-studio", district: "Nordstadt", ring: "aussen" });
     const r = validateDataset([...providers, kalender, p], {
       generatedAt: "2026-10-04T12:00:00+02:00",
@@ -147,15 +151,13 @@ describe("providerFromCandidate", () => {
     expect(r.ok ? [] : r.errors).toEqual([]);
   });
 
-  it("Fallbacks: Thema ohne Kategorie, Koordinaten als Adresse, kostenlos, ohne Sammelkalender", () => {
+  it("Fallbacks: Koordinaten als Adresse, ohne Sammelkalender", () => {
     const p = providerFromCandidate(cand({ title: "Papa-Frühstück", description: "kostenlos", organizer: "Verein" }), {
       id: "verein",
       geo: { lat: 49.45, lon: 11.08 },
       catalog: [],
       today: "2026-10-04",
     });
-    expect(p.topics).toEqual(["vaeter", "eltern-kind-gruppe"]);
-    expect(p.costs).toEqual(["kostenlos"]);
     expect(p.venues[0]?.address).toBe("49.45,11.08");
     expect(p.venues[0]?.district).toBeUndefined();
     expect(p.role === "anbieter" && p.coveredBy).toBeUndefined();

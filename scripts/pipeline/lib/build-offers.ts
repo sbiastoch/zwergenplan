@@ -178,7 +178,9 @@ function fromRaw(
 
 /** Gleicher Ort (≤ 50 m), gleicher Beginn, ähnlicher Titel, aber verschiedene Anbieter – meist derselbe Kurs zweimal erfasst. */
 function crossProviderDuplicates(offers: readonly Offer[], providers: readonly Provider[]): string[] {
-  const geo = new Map(providers.flatMap((p) => p.venues.map((v) => [v.id, v.geo] as const)));
+  const geo = new Map(
+    providers.flatMap((p) => (p.role === "anbieter" ? p.venues.map((v) => [v.id, v.geo] as const) : [])),
+  );
   const near = (a: string, b: string) => {
     const ga = geo.get(a);
     const gb = geo.get(b);
@@ -325,7 +327,8 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
   for (const old of previous) {
     const reason = carryReason(old.providerId);
     if (reason === undefined || ids.has(old.id)) continue;
-    const venueOk = providerById.get(old.providerId)?.venues.some((v) => v.id === old.venueId);
+    const owner = providerById.get(old.providerId);
+    const venueOk = owner?.role === "anbieter" && owner.venues.some((v) => v.id === old.venueId);
     if (!venueOk) continue;
     const sessions =
       old.format === "kurs" ? old.sessions : old.sessions.filter((s) => berlinDay(s.start) >= input.horizon.from);

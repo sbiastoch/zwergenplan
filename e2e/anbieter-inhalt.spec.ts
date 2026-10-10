@@ -196,7 +196,8 @@ test.describe("Anbieter-Sheet", () => {
     await openList(page);
     await row(page, TURNVEREIN).click();
     await expect(sheet(page).getByRole("heading", { level: 2 })).toHaveText(TURNVEREIN);
-    await expect(sheet(page).locator(".provider-cats")).toHaveText("Bewegung & Turnen");
+    // Kategorien nur aus Angeboten (Plan 0030): ohne Termine keine Kategorienzeile
+    await expect(sheet(page).locator(".provider-cats")).toHaveCount(0);
     await expect(
       sheet(page).getByText("Gerade stehen keine Termine im Zwergenplan. Auf der Website steht vielleicht mehr."),
     ).toBeVisible();

@@ -255,13 +255,14 @@ export function providerSharePage(
   generatedAt: string,
 ): SharePage {
   const ref = new Date(generatedAt);
-  // wie das Anbieter-Sheet: kommende Angebote und Kategorien aus Katalog und Angeboten (directory.ts)
-  const upcoming = providerOffers(offers, provider.id, ref).length;
+  // wie das Anbieter-Sheet: Zahl und Kategorien aus den kommenden Angeboten (directory.ts, Plan 0030)
+  const own = providerOffers(offers, provider.id, ref);
+  const upcoming = own.length;
   const count =
     upcoming === 0
       ? "Im Zwergenplan"
       : `${upcoming} ${upcoming === 1 ? "kommendes Angebot" : "kommende Angebote"} im Zwergenplan`;
-  const categories = providerCategories(provider, offers)
+  const categories = providerCategories(provider.id, own)
     .slice(0, MAX_LISTED)
     .map((c) => CATEGORY_LABELS[c]);
   const districts = [...new Set(provider.venues.flatMap((v) => (v.district ? [v.district] : [])))].slice(0, MAX_LISTED);

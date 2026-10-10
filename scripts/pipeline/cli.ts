@@ -203,7 +203,7 @@ function candidatesKeep(runDir: string, spec: string) {
       );
       continue;
     }
-    const draft = draftFromCandidate(c, { providerId: provider.id, venueId }, provider);
+    const draft = draftFromCandidate(c, { providerId: provider.id, venueId });
     if (!draft) {
       print(`  ${cid}: abgesagt – übersprungen`);
       continue;

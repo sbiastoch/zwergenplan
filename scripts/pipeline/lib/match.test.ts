@@ -1,20 +1,16 @@
 import { describe, expect, it } from "vitest";
-import type { Provider } from "../../../src/domain/schema.ts";
+import type { Anbieter, Provider } from "../../../src/domain/schema.ts";
 import type { Candidate } from "./candidate.ts";
 import { addressKey, matchCandidate } from "./match.ts";
 
 /** Auszug aus dem echten Katalog (Orte, Namen, Programm-URLs). */
-function anbieter(id: string, name: string, venues: Provider["venues"], programme: string[] = []): Provider {
+function anbieter(id: string, name: string, venues: Anbieter["venues"], programme: string[] = []): Anbieter {
   return {
     id,
     role: "anbieter",
     name,
     url: "https://example.org/",
     venues,
-    topics: ["krabbelgruppe"],
-    formats: ["regelmaessig"],
-    costs: ["kostenlos"],
-    registrations: ["ohne-anmeldung"],
     programme: programme.map((url) => ({ url, kind: "ical" as const })),
     availability: { shown: "nein" },
     verified: "2026-10-04",
@@ -124,7 +120,7 @@ describe("matchCandidate", () => {
 
   it("vid erkannt, aber mehrere Orte und keine Ortsangabe → offen; Name aus dem Ortsfeld", () => {
     const multi = catalog.map((p) =>
-      p.id === "ev-zerzabelshof-musikzwerge"
+      p.id === "ev-zerzabelshof-musikzwerge" && p.role === "anbieter"
         ? { ...p, venues: [...p.venues, venue("ev-zerzabelshof-saal", "Andere Str. 1, 90480 Nürnberg", 49.44, 11.12)] }
         : p,
     );

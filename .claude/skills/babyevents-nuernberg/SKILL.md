@@ -50,7 +50,7 @@ pnpm pipeline candidates list runs/<from>
 pnpm pipeline candidates keep runs/<from> <cid>,<cid>=<anbieter>/<ort>,…
 ```
 
-`keep` schreibt den Entwurf `raw/aggregatoren.json` und nennt je Event die offenen Felder. Fülle sie direkt in der Datei: `summary` in eigenen Worten (1–2 Sätze, was passiert), dazu `cost`/`registration`, falls offen. Prüfe dabei das abgeleitete `format`. Dann `pnpm pipeline validate-raw runs/<from>/raw/aggregatoren.json`.
+`keep` schreibt den Entwurf `raw/aggregatoren.json` und nennt je Event die offenen Felder. Fülle sie direkt in der Datei: `summary` in eigenen Worten (1–2 Sätze, was passiert), dazu `topics`, `cost` und `registration`, falls offen. Der Katalog liefert keine Rückfallwerte (ADR 0024). Prüfe dabei das abgeleitete `format`: Ein `einmalig` bei einer Reihe ergibt Einzeltermine mit anderer ID. Dann `pnpm pipeline validate-raw runs/<from>/raw/aggregatoren.json`.
 
 Fertig ist Schritt 2, wenn es für jedes `batch-<n>.json` ein `raw/batch-<n>.json` gibt und `validate-raw` für jede Rohdatei grün ist. Hat ein Subagent einen Anbieter ausgelassen, prüft ein neuer Subagent nur diesen: `pnpm pipeline select runs/<from> --only <id>` erzeugt ein zusätzliches Paket mit der nächsten freien Nummer, vorhandene Pakete bleiben unberührt.
 

@@ -6,7 +6,7 @@
 import { nextSession } from "./agenda.ts";
 import { compareReach, type Reach } from "./reach.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
-import { type Category, categoriesOf, type Topic } from "./topics.ts";
+import { type Category, categoriesOf } from "./topics.ts";
 
 /** aktiv: ≥ 1 sichtbares Angebot; ausgeblendet: kommende, aber keins passt zur Auswahl; ohne-termine: keine kommenden */
 type ProviderState = "aktiv" | "ausgeblendet" | "ohne-termine";
@@ -16,7 +16,6 @@ export interface ProviderEntry {
   id: string;
   name: string;
   url?: string;
-  topics: Topic[];
   venues: Array<{ name: string; address: string; district?: string }>;
 }
 
@@ -42,7 +41,7 @@ const placeName = (venue: { name: string; district?: string | undefined }) => ve
 
 /**
  * Rückfall-Eintrag aus den Angeboten eines Anbieters, der in `anbieter.json` fehlt (Datenstand weicht trotz Reload
- * ab, M4): Name und Orte aus den Angeboten, Themen aus den Angeboten, keine Website.
+ * ab, M4): Name und Orte aus den Angeboten, keine Website.
  */
 function fallbackEntry(own: readonly SiteOffer[]): ProviderEntry | undefined {
   const first = own[0];
@@ -55,7 +54,6 @@ function fallbackEntry(own: readonly SiteOffer[]): ProviderEntry | undefined {
   return {
     id: first.providerId,
     name: first.providerName,
-    topics: unique(own.flatMap((o) => o.topics)),
     venues: [...venues.values()],
   };
 }
@@ -181,13 +179,9 @@ export function findProvider(
   return providers.find((p) => p.id === providerId) ?? fallbackEntry(offers.filter((o) => o.providerId === providerId));
 }
 
-/**
- * Kategorien = Katalog-Themen ∪ Themen der Angebote dieses Anbieters (E6): Bei manchen Anbietern haben die Angebote
- * mehr Kategorien, als der Katalog nennt.
- */
-export function providerCategories(provider: ProviderEntry, offers: readonly SiteOffer[]): Category[] {
-  const own = offers.filter((o) => o.providerId === provider.id);
-  return categoriesOf([...provider.topics, ...own.flatMap((o) => o.topics)]);
+/** Kategorien aus den Themen der übergebenen Angebote dieses Anbieters; der Katalog führt keine (Plan 0030). */
+export function providerCategories(providerId: string, offers: readonly SiteOffer[]): Category[] {
+  return categoriesOf(offers.filter((o) => o.providerId === providerId).flatMap((o) => o.topics));
 }
 
 /**

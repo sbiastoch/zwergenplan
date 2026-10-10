@@ -60,7 +60,11 @@ write("data/site.json", JSON.stringify(site));
 write("data/meta.json", `${JSON.stringify(meta, null, 2)}\n`);
 // derselbe Datenstand wie site.json: Weicht er im Browser ab, lädt ensureFresh einmal neu (src/data/providers.ts)
 const directory = toProviderDirectory(result.providers, site.generatedAt);
-write("data/anbieter.json", JSON.stringify(directory));
+// Übergang (Plan 0030, Review M1): Ein Tab, der seit dem Deploy sichtbar blieb, läuft noch mit altem Code, der
+// `[...provider.topics]` rechnet. Erst `watchFreshness` hebt ihn auf neuen Code. Das leere Feld bleibt deshalb bis
+// frühestens einen Tag nach dem Deploy stehen (Restpunkt in docs/ideas.md).
+const legacyDirectory = { ...directory, providers: directory.providers.map((p) => ({ ...p, topics: [] })) };
+write("data/anbieter.json", JSON.stringify(legacyDirectory));
 
 let files = 0;
 for (const offer of site.offers) {

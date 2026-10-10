@@ -6,7 +6,7 @@ import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
 describe("toSiteData", () => {
-  const { providers, file } = loadFixtures();
+  const { providers, anbieter, file } = loadFixtures();
   const site = toSiteData(providers, file);
 
   it("ergänzt Anbietername und Ort", () => {
@@ -28,7 +28,7 @@ describe("toSiteData", () => {
   });
 
   it("lässt district weg, wenn der Ort keinen hat", () => {
-    const [first] = providers;
+    const [first] = anbieter;
     if (!first) throw new Error("Fixture");
     const { district: _omit, ...venue } = first.venues[0] ?? ({} as never);
     const site2 = toSiteData([{ ...first, venues: [venue] }], {
@@ -44,7 +44,7 @@ describe("toSiteData", () => {
 });
 
 describe("toProviderDirectory (Plan 0010, E6)", () => {
-  const { providers, file } = loadFixtures();
+  const { providers, anbieter, file } = loadFixtures();
   const directory = toProviderDirectory(providers, file.generatedAt);
 
   it("übernimmt den Datenstand von site.json", () => {
@@ -65,7 +65,7 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
   });
 
   it("sortiert Umlaute wie im Deutschen", () => {
-    const [first] = providers;
+    const [first] = anbieter;
     if (!first) throw new Error("Fixture");
     const named = ["Bad Beispiel", "Ärztehaus Beispiel", "Apotheke Beispiel"].map((name, i) => ({
       ...first,
@@ -81,13 +81,23 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
 
   it("liefert genau die Felder für Eltern, nichts aus der Recherche", () => {
     for (const p of directory.providers) {
-      expect(Object.keys(p).sort()).toEqual(["id", "name", "topics", "url", "venues"]);
+      expect(Object.keys(p).sort()).toEqual(["id", "name", "url", "venues"]);
       for (const v of p.venues) {
         expect(Object.keys(v).every((k) => ["name", "address", "district"].includes(k))).toBe(true);
       }
     }
     const json = JSON.stringify(directory);
-    for (const key of ["programme", "notes", "geo", "ring", "availability", "verified", "coveredBy", "role"]) {
+    for (const key of [
+      "topics",
+      "programme",
+      "notes",
+      "geo",
+      "ring",
+      "availability",
+      "verified",
+      "coveredBy",
+      "role",
+    ]) {
       expect(json).not.toContain(`"${key}"`);
     }
   });
@@ -98,7 +108,6 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
       id: "turnverein-beispiel",
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
-      topics: ["eltern-kind-turnen", "bewegung"],
       venues: [
         { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
         { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
@@ -158,8 +167,8 @@ describe("venueAddress", () => {
 });
 
 describe("toSiteData mit Ortsnamen in der Adresse (H6)", () => {
-  const { providers, file } = loadFixtures();
-  const [first] = providers;
+  const { anbieter, file } = loadFixtures();
+  const [first] = anbieter;
   if (!first) throw new Error("Fixture");
   const doubled = first.venues.map((v) => ({ ...v, name: "CVJM-Haus", address: `CVJM-Haus, ${v.address}` }));
   const site = toSiteData([{ ...first, venues: doubled }], {

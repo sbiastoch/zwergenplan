@@ -3,7 +3,7 @@ import type { ProviderRow } from "../../domain/directory.ts";
 import type { Reach } from "../../domain/reach.ts";
 import { hiddenProvidersText, idleLine, placesText, providerCountText, providerLine } from "./provider-format.ts";
 
-const provider = { id: "x", name: "X", topics: [], venues: [] };
+const provider = { id: "x", name: "X", venues: [] };
 const row = (overrides: Partial<ProviderRow> = {}): ProviderRow => ({
   provider,
   state: "aktiv",

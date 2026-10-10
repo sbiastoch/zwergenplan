@@ -23,107 +23,6 @@
             "type": "string",
             "format": "uri"
           },
-          "topics": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "pekip",
-                "fenkid",
-                "babymassage",
-                "babysignal",
-                "musik",
-                "singen",
-                "krabbelgruppe",
-                "spielgruppe",
-                "eltern-kind-gruppe",
-                "eltern-kind-turnen",
-                "bewegung",
-                "fitness-mit-baby",
-                "yoga-mit-baby",
-                "rueckbildung",
-                "spielplatz-indoor",
-                "tanz",
-                "waldgruppe",
-                "tiere-natur",
-                "kreativ",
-                "elterncafe",
-                "stillcafe",
-                "elterntreff",
-                "krabbelgottesdienst",
-                "vaeter",
-                "muetter",
-                "mehrsprachig",
-                "beratung",
-                "hebamme",
-                "erste-hilfe",
-                "beikost",
-                "babyschwimmen",
-                "kleinkindschwimmen",
-                "bibliothek",
-                "vorlesen",
-                "museum",
-                "kino",
-                "konzert",
-                "theater"
-              ]
-            }
-          },
-          "age": {
-            "type": "object",
-            "properties": {
-              "minMonths": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 216
-              },
-              "maxMonths": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 216
-              }
-            },
-            "required": [
-              "minMonths",
-              "maxMonths"
-            ],
-            "additionalProperties": false
-          },
-          "formats": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "kurs",
-                "regelmaessig",
-                "einmalig"
-              ]
-            }
-          },
-          "costs": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "kostenlos",
-                "kostenpflichtig"
-              ]
-            }
-          },
-          "registrations": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "mit-anmeldung",
-                "ohne-anmeldung"
-              ]
-            }
-          },
           "programme": {
             "minItems": 1,
             "type": "array",
@@ -168,7 +67,8 @@
                 ]
               },
               "how": {
-                "type": "string"
+                "type": "string",
+                "pattern": "\\p{L}"
               },
               "system": {
                 "type": "string"
@@ -185,7 +85,32 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
           "notes": {
-            "type": "string"
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "\\S"
+            }
+          },
+          "age": {
+            "type": "object",
+            "properties": {
+              "minMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              },
+              "maxMonths": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 216
+              }
+            },
+            "required": [
+              "minMonths",
+              "maxMonths"
+            ],
+            "additionalProperties": false
           },
           "venues": {
             "minItems": 1,
@@ -258,10 +183,6 @@
           "role",
           "name",
           "url",
-          "topics",
-          "formats",
-          "costs",
-          "registrations",
           "programme",
           "availability",
           "verified",
@@ -289,107 +210,6 @@
             "type": "string",
             "format": "uri"
           },
-          "topics": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "pekip",
-                "fenkid",
-                "babymassage",
-                "babysignal",
-                "musik",
-                "singen",
-                "krabbelgruppe",
-                "spielgruppe",
-                "eltern-kind-gruppe",
-                "eltern-kind-turnen",
-                "bewegung",
-                "fitness-mit-baby",
-                "yoga-mit-baby",
-                "rueckbildung",
-                "spielplatz-indoor",
-                "tanz",
-                "waldgruppe",
-                "tiere-natur",
-                "kreativ",
-                "elterncafe",
-                "stillcafe",
-                "elterntreff",
-                "krabbelgottesdienst",
-                "vaeter",
-                "muetter",
-                "mehrsprachig",
-                "beratung",
-                "hebamme",
-                "erste-hilfe",
-                "beikost",
-                "babyschwimmen",
-                "kleinkindschwimmen",
-                "bibliothek",
-                "vorlesen",
-                "museum",
-                "kino",
-                "konzert",
-                "theater"
-              ]
-            }
-          },
-          "age": {
-            "type": "object",
-            "properties": {
-              "minMonths": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 216
-              },
-              "maxMonths": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 216
-              }
-            },
-            "required": [
-              "minMonths",
-              "maxMonths"
-            ],
-            "additionalProperties": false
-          },
-          "formats": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "kurs",
-                "regelmaessig",
-                "einmalig"
-              ]
-            }
-          },
-          "costs": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "kostenlos",
-                "kostenpflichtig"
-              ]
-            }
-          },
-          "registrations": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "mit-anmeldung",
-                "ohne-anmeldung"
-              ]
-            }
-          },
           "programme": {
             "minItems": 1,
             "type": "array",
@@ -434,7 +254,8 @@
                 ]
               },
               "how": {
-                "type": "string"
+                "type": "string",
+                "pattern": "\\p{L}"
               },
               "system": {
                 "type": "string"
@@ -451,65 +272,11 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
           "notes": {
-            "type": "string"
-          },
-          "venues": {
+            "minItems": 1,
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "maxLength": 80,
-                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "address": {
-                  "type": "string",
-                  "minLength": 5
-                },
-                "district": {
-                  "type": "string"
-                },
-                "ring": {
-                  "type": "string",
-                  "enum": [
-                    "innen",
-                    "knapp-aussen",
-                    "aussen"
-                  ]
-                },
-                "geo": {
-                  "type": "object",
-                  "properties": {
-                    "lat": {
-                      "type": "number",
-                      "minimum": 49.3,
-                      "maximum": 49.65
-                    },
-                    "lon": {
-                      "type": "number",
-                      "minimum": 10.85,
-                      "maximum": 11.3
-                    }
-                  },
-                  "required": [
-                    "lat",
-                    "lon"
-                  ]
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "address",
-                "ring",
-                "geo"
-              ],
-              "additionalProperties": false
+              "type": "string",
+              "pattern": "\\S"
             }
           },
           "adapter": {
@@ -526,14 +293,9 @@
           "role",
           "name",
           "url",
-          "topics",
-          "formats",
-          "costs",
-          "registrations",
           "programme",
           "availability",
-          "verified",
-          "venues"
+          "verified"
         ],
         "additionalProperties": false
       },
@@ -557,107 +319,6 @@
             "type": "string",
             "format": "uri"
           },
-          "topics": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "pekip",
-                "fenkid",
-                "babymassage",
-                "babysignal",
-                "musik",
-                "singen",
-                "krabbelgruppe",
-                "spielgruppe",
-                "eltern-kind-gruppe",
-                "eltern-kind-turnen",
-                "bewegung",
-                "fitness-mit-baby",
-                "yoga-mit-baby",
-                "rueckbildung",
-                "spielplatz-indoor",
-                "tanz",
-                "waldgruppe",
-                "tiere-natur",
-                "kreativ",
-                "elterncafe",
-                "stillcafe",
-                "elterntreff",
-                "krabbelgottesdienst",
-                "vaeter",
-                "muetter",
-                "mehrsprachig",
-                "beratung",
-                "hebamme",
-                "erste-hilfe",
-                "beikost",
-                "babyschwimmen",
-                "kleinkindschwimmen",
-                "bibliothek",
-                "vorlesen",
-                "museum",
-                "kino",
-                "konzert",
-                "theater"
-              ]
-            }
-          },
-          "age": {
-            "type": "object",
-            "properties": {
-              "minMonths": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 216
-              },
-              "maxMonths": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 216
-              }
-            },
-            "required": [
-              "minMonths",
-              "maxMonths"
-            ],
-            "additionalProperties": false
-          },
-          "formats": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "kurs",
-                "regelmaessig",
-                "einmalig"
-              ]
-            }
-          },
-          "costs": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "kostenlos",
-                "kostenpflichtig"
-              ]
-            }
-          },
-          "registrations": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "mit-anmeldung",
-                "ohne-anmeldung"
-              ]
-            }
-          },
           "programme": {
             "minItems": 1,
             "type": "array",
@@ -702,7 +363,8 @@
                 ]
               },
               "how": {
-                "type": "string"
+                "type": "string",
+                "pattern": "\\p{L}"
               },
               "system": {
                 "type": "string"
@@ -719,65 +381,11 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
           "notes": {
-            "type": "string"
-          },
-          "venues": {
+            "minItems": 1,
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "maxLength": 80,
-                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
-                },
-                "name": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "address": {
-                  "type": "string",
-                  "minLength": 5
-                },
-                "district": {
-                  "type": "string"
-                },
-                "ring": {
-                  "type": "string",
-                  "enum": [
-                    "innen",
-                    "knapp-aussen",
-                    "aussen"
-                  ]
-                },
-                "geo": {
-                  "type": "object",
-                  "properties": {
-                    "lat": {
-                      "type": "number",
-                      "minimum": 49.3,
-                      "maximum": 49.65
-                    },
-                    "lon": {
-                      "type": "number",
-                      "minimum": 10.85,
-                      "maximum": 11.3
-                    }
-                  },
-                  "required": [
-                    "lat",
-                    "lon"
-                  ]
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "address",
-                "ring",
-                "geo"
-              ],
-              "additionalProperties": false
+              "type": "string",
+              "pattern": "\\S"
             }
           }
         },
@@ -786,14 +394,9 @@
           "role",
           "name",
           "url",
-          "topics",
-          "formats",
-          "costs",
-          "registrations",
           "programme",
           "availability",
-          "verified",
-          "venues"
+          "verified"
         ],
         "additionalProperties": false
       }

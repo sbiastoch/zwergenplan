@@ -3,7 +3,6 @@
  * Anbietername und Ort. Die UI importiert hieraus nur Typen – kein zod im Client-Bundle.
  */
 import type { Offer, OffersFile, Provider, Venue } from "./schema.ts";
-import type { Topic } from "./topics.ts";
 
 export interface SiteOffer extends Offer {
   providerName: string;
@@ -24,7 +23,6 @@ export interface SiteProvider {
   name: string;
   /** Website; laut Katalog bei allen Anbietern zugleich eine Programm-URL („Website & Programm“) */
   url: string;
-  topics: Topic[];
   /** Adresse ohne wiederholten Ortsnamen (`venueAddress`); `district` nur mit Wert */
   venues: Array<{ name: string; address: string; district?: string }>;
 }
@@ -70,7 +68,7 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
   const byId = new Map(providers.map((p) => [p.id, p]));
   const offers = file.offers.map((offer): SiteOffer => {
     const provider = byId.get(offer.providerId);
-    const venue = provider?.venues.find((v) => v.id === offer.venueId);
+    const venue = provider?.role === "anbieter" ? provider.venues.find((v) => v.id === offer.venueId) : undefined;
     if (!provider || !venue) throw new Error(`Ungeprüfte Daten: ${offer.id}`);
     const { name, address, district, ring, geo } = venue;
     return {
@@ -105,7 +103,6 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
             id: p.id,
             name: p.name,
             url: p.url,
-            topics: p.topics,
             venues: p.venues.map(({ name, address, district }) => ({
               name,
               address: venueAddress(name, address),
