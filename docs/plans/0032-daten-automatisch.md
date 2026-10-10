@@ -1,6 +1,6 @@
 # Plan 0032 – Daten automatisch: Nachtlauf und Entdecken über das Abo
 
-Status: in Umsetzung (Stufe 0 auf Branch `stufe-0-stabile-ids`, 2026-10-10). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
+Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10, Restpunkte in `docs/ideas.md`; als Nächstes Stufe 1). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
 Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird ersetzt), ADR 0022 (Entwurf, stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (entsteht mit der Freigabe, Inhalt in E14)

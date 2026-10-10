@@ -90,6 +90,13 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0015, Nachtrag A** (stabile IDs, Stufe 0 von Plan 0032, live seit 37a1ace, 2026-10-10; Einzelheiten in Plan 0015, E14–E17, R9):
+  - Verlegte Einzeltermine (gleicher Titel, anderer Tag) behalten ihre ID nicht; bleibt wie in ADR 0006 „ein anderer Termin“.
+  - Zusammenlegung zweier alter Angebote zu einem, mit Weiterleitung der verschwundenen ID. Bewusst nicht umgesetzt (Review B2), weil sie im Befund falsch zuordnete.
+  - Vor einer Umbenennung einer Katalog-ID (E16, Review M5): eine Abbildung alt → neu für die Zuordnung und ein Feld mit der früheren Katalog-ID, gegen das die Prüfung der `publicId` rechnet.
+  - `venueId` aus `SiteOffer` entfernen (E16, Review B1): Sie trägt die Katalog-ID weiter als Text in `site.json`.
+  - Die Umschreibung alter gespeicherter IDs (`migrateSavedIds`, Altform-Zweig in `cleanSavedProviders`, `newOfferIds`, `resolveRouteIds`) nach etwa 12 Monaten entfernen, also frühestens 2027-10 (E15).
+  - Restrisiko R9: Zwei Gruppen „Musikgarten 18 Mon.–3 J.“ desselben Anbieters mittwochs um 15:15 und 15:30 sind ununterscheidbar, wenn eine auf den Platz der anderen rückt. Im Bericht des Nachtlaufs (Plan 0032) auf Zuordnungen aus Stufe 1 und 2 achten.
 - **Plan 0030** (Restpunkte, live seit 58b6e34, 2026-10-10):
   - `topics: []` in `anbieter.json` entfernen (Übergangsfeld, Review M1, m2). Frühestens einen Tag nach dem Deploy, also ab 2026-10-11, und erst, wenn kein Tab mit altem Code mehr offen sein kann. Siehe Abschnitt „Übergangsfeld“ oben.
   - Anmeldefenster des Anbieters als Feld, Kann-warten-Punkte aus Plan 0031 (`verified` → `reviewed`, `AGGREGATOR_ADAPTERS` und `SOURCES` zusammenführen, `coveredBy` mit Zuordnungsschlüssel).
