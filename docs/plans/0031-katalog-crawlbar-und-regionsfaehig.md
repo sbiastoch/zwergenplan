@@ -249,3 +249,10 @@ Beide per `curl -X POST https://api.kursorganizer.com/graphql` mit `Content-Type
 - **M1** `fryday-nuernberg` und `stadtmission-schwangerschaftsberatung` trugen `use: termine` nur, damit die Regel grün wird. Nutzerentscheid vom 2026-10-10: „Behalten, nicht crawlen“. Neu ist `skipCrawl: { reason, since }` am `anbieter` (Schema, ADR 0025 Punkt 8, Skill); beide Seiten stehen jetzt ehrlich auf `use: info`. `skipCrawl` und `coveredBy` schließen sich aus (Test).
 - **M2** Was der Crawler abruft, regelt jetzt die Rolle (ADR 0025 Punkt 7, Nachtrag B, Schema-Kommentar): `programme` nur von `anbieter` ohne `coveredBy`/`skipCrawl`, `aggregator` nur über `adapter`, `verzeichnis` nie. Eine Datenmigration der `use`-Werte bei Sammelkalendern und Verzeichnissen ist damit unnötig; ihr `use` dokumentiert die Seite für die Pflege.
 - m3 Platzhalter-Verbot bei Sammelkalendern im Schema (`superRefine`, Test); m4 `ring` aus `match.test.ts` und den Kommentaren in `site-data.ts`; m5 Statuszeile, Test 4, Anhang A nachgezogen; m6/m7 Migrationsskript gelöscht (nachprüfbar in `e215ae6`), Export `Programme` zurückgenommen; m8 E2E siehe unten; m9 doppelte Zeile weg, `vid.test.ts` neu.
+
+## Ergebnis Phase c und Prüfung (2026-10-10)
+
+- `pnpm verify` grün nach Phase c und nach der Arch-Review-Nacharbeit (`8c12870`).
+- `pnpm e2e:local --affected` (pixel-7): 326 grün, 3 übersprungen. `pnpm e2e:local --affected --smoke` (echte Daten): 23 grün, 2 übersprungen (Schriften, die im Container fehlen). Gelaufen auf `d0f27ff`; danach änderten sich nur Schema-Regeln und zwei Katalog-Einträge, die weder `site.json` noch `anbieter.json` erreichen.
+- Kein `/browser-review`: Keine Ansicht ändert sich (`ring` fiel aus `site.json`, kein Leser).
+- Offen bis zum Abschluss: Push (der Session fehlt der GitHub-Zugang), CI auf `main`, Deploy.
