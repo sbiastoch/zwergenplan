@@ -6,11 +6,8 @@
  * Lieber eine neue ID als eine vertauschte: Eine neue ID ist der Zustand vor ADR 0022, eine falsche Zuordnung ließe
  * einen alten Link still auf ein fremdes Angebot zeigen. Deshalb verlangen Stufe 1 und 2 Eindeutigkeit.
  */
-import { isMap, isScalar, isSeq, parseDocument } from "yaml";
-import { z } from "zod";
-import { validateDataset } from "../../../src/domain/dataset.ts";
-import { LEGACY_OFFER_ID_PATTERN, offerKey, SHORT_ID_PATTERN, shortId } from "../../../src/domain/ids.ts";
-import { type Offer, OfferFields, OffersFile, type Provider, type Session } from "../../../src/domain/schema.ts";
+import { offerKey, shortId } from "../../../src/domain/ids.ts";
+import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/schema.ts";
 import { berlinDate } from "../../../src/domain/time.ts";
 import { similarTitle } from "./similar.ts";
 
@@ -283,70 +280,4 @@ export function checkIdContinuity(previous: OffersFile | undefined, next: readon
       ? [`ID ${o.id} wechselt den Anbieter: ${was} → ${o.providerId} (Fehler in der Zuordnung)`]
       : [];
   });
-}
-
-/** data/offers.json vor der Migration: wie `OffersFile`, aber mit beliebiger ID (Querprüfungen danach per validateDataset). */
-export const LegacyOffersFile = OffersFile.extend({ offers: z.array(OfferFields.extend({ id: z.string() })) });
-
-/**
- * Einmalige Migration der Angebote (E17): `id = shortId(alt, 0)`, Abbruch bei jeder Kollision und bei schon
- * migrierter Datei – die App rechnet alte IDs genau mit seed 0 um. `hash` nur für Tests.
- */
-export function migrateOfferIds(
-  file: z.infer<typeof LegacyOffersFile>,
-  hash: (text: string) => string = (t) => shortId(t, 0),
-): OffersFile {
-  const seen = new Map<string, string>();
-  const offers = file.offers.map((o) => {
-    if (!LEGACY_OFFER_ID_PATTERN.test(o.id)) throw new Error(`${o.id}: schon migriert oder keine alte Angebots-ID`);
-    const id = hash(o.id);
-    const other = seen.get(id);
-    if (other !== undefined) throw new Error(`Kollision: ${other} und ${o.id} ergeben ${id}`);
-    seen.set(id, o.id);
-    return { ...o, id };
-  });
-  return { ...file, offers: offers.sort(compareOffers) };
-}
-
-/**
- * Einmalige Migration des Katalogs (E17): `publicId: shortId(id, 0)` direkt nach `id` bei jedem Anbieter. Arbeitet auf
- * dem YAML-Dokument und prüft selbst, dass sich der Text nur um die neuen Zeilen unterscheidet.
- */
-export function migrateCatalogIds(text: string, hash: (text: string) => string = (t) => shortId(t, 0)): string {
-  const doc = parseDocument(text);
-  if (!isSeq(doc.contents)) throw new Error("Katalog ist keine Liste");
-  const seen = new Map<string, string>();
-  for (const item of doc.contents.items) {
-    if (!isMap(item)) continue;
-    const role: unknown = item.get("role");
-    if (role !== "anbieter") continue;
-    const id: unknown = item.get("id");
-    if (typeof id !== "string") throw new Error("Anbieter ohne id");
-    if (item.has("publicId")) throw new Error(`${id}: hat schon eine publicId`);
-    if (SHORT_ID_PATTERN.test(id)) throw new Error(`${id}: Katalog-ID hat die Form einer Kurz-ID (ADR 0022)`);
-    const publicId = hash(id);
-    const other = seen.get(publicId);
-    if (other !== undefined) throw new Error(`Kollision: ${other} und ${id} ergeben ${publicId}`);
-    seen.set(publicId, id);
-    const first = item.items[0];
-    if (!first || !isScalar(first.key) || first.key.value !== "id")
-      throw new Error(`${id}: id ist nicht der erste Schlüssel`);
-    item.items.splice(1, 0, doc.createPair("publicId", publicId));
-  }
-  const out = doc.toString({ lineWidth: 0 });
-  const stripped = out
-    .split("\n")
-    .filter((line) => !/^ {2}publicId: [0-9a-z]{8}$/.test(line))
-    .join("\n");
-  if (stripped !== text) throw new Error("Migration hätte andere Zeilen des Katalogs verändert – abgebrochen");
-  return out;
-}
-
-/** Beide Migrationen zusammen, geprüft mit `validateDataset` (E17). */
-export function migrateIds(rawOffers: unknown, catalogText: string, parseCatalog: (text: string) => unknown) {
-  const offers = migrateOfferIds(LegacyOffersFile.parse(rawOffers));
-  const catalog = migrateCatalogIds(catalogText);
-  const result = validateDataset(parseCatalog(catalog), offers);
-  if (!result.ok) throw new Error(`Migration ungültig:\n${result.errors.join("\n")}`);
-  return { offers, catalog };
 }

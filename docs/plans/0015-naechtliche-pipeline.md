@@ -1192,7 +1192,7 @@ Unabhängiger `plan-reviewer` nur auf die Teile, die N-I1 (kurze Pfade) und N-I2
 
 Umgesetzt auf dem Branch `stufe-0-stabile-ids` nach den Schritten S1–S5. N-I3 und N-I4 mit der Empfehlung: UID mit der Kurz-ID, keine Aliasseiten.
 
-**Abweichungen vom Plan** (die beiden ersten führen im Zweifel zu einer neuen ID, nie zu einer anderen alten):
+**Abweichungen vom Plan** (vom Nutzer am 2026-10-10 abgenommen; die beiden ersten führen im Zweifel zu einer neuen ID, nie zu einer anderen alten):
 
 | Stelle | Plan | Umgesetzt | Grund |
 |---|---|---|---|

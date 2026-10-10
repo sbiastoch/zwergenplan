@@ -1,19 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
 import type { Offer, OffersFile, Session } from "../../../src/domain/schema.ts";
-import { loadFixtures, rawFixtures } from "../../../src/domain/test-fixtures.ts";
-import {
-  assignIds,
-  checkIdContinuity,
-  type Draft,
-  keyOf,
-  LegacyOffersFile,
-  migrateCatalogIds,
-  migrateIds,
-  migrateOfferIds,
-  SAME_DAYS,
-  SAME_SESSIONS,
-} from "./stable-ids.ts";
+import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
+import { assignIds, checkIdContinuity, type Draft, keyOf, SAME_DAYS, SAME_SESSIONS } from "./stable-ids.ts";
 
 const { providers, file: fixtures } = loadFixtures();
 const HORIZON = { from: "2026-10-05", to: "2027-02-05" };
@@ -317,64 +306,5 @@ describe("checkIdContinuity", () => {
       "ID aaaaaaaa wechselt den Anbieter: turnverein-beispiel → familientreff-beispiel (Fehler in der Zuordnung)",
     ]);
     expect(checkIdContinuity(undefined, [old("aaaaaaaa")])).toEqual([]);
-  });
-});
-
-describe("migrateOfferIds (E17)", () => {
-  const legacy = LegacyOffersFile.parse({
-    ...fixtures,
-    offers: fixtures.offers.map((o, i) => ({ ...o, id: `alt--angebot-${i}--ort` })),
-  });
-
-  it("setzt shortId(alt, 0) je Angebot und sortiert", () => {
-    const out = migrateOfferIds(legacy);
-    expect(out.offers.map((o) => o.id).sort()).toEqual(legacy.offers.map((o) => shortId(o.id, 0)).sort());
-    const order = out.offers.map((o) => `${o.providerId} ${o.title}`);
-    expect(order).toEqual([...order].sort((a, b) => a.split(" ")[0]?.localeCompare(b.split(" ")[0] ?? "") || 0));
-  });
-
-  it("bricht bei Kollision und bei schon migrierter Datei ab", () => {
-    expect(() => migrateOfferIds(legacy, () => "kollisio")).toThrow("Kollision");
-    expect(() => migrateOfferIds(LegacyOffersFile.parse(fixtures))).toThrow("schon migriert");
-  });
-});
-
-describe("migrateCatalogIds (E17)", () => {
-  const catalog = `# Kommentar oben
-- id: anbieter-eins
-  role: anbieter
-  name: "Eins" # Kommentar am Wert
-  topics: [ pekip, musik ]
-  notes:
-    - erste Notiz
-    - zweite Notiz
-- id: kalender
-  role: aggregator
-  name: Kalender
-- id: anbieter-zwei
-  role: anbieter
-  geo: { lat: 49.4, lon: 11.0 }
-`;
-
-  it("setzt publicId direkt nach id, nur bei Anbietern, und ändert sonst keine Zeile", () => {
-    const out = migrateCatalogIds(catalog);
-    const added = out.split("\n").filter((l) => !catalog.split("\n").includes(l));
-    expect(added).toEqual([`  publicId: ${shortId("anbieter-eins", 0)}`, `  publicId: ${shortId("anbieter-zwei", 0)}`]);
-    expect(out.split("\n")[2]).toBe(`  publicId: ${shortId("anbieter-eins", 0)}`);
-    expect(out).toContain("topics: [ pekip, musik ]");
-    expect(out).toContain("    - erste Notiz");
-  });
-
-  it("bricht ab bei Kollision, vorhandener publicId und Katalog-ID in Kurzform", () => {
-    expect(() => migrateCatalogIds(catalog, () => "kollisio")).toThrow("Kollision");
-    expect(() => migrateCatalogIds(migrateCatalogIds(catalog))).toThrow("hat schon eine publicId");
-    expect(() => migrateCatalogIds("- id: abcd1234\n  role: anbieter\n")).toThrow("Form einer Kurz-ID");
-  });
-});
-
-describe("migrateIds", () => {
-  it("prüft das Ergebnis mit validateDataset", () => {
-    const raw = rawFixtures();
-    expect(() => migrateIds(raw.offers, "[]", () => raw.providers)).toThrow();
   });
 });

@@ -45,10 +45,10 @@ export function readPreviousOffers(): OffersFile | undefined {
   return OffersFileSchema.parse(readJson(OFFERS));
 }
 
-/** Schreibt data/offers.json (oder `target`) und formatiert es wie das Repo (Biome), damit Lint und Diffs stimmen. */
-export function writeOffers(file: OffersFile, target = OFFERS): void {
-  writeFileSync(target, `${JSON.stringify(file, null, 2)}\n`);
-  execFileSync(join(ROOT, "node_modules/.bin/biome"), ["format", "--write", target], { cwd: ROOT, stdio: "pipe" });
+/** Schreibt data/offers.json und formatiert es wie das Repo (Biome), damit Lint und Diffs stimmen. */
+export function writeOffers(file: OffersFile): void {
+  writeFileSync(OFFERS, `${JSON.stringify(file, null, 2)}\n`);
+  execFileSync(join(ROOT, "node_modules/.bin/biome"), ["format", "--write", OFFERS], { cwd: ROOT, stdio: "pipe" });
 }
 
 export function candidatesOf(runDir: string): Array<Candidate & { cid: string }> {
