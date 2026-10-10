@@ -1,6 +1,6 @@
 # ADR 0025 – Katalog crawlbar und regionsfähig
 
-Status: Entwurf (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung je Region statt fester bbox), ADR 0006 (Katalogformat) und ADR 0024 (`notes` ist Protokoll; `adapter` wird für `aggregator` Pflicht).
+Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung je Region statt fester bbox), ADR 0006 (Katalogformat) und ADR 0024 (`notes` ist Protokoll; `adapter` wird für `aggregator` Pflicht).
 
 ## Kontext
 

@@ -1,6 +1,6 @@
 # ADR 0024 – Katalog beschreibt Quellen, Angebote beschreiben Inhalte
 
-Status: angenommen (2026-10-10), mit Plan 0030. Ergänzt ADR 0003 (Datenmodell) und ADR 0006 („Ein Katalogformat“).
+Status: angenommen (2026-10-10), mit Plan 0030. Ergänzt ADR 0003 (Datenmodell) und ADR 0006 („Ein Katalogformat“). Ergänzt durch ADR 0025: `adapter` ist für `aggregator` Pflicht, `notes` liest der Crawler nicht.
 
 ## Kontext
 

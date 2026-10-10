@@ -1,6 +1,6 @@
 # ADR 0006 – Recherche-Pipeline: Katalog im Zod-Vertrag, Rohformat, ID-Regel
 
-Status: angenommen (2026-10-04), ergänzt ADR 0003. Details und Begründungen in Plan 0002. Katalogfelder je Rolle (ohne Facetten, `notes` als Liste) ergänzt durch ADR 0024.
+Status: angenommen (2026-10-04), ergänzt ADR 0003. Details und Begründungen in Plan 0002. Katalogfelder je Rolle (ohne Facetten, `notes` als Liste) ergänzt durch ADR 0024; ausführbare Programmeinträge und `region` durch ADR 0025.
 
 ## Kontext
 Der Recherche-Skill pflegte den Anbieterkatalog in einem eigenen Format, und seine Subagenten lieferten Termine als Freitext-Events mit RRULE-Strings. Die Website hat dagegen einen Zod-Vertrag mit materialisierten Terminen und deterministischen IDs (ADR 0001, ADR 0003). In der Praxis kollidiert die Offer-ID aus ADR 0003, z. B. bei drei Vorstellungen eines Stücks oder bei zwei parallelen Kursen mit gleichem Titel.

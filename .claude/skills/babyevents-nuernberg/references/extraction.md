@@ -9,7 +9,9 @@ Du bekommst den Horizont `from`–`to`, ein Paket `runs/<from>/batch-<n>.json` (
 
 ## Vorgehen je Anbieter
 
-1. **Alle** `programme`-URLs abrufen: `pnpm pipeline fetch-page URL --links`.
+1. **Alle** `programme`-URLs mit `use: termine` oder `verfuegbarkeit` abrufen: `pnpm pipeline fetch-page URL --links` (setzt `{von}`/`{bis}` selbst ein). Seiten mit `use: info` brauchst du nur bei Drift-Verdacht. `hint` an der Seite und `venues[].hint` sagen, worauf es ankommt.
+   - `render: browser`: Die Seite ist JS-gerendert; öffne sie mit WebFetch oder im Browser (claude-in-chrome).
+   - `request`: POST-Abfrage; mit `curl -X POST` und den Headern und dem Body aus dem Eintrag abrufen.
    - Status-Ampeln aus HTML-Attributen erscheinen im Text als `[Status: …]`.
    - JSON-LD und iCal-Feeds nimmst du zuerst.
    - Bei `HINWEIS: … JS-gerendert` öffnest du die Seite mit WebFetch oder im Browser (claude-in-chrome).

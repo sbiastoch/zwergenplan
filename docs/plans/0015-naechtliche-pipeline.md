@@ -1187,3 +1187,14 @@ Unabhängiger `plan-reviewer` nur auf die Teile, die N-I1 (kurze Pfade) und N-I2
 | **m6** Auflösen in `useRoute` statt in Effekten von `App.tsx` | übernommen: synchron im Initialisierer und in `onPop`, ein `replaceState` (E15, Tests 7, S2, Budget) |
 | **m7** ADR 0022, Punkt 6: 80 Zeichen gelten weiter im Schema | Wortlaut korrigiert |
 | **m8** Plan 0026, E1–E7 beschreiben weiter `angebot/`, `anbieter/` | Hinweis vor E1 in Plan 0026 |
+
+## Nachtrag B (2026-10-10): Katalog crawlbar (Plan 0031, ADR 0025)
+
+Plan 0031 hat den Katalog so umgebaut, dass dieser Plan ihn ausführen kann. Der Text oben bleibt stehen; wo er abweicht, gilt dieser Nachtrag.
+
+- **E4 (Abruf):** Statt `kind: js` steht `render: browser` (auch der Eval-Tag `js` aus E8 heißt künftig `render`). Seiten mit `use: info` ruft der Lauf nicht ab. Seiten mit `blocked` ruft er nicht ab; der Anbieter geht trotzdem ans Modell (bewusst ohne diese Quelle) und steht jede Nacht im Bericht. Platzhalter ersetzt `fillPlaceholders` (`scripts/pipeline/lib/placeholders.ts`, gibt es schon). Das Schemafeld `request` gibt es schon; die zwei Kursorganizer-Abfragen sind per `curl` geprüft (Plan 0031). Den POST-Abruf selbst baut dieser Plan (`fetch-page` kann heute nur GET).
+- **E3 (Eingabe):** Der Prompt bekommt je Seite `hint`, je Ort `venues[].hint`, dazu `availability.how`/`system`; `notes` nie.
+- **E5:** Der `inputHash` umfasst den Katalogauszug **ohne** `notes` (ersetzt „samt Orten und Notizen“).
+- **Schritt 4:** Schemafeld `request`, Platzhalter und `fillPlaceholders` entfallen (erledigt durch Plan 0031).
+- **Schritt 5:** Ausnahmen stehen künftig als `blocked` mit Abrufbeleg, nicht in `notes`. Die Eversports-Seiten (403 per Skript) stehen als `render: browser`; ob sie im Browser lesbar sind, klärt `pipeline fetch`.
+- **Neu:** `aggregator` hat immer einen `adapter`; jeder Anbieter ohne `coveredBy` hat eine Seite `use: termine` ohne `blocked` (Schema). Jeder Katalog-Eintrag hat `region`.
