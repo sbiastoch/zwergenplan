@@ -1,6 +1,6 @@
 # Plan 0032 – Daten automatisch: Nachtlauf und Entdecken über das Abo
 
-Status: Review eingearbeitet (2026-10-10; adversariales Review und Architekten-Urteil, Nutzerabnahme der wesentlichen Änderungen am 2026-10-10; N3 offen)
+Status: freigegeben (2026-10-10, Nutzer; N3 mit der Empfehlung entschieden). Umsetzung offen, Beginn mit Stufe 0.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
 Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird ersetzt), ADR 0022 (Entwurf, stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (entsteht mit der Freigabe, Inhalt in E14)
@@ -281,9 +281,9 @@ Test-first für alles in `lib/`:
 | R7 | CLI-Version ändert Ausgabeformat oder Optionen | Version gepinnt, Update nur mit Eval-Lauf und `llm.test.ts` |
 | R8 | Nutzungslimit beendet Läufe regelmäßig vorzeitig | Bestand bleibt (E5), Bericht und Rot; Bremsen und Takt anpassen |
 
-## Offene Nutzerentscheide
+## Nutzerentscheide
 
-- **N3** Modell im Cache-Schlüssel (E4): Ein Modellwechsel extrahiert einmal alles neu. Für Nutzer ändern sich dann Formulierungen (Titel, Zusammenfassungen, Themen), IDs, Links und Merklisten bleiben (ADR 0022), der Einbruchschutz hält die Zahl der Angebote. Alternative: Modell nicht im Schlüssel, der Bestand wechselt schleichend über Wochen. **Empfehlung: im Schlüssel lassen** (eine gewollte Umstellung nach bestandenem Eval statt eines Mischzustands).
+- **N3** (entschieden mit der Freigabe am 2026-10-10: Empfehlung gilt) Modell im Cache-Schlüssel (E4): Ein Modellwechsel extrahiert einmal alles neu. Für Nutzer ändern sich dann Formulierungen (Titel, Zusammenfassungen, Themen), IDs, Links und Merklisten bleiben (ADR 0022), der Einbruchschutz hält die Zahl der Angebote. Alternative: Modell nicht im Schlüssel, der Bestand wechselt schleichend über Wochen. **Empfehlung: im Schlüssel lassen** (eine gewollte Umstellung nach bestandenem Eval statt eines Mischzustands).
 
 ## Review (2026-10-10)
 
