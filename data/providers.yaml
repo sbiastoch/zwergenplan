@@ -880,7 +880,7 @@
   programme:
     - url: https://www.stadtmission-nuernberg.de/ich-brauche-hilfe/kinder-jugend-und-familie/schwangerschafts-und-sexualberatung
       kind: html
-      use: termine
+      use: info
     - url: https://stadtmission-nuernberg.de/fileadmin/03_Downloads_Nuernberg/Einrichtungen/Kinder-Jugend-und-Familie/Schwangerschafts-_und_Sexualberatung/Stadtmission_Flyer_SSB_Babymassage_kostenlos.pdf
       kind: pdf
       use: info
@@ -889,6 +889,9 @@
     how: Keine Termine online; Anmeldung T. 0911 37654-121 / ssb@stadtmission-nuernberg.de
     system: keins
   verified: 2026-10-04
+  skipCrawl:
+    reason: keine Termine online, nur Flyer der Beratungsstelle (Recherche-Notiz)
+    since: 2026-10-10
   notes:
     - Kostenlos. Termine nur auf Anfrage – für den Skill nur als Hinweis ausgeben, nicht als Termin. 'Teegarten' (Themenfrühstück für Schwangere und Mütter mit Baby) nur als Flyer von 2022 im Archiv – Aktualität unklar.
     - "[stadtmission-nuernberg.de/…/schwangerschafts-und-sexualberatung] Seite der Beratungsstelle mit Flyer-Downloads"
@@ -1713,12 +1716,15 @@
   programme:
     - url: https://fryday-nbg.com/
       kind: html
-      use: termine
+      use: info
   availability:
     shown: nein
     how: Keine Termine/Plätze online; 10er-Kurs oder MamaFLAT, Kontakt hello@fryday-nbg.com
     system: keins
   verified: 2026-10-04
+  skipCrawl:
+    reason: kein Kursplan online (Recherche-Notiz)
+    since: 2026-10-10
   notes:
     - "Niedrige Priorität: Angebot beschrieben, aber keine Termine prüfbar – für Zeitraumsuche nur als Hinweis nutzbar."
     - Wochenplan nur als Bild mit Stand 01/2023 – aktuelles Angebot unklar

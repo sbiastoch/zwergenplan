@@ -1197,4 +1197,5 @@ Plan 0031 hat den Katalog so umgebaut, dass dieser Plan ihn ausführen kann. Der
 - **E5:** Der `inputHash` umfasst den Katalogauszug **ohne** `notes` (ersetzt „samt Orten und Notizen“).
 - **Schritt 4:** Schemafeld `request`, Platzhalter und `fillPlaceholders` entfallen (erledigt durch Plan 0031).
 - **Schritt 5:** Ausnahmen stehen künftig als `blocked` mit Abrufbeleg, nicht in `notes`. Die Eversports-Seiten (403 per Skript) stehen als `render: browser`; ob sie im Browser lesbar sind, klärt `pipeline fetch`.
-- **Neu:** `aggregator` hat immer einen `adapter`; jeder Anbieter ohne `coveredBy` hat eine Seite `use: termine` ohne `blocked` (Schema). Jeder Katalog-Eintrag hat `region`.
+- **Was abgerufen wird (ADR 0025, Punkt 7):** `programme` nur von `anbieter` ohne `coveredBy` und ohne `skipCrawl`; `aggregator` nur über ihren `adapter` (ihr `programme` ist Doku, ohne Platzhalter); `verzeichnis` nie. Anbieter mit `skipCrawl` stehen nicht im Bericht als Fehler, sondern als bewusst ausgelassen.
+- **Neu:** `aggregator` hat immer einen `adapter`; jeder Anbieter ohne `coveredBy` und ohne `skipCrawl` hat eine Seite `use: termine` ohne `blocked` (Schema). Jeder Katalog-Eintrag hat `region`.

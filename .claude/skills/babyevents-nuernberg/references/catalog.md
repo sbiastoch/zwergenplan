@@ -24,7 +24,8 @@ Der nächtliche Crawler (Plan 0015) liest nur Felder, keine Notizen. Je Seite:
 | `blocked` | `{ reason, since }`, nur mit Abrufbeleg auch im Browser (Login, Bot-Schutz) |
 | `hint` | höchstens 200 Zeichen, **ohne Datum**: was ein Modell beim Lesen dieser Seite braucht („nur Gruppen ‚ab 0‘ und ‚ab 1‘“, „Termine im JSON-LD“) |
 
-- Ein `anbieter` ohne `coveredBy` braucht eine Seite mit `use: termine` ohne `blocked`. Bei `coveredBy` auf evangelische-termine bleibt die URL mit `vid=` Pflicht, sie ist der Zuordnungsschlüssel.
+- Ein `anbieter` ohne `coveredBy` braucht eine Seite mit `use: termine` ohne `blocked`. Veröffentlicht er keine Termine, bleibt er mit `skipCrawl: { reason, since }` im Katalog (in der Anbieterübersicht, ohne Abruf); `use` steht dann ehrlich auf `info`.
+- Abgerufen werden nur `anbieter` ohne `coveredBy`/`skipCrawl`. `programme` von Sammelkalendern und Verzeichnissen ist Doku für die Pflege. Bei `coveredBy` auf evangelische-termine bleibt die URL mit `vid=` Pflicht, sie ist der Zuordnungsschlüssel.
 - Folgeseiten mit stabilen URLs sind eigene Einträge; Links folgt der Crawler nie. Eine URL, die nur in einer Notiz steht, sieht der Crawler nicht: Was abgerufen werden soll, ist ein Programmeintrag.
 
 ## Orte (`venues`)

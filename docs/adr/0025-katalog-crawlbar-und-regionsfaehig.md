@@ -15,8 +15,10 @@ Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung 
 3. **Programmeinträge sind ausführbar**: `kind` (Format), `render: browser`, `use` (`termine | verfuegbarkeit | info`), `request` (POST mit JSON-Body), `blocked` (nur mit Abrufbeleg; der Anbieter ist dann bewusst ohne diese Quelle), `hint` (Extraktionshinweis ohne Datum), Platzhalter `{von}`/`{bis}` in URL und Body. `note` und `kind: js` entfallen.
 4. **`Venue.hint`** trägt Ortshinweise für den Crawler.
 5. **`notes` ist Protokoll für Menschen.** Der Crawler liest es nicht, weder im Prompt noch im Cache-Schlüssel. Was er braucht, steht in `hint`, `Venue.hint` und `availability.how`/`system`.
-6. **`aggregator` verlangt `adapter`.** Ein Sammelkalender ohne Adapter ist `verzeichnis`. `coveredBy` auf einen evtermine-Kalender verlangt eine `vid` in den Programm-URLs.
-7. Orte bleiben denormalisiert am Anbieter (ADR 0024).
+6. **`aggregator` verlangt `adapter`.** Ein Sammelkalender ohne Adapter ist `verzeichnis`. `coveredBy` auf einen evtermine-Kalender verlangt eine `vid` in den Programm-URLs. In URLs und Bodies von Sammelkalendern stehen keine Platzhalter; ihr Fenster setzt der Adapter.
+7. **Was der Crawler abruft, entscheidet die Rolle:** `programme` nur von `anbieter` ohne `coveredBy` und ohne `skipCrawl`; `aggregator` nur über ihren `adapter` (ihr `programme` ist Doku); `verzeichnis` nie. Innerhalb eines abgerufenen Anbieters entscheidet `use`.
+8. **`skipCrawl: { reason, since }`** am `anbieter`: bewusst nicht crawlen, weil er keine Termine veröffentlicht; er bleibt in der Anbieterübersicht (Nutzerentscheid 2026-10-10). Ohne `coveredBy` und ohne `skipCrawl` braucht ein Anbieter eine Seite `use: termine` ohne `blocked`.
+9. Orte bleiben denormalisiert am Anbieter (ADR 0024).
 
 ## Alternativen
 

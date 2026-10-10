@@ -72,7 +72,7 @@ const isJsonWithPlaceholders = (body: string) => {
 /**
  * Eine Stelle, an der Termine (oder Plätze) stehen, so beschrieben, dass ein Crawler sie abrufen kann (Plan 0031, E3).
  */
-export const Programme = z.strictObject({
+const Programme = z.strictObject({
   url: z.url().refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE),
   /** Format der Antwort */
   kind: z.enum(["html", "pdf", "ical", "json-api"]),
@@ -128,10 +128,11 @@ const sourceBase = {
 const AGGREGATOR_ADAPTERS = ["stadt-vk", "frankenkids", "evtermine"] as const;
 
 /**
- * Katalog-Eintrag (data/providers.yaml). Die Rolle bestimmt, was Pflicht ist:
- * - anbieter: veranstaltet selbst, hat mindestens einen Ort; nur Anbieter haben Angebote
- * - aggregator: Sammelkalender fremder Veranstalter (Termine werden Anbietern zugeordnet)
- * - verzeichnis: Liste zur Katalogpflege, liefert keine Termine
+ * Katalog-Eintrag (data/providers.yaml). Die Rolle bestimmt, was Pflicht ist und was der Crawler abruft (ADR 0025):
+ * - anbieter: veranstaltet selbst, hat mindestens einen Ort; nur Anbieter haben Angebote. Der Crawler ruft ihre
+ *   `programme` ab, außer bei `coveredBy` oder `skipCrawl`.
+ * - aggregator: Sammelkalender fremder Veranstalter; abgefragt nur über `adapter`, `programme` ist Doku
+ * - verzeichnis: Liste zur Katalogpflege, liefert keine Termine und wird nie abgerufen
  */
 export const Provider = z.discriminatedUnion("role", [
   z
@@ -143,13 +144,21 @@ export const Provider = z.discriminatedUnion("role", [
       venues: z.array(Venue).min(1),
       /** Termine kommen vollständig über diesen Sammelkalender (eigene Seite wird nicht abgefragt) */
       coveredBy: kebab.optional(),
+      /**
+       * Bewusst nicht crawlen: Der Anbieter veröffentlicht keine Termine, bleibt aber in der Anbieterübersicht
+       * (Nutzerentscheid, Plan 0031).
+       */
+      skipCrawl: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
     })
     .superRefine((p, ctx) => {
-      // ohne coveredBy holt der Crawler die Termine selbst: mindestens eine abrufbare Terminseite (Plan 0031, E3)
-      if (p.coveredBy === undefined && !p.programme.some((g) => g.use === "termine" && g.blocked === undefined))
+      // ohne coveredBy und skipCrawl holt der Crawler die Termine selbst: eine abrufbare Terminseite (Plan 0031, E3)
+      if (p.coveredBy !== undefined && p.skipCrawl !== undefined)
+        ctx.addIssue({ code: "custom", message: "skipCrawl und coveredBy schließen sich aus", path: ["skipCrawl"] });
+      const crawled = p.coveredBy === undefined && p.skipCrawl === undefined;
+      if (crawled && !p.programme.some((g) => g.use === "termine" && g.blocked === undefined))
         ctx.addIssue({
           code: "custom",
-          message: "braucht eine Terminseite (use: termine) ohne blocked",
+          message: "braucht eine Terminseite (use: termine) ohne blocked, sonst skipCrawl mit Grund",
           path: ["programme"],
         });
       const { bbox } = REGIONS[p.region];
@@ -158,13 +167,25 @@ export const Provider = z.discriminatedUnion("role", [
           ctx.addIssue({ code: "custom", message: `Ort außerhalb der Region ${p.region}`, path: ["venues", i, "geo"] });
       });
     }),
-  z.strictObject({
-    id: kebab,
-    role: z.literal("aggregator"),
-    ...sourceBase,
-    /** Pflicht: Ein Sammelkalender ohne Adapter ist für die Pipeline ein `verzeichnis` (Plan 0031, E5) */
-    adapter: z.enum(AGGREGATOR_ADAPTERS),
-  }),
+  z
+    .strictObject({
+      id: kebab,
+      role: z.literal("aggregator"),
+      ...sourceBase,
+      /** Pflicht: Ein Sammelkalender ohne Adapter ist für die Pipeline ein `verzeichnis` (Plan 0031, E5) */
+      adapter: z.enum(AGGREGATOR_ADAPTERS),
+    })
+    .superRefine((p, ctx) => {
+      // das Abfragefenster eines Sammelkalenders setzt sein Adapter, nicht die URL (Plan 0031, Review 2 m7)
+      p.programme.forEach((g, i) => {
+        if (/\{(von|bis)\}/.test(g.url + (g.request?.body ?? "")))
+          ctx.addIssue({
+            code: "custom",
+            message: "keine Platzhalter bei Sammelkalendern mit adapter",
+            path: ["programme", i],
+          });
+      });
+    }),
   z.strictObject({ id: kebab, role: z.literal("verzeichnis"), ...sourceBase }),
 ]);
 

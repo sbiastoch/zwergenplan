@@ -1,6 +1,6 @@
 # Plan 0031 – Katalog crawlbar und regionsfähig
 
-Status: in Umsetzung (2026-10-10; Plan-Review Durchgang 1 „Überarbeiten“ und Durchgang 2 „Freigabe mit Änderungen“, beide eingearbeitet; Phase a umgesetzt)
+Status: in Umsetzung (2026-10-10; Plan-Review zwei Durchgänge, Arch-Review eingearbeitet; Phasen a–c und Doku umgesetzt, Abschluss nach CI und Deploy)
 Datum: 2026-10-10
 Voraussetzung: Plan 0030 (Katalog entrümpeln, live bzw. auf demselben Branch). Reihenfolge zu Plan 0015, Nachtrag A (stabile IDs, migriert `providers.yaml` ebenfalls um `publicId`): unabhängig; wer zuerst kommt, wird vom anderen gemergt.
 Bezug: ADR 0006 (Katalog im Zod-Vertrag), ADR 0016 (Entwurf, nächtliche Pipeline), ADR 0022 (Entwurf, stabile IDs), ADR 0024 (Katalog beschreibt Quellen), Plan 0015 (nächtliche Pipeline, der Crawler), Plan 0030 (Katalog entrümpeln, Vorgänger); neu: ADR 0025
@@ -150,7 +150,7 @@ Plan 0015 bekommt einen „Nachtrag B (Plan 0031)“, ohne den bestehenden Text 
 2. Phase a, `dataset.test.ts`, Programm: `{foo}` in URL oder `request.body` → Fehler, `{von}`/`{bis}` gültig; `hint` mit „08.11.“ → Fehler (Heuristik, siehe unten); `request` ohne `body` → Fehler; `blocked` ohne `since` → Fehler; `coveredBy` auf evtermine-Kalender ohne `vid=`-URL → Fehler.
 3. Phase c, `dataset.test.ts`: `kind: js` → Fehler; `note` → Fehler (strict); Programmeintrag ohne `use` → Fehler; `anbieter` ohne `coveredBy` mit nur `use: info` oder nur gesperrten Terminseiten → Fehler; `aggregator` ohne `adapter` → Fehler.
    Der Datums-Check in `hint` ist eine Heuristik (`\d{1,2}\.\d{1,2}\.` und ISO-Datum): „8. November“ rutscht durch, „9.30.“ würde rot. Akzeptiert; die Anleitung verbietet Daten ohnehin.
-4. `regions.test.ts`: jede Region hat eine bbox mit min < max und eine Subdivision `DE-XX`.
+4. `regions.test.ts`: jede Region hat einen Namen und eine bbox mit min < max (die Subdivision ist nach Review 2 m9 gestrichen).
 5. `placeholders.test.ts`: `{von}`/`{bis}` aus einem Stichtag (Monatsanfang, +13 Monate, Jahreswechsel), andere Klammern bleiben unberührt. Der Stichtag ist ein Berliner Kalendertag (`today()` in `cli.ts`); die Funktion rechnet nur mit dem String, also ohne Zeitzonenfehler (Review 2 m3).
 6. `draft.test.ts`: `providerFromCandidate` schreibt `region` (aus dem Sammelkalender, sonst `nuernberg`), kein `ring`, `programme[0].use: termine`.
 7. `site-data.test.ts`: Die vorhandene Schlüsselprüfung der Anbieterübersicht bekommt `region`; `SiteOffer.venue` ohne `ring` sichert tsc über `Pick<Venue, …>`.
@@ -191,7 +191,7 @@ Drei Phasen, jede endet grün und mit Commit (Review B1: Erweitern, Migrieren, V
 > - Alles andere aus der `note` (Inhaltszusammenfassungen, „nächster Termin …“, Preise, Erläuterungen) wandert **wörtlich** als eigener Eintrag nach `notes` des Anbieters, mit vorangestellter URL-Kurzform in eckigen Klammern, z. B. `[eversports.de/widget/…] Eversports-Widget 'Yoga mit Baby' (3-12 Mon.)`.
 >
 > **Regeln:**
-> - **Nichts erfinden, nichts umformulieren.** Jeder Teil der alten `note`/`notes` (Teile trennt ein Prüfskript an `;`, ` – `, ` | ` und Satzende) muss wörtlich in `hint`, `notes`, `blocked.reason`, `request.body`, einem `request.headers`-Wert oder einer URL wieder auftauchen. Ein Teil darf auf mehrere Ziele verteilt werden, aber nicht gekürzt.
+> - **Nichts erfinden, nichts umformulieren.** Jeder Teil der alten `note` (das Prüfskript trennt nach E6.3 nur an `; ` und ` – ` und prüft gegen `hint`, `notes`, `venueHints`, `blocked.reason` und URLs; die strengere Formulierung hier galt den Subagenten als Arbeitsregel) muss wörtlich in `hint`, `notes`, `blocked.reason`, `request.body`, einem `request.headers`-Wert oder einer URL wieder auftauchen. Ein Teil darf auf mehrere Ziele verteilt werden, aber nicht gekürzt.
 > - **URLs mit `vid=` (evangelische-termine.de) bleiben unverändert**, auch wenn ihr Eintrag `use: info` wäre: Sie sind der Zuordnungsschlüssel der Pipeline. Sie bekommen `use: termine`.
 > - Paginierung: Stehen Folgeseiten mit stabilen URLs in der `note`, lege je Folgeseite einen eigenen Eintrag an (gleiches `kind`, `use: termine`). Brauchen sie Sitzungs-Parameter (`cHash`, „Links aus Seite übernehmen“), bleibt ein Eintrag, und die Erklärung wandert nach `notes`.
 > - Die alten `notes` des Anbieters übernimmst du unverändert in derselben Reihenfolge; neue Einträge aus `note` hängst du hinten an. Auch eine Notiz, die du nach `venueHints` überträgst, bleibt in `notes` stehen (das Prüfskript verlangt die alten `notes` als Präfix).
@@ -243,3 +243,9 @@ Beide per `curl -X POST https://api.kursorganizer.com/graphql` mit `Content-Type
   - 11 Programmseiten ergänzt, die nur als URL in Notizen standen (alle per Abruf mit 200 geprüft): Ohana Minis/Maxis, dance maxX MAXI, FBS-Suchen MilchZeit/FamilienOase/BewegungsOase, vier Studio-Herzschlag-Angebote, FamilienBox-Turnkurse (Eversports, `render: browser`), Bonhoeffer-Gruppen Langwasser.
   - Ortshinweise Wassermäuse ergänzt; Protokollnotizen für Zoff+Harmonie (Folgeseiten) und die zwei `{von}`-URLs.
 - **Offen für die Katalogpflege (kein Fehler der Migration, Nutzerentscheid):** `fryday-nuernberg` und `stadtmission-schwangerschaftsberatung` haben laut Notiz keine Seite mit Terminen; ihre einzige Seite steht als `termine`, damit die Regel aus Phase c greift. Ob sie im Katalog bleiben, entscheidet der Nutzer (Rückfallregel E3).
+
+## Arch-Review (2026-10-10) – Verdict: Nacharbeit nötig → eingearbeitet
+
+- **M1** `fryday-nuernberg` und `stadtmission-schwangerschaftsberatung` trugen `use: termine` nur, damit die Regel grün wird. Nutzerentscheid vom 2026-10-10: „Behalten, nicht crawlen“. Neu ist `skipCrawl: { reason, since }` am `anbieter` (Schema, ADR 0025 Punkt 8, Skill); beide Seiten stehen jetzt ehrlich auf `use: info`. `skipCrawl` und `coveredBy` schließen sich aus (Test).
+- **M2** Was der Crawler abruft, regelt jetzt die Rolle (ADR 0025 Punkt 7, Nachtrag B, Schema-Kommentar): `programme` nur von `anbieter` ohne `coveredBy`/`skipCrawl`, `aggregator` nur über `adapter`, `verzeichnis` nie. Eine Datenmigration der `use`-Werte bei Sammelkalendern und Verzeichnissen ist damit unnötig; ihr `use` dokumentiert die Seite für die Pflege.
+- m3 Platzhalter-Verbot bei Sammelkalendern im Schema (`superRefine`, Test); m4 `ring` aus `match.test.ts` und den Kommentaren in `site-data.ts`; m5 Statuszeile, Test 4, Anhang A nachgezogen; m6/m7 Migrationsskript gelöscht (nachprüfbar in `e215ae6`), Export `Programme` zurückgenommen; m8 E2E siehe unten; m9 doppelte Zeile weg, `vid.test.ts` neu.

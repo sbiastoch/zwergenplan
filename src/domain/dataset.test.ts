@@ -245,8 +245,29 @@ describe("validateDataset", () => {
       "Terminseite",
     ],
     ["Sammelkalender ohne adapter", (p: Cat) => delete (p.at(-1) as Record<string, unknown>)["adapter"], "adapter"],
+    [
+      "Platzhalter beim Sammelkalender mit adapter",
+      (p: Cat) => Object.assign(prog(p, p.length - 1), { url: "https://example.org/sammelkalender?von={von}" }),
+      "keine Platzhalter",
+    ],
+    [
+      "skipCrawl zusammen mit coveredBy",
+      (p: Cat) => {
+        Object.assign(p[0] as object, { skipCrawl: { reason: "keine Termine online", since: "2026-10-10" } });
+        Object.assign(p[0] as object, { coveredBy: "sammelkalender-beispiel" });
+      },
+      "schließen sich aus",
+    ],
   ])("Katalog 0031 Phase c: %s → Fehler", (_name, fn, expected) => {
     expect(errorsOf(mutate((_o, p) => fn(p)))).toContain(expected);
+  });
+
+  it("Katalog 0031: skipCrawl setzt die Terminseiten-Regel begründet aus (Nutzerentscheid)", () => {
+    const r = mutate((_o, p) => {
+      Object.assign(prog(p, 0), { use: "info" });
+      Object.assign(p[0] as object, { skipCrawl: { reason: "kein Kursplan online", since: "2026-10-10" } });
+    });
+    expect(errorsOf(r)).toBe("");
   });
 
   it("Katalog 0031: Platzhalter, render, use, request, blocked und hint sind gültig", () => {

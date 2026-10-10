@@ -16,7 +16,7 @@ export interface SiteData {
 
 /**
  * Ein Anbieter in der Anbieterübersicht (Plan 0010, E6): nur Angaben für Eltern, nichts aus der Recherche
- * (kein `programme`, `notes`, `ring`, `geo`). Nur Katalog-Einträge mit `role: anbieter`.
+ * (kein `programme`, `notes`, `region`, `geo`, kein Orts-`hint`). Nur Katalog-Einträge mit `role: anbieter`.
  */
 export interface SiteProvider {
   id: string;
@@ -92,7 +92,7 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
 
 /**
  * Katalog für die Anbieterübersicht (Plan 0010, E6): nur `role: anbieter`, auch ohne Angebote, nach Name (`de`).
- * Genau die Felder aus `SiteProvider` – Recherche-Angaben (`programme`, `notes`, `ring`, `geo` …) bleiben draußen.
+ * Genau die Felder aus `SiteProvider` – Recherche-Angaben (`programme`, `notes`, `region`, `geo`, Orts-`hint` …) bleiben draußen.
  */
 export function toProviderDirectory(providers: readonly Provider[], generatedAt: string): ProviderDirectoryData {
   const list = providers.flatMap((p): SiteProvider[] =>

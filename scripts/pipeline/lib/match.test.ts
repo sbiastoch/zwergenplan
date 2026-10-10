@@ -21,7 +21,6 @@ const venue = (id: string, address: string, lat: number, lon: number) => ({
   id,
   name: id,
   address,
-  ring: "aussen" as const,
   geo: { lat, lon },
 });
 
