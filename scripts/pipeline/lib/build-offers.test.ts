@@ -8,6 +8,7 @@ const { providers: fixtureProviders } = loadFixtures();
 const aggregator: Provider = {
   id: "ev-kalender",
   role: "aggregator",
+  region: "nuernberg",
   adapter: "evtermine",
   name: "Sammelkalender (fiktiv)",
   url: "https://example.org/kalender",
@@ -16,7 +17,16 @@ const aggregator: Provider = {
   verified: "2026-10-04",
 };
 const providers: Provider[] = [
-  ...fixtureProviders.map((p) => (p.id === "stadtbibliothek-beispiel" ? { ...p, coveredBy: "ev-kalender" } : p)),
+  // evtermine ordnet über die vid in den Programm-URLs zu (Plan 0031)
+  ...fixtureProviders.map((p) =>
+    p.id === "stadtbibliothek-beispiel"
+      ? {
+          ...p,
+          coveredBy: "ev-kalender",
+          programme: [{ url: "https://www.evangelische-termine.de/veranstaltungen?vid=999", kind: "html" as const }],
+        }
+      : p,
+  ),
   aggregator,
 ];
 

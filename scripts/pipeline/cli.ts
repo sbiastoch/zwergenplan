@@ -59,8 +59,8 @@ import {
 } from "./lib/gtfs.ts";
 import { renderFetchReport } from "./lib/html-extract.ts";
 import { matchCandidate, vidOf } from "./lib/match.ts";
+import { fillPlaceholders } from "./lib/placeholders.ts";
 import { RawBatch, validateRaw } from "./lib/raw.ts";
-import { classifyRing } from "./lib/ring.ts";
 import type { SourceStatus } from "./lib/run.ts";
 import { nextBatchFiles, selectBatches } from "./lib/select.ts";
 
@@ -131,7 +131,8 @@ function select() {
 }
 
 async function fetchPageCmd() {
-  const url = need(args[0], "URL");
+  // Katalog-URLs mit {von}/{bis} direkt abrufbar (Plan 0031, E3)
+  const url = fillPlaceholders(need(args[0], "URL"), today());
   try {
     print(renderFetchReport(await fetchPage(url), { maxChars: Number(values["max-chars"]), links: values.links }));
   } catch (e) {
@@ -410,7 +411,7 @@ switch (command) {
     break;
   case "geocode": {
     const g = (await geocode(need(args[0], "Adresse"))) ?? fail("nicht gefunden");
-    print({ ...g, ...classifyRing(g.lat, g.lon, g.district) });
+    print(g);
     break;
   }
   case "build":

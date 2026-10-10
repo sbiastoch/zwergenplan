@@ -78,7 +78,7 @@ function offer(fields: Pick<SiteOffer, "format" | "sessions"> & Partial<SiteOffe
     url: "https://example.org/",
     sourceUrl: "https://example.org/",
     providerName: "Anbieter",
-    venue: { name: "Ort", address: "Beispielweg 1", ring: "innen", geo: { lat: 49.45, lon: 11.08 } },
+    venue: { name: "Ort", address: "Beispielweg 1", geo: { lat: 49.45, lon: 11.08 } },
     ...fields,
   };
 }

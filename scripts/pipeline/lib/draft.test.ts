@@ -107,6 +107,7 @@ describe("providerFromCandidate", () => {
   const kalender: Provider = {
     id: "fk",
     role: "aggregator",
+    region: "nuernberg",
     adapter: "frankenkids",
     name: "Sammelkalender (fiktiv)",
     url: "https://example.org/fk",
@@ -141,9 +142,35 @@ describe("providerFromCandidate", () => {
       verified: "2026-10-04",
     });
     for (const facet of ["topics", "formats", "costs", "registrations"]) expect(p).not.toHaveProperty(facet);
+    // Plan 0031: Region aus dem Sammelkalender, Hauptort ohne ring, Programmseite für Termine
+    expect(p.region).toBe("nuernberg");
+    expect(p.venues[0]).not.toHaveProperty("ring");
+    expect(p.programme).toEqual([{ url: "https://imiluv.de", kind: "html", use: "termine" }]);
     expect(p.notes).toEqual(["Aus frankenkids aufgenommen (https://example.org/detail)."]);
-    expect(p.venues[0]).toMatchObject({ id: "imiluv-studio", district: "Nordstadt", ring: "aussen" });
+    expect(p.venues[0]).toMatchObject({ id: "imiluv-studio", district: "Nordstadt" });
     const r = validateDataset([...providers, kalender, p], {
+      generatedAt: "2026-10-04T12:00:00+02:00",
+      horizon: { from: "2026-10-04", to: "2026-10-04" },
+      offers: [],
+    });
+    expect(r.ok ? [] : r.errors).toEqual([]);
+  });
+
+  it("evangelische-termine: die vid kommt als Programmseite dazu, sonst scheitert coveredBy (Plan 0031)", () => {
+    const evKalender: Provider = { ...kalender, id: "et", adapter: "evtermine" };
+    const p = providerFromCandidate(cand({ organizer: "Ev. Gemeinde", organizerId: "579" }), {
+      id: "ev-gemeinde",
+      geo: { lat: 49.45, lon: 11.08 },
+      catalog: [evKalender],
+      today: "2026-10-04",
+    });
+    expect(p.coveredBy).toBe("et");
+    expect(p.programme.at(-1)).toEqual({
+      url: "https://www.evangelische-termine.de/ical?vid=579",
+      kind: "ical",
+      use: "termine",
+    });
+    const r = validateDataset([...providers, evKalender, p], {
       generatedAt: "2026-10-04T12:00:00+02:00",
       horizon: { from: "2026-10-04", to: "2026-10-04" },
       offers: [],

@@ -86,7 +86,7 @@ describe("KEBAB_ID_PATTERN (Plan 0010, E2)", () => {
   });
 
   it("ist die Regel des Schemas, mit unveränderter Meldung", () => {
-    const venue = { name: "Ort", address: "Weg 1, 90402 Nürnberg", ring: "innen", geo: { lat: 49.45, lon: 11.07 } };
+    const venue = { name: "Ort", address: "Weg 1, 90402 Nürnberg", geo: { lat: 49.45, lon: 11.07 } };
     expect(Venue.safeParse({ ...venue, id: "ort-eins" }).success).toBe(true);
     const bad = Venue.safeParse({ ...venue, id: "Ort--Eins" });
     expect(bad.success).toBe(false);
@@ -94,7 +94,7 @@ describe("KEBAB_ID_PATTERN (Plan 0010, E2)", () => {
   });
 
   it("begrenzt die Länge, weil IDs in geteilten Links stehen (Plan 0026, Arch-Review M1)", () => {
-    const venue = { name: "Ort", address: "Weg 1, 90402 Nürnberg", ring: "innen", geo: { lat: 49.45, lon: 11.07 } };
+    const venue = { name: "Ort", address: "Weg 1, 90402 Nürnberg", geo: { lat: 49.45, lon: 11.07 } };
     expect(Venue.safeParse({ ...venue, id: "a".repeat(MAX_KEBAB_ID) }).success).toBe(true);
     expect(Venue.safeParse({ ...venue, id: "a".repeat(MAX_KEBAB_ID + 1) }).success).toBe(false);
     // die längste mögliche Offer-ID aus zwei Katalog-IDs passt in MAX_OFFER_ID

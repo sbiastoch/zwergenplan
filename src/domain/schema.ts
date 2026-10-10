@@ -3,8 +3,9 @@
  * JSON Schema unter schema/ wird hieraus exportiert – nie von Hand ändern.
  */
 import { z } from "zod";
-import { inBounds, NUERNBERG_BBOX } from "./geo.ts";
+import { inBounds } from "./geo.ts";
 import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, MAX_OFFER_ID, OFFER_ID_PATTERN } from "./ids.ts";
+import { REGION_IDS, REGIONS } from "./regions.ts";
 import { isoWeekday } from "./time.ts";
 import { categoriesOf, TOPICS } from "./topics.ts";
 
@@ -19,19 +20,30 @@ export const Registration = z.enum(["mit-anmeldung", "ohne-anmeldung"]);
 export const Cost = z.enum(["kostenlos", "kostenpflichtig"]);
 const AvailabilityStatus = z.enum(["frei", "wenige", "ausgebucht", "warteliste", "ohne-anmeldung", "unbekannt"]);
 
-/** Koordinate im Großraum Nürnberg (`NUERNBERG_BBOX`, geo.ts) – alles außerhalb ist ein Geocoding-Fehler. */
+/** Koordinate; ob sie in der Region des Anbieters liegt, prüft `Provider` (Plan 0031, E1). */
 const Geo = z.object({
-  lat: z.number().min(NUERNBERG_BBOX.minLat).max(NUERNBERG_BBOX.maxLat),
-  lon: z.number().min(NUERNBERG_BBOX.minLon).max(NUERNBERG_BBOX.maxLon),
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
 });
+
+/** Heuristik (Plan 0031, Test 2): „08.11.“ oder ISO-Datum; „8. November“ rutscht durch. */
+const DATE_LIKE = /\d{1,2}\.\d{1,2}\.|\d{4}-\d{2}-\d{2}/;
+/** Kurzer Extraktionshinweis für das Modell, ohne Datum (das veraltet; Plan 0031, E3) */
+const Hint = z
+  .string()
+  .min(1)
+  .max(200)
+  .refine((h) => !DATE_LIKE.test(h), "hint ohne Datum");
 
 export const Venue = z.strictObject({
   id: kebab,
   name: z.string().min(1),
   address: z.string().min(5),
   district: z.string().optional(),
-  ring: z.enum(["innen", "knapp-aussen", "aussen"]),
+  // `ring` (Abstand zur Nürnberger Stadtmauer) entfällt: Nürnberg-Semantik, die niemand las (Plan 0031, E2).
   geo: Geo,
+  /** Extraktionshinweis zu diesem Ort für den Crawler („Babymassage freitags“), ohne Datum (Plan 0031, Review 2 M6) */
+  hint: Hint.optional(),
   // `nearestStops` (ADR 0005) entfällt: nächste Halte sind ein abgeleiteter Wert (ADR 0011, Plan 0009 E12).
 });
 
@@ -40,9 +52,51 @@ export const ProviderAge = z
   .strictObject({ minMonths: z.int().min(0).max(216), maxMonths: z.int().min(0).max(216) })
   .refine((a) => a.minMonths <= a.maxMonths, "minMonths <= maxMonths");
 
-const Programme = z.strictObject({
-  url: z.url(),
+/**
+ * Nur `{von}` und `{bis}` (YYYY-MM-DD, Abfragefenster) ersetzt der Abruf (Plan 0031, E3; Plan 0015, E4). Als Platzhalter
+ * gilt `{name}` aus Buchstaben und `_`; JSON- und GraphQL-Klammern mit Anführungszeichen oder Leerzeichen sind keine.
+ */
+const onlyKnownPlaceholders = (text: string) =>
+  [...text.matchAll(/\{([A-Za-z_]+)\}/g)].every(([, name]) => name === "von" || name === "bis");
+const PLACEHOLDER_MESSAGE = "nur die Platzhalter {von} und {bis}";
+/** JSON-Body, nachdem `{von}`/`{bis}` durch ein Datum ersetzt sind (Plan 0031, Review 2 B1) */
+const isJsonWithPlaceholders = (body: string) => {
+  try {
+    JSON.parse(body.replaceAll("{von}", "2026-01-01").replaceAll("{bis}", "2027-02-01"));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Eine Stelle, an der Termine (oder Plätze) stehen, so beschrieben, dass ein Crawler sie abrufen kann (Plan 0031, E3).
+ * Phase a: neue Felder optional, `note` und `kind: js` noch erlaubt; Phase c verengt.
+ */
+export const Programme = z.strictObject({
+  url: z.url().refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE),
+  /** Format der Antwort */
   kind: z.enum(["html", "pdf", "ical", "json-api", "js"]),
+  /** Seite braucht JavaScript; der Crawler rendert sie im Browser */
+  render: z.literal("browser").optional(),
+  /** Wozu die Seite dient: nur `termine` und `verfuegbarkeit` gehen in Abruf und Prompt */
+  use: z.enum(["termine", "verfuegbarkeit", "info"]).optional(),
+  request: z
+    .strictObject({
+      method: z.literal("POST"),
+      headers: z.record(z.string(), z.string()).optional(),
+      body: z
+        .string()
+        .min(1)
+        .refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE)
+        .refine(isJsonWithPlaceholders, "body muss JSON sein (mit {von}/{bis} als Datum)"),
+    })
+    .optional(),
+  /** mit Abrufbeleg gesperrt (Login, Bot-Schutz auch im Browser): Der Anbieter ist bewusst ohne diese Quelle */
+  blocked: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
+  /** kurzer Extraktionshinweis für das Modell, ohne Datum (das veraltet) */
+  hint: Hint.optional(),
+  /** Altform bis Plan 0031, Phase c */
   note: z.string().optional(),
 });
 
@@ -57,6 +111,8 @@ const Note = z
  * stehen nur an den Angeboten.
  */
 const sourceBase = {
+  /** Region der Quelle (Plan 0031, E1); Orte müssen in ihrer bbox liegen */
+  region: z.enum(REGION_IDS),
   name: z.string().min(1),
   url: z.url(),
   /** ALLE Stellen, an denen Termine stehen */
@@ -81,15 +137,23 @@ const AGGREGATOR_ADAPTERS = ["stadt-vk", "frankenkids", "evtermine"] as const;
  * - verzeichnis: Liste zur Katalogpflege, liefert keine Termine
  */
 export const Provider = z.discriminatedUnion("role", [
-  z.strictObject({
-    id: kebab,
-    role: z.literal("anbieter"),
-    ...sourceBase,
-    age: ProviderAge.optional(),
-    venues: z.array(Venue).min(1),
-    /** Termine kommen vollständig über diesen Sammelkalender (eigene Seite wird nicht abgefragt) */
-    coveredBy: kebab.optional(),
-  }),
+  z
+    .strictObject({
+      id: kebab,
+      role: z.literal("anbieter"),
+      ...sourceBase,
+      age: ProviderAge.optional(),
+      venues: z.array(Venue).min(1),
+      /** Termine kommen vollständig über diesen Sammelkalender (eigene Seite wird nicht abgefragt) */
+      coveredBy: kebab.optional(),
+    })
+    .superRefine((p, ctx) => {
+      const { bbox } = REGIONS[p.region];
+      p.venues.forEach((v, i) => {
+        if (!inBounds(v.geo, bbox))
+          ctx.addIssue({ code: "custom", message: `Ort außerhalb der Region ${p.region}`, path: ["venues", i, "geo"] });
+      });
+    }),
   z.strictObject({
     id: kebab,
     role: z.literal("aggregator"),

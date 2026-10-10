@@ -15,6 +15,12 @@
             "type": "string",
             "const": "anbieter"
           },
+          "region": {
+            "type": "string",
+            "enum": [
+              "nuernberg"
+            ]
+          },
           "name": {
             "type": "string",
             "minLength": 1
@@ -42,6 +48,69 @@
                     "json-api",
                     "js"
                   ]
+                },
+                "render": {
+                  "type": "string",
+                  "const": "browser"
+                },
+                "use": {
+                  "type": "string",
+                  "enum": [
+                    "termine",
+                    "verfuegbarkeit",
+                    "info"
+                  ]
+                },
+                "request": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "POST"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "body"
+                  ],
+                  "additionalProperties": false
+                },
+                "blocked": {
+                  "type": "object",
+                  "properties": {
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "since": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    }
+                  },
+                  "required": [
+                    "reason",
+                    "since"
+                  ],
+                  "additionalProperties": false
+                },
+                "hint": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
                 },
                 "note": {
                   "type": "string"
@@ -134,39 +203,35 @@
                 "district": {
                   "type": "string"
                 },
-                "ring": {
-                  "type": "string",
-                  "enum": [
-                    "innen",
-                    "knapp-aussen",
-                    "aussen"
-                  ]
-                },
                 "geo": {
                   "type": "object",
                   "properties": {
                     "lat": {
                       "type": "number",
-                      "minimum": 49.3,
-                      "maximum": 49.65
+                      "minimum": -90,
+                      "maximum": 90
                     },
                     "lon": {
                       "type": "number",
-                      "minimum": 10.85,
-                      "maximum": 11.3
+                      "minimum": -180,
+                      "maximum": 180
                     }
                   },
                   "required": [
                     "lat",
                     "lon"
                   ]
+                },
+                "hint": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
                 }
               },
               "required": [
                 "id",
                 "name",
                 "address",
-                "ring",
                 "geo"
               ],
               "additionalProperties": false
@@ -181,6 +246,7 @@
         "required": [
           "id",
           "role",
+          "region",
           "name",
           "url",
           "programme",
@@ -201,6 +267,12 @@
           "role": {
             "type": "string",
             "const": "aggregator"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "nuernberg"
+            ]
           },
           "name": {
             "type": "string",
@@ -229,6 +301,69 @@
                     "json-api",
                     "js"
                   ]
+                },
+                "render": {
+                  "type": "string",
+                  "const": "browser"
+                },
+                "use": {
+                  "type": "string",
+                  "enum": [
+                    "termine",
+                    "verfuegbarkeit",
+                    "info"
+                  ]
+                },
+                "request": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "POST"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "body"
+                  ],
+                  "additionalProperties": false
+                },
+                "blocked": {
+                  "type": "object",
+                  "properties": {
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "since": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    }
+                  },
+                  "required": [
+                    "reason",
+                    "since"
+                  ],
+                  "additionalProperties": false
+                },
+                "hint": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
                 },
                 "note": {
                   "type": "string"
@@ -291,6 +426,7 @@
         "required": [
           "id",
           "role",
+          "region",
           "name",
           "url",
           "programme",
@@ -310,6 +446,12 @@
           "role": {
             "type": "string",
             "const": "verzeichnis"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "nuernberg"
+            ]
           },
           "name": {
             "type": "string",
@@ -338,6 +480,69 @@
                     "json-api",
                     "js"
                   ]
+                },
+                "render": {
+                  "type": "string",
+                  "const": "browser"
+                },
+                "use": {
+                  "type": "string",
+                  "enum": [
+                    "termine",
+                    "verfuegbarkeit",
+                    "info"
+                  ]
+                },
+                "request": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "const": "POST"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "method",
+                    "body"
+                  ],
+                  "additionalProperties": false
+                },
+                "blocked": {
+                  "type": "object",
+                  "properties": {
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "since": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    }
+                  },
+                  "required": [
+                    "reason",
+                    "since"
+                  ],
+                  "additionalProperties": false
+                },
+                "hint": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
                 },
                 "note": {
                   "type": "string"
@@ -392,6 +597,7 @@
         "required": [
           "id",
           "role",
+          "region",
           "name",
           "url",
           "programme",

@@ -116,7 +116,8 @@ describe("validateDataset", () => {
     const aggregator = {
       id: "kalender-mit-adapter",
       role: "aggregator",
-      adapter: "evtermine",
+      region: "nuernberg",
+      adapter: "frankenkids",
       name: "Sammelkalender (fiktiv)",
       url: "https://example.org/kalender",
       programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
@@ -194,6 +195,85 @@ describe("validateDataset", () => {
     ],
   ])("Katalog: %s → Fehler", (_name, fn, expected) => {
     expect(errorsOf(mutate((_o, p) => fn(p)))).toContain(expected);
+  });
+
+  // Plan 0031, Phase a: Region und ausführbare Programmeinträge
+  type Cat = Array<Record<string, unknown>>;
+  const prog = (p: Cat, i: number) => (p[i] as { programme: Array<Record<string, unknown>> }).programme[0] ?? {};
+  const venue0 = (p: Cat) => (p[0] as { venues: Array<Record<string, unknown>> }).venues[0] ?? {};
+  it.each([
+    ["ohne Region", (p: Cat) => delete (p[0] as Record<string, unknown>)["region"], "region"],
+    ["unbekannte Region", (p: Cat) => Object.assign(p[0] as object, { region: "duesseldorf" }), "region"],
+    [
+      "Ort außerhalb der Region",
+      (p: Cat) => Object.assign(venue0(p), { geo: { lat: 51.2277, lon: 6.7735 } }),
+      "außerhalb der Region nuernberg",
+    ],
+    ["ring am Ort", (p: Cat) => Object.assign(venue0(p), { ring: "innen" }), "ring"],
+    [
+      "fremder Platzhalter in der URL",
+      (p: Cat) => Object.assign(prog(p, 0), { url: "https://example.org/?d={heute}" }),
+      "{von}",
+    ],
+    [
+      "fremder Platzhalter im Body",
+      (p: Cat) => Object.assign(prog(p, 0), { request: { method: "POST", body: '{"from":"{start}"}' } }),
+      "{von}",
+    ],
+    ["Datum im hint", (p: Cat) => Object.assign(prog(p, 0), { hint: "nächster Termin 08.11." }), "Datum"],
+    [
+      "Body kein JSON",
+      (p: Cat) => Object.assign(prog(p, 0), { request: { method: "POST", body: "von={von}" } }),
+      "JSON",
+    ],
+    ["Datum im hint am Ort", (p: Cat) => Object.assign(venue0(p), { hint: "Termine ab 2026-11-01" }), "Datum"],
+    ["request ohne body", (p: Cat) => Object.assign(prog(p, 0), { request: { method: "POST" } }), "body"],
+    ["blocked ohne since", (p: Cat) => Object.assign(prog(p, 0), { blocked: { reason: "Login" } }), "since"],
+  ])("Katalog 0031: %s → Fehler", (_name, fn, expected) => {
+    expect(errorsOf(mutate((_o, p) => fn(p)))).toContain(expected);
+  });
+
+  it("Katalog 0031: Platzhalter, render, use, request, blocked und hint sind gültig", () => {
+    const r = mutate((_o, p) =>
+      Object.assign(prog(p, 0), {
+        url: "https://example.org/programm?von={von}&bis={bis}",
+        render: "browser",
+        use: "termine",
+        hint: "nur Gruppen ab 0 und ab 1",
+        request: {
+          method: "POST",
+          headers: { Origin: "https://example.org" },
+          body: '{"query":"query { courses(options:{limit:50}) { items { id start } } }","variables":{"from":"{von}","to":"{bis}"}}',
+        },
+      }),
+    );
+    expect(errorsOf(r)).toBe("");
+    expect(
+      errorsOf(mutate((_o, p) => Object.assign(venue0(p), { hint: "Babymassage freitags, Krabbelgruppe dienstags" }))),
+    ).toBe("");
+    expect(errorsOf(r)).toBe("");
+  });
+
+  it("Katalog 0031: coveredBy auf einen evtermine-Kalender verlangt eine vid in den Programm-URLs", () => {
+    const kalender = {
+      id: "ev-kalender",
+      role: "aggregator",
+      region: "nuernberg",
+      adapter: "evtermine",
+      name: "Sammelkalender (fiktiv)",
+      url: "https://example.org/kalender",
+      programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
+      availability: { shown: "nein" },
+      verified: "2026-10-04",
+    };
+    const withCover = (url: string) =>
+      mutate((_o, p) => {
+        p.push(structuredClone(kalender));
+        Object.assign(p[0] as object, { coveredBy: "ev-kalender" });
+        Object.assign(prog(p, 0), { url });
+      });
+    expect(errorsOf(withCover("https://example.org/programm"))).toContain("vid=");
+    expect(errorsOf(withCover("https://www.evangelische-termine.de/veranstaltungen?vid=124"))).toBe("");
   });
 
   it("Katalog: Notizen als Liste, availability.how mit Text", () => {

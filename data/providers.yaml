@@ -1,6 +1,7 @@
 # Anbieterkatalog – Vertrag: src/domain/schema.ts (Provider), JSON Schema: schema/providers.schema.json
 - id: babykonzert-nuernberg
   role: anbieter
+  region: nuernberg
   name: Babykonzert – Klassik auf der Krabbeldecke (Presseclub Nürnberg)
   url: https://babykonzert.de/home/nuernberg/
   age:
@@ -23,10 +24,10 @@
       name: Marmorsaal des Presseclubs
       address: Marmorsaal des Presseclubs, Gewerbemuseumsplatz 2, 90403 Nürnberg
       district: Marienvorstadt
-      ring: innen
       geo: { lat: 49.451459, lon: 11.083642 }
 - id: cvjm-nuernberg-wuselwelt
   role: anbieter
+  region: nuernberg
   name: CVJM Nürnberg – Wuselwelt (offene Bewegungs-/Spielzeit 0-3 J)
   url: https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote
   age:
@@ -56,10 +57,10 @@
       name: CVJM-Haus
       address: CVJM-Haus, Kornmarkt 6, 90402 Nürnberg (Turnhalle 2. UG)
       district: Altstadt St. Lorenz
-      ring: innen
       geo: { lat: 49.449186, lon: 11.075447 }
 - id: hebamme-eva-kauper-wunderwerk
   role: anbieter
+  region: nuernberg
   name: Hebamme Eva Kauper – Praxis WunderWerk
   url: https://www.hebammeeva.de/kurse
   age:
@@ -76,7 +77,8 @@
       kind: html
       note: Babymassage-Kursstarts (z. B. Fr 16.10.-13.11.26, Fr 20.11.-18.12.26), 95 €, Ort je Wochentag
     - url: https://hebammeeva.mymiya.de/courses/
-      kind: js
+      kind: html
+      render: browser
       note: Buchung/Verfügbarkeit über miya (nur im Browser gerendert)
   availability:
     shown: teilweise
@@ -92,15 +94,14 @@
       name: WunderWerk
       address: Pfarrgasse 9, 90402 Nürnberg
       district: Altstadt (St. Lorenz)
-      ring: innen
       geo: { lat: 49.451707, lon: 11.079752 }
     - id: hebamme-eva-kauper-wunderwerk-praxis-just
       name: Praxis Just
       address: Kölner Straße 32, 90425 Nürnberg
-      ring: aussen
       geo: { lat: 49.467802, lon: 11.058629 }
 - id: hebamme-mainberger-praenatal
   role: anbieter
+  region: nuernberg
   name: Hebamme Susanne Mainberger (Kursraum Meet&Move bei Praenatal)
   url: https://mainberger.hebamio.de/kursliste
   age:
@@ -125,10 +126,10 @@
       name: Hebamme Susanne Mainberger (Kursraum Meet&Move bei Praenatal)
       address: Findelgasse 4, 90402 Nürnberg
       district: Altstadt (St. Lorenz)
-      ring: innen
       geo: { lat: 49.451921, lon: 11.078425 }
 - id: kath-stadtkirche-familiengottesdienste
   role: aggregator
+  region: nuernberg
   name: Katholische Stadtkirche Nürnberg – Übersicht Gottesdienste für Familien (alle Pfarreien)
   url: https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien
   programme:
@@ -144,6 +145,7 @@
     - "Sitz: Vordere Sterngasse 1, 90402 Nürnberg"
 - id: kindertheaterreihe-kuf
   role: anbieter
+  region: nuernberg
   name: Kindertheaterreihe 'Kurze Beine, kurze Wege' (KUF, Kulturläden)
   url: https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe.html
   age:
@@ -173,60 +175,50 @@
       name: Amt für Kultur und Freizeit
       address: Amt für Kultur und Freizeit, Gewerbemuseumsplatz 1, 90403 Nürnberg
       district: stadtweit
-      ring: innen
       geo: { lat: 49.451914, lon: 11.083874 }
     - id: kindertheaterreihe-kuf-kulturladen-loni-uebler-haus
       name: Kulturladen Loni-Übler-Haus
       address: Marthastraße 60, 90482 Nürnberg
-      ring: aussen
       geo: { lat: 49.45545, lon: 11.112479 }
     - id: kindertheaterreihe-kuf-vischers-kulturladen
       name: Vischers Kulturladen
       address: Hufelandstraße 4, 90419 Nürnberg
-      ring: aussen
       geo: { lat: 49.464494, lon: 11.06648 }
     - id: kindertheaterreihe-kuf-kulturladen-roethenbach
       name: Kulturladen Röthenbach
       address: Röthenbacher Hauptstraße 74, 90449 Nürnberg
-      ring: aussen
       geo: { lat: 49.415634, lon: 11.031718 }
     - id: kindertheaterreihe-kuf-kulturladen-gartenstadt
       name: Kulturladen Gartenstadt
       address: Frauenlobstraße 7, 90469 Nürnberg
-      ring: aussen
       geo: { lat: 49.416174, lon: 11.073692 }
     - id: kindertheaterreihe-kuf-kulturladen-zeltnerschloss
       name: Kulturladen Zeltnerschloss
       address: Gleißhammerstraße 6, 90408 Nürnberg
-      ring: aussen
       geo: { lat: 49.447443, lon: 11.109439 }
     - id: kindertheaterreihe-kuf-villa-leon
       name: Villa Leon
       address: Philipp-Körber-Weg 1, 90439 Nürnberg
-      ring: aussen
       geo: { lat: 49.44334, lon: 11.054293 }
     - id: kindertheaterreihe-kuf-kulturladen-ziegelstein
       name: Kulturladen Ziegelstein
       address: Gumbinner Str. 12, 90411 Nürnberg
-      ring: aussen
       geo: { lat: 49.486503, lon: 11.107458 }
     - id: kindertheaterreihe-kuf-kulturbuero-muggenhof
       name: Kulturbüro Muggenhof / Kulturwerkstatt Auf AEG
       address: Fürther Straße 244d, 90429 Nürnberg
-      ring: aussen
       geo: { lat: 49.460658, lon: 11.03232 }
     - id: kindertheaterreihe-kuf-gemeinschaftshaus-langwasser
       name: Gemeinschaftshaus Langwasser
       address: Glogauer Straße 50, 90473 Nürnberg
-      ring: aussen
       geo: { lat: 49.401934, lon: 11.136757 }
     - id: kindertheaterreihe-kuf-kuf-im-suedpunkt
       name: KUF im südpunkt
       address: Pillenreuther Straße 147, 90459 Nürnberg
-      ring: aussen
       geo: { lat: 49.43142, lon: 11.087226 }
 - id: neues-museum-baby-museum
   role: anbieter
+  region: nuernberg
   name: Neues Museum Nürnberg – Baby & Museum
   url: https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm
   age:
@@ -251,10 +243,10 @@
       name: Neues Museum Nürnberg – Baby & Museum
       address: Luitpoldstraße 5 (Klarissenplatz), 90402 Nürnberg
       district: Altstadt (Lorenz)
-      ring: innen
       geo: { lat: 49.447676, lon: 11.079934 }
 - id: schwimmschule-ohana-nuernberg
   role: anbieter
+  region: nuernberg
   name: Schwimmschule Ohana – Nürnberg (Kliniken Dr. Erler)
   url: https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3
   age:
@@ -283,10 +275,10 @@
       name: Kliniken Dr. Erler
       address: Kliniken Dr. Erler, Kontumazgarten 4-19, 90429 Nürnberg
       district: St. Johannis / Gostenhof (Kontumazgarten)
-      ring: innen
       geo: { lat: 49.452834, lon: 11.068684 }
 - id: stadtbibliothek-nuernberg
   role: anbieter
+  region: nuernberg
   name: Stadtbibliothek Nürnberg (Bildungscampus) – Bücherzwerge, Lesestart
   url: https://www.nuernberg.de/internet/stadtbibliothek/veranstaltungenkinder.html
   age:
@@ -317,25 +309,22 @@
       name: Stadtbibliothek Zentrum, Kinderbibliothek L3
       address: Gewerbemuseumsplatz 4, 90403 Nürnberg
       district: Altstadt-Ost / Marienvorstadt
-      ring: innen
       geo: { lat: 49.452002, lon: 11.082865 }
     - id: stadtbibliothek-nuernberg-stadtbibliothek-langwasser
       name: Stadtbibliothek Langwasser
       address: Glogauer Straße 50 (Gemeinschaftshaus), 90473 Nürnberg
-      ring: aussen
       geo: { lat: 49.401934, lon: 11.136757 }
     - id: stadtbibliothek-nuernberg-stadtbibliothek-maxfeld
       name: Stadtbibliothek Maxfeld
       address: Maxfeldstraße 27, 90409 Nürnberg
-      ring: knapp-aussen
       geo: { lat: 49.461693, lon: 11.084606 }
     - id: stadtbibliothek-nuernberg-stadtbibliothek-suedstadt-im
       name: Stadtbibliothek Südstadt im südpunkt
       address: Pillenreuther Straße 147, 90459 Nürnberg
-      ring: aussen
       geo: { lat: 49.43142, lon: 11.087226 }
 - id: sternenhaus-kuf
   role: anbieter
+  region: nuernberg
   name: Sternenhaus – Kinderkultur in der Vorweihnachtszeit (KUF)
   url: https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html
   age:
@@ -346,7 +335,8 @@
       kind: html
       note: Saison 28.11.–23.12.2026; Familienprogramm mit Ticketlinks ab 13.10.2026 auf dieser Seite
     - url: https://kukuq.eventim-inhouse.de/webshop/webticket/shop?production=97
-      kind: js
+      kind: html
+      render: browser
       note: Eventim-Inhouse-Webshop der Kulturinformation (Produktion Sternenhaus)
     - url: https://www.nuernberg.de/internet/kuf_kultur/sternenhaus_kinder_familien.html
       kind: html
@@ -369,10 +359,10 @@
       name: Sternenhaus – Kinderkultur in der Vorweihnachtszeit (KUF)
       address: Hans-Sachs-Platz 2, 90403 Nürnberg
       district: Altstadt (Sebald)
-      ring: innen
       geo: { lat: 49.453424, lon: 11.08032 }
 - id: dance-maxx-nuernberg
   role: anbieter
+  region: nuernberg
   name: Tanzstudio dance maxX Nürnberg – fitdankbaby® und Eltern-Kind-Tanz
   url: https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/
   age:
@@ -389,7 +379,8 @@
       kind: html
       note: Eltern-Kind-Tanz, Kinder ab 2 J.
     - url: https://calendly.com/dance-maxx-info/kostenlose-probestunde-fitdankbaby-in-nurnberg
-      kind: js
+      kind: html
+      render: browser
       note: Kostenlose Probestunde fitdankbaby buchen (Calendly zeigt freie Slots)
   availability:
     shown: nein
@@ -403,10 +394,10 @@
       name: Tanzstudio dance maxX Nürnberg – fitdankbaby® und Eltern-Kind-Tanz
       address: Kornmarkt 8, 90402 Nürnberg
       district: Altstadt
-      ring: innen
       geo: { lat: 49.449268, lon: 11.074381 }
 - id: zoff-harmonie
   role: anbieter
+  region: nuernberg
   name: Zoff + Harmonie – Familienbildung der Kath. Stadtkirche (Familienstützpunkt)
   url: https://zoff-harmonie.de/aktuelles/kurse-und-veranstaltungen
   age:
@@ -456,10 +447,10 @@
       name: Haus der Katholischen Stadtkirche
       address: Vordere Sterngasse 1, 90402 Nürnberg (Haus der Katholischen Stadtkirche)
       district: Altstadt (St. Lorenz)
-      ring: innen
       geo: { lat: 49.448549, lon: 11.078269 }
 - id: brk-familienzentrum
   role: anbieter
+  region: nuernberg
   name: BRK Familienzentrum – Kreisverband Nürnberg-Stadt (Familienstützpunkt)
   url: https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder.html
   age:
@@ -496,10 +487,10 @@
       name: BRK Familienzentrum – Kreisverband Nürnberg-Stadt (Familienstützpunkt)
       address: Nunnenbeckstraße 43 (EG), 90489 Nürnberg
       district: Veilhof/Wöhrd-Nord (östl. Laufertor)
-      ring: knapp-aussen
       geo: { lat: 49.45703, lon: 11.095069 }
 - id: die-familienbox
   role: anbieter
+  region: nuernberg
   name: Die FamilienBox – Das 'Dorf' für Familien
   url: https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/
   age:
@@ -516,7 +507,8 @@
       kind: html
       note: Kleinkindkurse 12-36 M.
     - url: https://www.eversports.de/org/widget/12409d8f-a593-49f5-8c73-910dfef5e2a6?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5
-      kind: js
+      kind: html
+      render: browser
       note: Eversports-Buchungskalender (Termine & Anmeldung); per Skript 403/Cloudflare
     - url: https://www.diefamilienbox.de/kinderkurse-nürnberg/offenes-familiencafé/
       kind: html
@@ -525,7 +517,8 @@
       kind: html
       note: Wochenstundenplan inkl. Erwachsenenkurse (Yoga mit Baby, Bauch-Beine-Beckenboden, Postnatales Pilates)
     - url: https://www.eversports.de/widget/w/vX25EB?list=course&group=84326
-      kind: js
+      kind: html
+      render: browser
       note: Eversports-Widget 'Yoga mit Baby' (3-12 Mon.); Turnkurse über https://www.eversports.de/org/widget/0455f70c-bfb9-40da-b2ca-d4a77077dae2?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5
   availability:
     shown: ja
@@ -542,10 +535,10 @@
       name: Die FamilienBox – Das 'Dorf' für Familien
       address: Rosenaustraße 7 (Hinterhaus), 90429 Nürnberg
       district: Gostenhof/Himpfelshof (Plärrer)
-      ring: knapp-aussen
       geo: { lat: 49.449976, lon: 11.062789 }
 - id: fbs-nuernberg
   role: anbieter
+  region: nuernberg
   name: FBS – Evangelische Familien-Bildungsstätte Nürnberg (Familienstützpunkt)
   url: https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/
   age:
@@ -599,25 +592,22 @@
       name: FBS Haupthaus
       address: Südliche Fürther Str. 20, 90429 Nürnberg
       district: Gostenhof (Plärrer-Umfeld)
-      ring: knapp-aussen
       geo: { lat: 49.449323, lon: 11.06096 }
     - id: fbs-nuernberg-gemeindehaus-thomaskirche
       name: Gemeindehaus Thomaskirche Großreuth
       address: Winterstraße 20a, 90431 Nürnberg
-      ring: aussen
       geo: { lat: 49.436185, lon: 11.021224 }
     - id: fbs-nuernberg-waldracker
       name: Waldracker
       address: Schiestlstraße, 90427 Nürnberg
-      ring: aussen
       geo: { lat: 49.511053, lon: 11.052141 }
     - id: fbs-nuernberg-wald-angebot-steinbruechlein
       name: Wald-Angebot Steinbrüchlein
       address: Am Steinbrüchlein, 90455 Nürnberg
-      ring: aussen
       geo: { lat: 49.388781, lon: 11.110957 }
 - id: hebammen-johannis
   role: anbieter
+  region: nuernberg
   name: Hebammen in Johannis (Hebammenpraxis St. Johannis)
   url: https://www.hebammen-johannis.de/kurse
   age:
@@ -643,10 +633,10 @@
       name: Hebammen in Johannis (Hebammenpraxis St. Johannis)
       address: Burgschmietstraße 25 (Hinterhaus), 90419 Nürnberg
       district: St. Johannis
-      ring: knapp-aussen
       geo: { lat: 49.457721, lon: 11.069299 }
 - id: hebanne-schulz
   role: anbieter
+  region: nuernberg
   name: HebAnne – Hebamme Anne Schulz
   url: https://www.hebanne-schulz.de/
   age:
@@ -672,10 +662,10 @@
       name: HebAnne – Hebamme Anne Schulz
       address: Rosenaustraße 7 (Hinterhaus, FamilienBox), 90429 Nürnberg
       district: Gostenhof/Himpfelshof
-      ring: knapp-aussen
       geo: { lat: 49.449976, lon: 11.062789 }
 - id: musication-musikgarten
   role: anbieter
+  region: nuernberg
   name: Musication – Musikgarten für Babys & Kleinkinder
   url: https://musication.de/kinder-musik/musikgarten-fuer-babys/
   age:
@@ -709,10 +699,10 @@
       name: Musication – Musikgarten für Babys & Kleinkinder
       address: Schanzäckerstraße 33-35, 90443 Nürnberg
       district: Gostenhof/Steinbühl
-      ring: knapp-aussen
       geo: { lat: 49.445661, lon: 11.068 }
 - id: staatstheater-nuernberg-familie
   role: anbieter
+  region: nuernberg
   name: Staatstheater Nürnberg – Vorschul- und Familienformate (Staatsphilharmonie, Oper)
   url: https://staatstheater-nuernberg.de/spielplan-26-27
   age:
@@ -738,10 +728,10 @@
       name: Staatstheater Nürnberg – Vorschul- und Familienformate (Staatsphilharmonie, Oper)
       address: Richard-Wagner-Platz 2–10, 90443 Nürnberg
       district: Südstadt / Opernhaus
-      ring: knapp-aussen
       geo: { lat: 49.445963, lon: 11.076238 }
 - id: stadtmission-schwangerschaftsberatung
   role: anbieter
+  region: nuernberg
   name: Stadtmission Nürnberg – Beratungsstelle für Schwangerschaftsfragen (Babymassage, Teegarten)
   url: https://www.stadtmission-nuernberg.de/ich-brauche-hilfe/kinder-jugend-und-familie/schwangerschafts-und-sexualberatung
   age:
@@ -766,10 +756,10 @@
       name: Stadtmission Nürnberg – Beratungsstelle für Schwangerschaftsfragen (Babymassage, Teegarten)
       address: Krellerstraße 3, 90489 Nürnberg
       district: Wöhrd
-      ring: knapp-aussen
       geo: { lat: 49.458645, lon: 11.093873 }
 - id: theater-salz-pfeffer
   role: anbieter
+  region: nuernberg
   name: Theater Salz+Pfeffer (Figurentheater)
   url: https://kinder-salzundpfeffer.reservix.de/events
   age:
@@ -794,10 +784,10 @@
       name: Theater Salz+Pfeffer (Figurentheater)
       address: Frauentorgraben 73, 90443 Nürnberg
       district: Plärrer / Steinbühl
-      ring: knapp-aussen
       geo: { lat: 49.447149, lon: 11.068328 }
 - id: wolf-pack-yoga
   role: anbieter
+  region: nuernberg
   name: Wolf Pack Yoga – Yoga mit Baby (in den Räumen der Hebammen in Johannis)
   url: https://www.wolfpack.yoga/yoga-mit-baby
   age:
@@ -808,7 +798,8 @@
       kind: html
       note: Kursblöcke mit Startdaten (22.10.26, 10.12.26, 11.02.27, 01.04.27, 03.06.27), Do 9:30-10:30, 6 Termine 102 EUR; je Block 'hier buchen'-Link zu Eversports-Activity
     - url: https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe
-      kind: js
+      kind: html
+      render: browser
       note: Eversports-Buchungsseite Block 22.10.26 (Cloudflare 403 für Skripte)
   availability:
     shown: ja
@@ -824,15 +815,14 @@
       name: Hebammen in Johannis
       address: Hebammen in Johannis, Burgschmietstraße 25, 90419 Nürnberg
       district: St. Johannis
-      ring: knapp-aussen
       geo: { lat: 49.457721, lon: 11.069299 }
     - id: wolf-pack-yoga-wolf-pack-yoga-studio
       name: Wolf Pack Yoga Studio
       address: Waechterstraße 25, 90489 Nürnberg
-      ring: aussen
       geo: { lat: 49.458036, lon: 11.095669 }
 - id: zentrum-kobergerstrasse
   role: anbieter
+  region: nuernberg
   name: Zentrum Kobergerstraße – Beratungsstelle für Schwangere, Eltern und Kinder (Familienstützpunkt)
   url: https://www.zentrum-koberger.de/koberger-minis-midis-maxis/
   age:
@@ -861,10 +851,10 @@
       name: Zentrum Kobergerstraße – Beratungsstelle für Schwangere, Eltern und Kinder (Familienstützpunkt)
       address: Kobergerstraße 79, 90408 Nürnberg
       district: Nordstadt (St. Johannis-Ost/Maxfeld)
-      ring: knapp-aussen
       geo: { lat: 49.463785, lon: 11.072326 }
 - id: atv-1873-frankonia
   role: anbieter
+  region: nuernberg
   name: ATV 1873 Frankonia Nürnberg – 'Riesen & Zwerge' (Eltern-Kind-Turnen)
   url: https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/
   age:
@@ -886,10 +876,10 @@
       name: ATV Kampfsportraum
       address: ATV Kampfsportraum, Willstätterstr. 30, 90449 Nürnberg
       district: Röthenbach / Eibach
-      ring: aussen
       geo: { lat: 49.427555, lon: 11.017203 }
 - id: cvjm-gostenhof-miniclub
   role: anbieter
+  region: nuernberg
   name: CVJM Nürnberg-Gostenhof – Mini-Club
   url: https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club
   age:
@@ -916,10 +906,10 @@
       name: CVJM Nürnberg-Gostenhof – Mini-Club
       address: Glockendonstraße 10, 90429 Nürnberg
       district: Gostenhof
-      ring: aussen
       geo: { lat: 49.451286, lon: 11.051704 }
 - id: djk-eibach
   role: anbieter
+  region: nuernberg
   name: DJK Nürnberg-Eibach – Eltern-Kind-Turnen und Mini-Club
   url: https://www.djk-eibach.de/abteilungen/turnen/
   age:
@@ -943,10 +933,10 @@
       name: DJK Nürnberg-Eibach – Eltern-Kind-Turnen und Mini-Club
       address: Turnhalle Volksschule Fürreuthweg, 90451 Nürnberg
       district: Eibach
-      ring: aussen
       geo: { lat: 49.408514, lon: 11.038562 }
 - id: ev-fischbach
   role: anbieter
+  region: nuernberg
   name: Ev. Auferstehungskirche Fischbach – Mutter-Kind-Gruppen & Minigottesdienst
   url: https://fischbach-evangelisch.de/
   age:
@@ -969,12 +959,12 @@
       name: Haus der Begegnung
       address: Haus der Begegnung, Fischbacher Hauptstraße 213, 90475 Nürnberg
       district: Fischbach
-      ring: aussen
       geo: { lat: 49.419786, lon: 11.195889 }
   notes:
     - Mutter-Kind-Gruppen in festen Gruppen (ca. 3 Monate bis 4 Jahre), Aufnahme per E-Mail; evangelische-termine nennt abweichend „ab 3 Jahren“
 - id: ev-zerzabelshof-musikzwerge
   role: anbieter
+  region: nuernberg
   name: Ev. Auferstehungskirche Zerzabelshof – Musikzwerge (Eltern mit Baby/Kleinkind)
   url: https://www.evangelische-termine.de/ical?vid=124
   age:
@@ -996,11 +986,11 @@
       name: Ev. Auferstehungskirche Zerzabelshof – Musikzwerge (Eltern mit Baby/Kleinkind)
       address: Julius-Schieder-Platz 2, 90480 Nürnberg
       district: Zerzabelshof
-      ring: aussen
       geo: { lat: 49.442408, lon: 11.129587 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-altenfurt-minigottesdienst
   role: anbieter
+  region: nuernberg
   name: Ev. Christuskirche Altenfurt – Minigottesdienst
   url: https://www.evangelische-termine.de/ical?vid=558
   age:
@@ -1019,11 +1009,11 @@
       name: Evang. Gemeindehaus Altenfurt
       address: Evang. Gemeindehaus Altenfurt, Schornbaumstraße 14, 90475 Nürnberg
       district: Altenfurt
-      ring: aussen
       geo: { lat: 49.406553, lon: 11.166538 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-emmaus-gartenstadt
   role: anbieter
+  region: nuernberg
   name: Ev. Emmauskirche Gartenstadt – Miniclub / Flitzefüchse
   url: https://www.evangelische-termine.de/ical?vid=562
   age:
@@ -1042,11 +1032,11 @@
       name: Gemeindezentrum
       address: Gemeindezentrum, Schulze-Delitzsch-Weg 28, 90469 Nürnberg
       district: Gartenstadt
-      ring: aussen
       geo: { lat: 49.401249, lon: 11.090512 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-laufamholz-miniclub
   role: anbieter
+  region: nuernberg
   name: Ev. Heilig-Geist-Kirche Laufamholz – Miniclub
   url: https://www.evangelische-termine.de/ical?vid=566
   age:
@@ -1065,11 +1055,11 @@
       name: Gemeindehaus Laufamholz
       address: Gemeindehaus Laufamholz, Am Doktorsfeld 13, 90482 Nürnberg
       district: Laufamholz
-      ring: aussen
       geo: { lat: 49.465919, lon: 11.164448 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-buchenbuehl-miniclub
   role: anbieter
+  region: nuernberg
   name: Ev. Himmelfahrtskirche Buchenbühl – Miniclub
   url: https://www.evangelische-termine.de/ical?vid=568
   age:
@@ -1088,11 +1078,11 @@
       name: Gemeindesaal
       address: Gemeindesaal, Baiersdorfer Straße 8, 90411 Nürnberg
       district: Buchenbühl
-      ring: aussen
       geo: { lat: 49.504962, lon: 11.107406 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-eibach
   role: anbieter
+  region: nuernberg
   name: Ev. Johanneskirche Eibach – Waldkrabbelgruppe & Rhythmik mit Eltern und Kindern
   url: https://pfar-rer.de/
   age:
@@ -1118,15 +1108,14 @@
       name: Gemeindehaus Eibach, Kleiner Saal
       address: Gemeindehaus Eibach, Eibacher Hauptstraße 61, 90451 Nürnberg
       district: Eibach
-      ring: aussen
       geo: { lat: 49.402702, lon: 11.035894 }
     - id: ev-eibach-waldkrabbelgruppe-bogen-an-der
       name: "Waldkrabbelgruppe: Bogen an der Weiherbrücke im Faberpark/-wald"
       address: Faberpark, Rednitzstraße/Castellstraße, 90451 Nürnberg
-      ring: aussen
       geo: { lat: 49.414005, lon: 11.026021 }
 - id: ev-st-markus-gibitzenhof
   role: anbieter
+  region: nuernberg
   name: Ev. Kirchengemeinde St. Markus – Offene Tür für Groß und Klein & Café für Alle
   url: https://www.evangelische-termine.de/ical?vid=586
   age:
@@ -1137,10 +1126,12 @@
       kind: ical
       note: ET vid=586, Titel 'Offene Tür für Groß und Klein' (Mo 9-11, Spielzeit mit Kleinkind + Kaffee)
     - url: https://www.sanktmarkus-nuernberg.de/familiencafe/
-      kind: js
+      kind: html
+      render: browser
       note: Café für Alle / Familiencafé Di nachmittags (Seite nennt 14-17 bzw. 15-18 Uhr), Familien mit Kindern jeden Alters, Spende; Seite teils JS-gerendert
     - url: https://www.sanktmarkus-nuernberg.de/familien-kinder/
-      kind: js
+      kind: html
+      render: browser
       note: Übersicht Familienangebote (u. a. 'Mäusebande')
   availability:
     shown: nein
@@ -1155,10 +1146,10 @@
       name: Markuskirche / FreiRaum
       address: Markuskirche / FreiRaum, Frankenstraße 29, 90443 Nürnberg
       district: Gibitzenhof
-      ring: aussen
       geo: { lat: 49.429889, lon: 11.067391 }
 - id: ev-melanchthon-ziegelstein
   role: anbieter
+  region: nuernberg
   name: Ev. Melanchthonkirche Ziegelstein – Eltern-Kind-Gruppe 0-3
   url: https://www.evangelische-termine.de/ical?vid=574
   age:
@@ -1169,7 +1160,8 @@
       kind: ical
       note: ET vid=574, Di 9:30-11
     - url: https://www.melanchthonkirche-ziegelstein.de/angebote/kinder-und-familie/
-      kind: js
+      kind: html
+      render: browser
       note: Familienseite (JS-gerendert, wenig Text)
   availability:
     shown: nein
@@ -1180,10 +1172,10 @@
       name: Gemeindehaus
       address: Gemeindehaus, Gumbinner Straße 12, 90411 Nürnberg
       district: Ziegelstein
-      ring: aussen
       geo: { lat: 49.486503, lon: 11.107458 }
 - id: ev-nikodemus-roethenbach
   role: anbieter
+  region: nuernberg
   name: Ev. Nikodemuskirche (Nürnberg-Röthenbach) – Krabbelgruppen & Café Niko Familiencafé
   url: https://www.evangelische-termine.de/ical?vid=575
   age:
@@ -1204,11 +1196,11 @@
       name: Gemeindezentrum Nikodemuskirche
       address: Gemeindezentrum Nikodemuskirche, Stuttgarter Straße 33, 90449 Nürnberg
       district: Röthenbach bei Schweinau
-      ring: aussen
       geo: { lat: 49.416888, lon: 11.031091 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-st-andreas-thon
   role: anbieter
+  region: nuernberg
   name: Ev. St. Andreas Thon – Miniclubs (nach Geburtsjahrgang)
   url: https://www.evangelische-termine.de/ical?vid=126
   age:
@@ -1230,11 +1222,11 @@
       name: Ökumenisches Gemeindezentrum Thon
       address: Ökumenisches Gemeindezentrum Thon (evang. Teil, UG), Cuxhavener Straße 54, 90425 Nürnberg
       district: Thon
-      ring: aussen
       geo: { lat: 49.476843, lon: 11.06632 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-kraftshof-boxdorf
   role: anbieter
+  region: nuernberg
   name: Ev. St. Georg Kraftshof / Zum guten Hirten Boxdorf – Miniclub & Minikirche
   url: https://www.evangelische-termine.de/ical?vid=581
   age:
@@ -1253,16 +1245,15 @@
       name: Gemeindesaal Boxdorf
       address: Gemeindesaal Boxdorf, Kronacher Straße 1, 90427 Nürnberg
       district: Boxdorf / Kraftshof
-      ring: aussen
       geo: { lat: 49.518705, lon: 11.026625 }
     - id: ev-kraftshof-boxdorf-st-georgskirche-kraftshof
       name: St. Georgskirche Kraftshof
       address: Kraftshofer Hauptstraße 170, 90427 Nürnberg
-      ring: aussen
       geo: { lat: 49.512076, lon: 11.049847 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-st-jobst
   role: anbieter
+  region: nuernberg
   name: Ev. St. Jobst Erlenstegen – Miniclub Eltern-Kind-Gruppe
   url: https://www.evangelische-termine.de/ical?vid=582
   age:
@@ -1281,11 +1272,11 @@
       name: Miniclubraum
       address: Miniclubraum, Äußere Sulzbacher Straße 144, 90491 Nürnberg
       district: Erlenstegen
-      ring: aussen
       geo: { lat: 49.465142, lon: 11.121603 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-moegeldorf-minigottesdienst
   role: anbieter
+  region: nuernberg
   name: Ev. St. Nikolaus und St. Ulrich Mögeldorf – Mini-Gottesdienst
   url: https://www.evangelische-termine.de/ical?vid=192
   age:
@@ -1306,11 +1297,11 @@
       name: Ev. St. Nikolaus und St. Ulrich Mögeldorf – Mini-Gottesdienst
       address: Kirchenberg 15, 90482 Nürnberg
       district: Mögeldorf
-      ring: aussen
       geo: { lat: 49.462431, lon: 11.132273 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-stephanus-gebersdorf
   role: anbieter
+  region: nuernberg
   name: Ev. Stephanuskirche Gebersdorf – Eltern-Kind-Gruppe
   url: https://www.evangelische-termine.de/ical?vid=579
   age:
@@ -1329,11 +1320,11 @@
       name: Gemeindehaus Stephanuskirche
       address: Gemeindehaus Stephanuskirche, Neumühlweg 20a, 90449 Nürnberg
       district: Gebersdorf
-      ring: aussen
       geo: { lat: 49.42815, lon: 11.005056 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-thomaskirche-grossreuth
   role: anbieter
+  region: nuernberg
   name: Ev. Thomaskirche Großreuth – Krabbelgruppe, Musikalische Früherziehung, Eltern-Kind-Yoga
   url: https://www.evangelische-termine.de/ical?vid=591
   age:
@@ -1354,11 +1345,11 @@
       name: Gemeindehaus der Thomaskirche
       address: Gemeindehaus der Thomaskirche, Winterstraße 22, 90431 Nürnberg
       district: Großreuth hinter der Veste
-      ring: aussen
       geo: { lat: 49.436436, lon: 11.021007 }
   coveredBy: et-dekanat-nuernberg
 - id: ev-st-johannis
   role: anbieter
+  region: nuernberg
   name: Ev.-Luth. Kirchengemeinde St. Johannis – Krabbelgruppen & Kirche Kunterbunt Mini
   url: https://www.st-johannis-nuernberg.de/gemeindeleben/fuer-kinder
   age:
@@ -1385,15 +1376,14 @@
       name: TabeaHaus
       address: TabeaHaus, Kölner Straße 33, 90419 Nürnberg
       district: St. Johannis
-      ring: aussen
       geo: { lat: 49.467356, lon: 11.056249 }
     - id: ev-st-johannis-evang-familienzentrum
       name: Evang. Familienzentrum Julienstraße
       address: Julienstraße 6, 90419 Nürnberg
-      ring: aussen
       geo: { lat: 49.459427, lon: 11.054941 }
 - id: ev-lutherkirche-hasenbuck
   role: anbieter
+  region: nuernberg
   name: Ev.-Luth. Lutherkirche Hasenbuck – Krabbelgruppe
   url: https://www.lutherkirche-nuernberg.de/
   age:
@@ -1418,10 +1408,10 @@
       name: Pfarramt Lutherkirche
       address: Pfarramt Lutherkirche (Keller, Zugang vom Garten), Nerzstraße 34, 90461 Nürnberg
       district: Hasenbuck
-      ring: aussen
       geo: { lat: 49.42458, lon: 11.089011 }
 - id: ev-suedstadt-krabbelgruppen
   role: anbieter
+  region: nuernberg
   name: Ev.-Luth. Pfarrei Nürnberg-Südstadt – Mutter/Vater-Kind-Gruppen (Gustav-Adolf-Gedächtniskirche, Christuskirche)
   url: https://www.evangelischimsueden-nuernberg.de/krabbelgruppen
   age:
@@ -1446,15 +1436,14 @@
       name: Gustav-Adolf-Gedächtniskirche Lichtenhof
       address: Allersberger Straße 116, 90461 Nürnberg
       district: Lichtenhof / Steinbühl
-      ring: aussen
       geo: { lat: 49.437608, lon: 11.089253 }
     - id: ev-suedstadt-krabbelgruppen-christuskirche-steinbuehl
       name: Christuskirche Steinbühl
       address: Siemensplatz 2, 90443 Nürnberg
-      ring: aussen
       geo: { lat: 49.440145, lon: 11.075786 }
 - id: ev-langwasser-miniclubs
   role: anbieter
+  region: nuernberg
   name: Evangelisch in Langwasser – MiniClub Dietrich-Bonhoeffer-Kirche & Mini-Club Passionskirche
   url: http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html
   age:
@@ -1479,17 +1468,16 @@
       name: Dietrich-Bonhoeffer-Kirche, Gemeindezentrum/Blaues Sofa
       address: Zugspitzstraße 201, 90471 Nürnberg
       district: Langwasser
-      ring: aussen
       geo: { lat: 49.407299, lon: 11.121303 }
     - id: ev-langwasser-miniclubs-gemeindehaus-passionskirche
       name: Gemeindehaus Passionskirche, Bühnenraum
       address: Dr.-Linnert-Ring 28, 90473 Nürnberg
-      ring: aussen
       geo: { lat: 49.396995, lon: 11.125972 }
   notes:
     - Mini-Club Passionskirche Do 15:30–17 Uhr weder auf evangelische-termine noch auf der Gruppenseite
 - id: feg-nuernberg-eltern-kind-kreis
   role: anbieter
+  region: nuernberg
   name: Freie evangelische Gemeinde (FeG) Nürnberg – Eltern-Kind-Kreis 'Zwergenaufstand'
   url: https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/
   age:
@@ -1510,10 +1498,10 @@
       name: Gemeindezentrum
       address: Gemeindezentrum, Holbeinstraße 21, 90441 Nürnberg
       district: Schweinau
-      ring: aussen
       geo: { lat: 49.435813, lon: 11.051621 }
 - id: fryday-nuernberg
   role: anbieter
+  region: nuernberg
   name: FRYDAY Fitnessstudio – Mama Plus Baby Fitness
   url: https://fryday-nbg.com/
   age:
@@ -1536,10 +1524,10 @@
       name: FRYDAY Fitnessstudio – Mama Plus Baby Fitness
       address: Fürther Straße 248b, 90429 Nürnberg
       district: Muggenhof / Eberhardshof
-      ring: aussen
       geo: { lat: 49.460777, lon: 11.028612 }
 - id: geburtshaus-nuernberger-nest
   role: anbieter
+  region: nuernberg
   name: Geburtshaus Nürnberger Nest
   url: https://nuernberger-nest.de/kursangebot/#nach-der-geburt
   age:
@@ -1574,10 +1562,10 @@
       name: Geburtshaus Nürnberger Nest
       address: Sulzbacher Straße 105, 90489 Nürnberg
       district: Veilhof
-      ring: aussen
       geo: { lat: 49.460027, lon: 11.102015 }
 - id: happy-bellies
   role: anbieter
+  region: nuernberg
   name: Happy Bellies (Physio Tine) – Kinderwagenkurs Outdoor & Rückbildung mit Baby
   url: https://www.happy-bellies.de/kinderwagenkurs
   age:
@@ -1609,15 +1597,14 @@
       name: Happy Bellies (Physio Tine) – Kinderwagenkurs Outdoor & Rückbildung mit Baby
       address: Freiligrathstraße 1, 90482 Nürnberg
       district: Mögeldorf
-      ring: aussen
       geo: { lat: 49.459567, lon: 11.134044 }
     - id: happy-bellies-kinderwagenkurs-treffpunkt
       name: Kinderwagenkurs, Treffpunkt Spielplatz Mögeldorfer Park
       address: Ziegenstraße 12, 90480 Nürnberg
-      ring: aussen
       geo: { lat: 49.46212, lon: 11.133178 }
 - id: hebamme-elena-paulus
   role: anbieter
+  region: nuernberg
   name: Hebamme Elena Paulus
   url: https://www.elena-paulus.de/kurse
   age:
@@ -1639,10 +1626,10 @@
       name: Hebamme Elena Paulus
       address: Hartstraße 20, 90475 Nürnberg
       district: Fischbach
-      ring: aussen
       geo: { lat: 49.417691, lon: 11.187044 }
 - id: hebamme-kobielski
   role: anbieter
+  region: nuernberg
   name: Hebamme Ewelina Kobielski (hebamme-nuernberg.de)
   url: https://hebamme-nuernberg.de/
   age:
@@ -1664,10 +1651,10 @@
       name: Hebamme Ewelina Kobielski (hebamme-nuernberg.de)
       address: Glogauer Straße 15, 90473 Nürnberg
       district: Langwasser
-      ring: aussen
       geo: { lat: 49.40349, lon: 11.135976 }
 - id: hebammenpraxis-gugelrund
   role: anbieter
+  region: nuernberg
   name: Hebammenpraxis Gugelrund
   url: https://www.gugelrund.de/home.html#kurse
   age:
@@ -1692,10 +1679,10 @@
       name: Hebammenpraxis Gugelrund
       address: Gugelstraße 124, 90459 Nürnberg
       district: Südstadt (Galgenhof/Steinbühl)
-      ring: aussen
       geo: { lat: 49.432462, lon: 11.078715 }
 - id: kath-st-georg-ziegelstein
   role: anbieter
+  region: nuernberg
   name: Kath. Pfarrei St. Georg Ziegelstein – Kleinkindergottesdienst
   url: https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien
   age:
@@ -1714,10 +1701,10 @@
       name: Pfarrsaal St. Georg
       address: Pfarrsaal St. Georg, Bierweg 33, 90411 Nürnberg
       district: Ziegelstein
-      ring: aussen
       geo: { lat: 49.487363, lon: 11.111692 }
 - id: kath-st-martin-nordstadt
   role: anbieter
+  region: nuernberg
   name: Kath. Pfarrei St. Martin – Eltern-Kind-Gruppen (Miniclubs) & Kleinkindergottesdienst
   url: https://st-martin-nuernberg.de/gemeinde/kinderjugend/miniclubs
   age:
@@ -1744,10 +1731,10 @@
       name: Pfarrsaal St. Martin
       address: Pfarrsaal St. Martin, Grolandstraße 71, 90408 Nürnberg
       district: Nordstadt
-      ring: aussen
       geo: { lat: 49.465513, lon: 11.080539 }
 - id: martha-maria-st-theresien
   role: anbieter
+  region: nuernberg
   name: Krankenhaus Martha-Maria St. Theresien – Elternschule (Elterncafé, Babymassage)
   url: https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608
   age:
@@ -1775,10 +1762,10 @@
       name: Krankenhaus Martha-Maria St. Theresien – Elternschule (Elterncafé, Babymassage)
       address: Mommsenstraße 24, 90491 Nürnberg
       district: Schoppershof/St. Jobst
-      ring: aussen
       geo: { lat: 49.469901, lon: 11.110013 }
 - id: musikfuechse
   role: anbieter
+  region: nuernberg
   name: Musikfüchse (Monja Fuchs) – Musikgarten-Kurse für Babys & Kleinkinder
   url: https://musikfuechse.com/musikfuechse-babys/
   age:
@@ -1811,15 +1798,14 @@
       name: Mutherstudio Kraftshof
       address: Mutherstudio, Kraftshofer Hauptstraße 181, 90427 Nürnberg (Zugang Am Kressenstein)
       district: Kraftshof
-      ring: aussen
       geo: { lat: 49.512361, lon: 11.047005 }
     - id: musikfuechse-pfarrscheune-fuerth-poppenreuth
       name: Pfarrscheune Fürth-Poppenreuth
       address: Poppenreuther Str. 134/136, 90765 Fürth
-      ring: aussen
       geo: { lat: 49.482478, lon: 11.012633 }
 - id: musikschule-nuernberg-eltern-kind
   role: anbieter
+  region: nuernberg
   name: Musikschule Nürnberg – Eltern-Kind-Kurse (Elementarbereich)
   url: https://www.nuernberg.de/internet/musikschule/elementarbereich.html
   age:
@@ -1830,7 +1816,8 @@
       kind: html
       note: Abschnitt 'Eltern-Kind-Kurse 26/27' (6 Monate bis 3½ Jahre, wöchentlich 45 Min., nicht in den Ferien, 4–6 Eltern-Kind-Paare)
     - url: https://www.nuernberg.de/internet/musikschule/veranstaltungen.html
-      kind: js
+      kind: html
+      render: browser
       note: Veranstaltungskalender der Musikschule (vk.nuernberg.de-Widget, JS). Nur Schülerkonzerte, keine Babykonzerte
     - url: https://www.nuernberg.de/internet/musikschule/onlineanmeldung.html
       kind: html
@@ -1852,15 +1839,14 @@
       name: Kulturwerkstatt Auf AEG
       address: Kulturwerkstatt Auf AEG, Fürther Straße 244d, 90429 Nürnberg
       district: Muggenhof
-      ring: aussen
       geo: { lat: 49.460658, lon: 11.03232 }
     - id: musikschule-nuernberg-eltern-kind-musikschulschloesschen
       name: Musikschulschlösschen Ziegenstraße
       address: Ziegenstraße 12, 90482 Nürnberg (Mögeldorf)
-      ring: aussen
       geo: { lat: 49.46212, lon: 11.133178 }
 - id: mutherstudio
   role: anbieter
+  region: nuernberg
   name: MUTHERSTUDIO Nürnberg
   url: https://mutherstudio.com/baby-and-kinderkurse-0-12-monate
   age:
@@ -1874,7 +1860,8 @@
       kind: html
       note: Kurse 1-3 Jahre
     - url: https://www.canva.com/design/DAFYzTfzNm8/view
-      kind: js
+      kind: html
+      render: browser
       note: Kursplan als Canva-Design (über https://mutherstudio.com/kursplan-mutherstudio verlinkt)
     - url: https://mutherstudio.com/mamababyyoga
       kind: html
@@ -1906,15 +1893,14 @@
       name: MUTHERSTUDIO Nürnberg
       address: Kraftshofer Hauptstraße 181, 90427 Nürnberg
       district: Kraftshof
-      ring: aussen
       geo: { lat: 49.512361, lon: 11.047005 }
     - id: mutherstudio-spielplatz-schiestlstrasse
       name: Spielplatz Schiestlstraße (Waldspielracker)
       address: Schiestlstraße, 90427 Nürnberg (Kraftshof)
-      ring: aussen
       geo: { lat: 49.511053, lon: 11.052141 }
 - id: nachbarschaftshaus-gostenhof
   role: anbieter
+  region: nuernberg
   name: Nachbarschaftshaus Gostenhof – Offenes Kinderzimmer
   url: https://www.nuernberg.de/internet/nh_gostenhof/kurse.html
   age:
@@ -1925,7 +1911,8 @@
       kind: html
       note: "Abschnitt 'Offenes Kinderzimmer': Di 9-12 Uhr, Do 14-17 Uhr (nicht in den Ferien), Raum 204, ohne pädagogische Betreuung. Abschnitt 'Eltern-Kind-Angebote' derzeit: 'bald neue Angebote'"
     - url: https://www.nuernberg.de/internet/nh_gostenhof/veranstaltungen.html
-      kind: js
+      kind: html
+      render: browser
       note: Veranstaltungsliste per JS; Daten über API ajax_vk.pl mit ABFRAGE='(veranstalterID == 412) OR (ortID == 28)'; dort außerdem Monatsprogramm-PDFs (z. B. mp10_26work_final.pdf)
     - url: https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28veranstalterID%20%3D%3D%20412%29%20OR%20%28ortID%20%3D%3D%2028%29&AUSGABEFELDER=TITEL,UNTERTITEL,DATUM,ORT&MAX_LIMIT=200&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-04
       kind: json-api
@@ -1942,10 +1929,10 @@
       name: Nachbarschaftshaus Gostenhof – Offenes Kinderzimmer
       address: Adam-Klein-Str. 6, 90429 Nürnberg
       district: Gostenhof
-      ring: aussen
       geo: { lat: 49.45031, lon: 11.053107 }
 - id: nuebad-flipper
   role: anbieter
+  region: nuernberg
   name: NÜBAD-FLIPPER e.V. – Schwimmkurse in den NürnbergBad-Hallenbädern (Kooperationspartner NürnbergBad)
   url: https://www.xn--nbad-flipper-dlb.de/kurskategorie/eltern-kind-schwimmkurse/
   age:
@@ -1956,7 +1943,8 @@
       kind: html
       note: Übersicht Eltern-Kind-Kurse (Mutter/Vater-Baby 3-12 Mon., Mutter/Vater-Kind 12-24 Mon., Kleinkind ab 2 / ab 3 J.); je Kurs Detailseite /kurs/<slug>/ mit Kursorganizer-iFrame
     - url: https://www.xn--nbad-flipper-dlb.de/kurs/mutter-vater-baby-schwimmen/
-      kind: js
+      kind: html
+      render: browser
       note: Detailseite; Termine nur im iFrame app.nuebad-flipper.kursorganizer.com (courseTypeIds=0ed81fb6-56cc-42e8-b95a-30bbe188e192)
     - url: https://api.kursorganizer.com/graphql
       kind: json-api
@@ -1978,25 +1966,22 @@
       name: Langwasserbad
       address: Langwasserbad, Breslauer Straße 251, 90471 Nürnberg
       district: Langwasser
-      ring: aussen
       geo: { lat: 49.411601, lon: 11.144364 }
     - id: nuebad-flipper-suedstadtbad
       name: Südstadtbad
       address: Allersberger Straße 120, 90461 Nürnberg
-      ring: aussen
       geo: { lat: 49.437103, lon: 11.0902 }
     - id: nuebad-flipper-katzwangbad
       name: Katzwangbad
       address: Helmut-Bloß-Straße 6, 90453 Nürnberg
-      ring: aussen
       geo: { lat: 49.355603, lon: 11.052114 }
     - id: nuebad-flipper-nordostbad
       name: Nordostbad
       address: Elbinger Straße 85, 90491 Nürnberg
-      ring: aussen
       geo: { lat: 49.470403, lon: 11.103739 }
 - id: post-sv-nuernberg
   role: anbieter
+  region: nuernberg
   name: Post SV Nürnberg – Babyschwimmen, Kleinkindschwimmen, Krabbelturnen/Turnzwerge, Babydance
   url: https://post-sv.de/sport/schwimmen/kursangebot/babyschwimmen/
   age:
@@ -2037,36 +2022,31 @@
       name: Hallenbad Ebensee
       address: Hallenbad Ebensee, Ziegenstraße 110, 90482 Nürnberg
       district: Nordost / Mögeldorf
-      ring: aussen
       geo: { lat: 49.466269, lon: 11.140747 }
     - id: post-sv-nuernberg-sportzentrum-nordost
       name: Sportzentrum Nordost
       address: Neumeyerstraße 80, 90411 Nürnberg
-      ring: aussen
       geo: { lat: 49.483474, lon: 11.124682 }
     - id: post-sv-nuernberg-vereinshalle-hasenbuck
       name: Vereinshalle Hasenbuck
       address: Ingolstädter Str. 255, 90461 Nürnberg
-      ring: aussen
       geo: { lat: 49.42296, lon: 11.087918 }
     - id: post-sv-nuernberg-theodor-billroth-schule
       name: Theodor-Billroth-Schule
       address: Billrothstraße 16, Nürnberg
-      ring: aussen
       geo: { lat: 49.464168, lon: 11.14028 }
     - id: post-sv-nuernberg-sportpark-schweinau
       name: Sportpark Schweinau
       address: Daimlerstraße 71, 90441 Nürnberg
-      ring: aussen
       geo: { lat: 49.423172, lon: 11.043514 }
     - id: post-sv-nuernberg-reutersbrunnenschule
       name: Turnhalle Reutersbrunnenschule
       address: Reutersbrunnenstraße 12, 90429 Nürnberg
       district: Himpfelshof
-      ring: knapp-aussen
       geo: { lat: 49.4532419, lon: 11.0583717 }
 - id: schwimmschule-baer-ritterbad
   role: anbieter
+  region: nuernberg
   name: Schwimmschule Bär – Babyschwimmen im Ritterbad
   url: https://www.schwimmschule-baer.de/kurse/kurszeiten/kurssuche
   age:
@@ -2091,10 +2071,10 @@
       name: Ritterbad
       address: Ritterbad, Findelwiesenstraße 21, 90478 Nürnberg
       district: Galgenhof/Glockenhof
-      ring: aussen
       geo: { lat: 49.443937, lon: 11.090543 }
 - id: schwimmschule-wassermaeuse-nuernberg
   role: anbieter
+  region: nuernberg
   name: Schwimmschule Wassermäuse – Standorte Nürnberg
   url: https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/
   age:
@@ -2102,7 +2082,8 @@
     maxMonths: 36
   programme:
     - url: https://www.schwimmschule-wassermaeuse.de/kurssuche-3/
-      kind: js
+      kind: html
+      render: browser
       note: Kurssuche als Kursorganizer-iFrame (app.wassermaeuse.kursorganizer.com), Filter Standort
     - url: https://api.kursorganizer.com/graphql
       kind: json-api
@@ -2127,20 +2108,18 @@
       name: Nürnberg Langwasser
       address: Nürnberg Langwasser Bad, Breslauer Straße 251, 90471 Nürnberg
       district: Langwasser
-      ring: aussen
       geo: { lat: 49.411601, lon: 11.144364 }
     - id: schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt
       name: Boxdorfer Werkstatt
       address: Würzburger Str. 13, 90427 Nürnberg
-      ring: aussen
       geo: { lat: 49.522127, lon: 11.024628 }
     - id: schwimmschule-wassermaeuse-nuernberg-nuernberg-west-tagesstaette
       name: Nürnberg West, Tagesstätte Zentrum für Körper- und Sprachbehinderte
       address: Bertha-von-Suttner-Straße 29, 90439 Nürnberg
-      ring: aussen
       geo: { lat: 49.44486, lon: 11.046645 }
 - id: stadtteilhaus-fisch
   role: anbieter
+  region: nuernberg
   name: Stadtteilhaus FiSch (Stadt Nürnberg, Schniegling)
   url: https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html
   age:
@@ -2168,15 +2147,14 @@
       name: Stadtteilhaus FiSch
       address: Mühlweg 22, 90427 Nürnberg
       district: Schniegling
-      ring: aussen
       geo: { lat: 49.470452, lon: 11.026933 }
     - id: stadtteilhaus-fisch-turnhalle-wahlerschule
       name: Turnhalle Wahlerschule
       address: Holsteiner Str. 2A, 90427 Nürnberg
-      ring: aussen
       geo: { lat: 49.468715, lon: 11.029417 }
 - id: stadtteiltreff-nordost
   role: anbieter
+  region: nuernberg
   name: Stadtteiltreff Nordost (Sozialamt) – Offener Krabbeltreff & multikulturelle Eltern-Kind-Gruppe
   url: https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html
   age:
@@ -2198,10 +2176,10 @@
       name: Stadtteiltreff Nordost (Sozialamt) – Offener Krabbeltreff & multikulturelle Eltern-Kind-Gruppe
       address: Leipziger Straße 48, 90491 Nürnberg
       district: Nordostbahnhof
-      ring: aussen
       geo: { lat: 49.470664, lon: 11.111928 }
 - id: studio-herzschlag
   role: anbieter
+  region: nuernberg
   name: Studio HERZSCHLAG (ehem. Knirpse & Co FamilienTreffpunkt)
   url: https://studioherzschlag.de/unsere-kurse/kalender/
   age:
@@ -2212,7 +2190,8 @@
       kind: html
       note: Wochenkalender aller Kurse inkl. externer Partner, Links auf Detailseiten /angebot/...
     - url: https://www.eversports.de/org/widget/26b05081-b56c-40ba-b067-13b4c5f9d3f8?venueId=64b8caca-3439-453b-8ee5-c287efa66ef5
-      kind: js
+      kind: html
+      render: browser
       note: Eversports-Kurskalender (ohne externe Angebote); per Skript 403
     - url: https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/
       kind: html
@@ -2224,7 +2203,8 @@
       kind: html
       note: "Tabellen je Saison-Kursreihe (Herbstzauber/Winterzauber): Alter, Tag, Uhrzeit, Start + alle Einzeltermine; 8x45 Min, 130 EUR"
     - url: https://mamalea-familienbegleitung.de/sinneszauber/
-      kind: js
+      kind: html
+      render: browser
       note: Sinneszauber 9 Mon-2 J; Bereich 'Termine & Buchung' wird per JS geladen (statisch leer); Zeiten auch im Studio-Herzschlag-Kalender
     - url: https://mamalea-familienbegleitung.de/babyzeichensprache-nuernberg/
       kind: html
@@ -2239,10 +2219,12 @@
       kind: html
       note: "Beispiel-Detailseite Partnerkurs: 'Aktuelle Termine' als Textzeilen (Alter, Tag, Uhrzeit, Startdatum, Preis); Buchung per Formular beim Partner"
     - url: https://www.eversports.de/org/widget/97017cfe-3f59-45a3-a040-35d1fbcd3aec?venueId=64b8caca-3439-453b-8ee5-c287efa66ef5
-      kind: js
+      kind: html
+      render: browser
       note: Eversports-Kalender (alle Termine, Drop-ins mit 🔷); Cloudflare blockt Skript-/WebFetch-Zugriff (403) -> nur im Browser
     - url: https://www.eversports.de/org/widget/f9abdcd5-4aec-4af7-93af-9aff5537ce11?venueId=64b8caca-3439-453b-8ee5-c287efa66ef5
-      kind: js
+      kind: html
+      render: browser
       note: Eversports-Kursreihen-Widget (Buchung Kursreihen)
     - url: https://studioherzschlag.de/angebot/yoga-mit-baby/
       kind: html
@@ -2263,15 +2245,14 @@
       name: Studio HERZSCHLAG (ehem. Knirpse & Co FamilienTreffpunkt)
       address: Äußere Sulzbacher Straße 16, 90489 Nürnberg
       district: Veilhof
-      ring: aussen
       geo: { lat: 49.459858, lon: 11.104703 }
     - id: studio-herzschlag-outdoor-fitness-mit-baby
       name: Outdoor-Fitness mit Baby, Treffpunkt Wöhrder See 'Tante Noris'
       address: Wöhrder See, Nürnberg
-      ring: aussen
       geo: { lat: 49.457533, lon: 11.109751 }
 - id: sv-johannis-07
   role: anbieter
+  region: nuernberg
   name: SV Johannis 07 – Eltern-Kind-Turnen
   url: https://www.sv-johannis07.de/eltern-kind-turnen
   age:
@@ -2297,10 +2278,10 @@
       name: SV Johannis 07 – Eltern-Kind-Turnen
       address: Zeisigweg 70, 90425 Nürnberg
       district: St. Johannis / Thon
-      ring: aussen
       geo: { lat: 49.470926, lon: 11.052931 }
 - id: theater-mummpitz
   role: anbieter
+  region: nuernberg
   name: Theater Mummpitz im Kachelbau – Jazz für Kinder / Klassik für Kinder
   url: https://www.theater-mummpitz.de/spielplan/
   age:
@@ -2329,10 +2310,10 @@
       name: Theater Mummpitz im Kachelbau – Jazz für Kinder / Klassik für Kinder
       address: Michael-Ende-Straße 17, 90439 Nürnberg
       district: Gostenhof / Kachelbau
-      ring: aussen
       geo: { lat: 49.44276, lon: 11.052236 }
 - id: treffpunkt-mut
   role: anbieter
+  region: nuernberg
   name: Treffpunkt e.V. – Familienstützpunkt Eberhardshof/Muggenhof (Gruppe MUT)
   url: https://www.treffpunkt-nbg.de/mut/
   age:
@@ -2359,10 +2340,10 @@
       name: Treffpunkt e.V. – Familienstützpunkt Eberhardshof/Muggenhof (Gruppe MUT)
       address: Fürther Straße 212, Gebäude E6 (Eingang Regerstraße), 2. OG, nicht barrierefrei, 90429 Nürnberg
       district: Eberhardshof
-      ring: aussen
       geo: { lat: 49.458394, lon: 11.034452 }
 - id: tsv-1846-nuernberg
   role: anbieter
+  region: nuernberg
   name: TSV 1846 Nürnberg – Eltern-und-Kind-Turnen
   url: https://www.tsv1846nuernberg.de/turnen/
   age:
@@ -2373,7 +2354,8 @@
       kind: html
       note: Tabelle Turngruppen; Eltern-und-Kind-Turnen 1,5-3 J. Mo 15:00-16:00
     - url: https://tsv1846nuernberg.kurabu.com/de/events/club
-      kind: js
+      kind: html
+      render: browser
       note: Kurabu-Kursportal/Kalender des Vereins (JS), v. a. Präventionskurse
   availability:
     shown: teilweise
@@ -2387,10 +2369,10 @@
       name: Sporthalle Fuggerstraße
       address: Sporthalle Fuggerstraße, Fuggerstr. 9, 90439 Nürnberg
       district: St. Leonhard / Sündersbühl
-      ring: aussen
       geo: { lat: 49.443419, lon: 11.049842 }
 - id: tsv-buch
   role: anbieter
+  region: nuernberg
   name: TSV Nürnberg-Buch 1921 – Eltern-Kind-Turnen
   url: https://www.tsv-buch.de/kinder-turnen/
   age:
@@ -2412,10 +2394,10 @@
       name: TSV Nürnberg-Buch 1921 – Eltern-Kind-Turnen
       address: Am Wegfeld 41, 90427 Nürnberg
       district: Buch
-      ring: aussen
       geo: { lat: 49.491718, lon: 11.044007 }
 - id: tb-johannis-1888
   role: anbieter
+  region: nuernberg
   name: Turnerbund St. Johannis 1888 – Eltern-Kind-Turnen
   url: https://www.tbj1888.de/abteilungen/turnen-und-gymnastik
   age:
@@ -2437,10 +2419,10 @@
       name: Turnerbund St. Johannis 1888 – Eltern-Kind-Turnen
       address: Schnepfenreuther Hauptstraße 19, 90425 Nürnberg
       district: St. Johannis / Thon
-      ring: aussen
       geo: { lat: 49.481467, lon: 11.052053 }
 - id: vfl-nuernberg
   role: anbieter
+  region: nuernberg
   name: VfL Nürnberg – Mutter-Kind-Turnen
   url: https://vfl-nuernberg.de/turnen/trainingszeiten/
   age:
@@ -2465,10 +2447,10 @@
       name: VfL-Sporthalle
       address: VfL-Sporthalle, Salzbrunner Straße 38, 90473 Nürnberg
       district: Langwasser
-      ring: aussen
       geo: { lat: 49.408296, lon: 11.140786 }
 - id: curt-termine-familie
   role: aggregator
+  region: nuernberg
   name: curt Nürnberg – Terminkalender Rubrik Familie
   url: https://www.curt.de/termine/84/tag/2026-10-10/21/
   programme:
@@ -2484,6 +2466,7 @@
     - Tagesansicht zeigt auch Folgetage – ein Aufruf je ~3 Tage genügt; Altersangaben fehlen meist (über Stadtkalender/Veranstalter gegenprüfen).
 - id: et-dekanat-nuernberg
   role: aggregator
+  region: nuernberg
   name: Evangelische Termine – Dekanat Nürnberg (alle ev. Gemeinden, Aggregator)
   url: https://www.feb-nuernberg.de/service/veranstaltungskalender/eltern-kind-gruppen
   programme:
@@ -2507,6 +2490,7 @@
   adapter: evtermine
 - id: frankenkids-eventkalender
   role: aggregator
+  region: nuernberg
   name: frankenkids – Familienmagazin Metropolregion Nürnberg, Eventkalender (WP The Events Calendar)
   url: https://www.frankenkids.de/eventkalender-franken/
   programme:
@@ -2529,14 +2513,17 @@
   adapter: frankenkids
 - id: kuf-kinderkultur-aggregator
   role: aggregator
+  region: nuernberg
   name: KUF Kultur – Veranstaltungen für Kinder & Kurse Kinder und Familie (Kulturläden)
   url: https://www.nuernberg.de/internet/kuf_kultur/kinderangebote.html
   programme:
     - url: https://www.nuernberg.de/internet/kuf_kultur/kinder_veranstaltungen.html
-      kind: js
+      kind: html
+      render: browser
       note: Alle Kinderveranstaltungen aller Kulturläden (vk.nuernberg.de-Widget, data-config='kuf_kategorien_kinder'). Ohne JS leer, Browser nötig
     - url: https://www.nuernberg.de/internet/kuf_kultur/kinder_familie_kurse.html
-      kind: js
+      kind: html
+      render: browser
       note: Gruppen und Kurse 'Kinder und Familie' (Eltern-Kind-Gruppen, Krabbelgruppen in Kulturläden), ebenfalls vk-Widget (JS)
     - url: https://www.nuernberg.de/internet/kuf_kultur/kinderangebote.html
       kind: html
@@ -2545,10 +2532,12 @@
       kind: json-api
       note: Alle KUF-Kinderangebote (Bereich_Kinder) aller Kulturläden; USERNAME=KundF ist nötig. Auf Titel/Untertitel wie Baby, Musikgarten, Mini, Eltern filtern.
     - url: https://www.nuernberg.de/internet/kuf_kultur/loni_gruppen_und_kurse.html
-      kind: js
+      kind: html
+      render: browser
       note: Loni-Übler-Haus Gruppen/Kurse (JS)
     - url: https://www.nuernberg.de/internet/kuf_kultur/roethenbach_gruppen_kurse.html
-      kind: js
+      kind: html
+      render: browser
       note: Kulturladen Röthenbach Gruppen/Kurse (JS)
   availability:
     shown: nein
@@ -2565,6 +2554,7 @@
     - "Ort Kulturladen Zeltnerschloss: Basar Baby-/Kindersachen, Familiennachmittage"
 - id: rausgegangen-kinder-familien
   role: aggregator
+  region: nuernberg
   name: rausgegangen Nürnberg – Kinder & Familien
   url: https://rausgegangen.de/nurnberg/kategorie/kinder-und-familien/
   programme:
@@ -2581,6 +2571,7 @@
     - Liste zeigt je Produktion nur den NÄCHSTEN Termin – Folgetermine stehen auf der Detailseite (JSON-LD, ohne Verfügbarkeit).
 - id: stadt-nuernberg-veranstaltungskalender
   role: aggregator
+  region: nuernberg
   name: Stadtportal Nürnberg – Theater für Kinder & Veranstaltungskalender
   url: https://www.nuernberg.de/internet/stadtportal/kultur_fuer_kinder.html
   programme:
@@ -2588,22 +2579,27 @@
       kind: html
       note: Linkhub Kindertheater (Mummpitz, Pfütze, Rootslöffel, Salz+Pfeffer, Kindertheaterreihe, panoptikum, Figurentheaterfestival), keine Termine
     - url: https://www.nuernberg.de/internet/stadtportal/nbg_komfortsuche.html
-      kind: js
+      kind: html
+      render: browser
       note: Zentraler Veranstaltungskalender Nürnberg/Fürth/Erlangen/Schwabach (vk.nuernberg.de, JS) mit Kategorie- und Datumsfilter. Gut für Stichwortsuche 'Baby', 'Krabbel', 'ab 2'
     - url: https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=(eintritt%20==%200)%20OR%20(eintritt%20==%201)&AUSGABEFELDER=TITEL%2CUNTERTITEL%2CBESCHREIBUNG%2CDATUM%2CVERANSTALTER%2CORT&ZEIGETAG=1&ALLETERMINE=1&ORDER=DATUM&MAX_LIMIT=50&START_LIMIT=0&START_DATUM=2026-10-05&ENDE_DATUM=2026-10-18&SUCHTEXT=baby&cachelabel=nuernberg
       kind: json-api
       note: "Backend aller nbg-vk-Widgets. Parameter: START_DATUM/ENDE_DATUM (YYYY-MM-DD), SUCHTEXT (nur EIN Wort! mehrere Wörter/Leerzeichen werden ignoriert -> liefert alles), SUCHTAGS=F%C3%9CR%20KINDER bzw. F%C3%9CR%20FAMILIEN (mehrere mit ||), KATEGORIEID1=.., EINTRITT=1 (kostenlos), MAX_LIMIT/START_LIMIT zum Blättern. Antwort: ANZAHLGESAMT, VERANSTALTUNGEN[] mit TITEL, ALLETERMINE{ISO-Start:{E:Ende}}, ORT*, ORTSLAT/ORTSLNG, VERANSTALTER[], ABGESAGT, AUSVERKAUFT."
     - url: https://www.nuernberg.de/internet/stadtportal/nbg_veranstaltungen.html
-      kind: js
+      kind: html
+      render: browser
       note: Browser-Ansicht des Gesamtkalenders (Filter Zielgruppe Kinder/Familien, Datum)
     - url: https://www.nuernberg.de/internet/jugendamt/veranstaltungen.html
-      kind: js
+      kind: html
+      render: browser
       note: "Jugendamt-Teilkalender (Widget-Config custom_user=jugendamt); per API: &USERNAME=jugendamt"
     - url: https://www.nuernberg.de/internet/kuf_kultur/kinder_familie_kurse.html
-      kind: js
+      kind: html
+      render: browser
       note: KUF Kinder&Familie-Kurse (Kulturläden); Widget-Config enthält api_query mit ortID-Liste der KUF-Häuser – aus data-config-Attribut übernehmbar
     - url: https://www.nuernberg.de/internet/kuf_kultur/veranstaltungen_kuf.html
-      kind: js
+      kind: html
+      render: browser
       note: Alle KUF-Veranstaltungen (custom_user=KundF); KUF-Programmheft zusätzlich als PDF (kuf_YYYY-NN_web.pdf)
   availability:
     shown: nein
@@ -2617,6 +2613,7 @@
   adapter: stadt-vk
 - id: familienbildung-nuernberg-0-3
   role: verzeichnis
+  region: nuernberg
   name: Familienbildung Stadt Nürnberg – Angebotsübersicht 'Eltern mit Kindern in den ersten drei Lebensjahren'
   url: https://www.nuernberg.de/internet/familienbildung/werdendeeltern.html
   programme:
@@ -2634,6 +2631,7 @@
     - Aggregator ohne Termine – nur zur Pflege/Erweiterung der Anbieterliste (z.B. vierteljährlich auf neue Anbieter prüfen), nicht für Terminsuche.
 - id: feb-eltern-kind-gruppen
   role: verzeichnis
+  region: nuernberg
   name: "forum erwachsenenbildung – Evang. Bildungswerk Nürnberg: Eltern-Kind-Gruppen in ev. Gemeinden (Verzeichnis)"
   url: https://www.feb-nuernberg.de/service/veranstaltungskalender/eltern-kind-gruppen
   programme:
@@ -2667,6 +2665,7 @@
     - "Ort Stephanuskirche Gebersdorf: Eltern-Kind-Gruppen"
 - id: imiluv-studio
   role: anbieter
+  region: nuernberg
   name: IMILUV Studio by Julia Beese
   url: https://imiluv.de
   programme:
@@ -2683,6 +2682,5 @@
       name: IMILUV Studio by Julia Beese
       address: Schopenhauer Str. 10, 90409 Nürnberg
       district: Weiterer Innenstadtgürtel West/Nord/Ost
-      ring: aussen
       geo: { lat: 49.4676674, lon: 11.0895169 }
   coveredBy: frankenkids-eventkalender

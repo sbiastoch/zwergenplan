@@ -4,6 +4,7 @@
  * Liefert einen VORSCHLAG; der Orchestrator bestätigt oder überschreibt ihn bei `candidates keep`.
  */
 import type { Anbieter, Provider, Venue } from "../../../src/domain/schema.ts";
+import { vidsIn } from "../../../src/domain/vid.ts";
 import type { Candidate } from "./candidate.ts";
 import { ratio } from "./similar.ts";
 
@@ -38,8 +39,7 @@ export function addressKey(address: string | undefined): string | undefined {
 }
 
 /** Veranstalter-IDs von evangelische-termine.de in den Programm-URLs eines Anbieters. */
-export const vidOf = (p: Provider): string[] =>
-  p.programme.flatMap((g) => /evangelische-termine\.de\/\S*[?&]vid=(\d+)/.exec(g.url)?.[1] ?? []);
+export const vidOf = (p: Provider): string[] => vidsIn(p.programme.map((g) => g.url));
 
 function nameScore(c: Candidate, p: Provider): number {
   const a = (c.organizer ?? c.location ?? "").toLowerCase();

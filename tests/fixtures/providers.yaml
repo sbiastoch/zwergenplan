@@ -1,6 +1,7 @@
 # FIKTIVE Testdaten – nur für Unit- und E2E-Tests, werden nie deployt.
 - id: familientreff-beispiel
   role: anbieter
+  region: nuernberg
   name: "Familientreff Beispielhof (fiktiv)"
   url: "https://example.org/familientreff"
   venues:
@@ -8,7 +9,6 @@
       name: "Familientreff Beispielhof"
       address: "Beispielstraße 1, 90402 Nürnberg"
       district: Altstadt
-      ring: innen
       geo: { lat: 49.4521, lon: 11.0767 }
   age: { minMonths: 0, maxMonths: 36 }
   programme:
@@ -18,6 +18,7 @@
   verified: 2026-10-04
 - id: musikschule-beispiel
   role: anbieter
+  region: nuernberg
   name: "Musikschule Beispiel (fiktiv)"
   url: "https://example.org/musikschule"
   venues:
@@ -25,7 +26,6 @@
       name: "Musikschule Beispiel, Haus Süd"
       address: "Tonleiterweg 7, 90459 Nürnberg"
       district: Südstadt
-      ring: aussen
       geo: { lat: 49.4362, lon: 11.0851 }
   age: { minMonths: 4, maxMonths: 72 }
   programme:
@@ -35,6 +35,7 @@
   verified: 2026-10-04
 - id: stadtbibliothek-beispiel
   role: anbieter
+  region: nuernberg
   name: "Bibliothek Beispiel (fiktiv)"
   url: "https://example.org/bibliothek"
   venues:
@@ -42,7 +43,6 @@
       name: "Bibliothek Beispiel Zentrum"
       address: "Lesegasse 3, 90403 Nürnberg"
       district: Altstadt
-      ring: innen
       geo: { lat: 49.4498, lon: 11.0812 }
   programme:
     - url: "https://example.org/bibliothek/termine"
@@ -51,6 +51,7 @@
   verified: 2026-10-04
 - id: theater-beispiel
   role: anbieter
+  region: nuernberg
   name: "Kleines Theater Beispiel (fiktiv)"
   url: "https://example.org/theater"
   venues:
@@ -58,16 +59,17 @@
       name: "Kleines Theater Beispiel"
       address: "Bühnenplatz 2, 90429 Nürnberg"
       district: Gostenhof
-      ring: knapp-aussen
       geo: { lat: 49.4495, lon: 11.0601 }
   programme:
     - url: "https://example.org/theater/spielplan"
-      kind: js
+      kind: html
+      render: browser
   availability: { shown: ja }
   verified: 2026-10-04
 # Worst Case für die Mobile-UX-Gates: so lang wie der längste echte Anbietername (111 Zeichen), lange Komposita.
 - id: gemeinde-beispiel
   role: anbieter
+  region: nuernberg
   name: "Ev.-Luth. Kirchengemeinde Beispielhausen-Südstadt – Mutter/Vater-Kind-Gruppen (Gemeindehaus Beispielkirche, fiktiv)"
   url: "https://example.org/gemeinde"
   venues:
@@ -75,7 +77,6 @@
       name: "Gemeindehaus der Evangelisch-Lutherischen Beispielkirchengemeinde (Untergeschoss, Zugang über den Pfarrgarten)"
       address: "Kirchengemeindehausstraße 128a (Hinterhaus), 90461 Nürnberg"
       district: Südstadt
-      ring: aussen
       geo: { lat: 49.4301, lon: 11.0892 }
   programme:
     - url: "https://example.org/gemeinde/gruppen"
@@ -86,6 +87,7 @@
 # seinem Namen (venueAddress kürzt), der zweite hat keinen Stadtteil.
 - id: turnverein-beispiel
   role: anbieter
+  region: nuernberg
   name: "Turnverein Beispiel (fiktiv)"
   url: "https://example.org/turnverein"
   venues:
@@ -93,12 +95,10 @@
       name: "Turnhalle Beispiel"
       address: "Turnhalle Beispiel, Sportweg 3, 90441 Nürnberg"
       district: Schweinau
-      ring: aussen
       geo: { lat: 49.4392, lon: 11.0442 }
     - id: turnverein-beispiel-gymnastik
       name: "Gymnastikraum Beispiel"
       address: "Am Beispielpark 7, 90480 Nürnberg"
-      ring: aussen
       geo: { lat: 49.4502, lon: 11.1301 }
   programme:
     - url: "https://example.org/turnverein"
@@ -108,6 +108,8 @@
 # Sammelkalender (Recherchequelle, Plan 0010, E6): darf nicht in anbieter.json stehen.
 - id: sammelkalender-beispiel
   role: aggregator
+  region: nuernberg
+  adapter: frankenkids
   name: "Sammelkalender Beispiel (fiktiv)"
   url: "https://example.org/sammelkalender"
   programme:

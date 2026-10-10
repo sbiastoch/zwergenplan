@@ -16,7 +16,6 @@ describe("toSiteData", () => {
       name: "Familientreff Beispielhof",
       address: "Beispielstraße 1, 90402 Nürnberg",
       district: "Altstadt",
-      ring: "innen",
       geo: { lat: 49.4521, lon: 11.0767 },
     });
   });
@@ -89,6 +88,7 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
     const json = JSON.stringify(directory);
     for (const key of [
       "topics",
+      "region",
       "programme",
       "notes",
       "geo",

@@ -4,6 +4,7 @@
  */
 import { offerId } from "./ids.ts";
 import { type OffersFile, OffersFile as OffersFileSchema, type Provider, ProvidersFile } from "./schema.ts";
+import { vidsIn } from "./vid.ts";
 
 export interface DatasetSummary {
   offers: number;
@@ -46,6 +47,9 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
     const via = providerById.get(prov.coveredBy);
     if (via?.role !== "aggregator")
       errors.push(`Anbieter ${prov.id}: coveredBy ${prov.coveredBy} ist kein Sammelkalender`);
+    // evangelische-termine fragt je vid ab und ordnet darüber zu (cli.ts `anbieterVids`, match.ts `vidOf`; Plan 0031)
+    else if (via.adapter === "evtermine" && vidsIn(prov.programme.map((g) => g.url)).length === 0)
+      errors.push(`Anbieter ${prov.id}: coveredBy ${prov.coveredBy} (evtermine) braucht eine Programm-URL mit vid=`);
   }
 
   const offerIds = new Set<string>();

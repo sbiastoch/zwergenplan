@@ -6,7 +6,7 @@ import type { Offer, OffersFile, Provider, Venue } from "./schema.ts";
 
 export interface SiteOffer extends Offer {
   providerName: string;
-  venue: Pick<Venue, "name" | "address" | "district" | "ring" | "geo">;
+  venue: Pick<Venue, "name" | "address" | "district" | "geo">;
 }
 
 export interface SiteData {
@@ -70,14 +70,13 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
     const provider = byId.get(offer.providerId);
     const venue = provider?.role === "anbieter" ? provider.venues.find((v) => v.id === offer.venueId) : undefined;
     if (!provider || !venue) throw new Error(`Ungeprüfte Daten: ${offer.id}`);
-    const { name, address, district, ring, geo } = venue;
+    const { name, address, district, geo } = venue;
     return {
       ...offer,
       providerName: provider.name,
       venue: {
         name,
         address: venueAddress(name, address),
-        ring,
         geo,
         ...(district === undefined ? {} : { district }),
       },

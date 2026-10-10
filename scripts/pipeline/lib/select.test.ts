@@ -8,7 +8,7 @@ function fail(): never {
   throw new Error("Fixture");
 }
 const { name, url, programme, availability, verified } = anbieter[0] ?? fail();
-const source = { name, url, programme, availability, verified };
+const source = { region: "nuernberg" as const, name, url, programme, availability, verified };
 const catalog: Provider[] = [
   ...providers.map((p) => (p.id === "theater-beispiel" ? { ...p, coveredBy: "kalender" } : p)),
   { ...source, id: "kalender", role: "aggregator", adapter: "stadt-vk" },
@@ -23,13 +23,11 @@ describe("selectBatches", () => {
       ["familientreff-beispiel", "musikschule-beispiel", "stadtbibliothek-beispiel"],
       ["gemeinde-beispiel", "turnverein-beispiel"],
     ]);
-    expect(s.adapters).toEqual([{ id: "kalender", adapter: "stadt-vk" }]);
-    expect(s.skipped.map((x) => x.id)).toEqual([
-      "theater-beispiel",
-      "sammelkalender-beispiel",
-      "anderer-kalender",
-      "liste",
+    expect(s.adapters).toEqual([
+      { id: "sammelkalender-beispiel", adapter: "frankenkids" },
+      { id: "kalender", adapter: "stadt-vk" },
     ]);
+    expect(s.skipped.map((x) => x.id)).toEqual(["theater-beispiel", "anderer-kalender", "liste"]);
   });
 
   it("--only prüft gezielt einzelne Anbieter, auch abgedeckte", () => {

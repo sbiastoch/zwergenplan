@@ -128,6 +128,7 @@ describe("validateRaw", () => {
         {
           id: "agg",
           role: "aggregator",
+          region: "nuernberg",
           name: "Sammelkalender (fiktiv)",
           url: "https://example.org/agg",
           programme: [{ url: "https://example.org/agg", kind: "html" }],

@@ -8,7 +8,6 @@ import { addDays } from "../../../src/domain/time.ts";
 import { categoriesOf, type Topic } from "../../../src/domain/topics.ts";
 import type { Candidate, Occurrence } from "./candidate.ts";
 import { FREE_RE, OPEN_RE, topicsFromText } from "./relevance.ts";
-import { classifyRing } from "./ring.ts";
 
 export interface Draft {
   event: Record<string, unknown>;
@@ -99,9 +98,23 @@ export function providerFromCandidate(
   return {
     id,
     role: "anbieter",
+    // die Region des Sammelkalenders, aus dem der Veranstalter kommt (Plan 0031, E1)
+    region: aggregator?.region ?? "nuernberg",
     name: c.organizer ?? c.location ?? c.title,
     url: c.organizerUrl ?? c.detailUrl,
-    programme: [{ url: c.organizerUrl ?? c.detailUrl, kind: "html" }],
+    programme: [
+      { url: c.organizerUrl ?? c.detailUrl, kind: "html", use: "termine" },
+      // evangelische-termine ordnet über die vid zu; `validateDataset` verlangt sie bei coveredBy (Plan 0031)
+      ...(c.source === "evtermine" && c.organizerId
+        ? [
+            {
+              url: `https://www.evangelische-termine.de/ical?vid=${c.organizerId}`,
+              kind: "ical" as const,
+              use: "termine" as const,
+            },
+          ]
+        : []),
+    ],
     availability: { shown: "nein" },
     verified: input.today,
     notes: [`Aus ${c.source} aufgenommen (${c.detailUrl}).`],
@@ -111,7 +124,6 @@ export function providerFromCandidate(
         name: c.location ?? c.organizer ?? id,
         address: c.address ?? `${geo.lat},${geo.lon}`,
         ...(district ? { district } : {}),
-        ring: classifyRing(geo.lat, geo.lon, district).ring,
         geo: { lat: geo.lat, lon: geo.lon },
       },
     ],

@@ -8,6 +8,7 @@ function anbieter(id: string, name: string, venues: Anbieter["venues"], programm
   return {
     id,
     role: "anbieter",
+    region: "nuernberg",
     name,
     url: "https://example.org/",
     venues,
