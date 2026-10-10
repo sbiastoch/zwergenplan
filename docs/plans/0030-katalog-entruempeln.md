@@ -159,3 +159,7 @@ Ansichten: `anbieter-sheet` (volle Matrix aus `scripts/screenshots.ts`) und das 
 - Dark Mode: keine hellen Inseln, Kontrast wie hell.
 - Micro-Interactions und Design-System: keine neuen Bedienelemente.
 Befunde: keine.
+
+## E2E lokal (2026-10-10)
+
+`pnpm e2e:local --affected` (pixel-7, 8 Specs, 314 Tests): 310 grün, 4 rot, alle in `e2e/pwa.spec.ts` (Offline mit Service Worker: Tests 4, 7, B1 und Laufzeit-Cache a). Derselbe Lauf von `e2e/pwa.spec.ts` auf dem Ausgangsstand `676b965` ohne Plan 0030 ist ebenso rot (5 von 15). Ursache ist die Umgebung der Cloud-Session: Playwright 1.63 erwartet Chromium-Build 1243, vorhanden war nur 1194 (per Symlink überbrückt). Kein Befund dieses Plans; die CI prüft mit passendem Browser.
