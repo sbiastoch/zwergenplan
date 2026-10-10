@@ -90,6 +90,15 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0030** (Restpunkte, live seit 58b6e34, 2026-10-10):
+  - `topics: []` in `anbieter.json` entfernen (Übergangsfeld, Review M1, m2). Frühestens einen Tag nach dem Deploy, also ab 2026-10-11, und erst, wenn kein Tab mit altem Code mehr offen sein kann. Siehe Abschnitt „Übergangsfeld“ oben.
+  - Anmeldefenster des Anbieters als Feld, Kann-warten-Punkte aus Plan 0031 (`verified` → `reviewed`, `AGGREGATOR_ADAPTERS` und `SOURCES` zusammenführen, `coveredBy` mit Zuordnungsschlüssel).
+  - Mehr Handarbeit bei Sammelkalender-Entwürfen (Kosten, Anmeldung, Format, Themen offen) ist akzeptiert (N2). Kein Restpunkt, aber beim Browser-Review der Anbieter-Sheets im Blick behalten.
+- **Plan 0031** (Restpunkte, live seit 58b6e34, 2026-10-10):
+  - Zweite Region bauen (R5, siehe oben). Der Vertrag trägt sie schon.
+  - Stichproben aus dem Ergebnis von Plan 0031 nachziehen, besonders die Einträge, die die Subagenten-Migration als Verdachtsfälle markiert hat (dance-maxx MAXI, die-familienbox-Turnkurse).
+  - Das Sheet der Anbieter mit und ohne Angebote im Browser-Review live frisch aufnehmen. Der Kurzcheck am 2026-10-10 hat nur die Anbieterliste bestätigt, `anbieter-sheet` war eine alte Datei.
+  - WebKit/iphone-15 `saved.spec.ts` „Deep-Link ./?ansicht=merkliste-karte“ war beim Lauf auf `main` (#295) wieder rot, mit denselben Konsolenmeldungen (`Worker failed to load`, OpenFreeMap-CORS). Der Rerun der fehlgeschlagenen Jobs war grün. Zählt in die Flake-Liste von Plan 0029 mit.
 - **Plan 0029** (Restpunkte, Ergebnis):
   - Flakes in CI. Am wichtigsten ist WebKit/iphone-15 `saved.spec.ts` „Deep-Link ./?ansicht=merkliste-karte“: `Worker failed to load` im Konsolenwächter (`e2e/fixtures.ts`). Am 2026-10-08/09 war er in fünf von sechs Läufen rot und wurde erst beim neuen Start grün. Außerdem der OpenFreeMap-Mock-Test (`59de3ef`) und `ENOTEMPTY` in `scripts/heavy.test.ts` (`bbe5830`, `117767b`).
   - Querschnitts-Specs enger zuordnen: `mobile-ux` und `layout` (etwa die Hälfte der Gerätetests) laufen über `Overlays.tsx` bei fast jeder UI-Änderung mit, Domänenmodule erreichen über `build-data.ts` fast jede Spec.

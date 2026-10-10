@@ -1,6 +1,6 @@
 # Plan 0030 – Katalog entrümpeln: keine Anbieter-Facetten, Felder nach Rolle, Notizen als Liste
 
-Status: in Umsetzung (2026-10-10; Plan-Review ein Durchgang ohne Blocker, eingearbeitet)
+Status: abgeschlossen, live seit 58b6e34 (2026-10-10)
 Datum: 2026-10-10
 Bezug: ADR 0003 (Datenmodell), ADR 0006 (Recherche-Pipeline, ein Katalogformat), ADR 0022 (Entwurf, stabile IDs; wird hier nicht berührt), Plan 0010 (Anbieterübersicht, E6 Kategorien), Plan 0026 (Vorschauseiten der Anbieter); neu: ADR 0024
 

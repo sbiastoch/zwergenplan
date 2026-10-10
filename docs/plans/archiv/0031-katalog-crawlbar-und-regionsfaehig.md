@@ -1,6 +1,6 @@
 # Plan 0031 – Katalog crawlbar und regionsfähig
 
-Status: in Umsetzung (2026-10-10; Plan-Review zwei Durchgänge, Arch-Review eingearbeitet; Phasen a–c und Doku umgesetzt, Abschluss nach CI und Deploy)
+Status: abgeschlossen, live seit 58b6e34 (2026-10-10)
 Datum: 2026-10-10
 Voraussetzung: Plan 0030 (Katalog entrümpeln, live bzw. auf demselben Branch). Reihenfolge zu Plan 0015, Nachtrag A (stabile IDs, migriert `providers.yaml` ebenfalls um `publicId`): unabhängig; wer zuerst kommt, wird vom anderen gemergt.
 Bezug: ADR 0006 (Katalog im Zod-Vertrag), ADR 0016 (Entwurf, nächtliche Pipeline), ADR 0022 (Entwurf, stabile IDs), ADR 0024 (Katalog beschreibt Quellen), Plan 0015 (nächtliche Pipeline, der Crawler), Plan 0030 (Katalog entrümpeln, Vorgänger); neu: ADR 0025
@@ -178,7 +178,7 @@ Drei Phasen, jede endet grün und mit Commit (Review B1: Erweitern, Migrieren, V
 
 ## Anhang A – Anleitung für die Migrations-Subagenten (wörtlich übergeben)
 
-> Du migrierst Programmeinträge und Notizen von Anbietern im Katalog `data/providers.yaml` des Projekts Zwergenplan (Angebote für Kinder unter 3 in Nürnberg). Lies `docs/plans/0031-katalog-crawlbar-und-regionsfaehig.md`, Abschnitte E3 und E4. Deine Eingabe sind die Dateien `runs/0031/in/<id>.json` aus deiner Liste. Schreibe je Datei `runs/0031/out/<id>.json` mit genau vier Schlüsseln: `programme` (Liste), `notes` (Liste von Strings, darf leer sein; leer wird beim Einsetzen zu „kein Feld“), `venueHints` (Objekt, darf leer sein) und `placeholders` (Objekt alte URL → neue URL, darf leer sein). Ändere sonst nichts, auch nicht `data/providers.yaml`.
+> Du migrierst Programmeinträge und Notizen von Anbietern im Katalog `data/providers.yaml` des Projekts Zwergenplan (Angebote für Kinder unter 3 in Nürnberg). Lies `docs/plans/archiv/0031-katalog-crawlbar-und-regionsfaehig.md`, Abschnitte E3 und E4. Deine Eingabe sind die Dateien `runs/0031/in/<id>.json` aus deiner Liste. Schreibe je Datei `runs/0031/out/<id>.json` mit genau vier Schlüsseln: `programme` (Liste), `notes` (Liste von Strings, darf leer sein; leer wird beim Einsetzen zu „kein Feld“), `venueHints` (Objekt, darf leer sein) und `placeholders` (Objekt alte URL → neue URL, darf leer sein). Ändere sonst nichts, auch nicht `data/providers.yaml`.
 >
 > **Pro Programmeintrag:**
 > - Was schon steht (`url`, `kind`, `render`), übernimmst du unverändert (Phase a hat `kind: js` schon in `kind: html` + `render: browser` umgestellt). In URLs von Sammelkalendern mit `adapter` setzt du keine Platzhalter. Ausnahme: Steht in der URL ein fester Zeitraum oder ein Platzhalter wie `FROM`, `START_DATUM=2026-10-01`, setze `{von}` bzw. `{bis}` ein (`{von}` = Beginn, `{bis}` = Ende des Abfragefensters). Nur wenn die `note` das ausdrücklich verlangt oder der Wert offensichtlich ein Datum des Abfragefensters ist.
