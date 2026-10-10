@@ -28,7 +28,7 @@ Der Katalog beschreibt **Quellen** (wer, wo, wie recherchiert), die Angebote bes
 
 ## Nicht-Ziele
 
-- **Ortsliste (Befund A).** Orte aus den Anbietern lösen und Dubletten zusammenführen änderte `venueId` und damit heute die Angebots-IDs (`providerId--slug--venueId`, ADR 0003/0006): geteilte Links, Merklisten-Einträge und Kalender-UIDs brächen. Kommt nach `docs/ideas.md`, mit dem Hinweis, dass es erst nach ADR 0022 (stabile Kurz-IDs) bruchfrei geht.
+- **Ortsliste (Befund A).** Orte aus den Anbietern lösen und Dubletten zusammenführen änderte `venueId` und damit heute die Angebots-IDs (`providerId--slug--venueId`, ADR 0003/0006): geteilte Links, Merklisten-Einträge und Kalender-UIDs brächen. Nutzerentscheid vom 2026-10-10: Orte bleiben denormalisiert am Anbieter, dafür gibt es zu wenig Überschneidung. Kein Eintrag in `docs/ideas.md`, die Entscheidung steht in ADR 0024 unter „Alternativen“.
 - **`Offer` ändert sich nicht.** `data/offers.json` bleibt byte-gleich, IDs bleiben.
 - **`age` am Anbieter** bleibt (nur bei `anbieter`). Er ist keine der vier Facetten, steht in der Skill-Konvention („darf über 36 hinausgehen“) und widerspricht keinem Angebot in einer Weise, die die UI zeigt.
 - **Anmeldestart/-schluss als strukturiertes Feld.** Bleibt Text, nur als eigener Listeneintrag. Ein Feld wäre eine eigene Idee (`docs/ideas.md`).
@@ -97,7 +97,7 @@ Läuft auf `data/providers.yaml` und `tests/fixtures/providers.yaml`. Danach `pn
 - **ADR 0024** „Katalog beschreibt Quellen, Angebote Inhalte“: Entscheidung E1–E3, Alternativen (Facetten ableiten; behalten und Konsistenz erzwingen), Konsequenzen (Kategorien nur aus Angeboten; mehr offene Felder im Entwurf). ADR 0003 und ADR 0006 („Ein Katalogformat“) bekommen einen Verweis in der Statuszeile (Review m5).
 - Skill `SKILL.md` (Schritt `keep`): offene Felder sind auch `topics` und `format`; ein abgeleitetes `einmalig` immer prüfen, denn eine Reihe als Einzeltermine ändert die ID-Form (Review m4).
 - Skill `babyevents-nuernberg/references/catalog.md`: Konvention zu `formats`/`costs`/`registrations` streichen, `notes` als Liste („eine Notiz je Eintrag“), Anmeldestart und -schluss je als eigener Eintrag; Rollen-Abschnitt nennt, welche Felder je Rolle gelten.
-- `docs/ideas.md`: Ortsliste (Befund A) mit dem ID-Hinweis; Anmeldefenster des Anbieters als Feld.
+- `docs/ideas.md`: Anmeldefenster des Anbieters als Feld (die Ortsliste ist verworfen, siehe Nicht-Ziele).
 - `docs/architecture.md`: nur falls es die Facetten nennt (prüfen per grep; heute keine Treffer).
 
 ## Tests (test-first)

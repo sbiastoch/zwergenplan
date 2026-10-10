@@ -21,7 +21,7 @@ Status: angenommen (2026-10-10), mit Plan 0030. Ergänzt ADR 0003 (Datenmodell) 
 
 - **Facetten aus den Angeboten ableiten und als Rückfall behalten**: weniger offene Felder im Entwurf, Kategorien auch für Anbieter ohne Termine (aus dem letzten Datenstand). Verworfen vom Nutzer zugunsten eines Katalogs ohne Inhaltsangaben.
 - **Facetten behalten, der Build erzwingt Konsistenz**: Der Katalog müsste bei jedem Lauf nachgezogen werden, und die Facetten wären eine Kopie der Angebote.
-- **Orte in eine eigene Liste mit globalen IDs** (Dubletten über Anbieter zusammenführen): ändert `venueId` und damit heute die Angebots-IDs. Erst nach ADR 0022 sinnvoll (`docs/ideas.md`).
+- **Orte in eine eigene Liste mit globalen IDs** (Dubletten über Anbieter zusammenführen): verworfen vom Nutzer am 2026-10-10. Orte bleiben denormalisiert am Anbieter; die Überschneidung (25 doppelte Koordinaten bei 129 Orten) ist zu klein für eine eigene Liste, und sie änderte `venueId` und damit die Angebots-IDs.
 
 ## Konsequenzen
 
