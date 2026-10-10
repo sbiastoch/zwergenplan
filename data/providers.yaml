@@ -144,7 +144,7 @@
       district: Altstadt (St. Lorenz)
       geo: { lat: 49.451921, lon: 11.078425 }
 - id: kath-stadtkirche-familiengottesdienste
-  role: aggregator
+  role: verzeichnis
   region: nuernberg
   name: Katholische Stadtkirche Nürnberg – Übersicht Gottesdienste für Familien (alle Pfarreien)
   url: https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien
@@ -161,6 +161,7 @@
     - Aggregator (Halbjahresliste bis ca. Jan 2027). Adresse = Sitz Stadtkirche/Zoff+Harmonie, nicht Veranstaltungsort. Zoff + Harmonie (kath. Familienbildung) gehört in den Familienbildungs-Bereich, hier nicht doppelt erfasst.
     - "Sitz: Vordere Sterngasse 1, 90402 Nürnberg"
     - "[stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien] Eine Seite mit allen kath. Pfarreien: je Pfarrei Name, Adresse, 'Termine:' mit Datum/Uhrzeit/Art. Für 0-3 relevant nur 'Kleinkindergottesdienst' (St. Georg, St. Martin) und ggf. 'Kinderkirche'; Familiengottesdienste/Kindermetten eher ältere Kinder"
+    - Sammelkalender ohne Abfrage-Adapter, deshalb seit Plan 0031 ein Verzeichnis (Quelle für die Katalogpflege)
 - id: kindertheaterreihe-kuf
   role: anbieter
   region: nuernberg
@@ -2783,7 +2784,7 @@
       district: Langwasser
       geo: { lat: 49.408296, lon: 11.140786 }
 - id: curt-termine-familie
-  role: aggregator
+  role: verzeichnis
   region: nuernberg
   name: curt Nürnberg – Terminkalender Rubrik Familie
   url: https://www.curt.de/termine/84/tag/2026-10-10/21/
@@ -2799,6 +2800,7 @@
     - Aggregator, Fokus Kindertheater/Feste (meist 3+/4+); für 0-3 nur gelegentlich (z.B. Puppentheater, Babykonzerte). Niedrige Priorität.
     - Tagesansicht zeigt auch Folgetage – ein Aufruf je ~3 Tage genügt; Altersangaben fehlen meist (über Stadtkalender/Veranstalter gegenprüfen).
     - "[curt.de/termine/84/tag/2026-10-10/21] Tagesansicht: /termine/84/tag/YYYY-MM-DD/21/ (21 = Rubrik FAMILIE; ohne /21/ = alle). Ein Aufruf pro Tag; Detailseiten /termine/84/termin/<id>/"
+    - Sammelkalender ohne Abfrage-Adapter, deshalb seit Plan 0031 ein Verzeichnis (Quelle für die Katalogpflege)
 - id: et-dekanat-nuernberg
   role: aggregator
   region: nuernberg
@@ -2854,7 +2856,7 @@
     - "[frankenkids.de/eventkalender-franken] Browser-Ansicht"
   adapter: frankenkids
 - id: kuf-kinderkultur-aggregator
-  role: aggregator
+  role: verzeichnis
   region: nuernberg
   name: KUF Kultur – Veranstaltungen für Kinder & Kurse Kinder und Familie (Kulturläden)
   url: https://www.nuernberg.de/internet/kuf_kultur/kinderangebote.html
@@ -2901,8 +2903,9 @@
     - "[nuernberg.de/cgi-bin/ajax_vk.pl] Alle KUF-Kinderangebote (Bereich_Kinder) aller Kulturläden; USERNAME=KundF ist nötig. Auf Titel/Untertitel wie Baby, Musikgarten, Mini, Eltern filtern."
     - "[nuernberg.de/internet/kuf_kultur/loni_gruppen_und_kurse.html] Loni-Übler-Haus Gruppen/Kurse (JS)"
     - "[nuernberg.de/internet/kuf_kultur/roethenbach_gruppen_kurse.html] Kulturladen Röthenbach Gruppen/Kurse (JS)"
+    - Sammelkalender ohne Abfrage-Adapter, deshalb seit Plan 0031 ein Verzeichnis (Quelle für die Katalogpflege)
 - id: rausgegangen-kinder-familien
-  role: aggregator
+  role: verzeichnis
   region: nuernberg
   name: rausgegangen Nürnberg – Kinder & Familien
   url: https://rausgegangen.de/nurnberg/kategorie/kinder-und-familien/
@@ -2920,6 +2923,7 @@
     - Aggregator, überwiegend Kindertheater (Mummpitz, Pfütze) ab 4 J, Musicals; für 0-3 kaum relevant. Niedrigste Priorität.
     - Liste zeigt je Produktion nur den NÄCHSTEN Termin – Folgetermine stehen auf der Detailseite (JSON-LD, ohne Verfügbarkeit).
     - "[rausgegangen.de/nurnberg/kategorie/kinder-und-familien/] Chronologische Liste (Datum, Uhrzeit, Titel inkl. Altersangabe wie '(4+ / 45 Min.)', Ort, Preis). Kein funktionierender Datumsparameter: /eventsearch/ ist bot-geschützt ('Hold tight'), ?date= wird ignoriert -> Liste lesen und clientseitig nach Datum filtern"
+    - Sammelkalender ohne Abfrage-Adapter, deshalb seit Plan 0031 ein Verzeichnis (Quelle für die Katalogpflege)
 - id: stadt-nuernberg-veranstaltungskalender
   role: aggregator
   region: nuernberg

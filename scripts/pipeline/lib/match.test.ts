@@ -12,7 +12,7 @@ function anbieter(id: string, name: string, venues: Anbieter["venues"], programm
     name,
     url: "https://example.org/",
     venues,
-    programme: programme.map((url) => ({ url, kind: "ical" as const })),
+    programme: programme.map((url) => ({ url, kind: "ical" as const, use: "termine" as const })),
     availability: { shown: "nein" },
     verified: "2026-10-04",
   };

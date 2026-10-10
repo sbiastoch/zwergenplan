@@ -45,8 +45,7 @@
                     "html",
                     "pdf",
                     "ical",
-                    "json-api",
-                    "js"
+                    "json-api"
                   ]
                 },
                 "render": {
@@ -111,14 +110,12 @@
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 200
-                },
-                "note": {
-                  "type": "string"
                 }
               },
               "required": [
                 "url",
-                "kind"
+                "kind",
+                "use"
               ],
               "additionalProperties": false
             }
@@ -298,8 +295,7 @@
                     "html",
                     "pdf",
                     "ical",
-                    "json-api",
-                    "js"
+                    "json-api"
                   ]
                 },
                 "render": {
@@ -364,14 +360,12 @@
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 200
-                },
-                "note": {
-                  "type": "string"
                 }
               },
               "required": [
                 "url",
-                "kind"
+                "kind",
+                "use"
               ],
               "additionalProperties": false
             }
@@ -431,7 +425,8 @@
           "url",
           "programme",
           "availability",
-          "verified"
+          "verified",
+          "adapter"
         ],
         "additionalProperties": false
       },
@@ -477,8 +472,7 @@
                     "html",
                     "pdf",
                     "ical",
-                    "json-api",
-                    "js"
+                    "json-api"
                   ]
                 },
                 "render": {
@@ -543,14 +537,12 @@
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 200
-                },
-                "note": {
-                  "type": "string"
                 }
               },
               "required": [
                 "url",
-                "kind"
+                "kind",
+                "use"
               ],
               "additionalProperties": false
             }

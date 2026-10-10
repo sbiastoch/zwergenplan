@@ -12,7 +12,6 @@ const source = { region: "nuernberg" as const, name, url, programme, availabilit
 const catalog: Provider[] = [
   ...providers.map((p) => (p.id === "theater-beispiel" ? { ...p, coveredBy: "kalender" } : p)),
   { ...source, id: "kalender", role: "aggregator", adapter: "stadt-vk" },
-  { ...source, id: "anderer-kalender", role: "aggregator" },
   { ...source, id: "liste", role: "verzeichnis" },
 ];
 
@@ -27,7 +26,7 @@ describe("selectBatches", () => {
       { id: "sammelkalender-beispiel", adapter: "frankenkids" },
       { id: "kalender", adapter: "stadt-vk" },
     ]);
-    expect(s.skipped.map((x) => x.id)).toEqual(["theater-beispiel", "anderer-kalender", "liste"]);
+    expect(s.skipped.map((x) => x.id)).toEqual(["theater-beispiel", "liste"]);
   });
 
   it("--only prüft gezielt einzelne Anbieter, auch abgedeckte", () => {

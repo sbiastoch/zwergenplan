@@ -12,7 +12,7 @@ const aggregator: Provider = {
   adapter: "evtermine",
   name: "Sammelkalender (fiktiv)",
   url: "https://example.org/kalender",
-  programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
+  programme: [{ url: "https://example.org/kalender/json", kind: "json-api", use: "termine" }],
   availability: { shown: "nein" },
   verified: "2026-10-04",
 };
@@ -23,7 +23,13 @@ const providers: Provider[] = [
       ? {
           ...p,
           coveredBy: "ev-kalender",
-          programme: [{ url: "https://www.evangelische-termine.de/veranstaltungen?vid=999", kind: "html" as const }],
+          programme: [
+            {
+              url: "https://www.evangelische-termine.de/veranstaltungen?vid=999",
+              kind: "html" as const,
+              use: "termine" as const,
+            },
+          ],
         }
       : p,
   ),

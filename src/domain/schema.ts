@@ -71,16 +71,15 @@ const isJsonWithPlaceholders = (body: string) => {
 
 /**
  * Eine Stelle, an der Termine (oder Plätze) stehen, so beschrieben, dass ein Crawler sie abrufen kann (Plan 0031, E3).
- * Phase a: neue Felder optional, `note` und `kind: js` noch erlaubt; Phase c verengt.
  */
 export const Programme = z.strictObject({
   url: z.url().refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE),
   /** Format der Antwort */
-  kind: z.enum(["html", "pdf", "ical", "json-api", "js"]),
+  kind: z.enum(["html", "pdf", "ical", "json-api"]),
   /** Seite braucht JavaScript; der Crawler rendert sie im Browser */
   render: z.literal("browser").optional(),
   /** Wozu die Seite dient: nur `termine` und `verfuegbarkeit` gehen in Abruf und Prompt */
-  use: z.enum(["termine", "verfuegbarkeit", "info"]).optional(),
+  use: z.enum(["termine", "verfuegbarkeit", "info"]),
   request: z
     .strictObject({
       method: z.literal("POST"),
@@ -96,8 +95,6 @@ export const Programme = z.strictObject({
   blocked: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
   /** kurzer Extraktionshinweis für das Modell, ohne Datum (das veraltet) */
   hint: Hint.optional(),
-  /** Altform bis Plan 0031, Phase c */
-  note: z.string().optional(),
 });
 
 /** Eine Notiz je Eintrag; „ | “ klebte früher mehrere zusammen (Plan 0030). */
@@ -148,6 +145,13 @@ export const Provider = z.discriminatedUnion("role", [
       coveredBy: kebab.optional(),
     })
     .superRefine((p, ctx) => {
+      // ohne coveredBy holt der Crawler die Termine selbst: mindestens eine abrufbare Terminseite (Plan 0031, E3)
+      if (p.coveredBy === undefined && !p.programme.some((g) => g.use === "termine" && g.blocked === undefined))
+        ctx.addIssue({
+          code: "custom",
+          message: "braucht eine Terminseite (use: termine) ohne blocked",
+          path: ["programme"],
+        });
       const { bbox } = REGIONS[p.region];
       p.venues.forEach((v, i) => {
         if (!inBounds(v.geo, bbox))
@@ -158,7 +162,8 @@ export const Provider = z.discriminatedUnion("role", [
     id: kebab,
     role: z.literal("aggregator"),
     ...sourceBase,
-    adapter: z.enum(AGGREGATOR_ADAPTERS).optional(),
+    /** Pflicht: Ein Sammelkalender ohne Adapter ist für die Pipeline ein `verzeichnis` (Plan 0031, E5) */
+    adapter: z.enum(AGGREGATOR_ADAPTERS),
   }),
   z.strictObject({ id: kebab, role: z.literal("verzeichnis"), ...sourceBase }),
 ]);

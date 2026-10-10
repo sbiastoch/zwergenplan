@@ -120,7 +120,7 @@ describe("validateDataset", () => {
       adapter: "frankenkids",
       name: "Sammelkalender (fiktiv)",
       url: "https://example.org/kalender",
-      programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
+      programme: [{ url: "https://example.org/kalender/json", kind: "json-api", use: "termine" }],
       availability: { shown: "nein" },
       verified: "2026-10-04",
     };
@@ -146,7 +146,7 @@ describe("validateDataset", () => {
       errorsOf(
         mutate((_o, p) => {
           const { venues: _v, age: _a, ...source } = p[0] ?? {};
-          p[0] = { ...source, role: "aggregator" };
+          p[0] = { ...source, role: "aggregator", adapter: "frankenkids" };
         }),
       ),
     ).toContain("ist kein Anbieter (aggregator)");
@@ -233,6 +233,22 @@ describe("validateDataset", () => {
     expect(errorsOf(mutate((_o, p) => fn(p)))).toContain(expected);
   });
 
+  // Plan 0031, Phase c: verengt
+  it.each([
+    ["kind: js", (p: Cat) => Object.assign(prog(p, 0), { kind: "js" }), "kind"],
+    ["note am Programmeintrag", (p: Cat) => Object.assign(prog(p, 0), { note: "alt" }), "note"],
+    ["Programmeintrag ohne use", (p: Cat) => delete prog(p, 0)["use"], "use"],
+    ["nur Infoseiten", (p: Cat) => Object.assign(prog(p, 0), { use: "info" }), "Terminseite"],
+    [
+      "nur gesperrte Terminseite",
+      (p: Cat) => Object.assign(prog(p, 0), { blocked: { reason: "Login", since: "2026-10-04" } }),
+      "Terminseite",
+    ],
+    ["Sammelkalender ohne adapter", (p: Cat) => delete (p.at(-1) as Record<string, unknown>)["adapter"], "adapter"],
+  ])("Katalog 0031 Phase c: %s → Fehler", (_name, fn, expected) => {
+    expect(errorsOf(mutate((_o, p) => fn(p)))).toContain(expected);
+  });
+
   it("Katalog 0031: Platzhalter, render, use, request, blocked und hint sind gültig", () => {
     const r = mutate((_o, p) =>
       Object.assign(prog(p, 0), {
@@ -262,7 +278,7 @@ describe("validateDataset", () => {
       adapter: "evtermine",
       name: "Sammelkalender (fiktiv)",
       url: "https://example.org/kalender",
-      programme: [{ url: "https://example.org/kalender/json", kind: "json-api" }],
+      programme: [{ url: "https://example.org/kalender/json", kind: "json-api", use: "termine" }],
       availability: { shown: "nein" },
       verified: "2026-10-04",
     };

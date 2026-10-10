@@ -104,14 +104,14 @@ describe("draftFromCandidate", () => {
 });
 
 describe("providerFromCandidate", () => {
-  const kalender: Provider = {
+  const kalender: Extract<Provider, { role: "aggregator" }> = {
     id: "fk",
     role: "aggregator",
     region: "nuernberg",
     adapter: "frankenkids",
     name: "Sammelkalender (fiktiv)",
     url: "https://example.org/fk",
-    programme: [{ url: "https://example.org/fk", kind: "html" }],
+    programme: [{ url: "https://example.org/fk", kind: "html", use: "termine" }],
     availability: { shown: "nein" },
     verified: "2026-10-04",
   };

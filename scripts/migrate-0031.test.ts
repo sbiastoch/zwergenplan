@@ -92,7 +92,7 @@ describe("migrate-0031 --apply: Schutz gegen Datenverlust (Plan 0031, E6.3; Revi
     ["alte notes nicht vorn", { ...good, notes: good.notes.slice(1) }, "Präfix"],
     ["Teil der note fehlt", { ...good, notes: good.notes.slice(0, 2) }, "Teil der note fehlt"],
     ["unbekannter Ort", { ...good, venueHints: { "x-haus": "y" } }, "unbekannter Ort"],
-    ["ohne use", { ...good, programme: [{ ...good.programme[0], use: undefined }, good.programme[1]] }, "ohne use"],
+    ["ohne use", { ...good, programme: [{ ...good.programme[0], use: undefined }, good.programme[1]] }, "use"],
     [
       "nur gesperrte Terminseite",
       {

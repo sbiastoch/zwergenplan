@@ -23,10 +23,8 @@ export function selectBatches(
   for (const p of catalog) {
     if (only && !only.has(p.id)) continue;
     if (p.role === "verzeichnis") skipped.push({ id: p.id, reason: "Verzeichnis (nur Katalogpflege)" });
-    else if (p.role === "aggregator") {
-      if (p.adapter) adapters.push({ id: p.id, adapter: p.adapter });
-      else skipped.push({ id: p.id, reason: "Sammelkalender ohne Adapter (Quelle für die Katalogpflege)" });
-    } else if (p.coveredBy && !only) skipped.push({ id: p.id, reason: `Termine über ${p.coveredBy}` });
+    else if (p.role === "aggregator") adapters.push({ id: p.id, adapter: p.adapter });
+    else if (p.coveredBy && !only) skipped.push({ id: p.id, reason: `Termine über ${p.coveredBy}` });
     else picked.push(p);
   }
   const size = Math.max(1, opts.batchSize);
