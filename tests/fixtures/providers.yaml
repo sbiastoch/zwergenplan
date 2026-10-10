@@ -14,6 +14,7 @@
   programme:
     - url: "https://example.org/familientreff/programm"
       kind: html
+      use: termine
   availability: { shown: ja, how: "Detailseite zeigt freie Plätze" }
   verified: 2026-10-04
 - id: musikschule-beispiel
@@ -31,6 +32,7 @@
   programme:
     - url: "https://example.org/musikschule/kurse"
       kind: html
+      use: termine
   availability: { shown: teilweise }
   verified: 2026-10-04
 - id: stadtbibliothek-beispiel
@@ -47,6 +49,7 @@
   programme:
     - url: "https://example.org/bibliothek/termine"
       kind: html
+      use: termine
   availability: { shown: nein }
   verified: 2026-10-04
 - id: theater-beispiel
@@ -63,6 +66,7 @@
   programme:
     - url: "https://example.org/theater/spielplan"
       kind: html
+      use: termine
       render: browser
   availability: { shown: ja }
   verified: 2026-10-04
@@ -81,6 +85,7 @@
   programme:
     - url: "https://example.org/gemeinde/gruppen"
       kind: html
+      use: termine
   availability: { shown: nein }
   verified: 2026-10-04
 # Anbieter ohne kommende Angebote (Plan 0010, E6): steht blass am Ende der Anbieterliste. Der erste Ort beginnt mit
@@ -103,6 +108,7 @@
   programme:
     - url: "https://example.org/turnverein"
       kind: html
+      use: termine
   availability: { shown: nein }
   verified: 2026-10-04
 # Sammelkalender (Recherchequelle, Plan 0010, E6): darf nicht in anbieter.json stehen.
@@ -115,5 +121,6 @@
   programme:
     - url: "https://example.org/sammelkalender/termine"
       kind: html
+      use: termine
   availability: { shown: unbekannt }
   verified: 2026-10-04
