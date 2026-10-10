@@ -12,7 +12,7 @@ import { dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type Browser, type BrowserContext, chromium, type Page, webkit } from "@playwright/test";
 import { BASE, OUT_DIR } from "../site.config.ts";
-import { offerImagePath } from "../src/domain/share.ts";
+import { offerImagePath, SHARE_DIRS } from "../src/domain/share.ts";
 import type { SiteData } from "../src/domain/site-data.ts";
 import { dataSource, ROOT } from "./lib/load-data.ts";
 import { type CardContent, OG_CANARY, OG_HEIGHT, OG_WIDTH, OG_ZOOM, offerCardHtml, ogDocument } from "./lib/og-card.ts";
@@ -175,7 +175,8 @@ try {
   );
 
   // Gate: so viele Bilder auf der Platte wie Angebote (Arch-Review m1), nicht nur so viele Schleifendurchläufe
-  const written = readdirSync(join(out, "angebot")).filter((d) => existsSync(join(out, "angebot", d, "vorschau.jpg")));
+  const dir = join(out, SHARE_DIRS.offer);
+  const written = readdirSync(dir).filter((d) => existsSync(join(dir, d, "vorschau.jpg")));
   if (written.length !== site.offers.length) fail(`${written.length} Bilder für ${site.offers.length} Angebote`);
   const sizes = site.offers.map((o) => statSync(join(out, offerImagePath(o.id))).size);
   const seconds = (performance.now() - started) / 1000;

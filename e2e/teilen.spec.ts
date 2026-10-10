@@ -2,7 +2,7 @@
  * Teilen per Link (Plan 0026, Stufe 1, Tests 6; Nachtrag A): Knopf im Detail und im Anbieter-Sheet, Rückfälle,
  * Vorschauseiten mit og:-Tags und Weiterleitung, 404.html, Kachelbild je Angebot. Fixtures, Uhr Mo 5.10.2026 12:00.
  *
- * `vite preview` liefert `/angebot/<id>/` als `angebot/<id>/index.html` aus (geprüft in Schritt 1); für unbekannte
+ * `vite preview` liefert `/a/<id>/` als `a/<id>/index.html` aus (geprüft in Schritt 1); für unbekannte
  * Pfade aber die SPA-Rückfallseite statt `404.html`. Den 404-Fall stellt deshalb `page.route` mit der gebauten
  * `dist-e2e/404.html` nach, wie GitHub Pages ihn liefert.
  */
@@ -10,11 +10,14 @@ import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
 
 const KRABBEL = "Offener Krabbeltreff";
-const KRABBEL_ID = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+const KRABBEL_ID = "lxizt974";
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
-const PEKIP_ID =
-  "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus";
-const PROVIDER_ID = "familientreff-beispiel";
+const PEKIP_ID = "nle21y1x";
+/** publicId von familientreff-beispiel (ADR 0022) */
+const PROVIDER_ID = "b5nuus36";
+/** dieselben vor ADR 0022: alte lange Angebots-ID und Katalog-ID, wie sie in alten Links stehen */
+const KRABBEL_LEGACY = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+const PROVIDER_LEGACY = "familientreff-beispiel";
 const PROVIDER = "Familientreff Beispielhof (fiktiv)";
 const SITE_URL = "https://zwergenplan.app/";
 const COPIED = "Link kopiert – zum Einfügen in WhatsApp & Co.";
@@ -86,7 +89,7 @@ test.describe("Knopf „Teilen“ (E6)", () => {
     await dialog.getByRole("button", { name: "Teilen" }).click();
     await expect.poll(() => shares(page)).toHaveLength(1);
     const origin = new URL(page.url()).origin;
-    expect(await shares(page)).toEqual([{ title: PEKIP, url: `${origin}/angebot/${PEKIP_ID}/` }]);
+    expect(await shares(page)).toEqual([{ title: PEKIP, url: `${origin}/a/${PEKIP_ID}/` }]);
     await expect(page.getByText(COPIED)).toHaveCount(0);
     await expect(page.getByRole("dialog", { name: "Link zum Teilen" })).toBeHidden();
   });
@@ -97,7 +100,7 @@ test.describe("Knopf „Teilen“ (E6)", () => {
     const dialog = await openDetail(page, KRABBEL);
     await dialog.getByRole("button", { name: "Teilen" }).click();
     await expect(dialog.getByText(COPIED)).toBeVisible();
-    expect(await copied(page)).toEqual([`${new URL(page.url()).origin}/angebot/${KRABBEL_ID}/`]);
+    expect(await copied(page)).toEqual([`${new URL(page.url()).origin}/a/${KRABBEL_ID}/`]);
   });
 
   test("scheitern Teilen und Kopieren, steht der Link markiert im Sheet über dem Detail (Review M2)", async ({
@@ -111,7 +114,7 @@ test.describe("Knopf „Teilen“ (E6)", () => {
     await expect(sheet).toBeVisible();
     const field = sheet.locator("input.share-link");
     await expect(field).toHaveAttribute("readonly", "");
-    await expect(field).toHaveValue(`${new URL(page.url()).origin}/angebot/${KRABBEL_ID}/`);
+    await expect(field).toHaveValue(`${new URL(page.url()).origin}/a/${KRABBEL_ID}/`);
     await expect(field).toBeFocused();
     const selection = await field.evaluate((el: HTMLInputElement) => [
       el.selectionStart,
@@ -149,7 +152,7 @@ test.describe("Knopf „Teilen“ (E6)", () => {
     await sheet.getByRole("button", { name: "Teilen" }).click();
     await expect.poll(() => shares(page)).toHaveLength(1);
     const origin = new URL(page.url()).origin;
-    expect(await shares(page)).toEqual([{ title: PROVIDER, url: `${origin}/anbieter/${PROVIDER_ID}/` }]);
+    expect(await shares(page)).toEqual([{ title: PROVIDER, url: `${origin}/p/${PROVIDER_ID}/` }]);
     // „Schließen“ bleibt da und schließt
     await sheet.getByRole("button", { name: "Schließen" }).click();
     await expect(sheet).toBeHidden();
@@ -158,7 +161,7 @@ test.describe("Knopf „Teilen“ (E6)", () => {
 
 test.describe("Vorschauseite (E2–E4)", () => {
   test("Angebot: og:-Tags, noindex, Kachelbild je Angebot", async ({ request }) => {
-    const res = await request.get(`angebot/${KRABBEL_ID}/`);
+    const res = await request.get(`a/${KRABBEL_ID}/`);
     expect(res.status()).toBe(200);
     const html = await res.text();
     expect(html).toContain('<meta name="robots" content="noindex, nofollow">');
@@ -166,19 +169,17 @@ test.describe("Vorschauseite (E2–E4)", () => {
     expect(meta(html, "og:description")).toBe(
       "Familientreff Beispielhof (fiktiv), Altstadt · 6–24 Monate · Kostenlos · Ohne Anmeldung",
     );
-    expect(meta(html, "og:url")).toBe(`${SITE_URL}angebot/${KRABBEL_ID}/`);
-    expect(meta(html, "og:image")).toMatch(
-      new RegExp(`^${SITE_URL}angebot/${KRABBEL_ID}/vorschau\\.jpg\\?v=[0-9a-f]{8}$`),
-    );
+    expect(meta(html, "og:url")).toBe(`${SITE_URL}a/${KRABBEL_ID}/`);
+    expect(meta(html, "og:image")).toMatch(new RegExp(`^${SITE_URL}a/${KRABBEL_ID}/vorschau\\.jpg\\?v=[0-9a-f]{8}$`));
     expect(meta(html, "twitter:card")).toBe("summary_large_image");
   });
 
   test("Anbieter: og:-Tags mit generischem Bild, das es gibt", async ({ request }) => {
-    const res = await request.get(`anbieter/${PROVIDER_ID}/`);
+    const res = await request.get(`p/${PROVIDER_ID}/`);
     expect(res.status()).toBe(200);
     const html = await res.text();
     expect(meta(html, "og:title")).toBe(PROVIDER);
-    expect(meta(html, "og:url")).toBe(`${SITE_URL}anbieter/${PROVIDER_ID}/`);
+    expect(meta(html, "og:url")).toBe(`${SITE_URL}p/${PROVIDER_ID}/`);
     expect(meta(html, "og:image")).toBe(`${SITE_URL}og/vorschau-v1.jpg`);
     const image = await request.get("og/vorschau-v1.jpg");
     expect(image.status()).toBe(200);
@@ -187,7 +188,7 @@ test.describe("Vorschauseite (E2–E4)", () => {
 
   test("Kachelbild (Nachtrag A): JPEG unter 300 kB, 1200 × 630, je Angebot eigene Bytes", async ({ page, request }) => {
     const get = async (id: string) => {
-      const res = await request.get(`angebot/${id}/vorschau.jpg`);
+      const res = await request.get(`a/${id}/vorschau.jpg`);
       expect(res.status()).toBe(200);
       expect(res.headers()["content-type"]).toContain("image/jpeg");
       const body = await res.body();
@@ -196,13 +197,13 @@ test.describe("Vorschauseite (E2–E4)", () => {
     };
     const [a, b] = [await get(KRABBEL_ID), await get(PEKIP_ID)];
     expect(a.equals(b), "zwei Angebote, zwei Bilder").toBe(false);
-    await page.goto(`angebot/${KRABBEL_ID}/vorschau.jpg`);
+    await page.goto(`a/${KRABBEL_ID}/vorschau.jpg`);
     const size = await page.locator("img").evaluate((img: HTMLImageElement) => [img.naturalWidth, img.naturalHeight]);
     expect(size).toEqual([1200, 630]);
   });
 
   test("Weiterleitung ins Detail ohne Zwischenschritt in der History (Review m7)", async ({ page }) => {
-    await page.goto(`angebot/${KRABBEL_ID}/`);
+    await page.goto(`a/${KRABBEL_ID}/`);
     await expect(page).toHaveURL(new RegExp(`/\\?angebot=${KRABBEL_ID}$`));
     const dialog = page.getByRole("dialog", { name: KRABBEL });
     await expect(dialog).toBeVisible();
@@ -213,26 +214,62 @@ test.describe("Vorschauseite (E2–E4)", () => {
     await expect(page.getByTestId("offer").first()).toBeVisible();
     expect(page.url()).not.toContain("angebot=");
     await page.goBack();
-    expect(page.url()).not.toContain("/angebot/");
+    expect(page.url()).not.toContain("/a/");
   });
 });
 
-test.describe("404.html (E7)", () => {
-  // Chromium meldet die 404-Antwort des Dokuments selbst in der Konsole; erlaubt nur für diese beiden Pfade.
-  test.use({ allowedConsoleErrors: [/\/(angebot\/gibt-es-nicht--x--y|irgendwas)\/ Failed to load resource: .* 404/] });
+test.describe("404.html (E7; ADR 0022)", () => {
+  // Chromium meldet die 404-Antwort des Dokuments selbst in der Konsole; erlaubt nur für diese Pfade.
+  test.use({
+    allowedConsoleErrors: [
+      /\/(a\/zzzzzzzz|p\/zzzzzzzz|angebot\/gibt-es-nicht--x--y|angebot\/familientreff-beispiel--[a-z0-9-]+|anbieter\/familientreff-beispiel|irgendwas)\/ Failed to load resource: .* 404/,
+    ],
+  });
+  const notFound = (page: Page, path: string) =>
+    page.route(`**/${path}`, (route) => route.fulfill({ status: 404, path: "dist-e2e/404.html" }));
 
   test("verschwundenes Angebot: 404.html leitet weiter, die App sagt es (E7)", async ({ page }) => {
-    const gone = "gibt-es-nicht--x--y";
-    await page.route(`**/angebot/${gone}/`, (route) => route.fulfill({ status: 404, path: "dist-e2e/404.html" }));
-    await page.goto(`angebot/${gone}/`);
+    await notFound(page, "a/zzzzzzzz/");
+    await page.goto("a/zzzzzzzz/");
     await expect(page.getByText(GONE)).toBeVisible();
     await expect(page.getByTestId("offer").first()).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(page.url()).not.toContain("angebot");
   });
 
+  test("alter Link auf ein verschwundenes Angebot (lange ID): derselbe Hinweis", async ({ page }) => {
+    await notFound(page, "angebot/gibt-es-nicht--x--y/");
+    await page.goto("angebot/gibt-es-nicht--x--y/");
+    await expect(page.getByText(GONE)).toBeVisible();
+    expect(page.url()).not.toContain("angebot");
+  });
+
+  test("alter Link auf ein Angebot: 404.html leitet weiter, die App rechnet die lange ID um", async ({ page }) => {
+    await notFound(page, `angebot/${KRABBEL_LEGACY}/`);
+    await page.goto(`angebot/${KRABBEL_LEGACY}/`);
+    await expect(page.getByRole("dialog", { name: KRABBEL })).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/\\?angebot=${KRABBEL_ID}$`));
+  });
+
+  test("alter Link auf einen Anbieter: Sheet öffnet, die Adresse zeigt die publicId", async ({ page }) => {
+    await notFound(page, `anbieter/${PROVIDER_LEGACY}/`);
+    await page.goto(`anbieter/${PROVIDER_LEGACY}/`);
+    await expect(page.getByRole("dialog", { name: "Anbieter" }).getByRole("heading", { name: PROVIDER })).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/\\?anbieter=${PROVIDER_ID}$`));
+  });
+
+  test("unbekannter Anbieter unter p/: weitergeleitet, nach dem Laden ohne Parameter und ohne Sheet (Plan 0010, E3)", async ({
+    page,
+  }) => {
+    await notFound(page, "p/zzzzzzzz/");
+    await page.goto("p/zzzzzzzz/");
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole("dialog", { name: "Anbieter" })).toHaveCount(0);
+  });
+
   test("404.html ohne passendes Muster: kein Sprung, Link zur Startseite", async ({ page }) => {
-    await page.route("**/irgendwas/", (route) => route.fulfill({ status: 404, path: "dist-e2e/404.html" }));
+    await notFound(page, "irgendwas/");
     await page.goto("irgendwas/");
     await expect(page.getByRole("heading", { name: "Diese Seite gibt es im Zwergenplan nicht (mehr)." })).toBeVisible();
     await expect(page.getByRole("link", { name: "Zum Zwergenplan" })).toHaveAttribute("href", "/");
@@ -243,19 +280,19 @@ test.describe("404.html (E7)", () => {
 test.describe("Bot mit JavaScript bleibt auf der Vorschauseite (Review M1)", () => {
   test.use({ userAgent: IMESSAGE_UA });
   test("iMessage-Abrufer sieht Titel und Link", async ({ page }) => {
-    await page.goto(`angebot/${KRABBEL_ID}/`);
+    await page.goto(`a/${KRABBEL_ID}/`);
     await expect(page.getByRole("heading", { level: 1, name: `${KRABBEL} · jeden Mittwoch, 10:00` })).toBeVisible();
     await expect(page.getByRole("link", { name: "Im Zwergenplan öffnen" })).toBeVisible();
     // eine Runde später steht die Seite immer noch da
     await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 100)));
-    expect(page.url()).toMatch(new RegExp(`/angebot/${KRABBEL_ID}/$`));
+    expect(page.url()).toMatch(new RegExp(`/a/${KRABBEL_ID}/$`));
   });
 });
 
 test.describe("In-App-Browser ohne „bot“ wird weitergeleitet", () => {
   test.use({ userAgent: "WhatsApp/2.23.20 A" });
   test("WhatsApp-User-Agent landet im Detail", async ({ page }) => {
-    await page.goto(`angebot/${KRABBEL_ID}/`);
+    await page.goto(`a/${KRABBEL_ID}/`);
     await expect(page.getByRole("dialog", { name: KRABBEL })).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/\\?angebot=${KRABBEL_ID}$`));
   });
@@ -264,7 +301,7 @@ test.describe("In-App-Browser ohne „bot“ wird weitergeleitet", () => {
 test.describe("ohne JavaScript", () => {
   test.use({ javaScriptEnabled: false });
   test("Titel, Beschreibung und Link sind sichtbar, der Link zeigt ins Detail", async ({ page }) => {
-    await page.goto(`angebot/${KRABBEL_ID}/`);
+    await page.goto(`a/${KRABBEL_ID}/`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(`${KRABBEL} · jeden Mittwoch, 10:00`);
     await expect(page.getByText("6–24 Monate · Kostenlos · Ohne Anmeldung")).toBeVisible();
     const link = page.getByRole("link", { name: "Im Zwergenplan öffnen" });

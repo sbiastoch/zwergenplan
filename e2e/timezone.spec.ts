@@ -18,12 +18,7 @@ test("die Liste rechnet Heute/Morgen in Berlin", async ({ page }) => {
 
 // Seit Plan 0025 (E8) der Kalender der Merkliste, mit vorbelegter Merkliste
 test("der Kalender der Merkliste markiert den Berliner Tag als heute", async ({ page }) => {
-  await page.addInitScript(() =>
-    localStorage.setItem(
-      "zwergenplan.merkliste",
-      JSON.stringify(["familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus"]),
-    ),
-  );
+  await page.addInitScript(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["lxizt974"])));
   await page.goto("./?ansicht=merkliste-kalender");
   const tuesday = page.getByRole("button", { name: /^Dienstag, 6\. Oktober/ });
   await expect(tuesday).toHaveClass(/\btoday\b/);

@@ -11,10 +11,9 @@ import { expect, test } from "./fixtures.ts";
 import { expectAccessible, expectMobileUx, expectTextFits, setTextScaleRelayout } from "./mobile-ux.ts";
 
 const IDS = {
-  treff: "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
-  pekip:
-    "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
-  elterncafe: "familientreff-beispiel--elterncafe-am-montag-20261005t0900--familientreff-beispiel-haus",
+  treff: "lxizt974",
+  pekip: "nle21y1x",
+  elterncafe: "blk2csz9",
 };
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
 const ALL_OVER = "Für heute ist alles vorbei";

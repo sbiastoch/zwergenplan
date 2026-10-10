@@ -622,11 +622,7 @@ test.describe("mit gemockten Kacheln", () => {
     // neue Sitzung mit drei gemerkten Angeboten an drei Orten: Der Ausschnitt hängt nicht von der Merkliste ab
     await page.addInitScript(
       (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
-      JSON.stringify([
-        "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
-        "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
-        "theater-beispiel--kuckuck-im-nest-theater-ab-18-monaten-20261115t1100--theater-beispiel-buehne",
-      ]),
+      JSON.stringify(["nle21y1x", "lxizt974", "3zemfuzk"]),
     );
     const before = tileLog.length;
     await openMap(page, "./?ansicht=merkliste-karte");
@@ -694,11 +690,7 @@ test.describe("mit gemockten Kacheln", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.addInitScript(
       (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
-      JSON.stringify([
-        "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
-        "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
-        "theater-beispiel--kuckuck-im-nest-theater-ab-18-monaten-20261115t1100--theater-beispiel-buehne",
-      ]),
+      JSON.stringify(["nle21y1x", "lxizt974", "3zemfuzk"]),
     );
     await page.goto("./?ansicht=merkliste");
     await expect(page.getByTestId("offer")).toHaveCount(3);

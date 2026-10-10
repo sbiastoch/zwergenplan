@@ -261,12 +261,7 @@ test.describe("Kategorie-Etikett folgt dem Filter (Plan 0014)", () => {
 
   // Seit Plan 0025 (E8) im Kalender der Merkliste: Die Kategorie der Startseite wählt nur die Form (Plan 0014)
   test("Kalender: der Punkt im Monatsraster trägt die gewählte Kategorie", async ({ page }) => {
-    await page.addInitScript(() =>
-      localStorage.setItem(
-        "zwergenplan.merkliste",
-        JSON.stringify(["theater-beispiel--babykonzert-im-advent-20261206t1000--theater-beispiel-buehne"]),
-      ),
-    );
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["kovtez0z"])));
     await page.goto("./?kat=buehne&ansicht=merkliste-kalender");
     await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
     await page.getByRole("button", { name: "Nächster Monat" }).click();
@@ -291,9 +286,9 @@ test.describe("alte URL ?ansicht=kalender", () => {
   });
 
   test("mit Anbieter: das Sheet öffnet über „Angebote“", async ({ page }) => {
-    await page.goto("./?ansicht=kalender&anbieter=theater-beispiel");
+    await page.goto("./?ansicht=kalender&anbieter=fv3fpfp2");
     await expect(page.getByRole("dialog", { name: "Anbieter" })).toBeVisible();
-    await expect(page).toHaveURL((url) => url.search === "?anbieter=theater-beispiel");
+    await expect(page).toHaveURL((url) => url.search === "?anbieter=fv3fpfp2");
     await page.keyboard.press("Escape");
     await expect(tabBar(page).getByRole("button", { name: /^Angebote/ })).toHaveAttribute("aria-current", "page");
   });

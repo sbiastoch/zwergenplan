@@ -1188,6 +1188,36 @@ Unabhängiger `plan-reviewer` nur auf die Teile, die N-I1 (kurze Pfade) und N-I2
 | **m7** ADR 0022, Punkt 6: 80 Zeichen gelten weiter im Schema | Wortlaut korrigiert |
 | **m8** Plan 0026, E1–E7 beschreiben weiter `angebot/`, `anbieter/` | Hinweis vor E1 in Plan 0026 |
 
+### Umsetzung zu Nachtrag A (2026-10-10, Stufe 0 von Plan 0032)
+
+Umgesetzt auf dem Branch `stufe-0-stabile-ids` nach den Schritten S1–S5. N-I3 und N-I4 mit der Empfehlung: UID mit der Kurz-ID, keine Aliasseiten.
+
+**Abweichungen vom Plan** (alle drei führen im Zweifel zu einer neuen ID, nie zu einer anderen alten):
+
+| Stelle | Plan | Umgesetzt | Grund |
+|---|---|---|---|
+| E14, Stufe 0 | `offerKey(p) === offerKey(d)` | Fensterschlüssel (`offerKey` mit dem ersten Termin ab `horizon.from`) auf beiden Seiten | Ein laufender Kurs, dessen Quelle die vergangenen Termine nicht mehr nennt und bei dem ein Termin verlegt wurde, hat einen anderen ersten Termin, T = 1/3 und D = 1/3: Er verlöre seine ID (bestehender Test „verlegter Termin erscheint nicht doppelt“). Die Saat neuer IDs bleibt `offerKey`, damit E15 gilt. |
+| E14, Stufe 1 | gleicher Anbieter, Ort, T ≥ 0,8, strikt bester | dazu **Titel-Widerspruch**: kein Treffer, wenn der neue Titel dem alten nicht ähnelt, aber einem anderen noch offenen Angebot desselben Anbieters | Probelauf, Durchgang 3: Rückt ein Angebot um eine Viertelstunde auf den frei gewordenen Platz der Schwester (Pikler 14:45 → 15:00, Zumbini 15:00 → 15:15), wäre T = 1 mit der falschen Schwester. Test in `stable-ids.test.ts`. |
+| E15, Wochen-Nachricht | Abbildung in `tailorPush` und in `runWeekly` | einmal in `newOfferIds` (`src/domain/news.ts`), das beide nutzen | eine Stelle statt zwei; Tests in `news.test.ts` und `push-weekly-core.test.ts` |
+
+Nebenbei: `src/domain/directory.test.ts` und `src/domain/provider-count.test.ts` brauchten doch eine Umstellung (Review m2 nahm das Gegenteil an): Sie vergleichen Katalog-IDs als Literale mit `site.json`-Daten. Sie nutzen jetzt `fixturePublicId` aus `test-fixtures.ts`. `batchProviders` las schon seit Plan 0031 nur die IDs (Review M3 war erledigt). `og-images.ts` hatte den Ordner `angebot` fest im Zähl-Gate; jetzt `SHARE_DIRS.offer`.
+
+**Migration:** `pnpm pipeline migrate-ids` auf `data/` (333 Angebote, 74 Anbieter) und `tests/fixtures/` (9 Angebote, 6 Anbieter), keine Kollision, keine Katalog-ID in Kurzform; der Katalog-Diff besteht nur aus den neuen `publicId`-Zeilen.
+
+**Probelauf** (Wegwerf-Skripte unter `runs/`): Die Rohdaten vom 04.10. liegen nur im Haupt-Checkout, nicht im Container dieser Umsetzung. Gemessen wurde deshalb `assignIds` direkt, mit den 333 migrierten Angeboten als Entwürfen (ohne ID) und als Vorstand; `fromRaw` ist damit nicht abgedeckt, das deckt `build-offers.test.ts`.
+
+| Durchgang | Störung | gleicher Schlüssel | gleiche Termine | ähnlicher Titel | neu | falsch zugeordnet |
+|---|---|---|---|---|---|---|
+| 1 | keine | 333 | 0 | 0 | 0 | 0 |
+| 2 | Klammerzusatz am Titelende entfernt (276 Titel) | 60 | 273 | 0 | 0 | 0 |
+| 3 | wie 2, dazu jede Uhrzeit +15 Min. | 33 | 1 | 175 | 124 | 1 |
+
+- Durchgang 2 vor der Titel-Widerspruch-Regel: 60 / 269 / 4, ebenfalls ohne Fehler; die vier Mehrdeutigkeiten in Stufe 1 waren die Paare mit identischen Terminen aus dem Befund (Pikler/Musikalische Früherziehung Mo 16:30, Pikler/Zumba Di 16:00), Stufe 2 löste sie richtig auf.
+- Durchgang 3 ist künstlich (alle Angebote wandern zugleich), zeigte aber vor der Regel 4 falsche Zuordnungen. Übrig bleibt ein Fall: zwei Gruppen „Musikgarten 18 Mon.–3 J.“ mittwochs um 15:15 und 15:30 desselben Anbieters; rückt die eine auf den Platz der anderen, sind sie in den Daten nicht unterscheidbar (R9, Restrisiko). Die 124 neuen IDs sind der Zustand vor ADR 0022 (R10).
+- Stichprobe Stufe 1 aus Durchgang 2: „Abenteuerturnen 1–3 J. (Fr 13.11., 15:00)“ → „Abenteuerturnen 1–3 J.“, „Babyschwimmen im Ritterbad (Mo 11:10)“ → „Babyschwimmen im Ritterbad“, „Musikzauber (Herbstzauber 1–2 J., Mi 9:00)“ → „Musikzauber“ – alle richtig.
+
+**Lokale Umgebung:** `scripts/heavy.test.ts` („ignoriert die Gruppe SIGINT und SIGTERM“) ist im Cloud-Container auch ohne diese Änderung rot (PID 1 räumt verwaiste Zombies nicht ab); in der CI grün. Playwright 1.63 erwartet Chromium-Revision 1243, der Container hat 1194; lokal lief E2E über ein eigenes `PLAYWRIGHT_BROWSERS_PATH` mit Symlinks auf das vorhandene Chromium.
+
 ## Nachtrag B (2026-10-10): Katalog crawlbar (Plan 0031, ADR 0025)
 
 Plan 0031 hat den Katalog so umgebaut, dass dieser Plan ihn ausführen kann. Der Text oben bleibt stehen; wo er abweicht, gilt dieser Nachtrag.

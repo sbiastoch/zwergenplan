@@ -122,7 +122,7 @@ test("in der Liste merken und entfernen: Zeile wandert, Fokus bleibt auf der nac
   await heart(page, THEATER).click();
   await expect(page.getByText(TOAST_SAVED)).toBeVisible();
   // die gemerkte ID steht nie in der URL
-  expect(page.url()).not.toContain("theater-beispiel");
+  expect(page.url()).not.toContain("fv3fpfp2");
   await expect(savedRow(page, THEATER)).toBeVisible();
   await expect(heart(page, THEATER)).toHaveAttribute("aria-pressed", "true");
   await expect(restRows(page).filter({ hasText: THEATER })).toHaveCount(0);
@@ -142,7 +142,7 @@ test("in der Liste merken und entfernen: Zeile wandert, Fokus bleibt auf der nac
 test("Reihenfolge: Suchfeld, Statuszeile, „Gemerkte Anbieter“, „Weitere Anbieter“; ohne Termine blass oben", async ({
   page,
 }) => {
-  await preset(page, ["theater-beispiel", "turnverein-beispiel"]);
+  await preset(page, ["fv3fpfp2", "fkbg3oeb"]);
   await page.goto("./?ansicht=anbieter");
   await expect(savedList(page).locator("li")).toHaveCount(2);
   const order = await page
@@ -155,14 +155,27 @@ test("Reihenfolge: Suchfeld, Statuszeile, „Gemerkte Anbieter“, „Weitere An
   await expect(savedList(page).locator(".place.idle")).toContainText("Gerade keine Termine im Plan");
   // gespeichert werden nur IDs
   expect(await page.evaluate(() => localStorage.getItem("zwergenplan.anbieter-merkliste"))).toBe(
-    JSON.stringify(["theater-beispiel", "turnverein-beispiel"]),
+    JSON.stringify(["fv3fpfp2", "fkbg3oeb"]),
+  );
+});
+
+test("gemerkte Anbieter mit Katalog-ID (vor ADR 0022): erscheinen und werden auf die publicId umgeschrieben", async ({
+  page,
+}) => {
+  await preset(page, ["theater-beispiel", "fkbg3oeb", "fv3fpfp2"]);
+  await page.goto("./?ansicht=anbieter");
+  await expect(savedList(page).locator("li")).toHaveCount(2);
+  await expect(savedRow(page, THEATER)).toBeVisible();
+  // Katalog-ID und publicId desselben Anbieters ergeben einen Eintrag an der ersten Stelle
+  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.anbieter-merkliste"))).toBe(
+    JSON.stringify(["fv3fpfp2", "fkbg3oeb"]),
   );
 });
 
 test("Suche trifft nur einen gemerkten: steht oben, kein „Kein Anbieter heißt so.“, Statuszeile bleibt", async ({
   page,
 }) => {
-  await preset(page, ["theater-beispiel"]);
+  await preset(page, ["fv3fpfp2"]);
   await page.goto("./?ansicht=anbieter");
   const status = page.locator("p.status");
   await expect(status).toContainText("Anbieter mit");
@@ -177,7 +190,7 @@ test("Suche trifft nur einen gemerkten: steht oben, kein „Kein Anbieter heißt
 });
 
 test("Startseiten-Filter blendet den gemerkten Anbieter aus: Zeile bleibt oben, blass", async ({ page }) => {
-  await preset(page, ["theater-beispiel"]);
+  await preset(page, ["fv3fpfp2"]);
   await page.goto("./?ansicht=anbieter&kat=buecher");
   const row = savedList(page).locator("li");
   await expect(row).toHaveCount(1);
@@ -188,7 +201,7 @@ test("Startseiten-Filter blendet den gemerkten Anbieter aus: Zeile bleibt oben, 
 test("Privatsphäre: Gemerkte Anbieter ändern keinen Request; nur der Tab „Anbieter“ lädt anbieter.json", async ({
   page,
 }) => {
-  await preset(page, ["familientreff-beispiel"]);
+  await preset(page, ["b5nuus36"]);
   const preloaded = startPreloads(page);
   await page.goto("./");
   await expect(page.getByTestId("offer").first()).toBeVisible();
@@ -218,7 +231,7 @@ test("Privatsphäre: mit und ohne gemerkte Anbieter dieselben Request-Pfade", as
   try {
     const other = await context.newPage();
     await other.clock.setFixedTime(FIXTURE_NOW);
-    await preset(other, ["familientreff-beispiel", "theater-beispiel"]);
+    await preset(other, ["b5nuus36", "fv3fpfp2"]);
     const withSaved = await flowPaths(other);
     await expect(savedList(other).locator("li")).toHaveCount(2);
     expect(withSaved).toEqual(without);
@@ -280,7 +293,7 @@ test("per Tastatur: Enter auf dem Herz merkt, der Fokus geht auf das nächste He
 test("Filter trifft nur einen gemerkten Anbieter: Hinweis auf die ausgeblendeten bleibt, kein Leerzustand", async ({
   page,
 }) => {
-  await preset(page, ["stadtbibliothek-beispiel"]);
+  await preset(page, ["kgjeqq3k"]);
   await page.goto("./?ansicht=anbieter&kat=buecher");
   await expect(savedList(page).locator(".place:not(.idle)")).toHaveCount(1);
   await expect(page.getByText("4 weitere Anbieter haben gerade nichts Passendes.")).toBeVisible();

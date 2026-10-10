@@ -177,15 +177,15 @@ test("Adresse mit Klammerzusatz: Ziel nur „Straße, PLZ Ort“ (Plan 0019, E2)
 // Unpassendes aus.
 test.describe("„Alle Termine“ passend zum Alter (Plan 0018)", () => {
   const TREFF = {
-    id: "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
+    id: "lxizt974",
     title: "Offener Krabbeltreff",
   };
   const REIME = {
-    id: "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
+    id: "rzzqsvxq",
     title: "Krabbelreime & Fingerspiele",
   };
   const BEWEGUNG = {
-    id: "gemeinde-beispiel--eltern-kind-bewegungslandschaftsnachmittag-fuer--gemeinde-beispiel-gemeindehaus",
+    id: "rv61suun",
     title: /^Eltern-Kind-Bewegungslandschaft/,
   };
 

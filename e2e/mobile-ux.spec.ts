@@ -60,11 +60,10 @@ async function openProviders(page: Page) {
 }
 
 /** IDs der Fixture-Angebote für Merkliste und Deep-Link (Plan 0018) */
-const PEKIP_ID =
-  "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus";
-const TREFF_ID = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
-const REIME_ID = "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum";
-const MUSIK_ID = "musikschule-beispiel--musikgarten-1-1-2-jahre-20261105t1600--musikschule-beispiel-sued";
+const PEKIP_ID = "nle21y1x";
+const TREFF_ID = "lxizt974";
+const REIME_ID = "rzzqsvxq";
+const MUSIK_ID = "qxdibmkc";
 
 /**
  * Geburtsdatum (ISO) und Merkliste vor dem Laden speichern und `path` laden (Plan 0018): `VIEWS` startet nach
@@ -195,10 +194,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   // Plan 0025, E3: Tab „Anbieter“ mit zwei gemerkten oben, einer davon ohne Termine (gestrichelt), Herz an jeder Zeile
   "anbieter-gemerkt": async (page) => {
     await page.evaluate(() =>
-      localStorage.setItem(
-        "zwergenplan.anbieter-merkliste",
-        JSON.stringify(["gemeinde-beispiel", "turnverein-beispiel"]),
-      ),
+      localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fqq3o4y8", "fkbg3oeb"])),
     );
     await page.goto("./?ansicht=anbieter");
     await expect(page.locator("ul.provider-saved li")).toHaveCount(2);
@@ -565,7 +561,7 @@ for (const [name, go] of Object.entries(VIEWS)) {
  * abgeschaltetem JavaScript wirklich so aussieht, prüft `e2e/teilen.spec.ts` („ohne JavaScript“).
  */
 test.describe("vorschauseite-ohne-js", () => {
-  const SHARE_PAGE = "angebot/familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus/";
+  const SHARE_PAGE = "a/lxizt974/";
   test.beforeEach(async ({ page }) => {
     await page.route(`**/${SHARE_PAGE}`, async (route) => {
       const response = await route.fetch();

@@ -139,10 +139,9 @@ test.describe("Export-Code nicht ladbar", () => {
 // Merkliste und Geburtsdatum stehen vor dem Laden im localStorage: Der Altersfilter blendet in „Entdecken“ aus.
 test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
   const IDS = {
-    pekip:
-      "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
-    treff: "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
-    reime: "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
+    pekip: "nle21y1x",
+    treff: "lxizt974",
+    reime: "rzzqsvxq",
   };
 
   async function openSaved(page: Page, ids: string[], birthDate: string) {
@@ -226,13 +225,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 });
 
 /** Fünf gemerkte Fixture-Angebote an vier Orten (Plan 0025, Test 9): 8 + 5 + 6 + 4 + 1 = 24 kommende Termine. */
-const FIVE = [
-  "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
-  "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
-  "musikschule-beispiel--musikgarten-1-1-2-jahre-20261105t1600--musikschule-beispiel-sued",
-  "stadtbibliothek-beispiel--krabbelreime-fingerspiele--stadtbibliothek-beispiel-zentrum",
-  "theater-beispiel--kuckuck-im-nest-theater-ab-18-monaten-20261115t1100--theater-beispiel-buehne",
-];
+const FIVE = ["nle21y1x", "lxizt974", "qxdibmkc", "rzzqsvxq", "3zemfuzk"];
 
 /** Merkliste vor dem Laden im localStorage (Plan 0025, Tests): nicht per Herz-Tipp */
 async function preset(page: Page, ids: readonly string[], providers: readonly string[] = []) {
@@ -274,6 +267,18 @@ const tabButton = (page: Page, name: string) =>
   page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
 const segment = (page: Page, name: "Liste" | "Karte" | "Kalender") =>
   page.getByRole("group", { name: "Darstellung der Merkliste" }).getByRole("button", { name, exact: true });
+
+test("Merkliste mit langen IDs (vor ADR 0022): zeigt die Angebote und ist danach auf Kurz-IDs umgeschrieben", async ({
+  page,
+}) => {
+  await preset(page, ["familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus", "nle21y1x"]);
+  await page.goto("./?ansicht=merkliste");
+  await expect(page.getByTestId("offer")).toHaveCount(2);
+  await expect(page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.merkliste"))).toBe(
+    JSON.stringify(["lxizt974", "nle21y1x"]),
+  );
+});
 
 test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
   test("Statuszeile zählt Angebote und kommende Termine, der runde Export-Knopf nimmt alle", async ({ page }) => {
@@ -355,7 +360,7 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
 
   test("ohne gemerktes Angebot: Leerzustand auch auf der Karte, kein Umschalter, keine Kacheln", async ({ page }) => {
     // nur ein Anbieter gemerkt: Der zählt auf der Merkliste nicht (E5a); Kacheln sind ohne Mock verboten (fixtures.ts)
-    await preset(page, [], ["theater-beispiel"]);
+    await preset(page, [], ["fv3fpfp2"]);
     const requests = tableRequests(page);
     await page.goto("./?ansicht=merkliste-karte");
     await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();
@@ -374,7 +379,7 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
   test("ohne gemerktes Angebot: Leerzustand auch im Kalender, kein Kalender, kein Anlass (Plan 0025, E5a)", async ({
     page,
   }) => {
-    await preset(page, [], ["theater-beispiel"]);
+    await preset(page, [], ["fv3fpfp2"]);
     const requests = tableRequests(page);
     await page.goto("./?ansicht=merkliste-kalender");
     await expect(page.getByText("Noch nichts gemerkt")).toBeVisible();

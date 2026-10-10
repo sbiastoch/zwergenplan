@@ -10,6 +10,13 @@ Der Vertrag ist `Provider` in `src/domain/schema.ts`, exportiert als `schema/pro
 - Der Katalog beschreibt Quellen, nicht Inhalte (ADR 0024). Alle Rollen haben `region`, `name`, `url`, `programme`, `availability`, `verified` und `notes`. Nur `anbieter` hat `age`, `venues` und `coveredBy`, nur `aggregator` hat `adapter`. Themen, Format, Kosten und Anmeldung stehen nur an den Angeboten.
 - `region` ist die Region der Quelle (heute nur `nuernberg`, `src/domain/regions.ts`); jeder Ort muss in ihrer bbox liegen (ADR 0025).
 
+## IDs (ADR 0022)
+
+- Die Katalog-ID (`id`) ist der interne Schlüssel für Angebote, Orte und Pipeline. Sie wird **nie umbenannt**: Zuordnung und Angebots-IDs hängen an ihr.
+- Jeder `anbieter` hat direkt unter `id` eine `publicId` (8 Zeichen `[0-9a-z]`). Sie steht in Links (`p/<publicId>/`), `site.json`, `anbieter.json` und der Merkliste gemerkter Anbieter und wird **nie geändert**.
+- Neue Einträge: `candidates add-provider` setzt die `publicId` selbst. Bei einem von Hand ergänzten Eintrag meldet `pnpm data:validate` „`<id>`: `publicId` fehlt – frei ist `<wert>`“; genau diesen Wert übernehmen, nie einen selbst ausdenken. Wechselt ein Eintrag zu `anbieter`, gilt dasselbe.
+- `aggregator` und `verzeichnis` haben keine `publicId`.
+
 ## Programmseiten (`programme`, ADR 0025)
 
 Der nächtliche Crawler (Plan 0015) liest nur Felder, keine Notizen. Je Seite:
@@ -30,7 +37,7 @@ Der nächtliche Crawler (Plan 0015) liest nur Felder, keine Notizen. Je Seite:
 
 ## Orte (`venues`)
 
-- Der Hauptort hat die Anbieter-ID als `id`, weitere Orte `<anbieter>-<slug>`. IDs sind dauerhaft und stecken in den Offer-IDs (ADR 0006). Wird ein Ort umbenannt, bleibt die `id`.
+- Der Hauptort hat die Anbieter-ID als `id`, weitere Orte `<anbieter>-<slug>`. IDs sind dauerhaft und stecken im Zuordnungsschlüssel der Angebots-IDs (ADR 0022). Wird ein Ort umbenannt, bleibt die `id`.
 - Ein neuer Ort braucht Koordinaten: `pnpm pipeline geocode "Straße Nr, PLZ Nürnberg"` liefert `lat`, `lon` und `district`.
 - `venues[].hint` (höchstens 200 Zeichen, ohne Datum) sagt dem Crawler, was an diesem Ort stattfindet („Babymassage freitags, Krabbelgruppen“). Ist die Koordinate nur ungefähr (Park, Straßenmitte), steht das in `notes`.
 - Meldet ein Subagent „neuer Ort“ als Drift: Ort anlegen, dann in der Rohdatei `venueId` der betroffenen Events umstellen und `build` neu laufen lassen.

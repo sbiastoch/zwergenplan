@@ -309,12 +309,7 @@ test.describe("ICS-Fuß im Detail", () => {
  */
 async function openMonth(page: Page, { day = true } = {}) {
   await page.setViewportSize({ width: 320, height: 640 });
-  await page.addInitScript(() =>
-    localStorage.setItem(
-      "zwergenplan.merkliste",
-      JSON.stringify(["familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus"]),
-    ),
-  );
+  await page.addInitScript(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["lxizt974"])));
   await page.goto("./?ansicht=merkliste-kalender", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
   await expect(page.getByRole("button", { name: /^Oktober 2026 · / })).toBeVisible();
@@ -804,10 +799,7 @@ test.describe("Export-Knopf der Merkliste über der ersten Kachel", () => {
         await page.setViewportSize({ width, height: 800 });
         await page.addInitScript(
           (saved) => localStorage.setItem("zwergenplan.merkliste", saved),
-          JSON.stringify([
-            "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus",
-            "familientreff-beispiel--pekip-gruppe-herbst-babys-geb-juni-aug-2026-20261013t0930--familientreff-beispiel-haus",
-          ]),
+          JSON.stringify(["lxizt974", "nle21y1x"]),
         );
         await page.goto("./?ansicht=merkliste");
         await expect(page.getByTestId("offer")).toHaveCount(2);
@@ -833,7 +825,7 @@ test.describe("Abstand unter dem Umschalter der Merkliste", () => {
         await page.setViewportSize({ width: 320, height: 800 });
         await page.addInitScript(
           (saved) => localStorage.setItem("zwergenplan.merkliste", saved),
-          JSON.stringify(["familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus"]),
+          JSON.stringify(["lxizt974"]),
         );
         await page.goto(`./?ansicht=${view}`);
         await expect(page.locator(".saved-filters .chip").first()).toBeVisible();

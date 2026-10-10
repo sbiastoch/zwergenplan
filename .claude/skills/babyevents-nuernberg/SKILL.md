@@ -60,11 +60,11 @@ Fertig ist Schritt 2, wenn es für jedes `batch-<n>.json` ein `raw/batch-<n>.jso
 pnpm pipeline build runs/<from>
 ```
 
-`build` schreibt `data/offers.json` und `runs/<from>/report.json`. Auf stdout stehen Zahlen, jede Quelle mit `fehler` und jede Drift-Meldung. Bricht es ab, nennt die Meldung Datei, Event und Feld. Korrigiere die Rohdatei und baue erneut. Fertig, wenn `build` „data/offers.json geschrieben“ meldet.
+`build` schreibt `data/offers.json` und `runs/<from>/report.json`. Angebots-IDs übernimmt es aus dem Vorstand (ADR 0022); die Hinweise „IDs: …“ im Bericht nennen jede Zuordnung über Termine oder Titel mit altem und neuem Titel. Auf stdout stehen Zahlen, jede Quelle mit `fehler` und jede Drift-Meldung. Bricht es ab, nennt die Meldung Datei, Event und Feld. Korrigiere die Rohdatei und baue erneut. Fertig, wenn `build` „data/offers.json geschrieben“ meldet.
 
 ## 4. Katalog pflegen
 
-Jede Drift-Meldung aus dem Bericht wird in `data/providers.yaml` umgesetzt (tote URL, Umzug, neues Buchungssystem, Schließung), danach `verified` auf heute. Die Regeln stehen in `references/catalog.md`. Fertig, wenn jede Drift-Meldung umgesetzt oder begründet verworfen ist und `pnpm data:validate` grün ist.
+Jede Drift-Meldung aus dem Bericht wird in `data/providers.yaml` umgesetzt (tote URL, Umzug, neues Buchungssystem, Schließung), danach `verified` auf heute. Die Regeln stehen in `references/catalog.md`; Katalog-IDs nie umbenennen, `publicId` nie ändern (ADR 0022). Fertig, wenn jede Drift-Meldung umgesetzt oder begründet verworfen ist und `pnpm data:validate` grün ist.
 
 ## 5. Veröffentlichen
 

@@ -8,7 +8,7 @@ import type { Page, Request } from "@playwright/test";
 import { expect, startPreloads, test } from "./fixtures.ts";
 import { expectMobileUx } from "./mobile-ux.ts";
 
-const KRABBELTREFF = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+const KRABBELTREFF = "lxizt974";
 const THEATER = "Kleines Theater Beispiel (fiktiv)";
 
 const isDirectory = (url: string) => new URL(url).pathname.endsWith("/data/anbieter.json");
@@ -158,7 +158,7 @@ test.describe("Lazy-Laden (E7, E9)", () => {
     const release = await holdSite(page);
     const directory = page.waitForRequest((r) => isDirectory(r.url()));
     const chunk = page.waitForRequest((r) => isChunk(r.url()));
-    await page.goto("./?anbieter=theater-beispiel", { waitUntil: "domcontentloaded" });
+    await page.goto("./?anbieter=fv3fpfp2", { waitUntil: "domcontentloaded" });
     await Promise.all([directory, chunk]);
     release();
     await expect(providerSheet(page).getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
@@ -174,7 +174,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
     // Startfokus auf dem Namen, nicht auf dem Herz daneben (Plan 0025, E2)
     await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeFocused();
-    expect(new URL(page.url()).search).toBe("?ansicht=anbieter&anbieter=theater-beispiel");
+    expect(new URL(page.url()).search).toBe("?ansicht=anbieter&anbieter=fv3fpfp2");
 
     await page.goBack();
     await expect(sheet).toBeHidden();
@@ -200,20 +200,18 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await card.click();
     const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
     await expect(detail).toBeVisible();
-    expect(new URL(page.url()).search).toBe(
-      `?ansicht=anbieter&anbieter=familientreff-beispiel&angebot=${KRABBELTREFF}`,
-    );
+    expect(new URL(page.url()).search).toBe(`?ansicht=anbieter&anbieter=b5nuus36&angebot=${KRABBELTREFF}`);
     expect(await topDialogOverSheet(page), "über dem Sheet liegt das Detail").toBe("Offener Krabbeltreff");
 
     await page.goBack();
     await expect(detail).toBeHidden();
     await expect(sheet).toBeVisible();
-    expect(new URL(page.url()).search).toBe("?ansicht=anbieter&anbieter=familientreff-beispiel");
+    expect(new URL(page.url()).search).toBe("?ansicht=anbieter&anbieter=b5nuus36");
     expect(await scroller.evaluate((el) => el.scrollTop), "Scrollposition erhalten").toBe(scrolled);
   });
 
   test("Website-Link im Sheet: neuer Tab, rel=noopener, Katalog-href (nicht angeklickt, E9)", async ({ page }) => {
-    await ready(page, "./?anbieter=theater-beispiel");
+    await ready(page, "./?anbieter=fv3fpfp2");
     const link = websiteLink(page);
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute("href", "https://example.org/theater");
@@ -227,7 +225,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     page,
   }) => {
     await saveOffer(page, KRABBELTREFF);
-    await ready(page, "./?ansicht=merkliste-kalender&anbieter=theater-beispiel");
+    await ready(page, "./?ansicht=merkliste-kalender&anbieter=fv3fpfp2");
     const sheet = providerSheet(page);
     await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
     await expect(tab(page, "Merkliste")).toHaveAttribute("aria-current", "page");
@@ -235,6 +233,16 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await expect(sheet).toBeHidden();
     await expect(page).toHaveURL(/\?ansicht=merkliste-kalender$/);
     await expect(tab(page, "Merkliste")).toBeFocused();
+  });
+
+  test("Katalog-ID aus einem alten Link öffnet dasselbe Sheet, die Adresse zeigt die publicId (ADR 0022)", async ({
+    page,
+  }) => {
+    await ready(page, "./?anbieter=theater-beispiel");
+    await expect(
+      providerSheet(page).getByRole("heading", { level: 2, name: "Kleines Theater Beispiel (fiktiv)" }),
+    ).toBeVisible();
+    expect(new URL(page.url()).search).toBe("?anbieter=fv3fpfp2");
   });
 
   test("unbekannte ID: Parameter weg, kein Sheet", async ({ page }) => {
@@ -255,7 +263,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     const sheet = providerSheet(page);
     await expect(sheet.getByRole("heading", { level: 2, name: "Familientreff Beispielhof (fiktiv)" })).toBeVisible();
     await expect(detail).toBeHidden();
-    expect(new URL(page.url()).search).toBe("?anbieter=familientreff-beispiel");
+    expect(new URL(page.url()).search).toBe("?anbieter=b5nuus36");
 
     await page.goBack();
     await expect(detail).toBeVisible();
@@ -266,7 +274,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
   test("Deep-Link mit Sheet und Detail: Das Detail liegt oben; derselbe Knopf führt ohne neuen Eintrag ins Sheet", async ({
     page,
   }) => {
-    await ready(page, `./?anbieter=familientreff-beispiel&angebot=${KRABBELTREFF}`);
+    await ready(page, `./?anbieter=b5nuus36&angebot=${KRABBELTREFF}`);
     const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
     const sheet = providerSheet(page);
     await expect(detail).toBeVisible();
@@ -279,7 +287,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await detail.getByRole("button", { name: "Mehr von diesem Anbieter" }).click();
     await expect(detail).toBeHidden();
     await expect(sheet.getByRole("heading", { level: 2, name: "Familientreff Beispielhof (fiktiv)" })).toBeVisible();
-    expect(new URL(page.url()).search).toBe("?anbieter=familientreff-beispiel");
+    expect(new URL(page.url()).search).toBe("?anbieter=b5nuus36");
     expect(await page.evaluate(() => window.history.length), "kein neuer History-Eintrag").toBe(length);
   });
 
@@ -289,7 +297,7 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     await ready(page);
     // Eintrag mit beiden Parametern, darüber einer ohne; Zurück löst popstate aus (wie ein Tipp auf „Zurück“)
     await page.evaluate((id) => {
-      window.history.pushState(null, "", `?anbieter=familientreff-beispiel&angebot=${id}`);
+      window.history.pushState(null, "", `?anbieter=b5nuus36&angebot=${id}`);
       window.history.pushState(null, "", "?ansicht=merkliste");
     }, KRABBELTREFF);
     await page.evaluate(() => window.history.back());
@@ -300,17 +308,17 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
   });
 
   test("Detail schließen über dem Sheet: Das Sheet bleibt darunter offen", async ({ page }) => {
-    await ready(page, `./?anbieter=familientreff-beispiel&angebot=${KRABBELTREFF}`);
+    await ready(page, `./?anbieter=b5nuus36&angebot=${KRABBELTREFF}`);
     const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
     await expect(detail).toBeVisible();
     await detail.getByRole("button", { name: "Zurück" }).click();
     await expect(detail).toBeHidden();
     await expect(providerSheet(page)).toBeVisible();
-    expect(new URL(page.url()).search).toBe("?anbieter=familientreff-beispiel");
+    expect(new URL(page.url()).search).toBe("?anbieter=b5nuus36");
   });
 
   test("der Seiten-Toast schweigt bei offenem Sheet", async ({ page }) => {
-    await ready(page, `./?anbieter=familientreff-beispiel&angebot=${KRABBELTREFF}`);
+    await ready(page, `./?anbieter=b5nuus36&angebot=${KRABBELTREFF}`);
     const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
     await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
     await detail.getByRole("button", { name: /merken$/ }).click();
@@ -330,12 +338,12 @@ test.describe("site.json scheitert (Arch-Review m3)", () => {
     page,
   }) => {
     await page.route("**/data/site.json", (route) => route.fulfill({ status: 503, body: "" }));
-    await page.goto("./?anbieter=theater-beispiel");
+    await page.goto("./?anbieter=fv3fpfp2");
     const alert = page.getByRole("alert");
     await expect(alert).toContainText("Die Angebote ließen sich gerade nicht laden.");
     // Ohne Datenstand gäbe es nur „wird geladen …“ ohne Ende: Das Sheet bleibt zu, die Fehlerseite ist bedienbar.
     await expect(providerSheet(page)).toBeHidden();
-    expect(new URL(page.url()).searchParams.get("anbieter")).toBe("theater-beispiel");
+    expect(new URL(page.url()).searchParams.get("anbieter")).toBe("fv3fpfp2");
 
     await page.unroute("**/data/site.json");
     await alert.getByRole("button", { name: "Nochmal versuchen" }).click();
@@ -365,7 +373,7 @@ test.describe("Fehler (E10)", () => {
 
   test("503 im Sheet: Fehlertext, „Nochmal versuchen“ lädt den Anbieter", async ({ page }) => {
     await page.route("**/data/anbieter.json", (route) => route.fulfill({ status: 503, body: "weg" }));
-    await ready(page, "./?anbieter=theater-beispiel");
+    await ready(page, "./?anbieter=fv3fpfp2");
     const sheet = providerSheet(page);
     await expect(sheet.locator(".lazy-box")).toContainText("Die Anbieter konnten nicht geladen werden.");
     await expectMobileUx(page);
@@ -411,7 +419,7 @@ test.describe("Datenstand (E6, M4)", () => {
       const data = (await response.json()) as { providers: { id: string }[] };
       await route.fulfill({
         response,
-        json: { ...data, providers: data.providers.filter((p) => p.id !== "theater-beispiel") },
+        json: { ...data, providers: data.providers.filter((p) => p.id !== "fv3fpfp2") },
       });
     });
     await ready(page, "./?ansicht=anbieter");
@@ -432,7 +440,7 @@ test.describe("Datenstand (E6, M4)", () => {
     const directory = collect(page, isDirectory);
     const chunks = collect(page, isChunk);
     const preloaded = page.waitForRequest((r) => isDirectory(r.url()));
-    await page.goto("./?anbieter=theater-beispiel", { waitUntil: "domcontentloaded" });
+    await page.goto("./?anbieter=fv3fpfp2", { waitUntil: "domcontentloaded" });
     await preloaded;
     release();
     await expect(providerSheet(page).getByRole("heading", { level: 2, name: THEATER })).toBeVisible();

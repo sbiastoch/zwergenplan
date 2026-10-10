@@ -32,7 +32,7 @@ const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.js
 const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof";
 const NB = "\u00a0";
 /** Offener Krabbeltreff (Fixture), für die vorbelegte Merkliste (Plan 0025) */
-const TREFF_ID = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+const TREFF_ID = "lxizt974";
 
 const offers = (page: Page) => page.getByTestId("offer");
 const card = (page: Page, title: string) => offers(page).filter({ hasText: title });

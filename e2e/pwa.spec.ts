@@ -132,8 +132,8 @@ test("Vorschauseite zum Teilen mit aktivem Service Worker: Weiterleitung ins Det
   page,
 }) => {
   await installed(page);
-  const id = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
-  await page.goto(`angebot/${id}/`);
+  const id = "lxizt974";
+  await page.goto(`a/${id}/`);
   await expect(page).toHaveURL(new RegExp(`/\\?angebot=${id}$`));
   await expect(page.getByRole("dialog", { name: "Offener Krabbeltreff" })).toBeVisible();
 });
