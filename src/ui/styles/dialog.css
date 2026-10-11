@@ -491,6 +491,17 @@
   html:has(dialog[open]) {
     overflow: hidden;
   }
+  /*
+   * Onboarding (Nachtrag Plan 0034, 2026-10-11): `overflow: hidden` sperrt nur das Scrollen per Finger, nicht per
+   * Skript. Nach einem Dropdown scrollte der Browser des Handys das Dokument (Fokus-Scroll, iOS beim Picker), der
+   * Wizard rutschte weg und die Liste kam darunter hervor. Mit festem body hat das Dokument keine Scrollhöhe mehr.
+   * Nur hier: Das Cover verdeckt die Seite ohnehin, bei Sheets und Detail bliebe sonst die Scrollposition nicht stehen.
+   */
+  html:has(dialog.onb[open]) body {
+    /* ohne overflow: Ein fester Block trägt nichts zur Scrollhöhe bei, abgeschnitten wird nichts (Text-Gate) */
+    position: fixed;
+    inset: 0 0 auto;
+  }
   .bigsticker .mini {
     width: 46px;
     height: 46px;

@@ -11,7 +11,8 @@
  * - Beim Unmount einmal `app.syncPush()`: Ein laufendes Abo bekommt die im Onboarding geänderten Angaben (Plan 0034, E9).
  * - Wischen (Plan 0034, E10): Pointer Events auf `.onb-flow`, nur Touch und Stift; nach links wie der Hauptknopf (außer
  *   auf dem letzten Schritt), nach rechts zurück. Danach gleitet der neue Schritt aus der Wischrichtung herein.
- * - Zurück ohne Geste (E11): Die Punkte früherer Schritte sind Knöpfe, spätere nicht (die Datumsprüfung bleibt).
+ * - Zurück ohne Geste: ab Schritt 2 der Knopf „Zurück“ links in der Kopfzeile; die Punkte sind reine Anzeige
+ *   (Nachtrag Plan 0034, 2026-10-11, ersetzt die Punkt-Knöpfe aus E11).
  */
 import { type PointerEvent, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -28,6 +29,7 @@ import {
 } from "../../domain/onboarding.ts";
 import type { InstallApi } from "../../domain/pwa.ts";
 import { useBirthDateInput } from "../birth-date-input.ts";
+import { Icon } from "../icons.tsx";
 import type { OnboardingFlowProps } from "../onboarding-types.ts";
 import { StepArt } from "./art.tsx";
 import { AgeStep, CityStep, WayStep } from "./steps.tsx";
@@ -125,19 +127,22 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
     >
       <div className="onb-stage">
         <div className="onb-topbar">
-          <div className="onb-dots">
-            {steps.map((s, i) =>
-              i < index ? (
-                <button
-                  key={s}
-                  type="button"
-                  aria-label={`Zu Schritt ${i + 1}: ${textOf(s, i).title}`}
-                  onClick={() => go(i)}
-                />
-              ) : (
-                <i key={s} className={i === index ? "on" : undefined} aria-hidden="true" />
-              ),
-            )}
+          {index > 0 ? (
+            <button type="button" className="onb-back" onClick={() => go(index - 1)}>
+              <Icon name="back" size={20} />
+              {ONBOARDING_TEXTS.back}
+            </button>
+          ) : (
+            // Platzhalter gleicher Breite: Die Punkte bleiben auf jedem Schritt an ihrer Stelle
+            <span className="onb-back" aria-hidden="true">
+              <Icon name="back" size={20} />
+              {ONBOARDING_TEXTS.back}
+            </span>
+          )}
+          <div className="onb-dots" aria-hidden="true">
+            {steps.map((s, i) => (
+              <i key={s} className={i === index ? "on" : i < index ? "done" : undefined} />
+            ))}
           </div>
           <button type="button" className="onb-skip" onClick={() => onEnd("abbruch")}>
             {ONBOARDING_TEXTS.skip}
@@ -163,7 +168,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
       </div>
       <div key={`d${index}`} className={`onb-data${slideClass}`}>
         {step === "stadt" && <CityStep />}
-        {step === "alter" && <AgeStep birth={birth} field={field} now={now} offers={offers} />}
+        {step === "alter" && <AgeStep birth={birth} field={field} now={now} />}
         {step === "weg" && <WayStep {...props} />}
         {step === "app" && app && parts && <app.AppStep install={install} parts={parts} heading={heading} />}
       </div>

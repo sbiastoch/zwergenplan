@@ -28,7 +28,7 @@ const KICKER = {
   stadt: /^(Willkommen|Schön, dass ihr da seid)$/,
   alter: "Passt zum Alter",
   weg: "Gut erreichbar",
-  app: /^(Immer griffbereit|Samstags-Nachricht)$/,
+  app: /^(Immer griffbereit|Einmal pro Woche)$/,
 } as const;
 export type Step = keyof typeof KICKER;
 

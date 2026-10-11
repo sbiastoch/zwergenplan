@@ -1,5 +1,5 @@
 /**
- * Samstags-Nachricht (Plan 0017, E6, E7, E10; ADR 0014): Push-Teil im Abschnitt „Als App“, Spiegeln in den
+ * Wöchentliche Push-Nachricht (Plan 0017, E6, E7, E10; ADR 0014): Push-Teil im Abschnitt „Als App“, Spiegeln in den
  * Geräte-Speicher und der Zuschnitt im Service Worker. Nur Chromium (`pixel-7`, `desktop`) mit dem neuen
  * Headless-Modus (`channel: "chromium"`): Die Headless-Shell verweigert Benachrichtigungen immer (Plan 0017,
  * „Umsetzung“, Schritt 4).
@@ -34,7 +34,7 @@ const SENT_AT = "2026-10-05T12:00:00+02:00";
 
 const sheet = (page: Page) => page.getByRole("dialog", { name: "Kind und Einstellungen" });
 const section = (page: Page) => sheet(page).getByRole("region", { name: "Als App" });
-const pushSwitch = (page: Page) => section(page).getByRole("switch", { name: "Samstags-Nachricht" });
+const pushSwitch = (page: Page) => section(page).getByRole("switch", { name: "Wöchentliche Push-Nachricht" });
 const subscribeButton = (page: Page) => section(page).getByRole("button", { name: "Suche abonnieren" });
 
 /** Fake-Push-Manager der Seite (der Service Worker bleibt echt); das Abo überlebt Neuladen über sessionStorage */
@@ -237,12 +237,12 @@ test("Aktuelle Suche abonnieren und entfernen: Statuszeile, Liste, Fokus (E7)", 
   await expect(subscribeButton(page)).toHaveAttribute("aria-pressed", "true");
   await expect(section(page).getByText("Abonniert", { exact: true })).toBeVisible();
   await expect(section(page).getByRole("status")).toHaveText(
-    "Abonniert. Die Wegzeit wirkt in der Nachricht ab einem Startpunkt.",
+    "Abonniert. Die Wegzeit wirkt in der Push-Nachricht ab einem Startpunkt.",
   );
   const item = section(page).getByRole("listitem");
   await expect(item).toHaveCount(1);
   await expect(item).toContainText("Wegzeit wirkt ab einem Startpunkt");
-  await expect(section(page)).toContainText("Kommt erst mit eingeschalteter Samstags-Nachricht.");
+  await expect(section(page)).toContainText("Kommt erst mit eingeschalteter wöchentlicher Push-Nachricht.");
   expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik&wegzeit=20"]');
 
   await section(page).getByRole("button", { name: "Such-Abo Musik & Singen · bis 20 Min. entfernen" }).click();
@@ -275,14 +275,14 @@ test.describe("Onboarding (Plan 0033, E8)", () => {
       await intro.locator(".onb-foot .btn.primary").click();
       await expect(title).toHaveText(new RegExp(`^Schritt ${n} von 4: `));
     }
-    const toggle = intro.getByRole("switch", { name: "Samstags-Nachricht" });
+    const toggle = intro.getByRole("switch", { name: "Wöchentliche Push-Nachricht" });
     await expect(toggle).toHaveAttribute("aria-checked", "false");
     await expect(toggle).toBeEnabled();
     expect(pushLog, "ohne Tipp kein Request an den Push-Worker").toEqual([]);
 
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-checked", "true");
-    await expect(intro.getByRole("status")).toHaveText("An. Die erste kommt am Samstag.");
+    await expect(intro.getByRole("status")).toHaveText("An. Die erste kommt in den nächsten Tagen.");
     expect(pushLog).toEqual([
       {
         method: "POST",
@@ -316,7 +316,7 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
   await openKidSheet(page);
   await pushSwitch(page).click();
   await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
-  await expect(section(page).getByRole("status")).toHaveText("Samstags-Nachricht ist an.");
+  await expect(section(page).getByRole("status")).toHaveText("Wöchentliche Push-Nachricht ist an.");
   expect(pushLog).toEqual([
     {
       method: "POST",
