@@ -95,6 +95,10 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0034** (Impressum und Suchmaschinen, live seit d72d578, 2026-10-11):
+  - Sitemap, `canonical` und Search Console sowie das Impressum offline stehen oben unter „Suchmaschinen“ und „Impressum offline“.
+  - Rechtstexte prüfen lassen (Nutzer): Impressum, Hinweise und Datenschutz sind nach bestem Wissen geschrieben, nicht juristisch geprüft. Ändern sich Hosting, Karte oder Push (ADR 0008, 0013, 0014, 0017), muss `imprintPage()` mit.
+
 - **Plan 0033** (Onboarding, live seit ecfccfb, 2026-10-11; Einzelheiten in „Risiken“, „Offene Punkte“ und „Browser-Review live“ des Plans):
   - Am echten Android mit Chrome prüfen (Nutzer): Installationsknopf im App-Schritt (headless kommt kein `beforeinstallprompt`), Zurück-Geste schließt das Onboarding und setzt das Flag (CloseWatcher), Schalter „Samstags-Nachricht“ mit echtem Berechtigungsdialog.
   - Am echten iPhone prüfen (Nutzer): im Safari-Tab Reihenfolge Stadt → App → Alter → Weg mit Teilen-Anleitung und ohne Schalter; in der installierten App läuft das Onboarding wegen des eigenen Speichers erneut, ohne Installationsteil.

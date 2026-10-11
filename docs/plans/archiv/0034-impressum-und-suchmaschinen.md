@@ -1,6 +1,6 @@
 # Plan 0034 – Impressum und Freigabe für Suchmaschinen
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit d72d578 (2026-10-11)
 Datum: 2026-10-11
 Bezug:
 - ADR 0002 (privat gedacht, ohne Impressum, `noindex`), ADR 0009 (keine `robots.txt`, `noindex, nofollow`), ADR 0020 (Vorschauseiten mit `noindex`), ADR 0013 (Service Worker), **neu ADR 0028** (im selben Commit)
@@ -113,3 +113,7 @@ Fixture-Build, 390×844 und 320×640, hell und dunkel: Liste unten, Kind-Sheet u
 - Dark Mode: keine hellen Inseln, Rücklink gelb wie auf `404.html`.
 - Micro-Interactions: statische Seite, keine Animation; Links mit Systemfokus.
 - Konsistenz: Stil der Seite wie Vorschauseiten und `404.html` (gemeinsamer `PAGE_STYLE`).
+
+## Browser-Review live (2026-10-11)
+
+`meta.json` zeigt `d72d578`. 390×844 hell und dunkel mit echten Daten: „Datenstand: 11.10.2026 · Impressum“ unter „Weitere Angebote zeigen“, Link im Kind-Sheet unterstrichen, `impressum/` liefert 200 mit Anschrift, Hinweisen und `info@zwergenplan.app`. Startseite ohne `robots`-Meta, `404.html` mit `noindex`. Restpunkte in `docs/ideas.md`.
