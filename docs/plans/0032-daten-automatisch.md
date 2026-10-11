@@ -357,6 +357,13 @@ E7 als Code, Workflow `discover.yml` im Modus `trocken`; der Modus `live` wartet
   - **Weiterleitungen je Sprung** im allgemeinen Abruf `io/http.ts` (gilt für Nachtlauf, Sammelkalender, Geocoder und Entdecken): `redirect: manual`, höchstens 5 Sprünge, jede Zieladresse (auch die erste) gegen die Sperre interner Adressen (`lib/redirect.ts`: IP-Literale, `localhost`, `.local`, `.internal`, `.lan`, `.home.arpa`, auch mit Punkt am Ende), Methode und Header wie `redirect: "follow"` (303 und 301/302 bei POST → GET ohne Body und Body-Header, bei anderem Origin ohne `Authorization`), `finalUrl` normalisiert wie bisher `res.url`. Eine abgelehnte Weiterleitung wird nicht wiederholt. Restrisiko: keine DNS-Prüfung; ein öffentlicher Name, der auf eine interne Adresse auflöst, kommt durch (der Abruf läuft nur im Job mit Leserecht).
   - **Trockenlauf** (alle 10 Begriffe, Code dieser Nacharbeit): 68 Kandidaten, 31 im Vorfilter, 23 verworfen, **2 würden aufgenommen**: Donum Vitae Nürnberg (ElternOase, wie im vorigen Lauf) und Sozial- und Familienzentrum Stein der Caritas Fürth (PEKiP ab der 4. Lebenswoche in Stein, in der bbox). 36 Aufrufe, 13 Min., $0,78. Schwimmschule SAM wird weiter verworfen, jetzt mit Adressen: Alle ihre Kursorte liegen außerhalb der bbox (Hilpoltstein, Postbauer-Heng, Georgensgmünd, Neuendettelsau …); sie ist also kein Anbieter der Region Nürnberg. Der PDF-Flyer des Familienzentrums Julienstraße wurde jetzt gelesen (verworfen: keine Termine).
   - Arch-Review: kein Blocker, 1 Major (Hint für weggelassene Orte), 6 Minor; eingearbeitet bis auf den doppelten PDF-Abruf (oben).
+
+### Stufe 4 – Nutzerentscheide (2026-10-11)
+
+- Fund-Seite ohne Adresse: Kontakt- oder Impressumsseite derselben Website wird beim Bewerten mit abgerufen (Option A).
+- Orte außerhalb der Region werden aus dem Eintrag weggelassen; verworfen wird nur, wenn keiner übrig bleibt.
+- **Region** = Stadt Nürnberg plus direkt angrenzende Orte (bbox in `src/domain/regions.ts` bleibt, z. B. Stein ist in Ordnung). Der Ausschluss von Fürth-Poppenreuth bei musikfuechse bleibt eine bewusste Einzelentscheidung.
+- `discover.yml` läuft wöchentlich im Modus `trocken` (`ENTDECKEN_MODUS` leer); nach zwei Wochen Bericht gibt der Nutzer den Modus `live` frei.
 **Stufe 5 – Abschluss:** Entdecken-Eval, Skill (E11), ADR 0026 angenommen, ADR 0016 auf „ersetzt“, Plan 0015 nach `docs/plans/archiv/` mit `ersetzt durch Plan 0032`, `docs/architecture.md` und `CLAUDE.md` nachgezogen.
 
 
