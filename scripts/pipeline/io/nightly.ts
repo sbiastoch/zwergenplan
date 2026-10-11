@@ -1,18 +1,30 @@
 /**
  * `pnpm pipeline nightly` (Plan 0032, E6): Abruf aller Eingaben (E3), je Anbieter `refreshProvider` (E5), danach
- * `build` aus `data/raw`. Zeitbudget und erster `abort` beenden den Lauf geordnet: Was nicht bearbeitet wurde,
- * bleibt unverändert, `build` läuft trotzdem (Fertiges wird gesichert).
+ * `build` aus `data/raw`. Zeitbudget, Bremsen (E8) und erster `abort` beenden den Lauf geordnet: Was nicht bearbeitet
+ * wurde, bleibt unverändert, `build` läuft trotzdem (Fertiges wird gesichert). Kosten je Aufruf nach
+ * `runs/<datum>/kosten.jsonl`, eine Zeile je Lauf nach `data/kosten.csv` (im Trockenlauf `runs/<datum>/kosten.csv`).
+ * Die Ampel rechnet `pipeline status` aus dem Bericht (lib/report.ts).
  */
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { addMonths, toBerlinIso } from "../../../src/domain/time.ts";
 import { batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
 import { isSource } from "../lib/candidate.ts";
+import {
+  appendCsvRow,
+  type BrakeKind,
+  type Brakes,
+  brakeHit,
+  costJsonl,
+  NIGHT_BRAKES,
+  summarizeCosts,
+} from "../lib/cost.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
-import { runLimited } from "../lib/fetch.ts";
-import { offerUnits, type RefreshResult } from "../lib/refresh.ts";
+import { renderFetchMarkdown, runLimited } from "../lib/fetch.ts";
+import { offerUnits } from "../lib/refresh.ts";
+import { changedProviders, type NightlyReport, type ProviderState } from "../lib/report.ts";
 import { planFetch } from "../lib/select.ts";
-import type { FetchResult, fetchInputs } from "./fetch-inputs.ts";
+import type { fetchInputs } from "./fetch-inputs.ts";
 import { readCatalog, readPreviousOffers, readRawDir, removeRaw, writeJson, writeOffers } from "./files.ts";
 import { loadFreeDays } from "./holidays.ts";
 import { refreshProvider } from "./refresh.ts";
@@ -31,6 +43,8 @@ export interface NightlyOptions {
   /** runs/<datum>: Eingaben, Bericht; mit `dryRun` auch raw/ und offers.json */
   runDir: string;
   only?: readonly string[];
+  /** Bremsen (E8), Standard `NIGHT_BRAKES` */
+  brakes?: Brakes;
   /** schreibt Zustand nach runDir/raw und offers.json nach runDir statt nach dataDir */
   dryRun?: boolean;
   /** YYYY-MM-DD, Europe/Berlin */
@@ -41,24 +55,7 @@ export interface NightlyOptions {
   freeDays?: typeof loadFreeDays;
 }
 
-type ProviderState = RefreshResult | "offen" | "abgebrochen" | "abort";
-
-export interface NightlyReport {
-  date: string;
-  durationMs: number;
-  results: Record<string, ProviderState>;
-  calls: CallRecord[];
-  /** Hinweise der Prüfung je Anbieter mit neuer Antwort (`validateRaw`, Teile), nur Anbieter mit Hinweisen */
-  warnings: Record<string, string[]>;
-  /** durch den Cache gesparte Aufrufe (E8) */
-  cached: number;
-  abort?: "auth" | "limit";
-  budgetHit: boolean;
-  /** Zustand von Anbietern, die nicht mehr im Katalog stehen (gelöscht, im Trockenlauf nur gemeldet) */
-  removed: string[];
-  adapters: FetchResult["adapters"];
-  build: { offers: number; sessions: number; errors: string[]; notes: string[]; written?: string };
-}
+export type { NightlyReport } from "../lib/report.ts";
 
 export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const started = performance.now();
@@ -68,6 +65,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const catalog = readCatalog(join(o.dataDir, "providers.yaml"));
   const byId = new Map(catalog.map((p) => [p.id, p] as const));
   const previous = readPreviousOffers(join(o.dataDir, "offers.json"));
+  const brakes = o.brakes ?? NIGHT_BRAKES;
 
   const plan = planFetch(catalog, { today: o.today, ...(o.only ? { only: o.only } : {}) });
   // erst hier geladen: fetch-inputs zieht Playwright nach, das Tests mit Fake-Abruf nicht brauchen
@@ -78,6 +76,17 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   mkdirSync(inputDir, { recursive: true });
   for (const [id, text] of Object.entries(fetched.texts)) writeFileSync(join(inputDir, `${id}.txt`), `${text}\n`);
   writeJson(join(inputDir, "hashes.json"), fetched.providers);
+  writeFileSync(
+    join(inputDir, "report.md"),
+    renderFetchMarkdown({
+      date: o.today,
+      durationMs: performance.now() - started,
+      providers: fetched.providers,
+      adapters: fetched.adapters,
+      skipped: plan.skipped,
+      comparison: undefined,
+    }),
+  );
 
   const results: Record<string, ProviderState> = {};
   const calls: CallRecord[] = [];
@@ -85,6 +94,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const controller = new AbortController();
   let abort: NightlyReport["abort"];
   let budgetHit = false;
+  let brake: BrakeKind | undefined;
   let cached = 0;
   const work = plan.providers.flatMap((p) => {
     const provider = byId.get(p.id);
@@ -103,6 +113,12 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
       }
       if (elapsedMin() >= o.budgetMin) {
         budgetHit = true;
+        results[provider.id] = "offen";
+        return;
+      }
+      // Bremse vor jedem Anbieter wie das Zeitbudget: laufende Anbieter enden noch (Überhang höchstens `concurrency`)
+      brake ??= brakeHit(calls, brakes);
+      if (brake) {
         results[provider.id] = "offen";
         return;
       }
@@ -175,6 +191,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     written = o.dryRun ? join(o.runDir, "offers.json") : join(o.dataDir, "offers.json");
     writeOffers(file, written);
   }
+  writeFileSync(join(o.runDir, "kosten.jsonl"), costJsonl(calls, { run: "nacht", date: o.today }));
   const out: NightlyReport = {
     date: o.today,
     durationMs: Math.round(performance.now() - started),
@@ -184,6 +201,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     cached,
     ...(abort ? { abort } : {}),
     budgetHit,
+    ...(brake ? { brake } : {}),
     removed,
     adapters: fetched.adapters,
     build: {
@@ -193,7 +211,38 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
       notes: [...notes, ...report.notes],
       ...(written ? { written } : {}),
     },
+    ...(previous
+      ? {
+          previous: {
+            offers: previous.offers.length,
+            sessions: previous.offers.reduce((n, offer) => n + offer.sessions.length, 0),
+          },
+        }
+      : {}),
   };
   writeJson(join(o.runDir, "nightly.json"), out);
+  appendCostRow(o.dryRun ? join(o.runDir, "kosten.csv") : join(o.dataDir, "kosten.csv"), out);
   return out;
+}
+
+/** Zeile der Zeitreihe `kosten.csv` (E8); Datum ist der Stichtag des Laufs (Europe/Berlin). */
+function appendCostRow(file: string, r: NightlyReport): void {
+  const t = summarizeCosts(r.calls, { cached: r.cached }).total;
+  const existing = existsSync(file) ? readFileSync(file, "utf8") : undefined;
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(
+    file,
+    appendCsvRow(existing, {
+      date: r.date,
+      run: "nacht",
+      region: "alle",
+      calls: r.calls.length,
+      tokensIn: t.tokensIn,
+      tokensOut: t.tokensOut,
+      usd: t.costUsd,
+      abort: r.abort ?? r.brake ?? (r.budgetHit ? "zeit" : ""),
+      newProviders: 0,
+      changedProviders: changedProviders(r),
+    }),
+  );
 }

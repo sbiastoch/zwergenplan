@@ -1,15 +1,41 @@
-# Nachtlauf (Plan 0032, E6). Stufe 1 / S1.2: NUR Messung – Abruf aller Eingaben nach Katalog, normalisiert und
-# gehasht (`pnpm pipeline fetch`), Vergleich mit der Vornacht. Kein Modellaufruf, kein Schreiben nach data/, kein
-# Commit, kein Push, kein Token. Gemessen werden 7 Nächte: Anteil geänderter Anbieter je Nacht, Hash-Rauschen,
-# Abruffehler je Art (Bericht im Job-Summary und im Artefakt).
-# S3.4 erweitert diesen Workflow um Extraktion, Gates, Publish und CI-Dispatch (dann contents: write, actions: write).
-# Nach 60 Tagen ohne Commit schaltet GitHub den Zeitplan ab; ab Stufe 3 committet der Lauf selbst (data/kosten.csv).
+# Nachtlauf (Plan 0032, E6). Drei Modi, Schalter für den Zeitplan ist die Repo-Variable NACHTLAUF_MODUS (leer = messen):
+#
+#   messen   Stufe 1 / S1.2: NUR Messung – Abruf aller Eingaben nach Katalog, normalisiert und gehasht
+#            (`pnpm pipeline fetch`), Vergleich mit der Vornacht. Kein Modell, kein Schreiben nach data/, kein Push.
+#   trocken  S3.2: voller Lauf mit Modell (`pnpm pipeline nightly`, schreibt data/ nur im Runner), Gates, Bericht,
+#            Artefakte (runs/<datum>/ und data/ des Laufs). Kein Push.
+#   live     S3.4: wie trocken, danach `pipeline publish` (Commit nach main, `pull --rebase`, Konflikt → rot ohne
+#            Push) und CI per workflow_dispatch (ein Push mit GITHUB_TOKEN startet sonst keine CI). Nur auf main.
+#
+# Der Job mit dem Modell hat nur `contents: read`; Schreibrecht und Token hat allein der Job `veroeffentlichen`, und
+# dort nur der Schritt, der pusht (persist-credentials: false). Rot nach E6: Gates rot, Push gescheitert, Ampel rot
+# (mehr als 20 % fehler, Abbruch, Bremse, Zeitbudget, Live-Stand mehr als einen Tag hinter main), siehe
+# `pnpm pipeline status`. Ab `live` committet der Lauf jede Nacht (data/kosten.csv), sonst schaltet GitHub den
+# Zeitplan nach 60 Tagen ohne Commit ab.
 name: Nachtlauf
 
 on:
   schedule:
     - cron: "30 1 * * *" # 01:30 UTC
   workflow_dispatch:
+    inputs:
+      modus:
+        description: "messen | trocken | live"
+        type: choice
+        options: [trocken, messen, live]
+        default: trocken
+      max_calls:
+        description: "Bremse MAX_CALLS (E8)"
+        default: "150"
+      max_tokens:
+        description: "Bremse MAX_TOKENS (E8)"
+        default: "3000000"
+      budget_min:
+        description: "Zeitbudget RUN_BUDGET_MIN in Minuten"
+        default: "50"
+      only:
+        description: "nur diese Anbieter (Komma-Liste, leer = alle)"
+        default: ""
 
 permissions:
   contents: read
@@ -19,9 +45,38 @@ concurrency:
   group: daten
   cancel-in-progress: false
 
+env:
+  # gepinnt wie spike-cli.yml (S1.1); Update nur mit Eval-Lauf und llm.test.ts (R7)
+  CLI_VERSION: "2.1.296"
+
 jobs:
+  modus:
+    name: Modus
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      modus: ${{ steps.m.outputs.modus }}
+    steps:
+      - id: m
+        env:
+          EVENT: ${{ github.event_name }}
+          VAR_MODUS: ${{ vars.NACHTLAUF_MODUS }}
+          INPUT_MODUS: ${{ inputs.modus }}
+          REF: ${{ github.ref }}
+        run: |
+          if [[ "$EVENT" == schedule ]]; then modus="${VAR_MODUS:-messen}"; else modus="${INPUT_MODUS:-trocken}"; fi
+          case "$modus" in messen|trocken|live) ;; *) echo "::error::unbekannter Modus: $modus"; exit 1 ;; esac
+          if [[ "$modus" == live && "$REF" != refs/heads/main ]]; then
+            echo "::error::Modus live nur auf main ($REF)"; exit 1
+          fi
+          echo "modus=$modus" >> "$GITHUB_OUTPUT"
+          echo "Modus: **$modus** ($EVENT)" >> "$GITHUB_STEP_SUMMARY"
+
+  # ── messen (S1.2, unverändert) ─────────────────────────────────────────────────────────────────────────────────
   fetch:
     name: Abruf und Hashes (S1.2)
+    needs: modus
+    if: needs.modus.outputs.modus == 'messen'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -76,3 +131,155 @@ jobs:
           name: nachtlauf-${{ steps.datum.outputs.datum }}-${{ github.run_id }}
           path: runs/${{ steps.datum.outputs.datum }}/fetch/
           retention-days: 14
+
+  # ── trocken und live: Lauf mit Modell, nur Leserecht ───────────────────────────────────────────────────────────
+  nachtlauf:
+    name: Nachtlauf (${{ needs.modus.outputs.modus }})
+    needs: modus
+    if: needs.modus.outputs.modus == 'trocken' || needs.modus.outputs.modus == 'live'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      ampel: ${{ steps.status.outputs.ampel }}
+      run_dir: ${{ steps.nightly.outputs.run_dir }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          # ganze Historie: Live-Stand gegen origin/main (Commits seit dem ausgelieferten, E6)
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Playwright-Chromium (render browser)
+        timeout-minutes: 9
+        run: .github/install-browsers.sh chromium
+      - name: pdftotext (poppler-utils)
+        timeout-minutes: 3
+        run: sudo apt-get install -y --no-install-recommends poppler-utils
+      - name: claude-code CLI (gepinnt)
+        run: |
+          npm i -g "@anthropic-ai/claude-code@${CLI_VERSION}"
+          echo "CLI: $(claude --version)" >> "$GITHUB_STEP_SUMMARY"
+      # `pipeline oepnv` entfällt: data/oepnv/fahrplan.json liegt im Repo, Gates und Build brauchen keinen neuen
+      # Auszug (veraltet → nur Warnung in data:validate); der Fahrplan bleibt Handarbeit über den Skill.
+      - name: Nachtlauf
+        id: nightly
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          MAX_CALLS: ${{ inputs.max_calls }}
+          MAX_TOKENS: ${{ inputs.max_tokens }}
+          RUN_BUDGET_MIN: ${{ inputs.budget_min }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          [[ "$ONLY" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::only enthält unerlaubte Zeichen"; exit 1; }
+          if [[ -n "$ONLY" ]]; then pnpm pipeline nightly --only "$ONLY"; else pnpm pipeline nightly; fi
+      - name: Gates (data:validate, check:fast)
+        id: gates
+        run: pnpm data:validate && pnpm check:fast
+      - name: Bericht
+        id: status
+        if: ${{ !cancelled() }}
+        env:
+          RUN_DIR: ${{ steps.nightly.outputs.run_dir }}
+          GATES: ${{ steps.gates.outcome }}
+        run: pnpm pipeline status "$RUN_DIR" --gates "$GATES" --report-only
+      - name: Laufverzeichnis sichern
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: nachtlauf-${{ github.run_id }}
+          # Eingaben, Bericht, nightly.json (Antworten und Aufrufe), kosten.jsonl
+          path: runs/
+          retention-days: 14
+      - name: Daten des Laufs sichern
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          # data/raw, offers.json, kosten.csv: Diff ansehen (trocken), Eingabe für `veroeffentlichen` (live)
+          name: daten-${{ github.run_id }}
+          path: |
+            data/raw/
+            data/offers.json
+            data/kosten.csv
+          retention-days: 14
+          if-no-files-found: error
+
+  # ── live: veröffentlichen, nur hier Schreibrecht ───────────────────────────────────────────────────────────────
+  veroeffentlichen:
+    name: Veröffentlichen
+    needs: [modus, nachtlauf]
+    if: needs.modus.outputs.modus == 'live' && needs.nachtlauf.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Stand des Laufs auf main legen; `publish` holt fremde Commits per `pull --rebase` nach (Konflikt → rot)
+      - name: Daten des Laufs übernehmen
+        run: |
+          git checkout -q -B main "$GITHUB_SHA"
+          rm -rf data/raw
+      - uses: actions/download-artifact@v4
+        with:
+          name: daten-${{ github.run_id }}
+          path: data/
+      - uses: actions/download-artifact@v4
+        with:
+          name: nachtlauf-${{ github.run_id }}
+          path: runs/
+      - name: publish (Commit und Push nach main)
+        id: publish
+        env:
+          RUN_DIR: ${{ needs.nachtlauf.outputs.run_dir }}
+          TOKEN: ${{ github.token }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          auth="$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+          echo "::add-mask::$auth"
+          export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
+          export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth"
+          pnpm pipeline publish "$RUN_DIR"
+      - name: CI auf main starten
+        if: steps.publish.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref main --repo "$GITHUB_REPOSITORY"
+
+  # ── Ampel: rot nach E6 ─────────────────────────────────────────────────────────────────────────────────────────
+  ampel:
+    name: Ampel
+    needs: [modus, nachtlauf, veroeffentlichen]
+    if: always() && (needs.modus.outputs.modus == 'trocken' || needs.modus.outputs.modus == 'live')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - env:
+          MODUS: ${{ needs.modus.outputs.modus }}
+          AMPEL: ${{ needs.nachtlauf.outputs.ampel }}
+          LAUF: ${{ needs.nachtlauf.result }}
+          PUSH: ${{ needs.veroeffentlichen.result }}
+        run: |
+          echo "Ampel ${AMPEL:-unbekannt}, Nachtlauf ${LAUF}, Veröffentlichen ${PUSH} (Modus ${MODUS})" | tee -a "$GITHUB_STEP_SUMMARY"
+          rot=0
+          [[ "$AMPEL" == rot || -z "$AMPEL" ]] && rot=1
+          [[ "$LAUF" != success ]] && rot=1
+          [[ "$MODUS" == live && "$PUSH" != success ]] && rot=1
+          exit "$rot"

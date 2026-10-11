@@ -15,21 +15,32 @@
  *                                               Eval aller eingefrorenen Fälle: `pnpm eval` (scripts/pipeline/eval.ts, E9).
  *   candidates fetch|list RUN_DIR               Sammelkalender abrufen / Kandidaten mit Zuordnung zeigen
  *   nightly [--only a,b] [--dry-run]            Nachtlauf (Plan 0032, E5/E6): Abruf, je Anbieter refresh (data/raw),
- *                                               build aus data/raw nach data/offers.json; Bericht
- *                                               runs/<heute>/nightly.json. --dry-run schreibt nach runs/<heute>/raw
- *                                               und runs/<heute>/offers.json. Zeitbudget RUN_BUDGET_MIN (Standard 50).
+ *                                               build aus data/raw nach data/offers.json, Zeile in data/kosten.csv;
+ *                                               Bericht runs/<heute>/nightly.json, Kosten runs/<heute>/kosten.jsonl.
+ *                                               --dry-run schreibt raw/, offers.json und kosten.csv nach
+ *                                               runs/<heute>/. Zeitbudget RUN_BUDGET_MIN (Standard 50), Bremsen
+ *                                               MAX_CALLS (150) und MAX_TOKENS (3 Mio.) (E8). Rot nur, wenn der
+ *                                               Build scheitert; die Ampel rechnet `status`.
+ *   status [RUN_DIR] [--gates X] [--push X] [--report-only]
+ *                                               Bericht des Nachtlaufs (E10) aus RUN_DIR/nightly.json (Standard
+ *                                               runs/<heute>): Ampel nach E6, Fehler, Einbrüche, Kosten, Live-Stand.
+ *                                               --gates/--push: Ausgang der Workflow-Schritte. Schreibt auch nach
+ *                                               $GITHUB_STEP_SUMMARY und `ampel=` nach $GITHUB_OUTPUT. Exit 1 bei
+ *                                               rot, außer mit --report-only.
  *   candidates keep RUN_DIR cid,cid=anbieter/ort [--force]   Entwurf raw/aggregatoren.json schreiben
  *   candidates add-provider RUN_DIR cid --id <neue-id>       Veranstalter in den Katalog aufnehmen
  *   validate-raw DATEI                          Rohdatei prüfen (Pflicht-Abschluss der Subagenten)
  *   holidays FROM TO                            freie Tage (Ferien/Feiertage Bayern)
  *   geocode "Adresse"                           Koordinaten, Stadtteil, Ring
  *   build RUN_DIR                               data/offers.json + RUN_DIR/report.json
- *   publish RUN_DIR                             prüfen, committen, pushen (ADR 0002)
+ *   publish RUN_DIR                             prüfen, committen, pushen (ADR 0002). Mit RUN_DIR/nightly.json
+ *                                               (Nachtlauf, E6): nur data/raw, data/offers.json, data/kosten.csv,
+ *                                               Commit-Text mit Kurzbericht, `pull --rebase` vor dem Push.
  *   oepnv [--force]                             Fahrplanauszug data/oepnv/fahrplan.json aus dem VGN-Feed
  *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
@@ -58,6 +69,7 @@ import {
   readJson,
   readMeta,
   readPreviousOffers,
+  readRawDir,
   sourceStatus,
   writeJson,
   writeOffers,
@@ -66,10 +78,13 @@ import { geocode } from "./io/geocode.ts";
 import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
+import { liveStatus } from "./io/live.ts";
 import { DEFAULT_BUDGET_MIN, runNightly } from "./io/nightly.ts";
+import { publishNightly } from "./io/publish.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import type { Candidate } from "./lib/candidate.ts";
+import { parseBrakes } from "./lib/cost.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
 import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
@@ -86,7 +101,9 @@ import {
 import { renderFetchReport } from "./lib/html-extract.ts";
 import { anbieterVids, matchCandidate } from "./lib/match.ts";
 import { fillPlaceholders } from "./lib/placeholders.ts";
-import { RawBatch, validateRaw } from "./lib/raw.ts";
+import { type ProviderRaw, RawBatch, validateRaw } from "./lib/raw.ts";
+import { offerUnits } from "./lib/refresh.ts";
+import { assessRun, NightlyReport, nightlyCommitMessage, renderStatus, type StepOutcome } from "./lib/report.ts";
 import type { SourceStatus } from "./lib/run.ts";
 import { nextBatchFiles, planFetch, selectBatches } from "./lib/select.ts";
 
@@ -103,6 +120,9 @@ const { positionals, values } = parseArgs({
     out: { type: "string" },
     compare: { type: "string" },
     "dry-run": { type: "boolean", default: false },
+    gates: { type: "string" },
+    push: { type: "string" },
+    "report-only": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -261,13 +281,25 @@ async function extractCmd(id: string) {
   print(`✓ ${join(outDir, `${id}.json`)}`);
 }
 
-/** Nachtlauf (Plan 0032, E6). Rot bei Abbruch, erreichtem Zeitbudget oder gescheitertem Build. */
+/** Schreibt `name=value` nach $GITHUB_OUTPUT, wenn der Lauf in Actions steckt. */
+function actionsOutput(name: string, value: string): void {
+  const file = process.env["GITHUB_OUTPUT"];
+  if (file) appendFileSync(file, `${name}=${value}\n`);
+}
+
+/**
+ * Nachtlauf (Plan 0032, E6). Rot (Exit 1) nur, wenn der Build scheitert: Abbruch, Zeitbudget und Bremse beenden den
+ * Lauf geordnet, Fertiges wird gesichert und darf nach grünen Gates gepusht werden (E6); die Ampel rechnet `status`.
+ */
 async function nightly() {
   const date = today();
   const runDir = join(ROOT, "runs", date);
+  actionsOutput("run_dir", runDir);
   const only = values.only?.split(",").filter(Boolean);
-  const budgetMin = Number(process.env["RUN_BUDGET_MIN"] ?? DEFAULT_BUDGET_MIN);
+  const budgetMin = Number(process.env["RUN_BUDGET_MIN"] || DEFAULT_BUDGET_MIN);
   if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
+  const brakes = parseBrakes(process.env);
+  if (!brakes.ok) fail(brakes.error);
   const dryRun = values["dry-run"];
   // Das Modell gehört in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
@@ -275,6 +307,7 @@ async function nightly() {
     extractor: createExtractor({ model }),
     keyParts: { ...EXTRACT_KEY_PARTS, model },
     budgetMin,
+    brakes: brakes.brakes,
     dataDir: join(ROOT, "data"),
     runDir,
     today: date,
@@ -288,11 +321,61 @@ async function nightly() {
   print(`Anbieter: ${summary}; Modellaufrufe ${r.calls.length}, durch den Cache gespart ${r.cached}`);
   if (r.abort) print(`✗ Abbruch: ${r.abort}`);
   if (r.budgetHit) print(`✗ Zeitbudget ${budgetMin} Min. erreicht`);
+  if (r.brake)
+    print(`✗ Bremse ${r.brake} erreicht (MAX_CALLS ${brakes.brakes.maxCalls}, MAX_TOKENS ${brakes.brakes.maxTokens})`);
   print(`Angebote: ${r.build.offers}, Termine: ${r.build.sessions}`);
-  print(`Bericht: ${join(runDir, "nightly.json")}`);
+  print(`Bericht: ${join(runDir, "nightly.json")} – Ampel: pnpm pipeline status ${runDir}`);
   if (!r.build.written) fail(`Build abgebrochen, nichts geschrieben:\n  ${r.build.errors.join("\n  ")}`);
   print(`✓ ${r.build.written}`);
-  if (r.abort || r.budgetHit) process.exit(1);
+}
+
+const STEP_OUTCOMES = ["success", "failure", "cancelled", "skipped"] as const;
+const stepOutcome = (value: string | undefined, what: string): StepOutcome | undefined => {
+  if (value === undefined || value === "") return undefined;
+  return STEP_OUTCOMES.find((o) => o === value) ?? fail(`${what}: unbekannter Ausgang „${value}“`);
+};
+
+/** Bericht des Nachtlaufs aus RUN_DIR (nightly.json) samt Zustand nach dem Lauf; `undefined` ohne Bericht. */
+function readNightly(runDir: string): { report: NightlyReport | undefined; raws: Record<string, ProviderRaw> } {
+  const file = join(runDir, "nightly.json");
+  const parsed = existsSync(file) ? NightlyReport.safeParse(readJson(file)) : undefined;
+  if (parsed && !parsed.success) print(`Hinweis: ${file} passt nicht zum Format – ${parsed.error.message}`);
+  const report = parsed?.success ? parsed.data : undefined;
+  // Trockenlauf: Zustand dieses Laufs liegt in RUN_DIR/raw und überlagert data/raw
+  const all = { ...readRawDir(join(ROOT, "data", "raw")), ...readRawDir(join(runDir, "raw")) };
+  const raws = report
+    ? Object.fromEntries(Object.entries(all).filter(([id]) => report.results[id] !== undefined))
+    : all;
+  return { report, raws };
+}
+
+/** Bericht des Nachtlaufs (E10) mit Ampel nach E6. */
+async function status() {
+  const runDir = args[0] ?? join(ROOT, "runs", today());
+  const { report, raws } = readNightly(runDir);
+  const live = await liveStatus();
+  const gates = stepOutcome(values.gates, "--gates");
+  const push = stepOutcome(values.push, "--push");
+  const verdict = assessRun(report, { live, ...(gates ? { gates } : {}), ...(push ? { push } : {}) });
+  const offersFile = report?.build.written ?? join(ROOT, "data", "offers.json");
+  const offers = existsSync(offersFile) ? (readPreviousOffers(offersFile)?.offers ?? []) : [];
+  const stock = Object.fromEntries(Object.keys(raws).map((id) => [id, offerUnits(offers, id)]));
+  const fetchFile = join(runDir, "fetch", "report.md");
+  const md = renderStatus({
+    report,
+    verdict,
+    live,
+    raws,
+    stock,
+    ...(existsSync(fetchFile) ? { fetchReport: readFileSync(fetchFile, "utf8") } : {}),
+  });
+  mkdirSync(runDir, { recursive: true });
+  writeFileSync(join(runDir, "status.md"), md);
+  print(md);
+  const summary = process.env["GITHUB_STEP_SUMMARY"];
+  if (summary) appendFileSync(summary, md);
+  actionsOutput("ampel", verdict.light);
+  if (verdict.light === "rot" && !values["report-only"]) process.exit(1);
 }
 
 async function candidatesFetch(runDir: string) {
@@ -470,7 +553,30 @@ async function build(runDir: string) {
   print("✓ data/offers.json geschrieben");
 }
 
+/** Nach dem Nachtlauf (E6): nur dessen Daten, Kurzbericht im Commit-Text, `pull --rebase` vor dem Push. */
+function publishAfterNightly(runDir: string) {
+  const { report, raws } = readNightly(runDir);
+  if (!report) fail(`${join(runDir, "nightly.json")} fehlt oder ist ungültig`);
+  if (!report.build.written || report.build.written !== join(ROOT, "data", "offers.json"))
+    fail(
+      "Der Lauf hat data/offers.json nicht geschrieben (Trockenlauf oder Build abgebrochen) – nichts zu veröffentlichen",
+    );
+  try {
+    const r = publishNightly({
+      git,
+      message: nightlyCommitMessage(report, raws),
+      validate: () =>
+        execFileSync("node", ["scripts/validate-data.ts", "--against-deployed"], { cwd: ROOT, stdio: "inherit" }),
+    });
+    actionsOutput("pushed", String(r.pushed));
+    print(r.pushed ? "✓ Nachtlauf veröffentlicht" : "Keine Änderung – nichts veröffentlicht");
+  } catch (e) {
+    fail((e as Error).message);
+  }
+}
+
 function publish(runDir: string) {
+  if (existsSync(join(runDir, "nightly.json"))) return publishAfterNightly(runDir);
   const meta = readMeta(runDir);
   if (git(["rev-parse", "--abbrev-ref", "HEAD"]) !== "main") fail("publish nur auf main (ADR 0002)");
   git(["fetch", "--quiet", "origin", "main"]);
@@ -555,6 +661,9 @@ switch (command) {
     break;
   case "nightly":
     await nightly();
+    break;
+  case "status":
+    await status();
     break;
   case "candidates": {
     const [sub, runDir, extra] = args;
