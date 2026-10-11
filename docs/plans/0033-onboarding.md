@@ -43,7 +43,7 @@ Auf dem iPhone im Browser (`InstallState` `ios`) rückt „App“ an Position 2.
 - **Geburtsdatum**: `KidSheet.tsx:44–55, 75–93` mit Text-Zustand, `parseGermanDate(text, today)` und `formatGermanDate` (`src/domain/time.ts:38–51`). `onBirthDate` ruft in `App.tsx:179–183` `setBirthDateStored` und `views.setAgeOnly(true)` auf. Der Altersfilter ist standardmäßig an und lebt nur im Speicher (`use-offer-views.ts`, `OfferViews.ageOnly`).
 - **Startpunkt**: `useOrigin()` (`use-app-state.ts:340–383`: `locateMe`, `setDistrict`, `canLocate`, `problem`). `OriginPicker.tsx` zeigt Standort-Knopf, Stadtteil-`<select>` aus `DISTRICTS` (`src/domain/districts.ts`), `originHint` (`format.ts:415`) und die OSM-Namensnennung.
 - **Wegzeit**: `useTransit().want()` lädt `wegzeit.json` und `linien.json` höchstens einmal je Sitzung. Anlässe sind Kind-Sheet, Karte und gespeicherter Startpunkt (`App.tsx:148–158`, Invariante „Kein Request hängt davon ab, welcher Startpunkt gilt“). Grenze: `LIMIT_MINUTES = [20, 30, 45]` (`src/domain/reach.ts:55`), `withReachLimit` (`src/domain/filter.ts`), URL-Schlüssel `wegzeit`. Das Filter-Sheet sperrt die Chips ohne wirksame Wegzeit (`Sheets.tsx:314–329`, Begründung `limitReason`, `format.ts:437`).
-- **Regionen**: `src/domain/regions.ts`: `Region { name; bbox }`, `REGION_IDS = ["nuernberg"]`. `schema.ts:8` liest `REGION_IDS`/`REGIONS` für die Geo-Prüfung. ADR 0025, Punkt 1: Weitere Felder kommen, wenn sie gelesen werden.
+- **Regionen**: `src/domain/regions.ts`: `Region { name; bbox }`, `REGION_IDS = ["nuernberg"]`. `schema.ts:8` liest `REGION_IDS`/`REGIONS` für die Geo-Prüfung. ADR 0025, Punkt 1: „Weitere Region-Felder … kommen mit der zweiten Region“ (ebenso `regions.ts:3–4`).
 - **App-Extras**: Der Lader `src/ui/AppExtras.tsx:27–37` lädt `app-extras/AppSection.tsx` und `src/data/pwa.ts` parallel und reicht `install` als Prop herein. Ein statischer Import zwischen zwei Lazy-Chunks schrieb `__vite__mapDeps` in den Einstieg (+0,11 kB, ADR 0013). `InstallState` und die Texte `installHelp`/`installFoot`/`pushView` stehen in `src/domain/pwa.ts`. Der Zustand `angebot` entsteht erst mit `beforeinstallprompt`, das erst gehört wird, wenn `pwa.ts` geladen ist (`data/pwa.ts:296–302`).
 - **Push**: `PushControls.tsx:169–265` (Abgleich beim Mount, Spiegeln nach jedem Rendern, `toggle` mit `enable`/`disable`, Statuszeile). `push.ts:136–141` `support()` meldet `kein-sw`, solange keine Registrierung besteht, also beim Erstbesuch vor `load`. `enable` wartet nach `requestPermission` auf `ready` (`push.ts:72–75`) ohne Zeitlimit. Der Schalter heißt heute „Wochen-Nachricht“ (`push-texts.ts:29`, README, `e2e/push.spec.ts:35, 243, 278`, `push-texts.test.ts`).
 - **Dialoge**: `src/ui/Dialog.tsx`. `showModal()` läuft im `useEffect`. `cancel` (Esc, Android-Zurück) und ein Tipp auf den Backdrop rufen `onClose` auf. Vollbild-Muster: `.detail` in `dialog.css:21–40`. `markAutofocus` setzt `autofocus`.
@@ -98,12 +98,13 @@ export function onboardingSteps(install: InstallState, push: PushCapability): St
 - Neuer Schlüssel `zwergenplan.einfuehrung` in `KEYS` (`src/data/preferences.ts`), Wert `"1"` (Version; jeder vorhandene Wert zählt als erledigt):
   - `loadOnboardingDone(): boolean` (`read(...) !== null`)
   - `saveOnboardingDone(): void`
-  - `hasStoredData(): boolean`: irgendein Schlüssel aus `KEYS` außer `onboarding` ist gesetzt. Such-Abos zählen ebenfalls: Ein Such-Abo geht auch ohne Push und ohne andere Angaben (`PushControls.tsx:133–138`). Geprüft wird der Schlüssel `"zwergenplan.such-abos"` als String, ohne Import von `searches-store.ts` (`app-data-only-lazy`; Review 2).
+  - `hasStoredData(): boolean`: irgendein Schlüssel aus `KEYS` außer `onboarding` ist gesetzt. Such-Abos zählen ebenfalls: Ein Such-Abo geht auch ohne Push und ohne andere Angaben (`PushControls.tsx:133–138`). Der Schlüssel der Such-Abos wird als Konstante `SEARCHES_KEY` in `preferences.ts` (Start) definiert und von `searches-store.ts` importiert (Lazy → Start ist erlaubt), damit eine Umbenennung beide trifft (Arch-Review m2).
 - Rein und im Start (`src/domain/onboarding-gate.ts`, ein Export):
   ```ts
   export type OnboardingGate = "zeigen" | "still-erledigt" | "nichts";
-  export function onboardingGate(g: { done: boolean; stored: boolean; deepLink: boolean }): OnboardingGate;
-  // done || deepLink → "nichts"; stored → "still-erledigt"; sonst "zeigen"
+  export function onboardingGate(g: { storage: boolean; done: boolean; stored: boolean; deepLink: boolean }): OnboardingGate;
+  // !storage || done || deepLink → "nichts"; stored → "still-erledigt"; sonst "zeigen"
+  // `storage`: localStorage nutzbar (Schreib-/Leseprobe in `preferences.ts`, `storageUsable()`); ohne Speicher käme das Onboarding sonst bei jedem Besuch (Arch-Review m3)
   ```
 - **Privatsphäre (Review H1)**: Ob der Onboarding-Chunk geladen wird, darf nicht davon abhängen, ob etwas gemerkt ist (`docs/architecture.md`, Invariante „Kein Request hängt davon ab, ob oder welche Anbieter gemerkt sind“). Deshalb:
   - Vorladen (`preloadOnboarding()`) hängt allein an `!done && !deepLink`, also an Gate ≠ `"nichts"`.
@@ -187,7 +188,7 @@ Regeln:
 
 - `Region` bekommt `population: number` (Einwohner, auf Tausend gerundet; Quelle und Stichtag im Kommentar, beim Umsetzen beim Bayerischen Landesamt für Statistik nachschlagen, nie schätzen). `REGIONS.nuernberg.population` wird gesetzt, `regions.test.ts` prüft `population > 0`.
   - Keine Schemaänderung: `schema.ts` liest nur `REGION_IDS` und `bbox`, `schema/*.json` bleibt gleich.
-  - ADR 0025 bekommt einen Nachtrag (E14).
+  - Das weicht von ADR 0025, Punkt 1 ab (Feld vor der zweiten Region). Der Nachtrag in ADR 0025 nennt das offen: Nutzerwunsch „sortiert nach den größten Städten“ (abgelehntes Review-L6); der Kopfkommentar von `regions.ts` wird mitgeändert (Arch-Review m1).
 - `cityChoices<K extends string>(regions: Readonly<Record<K, Region>>, maxTiles = 4): { tiles: { id: K; name: string }[]; more: { id: K; name: string }[] }` (generisch, damit der Test sechs Fake-Regionen ohne Cast nutzt): absteigend nach `population`, Gleichstand nach `name` (`localeCompare(…, "de")`), die ersten `maxTiles` als Kacheln, der Rest im Dropdown.
 - Heute eine Kachel „Nürnberg“, `aria-pressed="true"`, kein Dropdown (`more.length === 0` → nicht gerendert). Kacheln stehen in `role="group" aria-label="Stadt"`, das Dropdown hat `aria-label="Weitere Städte"` mit Leer-Option „Weitere Städte …“.
 - **Nichts speichern**, solange es eine Region gibt. Die Wahl lebt nur im Zustand des Flows. Speichern kommt mit der zweiten Region und deren Daten (`docs/ideas.md`).
@@ -248,7 +249,7 @@ Regeln:
   - `export function pushCapability(env = browserEnv()): PushCapability`: kein Service Worker, kein `PushManager` oder kein `Notification` → `nein`, `denied` → `verweigert`, sonst `ja`. Ohne Registrierung: Beim Erstbesuch kommt sie erst nach `load`, `support()` sagte dann `kein-sw`.
   - Im Onboarding zählt `kein-sw` bei `ja` als einschaltbar. `enable` wartet ohnehin auf `ready`.
   - `pushCapability` liefert `nein`, wenn der Notausgang aktiv ist (`__SW_OFF__`): Dort gibt es nie einen Service Worker, eine Erlaubnisfrage brächte nichts (Review M1).
-  - Zeitlimit (Review M1): Beim Erstbesuch kann die Installation des Service Workers auf langsamem Netz (Start-JS und `site.json` in den Cache) länger als 10 s dauern; ein festes Zeitlimit träfe dann echte Nutzer. Direkt nach `load` gibt es beim Erstbesuch noch keine Registrierung (`pwa-start.ts:20–21` importiert erst, dann `start()` → `register()`), ein Blick auf `getRegistration()` träfe also genau den langsamen Erstbesuch (Review 2, M-3). Deshalb: `start()` setzt `document.documentElement.dataset.pwa = "ohne-sw"`, wenn es **ohne** Registrierung endet (Notausgang, `register()` gescheitert). `PushEnv.swGivenUp(): boolean` liest das. `enable` wartet auf `ready` ohne Zeitlimit wie heute; nur wenn `swGivenUp()` gilt, endet es sofort bzw. nach `READY_TIMEOUT_MS = 10_000` ab diesem Zeitpunkt mit `PushError("abo")`. Der Fake-Timer-Test injiziert `swGivenUp`.
+  - Zeitlimit (Review M1): Beim Erstbesuch kann die Installation des Service Workers auf langsamem Netz (Start-JS und `site.json` in den Cache) länger als 10 s dauern; ein festes Zeitlimit träfe dann echte Nutzer. Direkt nach `load` gibt es beim Erstbesuch noch keine Registrierung (`pwa-start.ts:20–21` importiert erst, dann `start()` → `register()`), ein Blick auf `getRegistration()` träfe also genau den langsamen Erstbesuch (Review 2, M-3). Deshalb (Arch-Review M1, m5): `start()` setzt ein **eigenes** Attribut `document.documentElement.dataset.sw = "aus"`, wenn es **ohne** Registrierung endet (Notausgang, `register()` gescheitert oder blockiert). `data-pwa` behält allein die Bedeutung „bereit“ (darauf warten `installieren.spec.ts:44`, `push.spec.ts:445`, `pwa.spec.ts:215, 252, 306`). `PushEnv.swGivenUp(): Promise<void>` löst auf, sobald `data-sw="aus"` steht (sofort, wenn es schon steht, sonst per `MutationObserver` auf das Attribut). `enable` wartet auf `Promise.race([ready, swGivenUp().then(() => { throw new PushError("abo") })])`. Ein festes Zeitlimit gibt es nicht. Der Kanal `pwa.ts` → `push.ts` über `data-sw` steht in `docs/architecture.md` (App-Extras), `start()` bekommt einen Unit-Test dafür.
 
 ### E9 – Knöpfe und Abschluss
 
@@ -281,7 +282,7 @@ Regeln:
 - `ageHint(months: number, next?: { months: number; from: string }): string`:
   - `0` → „Neugeboren!“, sonst `plural(months, "Monat", "Monate") + "!"`
   - Mit `next` folgt „ Treffs ab {next.months} Monaten zeige ich dir mit Terminen ab dem {T.M.}.“ (Datum wie `dayDots`, ohne führende Null), sonst „ Ab jetzt siehst du nur, was passt.“
-  - `plural` liegt in `src/ui/format.ts`. Die Domäne schreibt ihren eigenen Zweizeiler, denn sie darf `src/ui` nicht importieren.
+  - `plural` zieht von `src/ui/format.ts` nach `src/domain/labels.ts` um; `format.ts` exportiert es weiter (keine zweite Kopie; Arch-Review m4).
 
 ### E11 – Gestaltung (Chunk-CSS `onboarding.css`, alles in `@layer components`)
 
@@ -305,6 +306,7 @@ Regeln:
   - `class` → `className`, `stroke-dasharray` → `strokeDasharray`, `text-anchor` → `textAnchor`, `font-size` → `fontSize`, `clip-path` → `clipPath`, Inline-`style` als Objekt.
   - `clipPath id` per `useId()`.
   - Alle `aria-hidden="true" focusable="false"`.
+  - **Helle Flächen im Dunkelmodus (Arch-Review M3)**: Die hellen Füllungen (`#FFFFFF`, `#E8F1FF`: Handy, Karten, Kalender, Fenster, Häuser, Benachrichtigung) setzen die SVGs über CSS-Variablen `--onb-paper` (hell `#ffffff`) und `--onb-screen` (hell `#e8f1ff`), im Dunkelmodus in **beiden** Dunkel-Blöcken `#2b3a49` bzw. `#1b2733`. Text darauf (`.onb-st`) nutzt `--onb-ink` (hell `#13212e`, dunkel `#eef3f8`); Konturen bleiben `#13212e`. Das Gate `expectNoBrightIslands` überspringt SVG; die Sichtprüfung im `/browser-review` deckt die Illustrationen ab (eigene Checklistenzeile).
   - Text in den SVGs (`.onb-st { font-family: var(--font-display); font-weight: 800; fill:#13212e }`).
   - **Text im SVG ist hier vertretbar**: Er ist rein dekorativ und für Hilfstechnik verborgen, der Inhalt steht im HTML-Text. Er skaliert nicht mit der Schriftgröße, kann also bei 200 % nichts sprengen. Die Gates `expectTextFits`/Inseln überspringen SVG ausdrücklich. Bewertet beim Browser-Review.
   - Pro Schritt nur eine Illustration im DOM (`key={step}` für die Einflug-Animation).
@@ -332,10 +334,10 @@ Regeln:
 
 - Neuer localStorage-Schlüssel: ein Flag ohne Personenbezug. Die Privatsphäre-Invariante bleibt gewahrt, weil das Vorladen nur am Flag und am Deep-Link hängt, nicht an gespeicherten Angaben (E2, Review H1). Nachweis in `docs/architecture.md` (Liste der Schlüssel) und E2E Test 10.
 - Neue Lazy-Kette: nach dem Muster aus ADR 0012/Plan 0010 (Ordner, Budget, Regeln, Lader). Kein ADR nötig, Plan 0010 und 0011 haben es ebenso gemacht.
-- `REGIONS.population`: Nachtrag in ADR 0025 (Feld kommt, weil es jetzt gelesen wird, Punkt 1).
+- `REGIONS.population`: Nachtrag in ADR 0025, der die Abweichung von Punkt 1 offen nennt (E5).
 - Wegzeit-Anlass „Onboarding-Schritt Weg“: Er fällt unter „beim Öffnen einer Startpunkt-Oberfläche“ (ADR 0011, Punkt 6), so wie Plan 0025 die Merklisten-Karte ergänzt hat. Der Text steht in `docs/architecture.md`.
 - Push-Schalter im Onboarding: Requests nur nach Tipp, kein Abgleich, kein laufendes Spiegeln. ADR 0014 bleibt in der Sache gleich, ein Nachtrag stellt klar, dass der Schalter auch im Onboarding steht.
-- Früheres Laden des PWA-Kern-Moduls: siehe E4. Ein Nachtrag in ADR 0013 stellt klar, dass Punkt 5 das Start-Bundle und die Registrierung meint. Hält das Arch-Review das für eine Abweichung, wird es ADR 0027 (0026 ist vergeben; vor dem Anlegen erneut prüfen, auch Remote-Branches).
+- Früheres Laden des PWA-Kern-Moduls (E4): Das Arch-Review (M2) wertet es als Abweichung von ADR 0013, Punkt 5 („Auch dieser Kern lädt lazy nach `load`“). Deshalb **neues ADR 0027 „App-Chunk beim Erststart vorladen“** (Nummer vor dem Anlegen erneut prüfen, auch Remote-Branches): Begründung Privatsphäre (E2, beide Chunks bei jedem Gate ≠ „nichts“) und früheres `beforeinstallprompt`; Folge Bandbreite neben `site.json`, Nachweis Test 14. ADR 0013 bekommt einen Verweis darauf. Veraltete Stellen: `docs/architecture.md` (PWA-Kern „nach `load`“), Kommentar `src/data/pwa.ts:296–299`.
 - Kein drittes Inline-Skript in `index.html`.
 
 ### E15 – E2E-Basis
@@ -379,7 +381,7 @@ Regeln:
   - Läuft absichtlich in `America/Los_Angeles`.
 - `src/domain/regions.test.ts`: `population > 0`.
 - `src/data/preferences.test.ts`: `loadOnboardingDone`/`saveOnboardingDone`; `hasStoredData` je Schlüssel; Flag allein zählt nicht als Angabe; Speicher wirft → `false`.
-- `src/data/push.test.ts`: `pushCapability` (ohne SW, ohne PushManager, ohne Notification, `denied`, ok); `enable` mit nie auflösendem `ready` → `PushError("abo")` nach `READY_TIMEOUT_MS` (Fake-Timer); Fakes um `hasServiceWorker` ergänzt.
+- `src/data/push.test.ts`: `pushCapability` (ohne SW, ohne PushManager, ohne Notification, `denied`, ok); `enable`: (a) `ready` löst auf → Abo; (b) `swGivenUp` hat schon aufgelöst → sofort `PushError("abo")`; (c) `swGivenUp` löst später auf → dann `PushError("abo")`; (d) keins von beiden → bleibt offen (kein Zeitlimit); Fakes um `hasServiceWorker` ergänzt.
 - `scripts/lib/chunks.test.ts`: zusätzliche `.css` direkt in `dist/assets/` ist rot, genau eine `index-*.css` ist grün.
 
 **E2E `e2e/onboarding.spec.ts`** (`test.use({ onboarding: "neu" })`, Fixture-Uhr 5.10.2026)
@@ -398,6 +400,8 @@ Regeln:
 13. Mobile-UX je Schritt (Schalter- und Knopf-Variante zusätzlich in Test 5 mit `channel: "chromium"`: `expectMobileUx` hell und dunkel, 320 px/200 %; Review 2, M-5): `expectMobileUx` hell, dunkel per `colorScheme` und per `data-theme="dark"`, `expectNoBrightIslands`; 320 px mit 200 % (`setTextScale`, `expectNoHorizontalScroll`, `expectTextFits({ scale: 2 })`); `expectReducedMotion`; `expectVisibleFocus`; läuft in allen Projekten inkl. `pixel-7-quer` (Dialog scrollt).
 14. Vitals Erstbesuch mit Onboarding (Chromium, `throttleMobile`, `observeVitals`): LCP < 2,5 s, CLS < 0,05.
 
+**Smoke (Deploy-Build, echte Daten; Arch-Review m6)**: ein Test mit `onboarding: "neu"` in einer Smoke-Spec: Dialog erscheint, Lead mit Zahlen, „Überspringen“ schließt, keine Konsolenfehler.
+
 **E2E `e2e/push.spec.ts`**, neuer Test mit `onboarding: "neu"` und `pushWorker: "mock"`: Schalter im letzten Schritt einschalten → genau ein `POST /abo` im `pushLog`, Status „An. Die erste kommt am Samstag.“; vorher kein Request an den Worker. Die bestehenden Push-Tests bleiben unverändert grün (Refaktor `usePushSwitch`).
 
 **`scripts/lib/e2e-map.ts`**:
@@ -411,7 +415,7 @@ Regeln:
   - Fertig, wenn: drei Werte mit Commit-SHA im Plan stehen.
 - **S1 Domäne (test-first)**: `onboarding-gate.ts`, `onboarding.ts` (E1, E5, E6, E9, E10), `regions.ts` (`population`, Quelle im Kommentar), `PushCapability` in `domain/pwa.ts`.
   - Fertig, wenn: Unit-Tests erst rot, dann grün und `pnpm verify` grün.
-- **S2 Daten (test-first)**: `preferences.ts` (E2), `push.ts` (`hasServiceWorker`, `swGivenUp`, `pushCapability`; `pwa.ts` setzt `data-pwa="ohne-sw"`, Zeitlimit für `ready`), `InstallApi` nach `src/domain/pwa.ts` (E4).
+- **S2 Daten (test-first)**: `preferences.ts` (E2), `push.ts` (`hasServiceWorker`, `swGivenUp`, `pushCapability`; `pwa.ts` setzt `data-sw="aus"`, Zeitlimit für `ready`), `InstallApi` nach `src/domain/pwa.ts` (E4).
   - Fertig, wenn: Unit-Tests grün, `pnpm verify` grün und `push.spec` lokal grün.
 - **S3 Refaktor ohne Verhaltensänderung**: `useBirthDateInput` aus `KidSheet`, `usePushSwitch` aus `PushControls`.
   - Fertig, wenn: `pnpm verify` grün, `pnpm e2e:local e2e/app.spec.ts e2e/push.spec.ts e2e/installieren.spec.ts` grün und Start-JS ± 0,05 kB.
@@ -471,7 +475,7 @@ Stand 2026-10-11: Der Nutzer hat das Mockup freigegeben („Passt so super, bitt
   - Push: „Schalter auch im Onboarding, dort ohne Abgleich und ohne laufendes Spiegeln“.
   - App-Extras: `AppStep`, `usePushSwitch`.
 - ADR 0012: Zeile in der Delta-Tabelle (und Budget-Nachtrag bei N1).
-- ADR 0013: Nachtrag zum Ladezeitpunkt des Kern-Moduls (E14).
+- ADR 0027 (neu): App-Chunk beim Erststart vorladen (E14). ADR 0013: Verweis auf ADR 0027. `docs/architecture.md`: PWA-Kern-Ladezeitpunkt, `data-sw`.
 - ADR 0014: Nachtrag „Schalter auch im Onboarding“.
 - ADR 0025: Nachtrag `population`.
 - `README.md`:
@@ -516,3 +520,12 @@ Neuer `plan-reviewer` auf die überarbeitete Fassung. Kein Blocker. Alles übern
 - Niedrig: Fokusziel ohne Statuszeile und `flushSync` (E9), generisches `cityChoices`, Such-Abos in `hasStoredData`, Umbenennung vollständig (S5), Zeilenangaben, „Egal“-Chip, Lead bei 0 Angeboten, `pnpm verify` in S6, CSS-Budget-Alternative in S4.
 
 Freigegeben zur Umsetzung.
+
+## Arch-Review des Plans (2026-10-11) – keine Blocker
+
+Das Stop-Gate verlangte `/arch-review` auf Plan und Mockup. Übernommen:
+
+- **M1** (`data-pwa="ohne-sw"` hätte „bereit“ überschrieben): eigenes Attribut `data-sw="aus"`, Kanal dokumentiert (E8).
+- **M2** (Vorladen des PWA-Kerns weicht von ADR 0013, Punkt 5 ab): neues ADR 0027 statt Nachtrag (E14, Doku).
+- **M3** (helle SVG-Flächen im Dunkelmodus): Füllungen über `--onb-paper`/`--onb-screen`/`--onb-ink`, Checklistenzeile im Browser-Review (E11).
+- **m1** (ADR 0025 falsch zitiert), **m2** (Such-Abo-Schlüssel als Konstante), **m3** (Gate ohne nutzbaren Speicher), **m4** (`plural` in die Domäne), **m5** (`enable` per `Promise.race` statt Zeitlimit, vier Testfälle), **m6** (Smoke-Test im Deploy-Build).
