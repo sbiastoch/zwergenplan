@@ -3,7 +3,7 @@
 Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 misst 7 Nächte bis 2026-10-18; Stufe 2 in Arbeit (Branch `plan-0032-s2`); Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
-Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird ersetzt), ADR 0022 (Entwurf, stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (entsteht mit der Freigabe, Inhalt in E14)
+Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird durch ADR 0026 ersetzt), ADR 0022 (stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (vorgeschlagen 2026-10-11, `docs/adr/0026-daten-automatisch.md`, Inhalt nach E14; angenommen mit Stufe 5)
 
 ## Anlass
 
@@ -223,7 +223,7 @@ ADR 0026 ersetzt ADR 0016 und nennt je einen Satz zu:
 - **ADR 0003:** Datenhorizont 12 Monate statt 4.
 - **ADR 0004:** Das Eval-Gate aus ADR 0016 entfällt; Backpressure leisten Validierung je Anbieter, Einbruchschutz, Gates vor dem Push und der Vergleich gegen den deployten Stand.
 - **ADR 0006:** Keine Subagenten-Pakete; Agenten pflegen den Katalog nur über `discover` (neue Anbieter) und von Hand über den Skill.
-- **ADR 0011 Nr. 4:** `pipeline oepnv` läuft auch im Nachtlauf (Feed-Cache in `actions/cache`).
+- **ADR 0011 Nr. 4:** ~~`pipeline oepnv` läuft auch im Nachtlauf (Feed-Cache in `actions/cache`).~~ Entfällt (Stufe 3 – Umsetzung): ADR 0026 lässt ADR 0011 Nr. 4 unverändert.
 - **`docs/architecture.md`:** `data/raw` und `data/discover` sind dauerhafter Zustand, kein Vertrag der Website; `scripts/validate-data.ts` darf aus `scripts/pipeline/lib` importieren; `pipeline publish` läuft aus dem Workflow.
 
 ## Stufen
