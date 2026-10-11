@@ -8,6 +8,8 @@
  */
 import { createHash } from "node:crypto";
 import type { Provider } from "../../../src/domain/schema.ts";
+import { addDays, berlinIsoDate } from "../../../src/domain/time.ts";
+import type { Candidate } from "./candidate.ts";
 
 /** Zeilen, die eines dieser Stücke enthalten (Kleinschreibung) und kurz sind, gehören zum Cookie-Banner. */
 const COOKIE_BANNER = [
@@ -95,7 +97,16 @@ function flatten(text: string): string {
 
 /** Normalisierung für den Hash: zusätzlich Zeitstempel, Session-IDs und Cookie-Banner (E3). */
 export function normalizeText(text: string): string {
-  const cleaned = flatten(text)
+  return normalizeValues(text)
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l !== "" && !isCookieLine(l))
+    .join("\n");
+}
+
+/** Zeitstempel und Session-IDs wie `normalizeText`, ohne den Zeilenfilter (für einzeilige Bestandteile, `extractKey`). */
+function normalizeValues(text: string): string {
+  return flatten(text)
     .replace(LABELLED_TIME, "$1$2<zeit>")
     .replace(JSON_TIME, '"$1":"<zeit>"')
     .replace(ISO_SECONDS, "<zeit>")
@@ -104,11 +115,6 @@ export function normalizeText(text: string): string {
     .replace(EPOCH, "$1<zeit>")
     .replace(PATH_SESSION, "")
     .replace(QUERY_SESSION, "$1<sid>");
-  return cleaned
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l !== "" && !isCookieLine(l))
-    .join("\n");
 }
 
 export interface HashInput {
@@ -149,17 +155,119 @@ interface KeyParts {
   model: string;
 }
 
+/** Überschrift des Seitentexts eines iCal-Feeds (`programmeText` in lib/fetch.ts), dahinter die Termine als JSON. */
+export const ICAL_HEADING = "## ICAL\n";
+
 /**
- * Cache-Schlüssel der Extraktion (E4): normalisierte Seiten und Kandidaten, Katalogauszug, Prompt, Antwort-Schema und
- * Modell. Ändert sich einer davon, wird der Anbieter neu extrahiert. Gespeichert als `inputHash` in `data/raw`.
+ * Cache-Schlüssel der Extraktion (E4, Kostenhebel „vergangene Termine“ in Plan 0032).
+ * - `hash`: Grundschlüssel über Seiten, Katalogauszug, Prompt, Schema und Modell, ohne datierte Bestandteile. Ohne solche
+ *   ist er bitgleich zum früheren `inputHash`.
+ * - `dated`: je letztem Tag (`YYYY-MM-DD`, nur ab `today`) ein Hash über die datierten Bestandteile dieses Tags,
+ *   nämlich iCal-Termine ohne RRULE (letzter Berliner Tag) und jeder Termin eines Kandidaten.
+ * Was vor heute endet, zählt nicht; sonst änderte jeder Feed den Schlüssel jede Nacht, nur weil die Zeit vergeht.
  */
+export interface ExtractKey {
+  hash: string;
+  dated: Record<string, string>;
+}
+
+/** Ändert sich einer der Bestandteile, wird der Anbieter neu extrahiert. Gespeichert in `data/raw` (`inputHash`, `dated`). */
 export function extractKey(
-  input: Omit<HashInput, "extra">,
+  input: { pages: HashInput["pages"]; candidates: readonly Candidate[] },
   parts: KeyParts,
-  opts: { orderFree?: boolean } = {},
-): string {
-  const withParts = { ...input, extra: { ...parts } };
-  return (opts.orderFree ?? ORDER_FREE_KEY) ? orderFreeHash(withParts) : inputHash(withParts);
+  opts: { today: string; orderFree?: boolean },
+): ExtractKey {
+  const items: Array<{ day: string; text: string }> = [];
+  const pages = input.pages.map((p) => {
+    const events = icalEvents(p.text);
+    if (!events) return p;
+    const rest = events.filter((e) => {
+      const day = icalLastDay(e);
+      // mit Feed: Ein Termin, der zu einem anderen Feed (Standort) wandert, ist eine Änderung
+      if (day) items.push({ day, text: JSON.stringify({ url: p.url, e }) });
+      return !day;
+    });
+    return rest.length === events.length ? p : { url: p.url, text: ICAL_HEADING + JSON.stringify(rest, null, 1) };
+  });
+  // je Termin: Fällt ein vergangener Termin einer Reihe weg, bleiben die künftigen gleich; eine Änderung am Kandidaten
+  // (Titel, Plätze) ändert alle seine Tage
+  for (const { occurrences, ...c } of input.candidates)
+    for (const o of occurrences)
+      items.push({ day: (o.end ?? o.start).slice(0, 10), text: JSON.stringify({ ...c, o }) });
+  const base = { pages, candidates: [], extra: { ...parts } };
+  const hash = (opts.orderFree ?? ORDER_FREE_KEY) ? orderFreeHash(base) : inputHash(base);
+  const byDay = new Map<string, string[]>();
+  for (const { day, text } of items)
+    if (day >= opts.today) byDay.set(day, [...(byDay.get(day) ?? []), normalizeValues(text)]);
+  const dated = Object.fromEntries(
+    [...byDay]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([day, texts]) => [day, createHash("sha256").update(JSON.stringify(texts.sort())).digest("hex")]),
+  );
+  return { hash, dated };
+}
+
+/** Gleiche Eingabe für die Extraktion: gleicher Grundschlüssel und gleiche datierte Bestandteile ab `today`. */
+export function sameKey(
+  stored: { inputHash?: string | undefined; dated?: Record<string, string> | undefined } | undefined,
+  key: ExtractKey,
+  today: string,
+): boolean {
+  if (stored?.inputHash !== key.hash) return false;
+  const a = datedFrom(stored.dated ?? {}, today);
+  const b = datedFrom(key.dated, today);
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+/** Datierte Bestandteile ab `today`, nach Tag sortiert (zum Vergleichen und Speichern). */
+export function datedFrom(dated: Readonly<Record<string, string>>, today: string): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(dated)
+      .filter(([day]) => day >= today)
+      .sort(([a], [b]) => a.localeCompare(b)),
+  );
+}
+
+type IcalItem = Record<string, unknown>;
+
+/** Termine eines iCal-Seitentexts, sonst `undefined` (andere Art oder kein lesbares JSON). */
+function icalEvents(text: string): IcalItem[] | undefined {
+  if (!text.startsWith(ICAL_HEADING)) return undefined;
+  try {
+    const parsed: unknown = JSON.parse(text.slice(ICAL_HEADING.length));
+    return Array.isArray(parsed) && parsed.every(isRecord) ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+const isRecord = (v: unknown): v is IcalItem => typeof v === "object" && v !== null && !Array.isArray(v);
+
+/** Datum oder lokale/UTC-Zeit (`ical.ts` verwirft Parameter wie TZID und VALUE); alles andere ist nicht lesbar. */
+const ICAL_DATE = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z)?)?$/;
+
+/** Berliner Tag eines iCal-Werts; `allDay`: nur ein Datum (ganztägig, DTEND ist dann exklusiv). */
+function icalDay(v: unknown): { day: string; allDay: boolean } | undefined {
+  const m = typeof v === "string" ? ICAL_DATE.exec(v) : null;
+  if (!m) return undefined;
+  const day = `${m[1]}-${m[2]}-${m[3]}`;
+  // UTC exakt umrechnen (`20261011T223000Z` ist der 12. in Berlin); lokale Zeiten gelten als Berliner Zeit
+  if (m[7]) return { day: berlinIsoDate(`${day}T${m[4]}:${m[5]}:${m[6]}Z`), allDay: false };
+  return { day, allDay: m[4] === undefined };
+}
+
+/**
+ * Letzter Berliner Tag eines einzelnen iCal-Termins; Serien (RRULE) und Termine ohne lesbares DTSTART haben keinen.
+ * Exakt, ohne Zuschlag: Ein Tag zu lange hieße, dass der gestrige Termin noch zählt, wenn der Feed ihn nachts schon
+ * weglässt, und der Hebel griffe nie (Arch-Review, Blocker 1).
+ */
+function icalLastDay(e: IcalItem): string | undefined {
+  if (e["RRULE"] !== undefined) return undefined;
+  const start = icalDay(e["DTSTART"]);
+  if (!start) return undefined;
+  const end = icalDay(e["DTEND"]);
+  const last = end ? (end.allDay ? addDays(end.day, -1) : end.day) : start.day;
+  return last > start.day ? last : start.day;
 }
 
 /** Katalogauszug für den Schlüssel: der Eintrag ohne `notes` (Protokoll für Menschen, ADR 0025, Punkt 5). */

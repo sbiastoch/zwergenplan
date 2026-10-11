@@ -3,7 +3,7 @@ import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import type { Candidate } from "./candidate.ts";
 import type { ExtractOutcome } from "./extract.ts";
-import { catalogExcerpt, extractKey } from "./normalize.ts";
+import { catalogExcerpt, extractKey, ICAL_HEADING } from "./normalize.ts";
 import { ProviderRaw, RawEvent } from "./raw.ts";
 import {
   applyOutcome,
@@ -23,6 +23,7 @@ const provider: Provider = (() => {
 })();
 const KEY_PARTS = { prompt: "Prompt v1", schema: "{}", model: "haiku" };
 const NOW = "2026-10-12T03:00:00+02:00";
+const TODAY = "2026-10-12";
 const YESTERDAY = "2026-10-11T03:00:00+02:00";
 const LAST_WEEK = "2026-10-05T03:00:00+02:00";
 
@@ -62,7 +63,11 @@ const fetched = (over: Partial<FetchedProvider> = {}): FetchedProvider => ({
   ...over,
 });
 const keyOf = (f: FetchedProvider, model = KEY_PARTS.model) =>
-  extractKey({ pages: f.pages, candidates: f.candidates }, { ...KEY_PARTS, model, catalog: catalogExcerpt(provider) });
+  extractKey(
+    { pages: f.pages, candidates: f.candidates },
+    { ...KEY_PARTS, model, catalog: catalogExcerpt(provider) },
+    { today: TODAY },
+  ).hash;
 
 const raw = (over: Partial<ProviderRaw> = {}): ProviderRaw =>
   ProviderRaw.parse({
@@ -82,6 +87,7 @@ const ctx = (over: Partial<RefreshContext> = {}): RefreshContext => ({
   prev: raw(),
   prevOfferCount: 0,
   keyParts: KEY_PARTS,
+  today: TODAY,
   now: NOW,
   ...over,
 });
@@ -285,6 +291,72 @@ describe("refresh: Regeln aus Plan 0032, E5", () => {
     const r = run(ctx({ fetched: changed }), { kind: "abort", abort: "limit" });
     expect(r).toMatchObject({ kind: "abort", abort: "limit" });
     expect("next" in r).toBe(false);
+  });
+});
+
+describe("refresh: vergangene Termine ändern den Schlüssel nicht (Plan 0032, Kostenhebel)", () => {
+  const FEED = "https://example.org/familientreff/termine.ics";
+  const termin = (day: string, summary = "Babymassage") => ({
+    SUMMARY: summary,
+    DTSTART: `${day.replaceAll("-", "")}T093000`,
+  });
+  const feed = (...events: object[]) =>
+    fetched({ pages: [{ url: FEED, text: ICAL_HEADING + JSON.stringify(events, null, 1) }] });
+  const keyAt = (f: FetchedProvider, today: string) =>
+    extractKey(
+      { pages: f.pages, candidates: f.candidates },
+      { ...KEY_PARTS, catalog: catalogExcerpt(provider) },
+      { today },
+    );
+  // Stand der Vornacht (11.): Termine am 10., 11. und 20.; der Lauf ist die direkt folgende Nacht (12.)
+  const vornacht = feed(termin("2026-10-10"), termin("2026-10-11"), termin("2026-10-20"));
+  const k0 = keyAt(vornacht, "2026-10-11");
+  const prev = raw({ inputHash: k0.hash, dated: k0.dated });
+
+  it("Feed verliert über Nacht nur Vergangenes: unverändert ohne Aufruf, dated ohne vergangene Tage", () => {
+    const r = run(ctx({ prev, fetched: feed(termin("2026-10-20")) }));
+    expect(r.called).toBe(false);
+    expect(r.kind === "keep" && r.result).toBe("unveraendert");
+    expect(nextOf(r).dated).toEqual({ "2026-10-20": k0.dated["2026-10-20"] });
+  });
+
+  it("geänderter künftiger Termin: Aufruf; gespeichert wird der neue Schlüssel ab heute", () => {
+    const f = feed(termin("2026-10-20", "Babymassage entfällt"));
+    const r = run(ctx({ prev, fetched: f }), ok(events(4)));
+    expect(r.called).toBe(true);
+    const k = keyAt(f, TODAY);
+    expect(nextOf(r)).toMatchObject({ inputHash: k.hash, dated: k.dated });
+  });
+
+  it("pending mit derselben künftigen Eingabe wird übernommen", () => {
+    const withPending = raw({
+      pending: { inputHash: k0.hash, dated: k0.dated, model: "haiku", events: events(1, "Neu") },
+    });
+    const r = run(ctx({ prev: { ...withPending, inputHash: "alt" }, fetched: feed(termin("2026-10-20")) }));
+    expect(r.kind === "keep" && r.result).toBe("pending-uebernommen");
+    expect(nextOf(r).dated).toEqual({ "2026-10-20": k0.dated["2026-10-20"] });
+  });
+
+  it("Zustand von vor dem Umbau (Hash über alles, ohne dated): einmal neu extrahiert", () => {
+    const old = raw({ inputHash: keyOf(feed(termin("2026-10-20"))) });
+    expect(run(ctx({ prev: old, fetched: feed(termin("2026-10-20")) }), ok(events(4))).called).toBe(true);
+  });
+
+  it("Einbruchschutz zählt nur künftige Termine: gealterte Einzeltermine sind kein Einbruch", () => {
+    const einzeln = (day: string) =>
+      ev(`Termin ${day}`, { format: "einmalig", schedule: { kind: "dates", dates: [{ start: `${day}T10:00` }] } });
+    const old = [
+      ...["01", "02", "03", "04", "05", "06", "07", "08"].map((d) => einzeln(`2026-10-${d}`)),
+      einzeln("2026-10-20"),
+      einzeln("2026-10-27"),
+      einzeln("2026-11-03"),
+      einzeln("2026-11-10"),
+    ];
+    const fresh = [einzeln("2026-10-20"), einzeln("2026-10-27"), einzeln("2026-11-03")];
+    const r = run(ctx({ prev: raw({ events: old }), fetched: changed }), ok(fresh));
+    expect(r.kind === "write" && r.result).toBe("extrahiert");
+    const collapse = run(ctx({ prev: raw({ events: old }), fetched: changed }), ok([]));
+    expect(collapse.kind === "write" && collapse.result).toBe("einbruch");
   });
 });
 

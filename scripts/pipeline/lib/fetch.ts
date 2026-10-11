@@ -5,7 +5,7 @@
 import { z } from "zod";
 import { extractPage } from "./html-extract.ts";
 import { parseIcal } from "./ical.ts";
-import { inputHash, normalizeWhitespace, orderFreeHash } from "./normalize.ts";
+import { ICAL_HEADING, inputHash, normalizeWhitespace, orderFreeHash } from "./normalize.ts";
 import type { PageTask } from "./select.ts";
 
 /** Eingabe-Obergrenze je Anbieter (E3): darüber `fehler`, nie gekürzt. */
@@ -43,7 +43,7 @@ export function programmeText(kind: PageTask["kind"], body: string, finalUrl: st
       return `${jsonLd}## TEXT\n${page.text}`;
     }
     case "ical":
-      return `## ICAL\n${JSON.stringify(parseIcal(body), null, 1)}`;
+      return `${ICAL_HEADING}${JSON.stringify(parseIcal(body), null, 1)}`;
     case "json-api":
       try {
         return JSON.stringify(JSON.parse(body), null, 1);

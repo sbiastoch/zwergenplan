@@ -43,6 +43,7 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
     prev: readRaw(rawDir, o.provider.id),
     prevOfferCount: o.prevOfferCount,
     keyParts: o.keyParts,
+    today: o.today,
     now: o.now,
   };
   const plan = planRefresh(ctx);

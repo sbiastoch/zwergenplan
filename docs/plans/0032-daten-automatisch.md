@@ -404,6 +404,72 @@ Umgesetzt, soweit es ohne den Modus `live` des Entdeckens geht. Offen bleiben di
 - **S3.2 Trockenlauf** (Run 38136150454, `main`): 74 Anbieter in 18 Min., 115 Modellaufrufe (fbs-nuernberg in 15 Teilen), 2,40 Mio. Tokens ein und 0,64 Mio. aus, $0,57 (CLI-Schätzung, API-Gegenwert). Ergebnis 372 Angebote und 5 307 Termine gegen 333 und 2 889 im Bestand (vor allem 12 statt 4 Monate). Einbruchschutz griff bei nuebad-flipper (10 → 0, Vorstand bleibt). Fehler: hebammenpraxis-gugelrund (404), sternenhaus-kuf (Bot-Schutz), studio-herzschlag (Timeout). Rot wegen eines Test-Flakes in `scripts/heavy.test.ts` (behoben in 398a0e8) und der Token-Bremse (3 Mio.), die 2 Anbieter offen ließ; der erste Lauf extrahiert alles neu, danach nur geänderte Seiten.
 - **S3.3:** Deploy-Build mit den Daten des Trockenlaufs hält alle Budgets (`pnpm size`, Daten 93 kB von 250 kB).
 - **Freigabe (Nutzer, 2026-10-11):** Push freigegeben; erster Live-Lauf per `workflow_dispatch` mit `max_tokens=5000000`, danach `NACHTLAUF_MODUS=live`. Die reine Hash-Messung aus S1.2 endet damit nach einer Nacht; geänderte Anbieter je Nacht zeigt weiter `data/kosten.csv`. Der Entscheid zum reihenfolgefreien Schlüssel (`ORDER_FREE_KEY`) fällt nach einigen Live-Nächten anhand der Zahl der gesparten Aufrufe.
+
+### Kostenhebel: vergangene Termine aus dem Vergleich (2026-10-11, Branch `kosten-vergangene`)
+
+**Anlass:** iCal-Feeds und Sammelkalender verlieren jeden Tag ihre vergangenen Termine. Damit ändert sich der Schlüssel (E4) von etwa 40 der 74 Anbieter jede Nacht, obwohl kein neuer Termin dazukam, und sie werden neu extrahiert. Ein bloßer Filter „ab heute“ vor dem Hash hilft nicht: Das Fenster rückt mit, und die Termine von gestern fallen trotzdem aus dem Hash. Der Vergleich muss beide Eingaben am selben Stichtag abschneiden.
+
+**Entscheidung:** Der Schlüssel hat zwei Teile.
+- **Grundschlüssel** (`inputHash`, wie bisher): normalisierte Seiten, Katalogauszug, Prompt, Schema, Modell. Ausgenommen sind die datierten Bestandteile:
+  - iCal-Termine **ohne** `RRULE` mit lesbarem `DTSTART` (Seitentext `## ICAL`, `lib/fetch.ts`).
+  - Alle Kandidaten.
+- **Datierte Bestandteile** (`dated`, neu): je letztem Tag (`JJJJ-MM-TT`) ein Hash über die sortierten, normalisierten Bestandteile mit diesem letzten Tag.
+  - Erkannt wird ein iCal-Text am Anfang `## ICAL\n` (`ICAL_HEADING`), der Rest per `JSON.parse`. Scheitert das, bleibt die ganze Seite im Grundschlüssel. Sonst wird der Rest wie in `programmeText` neu serialisiert.
+  - „Lesbar“ heißt `^\d{8}(T\d{6}Z?)?$`. `ical.ts` verwirft Parameter wie `TZID` und `VALUE`.
+  - Letzter Tag eines iCal-Termins ist der exakte Berliner Tag von `DTEND`, sonst von `DTSTART`.
+    - Zeiten mit `Z` werden über `berlinIsoDate` umgerechnet.
+    - Lokale Zeiten gelten als Berliner Zeit.
+    - Ein ganztägiges `DTEND` ist exklusiv, zählt also einen Tag früher.
+    - Ohne Zuschlag: Ein Tag zu lange hieße, dass der gestrige Termin noch zählt, wenn der Feed ihn nachts schon weglässt. Der Hebel griffe dann nie (Arch-Review, Blocker 1).
+  - Ein Kandidat zählt **je Termin**: Hash über den Kandidaten ohne `occurrences` plus diesen Termin, unter dessen Tag (`end ?? start`). Fällt der vergangene Termin einer Reihe weg, bleiben die künftigen Tage gleich. Eine Änderung am Kandidaten (Titel, Plätze) ändert alle seine Tage (Plan-Review M2).
+  - Bestandteile ohne lesbares Datum bleiben im Grundschlüssel.
+- **Vergleich** (`sameKey`, rein): Die Grundschlüssel sind gleich, und die Tage ≥ heute (Europe/Berlin, aus `now`) stimmen in beiden `dated` überein. Das gilt für `prev` und für `pending`.
+- **Gespeichert** wird `dated` nur mit Tagen ≥ heute, also ohne Vergangenes. Bei „unverändert“ kürzt der Lauf auch das alte `dated` auf heute. So wächst die Datei nicht.
+- Datenfluss: `extractKey` liefert `ExtractKey { hash, dated }` an `planRefresh`, `applyOutcome`, `adopt` und `pending`. `RefreshContext` bekommt `today` aus `io/refresh.ts`. Ein fehlendes `dated` gilt als leer.
+- **Einbruchschutz** (Plan-Review M1): Er zählt nur Termine ab heute, alt wie neu. Ohne Neu-Extraktion altern die alten Events. Die neue Antwort kennt nur Künftiges, das sähe sonst wie ein Einbruch aus.
+- Die Messung `hashes.json` aus `pipeline fetch` (`assembleProvider`) hasht weiter alles. Sie ist nicht der Cache-Schlüssel.
+- Was das Modell sieht, bleibt gleich: Der Eingabetext enthält weiter alle Termine; der Build filtert Vergangenes wie bisher.
+- **Fachlich gleichwertig:** Wird ein Anbieter nicht neu extrahiert, stammen seine Events aus einer Eingabe, die sich von der heutigen nur in vergangenen Terminen unterscheidet.
+- **Anbieter ohne datierte Bestandteile:** Grundschlüssel bitgleich zum alten `inputHash`, keine Neu-Extraktion.
+- **Anbieter mit datierten Bestandteilen:** einmal neu extrahiert in der ersten Nacht nach dem Deploy, geschätzt 20–30 ct.
+
+**Nicht erfasst:** Termine in HTML-Seiten, JSON-LD und `json-api`. Ihr Text lässt sich nicht verlässlich in Termine zerlegen.
+
+**Bleibt bei der Auswertung von `geaenderte_anbieter` zu beachten:**
+- Ein Feed mit gleitendem Fenster („nächste 90 Tage“) bekommt jede Nacht einen neuen künftigen Tag und wird weiter neu extrahiert.
+- Anbieter mit Kandidaten extrahieren einmal im Monat neu: Das Fenster der Sammelkalender (`placeholderWindow`) springt am Monatsersten.
+- Beides ist fachlich richtig.
+
+**Schema:** `ProviderRaw` bekommt `dated: Record<LocalDate, string>` optional, auch in `pending`.
+- Es gibt `dated` nur zusammen mit `inputHash`.
+- Danach `pnpm schema:export`.
+- Kein neuer Datenvertrag der Website (ADR 0026), ältere Dateien ohne `dated` bleiben gültig.
+
+**Tests:**
+- `normalize.test.ts`:
+  - Ohne datierte Bestandteile ist der Schlüssel gleich dem alten `inputHash`.
+  - Eine RRULE-Serie bleibt im Grundschlüssel.
+  - Ein Kandidat landet unter seinem letzten Tag.
+  - `sameKey` gilt nach Wegfall eines gestrigen Termins.
+  - `sameKey` gilt nicht bei einem neuen oder geänderten Termin ab heute.
+- `refresh.test.ts`:
+  - Ein Feed, der über Nacht nur den gestrigen Termin verliert, ergibt „unverändert“ ohne Aufruf, und `dated` wird gekürzt.
+  - Ein geänderter künftiger Termin ergibt „extract“.
+  - `pending` mit gleicher künftiger Eingabe wird übernommen.
+  - Migration: Ein alter Zustand ohne `dated` wird einmal neu extrahiert.
+  - Einbruchschutz mit gealterten Einzelterminen.
+- `normalize.test.ts`, weitere Fälle:
+  - Mehrtägige Termine, ganztägige Termine, Termine in UTC um Mitternacht.
+  - Ein iCal-Text, der sich nicht lesen lässt.
+  - Eine Reihe, deren vergangener Termin wegfällt.
+- Wirkung: Spalte `geaenderte_anbieter` in `data/kosten.csv` der Folgenächte.
+- **Plan-Review** (2026-10-11): kein Blocker.
+  - Eingearbeitet: M1 (Einbruchschutz nur Künftiges), M2 (Kandidaten je Termin), m3–m7 (UTC, Regex und Zerlegung festgelegt, Datenfluss, Tests, Hinweis auf `hashes.json`).
+- **Arch-Review** (2026-10-11):
+  - Blocker: Der pauschale Zuschlag von +1 Tag hätte den Hebel bei zwei aufeinanderfolgenden Nächten ausgehebelt. Behoben: Berliner Tag exakt, `DTEND` ganztägig exklusiv. Der Refresh-Test läuft jetzt über die Nächte 11 → 12.
+  - Minor: Doku in `architecture.md` ergänzt, Kommentar zu `prevOfferCount`.
+  - Zweites Review: OK. Eingearbeitet: Feed-URL im Tageshash, datierte Bestandteile ohne Cookie-Zeilenfilter, Hinweise zur Auswertung.
+
 ### Was der Nutzer tun muss
 
 - Secret `CLAUDE_CODE_OAUTH_TOKEN` anlegen (Stufe 1).

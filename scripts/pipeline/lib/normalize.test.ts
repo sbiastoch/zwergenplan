@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
+import type { Candidate } from "./candidate.ts";
 import {
   catalogExcerpt,
+  datedFrom,
   extractKey,
+  ICAL_HEADING,
   inputHash,
   normalizeText,
   normalizeWhitespace,
   ORDER_FREE_KEY,
   orderFreeHash,
+  sameKey,
 } from "./normalize.ts";
 
 const page = (stand: string) =>
@@ -134,20 +138,27 @@ describe("inputHash (Plan 0032, E3/E4)", () => {
 describe("extractKey (Plan 0032, E4)", () => {
   const input = { pages: [{ url: "https://a.de/1", text: "Kurs A\n10:45\nKurs B\n9:30" }], candidates: [] };
   const parts = { catalog: "{}", prompt: "Prompt v1", schema: "{}", model: "haiku" };
+  const today = { today: "2026-10-12" };
 
   it("Prompt, Schema, Modell und Katalogauszug gehen je in den Schlüssel (N3: Modellwechsel extrahiert neu)", () => {
-    const key = extractKey(input, parts);
+    const key = extractKey(input, parts, today).hash;
     expect(key).toMatch(/^[0-9a-f]{64}$/);
     for (const change of [{ prompt: "Prompt v2" }, { schema: '{"x":1}' }, { model: "sonnet" }, { catalog: '{"a":1}' }])
-      expect(extractKey(input, { ...parts, ...change })).not.toBe(key);
-    expect(extractKey(input, parts)).toBe(key);
+      expect(extractKey(input, { ...parts, ...change }, today).hash).not.toBe(key);
+    expect(extractKey(input, parts, today).hash).toBe(key);
   });
 
   it("Standard ist der Hash mit Reihenfolge; der reihenfolgefreie ist per ORDER_FREE_KEY umschaltbar (offen)", () => {
     const swapped = { ...input, pages: [{ url: "https://a.de/1", text: "Kurs B\n9:30\nKurs A\n10:45" }] };
     expect(ORDER_FREE_KEY).toBe(false);
-    expect(extractKey(swapped, parts)).not.toBe(extractKey(input, parts));
-    expect(extractKey(swapped, parts, { orderFree: true })).toBe(extractKey(input, parts, { orderFree: true }));
+    expect(extractKey(swapped, parts, today).hash).not.toBe(extractKey(input, parts, today).hash);
+    expect(extractKey(swapped, parts, { ...today, orderFree: true }).hash).toBe(
+      extractKey(input, parts, { ...today, orderFree: true }).hash,
+    );
+  });
+
+  it("ohne datierte Bestandteile ist der Grundschlüssel der frühere inputHash (keine Neu-Extraktion nach dem Umbau)", () => {
+    expect(extractKey(input, parts, today)).toEqual({ hash: inputHash({ ...input, extra: { ...parts } }), dated: {} });
   });
 
   it("catalogExcerpt: ohne notes (ADR 0025, Punkt 5), sonst der ganze Eintrag", () => {
@@ -158,5 +169,118 @@ describe("extractKey (Plan 0032, E4)", () => {
     expect(catalogExcerpt(withNotes)).toBe(catalogExcerpt(without));
     expect(catalogExcerpt(withNotes)).not.toContain("Protokoll");
     expect(catalogExcerpt({ ...p, name: "Anders" })).not.toBe(catalogExcerpt(p));
+  });
+});
+
+describe("extractKey: vergangene Termine zählen nicht (Plan 0032, Kostenhebel)", () => {
+  const parts = { catalog: "{}", prompt: "Prompt v1", schema: "{}", model: "haiku" };
+  const feed = (...events: object[]) => ({
+    url: "https://kirche.de/feed.ics",
+    text: ICAL_HEADING + JSON.stringify(events, null, 1),
+  });
+  const termin = (day: string, summary = "Krabbelgruppe") => ({
+    SUMMARY: summary,
+    DTSTART: `${day.replaceAll("-", "")}T093000`,
+  });
+  const serie = { SUMMARY: "Babytreff", DTSTART: "20260901T100000", RRULE: "FREQ=WEEKLY;BYDAY=MO" };
+  const kandidat = (starts: string[], title = "Eltern-Kind-Singen"): Candidate => ({
+    source: "evtermine",
+    sourceId: title,
+    title,
+    description: "",
+    detailUrl: `https://termine.de/${title}`,
+    cancelled: false,
+    soldOut: false,
+    waitlist: false,
+    weekly: false,
+    occurrences: starts.map((start) => ({ start })),
+  });
+  const key = (pages: ReturnType<typeof feed>[], candidates: Candidate[], day: string) =>
+    extractKey({ pages, candidates }, parts, { today: day });
+
+  it("ein Feed, der über Nacht nur den gestrigen Termin verliert, hat am neuen Tag denselben Schlüssel", () => {
+    const night1 = key([feed(termin("2026-10-11"), serie, termin("2026-10-14"))], [], "2026-10-11");
+    const night2 = key([feed(serie, termin("2026-10-14"))], [], "2026-10-12");
+    expect(Object.keys(night1.dated)).toEqual(["2026-10-11", "2026-10-14"]);
+    expect(sameKey({ inputHash: night1.hash, dated: night1.dated }, night2, "2026-10-12")).toBe(true);
+    // ein Feed, der den gestrigen Termin noch zeigt, ist am neuen Tag ebenfalls gleich
+    const late = key([feed(termin("2026-10-11"), serie, termin("2026-10-14"))], [], "2026-10-12");
+    expect(sameKey({ inputHash: night1.hash, dated: night1.dated }, late, "2026-10-12")).toBe(true);
+    const night3 = key([feed(serie, termin("2026-10-14"))], [], "2026-10-13");
+    expect(sameKey({ inputHash: night2.hash, dated: night2.dated }, night3, "2026-10-13")).toBe(true);
+  });
+
+  it("neuer oder geänderter künftiger Termin, geänderte Serie: anderer Schlüssel", () => {
+    const base = key([feed(serie, termin("2026-10-14"))], [], "2026-10-12");
+    const stored = { inputHash: base.hash, dated: base.dated };
+    for (const next of [
+      key([feed(serie, termin("2026-10-14"), termin("2026-10-20"))], [], "2026-10-12"),
+      key([feed(serie, termin("2026-10-14", "Krabbelgruppe fällt aus"))], [], "2026-10-12"),
+      key([feed({ ...serie, RRULE: "FREQ=WEEKLY;BYDAY=DI" }, termin("2026-10-14"))], [], "2026-10-12"),
+    ])
+      expect(sameKey(stored, next, "2026-10-12")).toBe(false);
+  });
+
+  it("Serien und Termine ohne lesbares DTSTART bleiben im Grundschlüssel", () => {
+    const k = key([feed(serie, { SUMMARY: "irgendwann" })], [], "2026-10-12");
+    expect(k.dated).toEqual({});
+    expect(k.hash).toBe(
+      inputHash({ pages: [feed(serie, { SUMMARY: "irgendwann" })], candidates: [], extra: { ...parts } }),
+    );
+  });
+
+  it("Kandidaten zählen unter ihrem letzten Termin; vergangene fallen weg, ohne den Grundschlüssel zu ändern", () => {
+    const night1 = key(
+      [],
+      [kandidat(["2026-10-11T10:00"]), kandidat(["2026-10-11T10:00", "2026-10-18T10:00"], "Reihe")],
+      "2026-10-11",
+    );
+    expect(Object.keys(night1.dated)).toEqual(["2026-10-11", "2026-10-18"]);
+    const night2 = key([], [kandidat(["2026-10-11T10:00", "2026-10-18T10:00"], "Reihe")], "2026-10-12");
+    expect(night2.hash).toBe(night1.hash);
+    expect(sameKey({ inputHash: night1.hash, dated: night1.dated }, night2, "2026-10-12")).toBe(true);
+    const later = key([], [kandidat(["2026-10-18T10:00"], "Reihe")], "2026-10-12");
+    expect(sameKey({ inputHash: night1.hash, dated: night1.dated }, later, "2026-10-12")).toBe(true);
+    const other = key([], [kandidat(["2026-10-11T10:00", "2026-10-18T10:30"], "Reihe")], "2026-10-12");
+    expect(sameKey({ inputHash: night1.hash, dated: night1.dated }, other, "2026-10-12")).toBe(false);
+  });
+
+  it("mehrtägige, ganztägige (DTEND exklusiv) und UTC-Termine zählen bis zu ihrem letzten Berliner Tag", () => {
+    const k = key(
+      [
+        feed(
+          { SUMMARY: "Freizeit", DTSTART: "20261010T090000", DTEND: "20261013T120000" },
+          { SUMMARY: "Familientag", DTSTART: "20261011", DTEND: "20261012" },
+          { SUMMARY: "Mitternacht", DTSTART: "20261011T223000Z" },
+        ),
+      ],
+      [],
+      "2026-10-12",
+    );
+    // Freizeit bis 13., Familientag nur am 11. (vor heute), Mitternacht 00:30 Berlin am 12.
+    expect(Object.keys(k.dated)).toEqual(["2026-10-12", "2026-10-13"]);
+  });
+
+  it("iCal-Text, der sich nicht lesen lässt, bleibt ganz im Grundschlüssel", () => {
+    const broken = { url: "https://kirche.de/feed.ics", text: `${ICAL_HEADING}[{"SUMMARY": ` };
+    const odd = feed({ SUMMARY: "TZ", DTSTART: "2026-10-14" });
+    for (const page of [broken, odd]) {
+      const k = key([page], [], "2026-10-12");
+      expect(k).toEqual({ hash: inputHash({ pages: [page], candidates: [], extra: { ...parts } }), dated: {} });
+    }
+  });
+
+  it("gespeicherter Schlüssel ohne dated (vor dem Umbau) passt nur ohne künftige datierte Bestandteile", () => {
+    const k = key([feed(serie)], [], "2026-10-12");
+    expect(sameKey({ inputHash: k.hash }, k, "2026-10-12")).toBe(true);
+    const withDates = key([feed(serie, termin("2026-10-14"))], [], "2026-10-12");
+    expect(sameKey({ inputHash: withDates.hash }, withDates, "2026-10-12")).toBe(false);
+  });
+
+  it("datedFrom: nur Tage ab heute, sortiert", () => {
+    expect(datedFrom({ "2026-10-13": "b", "2026-10-11": "a", "2026-10-12": "c" }, "2026-10-12")).toEqual({
+      "2026-10-12": "c",
+      "2026-10-13": "b",
+    });
   });
 });

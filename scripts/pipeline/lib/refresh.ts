@@ -4,13 +4,13 @@
  * 2. `applyOutcome`: neuer Zustand aus altem Zustand und Ergebnis der Extraktion.
  * Abrufen, Extrahieren und Schreiben liegen in `io/refresh.ts`.
  *
- * Grundsatz: `inputHash` ist immer der Schlüssel der Eingabe, aus der `events` stammen. Ein Fehler speichert den
+ * Grundsatz: `inputHash` (mit `dated`) ist immer der Schlüssel der Eingabe, aus der `events` stammen. Ein Fehler speichert den
  * neuen Schlüssel also nie; die nächste Nacht versucht es erneut, statt den Fehler zu cachen.
  */
 import type { Offer, Provider } from "../../../src/domain/schema.ts";
 import type { Candidate, Source } from "./candidate.ts";
 import type { ExtractKeyParts, ExtractOutcome } from "./extract.ts";
-import { catalogExcerpt, extractKey } from "./normalize.ts";
+import { catalogExcerpt, datedFrom, type ExtractKey, extractKey, sameKey } from "./normalize.ts";
 import type { ProviderRaw, RawEvent } from "./raw.ts";
 
 /** Ergebnis des Abrufs eines Anbieters (`io/fetch-inputs.ts`). */
@@ -41,6 +41,8 @@ export interface RefreshContext {
   /** Angebote des Anbieters im Vorstand `data/offers.json` (`offerUnits`); „alt“ für den ersten Lauf (E5) */
   prevOfferCount: number;
   keyParts: ExtractKeyParts;
+  /** YYYY-MM-DD, Europe/Berlin: Stichtag für die datierten Bestandteile des Schlüssels */
+  today: string;
   /** Abrufzeit mit Offset */
   now: string;
 }
@@ -55,7 +57,9 @@ export type RefreshResult =
   | "leer"
   | "fehler";
 
-export type RefreshPlan = { kind: "keep"; next: ProviderRaw; result: RefreshResult } | { kind: "extract"; key: string };
+export type RefreshPlan =
+  | { kind: "keep"; next: ProviderRaw; result: RefreshResult }
+  | { kind: "extract"; key: ExtractKey };
 
 export type RefreshApplied =
   | { kind: "write"; next: ProviderRaw; result: RefreshResult }
@@ -70,11 +74,18 @@ const COLLAPSE_MIN_OLD = 3;
 const statusOf = (events: readonly RawEvent[]): "ok" | "keine-termine" => (events.length > 0 ? "ok" : "keine-termine");
 
 /** Schlüssel der Eingabe dieses Laufs (E4). */
-function keyOf(ctx: RefreshContext): string {
+function keyOf(ctx: RefreshContext): ExtractKey {
   return extractKey(
     { pages: ctx.fetched.pages, candidates: ctx.fetched.candidates },
     { ...ctx.keyParts, catalog: catalogExcerpt(ctx.provider) },
+    { today: ctx.today },
   );
+}
+
+/** Schlüssel zum Speichern: `dated` nur ab heute und nur, wenn es datierte Bestandteile gibt. */
+function stored(key: { inputHash: string; dated?: Record<string, string> | undefined }, today: string) {
+  const dated = datedFrom(key.dated ?? {}, today);
+  return { inputHash: key.inputHash, ...(Object.keys(dated).length > 0 ? { dated } : {}) };
 }
 
 /** Sammelkalender, die zur Eingabe beigetragen haben. */
@@ -82,13 +93,16 @@ const sourcesOf = (candidates: readonly Candidate[]): Source[] => [...new Set(ca
 
 /**
  * Events gezählt wie Angebote in `offers.json` (E5: „alt“ ohne Raw-Datei kommt von dort): `build` zerlegt Einzeltermine
- * je Datum in eigene Angebote, alles andere ist ein Angebot je Event.
+ * je Datum in eigene Angebote, alles andere ist ein Angebot je Event. Termine vor `today` zählen nicht: Alte Events
+ * altern ohne Neu-Extraktion, die neue Antwort kennt nur Künftiges; sonst sähe das wie ein Einbruch aus. Der Vorstand
+ * (`prevOfferCount`, ohne Raw-Datei) braucht das nicht: `offers.json` enthält schon nichts Vergangenes.
  */
-const eventUnits = (events: readonly RawEvent[]) =>
-  events.reduce(
-    (n, e) => n + (e.format === "einmalig" && e.schedule.kind === "dates" ? e.schedule.dates.length : 1),
-    0,
-  );
+const eventUnits = (events: readonly RawEvent[], today: string) =>
+  events.reduce((n, e) => {
+    if (e.schedule.kind !== "dates") return n + 1;
+    const future = e.schedule.dates.filter((d) => (d.end ?? d.start).slice(0, 10) >= today).length;
+    return n + (e.format === "einmalig" ? future : Math.min(future, 1));
+  }, 0);
 
 /** Zahl der Angebote eines Anbieters im Vorstand (E5: „alt“ ohne Raw-Datei). */
 export function offerUnits(offers: readonly Offer[], providerId: string): number {
@@ -137,12 +151,12 @@ function failed(ctx: RefreshContext, reason: string): ProviderRaw {
 }
 
 /** Übernahme neuer Events: Status aus den Events, Fehlerserie und pending enden. */
-function adopted(ctx: RefreshContext, key: string, model: string, events: RawEvent[]): ProviderRaw {
+function adopted(ctx: RefreshContext, key: ExtractKey, model: string, events: RawEvent[]): ProviderRaw {
   const { prev, now } = ctx;
   const same = prev?.changedAt !== undefined && JSON.stringify(prev.events) === JSON.stringify(events);
   return {
     events,
-    inputHash: key,
+    ...stored({ inputHash: key.hash, dated: key.dated }, ctx.today),
     model,
     status: statusOf(events),
     checkedAt: now,
@@ -158,12 +172,14 @@ export function planRefresh(ctx: RefreshContext): RefreshPlan {
   const down = adapterFailure(ctx);
   if (down) return { kind: "keep", next: failed(ctx, down), result: "ausgefallen" };
   const key = keyOf(ctx);
-  if (prev?.inputHash === key) {
-    // Seite unverändert: alte Events bestätigt; ein offenes pending zu einer anderen Eingabe ist hinfällig
-    const { reason: _r, failingSince: _f, pending: _p, ...rest } = prev;
-    return { kind: "keep", next: { ...rest, status: statusOf(prev.events), checkedAt: now }, result: "unveraendert" };
+  if (prev?.inputHash !== undefined && sameKey(prev, key, ctx.today)) {
+    // Seite unverändert (bis auf Vergangenes): alte Events bestätigt; ein offenes pending zu einer anderen Eingabe ist
+    // hinfällig; `dated` verliert die vergangenen Tage
+    const { reason: _r, failingSince: _f, pending: _p, dated: _d, inputHash, ...rest } = prev;
+    const next = { ...rest, ...stored({ inputHash, dated: prev.dated }, ctx.today), status: statusOf(prev.events) };
+    return { kind: "keep", next: { ...next, checkedAt: now }, result: "unveraendert" };
   }
-  if (prev?.pending?.inputHash === key) {
+  if (prev?.pending && sameKey(prev.pending, key, ctx.today)) {
     const { model, events } = prev.pending;
     return { kind: "keep", next: adopted(ctx, key, model, events), result: "pending-uebernommen" };
   }
@@ -175,7 +191,7 @@ export function planRefresh(ctx: RefreshContext): RefreshPlan {
   return { kind: "extract", key };
 }
 
-export function applyOutcome(ctx: RefreshContext, key: string, outcome: ExtractOutcome): RefreshApplied {
+export function applyOutcome(ctx: RefreshContext, key: ExtractKey, outcome: ExtractOutcome): RefreshApplied {
   if (outcome.kind === "abort") return { kind: "abort", abort: outcome.abort };
   if (outcome.kind === "fehler") return { kind: "write", next: failed(ctx, outcome.reason), result: "fehler" };
   return { kind: "write", ...adopt(ctx, key, outcome.model, assignVia(outcome.events, ctx.fetched.candidates)) };
@@ -184,15 +200,15 @@ export function applyOutcome(ctx: RefreshContext, key: string, outcome: ExtractO
 /** Neue Events übernehmen oder als Einbruch zurückhalten (E5). */
 function adopt(
   ctx: RefreshContext,
-  key: string,
+  key: ExtractKey,
   model: string,
   events: RawEvent[],
 ): { next: ProviderRaw; result: "extrahiert" | "einbruch" } {
   const { prev, now } = ctx;
-  const old = prev?.inputHash !== undefined ? eventUnits(prev.events) : ctx.prevOfferCount;
-  const fresh = eventUnits(events);
+  const old = prev?.inputHash !== undefined ? eventUnits(prev.events, ctx.today) : ctx.prevOfferCount;
+  const fresh = eventUnits(events, ctx.today);
   if (old >= COLLAPSE_MIN_OLD && fresh < old / 2) {
-    const pending = { inputHash: key, model, events };
+    const pending = { ...stored({ inputHash: key.hash, dated: key.dated }, ctx.today), model, events };
     const next: ProviderRaw =
       prev?.inputHash !== undefined
         ? { ...prev, pending }

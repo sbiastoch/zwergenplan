@@ -56,6 +56,7 @@ export const RawBatch = z.strictObject({
 export type RawBatch = z.infer<typeof RawBatch>;
 
 const Instant = z.iso.datetime({ offset: true, local: false });
+const DatedKey = z.record(z.iso.date(), z.string().min(1));
 
 /**
  * Zustand je Anbieter in `data/raw/<providerId>.json` (Plan 0032, E5): dauerhafter Zustand der Pipeline, kein
@@ -72,6 +73,11 @@ export const ProviderRaw = z
      * wurde (erster Lauf mit Fehler oder zurückgehaltenem Einbruch); dann gilt für `build` der Vorstand.
      */
     inputHash: z.string().min(1).optional(),
+    /**
+     * Datierte Bestandteile der Eingabe (`ExtractKey.dated`): je letztem Tag ab dem Lauf ein Hash. Verglichen wird nur
+     * ab heute, so ändern vergangene Termine den Schlüssel nicht (Plan 0032, Kostenhebel). Nur mit `inputHash`.
+     */
+    dated: DatedKey.optional(),
     /** Modell, das `events` geliefert hat (bei Fallback das Fallback-Modell) */
     model: z.string().min(1).optional(),
     status: ProviderCheck.shape.status,
@@ -87,7 +93,12 @@ export const ProviderRaw = z
     sources: z.array(z.enum(SOURCES)),
     /** zurückgehaltener Einbruch (E5): wird übernommen, wenn die nächste Nacht dieselbe Eingabe liefert */
     pending: z
-      .strictObject({ inputHash: z.string().min(1), model: z.string().min(1), events: z.array(RawEvent) })
+      .strictObject({
+        inputHash: z.string().min(1),
+        dated: DatedKey.optional(),
+        model: z.string().min(1),
+        events: z.array(RawEvent),
+      })
       .optional(),
   })
   .superRefine((r, ctx) => {
@@ -99,6 +110,8 @@ export const ProviderRaw = z
       ctx.addIssue({ code: "custom", message: "failingSince nur bei status fehler", path: ["failingSince"] });
     if (r.inputHash === undefined && (r.events.length > 0 || r.status !== "fehler"))
       ctx.addIssue({ code: "custom", message: "ohne inputHash nur status fehler ohne Events", path: ["inputHash"] });
+    if (r.dated !== undefined && r.inputHash === undefined)
+      ctx.addIssue({ code: "custom", message: "dated nur mit inputHash", path: ["dated"] });
     if (
       (r.inputHash === undefined) !== (r.model === undefined) ||
       (r.inputHash === undefined) !== (r.changedAt === undefined)
