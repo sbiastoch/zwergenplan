@@ -9,7 +9,7 @@
  */
 import type { Offer, Provider } from "../../../src/domain/schema.ts";
 import type { Candidate, Source } from "./candidate.ts";
-import type { ExtractKeyParts, ExtractOutcome } from "./extract.ts";
+import type { CallRecord, ExtractKeyParts, ExtractOutcome } from "./extract.ts";
 import { catalogExcerpt, datedFrom, type ExtractKey, extractKey, sameKey } from "./normalize.ts";
 import type { ProviderRaw, RawEvent } from "./raw.ts";
 
@@ -195,6 +195,33 @@ export function applyOutcome(ctx: RefreshContext, key: ExtractKey, outcome: Extr
   if (outcome.kind === "abort") return { kind: "abort", abort: outcome.abort };
   if (outcome.kind === "fehler") return { kind: "write", next: failed(ctx, outcome.reason), result: "fehler" };
   return { kind: "write", ...adopt(ctx, key, outcome.model, assignVia(outcome.events, ctx.fetched.candidates)) };
+}
+
+/**
+ * Zweiter Versuch mit dem Fallback-Modell (Plan 0032, „Einbruch → ein Versuch mit dem Fallback-Modell“): nur nach einem
+ * Einbruch, an dem das Fallback-Modell nicht beteiligt war. Eine leere Antwort ist gültig, deshalb fragte der Ablauf aus
+ * E4 das Fallback-Modell sonst nie, und der Anbieter hinge am Einbruchschutz fest.
+ */
+export function needsStrongRetry(applied: RefreshApplied, calls: readonly CallRecord[]): boolean {
+  return applied.kind === "write" && applied.result === "einbruch" && !calls.some((c) => c.step === "fallback");
+}
+
+/**
+ * Einbruch, den das Fallback-Modell nicht bestätigen konnte (Fehler, Bremse, Zeitbudget): Bestand bleibt, aber **ohne**
+ * `pending`. Ein `pending` aus dem schwachen Modell übernähme die nächste Nacht bei gleicher Eingabe ungeprüft (E5);
+ * so versucht sie es stattdessen erneut (Plan-Review B1).
+ */
+export function unconfirmedCollapse(ctx: RefreshContext, why: string): RefreshApplied {
+  // auch ein älteres `pending` fällt weg: Es könnte bei Rückkehr zu seiner Eingabe sonst übernommen werden
+  const { pending: _p, ...next } = failed(ctx, `Einbruch nicht bestätigt (${why}), Bestand bleibt`);
+  return { kind: "write", next, result: "einbruch" };
+}
+
+/** Ergebnis nach dem zweiten Versuch: Sein Ergebnis gilt; `fehler` heißt unbestätigt. Ein Abbruch geht durch. */
+export function afterStrongRetry(ctx: RefreshContext, second: RefreshApplied): RefreshApplied {
+  return second.kind === "write" && second.result === "fehler"
+    ? unconfirmedCollapse(ctx, `Fallback-Modell: ${second.next.reason ?? "Fehler"}`)
+    : second;
 }
 
 /** Neue Events übernehmen oder als Einbruch zurückhalten (E5). */

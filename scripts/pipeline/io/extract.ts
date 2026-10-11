@@ -46,9 +46,12 @@ export interface ExtractorOptions {
   freeDays?: typeof loadFreeDays;
 }
 
+/** Fallback-Modell der Extraktion (E4): `LLM_MODEL_FALLBACK`, sonst Sonnet. */
+export const fallbackModelOf = (env: NodeJS.ProcessEnv): string => env["LLM_MODEL_FALLBACK"] ?? "sonnet";
+
 export function createExtractor(opts: ExtractorOptions = {}): Extractor {
   const model = opts.model ?? process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
-  const fallbackModel = opts.fallbackModel ?? process.env["LLM_MODEL_FALLBACK"] ?? "sonnet";
+  const fallbackModel = opts.fallbackModel ?? fallbackModelOf(process.env);
   const partMaxChars = opts.partMaxChars ?? PART_MAX_CHARS;
   const loadDays = opts.freeDays ?? loadFreeDays;
   const llmOpts: LlmOptions = { ...(opts.bin ? { bin: opts.bin } : {}), ...(opts.env ? { env: opts.env } : {}) };
@@ -84,9 +87,9 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
         ...(texts.length > 1 ? { part: { index: i + 1, count: texts.length } } : {}),
       }),
     );
-    return runExtractionInParts({
+    const r = await runExtractionInParts({
       providerId: input.provider.id,
-      model,
+      model: input.strong ? fallbackModel : model,
       fallbackModel,
       users,
       splitNotes: notes,
@@ -98,5 +101,6 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
           llmOpts,
         ),
     });
+    return input.strong ? { ...r, calls: r.calls.map((c) => ({ ...c, step: "fallback" as const })) } : r;
   };
 }

@@ -68,6 +68,7 @@ import {
   type ExtractInput,
   type ExtractOutcome,
   type ExtractResult,
+  fallbackModelOf,
 } from "./io/extract.ts";
 import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
 import { git, ROOT, readCatalog, readJson, readPreviousOffers, readRawDir, writeJson } from "./io/files.ts";
@@ -269,6 +270,7 @@ async function nightly() {
   const r = await runNightly({
     extractor: createExtractor({ model }),
     keyParts: { ...EXTRACT_KEY_PARTS, model },
+    strongRetry: model !== fallbackModelOf(process.env),
     budgetMin,
     brakes: brakes.brakes,
     dataDir: join(ROOT, "data"),

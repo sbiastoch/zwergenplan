@@ -2,17 +2,20 @@ import { describe, expect, it } from "vitest";
 import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import type { Candidate } from "./candidate.ts";
-import type { ExtractOutcome } from "./extract.ts";
+import type { CallRecord, ExtractOutcome } from "./extract.ts";
 import { catalogExcerpt, extractKey, ICAL_HEADING } from "./normalize.ts";
 import { ProviderRaw, RawEvent } from "./raw.ts";
 import {
+  afterStrongRetry,
   applyOutcome,
   assignVia,
   type FetchedProvider,
   NO_INPUT_MODEL,
+  needsStrongRetry,
   offerUnits,
   planRefresh,
   type RefreshContext,
+  unconfirmedCollapse,
 } from "./refresh.ts";
 
 const { providers } = loadFixtures();
@@ -357,6 +360,64 @@ describe("refresh: vergangene Termine ändern den Schlüssel nicht (Plan 0032, K
     expect(r.kind === "write" && r.result).toBe("extrahiert");
     const collapse = run(ctx({ prev: raw({ events: old }), fetched: changed }), ok([]));
     expect(collapse.kind === "write" && collapse.result).toBe("einbruch");
+  });
+});
+
+describe("refresh: Einbruch → ein Versuch mit dem Fallback-Modell (Plan 0032)", () => {
+  const call = (step: CallRecord["step"], model: string): CallRecord => ({
+    step,
+    providerId: provider.id,
+    model,
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheReadTokens: 0,
+    cacheCreationTokens: 0,
+    webSearchRequests: 0,
+    turns: 1,
+    durationMs: 1,
+    costUsd: null,
+    result: "ok",
+  });
+  const c = () => ctx({ fetched: changed });
+  const key = () => {
+    const plan = planRefresh(c());
+    if (plan.kind !== "extract") throw new Error("Aufruf erwartet");
+    return plan.key;
+  };
+  const collapse = () => applyOutcome(c(), key(), ok([]));
+
+  it("nur bei Einbruch und nur, wenn das Fallback-Modell nicht beteiligt war", () => {
+    expect(collapse()).toMatchObject({ kind: "write", result: "einbruch" });
+    expect(needsStrongRetry(collapse(), [call("extract", "haiku")])).toBe(true);
+    expect(needsStrongRetry(collapse(), [call("extract", "haiku"), call("fallback", "sonnet")])).toBe(false);
+    expect(needsStrongRetry(applyOutcome(c(), key(), ok(events(4))), [call("extract", "haiku")])).toBe(false);
+    expect(needsStrongRetry({ kind: "abort", abort: "limit" }, [])).toBe(false);
+  });
+
+  it("der zweite Versuch gilt; fehler heißt unbestätigt: Bestand ohne pending (Plan-Review B1); Abbruch geht durch", () => {
+    const full = applyOutcome(c(), key(), ok(events(4), "sonnet"));
+    expect(afterStrongRetry(c(), full)).toBe(full);
+    const again = applyOutcome(c(), key(), ok([], "sonnet"));
+    expect(afterStrongRetry(c(), again)).toBe(again);
+    const failed = afterStrongRetry(c(), applyOutcome(c(), key(), { kind: "fehler", reason: "Zeitüberschreitung" }));
+    expect(failed).toMatchObject({ kind: "write", result: "einbruch" });
+    const next = failed.kind === "write" ? ProviderRaw.parse(failed.next) : undefined;
+    expect(next?.pending).toBeUndefined();
+    expect(next?.events).toHaveLength(4);
+    expect(next?.reason).toBe("Einbruch nicht bestätigt (Fallback-Modell: Zeitüberschreitung), Bestand bleibt");
+    expect(afterStrongRetry(c(), { kind: "abort", abort: "auth" })).toEqual({ kind: "abort", abort: "auth" });
+  });
+
+  it("unbestätigt entfernt auch ein älteres pending (Arch-Review M1)", () => {
+    const prev = raw({ pending: { inputHash: "K1", model: "haiku", events: events(1, "Alt") } });
+    const held = unconfirmedCollapse(ctx({ fetched: changed, prev }), "Bremse");
+    expect(held.kind === "write" && held.next.pending).toBeUndefined();
+  });
+
+  it("unbestätigt: die nächste Nacht mit gleicher Eingabe extrahiert neu statt zu übernehmen", () => {
+    const held = unconfirmedCollapse(c(), "Bremse");
+    if (held.kind !== "write") throw new Error("write erwartet");
+    expect(planRefresh(ctx({ fetched: changed, prev: ProviderRaw.parse(held.next) })).kind).toBe("extract");
   });
 });
 
