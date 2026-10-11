@@ -507,3 +507,59 @@ Die 24-px-Variante sieht dem Mockup deutlich näher und genügt WCAG 2.5.8 (axe 
 - App-Schritt hell: Die „Teilen“-Marke im Hinweis hebt sich nur schwach vom Hintergrund ab (dunkel deutlich). Unverändert seit Plan 0033.
 
 Keine Fehler gefunden, die eine Codeänderung verlangen.
+
+## Nachtrag Nutzerfeedback (2026-10-11)
+
+Der Nutzer hat die live laufende Fassung (Plan 0033) auf dem Handy getestet. Umgesetzt als Fast-Track auf diesem Branch, je Punkt mit Anlass, Änderung und Test. Punkt 5 ändert E11 (siehe dort), E11 selbst bleibt als Stand der Freigabe stehen.
+
+**1. Dropdown lässt den Wizard wegscrollen (Bug)**
+
+- Anlass: „Nachdem man im Wizard einen Dropdown bedient hat, scrollt der Wizard weg und man sieht die Angebotsliste darunter.“ Betroffen ist die Stadtteil-Auswahl im Schritt „Weg“ („Weitere Städte“ gibt es erst ab der fünften Region).
+- Ursache: Gesperrt war der Hintergrund nur mit `html:has(dialog[open]) { overflow: hidden }` (`src/ui/styles/dialog.css`). Das sperrt das Scrollen per Finger, **nicht** das Scrollen per Skript oder durch den Browser selbst. Die Liste dahinter bleibt also scrollbar hoch. Öffnet der Picker (iOS: Rad bzw. Menü über der unteren Bildschirmhälfte) oder schließt er und das Feld behält den Fokus, scrollt der Browser das Dokument, um das Feld ins Bild zu holen. Bei iOS Safari verschiebt sich danach der feste Dialog gegen den sichtbaren Ausschnitt (bekannte Eigenheit von `position: fixed` nach Tastatur oder Picker), und der Ausschnitt bleibt stehen, weil der Nutzer wegen `overflow: hidden` nicht zurückscrollen kann. Darunter erscheint die Liste. Den nativen Picker kann Playwright nicht öffnen. Der Test stellt deshalb den Mechanismus nach: `window.scrollTo(0, 600)` nach der Wahl. Vor dem Fix ergab das auf `pixel-7` und `iphone-15` `scrollY = 600` (Test rot).
+- Änderung: Solange das Onboarding offen ist, hat das Dokument keine Scrollhöhe mehr: `html:has(dialog.onb[open]) body { position: fixed; inset: 0 0 auto }`. Ohne `overflow: hidden` am body, weil das Text-Gate (`expectTextFits`) sonst die verdeckte Liste als abgeschnitten meldet; ein fester Block trägt ohnehin nichts zur Scrollhöhe bei. Der Browser hat dann nichts, was er scrollen könnte, und der Dialog bleibt deckend an seinem Ort. Die Regel gilt nur fürs Onboarding: Dort verdeckt das Cover die Seite ohnehin, und das Ende „fertig“ springt sowieso nach oben. Bei Sheets und Detail ginge die Scrollposition der Liste verloren. Restrisiko: Wer das Onboarding über das Kind-Sheet erneut öffnet und mit „Überspringen“ schließt, steht danach oben in der Liste.
+- Test: `e2e/onboarding.spec.ts`, „Nachtrag 2026-10-11“, N1 (`pixel-7`, `iphone-15`): Nach `selectOption` und dem Scroll per Skript ist `scrollY` 0, der Dialog deckt den Viewport (oben 0, unten ≥ Höhe), an vier Punkten liegt der Dialog oben (`elementFromPoint`). N2 prüft dasselbe mit gefundenem Standort.
+
+**2. Gefundener Standort im Schritt „Weg“**
+
+- Anlass: Nutzerwunsch. Ist der Standort gefunden, soll die Stadtteil-Auswahl verschwinden, stattdessen der Standort mit einem Knopf zum Löschen.
+- Änderung: `WayStep` (`src/ui/onboarding/steps.tsx`) zeigt bei wirkendem Standort (dieselbe Regel wie `OriginPicker` im Kind-Sheet, Plan 0022: Standort, kein Problem, nicht außerhalb des Stadtgebiets) „Dein Standort“ und den Knopf „Standort entfernen“ (`.btn`, 44 px). Der Knopf ruft `originApi.clear` in `flushSync` und gibt den Fokus an die Stadtteil-Auswahl, die danach wieder neben dem Standort-Knopf steht (wie „Startpunkt entfernen“ im Kind-Sheet). Unter „Dein Standort“ steht klein der nächste Stadtteil (Punkt 8). Der Hinweis „Wegzeit ab deinem Standort (auf ca. 100 m gerundet).“ bleibt darunter. Texte in `ONBOARDING_TEXTS` (`locatedLabel`, `clearLocation`).
+- Test: N2 (`pixel-7`, `iphone-15`, Geolocation per `context.setGeolocation` wie `e2e/startpunkt.spec.ts`): Auswahl weg, „Dein Standort“ und Hinweis da, Knopf ≥ 44 × 44; nach dem Entfernen Fokus auf der Auswahl, Stadtteil wählbar und gespeichert (`zwergenplan.entfernung-ab`).
+
+**3. Lead im Schritt „Weg“**
+
+- Anlass: Nutzerentscheid.
+- Änderung: „Ich zeige, wie lange ihr mit Bus und Bahn braucht – mit höchstens einem Umstieg.“ statt „Fahrzeit nach echtem VGN-Fahrplan, …“ (`stepText`).
+- Test: `src/domain/onboarding.test.ts` („Alter und Weg“), E2E N2.
+
+**4. Name der Push-Nachricht**
+
+- Anlass: Nutzerentscheid. „Samstags-Nachricht“ heißt nicht mehr so, und es soll klar sein, dass keine Mail kommt.
+- Änderung: Schalter „Wöchentliche Push-Nachricht“. Kicker des App-Schritts ohne Installationsteil „Einmal pro Woche“, Lead „Einmal pro Woche eine Push-Nachricht, was es Neues für euch gibt.“, mit Installationsteil „… Und einmal pro Woche eine Push-Nachricht, …“. In `PUSH_TEXTS` und `APP_STEP_TEXTS` (`src/ui/app-extras/push-texts.ts`) steht kein Wochentag mehr: `switchSub` „Einmal pro Woche: …“, `added` „Kommt in die nächste Push-Nachricht.“, `addedOff` „Wirkt, sobald die wöchentliche Push-Nachricht an ist.“, `on`/`off`, `needsSwitch`, iOS-Hinweis. Statuszeile im App-Schritt „An. Die erste kommt in den nächsten Tagen.“: Der Versand läuft samstags 10:07 (`.github/workflows/push-weekly.yml`, Wächter Sa 10–14 Uhr), die erste kommt also spätestens nach sieben Tagen. Die Illustration im App-Schritt (`art.tsx`) zeigt „Diese Woche“ statt „Samstag, 10:00“. README, `docs/architecture.md` und ADR 0014 (Nachtrag) nennen den neuen Namen; die Versandzeit „samstags“ bleibt dort als Sachangabe. Der Text der Benachrichtigung selbst („… seit letztem Samstag“, `src/domain/push-payload.ts`) bleibt: Er kommt am Samstag und stimmt.
+- Textpassung: Bei 320 px und 200 % brach „Wöchentliche“ in der Schalterzeile mitten im Wort („Wöchentli|che“, `overflow-wrap: anywhere` der Dialoge). `.swtext` trennt jetzt mit `hyphens: auto` (`lang="de"`), im Kind-Sheet und im Onboarding.
+- Test: `src/ui/app-extras/push-texts.test.ts` (Name überall, kein „Samstag“ in den UI-Texten, Statuszeile), `src/domain/onboarding.test.ts`, Selektoren in `e2e/push.spec.ts`, `e2e/onboarding-push.spec.ts`, `e2e/onboarding-steps.ts`, `e2e/onboarding.spec.ts` (Test 7).
+
+**5. „Zurück“-Knopf statt Punkt-Knöpfen (ändert E11)**
+
+- Anlass: Nutzerentscheid nach dem Browser-Review (Bewertung der Punktreihe oben): Die Punkte sollen wieder eng wie im Mockup und reine Anzeige sein; zurück geht es über einen kleinen Knopf „Zurück“.
+- Änderung: Punkte wie vor E11 (`gap: 6px`, 9 px, gewählter Punkt 26 px, erledigte dunkel, `aria-hidden`). Ab Schritt 2 steht links in der Kopfzeile „‹ Zurück“ (`Icon name="back"`, 44 px hoch, ohne Wellenlinie, ruhiger als „Überspringen“). Auf Schritt 1 hält ein unsichtbarer Platzhalter gleicher Breite die Punkte an ihrer Stelle. Er geht einen Schritt zurück ohne Gleiten (wie die Knöpfe), Eingaben bleiben, der Fokus geht wie beim Wischen auf die Überschrift. Wischen bleibt. Das Mobile-UX-Gate `expectTouchTargets` gilt unverändert.
+- Sichtprüfung: 390 px hell und dunkel ruhig, „‹ Zurück“ links, Punkte daneben, „Überspringen“ rechts. Bei 320 px und 200 % rückt „Überspringen“ wie bisher unter die Punkte (Umbruch der Kopfzeile seit Plan 0033).
+- Test: Test 15g neu („Zurück“ fehlt auf Schritt 1, Punkte ohne Knöpfe und `aria-hidden`, Tipp und Tastatur führen zurück, Geburtsdatum bleibt, Ziel ≥ 44 × 44); Test 13 (Gates je Schritt, hell und dunkel, 320 px und 200 %).
+
+**6. Lead im Schritt „Alter“**
+
+- Anlass: Nutzerentscheid („Wir prüfen …“; die App spricht in Ich-Form, Plan 0033, E10).
+- Änderung: „Schluss mit dem Rechnen: Ich prüfe für jeden Termin, ob oder ab wann das Alter passt.“ statt „Auch bei regelmäßigen Treffs prüfe ich jeden einzelnen Termin.“
+- Test: `src/domain/onboarding.test.ts` („Alter und Weg“).
+
+**7. Altershinweis herzlich statt Rechnung**
+
+- Anlass: Nutzerwunsch. Der Hinweis nach der Eingabe („7 Monate! Treffs ab 8 Monaten zeige ich dir mit Terminen ab dem 21.10.“) war eine Rechen-Info.
+- Änderung: `ageHint(months)` (`src/domain/onboarding.ts`) gibt je Alter einen kurzen Satz: 0 „Willkommen auf der Welt!“, 1–2 „Ganz frisch dabei!“, 3–5 und 7–9 „Schon N Monate!“, 6 „Schon ein halbes Jahr!“, 10–11 „Bald ein Jahr!“, 12 „Ein ganzes Jahr – Glückwunsch!“, 13–17 „Schon über ein Jahr!“, 18 „Anderthalb Jahre!“, 19–23 „Bald zwei!“, 24–29 „Schon zwei!“, 30–32 „Zweieinhalb!“, 33–35 „Bald drei!“, ab 36 „Schon drei! Hier gibt’s vor allem Angebote bis 3.“ Ein Datum in der Zukunft bleibt bei der bestehenden Fehlermeldung (`useBirthDateInput`). `nextAgeStep` und `dateAtAge` sind damit ungenutzt und entfallen samt Tests, ebenso die Prop `offers` von `AgeStep`.
+- Test: Tabelle in `src/domain/onboarding.test.ts` (`it.each`, alle Grenzen); E2E Test 3, 10b, 11 erwarten „Schon 5 Monate!“.
+
+**8. Ermittelten Standort anzeigen (Onboarding und Kind-Sheet)**
+
+- Anlass: Nutzerwunsch: prüfen können, ob ein falscher Standort eingestellt ist.
+- Privatsphäre: Die Koordinate verlässt das Gerät nicht (ADR 0017), also kein Reverse-Geocoding bei Dritten. Gerechnet wird offline aus den Stadtteil-Punkten in `DISTRICTS`. Die Wegzeit-Tabelle (`wegzeit.json`) kennt Haltbereiche nur als Koordinaten, ohne Namen; eine Haltestelle lässt sich also nicht nennen, es bleibt beim Stadtteil.
+- Änderung: `nearestDistrictLabel(point)` (`src/domain/districts.ts`): „nächster Stadtteil: Altstadt“; liegt der nächste Stadtteil-Punkt weiter als 1,5 km weg, mit gerundeter Luftlinie („…, ca. 3 km“), damit ein Standort weit draußen auffällt. Onboarding: klein unter „Dein Standort“. Kind-Sheet (`OriginPicker`): „Startpunkt: **Mein Standort** (nächster Stadtteil: Altstadt)“, Löschen wie bisher über „Startpunkt entfernen“. Budget: `districts.ts` und `haversineMeters` liegen ohnehin im Start-Bundle, dazu kommen wenige Zeilen.
+- Test: `src/domain/districts.test.ts` (nah ohne, weit mit Entfernung); E2E N2 im Onboarding, `e2e/startpunkt.spec.ts` (Standort mit Freigabe: Anzeige im Kind-Sheet, weiter kein Request nach der Abfrage).

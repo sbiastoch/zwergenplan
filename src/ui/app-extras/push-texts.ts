@@ -26,8 +26,8 @@ export function searchLabel(search: string): string {
 }
 
 export const PUSH_TEXTS = {
-  switchLabel: "Samstags-Nachricht",
-  switchSub: "Samstags gegen 10 Uhr: was es Neues für euch gibt.",
+  switchLabel: "Wöchentliche Push-Nachricht",
+  switchSub: "Einmal pro Woche: was es Neues für euch gibt.",
   switching: "Wird eingeschaltet …",
   switchingOff: "Wird ausgeschaltet …",
   denied: "In den Einstellungen des Geräts erlaubt?",
@@ -35,29 +35,29 @@ export const PUSH_TEXTS = {
   subscribe: "Suche abonnieren",
   subscribed: "Abonniert",
   emptyFilter: "Wähle im Filter, was dich interessiert, und abonniere die Suche hier.",
-  added: "Abonniert. Kommt in die Nachricht am Samstag.",
-  addedOff: "Abonniert. Kommt in die Nachricht, sobald die Samstags-Nachricht an ist.",
-  addedNoOrigin: "Abonniert. Die Wegzeit wirkt in der Nachricht ab einem Startpunkt.",
+  added: "Abonniert. Kommt in die nächste Push-Nachricht.",
+  addedOff: "Abonniert. Wirkt, sobald die wöchentliche Push-Nachricht an ist.",
+  addedNoOrigin: "Abonniert. Die Wegzeit wirkt in der Push-Nachricht ab einem Startpunkt.",
   removed: "Such-Abo entfernt.",
   full: "Höchstens 5 Such-Abos. Erst eins entfernen.",
   listHeading: "Deine Such-Abos",
   noneWithAge: "Noch keine. Bis dahin zählt nur das Alter.",
   noneWithoutAge: "Noch keine. Bis dahin kommen alle neuen Angebote.",
   needsOrigin: "Wegzeit wirkt ab einem Startpunkt",
-  needsSwitch: "Kommt erst mit eingeschalteter Samstags-Nachricht.",
+  needsSwitch: "Kommt erst mit eingeschalteter wöchentlicher Push-Nachricht.",
   remove: "Entfernen",
   device: "Geräte-Kennung",
-  on: "Samstags-Nachricht ist an.",
-  off: "Samstags-Nachricht ist aus.",
+  on: "Wöchentliche Push-Nachricht ist an.",
+  off: "Wöchentliche Push-Nachricht ist aus.",
 } as const;
 
 /** Texte des App-Schritts im Onboarding (Plan 0033, E8); Schalter und Probleme wie oben */
 export const APP_STEP_TEXTS = {
   installed: "Geschafft! Liegt jetzt auf dem Startbildschirm.",
   iosNote:
-    "Auf dem iPhone kommt die Samstags-Nachricht nur in der installierten App. Darum frage ich das hier als Erstes. Die App hat einen eigenen Speicher, dort frage ich dann nach Alter und Startpunkt.",
+    "Auf dem iPhone kommt die wöchentliche Push-Nachricht nur in der installierten App. Darum frage ich das hier als Erstes. Die App hat einen eigenen Speicher, dort frage ich dann nach Alter und Startpunkt.",
   off: "Aus. Jederzeit änderbar.",
-  on: "An. Die erste kommt am Samstag.",
+  on: "An. Die erste kommt in den nächsten Tagen.",
 } as const;
 
 export function problemText(problem: PushProblem): string {

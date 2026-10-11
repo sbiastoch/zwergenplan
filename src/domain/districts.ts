@@ -16,7 +16,8 @@
  * Die IDs sind fest: Sie stehen im localStorage (`zwergenplan.entfernung-ab`) und werden nie aus
  * dem Namen abgeleitet. Reihenfolge: alphabetisch nach Name, deutsche Sortierung.
  */
-import type { GeoPoint } from "./geo.ts";
+import { type GeoPoint, haversineMeters } from "./geo.ts";
+import { roundedDistance } from "./reach.ts";
 
 export interface District {
   id: string;
@@ -66,4 +67,28 @@ const BY_ID = new Map(DISTRICTS.map((d) => [d.id, d]));
 
 export function districtById(id: string): District | undefined {
   return BY_ID.get(id);
+}
+
+/** bis hier „nächster Stadtteil: X“ ohne Entfernung; Stadtteil-Punkte liegen in der Stadt ≈ 1–2 km auseinander */
+const NEAR_M = 1500;
+
+/**
+ * Ermittelter Standort in Worten (Nachtrag Plan 0034, 2026-10-11), damit ein falscher Standort auffällt. Offline aus
+ * den Stadtteil-Punkten, ohne Reverse-Geocoding: Die Koordinate verlässt das Gerät nie (ADR 0017). Haltestellen
+ * nennt die Wegzeit-Tabelle nicht beim Namen, darum nur der Stadtteil.
+ */
+export function nearestDistrictLabel(point: GeoPoint): string {
+  let best = DISTRICTS[0];
+  let bestM = Number.POSITIVE_INFINITY;
+  for (const d of DISTRICTS) {
+    const m = haversineMeters(point, d.point);
+    if (m < bestM) {
+      best = d;
+      bestM = m;
+    }
+  }
+  const label = `nächster Stadtteil: ${best?.name ?? ""}`;
+  if (bestM <= NEAR_M) return label;
+  const { value, unit } = roundedDistance(bestM);
+  return `${label}, ca. ${String(value).replace(".", ",")} ${unit}`;
 }

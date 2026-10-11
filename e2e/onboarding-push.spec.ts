@@ -40,7 +40,7 @@ test.describe("Test 5: App-Schritt mit Schalter (Chromium)", () => {
     await goTo(page, "app");
     await expectStep(page, 4, 4);
     await expect(intro(page).getByText("Im Browser-Menü „App installieren“ wählen.")).toBeVisible();
-    const toggle = intro(page).getByRole("switch", { name: "Samstags-Nachricht" });
+    const toggle = intro(page).getByRole("switch", { name: "Wöchentliche Push-Nachricht" });
     await expect(toggle).toHaveAttribute("aria-checked", "false");
     await expect(toggle).toBeEnabled();
     await expect(intro(page)).toContainText("Aus. Jederzeit änderbar.");
@@ -64,7 +64,7 @@ test.describe("Test 5: App-Schritt mit Schalter (Chromium)", () => {
     await opened(page);
     await goTo(page, "app");
     await expectStep(page, 4, 4);
-    const toggle = intro(page).getByRole("switch", { name: "Samstags-Nachricht" });
+    const toggle = intro(page).getByRole("switch", { name: "Wöchentliche Push-Nachricht" });
     const box = await toggle.boundingBox();
     if (!box) throw new Error("Schalter ohne Box");
     const y = box.y + box.height / 2;
@@ -115,9 +115,9 @@ test.describe("Test 6: Desktop mit Push", () => {
 
   test("App-Schritt nur mit Schalter: „Neues kommt von selbst“", async ({ page }) => {
     await opened(page);
-    expect(await stepOrder(page)).toEqual(["Willkommen", "Passt zum Alter", "Gut erreichbar", "Samstags-Nachricht"]);
+    expect(await stepOrder(page)).toEqual(["Willkommen", "Passt zum Alter", "Gut erreichbar", "Einmal pro Woche"]);
     await expect(title(page)).toHaveText(/Neues kommt von selbst$/);
-    await expect(intro(page).getByRole("switch", { name: "Samstags-Nachricht" })).toBeVisible();
+    await expect(intro(page).getByRole("switch", { name: "Wöchentliche Push-Nachricht" })).toBeVisible();
     await expect(intro(page).getByRole("button", { name: "Zum Startbildschirm hinzufügen" })).toHaveCount(0);
     await expect(intro(page).locator(".onb-data")).not.toContainText("Browser-Menü");
   });

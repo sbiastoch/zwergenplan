@@ -1,10 +1,9 @@
 /**
  * Onboarding beim ersten Öffnen (Plan 0033): Schritte und Reihenfolge (E1), Stadt-Kacheln und Willkommenszahlen (E5),
- * Alterstipp (E6), Wegzeit-Chips (E7), Knopf-Beschriftungen (E9) und Texte (E10). Rein; nur im Lazy-Chunk
+ * Altershinweis (E6), Wegzeit-Chips (E7), Knopf-Beschriftungen (E9) und Texte (E10). Rein; nur im Lazy-Chunk
  * `assets/onboarding/` (Regel `onboarding-domain-only-lazy`). Ob es erscheint, entscheidet `onboarding-gate.ts` im Start.
  * Aus `pwa.ts` kommen nur Typen, sonst entstünde ein geteilter Chunk mit dem App-Teil (Review M2).
  */
-import { ageInMonths, fittingSessions } from "./age.ts";
 import { nextSession } from "./agenda.ts";
 import { plural } from "./labels.ts";
 import { countProviders } from "./provider-count.ts";
@@ -12,7 +11,6 @@ import type { InstallState, PushCapability } from "./pwa.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "./reach.ts";
 import type { Region } from "./regions.ts";
 import type { Offer } from "./schema.ts";
-import { addMonths, parseIsoDate } from "./time.ts";
 
 export type StepId = "stadt" | "alter" | "weg" | "app";
 
@@ -83,40 +81,23 @@ export function welcomeStats(offers: readonly Offer[], now: Date): { offers: num
 }
 
 /**
- * Der Tag, an dem ein Kind `months` Monate alt wird (ISO). Am Monatsende geklemmt wie in `ageInMonths`, also gilt
- * `ageInMonths(b, dateAtAge(b, m)) === m` und am Vortag `m - 1`.
+ * Hinweis unter dem Geburtsdatum (E10; Nachtrag Plan 0034, 2026-10-11): kurz und herzlich je Alter statt einer
+ * Rechnung. Ab 3 Jahren ehrlich: Der Zwergenplan ist für Kinder unter 3.
  */
-export function dateAtAge(birthDate: string, months: number): string {
-  return addMonths(birthDate, months);
-}
-
-/**
- * Nächste Altersstufe mit Treffs (E6): das kleinste Mindestalter über dem heutigen Alter unter den regelmäßigen
- * Angeboten, die mindestens einen passenden kommenden Termin haben. Die Liste stellt ein solches Angebot an diesen
- * Termin (Plan 0028). Kurse und Einzeltermine zählen nicht.
- */
-export function nextAgeStep(
-  offers: readonly Offer[],
-  birthDate: string,
-  now: Date,
-): { months: number; from: string } | undefined {
-  const age = ageInMonths(birthDate, now);
-  let best: number | undefined;
-  for (const offer of offers) {
-    const min = offer.age?.minMonths;
-    if (offer.format !== "regelmaessig" || min === undefined || min <= age) continue;
-    if (best !== undefined && min >= best) continue;
-    if (fittingSessions(offer, now, birthDate).length > 0) best = min;
-  }
-  return best === undefined ? undefined : { months: best, from: dateAtAge(birthDate, best) };
-}
-
-/** Hinweis unter dem Geburtsdatum (E10): „5 Monate! …“, Datum wie `dayDots` ohne führende Null */
-export function ageHint(months: number, next?: { months: number; from: string }): string {
-  const age = months === 0 ? "Neugeboren!" : `${plural(months, "Monat", "Monate")}!`;
-  if (!next) return `${age} Ab jetzt siehst du nur, was passt.`;
-  const { day, month } = parseIsoDate(next.from);
-  return `${age} Treffs ab ${plural(next.months, "Monat", "Monaten")} zeige ich dir mit Terminen ab dem ${day}.${month}.`;
+export function ageHint(months: number): string {
+  if (months < 1) return "Willkommen auf der Welt!";
+  if (months < 3) return "Ganz frisch dabei!";
+  if (months === 6) return "Schon ein halbes Jahr!";
+  if (months < 10) return `Schon ${months} Monate!`;
+  if (months < 12) return "Bald ein Jahr!";
+  if (months === 12) return "Ein ganzes Jahr – Glückwunsch!";
+  if (months < 18) return "Schon über ein Jahr!";
+  if (months === 18) return "Anderthalb Jahre!";
+  if (months < 24) return "Bald zwei!";
+  if (months < 30) return "Schon zwei!";
+  if (months < 33) return "Zweieinhalb!";
+  if (months < 36) return "Bald drei!";
+  return "Schon drei! Hier gibt’s vor allem Angebote bis 3.";
 }
 
 /** Chips „Höchstens unterwegs“ (E7); „Egal“ heißt ohne Grenze */
@@ -145,18 +126,22 @@ interface StepText {
   lead: string;
 }
 
-const SATURDAY = "gegen 10 Uhr eine Nachricht, was es Neues für euch gibt.";
+const WEEKLY = "einmal pro Woche eine Push-Nachricht, was es Neues für euch gibt.";
 
 function appText(app: AppStepParts | undefined): StepText {
   const push = app?.push === "schalter" || app?.push === "nur-in-app";
   if (app?.install === undefined) {
-    return { kicker: "Samstags-Nachricht", title: "Neues kommt von selbst", lead: `Samstags ${SATURDAY}` };
+    return {
+      kicker: "Einmal pro Woche",
+      title: "Neues kommt von selbst",
+      lead: "Einmal pro Woche eine Push-Nachricht, was es Neues für euch gibt.",
+    };
   }
   return {
     kicker: "Immer griffbereit",
     title: "Ein Tipp, und ich bin da",
     lead: push
-      ? `Auf dem Startbildschirm wie eine App. Und samstags ${SATURDAY}`
+      ? `Auf dem Startbildschirm wie eine App. Und ${WEEKLY}`
       : "Auf dem Startbildschirm wie eine App, mit eigenem Symbol und ohne Browserleiste.",
   };
 }
@@ -186,13 +171,13 @@ export function stepText(
       return {
         kicker: "Passt zum Alter",
         title: "Nur, was zu deinem Zwerg passt",
-        lead: "Auch bei regelmäßigen Treffs prüfe ich jeden einzelnen Termin.",
+        lead: "Schluss mit dem Rechnen: Ich prüfe für jeden Termin, ob oder ab wann das Alter passt.",
       };
     case "weg":
       return {
         kicker: "Gut erreichbar",
         title: "Nur, was ihr mit Bus und Bahn schafft",
-        lead: "Fahrzeit nach echtem VGN-Fahrplan, mit höchstens einem Umstieg.",
+        lead: "Ich zeige, wie lange ihr mit Bus und Bahn braucht – mit höchstens einem Umstieg.",
       };
     case "app": {
       const text = appText(ctx.app);
@@ -206,6 +191,7 @@ export const ONBOARDING_TEXTS = {
   dialog: "Einführung",
   skip: "Überspringen",
   later: "Später",
+  back: "Zurück",
   cityLabel: "Eure Stadt",
   cityGroup: "Stadt",
   moreCities: "Weitere Städte",
@@ -216,6 +202,8 @@ export const ONBOARDING_TEXTS = {
   locate: "Standort",
   locating: "Suche …",
   located: "Gefunden",
+  locatedLabel: "Dein Standort",
+  clearLocation: "Standort entfernen",
   district: "Stadtteil",
   districtEmpty: "Stadtteil …",
   limitLabel: "Höchstens unterwegs",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DISTRICTS, districtById } from "./districts.ts";
+import { DISTRICTS, districtById, nearestDistrictLabel } from "./districts.ts";
 import { inBounds } from "./geo.ts";
 
 describe("DISTRICTS", () => {
@@ -40,5 +40,21 @@ describe("DISTRICTS", () => {
   it("kennt unbekannte IDs nicht", () => {
     expect(districtById("unbekannt")).toBeUndefined();
     expect(districtById("")).toBeUndefined();
+  });
+});
+
+describe("nearestDistrictLabel (Nachtrag Plan 0034, 2026-10-11: ermittelten Standort zeigen, offline)", () => {
+  it("nennt den nächsten Stadtteil-Punkt; bis 1,5 km ohne Entfernung", () => {
+    expect(nearestDistrictLabel({ lat: 49.452, lon: 11.077 })).toBe("nächster Stadtteil: Altstadt");
+    expect(nearestDistrictLabel({ lat: 49.448, lon: 11.058 })).toBe("nächster Stadtteil: Gostenhof");
+  });
+
+  it("weiter weg mit gerundeter Luftlinie, damit ein falscher Standort auffällt", () => {
+    // Fürth Rathaus, ≈ 3 km vom nächsten Nürnberger Stadtteil-Punkt
+    expect(nearestDistrictLabel({ lat: 49.477, lon: 10.989 })).toMatch(
+      /^nächster Stadtteil: [^,]+, ca\. \d+(,\d)? km$/,
+    );
+    // Berlin
+    expect(nearestDistrictLabel({ lat: 52.52, lon: 13.405 })).toMatch(/^nächster Stadtteil: [^,]+, ca\. \d+ km$/);
   });
 });
