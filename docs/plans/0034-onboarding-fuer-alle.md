@@ -392,6 +392,11 @@ Entscheidung des Auftraggebers (2026-10-11): Wischen ist eine Geste ohne Alterna
 - **Zurück ohne Wischen** – entschieden (2026-10-11, vom Auftraggeber nach Review Runde 2, m7): Fortschrittspunkte früherer Schritte als Knöpfe (E11).
 - Keine weiteren offenen Nutzerentscheide. Im Browser-Review dem Nutzer zeigen: Wischen auf dem letzten Schritt endet nicht, Zurück per Punkt statt eigenem Knopf.
 
+## Umsetzung
+
+- **S0** (a4739b2, Code = `main` 9a4a894): `JS (initial)` 100,352 kB, `CSS` 12,126 kB, `Onboarding JS (lazy)` 6,289 kB, `Onboarding CSS (lazy)` 2,064 kB, `App-Extras JS (lazy)` 7,449 kB (von 7,6 kB).
+- **S1**: wie geplant. `pnpm verify` grün (`pnpm arch` erlaubt `src/data/preferences.test.ts` → `e2e/onboarding-flag.ts` und `scripts/screenshots.ts` → `e2e/`). `e2e/onboarding-flag.ts` hängt über `e2e/fixtures.ts` an jeder Spec, `--affected` wählt deshalb die volle Auswahl und fährt lokal nur `app`, `theme` und die direkt getroffenen Specs (139 grün); `onboarding.spec.ts` und `startpunkt.spec.ts` zusätzlich von Hand auf `pixel-7` (67 grün, 3 übersprungen). Abweichungen: Test 10c und der Deep-Link-Zusatz setzen den alten Wert „1“ per Init-Skript mit `sessionStorage`-Wächter; `stepText` bekommt `first` als Pflichtfeld, „App“ als Schritt 1 heißt in jeder Variante „Willkommen“. Zwischen S1 und S2 ist Test 12 „leere Bühne“ auf `iphone-15` erwartbar rot (gelbe Ladebühne vor lila App-Bühne), S2 behebt das; nicht gepusht.
+
 ## Review (2026-10-11) – Verdict: Überarbeiten
 
 Unabhängiger Plan-Review (`/plan-review`), Befunde bewertet vom Auftraggeber.

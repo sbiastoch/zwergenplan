@@ -1,11 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ONBOARDING_FLAG } from "../../e2e/onboarding-flag.ts";
 import {
-  hasStoredData,
   loadOnboardingDone,
   loadOriginDistrict,
   loadOriginPoint,
   loadSavedProviders,
-  SEARCHES_KEY,
   saveOnboardingDone,
   saveOrigin,
   saveSavedProviders,
@@ -180,8 +179,8 @@ describe("gemerkte Anbieter: nur die Form (Plan 0025, E1)", () => {
   });
 });
 
-describe("Onboarding-Flag und gespeicherte Angaben (Plan 0033, E2)", () => {
-  const FLAG = "zwergenplan.einfuehrung";
+describe("Onboarding-Flag (Plan 0033, E2; Plan 0034, E4)", () => {
+  const FLAG = ONBOARDING_FLAG.key;
   let storage: ReturnType<typeof fakeStorage>;
 
   beforeEach(() => {
@@ -193,37 +192,20 @@ describe("Onboarding-Flag und gespeicherte Angaben (Plan 0033, E2)", () => {
     vi.unstubAllGlobals();
   });
 
-  it("speichert das Flag als Version „1“; jeder vorhandene Wert zählt als erledigt", () => {
+  it("speichert genau den Wert aus e2e/onboarding-flag.ts (E2E und Screenshots nutzen ihn)", () => {
     expect(loadOnboardingDone()).toBe(false);
     saveOnboardingDone();
-    expect([...storage.data]).toEqual([[FLAG, "1"]]);
+    expect([...storage.data]).toEqual([[ONBOARDING_FLAG.key, ONBOARDING_FLAG.value]]);
     expect(loadOnboardingDone()).toBe(true);
+  });
+
+  it("erledigt nur bei Version „2“: „1“ (still gesetzt seit ecfccfb), „3“ und leer zählen nicht", () => {
     storage.data.set(FLAG, "2");
     expect(loadOnboardingDone()).toBe(true);
-  });
-
-  it("jeder Schlüssel der Angaben und die Such-Abos zählen als gespeichert", () => {
-    for (const key of [
-      "zwergenplan.geburtsdatum",
-      "zwergenplan.merkliste",
-      "zwergenplan.anbieter-merkliste",
-      "zwergenplan.darstellung",
-      "zwergenplan.entfernung-ab",
-      "zwergenplan.startpunkt",
-      SEARCHES_KEY,
-    ]) {
-      storage.data.clear();
-      expect(hasStoredData()).toBe(false);
-      storage.data.set(key, "x");
-      expect(hasStoredData(), key).toBe(true);
+    for (const value of ["1", "3", ""]) {
+      storage.data.set(FLAG, value);
+      expect(loadOnboardingDone(), value).toBe(false);
     }
-    expect(SEARCHES_KEY).toBe("zwergenplan.such-abos");
-  });
-
-  it("das Flag allein und fremde Schlüssel zählen nicht als Angabe", () => {
-    storage.data.set(FLAG, "1");
-    storage.data.set("anderes", "x");
-    expect(hasStoredData()).toBe(false);
   });
 
   it("Speicher nutzbar: Probe hinterlässt nichts", () => {
@@ -231,7 +213,7 @@ describe("Onboarding-Flag und gespeicherte Angaben (Plan 0033, E2)", () => {
     expect(storage.data.size).toBe(0);
   });
 
-  it("Speicher wirft: nichts gespeichert, nicht erledigt, nicht nutzbar", () => {
+  it("Speicher wirft: nicht erledigt, nicht nutzbar", () => {
     vi.stubGlobal("localStorage", {
       getItem: () => {
         throw new DOMException("gesperrt", "SecurityError");
@@ -243,7 +225,6 @@ describe("Onboarding-Flag und gespeicherte Angaben (Plan 0033, E2)", () => {
         throw new DOMException("gesperrt", "SecurityError");
       },
     });
-    expect(hasStoredData()).toBe(false);
     expect(loadOnboardingDone()).toBe(false);
     expect(storageUsable()).toBe(false);
     expect(() => saveOnboardingDone()).not.toThrow();

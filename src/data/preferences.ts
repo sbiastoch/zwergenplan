@@ -1,7 +1,7 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, gemerkte Anbieter, Darstellung,
  * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
- * Plan 0033, E2). Nichts davon gelangt in URL,
+ * Plan 0033, E2; versioniert seit Plan 0034, E4). Die Such-Abos liegen in `searches-store.ts`. Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
  */
@@ -16,10 +16,11 @@ const KEYS = {
 } as const;
 
 /**
- * Schlüssel der Such-Abos. Sie liegen im Lazy-Chunk (`searches-store.ts`), der den Namen von hier importiert; so
- * zählt `hasStoredData` sie auch nach einer Umbenennung (Plan 0033, E2, Arch-Review m2).
+ * Version des Flags „Onboarding erledigt“ (Plan 0034, E4). `"1"` wurde ab ecfccfb auch still an Bestandsnutzer vergeben
+ * (Plan 0033, Gate „still-erledigt“); erst `"2"` heißt „gesehen oder übersprungen“. Eine Erhöhung zeigt das Onboarding
+ * allen einmal erneut. E2E und Screenshots nutzen denselben Wert (`e2e/onboarding-flag.ts`, gekoppelt per Unit-Test).
  */
-export const SEARCHES_KEY = "zwergenplan.such-abos";
+const ONBOARDING_VERSION = "2";
 
 function read(key: string): string | null {
   try {
@@ -138,21 +139,13 @@ export function saveOrigin(value: string | StoredOriginPoint | undefined): void 
   );
 }
 
-/** Onboarding erledigt (Plan 0033, E2)? Jeder vorhandene Wert zählt; der Wert ist eine Version für später. */
+/** Onboarding erledigt? Nur die aktuelle Version zählt, exakt verglichen (Plan 0034, E4). */
 export function loadOnboardingDone(): boolean {
-  return read(KEYS.onboarding) !== null;
+  return read(KEYS.onboarding) === ONBOARDING_VERSION;
 }
 
 export function saveOnboardingDone(): void {
-  write(KEYS.onboarding, "1");
-}
-
-/**
- * Hat dieses Gerät schon Angaben gespeichert (Bestandsnutzer, E2)? Jeder Schlüssel außer dem Flag, dazu die Such-Abos:
- * Ein Such-Abo geht auch ohne andere Angaben.
- */
-export function hasStoredData(): boolean {
-  return [...Object.values(KEYS), SEARCHES_KEY].some((key) => key !== KEYS.onboarding && read(key) !== null);
+  write(KEYS.onboarding, ONBOARDING_VERSION);
 }
 
 /** Schreib- und Leseprobe (E2, Arch-Review m3): Ohne nutzbaren Speicher käme das Onboarding bei jedem Besuch. */
