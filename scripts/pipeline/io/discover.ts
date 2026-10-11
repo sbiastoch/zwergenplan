@@ -30,9 +30,11 @@ import {
   directoryFinds,
   dryRunCatalogIssues,
   entryFromAssessment,
+  type FetchedFind,
   type Find,
   findsFromSearch,
   hostOf,
+  isPdf,
   newProviderCommitMessage,
   parseAssessment,
   postpone,
@@ -77,6 +79,8 @@ export interface DiscoverDeps {
   search(term: string, regionName: string, signal: AbortSignal): Promise<StepReply>;
   assess(find: Find, message: string, signal: AbortSignal): Promise<StepReply>;
   fetchPage(url: string, opts?: { timeoutMs?: number; retries?: number }): Promise<FetchedPage>;
+  /** Text eines PDF über `pdftotext` wie im Abruf des Nachtlaufs (`io/fetch-inputs.ts`) */
+  fetchPdfText(url: string): Promise<string>;
   geocode(address: string): Promise<GeoResult | undefined>;
   extractor: Extractor;
   fetchInputs: typeof fetchInputs;
@@ -341,20 +345,25 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       }
 
       let page: FetchedPage;
+      let fetchedFind: FetchedFind;
       try {
         page = await o.deps.fetchPage(find.url);
         if (page.status >= 400) throw new Error(`HTTP ${page.status}`);
+        if (isPdf(page.contentType, page.finalUrl)) {
+          // PDF wie im Abruf des Nachtlaufs über pdftotext (Nutzerentscheid nach dem Trockenlauf); ohne Links
+          const text = await o.deps.fetchPdfText(page.finalUrl);
+          if (text.trim() === "") throw new Error("leeres PDF");
+          fetchedFind = { finalUrl: page.finalUrl, text, links: [] };
+        } else {
+          const extracted = extractPage(page.body, page.finalUrl);
+          const wall = botWall(extracted.text);
+          if (wall) throw new Error(wall);
+          fetchedFind = { finalUrl: page.finalUrl, text: extracted.text, links: extracted.links };
+        }
       } catch (e) {
         reject(find, `Seite nicht abrufbar: ${reasonOf(e)}`, true);
         continue;
       }
-      const extracted = extractPage(page.body, page.finalUrl);
-      const wall = botWall(extracted.text);
-      if (wall) {
-        reject(find, `Seite nicht abrufbar: ${wall}`, true);
-        continue;
-      }
-      const fetchedFind = { finalUrl: page.finalUrl, text: extracted.text, links: extracted.links };
       // Kontakt- oder Adressseiten derselben Website (Nutzerentscheid Option A); ein Fehler kostet nur diese Seite
       const extra: Array<{ url: string; text: string }> = [];
       for (const url of contactLinks(fetchedFind)) {
@@ -454,6 +463,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         find,
         grund: assessed.grund,
         first: { title: proof.first.title, start: proof.start, url: proof.first.url },
+        ...(built.notes.length > 0 ? { notes: built.notes } : {}),
       };
       const nextText = appendEntries(catalogText, [entry]);
       mkdirSync(dirname(outCatalog), { recursive: true });

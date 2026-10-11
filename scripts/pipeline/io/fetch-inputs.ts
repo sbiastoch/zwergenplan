@@ -51,6 +51,18 @@ function pdftotext(bytes: Uint8Array): Promise<string> {
   });
 }
 
+/** PDF abrufen und über `pdftotext` lesen; HTTP ≥ 400 und leeres PDF sind Fehler. Auch fürs Bewerten (Entdecken). */
+async function fetchPdf(url: string): Promise<{ text: string; finalUrl: string }> {
+  const res = await fetchBytes(url);
+  if (res.status >= 400) throw new Error(`HTTP ${res.status}`);
+  const text = await pdftotext(res.bytes);
+  if (text.trim() === "") throw new Error("leeres PDF");
+  return { text, finalUrl: res.finalUrl };
+}
+
+/** Text eines PDF (Entdecken, `DiscoverDeps.fetchPdfText`) */
+export const fetchPdfText = async (url: string): Promise<string> => (await fetchPdf(url)).text;
+
 /** Bot-Schutz zählt als Fehler (vor dem HTTP-Status, damit der Grund lesbar ist). */
 function checked(status: number, text: string): string {
   const wall = botWall(text);
@@ -63,18 +75,11 @@ async function fetchTask(
   task: PageTask,
   browser: ReturnType<typeof browserSession>,
 ): Promise<{ text: string; finalUrl: string }> {
-  const httpError = (status: number) => new Error(`HTTP ${status}`);
   if (task.render === "browser") {
     const page = await browser.render(task.url);
     return { text: checked(page.status, programmeText("html", page.body, page.finalUrl)), finalUrl: page.finalUrl };
   }
-  if (task.kind === "pdf") {
-    const res = await fetchBytes(task.url);
-    if (res.status >= 400) throw httpError(res.status);
-    const text = await pdftotext(res.bytes);
-    if (text.trim() === "") throw new Error("leeres PDF");
-    return { text, finalUrl: res.finalUrl };
-  }
+  if (task.kind === "pdf") return fetchPdf(task.url);
   const headers =
     task.kind === "json-api"
       ? {

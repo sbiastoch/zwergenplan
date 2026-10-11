@@ -22,6 +22,7 @@ import { searchQuery } from "./discover-terms.ts";
 import type { CallRecord } from "./extract.ts";
 import { matchCandidate } from "./match.ts";
 import type { ProviderRaw } from "./raw.ts";
+import { isInternalHost } from "./redirect.ts";
 import { isRelevant } from "./relevance.ts";
 import { costSection } from "./report.ts";
 import { ratio } from "./similar.ts";
@@ -48,13 +49,11 @@ export interface Find {
   quelle: string;
 }
 
-/** Keine IP-Literale und kein `localhost`: Adressen aus Suche und Webseiten holt unser Abruf (Arch-Review S4, m8) */
-const INTERNAL_HOST = /^(localhost|[\d.]+|\[.*\])$|\.local(host)?$/i;
-
+/** Keine IP-Literale und kein `localhost` (`isInternalHost`, gemeinsam mit dem Abruf `io/http.ts`) */
 const parseUrl = (url: string): URL | undefined => {
   try {
     const u = new URL(url);
-    return (u.protocol === "http:" || u.protocol === "https:") && !INTERNAL_HOST.test(u.hostname) ? u : undefined;
+    return (u.protocol === "http:" || u.protocol === "https:") && !isInternalHost(u.hostname) ? u : undefined;
   } catch {
     return undefined;
   }
@@ -250,6 +249,10 @@ export const searchMessage = (term: string, regionName: string): string =>
 /** Text der abgerufenen Seite fürs Bewerten (der Abruf kürzt nur hier, das Bewerten braucht nicht alles) */
 const ASSESS_MAX_CHARS = 30_000;
 const ASSESS_MAX_LINKS = 200;
+
+/** PDF am Content-Type oder an der Endung: beim Bewerten über `pdftotext` lesen, nicht als HTML */
+export const isPdf = (contentType: string, url: string): boolean =>
+  /application\/pdf/i.test(contentType) || /\.pdf$/i.test(parseUrl(url)?.pathname ?? "");
 
 /** Seite eines Kandidaten nach dem Abruf (`extractPage`) */
 export interface FetchedFind {
@@ -464,8 +467,17 @@ export function entryFromAssessment(
   if (owner) return { ok: false, grund: `Programmseite steht schon im Katalog (${owner})` };
   const { bbox } = REGIONS[ctx.region];
   if (ctx.geos.length !== a.venues.length) return { ok: false, grund: "Orte ohne Koordinaten" };
-  if (ctx.geos.some((g) => !inBounds(g, bbox)))
-    return { ok: false, grund: `Ort außerhalb der Region ${REGIONS[ctx.region].name}` };
+  // Orte außerhalb der Region fallen weg (Nutzerentscheid 2026-10-11, wie „musikfuechse nur Nürnberg“); verworfen
+  // wird nur, wenn keiner übrig bleibt
+  const located = a.venues.map((v, i) => ({ v, g: ctx.geos[i] ?? { lat: 0, lon: 0 } }));
+  const inside = located.filter((x) => inBounds(x.g, bbox));
+  const outside = located.filter((x) => !inBounds(x.g, bbox));
+  if (inside.length === 0)
+    return {
+      ok: false,
+      grund: `kein Ort in der Region ${REGIONS[ctx.region].name} (außerhalb: ${outside.map((x) => x.v.address).join("; ")})`,
+    };
+  for (const x of outside) notes.push(`Ort außerhalb der Region weggelassen: ${x.v.name}, ${x.v.address}`);
 
   const reservedIds = ctx.reserved?.ids ?? new Set<string>();
   const id = catalogId(a.name, ctx.catalog, reservedIds);
@@ -503,8 +515,7 @@ export function entryFromAssessment(
     availability: { shown: a.availability },
     verified: ctx.today,
     notes: [`Entdeckt ${ctx.today} über ${ctx.find.quelle}: ${ctx.find.url} – ${ctx.grund}`.replaceAll(" | ", " / ")],
-    venues: a.venues.map((v, i) => {
-      const g = ctx.geos[i] ?? { lat: 0, lon: 0 };
+    venues: inside.map(({ v, g }) => {
       return {
         id: venueId(),
         name: v.name,
@@ -567,6 +578,8 @@ export interface Adopted {
   find: Find;
   grund: string;
   first: { title: string; start: string; url: string };
+  /** Hinweise zum Eintrag (weggelassene Orte und Programmseiten), auch im Commit-Text */
+  notes?: string[];
 }
 
 export interface RegionReport {
@@ -605,6 +618,7 @@ export function newProviderCommitMessage(a: Adopted): string {
     `Quelle: ${line(a.find.quelle)}`,
     `Grund: ${line(a.grund)}`,
     `Erstes Angebot: ${line(a.first.title)} am ${formatGermanDate(berlinIsoDate(a.first.start))} (${line(a.first.url)})`,
+    ...(a.notes ?? []).map((n) => `Hinweis: ${line(n)}`),
     "",
     "Plan 0032, E7 (pnpm pipeline discover)",
   ].join("\n");

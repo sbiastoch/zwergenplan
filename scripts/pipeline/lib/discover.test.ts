@@ -17,6 +17,7 @@ import {
   entryFromAssessment,
   type Find,
   findsFromSearch,
+  isPdf,
   newProviderCommitMessage,
   newProvidersIssue,
   normalizeUrl,
@@ -210,6 +211,14 @@ describe("directoryFinds (E7.1)", () => {
         quelle: `verzeichnis:${dir.id}`,
       },
     ]);
+  });
+});
+
+describe("isPdf", () => {
+  it("am Content-Type oder an der Endung .pdf", () => {
+    expect(isPdf("application/pdf", "https://a.example.net/x")).toBe(true);
+    expect(isPdf("application/octet-stream", "https://a.example.net/flyer.PDF?v=2")).toBe(true);
+    expect(isPdf("text/html; charset=utf-8", "https://a.example.net/kurse")).toBe(false);
   });
 });
 
@@ -468,10 +477,24 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
     expect(r).toEqual({ ok: false, grund: "Programmseite steht schon im Katalog (stadtbibliothek-beispiel)" });
   });
 
-  it("Ort außerhalb der Region: verworfen", () => {
+  it("einziger Ort außerhalb der Region: verworfen, der Grund nennt die Adresse", () => {
     const r = entryFromAssessment(assessed, { ...ctx, geos: [{ lat: 48.1, lon: 11.5 }] });
-    expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.grund).toMatch(/außerhalb der Region/);
+    expect(r).toEqual({
+      ok: false,
+      grund: "kein Ort in der Region Nürnberg (außerhalb: Kernstraße 3, 90429 Nürnberg)",
+    });
+  });
+
+  it("Orte außerhalb der Region werden weggelassen, mit Hinweis (wie „musikfuechse nur Nürnberg“)", () => {
+    const two = {
+      ...assessed,
+      venues: [{ name: "Bad Roth", address: "Badstraße 1, 91154 Roth" }, ...assessed.venues],
+    };
+    const r = entryFromAssessment(two, { ...ctx, geos: [{ lat: 49.24, lon: 11.09 }, ...ctx.geos] });
+    if (!r.ok) throw new Error(r.grund);
+    expect(r.entry.venues.map((v) => v.name)).toEqual(["Gemeindehaus Gostenhof"]);
+    expect(r.entry.venues[0]?.id).toBe("krabbelzwerge-gostenhof");
+    expect(r.notes).toContain("Ort außerhalb der Region weggelassen: Bad Roth, Badstraße 1, 91154 Roth");
   });
 });
 
@@ -565,6 +588,12 @@ describe("Bericht und Commit-Text (E7.8 G4, E10)", () => {
     expect(m).toMatch(/Fund-URL: https:\/\/krabbelzwerge\.example\.net\/kurse/);
     expect(m).toMatch(/Grund: Krabbelgruppe mit Terminen/);
     expect(m).toMatch(/Erstes Angebot: Krabbelgruppe am 20\.10\.2026/);
+    expect(m).not.toMatch(/Hinweis:/);
+    const withNote = newProviderCommitMessage({
+      ...adopted,
+      notes: ["Ort außerhalb der Region weggelassen: Bad Roth"],
+    });
+    expect(withNote).toMatch(/\nHinweis: Ort außerhalb der Region weggelassen: Bad Roth\n/);
   });
 
   it("Trockenlauf: „würde aufnehmen“ und „verworfen“ mit Grund", () => {

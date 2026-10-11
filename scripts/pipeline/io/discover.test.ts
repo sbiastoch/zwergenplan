@@ -138,6 +138,9 @@ function deps(f: Fakes): DiscoverDeps {
       abort: null,
     }),
     fetchPage: async (url) => page(url, HOME),
+    fetchPdfText: async () => {
+      throw new Error("kein PDF erwartet");
+    },
     geocode: f.geocode ?? (async () => ({ lat: 49.449, lon: 11.06, display: "x", district: "Gostenhof" })),
     extractor: fakeExtractor(f.empty),
     fetchInputs: fakeFetchInputs,
@@ -167,6 +170,30 @@ const kandidaten = (...list: Array<{ name: string; url: string }>) => ({
 });
 
 describe("runDiscover (Plan 0032, E7)", () => {
+  it("PDF-Fund wird über pdftotext gelesen, nicht als HTML", async () => {
+    const d = tempData();
+    const flyer = "https://flyer.example.net/programm.pdf";
+    const messages: string[] = [];
+    const base = deps({ search: kandidaten({ name: "Familienzentrum Flyer", url: flyer }) });
+    await run(
+      d,
+      {},
+      {
+        deps: {
+          ...base,
+          fetchPage: async (url) => ({ ...page(url, "%PDF-1.4 Binärdaten"), contentType: "application/pdf" }),
+          fetchPdfText: async (url) => (url === flyer ? "Krabbelgruppe dienstags, Kernstraße 3" : ""),
+          assess: async (find, message, signal) => {
+            messages.push(message);
+            return base.assess(find, message, signal);
+          },
+        },
+      },
+    );
+    expect(messages[0]).toMatch(/## TEXT\nKrabbelgruppe dienstags, Kernstraße 3/);
+    expect(messages[0]).not.toMatch(/%PDF/);
+  });
+
   it("Bewerten bekommt die Kontaktseite derselben Website mit, ohne weiteren Modellaufruf", async () => {
     const d = tempData();
     const messages: string[] = [];
@@ -446,6 +473,8 @@ describe("runDiscover (Plan 0032, E7)", () => {
       assess: { [SITE]: assessOk("Krabbelzwerge Gostenhof") },
       geocode: async () => ({ lat: 48.14, lon: 11.58, display: "München" }),
     });
-    expect(far.regions[0]?.rejected[0]?.grund).toMatch(/außerhalb der Region/);
+    expect(far.regions[0]?.rejected[0]?.grund).toBe(
+      "kein Ort in der Region Nürnberg (außerhalb: Kernstraße 3, 90429 Nürnberg)",
+    );
   });
 });

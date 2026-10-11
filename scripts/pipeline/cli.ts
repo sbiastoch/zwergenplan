@@ -69,7 +69,7 @@ import {
   type ExtractOutcome,
   type ExtractResult,
 } from "./io/extract.ts";
-import { fetchInputs } from "./io/fetch-inputs.ts";
+import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
 import {
   appendToCatalog,
   batchFileFor,
@@ -422,6 +422,7 @@ async function discoverCmd() {
       geocode,
       extractor: createExtractor({ model }),
       fetchInputs,
+      fetchPdfText,
       aggregatorCandidates: fetchAggregatorCandidates,
       freeDays: loadFreeDays,
     },
