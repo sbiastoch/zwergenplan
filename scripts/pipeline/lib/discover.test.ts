@@ -172,7 +172,9 @@ describe("aggregatorFinds (E7.1)", () => {
       organizerUrl: "https://example.org/familientreff/herbst",
       address: "Beispielstraße 1, 90402 Nürnberg",
     });
-    const r = aggregatorFinds([known], catalog);
+    // die Startseite des bekannten Hosts ist kein Hinweis
+    const home = { ...known, sourceId: "9", organizerUrl: "https://www.example.org/" };
+    const r = aggregatorFinds([known, home], catalog);
     expect(r.finds).toEqual([]);
     expect(r.hints).toEqual([
       "familientreff-beispiel: neue Programmseite? https://example.org/familientreff/herbst (aus frankenkids)",
@@ -190,6 +192,8 @@ describe("directoryFinds (E7.1)", () => {
       { label: "Impressum", url: `https://${host}/impressum` },
       { label: "Instagram", url: "https://instagram.com/x" },
       { label: "ab", url: "https://kurz.example.net" },
+      { label: "Ticketshop", url: "https://tickets.example.com/" },
+      { label: "Familienzentrum", url: `https://sub.${host}/familien` },
     ]);
     expect(r).toEqual([
       {
