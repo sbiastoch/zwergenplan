@@ -46,3 +46,27 @@ export const DiscoverState = z.strictObject({
 export type DiscoverState = z.infer<typeof DiscoverState>;
 
 export const emptyState = (region: RegionId): DiscoverState => ({ region, abgelehnt: [], zurueckgestellt: [] });
+
+/**
+ * Invariante für `data:validate` (Arch-Review S4b, M1): Kein Katalogeintrag trägt eine zurückgenommene Katalog-ID oder
+ * `publicId` aus `abgelehnt`, gleich über welchen Weg er entstand (Entdecken, `add-provider`, von Hand).
+ */
+export function reservedConflicts(
+  catalog: ReadonlyArray<{ id: string; publicId?: string }>,
+  states: readonly DiscoverState[],
+): string[] {
+  const out: string[] = [];
+  for (const s of states)
+    for (const a of s.abgelehnt)
+      for (const p of catalog) {
+        if (a.id !== undefined && p.id === a.id)
+          out.push(
+            `data/discover/${s.region}.json: Katalog-ID ${p.id} ist zurückgenommen und darf nicht neu vergeben werden`,
+          );
+        if (a.publicId !== undefined && p.publicId === a.publicId)
+          out.push(
+            `data/discover/${s.region}.json: publicId ${a.publicId} (${p.id}) ist zurückgenommen und darf nicht neu vergeben werden`,
+          );
+      }
+  return out;
+}

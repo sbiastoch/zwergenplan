@@ -13,6 +13,7 @@ import {
   catalogId,
   contactLinks,
   directoryFinds,
+  dryRunCatalogIssues,
   entryFromAssessment,
   type Find,
   findsFromSearch,
@@ -25,6 +26,7 @@ import {
   proveYield,
   renderDiscoverReport,
   reservedIds,
+  sameSite,
   searchMessage,
   searchResponseSchema,
   staleHints,
@@ -208,6 +210,36 @@ describe("directoryFinds (E7.1)", () => {
         quelle: `verzeichnis:${dir.id}`,
       },
     ]);
+  });
+});
+
+describe("sameSite", () => {
+  it("gleicher Host oder Subdomain, nicht Nachbarn beim selben Hoster, nie intern", () => {
+    expect(sameSite("https://www.a.example.net/x", "https://a.example.net/")).toBe(true);
+    expect(sameSite("https://info.a.example.net/", "https://www.a.example.net/")).toBe(true);
+    expect(sameSite("https://a.jimdofree.com/", "https://b.jimdofree.com/")).toBe(false);
+    expect(sameSite("http://127.0.0.1/", "http://127.0.0.1/")).toBe(false);
+  });
+});
+
+describe("dryRunCatalogIssues (G1/G2 im Trockenlauf)", () => {
+  const first = catalog.find((p) => p.role === "anbieter");
+  if (first?.role !== "anbieter") throw new Error("Fixture ohne Anbieter");
+  const entry = { ...first, id: "neu-anbieter", publicId: shortId("neu-anbieter", 0) };
+  const neu = { ...entry, venues: [] };
+  it("nur die aufgenommenen neu und ein gültiger Katalog: keine Befunde", () => {
+    const venues = entry.venues.map((v) => ({ ...v, id: `neu-${v.id}` }));
+    expect(dryRunCatalogIssues(catalog, [...catalog, { ...entry, venues }], ["neu-anbieter"], today)).toEqual([]);
+  });
+  it("G2: fehlender oder geänderter Eintrag", () => {
+    expect(dryRunCatalogIssues(catalog, catalog, ["neu-anbieter"], today)).toEqual([
+      "G2: neue Katalogeinträge keine, erwartet neu-anbieter",
+    ]);
+    const changed = [{ ...catalog[0], name: "anders" }, ...catalog.slice(1)];
+    expect(dryRunCatalogIssues(catalog, changed, [], today)[0]).toMatch(/^G2: .*geändert/);
+  });
+  it("G1: ungültiger neuer Eintrag (Anbieter ohne Ort)", () => {
+    expect(dryRunCatalogIssues(catalog, [...catalog, neu], ["neu-anbieter"], today)[0]).toMatch(/^G1 \(Katalog\)/);
   });
 });
 
