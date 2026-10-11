@@ -1,10 +1,17 @@
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
+import { berlinIsoDate } from "../../../src/domain/time.ts";
+import { CASE_KINDS, TRAPS } from "../lib/eval-score.ts";
 import type { CallRecord, Extractor } from "../lib/extract.ts";
 import { loadCases, runEval, writeEval } from "./eval.ts";
+
+const tmpDirs: string[] = [];
+afterAll(() => {
+  for (const d of tmpDirs) rmSync(d, { recursive: true, force: true });
+});
 
 const { providers } = loadFixtures();
 const treff = providers.find((p) => p.id === "familientreff-beispiel");
@@ -14,6 +21,7 @@ const window = { from: "2026-10-11", to: "2027-02-04" };
 
 function caseDir(): string {
   const dir = mkdtempSync(join(tmpdir(), "eval-"));
+  tmpDirs.push(dir);
   const write = (name: string, starts: string[]) => {
     mkdirSync(join(dir, name));
     const input = {
@@ -145,5 +153,34 @@ describe("Eval-Lauf", () => {
 
   it("nennt unbekannte Fälle", () => {
     expect(() => loadCases(["fehlt"], caseDir())).toThrow(/unbekannte Fälle: fehlt/);
+  });
+});
+
+/**
+ * Die eingefrorenen Fälle selbst (Plan 0032, E9): Biome nimmt evals/cases aus, also prüft dieser Test Schema und
+ * Invarianten, bevor ein bezahlter Eval-Lauf daran scheitert.
+ */
+describe("evals/cases", () => {
+  const cases = loadCases();
+  it("mindestens 12 Fälle, alle Arten und alle drei Fallen", () => {
+    expect(cases.length).toBeGreaterThanOrEqual(12);
+    const kinds = new Set(cases.flatMap((c) => c.input.kinds));
+    for (const k of CASE_KINDS) expect(kinds, k).toContain(k);
+    const traps = new Set(cases.flatMap((c) => c.input.traps));
+    for (const t of TRAPS) expect(traps, t).toContain(t);
+  });
+
+  it.each(cases.map((c) => [c.name, c] as const))("%s: Katalog, Orte und Fenster passen", (name, c) => {
+    expect(name.startsWith(`${c.input.providerId}-`)).toBe(true);
+    expect(c.input.catalog.id).toBe(c.input.providerId);
+    expect(c.expected.window.from).toBe(c.input.today);
+    const venues = c.input.catalog.role === "anbieter" ? c.input.catalog.venues.map((v) => v.id) : [];
+    for (const o of c.expected.offers) {
+      expect(venues, o.title).toContain(o.venueId);
+      for (const s of o.starts) {
+        const day = berlinIsoDate(s);
+        expect(day >= c.expected.window.from && day <= c.expected.window.to, `${o.title} ${s}`).toBe(true);
+      }
+    }
   });
 });

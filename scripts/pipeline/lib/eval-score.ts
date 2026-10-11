@@ -159,6 +159,13 @@ export interface CaseScore {
   fields: Record<Field, Hits>;
 }
 
+const emptyFields = (): Record<Field, Hits> => ({
+  format: { hits: 0, total: 0 },
+  "availability.status": { hits: 0, total: 0 },
+  cost: { hits: 0, total: 0 },
+  registration: { hits: 0, total: 0 },
+  topics: { hits: 0, total: 0 },
+});
 const sessionKey = (venueId: string, start: string) => `${venueId}|${Date.parse(start)}`;
 const sameTopics = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && [...a].sort().join() === [...b].sort().join();
@@ -187,14 +194,15 @@ export function scoreCase(expected: readonly EvalOffer[], predicted: readonly Ev
   };
   const exp = slots(expected);
   const pred = slots(predicted);
-  // gemeinsame Termine je Angebotspaar "e|p"
-  const shared = new Map<string, number>();
+  // gemeinsame Termine je Angebotspaar, Schlüssel "e|p"
+  const shared = new Map<string, { ei: number; pi: number; n: number }>();
   let matched = 0;
   for (const [key, es] of exp) {
     const ps = [...(pred.get(key) ?? [])];
     const open = [...es];
     const pair = (ei: number, pi: number) => {
-      shared.set(`${ei}|${pi}`, (shared.get(`${ei}|${pi}`) ?? 0) + 1);
+      const k = `${ei}|${pi}`;
+      shared.set(k, { ei, pi, n: (shared.get(k)?.n ?? 0) + 1 });
       matched++;
       open.splice(open.indexOf(ei), 1);
       ps.splice(ps.indexOf(pi), 1);
@@ -208,12 +216,11 @@ export function scoreCase(expected: readonly EvalOffer[], predicted: readonly Ev
       if (pi !== undefined) pair(ei, pi);
     }
   }
-  const pairs = [...shared].sort(([ka, a], [kb, b]) => b - a || ka.localeCompare(kb));
+  const pairs = [...shared.values()].sort((a, b) => b.n - a.n || a.ei - b.ei || a.pi - b.pi);
   const usedE = new Set<number>();
   const usedP = new Set<number>();
-  const fields = Object.fromEntries(FIELDS.map((f) => [f, { hits: 0, total: 0 }])) as Record<Field, Hits>;
-  for (const [key] of pairs) {
-    const [ei, pi] = key.split("|").map(Number) as [number, number];
+  const fields = emptyFields();
+  for (const { ei, pi } of pairs) {
     if (usedE.has(ei) || usedP.has(pi)) continue;
     usedE.add(ei);
     usedP.add(pi);
@@ -269,15 +276,12 @@ export function summarize(results: readonly CaseResult[]): Summary {
   const zero: Count = { expected: 0, predicted: 0, matched: 0 };
   const sessions = results.reduce((s, r) => add(s, r.score.sessions), zero);
   const offers = results.reduce((s, r) => add(s, r.score.offers), zero);
-  const fields = Object.fromEntries(
-    FIELDS.map((f) => [
-      f,
-      results.reduce((h, r) => ({ hits: h.hits + r.score.fields[f].hits, total: h.total + r.score.fields[f].total }), {
-        hits: 0,
-        total: 0,
-      }),
-    ]),
-  ) as Record<Field, Hits>;
+  const fields = emptyFields();
+  for (const r of results)
+    for (const f of FIELDS) {
+      fields[f].hits += r.score.fields[f].hits;
+      fields[f].total += r.score.fields[f].total;
+    }
   const calls = results.flatMap((r) => r.calls);
   return {
     cases: results.length,
@@ -294,6 +298,13 @@ export function summarize(results: readonly CaseResult[]): Summary {
     costUsd: calls.reduce((s, c) => s + (c.costUsd ?? 0), 0),
     durationMs: calls.reduce((s, c) => s + c.durationMs, 0),
   };
+}
+
+/** Grund, warum ein Lauf keine Zeile in results.md bekommt: nicht alle Fälle bewertet, keine gültige Antwort. */
+export function unusableRun(results: readonly CaseResult[], cases: number): string | undefined {
+  if (results.length !== cases) return `nur ${results.length} von ${cases} Fällen bewertet`;
+  if (!results.some((r) => r.calls.some((c) => c.result === "ok"))) return "keine einzige gültige Antwort";
+  return undefined;
 }
 
 /** Kurzer Hash über Prompt und Antwortschema (`EXTRACT_KEY_PARTS`): eine Zeile in results.md je Stand. */

@@ -16,7 +16,7 @@ import { berlinIsoDate } from "../../src/domain/time.ts";
 import { type CaseRun, freezeCase, loadCases, runEval, writeEval } from "./io/eval.ts";
 import { createExtractor, EXTRACT_KEY_PARTS } from "./io/extract.ts";
 import { ROOT } from "./io/files.ts";
-import { CASE_KINDS, type EvalInput, promptHash, TRAPS } from "./lib/eval-score.ts";
+import { CASE_KINDS, type EvalInput, promptHash, TRAPS, unusableRun } from "./lib/eval-score.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -38,9 +38,10 @@ function fail(message: string): never {
 }
 const list = <T extends string>(raw: string | undefined, allowed: readonly T[], what: string): T[] => {
   const items = (raw ?? "").split(",").filter(Boolean);
-  const bad = items.filter((i) => !(allowed as readonly string[]).includes(i));
+  const known = (i: string): i is T => allowed.some((a) => a === i);
+  const bad = items.filter((i) => !known(i));
   if (bad.length > 0) fail(`${what} unbekannt: ${bad.join(", ")} (erlaubt: ${allowed.join(", ")})`);
-  return items as T[];
+  return items.filter(known);
 };
 const today = berlinIsoDate(new Date());
 
@@ -75,6 +76,8 @@ async function evaluate() {
   } catch (e) {
     fail((e as Error).message);
   }
+  const concurrency = Number(values.concurrency);
+  if (!Number.isInteger(concurrency) || concurrency < 1) fail(`--concurrency ungültig: ${values.concurrency}`);
   const hash = promptHash(EXTRACT_KEY_PARTS);
   print(`Eval ${today}: ${cases.length} Fälle, Modell ${model}, Fallback ${fallback}, Prompt-Hash ${hash}`);
   const controller = new AbortController();
@@ -83,11 +86,15 @@ async function evaluate() {
     cases,
     extractor: createExtractor({ model, fallbackModel: fallback }),
     signal: controller.signal,
-    concurrency: Number(values.concurrency),
+    concurrency,
     onCase: (r) => print(line(r)),
   });
   if (run.abort) fail(`Abbruch (${run.abort}) – keine Zeile in evals/results.md`);
   if (controller.signal.aborted) fail("abgebrochen – keine Zeile in evals/results.md");
+  // Ein Lauf ohne eine einzige gültige Antwort (CLI fehlt, Login abgelaufen) ist kein Messwert und darf die
+  // Warnung in data:validate nicht stillen
+  const unusable = unusableRun(run.results, cases.length);
+  if (unusable) fail(`${unusable} – keine Zeile in evals/results.md (Details: ${run.results.map(line).join("; ")})`);
   const outDir = join(ROOT, "runs", `eval-${today}-${model}${fallback === model ? "" : `-fb-${fallback}`}`);
   if (only) {
     // Teilmengen sind nicht vergleichbar: nur Details, keine Zeile
