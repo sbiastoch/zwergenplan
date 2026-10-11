@@ -95,6 +95,14 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0035** (Onboarding für Bestandsnutzer, App-Schritt je Plattform, Wischen, Nachtrag Nutzerfeedback; live seit 5a42282, 2026-10-11; Einzelheiten in „Risiken“, „Nachtrag Nutzerfeedback“ und „Browser-Review live“ des Plans):
+  - Am echten iPhone prüfen (Nutzer), zusätzlich zu Plan 0033 unten: Scroll-Sperre nach dem Stadtteil-Picker (Rad bzw. Menü, Nachtrag Punkt 1; Playwright stellt den Picker nur per `scrollTo` nach), Wischen ohne Klick nach der Geste (Klick-Unterdrückung nur bei Bedarf, E10), „‹ Zurück“, „Dein Standort“ mit nächstem Stadtteil.
+  - Am echten Android prüfen (Nutzer): Wischen vor und zurück neben der System-Zurück-Geste (äußere 24 px), Scroll-Sperre nach dem Stadtteil-Picker, Schalter „Wöchentliche Push-Nachricht“ mit echtem Dialog (headless ohne Push-Dienst nicht sichtbar).
+  - Restrisiko Scroll-Sperre: Wer das Onboarding über das Kind-Sheet erneut öffnet und mit „Überspringen“ schließt, steht danach oben in der Liste (Nachtrag Punkt 1).
+  - Umkehrbar entschieden ohne Nutzer: Kicker „Willkommen“/„Schön, dass ihr da seid“ auf iOS (N1), „Los geht’s“ auf Schritt 1 (N2), Wischen auf dem letzten Schritt beendet nicht.
+  - Feste Wartezeiten in E2E des Nachtrags (Arch-Review m5): flackert ein Test in der CI, wird er zum Befund.
+  - Setup-Link für iOS steht oben unter den Ideen.
+
 - **Plan 0034** (Impressum und Suchmaschinen, live seit d72d578, 2026-10-11):
   - Sitemap, `canonical` und Search Console sowie das Impressum offline stehen oben unter „Suchmaschinen“ und „Impressum offline“.
   - Rechtstexte prüfen lassen (Nutzer): Impressum, Hinweise und Datenschutz sind nach bestem Wissen geschrieben, nicht juristisch geprüft. Ändern sich Hosting, Karte oder Push (ADR 0008, 0013, 0014, 0017), muss `imprintPage()` mit.

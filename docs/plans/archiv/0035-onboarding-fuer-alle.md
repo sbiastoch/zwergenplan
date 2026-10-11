@@ -1,6 +1,6 @@
 # Plan 0035 – Onboarding für Bestandsnutzer, App-Schritt je Plattform, Wischen
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 5a42282 (2026-10-11)
 Datum: 2026-10-11
 Bezug:
 - Plan 0033 (`docs/plans/archiv/0033-onboarding.md`, live seit ecfccfb): E1 (Schritte und Reihenfolge), E2 (Gate, Flag, Privatsphäre), E8 (Schritt „App“), E10 (Texte), E15 (E2E-Basis), Test 7, Test 10, Test 12
@@ -579,3 +579,20 @@ Verdict: keine Blocker.
 - **m3** Zwei Stellen formatierten Entfernungen (`nearestDistrictLabel` und `reachShort`). → `distanceText(meters)` in `src/domain/reach.ts` neben `roundedDistance` ist die einzige Quelle; `format.ts` verliert dabei sein `Intl.NumberFormat` (Start-JS −0,056 kB). Test: `src/domain/reach.test.ts` („distanceText“), dazu unverändert `format.test.ts` (`reachShort`) und `districts.test.ts`.
 - **m4** `docs/ideas.md` nannte noch „Samstags-Nachricht“. → „Wöchentliche Push-Nachricht“; die historische Notiz zu N2 trägt den Hinweis auf den neuen Namen.
 - **m5** Feste Wartezeiten in E2E-Specs des Nachtrags. → Akzeptiert, bewusst nicht geändert: Sie stellen Browser-Verhalten nach (Picker, Scroll), auf das kein Ereignis wartet; flackert ein Test in der CI, wird er zum Befund.
+
+## Browser-Review live (2026-10-11)
+
+Kurzcheck nach `.claude/skills/browser-review/SKILL.md`, Abschnitt 6, auf https://zwergenplan.app/ (`meta.json`: `commit` 5a42282, 365 Angebote, 83 Anbieter). `node scripts/screenshots.ts https://zwergenplan.app/ --views=onboarding,kind`, 390 × 844 hell und dunkel angesehen (`onboarding-1…4-iphone-*`, `kind-iphone-*`). Interaktion per Playwright-Skript (Chromium, 390 × 844, Touch, Pixel-7- bzw. iPhone-UA; claude-in-chrome nicht verbunden). Bilder unter `e2e/.artifacts/screens/` und im Arbeitsverzeichnis der Session (nicht versioniert).
+
+- **(a) Leerer Speicher, Android-UA**: Onboarding erscheint, „Schritt 1 von 4“, Kicker-Folge Willkommen → Passt zum Alter → Gut erreichbar → Immer griffbereit (Stadt, Alter, Weg, App). Ohne Android-UA und ohne Installationsangebot entfällt der App-Schritt in headless Chromium (3 Schritte), wie geplant.
+- **(b) iPhone-UA (Safari-Tab)**: Ladebühne bei zurückgehaltenem Chunk lila `rgb(185,156,255)`, danach App-Bühne in derselben Farbe, kein Farbsprung. Schritt 1 „Ein Tipp, und ich bin da“, Kicker „Willkommen“, Teilen-Anleitung, iOS-Hinweis in Ich-Form („… dort frage ich dann nach Alter und Startpunkt.“), „Los geht’s“. Folge Willkommen → Schön, dass ihr da seid → Passt zum Alter → Gut erreichbar.
+- **(c) Bestandsnutzer** (Flag `"1"`, Geburtsdatum 2026-05-01): Onboarding erscheint, Feld vorbelegt „01.05.2026“ mit „Schon 5 Monate!“. Nach dem Ende Flag `"2"`, nach Neuladen kein Onboarding.
+- **(d) Standort** (Geolocation Altstadt gemockt): Auswahl verschwindet, „Dein Standort“, „nächster Stadtteil: Altstadt“, Knopf „Standort entfernen“, Hinweis „Wegzeit ab deinem Standort (auf ca. 100 m gerundet).“, Chips frei. Nach „Standort entfernen“ ist die Stadtteil-Auswahl zurück und fokussiert.
+- **(e) Zurück und Wischen**: Auf Schritt 1 kein „Zurück“; ab Schritt 2 „‹ Zurück“ links (87 × 44 px), Tipp führt zu Schritt 1. CDP-Touch: links wischen 1 → 2, rechts wischen 2 → 1.
+- **(f) Alters-Rückmeldung**: 01.10.2026 „Willkommen auf der Welt!“, 11.04.2026 „Schon ein halbes Jahr!“, 11.10.2025 „Ein ganzes Jahr – Glückwunsch!“, 11.04.2025 „Anderthalb Jahre!“, 11.10.2023 „Schon drei! Hier gibt’s vor allem Angebote bis 3.“
+- **(g) Texte**: Weg-Lead „Ich zeige, wie lange ihr mit Bus und Bahn braucht – mit höchstens einem Umstieg.“; iPhone-Lead „… Und einmal pro Woche eine Push-Nachricht, was es Neues für euch gibt.“; iOS-Hinweis „wöchentliche Push-Nachricht“. Den Schalter rendert headless Chromium nicht (kein Push-Dienst, „Benachrichtigungen sind nicht erlaubt“); der ausgelieferte Chunk `assets/app/AppSection-*.js` enthält „Wöchentliche Push-Nachricht“ (3×) und kein „Samstag“. Den Schalter mit echtem Dialog prüft der Nutzer am Gerät.
+- **(h) Scroll-Sperre**: Nach `selectOption` im Stadtteil und `window.scrollTo(0, 600)` bleibt `scrollY` 0, der Dialog deckt den Viewport (0–844), `elementFromPoint(200, 800)` liegt im Dialog.
+- **Konsole**: keine Fehler oder Warnungen (einziger Eintrag: ein 404 der absichtlich aufgerufenen Hilfsseite für den Speicher-Vorlauf). **Service Worker**: aktiv (`activated`), steuert die Seite, Scope `https://zwergenplan.app/`.
+- **Echte Daten**: Willkommens-Lead mit echten Zahlen („364 Babykurse, … von 60 Anbietern“; `meta.json` zählt 365 Angebote und 83 Katalog-Anbieter, der Lead zählt die gezeigten). Lange Titel und leere Zustände kommen im Onboarding nicht vor; Kind-Sheet mit echtem Startpunkt-Text und langem Erklärtext ohne Abschneiden. Bilder: Illustrationen (SVG) hell und dunkel vollständig, keine Kachelbilder betroffen.
+
+Keine Fehler. Offen bleibt die Prüfung am echten Gerät (`docs/ideas.md`).
