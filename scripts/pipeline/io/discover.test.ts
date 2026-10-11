@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -167,6 +167,54 @@ const kandidaten = (...list: Array<{ name: string; url: string }>) => ({
 });
 
 describe("runDiscover (Plan 0032, E7)", () => {
+  it("Bewerten bekommt die Kontaktseite derselben Website mit, ohne weiteren Modellaufruf", async () => {
+    const d = tempData();
+    const messages: string[] = [];
+    const fetched: string[] = [];
+    const base = deps({ search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }) });
+    await run(
+      d,
+      {},
+      {
+        deps: {
+          ...base,
+          fetchPage: async (url) => {
+            fetched.push(url);
+            return url.endsWith("/kontakt")
+              ? page(url, "<html><body><p>Kernstraße 3, 90429 Nürnberg</p></body></html>")
+              : page(url, `${HOME.replace("</body>", `<a href="${SITE}kontakt">Kontakt</a></body>`)}`);
+          },
+          assess: async (find, message, signal) => {
+            messages.push(message);
+            return base.assess(find, message, signal);
+          },
+        },
+      },
+    );
+    expect(fetched).toEqual([SITE, `${SITE}kontakt`]);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toMatch(/## WEITERE SEITE: https:\/\/krabbelzwerge\.example\.net\/kontakt\nKernstraße 3/);
+  });
+
+  it("zurückgenommene ID aus data/discover wird nicht neu vergeben, G2 im Trockenlauf grün", async () => {
+    const d = tempData();
+    mkdirSync(join(d.dataDir, "discover"));
+    writeFileSync(
+      join(d.dataDir, "discover", "nuernberg.json"),
+      JSON.stringify({
+        region: "nuernberg",
+        abgelehnt: [{ id: "krabbelzwerge-gostenhof", publicId: "abcd1234", grund: "zurückgenommen", datum: TODAY }],
+        zurueckgestellt: [],
+      }),
+    );
+    const r = await run(d, {
+      search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }),
+      assess: { [SITE]: assessOk("Krabbelzwerge Gostenhof") },
+    });
+    expect(r.regions[0]?.adopted.map((a) => a.id)).toEqual(["krabbelzwerge-gostenhof-2"]);
+    expect(r.gateErrors).toBeUndefined();
+  });
+
   it("Trockenlauf: würde aufnehmen, verwirft mit Grund, schreibt nichts nach data/", async () => {
     const d = tempData();
     const before = readFileSync(join(d.dataDir, "providers.yaml"), "utf8");

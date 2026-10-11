@@ -10,11 +10,13 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
+import { parse } from "yaml";
+import { REGION_IDS, REGIONS, type RegionId } from "../../../src/domain/regions.ts";
 import type { Anbieter, Offer, Provider } from "../../../src/domain/schema.ts";
 import { addMonths, toBerlinIso } from "../../../src/domain/time.ts";
 import { batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
 import type { Candidate } from "../lib/candidate.ts";
+import { catalogDiff } from "../lib/catalog-diff.ts";
 import { appendEntries } from "../lib/catalog-yaml.ts";
 import { appendCsvRow, type BrakeKind, type Brakes, brakeHit, costJsonl, summarizeCosts } from "../lib/cost.ts";
 import {
@@ -24,6 +26,7 @@ import {
   allowedUrlsOf,
   assessMessage,
   assessResponseSchema,
+  contactLinks,
   type DiscoverReport,
   directoryFinds,
   entryFromAssessment,
@@ -37,6 +40,7 @@ import {
   proveYield,
   type RegionReport,
   renderDiscoverReport,
+  reservedIds,
   searchMessage,
   searchResponseSchema,
   staleHints,
@@ -242,6 +246,9 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   const proofRaw = join(o.runDir, "beweis");
   let catalog: Provider[] = readCatalog(catalogFile);
   let catalogText = readFileSync(catalogFile, "utf8");
+  const originalCatalogText = catalogText;
+  // zurückgenommene IDs aller Regionen: IDs sind global (ADR 0022)
+  const reserved = reservedIds(REGION_IDS.map((r) => readState(o.dataDir, r)));
   const freeDays = await o.deps.freeDays(addMonths(o.today, -12), addMonths(o.today, 24));
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
   const regions: RegionReport[] = [];
@@ -347,7 +354,18 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         continue;
       }
       const fetchedFind = { finalUrl: page.finalUrl, text: extracted.text, links: extracted.links };
-      const a = await o.deps.assess(find, assessMessage(find, fetchedFind, regionName), controller.signal);
+      // Kontakt- oder Adressseiten derselben Website (Nutzerentscheid Option A); ein Fehler kostet nur diese Seite
+      const extra: Array<{ url: string; text: string }> = [];
+      for (const url of contactLinks(fetchedFind)) {
+        try {
+          const p = await o.deps.fetchPage(url);
+          const text = p.status < 400 ? extractPage(p.body, p.finalUrl).text : "";
+          if (text && !botWall(text)) extra.push({ url, text });
+        } catch {
+          // ohne diese Seite bewerten
+        }
+      }
+      const a = await o.deps.assess(find, assessMessage(find, fetchedFind, regionName, extra), controller.signal);
       calls.push(a.call);
       if (a.abort) {
         stop(a.abort);
@@ -395,6 +413,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         grund: assessed.grund,
         region,
         catalog,
+        reserved,
         today: o.today,
         geos,
         allowedUrls: allowedUrlsOf(find, fetchedFind),
@@ -469,6 +488,17 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   for (const state of states)
     writeJson(join(o.dryRun ? o.runDir : join(o.dataDir, "discover"), `${state.region}.json`), state);
 
+  // G2 auch im Trockenlauf (im Modus live prüft ihn jeder Commit): Der Katalog des Laufs darf gegenüber dem
+  // Ausgangsstand nur die aufgenommenen Anbieter neu haben
+  const gateErrors: string[] = [];
+  const added = regions.flatMap((x) => x.adopted.map((a) => a.id));
+  if (o.dryRun && added.length > 0) {
+    const d = catalogDiff(parse(originalCatalogText), parse(readFileSync(outCatalog, "utf8")));
+    if (!d.ok) gateErrors.push(...d.errors.map((e) => `G2: ${e}`));
+    else if (d.added.join(",") !== added.join(","))
+      gateErrors.push(`G2: neue Katalogeinträge ${d.added.join(", ")}, erwartet ${added.join(", ")}`);
+  }
+
   const report: DiscoverReport = {
     date: o.today,
     dryRun: o.dryRun,
@@ -478,6 +508,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     ...(abort ? { abort } : {}),
     ...(brake ? { brake } : {}),
     budgetHit,
+    ...(gateErrors.length > 0 ? { gateErrors } : {}),
   };
   mkdirSync(o.runDir, { recursive: true });
   writeFileSync(join(o.runDir, "kosten.jsonl"), costJsonl(calls, { run: "entdecken", date: o.today }));
