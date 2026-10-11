@@ -18,9 +18,12 @@ export const kicker = (page: Page) => intro(page).locator(".onb-kicker");
 /** Hauptknopf unten: „Los geht’s“, „Weiter“ oder die Abschluss-Beschriftung */
 export const primary = (page: Page) => intro(page).locator(".onb-foot .btn.primary");
 
-/** Kicker je Schritt (E10); der App-Schritt hat zwei Varianten */
+/**
+ * Kicker je Schritt (E10); der App-Schritt hat zwei Varianten. Schritt 1 heißt immer „Willkommen“, Stadt an Position 2
+ * (iPhone im Safari-Tab) „Schön, dass ihr da seid“ (Plan 0034, E2).
+ */
 const KICKER = {
-  stadt: "Willkommen",
+  stadt: /^(Willkommen|Schön, dass ihr da seid)$/,
   alter: "Passt zum Alter",
   weg: "Gut erreichbar",
   app: /^(Immer griffbereit|Samstags-Nachricht)$/,
@@ -40,12 +43,16 @@ export async function expectStep(page: Page, n: number, total: number) {
   await expect(title(page)).toBeFocused();
 }
 
-/** Mit dem Hauptknopf weiter, bis der Kicker zum Schritt passt */
+/**
+ * Mit dem Hauptknopf weiter, bis der Kicker zum Schritt passt. Auf dem iPhone trägt auch der App-Schritt 1
+ * „Willkommen“, darum hält „stadt“ nur mit sichtbarer Gruppe „Stadt“ (Plan 0034, E2).
+ */
 export async function goTo(page: Page, step: Step) {
   for (let i = 0; i < 4; i++) {
     const text = (await kicker(page).textContent()) ?? "";
     const want = KICKER[step];
-    if (typeof want === "string" ? text === want : want.test(text)) return;
+    const match = typeof want === "string" ? text === want : want.test(text);
+    if (match && (step !== "stadt" || (await intro(page).getByRole("group", { name: "Stadt" }).isVisible()))) return;
     const before = await title(page).textContent();
     await primary(page).click();
     await expect(title(page)).not.toHaveText(before ?? "");

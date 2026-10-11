@@ -1,7 +1,7 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { hasStoredData, loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/preferences.ts";
+import { loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/preferences.ts";
 import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
@@ -97,9 +97,9 @@ export function App() {
   /** Fokus-Ziel nach „Nochmal laden“ unter der Statuszeile (Plan 0009, N2) */
   const statusLine = useRef<HTMLParagraphElement>(null);
   /*
-   * Onboarding (Plan 0033, E2): synchron entschieden, ohne Inline-Skript. Bei jedem Gate ≠ „nichts“ laden Chunk und
-   * App-Teil sofort, parallel zu site.json, auch bei „still-erledigt“: Sonst verriete der Request, ob etwas gespeichert
-   * ist (Review H1). „still-erledigt“ setzt das Flag gleich hier; mehrfach ausgeführt (StrictMode) schadet das nicht.
+   * Onboarding (Plan 0033, E2; Plan 0034, E3): synchron entschieden, ohne Inline-Skript. Bei „zeigen“ laden Chunk und
+   * App-Teil sofort, parallel zu site.json. Gespeicherte Angaben zählen nicht, Bestandsnutzer sehen es also auch, und
+   * kein Request verrät, ob etwas gespeichert ist (Review H1).
    */
   const [onboarding, setOnboarding] = useState<OnboardingMode>(() => {
     // Mit Flag keine Schreibprobe: Sonst schriebe jeder Start `zwergenplan.probe` (Arch-Review der Umsetzung, m3)
@@ -107,14 +107,11 @@ export function App() {
     const gate = onboardingGate({
       storage: done || storageUsable(),
       done,
-      stored: hasStoredData(),
       deepLink: route.offerId !== undefined || route.providerId !== undefined,
     });
     if (gate === "nichts") return "aus";
     preloadOnboarding();
-    if (gate === "zeigen") return "auto";
-    saveOnboardingDone();
-    return "aus";
+    return "auto";
   });
 
   useEffect(() => {

@@ -54,7 +54,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
     if (dialog) dialog.scrollTop = 0;
   }, [index]);
 
-  const text = stepText(step, { ...(stats && { stats }), ...(parts && { app: parts }) });
+  const text = stepText(step, { first: index === 0, ...(stats && { stats }), ...(parts && { app: parts }) });
   /** „Später“ überspringt nur diesen Schritt und verwirft nichts; auf dem letzten Schritt endet es wie „Weiter“ */
   const later = () => (last ? onEnd("fertig") : setIndex(index + 1));
   const next = () => {

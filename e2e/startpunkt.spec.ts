@@ -14,6 +14,7 @@
 import type { Page } from "@playwright/test";
 import { expect, expectTwoLines, MAP_READY, startPreloads, test } from "./fixtures.ts";
 import { setTextScale } from "./mobile-ux.ts";
+import { ONBOARDING_FLAG } from "./onboarding-flag.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
 /** gespeicherter Punkt (Plan 0016): 49,45213 / 11,07672, gerundet */
@@ -102,10 +103,12 @@ function tableRequests(page: Page, matches: (url: string) => boolean = isTable):
 
 /** Alles im Speicher außer dem Flag „Onboarding erledigt“, das die Fixture setzt (Plan 0033, E15, Review H7) */
 async function storedValues(page: Page): Promise<string[]> {
-  return page.evaluate(() =>
-    Object.keys(localStorage)
-      .filter((k) => k !== "zwergenplan.einfuehrung")
-      .map((k) => `${k}=${localStorage.getItem(k) ?? ""}`),
+  return page.evaluate(
+    (flag) =>
+      Object.keys(localStorage)
+        .filter((k) => k !== flag)
+        .map((k) => `${k}=${localStorage.getItem(k) ?? ""}`),
+    ONBOARDING_FLAG.key,
   );
 }
 

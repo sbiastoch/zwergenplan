@@ -21,12 +21,13 @@ import {
   expectVisibleFocus,
   setTextScale,
 } from "./mobile-ux.ts";
+import { ONBOARDING_FLAG } from "./onboarding-flag.ts";
 import { expectStep, goTo, intro, kicker, opened, primary, stepOrder, title } from "./onboarding-steps.ts";
 import { clsFrom, observeVitals, readVitals, throttleMobile } from "./vitals.ts";
 
 test.use({ onboarding: "neu" });
 
-const FLAG = "zwergenplan.einfuehrung";
+const FLAG = ONBOARDING_FLAG.key;
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
 /** Projekte mit Android-User-Agent: App-Schritt mit Menü-Hinweis, also vier Schritte, „App“ zuletzt */
 const ANDROID = ["android-klein", "pixel-7", "pixel-7-quer"];
@@ -43,7 +44,7 @@ function chunkRequests(page: Page): string[] {
   return paths;
 }
 
-/** Antwort auf den Onboarding-Chunk: Er lädt auch bei „still erledigt“, sichtbar wird dann nichts. */
+/** Antwort auf den Onboarding-Chunk */
 function onboardingLoaded(page: Page) {
   return page.waitForResponse((r) => /\/assets\/onboarding\/OnboardingFlow-[^/]+\.js$/.test(new URL(r.url()).pathname));
 }
@@ -74,6 +75,7 @@ test.describe("Test 1: erster Start", () => {
     page,
   }) => {
     test.skip(!ANDROID.includes(test.info().project.name), "Reihenfolge mit App-Schritt zuletzt: Android-Projekte");
+    // Außerhalb des iPhone-Tabs bleibt „App“ zuletzt (Plan 0034, E1); die Kicker-Folge belegt das
     await opened(page);
     await expect(intro(page)).toBeVisible();
     await expect(intro(page).getByRole("button", { name: "Später" })).toHaveCount(0);
@@ -90,6 +92,8 @@ test.describe("Test 1: erster Start", () => {
 test.describe("Test 2: Stadt", () => {
   test("eine Kachel „Nürnberg“, gewählt; Lead mit Zahlen wie die Statuszeile", async ({ page }) => {
     await opened(page);
+    // auf dem iPhone ist Stadt Schritt 2 (Plan 0034, E1)
+    await goTo(page, "stadt");
     const city = intro(page).getByRole("group", { name: "Stadt" });
     await expect(city.getByRole("button")).toHaveCount(1);
     await expect(city.getByRole("button", { name: "Nürnberg" })).toHaveAttribute("aria-pressed", "true");
@@ -180,24 +184,33 @@ test.describe("Test 6: Desktop ohne Push", () => {
 });
 
 test.describe("Test 7: iPhone", () => {
-  test("Reihenfolge Stadt → App → Alter → Weg; App mit iOS-Anleitung und Hinweis, ohne Schalter", async ({ page }) => {
+  test("Reihenfolge App → Stadt → Alter → Weg; App zuerst mit iOS-Anleitung und Hinweis, ohne Schalter", async ({
+    page,
+  }) => {
     test.skip(test.info().project.name !== "iphone-15", "iOS-User-Agent nur im Projekt iphone-15");
     await opened(page);
-    await primary(page).click();
-    await expectStep(page, 2, 4);
-    await expect(kicker(page)).toHaveText("Immer griffbereit");
+    await expectStep(page, 1, 4);
+    await expect(kicker(page)).toHaveText("Willkommen");
+    await expect(title(page)).toHaveText(/Ein Tipp, und ich bin da$/);
     await expect(intro(page).locator(".onb-note")).toHaveText("Tippe auf Teilen und dann auf „Zum Home-Bildschirm“.");
     await expect(intro(page).locator(".onb-note .share svg")).toBeVisible();
     await expect(intro(page)).toContainText(
-      "Auf dem iPhone kommt die Samstags-Nachricht nur in der installierten App.",
+      "Auf dem iPhone kommt die Samstags-Nachricht nur in der installierten App. Darum frage ich das hier als Erstes. Die App hat einen eigenen Speicher, dort frage ich dann nach Alter und Startpunkt.",
     );
     await expect(intro(page).getByRole("switch")).toHaveCount(0);
+    await expect(primary(page)).toHaveText("Los geht’s");
+    await expect(intro(page).getByRole("button", { name: "Später" })).toHaveCount(0);
+    await primary(page).click();
+    await expectStep(page, 2, 4);
+    await expect(kicker(page)).toHaveText("Schön, dass ihr da seid");
+    await expect(intro(page).locator(".onb-lead")).toHaveText(/^\d+ Babykurse, .* von \d+ Anbietern\.$/);
     await primary(page).click();
     await expectStep(page, 3, 4);
     await expect(kicker(page)).toHaveText("Passt zum Alter");
     await primary(page).click();
     await expectStep(page, 4, 4);
     await expect(kicker(page)).toHaveText("Gut erreichbar");
+    await expect(primary(page)).toHaveText(/^(Zeig mir|Zur Liste)/);
   });
 });
 
@@ -219,7 +232,7 @@ test.describe("Test 8: Abschluss", () => {
     await expect(
       page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: /^Angebote/ }),
     ).toHaveAttribute("aria-current", "page");
-    expect(await flag(page)).toBe("1");
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
     await page.reload();
     await expect(page.getByTestId("offer").first()).toBeVisible();
     await expect(intro(page)).toHaveCount(0);
@@ -234,7 +247,7 @@ test.describe("Test 9: Abbrechen", () => {
     await intro(page).getByRole("button", { name: "Überspringen" }).click();
     await expect(intro(page)).toHaveCount(0);
     await expect(page.getByTestId("offer").first()).toBeVisible();
-    expect(await flag(page)).toBe("1");
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
     await page.reload();
     await expect(page.getByTestId("offer").first()).toBeVisible();
     await expect(intro(page)).toHaveCount(0);
@@ -249,7 +262,7 @@ test.describe("Test 9: Abbrechen", () => {
     await page.keyboard.press("Escape");
     await expect(intro(page)).toHaveCount(0);
     await expect(page.getByTestId("offer").first()).toBeVisible();
-    expect(await flag(page)).toBe("1");
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
     await page.reload();
     await expect(page.getByTestId("offer").first()).toBeVisible();
     await expect(intro(page)).toHaveCount(0);
@@ -269,7 +282,7 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
     await freshPreloads;
     expect(await flag(page)).toBeNull();
 
-    // mit Merkliste (eigener Kontext: eigener Speicher und HTTP-Cache): kein Onboarding, Flag still gesetzt
+    // mit Merkliste (eigener Kontext: eigener Speicher und HTTP-Cache): Onboarding erscheint ebenfalls (Plan 0034, E3)
     const context = await browser.newContext();
     try {
       const other = await context.newPage();
@@ -278,15 +291,16 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
       const stored = chunkRequests(other);
       const storedPreloads = Promise.all([startPreloads(other), onboardingLoaded(other)]);
       await other.goto("./");
-      await expect(other.getByTestId("offer").first()).toBeVisible();
+      await expect(intro(other).getByRole("heading", { name: /^Schritt 1 von \d:/ })).toBeVisible();
       await storedPreloads;
-      await expect(intro(other)).toHaveCount(0);
-      expect(await flag(other)).toBe("1");
       expect([...stored].sort(), "dieselben Chunks mit und ohne gespeicherte Angaben").toEqual([...fresh].sort());
       expect(
         stored.filter((p) => p.startsWith("onboarding/")),
         "Onboarding-Chunk genau einmal",
       ).toEqual(["onboarding/OnboardingFlow.js", "onboarding/OnboardingFlow.css"]);
+      await intro(other).getByRole("button", { name: "Überspringen" }).click();
+      await expect(intro(other)).toHaveCount(0);
+      expect(await flag(other)).toBe(ONBOARDING_FLAG.value);
 
       // zweiter Start: Flag gesetzt, kein Onboarding-Chunk, aus assets/app/ nur der PWA-Kern wie bei jedem Start
       stored.length = 0;
@@ -301,14 +315,50 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
     }
   });
 
-  test("Geburtsdatum gespeichert: kein Onboarding, Flag danach gesetzt", async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem("zwergenplan.geburtsdatum", "2026-04-20"));
-    const loaded = onboardingLoaded(page);
-    await page.goto("./");
-    await expect(page.getByTestId("offer").first()).toBeVisible();
-    await loaded;
+  test("Bestandsnutzer mit Geburtsdatum und Stadtteil sieht es, vorbelegt (Plan 0034, Test 10b)", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("zwergenplan.geburtsdatum", "2026-04-20");
+      localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof");
+    });
+    const tables: string[] = [];
+    page.on("request", (req) => {
+      const name = /\/(wegzeit|linien)\.json$/.exec(new URL(req.url()).pathname)?.[1];
+      if (name) tables.push(name);
+    });
+    await opened(page);
+    await goTo(page, "alter");
+    await expect(intro(page).getByLabel("Geburtsdatum")).toHaveValue("20.04.2026");
+    await expect(intro(page).locator("#onb-birth-hint")).toHaveText(/^5 Monate! /);
+    await goTo(page, "weg");
+    await expect(intro(page).getByRole("combobox", { name: "Stadtteil" })).toHaveValue("gostenhof");
+    await intro(page).getByRole("button", { name: "Überspringen" }).click();
     await expect(intro(page)).toHaveCount(0);
-    expect(await flag(page)).toBe("1");
+    expect(tables.sort(), "je genau ein Request auf Tabelle und Linien").toEqual(["linien", "wegzeit"]);
+    expect(
+      await page.evaluate(() => [
+        localStorage.getItem("zwergenplan.geburtsdatum"),
+        localStorage.getItem("zwergenplan.entfernung-ab"),
+      ]),
+    ).toEqual(["2026-04-20", "gostenhof"]);
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
+  });
+
+  test("altes Flag „1“ (still gesetzt seit ecfccfb): erscheint einmal (Plan 0034, Test 10c)", async ({ page }) => {
+    // nur beim ersten Laden, sonst stünde nach dem Neuladen wieder „1“ (Muster push.spec.ts)
+    await page.addInitScript((key) => {
+      if (sessionStorage.getItem("__e2eSeeded")) return;
+      sessionStorage.setItem("__e2eSeeded", "1");
+      localStorage.setItem(key, "1");
+    }, FLAG);
+    await opened(page);
+    await intro(page).getByRole("button", { name: "Überspringen" }).click();
+    await expect(intro(page)).toHaveCount(0);
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
+    const requests = chunkRequests(page);
+    await page.reload();
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    await expect(intro(page)).toHaveCount(0);
+    expect(requests.filter((p) => p.startsWith("onboarding/"))).toEqual([]);
   });
 
   test("Deep-Link: zuerst das Angebot, kein Onboarding, kein Flag; ohne Parameter erscheint es", async ({ page }) => {
@@ -321,6 +371,18 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
 
     await page.goto("./");
     await expect(intro(page).getByRole("heading", { name: /^Schritt 1 von \d:/ })).toBeVisible();
+  });
+
+  test("Deep-Link mit altem Flag „1“: kein Onboarding, Flag bleibt „1“", async ({ page }) => {
+    await page.addInitScript((key) => {
+      if (sessionStorage.getItem("__e2eSeeded")) return;
+      sessionStorage.setItem("__e2eSeeded", "1");
+      localStorage.setItem(key, "1");
+    }, FLAG);
+    await page.goto("./?angebot=kovtez0z");
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(intro(page)).toHaveCount(0);
+    expect(await flag(page)).toBe("1");
   });
 });
 
@@ -360,7 +422,7 @@ test.describe("Test 12: Chunk nicht ladbar", () => {
     await intro(page).getByRole("button", { name: "Überspringen" }).click();
     await expect(intro(page)).toHaveCount(0);
     await expect(page.getByRole("status")).toBeFocused();
-    expect(await flag(page)).toBe("1");
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
   });
 });
 
@@ -467,7 +529,7 @@ test.describe("Test 12: App-Teil nicht ladbar", () => {
     await dialog.getByRole("button", { name: /^Zeig mir|^Zur Liste/ }).click();
     await expect(intro(page)).toHaveCount(0);
     await expect(page.getByRole("status")).toBeFocused();
-    expect(await flag(page)).toBe("1");
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
   });
 });
 
@@ -491,7 +553,7 @@ test.describe("Test 11: erneut über das Kind-Sheet", () => {
     await expect(intro(page).locator("#onb-birth-hint")).toHaveText(/^5 Monate! /);
     await intro(page).getByRole("button", { name: "Überspringen" }).click();
     await expect(intro(page)).toHaveCount(0);
-    expect(await flag(page)).toBe("1");
+    expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
   });
 });
 
@@ -513,13 +575,14 @@ test.describe("Test 13: Mobile-UX je Schritt", () => {
   for (const scheme of SCHEMES) {
     test(`alle Schritte bestehen die Gates (${scheme.label})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme.colorScheme, reducedMotion: "reduce" });
-      await opened(page);
-      // Eine gespeicherte Darstellung machte aus dem Besuch einen Bestandsnutzer (kein Onboarding, E2). Deshalb setzt
-      // der Test `data-theme` wie die Wahl im Kind-Sheet (`use-app-state.ts`), nachdem das Onboarding steht.
+      // Seit Plan 0034 macht eine gespeicherte Darstellung keinen Bestandsnutzer mehr: Sie steht vor dem Laden im
+      // Speicher, und das Inline-Skript in index.html setzt `data-theme` vor dem ersten Paint (wie mobile-ux.spec.ts)
       if (scheme.chosenDark)
-        await page.evaluate(() => {
-          document.documentElement.dataset["theme"] = "dark";
+        await page.addInitScript(() => {
+          localStorage.setItem("zwergenplan.darstellung", "dunkel");
         });
+      await opened(page);
+      if (scheme.chosenDark) expect(await page.evaluate(() => document.documentElement.dataset["theme"])).toBe("dark");
       await eachStep(page, async () => {
         // vor expectMobileUx: dessen settle() wartet Animationen ab, die hier gar nicht erst laufen dürfen
         await expectReducedMotion(page);

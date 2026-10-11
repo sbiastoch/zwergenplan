@@ -14,6 +14,7 @@
  */
 import { existsSync, mkdirSync } from "node:fs";
 import { type BrowserContext, chromium, devices, type Page } from "@playwright/test";
+import { ONBOARDING_FLAG } from "../e2e/onboarding-flag.ts";
 
 const args = process.argv.slice(2);
 const url = args.find((a) => !a.startsWith("--")) ?? "http://localhost:4173/";
@@ -197,11 +198,11 @@ for (const vp of viewports) {
       });
       if (isLocal) await mockTiles(context);
       // Onboarding erledigt (Plan 0033, E15): Alle Ansichten außer „onboarding“ zeigen die App, nicht die Einführung.
+      // Schlüssel und Wert aus `e2e/onboarding-flag.ts` (Plan 0034, E6)
       if (view !== "onboarding")
-        await context.addInitScript(() => {
-          if (localStorage.getItem("zwergenplan.einfuehrung") === null)
-            localStorage.setItem("zwergenplan.einfuehrung", "1");
-        });
+        await context.addInitScript(({ key, value }) => {
+          if (localStorage.getItem(key) === null) localStorage.setItem(key, value);
+        }, ONBOARDING_FLAG);
       const page = await context.newPage();
       if (isLocal) await page.clock.setFixedTime(new Date("2026-10-05T12:00:00+02:00"));
       await page.goto(url);

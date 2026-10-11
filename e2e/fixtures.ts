@@ -15,6 +15,7 @@ import {
   type Route,
 } from "@playwright/test";
 import { PUSH_WORKER_URL } from "../site.config.ts";
+import { ONBOARDING_FLAG } from "./onboarding-flag.ts";
 
 /** Muss zu tests/fixtures/offers.json passen: Montag, 5.10.2026, 12:00 Berlin. */
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
@@ -58,14 +59,14 @@ interface Options {
  * laden). Für selbst gebaute Kontexte (`browser.newContext()`), die die Fixture-Option nicht erreicht (Plan 0033, E15).
  */
 export async function skipOnboarding(context: BrowserContext) {
-  await context.addInitScript(() => {
+  // Wert aus `e2e/onboarding-flag.ts` (Plan 0034, E6); ein vorhandener alter Wert „1“ bleibt (Test 10c setzt ihn)
+  await context.addInitScript(({ key, value }) => {
     try {
-      if (localStorage.getItem("zwergenplan.einfuehrung") === null)
-        localStorage.setItem("zwergenplan.einfuehrung", "1");
+      if (localStorage.getItem(key) === null) localStorage.setItem(key, value);
     } catch {
       // ohne Speicher erscheint das Onboarding ohnehin nicht (onboardingGate)
     }
-  });
+  }, ONBOARDING_FLAG);
 }
 
 /** Mock-Datei zu einem Pfad: Stil `/styles/<name>` → `<name>.json`, TileJSON `/planet`, Glyphen unter `fonts/`. */

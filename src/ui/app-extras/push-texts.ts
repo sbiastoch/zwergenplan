@@ -55,7 +55,7 @@ export const PUSH_TEXTS = {
 export const APP_STEP_TEXTS = {
   installed: "Geschafft! Liegt jetzt auf dem Startbildschirm.",
   iosNote:
-    "Auf dem iPhone kommt die Samstags-Nachricht nur in der installierten App. Darum frage ich das hier als Erstes. Die App hat einen eigenen Speicher und fragt dort noch einmal nach.",
+    "Auf dem iPhone kommt die Samstags-Nachricht nur in der installierten App. Darum frage ich das hier als Erstes. Die App hat einen eigenen Speicher, dort frage ich dann nach Alter und Startpunkt.",
   off: "Aus. Jederzeit änderbar.",
   on: "An. Die erste kommt am Samstag.",
 } as const;
