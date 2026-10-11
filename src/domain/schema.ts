@@ -143,7 +143,7 @@ export const Provider = z.discriminatedUnion("role", [
       id: kebab,
       /**
        * Öffentliche ID in Links, `site.json`, `anbieter.json` und Merkliste (ADR 0022). Nie ändern; `validateDataset`
-       * prüft `shortId(id, s)` mit `s` 0–9, neue Einträge bekommen sie von `add-provider` oder aus `data:validate`.
+       * prüft `shortId(id, s)` mit `s` 0–9, neue Einträge bekommen sie von `pipeline discover` oder aus `data:validate`.
        */
       publicId: shortIdField,
       role: z.literal("anbieter"),

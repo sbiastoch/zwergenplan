@@ -1,5 +1,5 @@
 /**
- * Terminregeln der Subagenten → konkrete lokale Termine (Berliner Ortszeit, ohne Offset).
+ * Terminregeln der Extraktion → konkrete lokale Termine (Berliner Ortszeit, ohne Offset).
  * Strukturierte Regeln statt RRULE-Strings: Zod prüft sie, der Expander bleibt klein (Plan 0002, E5).
  * Ferien/Feiertage und Ausnahmen werden hier herausgenommen; welche Termine in den Horizont
  * gehören, entscheidet build-offers je nach Format.

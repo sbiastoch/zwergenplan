@@ -17,6 +17,8 @@ import {
   entryFromAssessment,
   type Find,
   findsFromSearch,
+  hiddenEval,
+  hideProviders,
   isPdf,
   newProviderCommitMessage,
   newProvidersIssue,
@@ -624,6 +626,85 @@ describe("Bericht und Commit-Text (E7.8 G4, E10)", () => {
     expect(md).toMatch(/## Verworfen[\s\S]*Yoga[\s\S]*nur Erwachsene/);
     expect(md).toMatch(/Hinweise ohne Aktion[\s\S]*HTTP 404/);
     expect(md).toMatch(/Kosten/);
+  });
+});
+
+describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
+  const text = readFileSync(new URL("../../../tests/fixtures/providers.yaml", import.meta.url), "utf8");
+
+  it("hideProviders nimmt Anbieter aus Katalog und Text", () => {
+    const h = hideProviders(catalog, text, ["turnverein-beispiel", "musikschule-beispiel"]);
+    expect(h.hidden.map((p) => p.id)).toEqual(["musikschule-beispiel", "turnverein-beispiel"]);
+    expect(h.catalog.map((p) => p.id)).not.toContain("turnverein-beispiel");
+    expect(h.catalog).toHaveLength(catalog.length - 2);
+    expect(ProvidersFile.parse(parse(h.text)).map((p) => p.id)).toEqual(h.catalog.map((p) => p.id));
+  });
+
+  it("hideProviders: nur bekannte Anbieter, keine Sammelkalender", () => {
+    expect(() => hideProviders(catalog, text, ["gibts-nicht"])).toThrow(/gibts-nicht/);
+    expect(() => hideProviders(catalog, text, ["sammelkalender-beispiel"])).toThrow(/kein Anbieter/);
+  });
+
+  it("hiddenEval: aufgenommen vor verworfen vor Vorfilter, Rest nicht gefunden; Fremde zählen extra", () => {
+    const hidden = catalog.filter((p) =>
+      ["turnverein-beispiel", "musikschule-beispiel", "theater-beispiel", "familientreff-beispiel"].includes(p.id),
+    );
+    const adopted = (name: string, url: string, id: string) => ({
+      id,
+      name,
+      region: "nuernberg" as const,
+      find: find({ name, url }),
+      grund: "passt",
+      first: { title: "Kurs", start: "2026-10-20T10:00:00+02:00", url },
+    });
+    const e = hiddenEval(hidden, [
+      {
+        region: "nuernberg",
+        finds: 5,
+        // Host und ähnlicher Name genügen (Fund-URL ist eine Unterseite)
+        adopted: [
+          adopted("Turnverein Beispiel", "https://example.org/turnverein/kinder", "turnverein-beispiel"),
+          adopted("Krabbelzwerge", "https://krabbelzwerge.example.net/", "krabbelzwerge"),
+        ],
+        rejected: [
+          {
+            find: find({ name: "Musikschule Beispiel", url: "https://example.org/musikschule" }),
+            grund: "ohne Adresse",
+          },
+          { find: find({ name: "Turnverein", url: "https://example.org/turnverein" }), grund: "doppelt" },
+        ],
+        dropped: [
+          { find: find({ name: "Theater", url: "https://example.org/theater" }), grund: "Host und Name wie x" },
+        ],
+        hints: [],
+      },
+    ]);
+    expect(e.outcomes.map((o) => [o.id, o.ergebnis])).toEqual([
+      ["familientreff-beispiel", "nicht gefunden"],
+      ["musikschule-beispiel", "verworfen"],
+      ["theater-beispiel", "vorfilter"],
+      ["turnverein-beispiel", "aufgenommen"],
+    ]);
+    expect(e.outcomes.find((o) => o.id === "musikschule-beispiel")).toMatchObject({
+      grund: "ohne Adresse",
+      url: "https://example.org/musikschule",
+    });
+    expect(e.extra.map((a) => a.id)).toEqual(["krabbelzwerge"]);
+
+    const md = renderDiscoverReport({
+      date: today,
+      dryRun: true,
+      durationMs: 60_000,
+      regions: [],
+      calls: [],
+      budgetHit: false,
+      hidden: e,
+    });
+    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(1 von 4 wiedergefunden, 3 gefunden\)/);
+    expect(md).toMatch(
+      /\| musikschule-beispiel \| verworfen \| https:\/\/example\.org\/musikschule \| ohne Adresse \|/,
+    );
+    expect(md).toMatch(/Zusätzlich aufgenommen \(nicht ausgeblendet\): 1[\s\S]*krabbelzwerge/);
   });
 });
 

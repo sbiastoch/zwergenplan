@@ -14,7 +14,7 @@ const outDir = fileURLToPath(new URL("schema/", ROOT));
 const targets = {
   "providers.schema.json": ProvidersFile,
   "offers.schema.json": OffersFile,
-  /** Rohformat der Recherche-Subagenten (ADR 0006) */
+  /** Rohformat der Extraktion (ADR 0006, ADR 0026) */
   "raw-batch.schema.json": RawBatch,
   /** Zustand je Anbieter in data/raw (Plan 0032, E5) */
   "provider-raw.schema.json": ProviderRaw,

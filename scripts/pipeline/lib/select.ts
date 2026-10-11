@@ -1,14 +1,9 @@
 /**
- * Was aus dem Katalog abgerufen wird (ADR 0025, Punkt 7), an einer Stelle für beide Wege:
- * - `selectBatches`: Pakete für die Recherche-Subagenten (aus select_providers.py). Ein Lauf deckt immer den ganzen
- *   Katalog ab; Filter nach Thema/Ring/Alter gibt es nicht mehr (Plan 0002).
- * - `planFetch`: Abrufe des Nachtlaufs je Anbieter (Plan 0032, E3).
+ * Was aus dem Katalog abgerufen wird (ADR 0025, Punkt 7): `planFetch`, die Abrufe des Nachtlaufs und des
+ * Ertragsbeweises beim Entdecken je Anbieter (Plan 0032, E3).
  */
 import type { Anbieter, Provider } from "../../../src/domain/schema.ts";
 import { fillPlaceholders } from "./placeholders.ts";
-
-/** Katalog-Eintrag im Paket: ohne `publicId`, Subagenten arbeiten nur mit der Katalog-ID (ADR 0022, Review M3). */
-type BatchProvider = Omit<Anbieter, "publicId">;
 
 /** Wie ein Katalog-Eintrag abgerufen wird (ADR 0025, Punkt 7 und 8). */
 type CrawlRole =
@@ -27,46 +22,6 @@ function crawlRole(p: Provider): CrawlRole {
 
 function checkOnly(catalog: readonly Provider[], only: ReadonlySet<string> | undefined): void {
   for (const id of only ?? []) if (!catalog.some((p) => p.id === id)) throw new Error(`Unbekannter Anbieter: ${id}`);
-}
-
-export interface Selection {
-  batches: BatchProvider[][];
-  /** Sammelkalender mit Adapter – laufen über `candidates fetch` */
-  adapters: Array<{ id: string; adapter: string }>;
-  skipped: Array<{ id: string; reason: string }>;
-}
-
-export function selectBatches(
-  catalog: readonly Provider[],
-  opts: { batchSize: number; only?: readonly string[] },
-): Selection {
-  const skipped: Selection["skipped"] = [];
-  const adapters: Selection["adapters"] = [];
-  const picked: BatchProvider[] = [];
-  const only = opts.only ? new Set(opts.only) : undefined;
-  checkOnly(catalog, only);
-  for (const p of catalog) {
-    if (only && !only.has(p.id)) continue;
-    const role = crawlRole(p);
-    if (role.kind === "nie") skipped.push({ id: p.id, reason: role.reason });
-    else if (role.kind === "adapter") adapters.push({ id: p.id, adapter: role.adapter });
-    else if (role.kind === "kandidaten" && !only) skipped.push({ id: p.id, reason: role.reason });
-    else if (p.role === "anbieter") {
-      const { publicId: _public, ...entry } = p;
-      picked.push(entry);
-    }
-  }
-  const size = Math.max(1, opts.batchSize);
-  const batches: BatchProvider[][] = [];
-  for (let i = 0; i < picked.length; i += size) batches.push(picked.slice(i, i + size));
-  return { batches, adapters, skipped };
-}
-
-/** Nächste freie Paketdateien: Ein Nachprüf-Paket (--only) überschreibt nie ein vorhandenes Paket. */
-export function nextBatchFiles(existing: readonly string[], count: number): string[] {
-  const used = existing.flatMap((f) => /^batch-(\d+)\.json$/.exec(f)?.[1] ?? []).map(Number);
-  const start = used.length > 0 ? Math.max(...used) + 1 : 1;
-  return Array.from({ length: count }, (_, i) => `batch-${start + i}.json`);
 }
 
 type Programme = Anbieter["programme"][number];

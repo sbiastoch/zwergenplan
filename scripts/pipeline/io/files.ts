@@ -1,7 +1,7 @@
-/** Dateien und git für die Pipeline: Laufverzeichnis, Katalog, offers.json. Keine Logik. */
+/** Dateien und git für die Pipeline: Katalog, offers.json, Zustand je Anbieter. Keine Logik. */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 import {
@@ -10,14 +10,10 @@ import {
   type Provider,
   ProvidersFile,
 } from "../../../src/domain/schema.ts";
-import { toBerlinIso } from "../../../src/domain/time.ts";
-import { type Candidate, CandidatesFile, SOURCES, type Source } from "../lib/candidate.ts";
-import { appendEntries, providerIdsOf } from "../lib/catalog-yaml.ts";
 import { ProviderRaw } from "../lib/raw.ts";
-import { type RunMeta, RunMeta as RunMetaSchema, type SourceStatus, SourceStatusFile } from "../lib/run.ts";
 
 export const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
-export const CATALOG = join(ROOT, "data/providers.yaml");
+const CATALOG = join(ROOT, "data/providers.yaml");
 const OFFERS = join(ROOT, "data/offers.json");
 /** Zustand je Anbieter (Plan 0032, E5) */
 export const RAW_DIR = join(ROOT, "data/raw");
@@ -31,19 +27,8 @@ export function writeJson(file: string, value: unknown): void {
   renameSync(tmp, file);
 }
 
-export function readMeta(runDir: string): RunMeta {
-  const file = join(runDir, "meta.json");
-  if (!existsSync(file)) throw new Error(`${file} fehlt – zuerst \`pnpm pipeline init\``);
-  return RunMetaSchema.parse(readJson(file));
-}
-
 export function readCatalog(file: string = CATALOG): Provider[] {
   return ProvidersFile.parse(parse(readFileSync(file, "utf8")));
-}
-
-/** Hängt Einträge an den Katalog an, ohne Formatierung und Kommentare der übrigen zu ändern. */
-export function appendToCatalog(entries: readonly Provider[]): void {
-  writeFileSync(CATALOG, appendEntries(readFileSync(CATALOG, "utf8"), entries));
 }
 
 export function readPreviousOffers(file: string = OFFERS): OffersFile | undefined {
@@ -58,38 +43,6 @@ export function writeOffers(file: OffersFile, target: string = OFFERS): void {
   // Biome nur im Repo: ignorierte Pfade (runs/) und Temp-Verzeichnisse lehnt es ab
   if (target === OFFERS)
     execFileSync(join(ROOT, "node_modules/.bin/biome"), ["format", "--write", target], { cwd: ROOT, stdio: "pipe" });
-}
-
-export function candidatesOf(runDir: string): Array<Candidate & { cid: string }> {
-  const out: Array<Candidate & { cid: string }> = [];
-  for (const source of SOURCES) {
-    const file = join(runDir, "candidates", `${source}.json`);
-    if (!existsSync(file)) continue;
-    CandidatesFile.parse(readJson(file)).forEach((c, i) => {
-      out.push({ ...c, cid: `${source.slice(0, 2)}${i}` });
-    });
-  }
-  return out;
-}
-
-export function sourceStatus(runDir: string): Partial<Record<Source, SourceStatus>> {
-  const file = join(runDir, "candidates", "_status.json");
-  return existsSync(file) ? SourceStatusFile.parse(readJson(file)) : {};
-}
-
-/** Anbieter-IDs eines Pakets (batch-<n>.json). */
-export function batchProviders(file: string): string[] {
-  return providerIdsOf(readJson(file));
-}
-
-/** Prüfzeitpunkt einer Rohdatei = ihre Änderungszeit (kein Agent schreibt eine Uhrzeit). */
-export function checkedAtOf(file: string): string {
-  return toBerlinIso(statSync(file).mtime);
-}
-
-/** Paket zur Rohdatei: raw/batch-3.json ↔ batch-3.json */
-export function batchFileFor(rawFile: string): string {
-  return join(dirname(dirname(rawFile)), basename(rawFile));
 }
 
 export function git(args: string[]): string {

@@ -16,6 +16,7 @@ import { type Anbieter, type Offer, type Provider, Provider as ProviderSchema } 
 import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
 import type { Candidate } from "./candidate.ts";
 import { catalogDiff } from "./catalog-diff.ts";
+import { removeEntries } from "./catalog-yaml.ts";
 import { summarizeCosts } from "./cost.ts";
 import type { DiscoverState } from "./discover-state.ts";
 import { searchQuery } from "./discover-terms.ts";
@@ -612,6 +613,76 @@ export interface DiscoverReport {
   budgetHit: boolean;
   /** G2 im Trockenlauf verletzt (im Modus live bricht G2 den Lauf ab) */
   gateErrors?: string[];
+  /** Entdecken-Eval (`--hide`): was aus den ausgeblendeten Anbietern wurde */
+  hidden?: HiddenEval;
+}
+
+/** Ausgang eines ausgeblendeten Anbieters im Entdecken-Eval; Vorrang in dieser Reihenfolge */
+interface HiddenOutcome {
+  id: string;
+  name: string;
+  ergebnis: "aufgenommen" | "verworfen" | "vorfilter" | "nicht gefunden";
+  /** Fund-URL des passenden Kandidaten */
+  url?: string;
+  grund?: string;
+}
+
+export interface HiddenEval {
+  outcomes: HiddenOutcome[];
+  /** aufgenommen, aber zu keinem ausgeblendeten passend: neu oder falsch, von Hand zu beurteilen */
+  extra: Adopted[];
+}
+
+/**
+ * Entdecken-Eval (Plan 0032, E9): blendet bekannte Anbieter für einen Trockenlauf aus Katalog und Katalogtext aus,
+ * damit Vorfilter, Bewerten und Ertragsbeweis sie wie unbekannte behandeln. Nur `anbieter`; Sammelkalender und
+ * Verzeichnisse sind Quellen des Entdeckens selbst.
+ */
+export function hideProviders(
+  catalog: readonly Provider[],
+  text: string,
+  ids: readonly string[],
+): { catalog: Provider[]; text: string; hidden: Provider[] } {
+  const wanted = new Set(ids);
+  for (const id of wanted) {
+    const p = catalog.find((x) => x.id === id);
+    if (!p) throw new Error(`${id}: nicht im Katalog`);
+    if (p.role !== "anbieter") throw new Error(`${id}: kein Anbieter (${p.role})`);
+  }
+  return {
+    catalog: catalog.filter((p) => !wanted.has(p.id)),
+    text: removeEntries(text, [...wanted]),
+    hidden: catalog.filter((p) => wanted.has(p.id)),
+  };
+}
+
+/** Kandidat passt zu einem Anbieter: gleiche URL oder gleicher Host mit ähnlichem Namen (wie der Vorfilter) */
+function matchesProvider(find: Find, p: Provider): boolean {
+  const n = normalizeUrl(find.url);
+  const host = hostOf(find.url);
+  if (n && urlsOf(p).some((u) => normalizeUrl(u) === n)) return true;
+  return host !== undefined && urlsOf(p).some((u) => hostOf(u) === host) && similarName(find.name, p.name);
+}
+
+/** Wertet einen Lauf mit ausgeblendeten Anbietern aus: je Anbieter der beste Ausgang, dazu fremde Aufnahmen. */
+export function hiddenEval(hidden: readonly Provider[], regions: readonly RegionReport[]): HiddenEval {
+  const adopted = regions.flatMap((r) => r.adopted);
+  const rejected = regions.flatMap((r) => r.rejected);
+  const dropped = regions.flatMap((r) => r.dropped);
+  const outcomes = [...hidden]
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .map((p): HiddenOutcome => {
+      const base = { id: p.id, name: p.name };
+      const a = adopted.find((x) => matchesProvider(x.find, p));
+      if (a) return { ...base, ergebnis: "aufgenommen", url: a.find.url };
+      const r = rejected.find((x) => matchesProvider(x.find, p));
+      if (r) return { ...base, ergebnis: "verworfen", url: r.find.url, grund: r.grund };
+      const d = dropped.find((x) => matchesProvider(x.find, p));
+      if (d) return { ...base, ergebnis: "vorfilter", url: d.find.url, grund: d.grund };
+      return { ...base, ergebnis: "nicht gefunden" };
+    });
+  const extra = adopted.filter((a) => !hidden.some((p) => matchesProvider(a.find, p)));
+  return { outcomes, extra };
 }
 
 /** G4: ein Commit je Anbieter mit Fund-URL, Grund und erstem Angebot */
@@ -635,7 +706,7 @@ export function newProviderCommitMessage(a: Adopted): string {
 
 /**
  * Gates im Trockenlauf (Arch-Review S4, m5): G2 (nur die aufgenommenen Einträge neu, in dieser Reihenfolge) und der
- * Katalogteil von G1 (`validateDataset` wie `candidates add-provider`) auf dem Katalog des Laufs. Im Modus live
+ * Katalogteil von G1 (`validateDataset` wie `data:validate`) auf dem Katalog des Laufs. Im Modus live
  * prüfen beides `commitNewProvider` und `data:validate`.
  */
 export function dryRunCatalogIssues(
@@ -709,8 +780,24 @@ export function renderDiscoverReport(r: DiscoverReport): string {
     out.push("", "## Hinweise ohne Aktion", "");
     out.push(...(reg.hints.length > 0 ? reg.hints.map((h) => `- ${cell(h)}`) : ["keine"]));
   }
+  if (r.hidden) out.push("", ...hiddenSection(r.hidden));
   out.push("", ...costSection(summarizeCosts(r.calls, { cached: 0 }), results));
   return `${out.join("\n")}\n`;
+}
+
+function hiddenSection(h: HiddenEval): string[] {
+  const back = h.outcomes.filter((o) => o.ergebnis === "aufgenommen").length;
+  const found = h.outcomes.filter((o) => o.ergebnis !== "nicht gefunden").length;
+  return [
+    `## Eval: ausgeblendete Anbieter (${back} von ${h.outcomes.length} wiedergefunden, ${found} gefunden)`,
+    "",
+    "| ID | Ergebnis | Fund-URL | Grund |",
+    "|---|---|---|---|",
+    ...h.outcomes.map((o) => `| ${o.id} | ${o.ergebnis} | ${o.url ?? ""} | ${cell(o.grund ?? "")} |`),
+    "",
+    `Zusätzlich aufgenommen (nicht ausgeblendet): ${h.extra.length}`,
+    ...h.extra.map((a) => `- ${a.id}: ${cell(a.name)} (${a.find.url})`),
+  ];
 }
 
 const NEW_PROVIDER_SUBJECT = /^data: neuer Anbieter (\S+) \((\S+)\)$/;

@@ -49,7 +49,7 @@ export const emptyState = (region: RegionId): DiscoverState => ({ region, abgele
 
 /**
  * Invariante für `data:validate` (Arch-Review S4b, M1): Kein Katalogeintrag trägt eine zurückgenommene Katalog-ID oder
- * `publicId` aus `abgelehnt`, gleich über welchen Weg er entstand (Entdecken, `add-provider`, von Hand).
+ * `publicId` aus `abgelehnt`, gleich über welchen Weg er entstand (Entdecken oder von Hand).
  */
 export function reservedConflicts(
   catalog: ReadonlyArray<{ id: string; publicId?: string }>,

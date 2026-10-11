@@ -41,8 +41,6 @@ export const Candidate = z.strictObject({
 });
 export type Candidate = z.infer<typeof Candidate>;
 
-export const CandidatesFile = z.array(Candidate);
-
 /** Entfernt HTML-Tags und Entities und normalisiert Leerraum. */
 export function plainText(html: string | null | undefined): string {
   return (html ?? "")

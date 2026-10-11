@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appendEntries, providerIdsOf } from "./catalog-yaml.ts";
+import { appendEntries, removeEntries } from "./catalog-yaml.ts";
 
 const CATALOG = `# Kopf
 - id: a
@@ -23,9 +23,15 @@ describe("appendEntries", () => {
   });
 });
 
-describe("providerIdsOf", () => {
-  it("liest nur die IDs, auch aus Paketen mit Feldern eines älteren Katalogs (Review M5)", () => {
-    expect(providerIdsOf([{ id: "a", topics: ["pekip"], formats: ["kurs"] }, { id: "b" }])).toEqual(["a", "b"]);
-    expect(() => providerIdsOf([{ name: "ohne id" }])).toThrow();
+describe("removeEntries (Entdecken-Eval, Plan 0032, E9)", () => {
+  it("entfernt Einträge nach ID, übrige bleiben samt Kommentar unverändert", () => {
+    const two = appendEntries(CATALOG, [{ id: "b", role: "verzeichnis" }]);
+    const out = removeEntries(two, ["b"]);
+    expect(out).toBe(CATALOG);
+    expect(removeEntries(two, ["a"])).not.toMatch(/id: a\n/);
+    expect(removeEntries(two, ["a"])).toMatch(/- id: b\n/);
+  });
+  it("unbekannte ID ist ein Fehler", () => {
+    expect(() => removeEntries(CATALOG, ["gibts-nicht"])).toThrow(/gibts-nicht/);
   });
 });

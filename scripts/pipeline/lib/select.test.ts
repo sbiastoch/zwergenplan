@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { nextBatchFiles, planFetch, selectBatches } from "./select.ts";
+import { planFetch } from "./select.ts";
 
 const { providers, anbieter } = loadFixtures();
 function fail(): never {
@@ -14,51 +14,6 @@ const catalog: Provider[] = [
   { ...source, id: "kalender", role: "aggregator", adapter: "stadt-vk" },
   { ...source, id: "liste", role: "verzeichnis" },
 ];
-
-describe("selectBatches", () => {
-  it("packt Anbieter in Pakete und lässt Sammelkalender, Verzeichnisse und abgedeckte Anbieter aus", () => {
-    const s = selectBatches(catalog, { batchSize: 3 });
-    expect(s.batches.map((b) => b.map((p) => p.id))).toEqual([
-      ["familientreff-beispiel", "musikschule-beispiel", "stadtbibliothek-beispiel"],
-      ["gemeinde-beispiel", "turnverein-beispiel"],
-    ]);
-    expect(s.adapters).toEqual([
-      { id: "sammelkalender-beispiel", adapter: "frankenkids" },
-      { id: "kalender", adapter: "stadt-vk" },
-    ]);
-    expect(s.skipped.map((x) => x.id)).toEqual(["theater-beispiel", "liste"]);
-  });
-
-  it("skipCrawl: kein Paket, außer mit --only (ADR 0025, Punkt 8)", () => {
-    const withSkip = catalog.map((p) =>
-      p.id === "gemeinde-beispiel" ? { ...p, skipCrawl: { reason: "keine Termine online", since: "2026-10-01" } } : p,
-    );
-    const s = selectBatches(withSkip, { batchSize: 10 });
-    expect(s.batches.flat().map((p) => p.id)).not.toContain("gemeinde-beispiel");
-    expect(s.skipped).toContainEqual({ id: "gemeinde-beispiel", reason: "skipCrawl: keine Termine online" });
-    expect(selectBatches(withSkip, { batchSize: 10, only: ["gemeinde-beispiel"] }).batches.flat()).toHaveLength(1);
-  });
-
-  it("lässt die publicId aus den Paketen weg (ADR 0022)", () => {
-    for (const p of selectBatches(catalog, { batchSize: 3 }).batches.flat()) expect(p).not.toHaveProperty("publicId");
-  });
-
-  it("--only prüft gezielt einzelne Anbieter, auch abgedeckte", () => {
-    const s = selectBatches(catalog, { batchSize: 7, only: ["theater-beispiel"] });
-    expect(s.batches.map((b) => b.map((p) => p.id))).toEqual([["theater-beispiel"]]);
-    expect(() => selectBatches(catalog, { batchSize: 7, only: ["gibts-nicht"] })).toThrow("Unbekannter Anbieter");
-    expect(selectBatches(catalog, { batchSize: 0 }).batches).toHaveLength(5);
-  });
-});
-
-describe("nextBatchFiles", () => {
-  it("nummeriert hinter den vorhandenen Paketen weiter", () => {
-    expect(nextBatchFiles([], 2)).toEqual(["batch-1.json", "batch-2.json"]);
-    expect(nextBatchFiles(["batch-1.json", "batch-9.json", "selection.json", "meta.json"], 1)).toEqual([
-      "batch-10.json",
-    ]);
-  });
-});
 
 describe("planFetch (Plan 0032, E3; ADR 0025, Punkt 7)", () => {
   const today = "2026-10-11";

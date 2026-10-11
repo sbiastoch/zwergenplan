@@ -1,7 +1,8 @@
 /**
  * Ordnet einen Sammelkalender-Kandidaten einem Katalog-Anbieter und einem seiner Orte zu (Plan 0002, E7).
  * Nur Orte von Anbietern (role: anbieter) – Aggregatoren und Verzeichnisse haben keine Angebote.
- * Liefert einen VORSCHLAG; der Orchestrator bestätigt oder überschreibt ihn bei `candidates keep`.
+ * Der Nachtlauf gibt Kandidaten so ihrem Anbieter mit; das Entdecken sieht Kandidaten ohne Treffer als neue
+ * Veranstalter (Plan 0032, E7.1).
  */
 import type { Anbieter, Provider, Venue } from "../../../src/domain/schema.ts";
 import { vidsIn } from "../../../src/domain/vid.ts";

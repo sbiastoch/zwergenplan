@@ -1,7 +1,8 @@
 /**
- * Rohformat der Recherche-Subagenten (RawBatch) – ein pipeline-internes ZWISCHENFORMAT, kein zweiter
- * Datenvertrag (ADR 0006): Die Felder sind aus OfferFields abgeleitet, `pipeline build` macht daraus
- * data/offers.json. Exportiert nach schema/raw-batch.schema.json als Vorlage für die Agenten.
+ * Rohformat der Extraktion (RawBatch, Events je Anbieter) und Zustand je Anbieter (ProviderRaw, `data/raw`) – ein
+ * pipeline-internes ZWISCHENFORMAT, kein zweiter Datenvertrag (ADR 0006, ADR 0026): Die Felder sind aus OfferFields
+ * abgeleitet, der Build des Nachtlaufs macht daraus data/offers.json. Exportiert nach schema/raw-batch.schema.json
+ * und schema/provider-raw.schema.json.
  */
 import { z } from "zod";
 import { slug } from "../../../src/domain/ids.ts";
@@ -31,7 +32,7 @@ export const RawEvent = OfferFields.pick({
     .strictObject({ opens: LocalDateTime.optional(), deadline: LocalDateTime.optional() })
     .optional(),
   schedule: Schedule,
-  /** Herkunft, wenn das Event aus einem Sammelkalender stammt (setzt `candidates keep`) */
+  /** Herkunft, wenn das Event aus einem Sammelkalender stammt (setzt der Code, nie das Modell; Plan 0032, E4) */
   via: z.enum(SOURCES).optional(),
 });
 export type RawEvent = z.infer<typeof RawEvent>;

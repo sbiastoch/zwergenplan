@@ -477,4 +477,56 @@ describe("runDiscover (Plan 0032, E7)", () => {
       "kein Ort in der Region Nürnberg (außerhalb: Kernstraße 3, 90429 Nürnberg)",
     );
   });
+
+  it("--hide: ausgeblendeter Anbieter wird wiedergefunden, Bericht nennt das Eval, G2 bleibt grün", async () => {
+    const d = tempData();
+    const before = readFileSync(join(d.dataDir, "providers.yaml"), "utf8");
+    const turnverein = "https://example.org/turnverein";
+    const tvKurse = `${turnverein}/kinderturnen`;
+    const tv = assessOk("Turnverein Beispiel");
+    const base = deps({
+      search: kandidaten(
+        { name: "Turnverein Beispiel", url: turnverein },
+        { name: "Krabbelzwerge Gostenhof", url: SITE },
+      ),
+      assess: {
+        [turnverein]: {
+          ...tv,
+          eintrag: { ...tv.eintrag, url: turnverein, programme: [{ url: tvKurse, kind: "html", use: "termine" }] },
+        },
+        [SITE]: assessOk("Krabbelzwerge Gostenhof"),
+      },
+    });
+    const r = await run(
+      d,
+      {},
+      {
+        hide: ["turnverein-beispiel", "theater-beispiel"],
+        deps: {
+          ...base,
+          fetchPage: async (url) =>
+            page(url, url === turnverein ? `<p>Eltern-Kind-Turnen</p><a href="${tvKurse}">Kurse</a>` : HOME),
+        },
+      },
+    );
+    expect(r.regions[0]?.adopted.map((a) => a.id)).toEqual(["turnverein-beispiel", "krabbelzwerge-gostenhof"]);
+    expect(r.hidden?.outcomes.map((o) => [o.id, o.ergebnis])).toEqual([
+      ["theater-beispiel", "nicht gefunden"],
+      ["turnverein-beispiel", "aufgenommen"],
+    ]);
+    expect(r.hidden?.extra.map((a) => a.id)).toEqual(["krabbelzwerge-gostenhof"]);
+    expect(r.gateErrors).toBeUndefined();
+    expect(JSON.parse(readFileSync(join(d.runDir, "report.json"), "utf8")).hidden.outcomes).toHaveLength(2);
+    // data/ unverändert, der Katalog des Laufs kennt den ausgeblendeten nur als neuen Eintrag
+    expect(readFileSync(join(d.dataDir, "providers.yaml"), "utf8")).toBe(before);
+    const ids = (parse(readFileSync(join(d.runDir, "providers.yaml"), "utf8")) as Array<{ id: string }>).map(
+      (p) => p.id,
+    );
+    expect(ids).not.toContain("theater-beispiel");
+    expect(ids.filter((id) => id === "turnverein-beispiel")).toHaveLength(1);
+  });
+
+  it("--hide nur im Trockenlauf", async () => {
+    await expect(run(tempData(), {}, { dryRun: false, hide: ["turnverein-beispiel"] })).rejects.toThrow(/Trockenlauf/);
+  });
 });

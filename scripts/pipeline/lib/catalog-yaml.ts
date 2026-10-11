@@ -1,6 +1,5 @@
-/** Katalog-YAML ohne Dateizugriff (Plan 0030): Anhängen mit stabiler Formatierung, Paket-IDs lesen. */
+/** Katalog-YAML ohne Dateizugriff (Plan 0030): Anhängen mit stabiler Formatierung, Entfernen. */
 import { isMap, isPair, isScalar, isSeq, parseDocument, visit } from "yaml";
-import { z } from "zod";
 
 /** Listen, die als Block stehen bleiben: eine Notiz je Zeile statt einer überlangen Flow-Zeile (Review M4). */
 const BLOCK_LISTS = new Set(["notes"]);
@@ -24,12 +23,20 @@ export function appendEntries(text: string, entries: readonly object[]): string 
 }
 
 /**
- * Anbieter-IDs eines Pakets (batch-<n>.json). Nur die IDs: Ein Paket aus einem Lauf vor einer Katalogänderung bleibt
- * so lesbar (Review M5).
+ * Entfernt Einträge nach `id`, ohne die übrigen umzuformen. Nur für den Katalog eines Trockenlaufs (Entdecken-Eval,
+ * Plan 0032, E9); `data/providers.yaml` ändert es nie. Eine unbekannte ID ist ein Fehler.
  */
-export function providerIdsOf(batch: unknown): string[] {
-  return z
-    .array(z.looseObject({ id: z.string().min(1) }))
-    .parse(batch)
-    .map((p) => p.id);
+export function removeEntries(text: string, ids: readonly string[]): string {
+  const doc = parseDocument(text);
+  const root = doc.contents;
+  if (!isSeq(root)) throw new Error("Katalog ist keine Liste");
+  for (const id of ids) {
+    const index = root.items.findIndex((item) => {
+      const key = isMap(item) ? item.get("id", true) : undefined;
+      return isScalar(key) && String(key.value) === id;
+    });
+    if (index < 0) throw new Error(`${id}: nicht im Katalog`);
+    root.items.splice(index, 1);
+  }
+  return doc.toString({ lineWidth: 0 });
 }

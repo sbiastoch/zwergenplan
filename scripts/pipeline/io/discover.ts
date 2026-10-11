@@ -33,6 +33,8 @@ import {
   type FetchedFind,
   type Find,
   findsFromSearch,
+  hiddenEval,
+  hideProviders,
   hostOf,
   isPdf,
   newProviderCommitMessage,
@@ -121,6 +123,11 @@ export interface DiscoverOptions {
    * aufgenommen, Lauf geht weiter) oder einen anderen Fehler (G2, fremde Änderungen: Lauf bricht ab).
    */
   commit?: (id: string, message: string) => void;
+  /**
+   * Entdecken-Eval (E9): diese Anbieter gelten im Lauf als unbekannt; der Bericht sagt, welche wiedergefunden
+   * wurden. Nur im Trockenlauf.
+   */
+  hide?: readonly string[];
 }
 
 const SEARCH_PROMPT = fileURLToPath(new URL("../prompt/discover-search.md", import.meta.url));
@@ -251,6 +258,11 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   const proofRaw = join(o.runDir, "beweis");
   let catalog: Provider[] = readCatalog(catalogFile);
   let catalogText = readFileSync(catalogFile, "utf8");
+  let hidden: Provider[] | undefined;
+  if (o.hide && o.hide.length > 0) {
+    if (!o.dryRun) throw new Error("--hide nur im Trockenlauf (--dry-run)");
+    ({ catalog, text: catalogText, hidden } = hideProviders(catalog, catalogText, o.hide));
+  }
   const originalCatalogText = catalogText;
   // zurückgenommene IDs aller Regionen: IDs sind global (ADR 0022)
   const reserved = reservedIds(REGION_IDS.map((r) => readState(o.dataDir, r)));
@@ -521,6 +533,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     ...(brake ? { brake } : {}),
     budgetHit,
     ...(gateErrors.length > 0 ? { gateErrors } : {}),
+    ...(hidden ? { hidden: hiddenEval(hidden, regions) } : {}),
   };
   mkdirSync(o.runDir, { recursive: true });
   writeFileSync(join(o.runDir, "kosten.jsonl"), costJsonl(calls, { run: "entdecken", date: o.today }));
