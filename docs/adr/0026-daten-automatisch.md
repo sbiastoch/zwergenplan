@@ -1,6 +1,6 @@
 # ADR 0026 – Daten automatisch: Nachtlauf und Entdecken in GitHub Actions über `claude -p`
 
-Status: vorgeschlagen (2026-10-11), mit Plan 0032 (E14). Wird mit Stufe 5 von Plan 0032 angenommen und ersetzt dann ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006 und von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032.
+Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006 und von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032.
 
 ## Kontext
 
@@ -44,4 +44,4 @@ Status: vorgeschlagen (2026-10-11), mit Plan 0032 (E14). Wird mit Stufe 5 von Pl
 - Neue Abhängigkeiten außerhalb von `package.json`: die gepinnte `claude`-CLI und `pdftotext` (System) im Workflow; Playwright (schon devDependency) nur in `scripts/pipeline/io/browser.ts`.
 - Eine CLI-Version, die Ausgabeformat oder Optionen ändert, bricht `llm.test.ts` (Fake-Binary) oder den Eval-Lauf, bevor sie in den Nachtlauf kommt.
 - Ein falsch aufgenommener Anbieter wird per `git revert` zurückgenommen und in `abgelehnt` eingetragen.
-- Mit der Annahme (Plan 0032, Stufe 5) wird ADR 0016 „ersetzt durch ADR 0026“; ADR 0002, 0003, 0004 und 0006 bekommen Verweise, `docs/architecture.md`, `CLAUDE.md` („IDs vergibt nur `pipeline build`“ um `pipeline nightly` ergänzt) und der Skill werden nachgezogen.
+- Mit der Annahme (Plan 0032, Stufe 5) ist ADR 0016 „ersetzt durch ADR 0026“; ADR 0002, 0003, 0004 und 0006 verweisen in ihrer Statuszeile hierher, `docs/architecture.md`, `CLAUDE.md` (Datenfluss, IDs auch über `pipeline nightly` und `pipeline discover`) und der Skill `babyevents-nuernberg` (Wartungsleitfaden statt Lauf mit Subagenten) sind nachgezogen.

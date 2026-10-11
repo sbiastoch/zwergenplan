@@ -1,88 +1,124 @@
 ---
 name: babyevents-nuernberg
-description: Datenstand des Zwergenplans aktualisieren – alle Anbieter aus data/providers.yaml für die nächsten 4 Monate prüfen, data/offers.json bauen und auf main veröffentlichen. Nutzen bei „Daten aktualisieren“, „Pipeline-Lauf“, „neue Termine holen“ und bei Pflege des Anbieterkatalogs. Fragen wie „was machen wir nächste Woche mit dem Baby“ beantwortet die Website (https://zwergenplan.app/) bzw. data/offers.json.
+description: Datenpflege des Zwergenplans – Berichte von Nachtlauf und Entdecken sichten, falsch aufgenommene Anbieter zurücknehmen, den Anbieterkatalog data/providers.yaml von Hand pflegen, Eval-Fälle anlegen, das Modell wechseln, eine Region starten, den Fahrplan erneuern. Nutzen bei „Daten prüfen“, „Nachtlauf rot“, „Issue Neue Anbieter“, „Anbieter falsch aufgenommen“, „Modell wechseln“ und bei Pflege des Katalogs. Termine holt der Nachtlauf in GitHub Actions selbst. Fragen wie „was machen wir nächste Woche mit dem Baby“ beantwortet die Website (https://zwergenplan.app/) bzw. data/offers.json.
 ---
 
-# Zwergenplan-Datenstand aktualisieren
+# Zwergenplan-Daten pflegen
 
-Ein **Lauf** prüft den ganzen Katalog `data/providers.yaml` für den Horizont von 4 Monaten und endet mit einem Commit auf `main` (ADR 0002). Alle Befehle sind `pnpm pipeline …` (Übersicht: Kopf von `scripts/pipeline/cli.ts`). Der Lauf ist **fertig**, wenn CI auf `main` grün ist und die Live-Seite den neuen Commit zeigt.
+Die Daten aktualisieren sich selbst (Plan 0032, ADR 0026):
 
-Der Datenvertrag ist `src/domain/schema.ts`. Für Agenten ist er exportiert nach `schema/providers.schema.json` (Katalog), `schema/raw-batch.schema.json` (Ergebnis der Subagenten) und `schema/offers.schema.json`. Rohdaten werden korrigiert, das Schema bleibt, wie es ist.
+- **Nachtlauf** (`.github/workflows/nightly.yml`, täglich): ruft alle Seiten des Katalogs ab, extrahiert geänderte Anbieter mit dem Modell und schreibt `data/raw/<id>.json`, `data/offers.json` und `data/kosten.csv` auf `main`.
+- **Entdecken** (`.github/workflows/discover.yml`, sonntags): sucht neue Anbieter je Region und nimmt einen auf, wenn er mindestens ein Angebot für 0–3 Jahre liefert. Es schreibt `data/providers.yaml` (nur neue Einträge), `data/raw/<id>.json` und `data/discover/<region>.json`. Im Modus `trocken` (Repo-Variable `ENTDECKEN_MODUS` leer) steht das Ergebnis nur im Bericht.
 
-## 0. Fahrplan prüfen
+Dieser Skill ist der **Wartungsleitfaden** dafür. Er ruft dieselben Befehle wie die Workflows; Übersicht im Kopf von `scripts/pipeline/cli.ts` und `scripts/pipeline/eval.ts`. `data/offers.json`, `data/raw/` und `data/discover/` werden nie von Hand bearbeitet, mit einer Ausnahme: `abgelehnt` in `data/discover/<region>.json`. Der Datenvertrag ist `src/domain/schema.ts` (Katalog exportiert nach `schema/providers.schema.json`).
+
+Läufe mit Modell kosten Geld bzw. Abo-Kontingent. Lokal nutzen sie den Login des Entwicklers (`io/llm.ts`). Vor einem Lauf ohne `--only` oder `--terms` kurz sagen, was er etwa kostet (Nachtlauf voll ≈ $0,60, Entdecken voll ≈ $0,80–1,00).
+
+## 1. Bericht sichten
+
+```
+gh run list --workflow nightly.yml --limit 3
+gh run view <id>                         # Job-Summary: Ampel, Fehler, Einbrüche, Kosten
+gh run download <id> -n <artefakt>       # runs/<datum>/ mit nightly.json, status.md, kosten.jsonl
+pnpm pipeline status runs/<datum>        # Bericht aus einem heruntergeladenen oder lokalen Lauf
+```
+
+Entdecken genauso mit `--workflow discover.yml`. Nach einem Lauf im Modus `live` mit neuen Anbietern gibt es genau ein Issue „Neue Anbieter <datum>“ mit Commit-Links und Fund-URLs (`gh issue list --search "Neue Anbieter"`).
+
+Worauf achten:
+- **Ampel rot**: Gates, Push, Build, Abbruch (`auth`, `limit`), Bremse, Zeitbudget, mehr als 20 % der Anbieter mit Fehler oder Live-Stand ab 20 Std. hinter `main` (Plan 0032, „Stufe 3 – Umsetzung“). Ein Abbruch oder eine Bremse lässt nur Anbieter offen; die nächste Nacht holt sie nach.
+- **Quellen mit `fehler`** samt Grund und `failingSince`: ab 14 Tagen steht die Quelle unter „Hinweise ohne Aktion“. Das ist Katalogpflege (Abschnitt 3).
+- **Zurückgehaltene Einbrüche** (`pending`): Die alte Zahl Angebote bleibt, bis die Seite wieder mehr liefert oder der Katalog angepasst ist. Prüfen, ob der Anbieter wirklich weniger anbietet.
+- **Neue Anbieter** (Issue oder „Würde aufnehmen“ im Trockenlauf): Name, Fund-URL und erstes Angebot gegen die Website prüfen. Passt einer nicht, Abschnitt 2.
+
+Fertig, wenn jede rote Zeile und jeder neue Anbieter eingeordnet ist: in Ordnung, zurückgenommen (2) oder als Katalogpflege umgesetzt (3).
+
+## 2. Falsch aufgenommenen Anbieter zurücknehmen
+
+Jeder neue Anbieter ist ein eigener Commit `data: neuer Anbieter <id> (<region>)` mit Katalogeintrag und `data/raw/<id>.json`.
+
+1. `git revert <sha>` dieses Commits. `id` und `publicId` aus dem zurückgenommenen Eintrag notieren.
+2. In `data/discover/<region>.json` unter `abgelehnt` eintragen, sonst findet ihn das nächste Entdecken wieder:
+   ```json
+   { "url": "<Fund-URL>", "name": "<Name>", "id": "<id>", "publicId": "<publicId>", "grund": "<warum>", "datum": "<heute>" }
+   ```
+   Statt `url` geht `host` (ganzer Host samt Subdomains, etwa für einen Vermittler). `id` und `publicId` werden danach nie neu vergeben (ADR 0022); `pnpm data:validate` meldet jeden Katalogeintrag, der eine davon trägt.
+3. `pnpm data:validate`, dann Commit und Push wie in `CLAUDE.md`.
+
+Seine Angebote verschwinden mit dem nächsten Nachtlauf aus `data/offers.json` (der Nachtlauf löscht Zustände von Anbietern, die nicht mehr im Katalog stehen). Fertig, wenn der Revert und der Eintrag in `abgelehnt` auf `main` sind und CI grün ist.
+
+Geprüfte und bewusst nicht aufgenommene Anbieter ohne Rücknahme stehen in `references/excluded.md`. Findet das Entdecken einen davon, gehört er zusätzlich in `abgelehnt`.
+
+## 3. Katalog von Hand pflegen
+
+Regeln für `data/providers.yaml`: `references/catalog.md`. Lesarten der Buchungssysteme für `hint` und `availability.how`: `references/booking-systems.md`.
+
+Jede Änderung an einem Eintrag ändert den Eingabe-Hash; der Anbieter wird in der nächsten Nacht neu extrahiert. Vorher lokal prüfen:
+
+```
+pnpm pipeline fetch-page <url> --links         # was der Abruf von einer Seite sieht
+pnpm pipeline fetch --only <id>                # Abruf nach Katalog, Text unter runs/<heute>/fetch/<id>.txt
+pnpm pipeline nightly --only <id> --dry-run    # Extraktion und Build nur dieses Anbieters, nichts nach data/
+```
+
+Fertig ist eine Änderung, wenn der Trockenlauf das Erwartete liefert, `pnpm data:validate` grün ist und `verified` das heutige Datum trägt.
+
+**Hinweise ohne Aktion** im Bericht des Entdeckens:
+- „neue Programmseite?“: Seite eines bekannten Anbieters aus einem Sammelkalender, die der Katalog nicht kennt. Prüfen und als `programme`-Eintrag ergänzen. Das Entdecken ändert bestehende Einträge nie (G2).
+- Quelle mit Fehlerserie: URL korrigieren, `render: browser` setzen, `blocked` mit Beleg eintragen oder den Anbieter mit `skipCrawl` ruhen lassen.
+
+**Neuer Anbieter von Hand** (etwa aus `references/excluded.md`, wenn sich die Lage geändert hat): Eintrag nach `references/catalog.md` anlegen, Orte mit `pnpm pipeline geocode "<Adresse>"`. `pnpm data:validate` nennt die freie `publicId` („`<id>`: `publicId` fehlt – frei ist `<wert>`“); genau diesen Wert übernehmen. Dann `pnpm pipeline nightly --only <id> --dry-run` als Ertragsbeweis.
+
+**Offene Pflegepunkte** (Stand 2026-10-11, aus Plan 0032):
+- `hebammenpraxis-gugelrund`: Programmseite HTTP 404; neue URL suchen oder `skipCrawl`.
+- `sternenhaus-kuf`: eventim-Seite mit Bot-Schutz; im Browser prüfen, dann `blocked` mit Beleg.
+- `hebamme-eva-kauper-wunderwerk`: mymiya liefert nur 69 Zeichen; Kursliste über die miya-URL aus `references/booking-systems.md` prüfen.
+- `studio-herzschlag`: die drei eversports-Widgets liefern nur „Studio HERZSCHLAG“; andere Kalenderseite oder `render: browser` prüfen.
+- `nuebad-flipper`: Die GraphQL-Abfrage liefert je Kurs nur den ersten Termin; Folgetermine im `request` mit abfragen (danach Eval-Fall neu einfrieren, Abschnitt 4).
+
+## 4. Eval-Fälle anlegen
+
+```
+pnpm eval freeze <id> --kind html[,gross] [--trap ab-3-jahren]
+```
+
+legt `evals/cases/<id>-<heute>/` aus einem frischen Abruf an. `expected.json` ist ein Entwurf aus dem Bestand: von Hand gegen `input.json` prüfen, Korrekturen in `NOTES.md` (Plan 0032, E9). Arten und Fallen nennt `scripts/pipeline/eval.ts`. Fertig, wenn `pnpm verify` grün ist (`io/eval.test.ts` prüft alle Fälle).
+
+## 5. Modell wechseln
+
+1. Messen: `pnpm eval --model <neu>` (Modell allein) und `pnpm eval --model <neu> --fallback sonnet` (wie der Nachtlauf). Jeder volle Lauf schreibt eine Zeile in `evals/results.md`. Ein Lauf ist eine Stichprobe; vor einer Entscheidung je Modell zwei Läufe.
+2. Entscheidet der Nutzer für den Wechsel, setzt ein Commit `LLM_MODEL_EXTRACT` (und bei Bedarf `LLM_MODEL_FALLBACK`) in der `env` beider Workflows; ohne Wert gilt Haiku mit Sonnet als Fallback. Das Modell ist Teil des Cache-Schlüssels: Die erste Nacht danach extrahiert alles neu (N3). Dafür einmal `gh workflow run nightly.yml -f modus=live -f max_tokens=5000000` statt der normalen Bremse.
+3. Suche und Bewerten beim Entdecken wählt `LLM_MODEL_DISCOVER` (Standard Haiku), unabhängig davon.
+
+Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `evals/results.md`; sonst warnt `pnpm data:validate` in der CI.
+
+## 6. Region starten
+
+Eine neue Region ist ein eigener Plan (ÖPNV, Ferien, Sammelkalender-Adapter, Texte; Plan 0032, E13). Steht sie in `REGION_IDS` (`src/domain/regions.ts`), füllt das Entdecken ihren Katalog:
+
+```
+pnpm pipeline discover --region <id> --bootstrap --dry-run          # lokal, Bericht unter runs/<heute>/discover/
+gh workflow run discover.yml -f region=<id> -f bootstrap=true -f modus=trocken
+```
+
+`--bootstrap` hebt G3 auf `MAX_NEW` (Standard 30, Eingabe `max_new`); die Bremsen setzen `max_calls` und `max_tokens`. Erst nach Abnahme des Trockenlaufs durch den Nutzer mit `-f modus=live`.
+
+## 7. Fahrplan erneuern
 
 ```
 pnpm pipeline oepnv
 ```
 
-Der Befehl fragt beim VGN mit bedingtem `GET` nach einem neuen GTFS-Feed (Cache unter `~/.cache/zwergenplan/gtfs/`, Plan 0009). Ist der Feed unverändert, meldet er „Fahrplan aktuell“ und ändert nichts. Ist er neu, schreibt er `data/oepnv/fahrplan.json` mit neuem Stichtag (Referenz-Dienstag, Schultag). `publish` committet den Auszug dann mit dem Datenstand. Warnt `pnpm data:validate`, dass der Auszug abgelaufen ist oder ein Fahrplanwechsel ansteht, und der VGN hat noch keinen neuen Feed, bleibt der alte Auszug gültig; das gehört in den Abschlussbericht.
+fragt beim VGN mit bedingtem `GET` nach einem neuen GTFS-Feed (Cache unter `~/.cache/zwergenplan/gtfs/`, Plan 0009). Unverändert meldet er „Fahrplan aktuell“; neu schreibt er `data/oepnv/fahrplan.json`, den man dann normal committet und pusht. Der Nachtlauf erneuert den Fahrplan nicht (ADR 0026 lässt ADR 0011 Nr. 4 unverändert). Anlass ist die Warnung von `pnpm data:validate`, der Auszug sei abgelaufen oder ein Fahrplanwechsel stehe an.
 
-Fertig, wenn der Befehl „Fahrplan aktuell“ oder „data/oepnv/fahrplan.json geschrieben“ meldet. Bricht er ab (Netz, geänderte Spalten im Feed), bleibt der alte Auszug stehen: Grund in den Abschlussbericht, der Lauf geht weiter.
+## 8. Vom Abo auf die API umsteigen
 
-## 1. Lauf anlegen
-
-```
-pnpm pipeline init                 # → runs/<heute>/ mit meta.json (from, to)
-pnpm pipeline select runs/<from>   # → batch-<n>.json je Paket, selection.json
-```
-
-Fertig, wenn `selection.json` die Pakete, die Sammelkalender mit Adapter und die übersprungenen Einträge listet.
-
-## 2. Termine erfassen – Subagenten und Sammelkalender parallel
-
-**Subagenten zuerst**: Starte je Paket einen Subagenten im Hintergrund, alle in **einer** Nachricht. Jeder bekommt:
-- den Pfad `.claude/skills/babyevents-nuernberg/references/paket.md` mit dem Auftrag, ihn und den darin genannten Prompt `scripts/pipeline/prompt/extract.md` zuerst zu lesen und genau zu befolgen
-- den Horizont `from`–`to` aus `meta.json`
-- das Paket `runs/<from>/batch-<n>.json` und den Ausgabepfad `runs/<from>/raw/batch-<n>.json`
-
-**Sammelkalender währenddessen selbst**:
-
-```
-pnpm pipeline candidates fetch runs/<from>
-pnpm pipeline candidates list runs/<from>
-```
-
-`list` zeigt je Kandidat den Vorschlag `→ anbieter/ort` oder `?`. Behalten wird jeder Kandidat, an dem Eltern **mit** Kind von 0–3 Jahren teilnehmen: Krabbel- und Eltern-Kind-Gruppen, Miniclubs, Babymassage, PEKiP, Musikzwerge, Babykonzerte, Bücherzwerge, Eltern-Kind-Turnen, Krabbelgottesdienste, Fitness oder Yoga mit Baby. Kurse für Eltern ohne Kind, Basare, reine Vorträge und Angebote ab 3+ fallen weg.
-- Fehlt der Veranstalter im Katalog: `candidates add-provider runs/<from> <cid> --id <kebab-id>`, danach den neuen Eintrag in `data/providers.yaml` kurz prüfen.
-- Ein falscher oder offener Vorschlag wird überschrieben mit `<cid>=<anbieter>/<ort>`.
-
-```
-pnpm pipeline candidates keep runs/<from> <cid>,<cid>=<anbieter>/<ort>,…
-```
-
-`keep` schreibt den Entwurf `raw/aggregatoren.json` und nennt je Event die offenen Felder. Fülle sie direkt in der Datei: `summary` in eigenen Worten (1–2 Sätze, was passiert), dazu `topics`, `cost` und `registration`, falls offen. Der Katalog liefert keine Rückfallwerte (ADR 0024). Prüfe dabei das abgeleitete `format`: Ein `einmalig` bei einer Reihe ergibt Einzeltermine mit anderer ID. Dann `pnpm pipeline validate-raw runs/<from>/raw/aggregatoren.json`.
-
-Fertig ist Schritt 2, wenn es für jedes `batch-<n>.json` ein `raw/batch-<n>.json` gibt und `validate-raw` für jede Rohdatei grün ist. Hat ein Subagent einen Anbieter ausgelassen, prüft ein neuer Subagent nur diesen: `pnpm pipeline select runs/<from> --only <id>` erzeugt ein zusätzliches Paket mit der nächsten freien Nummer, vorhandene Pakete bleiben unberührt.
-
-## 3. Bauen
-
-```
-pnpm pipeline build runs/<from>
-```
-
-`build` schreibt `data/offers.json` und `runs/<from>/report.json`. Angebots-IDs übernimmt es aus dem Vorstand (ADR 0022); die Hinweise „IDs: …“ im Bericht nennen jede Zuordnung über Termine oder Titel mit altem und neuem Titel. Auf stdout stehen Zahlen, jede Quelle mit `fehler` und jede Drift-Meldung. Bricht es ab, nennt die Meldung Datei, Event und Feld. Korrigiere die Rohdatei und baue erneut. Fertig, wenn `build` „data/offers.json geschrieben“ meldet.
-
-## 4. Katalog pflegen
-
-Jede Drift-Meldung aus dem Bericht wird in `data/providers.yaml` umgesetzt (tote URL, Umzug, neues Buchungssystem, Schließung), danach `verified` auf heute. Die Regeln stehen in `references/catalog.md`; Katalog-IDs nie umbenennen, `publicId` nie ändern (ADR 0022). Fertig, wenn jede Drift-Meldung umgesetzt oder begründet verworfen ist und `pnpm data:validate` grün ist.
-
-## 5. Veröffentlichen
-
-```
-pnpm pipeline publish runs/<from>
-gh run watch <id> -i 120 --exit-status
-```
-
-Die Lauf-ID nennt `gh run list --branch main --limit 1`. Ein Intervall unter 2 Minuten reißt mit parallelen Sessions das API-Limit (Plan 0027, E13). Läuft der Skill als Subagent, beobachtet er die CI nicht: Er meldet SHA und Lauf-ID, und die Haupt-Session beobachtet.
-
-`publish` bricht ab, wenn es Änderungen außerhalb von `data/` gibt. Code-Änderungen gehören in einen eigenen Commit. Danach prüft `publish` gegen den deployten Stand, committet `data/` auf `main` und pusht. Ist CI rot, bleibt die alte Version live: Ursache reparieren, neu bauen, neu veröffentlichen.
-
-Fertig, wenn der CI-Lauf grün ist und `curl -s https://zwergenplan.app/data/meta.json` in `commit` den neuen Kurz-SHA zeigt. Als Subagent: fertig, wenn SHA und Lauf-ID gemeldet sind.
+Das Abo-Token (`CLAUDE_CODE_OAUTH_TOKEN`) ist nur der Einstieg (N-H). Für die API bei Anthropic: Secret `ANTHROPIC_API_KEY` anlegen und in beiden Workflows statt `CLAUDE_CODE_OAUTH_TOKEN` an die Schritte mit Modell geben. `io/llm.ts` reicht den Schlüssel schon durch; geändert wird nur dort und in den Workflows. Ein anderer Anbieter bedeutet einen neuen Aufrufweg allein in `io/llm.ts` (gleiche Schnittstelle `LlmCall`/`LlmResult`, `llm.test.ts`) und einen Eval-Lauf vor dem Umstellen.
 
 ## Abschlussbericht im Chat
 
-- Fahrplan: „aktuell“ oder neuer Stand mit Stichtag, ggf. Warnung zum Fahrplanwechsel
-- Angebote und Termine, verglichen mit dem vorigen Stand
-- **jede** Quelle mit `fehler` samt Grund und **jede** aus dem Altbestand übernommene Quelle
-- umgesetzte Katalogänderungen
-- Link zur Live-Seite
+- Ampel der letzten Läufe und jede rote Ursache
+- jede Quelle mit `fehler` samt Grund und jeder zurückgehaltene Einbruch
+- neue, zurückgenommene und von Hand geänderte Anbieter
+- Kosten der Läufe, wenn auffällig
+- offene Pflegepunkte

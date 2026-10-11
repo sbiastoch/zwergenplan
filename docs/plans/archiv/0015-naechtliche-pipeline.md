@@ -1,6 +1,6 @@
 # Plan 0015 – Nächtliche Datenpipeline mit Evals
 
-Status: Review eingearbeitet für Nachtrag A (stabile IDs, 2026-10-08, neue Stufe 0; Nutzerentscheide N-I1 und N-I2 am 2026-10-08 mit „ja“ entschieden und eingearbeitet, N-I3 und N-I4 offen, umsetzbar mit den empfohlenen Standards). Hauptteil freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0018 (Kalender-Export nur altersgerecht)
+Status: ersetzt durch Plan 0032 (2026-10-11). Nachtrag A (stabile IDs) ist als Stufe 0 von Plan 0032 umgesetzt und live (ADR 0022); Hauptteil und Nachtrag B wurden nie umgesetzt, der ADR-Entwurf 0016 ist ersetzt durch ADR 0026. Früherer Status: Review eingearbeitet für Nachtrag A (stabile IDs, 2026-10-08, neue Stufe 0; Nutzerentscheide N-I1 und N-I2 am 2026-10-08 mit „ja“ entschieden und eingearbeitet, N-I3 und N-I4 offen, umsetzbar mit den empfohlenen Standards). Hauptteil freigegeben nach Plan-Review (3 Durchgänge), Umsetzung offen. Nutzerentscheidungen vom 2026-10-06: E9 öffentlich (a), Datenhorizont 12 Monate bestätigt, Secrets folgen in Stufe C. Voraussetzung vor Stufe A live: Plan 0018 (Kalender-Export nur altersgerecht)
 Datum: 2026-10-06
 
 (ADR 0002 Hosting und Datenfluss, ADR 0003 Datenmodell, ADR 0004 Backpressure, ADR 0006 Recherche-Pipeline, Plan 0002 Pipeline, Plan 0009 Fahrplan; neu: ADR-Entwurf 0016; mit Nachtrag A neu: ADR-Entwurf 0022 stabile IDs.)

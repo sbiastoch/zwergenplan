@@ -1,6 +1,6 @@
 # ADR 0002 – Hosting, Sichtbarkeit und Datenfluss
 
-Status: angenommen (2026-10-04)
+Status: angenommen (2026-10-04). Datenpipeline in GitHub Actions über das Abo, Push aus Actions (allein im Job `veroeffentlichen`) und CI per `workflow_dispatch` ergänzt durch ADR 0026.
 
 ## Entscheidung
 - **GitHub Pages** aus dem öffentlichen Repo `sbiastoch/zwergenplan` unter `/zwergenplan/`. Der Pfad steht nur in `site.config.ts`. *Ersetzt durch ADR 0009: eigene Domain `zwergenplan.app` im Wurzelpfad.*

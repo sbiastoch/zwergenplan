@@ -4,8 +4,8 @@ Der Vertrag ist `Provider` in `src/domain/schema.ts`, exportiert als `schema/pro
 
 ## Rollen
 
-- `anbieter` veranstaltet selbst. Er hat mindestens einen Ort und als Einziger Angebote. `coveredBy: <aggregator>` heißt, dass seine Termine vollständig über diesen Sammelkalender kommen und kein Subagent seine Seite prüft.
-- `aggregator` ist ein Sammelkalender fremder Veranstalter mit `adapter` (Pflicht); `candidates fetch` fragt ihn ab. Ein Sammelkalender ohne Adapter ist ein `verzeichnis`.
+- `anbieter` veranstaltet selbst. Er hat mindestens einen Ort und als Einziger Angebote. `coveredBy: <aggregator>` heißt, dass seine Termine vollständig über diesen Sammelkalender kommen und der Nachtlauf seine Seite nicht abruft.
+- `aggregator` ist ein Sammelkalender fremder Veranstalter mit `adapter` (Pflicht); der Nachtlauf und das Entdecken fragen ihn über den Adapter ab. Ein Sammelkalender ohne Adapter ist ein `verzeichnis`.
 - `verzeichnis` ist eine Liste zur Katalogpflege und liefert keine Termine.
 - Der Katalog beschreibt Quellen, nicht Inhalte (ADR 0024). Alle Rollen haben `region`, `name`, `url`, `programme`, `availability`, `verified` und `notes`. Nur `anbieter` hat `age`, `venues` und `coveredBy`, nur `aggregator` hat `adapter`. Themen, Format, Kosten und Anmeldung stehen nur an den Angeboten.
 - `region` ist die Region der Quelle (heute nur `nuernberg`, `src/domain/regions.ts`); jeder Ort muss in ihrer bbox liegen (ADR 0025).
@@ -14,12 +14,12 @@ Der Vertrag ist `Provider` in `src/domain/schema.ts`, exportiert als `schema/pro
 
 - Die Katalog-ID (`id`) ist der interne Schlüssel für Angebote, Orte und Pipeline. Sie wird **nie umbenannt**: Zuordnung und Angebots-IDs hängen an ihr.
 - Jeder `anbieter` hat direkt unter `id` eine `publicId` (8 Zeichen `[0-9a-z]`). Sie steht in Links (`p/<publicId>/`), `site.json`, `anbieter.json` und der Merkliste gemerkter Anbieter und wird **nie geändert**.
-- Neue Einträge: `candidates add-provider` setzt die `publicId` selbst. Bei einem von Hand ergänzten Eintrag meldet `pnpm data:validate` „`<id>`: `publicId` fehlt – frei ist `<wert>`“; genau diesen Wert übernehmen, nie einen selbst ausdenken. Wechselt ein Eintrag zu `anbieter`, gilt dasselbe.
+- Neue Einträge: `pipeline discover` setzt die `publicId` selbst. Bei einem von Hand ergänzten Eintrag meldet `pnpm data:validate` „`<id>`: `publicId` fehlt – frei ist `<wert>`“; genau diesen Wert übernehmen, nie einen selbst ausdenken. Wechselt ein Eintrag zu `anbieter`, gilt dasselbe.
 - `aggregator` und `verzeichnis` haben keine `publicId`.
 
 ## Programmseiten (`programme`, ADR 0025)
 
-Der nächtliche Crawler (Plan 0015) liest nur Felder, keine Notizen. Je Seite:
+Der Nachtlauf (Plan 0032) liest nur Felder, keine Notizen. Je Seite:
 
 | Feld | Bedeutung |
 |---|---|
@@ -40,16 +40,16 @@ Der nächtliche Crawler (Plan 0015) liest nur Felder, keine Notizen. Je Seite:
 - Der Hauptort hat die Anbieter-ID als `id`, weitere Orte `<anbieter>-<slug>`. IDs sind dauerhaft und stecken im Zuordnungsschlüssel der Angebots-IDs (ADR 0022). Wird ein Ort umbenannt, bleibt die `id`.
 - Ein neuer Ort braucht Koordinaten: `pnpm pipeline geocode "Straße Nr, PLZ Nürnberg"` liefert `lat`, `lon` und `district`.
 - `venues[].hint` (höchstens 200 Zeichen, ohne Datum) sagt dem Crawler, was an diesem Ort stattfindet („Babymassage freitags, Krabbelgruppen“). Ist die Koordinate nur ungefähr (Park, Straßenmitte), steht das in `notes`.
-- Meldet ein Subagent „neuer Ort“ als Drift: Ort anlegen, dann in der Rohdatei `venueId` der betroffenen Events umstellen und `build` neu laufen lassen.
+- Ein neuer Ort braucht einen `venues`-Eintrag; der nächste Nachtlauf ordnet die Termine zu, weil der geänderte Katalogauszug den Eingabe-Hash ändert.
 
-## Drift umsetzen
+## Änderungen an Quellen umsetzen
 
 | Meldung | Änderung |
 |---|---|
 | tote oder umgezogene URL | `programme`-Eintrag korrigieren |
 | neues Buchungssystem | `availability.system` und `availability.how` anpassen |
-| Schließung | Eintrag löschen und mit Grund in `references/excluded.md` vermerken |
-| neuer Veranstalter, mehrfach in Sammelkalendern | als `anbieter` aufnehmen (`candidates add-provider` oder von Hand) |
+| Schließung | Eintrag löschen, mit `id` und `publicId` in `abgelehnt` eintragen (SKILL.md, Abschnitt 2) und mit Grund in `references/excluded.md` vermerken |
+| neuer Veranstalter, mehrfach in Sammelkalendern | findet das Entdecken selbst; sonst von Hand als `anbieter` aufnehmen (SKILL.md, Abschnitt 3) |
 
 Nach jeder Prüfung bekommt `verified` das heutige Datum.
 

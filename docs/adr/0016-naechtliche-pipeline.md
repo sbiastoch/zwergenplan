@@ -1,6 +1,6 @@
 # ADR 0016 – Nächtliche Datenpipeline: ein Modellaufruf je Anbieter, Zustand im Repo, Eval-Gate
 
-Status: Entwurf (2026-10-06), ergänzt ADR 0002, 0003, 0006 und 0011. Titel-Anker ersetzt durch ADR 0022 (Zuordnung gegen den Vorstand). Details und Begründungen in Plan 0015. **Wird durch ADR 0026 ersetzt (vorgeschlagen, Plan 0032)**; der Status ändert sich mit dessen Annahme (Plan 0032, Stufe 5).
+Status: **ersetzt durch ADR 0026** (2026-10-11, Plan 0032). Entwurf vom 2026-10-06, nie angenommen und nie umgesetzt; sollte ADR 0002, 0003, 0006 und 0011 ergänzen. Titel-Anker ersetzt durch ADR 0022 (Zuordnung gegen den Vorstand). Details und Begründungen in Plan 0015 (ersetzt durch Plan 0032).
 
 ## Kontext
 Bisher aktualisiert ein interaktiver Lauf in Claude Code die Daten (ADR 0002: lokal, Abo des Nutzers). Subagenten rufen dabei Seiten ab, folgen Links und schreiben Rohdaten für einen Horizont von 4 Monaten. Das teure Modell liest jedes Mal alle Seiten neu, es gibt keinen Zeitplan, und welches Modell wie gut extrahiert, ist nicht messbar. Gewünscht sind:

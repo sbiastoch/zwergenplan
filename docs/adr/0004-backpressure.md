@@ -1,6 +1,6 @@
 # ADR 0004 – Backpressure statt menschlichem Review
 
-Status: angenommen (2026-10-04)
+Status: angenommen (2026-10-04). Backpressure der automatischen Datenpipeline (Validierung je Anbieter, Einbruchschutz, Gates vor dem Push, Vergleich gegen den deployten Stand; Eval nur als Messung) regelt ADR 0026.
 
 ## Kontext
 Agenten arbeiten autonom, und es gibt kein PR-Review. Qualität muss deshalb aus Prüfungen kommen, die schnell und ohne Ermessen rot werden.
