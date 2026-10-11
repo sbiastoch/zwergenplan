@@ -24,7 +24,10 @@ Nachgeschärft, nachdem die Folge auf dem iPhone (eigener Speicher der installie
 
 ## Nicht-Ziele
 
-- Angaben zwischen Safari-Tab und installierter iPhone-App übertragen (getrennte Speicher, Plattformgrenze; kein Mechanismus über URL o. ä., Privatsphäre).
+- Angaben zwischen Safari-Tab und installierter iPhone-App übertragen (getrennte Speicher, Plattformgrenze). Dafür steht als Idee in `docs/ideas.md` der **Setup-Link für iOS**:
+  - Die Angaben reisen per Fragment (`#setup=…`, geht nie an den Server) in der Startadresse der Home-Bildschirm-App, ggf. mit vor dem Hinzufügen dynamisch umgeschriebener Manifest-`start_url`.
+  - Offen ist, ob iOS die aktuelle URL oder die Manifest-`start_url` übernimmt und ob ein umgeschriebenes Manifest greift. Das prüft erst eine Testseite auf einem echten iPhone, in der CI lässt es sich nicht nachstellen.
+  - Ein Abgleich über einen Server ist verworfen (Privatsphäre).
 - Neue Schritte, neue Eingaben, neue Gestaltung, neue Illustration. Der App-Schritt als erster Schritt nutzt die bestehende App-Bühne.
 - Ein allgemeiner Mechanismus „Onboarding nach großen Änderungen erneut zeigen“ über die Konstante hinaus. Die Konstante `ONBOARDING_VERSION` ist dieser Mechanismus; eine weitere Erhöhung ist eine Einzeiländerung mit eigenem Anlass.
 - Reichweiten-Grenze („Höchstens unterwegs“) vorbelegen: Sie lebt nur in der URL (`wegzeit=`), nicht im Speicher. Im Onboarding steht wie heute der Chip „Egal“ gewählt, wenn die URL keine Grenze trägt.
@@ -66,7 +69,7 @@ Nachgeschärft, nachdem die Folge auf dem iPhone (eigener Speicher der installie
   - `docs/architecture.md:101`, `:104`, `:132` (Gate „still-erledigt“, `hasStoredData`, `SEARCHES_KEY`, Flag-Wert `"1"`, Probe „ohne Onboarding-Flag“).
   - ADR 0027, Entscheidung 1 und Alternativen („still-erledigt“, iPhone „Position 2“).
   - ADR 0012, Delta-Zeile Plan 0033 (nennt `hasStoredData`; bleibt als Historie).
-  - `docs/ideas.md:71` (Idee „Onboarding erneut für alle“), `:97` (iPhone-Prüfung „Stadt → App → Alter → Weg“), `:101`.
+  - `docs/ideas.md`: Idee „Onboarding erneut für alle“, unter Plan 0033 die iPhone-Prüfung („Stadt → App → Alter → Weg“) und „Stadtwahl speichern und Onboarding-Version stehen oben“.
 
 ## Entscheidungen
 
@@ -230,9 +233,9 @@ Die Entscheidung von ADR 0027 (Vorladen bei Gate ≠ „nichts“, nur das Modul
     - Test-Beleg „mit und ohne gespeicherte Merkliste“ bleibt.
 - **ADR 0012**: Delta-Zeile „Plan 0034“ mit vorher/nachher `JS (initial)` (vermutlich leicht negativ). Die Zeile von Plan 0033 bleibt als Historie.
 - **`docs/ideas.md`**:
-  - `:71` „Onboarding erneut für alle nach großen Änderungen“ entfernen. Der Mechanismus ist mit Plan 0034 umgesetzt (`ONBOARDING_VERSION` erhöhen). Ein Satz unter „Offen aus abgeschlossenen Plänen“ bei Plan 0033 verweist darauf.
-  - `:97` iPhone-Prüfung: Reihenfolge im Safari-Tab „App → Stadt → Alter → Weg“. Die installierte App zeigt „Stadt → Alter → Weg → App“ mit Schalter.
-  - `:101`: „Onboarding-Version“ aus „stehen oben“ streichen.
+  - „Onboarding erneut für alle nach großen Änderungen“ entfernen. Der Mechanismus ist mit Plan 0034 umgesetzt (`ONBOARDING_VERSION` erhöhen). Ein Satz unter „Offen aus abgeschlossenen Plänen“ bei Plan 0033 verweist darauf.
+  - iPhone-Prüfung (Plan 0033): Reihenfolge im Safari-Tab „App → Stadt → Alter → Weg“. Die installierte App zeigt „Stadt → Alter → Weg → App“ mit Schalter.
+  - Restpunkte Plan 0033: „Onboarding-Version“ aus „stehen oben“ streichen.
 - **Plan 0033** (Archiv): keine Änderung; Verweis nur von hier.
 - Keine README-Änderung (das Onboarding steht dort nicht im Detail; in S5 per `grep -n -i "einführung\|onboarding" README.md` bestätigen).
 
