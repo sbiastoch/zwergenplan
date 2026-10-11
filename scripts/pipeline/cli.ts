@@ -12,6 +12,7 @@
  *   extract ID [--from DIR]                     Probe der Extraktion eines Anbieters mit dem Modell (Plan 0032, E4):
  *                                               Eingabe aus DIR (Ausgabe von `fetch`), sonst frisch abgerufen;
  *                                               Ergebnis und Aufrufe nach runs/<heute>/extract/<id>.json, nichts nach data/.
+ *                                               Eval aller eingefrorenen Fälle: `pnpm eval` (scripts/pipeline/eval.ts, E9).
  *   candidates fetch|list RUN_DIR               Sammelkalender abrufen / Kandidaten mit Zuordnung zeigen
  *   nightly [--only a,b] [--dry-run]            Nachtlauf (Plan 0032, E5/E6): Abruf, je Anbieter refresh (data/raw),
  *                                               build aus data/raw nach data/offers.json; Bericht
@@ -28,7 +29,6 @@
  *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
  */
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
@@ -70,6 +70,7 @@ import { DEFAULT_BUDGET_MIN, runNightly } from "./io/nightly.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
+import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
 import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
@@ -229,12 +230,8 @@ async function extractCmd(id: string) {
   const started = performance.now();
   const input: ExtractInput = { provider, text, candidates, allowedUrls, today: date };
   const result: ExtractResult = await createExtractor()(input, controller.signal);
-  const promptHash = createHash("sha256")
-    .update(EXTRACT_KEY_PARTS.prompt)
-    .update(EXTRACT_KEY_PARTS.schema)
-    .digest("hex")
-    .slice(0, 12);
-  writeJson(join(outDir, `${id}.json`), { providerId: id, date, chars: text.length, promptHash, ...result });
+  const hash = promptHash(EXTRACT_KEY_PARTS);
+  writeJson(join(outDir, `${id}.json`), { providerId: id, date, chars: text.length, promptHash: hash, ...result });
   const sum = (f: (c: CallRecord) => number) => result.calls.reduce((s, c) => s + f(c), 0);
   const headline = (o: ExtractOutcome) =>
     o.kind === "ok"

@@ -1,0 +1,261 @@
+{
+ "basis": "data/offers.json vom 2026-10-04T14:05:37+02:00, von Hand gegen input.json geprüft am 2026-10-11 (Korrekturen in NOTES.md)",
+ "window": {
+  "from": "2026-10-11",
+  "to": "2027-02-04"
+ },
+ "offers": [
+  {
+   "id": "en5mwmx3",
+   "title": "Kleinkindschwimmen ab 2 J. mit Elternteil, samstags 10:45 (Kurs 822)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-17T10:45:00+02:00",
+    "2026-10-24T10:45:00+02:00",
+    "2026-10-31T10:45:00+01:00",
+    "2026-11-14T10:45:00+01:00",
+    "2026-11-21T10:45:00+01:00",
+    "2026-11-28T10:45:00+01:00",
+    "2026-12-05T10:45:00+01:00",
+    "2026-12-12T10:45:00+01:00",
+    "2026-12-19T10:45:00+01:00"
+   ]
+  },
+  {
+   "id": "cbdm13yl",
+   "title": "Kleinkindschwimmen ab 2 J. mit Elternteil, sonntags 10:30 (Kurs 828)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-11T10:30:00+02:00",
+    "2026-10-18T10:30:00+02:00",
+    "2026-10-25T10:30:00+01:00",
+    "2026-11-15T10:30:00+01:00",
+    "2026-11-22T10:30:00+01:00",
+    "2026-11-29T10:30:00+01:00",
+    "2026-12-06T10:30:00+01:00",
+    "2026-12-13T10:30:00+01:00",
+    "2026-12-20T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "edq5pavs",
+   "title": "Mutter/Vater-Baby-Schwimmen (3–12 Mon.), montags 16:30 (Kurs 811)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-12T16:30:00+02:00",
+    "2026-10-19T16:30:00+02:00",
+    "2026-10-26T16:30:00+01:00",
+    "2026-11-09T16:30:00+01:00",
+    "2026-11-16T16:30:00+01:00",
+    "2026-11-23T16:30:00+01:00",
+    "2026-11-30T16:30:00+01:00",
+    "2026-12-07T16:30:00+01:00",
+    "2026-12-14T16:30:00+01:00"
+   ]
+  },
+  {
+   "id": "rbah2yfy",
+   "title": "Mutter/Vater-Baby-Schwimmen (3–12 Mon.), montags 17:00 (Kurs 812)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-12T17:00:00+02:00",
+    "2026-10-19T17:00:00+02:00",
+    "2026-10-26T17:00:00+01:00",
+    "2026-11-09T17:00:00+01:00",
+    "2026-11-16T17:00:00+01:00",
+    "2026-11-23T17:00:00+01:00",
+    "2026-11-30T17:00:00+01:00",
+    "2026-12-07T17:00:00+01:00",
+    "2026-12-14T17:00:00+01:00"
+   ]
+  },
+  {
+   "id": "hvd08gq1",
+   "title": "Mutter/Vater-Baby-Schwimmen (3–12 Mon.), montags 17:30 (Kurs 813)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-12T17:30:00+02:00",
+    "2026-10-19T17:30:00+02:00",
+    "2026-10-26T17:30:00+01:00",
+    "2026-11-09T17:30:00+01:00",
+    "2026-11-16T17:30:00+01:00",
+    "2026-11-23T17:30:00+01:00",
+    "2026-11-30T17:30:00+01:00",
+    "2026-12-07T17:30:00+01:00",
+    "2026-12-14T17:30:00+01:00"
+   ]
+  },
+  {
+   "id": "b76b87ob",
+   "title": "Mutter/Vater-Baby-Schwimmen (3–12 Mon.), samstags 10:15 (Kurs 821)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-17T10:15:00+02:00",
+    "2026-10-24T10:15:00+02:00",
+    "2026-10-31T10:15:00+01:00",
+    "2026-11-14T10:15:00+01:00",
+    "2026-11-21T10:15:00+01:00",
+    "2026-11-28T10:15:00+01:00",
+    "2026-12-05T10:15:00+01:00",
+    "2026-12-12T10:15:00+01:00",
+    "2026-12-19T10:15:00+01:00"
+   ]
+  },
+  {
+   "id": "0zc4g192",
+   "title": "Mutter/Vater-Baby-Schwimmen (3–12 Mon.), sonntags 08:45 (Kurs 825)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-11T08:45:00+02:00",
+    "2026-10-18T08:45:00+02:00",
+    "2026-10-25T08:45:00+01:00",
+    "2026-11-15T08:45:00+01:00",
+    "2026-11-22T08:45:00+01:00",
+    "2026-11-29T08:45:00+01:00",
+    "2026-12-06T08:45:00+01:00",
+    "2026-12-13T08:45:00+01:00",
+    "2026-12-20T08:45:00+01:00"
+   ]
+  },
+  {
+   "id": "1ep6li24",
+   "title": "Mutter/Vater-Baby-Schwimmen (3–12 Mon.), sonntags 09:15 (Kurs 826)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-11T09:15:00+02:00",
+    "2026-10-18T09:15:00+02:00",
+    "2026-10-25T09:15:00+01:00",
+    "2026-11-15T09:15:00+01:00",
+    "2026-11-22T09:15:00+01:00",
+    "2026-11-29T09:15:00+01:00",
+    "2026-12-06T09:15:00+01:00",
+    "2026-12-13T09:15:00+01:00",
+    "2026-12-20T09:15:00+01:00"
+   ]
+  },
+  {
+   "id": "p6xw7cnv",
+   "title": "Mutter/Vater-Kind-Schwimmen (12–24 Mon.), donnerstags 16:30 (Kurs 816)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "kleinkindschwimmen",
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-15T16:30:00+02:00",
+    "2026-10-22T16:30:00+02:00",
+    "2026-10-29T16:30:00+01:00",
+    "2026-11-12T16:30:00+01:00",
+    "2026-11-19T16:30:00+01:00",
+    "2026-11-26T16:30:00+01:00",
+    "2026-12-03T16:30:00+01:00",
+    "2026-12-10T16:30:00+01:00",
+    "2026-12-17T16:30:00+01:00"
+   ]
+  },
+  {
+   "id": "1qjwrt0c",
+   "title": "Mutter/Vater-Kind-Schwimmen (12–24 Mon.), sonntags 09:45 (Kurs 827)",
+   "venueId": "nuebad-flipper",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "kleinkindschwimmen",
+    "babyschwimmen"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-11T09:45:00+02:00",
+    "2026-10-18T09:45:00+02:00",
+    "2026-10-25T09:45:00+01:00",
+    "2026-11-15T09:45:00+01:00",
+    "2026-11-22T09:45:00+01:00",
+    "2026-11-29T09:45:00+01:00",
+    "2026-12-06T09:45:00+01:00",
+    "2026-12-13T09:45:00+01:00",
+    "2026-12-20T09:45:00+01:00"
+   ]
+  }
+ ]
+}

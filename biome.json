@@ -17,6 +17,7 @@
       "!data/oepnv",
       "!data/raw",
       "!data/discover",
+      "!evals/cases",
       "!tests/fixtures/oepnv"
     ]
   },

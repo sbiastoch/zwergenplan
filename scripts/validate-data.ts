@@ -7,6 +7,8 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
+import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
+import { hasResultFor, promptHash } from "./pipeline/lib/eval-score.ts";
 import { providerRawIssues } from "./pipeline/lib/raw.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
 
@@ -52,6 +54,19 @@ function rawIssues(): string[] {
   return issues;
 }
 
+/**
+ * Eval zum aktuellen Prompt (Plan 0032, E9): kein Gate, nur ein Hinweis, wenn `evals/results.md` für Prompt und
+ * Antwortschema (`EXTRACT_KEY_PARTS`) keine Zeile hat. Nach einem Prompt- oder Schemawechsel `pnpm eval` laufen lassen.
+ */
+function evalWarnings(): string[] {
+  const hash = promptHash(EXTRACT_KEY_PARTS);
+  const file = new URL("evals/results.md", ROOT);
+  const md = existsSync(file) ? readFileSync(file, "utf8") : "";
+  return hasResultFor(md, hash)
+    ? []
+    : [`Kein Eval für den aktuellen Extraktions-Prompt (Hash ${hash}) in evals/results.md – pnpm eval laufen lassen`];
+}
+
 const now = new Date();
 const fixture = source === "fixture";
 const plausibility = checkPlausibility(result.summary, deployed, { fixture, now });
@@ -62,6 +77,7 @@ const warnings = [
   ...plausibility.warnings,
   ...timetableCheck.warnings,
   ...(timetable.kind === "ok" ? timetableWarnings(timetable.timetable.source, now, { fixture }) : []),
+  ...evalWarnings(),
 ];
 for (const w of warnings) console.log(`::warning::${w}`);
 if (errors.length > 0) {
