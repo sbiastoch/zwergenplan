@@ -13,6 +13,7 @@
     "data:build": "node scripts/build-data.ts",
     "data:validate": "node scripts/validate-data.ts",
     "pipeline": "node scripts/pipeline/cli.ts",
+    "eval": "node scripts/pipeline/eval.ts",
     "schema:export": "node scripts/export-schema.ts",
     "schema:check": "node scripts/export-schema.ts --check",
     "typecheck": "tsc --noEmit -p .",

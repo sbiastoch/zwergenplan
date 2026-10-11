@@ -1,0 +1,244 @@
+{
+ "basis": "data/offers.json vom 2026-10-04T14:05:37+02:00, von Hand gegen input.json geprüft am 2026-10-11 (Korrekturen in NOTES.md)",
+ "window": {
+  "from": "2026-10-11",
+  "to": "2027-02-04"
+ },
+ "offers": [
+  {
+   "id": "ruodf7uh",
+   "title": "Musikfüchse Baby I, dienstags 10:30 (Kurs ab 15.09.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-13T10:30:00+02:00",
+    "2026-10-20T10:30:00+02:00",
+    "2026-10-27T10:30:00+01:00",
+    "2026-11-10T10:30:00+01:00",
+    "2026-11-17T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "eibci3ia",
+   "title": "Musikfüchse Baby I, montags 10:30 (Kurs ab 14.09.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-12T10:30:00+02:00",
+    "2026-10-19T10:30:00+02:00",
+    "2026-10-26T10:30:00+01:00",
+    "2026-11-09T10:30:00+01:00",
+    "2026-11-16T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "7j7aac1g",
+   "title": "Musikfüchse Baby II, dienstags 9:30 (Kurs ab 15.09.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-13T09:30:00+02:00",
+    "2026-10-20T09:30:00+02:00",
+    "2026-10-27T09:30:00+01:00",
+    "2026-11-10T09:30:00+01:00",
+    "2026-11-17T09:30:00+01:00"
+   ]
+  },
+  {
+   "id": "r2xt7pmd",
+   "title": "Musikfüchse Baby II, montags 9:30 (Kurs ab 14.09.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-12T09:30:00+02:00",
+    "2026-10-19T09:30:00+02:00",
+    "2026-10-26T09:30:00+01:00",
+    "2026-11-09T09:30:00+01:00",
+    "2026-11-16T09:30:00+01:00"
+   ]
+  },
+  {
+   "id": "jprrl38a",
+   "title": "Musikfüchse-Musikzwerge Baby I, dienstags 10:30 (ab 24.11.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-24T10:30:00+01:00",
+    "2026-12-01T10:30:00+01:00",
+    "2026-12-08T10:30:00+01:00",
+    "2026-12-15T10:30:00+01:00",
+    "2026-12-22T10:30:00+01:00",
+    "2027-01-12T10:30:00+01:00",
+    "2027-01-19T10:30:00+01:00",
+    "2027-01-26T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "u2g2dfp8",
+   "title": "Musikfüchse-Musikzwerge Baby I, montags 10:30 (ab 23.11.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-23T10:30:00+01:00",
+    "2026-11-30T10:30:00+01:00",
+    "2026-12-07T10:30:00+01:00",
+    "2026-12-14T10:30:00+01:00",
+    "2026-12-21T10:30:00+01:00",
+    "2027-01-11T10:30:00+01:00",
+    "2027-01-18T10:30:00+01:00",
+    "2027-01-25T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "s54868x7",
+   "title": "Musikfüchse-Musikzwerge Baby II, dienstags 9:30 (ab 24.11.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-24T09:30:00+01:00",
+    "2026-12-01T09:30:00+01:00",
+    "2026-12-08T09:30:00+01:00",
+    "2026-12-15T09:30:00+01:00",
+    "2026-12-22T09:30:00+01:00",
+    "2027-01-12T09:30:00+01:00",
+    "2027-01-19T09:30:00+01:00",
+    "2027-01-26T09:30:00+01:00"
+   ]
+  },
+  {
+   "id": "hv1ux30l",
+   "title": "Musikfüchse-Musikzwerge Baby II, montags 9:30 (ab 23.11.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-23T09:30:00+01:00",
+    "2026-11-30T09:30:00+01:00",
+    "2026-12-07T09:30:00+01:00",
+    "2026-12-14T09:30:00+01:00",
+    "2026-12-21T09:30:00+01:00",
+    "2027-01-11T09:30:00+01:00",
+    "2027-01-18T09:30:00+01:00",
+    "2027-01-25T09:30:00+01:00"
+   ]
+  },
+  {
+   "id": "bxhb3kbg",
+   "title": "Musikfüchse-Musikzwerge I (18 Mon.–3 J.), montags 15:30 (ab 23.11.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-23T15:30:00+01:00",
+    "2026-11-30T15:30:00+01:00",
+    "2026-12-07T15:30:00+01:00",
+    "2026-12-14T15:30:00+01:00",
+    "2026-12-21T15:30:00+01:00",
+    "2027-01-11T15:30:00+01:00",
+    "2027-01-18T15:30:00+01:00",
+    "2027-01-25T15:30:00+01:00"
+   ]
+  },
+  {
+   "id": "mx1g3tzf",
+   "title": "Musikfüchse-Musikzwerge I (18 Mon.–3 J.), montags 15:30 (Kurs ab 14.09.)",
+   "venueId": "musikfuechse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "availability": {
+    "status": "ausgebucht"
+   },
+   "starts": [
+    "2026-10-12T15:30:00+02:00",
+    "2026-10-19T15:30:00+02:00",
+    "2026-10-26T15:30:00+01:00",
+    "2026-11-09T15:30:00+01:00",
+    "2026-11-16T15:30:00+01:00"
+   ]
+  }
+ ]
+}

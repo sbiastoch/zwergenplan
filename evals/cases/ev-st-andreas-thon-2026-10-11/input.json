@@ -1,0 +1,1046 @@
+{
+ "kinds": [
+  "kandidaten"
+ ],
+ "traps": [],
+ "synthetic": false,
+ "origin": "pnpm eval freeze am 2026-10-11",
+ "providerId": "ev-st-andreas-thon",
+ "catalog": {
+  "id": "ev-st-andreas-thon",
+  "publicId": "dq5ixji2",
+  "role": "anbieter",
+  "region": "nuernberg",
+  "name": "Ev. St. Andreas Thon – Miniclubs (nach Geburtsjahrgang)",
+  "url": "https://www.evangelische-termine.de/ical?vid=126",
+  "programme": [
+   {
+    "url": "https://www.evangelische-termine.de/ical?vid=126",
+    "kind": "ical",
+    "use": "termine"
+   }
+  ],
+  "availability": {
+   "shown": "teilweise",
+   "how": "'(Warteliste)' steht im Titel voller Gruppen",
+   "system": "evangelische-termine.de"
+  },
+  "verified": "2026-10-04",
+  "notes": [
+   "Kontakt über Pfarrbüro; offen für alle Konfessionen.",
+   "[evangelische-termine.de/ical?vid=126] ET vid=126: Miniclubs Di 15-16:30 (geb. 07/2024-02/2025), Mi 9:30-11 (geb. 03-07/2026), Do 15:30-17 (geb. 04-09/2025), Fr 10-11:30 (geb. 09/2025-01/2026)"
+  ],
+  "age": {
+   "minMonths": 0,
+   "maxMonths": 24
+  },
+  "venues": [
+   {
+    "id": "ev-st-andreas-thon",
+    "name": "Ökumenisches Gemeindezentrum Thon",
+    "address": "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG), Cuxhavener Straße 54, 90425 Nürnberg",
+    "district": "Thon",
+    "geo": {
+     "lat": 49.476843,
+     "lon": 11.06632
+    }
+   }
+  ],
+  "coveredBy": "et-dekanat-nuernberg"
+ },
+ "today": "2026-10-11",
+ "text": "## Kandidaten (8)\n{\"source\":\"stadt-vk\",\"sourceId\":\"463257\",\"title\":\"Trempelmarkt St. Andreas\",\"description\":\"Goßes Angebot an Saisonbekleidung Herbst/Winter, sortiert nach Größen und getrennt nach Mädchen und Jungen, Sportartikel, Fahrräder, Bücher, Spielwaren, CDs für Babys bis Jugendliche. Wir laden Sie herzlich dazu ein, bei uns als Verkäufer und/oder Käufer mitzumachen. Bis zu 100 Verkäufer bieten Ihnen ein großes Sortiment Saisonbekleidung für Babys, Kinder und Jugendliche von Gr. 56 bis Gr. 176 an. Für einen übersichtlichen Einkauf sorgt eine Trennung der Kleidung nach Größen und eine Auslegung (ab Gr. 80) getrennt, nach Mädchen und Jungenbekleidung. Natürlich werden auch wieder Spielzeug, Büch\",\"organizer\":\"Evang.-Luth. Kirchengemeinde St. Andreas\",\"location\":\"Ökumenisches Gemeindezentrum St. Andreas Thon - evang. Teil EG\",\"address\":\"Cuxhavener Straße 54, 90425 Nürnberg\",\"geo\":{\"lat\":49.4767725,\"lon\":11.0662204},\"detailUrl\":\"https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=463257\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":false,\"registrationRequired\":false,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-23T14:00\",\"end\":\"2026-10-23T18:00\"},{\"start\":\"2026-10-24T09:00\",\"end\":\"2026-10-24T13:00\"}]}\n{\"source\":\"evtermine\",\"sourceId\":\"8245246\",\"title\":\"Miniclub - Kinder: geb. 04/2024- 07/2024\",\"description\":\"Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro\",\"organizer\":\"Nürnberg - St. Andreas\",\"organizerId\":\"126\",\"organizerUrl\":\"http://www.st-andreas-nuernberg.de\",\"location\":\"Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)\",\"address\":\"Cuxhavener Strasse 54, 90425 Nürnberg\",\"geo\":{\"lat\":49.476769030027,\"lon\":11.066150665283},\"detailUrl\":\"https://www.evangelische-termine.de/detail-bt?ID=8245246\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":false,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-12T15:15\",\"end\":\"2026-10-12T16:45\"},{\"start\":\"2026-10-19T15:15\",\"end\":\"2026-10-19T16:45\"},{\"start\":\"2026-10-26T15:15\",\"end\":\"2026-10-26T16:45\"},{\"start\":\"2026-11-02T15:15\",\"end\":\"2026-11-02T16:45\"},{\"start\":\"2026-11-09T15:15\",\"end\":\"2026-11-09T16:45\"},{\"start\":\"2026-11-16T15:15\",\"end\":\"2026-11-16T16:45\"},{\"start\":\"2026-11-23T15:15\",\"end\":\"2026-11-23T16:45\"},{\"start\":\"2026-11-30T15:15\",\"end\":\"2026-11-30T16:45\"},{\"start\":\"2026-12-07T15:15\",\"end\":\"2026-12-07T16:45\"},{\"start\":\"2026-12-14T15:15\",\"end\":\"2026-12-14T16:45\"},{\"start\":\"2026-12-21T15:15\",\"end\":\"2026-12-21T16:45\"},{\"start\":\"2027-01-11T15:15\",\"end\":\"2027-01-11T16:45\"},{\"start\":\"2027-01-18T15:15\",\"end\":\"2027-01-18T16:45\"},{\"start\":\"2027-01-25T15:15\",\"end\":\"2027-01-25T16:45\"},{\"start\":\"2027-02-01T15:15\",\"end\":\"2027-02-01T16:45\"},{\"start\":\"2027-02-08T15:15\",\"end\":\"2027-02-08T16:45\"},{\"start\":\"2027-02-15T15:15\",\"end\":\"2027-02-15T16:45\"},{\"start\":\"2027-02-22T15:15\",\"end\":\"2027-02-22T16:45\"},{\"start\":\"2027-03-01T15:15\",\"end\":\"2027-03-01T16:45\"},{\"start\":\"2027-03-08T15:15\",\"end\":\"2027-03-08T16:45\"},{\"start\":\"2027-03-15T15:15\",\"end\":\"2027-03-15T16:45\"},{\"start\":\"2027-03-22T15:15\",\"end\":\"2027-03-22T16:45\"},{\"start\":\"2027-04-05T15:15\",\"end\":\"2027-04-05T16:45\"},{\"start\":\"2027-04-12T15:15\",\"end\":\"2027-04-12T16:45\"},{\"start\":\"2027-04-19T15:15\",\"end\":\"2027-04-19T16:45\"},{\"start\":\"2027-04-26T15:15\",\"end\":\"2027-04-26T16:45\"},{\"start\":\"2027-05-03T15:15\",\"end\":\"2027-05-03T16:45\"},{\"start\":\"2027-05-10T15:15\",\"end\":\"2027-05-10T16:45\"},{\"start\":\"2027-05-24T15:15\",\"end\":\"2027-05-24T16:45\"},{\"start\":\"2027-05-31T15:15\",\"end\":\"2027-05-31T16:45\"},{\"start\":\"2027-06-07T15:15\",\"end\":\"2027-06-07T16:45\"},{\"start\":\"2027-06-14T15:15\",\"end\":\"2027-06-14T16:45\"},{\"start\":\"2027-06-21T15:15\",\"end\":\"2027-06-21T16:45\"},{\"start\":\"2027-06-28T15:15\",\"end\":\"2027-06-28T16:45\"},{\"start\":\"2027-07-05T15:15\",\"end\":\"2027-07-05T16:45\"},{\"start\":\"2027-07-12T15:15\",\"end\":\"2027-07-12T16:45\"},{\"start\":\"2027-07-19T15:15\",\"end\":\"2027-07-19T16:45\"},{\"start\":\"2027-07-26T15:15\",\"end\":\"2027-07-26T16:45\"}]}\n{\"source\":\"evtermine\",\"sourceId\":\"8225001\",\"title\":\"Miniclub - Kinder: geb. 07/2024- 02/2025 (Warteliste)\",\"description\":\"Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro\",\"organizer\":\"Nürnberg - St. Andreas\",\"organizerId\":\"126\",\"organizerUrl\":\"http://www.st-andreas-nuernberg.de\",\"location\":\"Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)\",\"address\":\"Cuxhavener Strasse 54, 90425 Nürnberg\",\"geo\":{\"lat\":49.476769030027,\"lon\":11.066150665283},\"detailUrl\":\"https://www.evangelische-termine.de/detail-bt?ID=8225001\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":true,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-13T15:00\",\"end\":\"2026-10-13T16:30\"},{\"start\":\"2026-10-20T15:00\",\"end\":\"2026-10-20T16:30\"},{\"start\":\"2026-10-27T15:00\",\"end\":\"2026-10-27T16:30\"},{\"start\":\"2026-11-03T15:00\",\"end\":\"2026-11-03T16:30\"},{\"start\":\"2026-11-10T15:00\",\"end\":\"2026-11-10T16:30\"},{\"start\":\"2026-11-17T15:00\",\"end\":\"2026-11-17T16:30\"},{\"start\":\"2026-11-24T15:00\",\"end\":\"2026-11-24T16:30\"},{\"start\":\"2026-12-01T15:00\",\"end\":\"2026-12-01T16:30\"},{\"start\":\"2026-12-08T15:00\",\"end\":\"2026-12-08T16:30\"},{\"start\":\"2026-12-15T15:00\",\"end\":\"2026-12-15T16:30\"},{\"start\":\"2026-12-22T15:00\",\"end\":\"2026-12-22T16:30\"},{\"start\":\"2026-12-29T15:00\",\"end\":\"2026-12-29T16:30\"},{\"start\":\"2027-01-05T15:00\",\"end\":\"2027-01-05T16:30\"},{\"start\":\"2027-01-12T15:00\",\"end\":\"2027-01-12T16:30\"},{\"start\":\"2027-01-19T15:00\",\"end\":\"2027-01-19T16:30\"},{\"start\":\"2027-01-26T15:00\",\"end\":\"2027-01-26T16:30\"},{\"start\":\"2027-02-02T15:00\",\"end\":\"2027-02-02T16:30\"},{\"start\":\"2027-02-09T15:00\",\"end\":\"2027-02-09T16:30\"},{\"start\":\"2027-02-16T15:00\",\"end\":\"2027-02-16T16:30\"},{\"start\":\"2027-02-23T15:00\",\"end\":\"2027-02-23T16:30\"},{\"start\":\"2027-03-02T15:00\",\"end\":\"2027-03-02T16:30\"},{\"start\":\"2027-03-09T15:00\",\"end\":\"2027-03-09T16:30\"},{\"start\":\"2027-03-16T15:00\",\"end\":\"2027-03-16T16:30\"},{\"start\":\"2027-03-23T15:00\",\"end\":\"2027-03-23T16:30\"},{\"start\":\"2027-03-30T15:00\",\"end\":\"2027-03-30T16:30\"},{\"start\":\"2027-04-06T15:00\",\"end\":\"2027-04-06T16:30\"},{\"start\":\"2027-04-13T15:00\",\"end\":\"2027-04-13T16:30\"},{\"start\":\"2027-04-20T15:00\",\"end\":\"2027-04-20T16:30\"},{\"start\":\"2027-04-27T15:00\",\"end\":\"2027-04-27T16:30\"},{\"start\":\"2027-05-04T15:00\",\"end\":\"2027-05-04T16:30\"},{\"start\":\"2027-05-11T15:00\",\"end\":\"2027-05-11T16:30\"},{\"start\":\"2027-05-18T15:00\",\"end\":\"2027-05-18T16:30\"},{\"start\":\"2027-05-25T15:00\",\"end\":\"2027-05-25T16:30\"},{\"start\":\"2027-06-01T15:00\",\"end\":\"2027-06-01T16:30\"},{\"start\":\"2027-06-08T15:00\",\"end\":\"2027-06-08T16:30\"},{\"start\":\"2027-06-15T15:00\",\"end\":\"2027-06-15T16:30\"},{\"start\":\"2027-06-22T15:00\",\"end\":\"2027-06-22T16:30\"},{\"start\":\"2027-06-29T15:00\",\"end\":\"2027-06-29T16:30\"},{\"start\":\"2027-07-06T15:00\",\"end\":\"2027-07-06T16:30\"},{\"start\":\"2027-07-13T15:00\",\"end\":\"2027-07-13T16:30\"},{\"start\":\"2027-07-20T15:00\",\"end\":\"2027-07-20T16:30\"},{\"start\":\"2027-07-27T15:00\",\"end\":\"2027-07-27T16:30\"}]}\n{\"source\":\"evtermine\",\"sourceId\":\"8154380\",\"title\":\"Miniclub: Kinder geb. 02-06/2026 (Warteliste)\",\"description\":\"Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro\",\"organizer\":\"Nürnberg - St. Andreas\",\"organizerId\":\"126\",\"organizerUrl\":\"http://www.st-andreas-nuernberg.de\",\"location\":\"Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)\",\"address\":\"Cuxhavener Strasse 54, 90425 Nürnberg\",\"geo\":{\"lat\":49.476769030027,\"lon\":11.066150665283},\"detailUrl\":\"https://www.evangelische-termine.de/detail-bt?ID=8154380\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":true,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-14T09:30\",\"end\":\"2026-10-14T11:00\"},{\"start\":\"2026-10-21T09:30\",\"end\":\"2026-10-21T11:00\"},{\"start\":\"2026-10-28T09:30\",\"end\":\"2026-10-28T11:00\"},{\"start\":\"2026-11-04T09:30\",\"end\":\"2026-11-04T11:00\"},{\"start\":\"2026-11-11T09:30\",\"end\":\"2026-11-11T11:00\"},{\"start\":\"2026-11-18T09:30\",\"end\":\"2026-11-18T11:00\"},{\"start\":\"2026-11-25T09:30\",\"end\":\"2026-11-25T11:00\"},{\"start\":\"2026-12-02T09:30\",\"end\":\"2026-12-02T11:00\"},{\"start\":\"2026-12-09T09:30\",\"end\":\"2026-12-09T11:00\"},{\"start\":\"2026-12-16T09:30\",\"end\":\"2026-12-16T11:00\"},{\"start\":\"2026-12-23T09:30\",\"end\":\"2026-12-23T11:00\"},{\"start\":\"2027-01-13T09:30\",\"end\":\"2027-01-13T11:00\"},{\"start\":\"2027-01-20T09:30\",\"end\":\"2027-01-20T11:00\"},{\"start\":\"2027-01-27T09:30\",\"end\":\"2027-01-27T11:00\"},{\"start\":\"2027-02-03T09:30\",\"end\":\"2027-02-03T11:00\"},{\"start\":\"2027-02-10T09:30\",\"end\":\"2027-02-10T11:00\"},{\"start\":\"2027-02-17T09:30\",\"end\":\"2027-02-17T11:00\"},{\"start\":\"2027-02-24T09:30\",\"end\":\"2027-02-24T11:00\"},{\"start\":\"2027-03-03T09:30\",\"end\":\"2027-03-03T11:00\"},{\"start\":\"2027-03-10T09:30\",\"end\":\"2027-03-10T11:00\"},{\"start\":\"2027-03-17T09:30\",\"end\":\"2027-03-17T11:00\"},{\"start\":\"2027-03-24T09:30\",\"end\":\"2027-03-24T11:00\"},{\"start\":\"2027-03-31T09:30\",\"end\":\"2027-03-31T11:00\"},{\"start\":\"2027-04-07T09:30\",\"end\":\"2027-04-07T11:00\"},{\"start\":\"2027-04-14T09:30\",\"end\":\"2027-04-14T11:00\"},{\"start\":\"2027-04-21T09:30\",\"end\":\"2027-04-21T11:00\"},{\"start\":\"2027-04-28T09:30\",\"end\":\"2027-04-28T11:00\"},{\"start\":\"2027-05-05T09:30\",\"end\":\"2027-05-05T11:00\"},{\"start\":\"2027-05-12T09:30\",\"end\":\"2027-05-12T11:00\"},{\"start\":\"2027-05-19T09:30\",\"end\":\"2027-05-19T11:00\"},{\"start\":\"2027-05-26T09:30\",\"end\":\"2027-05-26T11:00\"},{\"start\":\"2027-06-02T09:30\",\"end\":\"2027-06-02T11:00\"},{\"start\":\"2027-06-09T09:30\",\"end\":\"2027-06-09T11:00\"},{\"start\":\"2027-06-16T09:30\",\"end\":\"2027-06-16T11:00\"},{\"start\":\"2027-06-23T09:30\",\"end\":\"2027-06-23T11:00\"},{\"start\":\"2027-06-30T09:30\",\"end\":\"2027-06-30T11:00\"},{\"start\":\"2027-07-07T09:30\",\"end\":\"2027-07-07T11:00\"},{\"start\":\"2027-07-14T09:30\",\"end\":\"2027-07-14T11:00\"},{\"start\":\"2027-07-21T09:30\",\"end\":\"2027-07-21T11:00\"},{\"start\":\"2027-07-28T09:30\",\"end\":\"2027-07-28T11:00\"}]}\n{\"source\":\"evtermine\",\"sourceId\":\"8056402\",\"title\":\"Kindertheater\",\"subtitle\":\"\\\"Der Riese Rick macht sich schick\\\"\",\"description\":\"In einer beschaulichen Kleinstadt, in der Menschen und Tiere, Zwerge und Riesen zusammenleben, wohnt der hilfsbereite Riese Rick. Mit viel Herz unterstützt er seine tierischen Freunde: Er hilft Familie Maus, Bruno Bär und der Ziege – und erlebt dabei die Freude des Teilens. Eine liebevolle, humorvolle Geschichte über Freundschaft und Hilfsbereitschaft – mit einem fröhlichen Mitsingmoment am Ende. Ein besonderes Theatererlebnis für Familien und Kindergärten Ab 4 Jahren, Dauer: 45 Minute.\",\"organizer\":\"Nürnberg - St. Andreas\",\"organizerId\":\"126\",\"organizerUrl\":\"http://www.st-andreas-nuernberg.de\",\"location\":\"Ökumenisches Gemeindezentrum Thon (kath. Teil, EG)\",\"address\":\"Cuxhavener Strasse 60, 90425 Nürnberg\",\"geo\":{\"lat\":49.476741145503,\"lon\":11.066815853119},\"detailUrl\":\"https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe.html\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":false,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-14T15:00\",\"end\":\"2026-10-14T15:50\"}]}\n{\"source\":\"evtermine\",\"sourceId\":\"8154882\",\"title\":\"Miniclub - Kinder: geb. 04/2025- 09/2025 (Warteliste)\",\"description\":\"Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro\",\"organizer\":\"Nürnberg - St. Andreas\",\"organizerId\":\"126\",\"organizerUrl\":\"http://www.st-andreas-nuernberg.de\",\"location\":\"Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)\",\"address\":\"Cuxhavener Strasse 54, 90425 Nürnberg\",\"geo\":{\"lat\":49.476769030027,\"lon\":11.066150665283},\"detailUrl\":\"https://www.evangelische-termine.de/detail-bt?ID=8154882\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":true,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-15T15:30\",\"end\":\"2026-10-15T17:00\"},{\"start\":\"2026-10-22T15:30\",\"end\":\"2026-10-22T17:00\"},{\"start\":\"2026-10-29T15:30\",\"end\":\"2026-10-29T17:00\"},{\"start\":\"2026-11-05T15:30\",\"end\":\"2026-11-05T17:00\"},{\"start\":\"2026-11-12T15:30\",\"end\":\"2026-11-12T17:00\"},{\"start\":\"2026-11-19T15:30\",\"end\":\"2026-11-19T17:00\"},{\"start\":\"2026-11-26T15:30\",\"end\":\"2026-11-26T17:00\"},{\"start\":\"2026-12-03T15:30\",\"end\":\"2026-12-03T17:00\"},{\"start\":\"2026-12-10T15:30\",\"end\":\"2026-12-10T17:00\"},{\"start\":\"2026-12-17T15:30\",\"end\":\"2026-12-17T17:00\"},{\"start\":\"2027-01-14T15:30\",\"end\":\"2027-01-14T17:00\"},{\"start\":\"2027-01-21T15:30\",\"end\":\"2027-01-21T17:00\"},{\"start\":\"2027-01-28T15:30\",\"end\":\"2027-01-28T17:00\"},{\"start\":\"2027-02-04T15:30\",\"end\":\"2027-02-04T17:00\"},{\"start\":\"2027-02-11T15:30\",\"end\":\"2027-02-11T17:00\"},{\"start\":\"2027-02-18T15:30\",\"end\":\"2027-02-18T17:00\"},{\"start\":\"2027-02-25T15:30\",\"end\":\"2027-02-25T17:00\"},{\"start\":\"2027-03-04T15:30\",\"end\":\"2027-03-04T17:00\"},{\"start\":\"2027-03-11T15:30\",\"end\":\"2027-03-11T17:00\"},{\"start\":\"2027-03-18T15:30\",\"end\":\"2027-03-18T17:00\"},{\"start\":\"2027-03-25T15:30\",\"end\":\"2027-03-25T17:00\"},{\"start\":\"2027-04-01T15:30\",\"end\":\"2027-04-01T17:00\"},{\"start\":\"2027-04-08T15:30\",\"end\":\"2027-04-08T17:00\"},{\"start\":\"2027-04-15T15:30\",\"end\":\"2027-04-15T17:00\"},{\"start\":\"2027-04-22T15:30\",\"end\":\"2027-04-22T17:00\"},{\"start\":\"2027-04-29T15:30\",\"end\":\"2027-04-29T17:00\"},{\"start\":\"2027-05-13T15:30\",\"end\":\"2027-05-13T17:00\"},{\"start\":\"2027-05-20T15:30\",\"end\":\"2027-05-20T17:00\"},{\"start\":\"2027-06-03T15:30\",\"end\":\"2027-06-03T17:00\"},{\"start\":\"2027-06-10T15:30\",\"end\":\"2027-06-10T17:00\"},{\"start\":\"2027-06-17T15:30\",\"end\":\"2027-06-17T17:00\"},{\"start\":\"2027-06-24T15:30\",\"end\":\"2027-06-24T17:00\"},{\"start\":\"2027-07-01T15:30\",\"end\":\"2027-07-01T17:00\"},{\"start\":\"2027-07-08T15:30\",\"end\":\"2027-07-08T17:00\"},{\"start\":\"2027-07-15T15:30\",\"end\":\"2027-07-15T17:00\"},{\"start\":\"2027-07-22T15:30\",\"end\":\"2027-07-22T17:00\"},{\"start\":\"2027-07-29T15:30\",\"end\":\"2027-07-29T17:00\"}]}\n{\"source\":\"evtermine\",\"sourceId\":\"8163727\",\"title\":\"Miniclub: Kinder geb. 09/2025 - 01/2026\",\"description\":\"Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro\",\"organizer\":\"Nürnberg - St. Andreas\",\"organizerId\":\"126\",\"organizerUrl\":\"http://www.st-andreas-nuernberg.de\",\"location\":\"Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)\",\"address\":\"Cuxhavener Strasse 54, 90425 Nürnberg\",\"geo\":{\"lat\":49.476769030027,\"lon\":11.066150665283},\"detailUrl\":\"https://www.evangelische-termine.de/detail-bt?ID=8163727\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":false,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-16T10:00\",\"end\":\"2026-10-16T11:30\"},{\"start\":\"2026-10-23T10:00\",\"end\":\"2026-10-23T11:30\"},{\"start\":\"2026-10-30T10:00\",\"end\":\"2026-10-30T11:30\"},{\"start\":\"2026-11-06T10:00\",\"end\":\"2026-11-06T11:30\"},{\"start\":\"2026-11-13T10:00\",\"end\":\"2026-11-13T11:30\"},{\"start\":\"2026-11-20T10:00\",\"end\":\"2026-11-20T11:30\"},{\"start\":\"2026-11-27T10:00\",\"end\":\"2026-11-27T11:30\"},{\"start\":\"2026-12-04T10:00\",\"end\":\"2026-12-04T11:30\"},{\"start\":\"2026-12-11T10:00\",\"end\":\"2026-12-11T11:30\"},{\"start\":\"2026-12-18T10:00\",\"end\":\"2026-12-18T11:30\"},{\"start\":\"2027-01-08T10:00\",\"end\":\"2027-01-08T11:30\"},{\"start\":\"2027-01-15T10:00\",\"end\":\"2027-01-15T11:30\"},{\"start\":\"2027-01-22T10:00\",\"end\":\"2027-01-22T11:30\"},{\"start\":\"2027-01-29T10:00\",\"end\":\"2027-01-29T11:30\"},{\"start\":\"2027-02-05T10:00\",\"end\":\"2027-02-05T11:30\"},{\"start\":\"2027-02-12T10:00\",\"end\":\"2027-02-12T11:30\"},{\"start\":\"2027-02-19T10:00\",\"end\":\"2027-02-19T11:30\"},{\"start\":\"2027-02-26T10:00\",\"end\":\"2027-02-26T11:30\"},{\"start\":\"2027-03-05T10:00\",\"end\":\"2027-03-05T11:30\"},{\"start\":\"2027-03-12T10:00\",\"end\":\"2027-03-12T11:30\"},{\"start\":\"2027-03-19T10:00\",\"end\":\"2027-03-19T11:30\"},{\"start\":\"2027-04-02T10:00\",\"end\":\"2027-04-02T11:30\"},{\"start\":\"2027-04-09T10:00\",\"end\":\"2027-04-09T11:30\"},{\"start\":\"2027-04-16T10:00\",\"end\":\"2027-04-16T11:30\"},{\"start\":\"2027-04-23T10:00\",\"end\":\"2027-04-23T11:30\"},{\"start\":\"2027-04-30T10:00\",\"end\":\"2027-04-30T11:30\"},{\"start\":\"2027-05-07T10:00\",\"end\":\"2027-05-07T11:30\"},{\"start\":\"2027-05-14T10:00\",\"end\":\"2027-05-14T11:30\"},{\"start\":\"2027-05-21T10:00\",\"end\":\"2027-05-21T11:30\"},{\"start\":\"2027-05-28T10:00\",\"end\":\"2027-05-28T11:30\"},{\"start\":\"2027-06-04T10:00\",\"end\":\"2027-06-04T11:30\"},{\"start\":\"2027-06-11T10:00\",\"end\":\"2027-06-11T11:30\"},{\"start\":\"2027-06-18T10:00\",\"end\":\"2027-06-18T11:30\"},{\"start\":\"2027-06-25T10:00\",\"end\":\"2027-06-25T11:30\"},{\"start\":\"2027-07-02T10:00\",\"end\":\"2027-07-02T11:30\"},{\"start\":\"2027-07-09T10:00\",\"end\":\"2027-07-09T11:30\"},{\"start\":\"2027-07-16T10:00\",\"end\":\"2027-07-16T11:30\"},{\"start\":\"2027-07-23T10:00\",\"end\":\"2027-07-23T11:30\"},{\"start\":\"2027-07-30T10:00\",\"end\":\"2027-07-30T11:30\"}]}\n{\"source\":\"evtermine\",\"sourceId\":\"8056901\",\"title\":\"Trempelmarkt St. Andreas\",\"subtitle\":\"Second Hand Markt für Bekleidung (Gr. 0 - 176), Sportartikel, Spielwaren, Fahrzeuge\",\"description\":\"Wir laden Sie herzlich dazu ein, bei uns als Verkäufer und/oder Käufer mitzumachen. Bis zu 100 Verkäufer bieten Ihnen ein großes Sortiment Saisonbekleidung für Babys, Kinder und Jugendliche von Gr. 56 bis Gr. 176 an. Für einen übersichtlichen Einkauf sorgt eine Trennung der Kleidung nach Größen und eine Auslegung (ab Gr. 80) getrennt, nach Mädchen und Jungenbekleidung. Natürlich werden auch wieder Spielzeug, Bücher, Fahrräder, Kinderwagen, etc. zum Verkauf stehen. Kommen Sie doch zum Stöbern bei uns vorbei, wir freuen uns sehr auf sie. Wenn Sie gerne als Verkäufer teilnehmen wollen und noch ke\",\"organizer\":\"Nürnberg - St. Andreas\",\"organizerId\":\"126\",\"organizerUrl\":\"http://www.st-andreas-nuernberg.de\",\"location\":\"Ökumenisches Gemeindezentrum Thon (evang. Teil, EG)\",\"address\":\"Cuxhavener Strasse 54, 90425 Nürnberg\",\"geo\":{\"lat\":49.476838741266,\"lon\":11.066386699677},\"detailUrl\":\"https://www.evangelische-termine.de/detail-bt?ID=8056901\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":false,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-23T14:00\",\"end\":\"2026-10-23T18:00\"},{\"start\":\"2026-10-24T09:00\",\"end\":\"2026-10-24T13:00\"}]}",
+ "candidates": [
+  {
+   "source": "stadt-vk",
+   "sourceId": "463257",
+   "title": "Trempelmarkt St. Andreas",
+   "description": "Goßes Angebot an Saisonbekleidung Herbst/Winter, sortiert nach Größen und getrennt nach Mädchen und Jungen, Sportartikel, Fahrräder, Bücher, Spielwaren, CDs für Babys bis Jugendliche. Wir laden Sie herzlich dazu ein, bei uns als Verkäufer und/oder Käufer mitzumachen. Bis zu 100 Verkäufer bieten Ihnen ein großes Sortiment Saisonbekleidung für Babys, Kinder und Jugendliche von Gr. 56 bis Gr. 176 an. Für einen übersichtlichen Einkauf sorgt eine Trennung der Kleidung nach Größen und eine Auslegung (ab Gr. 80) getrennt, nach Mädchen und Jungenbekleidung. Natürlich werden auch wieder Spielzeug, Büch",
+   "organizer": "Evang.-Luth. Kirchengemeinde St. Andreas",
+   "location": "Ökumenisches Gemeindezentrum St. Andreas Thon - evang. Teil EG",
+   "address": "Cuxhavener Straße 54, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.4767725,
+    "lon": 11.0662204
+   },
+   "detailUrl": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=463257",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": false,
+   "registrationRequired": false,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-23T14:00",
+     "end": "2026-10-23T18:00"
+    },
+    {
+     "start": "2026-10-24T09:00",
+     "end": "2026-10-24T13:00"
+    }
+   ]
+  },
+  {
+   "source": "evtermine",
+   "sourceId": "8245246",
+   "title": "Miniclub - Kinder: geb. 04/2024- 07/2024",
+   "description": "Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro",
+   "organizer": "Nürnberg - St. Andreas",
+   "organizerId": "126",
+   "organizerUrl": "http://www.st-andreas-nuernberg.de",
+   "location": "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)",
+   "address": "Cuxhavener Strasse 54, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.476769030027,
+    "lon": 11.066150665283
+   },
+   "detailUrl": "https://www.evangelische-termine.de/detail-bt?ID=8245246",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": false,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-12T15:15",
+     "end": "2026-10-12T16:45"
+    },
+    {
+     "start": "2026-10-19T15:15",
+     "end": "2026-10-19T16:45"
+    },
+    {
+     "start": "2026-10-26T15:15",
+     "end": "2026-10-26T16:45"
+    },
+    {
+     "start": "2026-11-02T15:15",
+     "end": "2026-11-02T16:45"
+    },
+    {
+     "start": "2026-11-09T15:15",
+     "end": "2026-11-09T16:45"
+    },
+    {
+     "start": "2026-11-16T15:15",
+     "end": "2026-11-16T16:45"
+    },
+    {
+     "start": "2026-11-23T15:15",
+     "end": "2026-11-23T16:45"
+    },
+    {
+     "start": "2026-11-30T15:15",
+     "end": "2026-11-30T16:45"
+    },
+    {
+     "start": "2026-12-07T15:15",
+     "end": "2026-12-07T16:45"
+    },
+    {
+     "start": "2026-12-14T15:15",
+     "end": "2026-12-14T16:45"
+    },
+    {
+     "start": "2026-12-21T15:15",
+     "end": "2026-12-21T16:45"
+    },
+    {
+     "start": "2027-01-11T15:15",
+     "end": "2027-01-11T16:45"
+    },
+    {
+     "start": "2027-01-18T15:15",
+     "end": "2027-01-18T16:45"
+    },
+    {
+     "start": "2027-01-25T15:15",
+     "end": "2027-01-25T16:45"
+    },
+    {
+     "start": "2027-02-01T15:15",
+     "end": "2027-02-01T16:45"
+    },
+    {
+     "start": "2027-02-08T15:15",
+     "end": "2027-02-08T16:45"
+    },
+    {
+     "start": "2027-02-15T15:15",
+     "end": "2027-02-15T16:45"
+    },
+    {
+     "start": "2027-02-22T15:15",
+     "end": "2027-02-22T16:45"
+    },
+    {
+     "start": "2027-03-01T15:15",
+     "end": "2027-03-01T16:45"
+    },
+    {
+     "start": "2027-03-08T15:15",
+     "end": "2027-03-08T16:45"
+    },
+    {
+     "start": "2027-03-15T15:15",
+     "end": "2027-03-15T16:45"
+    },
+    {
+     "start": "2027-03-22T15:15",
+     "end": "2027-03-22T16:45"
+    },
+    {
+     "start": "2027-04-05T15:15",
+     "end": "2027-04-05T16:45"
+    },
+    {
+     "start": "2027-04-12T15:15",
+     "end": "2027-04-12T16:45"
+    },
+    {
+     "start": "2027-04-19T15:15",
+     "end": "2027-04-19T16:45"
+    },
+    {
+     "start": "2027-04-26T15:15",
+     "end": "2027-04-26T16:45"
+    },
+    {
+     "start": "2027-05-03T15:15",
+     "end": "2027-05-03T16:45"
+    },
+    {
+     "start": "2027-05-10T15:15",
+     "end": "2027-05-10T16:45"
+    },
+    {
+     "start": "2027-05-24T15:15",
+     "end": "2027-05-24T16:45"
+    },
+    {
+     "start": "2027-05-31T15:15",
+     "end": "2027-05-31T16:45"
+    },
+    {
+     "start": "2027-06-07T15:15",
+     "end": "2027-06-07T16:45"
+    },
+    {
+     "start": "2027-06-14T15:15",
+     "end": "2027-06-14T16:45"
+    },
+    {
+     "start": "2027-06-21T15:15",
+     "end": "2027-06-21T16:45"
+    },
+    {
+     "start": "2027-06-28T15:15",
+     "end": "2027-06-28T16:45"
+    },
+    {
+     "start": "2027-07-05T15:15",
+     "end": "2027-07-05T16:45"
+    },
+    {
+     "start": "2027-07-12T15:15",
+     "end": "2027-07-12T16:45"
+    },
+    {
+     "start": "2027-07-19T15:15",
+     "end": "2027-07-19T16:45"
+    },
+    {
+     "start": "2027-07-26T15:15",
+     "end": "2027-07-26T16:45"
+    }
+   ]
+  },
+  {
+   "source": "evtermine",
+   "sourceId": "8225001",
+   "title": "Miniclub - Kinder: geb. 07/2024- 02/2025 (Warteliste)",
+   "description": "Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro",
+   "organizer": "Nürnberg - St. Andreas",
+   "organizerId": "126",
+   "organizerUrl": "http://www.st-andreas-nuernberg.de",
+   "location": "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)",
+   "address": "Cuxhavener Strasse 54, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.476769030027,
+    "lon": 11.066150665283
+   },
+   "detailUrl": "https://www.evangelische-termine.de/detail-bt?ID=8225001",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": true,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-13T15:00",
+     "end": "2026-10-13T16:30"
+    },
+    {
+     "start": "2026-10-20T15:00",
+     "end": "2026-10-20T16:30"
+    },
+    {
+     "start": "2026-10-27T15:00",
+     "end": "2026-10-27T16:30"
+    },
+    {
+     "start": "2026-11-03T15:00",
+     "end": "2026-11-03T16:30"
+    },
+    {
+     "start": "2026-11-10T15:00",
+     "end": "2026-11-10T16:30"
+    },
+    {
+     "start": "2026-11-17T15:00",
+     "end": "2026-11-17T16:30"
+    },
+    {
+     "start": "2026-11-24T15:00",
+     "end": "2026-11-24T16:30"
+    },
+    {
+     "start": "2026-12-01T15:00",
+     "end": "2026-12-01T16:30"
+    },
+    {
+     "start": "2026-12-08T15:00",
+     "end": "2026-12-08T16:30"
+    },
+    {
+     "start": "2026-12-15T15:00",
+     "end": "2026-12-15T16:30"
+    },
+    {
+     "start": "2026-12-22T15:00",
+     "end": "2026-12-22T16:30"
+    },
+    {
+     "start": "2026-12-29T15:00",
+     "end": "2026-12-29T16:30"
+    },
+    {
+     "start": "2027-01-05T15:00",
+     "end": "2027-01-05T16:30"
+    },
+    {
+     "start": "2027-01-12T15:00",
+     "end": "2027-01-12T16:30"
+    },
+    {
+     "start": "2027-01-19T15:00",
+     "end": "2027-01-19T16:30"
+    },
+    {
+     "start": "2027-01-26T15:00",
+     "end": "2027-01-26T16:30"
+    },
+    {
+     "start": "2027-02-02T15:00",
+     "end": "2027-02-02T16:30"
+    },
+    {
+     "start": "2027-02-09T15:00",
+     "end": "2027-02-09T16:30"
+    },
+    {
+     "start": "2027-02-16T15:00",
+     "end": "2027-02-16T16:30"
+    },
+    {
+     "start": "2027-02-23T15:00",
+     "end": "2027-02-23T16:30"
+    },
+    {
+     "start": "2027-03-02T15:00",
+     "end": "2027-03-02T16:30"
+    },
+    {
+     "start": "2027-03-09T15:00",
+     "end": "2027-03-09T16:30"
+    },
+    {
+     "start": "2027-03-16T15:00",
+     "end": "2027-03-16T16:30"
+    },
+    {
+     "start": "2027-03-23T15:00",
+     "end": "2027-03-23T16:30"
+    },
+    {
+     "start": "2027-03-30T15:00",
+     "end": "2027-03-30T16:30"
+    },
+    {
+     "start": "2027-04-06T15:00",
+     "end": "2027-04-06T16:30"
+    },
+    {
+     "start": "2027-04-13T15:00",
+     "end": "2027-04-13T16:30"
+    },
+    {
+     "start": "2027-04-20T15:00",
+     "end": "2027-04-20T16:30"
+    },
+    {
+     "start": "2027-04-27T15:00",
+     "end": "2027-04-27T16:30"
+    },
+    {
+     "start": "2027-05-04T15:00",
+     "end": "2027-05-04T16:30"
+    },
+    {
+     "start": "2027-05-11T15:00",
+     "end": "2027-05-11T16:30"
+    },
+    {
+     "start": "2027-05-18T15:00",
+     "end": "2027-05-18T16:30"
+    },
+    {
+     "start": "2027-05-25T15:00",
+     "end": "2027-05-25T16:30"
+    },
+    {
+     "start": "2027-06-01T15:00",
+     "end": "2027-06-01T16:30"
+    },
+    {
+     "start": "2027-06-08T15:00",
+     "end": "2027-06-08T16:30"
+    },
+    {
+     "start": "2027-06-15T15:00",
+     "end": "2027-06-15T16:30"
+    },
+    {
+     "start": "2027-06-22T15:00",
+     "end": "2027-06-22T16:30"
+    },
+    {
+     "start": "2027-06-29T15:00",
+     "end": "2027-06-29T16:30"
+    },
+    {
+     "start": "2027-07-06T15:00",
+     "end": "2027-07-06T16:30"
+    },
+    {
+     "start": "2027-07-13T15:00",
+     "end": "2027-07-13T16:30"
+    },
+    {
+     "start": "2027-07-20T15:00",
+     "end": "2027-07-20T16:30"
+    },
+    {
+     "start": "2027-07-27T15:00",
+     "end": "2027-07-27T16:30"
+    }
+   ]
+  },
+  {
+   "source": "evtermine",
+   "sourceId": "8154380",
+   "title": "Miniclub: Kinder geb. 02-06/2026 (Warteliste)",
+   "description": "Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro",
+   "organizer": "Nürnberg - St. Andreas",
+   "organizerId": "126",
+   "organizerUrl": "http://www.st-andreas-nuernberg.de",
+   "location": "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)",
+   "address": "Cuxhavener Strasse 54, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.476769030027,
+    "lon": 11.066150665283
+   },
+   "detailUrl": "https://www.evangelische-termine.de/detail-bt?ID=8154380",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": true,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-14T09:30",
+     "end": "2026-10-14T11:00"
+    },
+    {
+     "start": "2026-10-21T09:30",
+     "end": "2026-10-21T11:00"
+    },
+    {
+     "start": "2026-10-28T09:30",
+     "end": "2026-10-28T11:00"
+    },
+    {
+     "start": "2026-11-04T09:30",
+     "end": "2026-11-04T11:00"
+    },
+    {
+     "start": "2026-11-11T09:30",
+     "end": "2026-11-11T11:00"
+    },
+    {
+     "start": "2026-11-18T09:30",
+     "end": "2026-11-18T11:00"
+    },
+    {
+     "start": "2026-11-25T09:30",
+     "end": "2026-11-25T11:00"
+    },
+    {
+     "start": "2026-12-02T09:30",
+     "end": "2026-12-02T11:00"
+    },
+    {
+     "start": "2026-12-09T09:30",
+     "end": "2026-12-09T11:00"
+    },
+    {
+     "start": "2026-12-16T09:30",
+     "end": "2026-12-16T11:00"
+    },
+    {
+     "start": "2026-12-23T09:30",
+     "end": "2026-12-23T11:00"
+    },
+    {
+     "start": "2027-01-13T09:30",
+     "end": "2027-01-13T11:00"
+    },
+    {
+     "start": "2027-01-20T09:30",
+     "end": "2027-01-20T11:00"
+    },
+    {
+     "start": "2027-01-27T09:30",
+     "end": "2027-01-27T11:00"
+    },
+    {
+     "start": "2027-02-03T09:30",
+     "end": "2027-02-03T11:00"
+    },
+    {
+     "start": "2027-02-10T09:30",
+     "end": "2027-02-10T11:00"
+    },
+    {
+     "start": "2027-02-17T09:30",
+     "end": "2027-02-17T11:00"
+    },
+    {
+     "start": "2027-02-24T09:30",
+     "end": "2027-02-24T11:00"
+    },
+    {
+     "start": "2027-03-03T09:30",
+     "end": "2027-03-03T11:00"
+    },
+    {
+     "start": "2027-03-10T09:30",
+     "end": "2027-03-10T11:00"
+    },
+    {
+     "start": "2027-03-17T09:30",
+     "end": "2027-03-17T11:00"
+    },
+    {
+     "start": "2027-03-24T09:30",
+     "end": "2027-03-24T11:00"
+    },
+    {
+     "start": "2027-03-31T09:30",
+     "end": "2027-03-31T11:00"
+    },
+    {
+     "start": "2027-04-07T09:30",
+     "end": "2027-04-07T11:00"
+    },
+    {
+     "start": "2027-04-14T09:30",
+     "end": "2027-04-14T11:00"
+    },
+    {
+     "start": "2027-04-21T09:30",
+     "end": "2027-04-21T11:00"
+    },
+    {
+     "start": "2027-04-28T09:30",
+     "end": "2027-04-28T11:00"
+    },
+    {
+     "start": "2027-05-05T09:30",
+     "end": "2027-05-05T11:00"
+    },
+    {
+     "start": "2027-05-12T09:30",
+     "end": "2027-05-12T11:00"
+    },
+    {
+     "start": "2027-05-19T09:30",
+     "end": "2027-05-19T11:00"
+    },
+    {
+     "start": "2027-05-26T09:30",
+     "end": "2027-05-26T11:00"
+    },
+    {
+     "start": "2027-06-02T09:30",
+     "end": "2027-06-02T11:00"
+    },
+    {
+     "start": "2027-06-09T09:30",
+     "end": "2027-06-09T11:00"
+    },
+    {
+     "start": "2027-06-16T09:30",
+     "end": "2027-06-16T11:00"
+    },
+    {
+     "start": "2027-06-23T09:30",
+     "end": "2027-06-23T11:00"
+    },
+    {
+     "start": "2027-06-30T09:30",
+     "end": "2027-06-30T11:00"
+    },
+    {
+     "start": "2027-07-07T09:30",
+     "end": "2027-07-07T11:00"
+    },
+    {
+     "start": "2027-07-14T09:30",
+     "end": "2027-07-14T11:00"
+    },
+    {
+     "start": "2027-07-21T09:30",
+     "end": "2027-07-21T11:00"
+    },
+    {
+     "start": "2027-07-28T09:30",
+     "end": "2027-07-28T11:00"
+    }
+   ]
+  },
+  {
+   "source": "evtermine",
+   "sourceId": "8056402",
+   "title": "Kindertheater",
+   "subtitle": "\"Der Riese Rick macht sich schick\"",
+   "description": "In einer beschaulichen Kleinstadt, in der Menschen und Tiere, Zwerge und Riesen zusammenleben, wohnt der hilfsbereite Riese Rick. Mit viel Herz unterstützt er seine tierischen Freunde: Er hilft Familie Maus, Bruno Bär und der Ziege – und erlebt dabei die Freude des Teilens. Eine liebevolle, humorvolle Geschichte über Freundschaft und Hilfsbereitschaft – mit einem fröhlichen Mitsingmoment am Ende. Ein besonderes Theatererlebnis für Familien und Kindergärten Ab 4 Jahren, Dauer: 45 Minute.",
+   "organizer": "Nürnberg - St. Andreas",
+   "organizerId": "126",
+   "organizerUrl": "http://www.st-andreas-nuernberg.de",
+   "location": "Ökumenisches Gemeindezentrum Thon (kath. Teil, EG)",
+   "address": "Cuxhavener Strasse 60, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.476741145503,
+    "lon": 11.066815853119
+   },
+   "detailUrl": "https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe.html",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": false,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-14T15:00",
+     "end": "2026-10-14T15:50"
+    }
+   ]
+  },
+  {
+   "source": "evtermine",
+   "sourceId": "8154882",
+   "title": "Miniclub - Kinder: geb. 04/2025- 09/2025 (Warteliste)",
+   "description": "Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro",
+   "organizer": "Nürnberg - St. Andreas",
+   "organizerId": "126",
+   "organizerUrl": "http://www.st-andreas-nuernberg.de",
+   "location": "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)",
+   "address": "Cuxhavener Strasse 54, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.476769030027,
+    "lon": 11.066150665283
+   },
+   "detailUrl": "https://www.evangelische-termine.de/detail-bt?ID=8154882",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": true,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-15T15:30",
+     "end": "2026-10-15T17:00"
+    },
+    {
+     "start": "2026-10-22T15:30",
+     "end": "2026-10-22T17:00"
+    },
+    {
+     "start": "2026-10-29T15:30",
+     "end": "2026-10-29T17:00"
+    },
+    {
+     "start": "2026-11-05T15:30",
+     "end": "2026-11-05T17:00"
+    },
+    {
+     "start": "2026-11-12T15:30",
+     "end": "2026-11-12T17:00"
+    },
+    {
+     "start": "2026-11-19T15:30",
+     "end": "2026-11-19T17:00"
+    },
+    {
+     "start": "2026-11-26T15:30",
+     "end": "2026-11-26T17:00"
+    },
+    {
+     "start": "2026-12-03T15:30",
+     "end": "2026-12-03T17:00"
+    },
+    {
+     "start": "2026-12-10T15:30",
+     "end": "2026-12-10T17:00"
+    },
+    {
+     "start": "2026-12-17T15:30",
+     "end": "2026-12-17T17:00"
+    },
+    {
+     "start": "2027-01-14T15:30",
+     "end": "2027-01-14T17:00"
+    },
+    {
+     "start": "2027-01-21T15:30",
+     "end": "2027-01-21T17:00"
+    },
+    {
+     "start": "2027-01-28T15:30",
+     "end": "2027-01-28T17:00"
+    },
+    {
+     "start": "2027-02-04T15:30",
+     "end": "2027-02-04T17:00"
+    },
+    {
+     "start": "2027-02-11T15:30",
+     "end": "2027-02-11T17:00"
+    },
+    {
+     "start": "2027-02-18T15:30",
+     "end": "2027-02-18T17:00"
+    },
+    {
+     "start": "2027-02-25T15:30",
+     "end": "2027-02-25T17:00"
+    },
+    {
+     "start": "2027-03-04T15:30",
+     "end": "2027-03-04T17:00"
+    },
+    {
+     "start": "2027-03-11T15:30",
+     "end": "2027-03-11T17:00"
+    },
+    {
+     "start": "2027-03-18T15:30",
+     "end": "2027-03-18T17:00"
+    },
+    {
+     "start": "2027-03-25T15:30",
+     "end": "2027-03-25T17:00"
+    },
+    {
+     "start": "2027-04-01T15:30",
+     "end": "2027-04-01T17:00"
+    },
+    {
+     "start": "2027-04-08T15:30",
+     "end": "2027-04-08T17:00"
+    },
+    {
+     "start": "2027-04-15T15:30",
+     "end": "2027-04-15T17:00"
+    },
+    {
+     "start": "2027-04-22T15:30",
+     "end": "2027-04-22T17:00"
+    },
+    {
+     "start": "2027-04-29T15:30",
+     "end": "2027-04-29T17:00"
+    },
+    {
+     "start": "2027-05-13T15:30",
+     "end": "2027-05-13T17:00"
+    },
+    {
+     "start": "2027-05-20T15:30",
+     "end": "2027-05-20T17:00"
+    },
+    {
+     "start": "2027-06-03T15:30",
+     "end": "2027-06-03T17:00"
+    },
+    {
+     "start": "2027-06-10T15:30",
+     "end": "2027-06-10T17:00"
+    },
+    {
+     "start": "2027-06-17T15:30",
+     "end": "2027-06-17T17:00"
+    },
+    {
+     "start": "2027-06-24T15:30",
+     "end": "2027-06-24T17:00"
+    },
+    {
+     "start": "2027-07-01T15:30",
+     "end": "2027-07-01T17:00"
+    },
+    {
+     "start": "2027-07-08T15:30",
+     "end": "2027-07-08T17:00"
+    },
+    {
+     "start": "2027-07-15T15:30",
+     "end": "2027-07-15T17:00"
+    },
+    {
+     "start": "2027-07-22T15:30",
+     "end": "2027-07-22T17:00"
+    },
+    {
+     "start": "2027-07-29T15:30",
+     "end": "2027-07-29T17:00"
+    }
+   ]
+  },
+  {
+   "source": "evtermine",
+   "sourceId": "8163727",
+   "title": "Miniclub: Kinder geb. 09/2025 - 01/2026",
+   "description": "Im MINICLUB können Eltern und Kinder Erfahrungen austauschen, neue Menschen kennen lernen, Vertrauen fördern, Unterstützung finden, spielen, basteln und singen, Zeit haben und sich wohlfühlen. Die MINICLUBS sind offen für alle Eltern und Kinder, egal welcher Konfession oder Religion sie angehören. Kontakt über Pfarrbüro",
+   "organizer": "Nürnberg - St. Andreas",
+   "organizerId": "126",
+   "organizerUrl": "http://www.st-andreas-nuernberg.de",
+   "location": "Ökumenisches Gemeindezentrum Thon (evang. Teil, UG)",
+   "address": "Cuxhavener Strasse 54, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.476769030027,
+    "lon": 11.066150665283
+   },
+   "detailUrl": "https://www.evangelische-termine.de/detail-bt?ID=8163727",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": false,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-16T10:00",
+     "end": "2026-10-16T11:30"
+    },
+    {
+     "start": "2026-10-23T10:00",
+     "end": "2026-10-23T11:30"
+    },
+    {
+     "start": "2026-10-30T10:00",
+     "end": "2026-10-30T11:30"
+    },
+    {
+     "start": "2026-11-06T10:00",
+     "end": "2026-11-06T11:30"
+    },
+    {
+     "start": "2026-11-13T10:00",
+     "end": "2026-11-13T11:30"
+    },
+    {
+     "start": "2026-11-20T10:00",
+     "end": "2026-11-20T11:30"
+    },
+    {
+     "start": "2026-11-27T10:00",
+     "end": "2026-11-27T11:30"
+    },
+    {
+     "start": "2026-12-04T10:00",
+     "end": "2026-12-04T11:30"
+    },
+    {
+     "start": "2026-12-11T10:00",
+     "end": "2026-12-11T11:30"
+    },
+    {
+     "start": "2026-12-18T10:00",
+     "end": "2026-12-18T11:30"
+    },
+    {
+     "start": "2027-01-08T10:00",
+     "end": "2027-01-08T11:30"
+    },
+    {
+     "start": "2027-01-15T10:00",
+     "end": "2027-01-15T11:30"
+    },
+    {
+     "start": "2027-01-22T10:00",
+     "end": "2027-01-22T11:30"
+    },
+    {
+     "start": "2027-01-29T10:00",
+     "end": "2027-01-29T11:30"
+    },
+    {
+     "start": "2027-02-05T10:00",
+     "end": "2027-02-05T11:30"
+    },
+    {
+     "start": "2027-02-12T10:00",
+     "end": "2027-02-12T11:30"
+    },
+    {
+     "start": "2027-02-19T10:00",
+     "end": "2027-02-19T11:30"
+    },
+    {
+     "start": "2027-02-26T10:00",
+     "end": "2027-02-26T11:30"
+    },
+    {
+     "start": "2027-03-05T10:00",
+     "end": "2027-03-05T11:30"
+    },
+    {
+     "start": "2027-03-12T10:00",
+     "end": "2027-03-12T11:30"
+    },
+    {
+     "start": "2027-03-19T10:00",
+     "end": "2027-03-19T11:30"
+    },
+    {
+     "start": "2027-04-02T10:00",
+     "end": "2027-04-02T11:30"
+    },
+    {
+     "start": "2027-04-09T10:00",
+     "end": "2027-04-09T11:30"
+    },
+    {
+     "start": "2027-04-16T10:00",
+     "end": "2027-04-16T11:30"
+    },
+    {
+     "start": "2027-04-23T10:00",
+     "end": "2027-04-23T11:30"
+    },
+    {
+     "start": "2027-04-30T10:00",
+     "end": "2027-04-30T11:30"
+    },
+    {
+     "start": "2027-05-07T10:00",
+     "end": "2027-05-07T11:30"
+    },
+    {
+     "start": "2027-05-14T10:00",
+     "end": "2027-05-14T11:30"
+    },
+    {
+     "start": "2027-05-21T10:00",
+     "end": "2027-05-21T11:30"
+    },
+    {
+     "start": "2027-05-28T10:00",
+     "end": "2027-05-28T11:30"
+    },
+    {
+     "start": "2027-06-04T10:00",
+     "end": "2027-06-04T11:30"
+    },
+    {
+     "start": "2027-06-11T10:00",
+     "end": "2027-06-11T11:30"
+    },
+    {
+     "start": "2027-06-18T10:00",
+     "end": "2027-06-18T11:30"
+    },
+    {
+     "start": "2027-06-25T10:00",
+     "end": "2027-06-25T11:30"
+    },
+    {
+     "start": "2027-07-02T10:00",
+     "end": "2027-07-02T11:30"
+    },
+    {
+     "start": "2027-07-09T10:00",
+     "end": "2027-07-09T11:30"
+    },
+    {
+     "start": "2027-07-16T10:00",
+     "end": "2027-07-16T11:30"
+    },
+    {
+     "start": "2027-07-23T10:00",
+     "end": "2027-07-23T11:30"
+    },
+    {
+     "start": "2027-07-30T10:00",
+     "end": "2027-07-30T11:30"
+    }
+   ]
+  },
+  {
+   "source": "evtermine",
+   "sourceId": "8056901",
+   "title": "Trempelmarkt St. Andreas",
+   "subtitle": "Second Hand Markt für Bekleidung (Gr. 0 - 176), Sportartikel, Spielwaren, Fahrzeuge",
+   "description": "Wir laden Sie herzlich dazu ein, bei uns als Verkäufer und/oder Käufer mitzumachen. Bis zu 100 Verkäufer bieten Ihnen ein großes Sortiment Saisonbekleidung für Babys, Kinder und Jugendliche von Gr. 56 bis Gr. 176 an. Für einen übersichtlichen Einkauf sorgt eine Trennung der Kleidung nach Größen und eine Auslegung (ab Gr. 80) getrennt, nach Mädchen und Jungenbekleidung. Natürlich werden auch wieder Spielzeug, Bücher, Fahrräder, Kinderwagen, etc. zum Verkauf stehen. Kommen Sie doch zum Stöbern bei uns vorbei, wir freuen uns sehr auf sie. Wenn Sie gerne als Verkäufer teilnehmen wollen und noch ke",
+   "organizer": "Nürnberg - St. Andreas",
+   "organizerId": "126",
+   "organizerUrl": "http://www.st-andreas-nuernberg.de",
+   "location": "Ökumenisches Gemeindezentrum Thon (evang. Teil, EG)",
+   "address": "Cuxhavener Strasse 54, 90425 Nürnberg",
+   "geo": {
+    "lat": 49.476838741266,
+    "lon": 11.066386699677
+   },
+   "detailUrl": "https://www.evangelische-termine.de/detail-bt?ID=8056901",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": false,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-23T14:00",
+     "end": "2026-10-23T18:00"
+    },
+    {
+     "start": "2026-10-24T09:00",
+     "end": "2026-10-24T13:00"
+    }
+   ]
+  }
+ ],
+ "allowedUrls": [
+  "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=463257",
+  "https://www.evangelische-termine.de/detail-bt?ID=8245246",
+  "https://www.evangelische-termine.de/detail-bt?ID=8225001",
+  "https://www.evangelische-termine.de/detail-bt?ID=8154380",
+  "https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe.html",
+  "https://www.evangelische-termine.de/detail-bt?ID=8154882",
+  "https://www.evangelische-termine.de/detail-bt?ID=8163727",
+  "https://www.evangelische-termine.de/detail-bt?ID=8056901"
+ ]
+}

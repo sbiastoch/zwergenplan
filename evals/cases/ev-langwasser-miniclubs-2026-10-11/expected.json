@@ -1,0 +1,73 @@
+{
+ "basis": "data/offers.json vom 2026-10-04T14:05:37+02:00, von Hand gegen input.json geprüft am 2026-10-11 (Korrekturen in NOTES.md)",
+ "window": {
+  "from": "2026-10-11",
+  "to": "2027-02-04"
+ },
+ "offers": [
+  {
+   "id": "qmq21q5q",
+   "title": "Mini-Club Passionskirche (Do vormittags)",
+   "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "topics": [
+    "eltern-kind-gruppe",
+    "krabbelgruppe",
+    "singen",
+    "kreativ"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-10-15T09:00:00+02:00",
+    "2026-10-22T09:00:00+02:00",
+    "2026-10-29T09:00:00+01:00",
+    "2026-11-05T09:00:00+01:00",
+    "2026-11-12T09:00:00+01:00",
+    "2026-11-19T09:00:00+01:00",
+    "2026-11-26T09:00:00+01:00",
+    "2026-12-03T09:00:00+01:00",
+    "2026-12-10T09:00:00+01:00",
+    "2026-12-17T09:00:00+01:00",
+    "2026-12-24T09:00:00+01:00",
+    "2026-12-31T09:00:00+01:00",
+    "2027-01-07T09:00:00+01:00",
+    "2027-01-14T09:00:00+01:00",
+    "2027-01-21T09:00:00+01:00",
+    "2027-01-28T09:00:00+01:00",
+    "2027-02-04T09:00:00+01:00"
+   ]
+  },
+  {
+   "id": "h4vtflr1",
+   "title": "MiniClub Dietrich-Bonhoeffer-Kirche (Mo nachmittags)",
+   "venueId": "ev-langwasser-miniclubs",
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "topics": [
+    "eltern-kind-gruppe",
+    "krabbelgruppe",
+    "singen"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-10-12T15:00:00+02:00",
+    "2026-10-19T15:00:00+02:00",
+    "2026-10-26T15:00:00+01:00",
+    "2026-11-09T15:00:00+01:00",
+    "2026-11-16T15:00:00+01:00",
+    "2026-11-23T15:00:00+01:00",
+    "2026-11-30T15:00:00+01:00",
+    "2026-12-07T15:00:00+01:00",
+    "2026-12-14T15:00:00+01:00",
+    "2026-12-21T15:00:00+01:00"
+   ]
+  }
+ ]
+}

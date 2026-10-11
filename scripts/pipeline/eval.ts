@@ -1,0 +1,105 @@
+/**
+ * Eval der Extraktion (Plan 0032, E9). Aufruf: `pnpm eval …`
+ *
+ *   [--model M] [--fallback M] [--case a,b] [--concurrency N]
+ *       Alle Fälle aus evals/cases/ (oder die genannten) mit `createExtractor` wie im Nachtlauf. Details nach
+ *       runs/eval-<datum>-<modell>/, eine Zeile an evals/results.md (nur mit allen Fällen, sonst nur Details).
+ *       --fallback: Standard = --model, damit das Modell allein gemessen wird; `--fallback sonnet` misst die
+ *       Konfiguration des Nachtlaufs. Modell Standard LLM_MODEL_EXTRACT bzw. haiku.
+ *   freeze ID --kind html[,gross] [--trap ab-3-jahren] [--force]
+ *       Fall evals/cases/<ID>-<heute>/ aus einem frischen Abruf anlegen; expected.json als Entwurf aus dem Bestand,
+ *       danach von Hand gegen input.json prüfen (Korrekturen in NOTES.md).
+ */
+import { join } from "node:path";
+import { parseArgs } from "node:util";
+import { berlinIsoDate } from "../../src/domain/time.ts";
+import { type CaseRun, freezeCase, loadCases, runEval, writeEval } from "./io/eval.ts";
+import { createExtractor, EXTRACT_KEY_PARTS } from "./io/extract.ts";
+import { ROOT } from "./io/files.ts";
+import { CASE_KINDS, type EvalInput, promptHash, TRAPS } from "./lib/eval-score.ts";
+
+const { positionals, values } = parseArgs({
+  allowPositionals: true,
+  options: {
+    model: { type: "string" },
+    fallback: { type: "string" },
+    case: { type: "string" },
+    concurrency: { type: "string", default: "3" },
+    kind: { type: "string" },
+    trap: { type: "string" },
+    force: { type: "boolean", default: false },
+  },
+});
+
+const print = (s: string) => process.stdout.write(`${s}\n`);
+function fail(message: string): never {
+  console.error(`✗ ${message}`);
+  process.exit(1);
+}
+const list = <T extends string>(raw: string | undefined, allowed: readonly T[], what: string): T[] => {
+  const items = (raw ?? "").split(",").filter(Boolean);
+  const bad = items.filter((i) => !(allowed as readonly string[]).includes(i));
+  if (bad.length > 0) fail(`${what} unbekannt: ${bad.join(", ")} (erlaubt: ${allowed.join(", ")})`);
+  return items as T[];
+};
+const today = berlinIsoDate(new Date());
+
+async function freeze(id: string) {
+  const kinds: EvalInput["kinds"] = list(values.kind, CASE_KINDS, "--kind");
+  if (kinds.length === 0) fail(`--kind fehlt (${CASE_KINDS.join(", ")})`);
+  const dir = await freezeCase({
+    providerId: id,
+    today,
+    kinds,
+    traps: list(values.trap, TRAPS, "--trap"),
+    force: values.force,
+  });
+  print(`✓ ${dir} – expected.json ist ein Entwurf aus dem Bestand: von Hand gegen input.json prüfen`);
+}
+
+function line(r: CaseRun): string {
+  const s = r.score.sessions;
+  const cost = r.calls.reduce((n, c) => n + (c.costUsd ?? 0), 0);
+  const secs = r.calls.reduce((n, c) => n + c.durationMs, 0) / 1000;
+  const head = r.outcome === "ok" ? "✓" : `✗ ${r.reason ?? ""}`;
+  return `${head} ${r.name}: Termine ${s.matched}/${s.expected} erwartet, ${s.predicted} vorhergesagt; ${r.calls.length} Aufrufe, $${cost.toFixed(3)}, ${secs.toFixed(0)} s`;
+}
+
+async function evaluate() {
+  const model = values.model ?? process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
+  const fallback = values.fallback ?? model;
+  const only = values.case?.split(",").filter(Boolean);
+  let cases: ReturnType<typeof loadCases>;
+  try {
+    cases = loadCases(only);
+  } catch (e) {
+    fail((e as Error).message);
+  }
+  const hash = promptHash(EXTRACT_KEY_PARTS);
+  print(`Eval ${today}: ${cases.length} Fälle, Modell ${model}, Fallback ${fallback}, Prompt-Hash ${hash}`);
+  const controller = new AbortController();
+  process.once("SIGINT", () => controller.abort());
+  const run = await runEval({
+    cases,
+    extractor: createExtractor({ model, fallbackModel: fallback }),
+    signal: controller.signal,
+    concurrency: Number(values.concurrency),
+    onCase: (r) => print(line(r)),
+  });
+  if (run.abort) fail(`Abbruch (${run.abort}) – keine Zeile in evals/results.md`);
+  if (controller.signal.aborted) fail("abgebrochen – keine Zeile in evals/results.md");
+  const outDir = join(ROOT, "runs", `eval-${today}-${model}${fallback === model ? "" : `-fb-${fallback}`}`);
+  if (only) {
+    // Teilmengen sind nicht vergleichbar: nur Details, keine Zeile
+    const row = writeEval(run, { date: today, model, fallback, hash, outDir }, join(outDir, "results.md"));
+    print(row);
+    print(`✓ ${outDir} (Teilmenge: keine Zeile in evals/results.md)`);
+    return;
+  }
+  print(writeEval(run, { date: today, model, fallback, hash, outDir }));
+  print(`✓ ${outDir}, Zeile in evals/results.md`);
+}
+
+if (positionals[0] === "freeze") await freeze(positionals[1] ?? fail("Anbieter-ID fehlt"));
+else if (positionals.length > 0) fail(`unbekannter Befehl ${positionals[0]} – siehe Kopf von scripts/pipeline/eval.ts`);
+else await evaluate();

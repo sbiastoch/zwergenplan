@@ -1,0 +1,8 @@
+{
+ "basis": "data/offers.json vom 2026-10-04T14:05:37+02:00, von Hand gegen input.json geprüft am 2026-10-11 (Korrekturen in NOTES.md)",
+ "window": {
+  "from": "2026-10-11",
+  "to": "2027-02-04"
+ },
+ "offers": []
+}

@@ -1,0 +1,54 @@
+{
+ "kinds": [
+  "html",
+  "keine-termine"
+ ],
+ "traps": [
+  "vergangen"
+ ],
+ "synthetic": true,
+ "origin": "von Hand gebaut am 2026-10-11 (fiktiver Anbieter, Plan 0032 E9)",
+ "providerId": "klangwiese-beispiel",
+ "catalog": {
+  "id": "klangwiese-beispiel",
+  "publicId": "l886qd9l",
+  "role": "anbieter",
+  "region": "nuernberg",
+  "name": "Klangwiese – Konzerte für die Allerkleinsten (fiktiv)",
+  "url": "https://example.org/klangwiese",
+  "programme": [
+   {
+    "url": "https://example.org/klangwiese/termine",
+    "kind": "html",
+    "use": "termine"
+   }
+  ],
+  "availability": {
+   "shown": "teilweise",
+   "how": "Platzangaben im Programmtext"
+  },
+  "verified": "2026-10-11",
+  "age": {
+   "minMonths": 0,
+   "maxMonths": 36
+  },
+  "venues": [
+   {
+    "id": "klangwiese-beispiel",
+    "name": "Klangwiese – Konzerte für die Allerkleinsten (fiktiv)",
+    "address": "Tonweg 3, 90403 Nürnberg",
+    "district": "Altstadt",
+    "geo": {
+     "lat": 49.4521,
+     "lon": 11.0767
+    }
+   }
+  ]
+ },
+ "today": "2026-10-11",
+ "text": "## Seite 1: https://example.org/klangwiese/termine (html)\n## TEXT\nKlangwiese – Konzerte für die Allerkleinsten (fiktiv)\nMitmachkonzerte für Babys und Kleinkinder von 0 bis 3 Jahren mit ihren Eltern. 45 Minuten, Krabbeldecken sind vorhanden.\nSaison 2025/26 – Rückblick\nSo 18.01.2026, 10:30 Uhr – „Winterklänge“ – ausverkauft\nSo 22.03.2026, 10:30 Uhr – „Frühlingserwachen“ – ausverkauft\nSo 21.06.2026, 10:30 Uhr – „Sommerwiese“\nSa 19.09.2026, 10:30 Uhr – „Herbstlaub“ (Zusatzkonzert)\nBabymassage mit Musik: 5 Termine, montags 10:00–11:00 Uhr, 07.09.–05.10.2026 – Kurs beendet.\nDie Termine der Saison 2026/27 stehen noch nicht fest. Abonnieren Sie unseren Newsletter, dann erfahren Sie sie als Erste.\nTickets 8 € (Erwachsene), Babys frei.\nKontakt · Impressum · Datenschutz",
+ "candidates": [],
+ "allowedUrls": [
+  "https://example.org/klangwiese/termine"
+ ]
+}

@@ -274,6 +274,14 @@ Umgesetzt: `io/llm.ts`, Prompt `scripts/pipeline/prompt/extract.md` (ersetzt `re
 
 **Stufe 2 – Extraktion lokal:** `io/llm.ts` (E2), Prompt, `extractProvider`, `refreshProvider` mit den Regeln aus E5, `ProviderRaw`, `build` aus `data/raw`. Dazu die 12 Eval-Fälle und `pnpm eval`. Ergebnis: Eval mit Haiku und Sonnet in `evals/results.md`; Modellwahl durch den Nutzer.
 
+**Stufe 2 – Eval (E9), Stand 2026-10-11:** 12 Fälle in `evals/cases/` (10 echte aus `pnpm eval freeze`, 2 synthetische Fallen mit `synthetic: true`), `expected.json` aus dem Bestand vom 2026-10-04, von Hand gegen den Text geprüft (Korrekturen in `NOTES.md` je Fall), Fenster bis zum Horizont des Bestands (2027-02-04). Bewertung `lib/eval-score.ts`, Lauf `pnpm eval` (`scripts/pipeline/eval.ts`, `io/eval.ts`), Ergebnisse in `evals/results.md`. Abweichungen und Ergänzungen:
+
+- `pnpm eval` misst das Modell allein (`--fallback` Standard = `--model`); `--fallback sonnet` misst die Konfiguration des Nachtlaufs.
+- Statt `extractProvider` heißt die gemeinsame Funktion `createExtractor` (Teil A).
+- `input.json` trägt statt des Katalogs einen Schnappschuss des Eintrags; Katalogpflege ändert Fälle nicht still. Eine Teilmenge (`--case`) schreibt keine Zeile in `results.md`.
+- CI-Warnung: `pnpm data:validate` meldet `::warning::`, wenn für den Prompt-Hash keine Zeile existiert (kein Gate).
+- Befund nuebad-flipper: Die GraphQL-Abfrage liefert je Kurs nur `startDateTime` des ersten Termins; Folgetermine stehen nicht in der Eingabe. Der Fall misst damit die Abfrage, nicht das Modell (Katalogpflege: Termine je Kurs mit abfragen).
+
 **Stufe 3 – Nachtlauf live:**
 - S3.1 Kostenbericht (E8) und `data/kosten.csv`.
 - S3.2 **Trockenlauf**: erster voller Lauf per `workflow_dispatch` ohne Push. Bericht an den Nutzer (Angebote gegen heute, geänderte Anbieter, Fehler, Tokens); er gibt den Push frei.

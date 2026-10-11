@@ -1,0 +1,76 @@
+{
+ "kinds": [
+  "pdf"
+ ],
+ "traps": [],
+ "synthetic": false,
+ "origin": "pnpm eval freeze am 2026-10-11",
+ "providerId": "stadtteilhaus-fisch",
+ "catalog": {
+  "id": "stadtteilhaus-fisch",
+  "publicId": "elyguhke",
+  "role": "anbieter",
+  "region": "nuernberg",
+  "name": "Stadtteilhaus FiSch (Stadt Nürnberg, Schniegling)",
+  "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+  "programme": [
+   {
+    "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+    "kind": "html",
+    "use": "termine"
+   },
+   {
+    "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+    "kind": "pdf",
+    "use": "termine"
+   }
+  ],
+  "availability": {
+   "shown": "nein",
+   "how": "Keine Platzanzeige; Mini-FiSche: 'Bitte erkundigen Sie sich nach freien Plätzen'",
+   "system": "keins (Stadtportal nuernberg.de, Imperia CMS)"
+  },
+  "verified": "2026-10-04",
+  "notes": [
+   "Der auf der städtischen 0-3-Seite verlinkte Familien-Café-Link (asd_fisch/aktuell_93794.html) ist tot (404) – Infos stehen auf elterntreffs.html. Mini-FiSche = feste Krabbelgruppen (Monatsbeitrag), kein Drop-in.",
+   "Die von nuernberg.de/familienbildung verlinkte Seite asd_fisch/aktuell_93794.html ist 404 – nur elterntreffs.html verwenden. Einstieg auch über www.fisch.nuernberg.de.",
+   "Ort Turnhalle Wahlerschule: Eltern-Kind-Turnen, Vater-Kind-Turnhalle",
+   "Programm-PDF heißt noch programmjanfeb24.pdf; Wochentage dort teils falsch (Website gilt)",
+   "[nuernberg.de/…/elterntreffs.html] Familien-Café Mo 15:30-17 (ohne Anmeldung); Mini-FiSche Krabbelgruppen Di/Mi/Fr 9-11 (12 €/Monat, feste Gruppe, nach freien Plätzen fragen); Vater-Kind-Frühstück Sa 9-12 mit Datumsliste (31.10., 21.11., 19.12.2026; 10 €); Vater-Kind offene Turnhalle Fr 18-20 mit Datumsliste; Eltern-Kind-Turnen Do (Anmeldung per Mail)",
+   "[nuernberg.de/…/programmjanfeb24.pdf] Zweimonats-Programm (Link-Text 'Programm September/Oktober 2026', Dateiname veraltet/fix) – verlinkt auf https://www.nuernberg.de/internet/asd_fisch/"
+  ],
+  "age": {
+   "minMonths": 0,
+   "maxMonths": 72
+  },
+  "venues": [
+   {
+    "id": "stadtteilhaus-fisch",
+    "name": "Stadtteilhaus FiSch",
+    "address": "Mühlweg 22, 90427 Nürnberg",
+    "district": "Schniegling",
+    "geo": {
+     "lat": 49.470452,
+     "lon": 11.026933
+    }
+   },
+   {
+    "id": "stadtteilhaus-fisch-turnhalle-wahlerschule",
+    "name": "Turnhalle Wahlerschule",
+    "address": "Holsteiner Str. 2A, 90427 Nürnberg",
+    "geo": {
+     "lat": 49.468715,
+     "lon": 11.029417
+    },
+    "hint": "Eltern-Kind-Turnen, Vater-Kind-Turnhalle"
+   }
+  ]
+ },
+ "today": "2026-10-11",
+ "text": "## Seite 1: https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html (html)\n## TEXT\nGruppen und Kurse für Familien\n– Stadtteilhaus FiSch\nGruppen und Kurse für Familien\nFamilien-Café\n<#_0_6>\nMini-FiSche\n<#_0_8>\nVater-Kind-Frühstück\n<#_0_13>\nVater-Kind: Die offene Turnhalle\n<#_0_38>\nEltern-Kind-Turnen\n<#_0_25>\nJonglier- und Zirkustreff\n<#_0_35>\n(Bild vergrößern)\nGemeinsam spielen, toben und turnen und dabei neue Freunde und Bekannte kennen lernen - das ist das Ziel der Elterntreffs für Mütter und Väter mit Kleinkindern. Während die Kleinen im Spielzimmer spielen, haben Mütter und Väter Gelegenheit mit anderen Eltern Erfahrungen auszutauschen oder einfach ein Schwätzchen zu halten.\nFamilien-Café\nEltern mit ihren Kindern treffen sich zum gemeinsamen Spiel und Austausch. Das Angebot richtet sich insbesondere auch an Eltern, die noch keinen Platz in den Krabbel-Gruppen haben oder deren Kinder den Kindergarten besuchen und die deshalb nicht mehr an einer Krabbel-Gruppe teilnehmen können. Und natürlich sind auch Väter oder Großeltern mit ihren Kindern herzlich willkommen. Eine Anmeldung ist nicht nötig.\nTermin:\nMontag von 15.30 bis 17 Uhr\nMini-FiSche\nIm Stadtteilhaus FiSch gibt es aktuell drei Krabbelgruppen - die Mini-FiSche - für Eltern oder Großeltern mit den ganz kleinen Kindern, die noch nicht in die Krippe oder Kita gehen, am Dienstag, Mittwoch oder Freitag. Mütter und Väter mit ihren Kindern treffen sich zum gemeinsamen Spiel und Austausch. Die Kinder finden ein geräumiges Spielzimmer mit altersspezifischen Spielsachen vor. Bei gutem Wetter sind wir in unserem Spielgarten. Auch Großeltern sind willkommen.\nTermine:\nDienstag, Mittwoch und Freitag\nZeit:\n9 - 11 Uhr\nKosten:\n12 Euro im Monat\nAnmeldung:\nBitte erkundigen Sie sich nach freien Plätzen im Stadtteilhaus FiSch\nVater-Kind-Frühstück\nDer ultimative Treffpunkt für Väter mit ihren Kindern.\nSeit über 20 Jahren treffen sich Väter mit ihren Kindern im Stadtteilhaus, um andere Papas kennen zu lernen, Erfahrungen auszutauschen, Freundschaften zu schließen und mit den Kleinen zu spielen und gemütlich zu frühstücken. Zum unschlagbaren Preis von 10.- Euro pro Familie inklusive Frühstücksbuffet sind wir im Sommer bei gutem Wetter im FiSchgarten, ansonsten im Toberaum.\nZeitrahmen:\nSamstag von 9 bis 12 Uhr\nTermine:\n31.10.; 21.11.; 19.12.2026\nKosten:\n10 Euro fürs Frühstücksbuffet\nAnmeldung:\nBitte im Stadtteilhaus FiSch anmelden\nVater-Kind: Die offene Turnhalle\nFreitags gehört die Halle euch: Bewegen, spielen, gemeinsam Zeit verbringen.\nOb Toben, Ballspiele, Turnen oder eigene Ideen - die Hallenzeit wird von den teilnehmenden Familien selbst gestaltet. Es gibt keine Übungsleitung. Ein Vater übernimmt die Hallenverantwortung und alle Teilnehmenden tragen gemeinsam Verantwortung für einen sicheren und respektvollen Umgang miteinander und mit den Sportgeräten.\nEin kostenloses Angebot des Stadtteilhauses FiSch.\nZeitrahmen:\nFreitag von 18 bis 20 Uhr\nTermine:\n02.10.26; 13.11.26; 29.01.27; 26.02.27; 12.03.27\nOrt:\nTurnhalle der Wahlerschule Schniegling, Holsteiner Str. 2A, 90427 Nürnberg\nEltern-Kind-Turnen\nImmer am Donnerstag, können wir Eltern-Kind-Turnen in der Turnhalle der Wahlerschule anbieten.\nDabei wird spielerisch die Motorik der Kinder gefördert. Die Kinder turnen gemeinsam mit ihren Eltern/Bezugspersonen und sammeln vielseitige Bewegungserfolge. Die Eltern/Bezugspersonen sind aktive Teilnehmer*innen, bieten Unterstützung, sind Spielgefährt*innen oder werden selbst zum Turngerät. Altersgerecht wird die Alltagmotorik der Kinder gefördert und das Bewegungsrepertoire mit viel Spaß erweitert.\nEs gibt drei Gruppen, die jeweils für eine Stunde am Donnerstag Turnen.\nKursleitung:\nChristina Schauerte\nAnmeldung:\nBitte bei Christina.Schauerte@gmx.net anmelden.\nJonglier- und Zirkustreff\nEin offener Jongliertreff, im Winterhalbjahr (Oktober bis März). Einmal im Monat am Freitag von 18 bis 20 Uhr für Erwachsene und Kinder ab dem Grundschulalter (6 Jahre), die\n• das Jonglieren bereits können oder es noch lernen wollen.\n• Spaß daran haben\n• üben möchten\n• Jonglieren mit anderen Geräten kennenlernen möchten\n• oder Rola Bola, Balancieren, Hula Hupp, Akrobatik, Poi und Einrad ausprobieren wollen.\nMit dabei ist: Hannes Göldner, ein Gaukler und Jongleur, der euch unterstützt, Tipps gibt und Neues zeigen kann. Er bringt viele Sachen zum Jonglieren mit.\nNatürlich dürfen die eigenen Jongliergeräte mitgebracht werden.\nWichtig: vergesst nicht eure Hallenturnschuhe.\nDas Mitmachen ist kostenfrei, über eine Spende freuen wir uns.\nKursleitung\nHanes Göldner, Gaukler und Jongleur\nTermine\n09.10.26; 27.11.26; 11.12.26; 15.01.27; 05.02.27; 05.03.27\nUhrzeit\n18 bis 20 Uhr\n## Seite 2: https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf (pdf)\nJugendamt\nStadtteilhaus FiSch\nProgramm\nfür\nSeptember / Oktober\n2026\nStadtteilhaus FiSch, Mühlweg 22, 90427 Nürnberg, · Telefon\nMobil\nHomepage www.fisch.nuernberg.de;\nEmail\n+49 (0)9 11 23 11 01 80\n+49 (0)1 60 90 51 72 70\nstadtteilhaus-fisch@stadt.nuernberg.de\nInstagram : stadtteilhaus.fisch\nBesonderes im\nSeptember / Oktober\nab 14.09.2026\nKartoffelfest\nFamiliencafé\nein Familienfest\njede Woche Montagnachmittag\nVon 15.30 bis 17 Uhr\nam Freitag, den 16. Oktober 2026\nvon 15 – 18.30 Uhr\nzusammen mit der Mittagsbetreuung e. V.\nFür Eltern und Großeltern\nmit ihren Kindern.\nmit:\nBasteln\nLagerfeuer\nGauklershow\nFeuershow\nSpielen\nKaffee und Kuchen\nu.v.m.\nKeine vorherige Anmeldung!\nEinfach vorbei kommen.\nKeine Teilnahmekosten.\nÜber eine Spende für den Kaffee freuen wir uns\nnatürlich.\nUkulele – Kurs\nfür Anfänger\nab 22. September 2026\nYoga-Aufbaukurs\nwöchentlich dienstags, von 15.09. – 18.12.2026\n12 Termine\nvon 19 – 20.15 Uhr\nvon 15.30 – 16.15 Uhr\nKosten 10 Euro/10 Termine\nkein Unterricht in den Schulferien\nHatha & Vinyasa-Yoga\nKosten: 180 Euro\nKursleitung: Maria Majewski (Musikpädagogin)\nAnmeldung: ma-majewski@gmx.de\nZukunftswerkstatt „SchnieWetzKrie“\nDienstag, 6. Oktober 2026\n18.30 – 21 Uhr\nStreetworkprojekt Schniegling\nMontag\n14 – 18 Uhr Offener Teenietreff (10-14 J.)\n18 – 20 Uhr Offener Treff (ab 12 J.)\nDienstag\nunterwegs,\n13 – 16 Uhr offene Sprechstunde: Hilfe bei\nSchulsachen, Bewerbungen uvm.!\n16.30 – 19 Uhr Wir sind im Stadtteil\nDu auch?\nMittwoch\nan der\n16 – 18 Uhr Kreativgruppe (Bitte Aushang\nTür lesen, mit Anmeldung)\nDonnerstag\n14 – 17:30 Uhr Mädchenzeit ab 10 J.\n18 – 20:30 Uhr Jungszeit ab 12 J.\nFreitag\n14 – 17.30 Uhr Offenes Haus (ab 6 J.)\n18 – 21 Uhr Offener Treff (ab 12 J.)\nNähere Infos zu den Angeboten gibt es bei:\nUta Siegmann, Sozialpädagoge (B. A.)\nStreetworkprojekt Schniegling\nTelefon: 09 11 / 231 10184 Mobil 0151/74221737\nINSTAGRAM: st.schniegling_und_vogelherd\nGesamttreffen\nAustausch der Gruppen über Ergebnisse und\nErfahrungen.\nInteressierte neue Menschen, die sich gerne\neinbringen wollen, sind willkommen, um sich zu\ninformieren\nund\neventuell\neiner\nGruppe\nanzuschließen.\nOrt dieser Veranstaltung:\nStadtteilhaus FiSch\n27. Oktober 2026\n24. November 2026\nSpiel- und Grillabend\nFreitag, 25. September 2026\nWir schmeißen um 17 Uhr den Grill an\nund besorgen die Getränke.\nFür sein Essen muss jeder selbst sorgen.\nJongliertreff Wahlerschule\nFreitag, 9. Oktober 2026\n18 – 20 Uhr\nfür Kinder ab 6 Jahre und Erwachsene\nKosten: 2 Euro pro Person\nNach Lust und Laune besteht die Möglichkeit zu\nSpielen (Ballspiele, Möllky, Wikingerkubb, …)\nein offener Treff für alle, die das Jonglieren können\noder es lernen wollen, und die viel Spaß daran\nhaben.\nBitte im FiSch anmelden!\nMit dabei ist Hannes Göldner (Gaukler, Jongleur)\nVater-Kind-Frühstück\nSamstag, 31. Oktober 2026\nEs dürfen eigene Sachen mitgebracht werden.\nHallenturnschuhe nicht vergessen\nOrt: Turnhalle der Wahlerschule\nvon 9 bis 12 Uhr\nim Stadtteilhaus FiSch\nUnkostenbeitrag: 10 Euro\nKennen lernen  spielen \ngemütlich frühstücken\nAnmeldung im Stadtteilhaus FiSch\nNEU\nVater-Kind-Turnen\nSamstag, 2. Oktober 2026\n(1 X monatlich)\nvon 18 bis 20 Uhr\nin der Turnhalle der Wahlerschule (Eingang über den\nPausenhof)\nein offener Treff für alle Väter, die mit ihren Kindern am\nFreitagabend in der Turnhalle der Wahlerschule aktiv\nsein möchten.\nEinfach vorbeikommen!\nFerienprogramm Herbst\nfür Grundschulkinder\nDienstag und Mittwoch, den 3. und 4. November 202\ntäglich von 8 -15.30 Uhr\nmit einem Kindertheater: „Das Nachttier“ vom\nFigurentheater Marie Bretschneider und weiteren Aktionen\n(u.a. dem Museum im Koffer) zum\nThema: „Wald – Forschen wie echte Entdecker*innen“\nAnmeldung nur für beide Tage möglich\nKosten: 20 Euro (mit Mittagessen)\nweitere Infos und Anmeldung demnächst in der\ngesonderten Ausschreibung.\nGartenfiSche\nab Dienstag, den 22. September 2026\n14.30 – 16 Uhr\nfür ab dem Grundschulalter ohne Eltern.\nKindertöpfern\nab Dienstag, den 6. Oktober 2026\nvon 14.30 – 16 Uhr\nEltern-Kind-Töpfern\nDas Büro des\nStadtteilhauses FiSch ist\nam\nDonnerstag,\n29. Oktober 2026\nnicht besetzt!\nab Mittwoch, den 16. September 2026\n15.30 – 16.30 Uhr\nfür kleinere Kinder mit ihren Eltern\nKosten: 2 Euro pro Termin und Person und\n9 Euro/Kilo Töpferware\nnur mit Anmeldung\nWOCHENÜBERSICHT\nMontag:\n9.30 - 11.00\n11.15 - 15.30\n14.00 - 18.00\n15.30 - 17.00\n18.00 - 20.00\nnach Vereinbarung\nYoga (Anfänger und Fortgeschrittene; gerne Senior*innen) ab 26.10.\nMittagsbetreuung mit Hausaufgabenbetreuung\nStreetworkprojekt: Offener Teenietreff (10-14 Jahre)\nFamiliencafé\nStreetworkprojekt: Offener Jugendtreff (ab 12 Jahre)\nDeutschkurs\nDienstag:\n9.00 - 11.00\n11.15 - 15.30\n13.00 - 16.00\n14.30 - 16.00\n15.30 - 16.15\n19.00 - 20.15\nnach Vereinbarung\nMini-FiSche\nMittagsbetreuung mit Hausaufgabenbetreuung\noffene Sprechstunde Streetworkprojekt\nGartenfische/Kindertöpfern ab 22.09.\nUkulele\nYoga-Kurs ab 15.09.\nDeutschkurs\nMittwoch:\n9.00 – 11.00\n11.15 - 15.30\n14.30 – 16.00\n16.00 - 18.00\n19.00 - 21.00\nnach Vereinbarung\nMini-FiSche\nMittagsbetreuung mit Hausaufgabenbetreuung\nEltern-Kind-Töpfern (mit Anmeldung) ab 16.09.\nStreetworkprojekt: Kreativgruppe mit Anmeldung\nErwachsenentöpfern\nDeutschkurs\nDonnerstag:\n11.15 - 15.30\n14.00 - 17.30\n14.30 - 15.30\n15.30 - 16.30\n16.30 - 17.30\n15.30 - 17.30\n18.00 - 20.30\nnach Vereinbarung\nMittagsbetreuung mit Hausaufgabenbetreuung\nStreetworkprojekt: offener Treff für Mädchen ab 10 Jahre\nEltern-Kind-Turnen I (3 - 6jährige) ab 24.09.\nEltern-Kind-Turnen II (3 - 6jährige) ab 24.09.\nEltern-Kind-Turnen III (3 - 6jährige) ab 24.09.\nMädchengruppe ab 01.10.\nStreetworkprojekt: offener Treff für Jungs ab 12 Jahre\nDeutschkurs\nFreitag:\n9.00 - 11.00\n11.15 - 15.00\n15.00 – 17.30\n18.00 - 21.00\nnach Vereinbarung\nMini-FiSche\nMittagsbetreuung\nOffener Treff für Schulkinder von 6 bis 14 Jahre\nStreetworkprojekt: Offener Jugendtreff (ab 12 Jahre)\nDeutschkurs\nHerausgegeben von der Stadt Nürnberg:\nAmt für Kinder, Jugendliche und Familien – Jugendamt,\nStadtteilhaus FiSch, Mühlweg 22, 90427 Nürnberg; Druck: Eigendruck",
+ "candidates": [],
+ "allowedUrls": [
+  "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+  "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf"
+ ]
+}

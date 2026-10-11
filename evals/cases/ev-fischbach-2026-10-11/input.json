@@ -1,0 +1,206 @@
+{
+ "kinds": [
+  "ical"
+ ],
+ "traps": [],
+ "synthetic": false,
+ "origin": "pnpm eval freeze am 2026-10-11",
+ "providerId": "ev-fischbach",
+ "catalog": {
+  "id": "ev-fischbach",
+  "publicId": "wd9824m4",
+  "role": "anbieter",
+  "region": "nuernberg",
+  "name": "Ev. Auferstehungskirche Fischbach – Mutter-Kind-Gruppen & Minigottesdienst",
+  "url": "https://fischbach-evangelisch.de/",
+  "programme": [
+   {
+    "url": "https://www.evangelische-termine.de/ical?vid=556",
+    "kind": "ical",
+    "use": "termine"
+   },
+   {
+    "url": "https://fischbach-evangelisch.de/",
+    "kind": "html",
+    "use": "info"
+   }
+  ],
+  "availability": {
+   "shown": "nein",
+   "how": "keine Angabe",
+   "system": "evangelische-termine.de"
+  },
+  "verified": "2026-10-04",
+  "notes": [
+   "Mutter-Kind-Gruppen in festen Gruppen (ca. 3 Monate bis 4 Jahre), Aufnahme per E-Mail; evangelische-termine nennt abweichend „ab 3 Jahren“",
+   "[evangelische-termine.de/ical?vid=556] ET vid=556: 'Mutter-Kind-Gruppe' Mo 14:30-16:30, Di 9:30-11:30, Do 9:30-10:30; 'Minigottesdienst' monatlich Do 15:00 (0-6 J. mit Eltern/Großeltern)",
+   "[fischbach-evangelisch.de] Gemeindeseite"
+  ],
+  "age": {
+   "minMonths": 0,
+   "maxMonths": 72
+  },
+  "venues": [
+   {
+    "id": "ev-fischbach",
+    "name": "Haus der Begegnung",
+    "address": "Haus der Begegnung, Fischbacher Hauptstraße 213, 90475 Nürnberg",
+    "district": "Fischbach",
+    "geo": {
+     "lat": 49.419786,
+     "lon": 11.195889
+    }
+   }
+  ]
+ },
+ "today": "2026-10-11",
+ "text": "## Seite 1: https://www.evangelische-termine.de/ical?vid=556 (ical)\n## ICAL\n[\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261012T143000\",\n\"DTEND\": \"20261012T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135832.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261013T093000\",\n\"DTEND\": \"20261013T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109420.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261013T193000\",\n\"DTEND\": \"20261013T203000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Kirchenvorstandssitzung\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107612.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261015T093000\",\n\"DTEND\": \"20261015T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121946.html\"\n},\n{\n\"DESCRIPTION\": \"Wissenswertes über Bienen\",\n\"DTSTART\": \"20261015T140000\",\n\"DTEND\": \"20261015T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Seniorennachmittag\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8152730.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261018T093000\",\n\"DTEND\": \"20261018T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst mit Kindergottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022746.html\"\n},\n{\n\"DESCRIPTION\": \"'Klangvoll durch das Jahr'\",\n\"DTSTART\": \"20261018T180000\",\n\"DTEND\": \"20261018T190000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Herbstkonzert des Kirchenchores :: mit dem Gastchor: Gospeltrain\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8229132.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261019T143000\",\n\"DTEND\": \"20261019T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135833.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261020T093000\",\n\"DTEND\": \"20261020T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109421.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261021T140000\",\n\"DTEND\": \"20261021T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"FiHNa - Rummy Club\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107601.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261022T093000\",\n\"DTEND\": \"20261022T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121947.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261022T150000\",\n\"DTEND\": \"20261022T153000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Minigottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107622.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261023T190000\",\n\"DTEND\": \"20261023T200000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Kulturkreis :: Leuchtende Bilder\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8171536.html\"\n},\n{\n\"DESCRIPTION\": \"Dr. Mohsen Farsijani & FAIR PLAY COMPANY\",\n\"DTSTART\": \"20261023T193000\",\n\"DTEND\": \"20261023T213000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Kulturkreis :: Konzert\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8171537.html\"\n},\n{\n\"DESCRIPTION\": \"'Pilgern'\",\n\"DTSTART\": \"20261025T180000\",\n\"DTEND\": \"20261025T190000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Kraftwerksgottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022747.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261026T143000\",\n\"DTEND\": \"20261026T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135834.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261027T093000\",\n\"DTEND\": \"20261027T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109422.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261029T093000\",\n\"DTEND\": \"20261029T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121948.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261030T190000\",\n\"DTEND\": \"20261030T200000\",\n\"LOCATION\": \"Nürnberg: Marienkirche\",\n\"SUMMARY\": \"Freundeskreis Marienkirche :: 'Gründungsfeier'\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8228770.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261101T093000\",\n\"DTEND\": \"20261101T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022748.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261102T143000\",\n\"DTEND\": \"20261102T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135835.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261103T190000\",\n\"DTEND\": \"20261103T220000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"'Die Dienstagsfrauen' :: Buchvorstellung in der kath. Bücherei\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8152812.html\"\n},\n{\n\"DESCRIPTION\": \"Spiele und Tänze im Sitzen\",\n\"DTSTART\": \"20261104T140000\",\n\"DTEND\": \"20261104T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"FiHNa - Spiele und Tänze im Sitzen für die ältere Generation\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107596.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261105T093000\",\n\"DTEND\": \"20261105T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121949.html\"\n},\n{\n\"DESCRIPTION\": \"im Anschluss Kirchenkaffee\",\n\"DTSTART\": \"20261108T093000\",\n\"DTEND\": \"20261108T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022749.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261109T143000\",\n\"DTEND\": \"20261109T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135836.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261110T093000\",\n\"DTEND\": \"20261110T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109423.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261110T193000\",\n\"DTEND\": \"20261110T203000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Kirchenvorstandssitzung\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107613.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261112T093000\",\n\"DTEND\": \"20261112T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121950.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261115T093000\",\n\"DTEND\": \"20261115T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022750.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261115T190000\",\n\"DTEND\": \"20261115T200000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mitarbeiterdank-Feier\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8228838.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261116T143000\",\n\"DTEND\": \"20261116T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135837.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261117T093000\",\n\"DTEND\": \"20261117T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109424.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261118T140000\",\n\"DTEND\": \"20261118T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"FiHNa - Rummy Club\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107602.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261118T193000\",\n\"DTEND\": \"20261118T203000\",\n\"LOCATION\": \"Nürnberg: Marienkirche\",\n\"SUMMARY\": \"Beichtgottesdienst mit Abendmahl\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8152396.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261119T093000\",\n\"DTEND\": \"20261119T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121951.html\"\n},\n{\n\"DESCRIPTION\": \"Filmnachmittag\",\n\"DTSTART\": \"20261119T140000\",\n\"DTEND\": \"20261119T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Seniorennachmittag\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8152731.html\"\n},\n{\n\"DESCRIPTION\": \"Gedichte, Zeichnungen Lieder und Musik\",\n\"DTSTART\": \"20261121T193000\",\n\"DTEND\": \"20261121T213000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Kulturkreis :: 'Denn Schmetterlinge leben hier nicht im Ghetto'\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8171538.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261122T093000\",\n\"DTEND\": \"20261122T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022751.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261123T143000\",\n\"DTEND\": \"20261123T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135838.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261124T093000\",\n\"DTEND\": \"20261124T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109425.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261126T093000\",\n\"DTEND\": \"20261126T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121952.html\"\n},\n{\n\"DESCRIPTION\": \"im Anschluss Kirchenkaffee\",\n\"DTSTART\": \"20261129T093000\",\n\"DTEND\": \"20261129T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst mit Abendmahl und Kindergottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022752.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261130T143000\",\n\"DTEND\": \"20261130T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135839.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261201T093000\",\n\"DTEND\": \"20261201T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109426.html\"\n},\n{\n\"DESCRIPTION\": \"Spiele und Tänze im Sitzen\",\n\"DTSTART\": \"20261202T140000\",\n\"DTEND\": \"20261202T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"FiHNa - Spiele und Tänze im Sitzen für die ältere Generation\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107597.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261203T093000\",\n\"DTEND\": \"20261203T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121953.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261206T093000\",\n\"DTEND\": \"20261206T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022753.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261207T143000\",\n\"DTEND\": \"20261207T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135840.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261208T093000\",\n\"DTEND\": \"20261208T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109427.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261208T193000\",\n\"DTEND\": \"20261208T203000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Kirchenvorstandssitzung\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107614.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261210T093000\",\n\"DTEND\": \"20261210T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121954.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261213T093000\",\n\"DTEND\": \"20261213T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022754.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261214T143000\",\n\"DTEND\": \"20261214T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135841.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahre\",\n\"DTSTART\": \"20261215T093000\",\n\"DTEND\": \"20261215T113000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8109428.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261216T140000\",\n\"DTEND\": \"20261216T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"FiHNa - Rummy Club\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8107603.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder von 3 Monaten bis 3 Jahren\",\n\"DTSTART\": \"20261217T093000\",\n\"DTEND\": \"20261217T103000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8121955.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261217T140000\",\n\"DTEND\": \"20261217T160000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Seniorennachmittag\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8152732.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261220T093000\",\n\"DTEND\": \"20261220T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022755.html\"\n},\n{\n\"DESCRIPTION\": \"Kinder ab 3 Jahren\",\n\"DTSTART\": \"20261221T143000\",\n\"DTEND\": \"20261221T163000\",\n\"LOCATION\": \"Nürnberg: Haus der Begegnung\",\n\"SUMMARY\": \"Mutter-Kind-Gruppe\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8135842.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20261227T093000\",\n\"DTEND\": \"20261227T103000\",\n\"LOCATION\": \"Nürnberg: Auferstehungskirche Fischbach\",\n\"SUMMARY\": \"Gottesdienst\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8022756.html\"\n},\n{\n\"DESCRIPTION\": \"\",\n\"DTSTART\": \"20270521\",\n\"DTEND\": \"20270531\",\n\"LOCATION\": \": Ohne Ort\",\n\"SUMMARY\": \"Gemeindereise :: Griechenland - Antike und Christentum\",\n\"URL\": \"https://www.evangelische-termine.de/veranstaltung_im_detail8171215.html\"\n}\n]\n## Kandidaten (1)\n{\"source\":\"evtermine\",\"sourceId\":\"8135832\",\"title\":\"Mutter-Kind-Gruppe\",\"description\":\"Die Kinder lernen unter Anleitung Lieder und bewegen sich zur Musik. Mütter und Väter können ihre Erfahrungen über Erziehungsfragen austauschen und pädagogische Anregungen erhalten, wie z. B. Motorik- und Spracherziehung, Sauberkeitserziehung oder Tipps zur gesunden Ernährung, Förderung der sozialen Belange von Mutter und Kind in der Gruppe. Ziele der Gruppen: - neue Kontakte mit Menschen in der gleichen Lebenssituation - Erfahrungs- und Informationsaustausch der Eltern - Schaffung von Spielmöglichkeiten - Kontaktmöglichkeit der Kinder untereinander - Anregung zur Reflexion\",\"organizer\":\"Nürnberg - Auferstehungskirche Fischbach\",\"organizerId\":\"556\",\"organizerUrl\":\"http://www.fischbach-evangelisch.de\",\"location\":\"Haus der Begegnung\",\"address\":\"Fischbacher Hauptstr. 213, 90475 Nürnberg\",\"geo\":{\"lat\":49.419346592092,\"lon\":11.195488060344},\"detailUrl\":\"https://www.evangelische-termine.de/detail-bt?ID=8135832\",\"cancelled\":false,\"soldOut\":false,\"waitlist\":false,\"weekly\":false,\"occurrences\":[{\"start\":\"2026-10-12T14:30\",\"end\":\"2026-10-12T16:30\"},{\"start\":\"2026-10-13T09:30\",\"end\":\"2026-10-13T11:30\"},{\"start\":\"2026-10-15T09:30\",\"end\":\"2026-10-15T10:30\"},{\"start\":\"2026-10-19T14:30\",\"end\":\"2026-10-19T16:30\"},{\"start\":\"2026-10-20T09:30\",\"end\":\"2026-10-20T11:30\"},{\"start\":\"2026-10-22T09:30\",\"end\":\"2026-10-22T10:30\"},{\"start\":\"2026-10-26T14:30\",\"end\":\"2026-10-26T16:30\"},{\"start\":\"2026-10-27T09:30\",\"end\":\"2026-10-27T11:30\"},{\"start\":\"2026-10-29T09:30\",\"end\":\"2026-10-29T10:30\"},{\"start\":\"2026-11-02T14:30\",\"end\":\"2026-11-02T16:30\"},{\"start\":\"2026-11-05T09:30\",\"end\":\"2026-11-05T10:30\"},{\"start\":\"2026-11-09T14:30\",\"end\":\"2026-11-09T16:30\"},{\"start\":\"2026-11-10T09:30\",\"end\":\"2026-11-10T11:30\"},{\"start\":\"2026-11-12T09:30\",\"end\":\"2026-11-12T10:30\"},{\"start\":\"2026-11-16T14:30\",\"end\":\"2026-11-16T16:30\"},{\"start\":\"2026-11-17T09:30\",\"end\":\"2026-11-17T11:30\"},{\"start\":\"2026-11-19T09:30\",\"end\":\"2026-11-19T10:30\"},{\"start\":\"2026-11-23T14:30\",\"end\":\"2026-11-23T16:30\"},{\"start\":\"2026-11-24T09:30\",\"end\":\"2026-11-24T11:30\"},{\"start\":\"2026-11-26T09:30\",\"end\":\"2026-11-26T10:30\"},{\"start\":\"2026-11-30T14:30\",\"end\":\"2026-11-30T16:30\"},{\"start\":\"2026-12-01T09:30\",\"end\":\"2026-12-01T11:30\"},{\"start\":\"2026-12-03T09:30\",\"end\":\"2026-12-03T10:30\"},{\"start\":\"2026-12-07T14:30\",\"end\":\"2026-12-07T16:30\"},{\"start\":\"2026-12-08T09:30\",\"end\":\"2026-12-08T11:30\"},{\"start\":\"2026-12-10T09:30\",\"end\":\"2026-12-10T10:30\"},{\"start\":\"2026-12-14T14:30\",\"end\":\"2026-12-14T16:30\"},{\"start\":\"2026-12-15T09:30\",\"end\":\"2026-12-15T11:30\"},{\"start\":\"2026-12-17T09:30\",\"end\":\"2026-12-17T10:30\"},{\"start\":\"2026-12-21T14:30\",\"end\":\"2026-12-21T16:30\"}]}",
+ "candidates": [
+  {
+   "source": "evtermine",
+   "sourceId": "8135832",
+   "title": "Mutter-Kind-Gruppe",
+   "description": "Die Kinder lernen unter Anleitung Lieder und bewegen sich zur Musik. Mütter und Väter können ihre Erfahrungen über Erziehungsfragen austauschen und pädagogische Anregungen erhalten, wie z. B. Motorik- und Spracherziehung, Sauberkeitserziehung oder Tipps zur gesunden Ernährung, Förderung der sozialen Belange von Mutter und Kind in der Gruppe. Ziele der Gruppen: - neue Kontakte mit Menschen in der gleichen Lebenssituation - Erfahrungs- und Informationsaustausch der Eltern - Schaffung von Spielmöglichkeiten - Kontaktmöglichkeit der Kinder untereinander - Anregung zur Reflexion",
+   "organizer": "Nürnberg - Auferstehungskirche Fischbach",
+   "organizerId": "556",
+   "organizerUrl": "http://www.fischbach-evangelisch.de",
+   "location": "Haus der Begegnung",
+   "address": "Fischbacher Hauptstr. 213, 90475 Nürnberg",
+   "geo": {
+    "lat": 49.419346592092,
+    "lon": 11.195488060344
+   },
+   "detailUrl": "https://www.evangelische-termine.de/detail-bt?ID=8135832",
+   "cancelled": false,
+   "soldOut": false,
+   "waitlist": false,
+   "weekly": false,
+   "occurrences": [
+    {
+     "start": "2026-10-12T14:30",
+     "end": "2026-10-12T16:30"
+    },
+    {
+     "start": "2026-10-13T09:30",
+     "end": "2026-10-13T11:30"
+    },
+    {
+     "start": "2026-10-15T09:30",
+     "end": "2026-10-15T10:30"
+    },
+    {
+     "start": "2026-10-19T14:30",
+     "end": "2026-10-19T16:30"
+    },
+    {
+     "start": "2026-10-20T09:30",
+     "end": "2026-10-20T11:30"
+    },
+    {
+     "start": "2026-10-22T09:30",
+     "end": "2026-10-22T10:30"
+    },
+    {
+     "start": "2026-10-26T14:30",
+     "end": "2026-10-26T16:30"
+    },
+    {
+     "start": "2026-10-27T09:30",
+     "end": "2026-10-27T11:30"
+    },
+    {
+     "start": "2026-10-29T09:30",
+     "end": "2026-10-29T10:30"
+    },
+    {
+     "start": "2026-11-02T14:30",
+     "end": "2026-11-02T16:30"
+    },
+    {
+     "start": "2026-11-05T09:30",
+     "end": "2026-11-05T10:30"
+    },
+    {
+     "start": "2026-11-09T14:30",
+     "end": "2026-11-09T16:30"
+    },
+    {
+     "start": "2026-11-10T09:30",
+     "end": "2026-11-10T11:30"
+    },
+    {
+     "start": "2026-11-12T09:30",
+     "end": "2026-11-12T10:30"
+    },
+    {
+     "start": "2026-11-16T14:30",
+     "end": "2026-11-16T16:30"
+    },
+    {
+     "start": "2026-11-17T09:30",
+     "end": "2026-11-17T11:30"
+    },
+    {
+     "start": "2026-11-19T09:30",
+     "end": "2026-11-19T10:30"
+    },
+    {
+     "start": "2026-11-23T14:30",
+     "end": "2026-11-23T16:30"
+    },
+    {
+     "start": "2026-11-24T09:30",
+     "end": "2026-11-24T11:30"
+    },
+    {
+     "start": "2026-11-26T09:30",
+     "end": "2026-11-26T10:30"
+    },
+    {
+     "start": "2026-11-30T14:30",
+     "end": "2026-11-30T16:30"
+    },
+    {
+     "start": "2026-12-01T09:30",
+     "end": "2026-12-01T11:30"
+    },
+    {
+     "start": "2026-12-03T09:30",
+     "end": "2026-12-03T10:30"
+    },
+    {
+     "start": "2026-12-07T14:30",
+     "end": "2026-12-07T16:30"
+    },
+    {
+     "start": "2026-12-08T09:30",
+     "end": "2026-12-08T11:30"
+    },
+    {
+     "start": "2026-12-10T09:30",
+     "end": "2026-12-10T10:30"
+    },
+    {
+     "start": "2026-12-14T14:30",
+     "end": "2026-12-14T16:30"
+    },
+    {
+     "start": "2026-12-15T09:30",
+     "end": "2026-12-15T11:30"
+    },
+    {
+     "start": "2026-12-17T09:30",
+     "end": "2026-12-17T10:30"
+    },
+    {
+     "start": "2026-12-21T14:30",
+     "end": "2026-12-21T16:30"
+    }
+   ]
+  }
+ ],
+ "allowedUrls": [
+  "https://www.evangelische-termine.de/ical?vid=556",
+  "https://www.evangelische-termine.de/detail-bt?ID=8135832"
+ ]
+}

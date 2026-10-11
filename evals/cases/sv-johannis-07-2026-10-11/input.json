@@ -1,0 +1,65 @@
+{
+ "kinds": [
+  "keine-termine",
+  "html"
+ ],
+ "traps": [],
+ "synthetic": false,
+ "origin": "pnpm eval freeze am 2026-10-11",
+ "providerId": "sv-johannis-07",
+ "catalog": {
+  "id": "sv-johannis-07",
+  "publicId": "ouedjvot",
+  "role": "anbieter",
+  "region": "nuernberg",
+  "name": "SV Johannis 07 – Eltern-Kind-Turnen",
+  "url": "https://www.sv-johannis07.de/eltern-kind-turnen",
+  "programme": [
+   {
+    "url": "https://www.sv-johannis07.de/eltern-kind-turnen",
+    "kind": "html",
+    "use": "termine"
+   },
+   {
+    "url": "https://shop.sv-johannis07.de/de/courses/",
+    "kind": "html",
+    "use": "termine"
+   }
+  ],
+  "availability": {
+   "shown": "unbekannt",
+   "how": "Nur Online-Buchung über Kursshop, keine Warteliste; Blockliste derzeit leer, Platzanzeige nicht prüfbar",
+   "system": "eigener Kursshop (shop.sv-johannis07.de)"
+  },
+  "verified": "2026-10-04",
+  "notes": [
+   "Bestandsfamilien werden automatisch in Folgekurs übernommen, Restplätze dann online.",
+   "Anmeldestart: blockweise; Bestandsfamilien werden automatisch umgebucht, Restplätze danach nur online ohne Warteliste (nächste Blöcke ab Januar 2027, Termine werden auf der Seite bekanntgegeben; Registrierung vorab möglich)",
+   "[sv-johannis07.de/eltern-kind-turnen] Zeiten: 2-3 J. Mo 16:00-16:45, 2-4 J. Do 16:30-17:15; nächste Blöcke ab Januar 2027 (Termine noch offen)",
+   "[shop.sv-johannis07.de/de/courses] Kursshop; Blocktermine je Kurs unter /de/bookings/block_list/course_id/<id>/ (2-3 J. = 2); derzeit 0 Einträge"
+  ],
+  "age": {
+   "minMonths": 24,
+   "maxMonths": 36
+  },
+  "venues": [
+   {
+    "id": "sv-johannis-07",
+    "name": "SV Johannis 07 – Eltern-Kind-Turnen",
+    "address": "Zeisigweg 70, 90425 Nürnberg",
+    "district": "St. Johannis / Thon",
+    "geo": {
+     "lat": 49.470926,
+     "lon": 11.052931
+    }
+   }
+  ]
+ },
+ "today": "2026-10-11",
+ "text": "## Seite 1: https://www.sv-johannis07.de/eltern-kind-turnen (html)\n## TEXT\nEltern-/Kind-Turnen - SV Johannis e.V.\nAktueller Kursplan\nRingen\nEltern-/Kind-Turnen\nZumba\nBody-Workouts\nSpinning\nGymnastik\nYoga\nPilates\nStep Aerobic\nSarengue\nPowerlifting\nCARYMEL fight & bite\nAnfahrt\nFormulare/Dokumente\nEltern-/Kind-Turnen\nKurze Infos zum Ablauf meiner Stunde\nSobald Kinder laufen können werden Grundlagen für das spätere Bewegungsverhalten gelegt. Spiele und Übungen mit Bällen, Reifen, Seilen, Langbänken, der Sprossenwand uvm. stehen ebenso auf dem Programm wie Hüpfen, Springen und Balancieren. Die Kinder sollen frei und ohne Zwang aktiv und fantasievoll in der Turnstunde mitmachen. Anfangs beginnen wir mit einem Begrüßungs- und Bewegungslied, danach beginnt das Spielturnen mit einer aufgebauten Bewegungslandschaft. Am Ende der Stunde kommen wir noch einmal im Kreis zusammen und singen unser Abschiedslied und es gibt ein Gummibärchen.\nMit zunehmendem Alter versuche ich durch aktive Spiele den Mannschaftsgeist zu wecken und die Zusammengehörigkeit zu fördern. Die Aufgaben der helfenden Elternhand gehen immer weiter zurück.\nDer Kurs ist nur \"Online\" buchbar. Anmeldungen per E-Mail oder Telefon werden nicht angenommen. Es gibt keine Wartelisten.\nDie Familien, die bereits in einem Kurs sind, haben die Möglichkeit nach Kursende weiter zu machen und automatisch für den Folgekurs eingebucht zu werden.\nJe nachdem, werden die einzelnen Kurse dann mit neuen Kindern aufgefüllt.\nDie nächsten Blöcke starten im Januar 2027.\nDie genauen Termine stehen noch nicht fest.\nSobald diese geplant sind, werden wir sie hier kundtun.\nGern können Sie sich und Ihr Kind schon vorab registriern.\nKlicken Sie hierzu auf \"Anmeldung\".\n\"\nANMELDUNG\"\nAltersgruppen und Zeiten:\n2 und 3 Jahre Elternkindturnen\nMontags: 16:00-16:45\n2 bis 4 Jahre\nElternkindturnen\nDonnerstags: 16:30 - 17:15\n4 und 5 Jahre Elternkindturnen\nMontags: 17:00-17:45\n5 und 6 Jahre Kinderturnen ohne Eltern\nDonnerstags: 17:30-18:15\nView the embedded image gallery online at:\nhttps://www.sv-johannis07.de/eltern-kind-turnen#sigProId5d04180b31\nBarbara Varjacic\nTrainerin\nInformationen & Kontakt\nInformationen & Kontakt\nTrainerin:\nEltern-Kind-Turnen am Donnerstag\nKontakt:\ngeschaeftsstelle\n@sv-johannis07.de\nGanzen Kalender ansehen\nAnne Fochtler\nTrainerin\nInformationen & Kontakt\nInformationen & Kontakt\nTrainerin:\nEltern-Kind-Turnen am Montag\nKontakt:\ngeschaeftsstelle@sv-johannis07.de\nPartner\n& Sponsoren\nEine Partnerschaft mit dem SV Johannis e. V. zahlt sich in jedem Falle aus.\nSponsor werden\nImpressum\nDatenschutz\nKontakt\n## Seite 2: https://shop.sv-johannis07.de/de/courses/ (html)\n## TEXT\nStart - SV Johannis 07 Nürnberg e.V.\nZum Hauptinhalt springen\nMenü Ein-/Ausblenden\nKurse\nÜbersicht\nKurse buchen\nKursplan\nWarenkorb\nLogin\nWir begrüßen Sie rechtherzlich und möchten Sie einladen, unsere Kurse kennenzulernen.\nStöbern Sie gemütlich von zu Hause in unserem Kursshop und finden Sie Ihren passenden Kurs.\nBuchen Sie Ihren passenden Termin und sichern Sie sich gleich Ihren Platz.\nUnser Kursprogramm\nInformation:\nDie Familien, die bereits in einem Kurs sind, haben die Möglichkeit nach Kursende weiter zu machen und automatisch für den Folgekurs eingebucht zu werden.\nJe nachdem, werden die einzelnen Kurse dann aufgefüllt.\nKinder die bereits Vereinsmitglied\nsind registrieren sich ganz normal und melden sich dann bezüglich der Buchung bitte bei Fr. Schramm per E-Mail: geschaeftsstelle@sv-johannis07.de\nGeschwisterkinder\nbekommen den \"Geschwisterkindpreis\". Bitte die Geschwisterkinder ganz normal mit regestrieren, für das erst Kind den Kurs ganz normal buchen und sich dann anschließend für die Buchung des Geschwisterkindes an Fr. Schramm per E-Mail: geschaeftsstelle@sv-johannis07.de wenden.\nEltern&Kind Turnen 2-4 Jahre - Donnerstag\nEltern&Kind Turnen 2-4 Jahre\n56,00 €\n8 Termine\n00:45 Std.\n2 J. bis 4 J.\nDie Kinder, sowie die Eltern sind gebeten feste Sportschuhe oder Turntappen zu tragen. Das Mitmachen in Socken ist aus versicherungstechnischen Gründen nicht gestattet.\nEssen in der Halle ist nicht erlaubt.\nKinderturnen (ohne Eltern) 5-6 Jahre Donnerstag\nKinderturnen 5-6 Jahre\n56,00 €\n8 Termine\n00:45 Std.\n5 J. bis 6 J.\nDie Kinder sollen feste Sportschuhe oder Turntappen tragen. Das Mitmachen in Socken ist aus versicherungstechnischen Gründen nicht gestattet.\nEssen in der Halle ist nicht erlaubt.\nEltern&Kind Turnen 2-3 Jahre\nEltern&Kind Turnen 2-3 Jahre\n70,00 €\n9 - 10 Termine\n00:45 Std.\n2 J. bis 3 J.\nDie Kinder, sowie die Eltern sind gebeten feste Sportschuhe oder Turntappen zu tragen. Das Mitmachen in Socken ist aus versicherungstechnischen Gründen nicht gestattet.\nEltern&Kind Turnen 4-5 Jahre\nEltern&Kind Turnen 4-5 Jahre\n70,00 €\n9 - 10 Termine\n00:45 Std.\n4 J. bis 5 J.\nDie Kinder, sowie die Eltern sind gebeten feste Sportschuhe oder Turntappen zu tragen. Das Mitmachen in Socken ist aus versicherungstechnischen Gründen nicht gestattet.\nRechtliche Hinweise\nImpressum\nAGB\nDatenschutzhinweise\nBitte haben Sie einen Augenblick Geduld",
+ "candidates": [],
+ "allowedUrls": [
+  "https://www.sv-johannis07.de/eltern-kind-turnen",
+  "https://shop.sv-johannis07.de/de/courses/"
+ ]
+}

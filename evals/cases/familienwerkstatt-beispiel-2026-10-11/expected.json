@@ -1,0 +1,38 @@
+{
+ "basis": "von Hand gebaut (synthetisch), siehe NOTES.md",
+ "window": {
+  "from": "2026-10-11",
+  "to": "2027-02-04"
+ },
+ "offers": [
+  {
+   "id": "hbn49bgx",
+   "title": "Eltern-Kind-Café",
+   "venueId": "familienwerkstatt-beispiel",
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "topics": [
+    "elterncafe"
+   ],
+   "availability": {
+    "status": "ohne-anmeldung"
+   },
+   "starts": [
+    "2026-10-15T09:30:00+02:00",
+    "2026-10-22T09:30:00+02:00",
+    "2026-10-29T09:30:00+01:00",
+    "2026-11-12T09:30:00+01:00",
+    "2026-11-19T09:30:00+01:00",
+    "2026-11-26T09:30:00+01:00",
+    "2026-12-03T09:30:00+01:00",
+    "2026-12-10T09:30:00+01:00",
+    "2026-12-17T09:30:00+01:00",
+    "2027-01-14T09:30:00+01:00",
+    "2027-01-21T09:30:00+01:00",
+    "2027-01-28T09:30:00+01:00",
+    "2027-02-04T09:30:00+01:00"
+   ]
+  }
+ ]
+}

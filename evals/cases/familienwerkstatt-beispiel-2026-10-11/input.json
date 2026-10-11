@@ -1,0 +1,53 @@
+{
+ "kinds": [
+  "html"
+ ],
+ "traps": [
+  "eltern-ohne-kind"
+ ],
+ "synthetic": true,
+ "origin": "von Hand gebaut am 2026-10-11 (fiktiver Anbieter, Plan 0032 E9)",
+ "providerId": "familienwerkstatt-beispiel",
+ "catalog": {
+  "id": "familienwerkstatt-beispiel",
+  "publicId": "ca9elvri",
+  "role": "anbieter",
+  "region": "nuernberg",
+  "name": "Familienwerkstatt Beispielhausen (fiktiv)",
+  "url": "https://example.org/familienwerkstatt",
+  "programme": [
+   {
+    "url": "https://example.org/familienwerkstatt/programm",
+    "kind": "html",
+    "use": "termine"
+   }
+  ],
+  "availability": {
+   "shown": "teilweise",
+   "how": "Platzangaben im Programmtext"
+  },
+  "verified": "2026-10-11",
+  "age": {
+   "minMonths": 0,
+   "maxMonths": 36
+  },
+  "venues": [
+   {
+    "id": "familienwerkstatt-beispiel",
+    "name": "Familienwerkstatt Beispielhausen (fiktiv)",
+    "address": "Musterweg 12, 90402 Nürnberg",
+    "district": "Altstadt",
+    "geo": {
+     "lat": 49.4521,
+     "lon": 11.0767
+    }
+   }
+  ]
+ },
+ "today": "2026-10-11",
+ "text": "## Seite 1: https://example.org/familienwerkstatt/programm (html)\n## TEXT\nFamilienwerkstatt Beispielhausen (fiktiv) – Programm Herbst/Winter 2026/27\nAlle Kurse finden im Haus der Familienwerkstatt, Musterweg 12, 90402 Nürnberg statt.\nGeburtsvorbereitung für Paare (Wochenendkurs)\nFür werdende Eltern ab der 25. Schwangerschaftswoche. Samstag, 14.11.2026, und Sonntag, 15.11.2026, jeweils 10:00–16:00 Uhr.\nKursgebühr 180 € pro Paar. Anmeldung online. Noch 3 Plätze frei.\nElternabend: Schlaf im ersten Lebensjahr\nVortrag mit Fragerunde für Mütter und Väter. Bitte kommen Sie ohne Kinder. Mittwoch, 25.11.2026, 19:30–21:00 Uhr. 12 € pro Person, Anmeldung erforderlich.\nErste Hilfe am Säugling und Kleinkind\nKurs für Eltern, Großeltern und Tagespflegepersonen (ohne Kinder). Samstag, 16.01.2027, 9:00–15:00 Uhr. 45 €. Plätze frei.\nRückbildungsgymnastik mit Kinderbetreuung\n8 Termine, dienstags 18:00–19:15 Uhr, ab 12.01.2027. Ihre Babys werden währenddessen im Nebenraum von unseren Betreuerinnen versorgt. 95 € (Kassenleistung). Nur noch Warteliste.\nInfoabend: Beikost – wann und wie?\nVortrag unserer Ernährungsberaterin für Eltern (ohne Kinder). Donnerstag, 03.12.2026, 19:00–20:30 Uhr, kostenlos, ohne Anmeldung.\nEltern-Kind-Café\nOffener Treff für Mütter und Väter mit Babys und Kleinkindern bis 3 Jahre: spielen, austauschen, Kaffee trinken. Jeden Donnerstag 9:30–11:00 Uhr, nicht in den bayerischen Schulferien. Ohne Anmeldung, kostenlos.\nKontakt: info@example.org · Impressum · Datenschutz",
+ "candidates": [],
+ "allowedUrls": [
+  "https://example.org/familienwerkstatt/programm"
+ ]
+}

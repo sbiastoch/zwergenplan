@@ -1,0 +1,114 @@
+{
+ "kinds": [
+  "json-api"
+ ],
+ "traps": [],
+ "synthetic": false,
+ "origin": "pnpm eval freeze am 2026-10-11",
+ "providerId": "nuebad-flipper",
+ "catalog": {
+  "id": "nuebad-flipper",
+  "publicId": "mhoou007",
+  "role": "anbieter",
+  "region": "nuernberg",
+  "name": "NÜBAD-FLIPPER e.V. – Schwimmkurse in den NürnbergBad-Hallenbädern (Kooperationspartner NürnbergBad)",
+  "url": "https://www.xn--nbad-flipper-dlb.de/kurskategorie/eltern-kind-schwimmkurse/",
+  "programme": [
+   {
+    "url": "https://www.xn--nbad-flipper-dlb.de/kurskategorie/eltern-kind-schwimmkurse/",
+    "kind": "html",
+    "use": "info"
+   },
+   {
+    "url": "https://www.xn--nbad-flipper-dlb.de/kurs/mutter-vater-baby-schwimmen/",
+    "kind": "html",
+    "render": "browser",
+    "use": "info"
+   },
+   {
+    "url": "https://api.kursorganizer.com/graphql",
+    "kind": "json-api",
+    "use": "termine",
+    "request": {
+     "method": "POST",
+     "headers": {
+      "Origin": "https://app.nuebad-flipper.kursorganizer.com",
+      "x-application-type": "end-user-app"
+     },
+     "body": "{\"query\":\"query { coursesWithPaginationPublic(filters:{courseTypeIds:[\\\"0ed81fb6-56cc-42e8-b95a-30bbe188e192\\\",\\\"35c6f0c1-fb50-40f4-b773-69aeaa674806\\\",\\\"f43e193d-e1f5-41de-a752-8eb1a240b7e8\\\",\\\"7acf112a-29a6-453c-b5c6-4387864556fa\\\"]}, options:{limit:200,offset:0}) { total items { id startDateTime freePlaces maxAttendees waitListCount location { name } courseType { name } } } }\"}"
+    },
+    "hint": "startDateTime ist UTC; Kurstitel aus courseType.name, Plätze aus freePlaces und waitListCount"
+   },
+   {
+    "url": "https://nuernbergbad.nuernberg.de/service/kurse/schwimmkurse-kinder-mit-eltern/",
+    "kind": "html",
+    "use": "info"
+   }
+  ],
+  "availability": {
+   "shown": "ja",
+   "how": "Kursorganizer zeigt pro Kurs Status (frei/ausgebucht -> Warteliste); API-Feld freePlaces (0 = voll) und waitListCount",
+   "system": "Kursorganizer"
+  },
+  "verified": "2026-10-04",
+  "notes": [
+   "Alle NürnbergBad-Schwimmkurse laufen über Nübad-Flipper. Baby-/Kleinkindkurse finden laut API nur im Langwasserbad statt (Sept-Dez-2026-Block: alle 6 Babykurse belegt, Warteliste). Neue Blöcke werden im Kalender-Tertial freigeschaltet (Anmeldephase Sept-Dez läuft). Büro Mo-Fr 9-13 Uhr, 0911 5808330. Südstadt/Katzwang/Nordost nur Kurse ab 4 J. mit Elternteil.",
+   "Anmeldestart: Anmeldephase je Kalender-Tertial; für Sept–Dez 2026 läuft sie, Kurse online buchbar",
+   "Ort Langwasserbad: Baby- und Kleinkindkurse",
+   "[xn--nbad-flipper-dlb.de/kurskategorie/el] Übersicht Eltern-Kind-Kurse (Mutter/Vater-Baby 3-12 Mon., Mutter/Vater-Kind 12-24 Mon., Kleinkind ab 2 / ab 3 J.); je Kurs Detailseite /kurs/<slug>/ mit Kursorganizer-iFrame",
+   "[xn--nbad-flipper-dlb.de/kurs/mutter-vate] Detailseite; Termine nur im iFrame app.nuebad-flipper.kursorganizer.com (courseTypeIds=0ed81fb6-56cc-42e8-b95a-30bbe188e192)",
+   "[api.kursorganizer.com/graphql] Kursorganizer-GraphQL, POST mit Headern Origin: https://app.nuebad-flipper.kursorganizer.com, x-application-type: end-user-app; Query coursesWithPaginationPublic(filters:{courseTypeIds:[...]}, options:{limit,offset}) liefert startDateTime (UTC), location.name, freePlaces, maxAttendees, waitListCount. courseTypeIds: Baby 0ed81fb6-56cc-42e8-b95a-30bbe188e192, Kind 12-24 Mon. 35c6f0c1-fb50-40f4-b773-69aeaa674806, Kleinkind ab 2 f43e193d-e1f5-41de-a752-8eb1a240b7e8, ab 3 7acf112a-29a6-453c-b5c6-4387864556fa",
+   "[nuernbergbad.nuernberg.de/service/kurse/] Infoseite der NürnbergBad (keine Termine), verlinkt zur Flipper-Buchung"
+  ],
+  "age": {
+   "minMonths": 0,
+   "maxMonths": 36
+  },
+  "venues": [
+   {
+    "id": "nuebad-flipper",
+    "name": "Langwasserbad",
+    "address": "Langwasserbad, Breslauer Straße 251, 90471 Nürnberg",
+    "district": "Langwasser",
+    "geo": {
+     "lat": 49.411601,
+     "lon": 11.144364
+    },
+    "hint": "Baby- und Kleinkindkurse"
+   },
+   {
+    "id": "nuebad-flipper-suedstadtbad",
+    "name": "Südstadtbad",
+    "address": "Allersberger Straße 120, 90461 Nürnberg",
+    "geo": {
+     "lat": 49.437103,
+     "lon": 11.0902
+    }
+   },
+   {
+    "id": "nuebad-flipper-katzwangbad",
+    "name": "Katzwangbad",
+    "address": "Helmut-Bloß-Straße 6, 90453 Nürnberg",
+    "geo": {
+     "lat": 49.355603,
+     "lon": 11.052114
+    }
+   },
+   {
+    "id": "nuebad-flipper-nordostbad",
+    "name": "Nordostbad",
+    "address": "Elbinger Straße 85, 90491 Nürnberg",
+    "geo": {
+     "lat": 49.470403,
+     "lon": 11.103739
+    }
+   }
+  ]
+ },
+ "today": "2026-10-11",
+ "text": "## Seite 1: https://api.kursorganizer.com/graphql (json-api)\n{\n\"data\": {\n\"coursesWithPaginationPublic\": {\n\"total\": 13,\n\"items\": [\n{\n\"id\": \"c86fea96-49d3-4c46-bdf7-07fae9b2e173\",\n\"startDateTime\": \"2026-09-21T14:30:00.184Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 1,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Baby-Schwimmen\"\n}\n},\n{\n\"id\": \"8a60039b-44bc-4d19-9794-19a1651d1378\",\n\"startDateTime\": \"2026-09-21T15:00:48.087Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 2,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Baby-Schwimmen\"\n}\n},\n{\n\"id\": \"2f3caaea-d987-4e56-b4eb-092f1140769a\",\n\"startDateTime\": \"2026-09-21T15:30:00.893Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 2,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Baby-Schwimmen\"\n}\n},\n{\n\"id\": \"7a1565b5-c9cd-4e6e-afab-debaef9d3d50\",\n\"startDateTime\": \"2026-09-24T14:30:00.016Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 4,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Kleinkind-Schwimmen\"\n}\n},\n{\n\"id\": \"b6165d6c-fff8-4e70-98d5-7db61ab28710\",\n\"startDateTime\": \"2026-09-26T08:15:00.937Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 11,\n\"waitListCount\": 5,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Baby-Schwimmen\"\n}\n},\n{\n\"id\": \"a0495dc8-39e4-4ac4-8058-96b726427469\",\n\"startDateTime\": \"2026-09-26T08:45:00.260Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 9,\n\"waitListCount\": 5,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Kleinkinderschwimmen ab 2 Jahre mit Elternteil\"\n}\n},\n{\n\"id\": \"763a96e7-daf1-4692-b41a-aa7adf3d47d9\",\n\"startDateTime\": \"2026-09-26T09:30:00.723Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 11,\n\"waitListCount\": 5,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Kleinkinderschwimmen ab 3 Jahre mit Elternteil\"\n}\n},\n{\n\"id\": \"bf6cdb8f-47b3-489b-a55c-6aab720cd42a\",\n\"startDateTime\": \"2026-09-27T06:45:00.305Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 1,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Baby-Schwimmen\"\n}\n},\n{\n\"id\": \"67f58f38-9e3e-4444-a9ae-1c4d42c6cb46\",\n\"startDateTime\": \"2026-09-27T07:15:00.411Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 3,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Baby-Schwimmen\"\n}\n},\n{\n\"id\": \"2479d7b1-f553-4098-9253-91a341a6b355\",\n\"startDateTime\": \"2026-09-27T07:45:00.210Z\",\n\"freePlaces\": -1,\n\"maxAttendees\": 10,\n\"waitListCount\": 8,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Mutter/Vater-Kleinkind-Schwimmen\"\n}\n},\n{\n\"id\": \"f8b95007-6136-4283-aa73-a94f815ad00a\",\n\"startDateTime\": \"2026-09-27T08:30:00.604Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 41,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Kleinkinderschwimmen ab 2 Jahre mit Elternteil\"\n}\n},\n{\n\"id\": \"dbae00b2-71ab-4fc6-bfe1-8e62508adeef\",\n\"startDateTime\": \"2026-09-27T09:15:00.278Z\",\n\"freePlaces\": -1,\n\"maxAttendees\": 10,\n\"waitListCount\": 17,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Kleinkinderschwimmen ab 3 Jahre mit Elternteil\"\n}\n},\n{\n\"id\": \"2a5dcdc1-306a-4283-85e2-3644eced560a\",\n\"startDateTime\": \"2026-09-27T10:00:00.583Z\",\n\"freePlaces\": 0,\n\"maxAttendees\": 10,\n\"waitListCount\": 18,\n\"location\": {\n\"name\": \"Langwasserbad\"\n},\n\"courseType\": {\n\"name\": \"Kleinkinderschwimmen ab 3 Jahre mit Elternteil\"\n}\n}\n]\n}\n}\n}",
+ "candidates": [],
+ "allowedUrls": [
+  "https://api.kursorganizer.com/graphql"
+ ]
+}

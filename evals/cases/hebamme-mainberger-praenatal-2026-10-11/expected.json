@@ -1,0 +1,80 @@
+{
+ "basis": "data/offers.json vom 2026-10-04T14:05:37+02:00, von Hand gegen input.json geprüft am 2026-10-11 (Korrekturen in NOTES.md)",
+ "window": {
+  "from": "2026-10-11",
+  "to": "2027-02-04"
+ },
+ "offers": [
+  {
+   "id": "kd7jf96y",
+   "title": "Rückbildung Di 10:30 (13.10.–8.12.)",
+   "venueId": "hebamme-mainberger-praenatal",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "rueckbildung",
+    "hebamme"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-10-13T10:30:00+02:00",
+    "2026-10-20T10:30:00+02:00",
+    "2026-10-27T10:30:00+01:00",
+    "2026-11-10T10:30:00+01:00",
+    "2026-11-17T10:30:00+01:00",
+    "2026-11-24T10:30:00+01:00",
+    "2026-12-01T10:30:00+01:00",
+    "2026-12-08T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "j0ddwhmb",
+   "title": "Rückbildung Di 10:30 (15.12.–2.3.)",
+   "venueId": "hebamme-mainberger-praenatal",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "rueckbildung",
+    "hebamme"
+   ],
+   "availability": {
+    "status": "wenige"
+   },
+   "starts": [
+    "2026-12-15T10:30:00+01:00",
+    "2026-12-22T10:30:00+01:00",
+    "2027-01-12T10:30:00+01:00",
+    "2027-01-26T10:30:00+01:00",
+    "2027-02-02T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "twnmkdnr",
+   "title": "Rückbildung Di 8:45 (1.12.–16.2.)",
+   "venueId": "hebamme-mainberger-praenatal",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "rueckbildung",
+    "hebamme"
+   ],
+   "availability": {
+    "status": "warteliste"
+   },
+   "starts": [
+    "2026-12-01T08:45:00+01:00",
+    "2026-12-08T08:45:00+01:00",
+    "2026-12-15T08:45:00+01:00",
+    "2026-12-22T08:45:00+01:00",
+    "2027-01-12T08:45:00+01:00",
+    "2027-01-26T08:45:00+01:00",
+    "2027-02-02T08:45:00+01:00"
+   ]
+  }
+ ]
+}
