@@ -1,6 +1,6 @@
 # Plan 0032 – Daten automatisch: Nachtlauf und Entdecken über das Abo
 
-Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10, Restpunkte in `docs/ideas.md`; als Nächstes Stufe 1). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
+Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 wartet auf ein gültiges Token, S1.2 misst 7 Nächte; Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
 Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird ersetzt), ADR 0022 (Entwurf, stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (entsteht mit der Freigabe, Inhalt in E14)
@@ -20,6 +20,7 @@ Entscheide im Gespräch:
 - **N-E** Websuche des Agenten ist erlaubt (Suchen ist kein Crawlen).
 - **N-F** Kosten jedes Laufs werden sauber berichtet.
 - **N-G** Wesentliche Änderungen aus Reviews werden dem Nutzer vor dem Einarbeiten begründet und von ihm abgenommen (Abschnitt „Review“).
+- **N-H** (2026-10-11) Das Abo-Token ist nur der einfache Einstieg in die Entwicklung. Später wird auf API-Nutzung umgestellt, ggf. über Anthropic oder andere Anbieter. Keine rechtliche Abwägung im Plan; der Wechsel geschieht allein in `io/llm.ts`.
 
 ## Ausgangslage
 
@@ -233,8 +234,32 @@ Jede Stufe endet mit grünem `pnpm verify` und grüner CI auf `main`.
 
 **Stufe 1 – Spike und Messung (ohne Commit von Daten):**
 - S1.1 `claude -p` in Actions: Workflow `spike-cli.yml` (manuell), drei Aufrufe mit Haiku (Extraktion ohne Werkzeuge, Bewerten ohne Werkzeuge, Websuche). Festhalten im Plan: Aufrufzeile nach E2 funktioniert (oder `--restricted`); Felder für Usage und `costUsd`; Erkennung von Auth-Fehler, Limit und Abschneiden; Dauer; Verbrauch gemessen am Nutzungsfenster.
-  **Gate (Nutzer):** Die Doku-Zitate zur Abo-Nutzung (R1) liegen vor; der Nutzer entscheidet bewusst, ob der Betrieb über das Abo läuft.
+  **Gate (Nutzer):** entschieden mit N-H (Abo für den Start, später API).
 - S1.2 `pnpm pipeline fetch [--only]` (E3) und `nightly.yml` nur mit Abruf und Hashes, 7 Nächte, Ergebnis als Artefakt. Gemessen: Anteil geänderter Anbieter je Nacht, Hash-Rauschen, Abruffehler je Art.
+
+### Stufe 1 – Ergebnisse (2026-10-11)
+
+**S1.1 Spike** (`.github/workflows/spike-cli.yml`, `.github/spike/`, CLI 2.1.296, live seit e07b6b4). Lokal mit Haiku verifiziert; der erste Actions-Lauf (38119906661) zeigte Aufrufzeile, `env -i`, leeres `HOME`/cwd und Auth-Erkennung als funktionsfähig, das Secret wurde aber mit „401 OAuth access token is invalid“ abgewiesen (neu setzen per `claude setup-token`, dann Lauf wiederholen). Verbindliche Korrekturen an E2 für Stufe 2:
+
+- `--json-schema` nimmt den Schema-**Text**, keinen Pfad (`llm.ts` liest die Datei und übergibt den Inhalt).
+- Websuche braucht `--tools "WebSearch,WebFetch"` **und** `--allowedTools "WebSearch,WebFetch"`; ohne Letzteres lehnt `dontAsk` jede Suche ab und meldet trotzdem `success` (`permission_denials` prüfen).
+- `--restricted` ersetzt die Liste nicht (lässt Datei- und MCP-Werkzeuge an); höchstens zusätzliche Härtung, nicht nötig bei leerem cwd/`HOME` und `--tools`.
+- Tokens und Kosten aus `modelUsage[model]` (`inputTokens`, `outputTokens`, `cache*`, `webSearchRequests`, `costUSD`), nicht aus `usage` (nur Hauptschleife). `total_cost_usd` enthält vermutlich die Websuche (CI-Lauf prüft gegen).
+- `--max-turns` zählt den Abschluss über `StructuredOutput` mit (`num_turns` = 2 ohne Werkzeuge): mindestens 3, mit Websuche 8.
+- Erkennung in `--output-format json`: Erfolg = `is_error: false` und `structured_output` vorhanden. `abort: "auth"` bei `api_error_status` 401/403; `abort: "limit"` bei 429 (Limit lokal nicht provozierbar, sicher nur in `stream-json` über `rate_limit_event`); `truncated` bei `result` „exceeded the N output token maximum“ (`CLAUDE_CODE_MAX_OUTPUT_TOKENS` greift). `subtype` ist bei API-Fehlern trotzdem `success`.
+- Nutzungsfenster (`five_hour`/`seven_day` `utilization`, 1-%-Schritte) gibt es nur in `stream-json`, das im Druckmodus `--verbose` verlangt. `--verbose` ist erlaubt, wenn stdout in eine Datei geht (stderr bleibt leer); E2 „Logs“ gilt für das Job-Log.
+- Kosten lokal (Schätzung der CLI, Listenpreis): Extraktion eines kleinen Kurstexts $0,0013, Bewerten $0,0008, Websuche mit 2–3 Suchen $0,026–0,038.
+
+**S1.2 Abruf** (`pnpm pipeline fetch`, `nightly.yml` nur Messung). Lokal: 74 Anbieter, 166 Seiten, 3 Adapter, 52–75 s, 1,80 Mio. Zeichen (größter: fbs-nuernberg 309 599, unter der Obergrenze 350 000). Ergebnis 67 ok, 5 leer (nur Kandidaten, keine), 2 fehler: `hebammenpraxis-gugelrund` HTTP 404, `sternenhaus-kuf` (eventim) Bot-Schutz. Fehler je Art: html 1/131, browser 1/17, ical/json-api/pdf/adapter 0. Abweichungen und Ergänzungen:
+
+- Der Browser-Kontext nutzt denselben Chrome-UA wie `io/http.ts`; ohne ihn sperrt Cloudflare die eversports-Seiten (9 von 17 Abrufen).
+- Cloudflare-Sperrseiten sind `fehler` („Bot-Schutz“), nicht Eingabe. Der Browser wartet, bis die Textlänge stabil ist (höchstens 15 s).
+- Gespeichert wird der Text nur leerraumnormalisiert (`<id>.txt`, spätere Modelleingabe); die stärkere Normalisierung gilt nur für den Hash.
+- `--only` ruft trotzdem alle Adapter ab (vergleichbare Hashes); `selectBatches` lässt `skipCrawl` jetzt auch ohne `--only` aus (ADR 0025, Punkt 7).
+- Hash-Rauschen zwischen Läufen im Minutenabstand: 1–4 von 72 Anbietern. Ursache vor allem fbs-nuernberg und schwimmschule-baer-ritterbad, die ihre Kurse bei jedem Laden umsortieren. Zusätzlich gemessen wird deshalb `orderFreeHash` (Zeilen ohne Reihenfolge): 0–2 von 72. **Offen nach den 7 Nächten (Nutzerentscheid vor Stufe 2):** wird der reihenfolgefreie Hash Cache-Schlüssel? Dafür: der größte Anbieter wird sonst jede Nacht neu extrahiert. Dagegen: ein reiner Tausch von Platzständen zwischen zwei Kursen bliebe unsichtbar.
+- iCal-Feeds ändern sich täglich, weil vergangene Termine herausfallen (echte, aber informationsarme Änderung); die Messung zeigt, wie stark das ins Gewicht fällt.
+- Katalogpflege (Skill, nicht hier): `hebammenpraxis-gugelrund` 404; `sternenhaus-kuf` Kandidat für `blocked`; `hebamme-eva-kauper-wunderwerk` (mymiya) liefert nur 69 Zeichen, ungeprüft.
+- `io/fetch-inputs.ts` wiederholt die Adapter-Schleife aus `candidates fetch`; sie entfällt mit E11.
 
 **Stufe 2 – Extraktion lokal:** `io/llm.ts` (E2), Prompt, `extractProvider`, `refreshProvider` mit den Regeln aus E5, `ProviderRaw`, `build` aus `data/raw`. Dazu die 12 Eval-Fälle und `pnpm eval`. Ergebnis: Eval mit Haiku und Sonnet in `evals/results.md`; Modellwahl durch den Nutzer.
 
@@ -272,7 +297,7 @@ Test-first für alles in `lib/`:
 
 | | Risiko | Gegenmaßnahme |
 |---|---|---|
-| R1 | **Abo-Nutzung in Actions.** Laut Doku ist OAuth-Anmeldung für „ordinary use“ gedacht, die Limits „assume ordinary, individual usage“, und Anthropic kann „without prior notice“ durchsetzen; dagegen wird `claude setup-token` ausdrücklich für CI und Skripte angeboten. Eine Sperre träfe auch die interaktive Arbeit des Nutzers. | S1.1 misst den Verbrauch, Nutzer entscheidet mit den Zitaten. Notausweg ohne Code: dieselbe CLI mit `ANTHROPIC_API_KEY` (braucht ein API-Konto, Abweichung von N-B, Nutzerentscheid). |
+| R1 | Abo-Läufe teilen sich das 5-Stunden- und Wochenkontingent mit der interaktiven Arbeit | Nur für den Start (N-H); Umstieg auf API-Nutzung ohne Pipeline-Umbau, nur in `io/llm.ts` (dieselbe CLI mit `ANTHROPIC_API_KEY` oder ein anderer Anbieter). |
 | R2 | Haiku extrahiert schlechter als gedacht | Eval in Stufe 2, Fallback auf Sonnet je Anbieter |
 | R3 | Prompt-Injection aus Webseiten oder Suchergebnissen | leeres Arbeitsverzeichnis, kein Token im Checkout, Werkzeuge per `--tools`, Bewerten ohne Werkzeuge, Schema, URL-Plausibilität, Ertragsbeweis, G2 |
 | R4 | Entdecken nimmt einen falschen Anbieter auf (Zielgruppe, Vermittler) | Ertragsbeweis mit Alter 0–3 und `isRelevant`, G3, Commit je Anbieter, Issue mit Mail, `abgelehnt` |
