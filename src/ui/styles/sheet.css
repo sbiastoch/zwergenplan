@@ -360,5 +360,8 @@
   .imprint a {
     color: inherit;
     padding-block: 4px;
+    /* das Reset nimmt Links die Unterstreichung; ohne sie sähe der Link wie Text aus (Browser-Review) */
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 }

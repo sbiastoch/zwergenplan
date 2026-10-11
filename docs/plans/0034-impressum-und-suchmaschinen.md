@@ -102,3 +102,14 @@ Kein Blocker. Übernommen:
 - m4 Herleitung von `MAX_PAGE_BYTES` auf rund 1,9 kB festen Text (≈ 9,1 kB) nachgezogen.
 - m5 `.imprint a` liegt in `sheet.css`.
 - Zusätzlich: „Wochen-Nachricht“ → „Samstags-Nachricht“ (ein Begriff überall, Plan 0033, N2).
+
+## Browser-Review lokal (2026-10-11)
+
+Fixture-Build, 390×844 und 320×640, hell und dunkel: Liste unten, Kind-Sheet unten, `impressum/` ganzseitig.
+- Lesbarkeit: Impressum klar gegliedert (Impressum, Hinweise, Datenschutz), Zeilenlänge begrenzt, Kontrast hell und dunkel gut. Der Link in der App ist dezent gedämpft.
+- Befund, behoben: Die Links „Impressum“ und „Impressum und Datenschutz“ hatten in der App keine Unterstreichung (Reset) und sahen wie Text aus; `.stand a`/`.imprint a` unterstreichen jetzt.
+- Daumen-Erreichbarkeit: Links liegen am Ende von Liste und Sheet, mit Abstand zu anderen Zielen; Trefferfläche ≥ 24 px (Touch-Gate grün).
+- Zustände: Bei 320 px bricht nichts aus, lange Wörter („nicht-kommerzielles“) trennen sauber; 200 % prüft `mobile-ux.spec.ts`.
+- Dark Mode: keine hellen Inseln, Rücklink gelb wie auf `404.html`.
+- Micro-Interactions: statische Seite, keine Animation; Links mit Systemfokus.
+- Konsistenz: Stil der Seite wie Vorschauseiten und `404.html` (gemeinsamer `PAGE_STYLE`).
