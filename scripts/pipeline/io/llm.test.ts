@@ -120,6 +120,12 @@ describe("callLlm (Fake-CLI)", () => {
     expect(seen?.cwd.startsWith(ROOT)).toBe(false);
   });
 
+  it("in Actions ohne Token nie das echte HOME; die CLI meldet den fehlenden Login → abort auth", async () => {
+    const env = { PATH: CI_ENV.PATH, HOME: "/home/runner", GITHUB_ACTIONS: "true" };
+    expect((await run("ok", env)).seen?.env["HOME"]).not.toBe("/home/runner");
+    expect((await run("nologin", env)).result.abort).toBe("auth");
+  });
+
   it("Erfolg: Ausgabe, Usage als Summe über modelUsage, Kosten, Schritte, Ablehnungen", async () => {
     const { result } = await run("ok");
     expect(result).toEqual({
@@ -140,6 +146,12 @@ describe("callLlm (Fake-CLI)", () => {
     expect(auth).toMatchObject({ output: null, abort: "auth", truncated: false });
     expect(auth.error).toContain("HTTP 401");
     expect((await run("429")).result).toMatchObject({ output: null, abort: "limit", truncated: false });
+  });
+
+  it("Kontextlimit ist ein Fehler des Anbieters, kein Abbruch des Laufs", async () => {
+    const { result } = await run("toolong");
+    expect(result).toMatchObject({ output: null, abort: null, truncated: false });
+    expect(result.error).toContain("HTTP 400");
   });
 
   it("abgeschnitten → truncated, kein abort", async () => {

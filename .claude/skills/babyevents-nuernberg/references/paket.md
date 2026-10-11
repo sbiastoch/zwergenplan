@@ -22,7 +22,7 @@ Ist ein Anbieter nicht prüfbar (Fehler, Login, Seite leer, nur Telefon), trägs
 
 ## Ausgabedatei
 
-Anders als im Prompt trägt jedes Event hier `providerId` (die Katalog-ID), und `sourceUrl` darf jede abgerufene Seite sein, auch eine über `--links` gefundene.
+Anders als im Prompt trägt jedes Event hier `providerId` (die Katalog-ID), und `sourceUrl` darf jede abgerufene Seite sein, auch eine über `--links` gefundene. Der Horizont ist `from`–`to` aus dem Lauf, nicht die zwölf Monate des Prompts.
 
 ```json
 {
