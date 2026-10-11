@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { inputHash, normalizeText, normalizeWhitespace, orderFreeHash } from "./normalize.ts";
+import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
+import {
+  catalogExcerpt,
+  extractKey,
+  inputHash,
+  normalizeText,
+  normalizeWhitespace,
+  ORDER_FREE_KEY,
+  orderFreeHash,
+} from "./normalize.ts";
 
 const page = (stand: string) =>
   [
@@ -119,5 +128,35 @@ describe("inputHash (Plan 0032, E3/E4)", () => {
       inputHash({ ...base, extra: { model: "sonnet" } }),
     );
     expect(inputHash({ ...base, extra: { a: "1", b: "2" } })).toBe(inputHash({ ...base, extra: { b: "2", a: "1" } }));
+  });
+});
+
+describe("extractKey (Plan 0032, E4)", () => {
+  const input = { pages: [{ url: "https://a.de/1", text: "Kurs A\n10:45\nKurs B\n9:30" }], candidates: [] };
+  const parts = { catalog: "{}", prompt: "Prompt v1", schema: "{}", model: "haiku" };
+
+  it("Prompt, Schema, Modell und Katalogauszug gehen je in den Schlüssel (N3: Modellwechsel extrahiert neu)", () => {
+    const key = extractKey(input, parts);
+    expect(key).toMatch(/^[0-9a-f]{64}$/);
+    for (const change of [{ prompt: "Prompt v2" }, { schema: '{"x":1}' }, { model: "sonnet" }, { catalog: '{"a":1}' }])
+      expect(extractKey(input, { ...parts, ...change })).not.toBe(key);
+    expect(extractKey(input, parts)).toBe(key);
+  });
+
+  it("Standard ist der Hash mit Reihenfolge; der reihenfolgefreie ist per ORDER_FREE_KEY umschaltbar (offen)", () => {
+    const swapped = { ...input, pages: [{ url: "https://a.de/1", text: "Kurs B\n9:30\nKurs A\n10:45" }] };
+    expect(ORDER_FREE_KEY).toBe(false);
+    expect(extractKey(swapped, parts)).not.toBe(extractKey(input, parts));
+    expect(extractKey(swapped, parts, { orderFree: true })).toBe(extractKey(input, parts, { orderFree: true }));
+  });
+
+  it("catalogExcerpt: ohne notes (ADR 0025, Punkt 5), sonst der ganze Eintrag", () => {
+    const [p] = loadFixtures().providers;
+    if (!p) throw new Error("Fixture fehlt");
+    const withNotes = { ...p, notes: ["2026-10-01: Protokoll"] };
+    const { notes: _notes, ...without } = withNotes;
+    expect(catalogExcerpt(withNotes)).toBe(catalogExcerpt(without));
+    expect(catalogExcerpt(withNotes)).not.toContain("Protokoll");
+    expect(catalogExcerpt({ ...p, name: "Anders" })).not.toBe(catalogExcerpt(p));
   });
 });

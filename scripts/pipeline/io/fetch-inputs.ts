@@ -19,6 +19,7 @@ import {
 } from "../lib/fetch.ts";
 import { anbieterVids, matchCandidate } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
+import type { FetchedProvider } from "../lib/refresh.ts";
 import type { FetchPlan, PageTask } from "../lib/select.ts";
 import { browserSession } from "./browser.ts";
 import { fetchBytes, fetchPage } from "./http.ts";
@@ -58,18 +59,21 @@ function checked(status: number, text: string): string {
   return text;
 }
 
-async function fetchTask(task: PageTask, browser: ReturnType<typeof browserSession>): Promise<string> {
+async function fetchTask(
+  task: PageTask,
+  browser: ReturnType<typeof browserSession>,
+): Promise<{ text: string; finalUrl: string }> {
   const httpError = (status: number) => new Error(`HTTP ${status}`);
   if (task.render === "browser") {
     const page = await browser.render(task.url);
-    return checked(page.status, programmeText("html", page.body, page.finalUrl));
+    return { text: checked(page.status, programmeText("html", page.body, page.finalUrl)), finalUrl: page.finalUrl };
   }
   if (task.kind === "pdf") {
     const res = await fetchBytes(task.url);
     if (res.status >= 400) throw httpError(res.status);
     const text = await pdftotext(res.bytes);
     if (text.trim() === "") throw new Error("leeres PDF");
-    return text;
+    return { text, finalUrl: res.finalUrl };
   }
   const headers =
     task.kind === "json-api"
@@ -80,7 +84,7 @@ async function fetchTask(task: PageTask, browser: ReturnType<typeof browserSessi
         }
       : {};
   const page = await fetchPage(task.url, { headers, ...(task.request ? { post: task.request.body } : {}) });
-  return checked(page.status, programmeText(task.kind, page.body, page.finalUrl));
+  return { text: checked(page.status, programmeText(task.kind, page.body, page.finalUrl)), finalUrl: page.finalUrl };
 }
 
 const hostOf = (url: string) => {
@@ -96,6 +100,8 @@ export interface FetchResult {
   /** Eingabetext (nur Leerraum normalisiert) je Anbieter (nur ok) */
   texts: Record<string, string>;
   adapters: Record<string, AdapterOutcome>;
+  /** Eingabe je Anbieter für Schlüssel und Extraktion (Plan 0032, E4/E5) */
+  inputs: Record<string, FetchedProvider>;
 }
 
 export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[], today: string): Promise<FetchResult> {
@@ -132,7 +138,15 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
         const started = performance.now();
         const ms = () => Math.round(performance.now() - started);
         try {
-          return { url: task.url, art: artOf(task), ok: true, text: await fetchTask(task, browser), ms: ms() };
+          const { text, finalUrl } = await fetchTask(task, browser);
+          return {
+            url: task.url,
+            art: artOf(task),
+            ok: true,
+            text,
+            ms: ms(),
+            ...(finalUrl && finalUrl !== task.url ? { finalUrl } : {}),
+          };
         } catch (e) {
           return { url: task.url, art: artOf(task), ok: false, reason: reasonOf(e), ms: ms() };
         }
@@ -145,16 +159,28 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
 
   const providers: HashesFile = {};
   const texts: Record<string, string> = {};
+  const inputs: Record<string, FetchedProvider> = {};
   for (const p of plan.providers) {
     const pages = outcomes.filter((_, i) => tasks[i]?.provider === p.id);
     const adapterFailure = adapterFailureFor(p.via, adapters);
-    const r = assembleProvider({
-      pages,
-      candidates: byProvider.get(p.id) ?? [],
-      ...(adapterFailure ? { adapterFailure } : {}),
-    });
+    const candidates = byProvider.get(p.id) ?? [];
+    const r = assembleProvider({ pages, candidates, ...(adapterFailure ? { adapterFailure } : {}) });
     providers[p.id] = r.entry;
     if (r.text) texts[p.id] = r.text;
+    const fetched = pages.flatMap((pg) => (pg.ok ? [pg] : []));
+    inputs[p.id] = {
+      status: r.entry.status,
+      ...(r.entry.reason ? { reason: r.entry.reason } : {}),
+      pages: fetched.map((pg) => ({ url: pg.url, text: pg.text })),
+      candidates,
+      text: r.text,
+      allowedUrls: [
+        ...new Set([
+          ...fetched.flatMap((pg) => [pg.url, ...(pg.finalUrl ? [pg.finalUrl] : [])]),
+          ...candidates.flatMap((c) => [c.detailUrl, ...(c.ticketUrl ? [c.ticketUrl] : [])]),
+        ]),
+      ],
+    };
   }
-  return { providers, texts, adapters };
+  return { providers, texts, adapters, inputs };
 }

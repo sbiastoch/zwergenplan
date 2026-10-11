@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
 import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { type BuildInput, buildOffers } from "./build-offers.ts";
-import { RawBatch } from "./raw.ts";
+import { type BuildInput, batchesFromRaw, buildOffers } from "./build-offers.ts";
+import { ProviderRaw, RawBatch, RawEvent } from "./raw.ts";
 
 const { providers: fixtureProviders } = loadFixtures();
 const aggregator: Provider = {
@@ -383,6 +383,53 @@ describe("buildOffers", () => {
     // übernommene Angebote behalten ihre ID aus dem Vorstand (ADR 0022)
     const before = new Map(prev.offers.map((o) => [o.title, o.id]));
     for (const o of file?.offers ?? []) expect(o.id).toBe(before.get(o.title));
+  });
+
+  it("aus data/raw: Anbieter ohne Raw-Datei behalten den Vorstand, auch mit coveredBy (Plan 0032, E5)", () => {
+    const { file: prev } = loadFixtures();
+    const raw = (over: Partial<ProviderRaw>): ProviderRaw =>
+      ProviderRaw.parse({ events: [], status: "keine-termine", checkedAt: CHECKED, sources: [], ...over });
+    const hashed = { inputHash: "a".repeat(64), model: "haiku", changedAt: CHECKED };
+    const { batches, notes } = batchesFromRaw(
+      {
+        "familientreff-beispiel": raw({ ...hashed, status: "ok", events: [RawEvent.parse(ev())] }),
+        // nie extrahiert, Fehler: Vorstand bleibt
+        "gemeinde-beispiel": raw({ status: "fehler", reason: "HTTP 503", failingSince: CHECKED }),
+        // bearbeitet, keine Termine: Angebote entfallen
+        "musikschule-beispiel": raw({ ...hashed }),
+        "theater-beispiel": raw({ ...hashed, status: "ok", events: [RawEvent.parse(ev({ venueId: "abgerissen" }))] }),
+        "nicht-mehr-im-katalog": raw({ ...hashed }),
+      },
+      providers,
+    );
+    expect(notes.join("\n")).toContain("nicht-mehr-im-katalog.json: kein Anbieter im Katalog");
+    expect(notes.join("\n")).toContain("abgerissen nicht im Katalog");
+    const { file, report } = buildOffers(
+      base({
+        previous: prev,
+        horizon: { from: "2026-10-15", to: "2027-02-15" },
+        generatedAt: "2026-10-15T06:00:00+02:00",
+        batches,
+        perProviderStatus: true,
+      }),
+    );
+    expect(report.errors).toEqual([]);
+    const own = (id: string) => file?.offers.filter((o) => o.providerId === id) ?? [];
+    const previousOf = (id: string) => prev.offers.filter((o) => o.providerId === id);
+    // stadtbibliothek-beispiel (coveredBy, ohne Raw-Datei) und gemeinde-beispiel (fehler) behalten ihren Vorstand
+    for (const id of ["stadtbibliothek-beispiel", "gemeinde-beispiel"]) {
+      expect(previousOf(id).length).toBeGreaterThan(0);
+      expect(own(id).map((o) => o.id)).toEqual(
+        previousOf(id)
+          .filter((o) => o.sessions.some((s) => s.start >= "2026-10-15"))
+          .map((o) => o.id),
+      );
+    }
+    expect(report.notes.join("\n")).toContain("noch nicht bearbeitet");
+    expect(own("musikschule-beispiel")).toEqual([]);
+    expect(own("familientreff-beispiel").map((o) => o.title)).toContain("Offener Krabbeltreff");
+    expect(own("familientreff-beispiel")[0]?.availability.checkedAt).toBe(CHECKED);
+    expect(report.failures).toEqual([{ id: "gemeinde-beispiel", reason: "HTTP 503" }]);
   });
 
   it("fasst einen laufenden Kurs aus zwei gleichrangigen Quellen über den Fensterschlüssel zusammen (Review m3)", () => {

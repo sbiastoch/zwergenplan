@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { expansionWindow, type RawContext, validateRaw } from "./raw.ts";
+import { expansionWindow, ProviderRaw, type RawContext, validateRaw } from "./raw.ts";
 
 const { providers } = loadFixtures();
 const ctx: RawContext = {
@@ -195,5 +195,37 @@ describe("expansionWindow", () => {
         "2027-02-05",
       ),
     ).toBe("2027-02-05");
+  });
+});
+
+describe("ProviderRaw (Plan 0032, E5)", () => {
+  const T = "2026-10-12T03:00:00+02:00";
+  const base = { events: [], status: "keine-termine", checkedAt: T, sources: [] };
+  const hashed = { inputHash: "a".repeat(64), model: "haiku", changedAt: T };
+  const issues = (raw: unknown) => {
+    const r = ProviderRaw.safeParse(raw);
+    return r.success ? [] : r.error.issues.map((i) => i.message);
+  };
+
+  it("nimmt gültige Zustände an: extrahiert, Fehler mit Serie, nie extrahiert mit Fehler", () => {
+    expect(issues({ ...base, ...hashed })).toEqual([]);
+    expect(issues({ ...base, ...hashed, status: "fehler", reason: "HTTP 503", failingSince: T })).toEqual([]);
+    expect(issues({ ...base, status: "fehler", reason: "Bot-Schutz", failingSince: T })).toEqual([]);
+  });
+
+  it("lehnt Widersprüche ab", () => {
+    expect(issues({ ...base, ...hashed, status: "fehler", failingSince: T })).toContain(
+      "status fehler braucht einen reason",
+    );
+    expect(issues({ ...base, ...hashed, status: "fehler", reason: "x" })).toContain(
+      "status fehler braucht failingSince",
+    );
+    expect(issues({ ...base, ...hashed, failingSince: T })).toContain("failingSince nur bei status fehler");
+    expect(issues(base)).toContain("ohne inputHash nur status fehler ohne Events");
+    expect(issues({ ...base, ...hashed, model: undefined })).toContain(
+      "inputHash, model und changedAt gibt es nur zusammen",
+    );
+    expect(issues({ ...base, ...hashed, checkedAt: "2026-10-12T03:00" })).not.toEqual([]); // Offset Pflicht
+    expect(issues({ ...base, ...hashed, via: "x" })).not.toEqual([]); // strikt
   });
 });

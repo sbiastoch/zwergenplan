@@ -1,10 +1,13 @@
 /**
- * Prüft den Datenbestand (Schema + Invarianten) und den Fahrplanauszug für die Wegzeit (Plan 0009).
+ * Prüft den Datenbestand (Schema + Invarianten), den Fahrplanauszug für die Wegzeit (Plan 0009) und den Zustand
+ * je Anbieter in data/raw (Plan 0032, E5).
  *   --against-deployed   zusätzlich Plausibilität gegen den LIVE deployten Stand (ADR 0002)
  */
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
-import { dataSource, loadDataset, loadTimetable, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
+import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
+import { ProviderRaw } from "./pipeline/lib/raw.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
 
 const source = dataSource();
@@ -26,12 +29,42 @@ if (process.argv.includes("--against-deployed")) {
   }
 }
 
+/**
+ * Zustand je Anbieter `data/raw/*.json` (Plan 0032, E5/E13): Schema `ProviderRaw`, Dateiname = Katalog-Anbieter,
+ * Events nur dieses Anbieters. Import aus scripts/pipeline/lib erlaubt (Plan 0032, E14; docs/architecture.md).
+ */
+function rawIssues(): string[] {
+  const dir = new URL(source === "fixture" ? "tests/fixtures/raw/" : "data/raw/", ROOT);
+  if (!existsSync(dir)) return [];
+  const anbieter = new Set(result.ok ? result.providers.filter((p) => p.role === "anbieter").map((p) => p.id) : []);
+  const issues: string[] = [];
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".json"))) {
+    const id = f.slice(0, -".json".length);
+    let raw: unknown;
+    try {
+      raw = JSON.parse(readFileSync(new URL(f, dir), "utf8"));
+    } catch (e) {
+      issues.push(`data/raw/${f}: Lesefehler: ${(e as Error).message}`);
+      continue;
+    }
+    const r = ProviderRaw.safeParse(raw);
+    if (!r.success) {
+      issues.push(...r.error.issues.map((i) => `data/raw/${f}: ${i.path.join(".") || "(Wurzel)"}: ${i.message}`));
+      continue;
+    }
+    if (!anbieter.has(id)) issues.push(`data/raw/${f}: ${id} ist kein Anbieter im Katalog`);
+    for (const e of [...r.data.events, ...(r.data.pending?.events ?? [])])
+      if (e.providerId !== id) issues.push(`data/raw/${f}: Event „${e.title}“ gehört zu ${e.providerId}`);
+  }
+  return issues;
+}
+
 const now = new Date();
 const fixture = source === "fixture";
 const plausibility = checkPlausibility(result.summary, deployed, { fixture, now });
 const timetable = loadTimetable(source);
 const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
-const errors = [...plausibility.errors, ...timetableCheck.errors];
+const errors = [...plausibility.errors, ...timetableCheck.errors, ...rawIssues()];
 const warnings = [
   ...plausibility.warnings,
   ...timetableCheck.warnings,

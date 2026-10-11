@@ -54,6 +54,61 @@ export const RawBatch = z.strictObject({
 });
 export type RawBatch = z.infer<typeof RawBatch>;
 
+const Instant = z.iso.datetime({ offset: true, local: false });
+
+/**
+ * Zustand je Anbieter in `data/raw/<providerId>.json` (Plan 0032, E5): dauerhafter Zustand der Pipeline, kein
+ * Vertrag der Website. Schreibt nur `refreshProvider` (`io/refresh.ts`), die Regeln stehen in `lib/refresh.ts`;
+ * `pipeline build` macht daraus `data/offers.json`. Exportiert nach schema/provider-raw.schema.json.
+ */
+export const ProviderRaw = z
+  .strictObject({
+    /** zuletzt übernommene Events; `via` setzt der Code (E4) */
+    events: z.array(RawEvent),
+    /**
+     * Schlüssel der Eingabe, aus der `events` stammen (`extractKey`, E4). Fehlt, solange der Anbieter nie extrahiert
+     * wurde (erster Lauf mit Fehler oder zurückgehaltenem Einbruch); dann gilt für `build` der Vorstand.
+     */
+    inputHash: z.string().min(1).optional(),
+    /** Modell, das `events` geliefert hat (bei Fallback das Fallback-Modell) */
+    model: z.string().min(1).optional(),
+    status: ProviderCheck.shape.status,
+    /** Pflicht bei fehler */
+    reason: z.string().optional(),
+    /** letzte Abrufzeit, zu der die Seite `events` bestätigt hat; Stand der Verfügbarkeit (`availability.checkedAt`) */
+    checkedAt: Instant,
+    /** letzte Änderung von `events` */
+    changedAt: Instant.optional(),
+    /** erster Lauf der aktuellen Fehlerserie */
+    failingSince: Instant.optional(),
+    /** Sammelkalender, die Kandidaten zur Eingabe beigetragen haben */
+    sources: z.array(z.enum(SOURCES)),
+    /** zurückgehaltener Einbruch (E5): wird übernommen, wenn die nächste Nacht dieselbe Eingabe liefert */
+    pending: z
+      .strictObject({ inputHash: z.string().min(1), model: z.string().min(1), events: z.array(RawEvent) })
+      .optional(),
+  })
+  .superRefine((r, ctx) => {
+    if (r.status === "fehler" && !r.reason)
+      ctx.addIssue({ code: "custom", message: "status fehler braucht einen reason", path: ["reason"] });
+    if (r.status === "fehler" && !r.failingSince)
+      ctx.addIssue({ code: "custom", message: "status fehler braucht failingSince", path: ["failingSince"] });
+    if (r.status !== "fehler" && r.failingSince)
+      ctx.addIssue({ code: "custom", message: "failingSince nur bei status fehler", path: ["failingSince"] });
+    if (r.inputHash === undefined && (r.events.length > 0 || r.status !== "fehler"))
+      ctx.addIssue({ code: "custom", message: "ohne inputHash nur status fehler ohne Events", path: ["inputHash"] });
+    if (
+      (r.inputHash === undefined) !== (r.model === undefined) ||
+      (r.inputHash === undefined) !== (r.changedAt === undefined)
+    )
+      ctx.addIssue({
+        code: "custom",
+        message: "inputHash, model und changedAt gibt es nur zusammen",
+        path: ["inputHash"],
+      });
+  });
+export type ProviderRaw = z.infer<typeof ProviderRaw>;
+
 export interface RawContext {
   providers: readonly Provider[];
   /** Anbieter des zugehörigen Pakets – jeder braucht einen Status */
