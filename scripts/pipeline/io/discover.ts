@@ -16,7 +16,6 @@ import type { Anbieter, Offer, Provider } from "../../../src/domain/schema.ts";
 import { addMonths, toBerlinIso } from "../../../src/domain/time.ts";
 import { batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
 import type { Candidate } from "../lib/candidate.ts";
-import { catalogDiff } from "../lib/catalog-diff.ts";
 import { appendEntries } from "../lib/catalog-yaml.ts";
 import { appendCsvRow, type BrakeKind, type Brakes, brakeHit, costJsonl, summarizeCosts } from "../lib/cost.ts";
 import {
@@ -29,6 +28,7 @@ import {
   contactLinks,
   type DiscoverReport,
   directoryFinds,
+  dryRunCatalogIssues,
   entryFromAssessment,
   type Find,
   findsFromSearch,
@@ -41,6 +41,7 @@ import {
   type RegionReport,
   renderDiscoverReport,
   reservedIds,
+  sameSite,
   searchMessage,
   searchResponseSchema,
   staleHints,
@@ -75,7 +76,7 @@ export interface StepReply {
 export interface DiscoverDeps {
   search(term: string, regionName: string, signal: AbortSignal): Promise<StepReply>;
   assess(find: Find, message: string, signal: AbortSignal): Promise<StepReply>;
-  fetchPage(url: string): Promise<FetchedPage>;
+  fetchPage(url: string, opts?: { timeoutMs?: number; retries?: number }): Promise<FetchedPage>;
   geocode(address: string): Promise<GeoResult | undefined>;
   extractor: Extractor;
   fetchInputs: typeof fetchInputs;
@@ -358,9 +359,12 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       const extra: Array<{ url: string; text: string }> = [];
       for (const url of contactLinks(fetchedFind)) {
         try {
-          const p = await o.deps.fetchPage(url);
-          const text = p.status < 400 ? extractPage(p.body, p.finalUrl).text : "";
-          if (text && !botWall(text)) extra.push({ url, text });
+          // kurz und ohne Wiederholung: Zusatzseiten dürfen das Zeitbudget nicht fressen (Arch-Review S4b, m3)
+          const p = await o.deps.fetchPage(url, { timeoutMs: 15_000, retries: 0 });
+          // eine Weiterleitung darf weder die Website verlassen noch auf eine interne Adresse zeigen (m1)
+          if (p.status >= 400 || !sameSite(p.finalUrl, page.finalUrl)) continue;
+          const text = extractPage(p.body, p.finalUrl).text;
+          if (text && !botWall(text)) extra.push({ url: p.finalUrl, text });
         } catch {
           // ohne diese Seite bewerten
         }
@@ -492,12 +496,10 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   // Ausgangsstand nur die aufgenommenen Anbieter neu haben
   const gateErrors: string[] = [];
   const added = regions.flatMap((x) => x.adopted.map((a) => a.id));
-  if (o.dryRun && added.length > 0) {
-    const d = catalogDiff(parse(originalCatalogText), parse(readFileSync(outCatalog, "utf8")));
-    if (!d.ok) gateErrors.push(...d.errors.map((e) => `G2: ${e}`));
-    else if (d.added.join(",") !== added.join(","))
-      gateErrors.push(`G2: neue Katalogeinträge ${d.added.join(", ")}, erwartet ${added.join(", ")}`);
-  }
+  if (o.dryRun && added.length > 0)
+    gateErrors.push(
+      ...dryRunCatalogIssues(parse(originalCatalogText), parse(readFileSync(outCatalog, "utf8")), added, o.today),
+    );
 
   const report: DiscoverReport = {
     date: o.today,

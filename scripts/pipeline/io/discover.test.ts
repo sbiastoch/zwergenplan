@@ -196,6 +196,63 @@ describe("runDiscover (Plan 0032, E7)", () => {
     expect(messages[0]).toMatch(/## WEITERE SEITE: https:\/\/krabbelzwerge\.example\.net\/kontakt\nKernstraße 3/);
   });
 
+  it("Kontaktseite mit Fehler oder Weiterleitung auf eine andere Website: Bewerten ohne sie, Lauf geht weiter", async () => {
+    const d = tempData();
+    const messages: string[] = [];
+    const base = deps({
+      search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }),
+      assess: { [SITE]: assessOk("Krabbelzwerge Gostenhof") },
+    });
+    const links = `<a href="${SITE}kontakt">Kontakt</a><a href="${SITE}anfahrt">Anfahrt</a>`;
+    const r = await run(
+      d,
+      {},
+      {
+        deps: {
+          ...base,
+          fetchPage: async (url) => {
+            if (url.endsWith("/kontakt")) return { ...page(url, "weg"), status: 404 };
+            if (url.endsWith("/anfahrt")) return page("https://fremd.example.org/anfahrt", "<p>Fremdstraße 1</p>");
+            return page(url, HOME.replace("</body>", `${links}</body>`));
+          },
+          assess: async (find, message, signal) => {
+            messages.push(message);
+            return base.assess(find, message, signal);
+          },
+        },
+      },
+    );
+    expect(messages[0]).not.toMatch(/WEITERE SEITE/);
+    expect(r.regions[0]?.adopted).toHaveLength(1);
+  });
+
+  it("eine nur auf der Kontaktseite verlinkte Adresse wird keine Programmseite", async () => {
+    const d = tempData();
+    const fremd = "https://krabbelzwerge.example.net/termine-fremd";
+    const withFremd = assessOk("Krabbelzwerge Gostenhof");
+    withFremd.eintrag.programme = [...withFremd.eintrag.programme, { url: fremd, kind: "html", use: "termine" }];
+    const base = deps({
+      search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }),
+      assess: { [SITE]: withFremd },
+    });
+    const r = await run(
+      d,
+      {},
+      {
+        deps: {
+          ...base,
+          fetchPage: async (url) =>
+            url.endsWith("/kontakt")
+              ? page(url, `<p>Kernstraße 3, 90429 Nürnberg</p><a href="${fremd}">Termine</a>`)
+              : page(url, HOME.replace("</body>", `<a href="${SITE}kontakt">Kontakt</a></body>`)),
+        },
+      },
+    );
+    expect(r.regions[0]?.hints.join()).toMatch(/nicht auf der abgerufenen Seite verlinkt: .*termine-fremd/);
+    const catalogText = readFileSync(join(d.runDir, "providers.yaml"), "utf8");
+    expect(catalogText).not.toMatch(/termine-fremd/);
+  });
+
   it("zurückgenommene ID aus data/discover wird nicht neu vergeben, G2 im Trockenlauf grün", async () => {
     const d = tempData();
     mkdirSync(join(d.dataDir, "discover"));

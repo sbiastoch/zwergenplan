@@ -8,12 +8,14 @@
  * verwirft deshalb nur bei gleicher URL oder bei gleichem Host UND ähnlichem Namen.
  */
 import { z } from "zod";
+import { validateDataset } from "../../../src/domain/dataset.ts";
 import { inBounds } from "../../../src/domain/geo.ts";
 import { nextPublicId, SHORT_ID_PATTERN, slug } from "../../../src/domain/ids.ts";
 import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
 import { type Anbieter, type Offer, type Provider, Provider as ProviderSchema } from "../../../src/domain/schema.ts";
 import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
 import type { Candidate } from "./candidate.ts";
+import { catalogDiff } from "./catalog-diff.ts";
 import { summarizeCosts } from "./cost.ts";
 import type { DiscoverState } from "./discover-state.ts";
 import { searchQuery } from "./discover-terms.ts";
@@ -268,19 +270,28 @@ const MAX_CONTACT_PAGES = 2;
 const CONTACT_MAX_CHARS = 8_000;
 
 /**
+ * Dieselbe Website: gleicher Host oder einer ist Subdomain des anderen (`www.`, `info.`). Strenger als „letzte zwei
+ * Teile“, damit zwei Seiten beim selben Baukasten-Hoster (`*.jimdofree.com`) nicht als eine gelten (Arch-Review S4b,
+ * m2). Interne Adressen: nie (`hostOf` liefert dann nichts).
+ */
+export function sameSite(a: string, b: string): boolean {
+  const x = hostOf(a);
+  const y = hostOf(b);
+  return x !== undefined && y !== undefined && (x === y || x.endsWith(`.${y}`) || y.endsWith(`.${x}`));
+}
+
+/**
  * Kontakt- oder Adressseiten derselben Website aus den Links der Fund-Seite (Nutzerentscheid 2026-10-11, Option A):
  * Startseiten nennen die Kursorte oft nicht, das Bewerten verwarf deshalb passende Anbieter. Höchstens zwei, nach
  * Vorrang; erkannt am Linktext oder am Pfad. Interne Adressen schließt `parseUrl` aus.
  */
 export function contactLinks(page: FetchedFind): string[] {
-  const site = hostOf(page.finalUrl);
   const self = normalizeUrl(page.finalUrl);
-  if (!site) return [];
+  if (!self) return [];
   const ranked = new Map<string, number>();
   for (const l of page.links) {
-    const host = hostOf(l.url);
     const n = normalizeUrl(l.url);
-    if (!host || !n || n === self || siteOf(host) !== siteOf(site)) continue;
+    if (!n || n === self || !sameSite(l.url, page.finalUrl)) continue;
     const path = parseUrl(l.url)?.pathname ?? "";
     const rank = CONTACT_PATTERNS.findIndex((p) => p.test(l.label) || p.test(path));
     if (rank >= 0 && !ranked.has(n)) ranked.set(n, rank);
@@ -462,7 +473,8 @@ export function entryFromAssessment(
     ...ctx.catalog.flatMap((p) => (p.role === "anbieter" ? [p.publicId] : [])),
     ...(ctx.reserved?.publicIds ?? []),
   ]);
-  // Orts-IDs zurückgenommener Anbieter tragen deren ID; auch sie nicht neu vergeben
+  // Orts-IDs zurückgenommener Anbieter: belegt ist nur deren Basis-ID (Orts-IDs sind intern, `offerKey` trägt die
+  // Anbieter-ID; Arch-Review S4b, m6)
   const usedVenues = new Set([
     ...ctx.catalog.flatMap((p) => (p.role === "anbieter" ? p.venues.map((v) => v.id) : [])),
     ...reservedIds,
@@ -596,6 +608,29 @@ export function newProviderCommitMessage(a: Adopted): string {
     "",
     "Plan 0032, E7 (pnpm pipeline discover)",
   ].join("\n");
+}
+
+/**
+ * Gates im Trockenlauf (Arch-Review S4, m5): G2 (nur die aufgenommenen Einträge neu, in dieser Reihenfolge) und der
+ * Katalogteil von G1 (`validateDataset` wie `candidates add-provider`) auf dem Katalog des Laufs. Im Modus live
+ * prüfen beides `commitNewProvider` und `data:validate`.
+ */
+export function dryRunCatalogIssues(
+  before: unknown,
+  after: unknown,
+  added: readonly string[],
+  today: string,
+): string[] {
+  const d = catalogDiff(before, after);
+  if (!d.ok) return d.errors.map((e) => `G2: ${e}`);
+  if (d.added.join(",") !== added.join(","))
+    return [`G2: neue Katalogeinträge ${d.added.join(", ") || "keine"}, erwartet ${added.join(", ") || "keine"}`];
+  const check = validateDataset(after, {
+    generatedAt: `${today}T00:00:00+00:00`,
+    horizon: { from: today, to: today },
+    offers: [],
+  });
+  return check.ok ? [] : check.errors.map((e) => `G1 (Katalog): ${e}`);
 }
 
 /** Abbruchgrund für Bericht und `kosten.csv` */

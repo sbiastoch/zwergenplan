@@ -8,7 +8,7 @@ import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
-import { DiscoverState } from "./pipeline/lib/discover-state.ts";
+import { DiscoverState, reservedConflicts } from "./pipeline/lib/discover-state.ts";
 import { hasResultFor, promptHash } from "./pipeline/lib/eval-score.ts";
 import { providerRawIssues } from "./pipeline/lib/raw.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
@@ -63,6 +63,7 @@ function discoverIssues(): string[] {
   const dir = new URL(source === "fixture" ? "tests/fixtures/discover/" : "data/discover/", ROOT);
   if (!existsSync(dir)) return [];
   const issues: string[] = [];
+  const states: DiscoverState[] = [];
   for (const f of readdirSync(dir).filter((n) => n.endsWith(".json"))) {
     const label = `data/discover/${f}`;
     try {
@@ -70,10 +71,13 @@ function discoverIssues(): string[] {
       if (!parsed.success) issues.push(...parsed.error.issues.map((i) => `${label} ${i.path.join(".")}: ${i.message}`));
       else if (`${parsed.data.region}.json` !== f)
         issues.push(`${label}: Region ${parsed.data.region} passt nicht zum Dateinamen`);
+      else states.push(parsed.data);
     } catch (e) {
       issues.push(`${label}: Lesefehler: ${(e as Error).message}`);
     }
   }
+  // zurückgenommene IDs nie neu vergeben, über jeden Weg (ADR 0022; Arch-Review S4b, M1)
+  if (result.ok) issues.push(...reservedConflicts(result.providers, states));
   return issues;
 }
 
