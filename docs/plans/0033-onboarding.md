@@ -428,7 +428,7 @@ Regeln:
   - Fertig, wenn:
     - `pnpm verify` grün und der Chunk-Wächter grün (genau `index-*.js` und `index-*.css` oben).
     - Die Stub-CSS liegt in `assets/onboarding/`.
-    - Start-JS gemessen und mit E13 verglichen. **Liegt es über 100 kB, zuerst im Start-Anteil des Onboardings sparen (Lader schlanker, Logik in den Chunk). Reicht das nicht: anhalten und Nutzerentscheid N1 einholen, bevor S5 beginnt** (Review H6; jede Anhebung des Budgets hat bisher der Nutzer entschieden).
+    - Start-JS gemessen und mit E13 verglichen. **Liegt es über 100 kB, zuerst im Start-Anteil des Onboardings sparen (Lader schlanker, Logik in den Chunk). Reicht das nicht: `JS (initial)` auf 101 kB anheben (N1, vom Nutzer entschieden), Nachtrag ADR 0012.**
     - `pnpm e2e:local --affected` ohne neue Fehler.
 - **S5 Oberfläche**: `OnboardingFlow.tsx`, `steps.tsx`, `art.tsx` (SVGs aus dem Mockup), `onboarding.css`, `AppStep` und `APP_STEP_TEXTS`, Link im Kind-Sheet (E12), `.dlg.onb`/`.onb-cover`/`.onb-pending`/`.onb-topbar`/`.onb-skip` in `dialog.css`. Umbenennung „Wochen-Nachricht“ → „Samstags-Nachricht“ (N2): `push-texts.ts` (`switchLabel`, `on`, `off`, `addedOff`, `needsSwitch`), Selektoren `e2e/push.spec.ts:35, 243, 278`, `push-texts.test.ts`, `docs/architecture.md`, README (Review L4).
   - Fertig, wenn: alle Schritte im Fixture-Build bedienbar sind, die Budgets gesetzt (Messwert + Reserve, Begründung im Commit), `pnpm verify` grün und `pnpm e2e:local --affected` ohne neue Fehler.
@@ -443,7 +443,7 @@ Regeln:
 
 ## Offene Punkte (Nutzerentscheid)
 
-Stand 2026-10-11: Der Nutzer hat das Mockup freigegeben („Passt so super, bitte bauen“) und war für N1–N3 nicht erreichbar. N2 („Samstags-Nachricht“ überall) und N3 sind nach den Empfehlungen entschieden, im Abschlussbericht genannt und vom Nutzer umkehrbar. **N1 bleibt offen**: Reißt die Messung in S4 das Budget auch nach Sparversuchen, hält die Umsetzung dort an (Review H6).
+Stand 2026-10-11: Der Nutzer hat das Mockup freigegeben („Passt so super, bitte bauen“) und war für N1–N3 nicht erreichbar. N2 („Samstags-Nachricht“ überall) und N3 sind nach den Empfehlungen entschieden, im Abschlussbericht genannt und vom Nutzer umkehrbar. **N1 entschieden (Nutzer, 2026-10-11): „Bei Bedarf anheben“.** Reißt die Messung in S4 das Budget auch nach Sparversuchen, wird `JS (initial)` auf 101 kB angehoben, mit Nachtrag in ADR 0012 und Begründung im Commit. Die Umsetzung hält dafür nicht mehr an.
 
 - **N1 – Start-Budget.** Rest ≈ 0,72 kB, geschätzter Bedarf +0,7 bis +0,9 kB.
   - Empfehlung: Liegt die Messung in S4 über 100 kB, `JS (initial)` auf **101 kB** setzen (Nachtrag ADR 0012). Die Gates LCP/CLS/Schrift-Swap bleiben unverändert, Präzedenz Plan 0019.
