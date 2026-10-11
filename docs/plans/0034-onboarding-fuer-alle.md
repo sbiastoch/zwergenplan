@@ -563,3 +563,19 @@ Der Nutzer hat die live laufende Fassung (Plan 0033) auf dem Handy getestet. Umg
 - Privatsphäre: Die Koordinate verlässt das Gerät nicht (ADR 0017), also kein Reverse-Geocoding bei Dritten. Gerechnet wird offline aus den Stadtteil-Punkten in `DISTRICTS`. Die Wegzeit-Tabelle (`wegzeit.json`) kennt Haltbereiche nur als Koordinaten, ohne Namen; eine Haltestelle lässt sich also nicht nennen, es bleibt beim Stadtteil.
 - Änderung: `nearestDistrictLabel(point)` (`src/domain/districts.ts`): „nächster Stadtteil: Altstadt“; liegt der nächste Stadtteil-Punkt weiter als 1,5 km weg, mit gerundeter Luftlinie („…, ca. 3 km“), damit ein Standort weit draußen auffällt. Onboarding: klein unter „Dein Standort“. Kind-Sheet (`OriginPicker`): „Startpunkt: **Mein Standort** (nächster Stadtteil: Altstadt)“, Löschen wie bisher über „Startpunkt entfernen“. Budget: `districts.ts` und `haversineMeters` liegen ohnehin im Start-Bundle, dazu kommen wenige Zeilen.
 - Test: `src/domain/districts.test.ts` (nah ohne, weit mit Entfernung); E2E N2 im Onboarding, `e2e/startpunkt.spec.ts` (Standort mit Freigabe: Anzeige im Kind-Sheet, weiter kein Request nach der Abfrage).
+
+**Warum ohne Plan-Review**
+
+Der Nutzer verlangte ausdrücklich den schnellen Weg („Führe all die Änderungen im fast track durch“). Alle acht Punkte sind Nutzerentscheide mit je einem Test (Unit oder E2E, oben je Punkt genannt). Statt eines Plan-Reviews vor der Umsetzung prüfte ein Arch-Review den Gesamtdiff des Nachtrags; seine Befunde und der Umgang damit stehen im folgenden Abschnitt.
+
+## Arch-Review der Umsetzung (2026-10-11)
+
+Verdict: keine Blocker.
+
+- **M1** `docs/architecture.md` beschrieb beim Onboarding noch die Punkt-Knöpfe aus E11. → Ersetzt: „Zurück“ ab Schritt 2 links in der Kopfzeile (`.onb-back`, 44 px), auf Schritt 1 ein unsichtbarer Platzhalter gleicher Breite, Punkte reine Anzeige (`aria-hidden`); am Code geprüft (`OnboardingFlow.tsx`, `onboarding.css`).
+- **M2** Der Zustand „Dein Standort“ (`.onb-origin` in `steps.tsx`) hatte kein Mobile-UX-Gate. → N2 prüft nach „Dein Standort“ `expectMobileUx` in allen drei Darstellungen (`SCHEMES`) und `expectNoBrightIslands` dunkel. Neuer Test „N2: … 320 px und 200 %“ mit dem längsten möglichen Text „nächster Stadtteil: Röthenbach b. Schweinau, ca. 1,8 km“ (Geolocation 49.413/11.009, über 1,5 km vom nächsten Stadtteil-Punkt). Die Fixture-Tabelle hat dort keinen Halt (der Standort wäre „außerhalb“); der Test legt per `page.route` den letzten Halt von `wegzeit.json` auf diesen Punkt. Kind-Sheet: Ansicht `kind-sheet-standort` in `e2e/mobile-ux.spec.ts` (Geolocation 49.45213/11.07672, „Mein Standort (nächster Stadtteil: Altstadt)“).
+- **m1** Budgetzeile fehlte. → ADR 0012, Zeile „Plan 0034, Nachtrag“: Start-JS 100,447 → 100,509 kB (+0,062 kB, gegen 347409f), CSS 12,153 → 12,172 kB.
+- **m2** Fast-Track ohne Plan-Review nicht begründet. → Abschnitt „Warum ohne Plan-Review“ oben.
+- **m3** Zwei Stellen formatierten Entfernungen (`nearestDistrictLabel` und `reachShort`). → `distanceText(meters)` in `src/domain/reach.ts` neben `roundedDistance` ist die einzige Quelle; `format.ts` verliert dabei sein `Intl.NumberFormat` (Start-JS −0,056 kB). Test: `src/domain/reach.test.ts` („distanceText“), dazu unverändert `format.test.ts` (`reachShort`) und `districts.test.ts`.
+- **m4** `docs/ideas.md` nannte noch „Samstags-Nachricht“. → „Wöchentliche Push-Nachricht“; die historische Notiz zu N2 trägt den Hinweis auf den neuen Namen.
+- **m5** Feste Wartezeiten in E2E-Specs des Nachtrags. → Akzeptiert, bewusst nicht geändert: Sie stellen Browser-Verhalten nach (Picker, Scroll), auf das kein Ereignis wartet; flackert ein Test in der CI, wird er zum Befund.
