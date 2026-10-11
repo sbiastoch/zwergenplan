@@ -7,6 +7,7 @@
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
  * (Plan 0017: Push-Teil im Kind-Sheet mit langem Such-Abo).
  * Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
+ * Das Flag „Onboarding erledigt“ steht vor jedem Laden im Speicher (Plan 0033, E15).
  * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
 import { existsSync, mkdirSync } from "node:fs";
@@ -189,6 +190,11 @@ for (const vp of viewports) {
         timezoneId: "Europe/Berlin",
       });
       if (isLocal) await mockTiles(context);
+      // Onboarding erledigt (Plan 0033, E15): Alle Ansichten zeigen die App, nicht die Einführung.
+      await context.addInitScript(() => {
+        if (localStorage.getItem("zwergenplan.einfuehrung") === null)
+          localStorage.setItem("zwergenplan.einfuehrung", "1");
+      });
       const page = await context.newPage();
       if (isLocal) await page.clock.setFixedTime(new Date("2026-10-05T12:00:00+02:00"));
       await page.goto(url);

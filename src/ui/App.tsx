@@ -1,9 +1,12 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
+import { hasStoredData, loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/preferences.ts";
 import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { activeFilterCount, EMPTY_FILTER, type FilterState, withDateRange } from "../domain/filter.ts";
+import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
@@ -29,7 +32,9 @@ import { preloadExportWhenIdle } from "./ics-export.ts";
 import { type AgeEscape, ListPending, ListView } from "./ListView.tsx";
 import { MapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
+import { Onboarding, preloadOnboarding } from "./Onboarding.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
+import type { OnboardingEnd } from "./onboarding-types.ts";
 import { ProviderPanel } from "./ProviderPanel.tsx";
 import { ProviderSearch } from "./ProviderSearch.tsx";
 import { SavedCalendar } from "./SavedCalendar.tsx";
@@ -50,6 +55,8 @@ import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
 type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
+/** Onboarding (Plan 0033, E9): „auto“ beim ersten Öffnen, „manuell“ über das Kind-Sheet (E12) */
+type OnboardingMode = "aus" | "auto" | "manuell";
 
 const NO_OFFERS: SiteOffer[] = [];
 const DISCOVER_VIEWS: readonly ViewOption<"entdecken" | "karte">[] = [
@@ -89,6 +96,24 @@ export function App() {
   const activeTab = useRef<HTMLButtonElement>(null);
   /** Fokus-Ziel nach „Nochmal laden“ unter der Statuszeile (Plan 0009, N2) */
   const statusLine = useRef<HTMLParagraphElement>(null);
+  /*
+   * Onboarding (Plan 0033, E2): synchron entschieden, ohne Inline-Skript. Bei jedem Gate ≠ „nichts“ laden Chunk und
+   * App-Teil sofort, parallel zu site.json, auch bei „still-erledigt“: Sonst verriete der Request, ob etwas gespeichert
+   * ist (Review H1). „still-erledigt“ setzt das Flag gleich hier; mehrfach ausgeführt (StrictMode) schadet das nicht.
+   */
+  const [onboarding, setOnboarding] = useState<OnboardingMode>(() => {
+    const gate = onboardingGate({
+      storage: storageUsable(),
+      done: loadOnboardingDone(),
+      stored: hasStoredData(),
+      deepLink: route.offerId !== undefined || route.providerId !== undefined,
+    });
+    if (gate === "nichts") return "aus";
+    preloadOnboarding();
+    if (gate === "zeigen") return "auto";
+    saveOnboardingDone();
+    return "aus";
+  });
 
   useEffect(() => {
     // `attempt` startet das Laden neu („Nochmal versuchen“)
@@ -257,7 +282,8 @@ export function App() {
   // Ohne site.json bliebe das Anbieter-Sheet beim Laden stehen, modal über der Fehlerseite (Arch-Review m3). Es öffnet
   // erst mit den Daten; `anbieter=` bleibt in der URL, „Nochmal versuchen“ öffnet es dann.
   const sheetProviderId = load.kind === "error" ? undefined : route.providerId;
-  const dialogOpen = sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined;
+  const dialogOpen =
+    sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined || onboarding !== "aus";
   const limit = route.filter.reachLimit;
   const limitOn = limitActive(reachMode);
   const hint = limit && limitHint(limit, reachMode);
@@ -307,6 +333,19 @@ export function App() {
         age={age}
       />
     );
+  /*
+   * Ende des Onboardings (E3, E9; Review H4): Cover und Dialog verschwinden im selben Commit wie der Tab-Wechsel
+   * (`flushSync`), dann geht der Fokus auf die Statuszeile, die die Zahl ansagt (sie fehlt beim Laden und bei Fehler).
+   */
+  const endOnboarding = (kind: OnboardingEnd) => {
+    if (kind !== "spaeter") saveOnboardingDone();
+    flushSync(() => {
+      setOnboarding("aus");
+      if (kind === "fertig") replace({ ...route, tab: "entdecken" });
+    });
+    if (kind === "fertig") window.scrollTo({ top: 0 });
+    (statusLine.current ?? activeTab.current)?.focus({ preventScroll: true });
+  };
   const limitAction: LimitActionFor = (focusTarget) => (
     <LimitAction
       mode={reachMode}
@@ -525,6 +564,22 @@ export function App() {
         filterButton={filterButton}
         activeTab={activeTab}
       />
+      {/* nach den Overlays: Im Modus „manuell“ schließt das Kind-Sheet im selben Commit (E3, Review 2, M-1) */}
+      {onboarding !== "aus" && (
+        <Onboarding
+          data={load.kind === "ready" ? offers : load.kind}
+          now={now}
+          today={today}
+          birthDate={birthDate}
+          onBirthDate={setBirthDate}
+          originApi={originApi}
+          transit={transit}
+          filter={route.filter}
+          setFilter={setFilter}
+          finish={{ count: visible.length, pending: listPending }}
+          onEnd={endOnboarding}
+        />
+      )}
     </div>
   );
 }

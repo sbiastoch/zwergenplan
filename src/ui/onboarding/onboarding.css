@@ -1,0 +1,77 @@
+/* Onboarding (Plan 0033, E11), Chunk-CSS in assets/onboarding/. Stand S4: Gerüst; Gestaltung aus dem Mockup in S5.
+   Im Start-CSS (dialog.css) stehen nur .dlg.onb, .onb-cover, .onb-pending, .onb-topbar und .onb-skip. */
+
+@layer components {
+  .onb-flow {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+  .onb-k-stadt {
+    --k: #ffd93b;
+  }
+  .onb-k-alter {
+    --k: #ff8cc0;
+  }
+  .onb-k-weg {
+    --k: #5cb8ff;
+  }
+  .onb-k-app {
+    --k: #b99cff;
+  }
+  .onb-stage {
+    position: relative;
+    flex: none;
+    height: clamp(180px, 42dvh, 318px);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top);
+    background-color: var(--k);
+    border-bottom: 3px solid #13212e;
+    border-radius: 0 0 50% 50% / 0 0 34px 34px;
+  }
+  .onb-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .onb-dots i {
+    width: 9px;
+    height: 9px;
+    border-radius: 5px;
+    background: rgba(19, 33, 46, 0.3);
+  }
+  .onb-dots i.on {
+    width: 26px;
+    background: #13212e;
+  }
+  .onb-dots i.done {
+    background: #13212e;
+  }
+  .onb-txt,
+  .onb-data,
+  .onb-foot {
+    width: 100%;
+    max-width: 34rem;
+    margin-inline: auto;
+    box-sizing: border-box;
+    padding: 1.25rem 1.5rem 0;
+  }
+  .onb-data,
+  .onb-row,
+  .onb-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+  }
+  .onb-data {
+    flex-direction: column;
+  }
+  .onb-tiles {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .onb-foot {
+    margin-top: auto;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  }
+}

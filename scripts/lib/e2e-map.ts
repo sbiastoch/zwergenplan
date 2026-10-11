@@ -114,6 +114,16 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Querschnitt Mobile-UX-Gates je Ansicht: die globale Hülle (Review 2, M1), dazu die Vorschauseite ohne JS und
   // 404.html, die nur diese Spec durch die Gates schickt (share-pages.ts).
   "e2e/mobile-ux.spec.ts": [...SHELL, SHARE_PAGES],
+  // Onboarding beim ersten Öffnen (Plan 0033): Lader und Chunk, App-Schritt aus dem App-Chunk, Geburtsdatum wie im
+  // Kind-Sheet, Gate und Flag im Speicher, Stadt-Kacheln aus den Regionen; Link „Einführung ansehen“ im Kind-Sheet.
+  "e2e/onboarding.spec.ts": [
+    /^src\/ui\/(Onboarding|AppExtras|KidSheet|Dialog)\.tsx$/,
+    /^src\/ui\/(onboarding-types|birth-date-input)\.ts$/,
+    /^src\/ui\/onboarding\//,
+    /^src\/ui\/app-extras\/AppSection\.tsx$/,
+    /^src\/domain\/(onboarding|onboarding-gate|regions)\.ts$/,
+    /^src\/data\/preferences\.ts$/,
+  ],
   // Web-Vitals der Startseite unter Drosselung, Wegzeit mit gespeichertem Stadtteil ohne Flackern.
   "e2e/perf.spec.ts": [
     /^src\/ui\/(Chrome|ListView|OfferCard)\.tsx$/,
@@ -212,14 +222,8 @@ export const FULL: readonly RegExp[] = [
 /**
  * Module, die nur Tests importieren (B6.3). Der Wächter prüft, dass sie wirklich nur aus Tests importiert werden.
  * - `src/domain/test-fixtures.ts`: Testdaten der Unit-Tests der Domäne.
- * - `src/domain/onboarding(-gate).ts`: Domäne des Onboardings, bis Plan 0033, S4 sie an Lader und Flow hängt; dann
- *   wandern sie zu `e2e/onboarding.spec.ts` (der Wächter meldet den ersten Import außerhalb der Tests).
  */
-export const TEST_ONLY: readonly string[] = [
-  "src/domain/test-fixtures.ts",
-  "src/domain/onboarding.ts",
-  "src/domain/onboarding-gate.ts",
-];
+export const TEST_ONLY: readonly string[] = ["src/domain/test-fixtures.ts"];
 
 /** Ohne E2E, wenn die Hülle keine Spec erreicht (B3). */
 export const NO_E2E: readonly RegExp[] = [

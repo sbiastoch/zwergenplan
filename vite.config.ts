@@ -59,6 +59,15 @@ const isAppExtrasModule = (id: string) =>
   );
 
 /**
+ * Onboarding beim ersten Öffnen (Plan 0033, E4) als Lazy-Chunk in assets/onboarding/, samt eigener CSS
+ * (`assetFileNames`). Budgets `Onboarding JS (lazy)` und `Onboarding CSS (lazy)`; `onboarding-ui-only-lazy` und
+ * `onboarding-domain-only-lazy` halten es aus dem Start. In `chunkFileNames` nach den App-Extras: Ein versehentlich
+ * geteilter Chunk mit Push-Code landet sichtbar in app/.
+ */
+const ONBOARDING = "assets/onboarding/[name]-[hash]";
+const isOnboardingModule = (id: string) => /\/src\/ui\/onboarding\/|\/src\/domain\/onboarding\.ts$/.test(id);
+
+/**
  * Öffentliche URL in den og:-Tags von index.html (Plan 0026, E5): einzige Quelle site.config.ts. Ein stehen
  * gebliebener Platzhalter `%ZP_…` bricht den Build.
  */
@@ -118,7 +127,9 @@ export default defineConfig({
                     ? `${ANBIETER}.js`
                     : chunk.moduleIds.some(isAppExtrasModule)
                       ? `${APP}.js`
-                      : "assets/[name]-[hash].js",
+                      : chunk.moduleIds.some(isOnboardingModule)
+                        ? `${ONBOARDING}.js`
+                        : "assets/[name]-[hash].js",
         // Alles, was der Einstieg statisch erreicht, bleibt im Einstieg, auch wenn Lazy-Chunks es teilen (ADR 0012).
         // Workaround für rolldown#11026: Ohne die Gruppe spaltet chunkOptimization z. B. jsx-runtime und time.ts als
         // eigene Start-Chunks ab, sobald mehrere Lazy-Chunks geteilte UI-Module nutzen. Auf main ändert die Gruppe
@@ -128,7 +139,9 @@ export default defineConfig({
         assetFileNames: (asset) =>
           asset.names.some((n) => /^Map(View|Screen)\b/.test(n))
             ? `${KARTE}[extname]`
-            : "assets/[name]-[hash][extname]",
+            : asset.names.some((n) => /^OnboardingFlow\b/.test(n))
+              ? `${ONBOARDING}[extname]`
+              : "assets/[name]-[hash][extname]",
       },
     },
   },

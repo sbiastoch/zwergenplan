@@ -12,7 +12,11 @@
 import { type RefObject, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { createPush } from "../../data/push.ts";
 import { type InstallApi, installFoot, installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
+import type { AppStepProps } from "../onboarding-types.ts";
 import { PushControls } from "./PushControls.tsx";
+
+/** Für den Flow des Onboardings (Plan 0033, E4): Der Lader reicht es als Prop weiter, kein Import aus dem Chunk. */
+export { pushCapability } from "../../data/push.ts";
 
 /** Teilen-Symbol von iOS (Kasten mit Pfeil nach oben). Nur hier gebraucht, deshalb nicht in icons.tsx (Start-Bundle). */
 function ShareIcon() {
@@ -136,4 +140,14 @@ export function AppFoot({ install, done }: { install: InstallApi; done: RefObjec
       {foot.after}
     </p>
   );
+}
+
+/**
+ * App-Schritt des Onboardings (Plan 0033, E8). Stand S4: nur der Installationshinweis, damit Lazy-Kette und Vorladen
+ * stehen; Installationsknopf, iPhone-Hinweis und Schalter „Samstags-Nachricht“ kommen in S5.
+ */
+export function AppStep({ install }: AppStepProps) {
+  const state = useSyncExternalStore(install.subscribe, install.state);
+  const help = installHelp(state);
+  return help?.kind === "text" ? <p>{help.text}</p> : null;
 }

@@ -1,6 +1,7 @@
 /**
  * Lader der Lazy-Kette „App-Extras“ (Plan 0011, E5, E7): Abschnitt „Als App“ im Kind-Sheet und dessen Fuß mit dem
- * Installationsknopf (Plan 0022), Chunk in `assets/app/`.
+ * Installationsknopf (Plan 0022), dazu der App-Schritt des Onboardings (`loadAppStep`, Plan 0033, E4), Chunk in
+ * `assets/app/`.
  * Einziger Zugang zu `src/ui/app-extras/` (`app-extras-ui-entry-only`, `lazy-loader-static`).
  * - Ein Ladevorgang für beide Teile (`useAppExtras`), das Kind-Sheet setzt sie an ihre Stelle. „Fertig“ gehört dem
  *   Kind-Sheet und bleibt dasselbe Element; der Chunk setzt nur Knopf bzw. iOS-Zeile davor (Arch-Review 0022, m1).
@@ -11,6 +12,7 @@
  */
 import type { ReactNode, RefObject } from "react";
 import { LoadFailed, useLazy } from "./Lazy.tsx";
+import type { AppStepModule } from "./onboarding-types.ts";
 
 type Extras = (done: RefObject<HTMLButtonElement | null>, retried: boolean) => AppExtras;
 interface AppExtras {
@@ -34,6 +36,19 @@ async function loadExtras(): Promise<Extras> {
     foot: <AppFoot install={install} done={done} />,
   });
   return loaded;
+}
+
+/**
+ * App-Schritt des Onboardings (Plan 0033, E8) aus denselben zwei Modulen; der Lader `Onboarding.tsx` reicht ihn als
+ * Prop in den Flow. Kind-Sheet und Onboarding teilen den Ladevorgang über die Modul-Map des Browsers (jede Datei ein
+ * Request); ein gemeinsamer Merker kostete 0,07 kB Start-JS (gemessen in S4).
+ */
+export async function loadAppStep(): Promise<AppStepModule> {
+  const [{ AppStep, pushCapability }, { install }] = await Promise.all([
+    import("./app-extras/AppSection.tsx"),
+    import("../data/pwa.ts"),
+  ]);
+  return { AppStep, install, pushCapability };
 }
 
 /**

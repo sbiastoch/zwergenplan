@@ -4,7 +4,7 @@
  * Laden vor. Fixtures, Uhr Mo 5.10.2026 12:00.
  */
 import type { Page, Request } from "@playwright/test";
-import { expect, startPreloads, test } from "./fixtures.ts";
+import { expect, skipOnboarding, startPreloads, test } from "./fixtures.ts";
 
 const TREFF = "Familientreff Beispielhof (fiktiv)";
 const THEATER = "Kleines Theater Beispiel (fiktiv)";
@@ -229,6 +229,8 @@ test("Privatsphäre: mit und ohne gemerkte Anbieter dieselben Request-Pfade", as
   // eigener Kontext: eigener Speicher und eigener HTTP-Cache, die Optionen aus `use` gelten auch hier
   const context = await browser.newContext();
   try {
+    // die Fixture-Option `onboarding` erreicht diesen Kontext nicht (Plan 0033, E15)
+    await skipOnboarding(context);
     const other = await context.newPage();
     await other.clock.setFixedTime(FIXTURE_NOW);
     await preset(other, ["b5nuus36", "fv3fpfp2"]);

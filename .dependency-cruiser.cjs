@@ -211,6 +211,41 @@ module.exports = {
       to: { path: "^src/data/(pwa|push|device-store|searches-store)\\.ts$", dependencyTypesNot: ["dynamic-import"] },
     },
     {
+      name: "onboarding-ui-only-lazy",
+      severity: "error",
+      comment:
+        "Das Onboarding src/ui/onboarding/ ist ein Lazy-Chunk in assets/onboarding/ (Plan 0033, E4): von außen nur per import(), auch Typen nicht statisch – sonst wächst das Startbundle. Props-Typen: src/ui/onboarding-types.ts.",
+      from: { path: "^src/", pathNot: "^src/ui/onboarding/" },
+      to: { path: "^src/ui/onboarding/", dependencyTypesNot: ["dynamic-import"] },
+    },
+    {
+      name: "onboarding-ui-entry-only",
+      severity: "error",
+      comment:
+        "Nur der Lader src/ui/Onboarding.tsx greift auf src/ui/onboarding/ zu (Plan 0033, E4), wie anbieter-ui-entry-only. Den Lader selbst prüft scripts/check-architecture.ts.",
+      from: { path: "^src/", pathNot: ["^src/ui/onboarding/", "^src/ui/Onboarding\\.tsx$"] },
+      to: { path: "^src/ui/onboarding/" },
+    },
+    {
+      name: "onboarding-domain-only-lazy",
+      severity: "error",
+      comment:
+        "Schritte, Texte und Alterstipp des Onboardings (src/domain/onboarding.ts) gehören in den Lazy-Chunk assets/onboarding/ (Plan 0033, E4): zur Laufzeit nur aus src/ui/onboarding/ und dem eigenen Test. Typ-Importe sind frei, sie kosten keine Bytes (AppStepParts in src/ui/onboarding-types.ts und im App-Teil src/ui/app-extras/). Ob es erscheint, entscheidet onboarding-gate.ts im Start.",
+      from: { path: "^src/", pathNot: ["^src/ui/onboarding/", "^src/domain/onboarding\\.(test\\.)?ts$"] },
+      to: { path: "^src/domain/onboarding\\.ts$", dependencyTypesNot: ["type-only"] },
+    },
+    {
+      name: "onboarding-apart-from-app",
+      severity: "error",
+      comment:
+        "Onboarding- und App-Chunk teilen kein Modul, das nur sie nutzen (Plan 0033, E4, Review M2): Rolldown legte es als eigenen Chunk direkt nach assets/ (Chunk-Wächter). Den App-Teil (Installationszustand, pushCapability, AppStep) reicht der Lader als Prop herein; aus PWA-Kern, Push, Geräte-Speicher, Such-Abos und deren Domäne nur Typen.",
+      from: { path: "^src/(ui/onboarding/|domain/onboarding\\.ts$)" },
+      to: {
+        path: "^src/(data/(pwa|push|device-store|searches-store)|domain/(pwa|searches|stored-origin))\\.ts$",
+        dependencyTypesNot: ["type-only"],
+      },
+    },
+    {
       name: "ui-reads-data-only-via-src-data",
       severity: "error",
       comment: "Datenzugriff nur über src/data.",

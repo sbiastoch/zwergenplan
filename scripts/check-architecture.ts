@@ -66,8 +66,8 @@ if (missed.length > 0) {
 
 /**
  * Lazy-Lader der Karte (Plan 0005), der Wegzeit-Logik (Plan 0009, E10), des ICS-Exports (Plan 0010, E8), der
- * Anbieterübersicht (Plan 0010, E7) und der App-Extras (Plan 0011, E5): Ihr Ziel darf nur per import() kommen.
- * dependency-cruiser fasst einen zusätzlichen statischen Import mit dem dynamischen zu einer Kante zusammen und sähe
+ * Anbieterübersicht (Plan 0010, E7), der App-Extras (Plan 0011, E5) und des Onboardings (Plan 0033, E4): Ihr Ziel
+ * darf nur per import() kommen. dependency-cruiser fasst einen zusätzlichen statischen Import mit dem dynamischen zu einer Kante zusammen und sähe
  * ihn nicht. Das Ziel der Wegzeit steht mit Endung, damit es nicht auch `../domain/transit-types.ts` trifft.
  */
 const LAZY_LOADERS: Array<[file: string, target: string]> = [
@@ -84,6 +84,8 @@ const LAZY_LOADERS: Array<[file: string, target: string]> = [
   // Abschnitt „Als App“ im Kind-Sheet (Plan 0011, E5, E7)
   ["src/ui/AppExtras.tsx", "./app-extras/"],
   ["src/ui/AppExtras.tsx", "../data/pwa.ts"],
+  // Onboarding beim ersten Öffnen (Plan 0033, E4)
+  ["src/ui/Onboarding.tsx", "./onboarding/"],
 ];
 for (const [file, target] of LAZY_LOADERS) {
   // auch Seiteneffekt-Importe ohne `from` (import "./karte/MapScreen.tsx")

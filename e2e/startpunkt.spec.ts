@@ -100,8 +100,13 @@ function tableRequests(page: Page, matches: (url: string) => boolean = isTable):
   return requests;
 }
 
+/** Alles im Speicher außer dem Flag „Onboarding erledigt“, das die Fixture setzt (Plan 0033, E15, Review H7) */
 async function storedValues(page: Page): Promise<string[]> {
-  return page.evaluate(() => Object.keys(localStorage).map((k) => `${k}=${localStorage.getItem(k) ?? ""}`));
+  return page.evaluate(() =>
+    Object.keys(localStorage)
+      .filter((k) => k !== "zwergenplan.einfuehrung")
+      .map((k) => `${k}=${localStorage.getItem(k) ?? ""}`),
+  );
 }
 
 test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein Request", async ({ page }) => {

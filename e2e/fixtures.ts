@@ -5,7 +5,15 @@
  * tests/fixtures/karte/, offline, nur solange die Karte im DOM ist und nur ohne Querystring.
  */
 import { existsSync } from "node:fs";
-import { test as base, expect, type Locator, type Page, type Request, type Route } from "@playwright/test";
+import {
+  type BrowserContext,
+  test as base,
+  expect,
+  type Locator,
+  type Page,
+  type Request,
+  type Route,
+} from "@playwright/test";
 import { PUSH_WORKER_URL } from "../site.config.ts";
 
 /** Muss zu tests/fixtures/offers.json passen: Montag, 5.10.2026, 12:00 Berlin. */
@@ -38,6 +46,26 @@ interface Options {
   allowedConsoleErrors: RegExp[];
   /** „verboten“: jeder Request an den Push-Worker ist rot. „mock“: 204 und Protokoll in `pushLog` (Plan 0017). */
   pushWorker: "verboten" | "mock";
+  /**
+   * Onboarding beim ersten Öffnen (Plan 0033, E15): „erledigt“ (Standard) setzt das Flag vor jedem Laden, die Specs
+   * sehen also die Liste wie bisher. „neu“ lässt den Speicher leer, das Onboarding erscheint.
+   */
+  onboarding: "erledigt" | "neu";
+}
+
+/**
+ * Flag „Onboarding erledigt“ vor jedem Laden setzen, nur wenn es fehlt (ein Test darf es selbst entfernen und neu
+ * laden). Für selbst gebaute Kontexte (`browser.newContext()`), die die Fixture-Option nicht erreicht (Plan 0033, E15).
+ */
+export async function skipOnboarding(context: BrowserContext) {
+  await context.addInitScript(() => {
+    try {
+      if (localStorage.getItem("zwergenplan.einfuehrung") === null)
+        localStorage.setItem("zwergenplan.einfuehrung", "1");
+    } catch {
+      // ohne Speicher erscheint das Onboarding ohnehin nicht (onboardingGate)
+    }
+  });
 }
 
 /** Mock-Datei zu einem Pfad: Stil `/styles/<name>` → `<name>.json`, TileJSON `/planet`, Glyphen unter `fonts/`. */
@@ -88,8 +116,17 @@ export const test = base.extend<
     thirdPartyGuard: undefined;
     /** Requests an den Push-Worker, wie der Mock sie bekam (nur mit pushWorker: "mock") */
     pushLog: PushRequest[];
+    onboardingGate: undefined;
   }
 >({
+  onboarding: ["erledigt", { option: true }],
+  onboardingGate: [
+    async ({ context, onboarding }, use) => {
+      if (onboarding === "erledigt") await skipOnboarding(context);
+      await use(undefined);
+    },
+    { auto: true },
+  ],
   pushWorker: ["verboten", { option: true }],
   pushLog: [
     async ({ context, pushWorker }, use) => {
