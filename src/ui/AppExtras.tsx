@@ -44,11 +44,11 @@ async function loadExtras(): Promise<Extras> {
  * Request); ein gemeinsamer Merker kostete 0,07 kB Start-JS (gemessen in S4).
  */
 export async function loadAppStep(): Promise<AppStepModule> {
-  const [{ AppStep, pushCapability }, { install }] = await Promise.all([
+  const [{ AppStep, pushCapability, syncPushMirror }, { install }] = await Promise.all([
     import("./app-extras/AppSection.tsx"),
     import("../data/pwa.ts"),
   ]);
-  return { AppStep, install, pushCapability };
+  return { AppStep, install, pushCapability, syncPush: syncPushMirror };
 }
 
 /**

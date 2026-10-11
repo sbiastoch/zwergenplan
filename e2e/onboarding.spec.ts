@@ -467,14 +467,22 @@ test.describe("Test 12: Lade- und Fehlerzustand bestehen die Gates", () => {
     });
   }
 
-  for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
+  /** ungemischte Farbe der ersten Bühne: App (lila) im Safari-Tab des iPhones, sonst Stadt (gelb), Plan 0034, E8 */
+  const firstStageColor = (project: string) => (project === "iphone-15" ? "185,156,255" : "255,217,59");
+
+  for (const scheme of SCHEMES) {
     test(`leere Bühne in der Farbe der ersten Bühne (${scheme.label})`, async ({ page }) => {
+      const project = test.info().project.name;
+      // hell ist die Farbe fest; geprüft auf dem iPhone, wo die Ladebühne die App-Farbe trägt (Review Runde 2, m3)
+      test.skip(scheme.label === "hell" && project !== "iphone-15", "hell: nur iphone-15");
       await page.emulateMedia({ colorScheme: scheme.colorScheme });
       const release = await holdChunk(page);
       if (scheme.chosenDark)
         await page.evaluate(() => {
           document.documentElement.dataset["theme"] = "dark";
         });
+      if (project === "iphone-15") await expect(page.locator(".onb-pending")).toHaveClass(/\bios\b/);
+      else await expect(page.locator(".onb-pending")).not.toHaveClass(/\bios\b/);
       // als gerundetes RGB: Der Build rechnet das feste `color-mix` der leeren Bühne vorab aus, die Bühne mischt
       // zur Laufzeit (`--mix`) und meldet `color(srgb …)`
       const background = (selector: string) =>
@@ -490,7 +498,8 @@ test.describe("Test 12: Lade- und Fehlerzustand bestehen die Gates", () => {
       release(false);
       await expect(title(page)).toHaveText(/^Schritt 1 von \d: /);
       expect(await background(".onb-stage")).toBe(pending);
-      expect(pending).not.toBe("255,217,59");
+      if (scheme.label === "hell") expect(pending).toBe(firstStageColor(project));
+      else expect(pending).not.toBe(firstStageColor(project));
     });
   }
 

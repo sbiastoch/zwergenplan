@@ -79,7 +79,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   "e2e/installieren.spec.ts": [
     /^src\/ui\/(AppExtras|KidSheet|Lazy)\.tsx$/,
     /^src\/ui\/app-extras\/AppSection\.tsx$/,
-    /^src\/data\/(pwa|pwa-start)\.ts$/,
+    /^src\/data\/(pwa|pwa-start|platform)\.ts$/,
     /^src\/domain\/pwa\.ts$/,
   ],
   // Karte: Lader (MapPanel, Lazy), Oberfläche karte/, MapLibre map/, Kacheln, Kamera-Regel mit Standort und
@@ -130,7 +130,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/onboarding\//,
     /^src\/ui\/app-extras\/AppSection\.tsx$/,
     /^src\/domain\/(onboarding|onboarding-gate|regions)\.ts$/,
-    /^src\/data\/preferences\.ts$/,
+    /^src\/data\/(preferences|platform)\.ts$/,
   ],
   // Web-Vitals der Startseite unter Drosselung, Wegzeit mit gespeichertem Stadtteil ohne Flackern.
   "e2e/perf.spec.ts": [

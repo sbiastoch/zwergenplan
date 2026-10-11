@@ -264,6 +264,18 @@ export function createPush(env: PushEnv = browserEnv()) {
 
     mirror,
 
+    /**
+     * Einmal am Ende des Onboardings (Plan 0034, E9): Mit Abo die Angaben in den Geräte-Speicher spiegeln, sonst nichts.
+     * Anders als `reconcile` kein Request und ohne Abo kein Leeren. Ohne `PushManager` (Safari-Tab) nicht einmal ein
+     * Blick auf die Registrierung (Review Runde 2, m5).
+     */
+    async mirrorIfSubscribed(data: MirrorData): Promise<void> {
+      if (!env.hasPushManager) return;
+      if (!(await this.subscription())) return;
+      mirroring = true;
+      await mirror(data);
+    },
+
     /** Geräte-Kennung für den Testversand: die ersten 8 Zeichen des SHA-256 des Endpoints (Schlüssel im Worker) */
     async deviceId(endpoint: string): Promise<string> {
       return (await sha256Hex(endpoint)).slice(0, 8);

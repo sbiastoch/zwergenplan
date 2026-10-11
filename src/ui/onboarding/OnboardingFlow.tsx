@@ -8,6 +8,7 @@
  * - Fokus auf die Überschrift beim Mounten und je Schritt (E3, Review H3), samt `scrollTop = 0` des Dialogs. Zusätzlich
  *   `autofocus` für den Modus „manuell“, in dem der Flow vor `showModal()` montiert (Review 2, M-1).
  * - Der App-Teil kommt als Prop aus `assets/app/` (kein statischer Import zwischen zwei Lazy-Chunks, E4).
+ * - Beim Unmount einmal `app.syncPush()`: Ein laufendes Abo bekommt die im Onboarding geänderten Angaben (Plan 0034, E9).
  */
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -44,6 +45,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const birth = useBirthDateInput(props.birthDate, today, props.onBirthDate);
   const stats = useMemo(() => offers && welcomeStats(offers, now), [offers, now]);
   const step = steps[index] ?? "stadt";
+  // Ende des Onboardings (jede Art: fertig, Überspringen, Esc, erneuter Aufruf): einmal spiegeln (Plan 0034, E9)
+  const appRef = useRef(app);
+  useEffect(() => () => void appRef.current?.syncPush().catch(() => {}), []);
   const last = index === steps.length - 1;
 
   useEffect(() => {
