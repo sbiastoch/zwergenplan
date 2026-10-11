@@ -22,7 +22,7 @@ import {
   setTextScale,
 } from "./mobile-ux.ts";
 import { ONBOARDING_FLAG } from "./onboarding-flag.ts";
-import { expectStep, goTo, intro, kicker, opened, primary, stepOrder, title } from "./onboarding-steps.ts";
+import { expectStep, goTo, intro, kicker, opened, primary, stepOrder, swipe, title } from "./onboarding-steps.ts";
 import { clsFrom, observeVitals, readVitals, throttleMobile } from "./vitals.ts";
 
 test.use({ onboarding: "neu" });
@@ -629,6 +629,192 @@ test.describe("Test 13: Mobile-UX je Schritt", () => {
       // expectVisibleFocus tabbt durch den Dialog; danach zurück auf die Überschrift wie nach einem Schrittwechsel
       await title(page).focus();
     });
+  });
+});
+
+/** Gesamtzahl der Schritte aus dem Vorlesetext der Überschrift */
+async function stepTotal(page: Page): Promise<number> {
+  return Number(/von (\d):/.exec((await title(page).textContent()) ?? "")?.[1]);
+}
+
+/** Breite des Viewports; Gesten starten innerhalb der äußeren 24 px Randzone nicht (E10) */
+const viewWidth = (page: Page) => page.viewportSize()?.width ?? 400;
+
+/**
+ * Echte Touch-Geste über CDP (nur Chromium, Plan 0034, E10): `touchStart`, mehrere `touchMove`, `touchEnd`. Prüft, dass
+ * mit `touch-action: pan-y pinch-zoom` die horizontale Geste bei der Seite ankommt und eine vertikale scrollt.
+ */
+async function touchDrag(page: Page, from: [number, number], to: [number, number]) {
+  const cdp = await page.context().newCDPSession(page);
+  const at = (x: number, y: number) => [{ x, y, id: 1 }];
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: at(...from) });
+  const steps = 10;
+  for (let i = 1; i <= steps; i++) {
+    const x = from[0] + ((to[0] - from[0]) * i) / steps;
+    const y = from[1] + ((to[1] - from[1]) * i) / steps;
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: at(x, y) });
+  }
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await cdp.detach();
+}
+
+test.describe("Test 15: Wischen (Plan 0034, E10, E11)", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("15a: nach links weiter, nach rechts zurück, Fokus auf der Überschrift; auf Schritt 1 nicht weiter zurück", async ({
+    page,
+  }) => {
+    await opened(page);
+    const total = await stepTotal(page);
+    const w = viewWidth(page);
+    await swipe(page, { from: [w - 100, 150], to: [w - 250, 160] });
+    await expectStep(page, 2, total);
+    await swipe(page, { from: [100, 150], to: [250, 140] });
+    await expectStep(page, 1, total);
+    await swipe(page, { from: [100, 150], to: [250, 140] });
+    await expectStep(page, 1, total);
+  });
+
+  test("15b: ungültiges Geburtsdatum hält das Wischen an; die Eingabe bleibt beim Blättern", async ({ page }) => {
+    await opened(page);
+    await goTo(page, "alter");
+    const w = viewWidth(page);
+    const field = intro(page).getByLabel("Geburtsdatum");
+    await field.fill("31.02.2026");
+    const before = await title(page).textContent();
+    await swipe(page, { from: [w - 100, 150], to: [w - 250, 150] });
+    await expect(field).toBeFocused();
+    await expect(intro(page).locator("#onb-birth-hint")).toHaveClass(/\bhint bad\b/);
+    await expect(title(page)).toHaveText(before ?? "");
+    await swipe(page, { from: [100, 150], to: [250, 150] });
+    await expect(title(page)).not.toHaveText(before ?? "");
+    await expect(title(page)).toBeFocused();
+    await swipe(page, { from: [w - 100, 150], to: [w - 250, 150] });
+    await expect(title(page)).toHaveText(before ?? "");
+    await expect(field).toHaveValue("31.02.2026");
+  });
+
+  test("15c: keine Wirkung am Rand, im Feld, bei vertikaler Geste und mit der Maus", async ({ page }) => {
+    await opened(page);
+    await goTo(page, "alter");
+    const w = viewWidth(page);
+    const field = intro(page).getByLabel("Geburtsdatum");
+    await field.fill("20.04.2026");
+    const before = (await title(page).textContent()) ?? "";
+    await swipe(page, { from: [10, 150], to: [200, 150] });
+    await swipe(page, { from: [w - 10, 150], to: [w - 200, 150] });
+    const box = await field.boundingBox();
+    if (!box) throw new Error("Feld ohne Box");
+    const y = box.y + box.height / 2;
+    await swipe(page, { target: field, from: [box.x + box.width - 10, y], to: [box.x + box.width - 160, y] });
+    await swipe(page, { from: [w - 100, 150], to: [w - 140, 350] });
+    await swipe(page, { from: [w - 100, 150], to: [w - 250, 150], pointerType: "mouse" });
+    await expect(title(page)).toHaveText(before);
+    // Gegenprobe: dieselbe Geste mit Touch wechselt
+    await swipe(page, { from: [w - 100, 150], to: [w - 250, 150] });
+    await expect(title(page)).not.toHaveText(before);
+  });
+
+  test("15d: auf dem letzten Schritt beendet Wischen nicht", async ({ page }) => {
+    await opened(page);
+    const total = await stepTotal(page);
+    for (let n = 1; n < total; n++) await primary(page).click();
+    await expectStep(page, total, total);
+    const w = viewWidth(page);
+    await swipe(page, { from: [w - 100, 150], to: [w - 250, 150] });
+    await expectStep(page, total, total);
+    await expect(intro(page)).toBeVisible();
+    expect(await flag(page)).toBeNull();
+  });
+
+  test("15e: Touch-Geste über Kachel und „Weiter“ wechselt genau einen Schritt (CDP)", async ({ page }) => {
+    test.skip(test.info().project.name !== "pixel-7", "CDP-Touch: pixel-7");
+    await opened(page);
+    const tile = intro(page).getByRole("button", { name: "Nürnberg" });
+    const t = await tile.boundingBox();
+    if (!t) throw new Error("Kachel ohne Box");
+    await touchDrag(page, [t.x + t.width - 10, t.y + t.height / 2], [t.x + t.width - 130, t.y + t.height / 2]);
+    await expectStep(page, 2, 4);
+    await expect(intro(page).getByRole("button", { name: "Später" })).toBeVisible();
+    const b = await primary(page).boundingBox();
+    if (!b) throw new Error("Knopf ohne Box");
+    const cx = b.x + b.width / 2;
+    await touchDrag(page, [cx + 60, b.y + b.height / 2], [cx - 80, b.y + b.height / 2]);
+    await expectStep(page, 3, 4);
+    // ein Klick nach der Geste käme sofort nach `touchEnd`; kein Ereignis zum Warten, darum kurz Zeit lassen
+    await page.waitForTimeout(400);
+    await expectStep(page, 3, 4);
+  });
+
+  test("15f: echte Touch-Geste wechselt, vertikale scrollt; Gleiten nur ohne reduzierte Bewegung (CDP)", async ({
+    page,
+  }) => {
+    test.skip(test.info().project.name !== "pixel-7", "CDP-Touch: pixel-7");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await opened(page);
+    const w = viewWidth(page);
+    await page.evaluate(() => {
+      window.__slides = 0;
+      document.addEventListener("animationstart", (e) => {
+        if (e.animationName === "onb-in" && e.target instanceof Element && e.target.classList.contains("onb-txt"))
+          window.__slides = (window.__slides ?? 0) + 1;
+      });
+    });
+    await touchDrag(page, [w - 100, 150], [w - 260, 155]);
+    await expectStep(page, 2, 4);
+    await expect(intro(page).locator(".onb-txt")).toHaveClass(/\bonb-in-vor\b/);
+    // zweiter Wischer in dieselbe Richtung: `key={index}` startet die Animation neu (M3)
+    await touchDrag(page, [w - 100, 150], [w - 260, 155]);
+    await expectStep(page, 3, 4);
+    await expect.poll(() => page.evaluate(() => window.__slides)).toBe(2);
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await touchDrag(page, [100, 150], [260, 155]);
+    await expectStep(page, 2, 4);
+    await expect(intro(page).locator(".onb-txt")).toHaveClass(/\bonb-in-zurueck\b/);
+    await expectReducedMotion(page);
+
+    await setTextScale(page, 2);
+    const dialog = intro(page);
+    await touchDrag(page, [w / 2, 600], [w / 2 + 10, 200]);
+    await expect.poll(() => dialog.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+    await expectStep(page, 2, 4);
+  });
+
+  test("15g: Punkte früherer Schritte sind Knöpfe; Tipp und Tastatur führen zurück", async ({ page }) => {
+    await opened(page);
+    const total = await stepTotal(page);
+    await primary(page).click();
+    await primary(page).click();
+    await expectStep(page, 3, total);
+    const dots = intro(page).locator(".onb-dots");
+    const dot1 = dots.getByRole("button", { name: /^Zu Schritt 1: / });
+    await expect(dots.getByRole("button")).toHaveCount(2);
+    await expect(dot1).toHaveCount(1);
+    await expect(dots.getByRole("button", { name: /^Zu Schritt 2: / })).toHaveCount(1);
+    for (const dot of await dots.getByRole("button").all()) {
+      const box = await dot.boundingBox();
+      expect(box?.width).toBeGreaterThanOrEqual(44);
+      expect(box?.height).toBeGreaterThanOrEqual(44);
+    }
+    // „Zu Schritt 2: <Überschrift>“: der Name nennt die Überschrift des Ziels
+    const name2 = (await dots.getByRole("button", { name: /^Zu Schritt 2: / }).getAttribute("aria-label")) ?? "";
+    await dot1.click();
+    await expectStep(page, 1, total);
+    await primary(page).click();
+    await expectStep(page, 2, total);
+    expect(name2).toBe(`Zu Schritt 2: ${((await title(page).textContent()) ?? "").replace(/^Schritt 2 von \d: /, "")}`);
+
+    await primary(page).click();
+    await expectStep(page, 3, total);
+    // per Tastatur: vom fokussierten Titel rückwärts bis zum Punkt (er steht vor dem Titel)
+    for (let i = 0; i < 10; i++) {
+      if (await dot1.evaluate((el) => el === document.activeElement)) break;
+      await page.keyboard.press("Shift+Tab");
+    }
+    await expect(dot1).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expectStep(page, 1, total);
   });
 });
 
