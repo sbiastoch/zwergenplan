@@ -69,6 +69,7 @@ import { fetchPage } from "./io/http.ts";
 import { DEFAULT_BUDGET_MIN, runNightly } from "./io/nightly.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
+import type { Candidate } from "./lib/candidate.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
 import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
@@ -212,19 +213,23 @@ async function extractCmd(id: string) {
   const provider = catalog.find((p) => p.id === id) ?? fail(`${id}: unbekannter Anbieter`);
   const outDir = join(ROOT, "runs", date, "extract");
   let dir = values.from;
+  // frisch abgerufen: Kandidaten und erlaubte URLs direkt aus dem Abruf wie im Nachtlauf (samt Redirect-Zielen)
+  let fresh: { candidates: readonly Candidate[]; allowedUrls: readonly string[] } | undefined;
   if (!dir) {
     dir = join(outDir, "input");
     const fetched = await fetchInputs(planFetch(catalog, { today: date, only: [id] }), catalog, date);
     mkdirSync(dir, { recursive: true });
     for (const [pid, text] of Object.entries(fetched.texts)) writeFileSync(join(dir, `${pid}.txt`), `${text}\n`);
     writeJson(join(dir, "hashes.json"), fetched.providers);
+    const own = fetched.inputs[id];
+    if (own) fresh = { candidates: own.candidates, allowedUrls: own.allowedUrls };
   }
   const entry = HashesFile.parse(readJson(join(dir, "hashes.json")))[id];
   const textFile = join(dir, `${id}.txt`);
   if (entry?.status !== "ok" || !existsSync(textFile))
     fail(`${id}: keine Eingabe in ${dir} (${entry?.status ?? "fehlt"}${entry?.reason ? `: ${entry.reason}` : ""})`);
   const text = readFileSync(textFile, "utf8").trimEnd();
-  const { candidates, allowedUrls } = inputsFromFetch(text, entry);
+  const { candidates, allowedUrls } = fresh ?? inputsFromFetch(text, entry);
   const controller = new AbortController();
   process.once("SIGINT", () => controller.abort());
   const started = performance.now();

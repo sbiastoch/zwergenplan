@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
- * Fake der Claude-CLI für scripts/pipeline/io/llm.test.ts (Plan 0032, E2). Die Umgebung des Aufrufs ist gefiltert,
- * deshalb steuert die erste Zeile von stdin: `FAKE <modus> <protokolldatei>`. Das Protokoll hält Argumente,
- * Arbeitsverzeichnis (samt Inhalt), Umgebung und stdin fest. Modi: ok, 401, 429, nologin, toolong, truncated, broken, exit.
+ * Fake der Claude-CLI für scripts/pipeline/io/llm.test.ts und io/extract.test.ts (Plan 0032, E2). Die Umgebung des
+ * Aufrufs ist gefiltert, deshalb steuert die erste Zeile von stdin, die mit `FAKE ` beginnt:
+ * `FAKE <modus> <protokolldatei> [<antwortdatei>]`. Das Protokoll hält Argumente, Arbeitsverzeichnis (samt Inhalt),
+ * Umgebung und stdin fest. Modi: ok, reply (structured_output aus der Antwortdatei), 401, 429, nologin, toolong,
+ * truncated, broken, exit.
  */
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const stdin = readFileSync(0, "utf8");
-const [, mode = "ok", record] = stdin.split("\n")[0]?.split(" ") ?? [];
+const control = stdin.split("\n").find((l) => l.startsWith("FAKE ")) ?? "";
+const [, mode = "ok", record, replyFile] = control.split(" ");
 if (record)
   writeFileSync(
     record,
@@ -51,6 +54,17 @@ switch (mode) {
         total_cost_usd: 0.0015,
         structured_output: { events: [] },
         permission_denials: [{ tool_name: "WebSearch" }],
+      })}\n`,
+    );
+    break;
+  case "reply":
+    process.stdout.write(
+      `${JSON.stringify({
+        ...base,
+        is_error: false,
+        result: "",
+        total_cost_usd: 0.0015,
+        structured_output: JSON.parse(readFileSync(replyFile, "utf8")),
       })}\n`,
     );
     break;

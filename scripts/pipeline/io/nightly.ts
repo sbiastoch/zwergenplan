@@ -48,6 +48,8 @@ export interface NightlyReport {
   durationMs: number;
   results: Record<string, ProviderState>;
   calls: CallRecord[];
+  /** Hinweise der Prüfung je Anbieter mit neuer Antwort (`validateRaw`, Teile), nur Anbieter mit Hinweisen */
+  warnings: Record<string, string[]>;
   /** durch den Cache gesparte Aufrufe (E8) */
   cached: number;
   abort?: "auth" | "limit";
@@ -79,6 +81,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
 
   const results: Record<string, ProviderState> = {};
   const calls: CallRecord[] = [];
+  const warnings: Record<string, string[]> = {};
   const controller = new AbortController();
   let abort: NightlyReport["abort"];
   let budgetHit = false;
@@ -119,6 +122,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
         calls.push(...r.calls);
         if (r.kind === "done") {
           results[provider.id] = r.result;
+          if (r.warnings) warnings[provider.id] = r.warnings;
           if (!r.called && r.result !== "ausgefallen") cached++;
         } else if (r.kind === "abort") {
           results[provider.id] = "abort";
@@ -176,6 +180,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     durationMs: Math.round(performance.now() - started),
     results,
     calls,
+    warnings,
     cached,
     ...(abort ? { abort } : {}),
     budgetHit,

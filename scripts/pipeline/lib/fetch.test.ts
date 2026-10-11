@@ -98,6 +98,15 @@ describe("assembleProvider (Plan 0032, E3)", () => {
     expect(later.entry.inputHash).toBe(r.entry.inputHash);
   });
 
+  it("Redirect-Ziel steht im Eintrag (erlaubte sourceUrl für extract --from), nicht im Hash", () => {
+    const moved = { ...page("https://a.de/1", "Kurs A"), finalUrl: "https://a.de/neu" };
+    const r = assembleProvider({ pages: [moved], candidates: [] });
+    expect(r.entry.pages[0]).toMatchObject({ url: "https://a.de/1", finalUrl: "https://a.de/neu" });
+    expect(r.entry.inputHash).toBe(
+      assembleProvider({ pages: [page("https://a.de/1", "Kurs A")], candidates: [] }).entry.inputHash,
+    );
+  });
+
   it("leer: keine Seiten, keine Kandidaten (coveredBy ohne Treffer)", () => {
     const r = assembleProvider({ pages: [], candidates: [] });
     expect(r.entry).toMatchObject({ status: "leer", chars: 0, candidates: 0 });

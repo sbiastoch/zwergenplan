@@ -8,6 +8,7 @@ import {
   inputsFromFetch,
   type ModelReply,
   runExtraction,
+  runExtractionInParts,
 } from "./extract.ts";
 
 const { providers } = loadFixtures();
@@ -105,6 +106,25 @@ describe("checkExtraction", () => {
   it("keine Antwortform", () => {
     expect(errorsOf(checkExtraction("Hallo", ctx))).toEqual(["Antwort ist kein Objekt mit events"]);
   });
+
+  it("Build-Probelauf: was erst der Build findet, ist ungültig (gleicher Titel und Ort, andere Merkmale)", () => {
+    const paid = { ...treff, cost: "kostenpflichtig", price: "5 €" };
+    expect(checkExtraction({ events: [treff] }, ctx).ok).toBe(true);
+    const errors = errorsOf(checkExtraction({ events: [treff, paid] }, ctx));
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatch(/^Build-Probelauf: Schlüssel .*gleichen Titel und Ort, aber andere Merkmale/);
+  });
+
+  it("Build-Probelauf auch für Anbieter mit coveredBy (der Sammelkalender gehört nicht zum Probelauf)", () => {
+    const covered = { ...ctx, provider: { ...provider, coveredBy: "stadt-veranstaltungskalender" } };
+    expect(checkExtraction({ events: [treff] }, covered).ok).toBe(true);
+  });
+
+  it("Hinweise aus validateRaw gehen mit", () => {
+    const past = { ...treff, format: "kurs", schedule: { kind: "dates", dates: [{ start: "2026-09-01T10:00" }] } };
+    const r = checkExtraction({ events: [past] }, ctx);
+    expect(r.ok && r.warnings).toEqual(["events.0 („Offener Krabbeltreff“): Kurs ist schon vorbei – entfällt"]);
+  });
 });
 
 describe("extractResponseSchema", () => {
@@ -131,6 +151,13 @@ describe("extractMessage", () => {
     expect(msg).toContain('"id": "familientreff-beispiel-haus"');
     expect(msg).not.toContain("intern");
     expect(msg).not.toContain("publicId");
+    expect(msg.endsWith("## Seite 1: …")).toBe(true);
+    expect(msg).not.toContain("Teil ");
+  });
+
+  it("mit Teil: eine Zeile nach dem Horizont, sonst gleich", () => {
+    const msg = extractMessage({ provider, text: "## Seite 1: …", ctx, part: { index: 2, count: 3 } });
+    expect(msg).toMatch(/^Heute: 2026-10-05\nHorizont: 2026-10-05 bis 2027-10-05\n\nTeil 2 von 3: /);
     expect(msg.endsWith("## Seite 1: …")).toBe(true);
   });
 });
@@ -198,6 +225,15 @@ describe("inputsFromFetch", () => {
   it("Zahl passt nicht zu hashes.json oder kaputte Zeile → keine Kandidaten", () => {
     expect(inputsFromFetch(real, { candidates: 2, pages }).candidates).toEqual([]);
     expect(inputsFromFetch("## Kandidaten (1)\n{kaputt", { candidates: 1, pages }).candidates).toEqual([]);
+  });
+
+  it("Redirect-Ziele und ticketUrl sind erlaubt wie im Nachtlauf", () => {
+    const withTicket = `## Kandidaten (1)\n${JSON.stringify({ ...CAND, ticketUrl: "https://tickets.example/1" })}`;
+    const r = inputsFromFetch(withTicket, {
+      candidates: 1,
+      pages: [{ url: PAGE, ok: true, finalUrl: `${PAGE}/neu` }],
+    });
+    expect(r.allowedUrls).toEqual([PAGE, `${PAGE}/neu`, "https://example.org/kandidat/1", "https://tickets.example/1"]);
   });
 
   it("ohne Kandidaten-Abschnitt", () => {
@@ -304,5 +340,94 @@ describe("runExtraction", () => {
     });
     expect(r.outcome.kind).toBe("fehler");
     expect(r.calls).toHaveLength(2);
+  });
+});
+
+describe("runExtractionInParts", () => {
+  const second = { ...treff, title: "Babymassage", schedule: { ...treff.schedule, weekdays: ["TH"] } };
+  const runParts = (f: ReturnType<typeof fake>, users: string[], signal?: AbortSignal) =>
+    runExtractionInParts({
+      providerId: provider.id,
+      model: "haiku",
+      fallbackModel: "sonnet",
+      users,
+      ctx,
+      call: f.call,
+      ...(signal ? { signal } : {}),
+    });
+
+  it("ein Teil: genau runExtraction, ohne Teil-Angabe", async () => {
+    const r = await runParts(fake(ok), ["EINGABE"]);
+    expect(r.outcome).toEqual({ kind: "ok", events: [{ ...treff, providerId: provider.id }], model: "haiku" });
+    expect(r.calls[0]).not.toHaveProperty("part");
+  });
+
+  it("je Teil ein Ablauf; Events vereinigt, gleiche nur einmal; Aufrufe mit Teil", async () => {
+    const f = fake(ok, invalid, reply({ output: { events: [treff, second] } }));
+    const r = await runParts(f, ["T1", "T2"]);
+    expect(r.outcome).toMatchObject({
+      kind: "ok",
+      model: "haiku",
+      warnings: ["1 gleiche Events aus mehreren Teilen nur einmal übernommen"],
+    });
+    expect(r.outcome.kind === "ok" && r.outcome.events.map((e) => e.title)).toEqual([
+      "Offener Krabbeltreff",
+      "Babymassage",
+    ]);
+    expect(r.calls.map((c) => [c.part, c.result])).toEqual([
+      ["1/2", "ok"],
+      ["2/2", "invalid"],
+      ["2/2", "ok"],
+    ]);
+    expect(f.seen.map((s) => s.user.split("\n")[0])).toEqual(["T1", "T2", "T2"]);
+  });
+
+  it("Modell je Teil verschieden (Fallback) → beide im Ergebnis", async () => {
+    const r = await runParts(fake(ok, invalid, invalid, reply({ output: { events: [second] } })), ["T1", "T2"]);
+    expect(r.outcome).toMatchObject({ kind: "ok", model: "haiku+sonnet" });
+  });
+
+  it("ein Teil scheitert → ganzer Anbieter fehler, die übrigen Teile laufen nicht", async () => {
+    const f = fake(reply({ truncated: true }));
+    const r = await runParts(f, ["T1", "T2", "T3"]);
+    expect(r.outcome).toEqual({ kind: "fehler", reason: "Teil 1/3: Ausgabe abgeschnitten (haiku)" });
+    expect(f.seen).toHaveLength(1);
+  });
+
+  it("abort beendet sofort", async () => {
+    const f = fake(ok, reply({ abort: "limit" }));
+    const r = await runParts(f, ["T1", "T2", "T3"]);
+    expect(r.outcome).toEqual({ kind: "abort", abort: "limit" });
+    expect(r.calls.map((c) => c.part)).toEqual(["1/3", "2/3"]);
+  });
+
+  it("abgebrochener Lauf: kein weiterer Teil", async () => {
+    const controller = new AbortController();
+    const f = fake(ok);
+    const call = f.call;
+    f.call = async (m, u) => {
+      controller.abort();
+      return call(m, u);
+    };
+    const r = await runParts(f, ["T1", "T2"], controller.signal);
+    expect(r.outcome).toEqual({ kind: "fehler", reason: "Lauf abgebrochen vor Teil 2/2" });
+  });
+
+  it("gemeinsame Prüfung über alle Teile: gleiche ID aus Teil 2 entfällt, Hinweise mit Index der Vereinigung", async () => {
+    // anderer Wochentag und Preis, aber dieselbe ID: dasselbe regelmäßige Angebot, sonst bräche der Build
+    const paid = { ...treff, cost: "kostenpflichtig", price: "5 €", schedule: { ...treff.schedule, weekdays: ["TH"] } };
+    const past = { ...second, format: "kurs", schedule: { kind: "dates", dates: [{ start: "2026-09-01T10:00" }] } };
+    const r = await runParts(fake(ok, reply({ output: { events: [paid, past] } })), ["T1", "T2"]);
+    expect(r.outcome).toMatchObject({
+      kind: "ok",
+      warnings: [
+        "1 gleiche Events aus mehreren Teilen nur einmal übernommen",
+        "events.1 („Babymassage“): Kurs ist schon vorbei – entfällt",
+      ],
+    });
+    expect(r.outcome.kind === "ok" && r.outcome.events.map((e) => [e.title, e.cost])).toEqual([
+      ["Offener Krabbeltreff", "kostenlos"],
+      ["Babymassage", "kostenlos"],
+    ]);
   });
 });

@@ -152,6 +152,19 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(again.cached).toBeGreaterThan(0);
   });
 
+  it("Hinweise der Prüfung je Anbieter stehen im Bericht (nightly.json)", async () => {
+    const dirsOf = tempData();
+    const { extractor } = fakeExtractor((id) =>
+      id === "musikschule-beispiel"
+        ? { kind: "ok", events: [], model: "haiku", warnings: ["Kurs ist schon vorbei"] }
+        : undefined,
+    );
+    const r = await runNightly(options(dirsOf, extractor));
+    expect(r.warnings).toEqual({ "musikschule-beispiel": ["Kurs ist schon vorbei"] });
+    const report = JSON.parse(readFileSync(join(dirsOf.runDir, "nightly.json"), "utf8"));
+    expect(report.warnings).toEqual(r.warnings);
+  });
+
   it("der erste abort beendet den Lauf geordnet: Rest bleibt unverändert, build läuft trotzdem", async () => {
     const dirsOf = tempData();
     const { extractor, seen } = fakeExtractor(() => ({ kind: "abort", abort: "limit" }));
