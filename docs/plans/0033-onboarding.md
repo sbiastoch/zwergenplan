@@ -1,6 +1,6 @@
 # Plan 0033 – Onboarding beim ersten Öffnen
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-11
 Bezug:
 - Referenz-Mockup `docs/design/onboarding-mockup.html` (freigegeben 2026-10-11; maßgeblich sind CSS, die vier SVGs und die Texte, die Skriptlogik ist Mockup; wird mit diesem Plan committet)
@@ -58,7 +58,7 @@ Auf dem iPhone im Browser (`InstallState` `ios`) rückt „App“ an Position 2.
   - `JS (initial)` 100 kB, zuletzt 99,280 kB, Rest ≈ 0,72 kB (ADR 0012, Delta-Tabelle, Plan 0015 Nachtrag A).
   - `CSS` 15 kB (zuletzt ≈ 11,9 kB).
   - `App-Extras JS (lazy)` 7,1 kB (6,49 kB nach Plan 0022).
-  - Vor der Umsetzung neu messen.
+  - Gemessen in S0 (2026-10-11, auf `3bf4adb`, Basis `e63b1e1`): `JS (initial)` 99,284 kB, `CSS` 11,925 kB, `App-Extras JS (lazy)` 6,507 kB.
 - **E2E**:
   - `e2e/fixtures.ts` setzt keinen Speicher. Alle Specs starten leer, nach diesem Plan also mit Onboarding.
   - `e2e/merkliste-anbieter.spec.ts:230` öffnet einen eigenen Kontext mit `browser.newContext()`.
