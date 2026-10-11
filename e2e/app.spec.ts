@@ -55,9 +55,9 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
   await expect(page.getByRole("heading", { level: 1, name: "Impressum" })).toBeVisible();
   await expect(page.getByText("Zwischen den Fleischbänken 12")).toBeVisible();
   // im Impressum und unter „Hinweise“ (E9)
-  const mail = page.getByRole("link", { name: "kontakt@zwergenplan.app" });
+  const mail = page.getByRole("link", { name: "info@zwergenplan.app" });
   await expect(mail).toHaveCount(2);
-  await expect(mail.first()).toHaveAttribute("href", "mailto:kontakt@zwergenplan.app");
+  await expect(mail.first()).toHaveAttribute("href", "mailto:info@zwergenplan.app");
   await expect(page.getByRole("heading", { level: 2, name: "Hinweise" })).toBeVisible();
   await expect(page.getByText(/Eine KI liest sie aus/)).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "Datenschutz" })).toBeVisible();

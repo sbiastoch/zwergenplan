@@ -289,7 +289,7 @@ describe("Impressum und Datenschutz (Plan 0034, E1, E2, E7)", () => {
       "Stephan Biastoch",
       "Zwischen den Fleischbänken 12",
       "90403 Nürnberg",
-      'href="mailto:kontakt@zwergenplan.app"',
+      'href="mailto:info@zwergenplan.app"',
       "Datenschutz",
       "Ohne Gewähr.",
       "Eine KI liest sie aus",

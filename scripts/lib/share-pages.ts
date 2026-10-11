@@ -337,7 +337,7 @@ const IMPRINT = {
   name: "Stephan Biastoch",
   street: "Zwischen den Fleischbänken 12",
   city: "90403 Nürnberg",
-  email: "kontakt@zwergenplan.app",
+  email: "info@zwergenplan.app",
 } as const;
 
 /**
