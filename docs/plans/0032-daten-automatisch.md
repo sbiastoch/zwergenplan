@@ -1,6 +1,6 @@
 # Plan 0032 – Daten automatisch: Nachtlauf und Entdecken über das Abo
 
-Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 wartet auf ein gültiges Token, S1.2 misst 7 Nächte; Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
+Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 misst 7 Nächte bis 2026-10-18; Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
 Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird ersetzt), ADR 0022 (Entwurf, stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (entsteht mit der Freigabe, Inhalt in E14)
@@ -239,7 +239,7 @@ Jede Stufe endet mit grünem `pnpm verify` und grüner CI auf `main`.
 
 ### Stufe 1 – Ergebnisse (2026-10-11)
 
-**S1.1 Spike** (`.github/workflows/spike-cli.yml`, `.github/spike/`, CLI 2.1.296, live seit e07b6b4). Lokal mit Haiku verifiziert; der erste Actions-Lauf (38119906661) zeigte Aufrufzeile, `env -i`, leeres `HOME`/cwd und Auth-Erkennung als funktionsfähig, das Secret wurde aber mit „401 OAuth access token is invalid“ abgewiesen (neu setzen per `claude setup-token`, dann Lauf wiederholen). Verbindliche Korrekturen an E2 für Stufe 2:
+**S1.1 Spike** (`.github/workflows/spike-cli.yml`, `.github/spike/`, CLI 2.1.296, live seit e07b6b4). Lokal mit Haiku verifiziert; in Actions mit neu gesetztem Secret bestätigt (Lauf 38123724260): Extraktion und Bewerten schema-gültig in 7,5 s bzw. 3,6 s ($0,0011 bzw. $0,0005), Websuche 30 s mit 3 Suchen und 7 Schritten ($0,042, `webSearchRequests` in `modelUsage`), ungültiges Token → `abort: "auth"` (401), Abschneiden → `truncated` (hier `api_error_status: null`, Erkennung also nur über den Meldungstext). Das Nutzungsfenster blieb vor und nach dem Lauf bei 3 % (5 Stunden) bzw. 48 % (Woche); der Verbrauch ist erst über einen vollen Nachtlauf messbar (S3.2). Verbindliche Korrekturen an E2 für Stufe 2:
 
 - `--json-schema` nimmt den Schema-**Text**, keinen Pfad (`llm.ts` liest die Datei und übergibt den Inhalt).
 - Websuche braucht `--tools "WebSearch,WebFetch"` **und** `--allowedTools "WebSearch,WebFetch"`; ohne Letzteres lehnt `dontAsk` jede Suche ab und meldet trotzdem `success` (`permission_denials` prüfen).
