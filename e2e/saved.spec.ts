@@ -452,6 +452,10 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
       await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
       await expect(page.getByRole("group", { name: "Kategorien" })).toHaveCount(0);
       await expect(page.getByRole("group", { name: "Schnellfilter" })).toHaveCount(0);
+      // Erst die Karte fertig laden lassen, dann neu navigieren: Bricht das Neuladen in WebKit das Laden der
+      // MapLibre-Worker bzw. des Stils ab, meldet MapLibre „Worker failed to load“ (globaler Dispatcher ohne
+      // error-Listener) oder WebKit „… due to access control checks“. Das ist Teardown, kein Produktfehler.
+      if (pressed === "Karte") await mapSettled(page);
       // Startseiten-Filter in der URL wirken nicht
       await page.goto(`${path}&format=einmalig`);
       await expect(page.getByRole("status")).toContainText("2 Angebote");
