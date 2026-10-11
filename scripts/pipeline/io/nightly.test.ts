@@ -246,6 +246,51 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(Object.values(r.results)).not.toContain("fehler");
   });
 
+  it("Bremse MAX_CALLS erreicht: geordnetes Ende wie beim Zeitbudget, Fertiges bleibt, build läuft (E8)", async () => {
+    const dirsOf = tempData();
+    const { extractor, seen } = fakeExtractor();
+    const r = await runNightly({ ...options(dirsOf, extractor), brakes: { maxCalls: 1, maxTokens: 1_000_000 } });
+    expect(seen).toHaveLength(1);
+    expect(r.brake).toBe("aufrufe");
+    expect(Object.values(r.results).filter((s) => s === "offen").length).toBeGreaterThan(0);
+    expect(readRaw(join(dirsOf.dataDir, "raw"), seen[0] ?? "")).toBeDefined();
+    expect(r.build.written).toBeDefined();
+  });
+
+  it("Bremse MAX_TOKENS zählt Tokens ein und aus", async () => {
+    const dirsOf = tempData();
+    const { extractor, seen } = fakeExtractor();
+    const r = await runNightly({ ...options(dirsOf, extractor), brakes: { maxCalls: 100, maxTokens: 110 } });
+    expect(seen).toHaveLength(1);
+    expect(r.brake).toBe("tokens");
+  });
+
+  it("schreibt kosten.jsonl je Aufruf, den Abruf-Bericht und eine Zeile in data/kosten.csv; Vorstand im Bericht", async () => {
+    const dirsOf = tempData();
+    const { extractor, seen } = fakeExtractor();
+    const r = await runNightly(options(dirsOf, extractor));
+    const jsonl = readFileSync(join(dirsOf.runDir, "kosten.jsonl"), "utf8").trimEnd().split("\n");
+    expect(jsonl).toHaveLength(seen.length);
+    expect(JSON.parse(jsonl[0] ?? "")).toMatchObject({ run: "nacht", date: TODAY, step: "extract", costUsd: 0.001 });
+    expect(existsSync(join(dirsOf.runDir, "fetch", "report.md"))).toBe(true);
+    const csv = readFileSync(join(dirsOf.dataDir, "kosten.csv"), "utf8").trimEnd().split("\n");
+    expect(csv[0]).toMatch(/^datum,lauf,region,aufrufe,/);
+    expect(csv[1]).toBe(
+      `${TODAY},nacht,alle,${seen.length},${seen.length * 100},${seen.length * 10},${(seen.length * 0.001).toFixed(4)},,0,${seen.length - 1}`,
+    );
+    expect(r.previous).toEqual({ offers: 9, sessions: 31 });
+    // zweite Nacht hängt an
+    await runNightly(options(dirsOf, fakeExtractor().extractor));
+    expect(readFileSync(join(dirsOf.dataDir, "kosten.csv"), "utf8").trimEnd().split("\n")).toHaveLength(3);
+  });
+
+  it("--dry-run schreibt kosten.csv nach runs/<datum>, nicht nach data/", async () => {
+    const dirsOf = tempData();
+    await runNightly({ ...options(dirsOf, fakeExtractor().extractor), dryRun: true });
+    expect(existsSync(join(dirsOf.dataDir, "kosten.csv"))).toBe(false);
+    expect(existsSync(join(dirsOf.runDir, "kosten.csv"))).toBe(true);
+  });
+
   it("--only bearbeitet nur die genannten Anbieter", async () => {
     const dirsOf = tempData();
     const { extractor, seen } = fakeExtractor();

@@ -1,0 +1,260 @@
+import { describe, expect, it } from "vitest";
+import type { CallRecord } from "./extract.ts";
+import { ProviderRaw } from "./raw.ts";
+import {
+  assessRun,
+  changedProviders,
+  type LiveStatus,
+  liveLag,
+  NightlyReport,
+  nightlyCommitMessage,
+  parseCommitLog,
+  renderStatus,
+} from "./report.ts";
+
+const NOW = new Date("2026-10-12T03:00:00+02:00");
+
+const call = (providerId: string, over: Partial<CallRecord> = {}): CallRecord => ({
+  step: "extract",
+  providerId,
+  model: "haiku",
+  inputTokens: 1000,
+  outputTokens: 500,
+  cacheReadTokens: 0,
+  cacheCreationTokens: 0,
+  webSearchRequests: 0,
+  turns: 2,
+  durationMs: 4000,
+  costUsd: 0.005,
+  result: "ok",
+  ...over,
+});
+
+function report(over: Partial<NightlyReport> = {}): NightlyReport {
+  return NightlyReport.parse({
+    date: "2026-10-12",
+    durationMs: 600_000,
+    results: { a: "extrahiert", b: "unveraendert", c: "unveraendert", d: "unveraendert", e: "unveraendert" },
+    calls: [call("a")],
+    warnings: {},
+    cached: 4,
+    budgetHit: false,
+    removed: [],
+    adapters: { "evangelische-termine": { status: "ok", candidates: 10, matched: 4, warnings: [] } },
+    build: { offers: 330, sessions: 2100, errors: [], notes: [], written: "data/offers.json" },
+    previous: { offers: 325, sessions: 2050 },
+    ...over,
+  });
+}
+
+const live: LiveStatus = { kind: "aktuell", commit: "abc1234" };
+
+const raw = (over: Partial<ProviderRaw>): ProviderRaw =>
+  ProviderRaw.parse({
+    events: [],
+    inputHash: "h0",
+    model: "haiku",
+    changedAt: "2026-10-01T02:00:00+02:00",
+    status: "ok",
+    checkedAt: "2026-10-12T02:00:00+02:00",
+    sources: [],
+    ...over,
+  });
+
+describe("assessRun (E6: Ampel)", () => {
+  it("grün ohne Befund", () => {
+    expect(assessRun(report(), { live })).toEqual({ light: "gruen", red: [], yellow: [] });
+  });
+
+  it("rot bei Abbruch, Bremse oder Zeitbudget", () => {
+    expect(assessRun(report({ abort: "limit" }), { live }).red).toEqual(["Abbruch: limit (Auth oder Nutzungslimit)"]);
+    expect(assessRun(report({ brake: "tokens" }), { live }).red).toEqual(["Bremse erreicht: tokens (E8)"]);
+    expect(assessRun(report({ budgetHit: true }), { live }).light).toBe("rot");
+  });
+
+  it("rot, wenn mehr als 20 % der Anbieter des Laufs fehler sind (fehler und ausgefallen); 20 % genau ist gelb", () => {
+    const five = { a: "fehler", b: "unveraendert", c: "unveraendert", d: "unveraendert", e: "extrahiert" } as const;
+    expect(assessRun(report({ results: five }), { live }).light).toBe("gelb");
+    const two = { ...five, b: "ausgefallen" } as const;
+    expect(assessRun(report({ results: two }), { live }).red).toEqual([
+      "2 von 5 Anbietern mit Fehler (40 %, Grenze 20 %)",
+    ]);
+  });
+
+  it("ein zurückgehaltener Einbruch ist kein Fehler des Laufs (auch mit status fehler im ersten Lauf), nur gelb", () => {
+    const results = { a: "einbruch", b: "einbruch", c: "unveraendert", d: "unveraendert" } as const;
+    const v = assessRun(report({ results }), { live });
+    expect(v.red).toEqual([]);
+    expect(v.yellow).toEqual(["2 Einbrüche zurückgehalten"]);
+  });
+
+  it("rot bei roten Gates, gescheitertem Push oder fehlendem Build", () => {
+    expect(assessRun(report(), { live, gates: "failure" }).red).toEqual(["Gates rot (data:validate, check:fast)"]);
+    expect(assessRun(report(), { live, push: "failure" }).red).toEqual(["Push gescheitert (Konflikt oder Prüfung)"]);
+    const noBuild = report({ build: { offers: 0, sessions: 0, errors: ["kaputt"], notes: [] } });
+    expect(assessRun(noBuild, { live }).red).toEqual(["Build abgebrochen: kaputt"]);
+  });
+
+  it("ohne Bericht rot", () => {
+    expect(assessRun(undefined, { live }).red).toEqual(["kein Bericht (nightly.json fehlt)"]);
+  });
+
+  it("Live-Stand: mehr als einen Tag hinter main ist rot, unbekannt gelb", () => {
+    const behind: LiveStatus = { kind: "hinter", commit: "abc1234", head: "def5678", hours: 30, commits: 2 };
+    expect(assessRun(report(), { live: behind }).red).toEqual(["Live-Stand 30 Std. hinter main (abc1234 → def5678)"]);
+    expect(assessRun(report(), { live: { ...behind, hours: 5 } }).light).toBe("gruen");
+    expect(assessRun(report(), { live: { kind: "unbekannt", reason: "offline" } }).yellow).toEqual([
+      "Live-Stand unbekannt: offline",
+    ]);
+  });
+
+  it("gelb bei fehlerhaften Anbietern unter der Grenze, offenen oder abgebrochenen Anbietern und Warnungen", () => {
+    const results = { a: "fehler", b: "offen", c: "unveraendert", d: "unveraendert", e: "unveraendert" } as const;
+    expect(assessRun(report({ results }), { live }).yellow).toEqual([
+      "1 Anbieter mit Fehler",
+      "1 Anbieter nicht bearbeitet (offen oder abgebrochen)",
+    ]);
+  });
+});
+
+describe("liveLag (E6: Live-Stand gegen main)", () => {
+  const at = (h: number) => new Date(NOW.getTime() - h * 3_600_000).toISOString();
+
+  it("aktuell, wenn der live ausgelieferte Commit main ist", () => {
+    expect(liveLag({ liveCommit: "abc1234", head: "abc1234ffff", missing: [], now: NOW })).toEqual({
+      kind: "aktuell",
+      commit: "abc1234",
+    });
+  });
+
+  it("zählt ab dem ältesten fehlenden Commit, der nicht nur Doku ist (Doku-Pfad deployt nicht, ADR 0021)", () => {
+    const missing = [
+      { sha: "n3", at: at(2), docOnly: false },
+      { sha: "n2", at: at(40), docOnly: true },
+      { sha: "n1", at: at(26), docOnly: false },
+    ];
+    expect(liveLag({ liveCommit: "abc1234", head: "n3", missing, now: NOW })).toEqual({
+      kind: "hinter",
+      commit: "abc1234",
+      head: "n3",
+      hours: 26,
+      commits: 2,
+    });
+    const docs = [{ sha: "n2", at: at(40), docOnly: true }];
+    expect(liveLag({ liveCommit: "abc1234", head: "n2", missing: docs, now: NOW }).kind).toBe("aktuell");
+  });
+
+  it("unbekannt ohne Live-Commit oder wenn er nicht in main liegt", () => {
+    expect(liveLag({ liveCommit: undefined, head: "x", missing: [], now: NOW, reason: "HTTP 500" })).toEqual({
+      kind: "unbekannt",
+      reason: "HTTP 500",
+    });
+    expect(liveLag({ liveCommit: "abc1234", head: "x", missing: undefined, now: NOW }).kind).toBe("unbekannt");
+  });
+});
+
+describe("renderStatus (E10)", () => {
+  const r = report({
+    results: { a: "extrahiert", b: "fehler", c: "einbruch", d: "unveraendert" },
+    calls: [call("a"), call("a", { step: "fallback", model: "sonnet", costUsd: 0.05 })],
+    warnings: { a: ["Kurs ist schon vorbei – entfällt"] },
+    adapters: {
+      "evangelische-termine": { status: "fehler", reason: "HTTP 502", candidates: 0, matched: 0, warnings: [] },
+    },
+  });
+  const md = renderStatus({
+    report: r,
+    verdict: assessRun(r, { live }),
+    live,
+    raws: {
+      b: raw({ status: "fehler", reason: "HTTP 404", failingSince: "2026-10-09T02:00:00+02:00" }),
+      c: raw({
+        status: "ok",
+        pending: { inputHash: "h", model: "haiku", events: [] },
+      }),
+    },
+    stock: { c: 7 },
+    fetchReport: "# Abruf 2026-10-12\n\n- Anbieter: 4",
+  });
+
+  it("Ampel und Gründe oben", () => {
+    expect(md).toMatch(/^# Nachtlauf 2026-10-12 – Ampel: rot/);
+    expect(md).toContain("- **rot:** 1 von 4 Anbietern mit Fehler (25 %, Grenze 20 %)");
+    expect(md).toContain("- 1 Einbruch zurückgehalten");
+  });
+
+  it("Angebote und Termine gegen den Vorstand", () => {
+    expect(md).toContain("| Angebote | 325 | 330 | +5 |");
+    expect(md).toContain("| Termine | 2.050 | 2.100 | +50 |");
+  });
+
+  it("jede Quelle mit fehler samt Grund und failingSince, auch Sammelkalender", () => {
+    expect(md).toContain("| b | HTTP 404 | 09.10.2026 |");
+    expect(md).toContain("| evangelische-termine (Sammelkalender) | HTTP 502 | – |");
+  });
+
+  it("zurückgehaltene Einbrüche mit Bestand und neuer Zahl", () => {
+    expect(md).toContain("| c | 7 | 0 |");
+  });
+
+  it("Warnungen je Anbieter", () => {
+    expect(md).toContain("a: Kurs ist schon vorbei – entfällt");
+  });
+
+  it("Kosten als Schätzung des API-Gegenwerts beschriftet, je Schritt und Modell, Cache", () => {
+    expect(md).toContain("Schätzung API-Gegenwert, nicht Abo-Preis");
+    expect(md).toContain("| extract | haiku | 1 |");
+    expect(md).toContain("| fallback | sonnet | 1 |");
+    expect(md).toContain("durch den Cache gespart: 4");
+  });
+
+  it("Live-Stand und Abruf-Bericht", () => {
+    expect(md).toContain("Live-Stand: aktuell (abc1234)");
+    expect(md).toContain("<details><summary>Abruf</summary>");
+    expect(md).toContain("# Abruf 2026-10-12");
+  });
+
+  it("ohne Bericht nur die Ampel", () => {
+    const none = renderStatus({
+      report: undefined,
+      verdict: assessRun(undefined, { live }),
+      live,
+      raws: {},
+      stock: {},
+    });
+    expect(none).toContain("Ampel: rot");
+    expect(none).toContain("kein Bericht");
+  });
+});
+
+describe("nightlyCommitMessage (Commit des Nachtlaufs)", () => {
+  it("Betreff mit Datum, Angeboten und geänderten Anbietern; Text mit Kurzbericht", () => {
+    const r = report({ results: { a: "extrahiert", b: "fehler", c: "pending-uebernommen", d: "unveraendert" } });
+    const msg = nightlyCommitMessage(r, {
+      b: raw({ status: "fehler", reason: "HTTP 404", failingSince: "2026-10-09T02:00:00+02:00" }),
+    });
+    const [subject, empty, ...body] = msg.split("\n");
+    expect(subject).toBe("data: Nachtlauf 2026-10-12 (330 Angebote, 2 Anbieter geändert)");
+    expect(empty).toBe("");
+    expect(body).toContain("Angebote 330 (vorher 325), Termine 2.100 (vorher 2.050)");
+    expect(body).toContain("Fehler: b (HTTP 404)");
+    expect(body.join("\n")).toContain("Schätzung API-Gegenwert");
+  });
+
+  it("changedProviders zählt übernommene neue Stände", () => {
+    expect(changedProviders(report({ results: { a: "extrahiert", b: "pending-uebernommen", c: "einbruch" } }))).toBe(2);
+  });
+});
+
+describe("parseCommitLog (Commits mit Dateien, für den Live-Stand)", () => {
+  it("liest Commits mit Zeit und geänderten Dateien; neueste zuerst", () => {
+    const text =
+      "\u0000aaa1111\t2026-10-12T01:00:00+00:00\n\ndocs/plans/x.md\n" +
+      "\u0000bbb2222\t2026-10-11T01:00:00+00:00\n\ndata/offers.json\nREADME.md\n";
+    expect(parseCommitLog(text)).toEqual([
+      { sha: "aaa1111", at: "2026-10-12T01:00:00+00:00", files: ["docs/plans/x.md"] },
+      { sha: "bbb2222", at: "2026-10-11T01:00:00+00:00", files: ["data/offers.json", "README.md"] },
+    ]);
+    expect(parseCommitLog("")).toEqual([]);
+  });
+});
