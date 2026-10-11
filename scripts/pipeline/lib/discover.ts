@@ -82,16 +82,17 @@ const urlsOf = (p: Provider): string[] => [p.url, ...p.programme.map((g) => g.ur
 
 /** gleicher oder ähnlicher Name (einer enthält den anderen, oder Ähnlichkeit ≥ NAME_RATIO) */
 function similarName(a: string, b: string): boolean {
-  const x = a
-    .toLowerCase()
-    .replace(/\([^)]*\)/g, "")
-    .trim();
-  const y = b
-    .toLowerCase()
-    .replace(/\([^)]*\)/g, "")
-    .trim();
-  if (x.length === 0 || y.length === 0) return false;
-  return x.includes(y) || y.includes(x) || ratio(x, y) >= NAME_RATIO;
+  // Katalognamen tragen Zusätze („Die FamilienBox – Das 'Dorf' für Familien“): verglichen wird auch der Kopf vor
+  // Gedankenstrich, Klammer oder Doppelpunkt, nur Buchstaben und Ziffern (Trockenlauf 2026-10-11)
+  const forms = (s: string) => {
+    const lower = s.toLowerCase().replace(/\([^)]*\)/g, "");
+    return [lower, lower.split(/\s[–-]\s|[(:,|]/)[0] ?? ""]
+      .map((f) => f.replace(/[^\p{L}\p{N}]/gu, ""))
+      .filter((f) => f.length >= 4);
+  };
+  const xs = forms(a);
+  const ys = forms(b);
+  return xs.some((x) => ys.some((y) => x.includes(y) || y.includes(x) || ratio(x, y) >= NAME_RATIO));
 }
 
 /** Vorfilter (E7.3): bekannte URL, bekannter Host mit ähnlichem Namen, `abgelehnt`, noch zurückgestellt. */
