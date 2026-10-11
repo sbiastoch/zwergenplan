@@ -7,7 +7,7 @@
  */
 import { useId, useRef } from "react";
 import { flushSync } from "react-dom";
-import { DISTRICTS } from "../domain/districts.ts";
+import { DISTRICTS, nearestDistrictLabel } from "../domain/districts.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
 import { markAutofocus } from "./Dialog.tsx";
 import { originHint, transitSourceNote } from "./format.ts";
@@ -42,6 +42,8 @@ export function OriginPicker({
         {origin ? (
           <>
             Startpunkt: <b>{origin.label}</b>
+            {/* ermittelter Standort in Worten, offline (Nachtrag Plan 0034, 2026-10-11; ADR 0017) */}
+            {located && ` (${nearestDistrictLabel(origin.point)})`}
           </>
         ) : (
           "Noch kein Startpunkt – dann zeigen wir keine Wegzeit."

@@ -159,7 +159,7 @@ function PhoneIcon() {
 }
 
 /**
- * App-Schritt des Onboardings (Plan 0033, E8): Installation nach `parts.install` und Schalter „Samstags-Nachricht“
+ * App-Schritt des Onboardings (Plan 0033, E8): Installation nach `parts.install` und Schalter „Wöchentliche Push-Nachricht“
  * nach `parts.push`. Die Teile rechnet der Flow live, aus „menue“ wird also der Knopf, sobald `beforeinstallprompt`
  * kommt. Gestaltet in der Chunk-CSS des Onboardings (`.onb-note`, `.onb .swrow`).
  */

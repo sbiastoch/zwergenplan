@@ -283,7 +283,7 @@ function PhoneArt() {
         <rect className="o" x="15" y="216" width="40" height="40" rx="11" fill="#FFD93B" />
         <path className="o" fill="#FF7070" d="M23 250 L35 224 L47 250Z" />
         <text className="st mu" x="64" y="231" fontSize="12">
-          Samstag, 10:00
+          Diese Woche
         </text>
         <text className="st pt" x="64" y="251" fontSize="15">
           3 neue Ideen

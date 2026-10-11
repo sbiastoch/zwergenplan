@@ -113,7 +113,7 @@ test.describe("Test 3: Alter", () => {
     const field = intro(page).getByLabel("Geburtsdatum");
     const hint = intro(page).locator("#onb-birth-hint");
     await field.fill("20.04.2026");
-    await expect(hint).toHaveText(/^5 Monate! /);
+    await expect(hint).toHaveText("Schon 5 Monate!");
     await expect(hint).toHaveClass(/\bhint ok\b/);
     await expect.poll(() => page.evaluate(() => localStorage.getItem("zwergenplan.geburtsdatum"))).toBe("2026-04-20");
 
@@ -195,7 +195,7 @@ test.describe("Test 7: iPhone", () => {
     await expect(intro(page).locator(".onb-note")).toHaveText("Tippe auf Teilen und dann auf „Zum Home-Bildschirm“.");
     await expect(intro(page).locator(".onb-note .share svg")).toBeVisible();
     await expect(intro(page)).toContainText(
-      "Auf dem iPhone kommt die Samstags-Nachricht nur in der installierten App. Darum frage ich das hier als Erstes. Die App hat einen eigenen Speicher, dort frage ich dann nach Alter und Startpunkt.",
+      "Auf dem iPhone kommt die wöchentliche Push-Nachricht nur in der installierten App. Darum frage ich das hier als Erstes. Die App hat einen eigenen Speicher, dort frage ich dann nach Alter und Startpunkt.",
     );
     await expect(intro(page).getByRole("switch")).toHaveCount(0);
     await expect(primary(page)).toHaveText("Los geht’s");
@@ -328,7 +328,7 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
     await opened(page);
     await goTo(page, "alter");
     await expect(intro(page).getByLabel("Geburtsdatum")).toHaveValue("20.04.2026");
-    await expect(intro(page).locator("#onb-birth-hint")).toHaveText(/^5 Monate! /);
+    await expect(intro(page).locator("#onb-birth-hint")).toHaveText("Schon 5 Monate!");
     await goTo(page, "weg");
     await expect(intro(page).getByRole("combobox", { name: "Stadtteil" })).toHaveValue("gostenhof");
     await intro(page).getByRole("button", { name: "Überspringen" }).click();
@@ -559,7 +559,7 @@ test.describe("Test 11: erneut über das Kind-Sheet", () => {
     await expect(title(page)).toBeFocused();
     await goTo(page, "alter");
     await expect(intro(page).getByLabel("Geburtsdatum")).toHaveValue("20.04.2026");
-    await expect(intro(page).locator("#onb-birth-hint")).toHaveText(/^5 Monate! /);
+    await expect(intro(page).locator("#onb-birth-hint")).toHaveText("Schon 5 Monate!");
     await intro(page).getByRole("button", { name: "Überspringen" }).click();
     await expect(intro(page)).toHaveCount(0);
     expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
@@ -781,40 +781,38 @@ test.describe("Test 15: Wischen (Plan 0034, E10, E11)", () => {
     await expectStep(page, 2, 4);
   });
 
-  test("15g: Punkte früherer Schritte sind Knöpfe; Tipp und Tastatur führen zurück", async ({ page }) => {
+  test("15g: „Zurück“ ab Schritt 2, Tipp und Tastatur; Eingaben bleiben, Punkte nur Anzeige (Nachtrag 2026-10-11)", async ({
+    page,
+  }) => {
     await opened(page);
     const total = await stepTotal(page);
+    const back = intro(page).getByRole("button", { name: "Zurück" });
+    await expect(back).toHaveCount(0);
+    await expect(intro(page).locator(".onb-dots button")).toHaveCount(0);
+    await expect(intro(page).locator(".onb-dots")).toHaveAttribute("aria-hidden", "true");
+    await goTo(page, "alter");
+    const field = intro(page).getByLabel("Geburtsdatum");
+    await field.fill("20.04.2026");
+    const at = Number(/^Schritt (\d)/.exec((await title(page).textContent()) ?? "")?.[1]);
     await primary(page).click();
-    await primary(page).click();
-    await expectStep(page, 3, total);
-    const dots = intro(page).locator(".onb-dots");
-    const dot1 = dots.getByRole("button", { name: /^Zu Schritt 1: / });
-    await expect(dots.getByRole("button")).toHaveCount(2);
-    await expect(dot1).toHaveCount(1);
-    await expect(dots.getByRole("button", { name: /^Zu Schritt 2: / })).toHaveCount(1);
-    for (const dot of await dots.getByRole("button").all()) {
-      const box = await dot.boundingBox();
-      expect(box?.width).toBeGreaterThanOrEqual(44);
-      expect(box?.height).toBeGreaterThanOrEqual(44);
-    }
-    // „Zu Schritt 2: <Überschrift>“: der Name nennt die Überschrift des Ziels
-    const name2 = (await dots.getByRole("button", { name: /^Zu Schritt 2: / }).getAttribute("aria-label")) ?? "";
-    await dot1.click();
-    await expectStep(page, 1, total);
-    await primary(page).click();
-    await expectStep(page, 2, total);
-    expect(name2).toBe(`Zu Schritt 2: ${((await title(page).textContent()) ?? "").replace(/^Schritt 2 von \d: /, "")}`);
+    await expectStep(page, at + 1, total);
+    const box = await back.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    await back.click();
+    await expectStep(page, at, total);
+    await expect(field).toHaveValue("20.04.2026");
 
     await primary(page).click();
-    await expectStep(page, 3, total);
-    // per Tastatur: vom fokussierten Titel rückwärts bis zum Punkt (er steht vor dem Titel)
+    await expectStep(page, at + 1, total);
+    // per Tastatur: vom fokussierten Titel rückwärts bis „Zurück“ (er steht vor dem Titel)
     for (let i = 0; i < 10; i++) {
-      if (await dot1.evaluate((el) => el === document.activeElement)) break;
+      if (await back.evaluate((el) => el === document.activeElement)) break;
       await page.keyboard.press("Shift+Tab");
     }
-    await expect(dot1).toBeFocused();
+    await expect(back).toBeFocused();
     await page.keyboard.press("Enter");
-    await expectStep(page, 1, total);
+    await expectStep(page, at, total);
   });
 });
 
@@ -836,5 +834,99 @@ test.describe("Test 14: Vitals beim Erstbesuch", () => {
       );
     expect(vitals.lcp, "LCP (ms)").toBeLessThan(2500);
     expect(cls, `CLS\n${detail}`).toBeLessThan(0.05);
+  });
+});
+
+/**
+ * Nachtrag Nutzerfeedback 2026-10-11 (Plan 0034): Nach einem Dropdown scrollte auf dem Handy der Hintergrund, der
+ * Wizard rutschte weg und die Liste kam darunter hervor. Der native Picker lässt sich in Playwright nicht öffnen; der
+ * Test prüft darum die Ursache: Solange das Onboarding offen ist, lässt sich das Dokument auch per Skript (so scrollt
+ * der Browser ein fokussiertes Feld ins Bild) nicht scrollen, und der Dialog deckt den Viewport.
+ */
+test.describe("Nachtrag 2026-10-11: Dropdown und Standort im Schritt Weg", () => {
+  test.beforeEach(() => {
+    const project = test.info().project.name;
+    test.skip(project !== "pixel-7" && project !== "iphone-15", "Mobilgeräte: pixel-7 und iphone-15");
+  });
+
+  /** Dialog deckt den Viewport, an Ecken und Mitte liegt der Dialog oben; das Dokument steht oben */
+  async function expectCovered(page: Page) {
+    const state = await page.evaluate(() => {
+      const dialog = document.querySelector("dialog.onb");
+      const r = dialog?.getBoundingClientRect();
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const points: [number, number][] = [
+        [2, 2],
+        [w / 2, h / 2],
+        [w - 2, h - 2],
+        [2, h - 2],
+      ];
+      return {
+        scrollY: window.scrollY,
+        rect: r && { top: r.top, bottom: r.bottom, h },
+        onTop: points.map(([x, y]) => Boolean(dialog?.contains(document.elementFromPoint(x, y)))),
+      };
+    });
+    expect(state.scrollY, "Dokument scrollt hinter dem Onboarding").toBe(0);
+    expect(state.rect?.top).toBe(0);
+    expect(state.rect?.bottom).toBeGreaterThanOrEqual(state.rect?.h ?? Number.POSITIVE_INFINITY);
+    expect(state.onTop, "Liste sichtbar statt Dialog").toEqual([true, true, true, true]);
+  }
+
+  test("N1: nach der Stadtteil-Wahl scrollt der Hintergrund nicht, der Dialog bleibt deckend", async ({ page }) => {
+    await opened(page);
+    await goTo(page, "weg");
+    // Vorbedingung: Die Liste dahinter wäre ohne Sperre scrollbar
+    expect(await page.evaluate(() => document.querySelector("main")?.scrollHeight ?? 0)).toBeGreaterThan(
+      await page.evaluate(() => window.innerHeight),
+    );
+    const district = intro(page).getByRole("combobox", { name: "Stadtteil" });
+    await district.selectOption("gostenhof");
+    await district.focus();
+    // was der Browser beim Schließen des Pickers tut: Fokus-Scroll und Scrollen des Dokuments
+    await page.evaluate(() => {
+      window.scrollTo(0, 600);
+      document.scrollingElement?.scrollBy(0, 600);
+    });
+    await expectCovered(page);
+    await expect(intro(page).getByRole("combobox", { name: "Stadtteil" })).toHaveValue("gostenhof");
+    await expect(title(page)).toBeInViewport();
+  });
+
+  test("N2: Standort gefunden ersetzt die Stadtteil-Auswahl; „Standort entfernen“ bringt sie zurück", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["geolocation"]);
+    await context.setGeolocation({ latitude: 49.45213, longitude: 11.07672 });
+    await opened(page);
+    await goTo(page, "weg");
+    await expect(intro(page).locator(".onb-lead")).toHaveText(
+      "Ich zeige, wie lange ihr mit Bus und Bahn braucht – mit höchstens einem Umstieg.",
+    );
+    const district = intro(page).getByRole("combobox", { name: "Stadtteil" });
+    await expect(district).toBeVisible();
+    await intro(page).getByRole("button", { name: "Standort", exact: true }).click();
+
+    await expect(intro(page).getByText("Dein Standort", { exact: true })).toBeVisible();
+    // ermittelter Standort in Worten, offline aus den Stadtteil-Punkten (Punkt 8)
+    await expect(intro(page).getByText("nächster Stadtteil: Altstadt", { exact: true })).toBeVisible();
+    await expect(intro(page).getByText("Wegzeit ab deinem Standort (auf ca. 100 m gerundet).")).toBeVisible();
+    await expect(district).toHaveCount(0);
+    const remove = intro(page).getByRole("button", { name: "Standort entfernen" });
+    const box = await remove.boundingBox();
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    await expectCovered(page);
+
+    await remove.click();
+    await expect(remove).toHaveCount(0);
+    await expect(district).toBeFocused();
+    await expect(intro(page).getByRole("button", { name: "Standort", exact: true })).toBeVisible();
+    await district.selectOption("gostenhof");
+    await expect(district).toHaveValue("gostenhof");
+    expect(await page.evaluate(() => localStorage.getItem("zwergenplan.entfernung-ab"))).toBe("gostenhof");
+    await expectCovered(page);
   });
 });

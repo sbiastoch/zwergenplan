@@ -51,47 +51,47 @@
   .onb-stage :focus-visible {
     outline-color: #13212e;
   }
-  /* Punkte in 44-px-Fächern (Plan 0034, E11): Die Punkte früherer Schritte sind Knöpfe, ihre Treffer-Flächen dürfen
-     sich nicht überlappen (axe target-size), also stehen alle Punkte im gleichen Raster. Der erste bleibt an seiner
-     Stelle (negativer Rand), Größe und Farbe der Punkte wie bisher. */
+  /* Punkte: reine Anzeige wie im Mockup (Nachtrag Plan 0034, 2026-10-11, ersetzt die Punkt-Knöpfe aus E11) */
   .onb-dots {
     display: flex;
-    align-items: center;
-    margin-left: -17.5px;
+    gap: 6px;
   }
   .onb-dots i {
     width: 9px;
     height: 9px;
-    margin-inline: 17.5px;
     border-radius: 5px;
     background: rgba(19, 33, 46, 0.3);
-    transition:
-      width 0.3s,
-      margin 0.3s;
+    transition: width 0.3s;
   }
   .onb-dots i.on {
     width: 26px;
-    margin-inline: 9px;
     background: #13212e;
   }
-  .onb-dots button {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    margin-block: -17.5px;
-    padding: 0;
+  .onb-dots i.done {
+    background: #13212e;
+  }
+  /* „Zurück“ ab Schritt 2 links in der Kopfzeile, ruhig wie „Überspringen“ (ohne Wellenlinie); 44 px hoch. Auf
+     Schritt 1 hält ein leerer Platz gleicher Breite die Punkte an ihrer Stelle. */
+  .onb-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 44px;
+    min-height: 44px;
+    margin-right: 8px;
     border: 0;
-    border-radius: 50%;
+    padding: 0 8px 0 2px;
     background: none;
-    outline-offset: -14px;
+    color: #13212e;
+    font-weight: 800;
+    white-space: nowrap;
   }
-  .onb-dots button::before {
-    content: "";
-    width: 9px;
-    height: 9px;
-    border-radius: 5px;
-    background: #13212e;
+  .onb-back[aria-hidden="true"] {
+    visibility: hidden;
+  }
+  /* mit „Zurück“ rückt die Kopfzeile näher an den Rand (Start-CSS: 22 px für die Ladebühne ohne Knopf) */
+  .onb-flow .onb-topbar {
+    padding-left: 8px;
   }
 
   /* Illustrationen (art.tsx): 276 × 259 bei voller Bühne, kleiner bei wenig Höhe */
@@ -234,6 +234,22 @@
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
+  }
+  /* gefundener Standort statt Knopf und Stadtteil-Auswahl (Nachtrag Plan 0034, 2026-10-11) */
+  .onb-origin {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .onb-origin svg {
+    flex: none;
+    margin-top: 0.1em;
+  }
+  .onb-origin small {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--muted);
   }
   .onb-row .select {
     flex: 1 1 10rem;
