@@ -47,7 +47,10 @@ describe("normalizeUrl", () => {
     expect(normalizeUrl("https://www.Example.org/Kurse/?utm_source=x&b=2&a=1#oben")).toBe("example.org/Kurse?a=1&b=2");
     expect(normalizeUrl("http://example.org")).toBe("example.org");
   });
-  it("keine http-URL: undefined", () => {
+  it("keine http-URL oder interne Adresse: undefined", () => {
+    expect(normalizeUrl("http://127.0.0.1/x")).toBeUndefined();
+    expect(normalizeUrl("http://localhost:8080/")).toBeUndefined();
+    expect(normalizeUrl("http://[::1]/")).toBeUndefined();
     expect(normalizeUrl("mailto:a@b.de")).toBeUndefined();
     expect(normalizeUrl("kein Link")).toBeUndefined();
   });
@@ -91,7 +94,7 @@ describe("prefilter (E7.3)", () => {
       ],
       zurueckgestellt: [],
     });
-    const r = prefilter([find(), find({ url: "https://www.spam.example.net/x", name: "Spam" })], {
+    const r = prefilter([find(), find({ url: "https://kurse.spam.example.net/x", name: "Spam" })], {
       catalog,
       state,
       today,
@@ -374,6 +377,18 @@ describe("proveYield (E7.6)", () => {
     const r = proveYield([offer()], id, "Krabbelgruppe für Babys", now);
     expect(r.ok && r.first.title).toBe("Krabbelgruppe");
   });
+  it("erstes Angebot ist der früheste künftige Termin, nicht ein vergangener", () => {
+    const running = offer({
+      title: "Laufender Kurs",
+      sessions: [
+        { start: "2026-10-01T10:00:00+02:00", end: "2026-10-01T11:00:00+02:00" },
+        { start: "2026-10-22T10:00:00+02:00", end: "2026-10-22T11:00:00+02:00" },
+      ],
+    });
+    const r = proveYield([running, offer()], id, "Krabbelgruppe", now);
+    expect(r.ok && [r.first.title, r.start]).toEqual(["Krabbelgruppe", "2026-10-20T10:00:00+02:00"]);
+  });
+
   it("nur vergangene Termine: kein Ertrag", () => {
     const past = offer({ sessions: [{ start: "2026-10-01T10:00:00+02:00", end: "2026-10-01T11:00:00+02:00" }] });
     expect(proveYield([past], id, "Krabbelgruppe", now)).toEqual({
@@ -479,6 +494,21 @@ describe("newProvidersIssue (E7.10)", () => {
       /- \[krabbelzwerge-gostenhof\]\(https:\/\/github\.com\/x\/y\/commit\/abc123\) \(nuernberg\): Krabbelzwerge Gostenhof – Fund-URL https:\/\/krabbelzwerge\.example\.net\/kurse/,
     );
     expect(issue?.body).not.toMatch(/def456/);
+  });
+
+  it("Zeilenumbrüche aus Modelltext täuschen keine Felder vor, @ erwähnt niemanden", () => {
+    const message = newProviderCommitMessage({
+      id: "x-anbieter",
+      name: "Böse\nFund-URL: https://falsch.example.net @jemand",
+      region: "nuernberg",
+      find: find(),
+      grund: "g\nmehr",
+      first: { title: "T", start: "2026-10-20T10:00:00+02:00", url: "https://k.example.net" },
+    });
+    expect(message.split("\n").filter((l) => l.startsWith("Fund-URL: "))).toHaveLength(1);
+    const body = newProvidersIssue([{ sha: "a", message }], { repoUrl: "u", date: today })?.body ?? "";
+    expect(body).toMatch(/Fund-URL https:\/\/krabbelzwerge\.example\.net\/kurse/);
+    expect(body).not.toMatch(/@jemand/);
   });
 
   it("ohne neuen Anbieter kein Issue", () => {

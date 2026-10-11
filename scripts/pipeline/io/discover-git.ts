@@ -11,6 +11,8 @@ import { changedPaths, type Git, rebaseAndPush } from "./publish.ts";
 
 const CATALOG_PATH = "data/providers.yaml";
 const STATE_PATHS = ["data/discover", "data/kosten.csv"] as const;
+/** alles, was Commits des Entdeckens berühren dürfen */
+const DISCOVER_PATHS = [CATALOG_PATH, "data/raw", ...STATE_PATHS];
 
 /** G1 rot: der Anbieter wird nicht aufgenommen, der Lauf geht weiter. Jeder andere Fehler bricht den Lauf ab. */
 export class GateError extends Error {}
@@ -87,6 +89,16 @@ export function publishDiscover(o: { git: Git; validate: () => void }): { pushed
   if (git(["rev-parse", "--abbrev-ref", "HEAD"]) !== "main") throw new Error("publish nur auf main (ADR 0002)");
   onlyPaths(git, []);
   if (Number(git(["rev-list", "--count", "origin/main..HEAD"])) === 0) return { pushed: false, commits: [] };
+  // Die Commits kommen aus dem Job mit dem Modell: nur Daten des Entdeckens, keine Merges (Arch-Review S4, B1;
+  // der Workflow prüft dasselbe schon vor dem Checkout)
+  if (git(["rev-list", "--merges", "origin/main..HEAD"]) !== "")
+    throw new Error("Merge-Commit unter den Commits des Entdeckens, nichts gepusht");
+  const touched = [...new Set(git(["log", "--name-only", "--format=", "origin/main..HEAD"]).split("\n"))].filter(
+    Boolean,
+  );
+  const foreign = touched.filter((p) => !within(p, DISCOVER_PATHS));
+  if (foreign.length > 0)
+    throw new Error(`Commits des Entdeckens ändern fremde Pfade, nichts gepusht:\n  ${foreign.join("\n  ")}`);
   let commits: PushedCommit[] = [];
   rebaseAndPush(git, () => {
     // nach dem Rebase (FETCH_HEAD = origin/main) und vor dem Push: so tragen die Links die SHAs auf main

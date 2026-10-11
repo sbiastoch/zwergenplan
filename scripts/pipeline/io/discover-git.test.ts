@@ -146,6 +146,16 @@ describe("publishDiscover (E7.9)", () => {
     ]);
   });
 
+  it("Commit mit fremdem Pfad (etwa Code aus dem Bundle): kein Push", () => {
+    const { origin, work, run } = setup();
+    const before = origin.git("rev-parse", "main").trim();
+    write(work.dir, "scripts/boese.ts", "x\n");
+    work.git("add", "scripts/boese.ts");
+    work.git("commit", "-qm", "data: Entdecken");
+    expect(() => publishDiscover({ git: run, validate: () => {} })).toThrow(/scripts\/boese\.ts/);
+    expect(origin.git("rev-parse", "main").trim()).toBe(before);
+  });
+
   it("ohne eigene Commits kein Push", () => {
     const { run } = setup();
     expect(publishDiscover({ git: run, validate: () => {} })).toEqual({ pushed: false, commits: [] });

@@ -7,7 +7,7 @@
  * `--dry-run`: alle Schritte echt, aber Katalog, Zustand, Rohdaten und `kosten.csv` nur nach `runs/<datum>/discover/`,
  * kein Commit, kein Issue. Die reine Logik liegt in `lib/discover.ts`.
  */
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
@@ -102,7 +102,10 @@ export interface DiscoverOptions {
   deps: DiscoverDeps;
   /** „Jetzt“ mit Offset für Ertragsbeweis und Zustand (Tests); Standard die Uhr */
   now?: () => string;
-  /** Fortschritt (nur Namen, URLs und Gründe, nie Modellantworten; E2 „Logs“); Standard keiner */
+  /**
+   * Fortschritt: Namen, URLs und Gründe, die zum Teil aus Modell und Webtext stammen (wie der Bericht im Summary,
+   * E10); nie ganze Modellantworten (E2 „Logs“). Standard keiner.
+   */
   log?: (line: string) => void;
   /**
    * Modus live (nicht im Trockenlauf): Commit eines neuen Anbieters nach G2 und G1. Wirft `GateError` (G1 rot: nicht
@@ -242,6 +245,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   const freeDays = await o.deps.freeDays(addMonths(o.today, -12), addMonths(o.today, 24));
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
   const regions: RegionReport[] = [];
+  const states: DiscoverState[] = [];
   const csvRows: Array<{ region: RegionId; calls: CallRecord[]; adopted: number }> = [];
 
   for (const region of o.regions) {
@@ -426,7 +430,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         region,
         find,
         grund: assessed.grund,
-        first: { title: proof.first.title, start: proof.first.sessions[0]?.start ?? "", url: proof.first.url },
+        first: { title: proof.first.title, start: proof.start, url: proof.first.url },
       };
       const nextText = appendEntries(catalogText, [entry]);
       mkdirSync(dirname(outCatalog), { recursive: true });
@@ -455,11 +459,15 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     const raws = Object.fromEntries(Object.entries(readRawDir(join(o.dataDir, "raw"))).filter(([id]) => ids.has(id)));
     report.hints.push(...staleHints(raws, o.today));
 
-    writeJson(join(o.dryRun ? o.runDir : join(o.dataDir, "discover"), `${region}.json`), state);
+    // erst nach allen Regionen geschrieben: ein Commit der nächsten Region erlaubt nur Katalog und Rohdaten
+    // (Arch-Review S4, M2)
+    states.push(state);
     csvRows.push({ region, calls: calls.slice(callsBefore), adopted: report.adopted.length });
     if (abort) break;
   }
   brake ??= brakeHit(calls, o.brakes);
+  for (const state of states)
+    writeJson(join(o.dryRun ? o.runDir : join(o.dataDir, "discover"), `${state.region}.json`), state);
 
   const report: DiscoverReport = {
     date: o.today,
@@ -497,7 +505,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
 }
 
 type Proof =
-  | { kind: "ja"; first: Offer; calls: CallRecord[] }
+  | { kind: "ja"; first: Offer; start: string; calls: CallRecord[] }
   | { kind: "nein"; grund: string; calls: CallRecord[] }
   | { kind: "abort"; abort: "auth" | "limit"; calls: CallRecord[] }
   | { kind: "abgebrochen"; calls: CallRecord[] };
@@ -525,6 +533,9 @@ async function proveEntry(
       calls: [],
     };
   const now = o.now?.() ?? toBerlinIso(new Date());
+  // frisch für jeden Kandidaten: ein früher verworfener Kandidat mit derselben ID (oder ein früherer Lauf am selben
+  // Tag) darf nicht als Vorstand gelten, sonst wären dessen Events der Beweis (Arch-Review S4, M1)
+  rmSync(join(ctx.proofRaw, `${entry.id}.json`), { force: true });
   const r = await refreshProvider({
     provider: entry,
     fetched: input,
@@ -540,8 +551,13 @@ async function proveEntry(
   if (r.kind === "abort") return { kind: "abort", abort: r.abort, calls: r.calls };
   if (r.kind === "abgebrochen") return { kind: "abgebrochen", calls: r.calls };
   const raw = readRaw(ctx.proofRaw, entry.id);
-  if (!raw || r.result === "fehler" || r.result === "ausgefallen")
-    return { kind: "nein", grund: `Extraktion gescheitert: ${raw?.reason ?? r.result}`, calls: r.calls };
+  // nur eine frische Extraktion zählt als Beweis
+  if (!raw || r.result !== "extrahiert")
+    return {
+      kind: "nein",
+      grund: r.result === "leer" ? "keine Eingabe" : `Extraktion gescheitert: ${raw?.reason ?? r.result}`,
+      calls: r.calls,
+    };
   const { batches, extracted } = batchesFromRaw({ [entry.id]: raw }, [entry]);
   const { file } = buildOffers({
     batches,
@@ -556,6 +572,6 @@ async function proveEntry(
   });
   const yielded = proveYield(file?.offers ?? [], entry.id, input.text, now);
   return yielded.ok
-    ? { kind: "ja", first: yielded.first, calls: r.calls }
+    ? { kind: "ja", first: yielded.first, start: yielded.start, calls: r.calls }
     : { kind: "nein", grund: yielded.grund, calls: r.calls };
 }
