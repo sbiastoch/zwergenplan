@@ -3,6 +3,7 @@ import { haversineMeters } from "./geo.ts";
 import {
   airlineReach,
   compareReach,
+  distanceText,
   LIMIT_MINUTES,
   type Origin,
   type Reach,
@@ -132,5 +133,18 @@ describe("roundedDistance", () => {
     [12_600, { unit: "km", value: 13 }],
   ])("%d m → %o", (meters, expected) => {
     expect(roundedDistance(meters)).toEqual(expected);
+  });
+});
+
+describe("distanceText (Arch-Review Plan 0034, m3: eine Quelle für die Entfernungsanzeige)", () => {
+  it.each([
+    [0, "100 m"],
+    [949, "900 m"],
+    [1427, "1,4 km"],
+    [2000, "2 km"],
+    [9960, "10 km"],
+    [12_400, "12 km"],
+  ])("%d m → %s", (meters, expected) => {
+    expect(distanceText(meters)).toBe(expected);
   });
 });

@@ -17,7 +17,7 @@
  * dem Namen abgeleitet. Reihenfolge: alphabetisch nach Name, deutsche Sortierung.
  */
 import { type GeoPoint, haversineMeters } from "./geo.ts";
-import { roundedDistance } from "./reach.ts";
+import { distanceText } from "./reach.ts";
 
 export interface District {
   id: string;
@@ -89,6 +89,5 @@ export function nearestDistrictLabel(point: GeoPoint): string {
   }
   const label = `nächster Stadtteil: ${best?.name ?? ""}`;
   if (bestM <= NEAR_M) return label;
-  const { value, unit } = roundedDistance(bestM);
-  return `${label}, ca. ${String(value).replace(".", ",")} ${unit}`;
+  return `${label}, ca. ${distanceText(bestM)}`;
 }
