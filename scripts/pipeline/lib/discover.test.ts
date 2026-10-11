@@ -83,6 +83,9 @@ describe("prefilter (E7.3)", () => {
     expect(twin.dropped[0]?.grund).toMatch(/Host und Name.*familientreff-beispiel/);
     const other = prefilter([find({ name: "Krabbelgruppe Sonnenschein", url: "https://example.org/sonne" })], ctx);
     expect(other.keep).toHaveLength(1);
+    // Kopf des Katalognamens ohne Zusatz, ohne Leerzeichen: „MusikschuleBeispiel Süd“ ~ „Musikschule Beispiel (fiktiv)“
+    const head = prefilter([find({ name: "MusikschuleBeispiel – Süd", url: "https://example.org/ms" })], ctx);
+    expect(head.dropped[0]?.grund).toMatch(/musikschule-beispiel/);
   });
 
   it("verwirft abgelehnte URL und abgelehnten Host", () => {
