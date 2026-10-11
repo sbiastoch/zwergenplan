@@ -1,0 +1,428 @@
+<!doctype html>
+<!--
+  Referenz-Mockup für Plan 0033 (Onboarding, Vollbild, ein Punkt je Screen). Freigegeben am 2026-10-11, Canvas:
+  https://claude.ai/artifact/FvQrUrPgxGce6rXo7DFriF. Nur fiktive Daten und Beispielstädte.
+  Läuft nicht für sich allein (die Design-Canvas-Laufzeit support.js fehlt) und wird nicht ausgeliefert.
+  Maßgeblich sind das CSS, die Illustrationen (SVG) und die Texte. Die Logik im Skript ist Mockup.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Onboarding · Alle Screens</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.board{display:flex;gap:48px;padding:40px;box-sizing:border-box;font-family:'Bricolage Grotesque',system-ui,sans-serif;background:#F4F7FB}
+.board.dark{background:#070C12}
+.board.pager{padding:0;gap:0;background:none}
+.col{display:flex;flex-direction:column;gap:12px}
+.caption{margin:0;font-weight:800;font-size:18px;letter-spacing:-.02em;color:#13212E}
+.board.dark .caption{color:#EEF3F8}
+.board.pager .caption{display:none}
+.zp{width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased;border-radius:36px;box-shadow:0 0 0 2.5px #13212E,8px 8px 0 2.5px #13212E}
+.board.pager .zp{border-radius:0;box-shadow:none}
+.th-light{--bg:#E8F1FF;--dotc:rgba(19,33,46,.13);--surface:#FFFFFF;--ink:#13212E;--muted:#475563;--soft:#EEF3FA;--edge2:rgba(19,33,46,.28);--line:#13212E;--shadow:#13212E;--primary:#13212E;--on-primary:#FFFFFF;--mix:100%}
+.th-dark{--bg:#0E1620;--dotc:rgba(238,243,248,.08);--surface:#1B2733;--ink:#EEF3F8;--muted:#A9B8C6;--soft:#243241;--edge2:rgba(238,243,248,.28);--line:#8FA4BA;--shadow:#34495E;--primary:#FFD93B;--on-primary:#13212E;--mix:72%}
+.k-yellow{--k:#FFD93B}.k-pink{--k:#FF8CC0}.k-blue{--k:#5CB8FF}.k-lila{--k:#B99CFF}.k-red{--k:#FF7070}.k-green{--k:#A6DB5E}
+.zp button,.zp select,.zp input{font:inherit;color:inherit}
+.zp button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.zp :focus-visible,.zp input:focus,.zp select:focus{outline:3px solid var(--ink);outline-offset:2px}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* Bühne mit Illustration */
+.stage{position:relative;height:318px;flex:none;display:grid;place-items:end center;padding-bottom:14px;box-sizing:border-box;background-color:color-mix(in srgb,var(--k) var(--mix),#0E1620);background-image:radial-gradient(rgba(19,33,46,.13) 1.3px,transparent 1.6px);background-size:18px 18px;border-bottom:3px solid #13212E;border-radius:0 0 50% 50% / 0 0 34px 34px}
+.topbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 10px 0 22px;z-index:2;color:#13212E}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:5px;background:rgba(19,33,46,.3);transition:width .3s}
+.dots i.on{width:26px;background:#13212E}
+.dots i.done{background:#13212E}
+.skip{min-height:44px;border:0;background:none;padding:0 12px;font-weight:800;color:#13212E;text-decoration:underline wavy;text-decoration-thickness:1.5px;text-underline-offset:5px}
+.art{width:276px;height:259px;overflow:visible;animation:artin .7s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes artin{from{opacity:0;transform:translateY(24px) scale(.94)}}
+
+/* Illustrationen */
+.o{stroke:#13212E;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.ln{fill:none;stroke:#13212E;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.sh{filter:drop-shadow(4px 4px 0 #13212E)}
+.ink{fill:#13212E}
+.st{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;fill:#13212E}
+.fl,.fl2,.fl3,.swing,.drive{transform-box:fill-box;transform-origin:center}
+.fl{animation:float 4s ease-in-out infinite}
+.fl2{animation:float 4.6s ease-in-out .8s infinite}
+.fl3{animation:float 3.6s ease-in-out 1.5s infinite}
+.swing{transform-origin:50% 0;animation:swing 2.4s ease-in-out infinite}
+.drive{animation:drive 2.2s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px) rotate(4deg)}}
+@keyframes swing{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(14deg)}80%{transform:rotate(-12deg)}90%{transform:rotate(6deg)}}
+@keyframes drive{50%{transform:translateX(6px)}}
+
+/* Text und Eingaben */
+.txt{padding:20px 24px 0}
+.kicker{display:inline-block;margin:0 0 8px;padding:2px 12px;border-radius:999px;border:2px solid var(--line);background:var(--k);color:#13212E;font-size:13px;font-weight:800;letter-spacing:.02em;transform:rotate(-2deg)}
+.h1{margin:0;font-weight:800;font-size:29px;line-height:1.04;letter-spacing:-.045em}
+.lead{margin:8px 0 0;font-size:16px;color:var(--muted)}
+.data{padding:16px 24px 0;display:flex;flex-direction:column;gap:10px}
+.lbl{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.input{min-height:54px;box-sizing:border-box;width:100%;border:2px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:3px 3px 0 var(--shadow);padding:0 14px;font-size:21px;font-weight:800;letter-spacing:.06em;color:var(--ink)}
+select.input{font-size:17px;font-weight:700;letter-spacing:0;appearance:none}
+.select{position:relative;display:block;flex:1;min-width:0}
+.select .ic{position:absolute;right:12px;top:17px;pointer-events:none}
+.row{display:flex;gap:10px;align-items:center}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{min-height:56px;display:flex;align-items:center;gap:10px;padding:0 12px;border:2px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:3px 3px 0 var(--shadow);font-weight:800;font-size:17px;letter-spacing:-.01em;text-align:left;transition:transform .15s}
+.tile:nth-child(odd){transform:rotate(-.6deg)}
+.tile:nth-child(even){transform:rotate(.6deg)}
+.tile:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--shadow)}
+.tile .dot{width:28px;height:28px;flex:none;box-sizing:border-box;border-radius:50%;background:var(--c);border:2px solid #13212E;color:#13212E;display:grid;place-items:center}
+.tile.on{background:var(--ink);color:var(--bg);animation:plop .38s cubic-bezier(.3,1.7,.5,1)}
+.c1{--c:#FF8CC0}.c2{--c:#FFD93B}.c3{--c:#5CB8FF}.c4{--c:#A6DB5E}
+.btn{min-height:54px;box-sizing:border-box;border-radius:999px;border:2px solid var(--line);background:var(--surface);box-shadow:3px 3px 0 var(--shadow);padding:0 18px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s;white-space:nowrap}
+.btn.primary{background:var(--primary);color:var(--on-primary)}
+.btn.wide{width:100%}
+.btn.on{background:#A6DB5E;color:#13212E}
+.btn:active,.chip:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--shadow)}
+.chips{display:flex;gap:8px}
+.chip{flex:1;min-height:46px;box-sizing:border-box;padding:0 6px;border-radius:999px;border:2px solid var(--line);background:var(--surface);box-shadow:2px 2px 0 var(--shadow);font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.chip.on{background:var(--ink);color:var(--bg);font-weight:800}
+.hint{margin:0;font-size:15px;padding:9px 12px;border-radius:12px;border:2px solid var(--line);background:#A6DB5E;color:#13212E;animation:plop .38s cubic-bezier(.3,1.7,.5,1)}
+.hint.plain{background:none;color:var(--muted);border-style:dashed;animation:none}
+.small{margin:0;font-size:14px;color:var(--muted)}
+.share{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:8px;background:var(--soft);font-weight:800;color:var(--ink)}
+.swrow{display:flex;align-items:center;gap:12px;padding:10px 8px 10px 16px;border:2px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:3px 3px 0 var(--shadow)}
+.swrow div{flex:1;display:flex;flex-direction:column;line-height:1.25}
+.swrow b{font-size:17px}
+.swrow small{font-size:14px;color:var(--muted)}
+.switch{width:64px;height:44px;border:0;background:none;padding:0;display:grid;place-items:center}
+.track{width:56px;height:32px;border-radius:16px;background:var(--soft);box-shadow:inset 0 1px 3px rgba(0,0,0,.2),0 0 0 2px var(--edge2);position:relative;transition:background .2s}
+.knob{position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;box-sizing:border-box;background:var(--surface);border:2px solid var(--line);transition:transform .32s cubic-bezier(.3,1.6,.5,1)}
+.switch[aria-checked=true] .track{background:#2EC4B6}
+.switch[aria-checked=true] .knob{transform:translateX(24px) rotate(180deg);background:#FFFFFF}
+.sum{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sum button{width:100%;min-height:62px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:6px 12px;border-radius:14px;border:2px solid var(--line);background:var(--surface);box-shadow:2px 2px 0 var(--shadow);text-align:left;line-height:1.2}
+.sum button.open{border-style:dashed;box-shadow:none;background:none}
+.sum span{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.sum b{font-size:15px}
+.foot{margin-top:auto;padding:12px 24px 24px;display:flex;flex-direction:column;gap:2px}
+.later{min-height:44px;border:0;background:none;font-weight:700;color:var(--muted)}
+@keyframes plop{0%{transform:scale(.82)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){.board *{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="{{ boardClass }}">
+  <sc-for list="{{ phones }}" as="p" hint-placeholder-count="6">
+    <div class="col">
+      <p class="caption">{{ p.caption }}</p>
+      <section class="zp {{ p.theme }} {{ p.k }}" aria-label="{{ p.caption }}">
+        <div class="stage">
+          <div class="topbar">
+            <div class="dots" aria-label="Schritt {{ p.num }} von {{ p.total }}"><sc-for list="{{ p.dots }}" as="d" hint-placeholder-count="6"><i class="{{ d }}"></i></sc-for></div>
+            <sc-if value="{{ p.showSkip }}" hint-placeholder-val="{{ true }}"><button class="skip" onClick="{{ p.skip }}">Überspringen</button></sc-if>
+          </div>
+
+          <sc-if value="{{ p.isWelcome }}" hint-placeholder-val="{{ true }}">
+            <svg class="art" viewBox="0 0 320 300" aria-hidden="true">
+              <g class="fl sh"><circle class="o" cx="38" cy="44" r="22" fill="#FF8CC0"></circle><path class="ink" transform="translate(26 32)" d="M12 2a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 14a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM2 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0zM14 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0zM12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10z"></path></g>
+              <g class="fl2 sh"><circle class="o" cx="152" cy="56" r="20" fill="#FFD93B"></circle><path class="ink" transform="translate(141 45) scale(.92)" d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"></path></g>
+              <g class="fl3 sh"><circle class="o" cx="292" cy="128" r="20" fill="#5CB8FF"></circle><path class="ink" transform="translate(281 117) scale(.92)" d="M12 2c4 5 7 8.5 7 12a7 7 0 0 1-14 0c0-3.5 3-7 7-12z"></path></g>
+              <g class="sh">
+                <path class="o" fill="#E3A872" d="M78 152 V138 H96 V150 H108 V138 H126 V150 H138 V138 H156 V150 H168 V138 H186 V150 H198 V138 H216 V152Z"></path>
+                <rect class="o" x="78" y="150" width="140" height="92" fill="#E3A872"></rect>
+                <path class="ink" d="M136 242 V212 a12 12 0 0 1 24 0 V242Z"></path>
+                <rect class="ink" x="98" y="170" width="10" height="16" rx="5"></rect><rect class="ink" x="186" y="170" width="10" height="16" rx="5"></rect>
+                <rect class="o" x="46" y="118" width="44" height="124" rx="4" fill="#F2C089"></rect>
+                <path class="o" fill="#FF7070" d="M40 120 L68 70 L96 120Z"></path>
+                <rect class="ink" x="62" y="140" width="12" height="18" rx="6"></rect>
+                <rect class="o" x="210" y="98" width="42" height="144" fill="#F2C089"></rect>
+                <path class="o" fill="#5CB8FF" d="M204 100 L231 50 L258 100Z"></path>
+                <path class="ln" d="M231 50 V28"></path><path class="o" fill="#FFD93B" d="M231 28 L252 34 L231 41Z"></path>
+                <rect class="ink" x="225" y="122" width="12" height="18" rx="6"></rect><rect class="ink" x="225" y="166" width="12" height="18" rx="6"></rect>
+                <rect class="o" x="6" y="204" width="54" height="50" fill="#FFFFFF"></rect>
+                <path class="o" fill="#B99CFF" d="M0 206 L33 176 L66 206Z"></path>
+                <path class="ln" d="M6 226 H60 M24 204 V254 M42 204 V254 M6 204 L24 226 M60 204 L42 226"></path>
+                <rect class="o" x="252" y="200" width="58" height="54" fill="#FFFFFF"></rect>
+                <path class="o" fill="#FF8CC0" d="M246 202 L281 170 L316 202Z"></path>
+                <path class="ln" d="M252 224 H310 M271 200 V254 M291 200 V254 M252 200 L271 224 M310 200 L291 224"></path>
+              </g>
+              <path class="o" fill="#A6DB5E" d="M14 268 C2 250 40 236 90 236 C130 236 142 244 172 242 C222 238 262 224 300 232 C326 240 320 270 296 274 L36 276 C26 276 18 274 14 268Z"></path>
+              <g transform="translate(128 196) scale(.54)">
+                <circle class="o" cx="60" cy="72" r="40" fill="#FFD93B"></circle>
+                <path class="o" fill="#FF7070" d="M18 58 Q60 40 102 58 L66 12 Q60 5 54 12 Z"></path>
+                <circle class="o" cx="60" cy="11" r="8" fill="#FFFFFF"></circle>
+                <circle class="ink" cx="46" cy="76" r="5"></circle><circle class="ink" cx="74" cy="76" r="5"></circle>
+                <ellipse cx="37" cy="88" rx="7" ry="4.5" fill="#FF8CC0"></ellipse><ellipse cx="83" cy="88" rx="7" ry="4.5" fill="#FF8CC0"></ellipse>
+                <path class="ln" d="M50 90 Q60 99 70 90"></path>
+              </g>
+            </svg>
+          </sc-if>
+
+          <sc-if value="{{ p.isAge }}" hint-placeholder-val="{{ false }}">
+            <svg class="art" viewBox="0 0 320 300" aria-hidden="true">
+              <g class="sh"><rect class="o" x="30" y="22" width="60" height="262" rx="12" fill="#FFD93B"></rect></g>
+              <path class="ln" d="M30 64 H50 M30 94 H42 M30 124 H50 M30 154 H42 M30 184 H50 M30 214 H42 M30 244 H50"></path>
+              <text class="st" x="54" y="69" font-size="13">12 M</text><text class="st" x="56" y="129" font-size="13">9 M</text><text class="st" x="56" y="189" font-size="13">6 M</text><text class="st" x="56" y="249" font-size="13">3 M</text>
+              <g class="fl sh">
+                <circle class="o" cx="104" cy="146" r="25" fill="#FF8CC0"></circle>
+                <circle class="ink" cx="96" cy="144" r="3"></circle><circle class="ink" cx="112" cy="144" r="3"></circle>
+                <path class="ln" d="M96 154 Q104 161 112 154 M103 122 c-2 -7 5 -11 9 -7"></path>
+              </g>
+              <g class="sh" transform="rotate(-4 222 90)">
+                <rect class="o" x="140" y="48" width="164" height="88" rx="14" fill="#FFFFFF"></rect>
+                <path class="o" fill="#A6DB5E" d="M140 76 V62 a14 14 0 0 1 14 -14 h136 a14 14 0 0 1 14 14 V76Z"></path>
+                <text class="st" x="154" y="102" font-size="16">Babymusik</text>
+                <text class="st" x="154" y="122" font-size="13" style="fill:#475563">ab 6 Monaten</text>
+              </g>
+              <g class="fl2"><circle class="o" cx="298" cy="50" r="18" fill="#A6DB5E"></circle><path class="ln" style="stroke-width:3.5" d="M290 50 l6 6 l11 -12"></path></g>
+              <g class="sh" transform="rotate(3 228 204)">
+                <rect class="o" x="146" y="162" width="164" height="88" rx="14" fill="#FFFFFF" stroke-dasharray="7 6"></rect>
+                <path class="o" fill="#FFB13B" d="M146 190 V176 a14 14 0 0 1 14 -14 h136 a14 14 0 0 1 14 14 V190Z"></path>
+                <text class="st" x="160" y="216" font-size="16">Krabbelgruppe</text>
+                <text class="st" x="160" y="236" font-size="13" style="fill:#475563">ab 9 Monaten</text>
+              </g>
+              <g class="fl3"><circle class="o" cx="306" cy="166" r="18" fill="#FFFFFF"></circle><path class="ln" d="M306 156 V166 L313 170"></path></g>
+              <g transform="translate(116 52) scale(.9)"><g class="fl2"><path class="o" fill="#FFFFFF" d="M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z"></path></g></g>
+            </svg>
+          </sc-if>
+
+          <sc-if value="{{ p.isWay }}" hint-placeholder-val="{{ false }}">
+            <svg class="art" viewBox="0 0 320 300" aria-hidden="true">
+              <defs><clipPath id="win"><rect x="58" y="152" width="204" height="42" rx="12"></rect></clipPath></defs>
+              <path class="ln" style="stroke-width:4;stroke-dasharray:1 11" d="M44 82 C110 8 200 118 276 58"></path>
+              <g class="sh"><path class="o" fill="#FFFFFF" d="M18 104 V78 L40 60 L62 78 V104Z"></path><rect class="o" x="34" y="84" width="12" height="20" fill="#FF7070"></rect></g>
+              <g class="fl sh"><circle class="o" cx="282" cy="54" r="24" fill="#FFD93B"></circle><path class="ink" transform="translate(270 42)" d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"></path></g>
+              <path class="ln" d="M6 176 H30 M0 196 H24 M8 216 H30"></path>
+              <g class="drive">
+                <path class="ln" d="M142 140 L160 114 L178 140 M148 114 H172"></path>
+                <g class="sh"><rect class="o" x="40" y="138" width="240" height="94" rx="28" fill="#5CB8FF"></rect></g>
+                <rect class="o" x="58" y="152" width="204" height="42" rx="12" fill="#E8F1FF"></rect>
+                <g clip-path="url(#win)">
+                  <g transform="translate(72 146) scale(.42)">
+                    <circle class="o" cx="60" cy="72" r="40" fill="#FFD93B"></circle>
+                    <path class="o" fill="#FF7070" d="M18 58 Q60 40 102 58 L66 12 Q60 5 54 12 Z"></path>
+                    <circle class="ink" cx="46" cy="76" r="5"></circle><circle class="ink" cx="74" cy="76" r="5"></circle>
+                    <path class="ln" d="M50 90 Q60 99 70 90"></path>
+                  </g>
+                  <path class="o" fill="#FF8CC0" d="M150 196 V180 a18 18 0 0 1 36 0 Z"></path>
+                  <path class="o" fill="#FFFFFF" d="M150 180 h36 v16 h-36z"></path>
+                  <circle class="o" cx="226" cy="170" r="11" fill="#A6DB5E"></circle><path class="ln" d="M226 181 V196"></path>
+                </g>
+                <path class="ln" d="M126 152 V194 M196 152 V194"></path>
+                <rect x="50" y="206" width="220" height="8" fill="#FFFFFF"></rect>
+                <circle class="ink" cx="92" cy="234" r="13"></circle><circle class="ink" cx="228" cy="234" r="13"></circle>
+                <circle cx="92" cy="234" r="4" fill="#FFFFFF"></circle><circle cx="228" cy="234" r="4" fill="#FFFFFF"></circle>
+              </g>
+              <path class="ln" style="stroke-width:4" d="M0 252 H320"></path>
+              <path class="ln" d="M20 252 v8 M60 252 v8 M100 252 v8 M140 252 v8 M180 252 v8 M220 252 v8 M260 252 v8 M300 252 v8"></path>
+              <g transform="rotate(10 266 116)"><g class="fl2 sh"><circle class="o" cx="266" cy="116" r="31" fill="#FFD93B"></circle><text class="st" x="266" y="118" font-size="24" text-anchor="middle">22</text><text class="st" x="266" y="134" font-size="12" text-anchor="middle">Min.</text></g></g>
+            </svg>
+          </sc-if>
+
+          <sc-if value="{{ p.isApp }}" hint-placeholder-val="{{ false }}">
+            <svg class="art" viewBox="0 0 320 300" aria-hidden="true">
+              <g class="sh"><rect class="o" x="86" y="16" width="148" height="270" rx="28" fill="#FFFFFF"></rect></g>
+              <rect x="98" y="38" width="124" height="230" rx="16" fill="#E8F1FF"></rect>
+              <rect class="ink" x="144" y="25" width="32" height="6" rx="3"></rect>
+              <g style="stroke:#13212E;stroke-width:2">
+                <rect x="108" y="52" width="30" height="30" rx="9" fill="#FF8CC0"></rect><rect x="145" y="52" width="30" height="30" rx="9" fill="#5CB8FF"></rect><rect x="182" y="52" width="30" height="30" rx="9" fill="#A6DB5E"></rect>
+                <rect x="108" y="98" width="30" height="30" rx="9" fill="#B99CFF"></rect><rect x="182" y="98" width="30" height="30" rx="9" fill="#2EC4B6"></rect>
+                <rect x="108" y="144" width="30" height="30" rx="9" fill="#FFB13B"></rect><rect x="145" y="144" width="30" height="30" rx="9" fill="#FF7070"></rect><rect x="182" y="144" width="30" height="30" rx="9" fill="#A3BDD0"></rect>
+                <rect x="182" y="190" width="30" height="30" rx="9" fill="#FFD93B"></rect>
+              </g>
+              <rect x="145" y="98" width="30" height="30" rx="9" fill="none" style="stroke:#13212E;stroke-width:2.5;stroke-dasharray:4 4"></rect>
+              <path class="ln" style="stroke-dasharray:2 9" d="M238 112 C222 140 196 134 184 120"></path>
+              <path class="ln" d="M190 112 L182 121 L193 125"></path>
+              <g class="fl sh">
+                <rect class="o" x="234" y="44" width="64" height="64" rx="18" fill="#FFD93B" transform="rotate(12 266 76)"></rect>
+                <g transform="translate(242 50) scale(.42) rotate(12 60 60)">
+                  <circle class="o" cx="60" cy="72" r="40" fill="#FFFFFF"></circle>
+                  <path class="o" fill="#FF7070" d="M18 58 Q60 40 102 58 L66 12 Q60 5 54 12 Z"></path>
+                  <circle class="ink" cx="46" cy="76" r="5"></circle><circle class="ink" cx="74" cy="76" r="5"></circle>
+                  <path class="ln" d="M50 90 Q60 99 70 90"></path>
+                </g>
+              </g>
+              <g transform="translate(286 4) scale(.9)"><g class="fl2"><path class="o" fill="#FFFFFF" d="M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z"></path></g></g>
+              <g transform="translate(-130 10) scale(.7)">
+                <g class="swing">
+                  <path class="o" fill="#FFD93B" d="M232 58 a8 8 0 0 1 16 0 c18 6 24 22 24 40 v18 l10 12 H198 l10 -12 v-18 c0 -18 6 -34 24 -40z"></path>
+                  <circle class="ink" cx="240" cy="138" r="8"></circle>
+                </g>
+                <path class="ln" d="M286 72 q12 16 0 34 M194 72 q-12 16 0 34"></path>
+              </g>
+              <g class="fl3 sh">
+                <rect class="o" x="4" y="204" width="180" height="64" rx="18" fill="#FFFFFF"></rect>
+                <rect class="o" x="15" y="216" width="40" height="40" rx="11" fill="#FFD93B"></rect>
+                <path class="o" fill="#FF7070" d="M23 250 L35 224 L47 250Z"></path>
+                <text class="st" x="64" y="231" font-size="12" style="fill:#475563">Samstag, 10:00</text>
+                <text class="st" x="64" y="251" font-size="15">3 neue Ideen</text>
+              </g>
+            </svg>
+          </sc-if>
+        </div>
+
+        <div class="txt">
+          <p class="kicker">{{ p.kicker }}</p>
+          <h1 class="h1">{{ p.title }}</h1>
+          <p class="lead">{{ p.lead }}</p>
+        </div>
+
+        <div class="data">
+          <sc-if value="{{ p.isWelcome }}" hint-placeholder-val="{{ true }}">
+            <span class="lbl">Eure Stadt</span>
+            <div class="tiles" role="group" aria-label="Stadt">
+              <sc-for list="{{ p.cities }}" as="c" hint-placeholder-count="4"><button class="{{ c.cls }}" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}"><span class="dot {{ c.k }}"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ c.icon }}"></path></svg></span>{{ c.label }}</button></sc-for>
+            </div>
+            <span class="select"><select class="input" aria-label="Weitere Städte" value="{{ p.otherCity }}" onChange="{{ p.setOtherCity }}"><option value="">Weitere Städte …</option><sc-for list="{{ p.moreCities }}" as="m" hint-placeholder-count="2"><option value="{{ m }}">{{ m }}</option></sc-for></select><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span>
+          </sc-if>
+          <sc-if value="{{ p.isAge }}" hint-placeholder-val="{{ false }}">
+            <label class="lbl" for="birth-{{ p.n }}">Geburtsdatum</label>
+            <input id="birth-{{ p.n }}" class="input" type="text" inputmode="numeric" placeholder="TT.MM.JJJJ" value="{{ p.birth }}" onChange="{{ p.setBirth }}">
+            <sc-if value="{{ p.hasAge }}" hint-placeholder-val="{{ false }}"><p class="hint">{{ p.ageHint }}</p></sc-if>
+            <sc-if value="{{ p.noAge }}" hint-placeholder-val="{{ true }}"><p class="small">Bleibt nur auf diesem Gerät.</p></sc-if>
+          </sc-if>
+          <sc-if value="{{ p.isWay }}" hint-placeholder-val="{{ false }}">
+            <div class="row">
+              <button class="{{ p.locCls }}" onClick="{{ p.locate }}"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5z"></path></svg>{{ p.locLabel }}</button>
+              <span class="select"><select class="input" aria-label="Stadtteil" value="{{ p.district }}" onChange="{{ p.setDistrict }}"><option value="">Stadtteil …</option><option>Gostenhof</option><option>Johannis</option><option>St. Leonhard</option><option>Südstadt</option><option>Wöhrd</option></select><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span>
+            </div>
+            <span class="lbl">Höchstens unterwegs</span>
+            <div class="chips" role="group" aria-label="Höchstens unterwegs"><sc-for list="{{ p.limits }}" as="l" hint-placeholder-count="4"><button class="{{ l.cls }}" aria-pressed="{{ l.on }}" onClick="{{ l.pick }}">{{ l.label }}</button></sc-for></div>
+          </sc-if>
+          <sc-if value="{{ p.isApp }}" hint-placeholder-val="{{ false }}">
+            <sc-if value="{{ p.isAndroid }}" hint-placeholder-val="{{ true }}">
+              <button class="{{ p.installCls }}" onClick="{{ p.install }}"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2"></path></svg>{{ p.installLabel }}</button>
+            </sc-if>
+            <sc-if value="{{ p.isIos }}" hint-placeholder-val="{{ false }}">
+              <p class="hint plain" style="color:var(--ink)">Tippe unten auf <span class="share"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 17.5 10H16"></path></svg>Teilen</span> und dann auf „Zum Home-Bildschirm“.</p>
+            </sc-if>
+            <div class="swrow"><div><b>Samstags-Nachricht</b><small>{{ p.pushSub }}</small></div><button class="switch" role="switch" aria-checked="{{ p.pushStr }}" aria-label="Samstags-Nachricht" onClick="{{ p.togglePush }}"><span class="track"><span class="knob"></span></span></button></div>
+            <sc-if value="{{ p.isIos }}" hint-placeholder-val="{{ false }}"><p class="small">Auf dem iPhone klappt die Nachricht nur in der installierten App. Darum frage ich das hier als Erstes.</p></sc-if>
+          </sc-if>
+        </div>
+
+        <div class="foot">
+          <button class="btn primary wide" onClick="{{ p.next }}">{{ p.primaryLabel }}</button>
+          <sc-if value="{{ p.hasLater }}" hint-placeholder-val="{{ true }}"><button class="later" onClick="{{ p.later }}">{{ p.laterLabel }}</button></sc-if>
+        </div>
+      </section>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"layout":{"editor":"enum","options":["Alle Screens","Durchklicken"],"default":"Alle Screens","section":"Ansicht"},"dark":{"editor":"boolean","default":false,"section":"Ansicht"},"device":{"editor":"enum","options":["Android","iPhone"],"default":"Android","section":"Ansicht"},"$preview":{"width":1784,"height":964}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = this.fresh();
+  }
+  fresh() {
+    return { i: 0, city: 'Nürnberg', birth: '', loc: false, district: '', limit: '30 Min.', installed: false, push: false };
+  }
+  parse(t) {
+    const m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*$/.exec(t || '');
+    if (!m) return null;
+    const d = new Date(+m[3], +m[2] - 1, +m[1]);
+    if (d.getDate() !== +m[1] || d > new Date(2026, 9, 11)) return null;
+    return d;
+  }
+  months(b) {
+    const t = new Date(2026, 9, 11);
+    let m = (t.getFullYear() - b.getFullYear()) * 12 + t.getMonth() - b.getMonth();
+    if (t.getDate() < b.getDate()) m--;
+    return m;
+  }
+  renderVals() {
+    const s = this.state;
+    const ios = this.props.device === 'iPhone';
+    const pager = this.props.layout === 'Durchklicken';
+    const order = ios ? ['welcome', 'app', 'age', 'way'] : ['welcome', 'age', 'way', 'app'];
+    const b = this.parse(s.birth);
+    const age = b ? this.months(b) : null;
+    const hasPlace = s.loc || s.district !== '';
+    let count = age !== null ? 192 : 333;
+    if (hasPlace) count = { '20 Min.': 71, '30 Min.': 118, '45 Min.': 164, 'Egal': count }[s.limit];
+
+    let cardDate = 'ab 9 Monaten';
+    let ageHint = '';
+    if (b) {
+      const nine = new Date(b.getFullYear(), b.getMonth() + 9, b.getDate());
+      const dd = String(nine.getDate()).padStart(2, '0') + '.' + String(nine.getMonth() + 1).padStart(2, '0') + '.';
+      const soon = nine > new Date(2026, 9, 11);
+      cardDate = soon ? 'ab 9 Mon. · dabei ab ' + dd : 'ab 9 Monaten · passt';
+      ageHint = (age === 1 ? '1 Monat' : age + ' Monate') + (soon ? '! Die Krabbelgruppe ab 9 Monaten erscheint ab dem ' + dd : '! Ab jetzt siehst du nur, was passt.');
+    }
+
+    const TEXT = {
+      welcome: { k: 'k-yellow', caption: 'Willkommen und Stadt', kicker: 'Willkommen', title: 'Alles für Kinder unter 3 an einem Ort', lead: '333 Babykurse, Krabbelgruppen, Konzerte und Ausflüge von über 70 Anbietern.' },
+      age: { k: 'k-pink', caption: 'Passt zum Alter', kicker: 'Passt zum Alter', title: 'Nur, was zu deinem Zwerg passt', lead: 'Auch bei regelmäßigen Treffs prüfe ich jeden einzelnen Termin.' },
+      way: { k: 'k-blue', caption: 'Erreichbar mit Bus und Bahn', kicker: 'Gut erreichbar', title: 'Nur, was ihr mit Bus und Bahn schafft', lead: 'Fahrzeit nach echtem VGN-Fahrplan, mit höchstens einem Umstieg.' },
+      app: { k: 'k-lila', caption: 'Als App und Samstags-Nachricht', kicker: 'Immer griffbereit', title: 'Ein Tipp, und ich bin da', lead: 'Auf dem Startbildschirm wie eine App. Und samstags um 10 Uhr eine Nachricht, was es Neues für euch gibt.' },
+    };
+    const go = (n) => () => this.setState({ i: Math.min(n, order.length - 1) });
+    // Beispiel-Liste: unterstützte Städte nach Einwohnern; die vier größten als Kacheln, der Rest im Menü
+    const CITIES = ['Düsseldorf', 'Nürnberg', 'Oldenburg', 'Fürth', 'Erlangen', 'Schwabach'];
+    const cities = CITIES.slice(0, 4).map((c, n) => ({
+      label: c, on: String(s.city === c), cls: 'tile' + (s.city === c ? ' on' : ''), k: 'c' + (n + 1),
+      icon: s.city === c ? 'm5 12 5 5 9-10' : '', pick: () => this.setState({ city: c }),
+    }));
+
+    const shared = {
+      theme: this.props.dark ? 'th-dark' : 'th-light',
+      yes: true,
+      isIos: ios, isAndroid: !ios,
+      birth: s.birth,
+      setBirth: (e) => this.setState({ birth: e.target.value }),
+      hasAge: age !== null, noAge: age === null, ageHint, cardDate,
+      locCls: 'btn' + (s.loc ? ' on' : ''),
+      locLabel: s.loc ? 'Gefunden' : 'Standort',
+      locate: () => this.setState({ loc: true, district: '' }),
+      district: s.district,
+      setDistrict: (e) => this.setState({ district: e.target.value, loc: false }),
+      limits: ['20 Min.', '30 Min.', '45 Min.', 'Egal'].map((l) => ({ label: l, on: String(s.limit === l), cls: 'chip' + (s.limit === l ? ' on' : ''), pick: () => this.setState({ limit: l }) })),
+      installCls: 'btn wide' + (s.installed ? ' on' : ''),
+      installLabel: s.installed ? 'Geschafft! Liegt jetzt auf dem Startbildschirm' : 'Zum Startbildschirm hinzufügen',
+      install: () => this.setState({ installed: true }),
+      pushStr: String(s.push),
+      pushSub: s.push ? 'An. Die erste kommt am Samstag.' : 'Aus. Jederzeit änderbar.',
+      togglePush: () => this.setState({ push: !s.push }),
+      cities,
+      moreCities: CITIES.slice(4),
+      otherCity: CITIES.slice(4).includes(s.city) ? s.city : '',
+      setOtherCity: (e) => this.setState({ city: e.target.value || 'Nürnberg' }),
+    };
+
+    const indices = pager ? [Math.min(s.i, order.length - 1)] : order.map((_, n) => n);
+    const phones = indices.map((n) => {
+      const key = order[n];
+      const t = TEXT[key];
+      const last = n === order.length - 1;
+      return Object.assign({}, shared, t, {
+        n,
+        caption: (n + 1) + ' · ' + t.caption,
+        num: n + 1, total: order.length,
+        dots: order.map((_, m) => (m === n ? 'on' : m < n ? 'done' : '')),
+        isWelcome: key === 'welcome', isAge: key === 'age', isWay: key === 'way', isApp: key === 'app',
+        showSkip: true,
+        // im Mockup: Überspringen und der letzte Schritt beginnen von vorn (in der App: zur Liste)
+        skip: () => this.setState(this.fresh()),
+        next: last ? () => this.setState(this.fresh()) : go(n + 1),
+        later: last ? () => this.setState(this.fresh()) : go(n + 1),
+        primaryLabel: key === 'welcome' ? "Los geht's" : last ? 'Zeig mir die ' + count + ' Angebote' : 'Weiter',
+        hasLater: key !== 'welcome',
+        laterLabel: 'Später',
+      });
+    });
+
+    return {
+      boardClass: 'board' + (pager ? ' pager' : '') + (this.props.dark ? ' dark' : ''),
+      phones,
+    };
+  }
+}
+</script>
+</body>
+</html>
