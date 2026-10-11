@@ -7,7 +7,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
-import { ProviderRaw } from "./pipeline/lib/raw.ts";
+import { providerRawIssues } from "./pipeline/lib/raw.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
 
 const source = dataSource();
@@ -47,14 +47,7 @@ function rawIssues(): string[] {
       issues.push(`data/raw/${f}: Lesefehler: ${(e as Error).message}`);
       continue;
     }
-    const r = ProviderRaw.safeParse(raw);
-    if (!r.success) {
-      issues.push(...r.error.issues.map((i) => `data/raw/${f}: ${i.path.join(".") || "(Wurzel)"}: ${i.message}`));
-      continue;
-    }
-    if (!anbieter.has(id)) issues.push(`data/raw/${f}: ${id} ist kein Anbieter im Katalog`);
-    for (const e of [...r.data.events, ...(r.data.pending?.events ?? [])])
-      if (e.providerId !== id) issues.push(`data/raw/${f}: Event „${e.title}“ gehört zu ${e.providerId}`);
+    issues.push(...providerRawIssues(`data/raw/${f}`, id, raw, anbieter));
   }
   return issues;
 }

@@ -8,6 +8,7 @@ import { z } from "zod";
 export const SOURCES = ["stadt-vk", "frankenkids", "evtermine"] as const;
 export const Source = z.enum(SOURCES);
 export type Source = z.infer<typeof Source>;
+export const isSource = (s: string): s is Source => (SOURCES as readonly string[]).includes(s);
 
 export const LocalDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "YYYY-MM-DDTHH:MM erwartet");
 

@@ -109,6 +109,17 @@ export const ProviderRaw = z
   });
 export type ProviderRaw = z.infer<typeof ProviderRaw>;
 
+/** Prüfung einer Datei `data/raw/<id>.json` für `pnpm data:validate` (E13): Schema, Katalog-Anbieter, eigene Events. */
+export function providerRawIssues(label: string, id: string, raw: unknown, anbieter: ReadonlySet<string>): string[] {
+  const r = ProviderRaw.safeParse(raw);
+  if (!r.success) return r.error.issues.map((i) => `${label}: ${i.path.join(".") || "(Wurzel)"}: ${i.message}`);
+  const issues: string[] = [];
+  if (!anbieter.has(id)) issues.push(`${label}: ${id} ist kein Anbieter im Katalog (räumt der nächste Nachtlauf weg)`);
+  for (const e of [...r.data.events, ...(r.data.pending?.events ?? [])])
+    if (e.providerId !== id) issues.push(`${label}: Event „${e.title}“ gehört zu ${e.providerId}`);
+  return issues;
+}
+
 export interface RawContext {
   providers: readonly Provider[];
   /** Anbieter des zugehörigen Pakets – jeder braucht einen Status */

@@ -432,6 +432,35 @@ describe("buildOffers", () => {
     expect(report.failures).toEqual([{ id: "gemeinde-beispiel", reason: "HTTP 503" }]);
   });
 
+  it("aus data/raw: extrahierter Anbieter mit fehler nimmt nur seine Rohdaten, nichts zusätzlich aus dem Vorstand", () => {
+    const { file: prev } = loadFixtures();
+    const { batches, extracted } = batchesFromRaw(
+      {
+        "familientreff-beispiel": ProviderRaw.parse({
+          events: [RawEvent.parse(ev())],
+          inputHash: "a".repeat(64),
+          model: "haiku",
+          changedAt: CHECKED,
+          status: "fehler",
+          reason: "HTTP 503",
+          failingSince: CHECKED,
+          checkedAt: CHECKED,
+          sources: [],
+        }),
+      },
+      providers,
+    );
+    expect([...extracted]).toEqual(["familientreff-beispiel"]);
+    const { file, report } = buildOffers(
+      base({ previous: prev, batches, perProviderStatus: true, extracted, generatedAt: "2026-10-05T06:00:00+02:00" }),
+    );
+    expect(report.errors).toEqual([]);
+    expect(prev.offers.filter((o) => o.providerId === "familientreff-beispiel").length).toBeGreaterThan(1);
+    expect(file?.offers.filter((o) => o.providerId === "familientreff-beispiel").map((o) => o.title)).toEqual([
+      "Offener Krabbeltreff",
+    ]);
+  });
+
   it("fasst einen laufenden Kurs aus zwei gleichrangigen Quellen über den Fensterschlüssel zusammen (Review m3)", () => {
     const kurs = (dates: string[]) =>
       ev({

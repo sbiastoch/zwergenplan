@@ -25,6 +25,12 @@ export interface FetchedProvider {
   text: string;
   /** erlaubte `sourceUrl` (E4): Seiten, Redirect-Ziele, Kandidaten */
   allowedUrls: readonly string[];
+  /** `seiten`: eigene Programmseiten (Kandidaten ergänzen); `kandidaten`: nur Kandidaten (`coveredBy`, `skipCrawl`) */
+  via: "seiten" | "kandidaten";
+  /** Adapter des Sammelkalenders aus `coveredBy` */
+  ownAdapter?: Source;
+  /** Sammelkalender dieses Laufs mit Ausfall oder Teilausfall (Warnungen), mit Grund */
+  adapterIssues: Partial<Record<Source, string>>;
 }
 
 export interface RefreshContext {
@@ -46,6 +52,7 @@ export type RefreshResult =
   | "ausgefallen"
   | "extrahiert"
   | "einbruch"
+  | "leer"
   | "fehler";
 
 export type RefreshPlan = { kind: "keep"; next: ProviderRaw; result: RefreshResult } | { kind: "extract"; key: string };
@@ -73,23 +80,51 @@ function keyOf(ctx: RefreshContext): string {
 /** Sammelkalender, die zur Eingabe beigetragen haben. */
 const sourcesOf = (candidates: readonly Candidate[]): Source[] => [...new Set(candidates.map((c) => c.source))].sort();
 
-/** Angebote zählen nach Ort und Titel: Ein Einzeltermin je Datum ist ein Event je Datum, aber ein Angebot. */
-const unitKey = (e: { venueId: string; title: string }) => `${e.venueId}|${e.title.trim().toLowerCase()}`;
-const eventUnits = (events: readonly RawEvent[]) => new Set(events.map(unitKey)).size;
+/**
+ * Events gezählt wie Angebote in `offers.json` (E5: „alt“ ohne Raw-Datei kommt von dort): `build` zerlegt Einzeltermine
+ * je Datum in eigene Angebote, alles andere ist ein Angebot je Event.
+ */
+const eventUnits = (events: readonly RawEvent[]) =>
+  events.reduce(
+    (n, e) => n + (e.format === "einmalig" && e.schedule.kind === "dates" ? e.schedule.dates.length : 1),
+    0,
+  );
 
-/** Zahl der Angebote eines Anbieters im Vorstand, gezählt wie `eventUnits` (E5: „alt“ ohne Raw-Datei). */
+/** Zahl der Angebote eines Anbieters im Vorstand (E5: „alt“ ohne Raw-Datei). */
 export function offerUnits(offers: readonly Offer[], providerId: string): number {
-  return new Set(offers.filter((o) => o.providerId === providerId).map(unitKey)).size;
+  return offers.filter((o) => o.providerId === providerId).length;
 }
 
-/** `via` setzt der Code (E4): die Quelle des Kandidaten, auf dessen URL das Event verweist; sonst keine. */
+/**
+ * Ausfall eines Sammelkalenders, der zu diesem Anbieter beiträgt (E5: „Adapter ausgefallen, auch teilweise“). Relevant
+ * sind der eigene Adapter (`coveredBy`), die Quellen der Vornacht (`sources`) und die dieses Laufs. Ohne fehlende
+ * Kandidaten bemerkte das sonst niemand: Der Anbieter würde ohne sie neu extrahiert, ihre Angebote fielen weg und
+ * bekämen bei der Rückkehr neue IDs (Arch-Review S2, B1). Ein Anbieter nur mit Kandidaten, dessen Quellen noch
+ * unbekannt sind (`skipCrawl`, erster Lauf), hängt an jedem Adapter.
+ */
+function adapterFailure(ctx: RefreshContext): string | undefined {
+  const { fetched, prev } = ctx;
+  const relevant = new Set<string>([
+    ...(prev?.sources ?? []),
+    ...sourcesOf(fetched.candidates),
+    ...(fetched.ownAdapter ? [fetched.ownAdapter] : []),
+  ]);
+  const any = fetched.via === "kandidaten" && relevant.size === 0;
+  const hit = Object.entries(fetched.adapterIssues)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .find(([s]) => any || relevant.has(s));
+  return hit ? `${hit[0]}: ${hit[1]}` : undefined;
+}
+
+/**
+ * `via` setzt der Code (E4): die Quelle des Kandidaten, dessen `detailUrl` die `sourceUrl` des Events ist; sonst
+ * keine. Nur `sourceUrl` (Herkunft), nicht `url`: Ein Sammelkalender verlinkt oft die Seite des Anbieters.
+ */
 export function assignVia(events: readonly RawEvent[], candidates: readonly Candidate[]): RawEvent[] {
   const byUrl = new Map<string, Source>();
-  for (const c of candidates) {
-    for (const url of [c.detailUrl, c.ticketUrl]) if (url && !byUrl.has(url)) byUrl.set(url, c.source);
-  }
+  for (const c of candidates) if (!byUrl.has(c.detailUrl)) byUrl.set(c.detailUrl, c.source);
   return events.map(({ via: _model, ...e }) => {
-    const via = byUrl.get(e.sourceUrl) ?? byUrl.get(e.url);
+    const via = byUrl.get(e.sourceUrl);
     return via ? { ...e, via } : e;
   });
 }
@@ -120,6 +155,8 @@ export function planRefresh(ctx: RefreshContext): RefreshPlan {
   const { prev, fetched, now } = ctx;
   if (fetched.status === "fehler")
     return { kind: "keep", next: failed(ctx, fetched.reason ?? "Abruf fehlgeschlagen"), result: "ausgefallen" };
+  const down = adapterFailure(ctx);
+  if (down) return { kind: "keep", next: failed(ctx, down), result: "ausgefallen" };
   const key = keyOf(ctx);
   if (prev?.inputHash === key) {
     // Seite unverändert: alte Events bestätigt; ein offenes pending zu einer anderen Eingabe ist hinfällig
@@ -131,8 +168,9 @@ export function planRefresh(ctx: RefreshContext): RefreshPlan {
     return { kind: "keep", next: adopted(ctx, key, model, events), result: "pending-uebernommen" };
   }
   if (fetched.status === "leer") {
-    const r = applyOutcome(ctx, key, { kind: "ok", events: [], model: NO_INPUT_MODEL });
-    if (r.kind === "write") return { kind: "keep", next: r.next, result: r.result };
+    // keine Eingabe, kein Aufruf: bewertet wie eine leere Antwort (der Einbruchschutz gilt auch hier)
+    const r = adopt(ctx, key, NO_INPUT_MODEL, []);
+    return { kind: "keep", next: r.next, result: r.result === "extrahiert" ? "leer" : r.result };
   }
   return { kind: "extract", key };
 }
@@ -140,12 +178,21 @@ export function planRefresh(ctx: RefreshContext): RefreshPlan {
 export function applyOutcome(ctx: RefreshContext, key: string, outcome: ExtractOutcome): RefreshApplied {
   if (outcome.kind === "abort") return { kind: "abort", abort: outcome.abort };
   if (outcome.kind === "fehler") return { kind: "write", next: failed(ctx, outcome.reason), result: "fehler" };
-  const events = assignVia(outcome.events, ctx.fetched.candidates);
+  return { kind: "write", ...adopt(ctx, key, outcome.model, assignVia(outcome.events, ctx.fetched.candidates)) };
+}
+
+/** Neue Events übernehmen oder als Einbruch zurückhalten (E5). */
+function adopt(
+  ctx: RefreshContext,
+  key: string,
+  model: string,
+  events: RawEvent[],
+): { next: ProviderRaw; result: "extrahiert" | "einbruch" } {
   const { prev, now } = ctx;
   const old = prev?.inputHash !== undefined ? eventUnits(prev.events) : ctx.prevOfferCount;
   const fresh = eventUnits(events);
-  if (old >= COLLAPSE_MIN_OLD && (fresh === 0 || fresh < old / 2)) {
-    const pending = { inputHash: key, model: outcome.model, events };
+  if (old >= COLLAPSE_MIN_OLD && fresh < old / 2) {
+    const pending = { inputHash: key, model, events };
     const next: ProviderRaw =
       prev?.inputHash !== undefined
         ? { ...prev, pending }
@@ -158,7 +205,7 @@ export function applyOutcome(ctx: RefreshContext, key: string, outcome: ExtractO
             sources: sourcesOf(ctx.fetched.candidates),
             pending,
           };
-    return { kind: "write", next, result: "einbruch" };
+    return { next, result: "einbruch" };
   }
-  return { kind: "write", next: adopted(ctx, key, outcome.model, events), result: "extrahiert" };
+  return { next: adopted(ctx, key, model, events), result: "extrahiert" };
 }

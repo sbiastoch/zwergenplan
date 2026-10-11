@@ -278,6 +278,10 @@ async function nightly() {
   const budgetMin = Number(process.env["RUN_BUDGET_MIN"] ?? DEFAULT_BUDGET_MIN);
   if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
   const dryRun = values["dry-run"];
+  // Mit dem Platzhalter würde jeder Anbieter `fehler` und offers.json neu gebaut (Arch-Review S2, M2)
+  // TODO(Plan 0032 S2): createExtractor() – danach diese Sperre entfernen
+  if (!dryRun)
+    fail("nightly schreibt nach data/ erst mit dem Extraktor (Plan 0032, Stufe 2 Teil A) – bis dahin --dry-run");
   const r = await runNightly({
     extractor: placeholderExtractor,
     keyParts: placeholderKeyParts,
