@@ -1,6 +1,18 @@
 # Eval-Ergebnisse
 
-Eine Zeile je Lauf von `pnpm eval` über alle Fälle in `evals/cases/` (Plan 0032, E9). Bewertet wird nach dem Expandieren mit der Build-Funktion des Nachtlaufs.
+Ergebnisse der Evals (Plan 0032, E9): Entdecken neuer Anbieter und Extraktion der Termine.
+
+## Entdecken
+
+Eine Zeile je Entdecken-Eval (`pnpm pipeline discover --dry-run --hide …`, Plan 0032, E9): bekannte Anbieter werden für einen Trockenlauf aus dem Katalog ausgeblendet. **Wiedergefunden**: würde aufgenommen. **Gefunden**: wiedergefunden oder als Kandidat bewertet und verworfen (Grund in Klammern). **Falsch aufgenommen**: aufgenommen, nicht ausgeblendet und von Hand als falsch beurteilt; **neu** sind aufgenommene, nicht ausgeblendete und passende Anbieter. Modell `LLM_MODEL_DISCOVER` für Suche und Bewerten, `LLM_MODEL_EXTRACT` für den Ertragsbeweis.
+
+| Datum | Modell | Ausgeblendet | Wiedergefunden | Gefunden | Nicht gefunden | Falsch aufgenommen | Neu | Aufrufe | Kosten (USD, Schätzung) | Dauer | je Anbieter |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2026-10-11 | haiku | 10 | 2 | 6 | 4 | 0 | 1 (donum-vitae-nuernberg) | 46 | $0.81 (Suche $0.74) | 15 Min. | brk-familienzentrum aufgenommen (über die PEKiP-Seite); zoff-harmonie aufgenommen (über das Verzeichnis der kath. Stadtkirche); cvjm-gostenhof-miniclub verworfen (Ertragsbeweis ohne künftigen Termin); djk-eibach, post-sv-nuernberg, schwimmschule-baer-ritterbad verworfen (Kursort ohne Postadresse: Turnhalle bzw. Bad nur mit Namen); die-familienbox, ev-suedstadt-krabbelgruppen, hebamme-elena-paulus, musikfuechse nicht gefunden |
+
+## Extraktion
+
+Eine Zeile je Lauf von `pnpm eval` über alle Fälle in `evals/cases/`. Bewertet wird nach dem Expandieren mit der Build-Funktion des Nachtlaufs. Neue Zeilen hängt `pnpm eval` ans Dateiende; diese Tabelle bleibt deshalb die letzte.
 
 - **Prompt-Hash**: sha256 über Prompt und Antwortschema (`EXTRACT_KEY_PARTS`), 12 Zeichen. `pnpm data:validate` warnt, wenn der aktuelle Hash hier fehlt.
 - **Modell**: `haiku` heißt ohne Fallback (Modell allein); `haiku (Fallback sonnet)` ist die Konfiguration des Nachtlaufs.

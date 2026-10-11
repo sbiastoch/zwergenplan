@@ -1,9 +1,9 @@
 # Plan 0032 – Daten automatisch: Nachtlauf und Entdecken über das Abo
 
-Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 maß eine Nacht (dann Live-Freigabe); Stufe 2 und 3 umgesetzt, Nachtlauf live freigegeben 2026-10-11; Stufe 4 als Code im Modus trocken (Branch `plan-0032-s4b`, „Stufe 4 – Umsetzung“); Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
+Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 maß eine Nacht (dann Live-Freigabe); Stufe 2 und 3 umgesetzt, Nachtlauf live freigegeben 2026-10-11; Stufe 4 als Code im Modus trocken (Branch `plan-0032-s4b`, „Stufe 4 – Umsetzung“); Stufe 5 umgesetzt 2026-10-11 (Branch `plan-0032-s5`, „Stufe 5 – Umsetzung“); offen: zwei Wochen Trockenlauf des Entdeckens und Freigabe `live`, danach Archivierung; Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
-Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird durch ADR 0026 ersetzt), ADR 0022 (stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (vorgeschlagen 2026-10-11, `docs/adr/0026-daten-automatisch.md`, Inhalt nach E14; angenommen mit Stufe 5)
+Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, ersetzt durch ADR 0026), ADR 0022 (stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (`docs/adr/0026-daten-automatisch.md`, Inhalt nach E14; vorgeschlagen 2026-10-11, angenommen 2026-10-11 mit Stufe 5)
 
 ## Anlass
 
@@ -194,7 +194,7 @@ Der Agent hat keine Schreib- oder Shell-Werkzeuge; alles, was er liefert, sind D
 - `expected.json` entsteht aus dem aktuellen Bestand und wird von Hand geprüft (Nutzer sieht 5 Stichproben).
 - `pnpm eval [--model …]` ruft dieselbe Funktion wie der Nachtlauf (`extractProvider`) und bewertet deterministisch (`lib/eval-score.ts`) **nach** dem Expandieren mit derselben Build-Funktion und denselben freien Tagen: Termine über Ort und Beginnzeit 1:1 zuordnen; Recall und Präzision; Feldtreffer für `format`, `availability.status`, `cost`, `registration`, `topics`; Validierungsrate; Kosten und Dauer.
 - Ergebnis als Zeile in `evals/results.md` (Datum, Modell, Hash von Prompt und Schema, Kennzahlen). Kein Gate: Das Eval läuft bei Modell- oder Prompt-Wechsel; CI warnt, wenn für den aktuellen Prompt-Hash keine Zeile existiert. Das frühere Eval-Gate (ADR 0016) ersetzen Validierung, Einbruchschutz und der Vergleich gegen den deployten Stand (E14).
-- **Entdecken-Eval** (Stufe 6): 10 bekannte Anbieter werden für einen Trockenlauf ausgeblendet; gemessen wird, wie viele `discover` wiederfindet und wie viele falsche es aufnehmen würde.
+- **Entdecken-Eval** (Stufe 5): 10 bekannte Anbieter werden für einen Trockenlauf ausgeblendet; gemessen wird, wie viele `discover` wiederfindet und wie viele falsche es aufnehmen würde.
 - Eingefrorene Eingaben liegen im öffentlichen Repo (wie Plan 0015, E9 entschieden).
 
 ### E10 – Bericht
@@ -365,6 +365,37 @@ E7 als Code, Workflow `discover.yml` im Modus `trocken`; der Modus `live` wartet
 - **Region** = Stadt Nürnberg plus direkt angrenzende Orte (bbox in `src/domain/regions.ts` bleibt, z. B. Stein ist in Ordnung). Der Ausschluss von Fürth-Poppenreuth bei musikfuechse bleibt eine bewusste Einzelentscheidung.
 - `discover.yml` läuft wöchentlich im Modus `trocken` (`ENTDECKEN_MODUS` leer); nach zwei Wochen Bericht gibt der Nutzer den Modus `live` frei.
 **Stufe 5 – Abschluss:** Entdecken-Eval, Skill (E11), ADR 0026 angenommen, ADR 0016 auf „ersetzt“, Plan 0015 nach `docs/plans/archiv/` mit `ersetzt durch Plan 0032`, `docs/architecture.md` und `CLAUDE.md` nachgezogen.
+
+### Stufe 5 – Umsetzung (2026-10-11, Branch `plan-0032-s5`)
+
+Umgesetzt, soweit es ohne den Modus `live` des Entdeckens geht. Offen bleiben die zwei Wochen Trockenlauf des Entdeckens (Stufe 4) und die Freigabe `ENTDECKEN_MODUS=live` durch den Nutzer; danach wird der Plan archiviert (Statuszeile bleibt bis dahin `in Umsetzung`).
+
+- **Entdecken-Eval (E9):** `pnpm pipeline discover --dry-run --hide a,b` blendet bekannte Anbieter aus Katalog und Katalogtext aus (`hideProviders`, `removeEntries` in `lib/catalog-yaml.ts`; nur im Trockenlauf, nur `anbieter` der Regionen des Laufs, G3 steigt um ihre Zahl). `hiddenEval` gibt je ausgeblendetem Anbieter den besten Ausgang (aufgenommen, verworfen, nicht bewertet, Vorfilter, nicht gefunden; Treffer wie im Vorfilter über URL oder Host und ähnlichen Namen, bei Aufnahmen auch über den Namen des Eintrags) und listet fremde Aufnahmen zum Beurteilen von Hand; Abschnitt im Bericht, `hidden` in `report.json`.
+- **Lauf** (lokaler Login, Haiku, alle 10 Begriffe; ausgeblendet: brk-familienzentrum, die-familienbox, post-sv-nuernberg, musikfuechse, djk-eibach, ev-suedstadt-krabbelgruppen, hebamme-elena-paulus, zoff-harmonie, cvjm-gostenhof-miniclub, schwimmschule-baer-ritterbad): 67 Kandidaten, 24 im Vorfilter, 32 verworfen, 3 würden aufgenommen; 46 Aufrufe, 15 Min., $0,81 (Suche $0,74). **Wiedergefunden 2 von 10** (brk-familienzentrum über die PEKiP-Seite, zoff-harmonie über das Verzeichnis der kath. Stadtkirche), **gefunden 6 von 10**, **falsch aufgenommen 0**; zusätzlich würde Donum Vitae Nürnberg aufgenommen (wie in den Trockenläufen von Stufe 4, passend). Verworfen: djk-eibach, post-sv-nuernberg und schwimmschule-baer-ritterbad, weil der Kursort (Turnhalle, Bad) auf den Seiten nur mit Namen ohne Postadresse steht; cvjm-gostenhof-miniclub am Ertragsbeweis (kein künftiger Termin). Nicht gefunden: die-familienbox, ev-suedstadt-krabbelgruppen, hebamme-elena-paulus, musikfuechse. Zeile unter „Entdecken“ in `evals/results.md`. Lesart: Das Entdecken ist vorsichtig (keine falsche Aufnahme), aber schwach im Wiederfinden; die größte Lücke sind Orte ohne Postadresse (Restpunkt unten), die zweite die Breite der Websuche.
+- Der erste Bericht des Laufs zählte zoff-harmonie als „nicht gefunden“: Der Fund hieß nach dem Linktext des Verzeichnisses nur „Kinder & Familie“. `hiddenEval` vergleicht Aufnahmen seitdem auch über den Namen des Eintrags (Test); die Zahlen oben sind mit diesem Stand aus `report.json` neu gerechnet.
+- **Skill (E11):** `babyevents-nuernberg` ist ein Wartungsleitfaden: Bericht und Issue sichten, Rücknahme per `git revert` und `abgelehnt` (mit `id` und `publicId`), Katalogpflege mit den offenen Punkten aus S1.2/Stufe 2 (gugelrund 404, sternenhaus-kuf Bot-Schutz, eva-kauper 69 Zeichen, studio-herzschlag eversports, nuebad-flipper Folgetermine), Eval-Fälle (`pnpm eval freeze`), Entdecken-Eval, Modellwechsel (`LLM_MODEL_EXTRACT`, Eval-Lauf, einmal höhere Token-Bremse), Region starten (`discover --bootstrap`), Fahrplan (`pipeline oepnv`), Umstieg auf die API (N-H). `references/paket.md` entfällt, `catalog.md` und `booking-systems.md` ohne alte Befehle.
+- **Entfernter Code** (vorher per grep und knip geprüft; nichts außer dem alten Skill nutzte ihn): `init`, `select`, `candidates fetch|list|keep|add-provider`, `validate-raw`, `build RUN_DIR` und der alte Weg von `publish RUN_DIR` (bleibt für den Nachtlauf), `selectBatches`, `nextBatchFiles`, `lib/draft.ts`, `lib/run.ts`, `providerIdsOf`, die Lauf-Helfer in `io/files.ts`, die Themen-Heuristik in `lib/relevance.ts`, `CandidatesFile`, die validate-raw-Prüfung im post-edit-Hook. Damit ist auch die doppelte Adapter-Schleife von `candidates fetch` neben `io/fetch-inputs.ts` weg (S1.2). Die `publicId` neuer Anbieter vergibt nur noch `pipeline discover` (`nextPublicId`) oder die Meldung von `data:validate`; `candidates add-provider` brauchte nichts mehr, weil das Entdecken Veranstalter aus Sammelkalendern selbst aufnimmt.
+- **ADRs:** ADR 0026 angenommen (Nachtlauf live seit 7bd84f2), ADR 0016 „ersetzt durch ADR 0026“, Verweise in der Statuszeile von ADR 0002, 0003, 0004, 0006, 0022 (Vergabeweg der IDs) und 0024 (`validate-raw` entfällt). Plan 0015 liegt mit `ersetzt durch Plan 0032` im Archiv.
+- **Doku:** `CLAUDE.md` (Stolperfallen, Daten: Datenfluss, `data/raw` und `data/discover` nie von Hand außer `abgelehnt`, IDs über `pipeline nightly` bzw. `pipeline discover`), `docs/architecture.md` (Datenfluss, `refreshProvider` erzeugt den Inhalt von `data/raw`, das Entdecken kopiert nur den Ertragsbeweis (Arch-Review S4, Minor 9), Horizont durch ADR 0026 gedeckt, Entdecken-Eval).
+- **Arch-Review (2026-10-11):** kein Blocker, 2 Major, 6 Minor; eingearbeitet: M1 (nicht bewertete Kandidaten als eigener Ausgang, G3 mit `--hide` angehoben), M2 (ADR 0022 und 0026 zum Vergabeweg), Minor 1–5; Minor 6 (Export `schema/raw-batch.schema.json` ohne Abnehmer) begründet in `docs/architecture.md`, Streichen als Restpunkt. Die Prüfung „nur Regionen des Laufs“ hat keinen Test, weil es heute nur eine Region gibt.
+
+**Restpunkte** (kommen bei der Archivierung nach `docs/ideas.md`):
+
+- Entdecken: Orte ohne Postadresse (Bad, Turnhalle, Gemeindehaus nur mit Namen) verwerfen passende Anbieter; Geocodieren über den Namen samt Ort oder eine Rückfrage im Bericht prüfen (Entdecken-Eval: 3 von 10).
+- Entdecken: Breite der Websuche (4 von 10 bekannten Anbietern nicht gefunden), etwa mehr Suchbegriffe oder Stadtteile; Kosten der Suche im Blick ($0,74 je Lauf).
+- PDF-Funde beim Bewerten werden zweimal abgerufen (erst als Seite, dann für `pdftotext`).
+- Weiterleitungen ohne DNS-Prüfung: ein öffentlicher Name, der auf eine interne Adresse auflöst, kommt durch.
+- Hash über die Eval-Fälle als Spalte in `evals/results.md` (heute deckt der Hash nur Prompt und Schema, nicht `extractMessage` und die Fälle); schmales Modul für `EXTRACT_KEY_PARTS` (`validate-data.ts` zieht `io/llm.ts` mit).
+- Gemeinsamer Ferien-Lader für Extraktor und Eval.
+- Test für `freezeCase`; Test für `io/live.ts`.
+- Entscheid zum reihenfolgefreien Schlüssel (`ORDER_FREE_KEY`) nach einigen Live-Nächten anhand der gesparten Aufrufe.
+- Vergangene Termine vor dem Hash filtern (iCal-Feeds ändern sich täglich, weil alte Termine herausfallen).
+- Teile großer Anbieter parallel extrahieren (fbs-nuernberg 12,5 Min. im Budget von 50 Min.), wenn das Zeitbudget eng wird.
+- Aufteilen: Kalenderseiten mit Tagesüberschriften über mehreren Einträgen (Folgeteil ohne Datum) sind nicht abgedeckt.
+- `LLM_MODEL_EXTRACT` steht in keinem Workflow; ein Modellwechsel ist eine Änderung an `nightly.yml` und `discover.yml`.
+- Export `schema/raw-batch.schema.json` streichen, wenn ihn niemand mehr liest.
+- Adapterabruf zweimal geschrieben: `fetchAggregatorCandidates` (`io/discover.ts`) und die Schleife in `io/fetch-inputs.ts`.
+- WebKit-Flake `e2e/saved.spec.ts:443` („Worker failed to load“), am 2026-10-11 dreimal in der CI.
 
 
 ### Stufe 3 – Trockenlauf und Freigabe (2026-10-11)

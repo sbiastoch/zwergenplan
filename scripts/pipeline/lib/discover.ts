@@ -666,6 +666,10 @@ function matchesProvider(find: Find, p: Provider): boolean {
   return host !== undefined && urlsOf(p).some((u) => hostOf(u) === host) && similarName(find.name, p.name);
 }
 
+/** Aufnahme passt über den Fund oder über den Namen des Eintrags (Funde aus Verzeichnissen heißen oft nur „Kinder & Familie“) */
+const adoptedMatches = (a: Adopted, p: Provider): boolean =>
+  matchesProvider(a.find, p) || matchesProvider({ ...a.find, name: a.name }, p);
+
 /** Wertet einen Lauf mit ausgeblendeten Anbietern aus: je Anbieter der beste Ausgang, dazu fremde Aufnahmen. */
 export function hiddenEval(hidden: readonly Provider[], regions: readonly RegionReport[]): HiddenEval {
   const adopted = regions.flatMap((r) => r.adopted);
@@ -676,7 +680,7 @@ export function hiddenEval(hidden: readonly Provider[], regions: readonly Region
     .sort((a, b) => a.id.localeCompare(b.id))
     .map((p): HiddenOutcome => {
       const base = { id: p.id, name: p.name };
-      const a = adopted.find((x) => matchesProvider(x.find, p));
+      const a = adopted.find((x) => adoptedMatches(x, p));
       if (a) return { ...base, ergebnis: "aufgenommen", url: a.find.url };
       const r = rejected.find((x) => matchesProvider(x.find, p));
       if (r) return { ...base, ergebnis: "verworfen", url: r.find.url, grund: r.grund };
@@ -692,7 +696,7 @@ export function hiddenEval(hidden: readonly Provider[], regions: readonly Region
       if (d) return { ...base, ergebnis: "vorfilter", url: d.find.url, grund: d.grund };
       return { ...base, ergebnis: "nicht gefunden" };
     });
-  const extra = adopted.filter((a) => !hidden.some((p) => matchesProvider(a.find, p)));
+  const extra = adopted.filter((a) => !hidden.some((p) => adoptedMatches(a, p)));
   return { outcomes, extra };
 }
 

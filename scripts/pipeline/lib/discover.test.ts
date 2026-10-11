@@ -665,6 +665,11 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
         adopted: [
           adopted("Turnverein Beispiel", "https://example.org/turnverein/kinder", "turnverein-beispiel"),
           adopted("Krabbelzwerge", "https://krabbelzwerge.example.net/", "krabbelzwerge"),
+          // Fund unter einem Allerweltsnamen (Verzeichnis-Link), der Eintrag trägt den Namen
+          {
+            ...adopted("Kleines Theater Beispiel", "https://example.org/theater/start", "kleines-theater-beispiel"),
+            find: find({ name: "Kinder & Familie", url: "https://example.org/theater/start" }),
+          },
         ],
         rejected: [
           {
@@ -683,7 +688,7 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
     expect(e.outcomes.map((o) => [o.id, o.ergebnis])).toEqual([
       ["familientreff-beispiel", "nicht bewertet"],
       ["musikschule-beispiel", "verworfen"],
-      ["theater-beispiel", "vorfilter"],
+      ["theater-beispiel", "aufgenommen"],
       ["turnverein-beispiel", "aufgenommen"],
     ]);
     expect(e.outcomes.find((o) => o.id === "musikschule-beispiel")).toMatchObject({
@@ -701,7 +706,7 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
       budgetHit: false,
       hidden: e,
     });
-    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(1 von 4 wiedergefunden, 4 gefunden\)/);
+    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(2 von 4 wiedergefunden, 4 gefunden\)/);
     expect(md).toMatch(
       /\| musikschule-beispiel \| verworfen \| https:\/\/example\.org\/musikschule \| ohne Adresse \|/,
     );
