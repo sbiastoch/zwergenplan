@@ -20,7 +20,7 @@ import { mirrorData, usePushSwitch } from "./use-push-switch.ts";
 /** Für den Flow des Onboardings (Plan 0033, E4): Der Lader reicht es als Prop weiter, kein Import aus dem Chunk. */
 export { pushCapability } from "../../data/push.ts";
 
-/** Ende des Onboardings (Plan 0034, E9): mit Abo einmal spiegeln, lokal und ohne Request */
+/** Ende des Onboardings (Plan 0035, E9): mit Abo einmal spiegeln, lokal und ohne Request */
 export function syncPushMirror(): Promise<void> {
   return createPush().mirrorIfSubscribed(mirrorData());
 }

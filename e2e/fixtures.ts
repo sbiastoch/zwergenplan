@@ -59,7 +59,7 @@ interface Options {
  * laden). Für selbst gebaute Kontexte (`browser.newContext()`), die die Fixture-Option nicht erreicht (Plan 0033, E15).
  */
 export async function skipOnboarding(context: BrowserContext) {
-  // Wert aus `e2e/onboarding-flag.ts` (Plan 0034, E6); ein vorhandener alter Wert „1“ bleibt (Test 10c setzt ihn)
+  // Wert aus `e2e/onboarding-flag.ts` (Plan 0035, E6); ein vorhandener alter Wert „1“ bleibt (Test 10c setzt ihn)
   await context.addInitScript(({ key, value }) => {
     try {
       if (localStorage.getItem(key) === null) localStorage.setItem(key, value);

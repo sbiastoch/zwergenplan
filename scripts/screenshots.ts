@@ -198,7 +198,7 @@ for (const vp of viewports) {
       });
       if (isLocal) await mockTiles(context);
       // Onboarding erledigt (Plan 0033, E15): Alle Ansichten außer „onboarding“ zeigen die App, nicht die Einführung.
-      // Schlüssel und Wert aus `e2e/onboarding-flag.ts` (Plan 0034, E6)
+      // Schlüssel und Wert aus `e2e/onboarding-flag.ts` (Plan 0035, E6)
       if (view !== "onboarding")
         await context.addInitScript(({ key, value }) => {
           if (localStorage.getItem(key) === null) localStorage.setItem(key, value);

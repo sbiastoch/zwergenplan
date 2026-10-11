@@ -265,7 +265,7 @@ export function createPush(env: PushEnv = browserEnv()) {
     mirror,
 
     /**
-     * Einmal am Ende des Onboardings (Plan 0034, E9): Mit Abo die Angaben in den Geräte-Speicher spiegeln, sonst nichts.
+     * Einmal am Ende des Onboardings (Plan 0035, E9): Mit Abo die Angaben in den Geräte-Speicher spiegeln, sonst nichts.
      * Anders als `reconcile` kein Request und ohne Abo kein Leeren. Ohne `PushManager` (Safari-Tab) nicht einmal ein
      * Blick auf die Registrierung (Review Runde 2, m5).
      */

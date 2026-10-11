@@ -179,7 +179,7 @@ describe("gemerkte Anbieter: nur die Form (Plan 0025, E1)", () => {
   });
 });
 
-describe("Onboarding-Flag (Plan 0033, E2; Plan 0034, E4)", () => {
+describe("Onboarding-Flag (Plan 0033, E2; Plan 0035, E4)", () => {
   const FLAG = ONBOARDING_FLAG.key;
   let storage: ReturnType<typeof fakeStorage>;
 

@@ -58,7 +58,7 @@
     border-bottom: 3px solid #13212e;
     border-radius: 0 0 50% 50% / 0 0 34px 34px;
   }
-  /* iPhone im Safari-Tab: App-Bühne zuerst (Plan 0034, E8) */
+  /* iPhone im Safari-Tab: App-Bühne zuerst (Plan 0035, E8) */
   .onb-pending.ios {
     background-color: #b99cff;
   }
@@ -492,7 +492,7 @@
     overflow: hidden;
   }
   /*
-   * Onboarding (Nachtrag Plan 0034, 2026-10-11): `overflow: hidden` sperrt nur das Scrollen per Finger, nicht per
+   * Onboarding (Nachtrag Plan 0035, 2026-10-11): `overflow: hidden` sperrt nur das Scrollen per Finger, nicht per
    * Skript. Nach einem Dropdown scrollte der Browser des Handys das Dokument (Fokus-Scroll, iOS beim Picker), der
    * Wizard rutschte weg und die Liste kam darunter hervor. Mit festem body hat das Dokument keine Scrollhöhe mehr.
    * Nur hier: Das Cover verdeckt die Seite ohnehin, bei Sheets und Detail bliebe sonst die Scrollposition nicht stehen.

@@ -75,7 +75,7 @@ test.describe("Test 1: erster Start", () => {
     page,
   }) => {
     test.skip(!ANDROID.includes(test.info().project.name), "Reihenfolge mit App-Schritt zuletzt: Android-Projekte");
-    // Außerhalb des iPhone-Tabs bleibt „App“ zuletzt (Plan 0034, E1); die Kicker-Folge belegt das
+    // Außerhalb des iPhone-Tabs bleibt „App“ zuletzt (Plan 0035, E1); die Kicker-Folge belegt das
     await opened(page);
     await expect(intro(page)).toBeVisible();
     await expect(intro(page).getByRole("button", { name: "Später" })).toHaveCount(0);
@@ -92,7 +92,7 @@ test.describe("Test 1: erster Start", () => {
 test.describe("Test 2: Stadt", () => {
   test("eine Kachel „Nürnberg“, gewählt; Lead mit Zahlen wie die Statuszeile", async ({ page }) => {
     await opened(page);
-    // auf dem iPhone ist Stadt Schritt 2 (Plan 0034, E1)
+    // auf dem iPhone ist Stadt Schritt 2 (Plan 0035, E1)
     await goTo(page, "stadt");
     const city = intro(page).getByRole("group", { name: "Stadt" });
     await expect(city.getByRole("button")).toHaveCount(1);
@@ -282,7 +282,7 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
     await freshPreloads;
     expect(await flag(page)).toBeNull();
 
-    // mit Merkliste (eigener Kontext: eigener Speicher und HTTP-Cache): Onboarding erscheint ebenfalls (Plan 0034, E3)
+    // mit Merkliste (eigener Kontext: eigener Speicher und HTTP-Cache): Onboarding erscheint ebenfalls (Plan 0035, E3)
     const context = await browser.newContext();
     try {
       const other = await context.newPage();
@@ -315,7 +315,7 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
     }
   });
 
-  test("Bestandsnutzer mit Geburtsdatum und Stadtteil sieht es, vorbelegt (Plan 0034, Test 10b)", async ({ page }) => {
+  test("Bestandsnutzer mit Geburtsdatum und Stadtteil sieht es, vorbelegt (Plan 0035, Test 10b)", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem("zwergenplan.geburtsdatum", "2026-04-20");
       localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof");
@@ -343,7 +343,7 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
     expect(await flag(page)).toBe(ONBOARDING_FLAG.value);
   });
 
-  test("altes Flag „1“ (still gesetzt seit ecfccfb): erscheint einmal (Plan 0034, Test 10c)", async ({ page }) => {
+  test("altes Flag „1“ (still gesetzt seit ecfccfb): erscheint einmal (Plan 0035, Test 10c)", async ({ page }) => {
     // nur beim ersten Laden, sonst stünde nach dem Neuladen wieder „1“ (Muster push.spec.ts)
     await page.addInitScript((key) => {
       if (sessionStorage.getItem("__e2eSeeded")) return;
@@ -467,7 +467,7 @@ test.describe("Test 12: Lade- und Fehlerzustand bestehen die Gates", () => {
     });
   }
 
-  /** ungemischte Farbe der ersten Bühne: App (lila) im Safari-Tab des iPhones, sonst Stadt (gelb), Plan 0034, E8 */
+  /** ungemischte Farbe der ersten Bühne: App (lila) im Safari-Tab des iPhones, sonst Stadt (gelb), Plan 0035, E8 */
   const firstStageColor = (project: string) => (project === "iphone-15" ? "185,156,255" : "255,217,59");
 
   for (const scheme of SCHEMES) {
@@ -584,7 +584,7 @@ test.describe("Test 13: Mobile-UX je Schritt", () => {
   for (const scheme of SCHEMES) {
     test(`alle Schritte bestehen die Gates (${scheme.label})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme.colorScheme, reducedMotion: "reduce" });
-      // Seit Plan 0034 macht eine gespeicherte Darstellung keinen Bestandsnutzer mehr: Sie steht vor dem Laden im
+      // Seit Plan 0035 macht eine gespeicherte Darstellung keinen Bestandsnutzer mehr: Sie steht vor dem Laden im
       // Speicher, und das Inline-Skript in index.html setzt `data-theme` vor dem ersten Paint (wie mobile-ux.spec.ts)
       if (scheme.chosenDark)
         await page.addInitScript(() => {
@@ -641,7 +641,7 @@ async function stepTotal(page: Page): Promise<number> {
 const viewWidth = (page: Page) => page.viewportSize()?.width ?? 400;
 
 /**
- * Echte Touch-Geste über CDP (nur Chromium, Plan 0034, E10): `touchStart`, mehrere `touchMove`, `touchEnd`. Prüft, dass
+ * Echte Touch-Geste über CDP (nur Chromium, Plan 0035, E10): `touchStart`, mehrere `touchMove`, `touchEnd`. Prüft, dass
  * mit `touch-action: pan-y pinch-zoom` die horizontale Geste bei der Seite ankommt und eine vertikale scrollt.
  */
 async function touchDrag(page: Page, from: [number, number], to: [number, number]) {
@@ -658,7 +658,7 @@ async function touchDrag(page: Page, from: [number, number], to: [number, number
   await cdp.detach();
 }
 
-test.describe("Test 15: Wischen (Plan 0034, E10, E11)", () => {
+test.describe("Test 15: Wischen (Plan 0035, E10, E11)", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("15a: nach links weiter, nach rechts zurück, Fokus auf der Überschrift; auf Schritt 1 nicht weiter zurück", async ({
@@ -838,7 +838,7 @@ test.describe("Test 14: Vitals beim Erstbesuch", () => {
 });
 
 /**
- * Nachtrag Nutzerfeedback 2026-10-11 (Plan 0034): Nach einem Dropdown scrollte auf dem Handy der Hintergrund, der
+ * Nachtrag Nutzerfeedback 2026-10-11 (Plan 0035): Nach einem Dropdown scrollte auf dem Handy der Hintergrund, der
  * Wizard rutschte weg und die Liste kam darunter hervor. Der native Picker lässt sich in Playwright nicht öffnen; der
  * Test prüft darum die Ursache: Solange das Onboarding offen ist, lässt sich das Dokument auch per Skript (so scrollt
  * der Browser ein fokussiertes Feld ins Bild) nicht scrollen, und der Dialog deckt den Viewport.
@@ -912,7 +912,7 @@ test.describe("Nachtrag 2026-10-11: Dropdown und Standort im Schritt Weg", () =>
     await expect(intro(page).getByText("Dein Standort", { exact: true })).toBeVisible();
     // ermittelter Standort in Worten, offline aus den Stadtteil-Punkten (Punkt 8)
     await expect(intro(page).getByText("nächster Stadtteil: Altstadt", { exact: true })).toBeVisible();
-    // Mobile-UX-Gates für den Zustand „Dein Standort“ (`.onb-origin`), hell und dunkel (Arch-Review Plan 0034, M2)
+    // Mobile-UX-Gates für den Zustand „Dein Standort“ (`.onb-origin`), hell und dunkel (Arch-Review Plan 0035, M2)
     await page.emulateMedia({ reducedMotion: "reduce" });
     const theme = await page.evaluate(() => document.documentElement.dataset["theme"]);
     for (const scheme of SCHEMES) {
@@ -954,7 +954,7 @@ test.describe("Nachtrag 2026-10-11: Dropdown und Standort im Schritt Weg", () =>
     await page.setViewportSize({ width: 320, height: 640 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await context.grantPermissions(["geolocation"]);
-    // Worst Case (Arch-Review Plan 0034, M2): längster Stadtteil-Name und über 1,5 km vom nächsten Stadtteil-Punkt,
+    // Worst Case (Arch-Review Plan 0035, M2): längster Stadtteil-Name und über 1,5 km vom nächsten Stadtteil-Punkt,
     // also mit Entfernung. Im Fixture-Stadtgebiet gibt es so einen Punkt nicht: Nur in diesem Test liegt der letzte
     // Halt der Wegzeit-Tabelle dort, sonst wäre der Standort „außerhalb“ und „Dein Standort“ fehlte.
     const worst = { latitude: 49.413, longitude: 11.009 };

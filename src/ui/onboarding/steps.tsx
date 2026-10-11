@@ -103,7 +103,7 @@ export function AgeStep({
  * Startpunkt und Wegzeit-Grenze (E7). Das Anzeigen des Schritts ist der Wegzeit-Anlass (`want()`), nie die Wahl. Die
  * Minuten-Chips sind gesperrt, solange die Wegzeit nicht wirkt (wie im Filter-Sheet); „Egal“ geht immer.
  * Wirkt ein gefundener Standort, steht statt Knopf und Stadtteil-Auswahl „Dein Standort“ mit „Standort entfernen“
- * (Nachtrag Plan 0034, 2026-10-11); dieselbe Regel wie `OriginPicker` im Kind-Sheet (Plan 0022).
+ * (Nachtrag Plan 0035, 2026-10-11); dieselbe Regel wie `OriginPicker` im Kind-Sheet (Plan 0022).
  */
 export function WayStep({ originApi, transit, filter, setFilter }: OnboardingFlowProps) {
   const { want, mode } = transit;

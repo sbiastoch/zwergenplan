@@ -1,4 +1,4 @@
-# Plan 0034 – Onboarding für Bestandsnutzer, App-Schritt je Plattform, Wischen
+# Plan 0035 – Onboarding für Bestandsnutzer, App-Schritt je Plattform, Wischen
 
 Status: in Umsetzung
 Datum: 2026-10-11
@@ -179,7 +179,7 @@ Ohne Änderung stünde auf dem iPhone im Safari-Tab beim Laden die gelbe Stadt-B
   - Warum nicht `src/domain/pwa.ts`: Das Modul wird zur Laufzeit nur aus `assets/app/` genutzt. Ein Import aus dem Start zöge es samt Installationstexten in den Einstieg. Warum nicht `src/data/pwa-start.ts`: `pwa.ts` müsste es statisch importieren, und `pwa-start.ts` lädt `pwa.ts` per `import()` (Zyklus).
 - **Lader** `src/ui/Onboarding.tsx:59`: `className={iosTab() ? "onb-pending ios" : "onb-pending"}`. Synchron, ohne Zustand; der Wert ändert sich während des Ladens nicht.
 - **Start-CSS** `src/ui/styles/dialog.css`:
-  - `.onb-pending.ios { background-color: #b99cff; }` neben `:53–59` (Kommentar: „iPhone im Safari-Tab: App-Bühne zuerst, Plan 0034, E8“).
+  - `.onb-pending.ios { background-color: #b99cff; }` neben `:53–59` (Kommentar: „iPhone im Safari-Tab: App-Bühne zuerst, Plan 0035, E8“).
   - Dunkel in beiden Blöcken (`:505–507` und `:512–514`): `.onb-pending.ios { background-color: color-mix(in srgb, #b99cff 80%, #0e1620); }`, wie `--mix: 80%` der Bühne im Chunk.
 - **Ausnahme, akzeptiert**: Lädt nur der App-Teil nicht, fehlt der Schritt „App“, und Schritt 1 ist die gelbe Stadt-Bühne nach einer lila Ladebühne. Das ist ein Fehlerfall (Plan 0033, Review H5); ein Farbsprung ist dort hinnehmbar.
 - **Budget**: geschätzt +0,05 bis +0,10 kB `JS (initial)` (Modul `platform.ts`, Klassenwahl im Lader), dagegen −0,03 bis −0,06 kB durch E3/E4 (`hasStoredData`, `SEARCHES_KEY`, Zweig „still-erledigt“). In S1 und S3 messen, Delta in ADR 0012. Liegt `JS (initial)` danach über 101 kB, ist das ein Blocker: dann zuerst den Sparversuch „Klasse per Inline-Ausdruck ohne `isIosDevice`-Export“ messen und den Nutzer fragen, bevor das Budget steigt.
@@ -280,7 +280,7 @@ Entscheidung des Auftraggebers (2026-10-11): Wischen ist eine Geste ohne Alterna
   - **10c** „altes Flag ‚1‘ → erscheint einmal“: Das Init-Skript setzt `ONBOARDING_FLAG.key = "1"` **nur beim ersten Laden**, mit `sessionStorage`-Wächter wie `e2e/push.spec.ts:306–308` (`if (sessionStorage.getItem("__e2eSeeded")) return; sessionStorage.setItem("__e2eSeeded", "1"); …`). Ohne Wächter schriebe es nach dem Neuladen wieder `"1"`, und der Test prüfte nichts. Die Option `"neu"` lässt den Wert stehen. Das Onboarding erscheint. Nach „Überspringen“ ist das Flag `ONBOARDING_FLAG.value`. Nach dem Neuladen kommt kein Onboarding und kein Request auf `assets/onboarding/`.
   - **Deep-Link** (bestehend): unverändert. Zusätzlich mit Flag `"1"` (gleicher Wächter): kein Onboarding, Flag bleibt `"1"`.
 - **Test 12 „leere Bühne in der Farbe der ersten Bühne“** (`:408–432`): läuft wie bisher in allen Projekten, auf `iphone-15` jetzt mit der lila Bühne. Die Gleichheit Ladebühne = Bühne von Schritt 1 bleibt die Kernprüfung. Die Gegenprobe „nicht ungemischt“ wird je Projekt: `255,217,59` auf Android, `185,156,255` auf `iphone-15` (Konstante je Projektname, wie `ANDROID`). Zusätzlich auf `iphone-15`: die Ladebühne trägt die Klasse `ios`, auf `pixel-7` nicht. Der Farbvergleich läuft auf `iphone-15` auch **hell** (Review Runde 2, m3), nicht nur dunkel.
-- **Test 13**: Kommentar `:517–518` neu: Mit Plan 0034 macht eine gespeicherte Darstellung keinen Bestandsnutzer mehr. `chosenDark` setzt deshalb `zwergenplan.darstellung = "dunkel"` per Init-Skript **vor** dem Laden, wie `e2e/mobile-ux.spec.ts:506`; das prüft den echten Weg (Inline-Skript in `index.html` setzt `data-theme` vor dem ersten Paint) statt `page.evaluate` nach dem Öffnen. Die Gates laufen weiter für jeden Schritt, auf `iphone-15` jetzt auch für „App“ als Schritt 1.
+- **Test 13**: Kommentar `:517–518` neu: Mit Plan 0035 macht eine gespeicherte Darstellung keinen Bestandsnutzer mehr. `chosenDark` setzt deshalb `zwergenplan.darstellung = "dunkel"` per Init-Skript **vor** dem Laden, wie `e2e/mobile-ux.spec.ts:506`; das prüft den echten Weg (Inline-Skript in `index.html` setzt `data-theme` vor dem ersten Paint) statt `page.evaluate` nach dem Öffnen. Die Gates laufen weiter für jeden Schritt, auf `iphone-15` jetzt auch für „App“ als Schritt 1.
 - **Test 15 „Wischen“ (neu)**, `reducedMotion: "reduce"` außer in 15f:
   - **15a**: Auf der Bühne nach links wischen → Schritt 2, Überschrift hat den Fokus. Nach rechts → Schritt 1, Fokus auf der Überschrift. Auf Schritt 1 nach rechts → bleibt Schritt 1.
   - **15b**: Auf „alter“ ein ungültiges Datum eintragen, außerhalb des Felds nach links wischen → bleibt auf „alter“, Fokus im Feld, Hinweis steht. Nach rechts zurück und wieder vor: Eingabe steht noch.
@@ -340,30 +340,30 @@ Entscheidung des Auftraggebers (2026-10-11): Wischen ist eine Geste ohne Alterna
 
 ## Doku
 
-- **ADR 0027**: Nachtrag „(2026-10-11): ohne ‚still-erledigt‘, Flag-Version 2, iPhone App zuerst (Plan 0034)“:
+- **ADR 0027**: Nachtrag „(2026-10-11): ohne ‚still-erledigt‘, Flag-Version 2, iPhone App zuerst (Plan 0035)“:
   - Das Gate kennt nur noch „zeigen“/„nichts“, Bestandsnutzer sehen das Onboarding. Damit hängt auch das Erscheinen nicht mehr an gespeicherten Angaben.
   - Erledigt ist nur `"2"`, alle mit `"1"` laden die Chunks beim nächsten Start einmal erneut.
   - Im Safari-Tab des iPhones steht „App“ an Position 1 (Grund: eigener Speicher der installierten App). Die Ladebühne trägt dort die App-Farbe (`iosTab()` aus `src/data/platform.ts`).
   - Der Kontextsatz „rückt ‚App‘ an Position 2“ und die Erwähnung von „still-erledigt“ in Entscheidung 1 gelten als überholt. Der Text oben bleibt stehen.
-- **ADR 0014**: Nachtrag „(2026-10-11, Plan 0034): Am Ende des Onboardings einmal `mirrorIfSubscribed`, lokal, ohne Request“.
-- **ADR 0013**: Nachtrag „(2026-10-11, Plan 0034): `display-mode` auch in `src/data/platform.ts`“: Ausnahme von Punkt 5, nur lesend (`standalone()`), ohne Listener, ohne `beforeinstallprompt` und Registrierung, im Start-Bundle für die Farbe der Ladebühne (E8). Muster ADR 0014, Punkt 6.
+- **ADR 0014**: Nachtrag „(2026-10-11, Plan 0035): Am Ende des Onboardings einmal `mirrorIfSubscribed`, lokal, ohne Request“.
+- **ADR 0013**: Nachtrag „(2026-10-11, Plan 0035): `display-mode` auch in `src/data/platform.ts`“: Ausnahme von Punkt 5, nur lesend (`standalone()`), ohne Listener, ohne `beforeinstallprompt` und Registrierung, im Start-Bundle für die Farbe der Ladebühne (E8). Muster ADR 0014, Punkt 6.
 - **`docs/architecture.md`**:
-  - `:96` PWA-Kern: „der einzige für `beforeinstallprompt` und `display-mode`“ um die zweite Ausnahme ergänzen: `src/data/platform.ts` liest `display-mode` nur lesend, ohne Listener (ADR 0013, Nachtrag 2026-10-11, Plan 0034).
-  - `:118` Push-Unterpunkt („Gespiegelt und abgeglichen wird nur, solange das Kind-Sheet offen ist …“): „und einmal am Ende des Onboardings (`mirrorIfSubscribed`, lokal, ohne Request; Plan 0034, E9)“.
+  - `:96` PWA-Kern: „der einzige für `beforeinstallprompt` und `display-mode`“ um die zweite Ausnahme ergänzen: `src/data/platform.ts` liest `display-mode` nur lesend, ohne Listener (ADR 0013, Nachtrag 2026-10-11, Plan 0035).
+  - `:118` Push-Unterpunkt („Gespiegelt und abgeglichen wird nur, solange das Kind-Sheet offen ist …“): „und einmal am Ende des Onboardings (`mirrorIfSubscribed`, lokal, ohne Request; Plan 0035, E9)“.
   - `:98` Push-Teil: zweite Ausnahme „am Ende des Onboardings einmal `mirrorIfSubscribed` (lokal, kein Request)“; „Gespiegelt und abgeglichen wird, solange das Kind-Sheet offen ist“ um „und einmal am Ende des Onboardings“ ergänzen.
   - `:101` Start: `onboardingGate` ohne „still-erledigt“; `hasStoredData` streichen; `src/data/platform.ts` (`iosTab`, Ladebühne `.onb-pending.ios`) nennen.
   - `:102` Chunk: Wischen (`swipeStep` in `src/domain/onboarding.ts`, Pointer Events auf `.onb-flow`, `touch-action: pan-y pinch-zoom`), Fortschrittspunkte früherer Schritte als Knöpfe (E11).
-  - `:104` Wann: „Vorladen bei jedem Gate ≠ ‚nichts‘“ ohne den Zusatz „auch bei still-erledigt …“, dazu „Bestandsnutzer sehen es einmal, gespeicherte Angaben stehen vorbelegt (Plan 0034)“.
+  - `:104` Wann: „Vorladen bei jedem Gate ≠ ‚nichts‘“ ohne den Zusatz „auch bei still-erledigt …“, dazu „Bestandsnutzer sehen es einmal, gespeicherte Angaben stehen vorbelegt (Plan 0035)“.
   - `:105` E2E: Flag-Schlüssel und -Wert aus `e2e/onboarding-flag.ts` (`ONBOARDING_FLAG`), gekoppelt per Unit-Test in `src/data/preferences.test.ts`; auch `scripts/screenshots.ts` nutzt ihn. Wischen: synthetische Pointer Events in beiden Engines, CDP-Touch nur Chromium.
-  - `:106` Push: „ohne laufendes Spiegeln“ → „ohne laufendes Spiegeln, einmal am Ende (Plan 0034, E9)“.
+  - `:106` Push: „ohne laufendes Spiegeln“ → „ohne laufendes Spiegeln, einmal am Ende (Plan 0035, E9)“.
   - `:132` Privatsphäre:
     - „die Such-Abos (`zwergenplan.such-abos`, `SEARCHES_KEY`)“ → Schlüssel in `src/data/searches-store.ts`.
     - Probe „nur beim Start ohne gültiges Onboarding-Flag“.
     - Flag „Wert `"2"` (`ONBOARDING_VERSION`; `"1"` aus Plan 0033 gilt nicht mehr als erledigt)“.
     - Test-Beleg „mit und ohne gespeicherte Merkliste“ bleibt.
-- **ADR 0012**: Delta-Zeile „Plan 0034“ mit vorher/nachher `JS (initial)` (E8 und E3/E4 gegeneinander), dazu die Lazy-Budgets in Klammern. Die Zeile von Plan 0033 bleibt als Historie.
+- **ADR 0012**: Delta-Zeile „Plan 0035“ mit vorher/nachher `JS (initial)` (E8 und E3/E4 gegeneinander), dazu die Lazy-Budgets in Klammern. Die Zeile von Plan 0033 bleibt als Historie.
 - **`docs/ideas.md`**:
-  - „Onboarding erneut für alle nach großen Änderungen“ entfernen. Der Mechanismus ist mit Plan 0034 umgesetzt (`ONBOARDING_VERSION` erhöhen). Ein Satz unter „Offen aus abgeschlossenen Plänen“ bei Plan 0033 verweist darauf.
+  - „Onboarding erneut für alle nach großen Änderungen“ entfernen. Der Mechanismus ist mit Plan 0035 umgesetzt (`ONBOARDING_VERSION` erhöhen). Ein Satz unter „Offen aus abgeschlossenen Plänen“ bei Plan 0033 verweist darauf.
   - iPhone-Prüfung (Plan 0033): Reihenfolge im Safari-Tab „App → Stadt → Alter → Weg“, Ladebühne lila, Wischen vor/zurück. Die installierte App zeigt „Stadt → Alter → Weg → App“ mit Schalter.
   - Restpunkte Plan 0033: „Onboarding-Version“ aus „stehen oben“ streichen.
   - Neu (nur falls im Browser-Review gewünscht): sichtbarer Knopf „Zurück“ im Onboarding.
@@ -380,7 +380,7 @@ Entscheidung des Auftraggebers (2026-10-11): Wischen ist eine Geste ohne Alterna
 - **Wischen gegen Systemgesten**: Am Bildschirmrand beginnende Gesten (Android-Zurück, Safari-Zurück) gehören dem System; `swipeStep` ignoriert die äußeren 24 px. Android-Zurück schließt den Dialog wie bisher (`cancel` = „Überspringen“). Dass `pointercancel` bei vertikalem Scrollen kommt und die horizontale Geste mit `touch-action: pan-y` bei der Seite ankommt, belegt nur Chromium per CDP (15f); auf WebKit prüft es der Nutzer am echten iPhone (`docs/ideas.md`).
 - **Wischen auf Knöpfen**: Ein Klick nach der Geste würde doppelt navigieren. Ob der Browser ihn auslöst, klärt Test 15e test-first per CDP-Touch; nur wenn ja, kommt die Klick-Unterdrückung (E10). WebKit prüft der Nutzer am echten iPhone.
 - **Kicker-Abhängigkeit in E2E**: `goTo` erkennt Schritte am Kicker. Auf iOS trägt der App-Schritt „Willkommen“, also könnte `goTo(page, "stadt")` fälschlich auf Schritt 1 halten. Gegenmittel (E2): Für „stadt“ prüft `goTo` zusätzlich die Gruppe „Stadt“ (`getByRole("group", { name: "Stadt" })`).
-- **Service-Worker-Cache**: Ein Gerät mit altem App-Stand (vor Plan 0034) wertet `"2"` als erledigt (jeder Wert zählt). Ein Rückfall auf den alten Stand richtet also keinen Schaden an.
+- **Service-Worker-Cache**: Ein Gerät mit altem App-Stand (vor Plan 0035) wertet `"2"` als erledigt (jeder Wert zählt). Ein Rückfall auf den alten Stand richtet also keinen Schaden an.
 - **Lokal kein WebKit**: Test 7, Test 2, Test 12 (Ladebühne) und Test 15 auf `iphone-15` laufen dann nur in der CI. Der Branch-Lauf wählt `onboarding.spec.ts` über den Diff.
 
 ## Offene Punkte
@@ -574,7 +574,7 @@ Verdict: keine Blocker.
 
 - **M1** `docs/architecture.md` beschrieb beim Onboarding noch die Punkt-Knöpfe aus E11. → Ersetzt: „Zurück“ ab Schritt 2 links in der Kopfzeile (`.onb-back`, 44 px), auf Schritt 1 ein unsichtbarer Platzhalter gleicher Breite, Punkte reine Anzeige (`aria-hidden`); am Code geprüft (`OnboardingFlow.tsx`, `onboarding.css`).
 - **M2** Der Zustand „Dein Standort“ (`.onb-origin` in `steps.tsx`) hatte kein Mobile-UX-Gate. → N2 prüft nach „Dein Standort“ `expectMobileUx` in allen drei Darstellungen (`SCHEMES`) und `expectNoBrightIslands` dunkel. Neuer Test „N2: … 320 px und 200 %“ mit dem längsten möglichen Text „nächster Stadtteil: Röthenbach b. Schweinau, ca. 1,8 km“ (Geolocation 49.413/11.009, über 1,5 km vom nächsten Stadtteil-Punkt). Die Fixture-Tabelle hat dort keinen Halt (der Standort wäre „außerhalb“); der Test legt per `page.route` den letzten Halt von `wegzeit.json` auf diesen Punkt. Kind-Sheet: Ansicht `kind-sheet-standort` in `e2e/mobile-ux.spec.ts` (Geolocation 49.45213/11.07672, „Mein Standort (nächster Stadtteil: Altstadt)“).
-- **m1** Budgetzeile fehlte. → ADR 0012, Zeile „Plan 0034, Nachtrag“: Start-JS 100,447 → 100,509 kB (+0,062 kB, gegen 347409f), CSS 12,153 → 12,172 kB.
+- **m1** Budgetzeile fehlte. → ADR 0012, Zeile „Plan 0035, Nachtrag“: Start-JS 100,447 → 100,509 kB (+0,062 kB, gegen 347409f), CSS 12,153 → 12,172 kB.
 - **m2** Fast-Track ohne Plan-Review nicht begründet. → Abschnitt „Warum ohne Plan-Review“ oben.
 - **m3** Zwei Stellen formatierten Entfernungen (`nearestDistrictLabel` und `reachShort`). → `distanceText(meters)` in `src/domain/reach.ts` neben `roundedDistance` ist die einzige Quelle; `format.ts` verliert dabei sein `Intl.NumberFormat` (Start-JS −0,056 kB). Test: `src/domain/reach.test.ts` („distanceText“), dazu unverändert `format.test.ts` (`reachShort`) und `districts.test.ts`.
 - **m4** `docs/ideas.md` nannte noch „Samstags-Nachricht“. → „Wöchentliche Push-Nachricht“; die historische Notiz zu N2 trägt den Hinweis auf den neuen Namen.

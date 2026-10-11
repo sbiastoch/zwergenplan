@@ -136,7 +136,7 @@ describe("roundedDistance", () => {
   });
 });
 
-describe("distanceText (Arch-Review Plan 0034, m3: eine Quelle für die Entfernungsanzeige)", () => {
+describe("distanceText (Arch-Review Plan 0035, m3: eine Quelle für die Entfernungsanzeige)", () => {
   it.each([
     [0, "100 m"],
     [949, "900 m"],

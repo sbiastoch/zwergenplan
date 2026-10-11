@@ -358,7 +358,7 @@ describe("mirror", () => {
   });
 });
 
-describe("mirrorIfSubscribed (Plan 0034, E9): einmal am Ende des Onboardings, ohne Request", () => {
+describe("mirrorIfSubscribed (Plan 0035, E9): einmal am Ende des Onboardings, ohne Request", () => {
   /** zählt Schreibvorgänge in den Geräte-Speicher */
   function counted(f: Fake) {
     const writes: string[] = [];

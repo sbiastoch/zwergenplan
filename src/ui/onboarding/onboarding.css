@@ -15,7 +15,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100%;
-    /* Wischen (Plan 0034, E10): vertikal scrollt der Browser, die horizontale Geste kommt bei der Seite an; Zoomen bleibt */
+    /* Wischen (Plan 0035, E10): vertikal scrollt der Browser, die horizontale Geste kommt bei der Seite an; Zoomen bleibt */
     touch-action: pan-y pinch-zoom;
   }
   .onb-k-stadt {
@@ -51,7 +51,7 @@
   .onb-stage :focus-visible {
     outline-color: #13212e;
   }
-  /* Punkte: reine Anzeige wie im Mockup (Nachtrag Plan 0034, 2026-10-11, ersetzt die Punkt-Knöpfe aus E11) */
+  /* Punkte: reine Anzeige wie im Mockup (Nachtrag Plan 0035, 2026-10-11, ersetzt die Punkt-Knöpfe aus E11) */
   .onb-dots {
     display: flex;
     gap: 6px;
@@ -178,7 +178,7 @@
     display: inline-block;
     margin: 0 0 8px;
     /*
-     * Pille in em statt 999px (Plan 0034): Einzeilig bleibt sie rund; bricht ein langer Kicker („Schön, dass ihr da
+     * Pille in em statt 999px (Plan 0035): Einzeilig bleibt sie rund; bricht ein langer Kicker („Schön, dass ihr da
      * seid“) bei 320 px und 200 % um, stößt der Text nicht an die Rundung (expectTextFits).
      */
     padding: 2px 0.9em;
@@ -235,7 +235,7 @@
     gap: 10px;
     align-items: center;
   }
-  /* gefundener Standort statt Knopf und Stadtteil-Auswahl (Nachtrag Plan 0034, 2026-10-11) */
+  /* gefundener Standort statt Knopf und Stadtteil-Auswahl (Nachtrag Plan 0035, 2026-10-11) */
   .onb-origin {
     flex: 1 1 auto;
     display: flex;
