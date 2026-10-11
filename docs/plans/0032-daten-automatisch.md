@@ -470,6 +470,50 @@ Umgesetzt, soweit es ohne den Modus `live` des Entdeckens geht. Offen bleiben di
   - Minor: Doku in `architecture.md` ergänzt, Kommentar zu `prevOfferCount`.
   - Zweites Review: OK. Eingearbeitet: Feed-URL im Tageshash, datierte Bestandteile ohne Cookie-Zeilenfilter, Hinweise zur Auswertung.
 
+### Einbruch → ein Versuch mit dem Fallback-Modell (2026-10-11, Branch `einbruch-fallback`)
+
+**Anlass:** studio-herzschlag (Katalogpflege 3590995). Haiku antwortet für einen Teil der Eingabe (PEKiP, MusikZauber, SinnesZauber) reproduzierbar mit `{"events": []}`, obwohl die Seiten eindeutige Termine nennen. Der Einbruchschutz (E5) hält den Bestand fest, aber nur eine Nacht. Bei gleicher Eingabe übernimmt die nächste Nacht das `pending` ungeprüft, und der Anbieter fällt auf Haikus Antwort (43 → 2). Eine leere Antwort ist gültig, deshalb wird das Fallback-Modell nie gefragt. Sonnet erfasst denselben Text vollständig (58 Events, etwa 57 ct statt 2 ct).
+
+**Entscheidung (Nutzer, 2026-10-11):**
+- Meldet `applyOutcome` einen Einbruch (`result: "einbruch"`) und war das Fallback-Modell an keinem Aufruf beteiligt (kein `CallRecord` mit `step: "fallback"`), ruft `refreshProvider` den Extraktor ein zweites Mal auf, mit `ExtractInput.strong: true`. Ein Einbruch, bei dem ein Teil schon das Fallback-Modell brauchte, bekommt keinen zweiten Versuch; das ist bewusst in Kauf genommen.
+- Nur mit `mayRetry` in `RefreshOptions`. Der Nachtlauf setzt es, wenn `strongRetry` an ist; die CLI schaltet das ein, wenn Extraktions- und Fallback-Modell verschieden sind (`fallbackModelOf`). `mayRetry()` prüft direkt vor dem zweiten Versuch Zeitbudget und Bremsen, wie die Schleife vor jedem Anbieter (Plan-Review M1, M2). Das Entdecken setzt es nicht: Dort gibt es keinen Vorstand und damit nie einen Einbruch.
+- `strong` heißt: alle Teile nur mit dem Fallback-Modell, ohne weiteren Fallback. Wiederholung bei ungültiger Antwort und Aufteilen bleiben gleich (`runExtractionInParts`).
+- Das zweite Ergebnis läuft durch dieselbe Regel (`applyOutcome`). Damit gibt es drei Fälle:
+  - Kein Einbruch mehr: Die Events werden übernommen.
+  - Wieder ein Einbruch: Der Bestand bleibt, `pending` kommt jetzt vom Fallback-Modell.
+  - `fehler` im zweiten Versuch, oder `mayRetry()` verneint: **unbestätigt** (`unconfirmedCollapse`). Der Bestand bleibt mit `status: fehler` und **ohne** `pending`, der Schlüssel wird nicht gespeichert. Die nächste Nacht extrahiert also neu, statt Haikus Antwort zu übernehmen (Plan-Review B1).
+  - Abbruch des Laufs (`signal`) vor oder im zweiten Versuch: `abgebrochen`, der Anbieter bleibt unverändert.
+- `abort` (Auth, Limit) im zweiten Versuch beendet den Lauf wie sonst auch; der Anbieter bleibt unverändert.
+- Die Aufrufe beider Versuche zählen für Bremse und `kosten.csv`.
+- Die reine Entscheidung liegt in `lib/refresh.ts` (`needsStrongRetry`, `afterStrongRetry`, `unconfirmedCollapse`), der Ablauf in `io/refresh.ts`.
+- **Bestehende `pending` aus Haiku:** Betroffen sind studio-herzschlag und nuebad-flipper. Beide haben seit der Katalogpflege 3590995 einen anderen Schlüssel, ihr `pending` wird also nie übernommen. Eine Migration ist nicht nötig.
+
+**Kosten:** Nur bei Einbrüchen. Ein Anbieter, an dem Haiku dauerhaft scheitert, kostet aber bei **jeder** Änderung seiner Eingabe erneut den Versuch mit Sonnet. Die Events werden unter dem normalen Schlüssel gespeichert, unveränderte Nächte kosten also nichts. Die Aufrufe heißen `fallback` und stehen in `kosten.jsonl`. Steigen die Kosten, ist das ein Fall für die Katalogpflege (Plan-Review M3). In der Nacht vom 11.10. gab es zwei, davon war nuebad-flipper ein Katalogfehler. Ein Versuch mit Sonnet kostet je nach Größe des Anbieters etwa 5–60 ct.
+
+**Tests:**
+- `lib/refresh.test.ts`: `needsStrongRetry` nur bei Einbruch ohne Fallback-Aufruf; `afterStrongRetry` für die Fälle oben.
+- `io/refresh.test.ts` (neu), falscher Extraktor, Temp-Ordner:
+  - Einbruch mit Haiku, dann voll mit `strong`: übernommen, beide Aufrufe gezählt.
+  - Zweiter Versuch `fehler`: Bestand ohne `pending`.
+  - `mayRetry()` verneint: kein Aufruf, Bestand ohne `pending`.
+  - Ohne `mayRetry`: wie bisher, mit `pending`.
+  - Folgenacht nach „unbestätigt“ extrahiert neu (`lib/refresh.test.ts`).
+  - Kein Einbruch: kein zweiter Aufruf.
+- `io/extract.test.ts`: `strong` ruft nur das Fallback-Modell.
+- Lokal: `pnpm verify`, keine E2E-Specs (Pipeline).
+- **Plan-Review** (2026-10-11), „Überarbeiten“, eingearbeitet:
+  - B1: unbestätigter Einbruch ohne `pending`.
+  - M1 und M2: `mayRetry` mit Budget, Bremse und verschiedenen Modellen.
+  - M3: Kosten bei wechselnder Eingabe genannt.
+  - m1–m5: `strong` in `ExtractInput`, Aufrufe beider Versuche in jeder Rückgabe, Entdecken und Erstlauf genannt, lokale Prüfung.
+- **Arch-Review** (2026-10-11), kein Blocker, eingearbeitet:
+  - Major: `unconfirmedCollapse` entfernt auch ein älteres `pending`.
+  - Minor:
+    - `mayRetry(own)` zählt die Aufrufe des ersten Versuchs für die Bremse mit.
+    - Wirft der zweite Versuch, gilt er als unbestätigt, und die Aufrufe bleiben gezählt.
+    - Das Zeitbudget setzt `budgetHit`.
+    - Test für einen Abbruch im zweiten Versuch.
+
 ### Was der Nutzer tun muss
 
 - Secret `CLAUDE_CODE_OAUTH_TOKEN` anlegen (Stufe 1).

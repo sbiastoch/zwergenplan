@@ -87,6 +87,16 @@ describe("createExtractor (Fake-CLI)", () => {
     expect(seen.stdin).toMatch(/^Heute: 2026-10-05\nHorizont: 2026-10-05 bis 2027-10-05\n/);
   });
 
+  it("strong: nur das Fallback-Modell, Aufrufe heißen fallback (Plan 0032, Einbruch → …)", async () => {
+    const c = control([event("Krabbeltreff", "WE")]);
+    const text = `## Seite 1: ${PAGE} (html)\n## TEXT\n${c.line}`;
+    const r = await extractor()({ ...input(text), strong: true }, new AbortController().signal);
+    expect(r.outcome).toMatchObject({ kind: "ok", model: "sonnet" });
+    expect(r.calls.map((x) => [x.step, x.model])).toEqual([["fallback", "sonnet"]]);
+    const seen = c.seen();
+    expect(seen.args[seen.args.indexOf("--model") + 1]).toBe("sonnet");
+  });
+
   it("über der Schwelle: ein Aufruf je Seite, Events vereinigt", async () => {
     const a = control([event("Krabbeltreff", "WE")]);
     const b = control([event("Babymassage", "TH")]);

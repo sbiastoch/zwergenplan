@@ -22,6 +22,11 @@ export interface ExtractInput {
   allowedUrls: readonly string[];
   /** YYYY-MM-DD in Berlin */
   today: string;
+  /**
+   * Nur das Fallback-Modell, ohne weiteren Fallback: zweiter Versuch nach einem Einbruch (Plan 0032, „Einbruch → ein
+   * Versuch mit dem Fallback-Modell“). Die Aufrufe heißen dann `fallback`.
+   */
+  strong?: boolean;
 }
 
 export interface CallRecord {

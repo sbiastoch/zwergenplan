@@ -51,6 +51,11 @@ export interface NightlyOptions {
   /** YYYY-MM-DD, Europe/Berlin */
   today: string;
   concurrency?: number;
+  /**
+   * Nach einem Einbruch ein zweiter Versuch mit dem Fallback-Modell (Plan 0032, „Einbruch → …“); nur sinnvoll, wenn es
+   * ein anderes Modell ist. Standard aus.
+   */
+  strongRetry?: boolean;
   /** für Tests: Abruf und Ferien ohne Netz */
   fetch?: typeof fetchInputs;
   freeDays?: typeof loadFreeDays;
@@ -131,6 +136,18 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
           extractor: o.extractor,
           signal: controller.signal,
           keyParts: o.keyParts,
+          // dieselben Grenzen wie vor jedem Anbieter, jetzt vor dem zweiten Versuch
+          ...(o.strongRetry
+            ? {
+                mayRetry: (own: readonly CallRecord[]) => {
+                  if (elapsedMin() >= o.budgetMin) {
+                    budgetHit = true;
+                    return false;
+                  }
+                  return brakeHit([...calls, ...own], brakes) === undefined;
+                },
+              }
+            : {}),
           today: o.today,
           now: fetchedAt,
           rawDir,

@@ -5,7 +5,15 @@
  */
 import type { Provider } from "../../../src/domain/schema.ts";
 import type { CallRecord, ExtractInput, ExtractKeyParts, Extractor } from "../lib/extract.ts";
-import { applyOutcome, type FetchedProvider, planRefresh, type RefreshResult } from "../lib/refresh.ts";
+import {
+  afterStrongRetry,
+  applyOutcome,
+  type FetchedProvider,
+  needsStrongRetry,
+  planRefresh,
+  type RefreshResult,
+  unconfirmedCollapse,
+} from "../lib/refresh.ts";
 import { RAW_DIR, readRaw, writeRaw } from "./files.ts";
 
 export interface RefreshOptions {
@@ -16,6 +24,11 @@ export interface RefreshOptions {
   extractor: Extractor;
   signal: AbortSignal;
   keyParts: ExtractKeyParts;
+  /**
+   * Darf nach einem Einbruch ein zweiter Versuch mit dem Fallback-Modell laufen (Bremse, Zeitbudget, verschiedene
+   * Modelle)? Ohne Angabe gibt es keinen und der Einbruch wird wie bisher zurückgehalten (Entdecken: nie ein Einbruch).
+   */
+  mayRetry?: (own: readonly CallRecord[]) => boolean;
   /** YYYY-MM-DD, Europe/Berlin */
   today: string;
   /** Abrufzeit mit Offset */
@@ -60,12 +73,33 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
     allowedUrls: o.fetched.allowedUrls,
     today: o.today,
   };
-  const { outcome, calls } = await o.extractor(input, o.signal);
+  const { outcome, calls: first } = await o.extractor(input, o.signal);
+  const calls = [...first];
   // Ein fertiges Ergebnis zählt auch nach dem Abbruch; ein Fehler durch den Abbruch nicht
   if (outcome.kind === "fehler" && o.signal.aborted) return { kind: "abgebrochen", calls };
-  const applied = applyOutcome(ctx, plan.key, outcome);
+  let applied = applyOutcome(ctx, plan.key, outcome);
+  let final = outcome;
+  // Einbruch ohne Fallback-Modell: ein zweiter Versuch nur mit ihm (Plan 0032, „Einbruch → …“)
+  if (o.mayRetry && needsStrongRetry(applied, calls)) {
+    if (o.signal.aborted) return { kind: "abgebrochen", calls };
+    if (!o.mayRetry(calls)) applied = unconfirmedCollapse(ctx, "kein zweiter Versuch: Bremse oder Zeitbudget");
+    else {
+      let retry: Awaited<ReturnType<Extractor>>;
+      try {
+        retry = await o.extractor({ ...input, strong: true }, o.signal);
+      } catch (e) {
+        // die Aufrufe des ersten Versuchs zählen trotzdem (Bremse, kosten.jsonl)
+        if (o.signal.aborted) return { kind: "abgebrochen", calls };
+        retry = { outcome: { kind: "fehler", reason: (e as Error).message }, calls: [] };
+      }
+      calls.push(...retry.calls);
+      if (retry.outcome.kind === "fehler" && o.signal.aborted) return { kind: "abgebrochen", calls };
+      applied = afterStrongRetry(ctx, applyOutcome(ctx, plan.key, retry.outcome));
+      final = retry.outcome;
+    }
+  }
   if (applied.kind === "abort") return { kind: "abort", abort: applied.abort, calls };
   writeRaw(outDir, o.provider.id, applied.next);
-  const warnings = outcome.kind === "ok" ? outcome.warnings : undefined;
+  const warnings = final.kind === "ok" ? final.warnings : undefined;
   return { kind: "done", result: applied.result, called: true, calls, ...(warnings ? { warnings } : {}) };
 }
