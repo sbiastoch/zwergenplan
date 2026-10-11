@@ -209,8 +209,14 @@ export const FULL: readonly RegExp[] = [
 /**
  * Module, die nur Tests importieren (B6.3). Der Wächter prüft, dass sie wirklich nur aus Tests importiert werden.
  * - `src/domain/test-fixtures.ts`: Testdaten der Unit-Tests der Domäne.
+ * - `src/domain/onboarding(-gate).ts`: Domäne des Onboardings, bis Plan 0033, S4 sie an Lader und Flow hängt; dann
+ *   wandern sie zu `e2e/onboarding.spec.ts` (der Wächter meldet den ersten Import außerhalb der Tests).
  */
-export const TEST_ONLY: readonly string[] = ["src/domain/test-fixtures.ts"];
+export const TEST_ONLY: readonly string[] = [
+  "src/domain/test-fixtures.ts",
+  "src/domain/onboarding.ts",
+  "src/domain/onboarding-gate.ts",
+];
 
 /** Ohne E2E, wenn die Hülle keine Spec erreicht (B3). */
 export const NO_E2E: readonly RegExp[] = [

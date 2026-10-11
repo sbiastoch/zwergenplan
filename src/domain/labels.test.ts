@@ -5,6 +5,7 @@ import {
   clock,
   costLabel,
   monthShort,
+  plural,
   registrationLabel,
   timeRange,
   weekdayName,
@@ -18,6 +19,14 @@ const byTitle = (title: string): SiteOffer => {
   if (!offer) throw new Error(`Fixture ${title} fehlt`);
   return offer;
 };
+
+describe("plural (aus src/ui/format.ts verschoben, Plan 0033, E10)", () => {
+  it("Einzahl nur bei genau 1", () => {
+    expect(plural(0, "Monat", "Monate")).toBe("0 Monate");
+    expect(plural(1, "Monat", "Monate")).toBe("1 Monat");
+    expect(plural(3, "Angebot", "Angebote")).toBe("3 Angebote");
+  });
+});
 
 describe("Monatsnamen kurz (Plan 0026, E3, Review m8)", () => {
   it("kürzt nur, wo es üblich ist", () => {

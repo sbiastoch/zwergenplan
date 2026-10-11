@@ -1,6 +1,7 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, gemerkte Anbieter, Darstellung,
- * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017). Nichts davon gelangt in URL,
+ * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
+ * Plan 0033, E2). Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
  */
@@ -11,7 +12,14 @@ const KEYS = {
   theme: "zwergenplan.darstellung",
   originDistrict: "zwergenplan.entfernung-ab",
   originPoint: "zwergenplan.startpunkt",
+  onboarding: "zwergenplan.einfuehrung",
 } as const;
+
+/**
+ * Schlüssel der Such-Abos. Sie liegen im Lazy-Chunk (`searches-store.ts`), der den Namen von hier importiert; so
+ * zählt `hasStoredData` sie auch nach einer Umbenennung (Plan 0033, E2, Arch-Review m2).
+ */
+export const SEARCHES_KEY = "zwergenplan.such-abos";
 
 function read(key: string): string | null {
   try {
@@ -128,4 +136,34 @@ export function saveOrigin(value: string | StoredOriginPoint | undefined): void 
     KEYS.originPoint,
     typeof value === "object" ? JSON.stringify({ source: value.source, lat: value.lat, lon: value.lon }) : undefined,
   );
+}
+
+/** Onboarding erledigt (Plan 0033, E2)? Jeder vorhandene Wert zählt; der Wert ist eine Version für später. */
+export function loadOnboardingDone(): boolean {
+  return read(KEYS.onboarding) !== null;
+}
+
+export function saveOnboardingDone(): void {
+  write(KEYS.onboarding, "1");
+}
+
+/**
+ * Hat dieses Gerät schon Angaben gespeichert (Bestandsnutzer, E2)? Jeder Schlüssel außer dem Flag, dazu die Such-Abos:
+ * Ein Such-Abo geht auch ohne andere Angaben.
+ */
+export function hasStoredData(): boolean {
+  return [...Object.values(KEYS), SEARCHES_KEY].some((key) => key !== KEYS.onboarding && read(key) !== null);
+}
+
+/** Schreib- und Leseprobe (E2, Arch-Review m3): Ohne nutzbaren Speicher käme das Onboarding bei jedem Besuch. */
+export function storageUsable(): boolean {
+  const probe = "zwergenplan.probe";
+  try {
+    localStorage.setItem(probe, "1");
+    const ok = localStorage.getItem(probe) === "1";
+    localStorage.removeItem(probe);
+    return ok;
+  } catch {
+    return false;
+  }
 }

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { createPush, type PushEnv, PushError, type PushRegistration, type PushSub } from "./push.ts";
+import { createPush, type PushEnv, PushError, type PushRegistration, type PushSub, pushCapability } from "./push.ts";
 
 const WORKER = "https://push.example";
 const KEY = "BPUBLIC";
@@ -11,6 +11,8 @@ interface Fake {
   requests: { method: string; url: string; body: unknown }[];
   setSub(endpoint: string | undefined): void;
   sub(): PushSub | undefined;
+  /** `data-sw="aus"`: `start()` endet ohne Registrierung */
+  giveUp(): void;
 }
 
 function fake(
@@ -22,12 +24,22 @@ function fake(
     subscribeFails?: boolean;
     fetchStatus?: number;
     fetchThrows?: boolean;
+    serviceWorker?: boolean;
+    /** `ready` löst nie auf (keine Registrierung, etwa Notausgang oder blockiert) */
+    readyNever?: boolean;
+    /** `data-sw="aus"` steht schon beim Aufruf */
+    gaveUp?: boolean;
   } = {},
 ): Fake {
   const calls: string[] = [];
   const store = new Map<string, unknown>();
   const requests: Fake["requests"] = [];
   let current: PushSub | undefined;
+  let giveUp = () => {};
+  const gaveUp = new Promise<void>((resolve) => {
+    giveUp = resolve;
+  });
+  if (options.gaveUp) giveUp();
   const makeSub = (endpoint: string): PushSub => ({
     endpoint,
     toJSON: () => ({ endpoint, keys: { p256dh: "p", auth: "a" } }),
@@ -51,6 +63,7 @@ function fake(
   const env: PushEnv = {
     workerUrl: WORKER,
     vapidKey: KEY,
+    hasServiceWorker: options.serviceWorker ?? true,
     hasPushManager: options.pushManager ?? true,
     permission: () => ("permission" in options ? options.permission : "default"),
     requestPermission: async () => {
@@ -61,10 +74,11 @@ function fake(
       calls.push("getRegistration");
       return options.registration === false ? undefined : registration;
     },
-    ready: async () => {
+    ready: () => {
       calls.push("ready");
-      return registration;
+      return options.readyNever ? new Promise<PushRegistration>(() => {}) : Promise.resolve(registration);
     },
+    swGivenUp: () => gaveUp,
     fetch: async (url, init) => {
       requests.push({ method: init.method, url, body: JSON.parse(init.body) });
       if (options.fetchThrows) throw new TypeError("offline");
@@ -88,6 +102,7 @@ function fake(
       current = endpoint === undefined ? undefined : makeSub(endpoint);
     },
     sub: () => current,
+    giveUp: () => giveUp(),
   };
 }
 
@@ -109,6 +124,67 @@ describe("support", () => {
     expect(await createPush(fake({ permission: "denied" }).env).support()).toBe("verweigert");
     expect(await createPush(fake({ permission: "granted" }).env).support()).toBe("ok");
     expect(await createPush(fake().env).support()).toBe("ok");
+  });
+});
+
+describe("pushCapability (Plan 0033, E8): ohne Blick auf die Registrierung", () => {
+  it("ohne Service Worker, PushManager oder Notification: nein", () => {
+    expect(pushCapability(fake({ serviceWorker: false }).env)).toBe("nein");
+    expect(pushCapability(fake({ pushManager: false }).env)).toBe("nein");
+    expect(pushCapability(fake({ permission: undefined }).env)).toBe("nein");
+  });
+
+  it("abgelehnt: verweigert; sonst ja, auch ohne Registrierung (Erstbesuch vor load)", () => {
+    expect(pushCapability(fake({ permission: "denied" }).env)).toBe("verweigert");
+    expect(pushCapability(fake({ permission: "granted" }).env)).toBe("ja");
+    const f = fake({ registration: false });
+    expect(pushCapability(f.env)).toBe("ja");
+    expect(f.calls).toEqual([]);
+  });
+});
+
+describe("enable wartet auf ready oder auf data-sw=aus (Plan 0033, E8)", () => {
+  /** Ist das Versprechen nach allen Mikro-Tasks noch offen? */
+  const pending = async (p: Promise<unknown>) => {
+    let done = false;
+    p.then(
+      () => (done = true),
+      () => (done = true),
+    );
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+    return !done;
+  };
+
+  it("(a) ready löst auf: Abo", async () => {
+    const f = fake();
+    await expect(createPush(f.env).enable(DATA)).resolves.toBe("https://web.push.apple.com/neu");
+  });
+
+  it("(b) data-sw=aus steht schon: sofort „abo“, ohne Abo und ohne Request", async () => {
+    const f = fake({ readyNever: true, gaveUp: true });
+    await expect(createPush(f.env).enable(DATA)).rejects.toEqual(new PushError("abo"));
+    expect(f.requests).toEqual([]);
+  });
+
+  it("(c) data-sw=aus kommt später: dann „abo“", async () => {
+    const f = fake({ readyNever: true });
+    const result = createPush(f.env).enable(DATA);
+    expect(await pending(result)).toBe(true);
+    f.giveUp();
+    await expect(result).rejects.toEqual(new PushError("abo"));
+  });
+
+  it("(d) keins von beiden: bleibt offen, kein Zeitlimit", async () => {
+    const f = fake({ readyNever: true });
+    expect(await pending(createPush(f.env).enable(DATA))).toBe(true);
+    expect(f.calls).toEqual(["requestPermission", "ready"]);
+  });
+
+  it("ready gewinnt, data-sw=aus kommt danach: kein unbehandelter Fehler", async () => {
+    const f = fake();
+    await expect(createPush(f.env).enable(DATA)).resolves.toBe("https://web.push.apple.com/neu");
+    f.giveUp();
+    for (let i = 0; i < 5; i++) await Promise.resolve();
   });
 });
 

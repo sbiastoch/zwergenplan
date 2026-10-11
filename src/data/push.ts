@@ -7,7 +7,7 @@
  * Zuschnitt im Service Worker. Die Umgebung ist injizierbar wie in `geolocation.ts`.
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
-import type { PushSupport } from "../domain/pwa.ts";
+import type { PushCapability, PushSupport } from "../domain/pwa.ts";
 import type { DeviceKey } from "./device-store.ts";
 // benannt statt `import * as`: ein Namensraum-Objekt zöge den Export-Helfer von rolldown in den Einstieg (+0,07 kB)
 import { clear, get, set } from "./device-store.ts";
@@ -39,6 +39,8 @@ export interface PushRegistration {
 export interface PushEnv {
   workerUrl: string;
   vapidKey: string;
+  /** `navigator.serviceWorker` da und kein Notausgang (`__SW_OFF__`, Plan 0033, E8, Review M1) */
+  hasServiceWorker: boolean;
   hasPushManager: boolean;
   /** `undefined`: kein `Notification` (Safari-Tab) */
   permission(): NotificationPermission | undefined;
@@ -47,6 +49,11 @@ export interface PushEnv {
   getRegistration(): Promise<PushRegistration | undefined>;
   /** aktiver Worker; nur im Tipp, wenn es eine Registrierung gibt */
   ready(): Promise<PushRegistration>;
+  /**
+   * Löst auf, sobald `start()` in `pwa.ts` ohne Registrierung geendet hat (`data-sw="aus"` auf `<html>`), sofort, wenn
+   * es schon steht. Dann käme `ready` nie (Plan 0033, E8).
+   */
+  swGivenUp(): Promise<void>;
   fetch(url: string, init: { method: string; body: string }): Promise<{ ok: boolean; status: number }>;
   store: {
     get(key: DeviceKey): Promise<unknown>;
@@ -63,11 +70,27 @@ export interface MirrorData {
   origin: string | StoredOriginPoint | undefined;
 }
 
+/** `data-sw="aus"` (gesetzt von `start()` in `pwa.ts`) beobachten; Kanal in docs/architecture.md (App-Extras) */
+function swGivenUp(): Promise<void> {
+  const root = document.documentElement;
+  const off = () => root.dataset["sw"] === "aus";
+  return new Promise((resolve) => {
+    if (off()) return resolve();
+    const observer = new MutationObserver(() => {
+      if (!off()) return;
+      observer.disconnect();
+      resolve();
+    });
+    observer.observe(root, { attributes: true, attributeFilter: ["data-sw"] });
+  });
+}
+
 function browserEnv(): PushEnv {
   const sw = typeof navigator === "undefined" ? undefined : navigator.serviceWorker;
   return {
     workerUrl: PUSH_WORKER_URL,
     vapidKey: VAPID_PUBLIC_KEY,
+    hasServiceWorker: sw !== undefined && !__SW_OFF__,
     hasPushManager: typeof PushManager !== "undefined",
     permission: () => (typeof Notification === "undefined" ? undefined : Notification.permission),
     requestPermission: () => Notification.requestPermission(),
@@ -76,6 +99,7 @@ function browserEnv(): PushEnv {
       if (!sw) throw new PushError("abo");
       return sw.ready;
     },
+    swGivenUp,
     fetch: (url, init) => fetch(url, { ...init, headers: { "content-type": "application/json" } }),
     store: { get, set, clear },
   };
@@ -87,6 +111,17 @@ async function sha256Hex(text: string): Promise<string> {
 }
 
 const MIRRORED = ["birthDate", "searches", "origin"] as const;
+
+/**
+ * Kann dieses Gerät Push (Plan 0033, E1, E8)? Für den App-Schritt des Onboardings. Anders als `support()` ohne Blick auf
+ * die Registrierung: Beim Erstbesuch kommt sie erst nach `load`, `support()` sagte dann `kein-sw`. Ohne Registrierung
+ * wartet `enable` ohnehin auf `ready` bzw. `data-sw="aus"`.
+ */
+export function pushCapability(env: PushEnv = browserEnv()): PushCapability {
+  const permission = env.permission();
+  if (!env.hasServiceWorker || !env.hasPushManager || permission === undefined) return "nein";
+  return permission === "denied" ? "verweigert" : "ja";
+}
 
 export function createPush(env: PushEnv = browserEnv()) {
   /** zuletzt geschriebene Werte als JSON-Text; leer heißt: beim nächsten Mal alles schreiben */
@@ -147,13 +182,20 @@ export function createPush(env: PushEnv = browserEnv()) {
 
     /**
      * Einschalten auf Tipp. `requestPermission` muss das erste `await` im Tipp-Handler sein, sonst verliert iOS die
-     * Nutzeraktivierung (Plan 0011, E12). Erst danach auf den aktiven Worker warten (`subscribe` braucht ihn).
+     * Nutzeraktivierung (Plan 0011, E12). Erst danach auf den aktiven Worker warten (`subscribe` braucht ihn). Endet
+     * `start()` ohne Registrierung (`data-sw="aus"`), käme `ready` nie: dann „abo“. Ein festes Zeitlimit gibt es nicht,
+     * es träfe den langsamen Erstbesuch (Plan 0033, E8).
      */
     async enable(data: MirrorData): Promise<string> {
       if ((await env.requestPermission()) !== "granted") throw new PushError("verweigert");
       let sub: PushSub;
       try {
-        sub = await (await env.ready()).pushManager.subscribe({
+        // `reject` statt eines geworfenen Fehlers in `then`: Gewinnt `ready`, bleibt kein unbehandelter Fehler zurück
+        const givenUp = new Promise<never>((_, reject) => {
+          void env.swGivenUp().then(() => reject(new PushError("abo")));
+        });
+        const registration = await Promise.race([env.ready(), givenUp]);
+        sub = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: env.vapidKey,
         });

@@ -189,6 +189,7 @@ Regeln:
 - `Region` bekommt `population: number` (Einwohner, auf Tausend gerundet; Quelle und Stichtag im Kommentar, beim Umsetzen beim Bayerischen Landesamt für Statistik nachschlagen, nie schätzen). `REGIONS.nuernberg.population` wird gesetzt, `regions.test.ts` prüft `population > 0`.
   - Keine Schemaänderung: `schema.ts` liest nur `REGION_IDS` und `bbox`, `schema/*.json` bleibt gleich.
   - Das weicht von ADR 0025, Punkt 1 ab (Feld vor der zweiten Region). Der Nachtrag in ADR 0025 nennt das offen: Nutzerwunsch „sortiert nach den größten Städten“ (abgelehntes Review-L6); der Kopfkommentar von `regions.ts` wird mitgeändert (Arch-Review m1).
+  - Umsetzung (S1): 527 000 aus 526 606 Einwohnern am 31.12.2023 (Fortschreibung auf Basis Zensus 2022, Bayerisches Landesamt für Statistik, „Statistik kommunal 2024“, Nürnberg 09564, Tabelle 1); der Test prüft zusätzlich die Rundung auf Tausend.
 - `cityChoices<K extends string>(regions: Readonly<Record<K, Region>>, maxTiles = 4): { tiles: { id: K; name: string }[]; more: { id: K; name: string }[] }` (generisch, damit der Test sechs Fake-Regionen ohne Cast nutzt): absteigend nach `population`, Gleichstand nach `name` (`localeCompare(…, "de")`), die ersten `maxTiles` als Kacheln, der Rest im Dropdown.
 - Heute eine Kachel „Nürnberg“, `aria-pressed="true"`, kein Dropdown (`more.length === 0` → nicht gerendert). Kacheln stehen in `role="group" aria-label="Stadt"`, das Dropdown hat `aria-label="Weitere Städte"` mit Leer-Option „Weitere Städte …“.
 - **Nichts speichern**, solange es eine Region gibt. Die Wahl lebt nur im Zustand des Flows. Speichern kommt mit der zweiten Region und deren Daten (`docs/ideas.md`).
@@ -251,6 +252,8 @@ Regeln:
   - `pushCapability` liefert `nein`, wenn der Notausgang aktiv ist (`__SW_OFF__`): Dort gibt es nie einen Service Worker, eine Erlaubnisfrage brächte nichts (Review M1).
   - Zeitlimit (Review M1): Beim Erstbesuch kann die Installation des Service Workers auf langsamem Netz (Start-JS und `site.json` in den Cache) länger als 10 s dauern; ein festes Zeitlimit träfe dann echte Nutzer. Direkt nach `load` gibt es beim Erstbesuch noch keine Registrierung (`pwa-start.ts:20–21` importiert erst, dann `start()` → `register()`), ein Blick auf `getRegistration()` träfe also genau den langsamen Erstbesuch (Review 2, M-3). Deshalb (Arch-Review M1, m5): `start()` setzt ein **eigenes** Attribut `document.documentElement.dataset.sw = "aus"`, wenn es **ohne** Registrierung endet (Notausgang, `register()` gescheitert oder blockiert). `data-pwa` behält allein die Bedeutung „bereit“ (darauf warten `installieren.spec.ts:44`, `push.spec.ts:445`, `pwa.spec.ts:215, 252, 306`). `PushEnv.swGivenUp(): Promise<void>` löst auf, sobald `data-sw="aus"` steht (sofort, wenn es schon steht, sonst per `MutationObserver` auf das Attribut). `enable` wartet auf `Promise.race([ready, swGivenUp().then(() => { throw new PushError("abo") })])`. Ein festes Zeitlimit gibt es nicht. Der Kanal `pwa.ts` → `push.ts` über `data-sw` steht in `docs/architecture.md` (App-Extras), `start()` bekommt einen Unit-Test dafür.
 
+- Umsetzung (S2): Das Setzen von `data-sw="aus"` läuft über `PwaEnv.markNoWorker()` (injizierbar wie `markReady`). Statt eines Zeitlimits gibt es nur das `Promise.race`; das Rennen nutzt `reject` statt eines Wurfs in `then`, damit nach gewonnenem `ready` kein unbehandelter Fehler bleibt (eigener Testfall).
+
 ### E9 – Knöpfe und Abschluss
 
 - `primaryLabel(index, total, finish: { count: number; pending: boolean }): string`:
@@ -283,6 +286,8 @@ Regeln:
   - `0` → „Neugeboren!“, sonst `plural(months, "Monat", "Monate") + "!"`
   - Mit `next` folgt „ Treffs ab {next.months} Monaten zeige ich dir mit Terminen ab dem {T.M.}.“ (Datum wie `dayDots`, ohne führende Null), sonst „ Ab jetzt siehst du nur, was passt.“
   - `plural` zieht von `src/ui/format.ts` nach `src/domain/labels.ts` um; `format.ts` exportiert es weiter (keine zweite Kopie; Arch-Review m4).
+
+- Umsetzung (S1): Die festen Texte des Flows (Labels, „Später“, „Überspringen“, Namensnennung) stehen in `ONBOARDING_TEXTS`, der Vorlesetext „Schritt n von m: “ in `stepOf(index, total)`. Weitere Texte (Platzhalter, Standort-Knopf) ergänzt S5 dort, sobald sie genutzt werden (knip).
 
 ### E11 – Gestaltung (Chunk-CSS `onboarding.css`, alles in `@layer components`)
 

@@ -11,8 +11,7 @@
  */
 import { type RefObject, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { createPush } from "../../data/push.ts";
-import type { InstallApi } from "../../data/pwa.ts";
-import { installFoot, installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
+import { type InstallApi, installFoot, installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
 import { PushControls } from "./PushControls.tsx";
 
 /** Teilen-Symbol von iOS (Kasten mit Pfeil nach oben). Nur hier gebraucht, deshalb nicht in icons.tsx (Start-Bundle). */

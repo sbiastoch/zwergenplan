@@ -13,6 +13,14 @@ describe("REGIONS (Plan 0031, E1)", () => {
     }
   });
 
+  it("hat für jede ID eine Einwohnerzahl, auf Tausend gerundet (Plan 0033, E5)", () => {
+    for (const id of REGION_IDS) {
+      const { population } = REGIONS[id];
+      expect(population).toBeGreaterThan(0);
+      expect(population % 1000).toBe(0);
+    }
+  });
+
   it("Nürnberg: Hauptmarkt liegt drin, Düsseldorf nicht", () => {
     const { bbox } = REGIONS.nuernberg;
     expect(inBounds({ lat: 49.4539, lon: 11.0775 }, bbox)).toBe(true);

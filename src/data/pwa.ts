@@ -8,7 +8,7 @@
  * wartet deshalb nie auf `ready`: Ohne Registrierung lädt ein Frische-Anlass nur die Daten neu.
  */
 
-import type { InstallState } from "../domain/pwa.ts";
+import type { InstallApi, InstallState } from "../domain/pwa.ts";
 
 /** Ab so alter Antwort holt die Rückkehr zur App einen neuen Stand (E4a) */
 export const FRESH_AFTER_MS = 30 * 60_000;
@@ -64,6 +64,11 @@ export interface PwaEnv {
   reload: () => void;
   /** `data-pwa="bereit"` auf `<html>`: Ab jetzt hört die Seite auf `beforeinstallprompt` (E6) */
   markReady: () => void;
+  /**
+   * `data-sw="aus"` auf `<html>`: `start()` endet ohne Registrierung (Notausgang, blockiert, gescheitert). Darauf wartet
+   * `enable` in `push.ts` statt mit Zeitlimit (Plan 0033, E8). Eigenes Attribut, `data-pwa` heißt weiter nur „bereit“.
+   */
+  markNoWorker: () => void;
 }
 
 function browserEnv(): PwaEnv {
@@ -91,6 +96,9 @@ function browserEnv(): PwaEnv {
     markReady: () => {
       document.documentElement.dataset["pwa"] = "bereit";
     },
+    markNoWorker: () => {
+      document.documentElement.dataset["sw"] = "aus";
+    },
   };
 }
 
@@ -107,6 +115,7 @@ export async function start(hooks: PwaHooks, env: PwaEnv = browserEnv()): Promis
     if (isIcsOffline(data)) hooks.say(ICS_OFFLINE);
   });
   const registration = await env.register().catch(() => undefined);
+  if (!registration) env.markNoWorker();
   return watchFreshness(hooks, env, registration);
 }
 
@@ -299,13 +308,7 @@ function browserInstallEnv(): InstallEnv {
  */
 const store = typeof window === "undefined" ? undefined : createInstallStore(browserInstallEnv());
 
-/** Installationszustand für den Abschnitt „Als App“ und den Fuß des Kind-Sheets (`useSyncExternalStore`, Tipp auf den Knopf) */
-export interface InstallApi {
-  state: () => InstallState;
-  subscribe: (onChange: () => void) => () => void;
-  prompt: () => Promise<void>;
-}
-
+/** Installationszustand (`InstallApi` in `src/domain/pwa.ts`, Plan 0033, E4) */
 export const install: InstallApi = {
   state: () => store?.state() ?? "keine",
   subscribe: (fn) => store?.subscribe(fn) ?? (() => {}),

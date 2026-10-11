@@ -14,6 +14,17 @@
  */
 export type InstallState = "app" | "angebot" | "installiert" | "menue" | "ios" | "keine";
 
+/**
+ * Installationszustand für den Abschnitt „Als App“, den Fuß des Kind-Sheets und den App-Schritt des Onboardings
+ * (`useSyncExternalStore`, Tipp auf den Knopf). Umgesetzt von `install` in `src/data/pwa.ts`; der Typ steht hier, weil
+ * `src/ui` auch Typen nicht aus dem Lazy-Chunk importieren darf (Regel `app-data-only-lazy`, Plan 0033, E4, Review H2).
+ */
+export interface InstallApi {
+  state: () => InstallState;
+  subscribe: (onChange: () => void) => () => void;
+  prompt: () => Promise<void>;
+}
+
 export type InstallHelp =
   | { kind: "text"; text: string }
   /** „Tippe auf [Teilen-Symbol] Teilen und dann auf …“; das Symbol setzt die Oberfläche zwischen `before` und `share` */
@@ -67,6 +78,13 @@ export function installFoot(state: InstallState): InstallFoot | undefined {
  * Erstbesuch vor der Registrierung, Notausgang), nicht „Browser kann nicht“ (Plan 0017, Runde 3 M1).
  */
 export type PushSupport = "ok" | "kein-sw" | "kein-push" | "verweigert";
+
+/**
+ * Kann dieses Gerät Push überhaupt (Plan 0033, E1, E8)? Anders als `PushSupport` ohne Blick auf eine Registrierung:
+ * Beim Erstbesuch kommt sie erst nach `load`. `nein`: kein Service Worker, kein `PushManager`, kein `Notification` oder
+ * der Notausgang ist aktiv. Ermittelt von `pushCapability()` in `src/data/push.ts`.
+ */
+export type PushCapability = "ja" | "verweigert" | "nein";
 
 export type PushView = { kind: "teil" } | { kind: "hinweis"; text: string } | { kind: "nichts" };
 

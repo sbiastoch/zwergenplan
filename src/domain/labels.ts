@@ -39,6 +39,11 @@ const MONTHS_SHORT = [
   "Dez.",
 ] as const;
 
+/** „1 Angebot“ / „3 Angebote“ (aus src/ui/format.ts hierher, damit auch die Onboarding-Domäne es nutzt; Plan 0033) */
+export function plural(n: number, one: string, many: string): string {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
 /** „Mittwoch“ für ISO-Wochentag 3 */
 export function weekdayName(isoWeekdayNumber: number): string {
   return WEEKDAYS[isoWeekdayNumber - 1] ?? "";

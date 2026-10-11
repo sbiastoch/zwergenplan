@@ -8,7 +8,7 @@ import { fittingSessions } from "../domain/age.ts";
 import { courseProgress, rhythm, uniformTimes, upcomingSessions, weekDays } from "../domain/agenda.ts";
 import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange } from "../domain/date-range.ts";
-import { MONTHS, monthShort, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
+import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
 import {
   type Origin,
   type Reach,
@@ -31,6 +31,7 @@ export {
   availabilityLabel,
   clock,
   costLabel,
+  plural,
   registrationLabel,
   timeRange,
 } from "../domain/labels.ts";
@@ -122,11 +123,6 @@ export function rangeEmptyTexts(unit: CalendarSelection["unit"]): { text: string
 /** „2 gemerkte Termine blendet der Filter aus.“ (Plan 0025, E5, Fall 1) */
 export function savedHiddenNote(hidden: number): string {
   return `${plural(hidden, "gemerkter Termin", "gemerkte Termine")} blendet der Filter aus.`;
-}
-
-/** „1 Angebot“ / „3 Angebote“ */
-export function plural(n: number, one: string, many: string): string {
-  return `${n} ${n === 1 ? one : many}`;
 }
 
 const AGE_RULE = "geprüft zum Kursstart";

@@ -1,10 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  hasStoredData,
+  loadOnboardingDone,
   loadOriginDistrict,
   loadOriginPoint,
   loadSavedProviders,
+  SEARCHES_KEY,
+  saveOnboardingDone,
   saveOrigin,
   saveSavedProviders,
+  storageUsable,
 } from "./preferences.ts";
 
 const KEY = "zwergenplan.entfernung-ab";
@@ -172,5 +177,85 @@ describe("gemerkte Anbieter: nur die Form (Plan 0025, E1)", () => {
     expect(loadSavedProviders()).toEqual(["b-anbieter", "a-anbieter"]);
     saveSavedProviders([]);
     expect(storage.data.has(PROVIDERS_KEY)).toBe(false);
+  });
+});
+
+describe("Onboarding-Flag und gespeicherte Angaben (Plan 0033, E2)", () => {
+  const FLAG = "zwergenplan.einfuehrung";
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("speichert das Flag als Version „1“; jeder vorhandene Wert zählt als erledigt", () => {
+    expect(loadOnboardingDone()).toBe(false);
+    saveOnboardingDone();
+    expect([...storage.data]).toEqual([[FLAG, "1"]]);
+    expect(loadOnboardingDone()).toBe(true);
+    storage.data.set(FLAG, "2");
+    expect(loadOnboardingDone()).toBe(true);
+  });
+
+  it("jeder Schlüssel der Angaben und die Such-Abos zählen als gespeichert", () => {
+    for (const key of [
+      "zwergenplan.geburtsdatum",
+      "zwergenplan.merkliste",
+      "zwergenplan.anbieter-merkliste",
+      "zwergenplan.darstellung",
+      "zwergenplan.entfernung-ab",
+      "zwergenplan.startpunkt",
+      SEARCHES_KEY,
+    ]) {
+      storage.data.clear();
+      expect(hasStoredData()).toBe(false);
+      storage.data.set(key, "x");
+      expect(hasStoredData(), key).toBe(true);
+    }
+    expect(SEARCHES_KEY).toBe("zwergenplan.such-abos");
+  });
+
+  it("das Flag allein und fremde Schlüssel zählen nicht als Angabe", () => {
+    storage.data.set(FLAG, "1");
+    storage.data.set("anderes", "x");
+    expect(hasStoredData()).toBe(false);
+  });
+
+  it("Speicher nutzbar: Probe hinterlässt nichts", () => {
+    expect(storageUsable()).toBe(true);
+    expect(storage.data.size).toBe(0);
+  });
+
+  it("Speicher wirft: nichts gespeichert, nicht erledigt, nicht nutzbar", () => {
+    vi.stubGlobal("localStorage", {
+      getItem: () => {
+        throw new DOMException("gesperrt", "SecurityError");
+      },
+      setItem: () => {
+        throw new DOMException("gesperrt", "SecurityError");
+      },
+      removeItem: () => {
+        throw new DOMException("gesperrt", "SecurityError");
+      },
+    });
+    expect(hasStoredData()).toBe(false);
+    expect(loadOnboardingDone()).toBe(false);
+    expect(storageUsable()).toBe(false);
+    expect(() => saveOnboardingDone()).not.toThrow();
+  });
+
+  it("Speicher liest, schreibt aber nicht (Kontingent voll): nicht nutzbar", () => {
+    vi.stubGlobal("localStorage", {
+      ...storage,
+      setItem: () => {
+        throw new DOMException("voll", "QuotaExceededError");
+      },
+    });
+    expect(storageUsable()).toBe(false);
   });
 });

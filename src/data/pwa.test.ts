@@ -40,6 +40,8 @@ function fakeEnv(fields: Partial<PwaEnv> = {}) {
     now: () => now,
     reload: () => calls.push("reload"),
     markReady: () => calls.push("bereit"),
+    // nicht in `calls`: Die Reihenfolge-Tests der Frische bleiben so unberührt
+    markNoWorker: vi.fn(),
     ...fields,
   };
   return {
@@ -148,6 +150,20 @@ describe("start (Plan 0011, E5)", () => {
     f.message(null);
     f.message({ type: "ics-offline" });
     expect(f.calls).toEqual(["bereit", `say: ${ICS_OFFLINE}`]);
+  });
+
+  it("ohne Registrierung (blockiert, Notausgang, Fehler) setzt es data-sw=aus, mit Registrierung nicht (Plan 0033, E8)", async () => {
+    const without = fakeEnv({ register: vi.fn(async () => undefined) });
+    await start(hooks(without.calls), without.env);
+    expect(without.env.markNoWorker).toHaveBeenCalledOnce();
+
+    const failed = fakeEnv({ register: vi.fn(async () => Promise.reject(new Error("SecurityError"))) });
+    await start(hooks(failed.calls), failed.env);
+    expect(failed.env.markNoWorker).toHaveBeenCalledOnce();
+
+    const ok = fakeEnv({ register: vi.fn(async () => registration([])) });
+    await start(hooks(ok.calls), ok.env);
+    expect(ok.env.markNoWorker).not.toHaveBeenCalled();
   });
 
   it("das Aufräumen entfernt die Listener", async () => {
