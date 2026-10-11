@@ -26,9 +26,9 @@ Der Zwergenplan ist eine installierbare Web-App (Plan 0011, ADR 0013). Offline �
 
 Icons entstehen aus `design/icon.svg` mit `node scripts/icons.ts` (die PNGs in `public/icons/` werden committet).
 
-### Wochen-Nachricht (Push)
+### Samstags-Nachricht (Push)
 
-Samstags gegen 10 Uhr kommt eine Nachricht aufs Gerät, auch wenn es nichts Neues gibt (Plan 0017, ADR 0014). Eingeschaltet wird sie im Kind-Sheet unter „Als App“ (Schalter „Wochen-Nachricht“); dort lassen sich auch Such-Abos anlegen („Aktuelle Suche abonnieren“). Auf dem iPhone geht das nur in der installierten App.
+Samstags gegen 10 Uhr kommt eine Nachricht aufs Gerät, auch wenn es nichts Neues gibt (Plan 0017, ADR 0014). Eingeschaltet wird sie im Kind-Sheet unter „Als App“ (Schalter „Samstags-Nachricht“); dort lassen sich auch Such-Abos anlegen („Aktuelle Suche abonnieren“). Auf dem iPhone geht das nur in der installierten App.
 
 - **Zuschnitt auf dem Gerät:** Der Service Worker rechnet die Nachricht aus Such-Abos, Alter und Wegzeit ab dem gespeicherten Startpunkt. Der Push-Worker kennt nur das Abo.
 - **Push-Worker:** `push-worker/` (Cloudflare Worker mit KV, `https://zwergenplan-push.sbiastoch.workers.dev`). Deploy von Hand: `pnpm push:deploy`, danach zeigt `/version` den Commit. Secret im Worker: `pnpm exec wrangler secret put PUSH_ADMIN_TOKEN -c push-worker/wrangler.toml`.

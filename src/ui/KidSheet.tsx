@@ -25,6 +25,7 @@ export function KidSheet({
   reachMode,
   transitSource,
   focusOrigin,
+  onIntro,
   onClose,
 }: {
   birthDate: string | undefined;
@@ -39,6 +40,8 @@ export function KidSheet({
   transitSource: TransitSource | undefined;
   /** geöffnet über „Startpunkt wählen“: die Stadtteil-Auswahl bekommt den Fokus */
   focusOrigin: boolean;
+  /** „Einführung ansehen“: Onboarding erneut (Plan 0033, E12) */
+  onIntro: () => void;
   onClose: () => void;
 }) {
   const input = useBirthDateInput(birthDate, today, onBirthDate);
@@ -110,6 +113,12 @@ export function KidSheet({
           </div>
         </fieldset>
         {extras.section}
+        <p className="small">
+          Alles noch einmal erklärt?{" "}
+          <button type="button" className="linkbtn" onClick={onIntro}>
+            Einführung ansehen
+          </button>
+        </p>
       </div>
       <div className="sheetfoot">
         {extras.foot}

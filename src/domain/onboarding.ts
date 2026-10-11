@@ -133,7 +133,7 @@ export function finishLabel({ count, pending }: { count: number; pending: boolea
 
 /** Hauptknopf je Schritt (E9) */
 export function primaryLabel(index: number, total: number, finish: { count: number; pending: boolean }): string {
-  if (index === 0) return "Los geht's";
+  if (index === 0) return "Los geht’s";
   return index === total - 1 ? finishLabel(finish) : "Weiter";
 }
 
@@ -199,9 +199,17 @@ export const ONBOARDING_TEXTS = {
   skip: "Überspringen",
   later: "Später",
   cityLabel: "Eure Stadt",
+  cityGroup: "Stadt",
   moreCities: "Weitere Städte",
+  moreCitiesEmpty: "Weitere Städte …",
   birthLabel: "Geburtsdatum",
+  birthPlaceholder: "TT.MM.JJJJ",
   localOnly: "Bleibt nur auf diesem Gerät.",
+  locate: "Standort",
+  locating: "Suche …",
+  located: "Gefunden",
+  district: "Stadtteil",
+  districtEmpty: "Stadtteil …",
   limitLabel: "Höchstens unterwegs",
   wayNote: "Bleibt nur auf diesem Gerät. Stadtteile: © OpenStreetMap-Mitwirkende.",
 } as const;

@@ -1,5 +1,5 @@
 /**
- * Wochen-Nachricht (Plan 0017, E6, E7, E10; ADR 0014): Push-Teil im Abschnitt „Als App“, Spiegeln in den
+ * Samstags-Nachricht (Plan 0017, E6, E7, E10; ADR 0014): Push-Teil im Abschnitt „Als App“, Spiegeln in den
  * Geräte-Speicher und der Zuschnitt im Service Worker. Nur Chromium (`pixel-7`, `desktop`) mit dem neuen
  * Headless-Modus (`channel: "chromium"`): Die Headless-Shell verweigert Benachrichtigungen immer (Plan 0017,
  * „Umsetzung“, Schritt 4).
@@ -32,7 +32,7 @@ const SENT_AT = "2026-10-05T12:00:00+02:00";
 
 const sheet = (page: Page) => page.getByRole("dialog", { name: "Kind und Einstellungen" });
 const section = (page: Page) => sheet(page).getByRole("region", { name: "Als App" });
-const pushSwitch = (page: Page) => section(page).getByRole("switch", { name: "Wochen-Nachricht" });
+const pushSwitch = (page: Page) => section(page).getByRole("switch", { name: "Samstags-Nachricht" });
 const subscribeButton = (page: Page) => section(page).getByRole("button", { name: "Suche abonnieren" });
 
 /** Fake-Push-Manager der Seite (der Service Worker bleibt echt); das Abo überlebt Neuladen über sessionStorage */
@@ -240,7 +240,7 @@ test("Aktuelle Suche abonnieren und entfernen: Statuszeile, Liste, Fokus (E7)", 
   const item = section(page).getByRole("listitem");
   await expect(item).toHaveCount(1);
   await expect(item).toContainText("Wegzeit wirkt ab einem Startpunkt");
-  await expect(section(page)).toContainText("Kommt erst mit eingeschalteter Wochen-Nachricht.");
+  await expect(section(page)).toContainText("Kommt erst mit eingeschalteter Samstags-Nachricht.");
   expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik&wegzeit=20"]');
 
   await section(page).getByRole("button", { name: "Such-Abo Musik & Singen · bis 20 Min. entfernen" }).click();
@@ -275,7 +275,7 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
   await openKidSheet(page);
   await pushSwitch(page).click();
   await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
-  await expect(section(page).getByRole("status")).toHaveText("Wochen-Nachricht ist an.");
+  await expect(section(page).getByRole("status")).toHaveText("Samstags-Nachricht ist an.");
   expect(pushLog).toEqual([
     {
       method: "POST",

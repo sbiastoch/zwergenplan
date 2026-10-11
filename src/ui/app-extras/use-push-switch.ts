@@ -1,5 +1,5 @@
 /**
- * Schalter der Wochen-Nachricht (Plan 0033, E8), aus `PushControls` herausgezogen, damit das Onboarding ihn ohne
+ * Schalter der Samstags-Nachricht (Plan 0033, E8), aus `PushControls` herausgezogen, damit das Onboarding ihn ohne
  * Duplikat nutzt. Texte macht jede Oberfläche selbst aus `result`; `seq` zählt hoch, damit ein wiederholtes Ergebnis
  * erneut angesagt wird.
  *

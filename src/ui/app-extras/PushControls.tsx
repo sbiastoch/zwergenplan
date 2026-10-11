@@ -1,5 +1,5 @@
 /**
- * Push-Teil im Abschnitt „Als App“ (Plan 0017, E6, E7): Schalter „Wochen-Nachricht“, „Aktuelle Suche abonnieren“,
+ * Push-Teil im Abschnitt „Als App“ (Plan 0017, E6, E7): Schalter „Samstags-Nachricht“, „Aktuelle Suche abonnieren“,
  * die Liste der Such-Abos und die Geräte-Kennung. Statisch in `AppSection` (gleicher Lazy-Chunk), ohne Props aus dem
  * Start: Geburtsdatum, Startpunkt und die Suche der Liste liest die Komponente bei jedem Rendern selbst. `KidSheet`
  * rendert den Abschnitt bei jeder Änderung neu, also sieht sie eine Änderung im selben Sheet sofort.

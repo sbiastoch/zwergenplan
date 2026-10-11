@@ -68,6 +68,8 @@ interface OverlaysProps {
    * fehlt nach dem Ablösen in der Merkliste oder bei einem Deep-Link (Plan 0008, E11).
    */
   activeTab: RefObject<HTMLButtonElement | null>;
+  /** „Einführung ansehen“ im Kind-Sheet (Plan 0033, E12) */
+  onIntro: () => void;
 }
 
 export function Overlays(props: OverlaysProps) {
@@ -173,6 +175,7 @@ export function Overlays(props: OverlaysProps) {
           reachMode={transit.mode}
           transitSource={transit.source}
           focusOrigin={sheet === "origin"}
+          onIntro={props.onIntro}
           onClose={() => setSheet(null)}
         />
       </Dialog>

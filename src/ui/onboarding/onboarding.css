@@ -1,8 +1,17 @@
-/* Onboarding (Plan 0033, E11), Chunk-CSS in assets/onboarding/. Stand S4: Gerüst; Gestaltung aus dem Mockup in S5.
-   Im Start-CSS (dialog.css) stehen nur .dlg.onb, .onb-cover, .onb-pending, .onb-topbar und .onb-skip. */
+/* Onboarding (Plan 0033, E11), Chunk-CSS in assets/onboarding/, Gestaltung aus dem freigegebenen Mockup
+   docs/design/onboarding-mockup.html. Im Start-CSS (dialog.css) stehen nur .dlg.onb, .onb-cover, .onb-pending,
+   .onb-topbar und .onb-skip. Schriftgrößen in rem (Textgröße 200 %, Review 2, M-4), Abstände in px wie im Mockup.
+   Reduzierte Bewegung: motion.css nimmt alle Animationen und Transitionen weg; kein Code hört auf `animationend`. */
 
 @layer components {
   .onb-flow {
+    /* Bühne: Kontrast von „Überspringen“ (#13212e) auf der abgedunkelten Farbe ≥ 4,5 : 1 (Abweichung 1 vom Mockup) */
+    --mix: 100%;
+    /* helle Flächen der Illustrationen, im Dunkelmodus gedämpft (Arch-Review M3) */
+    --onb-paper: #fff;
+    --onb-screen: #e8f1ff;
+    --onb-ink: #13212e;
+    --onb-muted: #475563;
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -19,15 +28,26 @@
   .onb-k-app {
     --k: #b99cff;
   }
+
+  /* Bühne mit Illustration; Kopfzeile (Punkte, „Überspringen“) liegt absolut darüber (dialog.css) */
   .onb-stage {
     position: relative;
     flex: none;
     height: clamp(180px, 42dvh, 318px);
     box-sizing: border-box;
-    padding-top: env(safe-area-inset-top);
-    background-color: var(--k);
+    display: grid;
+    /* feste Zeile: Erst so löst die Prozent-Höhe der Illustration gegen die Bühne auf */
+    grid-template-rows: minmax(0, 1fr);
+    place-items: end center;
+    padding: env(safe-area-inset-top) 0 14px;
+    background-color: color-mix(in srgb, var(--k) var(--mix), #0e1620);
+    background-image: radial-gradient(rgba(19, 33, 46, 0.13) 1.3px, transparent 1.6px);
+    background-size: 18px 18px;
     border-bottom: 3px solid #13212e;
     border-radius: 0 0 50% 50% / 0 0 34px 34px;
+  }
+  .onb-stage :focus-visible {
+    outline-color: #13212e;
   }
   .onb-dots {
     display: flex;
@@ -38,6 +58,7 @@
     height: 9px;
     border-radius: 5px;
     background: rgba(19, 33, 46, 0.3);
+    transition: width 0.3s;
   }
   .onb-dots i.on {
     width: 26px;
@@ -46,6 +67,74 @@
   .onb-dots i.done {
     background: #13212e;
   }
+
+  /* Illustrationen (art.tsx): 276 × 259 bei voller Bühne, kleiner bei wenig Höhe */
+  .onb-art {
+    height: calc(100% - 45px);
+    width: auto;
+    aspect-ratio: 320 / 300;
+    max-width: 100%;
+    overflow: visible;
+    animation: onb-artin 0.7s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+  }
+  .onb-art .o {
+    stroke: #13212e;
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .onb-art .ln {
+    fill: none;
+    stroke: #13212e;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .onb-art .sh {
+    filter: drop-shadow(4px 4px 0 #13212e);
+  }
+  .onb-art .ink {
+    fill: #13212e;
+  }
+  .onb-art .pa {
+    fill: var(--onb-paper);
+  }
+  .onb-art .sc {
+    fill: var(--onb-screen);
+  }
+  .onb-art .st {
+    font-family: var(--font-display);
+    font-weight: 800;
+    fill: #13212e;
+  }
+  .onb-art .st.pt {
+    fill: var(--onb-ink);
+  }
+  .onb-art .st.mu {
+    fill: var(--onb-muted);
+  }
+  .onb-art :is(.fl, .fl2, .fl3, .swing, .drive) {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .onb-art .fl {
+    animation: onb-float 4s ease-in-out infinite;
+  }
+  .onb-art .fl2 {
+    animation: onb-float 4.6s ease-in-out 0.8s infinite;
+  }
+  .onb-art .fl3 {
+    animation: onb-float 3.6s ease-in-out 1.5s infinite;
+  }
+  .onb-art .swing {
+    transform-origin: 50% 0;
+    animation: onb-swing 2.4s ease-in-out infinite;
+  }
+  .onb-art .drive {
+    animation: onb-drive 2.2s ease-in-out infinite;
+  }
+
+  /* Text */
   .onb-txt,
   .onb-data,
   .onb-foot {
@@ -53,25 +142,272 @@
     max-width: 34rem;
     margin-inline: auto;
     box-sizing: border-box;
-    padding: 1.25rem 1.5rem 0;
   }
-  .onb-data,
-  .onb-row,
-  .onb-chips {
+  .onb-txt {
+    padding: 20px 24px 0;
+  }
+  .onb-kicker {
+    display: inline-block;
+    margin: 0 0 8px;
+    padding: 2px 12px;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    background: var(--k);
+    color: #13212e;
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    transform: rotate(-2deg);
+  }
+  .onb-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.8125rem;
+    line-height: 1.04;
+    letter-spacing: -0.045em;
+    hyphens: auto;
+  }
+  /* Fokusziel per Skript beim Schrittwechsel (E3), nie per Tab erreichbar: ohne Rahmen, sonst stünde schon beim
+     ersten Öffnen ein Kasten um die Überschrift. Die Ansage kommt über den Fokus, nicht über den Rahmen. */
+  .onb-title:focus {
+    outline: none;
+  }
+  .onb-lead {
+    margin: 8px 0 0;
+    font-size: 1rem;
+    color: var(--muted);
+  }
+
+  /* Eingaben */
+  .onb-data {
+    padding: 16px 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .onb-data :is(p, .hint, .small) {
+    margin: 0;
+  }
+  .onb .lbl {
+    font-size: 0.8125rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .onb-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.625rem;
+    gap: 10px;
+    align-items: center;
   }
-  .onb-data {
-    flex-direction: column;
+  .onb-row .select {
+    flex: 1 1 10rem;
+    min-width: 0;
   }
-  .onb-tiles {
+  .onb .btn.on {
+    background: #a6db5e;
+    color: #13212e;
+  }
+  .onb-tiles,
+  .onb-chips {
     border: 0;
     margin: 0;
     padding: 0;
+    min-width: 0;
   }
+  .onb-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+    gap: 10px;
+  }
+  .onb-tile {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 3px 3px 0 var(--shadow);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+    text-align: left;
+    transition: transform 0.15s;
+  }
+  .onb-tile:nth-child(odd) {
+    transform: rotate(-0.6deg);
+  }
+  .onb-tile:nth-child(even) {
+    transform: rotate(0.6deg);
+  }
+  .onb-tile:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--shadow);
+  }
+  /* gewählt in --sel/--on-sel statt --ink: im Dunkeln sonst eine helle Insel (Abweichung 2 vom Mockup) */
+  .onb-tile[aria-pressed="true"] {
+    background: var(--sel);
+    color: var(--on-sel);
+    animation: onb-plop 0.38s cubic-bezier(0.3, 1.7, 0.5, 1);
+  }
+  .onb-tile .dot {
+    width: 28px;
+    height: 28px;
+    flex: none;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--c);
+    border: 2px solid #13212e;
+    color: #13212e;
+    display: grid;
+    place-items: center;
+  }
+  .onb-tile .c1 {
+    --c: #ff8cc0;
+  }
+  .onb-tile .c2 {
+    --c: #ffd93b;
+  }
+  .onb-tile .c3 {
+    --c: #5cb8ff;
+  }
+  .onb-tile .c4 {
+    --c: #a6db5e;
+  }
+  .onb-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .onb-chips .chip {
+    flex: 1 1 4.5rem;
+    min-height: 46px;
+    padding: 0 6px;
+    justify-content: center;
+  }
+  .onb .hint.ok {
+    animation: onb-plop 0.38s cubic-bezier(0.3, 1.7, 0.5, 1);
+  }
+  /* App-Schritt (AppStep im App-Chunk): Hinweis gestrichelt ohne Fläche, Schalterzeile als Karte */
+  .onb-note {
+    font-size: 0.9375rem;
+    padding: 9px 12px;
+    border-radius: 12px;
+    border: 2px dashed var(--line);
+    color: var(--ink);
+  }
+  /* Teilen-Symbol im Satz wie im Mockup (die Start-Regel gilt nur für Kind-Sheet und Fuß) */
+  .onb-note .share {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: var(--soft);
+    font-weight: 800;
+    color: var(--ink);
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+  .onb .swrow {
+    margin: 0;
+    padding: 10px 8px 10px 16px;
+    border: 2px solid var(--line);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: 3px 3px 0 var(--shadow);
+  }
+  .onb .swrow b {
+    font-size: 1.0625rem;
+  }
+
+  /* Fuß: Hauptknopf und „Später“ */
   .onb-foot {
     margin-top: auto;
-    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+    padding: 12px 24px calc(24px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  /* „Zeig mir die 123 Angebote“ bricht bei großer Schrift ausgewogen um */
+  .onb .btn.wide {
+    white-space: normal;
+    text-wrap: balance;
+  }
+  .onb .later {
+    min-height: 44px;
+    border: 0;
+    background: none;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  @keyframes onb-artin {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.94);
+    }
+  }
+  @keyframes onb-float {
+    50% {
+      transform: translateY(-8px) rotate(4deg);
+    }
+  }
+  @keyframes onb-swing {
+    0%,
+    60%,
+    100% {
+      transform: rotate(0);
+    }
+    70% {
+      transform: rotate(14deg);
+    }
+    80% {
+      transform: rotate(-12deg);
+    }
+    90% {
+      transform: rotate(6deg);
+    }
+  }
+  @keyframes onb-drive {
+    50% {
+      transform: translateX(6px);
+    }
+  }
+  @keyframes onb-plop {
+    0% {
+      transform: scale(0.82);
+    }
+    60% {
+      transform: scale(1.06);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /* Dunkel in beiden Blöcken wie tokens.css: Bühne zu 80 % gemischt, helle Flächen der Illustrationen gedämpft */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .onb-flow {
+      --mix: 80%;
+      --onb-paper: #2b3a49;
+      --onb-screen: #1b2733;
+      --onb-ink: #eef3f8;
+      --onb-muted: #a9b8c6;
+    }
+  }
+  :root[data-theme="dark"] .onb-flow {
+    --mix: 80%;
+    --onb-paper: #2b3a49;
+    --onb-screen: #1b2733;
+    --onb-ink: #eef3f8;
+    --onb-muted: #a9b8c6;
   }
 }

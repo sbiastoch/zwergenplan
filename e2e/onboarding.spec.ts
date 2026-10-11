@@ -144,7 +144,7 @@ test.describe("Test 12: App-Teil nicht ladbar", () => {
     await page.goto("./");
     const dialog = intro(page);
     await expect(dialog.getByRole("heading", { name: /^Schritt 1 von 3:/ })).toBeFocused();
-    await dialog.getByRole("button", { name: "Los geht's" }).click();
+    await dialog.getByRole("button", { name: "Los geht’s" }).click();
     await expect(dialog.getByRole("heading", { name: /^Schritt 2 von 3:/ })).toBeFocused();
     await dialog.getByRole("button", { name: "Weiter" }).click();
     await expect(dialog.getByRole("heading", { name: /^Schritt 3 von 3:/ })).toBeFocused();

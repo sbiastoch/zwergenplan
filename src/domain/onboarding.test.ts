@@ -199,7 +199,7 @@ describe("primaryLabel und finishLabel (E9)", () => {
   const ready = (count: number) => ({ count, pending: false });
 
   it("erster Schritt, Mitte, letzter Schritt", () => {
-    expect(primaryLabel(0, 4, ready(12))).toBe("Los geht's");
+    expect(primaryLabel(0, 4, ready(12))).toBe("Los geht’s");
     expect(primaryLabel(1, 4, ready(12))).toBe("Weiter");
     expect(primaryLabel(2, 4, ready(12))).toBe("Weiter");
     expect(primaryLabel(3, 4, ready(12))).toBe("Zeig mir die 12 Angebote");

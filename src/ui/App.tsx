@@ -563,6 +563,10 @@ export function App() {
         limitAction={limitAction}
         filterButton={filterButton}
         activeTab={activeTab}
+        onIntro={() => {
+          setSheet(null);
+          setOnboarding("manuell");
+        }}
       />
       {/* nach den Overlays: Im Modus „manuell“ schließt das Kind-Sheet im selben Commit (E3, Review 2, M-1) */}
       {onboarding !== "aus" && (

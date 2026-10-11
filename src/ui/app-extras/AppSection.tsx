@@ -14,6 +14,8 @@ import { createPush } from "../../data/push.ts";
 import { type InstallApi, installFoot, installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
 import type { AppStepProps } from "../onboarding-types.ts";
 import { PushControls } from "./PushControls.tsx";
+import { APP_STEP_TEXTS, problemText, PUSH_TEXTS as T } from "./push-texts.ts";
+import { usePushSwitch } from "./use-push-switch.ts";
 
 /** Für den Flow des Onboardings (Plan 0033, E4): Der Lader reicht es als Prop weiter, kein Import aus dem Chunk. */
 export { pushCapability } from "../../data/push.ts";
@@ -142,12 +144,105 @@ export function AppFoot({ install, done }: { install: InstallApi; done: RefObjec
   );
 }
 
+/** Handy-Symbol am Installationsknopf des Onboardings (Mockup); nur hier gebraucht wie `ShareIcon` */
+function PhoneIcon() {
+  return (
+    <svg className="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2" />
+    </svg>
+  );
+}
+
 /**
- * App-Schritt des Onboardings (Plan 0033, E8). Stand S4: nur der Installationshinweis, damit Lazy-Kette und Vorladen
- * stehen; Installationsknopf, iPhone-Hinweis und Schalter „Samstags-Nachricht“ kommen in S5.
+ * App-Schritt des Onboardings (Plan 0033, E8): Installation nach `parts.install` und Schalter „Samstags-Nachricht“
+ * nach `parts.push`. Die Teile rechnet der Flow live, aus „menue“ wird also der Knopf, sobald `beforeinstallprompt`
+ * kommt. Gestaltet in der Chunk-CSS des Onboardings (`.onb-note`, `.onb .swrow`).
  */
-export function AppStep({ install }: AppStepProps) {
-  const state = useSyncExternalStore(install.subscribe, install.state);
-  const help = installHelp(state);
-  return help?.kind === "text" ? <p>{help.text}</p> : null;
+export function AppStep({ install, parts, heading }: AppStepProps) {
+  const kind = parts.install;
+  // Verschwindet der Knopf mit dem Fokus (Tipp, `appinstalled`), fiele er im Modal auf <body>: dann die Überschrift
+  const hadButton = useRef(false);
+  useEffect(() => {
+    if (hadButton.current && kind !== "knopf" && document.activeElement === document.body) {
+      heading.current?.focus({ preventScroll: true });
+    }
+    hadButton.current = kind === "knopf";
+  }, [kind, heading]);
+  const foot = installFoot("angebot");
+  const menu = installHelp("menue");
+  const ios = installHelp("ios");
+  return (
+    <>
+      {kind === "knopf" && foot?.kind === "knopf" && (
+        <button type="button" className="btn wide" onClick={() => void install.prompt()}>
+          <PhoneIcon />
+          {foot.button}
+        </button>
+      )}
+      {kind === "installiert" && <p className="hint ok">{APP_STEP_TEXTS.installed}</p>}
+      {kind === "menue" && menu?.kind === "text" && <p>{menu.text}</p>}
+      {kind === "ios" && ios?.kind === "ios" && (
+        <p className="onb-note">
+          {ios.before}{" "}
+          <span className="share">
+            <ShareIcon />
+            {ios.share}
+          </span>{" "}
+          {ios.after}
+        </p>
+      )}
+      {parts.push === "schalter" && <PushSwitch />}
+      {parts.push === "nur-in-app" && <p className="small">{APP_STEP_TEXTS.iosNote}</p>}
+      {parts.push === "verweigert" && <p className="small">{problemText("verweigert")}</p>}
+    </>
+  );
+}
+
+/**
+ * Schalter im Onboarding: ohne Abgleich und ohne laufendes Spiegeln, Requests erst nach dem Tipp (ADR 0014, Punkt 4).
+ * Ergebnisse in einer Statuszeile; „an“/„aus“ steht schon sichtbar im Untertitel und wird dort nur vorgelesen.
+ */
+function PushSwitch() {
+  const [push] = useState(() => createPush());
+  const { on, busy, result, toggle } = usePushSwitch(push, { reconcile: false });
+  const label = useId();
+  const sub =
+    busy === "an" ? T.switching : busy === "aus" ? T.switchingOff : on ? APP_STEP_TEXTS.on : APP_STEP_TEXTS.off;
+  const said = result && (result.kind === "an" || result.kind === "aus");
+  return (
+    <>
+      <div className="swrow">
+        <span className="swtext">
+          <b id={label}>{T.switchLabel}</b>
+          <small>{sub}</small>
+        </span>
+        <button
+          type="button"
+          className="switch"
+          role="switch"
+          aria-checked={on === true}
+          aria-labelledby={label}
+          aria-busy={busy !== undefined}
+          disabled={busy !== undefined || on === undefined}
+          onClick={toggle}
+        >
+          <span className="track">
+            <span className="knob" />
+          </span>
+        </button>
+      </div>
+      <p role="status" className="small">
+        {result && (
+          // `key`: neuer Textknoten je Ergebnis, damit ein wiederholtes Ergebnis erneut angesagt wird
+          <span key={result.seq} className={said ? "sr-only" : undefined}>
+            {result.kind === "an"
+              ? APP_STEP_TEXTS.on
+              : result.kind === "aus"
+                ? APP_STEP_TEXTS.off
+                : problemText(result.kind)}
+          </span>
+        )}
+      </p>
+    </>
+  );
 }
