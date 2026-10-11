@@ -8,8 +8,8 @@
  */
 import type { CallRecord } from "./extract.ts";
 
-/** Lauf, zu dem ein Aufruf gehört (E7 bringt `entdecken`) */
-type RunKind = "nacht";
+/** Lauf, zu dem ein Aufruf gehört: Nachtlauf (E6) oder Entdecken (E7) */
+type RunKind = "nacht" | "entdecken";
 
 export interface CostLineContext {
   run: RunKind;
@@ -97,8 +97,10 @@ export interface Brakes {
   maxTokens: number;
 }
 
-/** Standard des Nachtlaufs (E8); Entdecken hat eigene (Stufe 4) */
+/** Standard des Nachtlaufs (E8) */
 export const NIGHT_BRAKES: Brakes = { maxCalls: 150, maxTokens: 3_000_000 };
+/** Standard des Entdeckens (E8, je Lauf über alle Regionen) */
+export const DISCOVER_BRAKES: Brakes = { maxCalls: 120, maxTokens: 5_000_000 };
 
 /** Bremsen aus der Umgebung (`MAX_CALLS`, `MAX_TOKENS`); leer = Standard, ungültig = Fehler (keine stille Grenze). */
 export function parseBrakes(

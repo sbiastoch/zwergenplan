@@ -1,0 +1,253 @@
+# Entdecken neuer Anbieter (Plan 0032, E7), wöchentlich je Region aus REGION_IDS. Zwei Modi, Schalter für den
+# Zeitplan ist die Repo-Variable ENTDECKEN_MODUS (leer = trocken):
+#
+#   trocken  `pnpm pipeline discover --dry-run`: alle Schritte echt (Websuche, Bewerten, Ertragsbeweis), Bericht
+#            „würde aufnehmen“/„verworfen“ im Job-Summary, Artefakt runs/. Kein Commit, kein Issue. Stufe 4 läuft zwei
+#            Wochen so, bevor der Nutzer den Modus live freigibt.
+#   live     wie trocken, aber je neuem Anbieter ein Commit nach G1 (data:validate, check:fast) und G2 (nur neue
+#            Katalogeinträge), am Ende ein Commit mit data/discover und data/kosten.csv. Die Commits gehen als
+#            git-Bundle an den Job `veroeffentlichen`, der allein Schreibrecht hat: `pull --rebase`, Prüfung, Push nach
+#            main, CI per workflow_dispatch, genau ein Issue „Neue Anbieter <datum>“, wenn mindestens einer neu ist.
+#            Nur auf main.
+#
+# Wie nightly.yml: Der Job mit dem Modell hat nur `contents: read`, das Token zum Pushen setzt nur der Push-Schritt
+# (persist-credentials: false). Rot: Abbruch (Auth, Limit), Bremse, Zeitbudget, G2, Push gescheitert.
+name: Entdecken
+
+on:
+  schedule:
+    - cron: "30 4 * * 0" # Sonntag 04:30 UTC
+  workflow_dispatch:
+    inputs:
+      modus:
+        description: "trocken | live"
+        type: choice
+        options: [trocken, live]
+        default: trocken
+      bootstrap:
+        description: "Bootstrap einer Region: G3-Grenze aus max_new statt 10"
+        type: boolean
+        default: false
+      region:
+        description: "nur diese Region (leer = alle aus REGION_IDS)"
+        default: ""
+      max_new:
+        description: "G3 mit bootstrap: höchstens so viele neue Anbieter je Region"
+        default: "30"
+      max_calls:
+        description: "Bremse MAX_CALLS (E8)"
+        default: "120"
+      max_tokens:
+        description: "Bremse MAX_TOKENS (E8)"
+        default: "5000000"
+      terms:
+        description: "nur diese Suchbegriffe (Komma-Liste, Teilwörter; leer = alle)"
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  # gemeinsam mit nightly.yml (E6); ein verworfener wartender Lauf ist hinnehmbar
+  group: daten
+  cancel-in-progress: false
+
+env:
+  # gepinnt wie nightly.yml; Update nur mit Eval-Lauf und llm.test.ts (R7)
+  CLI_VERSION: "2.1.296"
+
+jobs:
+  modus:
+    name: Modus
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      modus: ${{ steps.m.outputs.modus }}
+    steps:
+      - id: m
+        env:
+          EVENT: ${{ github.event_name }}
+          VAR_MODUS: ${{ vars.ENTDECKEN_MODUS }}
+          INPUT_MODUS: ${{ inputs.modus }}
+          REF: ${{ github.ref }}
+        run: |
+          if [[ "$EVENT" == schedule ]]; then modus="${VAR_MODUS:-trocken}"; else modus="${INPUT_MODUS:-trocken}"; fi
+          case "$modus" in trocken|live) ;; *) echo "::error::unbekannter Modus: $modus"; exit 1 ;; esac
+          if [[ "$modus" == live && "$REF" != refs/heads/main ]]; then
+            echo "::error::Modus live nur auf main ($REF)"; exit 1
+          fi
+          echo "modus=$modus" >> "$GITHUB_OUTPUT"
+          echo "Modus: **$modus** ($EVENT)" >> "$GITHUB_STEP_SUMMARY"
+
+  # ── Lauf mit Modell, nur Leserecht ─────────────────────────────────────────────────────────────────────────────
+  entdecken:
+    name: Entdecken (${{ needs.modus.outputs.modus }})
+    needs: modus
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    outputs:
+      ampel: ${{ steps.discover.outputs.ampel }}
+      run_dir: ${{ steps.discover.outputs.run_dir }}
+      commits: ${{ steps.bundle.outputs.commits }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          # ganze Historie: das git-Bundle der Commits setzt den Commit des Laufs voraus
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Zeitlimits und Wiederholung gegen hängendes apt, siehe Skript; danach ist der apt-Index frisch.
+      - name: Playwright-Chromium (render browser)
+        timeout-minutes: 9
+        run: .github/install-browsers.sh chromium
+      - name: pdftotext (poppler-utils)
+        timeout-minutes: 3
+        run: sudo apt-get install -y --no-install-recommends poppler-utils
+      - name: claude-code CLI (gepinnt)
+        run: |
+          npm i -g "@anthropic-ai/claude-code@${CLI_VERSION}"
+          echo "CLI: $(claude --version)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Entdecken
+        id: discover
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          MODUS: ${{ needs.modus.outputs.modus }}
+          BOOTSTRAP: ${{ inputs.bootstrap }}
+          REGION: ${{ inputs.region }}
+          TERMS: ${{ inputs.terms }}
+          MAX_NEW: ${{ inputs.max_new }}
+          MAX_CALLS: ${{ inputs.max_calls }}
+          MAX_TOKENS: ${{ inputs.max_tokens }}
+          # Commits nur lokal im Runner (G4); gepusht wird im Job veroeffentlichen. Der pre-commit-Hook entfällt,
+          # G1 (data:validate, check:fast) läuft vor jedem Commit im Lauf selbst.
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          LEFTHOOK: "0"
+        run: |
+          # Eingaben nur als Umgebung und gequotet; Region und Suchbegriffe prüft die CLI gegen ihre festen Listen
+          args=()
+          [[ "$MODUS" == trocken ]] && args+=(--dry-run)
+          [[ "$BOOTSTRAP" == true ]] && args+=(--bootstrap)
+          [[ -n "$REGION" ]] && args+=(--region "$REGION")
+          [[ -n "$TERMS" ]] && args+=(--terms "$TERMS")
+          pnpm pipeline discover "${args[@]}"
+      - name: Commits sichern (live)
+        id: bundle
+        if: needs.modus.outputs.modus == 'live'
+        run: |
+          n="$(git rev-list --count "$GITHUB_SHA"..HEAD)"
+          echo "commits=$n" >> "$GITHUB_OUTPUT"
+          if (( n > 0 )); then git bundle create entdecken.bundle HEAD "^$GITHUB_SHA"; fi
+          echo "Commits des Laufs: $n" >> "$GITHUB_STEP_SUMMARY"
+      - name: Laufverzeichnis sichern
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          # Bericht, Antworten der Modelle, kosten.jsonl, im Trockenlauf Katalog, Zustand und Rohdaten
+          name: entdecken-${{ github.run_id }}
+          path: runs/
+          retention-days: 14
+      - name: Commits für veroeffentlichen
+        if: steps.bundle.outputs.commits != '' && steps.bundle.outputs.commits != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: entdecken-bundle-${{ github.run_id }}
+          path: entdecken.bundle
+          retention-days: 14
+          if-no-files-found: error
+
+  # ── live: veröffentlichen, nur hier Schreibrecht ───────────────────────────────────────────────────────────────
+  veroeffentlichen:
+    name: Veröffentlichen
+    needs: [modus, entdecken]
+    if: needs.modus.outputs.modus == 'live' && needs.entdecken.result == 'success' && needs.entdecken.outputs.commits != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          # origin/main für `pull --rebase` und die Zahl eigener Commits
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: entdecken-bundle-${{ github.run_id }}
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: entdecken-${{ github.run_id }}
+          path: runs/
+      # Commits des Laufs auf main legen; `discover-publish` holt fremde Commits per `pull --rebase` nach
+      - name: Commits des Laufs übernehmen
+        run: |
+          git fetch -q ./entdecken.bundle HEAD
+          git checkout -q -B main FETCH_HEAD
+          rm entdecken.bundle
+      - name: discover-publish (Push nach main)
+        id: publish
+        env:
+          RUN_DIR: ${{ needs.entdecken.outputs.run_dir }}
+          TOKEN: ${{ github.token }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          LEFTHOOK: "0"
+        run: |
+          auth="$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+          unset TOKEN
+          echo "::add-mask::$auth"
+          export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
+          export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth"
+          pnpm pipeline discover-publish "$RUN_DIR"
+      - name: CI auf main starten
+        if: steps.publish.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref main --repo "$GITHUB_REPOSITORY"
+      - name: Issue „Neue Anbieter“
+        if: steps.publish.outputs.issue_file != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: ${{ steps.publish.outputs.issue_title }}
+          FILE: ${{ steps.publish.outputs.issue_file }}
+        run: gh issue create --repo "$GITHUB_REPOSITORY" --title "$TITLE" --body-file "$FILE"
+
+  # ── Ampel: rot bei Abbruch, Bremse, Zeitbudget, Fehler im Lauf oder beim Push ──────────────────────────────────
+  ampel:
+    name: Ampel
+    needs: [modus, entdecken, veroeffentlichen]
+    if: always() && needs.modus.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - env:
+          MODUS: ${{ needs.modus.outputs.modus }}
+          AMPEL: ${{ needs.entdecken.outputs.ampel }}
+          LAUF: ${{ needs.entdecken.result }}
+          PUSH: ${{ needs.veroeffentlichen.result }}
+          COMMITS: ${{ needs.entdecken.outputs.commits }}
+        run: |
+          echo "Ampel ${AMPEL:-unbekannt}, Entdecken ${LAUF}, Veröffentlichen ${PUSH} (Modus ${MODUS})" | tee -a "$GITHUB_STEP_SUMMARY"
+          rot=0
+          [[ "$AMPEL" == rot || -z "$AMPEL" ]] && rot=1
+          [[ "$LAUF" != success ]] && rot=1
+          [[ "$MODUS" == live && "$COMMITS" != 0 && "$PUSH" != success ]] && rot=1
+          exit "$rot"

@@ -30,7 +30,7 @@ export type ProviderState = z.infer<typeof ProviderState>;
 /** `CallRecord` (lib/extract.ts) beim Lesen von nightly.json; `part` nur, wenn gesetzt */
 const CallRecordSchema = z
   .object({
-    step: z.enum(["extract", "fallback"]),
+    step: z.enum(["extract", "fallback", "search", "assess"]),
     providerId: z.string(),
     part: z.string().optional(),
     model: z.string(),
@@ -205,7 +205,8 @@ function liveLine(live: LiveStatus): string {
   return `Live-Stand: unbekannt (${live.reason})`;
 }
 
-function costSection(c: CostSummary, results: NightlyReport["results"]): string[] {
+/** Kostenabschnitt des Berichts (E8); `results` = Ergebnis je Anbieter bzw. Kandidat (auch für das Entdecken) */
+export function costSection(c: CostSummary, results: Readonly<Record<string, string>>): string[] {
   const out = [
     `## Kosten (${COST_LABEL})`,
     "",

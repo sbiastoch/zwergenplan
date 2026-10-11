@@ -1,6 +1,6 @@
 /**
- * Prüft den Datenbestand (Schema + Invarianten), den Fahrplanauszug für die Wegzeit (Plan 0009) und den Zustand
- * je Anbieter in data/raw (Plan 0032, E5).
+ * Prüft den Datenbestand (Schema + Invarianten), den Fahrplanauszug für die Wegzeit (Plan 0009), den Zustand
+ * je Anbieter in data/raw (Plan 0032, E5) und den Zustand des Entdeckens in data/discover (E7).
  *   --against-deployed   zusätzlich Plausibilität gegen den LIVE deployten Stand (ADR 0002)
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -8,6 +8,7 @@ import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
+import { DiscoverState } from "./pipeline/lib/discover-state.ts";
 import { hasResultFor, promptHash } from "./pipeline/lib/eval-score.ts";
 import { providerRawIssues } from "./pipeline/lib/raw.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
@@ -55,6 +56,28 @@ function rawIssues(): string[] {
 }
 
 /**
+ * Zustand des Entdeckens `data/discover/<region>.json` (Plan 0032, E7/E13): Schema `DiscoverState`, Dateiname =
+ * Region. Biome nimmt den Ordner aus (vom Werkzeug geschrieben), deshalb prüft ihn hier Zod.
+ */
+function discoverIssues(): string[] {
+  const dir = new URL(source === "fixture" ? "tests/fixtures/discover/" : "data/discover/", ROOT);
+  if (!existsSync(dir)) return [];
+  const issues: string[] = [];
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".json"))) {
+    const label = `data/discover/${f}`;
+    try {
+      const parsed = DiscoverState.safeParse(JSON.parse(readFileSync(new URL(f, dir), "utf8")));
+      if (!parsed.success) issues.push(...parsed.error.issues.map((i) => `${label} ${i.path.join(".")}: ${i.message}`));
+      else if (`${parsed.data.region}.json` !== f)
+        issues.push(`${label}: Region ${parsed.data.region} passt nicht zum Dateinamen`);
+    } catch (e) {
+      issues.push(`${label}: Lesefehler: ${(e as Error).message}`);
+    }
+  }
+  return issues;
+}
+
+/**
  * Eval zum aktuellen Prompt (Plan 0032, E9): kein Gate, nur ein Hinweis, wenn `evals/results.md` für Prompt und
  * Antwortschema (`EXTRACT_KEY_PARTS`) keine Zeile hat. Nach einem Prompt- oder Schemawechsel `pnpm eval` laufen lassen.
  */
@@ -72,7 +95,7 @@ const fixture = source === "fixture";
 const plausibility = checkPlausibility(result.summary, deployed, { fixture, now });
 const timetable = loadTimetable(source);
 const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
-const errors = [...plausibility.errors, ...timetableCheck.errors, ...rawIssues()];
+const errors = [...plausibility.errors, ...timetableCheck.errors, ...rawIssues(), ...discoverIssues()];
 const warnings = [
   ...plausibility.warnings,
   ...timetableCheck.warnings,

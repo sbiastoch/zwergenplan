@@ -27,6 +27,17 @@
  *                                               --gates/--push: Ausgang der Workflow-Schritte. Schreibt auch nach
  *                                               $GITHUB_STEP_SUMMARY und `ampel=` nach $GITHUB_OUTPUT. Exit 1 bei
  *                                               rot, außer mit --report-only.
+ *   discover [--region <id>] [--bootstrap] [--dry-run] [--terms a,b]
+ *                                               Entdecken neuer Anbieter (Plan 0032, E7) je Region aus REGION_IDS:
+ *                                               Sammelkalender, Verzeichnisse, Websuche → Vorfilter → Bewerten →
+ *                                               Geocodieren → Ertragsbeweis (refreshProvider) → je Anbieter ein Commit
+ *                                               nach G1/G2 (G4), am Ende ein Commit mit data/discover und kosten.csv.
+ *                                               --dry-run: alles echt, aber nur nach runs/<heute>/discover/, kein
+ *                                               Commit. G3: höchstens 10 neue je Region, mit --bootstrap MAX_NEW
+ *                                               (Standard 30). Bremsen MAX_CALLS (120), MAX_TOKENS (5 Mio.),
+ *                                               Zeitbudget RUN_BUDGET_MIN (90). --terms: nur diese Suchbegriffe (Probe).
+ *   discover-publish RUN_DIR                    Commits des Entdeckens nach main (pull --rebase, validate-data,
+ *                                               push); schreibt RUN_DIR/issue.md, wenn ein Anbieter neu ist (E7.10).
  *   candidates keep RUN_DIR cid,cid=anbieter/ort [--force]   Entwurf raw/aggregatoren.json schreiben
  *   candidates add-provider RUN_DIR cid --id <neue-id>       Veranstalter in den Katalog aufnehmen
  *   validate-raw DATEI                          Rohdatei prüfen (Pflicht-Abschluss der Subagenten)
@@ -46,7 +57,10 @@ import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { z } from "zod";
 import { validateDataset } from "../../src/domain/dataset.ts";
+import { REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
 import { addMonths, berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
+import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
+import { commitNewProvider, commitRunState, publishDiscover } from "./io/discover-git.ts";
 import {
   type CallRecord,
   createExtractor,
@@ -84,7 +98,9 @@ import { publishNightly } from "./io/publish.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import type { Candidate } from "./lib/candidate.ts";
-import { parseBrakes } from "./lib/cost.ts";
+import { DISCOVER_BRAKES, parseBrakes } from "./lib/cost.ts";
+import { abortOf, MAX_NEW_PER_RUN, newProvidersIssue, renderDiscoverReport } from "./lib/discover.ts";
+import { selectTerms } from "./lib/discover-terms.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
 import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
@@ -123,6 +139,9 @@ const { positionals, values } = parseArgs({
     gates: { type: "string" },
     push: { type: "string" },
     "report-only": { type: "boolean", default: false },
+    region: { type: "string" },
+    bootstrap: { type: "boolean", default: false },
+    terms: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -327,6 +346,122 @@ async function nightly() {
   print(`Bericht: ${join(runDir, "nightly.json")} – Ampel: pnpm pipeline status ${runDir}`);
   if (!r.build.written) fail(`Build abgebrochen, nichts geschrieben:\n  ${r.build.errors.join("\n  ")}`);
   print(`✓ ${r.build.written}`);
+}
+
+/** Umgebung der Gates: ohne Modell-Token und ohne Push-Header (das Modell und git brauchen sie, Tests nicht) */
+const gateEnv = () =>
+  Object.fromEntries(
+    Object.entries(process.env).filter(
+      ([k]) => !k.startsWith("GIT_CONFIG_") && k !== "CLAUDE_CODE_OAUTH_TOKEN" && k !== "ANTHROPIC_API_KEY",
+    ),
+  );
+
+/** G1 (E7.8): `data:validate` und `check:fast` grün; sonst Fehler mit den letzten Zeilen der Ausgabe */
+function discoverGates(): void {
+  for (const script of ["data:validate", "check:fast"]) {
+    try {
+      execFileSync("pnpm", [script], { cwd: ROOT, env: gateEnv(), encoding: "utf8", stdio: "pipe" });
+    } catch (e) {
+      const out = `${(e as { stdout?: string }).stdout ?? ""}\n${(e as { stderr?: string }).stderr ?? ""}`;
+      console.error(out);
+      const tail = out
+        .split("\n")
+        .filter((l) => l.trim() !== "")
+        .slice(-3)
+        .join(" / ");
+      throw new Error(`${script} rot: ${tail}`);
+    }
+  }
+}
+
+/** Entdecken (Plan 0032, E7). Exit 1 nur bei G2 oder Programmfehler; Abbruch und Bremse enden geordnet (Ampel rot). */
+async function discoverCmd() {
+  const date = today();
+  const runDir = join(ROOT, "runs", date, "discover");
+  actionsOutput("run_dir", runDir);
+  const regions: RegionId[] = values.region
+    ? [REGION_IDS.find((r) => r === values.region) ?? fail(`unbekannte Region: ${values.region}`)]
+    : [...REGION_IDS];
+  const brakes = parseBrakes(process.env, DISCOVER_BRAKES);
+  if (!brakes.ok) fail(brakes.error);
+  const budgetMin = Number(process.env["RUN_BUDGET_MIN"] || DISCOVER_BUDGET_MIN);
+  if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
+  const maxNew = values.bootstrap ? Number(process.env["MAX_NEW"] || 30) : MAX_NEW_PER_RUN;
+  if (!(Number.isInteger(maxNew) && maxNew > 0)) fail(`MAX_NEW ungültig: ${process.env["MAX_NEW"]}`);
+  let terms: string[];
+  try {
+    terms = selectTerms(values.terms?.split(","));
+  } catch (e) {
+    fail((e as Error).message);
+  }
+  const dryRun = values["dry-run"];
+  // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf: Der Zustand des Ertragsbeweises gilt dort weiter (E1)
+  const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
+  const r = await runDiscover({
+    regions,
+    dataDir: join(ROOT, "data"),
+    runDir,
+    today: date,
+    dryRun,
+    maxNew,
+    terms,
+    brakes: brakes.brakes,
+    budgetMin,
+    keyParts: { ...EXTRACT_KEY_PARTS, model },
+    log: print,
+    deps: {
+      ...createDiscoverModel(),
+      fetchPage,
+      geocode,
+      extractor: createExtractor({ model }),
+      fetchInputs,
+      aggregatorCandidates: fetchAggregatorCandidates,
+      freeDays: loadFreeDays,
+    },
+    ...(dryRun
+      ? {}
+      : {
+          commit: (id: string, message: string) =>
+            commitNewProvider({ git, root: ROOT, id, message, gate: discoverGates }),
+        }),
+  });
+  const added = r.regions.reduce((n, x) => n + x.adopted.length, 0);
+  if (!dryRun)
+    commitRunState({
+      git,
+      root: ROOT,
+      message: `data: Entdecken ${date} (${regions.join(", ")}: ${added} neu)\n\nPlan 0032, E7 (pnpm pipeline discover)`,
+      gate: discoverGates,
+    });
+  const md = renderDiscoverReport(r);
+  print(md);
+  const summary = process.env["GITHUB_STEP_SUMMARY"];
+  if (summary) appendFileSync(summary, md);
+  actionsOutput("ampel", abortOf(r) ? "rot" : "gruen");
+  actionsOutput("neu", String(added));
+}
+
+/** Push der Commits des Entdeckens (E7.9) und Text des Issues (E7.10) nach RUN_DIR/issue.md */
+function discoverPublish(runDir: string) {
+  try {
+    const r = publishDiscover({
+      git,
+      validate: () =>
+        execFileSync("node", ["scripts/validate-data.ts"], { cwd: ROOT, stdio: "inherit", env: gateEnv() }),
+    });
+    actionsOutput("pushed", String(r.pushed));
+    const repoUrl = `${process.env["GITHUB_SERVER_URL"] ?? "https://github.com"}/${process.env["GITHUB_REPOSITORY"] ?? ""}`;
+    const issue = newProvidersIssue(r.commits, { repoUrl, date: today() });
+    if (issue) {
+      const file = join(runDir, "issue.md");
+      writeFileSync(file, `${issue.body}\n`);
+      actionsOutput("issue_title", issue.title);
+      actionsOutput("issue_file", file);
+    }
+    print(r.pushed ? `✓ ${r.commits.length} Commits nach main` : "Keine Commits – nichts veröffentlicht");
+  } catch (e) {
+    fail((e as Error).message);
+  }
 }
 
 const STEP_OUTCOMES = ["success", "failure", "cancelled", "skipped"] as const;
@@ -669,6 +804,12 @@ switch (command) {
     break;
   case "status":
     await status();
+    break;
+  case "discover":
+    await discoverCmd();
+    break;
+  case "discover-publish":
+    discoverPublish(need(args[0], "RUN_DIR"));
     break;
   case "candidates": {
     const [sub, runDir, extra] = args;

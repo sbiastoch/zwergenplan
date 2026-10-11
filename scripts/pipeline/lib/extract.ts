@@ -25,7 +25,8 @@ export interface ExtractInput {
 }
 
 export interface CallRecord {
-  step: "extract" | "fallback";
+  /** `search`/`assess`: Websuche und Bewerten des Entdeckens (Plan 0032, E7/E8) */
+  step: "extract" | "fallback" | "search" | "assess";
   providerId: string;
   /** Teil der Eingabe („2/5“), nur wenn sie aufgeteilt wurde (`splitInput`) */
   part?: string;
