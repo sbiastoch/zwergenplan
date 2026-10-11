@@ -121,8 +121,10 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/data\/transit\.ts$/,
   ],
   // Wochen-Nachricht: Push-Teil im Abschnitt „Als App“, Geräte-Speicher, Zuschnitt im Service Worker.
+  // Tippt das Geburtsdatum im Kind-Sheet (birth-date-input, Plan 0033, S3).
   "e2e/push.spec.ts": [
     /^src\/ui\/AppExtras\.tsx$/,
+    /^src\/ui\/birth-date-input\.ts$/,
     /^src\/ui\/app-extras\//,
     /^src\/data\/(push|device-store|searches-store)\.ts$/,
     /^src\/domain\/(searches|news|push-payload|push-types)\.ts$/,
@@ -183,6 +185,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Merkliste betrifft der Zeitraum nicht, Plan 0025, E5).
   "e2e/zeitraum.spec.ts": [
     /^src\/ui\/(Sheets|ListView)\.tsx$/,
+    /^src\/ui\/birth-date-input\.ts$/,
     /^src\/ui\/use-offer-views\.ts$/,
     /^src\/domain\/(date-range|filter)\.ts$/,
   ],

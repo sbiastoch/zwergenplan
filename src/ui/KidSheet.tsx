@@ -6,9 +6,9 @@
 import { useId, useRef, useState } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import { ageInMonths } from "../domain/age.ts";
-import { formatGermanDate, parseGermanDate } from "../domain/time.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
 import { useAppExtras } from "./AppExtras.tsx";
+import { BIRTH_DATE_INVALID, useBirthDateInput } from "./birth-date-input.ts";
 import { markAutofocus } from "./Dialog.tsx";
 import { plural } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
@@ -41,17 +41,19 @@ export function KidSheet({
   focusOrigin: boolean;
   onClose: () => void;
 }) {
-  const [text, setText] = useState(birthDate ? formatGermanDate(birthDate) : "");
+  const input = useBirthDateInput(birthDate, today, onBirthDate);
   // Plan 0020, E3: Ist das Geburtsdatum schon gesetzt, fokussiert das Öffnen die Überschrift statt des Feldes (iOS
   // öffnete sonst jedes Mal die Tastatur). Nur dann fokussierbar: Ohne Autofokus nähme `showModal()` sonst die
   // Überschrift als erstes fokussierbares Element. Stand beim Öffnen; das Sheet wird je Öffnen neu gemountet.
   const [focusHeading] = useState(() => birthDate !== undefined && !focusOrigin);
   const hintId = useId();
-  const parsed = parseGermanDate(text, today);
-  const hint = parsed
-    ? { cls: "hint ok", text: `Dein Kind ist heute ${plural(ageInMonths(parsed, today), "Monat", "Monate")} alt.` }
-    : text.trim()
-      ? { cls: "hint bad", text: "Bitte als TT.MM.JJJJ eingeben, z. B. 02.11.2025." }
+  const hint = input.parsed
+    ? {
+        cls: "hint ok",
+        text: `Dein Kind ist heute ${plural(ageInMonths(input.parsed, today), "Monat", "Monate")} alt.`,
+      }
+    : input.invalid
+      ? { cls: "hint bad", text: BIRTH_DATE_INVALID }
       : { cls: "hint", text: "Ohne Geburtsdatum zeigen wir alle Angebote." };
   const themes: [ThemeChoice, string][] = [
     ["auto", "Automatisch"],
@@ -79,17 +81,9 @@ export function KidSheet({
             autoComplete="off"
             placeholder="TT.MM.JJJJ"
             aria-describedby={hintId}
-            value={text}
-            onChange={(e) => {
-              const next = e.target.value;
-              setText(next);
-              const iso = parseGermanDate(next, today);
-              if (iso) onBirthDate(iso);
-              else if (!next.trim()) onBirthDate(undefined);
-            }}
-            onBlur={() => {
-              if (parsed) setText(formatGermanDate(parsed));
-            }}
+            value={input.text}
+            onChange={input.onChange}
+            onBlur={input.onBlur}
           />
         </label>
         <p id={hintId} className={hint.cls}>

@@ -4,34 +4,25 @@
  * Start: Geburtsdatum, Startpunkt und die Suche der Liste liest die Komponente bei jedem Rendern selbst. `KidSheet`
  * rendert den Abschnitt bei jeder Änderung neu, also sieht sie eine Änderung im selben Sheet sofort.
  *
- * Gespiegelt und abgeglichen wird nur hier, solange das Kind-Sheet offen ist (kein Push-Code beim App-Start, E9).
+ * Gespiegelt und abgeglichen wird nur hier (`usePushSwitch` mit `reconcile: true`), solange das Kind-Sheet offen ist
+ * (kein Push-Code beim App-Start, E9).
  * Rückmeldungen stehen in einer Statuszeile statt im Toast der App (E7).
  */
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { loadBirthDate, loadOriginDistrict, loadOriginPoint } from "../../data/preferences.ts";
-import { type MirrorData, type PushApi, PushError } from "../../data/push.ts";
+import type { PushApi } from "../../data/push.ts";
 import { loadSearchesRaw, saveSearches } from "../../data/searches-store.ts";
 import { filterFromSearch } from "../../domain/filter.ts";
 import type { PushSupport } from "../../domain/pwa.ts";
 import { addSearch, parseSearches, removeSearch, searchOf } from "../../domain/searches.ts";
 import { originFromStored } from "../../domain/stored-origin.ts";
 import { problemText, searchLabel, PUSH_TEXTS as T } from "./push-texts.ts";
-
-function mirrorData(): MirrorData {
-  return {
-    birthDate: loadBirthDate(),
-    searches: loadSearchesRaw(),
-    // Punkt zuerst wie `useOrigin`; gespeichert ist ohnehin höchstens eins (ADR 0017)
-    origin: loadOriginPoint() ?? loadOriginDistrict(),
-  };
-}
+import { usePushSwitch } from "./use-push-switch.ts";
 
 export function PushControls({ push, support }: { push: PushApi; support: Extract<PushSupport, "ok" | "verweigert"> }) {
   const switchLabel = useId();
   const listHeading = useRef<HTMLHeadingElement>(null);
-  /** `undefined`, bis der Abgleich weiß, ob ein Abo läuft */
-  const [on, setOn] = useState<boolean>();
-  const [busy, setBusy] = useState<"an" | "aus">();
+  const { on, busy, result, toggle } = usePushSwitch(push, { reconcile: true });
   const [deviceId, setDeviceId] = useState<string>();
   const [list, setList] = useState(() => parseSearches(loadSearchesRaw()));
   const [status, setStatus] = useState("");
@@ -41,25 +32,6 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
   const pressed = current !== "" && list.includes(current);
   // dieselbe Prüfung wie im Service Worker: ein Punkt außerhalb der Stadt zählt nicht (Arch-Review N1)
   const hasOrigin = originFromStored(loadOriginPoint() ?? loadOriginDistrict()) !== undefined;
-
-  // Abgleich beim Öffnen (Plan 0017, E6): ausgetauschtes Abo neu melden, fehlendes Abo → aus
-  useEffect(() => {
-    let live = true;
-    void push
-      .reconcile(mirrorData())
-      .catch(() => false)
-      .then((isOn) => {
-        if (live) setOn(isOn);
-      });
-    return () => {
-      live = false;
-    };
-  }, [push]);
-
-  // Spiegeln nach jedem Rendern; `mirror` schreibt nur, was sich geändert hat
-  useEffect(() => {
-    if (on) void push.mirror(mirrorData()).catch(() => undefined);
-  });
 
   useEffect(() => {
     if (!on) {
@@ -80,48 +52,18 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
   }, [on, push]);
 
   /** Vor jedem neuen Text leeren, damit eine Live-Region denselben Text erneut ansagt (Runde 3 M2) */
-  const say = (text: string) => {
+  const say = useCallback((text: string) => {
     setStatus("");
     setTimeout(() => setStatus(text), 50);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (result) say(result.kind === "an" ? T.on : result.kind === "aus" ? T.off : problemText(result.kind));
+  }, [result, say]);
 
   const store = (next: string[]) => {
     saveSearches(next);
     setList(next);
-  };
-
-  const toggle = () => {
-    if (on) {
-      setBusy("aus");
-      void push
-        .disable()
-        .then(() => {
-          setOn(false);
-          say(T.off);
-        })
-        // Geräte-Speicher kaputt: Der Schalter zeigt, ob noch ein Abo läuft (Arch-Review N2)
-        .catch(() =>
-          push
-            .subscription()
-            .then((sub) => setOn(sub !== undefined))
-            .catch(() => undefined),
-        )
-        .finally(() => setBusy(undefined));
-      return;
-    }
-    setBusy("an");
-    // `requestPermission` ist das erste `await` in `enable`, noch im Tipp (iOS, Plan 0011 E12)
-    void push
-      .enable(mirrorData())
-      .then(() => {
-        setOn(true);
-        say(T.on);
-      })
-      .catch((error: unknown) => {
-        setOn(false);
-        say(problemText(error instanceof PushError ? error.problem : "abo"));
-      })
-      .finally(() => setBusy(undefined));
   };
 
   const toggleCurrent = () => {
