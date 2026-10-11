@@ -1,0 +1,593 @@
+/**
+ * Entdecken neuer Anbieter (Plan 0032, E7), reine Logik: Kandidaten aus Sammelkalendern, Verzeichnissen und der
+ * Websuche, Vorfilter gegen Katalog und `abgelehnt`, Antwortformen der beiden Modellschritte, Katalogeintrag mit
+ * vom Code vergebenen IDs, Ertragsbeweis, Zustand `data/discover/<region>.json`, Bericht und Commit-Text.
+ * Abruf, Modellaufrufe, Geocodieren, Dateien und git liegen in `io/discover.ts`.
+ *
+ * Grundsatz (E7.3): Eine übersehene Dublette ist billig (Revert), ein verschluckter Anbieter nicht. Der Vorfilter
+ * verwirft deshalb nur bei gleicher URL oder bei gleichem Host UND ähnlichem Namen.
+ */
+import { z } from "zod";
+import { inBounds } from "../../../src/domain/geo.ts";
+import { nextPublicId, SHORT_ID_PATTERN, slug } from "../../../src/domain/ids.ts";
+import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
+import { type Anbieter, type Offer, type Provider, Provider as ProviderSchema } from "../../../src/domain/schema.ts";
+import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
+import type { Candidate } from "./candidate.ts";
+import { summarizeCosts } from "./cost.ts";
+import type { DiscoverState } from "./discover-state.ts";
+import { searchQuery } from "./discover-terms.ts";
+import type { CallRecord } from "./extract.ts";
+import { matchCandidate } from "./match.ts";
+import type { ProviderRaw } from "./raw.ts";
+import { isRelevant } from "./relevance.ts";
+import { costSection } from "./report.ts";
+import { ratio } from "./similar.ts";
+
+/** G3: höchstens so viele neue Anbieter je Lauf und Region (mit `--bootstrap` gilt `MAX_NEW`) */
+export const MAX_NEW_PER_RUN = 10;
+/** Wiedervorlage eines Kandidaten ohne Ertrag (E7.6): 8 Wochen */
+const WIEDERVORLAGE_DAYS = 56;
+/** Fehlerserie, ab der eine Quelle im Bericht steht (E7, Hinweise ohne Aktion) */
+const STALE_DAYS = 14;
+/** Ähnlicher Name bei gleichem Host (E7.3); streng, weil ein verschluckter Anbieter teurer ist als eine Dublette */
+const NAME_RATIO = 0.7;
+/** Externe Links je Verzeichnisseite, die als Kandidat zählen */
+const MAX_DIRECTORY_FINDS = 30;
+/** Seiten ohne eigenes Angebot: Netzwerke, Karten, Suchmaschinen */
+const FOREIGN_HOSTS =
+  /(^|\.)(facebook\.com|instagram\.com|youtube\.com|youtu\.be|twitter\.com|x\.com|tiktok\.com|linkedin\.com|xing\.com|pinterest\.\w+|whatsapp\.com|google\.\w+|goo\.gl|apple\.com|wikipedia\.org|openstreetmap\.org)$/;
+
+/** Ein Kandidat: Name, Fund-URL, Begründung und Herkunft (`suche:<begriff>`, `sammelkalender:<adapter>`, `verzeichnis:<id>`) */
+export interface Find {
+  name: string;
+  url: string;
+  warum: string;
+  quelle: string;
+}
+
+const parseUrl = (url: string): URL | undefined => {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:" ? u : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const bareHost = (u: URL) => u.hostname.toLowerCase().replace(/^www\./, "");
+
+/** Host ohne `www.`; ungültige URL: undefined */
+export const hostOf = (url: string): string | undefined => {
+  const u = parseUrl(url);
+  return u ? bareHost(u) : undefined;
+};
+
+/** Vergleichsform einer URL: ohne Schema, `www.`, Fragment, Tracking-Parameter und Schrägstrich am Ende. */
+export function normalizeUrl(url: string): string | undefined {
+  const u = parseUrl(url);
+  if (!u) return undefined;
+  const params = [...u.searchParams]
+    .filter(([k]) => !/^(utm_|fbclid$|gclid$)/i.test(k))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${v}`);
+  const path = u.pathname.replace(/\/+$/, "");
+  return `${bareHost(u)}${path}${params.length > 0 ? `?${params.join("&")}` : ""}`;
+}
+
+const urlsOf = (p: Provider): string[] => [p.url, ...p.programme.map((g) => g.url)];
+
+/** gleicher oder ähnlicher Name (einer enthält den anderen, oder Ähnlichkeit ≥ NAME_RATIO) */
+function similarName(a: string, b: string): boolean {
+  const x = a
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, "")
+    .trim();
+  const y = b
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, "")
+    .trim();
+  if (x.length === 0 || y.length === 0) return false;
+  return x.includes(y) || y.includes(x) || ratio(x, y) >= NAME_RATIO;
+}
+
+/** Vorfilter (E7.3): bekannte URL, bekannter Host mit ähnlichem Namen, `abgelehnt`, noch zurückgestellt. */
+export function prefilter(
+  finds: readonly Find[],
+  ctx: { catalog: readonly Provider[]; state: DiscoverState; today: string },
+): { keep: Find[]; dropped: Array<{ find: Find; grund: string }> } {
+  const byUrl = new Map<string, string>();
+  const byHost = new Map<string, Provider[]>();
+  for (const p of ctx.catalog)
+    for (const url of urlsOf(p)) {
+      const n = normalizeUrl(url);
+      if (n && !byUrl.has(n)) byUrl.set(n, p.id);
+      const h = hostOf(url);
+      if (h) byHost.set(h, [...new Set([...(byHost.get(h) ?? []), p])]);
+    }
+  const rejectedUrls = new Map(
+    ctx.state.abgelehnt.flatMap((a) => {
+      const n = a.url ? normalizeUrl(a.url) : undefined;
+      return n ? [[n, a.grund] as const] : [];
+    }),
+  );
+  const rejectedHosts = new Map(
+    ctx.state.abgelehnt.flatMap((a) => {
+      const h = a.host;
+      return h ? [[h.toLowerCase().replace(/^www\./, ""), a.grund] as const] : [];
+    }),
+  );
+  const postponed = new Map(
+    ctx.state.zurueckgestellt.flatMap((z) => {
+      const n = normalizeUrl(z.url);
+      return n ? [[n, z] as const] : [];
+    }),
+  );
+
+  const keep: Find[] = [];
+  const dropped: Array<{ find: Find; grund: string }> = [];
+  const seen = new Set<string>();
+  for (const find of finds) {
+    const n = normalizeUrl(find.url);
+    const host = hostOf(find.url);
+    if (!n || !host) {
+      dropped.push({ find, grund: "keine gültige Web-Adresse" });
+      continue;
+    }
+    if (seen.has(n)) continue;
+    seen.add(n);
+    const drop = (grund: string) => dropped.push({ find, grund });
+    const known = byUrl.get(n);
+    const twin = (byHost.get(host) ?? []).find((p) => similarName(find.name, p.name));
+    const rejected = rejectedUrls.get(n) ?? rejectedHosts.get(host);
+    const waiting = postponed.get(n);
+    if (FOREIGN_HOSTS.test(host)) drop("keine eigene Website (Netzwerk oder Suchdienst)");
+    else if (known) drop(`steht im Katalog (${known})`);
+    else if (twin) drop(`Host und Name wie ${twin.id}`);
+    else if (rejected) drop(`abgelehnt: ${rejected}`);
+    else if (waiting && waiting.wiedervorlage > ctx.today)
+      drop(`zurückgestellt bis ${waiting.wiedervorlage}: ${waiting.grund}`);
+    else keep.push(find);
+  }
+  return { keep, dropped };
+}
+
+/** Kandidat ohne Ertrag oder mit verworfener Bewertung: Wiedervorlage nach 8 Wochen (E7.6); ersetzt ältere Einträge. */
+export function postpone(state: DiscoverState, find: Find, grund: string, today: string): DiscoverState {
+  const n = normalizeUrl(find.url);
+  return {
+    ...state,
+    zurueckgestellt: [
+      ...state.zurueckgestellt.filter((z) => normalizeUrl(z.url) !== n),
+      { url: find.url, name: find.name, grund, datum: today, wiedervorlage: addDays(today, WIEDERVORLAGE_DAYS) },
+    ],
+  };
+}
+
+/**
+ * Sammelkalender (E7.1): Veranstalter ohne Katalog-Treffer (`lib/match.ts`) mit eigener Website und Baby- oder
+ * Kleinkindbezug im Termin. Ohne Website gibt es nichts abzurufen, die Websuche findet sie gegebenenfalls.
+ * Hinweise ohne Aktion: Seiten bekannter Anbieter auf deren Host, die der Katalog nicht kennt.
+ */
+export function aggregatorFinds(
+  candidates: readonly Candidate[],
+  catalog: readonly Provider[],
+): { finds: Find[]; hints: string[] } {
+  const finds = new Map<string, Find>();
+  const hints = new Set<string>();
+  const byId = new Map(catalog.map((p) => [p.id, p] as const));
+  for (const c of candidates) {
+    if (c.cancelled || !c.organizerUrl) continue;
+    const n = normalizeUrl(c.organizerUrl);
+    if (!n) continue;
+    const m = matchCandidate(c, catalog);
+    if (m.kind === "ok" || m.providerId !== undefined) {
+      const p = byId.get(m.providerId ?? "");
+      if (!p || (p.role === "anbieter" && p.coveredBy)) continue;
+      const known = new Set(urlsOf(p).flatMap((u) => normalizeUrl(u) ?? []));
+      const hosts = new Set(urlsOf(p).flatMap((u) => hostOf(u) ?? []));
+      const host = hostOf(c.organizerUrl);
+      if (!known.has(n) && host && hosts.has(host))
+        hints.add(`${p.id}: neue Programmseite? ${c.organizerUrl} (aus ${c.source})`);
+      continue;
+    }
+    if (finds.has(n) || !isRelevant(c.title, c.subtitle, c.description)) continue;
+    finds.set(n, {
+      name: c.organizer ?? c.location ?? c.title,
+      url: c.organizerUrl,
+      warum: `Termin „${c.title}“ im Sammelkalender ${c.source}`,
+      quelle: `sammelkalender:${c.source}`,
+    });
+  }
+  return { finds: [...finds.values()], hints: [...hints] };
+}
+
+/** Verzeichnisse (E7.1): Links auf fremde Hosts; ob sie neu sind, entscheidet der Vorfilter. */
+export function directoryFinds(dir: Provider, links: ReadonlyArray<{ label: string; url: string }>): Find[] {
+  const own = new Set(urlsOf(dir).flatMap((u) => hostOf(u) ?? []));
+  const out = new Map<string, Find>();
+  for (const l of links) {
+    const host = hostOf(l.url);
+    const n = normalizeUrl(l.url);
+    const label = l.label.trim();
+    if (!host || !n || own.has(host) || FOREIGN_HOSTS.test(host) || label.length < 3 || out.has(n)) continue;
+    out.set(n, {
+      name: label,
+      url: l.url,
+      warum: `Eintrag im Verzeichnis ${dir.name}`,
+      quelle: `verzeichnis:${dir.id}`,
+    });
+    if (out.size >= MAX_DIRECTORY_FINDS) break;
+  }
+  return [...out.values()];
+}
+
+/** Nachricht an die Websuche (E7.2) */
+export const searchMessage = (term: string, regionName: string): string =>
+  `Suchbegriff: ${searchQuery(term, regionName)}\nRegion: ${regionName}`;
+
+/** Text der abgerufenen Seite fürs Bewerten (der Abruf kürzt nur hier, das Bewerten braucht nicht alles) */
+const ASSESS_MAX_CHARS = 30_000;
+const ASSESS_MAX_LINKS = 200;
+
+/** Seite eines Kandidaten nach dem Abruf (`extractPage`) */
+export interface FetchedFind {
+  finalUrl: string;
+  text: string;
+  links: ReadonlyArray<{ label: string; url: string }>;
+}
+
+/** Nachricht ans Bewerten (E7.4): Region, Kandidat, Text und Links der abgerufenen Seite */
+export function assessMessage(find: Find, page: FetchedFind, regionName: string): string {
+  const links = page.links
+    .filter((l) => parseUrl(l.url))
+    .slice(0, ASSESS_MAX_LINKS)
+    .map((l) => `${l.label.replace(/\s+/g, " ").slice(0, 80)} -> ${l.url}`);
+  return [
+    `Region: ${regionName}`,
+    `Kandidat: ${find.name} (gefunden über ${find.quelle}: ${find.warum})`,
+    `Abgerufene Seite: ${page.finalUrl}`,
+    `## TEXT\n${page.text.slice(0, ASSESS_MAX_CHARS)}${page.text.length > ASSESS_MAX_CHARS ? "\n[… gekürzt]" : ""}`,
+    `## LINKS\n${links.join("\n")}`,
+  ].join("\n\n");
+}
+
+/** Erlaubte Programmseiten eines Kandidaten: Fund-URL, abgerufene Seite und ihre Links */
+export const allowedUrlsOf = (find: Find, page: FetchedFind): string[] => [
+  find.url,
+  page.finalUrl,
+  ...page.links.map((l) => l.url),
+];
+
+/** Antwort der Websuche (E7.2) */
+const SearchResponse = z.strictObject({
+  kandidaten: z
+    .array(z.strictObject({ name: z.string().min(1).max(160), url: z.string().min(1), warum: z.string().max(400) }))
+    .max(20),
+});
+
+/** JSON Schema ohne `$schema` (die CLI 2.1.296 bricht sonst ab, Stufe 2) */
+const jsonSchemaOf = (schema: z.ZodType): object => {
+  const { $schema: _, ...rest } = z.toJSONSchema(schema, { io: "input", unrepresentable: "any" });
+  return rest;
+};
+
+export const searchResponseSchema = (): object => jsonSchemaOf(SearchResponse);
+
+/** Treffer der Websuche als Kandidaten; Einträge ohne gültige URL entfallen still (der Vorfilter zählt sie nicht). */
+export function findsFromSearch(output: unknown, term: string): { ok: true; finds: Find[] } | { ok: false } {
+  const parsed = SearchResponse.safeParse(output);
+  if (!parsed.success) return { ok: false };
+  return {
+    ok: true,
+    finds: parsed.data.kandidaten.flatMap((k) =>
+      parseUrl(k.url) ? [{ name: k.name, url: k.url, warum: k.warum, quelle: `suche:${term}` }] : [],
+    ),
+  };
+}
+
+const AssessEntrySchema = z.strictObject({
+  name: z.string().min(1).max(120),
+  url: z.string(),
+  /** Alter, das der Anbieter insgesamt bedient (vollendete Monate) */
+  age: z.strictObject({ minMonths: z.int().min(0).max(216), maxMonths: z.int().min(0).max(216) }).optional(),
+  programme: z
+    .array(
+      z.strictObject({
+        url: z.string(),
+        kind: z.enum(["html", "pdf", "ical", "json-api"]),
+        render: z.literal("browser").optional(),
+        use: z.enum(["termine", "verfuegbarkeit", "info"]),
+      }),
+    )
+    .max(8),
+  venues: z
+    .array(z.strictObject({ name: z.string().min(1), address: z.string().min(5) }))
+    .min(1)
+    .max(5),
+  availability: z.enum(["ja", "teilweise", "nein", "unbekannt"]),
+});
+export type AssessEntry = z.infer<typeof AssessEntrySchema>;
+
+/** Antwort des Bewertens (E7.4): verwerfen mit Grund oder Katalogeintrag als Ausschnitt von `Provider` */
+const AssessResponse = z.strictObject({
+  entscheidung: z.enum(["aufnehmen", "verwerfen"]),
+  grund: z.string().min(1).max(400),
+  eintrag: AssessEntrySchema.optional(),
+});
+
+export const assessResponseSchema = (): object => jsonSchemaOf(AssessResponse);
+
+export function parseAssessment(
+  output: unknown,
+):
+  | { kind: "aufnehmen"; grund: string; entry: AssessEntry }
+  | { kind: "verwerfen"; grund: string }
+  | { kind: "ungueltig" } {
+  const parsed = AssessResponse.safeParse(output);
+  if (!parsed.success) return { kind: "ungueltig" };
+  const { entscheidung, grund, eintrag } = parsed.data;
+  if (entscheidung === "verwerfen") return { kind: "verwerfen", grund };
+  return eintrag ? { kind: "aufnehmen", grund, entry: eintrag } : { kind: "ungueltig" };
+}
+
+/** Katalog-ID (E7.7): kebab aus dem Namen, bei Kollision mit Suffix; nie in der Form einer `publicId` (ADR 0022). */
+export function catalogId(name: string, catalog: readonly Provider[]): string {
+  const taken = new Set(catalog.map((p) => p.id));
+  let base = slug(name, 50);
+  if (SHORT_ID_PATTERN.test(base)) base = `${base}-anbieter`;
+  if (!taken.has(base)) return base;
+  for (let i = 2; ; i++) if (!taken.has(`${base}-${i}`)) return `${base}-${i}`;
+}
+
+/**
+ * Katalogeintrag aus der Bewertung (E7.4, E7.7). IDs, `publicId`, Region, `verified` und Notiz setzt der Code.
+ * Programmseiten nur, wenn ihre URL auf der abgerufenen Seite steht (Schutz vor Prompt-Injection: der Abruf folgt
+ * keiner vom Modell erfundenen Adresse). Die Orte kommen mit Koordinaten aus dem Geocoder (`geos`, gleiche Reihenfolge).
+ */
+export function entryFromAssessment(
+  a: AssessEntry,
+  ctx: {
+    find: Find;
+    grund: string;
+    region: RegionId;
+    catalog: readonly Provider[];
+    today: string;
+    geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined }>;
+    allowedUrls: readonly string[];
+  },
+): { ok: true; entry: Anbieter; notes: string[] } | { ok: false; grund: string } {
+  const allowed = new Set(ctx.allowedUrls.flatMap((u) => normalizeUrl(u) ?? []));
+  const notes: string[] = [];
+  const programme = a.programme.filter((g) => {
+    const n = normalizeUrl(g.url);
+    if (n && allowed.has(n)) return true;
+    notes.push(`Programmseite nicht auf der abgerufenen Seite verlinkt: ${g.url}`);
+    return false;
+  });
+  if (!programme.some((g) => g.use === "termine"))
+    return { ok: false, grund: "keine abrufbare Terminseite (use: termine)" };
+  const knownPages = new Map(
+    ctx.catalog.flatMap((p) => p.programme.flatMap((g) => normalizeUrl(g.url) ?? []).map((n) => [n, p.id] as const)),
+  );
+  const owner = programme.map((g) => knownPages.get(normalizeUrl(g.url) ?? "")).find(Boolean);
+  if (owner) return { ok: false, grund: `Programmseite steht schon im Katalog (${owner})` };
+  const { bbox } = REGIONS[ctx.region];
+  if (ctx.geos.length !== a.venues.length) return { ok: false, grund: "Orte ohne Koordinaten" };
+  if (ctx.geos.some((g) => !inBounds(g, bbox)))
+    return { ok: false, grund: `Ort außerhalb der Region ${REGIONS[ctx.region].name}` };
+
+  const id = catalogId(a.name, ctx.catalog);
+  const usedPublic = new Set(ctx.catalog.flatMap((p) => (p.role === "anbieter" ? [p.publicId] : [])));
+  const usedVenues = new Set(ctx.catalog.flatMap((p) => (p.role === "anbieter" ? p.venues.map((v) => v.id) : [])));
+  const venueId = () => {
+    let vid = id;
+    for (let i = 2; usedVenues.has(vid); i++) vid = `${id}-${i}`;
+    usedVenues.add(vid);
+    return vid;
+  };
+  const homepage = normalizeUrl(a.url) && allowed.has(normalizeUrl(a.url) ?? "") ? a.url : ctx.find.url;
+  const entry = {
+    id,
+    publicId: nextPublicId(id, usedPublic),
+    role: "anbieter" as const,
+    region: ctx.region,
+    name: a.name,
+    url: homepage,
+    ...(a.age ? { age: a.age } : {}),
+    programme: programme.map((g) => ({
+      url: g.url,
+      kind: g.kind,
+      ...(g.render ? { render: g.render } : {}),
+      use: g.use,
+    })),
+    availability: { shown: a.availability },
+    verified: ctx.today,
+    notes: [`Entdeckt ${ctx.today} über ${ctx.find.quelle}: ${ctx.find.url} – ${ctx.grund}`.replaceAll(" | ", " / ")],
+    venues: a.venues.map((v, i) => {
+      const g = ctx.geos[i] ?? { lat: 0, lon: 0 };
+      return {
+        id: venueId(),
+        name: v.name,
+        address: v.address,
+        ...(g.district ? { district: g.district } : {}),
+        geo: { lat: g.lat, lon: g.lon },
+      };
+    }),
+  };
+  const checked = ProviderSchema.safeParse(entry);
+  if (!checked.success)
+    return {
+      ok: false,
+      grund: `Katalogeintrag ungültig: ${checked.error.issues.map((i) => `${i.path.join(".")} ${i.message}`).join("; ")}`,
+    };
+  return checked.data.role === "anbieter"
+    ? { ok: true, entry: checked.data, notes }
+    : { ok: false, grund: "kein Anbieter" };
+}
+
+/**
+ * Ertragsbeweis (E7.6, N-D): mindestens ein gültiges Angebot des neuen Anbieters für 0–3 Jahre mit künftigem Termin
+ * (nach dem Build, also schon geprüft) UND Baby- oder Kleinkindbezug im abgerufenen Text (`isRelevant`, Review M2).
+ */
+export function proveYield(
+  offers: readonly Offer[],
+  providerId: string,
+  text: string,
+  now: string,
+): { ok: true; first: Offer } | { ok: false; grund: string } {
+  const t = Date.parse(now);
+  const first = offers
+    .filter((o) => o.providerId === providerId && (o.age === undefined || o.age.minMonths <= 36))
+    .filter((o) => o.sessions.some((s) => Date.parse(s.start) >= t))
+    .sort((a, b) => (a.sessions[0]?.start ?? "").localeCompare(b.sessions[0]?.start ?? ""))[0];
+  if (!first) return { ok: false, grund: "kein Angebot für 0–3 Jahre mit künftigem Termin" };
+  if (!isRelevant(text)) return { ok: false, grund: "kein Baby- oder Kleinkindbezug im abgerufenen Text" };
+  return { ok: true, first };
+}
+
+/** Hinweise ohne Aktion (E7): Quellen mit Fehlerserie seit mehr als 14 Tagen. */
+export function staleHints(raws: Readonly<Record<string, ProviderRaw>>, today: string): string[] {
+  const limit = addDays(today, -STALE_DAYS);
+  return Object.entries(raws)
+    .filter(([, r]) => r.failingSince !== undefined && berlinIsoDate(r.failingSince) < limit)
+    .map(
+      ([id, r]) => `${id}: Quelle fehlerhaft seit ${berlinIsoDate(r.failingSince ?? "")} (${r.reason ?? "ohne Grund"})`,
+    );
+}
+
+/** Aufgenommen (oder im Trockenlauf: würde aufgenommen) */
+export interface Adopted {
+  id: string;
+  name: string;
+  region: RegionId;
+  find: Find;
+  grund: string;
+  first: { title: string; start: string; url: string };
+}
+
+export interface RegionReport {
+  region: RegionId;
+  /** Kandidaten vor dem Vorfilter */
+  finds: number;
+  dropped: Array<{ find: Find; grund: string }>;
+  adopted: Adopted[];
+  rejected: Array<{ find: Find; grund: string }>;
+  hints: string[];
+}
+
+export interface DiscoverReport {
+  date: string;
+  dryRun: boolean;
+  durationMs: number;
+  regions: RegionReport[];
+  calls: CallRecord[];
+  abort?: "auth" | "limit";
+  brake?: "aufrufe" | "tokens";
+  budgetHit: boolean;
+}
+
+/** G4: ein Commit je Anbieter mit Fund-URL, Grund und erstem Angebot */
+export function newProviderCommitMessage(a: Adopted): string {
+  return [
+    `data: neuer Anbieter ${a.id} (${a.region})`,
+    "",
+    `Name: ${a.name}`,
+    `Fund-URL: ${a.find.url}`,
+    `Quelle: ${a.find.quelle}`,
+    `Grund: ${a.grund}`,
+    `Erstes Angebot: ${a.first.title} am ${formatGermanDate(berlinIsoDate(a.first.start))} (${a.first.url})`,
+    "",
+    "Plan 0032, E7 (pnpm pipeline discover)",
+  ].join("\n");
+}
+
+/** Abbruchgrund für Bericht und `kosten.csv` */
+export const abortOf = (r: Pick<DiscoverReport, "abort" | "brake" | "budgetHit">): string =>
+  r.abort ?? r.brake ?? (r.budgetHit ? "zeit" : "");
+
+const cell = (s: string) => s.replaceAll("|", "/").replaceAll("\n", " ").slice(0, 200);
+
+/** Markdown für `runs/<datum>/discover/report.md` und `$GITHUB_STEP_SUMMARY` (E10). */
+export function renderDiscoverReport(r: DiscoverReport): string {
+  const stop = abortOf(r);
+  const out = [
+    `# Entdecken ${r.date}${r.dryRun ? " (Trockenlauf)" : ""}${stop ? ` – rot: vorzeitig beendet (${stop})` : ""}`,
+    "",
+    `- Dauer ${Math.round(r.durationMs / 60_000)} Min.`,
+  ];
+  const results: Record<string, string> = {};
+  for (const reg of r.regions) {
+    out.push(
+      "",
+      `## Region ${REGIONS[reg.region].name}: ${reg.adopted.length} ${r.dryRun ? "würden aufgenommen" : "neu"}, ` +
+        `${reg.rejected.length} verworfen, ${reg.dropped.length} im Vorfilter (von ${reg.finds} Kandidaten)`,
+      "",
+      r.dryRun ? "## Würde aufnehmen" : "## Aufgenommen",
+      "",
+    );
+    if (reg.adopted.length === 0) out.push("keine");
+    else {
+      out.push("| ID | Name | Fund-URL | Grund | erstes Angebot |", "|---|---|---|---|---|");
+      for (const a of reg.adopted) {
+        results[hostOf(a.find.url) ?? a.find.url] = "aufgenommen";
+        out.push(
+          `| ${a.id} | ${cell(a.name)} | ${a.find.url} | ${cell(a.grund)} | ` +
+            `${cell(a.first.title)}, ${formatGermanDate(berlinIsoDate(a.first.start))} |`,
+        );
+      }
+    }
+    out.push("", "## Verworfen", "");
+    if (reg.rejected.length === 0) out.push("keine");
+    else {
+      out.push("| Kandidat | URL | Quelle | Grund |", "|---|---|---|---|");
+      for (const x of reg.rejected) {
+        results[hostOf(x.find.url) ?? x.find.url] ??= "verworfen";
+        out.push(`| ${cell(x.find.name)} | ${x.find.url} | ${x.find.quelle} | ${cell(x.grund)} |`);
+      }
+    }
+    if (reg.dropped.length > 0) {
+      out.push("", `<details><summary>Vorfilter (${reg.dropped.length})</summary>`, "");
+      for (const d of reg.dropped) out.push(`- ${cell(d.find.name)} (${d.find.url}): ${cell(d.grund)}`);
+      out.push("", "</details>");
+    }
+    out.push("", "## Hinweise ohne Aktion", "");
+    out.push(...(reg.hints.length > 0 ? reg.hints.map((h) => `- ${cell(h)}`) : ["keine"]));
+  }
+  out.push("", ...costSection(summarizeCosts(r.calls, { cached: 0 }), results));
+  return `${out.join("\n")}\n`;
+}
+
+const NEW_PROVIDER_SUBJECT = /^data: neuer Anbieter (\S+) \((\S+)\)$/;
+
+/**
+ * Text des Issues „Neue Anbieter <datum>“ (E7.10) aus den gepushten Commits: je neuem Anbieter Commit-Link, Name
+ * und Fund-URL aus dem Commit-Text (G4). Ohne neuen Anbieter `undefined` (dann kein Issue).
+ */
+export function newProvidersIssue(
+  commits: ReadonlyArray<{ sha: string; message: string }>,
+  o: { repoUrl: string; date: string },
+): { title: string; body: string } | undefined {
+  const lines = commits.flatMap((c) => {
+    const [subject = "", ...rest] = c.message.split("\n");
+    const m = NEW_PROVIDER_SUBJECT.exec(subject);
+    if (!m) return [];
+    const field = (name: string) => rest.find((l) => l.startsWith(`${name}: `))?.slice(name.length + 2) ?? "–";
+    return [
+      `- [${m[1]}](${o.repoUrl}/commit/${c.sha}) (${m[2]}): ${field("Name")} – Fund-URL ${field("Fund-URL")}; ` +
+        `erstes Angebot: ${field("Erstes Angebot")}`,
+    ];
+  });
+  if (lines.length === 0) return undefined;
+  return {
+    title: `Neue Anbieter ${o.date}`,
+    body: [
+      `Das Entdecken (Plan 0032, E7) hat ${lines.length} neue Anbieter aufgenommen:`,
+      "",
+      ...lines,
+      "",
+      "Falsch aufgenommen? Commit per `git revert` zurücknehmen und URL oder Host mit Grund in " +
+        "`data/discover/<region>.json` unter `abgelehnt` eintragen, sonst findet ihn die nächste Woche wieder.",
+    ].join("\n"),
+  };
+}

@@ -106,6 +106,8 @@ describe("Doku liest niemand", () => {
     // liest den Prompt scripts/pipeline/prompt/extract.md (Plan 0032, E4). Unschädlich für Stufe 0, weil
     // scripts/** nicht auf der Positivliste der Doku steht (Test „ist keine Doku“ oben hält das fest).
     "scripts/pipeline/io/extract.ts",
+    // liest die Prompts scripts/pipeline/prompt/discover-*.md (Plan 0032, E7); unschädlich wie io/extract.ts
+    "scripts/pipeline/io/discover.ts",
   ]);
   // auch Vite-Importe mit Query wie "./x.md?raw" (Arch-Review m2)
   const MD_STRING = /\.md(\?[^"'`]*)?["'`]|\*\.md\b|\.md\$/;
