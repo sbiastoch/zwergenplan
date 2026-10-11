@@ -14,7 +14,7 @@ describe("isDocPath: Positivliste der Doku (Plan 0027, E1)", () => {
     "CLAUDE.md",
     "README.md",
     ".claude/skills/plan-review/SKILL.md",
-    ".claude/skills/babyevents-nuernberg/references/extraction.md",
+    ".claude/skills/babyevents-nuernberg/references/paket.md",
     ".claude/agents/plan-reviewer.md",
   ])("%s ist Doku", (path) => {
     expect(isDocPath(path)).toBe(true);
@@ -29,6 +29,8 @@ describe("isDocPath: Positivliste der Doku (Plan 0027, E1)", () => {
     "docs/plans/notiz.txt",
     "src/domain/format.ts",
     "src/ui/x.md",
+    // Prompt der Extraktion: wird von scripts/pipeline/io/extract.ts gelesen, ist also Code (Plan 0032, E4)
+    "scripts/pipeline/prompt/extract.md",
     ".claude/hooks/stop-gate.ts",
     ".claude/settings.json",
     ".claude/agents/sub/x.md",
@@ -101,6 +103,9 @@ describe("Doku liest niemand", () => {
     "scripts/lib/doc-check.test.ts",
     "scripts/lib/change-class.ts",
     "scripts/lib/change-class.test.ts",
+    // liest den Prompt scripts/pipeline/prompt/extract.md (Plan 0032, E4). Unschädlich für Stufe 0, weil
+    // scripts/** nicht auf der Positivliste der Doku steht (Test „ist keine Doku“ oben hält das fest).
+    "scripts/pipeline/io/extract.ts",
   ]);
   // auch Vite-Importe mit Query wie "./x.md?raw" (Arch-Review m2)
   const MD_STRING = /\.md(\?[^"'`]*)?["'`]|\*\.md\b|\.md\$/;

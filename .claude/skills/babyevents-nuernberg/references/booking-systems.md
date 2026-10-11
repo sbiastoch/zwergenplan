@@ -17,7 +17,7 @@ Nachschlagen, wenn ein Anbieter-Eintrag eines dieser Systeme unter `availability
 | **Elena Paulus, kinder-hautnah.de** | Freitext „ausgebucht“, „freie Plätze“, „Anmeldung möglich“ | direkt |
 | **evangelische-termine.de** | „(Warteliste)“ im Titel, sonst keine Angabe. Die Termine kommen über `pnpm pipeline candidates fetch` (JSON-API, inkl. Abfrage je `vid`), nicht über den iCal-Feed: Der kodiert Wochenreihen („jeweils“) fälschlich als `FREQ=DAILY`. | warteliste / unbekannt |
 | **miya** (Hebamme Eva Kauper) | Ohne Browser lesbar über `https://login.miya360.de/apps/mymiya/hebammeeva/course-portal/course/list/<typeId>` | direkt |
-| **go~mus** (Neues Museum) | Ohne Browser lesbar: `https://bsms.gomus.de/api/v4/events/<id>/dates/<date_id>` mit Header `X-Shop-Url: bsms-nmn-shop.gomus.de` | Platzangabe im JSON, Übersetzung nach der Tabelle in `extraction.md` |
+| **go~mus** (Neues Museum) | Ohne Browser lesbar: `https://bsms.gomus.de/api/v4/events/<id>/dates/<date_id>` mit Header `X-Shop-Url: bsms-nmn-shop.gomus.de` | Platzangabe im JSON, Übersetzung nach der Verfügbarkeitstabelle in `scripts/pipeline/prompt/extract.md` |
 | **Eventim Light** (Babykonzert) | Die Eventseite zeigt, ob Karten verfügbar sind | frei / ausgebucht |
 | **Ticketportale ohne Platzangabe** (rausgegangen, Eventim-Listen, JSON-LD mit `availability: null`) | nur Preis sichtbar | `unbekannt`, Ticketlink in `url` |
 | **Stadt-Kalender (`candidates fetch`)** | Felder `sold_out`, `cancelled` | ausgebucht / Termin weglassen |
