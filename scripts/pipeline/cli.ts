@@ -9,6 +9,9 @@
  *                                               E3, S1.2): DIR (Standard runs/<heute>/fetch/) bekommt <id>.txt,
  *                                               hashes.json und report.md; --compare = hashes.json der Vornacht.
  *                                               Kein Modell, nichts nach data/.
+ *   extract ID [--from DIR]                     Probe der Extraktion eines Anbieters mit dem Modell (Plan 0032, E4):
+ *                                               Eingabe aus DIR (Ausgabe von `fetch`), sonst frisch abgerufen;
+ *                                               Ergebnis und Aufrufe nach runs/<heute>/extract/<id>.json, nichts nach data/.
  *   candidates fetch|list RUN_DIR               Sammelkalender abrufen / Kandidaten mit Zuordnung zeigen
  *   candidates keep RUN_DIR cid,cid=anbieter/ort [--force]   Entwurf raw/aggregatoren.json schreiben
  *   candidates add-provider RUN_DIR cid --id <neue-id>       Veranstalter in den Katalog aufnehmen
@@ -21,13 +24,22 @@
  *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { z } from "zod";
 import { validateDataset } from "../../src/domain/dataset.ts";
 import { addMonths, berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
+import {
+  type CallRecord,
+  createExtractor,
+  EXTRACT_KEY_PARTS,
+  type ExtractInput,
+  type ExtractOutcome,
+  type ExtractResult,
+} from "./io/extract.ts";
 import { fetchInputs } from "./io/fetch-inputs.ts";
 import {
   appendToCatalog,
@@ -53,6 +65,7 @@ import { fetchPage } from "./io/http.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
+import { inputsFromFetch } from "./lib/extract.ts";
 import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
   extractTimetable,
@@ -179,6 +192,59 @@ async function fetchCmd() {
   writeFileSync(join(out, "report.md"), report);
   print(report);
   print(`✓ ${out}`);
+}
+
+/**
+ * Probe der Extraktion eines Anbieters (Plan 0032, Stufe 2): Eingabe aus einer Abruf-Ausgabe (`--from DIR`, sonst
+ * frisch abgerufen nach runs/<heute>/extract/input/), Ergebnis und Aufrufe nach runs/<heute>/extract/<id>.json.
+ * Schreibt nichts nach data/.
+ */
+async function extractCmd(id: string) {
+  const date = today();
+  const catalog = readCatalog();
+  const provider = catalog.find((p) => p.id === id) ?? fail(`${id}: unbekannter Anbieter`);
+  const outDir = join(ROOT, "runs", date, "extract");
+  let dir = values.from;
+  if (!dir) {
+    dir = join(outDir, "input");
+    const fetched = await fetchInputs(planFetch(catalog, { today: date, only: [id] }), catalog, date);
+    mkdirSync(dir, { recursive: true });
+    for (const [pid, text] of Object.entries(fetched.texts)) writeFileSync(join(dir, `${pid}.txt`), `${text}\n`);
+    writeJson(join(dir, "hashes.json"), fetched.providers);
+  }
+  const entry = HashesFile.parse(readJson(join(dir, "hashes.json")))[id];
+  const textFile = join(dir, `${id}.txt`);
+  if (entry?.status !== "ok" || !existsSync(textFile))
+    fail(`${id}: keine Eingabe in ${dir} (${entry?.status ?? "fehlt"}${entry?.reason ? `: ${entry.reason}` : ""})`);
+  const text = readFileSync(textFile, "utf8").trimEnd();
+  const { candidates, allowedUrls } = inputsFromFetch(text, entry.pages);
+  const controller = new AbortController();
+  process.once("SIGINT", () => controller.abort());
+  const started = performance.now();
+  const input: ExtractInput = { provider, text, candidates, allowedUrls, today: date };
+  const result: ExtractResult = await createExtractor()(input, controller.signal);
+  const promptHash = createHash("sha256")
+    .update(EXTRACT_KEY_PARTS.prompt)
+    .update(EXTRACT_KEY_PARTS.schema)
+    .digest("hex")
+    .slice(0, 12);
+  writeJson(join(outDir, `${id}.json`), { providerId: id, date, chars: text.length, promptHash, ...result });
+  const sum = (f: (c: CallRecord) => number) => result.calls.reduce((s, c) => s + f(c), 0);
+  const headline = (o: ExtractOutcome) =>
+    o.kind === "ok"
+      ? `✓ ${o.events.length} Events (${o.model})`
+      : o.kind === "fehler"
+        ? `✗ fehler: ${o.reason}`
+        : `✗ Abbruch: ${o.abort}`;
+  print(headline(result.outcome));
+  print(
+    `Eingabe ${text.length.toLocaleString("de-DE")} Zeichen, ${candidates.length} Kandidaten; ${result.calls.length} Aufrufe ` +
+      `(${result.calls.map((c) => `${c.step}/${c.model}: ${c.result}`).join(", ")}); ` +
+      `Tokens ein ${sum((c) => c.inputTokens)} + Cache ${sum((c) => c.cacheReadTokens)}/${sum((c) => c.cacheCreationTokens)}, ` +
+      `aus ${sum((c) => c.outputTokens)}; Schätzung $${sum((c) => c.costUsd ?? 0).toFixed(4)}; ` +
+      `${((performance.now() - started) / 1000).toFixed(1)} s`,
+  );
+  print(`✓ ${join(outDir, `${id}.json`)}`);
 }
 
 async function candidatesFetch(runDir: string) {
@@ -435,6 +501,9 @@ switch (command) {
     break;
   case "fetch":
     await fetchCmd();
+    break;
+  case "extract":
+    await extractCmd(need(args[0], "Anbieter-ID"));
     break;
   case "candidates": {
     const [sub, runDir, extra] = args;

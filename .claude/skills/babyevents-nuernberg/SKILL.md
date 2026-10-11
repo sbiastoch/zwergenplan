@@ -31,7 +31,7 @@ Fertig, wenn `selection.json` die Pakete, die Sammelkalender mit Adapter und die
 ## 2. Termine erfassen – Subagenten und Sammelkalender parallel
 
 **Subagenten zuerst**: Starte je Paket einen Subagenten im Hintergrund, alle in **einer** Nachricht. Jeder bekommt:
-- den Pfad `.claude/skills/babyevents-nuernberg/references/extraction.md` mit dem Auftrag, ihn zuerst zu lesen und genau zu befolgen
+- den Pfad `.claude/skills/babyevents-nuernberg/references/paket.md` mit dem Auftrag, ihn und den darin genannten Prompt `scripts/pipeline/prompt/extract.md` zuerst zu lesen und genau zu befolgen
 - den Horizont `from`–`to` aus `meta.json`
 - das Paket `runs/<from>/batch-<n>.json` und den Ausgabepfad `runs/<from>/raw/batch-<n>.json`
 
