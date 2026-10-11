@@ -151,8 +151,12 @@
   .onb-kicker {
     display: inline-block;
     margin: 0 0 8px;
-    padding: 2px 12px;
-    border-radius: 999px;
+    /*
+     * Pille in em statt 999px (Plan 0034): Einzeilig bleibt sie rund; bricht ein langer Kicker („Schön, dass ihr da
+     * seid“) bei 320 px und 200 % um, stößt der Text nicht an die Rundung (expectTextFits).
+     */
+    padding: 2px 0.9em;
+    border-radius: 1em;
     border: 2px solid var(--line);
     background: var(--k);
     color: #13212e;

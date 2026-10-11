@@ -10,6 +10,7 @@
  */
 
 import type { InstallApi, InstallState } from "../domain/pwa.ts";
+import { isIosDevice, standalone } from "./platform.ts";
 
 /** Ab so alter Antwort holt die Rückkehr zur App einen neuen Stand (E4a) */
 export const FRESH_AFTER_MS = 30 * 60_000;
@@ -232,14 +233,6 @@ export interface InstallEnv {
   onInstalled: (fn: () => void) => void;
 }
 
-/**
- * iPhone/iPad, heuristisch (E7): iPadOS meldet sich als Mac, nur die Touch-Punkte verraten es. Keine Versionsprüfung:
- * iOS 26 meldet im UA eingefroren `iPhone OS 18_7` (Spike). Fällt die Erkennung falsch aus, sieht man nur einen
- * Hilfetext.
- */
-const isIos = ({ userAgent, maxTouchPoints }: InstallEnv) =>
-  /iPhone|iPad|iPod/.test(userAgent) || (/Macintosh/.test(userAgent) && maxTouchPoints > 1);
-
 /** Merkt das Angebot des Browsers und meldet Änderungen (für `useSyncExternalStore`). */
 export function createInstallStore(env: InstallEnv) {
   let offer: PromptEvent | undefined;
@@ -264,7 +257,7 @@ export function createInstallStore(env: InstallEnv) {
       if (env.standalone()) return "app";
       if (installed) return "installiert";
       if (offer) return "angebot";
-      if (isIos(env)) return "ios";
+      if (isIosDevice(env)) return "ios";
       return /Android/.test(env.userAgent) ? "menue" : "keine";
     },
     subscribe(fn: () => void): () => void {
@@ -292,9 +285,7 @@ export function createInstallStore(env: InstallEnv) {
 
 function browserInstallEnv(): InstallEnv {
   return {
-    standalone: () =>
-      window.matchMedia("(display-mode: standalone)").matches ||
-      ("standalone" in navigator && navigator.standalone === true),
+    standalone,
     userAgent: navigator.userAgent,
     maxTouchPoints: navigator.maxTouchPoints,
     // Typ des Events in src/env.d.ts (fehlt in lib.dom)

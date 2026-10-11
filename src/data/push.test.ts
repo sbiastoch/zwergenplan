@@ -358,6 +358,56 @@ describe("mirror", () => {
   });
 });
 
+describe("mirrorIfSubscribed (Plan 0034, E9): einmal am Ende des Onboardings, ohne Request", () => {
+  /** zählt Schreibvorgänge in den Geräte-Speicher */
+  function counted(f: Fake) {
+    const writes: string[] = [];
+    const set = f.env.store.set;
+    f.env.store.set = async (key, value) => {
+      writes.push(key);
+      await set(key, value);
+    };
+    return writes;
+  }
+
+  it("ohne PushManager: fragt nicht einmal nach der Registrierung, schreibt nichts", async () => {
+    const f = fake({ pushManager: false });
+    const writes = counted(f);
+    await createPush(f.env).mirrorIfSubscribed(DATA);
+    expect(f.calls).toEqual([]);
+    expect(writes).toEqual([]);
+    expect(f.requests).toEqual([]);
+  });
+
+  it("ohne Abo: Geräte-Speicher bleibt unberührt, kein Request", async () => {
+    const f = fake();
+    f.store.set("birthDate", "2024-01-01");
+    const writes = counted(f);
+    await createPush(f.env).mirrorIfSubscribed(DATA);
+    expect(writes).toEqual([]);
+    expect([...f.store]).toEqual([["birthDate", "2024-01-01"]]);
+    expect(f.requests).toEqual([]);
+  });
+
+  it("mit Abo: schreibt Geburtsdatum, Such-Abos und Startpunkt, kein Request; gleiche Daten erneut: nichts", async () => {
+    const f = fake();
+    f.setSub("https://web.push.apple.com/a");
+    f.store.set("endpoint", "https://web.push.apple.com/a");
+    const writes = counted(f);
+    const push = createPush(f.env);
+    await push.mirrorIfSubscribed(DATA);
+    expect(writes.sort()).toEqual(["birthDate", "origin", "searches"]);
+    expect(f.store.get("birthDate")).toBe("2025-08-05");
+    expect(f.store.get("searches")).toBe('["kat=musik"]');
+    expect(f.store.get("origin")).toBe("gostenhof");
+    expect(f.store.get("endpoint")).toBe("https://web.push.apple.com/a");
+    writes.length = 0;
+    await push.mirrorIfSubscribed(DATA);
+    expect(writes).toEqual([]);
+    expect(f.requests).toEqual([]);
+  });
+});
+
 describe("mirror nach dem Ausschalten (E6: geleert heißt geleert)", () => {
   it("schreibt nichts, solange kein Abgleich oder Einschalten Push als an bestätigt hat", async () => {
     const f = fake();

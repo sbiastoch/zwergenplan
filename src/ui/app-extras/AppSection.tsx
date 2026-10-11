@@ -15,10 +15,15 @@ import { type InstallApi, installFoot, installHelp, type PushSupport, pushView }
 import type { AppStepProps } from "../onboarding-types.ts";
 import { PushControls } from "./PushControls.tsx";
 import { APP_STEP_TEXTS, problemText, PUSH_TEXTS as T } from "./push-texts.ts";
-import { usePushSwitch } from "./use-push-switch.ts";
+import { mirrorData, usePushSwitch } from "./use-push-switch.ts";
 
 /** Für den Flow des Onboardings (Plan 0033, E4): Der Lader reicht es als Prop weiter, kein Import aus dem Chunk. */
 export { pushCapability } from "../../data/push.ts";
+
+/** Ende des Onboardings (Plan 0034, E9): mit Abo einmal spiegeln, lokal und ohne Request */
+export function syncPushMirror(): Promise<void> {
+  return createPush().mirrorIfSubscribed(mirrorData());
+}
 
 /** Teilen-Symbol von iOS (Kasten mit Pfeil nach oben). Nur hier gebraucht, deshalb nicht in icons.tsx (Start-Bundle). */
 function ShareIcon() {

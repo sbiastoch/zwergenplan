@@ -4,12 +4,14 @@
  * - `preloadOnboarding()` startet Onboarding-Chunk und App-Teil (`loadAppStep`, `assets/app/`) schon im
  *   `useState`-Initializer von `App`, parallel zu `site.json`, bei jedem Gate ≠ „nichts“ (E2, Review H1, 2 M-2).
  * - Der Cover-Div steht schon im ersten Frame, bevor `Dialog` im Effekt `showModal()` ruft: Die Liste blitzt nicht auf.
- * - Laden (Chunk, App-Teil oder Daten offen): leere Bühne mit „Überspringen“ (Start-CSS, Review H5).
+ * - Laden (Chunk, App-Teil oder Daten offen): leere Bühne mit „Überspringen“ (Start-CSS, Review H5), in der Farbe der
+ *   ersten Bühne: im Safari-Tab des iPhones „App“ (Klasse `ios`, Plan 0034, E8), sonst Stadt.
  * - Chunk nicht ladbar: `LoadFailed` und „Später“ (Flag bleibt leer). Scheitert nur der App-Teil, läuft der Flow ohne
  *   den Schritt „App“.
  * - Esc und Android-Zurück (`cancel`) zählen wie „Überspringen“.
  */
 import type { ComponentType } from "react";
+import { iosTab } from "../data/platform.ts";
 import { loadAppStep } from "./AppExtras.tsx";
 import { Dialog } from "./Dialog.tsx";
 import { LoadFailed, useLazy } from "./Lazy.tsx";
@@ -56,7 +58,7 @@ export function Onboarding({ data, onEnd, ...rest }: OnboardingProps) {
             </button>
           </div>
         ) : module.kind === "laden" || data === "loading" ? (
-          <div className="onb-pending" aria-busy="true">
+          <div className={iosTab() ? "onb-pending ios" : "onb-pending"} aria-busy="true">
             <div className="onb-topbar">
               <button type="button" className="onb-skip" onClick={() => onEnd("abbruch")}>
                 Überspringen

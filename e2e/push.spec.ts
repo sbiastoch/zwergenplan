@@ -18,6 +18,8 @@ import {
   expectTextFits,
   setTextScale,
 } from "./mobile-ux.ts";
+import { ONBOARDING_FLAG } from "./onboarding-flag.ts";
+import { goTo, intro } from "./onboarding-steps.ts";
 
 test.use({ serviceWorkers: "allow", channel: "chromium", pushWorker: "mock" });
 test.skip(process.env["ZWERGENPLAN_SW"] === "aus", "Notausgang aktiv: Build ohne Service Worker (README)");
@@ -346,6 +348,64 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
   expect(pushLog.at(-1)).toEqual({ method: "DELETE", path: "/abo", body: { endpoint: ENDPOINT } });
   // Die Such-Abos gehören dem Nutzer, nicht dem Push
   expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik","kat=natur"]');
+});
+
+test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0034, E9)", () => {
+  /** Bestandsnutzer mit Angaben, nur beim ersten Laden (Muster oben) */
+  async function seed(page: Page) {
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem("__e2eSeeded")) return;
+      sessionStorage.setItem("__e2eSeeded", "1");
+      localStorage.setItem("zwergenplan.geburtsdatum", "2025-08-05");
+      localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof");
+    });
+  }
+
+  /** altes Flag „1“ setzen und neu laden: Das Onboarding erscheint (Plan 0034, E4); neues Alter und neuer Stadtteil */
+  async function onboardingWithNewValues(page: Page) {
+    await page.evaluate((key) => localStorage.setItem(key, "1"), ONBOARDING_FLAG.key);
+    await page.reload();
+    await expect(intro(page)).toBeVisible();
+    await goTo(page, "alter");
+    await intro(page).getByLabel("Geburtsdatum").fill("01.03.2026");
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("zwergenplan.geburtsdatum"))).toBe("2026-03-01");
+    await goTo(page, "weg");
+    await intro(page).getByRole("combobox", { name: "Stadtteil" }).selectOption("st-johannis");
+    await intro(page).getByRole("button", { name: "Überspringen" }).click();
+    await expect(intro(page)).toHaveCount(0);
+  }
+
+  test("mit Abo: neue Werte im Geräte-Speicher, kein Request an den Push-Worker", async ({
+    page,
+    context,
+    pushLog,
+  }) => {
+    await seed(page);
+    await installed(page, context);
+    await openKidSheet(page);
+    await pushSwitch(page).click();
+    await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
+    await expect
+      .poll(() => readStore(page))
+      .toEqual({ endpoint: ENDPOINT, birthDate: "2025-08-05", origin: "gostenhof" });
+    const requests = pushLog.length;
+
+    await onboardingWithNewValues(page);
+    await expect
+      .poll(() => readStore(page))
+      .toEqual({ endpoint: ENDPOINT, birthDate: "2026-03-01", origin: "st-johannis" });
+    expect(pushLog.slice(requests), "kein Request seit dem Neuladen").toEqual([]);
+  });
+
+  test("ohne Abo: Geräte-Speicher bleibt leer", async ({ page, context, pushLog }) => {
+    await seed(page);
+    await installed(page, context);
+    await onboardingWithNewValues(page);
+    // dem Cleanup Zeit geben: Er liest das Abo asynchron
+    await page.waitForTimeout(300);
+    expect(await readStore(page)).toEqual({});
+    expect(pushLog).toEqual([]);
+  });
 });
 
 test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requests für alle gleich (E10)", async ({
