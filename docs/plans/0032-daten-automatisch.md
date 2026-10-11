@@ -1,6 +1,6 @@
 # Plan 0032 – Daten automatisch: Nachtlauf und Entdecken über das Abo
 
-Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 misst 7 Nächte bis 2026-10-18; Stufe 2 in Arbeit (Branch `plan-0032-s2`); Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
+Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 maß eine Nacht (dann Live-Freigabe); Stufe 2 und 3 umgesetzt, Nachtlauf live freigegeben 2026-10-11; Stufe 4 in Arbeit; Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
 Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird durch ADR 0026 ersetzt), ADR 0022 (stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (vorgeschlagen 2026-10-11, `docs/adr/0026-daten-automatisch.md`, Inhalt nach E14; angenommen mit Stufe 5)
@@ -328,6 +328,12 @@ S3.1 und S3.4 als Code, ohne Daten-Push; S3.2 (Trockenlauf in Actions) und S3.3 
 
 **Stufe 5 – Abschluss:** Entdecken-Eval, Skill (E11), ADR 0026 angenommen, ADR 0016 auf „ersetzt“, Plan 0015 nach `docs/plans/archiv/` mit `ersetzt durch Plan 0032`, `docs/architecture.md` und `CLAUDE.md` nachgezogen.
 
+
+### Stufe 3 – Trockenlauf und Freigabe (2026-10-11)
+
+- **S3.2 Trockenlauf** (Run 38136150454, `main`): 74 Anbieter in 18 Min., 115 Modellaufrufe (fbs-nuernberg in 15 Teilen), 2,40 Mio. Tokens ein und 0,64 Mio. aus, $0,57 (CLI-Schätzung, API-Gegenwert). Ergebnis 372 Angebote und 5 307 Termine gegen 333 und 2 889 im Bestand (vor allem 12 statt 4 Monate). Einbruchschutz griff bei nuebad-flipper (10 → 0, Vorstand bleibt). Fehler: hebammenpraxis-gugelrund (404), sternenhaus-kuf (Bot-Schutz), studio-herzschlag (Timeout). Rot wegen eines Test-Flakes in `scripts/heavy.test.ts` (behoben in 398a0e8) und der Token-Bremse (3 Mio.), die 2 Anbieter offen ließ; der erste Lauf extrahiert alles neu, danach nur geänderte Seiten.
+- **S3.3:** Deploy-Build mit den Daten des Trockenlaufs hält alle Budgets (`pnpm size`, Daten 93 kB von 250 kB).
+- **Freigabe (Nutzer, 2026-10-11):** Push freigegeben; erster Live-Lauf per `workflow_dispatch` mit `max_tokens=5000000`, danach `NACHTLAUF_MODUS=live`. Die reine Hash-Messung aus S1.2 endet damit nach einer Nacht; geänderte Anbieter je Nacht zeigt weiter `data/kosten.csv`. Der Entscheid zum reihenfolgefreien Schlüssel (`ORDER_FREE_KEY`) fällt nach einigen Live-Nächten anhand der Zahl der gesparten Aufrufe.
 ### Was der Nutzer tun muss
 
 - Secret `CLAUDE_CODE_OAUTH_TOKEN` anlegen (Stufe 1).
