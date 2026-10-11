@@ -213,7 +213,9 @@ async function extractCmd(id: string) {
   const outDir = join(ROOT, "runs", date, "extract");
   let dir = values.from;
   // frisch abgerufen: Kandidaten und erlaubte URLs direkt aus dem Abruf wie im Nachtlauf (samt Redirect-Zielen)
-  let fresh: { candidates: readonly Candidate[]; allowedUrls: readonly string[] } | undefined;
+  let fresh:
+    | { candidates: readonly Candidate[]; allowedUrls: readonly string[]; pageUrls: readonly string[] }
+    | undefined;
   if (!dir) {
     dir = join(outDir, "input");
     const fetched = await fetchInputs(planFetch(catalog, { today: date, only: [id] }), catalog, date);
@@ -221,18 +223,22 @@ async function extractCmd(id: string) {
     for (const [pid, text] of Object.entries(fetched.texts)) writeFileSync(join(dir, `${pid}.txt`), `${text}\n`);
     writeJson(join(dir, "hashes.json"), fetched.providers);
     const own = fetched.inputs[id];
-    if (own) fresh = { candidates: own.candidates, allowedUrls: own.allowedUrls };
+    if (own)
+      fresh = { candidates: own.candidates, allowedUrls: own.allowedUrls, pageUrls: own.pages.map((p) => p.url) };
   }
   const entry = HashesFile.parse(readJson(join(dir, "hashes.json")))[id];
   const textFile = join(dir, `${id}.txt`);
   if (entry?.status !== "ok" || !existsSync(textFile))
     fail(`${id}: keine Eingabe in ${dir} (${entry?.status ?? "fehlt"}${entry?.reason ? `: ${entry.reason}` : ""})`);
   const text = readFileSync(textFile, "utf8").trimEnd();
-  const { candidates, allowedUrls } = fresh ?? inputsFromFetch(text, entry);
+  const { candidates, allowedUrls, pageUrls } = fresh ?? {
+    ...inputsFromFetch(text, entry),
+    pageUrls: entry.pages.flatMap((p) => (p.ok ? [p.url] : [])),
+  };
   const controller = new AbortController();
   process.once("SIGINT", () => controller.abort());
   const started = performance.now();
-  const input: ExtractInput = { provider, text, candidates, allowedUrls, today: date };
+  const input: ExtractInput = { provider, text, pageUrls, candidates, allowedUrls, today: date };
   const result: ExtractResult = await createExtractor()(input, controller.signal);
   const promptHash = createHash("sha256")
     .update(EXTRACT_KEY_PARTS.prompt)

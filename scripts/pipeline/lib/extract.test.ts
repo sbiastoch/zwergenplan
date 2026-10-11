@@ -368,7 +368,7 @@ describe("runExtractionInParts", () => {
     expect(r.outcome).toMatchObject({
       kind: "ok",
       model: "haiku",
-      warnings: ["1 gleiche Events aus mehreren Teilen nur einmal übernommen"],
+      warnings: ["Teil 2: „Offener Krabbeltreff“ entfällt, gleich „Offener Krabbeltreff“ aus Teil 1"],
     });
     expect(r.outcome.kind === "ok" && r.outcome.events.map((e) => e.title)).toEqual([
       "Offener Krabbeltreff",
@@ -421,7 +421,7 @@ describe("runExtractionInParts", () => {
     expect(r.outcome).toMatchObject({
       kind: "ok",
       warnings: [
-        "1 gleiche Events aus mehreren Teilen nur einmal übernommen",
+        "Teil 2: „Offener Krabbeltreff“ entfällt, gleich „Offener Krabbeltreff“ aus Teil 1",
         "events.1 („Babymassage“): Kurs ist schon vorbei – entfällt",
       ],
     });

@@ -59,7 +59,14 @@ const extractor = (partMaxChars?: number) =>
     freeDays: async () => ({}),
     ...(partMaxChars ? { partMaxChars } : {}),
   });
-const input = (text: string) => ({ provider, text, candidates: [], allowedUrls: [PAGE], today: "2026-10-05" });
+const input = (text: string) => ({
+  provider,
+  text,
+  pageUrls: [PAGE, `${PAGE}/2`],
+  candidates: [],
+  allowedUrls: [PAGE, `${PAGE}/2`],
+  today: "2026-10-05",
+});
 
 describe("createExtractor (Fake-CLI)", () => {
   it("ein Aufruf mit Prompt-Datei und Schema, Events mit providerId, Aufruf mit Verbrauch", async () => {

@@ -54,6 +54,7 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
   const input: ExtractInput = {
     provider: o.provider,
     text: o.fetched.text,
+    pageUrls: o.fetched.pages.map((p) => p.url),
     candidates: o.fetched.candidates,
     allowedUrls: o.fetched.allowedUrls,
     today: o.today,

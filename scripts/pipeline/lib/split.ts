@@ -7,9 +7,9 @@
  * 1. zwischen Seiten (`## Seite N: …`); kleine Seiten werden der Reihe nach bis zur Schwelle zusammengepackt;
  * 2. in einer Seite über der Schwelle vor jedem Abschnitt (`## TEXT`, `## ICAL`, `## JSON-LD`);
  * 3. in JSON (iCal, JSON-Schnittstelle, JSON-LD) nur zwischen den Elementen einer Ebene, oberste Ebene zuerst;
- * 4. im Text nach der wiederkehrenden Zeile, die einen Eintrag abschließt: die häufigste Zeile (mindestens 3-mal),
- *    bei Gleichstand die, die im ersten Eintrag zuletzt kommt (fbs-nuernberg.de: „Angebot drucken »“, Staatstheater:
- *    „Tickets“, PDF der Stadtbibliothek: die Fußzeile je Seite);
+ * 4. im Text nach der wiederkehrenden Zeile, die einen Eintrag abschließt (`entryEnd`: die im ersten Eintrag letzte
+ *    der Zeilen, die je Eintrag einmal vorkommen; fbs-nuernberg.de: „Angebot drucken »“, Staatstheater: „Tickets“,
+ *    PDF der Stadtbibliothek: die Fußzeile je Seite); ist sie ein Feldname („Leitung:“), nach dessen Wert;
  * 5. erst wenn nichts davon greift, an Zeilengrenzen.
  * Ein Teil einer zerlegten Seite beginnt wieder mit ihrer Kopfzeile, damit `sourceUrl` eindeutig bleibt. Der
  * Abschnitt `## Kandidaten (N)` (nur der letzte, wie in `inputsFromFetch`) kommt in den ersten Teil, in den er
@@ -28,7 +28,6 @@ import { similarTitle } from "./similar.ts";
 export const PART_MAX_CHARS = 25_000;
 
 const PAGE_HEADER = /^## Seite \d+: /;
-const CANDIDATES_HEADER = /^## Kandidaten \(\d+\)$/;
 /** Abschnitte innerhalb einer Seite (`programmeText`): `## TEXT`, `## ICAL`, `## JSON-LD` */
 const SECTION_HEADER = /^## /;
 const MIN_REPEATS = 3;
@@ -61,14 +60,28 @@ function pack(pieces: readonly (readonly string[])[], max: number): string[][] {
   return out;
 }
 
+/** Zählt, wo nur noch an Zeilengrenzen geschnitten werden konnte (Hinweis bis `nightly.json`). */
+interface Fallbacks {
+  lines: number;
+}
+
 /** Letzter Ausweg: an Zeilengrenzen. Eine einzelne Zeile über der Schwelle bleibt ganz. */
-const byLines = (lines: Lines, max: number) =>
-  pack(
+function byLines(lines: Lines, max: number, fb: Fallbacks): string[][] {
+  const out = pack(
     lines.map((l) => [l]),
     max,
   );
+  if (out.length > 1) fb.lines += out.length - 1;
+  return out;
+}
 
-/** Zeile, die einen Eintrag abschließt (siehe Kopf, Punkt 4), oder undefined. */
+/**
+ * Zeile, die einen Eintrag abschließt (siehe Kopf, Punkt 4), oder undefined. Kandidaten sind Zeilen, die mindestens
+ * 3-mal und mindestens halb so oft wie die häufigste vorkommen. Je Eintrag kommen die festen Feldzeilen gleich oft
+ * vor; deshalb zählt die Häufigkeit, die die meisten Zeilen teilen (eine Zeile, die zweimal je Eintrag steht, etwa
+ * zwei „Uhrzeit:“, gewinnt so nicht), bei Gleichstand die höhere. In dieser Gruppe gilt die Zeile, die im ersten
+ * Eintrag zuletzt kommt.
+ */
 function entryEnd(lines: Lines): string | undefined {
   const seen = new Map<string, { count: number; first: number }>();
   lines.forEach((l, i) => {
@@ -77,22 +90,28 @@ function entryEnd(lines: Lines): string | undefined {
     if (s) s.count++;
     else seen.set(l, { count: 1, first: i });
   });
-  let best: { line: string; count: number; first: number } | undefined;
-  for (const [line, s] of seen) {
-    if (s.count < MIN_REPEATS) continue;
-    if (!best || s.count > best.count || (s.count === best.count && s.first > best.first)) best = { line, ...s };
-  }
-  return best?.line;
+  const maxCount = Math.max(0, ...[...seen.values()].map((s) => s.count));
+  const floor = Math.max(MIN_REPEATS, Math.ceil(maxCount / 2));
+  const groups = new Map<number, Array<{ line: string; first: number }>>();
+  for (const [line, s] of seen)
+    if (s.count >= floor) groups.set(s.count, [...(groups.get(s.count) ?? []), { line, first: s.first }]);
+  let best: { count: number; members: Array<{ line: string; first: number }> } | undefined;
+  for (const [count, members] of groups)
+    if (!best || members.length > best.members.length || (members.length === best.members.length && count > best.count))
+      best = { count, members };
+  return best?.members.reduce((a, b) => (b.first > a.first ? b : a)).line;
 }
 
-function splitText(lines: Lines, max: number): string[][] {
+function splitText(lines: Lines, max: number, fb: Fallbacks): string[][] {
   if (size(lines) <= max) return [[...lines]];
   const end = entryEnd(lines);
-  const cuts = end === undefined ? [] : lines.flatMap((l, i) => (l === end ? [i] : []));
+  // Endet die Zeile mit „:“ (Feldname), gehört die nächste noch zum Eintrag (martha-maria.de: „Leitung:“, Name)
+  const after = end?.endsWith(":") ? 1 : 0;
+  const cuts = end === undefined ? [] : lines.flatMap((l, i) => (l === end ? [i + after] : []));
   const pieces = cutAfter(lines, cuts);
-  if (pieces.length <= 1) return byLines(lines, max);
+  if (pieces.length <= 1) return byLines(lines, max, fb);
   return pack(
-    pieces.flatMap((p) => splitText(p, max)),
+    pieces.flatMap((p) => splitText(p, max, fb)),
     max,
   );
 }
@@ -125,21 +144,21 @@ function jsonLines(lines: Lines): JsonLine[] {
 const MAX_JSON_LEVEL = 8;
 
 /** Schnitt hinter Zeilen, die auf `level` zurückschließen; reicht das nicht, eine Ebene tiefer. */
-function splitJson(items: readonly JsonLine[], level: number, max: number): string[][] {
+function splitJson(items: readonly JsonLine[], level: number, max: number, fb: Fallbacks): string[][] {
   const lines = items.map((j) => j.line);
   if (size(lines) <= max) return [lines];
-  if (level > MAX_JSON_LEVEL) return byLines(lines, max);
+  if (level > MAX_JSON_LEVEL) return byLines(lines, max, fb);
   const cuts = items.flatMap((j, i) => (j.after === level && j.before > level ? [i] : []));
   const pieces = cutAfter(items, cuts);
-  if (pieces.length <= 1) return splitJson(items, level + 1, max);
+  if (pieces.length <= 1) return splitJson(items, level + 1, max, fb);
   return pack(
-    pieces.flatMap((p) => splitJson(p, level + 1, max)),
+    pieces.flatMap((p) => splitJson(p, level + 1, max, fb)),
     max,
   );
 }
 
 /** Rumpf einer Seite (ohne Kopfzeile) in Stücke unter `max`: Abschnitte, dann JSON oder Text. */
-function splitBody(lines: Lines, max: number): string[][] {
+function splitBody(lines: Lines, max: number, fb: Fallbacks): string[][] {
   const starts = lines.flatMap((l, i) => (i > 0 && SECTION_HEADER.test(l) ? [i - 1] : []));
   const sections = cutAfter(lines, starts);
   const pieces = sections.flatMap((section) => {
@@ -147,40 +166,74 @@ function splitBody(lines: Lines, max: number): string[][] {
     const hasHead = head !== undefined && SECTION_HEADER.test(head);
     const body = hasHead ? rest : section;
     const isJson = body[0] === "[" || body[0] === "{";
-    if (!isJson) return splitText(section, max);
+    if (!isJson) return splitText(section, max, fb);
     // Kopf des Abschnitts zum ersten Stück; Tiefe zählt ab dem JSON
-    const json = splitJson(jsonLines(body), 1, hasHead ? max - head.length - 1 : max);
+    const json = splitJson(jsonLines(body), 1, hasHead ? max - head.length - 1 : max, fb);
     return hasHead ? [[head, ...(json[0] ?? [])], ...json.slice(1)] : json;
   });
   return pack(pieces, max);
 }
 
 /** Blöcke einer Seite: ganz, oder Stücke mit wiederholter Kopfzeile. */
-function pageBlocks(page: Lines, max: number): string[] {
+function pageBlocks(page: Lines, max: number, notes: string[]): string[] {
   if (size(page) <= max) return [page.join("\n")];
   const [head, ...body] = page;
-  if (head === undefined || !PAGE_HEADER.test(head)) return splitBody(page, max).map((p) => p.join("\n"));
-  return splitBody(body, max - head.length - 1).map((p) => [head, ...p].join("\n"));
+  const fb: Fallbacks = { lines: 0 };
+  const own = head !== undefined && PAGE_HEADER.test(head);
+  const blocks = own
+    ? splitBody(body, max - head.length - 1, fb).map((p) => [head, ...p].join("\n"))
+    : splitBody(page, max, fb).map((p) => p.join("\n"));
+  if (fb.lines > 0)
+    notes.push(
+      `${own ? head.replace(/ \([^)]*\)$/, "").replace(/^## /, "") : "Eingabe"}: ${fb.lines}-mal nur an Zeilengrenzen geschnitten, ein Eintrag kann getrennt sein`,
+    );
+  return blocks;
 }
 
 function candidateBlocks(rows: Lines, max: number): string[] {
   const block = (r: Lines) => [`## Kandidaten (${r.length})`, ...r].join("\n");
   if (block(rows).length <= max) return [block(rows)];
-  // Kopfzeile mit bis zu fünf Stellen einplanen
-  return byLines(rows, max - "## Kandidaten (00000)".length - 1).map(block);
+  // Kopfzeile mit bis zu fünf Stellen einplanen; jede Zeile ist ein Kandidat, ein Schnitt trennt keinen
+  return pack(
+    rows.map((r) => [r]),
+    max - "## Kandidaten (00000)".length - 1,
+  ).map(block);
 }
 
-/** Eingabe eines Anbieters (`assembleProvider`) in Teile bis `maxChars`; bis zur Schwelle unverändert ein Teil. */
-export function splitInput(text: string, maxChars: number): string[] {
-  if (text.length <= maxChars) return [text];
+/** Was der Abruf über die Eingabe weiß; nur diese Kopfzeilen sind echte Grenzen (Schutz gegen gefälschte im Text). */
+export interface InputLayout {
+  /** URLs der abgerufenen Seiten in der Reihenfolge von `assembleProvider` (`## Seite 1: …` ist die erste) */
+  pageUrls: readonly string[];
+  /** Zahl der Kandidaten; nur dann gibt es einen Abschnitt `## Kandidaten (N)` mit genau dieser Zahl */
+  candidates: number;
+}
+
+/**
+ * Eingabe eines Anbieters (`assembleProvider`) in Teile bis `maxChars`; bis zur Schwelle unverändert ein Teil.
+ * Seitengrenze ist nur die Kopfzeile `## Seite k: <k-te URL> (` in der erwarteten Reihenfolge, Kandidatenabschnitt nur
+ * der letzte mit der erwarteten Zahl; Gleiches im Seitentext bleibt Text. `notes`: wo nur an Zeilengrenzen
+ * geschnitten werden konnte.
+ */
+export function splitInput(text: string, maxChars: number, layout: InputLayout): { parts: string[]; notes: string[] } {
+  if (text.length <= maxChars) return { parts: [text], notes: [] };
   const lines = text.split("\n");
-  const at = lines.findLastIndex((l) => CANDIDATES_HEADER.test(l));
+  const candidatesHeader = `## Kandidaten (${layout.candidates})`;
+  const at = layout.candidates > 0 ? lines.lastIndexOf(candidatesHeader) : -1;
   const pageLines = at >= 0 ? lines.slice(0, at) : lines;
   const rows = at >= 0 ? lines.slice(at + 1) : [];
-  const starts = pageLines.flatMap((l, i) => (i > 0 && PAGE_HEADER.test(l) ? [i - 1] : []));
+  const starts: number[] = [];
+  let next = 0;
+  pageLines.forEach((l, i) => {
+    const url = layout.pageUrls[next];
+    if (url !== undefined && l.startsWith(`## Seite ${next + 1}: ${url} (`)) {
+      if (i > 0) starts.push(i - 1);
+      next++;
+    }
+  });
+  const notes: string[] = [];
   const pages = cutAfter(pageLines, starts).filter((p) => p.length > 0 && size(p) > 0);
   const parts = pack(
-    pages.flatMap((p) => pageBlocks(p, maxChars)).map((b) => [b]),
+    pages.flatMap((p) => pageBlocks(p, maxChars, notes)).map((b) => [b]),
     maxChars,
   ).map((p) => p.join("\n"));
   if (at >= 0)
@@ -189,10 +242,10 @@ export function splitInput(text: string, maxChars: number): string[] {
       if (fit >= 0) parts[fit] = `${parts[fit]}\n${block}`;
       else parts.push(block);
     }
-  return parts;
+  return { parts, notes };
 }
 
-type Mergeable = Pick<RawEvent, "title" | "venueId" | "schedule" | "format">;
+type Mergeable = Pick<RawEvent, "title" | "venueId" | "schedule" | "format" | "age">;
 
 /** Fenster für den Vergleich der Termine (wie `validateRaw`: Kurse mit allen Terminen, sonst ab Horizontbeginn). */
 export interface MergeWindow {
@@ -211,62 +264,71 @@ function sameOfferKey(e: Mergeable): string {
     : JSON.stringify([e.title, e.venueId, e.schedule]);
 }
 
-function starts(e: Mergeable, w: MergeWindow): string[] {
+type Occurrences = Array<{ start: string; end?: string | undefined }>;
+
+function occurrences(e: Mergeable, w: MergeWindow): Occurrences {
   return expandSchedule(e.schedule, {
     to: expansionWindow(e, w.to),
     freeDays: w.freeDays,
     ...(e.format === "kurs" ? {} : { from: w.from }),
-  })
-    .map((o) => o.start)
-    .filter((start) => e.format === "kurs" || start.slice(0, 10) >= w.from);
+  }).filter((o) => e.format === "kurs" || o.start.slice(0, 10) >= w.from);
+}
+
+/** Alles außer dem Titel, woran zwei Fassungen desselben Angebots gleich sein müssen. */
+function shape(e: Mergeable, occ: Occurrences): string {
+  const s = e.schedule;
+  const weekdays = s.kind === "weekly" ? s.weekdays : s.kind === "monthly" ? [s.nth, s.weekday] : null;
+  return JSON.stringify([e.venueId, e.format, e.age ?? null, occ[0]?.start ?? null, occ[0]?.end ?? null, weekdays]);
+}
+
+export interface MergeResult<T> {
+  events: T[];
+  /** je entfallenem oder angeglichenem Event eine Zeile mit beiden Titeln, für den Bericht */
+  notes: string[];
 }
 
 /**
  * Events aller Teile der Reihe nach vereinigen. Dasselbe Angebot auf mehreren Seiten (fbs-nuernberg.de: Kursliste,
  * Seite des Treffs, Suchseite) kommt aus mehreren Teilen, oft anders formuliert. Ein Event aus einem späteren Teil
  * gilt als schon erfasst, wenn ein früheres
- * - denselben Schlüssel hat (`sameOfferKey`; ein regelmäßiges Angebot mit derselben ID wäre im Build ohnehin eines),
- * - oder am selben Ort mit demselben ersten Termin beginnt und einen ähnlichen Titel hat (`similarTitle`, wie die
- *   Dublettenprüfung des Builds).
- * Im zweiten Fall entfällt es, wenn seine Termine im früheren enthalten sind oder es regelmäßig ist; sonst bekommt es
- * den Titel des früheren, damit der Build die Termine vereinigt (gleicher `windowKey`). Innerhalb eines Teils bleibt
- * alles, wie es das Modell geliefert hat (dort prüft `validateRaw`).
+ * - denselben Schlüssel hat (`sameOfferKey`; ein regelmäßiges Angebot mit derselben ID wäre im Build eines oder ein
+ *   Fehler, ADR 0006),
+ * - oder gleich gebaut ist (Ort, Format, Alter, Beginn und Ende des ersten Termins, Wochentage) und einen ähnlichen
+ *   Titel hat (`similarTitle`).
+ * Im zweiten Fall entfällt es, wenn seine Termine im früheren enthalten sind; sonst bekommt es den Titel des
+ * früheren, damit der Build die Termine vereinigt (gleicher `windowKey`). Anders als die Dublettenprüfung des Builds
+ * (nur rangniedere Quellen) gilt das für gleichrangige Events, deshalb die strenge Gleichheit; zwei parallele Gruppen
+ * mit anderem Alter oder anderer Uhrzeit bleiben beide. Innerhalb eines Teils bleibt alles, wie es das Modell
+ * geliefert hat (dort prüft `validateRaw`).
  */
-export function mergeParts<T extends Mergeable>(
-  parts: readonly (readonly T[])[],
-  window: MergeWindow,
-): { events: T[]; duplicates: number; retitled: number } {
-  const keys = new Set<string>();
-  const earlier: Array<{ e: T; starts: string[] }> = [];
+export function mergeParts<T extends Mergeable>(parts: readonly (readonly T[])[], window: MergeWindow): MergeResult<T> {
+  const keys = new Map<string, { title: string; part: number }>();
+  const earlier: Array<{ e: T; occ: Occurrences; shape: string; part: number }> = [];
   const events: T[] = [];
-  let duplicates = 0;
-  let retitled = 0;
-  for (const part of parts) {
-    const added: Array<{ e: T; starts: string[] }> = [];
+  const notes: string[] = [];
+  parts.forEach((part, p) => {
+    const added: typeof earlier = [];
     for (const e of part) {
-      if (keys.has(sameOfferKey(e))) {
-        duplicates++;
+      const label = `Teil ${p + 1}: „${e.title}“`;
+      const same = keys.get(sameOfferKey(e));
+      if (same) {
+        notes.push(`${label} entfällt, gleich „${same.title}“ aus Teil ${same.part}`);
         continue;
       }
-      const own = starts(e, window);
-      const twin = earlier.find(
-        (x) =>
-          x.e.venueId === e.venueId &&
-          x.starts[0] !== undefined &&
-          x.starts[0] === own[0] &&
-          similarTitle(x.e.title, e.title),
-      );
-      if (twin && (e.format === "regelmaessig" || own.every((s) => twin.starts.includes(s)))) {
-        duplicates++;
+      const occ = occurrences(e, window);
+      const own = shape(e, occ);
+      const twin = earlier.find((x) => occ.length > 0 && x.shape === own && similarTitle(x.e.title, e.title));
+      if (twin && (e.format === "regelmaessig" || occ.every((o) => twin.occ.some((t) => t.start === o.start)))) {
+        notes.push(`${label} entfällt, Termine schon in „${twin.e.title}“ aus Teil ${twin.part}`);
         continue;
       }
       const kept = twin ? { ...e, title: twin.e.title } : e;
-      if (twin) retitled++;
+      if (twin) notes.push(`${label} unter dem Titel „${twin.e.title}“ aus Teil ${twin.part} (Termine vereinigt)`);
       events.push(kept);
-      added.push({ e: kept, starts: own });
+      added.push({ e: kept, occ, shape: own, part: p + 1 });
     }
-    for (const a of added) keys.add(sameOfferKey(a.e));
+    for (const a of added) keys.set(sameOfferKey(a.e), { title: a.e.title, part: a.part });
     earlier.push(...added);
-  }
-  return { events, duplicates, retitled };
+  });
+  return { events, notes };
 }
