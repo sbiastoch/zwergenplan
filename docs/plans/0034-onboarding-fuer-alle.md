@@ -461,3 +461,49 @@ Zweiter unabhängiger Plan-Review (`/plan-review`) nach Einarbeitung von Runde 1
 **Abgelehnt**
 
 - Keiner.
+
+## Browser-Review lokal (2026-10-11)
+
+Fixture-Build (`dist-e2e/`, Stand 377886c), Preview auf freiem Port. `node scripts/screenshots.ts <URL> --views=onboarding,kind` (auch `--text=200`, 108 Bilder, alle angesehen) und ein Playwright-Skript für iPhone-UA (Safari-Tab), Querformat, 200 %, Ladebühne, Bestandsnutzer, CDP-Wischen und Punkt-Varianten. Bilder unter `e2e/.artifacts/screens/` (nicht versioniert).
+
+**Ergebnisse**
+
+- **iPhone (iOS-UA)**: Reihenfolge App → Stadt → Alter → Weg. Schritt 1 Kicker „Willkommen“, iOS-Hinweis in Ich-Form, „Los geht’s“; Schritt 2 „Schön, dass ihr da seid“ (`onboarding-iphone-1/2`, hell und dunkel).
+- **Querformat 844 × 390 und 200 %**: App-Schritt 1 scrollt im Dialog (Höhe 535 bzw. 836 px), Anleitung, Hinweis, „Los geht’s“ und „Überspringen“ erreichbar, nichts abgeschnitten, kein horizontales Scrollen. Auch 390 px / 200 % (1406 px Inhalt) bis „Los geht’s“ erreichbar.
+- **Kicker-Pille** „Schön, dass ihr da seid“ bei 320 px / 200 %: zweizeilig, `border-radius` 26 px (1em), Text stößt nirgends an. Einzeilig bei 100 % weiter rund.
+- **Ladebühne → Schritt 1** (Chunk zurückgehalten): iPhone lila → lila App-Bühne, Pixel gelb → gelbe Stadt-Bühne, hell und dunkel jeweils gleiche Farbe (z. B. dunkel iPhone `rgb(151,129,210)` vor und nach). Kein Farbsprung.
+- **Bestandsnutzer** mit altem Flag `"1"`, Geburtsdatum und Startpunkt: Onboarding erscheint, `20.04.2026` (mit grüner Altersbestätigung) und Gostenhof stehen vorbelegt. Nach dem Ende Flag `"2"`, nach Neuladen kein Onboarding. Liste danach mit „5 Mon.“ und Wegzeit ab Gostenhof. „Überspringen“ führt zur Liste, Flag `"2"`.
+- **Wischen (CDP-Touch, Pixel)**: links → weiter (1→2→3), rechts → zurück (3→2); Start in den äußeren 24 px links und rechts sowie eine 15-px-Geste bleiben ohne Wirkung. Vertikale Geste bei 200 % scrollt (`scrollTop` 0 → 113) und wechselt nicht. Letzter Schritt: links wischen beendet nicht. Gleit-Effekt mitten im Wechsel ruhig, ohne Sprung.
+- **Fortschrittspunkte**: Tipp auf Punkt 2 und Punkt 1 führt zurück. Bewertung siehe unten.
+
+**Checkliste**
+
+- Lesbarkeit: Kicker, Titel und Lead sind klar gestaffelt, Kontrast hell und dunkel gut. Die wichtigste Info je Schritt (Titel, Eingabe, Hauptknopf) ist sofort erfassbar.
+- Daumen-Erreichbarkeit: Der Hauptknopf liegt unten, „Später“ darunter, „Überspringen“ oben (bewusst seltene Aktion). Die Punkt-Knöpfe sitzen oben links, schwer erreichbar, dienen aber nur als Alternative zum Wischen.
+- Zustände: Laden (Bühne in der richtigen Farbe), vorbelegte Werte, 200 % und Querformat brechen nicht. Lange Texte (iOS-Hinweis, Kicker) umbrechen sauber.
+- Dark Mode: keine grellen Inseln. Bühnen gemischt, Knöpfe gelb.
+- Micro-Interactions: Wischen gleitet kurz ein, bei reduzierter Bewegung aus (Screenshot-Läufe mit `reduce` zeigen keine Animation). Punkt-Knöpfe ohne eigenen gedrückten Zustand, der Schrittwechsel ist die Rückmeldung.
+- Konsistenz: Pillen, Knöpfe und Bühnen wie im Mockup, mit einer Ausnahme: die Punktreihe (unten).
+
+**Fortschrittspunkte (E11), Bewertung**
+
+Vermessen auf Pixel, Schritt 3: Mockup (`docs/design/onboarding-mockup.html`, `gap: 6px`) ≈ 71 px Reihe; umgesetzt (44-px-Fächer) 176 px, Punkte im Abstand 35 px. Die Reihe wirkt dadurch auseinandergezogen und verliert den Charakter einer kompakten Fortschrittsanzeige, ist aber ruhig und eindeutig.
+
+Geprüfte engere Varianten (per eingespieltem CSS):
+
+| Variante | Reihe | Repo-Gate `expectTouchTargets` (44 × 44, `e2e/mobile-ux.ts`) | axe `target-size` | Tipp trifft richtigen Punkt |
+|---|---|---|---|---|
+| umgesetzt: 44-px-Fächer | 176 px | grün | grün | ja |
+| 24-px-Fächer, 44 px hoch | 96 px | **rot** (2 Knöpfe 24 × 44) | grün | ja |
+| 24-px-Fächer, Punkte 11 px | 96 px | **rot** | grün | ja |
+| Mockup, `gap: 6px` | 71 px | **rot** (9 × 9) | grün | ja |
+
+Die 24-px-Variante sieht dem Mockup deutlich näher und genügt WCAG 2.5.8 (axe grün, keine Überlappung). Sie scheitert aber am eigenen Gate des Repos: `expectTouchTargets` verlangt für jeden `button` 44 × 44 (nur Fließtext-Links 24 px). Eine Ausnahme für `.onb-dots button` wäre eine Lockerung eines Mobile-UX-Gates und braucht eine Begründung im Code und im Commit, eher ein ADR (CLAUDE.md, Backpressure). **Entscheidung: umgesetzte 44-px-Variante bleibt**; die engere Variante geht als Frage an den Nutzer (`docs/ideas.md` bzw. Nutzerentscheid). Bilder: `punkte-ist44-*.png`, `punkte-slot24-*.png`, `punkte-slot24gross-*.png`, `punkte-mockup6-*.png` (je mit `-zoom`) im Review-Verzeichnis der Session.
+
+**Befunde ohne Änderung (Geschmack bzw. vorher schon so)**
+
+- Fortschrittspunkte breiter als im Mockup (oben), Nutzerentscheid.
+- Ladebühne: „Überspringen“ zeigt beim Laden den Fokus-Rahmen (Autofokus im modalen Dialog). Unverändert seit Plan 0033.
+- App-Schritt hell: Die „Teilen“-Marke im Hinweis hebt sich nur schwach vom Hintergrund ab (dunkel deutlich). Unverändert seit Plan 0033.
+
+Keine Fehler gefunden, die eine Codeänderung verlangen.
