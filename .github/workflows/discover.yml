@@ -194,12 +194,24 @@ jobs:
         with:
           name: entdecken-${{ github.run_id }}
           path: runs/
-      # Commits des Laufs auf main legen; `discover-publish` holt fremde Commits per `pull --rebase` nach
-      - name: Commits des Laufs übernehmen
+      # Commits des Laufs auf main legen; `discover-publish` holt fremde Commits per `pull --rebase` nach. Vorher
+      # prüfen, mit dem Code dieses Commits: Das Bundle kommt aus dem Job mit dem Modell und darf nur Daten des
+      # Entdeckens ändern, linear und höchstens so viele Commits wie G3 zulässt (sonst liefe fremder Code hier mit
+      # Schreib-Token; Arch-Review S4, B1).
+      - name: Commits des Laufs prüfen und übernehmen
+        env:
+          MAX_COMMITS: "100"
         run: |
           git fetch -q ./entdecken.bundle HEAD
-          git checkout -q -B main FETCH_HEAD
           rm entdecken.bundle
+          git merge-base --is-ancestor "$GITHUB_SHA" FETCH_HEAD || { echo "::error::Bundle baut nicht auf dem Lauf auf"; exit 1; }
+          [[ -z "$(git rev-list --merges "$GITHUB_SHA"..FETCH_HEAD)" ]] || { echo "::error::Merge-Commit im Bundle"; exit 1; }
+          n="$(git rev-list --count "$GITHUB_SHA"..FETCH_HEAD)"
+          (( n <= MAX_COMMITS )) || { echo "::error::$n Commits im Bundle"; exit 1; }
+          bad="$(git log --name-only --format= "$GITHUB_SHA"..FETCH_HEAD | sort -u \
+            | grep -vE '^$|^data/providers\.yaml$|^data/raw/[a-z0-9-]+\.json$|^data/discover/[a-z0-9-]+\.json$|^data/kosten\.csv$' || true)"
+          [[ -z "$bad" ]] || { echo "::error::Bundle ändert fremde Pfade: $bad"; exit 1; }
+          git checkout -q -B main FETCH_HEAD
       - name: discover-publish (Push nach main)
         id: publish
         env:

@@ -46,10 +46,13 @@ export interface Find {
   quelle: string;
 }
 
+/** Keine IP-Literale und kein `localhost`: Adressen aus Suche und Webseiten holt unser Abruf (Arch-Review S4, m8) */
+const INTERNAL_HOST = /^(localhost|[\d.]+|\[.*\])$|\.local(host)?$/i;
+
 const parseUrl = (url: string): URL | undefined => {
   try {
     const u = new URL(url);
-    return u.protocol === "http:" || u.protocol === "https:" ? u : undefined;
+    return (u.protocol === "http:" || u.protocol === "https:") && !INTERNAL_HOST.test(u.hostname) ? u : undefined;
   } catch {
     return undefined;
   }
@@ -139,7 +142,8 @@ export function prefilter(
     const drop = (grund: string) => dropped.push({ find, grund });
     const known = byUrl.get(n);
     const twin = (byHost.get(host) ?? []).find((p) => similarName(find.name, p.name));
-    const rejected = rejectedUrls.get(n) ?? rejectedHosts.get(host);
+    // ein abgelehnter Host gilt auch für seine Subdomains
+    const rejected = rejectedUrls.get(n) ?? [...rejectedHosts].find(([h]) => host === h || host.endsWith(`.${h}`))?.[1];
     const waiting = postponed.get(n);
     if (FOREIGN_HOSTS.test(host)) drop("keine eigene Website (Netzwerk oder Suchdienst)");
     else if (known) drop(`steht im Katalog (${known})`);
@@ -435,15 +439,19 @@ export function proveYield(
   providerId: string,
   text: string,
   now: string,
-): { ok: true; first: Offer } | { ok: false; grund: string } {
+): { ok: true; first: Offer; start: string } | { ok: false; grund: string } {
   const t = Date.parse(now);
-  const first = offers
+  // je Angebot der erste künftige Termin; berichtet wird das Angebot mit dem frühesten (Arch-Review S4, m4)
+  const next = offers
     .filter((o) => o.providerId === providerId && (o.age === undefined || o.age.minMonths <= 36))
-    .filter((o) => o.sessions.some((s) => Date.parse(s.start) >= t))
-    .sort((a, b) => (a.sessions[0]?.start ?? "").localeCompare(b.sessions[0]?.start ?? ""))[0];
-  if (!first) return { ok: false, grund: "kein Angebot für 0–3 Jahre mit künftigem Termin" };
+    .flatMap((o) => {
+      const s = o.sessions.find((x) => Date.parse(x.start) >= t);
+      return s ? [{ first: o, start: s.start }] : [];
+    })
+    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))[0];
+  if (!next) return { ok: false, grund: "kein Angebot für 0–3 Jahre mit künftigem Termin" };
   if (!isRelevant(text)) return { ok: false, grund: "kein Baby- oder Kleinkindbezug im abgerufenen Text" };
-  return { ok: true, first };
+  return { ok: true, ...next };
 }
 
 /** Hinweise ohne Aktion (E7): Quellen mit Fehlerserie seit mehr als 14 Tagen. */
@@ -489,14 +497,17 @@ export interface DiscoverReport {
 
 /** G4: ein Commit je Anbieter mit Fund-URL, Grund und erstem Angebot */
 export function newProviderCommitMessage(a: Adopted): string {
+  // Name, Grund und Titel stammen aus Modell bzw. Webtext: einzeilig und gekürzt, sonst könnten sie Felder
+  // wie „Fund-URL:“ vortäuschen, die `newProvidersIssue` liest (Arch-Review S4, m3)
+  const line = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 200);
   return [
     `data: neuer Anbieter ${a.id} (${a.region})`,
     "",
-    `Name: ${a.name}`,
-    `Fund-URL: ${a.find.url}`,
-    `Quelle: ${a.find.quelle}`,
-    `Grund: ${a.grund}`,
-    `Erstes Angebot: ${a.first.title} am ${formatGermanDate(berlinIsoDate(a.first.start))} (${a.first.url})`,
+    `Name: ${line(a.name)}`,
+    `Fund-URL: ${line(a.find.url)}`,
+    `Quelle: ${line(a.find.quelle)}`,
+    `Grund: ${line(a.grund)}`,
+    `Erstes Angebot: ${line(a.first.title)} am ${formatGermanDate(berlinIsoDate(a.first.start))} (${line(a.first.url)})`,
     "",
     "Plan 0032, E7 (pnpm pipeline discover)",
   ].join("\n");
@@ -572,7 +583,9 @@ export function newProvidersIssue(
     const [subject = "", ...rest] = c.message.split("\n");
     const m = NEW_PROVIDER_SUBJECT.exec(subject);
     if (!m) return [];
-    const field = (name: string) => rest.find((l) => l.startsWith(`${name}: `))?.slice(name.length + 2) ?? "–";
+    // „@“ entschärft: Webtext soll im Issue niemanden erwähnen (Arch-Review S4, m3)
+    const field = (name: string) =>
+      (rest.find((l) => l.startsWith(`${name}: `))?.slice(name.length + 2) ?? "–").replaceAll("@", "(at)");
     return [
       `- [${m[1]}](${o.repoUrl}/commit/${c.sha}) (${m[2]}): ${field("Name")} – Fund-URL ${field("Fund-URL")}; ` +
         `erstes Angebot: ${field("Erstes Angebot")}`,
@@ -586,7 +599,8 @@ export function newProvidersIssue(
       "",
       ...lines,
       "",
-      "Falsch aufgenommen? Commit per `git revert` zurücknehmen und URL oder Host mit Grund in " +
+      "Falsch aufgenommen? Eintrag in `data/providers.yaml` und `data/raw/<id>.json` entfernen (vor dem ersten " +
+        "Nachtlauf geht auch ein Revert des Commits) und URL oder Host mit Grund in " +
         "`data/discover/<region>.json` unter `abgelehnt` eintragen, sonst findet ihn die nächste Woche wieder.",
     ].join("\n"),
   };

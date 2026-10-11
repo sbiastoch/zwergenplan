@@ -60,7 +60,7 @@ import { validateDataset } from "../../src/domain/dataset.ts";
 import { REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
 import { addMonths, berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
 import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
-import { commitNewProvider, commitRunState, publishDiscover } from "./io/discover-git.ts";
+import { commitNewProvider, commitRunState, GateError, publishDiscover } from "./io/discover-git.ts";
 import {
   type CallRecord,
   createExtractor,
@@ -395,6 +395,13 @@ async function discoverCmd() {
     fail((e as Error).message);
   }
   const dryRun = values["dry-run"];
+  // live: G1 erst auf dem Ausgangsstand; ist der schon rot, würde jeder Kandidat still verworfen (Arch-Review S4, m1)
+  if (!dryRun)
+    try {
+      discoverGates();
+    } catch (e) {
+      fail(`G1 schon vor dem Lauf rot, nichts entdeckt: ${(e as Error).message}`);
+    }
   // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf: Der Zustand des Ertragsbeweises gilt dort weiter (E1)
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const r = await runDiscover({
@@ -426,18 +433,29 @@ async function discoverCmd() {
         }),
   });
   const added = r.regions.reduce((n, x) => n + x.adopted.length, 0);
+  const red: string[] = [];
+  if (abortOf(r)) red.push(`vorzeitig beendet (${abortOf(r)})`);
+  // G1 rot bei einem Kandidaten heißt meist: der Stand selbst ist rot (Arch-Review S4, m1)
+  const gateRejects = r.regions.flatMap((x) => x.rejected).filter((x) => x.grund.startsWith("G1 rot"));
+  if (gateRejects.length > 0) red.push(`G1 rot bei ${gateRejects.length} Kandidaten`);
   if (!dryRun)
-    commitRunState({
-      git,
-      root: ROOT,
-      message: `data: Entdecken ${date} (${regions.join(", ")}: ${added} neu)\n\nPlan 0032, E7 (pnpm pipeline discover)`,
-      gate: discoverGates,
-    });
-  const md = renderDiscoverReport(r);
+    try {
+      commitRunState({
+        git,
+        root: ROOT,
+        message: `data: Entdecken ${date} (${regions.join(", ")}: ${added} neu)\n\nPlan 0032, E7 (pnpm pipeline discover)`,
+        gate: discoverGates,
+      });
+    } catch (e) {
+      // die geprüften Anbieter-Commits gehen trotzdem ins Bundle (Arch-Review S4, m2)
+      if (!(e instanceof GateError)) throw e;
+      red.push(`Zustand und Kosten nicht committet: ${e.message}`);
+    }
+  const md = `${renderDiscoverReport(r)}${red.map((x) => `\n- **rot:** ${x}`).join("")}\n`;
   print(md);
   const summary = process.env["GITHUB_STEP_SUMMARY"];
   if (summary) appendFileSync(summary, md);
-  actionsOutput("ampel", abortOf(r) ? "rot" : "gruen");
+  actionsOutput("ampel", red.length > 0 ? "rot" : "gruen");
   actionsOutput("neu", String(added));
 }
 
