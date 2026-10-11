@@ -13,7 +13,7 @@ const UA = {
   desktop: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36",
 };
 
-describe("isIosDevice (Plan 0034, E8)", () => {
+describe("isIosDevice (Plan 0035, E8)", () => {
   it("iPhone, iPad und iPod", () => {
     for (const userAgent of [UA.iphone, UA.ipad, UA.ipod])
       expect(isIosDevice({ userAgent, maxTouchPoints: 5 }), userAgent).toBe(true);

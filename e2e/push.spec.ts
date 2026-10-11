@@ -350,7 +350,7 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
   expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik","kat=natur"]');
 });
 
-test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0034, E9)", () => {
+test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0035, E9)", () => {
   /** Bestandsnutzer mit Angaben, nur beim ersten Laden (Muster oben) */
   async function seed(page: Page) {
     await page.addInitScript(() => {
@@ -361,7 +361,7 @@ test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0034, E9)"
     });
   }
 
-  /** altes Flag „1“ setzen und neu laden: Das Onboarding erscheint (Plan 0034, E4); neues Alter und neuer Stadtteil */
+  /** altes Flag „1“ setzen und neu laden: Das Onboarding erscheint (Plan 0035, E4); neues Alter und neuer Stadtteil */
   async function onboardingWithNewValues(page: Page) {
     await page.evaluate((key) => localStorage.setItem(key, "1"), ONBOARDING_FLAG.key);
     await page.reload();

@@ -43,7 +43,7 @@ describe("DISTRICTS", () => {
   });
 });
 
-describe("nearestDistrictLabel (Nachtrag Plan 0034, 2026-10-11: ermittelten Standort zeigen, offline)", () => {
+describe("nearestDistrictLabel (Nachtrag Plan 0035, 2026-10-11: ermittelten Standort zeigen, offline)", () => {
   it("nennt den nächsten Stadtteil-Punkt; bis 1,5 km ohne Entfernung", () => {
     expect(nearestDistrictLabel({ lat: 49.452, lon: 11.077 })).toBe("nächster Stadtteil: Altstadt");
     expect(nearestDistrictLabel({ lat: 49.448, lon: 11.058 })).toBe("nächster Stadtteil: Gostenhof");

@@ -5,7 +5,7 @@
  *   `useState`-Initializer von `App`, parallel zu `site.json`, bei jedem Gate ≠ „nichts“ (E2, Review H1, 2 M-2).
  * - Der Cover-Div steht schon im ersten Frame, bevor `Dialog` im Effekt `showModal()` ruft: Die Liste blitzt nicht auf.
  * - Laden (Chunk, App-Teil oder Daten offen): leere Bühne mit „Überspringen“ (Start-CSS, Review H5), in der Farbe der
- *   ersten Bühne: im Safari-Tab des iPhones „App“ (Klasse `ios`, Plan 0034, E8), sonst Stadt.
+ *   ersten Bühne: im Safari-Tab des iPhones „App“ (Klasse `ios`, Plan 0035, E8), sonst Stadt.
  * - Chunk nicht ladbar: `LoadFailed` und „Später“ (Flag bleibt leer). Scheitert nur der App-Teil, läuft der Flow ohne
  *   den Schritt „App“.
  * - Esc und Android-Zurück (`cancel`) zählen wie „Überspringen“.

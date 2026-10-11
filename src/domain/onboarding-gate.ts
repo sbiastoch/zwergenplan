@@ -1,5 +1,5 @@
 /**
- * Erscheint das Onboarding beim Start (Plan 0033, E2; Plan 0034, E3)? Rein und im Start-Bundle; `App` entscheidet damit
+ * Erscheint das Onboarding beim Start (Plan 0033, E2; Plan 0035, E3)? Rein und im Start-Bundle; `App` entscheidet damit
  * synchron im `useState`-Initializer. Die Texte und Schritte liegen in `onboarding.ts` (nur im Lazy-Chunk).
  *
  * - `zeigen`: Start ohne gültiges Flag, auch für Bestandsnutzer mit gespeicherten Angaben (sie stehen im Flow

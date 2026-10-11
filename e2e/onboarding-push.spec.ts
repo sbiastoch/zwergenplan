@@ -57,7 +57,7 @@ test.describe("Test 5: App-Schritt mit Schalter (Chromium)", () => {
     expect(pushLog).toEqual([]);
   });
 
-  test("Wischgeste, die auf dem Schalter beginnt, wechselt nicht und schaltet nicht (Plan 0034, E10)", async ({
+  test("Wischgeste, die auf dem Schalter beginnt, wechselt nicht und schaltet nicht (Plan 0035, E10)", async ({
     page,
     pushLog,
   }) => {

@@ -1,5 +1,5 @@
 /**
- * Plattform-Prüfung im Start-Bundle (Plan 0034, E8): Die Ladebühne des Onboardings braucht vor dem App-Chunk die Farbe
+ * Plattform-Prüfung im Start-Bundle (Plan 0035, E8): Die Ladebühne des Onboardings braucht vor dem App-Chunk die Farbe
  * der ersten Bühne, und im Safari-Tab des iPhones ist das „App“. `src/data/pwa.ts` (Lazy-Chunk) nutzt dieselben
  * Funktionen, so gibt es die Prüfung einmal.
  *

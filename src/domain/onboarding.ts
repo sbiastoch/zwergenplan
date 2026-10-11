@@ -49,7 +49,7 @@ export function appStepParts(install: InstallState, push: PushCapability): AppSt
 }
 
 /**
- * Reihenfolge, einmal beim Start des Flows festgelegt (Plan 0033, E1; Plan 0034, E1): Auf dem iPhone im Browser steht
+ * Reihenfolge, einmal beim Start des Flows festgelegt (Plan 0033, E1; Plan 0035, E1): Auf dem iPhone im Browser steht
  * „App“ zuerst, weil die installierte App einen eigenen Speicher hat (dort fragt das Onboarding Alter und Weg erneut;
  * Push gibt es nur in ihr). Sonst steht es zuletzt; ohne Teile entfällt es.
  */
@@ -81,7 +81,7 @@ export function welcomeStats(offers: readonly Offer[], now: Date): { offers: num
 }
 
 /**
- * Hinweis unter dem Geburtsdatum (E10; Nachtrag Plan 0034, 2026-10-11): kurz und herzlich je Alter statt einer
+ * Hinweis unter dem Geburtsdatum (E10; Nachtrag Plan 0035, 2026-10-11): kurz und herzlich je Alter statt einer
  * Rechnung. Ab 3 Jahren ehrlich: Der Zwergenplan ist für Kinder unter 3.
  */
 export function ageHint(months: number): string {
@@ -148,7 +148,7 @@ function appText(app: AppStepParts | undefined): StepText {
 
 /**
  * Kicker, Überschrift und Lead je Schritt (E10). Ohne Daten oder ohne Angebote steht der Lead ohne Zahlen. `first`:
- * Schritt 1 des Flows. Der Kicker hängt an der Position (Plan 0034, E2): Schritt 1 heißt „Willkommen“; steht Stadt
+ * Schritt 1 des Flows. Der Kicker hängt an der Position (Plan 0035, E2): Schritt 1 heißt „Willkommen“; steht Stadt
  * nicht zuerst (iPhone im Safari-Tab), heißt sie „Schön, dass ihr da seid“.
  */
 export function stepText(
@@ -215,7 +215,7 @@ export function stepOf(index: number, total: number): string {
   return `Schritt ${index + 1} von ${total}: `;
 }
 
-/** Richtung einer Wischgeste zwischen den Schritten (Plan 0034, E10) */
+/** Richtung einer Wischgeste zwischen den Schritten (Plan 0035, E10) */
 export type SwipeStep = "weiter" | "zurueck";
 
 /** Mindestweg, Randbreite (Systemgesten) und größte Steigung dy/dx (≈ 27°) einer Wischgeste */

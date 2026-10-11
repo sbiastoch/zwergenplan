@@ -52,7 +52,7 @@ describe("appStepParts und onboardingSteps (E1)", () => {
     ]);
   });
 
-  it("iPhone im Browser: App zuerst (Plan 0034, E1), ohne Schalter, nur der Hinweis", () => {
+  it("iPhone im Browser: App zuerst (Plan 0035, E1), ohne Schalter, nur der Hinweis", () => {
     for (const push of PUSH) expect(appStepParts("ios", push)).toEqual({ install: "ios", push: "nur-in-app" });
   });
 
@@ -113,7 +113,7 @@ describe("welcomeStats (E5)", () => {
   });
 });
 
-describe("ageHint (Nachtrag Plan 0034, 2026-10-11: herzlich statt Rechnen)", () => {
+describe("ageHint (Nachtrag Plan 0035, 2026-10-11: herzlich statt Rechnen)", () => {
   it.each([
     [0, "Willkommen auf der Welt!"],
     [1, "Ganz frisch dabei!"],
@@ -212,7 +212,7 @@ describe("stepText (E10)", () => {
   });
 });
 
-describe("stepText nach Position (Plan 0034, E2)", () => {
+describe("stepText nach Position (Plan 0035, E2)", () => {
   it("App als Schritt 1 (iPhone im Safari-Tab): Kicker „Willkommen“, Überschrift und Lead wie sonst", () => {
     const ios = { install: "ios", push: "nur-in-app" } as const;
     const later = stepText("app", { first: false, app: ios });
@@ -255,7 +255,7 @@ describe("LIMIT_CHOICES (E7)", () => {
   });
 });
 
-describe("swipeStep (Plan 0034, E10)", () => {
+describe("swipeStep (Plan 0035, E10)", () => {
   const width = 412;
   const g = (x0: number, y0: number, x1: number, y1: number) => swipeStep({ x0, y0, x1, y1, width });
 

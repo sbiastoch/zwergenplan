@@ -73,7 +73,7 @@ export function districtById(id: string): District | undefined {
 const NEAR_M = 1500;
 
 /**
- * Ermittelter Standort in Worten (Nachtrag Plan 0034, 2026-10-11), damit ein falscher Standort auffällt. Offline aus
+ * Ermittelter Standort in Worten (Nachtrag Plan 0035, 2026-10-11), damit ein falscher Standort auffällt. Offline aus
  * den Stadtteil-Punkten, ohne Reverse-Geocoding: Die Koordinate verlässt das Gerät nie (ADR 0017). Haltestellen
  * nennt die Wegzeit-Tabelle nicht beim Namen, darum nur der Stadtteil.
  */

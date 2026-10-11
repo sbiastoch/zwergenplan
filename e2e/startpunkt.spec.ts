@@ -366,7 +366,7 @@ test("Standort mit Freigabe: gerundet gespeichert, Wegzeit, ab dem Tipp kein Req
   const requests = collectRequests(page);
   await sheet.getByRole("button", { name: "Meinen Standort nutzen" }).click();
   await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
-  // ermittelter Standort in Worten, offline (Nachtrag Plan 0034, 2026-10-11); kein Request (unten geprüft)
+  // ermittelter Standort in Worten, offline (Nachtrag Plan 0035, 2026-10-11); kein Request (unten geprüft)
   await expect(sheet.getByText("Startpunkt:")).toContainText("(nächster Stadtteil: Altstadt)");
   await expect(sheet.getByText(/Wegzeit ab deinem Standort \(auf ca\. 100 m gerundet\)/)).toBeVisible();
   // Plan 0022: Stadtteil-Auswahl weg, der Knopf heißt jetzt „Standort aktualisieren“ und behält den Fokus

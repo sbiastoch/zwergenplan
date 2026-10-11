@@ -57,8 +57,8 @@ Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt 
 - **Punkt 5 geändert durch ADR 0027:** Beim ersten Start ohne Flag `zwergenplan.einfuehrung` (und ohne Deep-Link) lädt der Lader des Onboardings das Modul `src/data/pwa.ts` samt `AppSection` schon im `useState`-Initializer von `App`, nicht erst nach `load`. Die Registrierung (`start()`) bleibt nach `load` in `pwa-start.ts`, der Kern bleibt außerhalb des Start-Bundles.
 - `start()` setzt zusätzlich `data-sw="aus"` auf `<html>`, wenn es ohne Registrierung endet (Notausgang, blockiert, gescheitert). Darauf wartet `enable` in `src/data/push.ts` (Plan 0033, E8); `data-pwa` heißt weiter nur „bereit“.
 
-## Nachtrag (2026-10-11, Plan 0034): `display-mode` auch in `src/data/platform.ts`
+## Nachtrag (2026-10-11, Plan 0035): `display-mode` auch in `src/data/platform.ts`
 
 - **Ausnahme von Punkt 5:** Das neue Start-Modul `src/data/platform.ts` liest `display-mode` nur lesend (`standalone()`: `matchMedia("(display-mode: standalone)").matches` oder `navigator.standalone === true`), ohne Listener, ohne `beforeinstallprompt` und ohne Registrierung. Muster ist die Ausnahme aus ADR 0014, Punkt 6.
-- Grund: Die Ladebühne des Onboardings braucht vor dem App-Chunk die Farbe der ersten Bühne, und im Safari-Tab des iPhones ist das „App“ (`iosTab()`, Klasse `onb-pending ios`; Plan 0034, E8). Die Prüfung steht dafür im Start-Bundle (gemessen in ADR 0012, Zeile Plan 0034).
+- Grund: Die Ladebühne des Onboardings braucht vor dem App-Chunk die Farbe der ersten Bühne, und im Safari-Tab des iPhones ist das „App“ (`iosTab()`, Klasse `onb-pending ios`; Plan 0035, E8). Die Prüfung steht dafür im Start-Bundle (gemessen in ADR 0012, Zeile Plan 0035).
 - `src/data/pwa.ts` importiert `isIosDevice` und `standalone` von dort, so gibt es die Prüfung einmal. Registrieren, aktualisieren, auf Nachrichten und auf `beforeinstallprompt` hören bleibt allein `src/data/pwa.ts`.

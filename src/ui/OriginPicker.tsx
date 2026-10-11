@@ -42,7 +42,7 @@ export function OriginPicker({
         {origin ? (
           <>
             Startpunkt: <b>{origin.label}</b>
-            {/* ermittelter Standort in Worten, offline (Nachtrag Plan 0034, 2026-10-11; ADR 0017) */}
+            {/* ermittelter Standort in Worten, offline (Nachtrag Plan 0035, 2026-10-11; ADR 0017) */}
             {located && ` (${nearestDistrictLabel(origin.point)})`}
           </>
         ) : (

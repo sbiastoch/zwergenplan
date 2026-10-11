@@ -16,7 +16,7 @@ describe("searchLabel", () => {
 });
 
 describe("PUSH_TEXTS", () => {
-  it("nennt den Schalter überall „Wöchentliche Push-Nachricht“, ohne Wochentag (Nachtrag Plan 0034, 2026-10-11)", () => {
+  it("nennt den Schalter überall „Wöchentliche Push-Nachricht“, ohne Wochentag (Nachtrag Plan 0035, 2026-10-11)", () => {
     expect(PUSH_TEXTS.switchLabel).toBe("Wöchentliche Push-Nachricht");
     for (const text of [
       PUSH_TEXTS.on,

@@ -98,7 +98,7 @@ export function App() {
   /** Fokus-Ziel nach „Nochmal laden“ unter der Statuszeile (Plan 0009, N2) */
   const statusLine = useRef<HTMLParagraphElement>(null);
   /*
-   * Onboarding (Plan 0033, E2; Plan 0034, E3): synchron entschieden, ohne Inline-Skript. Bei „zeigen“ laden Chunk und
+   * Onboarding (Plan 0033, E2; Plan 0035, E3): synchron entschieden, ohne Inline-Skript. Bei „zeigen“ laden Chunk und
    * App-Teil sofort, parallel zu site.json. Gespeicherte Angaben zählen nicht, Bestandsnutzer sehen es also auch, und
    * kein Request verrät, ob etwas gespeichert ist (Review H1).
    */

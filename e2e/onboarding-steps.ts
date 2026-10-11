@@ -22,7 +22,7 @@ export const primary = (page: Page) => intro(page).locator(".onb-foot .btn.prima
 
 /**
  * Kicker je Schritt (E10); der App-Schritt hat zwei Varianten. Schritt 1 heißt immer „Willkommen“, Stadt an Position 2
- * (iPhone im Safari-Tab) „Schön, dass ihr da seid“ (Plan 0034, E2).
+ * (iPhone im Safari-Tab) „Schön, dass ihr da seid“ (Plan 0035, E2).
  */
 const KICKER = {
   stadt: /^(Willkommen|Schön, dass ihr da seid)$/,
@@ -47,7 +47,7 @@ export async function expectStep(page: Page, n: number, total: number) {
 
 /**
  * Mit dem Hauptknopf weiter, bis der Kicker zum Schritt passt. Auf dem iPhone trägt auch der App-Schritt 1
- * „Willkommen“, darum hält „stadt“ nur mit sichtbarer Gruppe „Stadt“ (Plan 0034, E2).
+ * „Willkommen“, darum hält „stadt“ nur mit sichtbarer Gruppe „Stadt“ (Plan 0035, E2).
  */
 export async function goTo(page: Page, step: Step) {
   for (let i = 0; i < 4; i++) {
@@ -76,7 +76,7 @@ export async function stepOrder(page: Page): Promise<string[]> {
 }
 
 /**
- * Wischgeste aus synthetischen Pointer Events (Plan 0034, E10): `pointerdown` und `pointerup` auf `target` (Standard:
+ * Wischgeste aus synthetischen Pointer Events (Plan 0035, E10): `pointerdown` und `pointerup` auf `target` (Standard:
  * die Bühne). Playwright erzeugt echte `PointerEvent`s, in Chromium und WebKit. Prüft die Logik, nicht `touch-action`.
  */
 export async function swipe(

@@ -48,7 +48,7 @@ export interface AppStepModule {
   AppStep: ComponentType<AppStepProps>;
   install: InstallApi;
   pushCapability: () => PushCapability;
-  /** am Ende des Onboardings einmal spiegeln, falls ein Abo läuft (Plan 0034, E9) */
+  /** am Ende des Onboardings einmal spiegeln, falls ein Abo läuft (Plan 0035, E9) */
   syncPush: () => Promise<void>;
 }
 

@@ -1,7 +1,7 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, gemerkte Anbieter, Darstellung,
  * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
- * Plan 0033, E2; versioniert seit Plan 0034, E4). Die Such-Abos liegen in `searches-store.ts`. Nichts davon gelangt in URL,
+ * Plan 0033, E2; versioniert seit Plan 0035, E4). Die Such-Abos liegen in `searches-store.ts`. Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
  */
@@ -16,7 +16,7 @@ const KEYS = {
 } as const;
 
 /**
- * Version des Flags „Onboarding erledigt“ (Plan 0034, E4). `"1"` wurde ab ecfccfb auch still an Bestandsnutzer vergeben
+ * Version des Flags „Onboarding erledigt“ (Plan 0035, E4). `"1"` wurde ab ecfccfb auch still an Bestandsnutzer vergeben
  * (Plan 0033, Gate „still-erledigt“); erst `"2"` heißt „gesehen oder übersprungen“. Eine Erhöhung zeigt das Onboarding
  * allen einmal erneut. E2E und Screenshots nutzen denselben Wert (`e2e/onboarding-flag.ts`, gekoppelt per Unit-Test).
  */
@@ -139,7 +139,7 @@ export function saveOrigin(value: string | StoredOriginPoint | undefined): void 
   );
 }
 
-/** Onboarding erledigt? Nur die aktuelle Version zählt, exakt verglichen (Plan 0034, E4). */
+/** Onboarding erledigt? Nur die aktuelle Version zählt, exakt verglichen (Plan 0035, E4). */
 export function loadOnboardingDone(): boolean {
   return read(KEYS.onboarding) === ONBOARDING_VERSION;
 }
