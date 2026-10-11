@@ -1,10 +1,10 @@
 # Plan 0034 – Onboarding für Bestandsnutzer, App-Schritt je Plattform, Wischen
 
-Status: Review eingearbeitet
+Status: freigegeben
 Datum: 2026-10-11
 Bezug:
 - Plan 0033 (`docs/plans/archiv/0033-onboarding.md`, live seit ecfccfb): E1 (Schritte und Reihenfolge), E2 (Gate, Flag, Privatsphäre), E8 (Schritt „App“), E10 (Texte), E15 (E2E-Basis), Test 7, Test 10, Test 12
-- ADR 0027 (App-Chunk beim Erststart vorladen), ADR 0014 (Push, im Safari-Tab kein Push), ADR 0017 (Startpunkt gespeichert), ADR 0012 (Startbudget, Delta-Tabelle)
+- ADR 0027 (App-Chunk beim Erststart vorladen), ADR 0013 (Punkt 5: `display-mode` nur in `src/data/pwa.ts`), ADR 0014 (Push, im Safari-Tab kein Push; Punkt 6 als Muster einer Ausnahme), ADR 0017 (Startpunkt gespeichert), ADR 0012 (Startbudget, Delta-Tabelle)
 
 ## Anlass
 
@@ -34,7 +34,7 @@ Nach dem Plan-Review, ebenfalls am 2026-10-11:
   - Offen ist, ob iOS die aktuelle URL oder die Manifest-`start_url` übernimmt und ob ein umgeschriebenes Manifest greift. Das prüft erst eine Testseite auf einem echten iPhone, in der CI lässt es sich nicht nachstellen.
   - Ein Abgleich über einen Server ist verworfen (Privatsphäre).
 - Neue Schritte, neue Eingaben, neue Gestaltung, neue Illustration. Der App-Schritt als erster Schritt nutzt die bestehende App-Bühne.
-- Ein sichtbarer Knopf „Zurück“. Zurück geht künftig per Wischen; wer nicht wischen kann, kommt mit „Überspringen“ und „Einführung ansehen“ (Kind-Sheet) ans Ziel. Ein Zurück-Knopf wäre eine neue Gestaltung (`docs/ideas.md`, falls gewünscht).
+- Ein eigener Knopf „Zurück“ neben den bestehenden Knöpfen. Zurück geht per Wischen und, ohne Wischen, per Tipp oder Tastatur auf die Fortschrittspunkte früherer Schritte (E11). Ein sichtbarer Zurück-Knopf wäre eine neue Gestaltung (`docs/ideas.md`, falls gewünscht).
 - Die Bühne folgt dem Finger nicht (kein Mitziehen während der Geste). Erst nach erkannter Geste wechselt der Schritt.
 - Ein allgemeiner Mechanismus „Onboarding nach großen Änderungen erneut zeigen“ über die Konstante hinaus. Die Konstante `ONBOARDING_VERSION` ist dieser Mechanismus; eine weitere Erhöhung ist eine Einzeiländerung mit eigenem Anlass.
 - Reichweiten-Grenze („Höchstens unterwegs“) vorbelegen: Sie lebt nur in der URL (`wegzeit=`), nicht im Speicher. Im Onboarding steht wie heute der Chip „Egal“ gewählt, wenn die URL keine Grenze trägt.
@@ -159,12 +159,12 @@ export function onboardingGate(g: { storage: boolean; done: boolean; deepLink: b
   - `e2e/fixtures.ts`, `skipOnboarding`: `context.addInitScript(({ key, value }) => { … }, ONBOARDING_FLAG)`, weiterhin nur bei fehlendem Flag (`=== null`). Ein vorhandenes `"1"` bleibt, damit Test 10c es setzen kann. Die Option heißt weiter `onboarding: "erledigt" | "neu"`.
   - `e2e/onboarding.spec.ts`: `FLAG` → `ONBOARDING_FLAG.key`. **Jede** Erwartung `"1"` am Flag wird `ONBOARDING_FLAG.value`: Tests 8, 9, 10, 11 und beide Tests 12 (Stellen unter „Ausgangslage“). Vollständig per `grep -rn '"1"' e2e/` und `grep -rn "einfuehrung" e2e/ scripts/`; übrig bleiben darf `"1"` nur dort, wo bewusst der alte Wert gesetzt wird (Test 10c, Deep-Link-Zusatz).
   - `e2e/startpunkt.spec.ts:107`: `ONBOARDING_FLAG.key`.
-  - `scripts/screenshots.ts:200–204`: importiert `../e2e/onboarding-flag.ts` (`scripts/` → `e2e/` ist erlaubt; in S2 mit `pnpm arch` bestätigen) und übergibt `ONBOARDING_FLAG` ans Init-Skript.
+  - `scripts/screenshots.ts:200–204`: importiert `../e2e/onboarding-flag.ts` (`scripts/` → `e2e/` ist erlaubt; in S1 mit `pnpm arch` bestätigen) und übergibt `ONBOARDING_FLAG` ans Init-Skript.
 - `scripts/lib/e2e-map.ts`: `e2e/onboarding-flag.ts` ist ein E2E-Helfer. `node scripts/e2e-select.ts e2e/onboarding-flag.ts` zeigt, ob die Auswahl ihn schon erfasst (Helfer wählen nach Importgraph). Wenn nicht, bekommt er einen Eintrag wie die anderen Helfer.
 
-### E7 – ADR: Nachträge zu ADR 0027 und ADR 0014, kein neues ADR
+### E7 – ADR: Nachträge zu ADR 0027, ADR 0014 und ADR 0013, kein neues ADR
 
-Die Entscheidung von ADR 0027 (Vorladen bei Gate ≠ „nichts“, nur das Modul früher, ein Ladevorgang je Datei) bleibt. Es ändern sich zwei Annahmen aus dem Kontext: Den Gate-Zustand „still-erledigt“ gibt es nicht mehr, und auf dem iPhone steht „App“ jetzt an Position 1. Ein Nachtrag statt Umschreiben hält die ursprüngliche Begründung lesbar. ADR 0014 bekommt einen Nachtrag zu E9 (einmal spiegeln am Ende des Onboardings, ohne Request), weil sein Nachtrag vom 2026-10-11 „im Onboarding kein Spiegeln“ festhält.
+Die Entscheidung von ADR 0027 (Vorladen bei Gate ≠ „nichts“, nur das Modul früher, ein Ladevorgang je Datei) bleibt. Es ändern sich zwei Annahmen aus dem Kontext: Den Gate-Zustand „still-erledigt“ gibt es nicht mehr, und auf dem iPhone steht „App“ jetzt an Position 1. Ein Nachtrag statt Umschreiben hält die ursprüngliche Begründung lesbar. ADR 0014 bekommt einen Nachtrag zu E9 (einmal spiegeln am Ende des Onboardings, ohne Request), weil sein Nachtrag vom 2026-10-11 „im Onboarding kein Spiegeln“ festhält. ADR 0013 bekommt einen Nachtrag zu E8 (Review Runde 2, M1): Punkt 5 legt `display-mode` allein in `src/data/pwa.ts`; `src/data/platform.ts` liest ihn als **Ausnahme** nur lesend (`matchMedia("(display-mode: standalone)").matches`, `navigator.standalone`), ohne Listener, ohne `beforeinstallprompt`, ohne Registrierung. Muster ist ADR 0014, Punkt 6 (`push.ts` liest die Registrierung nur lesend). `docs/architecture.md:96` nennt die zweite Ausnahme.
 
 ### E8 – Ladebühne in der Farbe der ersten Bühne, auch auf dem iPhone
 
@@ -174,6 +174,7 @@ Ohne Änderung stünde auf dem iPhone im Safari-Tab beim Laden die gelbe Stadt-B
   - `isIosDevice({ userAgent, maxTouchPoints })`: rein, der bisherige Ausdruck aus `pwa.ts:240–241`.
   - `standalone()`: der bisherige Ausdruck aus `pwa.ts:295–297` (`display-mode: standalone` oder `navigator.standalone === true`).
   - `iosTab()`: `!standalone() && isIosDevice(navigator)`. Das ist genau die Bedingung, unter der `install.state()` `"ios"` liefert (vor `"ios"` prüft `state()` nur noch „installiert“ und „Angebot“, beide kommen aus Chromium-Events und auf dem iPhone nie vor).
+  - Das liest `display-mode` außerhalb von `pwa.ts`: Ausnahme von ADR 0013, Punkt 5, nur lesend und ohne Listener (Nachtrag ADR 0013, E7).
   - `src/data/pwa.ts` importiert `isIosDevice` und `standalone` von dort (Lazy-Chunk → Start-Modul ist erlaubt und kostet nichts, das Modul liegt ohnehin im Einstieg), der lokale `isIos` und der `standalone`-Ausdruck in `browserInstallEnv` entfallen. So gibt es die Prüfung einmal.
   - Warum nicht `src/domain/pwa.ts`: Das Modul wird zur Laufzeit nur aus `assets/app/` genutzt. Ein Import aus dem Start zöge es samt Installationstexten in den Einstieg. Warum nicht `src/data/pwa-start.ts`: `pwa.ts` müsste es statisch importieren, und `pwa-start.ts` lädt `pwa.ts` per `import()` (Zyklus).
 - **Lader** `src/ui/Onboarding.tsx:59`: `className={iosTab() ? "onb-pending ios" : "onb-pending"}`. Synchron, ohne Zustand; der Wert ändert sich während des Ladens nicht.
@@ -187,9 +188,10 @@ Ohne Änderung stünde auf dem iPhone im Safari-Tab beim Laden die gelbe Stadt-B
 
 Ein Bestandsnutzer mit eingeschalteter Samstags-Nachricht ändert im Onboarding Geburtsdatum oder Startpunkt. Der App-Schritt spiegelt nicht (`reconcile: false`), also schneidet der Service Worker die nächste Nachricht mit den alten Werten zu, bis das Kind-Sheet einmal offen war.
 
-- **Push-API** (`src/data/push.ts`): neue Methode `mirrorIfSubscribed(data: MirrorData): Promise<void>`: `const sub = await this.subscription(); if (!sub) return; mirroring = true; await mirror(data);`. Anders als `reconcile` kein `register`, kein `forget`, kein `clearAll`: kein Request, und ohne Abo bleibt der Geräte-Speicher unberührt. `mirror` schreibt wie bisher nur Geändertes.
+- **Push-API** (`src/data/push.ts`): neue Methode `mirrorIfSubscribed(data: MirrorData): Promise<void>`: `if (!env.hasPushManager) return; const sub = await this.subscription(); if (!sub) return; mirroring = true; await mirror(data);`. Die Vorprüfung `env.hasPushManager` (Review Runde 2, m5) hält Geräte ohne Push (iOS-Tab, alte Browser) fern von `getRegistration()`/`pushManager`. Anders als `reconcile` kein `register`, kein `forget`, kein `clearAll`: kein Request, und ohne Abo bleibt der Geräte-Speicher unberührt. `mirror` schreibt wie bisher nur Geändertes.
 - **Aufruf**: `src/ui/app-extras/AppSection.tsx` exportiert `syncPushMirror(): Promise<void>` (`createPush().mirrorIfSubscribed(mirrorData())`; `mirrorData` wird dazu aus `use-push-switch.ts` exportiert). `AppStepModule` (`src/ui/onboarding-types.ts`) bekommt `syncPush: () => Promise<void>`, `loadAppStep()` (`src/ui/AppExtras.tsx:46`) reicht es durch.
 - **Wann**: `OnboardingFlow` ruft beim Unmount einmal `app?.syncPush().catch(() => {})` (Cleanup eines `useEffect` mit leerer Abhängigkeitsliste, Ref auf `app`). Das deckt jedes Ende ab: „fertig“, „Überspringen“, Esc und Android-Zurück (`cancel` im Lader), auch den erneuten Aufruf über „Einführung ansehen“. „Später“ gibt es nur bei nicht ladbarem Chunk, dann lief der Flow nie und es gibt nichts zu spiegeln. Fehlt der App-Teil (`app === undefined`), passiert nichts.
+- **Restrisiko** (Review Runde 2, m5): Läuft beim Ende noch eine Standortabfrage im Schritt „Weg“, spiegelt der Cleanup den Startpunkt vor ihrem Ergebnis. Der neue Standort landet dann erst beim nächsten Abgleich im Kind-Sheet im Geräte-Speicher. Akzeptiert: selten (Abfrage läuft, und gleichzeitig wird beendet), und der Zuschnitt fällt höchstens auf den alten Startpunkt zurück.
 - Der Code liegt in den Lazy-Chunks (`assets/app/`, `assets/onboarding/`), kein Start-Byte. StrictMode ruft den Cleanup im Entwicklungsmodus einmal mehr; das schadet nicht (lokale Schreibvorgänge, nur Geändertes).
 - **Privatsphäre** (E5): Kein Request. Ob gespiegelt wird, hängt am Abo, nicht an Angaben, und ist von außen nicht sichtbar. `docs/architecture.md:98` („Kein Push-Code läuft beim App-Start, mit einer Ausnahme …“) bekommt die zweite Ausnahme: „am Ende des Onboardings einmal `mirrorIfSubscribed` (lokal, ohne Request)“.
 
@@ -217,14 +219,25 @@ Neue Anforderung des Nutzers (2026-10-11). Wischen kommt **zusätzlich** zu den 
 - **UI** (`src/ui/onboarding/OnboardingFlow.tsx`), Pointer Events auf `.onb-flow`:
   - `onPointerDown`: nur `pointerType` `touch` oder `pen` (Maus nicht: Ziehen markiert dort Text, Desktop hat die Knöpfe), nur `isPrimary`. Start merken (`pointerId`, `clientX/Y`), außer die Geste beginnt in `input`, `select`, `textarea`, `[role="switch"]` oder in einem horizontal scrollbaren Element (Vorfahre bis `.onb-flow` mit `overflow-x` `auto`/`scroll` und `scrollWidth > clientWidth`).
   - `onPointerUp` mit gleicher `pointerId`: `swipeStep({ …, width: window.innerWidth })`, dann `next()` (außer letzter Schritt) bzw. `back()` (außer Schritt 1). `onPointerCancel` verwirft den Start (der Browser hat die Geste fürs vertikale Scrollen übernommen).
-  - War es eine Wischgeste, unterdrückt ein einmaliger `click`-Listener in der Capture-Phase auf `.onb-flow` den Klick, den der Browser nach `pointerup` auf einem Knopf oder einer Stadt-Kachel noch auslösen kann. Er wird beim nächsten `pointerdown` oder nach 400 ms entfernt.
+  - **Klick nach der Geste** (Review Runde 2, M2): Ob der Browser nach einer Touch-Geste mit Bewegung über einem Knopf noch `click` auslöst, wird **test-first** geklärt: Test 15e läuft zuerst nur per CDP-Touch (`pixel-7`) **ohne** Klick-Unterdrückung. Bleibt er grün (Browser feuert nach `touchmove` keinen Klick), entfallen Unterdrückung und Timer ganz. Wird er rot, kommt ein einmaliger `click`-Listener in der Capture-Phase auf `.onb-flow`, entfernt beim nächsten `pointerdown` oder nach 400 ms. Das Ergebnis steht unter „Umsetzung“.
   - CSS (`src/ui/onboarding/onboarding.css`): `.onb-flow { touch-action: pan-y pinch-zoom; }`. `pan-y` lässt vertikales Scrollen beim Browser und gibt die horizontale Geste der Seite; `pinch-zoom` hält das Zoomen frei (sonst schaltete `pan-y` es ab).
-  - **Gleit-Effekt**: Nach einer erkannten Geste bekommen `.onb-txt` und `.onb-data` des neuen Schritts die Klasse `onb-in-vor` bzw. `onb-in-zurueck` (Einblenden aus 24 px Versatz in Wischrichtung, 180 ms). Nach Knopf-Navigation keine Klasse, dort bleibt alles wie heute. Bei reduzierter Bewegung nimmt `motion.css` Animationen ohnehin weg (Kopfkommentar `onboarding.css:4`); kein Code hört auf `animationend`.
+  - **Gleit-Effekt**: Nach einer erkannten Geste bekommen `.onb-txt` und `.onb-data` des neuen Schritts die Klasse `onb-in-vor` bzw. `onb-in-zurueck` (Einblenden aus 24 px Versatz in Wischrichtung, 180 ms). Beide tragen `key={index}` (`OnboardingFlow.tsx:81`, `:97`; Review Runde 2, M3): React baut sie je Schritt neu, sonst bliebe die Klasse beim zweiten Wischen in dieselbe Richtung gleich, und die Animation liefe nicht erneut. Nach Knopf-Navigation keine Klasse, dort bleibt alles wie heute. Bei reduzierter Bewegung nimmt `motion.css` Animationen ohnehin weg (Kopfkommentar `onboarding.css:4`); kein Code hört auf `animationend`.
 - **Budget**: geschätzt `Onboarding JS (lazy)` +0,4 bis +0,6 kB (6,29 → höchstens 6,9 von 7,3), `Onboarding CSS (lazy)` +0,1 kB (≈ 2,1 von 2,5). Kein Start-Byte. Reicht das Budget nicht, wird zuerst der Gleit-Effekt gestrichen, dann gefragt.
 - **E2E**: Playwright kann auf `page.touchscreen` nur tippen. Festgelegt:
   - **Beide Engines** (`pixel-7`, `iphone-15`): synthetische Pointer Events per `locator.dispatchEvent("pointerdown" | "pointerup", { pointerId: 1, pointerType: "touch", isPrimary: true, clientX, clientY, bubbles: true })`. Playwright erzeugt dafür echte `PointerEvent`s, in Chromium und WebKit. Helfer `swipe(page, { from: [x, y], to: [x, y], target? })` in `e2e/onboarding-steps.ts`. Prüft die Logik, nicht `touch-action`.
   - **Nur Chromium**: echte Touch-Geste über CDP (`page.context().newCDPSession(page)`, `Input.dispatchTouchEvent` `touchStart`/`touchMove` in mehreren Schritten/`touchEnd`). Prüft, dass mit `touch-action` die horizontale Geste bei der Seite ankommt und eine vertikale scrollt statt zu wechseln. In WebKit mit `test.skip(browserName !== "chromium", "CDP-Touch nur in Chromium; WebKit deckt die synthetischen Pointer Events ab")`.
-- Keine neue Spec-Datei (Wischen gehört zu `e2e/onboarding.spec.ts`, Switch-Fall zu `e2e/onboarding-push.spec.ts`), also kein neuer Eintrag in `SPEC_COVERS`.
+- Keine neue Spec-Datei (Wischen gehört zu `e2e/onboarding.spec.ts`, Switch-Fall zu `e2e/onboarding-push.spec.ts`), also kein neuer Spec-Eintrag in `SPEC_COVERS`. Das neue Modul `src/data/platform.ts` kommt aber in die Abdeckung von `onboarding.spec` und `installieren.spec` (Review Runde 2, m6; S2).
+- **Lint** (Review Runde 2, m4): Meldet Biome für die Pointer-Handler auf `.onb-flow` `noStaticElementInteractions`, hängen die Listener per Ref in einem `useEffect` (`addEventListener`), kein `biome-ignore`.
+
+### E11 – Zurück per Tipp: Fortschrittspunkte als Knöpfe (Review Runde 2, m7)
+
+Entscheidung des Auftraggebers (2026-10-11): Wischen ist eine Geste ohne Alternative für „Zurück“ (WCAG 2.5.1, Zeigergesten). Damit Zurück auch per Tipp und Tastatur geht:
+
+- Die Fortschrittspunkte **früherer** Schritte werden `<button type="button">` mit `aria-label` „Zu Schritt n: <Überschrift>“ und rufen `setIndex(n - 1)` (wie `back()`, Fokus über den Effekt auf `index` auf die Überschrift).
+- Touch-Ziel mindestens 44 × 44 px per Polster (transparentes `padding` bzw. Pseudo-Element), das sichtbare Aussehen der Punkte ändert sich nicht.
+- Der aktuelle und die **zukünftigen** Punkte bleiben nicht interaktiv (weiter nur über „Weiter“, damit die Prüfung des Geburtsdatums nicht umgangen wird).
+- Fokus-Ring sichtbar (`:focus-visible` wie die übrigen Knöpfe).
+- Umsetzung in S3, Test 15g.
 
 ## Tests (test-first für Domäne und Daten)
 
@@ -244,7 +257,7 @@ Neue Anforderung des Nutzers (2026-10-11). Wischen kommt **zusätzlich** zu den 
     - dx −100, dy 50 → „weiter“ (Steigung 0,5); dy 51 → `undefined`.
     - rein vertikal (dx 0, dy 300) → `undefined`.
 - `src/data/platform.test.ts` (neu, zum neuen Modul): `isIosDevice` für iPhone-, iPad- und iPod-UA → `true`; `Macintosh` mit `maxTouchPoints` 5 → `true`, mit 0 → `false`; Android- und Desktop-UA → `false`. Die bisherigen Fälle aus `src/data/pwa.test.ts` (sofern dort `isIos` über `state()` geprüft wird) bleiben grün und belegen, dass `pwa.ts` die neue Funktion nutzt.
-- `src/data/push.test.ts`: `mirrorIfSubscribed` ohne Abo → kein `store.set`, kein `fetch`; mit Abo → schreibt `birthDate`, `searches`, `origin` in den Store, kein `fetch`; zweiter Aufruf mit gleichen Daten schreibt nichts.
+- `src/data/push.test.ts`: `mirrorIfSubscribed` ohne `hasPushManager` → kein `getRegistration`, kein `store.set` (m5); ohne Abo → kein `store.set`, kein `fetch`; mit Abo → schreibt `birthDate`, `searches`, `origin` in den Store, kein `fetch`; zweiter Aufruf mit gleichen Daten schreibt nichts.
 - `src/domain/onboarding-gate.test.ts`: Wahrheitstafel über `storage`, `done` und `deepLink` (8 Fälle), nur `"zeigen"` bei `storage && !done && !deepLink`. Der Fall `stored` entfällt; tsgo meldet jeden alten Aufruf mit `stored`.
 - `src/data/preferences.test.ts`:
   - `saveOnboardingDone()` schreibt `[[ONBOARDING_FLAG.key, ONBOARDING_FLAG.value]]` (aus `e2e/onboarding-flag.ts`, E6).
@@ -266,15 +279,16 @@ Neue Anforderung des Nutzers (2026-10-11). Wischen kommt **zusätzlich** zu den 
   - **10b** „Bestandsnutzer mit Geburtsdatum und Stadtteil sieht es, vorbelegt“ (ersetzt „Geburtsdatum gespeichert: kein Onboarding“): Init-Skript mit `zwergenplan.geburtsdatum = "2026-04-20"` und `zwergenplan.entfernung-ab = "gostenhof"`. Das Onboarding erscheint. `goTo("alter")`: Feld „20.04.2026“, Hinweis beginnt mit „5 Monate!“. `goTo("weg")`: Stadtteil-Auswahl hat den Wert `gostenhof`. Je genau ein Request auf `wegzeit.json` und `linien.json` in der ganzen Sitzung. Nach „Überspringen“ sind Geburtsdatum und Stadtteil unverändert und das Flag `ONBOARDING_FLAG.value`.
   - **10c** „altes Flag ‚1‘ → erscheint einmal“: Das Init-Skript setzt `ONBOARDING_FLAG.key = "1"` **nur beim ersten Laden**, mit `sessionStorage`-Wächter wie `e2e/push.spec.ts:306–308` (`if (sessionStorage.getItem("__e2eSeeded")) return; sessionStorage.setItem("__e2eSeeded", "1"); …`). Ohne Wächter schriebe es nach dem Neuladen wieder `"1"`, und der Test prüfte nichts. Die Option `"neu"` lässt den Wert stehen. Das Onboarding erscheint. Nach „Überspringen“ ist das Flag `ONBOARDING_FLAG.value`. Nach dem Neuladen kommt kein Onboarding und kein Request auf `assets/onboarding/`.
   - **Deep-Link** (bestehend): unverändert. Zusätzlich mit Flag `"1"` (gleicher Wächter): kein Onboarding, Flag bleibt `"1"`.
-- **Test 12 „leere Bühne in der Farbe der ersten Bühne“** (`:408–432`): läuft wie bisher in allen Projekten, auf `iphone-15` jetzt mit der lila Bühne. Die Gleichheit Ladebühne = Bühne von Schritt 1 bleibt die Kernprüfung. Die Gegenprobe „nicht ungemischt“ wird je Projekt: `255,217,59` auf Android, `185,156,255` auf `iphone-15` (Konstante je Projektname, wie `ANDROID`). Zusätzlich auf `iphone-15`: die Ladebühne trägt die Klasse `ios`, auf `pixel-7` nicht.
+- **Test 12 „leere Bühne in der Farbe der ersten Bühne“** (`:408–432`): läuft wie bisher in allen Projekten, auf `iphone-15` jetzt mit der lila Bühne. Die Gleichheit Ladebühne = Bühne von Schritt 1 bleibt die Kernprüfung. Die Gegenprobe „nicht ungemischt“ wird je Projekt: `255,217,59` auf Android, `185,156,255` auf `iphone-15` (Konstante je Projektname, wie `ANDROID`). Zusätzlich auf `iphone-15`: die Ladebühne trägt die Klasse `ios`, auf `pixel-7` nicht. Der Farbvergleich läuft auf `iphone-15` auch **hell** (Review Runde 2, m3), nicht nur dunkel.
 - **Test 13**: Kommentar `:517–518` neu: Mit Plan 0034 macht eine gespeicherte Darstellung keinen Bestandsnutzer mehr. `chosenDark` setzt deshalb `zwergenplan.darstellung = "dunkel"` per Init-Skript **vor** dem Laden, wie `e2e/mobile-ux.spec.ts:506`; das prüft den echten Weg (Inline-Skript in `index.html` setzt `data-theme` vor dem ersten Paint) statt `page.evaluate` nach dem Öffnen. Die Gates laufen weiter für jeden Schritt, auf `iphone-15` jetzt auch für „App“ als Schritt 1.
 - **Test 15 „Wischen“ (neu)**, `reducedMotion: "reduce"` außer in 15f:
   - **15a**: Auf der Bühne nach links wischen → Schritt 2, Überschrift hat den Fokus. Nach rechts → Schritt 1, Fokus auf der Überschrift. Auf Schritt 1 nach rechts → bleibt Schritt 1.
   - **15b**: Auf „alter“ ein ungültiges Datum eintragen, außerhalb des Felds nach links wischen → bleibt auf „alter“, Fokus im Feld, Hinweis steht. Nach rechts zurück und wieder vor: Eingabe steht noch.
   - **15c**: Keine Wirkung bei Start am Rand (x 10 und `width - 10`), bei Start im Geburtsdatum-Feld, bei überwiegend vertikaler Geste (dx −40, dy 200), bei `pointerType: "mouse"`.
   - **15d**: Auf dem letzten Schritt nach links → bleibt, das Onboarding ist noch offen, Flag unverändert.
-  - **15e**: Wischen über eine Stadt-Kachel bzw. über „Weiter“ wechselt genau einen Schritt (der Klick danach ist unterdrückt, keine Doppelnavigation).
-  - **15f** (nur Chromium, CDP-Touch): horizontale Touch-Geste auf der Bühne → Schritt 2; vertikale Touch-Geste bei 200 % Textgröße → kein Schrittwechsel, der Dialog ist gescrollt. Ohne `reduce`: nach der horizontalen Geste trägt `.onb-txt` die Klasse `onb-in-vor`; mit `reduce` laufen keine Animationen (`expectReducedMotion`).
+  - **15e** (test-first, nur `pixel-7`, CDP-Touch, M2): Wischen über eine Stadt-Kachel bzw. über „Weiter“ wechselt genau einen Schritt, keine Doppelnavigation. Zuerst **ohne** Klick-Unterdrückung; bleibt er grün, wird keine gebaut (E10).
+  - **15f** (`test.skip(testInfo.project.name !== "pixel-7", …)`, CDP-Touch; Review Runde 2, m2): horizontale Touch-Geste auf der Bühne → Schritt 2; vertikale Touch-Geste bei 200 % Textgröße → kein Schrittwechsel, der Dialog ist gescrollt. Ohne `reduce`: nach der horizontalen Geste trägt `.onb-txt` die Klasse `onb-in-vor`, nach einem **zweiten** Wischer nach links gilt `getAnimations().length > 0` auf dem neuen `.onb-txt` (M3: `key={index}` startet die Animation neu); mit `reduce` laufen keine Animationen (`expectReducedMotion`).
+  - **15g** (E11): Auf Schritt 3 sind die Punkte 1 und 2 Knöpfe („Zu Schritt 1: …“), Punkt 3 und 4 nicht. Tipp auf Punkt 1 → Schritt 1, Fokus auf der Überschrift; per Tastatur (Tab bis zum Punkt, Enter) ebenso. Treffer-Fläche ≥ 44 × 44 px (`boundingBox` des Knopfs).
 - Kommentar an `onboardingLoaded` („auch bei still erledigt“) streichen.
 - **Unverändert grün**:
   - `e2e/onboarding-push.spec.ts` (Android, App zuletzt), dazu ein Fall in Test 5: Wischgeste, die auf dem Schalter beginnt, wechselt nicht den Schritt und schaltet nicht.
@@ -298,22 +312,20 @@ Neue Anforderung des Nutzers (2026-10-11). Wischen kommt **zusätzlich** zu den 
   - `ONBOARDING_VERSION`, `loadOnboardingDone` und `saveOnboardingDone` ändern, `hasStoredData` entfernen, `SEARCHES_KEY` zurück nach `searches-store.ts` (E4).
   - `OnboardingFlow.tsx:57`: `first: index === 0` an `stepText`.
   - Kommentare in `onboarding-gate.ts`, `preferences.ts` (Kopf, `:18–22`) und `searches-store.ts` nachziehen.
-  - Fertig, wenn: `pnpm verify` grün ist (tsgo, knip ohne Funde zu `hasStoredData`/`SEARCHES_KEY`, `pnpm arch` grün mit dem Test-Import aus `e2e/`).
+  - **E2E dieses Schritts** (Review Runde 2, M4: die Änderung bricht sie, also zieht sie hier mit): `e2e/fixtures.ts` (`skipOnboarding` mit `ONBOARDING_FLAG`), `e2e/onboarding-steps.ts` (`KICKER.stadt`, `goTo` mit Gruppe „Stadt“), `e2e/onboarding.spec.ts` (Test 1 Kommentar, Test 2 per `goTo`, Test 7, Tests 8–11 inkl. 10a–c, beide Tests 12 mit Flag, Test 13, Kommentar `onboardingLoaded`), `e2e/startpunkt.spec.ts`, `scripts/screenshots.ts`. `grep -rn '"1"' e2e/` und `grep -rn "einfuehrung" e2e/ scripts/`: keine übrigen Flag-Werte außer den bewusst alten in Test 10c und Deep-Link. `node scripts/e2e-select.ts e2e/onboarding-flag.ts` prüfen.
+  - Fertig, wenn: `pnpm verify` grün ist (tsgo, knip ohne Funde zu `hasStoredData`/`SEARCHES_KEY`, `pnpm arch` grün mit dem Test-Import aus `e2e/` und dem Import `scripts/` → `e2e/`) und `pnpm e2e:local --affected` grün ist.
 - **S2 Ladebühne und Spiegeln (test-first)**:
   - `src/data/platform.test.ts` rot, dann `src/data/platform.ts`, `pwa.ts` darauf umstellen, Lader und `dialog.css` (E8).
-  - `push.test.ts` für `mirrorIfSubscribed` rot, dann `push.ts`, `AppSection.tsx` (`syncPushMirror`), `use-push-switch.ts` (`mirrorData` exportiert), `onboarding-types.ts`, `AppExtras.tsx`, Cleanup in `OnboardingFlow.tsx` (E9).
+  - `push.test.ts` für `mirrorIfSubscribed` rot (inkl. Fall ohne `hasPushManager`), dann `push.ts`, `AppSection.tsx` (`syncPushMirror`), `use-push-switch.ts` (`mirrorData` exportiert), `onboarding-types.ts`, `AppExtras.tsx`, Cleanup in `OnboardingFlow.tsx` (E9).
+  - `scripts/lib/e2e-map.ts`: `src/data/platform.ts` in `SPEC_COVERS` von `onboarding.spec` und `installieren.spec` (m6); `node scripts/e2e-select.ts src/data/platform.ts` nennt beide.
+  - **E2E dieses Schritts** (M4): Test 12 „leere Bühne in der Farbe der ersten Bühne“ (Klasse `ios`, Gegenprobe je Projekt, `iphone-15` hell und dunkel), `e2e/push.spec.ts` (E9, mit Gegenprobe).
   - `pnpm build` und size-limit: `JS (initial)` gegen S0 messen und eintragen.
-  - Fertig, wenn: `pnpm verify` grün ist und `JS (initial)` ≤ 101 kB.
-- **S3 Wischen (test-first)**: `swipeStep`-Tests rot, dann `swipeStep` in `onboarding.ts`, Pointer-Handler, `back()`, Klick-Unterdrückung und Gleit-Klassen in `OnboardingFlow.tsx`, `touch-action` und Keyframes in `onboarding.css` (E10). `pnpm build`, size-limit für die Onboarding-Budgets eintragen.
-  - Fertig, wenn: `pnpm verify` grün ist und beide Onboarding-Budgets halten.
-- **S4 E2E und Screenshots**:
-  - `fixtures.ts`, `onboarding-steps.ts` (`KICKER.stadt`, `goTo` mit Gruppe „Stadt“, Helfer `swipe`), `onboarding.spec.ts` (Tests 1 Kommentar, 2, 7, 8, 9, 10a–c, 11, beide Tests 12 mit Flag, Test 12 Ladebühne, 13, 15), `onboarding-push.spec.ts` (Test 5, Switch-Fall), `push.spec.ts` (E9), `startpunkt.spec.ts` und `scripts/screenshots.ts` nach E6 und „Tests“ umstellen.
-  - `grep -rn '"1"' e2e/` und `grep -rn "einfuehrung" e2e/ scripts/`: keine übrigen Flag-Werte außer den bewusst alten in Test 10c und Deep-Link.
-  - `node scripts/e2e-select.ts` prüfen; bei Bedarf `scripts/lib/e2e-map.ts` ergänzen.
-  - Fertig, wenn:
-    - `pnpm verify` grün ist.
-    - `pnpm e2e:local --affected` (im Hintergrund) grün ist.
-    - `pnpm e2e:local e2e/onboarding.spec.ts -- --project=iphone-15` grün ist, falls lokal WebKit geht (`libavif16`); sonst prüft es die CI auf dem Branch.
+  - Fertig, wenn: `pnpm verify` grün ist, `JS (initial)` ≤ 101 kB, `pnpm e2e:local --affected` grün ist und `pnpm e2e:local e2e/onboarding.spec.ts -- --project=iphone-15` grün ist (falls lokal WebKit geht; sonst die CI auf dem Branch).
+- **S3 Wischen und Zurück per Punkt (test-first)**: `swipeStep`-Tests rot, dann `swipeStep` in `onboarding.ts`, Pointer-Handler, `back()`, Gleit-Klassen mit `key={index}` in `OnboardingFlow.tsx`, `touch-action` und Keyframes in `onboarding.css` (E10), Fortschrittspunkte als Knöpfe (E11). Sofort danach `pnpm lint` (m4: bei `noStaticElementInteractions` Listener per Ref in `useEffect`, kein `biome-ignore`). Test 15e zuerst ohne Klick-Unterdrückung (M2); nur wenn er rot ist, die Unterdrückung bauen. `pnpm build`, size-limit für die Onboarding-Budgets eintragen.
+  - **E2E dieses Schritts** (M4): Helfer `swipe` in `e2e/onboarding-steps.ts`, Test 15a–g in `e2e/onboarding.spec.ts`, Switch-Fall in `e2e/onboarding-push.spec.ts` (Test 5).
+  - Fertig, wenn: `pnpm verify` grün ist, beide Onboarding-Budgets halten und `pnpm e2e:local --affected` grün ist.
+- **S4 E2E gesamt**: `node scripts/e2e-select.ts` prüfen; `pnpm e2e:local --affected` und, falls lokal WebKit geht, `pnpm e2e:local e2e/onboarding.spec.ts -- --project=iphone-15` über den ganzen Diff.
+  - Fertig, wenn: `pnpm verify` grün ist und beide Läufe grün sind (sonst prüft `iphone-15` die CI auf dem Branch).
 - **S5 Browser-Review lokal** (`/browser-review`, betroffene Ansichten):
   - Onboarding auf `iphone-15` (App als Schritt 1 mit Kicker „Willkommen“ und neuem Hinweis, Schritt 2 „Schön, dass ihr da seid“) und auf `pixel-7` unverändert, je hell und dunkel, 320 px / 200 %.
   - **Übergang Laden → Schritt 1** auf `iphone-15` und `pixel-7`, hell und dunkel: kein Farbsprung der Bühne (Chunk per Route zurückhalten wie Test 12).
@@ -334,10 +346,13 @@ Neue Anforderung des Nutzers (2026-10-11). Wischen kommt **zusätzlich** zu den 
   - Im Safari-Tab des iPhones steht „App“ an Position 1 (Grund: eigener Speicher der installierten App). Die Ladebühne trägt dort die App-Farbe (`iosTab()` aus `src/data/platform.ts`).
   - Der Kontextsatz „rückt ‚App‘ an Position 2“ und die Erwähnung von „still-erledigt“ in Entscheidung 1 gelten als überholt. Der Text oben bleibt stehen.
 - **ADR 0014**: Nachtrag „(2026-10-11, Plan 0034): Am Ende des Onboardings einmal `mirrorIfSubscribed`, lokal, ohne Request“.
+- **ADR 0013**: Nachtrag „(2026-10-11, Plan 0034): `display-mode` auch in `src/data/platform.ts`“: Ausnahme von Punkt 5, nur lesend (`standalone()`), ohne Listener, ohne `beforeinstallprompt` und Registrierung, im Start-Bundle für die Farbe der Ladebühne (E8). Muster ADR 0014, Punkt 6.
 - **`docs/architecture.md`**:
+  - `:96` PWA-Kern: „der einzige für `beforeinstallprompt` und `display-mode`“ um die zweite Ausnahme ergänzen: `src/data/platform.ts` liest `display-mode` nur lesend, ohne Listener (ADR 0013, Nachtrag 2026-10-11, Plan 0034).
+  - `:118` Push-Unterpunkt („Gespiegelt und abgeglichen wird nur, solange das Kind-Sheet offen ist …“): „und einmal am Ende des Onboardings (`mirrorIfSubscribed`, lokal, ohne Request; Plan 0034, E9)“.
   - `:98` Push-Teil: zweite Ausnahme „am Ende des Onboardings einmal `mirrorIfSubscribed` (lokal, kein Request)“; „Gespiegelt und abgeglichen wird, solange das Kind-Sheet offen ist“ um „und einmal am Ende des Onboardings“ ergänzen.
   - `:101` Start: `onboardingGate` ohne „still-erledigt“; `hasStoredData` streichen; `src/data/platform.ts` (`iosTab`, Ladebühne `.onb-pending.ios`) nennen.
-  - `:102` Chunk: Wischen (`swipeStep` in `src/domain/onboarding.ts`, Pointer Events auf `.onb-flow`, `touch-action: pan-y pinch-zoom`).
+  - `:102` Chunk: Wischen (`swipeStep` in `src/domain/onboarding.ts`, Pointer Events auf `.onb-flow`, `touch-action: pan-y pinch-zoom`), Fortschrittspunkte früherer Schritte als Knöpfe (E11).
   - `:104` Wann: „Vorladen bei jedem Gate ≠ ‚nichts‘“ ohne den Zusatz „auch bei still-erledigt …“, dazu „Bestandsnutzer sehen es einmal, gespeicherte Angaben stehen vorbelegt (Plan 0034)“.
   - `:105` E2E: Flag-Schlüssel und -Wert aus `e2e/onboarding-flag.ts` (`ONBOARDING_FLAG`), gekoppelt per Unit-Test in `src/data/preferences.test.ts`; auch `scripts/screenshots.ts` nutzt ihn. Wischen: synthetische Pointer Events in beiden Engines, CDP-Touch nur Chromium.
   - `:106` Push: „ohne laufendes Spiegeln“ → „ohne laufendes Spiegeln, einmal am Ende (Plan 0034, E9)“.
@@ -363,7 +378,7 @@ Neue Anforderung des Nutzers (2026-10-11). Wischen kommt **zusätzlich** zu den 
 - **Bestandsnutzer mit Samstags-Nachricht** (Review M4): Ohne E9 schnitte der Service Worker nach geänderten Angaben im Onboarding mit alten Werten zu, bis das Kind-Sheet offen war. E9 spiegelt am Ende einmal. Rest-Risiko: Wird die Seite während des Onboardings geschlossen (Tab weg, kein Unmount), wird nicht gespiegelt; dann gilt wie bisher der Abgleich beim nächsten Öffnen des Kind-Sheets. Das Onboarding kommt dann beim nächsten Start ohnehin erneut (Flag nicht gesetzt).
 - **Startbudget** (E8): Die iOS-Ladebühne kostet Start-Bytes bei 0,65 kB Rest. Gemessen in S2; über 101 kB ist Blocker (E8).
 - **Wischen gegen Systemgesten**: Am Bildschirmrand beginnende Gesten (Android-Zurück, Safari-Zurück) gehören dem System; `swipeStep` ignoriert die äußeren 24 px. Android-Zurück schließt den Dialog wie bisher (`cancel` = „Überspringen“). Dass `pointercancel` bei vertikalem Scrollen kommt und die horizontale Geste mit `touch-action: pan-y` bei der Seite ankommt, belegt nur Chromium per CDP (15f); auf WebKit prüft es der Nutzer am echten iPhone (`docs/ideas.md`).
-- **Wischen auf Knöpfen**: Ein Klick nach der Geste würde doppelt navigieren; die Klick-Unterdrückung (E10) verhindert das, Test 15e belegt es.
+- **Wischen auf Knöpfen**: Ein Klick nach der Geste würde doppelt navigieren. Ob der Browser ihn auslöst, klärt Test 15e test-first per CDP-Touch; nur wenn ja, kommt die Klick-Unterdrückung (E10). WebKit prüft der Nutzer am echten iPhone.
 - **Kicker-Abhängigkeit in E2E**: `goTo` erkennt Schritte am Kicker. Auf iOS trägt der App-Schritt „Willkommen“, also könnte `goTo(page, "stadt")` fälschlich auf Schritt 1 halten. Gegenmittel (E2): Für „stadt“ prüft `goTo` zusätzlich die Gruppe „Stadt“ (`getByRole("group", { name: "Stadt" })`).
 - **Service-Worker-Cache**: Ein Gerät mit altem App-Stand (vor Plan 0034) wertet `"2"` als erledigt (jeder Wert zählt). Ein Rückfall auf den alten Stand richtet also keinen Schaden an.
 - **Lokal kein WebKit**: Test 7, Test 2, Test 12 (Ladebühne) und Test 15 auf `iphone-15` laufen dann nur in der CI. Der Branch-Lauf wählt `onboarding.spec.ts` über den Diff.
@@ -372,7 +387,10 @@ Neue Anforderung des Nutzers (2026-10-11). Wischen kommt **zusätzlich** zu den 
 
 - **N1 Kicker** – entschieden (2026-10-11, vom Auftraggeber nach Empfehlung, ohne Nutzer, umkehrbar): Im Safari-Tab trägt der App-Schritt als Schritt 1 „Willkommen“, der Stadt-Schritt danach „Schön, dass ihr da seid“ (E2).
 - **N2 Knopf auf Schritt 1 (iOS)** – entschieden (2026-10-11, vom Auftraggeber nach Empfehlung, ohne Nutzer, umkehrbar): bleibt „Los geht’s“.
-- Keine weiteren offenen Nutzerentscheide. Im Browser-Review dem Nutzer zeigen: Wischen auf dem letzten Schritt endet nicht (E10) und es gibt keinen Zurück-Knopf (Nicht-Ziel).
+- **Wischen nach links auf dem letzten Schritt** – entschieden (2026-10-11, vom Auftraggeber, ohne Nutzer, umkehrbar): beendet nicht (E10).
+- **iOS-Hinweis in Ich-Form** – entschieden (2026-10-11, vom Auftraggeber, ohne Nutzer, umkehrbar): „… dort frage ich dann nach Alter und Startpunkt.“ (E2).
+- **Zurück ohne Wischen** – entschieden (2026-10-11, vom Auftraggeber nach Review Runde 2, m7): Fortschrittspunkte früherer Schritte als Knöpfe (E11).
+- Keine weiteren offenen Nutzerentscheide. Im Browser-Review dem Nutzer zeigen: Wischen auf dem letzten Schritt endet nicht, Zurück per Punkt statt eigenem Knopf.
 
 ## Review (2026-10-11) – Verdict: Überarbeiten
 
@@ -401,3 +419,30 @@ Unabhängiger Plan-Review (`/plan-review`), Befunde bewertet vom Auftraggeber.
 **Neu nach dem Review**
 
 - Nutzeranforderung „Wischen zwischen den Schritten“ → E10, Unit-Tests `swipeStep`, Test 15, S3, Budget-Schätzung. Neu dadurch: `/arch-review` Pflicht (S6, auch wegen `src/data/platform.ts`).
+
+## Review Runde 2 (2026-10-11) – Verdict: Freigabe mit Änderungen
+
+Zweiter unabhängiger Plan-Review (`/plan-review`) nach Einarbeitung von Runde 1 und dem Zusatz „Wischen“. Alle Befunde vom Auftraggeber übernommen.
+
+**Übernommen**
+
+- **M1** `src/data/platform.ts` liest `display-mode` außerhalb von `pwa.ts` (ADR 0013, Punkt 5) → Nachtrag ADR 0013 als Ausnahme (nur lesend, ohne Listener; Muster ADR 0014, Punkt 6), `docs/architecture.md:96`, E7, E8 und Doku-Liste ergänzt.
+- **M2** Klick-Unterdrückung ungeprüft angenommen → Test 15e test-first nur per CDP-Touch (`pixel-7`) ohne Unterdrückung; bleibt er grün, entfallen Unterdrückung und Timer (E10, S3, Risiken).
+- **M3** Gleit-Klasse bleibt beim zweiten Wischen gleich, Animation läuft nicht neu → `key={index}` auf `.onb-txt`/`.onb-data` (`OnboardingFlow.tsx:81`, `:97`), Test 15f mit zweitem Wischer (`getAnimations().length > 0`).
+- **M4** E2E-Anpassungen lagen gesammelt in S4, die Schritte davor wären lokal rot → in den verursachenden Schritt gezogen (S1: Flag-Datei, `fixtures.ts`, Tests 1, 2, 7–11, 13, Test 12 Flag, `startpunkt.spec.ts`, `screenshots.ts`; S2: Test 12 Ladebühne, `push.spec.ts` E9; S3: Test 15 und Switch-Fall). Jeder Schritt ist erst mit grünem `pnpm e2e:local --affected` fertig; S4 ist nur noch der Gesamtlauf.
+- **m1** `docs/architecture.md:118` und `:96` fehlten in der Doku-Liste → ergänzt.
+- **m2** 15f lief per `browserName` auch auf anderen Chromium-Projekten → `test.skip(project !== "pixel-7")`.
+- **m3** Farbvergleich Test 12 auf `iphone-15` nur dunkel → auch hell.
+- **m4** Pointer-Handler auf `div` können Biome `noStaticElementInteractions` auslösen → S3 ruft sofort `pnpm lint`; dann Listener per Ref in `useEffect`, kein `biome-ignore` (E10).
+- **m5** `mirrorIfSubscribed` ohne Push-Fähigkeit → prüft vorher `env.hasPushManager` (Unit-Fall); laufende Standortabfrage beim Ende als Restrisiko in E9.
+- **m6** `src/data/platform.ts` ohne E2E-Zuordnung → `SPEC_COVERS` von `onboarding.spec` und `installieren.spec`, Prüfung per `node scripts/e2e-select.ts src/data/platform.ts` in S2.
+- **m7** Zurück nur per Wischen (WCAG 2.5.1) → Entscheidung des Auftraggebers: Fortschrittspunkte früherer Schritte als Knöpfe („Zu Schritt n: <Titel>“, Ziel ≥ 44 px per Polster, Aussehen unverändert), zukünftige Punkte nicht interaktiv (E11, Test 15g, S3). Das Nicht-Ziel „Zurück-Knopf“ ist entsprechend gefasst.
+
+**Entschieden ohne Nutzer (umkehrbar)**
+
+- Wischen nach links auf dem letzten Schritt beendet nicht.
+- iOS-Hinweis in Ich-Form.
+
+**Abgelehnt**
+
+- Keiner.
