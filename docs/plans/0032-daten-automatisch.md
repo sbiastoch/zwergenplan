@@ -287,6 +287,11 @@ Anlass: fbs-nuernberg (309 000 Zeichen, ~71 Angebote) wurde mit Haiku in einem A
 - Dazu aus dem Arch-Review von Teil A/B: Build-Probelauf je Anbieter in `checkExtraction` (Fehler zählen als ungültig, also Wiederholung; ohne `coveredBy`, das prüft `data:validate`), `warnings` aus `validateRaw` an `ExtractOutcome` und in `nightly.json`, Redirect-Ziele (`finalUrl`) und `ticketUrl` auch in `pipeline extract` (frisch: direkt aus dem Abruf; `--from`: `finalUrl` steht jetzt in `hashes.json`), Test von `createExtractor` mit der Fake-CLI.
 - Offen: Die Teile laufen nacheinander (fbs 12,5 Min. im Budget von 50 Min. mit 3 Anbietern parallel); parallele Teile erst, wenn S3.2 zeigt, dass es eng wird.
 
+### Stufe 2 – Nutzerentscheide (2026-10-11)
+
+- **Modell:** Haiku mit Sonnet-Fallback (Plan-Standard). Grundlage: je zwei Eval-Läufe (`evals/results.md`); die Läufe streuen stark (Haiku Termine R/P 97/89 und 91/95 %, Sonnet 98/99 und 99/89 %), Sonnet trifft den Platzstand besser (96–100 % gegen 82 %), kostet aber das 4- bis 13-Fache.
+- **Stichproben:** musikfuechse nur Nürnberg (Ort Pfarrscheune Fürth-Poppenreuth aus dem Katalog entfernt, damit Fürther Kurse an der Validierung scheitern); Babymassage-Kurse der FamilienBox bleiben bei der FamilienBox; bei Widersprüchen gelten konkrete Feed-Daten vor allgemeinen Seiten- oder Katalogtexten; nuebad-flipper bleibt ohne Erwartung, bis die Abfrage Folgetermine liefert.
+
 **Stufe 2 – Extraktion lokal:** `io/llm.ts` (E2), Prompt, `extractProvider`, `refreshProvider` mit den Regeln aus E5, `ProviderRaw`, `build` aus `data/raw`. Dazu die 12 Eval-Fälle und `pnpm eval`. Ergebnis: Eval mit Haiku und Sonnet in `evals/results.md`; Modellwahl durch den Nutzer.
 
 **Stufe 2 – Eval (E9), Stand 2026-10-11:** 12 Fälle in `evals/cases/` (10 echte aus `pnpm eval freeze`, 2 synthetische Fallen mit `synthetic: true`), `expected.json` aus dem Bestand vom 2026-10-04, von Hand gegen den Text geprüft (Korrekturen in `NOTES.md` je Fall), Fenster bis zum Horizont des Bestands (2027-02-04). Bewertung `lib/eval-score.ts`, Lauf `pnpm eval` (`scripts/pipeline/eval.ts`, `io/eval.ts`), Ergebnisse in `evals/results.md`. Abweichungen und Ergänzungen:

@@ -2096,11 +2096,6 @@
       address: Mutherstudio, Kraftshofer Hauptstraße 181, 90427 Nürnberg (Zugang Am Kressenstein)
       district: Kraftshof
       geo: { lat: 49.512361, lon: 11.047005 }
-    - id: musikfuechse-pfarrscheune-fuerth-poppenreuth
-      name: Pfarrscheune Fürth-Poppenreuth
-      address: Poppenreuther Str. 134/136, 90765 Fürth
-      geo: { lat: 49.482478, lon: 11.012633 }
-      hint: Fürth, nicht Nürnberg
 - id: musikschule-nuernberg-eltern-kind
   publicId: dd67i17w
   role: anbieter
