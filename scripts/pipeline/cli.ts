@@ -4,6 +4,11 @@
  *   init [--from YYYY-MM-DD]                    Laufverzeichnis runs/<from>/ mit Horizont (4 Monate)
  *   select RUN_DIR [--batch 7] [--only a,b]     Pakete für die Subagenten
  *   fetch-page URL [--links] [--max-chars N]    Programmseite als Text (für Agenten)
+ *   fetch [--only a,b] [--out DIR] [--compare HASHES_JSON]
+ *                                               Abruf aller Eingaben nach Katalog, normalisiert und gehasht (Plan 0032,
+ *                                               E3, S1.2): DIR (Standard runs/<heute>/fetch/) bekommt <id>.txt,
+ *                                               hashes.json und report.md; --compare = hashes.json der Vornacht.
+ *                                               Kein Modell, nichts nach data/.
  *   candidates fetch|list RUN_DIR               Sammelkalender abrufen / Kandidaten mit Zuordnung zeigen
  *   candidates keep RUN_DIR cid,cid=anbieter/ort [--force]   Entwurf raw/aggregatoren.json schreiben
  *   candidates add-provider RUN_DIR cid --id <neue-id>       Veranstalter in den Katalog aufnehmen
@@ -16,14 +21,14 @@
  *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { z } from "zod";
 import { validateDataset } from "../../src/domain/dataset.ts";
-import type { Provider } from "../../src/domain/schema.ts";
 import { addMonths, berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
+import { fetchInputs } from "./io/fetch-inputs.ts";
 import {
   appendToCatalog,
   batchFileFor,
@@ -48,6 +53,7 @@ import { fetchPage } from "./io/http.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
+import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
   extractTimetable,
   feedModified,
@@ -58,11 +64,11 @@ import {
   vgnSource,
 } from "./lib/gtfs.ts";
 import { renderFetchReport } from "./lib/html-extract.ts";
-import { matchCandidate, vidOf } from "./lib/match.ts";
+import { anbieterVids, matchCandidate } from "./lib/match.ts";
 import { fillPlaceholders } from "./lib/placeholders.ts";
 import { RawBatch, validateRaw } from "./lib/raw.ts";
 import type { SourceStatus } from "./lib/run.ts";
-import { nextBatchFiles, selectBatches } from "./lib/select.ts";
+import { nextBatchFiles, planFetch, selectBatches } from "./lib/select.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -74,6 +80,8 @@ const { positionals, values } = parseArgs({
     "max-chars": { type: "string", default: "60000" },
     force: { type: "boolean", default: false },
     id: { type: "string" },
+    out: { type: "string" },
+    compare: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -99,9 +107,6 @@ const print = (value: unknown) => console.log(typeof value === "string" ? value 
 /** Ferien weit genug für Kurse mit vergangenen und künftigen Terminen (Plan 0002, E6). */
 const freeDaysFor = (meta: { from: string; to: string }) =>
   loadFreeDays(addMonths(meta.from, -12), addMonths(meta.to, 24));
-
-const anbieterVids = (catalog: readonly Provider[], aggregatorId: string) =>
-  catalog.flatMap((p) => (p.role === "anbieter" && p.coveredBy === aggregatorId ? vidOf(p) : []));
 
 async function init() {
   const from = values.from ?? today();
@@ -139,6 +144,41 @@ async function fetchPageCmd() {
     print(`## META\nFEHLER: ${(e as Error).message}`);
     process.exit(1);
   }
+}
+
+/** Abruf und Hashes ohne Modell (Plan 0032, S1.2). Schreibt nur nach --out, nie nach data/. */
+async function fetchCmd() {
+  const started = performance.now();
+  const date = today();
+  const out = values.out ?? join(ROOT, "runs", date, "fetch");
+  const catalog = readCatalog();
+  const only = values.only?.split(",").filter(Boolean);
+  const plan = planFetch(catalog, { today: date, ...(only ? { only } : {}) });
+  // Eine unlesbare Vornacht (fehlt, altes Format) heißt nur „kein Vergleich“; sonst bliebe der Cache für immer alt.
+  const parsed =
+    values.compare && existsSync(values.compare) ? HashesFile.safeParse(readJson(values.compare)) : undefined;
+  const previous = parsed?.success ? parsed.data : undefined;
+  if (values.compare && !previous)
+    print(`Hinweis: ${values.compare} fehlt oder passt nicht zum Format – kein Vergleich (erste Nacht?)`);
+  print(
+    `Abruf: ${plan.providers.length} Anbieter, ${plan.providers.reduce((s, p) => s + p.pages.length, 0)} Seiten, ` +
+      `Sammelkalender ${plan.adapters.map((a) => a.adapter).join(", ") || "keine"}`,
+  );
+  const result = await fetchInputs(plan, catalog, date);
+  mkdirSync(out, { recursive: true });
+  for (const [id, text] of Object.entries(result.texts)) writeFileSync(join(out, `${id}.txt`), `${text}\n`);
+  writeJson(join(out, "hashes.json"), result.providers);
+  const report = renderFetchMarkdown({
+    date,
+    durationMs: performance.now() - started,
+    providers: result.providers,
+    adapters: result.adapters,
+    skipped: plan.skipped,
+    comparison: previous ? compareHashes(previous, result.providers) : undefined,
+  });
+  writeFileSync(join(out, "report.md"), report);
+  print(report);
+  print(`✓ ${out}`);
 }
 
 async function candidatesFetch(runDir: string) {
@@ -392,6 +432,9 @@ switch (command) {
     break;
   case "fetch-page":
     await fetchPageCmd();
+    break;
+  case "fetch":
+    await fetchCmd();
     break;
   case "candidates": {
     const [sub, runDir, extra] = args;

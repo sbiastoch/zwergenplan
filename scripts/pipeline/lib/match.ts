@@ -39,7 +39,11 @@ export function addressKey(address: string | undefined): string | undefined {
 }
 
 /** Veranstalter-IDs von evangelische-termine.de in den Programm-URLs eines Anbieters. */
-export const vidOf = (p: Provider): string[] => vidsIn(p.programme.map((g) => g.url));
+const vidOf = (p: Provider): string[] => vidsIn(p.programme.map((g) => g.url));
+
+/** vids der Anbieter, deren Termine über diesen Sammelkalender kommen (`coveredBy`): Der Adapter fragt sie gezielt ab. */
+export const anbieterVids = (catalog: readonly Provider[], aggregatorId: string): string[] =>
+  catalog.flatMap((p) => (p.role === "anbieter" && p.coveredBy === aggregatorId ? vidOf(p) : []));
 
 function nameScore(c: Candidate, p: Provider): number {
   const a = (c.organizer ?? c.location ?? "").toLowerCase();

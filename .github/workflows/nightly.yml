@@ -1,0 +1,78 @@
+# Nachtlauf (Plan 0032, E6). Stufe 1 / S1.2: NUR Messung – Abruf aller Eingaben nach Katalog, normalisiert und
+# gehasht (`pnpm pipeline fetch`), Vergleich mit der Vornacht. Kein Modellaufruf, kein Schreiben nach data/, kein
+# Commit, kein Push, kein Token. Gemessen werden 7 Nächte: Anteil geänderter Anbieter je Nacht, Hash-Rauschen,
+# Abruffehler je Art (Bericht im Job-Summary und im Artefakt).
+# S3.4 erweitert diesen Workflow um Extraktion, Gates, Publish und CI-Dispatch (dann contents: write, actions: write).
+# Nach 60 Tagen ohne Commit schaltet GitHub den Zeitplan ab; ab Stufe 3 committet der Lauf selbst (data/kosten.csv).
+name: Nachtlauf
+
+on:
+  schedule:
+    - cron: "30 1 * * *" # 01:30 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # gemeinsam mit discover.yml (Stufe 4); ein verworfener wartender Lauf ist hinnehmbar (E6)
+  group: daten
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    name: Abruf und Hashes (S1.2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Zeitlimits und Wiederholung gegen hängendes apt (2026-10-08), siehe Skript; danach ist der apt-Index frisch.
+      - name: Playwright-Chromium (render browser)
+        timeout-minutes: 9
+        run: .github/install-browsers.sh chromium
+      - name: pdftotext (poppler-utils)
+        timeout-minutes: 3
+        run: sudo apt-get install -y --no-install-recommends poppler-utils
+      - name: Datum (Berlin)
+        id: datum
+        run: echo "datum=$(TZ=Europe/Berlin date +%F)" >> "$GITHUB_OUTPUT"
+      # hashes.json der Vornacht: neuester Cache-Eintrag mit dem Präfix (Schlüssel je Lauf eindeutig)
+      - name: Vornacht laden
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/nightly-prev
+          key: nightly-hashes-${{ github.run_id }}
+          restore-keys: nightly-hashes-
+      - name: Abruf
+        env:
+          OUT: runs/${{ steps.datum.outputs.datum }}/fetch
+        run: pnpm pipeline fetch --out "$OUT" --compare .cache/nightly-prev/hashes.json
+      - name: Bericht
+        if: always()
+        env:
+          OUT: runs/${{ steps.datum.outputs.datum }}/fetch
+        run: cat "$OUT/report.md" >> "$GITHUB_STEP_SUMMARY" || echo "kein Bericht" >> "$GITHUB_STEP_SUMMARY"
+      - name: Hashes für die nächste Nacht
+        env:
+          OUT: runs/${{ steps.datum.outputs.datum }}/fetch
+        run: |
+          mkdir -p .cache/nightly-prev
+          cp "$OUT/hashes.json" .cache/nightly-prev/hashes.json
+      - uses: actions/cache/save@v4
+        with:
+          path: .cache/nightly-prev
+          key: nightly-hashes-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nachtlauf-${{ steps.datum.outputs.datum }}-${{ github.run_id }}
+          path: runs/${{ steps.datum.outputs.datum }}/fetch/
+          retention-days: 14
