@@ -1,6 +1,6 @@
 # Plan 0033 – Onboarding beim ersten Öffnen
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit ecfccfb (2026-10-11)
 Datum: 2026-10-11
 Bezug:
 - Referenz-Mockup `docs/design/onboarding-mockup.html` (freigegeben 2026-10-11; maßgeblich sind CSS, die vier SVGs und die Texte, die Skriptlogik ist Mockup; wird mit diesem Plan committet)
@@ -581,3 +581,17 @@ Befunde:
 - **Offen (Geschmack, Nutzerentscheid)**: Bei 320–360 px passen die vier Wegzeit-Chips nicht in eine Zeile; „Egal“ steht allein in voller Breite in der zweiten Zeile (`onboarding-3-360-*`). Eine 2×2-Anordnung wäre ruhiger.
 - **Hinweis**: Im Ladezustand trägt „Überspringen“ den Fokusrahmen (`showModal()` fokussiert den ersten Knopf). Das ist gewollt sichtbarer Fokus, kein Befund.
 
+
+## Browser-Review live (2026-10-11)
+
+Kurzcheck nach `.claude/skills/browser-review/SKILL.md`, Abschnitt 6, auf https://zwergenplan.app/ (`meta.json`: `commit` `ecfccfb`, 365 Angebote, 83 Anbieter im Katalog). claude-in-chrome war nicht verbunden, die Interaktion lief per Playwright-Skript (Chromium, Pixel-7-Profil, 390×844, leerer Speicher).
+
+1. **Deploy**: `meta.json` zeigt `ecfccfb` = `git rev-parse --short HEAD`.
+2. **Screenshots**: `node scripts/screenshots.ts https://zwergenplan.app/ --views=onboarding,kind`. Angesehen: `onboarding-1…4-iphone-light/dark`, `kind-iphone-light/dark`, `onboarding-3-320-light`. Alle vier Schritte wie im Mockup, Bühnen dunkel abgedunkelt, keine grellen Inseln, „Überspringen“ frei über der Illustration, Wegzeit-Chips bei 390 px in einer Zeile. Im App-Schritt steht headless „Benachrichtigungen sind nicht erlaubt …“ (Headless-Shell verweigert immer, erwartet).
+3. **Interaktion**: Onboarding erscheint bei leerem Speicher („Schritt 1 von 4“). Lead „364 Babykurse, Krabbelgruppen, Konzerte und Ausflüge von 60 Anbietern.“ Das stimmt mit den echten Daten: 364 von 365 Angeboten haben einen kommenden Termin, sie kommen von 60 Anbietern, und die Statuszeile nach „Überspringen“ zeigt „364 Angebote ab heute“. Alter 20.04.2026 (Hinweis „5 Monate! Treffs ab 6 Monaten zeige ich dir mit Terminen ab dem 20.10.“), Gostenhof, 30 Min., „Zeig mir die 163 Angebote“. Danach Dialog zu, Statuszeile „163 Angebote ab heute · Wegzeit ab Gostenhof“, URL `?wegzeit=30`, Speicher `geburtsdatum`, `entfernung-ab`, `einfuehrung = "1"`. Nach dem Neuladen erscheint das Onboarding nicht wieder. Service Worker registriert (Scope `/`, `activated`, steuert die Seite). Konsole: keine Fehler und keine Warnungen.
+4. **Echte Daten**:
+   - Lange Texte: Der Lead mit echten Zahlen bricht sauber in zwei Zeilen, „Zeig mir die 364 Angebote“ passt in eine Zeile.
+   - Leere Zustände: Gibt es im Onboarding nicht. Ohne Startpunkt sind die Minuten-Chips gesperrt, mit dem Hinweis „Erst einen Startpunkt wählen.“
+   - Bilder: Die Illustrationen sind Inline-SVG, hell und dunkel vollständig, kein fehlendes Bild.
+
+Befunde: keine.

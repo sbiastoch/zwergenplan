@@ -92,6 +92,13 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0033** (Onboarding, live seit ecfccfb, 2026-10-11; Einzelheiten in „Risiken“, „Offene Punkte“ und „Browser-Review live“ des Plans):
+  - Am echten Android mit Chrome prüfen (Nutzer): Installationsknopf im App-Schritt (headless kommt kein `beforeinstallprompt`), Zurück-Geste schließt das Onboarding und setzt das Flag (CloseWatcher), Schalter „Samstags-Nachricht“ mit echtem Berechtigungsdialog.
+  - Am echten iPhone prüfen (Nutzer): im Safari-Tab Reihenfolge Stadt → App → Alter → Weg mit Teilen-Anleitung und ohne Schalter; in der installierten App läuft das Onboarding wegen des eigenen Speichers erneut, ohne Installationsteil.
+  - Restrisiko Push beim Erstbesuch: Hängt die Registrierung des Service Workers, ohne zu scheitern, bleibt der Schalter bei „Wird eingeschaltet …“ (kein festes Zeitlimit, E8).
+  - Fallback-Schrift in den SVG-Texten der Illustrationen vor dem Webfont-Swap am Gerät ansehen (dekorativ, kein Gate).
+  - N2 und N3 wurden nach den Empfehlungen entschieden, weil der Nutzer nicht erreichbar war: ein Begriff „Samstags-Nachricht“ überall, Abweichungen vom Mockup 1–5. Der Nutzer kann beides umkehren.
+  - Nicht umgesetzt (Nicht-Ziele): Such-Abos und Darstellung hell/dunkel im Onboarding, History-Einträge je Schritt (Zurück-Geste = Schritt zurück). Stadtwahl speichern und Onboarding-Version stehen oben.
 - **Plan 0015, Nachtrag A** (stabile IDs, Stufe 0 von Plan 0032, live seit 37a1ace, 2026-10-10; Einzelheiten in Plan 0015, E14–E17, R9):
   - Verlegte Einzeltermine (gleicher Titel, anderer Tag) behalten ihre ID nicht; bleibt wie in ADR 0006 „ein anderer Termin“.
   - Zusammenlegung zweier alter Angebote zu einem, mit Weiterleitung der verschwundenen ID. Bewusst nicht umgesetzt (Review B2), weil sie im Befund falsch zuordnete.
