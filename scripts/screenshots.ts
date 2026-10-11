@@ -5,13 +5,15 @@
  * Ansichten: start, merkliste, detail, filter, kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
  * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
- * (Plan 0017: Push-Teil im Kind-Sheet mit langem Such-Abo).
+ * (Plan 0017: Push-Teil im Kind-Sheet mit langem Such-Abo), onboarding (Plan 0033, E15: alle Schritte der Einführung
+ * beim ersten Öffnen, je ein Bild mit Endung -1, -2, …; mit Android-User-Agent, in der Headless-Shell also App-Schritt
+ * mit Menü-Hinweis und „verweigert“).
  * Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
- * Das Flag „Onboarding erledigt“ steht vor jedem Laden im Speicher (Plan 0033, E15).
+ * Das Flag „Onboarding erledigt“ steht vor jedem Laden im Speicher (Plan 0033, E15), außer in der Ansicht onboarding.
  * --text=200 simuliert große Schrift wie die Gates (Wurzel-Schriftgröße, Plan 0007, E7); Dateien enden auf -200.
  */
 import { existsSync, mkdirSync } from "node:fs";
-import { type BrowserContext, chromium, type Page } from "@playwright/test";
+import { type BrowserContext, chromium, devices, type Page } from "@playwright/test";
 
 const args = process.argv.slice(2);
 const url = args.find((a) => !a.startsWith("--")) ?? "http://localhost:4173/";
@@ -76,6 +78,8 @@ async function openMap(page: Page) {
 /** Jede Ansicht: Weg dorthin, ausgehend von der geladenen Startseite. */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   start: async () => {},
+  // eigener Ablauf in der Schleife unten (ohne Flag, ein Bild je Schritt)
+  onboarding: async () => {},
   // Kalender der Merkliste (Plan 0025, E8): Herzen statt localStorage, damit es auch live mit echten IDs geht
   "merkliste-kalender": async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
@@ -188,27 +192,48 @@ for (const vp of viewports) {
         reducedMotion: "reduce",
         locale: "de-DE",
         timezoneId: "Europe/Berlin",
+        // Onboarding: Android, damit der App-Schritt erscheint (sonst drei Schritte)
+        ...(view === "onboarding" && { userAgent: devices["Pixel 7"].userAgent }),
       });
       if (isLocal) await mockTiles(context);
-      // Onboarding erledigt (Plan 0033, E15): Alle Ansichten zeigen die App, nicht die Einführung.
-      await context.addInitScript(() => {
-        if (localStorage.getItem("zwergenplan.einfuehrung") === null)
-          localStorage.setItem("zwergenplan.einfuehrung", "1");
-      });
+      // Onboarding erledigt (Plan 0033, E15): Alle Ansichten außer „onboarding“ zeigen die App, nicht die Einführung.
+      if (view !== "onboarding")
+        await context.addInitScript(() => {
+          if (localStorage.getItem("zwergenplan.einfuehrung") === null)
+            localStorage.setItem("zwergenplan.einfuehrung", "1");
+        });
       const page = await context.newPage();
       if (isLocal) await page.clock.setFixedTime(new Date("2026-10-05T12:00:00+02:00"));
       await page.goto(url);
-      await ready(page);
-      await go(page);
-      if (textPercent !== 100)
-        await page.evaluate((p) => {
-          document.documentElement.style.fontSize = `${p}%`;
-        }, textPercent);
-      await page.waitForTimeout(150);
       const suffix = textPercent === 100 ? "" : `-${textPercent}`;
-      const file = `${outDir}/${view}-${vp.name}-${scheme}${suffix}.png`;
-      await page.screenshot({ path: file, fullPage: false });
-      console.log(file);
+      const shot = async (name: string) => {
+        if (textPercent !== 100)
+          await page.evaluate((p) => {
+            document.documentElement.style.fontSize = `${p}%`;
+          }, textPercent);
+        await page.waitForTimeout(150);
+        const file = `${outDir}/${name}-${vp.name}-${scheme}${suffix}.png`;
+        await page.screenshot({ path: file, fullPage: false });
+        console.log(file);
+      };
+      if (view === "onboarding") {
+        const intro = page.getByRole("dialog", { name: "Einführung" });
+        const title = intro.getByRole("heading", { level: 2 });
+        await title.waitFor();
+        const total = Number(/von (\d+):/.exec((await title.textContent()) ?? "")?.[1] ?? 0);
+        for (let n = 1; n <= total; n++) {
+          await page.waitForFunction(
+            (want) => document.querySelector("dialog .onb-title")?.textContent?.startsWith(want),
+            `Schritt ${n} von`,
+          );
+          await shot(`onboarding-${n}`);
+          if (n < total) await intro.locator(".onb-foot .btn.primary").click();
+        }
+      } else {
+        await ready(page);
+        await go(page);
+        await shot(view);
+      }
       await context.close();
     }
   }

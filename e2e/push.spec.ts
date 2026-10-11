@@ -252,6 +252,45 @@ test("Aktuelle Suche abonnieren und entfernen: Statuszeile, Liste, Fokus (E7)", 
   expect(pushLog).toEqual([]);
 });
 
+test.describe("Onboarding (Plan 0033, E8)", () => {
+  test.use({ onboarding: "neu" });
+
+  test("Schalter im letzten Schritt: vorher kein Request, nach dem Tipp genau ein POST /abo", async ({
+    page,
+    context,
+    pushLog,
+  }) => {
+    test.skip(test.info().project.name !== "pixel-7", "App-Schritt mit Schalter zuletzt: pixel-7");
+    await fakePushManager(page);
+    await context.grantPermissions(["notifications"], {
+      origin: new URL(test.info().project.use.baseURL ?? "").origin,
+    });
+    await page.goto("./");
+    const intro = page.getByRole("dialog", { name: "Einführung" });
+    const title = intro.getByRole("heading", { level: 2 });
+    await expect(title).toHaveText(/^Schritt 1 von 4: /);
+    for (let n = 2; n <= 4; n++) {
+      await intro.locator(".onb-foot .btn.primary").click();
+      await expect(title).toHaveText(new RegExp(`^Schritt ${n} von 4: `));
+    }
+    const toggle = intro.getByRole("switch", { name: "Samstags-Nachricht" });
+    await expect(toggle).toHaveAttribute("aria-checked", "false");
+    await expect(toggle).toBeEnabled();
+    expect(pushLog, "ohne Tipp kein Request an den Push-Worker").toEqual([]);
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-checked", "true");
+    await expect(intro.getByRole("status")).toHaveText("An. Die erste kommt am Samstag.");
+    expect(pushLog).toEqual([
+      {
+        method: "POST",
+        path: "/abo",
+        body: { endpoint: ENDPOINT, expirationTime: null, keys: { p256dh: "BTEST", auth: "QVVUSA" } },
+      },
+    ]);
+  });
+});
+
 test("ohne Filter erklärt der Abschnitt den Weg, statt einen Knopf zu zeigen (E7)", async ({ page, context }) => {
   await installed(page, context);
   await openKidSheet(page);

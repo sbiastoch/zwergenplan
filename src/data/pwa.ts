@@ -1,7 +1,8 @@
 /**
  * PWA-Kern (Plan 0011, E4a, E5, E7; ADR 0013), Lazy-Chunk in `assets/app/`: einziger Ort für `navigator.serviceWorker`,
  * `beforeinstallprompt` und `display-mode` (ab Stufe 2 auch das App-Badge). Geladen von `pwa-start.ts` nach `load`,
- * nur im Produktions-Build, und vom Abschnitt „Als App“ (`src/ui/app-extras/`). Injizierbare Umgebung wie
+ * nur im Produktions-Build, und vom Abschnitt „Als App“ (`src/ui/app-extras/`); beim Erststart ohne Flag schon über
+ * `preloadOnboarding()` bzw. `loadAppStep` (Plan 0033, ADR 0027). Injizierbare Umgebung wie
  * `geolocation.ts`; im Unit-Test stehen hier Fakes.
  *
  * Mit `serviceWorkers: "block"` (Playwright) liefert `register()` `undefined`, und `ready` löst nie auf. Dieses Modul
@@ -304,7 +305,8 @@ function browserInstallEnv(): InstallEnv {
 
 /**
  * Auf Modulebene: Der Listener hängt, sobald der Chunk lädt (nach `load` über `pwa-start.ts` oder mit dem Abschnitt
- * „Als App“). Geht das Event vorher verloren, zeigt Android den Weg über das Browser-Menü (E5, E7).
+ * „Als App“; beim Erststart ohne Flag schon über `preloadOnboarding()` bzw. `loadAppStep`, ADR 0027). Geht das Event
+ * vorher verloren, zeigt Android den Weg über das Browser-Menü (E5, E7).
  */
 const store = typeof window === "undefined" ? undefined : createInstallStore(browserInstallEnv());
 

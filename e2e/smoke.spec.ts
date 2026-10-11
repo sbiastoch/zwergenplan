@@ -123,6 +123,24 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
   await expectAccessible(page);
 });
 
+test.describe("Onboarding mit echten Daten (Plan 0033, Arch-Review m6)", () => {
+  test.use({ onboarding: "neu" });
+
+  test("erscheint beim ersten Öffnen mit Zahlen im Lead; „Überspringen“ schließt", async ({ page }) => {
+    const meta = await dataMeta(page);
+    test.skip(meta.offers === 0, "keine Daten: Lead ohne Zahlen");
+    await page.clock.setFixedTime(new Date(meta.generatedAt));
+    await page.goto("./");
+    const intro = page.getByRole("dialog", { name: "Einführung" });
+    await expect(intro.getByRole("heading", { level: 2 })).toHaveText(/^Schritt 1 von \d: /);
+    await expect(intro.locator(".onb-lead")).toHaveText(/^\d+ Babykurse, .* von \d+ Anbietern\.$/);
+    await intro.getByRole("button", { name: "Überspringen" }).click();
+    await expect(intro).toHaveCount(0);
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    // Konsolenfehler macht die Fixture `consoleGuard` rot
+  });
+});
+
 test("lange Listen werden schrittweise gezeigt (Plan 0003, E8)", async ({ page }) => {
   const meta = await openAtDataTime(page);
   test.skip(meta.offers <= 60, "zu wenige Angebote für mehrere Schritte");
