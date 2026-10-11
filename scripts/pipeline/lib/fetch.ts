@@ -83,7 +83,8 @@ export const HashesFile = z.record(z.string(), ProviderFetch);
 export type HashesFile = z.infer<typeof HashesFile>;
 
 export type PageOutcome =
-  | { url: string; art: Art; ok: true; text: string; ms: number }
+  /** `finalUrl`: Ziel nach Redirects, falls anders (erlaubte `sourceUrl`, Plan 0032, E4) */
+  | { url: string; art: Art; ok: true; text: string; ms: number; finalUrl?: string }
   | { url: string; art: Art; ok: false; reason: string; ms: number };
 
 const de = (n: number) => n.toLocaleString("de-DE");

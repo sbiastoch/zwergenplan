@@ -13,6 +13,10 @@
  *                                               Eingabe aus DIR (Ausgabe von `fetch`), sonst frisch abgerufen;
  *                                               Ergebnis und Aufrufe nach runs/<heute>/extract/<id>.json, nichts nach data/.
  *   candidates fetch|list RUN_DIR               Sammelkalender abrufen / Kandidaten mit Zuordnung zeigen
+ *   nightly [--only a,b] [--dry-run]            Nachtlauf (Plan 0032, E5/E6): Abruf, je Anbieter refresh (data/raw),
+ *                                               build aus data/raw nach data/offers.json; Bericht
+ *                                               runs/<heute>/nightly.json. --dry-run schreibt nach runs/<heute>/raw
+ *                                               und runs/<heute>/offers.json. Zeitbudget RUN_BUDGET_MIN (Standard 50).
  *   candidates keep RUN_DIR cid,cid=anbieter/ort [--force]   Entwurf raw/aggregatoren.json schreiben
  *   candidates add-provider RUN_DIR cid --id <neue-id>       Veranstalter in den Katalog aufnehmen
  *   validate-raw DATEI                          Rohdatei prüfen (Pflicht-Abschluss der Subagenten)
@@ -62,10 +66,12 @@ import { geocode } from "./io/geocode.ts";
 import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
+import { DEFAULT_BUDGET_MIN, runNightly } from "./io/nightly.ts";
 import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
+import type { ExtractKeyParts, Extractor } from "./lib/extract-types.ts";
 import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
   extractTimetable,
@@ -95,6 +101,7 @@ const { positionals, values } = parseArgs({
     id: { type: "string" },
     out: { type: "string" },
     compare: { type: "string" },
+    "dry-run": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -245,6 +252,54 @@ async function extractCmd(id: string) {
       `${((performance.now() - started) / 1000).toFixed(1)} s`,
   );
   print(`✓ ${join(outDir, `${id}.json`)}`);
+}
+
+/**
+ * Platzhalter bis zum Zusammenführen mit Teil A von Stufe 2 (Extraktor über `io/llm.ts`): Jeder Anbieter mit
+ * geänderter Eingabe wird `fehler`, sein alter Stand bleibt (E5).
+ * TODO(Plan 0032 S2): createExtractor()
+ */
+const placeholderExtractor: Extractor = async () => ({
+  outcome: { kind: "fehler", reason: "kein Extraktor" },
+  calls: [],
+});
+/** TODO(Plan 0032 S2): createExtractor() – Prompt und Schema aus EXTRACT_KEY_PARTS (io/extract.ts) */
+const placeholderKeyParts: ExtractKeyParts = {
+  prompt: "",
+  schema: "",
+  model: process.env["LLM_MODEL_EXTRACT"] ?? "haiku",
+};
+
+/** Nachtlauf (Plan 0032, E6). Rot bei Abbruch, erreichtem Zeitbudget oder gescheitertem Build. */
+async function nightly() {
+  const date = today();
+  const runDir = join(ROOT, "runs", date);
+  const only = values.only?.split(",").filter(Boolean);
+  const budgetMin = Number(process.env["RUN_BUDGET_MIN"] ?? DEFAULT_BUDGET_MIN);
+  if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
+  const dryRun = values["dry-run"];
+  const r = await runNightly({
+    extractor: placeholderExtractor,
+    keyParts: placeholderKeyParts,
+    budgetMin,
+    dataDir: join(ROOT, "data"),
+    runDir,
+    today: date,
+    dryRun,
+    ...(only ? { only } : {}),
+  });
+  const counts = new Map<string, number>();
+  for (const s of Object.values(r.results)) counts.set(s, (counts.get(s) ?? 0) + 1);
+  const summary = [...counts].map(([k, n]) => `${k} ${n}`).join(", ");
+  print(`Nachtlauf ${date}${dryRun ? " (Trockenlauf)" : ""}: ${Math.round(r.durationMs / 1000)} s`);
+  print(`Anbieter: ${summary}; Modellaufrufe ${r.calls.length}, durch den Cache gespart ${r.cached}`);
+  if (r.abort) print(`✗ Abbruch: ${r.abort}`);
+  if (r.budgetHit) print(`✗ Zeitbudget ${budgetMin} Min. erreicht`);
+  print(`Angebote: ${r.build.offers}, Termine: ${r.build.sessions}`);
+  print(`Bericht: ${join(runDir, "nightly.json")}`);
+  if (!r.build.written) fail(`Build abgebrochen, nichts geschrieben:\n  ${r.build.errors.join("\n  ")}`);
+  print(`✓ ${r.build.written}`);
+  if (r.abort || r.budgetHit) process.exit(1);
 }
 
 async function candidatesFetch(runDir: string) {
@@ -504,6 +559,9 @@ switch (command) {
     break;
   case "extract":
     await extractCmd(need(args[0], "Anbieter-ID"));
+    break;
+  case "nightly":
+    await nightly();
     break;
   case "candidates": {
     const [sub, runDir, extra] = args;

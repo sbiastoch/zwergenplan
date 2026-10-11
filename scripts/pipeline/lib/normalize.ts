@@ -7,6 +7,7 @@
  * reicht (R5); neue Muster kommen mit einem Testfall in `normalize.test.ts` dazu.
  */
 import { createHash } from "node:crypto";
+import type { Provider } from "../../../src/domain/schema.ts";
 
 /** Zeilen, die eines dieser Stücke enthalten (Kleinschreibung) und kurz sind, gehören zum Cookie-Banner. */
 const COOKIE_BANNER = [
@@ -115,10 +116,7 @@ export interface HashInput {
   pages: ReadonlyArray<{ url: string; text: string }>;
   /** zugeordnete Kandidaten aus Sammelkalendern; ihre Reihenfolge zählt nicht */
   candidates: readonly unknown[];
-  /**
-   * Weitere benannte Bestandteile des Schlüssels. Stufe 2 ergänzt Katalogauszug, Prompt, Antwort-Schema und Modell
-   * (E4); in Stufe 1 bleibt das leer.
-   */
+  /** Weitere benannte Bestandteile des Schlüssels; Katalogauszug, Prompt, Schema und Modell setzt `extractKey` (E4). */
   extra?: Readonly<Record<string, string>>;
 }
 
@@ -134,6 +132,40 @@ export function inputHash(input: HashInput): string {
  */
 export function orderFreeHash(input: HashInput): string {
   return hash(input, (text) => normalizeText(text).split("\n").sort().join("\n"));
+}
+
+/**
+ * Offener Nutzerentscheid nach den 7 Messnächten (Plan 0032, S1.2): Wird der reihenfolgefreie Hash Cache-Schlüssel?
+ * Dafür: Anbieter, die bei jedem Laden umsortieren (FBS), würden sonst jede Nacht neu extrahiert. Dagegen: Ein
+ * reiner Tausch von Platzständen zwischen zwei Kursen bliebe unsichtbar. Bis zum Entscheid der normale Hash.
+ */
+export const ORDER_FREE_KEY = false;
+
+/** Bestandteile des Schlüssels außer der Eingabe (E4); `catalog` aus `catalogExcerpt`. */
+interface KeyParts {
+  catalog: string;
+  prompt: string;
+  schema: string;
+  model: string;
+}
+
+/**
+ * Cache-Schlüssel der Extraktion (E4): normalisierte Seiten und Kandidaten, Katalogauszug, Prompt, Antwort-Schema und
+ * Modell. Ändert sich einer davon, wird der Anbieter neu extrahiert. Gespeichert als `inputHash` in `data/raw`.
+ */
+export function extractKey(
+  input: Omit<HashInput, "extra">,
+  parts: KeyParts,
+  opts: { orderFree?: boolean } = {},
+): string {
+  const withParts = { ...input, extra: { ...parts } };
+  return (opts.orderFree ?? ORDER_FREE_KEY) ? orderFreeHash(withParts) : inputHash(withParts);
+}
+
+/** Katalogauszug für den Schlüssel: der Eintrag ohne `notes` (Protokoll für Menschen, ADR 0025, Punkt 5). */
+export function catalogExcerpt(provider: Provider): string {
+  const { notes: _notes, ...rest } = provider;
+  return JSON.stringify(rest);
 }
 
 function hash(input: HashInput, pageText: (text: string) => string): string {

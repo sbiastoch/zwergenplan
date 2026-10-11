@@ -6,7 +6,7 @@ import { validateDataset } from "../../../src/domain/dataset.ts";
 import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/schema.ts";
 import { berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import type { Source } from "./candidate.ts";
-import { expansionWindow, type ProviderCheck, type RawBatch, type RawEvent } from "./raw.ts";
+import { expansionWindow, type ProviderCheck, type ProviderRaw, type RawBatch, type RawEvent } from "./raw.ts";
 import { expandSchedule } from "./schedule.ts";
 import { similarTitle } from "./similar.ts";
 import { assignIds, checkIdContinuity, compareOffers, type Draft, unionSessions, windowKey } from "./stable-ids.ts";
@@ -23,6 +23,50 @@ export interface BuildInput {
   generatedAt: string;
   /** Abrufstatus der Sammelkalender (candidates/_status.json) */
   sources: Partial<Record<Source, ProviderCheck["status"]>>;
+  /**
+   * Zustand je Anbieter aus `data/raw` (Plan 0032, E5): Jeder bearbeitete Anbieter hat einen eigenen Status, auch
+   * die mit `coveredBy`. Wer keinen hat (noch nie bearbeitet, Lauf vorzeitig beendet), behält seine Angebote aus
+   * dem Vorstand.
+   */
+  perProviderStatus?: boolean;
+}
+
+/** Datenhorizont von `data/offers.json` im Nachtlauf: heute + 12 Monate (Plan 0032, E5; ADR 0003 bisher 4). */
+export const HORIZON_MONTHS = 12;
+
+/**
+ * `data/raw/<id>.json` → Rohdateien für `buildOffers` (Plan 0032, E5). Anbieter, die nicht (mehr) im Katalog stehen,
+ * und Events mit einem Ort, den der Anbieter nicht (mehr) hat, entfallen mit Hinweis statt den Build zu brechen.
+ */
+export function batchesFromRaw(
+  raws: Readonly<Record<string, ProviderRaw>>,
+  providers: readonly Provider[],
+): { batches: BuildInput["batches"]; notes: string[] } {
+  const notes: string[] = [];
+  const byId = new Map(providers.map((p) => [p.id, p] as const));
+  const batches: Array<BuildInput["batches"][number]> = [];
+  for (const [id, raw] of Object.entries(raws).sort(([a], [b]) => a.localeCompare(b))) {
+    const p = byId.get(id);
+    if (p?.role !== "anbieter") {
+      notes.push(`data/raw/${id}.json: kein Anbieter im Katalog – entfällt`);
+      continue;
+    }
+    const venues = new Set(p.venues.map((v) => v.id));
+    const events = raw.events.filter((e) => {
+      if (e.providerId === id && venues.has(e.venueId)) return true;
+      notes.push(`data/raw/${id}.json „${e.title}“: Ort ${e.providerId}/${e.venueId} nicht im Katalog – entfällt`);
+      return false;
+    });
+    batches.push({
+      name: id,
+      checkedAt: raw.checkedAt,
+      batch: {
+        providers: { [id]: { status: raw.status, ...(raw.reason ? { reason: raw.reason } : {}), checked: [] } },
+        events,
+      },
+    });
+  }
+  return { batches, notes };
 }
 
 export interface BuildReport {
@@ -290,6 +334,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     if (p?.role !== "anbieter") return undefined;
     const s = status.get(providerId);
     if (s?.status === "fehler") return "Prüfung fehlgeschlagen";
+    if (s === undefined && input.perProviderStatus) return "noch nicht bearbeitet";
     if (s === undefined && p.coveredBy !== undefined && failedSources.has(p.coveredBy))
       return `${p.coveredBy} nicht erreichbar`;
     if (s === undefined && p.coveredBy === undefined) return "in diesem Lauf nicht geprüft";
