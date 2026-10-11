@@ -221,6 +221,19 @@ describe("runDiscover (Plan 0032, E7)", () => {
     expect(readFileSync(join(d.dataDir, "kosten.csv"), "utf8")).toMatch(/entdecken,nuernberg,3,.*,1,0\n$/);
   });
 
+  it("Ertragsbeweis extrahiert immer frisch, auch wenn ein Zustand derselben ID im Laufverzeichnis liegt", async () => {
+    const d = tempData();
+    const f = {
+      search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }),
+      assess: { [SITE]: assessOk("Krabbelzwerge Gostenhof") },
+    };
+    await run(d, f);
+    // zweiter Lauf am selben Tag: gleicher Schlüssel, aber kein „unverändert“ aus dem alten Beweis
+    const again = await run(d, f);
+    expect(again.calls.filter((c) => c.step === "extract")).toHaveLength(1);
+    expect(again.regions[0]?.adopted).toHaveLength(1);
+  });
+
   it("ohne Ertrag: verworfen und zurückgestellt, kein Katalogeintrag", async () => {
     const d = tempData();
     const r = await run(d, {
