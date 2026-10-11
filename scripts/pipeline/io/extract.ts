@@ -51,6 +51,7 @@ export function createExtractor(opts: { model?: string; fallbackModel?: string; 
     const ctx = {
       provider: input.provider,
       allowedUrls: input.allowedUrls,
+      candidates: input.candidates,
       // Datenhorizont heute + 12 Monate (E5)
       horizon: { from: input.today, to: addMonths(input.today, 12) },
       freeDays: await freeDaysFor(input.today),

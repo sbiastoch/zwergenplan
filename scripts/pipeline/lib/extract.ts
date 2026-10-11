@@ -61,6 +61,8 @@ export function extractResponseSchema(): object {
 export interface ExtractContext {
   provider: Provider;
   allowedUrls: readonly string[];
+  /** Kandidaten aus Sammelkalendern: Ein Event mit ihrer `detailUrl` als `sourceUrl` bekommt `via` (E4) */
+  candidates: readonly Candidate[];
   horizon: RawContext["horizon"];
   freeDays: RawContext["freeDays"];
 }
@@ -79,28 +81,38 @@ function urlKey(url: string): string {
 
 export type Checked = { ok: true; events: RawEvent[]; warnings: string[] } | { ok: false; errors: string[] };
 
+/** Nur die äußere Form; die Felder prüft `validateRaw`. */
+const Outer = z.object({ events: z.array(z.looseObject({})) });
 const CODE_FIELDS = ["providerId", "via"] as const;
-const label = (i: number, e: unknown) => `events.${i} („${String((e as { title?: unknown } | null)?.title ?? "?")}“)`;
+const label = (i: number, e: Record<string, unknown>) => `events.${i} („${String(e["title"] ?? "?")}“)`;
 
-/** Fachliche Prüfung einer Antwort: `validateRaw` nur mit diesem Anbieter, dazu `sourceUrl` aus `allowedUrls`. */
+/**
+ * Fachliche Prüfung einer Antwort: `validateRaw` nur mit diesem Anbieter, dazu `sourceUrl` aus `allowedUrls`.
+ * `providerId` und `via` setzt der Code (E4), `via` aus dem Kandidaten, dessen `detailUrl` die `sourceUrl` ist.
+ */
 export function checkExtraction(output: unknown, ctx: ExtractContext): Checked {
-  const events = (output as { events?: unknown } | null)?.events;
-  if (typeof output !== "object" || !Array.isArray(events))
-    return { ok: false, errors: ["Antwort ist kein Objekt mit events"] };
+  const outer = Outer.safeParse(output);
+  if (!outer.success) return { ok: false, errors: ["Antwort ist kein Objekt mit events"] };
+  const { events } = outer.data;
   const errors: string[] = [];
   const allowed = new Set(ctx.allowedUrls.map(urlKey));
+  const viaByUrl = new Map(ctx.candidates.map((c) => [urlKey(c.detailUrl), c.source] as const));
   events.forEach((e, i) => {
-    const fields = typeof e === "object" && e !== null ? (e as Record<string, unknown>) : {};
-    for (const f of CODE_FIELDS) if (f in fields) errors.push(`${label(i, e)}: ${f} setzt der Code, nicht die Antwort`);
-    if (typeof fields["sourceUrl"] === "string" && !allowed.has(urlKey(fields["sourceUrl"])))
-      errors.push(`${label(i, e)}.sourceUrl: ${fields["sourceUrl"]} ist keine abgerufene Seite`);
+    for (const f of CODE_FIELDS) if (f in e) errors.push(`${label(i, e)}: ${f} setzt der Code, nicht die Antwort`);
+    const url = e["sourceUrl"];
+    if (typeof url === "string" && !allowed.has(urlKey(url)))
+      errors.push(`${label(i, e)}.sourceUrl: ${url} ist keine abgerufene Seite`);
   });
   if (errors.length > 0) return { ok: false, errors };
   const id = ctx.provider.id;
+  const withCodeFields = events.map((e) => {
+    const via = typeof e["sourceUrl"] === "string" ? viaByUrl.get(urlKey(e["sourceUrl"])) : undefined;
+    return { ...e, providerId: id, ...(via ? { via } : {}) };
+  });
   const r = validateRaw(
     {
       providers: { [id]: { status: events.length > 0 ? "ok" : "keine-termine", checked: [...ctx.allowedUrls] } },
-      events: events.map((e) => ({ ...(e as object), providerId: id })),
+      events: withCodeFields,
     },
     { providers: [ctx.provider], expected: [id], horizon: ctx.horizon, freeDays: ctx.freeDays },
   );
@@ -108,25 +120,31 @@ export function checkExtraction(output: unknown, ctx: ExtractContext): Checked {
 }
 
 /**
- * Kandidaten und erlaubte URLs aus einer gespeicherten Abruf-Ausgabe (`pipeline fetch`: `<id>.txt` und die Seiten aus
- * `hashes.json`). Die Kandidaten stehen je Zeile als JSON im Abschnitt `## Kandidaten (N)` (`assembleProvider`).
+ * Kandidaten und erlaubte URLs aus einer gespeicherten Abruf-Ausgabe (`pipeline fetch`: `<id>.txt` und der Eintrag
+ * aus `hashes.json`), nur für die Probe `pipeline extract --from`. Der Text enthält fremden Seitentext; deshalb gilt
+ * nur der **letzte** Abschnitt `## Kandidaten (N)` (`assembleProvider` hängt ihn ans Ende), und nur, wenn N der Zahl
+ * aus `hashes.json` entspricht. Der Nachtlauf (Teil B) nimmt die Kandidaten direkt aus dem Abruf, nie aus dem Text.
  */
 export function inputsFromFetch(
   text: string,
-  pages: ReadonlyArray<{ url: string; ok: boolean }>,
+  entry: { candidates: number; pages: ReadonlyArray<{ url: string; ok: boolean }> },
 ): { candidates: Candidate[]; allowedUrls: string[] } {
-  const section = text.split(/^## Kandidaten \(\d+\)$/m)[1] ?? "";
-  const candidates = section.split("\n").flatMap((line) => {
-    if (!line.startsWith("{")) return [];
-    try {
-      const c = CandidateSchema.safeParse(JSON.parse(line));
-      return c.success ? [c.data] : [];
-    } catch {
-      return [];
-    }
-  });
-  const allowedUrls = [...pages.filter((p) => p.ok).map((p) => p.url), ...candidates.map((c) => c.detailUrl)];
+  const parts = text.split(/^## Kandidaten \((\d+)\)$/m);
+  const count = parts.length >= 3 ? Number(parts.at(-2)) : 0;
+  const section = entry.candidates > 0 && count === entry.candidates ? (parts.at(-1) ?? "") : "";
+  const lines = section.split("\n").filter((l) => l.startsWith("{"));
+  const candidates = lines.length === entry.candidates ? lines.flatMap(parseCandidate) : [];
+  const allowedUrls = [...entry.pages.filter((p) => p.ok).map((p) => p.url), ...candidates.map((c) => c.detailUrl)];
   return { candidates, allowedUrls: [...new Set(allowedUrls)] };
+}
+
+function parseCandidate(line: string): Candidate[] {
+  try {
+    const c = CandidateSchema.safeParse(JSON.parse(line));
+    return c.success ? [c.data] : [];
+  } catch {
+    return [];
+  }
 }
 
 /** Katalogauszug für das Modell: ohne `notes` (ADR 0025), IDs, Koordinaten und gesperrte oder reine Info-Seiten. */

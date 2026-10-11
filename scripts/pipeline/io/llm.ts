@@ -114,13 +114,17 @@ function llmArgs(call: Omit<LlmCall, "signal" | "user">): string[] {
  * Umgebung des Aufrufs: nur PATH, HOME, das Token und die Ausgabegrenze; `ANTHROPIC_API_KEY` nur, wenn gesetzt
  * (späterer Umstieg auf API, N-H). Alles andere (GITHUB_TOKEN, GIT_*, …) bleibt draußen.
  *
- * Lokale Ausnahme: Ohne Token und ohne API-Schlüssel gibt es nur den Login des Entwicklers in seinem `HOME`. Dann
- * bleibt `HOME` das echte (sonst fehlt der Login); in Actions ist das Token immer gesetzt, `HOME` also leer.
+ * Lokale Ausnahme (Abweichung von E2, nur für Proben und Evals am eigenen Rechner): Ohne Token und ohne API-Schlüssel
+ * gibt es nur den Login des Entwicklers in seinem `HOME`. Dann bleibt `HOME` das echte, sonst fehlt der Login. Dabei
+ * gelten dessen Nutzer-Einstellungen (Hooks, MCP, Nutzer-`CLAUDE.md`); Messwerte sind also nicht ganz wie in Actions.
+ * Wer das vermeiden will, setzt lokal ein Token (`claude setup-token`). In Actions (`GITHUB_ACTIONS`) gilt die
+ * Ausnahme nie: Fehlt dort das Secret, bleibt `HOME` leer, die CLI meldet den fehlenden Login und der Lauf endet mit
+ * `abort: "auth"`.
  */
 function llmEnv(source: NodeJS.ProcessEnv, emptyHome: string): Record<string, string> {
   const token = source["CLAUDE_CODE_OAUTH_TOKEN"] ?? "";
   const apiKey = source["ANTHROPIC_API_KEY"];
-  const localLogin = token === "" && !apiKey;
+  const localLogin = token === "" && !apiKey && source["GITHUB_ACTIONS"] !== "true";
   return {
     PATH: source["PATH"] ?? "",
     HOME: localLogin ? (source["HOME"] ?? emptyHome) : emptyHome,
@@ -132,13 +136,25 @@ function llmEnv(source: NodeJS.ProcessEnv, emptyHome: string): Record<string, st
 
 const TRUNCATED = /exceeded the \d+ output token maximum/;
 
-/** Abbruchgrund nach S1.1: 401/403 → auth, 429 bzw. Limit-Meldung → limit. Nur bei `is_error`. */
+/**
+ * Abbruchgrund nach S1.1: 401/403 bzw. Login-Meldung → auth, 429 bzw. Meldung zum Nutzungs- oder Ratenlimit → limit.
+ * Nur bei `is_error`. Das Limit-Muster ist eng, weil `limit` den ganzen Lauf beendet (E6): Kontext- oder
+ * Größenlimits sind ein Fehler des Anbieters, kein Abbruch.
+ */
 function abortOf(out: CliOutput): LlmResult["abort"] {
   if (!out.is_error) return null;
   const text = out.result ?? "";
-  if (out.api_error_status === 401 || out.api_error_status === 403 || /authenticat|oauth|bearer|billing/i.test(text))
+  if (
+    out.api_error_status === 401 ||
+    out.api_error_status === 403 ||
+    /authenticat|oauth|bearer|billing|not logged in|\/login|api key/i.test(text)
+  )
     return "auth";
-  if ((out.api_error_status === 429 || /limit/i.test(text)) && !TRUNCATED.test(text)) return "limit";
+  if (
+    (out.api_error_status === 429 || /rate.?limit|usage limit|limit reached|hit your limit/i.test(text)) &&
+    !TRUNCATED.test(text)
+  )
+    return "limit";
   return null;
 }
 

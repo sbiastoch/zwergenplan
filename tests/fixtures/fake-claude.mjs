@@ -2,7 +2,7 @@
 /**
  * Fake der Claude-CLI für scripts/pipeline/io/llm.test.ts (Plan 0032, E2). Die Umgebung des Aufrufs ist gefiltert,
  * deshalb steuert die erste Zeile von stdin: `FAKE <modus> <protokolldatei>`. Das Protokoll hält Argumente,
- * Arbeitsverzeichnis (samt Inhalt), Umgebung und stdin fest. Modi: ok, 401, 429, truncated, broken, exit.
+ * Arbeitsverzeichnis (samt Inhalt), Umgebung und stdin fest. Modi: ok, 401, 429, nologin, toolong, truncated, broken, exit.
  */
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 
@@ -66,6 +66,12 @@ switch (mode) {
     process.stdout.write(
       `${JSON.stringify(error(null, "API Error: Claude's response exceeded the 32000 output token maximum."))}\n`,
     );
+    break;
+  case "nologin":
+    process.stdout.write(`${JSON.stringify(error(null, "Not logged in · Please run /login"))}\n`);
+    break;
+  case "toolong":
+    process.stdout.write(`${JSON.stringify(error(400, "Prompt is too long: input exceeds the context limit"))}\n`);
     break;
   case "broken":
     process.stdout.write("{ kein JSON\n");

@@ -217,7 +217,7 @@ async function extractCmd(id: string) {
   if (entry?.status !== "ok" || !existsSync(textFile))
     fail(`${id}: keine Eingabe in ${dir} (${entry?.status ?? "fehlt"}${entry?.reason ? `: ${entry.reason}` : ""})`);
   const text = readFileSync(textFile, "utf8").trimEnd();
-  const { candidates, allowedUrls } = inputsFromFetch(text, entry.pages);
+  const { candidates, allowedUrls } = inputsFromFetch(text, entry);
   const controller = new AbortController();
   process.once("SIGINT", () => controller.abort());
   const started = performance.now();
