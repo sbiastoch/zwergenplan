@@ -15,6 +15,8 @@
     display: flex;
     flex-direction: column;
     min-height: 100%;
+    /* Wischen (Plan 0034, E10): vertikal scrollt der Browser, die horizontale Geste kommt bei der Seite an; Zoomen bleibt */
+    touch-action: pan-y pinch-zoom;
   }
   .onb-k-stadt {
     --k: #ffd93b;
@@ -49,22 +51,46 @@
   .onb-stage :focus-visible {
     outline-color: #13212e;
   }
+  /* Punkte in 44-px-Fächern (Plan 0034, E11): Die Punkte früherer Schritte sind Knöpfe, ihre Treffer-Flächen dürfen
+     sich nicht überlappen (axe target-size), also stehen alle Punkte im gleichen Raster. Der erste bleibt an seiner
+     Stelle (negativer Rand), Größe und Farbe der Punkte wie bisher. */
   .onb-dots {
     display: flex;
-    gap: 6px;
+    align-items: center;
+    margin-left: -17.5px;
   }
   .onb-dots i {
     width: 9px;
     height: 9px;
+    margin-inline: 17.5px;
     border-radius: 5px;
     background: rgba(19, 33, 46, 0.3);
-    transition: width 0.3s;
+    transition:
+      width 0.3s,
+      margin 0.3s;
   }
   .onb-dots i.on {
     width: 26px;
+    margin-inline: 9px;
     background: #13212e;
   }
-  .onb-dots i.done {
+  .onb-dots button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-block: -17.5px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    outline-offset: -14px;
+  }
+  .onb-dots button::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 5px;
     background: #13212e;
   }
 
@@ -373,6 +399,21 @@
     color: var(--muted);
   }
 
+  /* Nach einer Wischgeste gleitet der neue Schritt aus der Wischrichtung herein (E10) */
+  .onb-in-vor {
+    animation: onb-in 0.18s ease-out backwards;
+  }
+  .onb-in-zurueck {
+    --dx: -24px;
+    animation: onb-in 0.18s ease-out backwards;
+  }
+
+  @keyframes onb-in {
+    from {
+      opacity: 0;
+      transform: translateX(var(--dx, 24px));
+    }
+  }
   @keyframes onb-artin {
     from {
       opacity: 0;

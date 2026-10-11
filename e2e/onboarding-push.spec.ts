@@ -15,7 +15,7 @@ import {
   expectTextFits,
   setTextScale,
 } from "./mobile-ux.ts";
-import { expectStep, goTo, intro, offerInstall, opened, primary, stepOrder, title } from "./onboarding-steps.ts";
+import { expectStep, goTo, intro, offerInstall, opened, primary, stepOrder, swipe, title } from "./onboarding-steps.ts";
 
 test.use({ onboarding: "neu", channel: "chromium", pushWorker: "mock" });
 test.skip(
@@ -54,6 +54,27 @@ test.describe("Test 5: App-Schritt mit Schalter (Chromium)", () => {
     await expect(intro(page).getByText("Geschafft! Liegt jetzt auf dem Startbildschirm.")).toBeVisible();
     // der Knopf ging mit dem Fokus: Fokus auf der Überschrift
     await expect(title(page)).toBeFocused();
+    expect(pushLog).toEqual([]);
+  });
+
+  test("Wischgeste, die auf dem Schalter beginnt, wechselt nicht und schaltet nicht (Plan 0034, E10)", async ({
+    page,
+    pushLog,
+  }) => {
+    await opened(page);
+    await goTo(page, "app");
+    await expectStep(page, 4, 4);
+    const toggle = intro(page).getByRole("switch", { name: "Samstags-Nachricht" });
+    const box = await toggle.boundingBox();
+    if (!box) throw new Error("Schalter ohne Box");
+    const y = box.y + box.height / 2;
+    // nach rechts = zurück; auf dem letzten Schritt wäre „weiter“ ohnehin wirkungslos
+    await swipe(page, { target: toggle, from: [box.x + 10, y], to: [box.x + 160, y] });
+    await expectStep(page, 4, 4);
+    await expect(toggle).toHaveAttribute("aria-checked", "false");
+    // Gegenprobe auf der Bühne: dieselbe Richtung führt zurück
+    await swipe(page, { from: [box.x + 10, 150], to: [box.x + 160, 150] });
+    await expectStep(page, 3, 4);
     expect(pushLog).toEqual([]);
   });
 

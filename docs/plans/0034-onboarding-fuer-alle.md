@@ -1,6 +1,6 @@
 # Plan 0034 – Onboarding für Bestandsnutzer, App-Schritt je Plattform, Wischen
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-11
 Bezug:
 - Plan 0033 (`docs/plans/archiv/0033-onboarding.md`, live seit ecfccfb): E1 (Schritte und Reihenfolge), E2 (Gate, Flag, Privatsphäre), E8 (Schritt „App“), E10 (Texte), E15 (E2E-Basis), Test 7, Test 10, Test 12
@@ -400,6 +400,12 @@ Entscheidung des Auftraggebers (2026-10-11): Wischen ist eine Geste ohne Alterna
   - **Kicker-Pille in em** (`onboarding.css`): Test 13 „320 px und 200 %“ war auf `iphone-15` rot, weil der neue, längere Kicker „Schön, dass ihr da seid“ dort zweizeilig umbricht und an die 999-px-Rundung stößt. Jetzt `border-radius: 1em`, `padding: 2px 0.9em`: einzeilig weiter rund, zweizeilig ohne Anstoßen. Im Browser-Review (S5) ansehen.
   - Test 12 „leere Bühne“ läuft zusätzlich hell nur auf `iphone-15` und prüft dort die ungemischte App-Farbe genau; dunkel bleibt die Gegenprobe „nicht ungemischt“ je Projekt.
   - `push.spec.ts`: zwei Fälle in einem `describe` (mit Abo: neue Werte, kein Request; ohne Abo: Speicher bleibt `{}`). Der Fall ohne Abo wartet 300 ms auf den asynchronen Cleanup, weil es kein Ereignis gibt, auf das er warten könnte.
+- **S3**: `swipeStep` test-first (5 Unit-Fälle, erst rot), Pointer-Handler direkt als JSX-Props auf `.onb-flow`: `pnpm lint` meldet kein `noStaticElementInteractions`, also kein Ref-`useEffect` nötig. `Onboarding JS (lazy)` 6,386 → 6,995 kB (von 7,3), `Onboarding CSS (lazy)` 2,067 → 2,217 kB (von 2,5), `JS (initial)` unverändert 100,447 kB, `CSS` 12,153 kB. **Klick-Unterdrückung nicht gebaut**: Test 15e (CDP-Touch, `pixel-7`) war ohne sie grün, Chromium löst nach einer Touch-Geste mit Bewegung über Kachel bzw. „Weiter“ keinen Klick aus (genau ein Schrittwechsel, auch nach 400 ms). WebKit prüft der Nutzer am echten iPhone. Abweichungen:
+  - **Punkte im 44-px-Raster** (E11, „Aussehen gleich“ nur teilweise): Mit 9-px-Punkten im Abstand von 15 px überlappen 44-px-Treffer-Flächen. Das meldet axe als `target-size`-Verstoß (Test 13, Test 5), und ein Tipp auf Punkt 1 landet auf Punkt 2 (Playwright: „intercepts pointer events“). Darum steht jetzt jeder Punkt in einem 44 px breiten Fach (Rand statt `gap`), der erste bleibt an seiner Stelle. Größe, Form und Farbe der Punkte sind gleich, der **Abstand** wächst von 6 auf 35 px (Punktreihe ≈ 160 statt ≈ 70 px). Im Browser-Review (S5) dem Nutzer zeigen.
+  - Gleit-Klassen `onb-in-vor`/`onb-in-zurueck`; die Keys sind `t${index}` und `d${index}` statt `key={index}` auf beiden, weil gleiche Keys unter Geschwistern React verwirren (zwei Überschriften im DOM).
+  - Test 15f prüft den Neustart der Animation über einen Zähler für `animationstart` (`onb-in` auf `.onb-txt`, erwartet 2) statt `getAnimations().length > 0`: Die Animation dauert 180 ms und ist beim Prüfen nach `expectStep` womöglich schon vorbei.
+  - Test 5 (Switch-Fall) wischt nach **rechts** (zurück) vom Schalter, weil „App“ auf `pixel-7` der letzte Schritt ist und „weiter“ dort ohnehin nichts täte; Gegenprobe auf der Bühne führt zurück.
+- **S4**: `node scripts/e2e-select.ts` wählt lokal `app`, `theme`, `installieren`, `merkliste-anbieter`, `merkliste-kalender`, `onboarding-push`, `onboarding`, `push` (Rest in der CI). `pnpm e2e:local --affected` 137 grün, 9 übersprungen; `onboarding.spec.ts` auf `iphone-15` 32 grün, 6 übersprungen; `onboarding.spec.ts` und `onboarding-push.spec.ts` auf `desktop` (Fokus-Gate der Punkt-Knöpfe) 34 grün, 11 übersprungen.
 
 ## Review (2026-10-11) – Verdict: Überarbeiten
 
