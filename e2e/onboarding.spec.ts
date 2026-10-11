@@ -50,6 +50,16 @@ function onboardingLoaded(page: Page) {
 const flag = (page: Page) => page.evaluate((key) => localStorage.getItem(key), FLAG);
 const statusLine = (page: Page) => page.getByRole("status");
 
+/**
+ * Darstellungen für die Mobile-UX-Gates (Test 12, Test 13). Dunkel zweimal wie in `mobile-ux.spec.ts`: per System und
+ * per `data-theme="dark"` (gewählte Darstellung).
+ */
+const SCHEMES = [
+  { label: "hell", colorScheme: "light", chosenDark: false },
+  { label: "dunkel", colorScheme: "dark", chosenDark: false },
+  { label: "dunkel per Darstellung", colorScheme: "light", chosenDark: true },
+] as const;
+
 /** Zahl am Anfang der Statuszeile („8 Angebote ab heute“) */
 async function statusCount(page: Page): Promise<number> {
   const text = (await statusLine(page).textContent()) ?? "";
@@ -353,6 +363,94 @@ test.describe("Test 12: Chunk nicht ladbar", () => {
   });
 });
 
+/**
+ * Test 12, Mobile-UX von Lade- und Fehlerzustand (Arch-Review der Umsetzung, M1): Start-CSS `.onb-pending`,
+ * `.onb-topbar`, `.onb-skip`, `.onb-failed`. Dunkel per System und per `data-theme`; die leere Bühne hat dunkel die
+ * Farbe der ersten Bühne (kein Farbsprung beim Übergang in den Flow).
+ */
+test.describe("Test 12: Lade- und Fehlerzustand bestehen die Gates", () => {
+  test.use({ allowedConsoleErrors: [/\/assets\/onboarding\/\S+/] });
+
+  /** Onboarding-Chunk festhalten, bis `release(abort)` ihn abbricht bzw. durchlässt */
+  async function holdChunk(page: Page) {
+    let release: (abort: boolean) => void = () => {};
+    const held = new Promise<boolean>((resolve) => {
+      release = resolve;
+    });
+    await page.route("**/assets/onboarding/*", async (route) => {
+      if (await held) await route.abort();
+      else await route.fallback();
+    });
+    // WebKit zählt den hängenden Chunk zum `load` der Seite: nur bis DOMContentLoaded warten
+    await page.goto("./", { waitUntil: "domcontentloaded" });
+    await expect(intro(page).getByRole("button", { name: "Überspringen" })).toBeVisible();
+    return release;
+  }
+
+  for (const scheme of SCHEMES) {
+    test(`Laden und Fehler (${scheme.label})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme.colorScheme, reducedMotion: "reduce" });
+      const release = await holdChunk(page);
+      if (scheme.chosenDark)
+        await page.evaluate(() => {
+          document.documentElement.dataset["theme"] = "dark";
+        });
+      await expectMobileUx(page);
+      if (scheme.label !== "hell") await expectNoBrightIslands(page);
+      release(true);
+      await expect(intro(page).getByText("Die Einführung konnte nicht geladen werden.")).toBeVisible();
+      await expectMobileUx(page);
+      if (scheme.label !== "hell") await expectNoBrightIslands(page);
+    });
+  }
+
+  for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
+    test(`leere Bühne in der Farbe der ersten Bühne (${scheme.label})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme.colorScheme });
+      const release = await holdChunk(page);
+      if (scheme.chosenDark)
+        await page.evaluate(() => {
+          document.documentElement.dataset["theme"] = "dark";
+        });
+      // als gerundetes RGB: Der Build rechnet das feste `color-mix` der leeren Bühne vorab aus, die Bühne mischt
+      // zur Laufzeit (`--mix`) und meldet `color(srgb …)`
+      const background = (selector: string) =>
+        page.locator(selector).evaluate((el) => {
+          const c = getComputedStyle(el).backgroundColor;
+          const srgb = /^color\(srgb ([^)]+)\)$/.exec(c)?.[1];
+          const parts = srgb
+            ? srgb.split(" ").map((v) => Number.parseFloat(v) * 255)
+            : (/\(([^)]+)\)/.exec(c)?.[1]?.split(",").map(Number.parseFloat) ?? []);
+          return parts.slice(0, 3).map(Math.round).join(",");
+        });
+      const pending = await background(".onb-pending");
+      release(false);
+      await expect(title(page)).toHaveText(/^Schritt 1 von \d: /);
+      expect(await background(".onb-stage")).toBe(pending);
+      expect(pending).not.toBe("255,217,59");
+    });
+  }
+
+  test("320 px und 200 % Textgröße", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const release = await holdChunk(page);
+    const check = async () => {
+      await expectNoHorizontalScroll(page);
+      await expectTouchTargets(page);
+      await expectTextFits(page);
+      await setTextScale(page, 2);
+      await expectNoHorizontalScroll(page);
+      await expectTextFits(page, { scale: 2 });
+      await setTextScale(page, 1);
+    };
+    await check();
+    release(true);
+    await expect(intro(page).getByText("Die Einführung konnte nicht geladen werden.")).toBeVisible();
+    await check();
+  });
+});
+
 test.describe("Test 12: App-Teil nicht ladbar", () => {
   test.use({ allowedConsoleErrors: [/\/assets\/app\/AppSection-\S+/] });
 
@@ -397,16 +495,9 @@ test.describe("Test 11: erneut über das Kind-Sheet", () => {
 });
 
 /**
- * Test 13: Mobile-UX-Gates je Schritt in allen Projekten (inkl. `pixel-7-quer`: Der Dialog scrollt). Dunkel zweimal wie
- * in `mobile-ux.spec.ts`: per System und per `data-theme="dark"` (gewählte Darstellung). Ein Test je Darstellung, alle
- * Schritte darin; der Schalter und der Installationsknopf stehen in Test 5.
+ * Test 13: Mobile-UX-Gates je Schritt in allen Projekten (inkl. `pixel-7-quer`: Der Dialog scrollt). Ein Test je
+ * Darstellung, alle Schritte darin; der Schalter und der Installationsknopf stehen in Test 5.
  */
-const SCHEMES = [
-  { label: "hell", colorScheme: "light", chosenDark: false },
-  { label: "dunkel", colorScheme: "dark", chosenDark: false },
-  { label: "dunkel per Darstellung", colorScheme: "light", chosenDark: true },
-] as const;
-
 /** Je Schritt `check` aufrufen, dann weiter; der letzte Schritt bleibt offen */
 async function eachStep(page: Page, check: (n: number) => Promise<void>) {
   const total = Number(/von (\d):/.exec((await title(page).textContent()) ?? "")?.[1]);
@@ -445,7 +536,11 @@ test.describe("Test 13: Mobile-UX je Schritt", () => {
       await expectNoHorizontalScroll(page);
       await expectTouchTargets(page);
       await expectTextFits(page);
+      const titleSize = () => title(page).evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
+      const before = await titleSize();
       await setTextScale(page, 2);
+      // Schriftgrößen in rem: 200 % verdoppeln den Titel wirklich (E11, Review 2, M-4)
+      expect(await titleSize()).toBeCloseTo(2 * before, 1);
       await expectNoHorizontalScroll(page);
       await expectTextFits(page, { scale: 2 });
       await expectAccessible(page);

@@ -53,6 +53,7 @@
   .onb-pending {
     position: relative;
     height: clamp(180px, 42dvh, 318px);
+    /* Farbe der ersten Bühne (Stadt); dunkel wie .onb-flow zu 80 % gemischt (unten), sonst springt sie beim Laden */
     background-color: #ffd93b;
     border-bottom: 3px solid #13212e;
     border-radius: 0 0 50% 50% / 0 0 34px 34px;
@@ -501,8 +502,14 @@
 :root[data-theme="dark"] .dlg::backdrop {
   background: rgba(0, 0, 0, 0.62);
 }
+:root[data-theme="dark"] .onb-pending {
+  background-color: color-mix(in srgb, #ffd93b 80%, #0e1620);
+}
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .dlg::backdrop {
     background: rgba(0, 0, 0, 0.62);
+  }
+  :root:not([data-theme="light"]) .onb-pending {
+    background-color: color-mix(in srgb, #ffd93b 80%, #0e1620);
   }
 }

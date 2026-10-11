@@ -102,9 +102,11 @@ export function App() {
    * ist (Review H1). „still-erledigt“ setzt das Flag gleich hier; mehrfach ausgeführt (StrictMode) schadet das nicht.
    */
   const [onboarding, setOnboarding] = useState<OnboardingMode>(() => {
+    // Mit Flag keine Schreibprobe: Sonst schriebe jeder Start `zwergenplan.probe` (Arch-Review der Umsetzung, m3)
+    const done = loadOnboardingDone();
     const gate = onboardingGate({
-      storage: storageUsable(),
-      done: loadOnboardingDone(),
+      storage: done || storageUsable(),
+      done,
       stored: hasStoredData(),
       deepLink: route.offerId !== undefined || route.providerId !== undefined,
     });

@@ -51,9 +51,9 @@ export interface PushEnv {
   ready(): Promise<PushRegistration>;
   /**
    * Löst auf, sobald `start()` in `pwa.ts` ohne Registrierung geendet hat (`data-sw="aus"` auf `<html>`), sofort, wenn
-   * es schon steht. Dann käme `ready` nie (Plan 0033, E8).
+   * es schon steht. Dann käme `ready` nie (Plan 0033, E8). `signal` beendet das Beobachten, wenn `ready` gewinnt.
    */
-  swGivenUp(): Promise<void>;
+  swGivenUp(signal?: AbortSignal): Promise<void>;
   fetch(url: string, init: { method: string; body: string }): Promise<{ ok: boolean; status: number }>;
   store: {
     get(key: DeviceKey): Promise<unknown>;
@@ -71,7 +71,7 @@ export interface MirrorData {
 }
 
 /** `data-sw="aus"` (gesetzt von `start()` in `pwa.ts`) beobachten; Kanal in docs/architecture.md (App-Extras) */
-function swGivenUp(): Promise<void> {
+function swGivenUp(signal?: AbortSignal): Promise<void> {
   const root = document.documentElement;
   const off = () => root.dataset["sw"] === "aus";
   return new Promise((resolve) => {
@@ -82,6 +82,8 @@ function swGivenUp(): Promise<void> {
       resolve();
     });
     observer.observe(root, { attributes: true, attributeFilter: ["data-sw"] });
+    // gewinnt `ready`, bleibt das Versprechen offen, der Beobachter aber nicht hängen (Arch-Review der Umsetzung, m2)
+    signal?.addEventListener("abort", () => observer.disconnect(), { once: true });
   });
 }
 
@@ -191,10 +193,11 @@ export function createPush(env: PushEnv = browserEnv()) {
       let sub: PushSub;
       try {
         // `reject` statt eines geworfenen Fehlers in `then`: Gewinnt `ready`, bleibt kein unbehandelter Fehler zurück
+        const watch = new AbortController();
         const givenUp = new Promise<never>((_, reject) => {
-          void env.swGivenUp().then(() => reject(new PushError("abo")));
+          void env.swGivenUp(watch.signal).then(() => reject(new PushError("abo")));
         });
-        const registration = await Promise.race([env.ready(), givenUp]);
+        const registration = await Promise.race([env.ready(), givenUp]).finally(() => watch.abort());
         sub = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: env.vapidKey,

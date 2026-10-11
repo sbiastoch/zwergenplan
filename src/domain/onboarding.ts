@@ -67,6 +67,7 @@ export function cityChoices<K extends string>(
   regions: Readonly<Record<K, Region>>,
   maxTiles = 4,
 ): { tiles: { id: K; name: string }[]; more: { id: K; name: string }[] } {
+  // Cast: `Object.keys` liefert nur `string[]`; die Regionen sind feste Literale (`REGIONS`, Test-Fakes) ohne Fremdschlüssel
   const sorted = (Object.keys(regions) as K[])
     .map((id) => ({ id, ...regions[id] }))
     .sort((a, b) => b.population - a.population || a.name.localeCompare(b.name, "de"))

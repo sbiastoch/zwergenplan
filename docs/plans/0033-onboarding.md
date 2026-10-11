@@ -550,3 +550,14 @@ Das Stop-Gate verlangte `/arch-review` auf Plan und Mockup. Übernommen:
 - **M2** (Vorladen des PWA-Kerns weicht von ADR 0013, Punkt 5 ab): neues ADR 0027 statt Nachtrag (E14, Doku).
 - **M3** (helle SVG-Flächen im Dunkelmodus): Füllungen über `--onb-paper`/`--onb-screen`/`--onb-ink`, Checklistenzeile im Browser-Review (E11).
 - **m1** (ADR 0025 falsch zitiert), **m2** (Such-Abo-Schlüssel als Konstante), **m3** (Gate ohne nutzbaren Speicher), **m4** (`plural` in die Domäne), **m5** (`enable` per `Promise.race` statt Zeitlimit, vier Testfälle), **m6** (Smoke-Test im Deploy-Build).
+
+## Arch-Review der Umsetzung (2026-10-11)
+
+Keine Blocker. Eingearbeitet:
+
+- **M1** (Lade- und Fehlerzustand ohne Mobile-UX-Gate, `.onb-pending` dunkel ohne Abdunkelung): `.onb-pending` dunkel wie die erste Bühne zu 80 % gemischt (`dialog.css`, beide Dunkel-Blöcke). Test 12 prüft Laden (Chunk festgehalten) und Fehler mit `expectMobileUx`, `expectNoBrightIslands` (dunkel per System und per `data-theme`), 320 px/200 % und gleiche Farbe von leerer und erster Bühne.
+- **m1** (Test 13 prüfte die Verdopplung nicht): `.onb-title` vor und nach `setTextScale(page, 2)` verglichen, Verhältnis 2.
+- **m2** (`MutationObserver` in `swGivenUp` blieb hängen, wenn `ready` gewinnt): `swGivenUp(signal)`, `enable` bricht nach `Promise.race` ab; zwei Unit-Tests am Fake.
+- **m3** (Schreibprobe bei jedem Start): `App` probt nur ohne Flag; `zwergenplan.probe` in `docs/architecture.md` (Privatsphäre).
+- **m4** (Cast `as K[]`): Kommentar, warum sicher.
+- **m5** (Doku): `e2e/onboarding-push.spec.ts` mit Grund und die Ausnahme vom „Kein Push-Code beim App-Start“ (Erststart ohne Flag, nur lesend, ADR 0027) in `docs/architecture.md`.

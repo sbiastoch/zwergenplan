@@ -13,6 +13,8 @@ interface Fake {
   sub(): PushSub | undefined;
   /** `data-sw="aus"`: `start()` endet ohne Registrierung */
   giveUp(): void;
+  /** Signale, mit denen `enable` `swGivenUp` aufrief */
+  watching: (AbortSignal | undefined)[];
 }
 
 function fake(
@@ -34,6 +36,7 @@ function fake(
   const calls: string[] = [];
   const store = new Map<string, unknown>();
   const requests: Fake["requests"] = [];
+  const watching: (AbortSignal | undefined)[] = [];
   let current: PushSub | undefined;
   let giveUp = () => {};
   const gaveUp = new Promise<void>((resolve) => {
@@ -78,7 +81,10 @@ function fake(
       calls.push("ready");
       return options.readyNever ? new Promise<PushRegistration>(() => {}) : Promise.resolve(registration);
     },
-    swGivenUp: () => gaveUp,
+    swGivenUp: (signal) => {
+      watching.push(signal);
+      return gaveUp;
+    },
     fetch: async (url, init) => {
       requests.push({ method: init.method, url, body: JSON.parse(init.body) });
       if (options.fetchThrows) throw new TypeError("offline");
@@ -103,6 +109,7 @@ function fake(
     },
     sub: () => current,
     giveUp: () => giveUp(),
+    watching,
   };
 }
 
@@ -178,6 +185,20 @@ describe("enable wartet auf ready oder auf data-sw=aus (Plan 0033, E8)", () => {
     const f = fake({ readyNever: true });
     expect(await pending(createPush(f.env).enable(DATA))).toBe(true);
     expect(f.calls).toEqual(["requestPermission", "ready"]);
+  });
+
+  it("ready gewinnt: das Beobachten von data-sw endet (Abbruch-Signal)", async () => {
+    const f = fake();
+    await createPush(f.env).enable(DATA);
+    expect(f.watching).toHaveLength(1);
+    expect(f.watching[0]?.aborted).toBe(true);
+  });
+
+  it("(d) solange keins von beiden kommt, läuft das Beobachten weiter", async () => {
+    const f = fake({ readyNever: true });
+    void createPush(f.env).enable(DATA);
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+    expect(f.watching[0]?.aborted).toBe(false);
   });
 
   it("ready gewinnt, data-sw=aus kommt danach: kein unbehandelter Fehler", async () => {
