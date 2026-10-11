@@ -9,16 +9,21 @@
  *   `autofocus` für den Modus „manuell“, in dem der Flow vor `showModal()` montiert (Review 2, M-1).
  * - Der App-Teil kommt als Prop aus `assets/app/` (kein statischer Import zwischen zwei Lazy-Chunks, E4).
  * - Beim Unmount einmal `app.syncPush()`: Ein laufendes Abo bekommt die im Onboarding geänderten Angaben (Plan 0034, E9).
+ * - Wischen (Plan 0034, E10): Pointer Events auf `.onb-flow`, nur Touch und Stift; nach links wie der Hauptknopf (außer
+ *   auf dem letzten Schritt), nach rechts zurück. Danach gleitet der neue Schritt aus der Wischrichtung herein.
+ * - Zurück ohne Geste (E11): Die Punkte früherer Schritte sind Knöpfe, spätere nicht (die Datumsprüfung bleibt).
  */
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { type PointerEvent, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
   appStepParts,
   ONBOARDING_TEXTS,
   onboardingSteps,
   primaryLabel,
   type StepId,
+  type SwipeStep,
   stepOf,
   stepText,
+  swipeStep,
   welcomeStats,
 } from "../../domain/onboarding.ts";
 import type { InstallApi } from "../../domain/pwa.ts";
@@ -30,6 +35,16 @@ import "./onboarding.css";
 
 const NO_INSTALL: InstallApi = { state: () => "keine", subscribe: () => () => {}, prompt: async () => {} };
 
+/** Gesten, die in Eingaben, Schaltern oder horizontal scrollbaren Bereichen beginnen, gehören diesen (E10) */
+function ownsGesture(target: EventTarget, root: Element): boolean {
+  if (!(target instanceof Element) || target.closest("input, select, textarea, [role='switch']")) return true;
+  for (let el: Element | null = target; el && el !== root; el = el.parentElement) {
+    const { overflowX } = getComputedStyle(el);
+    if ((overflowX === "auto" || overflowX === "scroll") && el.scrollWidth > el.clientWidth) return true;
+  }
+  return false;
+}
+
 export function OnboardingFlow(props: OnboardingFlowProps) {
   const { offers, now, today, app, finish, onEnd } = props;
   const install = app?.install ?? NO_INSTALL;
@@ -39,6 +54,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const installState = useSyncExternalStore(install.subscribe, install.state);
   const parts = appStepParts(installState, push);
   const [index, setIndex] = useState(0);
+  // Schritt, auf den gewischt wurde, und die Richtung: nur dort gleitet er herein (E10)
+  const [slide, setSlide] = useState<{ at: number; dir: SwipeStep }>();
+  const touch = useRef<{ id: number; x: number; y: number }>(undefined);
   const heading = useRef<HTMLHeadingElement>(null);
   const field = useRef<HTMLInputElement>(null);
   // im Flow statt im Schritt: „Weiter“ hält bei ungültigem Datum an, der Text bleibt beim Blättern stehen
@@ -58,23 +76,68 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
     if (dialog) dialog.scrollTop = 0;
   }, [index]);
 
-  const text = stepText(step, { first: index === 0, ...(stats && { stats }), ...(parts && { app: parts }) });
-  /** „Später“ überspringt nur diesen Schritt und verwirft nichts; auf dem letzten Schritt endet es wie „Weiter“ */
-  const later = () => (last ? onEnd("fertig") : setIndex(index + 1));
-  const next = () => {
-    // der Hinweis steht schon da (E6)
-    if (step === "alter" && birth.invalid) field.current?.focus();
-    else later();
+  const textOf = (s: StepId, i: number) =>
+    stepText(s, { first: i === 0, ...(stats && { stats }), ...(parts && { app: parts }) });
+  const text = textOf(step, index);
+  /** Knöpfe und Punkte: ohne Gleiten */
+  const go = (i: number) => {
+    setSlide(undefined);
+    setIndex(i);
   };
+  /** „Später“ überspringt nur diesen Schritt und verwirft nichts; auf dem letzten Schritt endet es wie „Weiter“ */
+  const later = () => (last ? onEnd("fertig") : go(index + 1));
+  // der Hinweis steht schon da (E6)
+  const blocked = step === "alter" && birth.invalid;
+  const next = () => (blocked ? field.current?.focus() : later());
+
+  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    touch.current = undefined;
+    // Maus nicht: Ziehen markiert dort Text, und der Desktop hat die Knöpfe
+    if ((e.pointerType !== "touch" && e.pointerType !== "pen") || !e.isPrimary) return;
+    if (!ownsGesture(e.target, e.currentTarget)) touch.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  };
+  const onPointerUp = (e: PointerEvent<HTMLDivElement>) => {
+    const start = touch.current;
+    touch.current = undefined;
+    if (start?.id !== e.pointerId) return;
+    const dir = swipeStep({ x0: start.x, y0: start.y, x1: e.clientX, y1: e.clientY, width: window.innerWidth });
+    // Wischen beendet nie: Der Abschluss bleibt ein bewusster Tipp
+    if (dir === "weiter" && !last) {
+      next();
+      if (!blocked) setSlide({ at: index + 1, dir });
+    } else if (dir === "zurueck" && index > 0) {
+      setIndex(index - 1);
+      setSlide({ at: index - 1, dir });
+    }
+  };
+  // `key={index}` baut Text und Eingabe je Schritt neu, sonst liefe die Animation beim zweiten Wischer nicht erneut
+  const slideClass = slide?.at === index ? ` onb-in-${slide.dir === "weiter" ? "vor" : "zurueck"}` : "";
 
   return (
-    <div className={`onb-flow onb-k-${step}`}>
+    <div
+      className={`onb-flow onb-k-${step}`}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => {
+        // der Browser hat die Geste übernommen (vertikales Scrollen)
+        touch.current = undefined;
+      }}
+    >
       <div className="onb-stage">
         <div className="onb-topbar">
-          <div className="onb-dots" aria-hidden="true">
-            {steps.map((s, i) => (
-              <i key={s} className={i === index ? "on" : i < index ? "done" : undefined} />
-            ))}
+          <div className="onb-dots">
+            {steps.map((s, i) =>
+              i < index ? (
+                <button
+                  key={s}
+                  type="button"
+                  aria-label={`Zu Schritt ${i + 1}: ${textOf(s, i).title}`}
+                  onClick={() => go(i)}
+                />
+              ) : (
+                <i key={s} className={i === index ? "on" : undefined} aria-hidden="true" />
+              ),
+            )}
           </div>
           <button type="button" className="onb-skip" onClick={() => onEnd("abbruch")}>
             {ONBOARDING_TEXTS.skip}
@@ -82,7 +145,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
         </div>
         <StepArt key={step} step={step} />
       </div>
-      <div className="onb-txt">
+      <div key={`t${index}`} className={`onb-txt${slideClass}`}>
         <p className="onb-kicker">{text.kicker}</p>
         <h2
           ref={(el) => {
@@ -98,7 +161,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
         </h2>
         <p className="onb-lead">{text.lead}</p>
       </div>
-      <div className="onb-data">
+      <div key={`d${index}`} className={`onb-data${slideClass}`}>
         {step === "stadt" && <CityStep />}
         {step === "alter" && <AgeStep birth={birth} field={field} now={now} offers={offers} />}
         {step === "weg" && <WayStep {...props} />}

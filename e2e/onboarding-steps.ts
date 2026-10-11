@@ -2,13 +2,15 @@
  * Gemeinsame Wege durch das Onboarding (Plan 0033) für `onboarding.spec.ts` und `onboarding-push.spec.ts`. Zwei Specs,
  * weil `channel: "chromium"` (Schalter, E15) nur auf oberster Ebene einer Datei geht.
  */
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect } from "./fixtures.ts";
 
 declare global {
   interface Window {
     /** vom synthetischen beforeinstallprompt mitgezählt */
     __prompted?: number;
+    /** Gleit-Animationen von `.onb-txt` nach Wischgesten (Test 15f) */
+    __slides?: number;
   }
 }
 
@@ -71,6 +73,20 @@ export async function stepOrder(page: Page): Promise<string[]> {
     if (n < total) await primary(page).click();
   }
   return order;
+}
+
+/**
+ * Wischgeste aus synthetischen Pointer Events (Plan 0034, E10): `pointerdown` und `pointerup` auf `target` (Standard:
+ * die Bühne). Playwright erzeugt echte `PointerEvent`s, in Chromium und WebKit. Prüft die Logik, nicht `touch-action`.
+ */
+export async function swipe(
+  page: Page,
+  g: { from: [number, number]; to: [number, number]; target?: Locator; pointerType?: "touch" | "pen" | "mouse" },
+) {
+  const target = g.target ?? intro(page).locator(".onb-stage");
+  const init = { pointerId: 1, pointerType: g.pointerType ?? "touch", isPrimary: true, bubbles: true };
+  await target.dispatchEvent("pointerdown", { ...init, clientX: g.from[0], clientY: g.from[1] });
+  await target.dispatchEvent("pointerup", { ...init, clientX: g.to[0], clientY: g.to[1] });
 }
 
 /** Synthetisches `beforeinstallprompt` nach dem PWA-Kern (Muster `installieren.spec.ts`) */

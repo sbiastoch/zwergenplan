@@ -226,3 +226,21 @@ export const ONBOARDING_TEXTS = {
 export function stepOf(index: number, total: number): string {
   return `Schritt ${index + 1} von ${total}: `;
 }
+
+/** Richtung einer Wischgeste zwischen den Schritten (Plan 0034, E10) */
+export type SwipeStep = "weiter" | "zurueck";
+
+/** Mindestweg, Randbreite (Systemgesten) und größte Steigung dy/dx (≈ 27°) einer Wischgeste */
+export const SWIPE = { minDistance: 56, edge: 24, maxSlope: 0.5 } as const;
+
+/**
+ * Klassifiziert eine abgeschlossene Geste (E10); `width` ist die Breite des Viewports in CSS-Pixeln. Am Rand beginnende
+ * Gesten gehören dem System (Android-Zurück, Safari-Zurück/Vor), zu kurze oder eher vertikale zählen nicht.
+ */
+export function swipeStep(g: { x0: number; y0: number; x1: number; y1: number; width: number }): SwipeStep | undefined {
+  if (g.x0 < SWIPE.edge || g.x0 > g.width - SWIPE.edge) return undefined;
+  const dx = g.x1 - g.x0;
+  const dy = g.y1 - g.y0;
+  if (Math.abs(dx) < SWIPE.minDistance || Math.abs(dy) > Math.abs(dx) * SWIPE.maxSlope) return undefined;
+  return dx < 0 ? "weiter" : "zurueck";
+}

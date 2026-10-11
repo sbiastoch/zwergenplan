@@ -11,8 +11,10 @@ import {
   ONBOARDING_TEXTS,
   onboardingSteps,
   primaryLabel,
+  SWIPE,
   stepOf,
   stepText,
+  swipeStep,
   welcomeStats,
 } from "./onboarding.ts";
 import type { InstallState, PushCapability } from "./pwa.ts";
@@ -303,5 +305,39 @@ describe("LIMIT_CHOICES (E7)", () => {
     expect(LIMIT_CHOICES.map((c) => c.label)).toEqual(["20 Min.", "30 Min.", "45 Min.", "Egal"]);
     expect(LIMIT_CHOICES.map((c) => c.limit?.value)).toEqual([...LIMIT_MINUTES, undefined]);
     for (const c of LIMIT_CHOICES) if (c.limit) expect(c.limit.kind).toBe("minuten");
+  });
+});
+
+describe("swipeStep (Plan 0034, E10)", () => {
+  const width = 412;
+  const g = (x0: number, y0: number, x1: number, y1: number) => swipeStep({ x0, y0, x1, y1, width });
+
+  it("nach links weiter, nach rechts zurück", () => {
+    expect(g(300, 400, 200, 410)).toBe("weiter");
+    expect(g(100, 400, 200, 390)).toBe("zurueck");
+  });
+
+  it("Mindestweg genau 56 px", () => {
+    expect(SWIPE.minDistance).toBe(56);
+    expect(g(300, 400, 244, 400)).toBe("weiter");
+    expect(g(300, 400, 245, 400)).toBeUndefined();
+    expect(g(100, 400, 156, 400)).toBe("zurueck");
+  });
+
+  it("Start am Rand gehört dem System (24 px)", () => {
+    expect(g(23, 400, 200, 400)).toBeUndefined();
+    expect(g(389, 400, 200, 400)).toBeUndefined();
+    expect(g(24, 400, 200, 400)).toBe("zurueck");
+    expect(g(388, 400, 200, 400)).toBe("weiter");
+  });
+
+  it("Steigung höchstens 0,5", () => {
+    expect(g(300, 400, 200, 450)).toBe("weiter");
+    expect(g(300, 400, 200, 451)).toBeUndefined();
+    expect(g(300, 400, 200, 349)).toBeUndefined();
+  });
+
+  it("rein vertikal: nichts", () => {
+    expect(g(200, 100, 200, 400)).toBeUndefined();
   });
 });
