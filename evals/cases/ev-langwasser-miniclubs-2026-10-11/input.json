@@ -370,5 +370,11 @@
   "https://www.evangelisch-in-langwasser.de",
   "https://www.evangelische-termine.de/detail-bt?ID=7776210",
   "https://www.evangelische-termine.de/detail-bt?ID=8009815"
+ ],
+ "pageUrls": [
+  "https://www.evangelische-termine.de/ical?vid=560",
+  "https://www.evangelische-termine.de/ical?vid=555",
+  "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html",
+  "http://www.evangelisch-in-langwasser.de/bonhoeffer-gruppen.html"
  ]
 }

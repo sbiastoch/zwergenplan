@@ -104,6 +104,7 @@ export async function runEval(o: {
           text: input.text,
           candidates: input.candidates,
           allowedUrls: input.allowedUrls,
+          pageUrls: input.pageUrls,
           today: input.today,
         },
         signal,
@@ -205,6 +206,7 @@ export async function freezeCase(o: {
     text: f.text,
     candidates: f.candidates,
     allowedUrls: f.allowedUrls,
+    pageUrls: f.pages.map((p) => p.url),
   });
   const previous = readPreviousOffers();
   const max = addMonths(o.today, 12);

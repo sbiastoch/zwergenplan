@@ -50,5 +50,8 @@
  "candidates": [],
  "allowedUrls": [
   "https://example.org/klangwiese/termine"
+ ],
+ "pageUrls": [
+  "https://example.org/klangwiese/termine"
  ]
 }

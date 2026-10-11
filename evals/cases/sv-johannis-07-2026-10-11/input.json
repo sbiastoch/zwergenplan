@@ -61,5 +61,9 @@
  "allowedUrls": [
   "https://www.sv-johannis07.de/eltern-kind-turnen",
   "https://shop.sv-johannis07.de/de/courses/"
+ ],
+ "pageUrls": [
+  "https://www.sv-johannis07.de/eltern-kind-turnen",
+  "https://shop.sv-johannis07.de/de/courses/"
  ]
 }

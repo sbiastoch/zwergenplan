@@ -72,5 +72,9 @@
  "allowedUrls": [
   "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
   "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf"
+ ],
+ "pageUrls": [
+  "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+  "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf"
  ]
 }

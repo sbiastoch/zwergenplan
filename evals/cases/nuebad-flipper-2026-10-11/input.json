@@ -110,5 +110,8 @@
  "candidates": [],
  "allowedUrls": [
   "https://api.kursorganizer.com/graphql"
+ ],
+ "pageUrls": [
+  "https://api.kursorganizer.com/graphql"
  ]
 }

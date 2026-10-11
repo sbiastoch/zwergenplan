@@ -61,5 +61,8 @@
  "candidates": [],
  "allowedUrls": [
   "https://mainberger.hebamio.de/kursliste"
+ ],
+ "pageUrls": [
+  "https://mainberger.hebamio.de/kursliste"
  ]
 }

@@ -49,5 +49,8 @@
  "candidates": [],
  "allowedUrls": [
   "https://example.org/familienwerkstatt/programm"
+ ],
+ "pageUrls": [
+  "https://example.org/familienwerkstatt/programm"
  ]
 }

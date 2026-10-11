@@ -35,6 +35,7 @@ function caseDir(): string {
       text: `## Seite 1: ${PAGE} (html)\n## TEXT\nKrabbeltreff mittwochs 10 Uhr`,
       candidates: [],
       allowedUrls: [PAGE],
+      pageUrls: [PAGE],
     };
     const offers = starts.length
       ? [

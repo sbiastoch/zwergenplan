@@ -202,5 +202,8 @@
  "allowedUrls": [
   "https://www.evangelische-termine.de/ical?vid=556",
   "https://www.evangelische-termine.de/detail-bt?ID=8135832"
+ ],
+ "pageUrls": [
+  "https://www.evangelische-termine.de/ical?vid=556"
  ]
 }

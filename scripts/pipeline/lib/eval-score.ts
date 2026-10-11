@@ -48,6 +48,8 @@ export const EvalInput = z.strictObject({
   text: z.string(),
   candidates: z.array(Candidate),
   allowedUrls: z.array(z.string()),
+  /** URLs der Seiten in Abrufreihenfolge: nur ihre Kopfzeilen sind Schnittstellen beim Aufteilen (`lib/split.ts`) */
+  pageUrls: z.array(z.string()),
 });
 export type EvalInput = z.infer<typeof EvalInput>;
 
