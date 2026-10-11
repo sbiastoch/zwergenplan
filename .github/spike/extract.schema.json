@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "start": { "type": "string" },
+          "ageMin": { "type": ["integer", "null"] },
+          "ageMax": { "type": ["integer", "null"] },
+          "price": { "type": ["string", "null"] },
+          "availability": { "type": "string", "enum": ["frei", "wenige", "ausgebucht", "unbekannt"] }
+        },
+        "required": ["title", "start", "ageMin", "ageMax", "price", "availability"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["events"],
+  "additionalProperties": false
+}

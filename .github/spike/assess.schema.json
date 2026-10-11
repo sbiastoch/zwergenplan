@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "verdict": { "type": "string", "enum": ["aufnehmen", "verwerfen"] },
+    "reason": { "type": "string" },
+    "programUrl": { "type": ["string", "null"] }
+  },
+  "required": ["verdict", "reason", "programUrl"],
+  "additionalProperties": false
+}

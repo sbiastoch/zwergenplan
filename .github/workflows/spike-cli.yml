@@ -1,0 +1,99 @@
+# Spike Plan 0032, S1.1: `claude -p` über das Abo in Actions, nur von Hand.
+# Misst je Aufruf Exit-Code, Dauer, Usage, costUsd und die Erkennung von Auth-Fehler und Abschneiden, dazu das
+# Nutzungsfenster vor und nach den Aufrufen. Die Aufrufzeile steht in .github/spike/call.sh (nach E2).
+# Öffentliches Repo: Log und Zusammenfassung bekommen nur Metadaten, Modellantworten und rohe JSONs nur das Artefakt.
+# Jeder Aufruf-Schritt endet mit 0 (call.sh), damit alle Messungen entstehen; den Exit-Code der CLI nennt der Bericht.
+name: Spike claude -p
+
+on:
+  workflow_dispatch:
+    inputs:
+      cli_version:
+        description: "Version von @anthropic-ai/claude-code (lokal geprüft: 2.1.296)"
+        required: true
+        default: "2.1.296"
+      model:
+        description: "Modell"
+        required: true
+        default: "haiku"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spike-cli
+  cancel-in-progress: false
+
+jobs:
+  spike:
+    name: claude -p messen
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SPIKE_MODEL: ${{ inputs.model }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: CLI installieren (gepinnt)
+        env:
+          CLI_VERSION: ${{ inputs.cli_version }}
+        run: |
+          [[ "$CLI_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "cli_version muss x.y.z sein"; exit 1; }
+          [[ "$SPIKE_MODEL" =~ ^[a-z0-9.-]+$ ]] || { echo "model enthält unerlaubte Zeichen"; exit 1; }
+          npm i -g "@anthropic-ai/claude-code@${CLI_VERSION}"
+          echo "CLI: $(claude --version), Modell: $SPIKE_MODEL" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Nutzungsfenster vorher
+        if: ${{ !cancelled() }}
+        env:
+          SPIKE_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: .github/spike/window.sh vorher
+
+      - name: a) Extraktion ohne Werkzeuge
+        if: ${{ !cancelled() }}
+        env:
+          SPIKE_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: .github/spike/call.sh a-extract extract none 4
+
+      - name: b) Bewerten ohne Werkzeuge
+        if: ${{ !cancelled() }}
+        env:
+          SPIKE_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: .github/spike/call.sh b-assess assess none 4
+
+      - name: c) Websuche
+        if: ${{ !cancelled() }}
+        env:
+          SPIKE_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: .github/spike/call.sh c-search search web 8
+
+      - name: d) Auth-Fehler (ungültiges Token)
+        if: ${{ !cancelled() }}
+        env:
+          SPIKE_TOKEN: invalid
+        run: .github/spike/call.sh d-auth extract none 4
+
+      - name: e) Abschneiden (50 Ausgabe-Tokens)
+        if: ${{ !cancelled() }}
+        env:
+          SPIKE_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: .github/spike/call.sh e-truncate truncate none 4 50
+
+      - name: Nutzungsfenster nachher
+        if: ${{ !cancelled() }}
+        env:
+          SPIKE_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: .github/spike/window.sh nachher
+
+      - name: Rohdaten sichern (nur Artefakt)
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: spike-cli-${{ github.run_id }}
+          path: ${{ runner.temp }}/spike-out
+          retention-days: 7
+          if-no-files-found: warn

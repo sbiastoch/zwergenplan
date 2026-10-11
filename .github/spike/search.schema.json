@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "anbieter": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "type": "string" },
+          "warum": { "type": "string" }
+        },
+        "required": ["name", "url", "warum"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["anbieter"],
+  "additionalProperties": false
+}
