@@ -1,6 +1,6 @@
 # Plan 0032 – Daten automatisch: Nachtlauf und Entdecken über das Abo
 
-Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 misst 7 Nächte bis 2026-10-18; Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
+Status: in Umsetzung (Stufe 0 live seit 37a1ace, 2026-10-10; Stufe 1 umgesetzt 2026-10-11, S1.1 in Actions bestätigt, S1.2 misst 7 Nächte bis 2026-10-18; Stufe 2 in Arbeit (Branch `plan-0032-s2`); Ergebnisse unter „Stufe 1 – Ergebnisse“). Freigegeben 2026-10-10 vom Nutzer; N3 mit der Empfehlung entschieden.
 Datum: 2026-10-10
 Ersetzt: Plan 0015 (Hauptteil und Nachtrag B). Plan 0015, Nachtrag A (stabile IDs, ADR-Entwurf 0022) wird unverändert übernommen und ist Stufe 0 dieses Plans; seine offenen Entscheide N-I3 und N-I4 gelten weiter.
 Bezug: ADR 0002 (Hosting, Datenfluss), ADR 0003 (Datenmodell), ADR 0004 (Backpressure), ADR 0006 (Recherche-Pipeline), ADR 0011 (Fahrplan), ADR 0016 (Entwurf, wird ersetzt), ADR 0022 (Entwurf, stabile IDs), ADR 0024 und 0025 (Katalog); neu: ADR 0026 (entsteht mit der Freigabe, Inhalt in E14)
@@ -260,6 +260,17 @@ Jede Stufe endet mit grünem `pnpm verify` und grüner CI auf `main`.
 - iCal-Feeds ändern sich täglich, weil vergangene Termine herausfallen (echte, aber informationsarme Änderung); die Messung zeigt, wie stark das ins Gewicht fällt.
 - Katalogpflege (Skill, nicht hier): `hebammenpraxis-gugelrund` 404; `sternenhaus-kuf` Kandidat für `blocked`; `hebamme-eva-kauper-wunderwerk` (mymiya) liefert nur 69 Zeichen, ungeprüft.
 - `io/fetch-inputs.ts` wiederholt die Adapter-Schleife aus `candidates fetch`; sie entfällt mit E11.
+
+### Stufe 2 – Ergebnisse (laufend, 2026-10-11)
+
+Umgesetzt: `io/llm.ts`, Prompt `scripts/pipeline/prompt/extract.md` (ersetzt `references/extraction.md`; der Paket-Ablauf der alten Subagenten steht bis E11 in `references/paket.md`), `lib/extract.ts`/`io/extract.ts` (`createExtractor`), `ProviderRaw`, `lib/refresh.ts` (E5), `io/refresh.ts`, `io/nightly.ts`, `build` aus `data/raw`, `pipeline extract` und `pipeline nightly [--only] [--dry-run]`. Abweichungen und Präzisierungen:
+
+- **E2:** Das Antwortschema geht ohne `$schema` an die CLI (2.1.296 bricht sonst ab). `MAX_TURNS` 3: Bei abgeschnittener Ausgabe setzt die CLI selbst fort, jede Fortsetzung kostet die ganze Eingabe. Lokal ohne Token und ohne API-Schlüssel bleibt `HOME` das echte (Login); in Actions nie. `ANTHROPIC_API_KEY` wird durchgereicht, falls gesetzt (N-H). „Not logged in“ zählt als `auth`; ein Kontextlimit ist `fehler` des Anbieters, kein Abbruch.
+- **E4:** Die Wiederholung bekommt Meldungen und vorige Antwort; ein technischer Fehler ohne Antwort geht direkt zum Fallback. `via` setzt der Code, wenn `sourceUrl` die `detailUrl` eines Kandidaten ist. Kandidaten kommen immer aus dem Abruf, nie aus dem Text zurückgelesen.
+- **E5:** `inputHash`, `model`, `changedAt` sind in `ProviderRaw` nur gemeinsam gesetzt; fehlen sie, wurde der Anbieter nie erfolgreich extrahiert, und `build` nimmt den Vorstand. `pending` trägt das Modell. „Alt“ zählt wie `offers.json` (Einzeltermine je Datum). Ein neuer Schlüssel wird nur mit erfolgreicher Extraktion gespeichert; bei Fehler oder Einbruch bleibt `checkedAt`. Ausfall eines Sammelkalenders zählt je Anbieter nur für Quellen, die zu ihm beitragen (eigener Adapter, Quellen der Vornacht und dieses Laufs; ohne bekannte Quelle jeder Adapter). Ein extrahierter Anbieter mit `fehler` bekommt nichts zusätzlich aus dem Vorstand (keine Dubletten). Leere Eingabe ist `leer` ohne Modellaufruf. `nightly` löscht Raw-Dateien von Anbietern, die nicht mehr im Katalog stehen.
+- **E6 (für Stufe 3):** Die Ampel „mehr als 20 % fehler“ rechnet aus den Ergebnissen des Laufs, nicht aus `status`; ein zurückgehaltener Einbruch im ersten Lauf hat `status: fehler`, ist aber kein Fehler des Laufs.
+- **Schalter reihenfolgefreier Schlüssel:** `ORDER_FREE_KEY` in `lib/normalize.ts`, Standard `false`, bis zum Entscheid nach der Messung (S1.2).
+- **Probeläufe mit Haiku** (CLI-Schätzung): kleine bis mittlere Anbieter (3–74 k Zeichen) $0,003–0,017 und 5–91 s. 70–85 % der Ausgabe-Tokens sind Thinking (über die CLI nicht abschaltbar). fbs-nuernberg (309 k Zeichen) wurde abgeschnitten ($1,03, 8,6 Min.); große Eingaben werden deshalb in Teile entlang der Seitengrenzen zerlegt (in Arbeit). Inhaltliche Schwächen für das Eval: Theaterreihen zusammengefasst, Termine nur aus Kandidaten übersehen, laufende Kurse ohne Terminzahl leer, Platzstand ohne Detailseiten meist `unbekannt`.
 
 **Stufe 2 – Extraktion lokal:** `io/llm.ts` (E2), Prompt, `extractProvider`, `refreshProvider` mit den Regeln aus E5, `ProviderRaw`, `build` aus `data/raw`. Dazu die 12 Eval-Fälle und `pnpm eval`. Ergebnis: Eval mit Haiku und Sonnet in `evals/results.md`; Modellwahl durch den Nutzer.
 
