@@ -51,12 +51,13 @@ export function appStepParts(install: InstallState, push: PushCapability): AppSt
 }
 
 /**
- * Reihenfolge, einmal beim Start des Flows festgelegt (E1): Auf dem iPhone im Browser rückt „App“ an Position 2
- * (Push gibt es dort nur in der installierten App), sonst steht es zuletzt; ohne Teile entfällt es.
+ * Reihenfolge, einmal beim Start des Flows festgelegt (Plan 0033, E1; Plan 0034, E1): Auf dem iPhone im Browser steht
+ * „App“ zuerst, weil die installierte App einen eigenen Speicher hat (dort fragt das Onboarding Alter und Weg erneut;
+ * Push gibt es nur in ihr). Sonst steht es zuletzt; ohne Teile entfällt es.
  */
 export function onboardingSteps(install: InstallState, push: PushCapability): StepId[] {
   if (!appStepParts(install, push)) return ["stadt", "alter", "weg"];
-  return install === "ios" ? ["stadt", "app", "alter", "weg"] : ["stadt", "alter", "weg", "app"];
+  return install === "ios" ? ["app", "stadt", "alter", "weg"] : ["stadt", "alter", "weg", "app"];
 }
 
 /**
@@ -160,16 +161,20 @@ function appText(app: AppStepParts | undefined): StepText {
   };
 }
 
-/** Kicker, Überschrift und Lead je Schritt (E10). Ohne Daten oder ohne Angebote steht der Lead ohne Zahlen. */
+/**
+ * Kicker, Überschrift und Lead je Schritt (E10). Ohne Daten oder ohne Angebote steht der Lead ohne Zahlen. `first`:
+ * Schritt 1 des Flows. Der Kicker hängt an der Position (Plan 0034, E2): Schritt 1 heißt „Willkommen“; steht Stadt
+ * nicht zuerst (iPhone im Safari-Tab), heißt sie „Schön, dass ihr da seid“.
+ */
 export function stepText(
   step: StepId,
-  ctx: { stats?: { offers: number; providers: number }; app?: AppStepParts },
+  ctx: { first: boolean; stats?: { offers: number; providers: number }; app?: AppStepParts },
 ): StepText {
   switch (step) {
     case "stadt": {
       const { stats } = ctx;
       return {
-        kicker: "Willkommen",
+        kicker: ctx.first ? "Willkommen" : "Schön, dass ihr da seid",
         title: "Alles für Kinder unter 3 an einem Ort",
         lead:
           stats && stats.offers > 0
@@ -189,8 +194,10 @@ export function stepText(
         title: "Nur, was ihr mit Bus und Bahn schafft",
         lead: "Fahrzeit nach echtem VGN-Fahrplan, mit höchstens einem Umstieg.",
       };
-    case "app":
-      return appText(ctx.app);
+    case "app": {
+      const text = appText(ctx.app);
+      return ctx.first ? { ...text, kicker: "Willkommen" } : text;
+    }
   }
 }
 

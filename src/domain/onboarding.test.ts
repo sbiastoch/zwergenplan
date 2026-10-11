@@ -45,16 +45,16 @@ describe("appStepParts und onboardingSteps (E1)", () => {
       "menue/ja: stadt,alter,weg,app",
       "menue/verweigert: stadt,alter,weg,app",
       "menue/nein: stadt,alter,weg,app",
-      "ios/ja: stadt,app,alter,weg",
-      "ios/verweigert: stadt,app,alter,weg",
-      "ios/nein: stadt,app,alter,weg",
+      "ios/ja: app,stadt,alter,weg",
+      "ios/verweigert: app,stadt,alter,weg",
+      "ios/nein: app,stadt,alter,weg",
       "keine/ja: stadt,alter,weg,app",
       "keine/verweigert: stadt,alter,weg",
       "keine/nein: stadt,alter,weg",
     ]);
   });
 
-  it("iPhone im Browser: App an Position 2, ohne Schalter, nur der Hinweis", () => {
+  it("iPhone im Browser: App zuerst (Plan 0034, E1), ohne Schalter, nur der Hinweis", () => {
     for (const push of PUSH) expect(appStepParts("ios", push)).toEqual({ install: "ios", push: "nur-in-app" });
   });
 
@@ -216,23 +216,23 @@ describe("primaryLabel und finishLabel (E9)", () => {
 
 describe("stepText (E10)", () => {
   it("Stadt mit und ohne Daten", () => {
-    expect(stepText("stadt", { stats: { offers: 123, providers: 71 } })).toEqual({
+    expect(stepText("stadt", { first: true, stats: { offers: 123, providers: 71 } })).toEqual({
       kicker: "Willkommen",
       title: "Alles für Kinder unter 3 an einem Ort",
       lead: "123 Babykurse, Krabbelgruppen, Konzerte und Ausflüge von 71 Anbietern.",
     });
     const plain = "Babykurse, Krabbelgruppen, Konzerte und Ausflüge an einem Ort.";
-    expect(stepText("stadt", {}).lead).toBe(plain);
-    expect(stepText("stadt", { stats: { offers: 0, providers: 0 } }).lead).toBe(plain);
+    expect(stepText("stadt", { first: true }).lead).toBe(plain);
+    expect(stepText("stadt", { first: true, stats: { offers: 0, providers: 0 } }).lead).toBe(plain);
   });
 
   it("Alter und Weg", () => {
-    expect(stepText("alter", {})).toEqual({
+    expect(stepText("alter", { first: false })).toEqual({
       kicker: "Passt zum Alter",
       title: "Nur, was zu deinem Zwerg passt",
       lead: "Auch bei regelmäßigen Treffs prüfe ich jeden einzelnen Termin.",
     });
-    expect(stepText("weg", {})).toEqual({
+    expect(stepText("weg", { first: false })).toEqual({
       kicker: "Gut erreichbar",
       title: "Nur, was ihr mit Bus und Bahn schafft",
       lead: "Fahrzeit nach echtem VGN-Fahrplan, mit höchstens einem Umstieg.",
@@ -240,24 +240,50 @@ describe("stepText (E10)", () => {
   });
 
   it("drei Varianten des App-Schritts", () => {
-    expect(stepText("app", { app: { install: "knopf", push: "schalter" } })).toEqual({
+    expect(stepText("app", { first: false, app: { install: "knopf", push: "schalter" } })).toEqual({
       kicker: "Immer griffbereit",
       title: "Ein Tipp, und ich bin da",
       lead: "Auf dem Startbildschirm wie eine App. Und samstags gegen 10 Uhr eine Nachricht, was es Neues für euch gibt.",
     });
-    expect(stepText("app", { app: { install: "ios", push: "nur-in-app" } }).lead).toMatch(/^Auf dem .* samstags/);
+    expect(stepText("app", { first: false, app: { install: "ios", push: "nur-in-app" } }).lead).toMatch(
+      /^Auf dem .* samstags/,
+    );
     const installOnly = {
       kicker: "Immer griffbereit",
       title: "Ein Tipp, und ich bin da",
       lead: "Auf dem Startbildschirm wie eine App, mit eigenem Symbol und ohne Browserleiste.",
     };
-    expect(stepText("app", { app: { install: "menue", push: undefined } })).toEqual(installOnly);
-    expect(stepText("app", { app: { install: "menue", push: "verweigert" } })).toEqual(installOnly);
-    expect(stepText("app", { app: { install: undefined, push: "schalter" } })).toEqual({
+    expect(stepText("app", { first: false, app: { install: "menue", push: undefined } })).toEqual(installOnly);
+    expect(stepText("app", { first: false, app: { install: "menue", push: "verweigert" } })).toEqual(installOnly);
+    expect(stepText("app", { first: false, app: { install: undefined, push: "schalter" } })).toEqual({
       kicker: "Samstags-Nachricht",
       title: "Neues kommt von selbst",
       lead: "Samstags gegen 10 Uhr eine Nachricht, was es Neues für euch gibt.",
     });
+  });
+});
+
+describe("stepText nach Position (Plan 0034, E2)", () => {
+  it("App als Schritt 1 (iPhone im Safari-Tab): Kicker „Willkommen“, Überschrift und Lead wie sonst", () => {
+    const ios = { install: "ios", push: "nur-in-app" } as const;
+    const later = stepText("app", { first: false, app: ios });
+    expect(later.kicker).toBe("Immer griffbereit");
+    expect(stepText("app", { first: true, app: ios })).toEqual({ ...later, kicker: "Willkommen" });
+  });
+
+  it("Samstags-Variante als Schritt 1 heißt ebenfalls „Willkommen“, sonst „Samstags-Nachricht“", () => {
+    const pushOnly = { install: undefined, push: "schalter" } as const;
+    expect(stepText("app", { first: false, app: pushOnly }).kicker).toBe("Samstags-Nachricht");
+    expect(stepText("app", { first: true, app: pushOnly }).kicker).toBe("Willkommen");
+  });
+
+  it("Stadt nicht als Schritt 1: „Schön, dass ihr da seid“, Lead mit Zahlen bleibt", () => {
+    const stats = { offers: 123, providers: 71 };
+    expect(stepText("stadt", { first: false, stats })).toEqual({
+      ...stepText("stadt", { first: true, stats }),
+      kicker: "Schön, dass ihr da seid",
+    });
+    expect(stepText("stadt", { first: true, stats }).kicker).toBe("Willkommen");
   });
 });
 
