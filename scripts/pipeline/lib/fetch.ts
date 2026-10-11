@@ -61,6 +61,8 @@ const PageResult = z.object({
   ok: z.boolean(),
   reason: z.string().optional(),
   chars: z.number().optional(),
+  /** Ziel nach Redirects, falls anders: erlaubte `sourceUrl` auch für `pipeline extract --from` (E4) */
+  finalUrl: z.string().optional(),
   ms: z.number(),
 });
 
@@ -98,7 +100,9 @@ export function assembleProvider(input: {
 }): { entry: ProviderFetch; text: string } {
   const pages = input.pages.map(
     ({ url, art, ok, ms, ...rest }): z.infer<typeof PageResult> =>
-      "text" in rest ? { url, art, ok, ms, chars: rest.text.length } : { url, art, ok, ms, reason: rest.reason },
+      "text" in rest
+        ? { url, art, ok, ms, chars: rest.text.length, ...(rest.finalUrl ? { finalUrl: rest.finalUrl } : {}) }
+        : { url, art, ok, ms, reason: rest.reason },
   );
   const base = { chars: 0, candidates: input.candidates.length, pages };
   const failed = input.pages.flatMap((p) => (p.ok ? [] : [p]));

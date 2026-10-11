@@ -27,7 +27,8 @@ export interface RefreshOptions {
 }
 
 export type RefreshOutcome =
-  | { kind: "done"; result: RefreshResult; called: boolean; calls: CallRecord[] }
+  /** `warnings`: Hinweise der Prüfung zur neuen Antwort (`validateRaw`), nur wenn es welche gibt */
+  | { kind: "done"; result: RefreshResult; called: boolean; calls: CallRecord[]; warnings?: string[] }
   /** Auth oder Limit (E2): Anbieter unverändert, der Lauf endet geordnet */
   | { kind: "abort"; abort: "auth" | "limit"; calls: CallRecord[] }
   /** Lauf wurde während des Aufrufs abgebrochen: Anbieter unverändert */
@@ -63,5 +64,6 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
   const applied = applyOutcome(ctx, plan.key, outcome);
   if (applied.kind === "abort") return { kind: "abort", abort: applied.abort, calls };
   writeRaw(outDir, o.provider.id, applied.next);
-  return { kind: "done", result: applied.result, called: true, calls };
+  const warnings = outcome.kind === "ok" ? outcome.warnings : undefined;
+  return { kind: "done", result: applied.result, called: true, calls, ...(warnings ? { warnings } : {}) };
 }

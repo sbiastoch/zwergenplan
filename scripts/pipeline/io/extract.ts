@@ -6,9 +6,10 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { addMonths } from "../../../src/domain/time.ts";
-import { type Extractor, extractMessage, extractResponseSchema, runExtraction } from "../lib/extract.ts";
+import { type Extractor, extractMessage, extractResponseSchema, runExtractionInParts } from "../lib/extract.ts";
+import { PART_MAX_CHARS, splitInput } from "../lib/split.ts";
 import { loadFreeDays } from "./holidays.ts";
-import { callLlm } from "./llm.ts";
+import { callLlm, type LlmOptions } from "./llm.ts";
 
 export type {
   CallRecord,
@@ -34,15 +35,29 @@ export const EXTRACT_KEY_PARTS: { prompt: string; schema: string } = {
  */
 const MAX_TURNS = 3;
 
-export function createExtractor(opts: { model?: string; fallbackModel?: string; bin?: string } = {}): Extractor {
+export interface ExtractorOptions {
+  model?: string;
+  fallbackModel?: string;
+  /** Schwelle für das Aufteilen der Eingabe (`splitInput`), Standard `PART_MAX_CHARS` */
+  partMaxChars?: number;
+  /** für Tests: Fake-CLI und ihre Umgebung (`callLlm`), Ferien ohne Netz */
+  bin?: string;
+  env?: NodeJS.ProcessEnv;
+  freeDays?: typeof loadFreeDays;
+}
+
+export function createExtractor(opts: ExtractorOptions = {}): Extractor {
   const model = opts.model ?? process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const fallbackModel = opts.fallbackModel ?? process.env["LLM_MODEL_FALLBACK"] ?? "sonnet";
+  const partMaxChars = opts.partMaxChars ?? PART_MAX_CHARS;
+  const loadDays = opts.freeDays ?? loadFreeDays;
+  const llmOpts: LlmOptions = { ...(opts.bin ? { bin: opts.bin } : {}), ...(opts.env ? { env: opts.env } : {}) };
   // Ferien je Stichtag einmal laden; weit genug für laufende Kurse mit vergangenen Terminen (wie `pipeline build`)
   const freeDaysCache = new Map<string, Promise<Record<string, string>>>();
   const freeDaysFor = (today: string) => {
     const cached = freeDaysCache.get(today);
     if (cached) return cached;
-    const loading = loadFreeDays(addMonths(today, -12), addMonths(today, 24));
+    const loading = loadDays(addMonths(today, -12), addMonths(today, 24));
     freeDaysCache.set(today, loading);
     return loading;
   };
@@ -56,16 +71,27 @@ export function createExtractor(opts: { model?: string; fallbackModel?: string; 
       horizon: { from: input.today, to: addMonths(input.today, 12) },
       freeDays: await freeDaysFor(input.today),
     };
-    return runExtraction({
+    // Große Anbieter in Teilen (lib/split.ts); der Cache-Schlüssel bleibt der des ganzen Anbieters
+    const texts = splitInput(input.text, partMaxChars);
+    const users = texts.map((text, i) =>
+      extractMessage({
+        provider: input.provider,
+        text,
+        ctx,
+        ...(texts.length > 1 ? { part: { index: i + 1, count: texts.length } } : {}),
+      }),
+    );
+    return runExtractionInParts({
       providerId: input.provider.id,
       model,
       fallbackModel,
-      user: extractMessage({ provider: input.provider, text: input.text, ctx }),
+      users,
       ctx,
+      signal,
       call: (m, user) =>
         callLlm(
           { model: m, systemPromptFile: PROMPT_FILE, user, tools: "none", schema: SCHEMA, maxTurns: MAX_TURNS, signal },
-          opts.bin ? { bin: opts.bin } : {},
+          llmOpts,
         ),
     });
   };

@@ -5,8 +5,11 @@
  */
 import { z } from "zod";
 import type { Provider } from "../../../src/domain/schema.ts";
+import { fromBerlinLocal } from "../../../src/domain/time.ts";
+import { buildOffers } from "./build-offers.ts";
 import { type Candidate, Candidate as CandidateSchema } from "./candidate.ts";
 import { type RawContext, RawEvent, validateRaw } from "./raw.ts";
+import { mergeParts } from "./split.ts";
 
 export interface ExtractInput {
   provider: Provider;
@@ -22,6 +25,8 @@ export interface ExtractInput {
 export interface CallRecord {
   step: "extract" | "fallback";
   providerId: string;
+  /** Teil der Eingabe („2/5“), nur wenn sie aufgeteilt wurde (`splitInput`) */
+  part?: string;
   model: string;
   inputTokens: number;
   outputTokens: number;
@@ -35,7 +40,8 @@ export interface CallRecord {
 }
 
 export type ExtractOutcome =
-  | { kind: "ok"; events: RawEvent[]; model: string }
+  /** `warnings`: Hinweise aus `validateRaw` (etwa „Kurs ist schon vorbei – entfällt“), nur wenn es welche gibt */
+  | { kind: "ok"; events: RawEvent[]; model: string; warnings?: string[] }
   | { kind: "fehler"; reason: string }
   | { kind: "abort"; abort: "auth" | "limit" };
 
@@ -97,8 +103,36 @@ const CODE_FIELDS = ["providerId", "via"] as const;
 const label = (i: number, e: Record<string, unknown>) => `events.${i} („${String(e["title"] ?? "?")}“)`;
 
 /**
- * Fachliche Prüfung einer Antwort: `validateRaw` nur mit diesem Anbieter, dazu `sourceUrl` aus `allowedUrls`.
- * `providerId` und `via` setzt der Code (E4), `via` aus dem Kandidaten, dessen `detailUrl` die `sourceUrl` ist.
+ * Build-Probelauf (E4): die Events mit `buildOffers` probehalber zu Angeboten dieses einen Anbieters machen, ohne
+ * Vorstand. Findet, was `validateRaw` nicht sieht (etwa gleicher Schlüssel bei verschiedenen Merkmalen). `coveredBy`
+ * fällt weg: Der Probelauf kennt den Sammelkalender nicht, und die Beziehung prüft `data:validate` am Katalog.
+ */
+function buildProbe(events: RawEvent[], ctx: ExtractContext): string[] {
+  if (events.length === 0) return [];
+  const p = ctx.provider;
+  const provider: Provider = p.role === "anbieter" ? withoutCoveredBy(p) : p;
+
+  const at = fromBerlinLocal(`${ctx.horizon.from}T00:00`);
+  const { report } = buildOffers({
+    batches: [{ name: p.id, checkedAt: at, batch: { providers: { [p.id]: { status: "ok", checked: [] } }, events } }],
+    providers: [provider],
+    freeDays: ctx.freeDays,
+    horizon: ctx.horizon,
+    generatedAt: at,
+    sources: {},
+  });
+  return report.errors.map((e) => `Build-Probelauf: ${e}`);
+}
+
+function withoutCoveredBy(p: Extract<Provider, { role: "anbieter" }>): Provider {
+  const { coveredBy: _, ...rest } = p;
+  return rest;
+}
+
+/**
+ * Fachliche Prüfung einer Antwort: `validateRaw` nur mit diesem Anbieter, dazu `sourceUrl` aus `allowedUrls` und der
+ * Build-Probelauf. `providerId` und `via` setzt der Code (E4), `via` aus dem Kandidaten, dessen `detailUrl` die
+ * `sourceUrl` ist.
  */
 export function checkExtraction(output: unknown, ctx: ExtractContext): Checked {
   const outer = Outer.safeParse(output);
@@ -126,7 +160,9 @@ export function checkExtraction(output: unknown, ctx: ExtractContext): Checked {
     },
     { providers: [ctx.provider], expected: [id], horizon: ctx.horizon, freeDays: ctx.freeDays },
   );
-  return r.ok ? { ok: true, events: r.batch.events, warnings: r.warnings } : { ok: false, errors: r.errors };
+  if (!r.ok) return { ok: false, errors: r.errors };
+  const probe = buildProbe(r.batch.events, ctx);
+  return probe.length > 0 ? { ok: false, errors: probe } : { ok: true, events: r.batch.events, warnings: r.warnings };
 }
 
 /**
@@ -137,14 +173,18 @@ export function checkExtraction(output: unknown, ctx: ExtractContext): Checked {
  */
 export function inputsFromFetch(
   text: string,
-  entry: { candidates: number; pages: ReadonlyArray<{ url: string; ok: boolean }> },
+  entry: { candidates: number; pages: ReadonlyArray<{ url: string; ok: boolean; finalUrl?: string | undefined }> },
 ): { candidates: Candidate[]; allowedUrls: string[] } {
   const parts = text.split(/^## Kandidaten \((\d+)\)$/m);
   const count = parts.length >= 3 ? Number(parts.at(-2)) : 0;
   const section = entry.candidates > 0 && count === entry.candidates ? (parts.at(-1) ?? "") : "";
   const lines = section.split("\n").filter((l) => l.startsWith("{"));
   const candidates = lines.length === entry.candidates ? lines.flatMap(parseCandidate) : [];
-  const allowedUrls = [...entry.pages.filter((p) => p.ok).map((p) => p.url), ...candidates.map((c) => c.detailUrl)];
+  // dieselbe Menge wie im Nachtlauf (`fetchInputs`): Seiten, Redirect-Ziele, detailUrl und ticketUrl der Kandidaten
+  const allowedUrls = [
+    ...entry.pages.flatMap((p) => (p.ok ? [p.url, ...(p.finalUrl ? [p.finalUrl] : [])] : [])),
+    ...candidates.flatMap((c) => [c.detailUrl, ...(c.ticketUrl ? [c.ticketUrl] : [])]),
+  ];
   return { candidates, allowedUrls: [...new Set(allowedUrls)] };
 }
 
@@ -174,15 +214,25 @@ function catalogExcerpt(p: Provider) {
   };
 }
 
-/** Nachricht an das Modell (stdin): Datum und Horizont, Katalogauszug, dann der abgerufene Text. */
+/**
+ * Nachricht an das Modell (stdin): Datum und Horizont, Katalogauszug, dann der abgerufene Text. Bei aufgeteilter
+ * Eingabe (`part`) sagt eine Zeile, dass dies ein Teil ist; der Prompt bleibt gleich (Cache-Schlüssel, E4).
+ */
 export function extractMessage(input: {
   provider: Provider;
   text: string;
   ctx: Pick<ExtractContext, "horizon">;
+  part?: { index: number; count: number };
 }): string {
   const { from, to } = input.ctx.horizon;
+  const part = input.part
+    ? [
+        `Teil ${input.part.index} von ${input.part.count}: Die Eingabe dieses Anbieters ist auf ${input.part.count} Aufrufe verteilt. Erfasse die Angebote, die in diesem Teil stehen; die übrigen kommen aus den anderen Teilen.`,
+      ]
+    : [];
   return [
     `Heute: ${from}\nHorizont: ${from} bis ${to}`,
+    ...part,
     `## Anbieter\n${JSON.stringify(catalogExcerpt(input.provider), null, 1)}`,
     input.text,
   ].join("\n\n");
@@ -258,7 +308,13 @@ export async function runExtraction(p: {
   const settled = (a: Attempt): ExtractOutcome | undefined => {
     if (a.reply.abort) return { kind: "abort", abort: a.reply.abort };
     if (a.reply.truncated) return { kind: "fehler", reason: `Ausgabe abgeschnitten (${a.model})` };
-    if (a.checked?.ok) return { kind: "ok", events: a.checked.events, model: a.model };
+    if (a.checked?.ok)
+      return {
+        kind: "ok",
+        events: a.checked.events,
+        model: a.model,
+        ...(a.checked.warnings.length > 0 ? { warnings: a.checked.warnings } : {}),
+      };
     return undefined;
   };
   const done = (outcome: ExtractOutcome): ExtractResult => ({ outcome, calls });
@@ -284,4 +340,65 @@ export async function runExtraction(p: {
         ? `ungültig nach Wiederholung${step}: ${last.checked.errors.slice(0, 3).join("; ")}`
         : `Fehler${step ? " im Fallback" : ""} (${last.model}): ${last.reply.error ?? "keine Ausgabe"}`,
   });
+}
+
+/**
+ * Aufgeteilte Eingabe (`splitInput`): je Teil der Ablauf von `runExtraction` (Wiederholung, Fallback), dann die
+ * Events aller Teile vereinigt (`mergeParts`) und gemeinsam geprüft (`checkExtraction`, auch über die Teile hinweg).
+ * Scheitert ein Teil, ist der ganze Anbieter `fehler` (sein alter Stand bleibt, E5) und die übrigen Teile laufen
+ * nicht mehr; ein Abbruch (Auth, Limit) und ein abgebrochener Lauf (`signal`) beenden sofort. Mit einem Teil ist das
+ * genau `runExtraction`.
+ */
+export async function runExtractionInParts(p: {
+  providerId: string;
+  model: string;
+  fallbackModel: string;
+  /** Nachricht je Teil (`extractMessage` mit `part`) */
+  users: readonly string[];
+  ctx: ExtractContext;
+  call: (model: string, user: string) => Promise<ModelReply>;
+  signal?: AbortSignal;
+}): Promise<ExtractResult> {
+  const { users, ...common } = p;
+  const [only] = users;
+  if (users.length === 1 && only !== undefined) return runExtraction({ ...common, user: only });
+  const calls: CallRecord[] = [];
+  const parts: RawEvent[][] = [];
+  const models: string[] = [];
+  for (const [i, user] of users.entries()) {
+    const label = `${i + 1}/${users.length}`;
+    if (p.signal?.aborted) return { outcome: { kind: "fehler", reason: `Lauf abgebrochen vor Teil ${label}` }, calls };
+    const r = await runExtraction({ ...common, user });
+    calls.push(...r.calls.map((c) => ({ ...c, part: label })));
+    if (r.outcome.kind === "abort") return { outcome: r.outcome, calls };
+    if (r.outcome.kind === "fehler")
+      return { outcome: { kind: "fehler", reason: `Teil ${label}: ${r.outcome.reason}` }, calls };
+    parts.push(r.outcome.events);
+    if (!models.includes(r.outcome.model)) models.push(r.outcome.model);
+  }
+  const merged = mergeParts(parts, { ...p.ctx.horizon, freeDays: p.ctx.freeDays });
+  // `providerId` und `via` setzt checkExtraction wieder, aus denselben Regeln
+  const output = { events: merged.events.map(({ providerId: _p, via: _v, ...e }) => e) };
+  const checked = checkExtraction(output, p.ctx);
+  if (!checked.ok)
+    return {
+      outcome: { kind: "fehler", reason: `Teile zusammen ungültig: ${checked.errors.slice(0, 3).join("; ")}` },
+      calls,
+    };
+  const warnings = [
+    ...(merged.duplicates > 0 ? [`${merged.duplicates} gleiche Events aus mehreren Teilen nur einmal übernommen`] : []),
+    ...(merged.retitled > 0
+      ? [`${merged.retitled} Events unter dem Titel eines gleichen aus einem früheren Teil`]
+      : []),
+    ...checked.warnings,
+  ];
+  return {
+    outcome: {
+      kind: "ok",
+      events: checked.events,
+      model: models.join("+"),
+      ...(warnings.length > 0 ? { warnings } : {}),
+    },
+    calls,
+  };
 }
