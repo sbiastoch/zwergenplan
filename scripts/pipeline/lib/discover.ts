@@ -478,6 +478,12 @@ export function entryFromAssessment(
       grund: `kein Ort in der Region ${REGIONS[ctx.region].name} (außerhalb: ${outside.map((x) => x.v.address).join("; ")})`,
     };
   for (const x of outside) notes.push(`Ort außerhalb der Region weggelassen: ${x.v.name}, ${x.v.address}`);
+  const outsideHint =
+    outside.length > 0
+      ? `Nur Termine an ${inside.map((x) => x.v.name).join(", ")}; Termine an ${outside.map((x) => x.v.name).join(", ")} weglassen (außerhalb der Region)`
+          .replace(/\d{1,2}\.\d{1,2}\./g, "")
+          .slice(0, 200)
+      : undefined;
 
   const reservedIds = ctx.reserved?.ids ?? new Set<string>();
   const id = catalogId(a.name, ctx.catalog, reservedIds);
@@ -511,6 +517,9 @@ export function entryFromAssessment(
       kind: g.kind,
       ...(g.render ? { render: g.render } : {}),
       use: g.use,
+      // Der Extraktor sieht nur den Katalogauszug: ohne Hint landeten Termine an weggelassenen Orten am ersten Ort
+      // (prompt/extract.md, „Hauptort“); wie musikfuechse (Arch-Review S4c, M1)
+      ...(outsideHint && g.use === "termine" ? { hint: outsideHint } : {}),
     })),
     availability: { shown: a.availability },
     verified: ctx.today,

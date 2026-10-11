@@ -8,9 +8,14 @@
 export const MAX_REDIRECTS = 5;
 
 /** IP-Literale (v4 und v6) und `localhost`/`.local`: nie abrufen, auch nicht als Weiterleitungsziel */
-const INTERNAL_HOST = /^(localhost|[\d.]+|\[.*\])$|\.local(host)?$/i;
+const INTERNAL_HOST = /^(localhost|[\d.]+|\[.*\])$|\.(local|localhost|internal|lan|home\.arpa)$/i;
 
-export const isInternalHost = (hostname: string): boolean => INTERNAL_HOST.test(hostname);
+/**
+ * Namensbasierte Sperre (Nutzerentscheid): IP-Literale, `localhost` und lokale Suffixe, auch mit Punkt am Ende.
+ * Restrisiko: Ein öffentlicher Name, der auf eine private oder Link-Local-Adresse auflöst, kommt durch (keine
+ * DNS-Prüfung); der Abruf läuft nur im Job mit Leserecht (Plan 0032, „Stufe 4 – Umsetzung“).
+ */
+export const isInternalHost = (hostname: string): boolean => INTERNAL_HOST.test(hostname.replace(/\.$/, ""));
 
 /** Grund, warum eine Adresse nicht abgerufen wird; `undefined` = erlaubt */
 export function blockedUrl(url: string): string | undefined {

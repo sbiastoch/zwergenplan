@@ -495,6 +495,10 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
     expect(r.entry.venues.map((v) => v.name)).toEqual(["Gemeindehaus Gostenhof"]);
     expect(r.entry.venues[0]?.id).toBe("krabbelzwerge-gostenhof");
     expect(r.notes).toContain("Ort außerhalb der Region weggelassen: Bad Roth, Badstraße 1, 91154 Roth");
+    // der Extraktor erfährt es über den Hint jeder Terminseite, sonst landeten Roth-Termine am Nürnberger Ort
+    expect(r.entry.programme.map((g) => g.hint)).toEqual([
+      "Nur Termine an Gemeindehaus Gostenhof; Termine an Bad Roth weglassen (außerhalb der Region)",
+    ]);
   });
 });
 

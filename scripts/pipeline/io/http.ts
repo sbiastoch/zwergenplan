@@ -32,6 +32,8 @@ interface RequestOptions {
   fetchImpl?: typeof fetch;
 }
 
+const BODY_HEADERS = new Set(["content-type", "content-length", "content-encoding", "content-language"]);
+
 /** Weiterleitung abgelehnt (intern, zu viele Sprünge): kein Netzfehler, also keine Wiederholung */
 class RedirectError extends Error {}
 
@@ -45,12 +47,16 @@ async function fetchFollowing(url: string, opts: RequestOptions): Promise<{ res:
   if (blocked) throw new RedirectError(`Abruf abgelehnt (${blocked})`);
   const signal = AbortSignal.timeout(opts.timeoutMs ?? 60_000);
   const doFetch = opts.fetchImpl ?? fetch;
-  let current = url;
+  // normalisiert und ohne Fragment wie `res.url` bisher (Arch-Review S4c, m1)
+  const start = new URL(url);
+  start.hash = "";
+  let current = start.href;
   let method: "GET" | "POST" = opts.post === undefined ? "GET" : "POST";
   let body = opts.post;
+  let headers: Record<string, string> = { "User-Agent": UA, "Accept-Language": "de-DE,de", ...opts.headers };
   for (let hops = 0; ; hops++) {
     const res = await doFetch(current, {
-      headers: { "User-Agent": UA, "Accept-Language": "de-DE,de", ...opts.headers },
+      headers,
       signal,
       redirect: "manual",
       ...(method === "POST" ? { method, body: body ?? "" } : {}),
@@ -59,7 +65,16 @@ async function fetchFollowing(url: string, opts: RequestOptions): Promise<{ res:
     if (hop.kind === "fertig") return { res, finalUrl: current };
     await res.body?.cancel().catch(() => undefined);
     if (hop.kind === "fehler") throw new RedirectError(hop.reason);
-    current = hop.url;
+    // wie die Fetch-Spezifikation: ohne Body keine Body-Header, bei anderem Origin kein Authorization (m2)
+    const crossOrigin = new URL(hop.url).origin !== new URL(current).origin;
+    headers = Object.fromEntries(
+      Object.entries(headers).filter(([k]) => {
+        const key = k.toLowerCase();
+        if (!hop.body && BODY_HEADERS.has(key)) return false;
+        return !(crossOrigin && key === "authorization");
+      }),
+    );
+    current = new URL(hop.url).href;
     method = hop.method;
     body = hop.body ? body : undefined;
   }

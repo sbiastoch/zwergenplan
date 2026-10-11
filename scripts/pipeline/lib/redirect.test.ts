@@ -11,6 +11,10 @@ describe("blockedUrl", () => {
     expect(blockedUrl("http://[::1]/")).toMatch(/interne Adresse/);
     expect(blockedUrl("http://localhost:8080/")).toMatch(/interne Adresse/);
     expect(blockedUrl("http://drucker.local/")).toMatch(/interne Adresse/);
+    expect(blockedUrl("http://localhost./")).toMatch(/interne Adresse/);
+    expect(blockedUrl("http://metadata.google.internal/")).toMatch(/interne Adresse/);
+    expect(blockedUrl("http://router.home.arpa/")).toMatch(/interne Adresse/);
+    expect(blockedUrl("http://nas.lan/")).toMatch(/interne Adresse/);
     expect(blockedUrl("file:///etc/passwd")).toMatch(/kein http/);
   });
 });
