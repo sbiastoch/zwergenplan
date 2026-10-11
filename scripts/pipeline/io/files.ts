@@ -1,6 +1,6 @@
 /** Dateien und git für die Pipeline: Laufverzeichnis, Katalog, offers.json. Keine Logik. */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
@@ -23,9 +23,12 @@ const OFFERS = join(ROOT, "data/offers.json");
 export const RAW_DIR = join(ROOT, "data/raw");
 
 export const readJson = (file: string): unknown => JSON.parse(readFileSync(file, "utf8"));
+/** Atomar (temporäre Datei, dann umbenennen): Ein Abbruch mitten im Schreiben hinterlässt keine kaputte Datei. */
 export function writeJson(file: string, value: unknown): void {
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, `${JSON.stringify(value, null, 1)}\n`);
+  const tmp = `${file}.${process.pid}.tmp`;
+  writeFileSync(tmp, `${JSON.stringify(value, null, 1)}\n`);
+  renameSync(tmp, file);
 }
 
 export function readMeta(runDir: string): RunMeta {
@@ -108,6 +111,10 @@ export function readRawDir(dir: string): Record<string, ProviderRaw> {
     .sort())
     out[f.slice(0, -".json".length)] = ProviderRaw.parse(readJson(join(dir, f)));
   return out;
+}
+
+export function removeRaw(dir: string, providerId: string): void {
+  rmSync(join(dir, `${providerId}.json`), { force: true });
 }
 
 export function writeRaw(dir: string, providerId: string, raw: ProviderRaw): void {

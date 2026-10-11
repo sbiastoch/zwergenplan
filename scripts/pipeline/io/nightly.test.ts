@@ -38,9 +38,11 @@ const fakeFetch =
       const pages = p.pages.map((t) => ({ url: t.url, text: `${text} ${p.id}` }));
       out.providers[p.id] = { status: failed ? "fehler" : "ok", chars: 0, candidates: 0, pages: [] };
       out.texts[p.id] = `${text} ${p.id}`;
+      const common = { via: p.via, adapterIssues: {} };
       out.inputs[p.id] = failed
-        ? { status: "fehler", reason: "HTTP 503", pages: [], candidates: [], text: "", allowedUrls: [] }
+        ? { ...common, status: "fehler", reason: "HTTP 503", pages: [], candidates: [], text: "", allowedUrls: [] }
         : {
+            ...common,
             status: pages.length > 0 ? "ok" : "leer",
             pages,
             candidates: [],
@@ -195,6 +197,40 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(r.build.written).toBe(join(dirsOf.runDir, "offers.json"));
     const dry = JSON.parse(readFileSync(join(dirsOf.runDir, "offers.json"), "utf8"));
     expect(dry.offers.some((o: { title: string }) => o.title === "Offener Krabbeltreff")).toBe(true);
+  });
+
+  it("räumt den Zustand von Anbietern weg, die nicht mehr im Katalog stehen (Rücknahme, E7)", async () => {
+    const dirsOf = tempData();
+    const { extractor } = fakeExtractor();
+    await runNightly(options(dirsOf, extractor));
+    const rawDir = join(dirsOf.dataDir, "raw");
+    copyFileSync(join(rawDir, "musikschule-beispiel.json"), join(rawDir, "zurueckgenommen.json"));
+    const r = await runNightly(options(dirsOf, fakeExtractor().extractor));
+    expect(r.removed).toEqual(["zurueckgenommen"]);
+    expect(existsSync(join(rawDir, "zurueckgenommen.json"))).toBe(false);
+    expect(r.build.errors).toEqual([]);
+  });
+
+  it("wirft der Extraktor nach dem Abbruch (AbortError), zählt der Anbieter als abgebrochen, nicht als fehler", async () => {
+    const dirsOf = tempData();
+    let n = 0;
+    const extractor: Extractor = async (input, signal) => {
+      n++;
+      if (n === 1) {
+        await new Promise((r) => setTimeout(r, 20));
+        return { outcome: { kind: "abort", abort: "auth" }, calls: [] };
+      }
+      await new Promise((_, reject) =>
+        signal.addEventListener("abort", () =>
+          reject(new DOMException(`abgebrochen ${input.provider.id}`, "AbortError")),
+        ),
+      );
+      throw new Error("unerreichbar");
+    };
+    const r = await runNightly({ ...options(dirsOf, extractor), concurrency: 2 });
+    expect(r.abort).toBe("auth");
+    expect(Object.values(r.results)).toContain("abgebrochen");
+    expect(Object.values(r.results)).not.toContain("fehler");
   });
 
   it("--only bearbeitet nur die genannten Anbieter", async () => {

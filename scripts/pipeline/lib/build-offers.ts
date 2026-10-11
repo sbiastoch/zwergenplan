@@ -29,6 +29,12 @@ export interface BuildInput {
    * dem Vorstand.
    */
   perProviderStatus?: boolean;
+  /**
+   * Mit `perProviderStatus`: Anbieter, deren Events aus einer Extraktion stammen (`inputHash` in data/raw). Sie
+   * bekommen nichts aus dem Vorstand, auch bei `fehler`: Ihre alten Events stehen schon in den Rohdaten, eine
+   * zusätzliche Übernahme ergäbe Dubletten, wenn die Zuordnung eine neue ID vergibt (Arch-Review S2, m2).
+   */
+  extracted?: ReadonlySet<string>;
 }
 
 /** Datenhorizont von `data/offers.json` im Nachtlauf: heute + 12 Monate (Plan 0032, E5; ADR 0003 bisher 4). */
@@ -41,8 +47,9 @@ export const HORIZON_MONTHS = 12;
 export function batchesFromRaw(
   raws: Readonly<Record<string, ProviderRaw>>,
   providers: readonly Provider[],
-): { batches: BuildInput["batches"]; notes: string[] } {
+): { batches: BuildInput["batches"]; extracted: Set<string>; notes: string[] } {
   const notes: string[] = [];
+  const extracted = new Set<string>();
   const byId = new Map(providers.map((p) => [p.id, p] as const));
   const batches: Array<BuildInput["batches"][number]> = [];
   for (const [id, raw] of Object.entries(raws).sort(([a], [b]) => a.localeCompare(b))) {
@@ -51,6 +58,7 @@ export function batchesFromRaw(
       notes.push(`data/raw/${id}.json: kein Anbieter im Katalog – entfällt`);
       continue;
     }
+    if (raw.inputHash !== undefined) extracted.add(id);
     const venues = new Set(p.venues.map((v) => v.id));
     const events = raw.events.filter((e) => {
       if (e.providerId === id && venues.has(e.venueId)) return true;
@@ -66,7 +74,7 @@ export function batchesFromRaw(
       },
     });
   }
-  return { batches, notes };
+  return { batches, extracted, notes };
 }
 
 export interface BuildReport {
@@ -332,6 +340,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
   const carryReason = (providerId: string): string | undefined => {
     const p = providerById.get(providerId);
     if (p?.role !== "anbieter") return undefined;
+    if (input.perProviderStatus && input.extracted?.has(providerId)) return undefined;
     const s = status.get(providerId);
     if (s?.status === "fehler") return "Prüfung fehlgeschlagen";
     if (s === undefined && input.perProviderStatus) return "noch nicht bearbeitet";

@@ -5,7 +5,7 @@
  */
 import { execFile } from "node:child_process";
 import type { Provider } from "../../../src/domain/schema.ts";
-import type { Candidate } from "../lib/candidate.ts";
+import { type Candidate, isSource } from "../lib/candidate.ts";
 import {
   type AdapterOutcome,
   adapterFailureFor,
@@ -160,6 +160,15 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
   const providers: HashesFile = {};
   const texts: Record<string, string> = {};
   const inputs: Record<string, FetchedProvider> = {};
+  // Ausfälle der Sammelkalender bewertet die Regel je Anbieter (lib/refresh.ts), nicht der Abruf (Arch-Review S2, B1)
+  const adapterIssues: FetchedProvider["adapterIssues"] = {};
+  for (const [name, a] of Object.entries(adapters)) {
+    if (!isSource(name)) continue;
+    if (a.status === "fehler") adapterIssues[name] = a.reason ?? "Fehler";
+    else if (a.warnings.length > 0)
+      adapterIssues[name] = `Teilausfall (${a.warnings.length} Warnungen): ${a.warnings[0]}`;
+  }
+  const byId = new Map(catalog.map((c) => [c.id, c] as const));
   for (const p of plan.providers) {
     const pages = outcomes.filter((_, i) => tasks[i]?.provider === p.id);
     const adapterFailure = adapterFailureFor(p.via, adapters);
@@ -168,12 +177,19 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
     providers[p.id] = r.entry;
     if (r.text) texts[p.id] = r.text;
     const fetched = pages.flatMap((pg) => (pg.ok ? [pg] : []));
+    // Status ohne Adapter-Ausfall (der zählt oben im Messbericht für alle Kandidaten-Anbieter)
+    const own = adapterFailure ? assembleProvider({ pages, candidates }) : r;
+    const owner = byId.get(p.id);
+    const cover = owner?.role === "anbieter" && owner.coveredBy ? byId.get(owner.coveredBy) : undefined;
     inputs[p.id] = {
-      status: r.entry.status,
-      ...(r.entry.reason ? { reason: r.entry.reason } : {}),
+      status: own.entry.status,
+      ...(own.entry.reason ? { reason: own.entry.reason } : {}),
+      via: p.via,
+      ...(cover?.role === "aggregator" ? { ownAdapter: cover.adapter } : {}),
+      adapterIssues,
       pages: fetched.map((pg) => ({ url: pg.url, text: pg.text })),
       candidates,
-      text: r.text,
+      text: own.text,
       allowedUrls: [
         ...new Set([
           ...fetched.flatMap((pg) => [pg.url, ...(pg.finalUrl ? [pg.finalUrl] : [])]),

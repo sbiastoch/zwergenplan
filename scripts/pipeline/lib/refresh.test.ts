@@ -57,6 +57,8 @@ const fetched = (over: Partial<FetchedProvider> = {}): FetchedProvider => ({
   candidates: [],
   text: "## Seite 1\nKrabbeltreff mittwochs 10 Uhr",
   allowedUrls: ["https://example.org/familientreff/programm"],
+  via: "seiten",
+  adapterIssues: {},
   ...over,
 });
 const keyOf = (f: FetchedProvider, model = KEY_PARTS.model) =>
@@ -193,10 +195,20 @@ describe("refresh: Regeln aus Plan 0032, E5", () => {
     expect(nextOf(run(ctx({ prev: two, fetched: changed }), ok([]))).events).toEqual([]);
   });
 
-  it("Einbruch zählt Angebote (Titel und Ort), nicht Events: Einzeltermine je Datum sind ein Angebot", () => {
-    const sameTitle = Array.from({ length: 5 }, () => ev("Babykino"));
-    const prev = raw({ events: [...sameTitle, ev("Treff A")] }); // 2 Angebote
-    expect(nextOf(run(ctx({ prev, fetched: changed }), ok([])))).toMatchObject({ events: [] });
+  it("Einbruch zählt wie offers.json: Einzeltermine je Datum, sonst je Event", () => {
+    const dates = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({ start: `2026-11-${String(i + 10).padStart(2, "0")}T15:00` }));
+    const kino = (n: number) => ev("Babykino", { format: "einmalig", schedule: { kind: "dates", dates: dates(n) } });
+    // ein Event mit 6 Terminen = 6 Angebote; neu 2 Termine → Einbruch
+    expect(
+      nextOf(run(ctx({ prev: raw({ events: [kino(6)] }), fetched: changed }), ok([kino(2)]))).pending,
+    ).toBeDefined();
+    expect(
+      nextOf(run(ctx({ prev: raw({ events: [kino(6)] }), fetched: changed }), ok([kino(3)]))).pending,
+    ).toBeUndefined();
+    // erster Lauf: 6 Einzeltermin-Angebote im Vorstand gegen ein Event mit 5 Terminen → kein Einbruch
+    const first = nextOf(run(ctx({ prev: undefined, prevOfferCount: 6, fetched: changed }), ok([kino(5)])));
+    expect(first.status).toBe("ok");
   });
 
   it("Einbruch im ersten Lauf: alt = Angebote des Anbieters in data/offers.json", () => {
@@ -263,6 +275,7 @@ describe("refresh: Regeln aus Plan 0032, E5", () => {
     const empty = fetched({ status: "leer", pages: [], text: "" });
     const r = run(ctx({ prev: raw({ events: [] }), fetched: empty }));
     expect(r.called).toBe(false);
+    expect(r.kind === "keep" && r.result).toBe("leer");
     expect(nextOf(r)).toMatchObject({ status: "keine-termine", model: NO_INPUT_MODEL, inputHash: keyOf(empty) });
     // auch hier schützt der Einbruchschutz
     expect(nextOf(run(ctx({ fetched: empty }))).pending).toBeDefined();
@@ -272,6 +285,32 @@ describe("refresh: Regeln aus Plan 0032, E5", () => {
     const r = run(ctx({ fetched: changed }), { kind: "abort", abort: "limit" });
     expect(r).toMatchObject({ kind: "abort", abort: "limit" });
     expect("next" in r).toBe(false);
+  });
+});
+
+describe("refresh: Ausfall eines Sammelkalenders (E5, Arch-Review S2 B1)", () => {
+  const down = { evtermine: "HTTP 500" } as const;
+
+  it("Anbieter mit Seiten, dessen Quelle der Vornacht ausfiel: alte Events, fehler", () => {
+    const prev = raw({ sources: ["evtermine"] });
+    const r = run(ctx({ prev, fetched: fetched({ adapterIssues: down }) }));
+    expect(r.called).toBe(false);
+    expect(r.kind === "keep" && r.result).toBe("ausgefallen");
+    expect(nextOf(r)).toMatchObject({ status: "fehler", reason: "evtermine: HTTP 500", events: raw().events });
+  });
+
+  it("Ausfall eines fremden Sammelkalenders zählt nicht", () => {
+    const prev = raw({ sources: ["stadt-vk"] });
+    expect(nextOf(run(ctx({ prev, fetched: fetched({ adapterIssues: down }) }))).status).toBe("ok");
+  });
+
+  it("nur Kandidaten: der eigene Adapter (coveredBy) zählt; ohne bekannte Quellen jeder", () => {
+    const viaOwn = fetched({ via: "kandidaten", ownAdapter: "evtermine", adapterIssues: down, pages: [] });
+    expect(nextOf(run(ctx({ prev: undefined, fetched: viaOwn }))).status).toBe("fehler");
+    const other = fetched({ via: "kandidaten", ownAdapter: "stadt-vk", adapterIssues: down, pages: [] });
+    expect(planRefresh(ctx({ prev: undefined, fetched: other })).kind).toBe("extract");
+    const unknown = fetched({ via: "kandidaten", adapterIssues: down, pages: [] });
+    expect(nextOf(run(ctx({ prev: undefined, fetched: unknown }))).status).toBe("fehler");
   });
 });
 
@@ -289,7 +328,7 @@ describe("assignVia: via setzt der Code (E4)", () => {
     occurrences: [{ start: "2026-10-20T10:00" }],
   });
 
-  it("Events mit Kandidaten-URL bekommen dessen Quelle, alle anderen keine; die Angabe des Modells zählt nicht", () => {
+  it("via nur über sourceUrl = detailUrl; ein Link (url) auf eine Kandidatenseite zählt nicht, Angaben des Modells auch nicht", () => {
     const cands = [candidate("evtermine", "https://ev.de/1"), candidate("stadt-vk", "https://stadt.de/2")];
     const out = assignVia(
       [
@@ -299,7 +338,7 @@ describe("assignVia: via setzt der Code (E4)", () => {
       ],
       cands,
     );
-    expect(out.map((e) => e.via)).toEqual(["evtermine", "stadt-vk", undefined]);
+    expect(out.map((e) => e.via)).toEqual(["evtermine", undefined, undefined]);
     expect("via" in (out[2] ?? {})).toBe(false);
   });
 
@@ -320,11 +359,10 @@ describe("assignVia: via setzt der Code (E4)", () => {
 });
 
 describe("offerUnits", () => {
-  it("zählt Angebote eines Anbieters nach Titel und Ort", () => {
+  it("zählt die Angebote eines Anbieters", () => {
     const { file } = loadFixtures();
     const offers: OffersFile["offers"] = file.offers;
-    const own = offers.filter((o) => o.providerId === "familientreff-beispiel");
-    expect(offerUnits(offers, "familientreff-beispiel")).toBe(new Set(own.map((o) => `${o.venueId}|${o.title}`)).size);
+    expect(offerUnits(offers, "familientreff-beispiel")).toBe(4);
     expect(offerUnits(offers, "gibt-es-nicht")).toBe(0);
   });
 });

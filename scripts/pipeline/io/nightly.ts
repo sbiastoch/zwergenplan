@@ -7,13 +7,13 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { addMonths, toBerlinIso } from "../../../src/domain/time.ts";
 import { batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
-import { SOURCES, type Source } from "../lib/candidate.ts";
+import { isSource } from "../lib/candidate.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract-types.ts";
 import { runLimited } from "../lib/fetch.ts";
 import { offerUnits, type RefreshResult } from "../lib/refresh.ts";
 import { planFetch } from "../lib/select.ts";
 import type { FetchResult, fetchInputs } from "./fetch-inputs.ts";
-import { readCatalog, readPreviousOffers, readRawDir, writeJson, writeOffers } from "./files.ts";
+import { readCatalog, readPreviousOffers, readRawDir, removeRaw, writeJson, writeOffers } from "./files.ts";
 import { loadFreeDays } from "./holidays.ts";
 import { refreshProvider } from "./refresh.ts";
 
@@ -52,11 +52,11 @@ export interface NightlyReport {
   cached: number;
   abort?: "auth" | "limit";
   budgetHit: boolean;
+  /** Zustand von Anbietern, die nicht mehr im Katalog stehen (gelöscht, im Trockenlauf nur gemeldet) */
+  removed: string[];
   adapters: FetchResult["adapters"];
   build: { offers: number; sessions: number; errors: string[]; notes: string[]; written?: string };
 }
-
-const isSource = (s: string): s is Source => (SOURCES as readonly string[]).includes(s);
 
 export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const started = performance.now();
@@ -119,23 +119,37 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
         calls.push(...r.calls);
         if (r.kind === "done") {
           results[provider.id] = r.result;
-          if (!r.called && r.result === "unveraendert") cached++;
+          if (!r.called && r.result !== "ausgefallen") cached++;
         } else if (r.kind === "abort") {
           results[provider.id] = "abort";
           abort ??= r.abort;
           controller.abort();
         } else results[provider.id] = "abgebrochen";
       } catch (e) {
-        // ein Programmfehler bei einem Anbieter kostet nur diesen Anbieter (sein Zustand bleibt)
+        // Abbruch während des Aufrufs (AbortError) oder Programmfehler: nur dieser Anbieter, sein Zustand bleibt
+        if (controller.signal.aborted) {
+          results[provider.id] = "abgebrochen";
+          return;
+        }
         results[provider.id] = "fehler";
         console.error(`✗ ${provider.id}: ${(e as Error).message}`);
       }
     },
   );
 
+  // Zustand von Anbietern, die nicht mehr im Katalog stehen (Rücknahme per Revert, E7), räumt der Lauf weg;
+  // sonst bliebe data:validate rot (Arch-Review S2, M1). Im Trockenlauf nur gemeldet.
+  const removed: string[] = [];
+  const anbieter = new Set(catalog.filter((p) => p.role === "anbieter").map((p) => p.id));
+  for (const id of Object.keys(readRawDir(rawDir)))
+    if (!anbieter.has(id)) {
+      removed.push(id);
+      if (!o.dryRun) removeRaw(rawDir, id);
+    }
+
   // build aus data/raw, im Trockenlauf überlagert vom Zustand dieses Laufs
   const raws = { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(outDir) : {}) };
-  const { batches, notes } = batchesFromRaw(raws, catalog);
+  const { batches, extracted, notes } = batchesFromRaw(raws, catalog);
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
   const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
   const sources = Object.fromEntries(
@@ -150,6 +164,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     generatedAt: toBerlinIso(new Date()),
     sources,
     perProviderStatus: true,
+    extracted,
   });
   let written: string | undefined;
   if (file) {
@@ -164,6 +179,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     cached,
     ...(abort ? { abort } : {}),
     budgetHit,
+    removed,
     adapters: fetched.adapters,
     build: {
       offers: report.offers,

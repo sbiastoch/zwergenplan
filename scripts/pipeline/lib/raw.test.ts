@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { expansionWindow, ProviderRaw, type RawContext, validateRaw } from "./raw.ts";
+import { expansionWindow, ProviderRaw, providerRawIssues, type RawContext, validateRaw } from "./raw.ts";
 
 const { providers } = loadFixtures();
 const ctx: RawContext = {
@@ -227,5 +227,36 @@ describe("ProviderRaw (Plan 0032, E5)", () => {
     );
     expect(issues({ ...base, ...hashed, checkedAt: "2026-10-12T03:00" })).not.toEqual([]); // Offset Pflicht
     expect(issues({ ...base, ...hashed, via: "x" })).not.toEqual([]); // strikt
+  });
+});
+
+describe("providerRawIssues (data:validate, Plan 0032 E13)", () => {
+  const T = "2026-10-12T03:00:00+02:00";
+  const ok = {
+    events: [],
+    status: "keine-termine",
+    checkedAt: T,
+    sources: [],
+    inputHash: "a".repeat(64),
+    model: "haiku",
+    changedAt: T,
+  };
+  const anbieter = new Set(["familientreff-beispiel"]);
+
+  it("gültig, Schemafehler, verwaist, fremde Events", () => {
+    expect(providerRawIssues("f.json", "familientreff-beispiel", ok, anbieter)).toEqual([]);
+    expect(providerRawIssues("f.json", "familientreff-beispiel", { ...ok, status: "?" }, anbieter)[0]).toMatch(
+      /^f\.json: status: /,
+    );
+    expect(providerRawIssues("f.json", "weg", ok, anbieter)[0]).toContain("weg ist kein Anbieter im Katalog");
+    const event = treff;
+    expect(
+      providerRawIssues(
+        "f.json",
+        "familientreff-beispiel",
+        { ...ok, status: "ok", events: [{ ...event, providerId: "x" }] },
+        anbieter,
+      ),
+    ).toEqual(["f.json: Event „Offener Krabbeltreff“ gehört zu x"]);
   });
 });
