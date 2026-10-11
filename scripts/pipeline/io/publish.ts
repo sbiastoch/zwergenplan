@@ -28,7 +28,10 @@ export function publishNightly(o: { git: Git; message: string; validate: () => v
   o.validate();
   // alle Änderungen liegen in NIGHTLY_PATHS (oben geprüft); `data` statt der Liste, weil fehlende Pfade git stören
   git(["add", "-A", "--", "data"]);
-  if (git(["diff", "--cached", "--name-only"]) === "") return { pushed: false };
+  const staged = git(["diff", "--cached", "--name-only"]).split("\n").filter(Boolean);
+  if (staged.length === 0) return { pushed: false };
+  const stray = staged.filter((p) => !inNightlyPaths(p));
+  if (stray.length > 0) throw new Error(`Fremde Pfade im Commit, nichts committet:\n  ${stray.join("\n  ")}`);
   git(["commit", "-q", "-m", o.message]);
   try {
     git(["pull", "-q", "--rebase", "origin", "main"]);
@@ -40,6 +43,8 @@ export function publishNightly(o: { git: Git; message: string; validate: () => v
     }
     throw new Error(`Konflikt oder Fehler beim Nachholen von origin/main, nichts gepusht: ${(e as Error).message}`);
   }
+  // Fremde Commits (etwa ein entfernter Anbieter) können den Stand ungültig machen: erneut prüfen, sonst kein Push
+  o.validate();
   git(["push", "-q", "origin", "HEAD:main"]);
   return { pushed: true };
 }

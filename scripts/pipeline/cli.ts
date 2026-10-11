@@ -351,7 +351,7 @@ function readNightly(runDir: string): { report: NightlyReport | undefined; raws:
 
 /** Bericht des Nachtlaufs (E10) mit Ampel nach E6. */
 async function status() {
-  const runDir = args[0] ?? join(ROOT, "runs", today());
+  const runDir = args[0] || join(ROOT, "runs", today());
   const { report, raws } = readNightly(runDir);
   const live = await liveStatus();
   const gates = stepOutcome(values.gates, "--gates");
@@ -565,8 +565,13 @@ function publishAfterNightly(runDir: string) {
     const r = publishNightly({
       git,
       message: nightlyCommitMessage(report, raws),
+      // Prüfung ohne den Push-Header des Workflows (GIT_CONFIG_*): Schreibrecht nur für git (Arch-Review S3, M1)
       validate: () =>
-        execFileSync("node", ["scripts/validate-data.ts", "--against-deployed"], { cwd: ROOT, stdio: "inherit" }),
+        execFileSync("node", ["scripts/validate-data.ts", "--against-deployed"], {
+          cwd: ROOT,
+          stdio: "inherit",
+          env: Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("GIT_CONFIG_"))),
+        }),
     });
     actionsOutput("pushed", String(r.pushed));
     print(r.pushed ? "✓ Nachtlauf veröffentlicht" : "Keine Änderung – nichts veröffentlicht");

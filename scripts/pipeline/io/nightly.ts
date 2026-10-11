@@ -156,6 +156,8 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
       }
     },
   );
+  // Auch die zuletzt laufenden Anbieter können die Grenze reißen (E8: erreicht → rot)
+  brake ??= brakeHit(calls, brakes);
 
   // Zustand von Anbietern, die nicht mehr im Katalog stehen (Rücknahme per Revert, E7), räumt der Lauf weg;
   // sonst bliebe data:validate rot (Arch-Review S2, M1). Im Trockenlauf nur gemeldet.

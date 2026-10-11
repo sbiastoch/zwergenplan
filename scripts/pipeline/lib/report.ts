@@ -89,7 +89,11 @@ const FAILED: ReadonlySet<ProviderState> = new Set<ProviderState>(["fehler", "au
 const CHANGED: ReadonlySet<ProviderState> = new Set<ProviderState>(["extrahiert", "pending-uebernommen"]);
 const UNDONE: ReadonlySet<ProviderState> = new Set<ProviderState>(["offen", "abgebrochen", "abort"]);
 const MAX_FAILED_SHARE = 0.2;
-const MAX_LIVE_LAG_HOURS = 24;
+/**
+ * „Live-Stand mehr als einen Tag hinter main“ (E6), gemessen im nächsten Nachtlauf: Der Daten-Commit der Vornacht ist
+ * dann rund 24 Std. alt. Mit 20 Std. meldet schon die nächste Nacht rot, wenn er nicht live ging (Arch-Review S3).
+ */
+const MAX_LIVE_LAG_HOURS = 20;
 
 export function changedProviders(r: NightlyReport): number {
   return Object.values(r.results).filter((s) => CHANGED.has(s)).length;
@@ -181,7 +185,7 @@ export function assessRun(
   }
   if (ctx.gates === "failure" || ctx.gates === "cancelled") red.push("Gates rot (data:validate, check:fast)");
   if (ctx.push === "failure" || ctx.push === "cancelled") red.push("Push gescheitert (Konflikt oder Prüfung)");
-  if (ctx.live.kind === "hinter" && ctx.live.hours > MAX_LIVE_LAG_HOURS)
+  if (ctx.live.kind === "hinter" && ctx.live.hours >= MAX_LIVE_LAG_HOURS)
     red.push(`Live-Stand ${ctx.live.hours} Std. hinter main (${ctx.live.commit} → ${ctx.live.head})`);
   if (ctx.live.kind === "unbekannt") yellow.push(`Live-Stand unbekannt: ${ctx.live.reason}`);
   return { light: red.length > 0 ? "rot" : yellow.length > 0 ? "gelb" : "gruen", red, yellow };
@@ -201,7 +205,7 @@ function liveLine(live: LiveStatus): string {
   return `Live-Stand: unbekannt (${live.reason})`;
 }
 
-function costSection(c: CostSummary): string[] {
+function costSection(c: CostSummary, results: NightlyReport["results"]): string[] {
   const out = [
     `## Kosten (${COST_LABEL})`,
     "",
@@ -216,8 +220,14 @@ function costSection(c: CostSummary): string[] {
   }
   const top = c.providers.slice(0, 10);
   if (top.length > 0) {
-    out.push("", "| Anbieter (teuerste 10) | Aufrufe | davon ohne gültige Antwort | USD |", "|---|---|---|---|");
-    for (const p of top) out.push(`| ${p.providerId} | ${p.calls} | ${p.failed} | ${usd(p.costUsd)} |`);
+    // Ergebnis zeigt teure Nächte ohne Ertrag (etwa fehler erst in der gemeinsamen Prüfung der Teile, Stufe 2)
+    out.push(
+      "",
+      "| Anbieter (teuerste 10) | Aufrufe | davon ohne gültige Antwort | Ergebnis | USD |",
+      "|---|---|---|---|---|",
+    );
+    for (const p of top)
+      out.push(`| ${p.providerId} | ${p.calls} | ${p.failed} | ${results[p.providerId] ?? "–"} | ${usd(p.costUsd)} |`);
   }
   return out;
 }
@@ -292,7 +302,7 @@ export function renderStatus(s: StatusInput): string {
     for (const [id, list] of warned) for (const w of list) out.push(`- ${id}: ${cell(w)}`);
     out.push("", "</details>");
   }
-  out.push("", ...costSection(summarizeCosts(r.calls, { cached: r.cached })));
+  out.push("", ...costSection(summarizeCosts(r.calls, { cached: r.cached }), r.results));
   if (s.fetchReport) out.push("", "<details><summary>Abruf</summary>", "", s.fetchReport.trim(), "", "</details>");
   return `${out.join("\n")}\n`;
 }
