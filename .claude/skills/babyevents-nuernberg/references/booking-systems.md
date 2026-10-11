@@ -28,7 +28,7 @@ Für diese Systeme liefern Skripte oder WebFetch einen Fehler oder nur leere Sei
 
 - **Eversports** (Studio Herzschlag, Die FamilienBox, Wolf Pack Yoga): Cloudflare blockt Skripte mit 403. Ersatz für die Termine ist die HTML-Kalenderseite des Anbieters.
 - **Calendly**, **Nimbuscloud** (dance maxX; Login nötig)
-- **Eventim-Inhouse** (Staatstheater, Sternenhaus; Shop antwortet oft erst nach > 30 s), Canva-Kursplan (Mutherstudio), Kurabu-Kalender (TSV 1846), pekip.de-Gruppensuche.
+- **Eventim-Inhouse** (Staatstheater, Sternenhaus; Shop antwortet oft erst nach > 30 s; seit 2026-10-11 liefert der Host HTTP/2 INTERNAL_ERROR (Sternenhaus nutzt deshalb die Kalender-API mit AUSVERKAUFT)), Canva-Kursplan (Mutherstudio), Kurabu-Kalender (TSV 1846), pekip.de-Gruppensuche.
 
 Ohne lesbare Platzangabe bekommt ein Termin `availability: unbekannt` mit dem Buchungslink; der Anbieter gilt trotzdem als `ok`, sofern die Termine selbst lesbar waren.
 

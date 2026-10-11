@@ -400,23 +400,19 @@
   programme:
     - url: https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html
       kind: html
-      use: termine
-    - url: https://kukuq.eventim-inhouse.de/webshop/webticket/shop?production=97
-      kind: html
-      render: browser
-      use: verfuegbarkeit
+      use: info
     - url: https://www.nuernberg.de/internet/kuf_kultur/sternenhaus_kinder_familien.html
       kind: html
       use: info
-    - url: https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM={von}&USERNAME=KundF
+    - url: https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM={von}&USERNAME=KundF
       kind: json-api
       use: termine
-      hint: nach 'ab 2' filtern
+      hint: nach 'ab 2' filtern; AUSVERKAUFT 1 = ausgebucht
   availability:
     shown: ja
-    how: Im Eventim-Inhouse-Webshop sind freie Plätze bzw. 'ausverkauft' je Vorstellung sichtbar (JS)
+    how: Veranstaltungskalender-API liefert je Termin AUSVERKAUFT (1 = ausverkauft); Tickets im Eventim-Inhouse-Webshop
     system: Eventim Inhouse (kukuq)
-  verified: 2026-10-04
+  verified: 2026-10-11
   notes:
     - Theater, Musik, Geschichten, Ballett, Märchenstunde mit dem Christkind. Ein Ticket brauchen Kinder ab 3 Jahren; bei Veranstaltungen, die sich ausdrücklich an Kinder ab 2 richten, schon ab 2. Ein Teil des Programms ist also für 2–3-Jährige. Die Altersangabe steht je Veranstaltung.
     - Einziger KUF-Ort innerhalb des Rings; nur saisonal (Advent). Für 0-1 J. kaum geeignet; Stücke 'ab 2' gezielt suchen. Liegt an der Kinderweihnacht (Hans-Sachs-Platz).
@@ -428,6 +424,8 @@
     - "[nuernberg.de/cgi-bin/ajax_vk.pl] Alle Sternenhaus-Termine (ortID 6239) inkl. Beschreibung mit Altersangabe"
     - "[nuernberg.de/cgi-bin/ajax_vk.pl] FROM durch Laufbeginn ersetzen"
     - START_DATUM steht seit Plan 0031 als {von} in der URL
+    - "[nuernberg.de/…/sternenhaus.html] 2026-10-11: auf info, weil jede Vorstellung sonst doppelt kam (Seite und Kalender-API mit verschiedenen Titeln und Verfügbarkeiten); Termine nur aus der API"
+    - "[kukuq.eventim-inhouse.de] 2026-10-11: ganzer Host liefert HTTP/2 INTERNAL_ERROR, über HTTP/1.1 keine Antwort; als Quelle entfernt, weil ein Ausfall den ganzen Anbieter auf fehler setzt. Verfügbarkeit jetzt aus AUSVERKAUFT der Kalender-API (83 Termine 30.11.–22.12.)"
   venues:
     - id: sternenhaus-kuf
       name: Sternenhaus – Kinderkultur in der Vorweihnachtszeit (KUF)
@@ -1938,19 +1936,18 @@
   programme:
     - url: https://www.gugelrund.de/home.html#kurse
       kind: html
-      use: info
-    - url: https://www.gugelrund.de/kurse-2/babymassage-kurs-2.html
-      kind: html
       use: termine
+      hint: "Abschnitt Kurse: nur Kurse mit Baby (Babymassage o. ä.); Geburtsvorbereitung und Rückbildung sind ohne Kind"
   availability:
     shown: nein
     how: Keine Platzanzeige
     system: eigenes CMS (Contao)
-  verified: 2026-10-04
+  verified: 2026-10-11
   notes:
     - Schwerpunkt Hausgeburt. Rückbildung mit Kind (Hebamme 'Flotter Storch') laut Drittquelle auf Anfrage – auf der Seite nicht explizit als 'mit Baby' markiert.
     - "[gugelrund.de/home.html#kurse] Kursliste auf der Startseite, je Kurs eine Detailseite /kurse-2/<slug>.html mit Datum"
     - "[gugelrund.de/kurse-2/babymassage-kurs-2.html] Babymassage Fr 10:15-11:15, 5x, 65 € (aktuell 18.09.-16.10.2026)"
+    - "[gugelrund.de/home.html#kurse] 2026-10-11: babymassage-kurs-2.html HTTP 404, Kursliste bis 02/2027 nur Geburtsvorbereitung und Rückbildung ohne Baby; Startseite als Terminquelle, damit eine neue Babymassage auffällt"
   venues:
     - id: hebammenpraxis-gugelrund
       name: Hebammenpraxis Gugelrund
@@ -2270,8 +2267,8 @@
         headers:
           Origin: https://app.nuebad-flipper.kursorganizer.com
           x-application-type: end-user-app
-        body: '{"query":"query { coursesWithPaginationPublic(filters:{courseTypeIds:[\"0ed81fb6-56cc-42e8-b95a-30bbe188e192\",\"35c6f0c1-fb50-40f4-b773-69aeaa674806\",\"f43e193d-e1f5-41de-a752-8eb1a240b7e8\",\"7acf112a-29a6-453c-b5c6-4387864556fa\"]}, options:{limit:200,offset:0}) { total items { id startDateTime freePlaces maxAttendees waitListCount location { name } courseType { name } } } }"}'
-      hint: startDateTime ist UTC; Kurstitel aus courseType.name, Plätze aus freePlaces und waitListCount
+        body: '{"query":"query { coursesWithPaginationPublic(filters:{courseTypeIds:[\"0ed81fb6-56cc-42e8-b95a-30bbe188e192\",\"35c6f0c1-fb50-40f4-b773-69aeaa674806\",\"f43e193d-e1f5-41de-a752-8eb1a240b7e8\",\"7acf112a-29a6-453c-b5c6-4387864556fa\"]}, options:{limit:200,offset:0}) { total items { id startDateTime freePlaces maxAttendees waitListCount location { name } courseType { name } lessons { startDateTime endDateTime } } } }"}'
+      hint: Zeiten UTC; Einzeltermine in lessons (laufende Kurse mit allen künftigen Terminen übernehmen); Kurstitel aus courseType.name, Plätze aus freePlaces und waitListCount
     - url: https://nuernbergbad.nuernberg.de/service/kurse/schwimmkurse-kinder-mit-eltern/
       kind: html
       use: info
@@ -2279,7 +2276,7 @@
     shown: ja
     how: Kursorganizer zeigt pro Kurs Status (frei/ausgebucht -> Warteliste); API-Feld freePlaces (0 = voll) und waitListCount
     system: Kursorganizer
-  verified: 2026-10-04
+  verified: 2026-10-11
   notes:
     - "Alle NürnbergBad-Schwimmkurse laufen über Nübad-Flipper. Baby-/Kleinkindkurse finden laut API nur im Langwasserbad statt (Sept-Dez-2026-Block: alle 6 Babykurse belegt, Warteliste). Neue Blöcke werden im Kalender-Tertial freigeschaltet (Anmeldephase Sept-Dez läuft). Büro Mo-Fr 9-13 Uhr, 0911 5808330. Südstadt/Katzwang/Nordost nur Kurse ab 4 J. mit Elternteil."
     - "Anmeldestart: Anmeldephase je Kalender-Tertial; für Sept–Dez 2026 läuft sie, Kurse online buchbar"
@@ -2287,6 +2284,7 @@
     - "[xn--nbad-flipper-dlb.de/kurskategorie/el] Übersicht Eltern-Kind-Kurse (Mutter/Vater-Baby 3-12 Mon., Mutter/Vater-Kind 12-24 Mon., Kleinkind ab 2 / ab 3 J.); je Kurs Detailseite /kurs/<slug>/ mit Kursorganizer-iFrame"
     - "[xn--nbad-flipper-dlb.de/kurs/mutter-vate] Detailseite; Termine nur im iFrame app.nuebad-flipper.kursorganizer.com (courseTypeIds=0ed81fb6-56cc-42e8-b95a-30bbe188e192)"
     - "[api.kursorganizer.com/graphql] Kursorganizer-GraphQL, POST mit Headern Origin: https://app.nuebad-flipper.kursorganizer.com, x-application-type: end-user-app; Query coursesWithPaginationPublic(filters:{courseTypeIds:[...]}, options:{limit,offset}) liefert startDateTime (UTC), location.name, freePlaces, maxAttendees, waitListCount. courseTypeIds: Baby 0ed81fb6-56cc-42e8-b95a-30bbe188e192, Kind 12-24 Mon. 35c6f0c1-fb50-40f4-b773-69aeaa674806, Kleinkind ab 2 f43e193d-e1f5-41de-a752-8eb1a240b7e8, ab 3 7acf112a-29a6-453c-b5c6-4387864556fa"
+    - "[api.kursorganizer.com/graphql] 2026-10-11: startDateTime ist nur der erste Termin (alle Sept.); Folgetermine über lessons { startDateTime endDateTime } (Introspektion gesperrt, Feld aus Fehlermeldung). Alle 13 Kurse voll mit Warteliste, Block ab Januar 2027 noch nicht freigeschaltet"
     - "[nuernbergbad.nuernberg.de/service/kurse/] Infoseite der NürnbergBad (keine Termine), verlinkt zur Flipper-Buchung"
   venues:
     - id: nuebad-flipper
@@ -2550,11 +2548,12 @@
   programme:
     - url: https://studioherzschlag.de/unsere-kurse/kalender/
       kind: html
-      use: termine
+      use: info
     - url: https://www.eversports.de/org/widget/26b05081-b56c-40ba-b067-13b4c5f9d3f8?venueId=64b8caca-3439-453b-8ee5-c287efa66ef5
       kind: html
       render: browser
       use: termine
+      blocked: { reason: "eversports: Cloudflare 403, gerendert nur der Titel 'Studio HERZSCHLAG'", since: 2026-10-11 }
     - url: https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/
       kind: html
       use: termine
@@ -2577,7 +2576,14 @@
       use: termine
     - url: https://studioherzschlag.de/kurse-ab-september/
       kind: html
-      use: info
+      use: termine
+      hint: Hauptquelle aller Kursreihen mit Datum, Wochentag, Uhrzeit und Einheiten
+    - url: https://studioherzschlag.de/angebot/babymassage/
+      kind: html
+      use: termine
+    - url: https://studioherzschlag.de/angebot/bewegungsnest/
+      kind: html
+      use: termine
     - url: https://studioherzschlag.de/angebot/herzzeit/
       kind: html
       use: termine
@@ -2585,10 +2591,12 @@
       kind: html
       render: browser
       use: termine
+      blocked: { reason: "eversports: Cloudflare 403, gerendert nur der Titel 'Studio HERZSCHLAG'", since: 2026-10-11 }
     - url: https://www.eversports.de/org/widget/f9abdcd5-4aec-4af7-93af-9aff5537ce11?venueId=64b8caca-3439-453b-8ee5-c287efa66ef5
       kind: html
       render: browser
       use: termine
+      blocked: { reason: "eversports: Cloudflare 403, gerendert nur der Titel 'Studio HERZSCHLAG'", since: 2026-10-11 }
     - url: https://studioherzschlag.de/angebot/yoga-mit-baby/
       kind: html
       use: termine
@@ -2608,7 +2616,7 @@
     shown: teilweise
     how: "Eigene Kurse: Eversports mit Platzanzeige (JS); externe Partnerkurse (mit * markiert): Terminliste ohne Platzanzeige, Buchung per Formular/Warteliste"
     system: Eversports + WordPress-Formulare
-  verified: 2026-10-04
+  verified: 2026-10-11
   notes:
     - Sehr großes 0-3-Angebot; Events z. B. Laternenumzug 3.11.2026, Halloween-Spielecafé 27./28.10. Evtl. Überschneidung mit Familien-/Sportstudio-Liste.
     - Kurse finden im Studio Herzschlag statt (dort auch im Kalender gelistet) – bei Dedup beachten.
@@ -2628,6 +2636,7 @@
     - "[eversports.de/org/widget/97017cfe…] Eversports-Kalender (alle Termine, Drop-ins mit 🔷); Cloudflare blockt Skript-/WebFetch-Zugriff (403) -> nur im Browser"
     - "[eversports.de/org/widget/f9abdcd5…] Eversports-Kursreihen-Widget (Buchung Kursreihen)"
     - "[studioherzschlag.de/angebot/yoga-mit-baby] Yoga & Aerial Yoga mit Baby (Di/Do), Baby bis 1,5 J.; weitere Angebote: /angebot/pilates-fitness-mit-baby/, /angebot/outdoor-fitness-mit-baby/ (Di 10:00 + 15:00, Wöhrder See), /angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/ (8-36 Mon.), /angebot/eltern-kind-turnen/ (ab 1,5 J.)"
+    - "[studioherzschlag.de/kurse-ab-september/] 2026-10-11: Hauptquelle (statisch, alle Kursreihen) war nur info; eversports-Widgets per Cloudflare gesperrt; Kalenderseite ohne Zeiten auf info. Nacht 2026-10-11 lieferte nur 2 von 43 Angeboten (Einbruch zurückgehalten)"
   venues:
     - id: studio-herzschlag
       name: Studio HERZSCHLAG (ehem. Knirpse & Co FamilienTreffpunkt)

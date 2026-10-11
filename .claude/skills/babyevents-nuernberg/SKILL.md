@@ -70,12 +70,10 @@ Fertig ist eine Änderung, wenn der Trockenlauf das Erwartete liefert, `pnpm dat
 
 **Neuer Anbieter von Hand** (etwa aus `references/excluded.md`, wenn sich die Lage geändert hat): Eintrag nach `references/catalog.md` anlegen, Orte mit `pnpm pipeline geocode "<Adresse>"`. `pnpm data:validate` nennt die freie `publicId` („`<id>`: `publicId` fehlt – frei ist `<wert>`“); genau diesen Wert übernehmen. Dann `pnpm pipeline nightly --only <id> --dry-run` als Ertragsbeweis.
 
-**Offene Pflegepunkte** (Stand 2026-10-11, aus Plan 0032):
-- `hebammenpraxis-gugelrund`: Programmseite HTTP 404; neue URL suchen oder `skipCrawl`.
-- `sternenhaus-kuf`: eventim-Seite mit Bot-Schutz; im Browser prüfen, dann `blocked` mit Beleg.
+**Offene Pflegepunkte** (Stand 2026-10-11, nach der Katalogpflege):
+- `studio-herzschlag`: Haiku liefert für den Teil mit PEKiP, MusikZauber und SinnesZauber reproduzierbar `{"events": []}`, obwohl die Seiten Termine nennen. Sonnet erfasst alles (58 Events). Der Einbruchschutz hält den Bestand, bis die Pipeline das abfängt.
 - `hebamme-eva-kauper-wunderwerk`: mymiya liefert nur 69 Zeichen; Kursliste über die miya-URL aus `references/booking-systems.md` prüfen.
-- `studio-herzschlag`: die drei eversports-Widgets liefern nur „Studio HERZSCHLAG“; andere Kalenderseite oder `render: browser` prüfen.
-- `nuebad-flipper`: Die GraphQL-Abfrage liefert je Kurs nur den ersten Termin; Folgetermine im `request` mit abfragen (danach Eval-Fall neu einfrieren, Abschnitt 4).
+- `hebammenpraxis-gugelrund`: derzeit keine Kurse mit Baby; die Startseite ist Terminquelle, eine neue Babymassage fällt dem Nachtlauf auf.
 
 ## 4. Eval-Fälle anlegen
 
