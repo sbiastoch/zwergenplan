@@ -283,16 +283,23 @@
   .onb-tile .c4 {
     --c: #a6db5e;
   }
+  /* Vier Chips in einer Zeile, sonst 2 × 2 statt „Egal“ allein in voller Breite, bei großer Schrift je einer (Browser-Review) */
   .onb-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    container-type: inline-size;
   }
   .onb-chips .chip {
-    flex: 1 1 4.5rem;
+    flex: 1 1 max(calc(50% - 4px), 7rem);
     min-height: 46px;
     padding: 0 6px;
     justify-content: center;
+  }
+  @container (min-width: 20rem) {
+    .onb-chips .chip {
+      flex-basis: 0;
+    }
   }
   .onb .hint.ok {
     animation: onb-plop 0.38s cubic-bezier(0.3, 1.7, 0.5, 1);
