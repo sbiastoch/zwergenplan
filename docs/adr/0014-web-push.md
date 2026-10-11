@@ -66,3 +66,10 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
 - Ein Startpunkt, der außerhalb des Kind-Sheets gewählt wird, wirkt in der Nachricht erst nach dem nächsten Öffnen des Kind-Sheets (kein Haken im Start-Bundle).
 - Neue Gates für `push-worker/` (Typen, Unit-Tests, dependency-cruiser, knip) und die Fixture-Option `pushWorker: "mock"` im E2E-Drittanbieter-Wächter.
 - Weitere Push-Anlässe (Anmeldung öffnet, Merkliste) brauchen einen eigenen Plan, gegebenenfalls ein eigenes ADR.
+
+## Nachtrag (2026-10-11): Schalter auch im Onboarding (Plan 0033, E8)
+
+- Der Schalter heißt seit Plan 0033 überall „Samstags-Nachricht“ (N2); der Workflow heißt weiter „Wochen-Nachricht“.
+- Er steht zusätzlich im letzten Schritt „App“ des Onboardings (`AppStep` in `src/ui/app-extras/AppSection.tsx`, Hook `usePushSwitch` mit `reconcile: false`). Dort gibt es **keinen Abgleich** beim Anzeigen und **kein laufendes Spiegeln**: Den Anfangszustand liest `push.subscription()` lokal ohne Request, gespiegelt wird einmal beim Einschalten (`enable(mirrorData())`). Requests an den Push-Dienst und an den Worker entstehen also nur nach dem Tipp; Punkt 4 gilt unverändert. Das Kind-Sheet behält Abgleich und Spiegeln (`reconcile: true`).
+- Auf dem iPhone im Safari-Tab zeigt der Schritt keinen Schalter, nur den Hinweis, dass die Nachricht nur in der installierten App kommt.
+- Beim Erstbesuch gibt es vor `load` noch keine Registrierung. `pushCapability()` zählt deshalb nur, ob Service Worker, `PushManager` und `Notification` vorhanden sind (`nein` beim Notausgang `__SW_OFF__`, `verweigert` bei `denied`). `enable` wartet auf `ready` oder darauf, dass `start()` ohne Registrierung endet (`data-sw="aus"`, ADR 0013, Nachtrag 2026-10-11), dann „Das Gerät konnte die Benachrichtigung nicht einrichten …“; ein festes Zeitlimit gibt es nicht.

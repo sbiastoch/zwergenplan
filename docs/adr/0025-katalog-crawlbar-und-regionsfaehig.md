@@ -32,3 +32,9 @@ Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung 
 - Die Migration von 223 Programmeinträgen braucht Urteil; sie läuft über Subagenten mit Prüfskript (Plan 0031, E6).
 - Plan 0015 bekommt Nachtrag B: Abruf nach `render`/`use`/`blocked`, Prompt mit `hint`, Cache-Schlüssel ohne `notes`.
 - Eine zweite Region braucht: Eintrag in `regions.ts`, Katalog-Einträge mit `region`, und die Folgearbeiten außerhalb des Datenvertrags (Fahrplan, Stadtteile, Texte, Feiertage; `docs/ideas.md`).
+
+## Nachtrag (2026-10-11): `Region.population` vor der zweiten Region (Plan 0033, E5)
+
+- **Abweichung von Punkt 1** („Weitere Region-Felder … kommen mit der zweiten Region“): `Region` bekommt schon jetzt `population` (Einwohner, auf Tausend gerundet, Quelle und Stichtag im Kommentar von `src/domain/regions.ts`; Nürnberg 527 000 aus 526 606 am 31.12.2023, Bayerisches Landesamt für Statistik). Der Kopfkommentar von `regions.ts` nennt das.
+- **Grund:** Nutzerwunsch für das Onboarding, Stadt-Kacheln „sortiert nach den größten Städten, die wir unterstützen“, und darunter ein Dropdown für weitere. Die reine Funktion `cityChoices` (`src/domain/onboarding.ts`) sortiert danach; eine zweite Region ist damit nur ein Eintrag mit Daten. Das Plan-Review hatte das Feld bis zur zweiten Region zurückstellen wollen (Plan 0033, Review L6, abgelehnt).
+- **Keine Schemaänderung:** `src/domain/schema.ts` liest weiter nur `REGION_IDS` und `bbox`, `schema/*.json` bleibt gleich. Die Stadtwahl wird nicht gespeichert, solange es eine Region gibt (`docs/ideas.md`).

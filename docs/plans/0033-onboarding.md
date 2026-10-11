@@ -147,7 +147,7 @@ export function onboardingSteps(install: InstallState, push: PushCapability): St
 | `src/domain/onboarding-gate.ts` | Start | `onboardingGate` |
 | `src/domain/onboarding.ts` | nur Chunk `assets/onboarding/` | Schritte, `appStepParts`, Städte, Texte, Alterstipp, Labels (E1, E5–E10) |
 | `src/data/preferences.ts` | Start | E2 |
-| `src/data/push.ts` | Chunk `assets/app/` | `pushCapability`, Zeitlimit für `ready` (E8) |
+| `src/data/push.ts` | Chunk `assets/app/` | `pushCapability`, `swGivenUp` statt Zeitlimit für `ready` (E8) |
 | `src/ui/Onboarding.tsx` | Start, Lader | `preloadOnboarding()`, `Onboarding(props: OnboardingProps)`, `useLazy(loadOnboarding, () => loaded)` |
 | `src/ui/onboarding-types.ts` | Start (nur Typen) | `OnboardingProps`, `OnboardingEnd = "fertig" \| "abbruch" \| "spaeter"`, `AppStepProps` |
 | `src/domain/pwa.ts` | Start (Typen) | `PushCapability`; **`InstallApi` als Interface hierher verschoben** (Review H2): `app-data-only-lazy` verbietet aus `src/ui` auch Typ-Importe aus `src/data/pwa.ts` (`tsPreCompilationDeps: true`). `src/data/pwa.ts` implementiert es (`export const install: InstallApi`) und importiert den Typ aus der Domäne; `AppSection.tsx` und `onboarding-types.ts` importieren ihn von dort. |
@@ -420,7 +420,7 @@ Regeln:
   - Fertig, wenn: drei Werte mit Commit-SHA im Plan stehen.
 - **S1 Domäne (test-first)**: `onboarding-gate.ts`, `onboarding.ts` (E1, E5, E6, E9, E10), `regions.ts` (`population`, Quelle im Kommentar), `PushCapability` in `domain/pwa.ts`.
   - Fertig, wenn: Unit-Tests erst rot, dann grün und `pnpm verify` grün.
-- **S2 Daten (test-first)**: `preferences.ts` (E2), `push.ts` (`hasServiceWorker`, `swGivenUp`, `pushCapability`; `pwa.ts` setzt `data-sw="aus"`, Zeitlimit für `ready`), `InstallApi` nach `src/domain/pwa.ts` (E4).
+- **S2 Daten (test-first)**: `preferences.ts` (E2), `push.ts` (`hasServiceWorker`, `swGivenUp`, `pushCapability`; `pwa.ts` setzt `data-sw="aus"`, `enable` wartet per `Promise.race` statt Zeitlimit), `InstallApi` nach `src/domain/pwa.ts` (E4).
   - Fertig, wenn: Unit-Tests grün, `pnpm verify` grün und `push.spec` lokal grün.
 - **S3 Refaktor ohne Verhaltensänderung**: `useBirthDateInput` aus `KidSheet`, `usePushSwitch` aus `PushControls`.
   - Fertig, wenn: `pnpm verify` grün, `pnpm e2e:local e2e/app.spec.ts e2e/push.spec.ts e2e/installieren.spec.ts` grün und Start-JS ± 0,05 kB.
@@ -456,6 +456,7 @@ Regeln:
   - Fertig, wenn: `pnpm verify` grün, `pnpm e2e:local --affected` sowie `-- --project=iphone-15` für die Specs `onboarding` und `installieren` grün sind und `e2e-map.test.ts` grün.
 - **S7 Doku** (siehe unten).
   - Fertig, wenn: `check-docs` grün.
+  - Umsetzung (S7, 2026-10-11): neues ADR 0027 „App-Chunk beim Erststart vorladen“ (Nummer gegen `docs/adr/` und alle Remote-Branches geprüft), Verweis als Nachtrag in ADR 0013; Nachträge in ADR 0014 (Schalter im Onboarding, Begriff) und ADR 0025 (`population`); Zeile S5 in der Delta-Tabelle von ADR 0012; `docs/architecture.md` (Schichten, Datenfluss, Wegzeit-Anlass, Chunk-Wächter für CSS, Ladezeitpunkt des PWA-Kerns, Kanal `data-sw`, Absatz „Onboarding“, Push, `localStorage`-Schlüssel und Privatsphäre-Nachweis); README (Einleitung, Installation, Samstags-Nachricht); zwei Einträge in `docs/ideas.md`; „Risiken“ ohne festes Zeitlimit. Offen für Code: Kommentare in `src/data/pwa.ts` (Kopf und `store`, Ladezeitpunkt nur „nach `load`“ bzw. „mit dem Abschnitt Als App“) und die Screenshot-Ansicht `onboarding` (E15), die `.claude/skills/browser-review/SKILL.md` dann nicht eigens aufführen muss (die Liste der Ansichten steht im Kopf von `scripts/screenshots.ts`).
 - **S8 Reviews**: `/arch-review` (neues Modul, über 200 Zeilen), `/browser-review` lokal mit `--views=onboarding,kind,start` hell/dunkel, 320/200 %, quer.
   - Fertig, wenn: kein Blocker offen ist und jede Zeile der Checkliste beantwortet ist.
 - **S9 Commit, Push, CI auf `main`, `/browser-review live`**, auf einem echten Android und iPhone (Safari-Tab und installierte App).
@@ -478,7 +479,7 @@ Stand 2026-10-11: Der Nutzer hat das Mockup freigegeben („Passt so super, bitt
 - **Erster Besuch langsamer sichtbar**: Neue Nutzer sehen das Onboarding erst nach Chunk und `site.json`. Gegenmittel: Vorladen im Initializer und Cover. Gemessen in Test 14. Die LCP-Gates der Liste messen weiter ohne Onboarding.
 - **Rolldown-Abspaltung** (rolldown#11026) durch einen weiteren Chunk mit geteilten Start-Modulen. Die Gruppe `$initial` sollte halten, Gate ist der Chunk-Wächter (S4 mit realistischem Stub).
 - **Android-Zurück**: Chromes CloseWatcher kann ohne `cancel` schließen. Dann stimmt `open` in React nicht mehr. Der Flow nutzt kein zurückgehaltenes `cancel`. Optional `onClose`-Ereignis zusätzlich abfangen, im Browser-Review auf echtem Android prüfen.
-- **Push beim Erstbesuch**: Die Registrierung kommt nach `load`, `enable` wartet auf `ready`. Ohne Service Worker (Notausgang, blockiert) greift das Zeitlimit von 10 s mit „Das Gerät konnte die Benachrichtigung nicht einrichten …“.
+- **Push beim Erstbesuch**: Die Registrierung kommt nach `load`, `enable` wartet auf `ready`. Ein festes Zeitlimit gibt es nicht (E8, Umsetzung S2): Endet `start()` ohne Registrierung (Notausgang, blockiert, gescheitert), setzt es `data-sw="aus"`, `swGivenUp()` gewinnt das Rennen gegen `ready`, und es kommt „Das Gerät konnte die Benachrichtigung nicht einrichten …“. Restrisiko: Hängt die Registrierung, ohne zu scheitern, bleibt der Schalter bei „Wird eingeschaltet …“.
 - **`beforeinstallprompt`** kommt in Chrome erst nach Engagement-Heuristik oder gar nicht. Dann zeigt Android den Menü-Hinweis (wie heute im Kind-Sheet).
 - **App-Extras-Budget** 7,1 kB kann reißen (E13).
 - **E2E-Abdeckung**: Specs mit eigenem Kontext (`browser.newContext`) sehen das Onboarding, wenn sie `skipOnboarding` vergessen. Nach S4 läuft die volle Suite in der CI auf dem Branch.

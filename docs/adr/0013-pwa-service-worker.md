@@ -51,3 +51,8 @@ Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt 
 ## Nachtrag (2026-10-06): Wochen-Push (Plan 0017, ADR 0014)
 
 - **Punkt 5 geändert durch ADR 0014 (Punkt 6):** `src/data/push.ts` liest `navigator.serviceWorker.getRegistration()` und im Tipp-Handler `ready` selbst, nur lesend für `pushManager`. Registrieren, aktualisieren und auf Nachrichten hören bleibt allein `src/data/pwa.ts`. Grund: Eine Injektion über den Lader kostete Start-JS (Plan 0017, E9).
+
+## Nachtrag (2026-10-11): App-Chunk beim Erststart (Plan 0033, ADR 0027)
+
+- **Punkt 5 geändert durch ADR 0027:** Beim ersten Start ohne Flag `zwergenplan.einfuehrung` (und ohne Deep-Link) lädt der Lader des Onboardings das Modul `src/data/pwa.ts` samt `AppSection` schon im `useState`-Initializer von `App`, nicht erst nach `load`. Die Registrierung (`start()`) bleibt nach `load` in `pwa-start.ts`, der Kern bleibt außerhalb des Start-Bundles.
+- `start()` setzt zusätzlich `data-sw="aus"` auf `<html>`, wenn es ohne Registrierung endet (Notausgang, blockiert, gescheitert). Darauf wartet `enable` in `src/data/push.ts` (Plan 0033, E8); `data-pwa` heißt weiter nur „bereit“.

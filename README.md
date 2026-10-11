@@ -1,6 +1,6 @@
 # Zwergenplan
 
-Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnberg: Krabbelgruppen, Babykurse, Elterntreffs, Babykonzerte, Theater und Museen. Mit Alters- und Kategorienfilter und Kalenderdateien je Termin.
+Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnberg: Krabbelgruppen, Babykurse, Elterntreffs, Babykonzerte, Theater und Museen. Mit Alters- und Kategorienfilter und Kalenderdateien je Termin. Beim ersten Öffnen führt eine kurze Einführung durch Alter, Startpunkt und App (Plan 0033); sie lässt sich überspringen und im Kind-Sheet unter „Einführung ansehen“ erneut aufrufen.
 
 **Live:** https://zwergenplan.app/
 
@@ -20,7 +20,7 @@ Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnber
 
 Der Zwergenplan ist eine installierbare Web-App (Plan 0011, ADR 0013). Offline öffnet er mit dem zuletzt geladenen Stand.
 
-- **Android (Chrome):** Im Kind-Sheet („Dein Zwerg“) unter „Als App“ auf „Zum Startbildschirm hinzufügen“ tippen, oder im Browser-Menü „App installieren“ wählen.
+- **Android (Chrome):** Im Kind-Sheet („Dein Zwerg“) unter „Als App“ oder im letzten Schritt der Einführung auf „Zum Startbildschirm hinzufügen“ tippen, oder im Browser-Menü „App installieren“ wählen.
 - **iPhone/iPad (Safari):** Teilen-Symbol, dann „Zum Home-Bildschirm“. Die App hat dort einen eigenen Speicher (Spike h). Die App startet leer: Alter, Merkliste und Stadtteil dort noch einmal eintragen.
 - **Desktop (Chrome, Edge):** Symbol „Installieren“ in der Adressleiste.
 
@@ -28,7 +28,7 @@ Icons entstehen aus `design/icon.svg` mit `node scripts/icons.ts` (die PNGs in `
 
 ### Samstags-Nachricht (Push)
 
-Samstags gegen 10 Uhr kommt eine Nachricht aufs Gerät, auch wenn es nichts Neues gibt (Plan 0017, ADR 0014). Eingeschaltet wird sie im Kind-Sheet unter „Als App“ (Schalter „Samstags-Nachricht“); dort lassen sich auch Such-Abos anlegen („Aktuelle Suche abonnieren“). Auf dem iPhone geht das nur in der installierten App.
+Samstags gegen 10 Uhr kommt eine Nachricht aufs Gerät, auch wenn es nichts Neues gibt (Plan 0017, ADR 0014). Eingeschaltet wird sie im Kind-Sheet unter „Als App“ oder im letzten Schritt der Einführung (Schalter „Samstags-Nachricht“); dort lassen sich auch Such-Abos anlegen („Aktuelle Suche abonnieren“). Auf dem iPhone geht das nur in der installierten App.
 
 - **Zuschnitt auf dem Gerät:** Der Service Worker rechnet die Nachricht aus Such-Abos, Alter und Wegzeit ab dem gespeicherten Startpunkt. Der Push-Worker kennt nur das Abo.
 - **Push-Worker:** `push-worker/` (Cloudflare Worker mit KV, `https://zwergenplan-push.sbiastoch.workers.dev`). Deploy von Hand: `pnpm push:deploy`, danach zeigt `/version` den Commit. Secret im Worker: `pnpm exec wrangler secret put PUSH_ADMIN_TOKEN -c push-worker/wrangler.toml`.
