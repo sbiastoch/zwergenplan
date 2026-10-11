@@ -191,7 +191,8 @@ export function aggregatorFinds(
       const known = new Set(urlsOf(p).flatMap((u) => normalizeUrl(u) ?? []));
       const hosts = new Set(urlsOf(p).flatMap((u) => hostOf(u) ?? []));
       const host = hostOf(c.organizerUrl);
-      if (!known.has(n) && host && hosts.has(host))
+      // nur Unterseiten: die Startseite eines bekannten Anbieters ist keine neue Programmseite
+      if (!known.has(n) && host && hosts.has(host) && n !== host)
         hints.add(`${p.id}: neue Programmseite? ${c.organizerUrl} (aus ${c.source})`);
       continue;
     }
@@ -206,15 +207,28 @@ export function aggregatorFinds(
   return { finds: [...finds.values()], hints: [...hints] };
 }
 
-/** Verzeichnisse (E7.1): Links auf fremde Hosts; ob sie neu sind, entscheidet der Vorfilter. */
+/** Website eines Hosts: die letzten zwei Teile (`st-georg.stadtkirche-nuernberg.de` → `stadtkirche-nuernberg.de`) */
+const siteOf = (host: string) => host.split(".").slice(-2).join(".");
+
+/** Linktext, der nach einem Veranstalter klingt (Verzeichnisse nennen Pfarreien, Vereine, Praxen) */
+const PROVIDER_WORDS =
+  /pfarr|gemeinde|kirche|\bst\.|sankt|famili|zentrum|verein|e\. ?v\.|praxis|hebamm|kita|krippe|musikschule|schwimm|turn|sport|bildung|treff|caf[eé]/i;
+
+/**
+ * Verzeichnisse (E7.1): Links auf andere Websites, deren Text nach einem Veranstalter oder nach Babys klingt; ob
+ * sie neu sind, entscheidet der Vorfilter.
+ */
 export function directoryFinds(dir: Provider, links: ReadonlyArray<{ label: string; url: string }>): Find[] {
-  const own = new Set(urlsOf(dir).flatMap((u) => hostOf(u) ?? []));
+  const own = new Set(urlsOf(dir).flatMap((u) => (hostOf(u) ? [siteOf(hostOf(u) ?? "")] : [])));
   const out = new Map<string, Find>();
   for (const l of links) {
     const host = hostOf(l.url);
     const n = normalizeUrl(l.url);
-    const label = l.label.trim();
-    if (!host || !n || own.has(host) || FOREIGN_HOSTS.test(host) || label.length < 3 || out.has(n)) continue;
+    const label = l.label.replace(/\s+/g, " ").trim();
+    // Navigation (Impressum, Presse, Ticketshop) und Seiten derselben Website kosten nur Bewertungen: Der
+    // Trockenlauf vom 2026-10-11 verwarf 35 von 45 solcher Links (Plan 0032, „Stufe 4 – Umsetzung“)
+    if (!host || !n || own.has(siteOf(host)) || FOREIGN_HOSTS.test(host) || out.has(n)) continue;
+    if (!(isRelevant(label) || PROVIDER_WORDS.test(label))) continue;
     out.set(n, {
       name: label,
       url: l.url,
