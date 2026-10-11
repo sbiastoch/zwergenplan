@@ -33,7 +33,8 @@ afterEach(() => {
         // schon beendet
       }
     }
-    rmSync(d, { recursive: true, force: true });
+    // Der Enkel aus „flock -o“ kann nach dem SIGKILL noch kurz schreiben (ENOTEMPTY, Nachtlauf 2026-10-11)
+    rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });
 
