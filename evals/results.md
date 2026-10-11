@@ -4,7 +4,7 @@ Ergebnisse der Evals (Plan 0032, E9): Entdecken neuer Anbieter und Extraktion de
 
 ## Entdecken
 
-Eine Zeile je Entdecken-Eval (`pnpm pipeline discover --dry-run --hide …`, Plan 0032, E9): bekannte Anbieter werden für einen Trockenlauf aus dem Katalog ausgeblendet. **Wiedergefunden**: würde aufgenommen. **Gefunden**: wiedergefunden oder als Kandidat bewertet und verworfen (Grund in Klammern). **Falsch aufgenommen**: aufgenommen, nicht ausgeblendet und von Hand als falsch beurteilt; **neu** sind aufgenommene, nicht ausgeblendete und passende Anbieter. Modell `LLM_MODEL_DISCOVER` für Suche und Bewerten, `LLM_MODEL_EXTRACT` für den Ertragsbeweis.
+Eine Zeile je Entdecken-Eval (`pnpm pipeline discover --dry-run --hide …`, Plan 0032, E9): bekannte Anbieter werden für einen Trockenlauf aus dem Katalog ausgeblendet. **Wiedergefunden**: würde aufgenommen. **Gefunden**: von einer Quelle (Sammelkalender, Verzeichnis, Websuche) als Kandidat geliefert, gleich ob danach aufgenommen, verworfen, im Vorfilter gelandet oder nicht bewertet; misst die Breite der Quellen, „Wiedergefunden“ den ganzen Weg (Bericht: alles außer „nicht gefunden“). **Falsch aufgenommen**: aufgenommen, nicht ausgeblendet und von Hand als falsch beurteilt; **neu** sind aufgenommene, nicht ausgeblendete und passende Anbieter. Modell `LLM_MODEL_DISCOVER` für Suche und Bewerten, `LLM_MODEL_EXTRACT` für den Ertragsbeweis.
 
 | Datum | Modell | Ausgeblendet | Wiedergefunden | Gefunden | Nicht gefunden | Falsch aufgenommen | Neu | Aufrufe | Kosten (USD, Schätzung) | Dauer | je Anbieter |
 |---|---|---|---|---|---|---|---|---|---|---|---|

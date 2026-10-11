@@ -378,6 +378,8 @@ Umgesetzt, soweit es ohne den Modus `live` des Entdeckens geht. Offen bleiben di
 - **ADRs:** ADR 0026 angenommen (Nachtlauf live seit 7bd84f2), ADR 0016 „ersetzt durch ADR 0026“, Verweise in der Statuszeile von ADR 0002, 0003, 0004, 0006, 0022 (Vergabeweg der IDs) und 0024 (`validate-raw` entfällt). Plan 0015 liegt mit `ersetzt durch Plan 0032` im Archiv.
 - **Doku:** `CLAUDE.md` (Stolperfallen, Daten: Datenfluss, `data/raw` und `data/discover` nie von Hand außer `abgelehnt`, IDs über `pipeline nightly` bzw. `pipeline discover`), `docs/architecture.md` (Datenfluss, `refreshProvider` erzeugt den Inhalt von `data/raw`, das Entdecken kopiert nur den Ertragsbeweis (Arch-Review S4, Minor 9), Horizont durch ADR 0026 gedeckt, Entdecken-Eval).
 - **Arch-Review (2026-10-11):** kein Blocker, 2 Major, 6 Minor; eingearbeitet: M1 (nicht bewertete Kandidaten als eigener Ausgang, G3 mit `--hide` angehoben), M2 (ADR 0022 und 0026 zum Vergabeweg), Minor 1–5; Minor 6 (Export `schema/raw-batch.schema.json` ohne Abnehmer) begründet in `docs/architecture.md`, Streichen als Restpunkt. Die Prüfung „nur Regionen des Laufs“ hat keinen Test, weil es heute nur eine Region gibt.
+- **WebKit-Flake** `e2e/saved.spec.ts:443` („Worker failed to load“, am 2026-10-11 dreimal in der CI): behoben mit e63b1e1, der Test wartet per `mapSettled` vor dem Neuladen auf die Karte; lokal 40/40 grün, CI auf `main` grün.
+- **Nacharbeit zum Arch-Review** (Branch `plan-0032-review-fix`): M1 `pnpm pipeline nightly --build-only` baut `data/offers.json` ohne Abruf und Modell aus `data/raw` und Katalog neu (gleicher Build wie der Nachtlauf, `buildFromRaw` in `io/nightly.ts`) und räumt Zustände entfernter Anbieter weg; Schritt der Rücknahme im Skill und in `references/catalog.md`, Test „Anbieter aus dem Katalog entfernt“. m1 „gefunden“ im Entdecken-Eval heißt „von einer Quelle geliefert“ (auch Vorfilter und nicht bewertet), `evals/results.md` an den Code angeglichen, weil es die Breite der Quellen getrennt vom ganzen Weg misst; Test mit Vorfilter-Fall. m2 `--hide` hebt G3 auch mit `--bootstrap` an.
 
 **Restpunkte** (kommen bei der Archivierung nach `docs/ideas.md`):
 
@@ -395,7 +397,6 @@ Umgesetzt, soweit es ohne den Modus `live` des Entdeckens geht. Offen bleiben di
 - `LLM_MODEL_EXTRACT` steht in keinem Workflow; ein Modellwechsel ist eine Änderung an `nightly.yml` und `discover.yml`.
 - Export `schema/raw-batch.schema.json` streichen, wenn ihn niemand mehr liest.
 - Adapterabruf zweimal geschrieben: `fetchAggregatorCandidates` (`io/discover.ts`) und die Schleife in `io/fetch-inputs.ts`.
-- WebKit-Flake `e2e/saved.spec.ts:443` („Worker failed to load“), am 2026-10-11 dreimal in der CI.
 
 
 ### Stufe 3 – Trockenlauf und Freigabe (2026-10-11)

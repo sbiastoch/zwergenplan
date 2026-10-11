@@ -1,13 +1,24 @@
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { parse, stringify } from "yaml";
+import { validateDataset } from "../../../src/domain/dataset.ts";
 import type { ExtractOutcome, Extractor, ExtractResult } from "../lib/extract.ts";
 import { RawEvent } from "../lib/raw.ts";
 import type { FetchPlan } from "../lib/select.ts";
 import type { FetchResult } from "./fetch-inputs.ts";
-import { readRaw } from "./files.ts";
-import { runNightly } from "./nightly.ts";
+import { readCatalog, readPreviousOffers, readRaw } from "./files.ts";
+import { runBuildOnly, runNightly } from "./nightly.ts";
 
 const FIXTURES = new URL("../../../tests/fixtures/", import.meta.url);
 const TODAY = "2026-10-06";
@@ -309,5 +320,44 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     const r = await runNightly({ ...options(dirsOf, extractor), only: ["familientreff-beispiel"] });
     expect(Object.keys(r.results)).toEqual(["familientreff-beispiel"]);
     expect(seen).toEqual(["familientreff-beispiel"]);
+  });
+});
+
+describe("runBuildOnly (nightly --build-only, Arch-Review S5, M1)", () => {
+  it("Anbieter aus dem Katalog entfernt: seine Angebote und sein Zustand fallen weg, validateDataset grün", async () => {
+    const dirsOf = tempData();
+    // Abruf des Theaters fällt aus: Zustand „fehler“, seine Angebote bleiben aus dem Vorstand
+    await runNightly({ ...options(dirsOf, fakeExtractor().extractor), fetch: fakeFetch(["theater-beispiel"]) });
+    const rawDir = join(dirsOf.dataDir, "raw");
+    expect(readRaw(rawDir, "theater-beispiel")).toMatchObject({ status: "fehler" });
+    const before = readPreviousOffers(join(dirsOf.dataDir, "offers.json"));
+    if (!before) throw new Error("offers.json fehlt");
+    expect(before.offers.some((o) => o.providerId === "theater-beispiel")).toBe(true);
+    // Rücknahme von Hand: Eintrag aus dem Katalog gelöscht (wie nach der Rücknahme eines Entdecken-Commits)
+    const catalogFile = join(dirsOf.dataDir, "providers.yaml");
+    const entries = parse(readFileSync(catalogFile, "utf8")) as Array<{ id: string }>;
+    writeFileSync(catalogFile, stringify(entries.filter((p) => p.id !== "theater-beispiel")));
+    const catalog = readCatalog(catalogFile);
+    expect(validateDataset(catalog, before).ok).toBe(false);
+
+    const r = await runBuildOnly({ dataDir: dirsOf.dataDir, today: TODAY, freeDays: async () => ({}) });
+    expect(r.removed).toEqual(["theater-beispiel"]);
+    expect(r.build.errors).toEqual([]);
+    expect(r.build.written).toBe(join(dirsOf.dataDir, "offers.json"));
+    expect(existsSync(join(rawDir, "theater-beispiel.json"))).toBe(false);
+    const after = readPreviousOffers(join(dirsOf.dataDir, "offers.json"));
+    if (!after) throw new Error("offers.json fehlt");
+    expect(after.offers.some((o) => o.providerId === "theater-beispiel")).toBe(false);
+    expect(after.horizon).toEqual({ from: TODAY, to: "2027-10-06" });
+    expect(validateDataset(catalog, after).ok).toBe(true);
+    // IDs der übrigen Angebote bleiben stabil (ADR 0022)
+    const ids = (offers: ReadonlyArray<{ id: string; providerId: string }>) =>
+      offers
+        .filter((o) => o.providerId !== "theater-beispiel")
+        .map((o) => o.id)
+        .sort();
+    expect(ids(after.offers)).toEqual(ids(before.offers));
+    // kein Modell, keine Kostenzeile über die des Nachtlaufs hinaus
+    expect(readFileSync(join(dirsOf.dataDir, "kosten.csv"), "utf8").trimEnd().split("\n")).toHaveLength(2);
   });
 });

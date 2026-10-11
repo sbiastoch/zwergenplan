@@ -7,8 +7,9 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
 import { addMonths, toBerlinIso } from "../../../src/domain/time.ts";
-import { batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
+import { type BuildInput, batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
 import { isSource } from "../lib/candidate.ts";
 import {
   appendCsvRow,
@@ -159,40 +160,18 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   // Auch die zuletzt laufenden Anbieter können die Grenze reißen (E8: erreicht → rot)
   brake ??= brakeHit(calls, brakes);
 
-  // Zustand von Anbietern, die nicht mehr im Katalog stehen (Rücknahme per Revert, E7), räumt der Lauf weg;
-  // sonst bliebe data:validate rot (Arch-Review S2, M1). Im Trockenlauf nur gemeldet.
-  const removed: string[] = [];
-  const anbieter = new Set(catalog.filter((p) => p.role === "anbieter").map((p) => p.id));
-  for (const id of Object.keys(readRawDir(rawDir)))
-    if (!anbieter.has(id)) {
-      removed.push(id);
-      if (!o.dryRun) removeRaw(rawDir, id);
-    }
-
-  // build aus data/raw, im Trockenlauf überlagert vom Zustand dieses Laufs
-  const raws = { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(outDir) : {}) };
-  const { batches, extracted, notes } = batchesFromRaw(raws, catalog);
-  const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
-  const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
   const sources = Object.fromEntries(
     Object.entries(fetched.adapters).flatMap(([name, a]) => (isSource(name) ? [[name, a.status]] : [])),
   );
-  const { file, report } = buildOffers({
-    batches,
-    providers: catalog,
+  const { removed, build } = await buildFromRaw({
+    dataDir: o.dataDir,
+    catalog,
     previous,
-    freeDays,
-    horizon,
-    generatedAt: toBerlinIso(new Date()),
+    today: o.today,
     sources,
-    perProviderStatus: true,
-    extracted,
+    ...(o.dryRun ? { dryRun: { overlayDir: outDir, target: join(o.runDir, "offers.json") } } : {}),
+    ...(o.freeDays ? { freeDays: o.freeDays } : {}),
   });
-  let written: string | undefined;
-  if (file) {
-    written = o.dryRun ? join(o.runDir, "offers.json") : join(o.dataDir, "offers.json");
-    writeOffers(file, written);
-  }
   writeFileSync(join(o.runDir, "kosten.jsonl"), costJsonl(calls, { run: "nacht", date: o.today }));
   const out: NightlyReport = {
     date: o.today,
@@ -206,13 +185,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     ...(brake ? { brake } : {}),
     removed,
     adapters: fetched.adapters,
-    build: {
-      offers: report.offers,
-      sessions: report.sessions,
-      errors: report.errors,
-      notes: [...notes, ...report.notes],
-      ...(written ? { written } : {}),
-    },
+    build,
     ...(previous
       ? {
           previous: {
@@ -225,6 +198,85 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   writeJson(join(o.runDir, "nightly.json"), out);
   appendCostRow(o.dryRun ? join(o.runDir, "kosten.csv") : join(o.dataDir, "kosten.csv"), out);
   return out;
+}
+
+/**
+ * Aufräumen und `build` aus `data/raw` nach `data/offers.json`, gemeinsam für Nachtlauf und `--build-only`: gleiche
+ * Build-Funktion, gleicher Horizont, freie Tage, IDs stabil gegen den Vorstand (ADR 0022).
+ */
+async function buildFromRaw(o: {
+  dataDir: string;
+  catalog: readonly Provider[];
+  previous: OffersFile | undefined;
+  today: string;
+  sources: BuildInput["sources"];
+  /** Trockenlauf: Zustand dieses Laufs aus `overlayDir` überlagert data/raw, offers.json nach `target` */
+  dryRun?: { overlayDir: string; target: string };
+  freeDays?: typeof loadFreeDays;
+}): Promise<{ removed: string[]; build: NightlyReport["build"] }> {
+  const rawDir = join(o.dataDir, "raw");
+  // Zustand von Anbietern, die nicht mehr im Katalog stehen (Rücknahme per Revert, E7), räumt der Lauf weg;
+  // sonst bliebe data:validate rot (Arch-Review S2, M1). Im Trockenlauf nur gemeldet.
+  const removed: string[] = [];
+  const anbieter = new Set(o.catalog.filter((p) => p.role === "anbieter").map((p) => p.id));
+  for (const id of Object.keys(readRawDir(rawDir)))
+    if (!anbieter.has(id)) {
+      removed.push(id);
+      if (!o.dryRun) removeRaw(rawDir, id);
+    }
+
+  const raws = { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(o.dryRun.overlayDir) : {}) };
+  const { batches, extracted, notes } = batchesFromRaw(raws, o.catalog);
+  const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
+  const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
+  const { file, report } = buildOffers({
+    batches,
+    providers: o.catalog,
+    previous: o.previous,
+    freeDays,
+    horizon,
+    generatedAt: toBerlinIso(new Date()),
+    sources: o.sources,
+    perProviderStatus: true,
+    extracted,
+  });
+  let written: string | undefined;
+  if (file) {
+    written = o.dryRun?.target ?? join(o.dataDir, "offers.json");
+    writeOffers(file, written);
+  }
+  return {
+    removed,
+    build: {
+      offers: report.offers,
+      sessions: report.sessions,
+      errors: report.errors,
+      notes: [...notes, ...report.notes],
+      ...(written ? { written } : {}),
+    },
+  };
+}
+
+/**
+ * `pnpm pipeline nightly --build-only` (Arch-Review S5, M1): nur Aufräumen und `build` aus `data/raw` und dem
+ * Katalog, ohne Abruf, ohne Modell, ohne Bericht und ohne Zeile in `kosten.csv`. Für die Rücknahme eines Anbieters
+ * (Revert, Eintrag gelöscht): Seine Angebote fallen weg, `data:validate` wird wieder grün. Die freien Tage kommen
+ * wie im Nachtlauf aus OpenHolidays (Cache ~/.cache/zwergenplan, sonst Netz).
+ */
+export async function runBuildOnly(o: {
+  dataDir: string;
+  today: string;
+  freeDays?: typeof loadFreeDays;
+}): Promise<{ removed: string[]; build: NightlyReport["build"] }> {
+  return buildFromRaw({
+    dataDir: o.dataDir,
+    catalog: readCatalog(join(o.dataDir, "providers.yaml")),
+    previous: readPreviousOffers(join(o.dataDir, "offers.json")),
+    today: o.today,
+    // ohne Abruf kein Status der Sammelkalender; mit Zustand je Anbieter wirkt er ohnehin nicht (build-offers)
+    sources: {},
+    ...(o.freeDays ? { freeDays: o.freeDays } : {}),
+  });
 }
 
 /** Zeile der Zeitreihe `kosten.csv` (E8); Datum ist der Stichtag des Laufs (Europe/Berlin). */

@@ -18,6 +18,11 @@
  *                                               runs/<heute>/. Zeitbudget RUN_BUDGET_MIN (Standard 50), Bremsen
  *                                               MAX_CALLS (150) und MAX_TOKENS (3 Mio.) (E8). Rot nur, wenn der
  *                                               Build scheitert; die Ampel rechnet `status`.
+ *   nightly --build-only                        Nur Neubau von data/offers.json aus data/raw und Katalog (gleicher
+ *                                               Build, Horizont und ID-Abgleich wie der Nachtlauf), ohne Abruf, ohne
+ *                                               Modell, ohne Bericht und kosten.csv; entfernt data/raw/<id>.json von
+ *                                               Anbietern, die nicht mehr im Katalog stehen. Nach der Rücknahme eines
+ *                                               Anbieters vor `pnpm data:validate`. Freie Tage aus dem Cache, sonst Netz.
  *   status [RUN_DIR] [--gates X] [--push X] [--report-only]
  *                                               Bericht des Nachtlaufs (E10) aus RUN_DIR/nightly.json (Standard
  *                                               runs/<heute>): Ampel nach E6, Fehler, Einbrüche, Kosten, Live-Stand.
@@ -35,7 +40,8 @@
  *                                               Zeitbudget RUN_BUDGET_MIN (90). --terms: nur diese Suchbegriffe (Probe).
  *                                               --hide (nur mit --dry-run): Entdecken-Eval (E9), diese Anbieter gelten
  *                                               als unbekannt; der Bericht zählt, welche wiedergefunden werden.
- *                                               G3 steigt dabei um die Zahl der ausgeblendeten.
+ *                                               G3 (auch MAX_NEW mit --bootstrap) steigt dabei um die
+ *                                               Zahl der ausgeblendeten.
  *   discover-publish RUN_DIR                    Commits des Entdeckens nach main (pull --rebase, validate-data,
  *                                               push); schreibt RUN_DIR/issue.md, wenn ein Anbieter neu ist (E7.10).
  *   holidays FROM TO                            freie Tage (Ferien/Feiertage Bayern)
@@ -70,7 +76,7 @@ import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimeta
 import { loadFreeDays } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
 import { liveStatus } from "./io/live.ts";
-import { DEFAULT_BUDGET_MIN, runNightly } from "./io/nightly.ts";
+import { DEFAULT_BUDGET_MIN, runBuildOnly, runNightly } from "./io/nightly.ts";
 import { publishNightly } from "./io/publish.ts";
 import type { Candidate } from "./lib/candidate.ts";
 import { DISCOVER_BRAKES, parseBrakes } from "./lib/cost.ts";
@@ -113,6 +119,7 @@ const { positionals, values } = parseArgs({
     bootstrap: { type: "boolean", default: false },
     terms: { type: "string" },
     hide: { type: "string" },
+    "build-only": { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -248,6 +255,7 @@ function actionsOutput(name: string, value: string): void {
  */
 async function nightly() {
   const date = today();
+  if (values["build-only"]) return buildOnly(date);
   const runDir = join(ROOT, "runs", date);
   actionsOutput("run_dir", runDir);
   const only = values.only?.split(",").filter(Boolean);
@@ -280,6 +288,15 @@ async function nightly() {
     print(`✗ Bremse ${r.brake} erreicht (MAX_CALLS ${brakes.brakes.maxCalls}, MAX_TOKENS ${brakes.brakes.maxTokens})`);
   print(`Angebote: ${r.build.offers}, Termine: ${r.build.sessions}`);
   print(`Bericht: ${join(runDir, "nightly.json")} – Ampel: pnpm pipeline status ${runDir}`);
+  if (!r.build.written) fail(`Build abgebrochen, nichts geschrieben:\n  ${r.build.errors.join("\n  ")}`);
+  print(`✓ ${r.build.written}`);
+}
+
+/** Neubau ohne Modell nach einer Rücknahme (Arch-Review S5, M1); rot, wenn der Build scheitert. */
+async function buildOnly(date: string) {
+  const r = await runBuildOnly({ dataDir: join(ROOT, "data"), today: date });
+  if (r.removed.length > 0) print(`Zustand entfernt (nicht mehr im Katalog): ${r.removed.join(", ")}`);
+  print(`Angebote: ${r.build.offers}, Termine: ${r.build.sessions}`);
   if (!r.build.written) fail(`Build abgebrochen, nichts geschrieben:\n  ${r.build.errors.join("\n  ")}`);
   print(`✓ ${r.build.written}`);
 }
@@ -324,7 +341,7 @@ async function discoverCmd() {
   if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
   // Entdecken-Eval: G3 darf keinen ausgeblendeten Anbieter verdrängen (Arch-Review S5, M1)
   const evalHidden = values.hide?.split(",").filter(Boolean).length ?? 0;
-  const maxNew = values.bootstrap ? Number(process.env["MAX_NEW"] || 30) : MAX_NEW_PER_RUN + evalHidden;
+  const maxNew = (values.bootstrap ? Number(process.env["MAX_NEW"] || 30) : MAX_NEW_PER_RUN) + evalHidden;
   if (!(Number.isInteger(maxNew) && maxNew > 0)) fail(`MAX_NEW ungültig: ${process.env["MAX_NEW"]}`);
   let terms: string[];
   try {

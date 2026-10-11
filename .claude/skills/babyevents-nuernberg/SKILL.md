@@ -43,9 +43,10 @@ Jeder neue Anbieter ist ein eigener Commit `data: neuer Anbieter <id> (<region>)
    { "url": "<Fund-URL>", "name": "<Name>", "id": "<id>", "publicId": "<publicId>", "grund": "<warum>", "datum": "<heute>" }
    ```
    Statt `url` geht `host` (ganzer Host samt Subdomains, etwa für einen Vermittler). `id` und `publicId` werden danach nie neu vergeben (ADR 0022); `pnpm data:validate` meldet jeden Katalogeintrag, der eine davon trägt.
-3. `pnpm data:validate`, dann Commit und Push wie in `CLAUDE.md`.
+3. `pnpm pipeline nightly --build-only`: baut `data/offers.json` ohne Abruf und ohne Modell aus `data/raw` und dem Katalog neu (gleicher Build wie der Nachtlauf, IDs bleiben stabil) und entfernt `data/raw/<id>.json` von Anbietern, die nicht mehr im Katalog stehen. Ohne diesen Schritt stehen die Angebote des Anbieters weiter in `data/offers.json`, und `pnpm data:validate` meldet „unbekannter Anbieter“. Die freien Tage kommen aus dem Cache `~/.cache/zwergenplan/`, sonst aus dem Netz (OpenHolidays).
+4. `pnpm data:validate`, dann Commit (mit `data/offers.json` und `data/raw`) und Push wie in `CLAUDE.md`.
 
-Seine Angebote verschwinden mit dem nächsten Nachtlauf aus `data/offers.json` (der Nachtlauf löscht Zustände von Anbietern, die nicht mehr im Katalog stehen). Fertig, wenn der Revert und der Eintrag in `abgelehnt` auf `main` sind und CI grün ist.
+Fertig, wenn der Revert, der Neubau und der Eintrag in `abgelehnt` auf `main` sind und CI grün ist.
 
 Geprüfte und bewusst nicht aufgenommene Anbieter ohne Rücknahme stehen in `references/excluded.md`. Findet das Entdecken einen davon, gehört er zusätzlich in `abgelehnt`.
 

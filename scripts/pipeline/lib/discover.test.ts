@@ -647,7 +647,14 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
 
   it("hiddenEval: aufgenommen vor verworfen vor Vorfilter, Rest nicht gefunden; Fremde zählen extra", () => {
     const hidden = catalog.filter((p) =>
-      ["turnverein-beispiel", "musikschule-beispiel", "theater-beispiel", "familientreff-beispiel"].includes(p.id),
+      [
+        "turnverein-beispiel",
+        "musikschule-beispiel",
+        "theater-beispiel",
+        "familientreff-beispiel",
+        "stadtbibliothek-beispiel",
+        "gemeinde-beispiel",
+      ].includes(p.id),
     );
     const adopted = (name: string, url: string, id: string) => ({
       id,
@@ -680,6 +687,7 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
         ],
         dropped: [
           { find: find({ name: "Theater", url: "https://example.org/theater" }), grund: "Host und Name wie x" },
+          { find: find({ name: "Bibliothek Beispiel", url: "https://example.org/bibliothek" }), grund: "abgelehnt" },
         ],
         unassessed: [find({ name: "Familientreff Beispielhof", url: "https://example.org/familientreff/kurse" })],
         hints: [],
@@ -687,7 +695,9 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
     ]);
     expect(e.outcomes.map((o) => [o.id, o.ergebnis])).toEqual([
       ["familientreff-beispiel", "nicht bewertet"],
+      ["gemeinde-beispiel", "nicht gefunden"],
       ["musikschule-beispiel", "verworfen"],
+      ["stadtbibliothek-beispiel", "vorfilter"],
       ["theater-beispiel", "aufgenommen"],
       ["turnverein-beispiel", "aufgenommen"],
     ]);
@@ -706,7 +716,8 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
       budgetHit: false,
       hidden: e,
     });
-    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(2 von 4 wiedergefunden, 4 gefunden\)/);
+    // „gefunden“: von einer Quelle geliefert, gleich was danach geschah (auch Vorfilter, nicht bewertet)
+    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(2 von 6 wiedergefunden, 5 gefunden\)/);
     expect(md).toMatch(
       /\| musikschule-beispiel \| verworfen \| https:\/\/example\.org\/musikschule \| ohne Adresse \|/,
     );

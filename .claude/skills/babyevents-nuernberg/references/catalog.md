@@ -48,7 +48,7 @@ Der Nachtlauf (Plan 0032) liest nur Felder, keine Notizen. Je Seite:
 |---|---|
 | tote oder umgezogene URL | `programme`-Eintrag korrigieren |
 | neues Buchungssystem | `availability.system` und `availability.how` anpassen |
-| Schließung | Eintrag löschen, mit `id` und `publicId` in `abgelehnt` eintragen (SKILL.md, Abschnitt 2) und mit Grund in `references/excluded.md` vermerken |
+| Schließung | Eintrag löschen, mit `id` und `publicId` in `abgelehnt` eintragen (SKILL.md, Abschnitt 2) und mit Grund in `references/excluded.md` vermerken; dann `pnpm pipeline nightly --build-only` (Angebote und `data/raw/<id>.json` fallen weg) vor `pnpm data:validate` |
 | neuer Veranstalter, mehrfach in Sammelkalendern | findet das Entdecken selbst; sonst von Hand als `anbieter` aufnehmen (SKILL.md, Abschnitt 3) |
 
 Nach jeder Prüfung bekommt `verified` das heutige Datum.
