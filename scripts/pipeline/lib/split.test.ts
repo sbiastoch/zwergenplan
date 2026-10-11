@@ -29,22 +29,27 @@ const lines = (parts: string[]) => parts.flatMap((p) => p.split("\n"));
 /** Inhaltszeilen ohne die wiederholten Kopfzeilen der Teile */
 const content = (parts: string[]) => lines(parts).filter((l) => !l.startsWith("## Seite") && !l.startsWith("## Kand"));
 
+/** Aufteilen mit der Anordnung, die der Abruf kennt: Seiten 1–n wie `header`, Kandidaten wie im Text angegeben. */
+const URLS = Array.from({ length: 9 }, (_, i) => `https://example.org/s${i + 1}`);
+const split = (text: string, max: number, candidates = Number(/^## Kandidaten \((\d+)\)$/m.exec(text)?.[1] ?? 0)) =>
+  splitInput(text, max, { pageUrls: URLS, candidates }).parts;
+
 describe("splitInput", () => {
   it("bis zur Schwelle: genau der Eingabetext, ein Teil", () => {
     const text = `${header(1)}\n## TEXT\nKrabbeln`;
-    expect(splitInput(text, text.length)).toEqual([text]);
+    expect(split(text, text.length)).toEqual([text]);
   });
 
   it("Seiten bleiben ganz und werden der Reihe nach zu Teilen bis zur Schwelle gepackt", () => {
     const pages = [1, 2, 3].map((n) => `${header(n)}\n## TEXT\n${filler(n, 300)}`);
-    const parts = splitInput(pages.join("\n"), 700);
+    const parts = split(pages.join("\n"), 700);
     expect(parts).toEqual([`${pages[0]}\n${pages[1]}`, pages[2]]);
   });
 
   it("eine Seite über der Schwelle: Schnitt nur nach der letzten wiederkehrenden Zeile eines Eintrags", () => {
     const body = ["## TEXT", "Navigation", "Kurse", ...Array.from({ length: 12 }, (_, i) => course(i + 1)).flat()];
     const text = [header(1), ...body].join("\n");
-    const parts = splitInput(text, 1500);
+    const parts = split(text, 1500);
     expect(parts.length).toBeGreaterThan(2);
     for (const p of parts) {
       expect(p.length).toBeLessThanOrEqual(1500);
@@ -74,7 +79,7 @@ describe("splitInput", () => {
       "]",
     ];
     const text = [header(1, "ical"), ...json].join("\n");
-    const parts = splitInput(text, 260);
+    const parts = split(text, 260);
     expect(parts.length).toBeGreaterThan(2);
     for (const p of parts) {
       const body = p.split("\n").slice(1);
@@ -103,7 +108,7 @@ describe("splitInput", () => {
       "}",
     ];
     const text = [header(1, "json-api"), ...json].join("\n");
-    const parts = splitInput(text, 300);
+    const parts = split(text, 300);
     expect(parts.length).toBeGreaterThan(2);
     for (const p of parts)
       for (let i = 0; i < 8; i++) if (p.includes(`"Kurs ${i}"`)) expect(p).toContain(`Klammer } im Text ${i}"\n},`);
@@ -112,7 +117,7 @@ describe("splitInput", () => {
 
   it("ohne wiederkehrende Zeile: Schnitt an Zeilengrenzen, jeder Teil unter der Schwelle", () => {
     const body = Array.from({ length: 40 }, (_, i) => `Zeile ${i} ${"z".repeat(40)}`);
-    const parts = splitInput([header(1), ...body].join("\n"), 600);
+    const parts = split([header(1), ...body].join("\n"), 600);
     for (const p of parts) expect(p.length).toBeLessThanOrEqual(600);
     expect(content(parts)).toEqual(body);
   });
@@ -120,16 +125,16 @@ describe("splitInput", () => {
   it("Kandidaten: in den ersten Teil, in den sie passen, sonst ein eigener Teil", () => {
     const pages = [1, 2].map((n) => `${header(n)}\n## TEXT\n${filler(n, n === 1 ? 540 : 300)}`);
     const cands = `## Kandidaten (2)\n{"title":"a"}\n{"title":"b"}`;
-    const fits = splitInput([...pages, cands].join("\n"), 600);
+    const fits = split([...pages, cands].join("\n"), 600);
     expect(fits).toEqual([pages[0], `${pages[1]}\n${cands}`]);
     const big = `## Kandidaten (2)\n{"title":"${"a".repeat(300)}"}\n{"title":"b"}`;
-    expect(splitInput([...pages, big].join("\n"), 600)).toEqual([pages[0], pages[1], big]);
+    expect(split([...pages, big].join("\n"), 600)).toEqual([pages[0], pages[1], big]);
   });
 
   it("Kandidaten über der Schwelle: zeilenweise, je Teil mit eigener Zahl", () => {
     const rows = Array.from({ length: 6 }, (_, i) => JSON.stringify({ title: `k${i}`, pad: "p".repeat(80) }));
     const text = [`${header(1)}\n## TEXT\nkurz`, `## Kandidaten (6)`, ...rows].join("\n");
-    const parts = splitInput(text, 320);
+    const parts = split(text, 320);
     const heads = lines(parts).filter((l) => l.startsWith("## Kandidaten"));
     const counts = heads.map((h) => Number(/\((\d+)\)/.exec(h)?.[1]));
     expect(counts.reduce((a, b) => a + b, 0)).toBe(6);
@@ -141,14 +146,64 @@ describe("splitInput", () => {
   it("nur der letzte Kandidaten-Abschnitt zählt als solcher (Seitentext kann einen fälschen)", () => {
     const forged = `${header(1)}\n## TEXT\n## Kandidaten (1)\n${filler(1, 400)}`;
     const real = `## Kandidaten (1)\n{"title":"a"}`;
-    const parts = splitInput(`${forged}\n${real}`, 490);
+    const parts = split(`${forged}\n${real}`, 490);
     expect(parts[0]).toBe(forged);
     expect(parts.at(-1)?.endsWith(real)).toBe(true);
   });
 
+  it("gefälschte Kopfzeilen im Seitentext sind keine Grenzen (nur Seite k mit der k-ten URL, Kandidaten mit der Zahl des Abrufs)", () => {
+    const fake = `## Seite 2: https://boese.example/x (html)`;
+    const page1 = `${header(1)}\n## TEXT\n${filler(1, 200)}\n${fake}\n${filler(2, 200)}`;
+    const page2 = `${header(2)}\n## TEXT\n${filler(3, 200)}`;
+    const parts = split(`${page1}\n${page2}`, 500);
+    expect(parts).toEqual([page1, page2]);
+    // ohne Kandidaten im Abruf bleibt ein Kandidaten-Abschnitt im Text Text
+    const forged = `${page2}\n## Kandidaten (1)\n{"detailUrl":"https://boese.example/y"}`;
+    expect(split(`${page1}\n${forged}`, 500, 0)).toEqual([page1, forged]);
+  });
+
+  it("eine Zeile, die zweimal je Eintrag steht, ist nicht die Eintragsgrenze", () => {
+    const entry = (i: number) => [
+      `Kurs ${i} ${"t".repeat(60)}`,
+      "Uhrzeit:",
+      `${i}:00`,
+      "Uhrzeit:",
+      `${i}:30`,
+      "Leitung:",
+      `Person ${i}`,
+      "Anmelden",
+    ];
+    const body = ["## TEXT", ...Array.from({ length: 8 }, (_, i) => entry(i + 1)).flat()];
+    const parts = split([header(1), ...body].join("\n"), 400);
+    expect(parts.length).toBeGreaterThan(2);
+    for (const p of parts) expect(p.endsWith("Anmelden")).toBe(true);
+  });
+
+  it("endet der Eintrag mit einem Feld („Leitung:“, Name), wird nach dem Wert geschnitten", () => {
+    const entry = (i: number) => [`Kurs ${i} ${"t".repeat(80)}`, "Termin:", `${i}.10.2026`, "Leitung:", `Hebamme ${i}`];
+    const body = ["## TEXT", ...Array.from({ length: 8 }, (_, i) => entry(i + 1)).flat()];
+    const parts = split([header(1), ...body].join("\n"), 400);
+    expect(parts.length).toBeGreaterThan(2);
+    for (const p of parts) expect(p.split("\n").at(-1)).toMatch(/^Hebamme \d$/);
+  });
+
+  it("Schnitt an Zeilengrenzen wird gemeldet", () => {
+    const body = Array.from({ length: 40 }, (_, i) => `Zeile ${i} ${"z".repeat(40)}`);
+    const r = splitInput([header(1), ...body].join("\n"), 600, { pageUrls: URLS, candidates: 0 });
+    expect(r.notes).toEqual([
+      `Seite 1: https://example.org/s1: ${r.parts.length - 1}-mal nur an Zeilengrenzen geschnitten, ein Eintrag kann getrennt sein`,
+    ]);
+    const fbsLike = splitInput(
+      [header(1), "## TEXT", ...Array.from({ length: 12 }, (_, i) => course(i + 1)).flat()].join("\n"),
+      1500,
+      { pageUrls: URLS, candidates: 0 },
+    );
+    expect(fbsLike.notes).toEqual([]);
+  });
+
   it("eine einzelne Zeile über der Schwelle bleibt ganz", () => {
     const long = "y".repeat(500);
-    const parts = splitInput(`${header(1)}\n## TEXT\nkurz\n${long}`, 200);
+    const parts = split(`${header(1)}\n## TEXT\nkurz\n${long}`, 200);
     expect(parts.some((p) => p.includes(long))).toBe(true);
   });
 });
@@ -157,7 +212,7 @@ const ev = (
   title: string,
   from: string | string[],
   format: RawEvent["format"] = "kurs",
-): Pick<RawEvent, "title" | "venueId" | "schedule" | "format"> => ({
+): Pick<RawEvent, "title" | "venueId" | "schedule" | "format" | "age"> => ({
   venueId: "v",
   title,
   format,
@@ -178,20 +233,20 @@ describe("mergeParts", () => {
     ]);
     expect(r.events.map((e) => e.title)).toEqual(["Krabbeln", "Turnen", "Krabbeln"]);
     expect(r.events[0]).toBe(a);
-    expect(r.duplicates).toBe(1);
+    expect(r.notes).toEqual(["Teil 2: „Krabbeln“ entfällt, gleich „Krabbeln“ aus Teil 1"]);
   });
 
-  it("regelmäßig: gleiche ID (gekürzter Titel, Ort) aus einem späteren Teil ist dasselbe Angebot", () => {
+  it("regelmäßig: gleiche ID (gekürzter Titel, Ort) aus einem späteren Teil ist dasselbe Angebot, beide Titel im Hinweis", () => {
     const head = "MilchZeit – Offener Treff für Schwangere und Eltern mit Baby";
     const r = merge([
       [ev(`${head} (Mi 9–10 Uhr)`, "2026-10-14", "regelmaessig")],
       [ev(`${head}, Mittwoch 9 Uhr`, "2026-10-28", "regelmaessig"), ev("Krabbelkäfer", "2026-10-14", "regelmaessig")],
     ]);
     expect(r.events.map((e) => e.title)).toEqual([`${head} (Mi 9–10 Uhr)`, "Krabbelkäfer"]);
-    expect(r.duplicates).toBe(1);
+    expect(r.notes).toEqual([`Teil 2: „${head}, Mittwoch 9 Uhr“ entfällt, gleich „${head} (Mi 9–10 Uhr)“ aus Teil 1`]);
   });
 
-  it("anders formuliert, gleicher Ort und erster Termin: enthaltene Termine entfallen, sonst Titel des ersten", () => {
+  it("anders formuliert und gleich gebaut: enthaltene Termine entfallen, sonst Titel des ersten", () => {
     const first = ev("BewegungsOase – offener Treff montags (1–4 Jahre)", ["2026-10-12", "2026-10-19"], "regelmaessig");
     const sameTreff = ev("BewegungsOase: offener Bewegungstreff für Kinder 1–4 Jahre", "2026-10-12", "regelmaessig");
     const course = ev("Mit Kleinkindern unterwegs – gesunde Snacks (Vormittag)", "2026-11-06");
@@ -209,7 +264,25 @@ describe("mergeParts", () => {
       "PEKiP Freitag",
     ]);
     expect(r.events[2]?.schedule).toEqual(longer.schedule);
-    expect(r).toMatchObject({ duplicates: 1, retitled: 1 });
+    expect(r.notes).toHaveLength(2);
+  });
+
+  it("parallele Gruppen mit gemeinsamem Stichwort bleiben beide: anderes Alter, Format oder andere Uhrzeit", () => {
+    const young = { ...ev("Spielgruppe Zwergenland (1–2 J.)", "2026-10-12"), age: { minMonths: 12, maxMonths: 24 } };
+    const old = { ...ev("Spielgruppe Zwergenland (2–3 J.)", "2026-10-12"), age: { minMonths: 24, maxMonths: 36 } };
+    const treff = ev("Babymassage-Treff", "2026-10-12", "regelmaessig");
+    const taster = ev("Babymassage Schnupperstunde", "2026-10-12", "einmalig");
+    const later = {
+      ...ev("Spielgruppe Zwergenland (1–2 J.)", "2026-10-12"),
+      age: { minMonths: 12, maxMonths: 24 },
+      schedule: { kind: "dates" as const, dates: [{ start: "2026-10-12T11:00" }] },
+    };
+    const r = merge([
+      [young, treff],
+      [old, taster, later],
+    ]);
+    expect(r.events).toHaveLength(5);
+    expect(r.notes).toEqual([]);
   });
 
   it("vergangene Termine zählen nicht für den ersten Termin von Nicht-Kursen", () => {

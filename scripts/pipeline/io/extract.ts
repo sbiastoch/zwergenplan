@@ -72,7 +72,10 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
       freeDays: await freeDaysFor(input.today),
     };
     // Große Anbieter in Teilen (lib/split.ts); der Cache-Schlüssel bleibt der des ganzen Anbieters
-    const texts = splitInput(input.text, partMaxChars);
+    const { parts: texts, notes } = splitInput(input.text, partMaxChars, {
+      pageUrls: input.pageUrls,
+      candidates: input.candidates.length,
+    });
     const users = texts.map((text, i) =>
       extractMessage({
         provider: input.provider,
@@ -86,6 +89,7 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
       model,
       fallbackModel,
       users,
+      splitNotes: notes,
       ctx,
       signal,
       call: (m, user) =>

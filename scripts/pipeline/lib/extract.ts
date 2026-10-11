@@ -15,6 +15,8 @@ export interface ExtractInput {
   provider: Provider;
   /** Eingabe wie aus dem Abruf (`fetchInputs().texts[id]`, enthält die Kandidaten schon als eigenen Abschnitt) */
   text: string;
+  /** URLs der abgerufenen Seiten in der Reihenfolge des Texts (`## Seite k`); nur ihre Kopfzeilen sind Teilgrenzen */
+  pageUrls: readonly string[];
   candidates: readonly Candidate[];
   /** abgerufene URLs, Redirect-Ziele und Kandidaten-`detailUrl`: nur sie sind als `sourceUrl` erlaubt */
   allowedUrls: readonly string[];
@@ -347,7 +349,9 @@ export async function runExtraction(p: {
  * Events aller Teile vereinigt (`mergeParts`) und gemeinsam geprüft (`checkExtraction`, auch über die Teile hinweg).
  * Scheitert ein Teil, ist der ganze Anbieter `fehler` (sein alter Stand bleibt, E5) und die übrigen Teile laufen
  * nicht mehr; ein Abbruch (Auth, Limit) und ein abgebrochener Lauf (`signal`) beenden sofort. Mit einem Teil ist das
- * genau `runExtraction`.
+ * genau `runExtraction`. Scheitert erst die gemeinsame Prüfung, gibt es keine Wiederholung (welcher Teil?): `fehler`
+ * mit „Teile zusammen ungültig“, und weil ein Fehler keinen Cache-Schlüssel speichert, versucht es die nächste Nacht
+ * erneut (Plan 0032, „Aufteilen“). `mergeParts` nimmt die bekannten Ursachen (gleiche ID) vorher heraus.
  */
 export async function runExtractionInParts(p: {
   providerId: string;
@@ -355,11 +359,13 @@ export async function runExtractionInParts(p: {
   fallbackModel: string;
   /** Nachricht je Teil (`extractMessage` mit `part`) */
   users: readonly string[];
+  /** Hinweise des Aufteilens (`splitInput`), kommen zu den Hinweisen des Ergebnisses */
+  splitNotes?: readonly string[];
   ctx: ExtractContext;
   call: (model: string, user: string) => Promise<ModelReply>;
   signal?: AbortSignal;
 }): Promise<ExtractResult> {
-  const { users, ...common } = p;
+  const { users, splitNotes, ...common } = p;
   const [only] = users;
   if (users.length === 1 && only !== undefined) return runExtraction({ ...common, user: only });
   const calls: CallRecord[] = [];
@@ -385,13 +391,7 @@ export async function runExtractionInParts(p: {
       outcome: { kind: "fehler", reason: `Teile zusammen ungültig: ${checked.errors.slice(0, 3).join("; ")}` },
       calls,
     };
-  const warnings = [
-    ...(merged.duplicates > 0 ? [`${merged.duplicates} gleiche Events aus mehreren Teilen nur einmal übernommen`] : []),
-    ...(merged.retitled > 0
-      ? [`${merged.retitled} Events unter dem Titel eines gleichen aus einem früheren Teil`]
-      : []),
-    ...checked.warnings,
-  ];
+  const warnings = [...(splitNotes ?? []), ...merged.notes, ...checked.warnings];
   return {
     outcome: {
       kind: "ok",
