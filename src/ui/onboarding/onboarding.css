@@ -70,7 +70,9 @@
 
   /* Illustrationen (art.tsx): 276 × 259 bei voller Bühne, kleiner bei wenig Höhe */
   .onb-art {
-    height: calc(100% - 45px);
+    /* 45 px Luft für die Kopfzeile bei 100 %; in rem, weil „Überspringen“ mit der Schrift wächst und bei 200 % sonst
+       auf der Illustration liegt (Browser-Review lokal) */
+    height: calc(100% - 2.8125rem);
     width: auto;
     aspect-ratio: 320 / 300;
     max-width: 100%;

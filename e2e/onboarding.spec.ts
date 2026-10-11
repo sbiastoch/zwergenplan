@@ -36,7 +36,8 @@ function chunkRequests(page: Page): string[] {
   const paths: string[] = [];
   page.on("request", (req) => {
     const path = new URL(req.url()).pathname;
-    const match = /\/assets\/(onboarding|app)\/([^/]+?)-[^/-]+\.(js|css)$/.exec(path);
+    // Vite-Hash: 8 Zeichen Base64url, kann selbst „-“ enthalten (OnboardingFlow-B4N-hd85.js, Browser-Review lokal)
+    const match = /\/assets\/(onboarding|app)\/([^/]+)-[\w-]{8}\.(js|css)$/.exec(path);
     if (match) paths.push(`${match[1]}/${match[2]}.${match[3]}`);
   });
   return paths;
