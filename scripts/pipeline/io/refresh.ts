@@ -4,7 +4,7 @@
  * und Entdecken (Stufe 4) rufen dieselbe Funktion.
  */
 import type { Provider } from "../../../src/domain/schema.ts";
-import type { CallRecord, ExtractInput, ExtractKeyParts, Extractor } from "../lib/extract-types.ts";
+import type { CallRecord, ExtractInput, ExtractKeyParts, Extractor } from "../lib/extract.ts";
 import { applyOutcome, type FetchedProvider, planRefresh, type RefreshResult } from "../lib/refresh.ts";
 import { RAW_DIR, readRaw, writeRaw } from "./files.ts";
 

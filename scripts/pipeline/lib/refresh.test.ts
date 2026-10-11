@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import type { Candidate } from "./candidate.ts";
-import type { ExtractOutcome } from "./extract-types.ts";
+import type { ExtractOutcome } from "./extract.ts";
 import { catalogExcerpt, extractKey } from "./normalize.ts";
 import { ProviderRaw, RawEvent } from "./raw.ts";
 import {

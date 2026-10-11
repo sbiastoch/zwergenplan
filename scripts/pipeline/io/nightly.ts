@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { addMonths, toBerlinIso } from "../../../src/domain/time.ts";
 import { batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
 import { isSource } from "../lib/candidate.ts";
-import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract-types.ts";
+import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
 import { runLimited } from "../lib/fetch.ts";
 import { offerUnits, type RefreshResult } from "../lib/refresh.ts";
 import { planFetch } from "../lib/select.ts";

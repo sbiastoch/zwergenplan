@@ -9,7 +9,7 @@
  */
 import type { Offer, Provider } from "../../../src/domain/schema.ts";
 import type { Candidate, Source } from "./candidate.ts";
-import type { ExtractKeyParts, ExtractOutcome } from "./extract-types.ts";
+import type { ExtractKeyParts, ExtractOutcome } from "./extract.ts";
 import { catalogExcerpt, extractKey } from "./normalize.ts";
 import type { ProviderRaw, RawEvent } from "./raw.ts";
 

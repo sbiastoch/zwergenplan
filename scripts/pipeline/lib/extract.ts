@@ -46,6 +46,16 @@ export interface ExtractResult {
 
 export type Extractor = (input: ExtractInput, signal: AbortSignal) => Promise<ExtractResult>;
 
+/**
+ * Was außer der Eingabe in den Cache-Schlüssel geht (E4): Prompt, Antwort-Schema (Teil A: `EXTRACT_KEY_PARTS`)
+ * und das konfigurierte Extraktionsmodell (N3: Ein Modellwechsel extrahiert einmal alles neu).
+ */
+export interface ExtractKeyParts {
+  prompt: string;
+  schema: string;
+  model: string;
+}
+
 /** Antwort des Modells: `RawEvent` ohne `providerId` und `via`, die setzt der Code (E4). */
 const ExtractResponse = z.strictObject({ events: z.array(RawEvent.omit({ providerId: true, via: true })) });
 

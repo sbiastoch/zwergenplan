@@ -71,7 +71,6 @@ import { fetchSource } from "./io/sources.ts";
 import { buildOffers } from "./lib/build-offers.ts";
 import { draftFromCandidate, looksRegular, providerFromCandidate } from "./lib/draft.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
-import type { ExtractKeyParts, Extractor } from "./lib/extract-types.ts";
 import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
   extractTimetable,
@@ -254,22 +253,6 @@ async function extractCmd(id: string) {
   print(`✓ ${join(outDir, `${id}.json`)}`);
 }
 
-/**
- * Platzhalter bis zum Zusammenführen mit Teil A von Stufe 2 (Extraktor über `io/llm.ts`): Jeder Anbieter mit
- * geänderter Eingabe wird `fehler`, sein alter Stand bleibt (E5).
- * TODO(Plan 0032 S2): createExtractor()
- */
-const placeholderExtractor: Extractor = async () => ({
-  outcome: { kind: "fehler", reason: "kein Extraktor" },
-  calls: [],
-});
-/** TODO(Plan 0032 S2): createExtractor() – Prompt und Schema aus EXTRACT_KEY_PARTS (io/extract.ts) */
-const placeholderKeyParts: ExtractKeyParts = {
-  prompt: "",
-  schema: "",
-  model: process.env["LLM_MODEL_EXTRACT"] ?? "haiku",
-};
-
 /** Nachtlauf (Plan 0032, E6). Rot bei Abbruch, erreichtem Zeitbudget oder gescheitertem Build. */
 async function nightly() {
   const date = today();
@@ -278,13 +261,11 @@ async function nightly() {
   const budgetMin = Number(process.env["RUN_BUDGET_MIN"] ?? DEFAULT_BUDGET_MIN);
   if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
   const dryRun = values["dry-run"];
-  // Mit dem Platzhalter würde jeder Anbieter `fehler` und offers.json neu gebaut (Arch-Review S2, M2)
-  // TODO(Plan 0032 S2): createExtractor() – danach diese Sperre entfernen
-  if (!dryRun)
-    fail("nightly schreibt nach data/ erst mit dem Extraktor (Plan 0032, Stufe 2 Teil A) – bis dahin --dry-run");
+  // Das Modell gehört in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
+  const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const r = await runNightly({
-    extractor: placeholderExtractor,
-    keyParts: placeholderKeyParts,
+    extractor: createExtractor({ model }),
+    keyParts: { ...EXTRACT_KEY_PARTS, model },
     budgetMin,
     dataDir: join(ROOT, "data"),
     runDir,

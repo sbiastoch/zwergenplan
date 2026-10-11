@@ -2,7 +2,7 @@ import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFile
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { ExtractOutcome, Extractor, ExtractResult } from "../lib/extract-types.ts";
+import type { ExtractOutcome, Extractor, ExtractResult } from "../lib/extract.ts";
 import { RawEvent } from "../lib/raw.ts";
 import type { FetchPlan } from "../lib/select.ts";
 import type { FetchResult } from "./fetch-inputs.ts";
