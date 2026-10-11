@@ -51,6 +51,8 @@ describe("strategyFor: Tabelle aus Plan 0011, E4", () => {
     ["https://zwergenplan.app/angebot/a--b--c/vorschau.jpg?v=0123abcd", false, "netz"],
     ["https://zwergenplan.app/anbieter/familientreff-beispiel/", true, "netz"],
     ["https://zwergenplan.app/404.html", true, "netz"],
+    // Impressum: eigene statische Seite, offline nicht vorgehalten (Plan 0034, E5)
+    ["https://zwergenplan.app/impressum/", true, "netz"],
     ["https://zwergenplan.app/", false, "netz"],
   ];
   for (const [url, navigate, expected] of rows) {

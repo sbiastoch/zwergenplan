@@ -123,4 +123,10 @@
     font-size: 0.875rem;
     margin: 18px 0 0;
   }
+  /* Impressum (Plan 0034, E3): dezent wie der Datenstand, inline; 4 px oben und unten heben die Trefferfläche über
+   * 24 px (WCAG 2.5.8, Touch-Gate), ohne die Zeile zu erhöhen. Gegenstück im Kind-Sheet: `.imprint a` in sheet.css. */
+  .stand a {
+    color: inherit;
+    padding-block: 4px;
+  }
 }

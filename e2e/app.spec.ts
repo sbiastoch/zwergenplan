@@ -34,9 +34,34 @@ test("zeigt jedes kommende Angebot einmal, nach Tagen gruppiert, Vergangenes nic
   await expect(page.getByText("Datenstand:")).toBeVisible();
 });
 
-test("ist für Suchmaschinen gesperrt und liegt im Wurzelpfad", async ({ page }) => {
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+test("ist für Suchmaschinen offen und liegt im Wurzelpfad (Plan 0034, E4)", async ({ page }) => {
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
   expect(new URL(page.url()).pathname).toBe("/");
+});
+
+test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Seite (Plan 0034, E3)", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+  await expect(sheet.getByRole("link", { name: "Impressum und Datenschutz" })).toHaveAttribute("href", "/impressum/");
+  await sheet.getByRole("button", { name: "Fertig" }).click();
+  await expect(sheet).toBeHidden();
+
+  const link = page.getByRole("link", { name: "Impressum", exact: true });
+  await expect(link).toHaveAttribute("href", "/impressum/");
+  await link.click();
+  await expect(page).toHaveURL(/\/impressum\/$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Impressum" })).toBeVisible();
+  await expect(page.getByText("Zwischen den Fleischbänken 12")).toBeVisible();
+  // im Impressum und unter „Hinweise“ (E9)
+  const mail = page.getByRole("link", { name: "kontakt@zwergenplan.app" });
+  await expect(mail).toHaveCount(2);
+  await expect(mail.first()).toHaveAttribute("href", "mailto:kontakt@zwergenplan.app");
+  await expect(page.getByRole("heading", { level: 2, name: "Hinweise" })).toBeVisible();
+  await expect(page.getByText(/Eine KI liest sie aus/)).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "Datenschutz" })).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });
 
 test("Schnellfilter und Sticker stehen in der URL und überleben ein Neuladen", async ({ page }) => {

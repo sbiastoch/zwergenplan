@@ -160,11 +160,12 @@ test.describe("Knopf „Teilen“ (E6)", () => {
 });
 
 test.describe("Vorschauseite (E2–E4)", () => {
-  test("Angebot: og:-Tags, noindex, Kachelbild je Angebot", async ({ request }) => {
+  test("Angebot: og:-Tags, ohne robots, Kachelbild je Angebot", async ({ request }) => {
     const res = await request.get(`a/${KRABBEL_ID}/`);
     expect(res.status()).toBe(200);
     const html = await res.text();
-    expect(html).toContain('<meta name="robots" content="noindex, nofollow">');
+    // für Suchmaschinen offen (Plan 0034, E4)
+    expect(html).not.toContain('name="robots"');
     expect(meta(html, "og:title")).toBe(`${KRABBEL} · jeden Mittwoch, 10:00`);
     expect(meta(html, "og:description")).toBe(
       "Familientreff Beispielhof (fiktiv), Altstadt · 6–24 Monate · Kostenlos · Ohne Anmeldung",

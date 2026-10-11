@@ -356,4 +356,9 @@
     white-space: nowrap;
     vertical-align: bottom;
   }
+  /* Impressum im Kind-Sheet (Plan 0034, E3): wie `.stand a` in list.css, inline mit 24 px Trefferfläche */
+  .imprint a {
+    color: inherit;
+    padding-block: 4px;
+  }
 }

@@ -10,8 +10,8 @@ ADR 0002 legt GitHub Pages unter `https://sbiastoch.github.io/zwergenplan/` fest
 - Hosting bleibt **GitHub Pages** mit Deploy über Actions. Die Custom Domain steht in den Pages-Einstellungen des Repos (`gh api … /pages -f cname=…`). Eine `CNAME`-Datei im Artefakt ist bei Actions-Deploys wirkungslos und entfällt.
 - **DNS bei Porkbun**: Apex `A`/`AAAA` auf die vier GitHub-Pages-Adressen, `www` als `CNAME` auf `sbiastoch.github.io`. GitHub leitet `www` und die alte github.io-Adresse auf die Apex-Domain um.
 - **HTTPS ist Pflicht**: `.app` steht auf der HSTS-Preload-Liste, Browser öffnen die Domain nur per HTTPS. „Enforce HTTPS“ bleibt in den Pages-Einstellungen an.
-- **Keine `robots.txt`**, obwohl sie im Wurzelpfad wirken würde. Ein `Disallow: /` hält Crawler davon ab, das `noindex` zu lesen, und verlinkte URLs landen dann trotzdem als bloße Adresse im Index. Es bleibt bei `noindex, nofollow`.
-- **DNS-Hygiene**: Die Parking-Records von Porkbun werden vollständig gelöscht, auch die Wildcard `*.zwergenplan.app`. Wildcards ermöglichen bei GitHub Pages die Übernahme von Subdomains. Die Domain wird im GitHub-Konto verifiziert (TXT `_github-pages-challenge-sbiastoch`).
+- **Keine `robots.txt`**, obwohl sie im Wurzelpfad wirken würde. Ein `Disallow: /` hält Crawler davon ab, das `noindex` zu lesen, und verlinkte URLs landen dann trotzdem als bloße Adresse im Index. Es bleibt bei `noindex, nofollow`. *Ersetzt durch ADR 0028: kein `noindex` mehr außer auf `404.html`; eine `robots.txt` gibt es weiter nicht.*
+- **DNS-Hygiene**: Die Parking-Records von Porkbun werden vollständig gelöscht, auch die Wildcard `*.zwergenplan.app`. Wildcards ermöglichen bei GitHub Pages die Übernahme von Subdomains. Die Domain wird im GitHub-Konto verifiziert (TXT `_github-pages-challenge-sbiastoch`). *Ergänzt durch ADR 0028: MX-Einträge der Porkbun-Weiterleitung für `kontakt@zwergenplan.app`.*
 
 ## Konsequenzen
 - Neuer Origin: `localStorage` (Merkliste, Geburtsdatum, Darstellung) vom alten Origin `sbiastoch.github.io` ist auf der neuen Domain leer. Die Seite ist erst seit 2026-10-04 live, der Verlust ist hinnehmbar; eine Migration über Origins hinweg lohnt nicht.

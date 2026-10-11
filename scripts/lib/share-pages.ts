@@ -20,6 +20,7 @@ import {
 } from "../../src/domain/labels.ts";
 import { OFFER_PARAM, PROVIDER_PARAM } from "../../src/domain/route.ts";
 import {
+  IMPRINT_PATH,
   LEGACY_SHARE_DIRS,
   offerAppSearch,
   offerImagePath,
@@ -69,8 +70,8 @@ const MAX_FACT = 40;
  * Wächter gegen Fehler im Generator (Schleife, doppelter Block), nie gegen Daten (E4, Review M4). Gemessen am
  * 2026-10-08: Median 3,2 kB, größte 3,5 kB – die geplanten 4 kB hätte ein Titel voller „&“ reißen können. Strenge
  * Obergrenze aus den Kürzungen: Titel 110 Zeichen viermal, Beschreibung 200 Zeichen dreimal, je höchstens 6 Byte
- * escaped („&quot;“), dazu die ID viermal (bis ADR 0022 bis 240 Zeichen, seit ADR 0022 genau 8) und rund 1,6 kB fester
- * Text ≈ 8,8 kB. Der Wert bleibt, darüber liegt nur ein Bug.
+ * escaped („&quot;“), dazu die ID viermal (bis ADR 0022 bis 240 Zeichen, seit ADR 0022 genau 8) und rund 1,9 kB fester
+ * Text (seit Plan 0034 mit Fußlink aufs Impressum und dessen Stilregeln) ≈ 9,1 kB. Der Wert bleibt, darüber liegt nur ein Bug.
  */
 const MAX_PAGE_BYTES = 10_000;
 const GENERIC_IMAGE = "og/vorschau-v1.jpg";
@@ -193,7 +194,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,san
 main{max-width:34rem;margin:0 auto;padding:12vh 16px 32px;overflow-wrap:anywhere}
 h1{font-size:1.5rem;line-height:1.15;margin:.25rem 0 .75rem}
 p{margin:0 0 1rem}.brand{font-weight:800;color:var(--muted)}
-a{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:12px;background:var(--link);color:var(--on-link);font-weight:700;text-decoration:none}`;
+a{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:12px;background:var(--link);color:var(--on-link);font-weight:700;text-decoration:none}
+.foot{margin-top:2rem;font-size:.875rem}.foot a,.text a{display:inline;padding:4px 0;background:none;color:inherit;font-weight:400;text-decoration:underline}
+h2{font-size:1.125rem;margin:1.75rem 0 .5rem}.text{color:var(--muted)}.text strong{color:var(--ink)}`;
+
+/** Dezenter Link aufs Impressum am Ende jeder statischen Seite (Plan 0034, E3); inline, 24 px Trefferfläche */
+const IMPRINT_FOOT = `<p class="foot"><a href="${BASE}${IMPRINT_PATH}">Impressum</a></p>`;
 
 function sharePage({ title, description, sharePath, image, appSearch }: PageContent): string {
   const t = escapeHtml(title);
@@ -203,7 +209,6 @@ function sharePage({ title, description, sharePath, image, appSearch }: PageCont
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
 <title>${t} – Zwergenplan</title>
 <meta name="description" content="${d}">
@@ -228,6 +233,7 @@ function sharePage({ title, description, sharePath, image, appSearch }: PageCont
 <h1>${t}</h1>
 <p>${d}</p>
 <p><a id="go" href="${BASE}${escapeHtml(appSearch)}">Im Zwergenplan öffnen</a></p>
+${IMPRINT_FOOT}
 </main>
 <script>${SHARE_REDIRECT}</script>
 </body>
@@ -318,8 +324,65 @@ export function notFoundPage(): string {
 <p class="brand">Zwergenplan</p>
 <h1>Diese Seite gibt es im Zwergenplan nicht (mehr).</h1>
 <p><a href="${BASE}">Zum Zwergenplan</a></p>
+${IMPRINT_FOOT}
 </main>
 <script>${script}</script>
+</body>
+</html>
+`;
+}
+
+/** Angaben nach § 5 DDG (Plan 0034, E2): nur hier */
+const IMPRINT = {
+  name: "Stephan Biastoch",
+  street: "Zwischen den Fleischbänken 12",
+  city: "90403 Nürnberg",
+  email: "kontakt@zwergenplan.app",
+} as const;
+
+/**
+ * Impressum und Datenschutz (Plan 0034, E1, E7; ADR 0028): statisch, ohne Skript, für Suchmaschinen offen. Die Fakten
+ * im Datenschutz-Teil stammen aus ADR 0008 (Kacheln), 0013/0017 (Speicher im Browser) und 0014 (Push); ändert sich
+ * dort etwas, muss der Text mit.
+ */
+export function imprintPage(): string {
+  const { name, street, city, email } = IMPRINT;
+  return `<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Impressum und Datenschutz – Zwergenplan</title>
+<meta name="description" content="Impressum und Datenschutzhinweise des Zwergenplans.">
+<link rel="icon" href="${BASE}icons/icon.svg" type="image/svg+xml">
+<style>${PAGE_STYLE}</style>
+</head>
+<body>
+<main>
+<p class="brand">Zwergenplan</p>
+<h1>Impressum</h1>
+<p>Angaben gemäß § 5 DDG</p>
+<p>${name}<br>${street}<br>${city}</p>
+<p class="text">E-Mail: <a href="mailto:${email}">${email}</a></p>
+<h2>Hinweise</h2>
+<div class="text">
+<p><strong>Ohne Gewähr.</strong> Die Angebote stammen von den Webseiten der Anbieter. Eine KI liest sie aus und fasst sie zusammen, dabei passieren Fehler. Termine, Zeiten, Preise, Altersangaben, Orte, Beschreibungen und Wegzeiten können falsch, unvollständig oder veraltet sein. Bitte prüfe vor dem Besuch beim Anbieter, ob der Termin stattfindet und ob du dich anmelden musst.</p>
+<p><strong>Fehler gefunden, Angebot vermisst?</strong> Schreib gern an <a href="mailto:${email}">${email}</a>. Das gilt auch für Anbieter, die anders oder gar nicht im Zwergenplan stehen möchten.</p>
+<p><strong>Privat und unabhängig.</strong> Der Zwergenplan ist ein nicht-kommerzielles Projekt aus Nürnberg, ohne Werbung und ohne Verbindung zu den Anbietern. Für verlinkte Seiten sind deren Betreiber verantwortlich.</p>
+</div>
+<h2>Datenschutz</h2>
+<div class="text">
+<p><strong>Verantwortlich</strong> ist ${name}, Anschrift und E-Mail wie oben.</p>
+<p><strong>Keine Cookies, kein Tracking.</strong> Geburtsdatum, Merkliste, Startpunkt und Darstellung speichert nur dein Browser auf deinem Gerät. Sie werden nicht übertragen.</p>
+<p><strong>Hosting:</strong> Die Seite liegt bei GitHub Pages (GitHub Inc., USA). Beim Abruf verarbeitet GitHub technisch nötige Daten wie IP-Adresse und Zeitpunkt (Art. 6 Abs. 1 lit. f DSGVO).</p>
+<p><strong>Karte:</strong> Erst wenn du die Karte öffnest, lädt dein Browser Kartenkacheln von OpenFreeMap. Dabei sieht OpenFreeMap deine IP-Adresse.</p>
+<p><strong>Samstags-Nachricht:</strong> Nur wenn du sie einschaltest (Art. 6 Abs. 1 lit. a DSGVO). Dann speichert ein eigener Dienst bei Cloudflare die Adresse deines Push-Abos und das Datum der Anmeldung. Beim An- und Abmelden sieht er deine IP-Adresse; gegen Missbrauch zählt er eine Stunde lang Anfragen je IP, nur als Prüfsumme (Hash). Zugestellt wird über den Push-Dienst deines Browsers (z. B. Apple, Google, Mozilla). Ausschalten löscht das Abo.</p>
+<p><strong>Links</strong> zu Google Maps und zu den Anbietern öffnen deren Seiten erst, wenn du sie antippst. Dort gelten deren Datenschutzhinweise.</p>
+<p><strong>Deine Rechte:</strong> Auskunft, Berichtigung, Löschung, Einschränkung und Widerspruch per E-Mail an die Adresse oben. Beschweren kannst du dich beim Bayerischen Landesamt für Datenschutzaufsicht.</p>
+</div>
+<p><a href="${BASE}">Zum Zwergenplan</a></p>
+</main>
 </body>
 </html>
 `;

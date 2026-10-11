@@ -394,6 +394,7 @@ test.describe("Teilen mit echten Daten (Plan 0026, Tests 9; Nachtrag A; ADR 0022
     expect(await res.text()).toContain(`<h1>${escapeHtml(provider.text.slice(0, 30))}`);
     expect(await res.text()).toContain(`og:url" content="https://zwergenplan.app/p/${provider.id}/"`);
     expect(existsSync("dist/404.html"), "dist/404.html").toBe(true);
+    expect(existsSync("dist/impressum/index.html"), "dist/impressum/index.html").toBe(true);
     // die alten Ordner schreibt der Build nicht mehr; alte Links leiten über 404.html weiter (ADR 0022)
     expect(existsSync("dist/angebot"), "dist/angebot").toBe(false);
     expect(existsSync("dist/anbieter"), "dist/anbieter").toBe(false);

@@ -1,6 +1,6 @@
 # Plan 0034 – Impressum und Freigabe für Suchmaschinen
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-10-11
 Bezug:
 - ADR 0002 (privat gedacht, ohne Impressum, `noindex`), ADR 0009 (keine `robots.txt`, `noindex, nofollow`), ADR 0020 (Vorschauseiten mit `noindex`), ADR 0013 (Service Worker), **neu ADR 0028** (im selben Commit)
@@ -37,6 +37,7 @@ Der Nutzer, wörtlich: „Füge dezent ein Impressum hinzu und entferne den Auss
 - **E4 Suchmaschinen.** `robots`-Meta raus aus `index.html` und `sharePage()`. `404.html` behält `noindex, nofollow`. Die Impressum-Seite hat kein `robots`-Meta. Der Satz „keine `robots.txt`“ aus ADR 0009 bleibt (ohne Datei ist alles erlaubt). Sitemap und `canonical` sind nicht Teil dieses Plans (→ `docs/ideas.md`).
 - **E5 Service Worker unverändert.** `impressum/` ist eine Navigation außerhalb von `""`/`index.html`, also `"netz"`. Eine Zeile in `src/sw/routes.test.ts` hält das fest.
 - **E7 Datenschutz-Abschnitt** (auf Wunsch des Nutzers, sachlich, ohne Floskeln): Verantwortlicher wie oben; Hosting GitHub Pages (Server-Logs mit IP-Adresse beim Anbieter); keine Cookies, kein Tracking; Geburtsdatum, Merkliste, Startpunkt, Darstellung nur im Browser (`localStorage`/IndexedDB), verlassen das Gerät nicht; Karte lädt Kacheln von OpenFreeMap erst beim Öffnen der Karte (IP-Adresse); Push nur auf Wunsch: Abo beim eigenen Dienst auf Cloudflare Workers (Abo-Adresse, Anmeldedatum), Zustellung über den Push-Dienst des Browsers, Abschalten löscht das Abo; Links zu Google Maps und Anbieterseiten erst beim Tipp; Rechte (Auskunft, Berichtigung, Löschung, Widerspruch) per E-Mail, Beschwerde beim BayLDA. Rechtsgrundlagen: Art. 6 Abs. 1 lit. f (Bereitstellung), lit. a (Push). Die Quelle der Fakten sind ADR 0008, 0013, 0014, 0017; ändert sich dort etwas, muss der Abschnitt mit (ADR 0028 nennt die Kopplung).
+- **E9 Hinweise** (auf Wunsch des Nutzers, nach dem Arch-Review: „dass die Inhalte AI-Zusammenfassungen sind und Fehler enthalten können, genauso wie alle Daten“): Abschnitt vor dem Datenschutz. Ohne Gewähr, KI fasst die Anbieterseiten zusammen, alle Angaben samt Wegzeiten können falsch sein, vor dem Besuch beim Anbieter prüfen; Kontakt für Fehler, fehlende Angebote und Anbieter, die anders oder nicht erscheinen wollen; privat, nicht-kommerziell, ohne Werbung, unabhängig von den Anbietern, keine Verantwortung für verlinkte Seiten.
 - **E8 Keine Angabe nach § 18 Abs. 2 MStV.** Die Seite listet automatisiert öffentliche Anbieterangaben ohne eigene journalistisch-redaktionelle Beiträge. Steht im ADR 0028; der Nutzer kann es jederzeit ergänzen.
 - **E6 ADR 0028** „Impressum und Suchmaschinen“ ersetzt in ADR 0002 die Punkte „ohne Impressum und mit `noindex`“, in ADR 0009 „Es bleibt bei `noindex, nofollow`“ und in ADR 0020 das `noindex` der Vorschauseiten. Die drei ADRs bekommen je einen kursiven Ersetzungsvermerk wie bereits in ADR 0002. ADR 0028 begründet außerdem: die Weiterleitung der Vorschauseiten nur für Menschen (`SHARE_REDIRECT`) ist kein Cloaking, weil Bot und Mensch denselben Inhalt (Titel, Beschreibung, Link in die App) sehen; das Impressum ist offline nicht erreichbar (`"netz"`), hinnehmbar; die E-Mail `kontakt@zwergenplan.app` braucht MX-Einträge bei Porkbun (Weiterleitung), die der Nutzer anlegt. ADR 0009 bekommt im DNS-Punkt einen Ergänzungsvermerk dazu.
 
@@ -89,3 +90,15 @@ Kein Blocker. Übernommen:
 - m11 Rücklink ohne Filter: unter Risiken.
 - m12 MStV: entschieden in E8 (keine Angabe), steht in ADR 0028.
 - m13 Specs für den lokalen Lauf benannt (Schritt 5).
+
+## Arch-Review (2026-10-11) – Verdict: Nacharbeit nötig, eingearbeitet
+
+Kein Blocker. Übernommen:
+- M1 `getByText("Stephan Biastoch")` traf zwei Absätze: Test prüft die Straße (zeigte auch der erste lokale E2E-Lauf).
+- M2 Start-JS-Delta: gemessen und in ADR 0012 eingetragen (Schritt 6).
+- m1 Datenschutz nennt die IP beim Push-Worker und den Zähler je IP als Hash (ADR 0014, `push-worker/src/handler.ts`); Unit-Test prüft das Stichwort.
+- m2 Rückverweis: Invariante „Privatsphäre“ in `docs/architecture.md` nennt `imprintPage()`.
+- m3 Service-Worker-Absatz in `docs/architecture.md` nennt `impressum/`.
+- m4 Herleitung von `MAX_PAGE_BYTES` auf rund 1,9 kB festen Text (≈ 9,1 kB) nachgezogen.
+- m5 `.imprint a` liegt in `sheet.css`.
+- Zusätzlich: „Wochen-Nachricht“ → „Samstags-Nachricht“ (ein Begriff überall, Plan 0033, N2).

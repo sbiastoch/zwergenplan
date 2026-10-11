@@ -11,6 +11,8 @@ public/p/
 public/angebot/
 public/anbieter/
 public/404.html
+# Impressum und Datenschutz (Plan 0034), ebenfalls aus scripts/build-data.ts
+public/impressum/
 # Playwright
 test-results/
 playwright-report/

@@ -11,6 +11,7 @@ import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
+import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { leadCategory } from "../domain/topics.ts";
@@ -475,7 +476,13 @@ export function App() {
               />
             )}
             {/* erst mit der Liste: Sonst rutschte er beim Ersetzen des Platzhalters (CLS) */}
-            {!listPending && <p className="stand">Datenstand: {standDate(load.data.generatedAt)}</p>}
+            {!listPending && (
+              <p className="stand">
+                Datenstand: {standDate(load.data.generatedAt)} ·{" "}
+                {/* dezent, Plan 0034, E3; zweiter Weg im Kind-Sheet */}
+                <a href={`${import.meta.env.BASE_URL}${IMPRINT_PATH}`}>Impressum</a>
+              </p>
+            )}
           </>
         )}
         {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, resetIfActive, ageEscape)}

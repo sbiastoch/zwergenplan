@@ -2,7 +2,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { BASE, SITE_URL } from "../../site.config.ts";
 import type { SiteOffer, SiteProvider } from "../../src/domain/site-data.ts";
 import { fixtureSiteOffers } from "../../src/domain/test-fixtures.ts";
-import { checkSharePages, notFoundPage, offerPreview, offerSharePage, providerSharePage } from "./share-pages.ts";
+import {
+  checkSharePages,
+  imprintPage,
+  notFoundPage,
+  offerPreview,
+  offerSharePage,
+  providerSharePage,
+} from "./share-pages.ts";
 
 const GENERATED_AT = "2026-10-05T06:00:00+02:00";
 const offers = fixtureSiteOffers();
@@ -125,7 +132,9 @@ describe("Vorschauseite eines Angebots (Plan 0026, E4)", () => {
 
   it("liegt unter a/<id>/index.html und hat alle Tags (ADR 0022)", () => {
     expect(page.path).toBe(`a/${offer.id}/index.html`);
-    expect(page.html).toContain('<meta name="robots" content="noindex, nofollow">');
+    // für Suchmaschinen offen, mit Fußlink aufs Impressum (Plan 0034, E3, E4)
+    expect(page.html).not.toContain('name="robots"');
+    expect(page.html).toContain(`href="${BASE}impressum/"`);
     expect(meta(page.html, "og:title")).toBe("Offener Krabbeltreff · jeden Mittwoch, 10:00");
     expect(meta(page.html, "og:url")).toBe(`${SITE_URL}a/${offer.id}/`);
     expect(meta(page.html, "og:image")).toMatch(
@@ -213,8 +222,9 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
 
 describe("404.html (Plan 0026, E7)", () => {
   const html = notFoundPage();
-  it("noindex, ohne og:", () => {
+  it("noindex, ohne og:, mit Fußlink aufs Impressum (Plan 0034, E3)", () => {
     expect(html).toContain('<meta name="robots" content="noindex, nofollow">');
+    expect(html).toContain(`href="${BASE}impressum/"`);
     expect(html).not.toContain("og:");
     expect(html).toContain("Zum Zwergenplan");
   });
@@ -267,5 +277,30 @@ describe("Wächter gegen Fehler im Generator (Tests 10)", () => {
       providerName: '"'.repeat(300),
     };
     expect(checkSharePages([offerSharePage(worst, GENERATED_AT)])).toEqual([]);
+  });
+});
+
+describe("Impressum und Datenschutz (Plan 0034, E1, E2, E7)", () => {
+  const html = imprintPage();
+  it("nennt die Angaben nach § 5 DDG und den Datenschutz, ohne robots und Skript", () => {
+    for (const text of [
+      "<h1>Impressum</h1>",
+      "Angaben gemäß § 5 DDG",
+      "Stephan Biastoch",
+      "Zwischen den Fleischbänken 12",
+      "90403 Nürnberg",
+      'href="mailto:kontakt@zwergenplan.app"',
+      "Datenschutz",
+      "Ohne Gewähr.",
+      "Eine KI liest sie aus",
+      "OpenFreeMap",
+      "GitHub Pages",
+      "Prüfsumme (Hash)",
+      `href="${BASE}"`,
+    ]) {
+      expect(html).toContain(text);
+    }
+    expect(html).not.toContain('name="robots"');
+    expect(html).not.toContain("<script");
   });
 });

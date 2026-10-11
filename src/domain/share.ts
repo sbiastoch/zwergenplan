@@ -10,6 +10,8 @@ import { routeToSearch } from "./route.ts";
 
 /** Ordner der Vorschauseiten; sie heißen anders als die Query-Namen (`?angebot=`, `?anbieter=`, ADR 0022). */
 export const SHARE_DIRS = { offer: "a", provider: "p" } as const;
+/** Impressum und Datenschutz, statische Seite neben den Vorschauseiten (Plan 0034, E1, E2); relativ zur Basis */
+export const IMPRINT_PATH = "impressum/";
 /** Ordner bis ADR 0022 – nur noch Weiterleitungsregeln in `404.html` */
 export const LEGACY_SHARE_DIRS = { offer: "angebot", provider: "anbieter" } as const;
 

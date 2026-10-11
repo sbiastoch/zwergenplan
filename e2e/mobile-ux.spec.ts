@@ -636,6 +636,34 @@ test.describe("404-seite", () => {
   });
 });
 
+/** Impressum und Datenschutz (Plan 0034): eigenes Dokument wie die 404-Seite, Darstellung nur nach System. */
+test.describe("impressum", () => {
+  const heading = (page: Page) => page.getByRole("heading", { level: 1, name: "Impressum" });
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`impressum besteht die Mobile-UX-Gates (${colorScheme === "light" ? "hell" : "dunkel"})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto("impressum/");
+      await expect(heading(page)).toBeVisible();
+      await expectReducedMotion(page);
+      await expectMobileUx(page);
+      if (colorScheme === "dark") await expectNoBrightIslands(page);
+    });
+  }
+  test("impressum bricht bei 320 px und 200 % Textgröße nicht aus", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("impressum/");
+    await expect(heading(page)).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await expectTouchTargets(page);
+    await expectTextFits(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
+    await expectAccessible(page);
+  });
+});
+
 for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
   test(`Toast im Dunkeln ist keine helle Insel (${scheme.label})`, async ({ page }) => {
     await useScheme(page, scheme);

@@ -4,7 +4,8 @@
  *   public/data/anbieter.json (Anbieterübersicht, lädt erst beim Öffnen; Plan 0010, E6),
  *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7),
  *   public/data/linien.json (Linien je Zelle der Tabelle, Plan 0012, E7),
- *   public/a/<id>/, public/p/<publicId>/, public/404.html (Vorschauseiten zum Teilen, Plan 0026, ADR 0020/0022)
+ *   public/a/<id>/, public/p/<publicId>/, public/404.html (Vorschauseiten zum Teilen, Plan 0026, ADR 0020/0022),
+ *   public/impressum/index.html (Impressum und Datenschutz, Plan 0034)
  * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
  * (`TIMETABLE_REQUIRED`, seit Plan 0009, Schritt 5).
  */
@@ -15,10 +16,11 @@ import { fileURLToPath } from "node:url";
 import { DISTRICTS } from "../src/domain/districts.ts";
 import { icsContextFor, icsForSeries, icsForSession } from "../src/domain/ics.ts";
 import { seriesIcsPath, sessionIcsPath } from "../src/domain/ics-paths.ts";
+import { IMPRINT_PATH } from "../src/domain/share.ts";
 import { type SiteMeta, toProviderDirectory, toSiteData } from "../src/domain/site-data.ts";
 import { decodeTransitTable, INSIDE_METERS } from "../src/domain/transit.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
-import { checkSharePages, notFoundPage, offerSharePage, providerSharePage } from "./lib/share-pages.ts";
+import { checkSharePages, imprintPage, notFoundPage, offerSharePage, providerSharePage } from "./lib/share-pages.ts";
 import { buildTransitTables, withoutAccess } from "./transit/table.ts";
 
 /** Ab hier warnt der Build: Die Profil-CSA läuft in jedem data:build (Plan 0009, Backpressure). */
@@ -40,7 +42,7 @@ if (!result.ok) {
 const publicDir = fileURLToPath(new URL("public/", ROOT));
 // angebot/ und anbieter/ (vor ADR 0022) bleiben in der Liste: Ein bestehender Checkout behielte sonst veraltete Seiten,
 // und vite preview lieferte sie statt 404.html aus.
-for (const dir of ["data", "ics", "a", "p", "angebot", "anbieter", "404.html"]) {
+for (const dir of ["data", "ics", "a", "p", "angebot", "anbieter", "404.html", IMPRINT_PATH]) {
   rmSync(`${publicDir}${dir}`, { recursive: true, force: true });
 }
 
@@ -93,6 +95,7 @@ if (pageErrors.length > 0) {
 }
 for (const page of pages) write(page.path, page.html);
 write("404.html", notFoundPage());
+write(`${IMPRINT_PATH}index.html`, imprintPage());
 const largest = Math.max(...pages.map((p) => new TextEncoder().encode(p.html).length));
 
 console.log(

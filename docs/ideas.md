@@ -88,6 +88,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **5. Chromium-Shard in CI** (Plan 0027, Ausgangslage): Der Pixel-7-Shard liegt mit 486 s um 24 % über dem Chromium-Schnitt. Plan 0013 nennt eine Schwelle von 30 %; über ihr bekäme `pixel-7` zwei Shards.
 - **Browser-Installation in CI robuster** (Plan 0027, Ergebnis): Seit `.github/install-browsers.sh` hat apt Zeitlimits, und ein Retry räumt verwaistes `apt-get` ab. Hängt es trotzdem wieder, `playwright install` und `install-deps` trennen oder einen Container mit vorinstallierten Browsern nutzen.
 
+- **Suchmaschinen** (Plan 0034): `sitemap.xml` mit App, Vorschauseiten und Impressum; `canonical` auf den Vorschauseiten; Search Console einrichten.
+- **Impressum offline** (Plan 0034, ADR 0028): `impressum/` im Service Worker vorhalten, damit der Link in der installierten App ohne Netz nicht ins Leere führt.
+
 ## Offen aus abgeschlossenen Plänen
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.

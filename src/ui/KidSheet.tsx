@@ -6,6 +6,7 @@
 import { useId, useRef, useState } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import { ageInMonths } from "../domain/age.ts";
+import { IMPRINT_PATH } from "../domain/share.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
 import { useAppExtras } from "./AppExtras.tsx";
 import { BIRTH_DATE_INVALID, useBirthDateInput } from "./birth-date-input.ts";
@@ -118,6 +119,10 @@ export function KidSheet({
           <button type="button" className="linkbtn" onClick={onIntro}>
             Einführung ansehen
           </button>
+        </p>
+        {/* aus jedem Tab und auch im Lade- und Fehlerzustand erreichbar (Plan 0034, E3) */}
+        <p className="small imprint">
+          <a href={`${import.meta.env.BASE_URL}${IMPRINT_PATH}`}>Impressum und Datenschutz</a>
         </p>
       </div>
       <div className="sheetfoot">
