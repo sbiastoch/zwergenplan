@@ -14,7 +14,8 @@ import { loadSearchesRaw } from "../../data/searches-store.ts";
 
 export type PushSwitchResult = { kind: "an" | "aus" | PushProblem; seq: number };
 
-function mirrorData(): MirrorData {
+/** Angaben aus dem Speicher, wie sie gespiegelt werden; auch für `syncPushMirror` am Ende des Onboardings (Plan 0034, E9) */
+export function mirrorData(): MirrorData {
   return {
     birthDate: loadBirthDate(),
     searches: loadSearchesRaw(),

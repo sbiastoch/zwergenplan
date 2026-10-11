@@ -58,6 +58,10 @@
     border-bottom: 3px solid #13212e;
     border-radius: 0 0 50% 50% / 0 0 34px 34px;
   }
+  /* iPhone im Safari-Tab: App-Bühne zuerst (Plan 0034, E8) */
+  .onb-pending.ios {
+    background-color: #b99cff;
+  }
   .onb-topbar {
     position: absolute;
     top: env(safe-area-inset-top);
@@ -505,11 +509,17 @@
 :root[data-theme="dark"] .onb-pending {
   background-color: color-mix(in srgb, #ffd93b 80%, #0e1620);
 }
+:root[data-theme="dark"] .onb-pending.ios {
+  background-color: color-mix(in srgb, #b99cff 80%, #0e1620);
+}
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .dlg::backdrop {
     background: rgba(0, 0, 0, 0.62);
   }
   :root:not([data-theme="light"]) .onb-pending {
     background-color: color-mix(in srgb, #ffd93b 80%, #0e1620);
+  }
+  :root:not([data-theme="light"]) .onb-pending.ios {
+    background-color: color-mix(in srgb, #b99cff 80%, #0e1620);
   }
 }
