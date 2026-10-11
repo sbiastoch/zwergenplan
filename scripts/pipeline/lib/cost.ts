@@ -69,9 +69,9 @@ function groupBy<K>(calls: readonly CallRecord[], key: (c: CallRecord) => K): Ma
 
 export function summarizeCosts(calls: readonly CallRecord[], o: { cached: number }): CostSummary {
   const byStepModel = [...groupBy(calls, (c) => `${c.step}\u0000${c.model}`).values()]
-    .map((list) => {
-      const first = list[0] as CallRecord;
-      return { step: first.step, model: first.model, ...totalsOf(list) };
+    .flatMap((list) => {
+      const [first] = list;
+      return first ? [{ step: first.step, model: first.model, ...totalsOf(list) }] : [];
     })
     .sort((a, b) => a.step.localeCompare(b.step) || a.model.localeCompare(b.model));
   const providers = [...groupBy(calls, (c) => c.providerId)]

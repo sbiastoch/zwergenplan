@@ -257,6 +257,18 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(r.build.written).toBeDefined();
   });
 
+  it("reißt der letzte Anbieter die Bremse, ist sie trotzdem erreicht", async () => {
+    const dirsOf = tempData();
+    const { extractor, seen } = fakeExtractor();
+    const r = await runNightly({
+      ...options(dirsOf, extractor),
+      only: ["musikschule-beispiel"],
+      brakes: { maxCalls: 1, maxTokens: 1_000_000 },
+    });
+    expect(seen).toEqual(["musikschule-beispiel"]);
+    expect(r.brake).toBe("aufrufe");
+  });
+
   it("Bremse MAX_TOKENS zählt Tokens ein und aus", async () => {
     const dirsOf = tempData();
     const { extractor, seen } = fakeExtractor();

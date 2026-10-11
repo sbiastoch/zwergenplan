@@ -44,7 +44,8 @@ describe("publishNightly (Plan 0032, E6)", () => {
     let validated = 0;
     const r = publishNightly({ git: run, message: "data: Nachtlauf\n\nText", validate: () => validated++ });
     expect(r).toEqual({ pushed: true });
-    expect(validated).toBe(1);
+    // vor dem Commit und nach dem Rebase
+    expect(validated).toBe(2);
     expect(origin.git("log", "-1", "--format=%B", "main").trim()).toBe("data: Nachtlauf\n\nText");
     expect(origin.git("show", "--name-only", "--format=", "main").trim().split("\n").sort()).toEqual([
       "data/kosten.csv",
@@ -103,6 +104,23 @@ describe("publishNightly (Plan 0032, E6)", () => {
     };
     expect(() => publishNightly({ git: run, message: "x", validate })).toThrow(/Plausibilität/);
     expect(work.git("log", "--format=%s").trim()).toBe("start");
+  });
+
+  it("scheitert die Prüfung nach dem Rebase (fremder Commit), wird nicht gepusht", () => {
+    const { origin, work, run } = setup();
+    origin.git("checkout", "-q", "main");
+    write(origin.dir, "data/providers.yaml", "Anbieter entfernt\n");
+    origin.git("commit", "-qam", "Katalog");
+    origin.git("checkout", "-q", "parken");
+    const before = origin.git("rev-parse", "main").trim();
+    write(work.dir, "data/kosten.csv", "kopf\n");
+    let n = 0;
+    const validate = () => {
+      n++;
+      if (n === 2) throw new Error("Plausibilität nach Rebase");
+    };
+    expect(() => publishNightly({ git: run, message: "x", validate })).toThrow(/nach Rebase/);
+    expect(origin.git("rev-parse", "main").trim()).toBe(before);
   });
 
   it("ohne Änderung kein Commit und kein Push", () => {

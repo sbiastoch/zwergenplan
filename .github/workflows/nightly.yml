@@ -6,6 +6,7 @@
 #            Artefakte (runs/<datum>/ und data/ des Laufs). Kein Push.
 #   live     S3.4: wie trocken, danach `pipeline publish` (Commit nach main, `pull --rebase`, Konflikt → rot ohne
 #            Push) und CI per workflow_dispatch (ein Push mit GITHUB_TOKEN startet sonst keine CI). Nur auf main.
+#            Erst einschalten, wenn ADR 0026 (Abweichung von ADR 0002: Push aus Actions) mindestens vorgeschlagen ist.
 #
 # Der Job mit dem Modell hat nur `contents: read`; Schreibrecht und Token hat allein der Job `veroeffentlichen`, und
 # dort nur der Schritt, der pusht (persist-credentials: false). Rot nach E6: Gates rot, Push gescheitert, Ampel rot
@@ -251,8 +252,12 @@ jobs:
           GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          # kein pre-commit-Hook (check:fast samt Tests) mit Token in der Umgebung; die Gates liefen im Job nachtlauf
+          # auf genau diesen Daten, publish prüft vor dem Commit und nach dem Rebase mit validate-data
+          LEFTHOOK: "0"
         run: |
           auth="$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+          unset TOKEN
           echo "::add-mask::$auth"
           export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
           export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth"
