@@ -262,7 +262,7 @@ function PhoneArt() {
           <path className="ln" d="M50 90 Q60 99 70 90" />
         </g>
       </g>
-      <g transform="translate(286 4) scale(.9)">
+      <g transform="translate(264 130) scale(.9)">
         <g className="fl2">
           <path className="o" fill="#FFFFFF" d={SPARKLE} />
         </g>

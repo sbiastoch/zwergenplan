@@ -66,6 +66,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* große Schrift bei 320 px: „Überspringen“ rückt unter die Punkte, statt mitten im Wort zu brechen */
+    flex-wrap: wrap;
     padding: 14px 10px 0 22px;
     color: #13212e;
   }
@@ -84,6 +86,7 @@
     background: none;
     color: #13212e;
     font-weight: 800;
+    white-space: nowrap;
     text-decoration: underline wavy;
     text-decoration-thickness: 1.5px;
     text-underline-offset: 5px;

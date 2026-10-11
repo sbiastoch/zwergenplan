@@ -341,6 +341,17 @@
     white-space: normal;
     text-wrap: balance;
   }
+  /* Installationsknopf unter 360 px: „Zum Startbildschirm hinzufügen“ (≈ 256 px) passt sonst nicht in eine Zeile
+     (Text-Gate, Prüfung 5); ohne Symbol, mit schmalerem Polster und 15 px bleiben bei 320 px ≈ 12 px Luft. */
+  @media (max-width: 359px) {
+    .onb-data .btn.wide {
+      padding-inline: 8px;
+      font-size: 0.9375rem;
+    }
+    .onb-data .btn.wide svg {
+      display: none;
+    }
+  }
   .onb .later {
     min-height: 44px;
     border: 0;
