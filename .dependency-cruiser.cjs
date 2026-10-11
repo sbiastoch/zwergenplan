@@ -250,10 +250,10 @@ module.exports = {
       name: "pipeline-lib-pure",
       severity: "error",
       comment:
-        "scripts/pipeline/lib ist reine Logik mit Tests (Plan 0002): kein Netz, keine Dateien, kein git – das liegt in io/ und cli.ts.",
+        "scripts/pipeline/lib ist reine Logik mit Tests (Plan 0002): kein Netz, keine Dateien, kein git – das liegt in io/, cli.ts und eval.ts.",
       from: { path: "^scripts/pipeline/lib/", pathNot: "\\.test\\.ts$" },
       to: {
-        path: ["^scripts/pipeline/(io/|cli\\.ts)", "^scripts/lib/"],
+        path: ["^scripts/pipeline/(io/|cli\\.ts|eval\\.ts)", "^scripts/lib/"],
       },
     },
     {

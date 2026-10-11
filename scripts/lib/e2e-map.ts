@@ -224,6 +224,8 @@ export const NO_E2E: readonly RegExp[] = [
   /^\.claude\//,
   // echte Daten: erreichen nur die Smoke-Specs (SPEC_COVERS), die Geräte-Specs laufen mit tests/fixtures/
   /^data\//,
+  // Eval-Fälle und Ergebnisse der Extraktion: Testmaterial der Pipeline (Plan 0032, E9)
+  /^evals\//,
   /^push-worker\//,
   // Export von src/domain/schema.ts (schema:check) und die Vorlage der Icons (scripts/icons.ts schreibt public/)
   /^(schema|design)\//,

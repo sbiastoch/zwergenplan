@@ -207,8 +207,9 @@ export async function freezeCase(o: {
     allowedUrls: f.allowedUrls,
   });
   const previous = readPreviousOffers();
-  const to = previous ? [previous.horizon.to, addMonths(o.today, 12)].sort()[0] : addMonths(o.today, 12);
-  const window = { from: o.today, to: to ?? addMonths(o.today, 12) };
+  const max = addMonths(o.today, 12);
+  const to = previous && previous.horizon.to < max ? previous.horizon.to : max;
+  const window = { from: o.today, to };
   const offers = toEvalOffers(previous?.offers.filter((x) => x.providerId === o.providerId) ?? [], window);
   const expected: EvalExpected = {
     basis: `data/offers.json vom ${previous?.generatedAt ?? "(fehlt)"}, Entwurf – von Hand gegen input.json prüfen`,

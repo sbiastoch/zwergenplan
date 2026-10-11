@@ -12,6 +12,7 @@ import {
   scoreCase,
   summarize,
   toEvalOffers,
+  unusableRun,
 } from "./eval-score.ts";
 import { RawEvent } from "./raw.ts";
 
@@ -279,6 +280,21 @@ describe("summarize und resultsRow", () => {
     const md = `${RESULTS_HEADER}\n${resultsRow(summarize(results), results, { date: "2026-10-11", model: "haiku", hash: "abc123def456" })}\n`;
     expect(hasResultFor(md, "abc123def456")).toBe(true);
     expect(hasResultFor(md, "000000000000")).toBe(false);
+  });
+});
+
+describe("unusableRun", () => {
+  const ok: CaseResult = { name: "a", outcome: "ok", score: scoreCase([], []), calls: [call()] };
+  const bad: CaseResult = {
+    name: "b",
+    outcome: "fehler",
+    score: scoreCase([], []),
+    calls: [call({ result: "error" })],
+  };
+  it("braucht alle Fälle und mindestens eine gültige Antwort", () => {
+    expect(unusableRun([ok, bad], 2)).toBeUndefined();
+    expect(unusableRun([ok], 2)).toBe("nur 1 von 2 Fällen bewertet");
+    expect(unusableRun([bad, bad], 2)).toBe("keine einzige gültige Antwort");
   });
 });
 

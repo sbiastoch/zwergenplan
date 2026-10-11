@@ -8,9 +8,8 @@ Die 13 Kurse der Kursorganizer-Antwort von UTC in Berliner Zeit umgerechnet und 
 
 ## Korrekturen gegenüber dem Bestand
 
-keine
+- Alle 10 Angebote (90 Termine) entfallen (Entscheid nach dem Arch-Review, 2026-10-11): Die API liefert je Kurs nur `startDateTime` des ersten Termins (21.–27.09.2026, vor dem Fenster), keine Terminzahl, kein Ende und keine Ferien. Die Folgetermine im Bestand (je 9 im Fenster bis Mitte/Ende Dezember, Pause in den Herbstferien) stammen aus einer anderen Quelle und lassen sich aus input.json nicht belegen. Nach „Werte werden nie geraten“ entsteht aus dieser Eingabe kein Termin im Fenster; erwartet ist `{"events": []}` bzw. nichts im Fenster. Der Fall prüft damit vor allem, dass das Modell keine Folgetermine erfindet.
+- Restpunkt Katalogpflege: Die GraphQL-Abfrage um die Termine je Kurs erweitern, dann den Fall neu einfrieren (`pnpm eval freeze nuebad-flipper --kind json-api`).
 
 ## Grenzfälle
-
-- Die API liefert je Kurs nur `startDateTime` des ersten Termins (21.–27.09.2026, vor dem Fenster), keine Terminzahl, kein Ende und keine Ferien. Die Folgetermine im Bestand (je 9 im Fenster bis Mitte/Ende Dezember, Pause in den Herbstferien, sonntags auch 08.11. ausgelassen) lassen sich aus input.json nicht belegen. Bestand gelassen; ein Modell, das nichts rät, kann diese Termine nicht treffen.
 - Topics von „Mutter/Vater-Kleinkind-Schwimmen“ (12–24 Mon.): Bestand `kleinkindschwimmen` + `babyschwimmen`, vertretbar, gelassen.
