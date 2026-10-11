@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
 import type { Anbieter, Provider } from "../../../src/domain/schema.ts";
 import type { Candidate } from "./candidate.ts";
-import { addressKey, matchCandidate } from "./match.ts";
+import { addressKey, anbieterVids, matchCandidate } from "./match.ts";
 
 /** Auszug aus dem echten Katalog (Orte, Namen, Programm-URLs). */
 function anbieter(id: string, name: string, venues: Anbieter["venues"], programme: string[] = []): Anbieter {
@@ -152,5 +152,14 @@ describe("addressKey", () => {
     expect(addressKey("Neumühlweg 20a, 90449 Nürnberg")).toBe("neumuehlweg20a|90449");
     expect(addressKey("wechselnd, Nürnberger Wald")).toBeUndefined();
     expect(addressKey(undefined)).toBeUndefined();
+  });
+});
+
+describe("anbieterVids", () => {
+  it("vids nur der Anbieter, die über diesen Sammelkalender laufen (coveredBy)", () => {
+    const covered = catalog.map((p) => (p.id === "ev-zerzabelshof-musikzwerge" ? { ...p, coveredBy: "et" } : p));
+    expect(anbieterVids(covered, "et")).toEqual(["124"]);
+    expect(anbieterVids(covered, "anderer")).toEqual([]);
+    expect(anbieterVids(catalog, "et")).toEqual([]);
   });
 });

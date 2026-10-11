@@ -264,6 +264,14 @@ module.exports = {
       to: { dependencyTypes: ["core"], path: "^(node:)?(fs|net|http|https|child_process|os|dgram|dns|tls)(/|$)" },
     },
     {
+      name: "playwright-only-in-pipeline-browser",
+      severity: "error",
+      comment:
+        "In der Pipeline startet nur scripts/pipeline/io/browser.ts einen Browser (Plan 0032, E3: render: browser). Alle anderen Abrufe laufen über io/http.ts.",
+      from: { path: "^scripts/pipeline/", pathNot: "^scripts/pipeline/io/browser\\.ts$" },
+      to: { path: "(^|/)node_modules/(@playwright/test|playwright|playwright-core)/" },
+    },
+    {
       name: "transit-build-pure",
       severity: "error",
       comment:
