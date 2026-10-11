@@ -528,5 +528,6 @@ describe("runDiscover (Plan 0032, E7)", () => {
 
   it("--hide nur im Trockenlauf", async () => {
     await expect(run(tempData(), {}, { dryRun: false, hide: ["turnverein-beispiel"] })).rejects.toThrow(/Trockenlauf/);
+    await expect(run(tempData(), {}, { hide: ["sammelkalender-beispiel"] })).rejects.toThrow(/kein Anbieter/);
   });
 });

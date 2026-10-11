@@ -59,8 +59,9 @@ const Instant = z.iso.datetime({ offset: true, local: false });
 
 /**
  * Zustand je Anbieter in `data/raw/<providerId>.json` (Plan 0032, E5): dauerhafter Zustand der Pipeline, kein
- * Vertrag der Website. Schreibt nur `refreshProvider` (`io/refresh.ts`), die Regeln stehen in `lib/refresh.ts`;
- * `pipeline build` macht daraus `data/offers.json`. Exportiert nach schema/provider-raw.schema.json.
+ * Vertrag der Website. Den Inhalt erzeugt nur `refreshProvider` (`io/refresh.ts`, Regeln in `lib/refresh.ts`); das
+ * Entdecken kopiert bei Aufnahme nur seinen Ertragsbeweis hierher.
+ * Der Build in `pipeline nightly` macht daraus `data/offers.json`. Exportiert nach schema/provider-raw.schema.json.
  */
 export const ProviderRaw = z
   .strictObject({
@@ -123,7 +124,7 @@ export function providerRawIssues(label: string, id: string, raw: unknown, anbie
 
 export interface RawContext {
   providers: readonly Provider[];
-  /** Anbieter des zugehörigen Pakets – jeder braucht einen Status */
+  /** Anbieter, die einen Status brauchen */
   expected?: readonly string[];
   horizon: { from: string; to: string };
   freeDays: ExpandWindow["freeDays"];

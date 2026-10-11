@@ -35,6 +35,7 @@
  *                                               Zeitbudget RUN_BUDGET_MIN (90). --terms: nur diese Suchbegriffe (Probe).
  *                                               --hide (nur mit --dry-run): Entdecken-Eval (E9), diese Anbieter gelten
  *                                               als unbekannt; der Bericht zählt, welche wiedergefunden werden.
+ *                                               G3 steigt dabei um die Zahl der ausgeblendeten.
  *   discover-publish RUN_DIR                    Commits des Entdeckens nach main (pull --rebase, validate-data,
  *                                               push); schreibt RUN_DIR/issue.md, wenn ein Anbieter neu ist (E7.10).
  *   holidays FROM TO                            freie Tage (Ferien/Feiertage Bayern)
@@ -321,7 +322,9 @@ async function discoverCmd() {
   if (!brakes.ok) fail(brakes.error);
   const budgetMin = Number(process.env["RUN_BUDGET_MIN"] || DISCOVER_BUDGET_MIN);
   if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
-  const maxNew = values.bootstrap ? Number(process.env["MAX_NEW"] || 30) : MAX_NEW_PER_RUN;
+  // Entdecken-Eval: G3 darf keinen ausgeblendeten Anbieter verdrängen (Arch-Review S5, M1)
+  const evalHidden = values.hide?.split(",").filter(Boolean).length ?? 0;
+  const maxNew = values.bootstrap ? Number(process.env["MAX_NEW"] || 30) : MAX_NEW_PER_RUN + evalHidden;
   if (!(Number.isInteger(maxNew) && maxNew > 0)) fail(`MAX_NEW ungültig: ${process.env["MAX_NEW"]}`);
   let terms: string[];
   try {
@@ -332,6 +335,7 @@ async function discoverCmd() {
   const dryRun = values["dry-run"];
   const hide = values.hide?.split(",").filter(Boolean);
   if (hide && !dryRun) fail("--hide nur mit --dry-run (Entdecken-Eval)");
+  if (hide?.length === 0) fail("--hide ohne Anbieter");
   // live: G1 erst auf dem Ausgangsstand; ist der schon rot, würde jeder Kandidat still verworfen (Arch-Review S4, m1)
   if (!dryRun)
     try {

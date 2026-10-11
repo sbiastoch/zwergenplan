@@ -262,6 +262,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   if (o.hide && o.hide.length > 0) {
     if (!o.dryRun) throw new Error("--hide nur im Trockenlauf (--dry-run)");
     ({ catalog, text: catalogText, hidden } = hideProviders(catalog, catalogText, o.hide));
+    const outside = hidden.filter((p) => !o.regions.includes(p.region)).map((p) => p.id);
+    if (outside.length > 0) throw new Error(`--hide: nicht in den Regionen des Laufs: ${outside.join(", ")}`);
   }
   const originalCatalogText = catalogText;
   // zurückgenommene IDs aller Regionen: IDs sind global (ADR 0022)
@@ -498,6 +500,11 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       report.adopted.push(adopted);
       log(`  ✓ ${entry.id} (${find.url}): ${adopted.first.title}`);
     }
+
+    // nach dem Vorfilter übrig, aber nicht bewertet (G3, Bremse, Zeitbudget, Abbruch): für das Entdecken-Eval
+    const handled = new Set([...report.adopted, ...report.rejected, ...report.dropped].map((x) => x.find));
+    const unassessed = keep.filter((f) => !handled.has(f));
+    if (unassessed.length > 0) report.unassessed = unassessed;
 
     // Hinweise ohne Aktion (E7): Quellen mit Fehlerserie
     const ids = new Set(inRegion.map((p) => p.id));

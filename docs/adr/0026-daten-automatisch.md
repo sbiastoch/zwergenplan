@@ -1,6 +1,6 @@
 # ADR 0026 – Daten automatisch: Nachtlauf und Entdecken in GitHub Actions über `claude -p`
 
-Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006 und von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032.
+Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006, ändert den Vergabeweg der IDs aus ADR 0022 und weicht ab von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032.
 
 ## Kontext
 
@@ -25,6 +25,7 @@ Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd
 - **ADR 0003:** Der Datenhorizont von `data/offers.json` beträgt 12 Monate statt 4 (`HORIZON_MONTHS`).
 - **ADR 0004:** Das Eval-Gate aus ADR 0016 entfällt; Backpressure leisten Validierung je Anbieter (Schema, URL-Plausibilität, Wiederholung und Fallback), der Build-Probelauf je Anbieter, der Einbruchschutz, die Gates vor dem Push (`data:validate`, `check:fast`) und der Vergleich gegen den deployten Stand, während das Eval eine Messung ohne Gate ist und die CI nur warnt (`::warning::` aus `data:validate`), wenn für den aktuellen Prompt-Hash keine Zeile in `evals/results.md` steht.
 - **ADR 0006:** Es gibt keine Subagenten-Pakete mehr; extrahiert wird nur über `pipeline nightly` bzw. `refreshProvider`, und Agenten pflegen den Katalog nur über `discover` (neue Anbieter) und von Hand über den Skill `babyevents-nuernberg`.
+- **ADR 0022:** Nur der Vergabeweg ändert sich: Angebots-IDs vergibt der Build in `pipeline nightly`, die `publicId` neuer Anbieter `pipeline discover` oder die Meldung von `data:validate`; die Regel `shortId(id, seed)` bleibt.
 - **ADR 0011 Nr. 4:** Bleibt unverändert, anders als ADR 0016 und Plan 0032, E14 vorsahen: `pipeline oepnv` läuft nicht im Nachtlauf, `data/oepnv/fahrplan.json` liegt weiter im Repo und wird bei einem Fahrplanwechsel von Hand über den Skill erneuert (Plan 0032, „Stufe 3 – Umsetzung“).
 - **`docs/architecture.md`:** `data/raw` und `data/discover` sind dauerhafter Zustand der Pipeline in `data/`, aber kein Vertrag der Website („Ein Datenvertrag“ bleibt `src/domain/schema.ts`); `scripts/validate-data.ts` darf dafür aus `scripts/pipeline/lib` importieren, und `pipeline publish` läuft aus dem Workflow.
 

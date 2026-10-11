@@ -676,11 +676,12 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
         dropped: [
           { find: find({ name: "Theater", url: "https://example.org/theater" }), grund: "Host und Name wie x" },
         ],
+        unassessed: [find({ name: "Familientreff Beispielhof", url: "https://example.org/familientreff/kurse" })],
         hints: [],
       },
     ]);
     expect(e.outcomes.map((o) => [o.id, o.ergebnis])).toEqual([
-      ["familientreff-beispiel", "nicht gefunden"],
+      ["familientreff-beispiel", "nicht bewertet"],
       ["musikschule-beispiel", "verworfen"],
       ["theater-beispiel", "vorfilter"],
       ["turnverein-beispiel", "aufgenommen"],
@@ -700,7 +701,7 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
       budgetHit: false,
       hidden: e,
     });
-    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(1 von 4 wiedergefunden, 3 gefunden\)/);
+    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(1 von 4 wiedergefunden, 4 gefunden\)/);
     expect(md).toMatch(
       /\| musikschule-beispiel \| verworfen \| https:\/\/example\.org\/musikschule \| ohne Adresse \|/,
     );

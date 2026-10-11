@@ -215,7 +215,7 @@ export const AgeRange = z
 
 /** Felder eines Angebots ohne Querprüfungen – Basis für Offer und das Rohformat der Pipeline (ADR 0006). */
 export const OfferFields = z.strictObject({
-  /** gespeichert, vergeben und gehalten von `pipeline build` (ADR 0022) */
+  /** gespeichert, vergeben und gehalten vom Build in `pipeline nightly` (`buildOffers`, ADR 0022) */
   id: shortIdField,
   providerId: kebab,
   venueId: kebab,

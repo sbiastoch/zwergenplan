@@ -52,7 +52,7 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
   const partMaxChars = opts.partMaxChars ?? PART_MAX_CHARS;
   const loadDays = opts.freeDays ?? loadFreeDays;
   const llmOpts: LlmOptions = { ...(opts.bin ? { bin: opts.bin } : {}), ...(opts.env ? { env: opts.env } : {}) };
-  // Ferien je Stichtag einmal laden; weit genug für laufende Kurse mit vergangenen Terminen (wie `pipeline build`)
+  // Ferien je Stichtag einmal laden; weit genug für laufende Kurse mit vergangenen Terminen (wie der Build des Nachtlaufs)
   const freeDaysCache = new Map<string, Promise<Record<string, string>>>();
   const freeDaysFor = (today: string) => {
     const cached = freeDaysCache.get(today);

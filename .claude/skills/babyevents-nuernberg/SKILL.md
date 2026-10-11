@@ -84,6 +84,14 @@ pnpm eval freeze <id> --kind html[,gross] [--trap ab-3-jahren]
 
 legt `evals/cases/<id>-<heute>/` aus einem frischen Abruf an. `expected.json` ist ein Entwurf aus dem Bestand: von Hand gegen `input.json` prüfen, Korrekturen in `NOTES.md` (Plan 0032, E9). Arten und Fallen nennt `scripts/pipeline/eval.ts`. Fertig, wenn `pnpm verify` grün ist (`io/eval.test.ts` prüft alle Fälle).
 
+**Entdecken-Eval** (Plan 0032, E9): misst, ob das Entdecken bekannte Anbieter wiederfindet, etwa nach einer Änderung an Suchbegriffen oder Prompts von `prompt/discover-*.md`.
+
+```
+pnpm pipeline discover --dry-run --hide <id>,<id>,…    # ≈ 10 Anbieter verschiedener Arten, ≈ $1, 30–60 Min.
+```
+
+Der Bericht `runs/<heute>/discover/report.md` nennt je ausgeblendetem Anbieter den Ausgang (aufgenommen, verworfen mit Grund, nicht bewertet, Vorfilter, nicht gefunden) und unter „Zusätzlich aufgenommen“ Anbieter, die nicht ausgeblendet waren: Die sind neu oder falsch und werden von Hand beurteilt. Ergebnis als Zeile unter „Entdecken“ in `evals/results.md`.
+
 ## 5. Modell wechseln
 
 1. Messen: `pnpm eval --model <neu>` (Modell allein) und `pnpm eval --model <neu> --fallback sonnet` (wie der Nachtlauf). Jeder volle Lauf schreibt eine Zeile in `evals/results.md`. Ein Lauf ist eine Stichprobe; vor einer Entscheidung je Modell zwei Läufe.

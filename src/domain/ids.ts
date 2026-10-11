@@ -1,6 +1,6 @@
 /**
  * IDs (ADR 0022). Angebote und Anbieter haben eine gespeicherte Kurz-ID aus 8 Zeichen: Angebote in
- * data/offers.json (vergeben von `pipeline build`, gehalten über die Zuordnung gegen den Vorstand), Anbieter als
+ * data/offers.json (vergeben vom Build in `pipeline nightly`, gehalten über die Zuordnung gegen den Vorstand), Anbieter als
  * `publicId` im Katalog. Die alte lange Angebots-ID lebt als Zuordnungsschlüssel `offerKey` weiter; eine alte ID
  * oder Katalog-ID wird mit `shortId(alt, 0)` zur neuen (Rechenregel statt Alias-Liste). Eine geänderte ID bricht
  * Links, Merklisten und Kalender-UIDs – Regeln hier nur per ADR ändern.

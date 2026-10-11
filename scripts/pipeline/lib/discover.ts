@@ -599,6 +599,8 @@ export interface RegionReport {
   dropped: Array<{ find: Find; grund: string }>;
   adopted: Adopted[];
   rejected: Array<{ find: Find; grund: string }>;
+  /** nach dem Vorfilter übrig, aber nicht bewertet (G3, Bremse, Zeitbudget, Abbruch) */
+  unassessed?: Find[];
   hints: string[];
 }
 
@@ -621,7 +623,7 @@ export interface DiscoverReport {
 interface HiddenOutcome {
   id: string;
   name: string;
-  ergebnis: "aufgenommen" | "verworfen" | "vorfilter" | "nicht gefunden";
+  ergebnis: "aufgenommen" | "verworfen" | "nicht bewertet" | "vorfilter" | "nicht gefunden";
   /** Fund-URL des passenden Kandidaten */
   url?: string;
   grund?: string;
@@ -669,6 +671,7 @@ export function hiddenEval(hidden: readonly Provider[], regions: readonly Region
   const adopted = regions.flatMap((r) => r.adopted);
   const rejected = regions.flatMap((r) => r.rejected);
   const dropped = regions.flatMap((r) => r.dropped);
+  const unassessed = regions.flatMap((r) => r.unassessed ?? []);
   const outcomes = [...hidden]
     .sort((a, b) => a.id.localeCompare(b.id))
     .map((p): HiddenOutcome => {
@@ -677,6 +680,14 @@ export function hiddenEval(hidden: readonly Provider[], regions: readonly Region
       if (a) return { ...base, ergebnis: "aufgenommen", url: a.find.url };
       const r = rejected.find((x) => matchesProvider(x.find, p));
       if (r) return { ...base, ergebnis: "verworfen", url: r.find.url, grund: r.grund };
+      const u = unassessed.find((x) => matchesProvider(x, p));
+      if (u)
+        return {
+          ...base,
+          ergebnis: "nicht bewertet",
+          url: u.url,
+          grund: "Lauf vor dem Bewerten beendet (G3, Bremse, Zeit)",
+        };
       const d = dropped.find((x) => matchesProvider(x.find, p));
       if (d) return { ...base, ergebnis: "vorfilter", url: d.find.url, grund: d.grund };
       return { ...base, ergebnis: "nicht gefunden" };
