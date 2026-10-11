@@ -1,0 +1,78 @@
+{
+ "events": [
+  {
+   "providerId": "nachbarschaftshaus-gostenhof",
+   "venueId": "nachbarschaftshaus-gostenhof",
+   "title": "Offenes Kinderzimmer – Dienstag 9–12 Uhr",
+   "summary": "Offener Spieltreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne pädagogische Betreuung; eine Ansprechpartnerin ist vor Ort. Im Sommer ist der Garten nutzbar. Findet nicht in den Ferien statt.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "price": "Kostenfrei",
+   "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff, keine Anmeldung nötig"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "09:00",
+    "end": "12:00",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "nachbarschaftshaus-gostenhof",
+   "venueId": "nachbarschaftshaus-gostenhof",
+   "title": "Offenes Kinderzimmer – Donnerstag 14–17 Uhr",
+   "summary": "Offener Spieltreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne pädagogische Betreuung; eine Ansprechpartnerin ist vor Ort. Im Sommer ist der Garten nutzbar. Findet nicht in den Ferien statt.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "price": "Kostenfrei",
+   "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff, keine Anmeldung nötig"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "14:00",
+    "end": "17:00",
+    "from": "2026-10-15",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "c6e2fb7664a1f591654a1da6874ffa34d209e9cd0dadf0373720895e08829601",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

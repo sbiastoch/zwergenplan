@@ -1,0 +1,58 @@
+{
+ "events": [
+  {
+   "providerId": "hebamme-elena-paulus",
+   "venueId": "hebamme-elena-paulus",
+   "title": "Babymassage-Kurs (4 Wochen bis 6 Monate)",
+   "summary": "Kurs mit Massage und Berührungsübungen für Babys ab 4 Wochen bis 6 Monate, der die Bindung stärkt und entspannt. Dienstags 9:00–9:45 Uhr in Nürnberg-Fischbach; der Kurs vom 24.11. bis 22.12.2026 ist ausgebucht, ein nächster Kurs ist für voraussichtlich Februar 2027 geplant.",
+   "topics": [
+    "babymassage"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "65 Euro (inkl. Skript)",
+   "url": "https://www.elena-paulus.de/kurse",
+   "sourceUrl": "https://www.elena-paulus.de/kurse",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 6
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Kurs 24.11.–22.12.2026 ausgebucht"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-24T09:00",
+      "end": "2026-11-24T09:45"
+     },
+     {
+      "start": "2026-12-01T09:00",
+      "end": "2026-12-01T09:45"
+     },
+     {
+      "start": "2026-12-08T09:00",
+      "end": "2026-12-08T09:45"
+     },
+     {
+      "start": "2026-12-15T09:00",
+      "end": "2026-12-15T09:45"
+     },
+     {
+      "start": "2026-12-22T09:00",
+      "end": "2026-12-22T09:45"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "3f49d4c29bb4b7d2f7aa82eb85d704c5c5bcce76e85088d2394f0eaa3148843b",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

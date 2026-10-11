@@ -1,0 +1,74 @@
+{
+ "events": [],
+ "status": "fehler",
+ "reason": "Einbruch zurückgehalten (43 → 2 Angebote), Vorstand bleibt",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "failingSince": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "frankenkids"
+ ],
+ "pending": {
+  "inputHash": "7bd010befa50fbf7b9a2b1f24a2188ea22b93763b42117e0beeb935589495c3e",
+  "model": "haiku",
+  "events": [
+   {
+    "providerId": "studio-herzschlag",
+    "venueId": "studio-herzschlag-outdoor-fitness-mit-baby",
+    "title": "Mama Outdoor Fitness mit Baby – Anfänger (Di 10–11 Uhr)",
+    "summary": "Kraft-, Cardio- und Beweglichkeitstraining draußen am Wöhrder See, Baby im Kinderwagen oder in der Trage. Einstieg jederzeit möglich; Buchung über das Formular der Seite.",
+    "topics": [
+     "bewegung",
+     "fitness-mit-baby"
+    ],
+    "format": "regelmaessig",
+    "registration": "mit-anmeldung",
+    "cost": "kostenpflichtig",
+    "url": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
+    "sourceUrl": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
+    "availability": {
+     "status": "unbekannt",
+     "note": "Keine Platzanzeige; Buchung über das Formular auf der Seite. Externer Anbieter, Vertrag und Rechnung direkt beim Kursanbieter."
+    },
+    "schedule": {
+     "kind": "weekly",
+     "weekdays": [
+      "TU"
+     ],
+     "start": "10:00",
+     "end": "11:00",
+     "from": "2026-10-13",
+     "skipHolidays": true
+    }
+   },
+   {
+    "providerId": "studio-herzschlag",
+    "venueId": "studio-herzschlag-outdoor-fitness-mit-baby",
+    "title": "Mama Outdoor Fitness mit Baby – Fortgeschrittene (Di 15–16 Uhr)",
+    "summary": "Anspruchsvolleres Outdoor-Training für Mamas am Wöhrder See, Baby im Kinderwagen oder in der Trage ist dabei. Einstieg jederzeit möglich; Buchung über das Formular der Seite.",
+    "topics": [
+     "bewegung",
+     "fitness-mit-baby"
+    ],
+    "format": "regelmaessig",
+    "registration": "mit-anmeldung",
+    "cost": "kostenpflichtig",
+    "url": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
+    "sourceUrl": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
+    "availability": {
+     "status": "unbekannt",
+     "note": "Keine Platzanzeige; Buchung über das Formular auf der Seite. Externer Anbieter, Vertrag und Rechnung direkt beim Kursanbieter."
+    },
+    "schedule": {
+     "kind": "weekly",
+     "weekdays": [
+      "TU"
+     ],
+     "start": "15:00",
+     "end": "16:00",
+     "from": "2026-10-13",
+     "skipHolidays": true
+    }
+   }
+  ]
+ }
+}

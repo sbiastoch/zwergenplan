@@ -1,0 +1,46 @@
+{
+ "events": [
+  {
+   "providerId": "ev-st-jobst",
+   "venueId": "ev-st-jobst",
+   "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre, dienstags)",
+   "summary": "Wöchentlicher Treff für Kinder von 1–2 Jahren mit Mutter oder Vater im Miniclubraum des Gemeindehauses St. Jobst; Spielen, erste Gruppenerfahrungen und Austausch der Eltern. Die Quelle nennt weder Kosten noch Anmeldung, bitte beim Veranstalter erfragen.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=7984027",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984027",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 24
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Rückfrage beim Veranstalter (Ev. St. Jobst Erlenstegen)."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "15:00",
+    "end": "16:30",
+    "from": "2026-10-13",
+    "skipHolidays": false
+   },
+   "via": "evtermine"
+  }
+ ],
+ "inputHash": "adee5e196deac57cedff896cac6fb95cf0929857f2deb17aaca4ca4aaeb9706c",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}

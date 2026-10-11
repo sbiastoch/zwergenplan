@@ -1,0 +1,112 @@
+{
+ "events": [
+  {
+   "providerId": "hebanne-schulz",
+   "venueId": "hebanne-schulz",
+   "title": "Achtsame Babymassage, Kurs ab 21.09.2026",
+   "summary": "Kurs für Eltern mit Säugling (6 Wochen bis 5 Monate) zu sanfter Berührung und Babysignalen. Kleine Gruppen mit höchstens 6 Eltern-Kind-Paaren. Läuft bis 02.11.2026, Einstieg nicht mehr vorgesehen.",
+   "topics": [
+    "babymassage"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "105,00 €",
+   "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+   "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+   "age": {
+    "minMonths": 1,
+    "maxMonths": 5
+   },
+   "availability": {
+    "status": "wenige",
+    "note": "1 Platz frei (7 von 8 belegt)"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "11:00",
+    "end": "12:15",
+    "from": "2026-09-21",
+    "count": 7,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "hebanne-schulz",
+   "venueId": "hebanne-schulz",
+   "title": "Achtsame Babymassage, Kurs ab 09.11.2026",
+   "summary": "Kurs für Eltern mit Säugling (6 Wochen bis 5 Monate) zu sanfter Berührung und Babysignalen. Kleine Gruppen mit höchstens 6 Eltern-Kind-Paaren.",
+   "topics": [
+    "babymassage"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "105,00 €",
+   "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+   "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+   "age": {
+    "minMonths": 1,
+    "maxMonths": 5
+   },
+   "availability": {
+    "status": "frei",
+    "note": "7 Plätze frei (1 von 8 belegt)"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "11:00",
+    "end": "12:15",
+    "from": "2026-11-09",
+    "count": 7,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "hebanne-schulz",
+   "venueId": "hebanne-schulz",
+   "title": "Achtsame Babymassage, Kurs ab 11.01.2027",
+   "summary": "Kurs für Eltern mit Säugling (6 Wochen bis 5 Monate) zu sanfter Berührung und Babysignalen. Kleine Gruppen mit höchstens 6 Eltern-Kind-Paaren.",
+   "topics": [
+    "babymassage"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "105,00 €",
+   "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+   "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+   "age": {
+    "minMonths": 1,
+    "maxMonths": 5
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Noch keine Anmeldungen (0 von 8 belegt)"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "11:00",
+    "end": "12:15",
+    "from": "2027-01-11",
+    "count": 6,
+    "skipHolidays": false
+   }
+  }
+ ],
+ "inputHash": "7de0bc3cb165e255932f375a5174c8edec36e24744beedee76c458be455ad423",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

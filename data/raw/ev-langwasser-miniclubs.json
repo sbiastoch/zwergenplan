@@ -1,0 +1,512 @@
+{
+ "events": [
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs",
+   "title": "MiniClub Dietrich-Bonhoeffer-Kirche (montags 15–17 Uhr)",
+   "summary": "Wöchentlicher Treff für Kleinkinder im Gemeindezentrum, Blaues Sofa, montags von 15 bis 17 Uhr. Der Termin-Feed nennt weder Kosten noch Anmeldung; bei der Gemeinde nachfragen.",
+   "topics": [
+    "spielgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "http://www.evangelisch-in-langwasser.de/bonhoeffer-gruppen.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=560",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht ausgewiesen, bei der Gemeinde erfragen."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "interval": 1,
+    "start": "15:00",
+    "end": "17:00",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs",
+   "title": "MiniClub Mo 15–17 Uhr (Dietrich-Bonhoeffer-Kirche)",
+   "summary": "Eltern-Kind-Gruppe für Kleinkinder mit Eltern oder Großeltern: gemeinsames Spiel, erste Lieder und Reime, Austausch unter Familien. Montags im Gemeindezentrum Blaues Sofa. Keine Platzangabe in der Quelle; Anfragen beim Anbieter.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelisch-in-langwasser.de",
+   "sourceUrl": "https://www.evangelisch-in-langwasser.de",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Anmeldeangabe in der Quelle; bei Unklarheit beim Anbieter erfragen."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-12T15:00",
+      "end": "2026-10-12T17:00"
+     },
+     {
+      "start": "2026-10-19T15:00",
+      "end": "2026-10-19T17:00"
+     },
+     {
+      "start": "2026-10-26T15:00",
+      "end": "2026-10-26T17:00"
+     },
+     {
+      "start": "2026-11-09T15:00",
+      "end": "2026-11-09T17:00"
+     },
+     {
+      "start": "2026-11-16T15:00",
+      "end": "2026-11-16T17:00"
+     },
+     {
+      "start": "2026-11-23T15:00",
+      "end": "2026-11-23T17:00"
+     },
+     {
+      "start": "2026-11-30T15:00",
+      "end": "2026-11-30T17:00"
+     },
+     {
+      "start": "2026-12-07T15:00",
+      "end": "2026-12-07T17:00"
+     },
+     {
+      "start": "2026-12-14T15:00",
+      "end": "2026-12-14T17:00"
+     },
+     {
+      "start": "2026-12-21T15:00",
+      "end": "2026-12-21T17:00"
+     }
+    ]
+   },
+   "via": "evtermine"
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+   "title": "Mini-Club Do 9–10:30 Uhr (Passionskirche)",
+   "summary": "Eltern-Kind-Gruppe für Kleinkinder mit Eltern oder Großeltern: Kontakt zu Gleichaltrigen, erste Lieder und Reime, Austausch für Familien. Donnerstags im Bühnenraum des Gemeindehauses. Keine Platzangabe in der Quelle; Anfragen beim Anbieter.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8009815",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8009815",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Anmeldeangabe in der Quelle; bei Unklarheit beim Anbieter erfragen."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-15T09:00",
+      "end": "2026-10-15T10:30"
+     },
+     {
+      "start": "2026-10-22T09:00",
+      "end": "2026-10-22T10:30"
+     },
+     {
+      "start": "2026-10-29T09:00",
+      "end": "2026-10-29T10:30"
+     },
+     {
+      "start": "2026-11-05T09:00",
+      "end": "2026-11-05T10:30"
+     },
+     {
+      "start": "2026-11-12T09:00",
+      "end": "2026-11-12T10:30"
+     },
+     {
+      "start": "2026-11-19T09:00",
+      "end": "2026-11-19T10:30"
+     },
+     {
+      "start": "2026-11-26T09:00",
+      "end": "2026-11-26T10:30"
+     },
+     {
+      "start": "2026-12-03T09:00",
+      "end": "2026-12-03T10:30"
+     },
+     {
+      "start": "2026-12-10T09:00",
+      "end": "2026-12-10T10:30"
+     },
+     {
+      "start": "2026-12-17T09:00",
+      "end": "2026-12-17T10:30"
+     },
+     {
+      "start": "2026-12-24T09:00",
+      "end": "2026-12-24T10:30"
+     },
+     {
+      "start": "2026-12-31T09:00",
+      "end": "2026-12-31T10:30"
+     },
+     {
+      "start": "2027-01-07T09:00",
+      "end": "2027-01-07T10:30"
+     },
+     {
+      "start": "2027-01-14T09:00",
+      "end": "2027-01-14T10:30"
+     },
+     {
+      "start": "2027-01-21T09:00",
+      "end": "2027-01-21T10:30"
+     },
+     {
+      "start": "2027-01-28T09:00",
+      "end": "2027-01-28T10:30"
+     },
+     {
+      "start": "2027-02-04T09:00",
+      "end": "2027-02-04T10:30"
+     },
+     {
+      "start": "2027-02-11T09:00",
+      "end": "2027-02-11T10:30"
+     },
+     {
+      "start": "2027-02-18T09:00",
+      "end": "2027-02-18T10:30"
+     },
+     {
+      "start": "2027-02-25T09:00",
+      "end": "2027-02-25T10:30"
+     },
+     {
+      "start": "2027-03-04T09:00",
+      "end": "2027-03-04T10:30"
+     },
+     {
+      "start": "2027-03-11T09:00",
+      "end": "2027-03-11T10:30"
+     },
+     {
+      "start": "2027-03-18T09:00",
+      "end": "2027-03-18T10:30"
+     },
+     {
+      "start": "2027-03-25T09:00",
+      "end": "2027-03-25T10:30"
+     },
+     {
+      "start": "2027-04-01T09:00",
+      "end": "2027-04-01T10:30"
+     },
+     {
+      "start": "2027-04-08T09:00",
+      "end": "2027-04-08T10:30"
+     },
+     {
+      "start": "2027-04-15T09:00",
+      "end": "2027-04-15T10:30"
+     },
+     {
+      "start": "2027-04-22T09:00",
+      "end": "2027-04-22T10:30"
+     },
+     {
+      "start": "2027-04-29T09:00",
+      "end": "2027-04-29T10:30"
+     },
+     {
+      "start": "2027-05-06T09:00",
+      "end": "2027-05-06T10:30"
+     },
+     {
+      "start": "2027-05-13T09:00",
+      "end": "2027-05-13T10:30"
+     },
+     {
+      "start": "2027-06-03T09:00",
+      "end": "2027-06-03T10:30"
+     },
+     {
+      "start": "2027-06-10T09:00",
+      "end": "2027-06-10T10:30"
+     },
+     {
+      "start": "2027-06-17T09:00",
+      "end": "2027-06-17T10:30"
+     },
+     {
+      "start": "2027-06-24T09:00",
+      "end": "2027-06-24T10:30"
+     },
+     {
+      "start": "2027-07-01T09:00",
+      "end": "2027-07-01T10:30"
+     },
+     {
+      "start": "2027-09-16T09:00",
+      "end": "2027-09-16T10:30"
+     },
+     {
+      "start": "2027-09-23T09:00",
+      "end": "2027-09-23T10:30"
+     },
+     {
+      "start": "2027-09-30T09:00",
+      "end": "2027-09-30T10:30"
+     },
+     {
+      "start": "2027-10-07T09:00",
+      "end": "2027-10-07T10:30"
+     }
+    ]
+   },
+   "via": "evtermine"
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+   "title": "Mini-Club Passionskirche (donnerstags, Eltern/Großeltern mit Kleinkindern)",
+   "summary": "Offener Gruppentreff donnerstagvormittags für Mütter, Väter oder Großeltern mit kleinen Kindern. Im Termineintrag stehen weder Kosten noch Anmeldung; bitte bei der Gemeinde nachfragen.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Anfrage bei der Gemeinde"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "09:00",
+    "end": "10:30",
+    "from": "2026-10-15",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+   "title": "Mini-Club Passionskirche (Do 9–10:30 Uhr)",
+   "summary": "Offener Treff für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche. Donnerstags vormittags, laut Terminliste auch an Feiertagen; zur Anmeldung macht die Quelle keine Angaben.",
+   "topics": [
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; bei Fragen über die Gemeinde anfragen."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "09:00",
+    "end": "10:30",
+    "from": "2026-12-24",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+   "title": "Mini-Club Passionskirche (donnerstags 9–10:30 Uhr)",
+   "summary": "Donnerstagvormittags treffen sich Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses. Ob eine Anmeldung nötig ist und was es kostet, steht im Termin nicht; bitte beim Anbieter erfragen.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/ical?vid=555",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Anmeldeangabe im Termin – beim Anbieter erfragen"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "interval": 1,
+    "start": "09:00",
+    "end": "10:30",
+    "from": "2027-03-18",
+    "skipHolidays": true,
+    "except": [
+     "2027-05-20",
+     "2027-05-27"
+    ]
+   }
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+   "title": "Mini-Club Passionskirche (Do 9–10:30, Mütter, Väter, Großeltern mit Kind)",
+   "summary": "Offener Treff für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche, donnerstags 9–10:30 Uhr. Anmeldung und Kosten stehen im Termin nicht.",
+   "topics": [
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8115905.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Rückfrage beim Anbieter (Evangelisch in Langwasser)"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-06-17T09:00",
+      "end": "2027-06-17T10:30"
+     },
+     {
+      "start": "2027-06-24T09:00",
+      "end": "2027-06-24T10:30"
+     },
+     {
+      "start": "2027-07-01T09:00",
+      "end": "2027-07-01T10:30"
+     },
+     {
+      "start": "2027-09-16T09:00",
+      "end": "2027-09-16T10:30"
+     },
+     {
+      "start": "2027-09-23T09:00",
+      "end": "2027-09-23T10:30"
+     },
+     {
+      "start": "2027-09-30T09:00",
+      "end": "2027-09-30T10:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs",
+   "title": "Mini-Club Passionskirche (Do 9–10:30 Uhr)",
+   "summary": "Gruppenangebot für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche, donnerstags 9–10:30 Uhr. Anmeldung und Kosten nennt die Quelle nicht; bei der Gemeinde nachfragen.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8115911.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Anfrage bei der Evangelischen Gemeinde in Langwasser."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "09:00",
+    "end": "10:30",
+    "from": "2027-10-07",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-langwasser-miniclubs",
+   "venueId": "ev-langwasser-miniclubs",
+   "title": "Miniclub mit Kindern und Müttern (Mo 15–17 Uhr)",
+   "summary": "Gemeinsames Singen und Fingerspiele für Kinder mit ihren Müttern, bisweilen auch Vätern, dazu Austausch der Erwachsenen. Anmeldung ist nicht genannt; Auskunft gibt das Gemeinsame Büro (Tel. 0911 80 30 44).",
+   "topics": [
+    "eltern-kind-gruppe",
+    "singen",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "http://www.evangelisch-in-langwasser.de/bonhoeffer-gruppen.html",
+   "sourceUrl": "http://www.evangelisch-in-langwasser.de/bonhoeffer-gruppen.html",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Auskunft über das Gemeinsame Büro, Tel. 0911 80 30 44"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "15:00",
+    "end": "17:00",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "e5c24a71532ee62b9a612a8cdae7ce5fab0cadaa5feffc6ea5bd741ca3f00e12",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}

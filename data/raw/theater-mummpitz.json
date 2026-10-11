@@ -1,0 +1,106 @@
+{
+ "events": [
+  {
+   "providerId": "theater-mummpitz",
+   "venueId": "theater-mummpitz",
+   "title": "Jazz für Kinder (o.A.) – Konzertreihe am Sonntagvormittag",
+   "summary": "Moderiertes Jazz-Konzert mit Kasperl, Seppl und Gretel, rund 50 Minuten, einmal im Monat sonntags um 11 Uhr. Alle bekannten Termine im Horizont sind ausverkauft; Kinder unter 3 Jahren haben freien Eintritt.",
+   "topics": [
+    "musik",
+    "konzert",
+    "theater"
+   ],
+   "format": "einmalig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "6 € (ohne VGN); Kinder unter 3 Jahren frei",
+   "url": "https://mummpitz.reservix.de/events",
+   "sourceUrl": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Alle aufgeführten Termine ausverkauft"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-08T11:00"
+     },
+     {
+      "start": "2026-12-06T11:00"
+     },
+     {
+      "start": "2027-01-10T11:00"
+     },
+     {
+      "start": "2027-02-07T11:00"
+     },
+     {
+      "start": "2027-03-07T11:00"
+     },
+     {
+      "start": "2027-04-04T11:00"
+     },
+     {
+      "start": "2027-05-09T11:00"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "theater-mummpitz",
+   "venueId": "theater-mummpitz",
+   "title": "Klassik für Kinder (o.A.) – moderierte Konzerte der Musikhochschule",
+   "summary": "Studierende der Hochschule für Musik Nürnberg stellen Instrumente vor und spielen Lieblingsstücke, rund 50 Minuten sonntags um 11 Uhr. Die Konzerte richten sich an Kinder jeden Alters mit Begleitung; alle bekannten Termine sind ausverkauft.",
+   "topics": [
+    "musik",
+    "konzert"
+   ],
+   "format": "einmalig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "6 € (ohne VGN)",
+   "url": "https://mummpitz.reservix.de/events",
+   "sourceUrl": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Alle aufgeführten Termine ausverkauft"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-25T11:00"
+     },
+     {
+      "start": "2026-11-29T11:00"
+     },
+     {
+      "start": "2026-12-20T11:00"
+     },
+     {
+      "start": "2027-01-24T11:00"
+     },
+     {
+      "start": "2027-02-21T11:00"
+     },
+     {
+      "start": "2027-03-14T11:00"
+     },
+     {
+      "start": "2027-04-25T11:00"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "76742dac0af57c8349513ff963bdb4f2e8a45644ee96f1b21f3318822e4aa01f",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "frankenkids",
+  "stadt-vk"
+ ]
+}

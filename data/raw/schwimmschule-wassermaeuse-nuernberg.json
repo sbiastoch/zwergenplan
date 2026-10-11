@@ -1,0 +1,220 @@
+{
+ "events": [
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg",
+   "title": "Babyschwimmen (3–12 Mon.), Start 29.11.2026",
+   "summary": "Wassergewöhnung für Babys mit einem Elternteil im Becken. Der Kurs ist zum Starttermin ausgebucht, ohne Warteliste.",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "0 freie Plätze, keine Warteliste"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-29T13:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg",
+   "title": "Babyschwimmen (3–12 Mon.), Start 21.02.2027",
+   "summary": "Wassergewöhnung für Babys mit einem Elternteil im Becken. Nur noch ein Platz frei.",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "wenige",
+    "note": "1 Platz frei"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-02-21T13:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg",
+   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Start 29.11.2026",
+   "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren mit einem Elternteil. Der Kurs ist ausgebucht, ohne Warteliste.",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "age": {
+    "minMonths": 30,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "0 freie Plätze, keine Warteliste"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-29T14:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg",
+   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Start 21.02.2027",
+   "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren mit einem Elternteil. Der Kurs ist ausgebucht, ohne Warteliste.",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "age": {
+    "minMonths": 30,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "0 freie Plätze, keine Warteliste"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-02-21T15:00"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg",
+   "title": "Kleinkinderschwimmen (ab 15 Mon.), Start 21.02.2027",
+   "summary": "Schwimmen für Kleinkinder ab 15 Monaten mit einem Elternteil. Es sind noch sechs Plätze frei.",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "age": {
+    "minMonths": 15,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "6 Plätze frei"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-02-21T14:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
+   "title": "Babyschwimmen 2 (ab 8 Mon.), Start 30.11.2026",
+   "summary": "Wassergewöhnung für Babys ab 8 Monaten mit einem Elternteil im Becken. Fünf Plätze sind noch frei.",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "age": {
+    "minMonths": 8,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "5 Plätze frei"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-30T16:20"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
+   "title": "Babyschwimmen 2 (ab 8 Mon.), Start 22.02.2027",
+   "summary": "Wassergewöhnung für Babys ab 8 Monaten mit einem Elternteil im Becken. Alle zehn Plätze sind noch frei.",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "age": {
+    "minMonths": 8,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "10 Plätze frei"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-02-22T16:20"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "d307d75a7a34fa4f29ecd1b4620676446d436589adb88b165acd9d0c45fe8ff7",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

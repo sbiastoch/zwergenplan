@@ -1,0 +1,45 @@
+{
+ "events": [
+  {
+   "providerId": "feg-nuernberg-eltern-kind-kreis",
+   "venueId": "feg-nuernberg-eltern-kind-kreis",
+   "title": "Eltern-Kind-Kreis „Zwergenaufstand“ (0–3 Jahre)",
+   "summary": "Offener Treff für Eltern mit Kindern von 0 bis 3 Jahren mit Singen, Geschichten, gemeinsamem Frühstück und Basteln. Schnuppern ist erlaubt; um Spenden für das Bastelmaterial wird gebeten. Keine Ferientermine.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "singen",
+    "kreativ"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "price": "kostenlos, gelegentliche Spenden erbeten",
+   "url": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
+   "sourceUrl": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff, einfach vorbeikommen; Fragen an Saskia Schmidt (Tel. 0911 46206406, zwergenaufstand@feg-nuernberg.de)"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "09:30",
+    "end": "11:00",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "9089252ea390347eeaec3681470aafea45ab014a4839c02ddd266a389dfd4848",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

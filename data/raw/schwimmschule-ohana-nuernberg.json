@@ -1,0 +1,208 @@
+{
+ "events": [
+  {
+   "providerId": "schwimmschule-ohana-nuernberg",
+   "venueId": "schwimmschule-ohana-nuernberg",
+   "title": "Babyschwimmen ab 3 Monaten, Sa 10:15 (ab 14.11.2026)",
+   "summary": "Schwimmkurs für Babys ab 3 Monaten in Nürnberg (Kliniken Dr. Erler), samstags, zehn Termine von November bis Januar. Der Kurs ist ausgebucht.",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "189 €",
+   "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
+   "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Kurs ausgebucht"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "SA"
+    ],
+    "start": "10:15",
+    "from": "2026-11-14",
+    "count": 10,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "schwimmschule-ohana-nuernberg",
+   "venueId": "schwimmschule-ohana-nuernberg",
+   "title": "Babyschwimmen ab 3 Monaten, Sa 10:15 (ab 23.01.2027)",
+   "summary": "Schwimmkurs für Babys ab 3 Monaten in Nürnberg (Kliniken Dr. Erler), samstags, acht Termine von Januar bis März 2027. Plätze sind derzeit buchbar.",
+   "topics": [
+    "babyschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "189 €",
+   "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
+   "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Online buchbar"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "SA"
+    ],
+    "start": "10:15",
+    "from": "2027-01-23",
+    "count": 8,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "schwimmschule-ohana-nuernberg",
+   "venueId": "schwimmschule-ohana-nuernberg",
+   "title": "Minis ab 1 Jahr, Sa 09:30 (ab 14.11.2026)",
+   "summary": "Kleinkindschwimmen für Kinder ab 1 Jahr in Nürnberg (Kliniken Dr. Erler), samstags, zehn Termine von November bis Januar. Plätze sind derzeit buchbar.",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "189 €",
+   "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
+   "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Online buchbar"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "SA"
+    ],
+    "start": "09:30",
+    "from": "2026-11-14",
+    "count": 10,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "schwimmschule-ohana-nuernberg",
+   "venueId": "schwimmschule-ohana-nuernberg",
+   "title": "Minis ab 1 Jahr, Sa 09:30 (ab 23.01.2027)",
+   "summary": "Kleinkindschwimmen für Kinder ab 1 Jahr in Nürnberg (Kliniken Dr. Erler), samstags, acht Termine von Januar bis März 2027. Plätze sind derzeit buchbar.",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "189 €",
+   "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
+   "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Online buchbar"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "SA"
+    ],
+    "start": "09:30",
+    "from": "2027-01-23",
+    "count": 8,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "schwimmschule-ohana-nuernberg",
+   "venueId": "schwimmschule-ohana-nuernberg",
+   "title": "Maxis ab 2 Jahre, Sa 11:00 (ab 14.11.2026)",
+   "summary": "Kleinkindschwimmen für Kinder ab 2 Jahren in Nürnberg (Kliniken Dr. Erler), samstags, zehn Termine von November bis Januar. Der Kurs ist ausgebucht.",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "189 €",
+   "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+   "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+   "age": {
+    "minMonths": 24,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Kurs ausgebucht"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "SA"
+    ],
+    "start": "11:00",
+    "from": "2026-11-14",
+    "count": 10,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "schwimmschule-ohana-nuernberg",
+   "venueId": "schwimmschule-ohana-nuernberg",
+   "title": "Maxis ab 2 Jahre, Sa 11:00 (ab 23.01.2027)",
+   "summary": "Kleinkindschwimmen für Kinder ab 2 Jahren in Nürnberg (Kliniken Dr. Erler), samstags, acht Termine von Januar bis März 2027. Plätze sind derzeit buchbar.",
+   "topics": [
+    "kleinkindschwimmen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "189 €",
+   "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+   "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+   "age": {
+    "minMonths": 24,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Online buchbar"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "SA"
+    ],
+    "start": "11:00",
+    "from": "2027-01-23",
+    "count": 8,
+    "skipHolidays": false
+   }
+  }
+ ],
+ "inputHash": "41aa20f760604e0bc268ab58edc34d58f6f5e810129f3662ffaf211bce8212e2",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

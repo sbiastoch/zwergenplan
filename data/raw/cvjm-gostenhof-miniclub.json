@@ -1,0 +1,178 @@
+{
+ "events": [
+  {
+   "providerId": "cvjm-gostenhof-miniclub",
+   "venueId": "cvjm-gostenhof-miniclub",
+   "title": "Mini-Club für Kinder ab 18 Monaten bis 3 Jahre (dienstags)",
+   "summary": "Dienstagvormittags Treff für Eltern mit Kindern: Kniereiter, Fingerspiele, Bewegungslieder, Freispiel und eine gemeinsame Einheit bei Kaffee. Nicht in den Ferien. Anfrage per Mail oder Telefon.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+   "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+   "age": {
+    "minMonths": 18,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe. Anfrage bei Stefanie Becker, stefanie.becker@cvjm-nuernberg-gostenhof.de, 0151 65108244"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:00",
+    "end": "11:30",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "cvjm-gostenhof-miniclub",
+   "venueId": "cvjm-gostenhof-miniclub",
+   "title": "Mini-Club (Kinder 1–3 Jahre, dienstags)",
+   "summary": "Wöchentlicher Treff für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags 10:00–11:30 Uhr. Die Platzlage ist nicht angezeigt; Anmeldung bitte beim Anbieter erfragen.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "spielgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige; Anmeldung laut Quelle nicht angegeben"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:00",
+    "end": "11:30",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "cvjm-gostenhof-miniclub",
+   "venueId": "cvjm-gostenhof-miniclub",
+   "title": "Mini-Club (1–3 Jahre)",
+   "summary": "Regelmäßiger Spieltreff für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags 10–11:30 Uhr. Eine Platzanzeige gibt es nicht; Anmeldung bzw. Anfrage laut Anbieter.",
+   "topics": [
+    "spielgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8142810.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige; Anfrage beim CVJM Gostenhof"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:00",
+    "end": "11:30",
+    "from": "2026-12-22",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "cvjm-gostenhof-miniclub",
+   "venueId": "cvjm-gostenhof-miniclub",
+   "title": "Mini-Club für Kinder von 1 bis 3 Jahren (dienstags)",
+   "summary": "Wöchentliche Gruppe für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags 10:00–11:30 Uhr. Es gibt keine Platzanzeige; bei Fragen zur Anmeldung direkt beim CVJM nachfragen.",
+   "topics": [
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8142820.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige; Anfrage beim CVJM Nürnberg-Gostenhof"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-04-06T10:00",
+      "end": "2027-04-06T11:30"
+     },
+     {
+      "start": "2027-04-13T10:00",
+      "end": "2027-04-13T11:30"
+     },
+     {
+      "start": "2027-04-20T10:00",
+      "end": "2027-04-20T11:30"
+     },
+     {
+      "start": "2027-04-27T10:00",
+      "end": "2027-04-27T11:30"
+     },
+     {
+      "start": "2027-05-04T10:00",
+      "end": "2027-05-04T11:30"
+     },
+     {
+      "start": "2027-05-11T10:00",
+      "end": "2027-05-11T11:30"
+     },
+     {
+      "start": "2027-06-01T10:00",
+      "end": "2027-06-01T11:30"
+     },
+     {
+      "start": "2027-06-08T10:00",
+      "end": "2027-06-08T11:30"
+     },
+     {
+      "start": "2027-06-15T10:00",
+      "end": "2027-06-15T11:30"
+     },
+     {
+      "start": "2027-06-22T10:00",
+      "end": "2027-06-22T11:30"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "7fd9b85751d5176b7c381d9ae04d339e483f1a1d589c1942f03d0eb9d33ff5cb",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine",
+  "frankenkids"
+ ]
+}

@@ -1,0 +1,43 @@
+{
+ "events": [
+  {
+   "providerId": "vfl-nuernberg",
+   "venueId": "vfl-nuernberg",
+   "title": "Mutter-Kind-Turnen (montags 15:30)",
+   "summary": "Turnen für Mütter bzw. Eltern mit Kleinkind in der VfL-Sporthalle, jeden Montag 15:30–16:30 Uhr, ohne festes Ende. Freie Plätze sind auf der Seite nicht angegeben; Anfrage über den Verein.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://vfl-nuernberg.de/turnen/trainingszeiten/",
+   "sourceUrl": "https://vfl-nuernberg.de/turnen/trainingszeiten/",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Angabe zu freien Plätzen; Anfrage über den Kontakt des VfL Nürnberg."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "15:30",
+    "end": "16:30",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "cab65850ef5e19b125043957e7fc19dc9b1560a19f208e8f99dc72dd6ac5075f",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

@@ -1,0 +1,43 @@
+{
+ "events": [
+  {
+   "providerId": "tb-johannis-1888",
+   "venueId": "tb-johannis-1888",
+   "title": "Eltern-Kind-Turnen (Montag 15–16 Uhr)",
+   "summary": "Wöchentliche Turnstunde für Kinder ab etwa einem Jahr mit Begleitperson im Verein TB Johannis 1888. Die Seite nennt unter Eltern-Kind-Turnen zwei Montagstermine (15–16 und 16–17 Uhr); erfasst ist die Stunde ab 15 Uhr. Anmeldung und Kosten nicht angegeben, Anfragen über das Kontaktformular.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.tbj1888.de/abteilungen/turnen-und-gymnastik",
+   "sourceUrl": "https://www.tbj1888.de/abteilungen/turnen-und-gymnastik",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige; Anfrage über das Kontaktformular"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "15:00",
+    "end": "16:00",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "0d7454f7b4699344b510bc3951880c13c571855f9d0b8b8c1109c50f0909ec7a",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

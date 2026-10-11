@@ -1,0 +1,230 @@
+{
+ "events": [
+  {
+   "providerId": "mutherstudio",
+   "venueId": "mutherstudio",
+   "title": "Mama-Baby-Yoga (mittwochs 10:45, zwei Blöcke)",
+   "summary": "Yoga für Mütter mit Baby im Studio, Voraussetzung ist eine abgeschlossene Rückbildung. Zwei Blöcke à 8 Einheiten; laut Anbieter zertifiziert für den Krankenkassenzuschuss. Anmeldung per Mail.",
+   "topics": [
+    "yoga-mit-baby",
+    "muetter"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "129 € (8 Einheiten)",
+   "url": "https://mutherstudio.com/mamababyyoga",
+   "sourceUrl": "https://mutherstudio.com/mamababyyoga",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung per Mail an annette.samol@gmx.de"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-09-16T10:45",
+      "end": "2026-09-16T11:45"
+     },
+     {
+      "start": "2026-09-23T10:45",
+      "end": "2026-09-23T11:45"
+     },
+     {
+      "start": "2026-09-30T10:45",
+      "end": "2026-09-30T11:45"
+     },
+     {
+      "start": "2026-10-07T10:45",
+      "end": "2026-10-07T11:45"
+     },
+     {
+      "start": "2026-10-14T10:45",
+      "end": "2026-10-14T11:45"
+     },
+     {
+      "start": "2026-10-21T10:45",
+      "end": "2026-10-21T11:45"
+     },
+     {
+      "start": "2026-10-28T10:45",
+      "end": "2026-10-28T11:45"
+     },
+     {
+      "start": "2026-11-04T10:45",
+      "end": "2026-11-04T11:45"
+     },
+     {
+      "start": "2026-11-11T10:45",
+      "end": "2026-11-11T11:45"
+     },
+     {
+      "start": "2026-11-18T10:45",
+      "end": "2026-11-18T11:45"
+     },
+     {
+      "start": "2026-11-25T10:45",
+      "end": "2026-11-25T11:45"
+     },
+     {
+      "start": "2026-12-02T10:45",
+      "end": "2026-12-02T11:45"
+     },
+     {
+      "start": "2026-12-09T10:45",
+      "end": "2026-12-09T11:45"
+     },
+     {
+      "start": "2026-12-16T10:45",
+      "end": "2026-12-16T11:45"
+     },
+     {
+      "start": "2026-12-23T10:45",
+      "end": "2026-12-23T11:45"
+     },
+     {
+      "start": "2026-12-30T10:45",
+      "end": "2026-12-30T11:45"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "mutherstudio",
+   "venueId": "mutherstudio",
+   "title": "Mama, Mini & Mental Health (mittwochs 9:30, 0–18 Monate)",
+   "summary": "Gesprächs- und Bewegungskurs für Mütter mit Kindern bis ca. 18 Monate, mit Spielmaterial für die Kleinen. Anbieter nennt sechs Termine zwischen 23.09. und 25.11.26; Ferientermine entfallen.",
+   "topics": [
+    "elterntreff",
+    "muetter"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "90 €",
+   "url": "https://mutherstudio.com/body-mind-and-kids",
+   "sourceUrl": "https://mutherstudio.com/body-mind-and-kids",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 18
+   },
+   "availability": {
+    "status": "wenige",
+    "note": "Nur noch wenige Plätze"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "WE"
+    ],
+    "start": "09:30",
+    "end": "10:30",
+    "from": "2026-10-14",
+    "until": "2026-11-25",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "mutherstudio",
+   "venueId": "mutherstudio",
+   "title": "Waldspielracker 15 Mon.–3 J., Herbst 2026 (Di 10 Uhr)",
+   "summary": "Outdoor-Gruppe im Wald mit Naturmaterialien, Basteln, Fingerspielen und Bewegungsliedern. Treffpunkt Spielplatz Schiestlstraße (Kraftshof), genaue Infos nach der Buchung; findet bei jedem Wetter statt, außer bei Unwetterwarnung.",
+   "topics": [
+    "waldgruppe",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://mutherstudio.com/waldspielracker",
+   "sourceUrl": "https://mutherstudio.com/waldspielracker",
+   "age": {
+    "minMonths": 15,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über die Buchungsseite zum Wunschtermin; keine Platzanzeige. Anmeldung schließt, sobald die Plätze voll sind."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:00",
+    "end": "11:00",
+    "from": "2026-09-22",
+    "count": 8,
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "mutherstudio",
+   "venueId": "mutherstudio",
+   "title": "Waldspielracker 15 Mon.–3 J., Winter 2026/27 (Di 10 Uhr)",
+   "summary": "Winterkurs im Wald mit Naturmaterialien, Basteln und Bewegungsliedern, Treffpunkt Spielplatz Schiestlstraße (Kraftshof), bei jedem Wetter. Keine Termine am 22.12., 29.12., 05.01., 12.01., 19.01. und 09.02.",
+   "topics": [
+    "waldgruppe",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://mutherstudio.com/waldspielracker",
+   "sourceUrl": "https://mutherstudio.com/waldspielracker",
+   "age": {
+    "minMonths": 15,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über die Buchungsseite zum Wunschtermin; keine Platzanzeige. Anmeldung schließt, sobald die Plätze voll sind."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-12-01T10:00",
+      "end": "2026-12-01T11:00"
+     },
+     {
+      "start": "2026-12-08T10:00",
+      "end": "2026-12-08T11:00"
+     },
+     {
+      "start": "2026-12-15T10:00",
+      "end": "2026-12-15T11:00"
+     },
+     {
+      "start": "2027-01-26T10:00",
+      "end": "2027-01-26T11:00"
+     },
+     {
+      "start": "2027-02-02T10:00",
+      "end": "2027-02-02T11:00"
+     },
+     {
+      "start": "2027-02-16T10:00",
+      "end": "2027-02-16T11:00"
+     },
+     {
+      "start": "2027-02-23T10:00",
+      "end": "2027-02-23T11:00"
+     },
+     {
+      "start": "2027-03-02T10:00",
+      "end": "2027-03-02T11:00"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "c4208ad9f322d49a4fae89d87c1ff36a8c744c9aac512d6f6df8c23eabdc7308",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

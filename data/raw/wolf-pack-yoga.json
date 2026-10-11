@@ -1,0 +1,63 @@
+{
+ "events": [
+  {
+   "providerId": "wolf-pack-yoga",
+   "venueId": "wolf-pack-yoga",
+   "title": "Yoga mit Baby – donnerstags 9:30 (Babys 3–12 Monate)",
+   "summary": "Postnatales Yoga mit Kräftigung, Beckenboden und Atemübungen, das Baby ist dabei und darf stillen oder eine Pause machen. Geschlossener Kurs mit 6 Terminen; Stornierung ist gestaffelt bis zum Kursbeginn möglich.",
+   "topics": [
+    "yoga-mit-baby",
+    "rueckbildung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "102,00 € (Einzelticket, 6 Termine)",
+   "url": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
+   "sourceUrl": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Eversports zeigt „Nicht buchbar“ bei geschlossenem Kurs; Plätze und Anmeldung auf der Buchungsseite prüfen."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-22T09:30",
+      "end": "2026-10-22T10:30"
+     },
+     {
+      "start": "2026-10-29T09:30",
+      "end": "2026-10-29T10:30"
+     },
+     {
+      "start": "2026-11-05T09:30",
+      "end": "2026-11-05T10:30"
+     },
+     {
+      "start": "2026-11-12T09:30",
+      "end": "2026-11-12T10:30"
+     },
+     {
+      "start": "2026-11-19T09:30",
+      "end": "2026-11-19T10:30"
+     },
+     {
+      "start": "2026-11-26T09:30",
+      "end": "2026-11-26T10:30"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "6a20b037a09c7738e08297cf14e6f73dc1ad8027ee600a7fb1cac7ddc34dced5",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

@@ -1,0 +1,146 @@
+{
+ "events": [
+  {
+   "providerId": "ev-fischbach",
+   "venueId": "ev-fischbach",
+   "title": "Mutter-Kind-Gruppe, Kinder 3 Monate–3 Jahre (dienstags)",
+   "summary": "Treff für Eltern mit Babys und Kleinkindern bis 3 Jahre: Lieder, Bewegung und Austausch über Erziehungsfragen. Anmeldung und Preis stehen nicht in der Quelle.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/ical?vid=556",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=556",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Angaben zu Plätzen oder Anmeldung in der Quelle; bei der Gemeinde nachfragen."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-13T09:30",
+      "end": "2026-10-13T11:30"
+     },
+     {
+      "start": "2026-10-20T09:30",
+      "end": "2026-10-20T11:30"
+     },
+     {
+      "start": "2026-10-27T09:30",
+      "end": "2026-10-27T11:30"
+     },
+     {
+      "start": "2026-11-10T09:30",
+      "end": "2026-11-10T11:30"
+     },
+     {
+      "start": "2026-11-17T09:30",
+      "end": "2026-11-17T11:30"
+     },
+     {
+      "start": "2026-11-24T09:30",
+      "end": "2026-11-24T11:30"
+     },
+     {
+      "start": "2026-12-01T09:30",
+      "end": "2026-12-01T11:30"
+     },
+     {
+      "start": "2026-12-08T09:30",
+      "end": "2026-12-08T11:30"
+     },
+     {
+      "start": "2026-12-15T09:30",
+      "end": "2026-12-15T11:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "ev-fischbach",
+   "venueId": "ev-fischbach",
+   "title": "Mutter-Kind-Gruppe, Kinder 3 Monate–3 Jahre (donnerstags)",
+   "summary": "Treff für Eltern mit Babys und Kleinkindern bis 3 Jahre: Lieder, Bewegung und Austausch über Erziehungsfragen. Anmeldung und Preis stehen nicht in der Quelle.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/ical?vid=556",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=556",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Angaben zu Plätzen oder Anmeldung in der Quelle; bei der Gemeinde nachfragen."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-15T09:30",
+      "end": "2026-10-15T10:30"
+     },
+     {
+      "start": "2026-10-22T09:30",
+      "end": "2026-10-22T10:30"
+     },
+     {
+      "start": "2026-10-29T09:30",
+      "end": "2026-10-29T10:30"
+     },
+     {
+      "start": "2026-11-05T09:30",
+      "end": "2026-11-05T10:30"
+     },
+     {
+      "start": "2026-11-12T09:30",
+      "end": "2026-11-12T10:30"
+     },
+     {
+      "start": "2026-11-19T09:30",
+      "end": "2026-11-19T10:30"
+     },
+     {
+      "start": "2026-11-26T09:30",
+      "end": "2026-11-26T10:30"
+     },
+     {
+      "start": "2026-12-03T09:30",
+      "end": "2026-12-03T10:30"
+     },
+     {
+      "start": "2026-12-10T09:30",
+      "end": "2026-12-10T10:30"
+     },
+     {
+      "start": "2026-12-17T09:30",
+      "end": "2026-12-17T10:30"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "6a07372bb4347cc8c607a82058b11807c44db8449b3fb149f93264b6f0e3cb38",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}

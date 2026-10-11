@@ -1,0 +1,13 @@
+{
+ "events": [],
+ "status": "fehler",
+ "reason": "Einbruch zurückgehalten (10 → 0 Angebote), Vorstand bleibt",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "failingSince": "2026-10-11T14:06:10+02:00",
+ "sources": [],
+ "pending": {
+  "inputHash": "378dab2a256fe0e05109c427229324cec1e884d26bef54b1d2038a54fbccf325",
+  "model": "haiku",
+  "events": []
+ }
+}

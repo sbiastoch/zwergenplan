@@ -1,0 +1,8 @@
+{
+ "events": [],
+ "status": "fehler",
+ "reason": "https://kukuq.eventim-inhouse.de/webshop/webticket/shop?production=97: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://kukuq.eventim-inhouse.de/webshop/webticket/shop?production=97",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "failingSince": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

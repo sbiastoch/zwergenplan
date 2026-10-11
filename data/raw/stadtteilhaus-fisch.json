@@ -1,0 +1,236 @@
+{
+ "events": [
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Familien-Café (offener Montagstreff)",
+   "summary": "Offener Treff für Eltern, Großeltern und Väter mit Kindern zum Spielen und Austausch. Einfach vorbeikommen, keine Anmeldung nötig.",
+   "topics": [
+    "elterncafe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "price": "Spende für den Kaffee erbeten",
+   "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Keine Anmeldung nötig"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "15:30",
+    "end": "17:00",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Mini-FiSche Krabbelgruppe (Dienstag, 9–11 Uhr)",
+   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Spielzimmer, bei gutem Wetter Spielgarten. Plätze nur auf Anfrage.",
+   "topics": [
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "12 € im Monat",
+   "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "09:00",
+    "end": "11:00",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Mini-FiSche Krabbelgruppe (Mittwoch, 9–11 Uhr)",
+   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Spielzimmer, bei gutem Wetter Spielgarten. Plätze nur auf Anfrage.",
+   "topics": [
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "12 € im Monat",
+   "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "WE"
+    ],
+    "start": "09:00",
+    "end": "11:00",
+    "from": "2026-10-14",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Mini-FiSche Krabbelgruppe (Freitag, 9–11 Uhr)",
+   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Spielzimmer, bei gutem Wetter Spielgarten. Plätze nur auf Anfrage.",
+   "topics": [
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "12 € im Monat",
+   "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "FR"
+    ],
+    "start": "09:00",
+    "end": "11:00",
+    "from": "2026-10-16",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Vater-Kind-Frühstück (Samstags, 3 Termine)",
+   "summary": "Väter treffen sich mit ihren Kindern zum Spielen und gemeinsamen Frühstücksbuffet im Stadtteilhaus. Anmeldung im Stadtteilhaus FiSch nötig.",
+   "topics": [
+    "vaeter",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "10 € pro Familie (Frühstücksbuffet)",
+   "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung im Stadtteilhaus FiSch"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-31T09:00",
+      "end": "2026-10-31T12:00"
+     },
+     {
+      "start": "2026-11-21T09:00",
+      "end": "2026-11-21T12:00"
+     },
+     {
+      "start": "2026-12-19T09:00",
+      "end": "2026-12-19T12:00"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Vater-Kind: Die offene Turnhalle (Freitag, 18–20 Uhr)",
+   "summary": "Offene Halle für Väter mit Kindern: Bewegen und Spielen in Eigenregie, ohne Übungsleitung. Die Turnhalle der Wahlerschule ist der Ort; einfach vorbeikommen.",
+   "topics": [
+    "vaeter",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Einfach vorbeikommen"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-13T18:00",
+      "end": "2026-11-13T20:00"
+     },
+     {
+      "start": "2027-01-29T18:00",
+      "end": "2027-01-29T20:00"
+     },
+     {
+      "start": "2027-02-26T18:00",
+      "end": "2027-02-26T20:00"
+     },
+     {
+      "start": "2027-03-12T18:00",
+      "end": "2027-03-12T20:00"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Kartoffelfest mit Familiencafé (Familienfest)",
+   "summary": "Familienfest für Eltern und Großeltern mit Kindern: Basteln, Lagerfeuer, Gauklershow, Feuershow und Spielen, dazu Kaffee und Kuchen. Keine Anmeldung nötig.",
+   "topics": [
+    "elterntreff",
+    "elterncafe"
+   ],
+   "format": "einmalig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "price": "Spende für den Kaffee erbeten",
+   "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+   "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Keine vorherige Anmeldung"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-16T15:00",
+      "end": "2026-10-16T18:30"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "96ffd663dd90c314a10a22d8e955e589cdad3ad83d8ec85589766ae35f0677fc",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

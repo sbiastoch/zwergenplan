@@ -1,0 +1,41 @@
+{
+ "events": [
+  {
+   "providerId": "babykonzert-nuernberg",
+   "venueId": "babykonzert-nuernberg",
+   "title": "Babykonzert Klassik im Marmorsaal (08.11.2026)",
+   "summary": "Ein Klassikkonzert für Babys und Kleinkinder im Marmorsaal des Presseclubs. Babys und Kinder zahlen keinen Eintritt, Erwachsene brauchen eine Karte. Verfügbarkeit bitte auf der Ticketseite prüfen.",
+   "topics": [
+    "musik",
+    "konzert"
+   ],
+   "format": "einmalig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://babykonzert.de/home/nuernberg/",
+   "sourceUrl": "https://babykonzert.de/home/nuernberg/",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Karten über Eventim Light; Verfügbarkeit steht nicht im abgerufenen Text. Gutscheingäste vorher per E-Mail an saskia.duerr@babykonzert.de Plätze reservieren."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-08T11:00"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "327c37f88a969d8c7ff7537681a82bc4eae001eee5ee4fb2564c24bd91a32526",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

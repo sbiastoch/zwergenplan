@@ -1,0 +1,156 @@
+{
+ "events": [
+  {
+   "providerId": "ev-nikodemus-roethenbach",
+   "venueId": "ev-nikodemus-roethenbach",
+   "title": "Krabbelgruppe bis 3 Jahre – mittwochs 9:00–10:30 Uhr",
+   "summary": "Wöchentlicher Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
+   "topics": [
+    "krabbelgruppe",
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Kontakt über Diakonin Marion Hanek"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-14T09:00",
+      "end": "2026-10-14T10:30"
+     },
+     {
+      "start": "2026-10-21T09:00",
+      "end": "2026-10-21T10:30"
+     },
+     {
+      "start": "2026-10-28T09:00",
+      "end": "2026-10-28T10:30"
+     },
+     {
+      "start": "2026-11-11T09:00",
+      "end": "2026-11-11T10:30"
+     },
+     {
+      "start": "2026-11-18T09:00",
+      "end": "2026-11-18T10:30"
+     },
+     {
+      "start": "2026-11-25T09:00",
+      "end": "2026-11-25T10:30"
+     },
+     {
+      "start": "2026-12-02T09:00",
+      "end": "2026-12-02T10:30"
+     },
+     {
+      "start": "2026-12-09T09:00",
+      "end": "2026-12-09T10:30"
+     },
+     {
+      "start": "2026-12-16T09:00",
+      "end": "2026-12-16T10:30"
+     },
+     {
+      "start": "2026-12-23T09:00",
+      "end": "2026-12-23T10:30"
+     },
+     {
+      "start": "2027-01-13T09:00",
+      "end": "2027-01-13T10:30"
+     }
+    ]
+   },
+   "via": "evtermine"
+  },
+  {
+   "providerId": "ev-nikodemus-roethenbach",
+   "venueId": "ev-nikodemus-roethenbach",
+   "title": "Krabbelgruppe bis 3 Jahre – donnerstags 9:30–11:00 Uhr",
+   "summary": "Wöchentlicher Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
+   "topics": [
+    "krabbelgruppe",
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Kontakt über Diakonin Marion Hanek"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-15T09:30",
+      "end": "2026-10-15T11:00"
+     },
+     {
+      "start": "2026-10-22T09:30",
+      "end": "2026-10-22T11:00"
+     },
+     {
+      "start": "2026-10-29T09:30",
+      "end": "2026-10-29T11:00"
+     },
+     {
+      "start": "2026-11-12T09:30",
+      "end": "2026-11-12T11:00"
+     },
+     {
+      "start": "2026-11-19T09:30",
+      "end": "2026-11-19T11:00"
+     },
+     {
+      "start": "2026-11-26T09:30",
+      "end": "2026-11-26T11:00"
+     },
+     {
+      "start": "2026-12-03T09:30",
+      "end": "2026-12-03T11:00"
+     },
+     {
+      "start": "2026-12-10T09:30",
+      "end": "2026-12-10T11:00"
+     },
+     {
+      "start": "2026-12-17T09:30",
+      "end": "2026-12-17T11:00"
+     },
+     {
+      "start": "2027-01-14T09:30",
+      "end": "2027-01-14T11:00"
+     }
+    ]
+   },
+   "via": "evtermine"
+  }
+ ],
+ "inputHash": "c396a027119f5ed481749bc242224cb7f245dbf8f34c1daff21f826d988e46a1",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}

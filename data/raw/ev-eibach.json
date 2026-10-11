@@ -1,0 +1,153 @@
+{
+ "events": [
+  {
+   "providerId": "ev-eibach",
+   "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
+   "title": "Waldkrabbelgruppe (Donnerstag, Faberpark)",
+   "summary": "Eltern-Kind-Gruppe im Wald am Faberpark, donnerstags etwa 10–11 Uhr, in den Schulferien pausiert. Bei fast jedem Wetter; Treffpunkt laut Beschreibung.",
+   "topics": [
+    "waldgruppe",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107130.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platz- oder Anmeldeangabe im Kalender; bei Fragen beim Anbieter nachfragen."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "10:00",
+    "end": "11:00",
+    "from": "2026-10-15",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-eibach",
+   "venueId": "ev-eibach",
+   "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre, freitags)",
+   "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach.",
+   "topics": [
+    "musik",
+    "bewegung",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107087.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platz- oder Anmeldeangabe im Kalender; bei Fragen beim Anbieter nachfragen."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "FR"
+    ],
+    "start": "09:30",
+    "end": "10:30",
+    "from": "2026-10-16",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-eibach",
+   "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
+   "title": "Waldkrabbelgruppe (Faberpark, donnerstags 10–11 Uhr)",
+   "summary": "Eltern-Kind-Gruppe im Wald mit Spiel und Bewegung draußen, fast bei jedem Wetter. Findet nicht in den Schulferien statt; der Treffpunkt steht in der Beschreibung des Termins.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "krabbelgruppe",
+    "bewegung",
+    "tiere-natur"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107135.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Angabe zur Anmeldung; Treffpunkt laut Terminbeschreibung nachfragen."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "10:00",
+    "end": "11:00",
+    "from": "2026-11-26",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-eibach",
+   "venueId": "ev-eibach",
+   "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
+   "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils im Kleinen Saal des Gemeindehauses Eibach. Die Termine sind einzeln gelistet, mit Pausen über die Feiertage.",
+   "topics": [
+    "musik",
+    "singen",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107098.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Angabe zur Anmeldung im Kalendereintrag."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-27T09:30",
+      "end": "2026-11-27T10:30"
+     },
+     {
+      "start": "2026-12-04T09:30",
+      "end": "2026-12-04T10:30"
+     },
+     {
+      "start": "2026-12-11T09:30",
+      "end": "2026-12-11T10:30"
+     },
+     {
+      "start": "2026-12-18T09:30",
+      "end": "2026-12-18T10:30"
+     },
+     {
+      "start": "2027-01-15T09:30",
+      "end": "2027-01-15T10:30"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "9dbc06e420aeac4b133e24a00d5b99398424399038bf8433db0b42c892011fc7",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

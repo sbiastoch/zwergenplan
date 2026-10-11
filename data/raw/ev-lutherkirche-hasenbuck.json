@@ -1,0 +1,76 @@
+{
+ "events": [
+  {
+   "providerId": "ev-lutherkirche-hasenbuck",
+   "venueId": "ev-lutherkirche-hasenbuck",
+   "title": "Krabbelgruppe (dienstags 10:30–11:30)",
+   "summary": "Offene Krabbelgruppe im Keller des Pfarramts (Zugang vom Garten), dienstags 10:30–11:30 Uhr, laut Kalender bis 22.12.2026. Anmeldung und Kosten stehen nicht in der Quelle; bitte im Pfarramt erfragen.",
+   "topics": [
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8146742",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=571",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Angabe zur Anmeldung; bitte im Pfarramt der Lutherkirche nachfragen."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-13T10:30",
+      "end": "2026-10-13T11:30"
+     },
+     {
+      "start": "2026-10-20T10:30",
+      "end": "2026-10-20T11:30"
+     },
+     {
+      "start": "2026-10-27T10:30",
+      "end": "2026-10-27T11:30"
+     },
+     {
+      "start": "2026-11-10T10:30",
+      "end": "2026-11-10T11:30"
+     },
+     {
+      "start": "2026-11-17T10:30",
+      "end": "2026-11-17T11:30"
+     },
+     {
+      "start": "2026-11-24T10:30",
+      "end": "2026-11-24T11:30"
+     },
+     {
+      "start": "2026-12-01T10:30",
+      "end": "2026-12-01T11:30"
+     },
+     {
+      "start": "2026-12-08T10:30",
+      "end": "2026-12-08T11:30"
+     },
+     {
+      "start": "2026-12-15T10:30",
+      "end": "2026-12-15T11:30"
+     },
+     {
+      "start": "2026-12-22T10:30",
+      "end": "2026-12-22T11:30"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "a6d8a3220b84fdb4130228da4bba86fd031b3a8de56791b3dbbbeb4d9c7b0e58",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}

@@ -1,0 +1,251 @@
+{
+ "events": [
+  {
+   "providerId": "happy-bellies",
+   "venueId": "happy-bellies",
+   "title": "Kinderwagenkurs Outdoor (Zirkeltraining im Park, ab 18.09.)",
+   "summary": "60-minütiges Ganzkörpertraining als Zirkel im Park für Mütter nach der Rückbildung, Babys im Kinderwagen sind willkommen. Der Kurs läuft seit 18.09. und hat noch zwei Termine im Horizont; Anmeldung per E-Mail, Einzelstunden (Flexi) sind möglich.",
+   "topics": [
+    "fitness-mit-baby",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "75 € (Gesamtkurs, 6 × 60 Min.); Flexi-Variante 14 € pro Stunde",
+   "url": "https://www.happy-bellies.de/kinderwagenkurs",
+   "sourceUrl": "https://www.happy-bellies.de/kinderwagenkurs",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung per E-Mail an die Kursleitung"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-09-18T09:15",
+      "end": "2026-09-18T10:15"
+     },
+     {
+      "start": "2026-09-24T09:15",
+      "end": "2026-09-24T10:15"
+     },
+     {
+      "start": "2026-10-02T09:15",
+      "end": "2026-10-02T10:15"
+     },
+     {
+      "start": "2026-10-09T09:15",
+      "end": "2026-10-09T10:15"
+     },
+     {
+      "start": "2026-10-16T09:15",
+      "end": "2026-10-16T10:15"
+     },
+     {
+      "start": "2026-10-23T09:15",
+      "end": "2026-10-23T10:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "happy-bellies",
+   "venueId": "happy-bellies",
+   "title": "Rückbildungskurs Basis, Mittwoch 9.15 Uhr (ab 16.09.)",
+   "summary": "Rückbildungskurs als zertifizierter Präventionskurs nach § 20 SGB, 10 Termine, Mittwochs mit einem Donnerstagstermin am 19.11. Die Krankenkasse bezuschusst bei regelmäßiger Teilnahme. Anmeldung per E-Mail; ob ein Platz frei ist, zeigt die Seite nicht.",
+   "topics": [
+    "rueckbildung",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.happy-bellies.de/kopie-von-laufamholz",
+   "sourceUrl": "https://www.happy-bellies.de/kopie-von-laufamholz",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung per E-Mail an die Kursleitung"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-09-16T09:15",
+      "end": "2026-09-16T10:15"
+     },
+     {
+      "start": "2026-09-23T09:15",
+      "end": "2026-09-23T10:15"
+     },
+     {
+      "start": "2026-09-30T09:15",
+      "end": "2026-09-30T10:15"
+     },
+     {
+      "start": "2026-10-07T09:15",
+      "end": "2026-10-07T10:15"
+     },
+     {
+      "start": "2026-10-14T09:15",
+      "end": "2026-10-14T10:15"
+     },
+     {
+      "start": "2026-10-21T09:15",
+      "end": "2026-10-21T10:15"
+     },
+     {
+      "start": "2026-10-28T09:15",
+      "end": "2026-10-28T10:15"
+     },
+     {
+      "start": "2026-11-11T09:15",
+      "end": "2026-11-11T10:15"
+     },
+     {
+      "start": "2026-11-19T09:15",
+      "end": "2026-11-19T10:15"
+     },
+     {
+      "start": "2026-11-25T09:15",
+      "end": "2026-11-25T10:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "happy-bellies",
+   "venueId": "happy-bellies",
+   "title": "Rückbildungskurs Basis, Montag 11.30 Uhr (ab 21.09.)",
+   "summary": "Rückbildungskurs als zertifizierter Präventionskurs nach § 20 SGB, 10 Termine montags. Die Krankenkasse bezuschusst bei regelmäßiger Teilnahme. Anmeldung per E-Mail; freie Plätze zeigt die Seite nicht.",
+   "topics": [
+    "rueckbildung",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.happy-bellies.de/kopie-von-laufamholz",
+   "sourceUrl": "https://www.happy-bellies.de/kopie-von-laufamholz",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung per E-Mail an die Kursleitung"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-09-21T11:30",
+      "end": "2026-09-21T12:30"
+     },
+     {
+      "start": "2026-09-28T11:30",
+      "end": "2026-09-28T12:30"
+     },
+     {
+      "start": "2026-10-05T11:30",
+      "end": "2026-10-05T12:30"
+     },
+     {
+      "start": "2026-10-12T11:30",
+      "end": "2026-10-12T12:30"
+     },
+     {
+      "start": "2026-10-19T11:30",
+      "end": "2026-10-19T12:30"
+     },
+     {
+      "start": "2026-10-26T11:30",
+      "end": "2026-10-26T12:30"
+     },
+     {
+      "start": "2026-11-09T11:30",
+      "end": "2026-11-09T12:30"
+     },
+     {
+      "start": "2026-11-16T11:30",
+      "end": "2026-11-16T12:30"
+     },
+     {
+      "start": "2026-11-23T11:30",
+      "end": "2026-11-23T12:30"
+     },
+     {
+      "start": "2026-11-30T11:30",
+      "end": "2026-11-30T12:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "happy-bellies",
+   "venueId": "happy-bellies",
+   "title": "Rückbildungskurs Aufbau, Mittwoch 10.45 Uhr (ab 16.09.)",
+   "summary": "Aufbaukurs der Rückbildung als Präventionskurs nach § 20 SGB, 10 Termine, mittwochs mit einem Donnerstagstermin am 19.11. Der Kurs ist laut Seite ausgebucht.",
+   "topics": [
+    "rueckbildung",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.happy-bellies.de/kopie-von-m%C3%B6geldorf",
+   "sourceUrl": "https://www.happy-bellies.de/kopie-von-m%C3%B6geldorf",
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Kurs laut Seite ausgebucht"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-09-16T10:45",
+      "end": "2026-09-16T11:45"
+     },
+     {
+      "start": "2026-09-23T10:45",
+      "end": "2026-09-23T11:45"
+     },
+     {
+      "start": "2026-09-30T10:45",
+      "end": "2026-09-30T11:45"
+     },
+     {
+      "start": "2026-10-07T10:45",
+      "end": "2026-10-07T11:45"
+     },
+     {
+      "start": "2026-10-14T10:45",
+      "end": "2026-10-14T11:45"
+     },
+     {
+      "start": "2026-10-21T10:45",
+      "end": "2026-10-21T11:45"
+     },
+     {
+      "start": "2026-10-28T10:45",
+      "end": "2026-10-28T11:45"
+     },
+     {
+      "start": "2026-11-11T10:45",
+      "end": "2026-11-11T11:45"
+     },
+     {
+      "start": "2026-11-19T10:45",
+      "end": "2026-11-19T11:45"
+     },
+     {
+      "start": "2026-11-25T10:45",
+      "end": "2026-11-25T11:45"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "041d18a76ec9906d3befde9e5f86e84981e242c66d9c4e4c507a13d43f8d1ed7",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

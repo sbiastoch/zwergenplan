@@ -1,0 +1,177 @@
+{
+ "events": [
+  {
+   "providerId": "hebamme-eva-kauper-wunderwerk",
+   "venueId": "hebamme-eva-kauper-wunderwerk",
+   "title": "Minis-Krabbelgruppe (0–6 Monate), mittwochs",
+   "summary": "Offene Krabbelgruppe für Eltern mit Babys bis etwa 6 Monate zum Austausch und Spielen. 5 € pro Person, Kaffee und Tee sind vorhanden. Einstieg jederzeit möglich; Änderungen stehen in der WhatsApp-Gruppe.",
+   "topics": [
+    "krabbelgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "5 € / Person",
+   "url": "https://www.hebammeeva.de/krabbelgruppe",
+   "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 6
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff; Abstimmung über die WhatsApp-Gruppe"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "WE"
+    ],
+    "start": "10:00",
+    "end": "12:00",
+    "from": "2026-10-14",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "hebamme-eva-kauper-wunderwerk",
+   "venueId": "hebamme-eva-kauper-wunderwerk",
+   "title": "Midis-Krabbelgruppe (6–12 Monate), dienstags",
+   "summary": "Offene Krabbelgruppe für Eltern mit Babys von etwa 6 bis 12 Monaten zum Austausch und Spielen. 5 € pro Person, Kaffee und Tee sind vorhanden. Einstieg jederzeit möglich; Änderungen stehen in der WhatsApp-Gruppe.",
+   "topics": [
+    "krabbelgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "5 € / Person",
+   "url": "https://www.hebammeeva.de/krabbelgruppe",
+   "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff; Abstimmung über die WhatsApp-Gruppe"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:00",
+    "end": "12:00",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "hebamme-eva-kauper-wunderwerk",
+   "venueId": "hebamme-eva-kauper-wunderwerk",
+   "title": "Maxis-Krabbelgruppe (ab 12 Monate), donnerstags",
+   "summary": "Offene Krabbelgruppe für Eltern mit größeren Kleinkindern ab etwa 12 Monaten zum Austausch und Spielen. 5 € pro Person, Kaffee und Tee sind vorhanden. Einstieg jederzeit möglich; Änderungen stehen in der WhatsApp-Gruppe.",
+   "topics": [
+    "krabbelgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "5 € / Person",
+   "url": "https://www.hebammeeva.de/krabbelgruppe",
+   "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
+   "age": {
+    "minMonths": 13,
+    "maxMonths": 24
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff; Abstimmung über die WhatsApp-Gruppe"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "15:00",
+    "end": "17:00",
+    "from": "2026-10-15",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "hebamme-eva-kauper-wunderwerk",
+   "venueId": "hebamme-eva-kauper-wunderwerk",
+   "title": "Babymassage-Kurs (ab ca. 6 Wochen bis 6 Monate), freitags",
+   "summary": "Fünfteilige Babymassage-Kurse mit kleinen Gruppen (max. 7 Babys) im WunderWerk, je 45 Minuten. Anmeldung über die Buchungsseite; Startzeit laut Anbieter 10:00 oder 11:15 Uhr, Mittwochskurse gibt es bei Praxis Just.",
+   "topics": [
+    "babymassage"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "95 € (inkl. Öl & Handout)",
+   "url": "https://www.hebammeeva.de/babymassage",
+   "sourceUrl": "https://www.hebammeeva.de/babymassage",
+   "age": {
+    "minMonths": 1,
+    "maxMonths": 6
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung / Verfügbarkeit über miya-Buchung; keine Platzangabe auf der Website"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-16T10:00",
+      "end": "2026-10-16T10:45"
+     },
+     {
+      "start": "2026-10-23T10:00",
+      "end": "2026-10-23T10:45"
+     },
+     {
+      "start": "2026-10-30T10:00",
+      "end": "2026-10-30T10:45"
+     },
+     {
+      "start": "2026-11-06T10:00",
+      "end": "2026-11-06T10:45"
+     },
+     {
+      "start": "2026-11-13T10:00",
+      "end": "2026-11-13T10:45"
+     },
+     {
+      "start": "2026-11-20T10:00",
+      "end": "2026-11-20T10:45"
+     },
+     {
+      "start": "2026-11-27T10:00",
+      "end": "2026-11-27T10:45"
+     },
+     {
+      "start": "2026-12-04T10:00",
+      "end": "2026-12-04T10:45"
+     },
+     {
+      "start": "2026-12-11T10:00",
+      "end": "2026-12-11T10:45"
+     },
+     {
+      "start": "2026-12-18T10:00",
+      "end": "2026-12-18T10:45"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "c381cb21e384012dd510855d8355b95f0d62c6d431bc9ded54d755851fb77a50",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

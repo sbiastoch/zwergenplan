@@ -1,0 +1,89 @@
+{
+ "events": [
+  {
+   "providerId": "neues-museum-baby-museum",
+   "venueId": "neues-museum-baby-museum",
+   "title": "Baby & Museum: Führung für Erwachsene mit Babys",
+   "summary": "Monatliche Kurzführung durch das Neue Museum für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln und anschließendem Kaffee. Kinderwagen und Trage sind erlaubt. Tickets je Termin im Shop, 3 € zzgl. Eintritt.",
+   "topics": [
+    "museum",
+    "elterncafe"
+   ],
+   "format": "einmalig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "3 € zzgl. Eintritt (für Erwachsene)",
+   "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
+   "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Tickets je Termin über den Shop nmn-tickets.de; Platzangabe dort nicht sichtbar"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-13T10:30",
+      "end": "2026-11-13T11:30"
+     },
+     {
+      "start": "2026-11-27T10:30",
+      "end": "2026-11-27T11:30"
+     },
+     {
+      "start": "2026-12-04T10:30",
+      "end": "2026-12-04T11:30"
+     },
+     {
+      "start": "2026-12-11T10:30",
+      "end": "2026-12-11T11:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "neues-museum-baby-museum",
+   "venueId": "neues-museum-baby-museum",
+   "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
+   "summary": "Schauspielerin Mara Wengel liest in der Ausstellung DOUBLE UP! aus einem Kinderbuch vor und lädt zum Mitmachen ein. Kinder ab zwei Jahren kommen mit Familie oder Begleitung. 3 € zzgl. Eintritt für Erwachsene.",
+   "topics": [
+    "vorlesen",
+    "museum"
+   ],
+   "format": "einmalig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "3 € zzgl. Eintritt (für Erwachsene)",
+   "url": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
+   "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
+   "age": {
+    "minMonths": 24,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Tickets über den Shop nmn-tickets.de; Platzangabe dort nicht sichtbar"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-27T14:00"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "773c14d2c278aa10fd421f77f938c7497ab5fe5d1a2d203f59aefc1000e5df94",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "stadt-vk"
+ ]
+}

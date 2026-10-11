@@ -1,0 +1,85 @@
+{
+ "events": [
+  {
+   "providerId": "ev-buchenbuehl-miniclub",
+   "venueId": "ev-buchenbuehl-miniclub",
+   "title": "Miniclub Himmelfahrtskirche (mittwochs 15 Uhr, bis Dezember)",
+   "summary": "Spielerisches Training von Sinnen, Motorik und Miteinander für Krabbelkinder. Termine mittwochs 15:00–16:30 bis 23. Dezember 2026. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8231115",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8231115",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Angabe zu Plätzen oder Anmeldung. Beim Veranstalter (Ev. Himmelfahrtskirche Buchenbühl) erfragen."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-14T15:00",
+      "end": "2026-10-14T16:30"
+     },
+     {
+      "start": "2026-10-21T15:00",
+      "end": "2026-10-21T16:30"
+     },
+     {
+      "start": "2026-10-28T15:00",
+      "end": "2026-10-28T16:30"
+     },
+     {
+      "start": "2026-11-04T15:00",
+      "end": "2026-11-04T16:30"
+     },
+     {
+      "start": "2026-11-11T15:00",
+      "end": "2026-11-11T16:30"
+     },
+     {
+      "start": "2026-11-18T15:00",
+      "end": "2026-11-18T16:30"
+     },
+     {
+      "start": "2026-11-25T15:00",
+      "end": "2026-11-25T16:30"
+     },
+     {
+      "start": "2026-12-02T15:00",
+      "end": "2026-12-02T16:30"
+     },
+     {
+      "start": "2026-12-09T15:00",
+      "end": "2026-12-09T16:30"
+     },
+     {
+      "start": "2026-12-16T15:00",
+      "end": "2026-12-16T16:30"
+     },
+     {
+      "start": "2026-12-23T15:00",
+      "end": "2026-12-23T16:30"
+     }
+    ]
+   },
+   "via": "evtermine"
+  }
+ ],
+ "inputHash": "cdf93286c757d3a5e8eacdcaafe98b1f83e7fd37fe570bb047a083ddaeb2e9c5",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}

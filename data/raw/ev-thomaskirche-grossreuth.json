@@ -1,0 +1,139 @@
+{
+ "events": [
+  {
+   "providerId": "ev-thomaskirche-grossreuth",
+   "venueId": "ev-thomaskirche-grossreuth",
+   "title": "Krabbelgruppe (montags 15:30–17:30)",
+   "summary": "Spielen, Krabbeln, Musik und Fingerspiele sowie Erfahrungsaustausch für Eltern mit kleinen Kindern im kleinen Saal des Gemeindehauses. Die Termine pausieren über Weihnachten und Neujahr.",
+   "topics": [
+    "krabbelgruppe",
+    "musik",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8004133",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004133",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Rückfragen beim Anbieter über die Gemeinde."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-12T15:30",
+      "end": "2026-10-12T17:30"
+     },
+     {
+      "start": "2026-10-19T15:30",
+      "end": "2026-10-19T17:30"
+     },
+     {
+      "start": "2026-10-26T15:30",
+      "end": "2026-10-26T17:30"
+     },
+     {
+      "start": "2026-11-09T15:30",
+      "end": "2026-11-09T17:30"
+     },
+     {
+      "start": "2026-11-16T15:30",
+      "end": "2026-11-16T17:30"
+     },
+     {
+      "start": "2026-11-23T15:30",
+      "end": "2026-11-23T17:30"
+     },
+     {
+      "start": "2026-11-30T15:30",
+      "end": "2026-11-30T17:30"
+     },
+     {
+      "start": "2026-12-07T15:30",
+      "end": "2026-12-07T17:30"
+     },
+     {
+      "start": "2026-12-14T15:30",
+      "end": "2026-12-14T17:30"
+     },
+     {
+      "start": "2026-12-21T15:30",
+      "end": "2026-12-21T17:30"
+     },
+     {
+      "start": "2027-01-11T15:30",
+      "end": "2027-01-11T17:30"
+     },
+     {
+      "start": "2027-01-18T15:30",
+      "end": "2027-01-18T17:30"
+     },
+     {
+      "start": "2027-01-25T15:30",
+      "end": "2027-01-25T17:30"
+     }
+    ]
+   },
+   "via": "evtermine"
+  },
+  {
+   "providerId": "ev-thomaskirche-grossreuth",
+   "venueId": "ev-thomaskirche-grossreuth",
+   "title": "Eltern-Kind Yoga (dienstags 15:15–16:00)",
+   "summary": "Yoga für Eltern gemeinsam mit ihrem Kind im großen Saal des Gemeindehauses, sechs Termine von November bis Mitte Dezember. Anmeldung und Preis sind in der Quelle nicht angegeben.",
+   "topics": [
+    "yoga-mit-baby",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8048440",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8048440",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Anfrage beim Anbieter über die Gemeinde."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-10T15:15",
+      "end": "2026-11-10T16:00"
+     },
+     {
+      "start": "2026-11-17T15:15",
+      "end": "2026-11-17T16:00"
+     },
+     {
+      "start": "2026-11-24T15:15",
+      "end": "2026-11-24T16:00"
+     },
+     {
+      "start": "2026-12-01T15:15",
+      "end": "2026-12-01T16:00"
+     },
+     {
+      "start": "2026-12-08T15:15",
+      "end": "2026-12-08T16:00"
+     },
+     {
+      "start": "2026-12-15T15:15",
+      "end": "2026-12-15T16:00"
+     }
+    ]
+   },
+   "via": "evtermine"
+  }
+ ],
+ "inputHash": "d3ea06089180f40dfa69bb78e56ada515a24874b2070a2a71669ec7eea765241",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}

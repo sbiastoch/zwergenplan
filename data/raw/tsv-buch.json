@@ -1,0 +1,43 @@
+{
+ "events": [
+  {
+   "providerId": "tsv-buch",
+   "venueId": "tsv-buch",
+   "title": "Eltern-Kind-Turnen (1–4 Jahre, dienstags 15:30)",
+   "summary": "Gemeinsames Turnen mit Mama, Papa oder Oma/Opa: Balancieren, Hüpfen, Klettern. Dienstags außer in den Schulferien. Mitgliedschaft von Kind und Begleitperson ist nötig; Schnuppern nach Absprache, Mithilfe bei Auf- und Abbau erwartet.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.tsv-buch.de/kinder-turnen/",
+   "sourceUrl": "https://www.tsv-buch.de/kinder-turnen/",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 48
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige. Schnuppern nach Absprache: info@tsv-buch.de oder Katharina Düngfelder (0176-67220174)."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "15:30",
+    "end": "16:15",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "441dd6749b997c37d5559584ecc270e584834b0180975602f3f94a8744324f58",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

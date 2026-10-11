@@ -1,0 +1,46 @@
+{
+ "events": [
+  {
+   "providerId": "cvjm-nuernberg-wuselwelt",
+   "venueId": "cvjm-nuernberg-wuselwelt",
+   "title": "Wuselwelt – freitags Bewegungs- und Spielzeit für Kinder 0–3 Jahre",
+   "summary": "Offene Turnhallenzeit im CVJM: Die Kinder spielen frei in der vorbereiteten Umgebung, die Erwachsenen tauschen sich aus. Hallenschuhe oder ABS-Socken mitbringen. Kommen und Gehen jederzeit möglich; in den Ferien kein Treff.",
+   "topics": [
+    "bewegung",
+    "spielplatz-indoor"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "price": "keine Kosten",
+   "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+   "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Keine Anmeldung nötig"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "FR"
+    ],
+    "start": "09:30",
+    "end": "10:15",
+    "from": "2026-10-16",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "dca5542e9078da3d4703439956c3492d0fbdb9d65a9ec1a51a68fec7e8055cef",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "frankenkids"
+ ]
+}

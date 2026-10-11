@@ -1,0 +1,46 @@
+{
+ "events": [
+  {
+   "providerId": "kath-st-martin-nordstadt",
+   "venueId": "kath-st-martin-nordstadt",
+   "title": "Kleinkindergottesdienst (0–8 Jahre, mit Eltern)",
+   "summary": "Kindgerechter Gottesdienst im Pfarrsaal mit Liedern, einer biblischen Geschichte und oft einer passenden Bastelei. Die Termine stehen nur an einzelnen Sonntagen; einfach vorbeikommen.",
+   "topics": [
+    "krabbelgottesdienst",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
+   "sourceUrl": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 96
+   },
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Einfach vorbeikommen"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-11T10:30",
+      "end": "2026-10-11T11:00"
+     },
+     {
+      "start": "2026-12-13T10:30",
+      "end": "2026-12-13T11:00"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "67fb93fb09438d1d5ce2a7f1dabc5a4fb9be3c2279f04223f8f841dfcd8f27c5",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

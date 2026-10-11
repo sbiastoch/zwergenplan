@@ -1,0 +1,142 @@
+{
+ "events": [
+  {
+   "providerId": "musikschule-nuernberg-eltern-kind",
+   "venueId": "musikschule-nuernberg-eltern-kind-musikschulschloesschen",
+   "title": "Eltern-Kind-Kurs Mo 15 Uhr – Musikschulschlösschen Ziegenstraße",
+   "summary": "Singen, Lauschen, Bewegen und erstes Instrumentalspiel gemeinsam mit einer Begleitperson, in Gruppen mit 4–6 Eltern-Kind-Paaren. Wöchentlich, nicht in den bayerischen Schulferien.",
+   "topics": [
+    "musik",
+    "eltern-kind-gruppe",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 42
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige. Anmeldung per E-Mail an musikschule.nuernberg@stadt.nuernberg.de mit Anmeldeformular."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "15:00",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "musikschule-nuernberg-eltern-kind",
+   "venueId": "musikschule-nuernberg-eltern-kind-musikschulschloesschen",
+   "title": "Eltern-Kind-Kurs Mo 16 Uhr – Musikschulschlösschen Ziegenstraße",
+   "summary": "Singen, Lauschen, Bewegen und erstes Instrumentalspiel gemeinsam mit einer Begleitperson, in Gruppen mit 4–6 Eltern-Kind-Paaren. Wöchentlich, nicht in den bayerischen Schulferien.",
+   "topics": [
+    "musik",
+    "eltern-kind-gruppe",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 42
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige. Anmeldung per E-Mail an musikschule.nuernberg@stadt.nuernberg.de mit Anmeldeformular."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "16:00",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "musikschule-nuernberg-eltern-kind",
+   "venueId": "musikschule-nuernberg-eltern-kind",
+   "title": "Eltern-Kind-Kurs Di 15:45 Uhr – Kulturwerkstatt Auf AEG",
+   "summary": "Singen, Lauschen, Bewegen und erstes Instrumentalspiel gemeinsam mit einer Begleitperson, in Gruppen mit 4–6 Eltern-Kind-Paaren. Wöchentlich, nicht in den bayerischen Schulferien.",
+   "topics": [
+    "musik",
+    "eltern-kind-gruppe",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 42
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige. Anmeldung per E-Mail an musikschule.nuernberg@stadt.nuernberg.de mit Anmeldeformular."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "15:45",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "musikschule-nuernberg-eltern-kind",
+   "venueId": "musikschule-nuernberg-eltern-kind",
+   "title": "Eltern-Kind-Kurs Di 16:45 Uhr – Kulturwerkstatt Auf AEG",
+   "summary": "Singen, Lauschen, Bewegen und erstes Instrumentalspiel gemeinsam mit einer Begleitperson, in Gruppen mit 4–6 Eltern-Kind-Paaren. Wöchentlich, nicht in den bayerischen Schulferien.",
+   "topics": [
+    "musik",
+    "eltern-kind-gruppe",
+    "singen"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "sourceUrl": "https://www.nuernberg.de/internet/musikschule/elementarbereich.html",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 42
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige. Anmeldung per E-Mail an musikschule.nuernberg@stadt.nuernberg.de mit Anmeldeformular."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "16:45",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "8b5e4f19795620e3c8441ffde762a37ae0dbfab87e1c72dd257af10c391d0af2",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

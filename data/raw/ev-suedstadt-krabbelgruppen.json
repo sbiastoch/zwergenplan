@@ -1,0 +1,76 @@
+{
+ "events": [
+  {
+   "providerId": "ev-suedstadt-krabbelgruppen",
+   "venueId": "ev-suedstadt-krabbelgruppen",
+   "title": "Mutter/Vater-Kind-Gruppe Lichtenhof (dienstags 9:30)",
+   "summary": "Offene Mutter/Vater-Kind-Gruppe in der Gustav-Adolf-Gedächtniskirche, dienstags 9:30 bis 11:30 Uhr. Auskunft und Kontakt über Brigitte Schäfer (0911 4 46 69 56).",
+   "topics": [
+    "eltern-kind-gruppe",
+    "krabbelgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
+   "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anfrage bei Brigitte Schäfer, 0911 4 46 69 56"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "09:30",
+    "end": "11:30",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-suedstadt-krabbelgruppen",
+   "venueId": "ev-suedstadt-krabbelgruppen-christuskirche-steinbuehl",
+   "title": "Familie Mutter/Vater-Kind-Gruppe Steinbühl (dienstags 9:00)",
+   "summary": "Offene Familien-Gruppe für Mütter/Väter mit Kindern in der Christuskirche Steinbühl, dienstags 9:00 bis 11:00 Uhr. Tagesmütter mit ihren Kindern sind willkommen; Auskunft über das Pfarramt (0911 44 62 00).",
+   "topics": [
+    "eltern-kind-gruppe",
+    "krabbelgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
+   "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anfrage über das Pfarramt bzw. Petra Baier, 0911 44 62 00"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "09:00",
+    "end": "11:00",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "4ac0952e1c946abcff90ec16d7f5a3878d13aa558c1e5b4e6c7b8e71e3c71a63",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": []
+}

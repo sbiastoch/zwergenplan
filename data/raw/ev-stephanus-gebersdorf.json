@@ -1,0 +1,178 @@
+{
+ "events": [
+  {
+   "providerId": "ev-stephanus-gebersdorf",
+   "venueId": "ev-stephanus-gebersdorf",
+   "title": "Eltern-Kind-Gruppe Donnerstag (Väter/Mütter mit Kind)",
+   "summary": "Gemeinsame Spiel-, Sing- und Gesprächszeit für Eltern mit kleinen Kindern im Gemeindehaus der Stephanuskirche. Zeiten im Terminplan; Teilnahme laut Quelle nicht näher beschrieben, bei Fragen direkt bei der Gemeinde nachfragen.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "singen",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=7670261",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7670261",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Anfrage bei der Gemeinde Stephanuskirche Gebersdorf."
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-15T09:30",
+      "end": "2026-10-15T11:30"
+     },
+     {
+      "start": "2026-10-22T09:30",
+      "end": "2026-10-22T11:30"
+     },
+     {
+      "start": "2026-10-29T09:30",
+      "end": "2026-10-29T11:30"
+     },
+     {
+      "start": "2026-11-12T09:30",
+      "end": "2026-11-12T11:30"
+     },
+     {
+      "start": "2026-11-19T09:30",
+      "end": "2026-11-19T11:30"
+     },
+     {
+      "start": "2026-11-26T09:30",
+      "end": "2026-11-26T11:30"
+     },
+     {
+      "start": "2026-12-03T09:30",
+      "end": "2026-12-03T11:30"
+     },
+     {
+      "start": "2026-12-10T09:30",
+      "end": "2026-12-10T11:30"
+     },
+     {
+      "start": "2026-12-17T09:30",
+      "end": "2026-12-17T11:30"
+     },
+     {
+      "start": "2027-01-07T09:30",
+      "end": "2027-01-07T11:30"
+     },
+     {
+      "start": "2027-01-14T09:30",
+      "end": "2027-01-14T11:30"
+     },
+     {
+      "start": "2027-01-21T09:30",
+      "end": "2027-01-21T11:30"
+     },
+     {
+      "start": "2027-01-28T09:30",
+      "end": "2027-01-28T11:30"
+     },
+     {
+      "start": "2027-02-04T09:30",
+      "end": "2027-02-04T11:30"
+     },
+     {
+      "start": "2027-02-18T09:30",
+      "end": "2027-02-18T11:30"
+     },
+     {
+      "start": "2027-02-25T09:30",
+      "end": "2027-02-25T11:30"
+     },
+     {
+      "start": "2027-03-04T09:30",
+      "end": "2027-03-04T11:30"
+     },
+     {
+      "start": "2027-03-11T09:30",
+      "end": "2027-03-11T11:30"
+     },
+     {
+      "start": "2027-03-18T09:30",
+      "end": "2027-03-18T11:30"
+     },
+     {
+      "start": "2027-04-08T09:30",
+      "end": "2027-04-08T11:30"
+     },
+     {
+      "start": "2027-04-15T09:30",
+      "end": "2027-04-15T11:30"
+     },
+     {
+      "start": "2027-04-22T09:30",
+      "end": "2027-04-22T11:30"
+     },
+     {
+      "start": "2027-04-29T09:30",
+      "end": "2027-04-29T11:30"
+     },
+     {
+      "start": "2027-05-06T09:30",
+      "end": "2027-05-06T11:30"
+     },
+     {
+      "start": "2027-05-13T09:30",
+      "end": "2027-05-13T11:30"
+     },
+     {
+      "start": "2027-06-03T09:30",
+      "end": "2027-06-03T11:30"
+     },
+     {
+      "start": "2027-06-10T09:30",
+      "end": "2027-06-10T11:30"
+     },
+     {
+      "start": "2027-06-17T09:30",
+      "end": "2027-06-17T11:30"
+     },
+     {
+      "start": "2027-06-24T09:30",
+      "end": "2027-06-24T11:30"
+     },
+     {
+      "start": "2027-07-01T09:30",
+      "end": "2027-07-01T11:30"
+     },
+     {
+      "start": "2027-09-16T09:30",
+      "end": "2027-09-16T11:30"
+     },
+     {
+      "start": "2027-09-23T09:30",
+      "end": "2027-09-23T11:30"
+     },
+     {
+      "start": "2027-09-30T09:30",
+      "end": "2027-09-30T11:30"
+     },
+     {
+      "start": "2027-10-07T09:30",
+      "end": "2027-10-07T11:30"
+     }
+    ]
+   },
+   "via": "evtermine"
+  }
+ ],
+ "inputHash": "ff61f4d52751075e1487da940e77d4fc443bb8b0f9a14f6d384fc134092644e1",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-11T14:06:10+02:00",
+ "changedAt": "2026-10-11T14:06:10+02:00",
+ "sources": [
+  "evtermine"
+ ]
+}
