@@ -256,8 +256,49 @@ export interface FetchedFind {
   links: ReadonlyArray<{ label: string; url: string }>;
 }
 
-/** Nachricht ans Bewerten (E7.4): Region, Kandidat, Text und Links der abgerufenen Seite */
-export function assessMessage(find: Find, page: FetchedFind, regionName: string): string {
+/** Seiten mit der Adresse: Reihenfolge = Vorrang (Kontakt vor Anfahrt vor Impressum vor „Über uns“) */
+const CONTACT_PATTERNS = [
+  /kontakt|contact/i,
+  /anfahrt|standort|so finden sie uns|lageplan|adresse/i,
+  /impressum|imprint/i,
+  /über uns|ueber-uns|uber-uns|about/i,
+];
+/** weitere Seiten je Kandidat und Zeichen je Seite im Bewerten */
+const MAX_CONTACT_PAGES = 2;
+const CONTACT_MAX_CHARS = 8_000;
+
+/**
+ * Kontakt- oder Adressseiten derselben Website aus den Links der Fund-Seite (Nutzerentscheid 2026-10-11, Option A):
+ * Startseiten nennen die Kursorte oft nicht, das Bewerten verwarf deshalb passende Anbieter. Höchstens zwei, nach
+ * Vorrang; erkannt am Linktext oder am Pfad. Interne Adressen schließt `parseUrl` aus.
+ */
+export function contactLinks(page: FetchedFind): string[] {
+  const site = hostOf(page.finalUrl);
+  const self = normalizeUrl(page.finalUrl);
+  if (!site) return [];
+  const ranked = new Map<string, number>();
+  for (const l of page.links) {
+    const host = hostOf(l.url);
+    const n = normalizeUrl(l.url);
+    if (!host || !n || n === self || siteOf(host) !== siteOf(site)) continue;
+    const path = parseUrl(l.url)?.pathname ?? "";
+    const rank = CONTACT_PATTERNS.findIndex((p) => p.test(l.label) || p.test(path));
+    if (rank >= 0 && !ranked.has(n)) ranked.set(n, rank);
+  }
+  const urls = new Map(page.links.map((l) => [normalizeUrl(l.url) ?? "", l.url] as const));
+  return [...ranked]
+    .sort(([, a], [, b]) => a - b)
+    .slice(0, MAX_CONTACT_PAGES)
+    .flatMap(([n]) => urls.get(n) ?? []);
+}
+
+/** Nachricht ans Bewerten (E7.4): Region, Kandidat, Text und Links der abgerufenen Seite, weitere Seiten (Kontakt) */
+export function assessMessage(
+  find: Find,
+  page: FetchedFind,
+  regionName: string,
+  extra: ReadonlyArray<{ url: string; text: string }> = [],
+): string {
   const links = page.links
     .filter((l) => parseUrl(l.url))
     .slice(0, ASSESS_MAX_LINKS)
@@ -267,6 +308,7 @@ export function assessMessage(find: Find, page: FetchedFind, regionName: string)
     `Kandidat: ${find.name} (gefunden über ${find.quelle}: ${find.warum})`,
     `Abgerufene Seite: ${page.finalUrl}`,
     `## TEXT\n${page.text.slice(0, ASSESS_MAX_CHARS)}${page.text.length > ASSESS_MAX_CHARS ? "\n[… gekürzt]" : ""}`,
+    ...extra.map((x) => `## WEITERE SEITE: ${x.url}\n${x.text.slice(0, CONTACT_MAX_CHARS)}`),
     `## LINKS\n${links.join("\n")}`,
   ].join("\n\n");
 }
@@ -350,9 +392,25 @@ export function parseAssessment(
   return eintrag ? { kind: "aufnehmen", grund, entry: eintrag } : { kind: "ungueltig" };
 }
 
+/**
+ * Zurückgenommene Anbieter (`abgelehnt` mit `id`/`publicId`, alle Regionen): Ihre IDs werden nie neu vergeben (ADR
+ * 0022: eine `publicId` in alten Links und Merklisten darf nie auf einen anderen Anbieter zeigen).
+ */
+export function reservedIds(states: readonly DiscoverState[]): { ids: Set<string>; publicIds: Set<string> } {
+  const entries = states.flatMap((s) => s.abgelehnt);
+  return {
+    ids: new Set(entries.flatMap((a) => (a.id ? [a.id] : []))),
+    publicIds: new Set(entries.flatMap((a) => (a.publicId ? [a.publicId] : []))),
+  };
+}
+
 /** Katalog-ID (E7.7): kebab aus dem Namen, bei Kollision mit Suffix; nie in der Form einer `publicId` (ADR 0022). */
-export function catalogId(name: string, catalog: readonly Provider[]): string {
-  const taken = new Set(catalog.map((p) => p.id));
+export function catalogId(
+  name: string,
+  catalog: readonly Provider[],
+  reserved: ReadonlySet<string> = new Set(),
+): string {
+  const taken = new Set([...catalog.map((p) => p.id), ...reserved]);
   let base = slug(name, 50);
   if (SHORT_ID_PATTERN.test(base)) base = `${base}-anbieter`;
   if (!taken.has(base)) return base;
@@ -371,6 +429,8 @@ export function entryFromAssessment(
     grund: string;
     region: RegionId;
     catalog: readonly Provider[];
+    /** zurückgenommene Katalog-IDs und publicIds (`reservedIds`), gelten als belegt */
+    reserved?: { ids: ReadonlySet<string>; publicIds: ReadonlySet<string> };
     today: string;
     geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined }>;
     allowedUrls: readonly string[];
@@ -396,9 +456,17 @@ export function entryFromAssessment(
   if (ctx.geos.some((g) => !inBounds(g, bbox)))
     return { ok: false, grund: `Ort außerhalb der Region ${REGIONS[ctx.region].name}` };
 
-  const id = catalogId(a.name, ctx.catalog);
-  const usedPublic = new Set(ctx.catalog.flatMap((p) => (p.role === "anbieter" ? [p.publicId] : [])));
-  const usedVenues = new Set(ctx.catalog.flatMap((p) => (p.role === "anbieter" ? p.venues.map((v) => v.id) : [])));
+  const reservedIds = ctx.reserved?.ids ?? new Set<string>();
+  const id = catalogId(a.name, ctx.catalog, reservedIds);
+  const usedPublic = new Set([
+    ...ctx.catalog.flatMap((p) => (p.role === "anbieter" ? [p.publicId] : [])),
+    ...(ctx.reserved?.publicIds ?? []),
+  ]);
+  // Orts-IDs zurückgenommener Anbieter tragen deren ID; auch sie nicht neu vergeben
+  const usedVenues = new Set([
+    ...ctx.catalog.flatMap((p) => (p.role === "anbieter" ? p.venues.map((v) => v.id) : [])),
+    ...reservedIds,
+  ]);
   const venueId = () => {
     let vid = id;
     for (let i = 2; usedVenues.has(vid); i++) vid = `${id}-${i}`;
@@ -508,6 +576,8 @@ export interface DiscoverReport {
   abort?: "auth" | "limit";
   brake?: "aufrufe" | "tokens";
   budgetHit: boolean;
+  /** G2 im Trockenlauf verletzt (im Modus live bricht G2 den Lauf ab) */
+  gateErrors?: string[];
 }
 
 /** G4: ein Commit je Anbieter mit Fund-URL, Grund und erstem Angebot */
@@ -541,6 +611,7 @@ export function renderDiscoverReport(r: DiscoverReport): string {
     `# Entdecken ${r.date}${r.dryRun ? " (Trockenlauf)" : ""}${stop ? ` – rot: vorzeitig beendet (${stop})` : ""}`,
     "",
     `- Dauer ${Math.round(r.durationMs / 60_000)} Min.`,
+    ...(r.gateErrors ?? []).map((e) => `- **rot:** ${cell(e)}`),
   ];
   const results: Record<string, string> = {};
   for (const reg of r.regions) {
@@ -616,7 +687,8 @@ export function newProvidersIssue(
       "",
       "Falsch aufgenommen? Eintrag in `data/providers.yaml` und `data/raw/<id>.json` entfernen (vor dem ersten " +
         "Nachtlauf geht auch ein Revert des Commits) und URL oder Host mit Grund in " +
-        "`data/discover/<region>.json` unter `abgelehnt` eintragen, sonst findet ihn die nächste Woche wieder.",
+        "`data/discover/<region>.json` unter `abgelehnt` eintragen, mit `id` und `publicId` des Eintrags (sie werden nie " +
+        "neu vergeben), sonst findet ihn die nächste Woche wieder.",
     ].join("\n"),
   };
 }

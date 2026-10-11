@@ -435,6 +435,7 @@ async function discoverCmd() {
   const added = r.regions.reduce((n, x) => n + x.adopted.length, 0);
   const red: string[] = [];
   if (abortOf(r)) red.push(`vorzeitig beendet (${abortOf(r)})`);
+  red.push(...(r.gateErrors ?? []));
   // G1 rot bei einem Kandidaten heißt meist: der Stand selbst ist rot (Arch-Review S4, m1)
   const gateRejects = r.regions.flatMap((x) => x.rejected).filter((x) => x.grund.startsWith("G1 rot"));
   if (gateRejects.length > 0) red.push(`G1 rot bei ${gateRejects.length} Kandidaten`);
@@ -451,7 +452,9 @@ async function discoverCmd() {
       if (!(e instanceof GateError)) throw e;
       red.push(`Zustand und Kosten nicht committet: ${e.message}`);
     }
-  const md = `${renderDiscoverReport(r)}${red.map((x) => `\n- **rot:** ${x}`).join("")}\n`;
+  // G2-Fehler stehen schon im Bericht
+  const extraRed = red.filter((x) => !(r.gateErrors ?? []).includes(x));
+  const md = `${renderDiscoverReport(r)}${extraRed.map((x) => `\n- **rot:** ${x}`).join("")}\n`;
   print(md);
   const summary = process.env["GITHUB_STEP_SUMMARY"];
   if (summary) appendFileSync(summary, md);

@@ -3,6 +3,7 @@
  * `scripts/validate-data.ts` nur das Schema importiert, nicht die Logik des Entdeckens.
  */
 import { z } from "zod";
+import { KEBAB_ID_PATTERN, SHORT_ID_PATTERN } from "../../../src/domain/ids.ts";
 import { REGION_IDS, type RegionId } from "../../../src/domain/regions.ts";
 
 const IsoDate = z.iso.date();
@@ -21,10 +22,16 @@ export const DiscoverState = z.strictObject({
         /** ganzer Host (ohne `www.`), etwa ein Vermittler */
         host: z.string().min(3).optional(),
         name: z.string().optional(),
+        /**
+         * Katalog-ID und `publicId` eines zurückgenommenen Anbieters: werden nie neu vergeben, sonst zeigten alte
+         * Links und Merklisten auf einen anderen Anbieter (ADR 0022)
+         */
+        id: z.string().regex(KEBAB_ID_PATTERN).optional(),
+        publicId: z.string().regex(SHORT_ID_PATTERN).optional(),
         grund: z.string().min(1),
         datum: IsoDate,
       })
-      .refine((a) => a.url !== undefined || a.host !== undefined, "url oder host erwartet"),
+      .refine((a) => a.url !== undefined || a.host !== undefined || a.id !== undefined, "url, host oder id erwartet"),
   ),
   zurueckgestellt: z.array(
     z.strictObject({

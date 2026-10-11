@@ -11,6 +11,7 @@ import {
   assessMessage,
   assessResponseSchema,
   catalogId,
+  contactLinks,
   directoryFinds,
   entryFromAssessment,
   type Find,
@@ -23,6 +24,7 @@ import {
   prefilter,
   proveYield,
   renderDiscoverReport,
+  reservedIds,
   searchMessage,
   searchResponseSchema,
   staleHints,
@@ -209,7 +211,48 @@ describe("directoryFinds (E7.1)", () => {
   });
 });
 
+describe("contactLinks (Adresse für das Bewerten)", () => {
+  const page = (links: Array<{ label: string; url: string }>) => ({
+    finalUrl: "https://www.schwimm.example.net/kurse/",
+    text: "",
+    links,
+  });
+  it("Kontakt, Anfahrt, Impressum derselben Website, höchstens zwei, Kontakt zuerst", () => {
+    const r = contactLinks(
+      page([
+        { label: "Impressum", url: "https://schwimm.example.net/impressum" },
+        { label: "Kurse", url: "https://schwimm.example.net/kurse/baby" },
+        { label: "So finden Sie uns", url: "https://www.schwimm.example.net/anfahrt" },
+        { label: "Kontakt", url: "https://schwimm.example.net/kontakt/" },
+      ]),
+    );
+    expect(r).toEqual(["https://schwimm.example.net/kontakt/", "https://www.schwimm.example.net/anfahrt"]);
+  });
+  it("Subdomain derselben Website zählt, fremde Website, interne Adresse und die Seite selbst nicht", () => {
+    const r = contactLinks(
+      page([
+        { label: "Kontakt", url: "https://www.schwimm.example.net/kurse/" },
+        { label: "Kontakt", url: "https://andere.example.org/kontakt" },
+        { label: "Kontakt", url: "http://192.168.0.1/kontakt" },
+        { label: "Über uns", url: "https://info.schwimm.example.net/ueber-uns" },
+      ]),
+    );
+    expect(r).toEqual(["https://info.schwimm.example.net/ueber-uns"]);
+  });
+  it("erkennt die Adresse auch am Pfad ohne passenden Linktext", () => {
+    expect(contactLinks(page([{ label: "→", url: "https://schwimm.example.net/de/standorte" }]))).toEqual([
+      "https://schwimm.example.net/de/standorte",
+    ]);
+  });
+});
+
 describe("Nachrichten an das Modell", () => {
+  it("Bewerten bekommt weitere Seiten (Kontakt) als eigene Abschnitte", () => {
+    const m = assessMessage(find(), { finalUrl: "https://k.example.net/", text: "Kurse", links: [] }, "Nürnberg", [
+      { url: "https://k.example.net/kontakt", text: "Kernstraße 3, 90429 Nürnberg" },
+    ]);
+    expect(m).toMatch(/## WEITERE SEITE: https:\/\/k\.example\.net\/kontakt\nKernstraße 3/);
+  });
   it("Suche nennt Begriff mit Region", () => {
     expect(searchMessage("PEKiP", "Nürnberg")).toBe("Suchbegriff: PEKiP Nürnberg\nRegion: Nürnberg");
   });
@@ -280,6 +323,31 @@ describe("catalogId (E7.7)", () => {
   it("nie in der Form einer publicId (8 Zeichen ohne Bindestrich)", () => {
     expect(catalogId("Kinderzz", catalog)).toBe("kinderzz-anbieter");
   });
+  it("zurückgenommene IDs gelten als belegt", () => {
+    expect(catalogId("Krabbelzwerge", catalog, new Set(["krabbelzwerge", "krabbelzwerge-2"]))).toBe("krabbelzwerge-3");
+  });
+});
+
+describe("reservedIds (Rücknahme, E7)", () => {
+  it("Katalog-IDs und publicIds aus `abgelehnt` aller Regionen", () => {
+    const state = DiscoverState.parse({
+      region: "nuernberg",
+      abgelehnt: [
+        { id: "krabbelzwerge-gostenhof", publicId: "abcd1234", grund: "zurückgenommen", datum: today },
+        { host: "spam.example.net", grund: "Werbung", datum: today },
+      ],
+      zurueckgestellt: [],
+    });
+    const r = reservedIds([state]);
+    expect([...r.ids]).toEqual(["krabbelzwerge-gostenhof"]);
+    expect([...r.publicIds]).toEqual(["abcd1234"]);
+  });
+  it("Eintrag nur mit Grund ist ungültig", () => {
+    expect(
+      DiscoverState.safeParse({ region: "nuernberg", abgelehnt: [{ grund: "x", datum: today }], zurueckgestellt: [] })
+        .success,
+    ).toBe(false);
+  });
 });
 
 const assessed: AssessEntry = {
@@ -328,6 +396,21 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
     expect(r.notes).toEqual([
       "Programmseite nicht auf der abgerufenen Seite verlinkt: https://boese.example.com/termine",
     ]);
+  });
+
+  it("eine zurückgenommene ID samt publicId wird nicht neu vergeben", () => {
+    const old = shortId("krabbelzwerge-gostenhof", 0);
+    const r = entryFromAssessment(assessed, {
+      ...ctx,
+      reserved: {
+        ids: new Set(["krabbelzwerge-gostenhof"]),
+        publicIds: new Set([old, shortId("krabbelzwerge-gostenhof-2", 0)]),
+      },
+    });
+    if (!r.ok) throw new Error(r.grund);
+    expect(r.entry.id).toBe("krabbelzwerge-gostenhof-2");
+    expect(r.entry.publicId).toBe(shortId("krabbelzwerge-gostenhof-2", 1));
+    expect(r.entry.venues[0]?.id).toBe("krabbelzwerge-gostenhof-2");
   });
 
   it("zweiter Ort bekommt eine eigene, freie Orts-ID", () => {
