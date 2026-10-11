@@ -10,10 +10,10 @@ import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange } from "../domain/date-range.ts";
 import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
 import {
+  distanceText,
   type Origin,
   type Reach,
   type ReachLimit,
-  roundedDistance,
   roundedMinutes,
   stopMinutes,
 } from "../domain/reach.ts";
@@ -293,16 +293,13 @@ export function ageWindowLabel({ from, until }: ExportSelection, now: Date): str
   return undefined;
 }
 
-const DISTANCE = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
-
 /** Kachel und Orts-Liste: „25 Min.“, „über 2 Std.“ bzw. „1,4 km“ – gerundet von der Domäne (E8). */
 export function reachShort(reach: Reach): string {
   if (reach.kind === "oepnv") {
     const { over, value } = roundedMinutes(reach.minutes);
     return over ? "über 2 Std." : `${value} Min.`;
   }
-  const { unit, value } = roundedDistance(reach.meters);
-  return `${DISTANCE.format(value)} ${unit}`;
+  return distanceText(reach.meters);
 }
 
 const ORIGIN_PHRASES = { standort: "ab deinem Standort", karte: "ab der Kartenmitte" } as const;

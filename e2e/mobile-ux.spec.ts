@@ -385,6 +385,15 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       kid.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil."),
     ).toBeVisible();
   },
+  // ermittelter Standort im Kind-Sheet, in Worten „(nächster Stadtteil: Altstadt)“ (Arch-Review Plan 0034, M2)
+  "kind-sheet-standort": async (page) => {
+    await page.context().grantPermissions(["geolocation"]);
+    await page.context().setGeolocation({ latitude: 49.45213, longitude: 11.07672 });
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
+    await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort (nächster Stadtteil: Altstadt)");
+  },
   // Standort außerhalb des Stadtgebiets: Begründung mit „Startpunkt wählen“ (E11, m16)
   "filter-sheet-wegzeit-ausserhalb": async (page) => {
     await page.context().grantPermissions(["geolocation"]);

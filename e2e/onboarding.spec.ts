@@ -912,6 +912,23 @@ test.describe("Nachtrag 2026-10-11: Dropdown und Standort im Schritt Weg", () =>
     await expect(intro(page).getByText("Dein Standort", { exact: true })).toBeVisible();
     // ermittelter Standort in Worten, offline aus den Stadtteil-Punkten (Punkt 8)
     await expect(intro(page).getByText("nächster Stadtteil: Altstadt", { exact: true })).toBeVisible();
+    // Mobile-UX-Gates für den Zustand „Dein Standort“ (`.onb-origin`), hell und dunkel (Arch-Review Plan 0034, M2)
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const theme = await page.evaluate(() => document.documentElement.dataset["theme"]);
+    for (const scheme of SCHEMES) {
+      await page.emulateMedia({ colorScheme: scheme.colorScheme });
+      await page.evaluate(
+        ([dark, before]) => {
+          const root = document.documentElement;
+          if (dark) root.dataset["theme"] = "dark";
+          else if (before === undefined) delete root.dataset["theme"];
+          else root.dataset["theme"] = before;
+        },
+        [scheme.chosenDark, theme] as const,
+      );
+      await expectMobileUx(page);
+      if (scheme.label !== "hell") await expectNoBrightIslands(page);
+    }
     await expect(intro(page).getByText("Wegzeit ab deinem Standort (auf ca. 100 m gerundet).")).toBeVisible();
     await expect(district).toHaveCount(0);
     const remove = intro(page).getByRole("button", { name: "Standort entfernen" });
@@ -928,5 +945,44 @@ test.describe("Nachtrag 2026-10-11: Dropdown und Standort im Schritt Weg", () =>
     await expect(district).toHaveValue("gostenhof");
     expect(await page.evaluate(() => localStorage.getItem("zwergenplan.entfernung-ab"))).toBe("gostenhof");
     await expectCovered(page);
+  });
+
+  test("N2: „Dein Standort“ mit dem längsten Text bricht bei 320 px und 200 % Textgröße nicht aus", async ({
+    page,
+    context,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await context.grantPermissions(["geolocation"]);
+    // Worst Case (Arch-Review Plan 0034, M2): längster Stadtteil-Name und über 1,5 km vom nächsten Stadtteil-Punkt,
+    // also mit Entfernung. Im Fixture-Stadtgebiet gibt es so einen Punkt nicht: Nur in diesem Test liegt der letzte
+    // Halt der Wegzeit-Tabelle dort, sonst wäre der Standort „außerhalb“ und „Dein Standort“ fehlte.
+    const worst = { latitude: 49.413, longitude: 11.009 };
+    await context.setGeolocation(worst);
+    await page.route("**/data/wegzeit.json", async (route) => {
+      const response = await route.fetch();
+      const table = (await response.json()) as { lat: number[]; lon: number[] };
+      // Koordinaten als Differenzen in 1e-4 Grad (`undelta` in src/domain/transit.ts)
+      const moveLast = (deltas: number[], to: number) => {
+        const before = deltas.slice(0, -1).reduce((sum, d) => sum + d, 0);
+        deltas[deltas.length - 1] = Math.round(to * 1e4) - before;
+      };
+      moveLast(table.lat, worst.latitude);
+      moveLast(table.lon, worst.longitude);
+      await route.fulfill({ response, json: table });
+    });
+    await opened(page);
+    await goTo(page, "weg");
+    await intro(page).getByRole("button", { name: "Standort", exact: true }).click();
+    await expect(intro(page).getByText("Dein Standort", { exact: true })).toBeVisible();
+    await expect(
+      intro(page).getByText("nächster Stadtteil: Röthenbach b. Schweinau, ca. 1,8 km", { exact: true }),
+    ).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await expectTouchTargets(page);
+    await expectTextFits(page);
+    await setTextScale(page, 2);
+    await expectNoHorizontalScroll(page);
+    await expectTextFits(page, { scale: 2 });
   });
 });
