@@ -328,7 +328,35 @@ Arbeit direkt auf `main` im Haupt-Checkout (allein dort, `CLAUDE.md`, Punkt 6), 
   - `prefilter` nimmt `abgelehnt` als optionales Feld (ohne Angabe die eigene Region), damit die bestehenden Tests unverändert bleiben.
   - Test „Kachel Fürth, Weg übersprungen“: „Später“ geht einen Schritt weiter und beendet erst auf dem letzten; der Test klickt es, bis der Dialog zu ist.
   - Zwischen S1 und S2 war der echte Build lokal rot (Fürther Stadtteile ohne Zugangshalt, weil die Tabelle noch keine Fürther Zeilen hatte); nicht gepusht.
-- **Offen** (Haupt-Session): `/browser-review` lokal (Checkliste aus S5), `/arch-review`, S6 Trockenlauf, S7 Push und live, S8.
+- **Offen** (Haupt-Session): `/arch-review`, S6 Trockenlauf, S7 Push und live, S8. `/browser-review` lokal siehe unten.
+
+## Browser-Review lokal (2026-10-12)
+
+Fixture-Build (`dist-e2e/`, Stand d365eb4), Preview auf freiem Port. `node scripts/screenshots.ts <URL> --views=onboarding,kind,start-startpunkt,start` (84 Bilder, alle sechs Viewports hell und dunkel angesehen) und ein Playwright-Skript für die Fürth-Pfade auf `Pixel 7` (Chromium) und `iPhone 15` (WebKit), je hoch und quer, hell und dunkel. claude-in-chrome war nicht verbunden. Bilder unter `e2e/.artifacts/screens/` und `e2e/.artifacts/screens/fuerth/` (nicht versioniert).
+
+**Zusatzzeilen (G5)**
+
+- **Stadt**: Zwei Kacheln „Nürnberg“ (gewählt, Haken) und „Fürth“, nebeneinander ab 360 px, bei 320 px untereinander, quer in einer Reihe; hell und dunkel klar (`onboarding-1-*`).
+- **Weg mit Fürth**: Gruppen `Fürth:18 Nürnberg:35`, 53 Optionen, auf beiden Geräten in allen vier Varianten. Den nativen Picker zeichnet der Headless-Browser nicht. Ersatzweise ist die Auswahl als Listbox ausgeklappt (`weg-listbox-*`): Gruppenkopf fett, Einträge eingerückt, alle Einträge per Scrollen erreichbar, auch quer (Dialog scrollt, „Weiter“/„Später“ erreichbar). Dunkel steht `color-scheme: dark` am `select`; der native Picker folgt also dem Systemthema. Die weiße Listbox auf Chromium dunkel (`weg-listbox-pixel-hoch-dark`) ist ein Effekt des Ersatzes, WebKit zeigt sie dunkel. Den echten Picker auf Android und iOS prüft der Nutzer am Gerät.
+- **Wegzeit ab Fürther Stadtteil**: „Innenstadt (Fürth)“ gibt die Minuten-Chips frei, kein Hinweis „außerhalb“; Liste mit „Wegzeit ab Innenstadt (Fürth)“ und Minuten an den Karten (`weg-innenstadt-*`, `liste-fuerth-*`).
+- **Kind-Sheet**: `optgroup` Nürnberg zuerst (keine Stadt gespeichert, E7), Wert `fuerth-innenstadt` steht (`kind-fuerth-*`).
+- **Kachel Fürth, Weg übersprungen**: Liste „8 Angebote ab heute“ ohne Startpunkt, Speicher leer (`uebersprungen-*`).
+- **Startpunkt außerhalb** (Standort Erlangen gemockt): „Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth. Wähle einen Stadtteil.“ (`ausserhalb-*`).
+- **Konsole**: in allen Läufen ohne Fehler und Warnungen.
+
+**Checkliste**
+
+- Lesbarkeit: Kachel, Gruppenkopf und Stadtteil sind klar gestaffelt, Kontrast hell und dunkel gut.
+- Daumen-Erreichbarkeit: Kacheln und Auswahl im mittleren Bereich, „Weiter“ unten, unverändert.
+- Zustände: leer („Erst einen Startpunkt wählen“), gewählt, außerhalb und übersprungen brechen nicht. Lange Namen wie „Westvorstadt (Fürth)“ passen in die geschlossene Auswahl.
+- Dark Mode: keine grellen Inseln (außer im Ersatz-Listbox-Bild, s. o.).
+- Micro-Interactions: Kachelwahl über denselben gedrückten Zustand wie bisher (`aria-pressed`, Füllung und Haken); Bilder mit `reduce` ohne Animation.
+- Konsistenz: Kacheln und Auswahl wie im bestehenden Onboarding.
+
+**Befunde**
+
+- Niedrig: Bei Startpunkt außerhalb steht der Hinweis zweimal (roter Kasten unter der Auswahl und Text unter den Chips, `ausserhalb-pixel.png`). Schon vor Plan 0036 so, nur der Text ist neu; kein Blocker.
+- Niedrig: Statuszeile bricht auf `Pixel 7` hoch neben „Liste/Karte“ dreizeilig um, „(Fürth)“ allein in Zeile 3 (`liste-fuerth-pixel-hoch-light.png`); auf iPhone einzeilig.
 
 ## Offene Punkte
 
