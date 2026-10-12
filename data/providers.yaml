@@ -3304,3 +3304,28 @@
       address: Rosenstr. 16-20, 90762 Fürth
       district: Süd
       geo: { lat: 49.4767817, lon: 10.9866124 }
+- id: musikschule-fuerth
+  publicId: kfhpwtj3
+  role: anbieter
+  region: fuerth
+  name: Musikschule Fürth
+  url: https://www.musikschule-fuerth.de/
+  programme:
+    - url: https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/
+      kind: html
+      render: browser
+      use: termine
+  availability:
+    shown: unbekannt
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Familienzentrum: https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/ – Eltern-Kind-Kurse „Grabblmusik“ für Eltern mit Kleinkindern im Gruppenunterricht; Termine für Winter 2026 und Frühjahr 2027 sind auf der Seite veröffentlicht. Bedient Kinder etwa 2 bis unter 4 Jahre, überschneidet sich also teilweise mit 0–3."
+  age:
+    minMonths: 24
+    maxMonths: 47
+  venues:
+    - id: musikschule-fuerth
+      name: Musikschule Fürth e.V.
+      address: Südstadtpark 1, 90763 Fürth
+      district: Süd
+      geo: { lat: 49.4611196, lon: 10.9971424 }
