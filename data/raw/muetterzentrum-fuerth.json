@@ -1,0 +1,74 @@
+{
+ "events": [
+  {
+   "providerId": "muetterzentrum-fuerth",
+   "venueId": "muetterzentrum-fuerth",
+   "title": "Einführung von Beikost für Babys (ab ca. 4 Monaten)",
+   "summary": "Gespräch und praktische Breizubereitung für Mütter mit Babys ab ca. 4 Monaten; das Baby darf mitkommen. Anmeldung verpflichtend, 15 € je Termin.",
+   "topics": [
+    "beikost",
+    "muetter",
+    "elterntreff"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "15,– Euro je Termin (Mitglieder ermäßigt)",
+   "url": "https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html",
+   "sourceUrl": "https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung und Information im Mütterzentrum, Telefon 0911/77 27 99"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-12T13:00",
+      "end": "2026-10-12T15:30"
+     },
+     {
+      "start": "2026-12-14T13:00",
+      "end": "2026-12-14T15:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "muetterzentrum-fuerth",
+   "venueId": "muetterzentrum-fuerth",
+   "title": "Offene Krabbelgruppe (mittwochs 15–17 Uhr)",
+   "summary": "Offener Treff für Kinder mit Eltern oder Großeltern, wöchentlich mittwochs; Einstieg jederzeit, keine Anmeldung nötig. Unkostenbeitrag 4 €, Mitglieder frei.",
+   "topics": [
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "4,– Euro Unkostenbeitrag (Mitglieder kostenfrei)",
+   "url": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
+   "sourceUrl": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Keine Anmeldung nötig"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "WE"
+    ],
+    "start": "15:00",
+    "end": "17:00",
+    "from": "2026-10-14",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "90821f1248496d554759cf6a26aff6515ea057107b8ca0f01d7b134fa2bae1d3",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-12T10:12:47+02:00",
+ "changedAt": "2026-10-12T10:12:47+02:00",
+ "sources": []
+}

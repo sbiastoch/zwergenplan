@@ -3170,3 +3170,33 @@
       name: Hebammenpraxis Wunderwerk
       address: Markgraf-Alexander-Straße 30, 90556 Cadolzburg
       geo: { lat: 49.4573668, lon: 10.8602466 }
+- id: muetterzentrum-fuerth
+  publicId: ar412ygx
+  role: anbieter
+  region: fuerth
+  name: Mütterzentrum Fürth
+  url: https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html
+  programme:
+    - url: https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.muetterzentrum-fuerth.de/kurse-kopie.html
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.muetterzentrum-fuerth.de/offene-treffs-kopie.html
+      kind: html
+      render: browser
+      use: info
+  availability:
+    shown: unbekannt
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Krabbelgruppe: http://www.muetterzentrum-fuerth.de/index.php/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html – Mütterzentrum Fürth bietet selbst eine offene Krabbelgruppe für Kinder mit ihren Eltern, Spielgruppen und Familiencafés sowie Beikost-Kurse für Mütter mit Babys ab etwa 4 Monaten, mit veröffentlichten Terminen am Standort Rosenstraße 16-20 in Fürth."
+  venues:
+    - id: muetterzentrum-fuerth
+      name: Mütterzentrum Fürth (Mehrgenerationenhaus FABEL)
+      address: Rosenstraße 16-20, 90762 Fürth
+      district: Süd
+      geo: { lat: 49.4767817, lon: 10.9866124 }
