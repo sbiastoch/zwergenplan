@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { leadCategory } from "./topics.ts";
+import { fallbackCategory, leadCategory } from "./topics.ts";
 
 describe("leadCategory (Plan 0014, E1)", () => {
   it("nimmt ohne Fokus die erste Kategorie in fester Reihenfolge", () => {
@@ -21,5 +21,19 @@ describe("leadCategory (Plan 0014, E1)", () => {
   it("übergeht reine Merkmale ohne Kategorie", () => {
     expect(leadCategory(["mehrsprachig", "musik"], [])).toBe("musik");
     expect(leadCategory(["vaeter", "kreativ"], ["kreativ"])).toBe("kreativ");
+  });
+});
+
+describe("fallbackCategory (Plan 0037, E5)", () => {
+  it("nimmt die erste Kategorie in fester Reihenfolge", () => {
+    expect(fallbackCategory(["konzert", "musik"])).toBe("musik");
+  });
+
+  it("übergeht reine Merkmale", () => {
+    expect(fallbackCategory(["mehrsprachig", "kreativ"])).toBe("kreativ");
+  });
+
+  it("fällt bei reinen Merkmalen auf treffs-cafes zurück", () => {
+    expect(fallbackCategory(["vaeter", "mehrsprachig"])).toBe("treffs-cafes");
   });
 });

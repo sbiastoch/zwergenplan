@@ -1,7 +1,8 @@
 /**
  * Geschlossenes Themen-Vokabular (aus dem Recherche-Skill übernommen) und die
  * feste Zuordnung zu den 12 Filter-Kategorien der Oberfläche.
- * Kategorien werden nie gespeichert, sondern immer hieraus abgeleitet.
+ * Kategorien eines Angebots stehen seit ADR 0030 in `category`; `TOPIC_CATEGORIES` dient Themenregel, Warnung und
+ * Rückfall.
  */
 
 export const CATEGORIES = [
@@ -84,6 +85,14 @@ export const TOPICS = Object.keys(TOPIC_CATEGORIES) as [Topic, ...Topic[]];
 export function categoriesOf(topics: readonly Topic[]): Category[] {
   const found = new Set<Category>(topics.flatMap((t) => TOPIC_CATEGORIES[t]));
   return CATEGORIES.filter((c) => found.has(c));
+}
+
+/**
+ * Rückfall für Stände ohne `category`: die erste Kategorie der Themen in fester Reihenfolge, also das bisherige
+ * Etikett ohne Filter (Plan 0037, E5). Entfällt in Stufe C.
+ */
+export function fallbackCategory(topics: readonly Topic[]): Category {
+  return categoriesOf(topics)[0] ?? "treffs-cafes";
 }
 
 /**

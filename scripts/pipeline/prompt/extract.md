@@ -32,6 +32,7 @@ Beispiel:
   "venueId": "zoff-harmonie",
   "title": "PEKiP-Gruppe (Babys geb. Juli–Sept. 2026)",
   "summary": "Bewegungs- und Spielanregungen für Babys im ersten Lebensjahr, Austausch für Eltern. 10 Treffen.",
+  "category": "babykurse",
   "topics": ["pekip"],
   "format": "kurs",
   "registration": "mit-anmeldung",
@@ -54,6 +55,33 @@ Regeln:
 - `title` macht das Angebot unterscheidbar, etwa durch Altersgruppe oder Wochentag, wenn es mehrere gleichnamige Gruppen gibt. Regelmäßige Angebote desselben Orts müssen sich in den ersten 60 Zeichen unterscheiden. Höchstens 140 Zeichen.
 - `summary` sind **eigene Worte**, nie kopierter Anbietertext: 1–2 Sätze, was passiert und was man wissen muss (etwa „Einstieg jederzeit möglich“). Höchstens 320 Zeichen.
 - `topics` stammen aus dem Vokabular des Schemas. Mindestens eines muss ein Inhalt sein; `vaeter`, `muetter` und `mehrsprachig` sind reine Merkmale und kommen nur zusätzlich dazu.
+- `category` ist die **eine** Kategorie, unter der Eltern das Angebot suchen würden. Sie richtet sich nach dem, was Eltern und Kind dort hauptsächlich tun, nicht nach dem Ort und nicht nach dem Anbieter. Meist passt sie zu einem der `topics`.
+
+  | `category` | gemeint |
+  |---|---|
+  | `babykurse` | Kurse mit festem Babykonzept: PEKiP, FenKid, Babymassage, Babyzeichen, Sinneskurse für Babys |
+  | `krabbel-spielgruppen` | Krabbel-, Spiel- und Eltern-Kind-Gruppen, Miniclubs |
+  | `treffs-cafes` | Eltern- und Stillcafés, offene Treffs, Elternfrühstück, Krabbelgottesdienste |
+  | `bewegung` | Eltern-Kind-Turnen, Pikler-Bewegungskurse, Bewegungslandschaften, Tanz, Yoga, Fitness und Rückbildung mit Baby, Indoor-Spielplatz |
+  | `wasser` | Babyschwimmen, Kleinkindschwimmen |
+  | `musik` | selbst singen und musizieren: Musikgarten, Musikzwerge, Singkreise |
+  | `kreativ` | Malen, Basteln, Matschen, Kreativkurse |
+  | `buecher` | Vorlesen, Bilderbuchkino, Bücherzwerge, Reime und Fingerspiele in der Bibliothek |
+  | `museum` | Führungen, Workshops und Ausstellungen im Museum |
+  | `buehne` | zuschauen: Theater, Puppentheater, Konzert, Kino |
+  | `natur` | Wald- und Naturgruppen, Tiere, Bauernhof |
+  | `beratung` | Beratung, Hebammensprechstunde, Erste Hilfe, Beikost |
+
+  Passen mehrere, entscheidet:
+  - Ein Babykurs (PEKiP, FenKid, Babymassage) bleibt `babykurse`, auch wenn gesungen oder bewegt wird.
+  - Eine Krabbel- oder Eltern-Kind-Gruppe bleibt `krabbel-spielgruppen`, auch mit Singen, Basteln oder Turnen. Nur wenn das ganze Programm Musik ist (Musikgarten, „Musikzwerge“), ist es `musik`. Ist es ganz Turnen oder Bewegungslandschaft, ist es `bewegung`. Findet die Gruppe ganz im Wald statt, ist es `natur`.
+  - Heißt das Angebot Café, Treff oder Frühstück und spielen die Kinder nebenher, ist es `treffs-cafes`. Heißt es Krabbelgruppe oder Krabbeltreff, ist es `krabbel-spielgruppen`.
+  - Schauen Eltern und Kind zu (Konzert, Theater, Puppenspiel, Babykonzert), ist es `buehne`, auch wenn die Musik im Mittelpunkt steht. Singen und musizieren sie selbst, ist es `musik`.
+  - Tanz mit Kleinkindern ist `bewegung`. Ein Musikkurs mit Bewegungsspielen bleibt `musik`.
+  - Wird vorgelesen oder werden Bilderbuchbilder gezeigt (Bilderbuchkino, Kamishibai, Lesestunde), ist es `buecher`. Ein Theaterstück nach einem Bilderbuch ist `buehne`.
+  - Ein Angebot im Museum ist `museum`, wenn es um Ausstellung oder Führung geht. Ein Elterncafé, das nur in den Räumen des Museums stattfindet, ist `treffs-cafes`.
+  - Ein Krabbelgottesdienst ist `treffs-cafes`, auch mit Singen.
+  - Rückbildung, Yoga oder Fitness mit Baby ist `bewegung`. Eine Sprechstunde oder ein Vortrag mit Kind ist `beratung`, ein Stillcafé `treffs-cafes`.
 - `format`:
   - `kurs`: feste Reihe mit Anmeldung für das Ganze
   - `regelmaessig`: wiederkehrend ohne festes Ende, auch offene Treffs

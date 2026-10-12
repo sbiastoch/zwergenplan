@@ -14,3 +14,7 @@ Alle 8 Kandidaten aus evangelische-termine und dem Stadtkalender gegen die Regel
 
 - Topic `musik` bei allen Miniclubs: Der Text nennt „spielen, basteln und singen“; `singen`/`kreativ` wären genauer. Bestand gelassen, neue Gruppe gleich erfasst.
 - Mittwochsgruppe heißt jetzt „geb. 02-06/2026“ statt „03-07/2026“; Termine unverändert, Titel zählt nicht.
+
+## Kategorie (Plan 0037, E8)
+
+- Alle fünf Miniclubs: `krabbel-spielgruppen`, Alternative `musik` (Thema `musik` im Bestand). Der Text nennt „spielen, basteln und singen“, das Programm ist also nicht ganz Musik; nach E8 bleibt eine Eltern-Kind-Gruppe mit Singen `krabbel-spielgruppen`.

@@ -15,6 +15,7 @@
    "topics": [
     "kreativ"
    ],
+   "category": "kreativ",
    "availability": {
     "status": "unbekannt"
    },
@@ -35,6 +36,7 @@
     "elterncafe",
     "elterntreff"
    ],
+   "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung"
    },
@@ -65,6 +67,7 @@
    "topics": [
     "krabbelgruppe"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt"
    },
@@ -121,6 +124,7 @@
     "vaeter",
     "elterntreff"
    ],
+   "category": "treffs-cafes",
    "availability": {
     "status": "unbekannt"
    },
@@ -141,6 +145,7 @@
     "vaeter",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "ohne-anmeldung"
    },

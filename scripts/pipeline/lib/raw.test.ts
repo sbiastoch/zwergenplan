@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { expansionWindow, ProviderRaw, providerRawIssues, type RawContext, validateRaw } from "./raw.ts";
+import {
+  CATEGORY_CONFLICT,
+  expansionWindow,
+  ProviderRaw,
+  providerRawIssues,
+  type RawContext,
+  validateRaw,
+} from "./raw.ts";
 
 const { providers } = loadFixtures();
 const ctx: RawContext = {
@@ -50,6 +57,29 @@ describe("validateRaw", () => {
   it("verlangt ein Thema mit Kategorie, wie das Angebot (Plan 0030, Review M2)", () => {
     const r = validateRaw(batch([{ ...treff, topics: ["vaeter"] }]), ctx);
     expect(errors(r).join("\n")).toContain("events.0 („Offener Krabbeltreff“).topics: mindestens ein Thema");
+  });
+
+  describe("Hauptkategorie category (Plan 0037, E2, E4)", () => {
+    it("ein Event ohne category ist gültig (alte Stände in data/raw)", () => {
+      const r = validateRaw(batch([treff]), ctx);
+      expect(r.ok).toBe(true);
+    });
+
+    it("warnt, wenn category zu keinem Thema passt, ohne Fehler", () => {
+      const r = validateRaw(batch([{ ...treff, category: "musik" }]), ctx);
+      expect(errors(r)).toEqual([]);
+      expect(r.warnings).toEqual([
+        `events.0 („Offener Krabbeltreff“).category: musik ${CATEGORY_CONFLICT} (krabbelgruppe, elterncafe)`,
+      ]);
+      expect(CATEGORY_CONFLICT).toBe("passt zu keinem Thema");
+    });
+
+    it("warnt nicht, wenn category zu einem Thema passt", () => {
+      const r = validateRaw(batch([{ ...treff, category: "krabbel-spielgruppen" }]), ctx);
+      expect(errors(r)).toEqual([]);
+      expect(r.warnings).toEqual([]);
+      expect(r.ok && r.batch.events[0]?.category).toBe("krabbel-spielgruppen");
+    });
   });
 
   it("prüft Katalog-Referenzen", () => {

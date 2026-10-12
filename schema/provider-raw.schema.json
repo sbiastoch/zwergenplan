@@ -107,6 +107,23 @@
             "type": "string",
             "format": "uri"
           },
+          "category": {
+            "type": "string",
+            "enum": [
+              "babykurse",
+              "krabbel-spielgruppen",
+              "treffs-cafes",
+              "bewegung",
+              "wasser",
+              "musik",
+              "kreativ",
+              "buecher",
+              "museum",
+              "buehne",
+              "natur",
+              "beratung"
+            ]
+          },
           "age": {
             "type": "object",
             "properties": {
@@ -573,6 +590,23 @@
               "sourceUrl": {
                 "type": "string",
                 "format": "uri"
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "babykurse",
+                  "krabbel-spielgruppen",
+                  "treffs-cafes",
+                  "bewegung",
+                  "wasser",
+                  "musik",
+                  "kreativ",
+                  "buecher",
+                  "museum",
+                  "buehne",
+                  "natur",
+                  "beratung"
+                ]
               },
               "age": {
                 "type": "object",

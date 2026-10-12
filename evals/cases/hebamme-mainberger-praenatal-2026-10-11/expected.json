@@ -16,6 +16,7 @@
     "rueckbildung",
     "hebamme"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "warteliste"
    },
@@ -41,6 +42,7 @@
     "rueckbildung",
     "hebamme"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "wenige"
    },
@@ -63,6 +65,7 @@
     "rueckbildung",
     "hebamme"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "warteliste"
    },

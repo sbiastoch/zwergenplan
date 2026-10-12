@@ -1,5 +1,8 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
+import { CATEGORIES } from "../../../src/domain/topics.ts";
+import { EXTRACT_KEY_PARTS } from "../io/extract.ts";
 import {
   checkExtraction,
   type ExtractContext,
@@ -40,6 +43,7 @@ const treff = {
   venueId: "familientreff-beispiel-haus",
   title: "Offener Krabbeltreff",
   summary: "Spielen und Austausch für Familien mit Babys, Kaffee steht bereit.",
+  category: "krabbel-spielgruppen",
   topics: ["krabbelgruppe", "elterncafe"],
   format: "regelmaessig",
   registration: "ohne-anmeldung",
@@ -62,6 +66,18 @@ describe("checkExtraction", () => {
     expect(r.ok && r.events[0]?.via).toBe("stadt-vk");
     const own = checkExtraction({ events: [treff] }, ctx);
     expect(own.ok && own.events[0]).not.toHaveProperty("via");
+  });
+
+  it("category ist in der Antwort Pflicht, auch wenn die CLI das Schema nicht durchsetzt (Plan 0037, E3)", () => {
+    const { category: _, ...ohne } = treff;
+    const r = checkExtraction({ events: [ohne] }, ctx);
+    expect(r.ok).toBe(false);
+    expect(errorsOf(r)).toEqual(["events.0 („Offener Krabbeltreff“).category fehlt"]);
+  });
+
+  it("category bleibt erhalten", () => {
+    const r = checkExtraction({ events: [{ ...treff, category: "treffs-cafes" }] }, ctx);
+    expect(r.ok && r.events[0]?.category).toBe("treffs-cafes");
   });
 
   it("leere Liste ist gültig (keine Termine)", () => {
@@ -137,6 +153,25 @@ describe("extractResponseSchema", () => {
     expect(Object.keys(item.properties)).not.toContain("providerId");
     expect(Object.keys(item.properties)).not.toContain("via");
     expect(item.additionalProperties).toBe(false);
+  });
+
+  it("category ist Pflicht, mit dem Enum der 12 Kategorien (Plan 0037, E3)", () => {
+    const schema = extractResponseSchema() as {
+      properties: {
+        events: { items: { properties: Record<string, { enum?: unknown }>; required: string[] } };
+      };
+    };
+    const item = schema.properties.events.items;
+    expect(item.required).toContain("category");
+    expect(item.properties["category"]?.enum).toEqual([...CATEGORIES]);
+  });
+
+  it("Hash des Antwortschemas ist festgehalten: Er ist Teil des Cache-Schlüssels (Plan 0037, E3)", () => {
+    const hash = createHash("sha256").update(EXTRACT_KEY_PARTS.schema).digest("hex").slice(0, 12);
+    expect(
+      hash,
+      "Antwortschema geändert → volle Neu-Extraktion (Plan 0037, E3); nur mit höherer Bremse und bewusst anpassen.",
+    ).toBe("ab413b808c90");
   });
 
   it("ohne $schema (die CLI lehnt Draft 2020-12 als Meta-Schema ab)", () => {

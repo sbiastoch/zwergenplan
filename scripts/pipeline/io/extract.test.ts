@@ -4,7 +4,8 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { createExtractor } from "./extract.ts";
+import { CATEGORIES } from "../../../src/domain/topics.ts";
+import { createExtractor, EXTRACT_KEY_PARTS } from "./extract.ts";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const BIN = join(ROOT, "tests/fixtures/fake-claude.mjs");
@@ -20,6 +21,7 @@ const event = (title: string, weekday: string) => ({
   venueId: "familientreff-beispiel-haus",
   title,
   summary: "Spielen und Austausch für Familien mit Babys.",
+  category: "krabbel-spielgruppen",
   topics: ["krabbelgruppe"],
   format: "regelmaessig",
   registration: "ohne-anmeldung",
@@ -66,6 +68,22 @@ const input = (text: string) => ({
   candidates: [],
   allowedUrls: [PAGE, `${PAGE}/2`],
   today: "2026-10-05",
+});
+
+describe("Prompt (Plan 0037, E8)", () => {
+  it("die Kategorietabelle unter category nennt genau die 12 IDs aus CATEGORIES, jede einmal", () => {
+    const lines = EXTRACT_KEY_PARTS.prompt.split("\n").map((l) => l.trim());
+    const head = lines.findIndex((l) => /^\|\s*`category`\s*\|/.test(l));
+    expect(head, "Tabellenkopf „| `category` | … |“ fehlt im Prompt").toBeGreaterThanOrEqual(0);
+    const rows: string[] = [];
+    for (const l of lines.slice(head + 2)) {
+      const m = /^\|\s*`([^`]+)`\s*\|/.exec(l);
+      if (!m?.[1]) break;
+      rows.push(m[1]);
+    }
+    expect([...rows].sort()).toEqual([...CATEGORIES].sort());
+    expect(rows).toHaveLength(CATEGORIES.length);
+  });
 });
 
 describe("createExtractor (Fake-CLI)", () => {

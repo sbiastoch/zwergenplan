@@ -14,6 +14,7 @@
    "topics": [
     "babymassage"
    ],
+   "category": "babykurse",
    "availability": {
     "status": "unbekannt"
    },
@@ -45,6 +46,7 @@
     "kreativ",
     "spielgruppe"
    ],
+   "category": "babykurse",
    "availability": {
     "status": "unbekannt"
    },
@@ -76,6 +78,7 @@
     "kreativ",
     "spielgruppe"
    ],
+   "category": "babykurse",
    "availability": {
     "status": "unbekannt"
    },
@@ -106,6 +109,7 @@
    "topics": [
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -136,6 +140,7 @@
    "topics": [
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -178,6 +183,7 @@
    "topics": [
     "babymassage"
    ],
+   "category": "babykurse",
    "availability": {
     "status": "unbekannt"
    },
@@ -208,6 +214,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -238,6 +245,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -267,6 +275,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -298,6 +307,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -329,6 +339,7 @@
     "yoga-mit-baby",
     "rueckbildung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -358,6 +369,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -388,6 +400,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -419,6 +432,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -450,6 +464,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -507,6 +522,7 @@
     "eltern-kind-turnen",
     "bewegung"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -538,6 +554,7 @@
     "musik",
     "singen"
    ],
+   "category": "musik",
    "availability": {
     "status": "unbekannt"
    },
@@ -569,6 +586,7 @@
     "musik",
     "singen"
    ],
+   "category": "musik",
    "availability": {
     "status": "unbekannt"
    },
@@ -599,6 +617,7 @@
     "musik",
     "singen"
    ],
+   "category": "musik",
    "availability": {
     "status": "unbekannt"
    },
@@ -628,6 +647,7 @@
    "topics": [
     "pekip"
    ],
+   "category": "babykurse",
    "availability": {
     "status": "warteliste"
    },
@@ -652,6 +672,7 @@
    "topics": [
     "pekip"
    ],
+   "category": "babykurse",
    "availability": {
     "status": "warteliste"
    },
@@ -676,6 +697,7 @@
    "topics": [
     "pekip"
    ],
+   "category": "babykurse",
    "availability": {
     "status": "warteliste"
    },
@@ -701,6 +723,7 @@
     "fitness-mit-baby",
     "tanz"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -732,6 +755,7 @@
     "musik",
     "tanz"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },
@@ -763,6 +787,7 @@
     "musik",
     "tanz"
    ],
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt"
    },

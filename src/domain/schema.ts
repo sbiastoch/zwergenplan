@@ -7,7 +7,7 @@ import { inBounds } from "./geo.ts";
 import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, SHORT_ID_PATTERN } from "./ids.ts";
 import { REGION_IDS, REGIONS } from "./regions.ts";
 import { isoWeekday } from "./time.ts";
-import { categoriesOf, TOPICS } from "./topics.ts";
+import { CATEGORIES, categoriesOf, TOPICS } from "./topics.ts";
 
 const kebab = z.string().max(MAX_KEBAB_ID).regex(KEBAB_ID_PATTERN, "kebab-case erwartet");
 /** Angebots-ID und `publicId` eines Anbieters (ADR 0022) */
@@ -17,6 +17,8 @@ const Instant = z.iso.datetime({ offset: true, local: false });
 const IsoDate = z.iso.date();
 
 const Topic = z.enum(TOPICS);
+/** Hauptkategorie eines Angebots, gewählt von der Extraktion (ADR 0030) */
+export const CategoryField = z.enum(CATEGORIES);
 export const Format = z.enum(["kurs", "regelmaessig", "einmalig"]);
 export const Registration = z.enum(["mit-anmeldung", "ohne-anmeldung"]);
 export const Cost = z.enum(["kostenlos", "kostenpflichtig"]);
@@ -222,6 +224,8 @@ export const OfferFields = z.strictObject({
   title: z.string().min(1).max(140),
   /** eigene Zusammenfassung, nie 1:1 kopierter Anbietertext */
   summary: z.string().min(1).max(320),
+  /** Hauptkategorie (ADR 0030); optional bis Stufe B von Plan 0037 (E1), Pflicht ab dann */
+  category: CategoryField.optional(),
   topics: z.array(Topic).min(1),
   format: Format,
   registration: Registration,

@@ -26,6 +26,7 @@ const offer = (over: Partial<EvalOffer> = {}): EvalOffer => ({
   format: "regelmaessig",
   registration: "ohne-anmeldung",
   cost: "kostenlos",
+  category: "krabbel-spielgruppen",
   topics: ["krabbelgruppe"],
   availability: { status: "ohne-anmeldung" },
   starts: ["2026-10-14T10:00:00+02:00", "2026-10-21T10:00:00+02:00"],
@@ -104,11 +105,33 @@ describe("toEvalOffers", () => {
         format: "kurs",
         registration: "mit-anmeldung",
         cost: "kostenpflichtig",
+        // ohne category im Bestand: Rückfall aus den Themen (Übergang Plan 0037, E10)
+        category: "babykurse",
         topics: ["pekip"],
         availability: { status: "frei" },
         starts: ["2026-10-11T00:30:00+02:00"],
       },
     ]);
+  });
+
+  it("übernimmt category aus dem Angebot (Plan 0037, E10)", () => {
+    const o = {
+      id: "cccccccc",
+      providerId: treff.id,
+      venueId: VENUE,
+      title: "Babykonzert",
+      summary: "x",
+      category: "buehne",
+      topics: ["konzert", "musik"],
+      format: "einmalig",
+      registration: "mit-anmeldung",
+      cost: "kostenpflichtig",
+      availability: { status: "frei", checkedAt: "2026-10-04T10:00:00+02:00" },
+      url: "https://example.org/c",
+      sourceUrl: "https://example.org/c",
+      sessions: [{ start: "2026-10-12T10:00:00+02:00", end: "2026-10-12T11:00:00+02:00" }],
+    } satisfies Offer;
+    expect(toEvalOffers([o], { from: "2026-10-11", to: "2027-02-04" })[0]?.category).toBe("buehne");
   });
 });
 
@@ -206,7 +229,22 @@ describe("scoreCase", () => {
       cost: { hits: 0, total: 1 },
       registration: { hits: 0, total: 1 },
       topics: { hits: 1, total: 1 },
+      category: { hits: 1, total: 1 },
     });
+  });
+
+  it("Feldtreffer category exakt (Plan 0037, E10)", () => {
+    const s = scoreCase(
+      [offer({ category: "buehne", topics: ["konzert", "musik"] })],
+      [offer({ category: "musik", topics: ["konzert", "musik"] })],
+    );
+    expect(s.fields.category).toEqual({ hits: 0, total: 1 });
+  });
+
+  it("zählt vorhergesagte Angebote, deren category zu keinem Thema passt (Plan 0037, E10)", () => {
+    const later = ["2026-10-15T10:00:00+02:00"];
+    const s = scoreCase([], [offer({ category: "musik", topics: ["krabbelgruppe"] }), offer({ starts: later })]);
+    expect(s.categoryConflicts).toBe(1);
   });
 
   it("keine erwarteten Termine (Falle): jeder vorhergesagte Termin ist falsch positiv", () => {
@@ -274,6 +312,33 @@ describe("summarize und resultsRow", () => {
     expect(row).toContain("b fehler");
     expect(row).toContain("falle FP 2");
     expect(row).not.toContain("\n");
+  });
+
+  it("RESULTS_HEADER und resultsRow haben gleich viele Spalten; category und Kat. ohne Thema nach topics", () => {
+    const header = RESULTS_HEADER.split("\n");
+    const columns = (line: string | undefined) => line?.split("|").map((c) => c.trim());
+    expect(columns(header[0])?.slice(14, 17)).toEqual(["topics", "category", "Kat. ohne Thema"]);
+    expect(header[1]?.split("|").length).toBe(header[0]?.split("|").length);
+    const row = resultsRow(summarize(results), results, { date: "2026-10-11", model: "haiku", hash: "abc123def456" });
+    expect(row.split("|").length).toBe(header[0]?.split("|").length);
+  });
+
+  it("Kat. ohne Thema: Anteil der vorhergesagten Angebote, ohne vorhergesagte Angebote „–“", () => {
+    const later = ["2026-10-15T10:00:00+02:00"];
+    const mixed: CaseResult[] = [
+      {
+        name: "k-2026-10-11",
+        outcome: "ok",
+        score: scoreCase([], [offer({ category: "musik", topics: ["krabbelgruppe"] }), offer({ starts: later })]),
+        calls: [call()],
+      },
+    ];
+    const s = summarize(mixed);
+    expect(s.categoryConflicts).toBe(1);
+    const cellsOf = (row: string) => row.split("|").map((c) => c.trim());
+    expect(cellsOf(resultsRow(s, mixed, { date: "d", model: "m", hash: "h" }))[16]).toBe("50 %");
+    const none: CaseResult[] = [{ name: "x", outcome: "ok", score: scoreCase([], []), calls: [call()] }];
+    expect(cellsOf(resultsRow(summarize(none), none, { date: "d", model: "m", hash: "h" }))[16]).toBe("–");
   });
 
   it("findet eine Zeile zum Prompt-Hash", () => {

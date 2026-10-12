@@ -7,7 +7,7 @@ import { z } from "zod";
 import { berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
 import { type CostSummary, summarizeCosts } from "./cost.ts";
 import type { CallRecord } from "./extract.ts";
-import type { ProviderRaw } from "./raw.ts";
+import { CATEGORY_CONFLICT, type ProviderRaw } from "./raw.ts";
 import type { RefreshResult } from "./refresh.ts";
 
 const REFRESH_RESULTS = [
@@ -77,6 +77,8 @@ export const NightlyReport = z.object({
     errors: z.array(z.string()),
     notes: z.array(z.string()),
     written: z.string().optional(),
+    /** Angebote mit aus den Themen abgeleiteter Kategorie (Übergang Plan 0037, E5); fehlt in älteren Berichten */
+    derivedCategories: z.number().optional(),
   }),
   /** Vorstand `data/offers.json` vor dem Lauf; fehlt ohne Vorstand */
   previous: z.object({ offers: z.number(), sessions: z.number() }).optional(),
@@ -233,6 +235,27 @@ export function costSection(c: CostSummary, results: Readonly<Record<string, str
   return out;
 }
 
+/**
+ * Zeilen zum Übergang auf `category` (Plan 0037, E2, E5), je nur bei N > 0: abgeleitete Kategorien im Build und
+ * Widersprüche zu den Themen in den Events der neu übernommenen Anbieter. Ohne Einfluss auf die Ampel.
+ */
+function categoryLines(r: NightlyReport, raws: Readonly<Record<string, ProviderRaw>>): string[] {
+  const out: string[] = [];
+  const derived = r.build.derivedCategories ?? 0;
+  if (derived > 0) out.push(`Kategorie aus Themen abgeleitet: ${de(derived)} Angebote (Übergang Plan 0037)`);
+  const adopted = Object.keys(r.results).filter((id) => CHANGED.has(r.results[id] ?? "offen"));
+  const conflicts = adopted.reduce(
+    (n, id) => n + (r.warnings[id] ?? []).filter((w) => w.includes(CATEGORY_CONFLICT)).length,
+    0,
+  );
+  const events = adopted.reduce((n, id) => n + (raws[id]?.events.length ?? 0), 0);
+  if (conflicts > 0)
+    out.push(
+      `Kategorie passt zu keinem Thema: ${de(conflicts)} von ${de(events)} neuen Events (${Math.round((conflicts / Math.max(events, 1)) * 100)} %)`,
+    );
+  return out;
+}
+
 export interface StatusInput {
   report: NightlyReport | undefined;
   verdict: Verdict;
@@ -271,6 +294,8 @@ export function renderStatus(s: StatusInput): string {
     `| Angebote | ${prev ? de(prev.offers) : "–"} | ${de(r.build.offers)} | ${prev ? signed(r.build.offers - prev.offers) : "–"} |`,
     `| Termine | ${prev ? de(prev.sessions) : "–"} | ${de(r.build.sessions)} | ${prev ? signed(r.build.sessions - prev.sessions) : "–"} |`,
   );
+  const transition = categoryLines(r, s.raws);
+  if (transition.length > 0) out.push("", ...transition.map((l) => `- ${l}`));
   if (r.build.errors.length > 0) out.push("", "**Build-Fehler:**", ...r.build.errors.map((e) => `- ${e}`));
 
   const failing = Object.entries(s.raws)
@@ -329,6 +354,7 @@ export function nightlyCommitMessage(r: NightlyReport, raws: Readonly<Record<str
       .join(", ")}`,
   ];
   if (failing.length > 0) lines.push(`Fehler: ${failing.join(", ")}`);
+  lines.push(...categoryLines(r, raws));
   if (r.abort || r.brake || r.budgetHit)
     lines.push(`Vorzeitig beendet: ${r.abort ?? r.brake ?? "Zeitbudget"} (Rest unverändert)`);
   lines.push(

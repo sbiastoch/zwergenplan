@@ -406,3 +406,26 @@ describe("Themen und Kategorien", () => {
     expect(categoriesOf(["singen", "vorlesen", "musik", "vaeter"])).toEqual(["musik", "buecher"]);
   });
 });
+
+describe("Hauptkategorie category (Plan 0037, E1)", () => {
+  const withCategory = (category: unknown) =>
+    mutate((o) => {
+      const [first] = o.offers;
+      if (first) first["category"] = category;
+    });
+
+  it("ist gültig mit einer der 12 Kategorien", () => {
+    expect(errorsOf(withCategory("buehne"))).toBe("");
+  });
+
+  it("ist in Stufe A optional", () => {
+    const ohne = mutate((o) => {
+      for (const offer of o.offers) delete offer["category"];
+    });
+    expect(errorsOf(ohne)).toBe("");
+  });
+
+  it("lehnt Werte außerhalb von CATEGORIES ab", () => {
+    expect(errorsOf(withCategory("glaube"))).toContain("category");
+  });
+});

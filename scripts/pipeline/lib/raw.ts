@@ -6,7 +6,7 @@
  */
 import { z } from "zod";
 import { slug } from "../../../src/domain/ids.ts";
-import { OfferFields, type Provider, ProviderAge } from "../../../src/domain/schema.ts";
+import { CategoryField, OfferFields, type Provider, ProviderAge } from "../../../src/domain/schema.ts";
 import { fromBerlinLocal } from "../../../src/domain/time.ts";
 import { categoriesOf } from "../../../src/domain/topics.ts";
 import { LocalDateTime, SOURCES } from "./candidate.ts";
@@ -25,6 +25,12 @@ export const RawEvent = OfferFields.pick({
   url: true,
   sourceUrl: true,
 }).extend({
+  /**
+   * Hauptkategorie (ADR 0030). Steht bewusst hier und nicht im `pick`: Wird `OfferFields.category` in Stufe B Pflicht,
+   * bleibt sie im Rohformat optional, und Antwortschema samt Cache-Schlüssel bleiben gleich (Plan 0037, E1, E3).
+   * Optional bis Stufe C, weil alte Stände in `data/raw` sie nicht haben.
+   */
+  category: CategoryField.optional(),
   /** Alter laut Quelle; die Pipeline kappt auf 0–36 Monate */
   age: ProviderAge.optional(),
   availability: OfferFields.shape.availability.omit({ checkedAt: true }),
@@ -155,6 +161,9 @@ export function expansionWindow(event: Pick<RawEvent, "format" | "schedule">, ho
   return horizonTo;
 }
 
+/** Text der Warnung „category passt zu keinem Thema“; der Nachtlauf-Bericht zählt sie (Plan 0037, E2) */
+export const CATEGORY_CONFLICT = "passt zu keinem Thema";
+
 const where = (i: number, e: { title?: unknown }) => `events.${i} („${String(e.title ?? "?")}“)`;
 
 /** Schema + Katalog-Referenzen + Vollständigkeit + Termin-Probelauf. Meldungen nennen Pfad und Feld. */
@@ -201,6 +210,9 @@ export function validateRaw(input: unknown, ctx: RawContext): RawValidation {
     // Querprüfung von `Offer`, die `RawEvent` (aus `OfferFields`) nicht mitbringt: sonst fiele es erst im Build auf
     if (categoriesOf(e.topics).length === 0)
       errors.push(`${w}.topics: mindestens ein Thema muss einer Kategorie zugeordnet sein`);
+    // Nur eine Warnung: Die Hauptkategorie wählt das Modell, ein Widerspruch zu den Themen schadet nicht (Plan 0037, E2)
+    if (e.category !== undefined && !categoriesOf(e.topics).includes(e.category))
+      warnings.push(`${w}.category: ${e.category} ${CATEGORY_CONFLICT} (${e.topics.join(", ")})`);
     if (!provider) errors.push(`${w}: unbekannter Anbieter ${e.providerId}`);
     else if (provider.role !== "anbieter") errors.push(`${w}: ${e.providerId} ist kein Anbieter (${provider.role})`);
     else if (!provider.venues.some((v) => v.id === e.venueId))

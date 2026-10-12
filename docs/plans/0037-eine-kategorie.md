@@ -152,14 +152,14 @@ In `scripts/pipeline/prompt/extract.md`:
 - Nach der Regel zu `topics` (Z. 56) folgt dieser Abschnitt, wörtlich:
 
 ```markdown
-- `category` ist die **eine** Kategorie, unter der Eltern das Angebot suchen würden. Sie richtet sich nach dem, was Eltern und Kind dort hauptsächlich tun, nicht nach dem Ort und nicht nach dem Anbieter. Sie passt zu einem der `topics`.
+- `category` ist die **eine** Kategorie, unter der Eltern das Angebot suchen würden. Sie richtet sich nach dem, was Eltern und Kind dort hauptsächlich tun, nicht nach dem Ort und nicht nach dem Anbieter. Meist passt sie zu einem der `topics`.
 
   | `category` | gemeint |
   |---|---|
-  | `babykurse` | Kurse mit festem Babykonzept: PEKiP, FenKid, Babymassage, Babyzeichen |
+  | `babykurse` | Kurse mit festem Babykonzept: PEKiP, FenKid, Babymassage, Babyzeichen, Sinneskurse für Babys |
   | `krabbel-spielgruppen` | Krabbel-, Spiel- und Eltern-Kind-Gruppen, Miniclubs |
   | `treffs-cafes` | Eltern- und Stillcafés, offene Treffs, Elternfrühstück, Krabbelgottesdienste |
-  | `bewegung` | Eltern-Kind-Turnen, Bewegungslandschaften, Tanz, Yoga, Fitness und Rückbildung mit Baby, Indoor-Spielplatz |
+  | `bewegung` | Eltern-Kind-Turnen, Pikler-Bewegungskurse, Bewegungslandschaften, Tanz, Yoga, Fitness und Rückbildung mit Baby, Indoor-Spielplatz |
   | `wasser` | Babyschwimmen, Kleinkindschwimmen |
   | `musik` | selbst singen und musizieren: Musikgarten, Musikzwerge, Singkreise |
   | `kreativ` | Malen, Basteln, Matschen, Kreativkurse |
@@ -498,3 +498,18 @@ Keine Blocker. Alle Punkte übernommen:
 - **m6:** A6 notiert alle 12 Kategorien samt Nullen. Leere Kategorien führen zur Idee „Sticker ohne Treffer ausgrauen“ in `docs/ideas.md`, ohne Codeeingriff.
 
 Abgelehnt: keine.
+
+## Umsetzung
+
+- **A1–A3 (2026-10-12):** umgesetzt wie geplant. Abweichungen:
+  - `io/eval.test.ts` braucht `category` schon in A, weil `EvalOffer.category` Pflicht ist.
+  - Fixtures nur in `lib/extract.test.ts` und `io/extract.test.ts` nötig. Die übrigen Pipeline-Tests nutzen Fake-Extraktoren.
+  - Der Hash-Test liegt in `lib/extract.test.ts`, der Wert des Antwortschemas ist `ab413b808c90`.
+- **A3b (2026-10-12), Nutzerentscheide zu den Zweifelsfällen:**
+  - Familienbox „BabySinne“ wird `babykurse`.
+  - Pikler-Babygymnastik und Zumbini werden `bewegung`.
+  - Die Miniclubs St. Andreas Thon werden `krabbel-spielgruppen`.
+  - Folge für den Prompt (Abweichung vom wörtlichen E8-Text):
+    - Die Tabelle nennt „Sinneskurse für Babys“ unter `babykurse` und „Pikler-Bewegungskurse“ unter `bewegung`.
+    - Der Satz „Sie passt zu einem der `topics`“ lautet jetzt „Meist passt sie …“, denn kein Thema zeigt auf `babykurse` außer pekip, fenkid, babymassage und babysignal.
+    - Damit hat das Soll zwei Fälle „Kat. ohne Thema“ (BabySinne, 2 von 54). Das ist nach E2 erlaubt.

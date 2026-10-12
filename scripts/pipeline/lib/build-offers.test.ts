@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
-import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
+import { OffersFile, type Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
+import { fallbackCategory } from "../../../src/domain/topics.ts";
 import { type BuildInput, batchesFromRaw, buildOffers } from "./build-offers.ts";
 import { ProviderRaw, RawBatch, RawEvent } from "./raw.ts";
 
@@ -481,6 +482,125 @@ describe("buildOffers", () => {
     expect(report.errors).toEqual([]);
     expect(file?.offers).toHaveLength(1);
     expect(file?.offers[0]?.sessions).toHaveLength(4);
+  });
+
+  describe("Hauptkategorie category (Plan 0037, E5, E6)", () => {
+    it("a) category aus dem Rohevent landet im Angebot, auch in jedem zerlegten Einzeltermin", () => {
+      const { file, report } = buildOffers(
+        base({
+          batches: [
+            batch("batch-1", [
+              ev({
+                title: "Matschen im Hof",
+                format: "einmalig",
+                category: "kreativ",
+                topics: ["kreativ"],
+                schedule: { kind: "dates", dates: [{ start: "2026-10-17T10:00" }, { start: "2026-10-24T10:00" }] },
+              }),
+            ]),
+          ],
+        }),
+      );
+      expect(report.errors).toEqual([]);
+      expect(file?.offers.map((o) => o.category)).toEqual(["kreativ", "kreativ"]);
+      expect(report.derivedCategories).toBe(0);
+      expect(report.notes.join("\n")).not.toContain("aus den Themen abgeleitet");
+    });
+
+    it("b) ohne category: Rückfall aus den Themen, gezählt und je Anbieter gemeldet", () => {
+      const { file, report } = buildOffers(
+        base({ batches: [batch("batch-1", [ev({ topics: ["konzert", "musik"] })])] }),
+      );
+      expect(report.errors).toEqual([]);
+      expect(file?.offers[0]?.category).toBe("musik");
+      expect(report.derivedCategories).toBe(1);
+      expect(report.notes).toContain(
+        "familientreff-beispiel: 1 Angebote ohne category – aus den Themen abgeleitet (Übergang Plan 0037)",
+      );
+    });
+
+    const konzert = (category: string, topics: string[], via?: string, title = "Babykonzert im Advent") =>
+      ev({
+        ...(via ? { via } : {}),
+        title,
+        format: "einmalig",
+        category,
+        topics,
+        schedule: { kind: "dates", dates: [{ start: "2026-12-06T10:00" }] },
+      });
+
+    it("c) gleicher Schlüssel: Die Kategorie der ranghöheren Quelle gewinnt, Themen werden vereinigt", () => {
+      const { file, report } = buildOffers(
+        base({
+          batches: [
+            batch("aggregatoren", [konzert("musik", ["musik"], "stadt-vk")]),
+            batch("batch-1", [konzert("buehne", ["konzert"])]),
+          ],
+        }),
+      );
+      expect(report.errors).toEqual([]);
+      expect(file?.offers).toHaveLength(1);
+      expect(file?.offers[0]?.category).toBe("buehne");
+      expect(file?.offers[0]?.topics).toEqual(["konzert", "musik"]);
+    });
+
+    it("c) gleicher Schlüssel und gleicher Rang: Die Kategorie des früheren Events gewinnt", () => {
+      const mo = ev({
+        category: "krabbel-spielgruppen",
+        schedule: { kind: "dates", dates: [{ start: "2026-10-12T10:00" }] },
+      });
+      const doZusatz = ev({
+        category: "treffs-cafes",
+        topics: ["elterncafe"],
+        schedule: { kind: "dates", dates: [{ start: "2026-10-15T10:00" }] },
+      });
+      const { file } = buildOffers(base({ batches: [batch("batch-1", [mo]), batch("batch-2", [doZusatz])] }));
+      expect(file?.offers).toHaveLength(1);
+      expect(file?.offers[0]?.category).toBe("krabbel-spielgruppen");
+      expect(file?.offers[0]?.topics).toEqual(["krabbelgruppe", "elterncafe"]);
+    });
+
+    it("d) Dublette über den Titel: Das ranghöhere Angebot behält seine Kategorie", () => {
+      const { file } = buildOffers(
+        base({
+          batches: [
+            batch("aggregatoren", [konzert("musik", ["musik"], "frankenkids", "Adventliches Babykonzert")]),
+            batch("batch-1", [konzert("buehne", ["konzert"], undefined, "Babykonzert im Advent (Familientreff)")]),
+          ],
+        }),
+      );
+      expect(file?.offers).toHaveLength(1);
+      expect(file?.offers[0]?.category).toBe("buehne");
+      expect(file?.offers[0]?.topics).toEqual(["konzert", "musik"]);
+    });
+
+    it("e) Übernahme aus dem Altbestand ohne category: Rückfall, gezählt; f) die Datei besteht OffersFile", () => {
+      const { file: prev } = loadFixtures();
+      const ohne = { ...prev, offers: prev.offers.map(({ category: _, ...o }) => o) };
+      const { file, report } = buildOffers(
+        base({
+          previous: ohne,
+          horizon: { from: "2026-10-15", to: "2027-02-15" },
+          generatedAt: "2026-10-15T06:00:00+02:00",
+          batches: [
+            batch("batch-1", [], {
+              "familientreff-beispiel": { status: "fehler", reason: "503", checked: [] },
+              "musikschule-beispiel": ok,
+              "theater-beispiel": ok,
+            }),
+          ],
+        }),
+      );
+      expect(report.errors).toEqual([]);
+      const offers = file?.offers ?? [];
+      expect(offers.length).toBeGreaterThan(0);
+      for (const o of offers) expect(o.category).toBe(fallbackCategory(o.topics));
+      expect(report.derivedCategories).toBe(offers.length);
+      expect(report.notes.join("\n")).toContain(
+        "familientreff-beispiel: 3 Angebote ohne category – aus den Themen abgeleitet",
+      );
+      expect(OffersFile.safeParse(file).success).toBe(true);
+    });
   });
 
   it("sortiert nach Anbieter, Titel und Beginn (Plan 0015 E13) und hält IDs über Läufe", () => {

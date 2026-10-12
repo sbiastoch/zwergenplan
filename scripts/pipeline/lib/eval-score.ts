@@ -5,8 +5,9 @@
  */
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { type Offer, OfferFields, Provider } from "../../../src/domain/schema.ts";
+import { CategoryField, type Offer, OfferFields, Provider } from "../../../src/domain/schema.ts";
 import { addMonths, berlinIsoDate, fromBerlinLocal } from "../../../src/domain/time.ts";
+import { categoriesOf, fallbackCategory } from "../../../src/domain/topics.ts";
 import { buildOffers, HORIZON_MONTHS } from "./build-offers.ts";
 import { Candidate, type Source } from "./candidate.ts";
 import type { CallRecord } from "./extract.ts";
@@ -62,6 +63,8 @@ export const EvalOffer = z.strictObject({
   format: OfferFields.shape.format,
   registration: OfferFields.shape.registration,
   cost: OfferFields.shape.cost,
+  /** Hauptkategorie (Plan 0037, E10), exakt bewertet */
+  category: CategoryField,
   topics: OfferFields.shape.topics,
   availability: z.strictObject({ status: OfferFields.shape.availability.shape.status }),
   starts: z.array(Instant).min(1),
@@ -100,6 +103,8 @@ export function toEvalOffers(offers: readonly Offer[], window: Window): EvalOffe
         format: o.format,
         registration: o.registration,
         cost: o.cost,
+        // Übergang Plan 0037 (E10): Rückfall für Bestände ohne category (`pnpm eval freeze`); entfällt in Stufe C
+        category: o.category ?? fallbackCategory(o.topics),
         topics: o.topics,
         availability: { status: o.availability.status },
         starts,
@@ -143,7 +148,7 @@ export function predictOffers(p: {
   return { offers: toEvalOffers(file.offers, p.window), errors: [] };
 }
 
-const FIELDS = ["format", "availability.status", "cost", "registration", "topics"] as const;
+const FIELDS = ["format", "availability.status", "cost", "registration", "topics", "category"] as const;
 type Field = (typeof FIELDS)[number];
 
 interface Count {
@@ -159,6 +164,8 @@ export interface CaseScore {
   sessions: Count;
   offers: Count;
   fields: Record<Field, Hits>;
+  /** vorhergesagte Angebote, deren `category` zu keinem ihrer Themen passt (Plan 0037, E10); Bezug `offers.predicted` */
+  categoryConflicts: number;
 }
 
 const emptyFields = (): Record<Field, Hits> => ({
@@ -167,6 +174,7 @@ const emptyFields = (): Record<Field, Hits> => ({
   cost: { hits: 0, total: 0 },
   registration: { hits: 0, total: 0 },
   topics: { hits: 0, total: 0 },
+  category: { hits: 0, total: 0 },
 });
 const sessionKey = (venueId: string, start: string) => `${venueId}|${Date.parse(start)}`;
 const sameTopics = (a: readonly string[], b: readonly string[]) =>
@@ -177,6 +185,7 @@ const fieldHit: Record<Field, (a: EvalOffer, b: EvalOffer) => boolean> = {
   cost: (a, b) => a.cost === b.cost,
   registration: (a, b) => a.registration === b.registration,
   topics: (a, b) => sameTopics(a.topics, b.topics),
+  category: (a, b) => a.category === b.category,
 };
 
 /**
@@ -239,6 +248,7 @@ export function scoreCase(expected: readonly EvalOffer[], predicted: readonly Ev
     sessions: { expected: count(expected), predicted: count(predicted), matched },
     offers: { expected: expected.length, predicted: predicted.length, matched: usedE.size },
     fields,
+    categoryConflicts: predicted.filter((o) => !categoriesOf(o.topics).includes(o.category)).length,
   };
 }
 
@@ -262,6 +272,8 @@ export interface Summary {
   offerRecall: number | null;
   offerPrecision: number | null;
   fields: Record<Field, Hits>;
+  /** vorhergesagte Angebote mit `category` ohne passendes Thema, über alle Fälle; Bezug `offers.predicted` */
+  categoryConflicts: number;
   costUsd: number;
   durationMs: number;
 }
@@ -297,6 +309,7 @@ export function summarize(results: readonly CaseResult[]): Summary {
     offerRecall: ratio(offers.matched, offers.expected),
     offerPrecision: ratio(offers.matched, offers.predicted),
     fields,
+    categoryConflicts: results.reduce((n, r) => n + r.score.categoryConflicts, 0),
     costUsd: calls.reduce((s, c) => s + (c.costUsd ?? 0), 0),
     durationMs: calls.reduce((s, c) => s + c.durationMs, 0),
   };
@@ -315,8 +328,8 @@ export function promptHash(parts: { prompt: string; schema: string }): string {
 }
 
 export const RESULTS_HEADER = [
-  "| Datum | Modell | Prompt-Hash | Fälle gültig | Aufrufe gültig | Termine R | Termine P | Angebote R | Angebote P | format | Platzstand | cost | registration | topics | Kosten (USD, Schätzung) | Dauer | je Fall (Termine R/P in %, FP = falsch positive Termine) |",
-  "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+  "| Datum | Modell | Prompt-Hash | Fälle gültig | Aufrufe gültig | Termine R | Termine P | Angebote R | Angebote P | format | Platzstand | cost | registration | topics | category | Kat. ohne Thema | Kosten (USD, Schätzung) | Dauer | je Fall (Termine R/P in %, FP = falsch positive Termine) |",
+  "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
 ].join("\n");
 
 const pct = (v: number | null) => (v === null ? "–" : `${Math.round(v * 100)}`);
@@ -349,6 +362,7 @@ export function resultsRow(
     p(s.offerRecall),
     p(s.offerPrecision),
     ...FIELDS.map((f) => hitPct(s.fields[f])),
+    hitPct({ hits: s.categoryConflicts, total: s.offers.predicted }),
     `$${s.costUsd.toFixed(2)}`,
     `${Math.round(s.durationMs / 1000)} s`,
     results.map(perCase).join("; "),

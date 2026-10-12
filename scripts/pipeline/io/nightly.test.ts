@@ -176,6 +176,17 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(report.warnings).toEqual(r.warnings);
   });
 
+  it("schreibt build.derivedCategories nach nightly.json (Übergang Plan 0037, E5)", async () => {
+    const dirsOf = tempData();
+    const { extractor } = fakeExtractor();
+    // Vorstand ohne category (Fixtures vor Stufe B): gemeinde-beispiel scheitert und behält ihn per Rückfall
+    const r = await runNightly({ ...options(dirsOf, extractor), fetch: fakeFetch(["gemeinde-beispiel"]) });
+    expect(r.build.derivedCategories).toBeGreaterThan(0);
+    const report = JSON.parse(readFileSync(join(dirsOf.runDir, "nightly.json"), "utf8"));
+    expect(report.build.derivedCategories).toBe(r.build.derivedCategories);
+    expect(report.build.notes.join("\n")).toContain("aus den Themen abgeleitet");
+  });
+
   it("der erste abort beendet den Lauf geordnet: Rest bleibt unverändert, build läuft trotzdem", async () => {
     const dirsOf = tempData();
     const { extractor, seen } = fakeExtractor(() => ({ kind: "abort", abort: "limit" }));

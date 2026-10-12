@@ -16,6 +16,7 @@
     "eltern-kind-gruppe",
     "musik"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "warteliste"
    },
@@ -47,6 +48,7 @@
     "eltern-kind-gruppe",
     "musik"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "warteliste"
    },
@@ -81,6 +83,7 @@
     "eltern-kind-gruppe",
     "musik"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "warteliste"
    },
@@ -113,6 +116,7 @@
     "eltern-kind-gruppe",
     "musik"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt"
    },
@@ -143,6 +147,7 @@
     "eltern-kind-gruppe",
     "musik"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt"
    },

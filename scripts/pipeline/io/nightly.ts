@@ -270,6 +270,7 @@ async function buildFromRaw(o: {
       errors: report.errors,
       notes: [...notes, ...report.notes],
       ...(written ? { written } : {}),
+      derivedCategories: report.derivedCategories,
     },
   };
 }

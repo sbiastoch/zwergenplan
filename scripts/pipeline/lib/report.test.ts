@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CallRecord } from "./extract.ts";
-import { ProviderRaw } from "./raw.ts";
+import { CATEGORY_CONFLICT, ProviderRaw, RawEvent } from "./raw.ts";
 import {
   assessRun,
   changedProviders,
@@ -256,5 +256,74 @@ describe("parseCommitLog (Commits mit Dateien, für den Live-Stand)", () => {
       { sha: "bbb2222", at: "2026-10-11T01:00:00+00:00", files: ["data/offers.json", "README.md"] },
     ]);
     expect(parseCommitLog("")).toEqual([]);
+  });
+});
+
+describe("Übergang Plan 0037: abgeleitete Kategorien und Widersprüche (E2, E5)", () => {
+  const LINE = "Kategorie aus Themen abgeleitet: 3 Angebote (Übergang Plan 0037)";
+  const withBuild = (derivedCategories?: number) =>
+    report({
+      build: {
+        offers: 330,
+        sessions: 2100,
+        errors: [],
+        notes: [],
+        written: "data/offers.json",
+        ...(derivedCategories === undefined ? {} : { derivedCategories }),
+      },
+    });
+
+  it("Zeile „Kategorie aus Themen abgeleitet“ nur bei N > 0, im Commit-Text und im Bericht", () => {
+    expect(nightlyCommitMessage(withBuild(3), {})).toContain(LINE);
+    expect(nightlyCommitMessage(withBuild(0), {})).not.toContain("Kategorie aus Themen abgeleitet");
+    expect(nightlyCommitMessage(withBuild(), {})).not.toContain("Kategorie aus Themen abgeleitet");
+    const r = withBuild(3);
+    expect(renderStatus({ report: r, verdict: assessRun(r, { live }), live, raws: {}, stock: {} })).toContain(LINE);
+  });
+
+  it("NightlyReport liest einen alten Bericht ohne derivedCategories", () => {
+    expect(withBuild().build.derivedCategories).toBeUndefined();
+  });
+
+  const event = (i: number) =>
+    RawEvent.parse({
+      providerId: "a",
+      venueId: "a-haus",
+      title: `Treff ${i}`,
+      summary: "Spielen und Austausch.",
+      topics: ["krabbelgruppe"],
+      format: "regelmaessig",
+      registration: "ohne-anmeldung",
+      cost: "kostenlos",
+      url: "https://example.org/a",
+      sourceUrl: "https://example.org/a",
+      availability: { status: "ohne-anmeldung" },
+      schedule: { kind: "weekly", weekdays: ["WE"], start: "10:00", from: "2026-10-07", skipHolidays: true },
+    });
+  const events = (n: number) => Array.from({ length: n }, (_, i) => event(i));
+  const conflict = `events.0 („Treff 0“).category: musik ${CATEGORY_CONFLICT} (krabbelgruppe)`;
+  const raws = {
+    a: raw({ events: events(12) }),
+    b: raw({ events: events(8) }),
+    c: raw({ events: events(5) }),
+  };
+
+  it("zählt Widersprüche gegen die Events der neu übernommenen Anbieter", () => {
+    const r = report({
+      results: { a: "extrahiert", b: "pending-uebernommen", c: "einbruch" },
+      // c ist nicht übernommen: seine Warnung und seine Events zählen nicht
+      warnings: { a: [conflict, "Kurs ist schon vorbei – entfällt"], c: [conflict] },
+    });
+    const line = "Kategorie passt zu keinem Thema: 1 von 20 neuen Events (5 %)";
+    expect(nightlyCommitMessage(r, raws)).toContain(line);
+    expect(renderStatus({ report: r, verdict: assessRun(r, { live }), live, raws, stock: {} })).toContain(line);
+  });
+
+  it("ohne Widerspruch keine Zeile", () => {
+    const r = report({ results: { a: "extrahiert", b: "pending-uebernommen" }, warnings: { a: ["anderes"] } });
+    expect(nightlyCommitMessage(r, raws)).not.toContain("Kategorie passt zu keinem Thema");
+    expect(renderStatus({ report: r, verdict: assessRun(r, { live }), live, raws, stock: {} })).not.toContain(
+      "Kategorie passt zu keinem Thema",
+    );
   });
 });

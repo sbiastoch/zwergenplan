@@ -4,7 +4,7 @@
  * `io/llm.ts`), hier steht nur die Entscheidung, was mit einer Antwort geschieht.
  */
 import { z } from "zod";
-import type { Provider } from "../../../src/domain/schema.ts";
+import { CategoryField, type Provider } from "../../../src/domain/schema.ts";
 import { fromBerlinLocal } from "../../../src/domain/time.ts";
 import { buildOffers } from "./build-offers.ts";
 import { type Candidate, Candidate as CandidateSchema } from "./candidate.ts";
@@ -70,8 +70,13 @@ export interface ExtractKeyParts {
   model: string;
 }
 
-/** Antwort des Modells: `RawEvent` ohne `providerId` und `via`, die setzt der Code (E4). */
-const ExtractResponse = z.strictObject({ events: z.array(RawEvent.omit({ providerId: true, via: true })) });
+/**
+ * Antwort des Modells: `RawEvent` ohne `providerId` und `via`, die setzt der Code (E4). `category` ist hier schon
+ * Pflicht (Plan 0037, E3): Das Schema ist Teil des Cache-Schlüssels und ändert sich nur in Stufe A.
+ */
+const ExtractResponse = z.strictObject({
+  events: z.array(RawEvent.omit({ providerId: true, via: true }).extend({ category: CategoryField })),
+});
 
 /**
  * JSON Schema der Antwort für `--json-schema`, aus Zod abgeleitet wie `schema/*.json` (`scripts/export-schema.ts`).
@@ -151,6 +156,8 @@ export function checkExtraction(output: unknown, ctx: ExtractContext): Checked {
   const viaByUrl = new Map(ctx.candidates.map((c) => [urlKey(c.detailUrl), c.source] as const));
   events.forEach((e, i) => {
     for (const f of CODE_FIELDS) if (f in e) errors.push(`${label(i, e)}: ${f} setzt der Code, nicht die Antwort`);
+    // Übergang Plan 0037 (E3): `RawEvent.category` ist optional (alte Stände); entfällt in Stufe C
+    if (!("category" in e)) errors.push(`${label(i, e)}.category fehlt`);
     const url = e["sourceUrl"];
     if (typeof url === "string" && !allowed.has(urlKey(url)))
       errors.push(`${label(i, e)}.sourceUrl: ${url} ist keine abgerufene Seite`);

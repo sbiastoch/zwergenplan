@@ -16,6 +16,7 @@
     "krabbelgottesdienst",
     "singen"
    ],
+   "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung"
    },
@@ -35,6 +36,7 @@
     "krabbelgruppe",
     "singen"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt"
    },
@@ -62,6 +64,7 @@
     "krabbelgruppe",
     "singen"
    ],
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt"
    },

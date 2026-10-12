@@ -56,6 +56,23 @@
             "minLength": 1,
             "maxLength": 320
           },
+          "category": {
+            "type": "string",
+            "enum": [
+              "babykurse",
+              "krabbel-spielgruppen",
+              "treffs-cafes",
+              "bewegung",
+              "wasser",
+              "musik",
+              "kreativ",
+              "buecher",
+              "museum",
+              "buehne",
+              "natur",
+              "beratung"
+            ]
+          },
           "topics": {
             "minItems": 1,
             "type": "array",

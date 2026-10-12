@@ -5,6 +5,7 @@
 import { validateDataset } from "../../../src/domain/dataset.ts";
 import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/schema.ts";
 import { berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
+import { fallbackCategory } from "../../../src/domain/topics.ts";
 import type { Source } from "./candidate.ts";
 import { expansionWindow, type ProviderCheck, type ProviderRaw, type RawBatch, type RawEvent } from "./raw.ts";
 import { expandSchedule } from "./schedule.ts";
@@ -87,6 +88,8 @@ export interface BuildReport {
   errors: string[];
   /** Hinweise: geschätzte Enden, weggefallene Events, Zusammenführungen, Übernahmen */
   notes: string[];
+  /** Angebote, deren `category` aus den Themen abgeleitet ist (Übergang Plan 0037, E5; entfällt in Stufe C) */
+  derivedCategories: number;
 }
 
 /** Rangfolge bei Dubletten: Anbieterseite vor den Sammelkalendern (Plan 0002, E7). */
@@ -99,6 +102,8 @@ interface Candidate {
   rank: number;
   order: number;
   label: string;
+  /** `category` fehlte im Rohevent und kommt aus den Themen (Plan 0037, E5) */
+  derivedCategory: boolean;
 }
 
 function addMinutesLocal(local: string, minutes: number): string {
@@ -195,6 +200,8 @@ function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: strin
     venueId: e.venueId,
     title: e.title,
     summary: e.summary,
+    // Übergang Plan 0037 (E5): Rückfall für Stände ohne category; entfällt in Stufe C
+    category: e.category ?? fallbackCategory(e.topics),
     topics: e.topics,
     format: e.format,
     registration: e.registration,
@@ -242,8 +249,12 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     drift: [],
     errors: [],
     notes: [],
+    derivedCategories: 0,
   };
   const { notes } = report;
+  /** Angebote mit abgeleiteter Kategorie je Anbieter (Plan 0037, E5) */
+  const derived = new Map<string, number>();
+  const countDerived = (providerId: string) => derived.set(providerId, (derived.get(providerId) ?? 0) + 1);
   const batches = [...input.batches].sort((a, b) => a.name.localeCompare(b.name));
   const status = new Map<string, ProviderCheck>();
   for (const { batch } of batches) for (const [id, check] of Object.entries(batch.providers)) status.set(id, check);
@@ -260,7 +271,13 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     batch.events.forEach((e, i) => {
       const label = `${name}#${i} „${e.title}“`;
       for (const offer of fromRaw(e, checkedAt, input, label, notes)) {
-        candidates.push({ offer, rank: RANK[e.via ?? "anbieter"], order: order++, label });
+        candidates.push({
+          offer,
+          rank: RANK[e.via ?? "anbieter"],
+          order: order++,
+          label,
+          derivedCategory: e.category === undefined,
+        });
       }
     });
   }
@@ -280,6 +297,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     const [best, ...rest] = sorted as [Candidate, ...Candidate[]];
     let offer = best.offer;
     for (const other of rest) {
+      // `category` bleibt die von `best`: ranghöhere Quelle, bei gleichem Rang das frühere Event (Plan 0037, E6)
       offer = { ...offer, topics: unionTopics(offer.topics, other.offer.topics) };
       if (other.rank !== best.rank) {
         notes.push(`${other.label}: Dublette von ${best.label} (ranghöhere Quelle) – entfällt`);
@@ -314,6 +332,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
         h.offer.sessions.some((s) => low.offer.sessions.some((l) => Date.parse(l.start) === Date.parse(s.start))),
     );
     if (!high) return true;
+    // `category` bleibt die von `high` (Plan 0037, E6), nur die Themen werden vereinigt
     high.offer = { ...high.offer, topics: unionTopics(high.offer.topics, low.offer.topics) };
     notes.push(`${low.label}: Dublette von ${high.label} (ranghöhere Quelle) – entfällt`);
     return false;
@@ -327,6 +346,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
   });
   const offers = assigned.offers;
   notes.push(...assigned.notes);
+  for (const c of kept) if (c.derivedCategory) countDerived(c.offer.providerId);
   // 6. braucht IDs, deshalb nach der Zuordnung
   notes.push(...crossProviderDuplicates(offers, input.providers));
 
@@ -360,9 +380,16 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     const sessions =
       old.format === "kurs" ? old.sessions : old.sessions.filter((s) => berlinDay(s.start) >= input.horizon.from);
     if (sessions.length === 0 || Date.parse(sessions.at(-1)?.end ?? "") < cutoff) continue;
-    offers.push({ ...old, sessions });
+    // Übergang Plan 0037 (E5): Rückfall für Stände ohne category; entfällt in Stufe C
+    if (old.category === undefined) countDerived(old.providerId);
+    offers.push({ ...old, category: old.category ?? fallbackCategory(old.topics), sessions });
     ids.add(old.id);
     notes.push(`${old.id}: aus dem Altbestand übernommen (${reason}, Stand ${old.availability.checkedAt})`);
+  }
+
+  for (const [providerId, n] of [...derived].sort(([a], [b]) => a.localeCompare(b))) {
+    report.derivedCategories += n;
+    notes.push(`${providerId}: ${n} Angebote ohne category – aus den Themen abgeleitet (Übergang Plan 0037)`);
   }
 
   // 8. Sortierung (Plan 0015 E13), Prüfung
