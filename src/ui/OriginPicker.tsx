@@ -7,7 +7,8 @@
  */
 import { useId, useRef } from "react";
 import { flushSync } from "react-dom";
-import { DISTRICTS, nearestDistrictLabel } from "../domain/districts.ts";
+import { districtGroups } from "../domain/district-groups.ts";
+import { nearestDistrictLabel } from "../domain/districts.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
 import { markAutofocus } from "./Dialog.tsx";
 import { originHint, transitSourceNote } from "./format.ts";
@@ -79,10 +80,15 @@ export function OriginPicker({
               <option value="" disabled>
                 Stadtteil wählen …
               </option>
-              {DISTRICTS.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
+              {/* je Region eine Gruppe, die größte zuerst; keine Stadt gespeichert (Plan 0036, E7) */}
+              {districtGroups().map((g) => (
+                <optgroup key={g.region} label={g.name}>
+                  {g.districts.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
             <Icon name="down" size={20} />

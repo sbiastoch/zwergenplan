@@ -1,6 +1,6 @@
 # ADR 0012 – Startbudget, Rolldown-Workaround und Stack
 
-Status: angenommen (2026-10-05), Nutzerentscheidung: Option (a) mit Workaround. Betrifft Plan 0010 (E7, E8) und `.size-limit.json`. ADR 0001 (Stack) bleibt unverändert. **Geändert am 2026-10-06 durch Plan 0019 (E9): Budget `JS (initial)` 100 kB statt 92 kB, Nutzerentscheidung** (Nachtrag unten).
+Status: angenommen (2026-10-05), Nutzerentscheidung: Option (a) mit Workaround. Betrifft Plan 0010 (E7, E8) und `.size-limit.json`. ADR 0001 (Stack) bleibt unverändert. **Geändert am 2026-10-06 durch Plan 0019 (E9): Budget `JS (initial)` 100 kB statt 92 kB, Nutzerentscheidung** (Nachtrag unten). Seit Plan 0033 101 kB, seit Plan 0036 102 kB (Nachträge unten).
 
 ## Kontext
 
@@ -170,6 +170,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 | Plan 0034 (Impressum: Textlink hinter „Datenstand“ und im Kind-Sheet, `IMPRINT_PATH` aus `src/domain/share.ts`; die Seite selbst ist statisch und lädt kein JS; Lazy-Chunks unverändert, CSS 12,126 → 12,143 kB; gemessen gegen 9a4a894). Bis 101 kB bleiben etwa 0,58 kB | 100,352 kB | 100,423 kB | +0,071 kB |
 | Plan 0035, S1–S2 (Bestandsnutzer und iPhone-Ladebühne: Gate ohne „still-erledigt“, `hasStoredData` und `SEARCHES_KEY` aus `preferences.ts` entfernt, Flag-Version; neues Start-Modul `src/data/platform.ts` mit `iosTab()` und Klasse `onb-pending ios` im Lader, `.onb-pending.ios` hell und dunkel im Start-CSS; Lazy: `Onboarding JS` 6,289 → 6,386 kB von 7,3 kB, `Onboarding CSS` 2,064 → 2,067 kB von 2,5 kB (Kicker-Pille in em), `App-Extras JS` 7,449 → 7,469 kB von 7,6 kB (`mirrorIfSubscribed`, `syncPushMirror`), CSS 12,126 → 12,153 kB; geschätzt +0,05 bis +0,10 kB gegen −0,03 bis −0,06 kB; gemessen gegen a4739b2) | 100,352 kB | 100,446 kB | +0,094 kB |
 | Plan 0035, Nachtrag (Nutzerfeedback: Scroll-Sperre `.dlg.onb`, ermittelter Standort in Worten `nearestDistrictLabel`, Knopf „Zurück“ statt Punkt-Knöpfen, Name „Wöchentliche Push-Nachricht“; Arch-Review m3: `distanceText` in `reach.ts` als einzige Entfernungs-Formatierung, ersetzt `Intl.NumberFormat` in `format.ts`, −0,056 kB. Lazy: `Onboarding JS` 6,995 → 7,118 kB von 7,3 kB, `Onboarding CSS` 2,217 → 2,264 kB von 2,5 kB, `App-Extras JS` 7,469 → 7,478 kB von 7,6 kB; CSS 12,153 → 12,172 kB; ohne m3 100,565 kB; gemessen gegen 347409f, S3/S4 ohne Änderung am Start-JS). Beide Zeilen von Plan 0035 sind ohne Plan 0034 gemessen; nach dem Rebase auf Plan 0034 (Impressum, +0,071 kB) misst der Stand 100,582 kB, CSS 12,199 kB (gemessen gegen d72d578, +0,159 kB). Bis 101 kB bleiben etwa 0,42 kB | 100,447 kB | 100,509 kB | +0,062 kB |
+| Plan 0036, S1–S3 (Region Fürth: 18 Fürther Stadtteile in `districts.ts`, `DISTRICTS_BY_REGION`, `regions.ts` mit `kreis`, `byPopulation` und `regionList` im Start über `districtById` und `format.ts`; `optgroup` im Kind-Sheet über `district-groups.ts`. Lazy: `Onboarding JS` 7,118 → 7,13 kB; Wegzeit-Daten 51,76 kB von 64 kB, Linien-Daten 21,55 kB von 40 kB). **Über 101 kB: Budget auf 102 kB** (Nachtrag unten). Bis 102 kB bleiben etwa 0,75 kB | 100,582 kB | 101,25 kB | +0,67 kB |
 
 ## Nachtrag (2026-10-11): Budget 101 kB, Plan 0033
 
@@ -177,3 +178,9 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 - **Sparversuche:** gemeinsame Merker der Ladevorgänge entfernt (−0,078 kB), weiteres Weglassen brachte unter 0,01 kB. Onboarding-CSS im Start-CSS hätte 0,118 kB Start-JS gespart, aber jeden Start mit 1,5–2,5 kB render-blockierender CSS belastet.
 - **Nutzerentscheid N1 (2026-10-11), wörtlich: „Bei Bedarf anheben“.** `.size-limit.json` setzt `JS (initial)` auf 101 kB. Die Gates LCP < 2,5 s, CLS < 0,05 und Schrift-Swap bleiben unverändert (Präzedenz: Nachtrag „Stand nach Plan 0019“).
 - **Ausblick:** Der Kind-Sheet-Link aus Plan 0033, S5 kostet geschätzt weitere 0,06 kB. Danach bleiben gut 0,6 kB. Der nächste große Kandidat zum Auslagern bleibt der Kalender (−1,65 kB, `docs/ideas.md`).
+
+## Nachtrag (2026-10-12): Budget 102 kB, Plan 0036
+
+- **Ausgangslage:** Nach Plan 0035 blieben bis 101 kB etwa 0,42 kB. Die zweite Region Fürth (Plan 0036, E6) bringt Stadtteile als Daten in den Start, weil `use-app-state.ts` einen gespeicherten Stadtteil beim Start über `districtById` auflöst; dazu kleine Hilfen in `regions.ts` für Texte. Gemessen +0,67 kB, also 101,25 kB.
+- **Alternative:** Fürther Stadtteile lazy laden. Das bräuchte eine eigene Ladekette für `districtById` beim Start und brächte einen Layoutsprung beim gespeicherten Startpunkt (Plan 0036, Offene Punkte vor dem Review).
+- **Nutzerentscheid (2026-10-12): Budget auf 102 kB anheben.** `.size-limit.json` setzt `JS (initial)` auf 102 kB; die Begründung steht hier und im Commit, weil die JSON-Datei keinen Kommentar tragen kann. Die Gates LCP < 2,5 s, CLS < 0,05 und Schrift-Swap bleiben unverändert.

@@ -728,7 +728,7 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
   await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
   // Das Kind-Sheet sagt es selbst, nicht erst die Statuszeile (N3, H5)
   await expect(
-    sheet.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil."),
+    sheet.getByText("Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth. Wähle einen Stadtteil."),
   ).toBeVisible();
   await expect(sheet.getByText(/^Wegzeit ab deinem Standort/)).toHaveCount(0);
   await sheet.getByRole("button", { name: "Fertig" }).click();
@@ -738,7 +738,7 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
   await page.getByRole("button", { name: /^Alle Filter/ }).click();
   const filter = page.getByRole("dialog", { name: "Filter" });
   await expect(filter.getByRole("button", { name: "bis 20 Min." })).toBeDisabled();
-  await expect(filter.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.")).toBeVisible();
+  await expect(filter.getByText("Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth.")).toBeVisible();
   await filter.getByRole("button", { name: "Startpunkt wählen" }).click();
   const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
   await expect(kid).toBeVisible();

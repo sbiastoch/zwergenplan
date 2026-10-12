@@ -90,19 +90,65 @@ test.describe("Test 1: erster Start", () => {
 });
 
 test.describe("Test 2: Stadt", () => {
-  test("eine Kachel „Nürnberg“, gewählt; Lead mit Zahlen wie die Statuszeile", async ({ page }) => {
+  test("Kacheln „Nürnberg“ (gewählt) und „Fürth“ nach Einwohnern; Lead mit Zahlen wie die Statuszeile", async ({
+    page,
+  }) => {
     await opened(page);
     // auf dem iPhone ist Stadt Schritt 2 (Plan 0035, E1)
     await goTo(page, "stadt");
     const city = intro(page).getByRole("group", { name: "Stadt" });
-    await expect(city.getByRole("button")).toHaveCount(1);
+    // zwei Regionen (Plan 0036): Kacheln nach Einwohnern, kein Dropdown „Weitere Städte“
+    await expect(city.getByRole("button")).toHaveText(["Nürnberg", "Fürth"]);
     await expect(city.getByRole("button", { name: "Nürnberg" })).toHaveAttribute("aria-pressed", "true");
+    await expect(city.getByRole("button", { name: "Fürth" })).toHaveAttribute("aria-pressed", "false");
     await expect(intro(page).getByLabel("Weitere Städte")).toHaveCount(0);
     const lead = (await intro(page).locator(".onb-lead").textContent()) ?? "";
     expect(lead).toMatch(/^\d+ Babykurse, .* von \d+ Anbietern\.$/);
     await intro(page).getByRole("button", { name: "Überspringen" }).click();
     await expect(intro(page)).toHaveCount(0);
     expect(Number(/^\d+/.exec(lead)?.[0])).toBe(await statusCount(page));
+  });
+
+  test("Fürth gewählt: Weg-Schritt zeigt Fürther Stadtteile zuerst, Wegzeit ab „Innenstadt (Fürth)“ (Plan 0036, Test 6)", async ({
+    page,
+  }) => {
+    await opened(page);
+    await goTo(page, "stadt");
+    const city = intro(page).getByRole("group", { name: "Stadt" });
+    await city.getByRole("button", { name: "Fürth" }).click();
+    await expect(city.getByRole("button", { name: "Fürth" })).toHaveAttribute("aria-pressed", "true");
+    await expect(city.getByRole("button", { name: "Nürnberg" })).toHaveAttribute("aria-pressed", "false");
+
+    await goTo(page, "weg");
+    const select = intro(page).getByRole("combobox", { name: "Stadtteil" });
+    await expect(select.locator("optgroup")).toHaveCount(2);
+    await expect(select.locator("optgroup").first()).toHaveAttribute("label", "Fürth");
+    await expect(select.locator("optgroup").nth(1)).toHaveAttribute("label", "Nürnberg");
+    await select.selectOption("fuerth-innenstadt");
+    // Fixture-Halt 9100 liegt in Fürth-Innenstadt: Wegzeit wirkt, also kein Hinweis und Minuten-Chips frei (M2)
+    const chips = intro(page).getByRole("group", { name: "Höchstens unterwegs" });
+    await expect(chips.getByRole("button", { name: "30 Min." })).toBeEnabled();
+    await expect(intro(page)).not.toContainText("Wegzeiten gibt es nur");
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem("zwergenplan.entfernung-ab")))
+      .toContain("fuerth-innenstadt");
+    // Abschluss: auf Android folgt noch „App“, dann die Statuszeile
+    while (!/^(Zeig mir|Zur Liste)/.test((await primary(page).textContent()) ?? "")) await primary(page).click();
+    await primary(page).click();
+    await expect(intro(page)).toHaveCount(0);
+    await expect(statusLine(page)).toContainText("Wegzeit ab Innenstadt (Fürth)");
+  });
+
+  test("Fürth gewählt, Weg übersprungen: Liste ohne Startpunkt (Plan 0036, Review G5)", async ({ page }) => {
+    await opened(page);
+    await goTo(page, "stadt");
+    await intro(page).getByRole("group", { name: "Stadt" }).getByRole("button", { name: "Fürth" }).click();
+    await goTo(page, "weg");
+    // „Später“ geht einen Schritt weiter, auf dem letzten beendet es (auf Android folgt noch „App“)
+    while ((await intro(page).count()) > 0) await intro(page).getByRole("button", { name: "Später" }).click();
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    expect(await page.evaluate(() => localStorage.getItem("zwergenplan.entfernung-ab"))).toBeNull();
+    await expect(statusLine(page)).not.toContainText("ab Innenstadt");
   });
 });
 

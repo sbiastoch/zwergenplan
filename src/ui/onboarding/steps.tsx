@@ -2,13 +2,14 @@
  * Eingaben der Schritte „Stadt“, „Alter“ und „Weg“ (Plan 0033, E5–E7). Den Schritt „App“ bringt der App-Chunk als
  * Prop (`AppStep`, E8). Gespeichert wird über dieselben Wege wie im Kind-Sheet; hier wird nur angezeigt und gewählt.
  */
-import { type RefObject, useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
 import { ageInMonths } from "../../domain/age.ts";
-import { DISTRICTS, nearestDistrictLabel } from "../../domain/districts.ts";
+import { districtGroups } from "../../domain/district-groups.ts";
+import { nearestDistrictLabel } from "../../domain/districts.ts";
 import { withReachLimit } from "../../domain/filter.ts";
 import { ageHint, cityChoices, LIMIT_CHOICES, ONBOARDING_TEXTS as T } from "../../domain/onboarding.ts";
-import { REGIONS } from "../../domain/regions.ts";
+import { REGIONS, type RegionId } from "../../domain/regions.ts";
 import { BIRTH_DATE_INVALID, type useBirthDateInput } from "../birth-date-input.ts";
 import { limitReason, originHint } from "../format.ts";
 import { Icon } from "../icons.tsx";
@@ -17,12 +18,15 @@ import type { OnboardingFlowProps } from "../onboarding-types.ts";
 const DOTS = ["c1", "c2", "c3", "c4"];
 
 /**
- * Stadt-Kacheln, sortiert nach Einwohnern, der Rest im Dropdown (E5). Heute nur Nürnberg, vorgewählt. Die Wahl lebt
- * nur hier; gespeichert wird sie erst mit einer zweiten Region.
+ * Stadt-Kacheln, sortiert nach Einwohnern, der Rest im Dropdown (E5). Die größte Stadt ist vorgewählt. Die Wahl hält
+ * der Flow nur, um im Schritt „Weg“ deren Stadtteile zuerst zu zeigen; gespeichert wird sie nicht (Plan 0036, E7).
  */
-export function CityStep() {
+export function CityStep({ city, onCity }: { city: RegionId; onCity: (city: RegionId) => void }) {
   const { tiles, more } = cityChoices(REGIONS);
-  const [city, setCity] = useState<string>(tiles[0]?.id ?? "");
+  const setCity = (id: string) => {
+    const found = [...tiles, ...more].find((t) => t.id === id);
+    if (found) onCity(found.id);
+  };
   return (
     <>
       <p className="lbl">{T.cityLabel}</p>
@@ -105,7 +109,7 @@ export function AgeStep({
  * Wirkt ein gefundener Standort, steht statt Knopf und Stadtteil-Auswahl „Dein Standort“ mit „Standort entfernen“
  * (Nachtrag Plan 0035, 2026-10-11); dieselbe Regel wie `OriginPicker` im Kind-Sheet (Plan 0022).
  */
-export function WayStep({ originApi, transit, filter, setFilter }: OnboardingFlowProps) {
+export function WayStep({ originApi, transit, filter, setFilter, city }: OnboardingFlowProps & { city: RegionId }) {
   const { want, mode } = transit;
   useEffect(() => {
     want();
@@ -166,10 +170,15 @@ export function WayStep({ originApi, transit, filter, setFilter }: OnboardingFlo
               <option value="" disabled>
                 {T.districtEmpty}
               </option>
-              {DISTRICTS.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
+              {/* die gewählte Stadt zuerst, die anderen bleiben wählbar (Plan 0036, E7) */}
+              {districtGroups(city).map((g) => (
+                <optgroup key={g.region} label={g.name}>
+                  {g.districts.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
             <Icon name="down" size={20} />

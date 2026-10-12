@@ -480,7 +480,7 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
     expect(limitReason({ kind: "laedt" })).toBe("Wegzeiten werden geladen …");
     expect(limitReason({ kind: "luftlinie", reason: "fehler" })).toBe("Wegzeiten gerade nicht verfügbar.");
     expect(limitReason({ kind: "luftlinie", reason: "ausserhalb" })).toBe(
-      "Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.",
+      "Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth.",
     );
     expect(limitReason({ kind: "oepnv" })).toBeUndefined();
   });
@@ -723,7 +723,7 @@ describe("Hinweis im Kind-Sheet (Plan 0009, N3)", () => {
   });
 
   it("außerhalb des Stadtgebiets sagt es das Sheet selbst, für Standort und Kartenmitte", () => {
-    const text = "Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil.";
+    const text = "Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth. Wähle einen Stadtteil.";
     expect(originHint(undefined, standort, ausserhalb)).toEqual({ cls: "hint bad", text });
     expect(originHint(undefined, karte, ausserhalb)).toEqual({ cls: "hint bad", text });
   });

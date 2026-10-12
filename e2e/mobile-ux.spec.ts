@@ -382,7 +382,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(
-      kid.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg. Wähle einen Stadtteil."),
+      kid.getByText("Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth. Wähle einen Stadtteil."),
     ).toBeVisible();
   },
   // ermittelter Standort im Kind-Sheet, in Worten „(nächster Stadtteil: Altstadt)“ (Arch-Review Plan 0035, M2)
@@ -406,7 +406,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByRole("status")).toContainText("außerhalb des Stadtgebiets");
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filter" });
-    await expect(sheet.getByText("Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.")).toBeVisible();
+    await expect(sheet.getByText("Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth.")).toBeVisible();
     await sheet.getByRole("button", { name: "Startpunkt wählen" }).scrollIntoViewIfNeeded();
   },
   karte: openMap,

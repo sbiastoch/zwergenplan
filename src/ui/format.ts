@@ -17,6 +17,7 @@ import {
   roundedMinutes,
   stopMinutes,
 } from "../domain/reach.ts";
+import { regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import type { ExportSelection } from "../domain/saved.ts";
 import type { Session } from "../domain/schema.ts";
@@ -434,7 +435,7 @@ export function limitReason(mode: ReachMode | undefined): string | undefined {
   if (mode.kind === "luftlinie") {
     return mode.reason === "fehler"
       ? "Wegzeiten gerade nicht verfügbar."
-      : "Wegzeiten gibt es nur für Startpunkte im Stadtgebiet Nürnberg.";
+      : `Wegzeiten gibt es nur für Startpunkte in ${regionList()}.`;
   }
   return undefined;
 }
