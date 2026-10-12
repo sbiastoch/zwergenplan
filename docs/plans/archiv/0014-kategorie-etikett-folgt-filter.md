@@ -1,6 +1,8 @@
 # Plan 0014 – Das Kategorie-Etikett folgt dem Filter
 
 Status: abgeschlossen, live seit 2b8f92a (2026-10-06). Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“ (Plan 0027, Etappe 6). Früherer Status: **umgesetzt und live seit `2b8f92a`** (https://zwergenplan.app/). Browser-Review live bestanden, ohne Blocker.
+Zurückgebaut durch Plan 0037 (eine Kategorie je Angebot, ADR 0030).
+
 Datum: 2026-10-06
 Bezug: Plan 0003 (E9 Kachel, E10 Kategorien), `src/domain/topics.ts`, `src/ui/categories.ts`
 

@@ -83,7 +83,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Gerätematrix für fachliche Specs ausdünnen**: Kalender, Merkliste, Startpunkt … nur auf einem Teil der fünf Geräte. Spart grob 30–40 % Testzeit, ändert aber die Mobile-UX-Regel in `docs/architecture.md` und braucht ein ADR (Messung in Plan 0013).
 - **Selbsttests der Gates nur auf einem Gerät**: Die Kanarienvögel „Text-Gate erkennt …“ laufen heute auf allen fünf Geräten (8 Tests × 5, lokal ca. 130 s Testzeit). Nach Plan 0013 bringt das unter 20 s Wandzeit und ist eine Entscheidung über Testinhalt.
 - **Toast mit Hinweis-Symbol**: Der Toast zeigt immer ein Häkchen, auch bei „Kalender-Datei braucht Netz“ (ICS offline, Plan 0011). Eine zweite Art mit Hinweis-Symbol für Meldungen, die nicht geklappt haben, wäre ehrlicher; heute ist es der einzige solche Toast (Browser-Review live Plan 0011, H1).
-- **Mehrere Kategorie-Etiketten je Kachel**: 96 von 333 Angeboten haben mehr als eine Kategorie, die Kachel zeigt eine (seit Plan 0014 die gewählte). Alle zu zeigen, etwa als kleine Formen neben der Pille, bräuchte Platz bei 360 px und ein neues Design (Plan 0014, Nicht-Ziele).
+- **Themen ohne Abnehmer** (Plan 0037): Die Oberfläche liest `topics` nicht mehr. Entweder Merkmale (Väter, mehrsprachig) als Fakten zeigen oder `topics` aus Schema und Prompt streichen (spart Ausgabe-Tokens).
 - **Umzug auf ein anderes Gerät per QR-Code** (Geburtsdatum, Startpunkt, Merkliste im Fragment `#umzug=`): zurückgestellt (Nutzerentscheid 2026-10-08). iOS gibt gescannte Links nie an die Home-Bildschirm-App weiter; sinnvoll nur mit In-App-Scanner (jsQR, ca. 45 kB lazy), Teilen per Link reicht vorerst.
 - **CI-Ergebnis nach einem Fast-Forward wiederverwenden** (Plan 0027, E10, verworfen): Derselbe Commit hat auf dem Branch schon voll bestanden. Dafür müsste das Pages-Artefakt aus einem fremden Lauf kommen, `--against-deployed` läuft nur auf `main`, und ein Fehler in der Verdrahtung deployte ungeprüft.
 - **lefthook im Worktree** (Plan 0027, Nicht-Ziele): `pnpm install` in einem Worktree schreibt über `prepare` den eigenen lefthook-Pfad in das gemeinsame `.git/hooks/pre-commit`. Fehlt der Worktree später, greift der Fallback auf das lefthook des jeweiligen Checkouts. Sauberer wäre `prepare` nur im Haupt-Checkout.
@@ -97,6 +97,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0037** (eine Kategorie je Angebot, noch aktiv): Stufe C steht aus. Frühestens 7 Tage nach Stufe B, wenn zwei Nachtläufe `derivedCategories` = 0 melden und `data/raw/` kein Event ohne `category` mehr hat (E7). Dann `RawEvent.category` Pflicht, Rückfall, Zähler, `fallbackCategory`, `withCategory` und `adoptSite` entfernen. Dieser Punkt entfällt mit Stufe C.
 - **Plan 0036** (Zweite Region Fürth, live seit cbe5a56, 2026-10-12; Einzelheiten in „Risiken“, „Browser-Review lokal“, „Browser-Review live“ und „Live“ des Plans):
   - Am echten iPhone und Android prüfen (Nutzer): nativer Picker im Schritt „Weg“ und im Kind-Sheet mit `optgroup` (Fürth/Nürnberg, 53 Einträge), auch dunkel und quer. Headless zeichnet ihn nicht.
   - Ersten Sonntagslauf des Entdeckens mit zwei Regionen messen: Zeitbudget 90 Min. (erwartet 2 × 13–37 Min.), Kosten (erwartet $1,60–2,00 statt $0,80–1,00), Aufrufe der Bremse (etwa 74 von 120).
@@ -190,7 +191,6 @@ Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Ein
 - **Plan 0022** (Browser-Review live 2026-10-08), gilt auch für 0023 und 0024:
   - **Installationsknopf auf einem echten Android-Gerät mit Chrome prüfen:** Knopf im Fuß des Kind-Sheets, Dialog, nach `appinstalled` Fokus auf „Fertig“. Headless liefert Chrome kein `beforeinstallprompt`.
   - **iOS-Zeile der Checkliste auf einem echten iPhone abarbeiten** (Safari und Home-Bildschirm-App). Playwright-WebKit deckt das nur teilweise ab.
-- **Plan 0024** (Offene Fragen): Soll ein gewählter Kategoriefilter die Marker-Kategorie bestimmen (wie `leadCategory` mit `focus`)? Heute zählt nur die Häufigkeit.
 - **Plan 0025** (Browser-Review live Etappe 3 mit Plan 0028, 2026-10-09):
   - Seitenleiste quer: Label und Badge füllen die Pille ganz aus, es bleibt kein Rand. Etwas mehr Innenabstand oder ein kleineres Badge in der Seitenleiste prüfen.
   - Monatsraster bei 320 px und 200 %: Zweistellige Tage berühren sich. Kleinere Ziffern ab großer Schrift oder ein einspaltiges Wochenraster prüfen.

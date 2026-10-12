@@ -102,7 +102,7 @@ Nutzer (2026-10-12): „Angebote können mehrere Kategorien haben, es wird aber 
 `buildOffers` (`lib/build-offers.ts`) setzt `category` in jedem Angebot, das es schreibt:
 
 - `fromRaw`: `category: e.category ?? fallbackCategory(e.topics)`.
-- Schritt 7 (Übernahme aus dem Altbestand): `{ ...old, category: old.category ?? fallbackCategory(old.topics), sessions }`. Ohne diese Zeile schriebe die erste Nacht nach Stufe A Altbestand ohne `category`, und Stufe B fände ihn rot. Ab Stufe B ist `old.category` laut Typ Pflicht, der Ausdruck bleibt aber bis Stufe C als Laufzeit-Netz stehen (Altbestand aus einer Datei, die vor A6 geschrieben wurde). An beiden Stellen (`fromRaw` und Schritt 7) steht deshalb ein Kommentar: `// Übergang Plan 0037 (E5): Rückfall für Stände ohne category; entfällt in Stufe C`.
+- Schritt 7 (Übernahme aus dem Altbestand): `{ ...old, category: old.category ?? fallbackCategory(old.topics), sessions }`. Ohne diese Zeile schriebe die erste Nacht nach Stufe A Altbestand ohne `category`, und Stufe B fände ihn rot. Ab Stufe B ist `old.category` laut Typ Pflicht, der Ausdruck bleibt bis Stufe C stehen, ist ab B aber über die I/O-Schicht nicht mehr erreichbar: `readPreviousOffers` lehnt einen Bestand ohne `category` per Schema ab, der Nachtlauf bricht dann ab (Arch-Review B, Minor 1). Davor schützt B7. An beiden Stellen (`fromRaw` und Schritt 7) steht deshalb ein Kommentar: `// Übergang Plan 0037 (E5): Rückfall für Stände ohne category; entfällt in Stufe C`.
 - `fallbackCategory(topics)` ist neu in `src/domain/topics.ts`: die erste Kategorie in fester Reihenfolge, `categoriesOf(topics)[0] ?? "treffs-cafes"`. Das ist genau das heutige Etikett ohne Filter (`leadCategory(topics, [])`). Für Nutzer ändert sich bei den so gefüllten Angeboten also nichts.
 - **Zähler:** `BuildReport.derivedCategories: number`, die Zahl der Angebote mit Rückfall (beide Wege). Dazu ein Hinweis je Anbieter in `notes`: `<providerId>: N Angebote ohne category – aus den Themen abgeleitet (Übergang Plan 0037)`.
   - `NightlyReport.build.derivedCategories` (optional, `z.number()`), geschrieben von `io/nightly.ts`.
@@ -527,3 +527,11 @@ Abgelehnt: keine.
     - Die Widerspruchsquote im Nachtlauf-Bericht zählt nur frisch extrahierte Anbieter (`pending-uebernommen` ohne Modellaufruf blähte den Nenner auf).
     - Singular „1 Angebot“ im Build-Hinweis.
     - Statuszeile auf „in Umsetzung“.
+- **B1–B4, B6 (2026-10-12, Branch, vor A6):** umgesetzt wie geplant. Abweichungen und Hinweise:
+  - `pnpm verify` ist auf dem Branch erwartungsgemäß nur bei „Daten“ rot: `data/offers.json` hat vor dem Nachtlauf aus A6 kein `category`. Alle übrigen Schritte von `check:fast` sind grün, die Commits laufen deshalb mit `--no-verify` (Begründung im Commit-Text). Vor dem Merge gilt B7.
+  - `withCategory` gibt `Omit<T, "category"> & { category: Category }` statt `T` zurück. So kommt die Funktion ohne `as` aus; für ein konkretes `T` (`SiteOffer`) ist das Ergebnis ohne Cast zuweisbar.
+  - Rückfall-Tests (5e, `toEvalOffers` ohne `category`) bauen den Stand vor Stufe A per JSON-Umweg nach, weil der Typ `category` jetzt verlangt. Test 7 (`nightly.test.ts`) nimmt dafür ein Rohevent ohne `category` statt eines Altbestands, denn `readPreviousOffers` lehnt einen Bestand ohne `category` jetzt ab.
+  - `news.test.ts` und `push-tailor.test.ts`: Abo-Fälle, die die Krabbelreime erwarten, nennen jetzt `musik,buecher`.
+  - Test 19 e läuft ohne und mit `?kat=musik` (statt `?kat=buehne`). Test 17 und 19 d2 schreiben `site.json` per `page.route` um.
+  - `rg -n "kat=" e2e/` erneut geprüft: keine neue Stelle seit `84d39c7`, die Tabelle unter Test 19 gilt unverändert.
+  - Hash des Antwortschemas unverändert (`ab413b808c90`).
