@@ -3329,3 +3329,37 @@
       address: Südstadtpark 1, 90763 Fürth
       district: Süd
       geo: { lat: 49.4611196, lon: 10.9971424 }
+- id: famalie-fuerth-familienzentrum
+  publicId: d3oyu2gw
+  role: anbieter
+  region: fuerth
+  name: Famalië Fürth - Familienzentrum
+  url: https://www.bindungsorientierte-familienbegleitung.de/famalie
+  programme:
+    - url: https://www.bindungsorientierte-familienbegleitung.de/eltern-kind-treff
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.bindungsorientierte-familienbegleitung.de/babymassage
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.bindungsorientierte-familienbegleitung.de/krabbelgruppe-gruene-zukunft
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby
+      kind: html
+      render: browser
+      use: termine
+  availability:
+    shown: unbekannt
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Familienbildungsstätte: https://www.bindungsorientierte-familienbegleitung.de/famalie – Veranstalter bietet selbst Babymassage, Krabbelgruppe „Grüne Zukunft“, offenen Eltern-Kind-Treff und Yoga für Mama & Baby in Fürth an; Termine stehen auf den verlinkten Kursseiten, die ich nicht abgerufen habe."
+  venues:
+    - id: famalie-fuerth-familienzentrum
+      name: Famalië Familienzentrum
+      address: Amalienstraße 19, 90763 Fürth
+      district: Süd
+      geo: { lat: 49.4685917, lon: 10.9870057 }
