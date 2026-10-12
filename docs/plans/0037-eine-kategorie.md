@@ -1,6 +1,6 @@
 # Plan 0037 – Eine Kategorie je Angebot
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-12
 Bezug:
 - ADR 0030 (neu, `docs/adr/0030-eine-kategorie-je-angebot.md`): löst ADR 0003, Punkt „Themen und Kategorien“, und die Invariante „Kategorien werden berechnet, nie gespeichert“ (`docs/architecture.md`, ADR 0012) teilweise ab
@@ -513,3 +513,17 @@ Abgelehnt: keine.
     - Die Tabelle nennt „Sinneskurse für Babys“ unter `babykurse` und „Pikler-Bewegungskurse“ unter `bewegung`.
     - Der Satz „Sie passt zu einem der `topics`“ lautet jetzt „Meist passt sie …“, denn kein Thema zeigt auf `babykurse` außer pekip, fenkid, babymassage und babysignal.
     - Damit hat das Soll zwei Fälle „Kat. ohne Thema“ (BabySinne, 2 von 54). Das ist nach E2 erlaubt.
+- **A4 (2026-10-12), Eval-Abnahme bestanden:** zwei Haiku-Läufe, Prompt-Hash `7b31b918b80b`, zusammen $0,22.
+  - `category`: 100 % und 96 %.
+  - Kat. ohne Thema: 3 % und 4 %.
+  - Termine R: 99 % und 89 %. Die 89 % kommen aus der Familienbox (85 %), dieselbe Streuung wie am 2026-10-11.
+  - Angebote R: 96 % und 91 %.
+  - `format`: 94 % und 94 %.
+  - Alle drei Kriterien aus E10 sind erfüllt.
+- **A5 (2026-10-12):**
+  - `pnpm e2e:local --affected` (app, theme): 28 grün.
+  - `/arch-review` ohne Blocker. Übernommen:
+    - Doku aus E12 für Stufe A: Invariante, ADR 0030 angenommen, Hinweise in ADR 0003, 0012 und 0024, Skill.
+    - Die Widerspruchsquote im Nachtlauf-Bericht zählt nur frisch extrahierte Anbieter (`pending-uebernommen` ohne Modellaufruf blähte den Nenner auf).
+    - Singular „1 Angebot“ im Build-Hinweis.
+    - Statuszeile auf „in Umsetzung“.

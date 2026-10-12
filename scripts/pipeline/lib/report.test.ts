@@ -308,13 +308,13 @@ describe("Übergang Plan 0037: abgeleitete Kategorien und Widersprüche (E2, E5)
     c: raw({ events: events(5) }),
   };
 
-  it("zählt Widersprüche gegen die Events der neu übernommenen Anbieter", () => {
+  it("zählt Widersprüche gegen die Events der frisch extrahierten Anbieter", () => {
     const r = report({
       results: { a: "extrahiert", b: "pending-uebernommen", c: "einbruch" },
-      // c ist nicht übernommen: seine Warnung und seine Events zählen nicht
+      // b läuft ohne Modellaufruf, c ist nicht übernommen: ihre Warnungen und Events zählen nicht
       warnings: { a: [conflict, "Kurs ist schon vorbei – entfällt"], c: [conflict] },
     });
-    const line = "Kategorie passt zu keinem Thema: 1 von 20 neuen Events (5 %)";
+    const line = "Kategorie passt zu keinem Thema: 1 von 12 neuen Events (8 %)";
     expect(nightlyCommitMessage(r, raws)).toContain(line);
     expect(renderStatus({ report: r, verdict: assessRun(r, { live }), live, raws, stock: {} })).toContain(line);
   });

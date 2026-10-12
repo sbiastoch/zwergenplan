@@ -1,6 +1,6 @@
 # ADR 0024 – Katalog beschreibt Quellen, Angebote beschreiben Inhalte
 
-Status: angenommen (2026-10-10), mit Plan 0030. Ergänzt ADR 0003 (Datenmodell) und ADR 0006 („Ein Katalogformat“). Ergänzt durch ADR 0025: `adapter` ist für `aggregator` Pflicht, `notes` liest der Crawler nicht. Seit ADR 0026 entfallen Sammelkalender-Entwürfe und `validate-raw` (Punkt 4); geprüft wird jede Antwort der Extraktion mit `validateRaw` (`scripts/pipeline/lib/extract.ts`). Punkt 3 ergänzt durch ADR 0030 (Entwurf mit Plan 0037): Die Kategorien eines Anbieters sind die Hauptkategorien seiner kommenden Angebote.
+Status: angenommen (2026-10-10), mit Plan 0030. Ergänzt ADR 0003 (Datenmodell) und ADR 0006 („Ein Katalogformat“). Ergänzt durch ADR 0025: `adapter` ist für `aggregator` Pflicht, `notes` liest der Crawler nicht. Seit ADR 0026 entfallen Sammelkalender-Entwürfe und `validate-raw` (Punkt 4); geprüft wird jede Antwort der Extraktion mit `validateRaw` (`scripts/pipeline/lib/extract.ts`). Punkt 3 ergänzt durch ADR 0030 (mit Plan 0037): Die Kategorien eines Anbieters sind die Hauptkategorien seiner kommenden Angebote.
 
 ## Kontext
 

@@ -237,13 +237,15 @@ export function costSection(c: CostSummary, results: Readonly<Record<string, str
 
 /**
  * Zeilen zum Übergang auf `category` (Plan 0037, E2, E5), je nur bei N > 0: abgeleitete Kategorien im Build und
- * Widersprüche zu den Themen in den Events der neu übernommenen Anbieter. Ohne Einfluss auf die Ampel.
+ * Widersprüche zu den Themen in den Events der frisch extrahierten Anbieter. Ohne Einfluss auf die Ampel.
  */
 function categoryLines(r: NightlyReport, raws: Readonly<Record<string, ProviderRaw>>): string[] {
   const out: string[] = [];
   const derived = r.build.derivedCategories ?? 0;
   if (derived > 0) out.push(`Kategorie aus Themen abgeleitet: ${de(derived)} Angebote (Übergang Plan 0037)`);
-  const adopted = Object.keys(r.results).filter((id) => CHANGED.has(r.results[id] ?? "offen"));
+  // Nur frisch extrahierte Anbieter: `pending-uebernommen` läuft ohne Modellaufruf und ohne Warnungen und würde den
+  // Nenner nur aufblähen.
+  const adopted = Object.keys(r.results).filter((id) => r.results[id] === "extrahiert");
   const conflicts = adopted.reduce(
     (n, id) => n + (r.warnings[id] ?? []).filter((w) => w.includes(CATEGORY_CONFLICT)).length,
     0,

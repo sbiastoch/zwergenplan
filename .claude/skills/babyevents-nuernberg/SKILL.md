@@ -29,6 +29,7 @@ Worauf achten:
 - **Ampel rot**: Gates, Push, Build, Abbruch (`auth`, `limit`), Bremse, Zeitbudget, mehr als 20 % der Anbieter mit Fehler oder Live-Stand ab 20 Std. hinter `main` (Plan 0032, „Stufe 3 – Umsetzung“). Ein Abbruch oder eine Bremse lässt nur Anbieter offen; die nächste Nacht holt sie nach.
 - **Quellen mit `fehler`** samt Grund und `failingSince`: ab 14 Tagen steht die Quelle unter „Hinweise ohne Aktion“. Das ist Katalogpflege (Abschnitt 3).
 - **Zurückgehaltene Einbrüche** (`pending`): Die alte Zahl Angebote bleibt, bis die Seite wieder mehr liefert oder der Katalog angepasst ist. Prüfen, ob der Anbieter wirklich weniger anbietet.
+- **Kategorie** (Plan 0037): „Kategorie aus Themen abgeleitet: N“ ist ein Übergang (E5) und sinkt mit jeder Neu-Extraktion auf 0. „Kategorie passt zu keinem Thema“ über 5 % der neuen Events heißt: Eval-Fall anlegen und den Prompt schärfen, nicht den Code ändern.
 - **Neue Anbieter** (Issue oder „Würde aufnehmen“ im Trockenlauf): Name, Fund-URL und erstes Angebot gegen die Website prüfen. Passt einer nicht, Abschnitt 2.
 
 Fertig, wenn jede rote Zeile und jeder neue Anbieter eingeordnet ist: in Ordnung, zurückgenommen (2) oder als Katalogpflege umgesetzt (3).
@@ -97,7 +98,7 @@ Der Bericht `runs/<heute>/discover/report.md` nennt je ausgeblendetem Anbieter d
 2. Entscheidet der Nutzer für den Wechsel, setzt ein Commit `LLM_MODEL_EXTRACT` (und bei Bedarf `LLM_MODEL_FALLBACK`) in der `env` beider Workflows; ohne Wert gilt Haiku mit Sonnet als Fallback. Das Modell ist Teil des Cache-Schlüssels: Die erste Nacht danach extrahiert alles neu (N3). Dafür einmal `gh workflow run nightly.yml -f modus=live -f max_tokens=5000000` statt der normalen Bremse.
 3. Suche und Bewerten beim Entdecken wählt `LLM_MODEL_DISCOVER` (Standard Haiku), unabhängig davon.
 
-Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `evals/results.md`; sonst warnt `pnpm data:validate` in der CI.
+Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `evals/results.md`; sonst warnt `pnpm data:validate` in der CI. Ändert der Prompt die Antwort für alle Anbieter (etwa ein neues Feld), gilt wie beim Modellwechsel: einmal mit `max_tokens=5000000`.
 
 ## 6. Region starten
 

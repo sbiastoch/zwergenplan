@@ -1,6 +1,6 @@
 # ADR 0012 – Startbudget, Rolldown-Workaround und Stack
 
-Status: angenommen (2026-10-05), Nutzerentscheidung: Option (a) mit Workaround. Betrifft Plan 0010 (E7, E8) und `.size-limit.json`. ADR 0001 (Stack) bleibt unverändert. **Geändert am 2026-10-06 durch Plan 0019 (E9): Budget `JS (initial)` 100 kB statt 92 kB, Nutzerentscheidung** (Nachtrag unten). Seit Plan 0033 101 kB, seit Plan 0036 102 kB (Nachträge unten). Die unten zitierte Regel „Kategorien nie gespeichert“ ist teilweise abgelöst durch ADR 0030 (Entwurf mit Plan 0037): Die Hauptkategorie `category` wird gespeichert.
+Status: angenommen (2026-10-05), Nutzerentscheidung: Option (a) mit Workaround. Betrifft Plan 0010 (E7, E8) und `.size-limit.json`. ADR 0001 (Stack) bleibt unverändert. **Geändert am 2026-10-06 durch Plan 0019 (E9): Budget `JS (initial)` 100 kB statt 92 kB, Nutzerentscheidung** (Nachtrag unten). Seit Plan 0033 101 kB, seit Plan 0036 102 kB (Nachträge unten). Die unten zitierte Regel „Kategorien nie gespeichert“ ist teilweise abgelöst durch ADR 0030 (mit Plan 0037): Die Hauptkategorie `category` wird gespeichert.
 
 ## Kontext
 

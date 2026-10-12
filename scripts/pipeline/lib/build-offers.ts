@@ -389,7 +389,9 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
 
   for (const [providerId, n] of [...derived].sort(([a], [b]) => a.localeCompare(b))) {
     report.derivedCategories += n;
-    notes.push(`${providerId}: ${n} Angebote ohne category – aus den Themen abgeleitet (Übergang Plan 0037)`);
+    notes.push(
+      `${providerId}: ${n} ${n === 1 ? "Angebot" : "Angebote"} ohne category – aus den Themen abgeleitet (Übergang Plan 0037)`,
+    );
   }
 
   // 8. Sortierung (Plan 0015 E13), Prüfung

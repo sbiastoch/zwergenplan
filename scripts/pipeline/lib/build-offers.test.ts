@@ -515,7 +515,7 @@ describe("buildOffers", () => {
       expect(file?.offers[0]?.category).toBe("musik");
       expect(report.derivedCategories).toBe(1);
       expect(report.notes).toContain(
-        "familientreff-beispiel: 1 Angebote ohne category – aus den Themen abgeleitet (Übergang Plan 0037)",
+        "familientreff-beispiel: 1 Angebot ohne category – aus den Themen abgeleitet (Übergang Plan 0037)",
       );
     });
 
