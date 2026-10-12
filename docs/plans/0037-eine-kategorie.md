@@ -554,3 +554,15 @@ Abgelehnt: keine.
     - Ursache war nicht `category` (gzip +0,7 kB), sondern `berlinKey`: ein neues `Intl.DateTimeFormat` je Aufruf. Die nun lückenlos wöchentlichen Reihen lassen `uniformTimes` voll durchlaufen.
     - Fix als Kleinänderung `24a2364`, danach LCP etwa 2,27 s. Restpunkt in `docs/ideas.md`.
 - **Test 20 (2026-10-12):** `site.json` mit echten Daten: 104,9 kB gzip vor dem Plan (469 Angebote), 119,8 kB danach (498 Angebote, 7 052 Termine). Davon entfallen 0,7 kB auf `category`. Das Budget liegt bei 250 kB. Start-JS prüft der Budget-Job der CI.
+- **B7 (2026-10-12): live seit `bf2606c`, CI auf `main` grün.**
+  - Kurzcheck `/browser-review live` bei 390 px, hell und dunkel:
+    - `?kat=musik`: 56/56 Etiketten „Musik & Singen“.
+    - `?kat=museum`: 4. `?kat=buecher`: 2, sauberer Zustand.
+    - Alle 498 Kacheln haben ein Etikett. Beim Antippen springt kein Etikett.
+    - Keine Konsolenfehler, der Service Worker ist aktiv.
+    - Das Anbieter-Sheet zeigt die Vereinigung der Hauptkategorien.
+  - Datenbefund, Korrektur über Prompt und Eval-Fall (Nicht-Ziel: von Hand), Nutzerentscheid offen, weil jede Prompt-Änderung alles neu extrahiert:
+    - „Grabblmusik …“ (etwa 22 Kacheln) wurde `krabbel-spielgruppen` statt `musik`.
+    - „Musikspielerei …“ (6) wurde `babykurse` statt `musik`.
+  - UI-Minor, schon vor dem Plan so: Bei langen Etiketten rutscht die Uhrzeit in eine eigene Zeile.
+- **Offen bis Stufe C:** frühestens 2026-10-19, Voraussetzungen aus E7. `data/raw` hatte am 2026-10-12 noch 22 Events ohne `category`.
