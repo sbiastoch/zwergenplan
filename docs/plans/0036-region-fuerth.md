@@ -358,6 +358,19 @@ Fixture-Build (`dist-e2e/`, Stand d365eb4), Preview auf freiem Port. `node scrip
 - Niedrig: Bei Startpunkt außerhalb steht der Hinweis zweimal (roter Kasten unter der Auswahl und Text unter den Chips, `ausserhalb-pixel.png`). Schon vor Plan 0036 so, nur der Text ist neu; kein Blocker.
 - Niedrig: Statuszeile bricht auf `Pixel 7` hoch neben „Liste/Karte“ dreizeilig um, „(Fürth)“ allein in Zeile 3 (`liste-fuerth-pixel-hoch-light.png`); auf iPhone einzeilig.
 
+## Browser-Review live (2026-10-12)
+
+Kurzcheck auf https://zwergenplan.app/, `meta.json` zeigt `e7dd075` (= HEAD). `node scripts/screenshots.ts https://zwergenplan.app/ --views=onboarding,kind,start`, 390×844 hell und dunkel angesehen. claude-in-chrome war nicht verbunden; die Interaktion lief ersatzweise per Playwright-Skript (Chromium, 390×844, hell und dunkel).
+
+1. **Deploy**: `commit` = `e7dd075`, 418 Angebote, 83 Anbieter.
+2. **Bilder**: Kacheln „Nürnberg“ (gewählt) und „Fürth“ in Schritt 1 klar, hell und dunkel (`onboarding-1-iphone-*`). Kind-Sheet und Liste unverändert sauber (`kind-iphone-*`, `start-iphone-*`).
+3. **Interaktion**: Kachel Fürth → `aria-pressed=true`; Weg-Schritt mit Gruppen `Fürth:18 Nürnberg:35`; „Innenstadt (Fürth)“ gibt die Minuten-Chips frei, kein Hinweis „außerhalb“; Statuszeile „418 Angebote ab heute · Wegzeit ab Innenstadt (Fürth)“, Minuten an den Karten (z. B. 35 Min. nach Gibitzenhof). Kind-Sheet: Gruppen `Nürnberg:35 Fürth:18`, Wert `fuerth-innenstadt`. Beschreibung der Seite nennt „Nürnberg und Fürth“. Service Worker `activated`, Konsole ohne Fehler und Warnungen.
+4. **Echte Daten**: lange Titel und Anbieternamen brechen sauber um; kein leerer Zustand getroffen; Bilder (Illustrationen) laden.
+
+**Befund**
+
+- Niedrig: Im Weg-Schritt kürzt die geschlossene Auswahl auf 390 px „Innenstadt (Fürt…“ neben „Standort“. Der Name bleibt in Statuszeile und Kind-Sheet voll lesbar; kein Blocker.
+
 ## Offene Punkte
 
 Keine. Startbudget (102 kB) und Bootstrap-Trockenlauf sind vom Nutzer entschieden bzw. freigegeben (2026-10-12); den Trockenlauf startet die Haupt-Session.
