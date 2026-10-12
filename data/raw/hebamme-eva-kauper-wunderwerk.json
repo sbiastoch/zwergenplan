@@ -3,24 +3,26 @@
   {
    "providerId": "hebamme-eva-kauper-wunderwerk",
    "venueId": "hebamme-eva-kauper-wunderwerk",
-   "title": "Minis-Krabbelgruppe (0–6 Monate), mittwochs",
-   "summary": "Offene Krabbelgruppe für Eltern mit Babys bis etwa 6 Monate zum Austausch und Spielen. 5 € pro Person, Kaffee und Tee sind vorhanden. Einstieg jederzeit möglich; Änderungen stehen in der WhatsApp-Gruppe.",
+   "title": "Wunder-Krabbler Minis (0–6 Monate), Mittwoch 10–12 Uhr",
+   "summary": "Offene Krabbelgruppe für Eltern mit kleinen Babys, zum Austausch und Spielen. Kaffee und Tee sind gestellt. Wöchentliche Absprache, wer kommt, läuft über die WhatsApp-Gruppe.",
    "topics": [
-    "krabbelgruppe"
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "5 € / Person",
    "url": "https://www.hebammeeva.de/krabbelgruppe",
    "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
+   "category": "krabbel-spielgruppen",
    "age": {
     "minMonths": 0,
     "maxMonths": 6
    },
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff; Abstimmung über die WhatsApp-Gruppe"
+    "status": "unbekannt",
+    "note": "Abstimmung wöchentlich in der WhatsApp-Gruppe; Plätze bei Bedarf begrenzt"
    },
    "schedule": {
     "kind": "weekly",
@@ -36,24 +38,26 @@
   {
    "providerId": "hebamme-eva-kauper-wunderwerk",
    "venueId": "hebamme-eva-kauper-wunderwerk",
-   "title": "Midis-Krabbelgruppe (6–12 Monate), dienstags",
-   "summary": "Offene Krabbelgruppe für Eltern mit Babys von etwa 6 bis 12 Monaten zum Austausch und Spielen. 5 € pro Person, Kaffee und Tee sind vorhanden. Einstieg jederzeit möglich; Änderungen stehen in der WhatsApp-Gruppe.",
+   "title": "Wunder-Krabbler Midis (6–12 Monate), Dienstag 10–12 Uhr",
+   "summary": "Offene Krabbelgruppe für Eltern mit Babys ab etwa einem halben Jahr, zum Austausch und Spielen. Kaffee und Tee sind gestellt. Wöchentliche Absprache, wer kommt, läuft über die WhatsApp-Gruppe.",
    "topics": [
-    "krabbelgruppe"
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "5 € / Person",
    "url": "https://www.hebammeeva.de/krabbelgruppe",
    "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
+   "category": "krabbel-spielgruppen",
    "age": {
     "minMonths": 6,
     "maxMonths": 12
    },
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff; Abstimmung über die WhatsApp-Gruppe"
+    "status": "unbekannt",
+    "note": "Abstimmung wöchentlich in der WhatsApp-Gruppe; Plätze bei Bedarf begrenzt"
    },
    "schedule": {
     "kind": "weekly",
@@ -69,24 +73,26 @@
   {
    "providerId": "hebamme-eva-kauper-wunderwerk",
    "venueId": "hebamme-eva-kauper-wunderwerk",
-   "title": "Maxis-Krabbelgruppe (ab 12 Monate), donnerstags",
-   "summary": "Offene Krabbelgruppe für Eltern mit größeren Kleinkindern ab etwa 12 Monaten zum Austausch und Spielen. 5 € pro Person, Kaffee und Tee sind vorhanden. Einstieg jederzeit möglich; Änderungen stehen in der WhatsApp-Gruppe.",
+   "title": "Wunder-Krabbler Maxis (über 12 Monate), Donnerstag 15–17 Uhr",
+   "summary": "Offene Krabbelgruppe für Eltern mit größeren Babys und Kleinkindern, zum Austausch und Spielen. Kaffee und Tee sind gestellt. Wöchentliche Absprache, wer kommt, läuft über die WhatsApp-Gruppe.",
    "topics": [
-    "krabbelgruppe"
+    "krabbelgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "5 € / Person",
    "url": "https://www.hebammeeva.de/krabbelgruppe",
    "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
+   "category": "krabbel-spielgruppen",
    "age": {
-    "minMonths": 13,
+    "minMonths": 12,
     "maxMonths": 24
    },
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff; Abstimmung über die WhatsApp-Gruppe"
+    "status": "unbekannt",
+    "note": "Abstimmung wöchentlich in der WhatsApp-Gruppe; Plätze bei Bedarf begrenzt"
    },
    "schedule": {
     "kind": "weekly",
@@ -101,9 +107,9 @@
   },
   {
    "providerId": "hebamme-eva-kauper-wunderwerk",
-   "venueId": "hebamme-eva-kauper-wunderwerk",
-   "title": "Babymassage-Kurs (ab ca. 6 Wochen bis 6 Monate), freitags",
-   "summary": "Fünfteilige Babymassage-Kurse mit kleinen Gruppen (max. 7 Babys) im WunderWerk, je 45 Minuten. Anmeldung über die Buchungsseite; Startzeit laut Anbieter 10:00 oder 11:15 Uhr, Mittwochskurse gibt es bei Praxis Just.",
+   "venueId": "hebamme-eva-kauper-wunderwerk-praxis-just",
+   "title": "Babymassage-Kurs Fr 16.10.–13.11.26, 11:15 Uhr",
+   "summary": "Fünf Massage-Termine für Babys ab etwa 6 Wochen bis 6 Monate, mit Öl und Handout. Die Kurse finden ab 4 Teilnehmenden statt; Absagen weniger als 14 Tage vorher werden voll berechnet. Anmeldung über die Buchungsseite.",
    "topics": [
     "babymassage"
    ],
@@ -111,67 +117,97 @@
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "95 € (inkl. Öl & Handout)",
-   "url": "https://www.hebammeeva.de/babymassage",
+   "url": "https://hebammeeva.mymiya.de/courses/",
    "sourceUrl": "https://www.hebammeeva.de/babymassage",
+   "category": "babykurse",
    "age": {
-    "minMonths": 1,
+    "minMonths": 0,
     "maxMonths": 6
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung / Verfügbarkeit über miya-Buchung; keine Platzangabe auf der Website"
+    "note": "Anmeldung über die miya-Buchung; Platzangabe nicht sichtbar"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
      {
-      "start": "2026-10-16T10:00",
-      "end": "2026-10-16T10:45"
+      "start": "2026-10-16T11:15",
+      "end": "2026-10-16T12:00"
      },
      {
-      "start": "2026-10-23T10:00",
-      "end": "2026-10-23T10:45"
+      "start": "2026-10-23T11:15",
+      "end": "2026-10-23T12:00"
      },
      {
-      "start": "2026-10-30T10:00",
-      "end": "2026-10-30T10:45"
+      "start": "2026-10-30T11:15",
+      "end": "2026-10-30T12:00"
      },
      {
-      "start": "2026-11-06T10:00",
-      "end": "2026-11-06T10:45"
+      "start": "2026-11-06T11:15",
+      "end": "2026-11-06T12:00"
      },
      {
-      "start": "2026-11-13T10:00",
-      "end": "2026-11-13T10:45"
+      "start": "2026-11-13T11:15",
+      "end": "2026-11-13T12:00"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "hebamme-eva-kauper-wunderwerk",
+   "venueId": "hebamme-eva-kauper-wunderwerk",
+   "title": "Babymassage-Kurs Fr 20.11.–18.12.26, 11:15 Uhr",
+   "summary": "Fünf Massage-Termine für Babys ab etwa 6 Wochen bis 6 Monate, mit Öl und Handout. Die Kurse finden ab 4 Teilnehmenden statt; Absagen weniger als 14 Tage vorher werden voll berechnet. Anmeldung über die Buchungsseite.",
+   "topics": [
+    "babymassage"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "95 € (inkl. Öl & Handout)",
+   "url": "https://hebammeeva.mymiya.de/courses/",
+   "sourceUrl": "https://www.hebammeeva.de/babymassage",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 6
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über die miya-Buchung; Platzangabe nicht sichtbar"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-20T11:15",
+      "end": "2026-11-20T12:00"
      },
      {
-      "start": "2026-11-20T10:00",
-      "end": "2026-11-20T10:45"
+      "start": "2026-11-27T11:15",
+      "end": "2026-11-27T12:00"
      },
      {
-      "start": "2026-11-27T10:00",
-      "end": "2026-11-27T10:45"
+      "start": "2026-12-04T11:15",
+      "end": "2026-12-04T12:00"
      },
      {
-      "start": "2026-12-04T10:00",
-      "end": "2026-12-04T10:45"
+      "start": "2026-12-11T11:15",
+      "end": "2026-12-11T12:00"
      },
      {
-      "start": "2026-12-11T10:00",
-      "end": "2026-12-11T10:45"
-     },
-     {
-      "start": "2026-12-18T10:00",
-      "end": "2026-12-18T10:45"
+      "start": "2026-12-18T11:15",
+      "end": "2026-12-18T12:00"
      }
     ]
    }
   }
  ],
- "inputHash": "c381cb21e384012dd510855d8355b95f0d62c6d431bc9ded54d755851fb77a50",
+ "inputHash": "c08e58eebfe367529c6b26c669f5637c6a68c8924d4e584155c7d4d46caed2a7",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": []
 }

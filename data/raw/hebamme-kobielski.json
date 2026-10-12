@@ -3,19 +3,24 @@
   {
    "providerId": "hebamme-kobielski",
    "venueId": "hebamme-kobielski",
-   "title": "Babymassage, montags 10:00–10:45",
-   "summary": "Massage-Kurs für Babys in der Praxis der Hebamme, jeden Montag. Anmeldung über das Kontaktformular; keine Kassenleistung. Preis und Altersgrenze stehen nicht auf der Seite.",
+   "title": "Babymassage (montags, Praxis Glogauer Str.)",
+   "summary": "Massagekurs für Babys in der Hebammenpraxis, montags 10:00–10:45. Anmeldung über das Kontaktformular; keine Kassenleistung.",
    "topics": [
     "babymassage"
    ],
-   "format": "regelmaessig",
+   "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "url": "https://hebamme-nuernberg.de/",
    "sourceUrl": "https://hebamme-nuernberg.de/",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 12
+   },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über das Kontaktformular der Website"
+    "note": "Keine Platzanzeige; Anmeldung über das Kontaktformular"
    },
    "schedule": {
     "kind": "weekly",
@@ -25,42 +30,14 @@
     "start": "10:00",
     "end": "10:45",
     "from": "2026-10-12",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "hebamme-kobielski",
-   "venueId": "hebamme-kobielski",
-   "title": "Mama Fitness (mit Baby), montags 09:30–10:30",
-   "summary": "Fitness-Angebot der Hebamme für Mütter, jeden Montag in der Praxis. Laut Seite wird kein Babysitter benötigt, das Kind kann also mitkommen. Anmeldung über das Kontaktformular; Alter und Preis nicht angegeben.",
-   "topics": [
-    "fitness-mit-baby"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://hebamme-nuernberg.de/",
-   "sourceUrl": "https://hebamme-nuernberg.de/",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Kontaktformular der Website"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "09:30",
-    "end": "10:30",
-    "from": "2026-10-12",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   }
  ],
- "inputHash": "a9561ef36502ce35f1f86bfcf1acc81ddc25b136fcd9927c3600b1097eed166d",
+ "inputHash": "d00ab10dffb687b9e137de842e538b76dbb9c1b777fdcb9c1d603cdd0238d8b9",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": []
 }

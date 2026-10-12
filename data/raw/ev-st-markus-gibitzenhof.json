@@ -3,8 +3,8 @@
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Offene Tür für Groß und Klein (montags, FreiRaum)",
-   "summary": "Offener Treff im FreiRaum der Markuskirche für Familien mit kleinen Kindern, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung nötig.",
+   "title": "Offene Tür für Groß und Klein (montags)",
+   "summary": "Offener Vormittagstreff im FreiRaum der Markuskirche für Familien mit kleinen und großen Kindern. Einfach vorbeikommen, eine Anmeldung ist nicht nötig.",
    "topics": [
     "elterntreff",
     "eltern-kind-gruppe"
@@ -12,8 +12,70 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8113800.html",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8113801.html",
    "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
+   "category": "treffs-cafes",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff, einfach vorbeikommen"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "09:00",
+    "end": "11:00",
+    "from": "2026-11-09",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-st-markus-gibitzenhof",
+   "venueId": "ev-st-markus-gibitzenhof",
+   "title": "Café für Alle – Familiencafé (dienstags)",
+   "summary": "Offener Treff für Familien mit Kleinkindern: Kaffee und Kuchen gegen Spende, Kinderprogramm wie Basteln und Bilderbuchkino. Bei schönem Wetter auf dem Platz vor der Kirche, sonst im FreiRaum. Einfach vorbeikommen.",
+   "topics": [
+    "elterncafe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "price": "Kaffee und Kuchen gegen Spende",
+   "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
+   "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
+   "category": "treffs-cafes",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff, keine Anmeldung nötig"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "15:00",
+    "end": "17:00",
+    "from": "2026-10-13",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-st-markus-gibitzenhof",
+   "venueId": "ev-st-markus-gibitzenhof",
+   "title": "Offene Tür für Groß und Klein (montags, Vormittag)",
+   "summary": "Offener Vormittagstreff im FreiRaum der Markuskirche für Familien mit Kleinkind: Spielzeit, Kaffee und Gesellschaft. Ohne Anmeldung einfach kommen.",
+   "topics": [
+    "elterntreff",
+    "spielgruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8113801",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8113801",
+   "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
     "note": "Offener Treff, einfach vorbeikommen"
@@ -21,10 +83,6 @@
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-12T09:00",
-      "end": "2026-10-12T11:00"
-     },
      {
       "start": "2026-11-09T09:00",
       "end": "2026-11-09T11:00"
@@ -42,42 +100,12 @@
       "end": "2026-11-30T11:00"
      }
     ]
-   }
-  },
-  {
-   "providerId": "ev-st-markus-gibitzenhof",
-   "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Café für Alle (Familien-Café, dienstags)",
-   "summary": "Offenes Café auf dem Platz vor der Markuskirche oder im FreiRaum, Kaffee und Kuchen gegen Spende, Kinder sind ausdrücklich willkommen, ab und zu Bastel- oder Bilderbuchkino. Ohne Anmeldung; die Seite nennt widersprüchliche Zeiten (14–17 bzw. 15–18 Uhr), der Kalender 15–17 Uhr.",
-   "topics": [
-    "elterncafe",
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "price": "Kaffee und Kuchen gegen Spende",
-   "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
-   "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
    },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "15:00",
-    "end": "17:00",
-    "from": "2026-10-13",
-    "skipHolidays": true
-   }
+   "via": "evtermine"
   }
  ],
- "inputHash": "835f1d9616e0b38eff1fb000ffe233fc2f7d59c01c489f17103f8f2b695e273d",
+ "inputHash": "07ef32d27a502c247474330cedbc34abcea950ad90308a9510c952c46973fdfb",
  "dated": {
-  "2026-10-12": "37d8c91b0eb5a469ab8880ab11838e0897b0b9c3ecd21b35c60481df27647882",
   "2026-10-13": "a2c70c9eb9d26af3462fe7c37f3a47ccfdc323f38fcba478184463a34d613f01",
   "2026-10-14": "129cd408a5ba95871cf552df9aaa287ce2fe33d0dcaa7749f764c8478844b954",
   "2026-10-15": "c250b37ab0b76977fd296e23599a74014be21bc5174200df1ac36bf9faee1a4b",
@@ -98,25 +126,25 @@
   "2026-11-05": "84907b0a5de0e9acb915e8939ed85b03fdfd92dcf2e7a7a8098b8870f9dcf3e0",
   "2026-11-06": "223c4b8970d3ca8c7766bf132a1f53ff5240dd65ce509dba90a127b07695f74a",
   "2026-11-08": "699b9efc55d1b1ca9e1a141822e19e5ea9472d5adc9f13f304717c0016b34606",
-  "2026-11-09": "46b593d72446747c3db3ee78e2a36c2b07495494f747aea076035fd52ccf3573",
+  "2026-11-09": "b9e4fd8280d8c435201a620ccf86eede4cb5021148672392672deadd8b63b0dc",
   "2026-11-10": "cdf4e80746ad00b213bfb94ae4b5359cb22b7c8747b35d275e04a193e1e773d1",
   "2026-11-11": "ffde3beef6cc64ed3ebe0d9b855fe8cafdf95c7bd240d3285602fdb74564f0e8",
   "2026-11-12": "8458cff89121b4f3bed6b4b9da13e4e7490c58d640c0f0b707303c83fe0e8585",
   "2026-11-13": "7ca6adcfd1714be5b05b547012d5de5d2090ad1f02d7586bfe3cd40e5ef4c802",
   "2026-11-15": "61ce131e97fcc328b0176a53a193104ba699f7e81d4842dd3eecde1962f26f77",
-  "2026-11-16": "4f1b2af8edd5fc928df8464263378a374b921e03780c3bd413f9fa0864688c8d",
+  "2026-11-16": "4a7a391d4fcdbbf61242bffe41080091d022585ccb5a81e68c062be1e485efba",
   "2026-11-17": "90b0dd6eff7a0d09c31111810677c13380b5dff1ff5b720f3d6ac741ef4d4396",
   "2026-11-18": "b502baadc5d5ee6f9c6857bfcee6c2aa4997920e8d07911868ec02de4a26c698",
   "2026-11-19": "7a821f4ebd6e67e128c57387b38f4b8a2fe6144c92ddd16ee62802977562c199",
   "2026-11-20": "755c825afdafa92bb4c5c20eea1f871bc0dcc92214335404452b16ea266a7f93",
   "2026-11-22": "770930750d669146ea8292a17e4abbbdd73330c6bdddc344b5b5aa626080e792",
-  "2026-11-23": "777df122f45899fb5c71e29c3fcbdbf35a2d55583055b89b4339e503276f62b2",
+  "2026-11-23": "ce71d53383535a90677e1827f399d3dc8bc9a0100066363c3f674a34587a285a",
   "2026-11-24": "613b806d9a564d9c024707b3e3331d242aaff37a3d3f7e3e2eb1aff25673e04e",
   "2026-11-25": "e29b409ad0730d4c6e3aec076c481fb5212da5368d88aec39723f125cc1b0737",
   "2026-11-26": "0470270dd121db451c98cace7e5264048c3cd4610f6304ae860c0b652d3fba79",
   "2026-11-27": "ae0ec885df399698ec7688c1a60ba03a45d88fa31e85ffed83d45e0b851ca52c",
   "2026-11-29": "0127e92f6b082aab5ba4ac472551f84a0f66867770659d9820d20e8c4038cb7b",
-  "2026-11-30": "4a5e9e43c1c4331983131143a56a2155963460357f4fa1ef536d80025ba0ac89",
+  "2026-11-30": "3a5c8458c3d59bda6e52de4739d473c90c5a831b98790679ad9adb860b095612",
   "2026-12-01": "9e88396a041d653294fb5267bad92c1444849b80efba7252ee5ddef36313d36c",
   "2026-12-02": "9bee4865df70ed5dba28fd7d68728c036544eb86be02ce17533ad84c9a994775",
   "2026-12-03": "93b3c6dc8684c52d3e2f70dedc841b6a2c21396158546b8486b6f36e7988cf10",
@@ -161,8 +189,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-12T08:41:48+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": [
   "evtermine"
  ]

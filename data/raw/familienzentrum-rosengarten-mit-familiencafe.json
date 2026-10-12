@@ -4,24 +4,27 @@
    "providerId": "familienzentrum-rosengarten-mit-familiencafe",
    "venueId": "familienzentrum-rosengarten-mit-familiencafe",
    "title": "Café Kinderwagen (Eltern mit Babys, montags)",
-   "summary": "Offener Treff für Eltern mit Babys im Familiencafé Rosengarten, meist montags 10:00–11:30 Uhr. Einfach vorbeikommen zum Austausch und für Fragen rund um den Alltag mit Baby.",
+   "summary": "Offener Treff für Eltern mit einem Baby: Austausch mit anderen Eltern, Fragen und Kaffee im Familiencafé. Kommen ohne Anmeldung; aktuelle Termine stehen im WhatsApp-Kanal des Familiencafés und im Familienkalender der Stadt Fürth.",
    "topics": [
-    "elterncafe"
+    "elterncafe",
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.familieninfo-fuerth.de/familienstuetzpunkt/",
    "sourceUrl": "https://www.familieninfo-fuerth.de/familienstuetzpunkt/",
+   "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
+    "note": "Einfach vorbeikommen, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
     "weekdays": [
      "MO"
     ],
+    "interval": 1,
     "start": "10:00",
     "end": "11:30",
     "from": "2026-10-12",
@@ -29,10 +32,10 @@
    }
   }
  ],
- "inputHash": "64421f4a3df377ee2a85569c2fd0db33536e2d350f25d2fa4d121bc774f1d7b6",
+ "inputHash": "6220edd7913dad998d14b463c5e27d3e139dd628f92a02db2ba14a1c87793723",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-12T10:19:44+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": []
 }

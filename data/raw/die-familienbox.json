@@ -3,8 +3,8 @@
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Kleinkindturnen (12–36 Mon.) – Mo 9:30",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
+   "title": "Babyturnen (8–15 Monate), Montag 10:45",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Babys von 8 bis 15 Monaten. Freie Plätze je Termin nur in Eversports sichtbar.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -14,244 +14,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "09:30",
-    "end": "10:30",
-    "from": "2026-10-12",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Kleinkindturnen (12–36 Mon.) – Mo 15:15",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "15:15",
-    "end": "16:15",
-    "from": "2026-10-12",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Kleinkindturnen (12–36 Mon.) – Mo 16:30",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "16:30",
-    "end": "17:30",
-    "from": "2026-10-12",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Kleinkindturnen (12–36 Mon.) – Di 9:30",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "09:30",
-    "end": "10:30",
-    "from": "2026-10-13",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Kleinkindturnen (18–36 Mon.) – Di 16:00",
-   "summary": "Bewegungsstunde nach Emmi Pikler für ältere Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 18,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "16:00",
-    "end": "17:00",
-    "from": "2026-10-13",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Kleinkindturnen (12–36 Mon.) – Do 10:45",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "10:45",
-    "end": "11:45",
-    "from": "2026-10-15",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Kleinkindturnen (12–36 Mon.) – Fr 9:30",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "FR"
-    ],
-    "start": "09:30",
-    "end": "10:30",
-    "from": "2026-10-16",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Babyturnen (8–15 Mon.) – Mo 10:45",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Babys mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
     "minMonths": 8,
     "maxMonths": 15
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -261,14 +31,14 @@
     "start": "10:45",
     "end": "11:45",
     "from": "2026-10-12",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Babyturnen (8–18 Mon.) – Di 14:45",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Babys und Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
+   "title": "Babyturnen (8–18 Monate), Dienstag 14:45",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Babys von 8 bis 18 Monaten. Freie Plätze je Termin nur in Eversports sichtbar.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -278,13 +48,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
     "minMonths": 8,
     "maxMonths": 18
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -294,14 +65,14 @@
     "start": "14:45",
     "end": "15:45",
     "from": "2026-10-13",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Babyturnen (8–15 Mon.) – Do 9:30",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Babys mit Begleitperson. Die Plätze werden über Eversports gebucht.",
+   "title": "Babyturnen (8–15 Monate), Donnerstag 9:30",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Babys von 8 bis 15 Monaten. Freie Plätze je Termin nur in Eversports sichtbar.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -311,13 +82,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
     "minMonths": 8,
     "maxMonths": 15
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -327,14 +99,14 @@
     "start": "09:30",
     "end": "10:30",
     "from": "2026-10-15",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Babyturnen (8–15 Mon.) – Fr 12:00",
-   "summary": "Bewegungsstunde nach Emmi Pikler für Babys mit Begleitperson. Die Plätze werden über Eversports gebucht.",
+   "title": "Babyturnen (8–15 Monate), Freitag 12:00",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Babys von 8 bis 15 Monaten. Freie Plätze je Termin nur in Eversports sichtbar.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -344,13 +116,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
     "minMonths": 8,
     "maxMonths": 15
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -360,30 +133,133 @@
     "start": "12:00",
     "end": "13:00",
     "from": "2026-10-16",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "BabySinne (9–15 Mon.) – Di 9:30",
-   "summary": "Sinnesreise für Babys mit Begleitperson (Hören, Riechen, Schmecken, Tasten, Sehen). Die Plätze werden über Eversports gebucht.",
+   "title": "Kleinkindturnen (12–36 Monate), Montag 9:30",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Freie Plätze je Termin nur in Eversports sichtbar.",
    "topics": [
-    "eltern-kind-gruppe",
-    "kreativ"
+    "eltern-kind-turnen",
+    "bewegung"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
-    "minMonths": 9,
-    "maxMonths": 15
+    "minMonths": 12,
+    "maxMonths": 36
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "09:30",
+    "end": "10:30",
+    "from": "2026-10-12",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "Kleinkindturnen (12–36 Monate), Montag 15:15",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Freie Plätze je Termin nur in Eversports sichtbar.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung je Termin über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "15:15",
+    "end": "16:15",
+    "from": "2026-10-12",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "Kleinkindturnen (12–36 Monate), Montag 16:30",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Freie Plätze je Termin nur in Eversports sichtbar.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung je Termin über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "16:30",
+    "end": "17:30",
+    "from": "2026-10-12",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "Kleinkindturnen (12–36 Monate), Dienstag 9:30",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Freie Plätze je Termin nur in Eversports sichtbar.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -391,49 +267,118 @@
      "TU"
     ],
     "start": "09:30",
-    "end": "10:15",
+    "end": "10:30",
     "from": "2026-10-13",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "BabySinne (6–12 Mon.) – Di 10:30",
-   "summary": "Sinnesreise für Babys mit Begleitperson (Hören, Riechen, Schmecken, Tasten, Sehen). Die Plätze werden über Eversports gebucht.",
+   "title": "Kleinkindturnen (18–36 Monate), Dienstag 16:00",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder ab 18 Monaten mit Begleitperson. Freie Plätze je Termin nur in Eversports sichtbar.",
    "topics": [
-    "eltern-kind-gruppe",
-    "kreativ"
+    "eltern-kind-turnen",
+    "bewegung"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
-    "minMonths": 6,
-    "maxMonths": 12
+    "minMonths": 18,
+    "maxMonths": 36
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
     "weekdays": [
      "TU"
     ],
-    "start": "10:30",
-    "end": "11:15",
+    "start": "16:00",
+    "end": "17:00",
     "from": "2026-10-13",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Achtsame Babymassage (1–5 Mon.) – Mo 11:00",
-   "summary": "Babymassage-Kurs mit Eltern, der Bindung stärkt und bei Koliken entspannen soll. Die Plätze werden über Eversports gebucht.",
+   "title": "Kleinkindturnen (12–36 Monate), Donnerstag 10:45",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Freie Plätze je Termin nur in Eversports sichtbar.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung je Termin über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "10:45",
+    "end": "11:45",
+    "from": "2026-10-15",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "Kleinkindturnen (12–36 Monate), Freitag 9:30",
+   "summary": "Bewegungsstunde nach Emmi Pikler für Kleinkinder mit Begleitperson. Freie Plätze je Termin nur in Eversports sichtbar.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung je Termin über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "FR"
+    ],
+    "start": "09:30",
+    "end": "10:30",
+    "from": "2026-10-16",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "Achtsame Babymassage (6 Wochen–5 Monate), Montag 11:00",
+   "summary": "Babymassage-Kurs für Babys ab etwa sechs Wochen bis fünf Monate, den Eltern gemeinsam mit ihrem Baby besuchen. Buchung über Eversports.",
    "topics": [
     "babymassage"
    ],
@@ -442,13 +387,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "babykurse",
    "age": {
-    "minMonths": 1,
+    "minMonths": 0,
     "maxMonths": 5
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -458,14 +404,14 @@
     "start": "11:00",
     "end": "12:15",
     "from": "2026-10-12",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Babymassage (0–4 Mon.) – Do 12:00",
-   "summary": "Babymassage-Kurs mit Eltern für Babys bis 4 Monate. Die Plätze werden über Eversports gebucht.",
+   "title": "Babymassage (0–4 Monate), Donnerstag 12:00",
+   "summary": "Babymassage-Stunden für Babys bis vier Monate, die Eltern gemeinsam mit ihrem Baby besuchen. Buchung über Eversports.",
    "topics": [
     "babymassage"
    ],
@@ -474,13 +420,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "babykurse",
    "age": {
     "minMonths": 0,
     "maxMonths": 4
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -490,14 +437,80 @@
     "start": "12:00",
     "end": "13:00",
     "from": "2026-10-15",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Zumbini (0–4 Jahre) – Di 14:00",
-   "summary": "Musik- und Tanzstunde für Kinder bis 4 Jahre zusammen mit einem Elternteil. Die Plätze werden über Eversports gebucht.",
+   "title": "BabySinne (9–15 Monate), Dienstag 9:30",
+   "summary": "Sinnesangebot für Babys: Hören, Riechen, Schmecken, Tasten und Sehen werden spielerisch angeregt. Buchung über Eversports.",
+   "topics": [
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 9,
+    "maxMonths": 15
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung je Termin über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "09:30",
+    "end": "10:15",
+    "from": "2026-10-13",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "BabySinne (6–12 Monate), Dienstag 10:30",
+   "summary": "Sinnesangebot für Babys: Hören, Riechen, Schmecken, Tasten und Sehen werden spielerisch angeregt. Buchung über Eversports.",
+   "topics": [
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung je Termin über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:30",
+    "end": "11:15",
+    "from": "2026-10-13",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "Zumbini (0–4 Jahre), Dienstag 14:00",
+   "summary": "Tanz- und Musikstunde für kleine Kinder bis vier Jahre mit Begleitperson. Buchung je Termin über Eversports.",
    "topics": [
     "tanz",
     "musik"
@@ -507,13 +520,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
     "minMonths": 0,
     "maxMonths": 48
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -523,14 +537,14 @@
     "start": "14:00",
     "end": "14:45",
     "from": "2026-10-13",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Zumbini (0–4 Jahre) – Di 15:00",
-   "summary": "Musik- und Tanzstunde für Kinder bis 4 Jahre zusammen mit einem Elternteil. Die Plätze werden über Eversports gebucht.",
+   "title": "Zumbini (0–4 Jahre), Dienstag 15:00",
+   "summary": "Tanz- und Musikstunde für kleine Kinder bis vier Jahre mit Begleitperson. Buchung je Termin über Eversports.",
    "topics": [
     "tanz",
     "musik"
@@ -540,13 +554,14 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "age": {
     "minMonths": 0,
     "maxMonths": 48
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -556,14 +571,14 @@
     "start": "15:00",
     "end": "15:45",
     "from": "2026-10-13",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "Musikalische Früherziehung (9–15 Mon.) – Mi 9:30",
-   "summary": "Singen, Hören und Musizieren für Kinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
+   "title": "Musikalische Früherziehung (1–3 Jahre), Montag 16:30",
+   "summary": "Musik mit allen Sinnen für kleine Kinder: Singen, Hören und Bewegen fördern Entwicklung und Kreativität.",
    "topics": [
     "musik",
     "singen"
@@ -571,81 +586,16 @@
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "url": "https://www.diefamilienbox.de/kleinkindkurse-nürnberg/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 9,
-    "maxMonths": 15
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "09:30",
-    "end": "10:15",
-    "from": "2026-10-14",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Musikalische Früherziehung (6–12 Mon.) – Mi 10:30",
-   "summary": "Singen, Hören und Musizieren für Babys mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "10:30",
-    "end": "11:15",
-    "from": "2026-10-14",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Musikalische Früherziehung (1–3 Jahre) – Mo 16:30",
-   "summary": "Singen, Hören und Musizieren für Kleinkinder mit Begleitperson. Die Plätze werden über Eversports gebucht.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "musik",
    "age": {
     "minMonths": 12,
     "maxMonths": 36
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Anmeldung über die Website bzw. Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -655,110 +605,82 @@
     "start": "16:30",
     "end": "17:15",
     "from": "2026-10-12",
-    "skipHolidays": true
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "PEKiP-Gruppe (Babys 1. Lebensjahr) – Do 9:30",
-   "summary": "Spiel-, Bewegungs- und Austauschangebot für Babys im ersten Lebensjahr in kleinen festen Gruppen. Derzeit Warteliste; neue Kurse ab 26.11.2026.",
+   "title": "Musikalische Früherziehung (9–15 Monate), Mittwoch 9:30",
+   "summary": "Musik mit allen Sinnen für Babys: Singen, Hören und Bewegen fördern Entwicklung und Kreativität.",
    "topics": [
-    "pekip"
+    "musik",
+    "singen"
    ],
-   "format": "kurs",
+   "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "url": "https://www.diefamilienbox.de/kleinkindkurse-nürnberg/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "musik",
    "age": {
-    "minMonths": 0,
-    "maxMonths": 12
+    "minMonths": 9,
+    "maxMonths": 15
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Aktuell Warteliste; Anmeldung für die neuen Kurse ab 26.11.2026 über Eversports"
+    "note": "Anmeldung über die Website bzw. Eversports"
    },
    "schedule": {
     "kind": "weekly",
     "weekdays": [
-     "TH"
+     "WE"
     ],
     "start": "09:30",
-    "end": "11:00",
-    "from": "2026-11-26",
-    "skipHolidays": true
+    "end": "10:15",
+    "from": "2026-10-14",
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "PEKiP-Gruppe (Babys 1. Lebensjahr) – Do 11:30",
-   "summary": "Spiel-, Bewegungs- und Austauschangebot für Babys im ersten Lebensjahr in kleinen festen Gruppen. Derzeit Warteliste; neue Kurse ab 26.11.2026.",
+   "title": "Musikalische Früherziehung (6–12 Monate), Mittwoch 10:30",
+   "summary": "Musik mit allen Sinnen für Babys: Singen, Hören und Bewegen fördern Entwicklung und Kreativität.",
    "topics": [
-    "pekip"
+    "musik",
+    "singen"
    ],
-   "format": "kurs",
+   "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "url": "https://www.diefamilienbox.de/kleinkindkurse-nürnberg/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "musik",
    "age": {
-    "minMonths": 0,
+    "minMonths": 6,
     "maxMonths": 12
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Aktuell Warteliste; Anmeldung für die neuen Kurse ab 26.11.2026 über Eversports"
+    "note": "Anmeldung über die Website bzw. Eversports"
    },
    "schedule": {
     "kind": "weekly",
     "weekdays": [
-     "TH"
+     "WE"
     ],
-    "start": "11:30",
-    "end": "13:00",
-    "from": "2026-11-26",
-    "skipHolidays": true
+    "start": "10:30",
+    "end": "11:15",
+    "from": "2026-10-14",
+    "skipHolidays": false
    }
   },
   {
    "providerId": "die-familienbox",
    "venueId": "die-familienbox",
-   "title": "PEKiP-Gruppe (Babys 1. Lebensjahr) – Do 13:30",
-   "summary": "Spiel-, Bewegungs- und Austauschangebot für Babys im ersten Lebensjahr in kleinen festen Gruppen. Derzeit Warteliste; neue Kurse ab 26.11.2026.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Aktuell Warteliste; Anmeldung für die neuen Kurse ab 26.11.2026 über Eversports"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "13:30",
-    "end": "15:00",
-    "from": "2026-11-26",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "die-familienbox",
-   "venueId": "die-familienbox",
-   "title": "Beckenboden Mama Baby Yoga – Fr 10:30",
-   "summary": "Yoga für Mütter nach der Rückbildung mit Baby. Die Plätze werden über Eversports gebucht.",
+   "title": "Beckenboden Mama Baby Yoga (nach Rückbildung), Freitag 10:30",
+   "summary": "Yoga und Beckenbodenübungen nach der Rückbildung, bei denen das Baby dabei sein kann. Buchung über Eversports.",
    "topics": [
     "yoga-mit-baby",
     "rueckbildung"
@@ -768,9 +690,10 @@
    "cost": "kostenpflichtig",
    "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
    "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze je Termin im Buchungssystem Eversports prüfen"
+    "note": "Buchung je Termin über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -780,14 +703,113 @@
     "start": "10:30",
     "end": "12:00",
     "from": "2026-10-16",
-    "skipHolidays": true
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "PEKiP (Babys im ersten Lebensjahr), Donnerstag 9:30",
+   "summary": "Spiel- und Bewegungsgruppe im ersten Lebensjahr mit Austausch für Eltern in festen kleinen Gruppen. Aktuell Warteliste; neue Kurse ab 26.11.2026.",
+   "topics": [
+    "pekip"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/babykurse-nürnberg/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "warteliste",
+    "note": "Warteliste; neue Kurse ab 26.11.2026"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "09:30",
+    "end": "11:00",
+    "from": "2026-11-26",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "PEKiP (Babys im ersten Lebensjahr), Donnerstag 11:30",
+   "summary": "Spiel- und Bewegungsgruppe im ersten Lebensjahr mit Austausch für Eltern in festen kleinen Gruppen. Aktuell Warteliste; neue Kurse ab 26.11.2026.",
+   "topics": [
+    "pekip"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/babykurse-nürnberg/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "warteliste",
+    "note": "Warteliste; neue Kurse ab 26.11.2026"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "11:30",
+    "end": "13:00",
+    "from": "2026-11-26",
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "die-familienbox",
+   "venueId": "die-familienbox",
+   "title": "PEKiP (Babys im ersten Lebensjahr), Donnerstag 13:30",
+   "summary": "Spiel- und Bewegungsgruppe im ersten Lebensjahr mit Austausch für Eltern in festen kleinen Gruppen. Aktuell Warteliste; neue Kurse ab 26.11.2026.",
+   "topics": [
+    "pekip"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.diefamilienbox.de/babykurse-nürnberg/",
+   "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "warteliste",
+    "note": "Warteliste; neue Kurse ab 26.11.2026"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "13:30",
+    "end": "15:00",
+    "from": "2026-11-26",
+    "skipHolidays": false
    }
   }
  ],
- "inputHash": "ee836767c9f05add199e4e83cac005b202729d7b03f74783ee39272f40486080",
+ "inputHash": "e4d5efba57ef932205ddfef4eda378263c817f4b27428ec33c92628750658437",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": []
 }

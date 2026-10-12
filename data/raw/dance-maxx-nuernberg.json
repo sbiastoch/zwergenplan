@@ -3,20 +3,20 @@
   {
    "providerId": "dance-maxx-nuernberg",
    "venueId": "dance-maxx-nuernberg",
-   "title": "fitdankbaby® MAXI (Mittwoch 09:30)",
-   "summary": "Bewegungsstunde für Eltern mit Baby, mittwochs. Eine kostenlose Probestunde ist buchbar; Platzangaben gibt es online nicht.",
+   "title": "fitdankbaby® MAXI (Mittwoch 9:30)",
+   "summary": "Fitnesstraining für Eltern mit Kind, mittwochs vormittags. Anmeldung über das Nimbuscloud-Konto oder per Kontakt; kostenlose Probestunde möglich.",
    "topics": [
-    "fitness-mit-baby",
-    "bewegung"
+    "fitness-mit-baby"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "url": "https://dance-maxx.de/kursplan/fit-dank-baby-maxi/",
    "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige. Anmeldung über den Nimbuscloud-Login oder per Kontakt."
+    "note": "Keine öffentliche Platzanzeige. Anmeldung über Nimbuscloud-Login oder Kontakt, Probestunde über Calendly."
    },
    "schedule": {
     "kind": "weekly",
@@ -33,19 +33,19 @@
    "providerId": "dance-maxx-nuernberg",
    "venueId": "dance-maxx-nuernberg",
    "title": "fitdankbaby® MINI (Mittwoch 10:45)",
-   "summary": "Bewegungsstunde für Eltern mit Baby, mittwochs. Eine kostenlose Probestunde ist buchbar; Platzangaben gibt es online nicht.",
+   "summary": "Fitnesstraining für Eltern mit Kind, mittwochs vormittags. Anmeldung über das Nimbuscloud-Konto oder per Kontakt; kostenlose Probestunde möglich.",
    "topics": [
-    "fitness-mit-baby",
-    "bewegung"
+    "fitness-mit-baby"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "url": "https://www.dance-maxx.de/kursplan/fit-dank-baby-mini/",
    "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige. Anmeldung über den Nimbuscloud-Login oder per Kontakt."
+    "note": "Keine öffentliche Platzanzeige. Anmeldung über Nimbuscloud-Login oder Kontakt, Probestunde über Calendly."
    },
    "schedule": {
     "kind": "weekly",
@@ -62,20 +62,20 @@
    "providerId": "dance-maxx-nuernberg",
    "venueId": "dance-maxx-nuernberg",
    "title": "Eltern-Kind Tanz (Donnerstag 15:40)",
-   "summary": "Gemeinsames Tanzen für Eltern und Kind, donnerstags. Anmeldung über das Buchungssystem oder den Kontakt zur Tanzschule.",
+   "summary": "Gemeinsames Tanzen für Eltern und Kind, donnerstags nachmittags. Anmeldung über das Nimbuscloud-Konto oder per Kontakt.",
    "topics": [
     "tanz",
-    "bewegung",
-    "eltern-kind-gruppe"
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "url": "https://www.dance-maxx.de/kursplan/eltern-kind-tanz/",
    "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
+   "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige. Anmeldung über den Nimbuscloud-Login oder per Kontakt."
+    "note": "Keine öffentliche Platzanzeige. Anmeldung über Nimbuscloud-Login oder Kontakt."
    },
    "schedule": {
     "kind": "weekly",
@@ -89,10 +89,10 @@
    }
   }
  ],
- "inputHash": "8b5f42da0aec0250bae398560a8091f888d6a3a2124d4e5e8b7f38382cf90512",
+ "inputHash": "1335ba16a43135ad69db9175e0bcf8600c084a6dae954541155a42bf7112a34e",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": []
 }

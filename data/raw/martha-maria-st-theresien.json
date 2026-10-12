@@ -3,19 +3,70 @@
   {
    "providerId": "martha-maria-st-theresien",
    "venueId": "martha-maria-st-theresien",
-   "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
-   "summary": "Ungezwungener Austausch für werdende und junge Eltern, Fragen können an Hebammen und Stillberaterinnen gestellt werden. Kostenlos, Einstieg jederzeit ohne Anmeldung.",
+   "title": "Indische Babymassage (Babys 4 Wochen bis 7 Monate)",
+   "summary": "Kurs mit fünf Dienstagsterminen für Babys von etwa vier Wochen bis sieben Monaten, mit Körperkontakt und Massage für Eltern und Kind. Nächster Kursstart 17. November 2026; Anmeldung per E-Mail oder Telefon.",
    "topics": [
-    "elterncafe"
+    "babymassage"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "60 Euro",
+   "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+   "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 7
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung per E-Mail an novakovalenka@web.de oder telefonisch unter 0157 58063006"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-17T10:00",
+      "end": "2026-11-17T11:00"
+     },
+     {
+      "start": "2026-11-24T10:00",
+      "end": "2026-11-24T11:00"
+     },
+     {
+      "start": "2026-12-01T10:00",
+      "end": "2026-12-01T11:00"
+     },
+     {
+      "start": "2026-12-08T10:00",
+      "end": "2026-12-08T11:00"
+     },
+     {
+      "start": "2026-12-15T10:00",
+      "end": "2026-12-15T11:00"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "martha-maria-st-theresien",
+   "venueId": "martha-maria-st-theresien",
+   "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
+   "summary": "Ungezwungener Austausch für werdende und junge Eltern, Fragen können an Hebammen und Stillberaterinnen gestellt werden. Kostenlos, ohne Anmeldung, mittwochs 9:30 bis 11:30 Uhr.",
+   "topics": [
+    "elterncafe",
+    "stillcafe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
+   "price": "keine",
    "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
    "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+   "category": "treffs-cafes",
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung nötig"
+    "status": "ohne-anmeldung"
    },
    "schedule": {
     "kind": "dates",
@@ -30,56 +81,12 @@
      }
     ]
    }
-  },
-  {
-   "providerId": "martha-maria-st-theresien",
-   "venueId": "martha-maria-st-theresien",
-   "title": "Indische Babymassage (Babys 4 Wochen bis 7 Monate)",
-   "summary": "Kursreihe mit Massage-Anleitung für Eltern und Baby; vorgesehen für Babys von etwa vier Wochen bis sieben Monaten. Anmeldung per E-Mail oder Telefon.",
-   "topics": [
-    "babymassage"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "60 Euro",
-   "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
-   "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
-   "age": {
-    "minMonths": 1,
-    "maxMonths": 7
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per E-Mail an novakovalenka@web.de oder telefonisch unter 0157 58063006"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-02-24T10:00",
-      "end": "2026-02-24T11:00"
-     },
-     {
-      "start": "2026-05-05T10:00",
-      "end": "2026-05-05T11:00"
-     },
-     {
-      "start": "2026-09-22T10:00",
-      "end": "2026-09-22T11:00"
-     },
-     {
-      "start": "2026-11-17T10:00",
-      "end": "2026-11-17T11:00"
-     }
-    ]
-   }
   }
  ],
- "inputHash": "8ecef3455a6790664b1c9c21feeed95241ccbb20e1f64e6ee2d553f807363943",
+ "inputHash": "3d08520f7c85dbb7f4da519cd427c3de4848da6d1fb2068fa0a474ab74fd32db",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": []
 }

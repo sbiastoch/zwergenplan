@@ -3,22 +3,27 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Jazz für Kinder – Konzert mit König Semmelwurst (ohne Altersgrenze)",
-   "summary": "Einmal im Monat moderiertes Jazz-Puppentheater für Kinder und Begleitung, sonntags 11 Uhr. Kinder unter 3 Jahren haben freien Eintritt. Alle Termine im Horizont sind laut Spielplan ausverkauft.",
+   "title": "Jazz für Kinder (König Semmelwurst, o.A.)",
+   "summary": "Puppentheater mit Live-Jazz im Theater Mummpitz, ca. 50 Minuten, für Kinder und ihre Begleitung. Alle Termine im Horizont sind derzeit ausverkauft. Kinder unter 3 Jahren haben freien Eintritt.",
    "topics": [
-    "musik",
+    "theater",
     "konzert",
-    "theater"
+    "musik"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "6 € (ohne VGN); Kinder unter 3 Jahren frei",
+   "price": "6 € (ohne VGN); Kinder unter 3 Jahren freier Eintritt",
    "url": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
    "sourceUrl": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
+   "category": "buehne",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine im Horizont laut Spielplan ausverkauft; Tickets über Reservix"
+    "note": "Alle Termine ausverkauft; Karten über Reservix"
    },
    "schedule": {
     "kind": "dates",
@@ -50,11 +55,11 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Klassik für Kinder – moderierte Konzerte der Hochschule für Musik",
-   "summary": "Studierende der Hochschule für Musik stellen Instrumente vor und spielen Lieblingsstücke, rund 50 Minuten, sonntags 11 Uhr. Die Konzerte richten sich an Kinder jeden Alters mit Begleitung. Alle Termine im Horizont sind laut Spielplan ausverkauft.",
+   "title": "Klassik für Kinder (Studierende der Musikhochschule, o.A.)",
+   "summary": "Moderierte Konzerte, in denen Studierende der Hochschule für Musik Nürnberg Instrumente vorstellen und Lieblingsstücke spielen. Richtet sich an Kinder jeden Alters mit Begleitung. Alle Termine im Horizont sind derzeit ausverkauft.",
    "topics": [
-    "musik",
-    "konzert"
+    "konzert",
+    "musik"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -62,9 +67,14 @@
    "price": "6 € (ohne VGN)",
    "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
    "sourceUrl": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
+   "category": "buehne",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine im Horizont laut Spielplan ausverkauft; Tickets über Reservix"
+    "note": "Alle Termine ausverkauft; Karten über Reservix"
    },
    "schedule": {
     "kind": "dates",
@@ -94,7 +104,7 @@
    }
   }
  ],
- "inputHash": "3aa76488abba7577ae7d29ae4912197f0933905c6cd85fceea864f9aa9ec124e",
+ "inputHash": "ed160de7f68c4190c4493df58e62e22bda74ef567d56e5bd1f78adceb0659e9d",
  "dated": {
   "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
   "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
@@ -102,8 +112,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T10:49:42+02:00",
- "changedAt": "2026-10-12T08:41:48+02:00",
+ "checkedAt": "2026-10-12T14:49:58+02:00",
+ "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": [
   "frankenkids",
   "stadt-vk"
