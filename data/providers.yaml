@@ -3137,3 +3137,36 @@
       district: Weiterer Innenstadtgürtel West/Nord/Ost
       geo: { lat: 49.4676674, lon: 11.0895169 }
   coveredBy: frankenkids-eventkalender
+- id: hebammen-wunderwerk
+  publicId: urt9qp2k
+  role: anbieter
+  region: fuerth
+  name: Hebammen Wunderwerk
+  url: https://www.hebammen-wunderwerk.de/home
+  programme:
+    - url: https://www.hebammen-wunderwerk.de/kurse
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.hebammen-wunderwerk.de/kontakt
+      kind: html
+      render: browser
+      use: info
+  availability:
+    shown: teilweise
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Krabbelgruppe: https://www.hebammen-wunderwerk.de/kurse – Hebammenpraxis bietet Babyschwimmen ab dem 4. Lebensmonat (Fürth), Babymassage, Yoga mit Baby, Mama Fit mit Baby und FenKid-Baby-/Kleinkinderkurse (Cadolzburg) mit kommenden Terminen; einige Kurse sind ausgebucht."
+  age:
+    minMonths: 4
+    maxMonths: 216
+  venues:
+    - id: hebammen-wunderwerk
+      name: Zentrum für Therapie & Training (Babyschwimmen)
+      address: Hintere Str. 112, 90768 Fürth
+      district: West
+      geo: { lat: 49.4924259, lon: 10.9313768 }
+    - id: hebammen-wunderwerk-2
+      name: Hebammenpraxis Wunderwerk
+      address: Markgraf-Alexander-Straße 30, 90556 Cadolzburg
+      geo: { lat: 49.4573668, lon: 10.8602466 }
