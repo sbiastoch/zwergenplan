@@ -1,0 +1,76 @@
+{
+ "events": [
+  {
+   "providerId": "vhs-fuerth",
+   "venueId": "vhs-fuerth",
+   "title": "Eltern-Kind-Turnen für Kinder 1½ bis 2½ Jahre (Mittwoch)",
+   "summary": "Wöchentlich neu gestalteter Bewegungsparcours, Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09.2026 und ist im Horizont noch offen; Kursnummer 16301.",
+   "topics": [
+    "bewegung",
+    "eltern-kind-turnen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "82,50 €",
+   "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "age": {
+    "minMonths": 18,
+    "maxMonths": 30
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Platzangabe nicht angegeben; Anmeldung über die Kursdetails (Kursnummer 16301)."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "WE"
+    ],
+    "start": "17:00",
+    "from": "2026-10-14",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "vhs-fuerth",
+   "venueId": "vhs-fuerth",
+   "title": "Eltern-Kind-Turnen für Kinder 2 bis 3 Jahre (Donnerstag)",
+   "summary": "Wöchentlich neu gestalteter Bewegungsparcours, Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09.2026 und ist im Horizont noch offen; Kursnummer 16303.",
+   "topics": [
+    "bewegung",
+    "eltern-kind-turnen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "82,50 €",
+   "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "age": {
+    "minMonths": 24,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Platzangabe nicht angegeben; Anmeldung über die Kursdetails (Kursnummer 16303)."
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "17:00",
+    "from": "2026-10-15",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "3122dcb5087b08c6aca5afd5706a64c39d989f1778f4933fdb1fedf5dd4cb2d0",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-12T10:18:44+02:00",
+ "changedAt": "2026-10-12T10:18:44+02:00",
+ "sources": []
+}

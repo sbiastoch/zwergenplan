@@ -3252,3 +3252,29 @@
       address: Otto-Seeling-Promenade 10a, 90762 Fürth
       district: Süd
       geo: { lat: 49.4718522, lon: 10.9973901 }
+- id: vhs-fuerth
+  publicId: nl56xa8i
+  role: anbieter
+  region: fuerth
+  name: vhs Fürth
+  url: https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26
+  programme:
+    - url: https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.familieninfo-fuerth.de/betreuung-und-bildung/eltern-kind-treffs/eltern-kind-treffs-an-der-vhs/
+      kind: html
+      render: browser
+      use: info
+  availability:
+    shown: unbekannt
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Familienzentrum: http://www.familieninfo-fuerth.de/betreuung-und-bildung/eltern-kind-treffs/eltern-kind-treffs-an-der-vhs/ – Die vhs Fürth veranstaltet laut Familieninfo Eltern-Kind-Angebote im jeweils aktuellen Programm (Fachbereich Gesellschaft, junge vhs) mit Adresse in Fürth; konkrete 0–3-Kurse wie PEKiP oder Babymassage sind auf der abgerufenen Seite nicht belegt, das Programm verweist aber auf die vhs-Kursseite."
+  venues:
+    - id: vhs-fuerth
+      name: vhs Fürth
+      address: Hirschenstraße 27/29, 90762 Fürth
+      district: Süd
+      geo: { lat: 49.4765938, lon: 10.9886542 }
