@@ -1,0 +1,38 @@
+{
+ "events": [
+  {
+   "providerId": "familienzentrum-rosengarten-mit-familiencafe",
+   "venueId": "familienzentrum-rosengarten-mit-familiencafe",
+   "title": "Café Kinderwagen (Eltern mit Babys, montags)",
+   "summary": "Offener Treff für Eltern mit Babys im Familiencafé Rosengarten, meist montags 10:00–11:30 Uhr. Einfach vorbeikommen zum Austausch und für Fragen rund um den Alltag mit Baby.",
+   "topics": [
+    "elterncafe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.familieninfo-fuerth.de/familienstuetzpunkt/",
+   "sourceUrl": "https://www.familieninfo-fuerth.de/familienstuetzpunkt/",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff, einfach vorbeikommen"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "10:00",
+    "end": "11:30",
+    "from": "2026-10-12",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "64421f4a3df377ee2a85569c2fd0db33536e2d350f25d2fa4d121bc774f1d7b6",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-12T10:19:44+02:00",
+ "changedAt": "2026-10-12T10:19:44+02:00",
+ "sources": []
+}

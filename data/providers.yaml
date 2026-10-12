@@ -3278,3 +3278,29 @@
       address: Hirschenstraße 27/29, 90762 Fürth
       district: Süd
       geo: { lat: 49.4765938, lon: 10.9886542 }
+- id: familienzentrum-rosengarten-mit-familiencafe
+  publicId: q1i6d29u
+  role: anbieter
+  region: fuerth
+  name: Familienzentrum Rosengarten mit Familiencafé
+  url: https://www.familieninfo-fuerth.de/familienstuetzpunkt/
+  programme:
+    - url: https://www.familieninfo-fuerth.de/familienstuetzpunkt/
+      kind: html
+      render: browser
+      use: termine
+    - url: https://www.familieninfo-fuerth.de/familienstuetzpunkt/cafe-kinderwagen/
+      kind: html
+      render: browser
+      use: info
+  availability:
+    shown: unbekannt
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Familienzentrum: https://www.familieninfo-fuerth.de/familienstuetzpunkt/#cafekinderwagen – Das Familiencafé im Familienzentrum Rosengarten (Stadt Fürth) bietet den Eltern-Café „Café Kinderwagen“ für Eltern mit Babys, (fast) immer montags 10:00–11:30 Uhr, mit Terminen auf der Seite."
+  venues:
+    - id: familienzentrum-rosengarten-mit-familiencafe
+      name: Familienzentrum Rosengarten (Familiencafé, 1. Stock)
+      address: Rosenstr. 16-20, 90762 Fürth
+      district: Süd
+      geo: { lat: 49.4767817, lon: 10.9866124 }
