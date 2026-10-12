@@ -4,7 +4,7 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Schneeflocken, wippediwapp (Lucia Ruf)",
-   "summary": "Winterliederkonzert der Kinderliedermacherin Lucia Ruf zum Mitsingen und Mittanzen. Die Vorstellung am 30.11. um 9:30 Uhr ist ausverkauft, die um 10:45 Uhr ist buchbar.",
+   "summary": "Winterlieder-Mitmachkonzert mit Kinderliedermacherin Lucia Ruf zum Mitsingen und Tanzen. Zwei Vorstellungen am 30. November; die um 9:30 Uhr ist ausverkauft.",
    "topics": [
     "konzert",
     "musik",
@@ -21,8 +21,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "30.11. 9:30 Uhr ausverkauft; 30.11. 10:45 Uhr buchbar"
+    "status": "unbekannt",
+    "note": "30.11. 9:30 ausverkauft; für 10:45 keine Platzangabe, Tickets im Eventim-Webshop"
    },
    "schedule": {
     "kind": "dates",
@@ -42,10 +42,10 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Vom Wünschen, Brauchen und Bekommen (Martin Ellrodt)",
-   "summary": "Lustige und seltsame Geschichten rund ums Wünschen, erzählt von Martin Ellrodt. Die Vorstellung am 30.11. um 9:30 Uhr ist ausverkauft, die um 10:45 Uhr ist buchbar.",
+   "summary": "Erzähltheater mit lustigen und seltsamen Geschichten rund ums Wünschen. Die Vorstellung am 30. November um 9:30 Uhr ist ausverkauft.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "vorlesen",
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -57,8 +57,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "30.11. 9:30 Uhr ausverkauft; 30.11. 10:45 Uhr buchbar"
+    "status": "unbekannt",
+    "note": "30.11. 9:30 ausverkauft; für 10:45 keine Platzangabe"
    },
    "schedule": {
     "kind": "dates",
@@ -78,7 +78,7 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Artus und das magische Schwert (Musical Company)",
-   "summary": "Musical um den jungen König Artus, den der Zauberer Merlin begleitet, und den machtbesessenen Mordred. Die Vorstellung am 30.11. ist ausverkauft.",
+   "summary": "Musical über den jungen König Artus, seinen Helfer Merlin und den machthungrigen Mordred. Die Vorstellung ist ausverkauft.",
    "topics": [
     "theater",
     "musik"
@@ -94,7 +94,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Vorstellung ausverkauft"
+    "note": "ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -110,10 +110,10 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "David und der Weihnachtskarpfen (Ute Weidinger)",
-   "summary": "Vorweihnachtliche Geschichte von David und seinem Vater, die einen Weihnachtskarpfen kaufen wollen, erzählt von Ute Weidinger. Die Vorstellung am 1.12. ist ausverkauft.",
+   "summary": "Erzähltheater über Vater und Sohn, die einen Weihnachtskarpfen kaufen und dabei ganz unterschiedliche Pläne haben. Die Vorstellung ist ausverkauft.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "vorlesen",
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -126,7 +126,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Vorstellung ausverkauft"
+    "note": "ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -142,7 +142,7 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Es klopft bei Wanja in der Nacht (Theater Katinkaspringinsfeld)",
-   "summary": "Theaterstück nach dem Bilderbuch von Tilde Michels über Gastfreundschaft, Vertrauen und Zusammenhalt in einem Schneesturm. Beide Vorstellungen am 1.12. sind ausverkauft.",
+   "summary": "Theaterstück nach dem Bilderbuch von Tilde Michels über Gastfreundschaft und Zusammenhalt in einem Schneesturm. Beide Vorstellungen am 1. Dezember sind ausverkauft.",
    "topics": [
     "theater"
    ],
@@ -157,7 +157,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Vorstellungen ausverkauft"
+    "note": "beide Vorstellungen am 1.12. ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -177,7 +177,7 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Kinderkonzert mit Franz Flausenkopf",
-   "summary": "Kinderlieder zum Mitspringen, Mittanzen und Mitsingen mit Franz Flausenkopf. Zwei Vorstellungen am 1. und 3.12., derzeit ohne Ausverkauf.",
+   "summary": "Mitmach-Kinderkonzert mit viel Musik zum Mitspringen, Mittanzen und Mitsingen. Keine Platzangabe ausgewiesen.",
    "topics": [
     "konzert",
     "musik",
@@ -194,8 +194,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "Keine Ausverkauft-Markierung"
+    "status": "unbekannt",
+    "note": "keine Platzangabe ausgewiesen, Tickets im Eventim-Webshop"
    },
    "schedule": {
     "kind": "dates",
@@ -215,10 +215,10 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Das Wasser des Lebens – ein grimmscher Wettstreit unter Brüdern (Ute Weidinger)",
-   "summary": "Märchen der Brüder Grimm über drei Prinzen, die ihren Vater retten wollen, erzählt von Ute Weidinger. Am 1.12. um 10:45 Uhr.",
+   "summary": "Frei erzähltes Märchen der Brüder Grimm über drei Prinzen, die um die Rettung ihres Vaters wetteifern. Keine Platzangabe ausgewiesen.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "vorlesen",
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -230,8 +230,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "Keine Ausverkauft-Markierung"
+    "status": "unbekannt",
+    "note": "keine Platzangabe ausgewiesen"
    },
    "schedule": {
     "kind": "dates",
@@ -247,10 +247,10 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Lasst euch keinen Bären aufbinden (Isa Antz)",
-   "summary": "Geschichten von Grizzlys, Eisbären, Trollen und Sternen, erzählt von Isa Antz. Die Vorstellung am 2.12. um 9:30 Uhr ist ausverkauft, die um 10:45 Uhr ist buchbar.",
+   "summary": "Erzähltheater über Bären, Eisbären, Trolle sowie die Entstehung von Sternen und Feuer. Die Vorstellung um 9:30 Uhr am 2. Dezember ist ausverkauft.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "vorlesen",
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -262,8 +262,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "2.12. 9:30 Uhr ausverkauft; 2.12. 10:45 Uhr buchbar"
+    "status": "unbekannt",
+    "note": "2.12. 9:30 ausverkauft; für 10:45 keine Platzangabe"
    },
    "schedule": {
     "kind": "dates",
@@ -283,10 +283,10 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Unternehmen Weihnachtshase (Michl Zirk)",
-   "summary": "Abenteuerliche Geschichte um Paul und seinen Hasen Willy, erzählt von Michl Zirk. Nur die Vorstellung am 2.12. um 10:45 Uhr ist buchbar; die übrigen sind ausverkauft.",
+   "summary": "Erzähltheater um einen Jungen, seinen Hasen Willy und eine abenteuerliche Reise vor Weihnachten. Die Vorstellungen um 9:30 Uhr am 2. und 8. Dezember sowie um 10:45 Uhr am 8. Dezember sind ausverkauft.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "vorlesen",
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -298,8 +298,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "Buchbar: 2.12. 10:45 Uhr; ausverkauft: 2.12. 9:30, 8.12. 9:30 und 10:45 Uhr"
+    "status": "unbekannt",
+    "note": "mehrere Vorstellungen ausverkauft, 2.12. 10:45 ohne Platzangabe"
    },
    "schedule": {
     "kind": "dates",
@@ -327,10 +327,9 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Die magische Büchertasche (Matze Breun)",
-   "summary": "Zauber- und Erzählvorstellung von Matze Breun mit einer Büchertasche voller Überraschungen. Die Vorstellung am 2.12. ist ausverkauft.",
+   "summary": "Zauberei mit einer Büchertasche voller Überraschungen. Die Vorstellung am 2. Dezember ist ausverkauft.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -343,7 +342,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Vorstellung ausverkauft"
+    "note": "ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -359,10 +358,9 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Das Schokoladenschiff (Holger Trautmann)",
-   "summary": "Nikolausgeschichte über ein riesiges Schokoladenschiff und das braveste Kind der Welt, erzählt von Holger Trautmann. Beide Vorstellungen am 3.12. sind ausverkauft.",
+   "summary": "Nikolausgeschichte über ein riesiges Schokoladenschiff und das bravste Kind der Welt. Beide Vorstellungen am 3. Dezember sind ausverkauft.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -375,7 +373,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Vorstellungen ausverkauft"
+    "note": "beide Vorstellungen am 3.12. ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -395,10 +393,10 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Schneeflöckchen & Samtpfoten (Ines Honsel)",
-   "summary": "Katzenmärchen rund um Frau Müller, Frau Holle und einen als Katze verkleideten Bären, erzählt von Ines Honsel. Die Vorstellung am 4.12. um 9:30 Uhr ist ausverkauft, die um 10:45 Uhr ist buchbar.",
+   "summary": "Katzenmärchen im Winter: ein Kätzchen findet ein neues Zuhause, Frau Holle schaut vorbei. Die Vorstellung um 9:30 Uhr am 4. Dezember ist ausverkauft.",
    "topics": [
-    "theater",
-    "vorlesen"
+    "vorlesen",
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -410,8 +408,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "4.12. 9:30 Uhr ausverkauft; 4.12. 10:45 Uhr buchbar"
+    "status": "unbekannt",
+    "note": "4.12. 9:30 ausverkauft; für 10:45 keine Platzangabe"
    },
    "schedule": {
     "kind": "dates",
@@ -431,9 +429,8 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Wo das Nordlicht wohnt (Gabi Altenbach)",
-   "summary": "Geschichte vom Nordlicht, von Trollen und Eisbären im hohen Norden, erzählt von Gabi Altenbach. Zwei Vorstellungen am 4.12., derzeit ohne Ausverkauf.",
+   "summary": "Erzählung über Trolle, Bären und das Nordlicht im winterlichen Norden. Keine Platzangabe ausgewiesen.",
    "topics": [
-    "theater",
     "vorlesen"
    ],
    "format": "einmalig",
@@ -446,8 +443,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "Keine Ausverkauft-Markierung"
+    "status": "unbekannt",
+    "note": "keine Platzangabe ausgewiesen"
    },
    "schedule": {
     "kind": "dates",
@@ -467,11 +464,11 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Ritter Rost feiert Weihnachten (Patricia Prawit)",
-   "summary": "Mitmach-Geschichte mit viel Musik zum Mitsingen, Mitklatschen und Lachen, von Patricia Prawit. Die Vorstellung am 4.12. ist ausverkauft.",
+   "summary": "Geschichte zum Mitsingen, Mitklatschen und Lachen, mit viel Musik. Die Vorstellung am 4. Dezember ist ausverkauft.",
    "topics": [
-    "theater",
+    "singen",
     "musik",
-    "singen"
+    "vorlesen"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -484,7 +481,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Vorstellung ausverkauft"
+    "note": "ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -500,7 +497,7 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Brummkönig und Teigprinzessin (Thomas Herr)",
-   "summary": "Geschichte aus einem Koffer voll Mehl, Teig und Musik über einen König und eine Prinzessin, erzählt von Thomas Herr. Die Vorstellung am 7.12. um 10:45 Uhr ist ausverkauft, die um 9:30 Uhr ist buchbar.",
+   "summary": "Erzähltheater um einen König und eine Prinzessin, erzählt aus einem Koffer voller Mehl, Teig und Musik. Die Vorstellung um 10:45 Uhr am 7. Dezember ist ausverkauft.",
    "topics": [
     "theater",
     "musik"
@@ -515,8 +512,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "7.12. 9:30 Uhr buchbar; 7.12. 10:45 Uhr ausverkauft"
+    "status": "unbekannt",
+    "note": "7.12. 10:45 ausverkauft; 9:30 ohne Platzangabe"
    },
    "schedule": {
     "kind": "dates",
@@ -536,10 +533,9 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Elefant, Giraffe und Nashorn – Weihnachtsabenteuer am Okawango-Fluss (Cordula Gerndt)",
-   "summary": "Frei und ohne Buch erzählte Geschichte von Cordula Gerndt, ganz ohne Kulisse. Zwei Vorstellungen am 7.12., derzeit ohne Ausverkauf.",
+   "summary": "Mündlich und frei erzählte Weihnachtsgeschichte, ohne Buch und ohne Kulisse. Keine Platzangabe ausgewiesen.",
    "topics": [
-    "vorlesen",
-    "theater"
+    "vorlesen"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -551,8 +547,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "frei",
-    "note": "Keine Ausverkauft-Markierung"
+    "status": "unbekannt",
+    "note": "keine Platzangabe ausgewiesen"
    },
    "schedule": {
     "kind": "dates",
@@ -572,7 +568,7 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Der Nussknacker (Mindanddance)",
-   "summary": "Tanzvorstellung nach dem Nussknacker-Märchen um Clara und ihren Prinzen. Die Vorstellungen am 7. und 8.12. sind ausverkauft.",
+   "summary": "Tanz-Erzähltheater um Clara, den Nussknacker und das Zuckerreich. Die Vorstellungen am 7. und 8. Dezember um 10:00 Uhr sind ausverkauft.",
    "topics": [
     "tanz",
     "theater"
@@ -588,7 +584,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Vorstellungen ausverkauft"
+    "note": "beide Vorstellungen ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -608,7 +604,7 @@
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
    "title": "Tierisch kalt! – Mitmachkonzert (Rainer Wenzel)",
-   "summary": "Mitmachkonzert mit Liedern über Bären, Wölfe und Eulen im Winter, mit Rainer Wenzel. Beide Vorstellungen am 8.12. sind ausverkauft.",
+   "summary": "Mitmachkonzert mit Liedern über Tiere im Winter; Mut und Stimme mitbringen. Beide Vorstellungen am 8. Dezember sind ausverkauft.",
    "topics": [
     "konzert",
     "musik",
@@ -625,7 +621,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Vorstellungen ausverkauft"
+    "note": "beide Vorstellungen am 8.12. ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -644,10 +640,13 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Anders… (Cordelia Schuster, Erzählung)",
-   "summary": "Die Theaterpädagogin erzählt frei und ohne Text Geschichten aus ihrem Koffer; welche Geschichte kommt, entscheidet der Moment. Vier Vorstellungen im Dezember.",
+   "title": "Walking in the Winterwonderland – Kinderkonzert",
+   "summary": "Winter- und Weihnachtslieder aus aller Welt mit Gitarre und Kontrabass, bei dem gemeinsam mitgemacht wird. Zwei Vorstellungen am 17.12.; die Vormittagsvorstellung ist ausverkauft.",
    "topics": [
-    "theater"
+    "konzert",
+    "musik",
+    "singen",
+    "bewegung"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -660,26 +659,18 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets im Eventim-Webshop; nicht als ausverkauft markiert"
+    "note": "17.12. 9:30 ausverkauft; 17.12. 10:45 ohne Ausverkauft-Vermerk. Tickets im Eventim-Webshop."
    },
    "schedule": {
     "kind": "dates",
     "dates": [
      {
-      "start": "2026-12-09T09:30",
-      "end": "2026-12-09T10:15"
+      "start": "2026-12-17T09:30",
+      "end": "2026-12-17T10:15"
      },
      {
-      "start": "2026-12-09T10:45",
-      "end": "2026-12-09T11:30"
-     },
-     {
-      "start": "2026-12-14T09:30",
-      "end": "2026-12-14T10:10"
-     },
-     {
-      "start": "2026-12-14T10:45",
-      "end": "2026-12-14T11:30"
+      "start": "2026-12-17T10:45",
+      "end": "2026-12-17T11:30"
      }
     ]
    }
@@ -687,45 +678,8 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Tierisch kalt! – Mitmachkonzert (Rainer Wenzel)",
-   "summary": "Winterlieder zum Mitmachen über Tiere in Wald und Kälte, mit Mitsingen und Mitmachen. Beide Vorstellungen am 9.12. sind ausverkauft.",
-   "topics": [
-    "konzert",
-    "musik",
-    "singen"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Beide Vorstellungen ausverkauft"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-09T09:30",
-      "end": "2026-12-09T10:15"
-     },
-     {
-      "start": "2026-12-09T10:45",
-      "end": "2026-12-09T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Das geheimnisvolle Päckchen (Zaubertheater Augenblick)",
-   "summary": "Zauberer Hagi öffnet ein rätselhaftes Päckchen, die Kinder helfen ihm dabei. Die Vorstellung am 9.12. ist ausverkauft.",
+   "title": "Leinen los, bye bye, bis bald (Theater Kunststoff)",
+   "summary": "Theaterstück über zwei Freunde, die in ihrer Fantasie eine Reise mit Floß, heißer Wüste und Drachen erleben. Eine Vorstellung am 17.12.; ausverkauft.",
    "topics": [
     "theater"
    ],
@@ -746,560 +700,6 @@
     "kind": "dates",
     "dates": [
      {
-      "start": "2026-12-09T10:00",
-      "end": "2026-12-09T10:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Brummkönig und Teigprinzessin (Thomas Herr)",
-   "summary": "Eine Geschichte von einem König und einer Prinzessin, erzählt aus einem Koffer voller Mehl, Teig und Musik. Beide Vorstellungen am 10.12. sind ausverkauft.",
-   "topics": [
-    "theater",
-    "musik"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Beide Vorstellungen ausverkauft"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-10T09:30",
-      "end": "2026-12-10T10:15"
-     },
-     {
-      "start": "2026-12-10T10:45",
-      "end": "2026-12-10T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Lasst euch keinen Bären aufbinden (Isa Antz)",
-   "summary": "Erzählung über Bären, Eisbären, Sterne und Trolle in winterlicher Stimmung. Beide Vorstellungen am 10.12. sind ausverkauft.",
-   "topics": [
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Beide Vorstellungen ausverkauft"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-10T09:30",
-      "end": "2026-12-10T10:15"
-     },
-     {
-      "start": "2026-12-10T10:45",
-      "end": "2026-12-10T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Tim Mohr & Anka Nachtigall fürs Kinderohr (Konzert)",
-   "summary": "Indie-Folk-Mitmachkonzert mit Gesang, Gitarre und Geige, bei dem die Kinder Teil der Musik werden. Eine Vorstellung am 10.12.",
-   "topics": [
-    "konzert",
-    "musik",
-    "singen"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Tickets im Eventim-Webshop; nicht als ausverkauft markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-10T10:00",
-      "end": "2026-12-10T10:50"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Die Zauberflöte (Kinderoper Nürnberg)",
-   "summary": "Papageno und Tamino wollen Pamina aus der Gewalt der Königin der Nacht befreien, mit Zauberflöte und Glockenspiel. Die Vorstellung um 9 Uhr am 11.12. ist ausverkauft.",
-   "topics": [
-    "theater",
-    "konzert"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Vorstellung 9:00 Uhr ausverkauft; 11:00 Uhr nicht als ausverkauft markiert (Tickets im Eventim-Webshop)"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-11T09:00",
-      "end": "2026-12-11T10:15"
-     },
-     {
-      "start": "2026-12-11T11:00",
-      "end": "2026-12-11T12:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Rumpelstilzchen (Fußtheater Anne Klinge)",
-   "summary": "Fußtheater-Fassung des Märchens um die Müllerstochter Hanna und einen wunderlichen kleinen Mann. Die Vorstellung um 9:30 Uhr am 11.12. ist ausverkauft.",
-   "topics": [
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Vorstellung 9:30 Uhr ausverkauft; 10:45 Uhr nicht als ausverkauft markiert (Tickets im Eventim-Webshop)"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-11T09:30",
-      "end": "2026-12-11T10:15"
-     },
-     {
-      "start": "2026-12-11T10:45",
-      "end": "2026-12-11T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Stardust (Ben van Haeff)",
-   "summary": "Zweisprachiges Mitmachkonzert (Songs englisch, Dialog deutsch) auf der Suche nach dem Sternenstaub. Die Vorstellung um 9:30 Uhr am 14.12. ist ausverkauft.",
-   "topics": [
-    "konzert",
-    "musik",
-    "singen"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Vorstellung 9:30 Uhr ausverkauft; 10:45 Uhr nicht als ausverkauft markiert (Tickets im Eventim-Webshop)"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-14T09:30",
-      "end": "2026-12-14T10:10"
-     },
-     {
-      "start": "2026-12-14T10:45",
-      "end": "2026-12-14T11:25"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Schwanensee (Nürnberger Tanztheater)",
-   "summary": "Ballett-Märchen um Prinz Siegfried und die verzauberte Prinzessin Odette. Eine Vorstellung am 14.12.",
-   "topics": [
-    "theater",
-    "tanz"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Tickets im Eventim-Webshop; nicht als ausverkauft markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-14T10:00",
-      "end": "2026-12-14T10:50"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Endlich gute Kinderlieder (Toni Komisch)",
-   "summary": "Liedermacher mit lustigen Texten und phantasievollen Mitmachliedern für die ganze Familie. Beide Vorstellungen am 15.12. sind ausverkauft.",
-   "topics": [
-    "konzert",
-    "musik",
-    "singen"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Beide Vorstellungen ausverkauft"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-15T09:30",
-      "end": "2026-12-15T10:15"
-     },
-     {
-      "start": "2026-12-15T10:45",
-      "end": "2026-12-15T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Was Sachen so machen (Thalias Kompagnons)",
-   "summary": "Tristan Vogt verwandelt Dinge aus einer Schatzkiste in Spielfiguren mit eigenem Kopf. Die Vorstellung um 9:30 Uhr am 15.12. ist ausverkauft.",
-   "topics": [
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Vorstellung 9:30 Uhr ausverkauft; 10:30 und 11:30 Uhr nicht als ausverkauft markiert (Tickets im Eventim-Webshop)"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-15T09:30",
-      "end": "2026-12-15T10:00"
-     },
-     {
-      "start": "2026-12-15T10:30",
-      "end": "2026-12-15T11:00"
-     },
-     {
-      "start": "2026-12-15T11:30",
-      "end": "2026-12-15T12:00"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Janko – Ein musikalisches Märchen (Comoedia Mundi)",
-   "summary": "Loes Snijders erzählt, spielt und singt die Geschichte des hölzernen Janko nach einem slowakischen Märchen. Eine Vorstellung am 15.12.",
-   "topics": [
-    "theater",
-    "musik"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Tickets im Eventim-Webshop; nicht als ausverkauft markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-15T10:00",
-      "end": "2026-12-15T10:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Tischlein deck dich (Mosers Marionettentheater)",
-   "summary": "Marionettenspiel nach dem Märchen von drei Brüdern, einer Ziege und drei zauberhaften Geschenken. Beide Vorstellungen am 16.12. sind ausverkauft.",
-   "topics": [
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Beide Vorstellungen ausverkauft"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-16T09:00",
-      "end": "2026-12-16T09:45"
-     },
-     {
-      "start": "2026-12-16T10:45",
-      "end": "2026-12-16T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Mission Klobürste (Kollektiv Papperlapapp)",
-   "summary": "Zwei Agentinnen nehmen Kinder mit auf eine humorvolle, mitmachende Entdeckungsreise durch die Verdauung. Die Vorstellung um 9:30 Uhr am 16.12. ist ausverkauft.",
-   "topics": [
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Vorstellung 9:30 Uhr ausverkauft; 10:45 Uhr nicht als ausverkauft markiert (Tickets im Eventim-Webshop)"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-16T09:30",
-      "end": "2026-12-16T10:10"
-     },
-     {
-      "start": "2026-12-16T10:45",
-      "end": "2026-12-16T11:25"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Tim Mohr fürs Kinderohr (Tim Mohr)",
-   "summary": "Solo-Mitmachkonzert mit Ohrwürmern, Gitarre und kleinen Geschichten zum Mitsingen. Eine Vorstellung am 16.12.",
-   "topics": [
-    "konzert",
-    "musik",
-    "singen"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Tickets im Eventim-Webshop; nicht als ausverkauft markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-16T10:00",
-      "end": "2026-12-16T10:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Oscar der Gaukler (Marc Vogel)",
-   "summary": "Gaukler mit Jonglage, Diabolo und einem wackeligen Balanceakt auf dem Lastenrad, viel Witz und gute Laune. Eine Vorstellung am 17.12.",
-   "topics": [
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Tickets im Eventim-Webshop; nicht als ausverkauft markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-17T09:00",
-      "end": "2026-12-17T09:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Walking in the Winterwonderland – Kinderkonzert",
-   "summary": "Winter- und Weihnachtslieder aus aller Welt zum Mitsingen und Mitmachen. Zwei Vorstellungen am 17.12.; die Vorstellung um 9:30 Uhr ist ausverkauft.",
-   "topics": [
-    "musik",
-    "konzert",
-    "singen"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Vorstellung 17.12. 9:30 ausverkauft; für 10:45 keine Angabe. Tickets im Eventim-Webshop."
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-17T09:30",
-      "end": "2026-12-17T10:15"
-     },
-     {
-      "start": "2026-12-17T10:45",
-      "end": "2026-12-17T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "sternenhaus-kuf",
-   "venueId": "sternenhaus-kuf",
-   "title": "Leinen los, bye bye, bis bald – Theater Kunststoff",
-   "summary": "Theaterstück über ein Reiseabenteuer zweier Freunde in ihrer Fantasie, rund 35 Minuten. Die Vorstellung ist ausverkauft.",
-   "topics": [
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "ausverkauft"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
       "start": "2026-12-17T10:00",
       "end": "2026-12-17T10:35"
      }
@@ -1309,15 +709,15 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Oscar der Gaukler – Marc Vogel",
-   "summary": "Komische Gaukler-Show mit Jonglage, Diabolo und Balanceakt auf dem Lastenrad. Eine Vorstellung am 17.12.",
+   "title": "Oscar der Gaukler (Marc Vogel)",
+   "summary": "Gaukler mit Jonglage, Diabolo und einer wackeligen Balancenummer auf einem Lastenrad, viel Humor und Lachen. Eine Vorstellung am 17.12.",
    "topics": [
     "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1325,7 +725,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets im Eventim-Webshop; keine Platzangabe."
+    "note": "Keine Platzangabe; Tickets im Eventim-Webshop"
    },
    "schedule": {
     "kind": "dates",
@@ -1340,17 +740,18 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Winterkonzert für Kinder – Ralf Trautner & Christian Barthel",
-   "summary": "Bekannte und neue Kinderlieder auf eine musikalische Reise durch den Winter bis Weihnachten, mit Bewegung und Mitsingen. Eine Vorstellung am 18.12.",
+   "title": "Winterkonzert für Kinder (Ralf Trautner & Christian Barthel)",
+   "summary": "Bekannte und neue Kinderlieder auf einer musikalischen Reise durch den Winter bis Weihnachten, mit Bewegung, Mitsingen und Tanzen. Eine Vorstellung am 18.12.; ausverkauft.",
    "topics": [
-    "musik",
     "konzert",
-    "singen"
+    "singen",
+    "musik",
+    "tanz"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1358,7 +759,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "ausverkauft"
+    "note": "Vorstellung ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -1373,15 +774,15 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Die magische Büchertasche – Matze Breun",
-   "summary": "Zauberei mit einer Büchertasche voller Überraschungen für kleine und große Zuschauer. Eine Vorstellung am 18.12.",
+   "title": "Die magische Büchertasche (Matze Breun)",
+   "summary": "Zauberer Matze Breun holt aus seiner Büchertasche allerlei Überraschungen hervor. Eine Vorstellung am 18.12.; ausverkauft.",
    "topics": [
     "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1389,7 +790,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "ausverkauft"
+    "note": "Vorstellung ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -1404,8 +805,8 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Der Grüffelo – Theater Lanzelot",
-   "summary": "Theaterfassung der Geschichte der Maus, die sich einen furchterregenden Freund erfindet. Eine Vorstellung am 18.12.",
+   "title": "Der Grüffelo (Theater Lanzelot)",
+   "summary": "Die kleine Maus Max erfindet einen furchterregenden Freund namens Grüffelo, um sich im Wald zu schützen. Eine Vorstellung am 18.12.; ausverkauft.",
    "topics": [
     "theater",
     "vorlesen"
@@ -1413,7 +814,7 @@
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1421,7 +822,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "ausverkauft"
+    "note": "Vorstellung ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -1436,15 +837,15 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Das Schokoladenschiff – Holger Trautmann",
-   "summary": "Erzählstück über den Nikolaus, dem die Süßigkeiten ausgehen. Zwei Vorstellungen am 21.12.; die um 9:30 Uhr ist ausverkauft.",
+   "title": "Das Schokoladenschiff (Holger Trautmann)",
+   "summary": "Der Nikolaus hat keine Süßigkeiten mehr übrig und versucht, ein riesiges Schokoladenschiff aus dem Schaufenster zu bekommen. Zwei Vorstellungen am 21.12.; die erste ist ausverkauft.",
    "topics": [
     "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1452,7 +853,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Vorstellung 21.12. 9:30 ausverkauft; für 10:45 keine Angabe. Tickets im Eventim-Webshop."
+    "note": "21.12. 9:30 ausverkauft; 21.12. 10:45 ohne Ausverkauft-Vermerk. Tickets im Eventim-Webshop."
    },
    "schedule": {
     "kind": "dates",
@@ -1471,17 +872,18 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Kinderkonzert – Franz Flausenkopf",
+   "title": "Kinderkonzert (Franz Flausenkopf)",
    "summary": "Kinderlieder zum Mitspringen, Mittanzen und Mitsingen. Zwei Vorstellungen am 21.12.",
    "topics": [
-    "musik",
+    "konzert",
     "singen",
+    "musik",
     "tanz"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1489,7 +891,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe. Tickets im Eventim-Webshop."
+    "note": "Keine Platzangabe; Tickets im Eventim-Webshop"
    },
    "schedule": {
     "kind": "dates",
@@ -1508,16 +910,17 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Dickens: Eine Weihnachtsgeschichte – Erzählkonzert",
-   "summary": "Szenisches Erzählkonzert nach Dickens mit Musik und Märchenmotiven, zum Teil interaktiv. Eine Vorstellung am 21.12.",
+   "title": "Dickens: Eine Weihnachtsgeschichte (Erzählkonzert)",
+   "summary": "Dickens' Weihnachtsgeschichte als szenisches Erzählkonzert mit Musik und teils interaktiven Elementen. Eine Vorstellung am 21.12.; ausverkauft.",
    "topics": [
     "theater",
-    "musik"
+    "konzert",
+    "vorlesen"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1525,7 +928,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "ausverkauft"
+    "note": "Vorstellung ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -1540,8 +943,8 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Brummkönig und Teigprinzessin – Thomas Herr",
-   "summary": "Musikalisches Erzähltheater aus einem Koffer voller Mehl, Teig und Musik. Zwei Vorstellungen am 22.12.; die um 9:30 Uhr ist ausverkauft.",
+   "title": "Brummkönig und Teigprinzessin (Thomas Herr)",
+   "summary": "Ein König und eine Prinzessin, die nicht können, was der oder die andere sich wünscht, erzählt aus einem Koffer voller Mehl, Teig und Musik. Zwei Vorstellungen am 22.12.; die erste ist ausverkauft.",
    "topics": [
     "theater",
     "musik"
@@ -1549,7 +952,7 @@
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1557,7 +960,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Vorstellung 22.12. 9:30 ausverkauft; für 10:45 keine Angabe. Tickets im Eventim-Webshop."
+    "note": "22.12. 9:30 ausverkauft; 22.12. 10:45 ohne Ausverkauft-Vermerk. Tickets im Eventim-Webshop."
    },
    "schedule": {
     "kind": "dates",
@@ -1576,15 +979,16 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Unternehmen Weihnachtshase – Michl Zirk",
-   "summary": "Erzählstück über einen Jungen und seinen Hasen, die vor dem Weihnachtsbraten verschwinden. Zwei Vorstellungen am 22.12.; die um 9:30 Uhr ist ausverkauft.",
+   "title": "Unternehmen Weihnachtshase (Michl Zirk)",
+   "summary": "Paul und sein Hase Willy verschwinden, nachdem der Vater den Hasen zu Weihnachten schlachten will; eine lockere, abenteuerliche Geschichte. Zwei Vorstellungen am 22.12.; die erste ist ausverkauft.",
    "topics": [
-    "theater"
+    "theater",
+    "vorlesen"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1592,7 +996,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Vorstellung 22.12. 9:30 ausverkauft; für 10:45 keine Angabe. Tickets im Eventim-Webshop."
+    "note": "22.12. 9:30 ausverkauft; 22.12. 10:45 ohne Ausverkauft-Vermerk. Tickets im Eventim-Webshop."
    },
    "schedule": {
     "kind": "dates",
@@ -1611,8 +1015,8 @@
   {
    "providerId": "sternenhaus-kuf",
    "venueId": "sternenhaus-kuf",
-   "title": "Artus und das magische Schwert – Musical Company",
-   "summary": "Musical über den jungen König Artus, den der Zauberer Merlin begleitet. Eine Vorstellung am 22.12.",
+   "title": "Artus und das magische Schwert (Musical)",
+   "summary": "Musical über den jungen Artus, der mit Zauberer Merlin lernt, ein guter König zu sein, gegen den machtbesessenen Mordred. Eine Vorstellung am 22.12.",
    "topics": [
     "theater",
     "musik"
@@ -1620,7 +1024,7 @@
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+   "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
    "age": {
     "minMonths": 24,
@@ -1628,7 +1032,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe. Tickets im Eventim-Webshop."
+    "note": "Keine Platzangabe; Tickets im Eventim-Webshop"
    },
    "schedule": {
     "kind": "dates",
@@ -1641,10 +1045,10 @@
    }
   }
  ],
- "inputHash": "00299488c7750845665de35d335f18f08f049b39377404fe12d53cdcd9f6b4bd",
+ "inputHash": "9cd64875f0e8fb6f5411e6dcf4a68fbab610173678a852be3a47a3dabcc86bdb",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T08:41:48+02:00",
- "changedAt": "2026-10-12T08:41:48+02:00",
+ "checkedAt": "2026-10-12T09:51:26+02:00",
+ "changedAt": "2026-10-12T09:51:26+02:00",
  "sources": []
 }
