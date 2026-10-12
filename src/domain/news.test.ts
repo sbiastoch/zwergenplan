@@ -22,7 +22,9 @@ const search = (state: Partial<FilterState>): FilterState => ({ ...EMPTY_FILTER,
 const MUSIK = search({ categories: ["musik"] });
 const BUEHNE = search({ categories: ["buehne"] });
 const BABYKURSE = search({ categories: ["babykurse"] });
-const MUSIK_20 = search({ categories: ["musik"], reachLimit: { kind: "minuten", value: 20 } });
+/** Krabbelreime ist seit Plan 0037 `buecher`, nicht mehr `musik`: Musik und Bücher zusammen treffen beide Fixtures. */
+const MUSIK_BUECHER = search({ categories: ["musik", "buecher"] });
+const MUSIK_20 = search({ categories: ["musik", "buecher"], reachLimit: { kind: "minuten", value: 20 } });
 
 /** Wegzeit wie in filter.test.ts: Bibliothek 15,6 Min., Musikschule 29,6 Min. */
 const MINUTES: Record<string, number> = {
@@ -111,11 +113,16 @@ describe("offersInWeek", () => {
 describe("weeklyText – neue Treffer", () => {
   it("mit Abos: zählt die neuen, die zu einem Abo und zum Alter passen", () => {
     const fresh = [byKey("krabbeltreff"), byKey("musikgarten-1"), byKey("krabbelreime"), byKey("babykonzert-advent")];
-    expect(text({ fresh, searches: [MUSIK], birthDate: BIRTH_14 })).toEqual({
+    expect(text({ fresh, searches: [MUSIK_BUECHER, BUEHNE], birthDate: BIRTH_14 })).toEqual({
       title: "3 neue Angebote für deine Suchen",
       body: "Musikgarten 1 (1–2 Jahre), Krabbelreime & Fingerspiele und 1 weiteres",
       hits: [byKey("musikgarten-1").id, byKey("krabbelreime").id, byKey("babykonzert-advent").id],
     });
+  });
+
+  it("ein Abo kat=musik trifft nur die Hauptkategorie, das Babykonzert (buehne) nicht (Plan 0037, E9)", () => {
+    const fresh = [byKey("musikgarten-1"), byKey("babykonzert-advent")];
+    expect(text({ fresh, searches: [MUSIK] }).hits).toEqual([byKey("musikgarten-1").id]);
   });
 
   it("mit Abos: ein Abo genügt (ODER)", () => {
@@ -128,7 +135,7 @@ describe("weeklyText – neue Treffer", () => {
   });
 
   it("mit Abos: Singular", () => {
-    expect(text({ fresh: [byKey("krabbelreime")], searches: [MUSIK] })).toMatchObject({
+    expect(text({ fresh: [byKey("krabbelreime")], searches: [MUSIK_BUECHER] })).toMatchObject({
       title: "1 neues Angebot für deine Suchen",
       body: "Krabbelreime & Fingerspiele",
     });
@@ -171,7 +178,9 @@ describe("weeklyText – neue Treffer", () => {
 
   it("vor der Geburt: das Alter zählt nicht, die Abos schon", () => {
     const fresh = [byKey("musikgarten-1"), byKey("krabbelreime"), byKey("pekip-herbst")];
-    expect(text({ fresh, searches: [MUSIK], birthDate: "2026-12-01" }).title).toBe("2 neue Angebote für deine Suchen");
+    expect(text({ fresh, searches: [MUSIK_BUECHER], birthDate: "2026-12-01" }).title).toBe(
+      "2 neue Angebote für deine Suchen",
+    );
     expect(text({ fresh, birthDate: "2026-12-01" }).title).toBe("3 neue Angebote im Zwergenplan");
   });
 
@@ -200,12 +209,12 @@ describe("weeklyText – neue Treffer", () => {
 
 describe("weeklyText – nichts Neues", () => {
   it("mit Abos: zählt passende Angebote der nächsten 7 Tage", () => {
-    expect(text({ fresh: [byKey("krabbeltreff")], searches: [MUSIK] })).toEqual({
+    expect(text({ fresh: [byKey("krabbeltreff")], searches: [MUSIK_BUECHER] })).toEqual({
       title: "Diese Woche nichts Neues für deine Suchen",
       body: "1 passendes Angebot in den nächsten 7 Tagen.",
       hits: [],
     });
-    expect(text({ searches: [MUSIK, search({ categories: ["krabbel-spielgruppen"] })] }).body).toBe(
+    expect(text({ searches: [MUSIK_BUECHER, search({ categories: ["krabbel-spielgruppen"] })] }).body).toBe(
       "2 passende Angebote in den nächsten 7 Tagen.",
     );
     expect(text({ searches: [BUEHNE] }).body).toBe("In den nächsten 7 Tagen nichts Passendes.");

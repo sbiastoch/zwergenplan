@@ -118,6 +118,11 @@ describe("applyFilters", () => {
     ]);
   });
 
+  it("filtert die Kategorie nur über die Hauptkategorie category (Plan 0037, E9)", () => {
+    expect(ids({ ...EMPTY_FILTER, categories: ["musik"] })).toEqual(["musikgarten-1"]);
+    expect(ids({ ...EMPTY_FILTER, categories: ["krabbel-spielgruppen"] })).toEqual(["krabbeltreff"]);
+  });
+
   it("filtert nach Anmeldung", () => {
     expect(ids({ ...EMPTY_FILTER, registration: ["ohne-anmeldung"] })).toEqual([
       "krabbeltreff",
@@ -150,6 +155,9 @@ describe("matchesFilter", () => {
     expect(matching({ ...EMPTY_FILTER, categories: ["buecher", "buehne"] })).toEqual(
       ["krabbelreime", "kuckuck-im-nest", "babykonzert-advent"].sort(),
     );
+    // nur die Hauptkategorie zählt (Plan 0037, E9): Babykonzert ist buehne, Krabbelreime buecher
+    expect(matching({ ...EMPTY_FILTER, categories: ["musik"] })).toEqual(["musikgarten-1"]);
+    expect(matching({ ...EMPTY_FILTER, categories: ["krabbel-spielgruppen"] })).toEqual(["krabbeltreff"]);
   });
 
   it("ist für kommende Angebote genau applyFilters", () => {

@@ -2,7 +2,7 @@ import { nextSession } from "./agenda.ts";
 import { type DateRange, dateRange, inDateRange } from "./date-range.ts";
 import { LIMIT_MINUTES, type ReachFn, type ReachLimit, type ReachTarget, withinLimit } from "./reach.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
-import { CATEGORIES, type Category, categoriesOf } from "./topics.ts";
+import { CATEGORIES, type Category } from "./topics.ts";
 
 export const FORMATS = ["kurs", "regelmaessig", "einmalig"] as const satisfies readonly Format[];
 const REGISTRATIONS = ["mit-anmeldung", "ohne-anmeldung"] as const satisfies readonly Registration[];
@@ -140,10 +140,8 @@ export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: Filt
   if (!matches(state.formats, offer.format)) return false;
   if (!matches(state.registration, offer.registration)) return false;
   if (!matches(state.cost, offer.cost)) return false;
-  if (state.categories.length > 0) {
-    const cats = categoriesOf(offer.topics);
-    if (!cats.some((c) => state.categories.includes(c))) return false;
-  }
+  // nur die Hauptkategorie (Plan 0037, E9; ADR 0030): Etikett und Filter sind immer gleich
+  if (state.categories.length > 0 && !state.categories.includes(offer.category)) return false;
   const limit = state.reachLimit;
   if (reach && limit && withinLimit(reach(offer.venue), limit) === false) return false;
   return true;

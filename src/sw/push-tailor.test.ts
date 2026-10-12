@@ -90,7 +90,7 @@ describe("tailorPush", () => {
   it("mit Abo und Alter", async () => {
     const { e } = env({
       seenIds: without("musikgarten-1", "krabbelreime", "pekip-herbst"),
-      searches: '["kat=musik"]',
+      searches: '["kat=musik,buecher"]',
       birthDate: "2025-08-05",
     });
     const result = await run(e);
@@ -100,7 +100,7 @@ describe("tailorPush", () => {
   it("Abo mit Wegzeit ab einem Stadtteil: die Musikschule (29,6 Min.) fällt heraus", async () => {
     const { e, reachCalls } = env({
       seenIds: without("musikgarten-1", "krabbelreime"),
-      searches: '["kat=musik&wegzeit=20"]',
+      searches: '["kat=musik,buecher&wegzeit=20"]',
       origin: "gostenhof",
     });
     const result = await run(e);
@@ -113,7 +113,7 @@ describe("tailorPush", () => {
   it("Abo mit Wegzeit ohne Startpunkt: die Grenze wirkt nicht", async () => {
     const { e, reachCalls } = env({
       seenIds: without("musikgarten-1", "krabbelreime"),
-      searches: '["kat=musik&wegzeit=20"]',
+      searches: '["kat=musik,buecher&wegzeit=20"]',
     });
     const result = await run(e);
     expect(result.kind === "text" && result.text.hits).toHaveLength(2);
