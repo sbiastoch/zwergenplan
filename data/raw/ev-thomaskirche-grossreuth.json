@@ -3,8 +3,8 @@
   {
    "providerId": "ev-thomaskirche-grossreuth",
    "venueId": "ev-thomaskirche-grossreuth",
-   "title": "Krabbelgruppe (montags 15:30–17:30)",
-   "summary": "Spielen, Krabbeln, Musik und Fingerspiele sowie Erfahrungsaustausch für Eltern mit kleinen Kindern im kleinen Saal des Gemeindehauses. Die Termine pausieren über Weihnachten und Neujahr.",
+   "title": "Krabbelgruppe (montags, Gemeindehaus Thomaskirche)",
+   "summary": "Spielen, Krabbeln, Musik und Fingerspiele für Kleinkinder mit Zeit zum Austausch unter Eltern. Die Termine liegen bis Januar 2027 und pausieren in den Weihnachtsferien.",
    "topics": [
     "krabbelgruppe",
     "musik",
@@ -17,7 +17,7 @@
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004133",
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Rückfragen beim Anbieter über die Gemeinde."
+    "note": "In der Quelle steht keine Platzangabe oder Anmeldeinfo; bei Unsicherheit beim Anbieter nachfragen."
    },
    "schedule": {
     "kind": "dates",
@@ -81,11 +81,10 @@
   {
    "providerId": "ev-thomaskirche-grossreuth",
    "venueId": "ev-thomaskirche-grossreuth",
-   "title": "Eltern-Kind Yoga (dienstags 15:15–16:00)",
-   "summary": "Yoga für Eltern gemeinsam mit ihrem Kind im großen Saal des Gemeindehauses, sechs Termine von November bis Mitte Dezember. Anmeldung und Preis sind in der Quelle nicht angegeben.",
+   "title": "Eltern-Kind-Yoga-Kurs (dienstags, ab 10.11.2026)",
+   "summary": "Gemeinsame Yoga-Übungen für Eltern und Kleinkinder in sechs Terminen von 15:15 bis 16:00 Uhr im großen Saal des Gemeindehauses.",
    "topics": [
-    "yoga-mit-baby",
-    "bewegung"
+    "yoga-mit-baby"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -94,7 +93,7 @@
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8048440",
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Anfrage beim Anbieter über die Gemeinde."
+    "note": "Keine Platzangabe in der Quelle; Anmeldung und Preis beim Anbieter erfragen."
    },
    "schedule": {
     "kind": "dates",
@@ -128,11 +127,32 @@
    "via": "evtermine"
   }
  ],
- "inputHash": "d3ea06089180f40dfa69bb78e56ada515a24874b2070a2a71669ec7eea765241",
+ "inputHash": "f3bac3f19714bf7cb4cc07b7c23b3a65e3039206b65a20c7b21a49215bdca270",
+ "dated": {
+  "2026-10-12": "5a8e99ed8dfcc3f589baed2e45cb71e0b83e061e42058166eedad3508baa0b30",
+  "2026-10-19": "6dcd7cbc6e6a6c10fd4750caca1100a9690d548a8bfccb16419f2f540e4ce573",
+  "2026-10-26": "025648759bf05d3373efc6f3f658536958bce53c7ea421d81a56ac498094819d",
+  "2026-11-09": "bec37f84e89643f8b836674f7c2a6f77db68241059d69a7b1e5f8b0c22d17898",
+  "2026-11-10": "c31f4b3ce06935d216f3ac8c5e40a67b2be59c6b766d865c5ac81918be350f25",
+  "2026-11-16": "d9b9381bc511dcdabef91553ffa337bde3565b66b763cc5cfee335075d1e867c",
+  "2026-11-17": "0b1a0ef59c4f30a74f89984e1a5b8a7715019cdaa1ac9f17078f46019168ba47",
+  "2026-11-23": "0e3320677ea48691d7dbc3f3a31ffecf978786aebb5e061eb225a90e0023d5a2",
+  "2026-11-24": "98efd9c9b1520c0fcea24b83502baefd7b1f4935a773d74a7c7bbe3c44d2b3f6",
+  "2026-11-30": "591fd02abe0d3fb3528faeb93ad5f9e586aa199aeea94ea66169cd476853ee2a",
+  "2026-12-01": "25bd4d23f233152efed4de3b090f019ba045afa74722fa15d1d614185bdfc54d",
+  "2026-12-07": "b2a72cf94d3c7b439b6a0797f430941c1c48f01e833e9a23a347128936dc2117",
+  "2026-12-08": "e732f6ed826a1c9d350ea63ed88c28c7af1b6036e0893a0c907cbd3e0623cf45",
+  "2026-12-14": "3186d02b6c3462745974aa5631a6d0e05aec13ca1d41d751b5c4773e14229d0d",
+  "2026-12-15": "09edbacfbc7c0375769d6551a482ce88c4ef9acfcf91e7cd13509ed9655e975b",
+  "2026-12-21": "36ec28c8c5d03fa67ddfc607a448b38b1be4419b00b481b22ce97b1211946a8f",
+  "2027-01-11": "1cd4f302888b3b20b939ec77c4340fcc9bdec19904d73987a9fc0e2213657fb1",
+  "2027-01-18": "87ea7a3e5a79714a3f27459728dc92569c98d888c647476f2d6d0adb64a828b4",
+  "2027-01-25": "89a04a780d4882f7f8577313f5afb8366e68d8c9d16dbc1aee72ce7a73068bb2"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "evtermine"
  ]

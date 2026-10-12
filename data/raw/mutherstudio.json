@@ -223,8 +223,10 @@
  ],
  "inputHash": "c4208ad9f322d49a4fae89d87c1ff36a8c744c9aac512d6f6df8c23eabdc7308",
  "model": "haiku",
- "status": "ok",
+ "status": "fehler",
+ "reason": "https://mutherstudio.com/baby-and-kinderkurse-12-36-monate: HTTP 403 (+3 weitere)",
  "checkedAt": "2026-10-11T14:06:10+02:00",
  "changedAt": "2026-10-11T14:06:10+02:00",
+ "failingSince": "2026-10-12T08:41:48+02:00",
  "sources": []
 }

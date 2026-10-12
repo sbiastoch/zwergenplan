@@ -3,14 +3,14 @@
   {
    "providerId": "ev-laufamholz-miniclub",
    "venueId": "ev-laufamholz-miniclub",
-   "title": "Miniclub Donnerstag 15:00–16:30 Uhr",
-   "summary": "Eltern-Kind-Gruppe mit Austausch über den Erziehungsalltag, Liedern und Geschichten; die Kinder sammeln erste Gruppenerfahrungen. Kosten und Anmeldung stehen nicht im Kalendereintrag, bitte bei der Gemeinde erfragen.",
+   "title": "Miniclub Donnerstag (Eltern mit Kindern bis 3 Jahre)",
+   "summary": "Eltern-Kind-Gruppe mit Austausch über den Erziehungsalltag, Anregungen zu Ernährung, Sauberkeit und Sprachförderung sowie gemeinsamen Liedern und Geschichten. Termine donnerstags nachmittags.",
    "topics": [
     "eltern-kind-gruppe",
-    "spielgruppe"
+    "singen"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
+   "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8109111",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109111",
@@ -20,7 +20,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe im Kalendereintrag; bitte bei der Gemeinde (Gemeindehaus Laufamholz) nachfragen."
+    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, bei Fragen direkt an die Gemeinde wenden."
    },
    "schedule": {
     "kind": "dates",
@@ -56,14 +56,14 @@
   {
    "providerId": "ev-laufamholz-miniclub",
    "venueId": "ev-laufamholz-miniclub",
-   "title": "Miniclub Freitag 9:00–10:30 Uhr",
-   "summary": "Eltern-Kind-Gruppe mit Austausch über den Erziehungsalltag, Liedern und Geschichten; die Kinder sammeln erste Gruppenerfahrungen. Kosten und Anmeldung stehen nicht im Kalendereintrag, bitte bei der Gemeinde erfragen.",
+   "title": "Miniclub Freitag (Eltern mit Kindern bis 3 Jahre)",
+   "summary": "Eltern-Kind-Gruppe mit Austausch über den Erziehungsalltag, Anregungen zu Ernährung, Sauberkeit und Sprachförderung sowie gemeinsamen Liedern und Geschichten. Termine freitags vormittags.",
    "topics": [
     "eltern-kind-gruppe",
-    "spielgruppe"
+    "singen"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
+   "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8109111",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109111",
@@ -73,7 +73,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe im Kalendereintrag; bitte bei der Gemeinde (Gemeindehaus Laufamholz) nachfragen."
+    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, bei Fragen direkt an die Gemeinde wenden."
    },
    "schedule": {
     "kind": "dates",
@@ -123,11 +123,29 @@
    "via": "evtermine"
   }
  ],
- "inputHash": "d53e9e0cd2aba3037c12190eefab0f229f6286a446f1509fc0f0c4f92ef4bf7c",
+ "inputHash": "43821cc4a70539667331635f768a7f775998a6afad649465999d9dd24458a140",
+ "dated": {
+  "2026-10-15": "c78ac6bb1d6bfe2750098d4185037d2a51e31a8a4427f8484479512618e97dd3",
+  "2026-10-16": "c481d6668752299feef5406a94382a2a02aabd8c673ba2982c2d6bded4f0068c",
+  "2026-10-22": "44480b6c19a4e4a5522cbda745323f97b6cfb2a1b276a4b20ef315e792f41f06",
+  "2026-10-23": "df9bba2db26470402b3b02975b96084677574475f8dc9643b2ecc87913c56a5c",
+  "2026-10-29": "40e1407a176ed8d1b74c4d945f883a17d62fc3df9f48ab1e4f1c8a3a21a5f2c5",
+  "2026-10-30": "781c91f89fdde743ee8b73b85c282c5ad1176a9ed4051699f05e0a92b726c01b",
+  "2026-11-05": "0eaa558dc70eed93219e4b35ac8741d38306f4fc4c6c6d9a442598977f7e1bf9",
+  "2026-11-06": "a6fee9f986a5226e5592bff7663b3de138a19eeac8b89ceab22ad62257acfc29",
+  "2026-11-12": "d3ec370540ecf83c2bee241153fc24794d9fb57c1cf35662e00cf8d6ef1dbe14",
+  "2026-11-13": "f6143c3e6129fcb62dfbf72f39fcdd0cea44585b484b0715004f6fd25ad79107",
+  "2026-11-19": "4c019bc3bc072adc83a3a80602cb310a9c603c8b7c19e968848fcbf1cc251414",
+  "2026-11-20": "16cc74d00a0281becaa38e14fa31b9824c662a6eb8011e1a41576e450b1d69e3",
+  "2026-11-27": "86049bfe926a304f52391aa86022dc4cb7e53adf0d36faf1d69f279e1e4f95d0",
+  "2026-12-04": "1290904c493a71f8a1f542dd13213e1ae155a176dde9533a06c08ef9b864c9e1",
+  "2026-12-11": "f0012620d352569cf31b0890eb36154a26d401aca275983e9aff72fe860504ca",
+  "2026-12-18": "1e55e66e5dd340b8c260de4a1cd48ed3a9127dadbebfea3f64a25f9feec842e9"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "evtermine"
  ]

@@ -3,14 +3,14 @@
   {
    "providerId": "ev-buchenbuehl-miniclub",
    "venueId": "ev-buchenbuehl-miniclub",
-   "title": "Miniclub Himmelfahrtskirche (mittwochs 15 Uhr, bis Dezember)",
-   "summary": "Spielerisches Training von Sinnen, Motorik und Miteinander für Krabbelkinder. Termine mittwochs 15:00–16:30 bis 23. Dezember 2026. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+   "title": "Miniclub Himmelfahrtskirche Buchenbühl (Krabbelalter)",
+   "summary": "Spiel- und Bewegungsangebot für Krabbelkinder zum Training von Sinnen, Motorik und sozialem Miteinander, laut Eintrag mittwochs 15:00–16:30 Uhr. Angaben zu Anmeldung und Kosten fehlen im Eintrag.",
    "topics": [
-    "eltern-kind-gruppe",
+    "krabbelgruppe",
     "bewegung"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
+   "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8231115",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8231115",
@@ -20,7 +20,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung. Beim Veranstalter (Ev. Himmelfahrtskirche Buchenbühl) erfragen."
+    "note": "Keine Angabe zur Platzlage im Eintrag; Anfrage bei der Kirchengemeinde Buchenbühl (Baiersdorfer Straße 8)."
    },
    "schedule": {
     "kind": "dates",
@@ -74,11 +74,24 @@
    "via": "evtermine"
   }
  ],
- "inputHash": "cdf93286c757d3a5e8eacdcaafe98b1f83e7fd37fe570bb047a083ddaeb2e9c5",
+ "inputHash": "26db75e808e9292efdc072cee03c375cccde89e21707f76f0d20a43cb2c15168",
+ "dated": {
+  "2026-10-14": "b2557cebe03f8a05de6f481b3ccef870727b1fddbcd1dcc030263e5410f44674",
+  "2026-10-21": "09074771da4528d5ed614b276c4935bb772d7eb85602e874e06d63b966d52353",
+  "2026-10-28": "dd3e54d4225f94541db7c2bc9878799bcd13a50e5ec8b550253e7802c309ea62",
+  "2026-11-04": "bcd7795f03bc7435c1f18c9bc8e121807cf0b173d5252f85815812b656c1d6d0",
+  "2026-11-11": "44e25a57064444080012d6eba354e73339fd6f3232fb469aa661055b912f33a7",
+  "2026-11-18": "0749975fd3977fd22ecb6538d94515c227608a9137e563322e8c7f1db5d6a514",
+  "2026-11-25": "d9be97d2f1d5f95aaa44555e141f7e06d497cec8ed126902c1ee3074637a4f17",
+  "2026-12-02": "c4bb6e48534c7094d0ea512c3647fcde68b964b9cf67eebcb0bca75df33e61a5",
+  "2026-12-09": "c59e8ea824d593e7adbfd8cb751100a037598ef4374863e9b24b5bddf8486ddc",
+  "2026-12-16": "b94c007e851e0ff0af5a9cfbb2fc199042b04ff77cb6aa3010273fef0f549cee",
+  "2026-12-23": "349c3a92a1d6266fb3662ffef5d7e3606fc71825c645a92883b0d532d029b21e"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "evtermine"
  ]

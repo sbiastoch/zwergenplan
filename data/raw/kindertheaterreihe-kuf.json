@@ -1,9 +1,14 @@
 {
  "events": [],
- "inputHash": "b751ee40808ad777dff2bfbe82cadf9e676d0ba7ba7df10681006b919dd7c0d5",
+ "inputHash": "1f5906b190ab9af81e5f354f7f578f0662ce51e034879dd6e61b9c3214d3a3cb",
+ "dated": {
+  "2026-10-21": "babba23f706d63a9d6d5825ffd25dd40c5fcac8a772e11d18a594833c533d72a",
+  "2026-11-11": "52e00db8132f458172b32099e73571a442c5ed25256bd49ce1c4db0fc4362071",
+  "2026-11-28": "826aa6c17a3f9289730bcd986b6c6233318f9e044a71a555167ba5f21059ff72"
+ },
  "model": "haiku",
  "status": "keine-termine",
- "checkedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
  "changedAt": "2026-10-11T14:06:10+02:00",
  "sources": [
   "stadt-vk"

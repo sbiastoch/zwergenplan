@@ -3,18 +3,18 @@
   {
    "providerId": "stadtbibliothek-nuernberg",
    "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
-   "title": "Bücherzwerge mit Begleitperson (12–36 Monate), Langwasser",
-   "summary": "Gemeinsam mit einer Begleitperson gibt es Lieder, Fingerspiele und Geschichten für Kleinkinder, dazu ein Stück Bibliotheksbesuch. Eintritt frei, Anmeldung erforderlich.",
+   "title": "Bücherzwerge (12–36 Monate), Langwasser",
+   "summary": "Einmal im Monat erkunden Kinder mit ihrer Begleitperson die Bibliothek, mit Singen, Reimen und Vorlesen sowie Tipps zum Vorlesen. Anmeldung erforderlich, Eintritt frei.",
    "topics": [
-    "singen",
+    "bibliothek",
     "vorlesen",
-    "bibliothek"
+    "singen"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenlos",
    "price": "Eintritt frei",
-   "url": "https://www.nuernberg.de/internet/stadtbibliothek/veranstaltungenkinder.html",
+   "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
    "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
    "age": {
     "minMonths": 12,
@@ -41,46 +41,22 @@
      }
     ]
    }
-  },
-  {
-   "providerId": "stadtbibliothek-nuernberg",
-   "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-maxfeld",
-   "title": "Lesestart: Vorlesen & Mehr für Dreijährige (Maxfeld)",
-   "summary": "Eine altersgerechte Geschichte zum Vorlesen mit den Eltern, dazu ein Rahmenprogramm mit wiederkehrenden Ritualen. Eintritt frei, Anmeldung erforderlich.",
-   "topics": [
-    "vorlesen",
-    "bibliothek"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenlos",
-   "price": "Eintritt frei",
-   "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
-   "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
-   "age": {
-    "minMonths": 36,
-    "maxMonths": 47
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung unter 09 11 / 2 31-24 60 oder stb-maxfeld@stadt.nuernberg.de"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-04T15:00",
-      "end": "2026-11-04T15:45"
-     }
-    ]
-   }
   }
  ],
- "inputHash": "bee6c16ce2001a0433751c415418ded2e4a582976cb5afacf2fd6e0fddb72678",
+ "inputHash": "29ad05fc7552dbbee813f67185c39b884ecde8e971a1dd33f16c7b05ca3dfa97",
+ "dated": {
+  "2026-10-16": "b0bfdb87d43ffc31e63a511f0b336ee7691aa21ba5d015f46ca0e0b60abec5dc",
+  "2026-10-22": "1787b9cf3aecfbda18d89bdcfc73c37715ec5317b7b4df9994a0ef3ab64ab25e",
+  "2026-11-13": "220733e49472bc018079d133e42d1df8b54e24d5ea3cda3437823cfa65e22581",
+  "2026-11-19": "e21772940a916b8969f1f258f9a6b325cbb8cd9ceb6e854c863ec7b21ac42107",
+  "2026-11-27": "016af92905712802ddfe0b582cf69616d49f908105a330a645a03ef9bb37b763",
+  "2026-12-11": "a81798179ca7a19d3447f387b34da20fea6df8a25e43436296b9b3c218162ec1",
+  "2026-12-17": "87a47ff89e56c9a3406d5d569cc7c4c570954cc4f3432a4a70e9bec0a2aa967b"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "stadt-vk"
  ]

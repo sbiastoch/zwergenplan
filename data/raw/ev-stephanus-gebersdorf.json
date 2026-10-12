@@ -3,25 +3,21 @@
   {
    "providerId": "ev-stephanus-gebersdorf",
    "venueId": "ev-stephanus-gebersdorf",
-   "title": "Eltern-Kind-Gruppe Donnerstag (Väter/Mütter mit Kind)",
-   "summary": "Gemeinsame Spiel-, Sing- und Gesprächszeit für Eltern mit kleinen Kindern im Gemeindehaus der Stephanuskirche. Zeiten im Terminplan; Teilnahme laut Quelle nicht näher beschrieben, bei Fragen direkt bei der Gemeinde nachfragen.",
+   "title": "Vater-Mutter-Kind-Gruppe (Eltern-Kind-Gruppe, donnerstags)",
+   "summary": "Gemeinsame Spiel- und Singzeit für Eltern mit ihren Kleinen, dazu Austausch unter den Eltern. Die Termine liegen meist donnerstags 9:30–11:30 Uhr, nicht an jedem Donnerstag.",
    "topics": [
     "eltern-kind-gruppe",
-    "singen",
-    "elterntreff"
+    "elterntreff",
+    "singen"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=7670261",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7670261",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Anfrage bei der Gemeinde Stephanuskirche Gebersdorf."
+    "note": "Im Eintrag ist keine Anmeldung oder Platzangabe genannt; ggf. beim Veranstalter nachfragen."
    },
    "schedule": {
     "kind": "dates",
@@ -167,11 +163,50 @@
    "via": "evtermine"
   }
  ],
- "inputHash": "ff61f4d52751075e1487da940e77d4fc443bb8b0f9a14f6d384fc134092644e1",
+ "inputHash": "d0b73d93af014f53c8d858d4295ec21614dde4dc1902e5083e9e029dd125311b",
+ "dated": {
+  "2026-10-15": "337e6eea2a409a2069f3854955212c9dbd06f11ca5a1db56f352b72c07436d58",
+  "2026-10-22": "5b245029f50bf7facdad9e351c0df6b25e76c24ef3b9c959a0de0664f011f32e",
+  "2026-10-29": "c59823c5efdcda27dc840c7660b14af9a3e12f0778103aca4b9d7a36069693a9",
+  "2026-11-12": "dc120cb7305163e9b538625270e3bc298528f1fc01ef9dda6dddbf554aaf24b9",
+  "2026-11-19": "4bfcf4317656653f5e776223e3cd5796f6c6d7e8b86c3e3d8492b40829297720",
+  "2026-11-26": "1361b227723bd1083c42afac926da6d041b0b14928db227ab4882cee285f6e85",
+  "2026-12-03": "b8712933a20392682bf99b8edc374224ab899a209cea96e63e7e2c29fdbf52a4",
+  "2026-12-10": "bed90572f4968b43215b7a2c1040f5b3075c8c98fc6b9e751d9b70daad0a3cf0",
+  "2026-12-17": "05ab57b59f735be8771a0a263df18b00fcc75e2adc00fbd23fa630119ef610e9",
+  "2027-01-07": "9dd820248a2a42b040344f67a225f7228ba50b401b0c248164174e39d9ce871b",
+  "2027-01-14": "1bc13dd991a7d6a1306c41a9fcc7c22a6493c2fd969b10441e34d8c2707735cd",
+  "2027-01-21": "31f958885501398461903d6292df260d61dda94b1810bb4077cdaee0fe4c735d",
+  "2027-01-28": "72b48cda3557ad3bf9a4f15d596cd01b37a8e641e8393908c2040ecb17c67955",
+  "2027-02-04": "2393dbe6c32863210d7b3380921f93af7d52151cbe1694350911de26975b7171",
+  "2027-02-18": "1b51dc13ec0f2bc01ffc655d1bbd1b5b765c822f75429c5dba29960b2456aeef",
+  "2027-02-25": "b4a59eb80a5d3eadd670071ea70ea134cb8645efed598a2615d51ffe573f3056",
+  "2027-03-04": "a1ff79114591c9c87543438517ac7da58a3438e3c4a79ba4efead3fb0f253c89",
+  "2027-03-11": "9d477e308cdc8bd38940846f5bf250373f6fe994b5467b8a5e3ce0bcf525b82f",
+  "2027-03-18": "ce765f8eea2a2e5446ef2cfaf6755fa16682259c17047c09fd5b919c3bdfcad9",
+  "2027-04-08": "83988eb40ab6a0b4ba4bd057b0cda963a6c4b8f42de51040f65695341c912e77",
+  "2027-04-15": "478a5c9fc806967adcadfcae0d454197c1cdd1210f78b13469ba672e86a24b19",
+  "2027-04-22": "70c05012234a4035e52f5c47e8bcdd96c1d8712abac98485912c2bbe5992404e",
+  "2027-04-29": "74ad901ea02238830333f1de78be6c1abed863a12f11c7a6eb693a61db83b053",
+  "2027-05-06": "9345c5aad6cb7eb758a7614d904ca498ce36aab53093786e2452d610d9bbe5b6",
+  "2027-05-13": "2db4c9a280277d932233b2d111944b279516b804ab75558d278902c17ad92fad",
+  "2027-06-03": "fd2b637a546759366431ad9a44e3dd7de03634a374f9ccb53642da9f36a8f75b",
+  "2027-06-10": "28cfec354006869cc877423f39937d7ac2be12366ed488f39557f61a13473846",
+  "2027-06-17": "71351abd3fa4640bccfc6d306e4314769205e57a6a8548719ed0453650802413",
+  "2027-06-24": "fee39d4e4a15d18592bfe418cd84b3f0460f22e7d46e7dad6ab6131425fd7c3a",
+  "2027-07-01": "bea368c78fba2501d9ce2a62f2b547b66bda693eac3fa335d2ee3a75fe10d609",
+  "2027-09-16": "7399f94c3358c6c5ee818962969de91ec0cb043e6c92a79dc28b2c7796b456d6",
+  "2027-09-23": "1f2b586fcc257395b741b28d3db5cda7e690e48333275d6ab5dcb52fba5cbcf1",
+  "2027-09-30": "a2fe94ccd108c6e408a168837d23c4fe197b6d1b12c0f35bdcb93b984513a0f6",
+  "2027-10-07": "9d0674620c3ca226d80de1985c53a02b17466421eae58fd9a4d84d608365dadb",
+  "2027-10-14": "1bf996a33359e29c34d58d0e5f41a8e36c56c49040c911572678a34de287dc0c",
+  "2027-10-21": "4f8bef55a19514f4aee654236d39d3cc7d3d9bbdd0403fa529d3a1a60ea3a73e",
+  "2027-10-28": "c260ce7b9bb5e7f1d523f81a27771adad9015913080c5c01821fca6180f8f478"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "evtermine"
  ]

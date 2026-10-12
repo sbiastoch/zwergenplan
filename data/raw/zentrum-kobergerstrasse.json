@@ -3,11 +3,11 @@
   {
    "providerId": "zentrum-kobergerstrasse",
    "venueId": "zentrum-kobergerstrasse",
-   "title": "Koberger Minis (Babys 1–6 Monate)",
-   "summary": "Offener Treff für Eltern mit Babys von 1 bis 6 Monaten zum Austausch und Kennenlernen. Ohne Anmeldung, findet nicht in den Schulferien statt.",
+   "title": "Koberger Minis (Babys 1–6 Monate, donnerstags)",
+   "summary": "Offener Treff für Eltern mit Babys zum Austausch, dazu erste Kontakte für die Kleinen. Ohne Anmeldung, nicht in den Schulferien.",
    "topics": [
-    "eltern-kind-gruppe",
-    "elterntreff"
+    "elterntreff",
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -20,7 +20,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, keine Anmeldung nötig"
+    "note": "Ohne Anmeldung, einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -36,11 +36,10 @@
   {
    "providerId": "zentrum-kobergerstrasse",
    "venueId": "zentrum-kobergerstrasse",
-   "title": "Koberger Midis (Babys 6–12 Monate)",
-   "summary": "Offenes Elterncafé für Eltern mit Babys von 6 bis 12 Monaten; während die Kinder spielen, ist Zeit für Austausch mit anderen Eltern. Ohne Anmeldung, nicht in den Schulferien.",
+   "title": "Koberger Midis (Babys 6–12 Monate, dienstags)",
+   "summary": "Offenes Elterncafé, während die Kinder im Souterrain spielen. Ohne Anmeldung, nicht in den Schulferien.",
    "topics": [
     "elterncafe",
-    "elterntreff",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
@@ -54,7 +53,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offenes Café, keine Anmeldung nötig"
+    "note": "Ohne Anmeldung, einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -70,11 +69,10 @@
   {
    "providerId": "zentrum-kobergerstrasse",
    "venueId": "zentrum-kobergerstrasse",
-   "title": "Koberger Maxis (Kleinkinder 12–24 Monate)",
-   "summary": "Offenes Elterncafé für Eltern mit Kleinkindern von 12 bis 24 Monaten im Souterrain mit Kletterlandschaft. Ohne Anmeldung, nicht in den Schulferien.",
+   "title": "Koberger Maxis (Kleinkinder 12–24 Monate, mittwochs)",
+   "summary": "Offenes Elterncafé für Eltern mit Kleinkindern, mit Platz zum Toben und Klettern im Souterrain. Ohne Anmeldung, nicht in den Schulferien.",
    "topics": [
     "elterncafe",
-    "elterntreff",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
@@ -88,7 +86,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offenes Café, keine Anmeldung nötig"
+    "note": "Ohne Anmeldung, einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -105,11 +103,10 @@
    "providerId": "zentrum-kobergerstrasse",
    "venueId": "zentrum-kobergerstrasse",
    "title": "Vätergruppe mit Kindern unter 18 Monaten",
-   "summary": "Selbstorganisierter Treff für Väter mit Kindern unter 18 Monaten zum Austausch; meist im Bewegungsraum, im Sommer auch auf Spielplätzen. Keine Anmeldung nötig, Fragen per E-Mail.",
+   "summary": "Selbstorganisierter Treff für Väter mit ihren Kindern, meist im Bewegungsraum, im Sommer auch auf Spielplätzen. Keine Anmeldung nötig.",
    "topics": [
     "vaeter",
-    "elterntreff",
-    "eltern-kind-gruppe"
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -137,11 +134,32 @@
    }
   }
  ],
- "inputHash": "fa51927fb54d4242671fa573cbe06da8d2e138f791196760a984b5d942d63e60",
+ "inputHash": "995d191e04328fe30923b3293e084c9440eacea0f1a6c407f080e6cc4b3f2234",
+ "dated": {
+  "2026-10-13": "0141192e5d84136a6bfdc6e81331190c24554ff95ccc9771478a321ea9f69df4",
+  "2026-10-15": "a0b15975fcf501f207da4f167aa94e805505bba456e904ac9d342d05b96ce4d1",
+  "2026-10-20": "48a32958fa88e5c30eb0c87685c0b44acb3f8ec9ad6c9e048ec21881eac2d117",
+  "2026-10-22": "6cedaaa660994ef14199b67ba989350286699e7c46a9fdcf0789ac1665e600b2",
+  "2026-10-27": "a20afa503c160e27ca9223472ddf9a30d878c8cacce63a0ae023899bcb7b2697",
+  "2026-10-29": "f2ed2c27ec7db11123009f903ee7fa06247cb4d8dc8846c30993a62ed7316416",
+  "2026-11-10": "2979ffc0ae864b87b21e2fe193a7a4420a172b2e34fe1a8a6c533a7466c361b1",
+  "2026-11-12": "655ae28fc58787df6137e415dc30d42969c2b99727c6d36b3cec6c98d1ba0e2e",
+  "2026-11-17": "197fa6b26edb862fa291fc29c59c8f7b43e324a21a9f6af799f4b9f4924e291d",
+  "2026-11-19": "f2384178665c8a5fab6a7386e066294fd73808e3668d89c5cf0ab960924b9032",
+  "2026-11-24": "a5784b63c793c9dd448ad3da9e55d6c6847ec71fb6b90ad04e5c55d4f03f42ba",
+  "2026-11-26": "8d40e9c11c374defd0c00d4f9b2cba61b558ce451a955e6eb0e93d5143472c04",
+  "2026-12-01": "a720459157223de7a7b583b7b10da4728eb6ca8e8365bba2181545fca0fcc565",
+  "2026-12-03": "eccc174fa08c92163bc31f4adbf379d2b4080dd246df38f7264486456914e0c3",
+  "2026-12-08": "2c17d530fc8777e76a1e9e41d28b183aacb12b9c613725500b14dbfa41a6326f",
+  "2026-12-10": "6811bf53bd8f5068f6afe69fc6d214a8e7ecb2d3926af9b9d9934c59360e9bf6",
+  "2026-12-15": "6215be6465c957b6c3261666e4e9a773d3e6c39c3982dcea54a31fc7d6b042ee",
+  "2026-12-17": "13307c0e9d02be585d869f719e49192505a9b4eff369889ecb89174a4bb5cd17",
+  "2026-12-22": "9d39411047e384536f68351ff40dc8eab0e8f4dd24f49d4d360994b25859c5b6"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "frankenkids"
  ]

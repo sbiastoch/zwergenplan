@@ -3,11 +3,11 @@
   {
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
-   "title": "Baby & Museum: Führung für Erwachsene mit Babys",
-   "summary": "Monatliche Kurzführung durch das Neue Museum für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln und anschließendem Kaffee. Kinderwagen und Trage sind erlaubt. Tickets je Termin im Shop, 3 € zzgl. Eintritt.",
+   "title": "Baby & Museum: Kunst-Kurzführung für Eltern mit Babys",
+   "summary": "Gemeinsame Kurzführung durch die Ausstellung mit Babys, mit Pausen zum Füttern und Wickeln, danach Kaffee zum Austausch. Themen wechseln monatlich. Kinderwagen und Trage sind erlaubt.",
    "topics": [
     "museum",
-    "elterncafe"
+    "elterntreff"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -21,7 +21,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets je Termin über den Shop nmn-tickets.de; Platzangabe dort nicht sichtbar"
+    "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Restkontingent wird auf der Programmseite nicht angezeigt."
    },
    "schedule": {
     "kind": "dates",
@@ -49,10 +49,9 @@
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
    "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-   "summary": "Schauspielerin Mara Wengel liest in der Ausstellung DOUBLE UP! aus einem Kinderbuch vor und lädt zum Mitmachen ein. Kinder ab zwei Jahren kommen mit Familie oder Begleitung. 3 € zzgl. Eintritt für Erwachsene.",
+   "summary": "Eine Schauspielerin erzählt und spielt eine Geschichte aus einem Kinderbuch in der Ausstellung DOUBLE UP! mit. Kinder ab zwei Jahren machen aktiv mit, Erwachsene begleiten sie.",
    "topics": [
-    "vorlesen",
-    "museum"
+    "vorlesen"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -66,7 +65,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets über den Shop nmn-tickets.de; Platzangabe dort nicht sichtbar"
+    "note": "Ticket über den go~mus-Shop (nmn-tickets.de); Restkontingent wird auf der Programmseite nicht angezeigt."
    },
    "schedule": {
     "kind": "dates",
@@ -78,11 +77,20 @@
    }
   }
  ],
- "inputHash": "773c14d2c278aa10fd421f77f938c7497ab5fe5d1a2d203f59aefc1000e5df94",
+ "inputHash": "9d12cf03473b11710baa78ef7fb035f224f0e882eb141f35b0df8f62b6a0b3e2",
+ "dated": {
+  "2026-10-23": "53642745de7c615142b7af6154a2309788f97f45c2fba5d2e53000d0b40d90ac",
+  "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
+  "2026-11-13": "02758077c4f295a349671c42fd4810985342d83bb86afa633e9bac9349a6d8d6",
+  "2026-11-27": "708428860f7ba415fa818653b16b68d576c6c9fe9ec4e0b27ca6a3df1d3b1d32",
+  "2026-12-04": "62b6512fa0520a45636925c6594b2c50ae087c7d2774473d1a8e880447c75567",
+  "2026-12-06": "f3d39363e90d4a4c7db1861e399d25fabb0a01cfafb4f632a797df058955aa59",
+  "2026-12-11": "bc9ef57c48aed5c881d841286842d34974d39e66760030582f78c8b3898298fa"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "stadt-vk"
  ]

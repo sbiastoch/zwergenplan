@@ -3,16 +3,17 @@
   {
    "providerId": "cvjm-nuernberg-wuselwelt",
    "venueId": "cvjm-nuernberg-wuselwelt",
-   "title": "Wuselwelt – freitags Bewegungs- und Spielzeit für Kinder 0–3 Jahre",
-   "summary": "Offene Turnhallenzeit im CVJM: Die Kinder spielen frei in der vorbereiteten Umgebung, die Erwachsenen tauschen sich aus. Hallenschuhe oder ABS-Socken mitbringen. Kommen und Gehen jederzeit möglich; in den Ferien kein Treff.",
+   "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 Jahre",
+   "summary": "Offenes Freispiel in der Turnhalle im CVJM-Haus für Kinder bis 3 Jahre, begleitet von Eltern oder Großeltern. Danach Austausch unter Erwachsenen und Kaffee oder Tee im Kostbar. Hallenschuhe oder ABS-Socken mitbringen; Einstieg jederzeit möglich.",
    "topics": [
     "bewegung",
-    "spielplatz-indoor"
+    "spielplatz-indoor",
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "keine Kosten",
+   "price": "keine",
    "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
    "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
    "age": {
@@ -21,7 +22,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung nötig"
+    "note": "Offenes Angebot, Anmeldung nicht erforderlich"
    },
    "schedule": {
     "kind": "weekly",
@@ -35,11 +36,17 @@
    }
   }
  ],
- "inputHash": "dca5542e9078da3d4703439956c3492d0fbdb9d65a9ec1a51a68fec7e8055cef",
+ "inputHash": "0e8bde8d927894fbaf87c4fa59fbbef8a8357cf94cad9ea4d5ca6d6f961e71e4",
+ "dated": {
+  "2026-10-16": "52f584855313a2bfedcea1da0ba44d2113b61a27d596da60612b465d2aaebda6",
+  "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
+  "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
+  "2026-11-27": "4fc8440bb3b3ae5eb339264134dbd7d17ef41c1723a56f8e9fe0c1e8a8ee5893"
+ },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
+ "checkedAt": "2026-10-12T08:41:48+02:00",
+ "changedAt": "2026-10-12T08:41:48+02:00",
  "sources": [
   "frankenkids"
  ]
