@@ -167,7 +167,7 @@ test.describe("Anbieter-Sheet", () => {
     await openList(page);
     await row(page, THEATER).click();
     await expect(sheet(page).getByRole("heading", { level: 2 })).toHaveText(THEATER);
-    await expect(sheet(page).locator(".provider-cats")).toHaveText("Musik & Singen · Bühne & Konzert");
+    await expect(sheet(page).locator(".provider-cats")).toHaveText("Bühne & Konzert");
     const website = sheet(page).getByRole("link", { name: "Website & Programm" });
     await expect(website).toHaveAttribute("href", "https://example.org/theater");
     await expect(website).toHaveAttribute("target", "_blank");

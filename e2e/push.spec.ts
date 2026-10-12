@@ -445,7 +445,8 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   expect((await readStore(page))["seenIds"]).toEqual(seen);
 
   // Abo mit Wegzeit ab Gostenhof: die Musikschule (29,6 Min.) fällt heraus; Requests wie ohne Startpunkt
-  await writeStore(page, { seenIds: seen, searches: '["kat=musik&wegzeit=20"]', origin: "gostenhof" });
+  // Krabbelreime ist seit Plan 0037 buecher: das Abo nennt Musik und Bücher (E9)
+  await writeStore(page, { seenIds: seen, searches: '["kat=musik,buecher&wegzeit=20"]', origin: "gostenhof" });
   const withReach = await deliver(page, context, session);
   expect(withReach).toEqual({
     title: "1 neues Angebot für deine Suchen",
@@ -457,7 +458,7 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   // gespeicherter Standort (gerundeter Punkt, ADR 0017) statt Stadtteil: ebenfalls Wegzeit, dieselben Requests
   await writeStore(page, {
     seenIds: seen,
-    searches: '["kat=musik&wegzeit=20"]',
+    searches: '["kat=musik,buecher&wegzeit=20"]',
     origin: { source: "standort", lat: 49.448, lon: 11.058 },
   });
   const withPoint = await deliver(page, context, session);

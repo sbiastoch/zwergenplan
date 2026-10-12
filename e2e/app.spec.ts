@@ -256,44 +256,100 @@ test("ungültiges Geburtsdatum wird erklärt und nicht gespeichert", async ({ pa
   await expect(page.getByRole("button", { name: /^Kind und Einstellungen/ })).toContainText("Alter?");
 });
 
-test.describe("Kategorie-Etikett folgt dem Filter (Plan 0014)", () => {
+/**
+ * Eine Kategorie je Angebot (Plan 0037, E9, E11; ersetzt Plan 0014): Etikett, Farbe und Form kommen nur aus
+ * `category`, der Filter wirkt nur auf sie und ändert kein Etikett.
+ */
+test.describe("Eine Kategorie je Angebot (Plan 0037)", () => {
   const pill = (page: Page, title: string) => offers(page).filter({ hasText: title }).locator(".pill");
 
-  test("ohne Filter die erste Kategorie, mit Filter die gewählte, auch im Detail", async ({ page }) => {
-    await expect(pill(page, "Babykonzert im Advent")).toHaveText("Musik & Singen");
+  /** `site.json` aus dem Netz, vor dem Ausliefern umgeschrieben; die Seite bleibt Black-Box (wie `saveCopies`). */
+  async function rewriteSite(page: Page, change: (offers: Array<Record<string, unknown>>) => void) {
+    await page.route("**/data/site.json", async (route) => {
+      const response = await route.fetch();
+      const site = (await response.json()) as { offers: Array<Record<string, unknown>> };
+      change(site.offers);
+      await route.fulfill({ response, json: site });
+    });
+  }
 
-    await page.goto("./?kat=buehne");
+  test("a) ohne Filter trägt das Babykonzert seine Hauptkategorie, im Detail ebenso", async ({ page }) => {
     await expect(pill(page, "Babykonzert im Advent")).toHaveText("Bühne & Konzert");
     await offers(page).filter({ hasText: "Babykonzert im Advent" }).getByRole("heading").getByRole("button").click();
     const detail = page.getByRole("dialog", { name: "Babykonzert im Advent" });
     await expect(detail.locator(".catname")).toHaveText("Bühne & Konzert");
   });
 
-  for (const [kat, title, label] of [
-    ["buecher", "Krabbelreime & Fingerspiele", "Bücher & Vorlesen"],
-    ["treffs-cafes", "Offener Krabbeltreff", "Treffs & Cafés"],
-  ] as const) {
-    test(`?kat=${kat}: „${title}“ trägt „${label}“, die Pille passt hell und dunkel`, async ({ page }) => {
-      await page.goto(`./?kat=${kat}`);
-      await expect(pill(page, title)).toHaveText(label);
-      // Diese Pille erscheint auf Fixture-Kacheln erst mit Plan 0014 (Review, Finding 3).
-      for (const colorScheme of ["light", "dark"] as const) {
-        await page.emulateMedia({ colorScheme });
-        await expectMobileUx(page);
-      }
+  test("b) ?kat=musik zeigt nur Angebote mit Hauptkategorie Musik", async ({ page }) => {
+    await page.goto("./?kat=musik");
+    await expect(offers(page).filter({ hasText: "Musikgarten 1" })).toHaveCount(1);
+    await expect(offers(page).filter({ hasText: "Babykonzert im Advent" })).toHaveCount(0);
+    await expect(offers(page).filter({ hasText: "Krabbelreime & Fingerspiele" })).toHaveCount(0);
+    for (const label of await offers(page).locator(".pill").allTextContents()) expect(label).toBe("Musik & Singen");
+  });
+
+  test("c) ?kat=buecher: „Krabbelreime & Fingerspiele“ trägt „Bücher & Vorlesen“, hell und dunkel", async ({
+    page,
+  }) => {
+    await page.goto("./?kat=buecher");
+    await expect(pill(page, "Krabbelreime & Fingerspiele")).toHaveText("Bücher & Vorlesen");
+    for (const colorScheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme });
+      await expectMobileUx(page);
+    }
+  });
+
+  test("d1) ?kat=treffs-cafes: der Krabbeltreff fällt heraus, Leerzustand", async ({ page }) => {
+    // Das einzige Treffs-Angebot der Fixtures (Elterncafé, 9–10 Uhr) ist zur Fixture-Uhr (12 Uhr) vorbei.
+    await page.goto("./?kat=treffs-cafes");
+    await expect(page.getByText("Diese Seite ist noch leer")).toBeVisible();
+    await expect(page.getByText("Mit diesen Filtern gibt es keine Angebote.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();
+    await expect(offers(page)).toHaveCount(0);
+  });
+
+  test("d2) Pille „Treffs & Cafés“ unter den Gates, hell und dunkel", { tag: OWN_START }, async ({ page }) => {
+    // Plan 0014, Review, Finding 3: Diese Pille gibt es auf den Fixtures sonst nicht mehr.
+    await rewriteSite(page, (list) => {
+      const treff = list.find((o) => o["title"] === "Offener Krabbeltreff");
+      if (!treff) throw new Error("Krabbeltreff fehlt in den Fixture-Daten");
+      treff["category"] = "treffs-cafes";
+    });
+    await page.goto("./?kat=treffs-cafes");
+    await expect(pill(page, "Offener Krabbeltreff")).toHaveText("Treffs & Cafés");
+    for (const colorScheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme });
+      await expectMobileUx(page);
+    }
+  });
+
+  // Seit Plan 0025 (E8) im Kalender der Merkliste; der Filter ändert die Form nicht (Plan 0037, E11)
+  for (const search of ["", "kat=musik&"]) {
+    test(`e) Kalender ${search ? "mit ?kat=musik" : "ohne Filter"}: der Punkt trägt die Hauptkategorie`, async ({
+      page,
+    }) => {
+      await page.addInitScript(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["kovtez0z"])));
+      await page.goto(`./?${search}ansicht=merkliste-kalender`);
+      await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
+      await page.getByRole("button", { name: "Nächster Monat" }).click();
+      await page.getByRole("button", { name: "Nächster Monat" }).click();
+      const day = page.getByRole("button", { name: /^Sonntag, 6\. Dezember, 1 Termin$/ });
+      await expect(day.locator("span.k-buehne")).toHaveCount(1);
+      await expect(day.locator("span.k-musik")).toHaveCount(0);
     });
   }
 
-  // Seit Plan 0025 (E8) im Kalender der Merkliste: Die Kategorie der Startseite wählt nur die Form (Plan 0014)
-  test("Kalender: der Punkt im Monatsraster trägt die gewählte Kategorie", async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["kovtez0z"])));
-    await page.goto("./?kat=buehne&ansicht=merkliste-kalender");
-    await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
-    await page.getByRole("button", { name: "Nächster Monat" }).click();
-    await page.getByRole("button", { name: "Nächster Monat" }).click();
-    const day = page.getByRole("button", { name: /^Sonntag, 6\. Dezember, 1 Termin$/ });
-    await expect(day.locator("span.k-buehne")).toHaveCount(1);
-    await expect(day.locator("span.k-musik")).toHaveCount(0);
+  test("site.json ohne category (alter Cache): Rückfall aus den Themen, ohne Fehler", { tag: OWN_START }, async ({
+    page,
+  }) => {
+    // Übergang Plan 0037 (E13, Test 17): adoptSite füllt category; entfällt in Stufe C
+    await rewriteSite(page, (list) => {
+      for (const offer of list) delete offer["category"];
+    });
+    await page.goto("./");
+    await expect(pill(page, "Babykonzert im Advent")).toHaveText("Musik & Singen");
+    await page.goto("./?kat=musik");
+    await expect(offers(page).filter({ hasText: "Babykonzert im Advent" })).toHaveCount(1);
   });
 });
 
