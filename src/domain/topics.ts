@@ -96,12 +96,13 @@ export function fallbackCategory(topics: readonly Topic[]): Category {
 }
 
 /**
- * Leitkategorie eines Angebots – bestimmt Etikett, Farbe und Form. Liegt eine seiner Kategorien im Fokus
- * (gewählter Kategoriefilter), gewinnt die erste davon, sonst die erste überhaupt (feste Reihenfolge).
- * `focus` ist Pflicht, damit keine Aufrufstelle den Filter still vergisst (Plan 0014, E1).
+ * Angebot mit `category`, auch wenn es aus einem Stand ohne das Feld kommt: vorhandene `category` bleibt, sonst
+ * `fallbackCategory(topics)`. Für `adoptSite` in `App.tsx` (Plan 0037, E13). Der Rückgabetyp ist für ein konkretes
+ * `T` (etwa `SiteOffer`) ohne Cast an `T` zuweisbar.
  */
-export function leadCategory(topics: readonly Topic[], focus: readonly Category[]): Category {
-  const cats = categoriesOf(topics);
-  // Rückfall nur für den Typ: Das Schema verbietet Angebote ohne Kategorie.
-  return cats.find((c) => focus.includes(c)) ?? cats[0] ?? "treffs-cafes";
+// Übergang Plan 0037 (E13): site.json aus einem Cache vor Stufe A hat kein category; Rückfall bleibt bis Stufe C
+export function withCategory<T extends { category: Category; topics: readonly Topic[] }>(
+  offer: Omit<T, "category"> & { category?: Category },
+): Omit<T, "category"> & { category: Category } {
+  return { ...offer, category: offer.category ?? fallbackCategory(offer.topics) };
 }

@@ -8,7 +8,7 @@ import type { Origin, Reach } from "../domain/reach.ts";
 import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
-import { CATEGORY_LABELS, type Category } from "../domain/topics.ts";
+import { CATEGORY_LABELS } from "../domain/topics.ts";
 import {
   ageRangeLabel,
   ageWindowLabel,
@@ -47,8 +47,6 @@ interface DetailProps {
   reach: Reach | undefined;
   /** Wegzeit lädt: Platzhalter statt Entfernung (Plan 0009, E11) */
   reachPending: boolean;
-  /** Leitkategorie, wie auf der Kachel (`CardContext.categoryOf`, Plan 0014, E2) */
-  category: Category;
   saved: boolean;
   onToggleSave: (offer: SiteOffer) => void;
   /** Teilen per Link (Plan 0026, E6): synchron im Tipp */
@@ -72,7 +70,6 @@ export function DetailContent({
   origin,
   reach,
   reachPending,
-  category,
   saved,
   onToggleSave,
   onShare,
@@ -81,6 +78,8 @@ export function DetailContent({
   onIcs,
 }: DetailProps) {
   const [allDates, setAllDates] = useState(false);
+  // Etikett wie auf der Kachel, nur aus der Hauptkategorie (Plan 0037, E11)
+  const category = offer.category;
   const fromCalendar = day ? sessionOnDay(offer, day) : undefined;
   // Ohne Kalendertag der erste passende Termin, wie in der Alters-Kachel (Browser-Review Plan 0028)
   const ref = detailSession(offer, now, day, birthDate);

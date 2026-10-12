@@ -1,7 +1,7 @@
 /** Reine Umwandlungen für die Karte (Plan 0005, E6): Orte und Startpunkt als GeoJSON, Treffer beim Tippen. */
 import type { GeoPoint } from "../../domain/geo.ts";
 import type { Origin } from "../../domain/reach.ts";
-import { CATEGORIES, type Category, categoriesOf, type Topic } from "../../domain/topics.ts";
+import { CATEGORIES, type Category } from "../../domain/topics.ts";
 
 interface PointFeature<P> {
   type: "Feature";
@@ -23,7 +23,7 @@ interface MapPlace {
 
 /** Was die Karte über ein Angebot wissen muss (passt auf `SiteOffer`). */
 interface MapOffer {
-  topics: readonly Topic[];
+  category: Category;
 }
 
 /** Properties eines Ort-Punkts in der Quelle „orte“ */
@@ -34,21 +34,19 @@ export interface PlaceProperties {
 }
 
 /**
- * Kategorie des Markers (Plan 0024, E5): die häufigste unter den Angeboten des Ortes, je Angebot jede seiner
- * Kategorien einmal. Gleichstand: die frühere in `CATEGORIES`, also unabhängig von der Reihenfolge der Angebote.
+ * Kategorie des Markers (Plan 0024, E5; Plan 0037, E11): die häufigste Hauptkategorie unter den Angeboten des Ortes,
+ * je Angebot genau einmal. Gleichstand: die frühere in `CATEGORIES`, also unabhängig von der Reihenfolge der Angebote.
  * Liegt bewusst hier und nicht in `src/domain/topics.ts`: topics.ts gehört zum Start-Chunk, und nur die Karte
  * braucht die Regel (Plan 0024, E5). Braucht sie später die Merkliste-Karte, kommt sie über denselben Chunk.
  */
 export function mainCategory(offers: readonly MapOffer[]): Category {
   const counts = new Map<Category, number>();
-  for (const offer of offers) {
-    for (const category of categoriesOf(offer.topics)) counts.set(category, (counts.get(category) ?? 0) + 1);
-  }
+  for (const { category } of offers) counts.set(category, (counts.get(category) ?? 0) + 1);
   let best: Category | undefined;
   for (const category of CATEGORIES) {
     if ((counts.get(category) ?? 0) > (best ? (counts.get(best) ?? 0) : 0)) best = category;
   }
-  // Rückfall nur für den Typ (wie `leadCategory`): Das Schema verbietet Angebote ohne Kategorie.
+  // Rückfall nur für eine leere Liste
   return best ?? "treffs-cafes";
 }
 

@@ -14,7 +14,7 @@ import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
-import { leadCategory } from "../domain/topics.ts";
+import { type Category, withCategory } from "../domain/topics.ts";
 import { Header, QuickFilters, Stickers, TabBar, type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
   ageChipLabel,
@@ -54,6 +54,20 @@ import {
 } from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
+
+/** `site.json` im lockeren Format: Angebote ohne `category` aus einem Datencache vor Plan 0037, Stufe A (E13). */
+type LooseSiteData = Omit<SiteData, "offers"> & {
+  offers: Array<Omit<SiteOffer, "category"> & { category?: Category }>;
+};
+
+/**
+ * Übernimmt geladene Daten; ein Angebot ohne `category` bekommt den Rückfall aus den Themen. Einzige Stelle in
+ * `src/ui` dafür, nicht in `src/data` (ADR 0010, `data-domain-runtime-allowlist`).
+ */
+// Übergang Plan 0037 (E13): site.json aus einem Cache vor Stufe A hat kein category; Rückfall bleibt bis Stufe C
+function adoptSite(data: LooseSiteData): SiteData {
+  return { ...data, offers: data.offers.map((offer) => withCategory<SiteOffer>(offer)) };
+}
 
 type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
 /** Onboarding (Plan 0033, E9): „auto“ beim ersten Öffnen, „manuell“ über das Kind-Sheet (E12) */
@@ -120,7 +134,7 @@ export function App() {
     void attempt;
     setLoad({ kind: "loading" });
     loadSiteData().then(
-      (data) => setLoad({ kind: "ready", data }),
+      (data) => setLoad({ kind: "ready", data: adoptSite(data) }),
       // Die Fehlerart kennt nur src/data; ein unbekannter Fehler zeigt nie seinen Rohtext (Plan 0008, E5).
       (e: unknown) => setLoad({ kind: "error", reason: e instanceof SiteLoadError ? e.reason : "server" }),
     );
@@ -155,7 +169,7 @@ export function App() {
         refresh: () => {
           refreshTransit();
           return loadSiteData().then(
-            (data) => setLoad({ kind: "ready", data }),
+            (data) => setLoad({ kind: "ready", data: adoptSite(data) }),
             () => {},
           );
         },
@@ -240,7 +254,6 @@ export function App() {
     isUnfit: (id) => views.unfitIds.has(id),
     reachOf: views.reachOf,
     reachPending: reachMode?.kind === "laedt",
-    categoryOf: (offer) => leadCategory(offer.topics, route.filter.categories),
     onToggleSave,
     onOpen: (offer, day) => {
       setDetailDay(day);

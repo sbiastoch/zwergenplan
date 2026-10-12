@@ -297,16 +297,23 @@ describe("hasOffersOutside", () => {
   });
 });
 
-describe("providerCategories", () => {
-  it("leitet die Kategorien nur aus den Angeboten ab (Plan 0030, Theater: Musik & Singen, Bühne & Konzert)", () => {
+describe("providerCategories (Plan 0037, E11: Hauptkategorien)", () => {
+  it("vereinigt die Hauptkategorien der Angebote (Theater: nur Bühne & Konzert)", () => {
     const own = providerOffers(offers, pid("theater-beispiel"), FIXTURE_NOW);
-    expect(providerCategories(pid("theater-beispiel"), own)).toEqual(["musik", "buehne"]);
+    expect(providerCategories(pid("theater-beispiel"), own)).toEqual(["buehne"]);
     expect(providerCategories(pid("theater-beispiel"), [])).toEqual([]);
+  });
+
+  it("gleiche Hauptkategorien zählen einmal, kanonisch sortiert; Vergangenes zählt nicht", () => {
+    // Babymassage und PEKiP sind babykurse, der Krabbeltreff krabbel-spielgruppen; das Elterncafé
+    // (treffs-cafes) endet am 5.10. um 10:00 vor der Fixture-Uhr 12:00.
+    const own = providerOffers(offers, pid("familientreff-beispiel"), FIXTURE_NOW);
+    expect(providerCategories(pid("familientreff-beispiel"), own)).toEqual(["babykurse", "krabbel-spielgruppen"]);
   });
 
   it("zählt nur Angebote dieses Anbieters; ohne eigene Angebote keine Kategorien", () => {
     expect(providerCategories(pid("turnverein-beispiel"), upcoming)).toEqual([]);
-    expect(providerCategories(pid("theater-beispiel"), upcoming)).toEqual(["musik", "buehne"]);
+    expect(providerCategories(pid("theater-beispiel"), upcoming)).toEqual(["buehne"]);
   });
 });
 

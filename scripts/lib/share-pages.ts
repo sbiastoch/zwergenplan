@@ -31,7 +31,7 @@ import {
 } from "../../src/domain/share.ts";
 import type { SiteOffer, SiteProvider } from "../../src/domain/site-data.ts";
 import { berlinIsoDate, isoWeekday, parseIsoDate } from "../../src/domain/time.ts";
-import { CATEGORY_LABELS, type Category, leadCategory } from "../../src/domain/topics.ts";
+import { CATEGORY_LABELS, type Category } from "../../src/domain/topics.ts";
 
 export interface SharePage {
   /** relativ zum Ausgabeordner, z. B. „a/<id>/index.html“ */
@@ -153,7 +153,7 @@ export function offerPreview(offer: SiteOffer, generatedAt: string): OfferPrevie
   const age = ageRangeLabel(offer.age);
   const availability = availabilityLabel(offer);
   const suffix = ` · ${when}`;
-  const category = leadCategory(offer.topics, []);
+  const category = offer.category;
   // Ort zuerst (anders als die Kachel der App): lange Anbieternamen verdrängten sonst das „Wo“ aus zwei Zeilen
   const meta = sameName ? place : `${place} · ${offer.providerName}`;
   const facts: PreviewFact[] = [

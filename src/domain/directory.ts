@@ -6,7 +6,7 @@
 import { nextSession } from "./agenda.ts";
 import { compareReach, type Reach } from "./reach.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
-import { type Category, categoriesOf } from "./topics.ts";
+import { CATEGORIES, type Category } from "./topics.ts";
 
 /** aktiv: ≥ 1 sichtbares Angebot; ausgeblendet: kommende, aber keins passt zur Auswahl; ohne-termine: keine kommenden */
 type ProviderState = "aktiv" | "ausgeblendet" | "ohne-termine";
@@ -179,9 +179,12 @@ export function findProvider(
   return providers.find((p) => p.id === providerId) ?? fallbackEntry(offers.filter((o) => o.providerId === providerId));
 }
 
-/** Kategorien aus den Themen der übergebenen Angebote dieses Anbieters; der Katalog führt keine (Plan 0030). */
+/**
+ * Hauptkategorien der übergebenen Angebote dieses Anbieters, kanonisch sortiert; der Katalog führt keine (Plan 0030,
+ * Plan 0037 E11, ADR 0030).
+ */
 export function providerCategories(providerId: string, offers: readonly SiteOffer[]): Category[] {
-  return categoriesOf(offers.filter((o) => o.providerId === providerId).flatMap((o) => o.topics));
+  return CATEGORIES.filter((c) => offers.some((o) => o.providerId === providerId && o.category === c));
 }
 
 /**

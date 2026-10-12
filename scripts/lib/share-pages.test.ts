@@ -124,6 +124,14 @@ describe("Kachel im Bild (Nachtrag A, E16)", () => {
     const full = { ...offer, availability: { ...offer.availability, status: "ausgebucht" as const } };
     expect(offerPreview(full, GENERATED_AT).imageVersion).not.toBe(v);
   });
+
+  it("Kategorie nur aus category; die Version hängt an ihr (Plan 0037, E11)", () => {
+    const konzert = byTitle("Babykonzert im Advent");
+    expect(offerPreview(konzert, GENERATED_AT).category).toBe("buehne");
+    const musik = { ...konzert, category: "musik" as const };
+    expect(offerPreview(musik, GENERATED_AT).category).toBe("musik");
+    expect(offerPreview(musik, GENERATED_AT).imageVersion).not.toBe(offerPreview(konzert, GENERATED_AT).imageVersion);
+  });
 });
 
 describe("Vorschauseite eines Angebots (Plan 0026, E4)", () => {

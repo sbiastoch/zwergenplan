@@ -1,28 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fallbackCategory, leadCategory } from "./topics.ts";
-
-describe("leadCategory (Plan 0014, E1)", () => {
-  it("nimmt ohne Fokus die erste Kategorie in fester Reihenfolge", () => {
-    expect(leadCategory(["konzert", "musik"], [])).toBe("musik");
-  });
-
-  it("nimmt eine spätere Kategorie, wenn sie im Fokus liegt", () => {
-    expect(leadCategory(["konzert", "musik"], ["buehne"])).toBe("buehne");
-  });
-
-  it("bleibt bei der ersten Kategorie, wenn der Fokus nicht trifft", () => {
-    expect(leadCategory(["konzert", "musik"], ["wasser"])).toBe("musik");
-  });
-
-  it("folgt bei zwei Treffern der festen Reihenfolge, nicht der Auswahl", () => {
-    expect(leadCategory(["tanz"], ["musik", "bewegung"])).toBe("bewegung");
-  });
-
-  it("übergeht reine Merkmale ohne Kategorie", () => {
-    expect(leadCategory(["mehrsprachig", "musik"], [])).toBe("musik");
-    expect(leadCategory(["vaeter", "kreativ"], ["kreativ"])).toBe("kreativ");
-  });
-});
+import { fallbackCategory, withCategory } from "./topics.ts";
 
 describe("fallbackCategory (Plan 0037, E5)", () => {
   it("nimmt die erste Kategorie in fester Reihenfolge", () => {
@@ -35,5 +12,19 @@ describe("fallbackCategory (Plan 0037, E5)", () => {
 
   it("fällt bei reinen Merkmalen auf treffs-cafes zurück", () => {
     expect(fallbackCategory(["vaeter", "mehrsprachig"])).toBe("treffs-cafes");
+  });
+});
+
+describe("withCategory (Plan 0037, E13; Übergang bis Stufe C)", () => {
+  type Item = { id: string; category: "musik" | "buehne"; topics: Array<"konzert" | "musik"> };
+
+  it("behält eine vorhandene category", () => {
+    const item: Item = { id: "a", category: "buehne", topics: ["konzert", "musik"] };
+    expect(withCategory<Item>(item)).toEqual(item);
+  });
+
+  it("füllt eine fehlende category per Rückfall und ändert sonst nichts", () => {
+    const loose = { id: "b", topics: ["konzert", "musik"] as Item["topics"] };
+    expect(withCategory<Item>(loose)).toEqual({ id: "b", topics: ["konzert", "musik"], category: "musik" });
   });
 });

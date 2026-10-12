@@ -109,7 +109,6 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
           today={today}
           count={agendaOf({ unit: "woche", day: selection.day }).count}
           itemsOf={itemsOf}
-          categoryOf={ctx.categoryOf}
           label={label}
           select={select}
           go={go}
@@ -126,7 +125,6 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
           today={today}
           count={agendaOf({ unit: "monat", day: selection.day }).count}
           itemsOf={itemsOf}
-          categoryOf={ctx.categoryOf}
           label={label}
           select={select}
           onPick={(d) => {
@@ -248,7 +246,6 @@ interface StripProps {
   /** Termine der ganzen Woche bzw. des ganzen Monats ab heute, für den Namen des Titelknopfs */
   count: number;
   itemsOf: (d: string) => Occurrence<SiteOffer>[];
-  categoryOf: CardContext["categoryOf"];
   label: (d: string) => string;
   select: (unit: CalendarSelection["unit"], day: string) => void;
   go: (unit: CalendarSelection["unit"], target: string | undefined) => () => void;
@@ -274,7 +271,7 @@ function TitleButton({
   );
 }
 
-function WeekStrip({ nav, selection, today, count, itemsOf, categoryOf, label, select, go }: StripProps) {
+function WeekStrip({ nav, selection, today, count, itemsOf, label, select, go }: StripProps) {
   return (
     <>
       <div className="cal-nav">
@@ -322,7 +319,7 @@ function WeekStrip({ nav, selection, today, count, itemsOf, categoryOf, label, s
                 {itemsOf(d)
                   .slice(0, 3)
                   .map((o) => {
-                    const c = categoryOf(o.offer);
+                    const c = o.offer.category;
                     return (
                       <span key={`${o.offer.id}-${o.session.start}`} className={`k-${c}`}>
                         <Shape category={c} ink={false} />
@@ -344,7 +341,6 @@ function MonthGrid({
   today,
   count,
   itemsOf,
-  categoryOf,
   label,
   select,
   onPick,
@@ -387,7 +383,7 @@ function MonthGrid({
         ))}
         {month.days.map((d, i) => {
           const [first] = itemsOf(d);
-          const c = first && categoryOf(first.offer);
+          const c = first?.offer.category;
           return (
             <button
               key={d}
