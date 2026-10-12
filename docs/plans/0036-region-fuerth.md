@@ -316,6 +316,20 @@ Arbeit direkt auf `main` im Haupt-Checkout (allein dort, `CLAUDE.md`, Punkt 6), 
 - **`build-data` langsamer** (E5, +34 % Zeilen): In S2 messen. Läuft ein CPU-Test über 1 s, bekommt er ein eigenes Zeitlimit (`CLAUDE.md`).
 - **Fixture-Umzug von 9100** (M1): Er ändert die Fixture-Wegzeit nur für Startpunkte in seiner Nähe; vorher lag er 1,2 km von Eberhardshof und 2 km von Gostenhof, außerhalb jedes Innen-Tests. Die volle Suite auf `main` deckt es ab.
 
+## Umsetzung (2026-10-12, S1–S5 ohne Sichtprüfung und Arch-Review)
+
+- **S1** (d4e1a30): `regions.ts` mit `fuerth`, `kreis`, `byPopulation` (gemeinsame Sortierung für `cityChoices`, `districtGroups`, `regionList`) und `regionList`; 18 Fürther Stadtteile; `district-groups.ts`; Schema-Export. Overpass-Abgleich (G6): Die Tabelle in E6 stammt aus der Abfrage vom selben Tag, keine Abweichung.
+- **S2** (ec78e8b): echte Daten 556 → 747 Zeilen, `wegzeit.json` 52,4 kB gzip (gzip -9; size-limit 51,76 kB von 64 kB), `linien.json` 21,4 kB (size-limit 21,55 kB von 40 kB), Rechenzeit der Tabelle 2,1 → 2,3 s, `data:build` gesamt 11,3 → 14,9 s. Zugangshalt-Gate grün für alle 53 Stadtteile; alle 27 Fürther `suburb`-Punkte hätten einen Halt in höchstens 380 m gehabt, ausgefallen ist keiner (18 nach dem Weglassen der Weiler). Fixture: 9100 nach 49,4748 / 10,9885; `table.test.ts` erwartet 31 statt 26 Zellen.
+- **S3** (5680768): `JS (initial)` 100,58 → **101,25 kB** von 102 kB (Nachtrag ADR 0012), `Onboarding JS` 7,13 kB von 7,3 kB.
+- **S4** (505a08f): `prefilter` mit `abgelehnt` aller Regionen; Test 5b war ohne die Änderung in `io/discover.ts` rot.
+- **S5:** `pnpm e2e:local e2e/onboarding.spec.ts e2e/startpunkt.spec.ts e2e/mobile-ux.spec.ts` auf pixel-7: 290 bestanden, 7 übersprungen. Doku: ADR 0029, Verweise in ADR 0011 und 0025, `docs/architecture.md`, Skill, `docs/ideas.md`, `CLAUDE.md`.
+- **Abweichungen vom Plan:**
+  - `scripts/lib/e2e-map.ts` geändert: `district-groups.ts` ist den Specs `onboarding` und `startpunkt` zugeordnet. Ohne die Zuordnung war das neue Modul nach S1 (noch ohne Importeur in `src/ui`) „ohne Spec“ und `e2e-select.test.ts` rot.
+  - `prefilter` nimmt `abgelehnt` als optionales Feld (ohne Angabe die eigene Region), damit die bestehenden Tests unverändert bleiben.
+  - Test „Kachel Fürth, Weg übersprungen“: „Später“ geht einen Schritt weiter und beendet erst auf dem letzten; der Test klickt es, bis der Dialog zu ist.
+  - Zwischen S1 und S2 war der echte Build lokal rot (Fürther Stadtteile ohne Zugangshalt, weil die Tabelle noch keine Fürther Zeilen hatte); nicht gepusht.
+- **Offen** (Haupt-Session): `/browser-review` lokal (Checkliste aus S5), `/arch-review`, S6 Trockenlauf, S7 Push und live, S8.
+
 ## Offene Punkte
 
 Keine. Startbudget (102 kB) und Bootstrap-Trockenlauf sind vom Nutzer entschieden bzw. freigegeben (2026-10-12); den Trockenlauf startet die Haupt-Session.

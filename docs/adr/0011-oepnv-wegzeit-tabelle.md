@@ -8,6 +8,8 @@ Status: angenommen (2026-10-05), Umsetzung mit Plan 0009. Ersetzt Teile von ADR 
 
 **Geändert durch ADR 0019 (Plan 0020):** Wortlaut der Statuszeile (Punkt 3, Satz 3). Punkt 9 bleibt erfüllt, „außerhalb des Stadtgebiets“ steht weiter dort.
 
+**Geändert durch ADR 0029 (Plan 0036):** Punkt 2 und 9: Zeilen und Startgebiet sind die Stadtgebiete aller Regionen (`Region.kreis`, heute Nürnberg `de:09564:` und Fürth `de:09563:`), nicht nur Nürnberg.
+
 ## Kontext
 
 ADR 0005 legte fest, dass die Wegzeit aus einer statischen GTFS-Matrix entsteht: ~150 Halte U-Bahn, S-Bahn und Tram, `Venue.nearestStops`, Fahrzeit ohne Umsteige-Wartezeit. Plan 0009 hat das am VGN-Feed nachgemessen (Stand 24.06.2026, gültig bis 12.12.2026, 15,3 MB):

@@ -1,6 +1,6 @@
 # Zwergenplan
 
-Private, mobile-first PWA, die Angebote für Kinder unter 3 Jahren in Nürnberg findet. Gedacht für Freunde und Familie, für Suchmaschinen offen, mit Impressum und Datenschutz unter `impressum/` (ADR 0028). Statisch auf GitHub Pages. Daten kommen aus einer Agenten-Recherche (`.claude/skills/babyevents-nuernberg`) nach `data/`.
+Private, mobile-first PWA, die Angebote für Kinder unter 3 Jahren in Nürnberg und Fürth findet. Gedacht für Freunde und Familie, für Suchmaschinen offen, mit Impressum und Datenschutz unter `impressum/` (ADR 0028). Statisch auf GitHub Pages. Daten kommen aus einer Agenten-Recherche (`.claude/skills/babyevents-nuernberg`) nach `data/`.
 
 UI-Texte und Doku sind auf Deutsch, Code-Identifier auf Englisch. Die Kommandos stehen in `package.json`.
 

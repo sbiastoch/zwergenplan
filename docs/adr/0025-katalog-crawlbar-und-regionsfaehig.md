@@ -1,6 +1,6 @@
 # ADR 0025 – Katalog crawlbar und regionsfähig
 
-Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung je Region statt fester bbox), ADR 0006 (Katalogformat) und ADR 0024 (`notes` ist Protokoll; `adapter` wird für `aggregator` Pflicht).
+Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung je Region statt fester bbox), ADR 0006 (Katalogformat) und ADR 0024 (`notes` ist Protokoll; `adapter` wird für `aggregator` Pflicht). **Ergänzt durch ADR 0029 (Plan 0036):** zweite Region Fürth, Feld `kreis`, Reihenfolge des Entdeckens (Nachtrag unten).
 
 ## Kontext
 
@@ -38,3 +38,8 @@ Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung 
 - **Abweichung von Punkt 1** („Weitere Region-Felder … kommen mit der zweiten Region“): `Region` bekommt schon jetzt `population` (Einwohner, auf Tausend gerundet, Quelle und Stichtag im Kommentar von `src/domain/regions.ts`; Nürnberg 527 000 aus 526 606 am 31.12.2023, Bayerisches Landesamt für Statistik). Der Kopfkommentar von `regions.ts` nennt das.
 - **Grund:** Nutzerwunsch für das Onboarding, Stadt-Kacheln „sortiert nach den größten Städten, die wir unterstützen“, und darunter ein Dropdown für weitere. Die reine Funktion `cityChoices` (`src/domain/onboarding.ts`) sortiert danach; eine zweite Region ist damit nur ein Eintrag mit Daten. Das Plan-Review hatte das Feld bis zur zweiten Region zurückstellen wollen (Plan 0033, Review L6, abgelehnt).
 - **Keine Schemaänderung:** `src/domain/schema.ts` liest weiter nur `REGION_IDS` und `bbox`, `schema/*.json` bleibt gleich. Die Stadtwahl wird nicht gespeichert, solange es eine Region gibt (`docs/ideas.md`).
+
+## Nachtrag (2026-10-12): zweite Region Fürth (Plan 0036, ADR 0029)
+
+- Mit Fürth kommt das Feld `kreis` (Startgebiet der Wegzeit); Ferienland und Kamera kommen weiter nicht, weil nichts sie liest. `REGION_IDS` legt jetzt auch die Reihenfolge des Entdeckens fest (spezifischere Region zuerst).
+- Die Stadtwahl bleibt auch mit zwei Regionen ungespeichert (ADR 0029, Punkt 5).
