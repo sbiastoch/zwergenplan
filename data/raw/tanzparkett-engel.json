@@ -1,0 +1,44 @@
+{
+ "events": [
+  {
+   "providerId": "tanzparkett-engel",
+   "venueId": "tanzparkett-engel",
+   "title": "Eltern-Kind-Tanz (2–4 Jahre, samstags)",
+   "summary": "Spielerisches Tanzen für Kinder von etwa zwei bis vier Jahren, begleitet von einem Elternteil oder Großeltern. Teilnahme nur nach Anmeldung; eine kostenfreie Probestunde ist nach Anfrage per E-Mail oder Telefon möglich.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "bewegung",
+    "tanz"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://tanzparkett-engel.de/tp_wp/classes/",
+   "sourceUrl": "https://tanzparkett-engel.de/tp_wp/classes/",
+   "age": {
+    "minMonths": 24,
+    "maxMonths": 48
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung per E-Mail oder Telefon; Probestunde kostenfrei anfragen"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "SA"
+    ],
+    "start": "09:00",
+    "end": "10:00",
+    "from": "2026-10-17",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "1da763539b8f4369411f10ed24898a96445a34901d8b49732d8cd808bb1bf4bf",
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-12T10:13:54+02:00",
+ "changedAt": "2026-10-12T10:13:54+02:00",
+ "sources": []
+}

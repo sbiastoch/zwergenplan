@@ -3200,3 +3200,28 @@
       address: Rosenstraße 16-20, 90762 Fürth
       district: Süd
       geo: { lat: 49.4767817, lon: 10.9866124 }
+- id: tanzparkett-engel
+  publicId: lw2pty9b
+  role: anbieter
+  region: fuerth
+  name: Tanzparkett Engel
+  url: https://tanzparkett-engel.de/tp_wp/
+  programme:
+    - url: https://tanzparkett-engel.de/tp_wp/classes/
+      kind: html
+      render: browser
+      use: termine
+  availability:
+    shown: unbekannt
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Krabbelgruppe: https://tanzparkett-engel.de/tp_wp/classes/ – Eltern-Kind-Tanz für Kinder von zwei bis vier Jahren in Begleitung von Eltern oder Großeltern, im Studio in Fürth; nur nach Anmeldung, Termin auf der Kursseite (Samstag 9–10 Uhr)."
+  age:
+    minMonths: 24
+    maxMonths: 59
+  venues:
+    - id: tanzparkett-engel
+      name: Tanzparkett Engel, Ballett- und Tanzschule
+      address: Bahnhofplatz 10, 90762 Fürth
+      district: Süd
+      geo: { lat: 49.4705191, lon: 10.9889322 }
