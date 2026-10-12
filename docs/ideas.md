@@ -30,6 +30,8 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Einstieg in laufende Kurse**: Die Liste sortiert nach dem nächsten Termin und zeigt „Kurs · noch 4 von 8“ (Plan 0003). Ob ein Quereinstieg möglich ist, wissen die Daten nicht – dafür bräuchte das Schema ein Feld.
 - **Browser für den Recherche-Lauf**: Mit verbundenem claude-in-chrome werden Plätze bei Eversports, Calendly und Kurabu lesbar (im ersten Lauf `unbekannt`).
 - **Kompakter Kopfbereich im Querformat**: Sticker und Chips nehmen quer ≈ 150 px Höhe ein. Mit der Seitenleiste (Plan 0007, E14) ist das tragbar, ein kompakterer Kopf wäre ein eigenes Designthema (Befund H1).
+- **Aktiven Kategorie-Sticker ins Bild scrollen** (Browser-Review Plan 0037): Bei `?kat=musik` oder nach dem Neuladen steht die Sticker-Leiste am Anfang, gewählte Sticker weiter rechts sind nicht sichtbar, nur der Zähler an „Filter“ zeigt die Auswahl.
+- **Zurück nach dem Filter-Sheet** (Browser-Review Plan 0037): Chip-Taps legen keinen History-Eintrag an, „Zurück“ verlässt danach die App statt den vorigen Filter herzustellen. Ob Filterwechsel History-Einträge sein sollen, ist eine eigene Entscheidung.
 - **Rollende Kalenderwoche**: 7 Tage ab heute statt Mo–So, damit am Sonntag nicht 6 von 7 Tagen gesperrt sind (Befund H2). Ändert das Kalenderkonzept (`calendarNav`, Plan 0003 E14), deshalb ein eigener Plan.
 - **Seitenzoom als Gate**: Chrome Android zoomt auf Wunsch die ganze Seite, bei 200 % ist der Viewport dann ~206 px. Das Gate deckt heute 320 px bei 200 % Textgröße ab (Plan 0007, E7).
 - **Schrift-Preload**: `<link rel="preload">` der Latin-woff2 verkürzt das Swap-Fenster, braucht aber den gehashten Asset-Namen im HTML (Plan 0007, E11).

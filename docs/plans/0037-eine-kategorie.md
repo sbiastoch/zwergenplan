@@ -535,3 +535,12 @@ Abgelehnt: keine.
   - Test 19 e läuft ohne und mit `?kat=musik` (statt `?kat=buehne`). Test 17 und 19 d2 schreiben `site.json` per `page.route` um.
   - `rg -n "kat=" e2e/` erneut geprüft: keine neue Stelle seit `84d39c7`, die Tabelle unter Test 19 gilt unverändert.
   - Hash des Antwortschemas unverändert (`ab413b808c90`).
+- **Arch-Review B (2026-10-12): OK.** Übernommen:
+  - E5 und der Kommentar in Schritt 7 nennen den Rückfall ab B ehrlich als nur im Speicher erreichbar.
+  - Die Tests mit JSON-Umweg nennen das implizite `any`.
+  - Plan 0026 verweist auf `offer.category`.
+  - Der A5-Doku-Stand ist nach dem Zusammenführen erhalten.
+- **B5 Browser-Review lokal (2026-10-12): bestanden.**
+  - Geprüft wurden alle B5-Zeilen bei 320, 360 und 390 px, hell und dunkel, mit 0 Konsolenfehlern. Bilder in `e2e/.artifacts/b5/`.
+  - claude-in-chrome war nicht verbunden, die Interaktion lief deshalb über Playwright.
+  - Zwei Minor-Befunde kommen nicht aus diesem Plan: aktiver Sticker außerhalb des Blicks, „Zurück“ nach dem Filter-Sheet. Beide stehen in `docs/ideas.md`.

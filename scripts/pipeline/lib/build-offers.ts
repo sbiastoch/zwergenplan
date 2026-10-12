@@ -380,7 +380,8 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     const sessions =
       old.format === "kurs" ? old.sessions : old.sessions.filter((s) => berlinDay(s.start) >= input.horizon.from);
     if (sessions.length === 0 || Date.parse(sessions.at(-1)?.end ?? "") < cutoff) continue;
-    // Übergang Plan 0037 (E5): Rückfall für Stände ohne category; entfällt in Stufe C
+    // Übergang Plan 0037 (E5): Rückfall für Stände ohne category; entfällt in Stufe C. Ab Stufe B nur noch im Speicher
+    // erreichbar, denn `readPreviousOffers` lehnt einen Bestand ohne category per Schema ab.
     if (old.category === undefined) countDerived(old.providerId);
     offers.push({ ...old, category: old.category ?? fallbackCategory(old.topics), sessions });
     ids.add(old.id);

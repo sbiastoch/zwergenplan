@@ -134,7 +134,7 @@ describe("toEvalOffers", () => {
     } satisfies Offer;
     expect(toEvalOffers([o], { from: "2026-10-11", to: "2027-02-04" })[0]?.category).toBe("buehne");
     // Bestand vor Stufe A ohne category: Rückfall aus den Themen (Übergang Plan 0037, E10; entfällt in Stufe C).
-    // Der Typ verlangt category seit Stufe B, der JSON-Umweg baut den alten Stand ohne Cast nach.
+    // Der Typ verlangt category seit Stufe B, der JSON-Umweg (implizites `any` statt `as`) baut den alten Stand nach; entfällt in Stufe C.
     const { category: _, ...ohne } = o;
     const alt: Offer = JSON.parse(JSON.stringify(ohne));
     expect(toEvalOffers([alt], { from: "2026-10-11", to: "2027-02-04" })[0]?.category).toBe("musik");

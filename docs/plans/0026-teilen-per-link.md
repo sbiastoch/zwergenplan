@@ -496,7 +496,7 @@ Das ersetzt N4 für Angebote. Ein generisches Bild sieht in jedem Chat gleich au
 
 - **Eine Datei je Angebot**: `angebot/<offerId>/vorschau.jpg`, 1200 × 630 (1,91 : 1), JPEG Qualität 82, also neben der Vorschauseite im selben Ordner. Den Pfad liefert `offerImagePath(offerId)` aus `src/domain/share.ts`.
 - **Motiv**: die Kachel der Übersicht, vergrößert, auf dem Punktraster-Papier der App, immer hell.
-  - Kopfzeile: Kategorie-Pille mit Farbe, Form und Etikett der Leitkategorie (`leadCategory(offer.topics, [])`), daneben **wann**. Das ist derselbe Text wie im `og:title` (E3), also Rhythmus bzw. festes Datum, nie „nächster Termin“.
+  - Kopfzeile: Kategorie-Pille mit Farbe, Form und Etikett der Leitkategorie (`leadCategory(offer.topics, [])`; seit Plan 0037: `offer.category`), daneben **wann**. Das ist derselbe Text wie im `og:title` (E3), also Rhythmus bzw. festes Datum, nie „nächster Termin“.
   - Titel (höchstens 3 Zeilen, danach „…“ per `line-clamp`).
   - Meta: `{Anbieter} · {Ort}, {Stadtteil}` (höchstens 2 Zeilen). Die Kachel der App zeigt nur den Stadtteil, das Bild nennt auch den Ort, denn im Chat fehlt der Kontext.
   - Fakten wie auf der Kachel: **Alter** (immer, die Kachel zeigt es nur bei „passt nicht“), Kosten, Anmeldung (Rahmen bei „Anmeldung nötig“ wie `.fact.reg`), Plätze (nur mit aussagekräftigem Status, `availabilityLabel`). Der Kosten-Fakt wird im Bild deterministisch auf 40 Zeichen gekürzt (Wortende, „…“), denn `price` ist Freitext (Review A, M1).
