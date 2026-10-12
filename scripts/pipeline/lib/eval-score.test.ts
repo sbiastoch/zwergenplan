@@ -67,6 +67,7 @@ describe("toEvalOffers", () => {
         venueId: VENUE,
         title: "Kurs",
         summary: "x",
+        category: "babykurse",
         topics: ["pekip"],
         format: "kurs",
         registration: "mit-anmeldung",
@@ -87,6 +88,7 @@ describe("toEvalOffers", () => {
         venueId: VENUE,
         title: "Vorbei",
         summary: "x",
+        category: "babykurse",
         topics: ["pekip"],
         format: "einmalig",
         registration: "mit-anmeldung",
@@ -105,7 +107,6 @@ describe("toEvalOffers", () => {
         format: "kurs",
         registration: "mit-anmeldung",
         cost: "kostenpflichtig",
-        // ohne category im Bestand: Rückfall aus den Themen (Übergang Plan 0037, E10)
         category: "babykurse",
         topics: ["pekip"],
         availability: { status: "frei" },
@@ -132,6 +133,11 @@ describe("toEvalOffers", () => {
       sessions: [{ start: "2026-10-12T10:00:00+02:00", end: "2026-10-12T11:00:00+02:00" }],
     } satisfies Offer;
     expect(toEvalOffers([o], { from: "2026-10-11", to: "2027-02-04" })[0]?.category).toBe("buehne");
+    // Bestand vor Stufe A ohne category: Rückfall aus den Themen (Übergang Plan 0037, E10; entfällt in Stufe C).
+    // Der Typ verlangt category seit Stufe B, der JSON-Umweg baut den alten Stand ohne Cast nach.
+    const { category: _, ...ohne } = o;
+    const alt: Offer = JSON.parse(JSON.stringify(ohne));
+    expect(toEvalOffers([alt], { from: "2026-10-11", to: "2027-02-04" })[0]?.category).toBe("musik");
   });
 });
 

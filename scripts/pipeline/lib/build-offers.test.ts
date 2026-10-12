@@ -576,7 +576,11 @@ describe("buildOffers", () => {
 
     it("e) Übernahme aus dem Altbestand ohne category: Rückfall, gezählt; f) die Datei besteht OffersFile", () => {
       const { file: prev } = loadFixtures();
-      const ohne = { ...prev, offers: prev.offers.map(({ category: _, ...o }) => o) };
+      // Ab Stufe B verlangt der Typ `category`; ein Altbestand ohne das Feld kommt nur noch aus einer Datei vor A6.
+      // Der JSON-Umweg baut ihn ohne Cast nach, bis Stufe C das Netz entfernt (Plan 0037, E5).
+      const ohne: OffersFile = JSON.parse(
+        JSON.stringify({ ...prev, offers: prev.offers.map(({ category: _, ...o }) => o) }),
+      );
       const { file, report } = buildOffers(
         base({
           previous: ohne,

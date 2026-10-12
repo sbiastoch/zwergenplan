@@ -418,11 +418,21 @@ describe("Hauptkategorie category (Plan 0037, E1)", () => {
     expect(errorsOf(withCategory("buehne"))).toBe("");
   });
 
-  it("ist in Stufe A optional", () => {
+  it("ist ab Stufe B Pflicht", () => {
     const ohne = mutate((o) => {
-      for (const offer of o.offers) delete offer["category"];
+      const [first] = o.offers;
+      if (first) delete first["category"];
     });
-    expect(errorsOf(ohne)).toBe("");
+    expect(errorsOf(ohne)).toContain("category");
+  });
+
+  it("die Fixtures tragen category und bestehen", () => {
+    let missing = -1;
+    const r = mutate((o) => {
+      missing = o.offers.filter((offer) => offer["category"] === undefined).length;
+    });
+    expect(missing).toBe(0);
+    expect(errorsOf(r)).toBe("");
   });
 
   it("lehnt Werte außerhalb von CATEGORIES ab", () => {

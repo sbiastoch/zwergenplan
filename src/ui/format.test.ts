@@ -71,6 +71,7 @@ function offer(fields: Pick<SiteOffer, "format" | "sessions"> & Partial<SiteOffe
     venueId: "ort",
     title: "Titel",
     summary: "Zusammenfassung",
+    category: "musik",
     topics: ["musik"],
     registration: "mit-anmeldung",
     cost: "kostenlos",

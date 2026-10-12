@@ -20,6 +20,7 @@ function offer(id: string, day: string, age?: SiteOffer["age"], format: SiteOffe
     venueId: "ort",
     title: id,
     summary: "Zusammenfassung",
+    category: "musik",
     topics: ["musik"],
     format,
     ...(age ? { age } : {}),

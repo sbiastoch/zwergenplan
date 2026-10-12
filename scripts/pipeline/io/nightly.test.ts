@@ -178,9 +178,12 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
 
   it("schreibt build.derivedCategories nach nightly.json (Übergang Plan 0037, E5)", async () => {
     const dirsOf = tempData();
-    const { extractor } = fakeExtractor();
-    // Vorstand ohne category (Fixtures vor Stufe B): gemeinde-beispiel scheitert und behält ihn per Rückfall
-    const r = await runNightly({ ...options(dirsOf, extractor), fetch: fakeFetch(["gemeinde-beispiel"]) });
+    // Rohevent ohne category (Zustand vor Stufe A): gemeinde-beispiel bekommt es und der Build leitet die Kategorie ab
+    const ohneCategory = { ...treff, providerId: "gemeinde-beispiel", venueId: "gemeinde-beispiel-gemeindehaus" };
+    const { extractor } = fakeExtractor((id) =>
+      id === "gemeinde-beispiel" ? { kind: "ok", events: [ohneCategory], model: "haiku" } : undefined,
+    );
+    const r = await runNightly(options(dirsOf, extractor));
     expect(r.build.derivedCategories).toBeGreaterThan(0);
     const report = JSON.parse(readFileSync(join(dirsOf.runDir, "nightly.json"), "utf8"));
     expect(report.build.derivedCategories).toBe(r.build.derivedCategories);

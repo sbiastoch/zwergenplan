@@ -28,6 +28,7 @@ const draft = (over: Partial<Draft> = {}): Draft => ({
   venueId: "turnverein-beispiel-halle",
   title: "PEKiP (Di 9:30)",
   summary: "Bewegung und Spiel für Babys.",
+  category: "babykurse",
   topics: ["pekip"],
   format: "regelmaessig",
   registration: "mit-anmeldung",

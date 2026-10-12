@@ -249,6 +249,7 @@
           "venueId",
           "title",
           "summary",
+          "category",
           "topics",
           "format",
           "registration",

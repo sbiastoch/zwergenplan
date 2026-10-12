@@ -224,8 +224,8 @@ export const OfferFields = z.strictObject({
   title: z.string().min(1).max(140),
   /** eigene Zusammenfassung, nie 1:1 kopierter Anbietertext */
   summary: z.string().min(1).max(320),
-  /** Hauptkategorie (ADR 0030); optional bis Stufe B von Plan 0037 (E1), Pflicht ab dann */
-  category: CategoryField.optional(),
+  /** Hauptkategorie (ADR 0030), Pflicht seit Stufe B von Plan 0037 (E1); `RawEvent` hält sie bis Stufe C optional */
+  category: CategoryField,
   topics: z.array(Topic).min(1),
   format: Format,
   registration: Registration,

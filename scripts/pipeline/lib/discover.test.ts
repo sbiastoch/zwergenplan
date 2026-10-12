@@ -526,6 +526,7 @@ const offer = (over: Partial<Offer> = {}): Offer => ({
   venueId: "krabbelzwerge-gostenhof",
   title: "Krabbelgruppe",
   summary: "Spielen",
+  category: "krabbel-spielgruppen",
   topics: ["krabbelgruppe"],
   format: "regelmaessig",
   registration: "ohne-anmeldung",
