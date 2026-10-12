@@ -299,6 +299,73 @@ describe("runDiscover (Plan 0032, E7)", () => {
     expect(r.gateErrors).toBeUndefined();
   });
 
+  it("zwei Regionen: Fürth zuerst, keine Dublette, abgelehnt gilt über Regionen (Plan 0036, E2/E4)", async () => {
+    const d = tempData();
+    mkdirSync(join(d.dataDir, "discover"));
+    writeFileSync(
+      join(d.dataDir, "discover", "nuernberg.json"),
+      JSON.stringify({
+        region: "nuernberg",
+        abgelehnt: [{ host: "spam.example.net", grund: "Werbung", datum: TODAY }],
+        zurueckgestellt: [],
+      }),
+    );
+    const FUE = "https://kleeblatt.example.net/";
+    const MOE = "https://moegelzwerge.example.net/";
+    const entry = (name: string, url: string, address: string) => ({
+      entscheidung: "aufnehmen",
+      grund: "Krabbelgruppe mit Terminen",
+      eintrag: {
+        name,
+        url,
+        programme: [{ url: `${url}kurse`, kind: "html", use: "termine" }],
+        venues: [{ name: `${name} Raum`, address }],
+        availability: "unbekannt",
+      },
+    });
+    const fakes = {
+      // dieselbe Suche liefert in beiden Regionen dieselben Funde
+      search: kandidaten(
+        { name: "Kleeblatt Fürth", url: FUE },
+        { name: "Mögelzwerge", url: MOE },
+        { name: "Spam", url: "https://kurse.spam.example.net/x" },
+      ),
+      assess: {
+        [FUE]: entry("Kleeblatt Fürth", FUE, "Königstraße 1, 90762 Fürth"),
+        [MOE]: entry("Mögelzwerge", MOE, "Ostendstraße 1, 90482 Nürnberg"),
+      },
+      geocode: async (address) =>
+        address.includes("Fürth")
+          ? { lat: 49.476, lon: 10.989, display: "x", district: "Innenstadt" }
+          : { lat: 49.46, lon: 11.13, display: "x", district: "Mögeldorf" },
+    } satisfies Fakes;
+    // jede Fund-Seite verlinkt ihre Kursseite (Programmseiten nur aus den Links der Fund-Seite)
+    const fetchPage: DiscoverDeps["fetchPage"] = async (url) =>
+      page(url, `<html><body><p>Krabbelgruppe für Babys</p><a href="${new URL("kurse", url)}">Kurse</a></body></html>`);
+    const r = await run(d, fakes, { regions: ["fuerth", "nuernberg"], deps: { ...deps(fakes), fetchPage } });
+    const [fue, nbg] = r.regions;
+    expect(fue?.region).toBe("fuerth");
+    expect(fue?.adopted.map((a) => a.id)).toEqual(["kleeblatt-fuerth"]);
+    expect(fue?.rejected).toEqual([
+      { find: expect.objectContaining({ url: MOE }), grund: expect.stringMatching(/^kein Ort in der Region Fürth/) },
+    ]);
+    expect(fue?.dropped.map((x) => x.grund)).toEqual(["abgelehnt: Werbung"]);
+    // Nürnberg: Fürther Fund steht schon im Katalog, Mögeldorf wird im selben Lauf hier aufgenommen (Review G3)
+    expect(nbg?.region).toBe("nuernberg");
+    expect(nbg?.adopted.map((a) => a.id)).toEqual(["moegelzwerge"]);
+    expect(nbg?.dropped.map((x) => x.grund)).toEqual([expect.stringMatching(/Katalog/), "abgelehnt: Werbung"]);
+    const catalog = parse(readFileSync(join(d.runDir, "providers.yaml"), "utf8")) as Array<{
+      id: string;
+      region: string;
+    }>;
+    expect(catalog.slice(-2).map((p) => [p.id, p.region])).toEqual([
+      ["kleeblatt-fuerth", "fuerth"],
+      ["moegelzwerge", "nuernberg"],
+    ]);
+    const state = DiscoverState.parse(JSON.parse(readFileSync(join(d.runDir, "fuerth.json"), "utf8")));
+    expect(state.zurueckgestellt.map((z) => z.url)).toEqual([MOE]);
+  });
+
   it("Trockenlauf: würde aufnehmen, verwirft mit Grund, schreibt nichts nach data/", async () => {
     const d = tempData();
     const before = readFileSync(join(d.dataDir, "providers.yaml"), "utf8");

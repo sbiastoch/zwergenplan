@@ -267,7 +267,11 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   }
   const originalCatalogText = catalogText;
   // zurückgenommene IDs aller Regionen: IDs sind global (ADR 0022)
-  const reserved = reservedIds(REGION_IDS.map((r) => readState(o.dataDir, r)));
+  const allStates = REGION_IDS.map((r) => readState(o.dataDir, r));
+  const reserved = reservedIds(allStates);
+  // Sperren aller Regionen: Die Regionen überlappen, ein Abgelehnter darf nicht über die Nachbarregion zurückkommen
+  // (Plan 0036, E4)
+  const abgelehnt = allStates.flatMap((st) => st.abgelehnt);
   const freeDays = await o.deps.freeDays(addMonths(o.today, -12), addMonths(o.today, 24));
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
   const regions: RegionReport[] = [];
@@ -333,7 +337,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     report.finds = finds.length;
 
     // 3. Vorfilter (Code)
-    const { keep, dropped } = prefilter(finds, { catalog, state, today: o.today });
+    const { keep, dropped } = prefilter(finds, { catalog, state, abgelehnt, today: o.today });
     report.dropped.push(...dropped);
     log(
       `${regionName}: ${finds.length} Kandidaten, ${keep.length} nach dem Vorfilter, ${calls.length} Modellaufrufe bisher`,
@@ -352,7 +356,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       }
       open--;
       // ein früher in diesem Lauf aufgenommener Anbieter kann denselben Kandidaten schon abdecken
-      const again = prefilter([find], { catalog, state, today: o.today });
+      const again = prefilter([find], { catalog, state, abgelehnt, today: o.today });
       if (again.keep.length === 0) {
         report.dropped.push(...again.dropped);
         continue;

@@ -113,6 +113,22 @@ describe("prefilter (E7.3)", () => {
     expect(r.dropped.map((d) => d.grund)).toEqual(["abgelehnt: Vermittler", "abgelehnt: Werbung"]);
   });
 
+  it("abgelehnt aus einer anderen Region gilt auch hier; die Regionen überlappen (Plan 0036, E4)", () => {
+    const fremd = DiscoverState.parse({
+      region: "nuernberg",
+      abgelehnt: [{ host: "spam.example.net", grund: "Werbung", datum: "2026-09-01" }],
+      zurueckgestellt: [],
+    });
+    const r = prefilter([find({ url: "https://kurse.spam.example.net/x", name: "Spam" })], {
+      catalog,
+      state: emptyState("fuerth"),
+      abgelehnt: fremd.abgelehnt,
+      today,
+    });
+    expect(r.keep).toEqual([]);
+    expect(r.dropped.map((d) => d.grund)).toEqual(["abgelehnt: Werbung"]);
+  });
+
   it("zurückgestellt bis zur Wiedervorlage, danach wieder dabei", () => {
     const state = postpone(emptyState("nuernberg"), find(), "kein Angebot für 0–3", "2026-08-01");
     expect(state.zurueckgestellt[0]?.wiedervorlage).toBe("2026-09-26");

@@ -97,11 +97,21 @@ function similarName(a: string, b: string): boolean {
   return xs.some((x) => ys.some((y) => x.includes(y) || y.includes(x) || ratio(x, y) >= NAME_RATIO));
 }
 
-/** Vorfilter (E7.3): bekannte URL, bekannter Host mit ähnlichem Namen, `abgelehnt`, noch zurückgestellt. */
+/**
+ * Vorfilter (E7.3): bekannte URL, bekannter Host mit ähnlichem Namen, `abgelehnt`, noch zurückgestellt. `abgelehnt`
+ * sind die Sperren aller Regionen, weil sich die Regionen überlappen (Plan 0036, E4); ohne Angabe die der eigenen.
+ * `zurueckgestellt` bleibt je Region, der Grund hängt oft an ihr („kein Ort in der Region …“).
+ */
 export function prefilter(
   finds: readonly Find[],
-  ctx: { catalog: readonly Provider[]; state: DiscoverState; today: string },
+  ctx: {
+    catalog: readonly Provider[];
+    state: DiscoverState;
+    abgelehnt?: DiscoverState["abgelehnt"];
+    today: string;
+  },
 ): { keep: Find[]; dropped: Array<{ find: Find; grund: string }> } {
+  const abgelehnt = ctx.abgelehnt ?? ctx.state.abgelehnt;
   const byUrl = new Map<string, string>();
   const byHost = new Map<string, Provider[]>();
   for (const p of ctx.catalog)
@@ -112,13 +122,13 @@ export function prefilter(
       if (h) byHost.set(h, [...new Set([...(byHost.get(h) ?? []), p])]);
     }
   const rejectedUrls = new Map(
-    ctx.state.abgelehnt.flatMap((a) => {
+    abgelehnt.flatMap((a) => {
       const n = a.url ? normalizeUrl(a.url) : undefined;
       return n ? [[n, a.grund] as const] : [];
     }),
   );
   const rejectedHosts = new Map(
-    ctx.state.abgelehnt.flatMap((a) => {
+    abgelehnt.flatMap((a) => {
       const h = a.host;
       return h ? [[h.toLowerCase().replace(/^www\./, ""), a.grund] as const] : [];
     }),
