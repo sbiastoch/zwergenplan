@@ -4,15 +4,15 @@
    "providerId": "ev-zerzabelshof-musikzwerge",
    "venueId": "ev-zerzabelshof-musikzwerge",
    "title": "Musikzwerge für Eltern mit Baby ab ca. 3 Monaten",
-   "summary": "Gemeinsames Singen, Rhythmus mit Instrumenten und Fingerspiele für Eltern und Babys, dazu Austausch zu Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+   "summary": "Gemeinsames Singen, Musizieren mit Instrumenten und Fingerspiele für Eltern mit Baby; die Eltern lernen Lieder zum Weitergeben. Anmeldung und Kosten nennt die Quelle nicht, bitte beim Veranstalter erfragen.",
    "topics": [
     "musik",
     "singen",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8108194",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108194",
    "age": {
@@ -21,7 +21,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, bei Fragen direkt an die Auferstehungskirche Zerzabelshof wenden."
+    "note": "Keine Platzangabe; Anfrage beim Veranstalter, Auferstehungskirche Zerzabelshof"
    },
    "schedule": {
     "kind": "dates",
@@ -74,15 +74,15 @@
    "providerId": "ev-zerzabelshof-musikzwerge",
    "venueId": "ev-zerzabelshof-musikzwerge",
    "title": "Musikzwerge für Eltern mit Kind ab ca. 1 Jahr",
-   "summary": "Gemeinsames Singen, Rhythmus mit Instrumenten und Fingerspiele für Eltern und Kinder, dazu Austausch zu Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+   "summary": "Singen, Musizieren mit Instrumenten und Fingerspiele für Eltern mit Kleinkind ab ca. einem Jahr. Anmeldung und Kosten nennt die Quelle nicht, bitte beim Veranstalter erfragen.",
    "topics": [
     "musik",
     "singen",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8122211",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8122211",
    "age": {
@@ -91,7 +91,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, bei Fragen direkt an die Auferstehungskirche Zerzabelshof wenden."
+    "note": "Keine Platzangabe; Anfrage beim Veranstalter, Auferstehungskirche Zerzabelshof"
    },
    "schedule": {
     "kind": "dates",
@@ -144,15 +144,15 @@
    "providerId": "ev-zerzabelshof-musikzwerge",
    "venueId": "ev-zerzabelshof-musikzwerge",
    "title": "Musikzwerge für Eltern mit Kind ab ca. 18 Monaten",
-   "summary": "Gemeinsames Singen, Rhythmus mit Instrumenten und Fingerspiele für Eltern und Kinder, dazu Austausch zu Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+   "summary": "Singen, Musizieren mit Instrumenten und Fingerspiele für Eltern mit Kleinkind ab ca. 18 Monaten. Anmeldung und Kosten nennt die Quelle nicht, bitte beim Veranstalter erfragen.",
    "topics": [
     "musik",
     "singen",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8108207",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108207",
    "age": {
@@ -161,7 +161,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, bei Fragen direkt an die Auferstehungskirche Zerzabelshof wenden."
+    "note": "Keine Platzangabe; Anfrage beim Veranstalter, Auferstehungskirche Zerzabelshof"
    },
    "schedule": {
     "kind": "dates",
@@ -214,32 +214,28 @@
    "providerId": "ev-zerzabelshof-musikzwerge",
    "venueId": "ev-zerzabelshof-musikzwerge",
    "title": "Musikzwerge für Eltern mit Kind ab ca. 2 Jahren",
-   "summary": "Gemeinsames Singen, Rhythmus mit Instrumenten und Fingerspiele für Eltern und Kinder ab etwa zwei Jahren, dazu Austausch zu Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+   "summary": "Singen, Musizieren mit Instrumenten und Fingerspiele für Eltern mit Kindern ab 2 Jahren. Anmeldung und Kosten nennt die Quelle nicht, bitte beim Veranstalter erfragen.",
    "topics": [
     "musik",
     "singen",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8108180",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108180",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8108181",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108181",
    "age": {
     "minMonths": 24,
     "maxMonths": 36
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, bei Fragen direkt an die Auferstehungskirche Zerzabelshof wenden."
+    "note": "Keine Platzangabe; Anfrage beim Veranstalter, Auferstehungskirche Zerzabelshof"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-12T09:15",
-      "end": "2026-10-12T10:15"
-     },
      {
       "start": "2026-10-19T09:15",
       "end": "2026-10-19T10:15"
@@ -283,31 +279,31 @@
  ],
  "inputHash": "33887bbe3a29d2489da67e46d8021644210b8b85fb0d6fd81bf8166521f915ea",
  "dated": {
-  "2026-10-12": "018d8d64feba03005945954ae9a1b602f873e282c43625eb4706484934b3d450",
+  "2026-10-12": "7c4c53a369c8de41c07d356a5673b71b19465e724ea0ad0a35cb814679a8658f",
   "2026-10-13": "08c19c55c7c6ddbb8bde56d32a9ce255126246cea73368b157d1563ae1373fc5",
-  "2026-10-19": "37fd072dd17b0abeeb240fda729eb40baf8811a1299261d1be4b2a4dca31dcb1",
+  "2026-10-19": "0b55bc2ba7b2e69f4f678f9f45069cf78db693683aca3fc09594770c851bc583",
   "2026-10-20": "c7d2521638e614d73589bf65b8b266fcfd530d272ab9badeb642ea5832afe443",
-  "2026-10-26": "00872f868a7799a9f44380385c4d9a58986017b0a48c1f578aebed4d7d5d1ef1",
+  "2026-10-26": "3bba1c3573056b2f5b967699503916c1f8a241fec4b6ea80a88ceafeec4fa17a",
   "2026-10-27": "140ce2ebb98cb5914d5b401f426809c3dc0cbbbd190318d2e72691c25d0e11b6",
-  "2026-11-09": "969caaef00148916c170c47547ef6199294f90a53945853502d2ae96c6ef89eb",
+  "2026-11-09": "45ac362d8a5031823cbe45b427cd0d1deda012446f37af7642102ed8592f76e8",
   "2026-11-10": "e35f313e07befdb2347318f235530b518058a6943b5e38daeb840d7a05657ea9",
-  "2026-11-16": "3954eef16d77631040a6a232cc407d241a1e8c8eac04642eed13bae7f719c1f3",
+  "2026-11-16": "0bd2b7f7397b264aa85ba50a62f2fb275719113392bf7a4be5c2d01b88b3d776",
   "2026-11-17": "90bc31182f274c0665bbeb28578bffae5b7a8ca870b7b562c8cdadabceaaaa80",
-  "2026-11-23": "f6beb01dd34b60eb7196fbb8931681e6b8c919bc24d20d52d3a48ca95d555c1f",
+  "2026-11-23": "66bd6d0c5c7bef64667a66cfa1460bad6115368621266b82cd4500fbc3822bfa",
   "2026-11-24": "ce6dbc0cea18769f8007df06dacf74902d7fcc46c6f5806f5cb2e8a83a2964a5",
-  "2026-11-30": "72c3f080c1582ab6a82901aa6a91e3b76dba1d144de5e4f8375a372deed7df1b",
+  "2026-11-30": "5212068a42f6498bf1a5c2099cba0db3d19b92f20af2cefe48fc2ecd70821a2c",
   "2026-12-01": "7382632a98f4eb83c006099eaa63ee6d5ef5d289a6eb6bcedb3a8ab8a5fe8ae7",
-  "2026-12-07": "4697d1a5e9a614a8a1f4de6b70b74912ffa3c30e95aace9299ea9c1c6c28df0b",
+  "2026-12-07": "be19dac3da13572deaaeda496e762c46082654ad20e727555362175c40d9190e",
   "2026-12-08": "984ed0681bf41948fcf31606d221fbe04529c705806af6c9d0f9167c5ac01f01",
-  "2026-12-14": "b5932fef4cfb62b86d1230e3a27f6d646afc28f6ea9948ff2b823d00f37f1484",
+  "2026-12-14": "e40ff428932116dc2951c5712a32a5562d53c3b6cb14589a40ae8fdabdf01416",
   "2026-12-15": "3101c66f30d978c9f5b561a42cf78e2aac3c5e9013485eef73e4d89eda29c924",
-  "2026-12-21": "ee2241aab8759cc0956ac1728f518d2e48620405620530ccb45863361f486273",
+  "2026-12-21": "2cd8c7e15b4ae4f0fd05a0ddd6a8492d04c6dc9256255bde7f27a18da0eca424",
   "2026-12-22": "fab5ff98c3f0142634f04506afa4bfa3487524f9330985ac3babea1525f08474"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T09:51:26+02:00",
- "changedAt": "2026-10-12T08:41:48+02:00",
+ "checkedAt": "2026-10-12T10:49:42+02:00",
+ "changedAt": "2026-10-12T10:49:42+02:00",
  "sources": [
   "evtermine"
  ]
