@@ -29,5 +29,5 @@ Status: angenommen (2026-10-12), mit Plan 0036. **Ändert** ADR 0011, Punkt 2 un
 
 - Die Wegzeit-Tabelle wächst von 556 auf 747 Zeilen (51,8 kB gzip von 64 kB).
 - Das Entdecken braucht je Woche etwa doppelt so viel Zeit und Geld; reißt das Zeitbudget, fehlt der zweite Teil (Nürnberg) bis zur nächsten Woche.
-- Ein Fürther Anbieter mit einem Ort außerhalb der Fürther bbox verliert diesen beim Aufnehmen; Abhilfe ist Katalogpflege (`region` auf `nuernberg`).
+- Ein Fürther Anbieter mit einem Ort außerhalb der Fürther bbox verliert diesen beim Aufnehmen; Abhilfe ist Katalogpflege: `region` auf `nuernberg`, Ort ergänzen und den `hint` „… weglassen (außerhalb der Region)“ an den Terminseiten entfernen bzw. anpassen.
 - Eine weitere Region braucht: Eintrag in `regions.ts` (mit `kreis`, Reihenfolge), Stadtteile, Prüfung des Zugangshalt-Gates; außerhalb Bayerns oder des VGN zusätzlich Ferienland und Fahrplan (`docs/ideas.md`).

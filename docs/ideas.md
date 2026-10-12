@@ -17,7 +17,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Routenvorschlag oder Linienangabe** („U1 bis Plärrer“): Die Seite nennt nur Minuten (Plan 0009, Nicht-Ziel).
 - **Haltestelle als Startpunkt** (ADR 0005 nannte „Haltestelle wählen“): Stadtteil, Standort und Kartenmitte reichen, eine Liste mit 570 Halten wäre schlecht bedienbar (Plan 0009, ADR 0011).
 - **Weitere Zeitfenster der Wegzeit** (nachmittags, Wochenende): Die Nachmittagsspitze um 15 Uhr ist real, verdoppelt aber `wegzeit.json` (Plan 0009, Nutzerentscheidung: erst nur Di vormittags).
-- **Wegzeit ab Fürth oder Erlangen**: Startpunkte außerhalb des Nürnberger Stadtgebiets bekommen heute die Luftlinie mit Hinweis (Plan 0009, Nutzerentscheidung).
+- **Wegzeit ab Erlangen und den Landkreisen** (Stein, Zirndorf, …): Startpunkte außerhalb der Stadtgebiete aller Regionen bekommen heute die Luftlinie mit Hinweis (Plan 0009, Nutzerentscheidung; Fürth seit ADR 0029).
 - **Isochronen oder Linien auf der Karte** (Plan 0009, Nicht-Ziel).
 - **Alter des gespeicherten Standorts zeigen** („Mein Standort, zuletzt gewählt am …“): Ein wiederhergestellter Standort kann Tage alt sein. Kostet Start-Budget und Erklärtext (Plan 0016, Review K9).
 - **Sortierung der Tagesliste nach Wegzeit** (Plan 0004 und 0009, Nicht-Ziel).

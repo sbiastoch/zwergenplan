@@ -110,7 +110,7 @@ gh workflow run discover.yml -f region=<id> -f bootstrap=true -f modus=trocken
 
 `--bootstrap` hebt G3 auf `MAX_NEW` (Standard 30, Eingabe `max_new`); die Bremsen setzen `max_calls` und `max_tokens`. Erst nach Abnahme des Trockenlaufs durch den Nutzer mit `-f modus=live`. Neue Anbieter landen erst mit dem nächsten Nachtlauf in `data/offers.json`; danach also `gh workflow run nightly.yml -f modus=live`.
 
-Regionen überlappen (Fürth liegt in der Nürnberger bbox). Ein neuer Anbieter gehört zur Region des Laufs, der ihn aufnimmt. Hat er beim Aufnehmen einen Ort außerhalb der bbox seiner Region verloren (Hinweis im Commit-Text), `region` auf die umfassende Region setzen (etwa `nuernberg`; `region` ist keine ID) und den Ort von Hand ergänzen.
+Regionen überlappen (Fürth liegt in der Nürnberger bbox). Ein neuer Anbieter gehört zur Region des Laufs, der ihn aufnimmt. Hat er beim Aufnehmen einen Ort außerhalb der bbox seiner Region verloren (Hinweis im Commit-Text), `region` auf die umfassende Region setzen (etwa `nuernberg`; `region` ist keine ID) und den Ort von Hand ergänzen. Dazu an den Terminseiten den `hint` „Nur Termine an …; Termine an … weglassen (außerhalb der Region)“ entfernen bzw. anpassen, sonst lässt der Extraktor die Termine am ergänzten Ort weiter weg.
 
 ## 7. Fahrplan erneuern
 

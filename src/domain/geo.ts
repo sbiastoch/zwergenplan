@@ -18,7 +18,7 @@ export interface BBox {
 /** Großraum Nürnberg/Fürth/Erlangen – alles außerhalb ist ein Geocoding-Fehler. Region `nuernberg` (regions.ts). */
 export const NUERNBERG_BBOX = { minLat: 49.3, maxLat: 49.65, minLon: 10.85, maxLon: 11.3 } as const;
 
-/** Liegt der Punkt in der bbox (Standard: `NUERNBERG_BBOX`, die einzige Region der App)? Grenzen inklusiv. */
+/** Liegt der Punkt in der bbox (Standard: `NUERNBERG_BBOX`, der Großraum, der alle Regionen umfasst; ADR 0029, Punkt 1)? Grenzen inklusiv. */
 export function inBounds({ lat, lon }: GeoPoint, bbox: BBox = NUERNBERG_BBOX): boolean {
   const { minLat, maxLat, minLon, maxLon } = bbox;
   return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;

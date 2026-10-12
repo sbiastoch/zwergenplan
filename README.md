@@ -1,6 +1,6 @@
 # Zwergenplan
 
-Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnberg: Krabbelgruppen, Babykurse, Elterntreffs, Babykonzerte, Theater und Museen. Mit Alters- und Kategorienfilter und Kalenderdateien je Termin. Beim ersten Öffnen führt eine kurze Einführung durch Alter, Startpunkt und App (Plan 0033); sie lässt sich überspringen und im Kind-Sheet unter „Einführung ansehen“ erneut aufrufen.
+Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnberg und Fürth: Krabbelgruppen, Babykurse, Elterntreffs, Babykonzerte, Theater und Museen. Mit Alters- und Kategorienfilter und Kalenderdateien je Termin. Beim ersten Öffnen führt eine kurze Einführung durch Alter, Startpunkt und App (Plan 0033); sie lässt sich überspringen und im Kind-Sheet unter „Einführung ansehen“ erneut aufrufen.
 
 **Live:** https://zwergenplan.app/
 
