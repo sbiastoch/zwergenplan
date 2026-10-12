@@ -1,6 +1,6 @@
 # Plan 0036 – Zweite Region: Fürth
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit cbe5a56 (2026-10-12)
 Datum: 2026-10-12
 Bezug:
 - ADR 0025 (Katalog regionsfähig; Punkt 1 „Weitere Region-Felder … kommen mit der zweiten Region“, Nachtrag `population`)
@@ -382,6 +382,14 @@ Kurzcheck auf https://zwergenplan.app/, `meta.json` zeigt `e7dd075` (= HEAD). `n
 **Review Nachtrag A (2026-10-12) – Verdict: Freigabe mit Änderungen.** Übernommen: M2 (Begründung im Commit-Text), G1 (unbelegte Zeitangabe gestrichen), G2 (Pfad der Testkopie), G3 (Lint im Anlass), G4 (Querverweis in `docs/ideas.md`). Abgelehnt: M1 (Gate bei 75 % von `maxSize` in `data:validate`) – bei 4 MiB und heute 0,96 MB ist Platz für etwa drei weitere Regionen; das Gate kommt mit dem Aufteilen je Region, als Restpunkt in `docs/ideas.md`.
 
 **Test:** Lokal mit `biome format` an einer auf 1,36 MB aufgeblähten Kopie `data/offers.big.json` (im Repo, nicht ignoriert, danach gelöscht) (vorher Fehler, nachher grün), dann `pnpm verify`. Danach `gh workflow run nightly.yml -f modus=live`. Fertig, wenn der Nachtlauf grün ist und `data/offers.json` Angebote der 8 neuen Anbieter enthält.
+
+## Live (2026-10-12)
+
+- Code live seit e7dd075, Fix Nachtrag A cbe5a56; CI grün, Browser-Review live erledigt (oben).
+- Entdecken live (Commit 8c0e2aa) nahm 8 Fürther Anbieter auf. Der Satz weicht etwas vom Trockenlauf ab: neu dabei `famalie-fuerth-familienzentrum`, `hebammen-wunderwerk` und `familienzentrum-rosengarten-mit-familiencafe`; nicht dabei Pfarrei Christkönig und Heilig Geist Fürth.
+- Der Publish-Job des Entdeckens scheiterte zuerst an einem Konflikt in `data/kosten.csv` mit einem parallelen Nachtlauf. Von Hand aus dem Bundle rebased, beide Zeilen behalten.
+- Der Nachtlauf c751b34 brachte 52 Fürther Angebote, 469 gesamt.
+- Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“.
 
 ## Offene Punkte
 

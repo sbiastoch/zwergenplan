@@ -97,6 +97,15 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0036** (Zweite Region Fürth, live seit cbe5a56, 2026-10-12; Einzelheiten in „Risiken“, „Browser-Review lokal“, „Browser-Review live“ und „Live“ des Plans):
+  - Am echten iPhone und Android prüfen (Nutzer): nativer Picker im Schritt „Weg“ und im Kind-Sheet mit `optgroup` (Fürth/Nürnberg, 53 Einträge), auch dunkel und quer. Headless zeichnet ihn nicht.
+  - Ersten Sonntagslauf des Entdeckens mit zwei Regionen messen: Zeitbudget 90 Min. (erwartet 2 × 13–37 Min.), Kosten (erwartet $1,60–2,00 statt $0,80–1,00), Aufrufe der Bremse (etwa 74 von 120).
+  - Niedrig: Die Statuszeile bricht auf Pixel 7 hoch neben „Liste/Karte“ dreizeilig um, „(Fürth)“ allein in Zeile 3.
+  - Niedrig: Im Weg-Schritt kürzt die geschlossene Auswahl bei 390 px auf „Innenstadt (Fürt…“ neben „Standort“.
+  - Niedrig: Bei Startpunkt außerhalb steht der Hinweis doppelt (roter Kasten unter der Auswahl und Text unter den Chips); schon vor Plan 0036 so.
+  - Pfarrei Christkönig und Heilig Geist Fürth waren im Trockenlauf, aber nicht im Live-Entdecken; ggf. von Hand im Katalog nachtragen (Skill, Nutzerfrage).
+  - Konfliktrisiko `data/kosten.csv`: Laufen Nachtlauf und Entdecken parallel, scheitert der Publish-Job am Konflikt (2026-10-12 von Hand aus dem Bundle rebased, beide Zeilen behalten). Abhilfe: Läufe serialisieren (`concurrency`) oder Konflikte in `kosten.csv` automatisch durch Behalten beider Zeilen lösen.
+
 - **Plan 0035** (Onboarding für Bestandsnutzer, App-Schritt je Plattform, Wischen, Nachtrag Nutzerfeedback; live seit 5a42282, 2026-10-11; Einzelheiten in „Risiken“, „Nachtrag Nutzerfeedback“ und „Browser-Review live“ des Plans):
   - Am echten iPhone prüfen (Nutzer), zusätzlich zu Plan 0033 unten: Scroll-Sperre nach dem Stadtteil-Picker (Rad bzw. Menü, Nachtrag Punkt 1; Playwright stellt den Picker nur per `scrollTo` nach), Wischen ohne Klick nach der Geste (Klick-Unterdrückung nur bei Bedarf, E10), „‹ Zurück“, „Dein Standort“ mit nächstem Stadtteil.
   - Am echten Android prüfen (Nutzer): Wischen vor und zurück neben der System-Zurück-Geste (äußere 24 px), Scroll-Sperre nach dem Stadtteil-Picker, Schalter „Wöchentliche Push-Nachricht“ mit echtem Dialog (headless ohne Push-Dienst nicht sichtbar).
@@ -128,7 +137,7 @@ Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Ein
   - Anmeldefenster des Anbieters als Feld, Kann-warten-Punkte aus Plan 0031 (`verified` → `reviewed`, `AGGREGATOR_ADAPTERS` und `SOURCES` zusammenführen, `coveredBy` mit Zuordnungsschlüssel).
   - Mehr Handarbeit bei Sammelkalender-Entwürfen (Kosten, Anmeldung, Format, Themen offen) ist akzeptiert (N2). Kein Restpunkt, aber beim Browser-Review der Anbieter-Sheets im Blick behalten.
 - **Plan 0031** (Restpunkte, live seit 58b6e34, 2026-10-10):
-  - Zweite Region bauen (R5, siehe oben). Der Vertrag trägt sie schon.
+  - Zweite Region bauen (R5, siehe oben): erledigt mit Plan 0036 (Fürth).
   - Stichproben aus dem Ergebnis von Plan 0031 nachziehen, besonders die Einträge, die die Subagenten-Migration als Verdachtsfälle markiert hat (dance-maxx MAXI, die-familienbox-Turnkurse).
   - Das Sheet der Anbieter mit und ohne Angebote im Browser-Review live frisch aufnehmen. Der Kurzcheck am 2026-10-10 hat nur die Anbieterliste bestätigt, `anbieter-sheet` war eine alte Datei.
   - WebKit/iphone-15 `saved.spec.ts` „Deep-Link ./?ansicht=merkliste-karte“ war beim Lauf auf `main` (#295) wieder rot, mit denselben Konsolenmeldungen (`Worker failed to load`, OpenFreeMap-CORS). Der Rerun der fehlgeschlagenen Jobs war grün. Zählt in die Flake-Liste von Plan 0029 mit.
