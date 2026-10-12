@@ -371,6 +371,18 @@ Kurzcheck auf https://zwergenplan.app/, `meta.json` zeigt `e7dd075` (= HEAD). `n
 
 - Niedrig: Im Weg-Schritt kürzt die geschlossene Auswahl auf 390 px „Innenstadt (Fürt…“ neben „Standort“. Der Name bleibt in Statuszeile und Kind-Sheet voll lesbar; kein Blocker.
 
+## Nachtrag A (2026-10-12): `data/offers.json` über 1 MiB
+
+**Anlass:** Der erste Nachtlauf nach dem Live-Entdecken (8 Fürther Anbieter, Commit 8c0e2aa; Run 38223786447) brach ab. `writeJsonFormatted` (`scripts/pipeline/io/files.ts:45`) formatiert `data/offers.json` mit `biome format --write`. Biome verweigert Dateien über `files.maxSize` (Standard 1 MiB): „The size of the file is 1.1 MiB, which exceeds the configured maximum of 1.0 MiB“. Vorher lag die Datei bei 0,96 MB, die zweite Region schiebt sie darüber. Ohne Fix bleibt jeder Nachtlauf rot, und `biome check .` (`pnpm lint`) in der CI scheitert ab dem nächsten Daten-Commit ebenfalls an der Datei.
+
+**Änderung:** `biome.json` setzt `files.maxSize` auf 4 MiB (4 194 304 Byte). Damit ist für etwa vier Regionen dieser Größe Platz. Das ist keine gelockerte Regel: Biome prüft und formatiert dann genau wie vorher, nur große Dateien nicht mehr gar nicht. Ausnehmen wie `data/oepnv` kommt nicht infrage, weil der Nachtlauf `offers.json` bewusst formatiert (stabile Diffs). Weil `biome.json` keinen Kommentar tragen kann, steht die Begründung im Commit-Text (mit Verweis auf diesen Nachtrag), wie beim 102-kB-Budget.
+
+**Alternativen:** `offers.json` je Region teilen (größerer Umbau, Schema und Build; `docs/ideas.md` mit „Katalog je Anbieter“) oder kompakter schreiben (verliert lesbare Diffs). Beides ist für einen roten Nachtlauf zu groß.
+
+**Review Nachtrag A (2026-10-12) – Verdict: Freigabe mit Änderungen.** Übernommen: M2 (Begründung im Commit-Text), G1 (unbelegte Zeitangabe gestrichen), G2 (Pfad der Testkopie), G3 (Lint im Anlass), G4 (Querverweis in `docs/ideas.md`). Abgelehnt: M1 (Gate bei 75 % von `maxSize` in `data:validate`) – bei 4 MiB und heute 0,96 MB ist Platz für etwa drei weitere Regionen; das Gate kommt mit dem Aufteilen je Region, als Restpunkt in `docs/ideas.md`.
+
+**Test:** Lokal mit `biome format` an einer auf 1,36 MB aufgeblähten Kopie `data/offers.big.json` (im Repo, nicht ignoriert, danach gelöscht) (vorher Fehler, nachher grün), dann `pnpm verify`. Danach `gh workflow run nightly.yml -f modus=live`. Fertig, wenn der Nachtlauf grün ist und `data/offers.json` Angebote der 8 neuen Anbieter enthält.
+
 ## Offene Punkte
 
 Keine. Startbudget (102 kB) und Bootstrap-Trockenlauf sind vom Nutzer entschieden bzw. freigegeben (2026-10-12); den Trockenlauf startet die Haupt-Session.
