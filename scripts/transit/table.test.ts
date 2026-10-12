@@ -38,8 +38,9 @@ describe("areaId", () => {
 });
 
 describe("tableRows", () => {
-  it("macht nur Nürnberger Haltbereiche mit Einstieg im Fenster zu Zeilen", () => {
+  it("macht nur Haltbereiche der Regionen mit Einstieg im Fenster zu Zeilen (Plan 0036, E5)", () => {
     expect(tableRows(fixture).map((r) => r.id)).toEqual([
+      "de:09563:9100",
       "de:09564:9001",
       "de:09564:9002",
       "de:09564:9003",
@@ -47,7 +48,25 @@ describe("tableRows", () => {
       "de:09564:9005",
       "de:09564:9007",
     ]);
-    // de:09563:9100 (Nachbarstadt) nur Netz; 9006 nur Ausstieg; 9008 nur Endhalt
+    // de:09563:9100 liegt in Fürth-Innenstadt; 9006 nur Ausstieg; 9008 nur Endhalt
+  });
+
+  it("nimmt Nürnberg und Fürth, nicht den Landkreis Fürth (09573)", () => {
+    const stops: [string, number, number][] = [
+      ["de:09564:1:1:1", 49.45, 11.07],
+      ["de:09563:2:1:1", 49.475, 10.988],
+      ["de:09573:3:1:1", 49.443, 10.955],
+      ["de:09564:4:1:1", 49.46, 11.08],
+    ];
+    const trip = {
+      route: "1",
+      mode: "bus" as const,
+      stops: [2, 1, 0, 3],
+      times: [32400, 0, 120, 0, 120, 0, 120, 0],
+      flags: [3, 3, 3, 3],
+    };
+    const rows = tableRows({ stops, trips: [trip], window: { from: "08:30", to: "10:30" } });
+    expect(rows.map((r) => r.id)).toEqual(["de:09563:2", "de:09564:1"]);
   });
 
   it("legt die Zeile in den Mittelpunkt aller Steige des Bereichs", () => {
@@ -258,7 +277,8 @@ describe("buildTransitTables", () => {
 
   it("nennt Linien, Folgen und Zellen ohne Linien", () => {
     expect(lines.lines).toEqual([`Bus${NB}2`, `Bus${NB}202E`, `Tram${NB}1`]);
-    expect(stats).toEqual({ lines: 3, combos: 5, withoutLines: 12, outliers: 0, cells: 26 });
+    // 31 Zellen: seit Plan 0036 (E5) ist die Fürther Zeile 9100 dabei, alle fünf Orte mit Tram 1 erreichbar
+    expect(stats).toEqual({ lines: 3, combos: 5, withoutLines: 12, outliers: 0, cells: 31 });
   });
 
   it("ergibt ab Gostenhof zum Beispielhof gut 13 Min., gerundet „15 Min.“ (E2E-Erwartung, E15)", () => {
@@ -313,7 +333,7 @@ describe("withoutAccess", () => {
   });
 
   it("prüft gegen den Innen-Test 800 m, nicht gegen den Zugang 1 500 m (L7)", () => {
-    // Zeile 9001 liegt bei 49,4485 / 11,059; westlich davon kommt kein Nürnberger Haltbereich mehr
+    // Zeile 9001 liegt bei 49,4485 / 11,059; westlich davon kommt kein Haltbereich mehr (9100 liegt in Fürth, 5 km weg)
     const west = (meters: number) => ({
       id: `w${meters}`,
       name: `${meters} m westlich`,

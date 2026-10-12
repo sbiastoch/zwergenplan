@@ -1,7 +1,7 @@
 /**
  * Wegzeit-Tabelle Halt → Ort (Plan 0009, E5/E7; ADR 0011): aus dem Fahrplanauszug und den Orten der Angebote
- * entsteht `public/data/wegzeit.json`. Zeilen sind die Haltbereiche im Stadtgebiet Nürnberg mit Einstieg im
- * Fenster, Spalten die Orte (`placeKey`). Jede Zelle ist der Median der Tür-zu-Tür-Zeit über die
+ * entsteht `public/data/wegzeit.json`. Zeilen sind die Haltbereiche in den Stadtgebieten der Regionen
+ * (`Region.kreis`, Plan 0036, E5; ADR 0029) mit Einstieg im Fenster, Spalten die Orte (`placeKey`). Jede Zelle ist der Median der Tür-zu-Tür-Zeit über die
  * Abfahrtsminuten des Fensters, mit Warten am ersten Halt; den Fußweg zum Halt rechnet der Browser dazu.
  * Seit Plan 0012 (E4–E7, ADR 0015) mit höchstens einem Umstieg, Umstiegs-Bit und `public/data/linien.json`.
  *
@@ -9,6 +9,7 @@
  */
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { placeKey } from "../../src/domain/place-key.ts";
+import { REGION_IDS, REGIONS } from "../../src/domain/regions.ts";
 import type { Timetable } from "../../src/domain/schema.ts";
 import {
   COORD_SCALE,
@@ -31,8 +32,11 @@ import {
   TRANSFER_PENALTY_SECONDS,
 } from "./profile-csa.ts";
 
-/** Zeilen nur für Haltbereiche dieser Gemeinde (Nürnberg, E5); das Netz zum Rechnen ist der ganze Auszug. */
-const CITY_PREFIX = "de:09564:";
+/**
+ * Zeilen nur für Haltbereiche dieser Kreise (Stadtgebiete der Regionen; Plan 0009, E5; Plan 0036, E5); das Netz zum
+ * Rechnen ist der ganze Auszug.
+ */
+const CITY_PREFIXES = REGION_IDS.map((r) => `de:${REGIONS[r].kreis}:`);
 /** Abstand der Abfahrtsminuten */
 const STEP_SECONDS = 60;
 
@@ -54,13 +58,15 @@ export interface TableRow {
 }
 
 /**
- * Zeilen der Tabelle: Haltbereiche mit DHID-Präfix `de:09564:` und mindestens einem Einstieg mit Abfahrt im
+ * Zeilen der Tabelle: Haltbereiche mit DHID-Präfix einer Region (`de:<kreis>:`) und mindestens einem Einstieg mit Abfahrt im
  * Fenster (Grenzen inklusiv), sortiert nach ID. Ein Bereich mit nur Ausstieg oder nur Endhalt bleibt draußen.
  */
 export function tableRows(timetable: Pick<Timetable, "stops" | "trips" | "window">): TableRow[] {
   const from = clockSeconds(timetable.window.from);
   const to = clockSeconds(timetable.window.to);
-  const cityArea = timetable.stops.map(([id]) => (id.startsWith(CITY_PREFIX) ? areaId(id) : undefined));
+  const cityArea = timetable.stops.map(([id]) =>
+    CITY_PREFIXES.some((p) => id.startsWith(p)) ? areaId(id) : undefined,
+  );
   const departs = new Set<string>();
   for (const trip of timetable.trips) {
     let acc = 0;

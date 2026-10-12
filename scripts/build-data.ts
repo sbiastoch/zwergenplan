@@ -137,7 +137,7 @@ if (timetable.kind === "ok") {
     process.exit(1);
   }
   // Jeder wählbare Stadtteil braucht einen Zugangshalt, sonst hieße es dort „außerhalb des Stadtgebiets“
-  // (Plan 0009, Schritt 5). Das Fixture-Netz deckt nur Gostenhof ab.
+  // (Plan 0009, Schritt 5). Das Fixture-Netz deckt nur Gostenhof und Fürth-Innenstadt ab (Halt 9100, Plan 0036).
   if (source === "real") {
     const decoded = decodeTransitTable(table, new Set(table.places));
     const missing = decoded ? withoutAccess(decoded, DISTRICTS) : DISTRICTS;
