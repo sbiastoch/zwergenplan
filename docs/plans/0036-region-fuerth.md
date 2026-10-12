@@ -1,6 +1,6 @@
 # Plan 0036 – Zweite Region: Fürth
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-12
 Bezug:
 - ADR 0025 (Katalog regionsfähig; Punkt 1 „Weitere Region-Felder … kommen mit der zweiten Region“, Nachtrag `population`)

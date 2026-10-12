@@ -13,11 +13,24 @@
  *   node["place"~"suburb|quarter"](area.a);
  *   out;
  *
+ * Fürth (Plan 0036, E6): `place=suburb`-Punkte in der Stadtgrenze Fürth (OSM-Relation 62374), Overpass-Abfrage vom
+ * 2026-10-12, auf 3 Nachkommastellen gerundet. Weggelassen sind die Weiler am Stadtrand (Atzenhof, Bislohe,
+ * Braunsbach, Flexdorf, Herboldshof, Kronach, Mannhof, Ritzmannshof, Steinach). Allgemeine Namen tragen „(Fürth)“,
+ * denn Namen sind über alle Regionen eindeutig („Wegzeit ab …“). Ein Stadtteil ohne Zugangshalt in 800 m fällt aus der
+ * Liste, sein Punkt wird nie verschoben (`build-data.ts` prüft das).
+ *
+ *   [out:json][timeout:60];
+ *   area(3600062374)->.a;
+ *   node["place"="suburb"](area.a);
+ *   out;
+ *
  * Die IDs sind fest: Sie stehen im localStorage (`zwergenplan.entfernung-ab`) und werden nie aus
- * dem Namen abgeleitet. Reihenfolge: alphabetisch nach Name, deutsche Sortierung.
+ * dem Namen abgeleitet; Fürther mit Präfix `fuerth-`. Reihenfolge je Region: alphabetisch nach Name, deutsche
+ * Sortierung. Die Gruppen für die Auswahl bildet `district-groups.ts`.
  */
 import { type GeoPoint, haversineMeters } from "./geo.ts";
 import { distanceText } from "./reach.ts";
+import { REGION_IDS, type RegionId } from "./regions.ts";
 
 export interface District {
   id: string;
@@ -25,7 +38,7 @@ export interface District {
   point: GeoPoint;
 }
 
-export const DISTRICTS: readonly District[] = [
+const NUERNBERG: readonly District[] = [
   { id: "altenfurt", name: "Altenfurt", point: { lat: 49.408, lon: 11.167 } },
   { id: "altstadt", name: "Altstadt", point: { lat: 49.454, lon: 11.077 } },
   { id: "buch", name: "Buch", point: { lat: 49.497, lon: 11.045 } },
@@ -62,6 +75,35 @@ export const DISTRICTS: readonly District[] = [
   { id: "zerzabelshof", name: "Zerzabelshof", point: { lat: 49.445, lon: 11.125 } },
   { id: "ziegelstein", name: "Ziegelstein", point: { lat: 49.488, lon: 11.106 } },
 ];
+
+const FUERTH: readonly District[] = [
+  { id: "fuerth-altstadt", name: "Altstadt (Fürth)", point: { lat: 49.48, lon: 10.987 } },
+  { id: "fuerth-burgfarrnbach", name: "Burgfarrnbach", point: { lat: 49.489, lon: 10.923 } },
+  { id: "fuerth-dambach", name: "Dambach", point: { lat: 49.462, lon: 10.97 } },
+  { id: "fuerth-eschenau", name: "Eschenau", point: { lat: 49.46, lon: 10.96 } },
+  { id: "fuerth-espan", name: "Espan", point: { lat: 49.478, lon: 11.006 } },
+  { id: "fuerth-hardhoehe", name: "Hardhöhe", point: { lat: 49.481, lon: 10.956 } },
+  { id: "fuerth-innenstadt", name: "Innenstadt (Fürth)", point: { lat: 49.475, lon: 10.988 } },
+  { id: "fuerth-oberfuerberg", name: "Oberfürberg", point: { lat: 49.471, lon: 10.94 } },
+  { id: "fuerth-poppenreuth", name: "Poppenreuth", point: { lat: 49.481, lon: 11.012 } },
+  { id: "fuerth-ronhof", name: "Ronhof", point: { lat: 49.491, lon: 11.002 } },
+  { id: "fuerth-sack", name: "Sack", point: { lat: 49.502, lon: 11.013 } },
+  { id: "fuerth-schwand", name: "Schwand", point: { lat: 49.485, lon: 10.972 } },
+  { id: "fuerth-stadeln", name: "Stadeln", point: { lat: 49.513, lon: 10.975 } },
+  { id: "fuerth-suedstadt", name: "Südstadt (Fürth)", point: { lat: 49.463, lon: 10.996 } },
+  { id: "fuerth-unterfarrnbach", name: "Unterfarrnbach", point: { lat: 49.491, lon: 10.955 } },
+  { id: "fuerth-vach", name: "Vach", point: { lat: 49.527, lon: 10.967 } },
+  { id: "fuerth-weikershof", name: "Weikershof", point: { lat: 49.445, lon: 10.988 } },
+  { id: "fuerth-westvorstadt", name: "Westvorstadt (Fürth)", point: { lat: 49.47, lon: 10.968 } },
+];
+
+/** Stadtteile je Region; der `Record` verlangt für jede neue Region eine Liste (Plan 0036, E6) */
+export const DISTRICTS_BY_REGION: Readonly<Record<RegionId, readonly District[]>> = {
+  fuerth: FUERTH,
+  nuernberg: NUERNBERG,
+};
+
+export const DISTRICTS: readonly District[] = REGION_IDS.flatMap((r) => DISTRICTS_BY_REGION[r]);
 
 const BY_ID = new Map(DISTRICTS.map((d) => [d.id, d]));
 

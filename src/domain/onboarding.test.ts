@@ -77,13 +77,18 @@ describe("appStepParts und onboardingSteps (E1)", () => {
 });
 
 describe("cityChoices (E5)", () => {
-  it("eine Region: eine Kachel, kein Dropdown", () => {
-    expect(cityChoices(REGIONS)).toEqual({ tiles: [{ id: "nuernberg", name: "Nürnberg" }], more: [] });
+  it("Nürnberg und Fürth: zwei Kacheln nach Einwohnern, kein Dropdown (Plan 0036)", () => {
+    expect(cityChoices(REGIONS)).toEqual({
+      tiles: [
+        { id: "nuernberg", name: "Nürnberg" },
+        { id: "fuerth", name: "Fürth" },
+      ],
+      more: [],
+    });
   });
 
   it("sechs Regionen: vier Kacheln nach Einwohnern absteigend, Gleichstand nach Name, Rest im Dropdown", () => {
-    const bbox = REGIONS.nuernberg.bbox;
-    const region = (name: string, population: number): Region => ({ name, bbox, population });
+    const region = (name: string, population: number): Region => ({ ...REGIONS.nuernberg, name, population });
     const regions = {
       fuerth: region("Fürth", 132_000),
       erlangen: region("Erlangen", 117_000),

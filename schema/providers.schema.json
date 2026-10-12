@@ -22,6 +22,7 @@
           "region": {
             "type": "string",
             "enum": [
+              "fuerth",
               "nuernberg"
             ]
           },
@@ -292,6 +293,7 @@
           "region": {
             "type": "string",
             "enum": [
+              "fuerth",
               "nuernberg"
             ]
           },
@@ -469,6 +471,7 @@
           "region": {
             "type": "string",
             "enum": [
+              "fuerth",
               "nuernberg"
             ]
           },

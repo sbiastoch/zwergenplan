@@ -9,7 +9,7 @@ import { plural } from "./labels.ts";
 import { countProviders } from "./provider-count.ts";
 import type { InstallState, PushCapability } from "./pwa.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "./reach.ts";
-import type { Region } from "./regions.ts";
+import { byPopulation, type Region } from "./regions.ts";
 import type { Offer } from "./schema.ts";
 
 export type StepId = "stadt" | "alter" | "weg" | "app";
@@ -66,11 +66,7 @@ export function cityChoices<K extends string>(
   regions: Readonly<Record<K, Region>>,
   maxTiles = 4,
 ): { tiles: { id: K; name: string }[]; more: { id: K; name: string }[] } {
-  // Cast: `Object.keys` liefert nur `string[]`; die Regionen sind feste Literale (`REGIONS`, Test-Fakes) ohne Fremdschlüssel
-  const sorted = (Object.keys(regions) as K[])
-    .map((id) => ({ id, ...regions[id] }))
-    .sort((a, b) => b.population - a.population || a.name.localeCompare(b.name, "de"))
-    .map(({ id, name }) => ({ id, name }));
+  const sorted = byPopulation(regions).map(({ id, name }) => ({ id, name }));
   return { tiles: sorted.slice(0, maxTiles), more: sorted.slice(maxTiles) };
 }
 

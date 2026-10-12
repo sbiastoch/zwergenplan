@@ -129,7 +129,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(onboarding-types|birth-date-input)\.ts$/,
     /^src\/ui\/onboarding\//,
     /^src\/ui\/app-extras\/AppSection\.tsx$/,
-    /^src\/domain\/(onboarding|onboarding-gate|regions)\.ts$/,
+    /^src\/domain\/(onboarding|onboarding-gate|regions|district-groups)\.ts$/,
     /^src\/data\/(preferences|platform)\.ts$/,
   ],
   // Web-Vitals der Startseite unter Drosselung, Wegzeit mit gespeichertem Stadtteil ohne Flackern.
@@ -180,7 +180,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(KidSheet|OriginPicker|ReachLong|Ways|Sheets)\.tsx$/,
     /^src\/ui\/(origin-state|use-transit|use-app-state|format)\.ts$/,
     /^src\/data\/(geolocation|transit|preferences)\.ts$/,
-    /^src\/domain\/(reach|transit|transit-types|districts|geo|stored-origin|maps-link)\.ts$/,
+    /^src\/domain\/(reach|transit|transit-types|districts|district-groups|geo|stored-origin|maps-link)\.ts$/,
     BUILD_DATA,
   ],
   // Teilen: Knopf im Detail und im Anbieter-Sheet (useShare), Rückfall-Sheet mit Link (Sheets), Vorschauseiten,
