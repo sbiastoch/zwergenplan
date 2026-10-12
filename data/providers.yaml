@@ -3225,3 +3225,30 @@
       address: Bahnhofplatz 10, 90762 Fürth
       district: Süd
       geo: { lat: 49.4705191, lon: 10.9889322 }
+- id: institut-zukunftsmusik-evi-reich
+  publicId: t59iym8u
+  role: anbieter
+  region: fuerth
+  name: Institut Zukunftsmusik (Evi Reich)
+  url: https://institut-zukunftsmusik.de/kurse-buchen/
+  programme:
+    - url: https://institut-zukunftsmusik.de/kurse-buchen/
+      kind: html
+      use: termine
+    - url: https://institut-zukunftsmusik.de/kontakt/
+      kind: html
+      use: info
+  availability:
+    shown: unbekannt
+  verified: 2026-10-12
+  notes:
+    - "Entdeckt 2026-10-12 über suche:Musikgarten: https://institut-zukunftsmusik.de/kurse-buchen/ – Eltern-Kind-Kurse „Musikspielerei für Babys & Minis“ (ab 4 Monate) und „Musikspiel für Minis“ mit Terminen auf der Kursseite; Adresse in Fürth laut Kontakt-Seite, der Kursort wird dort aber nicht ausdrücklich genannt."
+  age:
+    minMonths: 4
+    maxMonths: 84
+  venues:
+    - id: institut-zukunftsmusik-evi-reich
+      name: Institut Zukunftsmusik (Kontakt- und Impressumsadresse)
+      address: Otto-Seeling-Promenade 10a, 90762 Fürth
+      district: Süd
+      geo: { lat: 49.4718522, lon: 10.9973901 }
