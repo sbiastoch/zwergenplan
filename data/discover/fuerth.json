@@ -1,0 +1,118 @@
+{
+ "region": "fuerth",
+ "abgelehnt": [],
+ "zurueckgestellt": [
+  {
+   "url": "https://www.vhs-fuerth.de/programm/gesellschaft-junge-vhs.html?action%5B93%5D=category&cat_ID=477-CAT-KAT83#cnt",
+   "name": "vhs Fürth (PEKiP im Gemeindezentrum St. Nikolaus)",
+   "grund": "Abgerufene Seite zeigt nur „Die Kategorie konnte nicht gefunden werden“; Kontakt- und Anfahrtsseite enthalten kein PEKiP-Angebot, keine Termine und keinen Hinweis auf den Veranstaltungsort St. Nikolaus. Seite ohne Inhalt, keine Termine veröffentlicht.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://kikudoo.com/bauchherzfamilie",
+   "name": "BauchHerzFamilie (Tamara Joußen)",
+   "grund": "Seite ohne Inhalt: Der abgerufene Text enthält nur Cookie-Hinweise und einen Link zur Datenschutzerklärung. Es sind keine Angebote, Orte, Adressen oder Termine erkennbar, daher lässt sich weder ein Angebot für Eltern mit Kindern von 0–3 Jahren in Fürth noch veröffentlichte Termine belegen.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.herzenskinder-fuerth.de",
+   "name": "Simone Richter – Herzenskinder Fürth",
+   "grund": "Keine Termine veröffentlicht: Die Seiten bieten Einzelberatungen (Trage- und Stillberatung, meist bei den Familien zu Hause) und eine Elternschule ohne Termine oder Kursangebote mit Kind; die behauptete Kursbuchung nach dem Wochenbett ist auf den abgerufenen Seiten nicht zu finden.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.diakonie-fuerth.de/unterstuetzen/eltern-kind-gruppen/",
+   "name": "Diakonie Fürth (PEKiP-Gruppe für Alleinerziehende)",
+   "grund": "Die PEKiP-Gruppe für Alleinerziehende (Babys ab 6 Wochen) ist zwar ein passendes Angebot, aber die Seite nennt keine Termine oder Kurszeiten, und der Veranstaltungsort der Gruppe steht nicht da; die Adresse ist nur die der Beratungsstelle. Der Hinweis „startet wieder am 30. September“ steht nur im Linktext ohne Jahr.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://bildung-fuerth.de/bildungsportal/eltern-kind-programme-5",
+   "name": "vhs Fürth",
+   "grund": "Die abgerufene Seite ist das städtische Bildungsportal, ein Sammelverzeichnis. Der vhs-Eintrag nennt PEKiP nur allgemein, ohne Termine, Kurstermine oder Veranstaltungsorte mit Adresse. Die eigene Website der vhs wurde nicht abgerufen.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://bella-familie.de/",
+   "name": "Hebammenpraxis Bella & Familie (Fürth-Burgfarrnbach)",
+   "grund": "kein Angebot für 0–3 Jahre mit künftigem Termin",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.herzenskinder-fuerth.de/babykurse",
+   "name": "herzenskinder Fürth – BabySteps Babykurs",
+   "grund": "BabySteps-Babykurse für Eltern mit Säuglingen ab den ersten Lebenswochen in Fürth (Ronhofer Weg 18), aber keine Kurstermine auf den abgerufenen Seiten veröffentlicht, nur Konzept und Standards; daher keine Aufnahme.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.drachenkinder-furth.de/de/kurse",
+   "name": "Drachenkinder Fürth",
+   "grund": "Außerhalb der Region: Die einzige Adresse (Von-Müller-Straße 25, 93437 Furth im Wald) liegt im Landkreis Cham, nicht in Fürth. Die Eltern-Kind-Angebote (FenKid, Babymassage, PEKiP-Hinweis) finden in dieser Praxis statt, nicht in der Region Fürth.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.brk-fuerth.de/kurse/gesundheitskurse/babyschwimmen.html",
+   "name": "BRK Kreisverband Fürth (Baby- u. Kleinkinderschwimmen)",
+   "grund": "kein Angebot für 0–3 Jahre mit künftigem Termin",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://tv-fuerth-1860.de/fileadmin/Bilder/02_Abteilungssport/Turnen/Kontakt/FAQs_fuer_E-K-Turnen_und_Kinderturnen_20.03.pdf",
+   "name": "TV Fürth 1860 e.V.",
+   "grund": "Einzige abgerufene Seite ist eine FAQ-PDF mit Kursplan für Eltern-Kind-Turnen, der laut Dokument auf 2023 verweist (Anfragen \"ab KW 24 2023\"). Aktuelle Termine für 2026 sind nicht belegt, und es liegt keine aktuelle Terminseite vor. Neu prüfen, wenn die Startseite aktuelle Kurstermine nennt.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.sgf1903.de/turnen",
+   "name": "SG Fürth 1903",
+   "grund": "Kein Eltern-Kind-Angebot auf der abgerufenen Turnseite belegt. Die Babyturnen-Notiz stammt nur aus einer Suche, nennt 1–4 Jahre (nicht 0–3) und der Kursplan (/turnen/sportangebote/uebersicht) wurde nicht abgerufen, daher nicht prüfbar. Erneut prüfen, falls der Kursplan Eltern-Kind-Kurse für 0–3 Jahre mit Terminen zeigt.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.musikgarten-fuerth.de",
+   "name": "Musikgarten Fürth (Diane Wörlein)",
+   "grund": "Seite ohne Inhalt: Die Startseite enthält nur Navigationselemente (Login, Sitemap, Druckversion) und keine Kursangebote, Termine oder Altersangaben; auch weitere Seiten fehlen.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.kilili.de/musikgarten",
+   "name": "Kilili – Musik für Babys und Kleinkinder",
+   "grund": "Musikgarten für Babys und Kleinkinder, aber kein Ort in Fürth belegt: Die Seite nennt Nürnberg, Fürth und Erlangen nur als Einzugsgebiet. Die einzige Adresse (Impressum, Pirckheimerstraße 36, 90408 Nürnberg) liegt außerhalb Fürths und ist nicht als Kursort ausgewiesen. Keine veröffentlichten Termine mit Ort.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://www.freiraum-fuerth.de/Kurse-Gruppen-A-Z/",
+   "name": "Freiraum Fürth",
+   "grund": "kein Ort in der Region Fürth (außerhalb: Erzbergstr. 10, 64658 Fürth)",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "http://www.stmichael-fuerth.de/miniclub",
+   "name": "Evangelische Kirchengemeinde St. Michael (MiniClub St. Michael)",
+   "grund": "Adresse nicht gefunden: Kirchenplatz 7, Fürth (PLZ auf der Seite nicht angegeben)",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  },
+  {
+   "url": "https://st-nikolaus-fuerth.de/gemeindeleben/eltern-kind-gruppe",
+   "name": "Katholische Pfarrgemeinde St. Nikolaus (Eltern-Kind-Gruppe)",
+   "grund": "Keine Termine veröffentlicht: Die Seite sagt „Zur Zeit gibt es in St. Nikolaus leider keine regelmäßigen Treffen“ und verweist nur auf Anmeldung im Pfarrbüro. Die Seite stammt laut Fußzeile aus 2018.",
+   "datum": "2026-10-12",
+   "wiedervorlage": "2026-12-07"
+  }
+ ]
+}
