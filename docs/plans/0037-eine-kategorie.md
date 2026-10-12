@@ -544,3 +544,13 @@ Abgelehnt: keine.
   - Geprüft wurden alle B5-Zeilen bei 320, 360 und 390 px, hell und dunkel, mit 0 Konsolenfehlern. Bilder in `e2e/.artifacts/b5/`.
   - claude-in-chrome war nicht verbunden, die Interaktion lief deshalb über Playwright.
   - Zwei Minor-Befunde kommen nicht aus diesem Plan: aktiver Sticker außerhalb des Blicks, „Zurück“ nach dem Filter-Sheet. Beide stehen in `docs/ideas.md`.
+- **A6 (2026-10-12): Neu-Extraktion per Nachtlauf (`4f3993e`), 136 Aufrufe, $0,91 Schätzung API-Gegenwert.**
+  - Alle 498 Angebote haben `category`. 24 davon sind aus den Themen abgeleitet (Übergang).
+  - „Kategorie passt zu keinem Thema“: 14 von 434 neuen Events (3 %).
+  - In `data/raw` stehen noch 22 Events ohne `category` (Einzeiler aus E7).
+  - Verteilung: bewegung 110, buehne 96, krabbel-spielgruppen 78, babykurse 62, musik 56, wasser 32, treffs-cafes 30, natur 13, kreativ 8, beratung 7, museum 4, buecher 2. Keine Kategorie ist leer.
+  - „Bücher“ ist klein geworden, weil Bilderbuch-Theater nach E8 zu `buehne` geht.
+  - Nebenbefund: Der Smoke auf `main` war danach rot, LCP 2,6–3,1 s statt unter 2,5 s.
+    - Ursache war nicht `category` (gzip +0,7 kB), sondern `berlinKey`: ein neues `Intl.DateTimeFormat` je Aufruf. Die nun lückenlos wöchentlichen Reihen lassen `uniformTimes` voll durchlaufen.
+    - Fix als Kleinänderung `24a2364`, danach LCP etwa 2,27 s. Restpunkt in `docs/ideas.md`.
+- **Test 20 (2026-10-12):** `site.json` mit echten Daten: 104,9 kB gzip vor dem Plan (469 Angebote), 119,8 kB danach (498 Angebote, 7 052 Termine). Davon entfallen 0,7 kB auf `category`. Das Budget liegt bei 250 kB. Start-JS prüft der Budget-Job der CI.
