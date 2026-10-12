@@ -77,17 +77,24 @@ export function toIcsUtc(instant: string | Date): string {
     .replace(/\.\d{3}/, "");
 }
 
-/** Lokaler Berliner Schlüssel eines Zeitpunkts: 20261013T0930 (für stabile IDs/Dateinamen). */
+const instantFmt = new Intl.DateTimeFormat("en-CA", {
+  timeZone: TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
+});
+
+/**
+ * Lokaler Berliner Schlüssel eines Zeitpunkts: 20261013T0930 (für stabile IDs/Dateinamen, Uhrzeiten der Kacheln).
+ * Nutzt den einen Formatierer `instantFmt`: Ein neuer je Aufruf kostete ≈ 0,1 ms, beim Start mit echten Daten
+ * ≈ 1 800 Aufrufe (LCP-Smoke nach dem Nachtlauf 2026-10-12).
+ */
 export function berlinKey(instant: string): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIME_ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(new Date(instant));
+  const parts = instantFmt.formatToParts(new Date(instant));
   const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
   return `${get("year")}${get("month")}${get("day")}T${get("hour")}${get("minute")}`;
 }
@@ -140,17 +147,6 @@ export function isoWeekday(isoDate: string): number {
   const { year, month, day } = parseIsoDate(isoDate);
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay() || 7;
 }
-
-const instantFmt = new Intl.DateTimeFormat("en-CA", {
-  timeZone: TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hourCycle: "h23",
-});
 
 /** Zeitpunkt → „2026-10-05T06:07:09+02:00“ (Berliner Ortszeit mit Offset, sekundengenau). */
 export function toBerlinIso(date: Date): string {

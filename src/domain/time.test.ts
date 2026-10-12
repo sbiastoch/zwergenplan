@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   addDays,
   addMonths,
   berlinIsoDate,
+  berlinKey,
   formatGermanDate,
   fromBerlinLocal,
   isIsoDate,
@@ -62,6 +63,27 @@ describe("Kalenderrechnung", () => {
   it("liefert den ISO-Wochentag (1 = Montag)", () => {
     expect(isoWeekday("2026-10-05")).toBe(1);
     expect(isoWeekday("2026-10-11")).toBe(7);
+  });
+});
+
+describe("berlinKey", () => {
+  it("liefert den Berliner Schlüssel, auch über Mitternacht und Zeitumstellung", () => {
+    expect(berlinKey("2026-10-13T09:30:00+02:00")).toBe("20261013T0930");
+    expect(berlinKey("2026-10-05T22:30:00Z")).toBe("20261006T0030");
+    expect(berlinKey("2026-10-25T10:00:00+01:00")).toBe("20261025T1000");
+  });
+
+  // LCP-Smoke (Nachtlauf 2026-10-12): Ein neues Intl.DateTimeFormat je Aufruf kostete ≈ 0,1 ms, auf der Startseite
+  // ≈ 1 800 Aufrufe (Rhythmus der regelmäßigen Kacheln), gedrosselt rund 0,7 s LCP.
+  it("baut kein Intl.DateTimeFormat je Aufruf", () => {
+    const ctor = vi.spyOn(Intl, "DateTimeFormat");
+    try {
+      berlinKey("2026-10-13T09:30:00+02:00");
+      berlinKey("2026-10-14T09:30:00+02:00");
+      expect(ctor).not.toHaveBeenCalled();
+    } finally {
+      ctor.mockRestore();
+    }
   });
 });
 
