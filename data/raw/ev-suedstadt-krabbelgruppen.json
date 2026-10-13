@@ -3,14 +3,14 @@
   {
    "providerId": "ev-suedstadt-krabbelgruppen",
    "venueId": "ev-suedstadt-krabbelgruppen",
-   "title": "Mutter/Vater-Kind-Gruppe, dienstags 9:30 (Lichtenhof)",
-   "summary": "Regelmäßige Krabbelgruppe für Eltern mit Kleinkindern in der Gustav-Adolf-Gedächtniskirche, dienstags 9:30 bis 11:30 Uhr. Auskunft und Kontakt über Brigitte Schäfer, 0911 - 4 46 69 56.",
+   "title": "Mutter/Vater-Kind-Gruppe Lichtenhof (dienstags 9:30)",
+   "summary": "Wöchentlicher Treff für Mütter und Väter mit Kleinkindern in der Gustav-Adolf-Gedächtniskirche. Auskunft und Anmeldung über Brigitte Schäfer, 0911 - 4 46 69 56.",
    "topics": [
     "krabbelgruppe",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
+   "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
    "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
@@ -21,7 +21,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe. Auskunft bei Brigitte Schäfer, 0911 - 4 46 69 56."
+    "note": "Keine Platzangabe. Kontakt: Brigitte Schäfer, 0911 - 4 46 69 56."
    },
    "schedule": {
     "kind": "weekly",
@@ -37,14 +37,14 @@
   {
    "providerId": "ev-suedstadt-krabbelgruppen",
    "venueId": "ev-suedstadt-krabbelgruppen-christuskirche-steinbuehl",
-   "title": "Familie Mutter/Vater-Kind-Gruppe, dienstags 9:00 (Steinbühl)",
-   "summary": "Regelmäßige Mutter/Vater-Kind-Gruppe in der Christuskirche Steinbühl, dienstags 9:00 bis 11:00 Uhr. Tagesmütter mit Kindern sind willkommen. Auskunft über das Pfarramt, 0911 - 44 62 00 (Petra Baier).",
+   "title": "Familie Mutter/Vater-Kind-Gruppe Christuskirche (dienstags 9:00)",
+   "summary": "Wöchentlicher Treff für Familien mit Kleinkindern in der Christuskirche Steinbühl; Tagesmütter mit ihren Kindern sind willkommen. Auskunft über das Pfarramt, 0911 - 44 62 00.",
    "topics": [
     "krabbelgruppe",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
+   "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
    "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
@@ -55,7 +55,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe. Auskunft über das Pfarramt, 0911 - 44 62 00 (Petra Baier)."
+    "note": "Keine Platzangabe. Kontakt: Petra Baier über das Pfarramt, 0911 - 44 62 00."
    },
    "schedule": {
     "kind": "weekly",
@@ -71,8 +71,7 @@
  ],
  "inputHash": "75488e156fd770d04d1340b5a7ef8d621f1026c3c1fbb585cd391d069fc13b11",
  "dated": {
-  "2026-10-12": "ed9b3184c5fc442d80c3f722e6f7a12c5126548a0ffbb99a376c2d13eb333d85",
-  "2026-10-13": "57d5436c7cedc5f35999e1ad1ecb5d03844762e2be7b6cae29fd75488c8ee004",
+  "2026-10-13": "22e397cebcc906c212591cec05a020fd5fe2ef2fd26e74dac12fb05d45088134",
   "2026-10-14": "2f002fb19d7fde04890c11d9571079b85afc97e16d4e8a4c517c0105af9289be",
   "2026-10-15": "dba7624c45e30861eb7333bda0b00f15d616fe85401d4a73a728e7bd90ff7fc6",
   "2026-10-16": "d187a53d067dcc230886ab647c8d92e9b483b8a6a8e154c26a2577926a96d1e3",
@@ -167,7 +166,7 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T14:49:58+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-13T10:14:52+02:00",
+ "changedAt": "2026-10-13T10:14:52+02:00",
  "sources": []
 }

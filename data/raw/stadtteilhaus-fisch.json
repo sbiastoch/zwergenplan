@@ -3,8 +3,8 @@
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Familien-Café (offener Montagstreff für Eltern mit Kindern)",
-   "summary": "Offener Treff zum gemeinsamen Spielen und Austauschen, auch für Väter und Großeltern. Einfach vorbeikommen, keine Anmeldung nötig.",
+   "title": "Familien-Café (Eltern mit Kindern, montags)",
+   "summary": "Offener Treff zum gemeinsamen Spielen und Austauschen für Eltern, Großeltern und Väter mit Kleinkindern. Keine Anmeldung nötig, auch wenn noch kein Krabbelgruppenplatz besteht.",
    "topics": [
     "elterncafe",
     "elterntreff"
@@ -12,13 +12,13 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "Keine Teilnahmekosten, Spende für den Kaffee erbeten",
+   "price": "kostenlos, Spende für Kaffee erwünscht",
    "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung nötig"
+    "note": "Einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -27,18 +27,19 @@
     ],
     "start": "15:30",
     "end": "17:00",
-    "from": "2026-10-12",
+    "from": "2026-10-19",
     "skipHolidays": true
    }
   },
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Mini-FiSche Krabbelgruppe Dienstag 9–11 Uhr",
-   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern vor Krippe und Kita, im Spielzimmer, bei gutem Wetter im Spielgarten. Freie Plätze bitte im Stadtteilhaus erfragen.",
+   "title": "Mini-FiSche Krabbelgruppe, Dienstag 9–11 Uhr",
+   "summary": "Krabbelgruppe mit Spielzimmer und bei gutem Wetter Spielgarten für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Freie Plätze erfragt man im Stadtteilhaus.",
    "topics": [
     "krabbelgruppe",
-    "spielgruppe"
+    "spielgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -58,18 +59,19 @@
     ],
     "start": "09:00",
     "end": "11:00",
-    "from": "2026-10-13",
+    "from": "2026-10-20",
     "skipHolidays": true
    }
   },
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Mini-FiSche Krabbelgruppe Mittwoch 9–11 Uhr",
-   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern vor Krippe und Kita, im Spielzimmer, bei gutem Wetter im Spielgarten. Freie Plätze bitte im Stadtteilhaus erfragen.",
+   "title": "Mini-FiSche Krabbelgruppe, Mittwoch 9–11 Uhr",
+   "summary": "Krabbelgruppe mit Spielzimmer und bei gutem Wetter Spielgarten für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Freie Plätze erfragt man im Stadtteilhaus.",
    "topics": [
     "krabbelgruppe",
-    "spielgruppe"
+    "spielgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -96,11 +98,12 @@
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Mini-FiSche Krabbelgruppe Freitag 9–11 Uhr",
-   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern vor Krippe und Kita, im Spielzimmer, bei gutem Wetter im Spielgarten. Freie Plätze bitte im Stadtteilhaus erfragen.",
+   "title": "Mini-FiSche Krabbelgruppe, Freitag 9–11 Uhr",
+   "summary": "Krabbelgruppe mit Spielzimmer und bei gutem Wetter Spielgarten für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Freie Plätze erfragt man im Stadtteilhaus.",
    "topics": [
     "krabbelgruppe",
-    "spielgruppe"
+    "spielgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -127,8 +130,8 @@
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Vater-Kind-Frühstück (Samstag 9–12 Uhr)",
-   "summary": "Treffen für Väter mit ihren Kindern: gemeinsam spielen und frühstücken, im Sommer im FiSchgarten, sonst im Toberaum. Anmeldung im Stadtteilhaus nötig.",
+   "title": "Vater-Kind-Frühstück (31.10., 21.11., 19.12.)",
+   "summary": "Gemeinsames Frühstücksbuffet und Spielen für Väter mit ihren Kindern, im Sommer im Garten, sonst im Toberaum. Anmeldung im Stadtteilhaus FiSch nötig.",
    "topics": [
     "vaeter",
     "elterntreff"
@@ -136,7 +139,7 @@
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "10 € pro Familie (Frühstücksbuffet)",
+   "price": "8 € pro Vater, 4 € pro Kind (Website nennt auch 10 € pro Familie)",
    "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "category": "treffs-cafes",
@@ -165,8 +168,8 @@
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch-turnhalle-wahlerschule",
-   "title": "Vater-Kind: Die offene Turnhalle (Freitag 18–20 Uhr)",
-   "summary": "Offene Hallenzeit für Väter mit Kindern: Toben, Ballspiele und eigene Ideen, ohne Übungsleitung. Kostenlos, einfach vorbeikommen.",
+   "title": "Vater-Kind: Die offene Turnhalle (freitags)",
+   "summary": "Selbst gestaltete Hallenzeit für Väter mit Kindern, ohne Übungsleitung; ein Vater übernimmt die Hallenverantwortung. Kostenlos, einfach vorbeikommen; Hallenturnschuhe mitbringen.",
    "topics": [
     "vaeter",
     "bewegung"
@@ -174,13 +177,12 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "kostenlos",
    "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "category": "bewegung",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Einfach vorbeikommen, Hallenturnschuhe mitbringen"
+    "note": "Einfach vorbeikommen"
    },
    "schedule": {
     "kind": "dates",
@@ -205,10 +207,10 @@
    }
   }
  ],
- "inputHash": "72988c628ed06b3e9cf37e936f2dd289e2d9a829fcd98f645d956f6a9071200a",
+ "inputHash": "2e29f52f13c88f67a39ffa89666ac461d9895b1d0ebabb93ac742573cb7b7410",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T14:49:58+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-13T10:14:52+02:00",
+ "changedAt": "2026-10-13T10:14:52+02:00",
  "sources": []
 }

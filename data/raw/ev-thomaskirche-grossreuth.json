@@ -3,30 +3,25 @@
   {
    "providerId": "ev-thomaskirche-grossreuth",
    "venueId": "ev-thomaskirche-grossreuth",
-   "title": "Krabbelgruppe (montags, Gemeindehaus Thomaskirche)",
-   "summary": "Spielen, Krabbeln, Musik und Fingerspiele mit Erfahrungsaustausch für Eltern. Im Kalender sind 13 Montagstermine ab heute bis Januar 2027 eingetragen, einzelne Termine fehlen in den Ferien. Die Angaben zu Anmeldung und Kosten fehlen im Kalender und sind vor Ort zu prüfen.",
+   "title": "Krabbelgruppe (Mo, Gemeindehaus Thomaskirche)",
+   "summary": "Spielen, Krabbeln, Musik und Fingerspiele sowie Austausch für Eltern mit Kleinkindern. Die Termine stehen im Veranstaltungskalender; Anmeldung und Kosten sind dort nicht angegeben, bitte beim Veranstalter erfragen.",
    "topics": [
     "krabbelgruppe",
-    "spielgruppe",
-    "eltern-kind-gruppe"
+    "singen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8004133",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004133",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8004134",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004134",
    "category": "krabbel-spielgruppen",
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Im Kalender ist keine Anmeldung genannt."
+    "status": "unbekannt",
+    "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalender; bitte beim Veranstalter nachfragen."
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-12T15:30",
-      "end": "2026-10-12T17:30"
-     },
      {
       "start": "2026-10-19T15:30",
       "end": "2026-10-19T17:30"
@@ -82,20 +77,20 @@
   {
    "providerId": "ev-thomaskirche-grossreuth",
    "venueId": "ev-thomaskirche-grossreuth",
-   "title": "Eltern-Kind-Yoga-Kurs (dienstags, Nov.–Dez. 2026)",
-   "summary": "Gemeinsame Yoga-Übungen für Eltern und Kind in einem Kurs mit sechs Terminen im November und Dezember 2026. Die Angaben zu Anmeldung und Kosten fehlen im Kalender und sind vor Ort zu prüfen.",
+   "title": "Eltern-Kind-Yoga Kurs (Di, Nov./Dez. 2026)",
+   "summary": "Yoga für Eltern gemeinsam mit ihrem Kind, sechs Termine dienstags im November und Dezember 2026. Anmeldung und Kosten sind im Kalender nicht angegeben; bitte beim Veranstalter erfragen.",
    "topics": [
     "yoga-mit-baby"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
+   "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8048440",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8048440",
    "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Im Kalender sind keine Plätze oder Anmeldeweg genannt; Anfrage beim Veranstalter."
+    "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalender; bitte beim Veranstalter nachfragen."
    },
    "schedule": {
     "kind": "dates",
@@ -131,30 +126,29 @@
  ],
  "inputHash": "318cead9cb5755c6ebdc93b78433013d29a502a55c1bb86803b5829c0454cdba",
  "dated": {
-  "2026-10-12": "5a8e99ed8dfcc3f589baed2e45cb71e0b83e061e42058166eedad3508baa0b30",
-  "2026-10-19": "6dcd7cbc6e6a6c10fd4750caca1100a9690d548a8bfccb16419f2f540e4ce573",
-  "2026-10-26": "025648759bf05d3373efc6f3f658536958bce53c7ea421d81a56ac498094819d",
-  "2026-11-09": "bec37f84e89643f8b836674f7c2a6f77db68241059d69a7b1e5f8b0c22d17898",
+  "2026-10-19": "ff03f0ba583a63bc5bed363c3f307c08deeafb11eb5322662614a8ce18ac90e7",
+  "2026-10-26": "e1f6a50c1eefbc3bac11912814c17dcf78a04d2b326c5303c2ff46a6bc3a04f5",
+  "2026-11-09": "4e67621b5e9ec4cc89413765f1fd13d983be5d75322674322fdacc4c61138b59",
   "2026-11-10": "c31f4b3ce06935d216f3ac8c5e40a67b2be59c6b766d865c5ac81918be350f25",
-  "2026-11-16": "d9b9381bc511dcdabef91553ffa337bde3565b66b763cc5cfee335075d1e867c",
+  "2026-11-16": "0afae86e562ad44c25d0660f3c9e20947f9e7d7e9d9406168fe103ac40cde25e",
   "2026-11-17": "0b1a0ef59c4f30a74f89984e1a5b8a7715019cdaa1ac9f17078f46019168ba47",
-  "2026-11-23": "0e3320677ea48691d7dbc3f3a31ffecf978786aebb5e061eb225a90e0023d5a2",
+  "2026-11-23": "ad1f134f892b3ac3919b9afb5d89dbdd223b4aaf8e2f0306b414321a0c19c0ff",
   "2026-11-24": "98efd9c9b1520c0fcea24b83502baefd7b1f4935a773d74a7c7bbe3c44d2b3f6",
-  "2026-11-30": "591fd02abe0d3fb3528faeb93ad5f9e586aa199aeea94ea66169cd476853ee2a",
+  "2026-11-30": "2d4d650573d4b0505c1b6cf7548f8c00411dd410adeb63818ae46c16a07a36cf",
   "2026-12-01": "25bd4d23f233152efed4de3b090f019ba045afa74722fa15d1d614185bdfc54d",
-  "2026-12-07": "b2a72cf94d3c7b439b6a0797f430941c1c48f01e833e9a23a347128936dc2117",
+  "2026-12-07": "9bdb86fa14dc9963397cf805f51db55f931002cc19b7f09b0fa30884c3142958",
   "2026-12-08": "e732f6ed826a1c9d350ea63ed88c28c7af1b6036e0893a0c907cbd3e0623cf45",
-  "2026-12-14": "3186d02b6c3462745974aa5631a6d0e05aec13ca1d41d751b5c4773e14229d0d",
+  "2026-12-14": "eb371633a6c0670344cf5deaa37f1bcb8afeb3ae83ff59f066585ac04902686c",
   "2026-12-15": "09edbacfbc7c0375769d6551a482ce88c4ef9acfcf91e7cd13509ed9655e975b",
-  "2026-12-21": "36ec28c8c5d03fa67ddfc607a448b38b1be4419b00b481b22ce97b1211946a8f",
-  "2027-01-11": "1cd4f302888b3b20b939ec77c4340fcc9bdec19904d73987a9fc0e2213657fb1",
-  "2027-01-18": "87ea7a3e5a79714a3f27459728dc92569c98d888c647476f2d6d0adb64a828b4",
-  "2027-01-25": "89a04a780d4882f7f8577313f5afb8366e68d8c9d16dbc1aee72ce7a73068bb2"
+  "2026-12-21": "d397ef89d39ebfcfb6e59442b9f91f65f15a901ffad59e6d11880d557c88a27a",
+  "2027-01-11": "7ce9a98dc58fe58ab0b0358226111c5e1a1a70b1128bcf5f1d3c46b40b3b536a",
+  "2027-01-18": "14d3634db6e29b3dcff4877782de68835d988c952a978381d874a3902f82869c",
+  "2027-01-25": "6f18f749d651503c4c8d339a46db7d2adfd93ca939b9390e7b28ddff06d6097b"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T14:49:58+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-13T10:14:52+02:00",
+ "changedAt": "2026-10-13T10:14:52+02:00",
  "sources": [
   "evtermine"
  ]

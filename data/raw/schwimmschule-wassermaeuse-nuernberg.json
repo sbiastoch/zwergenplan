@@ -3,15 +3,15 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Babyschwimmen (3–12 Monate), Start 29.11.2026",
-   "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten mit einem Elternteil. Starttermin am 29.11.2026, der Kurs ist ausgebucht und hat keine Warteliste.",
+   "title": "Babyschwimmen 3–12 Monate, Langwasser, Start 29.11.2026",
+   "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten im Langwasser Bad. Der Kurs ist laut Buchungssystem ausgebucht; eine Warteliste gibt es nicht.",
    "topics": [
     "babyschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://api.kursorganizer.com/graphql",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
    "sourceUrl": "https://api.kursorganizer.com/graphql",
    "category": "wasser",
    "age": {
@@ -20,7 +20,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "0 Plätze, keine Warteliste"
+    "note": "Keine freien Plätze, keine Warteliste"
    },
    "schedule": {
     "kind": "dates",
@@ -34,15 +34,15 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Babyschwimmen (3–12 Monate), Start 21.02.2027",
-   "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten mit einem Elternteil. Starttermin am 21.02.2027, noch 1 Platz frei.",
+   "title": "Babyschwimmen 3–12 Monate, Langwasser, Start 21.02.2027",
+   "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten im Langwasser Bad. Der Kurs ist laut Buchungssystem ausgebucht; eine Warteliste gibt es nicht.",
    "topics": [
     "babyschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://api.kursorganizer.com/graphql",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
    "sourceUrl": "https://api.kursorganizer.com/graphql",
    "category": "wasser",
    "age": {
@@ -50,8 +50,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "wenige",
-    "note": "1 Platz frei"
+    "status": "ausgebucht",
+    "note": "Keine freien Plätze, keine Warteliste"
    },
    "schedule": {
     "kind": "dates",
@@ -65,15 +65,15 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-   "title": "Babyschwimmen 2 (ab 8 Monate), Start 30.11.2026",
-   "summary": "Wassererfahrung für Babys ab 8 Monaten mit einem Elternteil. Starttermin am 30.11.2026, noch 5 Plätze frei.",
+   "title": "Babyschwimmen ab 8 Monaten, Boxdorfer Werkstatt, Start 30.11.2026",
+   "summary": "Babyschwimmen für Kinder ab 8 Monaten in der Boxdorfer Werkstatt. Der Kurs hat noch freie Plätze.",
    "topics": [
     "babyschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://api.kursorganizer.com/graphql",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
    "sourceUrl": "https://api.kursorganizer.com/graphql",
    "category": "wasser",
    "age": {
@@ -82,7 +82,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "5 Plätze frei"
+    "note": "4 Plätze frei"
    },
    "schedule": {
     "kind": "dates",
@@ -96,15 +96,15 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-   "title": "Babyschwimmen 2 (ab 8 Monate), Start 22.02.2027",
-   "summary": "Wassererfahrung für Babys ab 8 Monaten mit einem Elternteil. Starttermin am 22.02.2027, alle 10 Plätze frei.",
+   "title": "Babyschwimmen ab 8 Monaten, Boxdorfer Werkstatt, Start 22.02.2027",
+   "summary": "Babyschwimmen für Kinder ab 8 Monaten in der Boxdorfer Werkstatt. Der Kurs hat noch freie Plätze.",
    "topics": [
     "babyschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://api.kursorganizer.com/graphql",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
    "sourceUrl": "https://api.kursorganizer.com/graphql",
    "category": "wasser",
    "age": {
@@ -127,15 +127,79 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Kleinkinderschwimmen (ab 15 Monate), Start 21.02.2027",
-   "summary": "Wassergewöhnung und Schwimmfreude für Kleinkinder ab 15 Monaten mit einem Elternteil. Starttermin am 21.02.2027, noch 5 Plätze frei.",
+   "title": "Eltern-Kind-Schwimmen ab 2,5 Jahren, Langwasser, Start 29.11.2026",
+   "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren im Langwasser Bad. Der Kurs ist ausgebucht, es gibt keine Warteliste.",
+   "topics": [
+    "kleinkindschwimmen",
+    "eltern-kind-gruppe"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "category": "wasser",
+   "age": {
+    "minMonths": 30,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Keine freien Plätze, keine Warteliste"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-29T14:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg",
+   "title": "Eltern-Kind-Schwimmen ab 2,5 Jahren, Langwasser, Start 21.02.2027",
+   "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren im Langwasser Bad. Der Kurs ist ausgebucht, es gibt keine Warteliste.",
+   "topics": [
+    "kleinkindschwimmen",
+    "eltern-kind-gruppe"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+   "sourceUrl": "https://api.kursorganizer.com/graphql",
+   "category": "wasser",
+   "age": {
+    "minMonths": 30,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "ausgebucht",
+    "note": "Keine freien Plätze, keine Warteliste"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-02-21T15:00"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "schwimmschule-wassermaeuse-nuernberg",
+   "venueId": "schwimmschule-wassermaeuse-nuernberg",
+   "title": "Kleinkinderschwimmen ab 15 Monaten, Langwasser, Start 21.02.2027",
+   "summary": "Schwimmen für Kleinkinder ab 15 Monaten im Langwasser Bad. Der Kurs hat noch freie Plätze.",
    "topics": [
     "kleinkindschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "url": "https://api.kursorganizer.com/graphql",
+   "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
    "sourceUrl": "https://api.kursorganizer.com/graphql",
    "category": "wasser",
    "age": {
@@ -154,74 +218,12 @@
      }
     ]
    }
-  },
-  {
-   "providerId": "schwimmschule-wassermaeuse-nuernberg",
-   "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 Jahren), Start 29.11.2026",
-   "summary": "Schwimmen mit Eltern für Kinder ab 2,5 Jahren. Starttermin am 29.11.2026, der Kurs ist ausgebucht und hat keine Warteliste.",
-   "topics": [
-    "kleinkindschwimmen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://api.kursorganizer.com/graphql",
-   "sourceUrl": "https://api.kursorganizer.com/graphql",
-   "category": "wasser",
-   "age": {
-    "minMonths": 30,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "0 Plätze, keine Warteliste"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-29T14:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "schwimmschule-wassermaeuse-nuernberg",
-   "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 Jahren), Start 21.02.2027",
-   "summary": "Schwimmen mit Eltern für Kinder ab 2,5 Jahren. Starttermin am 21.02.2027, der Kurs ist ausgebucht und hat keine Warteliste.",
-   "topics": [
-    "kleinkindschwimmen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://api.kursorganizer.com/graphql",
-   "sourceUrl": "https://api.kursorganizer.com/graphql",
-   "category": "wasser",
-   "age": {
-    "minMonths": 30,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "0 Plätze, keine Warteliste"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2027-02-21T15:00"
-     }
-    ]
-   }
   }
  ],
- "inputHash": "24d3e63ce8a8e662bfb139b48d0c537f9eaf461895655e4dded2abd8100b5e2c",
+ "inputHash": "1d8be0a6a3be4d884162bd46fa141b40d81657dbaa3f56ffad78cf41d4c017f2",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-12T14:49:58+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-13T10:14:52+02:00",
+ "changedAt": "2026-10-13T10:14:52+02:00",
  "sources": []
 }
