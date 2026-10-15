@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-14T08:36:59+02:00",
+  "generatedAt": "2026-10-15T08:19:13+02:00",
   "horizon": {
-    "from": "2026-10-14",
-    "to": "2027-10-14"
+    "from": "2026-10-15",
+    "to": "2027-10-15"
   },
   "offers": [
     {
@@ -257,7 +257,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Karten über Eventim Light; Verfügbarkeit steht nicht im Seitentext. Gutscheingäste vorher per Mail an saskia.duerr@babykonzert.de reservieren.",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://babykonzert.de/home/nuernberg/",
       "sourceUrl": "https://babykonzert.de/home/nuernberg/",
@@ -1373,7 +1373,7 @@
       "availability": {
         "status": "ohne-anmeldung",
         "note": "Keine Anmeldung nötig",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
       "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
@@ -1525,6 +1525,10 @@
         {
           "start": "2027-10-08T09:30:00+02:00",
           "end": "2027-10-08T10:15:00+02:00"
+        },
+        {
+          "start": "2027-10-15T09:30:00+02:00",
+          "end": "2027-10-15T10:15:00+02:00"
         }
       ]
     },
@@ -1717,10 +1721,6 @@
       "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
       "sessions": [
         {
-          "start": "2026-10-14T09:30:00+02:00",
-          "end": "2026-10-14T10:30:00+02:00"
-        },
-        {
           "start": "2026-10-21T09:30:00+02:00",
           "end": "2026-10-21T10:30:00+02:00"
         },
@@ -1889,10 +1889,6 @@
       "url": "https://www.dance-maxx.de/kursplan/fit-dank-baby-mini/",
       "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
       "sessions": [
-        {
-          "start": "2026-10-14T10:45:00+02:00",
-          "end": "2026-10-14T11:45:00+02:00"
-        },
         {
           "start": "2026-10-21T10:45:00+02:00",
           "end": "2026-10-21T11:45:00+02:00"
@@ -3446,6 +3442,10 @@
         {
           "start": "2027-10-08T12:00:00+02:00",
           "end": "2027-10-08T13:00:00+02:00"
+        },
+        {
+          "start": "2027-10-15T12:00:00+02:00",
+          "end": "2027-10-15T13:00:00+02:00"
         }
       ]
     },
@@ -4141,6 +4141,10 @@
         {
           "start": "2027-10-08T10:30:00+02:00",
           "end": "2027-10-08T12:00:00+02:00"
+        },
+        {
+          "start": "2027-10-15T10:30:00+02:00",
+          "end": "2027-10-15T12:00:00+02:00"
         }
       ]
     },
@@ -4844,6 +4848,10 @@
         {
           "start": "2027-10-08T09:30:00+02:00",
           "end": "2027-10-08T10:30:00+02:00"
+        },
+        {
+          "start": "2027-10-15T09:30:00+02:00",
+          "end": "2027-10-15T10:30:00+02:00"
         }
       ]
     },
@@ -6036,10 +6044,6 @@
       "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
       "sessions": [
         {
-          "start": "2026-10-14T10:30:00+02:00",
-          "end": "2026-10-14T11:15:00+02:00"
-        },
-        {
           "start": "2026-10-21T10:30:00+02:00",
           "end": "2026-10-21T11:15:00+02:00"
         },
@@ -6272,10 +6276,6 @@
       "url": "https://www.diefamilienbox.de/kleinkindkurse-nürnberg/",
       "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
       "sessions": [
-        {
-          "start": "2026-10-14T09:30:00+02:00",
-          "end": "2026-10-14T10:15:00+02:00"
-        },
         {
           "start": "2026-10-21T09:30:00+02:00",
           "end": "2026-10-21T10:15:00+02:00"
@@ -7615,10 +7615,6 @@
       "sourceUrl": "https://www.djk-eibach.de/abteilungen/turnen/",
       "sessions": [
         {
-          "start": "2026-10-14T14:45:00+02:00",
-          "end": "2026-10-14T15:30:00+02:00"
-        },
-        {
           "start": "2026-10-21T14:45:00+02:00",
           "end": "2026-10-21T15:30:00+02:00"
         },
@@ -7852,10 +7848,6 @@
       "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8231115",
       "sessions": [
         {
-          "start": "2026-10-14T15:00:00+02:00",
-          "end": "2026-10-14T16:30:00+02:00"
-        },
-        {
           "start": "2026-10-21T15:00:00+02:00",
           "end": "2026-10-21T16:30:00+02:00"
         },
@@ -8067,6 +8059,10 @@
         {
           "start": "2027-10-08T09:30:00+02:00",
           "end": "2027-10-08T10:30:00+02:00"
+        },
+        {
+          "start": "2027-10-15T09:30:00+02:00",
+          "end": "2027-10-15T10:30:00+02:00"
         }
       ]
     },
@@ -9898,10 +9894,6 @@
       "url": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
       "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
       "sessions": [
-        {
-          "start": "2026-10-14T09:00:00+02:00",
-          "end": "2026-10-14T10:30:00+02:00"
-        },
         {
           "start": "2026-10-21T09:00:00+02:00",
           "end": "2026-10-21T10:30:00+02:00"
@@ -12096,10 +12088,6 @@
       "sourceUrl": "https://www.st-johannis-nuernberg.de/gemeindeleben/fuer-kinder",
       "sessions": [
         {
-          "start": "2026-10-14T13:30:00+02:00",
-          "end": "2026-10-14T16:00:00+02:00"
-        },
-        {
           "start": "2026-10-21T13:30:00+02:00",
           "end": "2026-10-21T16:00:00+02:00"
         },
@@ -13747,10 +13735,6 @@
       "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/eltern-kind-treff",
       "sessions": [
         {
-          "start": "2026-10-14T15:30:00+02:00",
-          "end": "2026-10-14T18:00:00+02:00"
-        },
-        {
           "start": "2026-10-21T15:30:00+02:00",
           "end": "2026-10-21T18:00:00+02:00"
         },
@@ -15092,10 +15076,6 @@
       "sourceUrl": "https://www.fbs-nuernberg.de/begegnung/familienoase/",
       "sessions": [
         {
-          "start": "2026-10-14T15:30:00+02:00",
-          "end": "2026-10-14T17:00:00+02:00"
-        },
-        {
           "start": "2026-10-21T15:30:00+02:00",
           "end": "2026-10-21T17:00:00+02:00"
         },
@@ -15269,10 +15249,6 @@
       "url": "https://www.fbs-nuernberg.de/begegnung/familienoase/",
       "sourceUrl": "https://www.fbs-nuernberg.de/?s=FamilienOase",
       "sessions": [
-        {
-          "start": "2026-10-14T15:30:00+02:00",
-          "end": "2026-10-14T17:00:00+02:00"
-        },
         {
           "start": "2026-10-21T15:30:00+02:00",
           "end": "2026-10-21T17:00:00+02:00"
@@ -15887,10 +15863,6 @@
       "sourceUrl": "https://www.fbs-nuernberg.de/?s=Krabbelk%C3%A4fer",
       "sessions": [
         {
-          "start": "2026-10-14T10:00:00+02:00",
-          "end": "2026-10-14T11:30:00+02:00"
-        },
-        {
           "start": "2026-10-21T10:00:00+02:00",
           "end": "2026-10-21T11:30:00+02:00"
         },
@@ -15944,10 +15916,6 @@
       "url": "https://www.fbs-nuernberg.de/begegnung/krabbelkaefer/",
       "sourceUrl": "https://www.fbs-nuernberg.de/begegnung/krabbelkaefer/",
       "sessions": [
-        {
-          "start": "2026-10-14T10:00:00+02:00",
-          "end": "2026-10-14T11:30:00+02:00"
-        },
         {
           "start": "2026-10-21T10:00:00+02:00",
           "end": "2026-10-21T11:30:00+02:00"
@@ -16182,10 +16150,6 @@
       "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
       "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
       "sessions": [
-        {
-          "start": "2026-10-14T09:00:00+02:00",
-          "end": "2026-10-14T10:00:00+02:00"
-        },
         {
           "start": "2026-10-28T09:00:00+01:00",
           "end": "2026-10-28T10:00:00+01:00"
@@ -18731,10 +18695,6 @@
       "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
       "sessions": [
         {
-          "start": "2026-10-14T10:00:00+02:00",
-          "end": "2026-10-14T11:30:00+02:00"
-        },
-        {
           "start": "2026-11-11T10:00:00+01:00",
           "end": "2026-11-11T11:30:00+01:00"
         },
@@ -19038,7 +18998,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Anmeldung über die miya-Buchung; Platzangabe nicht sichtbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://hebammeeva.mymiya.de/courses/",
       "sourceUrl": "https://www.hebammeeva.de/babymassage",
@@ -19084,7 +19044,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Anmeldung über die miya-Buchung; Platzangabe nicht sichtbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://hebammeeva.mymiya.de/courses/",
       "sourceUrl": "https://www.hebammeeva.de/babymassage",
@@ -19130,7 +19090,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Abstimmung wöchentlich in der WhatsApp-Gruppe; Plätze bei Bedarf begrenzt",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.hebammeeva.de/krabbelgruppe",
       "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
@@ -19304,7 +19264,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Abstimmung wöchentlich in der WhatsApp-Gruppe; Plätze bei Bedarf begrenzt",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.hebammeeva.de/krabbelgruppe",
       "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
@@ -19482,15 +19442,11 @@
       "availability": {
         "status": "unbekannt",
         "note": "Abstimmung wöchentlich in der WhatsApp-Gruppe; Plätze bei Bedarf begrenzt",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.hebammeeva.de/krabbelgruppe",
       "sourceUrl": "https://www.hebammeeva.de/krabbelgruppe",
       "sessions": [
-        {
-          "start": "2026-10-14T10:00:00+02:00",
-          "end": "2026-10-14T12:00:00+02:00"
-        },
         {
           "start": "2026-10-21T10:00:00+02:00",
           "end": "2026-10-21T12:00:00+02:00"
@@ -19893,7 +19849,7 @@
       "availability": {
         "status": "frei",
         "note": "Plätze vorhanden; Anmeldung über Hebamio",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://mainberger.hebamio.de/kursliste",
       "sourceUrl": "https://mainberger.hebamio.de/kursliste",
@@ -19919,7 +19875,7 @@
       "availability": {
         "status": "wenige",
         "note": "Noch wenige Plätze; Anmeldung über Hebamio",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://mainberger.hebamio.de/kursliste",
       "sourceUrl": "https://mainberger.hebamio.de/kursliste",
@@ -19973,7 +19929,7 @@
       "availability": {
         "status": "warteliste",
         "note": "Kurs voll, Anmeldung über „auf Warteliste setzen“ auf Hebamio",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://mainberger.hebamio.de/kursliste",
       "sourceUrl": "https://mainberger.hebamio.de/kursliste",
@@ -20027,7 +19983,7 @@
       "availability": {
         "status": "wenige",
         "note": "Noch wenige Plätze; Anmeldung über Hebamio",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://mainberger.hebamio.de/kursliste",
       "sourceUrl": "https://mainberger.hebamio.de/kursliste",
@@ -20081,7 +20037,7 @@
       "availability": {
         "status": "warteliste",
         "note": "Kurs voll, Anmeldung über „auf Warteliste setzen“ auf Hebamio",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://mainberger.hebamio.de/kursliste",
       "sourceUrl": "https://mainberger.hebamio.de/kursliste",
@@ -20135,7 +20091,7 @@
       "availability": {
         "status": "wenige",
         "note": "Noch wenige Plätze; Anmeldung über Hebamio",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://mainberger.hebamio.de/kursliste",
       "sourceUrl": "https://mainberger.hebamio.de/kursliste",
@@ -20193,7 +20149,7 @@
       "availability": {
         "status": "frei",
         "note": "Plätze vorhanden",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://mainberger.hebamio.de/kursliste",
       "sourceUrl": "https://mainberger.hebamio.de/kursliste",
@@ -20804,10 +20760,6 @@
       },
       "sessions": [
         {
-          "start": "2026-10-14T11:00:00+02:00",
-          "end": "2026-10-14T11:55:00+02:00"
-        },
-        {
           "start": "2026-10-28T11:00:00+01:00",
           "end": "2026-10-28T11:55:00+01:00"
         },
@@ -21084,10 +21036,6 @@
       "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
       "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
       "sessions": [
-        {
-          "start": "2026-10-14T15:30:00+02:00",
-          "end": "2026-10-14T16:15:00+02:00"
-        },
         {
           "start": "2026-10-21T15:30:00+02:00",
           "end": "2026-10-21T16:15:00+02:00"
@@ -21753,6 +21701,10 @@
         {
           "start": "2027-10-08T09:30:00+02:00",
           "end": "2027-10-08T10:15:00+02:00"
+        },
+        {
+          "start": "2027-10-15T09:30:00+02:00",
+          "end": "2027-10-15T10:15:00+02:00"
         }
       ]
     },
@@ -22172,6 +22124,10 @@
         {
           "start": "2027-10-08T10:30:00+02:00",
           "end": "2027-10-08T11:15:00+02:00"
+        },
+        {
+          "start": "2027-10-15T10:30:00+02:00",
+          "end": "2027-10-15T11:15:00+02:00"
         }
       ]
     },
@@ -22592,6 +22548,10 @@
         {
           "start": "2027-10-08T11:30:00+02:00",
           "end": "2027-10-08T12:15:00+02:00"
+        },
+        {
+          "start": "2027-10-15T11:30:00+02:00",
+          "end": "2027-10-15T12:15:00+02:00"
         }
       ]
     },
@@ -22980,10 +22940,6 @@
       "url": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
       "sourceUrl": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
       "sessions": [
-        {
-          "start": "2026-10-14T15:00:00+02:00",
-          "end": "2026-10-14T17:00:00+02:00"
-        },
         {
           "start": "2026-10-21T15:00:00+02:00",
           "end": "2026-10-21T17:00:00+02:00"
@@ -26461,7 +26417,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Tickets je Termin im go~mus-Shop (nmn-tickets.de); Restkontingent dort einsehbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
       "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
@@ -26487,7 +26443,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Tickets je Termin im go~mus-Shop (nmn-tickets.de); Restkontingent dort einsehbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
       "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
@@ -26513,7 +26469,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Tickets je Termin im go~mus-Shop (nmn-tickets.de); Restkontingent dort einsehbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
       "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
@@ -26539,7 +26495,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Tickets je Termin im go~mus-Shop (nmn-tickets.de); Restkontingent dort einsehbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
       "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
@@ -26569,7 +26525,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Tickets im go~mus-Shop (nmn-tickets.de)",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
       "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
@@ -27484,6 +27440,10 @@
         {
           "start": "2027-10-08T10:45:00+02:00",
           "end": "2027-10-08T11:15:00+02:00"
+        },
+        {
+          "start": "2027-10-15T10:45:00+02:00",
+          "end": "2027-10-15T11:15:00+02:00"
         }
       ]
     },
@@ -27717,6 +27677,10 @@
         {
           "start": "2027-10-08T11:15:00+02:00",
           "end": "2027-10-08T11:45:00+02:00"
+        },
+        {
+          "start": "2027-10-15T11:15:00+02:00",
+          "end": "2027-10-15T11:45:00+02:00"
         }
       ]
     },
@@ -28227,10 +28191,6 @@
       "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
       "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
       "sessions": [
-        {
-          "start": "2026-10-14T09:30:00+02:00",
-          "end": "2026-10-14T10:15:00+02:00"
-        },
         {
           "start": "2026-10-21T09:30:00+02:00",
           "end": "2026-10-21T10:15:00+02:00"
@@ -29378,6 +29338,10 @@
         {
           "start": "2027-10-08T15:00:00+02:00",
           "end": "2027-10-08T15:45:00+02:00"
+        },
+        {
+          "start": "2027-10-15T15:00:00+02:00",
+          "end": "2027-10-15T15:45:00+02:00"
         }
       ]
     },
@@ -30101,7 +30065,7 @@
       "availability": {
         "status": "ausgebucht",
         "note": "Kurs laut Buchungsseite ausgebucht",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
       "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
@@ -30167,7 +30131,7 @@
       "availability": {
         "status": "frei",
         "note": "Plätze laut Buchungsseite verfügbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
       "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
@@ -30225,7 +30189,7 @@
       "availability": {
         "status": "ausgebucht",
         "note": "Kurs laut Buchungsseite ausgebucht",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
       "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
@@ -30291,7 +30255,7 @@
       "availability": {
         "status": "frei",
         "note": "Plätze laut Buchungsseite verfügbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
       "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
@@ -30349,7 +30313,7 @@
       "availability": {
         "status": "frei",
         "note": "Plätze laut Buchungsseite verfügbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
       "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
@@ -30415,7 +30379,7 @@
       "availability": {
         "status": "frei",
         "note": "Plätze laut Buchungsseite verfügbar",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
       "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
@@ -30676,7 +30640,7 @@
       "availability": {
         "status": "unbekannt",
         "note": "Anmeldung unter 09 11 / 2 31- 41 57 oder stb-langwasser@stadt.nuernberg.de",
-        "checkedAt": "2026-10-14T08:36:54+02:00"
+        "checkedAt": "2026-10-15T08:19:09+02:00"
       },
       "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
       "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
@@ -31206,6 +31170,10 @@
         {
           "start": "2027-10-08T09:00:00+02:00",
           "end": "2027-10-08T11:00:00+02:00"
+        },
+        {
+          "start": "2027-10-15T09:00:00+02:00",
+          "end": "2027-10-15T11:00:00+02:00"
         }
       ]
     },
@@ -31229,10 +31197,6 @@
       "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
       "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
       "sessions": [
-        {
-          "start": "2026-10-14T09:00:00+02:00",
-          "end": "2026-10-14T11:00:00+02:00"
-        },
         {
           "start": "2026-10-21T09:00:00+02:00",
           "end": "2026-10-21T11:00:00+02:00"
@@ -38697,10 +38661,6 @@
       "sourceUrl": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
       "sessions": [
         {
-          "start": "2026-10-14T15:00:00+02:00",
-          "end": "2026-10-14T16:15:00+02:00"
-        },
-        {
           "start": "2026-10-21T15:00:00+02:00",
           "end": "2026-10-21T16:15:00+02:00"
         },
@@ -39223,10 +39183,6 @@
       "url": "https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/",
       "sourceUrl": "https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/",
       "sessions": [
-        {
-          "start": "2026-10-14T13:00:00+02:00",
-          "end": "2026-10-14T14:00:00+02:00"
-        },
         {
           "start": "2026-10-28T13:00:00+01:00",
           "end": "2026-10-28T14:00:00+01:00"
