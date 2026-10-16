@@ -3,8 +3,8 @@
   {
    "providerId": "ev-nikodemus-roethenbach",
    "venueId": "ev-nikodemus-roethenbach",
-   "title": "Krabbelgruppe bis 3 Jahre – Mittwoch 9:00–10:30",
-   "summary": "Wöchentliche Krabbelgruppe für Kinder bis 3 Jahre mit Eltern im Gemeindezentrum, zum Austausch und für gemeinsame Aktionen. Anmeldung bei Diakonin Marion Hanek.",
+   "title": "Krabbelgruppe bis 3 Jahre – Mittwoch 9:00",
+   "summary": "Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek; Kosten nicht angegeben.",
    "topics": [
     "krabbelgruppe",
     "eltern-kind-gruppe"
@@ -12,8 +12,8 @@
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107479",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107479",
    "category": "krabbel-spielgruppen",
    "age": {
     "minMonths": 0,
@@ -21,15 +21,11 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung bei Diakonin Marion Hanek"
+    "note": "Anfrage bei Diakonin Marion Hanek"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-14T09:00",
-      "end": "2026-10-14T10:30"
-     },
      {
       "start": "2026-10-21T09:00",
       "end": "2026-10-21T10:30"
@@ -77,8 +73,8 @@
   {
    "providerId": "ev-nikodemus-roethenbach",
    "venueId": "ev-nikodemus-roethenbach",
-   "title": "Krabbelgruppe bis 3 Jahre – Donnerstag 9:30–11:00",
-   "summary": "Wöchentliche Krabbelgruppe für Kinder bis 3 Jahre mit Eltern im Gemeindezentrum, zum Austausch und für gemeinsame Aktionen. Anmeldung bei Diakonin Marion Hanek.",
+   "title": "Krabbelgruppe bis 3 Jahre – Donnerstag 9:30",
+   "summary": "Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek; Kosten nicht angegeben.",
    "topics": [
     "krabbelgruppe",
     "eltern-kind-gruppe"
@@ -86,8 +82,8 @@
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107478",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107479",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107479",
    "category": "krabbel-spielgruppen",
    "age": {
     "minMonths": 0,
@@ -95,15 +91,11 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung bei Diakonin Marion Hanek"
+    "note": "Anfrage bei Diakonin Marion Hanek"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-15T09:30",
-      "end": "2026-10-15T11:00"
-     },
      {
       "start": "2026-10-22T09:30",
       "end": "2026-10-22T11:00"
@@ -147,11 +139,10 @@
   {
    "providerId": "ev-nikodemus-roethenbach",
    "venueId": "ev-nikodemus-roethenbach",
-   "title": "Café Niko – Das Familiencafé",
-   "summary": "Familiencafé mit Kaffee und Kuchen, Jung und Alt kommen zusammen; für die Kinder gibt es Spielsachen. Termine laut Kalender, ohne Anmeldung.",
+   "title": "Café Niko – Familiencafé mit Kaffee und Kuchen",
+   "summary": "Offenes Familiencafé: Eltern und Großeltern kommen bei Kaffee und Kuchen zusammen, für die Kinder gibt es Spielsachen. Kosten nicht angegeben.",
    "topics": [
-    "elterncafe",
-    "elterntreff"
+    "elterncafe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -181,34 +172,32 @@
  ],
  "inputHash": "0bca4acce84aa128ef5c729f1a5e3fc94346d8b6badf0cc7c14e7a8faef57e1c",
  "dated": {
-  "2026-10-14": "5eeacb1de2f89d3807adbb87c89bd429c27b55fba01fbbf8f4014790510f6748",
-  "2026-10-15": "0c0037da40da0c69ff849cbee11efd5156ed50d8c24059a45d0f234b0c5eeb13",
-  "2026-10-21": "48462fdc4ef7599497fae71ac3d43ff7d92d87844c110b1c2775b5f9c4834077",
-  "2026-10-22": "900c8fab1316987d378078754b19f561c2bab92b01684c2d9da8005804b62eb5",
-  "2026-10-28": "8a9504133aed5ada1bd87a4825a6412b26e8447e1f4981dd75781ecf4fc92c0d",
-  "2026-10-29": "2fd067940905f8c2ec37d00e94108d1adacb572ffc617a30cdbd928a0c564179",
-  "2026-11-11": "b380966045e27743a1efbdc53ddd8858c882ca7993c425b66dca35fe81885388",
-  "2026-11-12": "58b67aefb527f1827cc8811a350d10d2e9e078cd9e7769021878ff8fa941bde8",
-  "2026-11-18": "bf58245e3e5cec1349851b62c24f89f0fdaf970d88659c9810b77f0fb70130dd",
-  "2026-11-19": "a833aabbca891072e1200ae37a346c1b7166344e91d94a9c7a5dc706b7764a5f",
+  "2026-10-21": "fa8ea1cefe2e0d95ea18a6734343411b8b5a71a51601883dd6f26d15b8993651",
+  "2026-10-22": "3cf7c562282444dce675ec0928aa5d9c3dc95f859e85c711685b917d3c50a3c3",
+  "2026-10-28": "29ed29bf0b7bb2a7c4bec371f9144370fda2641dbb44aa4ce53cafcddc0805c1",
+  "2026-10-29": "10c2f2be105e860fa30b6b277132d639583513335de23c148c1a1ca4ac74cfbe",
+  "2026-11-11": "7b0718815e9b5de208ecf20f5f2a36636bea3e82de8e65410a12cf87a4ab5a40",
+  "2026-11-12": "59c4b6d5d89c800c75c7ffa620d4379088c1bcaf9b7a931b80f5a63af8f53afc",
+  "2026-11-18": "9fea783a59dbe4024dbcbf46a582015d584e054f5f0f8fb02ba48555193fd333",
+  "2026-11-19": "6c1c730b191e4b5160b322a115aec8251d69e66fffd0908e474b1c684db8b0f6",
   "2026-11-20": "adebc3e107aa4ebd93162d7f1e9b0051349e3cdd99cda089e1ffd61772152e7e",
-  "2026-11-25": "e06bd2e81e3ee231030cf932d7530629619ccf13bdd49b538242aac2705793b6",
-  "2026-11-26": "7f63e7139cdbd0a1fc026f0368bf332088ab194c54fcdcfb606398235f71379e",
-  "2026-12-02": "8f9f6dd979a0901012511a8abbbaa97dbd3cf44e58246b9dbfda6af35d21e0cf",
-  "2026-12-03": "62fe76d170e0b71b7d2e6fab3e941966cfb6d7137ead6687c370faa84c399287",
-  "2026-12-09": "f86143c270b454eca2cc5303f181d436cdb5c2378ad3a814cd9c0d779d9ad5ba",
-  "2026-12-10": "de7bca93a7533d4971e223fe5117b281800cf442aa10fc517b15fb604359c695",
-  "2026-12-16": "b3f1b8b90b3691999c20dc71ca96dee378b3b9d3464f3be788e0a9d9d7b500c1",
-  "2026-12-17": "f3e0232054083f98a3a0917fd18f7abc3c851b380cb80a0f2768ab40c08e4ec2",
-  "2026-12-23": "a0e9ff209a6b1abece88cd42e0ff149e275dffdc59ab2642df62c586f5e13d3d",
-  "2027-01-13": "56f9518a81d060f1852a5fa9bf824ce6821a6c4fbd520c2ad2a1219888c90f8d",
-  "2027-01-14": "d3a9f2d2a5471ef6c94ae68ee49c3882c9137bfb41aff26606a350e3e406f30b",
+  "2026-11-25": "95361794baba4427c9c4dea8f4e038d4b4e082da4b3f6c82fd7383861e5070a1",
+  "2026-11-26": "3da9c74542b590ef3f4320c767ddc1c5d3e9e861d7a686e99dd6c67eefe10b08",
+  "2026-12-02": "859e16aa24a37f647c49cf9c0f25f7cb349f83971c8133c15632550b04b9a967",
+  "2026-12-03": "fc7bf0e53db2e8d8db28cd1913fea3b940707684322b6d6d7e4b92a1484a5c20",
+  "2026-12-09": "42acc46767e7af4e8ed087c5d8907a7e22afb707f75319a8c382f30ea7499f7c",
+  "2026-12-10": "46a971d907356022fa31f538d00232d7d8e1df775cad31b3c46db4b5f0266d8d",
+  "2026-12-16": "0f405a8e6aa2e31444ff5905612478b856945a61ce412e7ddb27734dd6bcb818",
+  "2026-12-17": "3fe743d7066fc850c0ecdeb89db55dd745b1d834c9b8dec6d8351f551a7978df",
+  "2026-12-23": "d8de5508c7a9d4e047fe948723df1b90c03439128c9c3e0909edb6ab2c592ce9",
+  "2027-01-13": "ccd7688f43060e8e64cf1e5dbca7fa8a023b4dfbb675ad7595ff1ac991842829",
+  "2027-01-14": "83431b18117f8cf04ab7b45ab59ffeb4a57c85dc68b65eb28efd6fe3db7af49e",
   "2027-01-22": "0db1e5ad15fc7f3ebc6a466da9d9e7edc77ab6c1af5ea8bf6ed2229961c6aca9"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-13T10:14:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": [
   "evtermine"
  ]

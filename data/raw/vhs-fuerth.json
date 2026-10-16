@@ -3,8 +3,8 @@
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 1½–2½ Jahre (Mittwoch 17:00)",
-   "summary": "Freies Turnen mit wöchentlich neu gestaltetem Parcours; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Die Kursreihe läuft bereits, Termine ab 14.10. stehen im Plan.",
+   "title": "Eltern-Kind-Turnen (1½–2½ Jahre, mittwochs)",
+   "summary": "Wöchentlicher, neu gestalteter Parcours zum freien Turnen, bei dem Eltern aktiv mitmachen und Geräte mit aufbauen. Laufender Kurs; Anmeldung über die vhs (Kursnummer 16301).",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Kursseite der vhs kkursnummer 16301"
+    "note": "Anmeldung über die vhs, Kursnummer 16301"
    },
    "schedule": {
     "kind": "weekly",
@@ -30,15 +30,15 @@
      "WE"
     ],
     "start": "17:00",
-    "from": "2026-10-14",
+    "from": "2026-10-21",
     "skipHolidays": false
    }
   },
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 2–3 Jahre (Donnerstag 17:00)",
-   "summary": "Freies Turnen mit wöchentlich neu gestaltetem Parcours; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Die Kursreihe läuft bereits, Termine ab 15.10. stehen im Plan.",
+   "title": "Eltern-Kind-Turnen (2–3 Jahre, donnerstags)",
+   "summary": "Wöchentlicher, neu gestalteter Parcours zum freien Turnen, bei dem Eltern aktiv mitmachen und Geräte mit aufbauen. Laufender Kurs; Anmeldung über die vhs (Kursnummer 16303).",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -56,7 +56,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Kursseite der vhs, Kursnummer 16303"
+    "note": "Anmeldung über die vhs, Kursnummer 16303"
    },
    "schedule": {
     "kind": "weekly",
@@ -64,15 +64,15 @@
      "TH"
     ],
     "start": "17:00",
-    "from": "2026-10-15",
+    "from": "2026-10-22",
     "skipHolidays": false
    }
   }
  ],
- "inputHash": "4f45b9d3cff460c4bfa54744fc266be368faf37cda712b4e4b5c886cf09b233a",
+ "inputHash": "ce317502e0031950dc0d45084d3211101a7642e22d8ff7aec8d32a9fc3916dc3",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-13T10:14:52+02:00",
- "changedAt": "2026-10-13T10:14:52+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": []
 }

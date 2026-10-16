@@ -3,8 +3,8 @@
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Start 14.11.)",
-   "summary": "Wassergewöhnung und erste Schwimmbewegungen für Babys ab 3 Monaten, Eltern sind im Wasser dabei. Kursreihe samstags, 10 Termine. Dieser Kurs ist ausgebucht.",
+   "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Nov. 2026–Jan. 2027)",
+   "summary": "Schwimmkurs für Babys ab 3 Monate in den Kliniken Dr. Erler, samstags um 10:15 Uhr, Kursende am 16. Januar 2027. Der Kurs ist ausgebucht.",
    "topics": [
     "babyschwimmen"
    ],
@@ -21,7 +21,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Kurs laut Buchungsseite ausgebucht"
+    "note": "Kurs ausgebucht"
    },
    "schedule": {
     "kind": "weekly",
@@ -30,15 +30,15 @@
     ],
     "start": "10:15",
     "from": "2026-11-14",
-    "count": 10,
+    "until": "2027-01-16",
     "skipHolidays": false
    }
   },
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Start 23.01.)",
-   "summary": "Wassergewöhnung und erste Schwimmbewegungen für Babys ab 3 Monaten, Eltern sind im Wasser dabei. Kursreihe samstags, 8 Termine. Plätze laut Buchungsseite frei.",
+   "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Jan.–März 2027)",
+   "summary": "Schwimmkurs für Babys ab 3 Monate in den Kliniken Dr. Erler, samstags um 10:15 Uhr, vom 23. Januar bis 13. März 2027. Freie Plätze laut Buchungsseite.",
    "topics": [
     "babyschwimmen"
    ],
@@ -55,7 +55,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Plätze laut Buchungsseite verfügbar"
+    "note": "Freie Plätze laut Buchungsseite"
    },
    "schedule": {
     "kind": "weekly",
@@ -64,15 +64,15 @@
     ],
     "start": "10:15",
     "from": "2027-01-23",
-    "count": 8,
+    "until": "2027-03-13",
     "skipHolidays": false
    }
   },
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Minis ab 1 Jahr, Sa 09:30 (Start 14.11.)",
-   "summary": "Schwimmkurs für Kleinkinder ab einem Jahr mit einem Elternteil im Wasser. Kursreihe samstags, 10 Termine. Plätze laut Buchungsseite frei.",
+   "title": "Minis-Schwimmkurs ab 1 Jahr, Sa 9:30 (Nov. 2026–Jan. 2027)",
+   "summary": "Schwimmkurs für Kleinkinder ab 1 Jahr in den Kliniken Dr. Erler, samstags um 9:30 Uhr, Kursende am 16. Januar 2027. Freie Plätze laut Buchungsseite.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -89,7 +89,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Plätze laut Buchungsseite verfügbar"
+    "note": "Freie Plätze laut Buchungsseite"
    },
    "schedule": {
     "kind": "weekly",
@@ -98,15 +98,15 @@
     ],
     "start": "09:30",
     "from": "2026-11-14",
-    "count": 10,
+    "until": "2027-01-16",
     "skipHolidays": false
    }
   },
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Minis ab 1 Jahr, Sa 09:30 (Start 23.01.)",
-   "summary": "Schwimmkurs für Kleinkinder ab einem Jahr mit einem Elternteil im Wasser. Kursreihe samstags, 8 Termine. Plätze laut Buchungsseite frei.",
+   "title": "Minis-Schwimmkurs ab 1 Jahr, Sa 9:30 (Jan.–März 2027)",
+   "summary": "Schwimmkurs für Kleinkinder ab 1 Jahr in den Kliniken Dr. Erler, samstags um 9:30 Uhr, vom 23. Januar bis 13. März 2027. Freie Plätze laut Buchungsseite.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -123,7 +123,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Plätze laut Buchungsseite verfügbar"
+    "note": "Freie Plätze laut Buchungsseite"
    },
    "schedule": {
     "kind": "weekly",
@@ -132,15 +132,15 @@
     ],
     "start": "09:30",
     "from": "2027-01-23",
-    "count": 8,
+    "until": "2027-03-13",
     "skipHolidays": false
    }
   },
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Maxis ab 2 Jahren, Sa 11:00 (Start 14.11.)",
-   "summary": "Schwimmkurs für Kinder ab zwei Jahren mit Elternteil im Wasser. Kursreihe samstags, 10 Termine. Dieser Kurs ist ausgebucht.",
+   "title": "Maxis-Schwimmkurs ab 2 Jahre, Sa 11:00 (Nov. 2026–Jan. 2027)",
+   "summary": "Schwimmkurs für Kinder ab 2 Jahren in den Kliniken Dr. Erler, samstags um 11:00 Uhr, Kursende am 16. Januar 2027. Der Kurs ist ausgebucht.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -157,7 +157,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Kurs laut Buchungsseite ausgebucht"
+    "note": "Kurs ausgebucht"
    },
    "schedule": {
     "kind": "weekly",
@@ -166,15 +166,15 @@
     ],
     "start": "11:00",
     "from": "2026-11-14",
-    "count": 10,
+    "until": "2027-01-16",
     "skipHolidays": false
    }
   },
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Maxis ab 2 Jahren, Sa 11:00 (Start 23.01.)",
-   "summary": "Schwimmkurs für Kinder ab zwei Jahren mit Elternteil im Wasser. Kursreihe samstags, 8 Termine. Plätze laut Buchungsseite frei.",
+   "title": "Maxis-Schwimmkurs ab 2 Jahre, Sa 11:00 (Jan.–März 2027)",
+   "summary": "Schwimmkurs für Kinder ab 2 Jahren in den Kliniken Dr. Erler, samstags um 11:00 Uhr, vom 23. Januar bis 13. März 2027. Freie Plätze laut Buchungsseite.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -191,7 +191,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Plätze laut Buchungsseite verfügbar"
+    "note": "Freie Plätze laut Buchungsseite"
    },
    "schedule": {
     "kind": "weekly",
@@ -200,15 +200,15 @@
     ],
     "start": "11:00",
     "from": "2027-01-23",
-    "count": 8,
+    "until": "2027-03-13",
     "skipHolidays": false
    }
   }
  ],
- "inputHash": "49016710b260eb7a3e2f189d72aa7301266554cf7fc37f1d430503cc25561791",
+ "inputHash": "2c9513e4d7c7434c5b848f05fe60a468a367896c7682eae1d2a32d4d60b5e5d9",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-15T08:19:09+02:00",
- "changedAt": "2026-10-13T10:14:52+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": []
 }

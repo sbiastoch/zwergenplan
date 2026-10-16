@@ -4,7 +4,7 @@
    "providerId": "ev-st-jobst",
    "venueId": "ev-st-jobst",
    "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre)",
-   "summary": "Spielen und Gruppenerfahrung für Kinder von 1 bis 2 Jahren mit Mutter oder Vater, dazu Austausch unter Eltern. Die Treffen finden meist wöchentlich statt; Einstieg ist vermutlich jederzeit möglich.",
+   "summary": "Gemeinsames Spielen für Kinder von 1 bis 2 Jahren, dazu Austausch unter Eltern im Miniclubraum. Die Treffen finden meist wöchentlich dienstags statt. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Veranstalter nachfragen.",
    "topics": [
     "eltern-kind-gruppe",
     "spielgruppe"
@@ -12,8 +12,8 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=7984027",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984027",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=7984028",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984028",
    "category": "krabbel-spielgruppen",
    "age": {
     "minMonths": 12,
@@ -21,15 +21,11 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; bei der Gemeinde St. Jobst nachfragen."
+    "note": "Keine Platzangabe; Anfrage beim Veranstalter (St. Jobst Erlenstegen)."
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-13T15:00",
-      "end": "2026-10-13T16:30"
-     },
      {
       "start": "2026-10-20T15:00",
       "end": "2026-10-20T16:30"
@@ -81,24 +77,23 @@
  ],
  "inputHash": "611cf6a7bc2e5557b7658cbe6b1d8ac9ebaafd85f6857f603a039cb1dc4f3bee",
  "dated": {
-  "2026-10-13": "a0c70b549cbecea1053ffbc74dca5406e9ea8464109f542925b274d523027381",
-  "2026-10-20": "ddf87b1fcfec0e556809f6242deabe5f86d18f5d10e5fd094c11b1b2003ec24b",
+  "2026-10-20": "9a59d0faae7ca4192c591a11e4aeb95c356a1e80c0d31fa58bdb4b5e6c6adb3c",
   "2026-10-21": "0f4419b674805e9792f4780cf4cdb9663fe0b55270abe8725bad0a44e40fcda0",
-  "2026-10-27": "de64fa2a99655f86d3a8de4a4f640cd65a2d7811d97e44e77c3ec7ba901646d7",
+  "2026-10-27": "749e55b2473a0cbd1f08935eaf0158d97a375900ba90d379f82954f7864e7830",
   "2026-10-28": "b151e109be84b256bbec7fefae42f266d7546ad8f19ddaf152de534535a23de0",
-  "2026-11-03": "fd64e719374b9003b88ba30e6a148f628914a2cddee73f664ad3872f04a77cdb",
-  "2026-11-10": "e50186d9e28f42df60764ba8ea6bc003ba678bf028f738b2caf9abbd21d77046",
+  "2026-11-03": "a41cbaebcf38eedf4633280c00983513b6f5acfec55a2a31a0a020a87bcd7fe2",
+  "2026-11-10": "104ec7962c0fc310ab3c64ad4a29fc48b7b59c399acd7b68dda4c1eb8a6537a9",
   "2026-11-11": "14b9473f142ca49bac6910c8873b3ae47b09fe32fb38b289567f513f132ee54a",
-  "2026-11-17": "71df84869ff23e7885fbf8789aec5623ac60f21f849b5e4c1f9216a1913bbb73",
-  "2026-11-24": "67a9db10e1e9590e1dc7e3f4c84205cca8eb6df1fda17959aa0bd29b70fba678",
+  "2026-11-17": "64d38256fb42728000303056a9e1d2ec6ff095ef949b16053442f0d6b4d7c12d",
+  "2026-11-24": "c4e3341ac9b9343cd38b35a1e94f2e4d2b14075b3246bed992a0b55a3d59b713",
   "2026-11-25": "8bde3f27aabe56ccbb8b89c6ab3efe82d2592ef89909c725a2282c49c54508c5",
-  "2026-12-01": "e395b14273264ba7c9107edb5a64746c097b8196ca4fcbf9854d4dff1904df14",
-  "2026-12-08": "90c0096c270ef3b35f181a5ecad4469ec63e38035c70139c8e31e56aa2bc8312",
+  "2026-12-01": "008fa874afbe27dc425267d4395acced3ded359b1bd3f92be8a6b0598ecc1c33",
+  "2026-12-08": "23ded02a7637ccba66cd217f54b05ef0b3be93ec94516d63fa83eaeea16f09d5",
   "2026-12-09": "414f874d5bdc19f661fc0d0816232c4d72485b9882fd10aeb7486c327b87616f",
-  "2026-12-15": "bdd0c8c94dddf5e3bd550b785fd867cbc932d9811e562952389b9452dcd9222a",
+  "2026-12-15": "6d11352f62650a9524ff2d51598588a1c8b834a354eb96657b50dbce7553b4f5",
   "2026-12-16": "0bd6caba71d8a57c0cb53212c6a1e08010270489d1a725ddf2a1c9d0260d1fb7",
-  "2026-12-22": "a2621a37f308a62e7280f46aba6ad1a73e440293faedb019dd4e7d6f2b49c6be",
-  "2026-12-29": "15c0f6435ce9fd31e8272623d71310412d581a53a6626d7c49b19e3d6fcb3afe",
+  "2026-12-22": "c70e5b7bd6c53b0543452ea51ff8edfcb81b96c5cba907d3c6e4a38fece517e8",
+  "2026-12-29": "fb0f5a35a597a8a02421a143d101596a75ed315921d4b8f39aaf975207b16fbf",
   "2027-01-13": "daac4b3930a0665ca25768be71fde176f7d54ca85e51bd045b0b39f258834a80",
   "2027-01-27": "37a36a5a5d9dd31bb9c7e49ed2e54196e0716e5de660a549b43153d3a71f5ddb",
   "2027-02-03": "8f26157f26aa25dce4a8d51c1ffc0136f2b6ffa38b36f17c87f863ed1c2dfda6",
@@ -108,8 +103,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-13T10:14:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": [
   "evtermine"
  ]

@@ -3,8 +3,8 @@
   {
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
-   "title": "Baby & Museum: Kunstführung mit Baby",
-   "summary": "Kurzführung im Neuen Museum für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln, danach Kaffee zum Austausch. Kinderwagen und Trage sind erlaubt. Tickets je Termin über den Museumsshop.",
+   "title": "Baby & Museum – Kurzführung für Erwachsene mit Babys",
+   "summary": "Gemeinsame Kurzführung zu wechselnden Themen aus Kunst, Architektur und Design, mit Pausen zum Füttern und Wickeln, danach Kaffee zum Austausch. Kinderwagen und Trage sind erlaubt. Tickets über den Museumsshop.",
    "topics": [
     "museum",
     "elterntreff"
@@ -16,9 +16,13 @@
    "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
    "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
    "category": "museum",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 12
+   },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets je Termin im go~mus-Shop (nmn-tickets.de); Restkontingent dort einsehbar"
+    "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Kontingent ist dort sichtbar"
    },
    "schedule": {
     "kind": "dates",
@@ -46,7 +50,7 @@
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
    "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-   "summary": "Eine Schauspielerin nimmt Kinder ab zwei Jahren mit ihrer Familie spielerisch in Geschichten aus einem Kinderbuch im Museum mit. Eintritt für Erwachsene kommt dazu; Tickets im Museumsshop.",
+   "summary": "Eine Schauspielerin erzählt Geschichten aus einem Kinderbuch im Wonderland-Raum der Ausstellung, zum Mitmachen. Für Kinder ab zwei Jahren mit Begleitung; Erwachsene zahlen Eintritt.",
    "topics": [
     "vorlesen",
     "museum"
@@ -64,7 +68,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets im go~mus-Shop (nmn-tickets.de)"
+    "note": "Tickets über den go~mus-Shop (nmn-tickets.de)"
    },
    "schedule": {
     "kind": "dates",
@@ -76,7 +80,7 @@
    }
   }
  ],
- "inputHash": "34cb0e84d3ddc3015a7e834c3abe709697b86dc6a44d3b4b3f8e44a8e92caedc",
+ "inputHash": "0ed53be74362b32e2fb5a3df2b217f62d2b68699e706f530b34616de90270d1c",
  "dated": {
   "2026-10-23": "53642745de7c615142b7af6154a2309788f97f45c2fba5d2e53000d0b40d90ac",
   "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
@@ -88,8 +92,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-15T08:19:09+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": [
   "stadt-vk"
  ]

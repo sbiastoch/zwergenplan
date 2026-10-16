@@ -3,8 +3,8 @@
   {
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
-   "title": "Musikgarten für Babys (4–18 Monate), Dienstag 09:15",
-   "summary": "Musik- und Bewegungsstunde für Babys mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Der Preis enthält ein Instrumentenpaket.",
+   "title": "Musikgarten für Babys 4–18 Monate, Dienstag 09:15",
+   "summary": "Musikgarten für Babys mit Bezugsperson: Lieder, Fingerspiele, Rhythmusspiele und Musizieren mit einfachen Instrumenten. 15 Termine à 35 Minuten, nicht in den Schulferien. Preis inkl. Instrumentenpaket.",
    "topics": [
     "musik",
     "singen"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Anmeldung über „Jetzt anmelden“; Platzzahl nicht angegeben"
+    "note": "Anmeldung über Onlinebuchung (Button „Jetzt anmelden“)"
    },
    "schedule": {
     "kind": "weekly",
@@ -31,7 +31,7 @@
     ],
     "start": "09:15",
     "end": "09:50",
-    "from": "2026-10-13",
+    "from": "2026-10-20",
     "until": "2027-02-02",
     "skipHolidays": true
    }
@@ -39,8 +39,8 @@
   {
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
-   "title": "Musikgarten für Babys (4–18 Monate), Mittwoch 14:30",
-   "summary": "Musik- und Bewegungsstunde für Babys mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Der Preis enthält ein Instrumentenpaket.",
+   "title": "Musikgarten für Babys 4–18 Monate, Mittwoch 14:30",
+   "summary": "Musikgarten für Babys mit Bezugsperson: Lieder, Fingerspiele, Rhythmusspiele und Musizieren mit einfachen Instrumenten. 15 Termine à 35 Minuten, nicht in den Schulferien. Preis inkl. Instrumentenpaket.",
    "topics": [
     "musik",
     "singen"
@@ -58,7 +58,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Anmeldung über „Jetzt anmelden“; Platzzahl nicht angegeben"
+    "note": "Anmeldung über Onlinebuchung (Button „Jetzt anmelden“)"
    },
    "schedule": {
     "kind": "weekly",
@@ -67,7 +67,7 @@
     ],
     "start": "14:30",
     "end": "15:05",
-    "from": "2026-10-14",
+    "from": "2026-10-21",
     "until": "2027-02-03",
     "skipHolidays": true
    }
@@ -75,44 +75,8 @@
   {
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
-   "title": "Musikgarten für Babys (4–18 Monate), Donnerstag 15:00",
-   "summary": "Musik- und Bewegungsstunde für Babys mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Der Preis enthält ein Instrumentenpaket.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "170 € inkl. Instrumentenpaket",
-   "url": "https://musication.de/kinder-musik/musikgarten-fuer-babys/",
-   "sourceUrl": "https://musication.de/kinder-musik/musikgarten-fuer-babys/",
-   "category": "musik",
-   "age": {
-    "minMonths": 4,
-    "maxMonths": 18
-   },
-   "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Jetzt anmelden“; Platzzahl nicht angegeben"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "15:00",
-    "end": "15:35",
-    "from": "2026-10-15",
-    "until": "2027-02-04",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "musication-musikgarten",
-   "venueId": "musication-musikgarten",
    "title": "Musikgarten 18 Monate–3 Jahre, Dienstag 10:00",
-   "summary": "Musikstunde für Kleinkinder mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Inklusiv ausgerichtet, Inhalte werden an die Kinder angepasst.",
+   "summary": "Eltern-Kind-Musikkurs für Kinder bis 3 Jahre mit Bezugsperson: Singen, Bewegen und Musizieren mit einfachen Instrumenten. 15 Termine à 35 Minuten, nicht in den Schulferien.",
    "topics": [
     "musik",
     "singen"
@@ -120,7 +84,7 @@
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "150 €",
+   "price": "150 € (15 Termine)",
    "url": "https://musication.de/kinder-musik/musikgarten/",
    "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
    "category": "musik",
@@ -130,7 +94,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Anmeldung über „Jetzt anmelden“; Platzzahl nicht angegeben"
+    "note": "Anmeldung über Onlinebuchung (Button „Jetzt anmelden“)"
    },
    "schedule": {
     "kind": "weekly",
@@ -139,7 +103,7 @@
     ],
     "start": "10:00",
     "end": "10:35",
-    "from": "2026-10-13",
+    "from": "2026-10-20",
     "until": "2027-02-02",
     "skipHolidays": true
    }
@@ -148,7 +112,7 @@
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
    "title": "Musikgarten 18 Monate–3 Jahre, Mittwoch 15:15",
-   "summary": "Musikstunde für Kleinkinder mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Inklusiv ausgerichtet, Inhalte werden an die Kinder angepasst.",
+   "summary": "Eltern-Kind-Musikkurs für Kinder bis 3 Jahre mit Bezugsperson: Singen, Bewegen und Musizieren mit einfachen Instrumenten. 15 Termine à 35 Minuten, nicht in den Schulferien.",
    "topics": [
     "musik",
     "singen"
@@ -156,7 +120,7 @@
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "150 €",
+   "price": "150 € (15 Termine)",
    "url": "https://musication.de/kinder-musik/musikgarten/",
    "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
    "category": "musik",
@@ -166,7 +130,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Anmeldung über „Jetzt anmelden“; Platzzahl nicht angegeben"
+    "note": "Anmeldung über Onlinebuchung (Button „Jetzt anmelden“)"
    },
    "schedule": {
     "kind": "weekly",
@@ -175,7 +139,7 @@
     ],
     "start": "15:15",
     "end": "15:50",
-    "from": "2026-10-14",
+    "from": "2026-10-21",
     "until": "2027-02-03",
     "skipHolidays": true
    }
@@ -184,7 +148,7 @@
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
    "title": "Musikgarten 18 Monate–3 Jahre, Mittwoch 15:30",
-   "summary": "Musikstunde für Kleinkinder mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Inklusiv ausgerichtet, Inhalte werden an die Kinder angepasst.",
+   "summary": "Eltern-Kind-Musikkurs für Kinder bis 3 Jahre mit Bezugsperson: Singen, Bewegen und Musizieren mit einfachen Instrumenten. 15 Termine à 35 Minuten, nicht in den Schulferien.",
    "topics": [
     "musik",
     "singen"
@@ -192,7 +156,7 @@
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "150 €",
+   "price": "150 € (15 Termine)",
    "url": "https://musication.de/kinder-musik/musikgarten/",
    "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
    "category": "musik",
@@ -202,7 +166,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Anmeldung über „Jetzt anmelden“; Platzzahl nicht angegeben"
+    "note": "Anmeldung über Onlinebuchung (Button „Jetzt anmelden“)"
    },
    "schedule": {
     "kind": "weekly",
@@ -211,8 +175,8 @@
     ],
     "start": "15:30",
     "end": "16:05",
-    "from": "2026-10-14",
-    "until": "2027-01-27",
+    "from": "2026-10-21",
+    "until": "2027-02-03",
     "skipHolidays": true
    }
   },
@@ -220,7 +184,7 @@
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
    "title": "Musikgarten 18 Monate–3 Jahre, Donnerstag 15:45",
-   "summary": "Musikstunde für Kleinkinder mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Inklusiv ausgerichtet, Inhalte werden an die Kinder angepasst.",
+   "summary": "Eltern-Kind-Musikkurs für Kinder bis 3 Jahre mit Bezugsperson: Singen, Bewegen und Musizieren mit einfachen Instrumenten. 15 Termine à 35 Minuten, nicht in den Schulferien.",
    "topics": [
     "musik",
     "singen"
@@ -228,7 +192,7 @@
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "150 €",
+   "price": "150 € (15 Termine)",
    "url": "https://musication.de/kinder-musik/musikgarten/",
    "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
    "category": "musik",
@@ -238,7 +202,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Anmeldung über „Jetzt anmelden“; Platzzahl nicht angegeben"
+    "note": "Anmeldung über Onlinebuchung (Button „Jetzt anmelden“)"
    },
    "schedule": {
     "kind": "weekly",
@@ -247,7 +211,7 @@
     ],
     "start": "15:45",
     "end": "16:20",
-    "from": "2026-10-15",
+    "from": "2026-10-22",
     "until": "2027-02-04",
     "skipHolidays": true
    }
@@ -256,7 +220,7 @@
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
    "title": "Musikgarten 18 Monate–3 Jahre, Donnerstag 16:15",
-   "summary": "Musikstunde für Kleinkinder mit einer Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Der Kurs ist ausgebucht; Eintrag auf die Warteliste ist möglich.",
+   "summary": "Eltern-Kind-Musikkurs für Kinder bis 3 Jahre mit Bezugsperson. Der Kurs ist voll; Anmeldung nur über die Warteliste möglich.",
    "topics": [
     "musik",
     "singen"
@@ -264,7 +228,7 @@
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "150 €",
+   "price": "150 € (15 Termine)",
    "url": "https://musication.de/kinder-musik/musikgarten/",
    "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
    "category": "musik",
@@ -274,7 +238,7 @@
    },
    "availability": {
     "status": "warteliste",
-    "note": "belegt – klicken für Warteliste"
+    "note": "Warteliste über „belegt – klicken für Warteliste“"
    },
    "schedule": {
     "kind": "weekly",
@@ -283,7 +247,7 @@
     ],
     "start": "16:15",
     "end": "16:50",
-    "from": "2026-10-15",
+    "from": "2026-10-22",
     "until": "2027-02-04",
     "skipHolidays": true
    }
@@ -291,8 +255,8 @@
   {
    "providerId": "musication-musikgarten",
    "venueId": "musication-musikgarten",
-   "title": "Musikgarten auf Englisch (2–4 Jahre), Mittwoch 16:15",
-   "summary": "Musikgarten-Kurs auf Englisch mit Bezugsperson, 35 Minuten pro Woche, 15 Termine außer in den Schulferien. Der Kurs ist belegt; Eintrag auf die Warteliste ist möglich.",
+   "title": "Musikgarten auf Englisch (Singing English), Mittwoch 16:15",
+   "summary": "Musikgarten-Kurs auf Englisch für Kinder mit Bezugsperson: englische Lieder, Reime und Bewegungsspiele. 15 Termine à 35 Minuten, nicht in den Schulferien. Der Kurs ist voll; nur Warteliste.",
    "topics": [
     "musik",
     "singen",
@@ -301,7 +265,7 @@
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "150 €",
+   "price": "150 € pro Kind",
    "url": "https://musication.de/kinder-musik/musikgarten-englisch-singing-english/",
    "sourceUrl": "https://musication.de/kinder-musik/musikgarten-englisch-singing-english/",
    "category": "musik",
@@ -311,7 +275,7 @@
    },
    "availability": {
     "status": "warteliste",
-    "note": "belegt – klicken für Warteliste"
+    "note": "Warteliste über „belegt – klicken für Warteliste“"
    },
    "schedule": {
     "kind": "weekly",
@@ -320,16 +284,16 @@
     ],
     "start": "16:15",
     "end": "16:50",
-    "from": "2026-10-14",
+    "from": "2026-10-21",
     "until": "2027-01-27",
     "skipHolidays": true
    }
   }
  ],
- "inputHash": "2ee37e6e4fb6c8f8dbbe27b9c350c6d8f166507e0564a892212020879094817e",
+ "inputHash": "96edfb2b65c33a38d0c66dfd29fc2b2bc491515b7f2a9ffe63a90df5bb84c5a5",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-13T10:14:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": []
 }

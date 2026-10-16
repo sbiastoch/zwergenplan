@@ -3,14 +3,14 @@
   {
    "providerId": "ev-suedstadt-krabbelgruppen",
    "venueId": "ev-suedstadt-krabbelgruppen",
-   "title": "Mutter/Vater-Kind-Gruppe Lichtenhof (dienstags 9:30)",
-   "summary": "Wöchentlicher Treff für Mütter und Väter mit Kleinkindern in der Gustav-Adolf-Gedächtniskirche. Auskunft und Anmeldung über Brigitte Schäfer, 0911 - 4 46 69 56.",
+   "title": "Mutter/Vater-Kind-Gruppe Lichtenhof (dienstags 9:30–11:30)",
+   "summary": "Wöchentlicher Treff für Kinder bis etwa 3 Jahre mit Mutter oder Vater in der Gustav-Adolf-Gedächtniskirche. Vorab Kontakt mit Brigitte Schäfer aufnehmen (Telefon siehe Seite).",
    "topics": [
     "krabbelgruppe",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
    "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
@@ -21,7 +21,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe. Kontakt: Brigitte Schäfer, 0911 - 4 46 69 56."
+    "note": "Anfrage bei Brigitte Schäfer, Telefon 0911 - 4 46 69 56"
    },
    "schedule": {
     "kind": "weekly",
@@ -30,21 +30,21 @@
     ],
     "start": "09:30",
     "end": "11:30",
-    "from": "2026-10-13",
+    "from": "2026-10-20",
     "skipHolidays": true
    }
   },
   {
    "providerId": "ev-suedstadt-krabbelgruppen",
    "venueId": "ev-suedstadt-krabbelgruppen-christuskirche-steinbuehl",
-   "title": "Familie Mutter/Vater-Kind-Gruppe Christuskirche (dienstags 9:00)",
-   "summary": "Wöchentlicher Treff für Familien mit Kleinkindern in der Christuskirche Steinbühl; Tagesmütter mit ihren Kindern sind willkommen. Auskunft über das Pfarramt, 0911 - 44 62 00.",
+   "title": "Familien-Mutter/Vater-Kind-Gruppe Steinbühl (dienstags 9:00–11:00)",
+   "summary": "Wöchentlicher Treff für Familien mit kleinen Kindern in der Christuskirche Steinbühl; auch Tagesmütter mit ihren Kindern sind willkommen. Anfrage über das Pfarramt.",
    "topics": [
     "krabbelgruppe",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
    "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
@@ -55,7 +55,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe. Kontakt: Petra Baier über das Pfarramt, 0911 - 44 62 00."
+    "note": "Anfrage bei Petra Baier über das Pfarramt, Telefon 0911 - 44 62 00"
    },
    "schedule": {
     "kind": "weekly",
@@ -64,16 +64,13 @@
     ],
     "start": "09:00",
     "end": "11:00",
-    "from": "2026-10-13",
+    "from": "2026-10-20",
     "skipHolidays": true
    }
   }
  ],
  "inputHash": "75488e156fd770d04d1340b5a7ef8d621f1026c3c1fbb585cd391d069fc13b11",
  "dated": {
-  "2026-10-13": "22e397cebcc906c212591cec05a020fd5fe2ef2fd26e74dac12fb05d45088134",
-  "2026-10-14": "2f002fb19d7fde04890c11d9571079b85afc97e16d4e8a4c517c0105af9289be",
-  "2026-10-15": "dba7624c45e30861eb7333bda0b00f15d616fe85401d4a73a728e7bd90ff7fc6",
   "2026-10-16": "d187a53d067dcc230886ab647c8d92e9b483b8a6a8e154c26a2577926a96d1e3",
   "2026-10-18": "e33b6860db0640527e4517ee1f48ed3e527495e0440de7c73a107acbe8403a55",
   "2026-10-19": "b04995a854e3fcb4e3b81b2333537a23926f22c4ea7c826b88f8291b63f21573",
@@ -87,7 +84,7 @@
   "2026-10-28": "7635aa6c6fd3702eaa0ae144775770b38b46c7b42ba1d500f0c3468b6c1fc67a",
   "2026-10-29": "a33ca00c3946c71a537bfcf0163bf909d3e4229702dce9efc77bc4bf96522269",
   "2026-10-30": "d73b1b112e2c4a5eeabcf327d37392dfe9f9089ec439c60c2dc2607ae742270e",
-  "2026-11-01": "b241c911065d0a50da284d1bc381cc62149732ffbaa1d2f876ead1aabc34eaa5",
+  "2026-11-01": "967735f6f76b535bf368a311990fef4d2b9093fb9a65fddac0b0f2b281d397f5",
   "2026-11-02": "042b5a28ab22f4a98264a10db2d991a5fb85d768019c7fab004cb55276dadef9",
   "2026-11-04": "24d00b1afa261ab9d78c55b007fbd1b2aebe6daf3c79dad46f58c4d2822d9a23",
   "2026-11-05": "3184427185c0940a3a33e903980f32540d009d173fc48311973779903c452cf4",
@@ -166,7 +163,7 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-13T10:14:52+02:00",
- "changedAt": "2026-10-13T10:14:52+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": []
 }

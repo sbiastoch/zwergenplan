@@ -3,8 +3,8 @@
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg",
-   "title": "Babyschwimmen 3–6 Monate (Fr 10:45)",
-   "summary": "Spielerische Eltern-Kind-Gymnastik im warmen Wasser für Babys von 3 bis 6 Monaten. Laufende Kurse, freitags, ein Platz ist frei.",
+   "title": "Babyschwimmen (3–6 Monate), Freitag 10:45",
+   "summary": "Spielerische Eltern-Kind-Gymnastik im warmen Wasser für Babys von 3 bis 6 Monaten. Laut Kursübersicht ist noch ein Platz frei; Anmeldung über die Kursverwaltung.",
    "topics": [
     "babyschwimmen"
    ],
@@ -20,7 +20,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Platz frei; Anmeldung über die Kursverwaltung (schwimmen@post-sv.de)"
+    "note": "Platz frei. Anfrage: schwimmen@post-sv.de, Tel. 0911 540554764"
    },
    "schedule": {
     "kind": "weekly",
@@ -30,14 +30,14 @@
     "start": "10:45",
     "end": "11:15",
     "from": "2026-10-16",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg",
-   "title": "Babyschwimmen 6–12 Monate (Fr 11:15)",
-   "summary": "Spielerische Eltern-Kind-Gymnastik im warmen Wasser für Babys von 6 bis 12 Monaten. Laufende Kurse, freitags, derzeit ausgebucht.",
+   "title": "Babyschwimmen (6–12 Monate), Freitag 11:15",
+   "summary": "Spielerische Eltern-Kind-Gymnastik im warmen Wasser für Babys von 6 bis 12 Monaten. Der Kurs ist laut Kursübersicht ausgebucht.",
    "topics": [
     "babyschwimmen"
    ],
@@ -53,7 +53,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Ausgebucht; Anfrage an die Kursverwaltung (schwimmen@post-sv.de)"
+    "note": "ausgebucht"
    },
    "schedule": {
     "kind": "weekly",
@@ -63,14 +63,14 @@
     "start": "11:15",
     "end": "11:45",
     "from": "2026-10-16",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg",
-   "title": "Kleinkindschwimmen 2–3 Jahre (Mi 15:00)",
-   "summary": "Spielerisch ans Wasser heranführen, Springen, Tauchen und Antreiben mit Begleitperson. Laufender Kurs, mittwochs, derzeit ausgebucht.",
+   "title": "Kleinkindschwimmen (2–3 Jahre), Mittwoch 15:00",
+   "summary": "Spielerisch ans Wasser heranführen: Kind und Begleitperson üben gemeinsam Springen, Tauchen und Antreiben. Der Kurs ist laut Kursübersicht ausgebucht.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -86,7 +86,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Ausgebucht; Anfrage an die Kursverwaltung (schwimmen@post-sv.de)"
+    "note": "ausgebucht"
    },
    "schedule": {
     "kind": "weekly",
@@ -95,23 +95,23 @@
     ],
     "start": "15:00",
     "end": "15:45",
-    "from": "2026-10-14",
-    "skipHolidays": false
+    "from": "2026-10-21",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-sportzentrum-nordost",
-   "title": "Krabbelturner 0–1 Jahr (Mi 09:30)",
-   "summary": "Bewegungsstunde für Krabbelkinder bis etwa 1 Jahr mit Begleitperson. Dauerangebot ohne feste Bindung, Probestunde möglich; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Krabbelturner (0–1 Jahr), Mittwoch 09:30",
+   "summary": "Bewegungsstunde mit Eltern für die Kleinsten in der Halle. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -121,7 +121,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde vorbei kommen, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -130,23 +130,23 @@
     ],
     "start": "09:30",
     "end": "10:15",
-    "from": "2026-10-14",
-    "skipHolidays": false
+    "from": "2026-10-21",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-sportzentrum-nordost",
-   "title": "Turnzwerge 1–2 Jahre (Di 09:30)",
-   "summary": "Eltern-Kind-Turnen für Kleinkinder von 1 bis 2 Jahren mit Begleitperson. Dauerangebot ohne feste Bindung, Probestunde möglich; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Turnzwerge (1–2 Jahre), Dienstag 09:30",
+   "summary": "Bewegungsstunde mit Eltern für Kinder von 1 bis 2 Jahren in der Halle. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -156,7 +156,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde möglich, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -165,23 +165,23 @@
     ],
     "start": "09:30",
     "end": "10:15",
-    "from": "2026-10-13",
-    "skipHolidays": false
+    "from": "2026-10-20",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-sportzentrum-nordost",
-   "title": "Turnzwerge 2–3 Jahre (Di 10:15)",
-   "summary": "Eltern-Kind-Turnen für Kinder von 2 bis 3 Jahren mit Begleitperson. Dauerangebot ohne feste Bindung, Probestunde möglich; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Turnzwerge (2–3 Jahre), Dienstag 10:15",
+   "summary": "Bewegungsstunde mit Eltern für Kinder von 2 bis 3 Jahren in der Halle. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -191,7 +191,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde möglich, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -200,23 +200,23 @@
     ],
     "start": "10:15",
     "end": "11:00",
-    "from": "2026-10-13",
-    "skipHolidays": false
+    "from": "2026-10-20",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-theodor-billroth-schule",
-   "title": "Turnzwerge 1–3 Jahre (Di 15:00)",
-   "summary": "Eltern-Kind-Turnen für Kinder von 1 bis 3 Jahren mit Begleitperson. Dauerangebot ohne feste Bindung, Probestunde möglich; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Turnzwerge (1–3 Jahre), Dienstag 15:00",
+   "summary": "Bewegungsstunde mit Eltern für Kinder von 1 bis 3 Jahren. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -226,7 +226,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde möglich, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -235,23 +235,23 @@
     ],
     "start": "15:00",
     "end": "15:45",
-    "from": "2026-10-13",
-    "skipHolidays": false
+    "from": "2026-10-20",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-vereinshalle-hasenbuck",
-   "title": "Turnzwerge 1–3 Jahre (Do 09:30)",
-   "summary": "Eltern-Kind-Turnen für Kinder von 1 bis 3 Jahren mit Begleitperson. Dauerangebot ohne feste Bindung, Probestunde möglich; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Turnzwerge (1–3 Jahre), Donnerstag 09:30",
+   "summary": "Bewegungsstunde mit Eltern für Kinder von 1 bis 3 Jahren. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -261,7 +261,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde möglich, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -270,23 +270,23 @@
     ],
     "start": "09:30",
     "end": "10:15",
-    "from": "2026-10-15",
-    "skipHolidays": false
+    "from": "2026-10-22",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-sportpark-schweinau",
-   "title": "Turnzwerge 1–3 Jahre (Fr 15:00)",
-   "summary": "Eltern-Kind-Turnen für Kinder von 1 bis 3 Jahren mit Begleitperson. Dauerangebot ohne feste Bindung, Probestunde möglich; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Turnzwerge (1–3 Jahre), Freitag 15:00",
+   "summary": "Bewegungsstunde mit Eltern für Kinder von 1 bis 3 Jahren. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -296,7 +296,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde möglich, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -306,22 +306,22 @@
     "start": "15:00",
     "end": "15:45",
     "from": "2026-10-16",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-vereinshalle-hasenbuck",
-   "title": "Turnzwerge 1–3 Jahre (Mo 15:30)",
-   "summary": "Eltern-Kind-Turnen für Kinder von 1 bis 3 Jahren mit Begleitperson, auch inklusiv ausgeschrieben. Dauerangebot ohne feste Bindung; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Turnzwerge (1–3 Jahre), Montag 15:30",
+   "summary": "Bewegungsstunde mit Eltern für Kinder von 1 bis 3 Jahren. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -331,7 +331,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde möglich, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -340,23 +340,23 @@
     ],
     "start": "15:30",
     "end": "16:15",
-    "from": "2026-10-12",
-    "skipHolidays": false
+    "from": "2026-10-19",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "post-sv-nuernberg",
    "venueId": "post-sv-nuernberg-reutersbrunnenschule",
-   "title": "Eltern-Kind-Turnen 2–4 Jahre (Mo 16:30)",
-   "summary": "Eltern-Kind-Turnen für Kinder von 2 bis 4 Jahren mit Begleitperson. Dauerangebot ohne feste Bindung, Probestunde möglich; Zusatzbeitrag der Postis-Kinderwelt.",
+   "title": "Eltern-Kind-Turnen (2–4 Jahre), Montag 16:30",
+   "summary": "Eltern-Kind-Turnen für Kinder von 2 bis 4 Jahren in der Reutersbrunnenschule. Dauerangebot ohne feste Bindung; Probestunde möglich, Teilnahme über den Zusatzbeitrag „Fit und Gesund – Kinder“.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "bewegung",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“ (Betrag nicht angegeben)",
+   "price": "Zusatzbeitrag „Fit und Gesund – Kinder“",
    "url": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "sourceUrl": "https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/",
    "category": "bewegung",
@@ -366,7 +366,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Probestunde möglich, Fragen an kindersport@post-sv.de"
+    "note": "Keine Platzanzeige. Probestunde und Anfrage: kindersport@post-sv.de, Tel. 0911 540554766"
    },
    "schedule": {
     "kind": "weekly",
@@ -375,15 +375,15 @@
     ],
     "start": "16:30",
     "end": "17:15",
-    "from": "2026-10-12",
-    "skipHolidays": false
+    "from": "2026-10-19",
+    "skipHolidays": true
    }
   }
  ],
- "inputHash": "03cff2a47c547019c12f62ea6641ab70aed791341337e7c2d9a85642d60cd8ec",
+ "inputHash": "950b5dba54ea059623e0f5006fb3d56822359d5d7276b4dc13230ca7d96c303f",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-13T10:14:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": []
 }

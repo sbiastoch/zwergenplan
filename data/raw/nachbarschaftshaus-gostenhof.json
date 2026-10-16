@@ -3,16 +3,15 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer, Dienstag Vormittag (0–3 Jahre)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre, ohne festes Programm zum Spielen und Austauschen. Dienstags 9–12 Uhr, nicht in den Ferien, kostenfrei; im Sommer auch der Garten.",
+   "title": "Offenes Kinderzimmer (0–3 J.) – Dienstag Vormittag",
+   "summary": "Offener Treff ohne festes Programm für Eltern mit Kindern bis 3 Jahren zum Spielen und Austauschen. Einfach vorbeikommen, nicht in den Ferien, kostenfrei.",
    "topics": [
-    "elterntreff",
-    "eltern-kind-gruppe"
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "kostenfrei",
+   "price": "Kostenfrei",
    "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "category": "treffs-cafes",
@@ -31,23 +30,22 @@
     ],
     "start": "09:00",
     "end": "12:00",
-    "from": "2026-10-13",
+    "from": "2026-10-20",
     "skipHolidays": true
    }
   },
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer, Donnerstag Nachmittag (0–3 Jahre)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre, ohne festes Programm zum Spielen und Austauschen. Donnerstags 14–17 Uhr, nicht in den Ferien, kostenfrei; im Sommer auch der Garten.",
+   "title": "Offenes Kinderzimmer (0–3 J.) – Donnerstag Nachmittag",
+   "summary": "Offener Treff ohne festes Programm für Eltern mit Kindern bis 3 Jahren zum Spielen und Austauschen. Einfach vorbeikommen, nicht in den Ferien, kostenfrei.",
    "topics": [
-    "elterntreff",
-    "eltern-kind-gruppe"
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "kostenfrei",
+   "price": "Kostenfrei",
    "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "category": "treffs-cafes",
@@ -66,15 +64,15 @@
     ],
     "start": "14:00",
     "end": "17:00",
-    "from": "2026-10-15",
+    "from": "2026-10-22",
     "skipHolidays": true
    }
   }
  ],
- "inputHash": "95d84035be8ba59e574e3747a6b08ad15e43448c7a906ee4948fb1fc81ab3af0",
+ "inputHash": "3aa7cc36fdd43fbcffa2309c4ad42d004603d39e9b9fa9b71dd75733592b7e46",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-13T10:14:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-16T08:15:21+02:00",
+ "changedAt": "2026-10-16T08:15:21+02:00",
  "sources": []
 }
