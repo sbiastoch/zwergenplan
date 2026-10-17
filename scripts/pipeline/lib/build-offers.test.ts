@@ -3,8 +3,15 @@ import { shortId } from "../../../src/domain/ids.ts";
 import { OffersFile, type Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import { fallbackCategory } from "../../../src/domain/topics.ts";
-import { type BuildInput, batchesFromRaw, buildOffers } from "./build-offers.ts";
+import {
+  type BuildInput,
+  batchesFromRaw,
+  buildOffers,
+  type Candidate,
+  dropSameSourceDuplicates,
+} from "./build-offers.ts";
 import { ProviderRaw, RawBatch, RawEvent } from "./raw.ts";
+import { checkIdContinuity, type Draft, SAME_SOURCE_SESSIONS, windowKey } from "./stable-ids.ts";
 
 const { providers: fixtureProviders } = loadFixtures();
 const aggregator: Provider = {
@@ -652,5 +659,220 @@ describe("buildOffers", () => {
     expect(report.notes.join("\n")).toContain("erst ab 48 Monaten");
     expect(report.errors).toEqual([]);
     expect(file?.offers).toEqual([]);
+  });
+});
+
+describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; ADR 0031)", () => {
+  const FROM = "2026-10-05";
+  /** n Dienstage 9:30 ab dem 03.11.2026 (Index i ab `first`); bis März ohne Zeitumstellung, also +01:00 */
+  const tuesdays = (n: number, first = 0) =>
+    Array.from({ length: n }, (_, k) => {
+      const day = new Date(Date.UTC(2026, 10, 3 + 7 * (first + k))).toISOString().slice(0, 10);
+      return { start: `${day}T09:30:00+01:00`, end: `${day}T11:00:00+01:00` };
+    });
+  const draft = (over: Partial<Draft> = {}): Draft => ({
+    providerId: "turnverein-beispiel",
+    venueId: "turnverein-beispiel-halle",
+    title: "PEKiP (geb. Jan.–März 2026), dienstags 9:30",
+    summary: "Spielen und Bewegen für Babys (fiktiv).",
+    category: "babykurse",
+    topics: ["pekip"],
+    format: "kurs",
+    registration: "mit-anmeldung",
+    cost: "kostenpflichtig",
+    sessions: tuesdays(10),
+    availability: { status: "frei", checkedAt: CHECKED },
+    url: "https://example.org/turnverein/pekip",
+    sourceUrl: "https://example.org/turnverein",
+    ...over,
+  });
+  const cand = (order: number, over: Partial<Draft> = {}, rank = 0): Candidate => {
+    const offer = draft(over);
+    return { offer, rank, order, label: `turnverein-beispiel#${order} „${offer.title}“`, derivedCategory: false };
+  };
+  const none = new Set<string>();
+
+  it("5) gleiche Quelle, gleicher Kerntitel, gleiche Termine → das frühere bleibt, Themen vereinigt", () => {
+    const a = { ...cand(0, { age: { minMonths: 0, maxMonths: 12 } }), derivedCategory: true };
+    const b = cand(1, {
+      title: "PEKiP-Gruppe (Babys geb. Jan.–März 2026)",
+      topics: ["pekip", "babymassage"],
+      category: "bewegung",
+      age: { minMonths: 7, maxMonths: 10 },
+    });
+    const { kept, notes } = dropSameSourceDuplicates([a, b], none, FROM);
+    expect(kept).toHaveLength(1);
+    expect(kept[0]?.offer).toEqual({ ...a.offer, topics: ["pekip", "babymassage"] });
+    expect(kept[0]?.derivedCategory).toBe(true);
+    expect(notes).toEqual([`${b.label}: Dublette von ${a.label} (gleiche Quelle, gleiche Termine) – entfällt`]);
+  });
+
+  it("5) über buildOffers: zwei Fassungen aus einer Rohdatei → ein Angebot mit Hinweis", () => {
+    const pekip = (title: string, topics: string[]) =>
+      ev({
+        providerId: "turnverein-beispiel",
+        venueId: "turnverein-beispiel-halle",
+        title,
+        topics,
+        format: "kurs",
+        registration: "mit-anmeldung",
+        cost: "kostenpflichtig",
+        schedule: {
+          kind: "weekly",
+          weekdays: ["TU"],
+          start: "09:30",
+          end: "11:00",
+          from: "2026-11-03",
+          count: 8,
+          skipHolidays: true,
+        },
+      });
+    const { file, report } = buildOffers(
+      base({
+        batches: [
+          batch("turnverein-beispiel", [
+            pekip("PEKiP (geb. Jan.–März 2026), dienstags 9:30", ["pekip"]),
+            pekip("PEKiP-Gruppe (Babys geb. Jan.–März 2026)", ["pekip", "babymassage"]),
+          ]),
+        ],
+      }),
+    );
+    expect(report.errors).toEqual([]);
+    expect(file?.offers.map((o) => [o.title, o.topics])).toEqual([
+      ["PEKiP (geb. Jan.–März 2026), dienstags 9:30", ["pekip", "babymassage"]],
+    ]);
+    expect(report.notes.filter((n) => n.includes("gleiche Quelle, gleiche Termine"))).toEqual([
+      "turnverein-beispiel#1 „PEKiP-Gruppe (Babys geb. Jan.–März 2026)“: Dublette von turnverein-beispiel#0 „PEKiP (geb. Jan.–März 2026), dienstags 9:30“ (gleiche Quelle, gleiche Termine) – entfällt",
+    ]);
+  });
+
+  it("6) Fensterschlüssel im Vorstand gewinnt; Kette A ~ B ~ C → A und C; Eingabe unverändert", () => {
+    const x = cand(0, { title: "Babymassage", topics: ["babymassage"] });
+    const a = cand(1);
+    const b = cand(2, { title: "PEKiP-Gruppe (Babys geb. Jan.–März 2026)", topics: ["pekip", "babymassage"] });
+    const input = [x, a, b];
+    const before = structuredClone(input);
+    const vorstand = dropSameSourceDuplicates(input, new Set([windowKey(b.offer, FROM)]), FROM);
+    // sortiert B, X, A; die Ausgabe steht aber in der Reihenfolge der Eingabe
+    expect(vorstand.kept.map((c) => c.order)).toEqual([0, 2]);
+    expect(vorstand.kept[1]?.offer.title).toBe(b.offer.title);
+    expect(vorstand.notes).toEqual([
+      `${a.label}: Dublette von ${b.label} (gleiche Quelle, gleiche Termine) – entfällt`,
+    ]);
+    expect(input).toEqual(before);
+
+    // Jaccard A/B = B/C = 9/11 ≈ 0,82, A/C = 8/12 ≈ 0,67
+    const chain = [
+      cand(0, { sessions: tuesdays(10, 0) }),
+      cand(1, { sessions: tuesdays(10, 1) }),
+      cand(2, { sessions: tuesdays(10, 2) }),
+    ];
+    const chainBefore = structuredClone(chain);
+    const kette = dropSameSourceDuplicates(chain, none, FROM);
+    expect(kette.kept.map((c) => c.order)).toEqual([0, 2]);
+    expect(kette.notes).toHaveLength(1);
+    expect(kette.notes[0]).toContain("turnverein-beispiel#1");
+    expect(chain).toEqual(chainBefore);
+  });
+
+  it.each<[string, Partial<Draft>, Partial<Draft>, number?]>([
+    ["verschiedenem Kerntitel", { title: "Babyturnen (Di 9:30)" }, { title: "PEKiP (Babys im ersten Lebensjahr)" }],
+    ["benannten Gruppen", { title: "Spielgruppe Mäuse (Di 9:30)" }, { title: "Spielgruppe Bären (Di 9:30)" }],
+    ["verschiedener Gruppenkennung", { title: "PEKiP Gruppe A (Di 9:30)" }, { title: "PEKiP Gruppe B (Di 9:30)" }],
+    [
+      "Alter 9–15 / 12–36 Monate (Review M2)",
+      { title: "Turnen (Di 9:30)", age: { minMonths: 9, maxMonths: 15 } },
+      { title: "Turnen (Di 9:30)", age: { minMonths: 12, maxMonths: 36 } },
+    ],
+    ["verschiedenem Format", { format: "kurs" }, { format: "regelmaessig" }],
+    ["verschiedenem Rang (das bleibt Schritt 4)", {}, {}, 1],
+  ])("7) Parallelkurse mit gleichen Terminen bleiben beide bei %s", (_, over1, over2, rank2 = 0) => {
+    const { kept, notes } = dropSameSourceDuplicates([cand(0, over1), cand(1, over2, rank2)], none, FROM);
+    expect(kept.map((c) => c.order)).toEqual([0, 1]);
+    expect(notes).toEqual([]);
+  });
+
+  it("8) Schwelle SAME_SOURCE_SESSIONS = 0,8 auf den Terminen ab from; laufender Kurs mit und ohne Vergangenes", () => {
+    expect(SAME_SOURCE_SESSIONS).toBe(0.8);
+    const pair = (n1: number, n2: number) =>
+      dropSameSourceDuplicates([cand(0, { sessions: tuesdays(n1) }), cand(1, { sessions: tuesdays(n2) })], none, FROM)
+        .kept.length;
+    expect(pair(16, 20)).toBe(1); // 16/20 = 0,8
+    expect(pair(15, 19)).toBe(2); // 15/19 ≈ 0,79
+    // mit vergangenen Terminen nur 6/10; ab from (01.12.) gleich
+    const laufend = [cand(0, { sessions: tuesdays(10) }), cand(1, { sessions: tuesdays(6, 4) })];
+    const ab = dropSameSourceDuplicates(laufend, none, "2026-12-01");
+    expect(ab.kept.map((c) => c.order)).toEqual([0]);
+    expect(ab.kept[0]?.offer.sessions).toHaveLength(10);
+    expect(dropSameSourceDuplicates(laufend, none, FROM).kept).toHaveLength(2);
+  });
+
+  it("17) über buildOffers: Zwillinge im Vorstand, beide Fassungen neu betitelt → eine alte ID bleibt (E1 + E2)", () => {
+    const pekip = (title: string) =>
+      ev({
+        providerId: "turnverein-beispiel",
+        venueId: "turnverein-beispiel-halle",
+        title,
+        topics: ["pekip"],
+        format: "kurs",
+        registration: "mit-anmeldung",
+        cost: "kostenpflichtig",
+        schedule: {
+          kind: "weekly",
+          weekdays: ["FR"],
+          start: "09:30",
+          end: "11:00",
+          from: "2026-11-06",
+          count: 8,
+          skipHolidays: true,
+        },
+      });
+    const status = { "turnverein-beispiel": ok }; // sonst übernähme Schritt 7 den weggefallenen Zwilling
+    const once = (title: string, id: string) => {
+      const [offer] =
+        buildOffers(base({ batches: [batch("turnverein-beispiel", [pekip(title)], status)] })).file?.offers ?? [];
+      if (offer === undefined) throw new Error(`kein Angebot für „${title}“`);
+      return { ...offer, id };
+    };
+    // Vorstand aus der Zeit vor Schritt 4b: dasselbe Angebot zweimal, mit gleichen Terminen (Zwillinge, E2)
+    const previous: OffersFile = {
+      generatedAt: "2026-10-04T06:00:00+02:00",
+      horizon: { from: "2026-10-04", to: "2027-02-04" },
+      offers: [
+        once("PEKiP Fr 9:30 (geb. Jan.–März)", "aaaaaaaa"),
+        once("PEKiP-Gruppe (geb. Jan.–März, freitags)", "bbbbbbbb"),
+      ],
+    };
+    // Beide Fassungen neu betitelt: Kein Fensterschlüssel trifft den Vorstand, also entscheidet in 4b die Reihenfolge
+    // (das erste Event bleibt), und Stufe 0 greift nicht. So trifft der Entwurf beide Zwillinge in Stufe 1 gleich gut,
+    // und die Rangfolge aus E2 entscheidet: höhere Titelähnlichkeit zu „PEKiP-Gruppe (Babys geb. Jan.–März)“ hat
+    // bbbbbbbb (wie Test 9 in stable-ids.test.ts) – obwohl aaaaaaaa die kleinere ID wäre.
+    const { file, report } = buildOffers(
+      base({
+        previous,
+        batches: [
+          batch(
+            "turnverein-beispiel",
+            [pekip("PEKiP-Gruppe (Babys geb. Jan.–März)"), pekip("PEKiP Fr 9:30 Uhr (geb. Jan.–März)")],
+            status,
+          ),
+        ],
+      }),
+    );
+    expect(report.errors).toEqual([]);
+    const offers = file?.offers ?? [];
+    expect(offers.map((o) => [o.id, o.title])).toEqual([["bbbbbbbb", "PEKiP-Gruppe (Babys geb. Jan.–März)"]]);
+    expect(report.notes).toContain(
+      "turnverein-beispiel#1 „PEKiP Fr 9:30 Uhr (geb. Jan.–März)“: Dublette von turnverein-beispiel#0 „PEKiP-Gruppe (Babys geb. Jan.–März)“ (gleiche Quelle, gleiche Termine) – entfällt",
+    );
+    expect(report.notes).toContain(
+      "IDs: Zwilling im Vorstand – aaaaaaaa „PEKiP Fr 9:30 (geb. Jan.–März)“ fällt weg, bbbbbbbb „PEKiP-Gruppe (geb. Jan.–März, freitags)“ bleibt",
+    );
+    expect(report.notes).toContain(
+      "IDs: Stufe 1 bbbbbbbb „PEKiP-Gruppe (geb. Jan.–März, freitags)“ → „PEKiP-Gruppe (Babys geb. Jan.–März)“",
+    );
+    expect(report.notes.join("\n")).not.toContain("mehrdeutig");
+    // Das Netz meldet nur Anbieterwechsel einer bleibenden ID; der Wegfall eines Zwillings ist keiner
+    expect(checkIdContinuity(previous, offers)).toEqual([]);
   });
 });

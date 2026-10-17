@@ -10,7 +10,15 @@ import type { Source } from "./candidate.ts";
 import { expansionWindow, type ProviderCheck, type ProviderRaw, type RawBatch, type RawEvent } from "./raw.ts";
 import { expandSchedule } from "./schedule.ts";
 import { similarTitle } from "./similar.ts";
-import { assignIds, checkIdContinuity, compareOffers, type Draft, unionSessions, windowKey } from "./stable-ids.ts";
+import {
+  assignIds,
+  checkIdContinuity,
+  compareOffers,
+  type Draft,
+  sameOfferTwice,
+  unionSessions,
+  windowKey,
+} from "./stable-ids.ts";
 
 export interface BuildInput {
   /** Rohdateien; die Reihenfolge der Namen bestimmt, wer bei Vereinigungen gewinnt */
@@ -97,7 +105,7 @@ const RANK: Record<Source | "anbieter", number> = { anbieter: 0, "stadt-vk": 1, 
 const DEFAULT_MINUTES = 60;
 const DAY_MS = 86_400_000;
 
-interface Candidate {
+export interface Candidate {
   offer: Draft;
   rank: number;
   order: number;
@@ -216,6 +224,36 @@ function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: strin
     sourceUrl: e.sourceUrl,
   };
   return e.format === "einmalig" ? kept.map((s) => ({ ...base, sessions: [s] })) : [{ ...base, sessions: kept }];
+}
+
+/**
+ * Schritt 4b: Dubletten gleicher Quelle (Plan 0038, E1; ADR 0031). Unter Kandidaten gleichen Rangs entfällt, wer einem
+ * schon behaltenen doppelt ist (`sameOfferTwice`). Vorn stehen die, deren Fensterschlüssel im Vorstand vorkommt, dann
+ * gilt `order`; so springt der Titel nicht mit der Reihenfolge des Modells. Der Bleibende behält alles außer den
+ * Themen (vereinigt), auch `derivedCategory`; Termine werden nicht vereinigt (meist herausgenommene Ferientage).
+ * Rein: Die Eingabe bleibt unverändert, `kept` steht in ihrer Reihenfolge.
+ */
+export function dropSameSourceDuplicates(
+  candidates: readonly Candidate[],
+  previousWindowKeys: ReadonlySet<string>,
+  from: string,
+): { kept: Candidate[]; notes: string[] } {
+  const notes: string[] = [];
+  const inPrevious = (c: Candidate) => (previousWindowKeys.has(windowKey(c.offer, from)) ? 0 : 1);
+  const sorted = candidates
+    .map((c, index) => ({ c, index, previous: inPrevious(c) }))
+    .sort((a, b) => a.previous - b.previous || a.c.order - b.c.order);
+  const survivors: Array<{ c: Candidate; index: number }> = [];
+  for (const { c: low, index } of sorted) {
+    const high = survivors.find(({ c }) => c.rank === low.rank && sameOfferTwice(c.offer, low.offer, from));
+    if (high === undefined) {
+      survivors.push({ c: { ...low }, index });
+      continue;
+    }
+    high.c = { ...high.c, offer: { ...high.c.offer, topics: unionTopics(high.c.offer.topics, low.offer.topics) } };
+    notes.push(`${low.label}: Dublette von ${high.c.label} (gleiche Quelle, gleiche Termine) – entfällt`);
+  }
+  return { kept: survivors.sort((a, b) => a.index - b.index).map(({ c }) => c), notes };
 }
 
 /** Gleicher Ort (≤ 50 m), gleicher Beginn, ähnlicher Titel, aber verschiedene Anbieter – meist derselbe Kurs zweimal erfasst. */
@@ -337,16 +375,20 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     notes.push(`${low.label}: Dublette von ${high.label} (ranghöhere Quelle) – entfällt`);
     return false;
   });
+  // 4b. Dubletten gleicher Quelle: gleicher Rang, gleiches Angebot zweimal (Plan 0038, E1; ADR 0031)
+  const previousWindowKeys = new Set(previous.map((o) => windowKey(o, input.horizon.from)));
+  const deduped = dropSameSourceDuplicates(kept, previousWindowKeys, input.horizon.from);
+  notes.push(...deduped.notes);
   // 5. IDs: Zuordnung gegen den Vorstand samt Kursfortschreibung (ADR 0022)
   const assigned = assignIds({
-    drafts: kept.map((c) => c.offer),
+    drafts: deduped.kept.map((c) => c.offer),
     previous: input.previous,
     providers: input.providers,
     horizon: input.horizon,
   });
   const offers = assigned.offers;
   notes.push(...assigned.notes);
-  for (const c of kept) if (c.derivedCategory) countDerived(c.offer.providerId);
+  for (const c of deduped.kept) if (c.derivedCategory) countDerived(c.offer.providerId);
   // 6. braucht IDs, deshalb nach der Zuordnung
   notes.push(...crossProviderDuplicates(offers, input.providers));
 

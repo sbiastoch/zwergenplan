@@ -296,10 +296,11 @@ export interface MergeResult<T> {
  * - oder gleich gebaut ist (Ort, Format, Alter, Beginn und Ende des ersten Termins, Wochentage) und einen ähnlichen
  *   Titel hat (`similarTitle`).
  * Im zweiten Fall entfällt es, wenn seine Termine im früheren enthalten sind; sonst bekommt es den Titel des
- * früheren, damit der Build die Termine vereinigt (gleicher `windowKey`). Anders als die Dublettenprüfung des Builds
- * (nur rangniedere Quellen) gilt das für gleichrangige Events, deshalb die strenge Gleichheit; zwei parallele Gruppen
- * mit anderem Alter oder anderer Uhrzeit bleiben beide. Innerhalb eines Teils bleibt alles, wie es das Modell
- * geliefert hat (dort prüft `validateRaw`).
+ * früheren, damit der Build die Termine vereinigt (gleicher `windowKey`). Das gilt für gleichrangige Events, deshalb
+ * die strenge Gleichheit; zwei parallele Gruppen mit anderem Alter oder anderer Uhrzeit bleiben beide. Dubletten
+ * gleicher Quelle, die hier stehen bleiben (anderes Alter, andere Schedule-Art, derselbe Teil), entfernt der Build in
+ * Schritt 4b (`build-offers.ts`, ADR 0031). Innerhalb eines Teils bleibt hier alles, wie es das Modell geliefert hat
+ * (dort prüft `validateRaw`).
  */
 export function mergeParts<T extends Mergeable>(parts: readonly (readonly T[])[], window: MergeWindow): MergeResult<T> {
   const keys = new Map<string, { title: string; part: number }>();

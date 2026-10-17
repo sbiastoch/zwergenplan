@@ -1,6 +1,6 @@
 # Plan 0038 – Stabile IDs nachschärfen: Dubletten gleicher Quelle, Gleichstand unter Zwillingen, veränderte Terminreihen
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-16
 Bezug:
 - ADR 0022 (stabile IDs), Punkt 3 (Zuordnung gegen den Vorstand) und „Alternativen“ (Zusammenlegungen); wird durch ADR 0031 (neu, Datei `0031-stabile-ids-dubletten-und-terminreihen.md` in `docs/adr/`) ergänzt
@@ -275,3 +275,22 @@ Drittes Review: nötig, weil Blocker 1 die Regel geändert hat (letztes nach dem
 Abgelehnt: keine.
 
 Kein weiteres Review: Verdict „Freigabe mit Änderungen“ ohne Blocker; nach dem Skill `plan-review` ist ein neues Review nur bei „Überarbeiten“ mit geänderten Blockern nötig.
+
+## Umsetzung (2026-10-17)
+
+Schritte 2–4 und 6 umgesetzt (Tests 1–17 zuerst rot, wo das Verhalten neu ist; 11d, 12, 14, 15b (ii) waren schon grün, jede neue Regel ist per Mutation von mindestens einem Test gedeckt).
+
+Rückspiel (Schritt 5) mit dem echten Code (`df50a64` gegen den Arbeitsbaum): 449 → **455** von 498 und 398 → **415** von 483 gehalten; Listen (a) 12 / 22, (b) 6 / 5, (c) **0 / 0**, gleich den Listen des Prototyps (Abschnitt „Verifikation“).
+
+Abweichungen vom Plan:
+- **Stufe 1 entscheidet Zwillingskonflikte wie Stufe 2** (über E2 hinaus): Je Durchgang werden erst alle Gewinner bestimmt; gewinnen zwei Zwillinge im selben Durchgang verschiedene Entwürfe, trifft keiner („mehrdeutig in Stufe 1 – Zwilling …“). Ohne die Regel blieben beide IDs, obwohl die Zwillinge ein Angebot sind; eine Prüfung „verbraucht?“ in der Schleife hinge von der Reihenfolge ab. Test 11e (Stufe 1), ADR 0031, Punkt 3. Die Zwillinge eines solchen Konflikts nehmen auch an Stufe 2 nicht teil (Arch-Review, Minor 1; Test 11e, dritter Fall).
+- **Uhrzeit in der Gegenrichtung:** Es bleiben alle Kandidaten mit gemeinsamer Uhrzeit (nicht nur „genau einer“), danach wird unter Zwillingen nach Rang aufgelöst. Vorwärts unverändert.
+- **Test 11** mit Titeln ohne Zeitraum: „geb. Apr.–Juni“ gegen „geb. Jan.–März“ schließt `conflictingLabels` schon aus, der Test prüfte sonst den Verbrauch nicht. **Test 15b (i)** mit 11 von 16 Terminen: Bei identischen Terminen ordnet schon Stufe 1 zu.
+
+Restpunkt (beim Archivieren nach `docs/ideas.md`): Stufe 1 prüft `conflictingLabels` nicht. Zieht „Babyschwimmen 2“ mit exakt denselben Terminen auf den Platz von „Babyschwimmen 1“, erbt es dessen ID (bestehendes Verhalten, im Rückspiel kein Fall).
+
+## Arch-Review (2026-10-17) – Verdict: OK
+
+- **Minor 1** Zwillingskonflikt aus Stufe 1 wurde in Stufe 2 doch entschieden: behoben (die Zwillinge sind für Stufe 2 gesperrt), Test ergänzt. Rückspiel unverändert 455 / 415, (c) leer.
+- **Minor 2** römische Kennungen und `C`–`F` ungetestet: Tests ergänzt.
+- Hinweis: Der Restpunkt „Stufe 1 ohne `conflictingLabels`“ kommt als Korrektheitsrisiko nach `docs/ideas.md`, nicht als Komfort-Idee.
