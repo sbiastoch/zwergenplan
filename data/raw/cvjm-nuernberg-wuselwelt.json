@@ -3,17 +3,16 @@
   {
    "providerId": "cvjm-nuernberg-wuselwelt",
    "venueId": "cvjm-nuernberg-wuselwelt",
-   "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 Jahre mit Eltern",
-   "summary": "Offenes Freispiel in der Turnhalle des CVJM für Kleinkinder mit Eltern oder Bezugsperson, die Erwachsenen können sich dabei austauschen. Freitags 9:30–10:15 Uhr, außer in den Ferien; Hallenschuhe oder ABS-Socken mitbringen.",
+   "title": "Wuselwelt: Freispiel in der Turnhalle (Kinder 0–3 J.)",
+   "summary": "Offenes Freispiel für Kinder von 0 bis 3 Jahren mit Eltern oder Bezugsperson in der Turnhalle, freitags in der Schulzeit. Ohne Anmeldung und kostenlos; Hallenschuhe oder ABS-Socken mitbringen. Danach ist noch Einkehr im Café Kostbar möglich.",
    "topics": [
     "bewegung",
-    "spielplatz-indoor",
-    "krabbelgruppe"
+    "spielplatz-indoor"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "keine Kosten",
+   "price": "keine",
    "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
    "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
    "category": "bewegung",
@@ -23,7 +22,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung nötig"
+    "note": "Offenes Angebot, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -32,22 +31,22 @@
     ],
     "start": "09:30",
     "end": "10:15",
-    "from": "2026-10-16",
+    "from": "2026-10-23",
+    "until": "2027-10-17",
     "skipHolidays": true
    }
   }
  ],
- "inputHash": "f0ca55fe95e5aa2c1b0526f5a6a191c43bb25ff039dfa98eef4522bfe16b6b9b",
+ "inputHash": "7c2f8fbab1c1f76fc502ee283277cc0cc93e2cfd21899a7e0da8975b7bf5b249",
  "dated": {
-  "2026-10-16": "52f584855313a2bfedcea1da0ba44d2113b61a27d596da60612b465d2aaebda6",
   "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
   "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
   "2026-11-27": "4fc8440bb3b3ae5eb339264134dbd7d17ef41c1723a56f8e9fe0c1e8a8ee5893"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-16T08:15:21+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-17T07:59:57+02:00",
+ "changedAt": "2026-10-17T07:59:57+02:00",
  "sources": [
   "frankenkids"
  ]

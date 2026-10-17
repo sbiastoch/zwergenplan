@@ -3,8 +3,8 @@
   {
    "providerId": "schwimmschule-baer-ritterbad",
    "venueId": "schwimmschule-baer-ritterbad",
-   "title": "Babyschwimmen (montags 11:10 Uhr)",
-   "summary": "Babyschwimmen mit Eltern im Ritterbad, montags 11:10–11:40 Uhr, Leitung Julia Makarevich. Plätze gibt es nur auf Anfrage über das Kontaktformular; der Anbieter meldet lange Wartelisten und bittet um nur eine Anfrage.",
+   "title": "Babyschwimmen im Ritterbad (montags 11:10 Uhr)",
+   "summary": "Babyschwimmen mit Eltern im Ritterbad, montags 11:10–11:40 Uhr. Anmeldung nur per Anfrage über das Formular; wegen hoher Nachfrage sind die Wartezeiten lang.",
    "topics": [
     "babyschwimmen"
    ],
@@ -20,7 +20,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anfrage über den Button „Anfragen“ (Kontaktformular mit vorbelegtem Termin); keine Platzanzeige, lange Wartelisten laut Anbieter"
+    "note": "Keine Platzanzeige. Über den Button „Anfragen“ (Kontaktformular mit vorbelegtem Termin) anfragen; laut Website lange Wartelisten."
    },
    "schedule": {
     "kind": "weekly",
@@ -30,14 +30,14 @@
     "start": "11:10",
     "end": "11:40",
     "from": "2026-10-19",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   }
  ],
- "inputHash": "f51137197d84ee33145a2c6fcbfaf0a9cc2e0641c5b9497fd52c64aa2711f772",
+ "inputHash": "d7cd9c6262079fff735fe72688e1e0229511b0d591ba82309d2d8c9076516200",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-16T08:15:21+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-17T07:59:57+02:00",
+ "changedAt": "2026-10-17T07:59:57+02:00",
  "sources": []
 }

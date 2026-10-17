@@ -4,7 +4,7 @@
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
    "title": "Achtsame Babymassage, Start 21.09.2026 (Mo)",
-   "summary": "Kurs „Bindung durch Berührung“ mit Babys von etwa 6 Wochen bis 5 Monaten, max. 6 Eltern-Kind-Paare. Montags 11:00–12:15 Uhr, 7 Termine; die Gruppe läuft bereits.",
+   "summary": "Sanfte Berührungen für Babys ab ca. 6 Wochen, dazu Anleitung für Eltern, die Signale ihres Kindes besser zu lesen. Max. 6 Eltern-Kind-Paare, montags 75 Min. Der Kurs läuft bereits und endet am 02.11.2026.",
    "topics": [
     "babymassage"
    ],
@@ -20,8 +20,8 @@
     "maxMonths": 5
    },
    "availability": {
-    "status": "wenige",
-    "note": "7 von 8 Plätzen belegt, 1 Platz frei; Anmeldung über die Website"
+    "status": "unbekannt",
+    "note": "Anzeige 7 / 8 Teilnehmer; Anmeldung über „Hier Anmelden“ auf der Detailseite oder per E-Mail"
    },
    "schedule": {
     "kind": "dates",
@@ -61,7 +61,7 @@
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
    "title": "Achtsame Babymassage, Start 09.11.2026 (Mo)",
-   "summary": "Kurs „Bindung durch Berührung“ mit Babys von etwa 6 Wochen bis 5 Monaten, max. 6 Eltern-Kind-Paare. Montags 11:00–12:15 Uhr, 7 Termine vom 09.11. bis 21.12.2026.",
+   "summary": "Sanfte Berührungen für Babys ab ca. 6 Wochen, dazu Anleitung für Eltern, die Signale ihres Kindes besser zu lesen. Max. 6 Eltern-Kind-Paare, montags 75 Min.",
    "topics": [
     "babymassage"
    ],
@@ -77,8 +77,8 @@
     "maxMonths": 5
    },
    "availability": {
-    "status": "frei",
-    "note": "1 von 8 Plätzen belegt; Anmeldung über die Website"
+    "status": "unbekannt",
+    "note": "Anzeige 1 / 8 Teilnehmer; Anmeldung über „Hier Anmelden“ auf der Detailseite oder per E-Mail"
    },
    "schedule": {
     "kind": "dates",
@@ -118,7 +118,7 @@
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
    "title": "Achtsame Babymassage, Start 11.01.2027 (Mo)",
-   "summary": "Kurs „Bindung durch Berührung“ mit Babys von etwa 6 Wochen bis 5 Monaten, max. 6 Eltern-Kind-Paare. Montags 11:00–12:15 Uhr, 6 Termine vom 11.01. bis 15.02.2027.",
+   "summary": "Sanfte Berührungen für Babys ab ca. 6 Wochen, dazu Anleitung für Eltern, die Signale ihres Kindes besser zu lesen. Max. 6 Eltern-Kind-Paare, montags 75 Min.",
    "topics": [
     "babymassage"
    ],
@@ -134,8 +134,8 @@
     "maxMonths": 5
    },
    "availability": {
-    "status": "frei",
-    "note": "0 von 8 Plätzen belegt; Anmeldung über die Website"
+    "status": "unbekannt",
+    "note": "Anzeige 0 / 8 Teilnehmer; Anmeldung über „Hier Anmelden“ auf der Detailseite oder per E-Mail"
    },
    "schedule": {
     "kind": "dates",
@@ -168,10 +168,10 @@
    }
   }
  ],
- "inputHash": "28fd813631885749b6698824ed463c0be0ac0c78de2f1660cf08a322bcae3696",
+ "inputHash": "02797f233ad99b616d30889bf11b9eba9e7789ce7620fa9f05968296385ea09f",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-16T08:15:21+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-17T07:59:57+02:00",
+ "changedAt": "2026-10-17T07:59:57+02:00",
  "sources": []
 }

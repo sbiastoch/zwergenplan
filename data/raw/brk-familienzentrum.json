@@ -467,12 +467,11 @@
  ],
  "inputHash": "36a2c017c9508056a7c53246f6e14f4051844306849900af87ce0002d039012d",
  "dated": {
-  "2026-10-16": "61ca75b14466b55ecee1248d29d324d7c4307b471a98c310dc47a98f5ac19667",
   "2026-11-06": "81989aec13b24210571d7a5c037b45fa73573c48533b39ce40646d4bee9eb9a0"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-17T07:59:57+02:00",
  "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": [
   "frankenkids"

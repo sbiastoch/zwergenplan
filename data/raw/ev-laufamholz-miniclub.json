@@ -3,25 +3,22 @@
   {
    "providerId": "ev-laufamholz-miniclub",
    "venueId": "ev-laufamholz-miniclub",
-   "title": "Miniclub Donnerstag 15:00–16:30 (Eltern-Kind-Gruppe)",
-   "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz: Austausch unter Eltern, Lieder und Geschichten, erste Gruppenerfahrungen für die Kinder. Anmeldung und Kosten stehen im Eintrag nicht, bitte bei der Gemeinde erfragen.",
+   "title": "Miniclub Donnerstag 15 Uhr (Eltern-Kind-Gruppe)",
+   "summary": "Eltern-Kind-Gruppe mit Liedern, Geschichten und freiem Spiel. Eltern tauschen sich zu Erziehungsfragen aus, Kinder sammeln erste Gruppenerfahrungen. Kosten und Anmeldung stehen im Eintrag nicht; bitte beim Veranstalter nachfragen.",
    "topics": [
     "eltern-kind-gruppe",
-    "elterntreff"
+    "elterntreff",
+    "spielgruppe"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8109121",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109121",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8109112",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109112",
    "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu freien Plätzen; Anfrage bei der Gemeinde Laufamholz."
+    "note": "Keine Angabe zur Anmeldung im Eintrag; Nachfrage beim Veranstalter (Gemeindehaus Laufamholz)."
    },
    "schedule": {
     "kind": "dates",
@@ -53,33 +50,26 @@
   {
    "providerId": "ev-laufamholz-miniclub",
    "venueId": "ev-laufamholz-miniclub",
-   "title": "Miniclub Freitag 09:00–10:30 (Eltern-Kind-Gruppe)",
-   "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz: Austausch unter Eltern, Lieder und Geschichten, erste Gruppenerfahrungen für die Kinder. Anmeldung und Kosten stehen im Eintrag nicht, bitte bei der Gemeinde erfragen.",
+   "title": "Miniclub Freitag 9 Uhr (Eltern-Kind-Gruppe)",
+   "summary": "Eltern-Kind-Gruppe mit Liedern, Geschichten und freiem Spiel. Eltern tauschen sich zu Erziehungsfragen aus, Kinder sammeln erste Gruppenerfahrungen. Kosten und Anmeldung stehen im Eintrag nicht; bitte beim Veranstalter nachfragen.",
    "topics": [
     "eltern-kind-gruppe",
-    "elterntreff"
+    "elterntreff",
+    "spielgruppe"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8109121",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109121",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8109112",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109112",
    "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu freien Plätzen; Anfrage bei der Gemeinde Laufamholz."
+    "note": "Keine Angabe zur Anmeldung im Eintrag; Nachfrage beim Veranstalter (Gemeindehaus Laufamholz)."
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-16T09:00",
-      "end": "2026-10-16T10:30"
-     },
      {
       "start": "2026-10-23T09:00",
       "end": "2026-10-23T10:30"
@@ -123,26 +113,25 @@
  ],
  "inputHash": "bcdedf8fa4aa3d8e1db8b22303d1f5423d45ca510171eafe0032d83ea55628b5",
  "dated": {
-  "2026-10-16": "95b295096616858dc6edd0efefccd2e3dfbd0ccd84b21ccb314de7e4863858fb",
-  "2026-10-22": "b9c0966dc3eadf35a878b52ae828313d066a44e2f6fa0639f04cd5da9d224d01",
-  "2026-10-23": "03f5233ed385a8460b5e4aa00978ba894971cdacb766c1f9232c43293aa1b8eb",
-  "2026-10-29": "08136b7dbf0c8f24d27a3697adce3a681b43f83d6a0cbdbaa9faaa56262d9a5c",
-  "2026-10-30": "e34d47b1f354862be06f86637ae1d30bfc40f6174dc1889d80ca5651425b6b74",
-  "2026-11-05": "27d1e33d75ba28bcb44e4deeac98463a940898b817ebbc94712123de22a32e55",
-  "2026-11-06": "fc5949e25ec8255271915bcf6695884fb33e3dc69d817a7b6dcd76d69996e029",
-  "2026-11-12": "0261b456efc7920d81ee854c747131cd60269a46115e15671b685b3af7af7e4f",
-  "2026-11-13": "9b8b674bbea2e72d54c5922b2e9effb24e229a98f439fae2d588adb46071ecc2",
-  "2026-11-19": "d365d5caa6c1051adfaae2a43145d19a090aca0a08922e86ec25e8d38af77fa0",
-  "2026-11-20": "2c8c6d16b5975cfb2b09a64a0940b65f07ddeb40e6ffe8aa3a7300d482e276a4",
-  "2026-11-27": "24ef67a9077b1a1befc8f938aa8dc2920118f66715082fdb9e42aa2cfd6848cf",
-  "2026-12-04": "0e2095eb3ac96ab76a01fab4f2a881e3b05299d0b8960ecfd79ac22ba92a09c1",
-  "2026-12-11": "bc41fe13fb132d8816833142062c59e9cb6561e0eb8ea986fed785a8b703fc3a",
-  "2026-12-18": "89857fa69beca5e64afddeeb498f83ea685dc80dc506a8796171649c36c563a3"
+  "2026-10-22": "d69b04a24a3705904e742f70a097f2726a1d72bae769c86ba753028a445aa704",
+  "2026-10-23": "1be8dc052580d22410079dff4d97b8a162685fa8be9ee4b994fa7f0dbdd8abea",
+  "2026-10-29": "ab662db89f0b460642908475e4a7db772ac89523080d79bbcf9d7cbed47008f2",
+  "2026-10-30": "c3194de61da1e991f0bcc4102d845a009a7e525f287df68c2251c07d4149fbb1",
+  "2026-11-05": "e8b94fc91c8e2ba527d4149a58b88a6562791bd015b081070b04d2e37eb79f36",
+  "2026-11-06": "950ed19c8235cf5cfc8e520912e7bc8398a42f21b8d641446507ceb2a1701203",
+  "2026-11-12": "a25446e400fb8c28a5fdea2f384960ebb40737e7e303075ab1536352821fe208",
+  "2026-11-13": "31ddbc30077648b8e3d2f4e55368e59ac4e1049b464f570a22de9b792b50c28b",
+  "2026-11-19": "af92256ec6adc533a93044f975701ec364967d0f5e443db33508f6500cd0476f",
+  "2026-11-20": "60f70ef14659e65057e60b4db50dcfd817669ea487216368ea8297511f5ba790",
+  "2026-11-27": "191ca7a5ee50d1c60c1ef21c65c6162c05fdc68ab8790165c000925cf108fe44",
+  "2026-12-04": "238e73f5430acfea1a16546d5c09a41728ebaf251ffa47cb2cdcb6604a6ee929",
+  "2026-12-11": "f2d9f37a7cd59ea1b56e93e9a20d5baaac9d055eb422aab1ac868e61311bfcf9",
+  "2026-12-18": "f31f3316a2090e5978738debdfde58c671e16402d70db9f0721560e36c0573a9"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-16T08:15:21+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-17T07:59:57+02:00",
+ "changedAt": "2026-10-17T07:59:57+02:00",
  "sources": [
   "evtermine"
  ]

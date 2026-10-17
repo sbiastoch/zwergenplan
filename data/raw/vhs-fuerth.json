@@ -3,8 +3,8 @@
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen (1½–2½ Jahre, mittwochs)",
-   "summary": "Wöchentlicher, neu gestalteter Parcours zum freien Turnen, bei dem Eltern aktiv mitmachen und Geräte mit aufbauen. Laufender Kurs; Anmeldung über die vhs (Kursnummer 16301).",
+   "title": "Eltern-Kind-Turnen 1½–2½ Jahre (mittwochs)",
+   "summary": "Wöchentlich wechselnder Bewegungsparcours zum freien Turnen für Kinder ab 1½ bis 2½ Jahren, Eltern machen aktiv mit. Kursbeginn laut Seite 23.09.2026; Anmeldung über die Kursseite.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die vhs, Kursnummer 16301"
+    "note": "Platzangabe nicht gelistet; Anmeldung über die Kursseite (kurs-Nr. 16301)"
    },
    "schedule": {
     "kind": "weekly",
@@ -37,8 +37,8 @@
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen (2–3 Jahre, donnerstags)",
-   "summary": "Wöchentlicher, neu gestalteter Parcours zum freien Turnen, bei dem Eltern aktiv mitmachen und Geräte mit aufbauen. Laufender Kurs; Anmeldung über die vhs (Kursnummer 16303).",
+   "title": "Eltern-Kind-Turnen 2–3 Jahre (donnerstags)",
+   "summary": "Wöchentlich wechselnder Bewegungsparcours zum freien Turnen für Kinder von 2 bis 3 Jahren, Eltern machen aktiv mit. Kursbeginn laut Seite 24.09.2026; Anmeldung über die Kursseite.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -56,7 +56,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die vhs, Kursnummer 16303"
+    "note": "Platzangabe nicht gelistet; Anmeldung über die Kursseite (kurs-Nr. 16303)"
    },
    "schedule": {
     "kind": "weekly",
@@ -69,10 +69,10 @@
    }
   }
  ],
- "inputHash": "ce317502e0031950dc0d45084d3211101a7642e22d8ff7aec8d32a9fc3916dc3",
+ "inputHash": "b3b49b026243f587575c35a86365c692d724b6c57255d10e6b08d84a5553e5ce",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-16T08:15:21+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-17T07:59:57+02:00",
+ "changedAt": "2026-10-17T07:59:57+02:00",
  "sources": []
 }
