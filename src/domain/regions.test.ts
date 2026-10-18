@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { type BBox, inBounds, NUERNBERG_BBOX } from "./geo.ts";
-import { REGION_IDS, REGIONS, type Region, regionList } from "./regions.ts";
+import {
+  NETWORK_IDS,
+  NETWORKS,
+  networkAt,
+  networkOf,
+  REGION_IDS,
+  REGIONS,
+  type Region,
+  regionList,
+  regionsOf,
+  VRR_BBOX,
+} from "./regions.ts";
 
 const corners = ({ minLat, maxLat, minLon, maxLon }: BBox) => [
   { lat: minLat, lon: minLon },
@@ -37,10 +48,6 @@ describe("REGIONS (Plan 0031, E1)", () => {
 });
 
 describe("zweite Region (Plan 0036, E1–E3)", () => {
-  it("jede Region-bbox liegt in NUERNBERG_BBOX, also gelten Standort- und Fahrplanprüfung für alle (E1)", () => {
-    for (const id of REGION_IDS) expect(contains(NUERNBERG_BBOX, REGIONS[id].bbox)).toBe(true);
-  });
-
   it("liegt eine bbox in einer anderen, steht sie in REGION_IDS davor: das Entdecken läuft spezifisch zuerst (E2)", () => {
     REGION_IDS.forEach((a, i) => {
       REGION_IDS.forEach((b, j) => {
@@ -62,12 +69,70 @@ describe("zweite Region (Plan 0036, E1–E3)", () => {
     expect(new Set(keys).size).toBe(keys.length);
     expect(REGIONS.nuernberg.kreis).toBe("09564");
     expect(REGIONS.fuerth.kreis).toBe("09563");
+    expect(REGIONS.duesseldorf.kreis).toBe("05111");
   });
 
   it("regionList nennt die Namen nach Einwohnern (E8)", () => {
-    expect(regionList()).toBe("Nürnberg und Fürth");
+    expect(regionList()).toBe("Düsseldorf, Nürnberg und Fürth");
     const r = (name: string, population: number): Region => ({ ...REGIONS.fuerth, name, population });
     expect(regionList({ a: r("A", 3000), c: r("C", 1000), b: r("B", 2000) })).toBe("A, B und C");
     expect(regionList({ a: r("A", 3000) })).toBe("A");
+  });
+});
+
+const overlaps = (a: BBox, b: BBox) =>
+  a.minLat <= b.maxLat && b.minLat <= a.maxLat && a.minLon <= b.maxLon && b.minLon <= a.maxLon;
+
+describe("Netze (Plan 0039, E1/E2)", () => {
+  it("jede Region-bbox liegt in der bbox ihres Netzes (ersetzt ADR 0029, Punkt 1)", () => {
+    for (const id of REGION_IDS) expect(contains(NETWORKS[networkOf(id)].bbox, REGIONS[id].bbox)).toBe(true);
+  });
+
+  it("die Netz-bboxen überlappen nicht", () => {
+    NETWORK_IDS.forEach((a, i) => {
+      NETWORK_IDS.slice(i + 1).forEach((b) => {
+        expect(overlaps(NETWORKS[a].bbox, NETWORKS[b].bbox)).toBe(false);
+      });
+    });
+  });
+
+  it("vgn ist der Großraum Nürnberg mit bayerischen Ferien, vrr Düsseldorf mit denen aus NRW", () => {
+    expect(NETWORKS.vgn).toMatchObject({ area: "des Großraums Nürnberg", bbox: NUERNBERG_BBOX, holidays: "DE-BY" });
+    expect(NETWORKS.vrr).toMatchObject({ area: "von Düsseldorf", bbox: VRR_BBOX, holidays: "DE-NW" });
+    for (const id of NETWORK_IDS) expect(inBounds(NETWORKS[id].home, NETWORKS[id].bbox)).toBe(true);
+  });
+
+  it("regionsOf: Regionen eines Netzes in der Reihenfolge von REGION_IDS", () => {
+    expect(regionsOf("vgn")).toEqual(["fuerth", "nuernberg"]);
+    expect(regionsOf("vrr")).toEqual(["duesseldorf"]);
+    expect(NETWORK_IDS.flatMap((n) => regionsOf(n)).sort()).toEqual([...REGION_IDS].sort());
+  });
+
+  it("regionList über die Regionen eines Netzes", () => {
+    expect(regionList("vgn")).toBe("Nürnberg und Fürth");
+    expect(regionList("vrr")).toBe("Düsseldorf");
+  });
+
+  it("networkAt: Hauptmarkt Nürnberg → vgn, Rathaus Düsseldorf → vrr, Kölner Dom → keins", () => {
+    expect(networkAt({ lat: 49.454, lon: 11.077 })).toBe("vgn");
+    expect(networkAt({ lat: 51.226, lon: 6.773 })).toBe("vrr");
+    expect(networkAt({ lat: 50.941, lon: 6.958 })).toBeUndefined();
+  });
+
+  it("Düsseldorf: Rathaus und die Ecken der Stadtgrenze (OSM-Relation 62539, 2026-10-18) liegen drin, Köln-Chorweiler nicht (E2)", () => {
+    const { bbox, network, population, municipality } = REGIONS.duesseldorf;
+    expect(network).toBe("vrr");
+    expect(population).toBe(619_000);
+    expect(municipality).toBe("Düsseldorf");
+    expect(inBounds({ lat: 51.226, lon: 6.773 }, bbox)).toBe(true);
+    expect(contains(bbox, { minLat: 51.1244, maxLat: 51.3525, minLon: 6.6888, maxLon: 6.9399 })).toBe(true);
+    const chorweiler = { lat: 51.02, lon: 6.9 };
+    expect(inBounds(chorweiler, bbox)).toBe(false);
+    expect(inBounds(chorweiler, VRR_BBOX)).toBe(false);
+  });
+
+  it("Nürnberg und Fürth prüfen keine Gemeinde (Stadt plus Nachbarorte, E2)", () => {
+    expect(REGIONS.nuernberg.municipality).toBeUndefined();
+    expect(REGIONS.fuerth.municipality).toBeUndefined();
   });
 });

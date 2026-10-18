@@ -77,9 +77,10 @@ describe("appStepParts und onboardingSteps (E1)", () => {
 });
 
 describe("cityChoices (E5)", () => {
-  it("Nürnberg und Fürth: zwei Kacheln nach Einwohnern, kein Dropdown (Plan 0036)", () => {
+  it("Düsseldorf, Nürnberg und Fürth: drei Kacheln nach Einwohnern, kein Dropdown (Plan 0036; Plan 0039, E8)", () => {
     expect(cityChoices(REGIONS)).toEqual({
       tiles: [
+        { id: "duesseldorf", name: "Düsseldorf" },
         { id: "nuernberg", name: "Nürnberg" },
         { id: "fuerth", name: "Fürth" },
       ],

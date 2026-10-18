@@ -90,16 +90,17 @@ test.describe("Test 1: erster Start", () => {
 });
 
 test.describe("Test 2: Stadt", () => {
-  test("Kacheln „Nürnberg“ (gewählt) und „Fürth“ nach Einwohnern; Lead mit Zahlen wie die Statuszeile", async ({
+  test("Kacheln „Düsseldorf“, „Nürnberg“ (gewählt) und „Fürth“ nach Einwohnern; Lead mit Zahlen wie die Statuszeile", async ({
     page,
   }) => {
     await opened(page);
     // auf dem iPhone ist Stadt Schritt 2 (Plan 0035, E1)
     await goTo(page, "stadt");
     const city = intro(page).getByRole("group", { name: "Stadt" });
-    // zwei Regionen (Plan 0036): Kacheln nach Einwohnern, kein Dropdown „Weitere Städte“
-    await expect(city.getByRole("button")).toHaveText(["Nürnberg", "Fürth"]);
+    // drei Regionen (Plan 0036; Plan 0039, E8): Kacheln nach Einwohnern, Nürnberg vorgewählt, kein Dropdown
+    await expect(city.getByRole("button")).toHaveText(["Düsseldorf", "Nürnberg", "Fürth"]);
     await expect(city.getByRole("button", { name: "Nürnberg" })).toHaveAttribute("aria-pressed", "true");
+    await expect(city.getByRole("button", { name: "Düsseldorf" })).toHaveAttribute("aria-pressed", "false");
     await expect(city.getByRole("button", { name: "Fürth" })).toHaveAttribute("aria-pressed", "false");
     await expect(intro(page).getByLabel("Weitere Städte")).toHaveCount(0);
     const lead = (await intro(page).locator(".onb-lead").textContent()) ?? "";

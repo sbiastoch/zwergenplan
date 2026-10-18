@@ -18,8 +18,9 @@ import type { OnboardingFlowProps } from "../onboarding-types.ts";
 const DOTS = ["c1", "c2", "c3", "c4"];
 
 /**
- * Stadt-Kacheln, sortiert nach Einwohnern, der Rest im Dropdown (E5). Die größte Stadt ist vorgewählt. Die Wahl hält
- * der Flow nur, um im Schritt „Weg“ deren Stadtteile zuerst zu zeigen; gespeichert wird sie nicht (Plan 0036, E7).
+ * Stadt-Kacheln, sortiert nach Einwohnern, der Rest im Dropdown (E5). Nürnberg ist vorgewählt. Die Wahl hält der
+ * Flow nur, um im Schritt „Weg“ die Stadtteile ihres Netzes zu zeigen, sie zuerst; gespeichert wird sie (noch) nicht
+ * (Plan 0036, E7; Plan 0039, E8).
  */
 export function CityStep({ city, onCity }: { city: RegionId; onCity: (city: RegionId) => void }) {
   const { tiles, more } = cityChoices(REGIONS);
@@ -170,7 +171,7 @@ export function WayStep({ originApi, transit, filter, setFilter, city }: Onboard
               <option value="" disabled>
                 {T.districtEmpty}
               </option>
-              {/* die gewählte Stadt zuerst, die anderen bleiben wählbar (Plan 0036, E7) */}
+              {/* nur das Netz der gewählten Stadt, sie zuerst (Plan 0036, E7; Plan 0039, E8) */}
               {districtGroups(city).map((g) => (
                 <optgroup key={g.region} label={g.name}>
                   {g.districts.map((d) => (

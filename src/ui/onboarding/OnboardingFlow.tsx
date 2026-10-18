@@ -17,7 +17,6 @@
 import { type PointerEvent, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
   appStepParts,
-  cityChoices,
   ONBOARDING_TEXTS,
   onboardingSteps,
   primaryLabel,
@@ -29,7 +28,7 @@ import {
   welcomeStats,
 } from "../../domain/onboarding.ts";
 import type { InstallApi } from "../../domain/pwa.ts";
-import { REGION_IDS, REGIONS, type RegionId } from "../../domain/regions.ts";
+import type { RegionId } from "../../domain/regions.ts";
 import { useBirthDateInput } from "../birth-date-input.ts";
 import { Icon } from "../icons.tsx";
 import type { OnboardingFlowProps } from "../onboarding-types.ts";
@@ -58,8 +57,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const installState = useSyncExternalStore(install.subscribe, install.state);
   const parts = appStepParts(installState, push);
   const [index, setIndex] = useState(0);
-  // Stadtwahl nur für die Reihenfolge der Stadtteile im Schritt „Weg“, nie gespeichert (Plan 0036, E7)
-  const [city, setCity] = useState<RegionId>(() => cityChoices(REGIONS).tiles[0]?.id ?? REGION_IDS[0]);
+  // Stadtwahl nur für die Stadtteile im Schritt „Weg“, noch nie gespeichert (Plan 0036, E7). Vorauswahl Nürnberg statt
+  // der größten Kachel, die seit Düsseldorf nicht mehr Nürnberg ist; gespeichert wird ab Plan 0039, E8 (S6).
+  const [city, setCity] = useState<RegionId>("nuernberg");
   // Schritt, auf den gewischt wurde, und die Richtung: nur dort gleitet er herein (E10)
   const [slide, setSlide] = useState<{ at: number; dir: SwipeStep }>();
   const touch = useRef<{ id: number; x: number; y: number }>(undefined);

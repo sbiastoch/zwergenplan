@@ -236,7 +236,7 @@ describe("validateDataset", () => {
   const venue0 = (p: Cat) => (p[0] as { venues: Array<Record<string, unknown>> }).venues[0] ?? {};
   it.each([
     ["ohne Region", (p: Cat) => delete (p[0] as Record<string, unknown>)["region"], "region"],
-    ["unbekannte Region", (p: Cat) => Object.assign(p[0] as object, { region: "duesseldorf" }), "region"],
+    ["unbekannte Region", (p: Cat) => Object.assign(p[0] as object, { region: "koeln" }), "region"],
     [
       "Ort außerhalb der Region",
       (p: Cat) => Object.assign(venue0(p), { geo: { lat: 51.2277, lon: 6.7735 } }),

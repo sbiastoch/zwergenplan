@@ -80,7 +80,7 @@ export function OriginPicker({
               <option value="" disabled>
                 Stadtteil wählen …
               </option>
-              {/* je Region eine Gruppe, die größte zuerst; keine Stadt gespeichert (Plan 0036, E7) */}
+              {/* je Region eine Gruppe, die größte zuerst; vorerst das Netz `vgn` (Plan 0036, E7; Plan 0039, E8, S6) */}
               {districtGroups().map((g) => (
                 <optgroup key={g.region} label={g.name}>
                   {g.districts.map((d) => (

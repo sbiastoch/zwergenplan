@@ -1,17 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { DISTRICTS, DISTRICTS_BY_REGION, districtById, nearestDistrictLabel } from "./districts.ts";
 import { inBounds } from "./geo.ts";
-import { REGION_IDS, REGIONS } from "./regions.ts";
+import { NETWORKS, networkOf, REGION_IDS, REGIONS } from "./regions.ts";
 
 describe("DISTRICTS", () => {
-  it("hat 35 Nürnberger und 18 Fürther Stadtteile mit eindeutigen kebab-case-IDs (Plan 0036, E6)", () => {
+  it("hat 35 Nürnberger, 18 Fürther und 50 Düsseldorfer Stadtteile mit eindeutigen kebab-case-IDs (Plan 0036, E6; Plan 0039, E13)", () => {
     expect(DISTRICTS_BY_REGION.nuernberg).toHaveLength(35);
     expect(DISTRICTS_BY_REGION.fuerth).toHaveLength(18);
-    expect(DISTRICTS).toHaveLength(53);
+    expect(DISTRICTS_BY_REGION.duesseldorf).toHaveLength(50);
+    expect(DISTRICTS).toHaveLength(103);
     const ids = DISTRICTS.map((d) => d.id);
-    expect(new Set(ids).size).toBe(53);
+    expect(new Set(ids).size).toBe(103);
     for (const id of ids) expect(id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
     for (const { id } of DISTRICTS_BY_REGION.fuerth) expect(id).toMatch(/^fuerth-/);
+    for (const { id } of DISTRICTS_BY_REGION.duesseldorf) expect(id).toMatch(/^duesseldorf-/);
   });
 
   it("hat über alle Regionen eindeutige Namen; allgemeine tragen in Fürth „(Fürth)“ (E6, Review M4)", () => {
@@ -20,13 +22,24 @@ describe("DISTRICTS", () => {
     const fuerth = DISTRICTS_BY_REGION.fuerth.map((d) => d.name);
     for (const general of ["Altstadt", "Innenstadt", "Südstadt", "Westvorstadt"])
       expect(fuerth).toContain(`${general} (Fürth)`);
+    const duesseldorf = DISTRICTS_BY_REGION.duesseldorf.map((d) => d.name);
+    for (const general of ["Altstadt", "Stadtmitte", "Hafen", "Hamm"])
+      expect(duesseldorf).toContain(`${general} (Düsseldorf)`);
   });
 
-  it("liegt in der bbox der eigenen Region (damit in NUERNBERG_BBOX), mit höchstens 3 Nachkommastellen", () => {
+  it("Düsseldorfer IDs: Name in kebab-case, Umlaute als ae/oe/ue, ohne Zusatz (Plan 0039, E13)", () => {
+    expect(districtById("duesseldorf-altstadt")?.name).toBe("Altstadt (Düsseldorf)");
+    expect(districtById("duesseldorf-loerick")?.name).toBe("Lörick");
+    expect(districtById("duesseldorf-flingern-sued")?.name).toBe("Flingern Süd");
+    expect(districtById("duesseldorf-duesseltal")?.point).toEqual({ lat: 51.238, lon: 6.812 });
+    expect(districtById("duesseldorf-hubbelrath")?.point).toEqual({ lat: 51.258, lon: 6.908 });
+  });
+
+  it("liegt in der bbox der eigenen Region (damit in der ihres Netzes), mit höchstens 3 Nachkommastellen", () => {
     for (const region of REGION_IDS)
       for (const { point } of DISTRICTS_BY_REGION[region]) {
         expect(inBounds(point, REGIONS[region].bbox)).toBe(true);
-        expect(inBounds(point)).toBe(true);
+        expect(inBounds(point, NETWORKS[networkOf(region)].bbox)).toBe(true);
         expect(Math.round(point.lat * 1000) / 1000).toBe(point.lat);
         expect(Math.round(point.lon * 1000) / 1000).toBe(point.lon);
       }
@@ -65,6 +78,8 @@ describe("nearestDistrictLabel (Nachtrag Plan 0035, 2026-10-11: ermittelten Stan
     expect(nearestDistrictLabel({ lat: 49.448, lon: 11.058 })).toBe("nächster Stadtteil: Gostenhof");
     // Fürth Rathaus (Plan 0036)
     expect(nearestDistrictLabel({ lat: 49.477, lon: 10.989 })).toBe("nächster Stadtteil: Innenstadt (Fürth)");
+    // Rathaus Düsseldorf (Plan 0039)
+    expect(nearestDistrictLabel({ lat: 51.226, lon: 6.773 })).toBe("nächster Stadtteil: Altstadt (Düsseldorf)");
   });
 
   it("weiter weg mit gerundeter Luftlinie, damit ein falscher Standort auffällt", () => {

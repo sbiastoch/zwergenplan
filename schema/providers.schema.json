@@ -23,7 +23,8 @@
             "type": "string",
             "enum": [
               "fuerth",
-              "nuernberg"
+              "nuernberg",
+              "duesseldorf"
             ]
           },
           "name": {
@@ -294,7 +295,8 @@
             "type": "string",
             "enum": [
               "fuerth",
-              "nuernberg"
+              "nuernberg",
+              "duesseldorf"
             ]
           },
           "name": {
@@ -472,7 +474,8 @@
             "type": "string",
             "enum": [
               "fuerth",
-              "nuernberg"
+              "nuernberg",
+              "duesseldorf"
             ]
           },
           "name": {

@@ -24,8 +24,18 @@
  *   node["place"="suburb"](area.a);
  *   out;
  *
+ * Düsseldorf (Plan 0039, E13): alle 49 `place=suburb`-Punkte in der Stadtgrenze Düsseldorf (OSM-Relation 62539),
+ * Overpass-Abfrage vom 2026-10-18, auf 3 Nachkommastellen gerundet. Hubbelrath, einer der 50 amtlichen Stadtteile,
+ * führt OSM nicht als Punkt, sondern als Fläche (`way` 24813296, `place=suburb`); dort steht deren Mittelpunkt
+ * (`out center`). Allgemeine oder anderswo bekannte Namen tragen „(Düsseldorf)“: Altstadt, Stadtmitte, Hafen, Hamm.
+ *
+ *   [out:json][timeout:60];
+ *   area(3600062539)->.a;
+ *   node["place"="suburb"](area.a);
+ *   out;
+ *
  * Die IDs sind fest: Sie stehen im localStorage (`zwergenplan.entfernung-ab`) und werden nie aus
- * dem Namen abgeleitet; Fürther mit Präfix `fuerth-`. Reihenfolge je Region: alphabetisch nach Name, deutsche
+ * dem Namen abgeleitet; Fürther mit Präfix `fuerth-`, Düsseldorfer mit `duesseldorf-` (Umlaute als ae/oe/ue). Reihenfolge je Region: alphabetisch nach Name, deutsche
  * Sortierung. Die Gruppen für die Auswahl bildet `district-groups.ts`.
  */
 import { type GeoPoint, haversineMeters } from "./geo.ts";
@@ -97,10 +107,64 @@ const FUERTH: readonly District[] = [
   { id: "fuerth-westvorstadt", name: "Westvorstadt (Fürth)", point: { lat: 49.47, lon: 10.968 } },
 ];
 
+const DUESSELDORF: readonly District[] = [
+  { id: "duesseldorf-altstadt", name: "Altstadt (Düsseldorf)", point: { lat: 51.226, lon: 6.774 } },
+  { id: "duesseldorf-angermund", name: "Angermund", point: { lat: 51.329, lon: 6.781 } },
+  { id: "duesseldorf-benrath", name: "Benrath", point: { lat: 51.163, lon: 6.873 } },
+  { id: "duesseldorf-bilk", name: "Bilk", point: { lat: 51.203, lon: 6.785 } },
+  { id: "duesseldorf-carlstadt", name: "Carlstadt", point: { lat: 51.222, lon: 6.773 } },
+  { id: "duesseldorf-derendorf", name: "Derendorf", point: { lat: 51.245, lon: 6.792 } },
+  { id: "duesseldorf-duesseltal", name: "Düsseltal", point: { lat: 51.238, lon: 6.812 } },
+  { id: "duesseldorf-eller", name: "Eller", point: { lat: 51.201, lon: 6.838 } },
+  { id: "duesseldorf-flehe", name: "Flehe", point: { lat: 51.189, lon: 6.772 } },
+  { id: "duesseldorf-flingern-nord", name: "Flingern Nord", point: { lat: 51.231, lon: 6.813 } },
+  { id: "duesseldorf-flingern-sued", name: "Flingern Süd", point: { lat: 51.221, lon: 6.81 } },
+  { id: "duesseldorf-friedrichstadt", name: "Friedrichstadt", point: { lat: 51.214, lon: 6.782 } },
+  { id: "duesseldorf-garath", name: "Garath", point: { lat: 51.144, lon: 6.9 } },
+  { id: "duesseldorf-gerresheim", name: "Gerresheim", point: { lat: 51.238, lon: 6.861 } },
+  { id: "duesseldorf-golzheim", name: "Golzheim", point: { lat: 51.251, lon: 6.76 } },
+  { id: "duesseldorf-grafenberg", name: "Grafenberg", point: { lat: 51.241, lon: 6.833 } },
+  { id: "duesseldorf-hafen", name: "Hafen (Düsseldorf)", point: { lat: 51.217, lon: 6.734 } },
+  { id: "duesseldorf-hamm", name: "Hamm (Düsseldorf)", point: { lat: 51.204, lon: 6.739 } },
+  { id: "duesseldorf-hassels", name: "Hassels", point: { lat: 51.182, lon: 6.866 } },
+  { id: "duesseldorf-heerdt", name: "Heerdt", point: { lat: 51.232, lon: 6.72 } },
+  { id: "duesseldorf-hellerhof", name: "Hellerhof", point: { lat: 51.132, lon: 6.907 } },
+  { id: "duesseldorf-himmelgeist", name: "Himmelgeist", point: { lat: 51.168, lon: 6.806 } },
+  { id: "duesseldorf-holthausen", name: "Holthausen", point: { lat: 51.176, lon: 6.833 } },
+  { id: "duesseldorf-hubbelrath", name: "Hubbelrath", point: { lat: 51.258, lon: 6.908 } },
+  { id: "duesseldorf-itter", name: "Itter", point: { lat: 51.168, lon: 6.818 } },
+  { id: "duesseldorf-kaiserswerth", name: "Kaiserswerth", point: { lat: 51.301, lon: 6.736 } },
+  { id: "duesseldorf-kalkum", name: "Kalkum", point: { lat: 51.302, lon: 6.758 } },
+  { id: "duesseldorf-knittkuhl", name: "Knittkuhl", point: { lat: 51.269, lon: 6.871 } },
+  { id: "duesseldorf-lichtenbroich", name: "Lichtenbroich", point: { lat: 51.284, lon: 6.795 } },
+  { id: "duesseldorf-lierenfeld", name: "Lierenfeld", point: { lat: 51.208, lon: 6.83 } },
+  { id: "duesseldorf-lohausen", name: "Lohausen", point: { lat: 51.279, lon: 6.731 } },
+  { id: "duesseldorf-loerick", name: "Lörick", point: { lat: 51.246, lon: 6.724 } },
+  { id: "duesseldorf-ludenberg", name: "Ludenberg", point: { lat: 51.256, lon: 6.866 } },
+  { id: "duesseldorf-moersenbroich", name: "Mörsenbroich", point: { lat: 51.253, lon: 6.812 } },
+  { id: "duesseldorf-niederkassel", name: "Niederkassel", point: { lat: 51.24, lon: 6.752 } },
+  { id: "duesseldorf-oberbilk", name: "Oberbilk", point: { lat: 51.214, lon: 6.802 } },
+  { id: "duesseldorf-oberkassel", name: "Oberkassel", point: { lat: 51.23, lon: 6.755 } },
+  { id: "duesseldorf-pempelfort", name: "Pempelfort", point: { lat: 51.24, lon: 6.78 } },
+  { id: "duesseldorf-rath", name: "Rath", point: { lat: 51.264, lon: 6.82 } },
+  { id: "duesseldorf-reisholz", name: "Reisholz", point: { lat: 51.178, lon: 6.858 } },
+  { id: "duesseldorf-stadtmitte", name: "Stadtmitte (Düsseldorf)", point: { lat: 51.222, lon: 6.784 } },
+  { id: "duesseldorf-stockum", name: "Stockum", point: { lat: 51.265, lon: 6.753 } },
+  { id: "duesseldorf-unterbach", name: "Unterbach", point: { lat: 51.203, lon: 6.898 } },
+  { id: "duesseldorf-unterbilk", name: "Unterbilk", point: { lat: 51.21, lon: 6.767 } },
+  { id: "duesseldorf-unterrath", name: "Unterrath", point: { lat: 51.273, lon: 6.787 } },
+  { id: "duesseldorf-urdenbach", name: "Urdenbach", point: { lat: 51.148, lon: 6.866 } },
+  { id: "duesseldorf-vennhausen", name: "Vennhausen", point: { lat: 51.21, lon: 6.858 } },
+  { id: "duesseldorf-volmerswerth", name: "Volmerswerth", point: { lat: 51.187, lon: 6.762 } },
+  { id: "duesseldorf-wersten", name: "Wersten", point: { lat: 51.19, lon: 6.818 } },
+  { id: "duesseldorf-wittlaer", name: "Wittlaer", point: { lat: 51.319, lon: 6.742 } },
+];
+
 /** Stadtteile je Region; der `Record` verlangt für jede neue Region eine Liste (Plan 0036, E6) */
 export const DISTRICTS_BY_REGION: Readonly<Record<RegionId, readonly District[]>> = {
   fuerth: FUERTH,
   nuernberg: NUERNBERG,
+  duesseldorf: DUESSELDORF,
 };
 
 export const DISTRICTS: readonly District[] = REGION_IDS.flatMap((r) => DISTRICTS_BY_REGION[r]);

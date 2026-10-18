@@ -435,7 +435,8 @@ export function limitReason(mode: ReachMode | undefined): string | undefined {
   if (mode.kind === "luftlinie") {
     return mode.reason === "fehler"
       ? "Wegzeiten gerade nicht verfügbar."
-      : `Wegzeiten gibt es nur für Startpunkte in ${regionList()}.`;
+      : // vorerst das Netz `vgn`; das gewählte Netz kommt mit der gespeicherten Stadt (Plan 0039, E12, S6)
+        `Wegzeiten gibt es nur für Startpunkte in ${regionList("vgn")}.`;
   }
   return undefined;
 }
