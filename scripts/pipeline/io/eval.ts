@@ -5,6 +5,7 @@
  */
 import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { networkOf, type RegionId } from "../../../src/domain/regions.ts";
 import { addMonths } from "../../../src/domain/time.ts";
 import {
   type CaseResult,
@@ -19,6 +20,7 @@ import {
   type Window,
 } from "../lib/eval-score.ts";
 import type { ExtractOutcome, Extractor } from "../lib/extract.ts";
+import { subdivisionOf } from "../lib/holidays.ts";
 import { planFetch } from "../lib/select.ts";
 import { fetchInputs } from "./fetch-inputs.ts";
 import { ROOT, readCatalog, readJson, readPreviousOffers, writeJson } from "./files.ts";
@@ -55,14 +57,21 @@ export function loadCases(only?: readonly string[], dir: string = CASES_DIR): Lo
     });
 }
 
-/** Freie Tage wie im Extraktor (`io/extract.ts`): ein Jahr zurück, zwei voraus, je Stichtag einmal geladen. */
-function freeDaysLoader(): (today: string) => Promise<Record<string, string>> {
+/** Freie Tage eines Falls: das Land aus dem Netz der Region seines Anbieters, Stichtag des Falls (Plan 0039, E6). */
+type FreeDaysFor = (region: RegionId, today: string) => Promise<Record<string, string>>;
+
+/**
+ * Freie Tage wie im Extraktor (`io/extract.ts`): ein Jahr zurück, zwei voraus, je Land und Stichtag einmal geladen.
+ */
+function freeDaysLoader(): FreeDaysFor {
   const cache = new Map<string, Promise<Record<string, string>>>();
-  return (today) => {
-    const hit = cache.get(today);
+  return (region, today) => {
+    const subdivision = subdivisionOf(networkOf(region));
+    const key = `${subdivision} ${today}`;
+    const hit = cache.get(key);
     if (hit) return hit;
-    const loading = loadFreeDays(addMonths(today, -12), addMonths(today, 24));
-    cache.set(today, loading);
+    const loading = loadFreeDays(subdivision, addMonths(today, -12), addMonths(today, 24));
+    cache.set(key, loading);
     return loading;
   };
 }
@@ -86,7 +95,7 @@ export async function runEval(o: {
   signal: AbortSignal;
   concurrency: number;
   onCase?: (r: CaseRun) => void;
-  freeDaysFor?: (today: string) => Promise<Record<string, string>>;
+  freeDaysFor?: FreeDaysFor;
 }): Promise<EvalRun> {
   const freeDaysFor = o.freeDaysFor ?? freeDaysLoader();
   const stop = new AbortController();
@@ -114,7 +123,7 @@ export async function runEval(o: {
         stop.abort();
         return;
       }
-      const run = scoreRun(c, answer, calls, await freeDaysFor(input.today), expected.window);
+      const run = scoreRun(c, answer, calls, await freeDaysFor(input.catalog.region, input.today), expected.window);
       results.push(run);
       o.onCase?.(run);
     }

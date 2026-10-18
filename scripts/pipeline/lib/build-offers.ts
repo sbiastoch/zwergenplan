@@ -3,10 +3,12 @@
  * Rein und deterministisch: gleiche Eingabe und gleicher Vorstand, gleiche Ausgabe samt IDs (ADR 0022).
  */
 import { validateDataset } from "../../../src/domain/dataset.ts";
+import { networkOf } from "../../../src/domain/regions.ts";
 import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/schema.ts";
 import { berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import { fallbackCategory } from "../../../src/domain/topics.ts";
 import type { Source } from "./candidate.ts";
+import type { FreeDays, FreeDaysByNetwork } from "./holidays.ts";
 import { expansionWindow, type ProviderCheck, type ProviderRaw, type RawBatch, type RawEvent } from "./raw.ts";
 import { expandSchedule } from "./schedule.ts";
 import { similarTitle } from "./similar.ts";
@@ -26,7 +28,8 @@ export interface BuildInput {
   providers: readonly Provider[];
   /** bisheriger Stand (fehlt beim ersten Lauf) */
   previous?: OffersFile | undefined;
-  freeDays: Readonly<Record<string, string>>;
+  /** Ferien je Netz; jeder Anbieter rechnet mit denen seines Netzes (Plan 0039, E6) */
+  freeDays: FreeDaysByNetwork;
   horizon: { from: string; to: string };
   /** Zeitpunkt mit Offset */
   generatedAt: string;
@@ -135,11 +138,18 @@ const sameAttributes = (a: Draft, b: Draft) =>
 const unionTopics = (a: Offer["topics"], b: Offer["topics"]) => [...new Set([...a, ...b])];
 
 /** Ein Rohevent → 0…n Angebote ohne ID (einmalig wird je Termin zerlegt). */
-function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: string, notes: string[]): Draft[] {
+function fromRaw(
+  e: RawEvent,
+  checkedAt: string,
+  input: BuildInput,
+  freeDays: FreeDays,
+  label: string,
+  notes: string[],
+): Draft[] {
   const { from, to } = input.horizon;
   const occurrences = expandSchedule(e.schedule, {
     to: expansionWindow(e, to),
-    freeDays: input.freeDays,
+    freeDays,
     ...(e.format === "kurs" ? {} : { from }), // Kurse behalten ihre vergangenen Termine (Serien-ICS)
   });
   const sessions: Session[] = [];
@@ -302,13 +312,37 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     if (check.drift) report.drift.push({ id, drift: check.drift });
   }
 
+  // 0. Ferien je Netz (Plan 0039, E6): Fehlt die Map eines Netzes mit Events, bricht der Build ab, statt Termine in
+  // dessen Ferien stehen zu lassen. Ein unbekannter Anbieter rechnet ohne Ferien; ihn weist validateDataset ab.
+  const regionOf = new Map(input.providers.map((p) => [p.id, p.region] as const));
+  const networkOfProvider = (id: string) => {
+    const region = regionOf.get(id);
+    return region === undefined ? undefined : networkOf(region);
+  };
+  const missing = new Set(
+    batches.flatMap(({ batch }) =>
+      batch.events.flatMap((e) => {
+        const network = networkOfProvider(e.providerId);
+        return network !== undefined && input.freeDays[network] === undefined ? [network] : [];
+      }),
+    ),
+  );
+  if (missing.size > 0) {
+    report.errors.push(`Ferien für Netz ${[...missing].sort().join(", ")} nicht geladen`);
+    return { report };
+  }
+  const freeDaysOf = (id: string): FreeDays => {
+    const network = networkOfProvider(id);
+    return (network && input.freeDays[network]) ?? {};
+  };
+
   // 1. Rohevents → Kandidaten
   const candidates: Candidate[] = [];
   let order = 0;
   for (const { name, batch, checkedAt } of batches) {
     batch.events.forEach((e, i) => {
       const label = `${name}#${i} „${e.title}“`;
-      for (const offer of fromRaw(e, checkedAt, input, label, notes)) {
+      for (const offer of fromRaw(e, checkedAt, input, freeDaysOf(e.providerId), label, notes)) {
         candidates.push({
           offer,
           rank: RANK[e.via ?? "anbieter"],

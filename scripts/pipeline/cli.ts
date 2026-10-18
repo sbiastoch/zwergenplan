@@ -44,7 +44,8 @@
  *                                               Zahl der ausgeblendeten.
  *   discover-publish RUN_DIR                    Commits des Entdeckens nach main (pull --rebase, validate-data,
  *                                               push); schreibt RUN_DIR/issue.md, wenn ein Anbieter neu ist (E7.10).
- *   holidays FROM TO                            freie Tage (Ferien/Feiertage Bayern)
+ *   holidays FROM TO [--netz vgn|vrr]           freie Tage (Schulferien und Feiertage) des Bundeslands je Netz
+ *                                               (Plan 0039, E6); ohne --netz alle Netze
  *   geocode "Adresse"                           Koordinaten, Stadtteil, Ring
  *   publish RUN_DIR                             Nachtlauf veröffentlichen (E6, aus RUN_DIR/nightly.json): nur auf main,
  *                                               nur data/raw, data/offers.json, data/kosten.csv, Commit-Text mit
@@ -57,7 +58,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
-import { REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
+import { NETWORK_IDS, NETWORKS, REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
 import { berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
 import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
 import { commitNewProvider, commitRunState, GateError, publishDiscover } from "./io/discover-git.ts";
@@ -74,7 +75,7 @@ import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
 import { git, ROOT, readCatalog, readJson, readPreviousOffers, readRawDir, writeJson } from "./io/files.ts";
 import { geocode } from "./io/geocode.ts";
 import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
-import { loadFreeDays } from "./io/holidays.ts";
+import { loadFreeDays, loadFreeDaysByNetwork } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
 import { liveStatus } from "./io/live.ts";
 import { DEFAULT_BUDGET_MIN, runBuildOnly, runNightly } from "./io/nightly.ts";
@@ -121,6 +122,7 @@ const { positionals, values } = parseArgs({
     terms: { type: "string" },
     hide: { type: "string" },
     "build-only": { type: "boolean", default: false },
+    netz: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -552,7 +554,8 @@ async function oepnv() {
   const serviceDay = pickServiceDay({
     validFrom,
     validTo,
-    freeDays: await loadFreeDays(validFrom, validTo),
+    // Ferien des VGN, bis der Fahrplan je Netz kommt (Plan 0039, E4)
+    freeDays: await loadFreeDays(NETWORKS.vgn.holidays, validFrom, validTo),
     today: today(),
   });
   const source = vgnSource({ lastModified: feed.lastModified, fetchedAt: feed.fetchedAt, validFrom, validTo });
@@ -572,6 +575,15 @@ async function oepnv() {
     `✓ ${TIMETABLE_FILE.slice(ROOT.length)} geschrieben: ${kB(bytes)} roh, ${kB(gzipSync(text).length)} gzip, ` +
       `${count(text.split("\n").length - 1)} Zeilen, Laufzeit ${seconds} s`,
   );
+}
+
+/** `holidays FROM TO [--netz …]` (Plan 0039, E6): mit --netz die freien Tage dieses Netzes, sonst je Netz. */
+async function holidaysCmd(from: string, to: string) {
+  const netz = values.netz;
+  if (netz === undefined) return loadFreeDaysByNetwork(NETWORK_IDS, from, to);
+  const network = NETWORK_IDS.find((n) => n === netz);
+  if (network === undefined) fail(`--netz: unbekanntes Netz „${netz}“ (bekannt: ${NETWORK_IDS.join(", ")})`);
+  return loadFreeDays(NETWORKS[network].holidays, from, to);
 }
 
 switch (command) {
@@ -597,7 +609,7 @@ switch (command) {
     discoverPublish(need(args[0], "RUN_DIR"));
     break;
   case "holidays":
-    print(await loadFreeDays(need(args[0], "FROM"), need(args[1], "TO")));
+    print(await holidaysCmd(need(args[0], "FROM"), need(args[1], "TO")));
     break;
   case "geocode": {
     const g = (await geocode(need(args[0], "Adresse"))) ?? fail("nicht gefunden");

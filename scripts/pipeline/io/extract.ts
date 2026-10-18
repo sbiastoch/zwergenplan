@@ -5,10 +5,12 @@
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { networkOf, type RegionId } from "../../../src/domain/regions.ts";
 import { addMonths } from "../../../src/domain/time.ts";
 import { type Extractor, extractMessage, extractResponseSchema, runExtractionInParts } from "../lib/extract.ts";
+import { subdivisionOf } from "../lib/holidays.ts";
 import { PART_MAX_CHARS, splitInput } from "../lib/split.ts";
-import { loadFreeDays } from "./holidays.ts";
+import { type FreeDaysLoader, loadFreeDays } from "./holidays.ts";
 import { callLlm, type LlmOptions } from "./llm.ts";
 
 export type {
@@ -43,7 +45,7 @@ export interface ExtractorOptions {
   /** für Tests: Fake-CLI und ihre Umgebung (`callLlm`), Ferien ohne Netz */
   bin?: string;
   env?: NodeJS.ProcessEnv;
-  freeDays?: typeof loadFreeDays;
+  freeDays?: FreeDaysLoader;
 }
 
 /** Fallback-Modell der Extraktion (E4): `LLM_MODEL_FALLBACK`, sonst Sonnet. */
@@ -55,13 +57,17 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
   const partMaxChars = opts.partMaxChars ?? PART_MAX_CHARS;
   const loadDays = opts.freeDays ?? loadFreeDays;
   const llmOpts: LlmOptions = { ...(opts.bin ? { bin: opts.bin } : {}), ...(opts.env ? { env: opts.env } : {}) };
-  // Ferien je Stichtag einmal laden; weit genug für laufende Kurse mit vergangenen Terminen (wie der Build des Nachtlaufs)
+  // Ferien je Land und Stichtag einmal laden; weit genug für laufende Kurse mit vergangenen Terminen (wie der Build
+  // des Nachtlaufs). Das Land kommt aus dem Netz des Anbieters (Plan 0039, E6). Die Ferien gehen nicht in den
+  // Cache-Schlüssel ein (`extractKey`: Eingabe, Prompt, Schema, Modell, Katalogauszug), nur in die Prüfung der Antwort.
   const freeDaysCache = new Map<string, Promise<Record<string, string>>>();
-  const freeDaysFor = (today: string) => {
-    const cached = freeDaysCache.get(today);
+  const freeDaysFor = (region: RegionId, today: string) => {
+    const subdivision = subdivisionOf(networkOf(region));
+    const key = `${subdivision} ${today}`;
+    const cached = freeDaysCache.get(key);
     if (cached) return cached;
-    const loading = loadDays(addMonths(today, -12), addMonths(today, 24));
-    freeDaysCache.set(today, loading);
+    const loading = loadDays(subdivision, addMonths(today, -12), addMonths(today, 24));
+    freeDaysCache.set(key, loading);
     return loading;
   };
 
@@ -72,7 +78,7 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
       candidates: input.candidates,
       // Datenhorizont heute + 12 Monate (E5)
       horizon: { from: input.today, to: addMonths(input.today, 12) },
-      freeDays: await freeDaysFor(input.today),
+      freeDays: await freeDaysFor(input.provider.region, input.today),
     };
     // Große Anbieter in Teilen (lib/split.ts); der Cache-Schlüssel bleibt der des ganzen Anbieters
     const { parts: texts, notes } = splitInput(input.text, partMaxChars, {

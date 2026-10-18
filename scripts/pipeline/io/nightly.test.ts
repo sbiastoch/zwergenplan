@@ -357,7 +357,18 @@ describe("runBuildOnly (nightly --build-only, Arch-Review S5, M1)", () => {
     const catalog = readCatalog(catalogFile);
     expect(validateDataset(catalog, before).ok).toBe(false);
 
-    const r = await runBuildOnly({ dataDir: dirsOf.dataDir, today: TODAY, now: NOW, freeDays: async () => ({}) });
+    const loads: string[] = [];
+    const r = await runBuildOnly({
+      dataDir: dirsOf.dataDir,
+      today: TODAY,
+      now: NOW,
+      freeDays: async (subdivision) => {
+        loads.push(subdivision);
+        return {};
+      },
+    });
+    // nur die Ferien der Netze, deren Regionen im Katalog stehen: hier nur Nürnberg (Plan 0039, E6)
+    expect(loads).toEqual(["DE-BY"]);
     expect(r.removed).toEqual(["theater-beispiel"]);
     expect(r.build.errors).toEqual([]);
     expect(r.build.written).toBe(join(dirsOf.dataDir, "offers.json"));

@@ -127,4 +127,32 @@ describe("createExtractor (Fake-CLI)", () => {
     expect(b.seen().stdin).toContain("Teil 2 von 2: ");
     expect(b.seen().stdin).not.toContain("Krabbeltreff");
   });
+
+  it("Ferien aus dem Land des Anbieters, je Land und Stichtag einmal geladen (Plan 0039, E6)", async () => {
+    const loads: string[][] = [];
+    const ext = createExtractor({
+      model: "haiku",
+      fallbackModel: "sonnet",
+      bin: BIN,
+      env: { PATH: process.env["PATH"] ?? "", HOME: scratch, CLAUDE_CODE_OAUTH_TOKEN: "tok" },
+      freeDays: async (subdivision, from, to) => {
+        loads.push([subdivision, from, to]);
+        return {};
+      },
+    });
+    const run = (p: typeof provider) => {
+      const c = control([]);
+      return ext(
+        { ...input(`## Seite 1: ${PAGE} (html)\n## TEXT\n${c.line}`), provider: p },
+        new AbortController().signal,
+      );
+    };
+    await run(provider);
+    await run({ ...provider, region: "fuerth" });
+    await run({ ...provider, region: "duesseldorf" });
+    expect(loads).toEqual([
+      ["DE-BY", "2025-10-05", "2028-10-05"],
+      ["DE-NW", "2025-10-05", "2028-10-05"],
+    ]);
+  });
 });

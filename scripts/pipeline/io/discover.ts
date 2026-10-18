@@ -53,6 +53,7 @@ import {
 import { DiscoverState, emptyState } from "../lib/discover-state.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
 import { botWall } from "../lib/fetch.ts";
+import { type FreeDaysByNetwork, networksOfRegions } from "../lib/holidays.ts";
 import { extractPage, type FetchedPage } from "../lib/html-extract.ts";
 import { anbieterVids } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
@@ -61,7 +62,7 @@ import { GateError } from "./discover-git.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
 import { readCatalog, readJson, readRaw, readRawDir, writeJson } from "./files.ts";
 import type { GeoResult } from "./geocode.ts";
-import type { loadFreeDays } from "./holidays.ts";
+import { type FreeDaysLoader, loadFreeDaysByNetwork } from "./holidays.ts";
 import { callLlm, type LlmCall, type LlmOptions } from "./llm.ts";
 import { refreshProvider } from "./refresh.ts";
 import { fetchSource } from "./sources.ts";
@@ -92,7 +93,7 @@ export interface DiscoverDeps {
     aggregators: readonly Provider[],
     today: string,
   ): Promise<Candidate[]>;
-  freeDays: typeof loadFreeDays;
+  freeDays: FreeDaysLoader;
 }
 
 export interface DiscoverOptions {
@@ -272,7 +273,13 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   // Sperren aller Regionen: Die Regionen überlappen, ein Abgelehnter darf nicht über die Nachbarregion zurückkommen
   // (Plan 0036, E4)
   const abgelehnt = allStates.flatMap((st) => st.abgelehnt);
-  const freeDays = await o.deps.freeDays(addMonths(o.today, -12), addMonths(o.today, 24));
+  // Ferien der Netze der Regionen dieses Laufs; der Ertragsbeweis rechnet je Anbieter mit seinem Netz (Plan 0039, E6)
+  const freeDays = await loadFreeDaysByNetwork(
+    networksOfRegions(o.regions),
+    addMonths(o.today, -12),
+    addMonths(o.today, 24),
+    o.deps.freeDays,
+  );
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
   const regions: RegionReport[] = [];
   const states: DiscoverState[] = [];
@@ -587,7 +594,7 @@ async function proveEntry(
   ctx: {
     proofRaw: string;
     controller: AbortController;
-    freeDays: Record<string, string>;
+    freeDays: FreeDaysByNetwork;
     horizon: { from: string; to: string };
   },
 ): Promise<Proof> {

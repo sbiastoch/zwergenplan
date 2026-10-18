@@ -5,6 +5,7 @@
  */
 import { createHash } from "node:crypto";
 import { z } from "zod";
+import { networkOf } from "../../../src/domain/regions.ts";
 import { CategoryField, type Offer, OfferFields, Provider } from "../../../src/domain/schema.ts";
 import { addMonths, berlinIsoDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import { categoriesOf, fallbackCategory } from "../../../src/domain/topics.ts";
@@ -122,6 +123,7 @@ export function predictOffers(p: {
   events: readonly RawEvent[];
   provider: Provider;
   today: string;
+  /** freie Tage des Netzes, zu dem der Anbieter gehört */
   freeDays: Readonly<Record<string, string>>;
   window: Window;
 }): { offers: EvalOffer[]; errors: string[] } {
@@ -139,7 +141,8 @@ export function predictOffers(p: {
       },
     ],
     providers: [provider],
-    freeDays: p.freeDays,
+    // die freien Tage des Falls gelten für das Netz seines Anbieters (Plan 0039, E6)
+    freeDays: { [networkOf(provider.region)]: p.freeDays },
     horizon: { from: p.today, to: addMonths(p.today, HORIZON_MONTHS) },
     generatedAt: fromBerlinLocal(`${p.today}T03:00`),
     sources,

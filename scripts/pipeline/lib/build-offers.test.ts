@@ -49,7 +49,7 @@ const CHECKED = "2026-10-05T05:00:00+02:00";
 const base = (over: Partial<BuildInput> = {}): BuildInput => ({
   batches: [],
   providers,
-  freeDays: { "2026-11-04": "Herbstferien" },
+  freeDays: { vgn: { "2026-11-04": "Herbstferien" } },
   horizon: { from: "2026-10-05", to: "2027-02-05" },
   generatedAt: "2026-10-05T06:00:00+02:00",
   sources: { evtermine: "ok" },
@@ -659,6 +659,53 @@ describe("buildOffers", () => {
     expect(report.notes.join("\n")).toContain("erst ab 48 Monaten");
     expect(report.errors).toEqual([]);
     expect(file?.offers).toEqual([]);
+  });
+});
+
+describe("buildOffers: Ferien je Netz (Plan 0039, E6)", () => {
+  const nuernberg = providers.find((p) => p.id === "familientreff-beispiel");
+  if (nuernberg?.role !== "anbieter") throw new Error("Fixture familientreff-beispiel fehlt");
+  const duesseldorf: Provider = {
+    ...nuernberg,
+    id: "familientreff-duesseldorf",
+    publicId: shortId("familientreff-duesseldorf"),
+    region: "duesseldorf",
+    name: "Familientreff Düsseldorf (fiktiv)",
+    venues: [
+      {
+        id: "familientreff-duesseldorf-haus",
+        name: "Familientreff Bilk",
+        address: "Beispielstraße 1, 40225 Düsseldorf",
+        district: "Bilk",
+        geo: { lat: 51.203, lon: 6.785 },
+      },
+    ],
+  };
+  // NRW-Herbstferien 17.–31.10., bayerische 2.–6.11.2026
+  const freeDays = { vgn: { "2026-11-04": "Herbstferien" }, vrr: { "2026-10-21": "Herbstferien" } };
+  const starts = (file: OffersFile | undefined, providerId: string) =>
+    file?.offers.find((o) => o.providerId === providerId)?.sessions.map((s) => s.start.slice(0, 10));
+  const events = [ev(), ev({ providerId: "familientreff-duesseldorf", venueId: "familientreff-duesseldorf-haus" })];
+
+  it("Düsseldorf fällt am NRW-Ferientag aus, nicht am bayerischen; Nürnberg umgekehrt", () => {
+    const { file, report } = buildOffers(
+      base({ providers: [...providers, duesseldorf], freeDays, batches: [batch("batch-1", events)] }),
+    );
+    expect(report.errors).toEqual([]);
+    const dus = starts(file, "familientreff-duesseldorf");
+    expect(dus).not.toContain("2026-10-21");
+    expect(dus).toContain("2026-11-04");
+    const nbg = starts(file, "familientreff-beispiel");
+    expect(nbg).toContain("2026-10-21");
+    expect(nbg).not.toContain("2026-11-04");
+  });
+
+  it("fehlen die Ferien eines Netzes mit Anbietern, bricht der Build ab statt ohne Ferien zu rechnen", () => {
+    const { file, report } = buildOffers(
+      base({ providers: [...providers, duesseldorf], freeDays: { vgn: {} }, batches: [batch("batch-1", events)] }),
+    );
+    expect(file).toBeUndefined();
+    expect(report.errors.join("\n")).toMatch(/Ferien.*vrr/);
   });
 });
 

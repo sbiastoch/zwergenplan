@@ -4,6 +4,7 @@
  * `io/llm.ts`), hier steht nur die Entscheidung, was mit einer Antwort geschieht.
  */
 import { z } from "zod";
+import { networkOf } from "../../../src/domain/regions.ts";
 import { CategoryField, type Provider } from "../../../src/domain/schema.ts";
 import { fromBerlinLocal } from "../../../src/domain/time.ts";
 import { buildOffers } from "./build-offers.ts";
@@ -129,7 +130,8 @@ function buildProbe(events: RawEvent[], ctx: ExtractContext): string[] {
   const { report } = buildOffers({
     batches: [{ name: p.id, checkedAt: at, batch: { providers: { [p.id]: { status: "ok", checked: [] } }, events } }],
     providers: [provider],
-    freeDays: ctx.freeDays,
+    // die Ferien des Anbieters gelten für sein Netz (Plan 0039, E6)
+    freeDays: { [networkOf(p.region)]: ctx.freeDays },
     horizon: ctx.horizon,
     generatedAt: at,
     sources: {},

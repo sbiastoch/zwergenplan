@@ -22,12 +22,13 @@ import {
 } from "../lib/cost.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
 import { renderFetchMarkdown, runLimited } from "../lib/fetch.ts";
+import { networksOfRegions } from "../lib/holidays.ts";
 import { offerUnits } from "../lib/refresh.ts";
 import { changedProviders, type NightlyReport, type ProviderState } from "../lib/report.ts";
 import { planFetch } from "../lib/select.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
 import { readCatalog, readPreviousOffers, readRawDir, removeRaw, writeJson, writeOffers } from "./files.ts";
-import { loadFreeDays } from "./holidays.ts";
+import { type FreeDaysLoader, loadFreeDaysByNetwork } from "./holidays.ts";
 import { refreshProvider } from "./refresh.ts";
 
 /** Zeitbudget des Laufs in Minuten (E6, `RUN_BUDGET_MIN`) */
@@ -60,7 +61,7 @@ export interface NightlyOptions {
   strongRetry?: boolean;
   /** für Tests: Abruf und Ferien ohne Netz */
   fetch?: typeof fetchInputs;
-  freeDays?: typeof loadFreeDays;
+  freeDays?: FreeDaysLoader;
 }
 
 export type { NightlyReport } from "../lib/report.ts";
@@ -233,7 +234,7 @@ async function buildFromRaw(o: {
   sources: BuildInput["sources"];
   /** Trockenlauf: Zustand dieses Laufs aus `overlayDir` überlagert data/raw, offers.json nach `target` */
   dryRun?: { overlayDir: string; target: string };
-  freeDays?: typeof loadFreeDays;
+  freeDays?: FreeDaysLoader;
 }): Promise<{ removed: string[]; build: NightlyReport["build"] }> {
   const rawDir = join(o.dataDir, "raw");
   // Zustand von Anbietern, die nicht mehr im Katalog stehen (Rücknahme per Revert, E7), räumt der Lauf weg;
@@ -249,7 +250,13 @@ async function buildFromRaw(o: {
   const raws = { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(o.dryRun.overlayDir) : {}) };
   const { batches, extracted, notes } = batchesFromRaw(raws, o.catalog);
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
-  const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
+  // Ferien der Netze, deren Regionen im Katalog stehen; jeder Anbieter rechnet mit denen seines Netzes (Plan 0039, E6)
+  const freeDays = await loadFreeDaysByNetwork(
+    networksOfRegions(o.catalog.map((p) => p.region)),
+    addMonths(horizon.from, -12),
+    addMonths(horizon.to, 24),
+    o.freeDays,
+  );
   const { file, report } = buildOffers({
     batches,
     providers: o.catalog,
@@ -289,7 +296,7 @@ export async function runBuildOnly(o: {
   dataDir: string;
   today: string;
   now: () => string;
-  freeDays?: typeof loadFreeDays;
+  freeDays?: FreeDaysLoader;
 }): Promise<{ removed: string[]; build: NightlyReport["build"] }> {
   return buildFromRaw({
     dataDir: o.dataDir,
