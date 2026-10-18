@@ -266,9 +266,14 @@
     padding: 0;
     min-width: 0;
   }
+  /*
+   * Mindestbreite einer Kachel: fester Teil (Rand 2 × 2 px, Innenabstand 2 × 12 px, Punkt 28 px, Abstand 10 px = 66 px,
+   * plus Reserve) und der Name in rem, damit er mit der Schriftgröße wächst. 6rem fasst „Düsseldorf“ (91 px bei
+   * 17 px Schrift). Passen zwei Kacheln nicht, eine Spalte (Browser-Review 0039: mit 9rem brach „Düsseldorf“ bei 360 px).
+   */
   .onb-tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(68px + 6rem)), 1fr));
     gap: 10px;
   }
   .onb-tile {

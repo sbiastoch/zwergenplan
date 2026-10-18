@@ -90,6 +90,25 @@ test.describe("Test 1: erster Start", () => {
 });
 
 test.describe("Test 2: Stadt", () => {
+  // Kanarienvogel (Browser-Review 0039): Bei 360 und 365 px brach „Düsseldorf“ im Zwei-Spalten-Raster mitten im
+  // Wort. Die Geräteprojekte decken nur einzelne Breiten ab (lokal 412 und 320 px), deshalb eine Reihe von Breiten,
+  // mit Webfont und mit der Fallback-Schrift (Anfrage nie beantwortet, wie in layout.spec.ts).
+  for (const font of ["Webfont", "Fallback-Schrift"] as const) {
+    test(`Kacheln brechen bei keiner Breite von 320 bis 420 px mitten im Wort (${font}, Browser-Review 0039)`, async ({
+      page,
+    }) => {
+      if (font === "Fallback-Schrift") await page.route("**/assets/*.woff2", () => {});
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await opened(page);
+      await goTo(page, "stadt");
+      await expect(intro(page).getByRole("group", { name: "Stadt" }).getByRole("button")).toHaveCount(3);
+      for (const width of [320, 340, 360, 365, 370, 375, 384, 390, 400, 412, 420]) {
+        await page.setViewportSize({ width, height: 800 });
+        await expectTextFits(page);
+      }
+    });
+  }
+
   test("Kacheln „Düsseldorf“, „Nürnberg“ (gewählt) und „Fürth“ nach Einwohnern; Lead mit Zahlen wie die Statuszeile", async ({
     page,
   }) => {
