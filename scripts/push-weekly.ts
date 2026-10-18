@@ -3,7 +3,7 @@
  * der Ablauf steht testbar in `scripts/lib/push-weekly-core.ts`. Einziger Ort für `web-push`
  * (`web-push-only-in-push-weekly`).
  *
- *   node scripts/push-weekly.ts                      Zeitplan-Lauf (nur Samstag 10–14 Uhr Berlin, Versand-Marke)
+ *   node scripts/push-weekly.ts                      Zeitplan-Lauf (sendet immer, höchstens einmal je Tag)
  *   node scripts/push-weekly.ts --force --dry-run    Abos zählen
  *   node scripts/push-weekly.ts --force --only=<id>  Testversand an ein Gerät (Geräte-Kennung im Kind-Sheet)
  *

@@ -109,11 +109,11 @@ describe("runWeekly", () => {
     ).toHaveLength(2);
   });
 
-  it("außerhalb von Samstag 10–14 Uhr: kein Versand, keine Marke", async () => {
-    const { d, sent, marks } = deps({ now: new Date("2026-10-12T10:07:00+02:00") });
-    expect(await runWeekly(d, { force: false, dryRun: false })).toEqual({ status: "ausserhalb" });
-    expect(sent).toEqual([]);
-    expect(marks).toEqual([]);
+  it("ein stark verspäteter Zeitplan-Lauf sendet trotzdem (GitHub startete am 17.10. erst um 14:08)", async () => {
+    const { d, sent, marks } = deps({ now: new Date("2026-10-17T14:08:00+02:00") });
+    expect(await runWeekly(d, { force: false, dryRun: false })).toMatchObject({ status: "gesendet" });
+    expect(sent).toHaveLength(3);
+    expect(marks).toEqual(["2026-10-17"]);
   });
 
   it("Marke schon gesetzt (Re-run am selben Samstag): kein Versand", async () => {
@@ -142,7 +142,7 @@ describe("runWeekly", () => {
     });
   });
 
-  it("Testversand: ohne Wächter und Marke, nur an --only, mit data.test", async () => {
+  it("Testversand: ohne Marke, nur an --only, mit data.test", async () => {
     const { d, sent, marks } = deps({ now: new Date("2026-10-12T15:00:00+02:00") });
     const result = await runWeekly(d, { force: true, dryRun: false, only: "h3" });
     expect(result).toMatchObject({ status: "gesendet", sent: 1 });

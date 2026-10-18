@@ -2,7 +2,7 @@
  * Ablauf der Wochen-Nachricht (Plan 0017, E1, E2), ohne Netz und git testbar: `scripts/push-weekly.ts` verdrahtet
  * nur git, Dateien, Worker und `web-push`.
  *
- * 1. Zeitplan-Lauf: nur samstags 10–14 Uhr Berlin (`shouldSendNow`); Testversand (`--force`) ohne Wächter.
+ * 1. Zeitplan-Lauf sendet immer, auch verspätet (höchstens einmal je Tag, Versand-Marke); Testversand (`--force`) ohne Marke.
  * 2. Zahlen aus den Daten im Repo: neu seit dem Stand vor 7 × 24 h, Angebote der nächsten 7 Tage.
  * 3. Payload bauen und mit Zod prüfen (ungültig = Programmierfehler, rot).
  * 4. Erst die Abos lesen, dann die Versand-Marke setzen (ein Lesefehler kostet die Woche nicht), dann senden.
@@ -13,12 +13,12 @@ import { weeklyPayload } from "../../src/domain/push-payload.ts";
 import type { PushSubscriptionJson } from "../../src/domain/push-types.ts";
 import type { SiteOffer } from "../../src/domain/site-data.ts";
 import { PushPayloadSchema } from "./push-payload-schema.ts";
-import { berlinDay, shouldSendNow } from "./push-schedule.ts";
+import { berlinDay } from "./push-schedule.ts";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 export interface WeeklyArgs {
-  /** Testversand: ohne Wächter und Versand-Marke, Payload mit `data.test` */
+  /** Testversand: ohne Versand-Marke, Payload mit `data.test` */
   force: boolean;
   /** nur Abos zählen */
   dryRun: boolean;
@@ -90,17 +90,12 @@ export interface WeeklyDeps {
 }
 
 export type WeeklyResult =
-  | { status: "ausserhalb" }
   | { status: "schon-gesendet"; news: number; week: number }
   | { status: "trocken"; news: number; week: number; subscriptions: number }
   | { status: "gesendet"; news: number; week: number; sent: number; removed: number; failed: number };
 
 export async function runWeekly(deps: WeeklyDeps, args: WeeklyArgs): Promise<WeeklyResult> {
   const { now } = deps;
-  if (!args.force && !shouldSendNow(now)) {
-    deps.log("Nicht Samstag 10–14 Uhr (Berlin): kein Versand.");
-    return { status: "ausserhalb" };
-  }
   const before = await deps.previousIds(new Date(now.getTime() - WEEK_MS));
   if (!before) deps.warn("Der alte Stand vor 7 Tagen fehlt: neu = 0.");
   const news = before ? newOfferIds(before, deps.current, now).length : 0;

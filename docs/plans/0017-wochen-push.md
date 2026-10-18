@@ -74,7 +74,7 @@ Vor Schritt 1 wird ADR 0014 (noch Entwurf) überarbeitet: Auslöser wöchentlich
         timezone: "Europe/Berlin"
   ```
   Minute 7 statt 0: GitHub warnt, dass Läufe zur vollen Stunde unter Last verspätet oder ganz verworfen werden. Gemeint ist „Samstag gegen 10 Uhr“.
-- **Wächter** in der reinen Funktion `shouldSendNow(now: Date): boolean` (`scripts/lib/push-schedule.ts`, test-first): nur an einem Samstag in Berlin zwischen 10:00 und 14:00. Sonst Ende mit Exit 0 und Hinweis. So schickt ein später „Re-run“ am Montag keine Samstagsnachricht. Tests: Samstag 10:07 im Sommer und im Winter, 13:59/14:00, Freitag, Sonntag, beide Umstellungs-Wochenenden. Dazu `berlinDay(now)` für die Versand-Marke.
+- **Wächter** (entfallen mit Plan 0040, 2026-10-18) in der reinen Funktion `shouldSendNow(now: Date): boolean` (`scripts/lib/push-schedule.ts`, test-first): nur an einem Samstag in Berlin zwischen 10:00 und 14:00. Sonst Ende mit Exit 0 und Hinweis. So schickt ein später „Re-run“ am Montag keine Samstagsnachricht. Tests: Samstag 10:07 im Sommer und im Winter, 13:59/14:00, Freitag, Sonntag, beide Umstellungs-Wochenenden. Dazu `berlinDay(now)` für die Versand-Marke.
 - Ein Test liest `push-weekly.yml` und prüft `cron` und `timezone` gegen die Konstanten in `push-schedule.ts` (`PUSH_WEEKDAY`, `PUSH_HOUR`), damit Code und YAML nicht auseinanderlaufen.
 - `workflow_dispatch` im selben Workflow für Tests, ohne Wächter: Eingaben `only` (Pflicht, sobald `dry_run` aus ist) und `dry_run` (Standard `true`). Ersetzt `push-test.yml` aus Plan 0011.
 - Zeitpläne laufen nur auf dem Standard-Branch. Auf dem Branch wird lokal getestet (Schritt 6).

@@ -1,7 +1,7 @@
 # Wochen-Nachricht (Plan 0017, E1; ADR 0014): samstags gegen 10 Uhr Berliner Zeit an alle Push-Abos.
-# Minute 7: Läufe zur vollen Stunde verspätet oder verwirft GitHub unter Last. Der Wächter in
-# scripts/lib/push-schedule.ts sendet nur Samstag 10–14 Uhr; die Versand-Marke im Worker verhindert einen zweiten
-# Versand am selben Tag. Cron und Zeitzone gleicht scripts/lib/push-schedule.test.ts mit dem Code ab.
+# Minute 7: Läufe zur vollen Stunde verspätet oder verwirft GitHub unter Last. Jeder Zeitplan-Lauf sendet, auch
+# stark verspätet (am 10. und 17.10.2026 kam er erst 14 bzw. 16 Uhr); die Versand-Marke im Worker verhindert einen
+# zweiten Versand am selben Tag. Cron und Zeitzone gleicht scripts/lib/push-schedule.test.ts mit dem Code ab.
 # Kein Gate: Fehler beim Senden sind Warnungen. Nach 60 Tagen ohne Commit schaltet GitHub den Zeitplan ab (README).
 name: Wochen-Nachricht
 
@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: "Geräte-Kennung (Pflicht, sobald dry_run aus ist)"
+        description: "Geräte-Kennung für einen Testversand; leer mit dry_run aus = Versand an alle wie im Zeitplan"
         required: false
         default: ""
       dry_run:
@@ -24,8 +24,9 @@ permissions:
   contents: read
 
 concurrency:
-  # getrennt, damit ein Testversand keinen wartenden Zeitplan-Lauf abbricht
-  group: push-weekly-${{ github.event_name == 'schedule' && 'schedule' || 'test' }}
+  # getrennt, damit ein Testversand keinen wartenden Zeitplan-Lauf abbricht; Nachholen an alle reiht sich beim
+  # Zeitplan ein, denn die Versand-Marke (KV) ist nicht atomar (Plan 0040, Review 2)
+  group: push-weekly-${{ (github.event_name == 'schedule' || (!inputs.dry_run && inputs.only == '')) && 'schedule' || 'test' }}
   cancel-in-progress: false
 
 jobs:
@@ -50,7 +51,7 @@ jobs:
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           PUSH_ADMIN_TOKEN: ${{ secrets.PUSH_ADMIN_TOKEN }}
         run: node scripts/push-weekly.ts
-      - name: Testversand
+      - name: Testversand oder Nachholen
         if: github.event_name == 'workflow_dispatch'
         env:
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
@@ -60,6 +61,9 @@ jobs:
         run: |
           if [ "$DRY_RUN" = "true" ]; then
             node scripts/push-weekly.ts --force --dry-run ${ONLY:+--only=$ONLY}
+          elif [ -z "$ONLY" ]; then
+            # Nachholen eines verpassten Zeitplan-Laufs: an alle, mit Versand-Marke
+            node scripts/push-weekly.ts
           else
             node scripts/push-weekly.ts --force --only="$ONLY"
           fi

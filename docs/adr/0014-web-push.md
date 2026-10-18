@@ -25,7 +25,7 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
    - Ein Payload-Format für alle Browser: Declarative Web Push mit `mutable: true`. Der Absender schickt nur einen allgemeinen Text mit Zahlen aus den öffentlichen Daten (neu seit letztem Samstag, Angebote der nächsten 7 Tage) und den Versandzeitpunkt, ohne Bezug zu Personen.
    - Der Service Worker ersetzt ihn durch einen Text nach den **Such-Abos** (gemerkte Filter der Liste, ODER), dem **Alter** des Kindes und der Wegzeit ab dem **gespeicherten Startpunkt**. Auf Chromium und Firefox zeigt er ihn selbst an. Ein Tipp öffnet die Startseite (ist die App offen, kommt ihr Fenster nach vorn).
 2. **Abos in einem Cloudflare Worker mit Workers KV** (`push-worker/` im Repo, Gratis-Tarif).
-   - Er speichert nur das `PushSubscription`-JSON und das Datum der Anmeldung, dazu je Samstag eine Versand-Marke (höchstens ein Versand je Tag).
+   - Er speichert nur das `PushSubscription`-JSON und das Datum der Anmeldung, dazu je Versandtag eine Versand-Marke (höchstens ein Versand je Tag).
    - Öffentlich sind nur An- und Abmelden. Die Grenzen sind Allowlist der Push-Dienste, Größen- und Mengengrenze und ein Rate-Limit je IP (gehasht, eine Stunde). Die Origin-Prüfung (403) hält nur fremde Webseiten ab.
    - `GET /version` zeigt den deployten Commit, weil der Worker manuell deployt wird.
    - Lesen, Aufräumen und die Versand-Marke nur mit Token.
@@ -80,3 +80,9 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
 - Der Nachtrag vom 2026-10-11 (Plan 0033) gilt weiter für die Dauer des Onboardings: kein Abgleich, kein laufendes Spiegeln. Neu ist genau ein Spiegeln beim Ende: `OnboardingFlow` ruft beim Unmount `syncPush()` (`syncPushMirror` in `src/ui/app-extras/AppSection.tsx`), das `createPush().mirrorIfSubscribed(mirrorData())` aufruft. Das deckt „fertig“, „Überspringen“, Esc, Android-Zurück und den erneuten Aufruf über „Einführung ansehen“ ab.
 - `mirrorIfSubscribed` (`src/data/push.ts`) prüft zuerst `hasPushManager` (der Safari-Tab schaut nicht einmal auf die Registrierung), dann `subscription()`. Nur mit Abo schreibt es wie `mirror` das Geänderte in den Geräte-Speicher. Anders als `reconcile` gibt es kein `register`, kein `forget`, kein `clearAll`: **kein Request**, und ohne Abo bleibt der Geräte-Speicher unberührt. Punkt 4 gilt unverändert.
 - Restrisiko: Wird die Seite während des Onboardings geschlossen (kein Unmount) oder läuft beim Ende noch eine Standortabfrage, greift wie bisher der Abgleich beim nächsten Öffnen des Kind-Sheets.
+
+## Nachtrag (2026-10-18, Plan 0040): kein Zeitfenster mehr
+
+- GitHub hat die Zeitplan-Läufe am 10. und 17.10.2026 erst um 16:26 bzw. 14:08 Uhr gestartet. Der Wächter (Samstag 10–14 Uhr) hat beide Male den Versand verhindert.
+- Der Wächter entfällt (Nutzerentscheid). Jeder Zeitplan-Lauf sendet, auch verspätet. Höchstens ein Versand je Berliner Kalendertag bleibt über die Versand-Marke im Worker gesichert.
+- Ein verpasster Lauf lässt sich per `workflow_dispatch` mit `dry_run: false` und leerer Geräte-Kennung nachholen. Das sendet an alle, wie der Zeitplan.
