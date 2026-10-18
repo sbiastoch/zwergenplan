@@ -2,8 +2,9 @@
  * Prüft den Datenbestand und erzeugt die statischen Daten-Assets der Seite:
  *   public/data/site.json, public/data/meta.json, public/ics/**.ics,
  *   public/data/anbieter.json (Anbieterübersicht, lädt erst beim Öffnen; Plan 0010, E6),
- *   public/data/wegzeit.json (Wegzeit-Tabelle aus dem Fahrplanauszug, Plan 0009, E5/E7),
- *   public/data/linien.json (Linien je Zelle der Tabelle, Plan 0012, E7),
+ *   public/data/wegzeit/<netz>.json (Wegzeit-Tabelle aus dem Fahrplanauszug je Netz, Plan 0009, E5/E7; Plan 0039, E5),
+ *   public/data/linien/<netz>.json (Linien je Zelle der Tabelle, Plan 0012, E7),
+ *   übergangsweise public/data/wegzeit.json und linien.json als Kopie von vgn (bis Plan 0039, S6),
  *   public/a/<id>/, public/p/<publicId>/, public/404.html (Vorschauseiten zum Teilen, Plan 0026, ADR 0020/0022),
  *   public/impressum/index.html (Impressum und Datenschutz, Plan 0034)
  * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
@@ -13,24 +14,17 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { DISTRICTS } from "../src/domain/districts.ts";
+import { DISTRICTS_BY_REGION } from "../src/domain/districts.ts";
 import { icsContextFor, icsForSeries, icsForSession } from "../src/domain/ics.ts";
 import { seriesIcsPath, sessionIcsPath } from "../src/domain/ics-paths.ts";
+import { NETWORK_IDS, networkOf, regionsOf } from "../src/domain/regions.ts";
 import { IMPRINT_PATH } from "../src/domain/share.ts";
 import { type SiteMeta, toProviderDirectory, toSiteData } from "../src/domain/site-data.ts";
 import { decodeTransitTable, INSIDE_METERS } from "../src/domain/transit.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { checkSharePages, imprintPage, notFoundPage, offerSharePage, providerSharePage } from "./lib/share-pages.ts";
-import { buildTransitTables, withoutAccess } from "./transit/table.ts";
-
-/** Ab hier warnt der Build: Die Profil-CSA läuft in jedem data:build (Plan 0009, Backpressure). */
-const TRANSIT_WARN_SECONDS = 20;
-/**
- * Gate gegen einen stillen Ausfall der Linien (Plan 0012, E7, Review W3): Mit echten Daten darf höchstens dieser
- * Anteil der Zellen mit Wegzeit ohne Linien sein. Gemessen am 2026-10-05 (Auszug Stichtag 13.10.2026, 556 × 76):
- * 1 514 von 35 226 Zellen = 4,3 %; Schwelle = Messwert + 5 Prozentpunkte.
- */
-const MAX_WITHOUT_LINES = 0.093;
+import { accessIssues, transitGates } from "./transit/gates.ts";
+import { buildTransitTables, cityPrefixes } from "./transit/table.ts";
 
 const source = dataSource();
 const result = loadDataset(source);
@@ -105,52 +99,54 @@ console.log(
   `✓ Vorschauseiten: ${site.offers.length} Angebote, ${directory.providers.length} Anbieter, größte ${(largest / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} kB`,
 );
 
-// vorerst nur die Tabelle des Netzes vgn; Tabellen je Netz kommen mit Plan 0039, S4 (E5)
-const timetable = loadTimetable(source, "vgn");
-const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
-for (const w of timetableCheck.warnings) console.log(`::warning::${w}`);
-if (timetableCheck.errors.length > 0) {
-  console.error(`✗ Wegzeit:\n  ${timetableCheck.errors.join("\n  ")}`);
-  process.exit(1);
-}
-if (timetable.kind === "ok") {
+// Eine Tabelle je Netz (Plan 0039, E5): Auszug des Netzes, Orte der Angebote seiner Regionen, Zeilen aus deren Kreisen
+const regionOf = new Map(result.providers.flatMap((p) => (p.role === "anbieter" ? [[p.publicId, p.region]] : [])));
+for (const network of NETWORK_IDS) {
+  const timetable = loadTimetable(source, network);
+  const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
+  for (const w of timetableCheck.warnings) console.log(`::warning::${w}`);
+  if (timetableCheck.errors.length > 0) {
+    console.error(`✗ Wegzeit ${network}:\n  ${timetableCheck.errors.join("\n  ")}`);
+    process.exit(1);
+  }
+  if (timetable.kind !== "ok") continue;
+  const places = site.offers.flatMap((o) => {
+    const region = regionOf.get(o.providerId);
+    return region !== undefined && networkOf(region) === network ? [o.venue.geo] : [];
+  });
   const started = performance.now();
-  const { table, lines, stats } = buildTransitTables(
-    timetable.timetable,
-    site.offers.map((o) => o.venue.geo),
-  );
+  const { table, lines, stats } = buildTransitTables(timetable.timetable, places, cityPrefixes(network));
   const seconds = (performance.now() - started) / 1000;
-  write("data/wegzeit.json", JSON.stringify(table));
-  write("data/linien.json", JSON.stringify(lines));
+  write(`data/wegzeit/${network}.json`, JSON.stringify(table));
+  write(`data/linien/${network}.json`, JSON.stringify(lines));
+  if (network === "vgn") {
+    // Übergang bis Plan 0039, S6: Browser, Service Worker und E2E lesen noch die alten Pfade; S6 stellt sie um und
+    // entfernt diese Kopie.
+    write("data/wegzeit.json", JSON.stringify(table));
+    write("data/linien.json", JSON.stringify(lines));
+  }
   const took = seconds.toLocaleString("de-DE", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
-  console.log(`✓ Wegzeit: ${table.lat.length} Halte × ${table.places.length} Orte in ${took} s`);
+  console.log(`✓ Wegzeit ${network}: ${table.lat.length} Halte × ${table.places.length} Orte in ${took} s`);
   console.log(
-    `✓ Linien: ${stats.lines} Linien, ${stats.combos} Folgen, ${stats.withoutLines} Zellen ohne Linien (davon ${stats.outliers} unpassend)`,
+    `✓ Linien ${network}: ${stats.lines} Linien, ${stats.combos} Folgen, ${stats.withoutLines} Zellen ohne Linien (davon ${stats.outliers} unpassend)`,
   );
-  const share = stats.cells === 0 ? 1 : stats.withoutLines / stats.cells;
-  if (stats.withoutLines === stats.cells) {
-    console.error("✗ Linien: keine Zelle hat Linien (Plan 0012, E7)");
+  const gates = transitGates({ network, stats, places: table.places.length, seconds, real: source === "real" });
+  for (const w of gates.warnings) console.log(`::warning::${w}`);
+  if (gates.errors.length > 0) {
+    console.error(`✗ Linien:\n  ${gates.errors.join("\n  ")}`);
     process.exit(1);
   }
-  if (source === "real" && share > MAX_WITHOUT_LINES) {
-    const pct = (v: number) => `${(v * 100).toLocaleString("de-DE", { maximumFractionDigits: 1 })} %`;
-    console.error(`✗ Linien: ${pct(share)} der Zellen ohne Linien, erlaubt ${pct(MAX_WITHOUT_LINES)} (Plan 0012, E7)`);
-    process.exit(1);
-  }
-  // Jeder wählbare Stadtteil braucht einen Zugangshalt, sonst hieße es dort „außerhalb des Stadtgebiets“
-  // (Plan 0009, Schritt 5). Das Fixture-Netz deckt nur Gostenhof und Fürth-Innenstadt ab (Halt 9100, Plan 0036).
+  // Jeder wählbare Stadtteil der Regionen des Netzes braucht einen Zugangshalt, sonst hieße es dort „außerhalb des
+  // Stadtgebiets“ (Plan 0009, Schritt 5; je Netz seit Plan 0039, E5). Nur im echten Build: Die Fixture-Netze decken
+  // nur wenige Stadtteile ab, vgn Gostenhof und Fürth-Innenstadt (Halt 9100, Plan 0036), vrr ein Mini-Netz um
+  // Stadtmitte (Düsseldorf) (Plan 0039, E14).
   if (source === "real") {
-    const decoded = decodeTransitTable(table, new Set(table.places));
-    const missing = decoded ? withoutAccess(decoded, DISTRICTS) : DISTRICTS;
+    const missing = accessIssues(decodeTransitTable(table, new Set(table.places)), network);
     if (missing.length > 0) {
-      console.error(`✗ Wegzeit: ohne Zugangshalt (${INSIDE_METERS} m): ${missing.map((d) => d.name).join(", ")}`);
+      console.error(`✗ Wegzeit ${network}: ohne Zugangshalt (${INSIDE_METERS} m): ${missing.join(", ")}`);
       process.exit(1);
     }
-    console.log(`✓ Zugangshalt für alle ${DISTRICTS.length} Stadtteile`);
-  }
-  if (seconds > TRANSIT_WARN_SECONDS) {
-    console.log(
-      `::warning::Wegzeit-Berechnung dauerte ${took} s (> ${TRANSIT_WARN_SECONDS} s) – Cache über einen Hash aus Auszug und Orten erwägen (Plan 0009, Backpressure)`,
-    );
+    const districts = regionsOf(network).reduce((n, r) => n + DISTRICTS_BY_REGION[r].length, 0);
+    console.log(`✓ Zugangshalt ${network}: alle ${districts} Stadtteile`);
   }
 }

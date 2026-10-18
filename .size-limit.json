@@ -13,5 +13,9 @@
   { "name": "Daten (site.json)", "path": "dist/data/site.json", "limit": "250 kB", "gzip": true },
   { "name": "Daten (anbieter.json)", "path": "dist/data/anbieter.json", "limit": "15 kB", "gzip": true },
   { "name": "Wegzeit-Daten", "path": "dist/data/wegzeit.json", "limit": "64 kB", "gzip": true },
-  { "name": "Linien-Daten", "path": "dist/data/linien.json", "limit": "40 kB", "gzip": true }
+  { "name": "Linien-Daten", "path": "dist/data/linien.json", "limit": "40 kB", "gzip": true },
+  { "name": "Wegzeit-Daten vgn", "path": "dist/data/wegzeit/vgn.json", "limit": "64 kB", "gzip": true },
+  { "name": "Wegzeit-Daten vrr", "path": "dist/data/wegzeit/vrr.json", "limit": "64 kB", "gzip": true },
+  { "name": "Linien-Daten vgn", "path": "dist/data/linien/vgn.json", "limit": "40 kB", "gzip": true },
+  { "name": "Linien-Daten vrr", "path": "dist/data/linien/vrr.json", "limit": "40 kB", "gzip": true }
 ]

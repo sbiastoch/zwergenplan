@@ -23,7 +23,7 @@ const SHELL: readonly RegExp[] = [
   /^src\/ui\/categories\.ts$/,
 ];
 
-/** `scripts/build-data.ts` schreibt site.json, anbieter.json, wegzeit.json, linien.json, ICS-Dateien und Vorschauseiten. */
+/** `scripts/build-data.ts` schreibt site.json, anbieter.json, wegzeit/linien je Netz (übergangsweise auch wegzeit.json, linien.json), ICS-Dateien und Vorschauseiten. */
 const BUILD_DATA = /^scripts\/build-data\.ts$/;
 /** Vorschauseiten zum Teilen und 404.html (Plan 0026). */
 const SHARE_PAGES = /^scripts\/lib\/share-pages\.ts$/;

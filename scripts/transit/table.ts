@@ -1,15 +1,15 @@
 /**
  * Wegzeit-Tabelle Halt → Ort (Plan 0009, E5/E7; ADR 0011): aus dem Fahrplanauszug und den Orten der Angebote
- * entsteht `public/data/wegzeit.json`. Zeilen sind die Haltbereiche in den Stadtgebieten der Regionen
- * (`Region.kreis`, Plan 0036, E5; ADR 0029) mit Einstieg im Fenster, Spalten die Orte (`placeKey`). Jede Zelle ist der Median der Tür-zu-Tür-Zeit über die
+ * eines Netzes entsteht `public/data/wegzeit/<netz>.json` (eine Tabelle je Netz, Plan 0039, E5). Zeilen sind die
+ * Haltbereiche in den Stadtgebieten der Regionen des Netzes (`Region.kreis`, Plan 0036, E5; ADR 0029) mit Einstieg im Fenster, Spalten die Orte (`placeKey`). Jede Zelle ist der Median der Tür-zu-Tür-Zeit über die
  * Abfahrtsminuten des Fensters, mit Warten am ersten Halt; den Fußweg zum Halt rechnet der Browser dazu.
- * Seit Plan 0012 (E4–E7, ADR 0015) mit höchstens einem Umstieg, Umstiegs-Bit und `public/data/linien.json`.
+ * Seit Plan 0012 (E4–E7, ADR 0015) mit höchstens einem Umstieg, Umstiegs-Bit und `public/data/linien/<netz>.json`.
  *
  * Rein: keine Dateien, kein Netz (dependency-cruiser `transit-build-pure`).
  */
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { placeKey } from "../../src/domain/place-key.ts";
-import { REGION_IDS, REGIONS } from "../../src/domain/regions.ts";
+import { type NetworkId, REGIONS, regionsOf } from "../../src/domain/regions.ts";
 import type { Timetable } from "../../src/domain/schema.ts";
 import {
   COORD_SCALE,
@@ -33,10 +33,12 @@ import {
 } from "./profile-csa.ts";
 
 /**
- * Zeilen nur für Haltbereiche dieser Kreise (Stadtgebiete der Regionen; Plan 0009, E5; Plan 0036, E5); das Netz zum
- * Rechnen ist der ganze Auszug.
+ * DHID-Präfixe `de:<kreis>:` der Regionen eines Netzes: Zeilen nur für Haltbereiche dieser Kreise (Stadtgebiete; Plan
+ * 0009, E5; Plan 0036, E5; je Netz seit Plan 0039, E5). Das Netz zum Rechnen ist der ganze Auszug.
  */
-const CITY_PREFIXES = REGION_IDS.map((r) => `de:${REGIONS[r].kreis}:`);
+export function cityPrefixes(network: NetworkId): string[] {
+  return regionsOf(network).map((r) => `de:${REGIONS[r].kreis}:`);
+}
 /** Abstand der Abfahrtsminuten */
 const STEP_SECONDS = 60;
 
@@ -58,15 +60,16 @@ export interface TableRow {
 }
 
 /**
- * Zeilen der Tabelle: Haltbereiche mit DHID-Präfix einer Region (`de:<kreis>:`) und mindestens einem Einstieg mit Abfahrt im
+ * Zeilen der Tabelle: Haltbereiche mit einem der `prefixes` (`cityPrefixes(netz)`) und mindestens einem Einstieg mit Abfahrt im
  * Fenster (Grenzen inklusiv), sortiert nach ID. Ein Bereich mit nur Ausstieg oder nur Endhalt bleibt draußen.
  */
-export function tableRows(timetable: Pick<Timetable, "stops" | "trips" | "window">): TableRow[] {
+export function tableRows(
+  timetable: Pick<Timetable, "stops" | "trips" | "window">,
+  prefixes: readonly string[],
+): TableRow[] {
   const from = clockSeconds(timetable.window.from);
   const to = clockSeconds(timetable.window.to);
-  const cityArea = timetable.stops.map(([id]) =>
-    CITY_PREFIXES.some((p) => id.startsWith(p)) ? areaId(id) : undefined,
-  );
+  const cityArea = timetable.stops.map(([id]) => (prefixes.some((p) => id.startsWith(p)) ? areaId(id) : undefined));
   const departs = new Set<string>();
   for (const trip of timetable.trips) {
     let acc = 0;
@@ -150,7 +153,7 @@ export function contentId(parts: readonly unknown[]): string {
 
 /** Zahlen zur Meldung und zum Gate in `build-data` (E7) */
 export interface TransitBuildStats {
-  /** verschiedene Anzeigenamen in `linien.json` */
+  /** verschiedene Anzeigenamen in `linien/<netz>.json` */
   lines: number;
   /** verschiedene Folgen in Zellen mit Linien */
   combos: number;
@@ -164,7 +167,7 @@ export interface TransitBuildStats {
 
 /**
  * Rechnet Tabelle und Linien (E4–E7). `places` sind die Orte der Angebote in `site.json`-Reihenfolge, Doppelte
- * zählen einmal. `egressMeters` und `penaltySeconds` dienen Tests und Vergleichen.
+ * zählen einmal; `prefixes` wählt die Zeilen (`tableRows`). `egressMeters` und `penaltySeconds` dienen Tests und Vergleichen.
  *
  * Je Zeile und Abfahrtsminute zählt die kleinste Bewertung über die Steige des Bereichs und den direkten Abgang
  * (bei Gleichstand der Abgang, dann die Reihenfolge der Steige). Die Zelle ist der Median der echten Zeit, die
@@ -173,13 +176,14 @@ export interface TransitBuildStats {
 export function buildTransitTables(
   timetable: Timetable,
   places: readonly GeoPoint[],
+  prefixes: readonly string[],
   opts: { egressMeters?: number; penaltySeconds?: number } = {},
 ): { table: TransitTableFile; lines: TransitLinesFile; stats: TransitBuildStats } {
   const egressMeters = opts.egressMeters ?? EGRESS_METERS;
   const penaltySeconds = opts.penaltySeconds ?? TRANSFER_PENALTY_SECONDS;
   const columns = new Map<string, GeoPoint>();
   for (const p of places) if (!columns.has(placeKey(p))) columns.set(placeKey(p), p);
-  const rows = tableRows(timetable);
+  const rows = tableRows(timetable, prefixes);
   const from = clockSeconds(timetable.window.from);
   const count = (clockSeconds(timetable.window.to) - from) / STEP_SECONDS;
   const net = buildNetwork(timetable, { from });
@@ -294,7 +298,7 @@ export function buildTransitTables(
 /**
  * Startpunkte ohne Haltbereich im Umkreis des Innen-Tests (`INSIDE_METERS`, 800 m; Plan 0012, E2). Für die
  * Stadtteile muss die Liste leer sein, sonst bekäme ein wählbarer Stadtteil nur die Luftlinie (Plan 0009,
- * Schritt 5; `build-data` prüft das).
+ * Schritt 5; `accessIssues` in `gates.ts` prüft das je Netz).
  */
 export function withoutAccess<T extends { point: GeoPoint }>(
   table: Pick<TransitTable, "lat" | "lon">,

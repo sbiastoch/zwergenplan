@@ -10,7 +10,19 @@ import {
   transitReach,
   walkMinutes,
 } from "../../src/domain/transit.ts";
-import { areaId, buildTransitTables, cellValue, contentId, encodeBytes, tableRows, withoutAccess } from "./table.ts";
+import {
+  areaId,
+  buildTransitTables,
+  cellValue,
+  cityPrefixes,
+  contentId,
+  encodeBytes,
+  tableRows,
+  withoutAccess,
+} from "./table.ts";
+
+/** Kreis-Präfixe der Regionen im Netz vgn (Nürnberg, Fürth) */
+const VGN = cityPrefixes("vgn");
 
 const fixture = timetableSchema("vgn").parse(
   JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/vgn.json", import.meta.url), "utf8")),
@@ -39,7 +51,7 @@ describe("areaId", () => {
 
 describe("tableRows", () => {
   it("macht nur Haltbereiche der Regionen mit Einstieg im Fenster zu Zeilen (Plan 0036, E5)", () => {
-    expect(tableRows(fixture).map((r) => r.id)).toEqual([
+    expect(tableRows(fixture, VGN).map((r) => r.id)).toEqual([
       "de:09563:9100",
       "de:09564:9001",
       "de:09564:9002",
@@ -65,12 +77,36 @@ describe("tableRows", () => {
       times: [32400, 0, 120, 0, 120, 0, 120, 0],
       flags: [3, 3, 3, 3],
     };
-    const rows = tableRows({ stops, trips: [trip], window: { from: "08:30", to: "10:30" } });
+    const rows = tableRows({ stops, trips: [trip], window: { from: "08:30", to: "10:30" } }, VGN);
     expect(rows.map((r) => r.id)).toEqual(["de:09563:2", "de:09564:1"]);
   });
 
+  it("nimmt nur die Präfixe des übergebenen Netzes (Plan 0039, E5)", () => {
+    const stops: [string, number, number][] = [
+      ["de:09564:1:1:1", 49.45, 11.07],
+      ["de:05111:2:1:1", 51.22, 6.78],
+      ["de:09563:3:1:1", 49.475, 10.988],
+    ];
+    const trip = {
+      route: "1",
+      mode: "bus" as const,
+      stops: [0, 1, 2],
+      times: [32400, 0, 120, 0, 120, 0],
+      flags: [3, 3, 3],
+    };
+    const timetable = { stops, trips: [trip], window: { from: "08:30", to: "10:30" } };
+    expect(tableRows(timetable, VGN).map((r) => r.id)).toEqual(["de:09564:1"]);
+    expect(tableRows(timetable, cityPrefixes("vrr")).map((r) => r.id)).toEqual(["de:05111:2"]);
+    expect(tableRows(timetable, []).map((r) => r.id)).toEqual([]);
+  });
+
+  it("leitet die Präfixe aus den Regionen des Netzes ab", () => {
+    expect(cityPrefixes("vgn")).toEqual(["de:09563:", "de:09564:"]);
+    expect(cityPrefixes("vrr")).toEqual(["de:05111:"]);
+  });
+
   it("legt die Zeile in den Mittelpunkt aller Steige des Bereichs", () => {
-    const row = tableRows(fixture).find((r) => r.id === "de:09564:9004");
+    const row = tableRows(fixture, VGN).find((r) => r.id === "de:09564:9004");
     expect(row?.steige).toHaveLength(2);
     expect(row?.lat).toBeCloseTo((49.4505 + 49.45) / 2, 10);
     expect(row?.lon).toBeCloseTo((11.08 + 11.0815) / 2, 10);
@@ -83,15 +119,15 @@ describe("tableRows", () => {
       stops: [...fixture.stops].reverse(),
       trips: fixture.trips.map((t) => ({ ...t, stops: t.stops.map((i) => n - 1 - i) })),
     };
-    expect(tableRows(reversed).map((r) => r.id)).toEqual(tableRows(fixture).map((r) => r.id));
+    expect(tableRows(reversed, VGN).map((r) => r.id)).toEqual(tableRows(fixture, VGN).map((r) => r.id));
   });
 
   it("zählt eine Abfahrt nur im Fenster", () => {
     // letzte Abfahrt mit Einstieg: B2 an 9007 um 12:30:00 (Grenze inklusiv)
-    expect(tableRows({ ...fixture, window: { from: "12:30", to: "13:00" } }).map((r) => r.id)).toEqual([
+    expect(tableRows({ ...fixture, window: { from: "12:30", to: "13:00" } }, VGN).map((r) => r.id)).toEqual([
       "de:09564:9007",
     ]);
-    expect(tableRows({ ...fixture, window: { from: "12:31", to: "13:00" } })).toEqual([]);
+    expect(tableRows({ ...fixture, window: { from: "12:31", to: "13:00" } }, VGN)).toEqual([]);
   });
 });
 
@@ -143,9 +179,9 @@ describe("contentId (Plan 0012, E6)", () => {
 });
 
 describe("buildTransitTables", () => {
-  const { table: built, lines, stats } = buildTransitTables(fixture, places);
+  const { table: built, lines, stats } = buildTransitTables(fixture, places, VGN);
   const decoded = decodeTransitTable(built, new Set(places.map(placeKey)));
-  const rowIds = tableRows(fixture).map((r) => r.id);
+  const rowIds = tableRows(fixture, VGN).map((r) => r.id);
   const bytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
   const raw = bytes(built.minutes);
   const first = bytes(lines.first);
@@ -174,13 +210,13 @@ describe("buildTransitTables", () => {
   });
 
   it("nimmt die Orte als placeKey in der Reihenfolge der ersten Nennung, ohne Doppelte", () => {
-    const again = buildTransitTables(fixture, [theater, beispielhof, theater, musikschule]).table;
+    const again = buildTransitTables(fixture, [theater, beispielhof, theater, musikschule], VGN).table;
     expect(again.places).toEqual([placeKey(theater), placeKey(beispielhof), placeKey(musikschule)]);
   });
 
   it("übersteht den Round-Trip durch decodeTransitTable", () => {
     expect(decoded).toBeDefined();
-    const rows = tableRows(fixture);
+    const rows = tableRows(fixture, VGN);
     expect(decoded?.lat.length).toBe(rows.length);
     rows.forEach((r, i) => {
       expect(decoded?.lat[i]).toBeCloseTo(r.lat, 4);
@@ -294,21 +330,21 @@ describe("buildTransitTables", () => {
   it("verlängert den Abgang auf Wunsch (Vergleich 800 gegen 1 000 m, Schritt 5)", () => {
     // Punkt 900 m südlich von 9007: zu Fuß ab 9007 nur mit 1 000 m Abgang, sonst über Bus 2 und 9008
     const far: GeoPoint = { lat: 49.4365 - 0.0081, lon: 11.085 };
-    const short = buildTransitTables(fixture, [far], { egressMeters: 800 }).table;
-    const long = buildTransitTables(fixture, [far], { egressMeters: 1000 }).table;
+    const short = buildTransitTables(fixture, [far], VGN, { egressMeters: 800 }).table;
+    const long = buildTransitTables(fixture, [far], VGN, { egressMeters: 1000 }).table;
     expect(short.minutes).not.toBe(long.minutes);
     expect(short.id).not.toBe(long.id);
   });
 
   it("ist deterministisch: zweimal bauen ergibt dieselben Bytes (L6)", () => {
-    const again = buildTransitTables(fixture, places);
+    const again = buildTransitTables(fixture, places, VGN);
     expect(JSON.stringify(again.table)).toBe(JSON.stringify(built));
     expect(JSON.stringify(again.lines)).toBe(JSON.stringify(lines));
   });
 
   it("ändert die Kennung, wenn sich nur die Linien ändern (Review 2, H1)", () => {
     const renamed = { ...fixture, trips: fixture.trips.map((t) => (t.route === "202E" ? { ...t, route: "203" } : t)) };
-    const other = buildTransitTables(renamed, places);
+    const other = buildTransitTables(renamed, places, VGN);
     expect(other.table.minutes).toBe(built.minutes);
     expect(other.table.id).not.toBe(built.id);
   });
@@ -316,7 +352,7 @@ describe("buildTransitTables", () => {
 
 describe("withoutAccess", () => {
   const table = (() => {
-    const file = buildTransitTables(fixture, places).table;
+    const file = buildTransitTables(fixture, places, VGN).table;
     const decoded = decodeTransitTable(file, new Set(places.map(placeKey)));
     if (!decoded) throw new Error("Fixture-Tabelle ungültig");
     return decoded;
