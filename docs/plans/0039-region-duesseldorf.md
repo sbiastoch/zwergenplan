@@ -503,3 +503,39 @@ Neuer `plan-reviewer` auf die überarbeitete Fassung. Keine Blocker; B1 trägt (
 - **M1 übernommen:** `switchCity` als gemeinsame Stelle für Onboarding und Kind-Sheet; Laden je Netz und Sitzung; `refresh` mit Pfad des Netzes; E2E (E8).
 - **M2 übernommen:** `GeoResult.municipality`, Cache `geocode-v2.json`, unbekannte Gemeinde wird verworfen, Tests (E2, Test 1).
 - **m3–m14 übernommen:** `pnpm build && pnpm size` statt Fixture-Build; Fixture-Netz mit mindestens einer Linienzelle; Willkommenszahl nach angetippter Kachel; Ortsangaben `ReachMode` und `map-data.ts`; ADR 0029, Punkt 3 als ersetzt; CKAN-Auswahl mit Dateiname und Inhaltsprüfung; README-Lizenzabschnitt; Laufzeit-Warnung je Netz; zusätzliche E2E-Specs in S9; Leerzustand für Karte, Kalender, Statuszeile; Privatsphäre-Begründung eingeschränkt; Startbudget-Entscheid vor S1.
+
+## Browser-Review lokal (2026-10-18)
+
+Fixture-Build (`dist-e2e/`, Stand d7a8fbd), Preview auf freiem Port. `node scripts/screenshots.ts <URL>` mit allen Ansichten (228 Bilder, sechs Viewports hell und dunkel, alle als Montage je Ansicht angesehen, Auffälliges einzeln) und ein Playwright-Skript für die Düsseldorf-Pfade auf `Pixel 7` (Chromium) und `iPhone 15` (WebKit), je hoch und quer, hell und dunkel, dazu 320 × 640 auf beiden Engines (100 Bilder). claude-in-chrome war nicht verbunden; die Interaktion lief ersatzweise im Skript. Bilder unter `e2e/.artifacts/screens/` und `e2e/.artifacts/screens/ddf/` (nicht versioniert).
+
+**Zusatzzeilen (S9)**
+
+- **Onboarding, drei Kacheln**: „Düsseldorf“, „Nürnberg“ (vorgewählt, `aria-pressed=true`, Haken), „Fürth“ auf beiden Geräten in allen acht Varianten; quer in einer Reihe, bei 320 px untereinander (273 × 59 px). Die Lead-Zahl wechselt beim Antippen von „8 … von 5 Anbietern“ auf „2 … von 1 Anbieter“ (`onb-stadt-*`, `onb-stadt-ddf-*`). Bei 360 und 365 px bricht „Düsseldorf“ mitten im Wort um, siehe Befunde.
+- **Weg mit Düsseldorf**: eine `optgroup` „Düsseldorf“ mit 50 Einträgen, keine Nürnberger Stadtteile. „Stadtmitte (Düsseldorf)“ gibt die Minuten-Chips frei, kein Hinweis „außerhalb“ (`onb-weg-ddf-*`, `onb-weg-stadtmitte-*`). Die geschlossene Auswahl kürzt auf Pixel und iPhone hoch auf „Stadtmitte (Düsseld…“, wie bei Fürth.
+- **Liste mit Düsseldorf**: nur „Krabbelgruppe am Rhein“ und „Rheinzwerge-Liederkonzert“, Statuszeile „2 Angebote ab heute · Wegzeit ab Stadtmitte (Düsseldorf)“, „10 Min.“ an den Karten (`liste-ddf-*`).
+- **Kind-Sheet, Abschnitt „Eure Stadt“**: steht über „Wegzeit ab“. Reihenfolge der Überschriften: Eure Stadt, Wegzeit ab, Darstellung, Als App. Optionen „Düsseldorf, Nürnberg, Fürth“, Schrift 17 px (≥ 16 px, kein iOS-Zoom). Der Hinweis hat bei 320 px drei Zeilen (59 px, Chromium) bzw. zwei Zeilen (WebKit), sonst zwei bzw. quer eine. Die Abstände entsprechen denen der übrigen Abschnitte (`kind-stadt-ddf-*`, `kind-*`).
+- **Netzwechsel bei offenem Sheet** (Nürnberg mit Gostenhof → Düsseldorf): Der Startpunkt ist weg („Noch kein Startpunkt – …“). Der Fokus bleibt auf „Stadt“. Die Lage der Auswahl ist unverändert (y gleich, Scroll des Sheets gleich, auch quer bei `sheet-scroll` 219 bzw. 243). Danach stehen 50 Düsseldorfer Stadtteile zur Wahl, nach „Fertig“ lautet die Statuszeile „2 Angebote ab heute“ (`kind-wechsel-vorher-*`, `kind-wechsel-nachher-*`).
+- **Quellenhinweis VRR**: Ohne geladene Tabelle (Tabelle per Route blockiert) steht „Fahrplan: VRR – Verkehrsverbund Rhein-Ruhr AöR, CC BY 4.0.“ mit beiden Links (`kind-vrr-fallback-pixel-*`). Mit geladener Fixture-Tabelle steht deren Quelle „Fiktiver Fahrplan Düsseldorf für Tests, CC0 1.0“. Die echte VRR-Zeile prüft `/browser-review live`.
+- **Merkliste mit Angebot des anderen Netzes**: Mit Düsseldorf zeigt „Offener Krabbeltreff“ „in Nürnberg“, „Krabbelgruppe am Rhein“ „10 Min.“. Mit Nürnberg zeigt „Krabbelgruppe am Rhein“ „in Düsseldorf“, der Krabbeltreff „15 Min.“ (`merkliste-ddf-*`, `merkliste-nbg-*`).
+- **Karte über Düsseldorf**: „2 Angebote an 1 Ort“, Mitte 51,219 / 6,796 auf dem Familienzentrum Rheinzwerge, nur dessen Marker (`karte-ddf-*`). Kartenmitte nach Nürnberg geschoben, dann „Kartenmitte als Startpunkt“: Toast „Die Kartenmitte liegt außerhalb von Düsseldorf.“ (`karte-toast-*`).
+- **Leerzustand** (`site.json` ohne `vrr` per Route): „In Düsseldorf haben wir noch keine Angebote. Wir suchen gerade danach.“, „0 Angebote ab heute“. Die Karte zeigt „0 Angebote an 0 Orten“ über dem Düsseldorfer Startausschnitt (`leer-liste-*`, `leer-karte-*`).
+- **Standort außerhalb** (Standort in Nürnberg, Stadt Düsseldorf): „Dein Standort liegt außerhalb von Düsseldorf. Wähle einen Stadtteil oder eine andere Stadt.“ Kein Startpunkt gesetzt (`standort-aussen-*`).
+- **Anbieter-Tab**: Mit Düsseldorf steht dort nur „Rheinzwerge Beispiel (fiktiv)“ („1 Anbieter mit 2 Angeboten“), mit Nürnberg stehen die sechs Nürnberger Zeilen ohne ihn (`anbieter-ddf-*`, `anbieter-nbg-*`).
+- **Konsole**: keine Fehler der App. Es gab nur Meldungen der Testumgebung: WebGL-„GPU stall“ (Chromium headless), „Image wood-pattern could not be loaded“ (Kachel-Mock-Stil, WebKit) und `net::ERR_FAILED` der absichtlich blockierten Tabelle.
+
+**Checkliste**
+
+- Lesbarkeit: Kacheln, „Eure Stadt“ und „Wegzeit ab“ sind klar gestaffelt, Kontrast hell und dunkel gut. „in Düsseldorf“/„in Nürnberg“ steht fett wie die Minuten, was, wann, wo bleibt in 2 s erfassbar. Ausnahme ist die Kachel bei 360/365 px (Befund 1).
+- Daumen-Erreichbarkeit: Kacheln und Stadt-Auswahl liegen im mittleren Bereich, „Weiter“/„Fertig“ unten, unverändert. Bei 320 px liegt die dritte Kachel unter der Falz; der Schritt scrollt, „Los geht's“ bleibt erreichbar (Befund 3).
+- Zustände: leer (eigener Leerzustand), außerhalb (Standort, Kartenmitte), anderes Netz in der Merkliste und lange Stadtteilnamen in der Auswahl brechen nicht. Abgeschnitten wird nur die geschlossene Auswahl „Stadtmitte (Düsseld…“ im Weg-Schritt; der volle Name steht in Statuszeile und Kind-Sheet.
+- Dark Mode: keine grellen Inseln. Gewählte Kachel und Auswahl in `--sel`, Fehlerkasten „außerhalb“ gedämpft rot.
+- Micro-Interactions: Die Kachel zeigt den gedrückten Zustand über `aria-pressed` (Füllung und Haken), die Auswahl hat einen sichtbaren Fokusring. Die Bilder mit `reduce` sind ohne Animation, der Toast erscheint ohne Sprung.
+- Konsistenz: Kacheln, Auswahlfeld, Leerzustand und Toast nutzen die vorhandenen Bausteine.
+
+**Befunde**
+
+1. **Mittel**: Auf 360 und 365 px (häufige Android-Breiten) bricht die Kachel „Düsseldorf“ mitten im Wort zweizeilig um, „Düsseldor“ / „f“ (`e2e/.artifacts/screens/onboarding-1-360-light.png`, `onboarding-1-365-*`, hell und dunkel). Ursache: `.onb-tiles` mit `minmax(min(100%, 9rem), 1fr)` legt zwei Spalten à etwa 150 px an, in die Punkt und Name nicht passen (`src/ui/onboarding/onboarding.css:269–281`). Auf 320 px (eine Spalte) und ab 390 px (iPhone, Pixel) passt der Name. Kein Blocker, sollte aber vor dem Push behoben werden.
+2. **Niedrig**: Statuszeile auf `Pixel 7` hoch dreizeilig, „(Düsseldorf)“ allein in Zeile 3 (`ddf/liste-ddf-pixel-hoch-light.png`), wie schon bei Fürth (Plan 0036).
+3. **Niedrig**: Onboarding bei 320 px: Die dritte Kachel „Fürth“ und „Los geht's“ liegen unter der Falz (`onboarding-1-320-*`). Mit zwei Kacheln war das knapp sichtbar; der Schritt scrollt.
+4. **Niedrig**: Nach dem Netzwechsel im Kind-Sheet verschwindet der Startpunkt unterhalb der Falz, ohne Hinweis im sichtbaren Bereich (`ddf/kind-wechsel-nachher-iphone-hoch-light.png`). Der Fokus bleibt richtig auf „Stadt“. Ein kurzer Text unter der Auswahl wäre eine Idee für `docs/ideas.md`.
+5. **Niedrig**: Der Fokusring der Stadt-Auswahl liegt fast an der Beschriftung „Stadt“ (`ddf/kind-wechsel-nachher-iphone-hoch-light.png`). Überschrift „Eure Stadt“ und Beschriftung „Stadt“ doppeln sich; so ist es im Mockup A entschieden.
