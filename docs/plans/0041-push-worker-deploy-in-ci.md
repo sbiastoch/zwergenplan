@@ -17,7 +17,7 @@ Nutzerentscheid (2026-10-18): Der Deploy des Workers gehört in die CI.
 
 ## Ziel
 
-Nach jedem grünen Lauf auf `main` läuft der Worker mit dem Code von `main`, einschließlich der gebündelten npm-Pakete. Deployt wird nur, wenn sich etwas geändert hat. Die Versionswarnung der Wochen-Nachricht bleibt als Rückfallprüfung.
+Nach jedem voll geprüften Deploy auf `main` läuft der Worker mit dem Code von `main`, einschließlich der gebündelten npm-Pakete. Deployt wird nur, wenn sich etwas geändert hat. Die Versionswarnung der Wochen-Nachricht bleibt als Rückfallprüfung.
 
 ## Änderung
 
@@ -64,13 +64,10 @@ Nach jedem grünen Lauf auf `main` läuft der Worker mit dem Code von `main`, ei
 ```yaml
   push-worker:
     name: Deploy (Push-Worker)
-    needs: [scope, gates, deploy]
-    # Auch auf dem Doku-Pfad (deploy übersprungen, full=false): Dann ist der Worker-Code gleich dem eines voll geprüften
-    # Commits, und ein vorher roter Worker-Deploy wird nicht von einem grünen Doku-Lauf überdeckt (Plan 0041, Review M2).
-    if: >-
-      ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-      && needs.gates.result == 'success'
-      && (needs.deploy.result == 'success' || (needs.deploy.result == 'skipped' && needs.scope.outputs.full == 'false')) }}
+    needs: [deploy]
+    # Nur nach einem voll geprüften Pages-Deploy, nie auf dem Doku-Pfad (Nutzerentscheid, Plan 0041). Ohne Statusfunktion
+    # gilt success(): deploy grün, also auch gates grün, und ein abgebrochener Lauf deployt nicht.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     environment:
@@ -96,17 +93,17 @@ Nach jedem grünen Lauf auf `main` läuft der Worker mit dem Code von `main`, ei
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 ```
 
-- **Wann**: auf `main` nach einem voll geprüften Pages-Deploy. Auf dem Doku-Pfad läuft der Job ebenfalls. Dann deployt er nur, wenn der Worker noch nicht dem Code entspricht, etwa nach einem vorher roten Job. Der Code entspricht dabei dem eines voll geprüften Commits, denn der Doku-Pfad greift nur, wenn seit dem live ausgelieferten Commit bloß Doku dazukam.
+- **Wann**: nur auf `main` nach einem voll geprüften Pages-Deploy. Auf dem Doku-Pfad wird `deploy` übersprungen, damit auch `push-worker` (Nutzerentscheid 2026-10-18). Die Regel aus ADR 0021, Nr. 9 („bei `full=false` … ohne Deploy“) gilt also ohne Ausnahme.
 - **Reihenfolge**: Die Concurrency `ci-${{ github.ref }}` auf Workflow-Ebene reiht die Läufe auf `main` nacheinander ein. Ein älterer Lauf deployt also nicht nach einem neueren.
-- **`!cancelled()` statt `always()`** (Review 2, m1), wie bei `gates`: Ein abgebrochener Lauf deployt nicht. Weil der Ausdruck mit `!` beginnt, steht er laut GitHub-Doku in `${{ }}`.
-- **Ausnahme vom Doku-Pfad** (Review 2, M1): ADR 0021, Nr. 9, und CLAUDE.md, Schritt 6, sagen „bei `full=false` … ohne Deploy“. `push-worker` ist eine benannte Ausnahme: Er liefert nur Code eines voll geprüften Commits aus. Kosten: Jeder Doku-Commit auf `main` fährt einen Job mit `pnpm install`, etwa 1 Minute, der fast immer „aktuell“ meldet.
+- **Keine Statusfunktion im `if`**: Ohne `always()`/`!cancelled()` gilt `success()`. Der Job läuft also nur, wenn `deploy` grün war, und nicht nach einem Abbruch.
+- **Folge**: Ist der Job rot und kommt danach nur Doku, bleibt der nächste Lauf grün, und der Worker bleibt alt, bis der nächste Code-Commit auf `main` ihn deployt. Das nehmen wir hin. Sichtbar bleibt es durch den roten Lauf selbst und die Warnung „Push-Worker läuft mit …“ in jedem Lauf der Wochen-Nachricht. Notfalls hilft `pnpm push:deploy` von Hand.
 - **Kein Gate für die Website**: Der Job läuft nach dem Pages-Deploy, ein Fehler bei Cloudflare hält die Website also nicht auf. Der Lauf wird aber rot. Das ist gewollt: „Fertig“ heißt laut CLAUDE.md CI grün, und ein Worker mit veraltetem Code soll auffallen statt nur zu warnen. `ci-gates.ts` bleibt unverändert.
 - **Secrets im Environment `push-worker`** (Review M3). Repository-Secrets stünden jedem Push-Lauf auf jedem Branch zur Verfügung, und ein Branch kann das `if:` in der YAML ändern. Das Environment `push-worker` bekommt deshalb die Deployment-Branch-Regel „nur `main`“. `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` werden dort als Environment-Secrets angelegt, nicht als Repository-Secrets. Jobs auf anderen Branches lehnt GitHub für dieses Environment ab.
 - **Token-Scope** (Review M5): Startpunkt ist die Cloudflare-Vorlage „Edit Cloudflare Workers“, beschränkt auf das eigene Konto und ohne Zonen. Vor dem ersten CI-Lauf wird der Token lokal geprüft (Ablauf, Schritt 1). Was er tatsächlich braucht, wird nach diesem Test hier festgehalten.
 
 ### E4 – Doku
 
-- ADR 0021: ein Nachtrag zu Nr. 9, „außer dem Job `push-worker`, der nur Code eines voll geprüften Commits ausliefert (Plan 0041)“. CLAUDE.md, Schritt 6, Doku-Pfad: dieselbe Ausnahme in einem Halbsatz (Review 2, M1).
+- ADR 0021 und CLAUDE.md bleiben unverändert.
 - ADR 0014: ein Nachtrag „Deploy aus der CI (Plan 0041)“ mit Environment, Token-Scope und Lockfile in den Quellen. In Punkt 2 heißt es statt „weil der Worker manuell deployt wird“ künftig „zur Kontrolle des Deploys“.
 - `docs/architecture.md`, Zeile `push-worker/`: „Deploy aus der CI (Job `push-worker`, nur bei geändertem Code inkl. `pnpm-lock.yaml`), von Hand weiter mit `pnpm push:deploy`“.
 - README, Abschnitt Push: Environment `push-worker` mit Branch-Regel, die beiden Secrets, Deploy aus der CI. `pnpm push:deploy` bleibt für den Notfall.
@@ -127,9 +124,9 @@ Nach jedem grünen Lauf auf `main` läuft der Worker mit dem Code von `main`, ei
     - `deploy` wirft → `fehler/deploy`.
     - `/version` bleibt alt → nach 12 Versuchen `fehler/version`, `sleep` 12-mal mit 5000 ms.
     - Die neue Version kommt beim dritten Versuch → `deployt`.
-- `scripts/lib/ci-scope.test.ts`, neuer Fall „push-worker: nur auf main, nach gates und deploy, auch auf dem Doku-Pfad“. Er liest `ci.yml`, schneidet den Job mit dem vorhandenen Helfer `job()` aus und normalisiert Leerraum (`replace(/\s+/g, " ")`), damit ein Umbruch im gefalteten `if:` den Abgleich nicht still bricht (Review 2, m2). Er prüft:
-  - `needs` ist `[scope, gates, deploy]`.
-  - `if` enthält `!cancelled()`, `refs/heads/main`, `!= 'pull_request'` und `needs.gates.result == 'success'`, die Bedingung für den Doku-Pfad wörtlich, und kein `always()`.
+- `scripts/lib/ci-scope.test.ts`, neuer Fall „push-worker: nur auf main, nach deploy, nie auf dem Doku-Pfad“. Er liest `ci.yml`, schneidet den Job mit dem vorhandenen Helfer `job()` aus und normalisiert Leerraum (`replace(/\s+/g, " ")`), damit ein Umbruch den Abgleich nicht still bricht (Review 2, m2). Er prüft:
+  - `needs` ist `[deploy]`.
+  - `if` enthält `refs/heads/main` und `!= 'pull_request'` und keine Statusfunktion (`always()`, `cancelled()`, `failure()`), damit der Job nie läuft, wenn `deploy` übersprungen wurde.
   - `environment.name` ist `push-worker`, und `fetch-depth` ist `0`.
   - Das Skript `scripts/push-worker-deploy.ts` wird aufgerufen.
   - `gates.needs` enthält `push-worker` nicht.
@@ -153,7 +150,7 @@ Nach jedem grünen Lauf auf `main` läuft der Worker mit dem Code von `main`, ei
 - **Token**: Er kann höchstens Worker des Kontos ändern. Erreichbar ist er nur über das Environment `push-worker`, also nur aus Läufen auf `main`, und nie aus Fork-PRs.
 - **Paralleles Deploy von Hand und aus der CI**: Es gewinnt der letzte; `/version` zeigt ihn. Die Gruppe `push-worker` serialisiert nur CI-Läufe.
 - **Ein `wrangler`-Update ändert das Deploy-Verhalten**: `wrangler` ist gepinnt (ADR 0014). Ein Update ändert das Lockfile und löst dadurch einen Deploy aus, den die CI beobachtet.
-- **Schiefer Stand bei rotem Job**: Website neu, Worker alt. Das bleibt sichtbar, denn der Lauf ist rot, der Push-Lauf warnt, und der nächste Lauf auf `main` versucht es erneut, auch auf dem Doku-Pfad.
+- **Schiefer Stand bei rotem Job**: Website neu, Worker alt. Sichtbar durch den roten Lauf und die Warnung im Push-Lauf. Der nächste Code-Commit auf `main` versucht es erneut, ein reiner Doku-Commit nicht.
 
 ## Review (2026-10-18) – Verdict: Überarbeiten (kein Blocker)
 
@@ -161,7 +158,7 @@ Runde 1.
 
 Übernommen:
 - **M1, npm-Pakete**: `pnpm-lock.yaml` in `WORKER_SOURCES`, dazu ein Test für npm-Importe (E1, Tests).
-- **M2, Doku-Pfad überdeckt roten Job**: Der Job läuft auch auf dem Doku-Pfad, die Bedingung steht im CI-Test (E3).
+- **M2, Doku-Pfad überdeckt roten Job**: abgelehnt nach Nutzerentscheid (2026-10-18): Der Job läuft nicht auf dem Doku-Pfad. Ein roter Job bleibt bis zum nächsten Code-Commit stehen und ist über den roten Lauf und die Warnung im Push-Lauf sichtbar (E3, „Folge“).
 - **M3, Secrets**: Environment `push-worker` mit Branch-Regel `main` statt Repository-Secrets (E3, Ablauf).
 - **M4, ungetesteter Ablauf**: `runWorkerDeploy` mit injizierten Abhängigkeiten, getestet als Tabelle (E1, Tests).
 - **M5, Token-Scope**: Vorlage „Edit Cloudflare Workers“, vorab lokal getestet, Ergebnis wird festgehalten (E3, Ablauf).
@@ -179,8 +176,8 @@ Abgelehnt: keine.
 Kein Blocker. Runde 1 ist tragfähig gelöst.
 
 Übernommen:
-- **M1, Ausnahme vom Doku-Pfad**: Nachtrag zu ADR 0021, Nr. 9, und ein Halbsatz in CLAUDE.md, Schritt 6. Die Kosten (etwa 1 Minute je Doku-Commit) sind in E3 genannt.
-- **m1**: `!cancelled()` statt `always()`.
+- **M1, Ausnahme vom Doku-Pfad**: entfällt, denn nach Nutzerentscheid läuft der Job nicht auf dem Doku-Pfad. ADR 0021 und CLAUDE.md bleiben unverändert.
+- **m1**: erledigt durch `success()` (keine Statusfunktion im `if`).
 - **m2**: Der CI-Test normalisiert Leerraum.
 - **m3**: Token und Environment werden in allen Workflows geprüft.
 - **m4**: `ROOT` kommt in `push-worker-git.ts` aus `import.meta.url`.
