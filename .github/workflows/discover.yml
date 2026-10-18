@@ -1,4 +1,5 @@
-# Entdecken neuer Anbieter (Plan 0032, E7), wöchentlich je Region aus REGION_IDS. Zwei Modi, Schalter für den
+# Entdecken neuer Anbieter (Plan 0032, E7), wöchentlich je Netz (Plan 0039, E11): Sonntag die Regionen des Netzes vgn,
+# Samstag die des Netzes vrr (`--netz`, Regionen aus regionsOf), damit Bremsen und Zeitbudget je Netz gelten. Zwei Modi, Schalter für den
 # Zeitplan ist die Repo-Variable ENTDECKEN_MODUS (leer = trocken):
 #
 #   trocken  `pnpm pipeline discover --dry-run`: alle Schritte echt (Websuche, Bewerten, Ertragsbeweis), Bericht
@@ -16,7 +17,9 @@ name: Entdecken
 
 on:
   schedule:
-    - cron: "30 4 * * 0" # Sonntag 04:30 UTC
+    # Zuordnung Cron → Netz im Schritt „Entdecken“ (github.event.schedule); beide Zeilen dort mitändern
+    - cron: "30 4 * * 0" # Sonntag 04:30 UTC: Netz vgn
+    - cron: "30 4 * * 6" # Samstag 04:30 UTC: Netz vrr
   workflow_dispatch:
     inputs:
       modus:
@@ -29,7 +32,10 @@ on:
         type: boolean
         default: false
       region:
-        description: "nur diese Region (leer = alle aus REGION_IDS)"
+        description: "nur diese Region (leer = alle aus REGION_IDS bzw. aus netz)"
+        default: ""
+      netz:
+        description: "nur die Regionen dieses Netzes (vgn | vrr; leer = alle; nicht zusammen mit region)"
         default: ""
       max_new:
         description: "G3 mit bootstrap: höchstens so viele neue Anbieter je Region"
@@ -119,6 +125,9 @@ jobs:
           MODUS: ${{ needs.modus.outputs.modus }}
           BOOTSTRAP: ${{ inputs.bootstrap }}
           REGION: ${{ inputs.region }}
+          NETZ: ${{ inputs.netz }}
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
           TERMS: ${{ inputs.terms }}
           MAX_NEW: ${{ inputs.max_new }}
           MAX_CALLS: ${{ inputs.max_calls }}
@@ -131,11 +140,20 @@ jobs:
           GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
           LEFTHOOK: "0"
         run: |
-          # Eingaben nur als Umgebung und gequotet; Region und Suchbegriffe prüft die CLI gegen ihre festen Listen
+          # Eingaben nur als Umgebung und gequotet; Region, Netz und Suchbegriffe prüft die CLI gegen ihre festen Listen
+          if [[ "$EVENT" == schedule ]]; then
+            case "$SCHEDULE" in
+              "30 4 * * 0") NETZ=vgn ;;
+              "30 4 * * 6") NETZ=vrr ;;
+              *) echo "::error::Cron ohne Netz: $SCHEDULE"; exit 1 ;;
+            esac
+          fi
+          if [[ -n "$NETZ" ]]; then echo "Netz: **$NETZ**" >> "$GITHUB_STEP_SUMMARY"; fi
           args=()
           [[ "$MODUS" == trocken ]] && args+=(--dry-run)
           [[ "$BOOTSTRAP" == true ]] && args+=(--bootstrap)
           [[ -n "$REGION" ]] && args+=(--region "$REGION")
+          [[ -n "$NETZ" ]] && args+=(--netz "$NETZ")
           [[ -n "$TERMS" ]] && args+=(--terms "$TERMS")
           pnpm pipeline discover "${args[@]}"
       - name: Commits sichern (live)
