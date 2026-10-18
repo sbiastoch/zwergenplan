@@ -22,6 +22,8 @@ import { runBuildOnly, runNightly } from "./nightly.ts";
 
 const FIXTURES = new URL("../../../tests/fixtures/", import.meta.url);
 const TODAY = "2026-10-06";
+/** eingefrorene Uhr passend zu TODAY: Übernahme-Grenze und generatedAt hängen nicht vom Tagesdatum ab */
+const NOW = () => "2026-10-06T03:00:00+02:00";
 const KEY_PARTS = { prompt: "Prompt", schema: "{}", model: "haiku" };
 
 const dirs: string[] = [];
@@ -123,6 +125,7 @@ const options = (dirsOf: ReturnType<typeof tempData>, extractor: Extractor) => (
   keyParts: KEY_PARTS,
   budgetMin: 50,
   today: TODAY,
+  now: NOW,
   concurrency: 1,
   fetch: fakeFetch(),
   freeDays: async () => ({}),
@@ -354,7 +357,7 @@ describe("runBuildOnly (nightly --build-only, Arch-Review S5, M1)", () => {
     const catalog = readCatalog(catalogFile);
     expect(validateDataset(catalog, before).ok).toBe(false);
 
-    const r = await runBuildOnly({ dataDir: dirsOf.dataDir, today: TODAY, freeDays: async () => ({}) });
+    const r = await runBuildOnly({ dataDir: dirsOf.dataDir, today: TODAY, now: NOW, freeDays: async () => ({}) });
     expect(r.removed).toEqual(["theater-beispiel"]);
     expect(r.build.errors).toEqual([]);
     expect(r.build.written).toBe(join(dirsOf.dataDir, "offers.json"));

@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
-import { addMonths, toBerlinIso } from "../../../src/domain/time.ts";
+import { addMonths } from "../../../src/domain/time.ts";
 import { type BuildInput, batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
 import { isSource } from "../lib/candidate.ts";
 import {
@@ -50,6 +50,8 @@ export interface NightlyOptions {
   dryRun?: boolean;
   /** YYYY-MM-DD, Europe/Berlin */
   today: string;
+  /** „Jetzt“ als ISO mit Offset (Abrufzeit, generatedAt, Übernahme-Grenze); hineingegeben, damit Tests deterministisch sind */
+  now: () => string;
   concurrency?: number;
   /**
    * Nach einem Einbruch ein zweiter Versuch mit dem Fallback-Modell (Plan 0032, „Einbruch → …“); nur sinnvoll, wenn es
@@ -77,7 +79,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   // erst hier geladen: fetch-inputs zieht Playwright nach, das Tests mit Fake-Abruf nicht brauchen
   const fetchAll = o.fetch ?? (await import("./fetch-inputs.ts")).fetchInputs;
   const fetched = await fetchAll(plan, catalog, o.today);
-  const fetchedAt = toBerlinIso(new Date());
+  const fetchedAt = o.now();
   const inputDir = join(o.runDir, "fetch");
   mkdirSync(inputDir, { recursive: true });
   for (const [id, text] of Object.entries(fetched.texts)) writeFileSync(join(inputDir, `${id}.txt`), `${text}\n`);
@@ -185,6 +187,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     catalog,
     previous,
     today: o.today,
+    now: o.now,
     sources,
     ...(o.dryRun ? { dryRun: { overlayDir: outDir, target: join(o.runDir, "offers.json") } } : {}),
     ...(o.freeDays ? { freeDays: o.freeDays } : {}),
@@ -226,6 +229,7 @@ async function buildFromRaw(o: {
   catalog: readonly Provider[];
   previous: OffersFile | undefined;
   today: string;
+  now: () => string;
   sources: BuildInput["sources"];
   /** Trockenlauf: Zustand dieses Laufs aus `overlayDir` überlagert data/raw, offers.json nach `target` */
   dryRun?: { overlayDir: string; target: string };
@@ -252,7 +256,7 @@ async function buildFromRaw(o: {
     previous: o.previous,
     freeDays,
     horizon,
-    generatedAt: toBerlinIso(new Date()),
+    generatedAt: o.now(),
     sources: o.sources,
     perProviderStatus: true,
     extracted,
@@ -284,6 +288,7 @@ async function buildFromRaw(o: {
 export async function runBuildOnly(o: {
   dataDir: string;
   today: string;
+  now: () => string;
   freeDays?: typeof loadFreeDays;
 }): Promise<{ removed: string[]; build: NightlyReport["build"] }> {
   return buildFromRaw({
@@ -291,6 +296,7 @@ export async function runBuildOnly(o: {
     catalog: readCatalog(join(o.dataDir, "providers.yaml")),
     previous: readPreviousOffers(join(o.dataDir, "offers.json")),
     today: o.today,
+    now: o.now,
     // ohne Abruf kein Status der Sammelkalender; mit Zustand je Anbieter wirkt er ohnehin nicht (build-offers)
     sources: {},
     ...(o.freeDays ? { freeDays: o.freeDays } : {}),

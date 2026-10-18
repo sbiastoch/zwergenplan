@@ -58,7 +58,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
-import { berlinDate, berlinIsoDate, formatGermanDate } from "../../src/domain/time.ts";
+import { berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
 import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
 import { commitNewProvider, commitRunState, GateError, publishDiscover } from "./io/discover-git.ts";
 import {
@@ -276,6 +276,7 @@ async function nightly() {
     dataDir: join(ROOT, "data"),
     runDir,
     today: date,
+    now: () => toBerlinIso(new Date()),
     dryRun,
     ...(only ? { only } : {}),
   });
@@ -296,7 +297,7 @@ async function nightly() {
 
 /** Neubau ohne Modell nach einer Rücknahme (Arch-Review S5, M1); rot, wenn der Build scheitert. */
 async function buildOnly(date: string) {
-  const r = await runBuildOnly({ dataDir: join(ROOT, "data"), today: date });
+  const r = await runBuildOnly({ dataDir: join(ROOT, "data"), today: date, now: () => toBerlinIso(new Date()) });
   if (r.removed.length > 0) print(`Zustand entfernt (nicht mehr im Katalog): ${r.removed.join(", ")}`);
   print(`Angebote: ${r.build.offers}, Termine: ${r.build.sessions}`);
   if (!r.build.written) fail(`Build abgebrochen, nichts geschrieben:\n  ${r.build.errors.join("\n  ")}`);
