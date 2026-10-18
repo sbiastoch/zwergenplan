@@ -7,12 +7,12 @@ description: Datenpflege des Zwergenplans – Berichte von Nachtlauf und Entdeck
 
 Die Daten aktualisieren sich selbst (Plan 0032, ADR 0026):
 
-- **Nachtlauf** (`.github/workflows/nightly.yml`, täglich): ruft alle Seiten des Katalogs ab, extrahiert geänderte Anbieter mit dem Modell und schreibt `data/raw/<id>.json`, `data/offers.json` und `data/kosten.csv` auf `main`.
-- **Entdecken** (`.github/workflows/discover.yml`, sonntags): sucht neue Anbieter je Region und nimmt einen auf, wenn er mindestens ein Angebot für 0–3 Jahre liefert. Es schreibt `data/providers.yaml` (nur neue Einträge), `data/raw/<id>.json` und `data/discover/<region>.json`. Im Modus `trocken` (Repo-Variable `ENTDECKEN_MODUS` leer) steht das Ergebnis nur im Bericht.
+- **Nachtlauf** (`.github/workflows/nightly.yml`, täglich): ruft alle Seiten des Katalogs ab, extrahiert geänderte Anbieter mit dem Modell und schreibt `data/raw/<id>.json`, `data/offers.json` und `data/kosten.csv` auf `main`. Ein Lauf für alle Regionen; Schulferien und Feiertage nimmt er je Netz (VGN: Bayern, VRR: NRW, ADR 0032).
+- **Entdecken** (`.github/workflows/discover.yml`, je Netz ein Lauf: sonntags `--netz vgn` für Fürth und Nürnberg, samstags `--netz vrr` für Düsseldorf): sucht neue Anbieter je Region und nimmt einen auf, wenn er mindestens ein Angebot für 0–3 Jahre liefert. Es schreibt `data/providers.yaml` (nur neue Einträge), `data/raw/<id>.json` und `data/discover/<region>.json`. Im Modus `trocken` (Repo-Variable `ENTDECKEN_MODUS` leer) steht das Ergebnis nur im Bericht.
 
 Dieser Skill ist der **Wartungsleitfaden** dafür. Er ruft dieselben Befehle wie die Workflows; Übersicht im Kopf von `scripts/pipeline/cli.ts` und `scripts/pipeline/eval.ts`. `data/offers.json`, `data/raw/` und `data/discover/` werden nie von Hand bearbeitet, mit einer Ausnahme: `abgelehnt` in `data/discover/<region>.json`. Der Datenvertrag ist `src/domain/schema.ts` (Katalog exportiert nach `schema/providers.schema.json`).
 
-Läufe mit Modell kosten Geld bzw. Abo-Kontingent. Lokal nutzen sie den Login des Entwicklers (`io/llm.ts`). Vor einem Lauf ohne `--only` oder `--terms` kurz sagen, was er etwa kostet (Nachtlauf voll ≈ $0,60, Entdecken voll ≈ $0,80–1,00).
+Läufe mit Modell kosten Geld bzw. Abo-Kontingent. Lokal nutzen sie den Login des Entwicklers (`io/llm.ts`). Vor einem Lauf ohne `--only` oder `--terms` kurz sagen, was er etwa kostet (Nachtlauf voll ≈ $0,60, Entdecken voll ≈ $0,80–1,00 für das Netz `vgn` mit zwei Regionen, ≈ $0,40–0,50 für `vrr`).
 
 ## 1. Bericht sichten
 
@@ -23,7 +23,7 @@ gh run download <id> -n <artefakt>       # runs/<datum>/ mit nightly.json, statu
 pnpm pipeline status runs/<datum>        # Bericht aus einem heruntergeladenen oder lokalen Lauf
 ```
 
-Entdecken genauso mit `--workflow discover.yml`. Nach einem Lauf im Modus `live` mit neuen Anbietern gibt es genau ein Issue „Neue Anbieter <datum>“ mit Commit-Links und Fund-URLs (`gh issue list --search "Neue Anbieter"`).
+Entdecken genauso mit `--workflow discover.yml`; es gibt zwei Läufe je Woche (Samstag `vrr`, Sonntag `vgn`), also beide sichten. Von Hand nur ein Netz: `gh workflow run discover.yml -f netz=vrr` (oder `-f region=<id>`, nicht beides), lokal `pnpm pipeline discover --netz vrr --dry-run`. Nach einem Lauf im Modus `live` mit neuen Anbietern gibt es genau ein Issue „Neue Anbieter <datum>“ mit Commit-Links und Fund-URLs (`gh issue list --search "Neue Anbieter"`).
 
 Worauf achten:
 - **Ampel rot**: Gates, Push, Build, Abbruch (`auth`, `limit`), Bremse, Zeitbudget, mehr als 20 % der Anbieter mit Fehler oder Live-Stand ab 20 Std. hinter `main` (Plan 0032, „Stufe 3 – Umsetzung“). Ein Abbruch oder eine Bremse lässt nur Anbieter offen; die nächste Nacht holt sie nach.
@@ -102,16 +102,31 @@ Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `e
 
 ## 6. Region starten
 
-Eine neue Region ist ein eigener Plan (Muster: Plan 0036 Fürth, ADR 0029). Code-Teil: Eintrag in `src/domain/regions.ts` mit bbox (in `NUERNBERG_BBOX`), Einwohnern mit Quelle, `kreis` (Startgebiet der Wegzeit) und Platz in `REGION_IDS` (spezifischere Region vor der umfassenden, denn in dieser Reihenfolge läuft das Entdecken); Stadtteile in `src/domain/districts.ts` (jeder braucht einen Zugangshalt, `pnpm data:build` prüft das); Texte. Außerhalb Bayerns oder des VGN zusätzlich Ferien und Fahrplan (`docs/ideas.md`). Steht sie in `REGION_IDS`, füllt das Entdecken ihren Katalog:
+Eine neue Region ist ein eigener Plan (Muster: Plan 0036 Fürth im bestehenden Netz, ADR 0029; Plan 0039 Düsseldorf in einem neuen Netz, ADR 0032). Zuerst klären, zu welchem **Netz** (Verkehrsverbund in einem Bundesland, `NETWORKS` in `src/domain/regions.ts`) sie gehört.
+
+**Region in einem bestehenden Netz** (etwa Erlangen im VGN):
+- Eintrag in `src/domain/regions.ts`: bbox (in der bbox des Netzes), Einwohner mit Quelle und Stichtag, `kreis` (Startgebiet der Wegzeit), `network` und Platz in `REGION_IDS` (spezifischere Region vor der umfassenden, denn in dieser Reihenfolge läuft das Entdecken). `municipality` nur, wenn das Rechteck Nachbarstädte enthält, die nicht dazugehören sollen (Gemeinde-Prüfung beim Aufnehmen, wie Düsseldorf).
+- Stadtteile in `src/domain/districts.ts`: jeder braucht einen Haltbereich seines Netzes in 800 m mit Einstieg im Fenster (`pnpm data:build` prüft das, `scripts/transit/gates.ts`); Namen über alle Regionen eindeutig.
+- Texte; der Sonntags- bzw. Samstagslauf des Netzes nimmt die Region mit (`regionsOf`).
+
+**Region in einem neuen Netz** zusätzlich:
+- Netz-Eintrag in `NETWORK_IDS` und `NETWORKS`: `area` (Wendung nach „außerhalb“), `bbox` (Stadt plus Rand; Gültigkeitsbereich der Startpunkte und Zuschnitt des Auszugs; darf keine andere Netz-bbox berühren), `home` (Kartenmitte ohne Orte), `holidays` (ISO-Code des Bundeslands, für OpenHolidays) und `transitSource` (Namensnennung und Lizenz des Feeds).
+- Feed in `FEEDS` (`scripts/pipeline/lib/gtfs.ts`): Ort (feste URL oder CKAN-Datensatz), `modes` für jeden `route_type` des Feeds (ein unbekannter bricht ab), Bedarfsverkehr, `source` mit Lizenz und Hinweis „abgewandelt“. Lizenz und verlangte Namensnennung vorher nachlesen; README-Abschnitt „Datenquellen“ ergänzen.
+- `pnpm pipeline oepnv --netz <netz>` schreibt `data/oepnv/<netz>.json` (Größe, Steige, Fahrten, Laufzeit und Speicher in den Plan). Budgets `Wegzeit-Daten <netz>` und `Linien-Daten <netz>` in `.size-limit.json`.
+- Zweiter Cron in `.github/workflows/discover.yml` an einem eigenen Tag mit `--netz <netz>` (Bremsen und Zeitbudget gelten je Lauf).
+
+Steht sie in `REGION_IDS`, füllt das Entdecken ihren Katalog:
 
 ```
 pnpm pipeline discover --region <id> --bootstrap --dry-run          # lokal, Bericht unter runs/<heute>/discover/
 gh workflow run discover.yml -f region=<id> -f bootstrap=true -f modus=trocken
 ```
 
-`--bootstrap` hebt G3 auf `MAX_NEW` (Standard 30, Eingabe `max_new`); die Bremsen setzen `max_calls` und `max_tokens`. Erst nach Abnahme des Trockenlaufs durch den Nutzer mit `-f modus=live`. Neue Anbieter landen erst mit dem nächsten Nachtlauf in `data/offers.json`; danach also `gh workflow run nightly.yml -f modus=live`.
+`--bootstrap` hebt G3 auf `MAX_NEW` (Standard 30, Eingabe `max_new`); die Bremsen setzen `max_calls` und `max_tokens`. Erst nach Abnahme des Trockenlaufs durch den Nutzer mit `-f modus=live`. Neue Anbieter landen erst mit dem nächsten Nachtlauf in `data/offers.json`; danach also `gh workflow run nightly.yml -f modus=live`. In einem neuen Netz bekommen die Linien-Gates erst mit Orten etwas zu prüfen; `MAX_WITHOUT_LINES` danach für das Netz nachmessen.
 
-Regionen überlappen (Fürth liegt in der Nürnberger bbox). Ein neuer Anbieter gehört zur Region des Laufs, der ihn aufnimmt. Hat er beim Aufnehmen einen Ort außerhalb der bbox seiner Region verloren (Hinweis im Commit-Text), `region` auf die umfassende Region setzen (etwa `nuernberg`; `region` ist keine ID) und den Ort von Hand ergänzen. Dazu an den Terminseiten den `hint` „Nur Termine an …; Termine an … weglassen (außerhalb der Region)“ entfernen bzw. anpassen, sonst lässt der Extraktor die Termine am ergänzten Ort weiter weg.
+Regionen eines Netzes dürfen überlappen (Fürth liegt in der Nürnberger bbox). Ein neuer Anbieter gehört zur Region des Laufs, der ihn aufnimmt. Hat er beim Aufnehmen einen Ort außerhalb der bbox seiner Region verloren (Hinweis im Commit-Text), `region` auf die umfassende Region setzen (etwa `nuernberg`; `region` ist keine ID) und den Ort von Hand ergänzen. Dazu an den Terminseiten den `hint` „Nur Termine an …; Termine an … weglassen (außerhalb der Region)“ entfernen bzw. anpassen, sonst lässt der Extraktor die Termine am ergänzten Ort weiter weg.
+
+**Gemeinde-Prüfung** (Regionen mit `municipality`, heute Düsseldorf): Das Entdecken verwirft auch Orte in der bbox, deren Gemeinde laut Geocoding eine andere ist („andere Gemeinde (Neuss)“) oder fehlt („Gemeinde unbekannt“). Das Schema prüft nur die bbox: Einen Ort von Hand nur eintragen, wenn er wirklich in der Stadt liegt (`pnpm pipeline geocode "<Adresse>"` zeigt die Gemeinde). Ein Anbieter aus einer Nachbarstadt gehört nicht in die Region, auch wenn er im Rechteck liegt.
 
 ## 7. Fahrplan erneuern
 
@@ -119,7 +134,7 @@ Regionen überlappen (Fürth liegt in der Nürnberger bbox). Ein neuer Anbieter 
 pnpm pipeline oepnv
 ```
 
-fragt je Netz (VGN, VRR; nur eins mit `--netz vgn` bzw. `--netz vrr`) mit bedingtem `GET` nach einem neuen GTFS-Feed (Cache unter `~/.cache/zwergenplan/gtfs/<netz>/`, Plan 0009, Plan 0039). Den VRR-Feed sucht er über die CKAN-API von opendata-oepnv.de (jüngste `google_transit.zip`). Unverändert meldet er „Fahrplan aktuell“; neu schreibt er `data/oepnv/<netz>.json`, den man dann normal committet und pusht. Der Nachtlauf erneuert den Fahrplan nicht (ADR 0026 lässt ADR 0011 Nr. 4 unverändert). Anlass ist die Warnung von `pnpm data:validate`, der Auszug sei abgelaufen oder ein Fahrplanwechsel stehe an.
+fragt je Netz (VGN, VRR; nur eins mit `--netz vgn` bzw. `--netz vrr`) mit bedingtem `GET` nach einem neuen GTFS-Feed (Cache unter `~/.cache/zwergenplan/gtfs/<netz>/`, Plan 0009, Plan 0039). Den VRR-Feed sucht er über die CKAN-API von opendata-oepnv.de (jüngste `google_transit.zip`; monatliche „Beta“-Ausgabe, ein fehlender Monat schadet nicht, solange der Auszug gültig ist). Der VRR-Auszug braucht lokal etwa 17 s und bis 1,9 GB Speicher. Den Referenztag wählt er mit den Ferien des Netzes. Unverändert meldet er „Fahrplan aktuell“; neu schreibt er `data/oepnv/<netz>.json`, den man dann normal committet und pusht. Der Nachtlauf erneuert den Fahrplan nicht (ADR 0026 lässt ADR 0011 Nr. 4 unverändert). Anlass ist die Warnung von `pnpm data:validate`, der Auszug sei abgelaufen oder ein Fahrplanwechsel stehe an.
 
 ## 8. Vom Abo auf die API umsteigen
 

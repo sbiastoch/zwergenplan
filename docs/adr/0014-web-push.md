@@ -7,6 +7,8 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
 - Ändert die Invarianten „Privatsphäre“, „Startpunkt“ und „Kein Request hängt davon ab, welcher Startpunkt gilt“ in `docs/architecture.md`.
 - Details stehen in Plan 0017 (ersetzt Stufe 2 von Plan 0011) und für Übernommenes in Plan 0011 (E8, E10–E12).
 
+**Geändert durch ADR 0032 (Plan 0039):** Punkt 4: Die gewählte Stadt liegt bei eingeschaltetem Push zusätzlich im IndexedDB-Spiegel. Der Service Worker liest zuerst die Stadt und lädt dann je genau einmal `data/site.json` und die Tabelle des gespiegelten Netzes (`data/wegzeit/<netz>.json`, ohne Wert `vgn`) statt `data/wegzeit.json`; er zählt nur Angebote dieses Netzes, `seenIds` über alle. Die URL ist damit nicht mehr für alle gleich, sondern je Netz (bewusste Ausnahme, ADR 0032, Punkt 5).
+
 ## Kontext
 
 - Neue Angebote kommen mit jedem Pipeline-Lauf. Wer die Seite nicht öffnet, erfährt nichts davon.

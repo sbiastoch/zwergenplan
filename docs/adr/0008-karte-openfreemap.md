@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-04), umgesetzt mit Plan 0005. Ergänzt ADR 0001 (Stack), ADR 0005 (Fallback ohne GPS) und die Privatsphäre-Invariante in `docs/architecture.md`. Details in Plan 0005, der Startpunkt selbst in Plan 0004.
 
+**Geändert durch ADR 0032 (Plan 0039):** Kamera-Regel: Der Startausschnitt liegt über die kommenden Orte des gewählten Netzes (gespeicherte Stadt, `zwergenplan.stadt`), ohne Orte auf `home` des Netzes (`NETWORKS` in `src/domain/regions.ts`, statt `HOME` in `camera.ts`). Er hängt damit an einem von zwei Gebieten, sonst weiter an nichts Gespeichertem.
+
 ## Kontext
 
 Plan 0005 bringt eine Karte der Orte. Kartenkacheln braucht es dafür so oder so: von einem Drittanbieter oder selbst gehostet. Die Invariante „keine Drittanbieter-Requests“ kündigt für OpenFreeMap schon eine Ausnahme an. Diese ADR legt fest, welcher Weg es wird, was an den Kachel-Host geht und was nie, und wie die Tests das absichern.

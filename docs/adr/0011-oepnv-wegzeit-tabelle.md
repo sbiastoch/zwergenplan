@@ -10,6 +10,8 @@ Status: angenommen (2026-10-05), Umsetzung mit Plan 0009. Ersetzt Teile von ADR 
 
 **Geändert durch ADR 0029 (Plan 0036):** Punkt 2 und 9: Zeilen und Startgebiet sind die Stadtgebiete aller Regionen (`Region.kreis`, heute Nürnberg `de:09564:` und Fürth `de:09563:`), nicht nur Nürnberg.
 
+**Geändert durch ADR 0032 (Plan 0039):** Punkt 4: ein Auszug je Netz (`data/oepnv/<netz>.json`, `vgn` und `vrr`, `pnpm pipeline oepnv [--netz …]`) und eine Tabelle je Netz (`data/wegzeit/<netz>.json`, `data/linien/<netz>.json`). Punkt 2 und 9: Startgebiet sind die Stadtgebiete der Regionen **des Netzes** (ersetzt die Fassung aus ADR 0029). Punkt 5 ergänzt: VRR unter CC BY 4.0 mit Hinweis „abgewandelt“. Punkt 6: Der Pfad der Tabelle hängt am gewählten Netz (bewusste Ausnahme, eins von zwei Gebieten); neuer Anlass „Netz gewechselt bei offenem Kind-Sheet“.
+
 ## Kontext
 
 ADR 0005 legte fest, dass die Wegzeit aus einer statischen GTFS-Matrix entsteht: ~150 Halte U-Bahn, S-Bahn und Tram, `Venue.nearestStops`, Fahrzeit ohne Umsteige-Wartezeit. Plan 0009 hat das am VGN-Feed nachgemessen (Stand 24.06.2026, gültig bis 12.12.2026, 15,3 MB):

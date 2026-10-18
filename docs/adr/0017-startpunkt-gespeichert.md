@@ -6,6 +6,8 @@ Status: angenommen (2026-10-06), umgesetzt mit Plan 0016. Nutzerentscheidung vom
 - Ändert ADR 0011, Punkt 6, Spiegelstriche 1 und 3 (Laden beim Start und das verratene Bit: „ein Startpunkt“ statt „ein Stadtteil“).
 - Die Kamera-Regel (ADR 0008) und „kein Request ab der Wahl“ (ADR 0011, Punkt 6, Spiegelstrich 2) bleiben unverändert.
 
+**Geändert durch ADR 0032 (Plan 0039):** Punkt 4: Beim Start lädt höchstens die Tabelle des gewählten Netzes (Pfad je Netz, verrät eins von zwei Gebieten). Punkt 5: Geprüft wird gegen die bbox des gewählten Netzes (`NETWORKS[netz].bbox`) statt gegen `NUERNBERG_BBOX`; ein Punkt oder Stadtteil außerhalb gilt nicht, und ein Netzwechsel löscht ihn.
+
 ## Kontext
 
 Bisher wird nur die ID eines Stadtteils gespeichert. „Mein Standort“ und „Kartenmitte“ sind nach jedem Neuladen weg. Begründet war das in Plan 0004 so: Eine Koordinate ist praktisch die Wohnadresse, und der `localStorage` bleibt unbegrenzt liegen.

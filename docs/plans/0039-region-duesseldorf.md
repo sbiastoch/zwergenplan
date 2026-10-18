@@ -1,6 +1,6 @@
 # Plan 0039 – Region Düsseldorf: zweites Netz außerhalb von Bayern und VGN
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-18
 Bezug:
 - ADR 0025 (Katalog regionsfähig; Punkt 1 „Weitere Region-Felder (Ferienland, ÖPNV, Kamera) kommen mit der zweiten Region“), ADR 0029 (Fürth; Punkt 1 „jede Region-bbox liegt in `NUERNBERG_BBOX`“, Punkt 5 „Stadtwahl bleibt ungespeichert“)
@@ -447,6 +447,34 @@ Arbeit direkt auf `main` im Haupt-Checkout, kleine Commits, jeder Schritt erst f
 - **Leere Düsseldorf-Kachel** zwischen Push und Bootstrap/Nachtlauf (Stunden). Bei einem schwachen Trockenlauf (weniger als fünf Anbieter) fragt S10 den Nutzer, ob die Kachel trotzdem live geht.
 - **Kosten Entdecken** steigen um den Samstagslauf (E11).
 - **Nachbarstädte in der bbox** (E2): Neuss, Ratingen, Hilden, Erkrath und Meerbusch-Büderich liegen im Rechteck. Das Entdecken verwirft sie über `municipality`; ein Fehler des Geocodings (falsche oder fehlende Gemeinde) ließe einen Ort durch oder fiele weg. Der Trockenlauf zeigt beides; Abhilfe ist `abgelehnt` bzw. Katalogpflege.
+
+## Umsetzung (2026-10-18)
+
+Stand nach S1–S4, S6a und S8 (Branch `plan-0039`, lokal, nicht gepusht); S6b (Onboarding-Kacheln, Auswahlfeld „Stadt“ im Kind-Sheet nach Mockup A, Texte, Leerzustand, Datenschutz-Text) läuft parallel. Doku aus S9 mit ADR 0032 (`docs/adr/0032-netze-region-duesseldorf.md`). Wo der Code vom Plan abweicht, gilt der Code; die Abweichungen stehen unten.
+
+### Messwerte
+
+- **S1:** 50 Düsseldorfer Stadtteile (die 49 OSM-`suburb`-Punkte der Tabelle in E13 plus Hubbelrath, siehe Abweichungen), zusammen 103 mit den 53 aus Nürnberg und Fürth. `schema:export` für das Enum `region`.
+- **S3:** `data/oepnv/vrr.json` aus „VRR-Soll-Daten vom 15.10.2026“ (gültig 01.09.2026–28.02.2027), Referenztag **Di 03.11.2026** (NRW-Ferien), 4 574 Steige, 4 605 Fahrten, **1 528 kB roh, 289,8 kB gzip**; Laufzeit 17,2 s, Spitze **1,86 GB RSS**. Mehr als die 2 562 Steige und ≈ 1,02 MB der Ausgangslage, weil der Auszug auf `VRR_BBOX` (Stadt plus etwa 3 km Rand) zuschneidet, nicht auf die Stadt-bbox; ebenso liegt der Speicher über den gemessenen ≈ 1,4 GB. `data/oepnv/fahrplan.json` ist per `git mv` jetzt `data/oepnv/vgn.json`.
+- **S4:** echter Build: `vgn` 747 Zeilen × 82 Orte, **60 688 B gzip** (wie vorher); `vrr` 609 Zeilen × 0 Orte mit der Warnung „Netz vrr ohne Orte – Linien-Gates übersprungen“. Zugangshalt-Gate für alle 53 VGN- und 50 Düsseldorfer Stadtteile grün.
+- **S6a:** `pnpm build && pnpm size`: `JS (initial)` vor S6a 102,59 kB, nach S6a **103,22 kB** von 104 kB; Service Worker **10,02 kB** (Budget nach Nutzerentscheid 10,5 kB); `site.json` **113,38 kB gzip** von 250 kB (echte Daten, noch ohne Düsseldorfer Anbieter). Nachtrag in ADR 0012.
+- **S8:** `pnpm eval` mit Haiku auf den Prompt mit `{region}` (Hash `0e9f8910c248`): **11 von 12 Fällen**, $0,33, 2 016 s; `die-familienbox` brach mit „Ausgabe abgeschnitten“ ab (im Nachtlauf fängt der Fallback Sonnet das ab), die übrigen Fälle ohne Rückschritt. Wiederholung nach Nutzerentscheid nicht nötig. Kursolino (einziger Anbieter: Schwimmschule Ohana) hat keinen Standort in Düsseldorf; die Präfixe stehen in `references/booking-systems.md` des Skills.
+
+### Abweichungen vom Plan
+
+- **E8, Angebote anderer Netze:** kein neuer `ReachMode` `"anderes-netz"`. Die Entfernungszeile kommt aus `elsewhereText` (`src/ui/format.ts`), gereicht über `CardContext.elsewhere` (`src/ui/OfferCard.tsx`); das Detail unterdrückt dann den Ladezustand der Wegzeit. Die Wegzeit-Typen bleiben unberührt.
+- **E8, Netzwechsel:** `switchCity` ist der Hook `useSwitchCity` (mit `useCity`) in `src/ui/use-app-state.ts`. `useTransit` hält die Zustände je Netz über `networkTransitReducer` (`src/ui/use-transit.ts`); „höchstens einmal je Sitzung“ gilt je Netz.
+- **E5, Gates:** als reine Funktionen in `scripts/transit/gates.ts` (`transitGates`, `accessIssues`), nicht in `build-data.ts`; `TRANSIT_WARN_SECONDS` und `MAX_WITHOUT_LINES` stehen dort. S4 schrieb übergangsweise zusätzlich die alten Pfade `data/wegzeit.json` und `data/linien.json`; S6a hat diese Kopie und ihre Budgets wieder entfernt.
+- **E13, Hubbelrath:** als 50. Stadtteil aufgenommen, Punkt aus der `suburb`-Fläche (51,258 / 6,908), mit Zugangshalt.
+- **E13, Budgets:** zusätzlich zum Startbudget (104 kB) hat der Nutzer das Budget des Service Workers von 9 auf 10,5 kB angehoben (Nutzerentscheide).
+- **E10:** In den Cache-Schlüssel der Extraktion geht der für den Anbieter ausgefüllte Prompt (`lib/refresh.ts`), `promptHash` für Evals und `data:validate` bleibt über der Vorlage. Der Text ändert sich auch für Nürnberg und Fürth (Sammelkalender-Zeile, Kursolino); die erste Nacht danach extrahiert also wie geplant alle Anbieter neu.
+- **E6:** Die Ferien gehen nicht in den Cache-Schlüssel der Extraktion ein (geprüft in S2); ein Test dafür war daher nicht nötig. S3 nutzte bis zum Zusammenführen mit S2 einen Übergangshelfer für die NRW-Ferien.
+- **E11:** Der Workflow ordnet Netz und Tag über `github.event.schedule` zu, ein unbekannter Cron ist rot; `workflow_dispatch` hat die Eingaben `netz` und `region` (nicht beide zugleich).
+
+### Offen
+
+- S6b fertigstellen und nachmessen (Startbudget, Mobile-UX des Auswahlfelds); S9: E2E nach Plan, `/browser-review` lokal, `/arch-review`.
+- S10 Trockenlauf des Bootstraps mit Abnahme durch den Nutzer; S11 Push, Neuextraktion, Bootstrap live, Messung von `site.json`, `wegzeit/vrr.json`, `linien/vrr.json` und `MAX_WITHOUT_LINES` für `vrr`; S12 nach dem ersten Samstagslauf.
 
 ## Review (2026-10-18) – Verdict: Überarbeiten
 

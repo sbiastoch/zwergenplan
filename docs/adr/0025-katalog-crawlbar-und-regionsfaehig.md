@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung je Region statt fester bbox), ADR 0006 (Katalogformat) und ADR 0024 (`notes` ist Protokoll; `adapter` wird für `aggregator` Pflicht). **Ergänzt durch ADR 0029 (Plan 0036):** zweite Region Fürth, Feld `kreis`, Reihenfolge des Entdeckens (Nachtrag unten).
 
+**Geändert durch ADR 0032 (Plan 0039):** Die in Punkt 1 angekündigten Felder (Ferienland, ÖPNV, Kamera) kommen mit Düsseldorf, aber am Netz (`NETWORKS` in `src/domain/regions.ts`), nicht an der Region; dazu das Region-Feld `municipality`. Der Satz „Die Stadtwahl bleibt auch mit zwei Regionen ungespeichert“ im Nachtrag vom 2026-10-12 ist ersetzt: Die Stadt wird gespeichert (`zwergenplan.stadt`).
+
 ## Kontext
 
 - Der nächtliche Crawler (Plan 0015) braucht einen Katalog, aus dessen Feldern hervorgeht, welche Seite er wie abruft und wozu. Heute steht das als Freitext in `programme[].note` (222 von 223 Einträgen) und `notes`, gemischt mit Rechercheprotokoll und veraltenden Inhalten.

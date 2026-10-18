@@ -1,6 +1,6 @@
 # Zwergenplan
 
-Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnberg und Fürth: Krabbelgruppen, Babykurse, Elterntreffs, Babykonzerte, Theater und Museen. Mit Alters- und Kategorienfilter und Kalenderdateien je Termin. Beim ersten Öffnen führt eine kurze Einführung durch Alter, Startpunkt und App (Plan 0033); sie lässt sich überspringen und im Kind-Sheet unter „Einführung ansehen“ erneut aufrufen.
+Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnberg, Fürth und Düsseldorf: Krabbelgruppen, Babykurse, Elterntreffs, Babykonzerte, Theater und Museen. Mit Alters- und Kategorienfilter und Kalenderdateien je Termin. Beim ersten Öffnen führt eine kurze Einführung durch Stadt, Alter, Startpunkt und App (Plan 0033); sie lässt sich überspringen und im Kind-Sheet unter „Einführung ansehen“ erneut aufrufen. Die gewählte Stadt bestimmt, welche Angebote Liste und Karte zeigen, und lässt sich im Kind-Sheet umstellen (Plan 0039).
 
 **Live:** https://zwergenplan.app/
 
@@ -10,11 +10,15 @@ Private, mobile-first Seite mit Angeboten für Kinder unter 3 Jahren in Nürnber
 ## Datenquellen
 
 - **Angebote:** eigene Recherche aus den Programmen der Anbieter (`data/providers.yaml`, `data/offers.json`).
-- **Fahrplan für die Wegzeit:** VGN – Verkehrsverbund Großraum Nürnberg GmbH, „VGN-Soll-Daten vom 24.06.2026“, https://www.vgn.de/web-entwickler/open-data/. Lizenz: [CC BY-SA 3.0 DE](https://creativecommons.org/licenses/by-sa/3.0/de/) (https://creativecommons.org/licenses/by-sa/3.0/de/).
+- **Fahrplan für die Wegzeit in Nürnberg und Fürth:** VGN – Verkehrsverbund Großraum Nürnberg GmbH, „VGN-Soll-Daten vom 24.06.2026“, https://www.vgn.de/web-entwickler/open-data/. Lizenz: [CC BY-SA 3.0 DE](https://creativecommons.org/licenses/by-sa/3.0/de/) (https://creativecommons.org/licenses/by-sa/3.0/de/).
   - **Abgewandelt:** Auszug für einen Dienstagvormittag (`data/oepnv/vgn.json`, erzeugt mit `pnpm pipeline oepnv`) und daraus berechnete Wegzeiten (`data/wegzeit/vgn.json` auf der Website, entsteht bei jedem Build) und die Linien je Wegzeit (`data/linien/vgn.json`, ebenso). Alle drei stehen unter derselben Lizenz, CC BY-SA 3.0 DE. Der übrige Inhalt des Repos ist davon nicht berührt.
   - Titel und Stand ändern sich mit jedem Feed; maßgeblich ist das Feld `source` in `data/oepnv/vgn.json`.
   - Die Download-Seite des VGN nennt CC BY 3.0 DE, die Nutzungsbedingungen (Nr. 5 Abs. 3) CC BY-SA 3.0 DE. Wir folgen vorsichtig der strengeren Lizenz (ADR 0011).
   - Die Nennung bedeutet keine Unterstützung durch den VGN; für die berechneten Wegzeiten ist er nicht verantwortlich.
+- **Fahrplan für die Wegzeit in Düsseldorf:** VRR – Verkehrsverbund Rhein-Ruhr AöR, „VRR-Soll-Daten vom 15.10.2026“ (OpenVRR), https://www.opendata-oepnv.de/ht/de/organisation/verkehrsverbuende/vrr/openvrr/datensaetze. Lizenz: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.de) (https://creativecommons.org/licenses/by/4.0/deed.de).
+  - **Abgewandelt:** Auszug für einen Dienstagvormittag im Gebiet Düsseldorf (`data/oepnv/vrr.json`, erzeugt mit `pnpm pipeline oepnv --netz vrr`) und daraus berechnete Wegzeiten (`data/wegzeit/vrr.json` auf der Website, entsteht bei jedem Build) und die Linien je Wegzeit (`data/linien/vrr.json`, ebenso). Geändert sind Zuschnitt (Gebiet, Referenztag, Zeitfenster) und Form; die Wegzeiten sind daraus gerechnet (Plan 0039, ADR 0032).
+  - Titel und Stand ändern sich mit jedem Feed; maßgeblich ist das Feld `source` in `data/oepnv/vrr.json`.
+  - Die Nennung bedeutet keine Unterstützung durch den VRR; für die berechneten Wegzeiten ist er nicht verantwortlich.
 
 ## Als App installieren
 

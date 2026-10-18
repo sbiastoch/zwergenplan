@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-12), mit Plan 0036. **Ändert** ADR 0011, Punkt 2 und 9 (Startgebiet der Wegzeit) und **ergänzt** ADR 0025, Punkt 1 und dessen Nachtrag (Region-Felder, Stadtwahl).
 
+**Geändert durch ADR 0032 (Plan 0039):** Punkt 1 ersetzt (jede Region-bbox liegt in der bbox ihres Netzes, die Netz-bboxen überlappen nicht), Punkt 3 ersetzt (Startgebiet sind die Stadtgebiete der Regionen des Netzes), Punkt 5 ersetzt (die Stadtwahl wird gespeichert, Liste und Karte zeigen nur ihr Netz). Die letzte Konsequenz („außerhalb Bayerns oder des VGN zusätzlich Ferienland und Fahrplan“) ist mit ADR 0032 umgesetzt.
+
 ## Kontext
 
 - Der Nutzer will Fürth als eigene Region (2026-10-12): eigene Kachel im Onboarding, eigenes Entdecken, eigene bbox; gleicher VGN-Fahrplan, Bayern-Ferien; Angebote beider Städte bleiben für alle sichtbar.
