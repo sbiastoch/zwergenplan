@@ -27,5 +27,7 @@ __pycache__/
 .claude/worktrees/
 # Push: privater VAPID-Schlüssel und Admin-Token für den lokalen Testversand (Plan 0017, Schritt 2) – nie committen
 .push.local.json
+# Lokale Umgebungsvariablen (können Secrets enthalten) – nie committen
+.env
 # Wrangler (lokaler Zustand des Push-Workers)
 .wrangler/
