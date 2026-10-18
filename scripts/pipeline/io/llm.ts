@@ -107,6 +107,12 @@ function llmArgs(call: Omit<LlmCall, "signal" | "user">): string[] {
     "--no-session-persistence",
     "--permission-mode",
     "dontAsk",
+    // nur Projekt-Einstellungen (das frische cwd hat keine) und keine fremden MCP-Server: Lokal mit echtem HOME
+    // griffen sonst Nutzer-Einstellungen wie `modelSettings.<haiku>.effortLevel: "xhigh"`, Plugins und Hooks
+    // (Trockenlauf Düsseldorf 2026-10-18: 10x Ausgabe, Suchen an --max-turns gescheitert, Token-Bremse)
+    "--setting-sources",
+    "project",
+    "--strict-mcp-config",
   ];
 }
 
@@ -117,6 +123,7 @@ function llmArgs(call: Omit<LlmCall, "signal" | "user">): string[] {
  * Lokale Ausnahme (Abweichung von E2, nur für Proben und Evals am eigenen Rechner): Ohne Token und ohne API-Schlüssel
  * gibt es nur den Login des Entwicklers in seinem `HOME`. Dann bleibt `HOME` das echte, sonst fehlt der Login. Dabei
  * gelten dessen Nutzer-Einstellungen (Hooks, MCP, Nutzer-`CLAUDE.md`); Messwerte sind also nicht ganz wie in Actions.
+ * Nutzer-Einstellungen und MCP-Server blendet `llmArgs` aus (`--setting-sources project`, `--strict-mcp-config`).
  * Wer das vermeiden will, setzt lokal ein Token (`claude setup-token`). In Actions (`GITHUB_ACTIONS`) gilt die
  * Ausnahme nie: Fehlt dort das Secret, bleibt `HOME` leer, die CLI meldet den fehlenden Login und der Lauf endet mit
  * `abort: "auth"`.

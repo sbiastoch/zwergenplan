@@ -71,6 +71,9 @@ describe("callLlm (Fake-CLI)", () => {
       "--no-session-persistence",
       "--permission-mode",
       "dontAsk",
+      "--setting-sources",
+      "project",
+      "--strict-mcp-config",
     ]);
     expect(seen?.stdin).toMatch(/\nEingabe$/);
   });
