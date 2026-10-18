@@ -539,3 +539,46 @@ Fixture-Build (`dist-e2e/`, Stand d7a8fbd), Preview auf freiem Port. `node scrip
 3. **Niedrig**: Onboarding bei 320 px: Die dritte Kachel „Fürth“ und „Los geht's“ liegen unter der Falz (`onboarding-1-320-*`). Mit zwei Kacheln war das knapp sichtbar; der Schritt scrollt.
 4. **Niedrig**: Nach dem Netzwechsel im Kind-Sheet verschwindet der Startpunkt unterhalb der Falz, ohne Hinweis im sichtbaren Bereich (`ddf/kind-wechsel-nachher-iphone-hoch-light.png`). Der Fokus bleibt richtig auf „Stadt“. Ein kurzer Text unter der Auswahl wäre eine Idee für `docs/ideas.md`.
 5. **Niedrig**: Der Fokusring der Stadt-Auswahl liegt fast an der Beschriftung „Stadt“ (`ddf/kind-wechsel-nachher-iphone-hoch-light.png`). Überschrift „Eure Stadt“ und Beschriftung „Stadt“ doppeln sich; so ist es im Mockup A entschieden.
+
+## Zwischenstand und Übergabe (2026-10-18, Session-Ende)
+
+**Nicht live.** Nichts aus S1–S9 ist gepusht. Der Nutzer hat nach dem Trockenlauf (S10) angehalten: „Nur 4 Anbieter? Also vmtl nur eine Handvoll Angebote? … eine frische Session soll weitermachen und das Grundproblem lösen.“ Live auf `main` sind nur der Plan selbst (6348b6b, f650aac) und ein davon unabhängiger Testfix (da888f1).
+
+### Wo der Stand liegt
+
+- **Branch `plan-0039`** (lokal, nicht gepusht), Worktree `.claude/worktrees/plan-0039`, Spitze 49074e4 plus dieser Commit; 24 Commits vor `origin/main` (Stand 2026-10-18 nachmittags). Lineare Historie: S1 → S2 → Entdecken → S3 → S4 → S8 → Eval → S6a → Budget SW → Doku → S6b → Browser-Review → `llm.ts`-Fix → Arch-Review-Fixes → Eval neu.
+- Alle `plan-0039-*`-Branches (`-s1`, `-s2`, `-s3`, `-s4`, `-s6a`, `-s6b`, `-s8`, `-disc`, `-docs`, `-arch`) und ihre Worktrees unter `.claude/worktrees/agent-*` sind in `plan-0039` aufgegangen und können weg (`git worktree remove …`, `git branch -D …`; zwei Worktrees sind „locked“).
+- `pnpm verify` grün, `pnpm data:build` (echt) grün, `pnpm build && pnpm size` grün, E2E gezielt grün (Details in den Commits und in „Umsetzung“). Arch-Review: alle Befunde behoben (Commits e128bbf … c0efe8a). Browser-Review lokal: Abschnitt oben, mittlerer Befund (Kachelumbruch 360 px) behoben.
+- **Vor einem Push:** `git fetch && git rebase origin/main` (Nachtlauf und Entdecken committen täglich `data/` auf `main`; Konflikte möglich in `data/offers.json`, `data/raw/`, `data/kosten.csv` – immer die Fassung von `main` nehmen und `pnpm pipeline nightly --build-only` statt Hand-Merge). Danach volle CI auf `main` beobachten.
+- **Achtung beim Push:** `discover.yml` hat dann den Samstags-Cron für `vrr`. Steht die Repo-Variable `ENTDECKEN_MODUS` auf `live`, nimmt der erste Samstag Düsseldorfer Anbieter ohne weitere Abnahme auf.
+
+### Was der Trockenlauf gezeigt hat (Grundproblem)
+
+Lauf 2 (`runs/2026-10-18/discover/` im Worktree, 25 Min., $1,07, 69 Aufrufe): 10 Suchbegriffe → 53 Kandidaten → **4 würden aufgenommen** (Geburtshaus Düsseldorf, Hebamme Nina Krügel, YogaKitchen Oberkassel, Kinderschutzbund), 44 verworfen, 5 nicht bewertet. Zum Vergleich: Fürth-Bootstrap 8 Anbieter; Nürnberg hat 83, aber die stammen überwiegend aus der ursprünglichen Agenten-Recherche (Plan 0002, Skill) und aus drei Sammelkalender-Adaptern (`stadt-vk`, `frankenkids`, `evtermine`), nicht aus dem wöchentlichen Entdecken.
+
+Verwerfungsgründe (Auszählung des Berichts):
+
+| Grund | Portal-Fund | eigene Seite |
+|---|---|---|
+| keine aktuellen Termine (meist abgelaufene Einzel-PDFs) | 14 | 1 |
+| keine vollständige Ortsadresse auf den abgerufenen Seiten | 1 | 8 |
+| Ertragsbeweis leer („kein Angebot 0–3 mit künftigem Termin“) | – | 6 |
+| Seite nicht abrufbar (PDF-Download im Browser-Abruf, HTTP 500) | 4 | 2 |
+| außerhalb der Region (Neuss über `municipality`, Harsewinkel, Euskirchen) | 1 | 1 |
+| sonstiges | 1 | 5 |
+
+Beobachtungen, die eine frische Session prüfen sollte (Hypothesen, nicht verifiziert):
+
+1. **Die Websuche landet in NRW auf den Landesportalen** `fruehehilfen-online.nrw.de` und `guterstart.nrw.de` (je Angebot ein PDF-Export, oft abgelaufen; im Browser-Abruf „Download is starting“). 20 von 53 Kandidaten. Diese Portale sind eher **Sammelkalender** – ein Adapter (wie `evtermine`) könnte sie nach Düsseldorf und Datum filtern und Kandidaten mit Träger und Ort liefern, statt einzelne PDFs zu bewerten.
+2. **Große Träger haben Kursportale/Buchungssysteme**, die der Ertragsbeweis nicht lesen kann oder die keine Ortsadresse zeigen: Kaiserswerther Diakonie (Familienakademie: PEKiP, Babymassage, Klangentdecker – „Fronberghaus, Raum 004“ ohne Adresse), AWO Familienbildungswerk (`awo-duesseldorf.de/awo-kurse/kursliste/`, nur Stadtteile), DRK (`kursplaner.drk-duesseldorf.de`, `drk-bildung-duesseldorf.de`, Geocoding „Tellerringstraße 56“ fehlgeschlagen), efa (`efa-duesseldorf.de/kurssuche`, HTTP 500/leer), Diakonie-Familienzentren. Das sind vermutlich die meisten Düsseldorfer Angebote. Optionen: Katalogpflege von Hand mit `Venue`-Adressen und `hint` (Skill, Abschnitt 3), Lesarten der Buchungssysteme in `references/booking-systems.md`, ggf. Adapter.
+3. **Die Adress-Regel im Bewerten** („keine vollständige Postadresse auf den abgerufenen Seiten“ → verwerfen) trifft Anbieter, deren Adresse nur im Impressum oder auf einer nicht abgerufenen Kontaktseite steht. Prüfen, ob das Bewerten Impressum/Kontakt mit abruft oder ob die Regel für Träger mit bekannter Hauptadresse gelockert werden kann (Prompt `prompt/discover-assess.md`, Eval-Fälle für das Entdecken, Skill Abschnitt 4).
+4. **Zehn Suchbegriffe je Lauf** und „höchstens 10 Kandidaten je Suche“ sind für einen Bootstrap einer 620 000-Einwohner-Stadt knapp; ein Bootstrap mit Verzeichnissen (`role: verzeichnis`, etwa Stadt Düsseldorf „Familienportal“/Familienbüros, Elternschule UKD als Verweisliste) könnte mehr liefern.
+5. Die ursprüngliche Nürnberger Liste kam aus einer **Agenten-Recherche** (Skill `babyevents-nuernberg`). Für Düsseldorf wäre eine gleichwertige einmalige Recherche (Subagenten je Angebotsart) vermutlich der schnellste Weg zu 40+ Anbietern; das Entdecken hält den Katalog danach nur aktuell.
+
+Empfehlung für die nächste Session: zuerst einen kleinen Plan (Plan 0040) „Düsseldorfer Katalog füllen“ mit Ziel (z. B. ≥ 30 Anbieter, ≥ 150 Angebote vor dem Live-Gang), Messung der Hypothesen 1–3 ohne Modell (Abruf der Portale und Kursportale mit `pnpm pipeline fetch-page`), dann Entscheid Adapter vs. Handrecherche. Plan 0039 bleibt bis dahin unveröffentlicht oder geht mit leerer bzw. kleiner Düsseldorf-Kachel live – das entscheidet der Nutzer.
+
+### Weitere offene Punkte aus dieser Session
+
+- **Lokale Läufe mit Modell** ignorieren seit 28faadf die Nutzer-Einstellungen (`--setting-sources project`, `--strict-mcp-config`). Lauf 1 des Trockenlaufs ($2,15, 0 Ergebnisse) und der erste Eval ($0,33, 11/12) liefen noch mit Haiku-Effort „xhigh“ aus `~/.claude/settings.json`; der Eval ist neu gemessen (12/12, $0,14), die alte Zeile in `evals/results.md` vermerkt. Kosten dieser Session mit Modell: ≈ $3,90 (Eval 0,33 + 0,14, Trockenlauf 2,15 + 0,07 + 1,07, plus Probe).
+- S11 (Push, Nachtlauf mit `max_tokens=5000000` wegen des neuen Prompts ≈ $0,60, Bootstrap live, Nachtlauf, `/browser-review live`, Größen von `site.json` und `wegzeit/vrr.json` messen) und S12 (Archiv) stehen aus.
+- Browser-Review, Restbefunde niedrig: Statuszeile dreizeilig auf Pixel 7 mit „(Düsseldorf)“; nach Netzwechsel verschwindet der Startpunkt unter der Falz ohne Hinweis (Kandidat für `docs/ideas.md`).
