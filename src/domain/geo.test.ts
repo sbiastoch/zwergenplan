@@ -23,16 +23,16 @@ describe("inBounds", () => {
   const { minLat, maxLat, minLon, maxLon } = NUERNBERG_BBOX;
 
   it("schließt die Grenzen ein", () => {
-    expect(inBounds({ lat: minLat, lon: minLon })).toBe(true);
-    expect(inBounds({ lat: maxLat, lon: maxLon })).toBe(true);
-    expect(inBounds({ lat: 49.45, lon: 11.07 })).toBe(true);
+    expect(inBounds({ lat: minLat, lon: minLon }, NUERNBERG_BBOX)).toBe(true);
+    expect(inBounds({ lat: maxLat, lon: maxLon }, NUERNBERG_BBOX)).toBe(true);
+    expect(inBounds({ lat: 49.45, lon: 11.07 }, NUERNBERG_BBOX)).toBe(true);
   });
 
   it("lehnt Punkte knapp außerhalb ab", () => {
-    expect(inBounds({ lat: minLat - 0.001, lon: 11.07 })).toBe(false);
-    expect(inBounds({ lat: maxLat + 0.001, lon: 11.07 })).toBe(false);
-    expect(inBounds({ lat: 49.45, lon: minLon - 0.001 })).toBe(false);
-    expect(inBounds({ lat: 49.45, lon: maxLon + 0.001 })).toBe(false);
+    expect(inBounds({ lat: minLat - 0.001, lon: 11.07 }, NUERNBERG_BBOX)).toBe(false);
+    expect(inBounds({ lat: maxLat + 0.001, lon: 11.07 }, NUERNBERG_BBOX)).toBe(false);
+    expect(inBounds({ lat: 49.45, lon: minLon - 0.001 }, NUERNBERG_BBOX)).toBe(false);
+    expect(inBounds({ lat: 49.45, lon: maxLon + 0.001 }, NUERNBERG_BBOX)).toBe(false);
   });
 });
 

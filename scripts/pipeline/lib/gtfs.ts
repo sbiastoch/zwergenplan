@@ -4,6 +4,7 @@
  * Rein: Laden, Cache und Entpacken liegen in io/gtfs.ts, „heute“ wird hineingegeben.
  */
 import { inBounds } from "../../../src/domain/geo.ts";
+import { NETWORKS } from "../../../src/domain/regions.ts";
 import { Timetable, type TransitMode } from "../../../src/domain/schema.ts";
 import { addDays, berlinIsoDate, formatGermanDate, isoWeekday, toBerlinIso } from "../../../src/domain/time.ts";
 
@@ -333,7 +334,8 @@ export function extractTimetable(
     if (!regular(field(s, "location_type"))) continue;
     const lat = Number(field(s, "stop_lat"));
     const lon = Number(field(s, "stop_lon"));
-    stops.set(field(s, "stop_id"), inBounds({ lat, lon }) ? [lat, lon] : undefined);
+    // vorerst das Netz `vgn`; die bbox je Feed kommt mit `FEEDS` (Plan 0039, E3/E4, S3)
+    stops.set(field(s, "stop_id"), inBounds({ lat, lon }, NETWORKS.vgn.bbox) ? [lat, lon] : undefined);
   }
 
   const events = new Map<string, StopEvent[]>();

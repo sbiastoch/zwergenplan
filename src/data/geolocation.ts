@@ -1,10 +1,10 @@
 /**
  * Standort des Geräts (Plan 0004, E3). Nur auf Tipp, nie automatisch. Die Rohkoordinate verlässt
- * diese Datei nie: Sie wird sofort auf ca. 100 m gerundet (`coarsen`) und gegen `NUERNBERG_BBOX`
- * geprüft. Die Rohkoordinate wird nie gespeichert, geloggt oder verschickt; den gerundeten Punkt behält
+ * diese Datei nie: Sie wird sofort auf ca. 100 m gerundet (`coarsen`) und gegen die bbox des Netzes
+ * geprüft, die der Aufrufer übergibt (Plan 0039, E3; `src/data` importiert `regions.ts` nicht, ADR 0010). Die Rohkoordinate wird nie gespeichert, geloggt oder verschickt; den gerundeten Punkt behält
  * höchstens `preferences.ts` auf dem Gerät (ADR 0017, docs/architecture.md).
  */
-import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
+import { type BBox, coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 
 export type PositionProblem = "denied" | "unavailable" | "timeout" | "outside" | "unsupported";
 export type PositionResult = { ok: true; point: GeoPoint } | { ok: false; reason: PositionProblem };
@@ -54,8 +54,8 @@ export function canLocate(env: LocationEnv = browserEnv()): boolean {
  */
 const OVERALL_TIMEOUT_MS = 15_000;
 
-/** Fragt den Standort einmal ab. Liefert nur den gerundeten Punkt oder einen Fehlergrund. */
-export function requestPosition(env: LocationEnv = browserEnv()): Promise<PositionResult> {
+/** Fragt den Standort einmal ab. Liefert nur den gerundeten Punkt in `bbox` oder einen Fehlergrund. */
+export function requestPosition(bbox: BBox, env: LocationEnv = browserEnv()): Promise<PositionResult> {
   const { geolocation } = env;
   if (!geolocation || !env.isSecureContext) return Promise.resolve({ ok: false, reason: "unsupported" });
   return new Promise((resolve) => {
@@ -68,7 +68,7 @@ export function requestPosition(env: LocationEnv = browserEnv()): Promise<Positi
     geolocation.getCurrentPosition(
       ({ coords }) => {
         const point = coarsen({ lat: coords.latitude, lon: coords.longitude });
-        settle(inBounds(point) ? { ok: true, point } : { ok: false, reason: "outside" });
+        settle(inBounds(point, bbox) ? { ok: true, point } : { ok: false, reason: "outside" });
       },
       ({ code }) => settle({ ok: false, reason: reasonFor(code) }),
       OPTIONS,

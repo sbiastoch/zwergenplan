@@ -5,7 +5,7 @@
 import { z } from "zod";
 import { inBounds } from "./geo.ts";
 import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, SHORT_ID_PATTERN } from "./ids.ts";
-import { REGION_IDS, REGIONS } from "./regions.ts";
+import { NETWORKS, REGION_IDS, REGIONS } from "./regions.ts";
 import { isoWeekday } from "./time.ts";
 import { CATEGORIES, categoriesOf, TOPICS } from "./topics.ts";
 
@@ -322,8 +322,9 @@ export const Timetable = z
     message: "Stichtag muss im Gültigkeitszeitraum liegen",
     path: ["serviceDay"],
   })
-  .refine((t) => t.stops.every(([, lat, lon]) => inBounds({ lat, lon })), {
-    message: "alle Steige müssen in NUERNBERG_BBOX liegen",
+  // vorerst nur der VGN-Auszug; die bbox des geprüften Netzes kommt mit dem Auszug je Netz (Plan 0039, E3/E4, S3)
+  .refine((t) => t.stops.every(([, lat, lon]) => inBounds({ lat, lon }, NETWORKS.vgn.bbox)), {
+    message: "alle Steige müssen in der bbox des Netzes vgn liegen",
     path: ["stops"],
   })
   .refine((t) => t.trips.every((trip) => trip.stops.every((i) => i < t.stops.length)), {

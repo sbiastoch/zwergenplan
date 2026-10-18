@@ -15,11 +15,14 @@ export interface BBox {
   maxLon: number;
 }
 
-/** Großraum Nürnberg/Fürth/Erlangen – alles außerhalb ist ein Geocoding-Fehler. Region `nuernberg` (regions.ts). */
+/** Großraum Nürnberg/Fürth/Erlangen: Region `nuernberg` und bbox des Netzes `vgn` (regions.ts; Plan 0039, E3). */
 export const NUERNBERG_BBOX = { minLat: 49.3, maxLat: 49.65, minLon: 10.85, maxLon: 11.3 } as const;
 
-/** Liegt der Punkt in der bbox (Standard: `NUERNBERG_BBOX`, der Großraum, der alle Regionen umfasst; ADR 0029, Punkt 1)? Grenzen inklusiv. */
-export function inBounds({ lat, lon }: GeoPoint, bbox: BBox = NUERNBERG_BBOX): boolean {
+/**
+ * Liegt der Punkt in der bbox? Grenzen inklusiv. Ohne Standardwert: Jede Stelle sagt, gegen welche bbox sie prüft,
+ * meist die des Netzes (`NETWORKS` in regions.ts; Plan 0039, E3).
+ */
+export function inBounds({ lat, lon }: GeoPoint, bbox: BBox): boolean {
   const { minLat, maxLat, minLon, maxLon } = bbox;
   return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
 }

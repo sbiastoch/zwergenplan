@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { NUERNBERG_BBOX } from "../domain/geo.ts";
 import { canLocate, type LocationEnv, type PositionApi, requestPosition } from "./geolocation.ts";
 
 /** Gerät, das sofort mit einer Position antwortet */
@@ -15,16 +16,25 @@ const secure = (geolocation: PositionApi): LocationEnv => ({ geolocation, isSecu
 
 describe("requestPosition", () => {
   it("rundet den Standort sofort auf ca. 100 m", async () => {
-    expect(await requestPosition(secure(at(49.45213, 11.07672)))).toEqual({
+    expect(await requestPosition(NUERNBERG_BBOX, secure(at(49.45213, 11.07672)))).toEqual({
       ok: true,
       point: { lat: 49.452, lon: 11.077 },
     });
   });
 
-  it("prüft den gerundeten Punkt gegen NUERNBERG_BBOX", async () => {
-    expect(await requestPosition(secure(at(48.137, 11.575)))).toEqual({ ok: false, reason: "outside" });
+  it("prüft den gerundeten Punkt gegen die übergebene bbox (Plan 0039, E3)", async () => {
+    expect(await requestPosition(NUERNBERG_BBOX, secure(at(48.137, 11.575)))).toEqual({ ok: false, reason: "outside" });
+    const duesseldorf = { minLat: 51.08, maxLat: 51.4, minLon: 6.62, maxLon: 7.0 };
+    expect(await requestPosition(NUERNBERG_BBOX, secure(at(51.226, 6.773)))).toEqual({ ok: false, reason: "outside" });
+    expect(await requestPosition(duesseldorf, secure(at(51.226, 6.773)))).toEqual({
+      ok: true,
+      point: { lat: 51.226, lon: 6.773 },
+    });
     // knapp außerhalb, gerundet genau auf der Grenze 49,3 → gilt
-    expect(await requestPosition(secure(at(49.2996, 11.07)))).toEqual({ ok: true, point: { lat: 49.3, lon: 11.07 } });
+    expect(await requestPosition(NUERNBERG_BBOX, secure(at(49.2996, 11.07)))).toEqual({
+      ok: true,
+      point: { lat: 49.3, lon: 11.07 },
+    });
   });
 
   it.each([
@@ -33,14 +43,14 @@ describe("requestPosition", () => {
     [3, "timeout"],
     [0, "unavailable"],
   ] as const)("übersetzt Fehlercode %d in „%s“", async (code, reason) => {
-    expect(await requestPosition(secure(failing(code)))).toEqual({ ok: false, reason });
+    expect(await requestPosition(NUERNBERG_BBOX, secure(failing(code)))).toEqual({ ok: false, reason });
   });
 
   it("fragt grob, mit 10 s Zeitlimit und höchstens 5 min alter Position", async () => {
     const getCurrentPosition = vi.fn<PositionApi["getCurrentPosition"]>((success) =>
       success({ coords: { latitude: 49.45, longitude: 11.07 } }),
     );
-    await requestPosition(secure({ getCurrentPosition }));
+    await requestPosition(NUERNBERG_BBOX, secure({ getCurrentPosition }));
     expect(getCurrentPosition).toHaveBeenCalledOnce();
     expect(getCurrentPosition.mock.calls[0]?.[2]).toEqual({
       enableHighAccuracy: false,
@@ -51,11 +61,13 @@ describe("requestPosition", () => {
 
   it("ist ohne API oder ohne sicheren Kontext „unsupported“ und fragt gar nicht", async () => {
     const getCurrentPosition = vi.fn<PositionApi["getCurrentPosition"]>();
-    expect(await requestPosition({ geolocation: undefined, isSecureContext: true })).toEqual({
+    expect(await requestPosition(NUERNBERG_BBOX, { geolocation: undefined, isSecureContext: true })).toEqual({
       ok: false,
       reason: "unsupported",
     });
-    expect(await requestPosition({ geolocation: { getCurrentPosition }, isSecureContext: false })).toEqual({
+    expect(
+      await requestPosition(NUERNBERG_BBOX, { geolocation: { getCurrentPosition }, isSecureContext: false }),
+    ).toEqual({
       ok: false,
       reason: "unsupported",
     });
@@ -70,7 +82,7 @@ describe("requestPosition", () => {
     it("gibt nach 15 s „timeout“, wenn das Gerät nie antwortet (z. B. offener Berechtigungsdialog)", async () => {
       vi.useFakeTimers();
       let settled = false;
-      const result = requestPosition(secure({ getCurrentPosition: () => undefined })).then((r) => {
+      const result = requestPosition(NUERNBERG_BBOX, secure({ getCurrentPosition: () => undefined })).then((r) => {
         settled = true;
         return r;
       });
@@ -84,6 +96,7 @@ describe("requestPosition", () => {
       vi.useFakeTimers();
       let answer: ((position: { coords: { latitude: number; longitude: number } }) => void) | undefined;
       const late = requestPosition(
+        NUERNBERG_BBOX,
         secure({
           getCurrentPosition: (success) => {
             answer = success;
@@ -94,7 +107,7 @@ describe("requestPosition", () => {
       answer?.({ coords: { latitude: 49.45213, longitude: 11.07672 } });
       expect(await late).toEqual({ ok: false, reason: "timeout" });
 
-      expect(await requestPosition(secure(at(49.45213, 11.07672)))).toEqual({
+      expect(await requestPosition(NUERNBERG_BBOX, secure(at(49.45213, 11.07672)))).toEqual({
         ok: true,
         point: { lat: 49.452, lon: 11.077 },
       });
@@ -103,7 +116,7 @@ describe("requestPosition", () => {
   });
 
   it("nutzt ohne Parameter den Browser – in Node gibt es keine Geolocation", async () => {
-    expect(await requestPosition()).toEqual({ ok: false, reason: "unsupported" });
+    expect(await requestPosition(NUERNBERG_BBOX)).toEqual({ ok: false, reason: "unsupported" });
   });
 });
 

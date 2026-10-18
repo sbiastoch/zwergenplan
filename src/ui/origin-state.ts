@@ -9,6 +9,7 @@ import type { PositionProblem, PositionResult } from "../data/geolocation.ts";
 import type { StoredOriginPoint } from "../data/preferences.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
+import { NETWORKS } from "../domain/regions.ts";
 
 export interface OriginState {
   origin: Origin | undefined;
@@ -33,11 +34,14 @@ export function pointOrigin(source: StoredOriginPoint["source"], point: GeoPoint
   return { source, point, label: source === "standort" ? "Mein Standort" : "Kartenmitte" };
 }
 
-/** Gespeicherten Punkt erneut runden und gegen die Stadtgrenze prüfen; ungültig → kein Startpunkt (Plan 0016, E3) */
+/**
+ * Gespeicherten Punkt erneut runden und gegen die bbox des Netzes prüfen; ungültig → kein Startpunkt (Plan 0016, E3).
+ * Vorerst das Netz `vgn`; das gewählte Netz kommt mit der gespeicherten Stadt (Plan 0039, E3, S6).
+ */
 export function storedPointOrigin(stored: StoredOriginPoint | undefined): Origin | undefined {
   if (!stored) return undefined;
   const point = coarsen(stored);
-  return inBounds(point) ? pointOrigin(stored.source, point) : undefined;
+  return inBounds(point, NETWORKS.vgn.bbox) ? pointOrigin(stored.source, point) : undefined;
 }
 
 export function initialOriginState(origin: Origin | undefined): OriginState {

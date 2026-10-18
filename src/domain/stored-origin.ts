@@ -7,8 +7,12 @@
 import { districtById } from "./districts.ts";
 import { coarsen, inBounds } from "./geo.ts";
 import type { Origin } from "./reach.ts";
+import { NETWORKS } from "./regions.ts";
 
-/** Stadtteil-ID (String) oder gerundeter Punkt `{ source, lat, lon }`; ungültig oder außerhalb → `undefined` */
+/**
+ * Stadtteil-ID (String) oder gerundeter Punkt `{ source, lat, lon }`; ungültig oder außerhalb → `undefined`. Der Punkt
+ * gilt vorerst nur im Netz `vgn`; das gewählte Netz kommt mit der gespiegelten Stadt (Plan 0039, E3/E9, S6).
+ */
 export function originFromStored(value: unknown): Origin | undefined {
   if (typeof value === "string") {
     const district = districtById(value);
@@ -19,5 +23,5 @@ export function originFromStored(value: unknown): Origin | undefined {
     return undefined;
   }
   const point = coarsen({ lat, lon });
-  return inBounds(point) ? { source, point, label: "" } : undefined;
+  return inBounds(point, NETWORKS.vgn.bbox) ? { source, point, label: "" } : undefined;
 }

@@ -19,6 +19,7 @@ import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
+import { NETWORKS } from "../domain/regions.ts";
 import { isLegacyView, parseRoute, type Route, resolveRouteIds, routeToSearch } from "../domain/route.ts";
 import { cleanSavedProviders, migrateSavedIds, toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
@@ -349,7 +350,8 @@ export function useOrigin(): OriginApi {
   const locateMe = useCallback(() => {
     const request = ++nextRequest.current;
     dispatch({ type: "locate", request });
-    void requestPosition().then((result) => {
+    // vorerst immer das Netz `vgn`; das gewählte Netz kommt mit der gespeicherten Stadt (Plan 0039, E3/E8, S6)
+    void requestPosition(NETWORKS.vgn.bbox).then((result) => {
       dispatch({ type: "located", request, result });
       if (result.ok && nextRequest.current === request) saveOrigin({ source: "standort", ...result.point });
     });
@@ -365,7 +367,7 @@ export function useOrigin(): OriginApi {
 
   const setMapCenter = useCallback((center: GeoPoint) => {
     const point = coarsen(center);
-    if (!inBounds(point)) return false;
+    if (!inBounds(point, NETWORKS.vgn.bbox)) return false;
     nextRequest.current++;
     dispatch({ type: "mapCenter", point });
     saveOrigin({ source: "karte", ...point });
