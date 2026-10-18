@@ -3124,19 +3124,31 @@
     - url: https://imiluv.de
       kind: html
       use: info
+    - url: https://imiluv.de/schedule
+      kind: html
+      use: info
+    - url: https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1115067&min_date={von}&max_date={bis}&page_size=200
+      kind: json-api
+      use: termine
+      hint: "„Reformer Mums & Babies“: Pilates mit Baby (ca. 6 Wochen–6 Monate), Englisch, ärztliche Freigabe nötig. Termine aus date_start als dates, full=true = ausgebucht, url https://imiluv.de/schedule"
+    - url: https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1125443&min_date={von}&max_date={bis}&page_size=200
+      kind: json-api
+      use: termine
+      hint: "„Barre Baby Luv“: Barre mit Baby (ca. 6–12 Monate) in der Trage, Deutsch/Englisch, ärztliche Freigabe nötig. Termine aus date_start als dates, full=true = ausgebucht, url https://imiluv.de/schedule"
   availability:
-    shown: nein
-    how: Buchung nur in der IMILUV-App
-  verified: 2026-10-04
+    shown: teilweise
+    how: Buchung nur in der IMILUV-App (bsport); die Termin-API zeigt nur, ob ein Termin ausgebucht ist (full)
+    system: bsport
+  verified: 2026-10-18
   notes:
     - Aus frankenkids aufgenommen. Barre und Reformer Pilates für Mamas mit Babys (6 Wochen–12 Monate), 14-täglich laut frankenkids, Anmeldung über die IMILUV-App. Ärztliche Freigabe nach der Geburt erforderlich.
+    - "2026-10-18: coveredBy frankenkids-eventkalender entfernt. Seit 11.10. scheiterte jeder Nachtlauf am Build-Probelauf (der entfernt coveredBy und verlangt dann eine Terminseite). Der Stundenplan imiluv.de/schedule ist ein bsport-Widget (Firma 2795); die öffentliche bsport-API liefert je Kurs (activity) alle Termine, wöchentlich statt 14-täglich wie bei frankenkids. Ändert das Studio die activity-ID, die API ohne activity abrufen und nach activity_name suchen."
   venues:
     - id: imiluv-studio
       name: IMILUV Studio by Julia Beese
       address: Schopenhauer Str. 10, 90409 Nürnberg
       district: Weiterer Innenstadtgürtel West/Nord/Ost
       geo: { lat: 49.4676674, lon: 11.0895169 }
-  coveredBy: frankenkids-eventkalender
 - id: hebammen-wunderwerk
   publicId: urt9qp2k
   role: anbieter
