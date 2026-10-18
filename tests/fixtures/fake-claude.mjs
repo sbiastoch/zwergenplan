@@ -3,14 +3,16 @@
  * Fake der Claude-CLI für scripts/pipeline/io/llm.test.ts und io/extract.test.ts (Plan 0032, E2). Die Umgebung des
  * Aufrufs ist gefiltert, deshalb steuert die erste Zeile von stdin, die mit `FAKE ` beginnt:
  * `FAKE <modus> <protokolldatei> [<antwortdatei>]`. Das Protokoll hält Argumente, Arbeitsverzeichnis (samt Inhalt),
- * Umgebung und stdin fest. Modi: ok, reply (structured_output aus der Antwortdatei), 401, 429, nologin, toolong,
+ * Umgebung, stdin und den Inhalt der Prompt-Datei (`--system-prompt-file`, falls lesbar) fest. Modi: ok, reply (structured_output aus der Antwortdatei), 401, 429, nologin, toolong,
  * truncated, broken, exit.
  */
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const stdin = readFileSync(0, "utf8");
 const control = stdin.split("\n").find((l) => l.startsWith("FAKE ")) ?? "";
 const [, mode = "ok", record, replyFile] = control.split(" ");
+const args = process.argv.slice(2);
+const promptFile = args[args.indexOf("--system-prompt-file") + 1];
 if (record)
   writeFileSync(
     record,
@@ -20,6 +22,7 @@ if (record)
       cwdFiles: readdirSync("."),
       env: process.env,
       stdin,
+      systemPrompt: promptFile && existsSync(promptFile) ? readFileSync(promptFile, "utf8") : null,
     }),
   );
 

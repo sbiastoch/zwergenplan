@@ -48,7 +48,8 @@ function control(events: unknown[]) {
   writeFileSync(reply, JSON.stringify({ events }));
   return {
     line: `FAKE reply ${record} ${reply}`,
-    seen: () => JSON.parse(readFileSync(record, "utf8")) as { args: string[]; stdin: string },
+    seen: () =>
+      JSON.parse(readFileSync(record, "utf8")) as { args: string[]; stdin: string; systemPrompt: string | null },
   };
 }
 
@@ -87,7 +88,7 @@ describe("Prompt (Plan 0037, E8)", () => {
 });
 
 describe("createExtractor (Fake-CLI)", () => {
-  it("ein Aufruf mit Prompt-Datei und Schema, Events mit providerId, Aufruf mit Verbrauch", async () => {
+  it("ein Aufruf mit ausgefülltem Prompt und Schema, Events mit providerId, Aufruf mit Verbrauch", async () => {
     const c = control([event("Krabbeltreff", "WE")]);
     const r = await extractor()(input(`## Seite 1: ${PAGE} (html)\n## TEXT\n${c.line}`), new AbortController().signal);
     expect(r.outcome).toMatchObject({
@@ -100,7 +101,9 @@ describe("createExtractor (Fake-CLI)", () => {
     ]);
     expect(r.calls[0]).not.toHaveProperty("part");
     const seen = c.seen();
-    expect(seen.args[seen.args.indexOf("--system-prompt-file") + 1]).toMatch(/scripts\/pipeline\/prompt\/extract\.md$/);
+    expect(seen.systemPrompt).toMatch(/^# Termine eines Anbieters erfassen\n/);
+    expect(seen.systemPrompt).toContain("Anbieters aus Nürnberg und Umgebung");
+    expect(seen.systemPrompt).not.toContain("{region}");
     expect(JSON.parse(seen.args[seen.args.indexOf("--json-schema") + 1] ?? "")).toHaveProperty("properties.events");
     expect(seen.stdin).toMatch(/^Heute: 2026-10-05\nHorizont: 2026-10-05 bis 2027-10-05\n/);
   });
@@ -154,5 +157,18 @@ describe("createExtractor (Fake-CLI)", () => {
       ["DE-BY", "2025-10-05", "2028-10-05"],
       ["DE-NW", "2025-10-05", "2028-10-05"],
     ]);
+  });
+
+  it("Prompt mit der Region des Anbieters (Plan 0039, E10)", async () => {
+    const c = control([]);
+    const text = `## Seite 1: ${PAGE} (html)\n## TEXT\n${c.line}`;
+    await extractor()(
+      { ...input(text), provider: { ...provider, region: "duesseldorf" } },
+      new AbortController().signal,
+    );
+    const prompt = c.seen().systemPrompt;
+    expect(prompt).toContain("Anbieters aus Düsseldorf und Umgebung");
+    expect(prompt).toContain("Kursort in Düsseldorf und Umgebung");
+    expect(prompt).not.toContain("{region}");
   });
 });

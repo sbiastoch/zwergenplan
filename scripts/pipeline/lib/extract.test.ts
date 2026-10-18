@@ -7,6 +7,7 @@ import {
   checkExtraction,
   type ExtractContext,
   extractMessage,
+  extractPrompt,
   extractResponseSchema,
   inputsFromFetch,
   type ModelReply,
@@ -464,5 +465,36 @@ describe("runExtractionInParts", () => {
       ["Offener Krabbeltreff", "kostenlos"],
       ["Babymassage", "kostenlos"],
     ]);
+  });
+});
+
+describe("extractPrompt (Plan 0039, E10)", () => {
+  const template = EXTRACT_KEY_PARTS.prompt;
+
+  it("die Vorlage enthält den Platzhalter {region} (Einleitung, Hebamio, Kursolino)", () => {
+    expect(template.split("{region}").length - 1).toBeGreaterThanOrEqual(3);
+  });
+
+  it("Nürnberg: {region} wird durch den Namen der Region ersetzt, kein Platzhalter bleibt", () => {
+    const filled = extractPrompt(template, { ...provider, region: "nuernberg" });
+    expect(filled).toContain("eines** Anbieters aus Nürnberg und Umgebung");
+    expect(filled).toContain("Kursort in Nürnberg und Umgebung");
+    expect(filled).not.toMatch(/\{[a-z]+\}/);
+  });
+
+  it("Düsseldorf: der Name der Region des Anbieters", () => {
+    const filled = extractPrompt(template, { ...provider, region: "duesseldorf" });
+    expect(filled).toContain("eines** Anbieters aus Düsseldorf und Umgebung");
+    expect(filled).toContain("Kursort in Düsseldorf und Umgebung");
+    expect(filled).not.toContain("Nürnberg und Umgebung");
+    expect(filled).not.toMatch(/\{[a-z]+\}/);
+  });
+
+  it("unbekannter Platzhalter: Fehler statt halb ausgefülltem Prompt", () => {
+    expect(() => extractPrompt("aus {region}, {stadt}", provider)).toThrow(/\{stadt\}/);
+  });
+
+  it("Vorlage ohne Platzhalter bleibt unverändert", () => {
+    expect(extractPrompt("P", provider)).toBe("P");
   });
 });

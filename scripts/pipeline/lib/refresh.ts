@@ -9,7 +9,7 @@
  */
 import type { Offer, Provider } from "../../../src/domain/schema.ts";
 import type { Candidate, Source } from "./candidate.ts";
-import type { CallRecord, ExtractKeyParts, ExtractOutcome } from "./extract.ts";
+import { type CallRecord, type ExtractKeyParts, type ExtractOutcome, extractPrompt } from "./extract.ts";
 import { catalogExcerpt, datedFrom, type ExtractKey, extractKey, sameKey } from "./normalize.ts";
 import type { ProviderRaw, RawEvent } from "./raw.ts";
 
@@ -77,7 +77,12 @@ const statusOf = (events: readonly RawEvent[]): "ok" | "keine-termine" => (event
 function keyOf(ctx: RefreshContext): ExtractKey {
   return extractKey(
     { pages: ctx.fetched.pages, candidates: ctx.fetched.candidates },
-    { ...ctx.keyParts, catalog: catalogExcerpt(ctx.provider) },
+    // der tatsächliche Prompt des Anbieters, nicht die Vorlage (Plan 0039, E10)
+    {
+      ...ctx.keyParts,
+      prompt: extractPrompt(ctx.keyParts.prompt, ctx.provider),
+      catalog: catalogExcerpt(ctx.provider),
+    },
     { today: ctx.today },
   );
 }

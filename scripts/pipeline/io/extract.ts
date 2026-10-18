@@ -1,5 +1,6 @@
 /**
- * Extraktion eines Anbieters mit dem Modell (Plan 0032, E4): Prompt `prompt/extract.md`, Antwortschema aus Zod,
+ * Extraktion eines Anbieters mit dem Modell (Plan 0032, E4): Prompt aus der Vorlage `prompt/extract.md` mit der Region
+ * des Anbieters (Plan 0039, E10), Antwortschema aus Zod,
  * Aufruf über `io/llm.ts`, Prüfung und Ablauf in `lib/extract.ts`. Die Typen stehen in `lib/extract.ts` (reine Logik
  * darf `io/` nicht importieren) und werden hier für die Aufrufer weitergereicht.
  */
@@ -7,11 +8,17 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { networkOf, type RegionId } from "../../../src/domain/regions.ts";
 import { addMonths } from "../../../src/domain/time.ts";
-import { type Extractor, extractMessage, extractResponseSchema, runExtractionInParts } from "../lib/extract.ts";
+import {
+  type Extractor,
+  extractMessage,
+  extractPrompt,
+  extractResponseSchema,
+  runExtractionInParts,
+} from "../lib/extract.ts";
 import { subdivisionOf } from "../lib/holidays.ts";
 import { PART_MAX_CHARS, splitInput } from "../lib/split.ts";
 import { type FreeDaysLoader, loadFreeDays } from "./holidays.ts";
-import { callLlm, type LlmOptions } from "./llm.ts";
+import { callLlmWithPrompt, type LlmOptions } from "./llm.ts";
 
 export type {
   CallRecord,
@@ -24,7 +31,10 @@ export type {
 const PROMPT_FILE = fileURLToPath(new URL("../prompt/extract.md", import.meta.url));
 const SCHEMA = extractResponseSchema();
 
-/** Inhalte, die der Cache-Schlüssel (`inputHash`, E4) mitnimmt: Prompt und Antwortschema als Text. */
+/**
+ * Inhalte, die der Cache-Schlüssel (`inputHash`, E4) mitnimmt: Prompt-Vorlage und Antwortschema als Text. Die Vorlage
+ * füllt `lib/refresh.ts` je Anbieter aus (`extractPrompt`); `promptHash` (Evals) nimmt sie unausgefüllt.
+ */
 export const EXTRACT_KEY_PARTS: { prompt: string; schema: string } = {
   prompt: readFileSync(PROMPT_FILE, "utf8"),
   schema: JSON.stringify(SCHEMA),
@@ -80,6 +90,7 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
       horizon: { from: input.today, to: addMonths(input.today, 12) },
       freeDays: await freeDaysFor(input.provider.region, input.today),
     };
+    const systemPrompt = extractPrompt(EXTRACT_KEY_PARTS.prompt, input.provider);
     // Große Anbieter in Teilen (lib/split.ts); der Cache-Schlüssel bleibt der des ganzen Anbieters
     const { parts: texts, notes } = splitInput(input.text, partMaxChars, {
       pageUrls: input.pageUrls,
@@ -102,8 +113,8 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
       ctx,
       signal,
       call: (m, user) =>
-        callLlm(
-          { model: m, systemPromptFile: PROMPT_FILE, user, tools: "none", schema: SCHEMA, maxTurns: MAX_TURNS, signal },
+        callLlmWithPrompt(
+          { model: m, systemPrompt, user, tools: "none", schema: SCHEMA, maxTurns: MAX_TURNS, signal },
           llmOpts,
         ),
     });

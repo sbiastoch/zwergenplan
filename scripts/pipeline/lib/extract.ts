@@ -4,7 +4,7 @@
  * `io/llm.ts`), hier steht nur die Entscheidung, was mit einer Antwort geschieht.
  */
 import { z } from "zod";
-import { networkOf } from "../../../src/domain/regions.ts";
+import { networkOf, REGIONS } from "../../../src/domain/regions.ts";
 import { CategoryField, type Provider } from "../../../src/domain/schema.ts";
 import { fromBerlinLocal } from "../../../src/domain/time.ts";
 import { buildOffers } from "./build-offers.ts";
@@ -63,7 +63,8 @@ export type Extractor = (input: ExtractInput, signal: AbortSignal) => Promise<Ex
 
 /**
  * Was außer der Eingabe in den Cache-Schlüssel geht (E4): Prompt, Antwort-Schema (Teil A: `EXTRACT_KEY_PARTS`)
- * und das konfigurierte Extraktionsmodell (N3: Ein Modellwechsel extrahiert einmal alles neu).
+ * und das konfigurierte Extraktionsmodell (N3: Ein Modellwechsel extrahiert einmal alles neu). `prompt` ist die
+ * Vorlage; in den Schlüssel geht sie ausgefüllt (`extractPrompt`, Plan 0039, E10).
  */
 export interface ExtractKeyParts {
   prompt: string;
@@ -253,6 +254,19 @@ export function extractMessage(input: {
     `## Anbieter\n${JSON.stringify(catalogExcerpt(input.provider), null, 1)}`,
     input.text,
   ].join("\n\n");
+}
+
+/**
+ * Prompt eines Anbieters aus der Vorlage `prompt/extract.md` (Plan 0039, E10): `{region}` wird der Name seiner Region.
+ * Ein anderer Platzhalter ist ein Fehler, damit nie ein halb ausgefüllter Prompt an das Modell geht. Der ausgefüllte
+ * Text ist auch der Prompt im Cache-Schlüssel (`lib/refresh.ts`): Der Schlüssel ändert sich nur, wenn sich der
+ * tatsächliche Prompt des Anbieters ändert.
+ */
+export function extractPrompt(template: string, provider: Pick<Provider, "region">): string {
+  const filled = template.replaceAll("{region}", REGIONS[provider.region].name);
+  const left = /\{[a-z]+\}/.exec(filled);
+  if (left) throw new Error(`Prompt-Vorlage: unbekannter Platzhalter ${left[0]}`);
+  return filled;
 }
 
 /** Was der Ablauf von einem Modellaufruf braucht (`LlmResult` aus `io/llm.ts` passt). */

@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
-import { callLlm, type LlmCall } from "./llm.ts";
+import { callLlm, callLlmWithPrompt, type LlmCall } from "./llm.ts";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const BIN = join(ROOT, "tests/fixtures/fake-claude.mjs");
@@ -43,6 +43,7 @@ async function run(mode: string, env: NodeJS.ProcessEnv = CI_ENV, over: Partial<
         cwdFiles: string[];
         env: Record<string, string>;
         stdin: string;
+        systemPrompt: string | null;
       })
     : undefined;
   return { result, seen };
@@ -93,6 +94,22 @@ describe("callLlm (Fake-CLI)", () => {
     expect(seen?.env["HOME"]?.startsWith(ROOT)).toBe(false);
     expect(existsSync(seen?.cwd ?? "")).toBe(false);
     expect(existsSync(seen?.env["HOME"] ?? "")).toBe(false);
+  });
+
+  it("Prompt als Text: als Datei außerhalb des Arbeitsverzeichnisses übergeben, danach entfernt (Plan 0039, E10)", async () => {
+    const record = join(scratch, `call-${n++}.json`);
+    const { systemPromptFile: _, ...base } = call(`FAKE ok ${record}\nEingabe`);
+    await callLlmWithPrompt({ ...base, systemPrompt: "# Prompt für Düsseldorf" }, { bin: BIN, env: CI_ENV });
+    const seen = JSON.parse(readFileSync(record, "utf8")) as {
+      args: string[];
+      cwdFiles: string[];
+      systemPrompt: string;
+    };
+    const file = seen.args[seen.args.indexOf("--system-prompt-file") + 1] ?? "";
+    expect(seen.systemPrompt).toBe("# Prompt für Düsseldorf");
+    expect(seen.cwdFiles).toEqual([]);
+    expect(file.startsWith(ROOT)).toBe(false);
+    expect(existsSync(file)).toBe(false);
   });
 
   it("Umgebung nur PATH, HOME, Token und Ausgabegrenze", async () => {

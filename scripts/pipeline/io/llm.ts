@@ -7,7 +7,7 @@
  * kommen nie ins Log, nur zurück an den Aufrufer.
  */
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { z } from "zod";
@@ -270,5 +270,24 @@ export async function callLlm(call: LlmCall, opts: LlmOptions = {}): Promise<Llm
   } finally {
     rmSync(work, { recursive: true, force: true });
     rmSync(home, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Wie `callLlm`, mit dem Prompt als Text statt als Datei (Plan 0039, E10: Prompt der Extraktion je Region). Der Text
+ * kommt in eine eigene Datei außerhalb des Arbeitsverzeichnisses, die danach wieder entfernt wird.
+ */
+export async function callLlmWithPrompt(
+  call: Omit<LlmCall, "systemPromptFile"> & { systemPrompt: string },
+  opts: LlmOptions = {},
+): Promise<LlmResult> {
+  const { systemPrompt, ...rest } = call;
+  const dir = mkdtempSync(join(tmpdir(), "zp-llm-prompt-"));
+  try {
+    const systemPromptFile = join(dir, "system-prompt.md");
+    writeFileSync(systemPromptFile, systemPrompt);
+    return await callLlm({ ...rest, systemPromptFile }, opts);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 }

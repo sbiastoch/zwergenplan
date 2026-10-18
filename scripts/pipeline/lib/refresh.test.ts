@@ -280,6 +280,21 @@ describe("refresh: Regeln aus Plan 0032, E5", () => {
     expect(planRefresh(ctx({ keyParts: { ...KEY_PARTS, model: "sonnet" } })).kind).toBe("extract");
   });
 
+  it("der Prompt geht ausgefüllt in den Schlüssel: nur der tatsächliche Prompt zählt (Plan 0039, E10)", () => {
+    const region = { nuernberg: "Nürnberg", fuerth: "Fürth", duesseldorf: "Düsseldorf" }[provider.region];
+    const filled = { ...KEY_PARTS, prompt: `aus ${region}` };
+    const stored = extractKey(
+      { pages: fetched().pages, candidates: [] },
+      { ...filled, catalog: catalogExcerpt(provider) },
+      { today: TODAY },
+    ).hash;
+    const prev = raw({ inputHash: stored });
+    // Vorlage mit Platzhalter, die zum gespeicherten Prompt ausgefüllt wird: kein neuer Aufruf
+    expect(planRefresh(ctx({ prev, keyParts: { ...KEY_PARTS, prompt: "aus {region}" } })).kind).toBe("keep");
+    // anderer tatsächlicher Prompt: neu extrahieren
+    expect(planRefresh(ctx({ prev, keyParts: { ...KEY_PARTS, prompt: "in {region}" } })).kind).toBe("extract");
+  });
+
   it("leere Eingabe (weder Seiten noch Kandidaten): kein Aufruf, wie eine leere Antwort bewertet", () => {
     const empty = fetched({ status: "leer", pages: [], text: "" });
     const r = run(ctx({ prev: raw({ events: [] }), fetched: empty }));
