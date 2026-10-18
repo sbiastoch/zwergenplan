@@ -29,6 +29,7 @@ import {
 } from "../../domain/onboarding.ts";
 import type { InstallApi } from "../../domain/pwa.ts";
 import { networkOf, type RegionId } from "../../domain/regions.ts";
+import { offersInNetwork } from "../../domain/site-data.ts";
 import { useBirthDateInput } from "../birth-date-input.ts";
 import { Icon } from "../icons.tsx";
 import type { OnboardingFlowProps } from "../onboarding-types.ts";
@@ -70,13 +71,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   // Willkommenszahl über alle Angebote, gefiltert auf das Netz der angetippten Kachel (Plan 0039, E7; Review 2, m5)
   const stats = useMemo(() => {
     const network = networkOf(city);
-    return (
-      offers &&
-      welcomeStats(
-        offers.filter((o) => o.network === network),
-        now,
-      )
-    );
+    return offers && welcomeStats(offersInNetwork(offers, network), now);
   }, [offers, now, city]);
   const step = steps[index] ?? "stadt";
   // Ende des Onboardings (jede Art: fertig, Überspringen, Esc, erneuter Aufruf): einmal spiegeln (Plan 0035, E9)

@@ -2,7 +2,16 @@ import { describe, expect, it } from "vitest";
 import { icsContextFor, icsForSeries } from "./ics.ts";
 import { SHORT_ID_PATTERN } from "./ids.ts";
 import { Venue } from "./schema.ts";
-import { MIN_ADDRESS, type SiteProvider, toProviderDirectory, toSiteData, venueAddress } from "./site-data.ts";
+import {
+  adoptDirectory,
+  adoptSiteData,
+  MIN_ADDRESS,
+  offersInNetwork,
+  type SiteProvider,
+  toProviderDirectory,
+  toSiteData,
+  venueAddress,
+} from "./site-data.ts";
 import { fixtureKey, loadFixtures, fixturePublicId as pid } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
@@ -244,5 +253,52 @@ describe("time", () => {
 
   it("lehnt Nicht-ISO-Daten ab", () => {
     expect(() => parseIsoDate("2026-1-1")).toThrow("Kein ISO-Datum");
+  });
+});
+
+describe("offersInNetwork (Plan 0039, Arch-Review m2)", () => {
+  const { providers, file } = loadFixtures();
+  const { offers } = toSiteData(providers, file);
+
+  it("nimmt genau die Angebote des Netzes, Reihenfolge bleibt", () => {
+    const vgn = offersInNetwork(offers, "vgn");
+    const vrr = offersInNetwork(offers, "vrr");
+    expect(vgn.length).toBeGreaterThan(0);
+    expect(vrr.length).toBeGreaterThan(0);
+    expect(vgn.every((o) => o.network === "vgn")).toBe(true);
+    expect(vrr.every((o) => o.network === "vrr")).toBe(true);
+    expect(vgn.length + vrr.length).toBe(offers.length);
+    expect(vgn).toEqual(offers.filter((o) => o.network === "vgn"));
+  });
+});
+
+// Übergang Plan 0039 (Arch-Review M1): Daten aus einem Cache vor Plan 0039 haben kein `network`
+describe("adoptSiteData und adoptDirectory: Stand ohne network (Plan 0039, Arch-Review M1)", () => {
+  const { providers, file } = loadFixtures();
+  const site = toSiteData(providers, file);
+  const nuernberg = offersInNetwork(site.offers, "vgn");
+  const directory = toProviderDirectory(providers, file.generatedAt);
+
+  it("altes site.json ohne network und ohne category: alle Angebote im Netz vgn, sonst unverändert", () => {
+    const old = {
+      generatedAt: site.generatedAt,
+      offers: nuernberg.map(({ network: _n, category: _c, ...rest }) => rest),
+    };
+    const adopted = adoptSiteData(old);
+    expect(offersInNetwork(adopted.offers, "vgn").map((o) => o.id)).toEqual(nuernberg.map((o) => o.id));
+    expect(adopted.offers.every((o) => typeof o.category === "string")).toBe(true);
+    expect(adopted.generatedAt).toBe(site.generatedAt);
+  });
+
+  it("neues site.json bleibt, wie es ist", () => {
+    expect(adoptSiteData(site)).toEqual(site);
+  });
+
+  it("altes anbieter.json ohne network: alle Anbieter im Netz vgn", () => {
+    const vgnProviders = directory.providers.filter((p) => p.network === "vgn");
+    const old = { ...directory, providers: vgnProviders.map(({ network: _n, ...rest }) => rest) };
+    const adopted = adoptDirectory(old);
+    expect(adopted.providers).toEqual(vgnProviders);
+    expect(adoptDirectory(directory)).toEqual(directory);
   });
 });

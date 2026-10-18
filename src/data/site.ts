@@ -1,5 +1,5 @@
 /** Einziger Zugriffspunkt der Oberfläche auf Daten (dependency-cruiser erzwingt das). */
-import type { SiteData } from "../domain/site-data.ts";
+import type { LooseSiteData } from "../domain/site-data.ts";
 
 /** Warum die Daten fehlen (Plan 0008, E5). Den Text dazu wählt die Oberfläche (`loadErrorText`). */
 export type LoadFailure = "offline" | "netz" | "server";
@@ -64,7 +64,7 @@ function browserEnv(): SiteEnv {
   };
 }
 
-export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<SiteData> {
+export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<LooseSiteData> {
   let res: Response;
   try {
     // Pfad wie im Frühstart in index.html
@@ -74,10 +74,11 @@ export async function loadSiteData(env: SiteEnv = browserEnv()): Promise<SiteDat
     throw new SiteLoadError(env.online() ? "netz" : "offline", e);
   }
   if (!res.ok) throw new SiteLoadError("server", new Error(`HTTP ${res.status}`));
-  let data: SiteData;
+  let data: LooseSiteData;
   try {
-    // Bereits beim Build mit Zod geprüft (scripts/build-data.ts) – hier kein erneutes Parsen.
-    data = (await res.json()) as SiteData;
+    // Bereits beim Build mit Zod geprüft (scripts/build-data.ts) – hier kein erneutes Parsen. Locker, weil ein Cache
+    // einen älteren Stand liefern kann; `adoptSiteData` füllt fehlende Felder (Plan 0039, Arch-Review M1).
+    data = (await res.json()) as LooseSiteData;
   } catch (e) {
     throw new SiteLoadError("server", e);
   }

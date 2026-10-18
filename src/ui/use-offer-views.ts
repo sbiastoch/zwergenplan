@@ -21,6 +21,7 @@ import { quickRanges } from "../domain/date-range.ts";
 import { applyFilters, EMPTY_FILTER } from "../domain/filter.ts";
 import { countPlaces, placeKey } from "../domain/place-key.ts";
 import type { Reach, ReachFn } from "../domain/reach.ts";
+import type { NetworkId } from "../domain/regions.ts";
 import type { Route } from "../domain/route.ts";
 import {
   applySavedFilter,
@@ -30,7 +31,7 @@ import {
   savedFilterCount,
   savedOffers,
 } from "../domain/saved.ts";
-import type { SiteOffer } from "../domain/site-data.ts";
+import { offersInNetwork, type SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 
 /** Angebote je Schritt in der Liste (Plan 0003, E8) */
@@ -47,6 +48,8 @@ export interface OfferViewsInput {
   /** Filter der Merkliste (Plan 0025, E6), lebt in `App`; ohne Angabe leer */
   savedFilter?: SavedFilter;
   now: Date;
+  /** gewähltes Netz (Plan 0039, E8): Karte der Merkliste */
+  network: NetworkId;
   /** Entfernung ab dem Startpunkt (Wegzeit oder Luftlinie); ohne Startpunkt oder solange sie lädt `undefined` */
   reach?: ReachFn | undefined;
 }
@@ -148,6 +151,7 @@ export function useOfferViews({
   savedIds,
   savedFilter = EMPTY_SAVED_FILTER,
   now,
+  network,
   reach,
 }: OfferViewsInput): OfferViews {
   const [ageOnly, setAgeOnlyState] = useState(true);
@@ -231,12 +235,11 @@ export function useOfferViews({
     if (route.tab === "karte") return { placeCount: countPlaces(visible), cameraOffers: upcoming };
     if (route.tab === "merkliste-karte") {
       // Die Karte der Merkliste zeigt nur Gemerktes im gewählten Netz; das andere steht in der Liste (Plan 0039, E8)
-      const inNetwork = new Set(offers.map((o) => o.id));
-      const shown = savedVisibleList.filter((o) => inNetwork.has(o.id));
+      const shown = offersInNetwork(savedVisibleList, network);
       return { placeCount: countPlaces(shown), cameraOffers: upcoming };
     }
     return undefined;
-  }, [route.tab, visible, savedVisibleList, upcoming, offers]);
+  }, [route.tab, visible, savedVisibleList, upcoming, network]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
   const setAgeOnly = useCallback((on: boolean) => {

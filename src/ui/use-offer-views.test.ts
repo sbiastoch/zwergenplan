@@ -52,6 +52,7 @@ function render(input: Partial<OfferViewsInput>): OfferViews {
       birthDate: undefined,
       savedIds: [],
       now: NOW,
+      network: "vgn",
       ...input,
     });
     return null;
@@ -99,7 +100,14 @@ describe("useOfferViews", () => {
   it("Altersfilter aus: alles sichtbar, unpassende gezählt und markiert (Plan 0021, E1)", () => {
     let result: OfferViews | undefined;
     function Probe() {
-      result = useOfferViews({ offers: OFFERS, route: ENTDECKEN, birthDate: "2026-05-01", savedIds: [], now: NOW });
+      result = useOfferViews({
+        offers: OFFERS,
+        route: ENTDECKEN,
+        birthDate: "2026-05-01",
+        savedIds: [],
+        now: NOW,
+        network: "vgn",
+      });
       // Update während des Renderns: React rendert sofort neu, wie nach einem Tipp auf den Schalter.
       if (result.ageOnly) result.setAgeOnly(false);
       return null;
@@ -119,7 +127,14 @@ describe("useOfferViews", () => {
     let result: OfferViews | undefined;
     let step = 0;
     function Probe() {
-      result = useOfferViews({ offers: many, route: ENTDECKEN, birthDate: undefined, savedIds: [], now: NOW });
+      result = useOfferViews({
+        offers: many,
+        route: ENTDECKEN,
+        birthDate: undefined,
+        savedIds: [],
+        now: NOW,
+        network: "vgn",
+      });
       // Updates während des Renderns: erst „Weitere zeigen“, dann den Schalter umlegen
       if (step === 0) {
         step = 1;
@@ -232,7 +247,14 @@ describe("useOfferViews", () => {
       let result: OfferViews | undefined;
       function Probe() {
         const [now, setNow] = useState(before);
-        result = useOfferViews({ offers: OFFERS, route: kalender, birthDate: undefined, savedIds: [BABY.id], now });
+        result = useOfferViews({
+          offers: OFFERS,
+          route: kalender,
+          birthDate: undefined,
+          savedIds: [BABY.id],
+          now,
+          network: "vgn",
+        });
         // Update während des Renderns: React rendert sofort neu, der Kalender-Zustand bleibt erhalten.
         if (now === before) setNow(after);
         return null;
@@ -246,7 +268,14 @@ describe("useOfferViews", () => {
       let step = 0;
       function Probe() {
         const [route, setRoute] = useState<Route>(kalender);
-        result = useOfferViews({ offers: OFFERS, route, birthDate: undefined, savedIds: [BABY.id], now: NOW });
+        result = useOfferViews({
+          offers: OFFERS,
+          route,
+          birthDate: undefined,
+          savedIds: [BABY.id],
+          now: NOW,
+          network: "vgn",
+        });
         if (step === 0) {
           step = 1;
           result.savedCalendar?.setSelection({ unit: "tag", day: "2026-10-10" });
@@ -442,7 +471,7 @@ describe("useOfferViews", () => {
     it("Altersfilter aus: am nächsten Termin, wie ohne Kind", () => {
       let result: OfferViews | undefined;
       function Probe() {
-        result = useOfferViews({ ...input, route: ENTDECKEN, savedIds: [], now: NOW });
+        result = useOfferViews({ ...input, route: ENTDECKEN, savedIds: [], now: NOW, network: "vgn" });
         if (result.ageOnly) result.setAgeOnly(false);
         return null;
       }

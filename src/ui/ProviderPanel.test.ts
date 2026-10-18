@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const DATA = { generatedAt: "2026-10-05T06:00:00+02:00", providers: [] };
 
-const loadProviderDirectory = vi.fn(async () => DATA);
+const loadProviderDirectory = vi.fn(
+  async (): Promise<{ generatedAt: string; providers: Array<Record<string, unknown>> }> => DATA,
+);
 vi.mock("../data/providers.ts", () => ({ loadProviderDirectory, ensureFresh: vi.fn() }));
 
 const chunkLoaded = vi.fn();
@@ -29,7 +31,7 @@ describe("loadProviderUi (Plan 0010, E7)", () => {
     const first = loadProviderUi();
     expect(loadProviderUi()).toBe(first);
     const ui = await first;
-    expect(ui.data).toBe(DATA);
+    expect(ui.data).toEqual(DATA);
     expect(typeof ui.ProviderScreen).toBe("function");
     expect(typeof ui.ProviderSheet).toBe("function");
     expect(loadProviderDirectory).toHaveBeenCalledTimes(1);
@@ -41,7 +43,15 @@ describe("loadProviderUi (Plan 0010, E7)", () => {
     loadProviderDirectory.mockRejectedValueOnce(new Error("HTTP 503"));
     preloadProviderUi(); // schluckt den Fehler
     await expect(loadProviderUi()).rejects.toThrow("HTTP 503");
-    expect((await loadProviderUi()).data).toBe(DATA);
+    expect((await loadProviderUi()).data).toEqual(DATA);
     expect(loadProviderDirectory).toHaveBeenCalledTimes(2);
+  });
+
+  // Übergang Plan 0039 (Arch-Review M1): anbieter.json aus einem Cache vor Plan 0039 hat kein network
+  it("anbieter.json ohne network: die Anbieter gehören zu vgn", async () => {
+    const { loadProviderUi } = await import("./ProviderPanel.tsx");
+    const old = { id: "abc", name: "Alt", url: "https://example.org/", venues: [] };
+    loadProviderDirectory.mockResolvedValueOnce({ generatedAt: DATA.generatedAt, providers: [old] });
+    expect((await loadProviderUi()).data.providers).toEqual([{ ...old, network: "vgn" }]);
   });
 });

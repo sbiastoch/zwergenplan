@@ -4,27 +4,28 @@
  * Schritte (Review 2, M1): `loadProviderDirectory` kennt `site.json` nicht und kann deshalb schon beim Parsen der Route
  * starten; `ensureFresh` gleicht danach den Datenstand ab. `fetch` wird injiziert, weil Unit-Tests ihn verbieten.
  */
-import type { ProviderDirectoryData } from "../domain/site-data.ts";
+import type { LooseProviderDirectoryData } from "../domain/site-data.ts";
 
 export type FetchFn = (url: string, init?: RequestInit) => Promise<Response>;
 
 // zur Aufrufzeit lesen und ohne `this` rufen (sonst „Illegal invocation“)
 const browserFetch: FetchFn = (url, init) => globalThis.fetch(url, init);
 
-async function fetchDirectory(fetchFn: FetchFn, init?: RequestInit): Promise<ProviderDirectoryData> {
+async function fetchDirectory(fetchFn: FetchFn, init?: RequestInit): Promise<LooseProviderDirectoryData> {
   const res = await fetchFn(`${import.meta.env.BASE_URL}data/anbieter.json`, init);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  // Build-Artefakt, beim Build mit Zod geprüft (scripts/build-data.ts) – hier kein erneutes Parsen.
-  return (await res.json()) as ProviderDirectoryData;
+  // Build-Artefakt, beim Build mit Zod geprüft (scripts/build-data.ts) – hier kein erneutes Parsen. Locker, weil ein
+  // Cache einen Stand vor Plan 0039 liefern kann; `adoptDirectory` füllt `network` (Arch-Review M1).
+  return (await res.json()) as LooseProviderDirectoryData;
 }
 
 /** HTTP ≠ 2xx wirft. Gemerkt wird hier nichts; das gemeinsame Promise hält der Lader (ProviderPanel.tsx). */
-export function loadProviderDirectory(fetchFn: FetchFn = browserFetch): Promise<ProviderDirectoryData> {
+export function loadProviderDirectory(fetchFn: FetchFn = browserFetch): Promise<LooseProviderDirectoryData> {
   return fetchDirectory(fetchFn);
 }
 
 /** Ergebnis des Abgleichs je erwartetem Datenstand: Liste und Sheet laden nicht zweimal nach. */
-const reloads = new Map<string, Promise<ProviderDirectoryData>>();
+const reloads = new Map<string, Promise<LooseProviderDirectoryData>>();
 
 /**
  * Datenstand-Abgleich (M4): Stimmt `data.generatedAt` mit `expected` (aus site.json) überein, kommt `data` zurück.
@@ -33,10 +34,10 @@ const reloads = new Map<string, Promise<ProviderDirectoryData>>();
  * der Chunk als Rückfall-Zeilen aus den Angeboten. Wirft nie.
  */
 export function ensureFresh(
-  data: ProviderDirectoryData,
+  data: LooseProviderDirectoryData,
   expected: string,
   fetchFn: FetchFn = browserFetch,
-): Promise<ProviderDirectoryData> {
+): Promise<LooseProviderDirectoryData> {
   const known = reloads.get(expected);
   if (known) return known;
   if (data.generatedAt === expected) return Promise.resolve(data);

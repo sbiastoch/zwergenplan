@@ -11,7 +11,7 @@
 import { useEffect, useState } from "react";
 import { ensureFresh, loadProviderDirectory } from "../data/providers.ts";
 import { isKnownProvider } from "../domain/provider-count.ts";
-import type { ProviderDirectoryData } from "../domain/site-data.ts";
+import { adoptDirectory, type ProviderDirectoryData } from "../domain/site-data.ts";
 import { LoadFailed, useLazy } from "./Lazy.tsx";
 import type { ProviderScreenProps, ProviderSheetProps, ProviderUiModule } from "./provider-types.ts";
 
@@ -35,7 +35,7 @@ const peekProviderUi = (): ProviderUi | undefined => loaded;
 
 async function fetchUi(): Promise<ProviderUi> {
   const [ui, data] = await Promise.all([loadChunk(), loadProviderDirectory()]);
-  loaded = { ...ui, data };
+  loaded = { ...ui, data: adoptDirectory(data) };
   return loaded;
 }
 
@@ -75,7 +75,7 @@ function useFreshDirectory(
     if (!stale || known !== undefined || data === undefined || expected === undefined) return;
     let live = true;
     void ensureFresh(data, expected).then((next) => {
-      fresh.set(expected, next);
+      fresh.set(expected, adoptDirectory(next));
       if (live) setResolved((n) => n + 1);
     });
     return () => {

@@ -12,9 +12,8 @@ import { countProviders } from "../domain/provider-count.ts";
 import { type Tab, tabSection } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
-import type { SiteData, SiteOffer } from "../domain/site-data.ts";
+import { adoptSiteData, offersInNetwork, type SiteData, type SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
-import { type Category, withCategory } from "../domain/topics.ts";
 import { Header, QuickFilters, Stickers, TabBar, type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
   ageChipLabel,
@@ -59,20 +58,6 @@ import {
 } from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
-
-/** `site.json` im lockeren Format: Angebote ohne `category` aus einem Datencache vor Plan 0037, Stufe A (E13). */
-type LooseSiteData = Omit<SiteData, "offers"> & {
-  offers: Array<Omit<SiteOffer, "category"> & { category?: Category }>;
-};
-
-/**
- * Übernimmt geladene Daten; ein Angebot ohne `category` bekommt den Rückfall aus den Themen. Einzige Stelle in
- * `src/ui` dafür, nicht in `src/data` (ADR 0010, `data-domain-runtime-allowlist`).
- */
-// Übergang Plan 0037 (E13): site.json aus einem Cache vor Stufe A hat kein category; Rückfall bleibt bis Stufe C
-function adoptSite(data: LooseSiteData): SiteData {
-  return { ...data, offers: data.offers.map((offer) => withCategory<SiteOffer>(offer)) };
-}
 
 type LoadState = { kind: "loading" } | { kind: "error"; reason: LoadFailure } | { kind: "ready"; data: SiteData };
 /** Onboarding (Plan 0033, E9): „auto“ beim ersten Öffnen, „manuell“ über das Kind-Sheet (E12) */
@@ -146,7 +131,7 @@ export function App() {
     void attempt;
     setLoad({ kind: "loading" });
     loadSiteData().then(
-      (data) => setLoad({ kind: "ready", data: adoptSite(data) }),
+      (data) => setLoad({ kind: "ready", data: adoptSiteData(data) }),
       // Die Fehlerart kennt nur src/data; ein unbekannter Fehler zeigt nie seinen Rohtext (Plan 0008, E5).
       (e: unknown) => setLoad({ kind: "error", reason: e instanceof SiteLoadError ? e.reason : "server" }),
     );
@@ -167,7 +152,7 @@ export function App() {
    * Karte einen eigenen Leerzustand („In Düsseldorf haben wir noch keine Angebote.“, `emptyNetwork`, Review M7).
    */
   const allOffers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
-  const offers = useMemo(() => allOffers.filter((o) => o.network === network), [allOffers, network]);
+  const offers = useMemo(() => offersInNetwork(allOffers, network), [allOffers, network]);
   const emptyNetwork = load.kind === "ready" && offers.length === 0 && allOffers.length > 0 ? network : undefined;
   // Orte des Netzes: Die Wegzeit-Tabelle des Netzes muss zu ihnen passen (E8). Erst mit site.json bekannt.
   const placeKeys = useMemo(
@@ -189,7 +174,7 @@ export function App() {
         refresh: () => {
           refreshTransit();
           return loadSiteData().then(
-            (data) => setLoad({ kind: "ready", data: adoptSite(data) }),
+            (data) => setLoad({ kind: "ready", data: adoptSiteData(data) }),
             () => {},
           );
         },
@@ -207,6 +192,7 @@ export function App() {
     savedFilter,
     now,
     reach: transit.reach,
+    network,
   });
   const { visible, unfitCount, ageOnly, page, saved, detailOffer } = views;
 
@@ -568,11 +554,7 @@ export function App() {
             // einen Altersausweg gibt es nicht
             // Die Karte zeigt nur Gemerktes im gewählten Netz, das andere steht in der Liste (Plan 0039, E8)
             renderMap={(savedOffers, onResetSaved) =>
-              mapPanel(
-                savedOffers.filter((o) => o.network === network),
-                onResetSaved,
-                undefined,
-              )
+              mapPanel(offersInNetwork(savedOffers, network), onResetSaved, undefined)
             }
             renderCalendar={(onResetSaved) =>
               views.savedCalendar && (

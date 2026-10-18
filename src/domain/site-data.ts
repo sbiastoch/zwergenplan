@@ -4,6 +4,7 @@
  */
 import { type NetworkId, networkOf } from "./regions.ts";
 import type { Offer, OffersFile, Provider, Venue } from "./schema.ts";
+import { type Category, withCategory } from "./topics.ts";
 
 /** `providerId` ist hier die `publicId` des Anbieters, nicht die Katalog-ID (ADR 0022); `venueId` bleibt intern. */
 export interface SiteOffer extends Offer {
@@ -40,6 +41,54 @@ export interface ProviderDirectoryData {
   generatedAt: string;
   /** nach Name sortiert (`de`) */
   providers: SiteProvider[];
+}
+
+/** Angebote eines Netzes, Reihenfolge bleibt: Liste, Karte, Willkommenszahl, Karte der Merkliste (Plan 0039, E7/E8) */
+export function offersInNetwork<T extends { network: NetworkId }>(offers: readonly T[], network: NetworkId): T[] {
+  return offers.filter((o) => o.network === network);
+}
+
+/*
+ * Übergang Plan 0039 (Arch-Review M1): Ein site.json bzw. anbieter.json aus einem Cache vor Plan 0039 (alter Service
+ * Worker, alter Build) hat kein `network`. Ohne Rückfall wäre das Netz `vgn` leer, Bestandsnutzer sähen „In Nürnberg
+ * und Fürth haben wir noch keine Angebote“. Vor Plan 0039 gab es nur Nürnberg und Fürth, also `vgn`. Der Rückfall
+ * entfällt zusammen mit dem für `category` (Plan 0037, E13, Stufe C), frühestens 14 Tage nach dem Deploy von Plan
+ * 0039: Dann hat jeder Service Worker site.json und anbieter.json mindestens einmal neu geladen.
+ */
+const NETWORK_BEFORE_0039: NetworkId = "vgn";
+
+/** `site.json` im lockeren Format: ohne `category` (vor Plan 0037, Stufe A; E13) oder ohne `network` (vor Plan 0039) */
+export type LooseSiteData = Omit<SiteData, "offers"> & {
+  offers: Array<Omit<SiteOffer, "category" | "network"> & { category?: Category; network?: NetworkId }>;
+};
+
+/** `anbieter.json` im lockeren Format: Anbieter ohne `network` (vor Plan 0039) */
+export type LooseProviderDirectoryData = Omit<ProviderDirectoryData, "providers"> & {
+  providers: Array<Omit<SiteProvider, "network"> & { network?: NetworkId }>;
+};
+
+/**
+ * Übernimmt geladene Angebote: ohne `category` mit dem Rückfall aus den Themen (Plan 0037, E13), ohne `network` mit
+ * `vgn` (Übergang Plan 0039, Arch-Review M1). Einzige Stelle dafür, nicht in `src/data` (ADR 0010,
+ * `data-domain-runtime-allowlist`); `App.tsx` ruft sie nach jedem Laden.
+ */
+// Übergang Plan 0037 (E13) und Plan 0039 (Arch-Review M1): Rückfälle bleiben bis Stufe C von Plan 0037
+export function adoptSiteData(data: LooseSiteData): SiteData {
+  return {
+    ...data,
+    offers: data.offers.map((offer) =>
+      withCategory<SiteOffer>({ ...offer, network: offer.network ?? NETWORK_BEFORE_0039 }),
+    ),
+  };
+}
+
+/** Übernimmt einen geladenen Katalog; ein Anbieter ohne `network` gehört zu `vgn` (Übergang Plan 0039, Arch-Review M1) */
+// Übergang Plan 0039 (Arch-Review M1): Rückfall bleibt bis Stufe C von Plan 0037
+export function adoptDirectory(data: LooseProviderDirectoryData): ProviderDirectoryData {
+  return {
+    ...data,
+    providers: data.providers.map((p) => ({ ...p, network: p.network ?? NETWORK_BEFORE_0039 })),
+  };
 }
 
 export interface SiteMeta {
