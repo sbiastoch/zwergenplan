@@ -277,7 +277,6 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await withGostenhof(page);
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("5 Min.");
   },
-  // Quellenhinweis mit zwei Fließtext-Links (≥ 24 px, Plan 0009, E3)
   // Auswahl „Stadt“ über dem Startpunkt (Plan 0039, E8, Mockup Variante A), Düsseldorf gewählt: nur dessen Stadtteile
   "kind-sheet-stadt": async (page) => {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
@@ -308,6 +307,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       "Fürth",
     ]);
   },
+  // Quellenhinweis mit zwei Fließtext-Links (≥ 24 px, Plan 0009, E3)
   "kind-sheet-wegzeit": async (page) => {
     const sheet = await pickGostenhof(page);
     await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();
@@ -364,6 +364,20 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       .getByRole("button")
       .click();
     await expect(page.getByRole("dialog").getByText(/Geschwisterkinder ermäßigt/)).toBeVisible();
+  },
+  // Netz ohne Angebote (Plan 0039, E8, Review M7; Arch-Review m4): Düsseldorf gewählt, site.json ohne die
+  // Düsseldorfer Fixture-Angebote wie in startpunkt.spec.ts („Netz ohne Angebote“)
+  "entdecken-netz-leer": async (page) => {
+    await page.route("**/data/site.json", async (route) => {
+      const response = await route.fetch();
+      const data = (await response.json()) as { offers: { network: string }[] };
+      await route.fulfill({ response, json: { ...data, offers: data.offers.filter((o) => o.network !== "vrr") } });
+    });
+    await page.evaluate(() => localStorage.setItem("zwergenplan.stadt", "duesseldorf"));
+    await page.goto("./");
+    await expect(page.getByText("In Düsseldorf haben wir noch keine Angebote.")).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("0 Angebote ab heute");
+    await expect(page.getByTestId("offer")).toHaveCount(0);
   },
   // Tabelle blockiert (E11): Luftlinie, längste Statuszeile und Hinweis mit „Nochmal laden“
   "entdecken-wegzeit-rueckfall": async (page) => {
