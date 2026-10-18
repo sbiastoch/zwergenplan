@@ -3,15 +3,15 @@
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Nov. 2026–Jan. 2027)",
-   "summary": "Schwimmkurs für Babys ab 3 Monate in den Kliniken Dr. Erler, samstags um 10:15 Uhr, Kursende am 16. Januar 2027. Der Kurs ist ausgebucht.",
+   "title": "Babyschwimmen Babys ab 3 Monate, Sa 10:15 (Start 14.11.2026)",
+   "summary": "Wasserkurs für Babys samstags um 10:15 im Nürnberger Standort Kliniken Dr. Erler, rund 10 Termine bis Mitte Januar. Der Block ab 14.11. ist laut Buchungsseite ausgebucht.",
    "topics": [
     "babyschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "189 €",
+   "price": "189 € (inkl. 19% MwSt.)",
    "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
    "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
    "category": "wasser",
@@ -21,7 +21,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Kurs ausgebucht"
+    "note": "Kurs laut Buchungsseite ausgebucht"
    },
    "schedule": {
     "kind": "weekly",
@@ -37,15 +37,15 @@
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Jan.–März 2027)",
-   "summary": "Schwimmkurs für Babys ab 3 Monate in den Kliniken Dr. Erler, samstags um 10:15 Uhr, vom 23. Januar bis 13. März 2027. Freie Plätze laut Buchungsseite.",
+   "title": "Babyschwimmen Babys ab 3 Monate, Sa 10:15 (Start 23.01.2027)",
+   "summary": "Wasserkurs für Babys samstags um 10:15 im Nürnberger Standort Kliniken Dr. Erler, rund 8 Termine von Ende Januar bis Mitte März. Plätze laut Buchungsseite buchbar.",
    "topics": [
     "babyschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "189 €",
+   "price": "189 € (inkl. 19% MwSt.)",
    "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
    "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20290",
    "category": "wasser",
@@ -55,7 +55,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Freie Plätze laut Buchungsseite"
+    "note": "Plätze laut Buchungsseite buchbar"
    },
    "schedule": {
     "kind": "weekly",
@@ -71,15 +71,15 @@
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Minis-Schwimmkurs ab 1 Jahr, Sa 9:30 (Nov. 2026–Jan. 2027)",
-   "summary": "Schwimmkurs für Kleinkinder ab 1 Jahr in den Kliniken Dr. Erler, samstags um 9:30 Uhr, Kursende am 16. Januar 2027. Freie Plätze laut Buchungsseite.",
+   "title": "Kleinkindschwimmen Minis ab 1 Jahr, Sa 09:30 (Start 14.11.2026)",
+   "summary": "Wasserkurs für Kleinkinder ab 1 Jahr samstags um 09:30 im Nürnberger Standort Kliniken Dr. Erler, rund 10 Termine bis Mitte Januar. Plätze laut Buchungsseite buchbar.",
    "topics": [
     "kleinkindschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "189 €",
+   "price": "189 € (inkl. 19% MwSt.)",
    "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
    "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
    "category": "wasser",
@@ -89,7 +89,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Freie Plätze laut Buchungsseite"
+    "note": "Plätze laut Buchungsseite buchbar"
    },
    "schedule": {
     "kind": "weekly",
@@ -105,15 +105,15 @@
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Minis-Schwimmkurs ab 1 Jahr, Sa 9:30 (Jan.–März 2027)",
-   "summary": "Schwimmkurs für Kleinkinder ab 1 Jahr in den Kliniken Dr. Erler, samstags um 9:30 Uhr, vom 23. Januar bis 13. März 2027. Freie Plätze laut Buchungsseite.",
+   "title": "Kleinkindschwimmen Minis ab 1 Jahr, Sa 09:30 (Start 23.01.2027)",
+   "summary": "Wasserkurs für Kleinkinder ab 1 Jahr samstags um 09:30 im Nürnberger Standort Kliniken Dr. Erler, rund 8 Termine von Ende Januar bis Mitte März. Plätze laut Buchungsseite buchbar.",
    "topics": [
     "kleinkindschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "189 €",
+   "price": "189 € (inkl. 19% MwSt.)",
    "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
    "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291",
    "category": "wasser",
@@ -123,7 +123,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Freie Plätze laut Buchungsseite"
+    "note": "Plätze laut Buchungsseite buchbar"
    },
    "schedule": {
     "kind": "weekly",
@@ -139,15 +139,15 @@
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Maxis-Schwimmkurs ab 2 Jahre, Sa 11:00 (Nov. 2026–Jan. 2027)",
-   "summary": "Schwimmkurs für Kinder ab 2 Jahren in den Kliniken Dr. Erler, samstags um 11:00 Uhr, Kursende am 16. Januar 2027. Der Kurs ist ausgebucht.",
+   "title": "Kleinkindschwimmen Maxis ab 2 Jahre, Sa 11:00 (Start 14.11.2026)",
+   "summary": "Wasserkurs für Kinder ab 2 Jahren samstags um 11:00 im Nürnberger Standort Kliniken Dr. Erler, rund 10 Termine bis Mitte Januar. Der Block ab 14.11. ist laut Buchungsseite ausgebucht.",
    "topics": [
     "kleinkindschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "189 €",
+   "price": "189 € (inkl. 19% MwSt.)",
    "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
    "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
    "category": "wasser",
@@ -157,7 +157,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Kurs ausgebucht"
+    "note": "Kurs laut Buchungsseite ausgebucht"
    },
    "schedule": {
     "kind": "weekly",
@@ -173,15 +173,15 @@
   {
    "providerId": "schwimmschule-ohana-nuernberg",
    "venueId": "schwimmschule-ohana-nuernberg",
-   "title": "Maxis-Schwimmkurs ab 2 Jahre, Sa 11:00 (Jan.–März 2027)",
-   "summary": "Schwimmkurs für Kinder ab 2 Jahren in den Kliniken Dr. Erler, samstags um 11:00 Uhr, vom 23. Januar bis 13. März 2027. Freie Plätze laut Buchungsseite.",
+   "title": "Kleinkindschwimmen Maxis ab 2 Jahre, Sa 11:00 (Start 23.01.2027)",
+   "summary": "Wasserkurs für Kinder ab 2 Jahren samstags um 11:00 im Nürnberger Standort Kliniken Dr. Erler, rund 8 Termine von Ende Januar bis Mitte März. Plätze laut Buchungsseite buchbar.",
    "topics": [
     "kleinkindschwimmen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "189 €",
+   "price": "189 € (inkl. 19% MwSt.)",
    "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
    "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
    "category": "wasser",
@@ -191,7 +191,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Freie Plätze laut Buchungsseite"
+    "note": "Plätze laut Buchungsseite buchbar"
    },
    "schedule": {
     "kind": "weekly",
@@ -205,10 +205,10 @@
    }
   }
  ],
- "inputHash": "2c9513e4d7c7434c5b848f05fe60a468a367896c7682eae1d2a32d4d60b5e5d9",
+ "inputHash": "9a8f90be8b93b8b04e762be7eb9e612091e5b237f31181f951ac8a48fea6d1ee",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-17T07:59:57+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-18T08:28:10+02:00",
+ "changedAt": "2026-10-18T08:28:10+02:00",
  "sources": []
 }

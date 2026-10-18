@@ -3,8 +3,8 @@
   {
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
-   "title": "Baby & Museum – Kurzführung für Erwachsene mit Babys",
-   "summary": "Gemeinsame Kurzführung zu wechselnden Themen aus Kunst, Architektur und Design, mit Pausen zum Füttern und Wickeln, danach Kaffee zum Austausch. Kinderwagen und Trage sind erlaubt. Tickets über den Museumsshop.",
+   "title": "Baby & Museum: Kurzführung für Erwachsene mit Babys",
+   "summary": "Monatliche Kurzführung zu wechselnden Themen für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln. Anschließend Kaffee und Austausch. Kinderwagen und Trage sind erlaubt. Tickets je Termin im go~mus-Shop.",
    "topics": [
     "museum",
     "elterntreff"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Kontingent ist dort sichtbar"
+    "note": "Tickets je Termin im go~mus-Shop; Restkontingent dort nicht auf der Programmseite sichtbar"
    },
    "schedule": {
     "kind": "dates",
@@ -50,7 +50,7 @@
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
    "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-   "summary": "Eine Schauspielerin erzählt Geschichten aus einem Kinderbuch im Wonderland-Raum der Ausstellung, zum Mitmachen. Für Kinder ab zwei Jahren mit Begleitung; Erwachsene zahlen Eintritt.",
+   "summary": "Eine Schauspielerin erzählt und spielt Geschichten aus einem Kinderbuch im Wonderland-Raum der Ausstellung. Kinder ab zwei Jahren machen aktiv mit. Eintritt für Erwachsene zzgl. Tickets im Shop.",
    "topics": [
     "vorlesen",
     "museum"
@@ -68,7 +68,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets über den go~mus-Shop (nmn-tickets.de)"
+    "note": "Ticket über den go~mus-Shop; Verfügbarkeit dort nicht sichtbar"
    },
    "schedule": {
     "kind": "dates",
@@ -80,7 +80,7 @@
    }
   }
  ],
- "inputHash": "0ed53be74362b32e2fb5a3df2b217f62d2b68699e706f530b34616de90270d1c",
+ "inputHash": "248478189796a272c4d3de98f0bc15e9324baf3aa8d2d0791d409897760ec8ab",
  "dated": {
   "2026-10-23": "53642745de7c615142b7af6154a2309788f97f45c2fba5d2e53000d0b40d90ac",
   "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
@@ -92,8 +92,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-17T07:59:57+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-18T08:28:10+02:00",
+ "changedAt": "2026-10-18T08:28:10+02:00",
  "sources": [
   "stadt-vk"
  ]

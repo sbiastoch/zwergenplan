@@ -3,15 +3,14 @@
   {
    "providerId": "babykonzert-nuernberg",
    "venueId": "babykonzert-nuernberg",
-   "title": "Babykonzert: Klassik auf der Krabbeldecke (Sonntag, 08.11.2026)",
-   "summary": "Konzert mit Live-Musik für Babys und Kleinkinder im Marmorsaal des Presseclubs. Babys und Kinder zahlen keinen Eintritt; Erwachsene brauchen eine Karte. Gutscheingäste müssen vorher per Mail reserviert werden.",
+   "title": "Babykonzert Klassik auf der Krabbeldecke (08.11.2026, 11 und 13 Uhr)",
+   "summary": "Klassikkonzert für Babys und Eltern im Marmorsaal des Presseclubs. Babys und Kinder zahlen keinen Eintritt, Erwachsene brauchen Karten. Der 11-Uhr-Termin ist ausverkauft, für den Zusatztermin um 13 Uhr bitte die Verfügbarkeit prüfen.",
    "topics": [
     "konzert"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "Babys und Kinder zahlen keinen Eintritt; Erwachsene laut Ticketseite",
    "url": "https://babykonzert.de/home/nuernberg/",
    "sourceUrl": "https://babykonzert.de/home/nuernberg/",
    "category": "buehne",
@@ -21,22 +20,25 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Karten über Eventim Light; Verfügbarkeit steht nicht im Seitentext. Gutscheingäste vorher per Mail an saskia.duerr@babykonzert.de reservieren."
+    "note": "11 Uhr ausverkauft; 13 Uhr Karten über Eventim Light prüfen"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
      {
       "start": "2026-11-08T11:00"
+     },
+     {
+      "start": "2026-11-08T13:00"
      }
     ]
    }
   }
  ],
- "inputHash": "69b2409a5216d93b0fc82c7d3aa543bb26b39b9adc2c6720d6802a1ea1c268b9",
+ "inputHash": "49048d327f8acd12105c5c6b033fac6b19e54ed946e295b3a8350acf9e3803c1",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-17T07:59:57+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-18T08:28:10+02:00",
+ "changedAt": "2026-10-18T08:28:10+02:00",
  "sources": []
 }

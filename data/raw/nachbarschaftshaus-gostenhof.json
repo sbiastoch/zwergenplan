@@ -3,11 +3,10 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer, Dienstag 9–12 Uhr (0–3 Jahre)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre: Spielen, Treffen und Austauschen ohne festes Programm. Einfach vorbeikommen, nicht in den Ferien.",
+   "title": "Offenes Kinderzimmer (Dienstag 9–12 Uhr)",
+   "summary": "Offener Spiel- und Begegnungstreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne Anmeldung. Nicht in den Ferien; im Sommer auch der Garten.",
    "topics": [
     "spielgruppe",
-    "eltern-kind-gruppe",
     "elterntreff"
    ],
    "format": "regelmaessig",
@@ -22,7 +21,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "ohne-anmeldung"
+    "status": "ohne-anmeldung",
+    "note": "Einfach vorbeikommen, keine Anmeldung"
    },
    "schedule": {
     "kind": "weekly",
@@ -38,11 +38,10 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer, Donnerstag 14–17 Uhr (0–3 Jahre)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre: Spielen, Treffen und Austauschen ohne festes Programm. Einfach vorbeikommen, nicht in den Ferien.",
+   "title": "Offenes Kinderzimmer (Donnerstag 14–17 Uhr)",
+   "summary": "Offener Spiel- und Begegnungstreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne Anmeldung. Nicht in den Ferien; im Sommer auch der Garten.",
    "topics": [
     "spielgruppe",
-    "eltern-kind-gruppe",
     "elterntreff"
    ],
    "format": "regelmaessig",
@@ -57,7 +56,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "ohne-anmeldung"
+    "status": "ohne-anmeldung",
+    "note": "Einfach vorbeikommen, keine Anmeldung"
    },
    "schedule": {
     "kind": "weekly",
@@ -71,10 +71,10 @@
    }
   }
  ],
- "inputHash": "f070d238316b094a4c466e622b8f92eaac7be8931a406305fb975a4a82b87cd6",
+ "inputHash": "d8820540355b7317508d40753122e292a6b59bff33bdc45c8cd82c5c22b1537a",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-17T07:59:57+02:00",
- "changedAt": "2026-10-17T07:59:57+02:00",
+ "checkedAt": "2026-10-18T08:28:10+02:00",
+ "changedAt": "2026-10-18T08:28:10+02:00",
  "sources": []
 }
