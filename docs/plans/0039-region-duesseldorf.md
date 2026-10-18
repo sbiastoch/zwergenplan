@@ -319,10 +319,11 @@ Entschieden am 2026-10-18 nach den Reviews:
 - **Startbudget** (E13): `JS (initial)` von 102 auf **104 kB** anheben; Nachtrag ADR 0012 in S6.
 - **Privatsphäre** (E15, Punkt 4): Die Ausnahme wird angenommen; geladen wird nur die Tabelle des gewählten Netzes.
 
+- **Mockup** (E8, S7): Variante **A, Auswahlfeld „Stadt“** über dem Startpunkt im Kind-Sheet (Mockup https://claude.ai/artifact/XZ8yBj2iQ6yLgatS8LxFK1, Entscheid 2026-10-18). Onboarding mit drei Kacheln, Nürnberg vorgewählt.
+
 Noch offen:
 
-1. **Mockup** des Umschalters im Kind-Sheet (E8), vor S7.
-2. **Trockenlauf** des Bootstraps (S10): Abnahme der Kandidaten vor dem Live-Lauf.
+1. **Trockenlauf** des Bootstraps (S10): Abnahme der Kandidaten vor dem Live-Lauf.
 
 ## Dateien
 
