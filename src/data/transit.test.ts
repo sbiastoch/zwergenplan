@@ -127,7 +127,7 @@ describe("loadTransit: Tabelle und Rechenlogik (Plan 0009, E9)", () => {
 describe("loadTransit: Linien (Plan 0012, E9, S1)", () => {
   const linesCalls = (e: TransitEnv) => vi.mocked(e.fetch).mock.calls.filter(([url]) => url === LINES_URL);
 
-  it("fordert linien.json erst nach der Antwort der Tabelle und dem Chunk an, mit niedriger Priorität", async () => {
+  it("fordert linien/<netz>.json erst nach der Antwort der Tabelle und dem Chunk an, mit niedriger Priorität", async () => {
     const order: string[] = [];
     let releaseLogic = () => {};
     const logic = new Promise<typeof LOGIC>((resolve) => {

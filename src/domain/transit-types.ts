@@ -4,7 +4,8 @@
  */
 
 /**
- * Namensnennung nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (E3); den Abwandlungshinweis setzt der Text
+ * Namensnennung nach der Lizenz des Netzes (vgn: CC BY-SA 3.0 DE, Abschnitt 4a/4c, E3; vrr: CC BY 4.0, ADR 0032); den
+ * Abwandlungshinweis setzt der Text
  * (`transitSourceNote` in src/ui/format.ts).
  */
 export interface TransitSource {
@@ -24,13 +25,13 @@ export interface TransitSource {
 }
 
 /**
- * `public/data/wegzeit.json`: Build-Artefakt wie `site.json`, ohne Zod im Client. Entsteht nur durch
+ * `public/data/wegzeit/<netz>.json` (Plan 0039, E5): Build-Artefakt wie `site.json`, ohne Zod im Client. Entsteht nur durch
  * `scripts/transit/table.ts`, geprüft im Round-Trip-Test (E12).
  */
 export interface TransitTableFile {
   /** Formatversion 2 seit Plan 0012 (Umstiegs-Bit, `id`) */
   version: 2;
-  /** Inhaltskennung über beide Build-Dateien (Plan 0012, E6): 8 Hex-Ziffern, `table` in `linien.json` */
+  /** Inhaltskennung über beide Build-Dateien (Plan 0012, E6): 8 Hex-Ziffern, `table` in `linien/<netz>.json` */
   id: string;
   source: TransitSource;
   /** Referenz-Dienstag, „2026-10-13“ */
@@ -49,12 +50,12 @@ export interface TransitTableFile {
   minutes: string;
 }
 
-/** `public/data/linien.json` (Plan 0012, E7): Linien je Zelle der Wegzeit-Tabelle */
+/** `public/data/linien/<netz>.json` (Plan 0012, E7; Plan 0039, E5): Linien je Zelle der Wegzeit-Tabelle */
 export interface TransitLinesFile {
   version: 1;
-  /** `id` der passenden `wegzeit.json` (E6) */
+  /** `id` der passenden `wegzeit/<netz>.json` (E6) */
   table: string;
-  /** Namensnennung wie `wegzeit.json` (CC BY-SA 3.0 DE, ADR 0011 Punkt 5) */
+  /** Namensnennung wie `wegzeit/<netz>.json` (vgn: CC BY-SA 3.0 DE, ADR 0011 Punkt 5; vrr: CC BY 4.0, ADR 0032) */
   source: TransitSource;
   /** Anzeigenamen, sortiert (Code-Unit), höchstens 254: „Bus 36“, „S2“, „Tram 4“, „U1“ (mit U+00A0) */
   lines: string[];

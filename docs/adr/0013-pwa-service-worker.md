@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt ADR 0002 und die Bootstrap-Regel in `docs/architecture.md`. Details stehen in Plan 0011 (E2–E7), Abweichungen der Umsetzung dort unter „Umsetzung“.
 
+**Geändert durch ADR 0032 (Plan 0039):** Regel 5 (`oepnv`) gilt für die Tabellen je Netz, `data/wegzeit/<netz>.json` und `data/linien/<netz>.json`, statt `data/wegzeit.json` und `data/linien.json`. Beim `activate` löscht der Service Worker die Kopien der alten Pfade aus `zp-data` (`RETIRED_DATA_FILES` in `src/sw/routes.ts`).
+
 ## Kontext
 
 - Familie und Freunde öffnen den Zwergenplan fast nur auf dem Handy. Ohne Manifest gibt es kein eigenes Icon und keinen Vollbild-Start. Ohne Netz bricht die Seite mit „Keine Verbindung“ ab.

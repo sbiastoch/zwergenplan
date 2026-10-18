@@ -25,7 +25,7 @@ export type OriginAction =
   | { type: "locate"; request: number }
   | { type: "located"; request: number; result: PositionResult }
   | { type: "district"; origin: Origin }
-  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8); `point` schon gerundet und in Nürnberg */
+  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8); `point` schon gerundet und im gewählten Netz */
   | { type: "mapCenter"; point: GeoPoint }
   | { type: "clear" };
 

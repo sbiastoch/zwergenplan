@@ -69,7 +69,7 @@ export type TransitAction =
   | { type: "want"; retry?: true }
   | { type: "loaded"; attempt: number; file: TransitTableFile; logic: TransitLogic }
   | { type: "failed"; attempt: number }
-  /** Tabelle geladen, passt aber nicht zu den Orten der Seite (alte `wegzeit.json`, E8): wie ein Fehlschlag */
+  /** Tabelle geladen, passt aber nicht zu den Orten der Seite (alte `wegzeit/<netz>.json`, E8): wie ein Fehlschlag */
   | { type: "stale"; attempt: number }
   /** Linien angekommen (Plan 0012, E9): nur für die fertige Tabelle desselben Versuchs */
   | { type: "lines"; attempt: number; lines: TransitLinesFile }
@@ -191,7 +191,7 @@ export function deliverLoad(
 
 /**
  * Dekodierte Tabelle zu den Orten der Seite: `undefined`, solange Tabelle, Logik oder Orte fehlen; `null`, wenn
- * sie nicht passt (alte `wegzeit.json` aus dem HTTP-Cache, E8). `useTransit` meldet `null` dem Reducer als `stale`.
+ * sie nicht passt (alte `wegzeit/<netz>.json` aus dem HTTP-Cache, E8). `useTransit` meldet `null` dem Reducer als `stale`.
  * Hängt nur an Datei und Logik, nicht am ganzen Zustand: Die Ankunft der Linien dekodiert die Tabelle nicht neu.
  */
 export function decodeFor(
@@ -247,7 +247,7 @@ export interface TransitApi {
   mode: ReachMode | undefined;
   /** `undefined`: kein Startpunkt oder Tabelle lädt */
   reach: ReachFn | undefined;
-  /** Namensnennung aus `wegzeit.json` (E3), sobald die Tabelle passt */
+  /** Namensnennung aus `wegzeit/<netz>.json` (E3), sobald die Tabelle passt */
   source: TransitSource | undefined;
   /** Auslöser 2 und 3 aus E9: Kind-Sheet, Karte */
   want: () => void;

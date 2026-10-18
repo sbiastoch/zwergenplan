@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006, ändert den Vergabeweg der IDs aus ADR 0022 und weicht ab von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032.
 
+**Geändert durch ADR 0032 (Plan 0039):** Der Fahrplanauszug liegt je Netz unter `data/oepnv/<netz>.json` (`vgn.json`, vormals `data/oepnv/fahrplan.json`, und `vrr.json`) und entsteht weiter nur über `pnpm pipeline oepnv [--netz vgn|vrr]`, von Hand über den Skill, nicht im Nachtlauf.
+
 ## Kontext
 
 - Bisher aktualisiert ein interaktiver Lauf in Claude Code die Daten, lokal mit dem Abo des Nutzers (ADR 0002, ADR 0006). Subagenten lesen jedes Mal alle Seiten, es gibt keinen Zeitplan, und neue Anbieter findet nur, wer sucht.

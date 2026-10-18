@@ -229,7 +229,7 @@ describe("buildTransitTables", () => {
     expect(Number.isInteger(built.lat[1])).toBe(true);
   });
 
-  it("Rundlauf: linien.json → decodeTransitLines → dieselben Namen je Zelle (L5)", () => {
+  it("Rundlauf: linien/<netz>.json → decodeTransitLines → dieselben Namen je Zelle (L5)", () => {
     if (!decoded) throw new Error("Tabelle ungültig");
     const back = decodeTransitLines(JSON.parse(JSON.stringify(lines)), decoded);
     expect(back).toBeDefined();

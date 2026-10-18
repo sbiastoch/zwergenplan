@@ -17,7 +17,7 @@ import type {
   TransitTableFile,
 } from "./transit-types.ts";
 
-/** Formatversion von `wegzeit.json` (E7); 2 seit Plan 0012 (Umstiegs-Bit, `id`) */
+/** Formatversion von `wegzeit/<netz>.json` (E7); 2 seit Plan 0012 (Umstiegs-Bit, `id`) */
 export const TRANSIT_TABLE_VERSION = 2;
 /** Größter gespeicherter Wert; mehr gilt als „über 2 Std.“ (E5) */
 export const MAX_MINUTES = 120;
@@ -34,7 +34,7 @@ export const ACCESS_METERS = 1500;
 export const INSIDE_METERS = 800;
 /** Bit 7 eines Zellwerts: Die Verbindung hat einen Umstieg (Plan 0012, E2) */
 export const TRANSFER_BIT = 0x80;
-/** Formatversion von `linien.json` (Plan 0012, E7) */
+/** Formatversion von `linien/<netz>.json` (Plan 0012, E7) */
 const TRANSIT_LINES_VERSION = 1;
 /** Bytewerte 1–254 je Ebene (E7) */
 const MAX_LINE_NAMES = 254;
@@ -103,8 +103,8 @@ function fromBase64(text: string): Uint8Array | undefined {
 }
 
 /**
- * Prüft und dekodiert `wegzeit.json`. `undefined`, wenn Version oder Längen nicht passen oder ein Ort der
- * Seite keine Spalte hat (z. B. alte `wegzeit.json` aus dem HTTP-Cache zur neuen `site.json`, E8).
+ * Prüft und dekodiert `wegzeit/<netz>.json`. `undefined`, wenn Version oder Längen nicht passen oder ein Ort der
+ * Seite keine Spalte hat (z. B. alte `wegzeit/<netz>.json` aus dem HTTP-Cache zur neuen `site.json`, E8).
  * Die Datei kommt ungeprüft aus dem Netz, daher die Typprüfung ohne Zod.
  */
 export function decodeTransitTable(file: TransitTableFile, placeKeys: ReadonlySet<string>): TransitTable | undefined {
@@ -132,7 +132,7 @@ export function decodeTransitTable(file: TransitTableFile, placeKeys: ReadonlySe
 }
 
 /**
- * Prüft und dekodiert `linien.json` (Plan 0012, E8). `undefined`, wenn Version, Kennung (`table` ≠ `id` der
+ * Prüft und dekodiert `linien/<netz>.json` (Plan 0012, E8). `undefined`, wenn Version, Kennung (`table` ≠ `id` der
  * Tabelle), Namen oder Ebenen nicht passen; dann bleibt die Wegzeit ohne Linien. Ohne Zod wie die Tabelle.
  */
 export function decodeTransitLines(file: TransitLinesFile, table: TransitTable): TransitLines | undefined {

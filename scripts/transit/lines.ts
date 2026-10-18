@@ -1,6 +1,6 @@
 /**
  * Linien je Zelle der Wegzeit-Tabelle (Plan 0012, E1/E4/E7; ADR 0015): Anzeigenamen, die häufigste Folge im
- * Fenster und ihre Kodierung für `public/data/linien.json`.
+ * Fenster und ihre Kodierung für `public/data/linien/<netz>.json` (Plan 0039, E5).
  *
  * Rein: keine Dateien, kein Netz (dependency-cruiser `transit-build-pure`).
  */
@@ -117,7 +117,7 @@ function before(
 }
 
 /**
- * Zwei Byte-Ebenen für `linien.json` (E7): je Zelle die erste und die zweite Linie als Index + 1 in `lines`
+ * Zwei Byte-Ebenen für `linien/<netz>.json` (E7): je Zelle die erste und die zweite Linie als Index + 1 in `lines`
  * (sortiert), 0 = keine. Wirft bei mehr als 254 Namen.
  */
 export function encodeLines(
