@@ -1,6 +1,6 @@
 # Plan 0040 – Wochen-Nachricht ohne Zeitfenster, Nachholen per Hand
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit b0577de (2026-10-18)
 Datum: 2026-10-18
 Bezug:
 - Plan 0017, E1 (Zeitplan, Wächter `shouldSendNow`, Versand-Marke)
