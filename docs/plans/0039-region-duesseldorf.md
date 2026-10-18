@@ -1,6 +1,6 @@
 # Plan 0039 – Region Düsseldorf: zweites Netz außerhalb von Bayern und VGN
 
-Status: Review eingearbeitet
+Status: freigegeben
 Datum: 2026-10-18
 Bezug:
 - ADR 0025 (Katalog regionsfähig; Punkt 1 „Weitere Region-Felder (Ferienland, ÖPNV, Kamera) kommen mit der zweiten Region“), ADR 0029 (Fürth; Punkt 1 „jede Region-bbox liegt in `NUERNBERG_BBOX`“, Punkt 5 „Stadtwahl bleibt ungespeichert“)
@@ -312,12 +312,17 @@ Neues ADR 0032 als Datei `0032-netze-region-duesseldorf.md` in `docs/adr/` (Stat
 
 ADR 0011, 0014, 0017, 0025, 0029 bekommen je einen Verweis-Block „Geändert durch ADR 0032“. Ggf. Nachtrag ADR 0012 (Budget, E13).
 
-## Offene Nutzerentscheide
+## Nutzerentscheide
 
-1. **Startbudget** (E13): `JS (initial)` von 102 auf 104 kB anheben (empfohlen) oder Stadtteile auslagern. Wird **vor S1** eingeholt und als Nachtrag zu ADR 0012 festgehalten (Review 2, m14).
-2. **Privatsphäre** (E15, Punkt 4): die Ausnahme für die Wegzeit-URL je Netz annehmen (empfohlen) oder beide Tabellen für alle laden.
-3. **Mockup** des Umschalters im Kind-Sheet (E8), vor S7.
-4. **Trockenlauf** des Bootstraps (S10): Abnahme der Kandidaten vor dem Live-Lauf.
+Entschieden am 2026-10-18 nach den Reviews:
+
+- **Startbudget** (E13): `JS (initial)` von 102 auf **104 kB** anheben; Nachtrag ADR 0012 in S6.
+- **Privatsphäre** (E15, Punkt 4): Die Ausnahme wird angenommen; geladen wird nur die Tabelle des gewählten Netzes.
+
+Noch offen:
+
+1. **Mockup** des Umschalters im Kind-Sheet (E8), vor S7.
+2. **Trockenlauf** des Bootstraps (S10): Abnahme der Kandidaten vor dem Live-Lauf.
 
 ## Dateien
 
