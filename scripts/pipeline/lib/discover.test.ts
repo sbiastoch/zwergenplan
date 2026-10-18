@@ -13,6 +13,7 @@ import {
   catalogId,
   contactLinks,
   directoryFinds,
+  discoverRegions,
   dryRunCatalogIssues,
   entryFromAssessment,
   type Find,
@@ -518,6 +519,61 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
       "Nur Termine an Gemeindehaus Gostenhof; Termine an Bad Roth weglassen (außerhalb der Region)",
     ]);
   });
+
+  describe("Gemeinde-Prüfung für Regionen mit municipality (Plan 0039, E2)", () => {
+    const neuss = { name: "Neuss Hbf", address: "Neuss Hbf" };
+    const neussGeo = { lat: 51.204, lon: 6.684, municipality: "Neuss" };
+    const dus = { ...ctx, region: "duesseldorf" as const };
+
+    it("Ort in der Düsseldorfer bbox, aber in Neuss: verworfen mit „andere Gemeinde (Neuss)“", () => {
+      const r = entryFromAssessment({ ...assessed, venues: [neuss] }, { ...dus, geos: [neussGeo] });
+      expect(r).toEqual({
+        ok: false,
+        grund: "kein Ort in der Region Düsseldorf (außerhalb: Neuss Hbf – andere Gemeinde (Neuss))",
+      });
+    });
+
+    it("Region ohne municipality: derselbe Ort bleibt (nur die bbox zählt)", () => {
+      // Nürnberg hat keine Gemeinde-Prüfung; ein Ort in seiner bbox mit fremder Gemeinde (Nachbarort) bleibt
+      const r = entryFromAssessment(assessed, {
+        ...ctx,
+        geos: [{ lat: 49.449, lon: 11.06, district: "Gostenhof", municipality: "Stein" }],
+      });
+      expect(r.ok).toBe(true);
+    });
+
+    it("Ort ohne Gemeinde: verworfen mit „Gemeinde unbekannt“", () => {
+      const r = entryFromAssessment(
+        { ...assessed, venues: [{ name: "Halle", address: "Königsallee 1, 40212 Düsseldorf" }] },
+        { ...dus, geos: [{ lat: 51.226, lon: 6.78 }] },
+      );
+      expect(r).toEqual({
+        ok: false,
+        grund: "kein Ort in der Region Düsseldorf (außerhalb: Königsallee 1, 40212 Düsseldorf – Gemeinde unbekannt)",
+      });
+    });
+
+    it("Koordinaten-Adresse (ohne Gemeinde): verworfen mit „Gemeinde unbekannt“", () => {
+      const r = entryFromAssessment(
+        { ...assessed, venues: [{ name: "Spielplatz", address: "51.226, 6.78" }] },
+        { ...dus, geos: [{ lat: 51.226, lon: 6.78 }] },
+      );
+      expect(r).toEqual({
+        ok: false,
+        grund: "kein Ort in der Region Düsseldorf (außerhalb: 51.226, 6.78 – Gemeinde unbekannt)",
+      });
+    });
+
+    it("Düsseldorfer Ort bleibt, Neusser Ort fällt mit Grund im Hinweis weg", () => {
+      const r = entryFromAssessment(
+        { ...assessed, venues: [neuss, { name: "Halle", address: "Königsallee 1, 40212 Düsseldorf" }] },
+        { ...dus, geos: [neussGeo, { lat: 51.226, lon: 6.78, municipality: "Düsseldorf" }] },
+      );
+      if (!r.ok) throw new Error(r.grund);
+      expect(r.entry.venues.map((v) => v.name)).toEqual(["Halle"]);
+      expect(r.notes).toContain("Ort außerhalb der Region weggelassen: Neuss Hbf, Neuss Hbf – andere Gemeinde (Neuss)");
+    });
+  });
 });
 
 const offer = (over: Partial<Offer> = {}): Offer => ({
@@ -785,5 +841,23 @@ describe("newProvidersIssue (E7.10)", () => {
     expect(
       newProvidersIssue([{ sha: "a", message: "data: Entdecken" }], { repoUrl: "u", date: today }),
     ).toBeUndefined();
+  });
+});
+
+describe("discoverRegions (Plan 0039, E11)", () => {
+  it("--netz: Regionen des Netzes in der Reihenfolge von REGION_IDS", () => {
+    expect(discoverRegions({ netz: "vgn" })).toEqual(["fuerth", "nuernberg"]);
+    expect(discoverRegions({ netz: "vrr" })).toEqual(["duesseldorf"]);
+  });
+
+  it("--region: genau diese; ohne beides: alle", () => {
+    expect(discoverRegions({ region: "duesseldorf" })).toEqual(["duesseldorf"]);
+    expect(discoverRegions({})).toEqual(["fuerth", "nuernberg", "duesseldorf"]);
+  });
+
+  it("Unbekanntes und beides zugleich: Fehlertext", () => {
+    expect(discoverRegions({ netz: "mvv" })).toBe("unbekanntes Netz: mvv (vgn, vrr)");
+    expect(discoverRegions({ region: "muenchen" })).toBe("unbekannte Region: muenchen");
+    expect(discoverRegions({ region: "fuerth", netz: "vgn" })).toBe("--region und --netz schließen sich aus");
   });
 });

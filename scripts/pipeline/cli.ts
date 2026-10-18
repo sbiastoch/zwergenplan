@@ -29,8 +29,9 @@
  *                                               --gates/--push: Ausgang der Workflow-Schritte. Schreibt auch nach
  *                                               $GITHUB_STEP_SUMMARY und `ampel=` nach $GITHUB_OUTPUT. Exit 1 bei
  *                                               rot, außer mit --report-only.
- *   discover [--region <id>] [--bootstrap] [--dry-run] [--terms a,b] [--hide a,b]
- *                                               Entdecken neuer Anbieter (Plan 0032, E7) je Region aus REGION_IDS:
+ *   discover [--region <id> | --netz <vgn|vrr>] [--bootstrap] [--dry-run] [--terms a,b] [--hide a,b]
+ *                                               Entdecken neuer Anbieter (Plan 0032, E7) je Region aus REGION_IDS
+ *                                               (--netz: die des Netzes, Plan 0039, E11):
  *                                               Sammelkalender, Verzeichnisse, Websuche → Vorfilter → Bewerten →
  *                                               Geocodieren → Ertragsbeweis (refreshProvider) → je Anbieter ein Commit
  *                                               nach G1/G2 (G4), am Ende ein Commit mit data/discover und kosten.csv.
@@ -58,7 +59,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
-import { NETWORK_IDS, NETWORKS, REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
+import { NETWORK_IDS, NETWORKS, type RegionId } from "../../src/domain/regions.ts";
 import { berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
 import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
 import { commitNewProvider, commitRunState, GateError, publishDiscover } from "./io/discover-git.ts";
@@ -82,7 +83,7 @@ import { DEFAULT_BUDGET_MIN, runBuildOnly, runNightly } from "./io/nightly.ts";
 import { publishNightly } from "./io/publish.ts";
 import type { Candidate } from "./lib/candidate.ts";
 import { DISCOVER_BRAKES, parseBrakes } from "./lib/cost.ts";
-import { abortOf, MAX_NEW_PER_RUN, newProvidersIssue, renderDiscoverReport } from "./lib/discover.ts";
+import { abortOf, discoverRegions, MAX_NEW_PER_RUN, newProvidersIssue, renderDiscoverReport } from "./lib/discover.ts";
 import { selectTerms } from "./lib/discover-terms.ts";
 import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
@@ -118,11 +119,11 @@ const { positionals, values } = parseArgs({
     push: { type: "string" },
     "report-only": { type: "boolean", default: false },
     region: { type: "string" },
+    netz: { type: "string" },
     bootstrap: { type: "boolean", default: false },
     terms: { type: "string" },
     hide: { type: "string" },
     "build-only": { type: "boolean", default: false },
-    netz: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -337,9 +338,8 @@ async function discoverCmd() {
   const date = today();
   const runDir = join(ROOT, "runs", date, "discover");
   actionsOutput("run_dir", runDir);
-  const regions: RegionId[] = values.region
-    ? [REGION_IDS.find((r) => r === values.region) ?? fail(`unbekannte Region: ${values.region}`)]
-    : [...REGION_IDS];
+  const picked = discoverRegions({ region: values.region, netz: values.netz });
+  const regions: RegionId[] = typeof picked === "string" ? fail(picked) : picked;
   const brakes = parseBrakes(process.env, DISCOVER_BRAKES);
   if (!brakes.ok) fail(brakes.error);
   const budgetMin = Number(process.env["RUN_BUDGET_MIN"] || DISCOVER_BUDGET_MIN);

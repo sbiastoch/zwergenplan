@@ -11,7 +11,7 @@ import { z } from "zod";
 import { validateDataset } from "../../../src/domain/dataset.ts";
 import { inBounds } from "../../../src/domain/geo.ts";
 import { nextPublicId, SHORT_ID_PATTERN, slug } from "../../../src/domain/ids.ts";
-import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
+import { NETWORK_IDS, REGION_IDS, REGIONS, type RegionId, regionsOf } from "../../../src/domain/regions.ts";
 import { type Anbieter, type Offer, type Provider, Provider as ProviderSchema } from "../../../src/domain/schema.ts";
 import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
 import type { Candidate } from "./candidate.ts";
@@ -395,6 +395,23 @@ const AssessEntrySchema = z.strictObject({
 });
 export type AssessEntry = z.infer<typeof AssessEntrySchema>;
 
+/**
+ * Regionen eines Laufs (Plan 0039, E11): `--region` eine, `--netz` die des Netzes, ohne beides alle; Reihenfolge wie
+ * `REGION_IDS`. Fehler als Text, damit die CLI ihn meldet.
+ */
+export function discoverRegions(o: { region?: string | undefined; netz?: string | undefined }): RegionId[] | string {
+  if (o.region && o.netz) return "--region und --netz schließen sich aus";
+  if (o.region) {
+    const region = REGION_IDS.find((r) => r === o.region);
+    return region ? [region] : `unbekannte Region: ${o.region}`;
+  }
+  if (o.netz) {
+    const network = NETWORK_IDS.find((n) => n === o.netz);
+    return network ? regionsOf(network) : `unbekanntes Netz: ${o.netz} (${NETWORK_IDS.join(", ")})`;
+  }
+  return [...REGION_IDS];
+}
+
 /** Antwort des Bewertens (E7.4): verwerfen mit Grund oder Katalogeintrag als Ausschnitt von `Provider` */
 const AssessResponse = z.strictObject({
   entscheidung: z.enum(["aufnehmen", "verwerfen"]),
@@ -457,7 +474,8 @@ export function entryFromAssessment(
     /** zurückgenommene Katalog-IDs und publicIds (`reservedIds`), gelten als belegt */
     reserved?: { ids: ReadonlySet<string>; publicIds: ReadonlySet<string> };
     today: string;
-    geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined }>;
+    /** `municipality` aus dem Geocoder; zählt nur für Regionen mit `municipality` (Plan 0039, E2) */
+    geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined; municipality?: string | undefined }>;
     allowedUrls: readonly string[];
   },
 ): { ok: true; entry: Anbieter; notes: string[] } | { ok: false; grund: string } {
@@ -476,19 +494,30 @@ export function entryFromAssessment(
   );
   const owner = programme.map((g) => knownPages.get(normalizeUrl(g.url) ?? "")).find(Boolean);
   if (owner) return { ok: false, grund: `Programmseite steht schon im Katalog (${owner})` };
-  const { bbox } = REGIONS[ctx.region];
+  const { bbox, municipality } = REGIONS[ctx.region];
   if (ctx.geos.length !== a.venues.length) return { ok: false, grund: "Orte ohne Koordinaten" };
   // Orte außerhalb der Region fallen weg (Nutzerentscheid 2026-10-11, wie „musikfuechse nur Nürnberg“); verworfen
-  // wird nur, wenn keiner übrig bleibt
-  const located = a.venues.map((v, i) => ({ v, g: ctx.geos[i] ?? { lat: 0, lon: 0 } }));
-  const inside = located.filter((x) => inBounds(x.g, bbox));
-  const outside = located.filter((x) => !inBounds(x.g, bbox));
+  // wird nur, wenn keiner übrig bleibt. Hat die Region eine Gemeinde (Plan 0039, E2, „nur Stadt“), fällt auch ein Ort
+  // in der bbox weg, dessen Gemeinde eine andere oder unbekannt ist (Koordinaten-Adresse, Nominatim ohne Feld).
+  // null: Ort zählt; "": außerhalb der bbox (Adresse genügt als Grund); sonst der Gemeinde-Grund
+  const outsideWhy = (g: (typeof ctx.geos)[number]): string | null => {
+    if (!inBounds(g, bbox)) return "";
+    if (!municipality || g.municipality === municipality) return null;
+    return g.municipality ? `andere Gemeinde (${g.municipality})` : "Gemeinde unbekannt";
+  };
+  const located = a.venues.map((v, i) => {
+    const g = ctx.geos[i] ?? { lat: 0, lon: 0 };
+    return { v, g, why: outsideWhy(g) };
+  });
+  const inside = located.filter((x) => x.why === null);
+  const outside = located.filter((x) => x.why !== null);
+  const where = (x: (typeof located)[number]) => (x.why ? `${x.v.address} – ${x.why}` : x.v.address);
   if (inside.length === 0)
     return {
       ok: false,
-      grund: `kein Ort in der Region ${REGIONS[ctx.region].name} (außerhalb: ${outside.map((x) => x.v.address).join("; ")})`,
+      grund: `kein Ort in der Region ${REGIONS[ctx.region].name} (außerhalb: ${outside.map(where).join("; ")})`,
     };
-  for (const x of outside) notes.push(`Ort außerhalb der Region weggelassen: ${x.v.name}, ${x.v.address}`);
+  for (const x of outside) notes.push(`Ort außerhalb der Region weggelassen: ${x.v.name}, ${where(x)}`);
   const outsideHint =
     outside.length > 0
       ? `Nur Termine an ${inside.map((x) => x.v.name).join(", ")}; Termine an ${outside.map((x) => x.v.name).join(", ")} weglassen (außerhalb der Region)`
