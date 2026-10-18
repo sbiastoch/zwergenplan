@@ -875,7 +875,9 @@ describe("Angebot außerhalb des gewählten Netzes (Plan 0039, E8)", () => {
   it("nennt die Stadt statt Wegzeit oder Luftlinie", () => {
     expect(elsewhereText(at("vrr", 51.2197, 6.7951), "vgn")).toBe("in Düsseldorf");
     expect(elsewhereText(at("vgn", 49.4521, 11.0767), "vrr")).toBe("in Nürnberg");
-    expect(elsewhereText(at("vgn", 49.477, 10.989), "vrr")).toBe("in Fürth");
+    // Nürnberg-Eberhardshof liegt auch in der Fürther bbox: keine falsche Stadt, sondern beide (Arch-Review m1)
+    expect(elsewhereText(at("vgn", 49.455, 11.03), "vrr")).toBe("in Nürnberg und Fürth");
+    expect(elsewhereText(at("vgn", 49.477, 10.989), "vrr")).toBe("in Nürnberg und Fürth");
   });
 
   it("im gewählten Netz nichts", () => {

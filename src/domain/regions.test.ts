@@ -3,7 +3,6 @@ import { type BBox, inBounds, NUERNBERG_BBOX } from "./geo.ts";
 import {
   NETWORK_IDS,
   NETWORKS,
-  networkAt,
   networkOf,
   REGION_IDS,
   REGIONS,
@@ -114,10 +113,11 @@ describe("Netze (Plan 0039, E1/E2)", () => {
     expect(regionList("vrr")).toBe("Düsseldorf");
   });
 
-  it("networkAt: Hauptmarkt Nürnberg → vgn, Rathaus Düsseldorf → vrr, Kölner Dom → keins", () => {
-    expect(networkAt({ lat: 49.454, lon: 11.077 })).toBe("vgn");
-    expect(networkAt({ lat: 51.226, lon: 6.773 })).toBe("vrr");
-    expect(networkAt({ lat: 50.941, lon: 6.958 })).toBeUndefined();
+  it("Hauptmarkt Nürnberg liegt nur in der bbox von vgn, Rathaus Düsseldorf nur in der von vrr, Kölner Dom in keiner", () => {
+    const at = (point: { lat: number; lon: number }) => NETWORK_IDS.filter((id) => inBounds(point, NETWORKS[id].bbox));
+    expect(at({ lat: 49.454, lon: 11.077 })).toEqual(["vgn"]);
+    expect(at({ lat: 51.226, lon: 6.773 })).toEqual(["vrr"]);
+    expect(at({ lat: 50.941, lon: 6.958 })).toEqual([]);
   });
 
   it("Düsseldorf: Rathaus und die Ecken der Stadtgrenze (OSM-Relation 62539, 2026-10-18) liegen drin, Köln-Chorweiler nicht (E2)", () => {
@@ -132,11 +132,16 @@ describe("Netze (Plan 0039, E1/E2)", () => {
     expect(inBounds(chorweiler, VRR_BBOX)).toBe(false);
   });
 
-  it("regionAt: die spezifischste Region am Punkt (Fürth vor Nürnberg), sonst keine (Plan 0039, E8)", () => {
-    expect(regionAt({ lat: 49.477, lon: 10.989 })).toBe("fuerth");
-    expect(regionAt({ lat: 49.454, lon: 11.077 })).toBe("nuernberg");
-    expect(regionAt({ lat: 51.226, lon: 6.773 })).toBe("duesseldorf");
-    expect(regionAt({ lat: 50.941, lon: 6.958 })).toBeUndefined();
+  it("regionAt: die Region des Netzes nur, wenn genau eine bbox des Netzes trifft (Plan 0039, E8; Arch-Review m1)", () => {
+    // Hauptmarkt Nürnberg: nur in der Nürnberger bbox
+    expect(regionAt({ lat: 49.454, lon: 11.077 }, "vgn")).toBe("nuernberg");
+    expect(regionAt({ lat: 51.226, lon: 6.773 }, "vrr")).toBe("duesseldorf");
+    // Nürnberg-Eberhardshof liegt auch in der Fürther bbox, die Fürther Freiheit auch in der Nürnberger: offen
+    expect(regionAt({ lat: 49.455, lon: 11.03 }, "vgn")).toBeUndefined();
+    expect(regionAt({ lat: 49.477, lon: 10.989 }, "vgn")).toBeUndefined();
+    // Kölner Dom: in keiner; Rathaus Düsseldorf nicht im Netz vgn
+    expect(regionAt({ lat: 50.941, lon: 6.958 }, "vrr")).toBeUndefined();
+    expect(regionAt({ lat: 51.226, lon: 6.773 }, "vgn")).toBeUndefined();
   });
 
   it("Nürnberg und Fürth prüfen keine Gemeinde (Stadt plus Nachbarorte, E2)", () => {

@@ -396,8 +396,9 @@ export function reachNote(mode: ReachMode, origin: Origin): string {
  */
 export function elsewhereText(offer: Pick<SiteOffer, "network" | "venue">, network: NetworkId): string | undefined {
   if (offer.network === network) return undefined;
-  // Das Schema hält jeden Ort in der bbox seiner Region; ohne Treffer nennt die Zeile alle Städte des Netzes.
-  const region = regionAt(offer.venue.geo);
+  // Nur eine eindeutige Stadt; überlappen Region-bboxen am Ort (Nürnberg-West, Fürth), nennt die Zeile alle Städte
+  // des Netzes statt womöglich der falschen (Arch-Review m1).
+  const region = regionAt(offer.venue.geo, offer.network);
   return `in ${region ? REGIONS[region].name : regionList(offer.network)}`;
 }
 

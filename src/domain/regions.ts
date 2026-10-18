@@ -133,17 +133,14 @@ export function regionsOf(network: NetworkId): RegionId[] {
   return REGION_IDS.filter((id) => REGIONS[id].network === network);
 }
 
-/** In welcher Netz-bbox liegt der Punkt? Die bboxen überlappen nicht, also höchstens eine. */
-export function networkAt(point: GeoPoint): NetworkId | undefined {
-  return NETWORK_IDS.find((id) => inBounds(point, NETWORKS[id].bbox));
-}
-
 /**
- * Region am Punkt in der Reihenfolge von `REGION_IDS`, also die spezifischste zuerst (Fürth vor Nürnberg); keine,
- * wenn der Punkt in keiner Region-bbox liegt. Für „in Düsseldorf“ an Angeboten anderer Netze (Plan 0039, E8).
+ * Region des Netzes am Punkt, nur wenn genau eine ihrer bboxen ihn enthält; sonst keine. Regionen eines Netzes dürfen
+ * überlappen (die Fürther bbox liegt ganz in der Nürnberger), dann ist die Stadt aus der bbox nicht bestimmbar. Für
+ * „in Düsseldorf“ an Angeboten anderer Netze (Plan 0039, E8; Arch-Review m1).
  */
-export function regionAt(point: GeoPoint): RegionId | undefined {
-  return REGION_IDS.find((id) => inBounds(point, REGIONS[id].bbox));
+export function regionAt(point: GeoPoint, network: NetworkId): RegionId | undefined {
+  const hits = regionsOf(network).filter((id) => inBounds(point, REGIONS[id].bbox));
+  return hits.length === 1 ? hits[0] : undefined;
 }
 
 /** Regionen nach Einwohnern absteigend, bei Gleichstand nach Name (Kacheln, Stadtteil-Gruppen, Texte) */
