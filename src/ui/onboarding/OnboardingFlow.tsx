@@ -28,7 +28,7 @@ import {
   welcomeStats,
 } from "../../domain/onboarding.ts";
 import type { InstallApi } from "../../domain/pwa.ts";
-import type { RegionId } from "../../domain/regions.ts";
+import { networkOf, type RegionId } from "../../domain/regions.ts";
 import { useBirthDateInput } from "../birth-date-input.ts";
 import { Icon } from "../icons.tsx";
 import type { OnboardingFlowProps } from "../onboarding-types.ts";
@@ -49,7 +49,7 @@ function ownsGesture(target: EventTarget, root: Element): boolean {
 }
 
 export function OnboardingFlow(props: OnboardingFlowProps) {
-  const { offers, now, today, app, finish, onEnd } = props;
+  const { offers, now, today, app, finish, onEnd, cityApi } = props;
   const install = app?.install ?? NO_INSTALL;
   const [push] = useState(() => app?.pushCapability() ?? "nein");
   const [steps] = useState<StepId[]>(() => onboardingSteps(install.state(), push));
@@ -57,9 +57,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const installState = useSyncExternalStore(install.subscribe, install.state);
   const parts = appStepParts(installState, push);
   const [index, setIndex] = useState(0);
-  // Stadtwahl nur für die Stadtteile im Schritt „Weg“, noch nie gespeichert (Plan 0036, E7). Vorauswahl Nürnberg statt
-  // der größten Kachel, die seit Düsseldorf nicht mehr Nürnberg ist; gespeichert wird ab Plan 0039, E8 (S6).
-  const [city, setCity] = useState<RegionId>("nuernberg");
+  // Stadtwahl (Plan 0039, E8): Vorauswahl die gespeicherte Stadt, ohne sie Nürnberg (`cityFrom`), nicht die größte
+  // Kachel. Gespeichert wird beim Weitergehen über `switchCity`, auch im erneut gestarteten Onboarding.
+  const [city, setCity] = useState<RegionId>(cityApi.city);
   // Schritt, auf den gewischt wurde, und die Richtung: nur dort gleitet er herein (E10)
   const [slide, setSlide] = useState<{ at: number; dir: SwipeStep }>();
   const touch = useRef<{ id: number; x: number; y: number }>(undefined);
@@ -67,7 +67,17 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const field = useRef<HTMLInputElement>(null);
   // im Flow statt im Schritt: „Weiter“ hält bei ungültigem Datum an, der Text bleibt beim Blättern stehen
   const birth = useBirthDateInput(props.birthDate, today, props.onBirthDate);
-  const stats = useMemo(() => offers && welcomeStats(offers, now), [offers, now]);
+  // Willkommenszahl über alle Angebote, gefiltert auf das Netz der angetippten Kachel (Plan 0039, E7; Review 2, m5)
+  const stats = useMemo(() => {
+    const network = networkOf(city);
+    return (
+      offers &&
+      welcomeStats(
+        offers.filter((o) => o.network === network),
+        now,
+      )
+    );
+  }, [offers, now, city]);
   const step = steps[index] ?? "stadt";
   // Ende des Onboardings (jede Art: fertig, Überspringen, Esc, erneuter Aufruf): einmal spiegeln (Plan 0035, E9)
   const appRef = useRef(app);
@@ -90,8 +100,16 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
     setSlide(undefined);
     setIndex(i);
   };
-  /** „Später“ überspringt nur diesen Schritt und verwirft nichts; auf dem letzten Schritt endet es wie „Weiter“ */
-  const later = () => (last ? onEnd("fertig") : go(index + 1));
+  /**
+   * „Später“ überspringt nur diesen Schritt und verwirft nichts; auf dem letzten Schritt endet es wie „Weiter“. Jeder
+   * Weg vorwärts (Knopf, „Später“, Wischen) aus dem Schritt „Stadt“ speichert die Wahl (Plan 0039, E8); der Schritt
+   * „Weg“ zeigt danach Stadtteile und Wegzeit des neuen Netzes.
+   */
+  const later = () => {
+    if (step === "stadt" && city !== cityApi.city) cityApi.switchCity(city);
+    if (last) onEnd("fertig");
+    else go(index + 1);
+  };
   // der Hinweis steht schon da (E6)
   const blocked = step === "alter" && birth.invalid;
   const next = () => (blocked ? field.current?.focus() : later());

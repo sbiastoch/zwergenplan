@@ -14,6 +14,7 @@ import {
   setTextScale,
   setTextScaleRelayout,
 } from "./mobile-ux.ts";
+import { goTo, intro } from "./onboarding-steps.ts";
 
 /** wie FIXTURE_NOW in fixtures.ts: Mo 5.10.2026 12:00 Berlin */
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
@@ -277,6 +278,36 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("5 Min.");
   },
   // Quellenhinweis mit zwei Fließtext-Links (≥ 24 px, Plan 0009, E3)
+  // Auswahl „Stadt“ über dem Startpunkt (Plan 0039, E8, Mockup Variante A), Düsseldorf gewählt: nur dessen Stadtteile
+  "kind-sheet-stadt": async (page) => {
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    const city = kid.getByRole("combobox", { name: "Stadt", exact: true });
+    await city.selectOption("duesseldorf");
+    await expect(kid.getByLabel("Stadtteil", { exact: true }).locator("optgroup")).toHaveAttribute(
+      "label",
+      "Düsseldorf",
+    );
+    // iOS zoomt bei Eingaben unter 16 px (Review m15)
+    expect(await city.evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
+    await expect(page.locator(".app-pending")).toHaveCount(0);
+    await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
+    await city.scrollIntoViewIfNeeded();
+  },
+  // Onboarding, Schritt „Stadt“ mit drei Kacheln (Plan 0039, E8), erreicht über „Einführung ansehen“
+  "onboarding-stadt": async (page) => {
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    await page
+      .getByRole("dialog", { name: "Kind und Einstellungen" })
+      .getByRole("button", { name: "Einführung ansehen" })
+      .click();
+    await goTo(page, "stadt");
+    await expect(intro(page).getByRole("group", { name: "Stadt" }).getByRole("button")).toHaveText([
+      "Düsseldorf",
+      "Nürnberg",
+      "Fürth",
+    ]);
+  },
   "kind-sheet-wegzeit": async (page) => {
     const sheet = await pickGostenhof(page);
     await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();

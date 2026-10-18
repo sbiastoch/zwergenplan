@@ -27,6 +27,8 @@ export interface MapScreenProps {
   reach: ReachFn | undefined;
   dark: boolean;
   hasData: boolean;
+  /** gewähltes Netz, wenn es vor allen Filtern leer ist: eigener Leerzustand, Karte auf `home` (Plan 0039, E8) */
+  emptyNetwork: NetworkId | undefined;
   /** Kacheln im Orts-Sheet; `reachOf` auch für die Orts-Liste */
   ctx: CardContext;
   /** Kurzmeldung für das Orts-Sheet (der Seiten-Toast liegt hinter dem Modal) */

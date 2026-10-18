@@ -7,6 +7,7 @@ import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } fr
 import { type BoundCheck, type BoundLimits, checkBound, fieldLimits } from "../domain/date-range.ts";
 import { type FilterState, FORMATS, toggleIn, withDateRange, withReachLimit } from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
+import type { NetworkId } from "../domain/regions.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { markAutofocus } from "./Dialog.tsx";
@@ -166,6 +167,7 @@ export function FilterSheet({
   age,
   resultCount,
   mode,
+  network,
   limitAction,
   today,
   onClose,
@@ -178,6 +180,8 @@ export function FilterSheet({
   resultCount: number;
   /** nur mit Wegzeit sind die Grenzen bedienbar; sonst steht die Begründung darunter (E11, M6) */
   mode: ReachMode | undefined;
+  /** gewähltes Netz: „außerhalb“ nennt seine Städte (Plan 0039, E12) */
+  network: NetworkId;
   /** Knopf zur Begründung (`LimitAction`), Fokus-Ziel ist die Überschrift „Wegzeit“ (N2) */
   limitAction: LimitActionFor;
   /** Berliner „heute“: frühester Tag im Zeitraum (außer ein alter Link nennt einen früheren, E4) */
@@ -190,7 +194,7 @@ export function FilterSheet({
   const limits = fieldLimits(filter.range, today);
   const ageLabelId = useId();
   const ageNoteId = useId();
-  const reason = limitReason(mode);
+  const reason = limitReason(mode, network);
   /** Einfachwahl auf einer Listen-Dimension: „Egal“ = leere Liste */
   const single = <T extends string>(selected: readonly T[], value: T | undefined) =>
     value === undefined ? selected.length === 0 : selected.length === 1 && selected[0] === value;

@@ -21,7 +21,8 @@ export type OnboardingEnd = "fertig" | "abbruch" | "spaeter";
 /** Was die App dem Lader gibt. Der Lader reicht alles außer `data` an den Flow weiter. */
 export interface OnboardingProps {
   /**
-   * Angebote aus `site.json`, sonst `load.kind` der App. Der Flow startet erst, wenn sie geladen oder gescheitert ist
+   * Alle Angebote aus `site.json` (ungefiltert: die Willkommenszahl folgt der angetippten Kachel, Plan 0039, E7), sonst
+   * `load.kind` der App. Der Flow startet erst, wenn sie geladen oder gescheitert ist
    * (E5); so kompakt, weil jedes Byte in `App.tsx` ins Startbudget zählt (E13).
    */
   data: readonly SiteOffer[] | "loading" | "error";

@@ -151,6 +151,85 @@ test.describe("Test 2: Stadt", () => {
     expect(await page.evaluate(() => localStorage.getItem("zwergenplan.entfernung-ab"))).toBeNull();
     await expect(statusLine(page)).not.toContainText("ab Innenstadt");
   });
+
+  test("Düsseldorf gewählt: Zahl der Kachel, Weg nur mit Düsseldorfer Stadtteilen, Liste nur Düsseldorf, Stadt gespeichert (Plan 0039, Test 7)", async ({
+    page,
+  }) => {
+    await opened(page);
+    await goTo(page, "stadt");
+    const lead = intro(page).locator(".onb-lead");
+    await expect(lead).not.toHaveText(/^2 /);
+    await intro(page).getByRole("group", { name: "Stadt" }).getByRole("button", { name: "Düsseldorf" }).click();
+    // Willkommenszahl über alle Angebote, auf das Netz der angetippten Kachel gefiltert (E7, Review 2, m5)
+    await expect(lead).toHaveText("2 Babykurse, Krabbelgruppen, Konzerte und Ausflüge von 1 Anbieter.");
+    expect(await page.evaluate(() => localStorage.getItem("zwergenplan.stadt")), "erst beim Weitergehen").toBeNull();
+
+    await goTo(page, "weg");
+    expect(await page.evaluate(() => localStorage.getItem("zwergenplan.stadt"))).toBe("duesseldorf");
+    const select = intro(page).getByRole("combobox", { name: "Stadtteil" });
+    await expect(select.locator("optgroup")).toHaveCount(1);
+    await expect(select.locator("optgroup")).toHaveAttribute("label", "Düsseldorf");
+    await expect(select.locator("option[value='gostenhof']")).toHaveCount(0);
+    await select.selectOption({ label: "Stadtmitte (Düsseldorf)" });
+    // Fixture-Netz vrr: Halt an der Stadtmitte, Tram 709 zum Familienzentrum; Wegzeit wirkt, Minuten frei
+    const chips = intro(page).getByRole("group", { name: "Höchstens unterwegs" });
+    await expect(chips.getByRole("button", { name: "30 Min." })).toBeEnabled();
+    await expect(intro(page)).not.toContainText("Wegzeiten gibt es nur");
+    while (!/^(Zeig mir|Zur Liste)/.test((await primary(page).textContent()) ?? "")) await primary(page).click();
+    await primary(page).click();
+    await expect(intro(page)).toHaveCount(0);
+    await expect(statusLine(page)).toContainText("Wegzeit ab Stadtmitte (Düsseldorf)");
+    const offers = page.getByTestId("offer");
+    await expect(offers).toHaveCount(2);
+    await expect(offers.filter({ hasText: "Krabbelgruppe am Rhein" })).toBeVisible();
+    await expect(offers.filter({ hasText: "Rheinzwerge-Liederkonzert" })).toBeVisible();
+    await expect(offers.filter({ hasText: "Offener Krabbeltreff" })).toHaveCount(0);
+  });
+});
+
+test.describe("Netzwechsel im erneut gestarteten Onboarding (Plan 0039, E8; Review 2, M1)", () => {
+  test.use({ onboarding: "erledigt" });
+
+  test("gespeicherter Nürnberger Stadtteil, Düsseldorf gewählt: Stadtteil gelöscht, wegzeit/vrr.json genau einmal ab „Weg“", async ({
+    page,
+  }) => {
+    const vrr: string[] = [];
+    const vgn: string[] = [];
+    page.on("request", (req) => {
+      if (isTransitTable(req.url(), "vrr") || isTransitLines(req.url(), "vrr")) vrr.push(req.url());
+      if (isTransitTable(req.url(), "vgn")) vgn.push(req.url());
+    });
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await page.goto("./");
+    await expect(statusLine(page)).toContainText("Wegzeit ab Gostenhof");
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    await page
+      .getByRole("dialog", { name: "Kind und Einstellungen" })
+      .getByRole("button", { name: "Einführung ansehen" })
+      .click();
+    await goTo(page, "stadt");
+    const city = intro(page).getByRole("group", { name: "Stadt" });
+    // Vorauswahl ohne gespeicherte Stadt: Nürnberg
+    await expect(city.getByRole("button", { name: "Nürnberg" })).toHaveAttribute("aria-pressed", "true");
+    await city.getByRole("button", { name: "Düsseldorf" }).click();
+    await primary(page).click();
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("zwergenplan.stadt"))).toBe("duesseldorf");
+    expect(await page.evaluate(() => localStorage.getItem("zwergenplan.entfernung-ab"))).toBeNull();
+    expect(vrr, "vor dem Schritt „Weg“ keine Tabelle des neuen Netzes").toEqual([]);
+
+    await goTo(page, "weg");
+    await expect.poll(() => vrr.filter((u) => isTransitLines(u)).length).toBe(1);
+    await intro(page).getByRole("combobox", { name: "Stadtteil" }).selectOption({ label: "Stadtmitte (Düsseldorf)" });
+    await expect(
+      intro(page).getByRole("group", { name: "Höchstens unterwegs" }).getByRole("button", { name: "30 Min." }),
+    ).toBeEnabled();
+    await page.waitForTimeout(300);
+    expect(
+      vrr.map((u) => new URL(u).pathname.replace(/^.*\/data\//, "")),
+      "Tabelle und Linien von vrr je genau einmal",
+    ).toEqual(["wegzeit/vrr.json", "linien/vrr.json"]);
+    expect(vgn, "vgn nur beim Start mit gespeichertem Stadtteil").toHaveLength(1);
+  });
 });
 
 test.describe("Test 3: Alter", () => {

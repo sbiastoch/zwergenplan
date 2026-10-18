@@ -25,7 +25,9 @@ import {
   limitReason,
   listStatusParts,
   loadErrorText,
+  mapCenterOutside,
   mapStatusParts,
+  networkEmptyText,
   originHint,
   originPhrase,
   plural,
@@ -479,13 +481,19 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
   });
 
   it("Begründung unter gesperrten Chips je Modus (M6)", () => {
-    expect(limitReason(undefined)).toBe("Erst einen Startpunkt wählen.");
-    expect(limitReason({ kind: "laedt" })).toBe("Wegzeiten werden geladen …");
-    expect(limitReason({ kind: "luftlinie", reason: "fehler" })).toBe("Wegzeiten gerade nicht verfügbar.");
-    expect(limitReason({ kind: "luftlinie", reason: "ausserhalb" })).toBe(
+    expect(limitReason(undefined, "vgn")).toBe("Erst einen Startpunkt wählen.");
+    expect(limitReason({ kind: "laedt" }, "vgn")).toBe("Wegzeiten werden geladen …");
+    expect(limitReason({ kind: "luftlinie", reason: "fehler" }, "vgn")).toBe("Wegzeiten gerade nicht verfügbar.");
+    expect(limitReason({ kind: "luftlinie", reason: "ausserhalb" }, "vgn")).toBe(
       "Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth.",
     );
-    expect(limitReason({ kind: "oepnv" })).toBeUndefined();
+    expect(limitReason({ kind: "oepnv" }, "vgn")).toBeUndefined();
+  });
+
+  it("„außerhalb“ nennt die Städte des gewählten Netzes (Plan 0039, E12)", () => {
+    expect(limitReason({ kind: "luftlinie", reason: "ausserhalb" }, "vrr")).toBe(
+      "Wegzeiten gibt es nur für Startpunkte in Düsseldorf.",
+    );
   });
 
   it("Hinweis unter der Statuszeile, wenn wegzeit= nicht wirkt (E11)", () => {
@@ -520,7 +528,7 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
   const links = (parts: ReturnType<typeof transitSourceNote>) => parts.filter((p) => typeof p !== "string");
 
   it("nennt Rechteinhaber, Titel mit Stand, „abgewandelt“ und die Lizenz, beide als Link", () => {
-    const parts = transitSourceNote(source);
+    const parts = transitSourceNote(source, "vgn");
     expect(text(parts)).toBe(
       "Regel. " +
         "Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, ‚VGN-Soll-Daten vom 24.06.2026‘, abgewandelt, " +
@@ -533,7 +541,7 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
   });
 
   it("nennt den Satz zum Modell aus der Domäne, mit 10 Min. und 1,5 km aus den Konstanten (Arch-Review 0012, H7)", () => {
-    const parts = transitSourceNote({ ...source, rule: TRANSIT_RULE });
+    const parts = transitSourceNote({ ...source, rule: TRANSIT_RULE }, "vgn");
     expect(text(parts)).toMatch(
       /^Geschätzte Wegzeit mit Bus & Bahn oder zu Fuß für einen Dienstagvormittag, inklusive Warten\. /,
     );
@@ -542,26 +550,40 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
     expect(TRANSIT_RULE).toContain(`bis ${String(ACCESS_METERS / 1000).replace(".", ",")} km zum und vom Halt`);
     // ohne Erklärung (Tabelle noch nicht dekodiert) nur die Quelle
     const { rule: _rule, ...plain } = source;
-    expect(text(transitSourceNote(plain))).toMatch(/^Fahrplan: VGN/);
+    expect(text(transitSourceNote(plain, "vgn"))).toMatch(/^Fahrplan: VGN/);
   });
 
   it("lange Lizenz-Bezeichnung aus den Daten darf umbrechen (N4)", () => {
     const long = { ...source, license: "Datenlizenz Deutschland – Namensnennung – Version 2.0" };
-    expect(links(transitSourceNote(long)).at(-1)).toEqual({ text: long.license, href: long.licenseUrl });
+    expect(links(transitSourceNote(long, "vgn")).at(-1)).toEqual({ text: long.license, href: long.licenseUrl });
   });
 
   it("entsteht aus `source`, nicht fest im Code", () => {
     const fixture = { ...source, attribution: "Fiktive Testdaten", title: "Fiktiver Fahrplan", license: "CC0 1.0" };
-    expect(text(transitSourceNote(fixture))).toContain("Fahrplan: Fiktive Testdaten, ‚Fiktiver Fahrplan‘, abgewandelt");
-    expect(text(transitSourceNote(fixture))).toContain("Lizenz CC0 1.0.");
+    expect(text(transitSourceNote(fixture, "vgn"))).toContain(
+      "Fahrplan: Fiktive Testdaten, ‚Fiktiver Fahrplan‘, abgewandelt",
+    );
+    expect(text(transitSourceNote(fixture, "vgn"))).toContain("Lizenz CC0 1.0.");
   });
 
   it("ohne geladene Tabelle: VGN und Lizenz, beide als Link (die Erklärung kommt mit der Tabelle)", () => {
-    const parts = transitSourceNote(undefined);
+    const parts = transitSourceNote(undefined, "vgn");
     expect(text(parts)).toBe("Fahrplan: VGN – Verkehrsverbund Großraum Nürnberg GmbH, CC BY-SA 3.0 DE.");
     expect(links(parts)).toEqual([
       { text: "VGN – Verkehrsverbund Großraum Nürnberg GmbH", href: "https://www.vgn.de/web-entwickler/open-data/" },
       { text: "CC BY-SA 3.0 DE", href: "https://creativecommons.org/licenses/by-sa/3.0/de/", nowrap: true },
+    ]);
+  });
+
+  it("ohne geladene Tabelle im Netz vrr: VRR und CC BY 4.0 (Plan 0039, E12)", () => {
+    const parts = transitSourceNote(undefined, "vrr");
+    expect(text(parts)).toBe("Fahrplan: VRR – Verkehrsverbund Rhein-Ruhr AöR, CC BY 4.0.");
+    expect(links(parts)).toEqual([
+      {
+        text: "VRR – Verkehrsverbund Rhein-Ruhr AöR",
+        href: "https://www.opendata-oepnv.de/ht/de/organisation/verkehrsverbuende/vrr/openvrr/datensaetze",
+      },
+      { text: "CC BY 4.0", href: "https://creativecommons.org/licenses/by/4.0/deed.de", nowrap: true },
     ]);
   });
 });
@@ -718,37 +740,46 @@ describe("Hinweis im Kind-Sheet (Plan 0009, N3)", () => {
   const fehler: ReachMode = { kind: "luftlinie", reason: "fehler" };
 
   it("ein Problem der Standortabfrage geht vor; Großraum heißt Großraum, nicht Stadtgebiet", () => {
-    expect(originHint("outside", undefined, undefined)).toEqual({
+    expect(originHint("outside", undefined, undefined, "vgn")).toEqual({
       cls: "hint bad",
-      text: "Dein Standort liegt außerhalb des Großraums Nürnberg. Wähle einen Stadtteil.",
+      text: "Dein Standort liegt außerhalb des Großraums Nürnberg. Wähle einen Stadtteil oder eine andere Stadt.",
     });
-    expect(originHint("denied", standort, { kind: "oepnv" })?.cls).toBe("hint bad");
+    expect(originHint("denied", standort, { kind: "oepnv" }, "vgn")?.cls).toBe("hint bad");
+  });
+
+  it("Standort außerhalb nennt das Gebiet des gewählten Netzes (Plan 0039, E12)", () => {
+    expect(originHint("outside", undefined, undefined, "vrr")?.text).toBe(
+      "Dein Standort liegt außerhalb von Düsseldorf. Wähle einen Stadtteil oder eine andere Stadt.",
+    );
+    expect(originHint(undefined, standort, ausserhalb, "vrr")?.text).toBe(
+      "Wegzeiten gibt es nur für Startpunkte in Düsseldorf. Wähle einen Stadtteil.",
+    );
   });
 
   it("außerhalb des Stadtgebiets sagt es das Sheet selbst, für Standort und Kartenmitte", () => {
     const text = "Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth. Wähle einen Stadtteil.";
-    expect(originHint(undefined, standort, ausserhalb)).toEqual({ cls: "hint bad", text });
-    expect(originHint(undefined, karte, ausserhalb)).toEqual({ cls: "hint bad", text });
+    expect(originHint(undefined, standort, ausserhalb, "vgn")).toEqual({ cls: "hint bad", text });
+    expect(originHint(undefined, karte, ausserhalb, "vgn")).toEqual({ cls: "hint bad", text });
   });
 
   it("Standort: Wegzeit nur, wenn sie kommt oder da ist; ohne Tabelle Entfernung", () => {
     const modes: ReachMode[] = [{ kind: "oepnv" }, { kind: "laedt" }];
     for (const mode of modes) {
-      expect(originHint(undefined, standort, mode)).toEqual({
+      expect(originHint(undefined, standort, mode, "vgn")).toEqual({
         cls: "hint ok",
         text: "Wegzeit ab deinem Standort (auf ca. 100 m gerundet).",
       });
     }
-    expect(originHint(undefined, standort, fehler)?.text).toBe(
+    expect(originHint(undefined, standort, fehler, "vgn")?.text).toBe(
       "Entfernung ab deinem Standort (auf ca. 100 m gerundet).",
     );
   });
 
   it("kein Hinweis ohne Startpunkt, beim Stadtteil und bei der Kartenmitte im Stadtgebiet", () => {
-    expect(originHint(undefined, undefined, undefined)).toBeUndefined();
-    expect(originHint(undefined, stadtteil, fehler)).toBeUndefined();
-    expect(originHint(undefined, karte, { kind: "oepnv" })).toBeUndefined();
-    expect(originHint(undefined, karte, fehler)).toBeUndefined();
+    expect(originHint(undefined, undefined, undefined, "vgn")).toBeUndefined();
+    expect(originHint(undefined, stadtteil, fehler, "vgn")).toBeUndefined();
+    expect(originHint(undefined, karte, { kind: "oepnv" }, "vgn")).toBeUndefined();
+    expect(originHint(undefined, karte, fehler, "vgn")).toBeUndefined();
   });
 });
 
@@ -850,5 +881,20 @@ describe("Angebot außerhalb des gewählten Netzes (Plan 0039, E8)", () => {
   it("im gewählten Netz nichts", () => {
     expect(elsewhereText(at("vgn", 49.4521, 11.0767), "vgn")).toBeUndefined();
     expect(elsewhereText(at("vrr", 51.2197, 6.7951), "vrr")).toBeUndefined();
+  });
+});
+
+describe("Texte je Netz (Plan 0039, E8, E12)", () => {
+  it("Kartenmitte außerhalb nennt das Gebiet des gewählten Netzes", () => {
+    expect(mapCenterOutside("vgn")).toBe("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.");
+    expect(mapCenterOutside("vrr")).toBe("Die Kartenmitte liegt außerhalb von Düsseldorf.");
+  });
+
+  it("Leerzustand eines Netzes ohne Angebote nennt seine Städte", () => {
+    expect(networkEmptyText("vrr")).toEqual({
+      title: "In Düsseldorf haben wir noch keine Angebote.",
+      text: "Wir suchen gerade danach.",
+    });
+    expect(networkEmptyText("vgn").title).toBe("In Nürnberg und Fürth haben wir noch keine Angebote.");
   });
 });

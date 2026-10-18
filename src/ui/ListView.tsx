@@ -4,8 +4,9 @@
  */
 import type { ReactNode } from "react";
 import type { DayGroup, Occurrence } from "../domain/agenda.ts";
+import type { NetworkId } from "../domain/regions.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { ageEmptyText, dayHeading } from "./format.ts";
+import { ageEmptyText, dayHeading, networkEmptyText } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 
@@ -16,6 +17,8 @@ interface ListViewProps {
   today: string;
   ctx: CardContext;
   hasData: boolean;
+  /** gewähltes Netz, wenn es vor allen Filtern leer ist (Plan 0039, E8): eigener Leerzustand */
+  emptyNetwork?: NetworkId | undefined;
   /** nur mit aktiven URL-Filtern */
   onResetFilter?: (() => void) | undefined;
   /** nur, wenn der Altersfilter etwas ausblendet (Plan 0021, E4) */
@@ -31,11 +34,13 @@ export function ListView({
   today,
   ctx,
   hasData,
+  emptyNetwork,
   onResetFilter,
   age,
   openOnDay,
 }: ListViewProps) {
-  if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} age={age} />;
+  if (groups.length === 0)
+    return <NoOffers hasData={hasData} emptyNetwork={emptyNetwork} onResetFilter={onResetFilter} age={age} />;
   return (
     <>
       {groups.map((group) => {
@@ -85,18 +90,30 @@ export interface AgeEscape {
 
 /**
  * Leerzustand von Liste, Karte und Anbietern (Plan 0005, E12; Plan 0021, E4): Filter oder Alter blenden alles aus,
- * oder es gibt noch keine Daten. „Auch unpassende zeigen“ steht vor „Filter zurücksetzen“, es ist der direkte Weg.
+ * oder es gibt noch keine Daten, insgesamt oder im gewählten Netz (`emptyNetwork`, Plan 0039, E8). „Auch unpassende
+ * zeigen“ steht vor „Filter zurücksetzen“, es ist der direkte Weg.
  */
 export function NoOffers({
   hasData,
+  emptyNetwork,
   onResetFilter,
   age,
 }: {
   hasData: boolean;
+  /** gewähltes Netz ohne Angebote: „In Düsseldorf haben wir noch keine Angebote.“ statt „Daten folgen.“ */
+  emptyNetwork?: NetworkId | undefined;
   /** nur mit aktiven URL-Filtern */
   onResetFilter?: (() => void) | undefined;
   age?: AgeEscape | undefined;
 }) {
+  if (emptyNetwork) {
+    const { title, text } = networkEmptyText(emptyNetwork);
+    return (
+      <EmptyState icon="search" title={title}>
+        {text}
+      </EmptyState>
+    );
+  }
   if (!hasData) {
     return (
       <EmptyState icon="search" title="Noch keine Angebote">

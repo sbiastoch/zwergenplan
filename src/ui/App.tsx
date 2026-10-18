@@ -23,6 +23,7 @@ import {
   limitHint,
   listStatusParts,
   loadErrorText,
+  mapCenterOutside,
   mapStatusParts,
   OFFER_GONE,
   providerStatusParts,
@@ -162,12 +163,12 @@ export function App() {
   /*
    * Datenfluss (Plan 0039, E7/E8; Review M6): `allOffers` sind alle Angebote aus site.json, `offers` die des gewählten
    * Netzes. Liste, Kalender, Karte, Statuszeile, Orte der Wegzeit und Anbieter-Zeilen nehmen `offers`; Merkliste,
-   * Detail und Deep-Links `allOffers`. Ist das Netz leer, obwohl es Daten gibt, zeigt S6b einen eigenen Leerzustand
-   * (`networkEmpty`).
+   * Detail und Deep-Links `allOffers`. Ist das Netz vor allen Filtern leer, obwohl es Daten gibt, zeigen Liste und
+   * Karte einen eigenen Leerzustand („In Düsseldorf haben wir noch keine Angebote.“, `emptyNetwork`, Review M7).
    */
   const allOffers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
   const offers = useMemo(() => allOffers.filter((o) => o.network === network), [allOffers, network]);
-  const networkEmpty = load.kind === "ready" && offers.length === 0 && allOffers.length > 0;
+  const emptyNetwork = load.kind === "ready" && offers.length === 0 && allOffers.length > 0 ? network : undefined;
   // Orte des Netzes: Die Wegzeit-Tabelle des Netzes muss zu ihnen passen (E8). Erst mit site.json bekannt.
   const placeKeys = useMemo(
     () => (load.kind === "ready" ? new Set(offers.map((o) => placeKey(o.venue.geo))) : undefined),
@@ -370,14 +371,14 @@ export function App() {
         origin={origin}
         reach={transit.reach}
         dark={theme.dark}
-        hasData={!networkEmpty && offers.length > 0}
+        hasData={offers.length > 0}
+        emptyNetwork={emptyNetwork}
         ctx={ctx}
         toast={toast}
         onSheetOpen={setPlaceSheet}
         onPickOrigin={() => setSheet("origin")}
         onMapCenter={(center) => {
-          if (!originApi.setMapCenter(center))
-            say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.", undefined, "hint");
+          if (!originApi.setMapCenter(center)) say(mapCenterOutside(network), undefined, "hint");
         }}
         onResetFilter={onResetFilter}
         age={age}
@@ -516,7 +517,8 @@ export function App() {
                 onMore={views.showMore}
                 today={today}
                 ctx={ctx}
-                hasData={!networkEmpty && offers.length > 0}
+                hasData={offers.length > 0}
+                emptyNetwork={emptyNetwork}
                 onResetFilter={resetIfActive}
                 age={ageEscape}
                 openOnDay={route.filter.range !== undefined}
@@ -636,7 +638,7 @@ export function App() {
       {/* nach den Overlays: Im Modus „manuell“ schließt das Kind-Sheet im selben Commit (E3, Review 2, M-1) */}
       {onboarding !== "aus" && (
         <Onboarding
-          data={load.kind === "ready" ? offers : load.kind}
+          data={load.kind === "ready" ? allOffers : load.kind}
           now={now}
           today={today}
           birthDate={birthDate}

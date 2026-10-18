@@ -418,6 +418,124 @@ test.describe("Wegzeit je Netz (Plan 0039, E5)", () => {
   });
 });
 
+/** Pfade der Wegzeit-Requests ab `data/`, in Reihenfolge, z. B. „wegzeit/vrr.json“ */
+const transitPaths = (urls: string[]) => urls.map((u) => new URL(u).pathname.replace(/^.*\/data\//, ""));
+
+test.describe("Auswahl „Stadt“ im Kind-Sheet (Plan 0039, E8, Test 7)", () => {
+  test("Netzwechsel löscht den Nürnberger Stadtteil, lädt wegzeit/vrr.json genau einmal, ab der Wahl keine Requests", async ({
+    page,
+  }) => {
+    const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
+    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expect.poll(() => transitPaths(requests)).toEqual(["wegzeit/vgn.json", "linien/vgn.json"]);
+    const sheet = await openKidSheet(page);
+    const city = sheet.getByRole("combobox", { name: "Stadt", exact: true });
+    // drei Städte nach Einwohnern, Nürnberg gewählt (ohne gespeicherte Stadt)
+    await expect(city.locator("option")).toHaveText(["Düsseldorf", "Nürnberg", "Fürth"]);
+    await expect(city).toHaveValue("nuernberg");
+    const district = sheet.getByLabel("Stadtteil", { exact: true });
+    await expect(district.locator("optgroup")).toHaveCount(2);
+
+    await city.selectOption("duesseldorf");
+    await expect(sheet.getByText("Noch kein Startpunkt – dann zeigen wir keine Wegzeit.")).toBeVisible();
+    expect(await page.evaluate((key) => localStorage.getItem(key), KEY)).toBeNull();
+    expect(await page.evaluate(() => localStorage.getItem("zwergenplan.stadt"))).toBe("duesseldorf");
+    await expect(district.locator("optgroup")).toHaveCount(1);
+    await expect(district.locator("optgroup")).toHaveAttribute("label", "Düsseldorf");
+    // das offene Sheet ist eine Startpunkt-Oberfläche: Es lädt die Tabelle des neuen Netzes (E8)
+    await expect
+      .poll(() => transitPaths(requests))
+      .toEqual(["wegzeit/vgn.json", "linien/vgn.json", "wegzeit/vrr.json", "linien/vrr.json"]);
+
+    await district.selectOption({ label: "Stadtmitte (Düsseldorf)" });
+    await expect(sheet.getByText("Startpunkt:")).toContainText("Stadtmitte (Düsseldorf)");
+    await sheet.getByRole("button", { name: "Fertig" }).click();
+    await expect(page.getByRole("status")).toContainText("Wegzeit ab Stadtmitte (Düsseldorf)");
+    await expect(offers(page)).toHaveCount(2);
+    await expect(card(page, "Krabbelgruppe am Rhein").locator(".dist")).toHaveText(/Min\.$/);
+    await page.waitForTimeout(300);
+    expect(transitPaths(requests), "ab der Wahl des Startpunkts kein Request").toHaveLength(4);
+  });
+
+  test("das Auswahlfeld hat mindestens 16 px Schrift (iOS zoomt sonst, Review m15)", async ({ page }) => {
+    await ready(page);
+    const sheet = await openKidSheet(page);
+    const size = await sheet
+      .getByRole("combobox", { name: "Stadt", exact: true })
+      .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
+    expect(size).toBeGreaterThanOrEqual(16);
+  });
+
+  test.describe("offline nach dem Netzwechsel", () => {
+    // Der gescheiterte Request auf die Tabelle von vrr meldet sich in der Konsole
+    test.use({ allowedConsoleErrors: [TRANSIT_TABLE_ERROR] });
+
+    test("bestehender Fehlerzustand: Luftlinie, „Wegzeiten gerade nicht verfügbar“, „Nochmal laden“ bringt die Minuten", async ({
+      page,
+      context,
+    }) => {
+      await ready(page);
+      const vgnLoaded = transitLoaded(page);
+      const sheet = await openKidSheet(page);
+      await vgnLoaded;
+      await context.setOffline(true);
+      await sheet.getByRole("combobox", { name: "Stadt", exact: true }).selectOption("duesseldorf");
+      await sheet.getByLabel("Stadtteil", { exact: true }).selectOption({ label: "Stadtmitte (Düsseldorf)" });
+      await sheet.getByRole("button", { name: "Fertig" }).click();
+      await expect(page.getByRole("status")).toContainText(
+        "Luftlinie ab Stadtmitte (Düsseldorf) (Wegzeiten gerade nicht verfügbar)",
+      );
+      await expect(page.locator(".meta .dist").filter({ hasText: "Min." })).toHaveCount(0);
+
+      await page.getByRole("button", { name: /^Alle Filter/ }).click();
+      const filter = page.getByRole("dialog", { name: "Filter" });
+      await expect(filter.getByText("Wegzeiten gerade nicht verfügbar.")).toBeVisible();
+      await expect(filter.getByRole("button", { name: "bis 30 Min." })).toBeDisabled();
+      await context.setOffline(false);
+      await filter.getByRole("button", { name: "Nochmal laden" }).click();
+      await expect(filter.getByRole("button", { name: "bis 30 Min." })).toBeEnabled();
+      await filter.getByRole("button", { name: /Angebote zeigen$/ }).click();
+      await expect(page.getByRole("status")).toContainText("Wegzeit ab Stadtmitte (Düsseldorf)");
+    });
+  });
+});
+
+/**
+ * Netz ohne Angebote (Plan 0039, E8, Review M7 und Review 2, m12): Düsseldorf zwischen Push und Bootstrap. Die Route
+ * liefert site.json ohne die Düsseldorfer Fixture-Angebote.
+ */
+test.describe("Netz ohne Angebote", () => {
+  test.use({ tiles: "mock" });
+
+  test("Liste mit eigenem Leerzustand, Statuszeile „0 Angebote“, Karte ohne Marker und ohne Fehler", async ({
+    page,
+  }) => {
+    await page.route("**/data/site.json", async (route) => {
+      const response = await route.fetch();
+      const data = (await response.json()) as { offers: { network: string }[] };
+      await route.fulfill({ response, json: { ...data, offers: data.offers.filter((o) => o.network !== "vrr") } });
+    });
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.stadt", "duesseldorf"));
+    await page.goto("./");
+    await expect(page.getByText("In Düsseldorf haben wir noch keine Angebote.")).toBeVisible();
+    await expect(page.getByText("Wir suchen gerade danach.")).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("0 Angebote ab heute");
+    await expect(offers(page)).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await mapSettled(page);
+    await expect(page.getByRole("status")).toContainText("0 Angebote an 0 Orten");
+    await expect(page.getByText("In Düsseldorf haben wir noch keine Angebote.")).toBeVisible();
+    await expect(page.locator(".map-note")).toHaveCount(0);
+    // Startausschnitt ohne Orte: home des Netzes vrr, das Rathaus Düsseldorf (camera.ts)
+    const center = await page.evaluate(() => window.__zpMap?.getCenter());
+    expect(center?.lat).toBeCloseTo(51.226, 1);
+    expect(center?.lng).toBeCloseTo(6.773, 1);
+  });
+});
+
 test("Startpunkt entfernen löscht auch den gespeicherten Stadtteil", async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);

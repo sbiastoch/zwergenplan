@@ -9,7 +9,7 @@ import { districtGroups } from "../../domain/district-groups.ts";
 import { nearestDistrictLabel } from "../../domain/districts.ts";
 import { withReachLimit } from "../../domain/filter.ts";
 import { ageHint, cityChoices, LIMIT_CHOICES, ONBOARDING_TEXTS as T } from "../../domain/onboarding.ts";
-import { REGIONS, type RegionId } from "../../domain/regions.ts";
+import { networkOf, REGIONS, type RegionId } from "../../domain/regions.ts";
 import { BIRTH_DATE_INVALID, type useBirthDateInput } from "../birth-date-input.ts";
 import { limitReason, originHint } from "../format.ts";
 import { Icon } from "../icons.tsx";
@@ -18,9 +18,8 @@ import type { OnboardingFlowProps } from "../onboarding-types.ts";
 const DOTS = ["c1", "c2", "c3", "c4"];
 
 /**
- * Stadt-Kacheln, sortiert nach Einwohnern, der Rest im Dropdown (E5). Nürnberg ist vorgewählt. Die Wahl hält der
- * Flow nur, um im Schritt „Weg“ die Stadtteile ihres Netzes zu zeigen, sie zuerst; gespeichert wird sie (noch) nicht
- * (Plan 0036, E7; Plan 0039, E8).
+ * Stadt-Kacheln, sortiert nach Einwohnern, der Rest im Dropdown (E5). Vorgewählt ist die gespeicherte Stadt, sonst
+ * Nürnberg. Die Wahl hält der Flow; gespeichert wird sie beim Weitergehen über `switchCity` (Plan 0039, E8).
  */
 export function CityStep({ city, onCity }: { city: RegionId; onCity: (city: RegionId) => void }) {
   const { tiles, more } = cityChoices(REGIONS);
@@ -120,8 +119,9 @@ export function WayStep({ originApi, transit, filter, setFilter, city }: Onboard
   const outside = mode?.kind === "luftlinie" && mode.reason === "ausserhalb";
   const showLocated = located && !originApi.problem && !outside;
   const select = useRef<HTMLSelectElement>(null);
-  const note = originHint(originApi.problem, origin, mode);
-  const reason = limitReason(mode);
+  const network = networkOf(city);
+  const note = originHint(originApi.problem, origin, mode, network);
+  const reason = limitReason(mode, network);
   return (
     <>
       {showLocated ? (

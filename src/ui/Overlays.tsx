@@ -77,7 +77,7 @@ interface OverlaysProps {
 export function Overlays(props: OverlaysProps) {
   const { toast, sheet, setSheet, detailOffer, detailDay, closeDetail, ctx, say, filter, setFilter } = props;
   const { birthDate, setBirthDate, theme, today, originApi, filterButton, activeTab } = props;
-  const { transit, providerId, openProvider, closeProvider } = props;
+  const { transit, providerId, openProvider, closeProvider, cityApi } = props;
   const { origin } = originApi;
   const { now, onToggleSave } = ctx;
   // Teilen (Plan 0026, E6): Pfad nur aus der ID, nie aus `location`
@@ -153,6 +153,7 @@ export function Overlays(props: OverlaysProps) {
           age={props.filterAge}
           resultCount={props.resultCount}
           mode={transit.mode}
+          network={cityApi.network}
           limitAction={props.limitAction}
           today={today}
           onClose={() => setSheet(null)}
@@ -173,6 +174,7 @@ export function Overlays(props: OverlaysProps) {
           onTheme={theme.setChoice}
           today={today}
           origin={originApi}
+          cityApi={cityApi}
           reachMode={transit.mode}
           transitSource={transit.source}
           focusOrigin={sheet === "origin"}

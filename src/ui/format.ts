@@ -17,7 +17,7 @@ import {
   roundedMinutes,
   stopMinutes,
 } from "../domain/reach.ts";
-import { type NetworkId, REGIONS, regionAt, regionList } from "../domain/regions.ts";
+import { NETWORKS, type NetworkId, REGIONS, regionAt, regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import type { ExportSelection } from "../domain/saved.ts";
 import type { Session } from "../domain/schema.ts";
@@ -403,15 +403,33 @@ export function elsewhereText(offer: Pick<SiteOffer, "network" | "venue">, netwo
 
 /** Hinweise im Kind-Sheet, Abschnitt „Wegzeit ab“ (OriginPicker.tsx; Plan 0004, E5; Plan 0009, N3) */
 const UNAVAILABLE = "Standort gerade nicht verfügbar. Wähle stattdessen einen Stadtteil.";
-const PROBLEMS: Record<PositionProblem, string> = {
+const PROBLEMS: Record<Exclude<PositionProblem, "outside">, string> = {
   denied: "Standort nicht freigegeben. Wähle stattdessen einen Stadtteil.",
   unavailable: UNAVAILABLE,
   timeout: UNAVAILABLE,
-  // NUERNBERG_BBOX, also der Großraum; nicht zu verwechseln mit dem Stadtgebiet der Wegzeit (N3)
-  outside: "Dein Standort liegt außerhalb des Großraums Nürnberg. Wähle einen Stadtteil.",
   // Ohne API erscheint der Knopf gar nicht; der Text ist nur die Rückfallebene.
   unsupported: UNAVAILABLE,
 };
+
+/**
+ * Standort außerhalb der bbox des gewählten Netzes, also des Gültigkeitsbereichs (Großraum bzw. Stadt mit Rand); nicht
+ * zu verwechseln mit dem Stadtgebiet der Wegzeit (N3). Er kann in der anderen Stadt liegen (Plan 0039, E3, E12).
+ */
+function problemText(problem: PositionProblem, network: NetworkId): string {
+  return problem === "outside"
+    ? `Dein Standort liegt außerhalb ${NETWORKS[network].area}. Wähle einen Stadtteil oder eine andere Stadt.`
+    : PROBLEMS[problem];
+}
+
+/** Toast, wenn die Kartenmitte nicht im gewählten Netz liegt (Plan 0039, E12) */
+export function mapCenterOutside(network: NetworkId): string {
+  return `Die Kartenmitte liegt außerhalb ${NETWORKS[network].area}.`;
+}
+
+/** Leerzustand, wenn das gewählte Netz vor allen Filtern keine Angebote hat (Plan 0039, E8, Review M7) */
+export function networkEmptyText(network: NetworkId): { title: string; text: string } {
+  return { title: `In ${regionList(network)} haben wir noch keine Angebote.`, text: "Wir suchen gerade danach." };
+}
 
 /**
  * Hinweis unter der Auswahl: Problem der Standortabfrage, sonst was ab dem Startpunkt gilt. Das Sheet sagt
@@ -421,13 +439,14 @@ export function originHint(
   problem: PositionProblem | undefined,
   origin: Origin | undefined,
   mode: ReachMode | undefined,
+  network: NetworkId,
 ): { cls: string; text: string } | undefined {
-  if (problem) return { cls: "hint bad", text: PROBLEMS[problem] };
+  if (problem) return { cls: "hint bad", text: problemText(problem, network) };
   if (!origin || origin.source === "stadtteil") return undefined;
   // Standort oder Kartenmitte außerhalb des Stadtgebiets: dieselbe Begründung wie im Filter-Sheet (Text schon im
   // Startbundle, Plan 0009, N3)
   if (mode?.kind === "luftlinie" && mode.reason === "ausserhalb") {
-    return { cls: "hint bad", text: `${limitReason(mode)} Wähle einen Stadtteil.` };
+    return { cls: "hint bad", text: `${limitReason(mode, network)} Wähle einen Stadtteil.` };
   }
   if (origin.source !== "standort") return undefined;
   const what = mode?.kind === "luftlinie" ? "Entfernung" : "Wegzeit";
@@ -439,15 +458,14 @@ export function reachLimitLabel(limit: ReachLimit): string {
   return `bis ${limit.value} Min.`;
 }
 
-/** Begründung unter den gesperrten Chips „bis … Min.“ (M6); mit Wegzeit keine. */
-export function limitReason(mode: ReachMode | undefined): string | undefined {
+/** Begründung unter den gesperrten Chips „bis … Min.“ (M6); mit Wegzeit keine. „außerhalb“ nennt die Städte des Netzes. */
+export function limitReason(mode: ReachMode | undefined, network: NetworkId): string | undefined {
   if (!mode) return "Erst einen Startpunkt wählen.";
   if (mode.kind === "laedt") return "Wegzeiten werden geladen …";
   if (mode.kind === "luftlinie") {
     return mode.reason === "fehler"
       ? "Wegzeiten gerade nicht verfügbar."
-      : // vorerst das Netz `vgn`; das gewählte Netz kommt mit der gespeicherten Stadt (Plan 0039, E12, S6)
-        `Wegzeiten gibt es nur für Startpunkte in ${regionList("vgn")}.`;
+      : `Wegzeiten gibt es nur für Startpunkte in ${regionList(network)}.`;
   }
   return undefined;
 }
@@ -467,29 +485,35 @@ type NotePart = string | { text: string; href: string; nowrap?: true };
 
 /** längster Link-Text ohne Umbruch: „CC BY-SA 3.0 DE“ hat 15 Zeichen, 20 passen bei 320 px/200 % noch (N4) */
 const NOWRAP_MAX = 20;
-const VGN = "VGN – Verkehrsverbund Großraum Nürnberg GmbH";
-const VGN_URL = "https://www.vgn.de/web-entwickler/open-data/";
-const LICENSE: NotePart = {
-  text: "CC BY-SA 3.0 DE",
-  href: "https://creativecommons.org/licenses/by-sa/3.0/de/",
-  nowrap: true,
-};
+
+/** Lizenz als Link; nur kurze Bezeichnungen ohne Umbruch, eine lange aus den Daten muss bei 320 px/200 % umbrechen (N4) */
+function licenseLink(license: string, href: string): NotePart {
+  return { text: license, href, ...(license.length <= NOWRAP_MAX ? { nowrap: true } : {}) };
+}
 
 /**
- * Quellenhinweis im Kind-Sheet nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (E3): Rechteinhaber, Titel mit Stand (Link
- * auf die Quelle), „abgewandelt“, Lizenz (Link). Aus `source` in `wegzeit.json`; ohne geladene Tabelle nur VGN und
- * Lizenz.
+ * Quellenhinweis im Kind-Sheet nach CC BY-SA 3.0 DE, Abschnitt 4a/4c bzw. CC BY 4.0, 3(a) (E3): Rechteinhaber, Titel
+ * mit Stand (Link auf die Quelle), „abgewandelt“, Lizenz (Link). Aus `source` der geladenen Tabelle; ohne sie nur
+ * Rechteinhaber und Lizenz des gewählten Netzes (`NETWORKS[network].transitSource`, Plan 0039, E12).
  */
-export function transitSourceNote(source: TransitSource | undefined): NotePart[] {
+export function transitSourceNote(source: TransitSource | undefined, network: NetworkId): NotePart[] {
   // Die Erklärung des Modells liefert die geladene Tabelle (`source.rule`, Lazy-Chunk; Arch-Review 0012, Befund 2).
   const lead = `${source?.rule ? `${source.rule} ` : ""}Fahrplan: `;
-  if (!source) return [lead, { text: VGN, href: VGN_URL }, ", ", LICENSE, "."];
+  if (!source) {
+    const fallback = NETWORKS[network].transitSource;
+    return [
+      lead,
+      { text: fallback.attribution, href: fallback.url },
+      ", ",
+      licenseLink(fallback.license, fallback.licenseUrl),
+      ".",
+    ];
+  }
   return [
     `${lead}${source.attribution}, ‚`,
     { text: source.title, href: source.url },
     "‘, abgewandelt, Lizenz ",
-    // nur kurze Bezeichnungen: Eine lange aus den Daten muss bei 320 px/200 % umbrechen dürfen (N4)
-    { text: source.license, href: source.licenseUrl, ...(source.license.length <= NOWRAP_MAX ? { nowrap: true } : {}) },
+    licenseLink(source.license, source.licenseUrl),
     ".",
   ];
 }

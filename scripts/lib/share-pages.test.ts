@@ -313,4 +313,11 @@ describe("Impressum und Datenschutz (Plan 0034, E1, E2, E7)", () => {
     expect(html).not.toContain('name="robots"');
     expect(html).not.toContain("<script");
   });
+
+  it("nennt die gespeicherte Stadt und dass Wegzeit-Tabelle und Kartenausschnitt vom Gebiet abhängen (Plan 0039, E12)", () => {
+    expect(html).toContain("Geburtsdatum, Merkliste, Stadt, Startpunkt und Darstellung speichert nur dein Browser");
+    expect(html).toContain("data/wegzeit/vgn.json");
+    expect(html).toContain("data/wegzeit/vrr.json");
+    expect(html).toMatch(/Kartenausschnitt/);
+  });
 });

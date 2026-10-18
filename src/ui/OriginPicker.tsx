@@ -9,6 +9,7 @@ import { useId, useRef } from "react";
 import { flushSync } from "react-dom";
 import { districtGroups } from "../domain/district-groups.ts";
 import { nearestDistrictLabel } from "../domain/districts.ts";
+import type { NetworkId, RegionId } from "../domain/regions.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
 import { markAutofocus } from "./Dialog.tsx";
 import { originHint, transitSourceNote } from "./format.ts";
@@ -18,11 +19,17 @@ import type { ReachMode } from "./use-transit.ts";
 
 export function OriginPicker({
   api,
+  city,
+  network,
   mode,
   source,
   focus,
 }: {
   api: OriginApi;
+  /** gewählte Stadt: ihre Stadtteile zuerst, nur die ihres Netzes (Plan 0039, E8) */
+  city: RegionId;
+  /** Netz der Stadt: Texte zu „außerhalb“ und Quelle ohne geladene Tabelle (Plan 0039, E12) */
+  network: NetworkId;
   /** Modus der Anzeige ab dem Startpunkt (useTransit) */
   mode: ReachMode | undefined;
   source: TransitSource | undefined;
@@ -30,7 +37,7 @@ export function OriginPicker({
 }) {
   const { origin, locating } = api;
   const selectId = useId();
-  const hint = originHint(api.problem, origin, mode);
+  const hint = originHint(api.problem, origin, mode, network);
   const located = origin?.source === "standort";
   const outside = mode?.kind === "luftlinie" && mode.reason === "ausserhalb";
   const hideDistricts = located && !api.problem && !outside;
@@ -80,8 +87,8 @@ export function OriginPicker({
               <option value="" disabled>
                 Stadtteil wählen …
               </option>
-              {/* je Region eine Gruppe, die größte zuerst; vorerst das Netz `vgn` (Plan 0036, E7; Plan 0039, E8, S6) */}
-              {districtGroups().map((g) => (
+              {/* je Region des Netzes eine Gruppe, die gewählte Stadt zuerst (Plan 0036, E7; Plan 0039, E8) */}
+              {districtGroups(city).map((g) => (
                 <optgroup key={g.region} label={g.name}>
                   {g.districts.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -112,7 +119,7 @@ export function OriginPicker({
       {/* Eigene Live-Region im Dialog; die einzige role="status" der Seite bleibt die Statuszeile. */}
       <div aria-live="polite">{hint && <p className={hint.cls}>{hint.text}</p>}</div>
       <p className="small source-note">
-        {transitSourceNote(source).map((part) =>
+        {transitSourceNote(source, network).map((part) =>
           typeof part === "string" ? (
             part
           ) : (

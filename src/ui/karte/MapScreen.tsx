@@ -113,7 +113,12 @@ export function MapScreen(props: MapScreenProps) {
       {places.length > 0 ? (
         <PlaceList places={places} reachOf={ctx.reachOf} reachPending={ctx.reachPending} onPlace={openPlace} />
       ) : (
-        <NoOffers hasData={props.hasData} onResetFilter={props.onResetFilter} age={props.age} />
+        <NoOffers
+          hasData={props.hasData}
+          emptyNetwork={props.emptyNetwork}
+          onResetFilter={props.onResetFilter}
+          age={props.age}
+        />
       )}
       <Dialog
         open={place !== undefined}
