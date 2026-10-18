@@ -103,6 +103,13 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0038** (stabile IDs nachschärfen, live seit 0cc9c62, 2026-10-17; Einzelheiten in „Nicht-Ziele“, „Umsetzung“ und „Live“ des Plans):
+  - **Korrektheitsrisiko** (Arch-Review): Stufe 1 der Zuordnung prüft `conflictingLabels` nicht. Zieht „Babyschwimmen 2“ mit exakt denselben Terminen auf den Platz von „Babyschwimmen 1“, erbt es dessen ID; ein alter Link zeigte still auf ein anderes Angebot. Im Rückspiel und im ersten Nachtlauf kein Fall. Abhilfe: `conflictingLabels` auch in Stufe 1 ausschließen, mit Test.
+  - Format-Lockerung in Stufe 2 (`kurs` ↔ `regelmaessig`, auch `kurs` → `einmalig`): im Rückspiel 3 IDs, am 18.10. FBS „Abenteuerturnen 1“. Braucht eine weitere Abweichung von ADR 0022.
+  - Ortswechsel: Wechselt das Modell den Ort, obwohl der alte im Katalog bleibt, verlangen Stufe 1 und 2 den alten Ort (am 18.10. 5 IDs: Studio Herzschlag Outdoor-Fitness, FBS Waldwichtel und Waldracker). Abhilfe eher in der Extraktion (Ort im `hint`) als in der Zuordnung.
+  - Extraktion stabiler machen: Titel, Format, Ort, Anmeldung und Kosten wechseln von Lauf zu Lauf; Sternenhaus-Vorstellungen fehlen; Wassermäuse-Reihe bis Oktober 2027 statt bis zum nächsten Kurs.
+  - Dubletten mit verschiedenem ersten Kernwort („Tanzen für Mama & Baby …“ / „MAWIBA-Tanzkurs …“, FBS am 18.10.) und über verschiedene Formate (FBS „Abenteuerturnen 1“ als `kurs` und als drei `einmalig`) bleiben stehen; die alte ID wird dann mehrdeutig.
+  - Dubletten mit leerem Kerntitel (Ev. Langwasser „MiniClub Eltern-Kind-Gruppe (Mo 15–17 Uhr)“, CVJM „Mini-Club Dienstagvormittag“) bleiben stehen.
 - **Plan 0037** (eine Kategorie je Angebot, noch aktiv): Stufe C steht aus. Frühestens 7 Tage nach Stufe B, wenn zwei Nachtläufe `derivedCategories` = 0 melden und `data/raw/` kein Event ohne `category` mehr hat (E7). Dann `RawEvent.category` Pflicht, Rückfall, Zähler, `fallbackCategory`, `withCategory` und `adoptSite` entfernen. Dieser Punkt entfällt mit Stufe C.
 - **Plan 0036** (Zweite Region Fürth, live seit cbe5a56, 2026-10-12; Einzelheiten in „Risiken“, „Browser-Review lokal“, „Browser-Review live“ und „Live“ des Plans):
   - Am echten iPhone und Android prüfen (Nutzer): nativer Picker im Schritt „Weg“ und im Kind-Sheet mit `optgroup` (Fürth/Nürnberg, 53 Einträge), auch dunkel und quer. Headless zeichnet ihn nicht.

@@ -1,6 +1,6 @@
 # Plan 0038 – Stabile IDs nachschärfen: Dubletten gleicher Quelle, Gleichstand unter Zwillingen, veränderte Terminreihen
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 0cc9c62 (2026-10-17)
 Datum: 2026-10-16
 Bezug:
 - ADR 0022 (stabile IDs), Punkt 3 (Zuordnung gegen den Vorstand) und „Alternativen“ (Zusammenlegungen); wird durch ADR 0031 (neu, Datei `0031-stabile-ids-dubletten-und-terminreihen.md` in `docs/adr/`) ergänzt
@@ -294,3 +294,12 @@ Restpunkt (beim Archivieren nach `docs/ideas.md`): Stufe 1 prüft `conflictingLa
 - **Minor 1** Zwillingskonflikt aus Stufe 1 wurde in Stufe 2 doch entschieden: behoben (die Zwillinge sind für Stufe 2 gesperrt), Test ergänzt. Rückspiel unverändert 455 / 415, (c) leer.
 - **Minor 2** römische Kennungen und `C`–`F` ungetestet: Tests ergänzt.
 - Hinweis: Der Restpunkt „Stufe 1 ohne `conflictingLabels`“ kommt als Korrektheitsrisiko nach `docs/ideas.md`, nicht als Komfort-Idee.
+
+## Live (Nachtlauf 2026-10-18, Lauf 39103948015)
+
+Erster Nachtlauf mit den neuen Regeln (Schritt 8), alle Zeilen mit beiden Titeln angesehen:
+- 9 Dubletten gleicher Quelle entfernt (FBS 7: PEKiP-Gruppen, ZwergenTanz 2, Babymassage; Geburtshaus 2: Rückbildung), jede derselbe Kurs zweimal, keine Parallelgruppe.
+- 6 Hinweise „Zwilling im Vorstand“, jeweils die zweite Fassung eines Angebots; 12 Treffer in Stufe 2 (u. a. Wassermäuse, HerzZeit), alle derselbe Kurs.
+- Gehalten 457 von 472, 15 weggefallen (Bericht: 17, davon 2 von `imiluv-studio`, die Schritt 7 aus dem Altbestand übernimmt). Davon 6 Zwillinge (gewollt), 5 mit gewechseltem Ort (Studio Herzschlag Outdoor-Fitness, FBS Waldwichtel und Waldracker), 1 Format `kurs` → `einmalig` (FBS Abenteuerturnen 1), 1 Dublette mit verschiedenem ersten Kernwort (FBS „Tanzen für Mama & Baby …“ / „MAWIBA-Tanzkurs …“: die alte ID ist in Stufe 1 und 2 mehrdeutig), 2 ohne Nachfolger.
+
+Restpunkte stehen in `docs/ideas.md`, „Offen aus abgeschlossenen Plänen“.
