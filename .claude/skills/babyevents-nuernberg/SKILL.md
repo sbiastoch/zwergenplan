@@ -119,7 +119,7 @@ Regionen überlappen (Fürth liegt in der Nürnberger bbox). Ein neuer Anbieter 
 pnpm pipeline oepnv
 ```
 
-fragt beim VGN mit bedingtem `GET` nach einem neuen GTFS-Feed (Cache unter `~/.cache/zwergenplan/gtfs/`, Plan 0009). Unverändert meldet er „Fahrplan aktuell“; neu schreibt er `data/oepnv/fahrplan.json`, den man dann normal committet und pusht. Der Nachtlauf erneuert den Fahrplan nicht (ADR 0026 lässt ADR 0011 Nr. 4 unverändert). Anlass ist die Warnung von `pnpm data:validate`, der Auszug sei abgelaufen oder ein Fahrplanwechsel stehe an.
+fragt je Netz (VGN, VRR; nur eins mit `--netz vgn` bzw. `--netz vrr`) mit bedingtem `GET` nach einem neuen GTFS-Feed (Cache unter `~/.cache/zwergenplan/gtfs/<netz>/`, Plan 0009, Plan 0039). Den VRR-Feed sucht er über die CKAN-API von opendata-oepnv.de (jüngste `google_transit.zip`). Unverändert meldet er „Fahrplan aktuell“; neu schreibt er `data/oepnv/<netz>.json`, den man dann normal committet und pusht. Der Nachtlauf erneuert den Fahrplan nicht (ADR 0026 lässt ADR 0011 Nr. 4 unverändert). Anlass ist die Warnung von `pnpm data:validate`, der Auszug sei abgelaufen oder ein Fahrplanwechsel stehe an.
 
 ## 8. Vom Abo auf die API umsteigen
 

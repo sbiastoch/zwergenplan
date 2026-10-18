@@ -165,7 +165,7 @@ jobs:
         run: |
           npm i -g "@anthropic-ai/claude-code@${CLI_VERSION}"
           echo "CLI: $(claude --version)" >> "$GITHUB_STEP_SUMMARY"
-      # `pipeline oepnv` entfällt: data/oepnv/fahrplan.json liegt im Repo, Gates und Build brauchen keinen neuen
+      # `pipeline oepnv` entfällt: data/oepnv/<netz>.json liegen im Repo, Gates und Build brauchen keinen neuen
       # Auszug (veraltet → nur Warnung in data:validate); der Fahrplan bleibt Handarbeit über den Skill.
       - name: Nachtlauf
         id: nightly

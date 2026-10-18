@@ -105,7 +105,8 @@ console.log(
   `✓ Vorschauseiten: ${site.offers.length} Angebote, ${directory.providers.length} Anbieter, größte ${(largest / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} kB`,
 );
 
-const timetable = loadTimetable(source);
+// vorerst nur die Tabelle des Netzes vgn; Tabellen je Netz kommen mit Plan 0039, S4 (E5)
+const timetable = loadTimetable(source, "vgn");
 const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
 for (const w of timetableCheck.warnings) console.log(`::warning::${w}`);
 if (timetableCheck.errors.length > 0) {

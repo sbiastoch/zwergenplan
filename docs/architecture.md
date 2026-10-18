@@ -10,9 +10,9 @@ GitHub Actions (ADR 0026): nightly.yml (täglich) und discover.yml (wöchentlich
    │                    Plan 0032, E5/E6; `discover` = neue Anbieter je Region → providers.yaml, data/raw,
    │                    data/discover/<region>.json, Plan 0032, E7; `fetch` = nur Abruf und Hashes, S1.2)
    │  Wartung von Hand: Skill .claude/skills/babyevents-nuernberg (Katalogpflege, Rücknahmen, Eval, Fahrplan)
-   │  pnpm pipeline oepnv  (VGN-GTFS, nur lokal, Cache + bedingtes GET; Plan 0009, E4)
+   │  pnpm pipeline oepnv  (GTFS je Netz: VGN, VRR; nur lokal, Cache + bedingtes GET; Plan 0009, E4; Plan 0039, E4)
    ▼
-data/providers.yaml + data/offers.json + data/oepnv/fahrplan.json   (Commit auf main: Nachtlauf und Entdecken aus dem Job
+data/providers.yaml + data/offers.json + data/oepnv/<netz>.json     (Commit auf main: Nachtlauf und Entdecken aus dem Job
                           + data/raw/, data/discover/, data/kosten.csv    `veroeffentlichen`; Katalogpflege und Fahrplan von Hand)
                           │
             scripts/build-data.ts  (Zod + Invarianten; rot = kein Build; scripts/transit rechnet Wegzeit-Tabelle und Linien, `lines.ts`)

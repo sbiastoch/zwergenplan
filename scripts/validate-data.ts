@@ -1,11 +1,12 @@
 /**
- * Prüft den Datenbestand (Schema + Invarianten), den Fahrplanauszug für die Wegzeit (Plan 0009), den Zustand
+ * Prüft den Datenbestand (Schema + Invarianten), die Fahrplanauszüge je Netz (Plan 0009; Plan 0039, E4), den Zustand
  * je Anbieter in data/raw (Plan 0032, E5) und den Zustand des Entdeckens in data/discover (E7).
  *   --against-deployed   zusätzlich Plausibilität gegen den LIVE deployten Stand (ADR 0002)
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
+import { NETWORK_IDS } from "../src/domain/regions.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
 import { DiscoverState, reservedConflicts } from "./pipeline/lib/discover-state.ts";
@@ -97,13 +98,21 @@ function evalWarnings(): string[] {
 const now = new Date();
 const fixture = source === "fixture";
 const plausibility = checkPlausibility(result.summary, deployed, { fixture, now });
-const timetable = loadTimetable(source);
-const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
-const errors = [...plausibility.errors, ...timetableCheck.errors, ...rawIssues(), ...discoverIssues()];
+// ein Auszug je Netz, alle Pflicht (Plan 0039, E4)
+const timetables = NETWORK_IDS.map((network) => ({ network, load: loadTimetable(source, network) }));
+const timetableChecks = timetables.map(({ load }) => timetableIssues(load, { required: TIMETABLE_REQUIRED }));
+const errors = [
+  ...plausibility.errors,
+  ...timetableChecks.flatMap((c) => c.errors),
+  ...rawIssues(),
+  ...discoverIssues(),
+];
 const warnings = [
   ...plausibility.warnings,
-  ...timetableCheck.warnings,
-  ...(timetable.kind === "ok" ? timetableWarnings(timetable.timetable.source, now, { fixture }) : []),
+  ...timetableChecks.flatMap((c) => c.warnings),
+  ...timetables.flatMap(({ network, load }) =>
+    load.kind === "ok" ? timetableWarnings(load.timetable.source, now, { fixture, network }) : [],
+  ),
   ...evalWarnings(),
 ];
 for (const w of warnings) console.log(`::warning::${w}`);
@@ -114,7 +123,11 @@ if (errors.length > 0) {
 console.log(
   `✓ Daten (${source}) gültig: ${result.summary.offers} Angebote, ${result.summary.providers} Anbieter` +
     (deployed ? ` (deployt: ${deployed.offers})` : "") +
-    (timetable.kind === "ok"
-      ? `, Fahrplanauszug ${timetable.timetable.serviceDay} (${timetable.timetable.trips.length} Fahrten)`
-      : ""),
+    timetables
+      .map(({ network, load }) =>
+        load.kind === "ok"
+          ? `, Fahrplanauszug ${network} ${load.timetable.serviceDay} (${load.timetable.trips.length} Fahrten)`
+          : "",
+      )
+      .join(""),
 );

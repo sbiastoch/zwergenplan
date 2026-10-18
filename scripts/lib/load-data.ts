@@ -3,7 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 import { type ValidationResult, validateDataset } from "../../src/domain/dataset.ts";
-import { Timetable } from "../../src/domain/schema.ts";
+import type { NetworkId } from "../../src/domain/regions.ts";
+import { type Timetable, timetableSchema } from "../../src/domain/schema.ts";
 
 export const ROOT = new URL("../../", import.meta.url);
 
@@ -45,7 +46,7 @@ export const TIMETABLE_REQUIRED = true;
 export type TimetableLoad =
   | { kind: "ok"; timetable: Timetable }
   | { kind: "missing"; file: string }
-  | { kind: "invalid"; errors: string[] };
+  | { kind: "invalid"; file: string; errors: string[] };
 
 /** Pfad relativ zum Repo, sonst absolut (für Meldungen) */
 function relativeToRoot(file: URL): string {
@@ -54,24 +55,26 @@ function relativeToRoot(file: URL): string {
   return path.startsWith(root) ? path.slice(root.length) : path;
 }
 
-/** Liest und prüft einen Fahrplanauszug (Schema `Timetable`, src/domain/schema.ts). */
-export function readTimetable(file: URL): TimetableLoad {
+/** Liest und prüft den Fahrplanauszug eines Netzes (`timetableSchema`, src/domain/schema.ts). */
+export function readTimetable(file: URL, network: NetworkId): TimetableLoad {
   const text = readOptional(file);
-  if (text === undefined) return { kind: "missing", file: relativeToRoot(file) };
+  const path = relativeToRoot(file);
+  if (text === undefined) return { kind: "missing", file: path };
   let raw: unknown;
   try {
     raw = JSON.parse(text);
   } catch (e) {
-    return { kind: "invalid", errors: [`Lesefehler: ${(e as Error).message}`] };
+    return { kind: "invalid", file: path, errors: [`Lesefehler: ${(e as Error).message}`] };
   }
-  const r = Timetable.safeParse(raw);
+  const r = timetableSchema(network).safeParse(raw);
   if (r.success) return { kind: "ok", timetable: r.data };
-  return { kind: "invalid", errors: r.error.issues.map((i) => `${i.path.join(".") || "(Wurzel)"}: ${i.message}`) };
+  const errors = r.error.issues.map((i) => `${i.path.join(".") || "(Wurzel)"}: ${i.message}`);
+  return { kind: "invalid", file: path, errors };
 }
 
-/** `<Datenverzeichnis>/oepnv/fahrplan.json` (Plan 0009, E4/E7) */
-export function loadTimetable(source: DataSource = dataSource()): TimetableLoad {
-  return readTimetable(new URL("oepnv/fahrplan.json", dataDir(source)));
+/** `<Datenverzeichnis>/oepnv/<netz>.json` (Plan 0009, E4/E7; ein Auszug je Netz, Plan 0039, E4) */
+export function loadTimetable(source: DataSource, network: NetworkId): TimetableLoad {
+  return readTimetable(new URL(`oepnv/${network}.json`, dataDir(source)), network);
 }
 
 /** Fehler und Warnungen zum Auszug; Aktualität prüft `timetableWarnings` (scripts/transit/freshness.ts). */
@@ -79,7 +82,9 @@ export function timetableIssues(
   load: TimetableLoad,
   opts: { required: boolean },
 ): { errors: string[]; warnings: string[] } {
-  if (load.kind === "invalid") return { errors: load.errors.map((e) => `Fahrplanauszug: ${e}`), warnings: [] };
+  if (load.kind === "invalid") {
+    return { errors: load.errors.map((e) => `Fahrplanauszug ${load.file}: ${e}`), warnings: [] };
+  }
   if (load.kind === "missing") {
     const msg = `Kein Fahrplanauszug (${load.file}) – Wegzeit entfällt, \`pnpm pipeline oepnv\` ausführen`;
     return opts.required ? { errors: [msg], warnings: [] } : { errors: [], warnings: [msg] };

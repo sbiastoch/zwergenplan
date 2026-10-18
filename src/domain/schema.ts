@@ -5,7 +5,7 @@
 import { z } from "zod";
 import { inBounds } from "./geo.ts";
 import { KEBAB_ID_PATTERN, MAX_KEBAB_ID, SHORT_ID_PATTERN } from "./ids.ts";
-import { NETWORKS, REGION_IDS, REGIONS } from "./regions.ts";
+import { NETWORKS, type NetworkId, REGION_IDS, REGIONS } from "./regions.ts";
 import { isoWeekday } from "./time.ts";
 import { CATEGORIES, categoriesOf, TOPICS } from "./topics.ts";
 
@@ -289,12 +289,14 @@ const TimetableTrip = z
   .refine((t) => t.flags.length === t.stops.length, { message: "flags braucht 1 Wert je Halt", path: ["flags"] });
 
 /**
- * Fahrplanauszug für die Wegzeit (Plan 0009, E4; ADR 0011): ein Referenz-Dienstag, Fahrten im Großraum,
- * Abfahrtsfenster. Erzeugt von `pnpm pipeline oepnv` aus den VGN-Soll-Daten (CC BY-SA 3.0 DE).
+ * Fahrplanauszug für die Wegzeit (Plan 0009, E4; ADR 0011): ein Referenz-Dienstag, Fahrten eines Netzes,
+ * Abfahrtsfenster. Erzeugt von `pnpm pipeline oepnv` aus den Soll-Daten des Verbunds, ein Auszug je Netz
+ * (`data/oepnv/<netz>.json`, Plan 0039, E4). Geprüft wird über `timetableSchema(network)`, das die Steige gegen die
+ * bbox des Netzes hält (E3).
  */
-export const Timetable = z
+const TimetableBase = z
   .strictObject({
-    /** Namensnennung nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (Plan 0009, E3) */
+    /** Namensnennung (VGN: CC BY-SA 3.0 DE, Abschnitt 4a/4c, Plan 0009, E3; VRR: CC BY 4.0, Plan 0039, E4) */
     source: z.strictObject({
       attribution: z.string().min(1),
       title: z.string().min(1),
@@ -322,15 +324,19 @@ export const Timetable = z
     message: "Stichtag muss im Gültigkeitszeitraum liegen",
     path: ["serviceDay"],
   })
-  // vorerst nur der VGN-Auszug; die bbox des geprüften Netzes kommt mit dem Auszug je Netz (Plan 0039, E3/E4, S3)
-  .refine((t) => t.stops.every(([, lat, lon]) => inBounds({ lat, lon }, NETWORKS.vgn.bbox)), {
-    message: "alle Steige müssen in der bbox des Netzes vgn liegen",
-    path: ["stops"],
-  })
   .refine((t) => t.trips.every((trip) => trip.stops.every((i) => i < t.stops.length)), {
     message: "Steig-Index außerhalb von stops",
     path: ["trips"],
   });
+
+/** Schema des Auszugs eines Netzes: alle Steige in der bbox des Netzes (Plan 0039, E3) */
+export function timetableSchema(network: NetworkId) {
+  const { bbox } = NETWORKS[network];
+  return TimetableBase.refine((t) => t.stops.every(([, lat, lon]) => inBounds({ lat, lon }, bbox)), {
+    message: `alle Steige müssen in der bbox des Netzes ${network} liegen`,
+    path: ["stops"],
+  });
+}
 
 export type Venue = z.infer<typeof Venue>;
 export type Provider = z.infer<typeof Provider>;
@@ -341,7 +347,7 @@ export type Session = z.infer<typeof Session>;
 export type AgeRange = z.infer<typeof AgeRange>;
 export type Offer = z.infer<typeof Offer>;
 export type OffersFile = z.infer<typeof OffersFile>;
-export type Timetable = z.infer<typeof Timetable>;
+export type Timetable = z.infer<typeof TimetableBase>;
 export type TransitMode = z.infer<typeof TransitMode>;
 export type Format = z.infer<typeof Format>;
 export type Registration = z.infer<typeof Registration>;

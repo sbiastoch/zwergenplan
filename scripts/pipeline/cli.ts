@@ -51,15 +51,16 @@
  *   publish RUN_DIR                             Nachtlauf veröffentlichen (E6, aus RUN_DIR/nightly.json): nur auf main,
  *                                               nur data/raw, data/offers.json, data/kosten.csv, Commit-Text mit
  *                                               Kurzbericht, `pull --rebase` vor dem Push.
- *   oepnv [--force]                             Fahrplanauszug data/oepnv/fahrplan.json aus dem VGN-Feed
- *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
+ *   oepnv [--netz vgn|vrr] [--force]            Fahrplanauszug data/oepnv/<netz>.json aus dem GTFS-Feed des Netzes,
+ *                                               ohne --netz für alle Netze (Cache + bedingter GET; unverändert →
+ *                                               nichts tun, Plan 0009; je Netz Plan 0039, E4)
  */
 import { execFileSync } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
-import { NETWORK_IDS, NETWORKS, type RegionId } from "../../src/domain/regions.ts";
+import { NETWORK_IDS, NETWORKS, type NetworkId, type RegionId } from "../../src/domain/regions.ts";
 import { berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
 import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
 import { commitNewProvider, commitRunState, GateError, publishDiscover } from "./io/discover-git.ts";
@@ -75,7 +76,7 @@ import {
 import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
 import { git, ROOT, readCatalog, readJson, readPreviousOffers, readRawDir, writeJson } from "./io/files.ts";
 import { geocode } from "./io/geocode.ts";
-import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
+import { fetchFeed, readCurrentTimetable, timetableFile, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays, loadFreeDaysByNetwork } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
 import { liveStatus } from "./io/live.ts";
@@ -90,12 +91,12 @@ import { inputsFromFetch } from "./lib/extract.ts";
 import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
   extractTimetable,
+  FEEDS,
   feedModified,
   feedValidity,
   gtfsTables,
   pickServiceDay,
   serializeTimetable,
-  vgnSource,
 } from "./lib/gtfs.ts";
 import { renderFetchReport } from "./lib/html-extract.ts";
 import { fillPlaceholders } from "./lib/placeholders.ts";
@@ -536,17 +537,32 @@ const germanDate = (instantOrDate: string) => formatGermanDate(berlinIsoDate(ins
 const count = (n: number) => n.toLocaleString("de-DE");
 const kB = (bytes: number) => `${(bytes / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} kB`;
 
-/** Fahrplanauszug für die Wegzeit (Plan 0009, E4; Skill-Schritt 0). */
+/** `--netz` → die Netze des Laufs; ohne Angabe alle (Plan 0039, E4). */
+function networksOf(value: string | undefined): readonly NetworkId[] {
+  if (value === undefined) return NETWORK_IDS;
+  const network = NETWORK_IDS.find((n) => n === value);
+  if (!network) fail(`--netz ${value} unbekannt (${NETWORK_IDS.join(", ")})`);
+  return [network];
+}
+
+/** Fahrplanauszüge für die Wegzeit (Plan 0009, E4; je Netz Plan 0039, E4; Skill-Schritt 0). */
 async function oepnv() {
+  for (const network of networksOf(values.netz)) await oepnvNetwork(network);
+}
+
+async function oepnvNetwork(network: NetworkId) {
   const started = performance.now();
-  const feed = await fetchFeed();
+  const name = network.toUpperCase();
+  const feed = await fetchFeed(network);
   const modified = feedModified(feed.lastModified);
   print(
-    `Feed vom ${germanDate(modified)}: ${feed.status === 304 ? "HTTP 304, unverändert (Cache)" : "HTTP 200, neu geladen"}`,
+    `${name}-Feed vom ${germanDate(modified)}: ${feed.status === 304 ? "HTTP 304, unverändert (Cache)" : "HTTP 200, neu geladen"}`,
   );
-  const current = readCurrentTimetable();
+  const current = readCurrentTimetable(network);
   if (current?.source.modified === modified && !values.force) {
-    print(`✓ Fahrplan aktuell (Stand ${germanDate(modified)}, Stichtag ${current.serviceDay}) – nichts geändert`);
+    print(
+      `✓ ${name}-Fahrplan aktuell (Stand ${germanDate(modified)}, Stichtag ${current.serviceDay}) – nichts geändert`,
+    );
     return;
   }
   const tables = gtfsTables(unzipFeed(feed.zip()));
@@ -554,14 +570,19 @@ async function oepnv() {
   const serviceDay = pickServiceDay({
     validFrom,
     validTo,
-    // Ferien des VGN, bis der Fahrplan je Netz kommt (Plan 0039, E4)
-    freeDays: await loadFreeDays(NETWORKS.vgn.holidays, validFrom, validTo),
+    freeDays: await loadFreeDays(NETWORKS[network].holidays, validFrom, validTo),
     today: today(),
   });
-  const source = vgnSource({ lastModified: feed.lastModified, fetchedAt: feed.fetchedAt, validFrom, validTo });
-  const { timetable, stats } = extractTimetable(tables, { serviceDay, source });
+  const source = FEEDS[network].source({
+    lastModified: feed.lastModified,
+    fetchedAt: feed.fetchedAt,
+    validFrom,
+    validTo,
+    download: feed.url,
+  });
+  const { timetable, stats } = extractTimetable(tables, { network, serviceDay, source });
   const text = serializeTimetable(timetable);
-  writeTimetable(text);
+  writeTimetable(network, text);
   const seconds = ((performance.now() - started) / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 });
   print(
     `${source.title}, gültig ${germanDate(validFrom)}–${germanDate(validTo)}, Stichtag Di ${germanDate(serviceDay)}`,
@@ -571,9 +592,10 @@ async function oepnv() {
       `(Bedarfsverkehr weggelassen: ${count(stats.demandTrips)} Fahrten)`,
   );
   const bytes = Buffer.byteLength(text);
+  const rss = Math.round(process.resourceUsage().maxRSS / 1024);
   print(
-    `✓ ${TIMETABLE_FILE.slice(ROOT.length)} geschrieben: ${kB(bytes)} roh, ${kB(gzipSync(text).length)} gzip, ` +
-      `${count(text.split("\n").length - 1)} Zeilen, Laufzeit ${seconds} s`,
+    `✓ ${timetableFile(network).slice(ROOT.length)} geschrieben: ${kB(bytes)} roh, ${kB(gzipSync(text).length)} gzip, ` +
+      `${count(text.split("\n").length - 1)} Zeilen, Laufzeit ${seconds} s, Spitze ${count(rss)} MB RSS`,
   );
 }
 

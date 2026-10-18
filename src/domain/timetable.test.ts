@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Timetable } from "./schema.ts";
+import { timetableSchema } from "./schema.ts";
 
 /** Kleinster gültiger Fahrplanauszug (Plan 0009, E4): zwei Steige, eine Fahrt. */
 function base() {
@@ -31,11 +31,11 @@ type T = ReturnType<typeof base>;
 const issues = (fn: (t: T) => void) => {
   const t = base();
   fn(t);
-  const r = Timetable.safeParse(t);
+  const r = timetableSchema("vgn").safeParse(t);
   return r.success ? [] : r.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
 };
 
-describe("Timetable", () => {
+describe("timetableSchema", () => {
   it("akzeptiert einen gültigen Auszug", () => {
     expect(issues(() => {})).toEqual([]);
   });
@@ -76,5 +76,20 @@ describe("Timetable", () => {
 
   it("erlaubt gleiche Ankunft und Abfahrt an aufeinanderfolgenden Halten", () => {
     expect(issues((t) => t.trips[0]?.times.splice(2, 1, 0))).toEqual([]);
+  });
+
+  it("prüft die Steige gegen die bbox des Netzes (Plan 0039, E3)", () => {
+    const nuernberg = base();
+    expect(timetableSchema("vrr").safeParse(nuernberg).success).toBe(false);
+    const duesseldorf = base();
+    duesseldorf.stops = [
+      ["de:05111:18235:1:1", 51.222, 6.786],
+      ["de:05111:18000:1:1", 51.2199, 6.7944],
+    ];
+    expect(timetableSchema("vrr").safeParse(duesseldorf).success).toBe(true);
+    const r = timetableSchema("vgn").safeParse(duesseldorf);
+    expect(r.success ? [] : r.error.issues.map((i) => i.message)).toEqual([
+      "alle Steige müssen in der bbox des Netzes vgn liegen",
+    ]);
   });
 });

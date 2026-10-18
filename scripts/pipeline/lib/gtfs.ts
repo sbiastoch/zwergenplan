@@ -1,25 +1,19 @@
 /**
- * Fahrplanauszug aus dem VGN-GTFS-Feed (Plan 0009, E2–E4; ADR 0011): CSV lesen, Referenz-Dienstag wählen,
- * aktive Dienste bestimmen und die Fahrten eines Dienstagvormittags im Großraum herausschneiden.
- * Rein: Laden, Cache und Entpacken liegen in io/gtfs.ts, „heute“ wird hineingegeben.
+ * Fahrplanauszug aus dem GTFS-Feed eines Netzes (Plan 0009, E2–E4; ADR 0011; Plan 0039, E4): CSV lesen,
+ * Referenz-Dienstag wählen, aktive Dienste bestimmen und die Fahrten eines Dienstagvormittags in der bbox des Netzes
+ * herausschneiden. Was je Verbund anders ist (Ort des Feeds, Verkehrsmittel, Bedarfsverkehr, Namensnennung), steht in
+ * `FEEDS`. Rein: Laden, Cache und Entpacken liegen in io/gtfs.ts, „heute“ wird hineingegeben.
  */
-import { inBounds } from "../../../src/domain/geo.ts";
-import { NETWORKS } from "../../../src/domain/regions.ts";
-import { Timetable, type TransitMode } from "../../../src/domain/schema.ts";
+import { z } from "zod";
+import { type BBox, inBounds } from "../../../src/domain/geo.ts";
+import { NETWORKS, type NetworkId } from "../../../src/domain/regions.ts";
+import { type Timetable, type TransitMode, timetableSchema } from "../../../src/domain/schema.ts";
 import { addDays, berlinIsoDate, formatGermanDate, isoWeekday, toBerlinIso } from "../../../src/domain/time.ts";
-
-export const VGN_FEED_URL = "https://www.vgn.de/opendata/GTFS.zip";
 
 /** Abfahrtsfenster der Wegzeit (E5) */
 const WINDOW = { from: "08:30", to: "10:30" } as const;
 /** Obergrenze der Wegzeit (E8): Verbindungen bis Fensterende + 120 Min. reichen. */
 const HORIZON_SECONDS = 120 * 60;
-
-/** Bedarfsverkehre zählen nicht (E2): Anmeldung nötig, kein Takt. */
-const DEMAND_RESPONSIVE = new Set(["Rufbus", "Linienbedarfstaxi", "Anrufsammeltaxi", "Linientaxi"]);
-
-/** GTFS `route_type` → Verkehrsmittel (Plan 0012, E1); andere Typen kommen im VGN-Feed nicht vor. */
-const MODES: Readonly<Record<string, TransitMode>> = { "0": "tram", "1": "u-bahn", "2": "bahn", "3": "bus" };
 
 /** Bit 1 = Einsteigen erlaubt, Bit 2 = Aussteigen erlaubt (Schema `Timetable`) */
 const BOARD = 1;
@@ -35,7 +29,13 @@ export const GTFS_FILES = {
   stopTimes: "stop_times.txt",
 } as const;
 
-export type GtfsTexts = Record<keyof typeof GTFS_FILES, string>;
+/**
+ * Texte der Feed-Dateien. stop_times.txt kommt als Folge von Blöcken, die je an einem Zeilenende enden: Im VRR-Feed
+ * hat sie 665 MB und passt nicht in einen V8-String (Plan 0039, E4). Ein String gilt als ein Block.
+ */
+export type GtfsTexts = Record<Exclude<keyof typeof GTFS_FILES, "stopTimes">, string> & {
+  stopTimes: Iterable<string>;
+};
 export type CsvRow = Record<string, string>;
 
 export interface GtfsTables {
@@ -49,6 +49,34 @@ export interface GtfsTables {
 }
 
 // ── CSV ──────────────────────────────────────────────────────────────────────
+
+/**
+ * Bytes → Text in Blöcken von höchstens `blockSize` Bytes, je am letzten Zeilenende davor geschnitten (Plan 0039, E4).
+ * Ein Zeilenende (0x0A) liegt nie in einem UTF-8-Mehrbytezeichen; eine Zeile länger als der Block bleibt ganz.
+ */
+export function* decodeBlocks(bytes: Uint8Array, blockSize = 64 * 1024 * 1024): Generator<string> {
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  let start = 0;
+  while (start < bytes.length) {
+    let end = Math.min(start + blockSize, bytes.length);
+    if (end < bytes.length) {
+      const before = bytes.lastIndexOf(10, end - 1);
+      const after = bytes.indexOf(10, end);
+      end = before >= start ? before + 1 : after === -1 ? bytes.length : after + 1;
+    }
+    yield decoder.decode(bytes.subarray(start, end));
+    start = end;
+  }
+}
+
+/** Zeilen aller Blöcke; ein String ist ein Block (nicht eine Folge von Zeichen). */
+function* blockLines(blocks: Iterable<string>): Generator<string> {
+  if (typeof blocks === "string") {
+    yield* splitLines(blocks);
+    return;
+  }
+  for (const block of blocks) yield* splitLines(block);
+}
 
 /** Zeilen ohne Zeilenende (LF oder CRLF), ohne die Datei zu kopieren. */
 export function* splitLines(text: string): Generator<string> {
@@ -123,15 +151,18 @@ function field(row: CsvRow, name: string): string {
   return value;
 }
 
-/** Die Texte der Feed-Dateien über eine Lesefunktion (Dateiname wie im ZIP). */
-export function gtfsTexts(read: (file: string) => string): GtfsTexts {
+/** Die Texte der Feed-Dateien über Lesefunktionen (Dateiname wie im ZIP); stop_times.txt blockweise. */
+export function gtfsTexts(
+  read: (file: string) => string,
+  readBlocks: (file: string) => Iterable<string> = read,
+): GtfsTexts {
   return {
     routes: read(GTFS_FILES.routes),
     trips: read(GTFS_FILES.trips),
     stops: read(GTFS_FILES.stops),
     calendar: read(GTFS_FILES.calendar),
     calendarDates: read(GTFS_FILES.calendarDates),
-    stopTimes: read(GTFS_FILES.stopTimes),
+    stopTimes: readBlocks(GTFS_FILES.stopTimes),
   };
 }
 
@@ -144,7 +175,7 @@ export function gtfsTables(texts: GtfsTexts): GtfsTables {
     stops: all(texts.stops),
     calendar: all(texts.calendar),
     calendarDates: all(texts.calendarDates),
-    stopTimes: parseCsv(splitLines(texts.stopTimes)),
+    stopTimes: parseCsv(blockLines(texts.stopTimes)),
   };
 }
 
@@ -238,27 +269,114 @@ export function feedModified(lastModified: string): string {
   return toBerlinIso(modified);
 }
 
-/** Namensnennung nach CC BY-SA 3.0 DE, Abschnitt 4a/4c (E3). Titel wie auf der Download-Seite. */
-export function vgnSource(opts: {
+interface SourceInput {
   /** HTTP-Header Last-Modified des Feeds */
   lastModified: string;
   fetchedAt: Date;
   validFrom: string;
   validTo: string;
-}): TimetableSource {
+  /** tatsächlich geladene URL (beim VRR die Ressource der Ausgabe) */
+  download: string;
+}
+
+/**
+ * Namensnennung aus der Quelle des Netzes (`NETWORKS[…].transitSource`) und dem Stand des Feeds, Titel
+ * „<Verbund>-Soll-Daten vom <Last-Modified>“. Den Hinweis „abgewandelt“ setzt die Anzeige (`src/ui/format.ts`).
+ */
+function sourceOf(network: NetworkId, opts: SourceInput): TimetableSource {
   const modified = feedModified(opts.lastModified);
+  const { attribution, url, license, licenseUrl } = NETWORKS[network].transitSource;
   return {
-    attribution: "VGN – Verkehrsverbund Großraum Nürnberg GmbH",
-    title: `VGN-Soll-Daten vom ${formatGermanDate(berlinIsoDate(modified))}`,
-    url: "https://www.vgn.de/web-entwickler/open-data/",
-    download: VGN_FEED_URL,
-    license: "CC BY-SA 3.0 DE",
-    licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/de/",
+    attribution,
+    title: `${network.toUpperCase()}-Soll-Daten vom ${formatGermanDate(berlinIsoDate(modified))}`,
+    url,
+    download: opts.download,
+    license,
+    licenseUrl,
     modified,
     validFrom: opts.validFrom,
     validTo: opts.validTo,
     fetchedAt: toBerlinIso(opts.fetchedAt),
   };
+}
+
+// ── Feeds je Netz (Plan 0039, E4) ────────────────────────────────────────────
+
+/** Wo das ZIP liegt: feste URL oder CKAN-Datensatz, dessen jüngste Ressource `fileName` io/gtfs.ts sucht */
+export type FeedLocation = { kind: "url"; url: string } | { kind: "ckan"; api: string; fileName: string };
+
+export interface Feed {
+  network: NetworkId;
+  location: FeedLocation;
+  /** Zuschnitt des Auszugs: die bbox des Netzes (E3) */
+  bbox: BBox;
+  /** GTFS `route_type` → Verkehrsmittel (Plan 0012, E1); ein anderer Typ bei einer übernommenen Fahrt bricht ab */
+  modes: Readonly<Record<string, TransitMode>>;
+  /**
+   * Bedarfsverkehr an der Route erkennbar (Plan 0009, E2: Anmeldung nötig, kein Takt). Unabhängig davon fallen in
+   * jedem Feed Fahrten weg, die an keinem Halt regulär bedienen (`pickup_type`/`drop_off_type`).
+   */
+  isDemandRoute: (route: CsvRow) => boolean;
+  /** Namensnennung (Plan 0009, E3; Plan 0039, E4) */
+  source: (opts: SourceInput) => TimetableSource;
+}
+
+/** Im VGN-Feed nennt `route_desc` die Bedarfsverkehre (Plan 0009, E2). */
+const VGN_DEMAND_RESPONSIVE = new Set(["Rufbus", "Linienbedarfstaxi", "Anrufsammeltaxi", "Linientaxi"]);
+
+export const FEEDS: Readonly<Record<NetworkId, Feed>> = {
+  vgn: {
+    network: "vgn",
+    location: { kind: "url", url: "https://www.vgn.de/opendata/GTFS.zip" },
+    bbox: NETWORKS.vgn.bbox,
+    // andere Typen kommen im VGN-Feed nicht vor
+    modes: { "0": "tram", "1": "u-bahn", "2": "bahn", "3": "bus" },
+    // Pflichtspalte: fehlt sie, hat sich der Feed geändert (Risiken: laut abbrechen)
+    isDemandRoute: (route) => VGN_DEMAND_RESPONSIVE.has(field(route, "route_desc")),
+    // CC BY-SA 3.0 DE, Abschnitt 4a/4c (Plan 0009, E3); Titel wie auf der Download-Seite
+    source: (opts) => sourceOf("vgn", opts),
+  },
+  vrr: {
+    network: "vrr",
+    // jede Monatsausgabe ist eine neue Ressource mit eigener URL (OpenVRR, „Beta-Version“)
+    location: {
+      kind: "ckan",
+      api: "https://api.opendata-oepnv.de/api/3/action/package_show?id=soll-fahrplandaten-vrr",
+      fileName: "google_transit.zip",
+    },
+    bbox: NETWORKS.vrr.bbox,
+    // 1 = Stadtbahn (U70–U83); 106 RE/RB, 109 S-Bahn; 405 Einschienenbahn (SkyTrain, Schwebebahn) auf eigenem
+    // Fahrweg als `bahn`: eine eigene Art wäre eine Schemaänderung ohne sichtbaren Nutzen (gemessen 2026-10-18)
+    modes: { "0": "tram", "1": "u-bahn", "3": "bus", "106": "bahn", "109": "bahn", "405": "bahn" },
+    // keine Spalte route_desc: TaxiBus, AST, Bürgerbusse kennzeichnet der VRR nur über pickup_type/drop_off_type
+    isDemandRoute: () => false,
+    // CC BY 4.0; die Datensatzbeschreibung verlangt die „Nennung der VRR AöR“
+    source: (opts) => sourceOf("vrr", opts),
+  },
+};
+
+const CkanPackage = z.object({
+  success: z.literal(true),
+  result: z.object({
+    resources: z.array(z.object({ url: z.string(), format: z.string(), created: z.string() })),
+  }),
+});
+
+/**
+ * Download der jüngsten Ausgabe aus einer CKAN-Antwort `package_show` (Plan 0039, E4): Format ZIP, Dateiname der URL
+ * gleich `fileName`, größtes `created`. Nicht nach Namen, denn Monate fehlen oder kommen mehrfach („August 2026 II“).
+ */
+export function latestCkanResource(body: unknown, fileName: string): { url: string; created: string } {
+  const parsed = CkanPackage.safeParse(body);
+  if (!parsed.success) throw new Error(`CKAN-Antwort unlesbar: ${parsed.error.issues[0]?.message ?? "?"}`);
+  const fileOf = (url: string) => new URL(url).pathname.split("/").at(-1);
+  let latest: { url: string; created: string } | undefined;
+  for (const r of parsed.data.result.resources) {
+    if (r.format.toUpperCase() !== "ZIP" || fileOf(r.url) !== fileName) continue;
+    if (latest === undefined || r.created > latest.created) latest = { url: r.url, created: r.created };
+  }
+  if (latest === undefined) throw new Error(`CKAN: keine ZIP-Ressource ${fileName} im Datensatz`);
+  return latest;
 }
 
 // ── Auszug ───────────────────────────────────────────────────────────────────
@@ -276,7 +394,10 @@ interface ExtractStats {
   stops: number;
   trips: number;
   connections: number;
-  /** am Stichtag aktive Fahrten von Bedarfsverkehren, weggelassen (E2) */
+  /**
+   * am Stichtag aktive Fahrten von Bedarfsverkehren, weggelassen (E2): nach Route (VGN) oder ohne regulären Halt
+   * (mit mindestens einem Halt in der BBOX)
+   */
   demandTrips: number;
 }
 
@@ -287,14 +408,15 @@ const round5 = (x: number) => Math.round(x * 1e5) / 1e5;
 const regular = (value: string) => value === "" || value === "0";
 
 /**
- * Auszug für einen Stichtag (E4, Schritt 3): Fahrten aktiver Dienste ohne Bedarfsverkehr, nur Halte in
- * `NUERNBERG_BBOX`, zugeschnitten auf die Verbindungen mit Abfahrt im Fenster bis 120 Min. nach dessen Ende.
+ * Auszug für einen Stichtag (E4, Schritt 3): Fahrten aktiver Dienste ohne Bedarfsverkehr, nur Halte in der bbox des
+ * Netzes (Plan 0039, E3), zugeschnitten auf die Verbindungen mit Abfahrt im Fenster bis 120 Min. nach dessen Ende.
  * Verlässt eine Fahrt die BBOX und kommt zurück, wird der Abschnitt draußen eine Verbindung ohne Zwischenhalt.
  */
 export function extractTimetable(
   feed: GtfsTables,
-  opts: { serviceDay: string; source: TimetableSource },
+  opts: { network: NetworkId; serviceDay: string; source: TimetableSource },
 ): { timetable: Timetable; stats: ExtractStats } {
+  const config = FEEDS[opts.network];
   const services = activeServices(feed.calendar, feed.calendarDates, opts.serviceDay);
   const from = clockSeconds(WINDOW.from);
   const to = clockSeconds(WINDOW.to) + HORIZON_SECONDS;
@@ -310,8 +432,7 @@ export function extractTimetable(
   for (const r of feed.routes) {
     const id = field(r, "route_id");
     const name = field(r, "route_short_name") || field(r, "route_long_name");
-    const demand = DEMAND_RESPONSIVE.has(field(r, "route_desc"));
-    routes.set(id, { id, name, type: field(r, "route_type"), demand });
+    routes.set(id, { id, name, type: field(r, "route_type"), demand: config.isDemandRoute(r) });
   }
 
   const allTrips = new Set<string>();
@@ -334,11 +455,12 @@ export function extractTimetable(
     if (!regular(field(s, "location_type"))) continue;
     const lat = Number(field(s, "stop_lat"));
     const lon = Number(field(s, "stop_lon"));
-    // vorerst das Netz `vgn`; die bbox je Feed kommt mit `FEEDS` (Plan 0039, E3/E4, S3)
-    stops.set(field(s, "stop_id"), inBounds({ lat, lon }, NETWORKS.vgn.bbox) ? [lat, lon] : undefined);
+    stops.set(field(s, "stop_id"), inBounds({ lat, lon }, config.bbox) ? [lat, lon] : undefined);
   }
 
   const events = new Map<string, StopEvent[]>();
+  /** Fahrten mit mindestens einem regulären Halt, auch außerhalb der BBOX */
+  const regularTrips = new Set<string>();
   for (const st of feed.stopTimes) {
     const tripId = field(st, "trip_id");
     if (!tripRoute.has(tripId)) {
@@ -347,9 +469,10 @@ export function extractTimetable(
     }
     const stop = field(st, "stop_id");
     if (!stops.has(stop)) throw new Error(`GTFS: Fahrt ${tripId} hält an unbekanntem Steig ${stop}`);
+    const flags = (regular(field(st, "pickup_type")) ? BOARD : 0) | (regular(field(st, "drop_off_type")) ? ALIGHT : 0);
+    if (flags !== 0) regularTrips.add(tripId);
     const pos = stops.get(stop);
     if (pos === undefined) continue; // außerhalb der BBOX
-    const flags = (regular(field(st, "pickup_type")) ? BOARD : 0) | (regular(field(st, "drop_off_type")) ? ALIGHT : 0);
     const list = events.get(tripId) ?? [];
     if (list.length === 0) events.set(tripId, list);
     list.push({
@@ -364,6 +487,11 @@ export function extractTimetable(
 
   const kept: { tripId: string; route: string; mode: TransitMode; events: StopEvent[] }[] = [];
   for (const [tripId, list] of events) {
+    // Bedarfsverkehr nach pickup_type/drop_off_type (VRR, Plan 0039, E4): kein Halt mit regulärem Ein- oder Ausstieg
+    if (!regularTrips.has(tripId)) {
+      demandTrips++;
+      continue;
+    }
     list.sort((a, b) => a.seq - b.seq);
     list.forEach((e, k) => {
       const prev = list[k - 1];
@@ -377,7 +505,7 @@ export function extractTimetable(
     if (first === -1 || last < first) continue;
     const route = tripRoute.get(tripId);
     if (route === undefined) throw new Error(`GTFS: Fahrt ${tripId} ohne Route`);
-    kept.push({ tripId, ...lineOf(route), events: list.slice(first, last + 2) });
+    kept.push({ tripId, ...lineOf(route, config.modes), events: list.slice(first, last + 2) });
   }
   const firstDep = (k: (typeof kept)[number]) => k.events[0]?.dep ?? 0;
   kept.sort((a, b) => firstDep(a) - firstDep(b) || cmp(a.route, b.route) || cmp(a.tripId, b.tripId));
@@ -385,7 +513,7 @@ export function extractTimetable(
   const positions = new Map(kept.flatMap((k) => k.events.map((e) => [e.stop, e.pos] as const)));
   const usedStops = [...positions.keys()].sort(cmp);
   const index = new Map(usedStops.map((id, i) => [id, i] as const));
-  const timetable = Timetable.parse({
+  const timetable = timetableSchema(opts.network).parse({
     source: opts.source,
     serviceDay: opts.serviceDay,
     window: { ...WINDOW },
@@ -406,9 +534,12 @@ export function extractTimetable(
  * Name und Verkehrsmittel einer Linie, deren Fahrt im Auszug bleibt (Plan 0012, E1). Erst hier geprüft, damit
  * eine Bedarfs- oder inaktive Route mit erweitertem Typ (700, 900 …) den Lauf nicht abbricht (Review W5).
  */
-function lineOf(route: { id: string; name: string; type: string }): { route: string; mode: TransitMode } {
+function lineOf(
+  route: { id: string; name: string; type: string },
+  modes: Feed["modes"],
+): { route: string; mode: TransitMode } {
   if (route.name === "") throw new Error(`GTFS: Route ${route.id} ohne Namen`);
-  const mode = MODES[route.type];
+  const mode = modes[route.type];
   if (mode === undefined) throw new Error(`GTFS: Linie ${route.name} hat unbekannten route_type ${route.type}`);
   return { route: route.name, mode };
 }

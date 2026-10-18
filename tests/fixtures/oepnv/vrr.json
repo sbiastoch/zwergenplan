@@ -1,0 +1,41 @@
+{
+  "source": {"attribution":"Fiktive Testdaten (Zwergenplan)","title":"Fiktiver Fahrplan Düsseldorf für Tests","url":"https://zwergenplan.app/","download":"https://zwergenplan.app/","license":"CC0 1.0","licenseUrl":"https://creativecommons.org/publicdomain/zero/1.0/","modified":"2026-10-15T10:03:48+02:00","validFrom":"2026-09-01","validTo":"2027-02-28","fetchedAt":"2026-10-18T12:00:00+02:00"},
+  "serviceDay": "2026-10-13",
+  "window": {"from":"08:30","to":"10:30"},
+  "stops": [
+    ["de:05111:9500:1:1",51.2222,6.7846],
+    ["de:05111:9500:1:2",51.2221,6.7849],
+    ["de:05111:9501:1:1",51.2199,6.7944],
+    ["de:05111:9501:1:2",51.2198,6.7947]
+  ],
+  "trips": [
+    {"route":"709","mode":"tram","stops":[0,2],"times":[30000,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[30300,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[30600,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[30900,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[31200,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[31500,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[31800,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[32100,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[32400,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[32700,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[33000,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[33300,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[33600,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[33900,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[34200,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[34500,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[34800,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[35100,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[35400,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[35700,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[36000,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[36300,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[36600,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[36900,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[37200,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[37500,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[0,2],"times":[37800,0,240,0],"flags":[3,3]},
+    {"route":"709","mode":"tram","stops":[3,1],"times":[38100,0,240,0],"flags":[3,3]}
+  ]
+}

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
 import { placeKey } from "../../src/domain/place-key.ts";
-import { Timetable } from "../../src/domain/schema.ts";
+import { timetableSchema } from "../../src/domain/schema.ts";
 import {
   decodeTransitLines,
   decodeTransitTable,
@@ -12,8 +12,8 @@ import {
 } from "../../src/domain/transit.ts";
 import { areaId, buildTransitTables, cellValue, contentId, encodeBytes, tableRows, withoutAccess } from "./table.ts";
 
-const fixture = Timetable.parse(
-  JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/fahrplan.json", import.meta.url), "utf8")),
+const fixture = timetableSchema("vgn").parse(
+  JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/vgn.json", import.meta.url), "utf8")),
 );
 
 /** die fünf Fixture-Orte in der Reihenfolge von tests/fixtures/providers.yaml */
@@ -209,7 +209,7 @@ describe("buildTransitTables", () => {
     expect(decodeTransitLines({ ...lines, table: "00000000" }, decoded)).toBeUndefined();
   });
 
-  // L4: drei Zellen von Hand nachgerechnet (Fixture tests/fixtures/oepnv/fahrplan.json, Plan 0009, E15)
+  // L4: drei Zellen von Hand nachgerechnet (Fixture tests/fixtures/oepnv/vgn.json, Plan 0009, E15)
   it("direkt: 9001 → Beispielhof, Takt 10, Fahrzeit plus Median-Wartezeit 4,5 Min., „Tram 1“", () => {
     // Tram 1 ab 9001 um :x2:00 (8:32, 8:42 …), an 9003 :x8:30 (6,5 Min.), dann 61 m zu Fuß zum Beispielhof.
     // Wartezeit je Minute 0–9 Min., jede zwölfmal; Median (x[59] + x[60]) / 2 bei Warten 4 und 5 → 4,5.

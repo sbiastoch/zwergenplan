@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { type GeoPoint, haversineMeters } from "../../src/domain/geo.ts";
-import { Timetable } from "../../src/domain/schema.ts";
+import { timetableSchema } from "../../src/domain/schema.ts";
 import { ACCESS_METERS, walkMinutes } from "../../src/domain/transit.ts";
 import {
   buildNetwork,
@@ -638,8 +638,8 @@ const REFERENCE_TIMEOUT_MS = 30_000;
 
 describe("Referenz in zwei Ebenen und Rückverfolgung (T2, T3)", () => {
   it("gleicht der Referenz für jeden Steig und jede Minute (Fixture-Netz)", { timeout: REFERENCE_TIMEOUT_MS }, () => {
-    const fixture = Timetable.parse(
-      JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/fahrplan.json", import.meta.url), "utf8")),
+    const fixture = timetableSchema("vgn").parse(
+      JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/vgn.json", import.meta.url), "utf8")),
     );
     // die fünf Fixture-Orte (tests/fixtures/providers.yaml), dazu Gostenhof und ein Punkt im Nirgendwo
     const places: GeoPoint[] = [
