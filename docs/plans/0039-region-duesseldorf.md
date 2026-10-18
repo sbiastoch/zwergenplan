@@ -317,6 +317,7 @@ ADR 0011, 0014, 0017, 0025, 0029 bekommen je einen Verweis-Block „Geändert du
 Entschieden am 2026-10-18 nach den Reviews:
 
 - **Startbudget** (E13): `JS (initial)` von 102 auf **104 kB** anheben; Nachtrag ADR 0012 in S6.
+- **Service-Worker-Budget** (nach S6a, 2026-10-18): von 9 auf **10,5 kB**. Gemessen 10,02 kB, weil der Service Worker für den Push gespeicherte Stadtteile (jetzt 103) über `districtById` auflöst und `REGIONS` braucht. Nachtrag ADR 0012 in S9.
 - **Privatsphäre** (E15, Punkt 4): Die Ausnahme wird angenommen; geladen wird nur die Tabelle des gewählten Netzes.
 
 - **Mockup** (E8, S7): Variante **A, Auswahlfeld „Stadt“** über dem Startpunkt im Kind-Sheet (Mockup https://claude.ai/artifact/XZ8yBj2iQ6yLgatS8LxFK1, Entscheid 2026-10-18). Onboarding mit drei Kacheln, Nürnberg vorgewählt.
