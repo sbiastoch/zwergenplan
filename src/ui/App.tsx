@@ -19,6 +19,7 @@ import { Header, QuickFilters, Stickers, TabBar, type ViewOption, ViewToggle } f
 import {
   ageChipLabel,
   ageWarnText,
+  elsewhereText,
   limitHint,
   listStatusParts,
   loadErrorText,
@@ -43,12 +44,15 @@ import { SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
 import { NO_TOAST, Toast } from "./Toast.tsx";
 import {
+  type CityApi,
   useBirthDate,
+  useCity,
   useNow,
   useOrigin,
   useRoute,
   useSaved,
   useSavedProviders,
+  useSwitchCity,
   useTheme,
   useToast,
 } from "./use-app-state.ts";
@@ -91,9 +95,16 @@ export function App() {
   // erneuert sich im offenen Tab, höchstens einmal pro Minute (Plan 0007, E2)
   const now = useNow();
   const today = berlinIsoDate(now);
-  // Startpunkt der Entfernung: der zuletzt gewählte bleibt auf dem Gerät, ein Punkt nur gerundet (ADR 0017)
-  const originApi = useOrigin();
+  // Stadt und ihr Netz (Plan 0039, E8): ohne gespeicherte Stadt Nürnberg im Netz vgn
+  const cityState = useCity();
+  const { city, network } = cityState;
+  // Startpunkt der Entfernung: der zuletzt gewählte bleibt auf dem Gerät, ein Punkt nur gerundet (ADR 0017); er gilt
+  // nur im Netz der Stadt (Plan 0039, E3)
+  const originApi = useOrigin(network);
   const { origin } = originApi;
+  // die einzige Stelle für einen Netzwechsel, für Onboarding und Kind-Sheet (Plan 0039, E8)
+  const switchCity = useSwitchCity(cityState, originApi);
+  const cityApi: CityApi = { city, network, switchCity };
 
   const [sheet, setSheetState] = useState<SheetKind>(null);
   const [detailDay, setDetailDay] = useState<string>();
@@ -148,14 +159,22 @@ export function App() {
   const dataReady = load.kind === "ready";
   useEffect(() => (dataReady ? preloadExportWhenIdle() : undefined), [dataReady]);
 
-  const offers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
-  // Orte der Seite: Die Wegzeit-Tabelle muss zu ihnen passen (E8). Erst mit site.json bekannt.
+  /*
+   * Datenfluss (Plan 0039, E7/E8; Review M6): `allOffers` sind alle Angebote aus site.json, `offers` die des gewählten
+   * Netzes. Liste, Kalender, Karte, Statuszeile, Orte der Wegzeit und Anbieter-Zeilen nehmen `offers`; Merkliste,
+   * Detail und Deep-Links `allOffers`. Ist das Netz leer, obwohl es Daten gibt, zeigt S6b einen eigenen Leerzustand
+   * (`networkEmpty`).
+   */
+  const allOffers = load.kind === "ready" ? load.data.offers : NO_OFFERS;
+  const offers = useMemo(() => allOffers.filter((o) => o.network === network), [allOffers, network]);
+  const networkEmpty = load.kind === "ready" && offers.length === 0 && allOffers.length > 0;
+  // Orte des Netzes: Die Wegzeit-Tabelle des Netzes muss zu ihnen passen (E8). Erst mit site.json bekannt.
   const placeKeys = useMemo(
-    () => (load.kind === "ready" ? new Set(load.data.offers.map((o) => placeKey(o.venue.geo))) : undefined),
-    [load],
+    () => (load.kind === "ready" ? new Set(offers.map((o) => placeKey(o.venue.geo))) : undefined),
+    [load.kind, offers],
   );
-  // Wegzeit (Plan 0009, E9–E11): lädt beim Start nur mit gespeichertem Startpunkt, sonst erst auf Anlass
-  const transit = useTransit(origin, placeKeys);
+  // Wegzeit (Plan 0009, E9–E11): lädt beim Start nur mit gespeichertem Startpunkt, sonst erst auf Anlass; je Netz
+  const transit = useTransit(origin, placeKeys, network);
   const { mode: reachMode, want } = transit;
 
   // PWA-Kern nach `load` (Plan 0011, E5): setzt die Zeile „Offline – Stand vom …“ (`pwaNote`) und meldet ICS offline.
@@ -178,7 +197,16 @@ export function App() {
       }),
     [refreshTransit, say],
   );
-  const views = useOfferViews({ offers, route, birthDate, savedIds, savedFilter, now, reach: transit.reach });
+  const views = useOfferViews({
+    offers,
+    allOffers,
+    route,
+    birthDate,
+    savedIds,
+    savedFilter,
+    now,
+    reach: transit.reach,
+  });
   const { visible, unfitCount, ageOnly, page, saved, detailOffer } = views;
 
   // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
@@ -195,6 +223,12 @@ export function App() {
     },
     [want],
   );
+  // Netzwechsel bei offenem Kind-Sheet (Plan 0039, E8): `want` gehört dann zum neuen Netz, das offene Sheet ist eine
+  // Startpunkt-Oberfläche und lädt dessen Tabelle. Beim Öffnen ruft schon `setSheet` (zweimal ändert nichts).
+  const kidOpen = sheet === "kid" || sheet === "origin";
+  useEffect(() => {
+    if (kidOpen) want();
+  }, [kidOpen, want]);
 
   // Unbekanntes Angebot in der URL (abgelaufen, Tippfehler, alter geteilter Link): Parameter entfernen und sagen,
   // warum nichts aufgeht (Plan 0026, E7).
@@ -252,8 +286,10 @@ export function App() {
     animate,
     isSaved: (id) => savedIds.includes(id),
     isUnfit: (id) => views.unfitIds.has(id),
-    reachOf: views.reachOf,
+    // Angebote anderer Netze (Merkliste, Detail): keine Wegzeit, keine Luftlinie, sondern „in Düsseldorf“ (Plan 0039, E8)
+    reachOf: (offer) => (offer.network === network ? views.reachOf(offer) : undefined),
     reachPending: reachMode?.kind === "laedt",
+    elsewhere: (offer) => elsewhereText(offer, network),
     onToggleSave,
     onOpen: (offer, day) => {
       setDetailDay(day);
@@ -330,10 +366,11 @@ export function App() {
       <MapPanel
         offers={shown}
         cameraOffers={views.map.cameraOffers}
+        network={network}
         origin={origin}
         reach={transit.reach}
         dark={theme.dark}
-        hasData={offers.length > 0}
+        hasData={!networkEmpty && offers.length > 0}
         ctx={ctx}
         toast={toast}
         onSheetOpen={setPlaceSheet}
@@ -479,7 +516,7 @@ export function App() {
                 onMore={views.showMore}
                 today={today}
                 ctx={ctx}
-                hasData={offers.length > 0}
+                hasData={!networkEmpty && offers.length > 0}
                 onResetFilter={resetIfActive}
                 age={ageEscape}
                 openOnDay={route.filter.range !== undefined}
@@ -499,8 +536,9 @@ export function App() {
         {load.kind === "ready" && route.tab === "anbieter" && (
           <ProviderPanel
             generatedAt={load.data.generatedAt}
-            offers={offers}
+            offers={allOffers}
             visible={visible}
+            network={network}
             now={now}
             reachOf={views.reachOf}
             reachMode={reachMode}
@@ -526,7 +564,14 @@ export function App() {
             placeCount={views.map?.placeCount ?? 0}
             // Startseiten-Filter und Alter wirken auf der Merkliste nicht: Zurücksetzen meint den Merklisten-Filter,
             // einen Altersausweg gibt es nicht
-            renderMap={(savedOffers, onResetSaved) => mapPanel(savedOffers, onResetSaved, undefined)}
+            // Die Karte zeigt nur Gemerktes im gewählten Netz, das andere steht in der Liste (Plan 0039, E8)
+            renderMap={(savedOffers, onResetSaved) =>
+              mapPanel(
+                savedOffers.filter((o) => o.network === network),
+                onResetSaved,
+                undefined,
+              )
+            }
             renderCalendar={(onResetSaved) =>
               views.savedCalendar && (
                 <SavedCalendar
@@ -564,7 +609,7 @@ export function App() {
         onToggleProvider={onToggleProvider}
         onUnknownProvider={dropProvider}
         generatedAt={load.kind === "ready" ? load.data.generatedAt : undefined}
-        offers={offers}
+        offers={allOffers}
         visible={visible}
         ctx={ctx}
         say={say}
@@ -578,6 +623,7 @@ export function App() {
         theme={theme}
         today={today}
         originApi={originApi}
+        cityApi={cityApi}
         transit={transit}
         limitAction={limitAction}
         filterButton={filterButton}
@@ -596,6 +642,7 @@ export function App() {
           birthDate={birthDate}
           onBirthDate={setBirthDate}
           originApi={originApi}
+          cityApi={cityApi}
           transit={transit}
           filter={route.filter}
           setFilter={setFilter}

@@ -19,6 +19,7 @@ import "./map-overrides.css"; // nach maplibre-gl.css (E4)
 import { guardTileRequest, styleUrl } from "../../data/tiles.ts";
 import { DISTRICT_ZOOM, type StartCamera } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
+import type { NetworkId } from "../../domain/regions.ts";
 import type { MapViewProps } from "../map-types.ts";
 import { BASEMAP_PAINT, basemapChanges, basemapPalette, type MapTokens } from "./basemap.ts";
 import { nearestHit, originToFeatures, placesToFeatures } from "./geojson.ts";
@@ -55,15 +56,18 @@ const START_PADDING = {
   left: MARKER_INSET,
 };
 
-/** Zuletzt gesehener Ausschnitt dieser Sitzung; nie in URL oder Speicher (E9). */
-let lastCamera: { center: LngLatLike; zoom: number } | undefined;
+/**
+ * Zuletzt gesehener Ausschnitt dieser Sitzung; nie in URL oder Speicher (E9). Gilt nur im selben Netz: Nach einem
+ * Netzwechsel startet die Karte über dem neuen Netz (Plan 0039, E8).
+ */
+let lastCamera: { network: NetworkId; center: LngLatLike; zoom: number } | undefined;
 
 /**
- * Ausschnitt beim Öffnen (E9): der dieser Sitzung, sonst `start` aus `initialCamera` (öffentliche Daten,
- * nie Standort oder Kartenmitte). Als Konstruktor-Option, damit vorher kein anderer Ausschnitt Kacheln lädt.
+ * Ausschnitt beim Öffnen (E9): der dieser Sitzung im gewählten Netz, sonst `start` aus `initialCamera` (öffentliche
+ * Daten, nie Standort oder Kartenmitte). Als Konstruktor-Option, damit vorher kein anderer Ausschnitt Kacheln lädt.
  */
-function cameraOptions(start: StartCamera): Partial<MapOptions> {
-  if (lastCamera) return lastCamera;
+function cameraOptions(start: StartCamera, network: NetworkId): Partial<MapOptions> {
+  if (lastCamera?.network === network) return { center: lastCamera.center, zoom: lastCamera.zoom };
   if ("center" in start) return { center: lngLat(start.center), zoom: start.zoom };
   const { minLat, minLon, maxLat, maxLon } = start.bounds;
   return { bounds: [minLon, minLat, maxLon, maxLat], fitBoundsOptions: { padding: START_PADDING, maxZoom: 14 } };
@@ -179,7 +183,7 @@ export function MapView(props: MapViewProps) {
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
-        ...cameraOptions(start.start),
+        ...cameraOptions(start.start, start.network),
       });
     } catch {
       start.onProblem("webgl");
@@ -230,7 +234,7 @@ export function MapView(props: MapViewProps) {
     }
     return () => {
       clearTimeout(timer);
-      lastCamera = { center: map.getCenter(), zoom: map.getZoom() };
+      lastCamera = { network: latest.current.network, center: map.getCenter(), zoom: map.getZoom() };
       mapRef.current = undefined;
       if (__E2E__) Object.assign(window, { __zpMap: undefined });
       map.remove();

@@ -27,6 +27,7 @@ export function ProviderScreen({
   directory,
   offers,
   visible,
+  network,
   now,
   reachOf,
   reachMode,
@@ -42,8 +43,18 @@ export function ProviderScreen({
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
   const byReach = reachMode !== undefined && reachMode.kind !== "laedt";
   const { saved, active, hiddenCount, idle } = useMemo(
-    () => providerRows({ providers: directory.providers, visible, upcoming, reachOf, byReach, query, saved: savedIds }),
-    [directory.providers, visible, upcoming, reachOf, byReach, query, savedIds],
+    () =>
+      providerRows({
+        providers: directory.providers,
+        visible,
+        upcoming,
+        reachOf,
+        byReach,
+        query,
+        saved: savedIds,
+        network,
+      }),
+    [directory.providers, visible, upcoming, reachOf, byReach, query, savedIds, network],
   );
   const searching = query.trim() !== "";
   const matches = saved.length + active.length + idle.length;

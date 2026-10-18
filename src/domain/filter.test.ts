@@ -16,7 +16,8 @@ import { placeKey } from "./place-key.ts";
 import { airlineReach, type Origin, type ReachFn } from "./reach.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers } from "./test-fixtures.ts";
 
-const offers = fixtureSiteOffers();
+// Liste und Kalender filtern die Angebote des gewählten Netzes (Plan 0039, E7)
+const offers = fixtureSiteOffers("vgn");
 const ids = (state: FilterState) => applyFilters(offers, state, { now: FIXTURE_NOW }).map(fixtureKey);
 
 const gostenhofDistrict = districtById("gostenhof");

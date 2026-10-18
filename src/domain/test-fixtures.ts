@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { parse } from "yaml";
 import { validateDataset } from "./dataset.ts";
+import type { NetworkId } from "./regions.ts";
 import type { Anbieter, Offer, OffersFile, Provider } from "./schema.ts";
 import { type SiteOffer, toSiteData } from "./site-data.ts";
 
@@ -30,10 +31,14 @@ export function fixturePublicId(catalogId: string): string {
   return found.publicId;
 }
 
-/** Die Fixtures so, wie die Oberfläche sie lädt: mit Anbietername und Ort (für Filter mit Umkreis). */
-export function fixtureSiteOffers(): SiteOffer[] {
+/**
+ * Die Fixtures so, wie die Oberfläche sie lädt: mit Anbietername und Ort (für Filter mit Umkreis). Mit `network` nur
+ * die Angebote dieses Netzes, so wie Liste, Kalender und Push sie nach dem Netz-Filter bekommen (Plan 0039, E7).
+ */
+export function fixtureSiteOffers(network?: NetworkId): SiteOffer[] {
   const { providers, file } = loadFixtures();
-  return toSiteData(providers, file).offers;
+  const { offers } = toSiteData(providers, file);
+  return network === undefined ? offers : offers.filter((o) => o.network === network);
 }
 
 /** Kurze, stabile Testschlüssel → Titel der fiktiven Angebote (die IDs selbst sind lang, ADR 0006). */
@@ -46,6 +51,9 @@ const FIXTURE_TITLES = {
   "kuckuck-im-nest": "„Kuckuck im Nest“ – Theater ab 18 Monaten",
   "babykonzert-advent": "Babykonzert im Advent",
   vergangen: "Elterncafé am Montag",
+  // Netz vrr (Plan 0039, E14)
+  "krabbelgruppe-rhein": "Krabbelgruppe am Rhein",
+  "liederkonzert-rhein": "Rheinzwerge-Liederkonzert",
 } as const;
 export type FixtureKey = keyof typeof FIXTURE_TITLES;
 

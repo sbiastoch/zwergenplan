@@ -4,6 +4,7 @@
  * `decodeTransitTable` und `decodeTransitLines`. Wann geladen wird, entscheidet `useTransit`
  * (src/ui/use-transit.ts), nie die Wahl eines Startpunkts.
  */
+import type { NetworkId } from "../domain/regions.ts";
 import type { TransitLinesFile, TransitTableFile } from "../domain/transit-types.ts";
 
 /** Gemeinsames Zeitlimit für Tabelle (Abruf und Lesen) und Rechenlogik (E9); die Linien haben ein eigenes gleich langes */
@@ -47,11 +48,14 @@ type Settled<L> = { value: L | undefined; chunk: Exclude<ChunkOutcome, "zeitlimi
 /**
  * Lädt Tabelle und Rechenlogik (`loadLogic`, der Lazy-Chunk aus use-transit.ts) parallel, unter **einem**
  * Zeitlimit: Hängt der Chunk, endet das Laden trotzdem (Arch-Review 0009, Befund 3). `retry` („Nochmal laden“)
- * umgeht den HTTP-Cache, sonst käme eine veraltete `wegzeit.json` wieder aus dem Cache (Befund 2). Wirft nie.
+ * umgeht den HTTP-Cache, sonst käme eine veraltete Tabelle wieder aus dem Cache (Befund 2). Tabelle und Linien des
+ * gewählten Netzes (`data/wegzeit/<netz>.json`, `data/linien/<netz>.json`; Plan 0039, E5): Der Pfad verrät dem eigenen
+ * Host das Netz, nie den Startpunkt (E15). Wirft nie.
  */
 export async function loadTransit<L>(
   loadLogic: () => Promise<L>,
   retry: boolean,
+  network: NetworkId,
   env: TransitEnv = browserEnv(),
 ): Promise<TransitLoad<L>> {
   const controller = new AbortController();
@@ -66,12 +70,12 @@ export async function loadTransit<L>(
   try {
     const [settled, file] = await Promise.all([
       Promise.race([logic, expired]),
-      getJson<TransitTableFile>("wegzeit.json", { signal, cache }, env),
+      getJson<TransitTableFile>(`wegzeit/${network}.json`, { signal, cache }, env),
     ]);
     if (settled === "zeitlimit") return { logic: undefined, file, chunk: settled, lines: Promise.resolve(undefined) };
     // Ohne Logik gibt es keine Wegzeit, ohne Tabelle keine Zellen: dann keine Linien-Anfrage (Review W2, H10)
     const lines =
-      settled.value !== undefined && file !== undefined ? loadLines(cache, env) : Promise.resolve(undefined);
+      settled.value !== undefined && file !== undefined ? loadLines(network, cache, env) : Promise.resolve(undefined);
     return { logic: settled.value, file, chunk: settled.chunk, lines };
   } finally {
     clearTimeout(timer);
@@ -96,13 +100,12 @@ async function getJson<T>(
 }
 
 /**
- * `linien.json` mit niedriger Priorität, eigenem Abbruch und eigenem Zeitlimit ab der Anfrage; das `finally` von
+ * Linien des Netzes mit niedriger Priorität, eigenem Abbruch und eigenem Zeitlimit ab der Anfrage; das `finally` von
  * `loadTransit` räumt diesen Timer nicht ab (Plan 0012, E9). Wirft nie.
  */
-function loadLines(cache: RequestCache, env: TransitEnv): Promise<TransitLinesFile | undefined> {
+function loadLines(network: NetworkId, cache: RequestCache, env: TransitEnv): Promise<TransitLinesFile | undefined> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), env.timeoutMs);
-  return getJson<TransitLinesFile>("linien.json", { signal: controller.signal, cache, priority: "low" }, env).finally(
-    () => clearTimeout(timer),
-  );
+  const init: Parameters<TransitEnv["fetch"]>[1] = { signal: controller.signal, cache, priority: "low" };
+  return getJson<TransitLinesFile>(`linien/${network}.json`, init, env).finally(() => clearTimeout(timer));
 }

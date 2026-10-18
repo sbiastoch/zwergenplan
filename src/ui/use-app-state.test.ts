@@ -1,15 +1,19 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { NetworkId, RegionId } from "../domain/regions.ts";
 import { NO_TOAST, type ToastMessage } from "./Toast.tsx";
 import {
+  cityFrom,
   LONG_TOAST_MS,
   type OriginApi,
   type RouteApi,
+  useCity,
   useOrigin,
   useRoute,
   useSaved,
   useSavedProviders,
+  useSwitchCity,
   useToast,
 } from "./use-app-state.ts";
 
@@ -38,11 +42,11 @@ function fakeStorage() {
  * Rendert den Hook auf dem Server (kein DOM in Unit-Tests). `step` darf beim ersten Rendern eine
  * Aktion auslösen; React rendert dann sofort neu (Update in der Render-Phase), der letzte Stand zählt.
  */
-function renderOrigin(step?: (api: OriginApi) => void): OriginApi {
+function renderOrigin(step?: (api: OriginApi) => void, network: NetworkId = "vgn"): OriginApi {
   let result: OriginApi | undefined;
   let done = false;
   function Probe() {
-    result = useOrigin();
+    result = useOrigin(network);
     if (step && !done) {
       done = true;
       step(result);
@@ -130,6 +134,98 @@ describe("useOrigin (Plan 0004, E3)", () => {
     expect(accepted).toBe(false);
     expect(outside.origin?.source).toBe("stadtteil");
     expect([...storage.data]).toEqual([[KEY, "gostenhof"]]);
+  });
+});
+
+describe("Stadt und Netz (Plan 0039, E3/E8)", () => {
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("cityFrom: bekannte Stadt, sonst Nürnberg", () => {
+    expect(cityFrom("duesseldorf")).toBe("duesseldorf");
+    expect(cityFrom("fuerth")).toBe("fuerth");
+    expect(cityFrom(undefined)).toBe("nuernberg");
+    expect(cityFrom("atlantis")).toBe("nuernberg");
+  });
+
+  it("ein gespeicherter Startpunkt gilt nur im Netz der gewählten Stadt", () => {
+    storage.data.set(KEY, "duesseldorf-stadtmitte");
+    expect(renderOrigin(undefined, "vgn").origin).toBeUndefined();
+    expect(renderOrigin(undefined, "vrr").origin?.label).toBe("Stadtmitte (Düsseldorf)");
+    storage.data.set(KEY, "gostenhof");
+    expect(renderOrigin(undefined, "vrr").origin).toBeUndefined();
+    storage.data.delete(KEY);
+    storage.data.set(POINT_KEY, '{"source":"karte","lat":51.226,"lon":6.773}');
+    expect(renderOrigin(undefined, "vrr").origin?.source).toBe("karte");
+    expect(renderOrigin(undefined, "vgn").origin).toBeUndefined();
+  });
+
+  it("Kartenmitte gilt in der bbox des gewählten Netzes", () => {
+    let accepted: boolean | undefined;
+    renderOrigin((a) => {
+      accepted = a.setMapCenter({ lat: 51.226, lon: 6.773 });
+    }, "vrr");
+    expect(accepted).toBe(true);
+    renderOrigin((a) => {
+      accepted = a.setMapCenter({ lat: 51.226, lon: 6.773 });
+    }, "vgn");
+    expect(accepted).toBe(false);
+  });
+
+  /** Stadt und Startpunkt wie in App.tsx; `next` wechselt beim ersten Rendern die Stadt */
+  function renderCity(next?: RegionId) {
+    let result: { city: RegionId; network: NetworkId; origin: OriginApi["origin"] } | undefined;
+    let done = false;
+    function Probe() {
+      const cityState = useCity();
+      const originApi = useOrigin(cityState.network);
+      const switchCity = useSwitchCity(cityState, originApi);
+      if (next && !done) {
+        done = true;
+        switchCity(next);
+      }
+      result = { city: cityState.city, network: cityState.network, origin: originApi.origin };
+      return null;
+    }
+    renderToStaticMarkup(createElement(Probe));
+    if (!result) throw new Error("Hook nicht gerendert");
+    return result;
+  }
+
+  it("ohne gespeicherte Stadt Nürnberg im Netz vgn, nichts wird geschrieben", () => {
+    expect(renderCity()).toEqual({ city: "nuernberg", network: "vgn", origin: undefined });
+    expect(storage.data.size).toBe(0);
+  });
+
+  it("switchCity: Netzwechsel speichert die Stadt und löscht einen Nürnberger Stadtteil", () => {
+    storage.data.set(KEY, "gostenhof");
+    const after = renderCity("duesseldorf");
+    expect(after).toMatchObject({ city: "duesseldorf", network: "vrr", origin: undefined });
+    expect([...storage.data]).toEqual([["zwergenplan.stadt", "duesseldorf"]]);
+  });
+
+  it("switchCity im selben Netz (Nürnberg → Fürth) behält den Startpunkt", () => {
+    storage.data.set(KEY, "gostenhof");
+    const after = renderCity("fuerth");
+    expect(after).toMatchObject({ city: "fuerth", network: "vgn" });
+    expect(after.origin?.districtId).toBe("gostenhof");
+    expect(storage.data.get(KEY)).toBe("gostenhof");
+  });
+
+  it("switchCity löscht auch einen gespeicherten Startpunkt, der im alten Netz nicht galt", () => {
+    storage.data.set("zwergenplan.stadt", "duesseldorf");
+    storage.data.set(POINT_KEY, '{"source":"standort","lat":49.452,"lon":11.077}');
+    expect(renderCity().origin).toBeUndefined();
+    renderCity("nuernberg");
+    expect([...storage.data]).toEqual([["zwergenplan.stadt", "nuernberg"]]);
   });
 });
 

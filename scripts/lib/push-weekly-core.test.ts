@@ -77,8 +77,9 @@ describe("runWeekly", () => {
   it("Samstag: zählt neu gegen den Stand vor 7 Tagen, setzt die Marke, sendet und räumt 410 auf", async () => {
     const { d, sent, removed, marks, lines } = deps();
     const result = await runWeekly(d, { force: false, dryRun: false });
-    // Woche ab 10.10., 10:07: PEKiP (13.10.), Krabbeltreff (14.10.), Babymassage (17.10., 10:00)
-    expect(result).toEqual({ status: "gesendet", news: 2, week: 3, sent: 2, removed: 1, failed: 0 });
+    // Woche ab 10.10., 10:07: PEKiP (13.10.), Krabbeltreff (14.10.), Babymassage (17.10., 10:00) und, weil die
+    // allgemeine Fassung beide Netze zählt (Plan 0039, E9, bewusste Lücke), die Düsseldorfer Krabbelgruppe (13.10.)
+    expect(result).toEqual({ status: "gesendet", news: 2, week: 4, sent: 2, removed: 1, failed: 0 });
     expect(marks).toEqual(["2026-10-10"]);
     expect(sent).toHaveLength(3);
     expect(sent[0]?.payload).toMatchObject({
@@ -100,13 +101,15 @@ describe("runWeekly", () => {
     expect(result).toMatchObject({ news: 0 });
   });
 
-  it("die Woche zählt ab dem Lauf (Fixture-Jetzt: Krabbeltreff und Krabbelreime)", async () => {
+  it("die Woche zählt ab dem Lauf (Fixture-Jetzt: Krabbeltreff, Krabbelreime, Krabbelgruppe am Rhein)", async () => {
     const { d } = deps({ now: FIXTURE_NOW });
     const result = await runWeekly(d, { force: true, dryRun: true });
-    expect(result).toMatchObject({ week: 2 });
+    expect(result).toMatchObject({ week: 3 });
     expect(
-      offers.filter((o: SiteOffer) => ["krabbeltreff", "krabbelreime"].includes(fixtureKey(o) ?? "")),
-    ).toHaveLength(2);
+      offers.filter((o: SiteOffer) =>
+        ["krabbeltreff", "krabbelreime", "krabbelgruppe-rhein"].includes(fixtureKey(o) ?? ""),
+      ),
+    ).toHaveLength(3);
   });
 
   it("ein stark verspäteter Zeitplan-Lauf sendet trotzdem (GitHub startete am 17.10. erst um 14:08)", async () => {
@@ -138,7 +141,7 @@ describe("runWeekly", () => {
     expect(result).toMatchObject({ news: 0 });
     expect(warnings.join(" ")).toMatch(/alte Stand/);
     expect(sent[0]?.payload).toMatchObject({
-      notification: { body: "Diese Woche nichts Neues. 3 Angebote in den nächsten 7 Tagen." },
+      notification: { body: "Diese Woche nichts Neues. 4 Angebote in den nächsten 7 Tagen." },
     });
   });
 

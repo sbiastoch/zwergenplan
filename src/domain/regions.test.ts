@@ -8,6 +8,7 @@ import {
   REGION_IDS,
   REGIONS,
   type Region,
+  regionAt,
   regionList,
   regionsOf,
   VRR_BBOX,
@@ -129,6 +130,13 @@ describe("Netze (Plan 0039, E1/E2)", () => {
     const chorweiler = { lat: 51.02, lon: 6.9 };
     expect(inBounds(chorweiler, bbox)).toBe(false);
     expect(inBounds(chorweiler, VRR_BBOX)).toBe(false);
+  });
+
+  it("regionAt: die spezifischste Region am Punkt (Fürth vor Nürnberg), sonst keine (Plan 0039, E8)", () => {
+    expect(regionAt({ lat: 49.477, lon: 10.989 })).toBe("fuerth");
+    expect(regionAt({ lat: 49.454, lon: 11.077 })).toBe("nuernberg");
+    expect(regionAt({ lat: 51.226, lon: 6.773 })).toBe("duesseldorf");
+    expect(regionAt({ lat: 50.941, lon: 6.958 })).toBeUndefined();
   });
 
   it("Nürnberg und Fürth prüfen keine Gemeinde (Stadt plus Nachbarorte, E2)", () => {

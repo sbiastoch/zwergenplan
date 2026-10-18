@@ -5,6 +5,7 @@
  */
 import { nextSession } from "./agenda.ts";
 import { compareReach, type Reach } from "./reach.ts";
+import type { NetworkId } from "./regions.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
 import { CATEGORIES, type Category } from "./topics.ts";
 
@@ -16,6 +17,8 @@ export interface ProviderEntry {
   id: string;
   name: string;
   url?: string;
+  /** Netz (Plan 0039, E7); im Rückfall das Netz der Angebote */
+  network: NetworkId;
   venues: Array<{ name: string; address: string; district?: string }>;
 }
 
@@ -54,6 +57,7 @@ function fallbackEntry(own: readonly SiteOffer[]): ProviderEntry | undefined {
   return {
     id: first.providerId,
     name: first.providerName,
+    network: first.network,
     venues: [...venues.values()],
   };
 }
@@ -86,6 +90,8 @@ function nearestOf(offers: readonly SiteOffer[], reachOf: (offer: SiteOffer) => 
  *   ihrem Zustand (ein ausgeblendeter steht blass oben, statt in `hiddenCount` zu verschwinden).
  * Jeder Anbieter aus `visible` bekommt eine aktive Zeile, notfalls als Rückfall: ohne Suchtext gilt
  * `active.length` + aktive in `saved` = Zahl der verschiedenen `providerId` in `visible` (Statuszeile, `countProviders`).
+ * Nur Anbieter des gewählten Netzes bekommen eine Zeile, gemerkte immer (Plan 0039, E8). `upcoming` darf alle Netze
+ * enthalten: Ein gemerkter Anbieter des anderen Netzes steht dann als „ausgeblendet“ statt „ohne Termine“.
  */
 export function providerRows(input: {
   providers: readonly SiteProvider[];
@@ -97,6 +103,8 @@ export function providerRows(input: {
   query: string;
   /** IDs der gemerkten Anbieter; unbekannte ergeben keine Zeile */
   saved: readonly string[];
+  /** gewähltes Netz (Plan 0039, E8) */
+  network: NetworkId;
 }): { saved: ProviderRow[]; active: ProviderRow[]; hiddenCount: number; idle: ProviderRow[] } {
   const { providers, visible, upcoming, reachOf, byReach, query } = input;
   const savedIds = new Set(input.saved);
@@ -115,10 +123,11 @@ export function providerRows(input: {
   const hidden: ProviderRow[] = [];
   const empty: ProviderRow[] = [];
   for (const provider of entries.values()) {
+    const isSaved = savedIds.has(provider.id);
+    if (provider.network !== input.network && !isSaved) continue;
     const shownOffers = shownBy.get(provider.id) ?? [];
     const shown = shownOffers.length;
     const count = Math.max(upcomingBy.get(provider.id)?.length ?? 0, shown);
-    const isSaved = savedIds.has(provider.id);
     if (shown > 0) {
       const nearest = nearestOf(shownOffers, reachOf);
       const places = unique(shownOffers.map((o) => placeName(o.venue)));

@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { Origin } from "../domain/reach.ts";
-import { initialOriginState, type OriginState, originReducer, pointOrigin, storedPointOrigin } from "./origin-state.ts";
+import {
+  initialOriginState,
+  type OriginState,
+  originInNetwork,
+  originReducer,
+  pointOrigin,
+  storedPointOrigin,
+} from "./origin-state.ts";
 
 const GOSTENHOF: Origin = {
   source: "stadtteil",
@@ -123,8 +130,8 @@ describe("gespeicherter Punkt (Plan 0016, E3)", () => {
   });
 
   it("storedPointOrigin rundet erneut und stellt Standort bzw. Kartenmitte wieder her", () => {
-    expect(storedPointOrigin({ source: "standort", lat: 49.45213, lon: 11.07672 })).toEqual(MINE);
-    expect(storedPointOrigin({ source: "karte", lat: 49.452, lon: 11.077 })).toEqual({
+    expect(storedPointOrigin({ source: "standort", lat: 49.45213, lon: 11.07672 }, "vgn")).toEqual(MINE);
+    expect(storedPointOrigin({ source: "karte", lat: 49.452, lon: 11.077 }, "vgn")).toEqual({
       source: "karte",
       point: HERE,
       label: "Kartenmitte",
@@ -132,11 +139,36 @@ describe("gespeicherter Punkt (Plan 0016, E3)", () => {
   });
 
   it("storedPointOrigin verwirft Punkte außerhalb Nürnbergs und fehlende Werte", () => {
-    expect(storedPointOrigin({ source: "standort", lat: 48.137, lon: 11.575 })).toBeUndefined();
-    expect(storedPointOrigin({ source: "karte", lat: 0, lon: 0 })).toBeUndefined();
+    expect(storedPointOrigin({ source: "standort", lat: 48.137, lon: 11.575 }, "vgn")).toBeUndefined();
+    expect(storedPointOrigin({ source: "karte", lat: 0, lon: 0 }, "vgn")).toBeUndefined();
     // `loadOriginPoint` prüft nur `typeof`; `1e999` im JSON wird zu Infinity (Arch-Review 0016, m1)
-    expect(storedPointOrigin({ source: "standort", lat: Number.POSITIVE_INFINITY, lon: 11.077 })).toBeUndefined();
-    expect(storedPointOrigin({ source: "standort", lat: Number.NaN, lon: 11.077 })).toBeUndefined();
-    expect(storedPointOrigin(undefined)).toBeUndefined();
+    expect(
+      storedPointOrigin({ source: "standort", lat: Number.POSITIVE_INFINITY, lon: 11.077 }, "vgn"),
+    ).toBeUndefined();
+    expect(storedPointOrigin({ source: "standort", lat: Number.NaN, lon: 11.077 }, "vgn")).toBeUndefined();
+    expect(storedPointOrigin(undefined, "vgn")).toBeUndefined();
+  });
+
+  it("storedPointOrigin prüft gegen die bbox des gewählten Netzes (Plan 0039, E3)", () => {
+    const rathaus = { source: "standort", lat: 51.226, lon: 6.773 } as const;
+    expect(storedPointOrigin(rathaus, "vgn")).toBeUndefined();
+    expect(storedPointOrigin(rathaus, "vrr")?.point).toEqual({ lat: 51.226, lon: 6.773 });
+    expect(storedPointOrigin({ source: "karte", lat: 49.452, lon: 11.077 }, "vrr")).toBeUndefined();
+  });
+});
+
+describe("originInNetwork (Plan 0039, E8)", () => {
+  it("ohne Startpunkt immer, sonst nur mit Punkt in der bbox des Netzes", () => {
+    expect(originInNetwork(undefined, "vrr")).toBe(true);
+    expect(originInNetwork(GOSTENHOF, "vgn")).toBe(true);
+    expect(originInNetwork(GOSTENHOF, "vrr")).toBe(false);
+    const stadtmitte: Origin = {
+      source: "stadtteil",
+      point: { lat: 51.222, lon: 6.784 },
+      label: "Stadtmitte (Düsseldorf)",
+      districtId: "duesseldorf-stadtmitte",
+    };
+    expect(originInNetwork(stadtmitte, "vrr")).toBe(true);
+    expect(originInNetwork(stadtmitte, "vgn")).toBe(false);
   });
 });

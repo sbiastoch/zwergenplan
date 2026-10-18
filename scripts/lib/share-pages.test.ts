@@ -195,6 +195,7 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
     id: "b5nuus36", // publicId von familientreff-beispiel (ADR 0022)
     name: "Familientreff Beispielhof (fiktiv)",
     url: "https://example.org/",
+    network: "vgn",
     venues: [{ name: "Familientreff Beispielhof", address: "Beispielweg 1", district: "Altstadt" }],
   };
 
@@ -220,6 +221,7 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
       id: "fkbg3oeb", // publicId von turnverein-beispiel
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
+      network: "vgn",
       venues: [{ name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" }],
     };
     expect(meta(providerSharePage(turnverein, offers, GENERATED_AT).html, "og:description")).toBe(

@@ -2,17 +2,20 @@
  * Zuschnitt der Wochen-Nachricht im Service Worker (Plan 0017, E10; ADR 0014). Die Umgebung (Netz, Cache,
  * Geräte-Speicher) kommt herein, damit alles ohne Browser testbar ist; `sw.ts` verdrahtet nur.
  *
- * Bei **jedem** Push: genau einmal `site.json` und `wegzeit.json` (für alle gleich, Privatsphäre), dazu Geburtsdatum,
- * Such-Abos, Startpunkt und gesehene IDs aus dem Geräte-Speicher. Alles in höchstens `timeoutMs` (iOS beendet den
- * Service Worker nach ≈ 10 s, Spike); nach Ablauf wird nichts mehr geschrieben.
+ * Bei **jedem** Push: genau einmal `site.json` und die Wegzeit-Tabelle des gespiegelten Netzes (Plan 0039, E9; mit und
+ * ohne Startpunkt gleich), dazu Stadt, Geburtsdatum, Such-Abos, Startpunkt und gesehene IDs aus dem Geräte-Speicher.
+ * Erst die Stadt, dann die Tabelle; `site.json` läuft parallel. Gezählt werden nur Angebote des Netzes, gesehen sind
+ * alle (ein Netzwechsel meldet keine Flut „neuer“ Angebote). Alles in höchstens `timeoutMs` (iOS beendet den Service
+ * Worker nach ≈ 10 s, Spike); nach Ablauf wird nichts mehr geschrieben.
  */
 import { filterFromSearch } from "../domain/filter.ts";
 import { newOfferIds, offersInWeek, type WeeklyText, weeklyText } from "../domain/news.ts";
 import { placeKey } from "../domain/place-key.ts";
 import type { Origin, ReachFn } from "../domain/reach.ts";
+import type { NetworkId } from "../domain/regions.ts";
 import { parseSearches } from "../domain/searches.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { originFromStored } from "../domain/stored-origin.ts";
+import { networkFromStored, originFromStored } from "../domain/stored-origin.ts";
 import { decodeTransitTable, transitReach } from "../domain/transit.ts";
 import type { TransitTableFile } from "../domain/transit-types.ts";
 
@@ -23,14 +26,15 @@ export type TailorOutcome =
   | { kind: "zeit" }
   | { kind: "fehler" };
 
-type StoreKey = "birthDate" | "searches" | "origin" | "seenIds";
+type StoreKey = "birthDate" | "searches" | "origin" | "city" | "seenIds";
+type TablePath = `data/wegzeit/${NetworkId}.json`;
 
 export interface TailorEnv {
   timeoutMs: number;
   /** Netz am HTTP-Cache vorbei (bedingt); wirft bei Netz- oder Serverfehler */
-  fetchJson(path: "data/site.json" | "data/wegzeit.json"): Promise<unknown>;
+  fetchJson(path: "data/site.json" | TablePath): Promise<unknown>;
   /** Kopie aus `zp-data`, sonst `undefined` */
-  cachedJson(path: "data/wegzeit.json"): Promise<unknown>;
+  cachedJson(path: TablePath): Promise<unknown>;
   store: { get(key: StoreKey): Promise<unknown>; set(key: "seenIds", value: string[]): Promise<void> };
   /** Wegzeit ab `origin` aus der rohen Tabelle; im Unit-Test ersetzt (Dekodieren testet transit.test.ts) */
   reachFor?(table: unknown, offers: readonly SiteOffer[], origin: Origin): ReachFn | undefined;
@@ -62,25 +66,28 @@ export async function tailorPush({
   };
 
   const work = async (): Promise<TailorOutcome> => {
-    const [site, table, seen, searches, birthDate, stored] = await Promise.all([
-      env.fetchJson("data/site.json").catch(() => undefined),
-      env.fetchJson("data/wegzeit.json").catch(() => env.cachedJson("data/wegzeit.json")),
+    const site = env.fetchJson("data/site.json").catch(() => undefined);
+    const network = networkFromStored(await env.store.get("city"));
+    const tablePath: TablePath = `data/wegzeit/${network}.json`;
+    const [offers, table, seen, searches, birthDate, stored] = await Promise.all([
+      site.then((s) => (s as { offers?: unknown } | undefined)?.offers),
+      env.fetchJson(tablePath).catch(() => env.cachedJson(tablePath)),
       env.store.get("seenIds"),
       env.store.get("searches"),
       env.store.get("birthDate"),
       env.store.get("origin"),
     ]);
-    const offers = (site as { offers?: unknown } | undefined)?.offers;
     if (!Array.isArray(offers)) return { kind: "fehler" };
     // site.json entsteht zur Build-Zeit aus Zod-geprüften Daten; ein Formfehler wirft unten und endet als „fehler“, dann
     // zeigt das System die allgemeine Fassung (Arch-Review N9)
-    const siteOffers = offers as SiteOffer[];
-    const ids = siteOffers.map((o) => o.id);
+    const allOffers = offers as SiteOffer[];
+    const ids = allOffers.map((o) => o.id);
+    const siteOffers = allOffers.filter((o) => o.network === network);
     if (!isStringArray(seen)) {
       await write(ids);
       return { kind: "nichts" };
     }
-    const origin = originFromStored(stored);
+    const origin = originFromStored(stored, network);
     const reach = origin && table !== undefined ? (env.reachFor ?? defaultReach)(table, siteOffers, origin) : undefined;
     const freshIds = new Set(newOfferIds(seen, siteOffers, now));
     const text = weeklyText({

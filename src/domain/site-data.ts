@@ -2,11 +2,14 @@
  * Was die Oberfläche lädt (public/data/site.json): geprüfte Angebote, denormalisiert um
  * Anbietername und Ort. Die UI importiert hieraus nur Typen – kein zod im Client-Bundle.
  */
+import { type NetworkId, networkOf } from "./regions.ts";
 import type { Offer, OffersFile, Provider, Venue } from "./schema.ts";
 
 /** `providerId` ist hier die `publicId` des Anbieters, nicht die Katalog-ID (ADR 0022); `venueId` bleibt intern. */
 export interface SiteOffer extends Offer {
   providerName: string;
+  /** Netz der Region des Anbieters (Plan 0039, E7); die Region selbst erreicht die Website nicht (ADR 0029, Punkt 2) */
+  network: NetworkId;
   venue: Pick<Venue, "name" | "address" | "district" | "geo">;
 }
 
@@ -25,6 +28,8 @@ export interface SiteProvider {
   name: string;
   /** Website; laut Katalog bei allen Anbietern zugleich eine Programm-URL („Website & Programm“) */
   url: string;
+  /** Netz der Region (Plan 0039, E7): Tab und Sheet „Anbieter“ zeigen nur das gewählte Netz */
+  network: NetworkId;
   /** Adresse ohne wiederholten Ortsnamen (`venueAddress`); `district` nur mit Wert */
   venues: Array<{ name: string; address: string; district?: string }>;
 }
@@ -78,6 +83,7 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
       // die einzige Anbieter-ID im Browser ist die publicId (ADR 0022)
       providerId: provider.publicId,
       providerName: provider.name,
+      network: networkOf(provider.region),
       venue: {
         name,
         address: venueAddress(name, address),
@@ -98,7 +104,8 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
 
 /**
  * Katalog für die Anbieterübersicht (Plan 0010, E6): nur `role: anbieter`, auch ohne Angebote, nach Name (`de`).
- * Genau die Felder aus `SiteProvider` – Recherche-Angaben (`programme`, `notes`, `region`, `geo`, Orts-`hint` …) bleiben draußen.
+ * Genau die Felder aus `SiteProvider` – Recherche-Angaben (`programme`, `notes`, `region`, `geo`, Orts-`hint` …) bleiben
+ * draußen; aus der Region wird nur das Netz (Plan 0039, E7).
  */
 export function toProviderDirectory(providers: readonly Provider[], generatedAt: string): ProviderDirectoryData {
   const list = providers.flatMap((p): SiteProvider[] =>
@@ -108,6 +115,7 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
             id: p.publicId,
             name: p.name,
             url: p.url,
+            network: networkOf(p.region),
             venues: p.venues.map(({ name, address, district }) => ({
               name,
               address: venueAddress(name, address),

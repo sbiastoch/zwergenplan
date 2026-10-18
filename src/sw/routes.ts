@@ -4,6 +4,7 @@
  *
  * Alle Pfade gelten relativ zu `registration.scope`, nie mit festem `/` (BASE bleibt die einzige Pfadquelle).
  */
+import { NETWORK_IDS } from "../domain/regions.ts";
 
 /** Strategie je Request, Reihenfolge der Prüfung siehe `RULES` */
 export type Strategy =
@@ -38,8 +39,17 @@ interface Target {
   navigate: boolean;
 }
 
-/** Dateien der Wegzeit (Plan 0009, Plan 0012): Sie laden nur auf Anlass, deshalb kein Precache, nur Laufzeit-Cache */
-const TRANSIT_FILES: readonly string[] = ["data/wegzeit.json", "data/linien.json"];
+/**
+ * Dateien der Wegzeit (Plan 0009, Plan 0012), je Netz Tabelle und Linien (Plan 0039, E5): Sie laden nur auf Anlass,
+ * deshalb kein Precache, nur Laufzeit-Cache
+ */
+const TRANSIT_FILES: readonly string[] = NETWORK_IDS.flatMap((n) => [
+  `data/wegzeit/${n}.json`,
+  `data/linien/${n}.json`,
+]);
+
+/** Pfade der Wegzeit bis Plan 0039: Ihre Kopien in `zp-data` löscht `activate` (E5, Review m13) */
+const RETIRED_DATA_FILES: readonly string[] = ["data/wegzeit.json", "data/linien.json"];
 
 /** Die Regeln in Prüfreihenfolge: Die erste passende gilt. Pfadregeln stehen vor der Navigationsregel. */
 export const RULES: ReadonlyArray<{ strategy: Exclude<Strategy, "netz">; test: (t: Target) => boolean }> = [
@@ -51,17 +61,26 @@ export const RULES: ReadonlyArray<{ strategy: Exclude<Strategy, "netz">; test: (
   { strategy: "schale", test: (t) => t.navigate && (t.path === "" || t.path === "index.html") },
 ];
 
-export function strategyFor({ url, scope, method, navigate }: RouteRequest): Strategy {
-  if (method !== "GET") return "netz";
+function targetOf(url: string, scope: string, navigate: boolean): Target {
   const target = new URL(url);
   const base = new URL(scope);
-  const inScope = target.pathname.startsWith(base.pathname);
-  const t: Target = {
-    foreign: target.origin !== base.origin,
-    path: inScope ? target.pathname.slice(base.pathname.length) : undefined,
-    navigate,
-  };
+  const foreign = target.origin !== base.origin;
+  const inScope = !foreign && target.pathname.startsWith(base.pathname);
+  return { foreign, path: inScope ? target.pathname.slice(base.pathname.length) : undefined, navigate };
+}
+
+export function strategyFor({ url, scope, method, navigate }: RouteRequest): Strategy {
+  if (method !== "GET") return "netz";
+  const t = targetOf(url, scope, navigate);
   return RULES.find((rule) => rule.test(t))?.strategy ?? "netz";
+}
+
+/** Einträge aus `zp-data` (URLs von `cache.keys()`) unter den alten Wegzeit-Pfaden; `activate` löscht sie (E5) */
+export function retiredDataEntries(urls: readonly string[], scope: string): string[] {
+  return urls.filter((url) => {
+    const { path } = targetOf(url, scope, false);
+    return path !== undefined && RETIRED_DATA_FILES.includes(path);
+  });
 }
 
 /** Header an Antworten aus dem Cache; nur `src/data/site.ts` liest ihn (gleicher Name dort, E4). */

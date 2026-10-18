@@ -5,8 +5,8 @@ import { fixtureSiteOffers, fixturePublicId as pid } from "./test-fixtures.ts";
 describe("countProviders (Plan 0010, E4)", () => {
   it("zählt verschiedene Anbieter, nicht Angebote", () => {
     const offers = fixtureSiteOffers();
-    expect(offers).toHaveLength(9);
-    expect(countProviders(offers)).toBe(5);
+    expect(offers).toHaveLength(11);
+    expect(countProviders(offers)).toBe(6);
     expect(countProviders(offers.filter((o) => o.providerId === pid("familientreff-beispiel")))).toBe(1);
   });
 

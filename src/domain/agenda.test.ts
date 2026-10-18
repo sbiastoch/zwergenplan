@@ -47,17 +47,19 @@ describe("groupByNextSession", () => {
   it("zeigt jedes Angebot einmal am nächsten Termin, nach Berliner Tag gruppiert", () => {
     const groups = groupByNextSession(file.offers, FIXTURE_NOW);
     expect(groups.map((g) => g.day)).toEqual([
+      "2026-10-06",
       "2026-10-07",
       "2026-10-09",
       "2026-10-13",
       "2026-10-17",
       "2026-10-20",
+      "2026-10-24",
       "2026-11-05",
       "2026-11-15",
       "2026-12-06",
     ]);
-    expect(groups[0]?.items.map((i) => fixtureKey(i.offer))).toEqual(["krabbeltreff"]);
-    expect(groups[0]?.items[0]?.session.start).toBe("2026-10-07T10:00:00+02:00");
+    expect(groups[1]?.items.map((i) => fixtureKey(i.offer))).toEqual(["krabbeltreff"]);
+    expect(groups[1]?.items[0]?.session.start).toBe("2026-10-07T10:00:00+02:00");
     const all = groups.flatMap((g) => g.items.map((i) => fixtureKey(i.offer)));
     expect(all).not.toContain("vergangen");
     expect(new Set(all).size).toBe(all.length);

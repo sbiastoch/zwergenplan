@@ -379,7 +379,9 @@ describe("buildOffers", () => {
     );
     expect(report.errors).toEqual([]);
     const providersOf = new Set(file?.offers.map((o) => o.providerId));
-    expect(providersOf).toEqual(new Set(["familientreff-beispiel", "stadtbibliothek-beispiel", "gemeinde-beispiel"]));
+    expect(providersOf).toEqual(
+      new Set(["familientreff-beispiel", "stadtbibliothek-beispiel", "gemeinde-beispiel", "rheinzwerge-beispiel"]),
+    );
     expect(file?.offers.some((o) => o.title === "Elterncafé am Montag")).toBe(false); // Termin vorbei
     const treff = file?.offers.find((o) => o.title === "Offener Krabbeltreff");
     expect(treff?.sessions.every((s) => s.start >= "2026-10-15")).toBe(true); // regelmäßig: nur ab from

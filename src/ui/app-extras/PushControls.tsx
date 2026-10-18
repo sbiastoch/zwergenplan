@@ -9,13 +9,13 @@
  * Rückmeldungen stehen in einer Statuszeile statt im Toast der App (E7).
  */
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { loadBirthDate, loadOriginDistrict, loadOriginPoint } from "../../data/preferences.ts";
+import { loadBirthDate, loadCity, loadOriginDistrict, loadOriginPoint } from "../../data/preferences.ts";
 import type { PushApi } from "../../data/push.ts";
 import { loadSearchesRaw, saveSearches } from "../../data/searches-store.ts";
 import { filterFromSearch } from "../../domain/filter.ts";
 import type { PushSupport } from "../../domain/pwa.ts";
 import { addSearch, parseSearches, removeSearch, searchOf } from "../../domain/searches.ts";
-import { originFromStored } from "../../domain/stored-origin.ts";
+import { networkFromStored, originFromStored } from "../../domain/stored-origin.ts";
 import { problemText, searchLabel, PUSH_TEXTS as T } from "./push-texts.ts";
 import { usePushSwitch } from "./use-push-switch.ts";
 
@@ -30,8 +30,9 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
   // ohne Zeitraum: Such-Abos lassen ihn weg (Plan 0023, E12)
   const current = searchOf(filterFromSearch(location.search));
   const pressed = current !== "" && list.includes(current);
-  // dieselbe Prüfung wie im Service Worker: ein Punkt außerhalb der Stadt zählt nicht (Arch-Review N1)
-  const hasOrigin = originFromStored(loadOriginPoint() ?? loadOriginDistrict()) !== undefined;
+  // dieselbe Prüfung wie im Service Worker: ein Punkt außerhalb des Netzes der Stadt zählt nicht (Arch-Review N1)
+  const hasOrigin =
+    originFromStored(loadOriginPoint() ?? loadOriginDistrict(), networkFromStored(loadCity())) !== undefined;
 
   useEffect(() => {
     if (!on) {

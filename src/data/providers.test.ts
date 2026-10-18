@@ -6,7 +6,9 @@ const URL = `${import.meta.env.BASE_URL}data/anbieter.json`;
 
 const directory = (generatedAt: string): ProviderDirectoryData => ({
   generatedAt,
-  providers: [{ id: "theater-beispiel", name: "Kleines Theater", url: "https://example.org/", venues: [] }],
+  providers: [
+    { id: "theater-beispiel", name: "Kleines Theater", url: "https://example.org/", network: "vgn", venues: [] },
+  ],
 });
 
 /** fetch-Stub: liefert die Antworten der Reihe nach, die letzte wiederholt */

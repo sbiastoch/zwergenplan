@@ -3,8 +3,8 @@ import { loadTransit, TRANSIT_TIMEOUT_MS, type TransitEnv } from "./transit.ts";
 
 const FILE = { version: 2, id: "0badc0de", places: [], lat: [], lon: [], minutes: "" };
 const LINES = { version: 1, table: "0badc0de", lines: [], first: "", second: "" };
-const URL = `${import.meta.env.BASE_URL}data/wegzeit.json`;
-const LINES_URL = `${import.meta.env.BASE_URL}data/linien.json`;
+const URL = `${import.meta.env.BASE_URL}data/wegzeit/vgn.json`;
+const LINES_URL = `${import.meta.env.BASE_URL}data/linien/vgn.json`;
 const LOGIC = { name: "Rechenlogik" };
 const logicOk = async () => LOGIC;
 const never = <T>() => new Promise<T>(() => {});
@@ -37,9 +37,20 @@ afterEach(() => {
 });
 
 describe("loadTransit: Tabelle und Rechenlogik (Plan 0009, E9)", () => {
-  it("lädt data/wegzeit.json vom eigenen Origin, für alle gleich, und die Rechenlogik parallel", async () => {
+  it("lädt Tabelle und Linien des übergebenen Netzes, nie die alten Pfade (Plan 0039, E5)", async () => {
+    const fetch = vi.fn(
+      async (url: string) => new Response(JSON.stringify(url.includes("wegzeit") ? FILE : LINES), { status: 200 }),
+    );
+    await (await loadTransit(logicOk, false, "vrr", env({ fetch }))).lines;
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      `${import.meta.env.BASE_URL}data/wegzeit/vrr.json`,
+      `${import.meta.env.BASE_URL}data/linien/vrr.json`,
+    ]);
+  });
+
+  it("lädt data/wegzeit/<netz>.json vom eigenen Origin, für alle im Netz gleich, und die Rechenlogik parallel", async () => {
     const e = env();
-    const result = await loadTransit(logicOk, false, e);
+    const result = await loadTransit(logicOk, false, "vgn", e);
     expect(await core(Promise.resolve(result))).toEqual({ logic: LOGIC, file: FILE, chunk: "ok" });
     expect(e.fetch).toHaveBeenCalledWith(URL, { signal: expect.any(AbortSignal), cache: "default" });
     expect(await result.lines).toEqual(LINES);
@@ -48,7 +59,7 @@ describe("loadTransit: Tabelle und Rechenlogik (Plan 0009, E9)", () => {
 
   it("„Nochmal laden“ umgeht den HTTP-Cache: sonst käme dieselbe veraltete Datei (Arch-Review 0009, Befund 2)", async () => {
     const e = env();
-    await (await loadTransit(logicOk, true, e)).lines;
+    await (await loadTransit(logicOk, true, "vgn", e)).lines;
     expect(e.fetch).toHaveBeenCalledWith(URL, { signal: expect.any(AbortSignal), cache: "reload" });
     // Plan 0012, E9: beide Dateien ohne Cache
     expect(e.fetch).toHaveBeenCalledWith(LINES_URL, {
@@ -65,7 +76,7 @@ describe("loadTransit: Tabelle und Rechenlogik (Plan 0009, E9)", () => {
       async () => new Response("<html>", { status: 200 }),
     ];
     for (const fetch of failing) {
-      expect(await core(loadTransit(logicOk, false, env({ fetch })))).toEqual({
+      expect(await core(loadTransit(logicOk, false, "vgn", env({ fetch })))).toEqual({
         logic: LOGIC,
         file: undefined,
         chunk: "ok",
@@ -74,14 +85,14 @@ describe("loadTransit: Tabelle und Rechenlogik (Plan 0009, E9)", () => {
   });
 
   it("gescheiterter Import der Rechenlogik: keine Logik, die Tabelle bleibt", async () => {
-    const result = await core(loadTransit(() => Promise.reject(new TypeError("dynamic import")), false, env()));
+    const result = await core(loadTransit(() => Promise.reject(new TypeError("dynamic import")), false, "vgn", env()));
     expect(result).toEqual({ logic: undefined, file: FILE, chunk: "fehler" });
   });
 
   it("bricht den Abruf nach dem Zeitlimit ab", async () => {
     vi.useFakeTimers();
     const { fetch, seen } = hangingFetch();
-    const result = loadTransit(logicOk, false, env({ fetch, timeoutMs: TRANSIT_TIMEOUT_MS }));
+    const result = loadTransit(logicOk, false, "vgn", env({ fetch, timeoutMs: TRANSIT_TIMEOUT_MS }));
     await vi.advanceTimersByTimeAsync(TRANSIT_TIMEOUT_MS);
     expect(await core(result)).toEqual({ logic: LOGIC, file: undefined, chunk: "ok" });
     expect(seen.signal?.aborted).toBe(true);
@@ -90,7 +101,7 @@ describe("loadTransit: Tabelle und Rechenlogik (Plan 0009, E9)", () => {
   it("dasselbe Zeitlimit gilt für den Chunk: Hängt der Import, ist nach 8 s Schluss (Arch-Review 0009, Befund 3)", async () => {
     vi.useFakeTimers();
     let settled = false;
-    const result = loadTransit(never, false, env({ timeoutMs: TRANSIT_TIMEOUT_MS })).finally(() => {
+    const result = loadTransit(never, false, "vgn", env({ timeoutMs: TRANSIT_TIMEOUT_MS })).finally(() => {
       settled = true;
     });
     await vi.advanceTimersByTimeAsync(TRANSIT_TIMEOUT_MS - 1);
@@ -103,7 +114,7 @@ describe("loadTransit: Tabelle und Rechenlogik (Plan 0009, E9)", () => {
   it("ein gemeinsames Zeitlimit, nicht je Ladeweg: Hängt beides, endet es nach 8 s", async () => {
     vi.useFakeTimers();
     const { fetch } = hangingFetch();
-    const result = loadTransit(never, false, env({ fetch, timeoutMs: TRANSIT_TIMEOUT_MS }));
+    const result = loadTransit(never, false, "vgn", env({ fetch, timeoutMs: TRANSIT_TIMEOUT_MS }));
     await vi.advanceTimersByTimeAsync(TRANSIT_TIMEOUT_MS);
     expect(await core(result)).toEqual({ logic: undefined, file: undefined, chunk: "zeitlimit" });
   });
@@ -131,7 +142,7 @@ describe("loadTransit: Linien (Plan 0012, E9, S1)", () => {
         return okFetch(url);
       }),
     });
-    const pending = loadTransit(() => logic, false, e);
+    const pending = loadTransit(() => logic, false, "vgn", e);
     await Promise.resolve();
     await new Promise((r) => setTimeout(r, 0));
     expect(order).toEqual(["tabelle"]);
@@ -148,10 +159,12 @@ describe("loadTransit: Linien (Plan 0012, E9, S1)", () => {
     const noTable = env({
       fetch: vi.fn(async (url: string) => (url === URL ? new Response("x", { status: 500 }) : okFetch(url))),
     });
-    expect(await (await loadTransit(logicOk, false, noTable)).lines).toBeUndefined();
+    expect(await (await loadTransit(logicOk, false, "vgn", noTable)).lines).toBeUndefined();
     expect(linesCalls(noTable)).toEqual([]);
     const noLogic = env();
-    expect(await (await loadTransit(() => Promise.reject(new Error("chunk")), false, noLogic)).lines).toBeUndefined();
+    expect(
+      await (await loadTransit(() => Promise.reject(new Error("chunk")), false, "vgn", noLogic)).lines,
+    ).toBeUndefined();
     expect(linesCalls(noLogic)).toEqual([]);
   });
 
@@ -163,7 +176,7 @@ describe("loadTransit: Linien (Plan 0012, E9, S1)", () => {
     ];
     for (const lines of failing) {
       const e = env({ fetch: vi.fn(async (url: string) => (url === URL ? okFetch(url) : lines(url))) });
-      const result = await loadTransit(logicOk, false, e);
+      const result = await loadTransit(logicOk, false, "vgn", e);
       expect(result.file).toEqual(FILE);
       expect(await result.lines).toBeUndefined();
     }
@@ -182,7 +195,7 @@ describe("loadTransit: Linien (Plan 0012, E9, S1)", () => {
         );
       }),
     });
-    const result = await loadTransit(logicOk, false, e);
+    const result = await loadTransit(logicOk, false, "vgn", e);
     expect(result.file).toEqual(FILE);
     let done = false;
     const lines = result.lines.then((v) => {

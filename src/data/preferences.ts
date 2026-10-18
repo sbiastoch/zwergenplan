@@ -1,6 +1,6 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, gemerkte Anbieter, Darstellung,
- * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
+ * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), gewählte Stadt (Plan 0039, E8), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
  * Plan 0033, E2; versioniert seit Plan 0035, E4). Die Such-Abos liegen in `searches-store.ts`. Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
@@ -13,6 +13,7 @@ const KEYS = {
   originDistrict: "zwergenplan.entfernung-ab",
   originPoint: "zwergenplan.startpunkt",
   onboarding: "zwergenplan.einfuehrung",
+  city: "zwergenplan.stadt",
 } as const;
 
 /**
@@ -137,6 +138,21 @@ export function saveOrigin(value: string | StoredOriginPoint | undefined): void 
     KEYS.originPoint,
     typeof value === "object" ? JSON.stringify({ source: value.source, lat: value.lat, lon: value.lon }) : undefined,
   );
+}
+
+/**
+ * Gewählte Stadt (Plan 0039, E8) als roher Wert. Geprüft wird nur die Form (Text, höchstens 32 Zeichen); ob es die
+ * Region gibt, prüft die UI gegen `REGION_IDS` (ADR 0010: src/data importiert `regions.ts` nicht). Ohne Wert gilt dort
+ * Nürnberg.
+ */
+export function loadCity(): string | undefined {
+  const value = read(KEYS.city);
+  return value && value.length <= 32 ? value : undefined;
+}
+
+/** Stadt speichern; `undefined` löscht */
+export function saveCity(value: string | undefined): void {
+  write(KEYS.city, value);
 }
 
 /** Onboarding erledigt? Nur die aktuelle Version zählt, exakt verglichen (Plan 0035, E4). */

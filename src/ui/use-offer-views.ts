@@ -37,7 +37,10 @@ import { berlinIsoDate } from "../domain/time.ts";
 const PAGE = 40;
 
 export interface OfferViewsInput {
+  /** Angebote des gewählten Netzes (Plan 0039, E7): Liste, Kalender, Karte, Statuszeile */
   offers: readonly SiteOffer[];
+  /** alle Angebote aller Netze: Merkliste und Detail (Deep-Links); ohne Angabe `offers` (E8) */
+  allOffers?: readonly SiteOffer[];
   route: Route;
   birthDate: string | undefined;
   savedIds: readonly string[];
@@ -139,6 +142,7 @@ function reachCache(reachFn: ReachFn | undefined): (offer: SiteOffer) => Reach |
 
 export function useOfferViews({
   offers,
+  allOffers = offers,
   route,
   birthDate,
   savedIds,
@@ -166,14 +170,20 @@ export function useOfferViews({
   // erscheinen sie wie alle anderen, unpassende sind markiert.
   const fits = useMemo(() => (ageOnly ? sessionFit(birthDate) : undefined), [ageOnly, birthDate]);
   const groups = useMemo(() => groupByNextSession(visible, now, range, fits), [visible, now, range, fits]);
-  const dataEnd = useMemo(() => lastSessionDay(upcoming), [upcoming]);
+  // Datenhorizont der Merkliste über alle Netze: Gemerktes aus dem anderen Netz soll im Kalender erreichbar sein
+  const allUpcoming = useMemo(
+    () => (allOffers === offers ? upcoming : applyFilters(allOffers, EMPTY_FILTER, { now })),
+    [allOffers, offers, upcoming, now],
+  );
+  const dataEnd = useMemo(() => lastSessionDay(allUpcoming), [allUpcoming]);
   const today = berlinIsoDate(now);
   const savedQuick = useMemo(() => quickRanges(today, dataEnd), [today, dataEnd]);
   const reachOf = useMemo(() => reachCache(reach), [reach]);
   // Startausschnitt nur aus öffentlichen Daten: alle kommenden Angebote, ohne Filter, Alter und Startpunkt
   // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
   // Die Karte der Merkliste zählt die Orte der gemerkten Angebote, ihr Startausschnitt ist derselbe (Plan 0025, E4).
-  const saved = useMemo(() => savedOffers(offers, savedIds, now, birthDate), [offers, savedIds, now, birthDate]);
+  // Die Merkliste kennt alle Netze (Plan 0039, E8): Gemerktes aus dem anderen Netz bleibt sichtbar.
+  const saved = useMemo(() => savedOffers(allOffers, savedIds, now, birthDate), [allOffers, savedIds, now, birthDate]);
   const savedList = useMemo(() => saved.map((o) => o.offer), [saved]);
   const onCalendar = route.tab === "merkliste-kalender";
   // Merklisten-Filter (E6): Im Kalender ist die Auswahl der Zeitraum, die Schnellwahl „ab …“ wirkt dort nicht (E5).
@@ -209,19 +219,24 @@ export function useOfferViews({
     () =>
       onCalendar
         ? endedOnDay(
-            offers.filter((o) => savedIds.includes(o.id) && matchesSavedFilter(o, savedFilter)),
+            allOffers.filter((o) => savedIds.includes(o.id) && matchesSavedFilter(o, savedFilter)),
             today,
             now,
             savedFits,
           )
         : 0,
-    [onCalendar, offers, savedIds, savedFilter, today, now, savedFits],
+    [onCalendar, allOffers, savedIds, savedFilter, today, now, savedFits],
   );
   const map = useMemo(() => {
     if (route.tab === "karte") return { placeCount: countPlaces(visible), cameraOffers: upcoming };
-    if (route.tab === "merkliste-karte") return { placeCount: countPlaces(savedVisibleList), cameraOffers: upcoming };
+    if (route.tab === "merkliste-karte") {
+      // Die Karte der Merkliste zeigt nur Gemerktes im gewählten Netz; das andere steht in der Liste (Plan 0039, E8)
+      const inNetwork = new Set(offers.map((o) => o.id));
+      const shown = savedVisibleList.filter((o) => inNetwork.has(o.id));
+      return { placeCount: countPlaces(shown), cameraOffers: upcoming };
+    }
     return undefined;
-  }, [route.tab, visible, savedVisibleList, upcoming]);
+  }, [route.tab, visible, savedVisibleList, upcoming, offers]);
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
   const setAgeOnly = useCallback((on: boolean) => {
@@ -254,7 +269,8 @@ export function useOfferViews({
     savedVisible,
     savedFiltered,
     savedQuick,
-    detailOffer: route.offerId ? offers.find((o) => o.id === route.offerId) : undefined,
+    // Deep-Links öffnen jedes Angebot, auch aus dem anderen Netz (Plan 0039, E8)
+    detailOffer: route.offerId ? allOffers.find((o) => o.id === route.offerId) : undefined,
     map,
     reachOf,
   };

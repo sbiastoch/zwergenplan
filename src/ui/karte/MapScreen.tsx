@@ -25,10 +25,10 @@ const NOTES: Record<MapProblem, string> = {
 };
 
 export function MapScreen(props: MapScreenProps) {
-  const { offers, cameraOffers, origin, reach, ctx, onSheetOpen } = props;
+  const { offers, cameraOffers, origin, reach, network, ctx, onSheetOpen } = props;
   const { places, start } = useMemo(
-    () => mapData(offers, cameraOffers, origin, reach),
-    [offers, cameraOffers, origin, reach],
+    () => mapData(offers, cameraOffers, origin, reach, network),
+    [offers, cameraOffers, origin, reach, network],
   );
   const { module, attempt, retry } = useLazy(loadMapView);
   const [ready, setReady] = useState(false);
@@ -63,9 +63,11 @@ export function MapScreen(props: MapScreenProps) {
       <div className="map-box" data-state={state}>
         {module.kind === "da" && !problem && (
           <module.View
-            key={build}
+            // ein Netzwechsel baut die Karte neu auf, mit dem Startausschnitt des neuen Netzes (Plan 0039, E8)
+            key={`${build}-${network}`}
             places={places}
             start={start}
+            network={network}
             origin={origin}
             dark={props.dark}
             onPlace={(key) => {

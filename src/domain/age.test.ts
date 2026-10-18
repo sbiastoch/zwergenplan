@@ -84,7 +84,7 @@ describe("offerFitsAge", () => {
 
 describe("splitByAge", () => {
   it("teilt nach der Altersregel, Reihenfolge bleibt", () => {
-    const upcoming = applyFilters(fixtureSiteOffers(), EMPTY_FILTER, { now: FIXTURE_NOW });
+    const upcoming = applyFilters(fixtureSiteOffers("vgn"), EMPTY_FILTER, { now: FIXTURE_NOW });
     // Kind geb. 1.9.2026: im Oktober 1 Monat alt
     const { fitting, unfit } = splitByAge(upcoming, "2026-09-01", FIXTURE_NOW);
     // Reihenfolge der Eingabe, also wie in site.json chronologisch nach erstem Termin
@@ -100,7 +100,7 @@ describe("splitByAge", () => {
 });
 
 describe("ageVisibility", () => {
-  const upcoming = applyFilters(fixtureSiteOffers(), EMPTY_FILTER, { now: FIXTURE_NOW });
+  const upcoming = applyFilters(fixtureSiteOffers("vgn"), EMPTY_FILTER, { now: FIXTURE_NOW });
   // Ausschnitt wie nach einem Filter: ein passendes und zwei unpassende Angebote (Kind geb. 1.9.2026)
   const filtered = upcoming.filter((o) =>
     ["pekip-herbst", "krabbeltreff", "musikgarten-1"].includes(fixtureKey(o) ?? ""),

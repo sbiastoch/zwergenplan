@@ -5,6 +5,7 @@
  */
 import type { ComponentType } from "react";
 import type { Reach } from "../domain/reach.ts";
+import type { NetworkId } from "../domain/regions.ts";
 import type { ProviderDirectoryData, SiteOffer } from "../domain/site-data.ts";
 import type { AgeEscape } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
@@ -14,10 +15,15 @@ import type { ReachMode } from "./use-transit.ts";
 export interface ProviderScreenProps {
   /** Katalog, schon mit dem Datenstand von site.json abgeglichen (`ensureFresh` im ProviderPanel, E6) */
   directory: ProviderDirectoryData;
-  /** alle Angebote aus site.json; „kommend“ rechnet der Chunk (`applyFilters` ohne Filter, E4), Rückfall-Zeilen auch */
+  /**
+   * alle Angebote aus site.json, aller Netze; „kommend“ rechnet der Chunk (`applyFilters` ohne Filter, E4), Rückfall-Zeilen
+   * auch. Zeilen bekommen nur Anbieter des Netzes und gemerkte (`network`, Plan 0039, E8).
+   */
   offers: readonly SiteOffer[];
-  /** sichtbare Angebote wie in „Entdecken“: Filter, Sticker, Wegzeit-Grenze, Alter (E4) */
+  /** sichtbare Angebote wie in „Entdecken“ (nur das gewählte Netz): Filter, Sticker, Wegzeit-Grenze, Alter (E4) */
   visible: readonly SiteOffer[];
+  /** gewähltes Netz (Plan 0039, E8) */
+  network: NetworkId;
   now: Date;
   /** Wegzeit bzw. Luftlinie zum Ort eines Angebots; `undefined` ohne Startpunkt */
   reachOf: (offer: SiteOffer) => Reach | undefined;
@@ -42,7 +48,10 @@ export interface ProviderScreenProps {
 export interface ProviderSheetProps {
   directory: ProviderDirectoryData;
   providerId: string;
-  /** alle Angebote; das Sheet zeigt alle kommenden des Anbieters, unabhängig von Filtern und Alter (E4) */
+  /**
+   * alle Angebote aller Netze; das Sheet zeigt alle kommenden des Anbieters, unabhängig von Filtern und Alter (E4), auch
+   * für einen Anbieter eines anderen Netzes (Deep-Link, gemerkt; Plan 0039, E8)
+   */
   offers: readonly SiteOffer[];
   /** für den Hinweis „Alle Angebote, auch die außerhalb deiner Auswahl.“ (E4) */
   visible: readonly SiteOffer[];

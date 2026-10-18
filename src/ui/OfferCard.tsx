@@ -32,6 +32,11 @@ export interface CardContext {
   reachOf: (offer: SiteOffer) => Reach | undefined;
   /** Wegzeit lädt: Platzhalter statt Entfernung, ohne Layoutsprung (Plan 0009, E11) */
   reachPending: boolean;
+  /**
+   * „in Düsseldorf“ für ein Angebot außerhalb des gewählten Netzes (Merkliste, Detail, Deep-Link; Plan 0039, E8): steht
+   * statt Wegzeit oder Luftlinie, `reachOf` liefert dann nichts. Im Netz `undefined`.
+   */
+  elsewhere: (offer: SiteOffer) => string | undefined;
 }
 
 interface OfferCardProps {
@@ -58,6 +63,7 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, context }: Of
   const availability = availabilityLabel(offer);
   const atPlace = context === "place";
   const reach = atPlace ? undefined : ctx.reachOf(offer);
+  const elsewhere = atPlace ? undefined : ctx.elsewhere(offer);
   const where = offer.venue.district ?? offer.venue.name;
   const when = dated ? `${shortDate(sessionDay(session))} · ${clock(session.start)} Uhr` : `${timeRange(session)} Uhr`;
 
@@ -78,7 +84,12 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, context }: Of
         </h3>
         <p className="meta">
           {context === "provider" ? where : atPlace ? offer.providerName : `${offer.providerName} · ${where}`}
-          {reach ? (
+          {elsewhere ? (
+            <>
+              {" · "}
+              <span className="dist">{elsewhere}</span>
+            </>
+          ) : reach ? (
             <>
               {" · "}
               <span className="dist">{reachShort(reach)}</span>

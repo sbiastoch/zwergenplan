@@ -7,7 +7,8 @@ import type { ReachFn } from "./reach.ts";
 import type { SiteOffer } from "./site-data.ts";
 import { FIXTURE_NOW, type FixtureKey, fixtureKey, fixtureSiteOffers, loadFixtures } from "./test-fixtures.ts";
 
-const offers = fixtureSiteOffers();
+// Der Service Worker rechnet über die Angebote des gespiegelten Netzes (Plan 0039, E9)
+const offers = fixtureSiteOffers("vgn");
 const byKey = (key: FixtureKey): SiteOffer => {
   const offer = offers.find((o) => fixtureKey(o) === key);
   if (!offer) throw new Error(`Fixture-Angebot ${key} fehlt`);

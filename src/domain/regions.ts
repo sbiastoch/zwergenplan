@@ -138,6 +138,14 @@ export function networkAt(point: GeoPoint): NetworkId | undefined {
   return NETWORK_IDS.find((id) => inBounds(point, NETWORKS[id].bbox));
 }
 
+/**
+ * Region am Punkt in der Reihenfolge von `REGION_IDS`, also die spezifischste zuerst (Fürth vor Nürnberg); keine,
+ * wenn der Punkt in keiner Region-bbox liegt. Für „in Düsseldorf“ an Angeboten anderer Netze (Plan 0039, E8).
+ */
+export function regionAt(point: GeoPoint): RegionId | undefined {
+  return REGION_IDS.find((id) => inBounds(point, REGIONS[id].bbox));
+}
+
 /** Regionen nach Einwohnern absteigend, bei Gleichstand nach Name (Kacheln, Stadtteil-Gruppen, Texte) */
 export function byPopulation<K extends string>(regions: Readonly<Record<K, Region>>): (Region & { id: K })[] {
   // Cast: `Object.keys` liefert nur `string[]`; die Regionen sind feste Literale (`REGIONS`, Test-Fakes)

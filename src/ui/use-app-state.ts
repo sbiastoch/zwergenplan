@@ -1,14 +1,18 @@
-/** Zustand, der den Browser berührt: URL/History, Präferenzen (über src/data), Toast, Farbschema, Uhr, Startpunkt. */
+/**
+ * Zustand, der den Browser berührt: URL/History, Präferenzen (über src/data), Toast, Farbschema, Uhr, Stadt, Startpunkt.
+ */
 import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { canLocate, type PositionProblem, requestPosition } from "../data/geolocation.ts";
 import {
   loadBirthDate,
+  loadCity,
   loadOriginDistrict,
   loadOriginPoint,
   loadSaved,
   loadSavedProviders,
   loadTheme,
   saveBirthDate,
+  saveCity,
   saveOrigin,
   saveSaved,
   saveSavedProviders,
@@ -19,12 +23,12 @@ import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
-import { NETWORKS } from "../domain/regions.ts";
+import { NETWORKS, type NetworkId, networkOf, REGION_IDS, type RegionId } from "../domain/regions.ts";
 import { isLegacyView, parseRoute, type Route, resolveRouteIds, routeToSearch } from "../domain/route.ts";
 import { cleanSavedProviders, migrateSavedIds, toggleId } from "../domain/saved.ts";
 import { sameMinute } from "../domain/time.ts";
 import { SHARE_COPIED } from "./format.ts";
-import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
+import { initialOriginState, originInNetwork, originReducer, storedPointOrigin } from "./origin-state.ts";
 import { preloadProviderUi } from "./ProviderPanel.tsx";
 import { NO_TOAST, type ToastMessage, type ToastTone } from "./Toast.tsx";
 
@@ -309,6 +313,60 @@ export function useNow(): Date {
   return now;
 }
 
+/** Gewählte Stadt aus dem Speicher: gültig gegen `REGION_IDS`, sonst (auch ohne Wert) Nürnberg (Plan 0039, E8) */
+export function cityFrom(stored: string | undefined): RegionId {
+  return REGION_IDS.find((id) => id === stored) ?? "nuernberg";
+}
+
+export interface CityState {
+  /** gewählte Stadt; ordnet die Stadtteile (gewählte zuerst) */
+  city: RegionId;
+  /** Netz der Stadt: Liste, Kalender, Karte, Anbieter, Wegzeit-Tabelle und Gültigkeit des Startpunkts */
+  network: NetworkId;
+  /** nur Zustand und Speicher; von außen immer über `useSwitchCity` (eine Stelle für den Netzwechsel) */
+  setCity: (city: RegionId) => void;
+}
+
+/** Stadt (Plan 0039, E8): gespeichert unter `zwergenplan.stadt`; Bestandsnutzer ohne Wert behalten Nürnberg */
+export function useCity(): CityState {
+  const [city, setCityState] = useState(() => cityFrom(loadCity()));
+  const setCity = useCallback((next: RegionId) => {
+    setCityState(next);
+    saveCity(next);
+  }, []);
+  return { city, network: networkOf(city), setCity };
+}
+
+/** Was Onboarding und Kind-Sheet von der Stadt brauchen (Plan 0039, E8): Wahl und der eine Weg, sie zu ändern */
+export interface CityApi {
+  city: RegionId;
+  network: NetworkId;
+  switchCity: (city: RegionId) => void;
+}
+
+/**
+ * Stadt wechseln (Plan 0039, E8; Review 2, M1): die **einzige** Stelle für einen Netzwechsel, für Onboarding und
+ * Kind-Sheet. Sie speichert die Stadt und löscht den Startpunkt, wenn er nicht im neuen Netz liegt (Stadtteil einer
+ * Region des alten Netzes, Punkt außerhalb der neuen Netz-bbox); eine laufende Standortabfrage verfällt dann mit.
+ * Alles Weitere folgt aus dem Netz: Liste, Kalender, Karte und Anbieter filtern neu, `useTransit` zeigt den Zustand der
+ * Tabelle des neuen Netzes (eine offene Startpunkt-Oberfläche fordert sie an), die Karte verwirft ihren Ausschnitt
+ * (`MapView`, Prop `network`). Ein Wechsel im selben Netz (Nürnberg ↔ Fürth) ändert nur die Reihenfolge der Stadtteile.
+ */
+export function useSwitchCity(cityState: CityState, originApi: OriginApi): (city: RegionId) => void {
+  const { network, setCity } = cityState;
+  const { origin, locating, clear } = originApi;
+  return useCallback(
+    (next: RegionId) => {
+      setCity(next);
+      const nextNetwork = networkOf(next);
+      if (nextNetwork === network) return;
+      // ohne gültigen Startpunkt trotzdem: Im Speicher kann einer liegen, der im alten Netz nicht galt
+      if (locating || origin === undefined || !originInNetwork(origin, nextNetwork)) clear();
+    },
+    [network, setCity, origin, locating, clear],
+  );
+}
+
 export interface OriginApi {
   /** gewählter Startpunkt; der zuletzt gewählte bleibt auf dem Gerät (ADR 0017) */
   origin: Origin | undefined;
@@ -321,7 +379,7 @@ export interface OriginApi {
   /** „Meinen Standort nutzen“: fragt einmal ab, nur auf Tipp */
   locateMe: () => void;
   setDistrict: (id: string) => void;
-  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8): gerundet und so gespeichert; `false` außerhalb Nürnbergs */
+  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8): gerundet und so gespeichert; `false` außerhalb des Netzes */
   setMapCenter: (center: GeoPoint) => boolean;
   /** „Startpunkt entfernen“: auch den gespeicherten Punkt bzw. Stadtteil */
   clear: () => void;
@@ -332,16 +390,25 @@ function districtOrigin(id: string | undefined): Origin | undefined {
   return district && { source: "stadtteil", point: district.point, label: district.name, districtId: district.id };
 }
 
+/** Gespeicherter Startpunkt, wenn er im Netz der gewählten Stadt liegt (Plan 0039, E3); sonst keiner */
+function storedOrigin(network: NetworkId): Origin | undefined {
+  const origin = storedPointOrigin(loadOriginPoint(), network) ?? districtOrigin(loadOriginDistrict());
+  return originInNetwork(origin, network) ? origin : undefined;
+}
+
 /**
  * Startpunkt der Entfernung (Plan 0004, E3; Plan 0016). Gespeichert wird der zuletzt gewählte: ein Stadtteil als
  * ID, Standort und Kartenmitte als schon gerundeter Punkt (ADR 0017), nie beides. Der Standort wird nur auf Tipp
  * abgefragt, auch mit gespeichertem Standort nie beim Start. Die Reihenfolge (späte Antworten) regelt
- * `originReducer`; ein ungültiger gespeicherter Punkt oder eine unbekannte ID zählt als „nicht gespeichert“.
+ * `originReducer`; ein ungültiger gespeicherter Punkt, eine unbekannte ID oder ein Startpunkt außerhalb des Netzes der
+ * gewählten Stadt zählt als „nicht gespeichert“. Standort und Kartenmitte gelten in der bbox dieses Netzes (Plan 0039,
+ * E3); einen Netzwechsel regelt `useSwitchCity`.
  */
-export function useOrigin(): OriginApi {
-  const [state, dispatch] = useReducer(originReducer, undefined, () =>
-    initialOriginState(storedPointOrigin(loadOriginPoint()) ?? districtOrigin(loadOriginDistrict())),
-  );
+export function useOrigin(network: NetworkId): OriginApi {
+  const [state, dispatch] = useReducer(originReducer, undefined, () => initialOriginState(storedOrigin(network)));
+  // für die Callbacks: das Netz zum Zeitpunkt des Tipps
+  const bbox = useRef(NETWORKS[network].bbox);
+  bbox.current = NETWORKS[network].bbox;
   const [locatable] = useState(() => canLocate());
   // Jede Wahl zählt hoch: Eine Standort-Antwort wird nur gespeichert, solange ihre Abfrage die neueste ist; dieselbe
   // Regel wie `pending` im Reducer (Plan 0016, E2).
@@ -350,8 +417,7 @@ export function useOrigin(): OriginApi {
   const locateMe = useCallback(() => {
     const request = ++nextRequest.current;
     dispatch({ type: "locate", request });
-    // vorerst immer das Netz `vgn`; das gewählte Netz kommt mit der gespeicherten Stadt (Plan 0039, E3/E8, S6)
-    void requestPosition(NETWORKS.vgn.bbox).then((result) => {
+    void requestPosition(bbox.current).then((result) => {
       dispatch({ type: "located", request, result });
       if (result.ok && nextRequest.current === request) saveOrigin({ source: "standort", ...result.point });
     });
@@ -367,7 +433,7 @@ export function useOrigin(): OriginApi {
 
   const setMapCenter = useCallback((center: GeoPoint) => {
     const point = coarsen(center);
-    if (!inBounds(point, NETWORKS.vgn.bbox)) return false;
+    if (!inBounds(point, bbox.current)) return false;
     nextRequest.current++;
     dispatch({ type: "mapCenter", point });
     saveOrigin({ source: "karte", ...point });

@@ -113,7 +113,7 @@ function fake(
   };
 }
 
-const DATA = { birthDate: "2025-08-05", searches: '["kat=musik"]', origin: "gostenhof" };
+const DATA = { birthDate: "2025-08-05", searches: '["kat=musik"]', origin: "gostenhof", city: "duesseldorf" };
 
 describe("support", () => {
   it("ohne Registrierung ist es „kein-sw“, ohne zu warten", async () => {
@@ -227,6 +227,7 @@ describe("enable", () => {
       birthDate: "2025-08-05",
       searches: '["kat=musik"]',
       origin: "gostenhof",
+      city: "duesseldorf",
     });
   });
 
@@ -344,10 +345,10 @@ describe("mirror", () => {
     f.setSub("https://web.push.apple.com/a");
     f.store.set("endpoint", "https://web.push.apple.com/a");
     const push = createPush(f.env);
-    await push.reconcile({ birthDate: undefined, searches: null, origin: undefined });
+    await push.reconcile({ birthDate: undefined, searches: null, origin: undefined, city: undefined });
     writes.length = 0;
     await push.mirror(DATA);
-    expect(writes.sort()).toEqual(["birthDate", "origin", "searches"]);
+    expect(writes.sort()).toEqual(["birthDate", "city", "origin", "searches"]);
     writes.length = 0;
     await push.mirror(DATA);
     expect(writes).toEqual([]);
@@ -355,6 +356,8 @@ describe("mirror", () => {
     expect(writes.sort()).toEqual(["birthDate", "origin"]);
     expect(f.store.has("birthDate")).toBe(false);
     expect(f.store.get("origin")).toEqual({ source: "standort", lat: 49.452, lon: 11.077 });
+    // die Stadt (Plan 0039, E9): roher Wert wie im localStorage, geprüft erst im Service Worker
+    expect(f.store.get("city")).toBe("duesseldorf");
   });
 });
 
@@ -396,7 +399,7 @@ describe("mirrorIfSubscribed (Plan 0035, E9): einmal am Ende des Onboardings, oh
     const writes = counted(f);
     const push = createPush(f.env);
     await push.mirrorIfSubscribed(DATA);
-    expect(writes.sort()).toEqual(["birthDate", "origin", "searches"]);
+    expect(writes.sort()).toEqual(["birthDate", "city", "origin", "searches"]);
     expect(f.store.get("birthDate")).toBe("2025-08-05");
     expect(f.store.get("searches")).toBe('["kat=musik"]');
     expect(f.store.get("origin")).toBe("gostenhof");
@@ -450,7 +453,12 @@ describe("mirror nach dem Ausschalten (E6: geleert heißt geleert)", () => {
       await clear();
       release();
     };
-    const inFlight = push.mirror({ birthDate: undefined, searches: '["kat=natur"]', origin: "st-johannis" });
+    const inFlight = push.mirror({
+      birthDate: undefined,
+      searches: '["kat=natur"]',
+      origin: "st-johannis",
+      city: undefined,
+    });
     await push.disable();
     await inFlight;
     expect(f.store.size).toBe(0);

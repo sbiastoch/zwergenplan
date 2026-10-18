@@ -4,6 +4,7 @@ import {
   assetsToEvict,
   DATA_CACHE,
   RULES,
+  retiredDataEntries,
   type Strategy,
   shellCache,
   staleShells,
@@ -27,9 +28,15 @@ describe("strategyFor: Tabelle aus Plan 0011, E4", () => {
     ["https://zwergenplan.app/assets/karte/MapView-B.js", false, "asset"],
     // 4, 5 Daten
     ["https://zwergenplan.app/data/site.json", false, "site"],
-    ["https://zwergenplan.app/data/wegzeit.json", false, "oepnv"],
-    // Linien der Wegzeit (Plan 0012): wie die Tabelle, nie im Precache
-    ["https://zwergenplan.app/data/linien.json", false, "oepnv"],
+    // Wegzeit je Netz (Plan 0039, E5): Tabelle und Linien (Plan 0012), nie im Precache
+    ["https://zwergenplan.app/data/wegzeit/vgn.json", false, "oepnv"],
+    ["https://zwergenplan.app/data/linien/vgn.json", false, "oepnv"],
+    ["https://zwergenplan.app/data/wegzeit/vrr.json", false, "oepnv"],
+    ["https://zwergenplan.app/data/linien/vrr.json", false, "oepnv"],
+    // alte Pfade bis Plan 0039: kein eigener Cache mehr
+    ["https://zwergenplan.app/data/wegzeit.json", false, "netz"],
+    ["https://zwergenplan.app/data/linien.json", false, "netz"],
+    ["https://zwergenplan.app/data/wegzeit/xyz.json", false, "netz"],
     // 6 Navigation auf die App, mit beliebiger Query
     ["https://zwergenplan.app/", true, "schale"],
     ["https://zwergenplan.app/index.html", true, "schale"],
@@ -67,8 +74,8 @@ describe("strategyFor: Tabelle aus Plan 0011, E4", () => {
 
   it("Querystring und Fragment ändern die Datenregeln nicht", () => {
     expect(get("https://zwergenplan.app/data/site.json?v=1")).toBe("site");
-    expect(get("https://zwergenplan.app/data/linien.json?v=2")).toBe("oepnv");
-    expect(get("https://zwergenplan.app/data/wegzeit.json?v=2")).toBe("oepnv");
+    expect(get("https://zwergenplan.app/data/linien/vgn.json?v=2")).toBe("oepnv");
+    expect(get("https://zwergenplan.app/data/wegzeit/vrr.json?v=2")).toBe("oepnv");
     expect(get("https://zwergenplan.app/assets/a.js#x")).toBe("asset");
   });
 
@@ -92,6 +99,22 @@ describe("strategyFor: Tabelle aus Plan 0011, E4", () => {
 });
 
 describe("Caches (E4)", () => {
+  it("activate löscht die alten Kopien data/wegzeit.json und data/linien.json aus zp-data (Plan 0039, E5)", () => {
+    const keys = [
+      `${SCOPE}data/site.json`,
+      `${SCOPE}data/wegzeit.json`,
+      `${SCOPE}data/linien.json`,
+      `${SCOPE}data/wegzeit/vgn.json`,
+      `${SCOPE}data/linien/vgn.json`,
+      "https://anders.example/data/wegzeit.json",
+    ];
+    expect(retiredDataEntries(keys, SCOPE)).toEqual([`${SCOPE}data/wegzeit.json`, `${SCOPE}data/linien.json`]);
+    const sub = "https://beispiel.github.io/zwerg/";
+    expect(retiredDataEntries([`${sub}data/linien.json?v=1`, `${SCOPE}data/linien.json`], sub)).toEqual([
+      `${sub}data/linien.json?v=1`,
+    ]);
+  });
+
   it("Schale je Version, alte Schalen werden gelöscht, andere Caches bleiben", () => {
     expect(shellCache("abc")).toBe("zp-shell-abc");
     expect(staleShells(["zp-shell-alt", "zp-shell-abc", "zp-assets", DATA_CACHE, "fremd"], "abc")).toEqual([

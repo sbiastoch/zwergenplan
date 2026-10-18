@@ -17,7 +17,7 @@ import {
   roundedMinutes,
   stopMinutes,
 } from "../domain/reach.ts";
-import { regionList } from "../domain/regions.ts";
+import { type NetworkId, REGIONS, regionAt, regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import type { ExportSelection } from "../domain/saved.ts";
 import type { Session } from "../domain/schema.ts";
@@ -388,6 +388,17 @@ export function reachNote(mode: ReachMode, origin: Origin): string {
   const from = originPhrase(origin);
   if (mode.kind !== "luftlinie") return `Wegzeit ${from}`;
   return `Luftlinie ${from} (${mode.reason === "fehler" ? "Wegzeiten gerade nicht verfügbar" : "außerhalb des Stadtgebiets"})`;
+}
+
+/**
+ * Entfernungszeile eines Angebots außerhalb des gewählten Netzes (Plan 0039, E8): keine Wegzeit, keine Luftlinie
+ * („ca. 400 km“), sondern die Stadt am Ort. Im gewählten Netz `undefined`.
+ */
+export function elsewhereText(offer: Pick<SiteOffer, "network" | "venue">, network: NetworkId): string | undefined {
+  if (offer.network === network) return undefined;
+  // Das Schema hält jeden Ort in der bbox seiner Region; ohne Treffer nennt die Zeile alle Städte des Netzes.
+  const region = regionAt(offer.venue.geo);
+  return `in ${region ? REGIONS[region].name : regionList(offer.network)}`;
 }
 
 /** Hinweise im Kind-Sheet, Abschnitt „Wegzeit ab“ (OriginPicker.tsx; Plan 0004, E5; Plan 0009, N3) */

@@ -68,6 +68,8 @@ export interface MirrorData {
   /** rohe Liste aus `searches-store.ts` */
   searches: string | null;
   origin: string | StoredOriginPoint | undefined;
+  /** gewählte Stadt, roh wie `loadCity` (Plan 0039, E9); ob es sie gibt, prüft der Service Worker */
+  city: string | undefined;
 }
 
 /** `data-sw="aus"` (gesetzt von `start()` in `pwa.ts`) beobachten; Kanal in docs/architecture.md (App-Extras) */
@@ -112,7 +114,7 @@ async function sha256Hex(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-const MIRRORED = ["birthDate", "searches", "origin"] as const;
+const MIRRORED = ["birthDate", "searches", "origin", "city"] as const;
 
 /**
  * Kann dieses Gerät Push (Plan 0033, E1, E8)? Für den App-Schritt des Onboardings. Anders als `support()` ohne Blick auf

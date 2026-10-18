@@ -352,6 +352,74 @@
       },
       "url": "https://example.org/theater/babykonzert",
       "sourceUrl": "https://example.org/theater/spielplan"
+    },
+    {
+      "id": "hcv2g8og",
+      "providerId": "rheinzwerge-beispiel",
+      "venueId": "rheinzwerge-beispiel-haus",
+      "title": "Krabbelgruppe am Rhein",
+      "summary": "Jeden Dienstag Krabbeln, Singen und Austausch im Familienzentrum.",
+      "category": "krabbel-spielgruppen",
+      "topics": ["krabbelgruppe"],
+      "format": "regelmaessig",
+      "registration": "ohne-anmeldung",
+      "cost": "kostenlos",
+      "age": {
+        "minMonths": 6,
+        "maxMonths": 24
+      },
+      "sessions": [
+        {
+          "start": "2026-10-06T10:00:00+02:00",
+          "end": "2026-10-06T11:30:00+02:00"
+        },
+        {
+          "start": "2026-10-13T10:00:00+02:00",
+          "end": "2026-10-13T11:30:00+02:00"
+        },
+        {
+          "start": "2026-10-20T10:00:00+02:00",
+          "end": "2026-10-20T11:30:00+02:00"
+        },
+        {
+          "start": "2026-10-27T10:00:00+01:00",
+          "end": "2026-10-27T11:30:00+01:00"
+        },
+        {
+          "start": "2026-11-03T10:00:00+01:00",
+          "end": "2026-11-03T11:30:00+01:00"
+        }
+      ],
+      "availability": {
+        "status": "ohne-anmeldung",
+        "checkedAt": "2026-10-05T05:40:00+02:00"
+      },
+      "url": "https://rheinzwerge.example.net/krabbelgruppe",
+      "sourceUrl": "https://rheinzwerge.example.net/programm"
+    },
+    {
+      "id": "urzywa9y",
+      "providerId": "rheinzwerge-beispiel",
+      "venueId": "rheinzwerge-beispiel-haus",
+      "title": "Rheinzwerge-Liederkonzert",
+      "summary": "Mitmachkonzert mit Kinderliedern für die Allerkleinsten.",
+      "category": "musik",
+      "topics": ["musik"],
+      "format": "einmalig",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "sessions": [
+        {
+          "start": "2026-10-24T10:30:00+02:00",
+          "end": "2026-10-24T11:15:00+02:00"
+        }
+      ],
+      "availability": {
+        "status": "unbekannt",
+        "checkedAt": "2026-10-05T05:40:00+02:00"
+      },
+      "url": "https://rheinzwerge.example.net/konzert",
+      "sourceUrl": "https://rheinzwerge.example.net/programm"
     }
   ]
 }

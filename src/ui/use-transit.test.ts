@@ -7,12 +7,15 @@ import {
   decodeLinesFor,
   deliverLoad,
   initialTransitState,
+  initialTransitStates,
   limitActive,
+  networkTransitReducer,
   reloadAfterRetry,
   resolveReach,
   type TransitAction,
   type TransitState,
   transitReducer,
+  transitStateOf,
 } from "./use-transit.ts";
 
 const run = (state: TransitState, ...actions: TransitAction[]) => actions.reduce(transitReducer, state);
@@ -119,6 +122,37 @@ describe("transitReducer (Plan 0009, E9/E11)", () => {
     expect(transitReducer(loading, { type: "stale", attempt: 1 })).toBe(loading);
     const done = ready();
     expect(transitReducer(done, { type: "stale", attempt: 7 })).toBe(done);
+  });
+});
+
+describe("je Netz höchstens einmal je Sitzung (Plan 0039, E5/E8)", () => {
+  it("lädt beim Start nur für das gewählte Netz, das andere bleibt aus", () => {
+    const states = initialTransitStates("vrr", true);
+    expect(transitStateOf(states, "vrr")).toEqual({ kind: "laedt", attempt: 1, retry: false });
+    expect(transitStateOf(states, "vgn")).toEqual({ kind: "aus", attempt: 0 });
+    expect(transitStateOf(initialTransitStates("vgn", false), "vgn")).toEqual({ kind: "aus", attempt: 0 });
+  });
+
+  it("Aktionen wirken nur auf ihr Netz; eine geladene Tabelle bleibt, ein zweites want() lädt nicht neu", () => {
+    const vgnReady = networkTransitReducer(initialTransitStates("vgn", true), {
+      type: "loaded",
+      attempt: 1,
+      file: FILE,
+      logic,
+      network: "vgn",
+    });
+    const switched = networkTransitReducer(vgnReady, { type: "want", network: "vrr" });
+    expect(transitStateOf(switched, "vrr")).toEqual({ kind: "laedt", attempt: 1, retry: false });
+    expect(transitStateOf(switched, "vgn")).toBe(transitStateOf(vgnReady, "vgn"));
+    // eine späte Antwort für vgn trifft die Tabelle von vrr nicht
+    const late = networkTransitReducer(switched, { type: "failed", attempt: 1, network: "vgn" });
+    expect(transitStateOf(late, "vrr").kind).toBe("laedt");
+    // zurück zu vgn: kein neuer Request
+    expect(networkTransitReducer(switched, { type: "want", network: "vgn" })).toBe(switched);
+    // Frische-Anlass nur für das gewählte Netz
+    const refreshed = networkTransitReducer(switched, { type: "refresh", network: "vgn" });
+    expect(transitStateOf(refreshed, "vgn")).toMatchObject({ kind: "bereit", refresh: true, attempt: 2 });
+    expect(transitStateOf(refreshed, "vrr")).toBe(transitStateOf(switched, "vrr"));
   });
 });
 

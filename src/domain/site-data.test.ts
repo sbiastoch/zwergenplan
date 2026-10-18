@@ -3,7 +3,7 @@ import { icsContextFor, icsForSeries } from "./ics.ts";
 import { SHORT_ID_PATTERN } from "./ids.ts";
 import { Venue } from "./schema.ts";
 import { MIN_ADDRESS, type SiteProvider, toProviderDirectory, toSiteData, venueAddress } from "./site-data.ts";
-import { fixtureKey, loadFixtures } from "./test-fixtures.ts";
+import { fixtureKey, loadFixtures, fixturePublicId as pid } from "./test-fixtures.ts";
 import { berlinDate, berlinKey, parseIsoDate, toIcsUtc } from "./time.ts";
 
 describe("toSiteData", () => {
@@ -58,6 +58,14 @@ describe("toSiteData", () => {
     expect(site2.offers.every((o) => !("district" in o.venue))).toBe(true);
   });
 
+  it("schreibt je Angebot das Netz der Region des Anbieters, nicht die Region (Plan 0039, E7)", () => {
+    const networkOf = (key: string) => site.offers.find((o) => fixtureKey(o) === key)?.network;
+    expect(networkOf("pekip-herbst")).toBe("vgn");
+    expect(networkOf("krabbelgruppe-rhein")).toBe("vrr");
+    expect(site.offers.every((o) => o.network === "vgn" || o.network === "vrr")).toBe(true);
+    expect(JSON.stringify(site)).not.toContain('"region"');
+  });
+
   it("weist ungeprüfte Referenzen ab", () => {
     expect(() => toSiteData([], file)).toThrow("Ungeprüfte Daten");
   });
@@ -81,11 +89,18 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
         "familientreff-beispiel",
         "theater-beispiel",
         "musikschule-beispiel",
+        "rheinzwerge-beispiel",
         "turnverein-beispiel",
       ].map((id) => publicIdOf.get(id)),
     );
     for (const p of directory.providers) expect(SHORT_ID_PATTERN.test(p.id), p.name).toBe(true);
     expect(providers.some((p) => p.role === "aggregator")).toBe(true);
+  });
+
+  it("schreibt je Anbieter das Netz seiner Region (Plan 0039, E7)", () => {
+    const networkOf = (id: string) => directory.providers.find((p) => p.id === pid(id))?.network;
+    expect(networkOf("familientreff-beispiel")).toBe("vgn");
+    expect(networkOf("rheinzwerge-beispiel")).toBe("vrr");
   });
 
   it("sortiert Umlaute wie im Deutschen", () => {
@@ -105,7 +120,7 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
 
   it("liefert genau die Felder für Eltern, nichts aus der Recherche", () => {
     for (const p of directory.providers) {
-      expect(Object.keys(p).sort()).toEqual(["id", "name", "url", "venues"]);
+      expect(Object.keys(p).sort()).toEqual(["id", "name", "network", "url", "venues"]);
       for (const v of p.venues) {
         expect(Object.keys(v).every((k) => ["name", "address", "district"].includes(k))).toBe(true);
       }
@@ -133,6 +148,7 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
       id: anbieter.find((p) => p.id === "turnverein-beispiel")?.publicId ?? "",
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
+      network: "vgn",
       venues: [
         { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
         { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },

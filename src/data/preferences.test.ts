@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ONBOARDING_FLAG } from "../../e2e/onboarding-flag.ts";
 import {
+  loadCity,
   loadOnboardingDone,
   loadOriginDistrict,
   loadOriginPoint,
   loadSavedProviders,
+  saveCity,
   saveOnboardingDone,
   saveOrigin,
   saveSavedProviders,
@@ -72,6 +74,50 @@ describe("Startpunkt-Stadtteil", () => {
     });
     expect(loadOriginDistrict()).toBeUndefined();
     expect(() => saveOrigin("gostenhof")).not.toThrow();
+  });
+});
+
+describe("Stadt (Plan 0039, E8): nur die Form", () => {
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("speichert die Stadt unter zwergenplan.stadt und löscht sie mit undefined", () => {
+    saveCity("duesseldorf");
+    expect([...storage.data]).toEqual([["zwergenplan.stadt", "duesseldorf"]]);
+    expect(loadCity()).toBe("duesseldorf");
+    saveCity(undefined);
+    expect(storage.data.size).toBe(0);
+    expect(loadCity()).toBeUndefined();
+  });
+
+  it("liefert den rohen Wert bis 32 Zeichen; ob es die Region gibt, prüft die UI", () => {
+    storage.data.set("zwergenplan.stadt", "atlantis");
+    expect(loadCity()).toBe("atlantis");
+    storage.data.set("zwergenplan.stadt", "x".repeat(33));
+    expect(loadCity()).toBeUndefined();
+    storage.data.set("zwergenplan.stadt", "");
+    expect(loadCity()).toBeUndefined();
+  });
+
+  it("übersteht einen gesperrten Speicher", () => {
+    vi.stubGlobal("localStorage", {
+      getItem: () => {
+        throw new Error("SecurityError");
+      },
+      setItem: () => {
+        throw new Error("QuotaExceededError");
+      },
+    });
+    expect(loadCity()).toBeUndefined();
+    expect(() => saveCity("nuernberg")).not.toThrow();
   });
 });
 

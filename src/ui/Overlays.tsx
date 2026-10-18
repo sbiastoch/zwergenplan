@@ -14,7 +14,7 @@ import type { CardContext } from "./OfferCard.tsx";
 import { ProviderSheetLoader } from "./ProviderPanel.tsx";
 import { type AgeFilter, FilterSheet, type LimitActionFor, ManualLinkSheet } from "./Sheets.tsx";
 import type { ToastMessage } from "./Toast.tsx";
-import { type OriginApi, type Say, useShare } from "./use-app-state.ts";
+import { type CityApi, type OriginApi, type Say, useShare } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
 
 /** „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl) */
@@ -57,6 +57,8 @@ interface OverlaysProps {
   theme: { choice: ThemeChoice; setChoice: (choice: ThemeChoice) => void };
   today: string;
   originApi: OriginApi;
+  /** Stadt für die Auswahl „Stadt“ im Kind-Sheet (Plan 0039, E8) */
+  cityApi: CityApi;
   /** Wegzeit: Modus für die Filtergruppe, Quelle für den Hinweis im Kind-Sheet */
   transit: TransitApi;
   /** Knopf zur Begründung der gesperrten Wegzeit-Grenze (`LimitAction`) */
@@ -133,7 +135,7 @@ export function Overlays(props: OverlaysProps) {
             generatedAt={props.generatedAt}
             origin={origin}
             reach={ctx.reachOf(detailOffer)}
-            reachPending={ctx.reachPending}
+            reachPending={ctx.reachPending && ctx.elsewhere(detailOffer) === undefined}
             saved={ctx.isSaved(detailOffer.id)}
             onToggleSave={onToggleSave}
             onShare={shareOffer}

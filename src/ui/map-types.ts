@@ -8,6 +8,7 @@ import type { StartCamera } from "../domain/camera.ts";
 import type { GeoPoint } from "../domain/geo.ts";
 import type { Place } from "../domain/places.ts";
 import type { Origin, ReachFn } from "../domain/reach.ts";
+import type { NetworkId } from "../domain/regions.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import type { AgeEscape } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
@@ -19,6 +20,8 @@ export interface MapScreenProps {
   offers: readonly SiteOffer[];
   /** Datenbasis des Startausschnitts: alle kommenden Angebote, ohne Filter, Alter, Startpunkt (ADR 0008) */
   cameraOffers: readonly SiteOffer[];
+  /** gewähltes Netz (Plan 0039, E8): Startausschnitt über seinen Orten; ein Wechsel baut die Karte neu auf */
+  network: NetworkId;
   origin: Origin | undefined;
   /** Wegzeit bzw. Luftlinie zum Sortieren der Orts-Liste; `undefined` ohne Startpunkt oder solange sie lädt */
   reach: ReachFn | undefined;
@@ -44,6 +47,8 @@ export interface MapViewProps {
   places: readonly Place<Pick<SiteOffer, "category">>[];
   /** Ausschnitt beim ersten Öffnen der Sitzung, aus öffentlichen Daten (`initialCamera`, ADR 0008) */
   start: StartCamera;
+  /** Netz von `start`: Der gemerkte Ausschnitt der Sitzung gilt nur im selben Netz (Plan 0039, E8) */
+  network: NetworkId;
   /** wird nur gezeichnet; angefahren wird nur ein Stadtteil (E9, ADR 0008) */
   origin: Origin | undefined;
   dark: boolean;

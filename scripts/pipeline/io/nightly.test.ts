@@ -318,7 +318,7 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(csv[1]).toBe(
       `${TODAY},nacht,alle,${seen.length},${seen.length * 100},${seen.length * 10},${(seen.length * 0.001).toFixed(4)},,0,${seen.length - 1}`,
     );
-    expect(r.previous).toEqual({ offers: 9, sessions: 31 });
+    expect(r.previous).toEqual({ offers: 11, sessions: 37 });
     // zweite Nacht hängt an
     await runNightly(options(dirsOf, fakeExtractor().extractor));
     expect(readFileSync(join(dirsOf.dataDir, "kosten.csv"), "utf8").trimEnd().split("\n")).toHaveLength(3);
@@ -367,8 +367,8 @@ describe("runBuildOnly (nightly --build-only, Arch-Review S5, M1)", () => {
         return {};
       },
     });
-    // nur die Ferien der Netze, deren Regionen im Katalog stehen: hier nur Nürnberg (Plan 0039, E6)
-    expect(loads).toEqual(["DE-BY"]);
+    // nur die Ferien der Netze, deren Regionen im Katalog stehen: Nürnberg und Düsseldorf (Plan 0039, E6)
+    expect(loads).toEqual(["DE-BY", "DE-NW"]);
     expect(r.removed).toEqual(["theater-beispiel"]);
     expect(r.build.errors).toEqual([]);
     expect(r.build.written).toBe(join(dirsOf.dataDir, "offers.json"));

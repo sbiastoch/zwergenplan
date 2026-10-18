@@ -63,12 +63,12 @@ describe("placesOf", () => {
     expect(placesOf([])).toEqual([]);
   });
 
-  it("findet in den Fixtures 5 Orte, Familientreff Beispielhof mit 4 Angeboten", () => {
+  it("findet in den Fixtures 6 Orte (einer in Düsseldorf), Familientreff Beispielhof mit 4 Angeboten", () => {
     const places = placesOf(fixtureSiteOffers());
-    expect(places).toHaveLength(5);
+    expect(places).toHaveLength(6);
     const counts = Object.fromEntries(places.map((p) => [p.names.join(" / "), p.offers.length]));
     expect(counts["Familientreff Beispielhof"]).toBe(4);
-    expect(Object.values(counts).sort()).toEqual([1, 1, 1, 2, 4]);
+    expect(Object.values(counts).sort()).toEqual([1, 1, 1, 2, 2, 4]);
   });
 });
 

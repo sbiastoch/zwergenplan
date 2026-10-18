@@ -20,8 +20,8 @@ describe("validateDataset", () => {
   it("akzeptiert die Fixtures", () => {
     const r = mutate(() => {});
     expect(errorsOf(r)).toBe("");
-    // 7 Katalog-Einträge: 6 Anbieter (einer ohne Angebote) und ein Sammelkalender (Plan 0010, E6)
-    expect(r.ok && r.summary).toEqual({ offers: 9, providers: 7, generatedAt: "2026-10-05T06:00:00+02:00" });
+    // 8 Katalog-Einträge: 7 Anbieter (einer ohne Angebote, einer in Düsseldorf) und ein Sammelkalender (Plan 0010, E6)
+    expect(r.ok && r.summary).toEqual({ offers: 11, providers: 8, generatedAt: "2026-10-05T06:00:00+02:00" });
   });
 
   it.each([

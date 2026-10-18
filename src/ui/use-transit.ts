@@ -1,12 +1,14 @@
 /**
  * Wegzeit-Tabelle: Laden und Modus der Anzeige (Plan 0009, E9–E11; ADR 0011). Kern ist ein reiner Reducer
  * (wie origin-state.ts): Geladen wird nur auf `want()` (Kind-Sheet, Karte, „Nochmal laden“) oder beim Start mit
- * gespeichertem Startpunkt (ADR 0017), höchstens einmal je Sitzung. Die Wahl eines Startpunkts löst nie einen
- * Request aus: Der Startpunkt geht nur in `resolveReach` ein, nie in den Ladezustand.
+ * gespeichertem Startpunkt (ADR 0017), höchstens einmal je Sitzung und Netz (Plan 0039, E5/E8): Jedes Netz hat seinen
+ * eigenen Zustand, gezeigt wird der des gewählten. Die Wahl eines Startpunkts löst nie einen Request aus: Der Startpunkt
+ * geht nur in `resolveReach` ein, nie in den Ladezustand.
  */
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { type ChunkOutcome, loadTransit, type TransitLoad } from "../data/transit.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
+import type { NetworkId } from "../domain/regions.ts";
 import type {
   TransitLines,
   TransitLinesFile,
@@ -77,6 +79,32 @@ export type TransitAction =
 /** Mit gespeichertem Startpunkt (Stadtteil oder Punkt, ADR 0017) lädt die Tabelle gleich beim Start (E9, Auslöser 1). */
 export function initialTransitState(storedOrigin: boolean): TransitState {
   return storedOrigin ? { kind: "laedt", attempt: 1, retry: false } : { kind: "aus", attempt: 0 };
+}
+
+/** Zustand je Netz (Plan 0039, E5); ein fehlendes Netz ist „aus“ */
+export type TransitStates = Readonly<Partial<Record<NetworkId, TransitState>>>;
+
+const IDLE: TransitState = { kind: "aus", attempt: 0 };
+
+export function transitStateOf(states: TransitStates, network: NetworkId): TransitState {
+  return states[network] ?? IDLE;
+}
+
+/** Beim Start lädt höchstens die Tabelle des gewählten Netzes, und nur mit gespeichertem Startpunkt darin (ADR 0017) */
+export function initialTransitStates(network: NetworkId, storedOrigin: boolean): TransitStates {
+  const states: Partial<Record<NetworkId, TransitState>> = {};
+  states[network] = initialTransitState(storedOrigin);
+  return states;
+}
+
+/** `transitReducer` für das Netz der Aktion; die anderen Netze bleiben, wie sie sind */
+export function networkTransitReducer(
+  states: TransitStates,
+  action: TransitAction & { network: NetworkId },
+): TransitStates {
+  const before = transitStateOf(states, action.network);
+  const after = transitReducer(before, action);
+  return after === before ? states : { ...states, [action.network]: after };
 }
 
 /** Ein Versuch läuft: erstes Laden oder Neuladen einer fertigen Tabelle (E4a) */
@@ -234,10 +262,20 @@ export interface TransitApi {
 
 /**
  * `origin` beim ersten Aufruf entscheidet über das Laden beim Start (gespeicherter Startpunkt, E9; ADR 0017). Danach geht der
- * Startpunkt nur noch in die Rechnung ein. `placeKeys`: Orte der Seite (`undefined`, solange `site.json` lädt).
+ * Startpunkt nur noch in die Rechnung ein. `placeKeys`: Orte des gewählten Netzes (`undefined`, solange `site.json`
+ * lädt). `network`: Netz der gewählten Stadt (Plan 0039, E5); ein Wechsel zeigt den Zustand des neuen Netzes, und
+ * `want` bekommt eine neue Identität, damit eine offene Startpunkt-Oberfläche dessen Tabelle anfordert.
  */
-export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<string> | undefined): TransitApi {
-  const [state, dispatch] = useReducer(transitReducer, origin !== undefined, initialTransitState);
+export function useTransit(
+  origin: Origin | undefined,
+  placeKeys: ReadonlySet<string> | undefined,
+  network: NetworkId,
+): TransitApi {
+  const [states, dispatchAll] = useReducer(networkTransitReducer, undefined, () =>
+    initialTransitStates(network, origin !== undefined),
+  );
+  const state = transitStateOf(states, network);
+  const dispatch = useCallback((action: TransitAction) => dispatchAll({ ...action, network }), [network]);
   const attempt = loading(state) ? state.attempt : 0;
   const retry = state.kind === "laedt" && state.retry;
 
@@ -247,13 +285,14 @@ export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<st
     // Rechenlogik und Tabelle parallel, ein Zeitlimit für beide. Ab dem zweiten Versuch ohne HTTP-Cache; scheitert
     // bei „Nochmal laden“ nur der Chunk, lädt die Seite neu (N1).
     // Die Linien kommen danach, auch wenn der Effekt dann schon abgeräumt ist (deliverLoad, Plan 0012, E9).
-    void loadTransit(loadLogic, attempt > 1).then((load) =>
+    // Wechselt das Netz während des Ladens, verfällt die Antwort; zurück im Netz läuft derselbe Versuch erneut.
+    void loadTransit(loadLogic, attempt > 1, network).then((load) =>
       deliverLoad(load, { attempt, retry, isLive: () => live, dispatch, reload: () => window.location.reload() }),
     );
     return () => {
       live = false;
     };
-  }, [attempt, retry]);
+  }, [attempt, retry, network, dispatch]);
 
   const ready = state.kind === "bereit" ? state : undefined;
   const file = ready?.file;
@@ -265,10 +304,13 @@ export function useTransit(origin: Origin | undefined, placeKeys: ReadonlySet<st
   const loadedAttempt = state.attempt;
   useEffect(() => {
     if (table === null) dispatch({ type: "stale", attempt: loadedAttempt });
-  }, [table, loadedAttempt]);
+  }, [table, loadedAttempt, dispatch]);
   const { mode, reach } = useMemo(() => resolveReach(state, table, origin, lines), [state, table, origin, lines]);
-  const want = useCallback(() => dispatch({ type: "want" }), []);
-  const retryNow = useCallback(() => dispatch({ type: "want", retry: true }), []);
-  const refresh = useCallback(() => dispatch({ type: "refresh" }), []);
+  const want = useCallback(() => dispatch({ type: "want" }), [dispatch]);
+  const retryNow = useCallback(() => dispatch({ type: "want", retry: true }), [dispatch]);
+  // stabil über Netzwechsel: `startPwa` in App.tsx hängt daran und soll nicht neu starten; gemeint ist das aktuelle Netz
+  const current = useRef(network);
+  current.current = network;
+  const refresh = useCallback(() => dispatchAll({ type: "refresh", network: current.current }), []);
   return { mode, reach, source: table?.source, want, retry: retryNow, refresh };
 }

@@ -117,6 +117,27 @@
       use: termine
   availability: { shown: nein }
   verified: 2026-10-04
+# Düsseldorf (Plan 0039, E14): fiktiver Anbieter im Netz vrr, Ort am Halt de:05111:9501 des Fixture-Netzes
+# tests/fixtures/oepnv/vrr.json, damit der Fixture-Build für vrr Zellen mit Linie (Tram 709) hat.
+- id: rheinzwerge-beispiel
+  publicId: o9b2vd23
+  role: anbieter
+  region: duesseldorf
+  name: "Rheinzwerge Beispiel (fiktiv)"
+  url: "https://rheinzwerge.example.net/"
+  venues:
+    - id: rheinzwerge-beispiel-haus
+      name: "Familienzentrum Rheinzwerge"
+      address: "Beispielallee 9, 40210 Düsseldorf"
+      district: Stadtmitte
+      geo: { lat: 51.2197, lon: 6.7951 }
+  age: { minMonths: 0, maxMonths: 36 }
+  programme:
+    - url: "https://rheinzwerge.example.net/programm"
+      kind: html
+      use: termine
+  availability: { shown: nein }
+  verified: 2026-10-04
 # Sammelkalender (Recherchequelle, Plan 0010, E6): darf nicht in anbieter.json stehen.
 - id: sammelkalender-beispiel
   role: aggregator

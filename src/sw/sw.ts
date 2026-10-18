@@ -4,8 +4,9 @@
  *
  * - Precache im `install`: Schale (`index.html` am HTTP-Cache vorbei, Start-Assets) und `data/site.json`, damit die
  *   App auch beim ersten Start offline öffnet.
- * - `activate`: alte Schalen löschen, Navigation Preload an, `clients.claim()`. Kein automatisches Neuladen; das
- *   macht nur die Seite beim Frische-Anlass (E4a, `src/data/pwa.ts`).
+ * - `activate`: alte Schalen und die Kopien der alten Wegzeit-Pfade löschen (Plan 0039, E5), Navigation Preload an,
+ *   `clients.claim()`. Kein automatisches Neuladen; das macht nur die Seite beim Frische-Anlass (E4a,
+ *   `src/data/pwa.ts`).
  * - Fremde Origins und alles ohne Regel: kein `respondWith` (ADR 0008).
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
@@ -19,6 +20,7 @@ import {
   DATA_CACHE,
   NAVIGATION_TIMEOUT_MS,
   OFFLINE_HEADER,
+  retiredDataEntries,
   SITE_TIMEOUT_MS,
   shellCache,
   staleShells,
@@ -57,6 +59,13 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       await Promise.all(staleShells(await caches.keys(), __SW_VERSION__).map((name) => caches.delete(name)));
+      // Kopien der alten Wegzeit-Pfade (bis Plan 0039, E5): Der neue Code fragt sie nie mehr an
+      const data = await caches.open(DATA_CACHE);
+      const retired = retiredDataEntries(
+        (await data.keys()).map((request) => request.url),
+        self.registration.scope,
+      );
+      await Promise.all(retired.map((url) => data.delete(url)));
       await self.registration.navigationPreload?.enable();
       await self.clients.claim();
     })(),

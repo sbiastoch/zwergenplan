@@ -21,6 +21,7 @@ const TURNVEREIN: SiteProvider = {
   id: pid("turnverein-beispiel"),
   name: "Turnverein Beispiel (fiktiv)",
   url: "https://example.org/turnverein",
+  network: "vgn",
   venues: [
     { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
     { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
@@ -31,8 +32,10 @@ it("Katalog der Fixtures enthält den Turnverein ohne Angebote", () => {
   expect(catalog).toContainEqual(TURNVEREIN);
 });
 
-const offers = fixtureSiteOffers();
-const upcoming = applyFilters(offers, EMPTY_FILTER, { now: FIXTURE_NOW });
+// wie der Tab (Plan 0039, E8): kommende über alle Netze, sichtbar nur das gewählte Netz
+const offers = fixtureSiteOffers("vgn");
+const upcoming = applyFilters(fixtureSiteOffers(), EMPTY_FILTER, { now: FIXTURE_NOW });
+const visibleInNetwork = applyFilters(offers, EMPTY_FILTER, { now: FIXTURE_NOW });
 const visibleWith = (state: FilterState) => applyFilters(offers, state, { now: FIXTURE_NOW });
 const buecher: FilterState = { ...EMPTY_FILTER, categories: ["buecher"] };
 
@@ -40,12 +43,13 @@ const noReach = () => undefined;
 const rows = (overrides: Partial<Parameters<typeof providerRows>[0]> = {}) =>
   providerRows({
     providers: catalog,
-    visible: upcoming,
+    visible: visibleInNetwork,
     upcoming,
     reachOf: noReach,
     byReach: false,
     query: "",
     saved: [],
+    network: "vgn",
     ...overrides,
   });
 const ids = (list: readonly ProviderRow[]) => list.map((r) => r.provider.id);
@@ -190,6 +194,7 @@ describe("providerRows", () => {
     expect(theater?.provider).toEqual({
       id: pid("theater-beispiel"),
       name: "Kleines Theater Beispiel (fiktiv)",
+      network: "vgn",
       venues: [{ name: "Kleines Theater Beispiel", address: "Bühnenplatz 2, 90429 Nürnberg", district: "Gostenhof" }],
     });
     expect(theater?.provider.url).toBeUndefined();
@@ -198,9 +203,9 @@ describe("providerRows", () => {
 
   it("Invariante: active.length === Anzahl verschiedener Anbieter in visible", () => {
     const cases: Array<[SiteProvider[], SiteOffer[]]> = [
-      [catalog, upcoming],
+      [catalog, visibleInNetwork],
       [catalog, visibleWith(buecher)],
-      [catalog.filter((p) => p.id !== pid("theater-beispiel")), upcoming],
+      [catalog.filter((p) => p.id !== pid("theater-beispiel")), visibleInNetwork],
       [[], visibleWith({ ...EMPTY_FILTER, categories: ["musik"] })],
     ];
     for (const [providers, visible] of cases) {
@@ -213,6 +218,7 @@ describe("providerRows", () => {
       id,
       name,
       url: "https://example.org",
+      network: "vgn",
       venues: [],
     });
     const result = providerRows({
@@ -223,6 +229,7 @@ describe("providerRows", () => {
       byReach: false,
       query: "",
       saved: [],
+      network: "vgn",
     });
     expect(result.idle.map((r) => r.provider.name)).toEqual(["Apotheke", "Ärztehaus Beispiel", "Bücherei"]);
   });
@@ -231,6 +238,31 @@ describe("providerRows", () => {
     const first = catalog[0];
     if (!first) throw new Error("Katalog leer");
     expect(rows({ providers: [first, first] }).active.filter((r) => r.provider.id === first.id)).toHaveLength(1);
+  });
+});
+
+describe("providerRows: Netz (Plan 0039, E8)", () => {
+  it("zeigt nur Anbieter des gewählten Netzes, auch ohne Termine und als Rückfall", () => {
+    const all = [...ids(rows().active), ...ids(rows().idle)];
+    expect(all).not.toContain(pid("rheinzwerge-beispiel"));
+    expect(all).toContain(pid("turnverein-beispiel"));
+    const vrr = rows({
+      network: "vrr",
+      visible: applyFilters(fixtureSiteOffers("vrr"), EMPTY_FILTER, { now: FIXTURE_NOW }),
+    });
+    expect(ids(vrr.active)).toEqual([pid("rheinzwerge-beispiel")]);
+    expect(vrr.idle).toEqual([]);
+    expect(vrr.hiddenCount).toBe(0);
+    const fallback = rows({ network: "vrr", providers: [], visible: [] });
+    expect(fallback.hiddenCount).toBe(1);
+  });
+
+  it("gemerkte Anbieter des anderen Netzes stehen immer unter saved, mit ihren kommenden Angeboten", () => {
+    const result = rows({ saved: [pid("rheinzwerge-beispiel")] });
+    expect(result.saved.map((r) => [r.provider.id, r.state, r.upcoming])).toEqual([
+      [pid("rheinzwerge-beispiel"), "ausgeblendet", 2],
+    ]);
+    expect(result.hiddenCount).toBe(0);
   });
 });
 
@@ -244,7 +276,7 @@ describe("providerRows: gemerkte Anbieter (Plan 0025, E3)", () => {
     expect(result.saved.map((r) => [r.provider.id, r.state])).toEqual([[pid("theater-beispiel"), "aktiv"]]);
     expect(ids(result.active)).not.toContain(pid("theater-beispiel"));
     const activeSaved = result.saved.filter((r) => r.state === "aktiv").length;
-    expect(result.active.length + activeSaved).toBe(distinctProviders(upcoming));
+    expect(result.active.length + activeSaved).toBe(distinctProviders(visibleInNetwork));
   });
 
   it("ausgeblendet: bleibt unter saved, blass, und zählt nicht in hiddenCount", () => {

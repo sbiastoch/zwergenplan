@@ -18,6 +18,7 @@ import {
   clock,
   collectionToast,
   dayHeading,
+  elsewhereText,
   exportLabel,
   formatFact,
   limitHint,
@@ -79,6 +80,7 @@ function offer(fields: Pick<SiteOffer, "format" | "sessions"> & Partial<SiteOffe
     url: "https://example.org/",
     sourceUrl: "https://example.org/",
     providerName: "Anbieter",
+    network: "vgn",
     venue: { name: "Ort", address: "Beispielweg 1", geo: { lat: 49.45, lon: 11.08 } },
     ...fields,
   };
@@ -830,5 +832,23 @@ describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
     // Grenze um 0:30 Berlin am 1.1.2027 (UTC und Los Angeles: 31.12.2026) zählt als Berliner Tag
     const midnight = { sessions: sessions("2026-12-25", 2, 7, "00:30", "01:30"), until: "2027-01-01T00:30:00+01:00" };
     expect(ageWindowLabel(midnight, FIXTURE_NOW)).toBe("passt bis 1.1.2027");
+  });
+});
+
+describe("Angebot außerhalb des gewählten Netzes (Plan 0039, E8)", () => {
+  const at = (network: SiteOffer["network"], lat: number, lon: number) => ({
+    network,
+    venue: { name: "Ort", address: "Weg 1", geo: { lat, lon } },
+  });
+
+  it("nennt die Stadt statt Wegzeit oder Luftlinie", () => {
+    expect(elsewhereText(at("vrr", 51.2197, 6.7951), "vgn")).toBe("in Düsseldorf");
+    expect(elsewhereText(at("vgn", 49.4521, 11.0767), "vrr")).toBe("in Nürnberg");
+    expect(elsewhereText(at("vgn", 49.477, 10.989), "vrr")).toBe("in Fürth");
+  });
+
+  it("im gewählten Netz nichts", () => {
+    expect(elsewhereText(at("vgn", 49.4521, 11.0767), "vgn")).toBeUndefined();
+    expect(elsewhereText(at("vrr", 51.2197, 6.7951), "vrr")).toBeUndefined();
   });
 });

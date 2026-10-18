@@ -9,7 +9,7 @@ import type { PositionProblem, PositionResult } from "../data/geolocation.ts";
 import type { StoredOriginPoint } from "../data/preferences.ts";
 import { coarsen, type GeoPoint, inBounds } from "../domain/geo.ts";
 import type { Origin } from "../domain/reach.ts";
-import { NETWORKS } from "../domain/regions.ts";
+import { NETWORKS, type NetworkId } from "../domain/regions.ts";
 
 export interface OriginState {
   origin: Origin | undefined;
@@ -35,13 +35,21 @@ export function pointOrigin(source: StoredOriginPoint["source"], point: GeoPoint
 }
 
 /**
- * Gespeicherten Punkt erneut runden und gegen die bbox des Netzes prüfen; ungültig → kein Startpunkt (Plan 0016, E3).
- * Vorerst das Netz `vgn`; das gewählte Netz kommt mit der gespeicherten Stadt (Plan 0039, E3, S6).
+ * Gespeicherten Punkt erneut runden und gegen die bbox des gewählten Netzes prüfen; ungültig oder in einem anderen
+ * Netz → kein Startpunkt (Plan 0016, E3; Plan 0039, E3).
  */
-export function storedPointOrigin(stored: StoredOriginPoint | undefined): Origin | undefined {
+export function storedPointOrigin(stored: StoredOriginPoint | undefined, network: NetworkId): Origin | undefined {
   if (!stored) return undefined;
   const point = coarsen(stored);
-  return inBounds(point, NETWORKS.vgn.bbox) ? pointOrigin(stored.source, point) : undefined;
+  return inBounds(point, NETWORKS[network].bbox) ? pointOrigin(stored.source, point) : undefined;
+}
+
+/**
+ * Gilt der Startpunkt im Netz (Plan 0039, E8)? Ohne Startpunkt ja. Ein Stadtteil liegt in der bbox seiner Region, die in
+ * der ihres Netzes; die Netz-bboxen überlappen nicht. Also reicht für Stadtteil, Standort und Kartenmitte der Punkt.
+ */
+export function originInNetwork(origin: Origin | undefined, network: NetworkId): boolean {
+  return !origin || inBounds(origin.point, NETWORKS[network].bbox);
 }
 
 export function initialOriginState(origin: Origin | undefined): OriginState {

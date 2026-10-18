@@ -9,7 +9,7 @@ import type { FilterState } from "../domain/filter.ts";
 import type { AppStepParts } from "../domain/onboarding.ts";
 import type { InstallApi, PushCapability } from "../domain/pwa.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import type { OriginApi } from "./use-app-state.ts";
+import type { CityApi, OriginApi } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
 
 /**
@@ -33,6 +33,8 @@ export interface OnboardingProps {
   onBirthDate: (iso: string | undefined) => void;
   /** Startpunkt wie im Kind-Sheet (ADR 0017) */
   originApi: OriginApi;
+  /** Stadt: Vorauswahl der Kacheln, `switchCity` beim Weitergehen (Plan 0039, E8) */
+  cityApi: CityApi;
   /** `want()` beim Anzeigen des Schritts „Weg“, `mode` für Hinweis und gesperrte Chips (E7) */
   transit: TransitApi;
   /** Filter der Startseite: nur `reachLimit` (`wegzeit=`) ändert der Flow (E7) */

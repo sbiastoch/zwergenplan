@@ -31,6 +31,7 @@ function offer(id: string, day: string, age?: SiteOffer["age"], format: SiteOffe
     url: "https://example.org/",
     sourceUrl: "https://example.org/",
     providerName: "Anbieter",
+    network: "vgn",
     venue: { name: "Ort", address: "Beispielweg 1", geo: { lat: 49.45, lon: 11.08 } },
   };
 }
@@ -132,6 +133,42 @@ describe("useOfferViews", () => {
     renderToStaticMarkup(createElement(Probe));
     expect(step).toBe(2);
     expect(result?.page.remaining).toBe(5);
+  });
+
+  describe("Netz (Plan 0039, E7/E8)", () => {
+    const RHEIN: SiteOffer = {
+      ...offer("rhein", "2026-10-11"),
+      network: "vrr",
+      venue: { name: "Rhein", address: "Allee 1", geo: { lat: 51.22, lon: 6.79 } },
+    };
+    const ALL = [...OFFERS, RHEIN];
+
+    it("Liste nur aus dem Netz; Merkliste, Detail und Kalender der Merkliste aus allen Netzen", () => {
+      const v = render({ allOffers: ALL, savedIds: [RHEIN.id, BABY.id] });
+      expect(ids(v.visible)).toEqual(["baby", "gross"]);
+      expect(savedTitles(v)).toEqual(["baby", "rhein"]);
+      expect(render({ allOffers: ALL, route: { ...ENTDECKEN, offerId: RHEIN.id } }).detailOffer?.title).toBe("rhein");
+      const calendar = render({
+        allOffers: ALL,
+        savedIds: [RHEIN.id],
+        route: { tab: "merkliste-kalender", filter: EMPTY_FILTER },
+      }).savedCalendar;
+      expect([...(calendar?.index.keys() ?? [])]).toEqual(["2026-10-11"]);
+    });
+
+    it("Karte der Merkliste zählt nur Gemerktes im Netz, Startausschnitt aus dem Netz", () => {
+      const v = render({
+        allOffers: ALL,
+        savedIds: [RHEIN.id, BABY.id],
+        route: { tab: "merkliste-karte", filter: EMPTY_FILTER },
+      });
+      expect(v.map?.placeCount).toBe(1);
+      expect(v.map?.cameraOffers.map((o) => o.title)).toEqual(["baby", "gross"]);
+    });
+
+    it("ohne allOffers wie bisher: alles aus offers", () => {
+      expect(savedTitles(render({ savedIds: [BABY.id] }))).toEqual(["baby"]);
+    });
   });
 
   describe("Kalender der Merkliste (Plan 0025, E5, E8)", () => {

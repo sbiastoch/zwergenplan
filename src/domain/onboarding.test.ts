@@ -110,8 +110,8 @@ describe("cityChoices (E5)", () => {
 
 describe("welcomeStats (E5)", () => {
   it("zählt nur Angebote mit kommendem Termin und jeden Anbieter einmal", () => {
-    // Fixtures: 9 Angebote, das Elterncafé ist am 5.10. um 12 Uhr vorbei; 5 Anbieter
-    expect(welcomeStats(fixtureSiteOffers(), FIXTURE_NOW)).toEqual({ offers: 8, providers: 5 });
+    // Fixtures: 11 Angebote, das Elterncafé ist am 5.10. um 12 Uhr vorbei; 6 Anbieter (einer in Düsseldorf)
+    expect(welcomeStats(fixtureSiteOffers(), FIXTURE_NOW)).toEqual({ offers: 10, providers: 6 });
   });
 
   it("ein Anbieter nur mit beendeten Angeboten zählt nicht", () => {
