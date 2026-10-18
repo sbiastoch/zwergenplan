@@ -5,7 +5,7 @@
  */
 import { readFileSync } from "node:fs";
 import type { BrowserContext, Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, isTransitLines, isTransitTable, MAP_READY, test } from "./fixtures.ts";
 import { expectMobileUx } from "./mobile-ux.ts";
 
 /** Fixture-Datenstand (tests/fixtures/offers.json, generatedAt 5.10.2026) */
@@ -13,8 +13,9 @@ const OFFLINE_NOTE = "Offline – Stand vom 5.10.";
 const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof";
 /** Beispielhof ab Gostenhof direkt mit Tram 1 (Plan 0012, E1; Fixture wie in startpunkt.spec.ts) */
 const KRABBELTREFF_TRAM = "ca. 15 Min. mit Tram\u00a01 ab Gostenhof";
-const isTable = (url: string) => new URL(url).pathname.endsWith("/data/wegzeit.json");
-const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.json");
+// Tabelle und Linien des Netzes (Plan 0039, E5; Matcher aus fixtures.ts)
+const isTable = (url: string) => isTransitTable(url);
+const isLines = (url: string) => isTransitLines(url);
 const offers = (page: Page) => page.getByTestId("offer");
 const isSite = (url: string) => new URL(url).pathname.endsWith("/data/site.json");
 
@@ -297,7 +298,7 @@ test("6 online kommt site.json aus dem Netz (ohne X-Zp-Cache), durch den Service
   await expect(page.getByRole("status")).not.toContainText("Offline");
 });
 
-test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request auf wegzeit.json (E4a)", async ({
+test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request auf die Tabelle (E4a)", async ({
   page,
 }) => {
   await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
@@ -320,8 +321,8 @@ test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request au
   await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
   await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
   await page.waitForTimeout(300);
-  expect(tables, "genau ein weiterer Request auf wegzeit.json").toHaveLength(1);
-  expect(lines, "genau ein weiterer Request auf linien.json (Plan 0012)").toHaveLength(1);
+  expect(tables, "genau ein weiterer Request auf die Tabelle").toHaveLength(1);
+  expect(lines, "genau ein weiterer Request auf die Linien (Plan 0012)").toHaveLength(1);
 });
 
 test.describe("Laufzeit-Cache der Daten (Arch-Review Stufe 1, B1)", () => {
@@ -336,7 +337,7 @@ test.describe("Laufzeit-Cache der Daten (Arch-Review Stufe 1, B1)", () => {
     const lines = page.waitForResponse((r) => isLines(r.url()) && r.ok());
     await page.reload();
     expect((await table).fromServiceWorker()).toBe(true);
-    expect((await lines).fromServiceWorker(), "linien.json über den Service Worker (Plan 0012)").toBe(true);
+    expect((await lines).fromServiceWorker(), "Linien über den Service Worker (Plan 0012)").toBe(true);
     await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
     await context.setOffline(true);
     await page.reload();

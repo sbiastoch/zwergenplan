@@ -27,6 +27,29 @@ const TILE_FIXTURES = "tests/fixtures/karte";
 /** Push-Worker (Plan 0017): nur mit `test.use({ pushWorker: "mock" })`, dann protokolliert statt im Netz */
 const PUSH_ORIGIN = new URL(PUSH_WORKER_URL).origin;
 
+/**
+ * Wegzeit-Tabelle bzw. Linien eines Netzes (Plan 0039, E5; Review M3): `data/wegzeit/<netz>.json` bzw.
+ * `data/linien/<netz>.json`, ohne `network` jedes Netz. Für `page.route` als Prädikat: `(u) => isTransitTable(u.href)`.
+ * Der Kanarientest in `startpunkt.spec.ts` belegt, dass sie den tatsächlich geladenen Request treffen und die alten
+ * Pfade `data/wegzeit.json`, `data/linien.json` nie angefragt werden; sonst würden Datenschutz-Zählungen leer grün.
+ */
+export function isTransitTable(url: string, network?: "vgn" | "vrr"): boolean {
+  return transitPath(url, "wegzeit", network);
+}
+
+export function isTransitLines(url: string, network?: "vgn" | "vrr"): boolean {
+  return transitPath(url, "linien", network);
+}
+
+function transitPath(url: string, kind: "wegzeit" | "linien", network: string | undefined): boolean {
+  const match = new URL(url).pathname.match(/\/data\/(wegzeit|linien)\/(vgn|vrr)\.json$/);
+  return match?.[1] === kind && (network === undefined || match[2] === network);
+}
+
+/** Konsolenfehler eines abgebrochenen Requests auf Tabelle bzw. Linien (für `allowedConsoleErrors`) */
+export const TRANSIT_TABLE_ERROR = /\/data\/wegzeit\/(vgn|vrr)\.json\b/;
+export const TRANSIT_LINES_ERROR = /\/data\/linien\/(vgn|vrr)\.json\b/;
+
 /** Ein vom Push-Mock beantworteter Request: Methode, Pfad und JSON-Body */
 export interface PushRequest {
   method: string;
@@ -317,20 +340,23 @@ export async function expectTwoLines(el: Locator, spoken: string) {
  * (Plan 0012, E1/E4). Kennung und Minuten bleiben, die Datei passt also weiter zur Tabelle.
  */
 export async function twoLinesEverywhere(page: Page) {
-  await page.route("**/data/linien.json", async (route) => {
-    const response = await route.fetch();
-    const file: { lines: string[]; first: string; second: string } = await response.json();
-    const bytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    const tram = file.lines.indexOf("Tram\u00a01") + 1;
-    const bus = file.lines.indexOf("Bus\u00a0202E") + 1;
-    if (tram === 0 || bus === 0) throw new Error(`Fixture-Linien unerwartet: ${file.lines.join(", ")}`);
-    const first = bytes(file.first);
-    const second = bytes(file.second);
-    first.forEach((v, i) => {
-      if (v === tram && second[i] === 0) second[i] = bus;
-    });
-    await route.fulfill({ response, json: { ...file, second: btoa(String.fromCharCode(...second)) } });
-  });
+  await page.route(
+    (url) => isTransitLines(url.href, "vgn"),
+    async (route) => {
+      const response = await route.fetch();
+      const file: { lines: string[]; first: string; second: string } = await response.json();
+      const bytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const tram = file.lines.indexOf("Tram\u00a01") + 1;
+      const bus = file.lines.indexOf("Bus\u00a0202E") + 1;
+      if (tram === 0 || bus === 0) throw new Error(`Fixture-Linien unerwartet: ${file.lines.join(", ")}`);
+      const first = bytes(file.first);
+      const second = bytes(file.second);
+      first.forEach((v, i) => {
+        if (v === tram && second[i] === 0) second[i] = bus;
+      });
+      await route.fulfill({ response, json: { ...file, second: btoa(String.fromCharCode(...second)) } });
+    },
+  );
 }
 
 export { expect };

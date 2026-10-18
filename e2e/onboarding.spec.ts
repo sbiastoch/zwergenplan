@@ -9,7 +9,7 @@
  * deshalb in `onboarding-push.spec.ts`.
  */
 import type { Page } from "@playwright/test";
-import { expect, startPreloads, test } from "./fixtures.ts";
+import { expect, isTransitLines, isTransitTable, startPreloads, test } from "./fixtures.ts";
 import {
   expectAccessible,
   expectMobileUx,
@@ -179,17 +179,20 @@ test.describe("Test 4: Weg und Privatsphäre", () => {
   }) => {
     const transit: string[] = [];
     page.on("request", (req) => {
-      const path = new URL(req.url()).pathname;
-      if (/\/data\/(wegzeit|linien)\.json$/.test(path)) transit.push(path.slice(path.lastIndexOf("/") + 1));
+      if (isTransitTable(req.url())) transit.push("wegzeit");
+      if (isTransitLines(req.url())) transit.push("linien");
     });
     let release = () => {};
     const held = new Promise<void>((resolve) => {
       release = resolve;
     });
-    await page.route("**/data/wegzeit.json", async (route) => {
-      await held;
-      await route.continue();
-    });
+    await page.route(
+      (url) => isTransitTable(url.href),
+      async (route) => {
+        await held;
+        await route.continue();
+      },
+    );
     await opened(page);
     await goTo(page, "alter");
     await intro(page).getByLabel("Geburtsdatum").fill("20.04.2026");
@@ -197,7 +200,7 @@ test.describe("Test 4: Weg und Privatsphäre", () => {
 
     await goTo(page, "weg");
     // Linien kommen erst nach der Tabelle (use-transit.ts); die Tabelle hält der Test noch fest
-    await expect.poll(() => transit).toEqual(["wegzeit.json"]);
+    await expect.poll(() => transit).toEqual(["wegzeit"]);
     const chips = intro(page).getByRole("group", { name: "Höchstens unterwegs" });
     await expect(chips.getByRole("button")).toHaveText(["20 Min.", "30 Min.", "45 Min.", "Egal"]);
     await intro(page).getByRole("combobox", { name: "Stadtteil" }).selectOption("gostenhof");
@@ -206,11 +209,11 @@ test.describe("Test 4: Weg und Privatsphäre", () => {
     await expect(chips.getByRole("button", { name: "Egal" })).toBeEnabled();
     release();
     await expect(chips.getByRole("button", { name: "30 Min." })).toBeEnabled();
-    await expect.poll(() => [...transit].sort()).toEqual(["linien.json", "wegzeit.json"]);
+    await expect.poll(() => [...transit].sort()).toEqual(["linien", "wegzeit"]);
     await chips.getByRole("button", { name: "30 Min." }).click();
     await expect(chips.getByRole("button", { name: "30 Min." })).toHaveAttribute("aria-pressed", "true");
 
-    expect([...transit].sort(), "keine weiteren Requests nach Wahl und Chip").toEqual(["linien.json", "wegzeit.json"]);
+    expect([...transit].sort(), "keine weiteren Requests nach Wahl und Chip").toEqual(["linien", "wegzeit"]);
     const url = new URL(page.url());
     expect([...url.searchParams.keys()]).toEqual(["wegzeit"]);
     expect(url.searchParams.get("wegzeit")).toBe("30");
@@ -369,8 +372,8 @@ test.describe("Test 10: Bestandsnutzer und Privatsphäre", () => {
     });
     const tables: string[] = [];
     page.on("request", (req) => {
-      const name = /\/(wegzeit|linien)\.json$/.exec(new URL(req.url()).pathname)?.[1];
-      if (name) tables.push(name);
+      if (isTransitTable(req.url())) tables.push("wegzeit");
+      if (isTransitLines(req.url())) tables.push("linien");
     });
     await opened(page);
     await goTo(page, "alter");
@@ -1006,18 +1009,21 @@ test.describe("Nachtrag 2026-10-11: Dropdown und Standort im Schritt Weg", () =>
     // Halt der Wegzeit-Tabelle dort, sonst wäre der Standort „außerhalb“ und „Dein Standort“ fehlte.
     const worst = { latitude: 49.413, longitude: 11.009 };
     await context.setGeolocation(worst);
-    await page.route("**/data/wegzeit.json", async (route) => {
-      const response = await route.fetch();
-      const table = (await response.json()) as { lat: number[]; lon: number[] };
-      // Koordinaten als Differenzen in 1e-4 Grad (`undelta` in src/domain/transit.ts)
-      const moveLast = (deltas: number[], to: number) => {
-        const before = deltas.slice(0, -1).reduce((sum, d) => sum + d, 0);
-        deltas[deltas.length - 1] = Math.round(to * 1e4) - before;
-      };
-      moveLast(table.lat, worst.latitude);
-      moveLast(table.lon, worst.longitude);
-      await route.fulfill({ response, json: table });
-    });
+    await page.route(
+      (url) => isTransitTable(url.href),
+      async (route) => {
+        const response = await route.fetch();
+        const table = (await response.json()) as { lat: number[]; lon: number[] };
+        // Koordinaten als Differenzen in 1e-4 Grad (`undelta` in src/domain/transit.ts)
+        const moveLast = (deltas: number[], to: number) => {
+          const before = deltas.slice(0, -1).reduce((sum, d) => sum + d, 0);
+          deltas[deltas.length - 1] = Math.round(to * 1e4) - before;
+        };
+        moveLast(table.lat, worst.latitude);
+        moveLast(table.lon, worst.longitude);
+        await route.fulfill({ response, json: table });
+      },
+    );
     await opened(page);
     await goTo(page, "weg");
     await intro(page).getByRole("button", { name: "Standort", exact: true }).click();

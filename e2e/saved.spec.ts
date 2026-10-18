@@ -4,7 +4,7 @@
  */
 import { readFileSync } from "node:fs";
 import type { Download, Page } from "@playwright/test";
-import { expect, MAP_READY, startPreloads, test } from "./fixtures.ts";
+import { expect, isTransitTable, MAP_READY, startPreloads, test } from "./fixtures.ts";
 import { expectMobileUx, setTextScale } from "./mobile-ux.ts";
 
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
@@ -258,7 +258,7 @@ async function mapSettled(page: Page) {
 function tableRequests(page: Page): string[] {
   const requests: string[] = [];
   page.on("request", (req) => {
-    if (new URL(req.url()).pathname.endsWith("/data/wegzeit.json")) requests.push(req.url());
+    if (isTransitTable(req.url())) requests.push(req.url());
   });
   return requests;
 }
@@ -267,6 +267,35 @@ const tabButton = (page: Page, name: string) =>
   page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
 const segment = (page: Page, name: "Liste" | "Karte" | "Kalender") =>
   page.getByRole("group", { name: "Darstellung der Merkliste" }).getByRole("button", { name, exact: true });
+
+test.describe("Angebot aus dem anderen Netz (Plan 0039, E8)", () => {
+  /** Krabbelgruppe am Rhein (Düsseldorf, Fixture) und Offener Krabbeltreff (Nürnberg) */
+  const RHEIN_ID = "hcv2g8og";
+
+  test("Merkliste zeigt es mit „in Düsseldorf“ statt Entfernung, auch mit Startpunkt", async ({ page }) => {
+    await preset(page, ["lxizt974", RHEIN_ID]);
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await page.goto("./?ansicht=merkliste");
+    const rhein = page.getByTestId("offer").filter({ hasText: "Krabbelgruppe am Rhein" });
+    const treff = page.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" });
+    await expect(page.getByTestId("offer")).toHaveCount(2);
+    await expect(rhein.locator(".dist")).toHaveText("in Düsseldorf");
+    await expect(treff.locator(".dist")).toHaveText("15 Min.");
+    await expect(rhein).not.toContainText("km");
+    // „Entdecken“ zeigt nur das Netz der Stadt (ohne gespeicherte Stadt Nürnberg)
+    await tabButton(page, "Angebote").click();
+    await expect(page.getByTestId("offer").filter({ hasText: "Krabbelgruppe am Rhein" })).toHaveCount(0);
+    await expect(page.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" })).toBeVisible();
+  });
+
+  test("Deep-Link öffnet es auch bei Nürnberg, ohne Wegzeit", async ({ page }) => {
+    await page.goto(`./?angebot=${RHEIN_ID}`);
+    const detail = page.getByRole("dialog", { name: "Krabbelgruppe am Rhein" });
+    await expect(detail).toBeVisible();
+    await expect(detail).toContainText("Beispielallee 9, 40210 Düsseldorf");
+    await expect(detail.locator(".reach-long")).toHaveCount(0);
+  });
+});
 
 test("Merkliste mit langen IDs (vor ADR 0022): zeigt die Angebote und ist danach auf Kurz-IDs umgeschrieben", async ({
   page,

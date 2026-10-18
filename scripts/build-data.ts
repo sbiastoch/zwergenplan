@@ -4,7 +4,6 @@
  *   public/data/anbieter.json (Anbieterübersicht, lädt erst beim Öffnen; Plan 0010, E6),
  *   public/data/wegzeit/<netz>.json (Wegzeit-Tabelle aus dem Fahrplanauszug je Netz, Plan 0009, E5/E7; Plan 0039, E5),
  *   public/data/linien/<netz>.json (Linien je Zelle der Tabelle, Plan 0012, E7),
- *   übergangsweise public/data/wegzeit.json und linien.json als Kopie von vgn (bis Plan 0039, S6),
  *   public/a/<id>/, public/p/<publicId>/, public/404.html (Vorschauseiten zum Teilen, Plan 0026, ADR 0020/0022),
  *   public/impressum/index.html (Impressum und Datenschutz, Plan 0034)
  * Ungültige Daten, ein ungültiger oder fehlender Auszug → Exit 1 → kein Build, kein Deploy
@@ -119,12 +118,6 @@ for (const network of NETWORK_IDS) {
   const seconds = (performance.now() - started) / 1000;
   write(`data/wegzeit/${network}.json`, JSON.stringify(table));
   write(`data/linien/${network}.json`, JSON.stringify(lines));
-  if (network === "vgn") {
-    // Übergang bis Plan 0039, S6: Browser, Service Worker und E2E lesen noch die alten Pfade; S6 stellt sie um und
-    // entfernt diese Kopie.
-    write("data/wegzeit.json", JSON.stringify(table));
-    write("data/linien.json", JSON.stringify(lines));
-  }
   const took = seconds.toLocaleString("de-DE", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
   console.log(`✓ Wegzeit ${network}: ${table.lat.length} Halte × ${table.places.length} Orte in ${took} s`);
   console.log(

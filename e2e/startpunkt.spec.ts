@@ -12,7 +12,17 @@
  * Luftlinie: Theater 226 m, Beispielhof 1 427 m, Bibliothek 1 689 m, Musikschule 2 358 m, Gemeinde 3 008 m.
  */
 import type { Page } from "@playwright/test";
-import { expect, expectTwoLines, MAP_READY, startPreloads, test } from "./fixtures.ts";
+import {
+  expect,
+  expectTwoLines,
+  isTransitLines,
+  isTransitTable,
+  MAP_READY,
+  startPreloads,
+  TRANSIT_LINES_ERROR,
+  TRANSIT_TABLE_ERROR,
+  test,
+} from "./fixtures.ts";
 import { setTextScale } from "./mobile-ux.ts";
 import { ONBOARDING_FLAG } from "./onboarding-flag.ts";
 
@@ -24,12 +34,13 @@ const STORED_MAP_CENTER = '{"source":"karte","lat":49.452,"lon":11.077}';
 const WEGZEIT_STANDORT = "Wegzeit ab deinem Standort";
 /** Eine Koordinate mit mindestens zwei Nachkommastellen, z. B. „49.45“ */
 const COORDINATE = /\d{2}\.\d{2,}/;
-const TABLE = "**/data/wegzeit.json";
+/** Tabelle und Linien jedes Netzes (Plan 0039, E5; Matcher aus fixtures.ts, Kanarientest unten) */
+const isTable = (url: string) => isTransitTable(url);
+const TABLE = (url: URL) => isTransitTable(url.href);
 const CHUNK = "**/assets/oepnv/*.js";
-const isTable = (url: string) => new URL(url).pathname.endsWith("/data/wegzeit.json");
 const isChunk = (url: string) => /\/assets\/oepnv\/[^/]+\.js$/.test(new URL(url).pathname);
-const LINES = "**/data/linien.json";
-const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.json");
+const isLines = (url: string) => isTransitLines(url);
+const LINES = (url: URL) => isTransitLines(url.href);
 const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof";
 const NB = "\u00a0";
 /** Offener Krabbeltreff (Fixture), für die vorbelegte Merkliste (Plan 0025) */
@@ -259,7 +270,7 @@ test.describe("Statuszeile auf „Karte“", () => {
   });
 });
 
-test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request auf wegzeit.json und linien.json (E9)", async ({
+test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request auf Tabelle und Linien (E9)", async ({
   page,
 }) => {
   const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
@@ -320,7 +331,7 @@ test.describe("Gespeicherter Stadtteil", () => {
   // Die Karte (zweiter Auslöser) lädt Kacheln
   test.use({ tiles: "mock" });
 
-  test("genau ein Request beim Start, auch auf linien.json; Kind-Sheet und Karte laden nicht erneut (E9)", async ({
+  test("genau ein Request beim Start, auch auf die Linien; Kind-Sheet und Karte laden nicht erneut (E9)", async ({
     page,
   }) => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
@@ -336,6 +347,74 @@ test.describe("Gespeicherter Stadtteil", () => {
     await page.waitForTimeout(300);
     expect(requests).toHaveLength(1);
     expect(lines).toHaveLength(1);
+  });
+});
+
+/**
+ * Kanarientest (Plan 0039, Review M3): Die Matcher aus fixtures.ts treffen den tatsächlich geladenen Request, und die
+ * alten Pfade `data/wegzeit.json`, `data/linien.json` werden nie angefragt. Sonst zählten die Datenschutz-Prüfungen
+ * („kein Request ab der Wahl“) leer und blieben grün. Ohne gespeicherte Stadt lädt die Tabelle von vgn.
+ */
+test.describe("Wegzeit je Netz (Plan 0039, E5)", () => {
+  test.use({ tiles: "mock" });
+
+  test("Kanarienvogel: Matcher treffen die geladenen Requests, alte Pfade nie; ohne Stadt vgn", async ({ page }) => {
+    const all = collectRequests(page);
+    const tables = tableRequests(page);
+    const lines = tableRequests(page, isLines);
+    await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expect.poll(() => lines.length).toBe(1);
+    const sheet = await openKidSheet(page);
+    await sheet.getByRole("button", { name: "Fertig" }).click();
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await mapSettled(page);
+    expect(tables.map((u) => new URL(u).pathname)).toEqual([expect.stringMatching(/\/data\/wegzeit\/vgn\.json$/)]);
+    expect(lines.map((u) => new URL(u).pathname)).toEqual([expect.stringMatching(/\/data\/linien\/vgn\.json$/)]);
+    const old = all.filter((u) => /\/data\/(wegzeit|linien)\.json$/.test(new URL(u).pathname));
+    expect(old, "alte Pfade nie angefragt").toEqual([]);
+    expect(all.filter((u) => isTransitTable(u, "vrr") || isTransitLines(u, "vrr"))).toEqual([]);
+  });
+
+  test("Düsseldorf gewählt: nur Düsseldorfer Angebote, wegzeit/vrr.json genau einmal ab gespeichertem Stadtteil", async ({
+    page,
+  }) => {
+    const tables = tableRequests(page);
+    const lines = tableRequests(page, isLines);
+    await page.addInitScript((key) => {
+      localStorage.setItem("zwergenplan.stadt", "duesseldorf");
+      localStorage.setItem(key, "duesseldorf-stadtmitte");
+    }, KEY);
+    await ready(page);
+    await expect(page.getByRole("status")).toContainText("Wegzeit ab Stadtmitte (Düsseldorf)");
+    await expect(offers(page)).toHaveCount(2);
+    await expect(card(page, "Krabbelgruppe am Rhein")).toBeVisible();
+    await expect(card(page, "Rheinzwerge-Liederkonzert")).toBeVisible();
+    await expect(card(page, "Offener Krabbeltreff")).toHaveCount(0);
+    // Tram 709 vom Halt an der Stadtmitte zum Familienzentrum (Fixture-Netz tests/fixtures/oepnv/vrr.json)
+    await expect(card(page, "Krabbelgruppe am Rhein").locator(".dist")).toHaveText(/Min\.$/);
+    await expect.poll(() => lines.length).toBe(1);
+    const sheet = await openKidSheet(page);
+    await sheet.getByRole("button", { name: "Fertig" }).click();
+    await page.waitForTimeout(300);
+    expect(tables.map((u) => new URL(u).pathname)).toEqual([expect.stringMatching(/\/data\/wegzeit\/vrr\.json$/)]);
+    expect(lines.map((u) => new URL(u).pathname)).toEqual([expect.stringMatching(/\/data\/linien\/vrr\.json$/)]);
+  });
+
+  test("Düsseldorf gewählt, Nürnberger Stadtteil gespeichert: kein Startpunkt, kein Request beim Start", async ({
+    page,
+  }) => {
+    const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
+    await page.addInitScript((key) => {
+      localStorage.setItem("zwergenplan.stadt", "duesseldorf");
+      localStorage.setItem(key, "gostenhof");
+    }, KEY);
+    await ready(page);
+    await expect(offers(page)).toHaveCount(2);
+    await expect(page.getByRole("status")).not.toContainText("Wegzeit");
+    await page.waitForTimeout(300);
+    expect(requests).toEqual([]);
   });
 });
 
@@ -409,9 +488,7 @@ test("Standort mit Freigabe: gerundet gespeichert, Wegzeit, ab dem Tipp kein Req
 });
 
 test.describe("Gespeicherter Standort (Plan 0016)", () => {
-  test("genau ein Request beim Start auf wegzeit.json und linien.json, Kind-Sheet zeigt „Mein Standort“", async ({
-    page,
-  }) => {
+  test("genau ein Request beim Start auf Tabelle und Linien, Kind-Sheet zeigt „Mein Standort“", async ({ page }) => {
     await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
       key: POINT_KEY,
       value: STORED_HERE,
@@ -550,7 +627,7 @@ test("Standort antwortet nie: Knopf bleibt fokussiert und „busy“, nach 15 s 
 
 test.describe("Rückfall auf die Luftlinie (E11)", () => {
   // Der abgebrochene Request meldet sich in beiden Engines in der Konsole.
-  test.use({ allowedConsoleErrors: [/\/data\/wegzeit\.json\b/] });
+  test.use({ allowedConsoleErrors: [TRANSIT_TABLE_ERROR] });
 
   test("Tabelle nicht ladbar: Luftlinie, gesperrte Chips, „Nochmal laden“ bringt die Minuten", async ({ page }) => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
@@ -598,7 +675,7 @@ test.describe("Rückfall auf die Luftlinie (E11)", () => {
   });
 });
 
-// Arch-Review 0009, Befund 2: Eine alte wegzeit.json (HTTP-Cache) passt nicht zu site.json. „Nochmal laden“ muss
+// Arch-Review 0009, Befund 2: Eine alte Tabelle (HTTP-Cache) passt nicht zu site.json. „Nochmal laden“ muss
 // dann wirklich neu laden, und zwar am HTTP-Cache vorbei, sonst käme dieselbe Datei wieder.
 test("Veraltete Tabelle: Hinweis, „Nochmal laden“ lädt ohne Cache neu und bringt die Minuten (E8, E11)", async ({
   page,
@@ -609,7 +686,7 @@ test("Veraltete Tabelle: Hinweis, „Nochmal laden“ lädt ohne Cache neu und b
   await page.addInitScript(() => {
     const original = window.fetch;
     window.fetch = (input, init) => {
-      if (String(input).endsWith("/data/wegzeit.json")) {
+      if (/\/data\/wegzeit\/(vgn|vrr)\.json$/.test(String(input))) {
         const seen = sessionStorage.getItem("e2e-wegzeit-cache");
         sessionStorage.setItem("e2e-wegzeit-cache", `${seen ? `${seen} ` : ""}${init?.cache}`);
       }
@@ -692,7 +769,7 @@ test.describe("Rechenlogik und Tabelle nicht ladbar (N1)", () => {
   test.use({
     // ein Muster: Ein Array mit zwei Elementen läse Playwright als Tupel [Wert, Optionen]
     allowedConsoleErrors: [
-      /\/assets\/oepnv\/\S+ .*(ERR_FAILED|Failed to load|Failed to fetch dynamically imported module)|\/data\/wegzeit\.json\b/,
+      /\/assets\/oepnv\/\S+ .*(ERR_FAILED|Failed to load|Failed to fetch dynamically imported module)|\/data\/wegzeit\/(vgn|vrr)\.json\b/,
     ],
   });
 
@@ -1059,9 +1136,9 @@ test("Wege ab Gostenhof: Hauptweg mit Umstieg, zu Fuß als anderer Weg", async (
 test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
   test.describe("abgebrochen", () => {
     // Der abgebrochene Request meldet sich je nach Engine in der Konsole.
-    test.use({ allowedConsoleErrors: [/\/data\/linien\.json\b/] });
+    test.use({ allowedConsoleErrors: [TRANSIT_LINES_ERROR] });
 
-    test("linien.json abgebrochen: „mit Bus & Bahn“, Minuten und Filter wirken", async ({ page }) => {
+    test("Linien abgebrochen: „mit Bus & Bahn“, Minuten und Filter wirken", async ({ page }) => {
       await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
       await page.route(LINES, (route) => route.abort());
       await ready(page, "./?wegzeit=20");
@@ -1074,7 +1151,7 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
     });
 
     // Gegentest zu „Wege ab Gostenhof“ (Plan 0019, Review 3, M1): Musikgarten hätte mit Linien eine Karte
-    test("linien.json abgebrochen: keine Karte „Wege ab …“ beim Musikgarten", async ({ page }) => {
+    test("Linien abgebrochen: keine Karte „Wege ab …“ beim Musikgarten", async ({ page }) => {
       await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
       await page.route(LINES, (route) => route.abort());
       await ready(page);
@@ -1088,7 +1165,7 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
     });
   });
 
-  test("linien.json passt nicht zur Tabelle (fremde Kennung): „mit Bus & Bahn“, Minuten unverändert, kein Neuladen (Arch-Review 0012, H9)", async ({
+  test("Linien passen nicht zur Tabelle (fremde Kennung): „mit Bus & Bahn“, Minuten unverändert, kein Neuladen (Arch-Review 0012, H9)", async ({
     page,
   }) => {
     await page.route(LINES, async (route) => {
@@ -1110,7 +1187,7 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
     expect(await page.evaluate(() => "zpOhneNeuladen" in window), "kein Neuladen").toBe(true);
   });
 
-  test("linien.json kommt 1,5 s später: erst „mit Bus & Bahn“, dann die Linien ohne Interaktion (Review B1)", async ({
+  test("Linien kommen 1,5 s später: erst „mit Bus & Bahn“, dann die Linien ohne Interaktion (Review B1)", async ({
     page,
   }) => {
     let release: () => void = () => {};

@@ -8,7 +8,7 @@
  * → „15 Min.“, Gemeinde 23,6 → „25 Min.“ (Tram 1 → Bus 202E), Musikschule 29,6 → „30 Min.“.
  */
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, isTransitTable, TRANSIT_TABLE_ERROR, test } from "./fixtures.ts";
 import { clsFrom, observeVitals, readVitals } from "./vitals.ts";
 
 const BIBLIOTHEK = "Bibliothek Beispiel (fiktiv)";
@@ -66,10 +66,13 @@ test.describe("Startpunkt Gostenhof", () => {
   });
 
   test.describe("Tabelle fehlt", () => {
-    test.use({ allowedConsoleErrors: [/\/data\/wegzeit\.json\b/] });
+    test.use({ allowedConsoleErrors: [TRANSIT_TABLE_ERROR] });
 
     test("Rückfall auf die Luftlinie: nach Entfernung sortiert, mit m bzw. km", async ({ page }) => {
-      await page.route("**/data/wegzeit.json", (route) => route.fulfill({ status: 404 }));
+      await page.route(
+        (url) => isTransitTable(url.href),
+        (route) => route.fulfill({ status: 404 }),
+      );
       await storeGostenhof(page);
       await openList(page);
       await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
@@ -86,10 +89,13 @@ test.describe("Startpunkt Gostenhof", () => {
     const held = new Promise<void>((resolve) => {
       release = resolve;
     });
-    await page.route("**/data/wegzeit.json", async (route) => {
-      await held;
-      await route.continue();
-    });
+    await page.route(
+      (url) => isTransitTable(url.href),
+      async (route) => {
+        await held;
+        await route.continue();
+      },
+    );
     await observeVitals(page);
     await storeGostenhof(page);
     await openList(page);

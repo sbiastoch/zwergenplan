@@ -4,7 +4,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, isTransitLines, MAP_READY, test } from "./fixtures.ts";
 import {
   expectAccessible,
   expectMobileUx,
@@ -79,10 +79,10 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
 }) => {
   const meta = await openAtDataTime(page);
   test.skip(meta.offers === 0, "keine Daten");
-  const lines = page.waitForResponse((r) => r.url().endsWith("/data/linien.json") && r.ok());
+  const lines = page.waitForResponse((r) => isTransitLines(r.url(), "vgn") && r.ok());
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
-  // Quellenhinweis aus der echten wegzeit.json (CC BY-SA 3.0 DE, E3)
+  // Quellenhinweis aus der echten Tabelle von vgn (CC BY-SA 3.0 DE, E3)
   await expect(sheet.getByRole("link", { name: /^VGN-Soll-Daten vom / })).toBeVisible();
   await expect(sheet.getByRole("link", { name: "CC BY-SA 3.0 DE" })).toHaveAttribute(
     "href",
@@ -99,7 +99,7 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
   // Knopf-Beschriftungen mit Daten dürfen umbrechen: Prüfung 5 nur mit Fixtures (Plan 0007, E10).
   await expectMobileUx(page, { buttons: false });
 
-  // Plan 0012, E5 (Review W3): Die echte linien.json passt zur Tabelle, mindestens ein Detail nennt Linien.
+  // Plan 0012, E5 (Review W3): Die echten Linien von vgn passen zur Tabelle, mindestens ein Detail nennt Linien.
   await lines;
   const titles = page.getByTestId("offer").getByRole("heading", { level: 3 });
   const named: string[] = [];

@@ -2,7 +2,7 @@
  * Web-Vitals unter Mobile-Bedingungen (CPU 4× gedrosselt, langsames Netz).
  * Nur Chromium: CDP-Drosselung und LCP-API gibt es nur dort. Der Schrift-Swap steht in font-swap.spec.ts.
  */
-import { expect, test } from "./fixtures.ts";
+import { expect, isTransitTable, test } from "./fixtures.ts";
 import { clsFrom, observeVitals, readVitals, throttleMobile } from "./vitals.ts";
 
 const BUDGET = { lcpMs: 2500, cls: 0.05 };
@@ -40,10 +40,13 @@ test("Wegzeit lädt bei gespeichertem Stadtteil und ?wegzeit=: kein Flackern, CL
   test.skip(browserName !== "chromium" || !isMobile, "nur Chromium-Mobile");
   await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
   // Tabelle zusätzlich zum gedrosselten Netz um 1,5 s verzögert: Laden und Umschalten auf die gefilterte Liste
-  await page.route("**/data/wegzeit.json", async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    await route.continue();
-  });
+  await page.route(
+    (url) => isTransitTable(url.href),
+    async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    },
+  );
   await throttleMobile(page);
   await observeVitals(page);
   await page.goto("./?wegzeit=20");

@@ -1,6 +1,6 @@
 /** Mobile-UX-Gates für jede Ansicht und jedes Overlay, hell und dunkel (Plan 0003, Plan 0007, docs/architecture.md). */
 import type { Page } from "@playwright/test";
-import { expect, MAP_READY, test, twoLinesEverywhere } from "./fixtures.ts";
+import { expect, isTransitTable, MAP_READY, TRANSIT_TABLE_ERROR, test, twoLinesEverywhere } from "./fixtures.ts";
 import {
   backgroundLuminance,
   expectAccessible,
@@ -93,8 +93,8 @@ const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-f
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
 const CONSOLE_ERRORS: Record<string, RegExp[]> = {
-  "entdecken-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
-  "filter-sheet-wegzeit-rueckfall": [/\/data\/wegzeit\.json\b/],
+  "entdecken-wegzeit-rueckfall": [TRANSIT_TABLE_ERROR],
+  "filter-sheet-wegzeit-rueckfall": [TRANSIT_TABLE_ERROR],
   "anbieter-fehler": [/\/data\/anbieter\.json\b/],
   "anbieter-sheet-fehler": [/\/data\/anbieter\.json\b/],
 };
@@ -336,7 +336,10 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   },
   // Tabelle blockiert (E11): Luftlinie, längste Statuszeile und Hinweis mit „Nochmal laden“
   "entdecken-wegzeit-rueckfall": async (page) => {
-    await page.route("**/data/wegzeit.json", (route) => route.abort());
+    await page.route(
+      (url) => isTransitTable(url.href),
+      (route) => route.abort(),
+    );
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await page.goto("./?wegzeit=30");
     await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
@@ -347,7 +350,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   // 0009, Befund 5). Das Zeitlimit des Ladens (8 s, `TRANSIT_TIMEOUT_MS`) darf während der Prüfungen nicht ablaufen.
   // Die Uhr anzuhalten geht nicht, axe braucht laufende Timer; deshalb fallen die 8-s-Timer weg. Seit Plan 0012
   // nutzt auch das Laden der Linien (`loadLines`) `TRANSIT_TIMEOUT_MS`; hier trifft der Hack aber nur den Timer der
-  // Tabelle, denn die Linien werden erst nach der Antwort von wegzeit.json angefordert, und die hält diese Ansicht
+  // Tabelle, denn die Linien werden erst nach der Antwort der Tabelle angefordert, und die hält diese Ansicht
   // zurück. Sonst gibt es in src keinen 8-s-Timer.
   "entdecken-wegzeit-laedt": async (page) => {
     await page.addInitScript(() => {
@@ -357,7 +360,10 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
           ms === 8000 ? 0 : original(handler, ms, ...args),
       });
     });
-    await page.route("**/data/wegzeit.json", () => {});
+    await page.route(
+      (url) => isTransitTable(url.href),
+      () => {},
+    );
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await page.goto("./?wegzeit=30");
     await expect(page.locator(".list-pending")).toHaveText("Wegzeiten werden geladen …");
@@ -365,7 +371,10 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   },
   // Filter-Sheet bei Tabelle blockiert: gesperrte Chips, Begründung mit „Nochmal laden“ (E11, M6)
   "filter-sheet-wegzeit-rueckfall": async (page) => {
-    await page.route("**/data/wegzeit.json", (route) => route.abort());
+    await page.route(
+      (url) => isTransitTable(url.href),
+      (route) => route.abort(),
+    );
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await page.goto("./");
     await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");

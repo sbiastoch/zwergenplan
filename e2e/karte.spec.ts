@@ -4,7 +4,16 @@
  * `window.__zpMap` gibt es nur im E2E-Build (E13, begründete Ausnahme von „E2E ist Black-Box“).
  */
 import type { BrowserContext, Page } from "@playwright/test";
-import { expect, expectTwoLines, MAP_READY, startPreloads, test, twoLinesEverywhere } from "./fixtures.ts";
+import {
+  expect,
+  expectTwoLines,
+  isTransitLines,
+  isTransitTable,
+  MAP_READY,
+  startPreloads,
+  test,
+  twoLinesEverywhere,
+} from "./fixtures.ts";
 
 const NB = "\u00a0";
 
@@ -145,7 +154,9 @@ test("Startseite lädt weder Karten- noch Wegzeit-Code und fragt OpenFreeMap nic
   await page.goto("./");
   await expect(page.getByTestId("offer").first()).toBeVisible();
   await page.waitForLoadState("networkidle");
-  expect(requests.filter((url) => /\/assets\/(karte|oepnv)\/|openfreemap|\/data\/wegzeit\.json/.test(url))).toEqual([]);
+  expect(requests.filter((url) => /\/assets\/(karte|oepnv)\/|openfreemap/.test(url) || isTransitTable(url))).toEqual(
+    [],
+  );
 });
 
 test.describe("mit gemockten Kacheln", () => {
@@ -293,10 +304,10 @@ test.describe("mit gemockten Kacheln", () => {
     const preloaded = startPreloads(page);
     await page.goto("./");
     await expect(page.getByTestId("offer").first()).toBeVisible();
-    const table = page.waitForResponse((r) => r.url().endsWith("/data/wegzeit.json") && r.ok());
+    const table = page.waitForResponse((r) => isTransitTable(r.url()) && r.ok());
     const chunk = page.waitForResponse((r) => /\/assets\/oepnv\/[^/]+\.js$/.test(r.url()) && r.ok());
     // Plan 0012, E3: die Linien kommen nach Tabelle und Chunk; erst danach beginnt die Zählung
-    const lines = page.waitForResponse((r) => r.url().endsWith("/data/linien.json") && r.ok());
+    const lines = page.waitForResponse((r) => isTransitLines(r.url()) && r.ok());
     await page.getByRole("button", { name: "Karte", exact: true }).click();
     await Promise.all([table, chunk, lines]);
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
@@ -330,7 +341,7 @@ test.describe("mit gemockten Kacheln", () => {
       page.getByRole("dialog").locator(".reach-long"),
       "ca. 30 Min. mit Tram 1, dann Bus 2 ab Gostenhof",
     );
-    // Stadtteil-Zoom lädt Kacheln (erlaubt, ADR 0008); sonst kommt nichts dazu, schon gar nicht wegzeit.json
+    // Stadtteil-Zoom lädt Kacheln (erlaubt, ADR 0008); sonst kommt nichts dazu, schon gar nicht die Wegzeit-Tabelle
     expect(requests.filter((url) => !url.startsWith("https://tiles.openfreemap.org/"))).toEqual([]);
   });
 
@@ -634,6 +645,20 @@ test.describe("mit gemockten Kacheln", () => {
     ).toHaveAttribute("aria-current", "page");
     expect(await camera(page)).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);
+  });
+
+  test("Düsseldorf gewählt: Startausschnitt über den Düsseldorfer Orten, nur deren Marker (Plan 0039, E8)", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.stadt", "duesseldorf"));
+    await openMap(page);
+    await expect(page.getByRole("status")).toContainText("2 Angebote an 1 Ort");
+    await expect(places(page)).toHaveCount(1);
+    await expect(places(page).first()).toContainText("Familienzentrum Rheinzwerge");
+    // ein Ort: Mitte auf ihm (fitBounds mit maxZoom 14), weit weg vom Hauptmarkt
+    const { lat, lng } = await camera(page);
+    expect(Math.abs(lat - 51.2197)).toBeLessThan(0.02);
+    expect(Math.abs(lng - 6.7951)).toBeLessThan(0.02);
   });
 
   test("Startausschnitt verrät weder Standort noch Alter: Standort, Geburtsdatum, „Kurse“ und „bis 20 Min.“ in der Liste, dann Karte (Arch-Review B1, m1; Plan 0009)", async ({

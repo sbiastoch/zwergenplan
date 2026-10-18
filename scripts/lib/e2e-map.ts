@@ -23,7 +23,7 @@ const SHELL: readonly RegExp[] = [
   /^src\/ui\/categories\.ts$/,
 ];
 
-/** `scripts/build-data.ts` schreibt site.json, anbieter.json, wegzeit/linien je Netz (übergangsweise auch wegzeit.json, linien.json), ICS-Dateien und Vorschauseiten. */
+/** `scripts/build-data.ts` schreibt site.json, anbieter.json, wegzeit/linien je Netz, ICS-Dateien und Vorschauseiten. */
 const BUILD_DATA = /^scripts\/build-data\.ts$/;
 /** Vorschauseiten zum Teilen und 404.html (Plan 0026). */
 const SHARE_PAGES = /^scripts\/lib\/share-pages\.ts$/;
@@ -35,7 +35,7 @@ const VITE_SW = /^scripts\/vite-sw\.ts$/;
 /** Je Spec: welche Dateien sie über die Oberfläche treibt. Reihenfolge wie `ls e2e/*.spec.ts`. */
 export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Inhalt der Anbieterliste und des Anbieter-Sheets: Sortierung nach Wegzeit oder Luftlinie, Suche, Sticker-Filter.
-  // Liest anbieter.json und wegzeit.json aus build-data.ts.
+  // Liest anbieter.json und die Wegzeit-Tabelle aus build-data.ts.
   "e2e/anbieter-inhalt.spec.ts": [
     /^src\/ui\/anbieter\//,
     /^src\/ui\/ProviderSearch\.tsx$/,
@@ -150,7 +150,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     VITE_SW,
   ],
   // Installierbare App und Service Worker: Manifest, Precache (vite-sw.ts), offline, Laufzeit-Cache von site.json
-  // und wegzeit.json (build-data.ts), Vorschauseite mit aktivem Service Worker (share-pages.ts), „Alle Termine“
+  // und der Wegzeit (build-data.ts), Vorschauseite mit aktivem Service Worker (share-pages.ts), „Alle Termine“
   // offline (ics-export).
   "e2e/pwa.spec.ts": [
     /^src\/sw\//,
@@ -175,7 +175,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   "e2e/smoke.spec.ts": [/^data\//, BUILD_DATA, SHARE_PAGES, OG_IMAGES, VITE_SW, /^src\/sw\//],
   // Startpunkt und Wegzeit: Kind-Sheet und OriginPicker, Standort, Stadtteil, Tabelle und Linien (use-transit,
   // transit.ts), Rückfall auf die Luftlinie, Wegzeit-Filter im Filter-Sheet, Linien und Route im Detail.
-  // Liest wegzeit.json und linien.json aus build-data.ts.
+  // Liest Wegzeit-Tabelle und Linien je Netz aus build-data.ts.
   "e2e/startpunkt.spec.ts": [
     /^src\/ui\/(KidSheet|OriginPicker|ReachLong|Ways|Sheets)\.tsx$/,
     /^src\/ui\/(origin-state|use-transit|use-app-state|format)\.ts$/,

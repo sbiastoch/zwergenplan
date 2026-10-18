@@ -171,7 +171,8 @@ function payload({ test: isTest = false }: { test?: boolean } = {}) {
 
 /**
  * Push zustellen und die angezeigte Nachricht lesen (danach geschlossen). Zählt dabei die Requests des Service
- * Workers auf `data/` (Privatsphäre: je Push genau einer auf site.json und wegzeit.json, ohne Query).
+ * Workers auf `data/` (Privatsphäre: je Push genau einer auf site.json und die Wegzeit-Tabelle des gespiegelten Netzes,
+ * ohne Query; Plan 0039, E9).
  */
 async function deliver(
   page: Page,
@@ -418,7 +419,8 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   const seen = ids.all.filter((id) => !unseen.includes(id));
   const session = await cdpFor(page, context);
   const startPage = new URL("./", test.info().project.use.baseURL ?? "").href;
-  const SAME_REQUESTS = ["/data/site.json", "/data/wegzeit.json"];
+  // ohne gespiegelte Stadt das Netz vgn (Plan 0039, E9)
+  const SAME_REQUESTS = ["/data/site.json", "/data/wegzeit/vgn.json"];
 
   // ohne Abos und Alter: alle neuen
   await writeStore(page, { seenIds: seen });
@@ -464,6 +466,23 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   const withPoint = await deliver(page, context, session);
   expect(withPoint.title).toBe("1 neues Angebot für deine Suchen");
   expect(withPoint.requests).toEqual(SAME_REQUESTS);
+
+  // gespiegelte Stadt Düsseldorf (Plan 0039, E9): zählt nur Düsseldorfer Angebote, lädt die Tabelle von vrr; ein
+  // Nürnberger Stadtteil gilt dort nicht, die Requests bleiben dieselben
+  const rhein = ids.byTitle("Krabbelgruppe am Rhein");
+  const notRhein = ids.all.filter((id) => id !== rhein && !unseen.includes(id));
+  await writeStore(page, { seenIds: notRhein, city: "duesseldorf", origin: "gostenhof" });
+  const vrr = await deliver(page, context, session);
+  expect(vrr).toEqual({
+    title: "1 neues Angebot im Zwergenplan",
+    body: "Krabbelgruppe am Rhein",
+    navigate: startPage,
+    requests: ["/data/site.json", "/data/wegzeit/vrr.json"],
+  });
+  // gesehen sind danach alle Angebote, auch die Nürnberger
+  await expect
+    .poll(async () => ((await readStore(page))["seenIds"] as string[] | undefined)?.length)
+    .toBe(ids.all.length);
 });
 
 for (const colorScheme of ["light", "dark"] as const) {

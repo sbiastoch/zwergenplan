@@ -5,7 +5,7 @@
  * Einzelnen prüft anbieter-inhalt.spec.ts (Paket B). Hier zählen die Wege: Zeile → Sheet → Kachel → Detail und zurück.
  */
 import type { Page, Request } from "@playwright/test";
-import { expect, startPreloads, test } from "./fixtures.ts";
+import { expect, isTransitLines, isTransitTable, startPreloads, test } from "./fixtures.ts";
 import { expectMobileUx } from "./mobile-ux.ts";
 
 const KRABBELTREFF = "lxizt974";
@@ -162,6 +162,47 @@ test.describe("Lazy-Laden (E7, E9)", () => {
     await Promise.all([directory, chunk]);
     release();
     await expect(providerSheet(page).getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
+  });
+});
+
+test.describe("Netz der gewählten Stadt (Plan 0039, E8; Review M5)", () => {
+  const RHEINZWERGE = "Rheinzwerge Beispiel (fiktiv)";
+  const RHEINZWERGE_ID = "o9b2vd23";
+
+  test("ohne Stadt (Nürnberg): kein Düsseldorfer Anbieter; mit Düsseldorf nur er", async ({ page }) => {
+    await ready(page, "./?ansicht=anbieter");
+    await listReady(page);
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(row(page, THEATER)).toBeVisible();
+    await expect(row(page, RHEINZWERGE)).toHaveCount(0);
+
+    await page.evaluate(() => localStorage.setItem("zwergenplan.stadt", "duesseldorf"));
+    await page.reload();
+    await listReady(page);
+    await expect(page.getByRole("status")).toHaveText("1 Anbieter mit 2 Angeboten");
+    await expect(rows(page)).toHaveCount(1);
+    await expect(row(page, RHEINZWERGE)).toBeVisible();
+  });
+
+  test("ein gemerkter Anbieter des anderen Netzes steht immer oben; sein Sheet zeigt seine Angebote", async ({
+    page,
+  }) => {
+    await page.addInitScript(
+      (id) => localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify([id])),
+      RHEINZWERGE_ID,
+    );
+    await ready(page, "./?ansicht=anbieter");
+    await listReady(page);
+    const saved = page.locator("ul.provider-saved").locator("button.place", { hasText: RHEINZWERGE });
+    await expect(saved).toBeVisible();
+    await saved.click();
+    await expect(providerSheet(page).getByRole("heading", { level: 2, name: RHEINZWERGE })).toBeVisible();
+    await expect(providerSheet(page).getByTestId("offer")).toHaveCount(2);
+  });
+
+  test("Deep-Link p/<publicId> bzw. ?anbieter= öffnet einen Anbieter des anderen Netzes", async ({ page }) => {
+    await ready(page, `./?anbieter=${RHEINZWERGE_ID}`);
+    await expect(providerSheet(page).getByRole("heading", { level: 2, name: RHEINZWERGE })).toBeVisible();
   });
 });
 
@@ -466,10 +507,10 @@ test.describe("Privatsphäre (E9)", () => {
     await ready(page, "./?ansicht=anbieter");
     await listReady(page);
     const loaded = Promise.all([
-      page.waitForResponse((r) => new URL(r.url()).pathname.endsWith("/data/wegzeit.json") && r.ok()),
+      page.waitForResponse((r) => isTransitTable(r.url()) && r.ok()),
       page.waitForResponse((r) => /\/assets\/oepnv\/[^/]+\.js$/.test(new URL(r.url()).pathname) && r.ok()),
       // Plan 0012, E3: die Linien kommen nach Tabelle und Chunk, auch sie vor der Wahl
-      page.waitForResponse((r) => new URL(r.url()).pathname.endsWith("/data/linien.json") && r.ok()),
+      page.waitForResponse((r) => isTransitLines(r.url()) && r.ok()),
     ]);
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });

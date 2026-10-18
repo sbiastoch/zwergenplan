@@ -105,7 +105,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     // Startpunkt (Plan 0004): Abschnitt „Wegzeit ab“ mit gesetztem Stadtteil
     await page.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
   },
-  // Quellenhinweis der Wegzeit mit zwei Links (Plan 0009, E3), aus der geladenen wegzeit.json
+  // Quellenhinweis der Wegzeit mit zwei Links (Plan 0009, E3), aus der geladenen Wegzeit-Tabelle
   "kind-quelle": async (page) => {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
