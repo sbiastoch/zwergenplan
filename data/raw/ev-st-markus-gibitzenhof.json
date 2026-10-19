@@ -4,10 +4,9 @@
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
    "title": "Offene Tür für Groß und Klein (montags)",
-   "summary": "Offener Treff für Familien mit kleinen Kindern im FreiRaum der Markuskirche, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung nötig.",
+   "summary": "Offener Treff im FreiRaum der Markuskirche für Familien mit kleinen Kindern, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung nötig.",
    "topics": [
-    "elterntreff",
-    "eltern-kind-gruppe"
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -17,7 +16,7 @@
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
+    "note": "Offener Treff, keine Anmeldung"
    },
    "schedule": {
     "kind": "weekly",
@@ -33,8 +32,8 @@
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Café für Alle – Familiencafé dienstags, offener Treff",
-   "summary": "Offener Familientreff in der Markuskirche, bei gutem Wetter auf dem Platz davor, sonst im FreiRaum. Kaffee und Kuchen gegen Spende, ab und zu Basteln oder Bilderbuchkino. Einfach vorbeikommen.",
+   "title": "Café für Alle (Familiencafé, dienstags)",
+   "summary": "Offenes Familiencafé auf dem Platz vor der Markuskirche, bei Regen im FreiRaum: Kaffee und Kuchen gegen Spende, ab und zu Basteln oder Bilderbuchkino. Kinder sind ausdrücklich willkommen; Einstieg jederzeit möglich.",
    "topics": [
     "elterncafe",
     "elterntreff"
@@ -42,13 +41,13 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "Kaffee und Kuchen gegen Spende",
+   "price": "Spende für Kaffee und Kuchen",
    "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
    "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, keine Anmeldung nötig"
+    "note": "Offener Treff, einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -56,7 +55,6 @@
      "TU"
     ],
     "start": "15:00",
-    "end": "18:00",
     "from": "2026-10-20",
     "skipHolidays": true
    }
@@ -64,12 +62,10 @@
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Offene Tür für Groß und Klein – montags Spielzeit mit Kleinkind",
-   "summary": "Offener Vormittag für Kleinkinder und Begleitpersonen mit Spielzeit, Kaffee und Gesellschaft. Ohne Anmeldung, einfach vorbeikommen.",
+   "title": "Offene Tür für Groß und Klein (montagvormittags)",
+   "summary": "Offener Vormittagstreff für Familien mit Kleinkindern zum Spielen, Kaffeetrinken und Austauschen. Ohne Anmeldung, einfach vorbeikommen.",
    "topics": [
-    "krabbelgruppe",
-    "eltern-kind-gruppe",
-    "elterntreff"
+    "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -79,7 +75,7 @@
    "category": "krabbel-spielgruppen",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
+    "note": "Offener Treff, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "dates",
@@ -105,9 +101,8 @@
    "via": "evtermine"
   }
  ],
- "inputHash": "07ef32d27a502c247474330cedbc34abcea950ad90308a9510c952c46973fdfb",
+ "inputHash": "cd676145798c48b6d14952029969b251f4a5956ec8c285f88bfb3b9670a65c51",
  "dated": {
-  "2026-10-18": "da465d94d1ae6609c2888d70fa9f4e11081de73f7701ec0f4cb8d591c066c848",
   "2026-10-20": "8f116179ca966e41658cbd3073a84f75e6d18d237af788327d28eb4c2a2c880b",
   "2026-10-21": "e10f7cfa6b1ca023f97c13e4352f048bb15a0be474ff6487a3b9b718b1db2955",
   "2026-10-22": "ae755afaf9889dfe916ace6d49476c9647b0f89fb609fcd94b5c6db1aaf6689f",
@@ -188,8 +183,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": [
   "evtermine"
  ]

@@ -3,15 +3,15 @@
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage (Start Sept. 2026)",
-   "summary": "Kurs „Bindung durch Berührung“ für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: sanfte Berührungen und die Signale des Babys besser verstehen. Max. 6 Eltern-Kind-Paare. Läuft noch bis 02.11.2026.",
+   "title": "Achtsame Babymassage – Kurs Mo 21.09.–02.11.2026",
+   "summary": "Sanfte Körperberührungen und Austausch für Eltern und Babys von 6 Wochen bis 5 Monate, höchstens 6 Paare, montags 11:00–12:15 Uhr in der FamilienBox. Der Kurs läuft noch bis 02.11.2026; nur noch 1 Platz frei.",
    "topics": [
     "babymassage"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "105 €",
+   "price": "105,00 €",
    "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
    "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
    "category": "babykurse",
@@ -21,32 +21,54 @@
    },
    "availability": {
     "status": "wenige",
-    "note": "Teilnehmerzahl 7 von 8, also 1 Platz frei"
+    "note": "1 Platz frei (7 von 8 belegt)"
    },
    "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "11:00",
-    "end": "12:15",
-    "from": "2026-09-21",
-    "count": 7,
-    "skipHolidays": false
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-09-21T11:00",
+      "end": "2026-09-21T12:15"
+     },
+     {
+      "start": "2026-09-28T11:00",
+      "end": "2026-09-28T12:15"
+     },
+     {
+      "start": "2026-10-05T11:00",
+      "end": "2026-10-05T12:15"
+     },
+     {
+      "start": "2026-10-12T11:00",
+      "end": "2026-10-12T12:15"
+     },
+     {
+      "start": "2026-10-19T11:00",
+      "end": "2026-10-19T12:15"
+     },
+     {
+      "start": "2026-10-26T11:00",
+      "end": "2026-10-26T12:15"
+     },
+     {
+      "start": "2026-11-02T11:00",
+      "end": "2026-11-02T12:15"
+     }
+    ]
    }
   },
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage (Start Nov. 2026)",
-   "summary": "Zweiter Durchgang der Babymassage-Reihe für Babys von etwa 6 Wochen bis 5 Monaten bei Kursbeginn, montags 11–12.15 Uhr in der FamilienBox. Max. 6 Eltern-Kind-Paare.",
+   "title": "Achtsame Babymassage – Kurs Mo 09.11.–21.12.2026",
+   "summary": "Sanfte Körperberührungen und Austausch für Eltern und Babys von 6 Wochen bis 5 Monate, höchstens 6 Paare, montags 11:00–12:15 Uhr in der FamilienBox. Sieben Termine, noch 3 Plätze frei.",
    "topics": [
     "babymassage"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "105 €",
+   "price": "105,00 €",
    "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
    "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
    "category": "babykurse",
@@ -56,32 +78,54 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Teilnehmerzahl 4 von 8, also 4 Plätze frei. Anmeldung über die Website."
+    "note": "3 Plätze frei (5 von 8 belegt)"
    },
    "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "11:00",
-    "end": "12:15",
-    "from": "2026-11-09",
-    "count": 7,
-    "skipHolidays": false
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-09T11:00",
+      "end": "2026-11-09T12:15"
+     },
+     {
+      "start": "2026-11-16T11:00",
+      "end": "2026-11-16T12:15"
+     },
+     {
+      "start": "2026-11-23T11:00",
+      "end": "2026-11-23T12:15"
+     },
+     {
+      "start": "2026-11-30T11:00",
+      "end": "2026-11-30T12:15"
+     },
+     {
+      "start": "2026-12-07T11:00",
+      "end": "2026-12-07T12:15"
+     },
+     {
+      "start": "2026-12-14T11:00",
+      "end": "2026-12-14T12:15"
+     },
+     {
+      "start": "2026-12-21T11:00",
+      "end": "2026-12-21T12:15"
+     }
+    ]
    }
   },
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage (Start Jan. 2027)",
-   "summary": "Dritter Durchgang der Babymassage-Reihe für Babys von etwa 6 Wochen bis 5 Monaten bei Kursbeginn, montags 11–12.15 Uhr in der FamilienBox. Max. 6 Eltern-Kind-Paare.",
+   "title": "Achtsame Babymassage – Kurs Mo 11.01.–15.02.2027",
+   "summary": "Sanfte Körperberührungen und Austausch für Eltern und Babys von 6 Wochen bis 5 Monate, höchstens 6 Paare, montags 11:00–12:15 Uhr in der FamilienBox. Sechs Termine, alle 8 Plätze frei.",
    "topics": [
     "babymassage"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "105 €",
+   "price": "105,00 €",
    "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
    "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
    "category": "babykurse",
@@ -91,25 +135,43 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Teilnehmerzahl 0 von 8, Kurs noch leer. Anmeldung über die Website."
+    "note": "8 Plätze frei (0 von 8 belegt)"
    },
    "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "11:00",
-    "end": "12:15",
-    "from": "2027-01-11",
-    "count": 6,
-    "skipHolidays": false
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-01-11T11:00",
+      "end": "2027-01-11T12:15"
+     },
+     {
+      "start": "2027-01-18T11:00",
+      "end": "2027-01-18T12:15"
+     },
+     {
+      "start": "2027-01-25T11:00",
+      "end": "2027-01-25T12:15"
+     },
+     {
+      "start": "2027-02-01T11:00",
+      "end": "2027-02-01T12:15"
+     },
+     {
+      "start": "2027-02-08T11:00",
+      "end": "2027-02-08T12:15"
+     },
+     {
+      "start": "2027-02-15T11:00",
+      "end": "2027-02-15T12:15"
+     }
+    ]
    }
   }
  ],
- "inputHash": "dbf1533197849550494f0b0084db47baf6c5dca624bf278c5d30a95cc428ee69",
+ "inputHash": "90e6a451d08a8463f0a32d0c74f6ae18ea83eb1f1d583e1e00bad3993940e080",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": []
 }

@@ -3,8 +3,8 @@
   {
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
-   "title": "Baby & Museum: Kurzführung für Erwachsene mit Babys",
-   "summary": "Monatliche Kurzführung zu wechselnden Themen für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln. Anschließend Kaffee und Austausch. Kinderwagen und Trage sind erlaubt. Tickets je Termin im go~mus-Shop.",
+   "title": "Baby & Museum: Kunst-Führung mit Babys für Erwachsene",
+   "summary": "Kurzführung durch das Neue Museum für Eltern mit Babys, mit Pausen zum Füttern und Wickeln, danach Kaffee zum Austausch. Kinderwagen und Trage sind erlaubt. 3 € zzgl. Eintritt, Tickets im go~mus-Shop.",
    "topics": [
     "museum",
     "elterntreff"
@@ -13,16 +13,12 @@
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "3 € zzgl. Eintritt (für Erwachsene)",
-   "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
+   "url": "https://nmn-tickets.de/#/product/event/161?date_id=5140",
    "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
    "category": "museum",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 12
-   },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets je Termin im go~mus-Shop; Restkontingent dort nicht auf der Programmseite sichtbar"
+    "note": "Kontingent nur im go~mus-Shop sichtbar; Ticket je Termin über den Shop buchen"
    },
    "schedule": {
     "kind": "dates",
@@ -50,7 +46,7 @@
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
    "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-   "summary": "Eine Schauspielerin erzählt und spielt Geschichten aus einem Kinderbuch im Wonderland-Raum der Ausstellung. Kinder ab zwei Jahren machen aktiv mit. Eintritt für Erwachsene zzgl. Tickets im Shop.",
+   "summary": "Eine Schauspielerin erzählt Geschichten aus einem Kinderbuch im Wonderland-Raum der Ausstellung, die Kinder machen aktiv mit. Für Kinder ab zwei Jahren mit ihren Familien. 3 € zzgl. Eintritt für Erwachsene, Ticket im Shop.",
    "topics": [
     "vorlesen",
     "museum"
@@ -68,7 +64,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Ticket über den go~mus-Shop; Verfügbarkeit dort nicht sichtbar"
+    "note": "Ticket über den go~mus-Shop; Kontingent dort einsehbar"
    },
    "schedule": {
     "kind": "dates",
@@ -82,7 +78,6 @@
  ],
  "inputHash": "248478189796a272c4d3de98f0bc15e9324baf3aa8d2d0791d409897760ec8ab",
  "dated": {
-  "2026-10-23": "53642745de7c615142b7af6154a2309788f97f45c2fba5d2e53000d0b40d90ac",
   "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
   "2026-11-13": "02758077c4f295a349671c42fd4810985342d83bb86afa633e9bac9349a6d8d6",
   "2026-11-27": "708428860f7ba415fa818653b16b68d576c6c9fe9ec4e0b27ca6a3df1d3b1d32",
@@ -92,8 +87,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": [
   "stadt-vk"
  ]

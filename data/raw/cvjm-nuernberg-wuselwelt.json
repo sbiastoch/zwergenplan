@@ -3,8 +3,8 @@
   {
    "providerId": "cvjm-nuernberg-wuselwelt",
    "venueId": "cvjm-nuernberg-wuselwelt",
-   "title": "Wuselwelt: Freispiel in der Turnhalle (Kinder 0–3 J.)",
-   "summary": "Offenes Freispiel für Kinder von 0 bis 3 Jahren mit Eltern oder Bezugsperson in der Turnhalle, freitags in der Schulzeit. Ohne Anmeldung und kostenlos; Hallenschuhe oder ABS-Socken mitbringen. Danach ist noch Einkehr im Café Kostbar möglich.",
+   "title": "Wuselwelt – freies Bewegungsspiel für Kinder 0–3 Jahre (freitags)",
+   "summary": "Offenes Freispiel in der Turnhalle mit vorbereiteter Spielumgebung, Eltern oder Bezugsperson sind dabei; Hallenschuhe oder ABS-Socken mitbringen. Keine Anmeldung, kostenlos, in den Ferien kein Termin. Einstieg jederzeit möglich.",
    "topics": [
     "bewegung",
     "spielplatz-indoor"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offenes Angebot, keine Anmeldung nötig"
+    "note": "Offenes Angebot ohne Anmeldung"
    },
    "schedule": {
     "kind": "weekly",
@@ -32,12 +32,11 @@
     "start": "09:30",
     "end": "10:15",
     "from": "2026-10-23",
-    "until": "2027-10-17",
     "skipHolidays": true
    }
   }
  ],
- "inputHash": "7c2f8fbab1c1f76fc502ee283277cc0cc93e2cfd21899a7e0da8975b7bf5b249",
+ "inputHash": "cc261f4560b2bccb038c99f64ea504a0d1ee88fe7f01080a45a9b852dda41354",
  "dated": {
   "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
   "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
@@ -45,8 +44,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-17T07:59:57+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": [
   "frankenkids"
  ]

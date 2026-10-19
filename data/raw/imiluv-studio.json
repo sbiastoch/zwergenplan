@@ -1,8 +1,179 @@
 {
- "events": [],
- "status": "fehler",
- "reason": "ungültig nach Wiederholung und Fallback: Build-Probelauf: providers.yaml 0.programme: braucht eine Terminseite (use: termine) ohne blocked, sonst skipCrawl mit Grund",
- "checkedAt": "2026-10-11T14:06:10+02:00",
- "failingSince": "2026-10-11T14:06:10+02:00",
- "sources": []
+ "events": [
+  {
+   "providerId": "imiluv-studio",
+   "venueId": "imiluv-studio",
+   "title": "Reformer Mums & Babies (Pilates mit Baby, ca. 6 Wochen–6 Monate)",
+   "summary": "Sanftes Reformer-Pilates nach der Geburt, das Baby ist dabei, Kursleitung auf Englisch. Ärztliche Freigabe nötig. Buchung in der IMILUV-App; 55 Minuten.",
+   "topics": [
+    "fitness-mit-baby",
+    "mehrsprachig"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "5 Credits pro Termin",
+   "url": "https://imiluv.de/schedule",
+   "sourceUrl": "https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1115067&min_date=2026-10-01&max_date=2027-11-01&page_size=200",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 1,
+    "maxMonths": 6
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Laut Buchungssystem nicht ausgebucht; Buchung in der IMILUV-App"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-21T11:00",
+      "end": "2026-10-21T11:55"
+     },
+     {
+      "start": "2026-10-28T11:00",
+      "end": "2026-10-28T11:55"
+     },
+     {
+      "start": "2026-11-04T11:00",
+      "end": "2026-11-04T11:55"
+     },
+     {
+      "start": "2026-11-11T11:00",
+      "end": "2026-11-11T11:55"
+     },
+     {
+      "start": "2026-11-18T11:00",
+      "end": "2026-11-18T11:55"
+     },
+     {
+      "start": "2026-11-25T11:00",
+      "end": "2026-11-25T11:55"
+     },
+     {
+      "start": "2026-12-02T11:00",
+      "end": "2026-12-02T11:55"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "imiluv-studio",
+   "venueId": "imiluv-studio",
+   "title": "Barre Baby Luv (Barre mit Baby im Tragetuch, ca. 6–12 Monate)",
+   "summary": "Barre-Training für Mamas mit Baby in der Trage, Babys ca. 6–12 Monate. Deutsch/Englisch, ärztliche Freigabe nötig. Anmeldung über die IMILUV-App; 55 Minuten.",
+   "topics": [
+    "fitness-mit-baby",
+    "mehrsprachig"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "5 Credits pro Termin",
+   "url": "https://www.frankenkids.de/veranstaltungen/barre-fuer-mamas-babys/2026-10-08/",
+   "sourceUrl": "https://www.frankenkids.de/veranstaltungen/barre-fuer-mamas-babys/2026-10-08/",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über die IMILUV-App"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-22T10:45",
+      "end": "2026-10-22T11:40"
+     },
+     {
+      "start": "2026-11-05T10:45",
+      "end": "2026-11-05T11:40"
+     },
+     {
+      "start": "2026-11-19T10:45",
+      "end": "2026-11-19T11:40"
+     }
+    ]
+   },
+   "via": "frankenkids"
+  },
+  {
+   "providerId": "imiluv-studio",
+   "venueId": "imiluv-studio",
+   "title": "Barre Baby Luv (Babys ca. 6–12 Monate)",
+   "summary": "Barre-Training mit Baby in der Trage, Deutsch/Englisch. Ärztliche Freigabe nötig. Buchung nur in der IMILUV-App; Einstieg bei Terminen mit freien Plätzen möglich.",
+   "topics": [
+    "fitness-mit-baby",
+    "bewegung"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "4 Credits pro Termin",
+   "url": "https://imiluv.de/schedule",
+   "sourceUrl": "https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1125443&min_date=2026-10-01&max_date=2027-11-01&page_size=200",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 6,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Nicht ausgebucht laut Terminliste; Anmeldung in der IMILUV-App (bsport)"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-22T10:45",
+      "end": "2026-10-22T11:35"
+     },
+     {
+      "start": "2026-10-29T10:45",
+      "end": "2026-10-29T11:35"
+     },
+     {
+      "start": "2026-11-05T10:45",
+      "end": "2026-11-05T11:35"
+     },
+     {
+      "start": "2026-11-12T10:45",
+      "end": "2026-11-12T11:35"
+     },
+     {
+      "start": "2026-11-19T10:45",
+      "end": "2026-11-19T11:35"
+     },
+     {
+      "start": "2026-11-26T10:45",
+      "end": "2026-11-26T11:35"
+     },
+     {
+      "start": "2026-12-03T10:45",
+      "end": "2026-12-03T11:35"
+     }
+    ]
+   }
+  }
+ ],
+ "inputHash": "155b317ec4bfc6d66bc6b45dfb8b6e66186b9fd8c680214c8445c459f2727481",
+ "dated": {
+  "2026-10-22": "1f0027e86afef28c64f86af055be0f431ea8b5a46e94f712fad7c6866ffe79f5",
+  "2026-10-28": "bb0e397cfa0f7faa8bc071e45c37caebbc8ac116cbb0a2fc25e49920f0115d6b",
+  "2026-11-05": "4469413ab5cecdfa1ba87562ddf4671fa640e3e4ced70a41309448442ec050dd",
+  "2026-11-11": "24881df50e6dff67323da14243116da9864ce627834593e9e54e2667bcae5660",
+  "2026-11-19": "e4866a6c6ee548e519d562ca53a332f4bfeec60ff1bbc73c9754a467b41710d8",
+  "2026-11-25": "8aa9d068f13f2fb4759af4924487f1d2590dcd95c7a53258c3d43651a9550e72"
+ },
+ "model": "haiku",
+ "status": "ok",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
+ "sources": [
+  "frankenkids"
+ ]
 }

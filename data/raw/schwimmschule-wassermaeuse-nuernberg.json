@@ -3,8 +3,8 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Babyschwimmen (3–12 Monate), Termin 29.11.2026",
-   "summary": "Wassergewöhnung für Babys im Nürnberger Langwasser Bad mit einem Elternteil. Der Kurs ist laut Buchungssystem ausgebucht, es gibt keine Warteliste.",
+   "title": "Babyschwimmen (3–12 Mon.), Start 29.11.2026",
+   "summary": "Schwimmkurs für Babys von 3 bis 12 Monaten in Langwasser. Für den Starttermin am 29.11.2026 sind alle Plätze belegt, eine Warteliste wird nicht angezeigt.",
    "topics": [
     "babyschwimmen"
    ],
@@ -20,7 +20,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "0 freie Plätze, keine Warteliste"
+    "note": "0 freie Plätze, keine Warteliste (Kursorganizer)"
    },
    "schedule": {
     "kind": "dates",
@@ -34,8 +34,8 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Babyschwimmen (3–12 Monate), Termin 21.02.2027",
-   "summary": "Wassergewöhnung für Babys im Nürnberger Langwasser Bad mit einem Elternteil. Der Kurs ist laut Buchungssystem ausgebucht, es gibt keine Warteliste.",
+   "title": "Babyschwimmen (3–12 Mon.), Start 21.02.2027",
+   "summary": "Schwimmkurs für Babys von 3 bis 12 Monaten in Langwasser. Für den Starttermin am 21.02.2027 sind alle Plätze belegt, eine Warteliste wird nicht angezeigt.",
    "topics": [
     "babyschwimmen"
    ],
@@ -51,7 +51,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "0 freie Plätze, keine Warteliste"
+    "note": "0 freie Plätze, keine Warteliste (Kursorganizer)"
    },
    "schedule": {
     "kind": "dates",
@@ -65,8 +65,8 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 Jahren), Termin 29.11.2026",
-   "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren mit Begleitperson im Langwasser Bad. Laut Buchungssystem ausgebucht, ohne Warteliste.",
+   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Start 29.11.2026",
+   "summary": "Schwimmen mit Eltern für Kinder ab 2,5 Jahren in Langwasser. Für den Starttermin am 29.11.2026 sind keine Plätze frei, es gibt einen Eintrag auf der Warteliste.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -81,8 +81,8 @@
     "maxMonths": 36
    },
    "availability": {
-    "status": "ausgebucht",
-    "note": "0 freie Plätze, keine Warteliste"
+    "status": "warteliste",
+    "note": "0 freie Plätze, 1 Person auf der Warteliste"
    },
    "schedule": {
     "kind": "dates",
@@ -96,8 +96,8 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 Jahren), Termin 21.02.2027",
-   "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren mit Begleitperson im Langwasser Bad. Laut Buchungssystem ausgebucht, ohne Warteliste.",
+   "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Start 21.02.2027",
+   "summary": "Schwimmen mit Eltern für Kinder ab 2,5 Jahren in Langwasser. Für den Starttermin am 21.02.2027 sind alle Plätze belegt, eine Warteliste wird nicht angezeigt.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -113,7 +113,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "0 freie Plätze, keine Warteliste"
+    "note": "0 freie Plätze, keine Warteliste (Kursorganizer)"
    },
    "schedule": {
     "kind": "dates",
@@ -127,8 +127,8 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg",
-   "title": "Kleinkinderschwimmen (ab 15 Monate), Termin 21.02.2027",
-   "summary": "Schwimmen für Kleinkinder ab 15 Monaten im Langwasser Bad. Laut Buchungssystem sind noch 5 Plätze frei.",
+   "title": "Kleinkinderschwimmen (ab 15 Mon.), Start 21.02.2027",
+   "summary": "Schwimmkurs für Kleinkinder ab 15 Monaten in Langwasser. Für den Starttermin am 21.02.2027 sind noch 5 Plätze frei; Angaben zur Begleitung durch Erwachsene fehlen in den Daten.",
    "topics": [
     "kleinkindschwimmen"
    ],
@@ -144,7 +144,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "5 freie Plätze"
+    "note": "5 freie Plätze (Kursorganizer)"
    },
    "schedule": {
     "kind": "dates",
@@ -158,8 +158,8 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-   "title": "Babyschwimmen 2 (ab 8 Monaten), Termin 30.11.2026",
-   "summary": "Wassergewöhnung für Babys ab 8 Monaten in der Boxdorfer Werkstatt mit einem Elternteil. Laut Buchungssystem sind noch 4 Plätze frei.",
+   "title": "Babyschwimmen 2 (ab 8 Mon.), Start 30.11.2026",
+   "summary": "Schwimmkurs für Babys ab 8 Monaten in der Boxdorfer Werkstatt. Für den Starttermin am 30.11.2026 sind noch 4 Plätze frei.",
    "topics": [
     "babyschwimmen"
    ],
@@ -175,7 +175,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "4 freie Plätze"
+    "note": "4 freie Plätze (Kursorganizer)"
    },
    "schedule": {
     "kind": "dates",
@@ -189,8 +189,8 @@
   {
    "providerId": "schwimmschule-wassermaeuse-nuernberg",
    "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-   "title": "Babyschwimmen 2 (ab 8 Monaten), Termin 22.02.2027",
-   "summary": "Wassergewöhnung für Babys ab 8 Monaten in der Boxdorfer Werkstatt mit einem Elternteil. Laut Buchungssystem sind alle 10 Plätze frei.",
+   "title": "Babyschwimmen 2 (ab 8 Mon.), Start 22.02.2027",
+   "summary": "Schwimmkurs für Babys ab 8 Monaten in der Boxdorfer Werkstatt. Für den Starttermin am 22.02.2027 sind alle 10 Plätze frei.",
    "topics": [
     "babyschwimmen"
    ],
@@ -206,7 +206,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "10 freie Plätze"
+    "note": "10 freie Plätze von 10 (Kursorganizer)"
    },
    "schedule": {
     "kind": "dates",
@@ -218,10 +218,10 @@
    }
   }
  ],
- "inputHash": "74430e777947a6479d9ef5ac9a8b093e9c103937301f51c7f105115aebc0b20b",
+ "inputHash": "c4e1429c8940899a6fff9936c0001ad5f55fd841285bdc5546d7231be4b08b9b",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": []
 }

@@ -3,810 +3,10 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "PEKiP 3–5 Monate, Do 11:15 (Geb. Mai–Juli 2026)",
-   "summary": "PEKiP-Kurs für Babys von 3–5 Monaten mit Bewegungs- und Sinnesanregungen und Austausch unter Eltern. Läuft bis 22.10.; Angebot eines externen Partners, Anmeldung über das Buchungsformular.",
+   "title": "Babyturnen im BewegungsRaum (9–14 Mon.), Fr 11:30, Herbst",
+   "summary": "Bewegungsangebot für Babys von 9 bis 14 Monaten mit Begleitperson. Acht Termine freitags bis 6. November; Buchung über Eversports.",
    "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 €",
-   "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 3,
-    "maxMonths": 5
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Buchungsformular, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-03T11:15",
-      "end": "2026-09-03T12:45"
-     },
-     {
-      "start": "2026-09-10T11:15",
-      "end": "2026-09-10T12:45"
-     },
-     {
-      "start": "2026-09-17T11:15",
-      "end": "2026-09-17T12:45"
-     },
-     {
-      "start": "2026-09-24T11:15",
-      "end": "2026-09-24T12:45"
-     },
-     {
-      "start": "2026-10-01T11:15",
-      "end": "2026-10-01T12:45"
-     },
-     {
-      "start": "2026-10-08T11:15",
-      "end": "2026-10-08T12:45"
-     },
-     {
-      "start": "2026-10-15T11:15",
-      "end": "2026-10-15T12:45"
-     },
-     {
-      "start": "2026-10-22T11:15",
-      "end": "2026-10-22T12:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "PEKiP 6–8 Monate, Di 10:30 (Geb. März–Apr. 2026)",
-   "summary": "PEKiP-Kurs für Babys von 6–8 Monaten mit Bewegungsspielen, Einzelberatung und Austausch unter Eltern. Läuft bis 20.10.; Angebot eines externen Partners, Anmeldung über das Buchungsformular.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 €",
-   "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 8
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Buchungsformular, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-01T10:30",
-      "end": "2026-09-01T12:00"
-     },
-     {
-      "start": "2026-09-08T10:30",
-      "end": "2026-09-08T12:00"
-     },
-     {
-      "start": "2026-09-15T10:30",
-      "end": "2026-09-15T12:00"
-     },
-     {
-      "start": "2026-09-22T10:30",
-      "end": "2026-09-22T12:00"
-     },
-     {
-      "start": "2026-09-29T10:30",
-      "end": "2026-09-29T12:00"
-     },
-     {
-      "start": "2026-10-06T10:30",
-      "end": "2026-10-06T12:00"
-     },
-     {
-      "start": "2026-10-13T10:30",
-      "end": "2026-10-13T12:00"
-     },
-     {
-      "start": "2026-10-20T10:30",
-      "end": "2026-10-20T12:00"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "PEKiP 6–8 Monate, Fr 9:30 (Geb. März–Apr. 2026)",
-   "summary": "PEKiP-Kurs für Babys von 6–8 Monaten mit Bewegungsspielen, Einzelberatung und Austausch unter Eltern. Läuft bis 23.10.; Angebot eines externen Partners, Anmeldung über das Buchungsformular.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 €",
-   "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 8
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Buchungsformular, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-04T09:30",
-      "end": "2026-09-04T11:00"
-     },
-     {
-      "start": "2026-09-11T09:30",
-      "end": "2026-09-11T11:00"
-     },
-     {
-      "start": "2026-09-18T09:30",
-      "end": "2026-09-18T11:00"
-     },
-     {
-      "start": "2026-09-25T09:30",
-      "end": "2026-09-25T11:00"
-     },
-     {
-      "start": "2026-10-02T09:30",
-      "end": "2026-10-02T11:00"
-     },
-     {
-      "start": "2026-10-09T09:30",
-      "end": "2026-10-09T11:00"
-     },
-     {
-      "start": "2026-10-16T09:30",
-      "end": "2026-10-16T11:00"
-     },
-     {
-      "start": "2026-10-23T09:30",
-      "end": "2026-10-23T11:00"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "PEKiP 3–5 Monate, Do 9:30 (Geb. Juni–Aug. 2026)",
-   "summary": "PEKiP-Kurs für Babys von 3–5 Monaten mit sanften Bewegungs- und Sinnesanregungen und Austausch unter Eltern. Angebot eines externen Partners, Anmeldung über das Buchungsformular.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 €",
-   "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 3,
-    "maxMonths": 5
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Buchungsformular, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-29T09:30",
-      "end": "2026-10-29T11:00"
-     },
-     {
-      "start": "2026-11-05T09:30",
-      "end": "2026-11-05T11:00"
-     },
-     {
-      "start": "2026-11-12T09:30",
-      "end": "2026-11-12T11:00"
-     },
-     {
-      "start": "2026-11-19T09:30",
-      "end": "2026-11-19T11:00"
-     },
-     {
-      "start": "2026-11-26T09:30",
-      "end": "2026-11-26T11:00"
-     },
-     {
-      "start": "2026-12-03T09:30",
-      "end": "2026-12-03T11:00"
-     },
-     {
-      "start": "2026-12-10T09:30",
-      "end": "2026-12-10T11:00"
-     },
-     {
-      "start": "2026-12-17T09:30",
-      "end": "2026-12-17T11:00"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "PEKiP 3–5 Monate, Do 11:15 (Geb. Juni–Aug. 2026)",
-   "summary": "PEKiP-Kurs für Babys von 3–5 Monaten. Ein Papa-PEKiP-Termin am 06.12. (9:30–11:00) gehört dazu. Angebot eines externen Partners, Anmeldung über das Buchungsformular.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 €",
-   "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 3,
-    "maxMonths": 5
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Buchungsformular, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-29T11:15",
-      "end": "2026-10-29T12:45"
-     },
-     {
-      "start": "2026-11-05T11:15",
-      "end": "2026-11-05T12:45"
-     },
-     {
-      "start": "2026-11-12T11:15",
-      "end": "2026-11-12T12:45"
-     },
-     {
-      "start": "2026-11-19T11:15",
-      "end": "2026-11-19T12:45"
-     },
-     {
-      "start": "2026-11-26T11:15",
-      "end": "2026-11-26T12:45"
-     },
-     {
-      "start": "2026-12-03T11:15",
-      "end": "2026-12-03T12:45"
-     },
-     {
-      "start": "2026-12-06T09:30",
-      "end": "2026-12-06T11:00"
-     },
-     {
-      "start": "2026-12-10T11:15",
-      "end": "2026-12-10T12:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "PEKiP 6–8 Monate, Di 10:30 (Geb. Apr.–Mai 2026)",
-   "summary": "PEKiP-Kurs für Babys von 6–8 Monaten mit Bewegungsspielen, Einzelberatung und Austausch unter Eltern. Ein Papa-PEKiP-Termin am 06.12. (11:15–12:45) gehört dazu. Angebot eines externen Partners.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 €",
-   "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 8
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Buchungsformular, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-27T10:30",
-      "end": "2026-10-27T12:00"
-     },
-     {
-      "start": "2026-11-03T10:30",
-      "end": "2026-11-03T12:00"
-     },
-     {
-      "start": "2026-11-10T10:30",
-      "end": "2026-11-10T12:00"
-     },
-     {
-      "start": "2026-11-17T10:30",
-      "end": "2026-11-17T12:00"
-     },
-     {
-      "start": "2026-11-24T10:30",
-      "end": "2026-11-24T12:00"
-     },
-     {
-      "start": "2026-12-01T10:30",
-      "end": "2026-12-01T12:00"
-     },
-     {
-      "start": "2026-12-06T11:15",
-      "end": "2026-12-06T12:45"
-     },
-     {
-      "start": "2026-12-08T10:30",
-      "end": "2026-12-08T12:00"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "PEKiP 6–8 Monate, Fr 9:30 (Geb. Apr.–Mai 2026)",
-   "summary": "PEKiP-Kurs für Babys von 6–8 Monaten mit Bewegungsspielen, Einzelberatung und Austausch unter Eltern. Angebot eines externen Partners, Anmeldung über das Buchungsformular.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 €",
-   "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 8
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über das Buchungsformular, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-30T09:30",
-      "end": "2026-10-30T11:00"
-     },
-     {
-      "start": "2026-11-06T09:30",
-      "end": "2026-11-06T11:00"
-     },
-     {
-      "start": "2026-11-13T09:30",
-      "end": "2026-11-13T11:00"
-     },
-     {
-      "start": "2026-11-20T09:30",
-      "end": "2026-11-20T11:00"
-     },
-     {
-      "start": "2026-11-27T09:30",
-      "end": "2026-11-27T11:00"
-     },
-     {
-      "start": "2026-12-04T09:30",
-      "end": "2026-12-04T11:00"
-     },
-     {
-      "start": "2026-12-11T09:30",
-      "end": "2026-12-11T11:00"
-     },
-     {
-      "start": "2026-12-18T09:30",
-      "end": "2026-12-18T11:00"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Musikzauber Herbstzauber 6–15 Monate (Mi 10:00)",
-   "summary": "Musikkurs mit Liedern, Bewegung und Fingerspielen zum Herbstmotto, 8 Einheiten à 45 Minuten. Einstieg in laufende Kurse nach Rückfrage; Anmeldung über die Kursseite.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "130 € (8 Einheiten)",
-   "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "category": "musik",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 15
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-16T10:00",
-      "end": "2026-09-16T10:45"
-     },
-     {
-      "start": "2026-09-23T10:00",
-      "end": "2026-09-23T10:45"
-     },
-     {
-      "start": "2026-09-30T10:00",
-      "end": "2026-09-30T10:45"
-     },
-     {
-      "start": "2026-10-21T10:00",
-      "end": "2026-10-21T10:45"
-     },
-     {
-      "start": "2026-10-28T10:00",
-      "end": "2026-10-28T10:45"
-     },
-     {
-      "start": "2026-11-04T10:00",
-      "end": "2026-11-04T10:45"
-     },
-     {
-      "start": "2026-11-11T10:00",
-      "end": "2026-11-11T10:45"
-     },
-     {
-      "start": "2026-11-18T10:00",
-      "end": "2026-11-18T10:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Musikzauber Herbstzauber 1–2 Jahre (Mi 9:00)",
-   "summary": "Musikkurs mit Liedern, Bewegung und Fingerspielen zum Herbstmotto, 8 Einheiten à 45 Minuten. Einstieg in laufende Kurse nach Rückfrage; Anmeldung über die Kursseite.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "130 € (8 Einheiten)",
-   "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "category": "musik",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 24
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-16T09:00",
-      "end": "2026-09-16T09:45"
-     },
-     {
-      "start": "2026-09-23T09:00",
-      "end": "2026-09-23T09:45"
-     },
-     {
-      "start": "2026-09-30T09:00",
-      "end": "2026-09-30T09:45"
-     },
-     {
-      "start": "2026-10-21T09:00",
-      "end": "2026-10-21T09:45"
-     },
-     {
-      "start": "2026-10-28T09:00",
-      "end": "2026-10-28T09:45"
-     },
-     {
-      "start": "2026-11-04T09:00",
-      "end": "2026-11-04T09:45"
-     },
-     {
-      "start": "2026-11-11T09:00",
-      "end": "2026-11-11T09:45"
-     },
-     {
-      "start": "2026-11-18T09:00",
-      "end": "2026-11-18T09:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Musikzauber Winterzauber 6–15 Monate (Mi 10:00)",
-   "summary": "Musikkurs mit Liedern, Bewegung und Winterthemen, 8 Einheiten à 45 Minuten. Anmeldung über die Kursseite; die Plätze sind dort nicht angezeigt.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "130 € (8 Einheiten)",
-   "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "category": "musik",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 15
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-02T10:00",
-      "end": "2026-12-02T10:45"
-     },
-     {
-      "start": "2026-12-09T10:00",
-      "end": "2026-12-09T10:45"
-     },
-     {
-      "start": "2026-12-16T10:00",
-      "end": "2026-12-16T10:45"
-     },
-     {
-      "start": "2027-01-13T10:00",
-      "end": "2027-01-13T10:45"
-     },
-     {
-      "start": "2027-01-20T10:00",
-      "end": "2027-01-20T10:45"
-     },
-     {
-      "start": "2027-01-27T10:00",
-      "end": "2027-01-27T10:45"
-     },
-     {
-      "start": "2027-02-03T10:00",
-      "end": "2027-02-03T10:45"
-     },
-     {
-      "start": "2027-02-10T10:00",
-      "end": "2027-02-10T10:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Musikzauber Winterzauber 1–2 Jahre (Mi 9:00)",
-   "summary": "Musikkurs mit Liedern, Bewegung und Winterthemen, 8 Einheiten à 45 Minuten. Anmeldung über die Kursseite; die Plätze sind dort nicht angezeigt.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "130 € (8 Einheiten)",
-   "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "category": "musik",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 24
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-02T09:00",
-      "end": "2026-12-02T09:45"
-     },
-     {
-      "start": "2026-12-09T09:00",
-      "end": "2026-12-09T09:45"
-     },
-     {
-      "start": "2026-12-16T09:00",
-      "end": "2026-12-16T09:45"
-     },
-     {
-      "start": "2027-01-13T09:00",
-      "end": "2027-01-13T09:45"
-     },
-     {
-      "start": "2027-01-20T09:00",
-      "end": "2027-01-20T09:45"
-     },
-     {
-      "start": "2027-01-27T09:00",
-      "end": "2027-01-27T09:45"
-     },
-     {
-      "start": "2027-02-03T09:00",
-      "end": "2027-02-03T09:45"
-     },
-     {
-      "start": "2027-02-10T09:00",
-      "end": "2027-02-10T09:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Musikzauber Winterzauber 1–2 Jahre (Mi 15:00)",
-   "summary": "Musikkurs mit Liedern, Bewegung und Winterthemen, 8 Einheiten à 45 Minuten. Anmeldung über die Kursseite; die Plätze sind dort nicht angezeigt.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "130 € (8 Einheiten)",
-   "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "category": "musik",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 24
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-02T15:00",
-      "end": "2026-12-02T15:45"
-     },
-     {
-      "start": "2026-12-09T15:00",
-      "end": "2026-12-09T15:45"
-     },
-     {
-      "start": "2026-12-16T15:00",
-      "end": "2026-12-16T15:45"
-     },
-     {
-      "start": "2027-01-13T15:00",
-      "end": "2027-01-13T15:45"
-     },
-     {
-      "start": "2027-01-20T15:00",
-      "end": "2027-01-20T15:45"
-     },
-     {
-      "start": "2027-01-27T15:00",
-      "end": "2027-01-27T15:45"
-     },
-     {
-      "start": "2027-02-03T15:00",
-      "end": "2027-02-03T15:45"
-     },
-     {
-      "start": "2027-02-10T15:00",
-      "end": "2027-02-10T15:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Musikzauber Winterzauber 2–3 Jahre (Mi 16:00)",
-   "summary": "Musikkurs mit Liedern, Bewegung und Winterthemen für Kleinkinder, 8 Einheiten à 45 Minuten. Anmeldung über die Kursseite; die Plätze sind dort nicht angezeigt.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "130 € (8 Einheiten)",
-   "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-   "category": "musik",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website, keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-02T16:00",
-      "end": "2026-12-02T16:45"
-     },
-     {
-      "start": "2026-12-09T16:00",
-      "end": "2026-12-09T16:45"
-     },
-     {
-      "start": "2026-12-16T16:00",
-      "end": "2026-12-16T16:45"
-     },
-     {
-      "start": "2027-01-13T16:00",
-      "end": "2027-01-13T16:45"
-     },
-     {
-      "start": "2027-01-20T16:00",
-      "end": "2027-01-20T16:45"
-     },
-     {
-      "start": "2027-01-27T16:00",
-      "end": "2027-01-27T16:45"
-     },
-     {
-      "start": "2027-02-03T16:00",
-      "end": "2027-02-03T16:45"
-     },
-     {
-      "start": "2027-02-10T16:00",
-      "end": "2027-02-10T16:45"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Babyturnen im BewegungsRaum (9–14 Mon.) – Herbst 2026",
-   "summary": "Gemeinsames Turnen im BewegungsRaum für Babys von 9 bis 14 Monaten, freitags 11:30–12:30 Uhr. Im Herbst stehen noch drei Termine aus. Buchung über Eversports.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "eltern-kind-turnen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -820,34 +20,27 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-23T11:30",
-      "end": "2026-10-23T12:30"
-     },
-     {
-      "start": "2026-10-30T11:30",
-      "end": "2026-10-30T12:30"
-     },
-     {
-      "start": "2026-11-06T11:30",
-      "end": "2026-11-06T12:30"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "FR"
+    ],
+    "start": "11:30",
+    "end": "12:30",
+    "from": "2026-09-18",
+    "count": 8,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Babyturnen im BewegungsRaum (9–14 Mon.) – Winter 2026/27",
-   "summary": "Winterreihe mit 7 Einheiten für Babys von 9 bis 14 Monaten, freitags 11:30–12:30 Uhr ab 20.11. Buchung über Eversports.",
+   "title": "Babyturnen im BewegungsRaum (9–14 Mon.), Fr 11:30, Winter",
+   "summary": "Zweite Kursreihe des Babyturnens für Babys von 9 bis 14 Monaten mit Begleitperson, sieben Termine freitags ab 20. November. Buchung über Eversports.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "eltern-kind-turnen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -861,7 +54,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -878,52 +71,78 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Kleinkindturnen im BewegungsRaum (12–24 Mon.) – Herbst 2026",
-   "summary": "Bewegungsangebot im BewegungsRaum für Kleinkinder von 12 bis 24 Monaten, freitags 10:15–11:15 Uhr. Im Herbst stehen noch drei Termine aus. Buchung über Eversports.",
+   "title": "SinnesZauber (9–15 Mon.), Mo 10:30",
+   "summary": "Sinnesspiele für Babys von 9 bis 15 Monaten mit Begleitperson, vier Termine montags vom 23. November bis 14. Dezember. Buchung über Eversports.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "spielgruppe"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "url": "https://studioherzschlag.de/kurse-ab-september/",
    "sourceUrl": "https://studioherzschlag.de/kurse-ab-september/",
-   "category": "bewegung",
+   "category": "babykurse",
    "age": {
-    "minMonths": 12,
-    "maxMonths": 24
+    "minMonths": 9,
+    "maxMonths": 15
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-23T10:15",
-      "end": "2026-10-23T11:15"
-     },
-     {
-      "start": "2026-10-30T10:15",
-      "end": "2026-10-30T11:15"
-     },
-     {
-      "start": "2026-11-06T10:15",
-      "end": "2026-11-06T11:15"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "10:30",
+    "end": "11:15",
+    "from": "2026-11-23",
+    "count": 4,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Kleinkindturnen im BewegungsRaum (12–24 Mon.) – Winter 2026/27",
-   "summary": "Winterreihe mit 7 Einheiten für Kleinkinder von 12 bis 24 Monaten, freitags 10:15–11:15 Uhr ab 20.11. Buchung über Eversports.",
+   "title": "SinnesZauber (12–24 Mon.), Mo 11:30",
+   "summary": "Sinnesspiele für Kleinkinder von 12 bis 24 Monaten mit Begleitperson, vier Termine montags vom 23. November bis 14. Dezember. Buchung über Eversports.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "spielgruppe"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://studioherzschlag.de/kurse-ab-september/",
+   "sourceUrl": "https://studioherzschlag.de/kurse-ab-september/",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 24
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "11:30",
+    "end": "12:15",
+    "from": "2026-11-23",
+    "count": 4,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "studio-herzschlag",
+   "venueId": "studio-herzschlag",
+   "title": "Kleinkindturnen im BewegungsRaum (12–24 Mon.), Fr 10:15, Herbst",
+   "summary": "Turnen im BewegungsRaum für Kleinkinder von 12 bis 24 Monaten mit Begleitperson. Acht Termine freitags bis 6. November; Buchung über Eversports.",
+   "topics": [
+    "eltern-kind-turnen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -937,7 +156,41 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "FR"
+    ],
+    "start": "10:15",
+    "end": "11:15",
+    "from": "2026-09-18",
+    "count": 8,
+    "skipHolidays": false
+   }
+  },
+  {
+   "providerId": "studio-herzschlag",
+   "venueId": "studio-herzschlag",
+   "title": "Kleinkindturnen im BewegungsRaum (12–24 Mon.), Fr 10:15, Winter",
+   "summary": "Zweite Kursreihe für Kleinkinder von 12 bis 24 Monaten mit Begleitperson, sieben Termine freitags ab 20. November. Buchung über Eversports.",
+   "topics": [
+    "eltern-kind-turnen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://studioherzschlag.de/kurse-ab-september/",
+   "sourceUrl": "https://studioherzschlag.de/kurse-ab-september/",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 24
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Buchung über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -954,11 +207,10 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Kleinkindturnen im BewegungsRaum (22–36 Mon.) – Herbst 2026",
-   "summary": "Bewegungsangebot im BewegungsRaum für Kinder von 22 bis 36 Monaten, freitags 9:00–10:00 Uhr. Im Herbst stehen noch drei Termine aus. Buchung über Eversports.",
+   "title": "Kleinkindturnen im BewegungsRaum (22–36 Mon.), Fr 09:00, Herbst",
+   "summary": "Turnen im BewegungsRaum für Kinder von 22 bis 36 Monaten mit Begleitperson. Acht Termine freitags bis 6. November; Buchung über Eversports.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "eltern-kind-turnen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -972,34 +224,27 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-23T09:00",
-      "end": "2026-10-23T10:00"
-     },
-     {
-      "start": "2026-10-30T09:00",
-      "end": "2026-10-30T10:00"
-     },
-     {
-      "start": "2026-11-06T09:00",
-      "end": "2026-11-06T10:00"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "FR"
+    ],
+    "start": "09:00",
+    "end": "10:00",
+    "from": "2026-09-18",
+    "count": 8,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Kleinkindturnen im BewegungsRaum (22–36 Mon.) – Winter 2026/27",
-   "summary": "Winterreihe mit 7 Einheiten für Kinder von 22 bis 36 Monaten, freitags 9:00–10:00 Uhr ab 20.11. Buchung über Eversports.",
+   "title": "Kleinkindturnen im BewegungsRaum (22–36 Mon.), Fr 09:00, Winter",
+   "summary": "Zweite Kursreihe für Kinder von 22 bis 36 Monaten mit Begleitperson, sieben Termine freitags ab 20. November. Buchung über Eversports.",
    "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+    "eltern-kind-turnen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -1013,7 +258,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -1030,96 +275,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "SinnesZauber (9–15 Mon.)",
-   "summary": "Sinnesangebot für Babys von 9 bis 15 Monaten, 4 Einheiten montags 10:30–11:15 Uhr vom 23.11. bis 14.12. Buchung über Eversports.",
-   "topics": [
-    "eltern-kind-gruppe"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://studioherzschlag.de/kurse-ab-september/",
-   "sourceUrl": "https://studioherzschlag.de/kurse-ab-september/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 9,
-    "maxMonths": 15
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-23T10:30",
-      "end": "2026-11-23T11:15"
-     },
-     {
-      "start": "2026-11-30T10:30",
-      "end": "2026-11-30T11:15"
-     },
-     {
-      "start": "2026-12-07T10:30",
-      "end": "2026-12-07T11:15"
-     },
-     {
-      "start": "2026-12-14T10:30",
-      "end": "2026-12-14T11:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "SinnesZauber (1–2 J.)",
-   "summary": "Sinnesangebot für Kleinkinder von 12 bis 24 Monaten, 4 Einheiten montags 11:30–12:15 Uhr vom 23.11. bis 14.12. Buchung über Eversports.",
-   "topics": [
-    "eltern-kind-gruppe"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://studioherzschlag.de/kurse-ab-september/",
-   "sourceUrl": "https://studioherzschlag.de/kurse-ab-september/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 24
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-23T11:30",
-      "end": "2026-11-23T12:15"
-     },
-     {
-      "start": "2026-11-30T11:30",
-      "end": "2026-11-30T12:15"
-     },
-     {
-      "start": "2026-12-07T11:30",
-      "end": "2026-12-07T12:15"
-     },
-     {
-      "start": "2026-12-14T11:30",
-      "end": "2026-12-14T12:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "studio-herzschlag",
-   "venueId": "studio-herzschlag",
-   "title": "Yoga mit Baby mit Aerial-Einheit – Herbst 2026",
-   "summary": "Yoga mit Baby dienstags 10:15–11:15 Uhr, mit einer Aerial-Einheit. Noch vier Termine bis 10.11. Buchung über Eversports.",
+   "title": "Yoga mit Baby, Di 10:15, Herbst",
+   "summary": "Yoga mit Baby, eine Einheit mit Aerial-Elementen. Neun Termine dienstags vom 15. September bis 10. November; Buchung über Eversports.",
    "topics": [
     "yoga-mit-baby"
    ],
@@ -1131,35 +288,25 @@
    "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-20T10:15",
-      "end": "2026-10-20T11:15"
-     },
-     {
-      "start": "2026-10-27T10:15",
-      "end": "2026-10-27T11:15"
-     },
-     {
-      "start": "2026-11-03T10:15",
-      "end": "2026-11-03T11:15"
-     },
-     {
-      "start": "2026-11-10T10:15",
-      "end": "2026-11-10T11:15"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:15",
+    "end": "11:15",
+    "from": "2026-09-15",
+    "count": 9,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Yoga mit Baby mit Aerial-Einheit – Winter 2026/27",
-   "summary": "Yoga mit Baby dienstags 10:15–11:15 Uhr ab 17.11., 9 Einheiten, mit einer Aerial-Einheit. Buchung über Eversports.",
+   "title": "Yoga mit Baby, Di 10:15, Winter",
+   "summary": "Yoga mit Baby mit Aerial-Einheit, neun Termine dienstags ab 17. November bis Ende Januar. Buchung über Eversports.",
    "topics": [
     "yoga-mit-baby"
    ],
@@ -1171,7 +318,7 @@
    "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -1188,8 +335,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Pilates & Fitness mit Kleinkind (Aerial-Einheiten) – Herbst 2026",
-   "summary": "Pilates und Fitness mit Kleinkind donnerstags 9:15–10:15 Uhr, mit Aerial-Einheiten. Noch vier Termine bis 12.11. Buchung über Eversports.",
+   "title": "Pilates & Fitness mit Kleinkind, Do 09:15, Herbst",
+   "summary": "Pilates- und Fitnesskurs mit Kleinkind, mit Aerial-Einheiten. Neun Termine donnerstags vom 17. September bis 12. November; Buchung über Eversports.",
    "topics": [
     "fitness-mit-baby"
    ],
@@ -1201,35 +348,25 @@
    "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-22T09:15",
-      "end": "2026-10-22T10:15"
-     },
-     {
-      "start": "2026-10-29T09:15",
-      "end": "2026-10-29T10:15"
-     },
-     {
-      "start": "2026-11-05T09:15",
-      "end": "2026-11-05T10:15"
-     },
-     {
-      "start": "2026-11-12T09:15",
-      "end": "2026-11-12T10:15"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "09:15",
+    "end": "10:15",
+    "from": "2026-09-17",
+    "count": 9,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Pilates & Fitness mit Baby (Aerial-Einheiten) – Herbst 2026",
-   "summary": "Pilates und Fitness mit Baby donnerstags 10:30–11:30 Uhr, mit Aerial-Einheiten. Noch vier Termine bis 12.11. Buchung über Eversports.",
+   "title": "Pilates & Fitness mit Baby, Do 10:30, Herbst",
+   "summary": "Pilates und Fitness mit Baby, mit Aerial-Einheiten. Neun Termine donnerstags vom 17. September bis 12. November; Buchung über Eversports.",
    "topics": [
     "fitness-mit-baby"
    ],
@@ -1241,35 +378,25 @@
    "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-22T10:30",
-      "end": "2026-10-22T11:30"
-     },
-     {
-      "start": "2026-10-29T10:30",
-      "end": "2026-10-29T11:30"
-     },
-     {
-      "start": "2026-11-05T10:30",
-      "end": "2026-11-05T11:30"
-     },
-     {
-      "start": "2026-11-12T10:30",
-      "end": "2026-11-12T11:30"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "10:30",
+    "end": "11:30",
+    "from": "2026-09-17",
+    "count": 9,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Pilates & Fitness mit Baby (Aerial-Einheiten) – Winter 2026/27",
-   "summary": "Pilates und Fitness mit Baby donnerstags 10:30–11:30 Uhr ab 19.11., 8 Einheiten bis 28.01.2027. Buchung über Eversports.",
+   "title": "Pilates & Fitness mit Baby, Do 10:30, Winter",
+   "summary": "Pilates und Fitness mit Baby, mit Aerial-Einheiten. Acht Termine donnerstags ab 19. November bis Ende Januar; Buchung über Eversports.",
    "topics": [
     "fitness-mit-baby"
    ],
@@ -1281,7 +408,7 @@
    "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über Eversports; Platzanzeige nicht abrufbar"
+    "note": "Buchung über Eversports"
    },
    "schedule": {
     "kind": "weekly",
@@ -1298,8 +425,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Babymassage + Babyyoga, Mo 11:15 (Okt.)",
-   "summary": "Sanfte Babymassage mit Babyyoga und Achtsamkeit für Babys ab ca. 6 Wochen bis 4 Monate, höchstens 6 Familien. Kurs eines Partners im Studio; Buchung über das Formular, der Vertrag besteht mit dem Partner.",
+   "title": "Babymassage + Babyyoga (ab 6 Wo.), Mo 11:15, Okt. 2026",
+   "summary": "Sanfte indische Babymassage mit Babyyoga und Achtsamkeitsübungen für Babys ab etwa 6 Wochen, höchstens 6 Familien. Externer Partnerkurs, Buchung über das Formular.",
    "topics": [
     "babymassage",
     "yoga-mit-baby"
@@ -1317,7 +444,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
     "kind": "dates",
@@ -1344,8 +471,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Babymassage + Babyyoga, Di 9:00 (Okt.–Nov.)",
-   "summary": "Sanfte Babymassage mit Babyyoga und Achtsamkeit für Babys ab ca. 6 Wochen bis 4 Monate, höchstens 6 Familien. Kurs eines Partners im Studio; Buchung über das Formular, der Vertrag besteht mit dem Partner.",
+   "title": "Babymassage + Babyyoga (ab 6 Wo.), Di 9:00, Okt.–Nov. 2026",
+   "summary": "Sanfte Babymassage mit Babyyoga und Achtsamkeitsübungen für Babys ab etwa 6 Wochen, höchstens 6 Familien, sechs Termine. Externer Partnerkurs, Buchung über das Formular.",
    "topics": [
     "babymassage",
     "yoga-mit-baby"
@@ -1363,7 +490,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
     "kind": "dates",
@@ -1398,8 +525,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Babymassage + Babyyoga, Di 9:00 (Nov.–Dez.)",
-   "summary": "Sanfte Babymassage mit Babyyoga und Achtsamkeit für Babys ab ca. 6 Wochen bis 4 Monate, höchstens 6 Familien. Kurs eines Partners im Studio; Buchung über das Formular, der Vertrag besteht mit dem Partner.",
+   "title": "Babymassage + Babyyoga (ab 6 Wo.), Di 9:00, Nov.–Dez. 2026",
+   "summary": "Sanfte Babymassage mit Babyyoga und Achtsamkeitsübungen für Babys ab etwa 6 Wochen, höchstens 6 Familien, vier Termine. Externer Partnerkurs, Buchung über das Formular.",
    "topics": [
     "babymassage",
     "yoga-mit-baby"
@@ -1417,7 +544,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
     "kind": "dates",
@@ -1444,8 +571,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "BewegungsNest 1,5–3 J., Mi 15:45 (Herbst)",
-   "summary": "Bewegungslandschaften und kleine Impulse, in denen Kinder frei und in eigenem Tempo klettern, balancieren und ausprobieren. Kurs eines Partners; dieser Kurs ist bereits ausgebucht.",
+   "title": "BewegungsNest 1,5–3 J., Mi 15:45, Sept.–Okt. 2026",
+   "summary": "Bewegungsangebot für Kinder von 1,5 bis 3 Jahren mit Bewegungslandschaften und kleinen Impulsen, ohne starre Vorgaben. Externer Partnerkurs; der Herbstkurs ist ausgebucht.",
    "topics": [
     "bewegung",
     "eltern-kind-turnen"
@@ -1463,7 +590,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "ausgebucht"
+    "note": "Laut Seite ausgebucht"
    },
    "schedule": {
     "kind": "dates",
@@ -1506,8 +633,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "BewegungsNest 1,5–3 J., Do 16:00 (Winter)",
-   "summary": "Bewegungslandschaften und kleine Impulse, in denen Kinder frei und in eigenem Tempo klettern, balancieren und ausprobieren. Kurs eines Partners; Buchung über das Formular, keine Platzangabe sichtbar.",
+   "title": "BewegungsNest 1,5–3 J., Do 16:00, Dez. 2026–Feb. 2027",
+   "summary": "Bewegungsangebot für Kinder von 1,5 bis 3 Jahren mit Bewegungslandschaften und kleinen Impulsen. Externer Partnerkurs, Buchung über das Formular; Feiertage 24.12. und 31.12. entfallen.",
    "topics": [
     "bewegung",
     "eltern-kind-turnen"
@@ -1525,7 +652,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
     "kind": "dates",
@@ -1568,8 +695,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "BewegungsNest 1,5–3 J., Do 16:00 (Frühjahr)",
-   "summary": "Bewegungslandschaften und kleine Impulse, in denen Kinder frei und in eigenem Tempo klettern, balancieren und ausprobieren. Kurs eines Partners; Buchung über das Formular, keine Platzangabe sichtbar.",
+   "title": "BewegungsNest 1,5–3 J., Do 16:00, Feb.–Apr. 2027",
+   "summary": "Bewegungsangebot für Kinder von 1,5 bis 3 Jahren mit Bewegungslandschaften und kleinen Impulsen. Externer Partnerkurs, Buchung über das Formular; der Termin am 25.03. entfällt.",
    "topics": [
     "bewegung",
     "eltern-kind-turnen"
@@ -1587,7 +714,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
     "kind": "dates",
@@ -1630,8 +757,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "BewegungsNest 1,5–3 J., Do 16:00 (Sommer)",
-   "summary": "Bewegungslandschaften und kleine Impulse, in denen Kinder frei und in eigenem Tempo klettern, balancieren und ausprobieren. Kurs eines Partners; Buchung über das Formular, keine Platzangabe sichtbar.",
+   "title": "BewegungsNest 1,5–3 J., Do 16:00, Apr.–Juli 2027",
+   "summary": "Bewegungsangebot für Kinder von 1,5 bis 3 Jahren mit Bewegungslandschaften und kleinen Impulsen. Externer Partnerkurs, Buchung über das Formular; die Termine am 06.05. und 27.05. entfallen.",
    "topics": [
     "bewegung",
     "eltern-kind-turnen"
@@ -1649,7 +776,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
     "kind": "dates",
@@ -1692,11 +819,11 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "HerzZeit Kleine Entdecker (9–24 Monate)",
-   "summary": "Freies Spielen und Entdecken mit Sensorik- und Alltagsmaterial sowie gemeinsamen Liedern und Ritualen. 8 Termine dienstags ab 15.09.; ein Nachholtermin am 10.11. wird separat angegeben.",
+   "title": "HerzZeit Kleine Entdecker (9–24 Mon.), Di 14:00",
+   "summary": "Eltern-Kind-Kurs mit freiem Spielen, Sinnesmaterial und gemeinsamen Liedern; Austausch unter den Familien. Acht Termine ab 15.09., Nachholtermin 10.11.; Drop-in für 15 € möglich.",
    "topics": [
-    "eltern-kind-gruppe",
-    "spielgruppe"
+    "spielgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -1711,54 +838,28 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-15T14:00",
-      "end": "2026-09-15T14:45"
-     },
-     {
-      "start": "2026-09-22T14:00",
-      "end": "2026-09-22T14:45"
-     },
-     {
-      "start": "2026-09-29T14:00",
-      "end": "2026-09-29T14:45"
-     },
-     {
-      "start": "2026-10-06T14:00",
-      "end": "2026-10-06T14:45"
-     },
-     {
-      "start": "2026-10-13T14:00",
-      "end": "2026-10-13T14:45"
-     },
-     {
-      "start": "2026-10-20T14:00",
-      "end": "2026-10-20T14:45"
-     },
-     {
-      "start": "2026-10-27T14:00",
-      "end": "2026-10-27T14:45"
-     },
-     {
-      "start": "2026-11-03T14:00",
-      "end": "2026-11-03T14:45"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "14:00",
+    "end": "14:45",
+    "from": "2026-09-15",
+    "count": 8,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "HerzZeit Kleine Künstler (2–4 Jahre)",
-   "summary": "Ein gemeinsames kreatives Projekt pro Stunde mit der Bezugsperson, etwa Basteln oder kleine Naturprojekte. 8 Termine dienstags ab 15.09.; ein Nachholtermin am 10.11. wird separat angegeben.",
+   "title": "HerzZeit Kleine Künstler (2–4 J.), Di 15:00",
+   "summary": "Eltern-Kind-Kurs, in jeder Stunde entsteht ein kreatives Projekt gemeinsam mit der Bezugsperson, etwa Basteln und kleine Naturprojekte. Acht Termine ab 15.09., Nachholtermin 10.11.; Drop-in für 15 € möglich.",
    "topics": [
-    "eltern-kind-gruppe",
-    "kreativ"
+    "kreativ",
+    "eltern-kind-gruppe"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -1766,61 +867,34 @@
    "price": "130 € (8 Termine)",
    "url": "https://studioherzschlag.de/angebot/herzzeit/",
    "sourceUrl": "https://studioherzschlag.de/angebot/herzzeit/",
-   "category": "krabbel-spielgruppen",
+   "category": "kreativ",
    "age": {
     "minMonths": 24,
     "maxMonths": 48
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Buchung über das Formular; keine Platzangabe sichtbar"
+    "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-15T15:00",
-      "end": "2026-09-15T16:00"
-     },
-     {
-      "start": "2026-09-22T15:00",
-      "end": "2026-09-22T16:00"
-     },
-     {
-      "start": "2026-09-29T15:00",
-      "end": "2026-09-29T16:00"
-     },
-     {
-      "start": "2026-10-06T15:00",
-      "end": "2026-10-06T16:00"
-     },
-     {
-      "start": "2026-10-13T15:00",
-      "end": "2026-10-13T16:00"
-     },
-     {
-      "start": "2026-10-20T15:00",
-      "end": "2026-10-20T16:00"
-     },
-     {
-      "start": "2026-10-27T15:00",
-      "end": "2026-10-27T16:00"
-     },
-     {
-      "start": "2026-11-03T15:00",
-      "end": "2026-11-03T16:00"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "15:00",
+    "end": "16:00",
+    "from": "2026-09-15",
+    "count": 8,
+    "skipHolidays": false
    }
   },
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Laternenbasteln mit Kind (HerzZeit)",
-   "summary": "Gemeinsames Laternenbasteln für Eltern mit Kind an zwei Dienstagnachmittagen. Materialkosten 5 €; Anmeldung über das Formular.",
+   "title": "Laternenbasteln mit Kind (20.10. und 27.10.)",
+   "summary": "Einmaliger Bastelnachmittag im Rahmen von HerzZeit mit Kind, Materialkosten 5 €. Der Termin am 27.10. ist ausgebucht, zum 20.10. fehlt eine Platzangabe.",
    "topics": [
-    "kreativ",
-    "eltern-kind-gruppe"
+    "kreativ"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -1831,7 +905,7 @@
    "category": "kreativ",
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über das Formular; keine Platzangabe sichtbar"
+    "note": "27.10. ausgebucht; 20.10. ohne Platzangabe, Anmeldung über das Formular"
    },
    "schedule": {
     "kind": "dates",
@@ -1850,8 +924,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Mama Outdoor Fitness mit Baby – Anfänger (dienstags 10:00)",
-   "summary": "Ausdauer- und Krafttraining an der frischen Luft am Wöhrder See, das Baby ist im Kinderwagen oder in der Trage dabei. Einstieg jederzeit möglich; Buchung über das Formular, der Vertrag besteht mit dem externen Partner.",
+   "title": "Outdoor-Fitness mit Baby, Anfänger (Di 10–11 Uhr)",
+   "summary": "Ausdauer- und Krafttraining an der frischen Luft am Wöhrder See, Baby im Kinderwagen oder in der Trage. Einstieg jederzeit möglich. Angebot eines externen Partners: Vertrag und Rechnung dort.",
    "topics": [
     "fitness-mit-baby",
     "bewegung"
@@ -1880,8 +954,8 @@
   {
    "providerId": "studio-herzschlag",
    "venueId": "studio-herzschlag",
-   "title": "Mama Outdoor Fitness mit Baby – Fortgeschritten (dienstags 15:00)",
-   "summary": "Ausdauer- und Krafttraining an der frischen Luft am Wöhrder See, das Baby ist im Kinderwagen oder in der Trage dabei. Einstieg jederzeit möglich; Buchung über das Formular, der Vertrag besteht mit dem externen Partner.",
+   "title": "Outdoor-Fitness mit Baby, Fortgeschrittene (Di 15–16 Uhr)",
+   "summary": "Fortgeschrittenen-Training mit Ausdauer, Kraft und Beweglichkeit an der frischen Luft am Wöhrder See, Baby im Kinderwagen oder in der Trage. Einstieg jederzeit möglich. Angebot eines externen Partners: Vertrag und Rechnung dort.",
    "topics": [
     "fitness-mit-baby",
     "bewegung"
@@ -1908,15 +982,15 @@
    }
   }
  ],
- "inputHash": "138d837dc98d68a034b209d170a317143a29b24bfab75eec46a361bee924867f",
+ "inputHash": "ead316d7a241dc15dcc3fbaef433a86aeb6422af1f377b611613d8df30d64f24",
  "dated": {
   "2026-11-30": "0f2d519fa72c5a072839aeaea365b4584120eab8046e69d49f2e794796677573",
   "2026-12-02": "8ee32202c3a3084ec909754f885fe80d6c1ee9933f1c958a42676ce56ea0c265"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": [
   "frankenkids"
  ]

@@ -3,8 +3,8 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer (Dienstag 9–12 Uhr)",
-   "summary": "Offener Spiel- und Begegnungstreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne Anmeldung. Nicht in den Ferien; im Sommer auch der Garten.",
+   "title": "Offenes Kinderzimmer – Dienstag 9–12 Uhr",
+   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahren: freies Spielen und Austausch im Kinderzimmer. Einfach vorbeikommen, nicht in den Ferien; ohne pädagogische Betreuung.",
    "topics": [
     "spielgruppe",
     "elterntreff"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Einfach vorbeikommen, keine Anmeldung"
+    "note": "Offener Treff, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -38,8 +38,8 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer (Donnerstag 14–17 Uhr)",
-   "summary": "Offener Spiel- und Begegnungstreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne Anmeldung. Nicht in den Ferien; im Sommer auch der Garten.",
+   "title": "Offenes Kinderzimmer – Donnerstag 14–17 Uhr",
+   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahren: freies Spielen und Austausch im Kinderzimmer. Einfach vorbeikommen, nicht in den Ferien; ohne pädagogische Betreuung.",
    "topics": [
     "spielgruppe",
     "elterntreff"
@@ -57,7 +57,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Einfach vorbeikommen, keine Anmeldung"
+    "note": "Offener Treff, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -71,10 +71,10 @@
    }
   }
  ],
- "inputHash": "d8820540355b7317508d40753122e292a6b59bff33bdc45c8cd82c5c22b1537a",
+ "inputHash": "fa656021d624a403eb3fa6d3b5ea56e00dee257e7e985b5da70ba4fa0a433658",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": []
 }

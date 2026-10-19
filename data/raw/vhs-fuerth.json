@@ -3,8 +3,8 @@
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 1½–2½ Jahre (Mittwoch 17:00)",
-   "summary": "Wöchentlich neu aufgebauter Bewegungsparcours, Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursstart war der 23.09.2026; Anmeldung über die vhs (Kursnummer 16301).",
+   "title": "Eltern-Kind-Turnen 1½–2½ Jahre (Mi, 17:00)",
+   "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09.2026.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die vhs-Kursseite (Kursnummer 16301)"
+    "note": "Freie Plätze nicht angegeben; Anmeldung über die Kursdetails (Kursnummer 16301)."
    },
    "schedule": {
     "kind": "weekly",
@@ -37,8 +37,8 @@
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 2–3 Jahre (Donnerstag 17:00)",
-   "summary": "Wöchentlich neu aufgebauter Bewegungsparcours, Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursstart war der 24.09.2026; Anmeldung über die vhs (Kursnummer 16303).",
+   "title": "Eltern-Kind-Turnen 2–3 Jahre (Do, 17:00)",
+   "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09.2026.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -56,7 +56,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die vhs-Kursseite (Kursnummer 16303)"
+    "note": "Freie Plätze nicht angegeben; Anmeldung über die Kursdetails (Kursnummer 16303)."
    },
    "schedule": {
     "kind": "weekly",
@@ -69,10 +69,10 @@
    }
   }
  ],
- "inputHash": "fcd25bc5cbc50d4d679b6e6870cc085ef164cab53d99d9af4aeea2f1a55ebdc4",
+ "inputHash": "93bc4712e2c8993b80734a2cca6775a718f79b1bd3257b726079e8788502a971",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-18T08:28:10+02:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
+ "checkedAt": "2026-10-19T08:39:52+02:00",
+ "changedAt": "2026-10-19T08:39:52+02:00",
  "sources": []
 }
