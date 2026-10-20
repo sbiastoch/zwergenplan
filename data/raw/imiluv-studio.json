@@ -3,8 +3,8 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Reformer Mums & Babies (Pilates mit Baby, ca. 6 Wochen–6 Monate)",
-   "summary": "Sanftes Reformer-Pilates nach der Geburt, das Baby ist dabei, Kursleitung auf Englisch. Ärztliche Freigabe nötig. Buchung in der IMILUV-App; 55 Minuten.",
+   "title": "Reformer Pilates für Mamas & Babys (ca. 6 Wochen–6 Monate)",
+   "summary": "Pilates auf dem Reformer mit Baby, 55 Min., auf Englisch. Ärztliche Freigabe nötig. Buchung nur über die IMILUV-App (bsport), Termine einzeln buchbar.",
    "topics": [
     "fitness-mit-baby",
     "mehrsprachig"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Laut Buchungssystem nicht ausgebucht; Buchung in der IMILUV-App"
+    "note": "Nicht ausgebucht laut Termin-API; Buchung in der IMILUV-App (bsport)"
    },
    "schedule": {
     "kind": "dates",
@@ -61,54 +61,11 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Barre Baby Luv (Barre mit Baby im Tragetuch, ca. 6–12 Monate)",
-   "summary": "Barre-Training für Mamas mit Baby in der Trage, Babys ca. 6–12 Monate. Deutsch/Englisch, ärztliche Freigabe nötig. Anmeldung über die IMILUV-App; 55 Minuten.",
+   "title": "Barre Baby Luv (Babys ca. 6–12 Monate, in der Trage)",
+   "summary": "Barre-Training mit Baby in der Trage, rund 50 Minuten, Deutsch/Englisch. Ärztliche Freigabe nötig. Buchung nur in der IMILUV-App, Termine laufen wöchentlich donnerstags.",
    "topics": [
     "fitness-mit-baby",
     "mehrsprachig"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "5 Credits pro Termin",
-   "url": "https://www.frankenkids.de/veranstaltungen/barre-fuer-mamas-babys/2026-10-08/",
-   "sourceUrl": "https://www.frankenkids.de/veranstaltungen/barre-fuer-mamas-babys/2026-10-08/",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die IMILUV-App"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-22T10:45",
-      "end": "2026-10-22T11:40"
-     },
-     {
-      "start": "2026-11-05T10:45",
-      "end": "2026-11-05T11:40"
-     },
-     {
-      "start": "2026-11-19T10:45",
-      "end": "2026-11-19T11:40"
-     }
-    ]
-   },
-   "via": "frankenkids"
-  },
-  {
-   "providerId": "imiluv-studio",
-   "venueId": "imiluv-studio",
-   "title": "Barre Baby Luv (Babys ca. 6–12 Monate)",
-   "summary": "Barre-Training mit Baby in der Trage, Deutsch/Englisch. Ärztliche Freigabe nötig. Buchung nur in der IMILUV-App; Einstieg bei Terminen mit freien Plätzen möglich.",
-   "topics": [
-    "fitness-mit-baby",
-    "bewegung"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -122,8 +79,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "frei",
-    "note": "Nicht ausgebucht laut Terminliste; Anmeldung in der IMILUV-App (bsport)"
+    "status": "unbekannt",
+    "note": "Buchung in der IMILUV-App (bsport); die Termin-API zeigt keine Platzzahl, nur ob ein Termin voll ist. Zum Stand der Abfrage war keiner als ausgebucht markiert."
    },
    "schedule": {
     "kind": "dates",
@@ -160,7 +117,7 @@
    }
   }
  ],
- "inputHash": "155b317ec4bfc6d66bc6b45dfb8b6e66186b9fd8c680214c8445c459f2727481",
+ "inputHash": "134db90e8016b4cc35f990c78eaef549ba1d419291f064e9d2e6214bc2e59bba",
  "dated": {
   "2026-10-22": "1f0027e86afef28c64f86af055be0f431ea8b5a46e94f712fad7c6866ffe79f5",
   "2026-10-28": "bb0e397cfa0f7faa8bc071e45c37caebbc8ac116cbb0a2fc25e49920f0115d6b",
@@ -171,8 +128,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": [
   "frankenkids"
  ]

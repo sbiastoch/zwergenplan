@@ -3,8 +3,8 @@
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage – Kurs Mo 21.09.–02.11.2026",
-   "summary": "Sanfte Körperberührungen und Austausch für Eltern und Babys von 6 Wochen bis 5 Monate, höchstens 6 Paare, montags 11:00–12:15 Uhr in der FamilienBox. Der Kurs läuft noch bis 02.11.2026; nur noch 1 Platz frei.",
+   "title": "Achtsame Babymassage Mo, Start 21.09.2026 (läuft)",
+   "summary": "Berührungsbasierter Kurs „Bindung durch Berührung“ für Eltern und Babys von 6 Wochen bis 5 Monaten, max. 6 Paare. Der Kurs läuft bereits; laut Website sind noch 2 Termine im Horizont.",
    "topics": [
     "babymassage"
    ],
@@ -60,8 +60,8 @@
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage – Kurs Mo 09.11.–21.12.2026",
-   "summary": "Sanfte Körperberührungen und Austausch für Eltern und Babys von 6 Wochen bis 5 Monate, höchstens 6 Paare, montags 11:00–12:15 Uhr in der FamilienBox. Sieben Termine, noch 3 Plätze frei.",
+   "title": "Achtsame Babymassage Mo, 09.11.–21.12.2026",
+   "summary": "Berührungsbasierter Kurs „Bindung durch Berührung“ für Eltern und Babys von 6 Wochen bis 5 Monaten, max. 6 Paare. Der Kurs ist laut Website bereits ausgebucht.",
    "topics": [
     "babymassage"
    ],
@@ -77,8 +77,8 @@
     "maxMonths": 5
    },
    "availability": {
-    "status": "frei",
-    "note": "3 Plätze frei (5 von 8 belegt)"
+    "status": "ausgebucht",
+    "note": "8 von 8 Plätzen belegt"
    },
    "schedule": {
     "kind": "dates",
@@ -117,8 +117,8 @@
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage – Kurs Mo 11.01.–15.02.2027",
-   "summary": "Sanfte Körperberührungen und Austausch für Eltern und Babys von 6 Wochen bis 5 Monate, höchstens 6 Paare, montags 11:00–12:15 Uhr in der FamilienBox. Sechs Termine, alle 8 Plätze frei.",
+   "title": "Achtsame Babymassage Mo, 11.01.–15.02.2027",
+   "summary": "Berührungsbasierter Kurs „Bindung durch Berührung“ für Eltern und Babys von 6 Wochen bis 5 Monaten, max. 6 Paare. Alle 8 Plätze sind laut Website noch frei.",
    "topics": [
     "babymassage"
    ],
@@ -168,10 +168,10 @@
    }
   }
  ],
- "inputHash": "90e6a451d08a8463f0a32d0c74f6ae18ea83eb1f1d583e1e00bad3993940e080",
+ "inputHash": "00bc7727d27deab5616bf7fc6a8ec0ac69a6c50f004cb296fc230f2d27a2f5ce",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": []
 }

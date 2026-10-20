@@ -4,7 +4,7 @@
    "providerId": "tsv-1846-nuernberg",
    "venueId": "tsv-1846-nuernberg",
    "title": "Eltern-und-Kind-Turnen (1,5–3 Jahre), montags 15–16 Uhr",
-   "summary": "Wöchentliches Bewegungsturnen für Kleinkinder mit einem Elternteil in der Sporthalle Fuggerstraße, mit Geräten und Spielen. Die Gruppe ist laut Website derzeit komplett ausgebucht.",
+   "summary": "Bewegungserfahrungen und Spiel für Kleinkinder ab 1,5 Jahren mit Begleitperson, montags in der Sporthalle Fuggerstraße. Der Kurs ist laut Seite komplett ausgebucht; Preis auf der Seite nicht angegeben.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -21,7 +21,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Kurs komplett ausgebucht laut Turnseite; keine Warteliste genannt, Nachfrage per Mail an den Übungsleiter möglich"
+    "note": "Kurs komplett ausgebucht laut Turnseite"
    },
    "schedule": {
     "kind": "weekly",
@@ -30,15 +30,15 @@
     ],
     "start": "15:00",
     "end": "16:00",
-    "from": "2026-10-19",
+    "from": "2026-10-26",
     "skipHolidays": false
    }
   }
  ],
- "inputHash": "63671b95a82cdac2fc0d26c08e61e3701dfa1f29d12f37ef6ec156817e9b9c89",
+ "inputHash": "30943eb93dccd903c3c315d303a81e24963393c1f25af7d47be41a9fce00a100",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": []
 }

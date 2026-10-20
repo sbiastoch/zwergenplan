@@ -3,8 +3,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby I (4–12 Mon.), Mo 10:30, ab Nov. 2026",
-   "summary": "Musikgarten für Babys von etwa 4 bis 12 Monaten mit Eltern in Nürnberg-Kraftshof, 45 Minuten, 8 Termine. Die Anmeldung läuft über den Button „Kurs buchen“.",
+   "title": "Musikfüchse Baby I (4–12 Mon.) Mo 10:30, ab 23.11.2026",
+   "summary": "Musikstunde mit Singen, Rasseln und Tüchern für Babys mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Laut Kursliste ausgebucht.",
    "topics": [
     "musik",
     "singen"
@@ -21,8 +21,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "frei",
-    "note": "Kein Ausgebucht-Hinweis; Buchung über „Kurs buchen“"
+    "status": "ausgebucht",
+    "note": "Auf der Kursliste als AUSGEBUCHT markiert"
    },
    "schedule": {
     "kind": "dates",
@@ -65,8 +65,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby II (10–18 Mon.), Mo 9:30, ab Nov. 2026",
-   "summary": "Musikgarten für Babys von etwa 10 bis 18 Monaten mit Eltern in Nürnberg-Kraftshof, 45 Minuten, 8 Termine. Die Anmeldung läuft über den Button „Kurs buchen“.",
+   "title": "Musikfüchse Baby II (10–18 Mon.) Mo 09:30, ab 23.11.2026",
+   "summary": "Musikstunde für Babys ab ca. 10 Monaten mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
    "topics": [
     "musik",
     "singen"
@@ -84,7 +84,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Kein Ausgebucht-Hinweis; Buchung über „Kurs buchen“"
+    "note": "Anmeldung über „Kurs buchen“"
    },
    "schedule": {
     "kind": "dates",
@@ -127,8 +127,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby I (4–12 Mon.), Di 10:30, ab Nov. 2026",
-   "summary": "Musikgarten für Babys von etwa 4 bis 12 Monaten mit Eltern in Nürnberg-Kraftshof, 45 Minuten, 8 Termine. Die Anmeldung läuft über den Button „Kurs buchen“.",
+   "title": "Musikfüchse Baby I (4–12 Mon.) Di 10:30, ab 24.11.2026",
+   "summary": "Musikstunde mit Singen, Rasseln und Tüchern für Babys mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
    "topics": [
     "musik",
     "singen"
@@ -146,7 +146,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Kein Ausgebucht-Hinweis; Buchung über „Kurs buchen“"
+    "note": "Anmeldung über „Kurs buchen“"
    },
    "schedule": {
     "kind": "dates",
@@ -189,8 +189,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby II (10–18 Mon.), Di 9:30, ab Nov. 2026",
-   "summary": "Musikgarten für Babys von etwa 10 bis 18 Monaten mit Eltern in Nürnberg-Kraftshof, 45 Minuten, 8 Termine. Die Anmeldung läuft über den Button „Kurs buchen“.",
+   "title": "Musikfüchse Baby II (10–18 Mon.) Di 09:30, ab 24.11.2026",
+   "summary": "Musikstunde für Babys ab ca. 10 Monaten mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
    "topics": [
     "musik",
     "singen"
@@ -208,7 +208,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Kein Ausgebucht-Hinweis; Buchung über „Kurs buchen“"
+    "note": "Anmeldung über „Kurs buchen“"
    },
    "schedule": {
     "kind": "dates",
@@ -251,70 +251,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge I (18 Mon.–3 J.), Mo 15:30, ab Nov. 2026",
-   "summary": "Musikgarten für Kinder von etwa 18 Monaten bis 3 Jahren mit Begleitperson in Nürnberg-Kraftshof, 45 Minuten, 8 Termine. Die Anmeldung läuft über den Button „Kurs buchen“.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "120 € (8 Termine)",
-   "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-   "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-   "category": "musik",
-   "age": {
-    "minMonths": 18,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "frei",
-    "note": "Kein Ausgebucht-Hinweis; Buchung über „Kurs buchen“"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-23T15:30",
-      "end": "2026-11-23T16:15"
-     },
-     {
-      "start": "2026-11-30T15:30",
-      "end": "2026-11-30T16:15"
-     },
-     {
-      "start": "2026-12-07T15:30",
-      "end": "2026-12-07T16:15"
-     },
-     {
-      "start": "2026-12-14T15:30",
-      "end": "2026-12-14T16:15"
-     },
-     {
-      "start": "2026-12-21T15:30",
-      "end": "2026-12-21T16:15"
-     },
-     {
-      "start": "2027-01-11T15:30",
-      "end": "2027-01-11T16:15"
-     },
-     {
-      "start": "2027-01-18T15:30",
-      "end": "2027-01-18T16:15"
-     },
-     {
-      "start": "2027-01-25T15:30",
-      "end": "2027-01-25T16:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "musikfuechse",
-   "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby I (4–12 Mon.), Mo 10:30, Sept. 2026",
-   "summary": "Laufender Musikgarten für Babys von etwa 4 bis 12 Monaten in Nürnberg-Kraftshof, Start 14.09.2026, 45 Minuten. Ob noch ein Einstieg möglich ist, steht nicht auf der Seite; dazu beim Anbieter nachfragen.",
+   "title": "Musikfüchse Baby I (4–12 Mon.) Mo 10:30, ab 14.09.2026",
+   "summary": "Laufender Kurs bis 16.11.2026, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
    "topics": [
     "musik",
     "singen"
@@ -331,8 +269,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "unbekannt",
-    "note": "Kurs läuft bereits; Einstieg beim Anbieter erfragen"
+    "status": "frei",
+    "note": "Anmeldung über „Kurs buchen“"
    },
    "schedule": {
     "kind": "dates",
@@ -375,8 +313,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby II (10–18 Mon.), Mo 9:30, Sept. 2026",
-   "summary": "Laufender Musikgarten für Babys von etwa 10 bis 18 Monaten in Nürnberg-Kraftshof, Start 14.09.2026, 45 Minuten. Ob noch ein Einstieg möglich ist, steht nicht auf der Seite; dazu beim Anbieter nachfragen.",
+   "title": "Musikfüchse Baby II (10–18 Mon.) Mo 09:30, ab 14.09.2026",
+   "summary": "Laufender Kurs bis 16.11.2026 für Babys ab ca. 10 Monaten, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
    "topics": [
     "musik",
     "singen"
@@ -393,8 +331,8 @@
     "maxMonths": 18
    },
    "availability": {
-    "status": "unbekannt",
-    "note": "Kurs läuft bereits; Einstieg beim Anbieter erfragen"
+    "status": "frei",
+    "note": "Anmeldung über „Kurs buchen“"
    },
    "schedule": {
     "kind": "dates",
@@ -437,8 +375,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby I (4–12 Mon.), Di 10:30, Sept. 2026",
-   "summary": "Laufender Musikgarten für Babys von etwa 4 bis 12 Monaten in Nürnberg-Kraftshof, Start 15.09.2026, 45 Minuten. Ob noch ein Einstieg möglich ist, steht nicht auf der Seite; dazu beim Anbieter nachfragen.",
+   "title": "Musikfüchse Baby I (4–12 Mon.) Di 10:30, ab 15.09.2026",
+   "summary": "Laufender Kurs bis 17.11.2026, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
    "topics": [
     "musik",
     "singen"
@@ -455,8 +393,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "unbekannt",
-    "note": "Kurs läuft bereits; Einstieg beim Anbieter erfragen"
+    "status": "frei",
+    "note": "Anmeldung über „Kurs buchen“"
    },
    "schedule": {
     "kind": "dates",
@@ -499,8 +437,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge Baby II (10–18 Mon.), Di 9:30, Sept. 2026",
-   "summary": "Laufender Musikgarten für Babys von etwa 10 bis 18 Monaten in Nürnberg-Kraftshof, Start 15.09.2026, 45 Minuten. Ob noch ein Einstieg möglich ist, steht nicht auf der Seite; dazu beim Anbieter nachfragen.",
+   "title": "Musikfüchse Baby II (10–18 Mon.) Di 09:30, ab 15.09.2026",
+   "summary": "Laufender Kurs bis 17.11.2026 für Babys ab ca. 10 Monaten, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
    "topics": [
     "musik",
     "singen"
@@ -517,8 +455,8 @@
     "maxMonths": 18
    },
    "availability": {
-    "status": "unbekannt",
-    "note": "Kurs läuft bereits; Einstieg beim Anbieter erfragen"
+    "status": "frei",
+    "note": "Anmeldung über „Kurs buchen“"
    },
    "schedule": {
     "kind": "dates",
@@ -561,8 +499,70 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse-Musikzwerge I (18 Mon.–3 J.), Mo 15:30, Sept. 2026 (ausgebucht)",
-   "summary": "Laufender Musikgarten für Kinder von etwa 18 Monaten bis 3 Jahren in Nürnberg-Kraftshof, Start 14.09.2026, 45 Minuten. Der Kurs ist laut Kursliste ausgebucht.",
+   "title": "Musikfüchse I (18 Mon.–3 J.) Mo 15:30, ab 23.11.2026",
+   "summary": "Musikstunde für Kinder ab ca. 18 Monaten mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
+   "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
+   "category": "musik",
+   "age": {
+    "minMonths": 18,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "frei",
+    "note": "Anmeldung über „Kurs buchen“"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-23T15:30",
+      "end": "2026-11-23T16:15"
+     },
+     {
+      "start": "2026-11-30T15:30",
+      "end": "2026-11-30T16:15"
+     },
+     {
+      "start": "2026-12-07T15:30",
+      "end": "2026-12-07T16:15"
+     },
+     {
+      "start": "2026-12-14T15:30",
+      "end": "2026-12-14T16:15"
+     },
+     {
+      "start": "2026-12-21T15:30",
+      "end": "2026-12-21T16:15"
+     },
+     {
+      "start": "2027-01-11T15:30",
+      "end": "2027-01-11T16:15"
+     },
+     {
+      "start": "2027-01-18T15:30",
+      "end": "2027-01-18T16:15"
+     },
+     {
+      "start": "2027-01-25T15:30",
+      "end": "2027-01-25T16:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "musikfuechse",
+   "venueId": "musikfuechse",
+   "title": "Musikfüchse I (18 Mon.–3 J.) Mo 15:30, ab 14.09.2026",
+   "summary": "Laufender Kurs bis 16.11.2026 für Kinder ab ca. 18 Monaten, 45 Min., 8 Termine im Mutherstudio Kraftshof. Laut Kursliste ausgebucht.",
    "topics": [
     "musik",
     "singen"
@@ -580,7 +580,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "AUSGEBUCHT laut Kursliste"
+    "note": "Auf der Kursliste als AUSGEBUCHT markiert"
    },
    "schedule": {
     "kind": "dates",
@@ -621,10 +621,10 @@
    }
   }
  ],
- "inputHash": "42c5a9a837a86120234472cb26e7bef8d92e9389659743b7a8eab657765ce075",
+ "inputHash": "21688ec8e4dd3bca291f6329423dd8b39789c073cf96c115ac81d3b303d8ad77",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": []
 }

@@ -3,37 +3,8 @@
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Offene Tür für Groß und Klein (montags)",
-   "summary": "Offener Treff im FreiRaum der Markuskirche für Familien mit kleinen Kindern, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung nötig.",
-   "topics": [
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8113801.html",
-   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
-   "category": "treffs-cafes",
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff, keine Anmeldung"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "09:00",
-    "end": "11:00",
-    "from": "2026-11-09",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "ev-st-markus-gibitzenhof",
-   "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Café für Alle (Familiencafé, dienstags)",
-   "summary": "Offenes Familiencafé auf dem Platz vor der Markuskirche, bei Regen im FreiRaum: Kaffee und Kuchen gegen Spende, ab und zu Basteln oder Bilderbuchkino. Kinder sind ausdrücklich willkommen; Einstieg jederzeit möglich.",
+   "title": "Café für Alle – Familiencafé mit Kinderprogramm (dienstags)",
+   "summary": "Offener Treff für Familien mit Kindern jeden Alters und alle Interessierten: Kaffee und Kuchen gegen Spende, dazu Bastelaktionen oder Bilderbuchkino. Einfach vorbeikommen, keine Anmeldung.",
    "topics": [
     "elterncafe",
     "elterntreff"
@@ -41,13 +12,13 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "Spende für Kaffee und Kuchen",
+   "price": "Kaffee und Kuchen gegen Spende",
    "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
    "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
+    "note": "Offener Treff, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -55,6 +26,7 @@
      "TU"
     ],
     "start": "15:00",
+    "end": "18:00",
     "from": "2026-10-20",
     "skipHolidays": true
    }
@@ -62,20 +34,21 @@
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Offene Tür für Groß und Klein (montagvormittags)",
-   "summary": "Offener Vormittagstreff für Familien mit Kleinkindern zum Spielen, Kaffeetrinken und Austauschen. Ohne Anmeldung, einfach vorbeikommen.",
+   "title": "Offene Tür für Groß und Klein (montags, Vormittag)",
+   "summary": "Offener Vormittag im FreiRaum für Eltern mit Kleinkindern: gemeinsame Spielzeit, Kaffee und Gesellschaft. Ohne Anmeldung, jeder ist willkommen.",
    "topics": [
-    "eltern-kind-gruppe"
+    "elterntreff",
+    "krabbelgruppe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8113801",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8113801",
-   "category": "krabbel-spielgruppen",
+   "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, keine Anmeldung nötig"
+    "note": "Offener Treff, einfach kommen"
    },
    "schedule": {
     "kind": "dates",
@@ -103,7 +76,7 @@
  ],
  "inputHash": "cd676145798c48b6d14952029969b251f4a5956ec8c285f88bfb3b9670a65c51",
  "dated": {
-  "2026-10-20": "8f116179ca966e41658cbd3073a84f75e6d18d237af788327d28eb4c2a2c880b",
+  "2026-10-20": "f53b8e90f47bd9e1b389281c0381083c0d4045c209ec16a31e92e9f4d449e51a",
   "2026-10-21": "e10f7cfa6b1ca023f97c13e4352f048bb15a0be474ff6487a3b9b718b1db2955",
   "2026-10-22": "ae755afaf9889dfe916ace6d49476c9647b0f89fb609fcd94b5c6db1aaf6689f",
   "2026-10-23": "4e604e2beb670c921112ed71657e8ab2b7e742bd5eb9a15ab15c5d622898ceff",
@@ -183,8 +156,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": [
   "evtermine"
  ]

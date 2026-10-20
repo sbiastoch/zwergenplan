@@ -3,81 +3,16 @@
   {
    "providerId": "ev-zerzabelshof-musikzwerge",
    "venueId": "ev-zerzabelshof-musikzwerge",
-   "title": "Musikzwerge für Babys ab ca. 3 Monaten (Montag 10:30)",
-   "summary": "Gemeinsames Singen und Musizieren mit Rhythmus, Instrumenten und tönenden Materialien; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Neun Termine bis Dezember 2026, keine Platzangabe.",
+   "title": "Musikzwerge ab ca. 1 Jahr (Di 9:15)",
+   "summary": "Gemeinsames Singen, Fingerspiele und Musizieren mit Instrumenten für Eltern und Kind; Eltern bekommen Lieder und Spielideen zum Weitergeben. Termine laut Sammelkalender, Anmeldung und Preis nicht angegeben.",
    "topics": [
     "musik",
-    "singen"
+    "singen",
+    "eltern-kind-gruppe"
    ],
-   "format": "kurs",
+   "format": "regelmaessig",
    "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8108195",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108195",
-   "category": "musik",
-   "age": {
-    "minMonths": 3,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Platzangabe im Kalender"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-19T10:30",
-      "end": "2026-10-19T11:30"
-     },
-     {
-      "start": "2026-10-26T10:30",
-      "end": "2026-10-26T11:30"
-     },
-     {
-      "start": "2026-11-09T10:30",
-      "end": "2026-11-09T11:30"
-     },
-     {
-      "start": "2026-11-16T10:30",
-      "end": "2026-11-16T11:30"
-     },
-     {
-      "start": "2026-11-23T10:30",
-      "end": "2026-11-23T11:30"
-     },
-     {
-      "start": "2026-11-30T10:30",
-      "end": "2026-11-30T11:30"
-     },
-     {
-      "start": "2026-12-07T10:30",
-      "end": "2026-12-07T11:30"
-     },
-     {
-      "start": "2026-12-14T10:30",
-      "end": "2026-12-14T11:30"
-     },
-     {
-      "start": "2026-12-21T10:30",
-      "end": "2026-12-21T11:30"
-     }
-    ]
-   },
-   "via": "evtermine"
-  },
-  {
-   "providerId": "ev-zerzabelshof-musikzwerge",
-   "venueId": "ev-zerzabelshof-musikzwerge",
-   "title": "Musikzwerge für Kinder ab ca. 1 Jahr (Dienstag 9:15)",
-   "summary": "Gemeinsames Singen und Musizieren mit Rhythmus, Instrumenten und tönenden Materialien; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Neun Termine bis Dezember 2026, keine Platzangabe.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
+   "cost": "kostenpflichtig",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8122212",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8122212",
    "category": "musik",
@@ -87,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe im Kalender"
+    "note": "Keine Platzangabe; Auskunft beim Veranstalter, Auferstehungskirche Zerzabelshof"
    },
    "schedule": {
     "kind": "dates",
@@ -135,15 +70,16 @@
   {
    "providerId": "ev-zerzabelshof-musikzwerge",
    "venueId": "ev-zerzabelshof-musikzwerge",
-   "title": "Musikzwerge für Kinder ab ca. 18 Monaten (Dienstag 10:30)",
-   "summary": "Gemeinsames Singen und Musizieren mit Rhythmus, Instrumenten und tönenden Materialien; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Neun Termine bis Dezember 2026, keine Platzangabe.",
+   "title": "Musikzwerge ab 18 Monaten (Di 10:30)",
+   "summary": "Gemeinsames Singen, Fingerspiele und Musizieren mit Instrumenten für Eltern und Kind; Eltern bekommen Lieder und Spielideen zum Weitergeben. Termine laut Sammelkalender, Anmeldung und Preis nicht angegeben.",
    "topics": [
     "musik",
-    "singen"
+    "singen",
+    "eltern-kind-gruppe"
    ],
-   "format": "kurs",
+   "format": "regelmaessig",
    "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
+   "cost": "kostenpflichtig",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=8108208",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108208",
    "category": "musik",
@@ -153,7 +89,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe im Kalender"
+    "note": "Keine Platzangabe; Auskunft beim Veranstalter, Auferstehungskirche Zerzabelshof"
    },
    "schedule": {
     "kind": "dates",
@@ -201,17 +137,18 @@
   {
    "providerId": "ev-zerzabelshof-musikzwerge",
    "venueId": "ev-zerzabelshof-musikzwerge",
-   "title": "Musikzwerge für Eltern mit Kind ab ca. 2 Jahren (Montag 9:15)",
-   "summary": "Gemeinsames Singen und Musizieren mit Rhythmus, Instrumenten und tönenden Materialien; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Neun Termine bis Dezember 2026, keine Platzangabe.",
+   "title": "Musikzwerge ab 2 Jahren (Mo 9:15)",
+   "summary": "Gemeinsames Singen, Fingerspiele und Musizieren mit Instrumenten für Kinder ab 2 Jahren mit Eltern. Termine laut Sammelkalender, Anmeldung und Preis nicht angegeben.",
    "topics": [
     "musik",
-    "singen"
+    "singen",
+    "eltern-kind-gruppe"
    ],
-   "format": "kurs",
+   "format": "regelmaessig",
    "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8108181",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108181",
+   "cost": "kostenpflichtig",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8108182",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108182",
    "category": "musik",
    "age": {
     "minMonths": 24,
@@ -219,15 +156,11 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe im Kalender"
+    "note": "Keine Platzangabe; Auskunft beim Veranstalter, Auferstehungskirche Zerzabelshof"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-19T09:15",
-      "end": "2026-10-19T10:15"
-     },
      {
       "start": "2026-10-26T09:15",
       "end": "2026-10-26T10:15"
@@ -263,33 +196,95 @@
     ]
    },
    "via": "evtermine"
+  },
+  {
+   "providerId": "ev-zerzabelshof-musikzwerge",
+   "venueId": "ev-zerzabelshof-musikzwerge",
+   "title": "Musikzwerge ab ca. 3 Monaten (Mo 10:30)",
+   "summary": "Gemeinsames Singen, Fingerspiele und Musizieren mit Instrumenten für Eltern mit Baby; Eltern bekommen Lieder und Spielideen zum Weitergeben. Termine laut Sammelkalender, Anmeldung und Preis nicht angegeben.",
+   "topics": [
+    "musik",
+    "singen",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8108196",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108196",
+   "category": "musik",
+   "age": {
+    "minMonths": 3,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzangabe; Auskunft beim Veranstalter, Auferstehungskirche Zerzabelshof"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-26T10:30",
+      "end": "2026-10-26T11:30"
+     },
+     {
+      "start": "2026-11-09T10:30",
+      "end": "2026-11-09T11:30"
+     },
+     {
+      "start": "2026-11-16T10:30",
+      "end": "2026-11-16T11:30"
+     },
+     {
+      "start": "2026-11-23T10:30",
+      "end": "2026-11-23T11:30"
+     },
+     {
+      "start": "2026-11-30T10:30",
+      "end": "2026-11-30T11:30"
+     },
+     {
+      "start": "2026-12-07T10:30",
+      "end": "2026-12-07T11:30"
+     },
+     {
+      "start": "2026-12-14T10:30",
+      "end": "2026-12-14T11:30"
+     },
+     {
+      "start": "2026-12-21T10:30",
+      "end": "2026-12-21T11:30"
+     }
+    ]
+   },
+   "via": "evtermine"
   }
  ],
  "inputHash": "e4ec70a50a6b190fb83d512c10506c61aaa9b7514f187d8596bc3d8e51a2bff9",
  "dated": {
-  "2026-10-19": "2653e748e6971a23668f3e33246d1008d1aed33253892d6d88ed386b1bc67cea",
   "2026-10-20": "9b694d230272ffb0e34d640bb9b9841d170802d385f4927cf1d115586fa59c31",
-  "2026-10-26": "096aa357951d998f1cabb213b9c84609904c08b30ee2a2ba141462585ec75769",
+  "2026-10-26": "7a59cb41d7e58d662d547a4255645163bb8341cd6e7e8b5897825cc5233a9865",
   "2026-10-27": "0ba0fd2d3a807498e0173407c5e49bb7f060a67036d1a7c049102876058ba550",
-  "2026-11-09": "d1c1cde70d5711a8dba947646ec9db14626f9d946b25be78418746d2868fd9de",
+  "2026-11-09": "97f97dfeced5bb79a604d95d4e04ab503bc4c62195739491ac16f28e152c7562",
   "2026-11-10": "3d26c4b0030fede7c4139cc9b88d06d17e62b5a5da57b6e266ebe59b7170e4bb",
-  "2026-11-16": "c2cf5cd8058cd233acc8fd97fa453b48b81aa96a9ca9b17cadb70515d1cea904",
+  "2026-11-16": "145885886aa522d33568e87394c9ece5438b5ed54e1b215e423e50b0925f680e",
   "2026-11-17": "7fe07c9b5b817c3ebad7ebab80abc0d4926c42e8f8b6f8dff887a77e5c4b96a0",
-  "2026-11-23": "8de37bc5892c61d21b34d6ab28e7ad83bd55628b8946e5567261d67f5bb104ba",
+  "2026-11-23": "5fd7e5d888ab3a5dcaeb07ad80434029d56d27e54f8affa7013ffb80b85ec1c2",
   "2026-11-24": "dcbe290e64ab13e1a815d86696625ede525658238f0d6abf154089a97a70746a",
-  "2026-11-30": "afe4ccf7dcae7b70eb930266dc960d184e7b6f3726a67559fb81939ddd869f46",
+  "2026-11-30": "4832c084c193027e8c966bc8689940950745c24cb09053ee95744fb0ffa08972",
   "2026-12-01": "d6cb119765933e3db1947af3c826d4aa1a011be93431a381d7240f6382c32404",
-  "2026-12-07": "4feef5aa33a554988fbffcf68b7a5a2fcbdcc26a0ea75f9d37657cbb6a40b071",
+  "2026-12-07": "409c16c28a86259d10738fc8c4c75660b3398c2ab67e2a2508774ee3ac91d3f0",
   "2026-12-08": "37e4745407d5e3b1b395f0e71df0f83e6c3c314460b0256a8a5447cd4accd042",
-  "2026-12-14": "cdb20f294d71adf6ad0a7b247311439fe880eaadf88a90ac86d3231e6f8dc42f",
+  "2026-12-14": "6d9e7e72e0a70e8a620cdac8e550e6bb85acc31ac8c306063f31c791899050b2",
   "2026-12-15": "3c47659bc10f8fcd61856fad4099bdcd9431d077e2f8c7513b66878e64c57a73",
-  "2026-12-21": "8f063254a729967ecbfca4de5ed03e31dbf16ff5039531e86dbeadfc939e51c5",
+  "2026-12-21": "073810c0353d93b8e230d89b14c709ac32fc397684887e7a45e93f013e2356fc",
   "2026-12-22": "62bd0f2712f497460536439a8ae04295d2cbbd0d91fc1b0a747ddf30e15867c9"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": [
   "evtermine"
  ]

@@ -3,8 +3,8 @@
   {
    "providerId": "martha-maria-st-theresien",
    "venueId": "martha-maria-st-theresien",
-   "title": "Indische Babymassage (Babys 4 Wochen bis 7 Monate)",
-   "summary": "Kurs mit fünf Dienstagsterminen für Babys von etwa vier Wochen bis sieben Monaten, mit Körperkontakt und Massage für Eltern und Kind. Nächster Kursstart 17. November 2026; Anmeldung per E-Mail oder Telefon.",
+   "title": "Babymassage (indische Babymassage, Babys ca. 4 Wochen bis 7 Monate)",
+   "summary": "Kurs mit indischer Babymassage für Babys von etwa vier Wochen bis sieben Monaten, dienstags 10–11 Uhr im Elterncafé der Wochenstation. Anmeldung per E-Mail oder Telefon, Kosten 60 Euro.",
    "topics": [
     "babymassage"
    ],
@@ -27,24 +27,20 @@
     "kind": "dates",
     "dates": [
      {
+      "start": "2026-02-24T10:00",
+      "end": "2026-02-24T11:00"
+     },
+     {
+      "start": "2026-05-05T10:00",
+      "end": "2026-05-05T11:00"
+     },
+     {
+      "start": "2026-09-22T10:00",
+      "end": "2026-09-22T11:00"
+     },
+     {
       "start": "2026-11-17T10:00",
       "end": "2026-11-17T11:00"
-     },
-     {
-      "start": "2026-11-24T10:00",
-      "end": "2026-11-24T11:00"
-     },
-     {
-      "start": "2026-12-01T10:00",
-      "end": "2026-12-01T11:00"
-     },
-     {
-      "start": "2026-12-08T10:00",
-      "end": "2026-12-08T11:00"
-     },
-     {
-      "start": "2026-12-15T10:00",
-      "end": "2026-12-15T11:00"
      }
     ]
    }
@@ -53,10 +49,10 @@
    "providerId": "martha-maria-st-theresien",
    "venueId": "martha-maria-st-theresien",
    "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
-   "summary": "Ungezwungener Austausch für werdende und junge Eltern, Fragen können an Hebammen und Stillberaterinnen gestellt werden. Kostenlos, ohne Anmeldung, mittwochs 9:30 bis 11:30 Uhr.",
+   "summary": "Offenes Treffen mittwochs 9:30–11:30 Uhr auf der Station B3 zum Austausch mit anderen werdenden und jungen Eltern; Fragen können an die Hebammen und Stillberaterinnen gestellt werden. Kostenlos, ohne Anmeldung.",
    "topics": [
     "elterncafe",
-    "stillcafe"
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -81,12 +77,42 @@
      }
     ]
    }
+  },
+  {
+   "providerId": "martha-maria-st-theresien",
+   "venueId": "martha-maria-st-theresien",
+   "title": "Einführungskurs indische Babymassage (5 Termine, dienstags)",
+   "summary": "Fünf Kurstermine je dienstags von 10 bis 11 Uhr, Treffpunkt Station B3 (Elterncafé). Der Einstieg ist laut Anbieter jederzeit möglich; Termine und Anmeldung telefonisch oder per Mail erfragen.",
+   "topics": [
+    "babymassage"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "60 Euro",
+   "url": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
+   "sourceUrl": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
+   "category": "babykurse",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung telefonisch unter 0157 58063006 oder per Mail an novakovalenka@web.de"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "10:00",
+    "end": "11:00",
+    "from": "2026-10-20",
+    "skipHolidays": true
+   }
   }
  ],
- "inputHash": "3d08520f7c85dbb7f4da519cd427c3de4848da6d1fb2068fa0a474ab74fd32db",
+ "inputHash": "a59ea11f107375e73edf859eec97926724865c11416fce82ef54e3e854713c68",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": []
 }

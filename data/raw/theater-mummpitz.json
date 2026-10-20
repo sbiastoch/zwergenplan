@@ -3,11 +3,10 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Jazz für Kinder mit König Semmelwurst (o.A.)",
-   "summary": "Sonntagsvorstellungen mit Puppenspiel und Live-Jazz von Ferdinand Roscher und Musikern, etwa einmal im Monat. Kinder unter 3 Jahren haben freien Eintritt. Alle aufgeführten Termine sind ausverkauft.",
+   "title": "Jazz für Kinder (o.A.)",
+   "summary": "Moderiertes Jazz-Puppenspiel rund um König Semmelwurst, ca. 50 Minuten, meist am ersten Sonntag im Monat um 11 Uhr. Kinder unter 3 Jahren haben freien Eintritt; ein Frühstück vor der Vorstellung ist im Café Mahlzahn vorbestellbar.",
    "topics": [
-    "konzert",
-    "theater"
+    "konzert"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -18,31 +17,38 @@
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine ausverkauft; Tickets über Reservix"
+    "note": "Alle aufgeführten Termine ausverkauft (Stand Spielplan)"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
      {
-      "start": "2026-11-08T11:00"
+      "start": "2026-11-08T11:00",
+      "end": "2026-11-08T11:50"
      },
      {
-      "start": "2026-12-06T11:00"
+      "start": "2026-12-06T11:00",
+      "end": "2026-12-06T11:50"
      },
      {
-      "start": "2027-01-10T11:00"
+      "start": "2027-01-10T11:00",
+      "end": "2027-01-10T11:50"
      },
      {
-      "start": "2027-02-07T11:00"
+      "start": "2027-02-07T11:00",
+      "end": "2027-02-07T11:50"
      },
      {
-      "start": "2027-03-07T11:00"
+      "start": "2027-03-07T11:00",
+      "end": "2027-03-07T11:50"
      },
      {
-      "start": "2027-04-04T11:00"
+      "start": "2027-04-04T11:00",
+      "end": "2027-04-04T11:50"
      },
      {
-      "start": "2027-05-09T11:00"
+      "start": "2027-05-09T11:00",
+      "end": "2027-05-09T11:50"
      }
     ]
    }
@@ -50,8 +56,8 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Klassik für Kinder – Instrumente zum Hören (o.A.)",
-   "summary": "Moderierte Konzerte, in denen Studierende der Hochschule für Musik Nürnberg ihre Instrumente vorstellen und Lieblingsstücke spielen. Die Veranstaltung richtet sich an Kinder jeden Alters mit Begleitung. Alle aufgeführten Termine sind ausverkauft.",
+   "title": "Klassik für Kinder (o.A.)",
+   "summary": "Moderierte Konzerte mit Studierenden der Hochschule für Musik Nürnberg, ca. 50 Minuten; jeder Termin stellt andere Instrumente vor. Die Konzerte richten sich an Kinder jeden Alters mit ihren Begleitpersonen.",
    "topics": [
     "konzert"
    ],
@@ -64,37 +70,44 @@
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine ausverkauft; Tickets über Reservix"
+    "note": "Alle aufgeführten Termine ausverkauft (Stand Spielplan)"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
      {
-      "start": "2026-10-25T11:00"
+      "start": "2026-10-25T11:00",
+      "end": "2026-10-25T11:50"
      },
      {
-      "start": "2026-11-29T11:00"
+      "start": "2026-11-29T11:00",
+      "end": "2026-11-29T11:50"
      },
      {
-      "start": "2026-12-20T11:00"
+      "start": "2026-12-20T11:00",
+      "end": "2026-12-20T11:50"
      },
      {
-      "start": "2027-01-24T11:00"
+      "start": "2027-01-24T11:00",
+      "end": "2027-01-24T11:50"
      },
      {
-      "start": "2027-02-21T11:00"
+      "start": "2027-02-21T11:00",
+      "end": "2027-02-21T11:50"
      },
      {
-      "start": "2027-03-14T11:00"
+      "start": "2027-03-14T11:00",
+      "end": "2027-03-14T11:50"
      },
      {
-      "start": "2027-04-25T11:00"
+      "start": "2027-04-25T11:00",
+      "end": "2027-04-25T11:50"
      }
     ]
    }
   }
  ],
- "inputHash": "ddcf77d3f1ff1239a273992507c4d48922bcb477856c6d27ef7ad7a4c4c96afd",
+ "inputHash": "8be1e557fefdd936a423c31109f0a1a6377ac329fc7dfd2f01bbfd8bf109970d",
  "dated": {
   "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
   "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
@@ -102,8 +115,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": [
   "frankenkids",
   "stadt-vk"

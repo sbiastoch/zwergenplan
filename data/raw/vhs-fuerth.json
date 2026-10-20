@@ -3,8 +3,8 @@
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 1½–2½ Jahre (Mi, 17:00)",
-   "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09.2026.",
+   "title": "Eltern-Kind-Turnen 1½–2½ Jahre (Mittwoch 17:00)",
+   "summary": "Freies Turnen an einem wöchentlich neu aufgebauten Parcours, Eltern machen aktiv mit. Die Gruppe läuft seit 23.09.2026; die Anmeldung läuft über die vhs.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze nicht angegeben; Anmeldung über die Kursdetails (Kursnummer 16301)."
+    "note": "Kursnummer 16301; Anmeldung über die vhs, Platzangabe nicht angegeben"
    },
    "schedule": {
     "kind": "weekly",
@@ -37,8 +37,8 @@
   {
    "providerId": "vhs-fuerth",
    "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 2–3 Jahre (Do, 17:00)",
-   "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09.2026.",
+   "title": "Eltern-Kind-Turnen 2–3 Jahre (Donnerstag 17:00)",
+   "summary": "Freies Turnen an einem wöchentlich neu aufgebauten Parcours, Eltern machen aktiv mit. Die Gruppe läuft seit 24.09.2026; die Anmeldung läuft über die vhs.",
    "topics": [
     "eltern-kind-turnen",
     "bewegung"
@@ -56,7 +56,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Freie Plätze nicht angegeben; Anmeldung über die Kursdetails (Kursnummer 16303)."
+    "note": "Kursnummer 16303; Anmeldung über die vhs, Platzangabe nicht angegeben"
    },
    "schedule": {
     "kind": "weekly",
@@ -69,10 +69,10 @@
    }
   }
  ],
- "inputHash": "93bc4712e2c8993b80734a2cca6775a718f79b1bd3257b726079e8788502a971",
+ "inputHash": "91dc8a74c55e6e95547f2a4443c2a0e093fbede02eae73e56d8b1c49902dad52",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": []
 }

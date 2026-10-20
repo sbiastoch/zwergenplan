@@ -3,10 +3,11 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer – Dienstag 9–12 Uhr",
-   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahren: freies Spielen und Austausch im Kinderzimmer. Einfach vorbeikommen, nicht in den Ferien; ohne pädagogische Betreuung.",
+   "title": "Offenes Kinderzimmer (Dienstag 9–12 Uhr)",
+   "summary": "Offener Treff ohne Programm zum Spielen, Treffen und Austauschen für Eltern mit Kindern. Keine Anmeldung, Einstieg jederzeit möglich. Nicht in den Ferien.",
    "topics": [
     "spielgruppe",
+    "eltern-kind-gruppe",
     "elterntreff"
    ],
    "format": "regelmaessig",
@@ -38,10 +39,11 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer – Donnerstag 14–17 Uhr",
-   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahren: freies Spielen und Austausch im Kinderzimmer. Einfach vorbeikommen, nicht in den Ferien; ohne pädagogische Betreuung.",
+   "title": "Offenes Kinderzimmer (Donnerstag 14–17 Uhr)",
+   "summary": "Offener Treff ohne Programm zum Spielen, Treffen und Austauschen für Eltern mit Kindern. Keine Anmeldung, Einstieg jederzeit möglich. Nicht in den Ferien.",
    "topics": [
     "spielgruppe",
+    "eltern-kind-gruppe",
     "elterntreff"
    ],
    "format": "regelmaessig",
@@ -71,10 +73,10 @@
    }
   }
  ],
- "inputHash": "fa656021d624a403eb3fa6d3b5ea56e00dee257e7e985b5da70ba4fa0a433658",
+ "inputHash": "d525ec4ab08309b79ec272afd49e1c28df911586f11bf89cae67ef27e5d3b9f0",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": []
 }

@@ -3,12 +3,11 @@
   {
    "providerId": "stadtbibliothek-nuernberg",
    "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
-   "title": "Bücherzwerge (12–36 Monate), Stadtbibliothek Langwasser",
-   "summary": "Einmal im Monat mit Begleitperson: Singen, Reime, Fingerspiele und Vorlesen für Kinder von 12 bis 36 Monaten. Anmeldung erforderlich, Eintritt frei.",
+   "title": "Bücherzwerge (12–36 Monate)",
+   "summary": "Einmal im Monat Fingerspiele, Lieder und Vorlesen für Kinder von 12 bis 36 Monaten mit Begleitperson in der Bibliothek Langwasser. Eintritt frei, Anmeldung erforderlich.",
    "topics": [
     "vorlesen",
-    "singen",
-    "bibliothek"
+    "singen"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -44,7 +43,7 @@
    }
   }
  ],
- "inputHash": "799973bb639637f7ff19fc7e74612cb9a4b0b09870f065abb6843d38b227059c",
+ "inputHash": "16f0fc64e47bc6e649de341e95b8ec4275de0d2e7769ea2bebbe2de20b104781",
  "dated": {
   "2026-10-22": "1787b9cf3aecfbda18d89bdcfc73c37715ec5317b7b4df9994a0ef3ab64ab25e",
   "2026-11-13": "220733e49472bc018079d133e42d1df8b54e24d5ea3cda3437823cfa65e22581",
@@ -55,8 +54,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-19T08:39:52+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-20T08:26:12+02:00",
+ "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": [
   "stadt-vk"
  ]
