@@ -3,21 +3,22 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Jazz für Kinder (o.A.)",
-   "summary": "Moderiertes Jazz-Puppenspiel rund um König Semmelwurst, ca. 50 Minuten, meist am ersten Sonntag im Monat um 11 Uhr. Kinder unter 3 Jahren haben freien Eintritt; ein Frühstück vor der Vorstellung ist im Café Mahlzahn vorbestellbar.",
+   "title": "Jazz für Kinder (ohne Altersgrenze)",
+   "summary": "Monatliche Jazz-Vorstellung mit Puppen und Live-Musik rund um König Semmelwurst, etwa 50 Minuten. Alle Termine im Horizont sind bereits ausverkauft.",
    "topics": [
-    "konzert"
+    "konzert",
+    "theater"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "6 € (ohne VGN); Kinder unter 3 Jahren frei",
+   "price": "6 € (ohne VGN), Kinder unter 3 Jahren haben freien Eintritt",
    "url": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
    "sourceUrl": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle aufgeführten Termine ausverkauft (Stand Spielplan)"
+    "note": "Alle Termine im Horizont ausverkauft; Karten über Reservix"
    },
    "schedule": {
     "kind": "dates",
@@ -56,8 +57,8 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Klassik für Kinder (o.A.)",
-   "summary": "Moderierte Konzerte mit Studierenden der Hochschule für Musik Nürnberg, ca. 50 Minuten; jeder Termin stellt andere Instrumente vor. Die Konzerte richten sich an Kinder jeden Alters mit ihren Begleitpersonen.",
+   "title": "Klassik für Kinder (ohne Altersgrenze)",
+   "summary": "Moderierte Konzerte mit Studierenden der Hochschule für Musik Nürnberg, etwa 50 Minuten, für Kinder jeden Alters mit Begleitung. Alle Termine im Horizont sind bereits ausverkauft.",
    "topics": [
     "konzert"
    ],
@@ -70,7 +71,7 @@
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle aufgeführten Termine ausverkauft (Stand Spielplan)"
+    "note": "Alle Termine im Horizont ausverkauft; Karten über Reservix"
    },
    "schedule": {
     "kind": "dates",
@@ -107,7 +108,7 @@
    }
   }
  ],
- "inputHash": "8be1e557fefdd936a423c31109f0a1a6377ac329fc7dfd2f01bbfd8bf109970d",
+ "inputHash": "d361d2895a67797088db24983cf7d1c420379e8393d7371e2042c05e9620a6d7",
  "dated": {
   "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
   "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
@@ -115,8 +116,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-20T08:26:12+02:00",
- "changedAt": "2026-10-20T08:26:12+02:00",
+ "checkedAt": "2026-10-21T08:26:15+02:00",
+ "changedAt": "2026-10-21T08:26:15+02:00",
  "sources": [
   "frankenkids",
   "stadt-vk"

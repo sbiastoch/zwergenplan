@@ -140,7 +140,6 @@
  ],
  "inputHash": "0f17f8dba18826af0800c201df24f3b283dfa87d4a7bfbdd4de229062bfa764d",
  "dated": {
-  "2026-10-20": "48a32958fa88e5c30eb0c87685c0b44acb3f8ec9ad6c9e048ec21881eac2d117",
   "2026-10-22": "6cedaaa660994ef14199b67ba989350286699e7c46a9fdcf0789ac1665e600b2",
   "2026-10-27": "a20afa503c160e27ca9223472ddf9a30d878c8cacce63a0ae023899bcb7b2697",
   "2026-10-29": "f2ed2c27ec7db11123009f903ee7fa06247cb4d8dc8846c30993a62ed7316416",
@@ -160,7 +159,7 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-20T08:26:12+02:00",
+ "checkedAt": "2026-10-21T08:26:15+02:00",
  "changedAt": "2026-10-12T14:49:58+02:00",
  "sources": [
   "frankenkids"

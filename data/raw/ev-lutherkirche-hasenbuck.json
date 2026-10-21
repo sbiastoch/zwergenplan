@@ -3,8 +3,8 @@
   {
    "providerId": "ev-lutherkirche-hasenbuck",
    "venueId": "ev-lutherkirche-hasenbuck",
-   "title": "Krabbelgruppe (dienstags, Pfarramt Lutherkirche)",
-   "summary": "Krabbelgruppe für Kinder bis etwa 3 Jahre im Keller des Pfarramts (Zugang vom Garten), dienstags 10:30–11:30 Uhr. Eingetragen sind Termine bis Dezember 2026; am 3.11. findet laut Kalender kein Treffen statt.",
+   "title": "Krabbelgruppe (dienstags 10:30–11:30)",
+   "summary": "Wöchentliche Krabbelgruppe für Kleinkinder mit Eltern im Keller des Pfarramts (Zugang vom Garten). Die Termine stehen im Kalender bis Mitte Dezember 2026; eine Anmeldung ist laut Quelle nicht angegeben.",
    "topics": [
     "krabbelgruppe",
     "eltern-kind-gruppe"
@@ -12,8 +12,8 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8146743",
-   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=571",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
    "category": "krabbel-spielgruppen",
    "age": {
     "minMonths": 0,
@@ -21,15 +21,11 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle"
+    "note": "Keine Angabe zu Plätzen oder Anmeldung auf der Quelle; bei Fragen über die Lutherkirche Hasenbuck anfragen."
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-20T10:30",
-      "end": "2026-10-20T11:30"
-     },
      {
       "start": "2026-10-27T10:30",
       "end": "2026-10-27T11:30"
@@ -63,48 +59,48 @@
       "end": "2026-12-22T11:30"
      }
     ]
-   }
+   },
+   "via": "evtermine"
   }
  ],
  "inputHash": "d2ff03540d8989b892ecf73cdad6311f72c0fb3058499b7807ac6fad537bf70b",
  "dated": {
-  "2026-10-20": "132fef8ebb761e3db4ef5a81392fceabdc6f05b050a551993caa0e00401fbd35",
   "2026-10-21": "543ad0cba9aa3299deb8d2f4d4302efece2719abf7d9ef411574d5958904f42d",
   "2026-10-22": "d4a39ed92b2c43757ac79a3885a921cc4d15cba2176f769e50cbbad8e828e725",
   "2026-10-25": "12d0146b8407dd58f5ccee0f93fdae0ff0a799f37491fc912ba39e96e69ad798",
-  "2026-10-27": "ae0d4feb1582546324aab19d15f5d082b732f91eb196bcbf57266198e46da81e",
+  "2026-10-27": "1daa503bd8892ddfaaa802f0bd8ff0e4af0e65453ba8dd2a5f12802f2372c8cc",
   "2026-10-28": "39699eb687e2c65993eef9de3d8cee6ff8fbd032e924f00a31401b5010db9e87",
   "2026-10-29": "03f3b189a156a161b6e9bfd28f27da13eb612ea17577817af128f8f32e042197",
   "2026-10-31": "73ef50f4328526974c75553f63dcd073dc9b8d56bb2b75928d697b36d14990b6",
   "2026-11-01": "3cebde68a269fb15bd44e42fc161a9b2350bff3cb183f92dcb2dfbf3355f7527",
   "2026-11-08": "c6fd590f449a635df366dee0a3171b72ffa23068c221dbbaf8a303bf7e3ab1f2",
   "2026-11-09": "b4bd4c04855669a292c89976738289b98e4a9a2c02e93b52f5a528f03b909dcc",
-  "2026-11-10": "5466ec860f0deea4a1d89269369cb743cad0fe53686d2936e98636bf158539df",
+  "2026-11-10": "53a32068e744bd15dfedc0d5e384af571f6e63ccc2eb09ccc4079a6a53ff9a5c",
   "2026-11-11": "afbe9703fa69a436ebcd4139d3598397a5cb8a068b2b3b283ad0f885d57ee11d",
   "2026-11-12": "bac796ae5cf211accc195ff8e32ecc92718d573e6d934db9a342a8e06caae325",
   "2026-11-15": "f4c5d0c78d0697ba254af4e5d06fcd2fab5bf5ba5954daa30d9b7afce4edd2be",
-  "2026-11-17": "70c87a774f5f2d72296752bc5b4d9b526439f1de16613adff74f1913e3c5a02a",
+  "2026-11-17": "911f53031b5f7e058694e4b044de74c4170dde57ecf14c52a85da3e0239e1840",
   "2026-11-18": "0a099445fc380e154542bf39adac3ca34e1c78b28785d61b8c9ebdae64712517",
   "2026-11-19": "d62811f7a77a91f8a07576210e5b002070c042eff9c73ca3616821f2fcf0cff7",
   "2026-11-22": "75ec914ca082b2ac37850415faaf9943ec55f4f166f499c0de550bce7453c09f",
-  "2026-11-24": "366de0cf0a8faac46b659a56ef3953cbaf3ea7a814dfb138ac4b05f6d87599cb",
+  "2026-11-24": "aa0ae7890d6130dc2a0351d8996f0a4b94dec76f12253254c03f3549be955f8e",
   "2026-11-25": "9bc5227822fdb6434229f24d5658a360712b2690f68df8333f2dbe6184f8f2c0",
   "2026-11-26": "0e2cd5b12196d67d6d041cedcf60ded7f3b7fa0c926e11e9d17193c4ee8ccc31",
   "2026-11-29": "aa9385d26e6824afd6adae7f5469e3b5aa3bd18ab265be5a45ade4bddf378be4",
-  "2026-12-01": "65ee0c42385d53fdf072a529f45560946955e7ede6326e46041e5bd1d2cd0975",
+  "2026-12-01": "b87cd94c066e4da5e4d522315e5807177b06efc8ef6f1515d5e9193e38d73013",
   "2026-12-02": "2fcbf3a507200f9684d9650aed2d9384811607c5e29c690a000f4a72b72994a3",
   "2026-12-03": "f354cd0da988384b888ddc475968a885ffb7feba805c37624e3820a2f65d57fc",
   "2026-12-06": "a07c12b2ac3ca07d6d914507633e866ae37fcb7afe3717601b6843e39da610ee",
   "2026-12-07": "524529de08ca69edd026210f898fbc1bcbdb4cf97398ee6ed01b0de83efdcd7e",
-  "2026-12-08": "d814f6cf1993112f33960d58dc964974260def9a44e3bb8ab7ca520f62958e29",
+  "2026-12-08": "8b41d17ae6b44435af130bf54eecdafea9629f9cde03e7d6b4c26cc505f4593d",
   "2026-12-09": "541149c714554ba4bb940a41dbb1232788af3700fb2ab60b883fa2ea27503662",
   "2026-12-10": "5feab6e3bfc6663b03901b34f49eece09961fad3d6fedc5ebae9696c48cc456e",
   "2026-12-13": "ffdf6a80826e306c793b6de4f09943eccd448a0d96c796b08a85498533ffdbc8",
-  "2026-12-15": "278f8ae5cb78baf2db6ca6225a3ea1125c38d20984d14ca17e7cfdd8db22ec9d",
+  "2026-12-15": "78753f422c358fbbac333d13507c8e9295c970b310d049c8e7b1d5894746a01c",
   "2026-12-16": "aac5c4e2eaa44ed5b381b4032219994f8d6b780289ffa14321d575a958dab1d8",
   "2026-12-17": "3f4d3d3a7982da7de5b2ba137b3eeca11e45568ce3bd4465e8c853d1e24d98e1",
   "2026-12-20": "1781f44bcaaf55af4941242c50aa72847beca883e4e3b8e6f948f768e43a83df",
-  "2026-12-22": "b32896a649a4b82333273a19c5bb1b46b65d3e7891f3486cbc948ba19270dfa0",
+  "2026-12-22": "fdef6427dab928cfb2e490ac963fad996ef940a8797c4323433dd6a87d30807e",
   "2026-12-23": "48ee9ab633fc2f33e8b046681d6aa18ff92122eadc70b6dd4db089c704d9b4fe",
   "2026-12-27": "16865b9cb9d214a29c52484eb3a041f33ce2381a0e445b0198023db20de40ce4",
   "2027-01-03": "a48d3c15b668f3f777f68d5fbe38181ab2ba79ee28eebd31d170c8166d98b88b",
@@ -126,8 +122,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-20T08:26:12+02:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
+ "checkedAt": "2026-10-21T08:26:15+02:00",
+ "changedAt": "2026-10-21T08:26:15+02:00",
  "sources": [
   "evtermine"
  ]
