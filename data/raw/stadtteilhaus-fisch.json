@@ -3,8 +3,8 @@
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Familien-Café (Eltern mit Kindern, montags)",
-   "summary": "Offener Treff zum gemeinsamen Spielen und Austauschen für Eltern, Großeltern und Väter mit Kleinkindern. Keine Anmeldung nötig, auch wenn noch kein Krabbelgruppenplatz besteht.",
+   "title": "Familien-Café (montags, offener Treff)",
+   "summary": "Offener Spiel- und Austauschtreff für Eltern, Großeltern und Kinder; Väter sind willkommen. Einstieg jederzeit, keine Anmeldung nötig.",
    "topics": [
     "elterncafe",
     "elterntreff"
@@ -12,13 +12,11 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "kostenlos, Spende für Kaffee erwünscht",
    "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "category": "treffs-cafes",
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Einfach vorbeikommen"
+    "status": "ohne-anmeldung"
    },
    "schedule": {
     "kind": "weekly",
@@ -27,15 +25,15 @@
     ],
     "start": "15:30",
     "end": "17:00",
-    "from": "2026-10-19",
+    "from": "2026-10-26",
     "skipHolidays": true
    }
   },
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Mini-FiSche Krabbelgruppe, Dienstag 9–11 Uhr",
-   "summary": "Krabbelgruppe mit Spielzimmer und bei gutem Wetter Spielgarten für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Freie Plätze erfragt man im Stadtteilhaus.",
+   "title": "Mini-FiSche Krabbelgruppe Dienstag 9–11 Uhr",
+   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern vor Krippe oder Kita, mit Spielzimmer und Spielgarten. 12 € im Monat; Plätze nur auf Nachfrage.",
    "topics": [
     "krabbelgruppe",
     "spielgruppe",
@@ -50,7 +48,7 @@
    "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt",
-    "note": "Nach freien Plätzen im Stadtteilhaus FiSch erkundigen"
+    "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
    },
    "schedule": {
     "kind": "weekly",
@@ -59,15 +57,15 @@
     ],
     "start": "09:00",
     "end": "11:00",
-    "from": "2026-10-20",
+    "from": "2026-10-27",
     "skipHolidays": true
    }
   },
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Mini-FiSche Krabbelgruppe, Mittwoch 9–11 Uhr",
-   "summary": "Krabbelgruppe mit Spielzimmer und bei gutem Wetter Spielgarten für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Freie Plätze erfragt man im Stadtteilhaus.",
+   "title": "Mini-FiSche Krabbelgruppe Mittwoch 9–11 Uhr",
+   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern vor Krippe oder Kita, mit Spielzimmer und Spielgarten. 12 € im Monat; Plätze nur auf Nachfrage.",
    "topics": [
     "krabbelgruppe",
     "spielgruppe",
@@ -82,7 +80,7 @@
    "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt",
-    "note": "Nach freien Plätzen im Stadtteilhaus FiSch erkundigen"
+    "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
    },
    "schedule": {
     "kind": "weekly",
@@ -91,15 +89,15 @@
     ],
     "start": "09:00",
     "end": "11:00",
-    "from": "2026-10-14",
+    "from": "2026-10-28",
     "skipHolidays": true
    }
   },
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Mini-FiSche Krabbelgruppe, Freitag 9–11 Uhr",
-   "summary": "Krabbelgruppe mit Spielzimmer und bei gutem Wetter Spielgarten für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Freie Plätze erfragt man im Stadtteilhaus.",
+   "title": "Mini-FiSche Krabbelgruppe Freitag 9–11 Uhr",
+   "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern vor Krippe oder Kita, mit Spielzimmer und Spielgarten. 12 € im Monat; Plätze nur auf Nachfrage.",
    "topics": [
     "krabbelgruppe",
     "spielgruppe",
@@ -114,7 +112,7 @@
    "category": "krabbel-spielgruppen",
    "availability": {
     "status": "unbekannt",
-    "note": "Nach freien Plätzen im Stadtteilhaus FiSch erkundigen"
+    "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
    },
    "schedule": {
     "kind": "weekly",
@@ -123,15 +121,15 @@
     ],
     "start": "09:00",
     "end": "11:00",
-    "from": "2026-10-16",
+    "from": "2026-10-23",
     "skipHolidays": true
    }
   },
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch",
-   "title": "Vater-Kind-Frühstück (31.10., 21.11., 19.12.)",
-   "summary": "Gemeinsames Frühstücksbuffet und Spielen für Väter mit ihren Kindern, im Sommer im Garten, sonst im Toberaum. Anmeldung im Stadtteilhaus FiSch nötig.",
+   "title": "Vater-Kind-Frühstück (Samstag 9–12 Uhr)",
+   "summary": "Treffen für Väter mit Kindern zum Spielen, Kennenlernen und gemeinsamen Frühstück. Termine 31.10., 21.11. und 19.12.2026; Anmeldung im Stadtteilhaus.",
    "topics": [
     "vaeter",
     "elterntreff"
@@ -139,7 +137,7 @@
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "8 € pro Vater, 4 € pro Kind (Website nennt auch 10 € pro Familie)",
+   "price": "8 € pro Vater, 4 € pro Kind",
    "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "category": "treffs-cafes",
@@ -168,11 +166,11 @@
   {
    "providerId": "stadtteilhaus-fisch",
    "venueId": "stadtteilhaus-fisch-turnhalle-wahlerschule",
-   "title": "Vater-Kind: Die offene Turnhalle (freitags)",
-   "summary": "Selbst gestaltete Hallenzeit für Väter mit Kindern, ohne Übungsleitung; ein Vater übernimmt die Hallenverantwortung. Kostenlos, einfach vorbeikommen; Hallenturnschuhe mitbringen.",
+   "title": "Vater-Kind: Offene Turnhalle (Freitag 18–20 Uhr)",
+   "summary": "Freie Hallenzeit für Väter mit Kindern, von den Familien selbst gestaltet und ohne Übungsleitung. Ein Vater übernimmt die Hallenverantwortung. Kostenlos.",
    "topics": [
-    "vaeter",
-    "bewegung"
+    "bewegung",
+    "vaeter"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -181,8 +179,7 @@
    "sourceUrl": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
    "category": "bewegung",
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Einfach vorbeikommen"
+    "status": "ohne-anmeldung"
    },
    "schedule": {
     "kind": "dates",
@@ -205,12 +202,43 @@
      }
     ]
    }
+  },
+  {
+   "providerId": "stadtteilhaus-fisch",
+   "venueId": "stadtteilhaus-fisch",
+   "title": "Eltern-Kind-Töpfern (Mittwoch 15:30–16:30 Uhr)",
+   "summary": "Töpfern gemeinsam mit Eltern für kleinere Kinder. Nur mit Anmeldung; 2 € pro Termin und Person, Ware wird mit 9 € pro kg berechnet.",
+   "topics": [
+    "kreativ",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "2 € pro Termin und Person; 9 € pro kg Töpferware",
+   "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+   "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+   "category": "kreativ",
+   "availability": {
+    "status": "unbekannt",
+    "note": "Nur mit Anmeldung im Stadtteilhaus FiSch"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "WE"
+    ],
+    "start": "15:30",
+    "end": "16:30",
+    "from": "2026-10-28",
+    "skipHolidays": true
+   }
   }
  ],
- "inputHash": "2e29f52f13c88f67a39ffa89666ac461d9895b1d0ebabb93ac742573cb7b7410",
+ "inputHash": "6edb199db0a8d16fa20e8627f169d4fa7956a35c26b130d64d5afb640a9c820d",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-21T08:26:15+02:00",
- "changedAt": "2026-10-13T10:14:52+02:00",
+ "checkedAt": "2026-10-22T08:32:08+02:00",
+ "changedAt": "2026-10-22T08:32:08+02:00",
  "sources": []
 }

@@ -209,8 +209,10 @@
   "2027-12-31": "4a8f1de173f245e1a5bb91bab6d29d6709379182528755f654f1e7fc66f5148c"
  },
  "model": "haiku",
- "status": "ok",
+ "status": "fehler",
+ "reason": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
  "checkedAt": "2026-10-21T08:26:15+02:00",
  "changedAt": "2026-10-17T07:59:57+02:00",
+ "failingSince": "2026-10-22T08:32:08+02:00",
  "sources": []
 }

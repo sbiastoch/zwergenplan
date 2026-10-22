@@ -3,8 +3,8 @@
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "PEKiP (geb. April–Juni 2026), Di 9:30",
-   "summary": "Entwicklungsbegleitung für Babys im ersten Lebensjahr mit Sinnesanregungen und Austausch für Eltern. Fortsetzerkurs: Neueinstieg nur, solange Plätze frei sind.",
+   "title": "PEKiP (Babys geb. April–Juni 2026), Di 9:30 Uhr",
+   "summary": "Entwicklungsbegleitung für Babys mit Sinnesanregungen, Spielmaterial und Austausch für Eltern. Der Kurs läuft seit September und endet am 15.12.; Einstieg nur bei freien Plätzen.",
    "topics": [
     "pekip"
    ],
@@ -20,9 +20,8 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
+    "note": "Platzangabe nicht in der Liste; Anmeldung über die Detailseite"
    },
-   "registrationWindow": {},
    "schedule": {
     "kind": "weekly",
     "weekdays": [
@@ -30,16 +29,16 @@
     ],
     "start": "09:30",
     "end": "11:00",
-    "from": "2026-10-20",
+    "from": "2026-10-22",
     "until": "2026-12-15",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   },
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "PEKiP (geb. Dezember 2025–Februar 2026), Di 11:30",
-   "summary": "Entwicklungsbegleitung für Babys im ersten Lebensjahr mit Sinnesanregungen und Austausch für Eltern. Der Kurs ist ausgebucht.",
+   "title": "PEKiP (Babys geb. Dez. 2025–Feb. 2026), Di 11:30 Uhr",
+   "summary": "Entwicklungsbegleitung für Babys im ersten Lebensjahr mit Austausch für Eltern. Die Gruppe ist ausgebucht; der Kurs läuft bis 15.12.",
    "topics": [
     "pekip"
    ],
@@ -55,7 +54,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Kurs ist ausgebucht"
+    "note": "In der Programmliste als ausgebucht markiert"
    },
    "schedule": {
     "kind": "weekly",
@@ -64,48 +63,16 @@
     ],
     "start": "11:30",
     "end": "13:00",
-    "from": "2026-10-20",
+    "from": "2026-10-22",
     "until": "2026-12-15",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   },
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Schnupper-PEKiP (geb. Juni–August 2026)",
-   "summary": "Einmalige Schnupperstunde zum Ausprobieren für Eltern mit Babys, die sich für PEKiP interessieren.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
-   "sourceUrl": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 1,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-19T14:00",
-      "end": "2026-11-19T15:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "zoff-harmonie",
-   "venueId": "zoff-harmonie",
-   "title": "PEKiP (geb. Juni–August 2026), Do 14:00",
-   "summary": "Entwicklungsbegleitung für Babys im ersten Lebensjahr mit Sinnesanregungen und Austausch für Eltern. Start im November 2026.",
+   "title": "PEKiP (Babys geb. Juni–Aug. 2026), Do 14:00 Uhr",
+   "summary": "Frühe Entwicklungsbegleitung mit Sinnesanregungen und Austausch für Eltern, Start im November. Neueinsteigende sind willkommen, soweit Plätze frei sind; Krankenkassen bezuschussen teils.",
    "topics": [
     "pekip"
    ],
@@ -121,7 +88,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
+    "note": "Platzangabe nicht in der Liste; Anmeldung über die Detailseite"
    },
    "schedule": {
     "kind": "weekly",
@@ -132,14 +99,46 @@
     "end": "15:30",
     "from": "2026-11-26",
     "until": "2027-02-04",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   },
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Waldspielgruppe „Die Eulenbande“ (Kinder 2–4 Jahre)",
-   "summary": "Waldgruppe, in der Kinder die Natur spielerisch entdecken: Tiere beobachten, Schätze sammeln, Jahreszeiten erleben. Laufende Reihe bis Ende Oktober 2026.",
+   "title": "Schnupperstunde PEKiP (Babys geb. Juni–Aug. 2026)",
+   "summary": "Einzelne Probestunde zum Ausprobieren für Eltern mit Baby, die noch unsicher sind, ob PEKiP passt.",
+   "topics": [
+    "pekip"
+   ],
+   "format": "einmalig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
+   "sourceUrl": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
+   "category": "babykurse",
+   "age": {
+    "minMonths": 1,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Platzangabe nicht in der Liste; Anmeldung über die Detailseite"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-19T14:00",
+      "end": "2026-11-19T15:30"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "zoff-harmonie",
+   "venueId": "zoff-harmonie",
+   "title": "Eulenbande – Waldspielgruppe für Kinder von 2–4 Jahren",
+   "summary": "Gemeinsame Waldgruppe: Tiere beobachten, Schätze sammeln und die Jahreszeiten erleben. Die Reihe endet am 30.10.",
    "topics": [
     "waldgruppe"
    ],
@@ -155,28 +154,29 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
+    "note": "Platzangabe nicht in der Liste; Anmeldung über die Detailseite"
    },
    "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "FR"
-    ],
-    "start": "15:00",
-    "end": "16:30",
-    "from": "2026-10-23",
-    "until": "2026-10-30",
-    "skipHolidays": false
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-10-23T15:00",
+      "end": "2026-10-23T16:30"
+     },
+     {
+      "start": "2026-10-30T15:00",
+      "end": "2026-10-30T16:30"
+     }
+    ]
    }
   },
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Spielgruppe „Schritte ins Leben“ (10–24 Monate)",
-   "summary": "Spielgruppe für Kinder, die mit allen Sinnen die Welt entdecken und in der Gemeinschaft wachsen. Eltern sind dabei.",
+   "title": "Spielgruppe „Schritte ins Leben“ (10–24 Monate), Di 16:00 Uhr",
+   "summary": "Spielgruppe für Kinder von 10 bis 24 Monaten mit Mutter oder Vater: gemeinsam die Welt mit allen Sinnen entdecken und in der Gemeinschaft wachsen.",
    "topics": [
-    "spielgruppe",
-    "eltern-kind-gruppe"
+    "spielgruppe"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -190,7 +190,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
+    "note": "Platzangabe nicht in der Liste; Anmeldung über die Detailseite"
    },
    "schedule": {
     "kind": "weekly",
@@ -201,47 +201,14 @@
     "end": "17:30",
     "from": "2026-11-17",
     "until": "2026-12-15",
-    "skipHolidays": false
+    "skipHolidays": true
    }
   },
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Offener Elterntreff: Fragen an eine Apothekerin",
-   "summary": "Offener Elterntreff für Eltern mit Kindern von 0 bis 2 Jahren mit einer Apothekerin zu Fieber, Husten und Co. Einmaliger Termin.",
-   "topics": [
-    "elterntreff",
-    "beratung"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/eltern-kind-gruppen",
-   "sourceUrl": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/eltern-kind-gruppen",
-   "category": "beratung",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 24
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-21T10:00",
-      "end": "2026-10-21T11:30"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "zoff-harmonie",
-   "venueId": "zoff-harmonie",
-   "title": "babySignal – mit den Händen sprechen",
-   "summary": "Einführung in Babyzeichen, damit Eltern und Baby schon vor den ersten Worten miteinander kommunizieren können. Ein Elternteil mit Baby.",
+   "title": "babySignal – mit den Händen sprechen (6–24 Monate)",
+   "summary": "Einführung in Babyzeichen, damit Eltern und Kind schon vor den ersten Worten miteinander kommunizieren können. Für ein Elternteil mit Baby.",
    "topics": [
     "babysignal"
    ],
@@ -257,7 +224,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
+    "note": "Platzangabe nicht in der Liste; Anmeldung über die Detailseite"
    },
    "schedule": {
     "kind": "dates",
@@ -272,8 +239,8 @@
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Offener Elterntreff: Adventsvormittag mit Baby",
-   "summary": "Offener Elterntreff für Eltern mit Kindern von 0 bis 2 Jahren mit Austausch zu Entwicklungsthemen in vorweihnachtlicher Atmosphäre. Einmaliger Termin.",
+   "title": "Offener Elterntreff: Adventsvormittag mit Baby/Kleinkind (0–2 J.)",
+   "summary": "Austausch für Eltern mit Kindern von 0 bis 2 Jahren zu Entwicklungsthemen, diesmal in vorweihnachtlicher Runde.",
    "topics": [
     "elterntreff"
    ],
@@ -289,7 +256,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über die Website; Platzangabe nicht sichtbar"
+    "note": "Platzangabe nicht in der Liste; Anmeldung über die Detailseite"
    },
    "schedule": {
     "kind": "dates",
@@ -304,8 +271,8 @@
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Singen mit dem Baby (Babys 4–12 Monate)",
-   "summary": "Lieder für den Alltag, Kniereiter und Fingerspiele für Eltern mit Babys von 4 bis 12 Monaten. Dienstags vom 17.11. bis 15.12.2026.",
+   "title": "Singen mit dem Baby (Kinder 4–12 Monate)",
+   "summary": "Lieder für Alltagssituationen, Kniereiter und Fingerspiele zum Mitmachen für Eltern mit Babys. Anmeldung erforderlich.",
    "topics": [
     "musik",
     "singen"
@@ -322,7 +289,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über das Online-Formular der Detailseite"
+    "note": "Anmeldung über das Online-Formular der Seite; Platzangabe nicht angezeigt"
    },
    "schedule": {
     "kind": "weekly",
@@ -330,6 +297,7 @@
      "TU"
     ],
     "start": "15:00",
+    "end": "15:45",
     "from": "2026-11-17",
     "until": "2026-12-15",
     "skipHolidays": false
@@ -339,9 +307,10 @@
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
    "title": "Musikalische Entdeckungsreise (Kinder 1–2 Jahre)",
-   "summary": "Gemeinsames Musizieren in der Gruppe für Mütter und Väter mit Kindern von 1 bis 2 Jahren. Donnerstags vom 19.11. bis 10.12.2026.",
+   "summary": "Gruppenangebot, bei dem Eltern mit ihren einjährigen und zweijährigen Kindern Musik entdecken. Anmeldung erforderlich.",
    "topics": [
-    "musik"
+    "musik",
+    "singen"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -355,7 +324,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über das Online-Formular der Detailseite"
+    "note": "Anmeldung über das Online-Formular der Seite; Platzangabe nicht angezeigt"
    },
    "schedule": {
     "kind": "weekly",
@@ -363,6 +332,7 @@
      "TH"
     ],
     "start": "09:30",
+    "end": "10:30",
     "from": "2026-11-19",
     "until": "2026-12-10",
     "skipHolidays": false
@@ -371,11 +341,11 @@
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Papa + Ich: Naturforscher – Advent im Wald (Kinder 2–6 Jahre)",
-   "summary": "Naturerlebnis im Wald für Väter mit Kindern von 2 bis 6 Jahren rund um die Adventszeit. Einmaliger Termin am 5.12.2026, 10–12 Uhr.",
+   "title": "Papa + Ich: Naturforscher „Wir feiern Advent im Wald“ (Kinder 2–6 Jahre)",
+   "summary": "Einmaliger Waldnachmittag für Väter mit ihren Kindern im Advent, mit Bewegung an der frischen Luft und Naturentdeckungen. Anmeldung erforderlich.",
    "topics": [
     "waldgruppe",
-    "tiere-natur"
+    "vaeter"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -389,7 +359,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über das Online-Formular der Detailseite"
+    "note": "Anmeldung über das Online-Formular der Seite; Platzangabe nicht angezeigt"
    },
    "schedule": {
     "kind": "dates",
@@ -404,10 +374,11 @@
   {
    "providerId": "zoff-harmonie",
    "venueId": "zoff-harmonie",
-   "title": "Waldspielgruppe „Die Eulenbande“ (Kinder 2–4 Jahre)",
-   "summary": "Waldgruppe für Mütter und Väter mit Kindern von 2 bis 4 Jahren: Tiere beobachten, Waldschätze sammeln, Jahreszeiten erleben. Freitags bis 30.10.2026.",
+   "title": "Waldspielgruppe „Die Eulenbande“ (Kinder 2–4 Jahre, freitags)",
+   "summary": "Waldgruppe für Eltern mit Kindern von 2 bis 4 Jahren: gemeinsam Tiere beobachten, Waldschätze sammeln und die Jahreszeiten erleben. Die Reihe läuft bis 30. Oktober 2026.",
    "topics": [
-    "waldgruppe"
+    "waldgruppe",
+    "eltern-kind-gruppe"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -421,7 +392,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung über das Online-Formular der Detailseite"
+    "note": "Anmeldung über das Online-Formular der Seite; Platzangabe nicht angezeigt"
    },
    "schedule": {
     "kind": "weekly",
@@ -429,20 +400,21 @@
      "FR"
     ],
     "start": "15:00",
+    "end": "16:30",
     "from": "2026-10-23",
     "until": "2026-10-30",
     "skipHolidays": false
    }
   }
  ],
- "inputHash": "b16a035d5b89c4c60619f4471cf46d6a3304bfaaeb6bebd469890d652ab14a94",
+ "inputHash": "95f59107bef6aa930008e3e0d68ed76e3ae0fbe71d68e85fd5210097b3325886",
  "dated": {
   "2026-11-14": "5c69668c73d1a792704af3f07afd83b8d1e46db0c29bf45cedff06a588ffaefb"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-21T08:26:15+02:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
+ "checkedAt": "2026-10-22T08:32:08+02:00",
+ "changedAt": "2026-10-22T08:32:08+02:00",
  "sources": [
   "stadt-vk"
  ]

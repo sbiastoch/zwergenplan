@@ -3,8 +3,8 @@
   {
    "providerId": "cvjm-nuernberg-wuselwelt",
    "venueId": "cvjm-nuernberg-wuselwelt",
-   "title": "Wuselwelt – freies Bewegungsspiel für Kinder 0–3 Jahre (freitags)",
-   "summary": "Offenes Freispiel in der Turnhalle mit vorbereiteter Spielumgebung, Eltern oder Bezugsperson sind dabei; Hallenschuhe oder ABS-Socken mitbringen. Keine Anmeldung, kostenlos, in den Ferien kein Termin. Einstieg jederzeit möglich.",
+   "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 mit Eltern",
+   "summary": "Freispiel in der Turnhalle des CVJM mit vorbereiteter Spielumgebung, Eltern oder Bezugsperson sind dabei. Ohne Anmeldung und kostenlos; Hallenschuhe oder ABS-Socken mitbringen. In den Ferien findet kein Treff statt.",
    "topics": [
     "bewegung",
     "spielplatz-indoor"
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offenes Angebot ohne Anmeldung"
+    "note": "Offenes Angebot, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -36,7 +36,7 @@
    }
   }
  ],
- "inputHash": "cc261f4560b2bccb038c99f64ea504a0d1ee88fe7f01080a45a9b852dda41354",
+ "inputHash": "0369675fbc12a26255a69d8973c8909ddab76c6ee678eb1958ad1fc007c95b69",
  "dated": {
   "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
   "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
@@ -44,8 +44,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-21T08:26:15+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-22T08:32:08+02:00",
+ "changedAt": "2026-10-22T08:32:08+02:00",
  "sources": [
   "frankenkids"
  ]

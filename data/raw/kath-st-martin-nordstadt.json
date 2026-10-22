@@ -3,8 +3,8 @@
   {
    "providerId": "kath-st-martin-nordstadt",
    "venueId": "kath-st-martin-nordstadt",
-   "title": "Kleinkindergottesdienst für Kinder 0 bis ca. 8 Jahre mit Eltern",
-   "summary": "Kindgerechter Gottesdienst im Pfarrsaal mit Singen, biblischer Geschichte und oft einer Bastelei zum Thema. Eltern kommen mit ihren Kindern einfach vorbei; im Horizont ist der Termin am 13. Dezember 2026.",
+   "title": "Kleinkindergottesdienst für Kinder bis ca. 8 Jahre mit Eltern",
+   "summary": "Kindgerechter Gottesdienst im Pfarrsaal mit Singen, einer biblischen Geschichte und oft einer Bastelei zum Thema. Im Horizont ist nur der Termin am 13. Dezember 2026 angegeben; Anmeldung ist auf der Seite nicht genannt, Fragen gehen ans Pfarrbüro.",
    "topics": [
     "krabbelgottesdienst"
    ],
@@ -12,15 +12,15 @@
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
-   "sourceUrl": "https://st-martin-nuernberg.de/aktuelles/termine",
+   "sourceUrl": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
    "category": "treffs-cafes",
    "age": {
     "minMonths": 0,
     "maxMonths": 96
    },
    "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung genannt, einfach vorbeikommen"
+    "status": "unbekannt",
+    "note": "Keine Anmeldung auf der Seite genannt; Fragen an das Pfarrbüro, Tel. 0911 9909 8871"
    },
    "schedule": {
     "kind": "dates",
@@ -33,10 +33,10 @@
    }
   }
  ],
- "inputHash": "98e9bcbe0ad3e172c85c0ae08344990c067e4aaccdffa5b39f074e793dd7936d",
+ "inputHash": "3b2776ec21d4bf161f8d2d87553032673689d9a50ad8d2dfb67d0384d26ce2d1",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-21T08:26:15+02:00",
- "changedAt": "2026-10-19T08:39:52+02:00",
+ "checkedAt": "2026-10-22T08:32:08+02:00",
+ "changedAt": "2026-10-22T08:32:08+02:00",
  "sources": []
 }

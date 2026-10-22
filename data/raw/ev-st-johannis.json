@@ -487,9 +487,11 @@
   "2027-02-14": "f1c5c13453baa8e3732627ce8de70b679a6d82577446ba069c8b2bd9d123ff94"
  },
  "model": "haiku",
- "status": "ok",
+ "status": "fehler",
+ "reason": "https://www.st-johannis-nuernberg.de/gemeindeleben/fuer-kinder: fetch failed (ECONNREFUSED)",
  "checkedAt": "2026-10-21T08:26:15+02:00",
  "changedAt": "2026-10-16T08:15:21+02:00",
+ "failingSince": "2026-10-22T08:32:08+02:00",
  "sources": [
   "evtermine"
  ]

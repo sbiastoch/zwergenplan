@@ -4,13 +4,14 @@
    "providerId": "ev-st-jobst",
    "venueId": "ev-st-jobst",
    "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre)",
-   "summary": "Spielen und Austausch für Eltern mit Kindern von 1 bis 2 Jahren im Miniclubraum der Gemeinde, meist wöchentlich. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Veranstalter nachfragen.",
+   "summary": "Wöchentliche Spiel- und Austauschgruppe für Eltern mit Kindern von 1 bis 2 Jahren im Miniclubraum. Eingetragen sind Termine bis Ende Dezember 2026; Platzangaben fehlen, daher bei der Gemeinde nachfragen.",
    "topics": [
     "eltern-kind-gruppe",
-    "spielgruppe"
+    "krabbelgruppe",
+    "elterntreff"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
+   "registration": "mit-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
@@ -21,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe in der Quelle; Anmeldung und Kosten nicht angegeben, bei St. Jobst Erlenstegen erfragen."
+    "note": "Keine Platzangabe im Eintrag. Anfrage über die Gemeinde St. Jobst Erlenstegen."
    },
    "schedule": {
     "kind": "dates",
@@ -73,33 +74,32 @@
  ],
  "inputHash": "611cf6a7bc2e5557b7658cbe6b1d8ac9ebaafd85f6857f603a039cb1dc4f3bee",
  "dated": {
-  "2026-10-21": "0f4419b674805e9792f4780cf4cdb9663fe0b55270abe8725bad0a44e40fcda0",
   "2026-10-27": "68a83119add4d158f1532d1b4dee9d23f51ce12ba14b5286615ef61c34f206e5",
-  "2026-10-28": "b151e109be84b256bbec7fefae42f266d7546ad8f19ddaf152de534535a23de0",
+  "2026-10-28": "b41a08797921acaa304ec3add9d8d0730b2b8bc326304cf57c24fbe7f7efa920",
   "2026-11-03": "c1c11b9b2b5d2d19a3dbf015291b0159d880fe645315efab2f6c366190377dbd",
   "2026-11-10": "720a99a62b4940ee76ef54adf7765e1e7ae389d975c1d28a961ee77d48ba3c10",
-  "2026-11-11": "14b9473f142ca49bac6910c8873b3ae47b09fe32fb38b289567f513f132ee54a",
+  "2026-11-11": "dcb64a309bf13d359a5b5c9a76d5f5dcd0ba06e889ae62a98cfca0d142b9d498",
   "2026-11-17": "29241e66519955a22853d22473e78bc6493cbdc3daa119b5e815e55b765b364f",
   "2026-11-24": "709eb222d5e46cb487d4289f0e2c39cefb43db5174275cf87d5c498231f71b79",
-  "2026-11-25": "8bde3f27aabe56ccbb8b89c6ab3efe82d2592ef89909c725a2282c49c54508c5",
+  "2026-11-25": "2298ccaa2be2cb870615e9bdf8f86c15b182cff26dbb19403d5b1dd56a098a2e",
   "2026-12-01": "61b18762938a0e0b079c332c8bb6bdc6daa31f824a22cec0802f0b23f94d6c25",
   "2026-12-08": "8fe5f60a91345bac08e3a03636feb194253e6bb75ab00e756b03129eb39cf17f",
-  "2026-12-09": "414f874d5bdc19f661fc0d0816232c4d72485b9882fd10aeb7486c327b87616f",
+  "2026-12-09": "c0c562effd4e0417f9a4ca04dbbbbe06a40fcfcfdec01e7df6ff2380093ce528",
   "2026-12-15": "bfc16ef99a2a7fae715a5acce83aeab1dd36de34f35d65ee1293a1e1f8eb6bd8",
-  "2026-12-16": "0bd6caba71d8a57c0cb53212c6a1e08010270489d1a725ddf2a1c9d0260d1fb7",
+  "2026-12-16": "914d2eeeef2a324e381cd020072a000c3a1dd937879bd2e53c59609788fb4563",
   "2026-12-22": "5edcb979a0e054788bae4d86f769e0fdef3ea3fb54049f1f1de6d22a605e4629",
   "2026-12-29": "8d6dd80bb9031823cefd12af4f3e513967ebf00aafadd2b6ca7aae879e467759",
-  "2027-01-13": "daac4b3930a0665ca25768be71fde176f7d54ca85e51bd045b0b39f258834a80",
-  "2027-01-27": "37a36a5a5d9dd31bb9c7e49ed2e54196e0716e5de660a549b43153d3a71f5ddb",
-  "2027-02-03": "8f26157f26aa25dce4a8d51c1ffc0136f2b6ffa38b36f17c87f863ed1c2dfda6",
-  "2027-02-17": "ce7863f57e28587fadf8f2ccdc4f8b894df59e750e84e8b081f31b5fa3416a95",
-  "2027-03-03": "5a20c5f3666563f03829de7739836b2cf87e8f119786582958a444ec81a44fab",
-  "2027-03-17": "5aa72a6e93b2373a93e40009e8cf7533bc61502f37f32cd2240c64959ff59aea"
+  "2027-01-13": "c5a5b06650e6676a912764dc4e54e83bb24a82895a583bd7bccad88e94420b5f",
+  "2027-01-27": "6655d56f268d3245f2e9eb1dd5db394af97a129222ec98ca74cfab17e89b2d40",
+  "2027-02-03": "292d5d9612f1f73652f5a56a29854192a5b0f94c0558ce53c70aed2534db4bc9",
+  "2027-02-17": "269e1afc79530461dfedae7a39dd637d948922750975dc32eb62a48f72613cbf",
+  "2027-03-03": "b9ec8a820302ac6636e46d6d56c04844699be1c3fc81fec5c5d51015310e4c98",
+  "2027-03-17": "d307b41ef2e57d98309197c8f830a30d5e95a65bb41a1b4b31e56cd20ed11259"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-21T08:26:15+02:00",
- "changedAt": "2026-10-21T08:26:15+02:00",
+ "checkedAt": "2026-10-22T08:32:08+02:00",
+ "changedAt": "2026-10-22T08:32:08+02:00",
  "sources": [
   "evtermine"
  ]

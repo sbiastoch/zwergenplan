@@ -3,8 +3,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby I (4–12 Mon.) Mo 10:30, ab 23.11.2026",
-   "summary": "Musikstunde mit Singen, Rasseln und Tüchern für Babys mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Laut Kursliste ausgebucht.",
+   "title": "Musikfüchse Baby I, Mo 10:30 Uhr (Sept.–Nov. 2026)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 4–12 Monate, 45 Min. Laufender Herbstkurs; die letzten Termine liegen im Horizont (26.10., 09.11., 16.11.).",
    "topics": [
     "musik",
     "singen"
@@ -21,256 +21,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "ausgebucht",
-    "note": "Auf der Kursliste als AUSGEBUCHT markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-23T10:30",
-      "end": "2026-11-23T11:15"
-     },
-     {
-      "start": "2026-11-30T10:30",
-      "end": "2026-11-30T11:15"
-     },
-     {
-      "start": "2026-12-07T10:30",
-      "end": "2026-12-07T11:15"
-     },
-     {
-      "start": "2026-12-14T10:30",
-      "end": "2026-12-14T11:15"
-     },
-     {
-      "start": "2026-12-21T10:30",
-      "end": "2026-12-21T11:15"
-     },
-     {
-      "start": "2027-01-11T10:30",
-      "end": "2027-01-11T11:15"
-     },
-     {
-      "start": "2027-01-18T10:30",
-      "end": "2027-01-18T11:15"
-     },
-     {
-      "start": "2027-01-25T10:30",
-      "end": "2027-01-25T11:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "musikfuechse",
-   "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby II (10–18 Mon.) Mo 09:30, ab 23.11.2026",
-   "summary": "Musikstunde für Babys ab ca. 10 Monaten mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "120 € (8 Termine)",
-   "url": "https://musikfuechse.com/musikfuechse-babys/",
-   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-   "category": "musik",
-   "age": {
-    "minMonths": 10,
-    "maxMonths": 18
-   },
-   "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-23T09:30",
-      "end": "2026-11-23T10:15"
-     },
-     {
-      "start": "2026-11-30T09:30",
-      "end": "2026-11-30T10:15"
-     },
-     {
-      "start": "2026-12-07T09:30",
-      "end": "2026-12-07T10:15"
-     },
-     {
-      "start": "2026-12-14T09:30",
-      "end": "2026-12-14T10:15"
-     },
-     {
-      "start": "2026-12-21T09:30",
-      "end": "2026-12-21T10:15"
-     },
-     {
-      "start": "2027-01-11T09:30",
-      "end": "2027-01-11T10:15"
-     },
-     {
-      "start": "2027-01-18T09:30",
-      "end": "2027-01-18T10:15"
-     },
-     {
-      "start": "2027-01-25T09:30",
-      "end": "2027-01-25T10:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "musikfuechse",
-   "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby I (4–12 Mon.) Di 10:30, ab 24.11.2026",
-   "summary": "Musikstunde mit Singen, Rasseln und Tüchern für Babys mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "120 € (8 Termine)",
-   "url": "https://musikfuechse.com/musikfuechse-babys/",
-   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-   "category": "musik",
-   "age": {
-    "minMonths": 4,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-24T10:30",
-      "end": "2026-11-24T11:15"
-     },
-     {
-      "start": "2026-12-01T10:30",
-      "end": "2026-12-01T11:15"
-     },
-     {
-      "start": "2026-12-08T10:30",
-      "end": "2026-12-08T11:15"
-     },
-     {
-      "start": "2026-12-15T10:30",
-      "end": "2026-12-15T11:15"
-     },
-     {
-      "start": "2026-12-22T10:30",
-      "end": "2026-12-22T11:15"
-     },
-     {
-      "start": "2027-01-12T10:30",
-      "end": "2027-01-12T11:15"
-     },
-     {
-      "start": "2027-01-19T10:30",
-      "end": "2027-01-19T11:15"
-     },
-     {
-      "start": "2027-01-26T10:30",
-      "end": "2027-01-26T11:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "musikfuechse",
-   "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby II (10–18 Mon.) Di 09:30, ab 24.11.2026",
-   "summary": "Musikstunde für Babys ab ca. 10 Monaten mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "120 € (8 Termine)",
-   "url": "https://musikfuechse.com/musikfuechse-babys/",
-   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-   "category": "musik",
-   "age": {
-    "minMonths": 10,
-    "maxMonths": 18
-   },
-   "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-24T09:30",
-      "end": "2026-11-24T10:15"
-     },
-     {
-      "start": "2026-12-01T09:30",
-      "end": "2026-12-01T10:15"
-     },
-     {
-      "start": "2026-12-08T09:30",
-      "end": "2026-12-08T10:15"
-     },
-     {
-      "start": "2026-12-15T09:30",
-      "end": "2026-12-15T10:15"
-     },
-     {
-      "start": "2026-12-22T09:30",
-      "end": "2026-12-22T10:15"
-     },
-     {
-      "start": "2027-01-12T09:30",
-      "end": "2027-01-12T10:15"
-     },
-     {
-      "start": "2027-01-19T09:30",
-      "end": "2027-01-19T10:15"
-     },
-     {
-      "start": "2027-01-26T09:30",
-      "end": "2027-01-26T10:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "musikfuechse",
-   "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby I (4–12 Mon.) Mo 10:30, ab 14.09.2026",
-   "summary": "Laufender Kurs bis 16.11.2026, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "120 € (8 Termine)",
-   "url": "https://musikfuechse.com/musikfuechse-babys/",
-   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-   "category": "musik",
-   "age": {
-    "minMonths": 4,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
    },
    "schedule": {
     "kind": "dates",
@@ -313,8 +65,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby II (10–18 Mon.) Mo 09:30, ab 14.09.2026",
-   "summary": "Laufender Kurs bis 16.11.2026 für Babys ab ca. 10 Monaten, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
+   "title": "Musikfüchse Baby II, Mo 9:30 Uhr (Sept.–Nov. 2026)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 10–18 Monate, 45 Min. Laufender Herbstkurs; die letzten Termine liegen im Horizont (26.10., 09.11., 16.11.).",
    "topics": [
     "musik",
     "singen"
@@ -331,8 +83,8 @@
     "maxMonths": 18
    },
    "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
    },
    "schedule": {
     "kind": "dates",
@@ -375,8 +127,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby I (4–12 Mon.) Di 10:30, ab 15.09.2026",
-   "summary": "Laufender Kurs bis 17.11.2026, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
+   "title": "Musikfüchse Baby I, Di 10:30 Uhr (Sept.–Nov. 2026)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 4–12 Monate, 45 Min. Laufender Herbstkurs; die letzten Termine liegen im Horizont (27.10., 10.11., 17.11.).",
    "topics": [
     "musik",
     "singen"
@@ -393,8 +145,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
    },
    "schedule": {
     "kind": "dates",
@@ -437,8 +189,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse Baby II (10–18 Mon.) Di 09:30, ab 15.09.2026",
-   "summary": "Laufender Kurs bis 17.11.2026 für Babys ab ca. 10 Monaten, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
+   "title": "Musikfüchse Baby II, Di 9:30 Uhr (Sept.–Nov. 2026)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 10–18 Monate, 45 Min. Laufender Herbstkurs; die letzten Termine liegen im Horizont (27.10., 10.11., 17.11.).",
    "topics": [
     "musik",
     "singen"
@@ -455,8 +207,8 @@
     "maxMonths": 18
    },
    "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
    },
    "schedule": {
     "kind": "dates",
@@ -499,70 +251,8 @@
   {
    "providerId": "musikfuechse",
    "venueId": "musikfuechse",
-   "title": "Musikfüchse I (18 Mon.–3 J.) Mo 15:30, ab 23.11.2026",
-   "summary": "Musikstunde für Kinder ab ca. 18 Monaten mit Eltern, 45 Min., 8 Termine im Mutherstudio Kraftshof. Buchbar über den Link „Kurs buchen“.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "120 € (8 Termine)",
-   "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-   "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-   "category": "musik",
-   "age": {
-    "minMonths": 18,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "frei",
-    "note": "Anmeldung über „Kurs buchen“"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-23T15:30",
-      "end": "2026-11-23T16:15"
-     },
-     {
-      "start": "2026-11-30T15:30",
-      "end": "2026-11-30T16:15"
-     },
-     {
-      "start": "2026-12-07T15:30",
-      "end": "2026-12-07T16:15"
-     },
-     {
-      "start": "2026-12-14T15:30",
-      "end": "2026-12-14T16:15"
-     },
-     {
-      "start": "2026-12-21T15:30",
-      "end": "2026-12-21T16:15"
-     },
-     {
-      "start": "2027-01-11T15:30",
-      "end": "2027-01-11T16:15"
-     },
-     {
-      "start": "2027-01-18T15:30",
-      "end": "2027-01-18T16:15"
-     },
-     {
-      "start": "2027-01-25T15:30",
-      "end": "2027-01-25T16:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "musikfuechse",
-   "venueId": "musikfuechse",
-   "title": "Musikfüchse I (18 Mon.–3 J.) Mo 15:30, ab 14.09.2026",
-   "summary": "Laufender Kurs bis 16.11.2026 für Kinder ab ca. 18 Monaten, 45 Min., 8 Termine im Mutherstudio Kraftshof. Laut Kursliste ausgebucht.",
+   "title": "Musikfüchse-Musikzwerge I, Mo 15:30 Uhr (Sept.–Nov. 2026)",
+   "summary": "Musikspiel mit Eltern für Kinder ca. 18 Monate bis 3 Jahre, 45 Min. Laufender Herbstkurs, ausgebucht; die letzten Termine liegen im Horizont.",
    "topics": [
     "musik",
     "singen"
@@ -580,7 +270,7 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "Auf der Kursliste als AUSGEBUCHT markiert"
+    "note": "Kurs als ausgebucht gekennzeichnet"
    },
    "schedule": {
     "kind": "dates",
@@ -619,12 +309,322 @@
      }
     ]
    }
+  },
+  {
+   "providerId": "musikfuechse",
+   "venueId": "musikfuechse",
+   "title": "Musikfüchse Baby I, Mo 10:30 Uhr (Nov. 2026–Jan. 2027)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 4–12 Monate, 45 Min., 8 Termine ab 23.11.2026. Anmeldung über das Buchungsformular.",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://musikfuechse.com/musikfuechse-babys/",
+   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+   "category": "musik",
+   "age": {
+    "minMonths": 4,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-23T10:30",
+      "end": "2026-11-23T11:15"
+     },
+     {
+      "start": "2026-11-30T10:30",
+      "end": "2026-11-30T11:15"
+     },
+     {
+      "start": "2026-12-07T10:30",
+      "end": "2026-12-07T11:15"
+     },
+     {
+      "start": "2026-12-14T10:30",
+      "end": "2026-12-14T11:15"
+     },
+     {
+      "start": "2026-12-21T10:30",
+      "end": "2026-12-21T11:15"
+     },
+     {
+      "start": "2027-01-11T10:30",
+      "end": "2027-01-11T11:15"
+     },
+     {
+      "start": "2027-01-18T10:30",
+      "end": "2027-01-18T11:15"
+     },
+     {
+      "start": "2027-01-25T10:30",
+      "end": "2027-01-25T11:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "musikfuechse",
+   "venueId": "musikfuechse",
+   "title": "Musikfüchse Baby II, Mo 9:30 Uhr (Nov. 2026–Jan. 2027)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 10–18 Monate, 45 Min., 8 Termine ab 23.11.2026. Anmeldung über das Buchungsformular.",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://musikfuechse.com/musikfuechse-babys/",
+   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+   "category": "musik",
+   "age": {
+    "minMonths": 10,
+    "maxMonths": 18
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-23T09:30",
+      "end": "2026-11-23T10:15"
+     },
+     {
+      "start": "2026-11-30T09:30",
+      "end": "2026-11-30T10:15"
+     },
+     {
+      "start": "2026-12-07T09:30",
+      "end": "2026-12-07T10:15"
+     },
+     {
+      "start": "2026-12-14T09:30",
+      "end": "2026-12-14T10:15"
+     },
+     {
+      "start": "2026-12-21T09:30",
+      "end": "2026-12-21T10:15"
+     },
+     {
+      "start": "2027-01-11T09:30",
+      "end": "2027-01-11T10:15"
+     },
+     {
+      "start": "2027-01-18T09:30",
+      "end": "2027-01-18T10:15"
+     },
+     {
+      "start": "2027-01-25T09:30",
+      "end": "2027-01-25T10:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "musikfuechse",
+   "venueId": "musikfuechse",
+   "title": "Musikfüchse Baby I, Di 10:30 Uhr (Nov. 2026–Jan. 2027)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 4–12 Monate, 45 Min., 8 Termine ab 24.11.2026. Anmeldung über das Buchungsformular.",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://musikfuechse.com/musikfuechse-babys/",
+   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+   "category": "musik",
+   "age": {
+    "minMonths": 4,
+    "maxMonths": 12
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-24T10:30",
+      "end": "2026-11-24T11:15"
+     },
+     {
+      "start": "2026-12-01T10:30",
+      "end": "2026-12-01T11:15"
+     },
+     {
+      "start": "2026-12-08T10:30",
+      "end": "2026-12-08T11:15"
+     },
+     {
+      "start": "2026-12-15T10:30",
+      "end": "2026-12-15T11:15"
+     },
+     {
+      "start": "2026-12-22T10:30",
+      "end": "2026-12-22T11:15"
+     },
+     {
+      "start": "2027-01-12T10:30",
+      "end": "2027-01-12T11:15"
+     },
+     {
+      "start": "2027-01-19T10:30",
+      "end": "2027-01-19T11:15"
+     },
+     {
+      "start": "2027-01-26T10:30",
+      "end": "2027-01-26T11:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "musikfuechse",
+   "venueId": "musikfuechse",
+   "title": "Musikfüchse Baby II, Di 9:30 Uhr (Nov. 2026–Jan. 2027)",
+   "summary": "Musikspiel mit Eltern für Babys ca. 10–18 Monate, 45 Min., 8 Termine ab 24.11.2026. Anmeldung über das Buchungsformular.",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://musikfuechse.com/musikfuechse-babys/",
+   "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+   "category": "musik",
+   "age": {
+    "minMonths": 10,
+    "maxMonths": 18
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-24T09:30",
+      "end": "2026-11-24T10:15"
+     },
+     {
+      "start": "2026-12-01T09:30",
+      "end": "2026-12-01T10:15"
+     },
+     {
+      "start": "2026-12-08T09:30",
+      "end": "2026-12-08T10:15"
+     },
+     {
+      "start": "2026-12-15T09:30",
+      "end": "2026-12-15T10:15"
+     },
+     {
+      "start": "2026-12-22T09:30",
+      "end": "2026-12-22T10:15"
+     },
+     {
+      "start": "2027-01-12T09:30",
+      "end": "2027-01-12T10:15"
+     },
+     {
+      "start": "2027-01-19T09:30",
+      "end": "2027-01-19T10:15"
+     },
+     {
+      "start": "2027-01-26T09:30",
+      "end": "2027-01-26T10:15"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "musikfuechse",
+   "venueId": "musikfuechse",
+   "title": "Musikfüchse-Musikzwerge I, Mo 15:30 Uhr (Nov. 2026–Jan. 2027)",
+   "summary": "Musikspiel mit Eltern für Kinder ca. 18 Monate bis 3 Jahre, 45 Min., 8 Termine ab 23.11.2026. Anmeldung über das Buchungsformular.",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "120 € (8 Termine)",
+   "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
+   "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
+   "category": "musik",
+   "age": {
+    "minMonths": 18,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Anmeldung über den Button 'Kurs buchen' (Kursort Kraftshof)"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-23T15:30",
+      "end": "2026-11-23T16:15"
+     },
+     {
+      "start": "2026-11-30T15:30",
+      "end": "2026-11-30T16:15"
+     },
+     {
+      "start": "2026-12-07T15:30",
+      "end": "2026-12-07T16:15"
+     },
+     {
+      "start": "2026-12-14T15:30",
+      "end": "2026-12-14T16:15"
+     },
+     {
+      "start": "2026-12-21T15:30",
+      "end": "2026-12-21T16:15"
+     },
+     {
+      "start": "2027-01-11T15:30",
+      "end": "2027-01-11T16:15"
+     },
+     {
+      "start": "2027-01-18T15:30",
+      "end": "2027-01-18T16:15"
+     },
+     {
+      "start": "2027-01-25T15:30",
+      "end": "2027-01-25T16:15"
+     }
+    ]
+   }
   }
  ],
- "inputHash": "21688ec8e4dd3bca291f6329423dd8b39789c073cf96c115ac81d3b303d8ad77",
+ "inputHash": "42c5a9a837a86120234472cb26e7bef8d92e9389659743b7a8eab657765ce075",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-21T08:26:15+02:00",
- "changedAt": "2026-10-20T08:26:12+02:00",
+ "checkedAt": "2026-10-22T08:32:08+02:00",
+ "changedAt": "2026-10-22T08:32:08+02:00",
  "sources": []
 }
