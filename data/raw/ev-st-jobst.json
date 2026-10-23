@@ -3,15 +3,15 @@
   {
    "providerId": "ev-st-jobst",
    "venueId": "ev-st-jobst",
-   "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre)",
-   "summary": "Wöchentliche Spiel- und Austauschgruppe für Eltern mit Kindern von 1 bis 2 Jahren im Miniclubraum. Eingetragen sind Termine bis Ende Dezember 2026; Platzangaben fehlen, daher bei der Gemeinde nachfragen.",
+   "title": "Miniclub Eltern-Kind-Gruppe (Kinder etwa 1–2 Jahre)",
+   "summary": "Wöchentliche Gruppe im Miniclubraum von St. Jobst: gemeinsames Spielen, erste Gruppenerfahrungen für die Kleinen und Austausch unter Eltern. Die Quelle nennt keine Anmeldung und keine Kosten.",
    "topics": [
     "eltern-kind-gruppe",
-    "krabbelgruppe",
+    "spielgruppe",
     "elterntreff"
    ],
    "format": "regelmaessig",
-   "registration": "mit-anmeldung",
+   "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
    "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe im Eintrag. Anfrage über die Gemeinde St. Jobst Erlenstegen."
+    "note": "Keine Angabe zur Anmeldung; beim Veranstalter (Ev. St. Jobst) nachfragen"
    },
    "schedule": {
     "kind": "dates",
@@ -83,8 +83,8 @@
   "2026-11-24": "709eb222d5e46cb487d4289f0e2c39cefb43db5174275cf87d5c498231f71b79",
   "2026-11-25": "2298ccaa2be2cb870615e9bdf8f86c15b182cff26dbb19403d5b1dd56a098a2e",
   "2026-12-01": "61b18762938a0e0b079c332c8bb6bdc6daa31f824a22cec0802f0b23f94d6c25",
+  "2026-12-02": "b0bc186911ba08243e6417e43d14eb2b76023c12ce83dbb0290e14e227513e25",
   "2026-12-08": "8fe5f60a91345bac08e3a03636feb194253e6bb75ab00e756b03129eb39cf17f",
-  "2026-12-09": "c0c562effd4e0417f9a4ca04dbbbbe06a40fcfcfdec01e7df6ff2380093ce528",
   "2026-12-15": "bfc16ef99a2a7fae715a5acce83aeab1dd36de34f35d65ee1293a1e1f8eb6bd8",
   "2026-12-16": "914d2eeeef2a324e381cd020072a000c3a1dd937879bd2e53c59609788fb4563",
   "2026-12-22": "5edcb979a0e054788bae4d86f769e0fdef3ea3fb54049f1f1de6d22a605e4629",
@@ -98,8 +98,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
+ "changedAt": "2026-10-23T08:24:44+02:00",
  "sources": [
   "evtermine"
  ]

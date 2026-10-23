@@ -470,11 +470,9 @@
   "2026-11-06": "81989aec13b24210571d7a5c037b45fa73573c48533b39ce40646d4bee9eb9a0"
  },
  "model": "haiku",
- "status": "fehler",
- "reason": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html: fetch failed (UND_ERR_CONNECT_TIMEOUT) (+3 weitere)",
- "checkedAt": "2026-10-21T08:26:15+02:00",
+ "status": "ok",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
  "changedAt": "2026-10-12T14:49:58+02:00",
- "failingSince": "2026-10-22T08:32:08+02:00",
  "sources": [
   "frankenkids"
  ]

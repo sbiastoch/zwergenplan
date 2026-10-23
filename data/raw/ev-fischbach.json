@@ -3,8 +3,8 @@
   {
    "providerId": "ev-fischbach",
    "venueId": "ev-fischbach",
-   "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), dienstags 9:30–11:30",
-   "summary": "Offene Gruppe für Mütter und Väter mit kleinen Kindern: Austausch, Anregungen für den Alltag, erste Lieder und Gruppenspiel. Preis und Anmeldung stehen nicht auf der Seite, bitte beim Veranstalter erfragen.",
+   "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), dienstags",
+   "summary": "Vormittagsgruppe für Kinder von 3 Monaten bis 3 Jahren: gemeinsam Lieder singen und zur Musik bewegen, dazu Austausch für Mütter und Väter. Ein Treffen dauert zwei Stunden.",
    "topics": [
     "eltern-kind-gruppe",
     "elterntreff"
@@ -21,47 +21,24 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung; Kontakt über die Kirchengemeinde Fischbach."
+    "note": "Keine Angaben zu Plätzen oder Anmeldung in der Quelle; bei der Auferstehungskirche Fischbach nachfragen."
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-27T09:30",
-      "end": "2026-10-27T11:30"
-     },
-     {
-      "start": "2026-11-10T09:30",
-      "end": "2026-11-10T11:30"
-     },
-     {
-      "start": "2026-11-17T09:30",
-      "end": "2026-11-17T11:30"
-     },
-     {
-      "start": "2026-11-24T09:30",
-      "end": "2026-11-24T11:30"
-     },
-     {
-      "start": "2026-12-01T09:30",
-      "end": "2026-12-01T11:30"
-     },
-     {
-      "start": "2026-12-08T09:30",
-      "end": "2026-12-08T11:30"
-     },
-     {
-      "start": "2026-12-15T09:30",
-      "end": "2026-12-15T11:30"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "09:30",
+    "end": "11:30",
+    "from": "2026-10-27",
+    "skipHolidays": true
    }
   },
   {
    "providerId": "ev-fischbach",
    "venueId": "ev-fischbach",
-   "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), donnerstags 9:30–10:30",
-   "summary": "Offene Gruppe für Mütter und Väter mit kleinen Kindern: Austausch, Anregungen für den Alltag, erste Lieder und Gruppenspiel. Preis und Anmeldung stehen nicht auf der Seite, bitte beim Veranstalter erfragen.",
+   "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), donnerstags",
+   "summary": "Vormittagsgruppe für Kinder von 3 Monaten bis 3 Jahren mit Liedern und Bewegung zur Musik sowie Erfahrungsaustausch für Eltern. Ein Treffen dauert eine Stunde.",
    "topics": [
     "eltern-kind-gruppe",
     "elterntreff"
@@ -69,7 +46,7 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8121947.html",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8121948.html",
    "sourceUrl": "https://www.evangelische-termine.de/ical?vid=556",
    "category": "krabbel-spielgruppen",
    "age": {
@@ -78,102 +55,70 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung; Kontakt über die Kirchengemeinde Fischbach."
+    "note": "Keine Angaben zu Plätzen oder Anmeldung in der Quelle; bei der Auferstehungskirche Fischbach nachfragen."
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-22T09:30",
-      "end": "2026-10-22T10:30"
-     },
-     {
-      "start": "2026-10-29T09:30",
-      "end": "2026-10-29T10:30"
-     },
-     {
-      "start": "2026-11-05T09:30",
-      "end": "2026-11-05T10:30"
-     },
-     {
-      "start": "2026-11-12T09:30",
-      "end": "2026-11-12T10:30"
-     },
-     {
-      "start": "2026-11-19T09:30",
-      "end": "2026-11-19T10:30"
-     },
-     {
-      "start": "2026-11-26T09:30",
-      "end": "2026-11-26T10:30"
-     },
-     {
-      "start": "2026-12-03T09:30",
-      "end": "2026-12-03T10:30"
-     },
-     {
-      "start": "2026-12-10T09:30",
-      "end": "2026-12-10T10:30"
-     },
-     {
-      "start": "2026-12-17T09:30",
-      "end": "2026-12-17T10:30"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "09:30",
+    "end": "10:30",
+    "from": "2026-10-29",
+    "skipHolidays": true
    }
   }
  ],
  "inputHash": "5b455733252ec55dcb90592d697f58d0fe1bc5c77e1a29d6e9dbc9ef0f5a85f8",
  "dated": {
-  "2026-10-22": "6e2ece461b096f40620991758a382ed7e66170515c68797c0aed812d952b6eed",
   "2026-10-23": "841c550e7689a6c8c5bf13a97344a8f432e718e7f0341b8e72e681872b186647",
   "2026-10-25": "6654038cc277c48653b02a554cfbe16f2b5e44941f2ea4f3fbe3282042b3993b",
-  "2026-10-26": "c79754f19a85859e38328a69bf479f9ec19dfa7dab1c46145feb066bdbdce892",
-  "2026-10-27": "0b6fb29452effdbc135e27e4401f8ac75d8c78f821e92b98d987d1bf5da6f53d",
-  "2026-10-29": "1b628c2d3d195272bfaf62f8042d080bd13f80e727d1cbf42c391169dca7d6cb",
+  "2026-10-26": "a1eae4e2b98f32872fdb3e030f9436a0cbaecf34296a54c45a8391901c150ea2",
+  "2026-10-27": "c85d120dc7b8b276da74aea612ad35e6ea1b8edd83157cc5d86e9335be8137c1",
+  "2026-10-29": "b0b1054acda8275347905dfbe5968ea799224e9092c6c5b9982def26a99366d1",
   "2026-10-30": "e91babf5ff2197e4518d12900a1bf7ebf898d3fd3e01454f3bf5935a0253d666",
   "2026-11-01": "b7df5a104c6dedf9e33489b8812c1aabc23edfffccbcc584dd285809b7614b4d",
-  "2026-11-02": "9ef622b65acc8c5309a7cba666b80c5081e989380bfe0bf38cb109c48e403519",
+  "2026-11-02": "143d9aa93c2d1ff5f033f7da2faeafc0ff67579312bb3af868224f8423b0766b",
   "2026-11-03": "4ca497b1bce355ad1da8b16d0c4f1031936b8423ba6347be690c286793a9f302",
   "2026-11-04": "bad07d8e0f06027eb984a3ba2e71d6b7703b98534f3d64c2d65d385597eaf831",
-  "2026-11-05": "99ef38c7ee806a5dde324b85070616bbed9dc0b1df0eb799e2303e00fb104d29",
+  "2026-11-05": "012b4eb9d56206eac79cfdd3e9920ada14defb3a54154a98948520f67d1b429f",
   "2026-11-08": "a15f37dca9891b131a9d333cb898833efbb37fb8f3c6898c691422977091fdfd",
-  "2026-11-09": "05f6bd547df6e3c5db82958ba28d859a5b94712af412abda7738a3e960275941",
-  "2026-11-10": "e770c6deab16e8e78bbf2838facd58c662e8fd72670f9f83c1d28f010e9ea11c",
-  "2026-11-12": "039cf0f64a0faf74d2e0d1d7c8ea85a557e3de7932bd1983574069426498932b",
+  "2026-11-09": "8a3173467d0c1c711dcb6e809ec47e471d3f6c79774d5758cfeca31ab4e8a8d3",
+  "2026-11-10": "4e90216ffa5101097a96ee456ad91269ca3b171c929152d7990a5d32d4d70219",
+  "2026-11-12": "425555ce590934750b650d665dbdf12ece51dd920996c31a99bf3697066540e2",
   "2026-11-15": "80b3bc2b98dc54e769f523835989a32c4a5ba2b80d53197331d7a06802ee6149",
-  "2026-11-16": "2af620c472c13929f75a47dc1e1b6d42a27a43f9494f8390fb530602bf8af242",
-  "2026-11-17": "7058483d900fd4e0a698221cdf7814c179819e16194e4f55d6ed789d3953528b",
+  "2026-11-16": "7a709bc6f2df714ed8cc3f0d34fc633259c0f9d86d9cb64c2e9c413fd1734af5",
+  "2026-11-17": "68d033f8b9269acfeca86fb64f9ee67236a8b95d112ee8208939ed6e2dd60ec8",
   "2026-11-18": "c5db1fb83a94e17919370e74d16ed414ed44971225c90c11253777a97c7cb645",
-  "2026-11-19": "c5f21554a673e31e1adfe0c830cc27e901cb342c9114c6f3250ab9fe3b00fac6",
+  "2026-11-19": "0e8d5b92ca3a257e5aae40531516804f59eb69a365251e8f0170418d2d50fd76",
   "2026-11-21": "cb592a46da39703fd3715998f7f2219d21aa1fc4edbc1cab70372736cfa3c992",
   "2026-11-22": "75ca95b28d7d21186c64e047c752d354b2639e1a2590aef65135d73478e7f62c",
-  "2026-11-23": "cc5981f803b15e192455d9eecf8126d440cf129012a0a04c693988222b0655b2",
-  "2026-11-24": "96eb41e55e89dc2900e1bf91ee26e9967e854bfdd96ab4d05b81bb385c72f6d7",
-  "2026-11-26": "4b4c9c4ab8298e5fd934d7b4e2234487fcefe431cbaaea7a82885d540fb6c104",
+  "2026-11-23": "50ab6fb647aeaf2b8e0803a609db1276e99f28fb3dda195b73dc219a11950f27",
+  "2026-11-24": "4ee373744f54e8d64fc1dbd11e4d851e8222c229683e8eaa257b4a83468b455e",
+  "2026-11-26": "094f197d08327594442606947c5f7f28a85b38d1aa20f11c13255b86a81bfd3f",
   "2026-11-29": "158baad953f5dbcd5d76e6a3d9e818915309eb58603baee130b48b8fe5687de2",
-  "2026-11-30": "ee7393e1364ed408e9bcfa2f0d46ef87245eebd9ae1791e58ea9cf676f2d072e",
-  "2026-12-01": "5bbb0971cb1007fea13f0b9b8d61728f20fa9c704b2344568ab626259ec0781f",
+  "2026-11-30": "72a2af27dc2a433b23055ce23aa22eafb8d0b3de7cd838805b926d3db76c4e8e",
+  "2026-12-01": "81aab6416919c94a017a1cd997ae3861be21e654141c35509c5bd9866f785be1",
   "2026-12-02": "14828e58ef55ddd9d37213bd998540ebcd09683d03a70cdb5d59b3dedd44dbdc",
-  "2026-12-03": "7b5d17e04f328a8f28419f2c9f9e6b34f4fcb318ee70c4fe293b4a1ddcbb8a44",
+  "2026-12-03": "02c057e2f6a7451919bf240a4198057c7dd842a63d6cae4660d2469bdcf483a4",
   "2026-12-06": "430a0cc568bbfb23e914ffb4bc6b1cb51db923617875cfeac80232f72dbeefa3",
-  "2026-12-07": "e50ccfd46187a4c2e39b2c93f8013407f4dc6b4f0fdfb3432580bab9299f9dec",
-  "2026-12-08": "160036b9f1b3a13a50a47dd4ccb03c49d1c5224c1ae6ffa4345eadaa40afacb3",
-  "2026-12-10": "864a18ffc1aea5209d6c56d9d258bbc739b620779bbd93857440f075fab743d7",
+  "2026-12-07": "eb7065986ffca2931d9d00a973d694abab6d1d99d6c9f237de7735a258fde323",
+  "2026-12-08": "341652bc89093af7d6b2804edebc165bda2f743099271604017b3a74671edd59",
+  "2026-12-10": "a95f2f24c3c0ae9e236cb521f5e4da33228464cdf02d87c8876697497d9bab89",
   "2026-12-13": "6c0da42e2233a21d5aa3e4fcf2ccddb90b30c4ee53c6910f6b1a7dadbe61be29",
-  "2026-12-14": "d169b51c40305ca0cb8bb8baeb4aa2c0614ab1c61a9b2b6bc400787455a4b228",
-  "2026-12-15": "276868a8fd2c0ef0d6a14579fd9156ab4451720d08c2679a578884f8e78c2606",
+  "2026-12-14": "f0efe8f4604dd6daa0aa7fd736041069fa52e619f1bbb15e9cfb383e7541579b",
+  "2026-12-15": "90d62197dda2cc5252593e3d99f4b7310afc5cfae9825b8adae4e9c401213227",
   "2026-12-16": "17e05f644b7e26122f48aed58d00683419f65656577ed4b1219cf793e56b293b",
-  "2026-12-17": "621aef0b94ccd8fa570f6baa596d91d1207f20c42973327a1f42640dc6acbbbb",
+  "2026-12-17": "e726b2e175103f066c83077ddeb50c1cf257b3c242a6a9097e41451b5573e468",
   "2026-12-20": "3c56f330e4482a733195fe31baad6e4a5d0b730f3b14ea20c39990169b422e7c",
-  "2026-12-21": "c1aa67c7c5902f8a6bbf33f881686cf21fda5c166a37d47fcdcb440e984c8659",
+  "2026-12-21": "838df1e1ec13ce408a06d8bacd9b313bdbaa69de365dd598492de94e4df49555",
   "2026-12-27": "fb4599fe7a73cbe06efb318f079c53c8e4888bad32d80b1ac6c309b71ce556c5",
   "2027-05-30": "c6399eb8664c63001c91a9da94ed95633ee69b0d3c8fbe9978d02f0705345457"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
- "changedAt": "2026-10-21T08:26:15+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
+ "changedAt": "2026-10-23T08:24:44+02:00",
  "sources": [
   "evtermine"
  ]

@@ -3,15 +3,16 @@
   {
    "providerId": "cvjm-gostenhof-miniclub",
    "venueId": "cvjm-gostenhof-miniclub",
-   "title": "Mini-Club für Kinder ab 18 Monaten bis 3 Jahre (dienstags)",
-   "summary": "Dienstagvormittags treffen sich Eltern mit Kindern zu Kniereitern, Fingerspielen, Bewegungsliedern, Bilderbuch oder Basteln, dazu Freispielzeit und Kaffee. Nicht in den Ferien. Fragen an Stefanie Becker, 0151 65108244.",
+   "title": "Mini-Club für Kinder 18 Monate bis 3 Jahre (dienstags vormittags)",
+   "summary": "Dienstagvormittags Treff mit Kniereitern, Fingerspielen und Bewegungsliedern, dazu Freispiel und Kaffee. Nicht in den Schulferien. Anfrage bei Stefanie Becker, 0151 65108244.",
    "topics": [
     "eltern-kind-gruppe",
-    "elterntreff"
+    "spielgruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "Preis nicht angegeben, bitte beim Anbieter erfragen",
    "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
    "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
    "category": "krabbel-spielgruppen",
@@ -21,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige. Auskunft bei Stefanie Becker, 0151 65108244, stefanie.becker@cvjm-nuernberg-gostenhof.de"
+    "note": "Keine Platzanzeige. Anfrage bei Stefanie Becker, 0151 65108244 oder stefanie.becker@cvjm-nuernberg-gostenhof.de"
    },
    "schedule": {
     "kind": "weekly",
@@ -37,15 +38,15 @@
   {
    "providerId": "cvjm-gostenhof-miniclub",
    "venueId": "cvjm-gostenhof-miniclub",
-   "title": "Mini-Club (1–3 Jahre, dienstags)",
-   "summary": "Spielgruppe für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags vormittags. Keine Platzanzeige; die Termine stammen aus dem Veranstaltungskalender, Teilnahmebedingungen bitte auf der Detailseite prüfen.",
+   "title": "Mini-Club für Kinder von 1 bis 3 Jahren (dienstags)",
+   "summary": "Spiel- und Bewegungsgruppe für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags 10:00–11:30 Uhr. Anmeldung und Beitrag stehen im Kalendereintrag nicht; bitte auf der Website prüfen.",
    "topics": [
     "spielgruppe",
     "eltern-kind-gruppe"
    ],
    "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
    "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
    "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
    "category": "krabbel-spielgruppen",
@@ -55,7 +56,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzanzeige; Anfrage über die Website des CVJM"
+    "note": "Keine Platzanzeige; Anmeldung bitte über die Website klären"
    },
    "schedule": {
     "kind": "dates",
@@ -98,11 +99,79 @@
      }
     ]
    }
+  },
+  {
+   "providerId": "cvjm-gostenhof-miniclub",
+   "venueId": "cvjm-gostenhof-miniclub",
+   "title": "Mini-Club (1–3 Jahre, dienstags)",
+   "summary": "Spielgruppe für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM, dienstags 10:00–11:30 Uhr. Die Termine im Kalender reichen bis April 2027. Anmeldung, Kosten und Begleitung durch Eltern stehen in diesem Auszug nicht; bitte beim CVJM erfragen.",
+   "topics": [
+    "spielgruppe",
+    "eltern-kind-gruppe"
+   ],
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
+   "category": "krabbel-spielgruppen",
+   "age": {
+    "minMonths": 12,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Keine Platzanzeige; Anmeldung beim CVJM erfragen"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-01-19T10:00",
+      "end": "2027-01-19T11:30"
+     },
+     {
+      "start": "2027-01-26T10:00",
+      "end": "2027-01-26T11:30"
+     },
+     {
+      "start": "2027-02-02T10:00",
+      "end": "2027-02-02T11:30"
+     },
+     {
+      "start": "2027-02-16T10:00",
+      "end": "2027-02-16T11:30"
+     },
+     {
+      "start": "2027-02-23T10:00",
+      "end": "2027-02-23T11:30"
+     },
+     {
+      "start": "2027-03-02T10:00",
+      "end": "2027-03-02T11:30"
+     },
+     {
+      "start": "2027-03-09T10:00",
+      "end": "2027-03-09T11:30"
+     },
+     {
+      "start": "2027-03-16T10:00",
+      "end": "2027-03-16T11:30"
+     },
+     {
+      "start": "2027-04-06T10:00",
+      "end": "2027-04-06T11:30"
+     },
+     {
+      "start": "2027-04-13T10:00",
+      "end": "2027-04-13T11:30"
+     }
+    ]
+   }
   }
  ],
  "inputHash": "66c78cf5681eafd386f80106468c14a7358662e093e9f260ca93caaecf8288c4",
  "dated": {
-  "2026-10-22": "1ae21d16cd6bffeab69d92a3de533e314f178db5e6f5936903a458063dc234b6",
   "2026-10-23": "9f3e1432bd5634233fdf8471a4e244b4d28e616b6c5fe7b80f08b6cb82bd795b",
   "2026-10-26": "c724960825385f5b57a93cece84883a8c74c06972f17030219848564d1fa9260",
   "2026-10-27": "188b9e3ec31446d8c769bd71b16b794dc069895cdb47c6ccb96dcd623d9f5672",
@@ -187,7 +256,7 @@
   "2027-04-06": "73022cf13647f034ad50a9e6e5dafe6784ac592000eb7a3a61e7053071136e1d",
   "2027-04-08": "44da1e1103049721a14333542e5dd025348bf0a11b7f9382a05e47862d837e3e",
   "2027-04-09": "32496833c0f8ed3246c08ddc97f5aa9156ca1ede8cc83cf4702fb1e3425dd759",
-  "2027-04-12": "f213b8ebafe0e1ebfa44829c4464705a885954d974b31ca7188a71562f3610e1",
+  "2027-04-12": "4ba5f444c553f1ed486acbdd544b51777bf31938c952bcd1bd3890793c0f4c48",
   "2027-04-13": "759b18971e32801c797507d285059b7711b98f4dd5d4adb278e13a874bf1fba9",
   "2027-04-15": "2b1cf6d95eaabeee853ad2bf4cb521251c153f7f25954506fc651bbbfcc9ff34",
   "2027-04-16": "36fc04f4131172266073b07fc4720cfbff43c41ed3179f9e9d8713b13fc7a6cf",
@@ -243,8 +312,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
- "changedAt": "2026-10-21T08:26:15+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
+ "changedAt": "2026-10-23T08:24:44+02:00",
  "sources": [
   "evtermine",
   "frankenkids"

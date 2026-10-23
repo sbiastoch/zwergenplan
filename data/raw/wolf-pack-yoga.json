@@ -3,18 +3,17 @@
   {
    "providerId": "wolf-pack-yoga",
    "venueId": "wolf-pack-yoga",
-   "title": "Yoga mit Baby, Donnerstag 9:30 (Kurs ab 22.10.2026)",
-   "summary": "Postnatales Yoga nach der Rückbildung, Babys von 3 bis 12 Monaten dürfen mit dabei sein. Geschlossene Kursblöcke mit 6 Terminen donnerstags 9:30–10:30; weitere Blöcke ab 10.12.2026, 11.02.2027, 01.04.2027 und 03.06.2027 laut Website, Termine bitte auf der Buchungsseite prüfen.",
+   "title": "Yoga mit Baby (Babys 3–12 Monate, donnerstags)",
+   "summary": "Kräftigende, fließende Yogaübungen nach der Geburt mit dem Baby dabei, im Anschluss an die Rückbildung. Der geschlossene Kurs läuft bereits; ein Einstieg ist derzeit nicht möglich.",
    "topics": [
-    "yoga-mit-baby",
-    "bewegung"
+    "yoga-mit-baby"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "102 € (Einzelticket, 6 Termine)",
+   "price": "102 € (6 Termine)",
    "url": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
-   "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
+   "sourceUrl": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
    "category": "bewegung",
    "age": {
     "minMonths": 3,
@@ -22,15 +21,11 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Auf der Buchungsseite steht „Nicht buchbar“; keine Platzangabe. Anmeldung über die Eversports-Seite des Kurses."
+    "note": "Geschlossener Kurs, auf Eversports derzeit nicht buchbar; Anfrage beim Anbieter"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-22T09:30",
-      "end": "2026-10-22T10:30"
-     },
      {
       "start": "2026-10-29T09:30",
       "end": "2026-10-29T10:30"
@@ -55,10 +50,10 @@
    }
   }
  ],
- "inputHash": "81274be13eca476de1e2cea32e63dbb9d8b39661eb818217d9d1d001066bac25",
+ "inputHash": "fc8c0d00f0a217850b672cb080305c567cf97f3c0fce7bf4c9300ba208d3a3ba",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
+ "changedAt": "2026-10-23T08:24:44+02:00",
  "sources": []
 }

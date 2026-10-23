@@ -71,8 +71,6 @@
  ],
  "inputHash": "75488e156fd770d04d1340b5a7ef8d621f1026c3c1fbb585cd391d069fc13b11",
  "dated": {
-  "2026-10-21": "7a718cca6f79e9111d3c3d42d05a850a2245810062604015456b080f3533f85b",
-  "2026-10-22": "5509bb279322df3a2ef944afc8985634e57ee2c3e680eec08ded91f13937caa7",
   "2026-10-23": "0f93f671fb8c64dfd0f8511ca875794a215f6d94f04991e99f5700e14dc739cb",
   "2026-10-25": "c2ee4b825bb91b17a243286ca1521c376372cccf849d7f3bb538ad32f34b85dd",
   "2026-10-26": "86038a713b38c3ae12abef0ea3deaff46797a0b9b85acf579d8e193595bc7aa7",
@@ -209,10 +207,8 @@
   "2027-12-31": "4a8f1de173f245e1a5bb91bab6d29d6709379182528755f654f1e7fc66f5148c"
  },
  "model": "haiku",
- "status": "fehler",
- "reason": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
- "checkedAt": "2026-10-21T08:26:15+02:00",
+ "status": "ok",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
  "changedAt": "2026-10-17T07:59:57+02:00",
- "failingSince": "2026-10-22T08:32:08+02:00",
  "sources": []
 }

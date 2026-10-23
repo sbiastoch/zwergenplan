@@ -3,8 +3,8 @@
   {
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
-   "title": "Baby & Museum: Kunst-Führung mit Babys",
-   "summary": "Kurzführung zu wechselnden Themen für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln. Danach gibt es Kaffee und Austausch. Kinderwagen und Trage sind erlaubt. Tickets nur über den Museumsshop.",
+   "title": "Baby & Museum: Kunstführung für Erwachsene mit Babys",
+   "summary": "Kurzführung durchs Neue Museum zu wechselnden Themen, mit Pausen zum Füttern und Wickeln, danach Kaffee zum Austausch. Preis: 3 € zzgl. Eintritt je Erwachsenem. Der Termin am 23.10. entfällt.",
    "topics": [
     "museum",
     "elterntreff"
@@ -13,7 +13,7 @@
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "3 € zzgl. Eintritt (für Erwachsene)",
-   "url": "https://nmn-tickets.de/#/product/event/161?date_id=5140",
+   "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
    "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
    "category": "museum",
    "age": {
@@ -22,7 +22,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets über den go~mus-Shop; Restkontingent ist dort sichtbar"
+    "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Platzangaben nur dort sichtbar"
    },
    "schedule": {
     "kind": "dates",
@@ -50,7 +50,7 @@
    "providerId": "neues-museum-baby-museum",
    "venueId": "neues-museum-baby-museum",
    "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-   "summary": "Die Schauspielerin Mara Wengel erzählt Geschichten aus dem Wonderland-Raum der Ausstellung „Double Up!“, zum Mitmachen. Kinder ab zwei Jahren und ihre Begleitungen sind eingeladen. Tickets nur über den Museumsshop.",
+   "summary": "Schauspielerin liest und spielt Geschichten aus einem Kinderbuch im Museum, Kinder machen aktiv mit. Preis: 3 € zzgl. Eintritt für Erwachsene.",
    "topics": [
     "vorlesen",
     "museum"
@@ -68,7 +68,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Tickets über den go~mus-Shop"
+    "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Platzangaben nur dort sichtbar"
    },
    "schedule": {
     "kind": "dates",
@@ -80,7 +80,7 @@
    }
   }
  ],
- "inputHash": "d32f3be8e414b2b46b1625bbc2931209859ab97e059aca3fe6898c3c399ed328",
+ "inputHash": "a7bfcca08656a2d0efc274bba4f3c00a45ac99ab1a1b383527144ff0b8a583c7",
  "dated": {
   "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
   "2026-11-13": "02758077c4f295a349671c42fd4810985342d83bb86afa633e9bac9349a6d8d6",
@@ -91,8 +91,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
+ "changedAt": "2026-10-23T08:24:44+02:00",
  "sources": [
   "stadt-vk"
  ]

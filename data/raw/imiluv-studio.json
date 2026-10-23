@@ -3,10 +3,11 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Reformer Mums & Babies (Pilates mit Baby, Englisch)",
-   "summary": "Sanftes Reformer-Pilates für Mütter mit Babys ca. 6 Wochen bis 6 Monate, auf Englisch, 55 Minuten. Ärztliche Freigabe ist nötig. Buchung nur in der IMILUV-App.",
+   "title": "Reformer Mums & Babies: Pilates mit Baby (6 Wochen–6 Monate)",
+   "summary": "Pilates auf dem Reformer mit Baby, Anleitung auf Englisch, je 55 Minuten. Ärztliche Freigabe nötig. Buchung nur in der IMILUV-App (bsport), 5 Credits pro Termin.",
    "topics": [
     "fitness-mit-baby",
+    "bewegung",
     "mehrsprachig"
    ],
    "format": "regelmaessig",
@@ -21,8 +22,8 @@
     "maxMonths": 6
    },
    "availability": {
-    "status": "frei",
-    "note": "Buchbar in der IMILUV-App; laut Termin-API nicht ausgebucht"
+    "status": "unbekannt",
+    "note": "Laut Termin-API nicht ausgebucht; Anmeldung in der IMILUV-App (bsport)"
    },
    "schedule": {
     "kind": "dates",
@@ -61,14 +62,13 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Barre Baby Luv (Babys ca. 6–12 Monate, in der Trage)",
-   "summary": "Barre-Training mit Baby in der Trage, 50 Minuten, Deutsch/Englisch. Ärztliche Freigabe nötig. Buchung nur über die IMILUV-App; ab 29.10. sind die Termine buchbar.",
+   "title": "Barre Baby Luv (Babys ca. 6–12 Monate, Donnerstag)",
+   "summary": "Barre-Training mit Baby in der Trage, Deutsch und Englisch. Ärztliche Freigabe ist nötig. Buchung nur in der IMILUV-App, jeder Termin einzeln.",
    "topics": [
     "fitness-mit-baby",
-    "bewegung",
-    "mehrsprachig"
+    "bewegung"
    ],
-   "format": "kurs",
+   "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "4 Credits pro Termin",
@@ -81,15 +81,11 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Keine Termine ausgebucht. Buchung über die IMILUV-App; der Termin am 22.10. ist laut Terminliste noch nicht buchbar."
+    "note": "Buchung in der IMILUV-App; laut Terminliste noch nicht ausgebucht"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-22T10:45",
-      "end": "2026-10-22T11:35"
-     },
      {
       "start": "2026-10-29T10:45",
       "end": "2026-10-29T11:35"
@@ -118,9 +114,8 @@
    }
   }
  ],
- "inputHash": "cc4b906a05f7642849e55a90f611faf8b260fbc1858ad8da3974d79701b9b657",
+ "inputHash": "61c8e5a09b6fb65e42b9021e627c6a5b1b53b38dcf201629caa33f39708fcdab",
  "dated": {
-  "2026-10-22": "1f0027e86afef28c64f86af055be0f431ea8b5a46e94f712fad7c6866ffe79f5",
   "2026-10-28": "bb0e397cfa0f7faa8bc071e45c37caebbc8ac116cbb0a2fc25e49920f0115d6b",
   "2026-11-05": "4469413ab5cecdfa1ba87562ddf4671fa640e3e4ced70a41309448442ec050dd",
   "2026-11-11": "24881df50e6dff67323da14243116da9864ce627834593e9e54e2667bcae5660",
@@ -129,8 +124,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
+ "changedAt": "2026-10-23T08:24:44+02:00",
  "sources": [
   "frankenkids"
  ]

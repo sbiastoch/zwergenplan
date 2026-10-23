@@ -45,7 +45,6 @@
  ],
  "inputHash": "16f0fc64e47bc6e649de341e95b8ec4275de0d2e7769ea2bebbe2de20b104781",
  "dated": {
-  "2026-10-22": "1787b9cf3aecfbda18d89bdcfc73c37715ec5317b7b4df9994a0ef3ab64ab25e",
   "2026-11-13": "220733e49472bc018079d133e42d1df8b54e24d5ea3cda3437823cfa65e22581",
   "2026-11-19": "e21772940a916b8969f1f258f9a6b325cbb8cd9ceb6e854c863ec7b21ac42107",
   "2026-11-27": "016af92905712802ddfe0b582cf69616d49f908105a330a645a03ef9bb37b763",
@@ -54,7 +53,7 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
  "changedAt": "2026-10-20T08:26:12+02:00",
  "sources": [
   "stadt-vk"

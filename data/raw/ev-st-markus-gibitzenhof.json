@@ -4,20 +4,20 @@
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
    "title": "Offene Tür für Groß und Klein (montags)",
-   "summary": "Offener Treff im FreiRaum der Markuskirche für Familien mit kleinen Kindern. Einfach vorbeikommen, keine Anmeldung nötig.",
+   "summary": "Offener Treff im FreiRaum der Markuskirche, bei dem Familien mit kleinen Kindern einfach vorbeikommen und spielen können. Keine Anmeldung nötig.",
    "topics": [
-    "elterntreff",
-    "eltern-kind-gruppe"
+    "eltern-kind-gruppe",
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
    "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8113801.html",
    "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
-   "category": "treffs-cafes",
+   "category": "krabbel-spielgruppen",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, keine Anmeldung"
+    "note": "Offener Treff, einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -34,7 +34,7 @@
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
    "title": "Café für Alle (dienstags, Helmut-Herold-Platz)",
-   "summary": "Offenes Café auf dem Platz für Alle vor der Markuskirche, mit Angeboten für Groß und Klein. Einfach vorbeikommen, ohne Anmeldung; bei schlechtem Wetter kann es ausfallen.",
+   "summary": "Offenes Café auf dem Helmut-Herold-Platz bzw. im FreiRaum für alle, Kinder sind willkommen; am 24.11. gibt es ein Bilderbuchkino. Keine Anmeldung nötig.",
    "topics": [
     "elterncafe",
     "elterntreff"
@@ -47,7 +47,7 @@
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offenes Café, keine Anmeldung"
+    "note": "Offener Treff, einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -66,8 +66,8 @@
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Café für Alle (Familien mit Kindern, Dienstag)",
-   "summary": "Offener Treff für Familien mit Kindern jeden Alters bei Kaffee und Kuchen gegen Spende, ab und zu mit Bastel- und Bilderbuchangebot. Einfach vorbeikommen, Uhrzeit laut Quellen teils unterschiedlich (15–17 oder 15–18 Uhr).",
+   "title": "Café für Alle (Familientreff, dienstags)",
+   "summary": "Offener Familientreff dienstags, bei schönem Wetter auf dem Platz vor der Kirche, sonst im FreiRaum. Kaffee und Kuchen gegen Spende, oft Bastel- und Bilderbuchangebote. Einfach vorbeikommen, Kinderlärm ist willkommen.",
    "topics": [
     "elterncafe",
     "elterntreff"
@@ -75,13 +75,12 @@
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "Kaffee und Kuchen gegen Spende",
    "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
    "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "offener Treff, einfach vorbeikommen"
+    "note": "offener Treff, keine Anmeldung"
    },
    "schedule": {
     "kind": "weekly",
@@ -89,14 +88,55 @@
      "TU"
     ],
     "start": "15:00",
+    "end": "18:00",
     "from": "2026-10-27",
     "skipHolidays": true
    }
+  },
+  {
+   "providerId": "ev-st-markus-gibitzenhof",
+   "venueId": "ev-st-markus-gibitzenhof",
+   "title": "Offene Tür für Groß und Klein (montags, Vormittag)",
+   "summary": "Offener Vormittagstreff mit Spielzeit für Kleinkinder, Kaffee und Gesellschaft im FreiRaum der Markuskirche. Einfach vorbeikommen, keine Anmeldung nötig.",
+   "topics": [
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8113801",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8113801",
+   "category": "treffs-cafes",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "offener Treff, keine Anmeldung"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-09T09:00",
+      "end": "2026-11-09T11:00"
+     },
+     {
+      "start": "2026-11-16T09:00",
+      "end": "2026-11-16T11:00"
+     },
+     {
+      "start": "2026-11-23T09:00",
+      "end": "2026-11-23T11:00"
+     },
+     {
+      "start": "2026-11-30T09:00",
+      "end": "2026-11-30T11:00"
+     }
+    ]
+   },
+   "via": "evtermine"
   }
  ],
  "inputHash": "cd676145798c48b6d14952029969b251f4a5956ec8c285f88bfb3b9670a65c51",
  "dated": {
-  "2026-10-22": "c5b710644047ce4aec8fb554bb790999a3c794433152fefdded73e4bfdd57c68",
   "2026-10-23": "4e604e2beb670c921112ed71657e8ab2b7e742bd5eb9a15ab15c5d622898ceff",
   "2026-10-24": "0638f4c357d429a5125b480078b0e111bcd0d537d2f93ef68593af392cd254d3",
   "2026-10-25": "fe35c44db86a60e62115f63872f00e947d62e425e0e26e7f91a8e4c4a180f112",
@@ -137,7 +177,7 @@
   "2026-12-06": "50cf79aa4359a9b886c9f3b5ef63efae850b080596026adf2cd4e5fc65b87d70",
   "2026-12-08": "b95946485c9e5732cc26c8d766fa87e915d78edc23f346b61dcff562a344c41e",
   "2026-12-09": "cf78064b43ff609582560bc4801edbd57d98b7fd23327853d7638d2fdbd7a94d",
-  "2026-12-10": "0d7691996fa42eb8fae2814d845828a210e1b74409e00e2bac807cfe48bc6bc2",
+  "2026-12-10": "fb4189fc5d37a8e8c893ad0c1c6abeea992b3a6f9e975a670d8f68c48f05550c",
   "2026-12-11": "708d629776dc63b6a724b78c0f104bc2c36e24f97de431cdc0b3868c94530880",
   "2026-12-13": "39f51308eb7e7094d3fb84e0c6f7653a55ce9e573f024e0d2d6147136de78075",
   "2026-12-15": "64da0aaf9901fbafe657fb68ad598e50cdb88cb0a5b33809082c0f6b1e346d69",
@@ -210,8 +250,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-22T08:32:08+02:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
+ "checkedAt": "2026-10-23T08:24:44+02:00",
+ "changedAt": "2026-10-23T08:24:44+02:00",
  "sources": [
   "evtermine"
  ]

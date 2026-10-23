@@ -158,9 +158,11 @@
   "2026-12-22": "9d39411047e384536f68351ff40dc8eab0e8f4dd24f49d4d360994b25859c5b6"
  },
  "model": "haiku",
- "status": "ok",
+ "status": "fehler",
+ "reason": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/: fetch failed (ERR_TLS_CERT_ALTNAME_INVALID) (+2 weitere)",
  "checkedAt": "2026-10-22T08:32:08+02:00",
  "changedAt": "2026-10-12T14:49:58+02:00",
+ "failingSince": "2026-10-23T08:24:44+02:00",
  "sources": [
   "frankenkids"
  ]
