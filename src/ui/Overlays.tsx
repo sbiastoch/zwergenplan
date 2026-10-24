@@ -61,8 +61,11 @@ interface OverlaysProps {
   transit: TransitApi;
   /** Knopf zur Begründung der gesperrten Wegzeit-Grenze (`LimitAction`) */
   limitAction: LimitActionFor;
-  /** Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. */
-  filterButton: RefObject<HTMLButtonElement | null>;
+  /**
+   * Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl, dann der
+   * Filter-Knopf; aus der Aufforderung „Wovon aus gerechnet?“ die Statuszeile (Plan 0043, E7).
+   */
+  kidFallback: RefObject<HTMLElement | null>;
   /**
    * Fokus-Rückweg des Details: der Knopf des aktiven Tabs. Die Kachel, die das Detail geöffnet hat,
    * fehlt nach dem Ablösen in der Merkliste oder bei einem Deep-Link (Plan 0008, E11).
@@ -74,7 +77,7 @@ interface OverlaysProps {
 
 export function Overlays(props: OverlaysProps) {
   const { toast, sheet, setSheet, detailOffer, detailDay, closeDetail, ctx, say, filter, setFilter } = props;
-  const { birthDate, setBirthDate, theme, today, originApi, filterButton, activeTab } = props;
+  const { birthDate, setBirthDate, theme, today, originApi, kidFallback, activeTab } = props;
   const { transit, providerId, openProvider, closeProvider } = props;
   const { origin } = originApi;
   const { now, onToggleSave } = ctx;
@@ -162,7 +165,7 @@ export function Overlays(props: OverlaysProps) {
         label="Kind und Einstellungen"
         className="sheet"
         toast={toast}
-        fallbackFocus={filterButton}
+        fallbackFocus={kidFallback}
       >
         <KidSheet
           birthDate={birthDate}

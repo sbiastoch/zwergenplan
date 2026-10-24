@@ -51,7 +51,7 @@ test("Menü per Tipp: „Neu eingestellt“ wählen – URL, gefüllter Knopf, W
 
   await button.click();
   await expect(button).toHaveAttribute("aria-expanded", "true");
-  await expect(menu(page).getByRole("menuitemradio")).toHaveCount(2);
+  await expect(menu(page).getByRole("menuitemradio")).toHaveCount(3);
   await expect(item(page, "Nächste Termine")).toHaveAttribute("aria-checked", "true");
   await expect(item(page, "Nächste Termine")).toBeFocused();
   await expect(item(page, "Neu eingestellt")).toHaveAccessibleDescription("neueste zuerst");
@@ -93,13 +93,15 @@ test("Tastatur: Pfeile mit Umlauf, Home/End, Escape und Wahl geben den Fokus an 
   await page.keyboard.press("ArrowDown");
   await expect(item(page, "Neu eingestellt")).toBeFocused();
   await page.keyboard.press("ArrowDown");
+  await expect(item(page, "Nächstgelegen")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
   await expect(item(page, "Nächste Termine")).toBeFocused();
   await page.keyboard.press("ArrowUp");
-  await expect(item(page, "Neu eingestellt")).toBeFocused();
+  await expect(item(page, "Nächstgelegen")).toBeFocused();
   await page.keyboard.press("Home");
   await expect(item(page, "Nächste Termine")).toBeFocused();
   await page.keyboard.press("End");
-  await expect(item(page, "Neu eingestellt")).toBeFocused();
+  await expect(item(page, "Nächstgelegen")).toBeFocused();
 
   await page.keyboard.press("Escape");
   await expect(menu(page)).toBeHidden();
@@ -107,7 +109,7 @@ test("Tastatur: Pfeile mit Umlauf, Home/End, Escape und Wahl geben den Fokus an 
   await expect(page).toHaveURL((url) => url.search === "");
 
   await page.keyboard.press(" ");
-  await page.keyboard.press("End");
+  await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await expect(menu(page)).toBeHidden();
   await expect(page).toHaveURL(/\?sortierung=neu$/);
@@ -262,7 +264,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await sortButton(page).click();
     await expect(menu(page)).toBeVisible();
     await expectMobileUx(page);
-    await page.keyboard.press("End");
+    await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\?sortierung=neu$/);
     await expectMobileUx(page);
@@ -313,3 +315,85 @@ for (const viewport of [
     await expectAccessible(page);
   });
 }
+
+test.describe("Nächstgelegen (E7)", () => {
+  test("ohne Startpunkt: Aufforderung ohne Request, „Startpunkt wählen“ öffnet das Sheet, danach nach Wegzeit", async ({
+    page,
+  }) => {
+    const tables: string[] = [];
+    page.on("request", (r) => {
+      if (/\/data\/(wegzeit|linien)\.json/.test(r.url())) tables.push(r.url());
+    });
+    await ready(page);
+    await sortButton(page).click();
+    await expect(item(page, "Nächstgelegen")).toHaveAccessibleDescription("Startpunkt wählen");
+    await item(page, "Nächstgelegen").click();
+    await expect(page).toHaveURL(/\?sortierung=nah$/);
+    await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Nächstgelegen");
+    await expect(page.getByText("Wovon aus gerechnet?")).toBeVisible();
+    await expect(page.getByText("Bis dahin nach Terminen")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Mittwoch, 7. Oktober" })).toBeVisible();
+    // Die Wahl selbst lädt keine Tabelle (Invariante: kein Request hängt am Startpunkt)
+    await page.waitForTimeout(300);
+    expect(tables).toEqual([]);
+
+    await page.getByRole("button", { name: "Startpunkt wählen" }).click();
+    const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    await expect(sheet).toBeVisible();
+    await sheet.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    // Der Knopf ist weg: Der Fokus geht auf die Statuszeile, nicht auf <body>
+    await expect(page.getByRole("status")).toBeFocused();
+    await expect(page.getByText("Wovon aus gerechnet?")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Bis 20 Minuten/);
+  });
+
+  test("mit gespeichertem Stadtteil: Bänder in Reihenfolge, Unterzeile und Menü nennen den Startpunkt", async ({
+    page,
+  }) => {
+    await page.goto("./");
+    await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await ready(page, "./?sortierung=nah");
+    const headings = page.locator("section > h2.daylabel > span:first-child");
+    await expect(headings.first()).toHaveText("Bis 20 Minuten");
+    const titles = await headings.allTextContents();
+    expect(titles.length).toBeGreaterThanOrEqual(2);
+    expect(titles).toEqual(
+      ["Bis 20 Minuten", "Bis 30 Minuten", "Bis 45 Minuten", "Über 45 Minuten"].filter((t) => titles.includes(t)),
+    );
+    await expect(page.getByRole("region", { name: "Bis 20 Minuten, mit Bus & Bahn ab Gostenhof" })).toBeVisible();
+    // Karten mit Datum, innerhalb des Bands nach gerundeten Minuten
+    await expect(
+      page
+        .getByRole("region", { name: /^Bis 20 Minuten/ })
+        .locator(".when")
+        .first(),
+    ).toHaveText(/^\w\w \d+\.\d+\. · /);
+    await sortButton(page).click();
+    await expect(item(page, "Nächstgelegen")).toHaveAccessibleDescription("Wegzeit ab Gostenhof");
+    await expect(item(page, "Nächstgelegen")).toHaveAttribute("aria-checked", "true");
+  });
+});
+
+test("„Nächstgelegen“ wartet auf die Wegzeit: Platzhalter statt Liste, die Zahl bleibt sichtbar (Review 3, M6)", async ({
+  page,
+}) => {
+  let release = () => {};
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/data/wegzeit.json", async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto("./");
+  await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+  await page.goto("./?sortierung=nah");
+  await expect(page.getByText("Wegzeiten werden geladen …")).toBeVisible();
+  await expect(page.getByTestId("offer")).toHaveCount(0);
+  await expect(page.getByRole("status")).not.toHaveClass(/pending/);
+  await expect(page.getByRole("status")).toContainText("8 Angebote");
+  release();
+  await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Bis 20 Minuten/);
+});

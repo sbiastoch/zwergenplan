@@ -108,6 +108,19 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.goto(new URL("?sortierung=neu", page.url()).href);
     await page.getByRole("heading", { level: 2 }).first().waitFor();
   },
+  // Nächstgelegen (Plan 0043, E7): ohne Startpunkt die Aufforderung, mit Gostenhof die Wegzeit-Bänder
+  nah: async (page) => {
+    await page.goto(new URL("?sortierung=nah", page.url()).href);
+    await page.getByText("Wovon aus gerechnet?").waitFor();
+  },
+  "nah-startpunkt": async (page) => {
+    await withGostenhof(page);
+    await page.goto(new URL("?sortierung=nah", page.url()).href);
+    await page
+      .getByRole("heading", { level: 2, name: /Minuten/ })
+      .first()
+      .waitFor();
+  },
   kind: async (page) => {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.getByLabel("Geburtsdatum").fill("02.11.2025");

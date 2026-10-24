@@ -18,7 +18,7 @@ import {
 import { type CalendarSelection, clampDay } from "../domain/calendar.ts";
 import { quickRanges } from "../domain/date-range.ts";
 import { applyFilters, EMPTY_FILTER } from "../domain/filter.ts";
-import { groupByListing, type ListGroup } from "../domain/listing.ts";
+import { groupByListing, groupByReach, type ListGroup } from "../domain/listing.ts";
 import { countPlaces, placeKey } from "../domain/place-key.ts";
 import type { Reach, ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
@@ -60,7 +60,7 @@ export interface OfferViews {
   ageOnly: boolean;
   /** schaltet den Altersfilter und beginnt die Liste wieder mit dem ersten Schritt */
   setAgeOnly: (on: boolean) => void;
-  /** aktueller Ausschnitt der Liste „Entdecken“, nach Terminen oder nach „Neu eingestellt“ (Plan 0043, E4) */
+  /** aktueller Ausschnitt der Liste „Entdecken“: nach Terminen, „Neu eingestellt“ oder Wegzeit (Plan 0043, E4, E7) */
   page: { groups: ListGroup<Occurrence<SiteOffer>>[]; remaining: number };
   showMore: () => void;
   /** nach Filterwechsel wieder mit dem ersten Schritt beginnen */
@@ -165,23 +165,22 @@ export function useOfferViews({
   // Mit „nur altersgerecht“ stehen regelmäßige Angebote am ersten passenden Termin (Plan 0028). Ohne Altersfilter
   // erscheinen sie wie alle anderen, unpassende sind markiert.
   const fits = useMemo(() => (ageOnly ? sessionFit(birthDate) : undefined), [ageOnly, birthDate]);
-  const sort = route.sort;
-  const groups = useMemo(
-    (): ListGroup<Occurrence<SiteOffer>>[] =>
-      sort === "neu"
-        ? groupByListing(visible, now, range, fits)
-        : groupByNextSession(visible, now, range, fits).map(({ day, items }) => ({
-            kind: "termin",
-            key: day,
-            day,
-            items,
-          })),
-    [sort, visible, now, range, fits],
-  );
+  const reachOf = useMemo(() => reachCache(reach), [reach]);
+  // „Nächstgelegen“ ohne Wegzeit (kein Startpunkt) zeigt bis dahin die Termine (Plan 0043, E7)
+  const sort = route.sort === "nah" && !reach ? undefined : route.sort;
+  const groups = useMemo((): ListGroup<Occurrence<SiteOffer>>[] => {
+    if (sort === "neu") return groupByListing(visible, now, range, fits);
+    if (sort === "nah") return groupByReach(visible, now, reachOf, range, fits);
+    return groupByNextSession(visible, now, range, fits).map(({ day, items }) => ({
+      kind: "termin",
+      key: day,
+      day,
+      items,
+    }));
+  }, [sort, visible, now, range, fits, reachOf]);
   const dataEnd = useMemo(() => lastSessionDay(upcoming), [upcoming]);
   const today = berlinIsoDate(now);
   const savedQuick = useMemo(() => quickRanges(today, dataEnd), [today, dataEnd]);
-  const reachOf = useMemo(() => reachCache(reach), [reach]);
   // Startausschnitt nur aus öffentlichen Daten: alle kommenden Angebote, ohne Filter, Alter und Startpunkt
   // (ADR 0008; Arch-Review 0005, B1 und m1). Sonst verriete die Kachelwahl Standort oder Alter des Kindes.
   // Die Karte der Merkliste zählt die Orte der gemerkten Angebote, ihr Startausschnitt ist derselbe (Plan 0025, E4).

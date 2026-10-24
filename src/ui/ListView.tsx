@@ -1,11 +1,12 @@
 /**
  * „Entdecken“ als Liste (Plan 0003, E7/E8): jedes Angebot einmal am nächsten Termin, nach Tagen gruppiert; mit
- * Zeitraum am Termin darin (Plan 0023, E6). Mit „Neu eingestellt“ nach Wochen gruppiert, die Karten dann mit Datum
- * (Plan 0043, E4).
+ * Zeitraum am Termin darin (Plan 0023, E6). Mit „Neu eingestellt“ nach Wochen, mit „Nächstgelegen“ nach Wegzeit-Bändern
+ * gruppiert, die Karten dann mit Datum (Plan 0043, E4, E7).
  */
 import type { ReactNode } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
 import type { ListGroup } from "../domain/listing.ts";
+import type { Origin } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { ageEmptyText, listingHeading, NOTHING_NEW } from "./format.ts";
@@ -25,6 +26,8 @@ interface ListViewProps {
   age?: AgeEscape | undefined;
   /** Zeitraum aktiv: Das Detail bezieht sich auf den Termin der Karte, wie im Kalender (Plan 0023, E7) */
   openOnDay: boolean;
+  /** Startpunkt für die Unterzeilen der Wegzeit-Bänder (Plan 0043, E7) */
+  origin?: Origin | undefined;
 }
 
 export function ListView({
@@ -37,13 +40,14 @@ export function ListView({
   onResetFilter,
   age,
   openOnDay,
+  origin,
 }: ListViewProps) {
   if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} age={age} />;
   return (
     <>
       {groups[0]?.kind === "frueher" && <p className="status">{NOTHING_NEW}</p>}
       {groups.map((group) => {
-        const { title, sub } = listingHeading(group, today);
+        const { title, sub } = listingHeading(group, today, origin);
         const dated = group.kind !== "termin";
         return (
           <section key={group.key} aria-label={sub ? `${title}, ${sub}` : title}>
@@ -75,8 +79,8 @@ export function ListView({
 }
 
 /**
- * Platzhalter der Liste, solange die Wegzeit zu einer gesetzten Grenze lädt (Plan 0009, E11, M7): so hoch wie zwei
- * Tagesgruppen, danach erscheint die gefilterte Liste, ohne dass Kacheln springen.
+ * Platzhalter der Liste, solange die Wegzeit zu einer gesetzten Grenze oder für „Nächstgelegen“ lädt (Plan 0009, E11,
+ * M7; Plan 0043, E7): so hoch wie zwei Tagesgruppen, danach erscheint die Liste, ohne dass Kacheln springen.
  */
 export function ListPending() {
   return (

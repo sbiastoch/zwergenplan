@@ -64,7 +64,7 @@ export interface Route {
   sort?: Sort;
 }
 
-const SORTS = ["neu"] as const;
+const SORTS = ["neu", "nah"] as const;
 export type Sort = (typeof SORTS)[number];
 const SORT_PARAM = "sortierung";
 

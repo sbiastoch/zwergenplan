@@ -9,9 +9,10 @@ import { courseProgress, rhythm, uniformTimes, upcomingSessions, weekDays } from
 import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange } from "../domain/date-range.ts";
 import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
-import { type ListGroupHead, NEW_DAYS } from "../domain/listing.ts";
+import { type ListGroupHead, METER_BANDS, NEW_DAYS } from "../domain/listing.ts";
 import {
   distanceText,
+  LIMIT_MINUTES,
   type Origin,
   type Reach,
   type ReachLimit,
@@ -93,10 +94,11 @@ function weekdayDayMonth(day: string, withMonth = true): string {
 }
 
 /**
- * Überschrift einer Gruppe der Liste (Plan 0043, E4): Termine wie `dayHeading`; „Neu diese Woche“ mit „seit So, 18.
- * Okt.“, „Neu vorige Woche“ mit dem Zeitraum, „Früher eingestellt“ ohne Unterzeile.
+ * Überschrift einer Gruppe der Liste (Plan 0043, E4, E7): Termine wie `dayHeading`; „Neu diese Woche“ mit „seit So, 18.
+ * Okt.“, „Neu vorige Woche“ mit dem Zeitraum, „Früher eingestellt“ ohne Unterzeile; Wegzeit-Bänder („Bis 20 Minuten“,
+ * „Über 10 km“) mit „mit Bus & Bahn ab …“ bzw. „Luftlinie ab …“.
  */
-export function listingHeading(group: ListGroupHead, today: string): { title: string; sub?: string } {
+export function listingHeading(group: ListGroupHead, today: string, origin?: Origin): { title: string; sub?: string } {
   switch (group.kind) {
     case "termin":
       return dayHeading(group.day, today);
@@ -111,6 +113,22 @@ export function listingHeading(group: ListGroupHead, today: string): { title: st
     }
     case "frueher":
       return { title: "Früher eingestellt" };
+    case "wegzeit": {
+      // Bänder der Sortierung „Nächstgelegen“ (Plan 0043, E7)
+      const { unit, upTo } = group.band;
+      const from = origin ? ` ${originPhrase(origin)}` : "";
+      if (unit === "min")
+        return {
+          title: upTo === undefined ? `Über ${LIMIT_MINUTES.at(-1)} Minuten` : `Bis ${upTo} Minuten`,
+          sub: `${BY_TRANSIT}${from}`,
+        };
+      return {
+        title: upTo === undefined ? `Über ${(METER_BANDS.at(-1) ?? 0) / 1000} km` : `Bis ${upTo / 1000} km`,
+        sub: `Luftlinie${from}`,
+      };
+    }
+    case "ohne-wegzeit":
+      return { title: "Ohne Wegzeit" };
   }
 }
 
@@ -421,6 +439,12 @@ export function wayParts(
  * Zusatz der Statuszeile hinter der Zahl (Plan 0020, E1; ADR 0019): nur der Startpunkt, die Annahme (Di vormittags,
  * 1 Umstieg, Warten) erklärt das Kind-Sheet. Der seltene Rückfall auf die Luftlinie nennt seinen Grund (ADR 0011, 9).
  */
+/** Untertitel von „Nächstgelegen“ im Sortiermenü (Plan 0043, E7; Review 3, K3) */
+export function nearSortSub(mode: ReachMode | undefined, origin: Origin | undefined): string {
+  if (!origin) return "Startpunkt wählen";
+  return `${mode?.kind === "luftlinie" ? "Luftlinie" : "Wegzeit"} ${originPhrase(origin)}`;
+}
+
 export function reachNote(mode: ReachMode, origin: Origin): string {
   const from = originPhrase(origin);
   if (mode.kind !== "luftlinie") return `Wegzeit ${from}`;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { sessionFit } from "./age.ts";
 import { groupByNextSession, type Occurrence } from "./agenda.ts";
-import { groupByListing, isNewlyListed, listingWeek } from "./listing.ts";
+import { groupByListing, groupByReach, isNewlyListed, listingWeek } from "./listing.ts";
 import type { SiteOffer } from "./site-data.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers } from "./test-fixtures.ts";
 
@@ -87,5 +87,87 @@ describe("groupByListing: Liste „Neu eingestellt“ (Plan 0043, E4)", () => {
       FIXTURE_NOW,
     );
     expect(groups.map((g) => [g.kind, keys(g.items)])).toEqual([["frueher", ["pekip-herbst"]]]);
+  });
+});
+
+describe("groupByReach: Liste „Nächstgelegen“ (Plan 0043, E7)", () => {
+  const offers = fixtureSiteOffers();
+  const byKey = (key: string) => {
+    const offer = offers.find((o) => fixtureKey(o) === key);
+    if (!offer) throw new Error(`Fixture ${key} fehlt`);
+    return offer;
+  };
+  const transit = (minutes: Record<string, number>) => (offer: SiteOffer) => {
+    const value = minutes[offer.id];
+    return value === undefined ? undefined : ({ kind: "oepnv", minutes: value, byFoot: false } as const);
+  };
+  const heads = (groups: ReturnType<typeof groupByReach>) =>
+    groups.map((g) => [g.key, g.items.map((i) => fixtureKey(i.offer))]);
+
+  it("Bänder an den Stufen der Wegzeit-Grenze, auf gerundeten Minuten wie auf der Karte", () => {
+    const treff = byKey("krabbeltreff");
+    const reime = byKey("krabbelreime");
+    const musik = byKey("musikgarten-1");
+    const kuckuck = byKey("kuckuck-im-nest");
+    const pekip = byKey("pekip-herbst");
+    const massage = byKey("babymassage-workshop");
+    const konzert = byKey("babykonzert-advent");
+    // 22,4 → 20 (bis 20), 22,6 → 25 (bis 30), 32,4 → 30 (bis 30), 32,6 → 35 (bis 45), 47,4 → 45 (bis 45),
+    // 47,6 → 50 (über 45), über 2 Std.
+    const groups = groupByReach(
+      [treff, reime, musik, kuckuck, pekip, massage, konzert],
+      FIXTURE_NOW,
+      transit({
+        [treff.id]: 22.4,
+        [reime.id]: 22.6,
+        [musik.id]: 32.4,
+        [massage.id]: 32.6,
+        [konzert.id]: 47.4,
+        [kuckuck.id]: 47.6,
+        [pekip.id]: 200,
+      }),
+    );
+    expect(heads(groups)).toEqual([
+      ["w:min:20", ["krabbeltreff"]],
+      ["w:min:30", ["krabbelreime", "musikgarten-1"]],
+      ["w:min:45", ["babymassage-workshop", "babykonzert-advent"]],
+      ["w:min:mehr", ["kuckuck-im-nest", "pekip-herbst"]],
+    ]);
+    expect(groups.map((g) => ("band" in g ? g.band : undefined))).toEqual([
+      { unit: "min", upTo: 20 },
+      { unit: "min", upTo: 30 },
+      { unit: "min", upTo: 45 },
+      { unit: "min" },
+    ]);
+  });
+
+  it("gleiche gerundete Minuten: nach Termin, dann Titel; ohne Ergebnis am Ende", () => {
+    const treff = byKey("krabbeltreff"); // 7.10.
+    const reime = byKey("krabbelreime"); // 9.10.
+    const pekip = byKey("pekip-herbst");
+    const groups = groupByReach([reime, treff, pekip], FIXTURE_NOW, transit({ [treff.id]: 14.6, [reime.id]: 15.2 }));
+    expect(heads(groups)).toEqual([
+      ["w:min:20", ["krabbeltreff", "krabbelreime"]],
+      ["ohne-wegzeit", ["pekip-herbst"]],
+    ]);
+  });
+
+  it("Luftlinie: Bänder nach Metern (1, 3, 10 km)", () => {
+    const meters: Record<string, number> = {};
+    const list = ["krabbeltreff", "krabbelreime", "musikgarten-1", "kuckuck-im-nest"].map(byKey);
+    [940, 2_960, 9_960, 12_000].forEach((m, i) => {
+      meters[list[i]?.id ?? ""] = m;
+    });
+    const groups = groupByReach(list, FIXTURE_NOW, (o) => ({ kind: "luftlinie", meters: meters[o.id] ?? 0 }));
+    expect(groups.map((g) => g.key)).toEqual(["w:m:1000", "w:m:3000", "w:m:10000", "w:m:mehr"]);
+  });
+
+  it("Zeitraum und Alter wirken wie bei „Nächste Termine“", () => {
+    const range = { from: "2026-10-10", to: "2026-11-30" };
+    const fits = sessionFit("2025-08-05");
+    const byDate = groupByNextSession(offers, FIXTURE_NOW, range, fits).flatMap((g) => g.items);
+    const byReach = groupByReach(offers, FIXTURE_NOW, () => undefined, range, fits).flatMap((g) => g.items);
+    const at = (list: Occurrence<SiteOffer>[]) => new Map(list.map((i) => [i.offer.id, i.session.start] as const));
+    expect(at(byReach)).toEqual(at(byDate));
   });
 });

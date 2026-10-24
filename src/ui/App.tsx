@@ -23,6 +23,7 @@ import {
   listStatusParts,
   loadErrorText,
   mapStatusParts,
+  nearSortSub,
   OFFER_GONE,
   providerStatusParts,
   reachNote,
@@ -81,11 +82,11 @@ const DISCOVER_VIEWS: readonly ViewOption<"entdecken" | "karte">[] = [
 ];
 /** Sortierungen der Liste (Plan 0043, E4); „termine“ steht nie in der URL */
 type SortChoice = "termine" | Sort;
-const SORT_OPTIONS: readonly SortOption<SortChoice>[] = [
-  { value: "termine", title: "Nächste Termine", sub: "was als Nächstes stattfindet" },
-  { value: "neu", title: "Neu eingestellt", sub: "neueste zuerst" },
-];
-const sortTitle = (sort: Sort) => SORT_OPTIONS.find((o) => o.value === sort)?.title ?? "";
+const SORT_TITLES: Record<SortChoice, string> = {
+  termine: "Nächste Termine",
+  neu: "Neu eingestellt",
+  nah: "Nächstgelegen",
+};
 
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
@@ -113,7 +114,8 @@ export function App() {
   // Filter der Merkliste: getrennt vom Startseiten-Filter, nie in der URL, übersteht Tab- und Darstellungswechsel,
   // nicht das Neuladen (Plan 0025, E6)
   const [savedFilter, setSavedFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER);
-  // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl.
+  // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. Aus der
+  // Aufforderung „Wovon aus gerechnet?“ geht er stattdessen auf die Statuszeile (`originFromPrompt`, Plan 0043, E7).
   const filterButton = useRef<HTMLButtonElement>(null);
   // Fokus-Rückweg des Details: Die Kachel, die es geöffnet hat, kann beim Schließen fehlen (Plan 0008, E11).
   const activeTab = useRef<HTMLButtonElement>(null);
@@ -196,9 +198,13 @@ export function App() {
     if (route.tab === "karte" || route.tab === "merkliste-karte") want();
   }, [route.tab, want]);
   // Das Kind-Sheet auch (Auslöser 2). Nie die Wahl selbst: Ab da entsteht kein Request.
+  // Aus der Aufforderung „Wovon aus gerechnet?“ geöffnet (Plan 0043, E7): Ihr Knopf verschwindet mit der Wahl, der Fokus
+  // geht beim Schließen auf die Statuszeile statt auf den Filter-Knopf
+  const [originFromPrompt, setOriginFromPrompt] = useState(false);
   const setSheet = useCallback(
     (next: SheetKind) => {
       if (next === "kid" || next === "origin") want();
+      if (next !== null) setOriginFromPrompt(false);
       setSheetState(next);
     },
     [want],
@@ -304,6 +310,15 @@ export function App() {
    * Sortierung (Plan 0043, E4): nur in der Liste, rechts neben „Liste | Karte“, auch im Ladezustand (kein Springen).
    * Nach der Wahl beginnt die Liste oben mit dem ersten Schritt; der Fokus bleibt am Knopf (SortMenu).
    */
+  const sortOptions: readonly SortOption<SortChoice>[] = [
+    { value: "termine", title: SORT_TITLES.termine, sub: "was als Nächstes stattfindet" },
+    { value: "neu", title: SORT_TITLES.neu, sub: "neueste zuerst" },
+    {
+      value: "nah",
+      title: SORT_TITLES.nah,
+      sub: nearSortSub(reachMode, origin),
+    },
+  ];
   const onSort = (value: SortChoice) => {
     const { sort: _old, ...rest } = route;
     replace(value === "termine" ? rest : { ...rest, sort: value });
@@ -315,7 +330,7 @@ export function App() {
     (route.tab === "entdecken" ? (
       <div className="view-tools">
         {viewToggle}
-        <SortMenu options={SORT_OPTIONS} current={route.sort ?? "termine"} plain="termine" onChange={onSort} />
+        <SortMenu options={sortOptions} current={route.sort ?? "termine"} plain="termine" onChange={onSort} />
       </div>
     ) : (
       viewToggle
@@ -332,6 +347,10 @@ export function App() {
   // 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11). Die Merkliste kennt keine Wegzeit-Grenze
   // und wartet nie (Plan 0025, E8).
   const listPending = reachMode?.kind === "laedt" && limit !== undefined;
+  // „Nächstgelegen“ wartet ebenso auf die Wegzeit, damit die Liste nicht nachträglich umsortiert (Plan 0043, E7). Nur
+  // die Liste: Die Zahl der Statuszeile stimmt, und `finish.pending` des Onboardings hängt an `listPending`.
+  const listWaits = listPending || (route.sort === "nah" && reachMode?.kind === "laedt");
+  const askOrigin = route.sort === "nah" && !origin;
   /** „Zurücksetzen“: URL-Filter leer, Altersfilter wieder an – zurück auf den Standard (Plan 0021, E2) */
   const resetFilters = () => {
     setFilter(EMPTY_FILTER);
@@ -466,7 +485,7 @@ export function App() {
                     {listWords}
                     {reachSuffix}
                     {/* Ansage der Sortierung ohne sichtbare Änderung (Plan 0043, E4; Review 2, K3) */}
-                    {route.sort && <span className="sr-only">. Sortiert nach {sortTitle(route.sort)}</span>}
+                    {route.sort && <span className="sr-only">. Sortiert nach {SORT_TITLES[route.sort]}</span>}
                   </span>
                 )}
                 {pwaNote && (
@@ -500,7 +519,28 @@ export function App() {
         )}
         {load.kind === "ready" && route.tab === "entdecken" && (
           <>
-            {listPending ? (
+            {askOrigin && (
+              <>
+                <div className="empty">
+                  <b>Wovon aus gerechnet?</b>
+                  Wähle einen Startpunkt, dann stehen die Angebote mit der kürzesten Wegzeit mit Bus & Bahn oben.
+                  <span className="empty-actions">
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => {
+                        setSheet("origin");
+                        setOriginFromPrompt(true);
+                      }}
+                    >
+                      Startpunkt wählen
+                    </button>
+                  </span>
+                </div>
+                <p className="status">Bis dahin nach Terminen</p>
+              </>
+            )}
+            {listWaits ? (
               <ListPending />
             ) : (
               <ListView
@@ -513,10 +553,11 @@ export function App() {
                 onResetFilter={resetIfActive}
                 age={ageEscape}
                 openOnDay={route.filter.range !== undefined}
+                origin={origin}
               />
             )}
             {/* erst mit der Liste: Sonst rutschte er beim Ersetzen des Platzhalters (CLS) */}
-            {!listPending && (
+            {!listWaits && (
               <p className="stand">
                 Datenstand: {standDate(load.data.generatedAt)} ·{" "}
                 {/* dezent, Plan 0034, E3; zweiter Weg im Kind-Sheet */}
@@ -610,7 +651,7 @@ export function App() {
         originApi={originApi}
         transit={transit}
         limitAction={limitAction}
-        filterButton={filterButton}
+        kidFallback={originFromPrompt ? statusLine : filterButton}
         activeTab={activeTab}
         onIntro={() => {
           setSheet(null);

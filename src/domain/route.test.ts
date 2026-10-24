@@ -150,8 +150,9 @@ describe("URL-Route", () => {
     expect(routeToSearch(parseRoute("?ansicht=karte&wegzeit=30"))).toBe("wegzeit=30&ansicht=karte");
   });
 
-  it("Sortierung (Plan 0043, E4): sortierung=neu gelesen und nach der Ansicht geschrieben, Unbekanntes entfällt", () => {
+  it("Sortierung (Plan 0043, E4): sortierung=neu/nah gelesen und nach der Ansicht geschrieben, Unbekanntes entfällt", () => {
     expect(parseRoute("?sortierung=neu").sort).toBe("neu");
+    expect(parseRoute("?sortierung=nah").sort).toBe("nah");
     expect(parseRoute("?sortierung=termine")).not.toHaveProperty("sort");
     expect(parseRoute("?sortierung=preis")).not.toHaveProperty("sort");
     expect(routeToSearch(parseRoute(`?sortierung=neu&kat=musik&ansicht=karte&angebot=${offerId}`))).toBe(

@@ -20,7 +20,6 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Wegzeit ab Erlangen und den Landkreisen** (Stein, Zirndorf, …): Startpunkte außerhalb der Stadtgebiete aller Regionen bekommen heute die Luftlinie mit Hinweis (Plan 0009, Nutzerentscheidung; Fürth seit ADR 0029).
 - **Isochronen oder Linien auf der Karte** (Plan 0009, Nicht-Ziel).
 - **Alter des gespeicherten Standorts zeigen** („Mein Standort, zuletzt gewählt am …“): Ein wiederhergestellter Standort kann Tage alt sein. Kostet Start-Budget und Erklärtext (Plan 0016, Review K9).
-- **Sortierung der Tagesliste nach Wegzeit** (Plan 0004 und 0009, Nicht-Ziel).
 - **`transfers.txt` des VGN** für Umstiegszeiten: deckt nur einen Teil der Paare ab und ist in sich nicht einheitlich; heute gilt ein eigenes, überall gleiches Modell (Plan 0009, E6).
 - **Visuelle Regression** (Playwright-Screenshots als Gate), sobald das Design steht. Baselines entstehen dann im Playwright-Docker-Image, plus ein `workflow_dispatch` zum Aktualisieren.
 - **Lighthouse CI**, falls `@lhci/cli` wieder aktuell gepflegt wird. Bis dahin decken Playwright-Web-Vitals und axe das ab.

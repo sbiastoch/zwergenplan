@@ -131,6 +131,16 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.goto("./?sortierung=neu");
     await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Neu diese Woche/);
   },
+  // Nächstgelegen (E7): ohne Startpunkt die Aufforderung, mit Stadtteil die Wegzeit-Bänder
+  "entdecken-nah": async (page) => {
+    await page.goto("./?sortierung=nah");
+    await expect(page.getByText("Wovon aus gerechnet?")).toBeVisible();
+  },
+  "entdecken-nah-startpunkt": async (page) => {
+    await withGostenhof(page);
+    await page.goto("./?sortierung=nah");
+    await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Bis \d+ Minuten/);
+  },
   // Plan 0025, E5 (Test 15): Kalender der Merkliste, Woche mit Titelknopf und Tagen gruppiert. Bei offenem Monat ist
   // die Wochenleiste ausgeblendet (Plan 0007, E5), B3 misst aber beide Raster.
   "merkliste-kalender-woche": async (page) => {

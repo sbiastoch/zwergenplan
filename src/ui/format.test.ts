@@ -27,6 +27,7 @@ import {
   listStatusParts,
   loadErrorText,
   mapStatusParts,
+  nearSortSub,
   originHint,
   originPhrase,
   plural,
@@ -134,6 +135,23 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
       "Di, 27. Okt. – Mo, 2. Nov.",
     );
     expect(listingHeading({ kind: "frueher" }, today)).toEqual({ title: "Früher eingestellt" });
+    // Nächstgelegen (Plan 0043, E7)
+    const gostenhof = { source: "stadtteil", label: "Gostenhof", point: { lat: 49.45, lon: 11.06 } } as const;
+    expect(listingHeading({ kind: "wegzeit", band: { unit: "min", upTo: 20 } }, today, gostenhof)).toEqual({
+      title: "Bis 20 Minuten",
+      sub: "mit Bus & Bahn ab Gostenhof",
+    });
+    expect(listingHeading({ kind: "wegzeit", band: { unit: "min" } }, today, gostenhof).title).toBe("Über 45 Minuten");
+    expect(listingHeading({ kind: "wegzeit", band: { unit: "m", upTo: 3000 } }, today, gostenhof)).toEqual({
+      title: "Bis 3 km",
+      sub: "Luftlinie ab Gostenhof",
+    });
+    expect(listingHeading({ kind: "wegzeit", band: { unit: "m" } }, today, gostenhof).title).toBe("Über 10 km");
+    expect(listingHeading({ kind: "ohne-wegzeit" }, today)).toEqual({ title: "Ohne Wegzeit" });
+    expect(nearSortSub(undefined, undefined)).toBe("Startpunkt wählen");
+    expect(nearSortSub({ kind: "oepnv" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
+    expect(nearSortSub({ kind: "laedt" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
+    expect(nearSortSub({ kind: "luftlinie", reason: "ausserhalb" }, gostenhof)).toBe("Luftlinie ab Gostenhof");
     expect(listedSince("2026-10-22T05:00:00+02:00")).toBe("Im Zwergenplan seit 22. Oktober");
     // Berliner Tag: 23:30 UTC am 21.10. ist schon der 22.
     expect(listedSince("2026-10-21T23:30:00Z")).toBe("Im Zwergenplan seit 22. Oktober");
