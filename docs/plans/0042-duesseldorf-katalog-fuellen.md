@@ -1,6 +1,6 @@
 # Plan 0042 – Düsseldorfer Katalog füllen
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-10-18
 Bezug:
 - Plan 0039 (`docs/plans/0039-region-duesseldorf.md`), Abschnitt „Zwischenstand und Übergabe“: Trockenlauf mit 4 Anbietern, Hypothesen 1–5, Empfehlung „zuerst ein kleiner Plan ‚Düsseldorfer Katalog füllen‘“. Dort heißt er noch Plan 0040; die Nummer ist inzwischen vergeben.
@@ -280,7 +280,10 @@ Regeln für jeden Subagenten, im Auftrag wörtlich mitzugeben:
 
 Die Haupt-Session prüft je Paket zwei Einträge selbst gegen die Website: Orte, Alter und Programmseiten.
 
-## Nutzerentscheide (offen)
+## Nutzerentscheide (2026-10-24: alle Empfehlungen angenommen)
+
+Der Nutzer hat N1–N5 am 2026-10-24 wie empfohlen entschieden: N1 ja (Folgeplan, nur Name, Website, Anzahl), N2 ein gemeinsamer Push mit Nachtlauf per Hand, N3 `duesseldorf.de` bleibt draußen, N4 Ziele wie im Abschnitt „Ziel“, N5 `ENTDECKEN_MODUS` nach Abnahme aus S3.3 unverändert.
+
 
 - **N1 – Navigator als Fundquelle** (Folgeplan, E5). Empfehlung: ja, mit Name, Website und Anzahl, ohne Texte und Termine. Alternative: zusätzlich bei der Redaktion anfragen (familien-navigator@duesseldorf.de), ob Termine übernommen werden dürfen.
 - **N2 – Live-Gang.** Empfehlung: Plan 0039 und der gefüllte Katalog gehen in einem Push live, gleich danach der Nachtlauf per Hand mit angehobenen Bremsen (S4).
