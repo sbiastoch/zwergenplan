@@ -15,7 +15,7 @@ Bezug:
   - Die aktuelle Sucheinstellung der Liste (Kategorien, Format, Anmeldung, Kosten, Wegzeit) lässt sich in den Push-Einstellungen (Kind-Sheet, Abschnitt „Als App“) mit „Aktuelle Suche abonnieren“ merken (der Filter-Sheet hat dafür kein Start-Budget, E9).
   - Die Abos erscheinen dort als Liste und lassen sich entfernen.
   - Die Nachricht nennt die neuen Angebote, die zu mindestens einem Abo und zum Alter passen. Ohne Abo zählt nur das Alter.
-- Ein Tipp auf die Nachricht öffnet die App auf der Startseite (Nutzerentscheidung 4). Die Nachricht selbst nennt die ersten zwei neuen Titel.
+- Ein Tipp auf die Nachricht öffnet die App auf der Startseite (Nutzerentscheidung 4; **seit Plan 0043, E6 die Liste „Neu eingestellt“**, `./?sortierung=neu`). Die Nachricht selbst nennt die ersten zwei neuen Titel.
 - Such-Abos, Geburtsdatum und Startpunkt verlassen das Gerät nicht. Der Absender kennt nur das Push-Abo.
 
 Nutzerentscheidungen dazu (2026-10-06):
@@ -95,7 +95,7 @@ Vor Schritt 1 wird ADR 0014 (noch Entwurf) überarbeitet: Auslöser wöchentlich
 Der allgemeine Text erscheint nur, wenn das Gerät nicht zuschneiden kann (Service Worker zu langsam oder kaputt, `seenIds` fehlen):
 - `news > 0`: Titel „Zwergenplan“, Text „7 neue Angebote seit letztem Samstag“ (Singular „1 neues Angebot …“).
 - `news = 0`: Titel „Zwergenplan“, Text „Diese Woche nichts Neues. 42 Angebote in den nächsten 7 Tagen.“
-- **`navigate` ist immer die Startseite** (Review H2, Nutzerentscheidung 4), auch beim zugeschnittenen Text (E10).
+- **`navigate` ist immer die Startseite** (Review H2, Nutzerentscheidung 4), auch beim zugeschnittenen Text (E10). Geändert durch Plan 0043, E6: immer `./?sortierung=neu`.
 
 ### E3 – Was „neu“ auf dem Gerät heißt (Review H1)
 

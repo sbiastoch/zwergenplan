@@ -92,4 +92,9 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
 - Neu ist ein Angebot mit `listedAt` (ADR 0022, Nachtrag Plan 0043), wenn es in dieser Woche eingestellt wurde (`listingWeek` in `src/domain/listing.ts`, Berliner Kalendertage, heute und die 6 Tage davor). Die gesehenen IDs (`seenIds`) entscheiden nur noch für Angebote ohne `listedAt`. Ohne `seenIds` wird ebenfalls zugeschnitten, sobald ein Angebot `listedAt` hat. Die CI zählt ihre Zahl „neu“ des allgemeinen Texts nach derselben Regel.
 - Zum Alter muss der **Beginn** passen (`startFitsAge`): bei regelmäßigen Angeboten der nächste Termin, nicht erst ein späterer. Die Wochenzahl verlangt zusätzlich einen passenden Termin in den 7 Tagen.
 - Bewusste Lücke: Kommt der Datenstand eines Samstags erst nach dem Versand an, nennt keine Nachricht die an diesem Tag eingestellten Angebote (eine Woche später liegen sie am Tag 7). Sie stehen in der App unter „Neu eingestellt“ und tragen das Etikett.
-- Das Ziel eines Tipps folgt mit Plan 0043, E6 in einem eigenen Nachtrag.
+- Das Ziel eines Tipps steht im folgenden Nachtrag.
+
+## Nachtrag (2026-10-24, Plan 0043, E6): Ein Tipp öffnet „Neu eingestellt“
+
+- Das Ziel eines Tipps ist die feste URL `./?sortierung=neu` (`PUSH_TARGET` in `src/domain/push-payload.ts`), für alle Geräte gleich, im `navigate` der allgemeinen Payload der CI wie der zugeschnittenen Nachricht des Service Workers. Die Begründung zur Privatsphäre (kein gerätespezifisches Ziel) gilt weiter.
+- Ist die App offen, kommt ihr Fenster nach vorn und navigiert zum Ziel (`clickPlan` in `src/sw/push-decision.ts`); der Zustand des Fensters (offenes Detail, Tab) geht dabei bewusst verloren, der Tipp soll die neuen Angebote zeigen. Unkontrollierte Fenster lehnen `navigate` ab, dann öffnet der Service Worker ein neues; scheitert die Navigation, bleibt das Fenster vorn. iOS folgt `navigate` der Nachricht selbst.

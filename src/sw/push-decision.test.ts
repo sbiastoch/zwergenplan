@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { weeklyPayload } from "../domain/push-payload.ts";
 import { FIXTURE_NOW } from "../domain/test-fixtures.ts";
-import { decidePush, readProposed } from "./push-decision.ts";
+import { clickPlan, decidePush, readProposed } from "./push-decision.ts";
 
 const SCOPE = "https://zwergenplan.app/";
 const payload = weeklyPayload({ news: 3, week: 7, siteUrl: SCOPE, sentAt: FIXTURE_NOW });
@@ -31,7 +31,7 @@ describe("readProposed", () => {
 });
 
 describe("decidePush", () => {
-  it("zeigt den Zuschnitt, immer mit navigate auf die Startseite (Pflicht auf iOS)", () => {
+  it("zeigt den Zuschnitt, immer mit navigate auf „Neu eingestellt“ (Pflicht auf iOS; Plan 0043, E6)", () => {
     const { show } = decidePush({ proposed, declarative: true, outcome: { kind: "text", text: TEXT }, scope: SCOPE });
     expect(show).toEqual({
       title: TEXT.title,
@@ -40,8 +40,8 @@ describe("decidePush", () => {
         tag: "wochen-nachricht",
         lang: "de",
         icon: "https://zwergenplan.app/icons/icon-192.png",
-        navigate: SCOPE,
-        data: { navigate: SCOPE },
+        navigate: `${SCOPE}?sortierung=neu`,
+        data: { navigate: `${SCOPE}?sortierung=neu` },
       },
     });
   });
@@ -56,12 +56,23 @@ describe("decidePush", () => {
     const { show } = decidePush({ proposed, declarative: false, outcome: { kind: "zeit" }, scope: SCOPE });
     expect(show?.title).toBe("Zwergenplan");
     expect(show?.options.body).toBe("3 neue Angebote seit letztem Samstag");
-    expect(show?.options.navigate).toBe(SCOPE);
+    expect(show?.options.navigate).toBe(`${SCOPE}?sortierung=neu`);
   });
 
   it("klassisch mit kaputter Payload: fester Ersatztitel (Chrome verlangt eine sichtbare Nachricht)", () => {
     const { show } = decidePush({ proposed: undefined, declarative: false, outcome: { kind: "fehler" }, scope: SCOPE });
     expect(show?.title).toBe("Neues im Zwergenplan");
     expect(show?.options.body).toBe("");
+  });
+});
+
+describe("clickPlan: Tipp auf die Nachricht (Plan 0043, E6)", () => {
+  it("ein kontrolliertes Fenster: nach vorn holen und dorthin navigieren", () => {
+    expect(clickPlan([{ controlled: false }, { controlled: true }])).toEqual({ kind: "navigieren", index: 1 });
+  });
+
+  it("nur unkontrollierte Fenster (navigate lehnt dort ab) oder keins: neues Fenster öffnen", () => {
+    expect(clickPlan([{ controlled: false }])).toEqual({ kind: "oeffnen" });
+    expect(clickPlan([])).toEqual({ kind: "oeffnen" });
   });
 });

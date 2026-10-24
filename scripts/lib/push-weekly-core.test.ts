@@ -87,7 +87,7 @@ describe("runWeekly", () => {
     expect(sent[0]?.payload).toMatchObject({
       notification: {
         body: "2 neue Angebote seit letztem Samstag",
-        navigate: SITE,
+        navigate: `${SITE}?sortierung=neu`,
         data: { sentAt: "2026-10-10T10:07:00+02:00" },
       },
     });

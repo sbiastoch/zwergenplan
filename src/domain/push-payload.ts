@@ -18,6 +18,12 @@ export const PUSH_TOPIC = "neueangebote";
 /** Wie lange der Push-Dienst ein Push für ein offline Gerät aufhebt: 1 Tag (am Montag ist die Samstagsnachricht alt). */
 export const PUSH_TTL_SECONDS = 86_400;
 
+/**
+ * Ziel jedes Tipps auf die Nachricht, relativ zur Seite: die Liste „Neu eingestellt“ (Plan 0043, E6; ADR 0014,
+ * Nachtrag). Für alle Geräte gleich, kein gerätespezifisches Ziel (Privatsphäre).
+ */
+export const PUSH_TARGET = "./?sortierung=neu";
+
 /** Fester Text, wenn die Payload kaputt ist: Chrome verlangt bei jedem Push eine sichtbare Nachricht (Plan 0011, E10). */
 export const FALLBACK_TITLE = "Neues im Zwergenplan";
 
@@ -34,7 +40,8 @@ function generalBody(news: number, week: number): string {
 
 /**
  * `news`: neue Angebote seit dem Datenstand vor 7 × 24 h; `week`: Angebote mit einem Termin in den nächsten 7 Tagen.
- * `navigate` ist immer die Startseite (Nutzerentscheidung 4). `test` markiert einen Testversand: Der Service Worker
+ * `navigate` ist immer `PUSH_TARGET` („Neu eingestellt“, Plan 0043, E6; vorher die Startseite, Plan 0017,
+ * Nutzerentscheidung 4). `test` markiert einen Testversand: Der Service Worker
  * schreibt dann nichts in den Geräte-Speicher (E3).
  */
 export function weeklyPayload({
@@ -55,7 +62,7 @@ export function weeklyPayload({
     notification: {
       title: "Zwergenplan",
       body: generalBody(count(news, "neue Angebote"), count(week, "Angebote der Woche")),
-      navigate: new URL("./", siteUrl).href,
+      navigate: new URL(PUSH_TARGET, siteUrl).href,
       tag: PUSH_TAG,
       lang: "de",
       data: test ? { sentAt: toBerlinIso(sentAt), test } : { sentAt: toBerlinIso(sentAt) },

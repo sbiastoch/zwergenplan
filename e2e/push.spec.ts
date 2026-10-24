@@ -160,7 +160,7 @@ function payload({ test: isTest = false, sentAt = SENT_AT }: { test?: boolean; s
     notification: {
       title: "Zwergenplan",
       body: "3 neue Angebote seit letztem Samstag",
-      navigate: new URL("./", base).href,
+      navigate: new URL("./?sortierung=neu", base).href,
       tag: "wochen-nachricht",
       lang: "de",
       data: isTest ? { sentAt, test: true } : { sentAt },
@@ -417,7 +417,8 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   const unseen = [ids.byTitle("Musikgarten"), ids.byTitle("Krabbelreime")];
   const seen = ids.all.filter((id) => !unseen.includes(id));
   const session = await cdpFor(page, context);
-  const startPage = new URL("./", test.info().project.use.baseURL ?? "").href;
+  // Ziel jedes Tipps: „Neu eingestellt“ (Plan 0043, E6; ADR 0014, Nachtrag)
+  const startPage = new URL("./?sortierung=neu", test.info().project.use.baseURL ?? "").href;
   const SAME_REQUESTS = ["/data/site.json", "/data/wegzeit.json"];
 
   // ohne Abos und Alter: alle neuen

@@ -11,7 +11,7 @@ describe("weeklyPayload", () => {
       notification: {
         title: "Zwergenplan",
         body: "7 neue Angebote seit letztem Samstag",
-        navigate: "https://zwergenplan.app/",
+        navigate: "https://zwergenplan.app/?sortierung=neu",
         tag: "wochen-nachricht",
         lang: "de",
         data: { sentAt: "2026-10-05T12:00:00+02:00" },
@@ -34,10 +34,10 @@ describe("weeklyPayload", () => {
     expect(body(0)).toBe("Diese Woche nichts Neues.");
   });
 
-  it("führt immer auf die Startseite, auch ohne Schrägstrich am Ende", () => {
+  it("führt immer auf „Neu eingestellt“, auch ohne Schrägstrich am Ende (Plan 0043, E6)", () => {
     expect(
       weeklyPayload({ news: 2, week: 0, siteUrl: "http://localhost:4173", sentAt: FIXTURE_NOW }).notification.navigate,
-    ).toBe("http://localhost:4173/");
+    ).toBe("http://localhost:4173/?sortierung=neu");
   });
 
   it("setzt sentAt immer mit Offset (Berliner Zeit, auch im Winter)", () => {

@@ -278,3 +278,6 @@ Abgelehnt: keine. Kein neuer Blocker offen; B1 ist mit dem Fix aus dem Review be
   - Budget: Start-JS 102,56 → 103,25 kB (+0,69 kB), CSS und Service Worker unverändert (12,45 kB, 8,81 kB von 9 kB; `groupByReach` liegt nicht im Service Worker).
   - „Bis dahin nach Terminen“ ist eine Zeile `.status` statt einer Überschrift: Die Tagesgruppen darunter sind `h2`, eine weitere `h2` darüber hätte nichts gegliedert.
   - Arch-Review Schritt 2b: OK, kein Blocker. Übernommen: Band „Bis 45 Minuten“ im Unit-Test, E2E für das Warten auf die Wegzeit (`listWaits`), `METER_BANDS` als Quelle des Titels „Über 10 km“, Menü-Untertitel `nearSortSub` in `format.ts` mit Test, Doku in `architecture.md`.
+- **Schritt 3** (E6):
+  - `clickPlan` liefert „navigieren“ zum ersten kontrollierten Fenster oder „öffnen“; ein unkontrolliertes Fenster wird nicht erst nach vorn geholt, weil daneben ohnehin ein neues aufgeht.
+  - Budget: Service Worker 8,81 → 8,94 kB von 9 kB (Puffer 0,06 kB), keine Anhebung; Start-JS unverändert.

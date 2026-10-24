@@ -10,7 +10,8 @@
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
 import { get as storeGet, set as storeSet } from "../data/device-store.ts";
-import { decidePush, readProposed } from "./push-decision.ts";
+import { PUSH_TARGET } from "../domain/push-payload.ts";
+import { clickPlan, decidePush, readProposed } from "./push-decision.ts";
 import { type TailorEnv, tailorPush } from "./push-tailor.ts";
 import { resubscribe } from "./resubscribe.ts";
 import {
@@ -235,12 +236,20 @@ self.addEventListener("push", (event: DeclarativePushEvent) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const data = Object(event.notification.data) as { navigate?: unknown };
-  const target = typeof data.navigate === "string" ? data.navigate : self.registration.scope;
+  const target = typeof data.navigate === "string" ? data.navigate : new URL(PUSH_TARGET, self.registration.scope).href;
   event.waitUntil(
     (async () => {
-      const [open] = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-      if (open) await open.focus();
-      else await self.clients.openWindow(target);
+      const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      const controlled = new Set((await self.clients.matchAll({ type: "window" })).map((c) => c.id));
+      const plan = clickPlan(windows.map((w) => ({ controlled: controlled.has(w.id) })));
+      const open = plan.kind === "navigieren" ? windows[plan.index] : undefined;
+      if (!open) {
+        await self.clients.openWindow(target);
+        return;
+      }
+      await open.focus();
+      // Scheitert die Navigation, bleibt das Fenster vorn wie bisher
+      await open.navigate(target).catch(() => undefined);
     })(),
   );
 });

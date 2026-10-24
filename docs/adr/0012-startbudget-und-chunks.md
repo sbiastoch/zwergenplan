@@ -174,6 +174,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 | Plan 0043, Schritt 1 (`listedAt`, `listing.ts` im Service Worker über `news.ts`; Start-JS unverändert bis auf Rundung; Service Worker 8,77 kB von 9 kB, Puffer 0,23 kB; `site.json` gzip +0,6 kB, wenn alle Angebote das Feld tragen; gemessen nach f5ff3e3) | 101,25 kB | 101,23 kB | −0,02 kB |
 | Plan 0043, Schritt 2 (Sortierung „Neu eingestellt“: `sort` in der Route, `groupByListing`/`isNewlyListed` in `listing.ts`, `ListGroup` und generisches `takeGroups`, `listingHeading`/`listedSince` in `format.ts`, `SortMenu.tsx` mit Menü und Tastenlogik, Etikett in `OfferCard`, Satz im Detail; CSS 12,2 → 12,45 kB; Service Worker 8,77 → 8,81 kB von 9 kB, Puffer 0,19 kB). **Über 102 kB: Budget auf 150 kB** (Nachtrag unten). Vor den Fixes aus dem Arch-Review 102,54 kB | 101,23 kB | 102,56 kB | +1,33 kB |
 | Plan 0043, Schritt 2b (Sortierung „Nächstgelegen“: `groupByReach` mit Bändern aus `LIMIT_MINUTES` bzw. Metern in `listing.ts`, Band-Überschriften in `format.ts`, dritter Menüpunkt, Aufforderung „Wovon aus gerechnet?“, `listWaits`; CSS und Service Worker unverändert, `groupByReach` liegt nicht im Service Worker) | 102,56 kB | 103,25 kB | +0,69 kB |
+| Plan 0043, Schritt 3 (Tipp auf die Nachricht öffnet „Neu eingestellt“: `PUSH_TARGET`, `clickPlan` und `navigate` im Service Worker; Start-JS bis auf Rundung unverändert; Service Worker 8,81 → 8,94 kB von 9 kB, Puffer 0,06 kB, keine Anhebung nötig) | 103,25 kB | 103,26 kB | +0,01 kB |
 
 ## Nachtrag (2026-10-11): Budget 101 kB, Plan 0033
 
