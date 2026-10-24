@@ -6,14 +6,72 @@ import {
   botWall,
   compareHashes,
   type HashesFile,
+  joinFollowPages,
   MAX_INPUT_CHARS,
+  nextPageUrl,
   programmeText,
   renderFetchMarkdown,
   runLimited,
 } from "./fetch.ts";
+import { extractPage } from "./html-extract.ts";
 
 const fixture = (file: string) =>
   readFileSync(new URL(`../../../tests/fixtures/pipeline/${file}`, import.meta.url), "utf8");
+
+describe("nextPageUrl (Plan 0042, E2, Test 1)", () => {
+  const BASE = "https://www.beispiel.example/kurse/familie/spielgruppen/kategorie/Spielgruppen/1378";
+  const linksOf = (file: string, url: string) => extractPage(fixture(file), url).links;
+  const follow = { match: "browse=forward", max: 5 };
+
+  it("Seite 1: der erste Link mit match derselben Website, nicht der fremde Host", () => {
+    expect(nextPageUrl(linksOf("kufer-seite-1.html", BASE), follow, new Set([BASE]), BASE)).toBe(
+      `${BASE}?knr=2602623003&browse=forward`,
+    );
+  });
+
+  it("Seite 2: überspringt die schon abgerufene Seite 2, findet Seite 3", () => {
+    const p2 = `${BASE}?knr=2602623003&browse=forward`;
+    expect(nextPageUrl(linksOf("kufer-seite-2.html", p2), follow, new Set([BASE, p2]), BASE)).toBe(
+      `${BASE}?knr=2602623009&browse=forward`,
+    );
+  });
+
+  it("nie ein Warenkorb-Link: match muss das Ende der URL sein (Kufer: …&browse=forward&knradd=…)", () => {
+    const links = linksOf("kufer-seite-1.html", BASE);
+    expect(links.some((l) => l.url.includes("knradd"))).toBe(true);
+    const seen = new Set([BASE, `${BASE}?knr=2602623003&browse=forward`, `${BASE}?knr=2602623009&browse=forward`]);
+    expect(nextPageUrl(links, follow, seen, BASE)).toBeUndefined();
+  });
+
+  it("eine schon abgerufene Seite mit #Anker zählt als abgerufen; die Rückgabe hat keinen Anker", () => {
+    const p2 = `${BASE}?knr=2602623003&browse=forward`;
+    const links = [
+      { label: "oben", url: `${p2}#top` },
+      { label: "3", url: `${BASE}?knr=2602623009&browse=forward#liste` },
+    ];
+    expect(nextPageUrl(links, follow, new Set([BASE, p2]), BASE)).toBe(`${BASE}?knr=2602623009&browse=forward`);
+  });
+
+  it("am Ende: undefined", () => {
+    const p2 = `${BASE}?knr=2602623003&browse=forward`;
+    const p3 = `${BASE}?knr=2602623009&browse=forward`;
+    expect(nextPageUrl(linksOf("kufer-seite-2.html", p3), follow, new Set([BASE, p2, p3]), BASE)).toBeUndefined();
+  });
+
+  it("www und Groß-/Kleinschreibung des Hosts zählen als dieselbe Website", () => {
+    const links = [{ label: "2", url: "https://BEISPIEL.example/liste?seite=2&browse=forward" }];
+    expect(nextPageUrl(links, follow, new Set(), BASE)).toBe(links[0]?.url);
+  });
+});
+
+describe("joinFollowPages (Plan 0042, E2)", () => {
+  it("verbindet in Reihenfolge mit Trennzeile je Folgeseite", () => {
+    expect(joinFollowPages(["eins", "zwei", "drei"])).toBe(
+      "eins\n\n--- Folgeseite 1 ---\nzwei\n\n--- Folgeseite 2 ---\ndrei",
+    );
+    expect(joinFollowPages(["nur"])).toBe("nur");
+  });
+});
 
 describe("programmeText", () => {
   it("html: Text und JSON-LD, ohne Links", () => {

@@ -1,6 +1,6 @@
 # ADR 0026 – Daten automatisch: Nachtlauf und Entdecken in GitHub Actions über `claude -p`
 
-Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006, ändert den Vergabeweg der IDs aus ADR 0022 und weicht ab von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032.
+Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006, ändert den Vergabeweg der IDs aus ADR 0022 und weicht ab von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032. **Ergänzt durch Plan 0042:** Folgeseiten mit `follow` (Nachtrag unten).
 
 **Geändert durch ADR 0032 (Plan 0039):** Der Fahrplanauszug liegt je Netz unter `data/oepnv/<netz>.json` (`vgn.json`, vormals `data/oepnv/fahrplan.json`, und `vrr.json`) und entsteht weiter nur über `pnpm pipeline oepnv [--netz vgn|vrr]`, von Hand über den Skill, nicht im Nachtlauf.
 
@@ -48,3 +48,10 @@ Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd
 - Eine CLI-Version, die Ausgabeformat oder Optionen ändert, bricht `llm.test.ts` (Fake-Binary) oder den Eval-Lauf, bevor sie in den Nachtlauf kommt.
 - Ein falsch aufgenommener Anbieter wird per `git revert` zurückgenommen und in `abgelehnt` eingetragen.
 - Mit der Annahme (Plan 0032, Stufe 5) ist ADR 0016 „ersetzt durch ADR 0026“; ADR 0002, 0003, 0004 und 0006 verweisen in ihrer Statuszeile hierher, `docs/architecture.md`, `CLAUDE.md` (Datenfluss, IDs auch über `pipeline nightly` und `pipeline discover`) und der Skill `babyevents-nuernberg` (Wartungsleitfaden statt Lauf mit Subagenten) sind nachgezogen.
+
+## Nachtrag (2026-10-24): Folgeseiten mit `follow` (Plan 0042, E2)
+
+- **Ergänzung zu Punkt 2** („Links werden nie verfolgt“): Die zweite Ausnahme sind die Folgeseiten derselben Liste, ausdrücklich im Katalog mit `follow: { match, max }` an einer `kind: html`-Programmseite ohne `render`. Der Abruf folgt je Seite dem ersten unbesuchten Link derselben Website, dessen URL (ohne `#…`) auf `match` endet, bis `max` Folgeseiten, und verbindet die Texte zu einer Eingabe (ein Eingabe-Hash). Fehlt eine Folgeseite, scheitert die Programmseite; der Einbruchschutz hält den Bestand.
+- **Grund:** Die Kursportale der Düsseldorfer Familienbildungswerke (Kufer) blättern per Cursor (`?knr=<letzter Kurs>&browse=forward`). Feste URLs je Folgeseite veralten mit jedem neuen Kurs, eine Gesamtansicht gibt es nicht (Messung 2026-10-24, Plan 0042, „Umsetzung“).
+- **Ende statt Teilstring:** An dieselbe Folge-URL hängt Kufer `&knradd=…` für „in den Warenkorb legen“; ein Teilstring hätte diese Links verfolgt.
+- Der Katalog nennt weiter jede Programmseite, an der eine Liste beginnt. Das Bewerten beim Entdecken setzt `follow` nie; das Feld kommt nur von Hand.

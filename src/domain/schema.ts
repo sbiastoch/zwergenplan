@@ -73,6 +73,9 @@ const isJsonWithPlaceholders = (body: string) => {
   }
 };
 
+/** Höchstzahl der Folgeseiten einer Liste (`Programme.follow.max`, Plan 0042, E2); auch `fetch-page --max`. */
+export const FOLLOW_MAX = 40;
+
 /**
  * Eine Stelle, an der Termine (oder Plätze) stehen, so beschrieben, dass ein Crawler sie abrufen kann (Plan 0031, E3).
  */
@@ -100,11 +103,26 @@ const Programme = z
     blocked: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
     /** kurzer Extraktionshinweis für das Modell, ohne Datum (das veraltet) */
     hint: Hint.optional(),
+    /**
+     * Folgeseiten derselben Liste (Kufer: `?knr=…&browse=forward`): Der Abruf folgt dem ersten Link derselben
+     * Website, dessen URL auf `match` endet, bis `max` Folgeseiten (Plan 0042, E2; Nachtrag zu ADR 0026, Punkt 2)
+     */
+    follow: z
+      .strictObject({
+        /** Ende der URL der Folgeseite, etwa "browse=forward" (nicht Teilstring: Warenkorb-Links hängen daran an) */
+        match: z.string().min(3),
+        /** höchstens so viele Folgeseiten */
+        max: z.int().min(1).max(FOLLOW_MAX),
+      })
+      .optional(),
   })
   .superRefine((g, ctx) => {
     // ein PDF liest pdftotext; im Browser endete der Abruf mit „Download is starting“ (Plan 0042, E6)
     if (g.render !== undefined && g.kind === "pdf")
       ctx.addIssue({ code: "custom", message: "render nicht bei kind: pdf", path: ["render"] });
+    // Links liest der Abruf nur aus statischem HTML (Plan 0042, E2)
+    if (g.follow !== undefined && (g.kind !== "html" || g.render !== undefined))
+      ctx.addIssue({ code: "custom", message: "follow nur bei kind: html ohne render", path: ["follow"] });
   });
 
 /** Eine Notiz je Eintrag; „ | “ klebte früher mehrere zusammen (Plan 0030). */

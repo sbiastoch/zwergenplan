@@ -13,10 +13,14 @@ import {
   assembleProvider,
   botWall,
   type HashesFile,
+  joinFollowPages,
+  nextPageUrl,
   type PageOutcome,
   programmeText,
   runLimited,
+  siteOf,
 } from "../lib/fetch.ts";
+import { extractPage } from "../lib/html-extract.ts";
 import { anbieterVids, matchCandidate } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
 import type { FetchedProvider } from "../lib/refresh.ts";
@@ -90,7 +94,41 @@ async function fetchTask(
         }
       : {};
   const page = await fetchPage(task.url, { headers, ...(task.request ? { post: task.request.body } : {}) });
-  return { text: checked(page.status, programmeText(task.kind, page.body, page.finalUrl)), finalUrl: page.finalUrl };
+  const text = checked(page.status, programmeText(task.kind, page.body, page.finalUrl));
+  if (task.kind !== "html" || !task.follow) return { text, finalUrl: page.finalUrl };
+  return { text: (await withFollowPages(text, page, task.follow, [task.url])).text, finalUrl: page.finalUrl };
+}
+
+/**
+ * Folgeseiten einer HTML-Liste (Plan 0042, E2): je Seite der erste unbesuchte Link derselben Website mit
+ * `follow.match`, bis `follow.max` Folgeseiten. Scheitert eine Folgeseite, leitet sie auf eine fremde Website oder
+ * gibt es nach `max` Folgeseiten noch einen Folgelink, scheitert die ganze Programmseite: ein halber Text ließe
+ * Kurse still verschwinden, der Einbruchschutz hält dann den Bestand (Arch-Review S1, m1/m2). Auch für
+ * `fetch-page --follow`.
+ */
+export async function withFollowPages(
+  firstText: string,
+  first: { body: string; finalUrl: string },
+  follow: { match: string; max: number },
+  alsoSeen: readonly string[] = [],
+): Promise<{ text: string; pages: number }> {
+  const texts = [firstText];
+  const seen = new Set([first.finalUrl, ...alsoSeen]);
+  let current = first;
+  for (;;) {
+    const url = nextPageUrl(extractPage(current.body, current.finalUrl).links, follow, seen, first.finalUrl);
+    if (!url) break;
+    if (texts.length > follow.max)
+      throw new Error(`mehr als ${follow.max} Folgeseiten (follow.max im Katalog erhöhen)`);
+    seen.add(url);
+    const page = await fetchPage(url);
+    if (siteOf(page.finalUrl) !== siteOf(first.finalUrl))
+      throw new Error(`Folgeseite leitet auf fremde Website: ${page.finalUrl}`);
+    seen.add(page.finalUrl);
+    texts.push(checked(page.status, programmeText("html", page.body, page.finalUrl)));
+    current = page;
+  }
+  return { text: joinFollowPages(texts), pages: texts.length };
 }
 
 const hostOf = (url: string) => {

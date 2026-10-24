@@ -26,8 +26,11 @@ function checkOnly(catalog: readonly Provider[], only: ReadonlySet<string> | und
 
 type Programme = Anbieter["programme"][number];
 
-/** Ein Abruf: genau diese URL, Links darauf werden nie verfolgt (Plan 0032, E3). */
-export type PageTask = Pick<Programme, "url" | "kind" | "render" | "request">;
+/**
+ * Ein Abruf: genau diese URL (Plan 0032, E3). Links darauf werden nie verfolgt, außer den Folgeseiten derselben
+ * Liste, wenn der Katalog sie mit `follow` und Höchstzahl nennt (Plan 0042, E2).
+ */
+export type PageTask = Pick<Programme, "url" | "kind" | "render" | "request" | "follow">;
 
 interface ProviderPlan {
   id: string;
@@ -49,6 +52,7 @@ function pageTask(g: Programme, today: string): PageTask {
     url: fillPlaceholders(g.url, today),
     kind: g.kind,
     ...(g.render ? { render: g.render } : {}),
+    ...(g.follow ? { follow: g.follow } : {}),
     ...(g.request ? { request: { ...g.request, body: fillPlaceholders(g.request.body, today) } } : {}),
   };
 }

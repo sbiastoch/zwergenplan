@@ -29,11 +29,12 @@ Der Nachtlauf (Plan 0032) liest nur Felder, keine Notizen. Je Seite:
 | `use` | `termine` (Abruf und Prompt), `verfuegbarkeit` (nur Plätze), `info` (Linkhub, Erklärseite, Spiegelseite; nicht abgerufen) |
 | `request` | POST mit JSON-Body (Kursorganizer-GraphQL); vor dem Eintragen einmal per `curl` prüfen |
 | `blocked` | `{ reason, since }`, nur mit Abrufbeleg auch im Browser (Login, Bot-Schutz) |
+| `follow` | `{ match, max }`, nur `kind: html` ohne `render`: Folgeseiten derselben Liste (Kufer `browse=forward`). Der Abruf folgt dem ersten unbesuchten Link derselben Website, dessen URL auf `match` **endet** (nicht Teilstring: Warenkorb-Links hängen daran an), bis `max` Folgeseiten. Vorher `pnpm pipeline fetch-page <url> --follow <match> --max N` (zeigt Seiten und Zeichen) |
 | `hint` | höchstens 200 Zeichen, **ohne Datum**: was ein Modell beim Lesen dieser Seite braucht („nur Gruppen ‚ab 0‘ und ‚ab 1‘“, „Termine im JSON-LD“) |
 
 - Ein `anbieter` ohne `coveredBy` braucht eine Seite mit `use: termine` ohne `blocked`. Veröffentlicht er keine Termine, bleibt er mit `skipCrawl: { reason, since }` im Katalog (in der Anbieterübersicht, ohne Abruf); `use` steht dann ehrlich auf `info`.
 - Abgerufen werden nur `anbieter` ohne `coveredBy`/`skipCrawl`. `programme` von Sammelkalendern und Verzeichnissen ist Doku für die Pflege. Bei `coveredBy` auf evangelische-termine bleibt die URL mit `vid=` Pflicht, sie ist der Zuordnungsschlüssel.
-- Folgeseiten mit stabilen URLs sind eigene Einträge; Links folgt der Crawler nie. Eine URL, die nur in einer Notiz steht, sieht der Crawler nicht: Was abgerufen werden soll, ist ein Programmeintrag.
+- Folgeseiten mit stabilen URLs sind eigene Einträge. Sonst folgt der Crawler Links nur mit `follow` (Plan 0042, ADR 0026, Nachtrag 2026-10-24); dann zählt die Summe aller Seiten eines Anbieters gegen `MAX_INPUT_CHARS` (350 000), Richtwert ≤ 250 000. Eine URL, die nur in einer Notiz steht, sieht der Crawler nicht: Was abgerufen werden soll, ist ein Programmeintrag.
 
 ## Orte (`venues`)
 

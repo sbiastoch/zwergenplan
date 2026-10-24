@@ -2,6 +2,8 @@
  * Recherche-Pipeline (Plan 0002). Aufruf: `pnpm pipeline <befehl> …`
  *
  *   fetch-page URL [--links] [--max-chars N]    Programmseite als Text (Katalogpflege)
+ *   fetch-page URL --follow MATCH [--max N]     dazu die Folgeseiten wie im Nachtlauf (`follow`, Plan 0042, E2):
+ *                                               verbundener Text und Zeichenzahl, höchstens N Folgeseiten (Standard 12)
  *   fetch [--only a,b] [--out DIR] [--compare HASHES_JSON]
  *                                               Abruf aller Eingaben nach Katalog, normalisiert und gehasht (Plan 0032,
  *                                               E3, S1.2): DIR (Standard runs/<heute>/fetch/) bekommt <id>.txt,
@@ -61,6 +63,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { NETWORK_IDS, NETWORKS, type NetworkId, type RegionId } from "../../src/domain/regions.ts";
+import { FOLLOW_MAX } from "../../src/domain/schema.ts";
 import { berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
 import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
 import { commitNewProvider, commitRunState, GateError, publishDiscover } from "./io/discover-git.ts";
@@ -73,7 +76,7 @@ import {
   type ExtractResult,
   fallbackModelOf,
 } from "./io/extract.ts";
-import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
+import { fetchInputs, fetchPdfText, withFollowPages } from "./io/fetch-inputs.ts";
 import { git, ROOT, readCatalog, readJson, readPreviousOffers, readRawDir, writeJson } from "./io/files.ts";
 import { geocode } from "./io/geocode.ts";
 import { fetchFeed, readCurrentTimetable, timetableFile, unzipFeed, writeTimetable } from "./io/gtfs.ts";
@@ -88,7 +91,7 @@ import { abortOf, discoverRegions, MAX_NEW_PER_RUN, newProvidersIssue, renderDis
 import { selectTerms } from "./lib/discover-terms.ts";
 import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
-import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
+import { compareHashes, HashesFile, programmeText, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
   extractTimetable,
   FEEDS,
@@ -112,6 +115,8 @@ const { positionals, values } = parseArgs({
     only: { type: "string" },
     links: { type: "boolean", default: false },
     "max-chars": { type: "string", default: "60000" },
+    follow: { type: "string" },
+    max: { type: "string", default: "12" },
     force: { type: "boolean", default: false },
     out: { type: "string" },
     compare: { type: "string" },
@@ -147,7 +152,19 @@ async function fetchPageCmd() {
   // Katalog-URLs mit {von}/{bis} direkt abrufbar (Plan 0031, E3)
   const url = fillPlaceholders(need(args[0], "URL"), today());
   try {
-    print(renderFetchReport(await fetchPage(url), { maxChars: Number(values["max-chars"]), links: values.links }));
+    const page = await fetchPage(url);
+    if (values.follow) {
+      // derselbe Abruf wie im Nachtlauf, damit die Pflege Seitenzahl und Zeichen vor dem Eintrag sieht
+      const first = programmeText("html", page.body, page.finalUrl);
+      const max = Number(values.max);
+      if (!Number.isInteger(max) || max < 1 || max > FOLLOW_MAX)
+        throw new Error(`--max muss eine ganze Zahl von 1 bis ${FOLLOW_MAX} sein (wie follow.max im Katalog)`);
+      const r = await withFollowPages(first, page, { match: values.follow, max }, [url]);
+      print(`## META\nstatus=${page.status} final_url=${page.finalUrl} seiten=${r.pages} zeichen=${r.text.length}`);
+      print(r.text.slice(0, Number(values["max-chars"])));
+      return;
+    }
+    print(renderFetchReport(page, { maxChars: Number(values["max-chars"]), links: values.links }));
   } catch (e) {
     print(`## META\nFEHLER: ${(e as Error).message}`);
     process.exit(1);

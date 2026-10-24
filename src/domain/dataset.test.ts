@@ -284,6 +284,18 @@ describe("validateDataset", () => {
       (p: Cat) => Object.assign(prog(p, 0), { kind: "pdf", render: "browser" }),
       "render nicht bei kind: pdf",
     ],
+    // Plan 0042, E2: Folgeseiten nur bei statischem HTML
+    [
+      "follow bei kind: pdf",
+      (p: Cat) => Object.assign(prog(p, 0), { kind: "pdf", follow: { match: "browse=forward", max: 5 } }),
+      "follow nur bei kind: html ohne render",
+    ],
+    [
+      "follow mit render",
+      (p: Cat) => Object.assign(prog(p, 0), { render: "browser", follow: { match: "browse=forward", max: 5 } }),
+      "follow nur bei kind: html ohne render",
+    ],
+    ["follow mit max 0", (p: Cat) => Object.assign(prog(p, 0), { follow: { match: "browse=forward", max: 0 } }), "max"],
     [
       "Platzhalter beim Sammelkalender mit adapter",
       (p: Cat) => Object.assign(prog(p, p.length - 1), { url: "https://example.org/sammelkalender?von={von}" }),
@@ -299,6 +311,13 @@ describe("validateDataset", () => {
     ],
   ])("Katalog 0031 Phase c: %s → Fehler", (_name, fn, expected) => {
     expect(errorsOf(mutate((_o, p) => fn(p)))).toContain(expected);
+  });
+
+  it("Katalog 0042: follow bei kind: html ohne render ist gültig (E2)", () => {
+    const r = mutate((_o, p) => {
+      Object.assign(prog(p, 0), { kind: "html", follow: { match: "browse=forward", max: 12 } });
+    });
+    expect(errorsOf(r)).toBe("");
   });
 
   it("Katalog 0031: skipCrawl setzt die Terminseiten-Regel begründet aus (Nutzerentscheid)", () => {

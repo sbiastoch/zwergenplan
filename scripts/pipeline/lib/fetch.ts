@@ -35,7 +35,37 @@ export function botWall(text: string): string | undefined {
   return hit ? `Bot-Schutz (${hit.name})` : undefined;
 }
 
-/** Text einer abgerufenen Seite je Art. Links werden nie verfolgt und stehen nicht in der Eingabe. */
+/** Website einer URL: Host ohne `www.`, klein geschrieben; `undefined` bei ungültiger URL (Plan 0042, E2). */
+export function siteOf(url: string): string | undefined {
+  try {
+    return new URL(url).hostname.toLowerCase().replace(/^www\./, "");
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Nächste Folgeseite einer Liste (Plan 0042, E2): der erste Link derselben Website (Host ohne `www.`), dessen URL
+ * (ohne `#…`, auch beim Vergleich mit `seen`) auf `follow.match` endet und der noch nicht abgerufen ist; sonst
+ * `undefined`. Das Ende, nicht ein
+ * Teilstring: Kufer hängt an dieselbe Folge-URL `&knradd=…` für „in den Warenkorb legen“ (Messung 2026-10-24).
+ */
+export function nextPageUrl(
+  links: ReadonlyArray<{ url: string }>,
+  follow: { match: string },
+  seen: ReadonlySet<string>,
+  from: string,
+): string | undefined {
+  const own = siteOf(from);
+  const urls = links.map((l) => l.url.split("#")[0] ?? l.url);
+  return urls.find((u) => u.endsWith(follow.match) && !seen.has(u) && siteOf(u) === own);
+}
+
+/** Texte einer Liste und ihrer Folgeseiten in Reihenfolge, getrennt durch `--- Folgeseite <n> ---` (E2). */
+export const joinFollowPages = (texts: readonly string[]): string =>
+  texts.map((t, i) => (i === 0 ? t : `\n--- Folgeseite ${i} ---\n${t}`)).join("\n");
+
+/** Text einer abgerufenen Seite je Art. Links stehen nicht in der Eingabe; Folgeseiten verbindet `joinFollowPages`. */
 export function programmeText(kind: PageTask["kind"], body: string, finalUrl: string): string {
   switch (kind) {
     case "html": {

@@ -40,6 +40,7 @@ describe("planFetch (Plan 0032, E3; ADR 0025, Punkt 7)", () => {
         },
         { url: "https://a.example/flyer.pdf", kind: "pdf", use: "termine" },
         { url: "https://a.example/feed.ics", kind: "ical", use: "termine" },
+        { url: "https://a.example/liste", kind: "html", use: "termine", follow: { match: "browse=forward", max: 3 } },
       ],
     },
     { ...base, id: "abgedeckt", coveredBy: "kalender" },
@@ -61,6 +62,8 @@ describe("planFetch (Plan 0032, E3; ADR 0025, Punkt 7)", () => {
       },
       { url: "https://a.example/flyer.pdf", kind: "pdf" },
       { url: "https://a.example/feed.ics", kind: "ical" },
+      // Folgeseiten nur, wenn der Katalog sie nennt (Plan 0042, E2)
+      { url: "https://a.example/liste", kind: "html", follow: { match: "browse=forward", max: 3 } },
     ]);
   });
 

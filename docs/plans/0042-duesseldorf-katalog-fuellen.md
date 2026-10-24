@@ -425,6 +425,30 @@ Die Subagenten der Recherche laufen in der Claude-Code-Session; sie sind im Post
 - **Samstagslauf live:** Steht `ENTDECKEN_MODUS` auf `live`, nimmt das Entdecken nach dem Push Düsseldorfer Anbieter ohne Abnahme auf. S3.3 nimmt den Trockenlauf vorher ab, S4.0 und N5 regeln die Variable.
 - **Rechtliches beim Navigator:** In diesem Plan dient er nur als Fundstelle für Adressen und als Messlatte (Ziel 2). Im Repo wird nichts aus ihm gespeichert.
 
+## Umsetzung
+
+### S0 – Messungen (2026-10-24, ohne Modell)
+
+M1 (Subagent mit `fetch-page`, curl; Rohdaten unter dem Job-Verzeichnis, nicht im Repo):
+- **Keine Gesamtansicht (Fall a) bei keinem Träger.** Feste Seitengröße (efa, DRK, KWD 25 Kurse; ASG 7). `pagesize`, `limit`, `anzahl`, `browse=all`, `print` u. a. ändern nichts; die efa-Stichwortsuche ist ebenso auf 25 begrenzt; `programm.asg-bildungsforum.de` leitet auf die Startseite.
+- **Fall (b) mit statischem Link** bei efa, DRK, ASG und KWD: `<kategorie>?knr=<letzter Kurs>&browse=forward`, gleicher Host, relativ im HTML. Kein Folgelink nur per JavaScript. `cHash` hat nur AWO, nicht KWD (Annahme im Anhang falsch).
+- **AWO** braucht kein `follow`: jede Kategorie liegt auf einer Seite.
+- **Zeichen je Träger** (alle unter 250 000): efa ≈ 38 000 (4 Kategorien, 6 Seiten; mit Wasserspaß, Baby-Treffen und Sprach-Spielgruppen ≈ 55 000), DRK ≈ 47 000 (7 Kategorien, 12 Seiten), ASG ≈ 133 000 (6 Kategorien, 43 Seiten), AWO ≈ 13 000 (Kat. 25 und 27), KWD ≈ 26 000 (Kat. 10, 4 Seiten). Höchstens 11 Seiten je Kategorie, `max: 12` genügt.
+- **Nebenbefund:** efa und ASG nennen „N Termine“, DRK, AWO und KWD nur den Kursbeginn. Von deren Kursen beginnen viele vor heute (DRK 84 von 154, AWO 46 von 76, KWD 8 von 25 in Kat. 130); ob sie noch laufen, zeigt die Liste nicht. Das prüft der Ertragsbeweis in S2; reicht es nicht, entscheidet der Nutzer über Detailseiten oder einen `hint`.
+
+M2 (Soll für Ziel 3, Kurse gesamt / künftig): efa PEKiP/Eltern-Baby 27/26, Bewegung 46/41; DRK Kat. 130 33/17 (Beginn ≥ heute); ASG Spielgruppen 1379 77/74, Musik 1383 23/23; AWO Kat. 25 23; KWD Kat. 10 86/76.
+
+### S1 – Abruf
+
+- **E6** umgesetzt (`6af7770`): PDF vor Browser, `entryFromAssessment` ohne `render` bei PDF, Schema lehnt `render` bei PDF ab, `data/discover/duesseldorf.json` mit fünf Hosts und Test gegen die echte Datei.
+- **E2** umgesetzt, weil M1 Fall (b) fand. **Abweichung:** `match` ist das **Ende** der URL (ohne `#…`), kein Teilstring. Der erste Probelauf auf KWD folgte sonst den Links „in den Warenkorb legen“ (`…&browse=forward&knradd=…`) und „Kurs löschen“ und kam auf 13 statt 4 Seiten. Anker auf schon abgerufene Seiten zählen als abgerufen. `max` zählt die Folgeseiten. Probe danach: KWD Kat. 10 4 Seiten, ASG Musik 4, efa Eltern-Baby 2, wie M1.
+- `fetch-page --follow <match> [--max N]` nutzt `withFollowPages` aus `io/fetch-inputs.ts`, also denselben Abruf wie der Nachtlauf.
+- **Arch-Review S1** (2026-10-24, Verdict OK, kein Blocker, kein Major), übernommen:
+  - m1: Gibt es nach `max` Folgeseiten noch einen Folgelink, scheitert die Programmseite („mehr als N Folgeseiten“), statt still Kurse zu verlieren.
+  - m2: Leitet eine Folgeseite auf eine fremde Website weiter, scheitert die Programmseite.
+  - m3: `fetch-page --max` verlangt eine ganze Zahl 1 bis `FOLLOW_MAX` (40, neben dem Schema).
+  - m4: robots.txt der Kufer-Hosts geprüft (2026-10-24): efa, DRK und ASG sperren nur `typo3`, `id=`, `L=`, `cHash` u. Ä., nicht `/kategorie/…?knr=…&browse=forward`; AWO erlaubt alles (auch `cHash`); KWD hat keine robots.txt (404).
+
 ## Review (2026-10-18) – Verdict: Überarbeiten
 
 Unabhängiger `plan-reviewer`; alle Befunde sind gegen den Code geprüft.
