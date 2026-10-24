@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { offerKey } from "./ids.ts";
+import { listingWeek } from "./listing.ts";
 import { newOfferIds, offersInWeek, type WeeklyInput, weeklyText } from "./news.ts";
 import { placeKey } from "./place-key.ts";
 import type { ReachFn } from "./reach.ts";
@@ -14,6 +15,8 @@ const byKey = (key: FixtureKey): SiteOffer => {
   return offer;
 };
 const keys = (list: readonly SiteOffer[]) => list.map(fixtureKey);
+/** Der Bestand vor Plan 0043: ohne `listedAt`, dort entscheiden die gesehenen IDs */
+const unlisted = offers.map(({ listedAt: _, ...o }) => o);
 
 /** Am Fixture-Jetzt (5.10.2026) genau 14 Monate alt. */
 const BIRTH_14 = "2025-08-05";
@@ -47,22 +50,22 @@ const WEEK = offersInWeek(offers, FIXTURE_NOW);
 const text = (input: Partial<WeeklyInput<SiteOffer>>) =>
   weeklyText({ fresh: [], week: WEEK, searches: [], now: FIXTURE_NOW, ...input });
 
-describe("newOfferIds", () => {
+describe("newOfferIds ohne listedAt: gesehene IDs (Bestand vor Plan 0043)", () => {
   it("liefert alle kommenden Angebote, die vorher unbekannt waren, in der Reihenfolge der Daten", () => {
-    const ids = newOfferIds([], offers, FIXTURE_NOW);
-    expect(ids).toEqual(offers.filter((o) => fixtureKey(o) !== "vergangen").map((o) => o.id));
+    const ids = newOfferIds([], unlisted, FIXTURE_NOW);
+    expect(ids).toEqual(unlisted.filter((o) => fixtureKey(o) !== "vergangen").map((o) => o.id));
   });
 
   it("kennt Angebote auch unter ihrer alten langen ID (ADR 0022)", () => {
     // der Stand vor dem Umstieg: alte IDs aus Katalog-ID, Titel, Ort und erstem Termin
     const legacy = loadFixtures().file.offers.map((o) => offerKey({ ...o, firstStart: o.sessions[0]?.start ?? "" }));
     expect(legacy.every((id) => id.includes("--"))).toBe(true);
-    expect(newOfferIds(legacy, offers, FIXTURE_NOW)).toEqual([]);
+    expect(newOfferIds(legacy, unlisted, FIXTURE_NOW)).toEqual([]);
   });
 
   it("lässt bekannte Angebote weg", () => {
     const known = [byKey("krabbeltreff").id, byKey("pekip-herbst").id];
-    const ids = newOfferIds(known, offers, FIXTURE_NOW);
+    const ids = newOfferIds(known, unlisted, FIXTURE_NOW);
     expect(ids).not.toContain(byKey("krabbeltreff").id);
     expect(ids).not.toContain(byKey("pekip-herbst").id);
     expect(ids).toContain(byKey("musikgarten-1").id);
@@ -80,10 +83,62 @@ describe("newOfferIds", () => {
     expect(
       newOfferIds(
         offers.map((o) => o.id),
-        offers,
+        unlisted,
         FIXTURE_NOW,
       ),
     ).toEqual([]);
+  });
+});
+
+describe("newOfferIds mit listedAt: eingestellt in dieser Woche (Plan 0043, E3)", () => {
+  const all = offers.map((o) => o.id);
+
+  it("Fixtures: Musikgarten (5.10.) und Krabbelreime (2.10.) sind neu, auch wenn das Gerät sie kennt", () => {
+    expect(keys(offers.filter((o) => newOfferIds(all, offers, FIXTURE_NOW).includes(o.id))).sort()).toEqual([
+      "krabbelreime",
+      "musikgarten-1",
+    ]);
+  });
+
+  it("Kernfall: vor 7 bis 13 Tagen eingestellt und nicht in den gesehenen IDs ist nicht neu (Review 4, K1)", () => {
+    expect(listingWeek(byKey("krabbeltreff"), FIXTURE_NOW)).toBe("vorige-woche");
+    expect(newOfferIds([], [byKey("krabbeltreff")], FIXTURE_NOW)).toEqual([]);
+  });
+
+  it("Wochengrenze: Tag 6 neu, Tag 7 nicht; listedAt nach jetzt neu", () => {
+    const listed = (listedAt: string) => newOfferIds([], [{ ...byKey("krabbelreime"), listedAt }], FIXTURE_NOW);
+    expect(listed("2026-09-29T00:00:00+02:00")).toHaveLength(1);
+    expect(listed("2026-09-28T23:59:00+02:00")).toEqual([]);
+    expect(listed("2026-10-06T05:00:00+02:00")).toHaveLength(1);
+  });
+
+  it("ein neuer Durchgang unter alter ID ist neu, obwohl er in den gesehenen IDs steht", () => {
+    const run = { ...byKey("krabbeltreff"), listedAt: "2026-10-04T05:00:00+02:00" };
+    expect(newOfferIds([run.id], [run], FIXTURE_NOW)).toEqual([run.id]);
+  });
+
+  it("beendete Angebote sind nicht neu", () => {
+    expect(newOfferIds([], [{ ...byKey("vergangen"), listedAt: "2026-10-05T05:00:00+02:00" }], FIXTURE_NOW)).toEqual(
+      [],
+    );
+  });
+
+  it("ohne gesehene IDs zählen nur Angebote mit listedAt", () => {
+    expect(keys(offers.filter((o) => newOfferIds(undefined, offers, FIXTURE_NOW).includes(o.id))).sort()).toEqual([
+      "krabbelreime",
+      "musikgarten-1",
+    ]);
+    expect(newOfferIds(undefined, unlisted, FIXTURE_NOW)).toEqual([]);
+  });
+
+  it("jeder Treffer mit listedAt steht in „Neu diese Woche“", () => {
+    const fresh = offers.filter((o) => newOfferIds([], offers, FIXTURE_NOW).includes(o.id));
+    const { hits } = text({ fresh });
+    for (const id of hits) {
+      const hit = offers.find((o) => o.id === id);
+      if (hit?.listedAt !== undefined) expect(listingWeek(hit, FIXTURE_NOW)).toBe("diese-woche");
+    }
+    expect(hits.length).toBeGreaterThan(0);
   });
 });
 
@@ -204,6 +259,41 @@ describe("weeklyText – neue Treffer", () => {
     expect(text({ fresh, birthDate: "2026-09-01" }).title).toBe("1 neues Angebot passt zu 1 Monat");
     expect(text({ fresh, birthDate: "2026-09-20" }).title).toBe("1 neues Angebot passt zu 0 Monaten");
     expect(text({ fresh, birthDate: "2024-09-01" }).title).toBe("1 neues Angebot passt zu 2 Jahren");
+  });
+});
+
+describe("weeklyText – der Beginn passt (Plan 0043, E2)", () => {
+  /** Turnzwerge-Fall: regelmäßig 12–36 Monate, bis in den nächsten Sommer; das Kind ist 8 Monate */
+  const BIRTH_8 = "2026-02-05";
+  const mondays = Array.from({ length: 40 }, (_, i) => {
+    const start = new Date(Date.UTC(2026, 9, 5 + 7 * i, 14, 0));
+    return { start: start.toISOString(), end: new Date(start.getTime() + 3_600_000).toISOString() };
+  });
+  const turnzwerge: SiteOffer = {
+    ...byKey("krabbeltreff"),
+    title: "Turnzwerge (1–3 Jahre)",
+    age: { minMonths: 12, maxMonths: 36 },
+    sessions: mondays,
+  };
+
+  it("nennt ein regelmäßiges Angebot nicht, das erst ab einem späteren Termin passt", () => {
+    expect(text({ fresh: [turnzwerge], birthDate: BIRTH_8, week: [] }).hits).toEqual([]);
+    // ab 12 Monaten passt der nächste Termin, auch Monate entfernt
+    expect(text({ fresh: [turnzwerge], birthDate: "2025-10-05", week: [] }).hits).toEqual([turnzwerge.id]);
+  });
+
+  it("die Wochenzahl zählt ein regelmäßiges Angebot nur mit passendem Termin in den 7 Tagen", () => {
+    expect(text({ birthDate: BIRTH_8, week: [turnzwerge] }).body).toBe("In den nächsten 7 Tagen nichts Passendes.");
+    expect(text({ birthDate: "2025-10-05", week: [turnzwerge] }).body).toBe(
+      "1 passendes Angebot in den nächsten 7 Tagen.",
+    );
+    // Der nächste Termin passt, aber in den 7 Tagen liegt kein Termin, der passt
+    const later = { ...turnzwerge, sessions: mondays.slice(4) };
+    expect(text({ birthDate: "2025-10-05", week: [later] }).body).toBe("In den nächsten 7 Tagen nichts Passendes.");
+  });
+
+  it("vor der Geburt zählt die Woche ohne Alter, auch regelmäßige Angebote", () => {
+    expect(text({ birthDate: "2026-12-01", week: [turnzwerge] }).body).toBe("1 Angebot in den nächsten 7 Tagen.");
   });
 });
 

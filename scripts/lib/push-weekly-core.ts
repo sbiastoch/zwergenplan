@@ -3,7 +3,8 @@
  * nur git, Dateien, Worker und `web-push`.
  *
  * 1. Zeitplan-Lauf sendet immer, auch verspätet (höchstens einmal je Tag, Versand-Marke); Testversand (`--force`) ohne Marke.
- * 2. Zahlen aus den Daten im Repo: neu seit dem Stand vor 7 × 24 h, Angebote der nächsten 7 Tage.
+ * 2. Zahlen aus den Daten im Repo: neu (`listedAt` in dieser Woche, ohne `listedAt` seit dem Stand vor 7 × 24 h),
+ *    Angebote der nächsten 7 Tage.
  * 3. Payload bauen und mit Zod prüfen (ungültig = Programmierfehler, rot).
  * 4. Erst die Abos lesen, dann die Versand-Marke setzen (ein Lesefehler kostet die Woche nicht), dann senden.
  *    404/410 → beim Worker löschen. Fehler beim Senden sind Warnungen. Ausgabe nur als Zahlen.
@@ -97,8 +98,9 @@ export type WeeklyResult =
 export async function runWeekly(deps: WeeklyDeps, args: WeeklyArgs): Promise<WeeklyResult> {
   const { now } = deps;
   const before = await deps.previousIds(new Date(now.getTime() - WEEK_MS));
-  if (!before) deps.warn("Der alte Stand vor 7 Tagen fehlt: neu = 0.");
-  const news = before ? newOfferIds(before, deps.current, now).length : 0;
+  if (!before) deps.warn("Der alte Stand vor 7 Tagen fehlt: Angebote ohne listedAt zählen nicht als neu.");
+  // dieselbe Regel wie der Zuschnitt auf dem Gerät (Plan 0043, E3): `listedAt` in dieser Woche, sonst die ID-Differenz
+  const news = newOfferIds(before, deps.current, now).length;
   const week = offersInWeek(deps.current, now).length;
   const payload = PushPayloadSchema.parse(
     weeklyPayload({ news, week, siteUrl: deps.siteUrl, sentAt: now, ...(args.force ? { test: true as const } : {}) }),

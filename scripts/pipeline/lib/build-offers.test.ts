@@ -9,6 +9,7 @@ import {
   buildOffers,
   type Candidate,
   dropSameSourceDuplicates,
+  isNewRun,
 } from "./build-offers.ts";
 import { ProviderRaw, RawBatch, RawEvent } from "./raw.ts";
 import { checkIdContinuity, type Draft, SAME_SOURCE_SESSIONS, windowKey } from "./stable-ids.ts";
@@ -874,5 +875,129 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
     expect(report.notes.join("\n")).not.toContain("mehrdeutig");
     // Das Netz meldet nur Anbieterwechsel einer bleibenden ID; der Wegfall eines Zwillings ist keiner
     expect(checkIdContinuity(previous, offers)).toEqual([]);
+  });
+});
+
+describe("listedAt: zuerst im Zwergenplan (Plan 0043, E1)", () => {
+  const LATER = "2026-10-06T06:00:00+02:00";
+  const weekly = (over: Record<string, unknown> = {}) =>
+    ev({
+      schedule: {
+        kind: "weekly",
+        weekdays: ["WE"],
+        start: "10:00",
+        end: "11:30",
+        from: "2026-10-07",
+        skipHolidays: true,
+      },
+      ...over,
+    });
+  const dates = (days: string[], over: Record<string, unknown> = {}) =>
+    ev({ schedule: { kind: "dates", dates: days.map((d) => ({ start: `${d}T10:00` })) }, ...over });
+  const build = (events: unknown[], over: Partial<BuildInput> = {}) => {
+    const { file, report } = buildOffers(base({ batches: [batch("batch-1", events)], ...over }));
+    expect(report.errors).toEqual([]);
+    return file as OffersFile;
+  };
+  const again = (previous: OffersFile, events: unknown[], over: Partial<BuildInput> = {}) =>
+    build(events, { previous, generatedAt: LATER, ...over });
+
+  it("ein neues Angebot bekommt generatedAt, eine zugeordnete ID behält das Datum des Vorgängers", () => {
+    const first = build([ev()]);
+    expect(first.offers[0]?.listedAt).toBe("2026-10-05T06:00:00+02:00");
+    const second = again(first, [ev({ title: "Offener Krabbeltreff (neu)" }), ev({ title: "Zwergentreff" })]);
+    const byTitle = new Map(second.offers.map((o) => [o.title, o]));
+    expect(byTitle.get("Offener Krabbeltreff (neu)")?.id).toBe(first.offers[0]?.id);
+    expect(byTitle.get("Offener Krabbeltreff (neu)")?.listedAt).toBe("2026-10-05T06:00:00+02:00");
+    expect(byTitle.get("Zwergentreff")?.listedAt).toBe(LATER);
+  });
+
+  it("ein Vorgänger ohne Feld bleibt ohne (kein Nachtragen für den Bestand)", () => {
+    const first = build([ev()]);
+    const bare = { ...first, offers: first.offers.map(({ listedAt: _, ...o }) => o) };
+    expect(again(bare, [ev()]).offers[0]?.listedAt).toBeUndefined();
+  });
+
+  it("die Übernahme aus dem Altbestand behält das Feld", () => {
+    const { file: prev } = loadFixtures();
+    const listed = prev.offers.filter((o) => o.listedAt !== undefined);
+    expect(listed.length).toBeGreaterThan(0);
+    const { file } = buildOffers(base({ previous: prev, generatedAt: LATER, batches: [batch("batch-1", [], {})] }));
+    const after = new Map(file?.offers.map((o) => [o.id, o.listedAt]));
+    const carried = listed.filter((o) => after.has(o.id));
+    expect(carried.length).toBeGreaterThan(0);
+    for (const o of carried) expect(after.get(o.id)).toBe(o.listedAt);
+  });
+
+  it("eine laufende Kursfortschreibung behält das Datum", () => {
+    const kurs = (days: string[]) => dates(days, { title: "PEKiP", format: "kurs", topics: ["pekip"] });
+    const first = build([kurs(["2026-09-29", "2026-10-06", "2026-10-13"])]);
+    const second = again(first, [kurs(["2026-10-13"])], {
+      horizon: { from: "2026-10-12", to: "2027-02-12" },
+      generatedAt: "2026-10-12T06:00:00+02:00",
+    });
+    expect(second.offers[0]?.id).toBe(first.offers[0]?.id);
+    expect(second.offers[0]?.listedAt).toBe(first.offers[0]?.listedAt);
+  });
+
+  it("wächst ein unbefristetes Angebot mit dem Horizont, bleibt das Datum (Review 4, B1)", () => {
+    const first = build([weekly()]);
+    const second = again(first, [weekly()], {
+      horizon: { from: "2026-10-12", to: "2027-02-12" },
+      generatedAt: "2026-10-12T06:00:00+02:00",
+    });
+    expect(second.offers[0]?.sessions.at(-1)?.start.slice(0, 10)).toBe("2027-02-10");
+    expect(second.offers[0]?.listedAt).toBe(first.offers[0]?.listedAt);
+  });
+
+  it("ein angehängter Nachholtermin kurz nach dem letzten lässt das Datum stehen", () => {
+    const first = build([dates(["2026-10-07", "2026-10-14", "2026-10-21"])]);
+    const second = again(first, [dates(["2026-10-07", "2026-10-14", "2026-10-21", "2026-11-02"])]);
+    expect(second.offers[0]?.id).toBe(first.offers[0]?.id);
+    expect(second.offers[0]?.listedAt).toBe(first.offers[0]?.listedAt);
+  });
+
+  it("ein neuer Kursdurchgang unter alter ID gilt als neu: im alten Horizont und mindestens 14 Tage Pause", () => {
+    const kurs = (days: string[]) => dates(days, { title: "PEKiP", format: "kurs", topics: ["pekip"] });
+    const first = build([kurs(["2026-10-07", "2026-10-14", "2026-10-21"])]);
+    // 21.10. → 4.11.: genau 14 Tage, im alten Horizont (bis 5.2.2027)
+    const run = again(first, [kurs(["2026-10-07", "2026-10-14", "2026-10-21", "2026-11-04", "2026-11-11"])]);
+    expect(run.offers[0]?.id).toBe(first.offers[0]?.id);
+    expect(run.offers[0]?.listedAt).toBe(LATER);
+    // 13 Tage Pause: Fortschreibung
+    const close = again(first, [kurs(["2026-10-07", "2026-10-14", "2026-10-21", "2026-11-03"])]);
+    expect(close.offers[0]?.listedAt).toBe(first.offers[0]?.listedAt);
+  });
+
+  it("regelmäßig: ein weiterer veröffentlichter Termin ist nie ein neuer Durchgang (Arch-Review M1, Bücherzwerge)", () => {
+    // monatlich, der Anbieter nennt nur die nächsten Termine; der Januartermin kommt 35 Tage nach dem letzten dazu
+    const first = build([dates(["2026-10-22", "2026-11-19", "2026-12-17"])]);
+    const second = again(first, [dates(["2026-10-22", "2026-11-19", "2026-12-17", "2027-01-21"])]);
+    expect(second.offers[0]?.id).toBe(first.offers[0]?.id);
+    expect(second.offers[0]?.listedAt).toBe(first.offers[0]?.listedAt);
+  });
+
+  it("isNewRun: erster neuer Termin nach dem alten Horizont ist kein neuer Durchgang", () => {
+    const prev = {
+      format: "kurs" as const,
+      sessions: [{ start: "2026-10-21T10:00:00+02:00", end: "2026-10-21T11:00:00+02:00" }],
+    };
+    const next = (day: string) => ({
+      format: "kurs" as const,
+      sessions: [...prev.sessions, { start: `${day}T10:00:00+01:00`, end: `${day}T11:00:00+01:00` }],
+    });
+    expect(isNewRun(prev, next("2027-02-03"), "2027-02-05")).toBe(true);
+    expect(isNewRun(prev, next("2027-02-05"), "2027-02-05")).toBe(true);
+    expect(isNewRun(prev, next("2027-02-06"), "2027-02-05")).toBe(false);
+    expect(isNewRun(prev, prev, "2027-02-05")).toBe(false);
+    expect(isNewRun({ ...prev, format: "regelmaessig" }, next("2027-02-03"), "2027-02-05")).toBe(false);
+    // verlegte Uhrzeit: alle Termine „neu“, aber der erste liegt vor dem letzten alten
+    const moved = { ...prev, sessions: [{ start: "2026-10-21T10:30:00+02:00", end: "2026-10-21T11:30:00+02:00" }] };
+    expect(isNewRun({ ...prev, sessions: next("2026-11-30").sessions }, moved, "2027-02-05")).toBe(false);
+  });
+
+  it("das Rohformat kennt das Feld nicht: nur der Build setzt es", () => {
+    expect(RawEvent.safeParse({ ...ev(), listedAt: "2026-10-05T06:00:00+02:00" }).success).toBe(false);
+    expect(RawEvent.safeParse(ev()).success).toBe(true);
   });
 });

@@ -101,7 +101,8 @@
         "checkedAt": "2026-10-05T05:40:00+02:00"
       },
       "url": "https://example.org/familientreff/krabbeltreff",
-      "sourceUrl": "https://example.org/familientreff/programm"
+      "sourceUrl": "https://example.org/familientreff/programm",
+      "listedAt": "2026-09-28T05:00:00+02:00"
     },
     {
       "id": "nle21y1x",
@@ -162,7 +163,8 @@
         "checkedAt": "2026-10-05T05:40:00+02:00"
       },
       "url": "https://example.org/familientreff/pekip-herbst",
-      "sourceUrl": "https://example.org/familientreff/programm"
+      "sourceUrl": "https://example.org/familientreff/programm",
+      "listedAt": "2026-09-15T05:00:00+02:00"
     },
     {
       "id": "rv61suun",
@@ -258,7 +260,8 @@
         "checkedAt": "2026-10-05T05:41:00+02:00"
       },
       "url": "https://example.org/musikschule/musikgarten-1",
-      "sourceUrl": "https://example.org/musikschule/kurse"
+      "sourceUrl": "https://example.org/musikschule/kurse",
+      "listedAt": "2026-10-05T05:00:00+02:00"
     },
     {
       "id": "rzzqsvxq",
@@ -298,7 +301,8 @@
         "checkedAt": "2026-10-05T05:42:00+02:00"
       },
       "url": "https://example.org/bibliothek/krabbelreime",
-      "sourceUrl": "https://example.org/bibliothek/termine"
+      "sourceUrl": "https://example.org/bibliothek/termine",
+      "listedAt": "2026-10-02T05:00:00+02:00"
     },
     {
       "id": "3zemfuzk",
@@ -327,7 +331,8 @@
         "checkedAt": "2026-10-05T05:43:00+02:00"
       },
       "url": "https://example.org/theater/kuckuck",
-      "sourceUrl": "https://example.org/theater/spielplan"
+      "sourceUrl": "https://example.org/theater/spielplan",
+      "listedAt": "2026-09-24T05:00:00+02:00"
     },
     {
       "id": "kovtez0z",
@@ -351,7 +356,8 @@
         "checkedAt": "2026-10-05T05:43:00+02:00"
       },
       "url": "https://example.org/theater/babykonzert",
-      "sourceUrl": "https://example.org/theater/spielplan"
+      "sourceUrl": "https://example.org/theater/spielplan",
+      "listedAt": "2026-09-15T05:00:00+02:00"
     }
   ]
 }

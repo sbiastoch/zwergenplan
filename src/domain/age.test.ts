@@ -10,6 +10,7 @@ import {
   offerFitsAge,
   sessionFit,
   splitByAge,
+  startFitsAge,
 } from "./age.ts";
 import { applyFilters, EMPTY_FILTER } from "./filter.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, fixtureSiteOffers } from "./test-fixtures.ts";
@@ -79,6 +80,43 @@ describe("offerFitsAge", () => {
 
   it("läuft wirklich in einer fremden Zeitzone (sonst wären die Berlin-Tests wertlos)", () => {
     expect(Intl.DateTimeFormat().resolvedOptions().timeZone).toBe("America/Los_Angeles");
+  });
+});
+
+describe("startFitsAge: der Beginn passt (Plan 0043, E2)", () => {
+  /** Turnzwerge-Fall: 12–36 Monate, jeden Montag bis Oktober 2027; das Kind ist am 24.10.2026 genau 8 Monate */
+  const BIRTH_8 = "2026-02-24";
+  const NOW = new Date("2026-10-24T10:00:00+02:00");
+  const mondays = Array.from({ length: 50 }, (_, i) => {
+    const start = new Date(Date.UTC(2026, 9, 26 + 7 * i, 9, 0));
+    return { start: start.toISOString(), end: new Date(start.getTime() + 3_600_000).toISOString() };
+  });
+  const turnzwerge = { ...fixtureOffer("krabbeltreff"), age: { minMonths: 12, maxMonths: 36 }, sessions: mondays };
+
+  it("regelmäßig: passt der nächste Termin nicht, zählt kein späterer (anders als offerFitsAge)", () => {
+    expect(offerFitsAge(turnzwerge, BIRTH_8, NOW)).toBe(true);
+    expect(startFitsAge(turnzwerge, BIRTH_8, NOW)).toBe(false);
+  });
+
+  it("regelmäßig: passt der nächste Termin, ohne Zeitgrenze", () => {
+    // ab Februar 12 Monate: Ab dann ist der nächste Termin passend, auch wenn er Monate entfernt ist
+    expect(startFitsAge(turnzwerge, BIRTH_8, new Date("2027-02-24T12:00:00+01:00"))).toBe(true);
+    const later = { ...turnzwerge, sessions: mondays.slice(20) };
+    expect(later.sessions[0]?.start.slice(0, 10)).toBe("2027-03-15");
+    expect(startFitsAge(later, BIRTH_8, NOW)).toBe(true);
+  });
+
+  it("regelmäßig ohne kommenden Termin: false", () => {
+    expect(startFitsAge(turnzwerge, BIRTH_8, new Date("2028-01-01T12:00:00+01:00"))).toBe(false);
+  });
+
+  it("Kurs und Einzeltermin wie offerFitsAge: erster Termin", () => {
+    const musik = fixtureOffer("musikgarten-1"); // 12–24, erster Termin 5.11.2026
+    expect(startFitsAge(musik, "2025-11-05", FIXTURE_NOW)).toBe(true);
+    expect(startFitsAge(musik, "2025-11-06", FIXTURE_NOW)).toBe(false);
+    const kuckuck = fixtureOffer("kuckuck-im-nest");
+    for (const birth of ["2025-05-15", "2025-05-16"])
+      expect(startFitsAge(kuckuck, birth, FIXTURE_NOW)).toBe(offerFitsAge(kuckuck, birth, FIXTURE_NOW));
   });
 });
 

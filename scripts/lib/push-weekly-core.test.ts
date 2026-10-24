@@ -14,6 +14,8 @@ import {
 } from "./push-weekly-core.ts";
 
 const offers = fixtureSiteOffers();
+/** Der Bestand vor Plan 0043: ohne `listedAt`, dort zählt die ID-Differenz */
+const unlisted = offers.map(({ listedAt: _, ...o }) => o);
 
 const SATURDAY = new Date("2026-10-10T10:07:00+02:00");
 const SITE = "https://zwergenplan.app/";
@@ -32,9 +34,10 @@ function deps(overrides: Partial<WeeklyDeps> = {}) {
     now: SATURDAY,
     siteUrl: SITE,
     current: offers,
-    // neu: Krabbeltreff und PEKiP (beide mit Terminen nach dem 10.10.)
+    // neu (Plan 0043, E3): Musikgarten (eingestellt 5.10.) und Babymassage (ohne listedAt, fehlt im alten Stand);
+    // Krabbeltreff fehlt dort auch, ist aber am 28.9. eingestellt und damit nicht neu
     previousIds: async () =>
-      offers.filter((o) => !["krabbeltreff", "pekip-herbst"].includes(fixtureKey(o) ?? "")).map((o) => o.id),
+      offers.filter((o) => !["krabbeltreff", "babymassage-workshop"].includes(fixtureKey(o) ?? "")).map((o) => o.id),
     worker: {
       list: async () => [sub(1), sub(2), sub(3)],
       mark: async (day) => {
@@ -95,7 +98,7 @@ describe("runWeekly", () => {
 
   it("ein alter Stand mit langen IDs zählt dieselben Angebote nicht als neu (ADR 0022, Review M2)", async () => {
     const legacy = loadFixtures().file.offers.map((o) => offerKey({ ...o, firstStart: o.sessions[0]?.start ?? "" }));
-    const { d } = deps({ previousIds: async () => legacy });
+    const { d } = deps({ current: unlisted, previousIds: async () => legacy });
     const result = await runWeekly(d, { force: false, dryRun: true });
     expect(result).toMatchObject({ news: 0 });
   });
@@ -132,8 +135,11 @@ describe("runWeekly", () => {
     expect(marks).toEqual([]);
   });
 
-  it("fehlt der alte Stand: neu = 0 mit Warnung", async () => {
-    const { d, sent, warnings } = deps({ previousIds: async () => undefined });
+  it("fehlt der alte Stand: zählen nur Angebote mit listedAt, mit Warnung", async () => {
+    const listed = deps({ previousIds: async () => undefined });
+    expect(await runWeekly(listed.d, { force: false, dryRun: true })).toMatchObject({ news: 1 });
+    expect(listed.warnings.join(" ")).toMatch(/alte Stand/);
+    const { d, sent, warnings } = deps({ current: unlisted, previousIds: async () => undefined });
     const result = await runWeekly(d, { force: false, dryRun: false });
     expect(result).toMatchObject({ news: 0 });
     expect(warnings.join(" ")).toMatch(/alte Stand/);

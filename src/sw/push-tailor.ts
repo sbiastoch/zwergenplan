@@ -18,7 +18,7 @@ import type { TransitTableFile } from "../domain/transit-types.ts";
 
 export type TailorOutcome =
   | { kind: "text"; text: WeeklyText }
-  /** kein Zuschnitt möglich (gesehene IDs fehlten): das System bzw. der allgemeine Text */
+  /** kein Zuschnitt möglich (gesehene IDs fehlten und kein Angebot hat `listedAt`): das System bzw. der allgemeine Text */
   | { kind: "nichts" }
   | { kind: "zeit" }
   | { kind: "fehler" };
@@ -76,13 +76,15 @@ export async function tailorPush({
     // zeigt das System die allgemeine Fassung (Arch-Review N9)
     const siteOffers = offers as SiteOffer[];
     const ids = siteOffers.map((o) => o.id);
-    if (!isStringArray(seen)) {
+    // Ohne gesehene IDs entscheidet `listedAt` (Plan 0043, E3); hat noch kein Angebot eins (Übergang), kein Zuschnitt
+    const known = isStringArray(seen) ? seen : undefined;
+    if (known === undefined && !siteOffers.some((o) => o.listedAt !== undefined)) {
       await write(ids);
       return { kind: "nichts" };
     }
     const origin = originFromStored(stored);
     const reach = origin && table !== undefined ? (env.reachFor ?? defaultReach)(table, siteOffers, origin) : undefined;
-    const freshIds = new Set(newOfferIds(seen, siteOffers, now));
+    const freshIds = new Set(newOfferIds(known, siteOffers, now));
     const text = weeklyText({
       fresh: siteOffers.filter((o) => freshIds.has(o.id)),
       week: offersInWeek(siteOffers, now),

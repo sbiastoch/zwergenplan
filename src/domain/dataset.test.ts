@@ -369,6 +369,14 @@ describe("validateDataset", () => {
       ),
     ).toContain("checkedAt");
   });
+
+  it("listedAt höchstens generatedAt, gültig als Instant mit Offset (Plan 0043, E1)", () => {
+    const listed = (value: string) =>
+      errorsOf(mutate((o) => ((o.offers[0] as { listedAt?: string }).listedAt = value)));
+    expect(listed("2026-10-05T06:00:00+02:00")).toBe("");
+    expect(listed("2026-10-05T06:00:01+02:00")).toContain("listedAt liegt nach generatedAt");
+    expect(listed("2026-10-05T06:00:00")).toContain("listedAt");
+  });
 });
 
 describe("checkPlausibility", () => {

@@ -103,6 +103,9 @@ export function validateDataset(rawProviders: unknown, rawOffers: unknown): Vali
     if (Date.parse(offer.availability.checkedAt) > generatedAt + 60_000) {
       errors.push(`${where}: availability.checkedAt liegt nach generatedAt`);
     }
+    // `listedAt` setzt der Build auf `generatedAt` oder übernimmt es (Plan 0043, E1)
+    if (offer.listedAt !== undefined && Date.parse(offer.listedAt) > generatedAt)
+      errors.push(`${where}: listedAt liegt nach generatedAt`);
   }
 
   if (errors.length > 0) return { ok: false, errors };

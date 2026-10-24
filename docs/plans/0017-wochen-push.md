@@ -99,6 +99,8 @@ Der allgemeine Text erscheint nur, wenn das Gerät nicht zuschneiden kann (Servi
 
 ### E3 – Was „neu“ auf dem Gerät heißt (Review H1)
 
+> **Ersetzt durch Plan 0043, E3** (2026-10-24): Hat ein Angebot `listedAt`, ist es neu, wenn es in dieser Woche eingestellt wurde (`listingWeek`); `seenIds` entscheiden nur noch für Angebote ohne `listedAt`. Ohne `seenIds` wird ebenfalls zugeschnitten, sobald ein Angebot `listedAt` hat.
+
 - `seenIds` im Geräte-Speicher: die Angebots-IDs, die das Gerät bei der letzten Wochen-Nachricht kannte.
   - **Nur der Service Worker schreibt sie**, nach jedem Push, auf die IDs der dabei geladenen `site.json`. Beim Einschalten schreibt die App **keine** `seenIds` (Runde 3, Scope): Der erste Push nach dem Einschalten findet keine und schreibt sie (Schritt 3 in E10); die erste Woche zeigt dann den allgemeinen Text. Das spart einen Netzpfad samt Tests, und `PushControls` braucht keine Angebote.
   - Die App schreibt sie beim Öffnen **nicht** (Abweichung von Plan 0011 E12): Die Liste markiert nichts als neu, Öffnen heißt also nicht Bemerken. Wer freitags die Liste öffnet, bekommt samstags trotzdem alles, was in der Woche dazukam. Damit entfällt auch ein zweiter Abonnent von `onSiteLoad` (`src/data/site.ts`, heute genau einer für den PWA-Kern).
@@ -257,7 +259,7 @@ Daraus folgt:
    - aus dem Geräte-Speicher: `seenIds`, `searches`, `birthDate`, `origin`.
 2. `reach` = `transitReach(decodeTransitTable(file, placeKeys), origin)`; `placeKeys` = `new Set(site.offers.map((o) => placeKey(o.venue.geo)))` (wie `App.tsx`). `origin` (Nutzerentscheidung 5): `{ districtId }` → `districtById` (`source: "stadtteil"`); ein Punkt (`source` „standort“ oder „karte“, `lat`/`lon` Zahlen) → erneut `coarsen` und `inBounds` aus `src/domain/geo.ts`, wie `storedPointOrigin` in `src/ui/origin-state.ts` (der Service Worker darf `src/ui` nicht importieren; die zwei Aufrufe stehen in `push-tailor.ts`, Start-Code bleibt unberührt). Ungültig, außerhalb, fehlt etwas oder scheitert das Dekodieren: `undefined`, die Wegzeit-Grenze wirkt dann nicht.
 3. Testversand (`data.test: true`): Ab hier wird nichts geschrieben (siehe 5); die Prüfung steht vor jedem Schreiben (Runde 3). Nach Ablauf des Zeitlimits wird ebenfalls nichts mehr geschrieben.
-   Fehlen `seenIds`: `seenIds` schreiben (außer beim Testversand), Ergebnis „kein Zuschnitt“ (allgemeiner Text).
+   Fehlen `seenIds`: `seenIds` schreiben (außer beim Testversand), Ergebnis „kein Zuschnitt“ (allgemeiner Text). **Geändert durch Plan 0043, E3:** Hat ein Angebot `listedAt`, wird auch ohne `seenIds` zugeschnitten; „kein Zuschnitt“ nur, wenn keins eins hat.
 4. Sonst `fresh` = Angebote aus `newOfferIds(seenIds, site.offers, now)`, `week` = `offersInWeek(site.offers, now)`, `searches` = `parseSearches(raw).map(filterFromSearch)`, `weeklyText(…)`.
 5. **Testversand (Runde 2 M-D):** Trägt die Payload `data.test: true`, schreibt der Zuschnitt **nichts**. So verbraucht ein Testversand die Woche nicht.
 6. Sonst **vor** dem Anzeigen `seenIds` = alle IDs der geladenen `site.json` schreiben. Scheitert das Schreiben, wird trotzdem der zugeschnittene Text gezeigt (nächste Woche zählt dann dieselben noch einmal).
@@ -356,7 +358,7 @@ Unverändert bleiben `src/ui/AppExtras.tsx` (Lader), `src/data/pwa.ts`, `src/dat
 ## Akzeptanzkriterien
 
 - Samstags gegen 10 Uhr Berlin kommt auf jedem angemeldeten Gerät **höchstens eine** Nachricht, auch an den Umstellungs-Wochenenden und bei einem „Re-run“ (Versand-Marke im Worker, E1). Verwirft GitHub einen Lauf, fällt die Woche aus.
-- Mit Abos nennt sie die neuen Angebote, die zu einem Abo und zum Alter passen, oder sagt „nichts Neues“ mit der Zahl passender Angebote der nächsten 7 Tage. Ohne Abo zählt das Alter, ohne beides zählen alle. Den allgemeinen Text des Absenders sieht man nur, wenn das Gerät nicht zuschneiden kann. Ein Tipp öffnet die Startseite.
+- Mit Abos nennt sie die neuen Angebote (seit Plan 0043, E3: in dieser Woche eingestellt), die zu einem Abo und zum Alter passen (seit Plan 0043, E2: der Beginn passt), oder sagt „nichts Neues“ mit der Zahl passender Angebote der nächsten 7 Tage. Ohne Abo zählt das Alter, ohne beides zählen alle. Den allgemeinen Text des Absenders sieht man nur, wenn das Gerät nicht zuschneiden kann. Ein Tipp öffnet die Startseite.
 - Der Worker erhält nie Geburtsdatum, Such-Abos, Startpunkt oder `seenIds` (E2E-Protokoll). Die Requests des Service Workers beim Push sind für alle Geräte gleich.
 - `JS (initial)` ≤ 100 kB (Budget seit Plan 0019, ADR 0012), `App-Extras JS (lazy)` ≤ 7,1 kB, `Service Worker` ≤ 9 kB (siehe „Nachtrag 2“).
 - Nach dem Abschalten sind Abo beim Worker und Geräte-Speicher leer; die Such-Abos im `localStorage` bleiben (sie gehören dem Nutzer, nicht dem Push).

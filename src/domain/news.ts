@@ -1,25 +1,30 @@
 /**
- * Die Wochen-Nachricht auf dem Gerät (Plan 0017, E3, E4): was „neu“ heißt (Angebote, die das Gerät bei der letzten
- * Nachricht noch nicht kannte und die noch einen kommenden Termin haben) und der zugeschnittene Text nach Such-Abos
- * und Alter. Rein, `now` kommt immer von außen. Nur der Service Worker und die CI nutzen es (`push-domain-not-in-start`).
+ * Die Wochen-Nachricht auf dem Gerät (Plan 0017, E3, E4; Plan 0043, E2, E3): was „neu“ heißt und der zugeschnittene
+ * Text nach Such-Abos und Alter. Rein, `now` kommt immer von außen. Nur der Service Worker und die CI nutzen es
+ * (`push-domain-not-in-start`).
  */
-import { ageInMonths, offerFitsAge } from "./age.ts";
+import { ageInMonths, sessionFit, startFitsAge } from "./age.ts";
 import { nextSession } from "./agenda.ts";
 import { type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId } from "./ids.ts";
+import { listingWeek } from "./listing.ts";
 import type { ReachFn, ReachTarget } from "./reach.ts";
-import type { Offer } from "./schema.ts";
+import type { Offer, Session } from "./schema.ts";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
- * IDs aus `after`, die nicht in `before` stehen und noch nicht beendet sind (Regel der Liste), in Datenreihenfolge.
- * Alte lange IDs in `before` (gespeicherte `seenIds`, Stand vor 7 Tagen) zählen als ihre Kurz-ID (ADR 0022) – sonst
- * meldete die erste Nachricht nach dem Umstieg alle Angebote als neu.
+ * IDs der neuen Angebote mit kommendem Termin (Regel der Liste), in Datenreihenfolge (Plan 0043, E3): Mit `listedAt`
+ * ist neu, was in dieser Woche eingestellt wurde (`listingWeek`, auch ein neuer Durchgang unter alter ID). Ohne
+ * `listedAt` (Bestand vor Plan 0043) ist neu, was in `before` fehlt; ohne `before` keins davon. Alte lange IDs in
+ * `before` (gespeicherte `seenIds`, Stand vor 7 Tagen) zählen als ihre Kurz-ID (ADR 0022) – sonst meldete die erste
+ * Nachricht nach dem Umstieg alle Angebote als neu.
  */
-export function newOfferIds(before: readonly string[], after: readonly Offer[], now: Date): string[] {
-  const known = new Set(before.map((id) => resolveOfferId(id) ?? id));
-  return after.filter((o) => !known.has(o.id) && nextSession(o, now) !== undefined).map((o) => o.id);
+export function newOfferIds(before: readonly string[] | undefined, after: readonly Offer[], now: Date): string[] {
+  const known = before && new Set(before.map((id) => resolveOfferId(id) ?? id));
+  const fresh = (o: Offer) =>
+    o.listedAt !== undefined ? listingWeek(o, now) === "diese-woche" : known !== undefined && !known.has(o.id);
+  return after.filter((o) => fresh(o) && nextSession(o, now) !== undefined).map((o) => o.id);
 }
 
 /**
@@ -27,14 +32,12 @@ export function newOfferIds(before: readonly string[], after: readonly Offer[], 
  * an den Umstellungs-Wochenenden verschiebt sich das Ende bewusst um eine Stunde.
  */
 export function offersInWeek<T extends Offer>(offers: readonly T[], now: Date): T[] {
-  const from = now.getTime();
-  const to = from + WEEK_MS;
-  return offers.filter((o) =>
-    o.sessions.some((s) => {
-      const start = Date.parse(s.start);
-      return start >= from && start < to;
-    }),
-  );
+  return offers.filter((o) => o.sessions.some((s) => startsInWeek(s, now)));
+}
+
+function startsInWeek(session: Session, now: Date): boolean {
+  const start = Date.parse(session.start);
+  return start >= now.getTime() && start < now.getTime() + WEEK_MS;
 }
 
 export interface WeeklyInput<T extends Offer & { venue: ReachTarget }> {
@@ -76,7 +79,8 @@ function titleList(offers: readonly Offer[]): string {
 
 /**
  * Der zugeschnittene Text (E4), immer einer. Passt heißt: (keine Abos oder ein Abo passt) und (kein gültiges Alter
- * oder das Angebot passt zum Alter). Vor der Geburt zählt nur das Alter nicht, die Abos wirken weiter.
+ * oder der Beginn passt zum Alter, `startFitsAge`). Die Wochenzahl verlangt bei regelmäßigen Angeboten zusätzlich einen
+ * passenden Termin in den 7 Tagen (Plan 0043, E2). Vor der Geburt zählt nur das Alter nicht, die Abos wirken weiter.
  */
 export function weeklyText<T extends Offer & { venue: ReachTarget }>({
   fresh,
@@ -90,7 +94,10 @@ export function weeklyText<T extends Offer & { venue: ReachTarget }>({
   const byAge = birthDate !== undefined && months >= 0;
   const bySearch = searches.length > 0;
   const fits = (o: T) =>
-    (!bySearch || searches.some((s) => matchesFilter(o, s, reach))) && (!byAge || offerFitsAge(o, birthDate, now));
+    (!bySearch || searches.some((s) => matchesFilter(o, s, reach))) && (!byAge || startFitsAge(o, birthDate, now));
+  // `sessionFit` ist die eine Quelle der Prüfung je Termin (Kurse und Einzeltermine prüft es nicht, ADR 0007)
+  const sessionFits = byAge ? sessionFit(birthDate) : undefined;
+  const fitsInWeek = (o: T) => !sessionFits || o.sessions.some((s) => startsInWeek(s, now) && sessionFits(o, s));
   const hits = fresh.filter(fits);
   const n = hits.length;
   if (n > 0) {
@@ -101,7 +108,7 @@ export function weeklyText<T extends Offer & { venue: ReachTarget }>({
         : `${n === 1 ? "1 neues Angebot" : `${n} neue Angebote`} im Zwergenplan`;
     return { title, body: titleList(hits), hits: hits.map((o) => o.id) };
   }
-  const m = week.filter(fits).length;
+  const m = week.filter((o) => fits(o) && fitsInWeek(o)).length;
   const filtered = bySearch || byAge;
   const title = bySearch
     ? "Diese Woche nichts Neues für deine Suchen"

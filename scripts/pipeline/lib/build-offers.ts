@@ -4,7 +4,7 @@
  */
 import { validateDataset } from "../../../src/domain/dataset.ts";
 import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/schema.ts";
-import { berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
+import { addDays, berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import { fallbackCategory } from "../../../src/domain/topics.ts";
 import type { Source } from "./candidate.ts";
 import { expansionWindow, type ProviderCheck, type ProviderRaw, type RawBatch, type RawEvent } from "./raw.ts";
@@ -256,6 +256,38 @@ export function dropSameSourceDuplicates(
   return { kept: survivors.sort((a, b) => a.index - b.index).map(({ c }) => c), notes };
 }
 
+/** Mindestpause vor einem neuen Durchgang unter alter ID (Plan 0043, E1) */
+const NEW_RUN_GAP_DAYS = 14;
+
+/**
+ * Neuer Kursdurchgang unter alter ID (Plan 0043, E1): Beide sind Kurse, der erste Termin, den der Vorgänger nicht
+ * hatte, lag schon in dessen Horizont (hätte also im alten Stand stehen können) und beginnt mindestens 14 Berliner
+ * Kalendertage nach dessen letztem Termin. Das nächtliche Wachsen unbefristeter Angebote mit dem Horizont (Review 4,
+ * B1) und angehängte Nachholtermine zählen nicht, regelmäßige Angebote nie: Anbieter, die nur die nächsten Termine
+ * nennen, hängen sonst bei jedem neuen Monatstermin wieder „Neu“ an (Arch-Review M1).
+ */
+export function isNewRun(
+  previous: Pick<Offer, "format" | "sessions">,
+  next: Pick<Offer, "format" | "sessions">,
+  previousHorizonTo: string,
+): boolean {
+  if (previous.format !== "kurs" || next.format !== "kurs") return false;
+  const known = new Set(previous.sessions.map((s) => Date.parse(s.start)));
+  const firstNew = next.sessions.find((s) => !known.has(Date.parse(s.start)));
+  const last = previous.sessions.at(-1);
+  if (firstNew === undefined || last === undefined) return false;
+  const day = berlinDay(firstNew.start);
+  return day <= previousHorizonTo && day >= addDays(berlinDay(last.start), NEW_RUN_GAP_DAYS);
+}
+
+/** `listedAt` hängt an der ID (ADR 0022): vom Vorgänger übernommen, auch „fehlt“; neu oder neuer Durchgang: jetzt. */
+function withListedAt(offer: Offer, previous: Offer | undefined, input: BuildInput): Offer {
+  const horizonTo = input.previous?.horizon.to;
+  if (previous === undefined || (horizonTo !== undefined && isNewRun(previous, offer, horizonTo)))
+    return { ...offer, listedAt: input.generatedAt };
+  return previous.listedAt === undefined ? offer : { ...offer, listedAt: previous.listedAt };
+}
+
 /** Gleicher Ort (≤ 50 m), gleicher Beginn, ähnlicher Titel, aber verschiedene Anbieter – meist derselbe Kurs zweimal erfasst. */
 function crossProviderDuplicates(offers: readonly Offer[], providers: readonly Provider[]): string[] {
   const geo = new Map(
@@ -386,7 +418,8 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     providers: input.providers,
     horizon: input.horizon,
   });
-  const offers = assigned.offers;
+  const previousById = new Map(previous.map((o) => [o.id, o] as const));
+  const offers = assigned.offers.map((o) => withListedAt(o, previousById.get(o.id), input));
   notes.push(...assigned.notes);
   for (const c of deduped.kept) if (c.derivedCategory) countDerived(c.offer.providerId);
   // 6. braucht IDs, deshalb nach der Zuordnung

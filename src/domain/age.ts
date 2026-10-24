@@ -1,4 +1,4 @@
-import { referenceSession, type SessionFit, upcomingSessions } from "./agenda.ts";
+import { nextSession, referenceSession, type SessionFit, upcomingSessions } from "./agenda.ts";
 import type { AgeRange, Offer, Session } from "./schema.ts";
 import { berlinDate, daysInMonth, parseIsoDate } from "./time.ts";
 
@@ -54,6 +54,17 @@ export function offerFitsAge(offer: Offer, birthDate: string, now: Date): boolea
     return fittingSessions(offer, now, birthDate).length > 0;
   }
   return fitsAgeAt(offer.age, birthDate, first.start);
+}
+
+/**
+ * „Der Beginn passt“ für die Wochen-Nachricht (Plan 0043, E2): Kurs und Einzeltermin wie `offerFitsAge` (erster
+ * Termin), regelmäßig der nächste nicht beendete Termin – ohne Zeitgrenze, aber nicht erst ein späterer, zu dem man
+ * das Angebot gar nicht als Ganzes buchen würde. Die Liste bleibt bei `offerFitsAge` (Plan 0028).
+ */
+export function startFitsAge(offer: Offer, birthDate: string, now: Date): boolean {
+  if (offer.format !== "regelmaessig") return offerFitsAge(offer, birthDate, now);
+  const next = nextSession(offer, now);
+  return next !== undefined && fitsAgeAt(offer.age, birthDate, next.start);
 }
 
 /** Teilt nach `offerFitsAge`; die Reihenfolge bleibt erhalten. */

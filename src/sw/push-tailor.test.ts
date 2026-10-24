@@ -13,6 +13,8 @@ const id = (key: FixtureKey) => {
   return offer.id;
 };
 const allIds = offers.map((o) => o.id);
+/** `site.json` vor Plan 0043: kein Angebot trägt `listedAt` */
+const unlisted = offers.map(({ listedAt: _, ...o }) => o);
 const without = (...keys: FixtureKey[]) => allIds.filter((i) => !keys.map(id).includes(i));
 
 /** Wegzeit wie in filter.test.ts: Bibliothek 15,6 Min., Musikschule 29,6 Min. */
@@ -35,7 +37,14 @@ const STALE_TABLE = { version: 2, id: "alt" };
 
 function env(
   stored: Record<string, unknown>,
-  options: { tableFails?: boolean; cached?: unknown; siteFails?: boolean; hang?: boolean; setFails?: boolean } = {},
+  options: {
+    tableFails?: boolean;
+    cached?: unknown;
+    siteFails?: boolean;
+    hang?: boolean;
+    setFails?: boolean;
+    site?: readonly SiteOffer[];
+  } = {},
 ) {
   const writes: [string, unknown][] = [];
   const reachCalls: { table: unknown; origin: Origin }[] = [];
@@ -45,7 +54,7 @@ function env(
       if (options.hang) return new Promise(() => undefined);
       if (path === "data/site.json") {
         if (options.siteFails) throw new TypeError("offline");
-        return { offers };
+        return { offers: options.site ?? offers };
       }
       if (options.tableFails) throw new TypeError("offline");
       return FRESH_TABLE;
@@ -132,8 +141,29 @@ describe("tailorPush", () => {
     expect(nothing.reachCalls).toEqual([]);
   });
 
-  it("ohne gesehene IDs: kein Zuschnitt, aber die IDs werden geschrieben", async () => {
-    const { e, writes } = env({});
+  it("ohne gesehene IDs: zugeschnitten über listedAt (Plan 0043, E3), die IDs werden geschrieben", async () => {
+    const { e, writes } = env({ birthDate: "2025-08-05" });
+    expect(await run(e)).toEqual({
+      kind: "text",
+      text: {
+        title: "2 neue Angebote passen zu 14 Monaten",
+        body: "Krabbelreime & Fingerspiele und Musikgarten 1 (1–2 Jahre)",
+        hits: [id("krabbelreime"), id("musikgarten-1")],
+      },
+    });
+    expect(writes).toEqual([["seenIds", allIds]]);
+  });
+
+  it("gesehene IDs zählen nur ohne listedAt: Krabbeltreff (vorige Woche eingestellt) ist nicht neu", async () => {
+    const { e } = env({ seenIds: without("krabbeltreff", "babymassage-workshop") });
+    const result = await run(e);
+    expect(result.kind === "text" && result.text.hits.sort()).toEqual(
+      [id("krabbelreime"), id("musikgarten-1"), id("babymassage-workshop")].sort(),
+    );
+  });
+
+  it("ohne gesehene IDs und ohne jedes listedAt (Übergang): kein Zuschnitt, aber die IDs werden geschrieben", async () => {
+    const { e, writes } = env({}, { site: unlisted });
     expect(await run(e)).toEqual({ kind: "nichts" });
     expect(writes).toEqual([["seenIds", allIds]]);
   });
@@ -143,8 +173,11 @@ describe("tailorPush", () => {
     expect((await run(withIds.e, true)).kind).toBe("text");
     expect(withIds.writes).toEqual([]);
     const noIds = env({});
-    expect(await run(noIds.e, true)).toEqual({ kind: "nichts" });
+    expect((await run(noIds.e, true)).kind).toBe("text");
     expect(noIds.writes).toEqual([]);
+    const transition = env({}, { site: unlisted });
+    expect(await run(transition.e, true)).toEqual({ kind: "nichts" });
+    expect(transition.writes).toEqual([]);
   });
 
   it("scheitert das Schreiben, kommt der Text trotzdem", async () => {

@@ -153,7 +153,7 @@ async function cdpFor(page: Page, context: BrowserContext): Promise<{ cdp: CDPSe
   return { cdp, registrationId: ids[0] ?? "" };
 }
 
-function payload({ test: isTest = false }: { test?: boolean } = {}) {
+function payload({ test: isTest = false, sentAt = SENT_AT }: { test?: boolean; sentAt?: string } = {}) {
   const base = test.info().project.use.baseURL ?? "";
   return {
     web_push: 8030,
@@ -163,7 +163,7 @@ function payload({ test: isTest = false }: { test?: boolean } = {}) {
       navigate: new URL("./", base).href,
       tag: "wochen-nachricht",
       lang: "de",
-      data: isTest ? { sentAt: SENT_AT, test: true } : { sentAt: SENT_AT },
+      data: isTest ? { sentAt, test: true } : { sentAt },
     },
     mutable: true,
   };
@@ -177,7 +177,7 @@ async function deliver(
   page: Page,
   context: BrowserContext,
   session: { cdp: CDPSession; registrationId: string },
-  options: { test?: boolean } = {},
+  options: { test?: boolean; sentAt?: string } = {},
 ) {
   const requests: string[] = [];
   const onRequest = (req: { url: () => string; serviceWorker: () => unknown }) => {
@@ -430,11 +430,12 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
     requests: SAME_REQUESTS,
   });
 
-  // danach kennt das Gerät alles: nichts Neues
+  // danach kennt das Gerät alles, und 8 Tage später sind beide nur noch „vorige Woche“ eingestellt: nichts Neues
+  // (Plan 0043, E3: mit `listedAt` entscheidet die Woche, nicht die gesehenen IDs)
   await expect
     .poll(async () => ((await readStore(page))["seenIds"] as string[] | undefined)?.length)
     .toBe(ids.all.length);
-  const second = await deliver(page, context, session);
+  const second = await deliver(page, context, session, { sentAt: "2026-10-13T12:00:00+02:00" });
   expect(second.title).toBe("Diese Woche nichts Neues");
   expect(second.body).toMatch(/^\d+ Angebote? in den nächsten 7 Tagen\.$/);
 
@@ -464,6 +465,14 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   const withPoint = await deliver(page, context, session);
   expect(withPoint.title).toBe("1 neues Angebot für deine Suchen");
   expect(withPoint.requests).toEqual(SAME_REQUESTS);
+
+  // ohne gesehene IDs (erste Nachricht nach dem Einschalten): zugeschnitten über `listedAt` (Plan 0043, E3)
+  await writeStore(page, { birthDate: "2025-08-05" });
+  const firstEver = await deliver(page, context, session);
+  expect(firstEver.title).toBe("2 neue Angebote passen zu 14 Monaten");
+  await expect
+    .poll(async () => ((await readStore(page))["seenIds"] as string[] | undefined)?.length)
+    .toBe(ids.all.length);
 });
 
 for (const colorScheme of ["light", "dark"] as const) {

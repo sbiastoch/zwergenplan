@@ -241,6 +241,11 @@ export const OfferFields = z.strictObject({
   }),
   url: z.url(),
   sourceUrl: z.url(),
+  /**
+   * Zuerst im Zwergenplan: gesetzt und gehalten vom Build in `pipeline nightly` (wie `id`, ADR 0022; Plan 0043, E1);
+   * fehlt bei Angeboten, die vor Plan 0043 schon da waren
+   */
+  listedAt: Instant.optional(),
 });
 
 export const Offer = OfferFields.refine((o) => categoriesOf(o.topics).length > 0, {
