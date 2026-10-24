@@ -555,7 +555,8 @@ export function entryFromAssessment(
     programme: programme.map((g) => ({
       url: g.url,
       kind: g.kind,
-      ...(g.render ? { render: g.render } : {}),
+      // render nur bei HTML: ein PDF liest pdftotext, das Schema lehnt die Kombination ab (Plan 0042, E6)
+      ...(g.render && g.kind === "html" ? { render: g.render } : {}),
       use: g.use,
       // Der Extraktor sieht nur den Katalogauszug: ohne Hint landeten Termine an weggelassenen Orten am ersten Ort
       // (prompt/extract.md, „Hauptort“); wie musikfuechse (Arch-Review S4c, M1)

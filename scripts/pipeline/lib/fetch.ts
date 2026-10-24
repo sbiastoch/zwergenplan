@@ -15,7 +15,8 @@ export const MAX_INPUT_CHARS = 350_000;
 const ARTS = ["html", "browser", "ical", "json-api", "pdf", "adapter", "eingabe"] as const;
 type Art = (typeof ARTS)[number];
 
-export const artOf = (task: PageTask): Art => (task.render === "browser" ? "browser" : task.kind);
+export const artOf = (task: PageTask): Art =>
+  task.render === "browser" && task.kind !== "pdf" ? "browser" : task.kind;
 
 /**
  * Bot-Schutz statt Inhalt: Die Seite ist nicht abrufbar, auch wenn HTTP 200 kam. Ohne diese Erkennung landete die

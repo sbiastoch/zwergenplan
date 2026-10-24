@@ -8,7 +8,7 @@ Der Vertrag ist `Provider` in `src/domain/schema.ts`, exportiert als `schema/pro
 - `aggregator` ist ein Sammelkalender fremder Veranstalter mit `adapter` (Pflicht); der Nachtlauf und das Entdecken fragen ihn über den Adapter ab. Ein Sammelkalender ohne Adapter ist ein `verzeichnis`.
 - `verzeichnis` ist eine Liste zur Katalogpflege und liefert keine Termine.
 - Der Katalog beschreibt Quellen, nicht Inhalte (ADR 0024). Alle Rollen haben `region`, `name`, `url`, `programme`, `availability`, `verified` und `notes`. Nur `anbieter` hat `age`, `venues` und `coveredBy`, nur `aggregator` hat `adapter`. Themen, Format, Kosten und Anmeldung stehen nur an den Angeboten.
-- `region` ist die Region der Quelle (heute nur `nuernberg`, `src/domain/regions.ts`); jeder Ort muss in ihrer bbox liegen (ADR 0025).
+- `region` ist die Region der Quelle (`nuernberg`, `fuerth`, `duesseldorf`; `src/domain/regions.ts`); jeder Ort muss in ihrer bbox liegen (ADR 0025).
 
 ## IDs (ADR 0022)
 
@@ -25,7 +25,7 @@ Der Nachtlauf (Plan 0032) liest nur Felder, keine Notizen. Je Seite:
 |---|---|
 | `url` | darf `{von}`/`{bis}` enthalten (Monatsanfang bis +13 Monate); `pipeline fetch-page` setzt sie ein. Keine Platzhalter in URLs von Sammelkalendern mit `adapter` |
 | `kind` | Format: `html`, `pdf`, `ical`, `json-api` |
-| `render: browser` | Seite braucht JavaScript (früher `kind: js`); Eversports-Widgets mit 403 per Skript gehören hierher |
+| `render: browser` | Seite braucht JavaScript (früher `kind: js`); Eversports-Widgets mit 403 per Skript gehören hierher. Nie bei `kind: pdf`: ein PDF liest `pdftotext` (Plan 0042, E6) |
 | `use` | `termine` (Abruf und Prompt), `verfuegbarkeit` (nur Plätze), `info` (Linkhub, Erklärseite, Spiegelseite; nicht abgerufen) |
 | `request` | POST mit JSON-Body (Kursorganizer-GraphQL); vor dem Eintragen einmal per `curl` prüfen |
 | `blocked` | `{ reason, since }`, nur mit Abrufbeleg auch im Browser (Login, Bot-Schutz) |

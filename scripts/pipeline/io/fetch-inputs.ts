@@ -75,11 +75,12 @@ async function fetchTask(
   task: PageTask,
   browser: ReturnType<typeof browserSession>,
 ): Promise<{ text: string; finalUrl: string }> {
+  // ein PDF geht an pdftotext, auch mit render (Chromium bräche mit „Download is starting“ ab; Plan 0042, E6)
+  if (task.kind === "pdf") return fetchPdf(task.url);
   if (task.render === "browser") {
     const page = await browser.render(task.url);
     return { text: checked(page.status, programmeText("html", page.body, page.finalUrl)), finalUrl: page.finalUrl };
   }
-  if (task.kind === "pdf") return fetchPdf(task.url);
   const headers =
     task.kind === "json-api"
       ? {

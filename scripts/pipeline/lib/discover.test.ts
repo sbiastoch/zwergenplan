@@ -114,6 +114,23 @@ describe("prefilter (E7.3)", () => {
     expect(r.dropped.map((d) => d.grund)).toEqual(["abgelehnt: Vermittler", "abgelehnt: Werbung"]);
   });
 
+  it("die echte data/discover/duesseldorf.json sperrt Portale und duesseldorf.de, nicht fremde Hosts (Plan 0042, E6)", () => {
+    const state = DiscoverState.parse(
+      JSON.parse(readFileSync(new URL("../../../data/discover/duesseldorf.json", import.meta.url), "utf8")),
+    );
+    const urls = [
+      "https://www.guterstart.nrw.de/fhiangebot/exportpdf/id/1",
+      "https://www.duesseldorf.de/stadtbuechereien/",
+      "https://familien-navigator.duesseldorf.de/",
+      "https://duesseldorf.kita-navigator.org/",
+    ];
+    const r = prefilter(
+      urls.map((url, i) => find({ url, name: `Fund ${i}` })),
+      { catalog, state, today },
+    );
+    expect(r.keep.map((f) => f.url)).toEqual(["https://duesseldorf.kita-navigator.org/"]);
+  });
+
   it("abgelehnt aus einer anderen Region gilt auch hier; die Regionen überlappen (Plan 0036, E4)", () => {
     const fremd = DiscoverState.parse({
       region: "nuernberg",
@@ -480,6 +497,25 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
     };
     const r = entryFromAssessment(two, { ...ctx, geos: [...ctx.geos, { lat: 49.45, lon: 11.05 }] });
     expect(r.ok && r.entry.venues.map((v) => v.id)).toEqual(["krabbelzwerge-gostenhof", "krabbelzwerge-gostenhof-2"]);
+  });
+
+  it("PDF mit render: browser wird ein Eintrag ohne render (Plan 0042, E6)", () => {
+    const pdf = {
+      ...assessed,
+      programme: [
+        {
+          url: "https://krabbelzwerge.example.net/kurse",
+          kind: "pdf" as const,
+          render: "browser" as const,
+          use: "termine" as const,
+        },
+      ],
+    };
+    const r = entryFromAssessment(pdf, ctx);
+    if (!r.ok) throw new Error(r.grund);
+    expect(r.entry.programme).toEqual([
+      { url: "https://krabbelzwerge.example.net/kurse", kind: "pdf", use: "termine" },
+    ]);
   });
 
   it("ohne erlaubte Terminseite: verworfen", () => {

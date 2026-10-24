@@ -76,30 +76,36 @@ const isJsonWithPlaceholders = (body: string) => {
 /**
  * Eine Stelle, an der Termine (oder Plätze) stehen, so beschrieben, dass ein Crawler sie abrufen kann (Plan 0031, E3).
  */
-const Programme = z.strictObject({
-  url: z.url().refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE),
-  /** Format der Antwort */
-  kind: z.enum(["html", "pdf", "ical", "json-api"]),
-  /** Seite braucht JavaScript; der Crawler rendert sie im Browser */
-  render: z.literal("browser").optional(),
-  /** Wozu die Seite dient: nur `termine` und `verfuegbarkeit` gehen in Abruf und Prompt */
-  use: z.enum(["termine", "verfuegbarkeit", "info"]),
-  request: z
-    .strictObject({
-      method: z.literal("POST"),
-      headers: z.record(z.string(), z.string()).optional(),
-      body: z
-        .string()
-        .min(1)
-        .refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE)
-        .refine(isJsonWithPlaceholders, "body muss JSON sein (mit {von}/{bis} als Datum)"),
-    })
-    .optional(),
-  /** mit Abrufbeleg gesperrt (Login, Bot-Schutz auch im Browser): Der Anbieter ist bewusst ohne diese Quelle */
-  blocked: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
-  /** kurzer Extraktionshinweis für das Modell, ohne Datum (das veraltet) */
-  hint: Hint.optional(),
-});
+const Programme = z
+  .strictObject({
+    url: z.url().refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE),
+    /** Format der Antwort */
+    kind: z.enum(["html", "pdf", "ical", "json-api"]),
+    /** Seite braucht JavaScript; der Crawler rendert sie im Browser */
+    render: z.literal("browser").optional(),
+    /** Wozu die Seite dient: nur `termine` und `verfuegbarkeit` gehen in Abruf und Prompt */
+    use: z.enum(["termine", "verfuegbarkeit", "info"]),
+    request: z
+      .strictObject({
+        method: z.literal("POST"),
+        headers: z.record(z.string(), z.string()).optional(),
+        body: z
+          .string()
+          .min(1)
+          .refine(onlyKnownPlaceholders, PLACEHOLDER_MESSAGE)
+          .refine(isJsonWithPlaceholders, "body muss JSON sein (mit {von}/{bis} als Datum)"),
+      })
+      .optional(),
+    /** mit Abrufbeleg gesperrt (Login, Bot-Schutz auch im Browser): Der Anbieter ist bewusst ohne diese Quelle */
+    blocked: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
+    /** kurzer Extraktionshinweis für das Modell, ohne Datum (das veraltet) */
+    hint: Hint.optional(),
+  })
+  .superRefine((g, ctx) => {
+    // ein PDF liest pdftotext; im Browser endete der Abruf mit „Download is starting“ (Plan 0042, E6)
+    if (g.render !== undefined && g.kind === "pdf")
+      ctx.addIssue({ code: "custom", message: "render nicht bei kind: pdf", path: ["render"] });
+  });
 
 /** Eine Notiz je Eintrag; „ | “ klebte früher mehrere zusammen (Plan 0030). */
 const Note = z

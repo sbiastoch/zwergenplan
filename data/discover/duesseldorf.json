@@ -1,0 +1,36 @@
+{
+ "region": "duesseldorf",
+ "abgelehnt": [
+  {
+   "host": "fruehehilfen-online.nrw.de",
+   "name": "Familien-Navigator / Frühe Hilfen NRW",
+   "grund": "Sammelportal, Einträge sind Einzel-PDFs; Träger stehen im Katalog (Plan 0042, E6)",
+   "datum": "2026-10-24"
+  },
+  {
+   "host": "guterstart.nrw.de",
+   "name": "Guter Start NRW",
+   "grund": "Sammelportal, Einträge sind Einzel-PDFs; Träger stehen im Katalog (Plan 0042, E6)",
+   "datum": "2026-10-24"
+  },
+  {
+   "host": "guter-start.nrw.de",
+   "name": "Guter Start NRW",
+   "grund": "Sammelportal, Einträge sind Einzel-PDFs; Träger stehen im Katalog (Plan 0042, E6)",
+   "datum": "2026-10-24"
+  },
+  {
+   "host": "kindaling.de",
+   "name": "kindaling",
+   "grund": "Sammelportal, Inhalt nur per JavaScript; Träger stehen im Katalog (Plan 0042, E6)",
+   "datum": "2026-10-24"
+  },
+  {
+   "host": "duesseldorf.de",
+   "name": "Stadt Düsseldorf",
+   "grund": "robots.txt sperrt fremde Crawler, Plan 0042, E7",
+   "datum": "2026-10-24"
+  }
+ ],
+ "zurueckgestellt": []
+}

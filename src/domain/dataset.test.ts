@@ -278,6 +278,12 @@ describe("validateDataset", () => {
       "Terminseite",
     ],
     ["Sammelkalender ohne adapter", (p: Cat) => delete (p.at(-1) as Record<string, unknown>)["adapter"], "adapter"],
+    // Plan 0042, E6: ein PDF geht an pdftotext, nicht an den Browser
+    [
+      "render bei kind: pdf",
+      (p: Cat) => Object.assign(prog(p, 0), { kind: "pdf", render: "browser" }),
+      "render nicht bei kind: pdf",
+    ],
     [
       "Platzhalter beim Sammelkalender mit adapter",
       (p: Cat) => Object.assign(prog(p, p.length - 1), { url: "https://example.org/sammelkalender?von={von}" }),
