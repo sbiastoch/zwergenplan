@@ -3,26 +3,26 @@
   {
    "providerId": "cvjm-nuernberg-wuselwelt",
    "venueId": "cvjm-nuernberg-wuselwelt",
-   "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 mit Eltern",
-   "summary": "Freispiel in der Turnhalle des CVJM mit vorbereiteter Spielumgebung, Eltern oder Bezugsperson sind dabei. Ohne Anmeldung und kostenlos; Hallenschuhe oder ABS-Socken mitbringen. In den Ferien findet kein Treff statt.",
+   "title": "Wuselwelt – Bewegungs- und Spielzeit für Kinder 0–3 mit Eltern",
+   "summary": "Offenes Freispiel in der Turnhalle für Kinder von 0 bis 3 Jahren mit Eltern oder Bezugsperson, freitags 9:30–10:15 Uhr, außer in den Ferien. Einfach vorbeikommen, kostenlos; Hallenschuhe oder ABS-Socken mitbringen.",
    "topics": [
-    "bewegung",
-    "spielplatz-indoor"
+    "krabbelgruppe",
+    "eltern-kind-turnen"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "keine",
+   "price": "keine Kosten",
    "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
    "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-   "category": "bewegung",
+   "category": "krabbel-spielgruppen",
    "age": {
     "minMonths": 0,
     "maxMonths": 36
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offenes Angebot, keine Anmeldung nötig"
+    "note": "Keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -31,12 +31,12 @@
     ],
     "start": "09:30",
     "end": "10:15",
-    "from": "2026-10-23",
+    "from": "2026-10-30",
     "skipHolidays": true
    }
   }
  ],
- "inputHash": "0369675fbc12a26255a69d8973c8909ddab76c6ee678eb1958ad1fc007c95b69",
+ "inputHash": "cca63cdff55a8c13cb77130cb26dd760d0091630dbfcb82c9700d0bb6116d4e2",
  "dated": {
   "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
   "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
@@ -44,8 +44,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-23T08:24:44+02:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
+ "checkedAt": "2026-10-24T08:20:24+02:00",
+ "changedAt": "2026-10-24T08:20:24+02:00",
  "sources": [
   "frankenkids"
  ]

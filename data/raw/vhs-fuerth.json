@@ -1,78 +1,9 @@
 {
- "events": [
-  {
-   "providerId": "vhs-fuerth",
-   "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 1½–2½ Jahre (mittwochs)",
-   "summary": "Wöchentlicher Turnparcours zum freien Ausprobieren mit Eltern. Die Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs lief ab 23.09.2026 und geht im Horizont weiter; ein späterer Einstieg ist nicht angegeben.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "82,50 €",
-   "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
-   "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 18,
-    "maxMonths": 30
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Kursdetails (Kursnummer 16301)"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "17:00",
-    "from": "2026-10-28",
-    "skipHolidays": false
-   }
-  },
-  {
-   "providerId": "vhs-fuerth",
-   "venueId": "vhs-fuerth",
-   "title": "Eltern-Kind-Turnen 2–3 Jahre (donnerstags)",
-   "summary": "Wöchentlicher Turnparcours zum freien Ausprobieren mit Eltern. Die Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs lief ab 24.09.2026 und geht im Horizont weiter; ein späterer Einstieg ist nicht angegeben.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "82,50 €",
-   "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
-   "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung über die Kursdetails (Kursnummer 16303)"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "17:00",
-    "from": "2026-10-29",
-    "skipHolidays": false
-   }
-  }
- ],
- "inputHash": "8b27646c542a29fa4e7c2a428e0864a206cf2af573590cda60cccf39a132deb1",
+ "events": [],
+ "inputHash": "0dfb8705ba364b3319e4988ebd0eb1761053d7a61e22cf7f1bb6a416487135f4",
  "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-23T08:24:44+02:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
+ "status": "keine-termine",
+ "checkedAt": "2026-10-24T08:20:24+02:00",
+ "changedAt": "2026-10-24T08:20:24+02:00",
  "sources": []
 }

@@ -3,8 +3,8 @@
   {
    "providerId": "geburtshaus-nuernberger-nest",
    "venueId": "geburtshaus-nuernberger-nest",
-   "title": "Rückbildung mit/ohne Baby, freitags 12 Uhr (Start 25.09.)",
-   "summary": "Sanfte Rückbildung für Frauen, die vor mindestens 8 Wochen geboren haben, mit oder ohne Baby. Kräftigung, Lockerung und Wissen für den Alltag. Anmeldung über die Kursleitung.",
+   "title": "Rückbildung mit Katrina, freitags 12–13:30 (Start Sept.)",
+   "summary": "Rückbildungskurs für Frauen, die mindestens 8 Wochen geboren haben. Babys dürfen mit, müssen aber nicht. Anmeldung über Hebamio.",
    "topics": [
     "rueckbildung"
    ],
@@ -51,8 +51,8 @@
   {
    "providerId": "geburtshaus-nuernberger-nest",
    "venueId": "geburtshaus-nuernberger-nest",
-   "title": "Rückbildung mit/ohne Baby, Mo/Di/Do/Fr 12 Uhr (Start 09.11.)",
-   "summary": "Rückbildungskurs für Frauen ab 8 Wochen nach der Geburt, Baby kann mitgebracht werden. Die Termine liegen an verschiedenen Wochentagen. Anmeldung über die Kursleitung.",
+   "title": "Rückbildung mit Katrina, Nov.-Gruppe (wechselnde Wochentage)",
+   "summary": "Rückbildungskurs für Frauen ab 8 Wochen nach der Geburt, mit oder ohne Baby. Die Termine liegen an verschiedenen Wochentagen. Anmeldung über Hebamio.",
    "topics": [
     "rueckbildung"
    ],
@@ -99,8 +99,8 @@
   {
    "providerId": "geburtshaus-nuernberger-nest",
    "venueId": "geburtshaus-nuernberger-nest",
-   "title": "Rückbildung mit/ohne Baby, donnerstags 17:20 (Start 24.09.)",
-   "summary": "Rückbildungskurs für Frauen ab 8 Wochen nach der Geburt, mit oder ohne Baby. Kräftigung, Lockerung und Wissen für den Alltag. Anmeldung über die Kursleitung.",
+   "title": "Rückbildung mit Katrina, donnerstags 17:20 (Start Sept.)",
+   "summary": "Rückbildungskurs für Frauen ab 8 Wochen nach der Geburt, mit oder ohne Baby. Die Gruppe trifft sich donnerstags am späten Nachmittag. Anmeldung über Hebamio.",
    "topics": [
     "rueckbildung"
    ],
@@ -147,8 +147,8 @@
   {
    "providerId": "geburtshaus-nuernberger-nest",
    "venueId": "geburtshaus-nuernberger-nest",
-   "title": "Rückbildung mit/ohne Baby, Mi/Do 17:20 (Start 02.12.)",
-   "summary": "Rückbildungskurs für Frauen ab 8 Wochen nach der Geburt, mit oder ohne Baby. Die Termine liegen mittwochs und donnerstags. Anmeldung über die Kursleitung.",
+   "title": "Rückbildung mit Katrina, Dez.-Gruppe (wechselnde Wochentage)",
+   "summary": "Rückbildungskurs für Frauen ab 8 Wochen nach der Geburt, mit oder ohne Baby. Die Termine liegen an verschiedenen Wochentagen. Anmeldung über Hebamio.",
    "topics": [
     "rueckbildung"
    ],
@@ -195,8 +195,8 @@
   {
    "providerId": "geburtshaus-nuernberger-nest",
    "venueId": "geburtshaus-nuernberger-nest",
-   "title": "Stilltreff Milch-Café mit Stillberaterin Sonja Knittel",
-   "summary": "Offener Austausch rund ums Stillen und Leben mit Baby in gemütlicher Runde, meist am zweiten Mittwoch im Monat. Anmeldung erforderlich, 8 € pro Treffen vor Ort.",
+   "title": "Stilltreff Milch-Café (Mamas mit Babys)",
+   "summary": "Offener Austausch rund ums Stillen und das Leben mit Baby, mit Stillberaterin Sonja Knittel. Die Themen richten sich nach den Fragen der Teilnehmerinnen. Anmeldung per Mail erforderlich.",
    "topics": [
     "stillcafe",
     "elterntreff"
@@ -204,13 +204,13 @@
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "8 € pro Treffen",
-   "url": "https://kinder-hautnah.de/termine-aktuelles/",
+   "price": "8 € pro Treffen, vor Ort zu zahlen",
+   "url": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
    "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
    "category": "treffs-cafes",
    "availability": {
     "status": "unbekannt",
-    "note": "Anmeldung unter knittel@kinder-hautnah.de oder über kinder-hautnah.de"
+    "note": "Anmeldung per Mail an knittel@kinder-hautnah.de"
    },
    "schedule": {
     "kind": "dates",
@@ -229,12 +229,168 @@
      }
     ]
    }
+  },
+  {
+   "providerId": "geburtshaus-nuernberger-nest",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "title": "Rückbildung mit/ohne Baby (Mittagskurs, Sept.–Nov. 2026)",
+   "summary": "Kräftigung von Beckenboden, Bauch und Körper für Frauen ab 8 Wochen nach der Geburt, mit oder ohne Baby. Die Stunden bauen aufeinander auf, regelmäßige Teilnahme ist wichtig. Derzeit Warteliste.",
+   "topics": [
+    "rueckbildung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "price": "Kosten werden von Krankenkassen bezahlt",
+   "url": "https://bauersachs.hebamio.de/kursliste",
+   "sourceUrl": "https://bauersachs.hebamio.de/kursliste",
+   "category": "bewegung",
+   "availability": {
+    "status": "warteliste",
+    "note": "Auf Warteliste setzen über Hebamio"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-09-25T12:00",
+      "end": "2026-09-25T13:40"
+     },
+     {
+      "start": "2026-10-02T12:00",
+      "end": "2026-10-02T13:40"
+     },
+     {
+      "start": "2026-10-16T12:00",
+      "end": "2026-10-16T13:40"
+     },
+     {
+      "start": "2026-10-23T12:00",
+      "end": "2026-10-23T13:40"
+     },
+     {
+      "start": "2026-10-30T12:00",
+      "end": "2026-10-30T13:40"
+     },
+     {
+      "start": "2026-11-13T12:00",
+      "end": "2026-11-13T13:40"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "geburtshaus-nuernberger-nest",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "title": "Rückbildung mit/ohne Baby, Mittagskurs (Jan.–Feb. 2027)",
+   "summary": "Rückbildungskurs für Wöchnerinnen zur Kräftigung von Beckenboden, Bauch und Rumpf, Baby kann frei gewählt mitkommen. Sieben Termine mittags; der letzte Termin am 26.2. ist ein Ersatztermin, bitte freihalten.",
+   "topics": [
+    "rueckbildung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "price": "wird von Krankenkassen bezahlt",
+   "url": "https://bauersachs.hebamio.de/kursliste",
+   "sourceUrl": "https://bauersachs.hebamio.de/kursliste",
+   "category": "bewegung",
+   "availability": {
+    "status": "frei",
+    "note": "Plätze vorhanden"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-01-15T12:00",
+      "end": "2027-01-15T13:00"
+     },
+     {
+      "start": "2027-01-22T12:00",
+      "end": "2027-01-22T13:40"
+     },
+     {
+      "start": "2027-01-29T12:00",
+      "end": "2027-01-29T13:40"
+     },
+     {
+      "start": "2027-02-05T12:00",
+      "end": "2027-02-05T13:40"
+     },
+     {
+      "start": "2027-02-12T12:00",
+      "end": "2027-02-12T13:40"
+     },
+     {
+      "start": "2027-02-19T12:00",
+      "end": "2027-02-19T13:40"
+     },
+     {
+      "start": "2027-02-26T12:00",
+      "end": "2027-02-26T13:40"
+     }
+    ]
+   }
+  },
+  {
+   "providerId": "geburtshaus-nuernberger-nest",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "title": "Postpartum Recovery (Rückbildung auf Englisch, Feb.–Apr. 2027)",
+   "summary": "Rückbildungskurs auf Englisch für Frauen, die vor mindestens 8 Wochen geboren haben; mit oder ohne Baby. Standort Karolinenstraße 1A, 3. Stock, Aufzug vorhanden. Die Termine am 5.4. und 12.4. sind der letzte bzw. ein Puffertermin.",
+   "topics": [
+    "rueckbildung",
+    "mehrsprachig"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "price": "von gesetzlicher Krankenkasse übernommen, wenn vor 9 Monaten nach der Geburt abgeschlossen; Privatversicherte werden direkt abgerechnet",
+   "url": "https://bauersachs.hebamio.de/kursliste",
+   "sourceUrl": "https://bauersachs.hebamio.de/kursliste",
+   "category": "bewegung",
+   "availability": {
+    "status": "frei",
+    "note": "Plätze vorhanden"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2027-02-22T12:00",
+      "end": "2027-02-22T13:40"
+     },
+     {
+      "start": "2027-03-01T12:00",
+      "end": "2027-03-01T13:40"
+     },
+     {
+      "start": "2027-03-08T12:00",
+      "end": "2027-03-08T13:40"
+     },
+     {
+      "start": "2027-03-15T12:00",
+      "end": "2027-03-15T13:40"
+     },
+     {
+      "start": "2027-03-22T12:00",
+      "end": "2027-03-22T13:40"
+     },
+     {
+      "start": "2027-04-05T12:00",
+      "end": "2027-04-05T13:40"
+     },
+     {
+      "start": "2027-04-12T12:00",
+      "end": "2027-04-12T13:40"
+     }
+    ]
+   }
   }
  ],
- "inputHash": "618e849a493e95f12220ebf5f725fd1c91bd9543dc00199f04b464b64649f9cb",
+ "inputHash": "6fc767ed1cf48b643deeeeb9bbe3983b5e46fd75f5a363537938977a614947c5",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-23T08:24:44+02:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
+ "checkedAt": "2026-10-24T08:20:24+02:00",
+ "changedAt": "2026-10-24T08:20:24+02:00",
  "sources": []
 }

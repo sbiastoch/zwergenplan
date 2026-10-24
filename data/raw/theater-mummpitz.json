@@ -3,23 +3,21 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Jazz für Kinder (o. A.)",
-   "summary": "Kasperl, Seppl und Gretel erleben im Jazz-Puppentheater mit Live-Musik neue Geschichten rund um König Semmelwurst. Alle Termine sind bereits ausverkauft. Kinder unter 3 Jahren haben freien Eintritt.",
+   "title": "Jazz für Kinder (Sonntagsvorstellung 11 Uhr)",
+   "summary": "Monatliche Jazz-Vorstellung mit Kasperl, Seppl und Gretel und Live-Band, rund 50 Minuten. Kinder unter 3 Jahren haben freien Eintritt; Frühstück gibt es vorab im Café Mahlzahn.",
    "topics": [
-    "konzert",
-    "musik",
-    "theater"
+    "konzert"
    ],
-   "format": "einmalig",
+   "format": "regelmaessig",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "6 € (ohne VGN)",
+   "price": "6 € (ohne VGN); Kinder unter 3 Jahren frei",
    "url": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
    "sourceUrl": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine ausverkauft; Tickets über Reservix"
+    "note": "Alle angezeigten Termine ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -51,11 +49,10 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Klassik für Kinder (o. A.)",
-   "summary": "Studierende der Hochschule für Musik Nürnberg stellen moderiert Instrumente und Lieblingstücke vor; jeder Termin hat ein eigenes Programm. Alle Termine sind bereits ausverkauft. Die Konzerte sind für Kinder jeden Alters gedacht, begleitende Erwachsene sind willkommen.",
+   "title": "Klassik für Kinder – moderierte Konzerte (Sonntag 11 Uhr)",
+   "summary": "Studierende der Hochschule für Musik Nürnberg stellen in moderierten Konzerten ihre Instrumente vor, rund 50 Minuten. Die Konzerte richten sich an Kinder jeden Alters und ihre Begleitung.",
    "topics": [
-    "konzert",
-    "musik"
+    "konzert"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -66,44 +63,37 @@
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine ausverkauft; Tickets über Reservix"
+    "note": "Alle angezeigten Termine ausverkauft"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
      {
-      "start": "2026-10-25T11:00",
-      "end": "2026-10-25T11:50"
+      "start": "2026-10-25T11:00"
      },
      {
-      "start": "2026-11-29T11:00",
-      "end": "2026-11-29T11:50"
+      "start": "2026-11-29T11:00"
      },
      {
-      "start": "2026-12-20T11:00",
-      "end": "2026-12-20T11:50"
+      "start": "2026-12-20T11:00"
      },
      {
-      "start": "2027-01-24T11:00",
-      "end": "2027-01-24T11:50"
+      "start": "2027-01-24T11:00"
      },
      {
-      "start": "2027-02-21T11:00",
-      "end": "2027-02-21T11:50"
+      "start": "2027-02-21T11:00"
      },
      {
-      "start": "2027-03-14T11:00",
-      "end": "2027-03-14T11:50"
+      "start": "2027-03-14T11:00"
      },
      {
-      "start": "2027-04-25T11:00",
-      "end": "2027-04-25T11:50"
+      "start": "2027-04-25T11:00"
      }
     ]
    }
   }
  ],
- "inputHash": "0fe2dc0319103d55ccd386dda817cc503fc0477557fd080ab5b56cfd5a3a30d1",
+ "inputHash": "68a3956b1d2a9872048e99a3d96bf3ebe705d4076d7dfd6796f257fc10272741",
  "dated": {
   "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
   "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
@@ -119,8 +109,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-23T08:24:44+02:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
+ "checkedAt": "2026-10-24T08:20:24+02:00",
+ "changedAt": "2026-10-24T08:20:24+02:00",
  "sources": [
   "frankenkids",
   "stadt-vk"

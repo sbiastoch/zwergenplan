@@ -3,20 +3,19 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer, Dienstag (0–3 Jahre)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre zum Spielen und Austauschen, ohne festes Programm. Dienstags 9–12 Uhr, nicht in den Ferien, ohne Anmeldung und kostenfrei.",
+   "title": "Offenes Kinderzimmer (0–3 Jahre) – Dienstag",
+   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahren, ohne Programm zum Spielen, Austauschen und Kennenlernen. Keine Anmeldung nötig; in den Ferien geschlossen.",
    "topics": [
     "elterntreff",
-    "spielgruppe",
-    "eltern-kind-gruppe"
+    "spielgruppe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "Kostenfrei",
+   "price": "kostenfrei",
    "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "category": "krabbel-spielgruppen",
+   "category": "treffs-cafes",
    "age": {
     "minMonths": 0,
     "maxMonths": 36
@@ -39,20 +38,19 @@
   {
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer, Donnerstag (0–3 Jahre)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre zum Spielen und Austauschen, ohne festes Programm. Donnerstags 14–17 Uhr, nicht in den Ferien, ohne Anmeldung und kostenfrei.",
+   "title": "Offenes Kinderzimmer (0–3 Jahre) – Donnerstag",
+   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahren, ohne Programm zum Spielen, Austauschen und Kennenlernen. Keine Anmeldung nötig; in den Ferien geschlossen.",
    "topics": [
     "elterntreff",
-    "spielgruppe",
-    "eltern-kind-gruppe"
+    "spielgruppe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "Kostenfrei",
+   "price": "kostenfrei",
    "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "category": "krabbel-spielgruppen",
+   "category": "treffs-cafes",
    "age": {
     "minMonths": 0,
     "maxMonths": 36
@@ -73,10 +71,10 @@
    }
   }
  ],
- "inputHash": "a0b3f3487a562f25ac52bdb6688b751de80e773c5cddf28a755b78d7bb98b85f",
+ "inputHash": "3e0b2604a17614bdc4948b367551e332b57bfbc0a2366ffc74ce4a60afc7757c",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-23T08:24:44+02:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
+ "checkedAt": "2026-10-24T08:20:24+02:00",
+ "changedAt": "2026-10-24T08:20:24+02:00",
  "sources": []
 }
