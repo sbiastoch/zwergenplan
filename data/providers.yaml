@@ -3375,3 +3375,2172 @@
       address: Amalienstraße 19, 90763 Fürth
       district: Süd
       geo: { lat: 49.4685917, lon: 10.9870057 }
+- id: kaiserswerther-familienakademie
+  publicId: lz5h55jn
+  role: anbieter
+  region: duesseldorf
+  name: Kaiserswerther Familienakademie (Kaiserswerther Diakonie)
+  url: https://www.kaiserswerther-diakonie.de/programm-familienakademie/
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.kaiserswerther-diakonie.de/programm-familienakademie/kurse/das-baby-ist-da/kategorie/Das+Baby+ist+da/10
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 6
+      hint: Nur Kurse mit Kind bis 3 Jahre; Rückbildung ohne Baby, Beckenboden, Erste Hilfe, Babysitter und Erwachsenentanz weglassen
+  availability:
+    shown: ja
+    how: Ampel je Kurs in der Liste; "Anmeldung auf Warteliste" heißt ausgebucht, "fast ausgebucht" wenige Plätze
+    system: Kufer (KuferWeb)
+  verified: 2026-10-24
+  notes:
+    - Kategorie 10 "Das Baby ist da!" enthält die Teilkategorien Eltern-Kind-Angebote (130), Sport mit Baby (148), Elternstart NRW (149) und Junge Eltern (131) sowie Rückbildung (52). Kat. 10 gewählt, weil sie zusätzlich die Beratungen mit Baby (Baby satt und zufrieden, Trageberatung, Schlaf gut Baby) abdeckt, die in 130/148/149 fehlen; 4 Seiten, 24 640 Zeichen.
+    - Die Liste nennt nur den Kursbeginn. Kurse haben laut Detailseite 1 bis 6 Termine, meist wöchentlich (PEKiP 6 Termine mit Lücke in den Herbstferien, Klangentdecker 5, Mama Yoga 6, Trageberatung 1).
+    - Kontakt Kaiserswerther Diakonie, Alte Landstraße 179, 40489 Düsseldorf (Kontaktblock der Familienakademie-Seite); Fronberghaus laut Veranstaltungsseiten Alte Landstraße 179c.
+  venues:
+    - id: kaiserswerther-familienakademie
+      name: Fronberghaus (Kaiserswerther Familienakademie)
+      address: Alte Landstraße 179c, 40489 Düsseldorf
+      district: Kaiserswerth
+      geo: { lat: 51.300203, lon: 6.743728 }
+      hint: Fronberghaus, Raum 004, 008 und 009 (kleiner Salon)
+- id: drk-familienbildung-duesseldorf
+  publicId: 2gjaak8v
+  role: anbieter
+  region: duesseldorf
+  name: DRK Familienbildung Düsseldorf (Familientreffs)
+  url: https://www.drk-bildung-duesseldorf.de/kurse/eltern-kind-angebote
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.drk-bildung-duesseldorf.de/kurse/eltern-kind-angebote/kategorie/130
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 4
+      hint: Nur Kurse mit Kind; Babymassage, Elternstart NRW und Offene Treffs sind Angebote mit Baby
+    - url: https://www.drk-bildung-duesseldorf.de/kurse/eltern-kind-angebote/kategorie/131
+      kind: html
+      use: termine
+    - url: https://www.drk-bildung-duesseldorf.de/kurse/eltern-kind-angebote/kategorie/134
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 4
+      hint: Nur Kurse für Kinder bis 3 Jahre; Gruppen ab 3 Jahren (Yogalöwen, Tanz, Wald) weglassen
+    - url: https://www.drk-bildung-duesseldorf.de/kurse/eltern-kind-angebote/kategorie/135
+      kind: html
+      use: termine
+    - url: https://www.drk-bildung-duesseldorf.de/kurse/eltern-kind-angebote/kategorie/143
+      kind: html
+      use: termine
+      hint: Nur Treffs für Eltern mit Kindern bis 3 Jahre; Themenfrühstück und Elternabende ohne Kind weglassen
+    - url: https://www.drk-bildung-duesseldorf.de/kurse/familienbildung/kategorie/142
+      kind: html
+      use: termine
+      hint: Nur Eltern-Kind-Schwimmen (EKiS); Interessentenlisten sind keine Termine
+  availability:
+    shown: ja
+    how: "Ampel je Kurs im Text der Liste: 'Dieser Kurs ist buchbar' = frei, 'schon voll, Warteliste ist aber möglich' = warteliste; Detailseite nennt freie Plätze"
+    system: Kufer (KuferWeb)
+  verified: 2026-10-24
+  notes:
+    - "Kufer-Kursliste: 25 Kurse je Seite, Folgeseiten per browse=forward (6 Kategorien, 8 Seiten, rund 31 000 Zeichen)."
+    - "Die Liste nennt nur den Kursbeginn. Detailseiten (Stichprobe 2026-10-24): ElBa 26-1246 Beginn 04.08., Ende 22.12., 17 Termine; Turnlöwen Mini 26-1554 Beginn 01.09., Ende 29.12., 16 Termine; Elternstart NRW 26-1085 Beginn 30.10., Ende 27.11., 5 Termine. Kurse laufen wöchentlich bis Jahresende, auch wenn der Beginn vor heute liegt."
+    - "Kategorie 137 (Besondere Aktionen) bewusst nicht aufgenommen: fast nur Einzeltermine für Kinder ab 2 bis 6 Jahren an städtischen Familienzentren. Wasser: Kategorie 142 statt /kurse/angebote-im-wasser (dort auch Schwimmkurse für Ältere)."
+    - "Orte nicht aufgenommen: Städt. Familienzentren an der Sulzbachstraße (ohne Hausnummer, Waldentdecker 2-5 Jahre), Ingeborg-Bachmann-Str. 29 und Lacombletstr. 10a (Gruppen ab 3 Jahren)."
+    - "Gerresheim: Gebäudeübersicht nennt Flinger Broich 203, Außenstellenübersicht und Kursliste Im Heidewinkel 1e; Kursdetail teils Im Heidewinkel 2. Hier Im Heidewinkel 1e."
+  venues:
+    - id: drk-familienbildung-duesseldorf
+      name: DRK Familientreff Friedrichstadt (Haus Friedrichstadt)
+      address: Jahnstr. 47, 40215 Düsseldorf
+      district: Friedrichstadt
+      geo: { lat: 51.214677, lon: 6.780532 }
+      hint: in der Kursliste ‚Jahnstr. 47, DRK-Haus Friedrichstadt‘ bzw. ‚DRK - Haus Friedrichstadt‘
+    - id: drk-familienbildung-duesseldorf-gerresheim
+      name: DRK Familientreff Gerresheim
+      address: Im Heidewinkel 1e, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.245189, lon: 6.856052 }
+      hint: in der Kursliste ‚Im Heidewinkel 1e, DRK - Familientreff Gerresheim‘
+    - id: drk-familienbildung-duesseldorf-pempelfort
+      name: DRK Aktivtreff Pempelfort
+      address: Sternstraße 31, 40479 Düsseldorf
+      district: Pempelfort
+      geo: { lat: 51.233958, lon: 6.781654 }
+      hint: in der Kursliste ‚Sternstraße 31, DRK- Aktivtreff Pempelfort‘
+    - id: drk-familienbildung-duesseldorf-benrath
+      name: Bürgerhaus Benrath
+      address: Telleringstraße 56, 40597 Düsseldorf
+      district: Benrath
+      geo: { lat: 51.165334, lon: 6.882158 }
+      hint: in der Kursliste ‚Bürgerhaus Benrath, Tellerringstr.56 / Telleringstr. 56, Raum 6 bzw. 35‘
+    - id: drk-familienbildung-duesseldorf-welcome-point
+      name: DRK Welcome Point Hassels
+      address: Potsdamer Str. 41, 40599 Düsseldorf
+      district: Hassels
+      geo: { lat: 51.185002, lon: 6.861955 }
+      hint: in der Kursliste ‚DRK - Welcome Point, Potsdamer Straße 41‘
+    - id: drk-familienbildung-duesseldorf-momentum-spa
+      name: Momentum Spa Golzheim (Eltern-Kind-Schwimmen)
+      address: Am Bonneshof 30a, 40474 Düsseldorf
+      district: Golzheim
+      geo: { lat: 51.253635, lon: 6.766555 }
+      hint: in der Kursliste ‚Am Bonneshof 30A, Momentum Spa Golzheim‘; Eltern-Kind-Schwimmen EKiS
+    - id: drk-familienbildung-duesseldorf-martin-luther-schule
+      name: Lehrschwimmbad Martin-Luther-Schule
+      address: Gotenstraße 20, 40225 Düsseldorf
+      district: Bilk
+      geo: { lat: 51.196231, lon: 6.779047 }
+      hint: in der Kursliste ‚Gotenstraße 20, Lehrschwimmbad Martin-Luther-Schule‘; Eltern-Kind-Schwimmen
+- id: kinderschutzbund-duesseldorf
+  publicId: jscvwp4z
+  role: anbieter
+  region: duesseldorf
+  name: Kinderschutzbund Düsseldorf – Familiencafés
+  url: https://kinderschutzbund-duesseldorf.de/familiencafe-am-evk-bilk/
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://kinderschutzbund-duesseldorf.de/familiencafe-am-evk-bilk/
+      kind: html
+      use: termine
+      hint: Nur Termine für Familiencafé am EVK; Kinderkleiderkiste und Beratung sind keine Gruppen
+    - url: https://kinderschutzbund-duesseldorf.de/familiencafe-blauer-elefant/
+      kind: html
+      use: termine
+    - url: https://kinderschutzbund-duesseldorf.de/familiencafe-sana/
+      kind: html
+      use: termine
+      hint: Rückbildungskurs mit Baby und Beratungstermine sind eigene Einträge, Beratung weglassen
+  availability:
+    shown: nein
+    how: Offene Treffs ohne Anmeldung; Spielgruppen (1-3 J.) mit Anmeldung, keine Platzangabe online
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Drei Familiencafés mit Terminliste auf der jeweiligen Seite (Eltern-Kind-Treff 0-3, Klitzeklein 0-1, Spielgruppe 1-3, WINZIGKLEIN, Griffbereit Mini). Kostenfrei.
+    - Kontakt Familiencafé am EVK 0211 56674229, Blauer Elefant 0211 61705729, Sana 0211 61705724.
+  venues:
+    - id: kinderschutzbund-duesseldorf
+      name: Familiencafé am EVK
+      address: Kirchfeldstr. 48, 40217 Düsseldorf
+      district: Unterbilk
+      geo: { lat: 51.212556, lon: 6.774652 }
+      hint: Familiencafé am EVK (Unterbilk)
+    - id: kinderschutzbund-duesseldorf-blauer-elefant
+      name: Familiencafé BLAUER ELEFANT (Haus für Kinder)
+      address: Posener Str. 60, 40231 Düsseldorf
+      district: Lierenfeld
+      geo: { lat: 51.210231, lon: 6.833333 }
+      hint: Familiencafé BLAUER ELEFANT
+    - id: kinderschutzbund-duesseldorf-sana
+      name: Familiencafé am Sana Krankenhaus Gerresheim
+      address: Im Heidewinkel 8, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.244628, lon: 6.855575 }
+      hint: Familiencafé am Sana
+- id: sos-mgh-hell-ga
+  publicId: xlq3tlaj
+  role: anbieter
+  region: duesseldorf
+  name: SOS-Mehrgenerationenhaus Hell-GA (SOS-Kinderdorf Düsseldorf)
+  url: https://www.sos-kinderdorf.de/kinderdorf-duesseldorf/angebote/mehrgenerationenhaus-hell-ga
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.sos-kinderdorf.de/kinderdorf-duesseldorf/angebote/mehrgenerationenhaus-hell-ga
+      kind: html
+      use: info
+    - url: https://www.sos-kinderdorf.de/service/download/Programm%20im%20Mehrgenerationenhaus?id=238436
+      kind: pdf
+      use: termine
+      hint: Wochenplan ohne Daten; nur Eltern-Kind-Gruppe, Spieltreff, Storchennest, Hebammensprechstunde, Spielgruppen (0-3). Senioren und Kochkurse 5+ weglassen
+  availability:
+    shown: nein
+    how: Keine Platzangabe; Kontakt je Angebot im Programm-PDF
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Programm-PDF (17 MB, Stand 03/2026) ist ein Wochenplan Mo-Fr, Wochenregeln ausrollen, nicht in Schulferien prüfen. Wichtig fuer Pflege - Dateigröße gegen Abruf-Limit prüfen, Link-ID 238436 kann sich beim Update ändern.
+    - Eltern-Kind-Gruppe Mo 9:30-10:30, Spieltreff Di 10:30-12 und Mi 9-10:30 und 10:30-12, Storchennest Di 9:30-10:30 (Babys erste Wochen), Hebammensprechstunde Di 10-12 (Beratung).
+  venues:
+    - id: sos-mgh-hell-ga
+      name: SOS-Mehrgenerationenhaus Hell-GA
+      address: Matthias-Erzberger-Straße 24, 40595 Düsseldorf
+      district: Garath
+      geo: { lat: 51.14102, lon: 6.904055 }
+      hint: Eltern-Kind-Gruppe, Spieltreff, Storchennest im Mehrgenerationenhaus
+- id: die-agb-duesseldorf
+  publicId: gihvppsq
+  role: anbieter
+  region: duesseldorf
+  name: Die AGB e.V. – Eltern-Baby-Gruppen und griffbereitMINI
+  url: https://www.die-agb.de/termine/
+  age:
+    minMonths: 0
+    maxMonths: 12
+  programme:
+    - url: https://www.die-agb.de/termine/
+      kind: html
+      use: termine
+      hint: Nur griffbereitMINI und Eltern-Kind/Schwangere (bis 1 J.); Senioren, Sprach-, Musik- und Alleinerziehenden-Termine weglassen
+    - url: https://www.die-agb.de/spielend-zusammen-wachsen/
+      kind: html
+      use: termine
+      hint: Babygruppen ab 12. Lebenswoche; Kursstart und Wochentag je Kurs, 3 Kurseinheiten
+  availability:
+    shown: nein
+    how: Anmeldung über Formular; keine Platzangabe
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - griffbereitMINI Sprachbildung montags 9:00-10:30, kostenfrei. Spielend Zusammen Wachsen (Luitgard Kiefer) Babygruppen in Bilk.
+    - Veranstaltungsort heißt auf den Terminen 'Die AGB im Salzmannbau'; Adresse des Salzmannbaus ist nicht ausdrücklich genannt, Geschäftsstelle Himmelgeister Str. 107 angenommen. Vor dem Geocoding prüfen.
+  venues:
+    - id: die-agb-duesseldorf
+      name: Die AGB im Salzmannbau
+      address: Himmelgeister Str. 107, 40225 Düsseldorf
+      district: Bilk
+      geo: { lat: 51.198809, lon: 6.781155 }
+      hint: griffbereitMINI und Spielend Zusammen Wachsen
+- id: diakonie-stadtteilladen-flingern
+  publicId: cggbuxb8
+  role: anbieter
+  region: duesseldorf
+  name: Diakonie Düsseldorf – Stadtteilladen Flingern (Eltern-Kind-Café)
+  url: https://www.diakonie-duesseldorf.de/jugend-familie/stadtteilarbeit/stadtteilladen-flingern
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.diakonie-duesseldorf.de/jugend-familie/stadtteilarbeit/stadtteilladen-flingern
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Kostenfrei; keine Uhrzeit, keine Anmeldeangabe online
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Eltern-Kind-Café nur als Satz "jeden Donnerstag" ohne Uhrzeit, keine Termine online
+    since: 2026-10-24
+  notes:
+    - Eltern-Kind-Café jeden Donnerstag für Mütter mit Kindern unter 3 Jahren (Frühstück, Singen, Spielen). Weitere Angebote über die GISA-App der Diakonie, nicht abrufbar.
+    - Ernst-Lange-Haus (Fürstenberger Str. 16, 40599 Düsseldorf) nennt auf seiner Seite keine Eltern-Kind-Gruppe mit Termin, daher nicht aufgenommen.
+  venues:
+    - id: diakonie-stadtteilladen-flingern
+      name: Stadtteilladen Flingern
+      address: Gerresheimer Straße 167, 40233 Düsseldorf
+      district: Flingern Süd
+      geo: { lat: 51.225553, lon: 6.806026 }
+      hint: Eltern-Kind-Café donnerstags
+- id: caritas-stadtteilladen-wersten
+  publicId: rswpkt3b
+  role: anbieter
+  region: duesseldorf
+  name: Caritas Düsseldorf – Stadtteilladen Wersten
+  url: https://www.caritas-duesseldorf.de/hilfe-angebote/kinder-jugend-familie/stadtteilladen-wersten/
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.caritas-duesseldorf.de/hilfe-angebote/kinder-jugend-familie/stadtteilladen-wersten/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Offene Treffs; keine Anmeldung genannt
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Wochenplan nur als Halbjahres-PDF (1. HJ 2026, veraltet), Seite selbst ohne Termine
+    since: 2026-10-24
+  notes:
+    - Das PDF "2026_1.HJ_Stadtteilladen-Wersten_Angebote.pdf" nennt Internationalen Still-Treff/Babytreff (1x im Monat, Mi 10-11:30) und eine selbstorganisierte Krabbelgruppe (Fr). Ein 2. HJ-PDF unter dem erwarteten Namen gibt es nicht (404).
+    - robots.txt der Caritas-Seite nicht lesbar (HTML statt Text); nur eine Seite abgerufen.
+  venues:
+    - id: caritas-stadtteilladen-wersten
+      name: Stadtteilladen Wersten
+      address: Liebfrauenstr. 30, 40591 Düsseldorf
+      district: Wersten
+      geo: { lat: 51.189362, lon: 6.820343 }
+      hint: Babytreff und Krabbelgruppe
+- id: geburtshaus-duesseldorf
+  publicId: py6r4qum
+  role: anbieter
+  region: duesseldorf
+  name: Geburtshaus Düsseldorf – Eltern-Kind-Kurse (Babymassage, Krabbelgruppe, Spielgruppe)
+  url: https://geburtshaus-duesseldorf.de/eltern-kind-kurse.html
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://ghd.hebamio.de/kursliste/17
+      kind: html
+      use: termine
+      hint: Babymassage-Kurse im Geburtshaus; Alter steht im Kurstitel
+    - url: https://ghd.hebamio.de/kursliste/25
+      kind: html
+      use: termine
+      hint: Babymassage für queere Familien, Kurse mit Baby
+    - url: https://ghd.hebamio.de/kursliste/15
+      kind: html
+      use: termine
+      hint: Spielend zusammen Wachsen im ersten Lebensjahr, wöchentlich; Alter der Kinder steht im Kurstitel
+    - url: https://ghd.hebamio.de/kursliste/16
+      kind: html
+      use: termine
+      hint: Krabbelgruppe ab 8 bis 12 Monate, wöchentlich
+    - url: https://ghd.hebamio.de/kursliste/18
+      kind: html
+      use: termine
+      hint: Spielgruppe ab 1 Jahr, wöchentlich
+    - url: https://ghd.hebamio.de/kursliste/11
+      kind: html
+      use: termine
+      hint: Rückbildung mit Babymassage-Anteil; nur aufnehmen, was Eltern mit Baby besuchen
+    - url: https://ghd.hebamio.de/kursliste/13
+      kind: html
+      use: termine
+      hint: Postnatalyoga mit Babymassage-Anteil; nur aufnehmen, was Eltern mit Baby besuchen
+    - url: https://geburtshaus-duesseldorf.de/eltern-kind-kurse.html
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: "Hebamio-Liste: 'zur Anmeldung' = Plätze frei, 'auf Warteliste setzen' = ausgebucht"
+    system: Hebamio
+  verified: 2026-10-24
+  notes:
+    - Kursliste je Kategorie (15, 16, 17, 18, 11, 13, 25), die Gesamtliste /kursliste ist mit gut 75000 Zeichen zu lang für den Abruf (Grenze 60000).
+    - Weitere Kategorien der Liste ohne Baby (Rückbildung 10, Rückbildungsfitness 14, Postnatalyoga 12, Geburtsvorbereitung, Schwangerenyoga, Infoabende) bewusst nicht aufgenommen.
+    - Alle Kurse haben den Kursort Geburtshaus Düsseldorf. Die Babymassage von Familienbegleitung Düsseldorf steht ebenfalls in dieser Liste, dort nicht doppelt aufnehmen.
+    - Hebamio-Listen reichen bis 2028; der Horizont des Builds schneidet ab.
+  venues:
+    - id: geburtshaus-duesseldorf
+      name: Geburtshaus Düsseldorf
+      address: Achenbachstraße 56a, 40237 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.234071, lon: 6.804247 }
+      hint: Alle Kurse der Hebamio-Listen finden hier statt
+- id: hebamme-nina-kruegel
+  publicId: 7lna8tz8
+  role: anbieter
+  region: duesseldorf
+  name: Hebamme Nina Krügel – Babymassage und Rückbildung
+  url: https://www.hebamme-nina-kruegel.de/kurse/kurse-nach-der-geburt.php
+  age:
+    minMonths: 1
+    maxMonths: 4
+  programme:
+    - url: https://www.hebamme-nina-kruegel.de/kurse/kurse-nach-der-geburt.php
+      kind: html
+      use: termine
+      hint: Nur Starttermine, gruppiert unter einer Jahresüberschrift; 8 Termine je 90 Minuten. Kurs ohne Datum am Zeilenende, 'ausgebucht' und 'Warteliste' beachten. Yoga-Abschnitt weglassen.
+  availability:
+    shown: ja
+    how: "Freitext je Starttermin: 'ausgebucht / Warteliste', 'noch 5 Plätze frei'; ohne Zusatz offen. Anmeldung per E-Mail"
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Kurs 'Babymassage + Rückbildung' mit Babys ab 6 Wochen bis ca. 4 Monate, 192 Euro, Krankenkassen-Erstattung möglich.
+    - Zusätzlich Kundalini Yoga online und Einzelanleitung Yoga ohne Baby, nicht aufgenommen.
+  venues:
+    - id: hebamme-nina-kruegel
+      name: Hebammenpraxis Nina Krügel (Innenhof)
+      address: Hansaallee 240, 40547 Düsseldorf
+      district: Lörick
+      geo: { lat: 51.238617, lon: 6.733471 }
+- id: yogakitchen-duesseldorf
+  publicId: ibcnj4es
+  role: anbieter
+  region: duesseldorf
+  name: YogaKitchen Düsseldorf Oberkassel – Babymassage und Babygymnastik
+  url: https://www.yogakitchen-duesseldorf.de/mutter-und-kind-yoga-kurse.php
+  age:
+    minMonths: 1
+    maxMonths: 12
+  programme:
+    - url: http://www.yogakitchen-duesseldorf.de/praeventionskurs-anmeldung.php
+      kind: html
+      use: termine
+      hint: Nur den Abschnitt 'Kurse für junge Mütter' (Babymassage, Babygymnastik) aufnehmen; Pilates, Prävention, Yoga und Livestream weglassen
+    - url: https://www.yogakitchen-duesseldorf.de/mutter-und-kind-yoga-kurse.php
+      kind: html
+      use: info
+  availability:
+    shown: teilweise
+    how: Auf der Anmeldeseite steht bei ausgebuchten Kursen 'Warteliste'; ohne Zusatz buchbar
+    system: eigenes Anmeldeformular
+  verified: 2026-10-24
+  notes:
+    - Die Mum+Baby-Yoga-Kurse (8 x 75 Min., 120 Euro, Baby 6 bis 12 Monate) haben auf keiner abgerufenen Seite Termine; nur die Beschreibung. Der Kursplan nennt wöchentliche Baby-Massage- und Baby-Gymnastik-Slots, ebenfalls ohne Datum.
+    - Weitere Seiten des Studios (Rückbildung mit Baby, Postnatal-Yoga) nicht abgerufen.
+  venues:
+    - id: yogakitchen-duesseldorf
+      name: YogaKitchen Düsseldorf (Oberkassel)
+      address: Oberkasseler Straße 100, 40545 Düsseldorf
+      district: Oberkassel
+      geo: { lat: 51.232582, lon: 6.756089 }
+- id: familieninstitut-vom-heede
+  publicId: fkirsfl2
+  role: anbieter
+  region: duesseldorf
+  name: Familieninstitut Heike vom Heede – Babymassage, Babygymnastik, Krabbelgruppe
+  url: https://familieninstitut-duesseldorf.de/kursangebot
+  age:
+    minMonths: 1
+    maxMonths: 24
+  programme:
+    - url: https://app1.edoobox.com/de/HVH/?edref=hvh
+      kind: html
+      use: termine
+      hint: Nur Babymassage, Babygymnastik Präsenz und Krabbelgruppe aufnehmen; Online-Babygym, Elternwerden, Geburtsvorbereitung weglassen. Spalte Geburtsmonat = Alter der Babys
+    - url: https://familieninstitut-duesseldorf.de/kurse/babymassage
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: "edoobox-Liste: 'Jetzt anmelden' = buchbar; Kurse ohne diesen Zusatz sind ausgebucht oder die Anmeldefrist ist abgelaufen"
+    system: edoobox
+  verified: 2026-10-24
+  notes:
+    - Die Kurs-Detailseiten und die Startseite nennen keine Termine; die Termine stehen nur in der edoobox-Übersicht (kurs-buchen verlinkt dorthin).
+    - Waldgruppe (ab 1,5 bis 2 Jahre) findet in Ratingen statt und ist nicht aufgenommen.
+    - Babymassage ab 4. Lebenswoche, 4 x 60 Min., 160 Euro. Babygymnastik ab der 7. Lebenswoche (Präsenz oder online).
+  venues:
+    - id: familieninstitut-vom-heede
+      name: Familieninstitut Heike vom Heede
+      address: Schwanenmarkt 4, 40213 Düsseldorf
+      district: Carlstadt
+      geo: { lat: 51.219607, lon: 6.772579 }
+      hint: Präsenzkurse (Babymassage, Babygymnastik, Krabbelgruppe) hier; Online-Kurse weglassen
+- id: familienbegleitung-duesseldorf
+  publicId: 834vmnuy
+  role: anbieter
+  region: duesseldorf
+  name: Familienbegleitung Düsseldorf (Sophie Wölbling) – Still- und Trageangebote
+  url: https://familienbegleitung-duesseldorf.de/termine/
+  age:
+    minMonths: 0
+    maxMonths: 12
+  programme:
+    - url: https://familienbegleitung-duesseldorf.de/termine/
+      kind: html
+      use: termine
+      hint: Nur Termine im Geburtshaus, im Familiencafé am EVK und bei Mama macht. Babymassage im Geburtshaus weglassen (steht in der Hebamio-Liste); Termine an anderen Orten weglassen
+    - url: https://familienbegleitung-duesseldorf.de/babymassage/
+      kind: html
+      use: info
+  availability:
+    shown: teilweise
+    how: Freitext im Termineintrag ('nur noch 4 Plätze frei'); sonst Anmeldelink je Termin
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Die Babymassage im Geburtshaus (auch für queere Familien) steht auch in der Hebamio-Liste des Geburtshauses (Eintrag geburtshaus-duesseldorf).
+    - Weitere Orte der Terminliste sind Stadtteilladen Wersten, Haus für Kinder Lierenfeld, Urdenbach und Familiencafé SANA Gerresheim; vollständige Adressen nicht ermittelt, deshalb nicht aufgenommen.
+    - Elternseminare bei Mama macht (Beikost, Abstillen) mit Baby erlaubt; Stillsprechstunden im Familiencafé am EVK.
+  venues:
+    - id: familienbegleitung-duesseldorf
+      name: Geburtshaus Düsseldorf (Babymassage, Trageworkshop)
+      address: Achenbachstraße 56a, 40237 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.234071, lon: 6.804247 }
+      hint: Trageworkshops und Infoabende hier; Babymassage weglassen
+    - id: familienbegleitung-duesseldorf-familiencafe-evk
+      name: Familiencafé am EVK (Still- und Beikostsprechstunde)
+      address: Kirchfeldstraße 48, 40217 Düsseldorf
+      district: Unterbilk
+      geo: { lat: 51.212556, lon: 6.774652 }
+      hint: Offene Still- und Beikostsprechstunde
+    - id: familienbegleitung-duesseldorf-mama-macht
+      name: Mama macht… (Elternseminare)
+      address: Jahnstraße 17, 40215 Düsseldorf
+      district: Friedrichstadt
+      geo: { lat: 51.216573, lon: 6.780557 }
+      hint: Elternseminare mit Baby (Beikost, Abstillen)
+- id: duessel-mami
+  publicId: wyn79777
+  role: anbieter
+  region: duesseldorf
+  name: Düssel Mami – Praxis für Hebammen und Familienbegleitung
+  url: https://www.duessel-mami.de/nach-der-geburt/babykurse/
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.duessel-mami.de/nach-der-geburt/babykurse/
+      kind: html
+      use: info
+    - url: https://www.duessel-mami.de/nach-der-geburt/babymassage/
+      kind: html
+      use: info
+    - url: https://www.duessel-mami.de/anmeldung/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Anmeldung online über die Anmeldeseite, Warteliste per E-Mail
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Kursseiten ohne Termine, Buchung nur über ein nicht abrufbares Anmeldeverfahren (Recherche-Notiz)
+    since: 2026-10-24
+  notes:
+    - Fortlaufende Babykurse für das ganze erste Lebensjahr (nach Alter der Babys), dazu Babymassage ab 6 Wochen, Klangreise für 1- und 2-Jährige, Babygebärden, Kinderturnen, Kindertanz, Kinderyoga, Rückbildung mit Baby.
+    - Die Kurse der Hebamme Katharina Rademacher (Gerresheim) werden über Düssel Mami gebucht und stehen deshalb hier, nicht als eigener Eintrag.
+    - Die Kursseiten sind Jimdo-Seiten ohne Terminliste; eine Terminquelle (Buchungswidget) wurde nicht gefunden.
+  venues:
+    - id: duessel-mami
+      name: Düssel Mami – Praxis für Hebammen und Familienbegleitung
+      address: Grafenberger Allee 368, 40235 Düsseldorf
+      district: Grafenberg
+      geo: { lat: 51.240311, lon: 6.824414 }
+- id: evk-elternschule-duesseldorf
+  publicId: 8zzt670b
+  role: anbieter
+  region: duesseldorf
+  name: Elternschule am Evangelischen Krankenhaus Düsseldorf – Eltern-Kind-Kurse
+  url: https://www.evk-duesseldorf.de/geburt-und-kindernetzwerk/elternschule/kurse-im-ersten-jahr/babymassage.html
+  age:
+    minMonths: 0
+    maxMonths: 18
+  programme:
+    - url: https://app1.edoobox.com/ES-EVK/?edref=esevk
+      kind: html
+      use: termine
+      hint: Nur Eltern-Kind-Kurse (Babymassage, Mit allen Sinnen, Krabbelkäferchen, Musik erleben), Mom-Yoga und Rückbildung mit Babymassage; Geburtsvorbereitung u. a. ohne Kind weglassen
+  availability:
+    shown: ja
+    how: edoobox-Liste mit Spalte 'Freie Plätze' (Zahl) und Status 'Jetzt anmelden' bzw. 'Warteliste'
+    system: edoobox
+  verified: 2026-10-24
+  notes:
+    - Die edoobox-Gesamtliste enthält auch Geburtsvorbereitung (deutsch, japanisch), Akupunktur, Säuglingspflege, Notfallkurse und Ernährung; nur die Eltern-Kind-Anteile sind gemeint.
+    - Der Kursort ist in der Liste nicht angegeben; angenommen wird die Elternschule an der Suitbertusstraße. Das Plan-0042-Anhang nennt zusätzlich Kirchfeldstraße 40 (Krankenhaus), nicht verifiziert.
+    - Die Termine der Kurse 'Mit allen Sinnen' (früher PEKiP) tragen den Geburtsmonat im Titel ('Baby geb. …').
+    - robots.txt von evk-duesseldorf.de sperrt ClaudeBot, Claude-Web und anthropic-ai; für alle anderen gilt crawl-delay 5. Die edoobox-Seite selbst ist erlaubt (Disallow nur /book/ u. ä.).
+  venues:
+    - id: evk-elternschule-duesseldorf
+      name: Elternschule am Evangelischen Krankenhaus Düsseldorf
+      address: Suitbertusstraße 35, 40223 Düsseldorf
+      district: Bilk
+      geo: { lat: 51.205599, lon: 6.767468 }
+- id: hebavit
+  publicId: au84xy48
+  role: anbieter
+  region: duesseldorf
+  name: Hebavit (Ilona Wächter) – Rückbildung und Babymassage
+  url: https://www.hebavit.de/nach-der-geburt/
+  age:
+    minMonths: 1
+    maxMonths: 6
+  programme:
+    - url: https://www.hebavit.de/hebavit-aktuelle-termine/
+      kind: html
+      use: termine
+      hint: Nur 'Rückbildung & Babymassage' (mit Baby) aufnehmen; Yoga, Aerial Yoga, Geburtsvorbereitung und Beratung weglassen. Überschrift 'Alle Angebote für 2023/2024' ist veraltet
+    - url: https://www.hebavit.de/nach-der-geburt/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Anmeldung per E-Mail mit Wunschtermin; ausgebuchte Kurse stehen als 'ausgebucht' neben dem Termin
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Babymassage ab der 6. Lebenswoche, Kurs 8 x 90 Min., Babymassage-Anteil 134 Euro, Rückbildung wird von der Krankenkasse erstattet.
+    - Die Kontaktseite nennt die Räumlichkeiten, sagt aber auch 'Das kommt ganz auf den Kurs an' zum Kursort.
+  venues:
+    - id: hebavit
+      name: Hebavit Ilona Wächter (Volmerswerth)
+      address: Viehfahrtsweg 19, 40221 Düsseldorf
+      district: Volmerswerth
+      geo: { lat: 51.185912, lon: 6.756722 }
+- id: praxis-bullerbue
+  publicId: 71c3p09c
+  role: anbieter
+  region: duesseldorf
+  name: Bullerbü Familienbegleitung (Nuray Voigt) – BabyBoogie und Babykurse in Holthausen
+  url: https://praxisbullerbue.com/babykurse/
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://praxisbullerbue.com/kindertanz/
+      kind: html
+      use: termine
+      hint: "BabyBoogie, 7 bis 36 Monate, wöchentlich: nur den Düsseldorfer Termin (Holthausen) aufnehmen, Duisburg weglassen. Wochenregel ausrollen"
+    - url: https://praxisbullerbue.com/babykurse/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Buchung über die Anbieterseite, kein Platzstatus lesbar
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Die Babykurse-Seite besteht aus einer Grafik (Babykurs.png) und nennt Termine nicht im Text; der Zeitplan der Babykurse ist daher nicht lesbar. Nur BabyBoogie hat einen Wochenplan im Text.
+    - Düsseldorfer Kurse laufen laut Startseite in der Villa Hügelchen (Holthausen), ab September zusätzlich in der YogaEule grow&fly in Wersten (Kölner Landstraße 152, 40591; Adresse aus Websuche, nicht von einer Anbieterseite bestätigt) und werden hier nicht aufgenommen.
+    - Praxisanschrift der Inhaberin ist Bonner Straße 103, 40589 Düsseldorf; dort finden laut Startseite derzeit keine Düsseldorfer Kurse statt.
+    - Die Duisburger Kurse (Wedau) sind außerhalb der Region.
+  venues:
+    - id: praxis-bullerbue
+      name: Familienzentrum Villa Hügelchen (Holthausen)
+      address: Hügelstraße 51a, 40589 Düsseldorf
+      district: Holthausen
+      geo: { lat: 51.179054, lon: 6.830868 }
+      hint: BabyBoogie dienstags und weitere Babykurse in Holthausen
+- id: mama-macht
+  publicId: wlei8h7v
+  role: anbieter
+  region: duesseldorf
+  name: Mama macht… – Krabbelgruppe, Babymassage und Kinderturnen
+  url: https://www.mamamacht.de/kurse-buchen/
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://kikudoo.com/public/de/providers/k03nNd/courses
+      kind: html
+      use: termine
+      hint: Nur Eltern-Kind-Kurse bis 3 Jahre (Krabbelgruppe, Babymassage, Kinderturnen Minis/Maxis). Interessentenlisten (Flex), Kurse ab 3 Jahren und Schulkinder weglassen
+    - url: https://www.mamamacht.de/kurse-f%C3%BCr-kinder/krabbelgruppe/
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: Kikudoo zeigt 'Place Left' bzw. 'Places Left' je Kurs; Kurse ohne Zusatz und 'Flex'-Einträge sind Interessentenlisten
+    system: Kikudoo
+  verified: 2026-10-24
+  notes:
+    - Die Seite kurse-buchen bettet das Kikudoo-Widget als iframe ein; die Kurse stehen im Text der Kikudoo-Seite (robots.txt von kikudoo.com erlaubt alles).
+    - Krabbelgruppe in 5 Kursen mit je 7 Terminen bis zum 1. Geburtstag, getrennt nach Geburtsquartal; Krabbelgruppe 2.0 für Familien mit Geschwisterkind.
+    - Rückbildung und Fitness (ohne Baby) sowie Selbstbehauptung für Kinder ab 3 Jahren nicht aufgenommen.
+  venues:
+    - id: mama-macht
+      name: Mama macht… (Friedrichstadt)
+      address: Jahnstraße 17, 40215 Düsseldorf
+      district: Friedrichstadt
+      geo: { lat: 51.216573, lon: 6.780557 }
+- id: herz-und-sinn
+  publicId: rs5jx2eh
+  role: anbieter
+  region: duesseldorf
+  name: herz und sinn – Babykurs mini & me, Babymassage, Spielgruppe
+  url: https://www.herzundsinn.de/kursuebersicht
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://widgets.yolawo.de/w/64fed28c5931ee58e5e78a00
+      kind: html
+      render: browser
+      use: termine
+      hint: Nur Kurse nach der Geburt (baby in balance, mini & me, maxi & me, Rückbildung mit Baby, mum & yoga); Waldspielgruppe und Kurse vor der Geburt weglassen
+    - url: https://www.herzundsinn.de/kursuebersicht
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: Yolawo-Buchungssystem mit Plätzen und Warteliste je Kurs (nur im Browser lesbar)
+    system: Yolawo
+  verified: 2026-10-24
+  notes:
+    - "NICHT GEPRÜFT: Das Yolawo-Widget ist eine Angular-App und braucht JavaScript (fetch-page liefert nur den Titel 'Yolawo Widgets'). render: browser ist eine Annahme; die CLI kennt keine --render-Option, der Browser-Abruf des Nachtlaufs wurde nicht probiert."
+    - mini & me (fortlaufender Babykurs in vier Kursblöcken, neue Termine etwa sechs Wochen vor Beginn), baby in balance (Babymassage), maxi & me (Spielgruppe ab 12 Monate), mum & yoga, back to me I und II (Rückbildung mit Baby).
+    - Die Waldspielgruppe maxi & explore (1,5 bis 3 Jahre) trifft sich im Aaper Wald an der Wilhelm-Unger-Straße Ecke Sandsteig; keine PLZ von einer Anbieterseite, deshalb nicht als Ort aufgenommen.
+    - Squarespace-Standard-robots.txt sperrt anthropic-ai und andere KI-Crawler; die Yolawo-Seite trägt meta robots noindex.
+  venues:
+    - id: herz-und-sinn
+      name: herz & sinn Kursräume
+      address: Frankenstraße 9a, 40476 Düsseldorf
+      district: Derendorf
+      geo: { lat: 51.248636, lon: 6.777706 }
+      hint: Kurse nach der Geburt (mini & me, baby in balance, maxi & me) in den Kursräumen
+- id: fit4mom-duesseldorf
+  publicId: h1omauh5
+  role: anbieter
+  region: duesseldorf
+  name: fit4mom (Hebamme Yvonne Kayser) – Babymassage und Spiel- und Krabbelgruppe
+  url: https://www.fit4mom.de/babymassage-krabbelgruppe.html
+  age:
+    minMonths: 1
+    maxMonths: 13
+  programme:
+    - url: https://www.fit4mom.de/babymassage-krabbelgruppe.html
+      kind: html
+      render: browser
+      use: termine
+      hint: Babymassage (ab 6. Lebenswoche) und Spiel- und Krabbelgruppe (3 bis 13 Monate); Termine stehen im KidsGo-Anmeldewidget
+  availability:
+    shown: unbekannt
+    how: Anmeldung über das KidsGo-Widget auf der Seite
+    system: KidsGo
+  verified: 2026-10-24
+  notes:
+    - "NICHT GEPRÜFT: Die Termine stehen in einem KidsGo-Script-Widget (//www.kidsgo.de/mod/kv/extt_js/…), das fetch-page nicht auslöst. render: browser ist eine Annahme; ohne Termine im Text wäre der Eintrag ein Fall für skipCrawl."
+    - Im Gästekommentar vom 11.10.2026 verabschiedet sich eine Teilnehmerin ('Ich werde dich vermissen'); die Startseite zeigt keinen Hinweis auf ein Ende. Vor der Übernahme prüfen, ob die Kurse weiterlaufen.
+    - Die Feeddatei /share/kursangebote.xml liefert HTTP 403.
+  venues:
+    - id: fit4mom-duesseldorf
+      name: fit4mom Kursraum (Grafenberg)
+      address: Grafenberger Allee 368, 40235 Düsseldorf
+      district: Grafenberg
+      geo: { lat: 51.240311, lon: 6.824414 }
+- id: core-in-balance
+  publicId: mgbksk12
+  role: anbieter
+  region: duesseldorf
+  name: Core in Balance (Iris) – Rückbildung mit Baby und Mamafitness
+  url: https://coreinbalance.de/
+  age:
+    minMonths: 0
+    maxMonths: 12
+  programme:
+    - url: https://coreinbalance.de/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Buchung über einen externen Buchungskalender, Anmeldung zu Outdoor-Sport per WhatsApp
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Terminliste der Startseite mischt Daten ohne Jahr und vergangene Kurse, Buchung über externen Kalender (Recherche-Notiz)
+    since: 2026-10-24
+  notes:
+    - Praxis für Frauengesundheit; 'Rückbildung' (Kind kann dabei sein), 'Rückbildung ohne Baby', BuggyFit, 'CoreInBalance to Go Outdoor Sport'. Nur die Mit-Baby-Angebote taugen für die Anbieterübersicht.
+    - Der Plan-0042-Anhang nennt 'buggyFit Düsseldorf / Core in Balance'; die buggyFit-Standortseite Volmerswerth (Gebietsleitung Jenny Müller) ist ausgeschlossen, siehe unten.
+  venues:
+    - id: core-in-balance
+      name: Core in Balance – Praxis für Frauengesundheit
+      address: Mülheimer Straße 5, 40239 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.238287, lon: 6.798599 }
+- id: baeder-duesseldorf
+  publicId: r48p2f5o
+  role: anbieter
+  region: duesseldorf
+  name: Bädergesellschaft Düsseldorf – Babyschwimmen ab 3 Monaten
+  url: https://www.baeder-duesseldorf.de/kurse/schwimmkurse-fuer-kinder/babyschwimmen-ab-3-monaten/
+  age:
+    minMonths: 3
+    maxMonths: 12
+  programme:
+    - url: https://www.baeder-duesseldorf.de/kurse/schwimmkurse-fuer-kinder/babyschwimmen-ab-3-monaten/
+      kind: html
+      use: termine
+      hint: Wochenplan je Bad, Offener Kurs ohne Voranmeldung. Wochenregel ausrollen; entfällt an Feiertagen, im Düsselstrand auch in den Ferien.
+  availability:
+    shown: nein
+    how: Offener Kurs, Anmeldung nur vor Kursbeginn an der Schwimmbadkasse; keine Onlineanmeldung
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Pro Einheit 11,40 €, 10er Tarif 107,60 €. Einheiten einzeln besuchbar, auch Sonntagskurse.
+    - "[baeder-duesseldorf.de/kurse/schwimmkurse-fuer-kinder/babyschwimmen-ab-3-monaten] Kurszeiten je Bad (robots.txt der Domain ohne Disallow)"
+    - Weitere Kinderkurse der Bäder (Schwimmen lernen ab 5 Jahren) gehören nicht zu 0–3.
+  venues:
+    - id: baeder-duesseldorf
+      name: Freizeitbad Düsselstrand
+      address: Kettwiger Straße 50, 40233 Düsseldorf
+      district: Flingern Süd
+      geo: { lat: 51.22433, lon: 6.810279 }
+      hint: Dienstag, Donnerstag und Sonntag; entfällt in den Ferien und an Feiertagen
+    - id: baeder-duesseldorf-rheinblick-741
+      name: Rheinblick 741
+      address: Pariser Straße 41, 40549 Düsseldorf
+      district: Oberkassel
+      geo: { lat: 51.231758, lon: 6.733317 }
+      hint: Mittwoch
+    - id: baeder-duesseldorf-niederheid
+      name: Familienbad Niederheid
+      address: Paul-Thomas-Straße 35, 40589 Düsseldorf
+      district: Holthausen
+      geo: { lat: 51.171616, lon: 6.849658 }
+      hint: Sonntag
+    - id: baeder-duesseldorf-allwetterbad-flingern
+      name: Hallenbad Allwetterbad Flingern
+      address: Flinger Broich 91a, 40235 Düsseldorf
+      district: Flingern Nord
+      geo: { lat: 51.225047, lon: 6.833588 }
+      hint: Mittwoch, 45 Minuten Wasserzeit
+    - id: baeder-duesseldorf-badehaus-benrath
+      name: Badehaus Benrath
+      address: Regerstraße 9, 40597 Düsseldorf
+      district: Benrath
+      geo: { lat: 51.159991, lon: 6.878537 }
+      hint: Donnerstag
+- id: sharky-duesseldorf
+  publicId: 1aw9jx70
+  role: anbieter
+  region: duesseldorf
+  name: Sharky Düsseldorf – Baby- und Kleinkinderschwimmen
+  url: https://www.sharky-duesseldorf.de/baby-und-kleinkinderschwimmen/
+  age:
+    minMonths: 3
+    maxMonths: 36
+  programme:
+    - url: https://www.sharky-duesseldorf.de/baby-schwimmen/show/16884/
+      kind: html
+      use: termine
+      hint: Babyschwimmen 0–1 Jahr; Kurstermine als JSON-LD mit Verfügbarkeit (InStock, SoldOut)
+    - url: https://www.sharky-duesseldorf.de/kleinkinder-schwimmen-1-2-jahre/show/16885/
+      kind: html
+      use: termine
+      hint: Kleinkinderschwimmen 1–2 Jahre mit Begleitperson im Wasser; Termine als JSON-LD
+    - url: https://www.sharky-duesseldorf.de/kleinkinder-schwimmen-2-3-jahre/show/16886/
+      kind: html
+      use: termine
+      hint: Kleinkinderschwimmen 2–3 Jahre mit Begleitperson im Wasser; Termine als JSON-LD
+    - url: https://www.sharky-duesseldorf.de/baby-und-kleinkinderschwimmen/
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: JSON-LD je Kurs mit schema.org InStock bzw. SoldOut; Buchung im Kundenkonto (Kutego)
+    system: Kutego
+  verified: 2026-10-24
+  notes:
+    - Kurse auch nach Beginn buchbar, Gebühr passt sich an. Der Kurs 3–4 Jahre (kleinkinder-schwimmen-3-4-jahre) bleibt draußen.
+    - "[sharky-duesseldorf.de/baby-schwimmen/show/<id>] Die Listenseite zeigt keine Termine, die /show/-Seite schon. robots.txt sperrt nur /api/ und /account/."
+    - Das Trockenlauf-Ergebnis „kein Angebot mit Termin“ kam von der Listenseite, nicht von den /show/-Seiten.
+  venues:
+    - id: sharky-duesseldorf
+      name: Sharky Schwimmschule Düsseldorf
+      address: Am Bonneshof 30a, 40474 Düsseldorf
+      district: Golzheim
+      geo: { lat: 51.253635, lon: 6.766555 }
+- id: aqua-gym-duesseldorf
+  publicId: kajxznyu
+  role: anbieter
+  region: duesseldorf
+  name: AQUA GYM Düsseldorf – Babyschwimmen
+  url: https://aquagym-duesseldorf.de/Babyschwimmen/
+  age:
+    minMonths: 2
+    maxMonths: 23
+  programme:
+    - url: https://aquagym-duesseldorf.de/Babyschwimmen/
+      kind: html
+      use: info
+    - url: https://widget.fitogram.pro/aqua-gym-dusseldorf/?w=/event/3b89012c-9078-4eef-8324-052283cbcf85
+      kind: html
+      render: browser
+      use: termine
+      hint: BABY II (8–16 Monate); Einzeltermine buchbar
+    - url: https://widget.fitogram.pro/aqua-gym-dusseldorf/?w=/event/5e01a2a2-cf4c-4470-932e-cf2d6bb9697f
+      kind: html
+      render: browser
+      use: termine
+      hint: BABY III (17–23 Monate); Einzeltermine buchbar
+  availability:
+    shown: unbekannt
+    how: Buchung über fitogram-Widget bzw. Eversports (Cloudflare 403 für Skripte)
+    system: fitogram, Eversports
+  verified: 2026-10-24
+  notes:
+    - "UNGEPRÜFT: Die fitogram-Seiten sind ohne Browser leer (7 KB Gerüst). Ob render: browser Termine liefert, zeigt erst ein Trockenlauf. Fällt er leer aus, auf skipCrawl umstellen."
+    - BABY I (2,5–8 Monate) hat auf der Seite keinen Widget-Link; Eversports-Kalender www.eversports.de/s/aqua-gym-duesseldorf liefert 403.
+    - Eltern-Kind-Schwimmkurs (aquagym-duesseldorf.de/Schwimmschule/ELTERN-KIND-Schwimmkurs/) ohne Altersangabe und ohne Termine, nicht aufgenommen.
+    - "[aquagym-duesseldorf.de/Babyschwimmen] Kursbeschreibung BABY I bis III, aktive Zeit 30 bis 35 Minuten"
+  venues:
+    - id: aqua-gym-duesseldorf
+      name: AQUA GYM Düsseldorf
+      address: Glockenstraße 24, 40476 Düsseldorf
+      district: Derendorf
+      geo: { lat: 51.245801, lon: 6.786334 }
+      hint: Zugang mit Kinderwagen über das Anwohnerhaus Nr. 24 (Dachterrasse)
+- id: zwergenstube-duesseldorf
+  publicId: jduqhdc1
+  role: anbieter
+  region: duesseldorf
+  name: Zwergenstube Düsseldorf – Turnzwerge und Minis
+  url: https://zwergenstube-duesseldorf.com/eltern-kind-turnkurse/
+  age:
+    minMonths: 9
+    maxMonths: 84
+  programme:
+    - url: https://zwergenstube-duesseldorf.com/alle-kurse/
+      kind: html
+      use: termine
+      hint: Leitet auf die ebusy-Kursliste um. Nur Kurse ab 9 Monaten bis etwa 3 Jahre; Kurse ab 3,5 Jahren und Papa-Kind-Kurs weglassen. Altersangabe steht im Kursnamen (Jahre).
+    - url: https://zwergenstube-duesseldorf.com/turnzwerge-duesseldorf/
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: Buchungsliste mit Buchen-Link je Kurs; Einzelstunden (Schnupper) als Kurs mit Preis ab 17 €
+    system: ebusy
+  verified: 2026-10-24
+  notes:
+    - Minis 9 Monate bis 2 Jahre, Turnzwerge ab 1,5 bis 7 Jahre, 23 Kurse an 6 Wochentagen.
+    - "ROBOTS: zwergenstube-duesseldorf.ebusy.de/robots.txt hat „Disallow: /“. Der Abruf läuft über die Weiterleitung von zwergenstube-duesseldorf.com/alle-kurse/, die Pipeline beachtet robots.txt nicht. Entscheidung offen (siehe Rückmeldung)."
+    - Die Standorte-Seite nennt zwei Hallen; die Bestandsaufnahme nannte zusätzlich Flurstr. 57 (Kloster Flingern, Spieltreff), die derzeit nicht als Kursort geführt wird.
+    - "[zwergenstube-duesseldorf.com/standorte] Adressen der beiden Turnhallen"
+  venues:
+    - id: zwergenstube-duesseldorf
+      name: Turnhalle Franz-Marc-Schule (Lohbachweg)
+      address: Lohbachweg 18, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.22993, lon: 6.84297 }
+    - id: zwergenstube-duesseldorf-graf-recke-strasse
+      name: Turnhalle Gemeinschaftshauptschule Graf-Recke-Straße
+      address: Graf-Recke-Straße 230, 40235 Düsseldorf
+      district: Grafenberg
+      geo: { lat: 51.246383, lon: 6.823431 }
+- id: rohrspatz-duesseldorf
+  publicId: cfrxar29
+  role: anbieter
+  region: duesseldorf
+  name: Rohrspatz – Musikalische Früherziehung (Unterbilk)
+  url: https://rohrspatz-duesseldorf.de/
+  age:
+    minMonths: 0
+    maxMonths: 72
+  programme:
+    - url: https://rohrspatz-duesseldorf.de/eltern-kind-kurs-duesseldorf
+      kind: html
+      use: info
+    - url: https://rohrspatz-duesseldorf.de/musikkurs-fuer-babys
+      kind: html
+      use: info
+    - url: https://rohrspatz-duesseldorf.de/musikkurs-u3
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Quartalskurse, bei Ausbuchung Eintrag auf die Wartebank per E-Mail
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Der Kursplan steht nur als Bild, die Kursseiten nennen Altersgruppen und Quartalsstart ohne Wochentage und Uhrzeiten
+    since: 2026-10-24
+  notes:
+    - Gruppen Nestlinge (erstes Lebensjahr), Piepmatzen (12–18 Monate), Küken (1,5–3 Jahre). Kurse starten quartalsweise, meist drei Monate.
+    - "[rohrspatz-duesseldorf.de/eltern-kind-kurs-duesseldorf] Seite „Kursplan“ enthält nur ein Bild „Kursplan Herbst-Winter“, kein lesbarer Text"
+    - Adresse Eingang Bilker Allee.
+  venues:
+    - id: rohrspatz-duesseldorf
+      name: Rohrspatz Studio Unterbilk
+      address: Florastraße 78, 40217 Düsseldorf
+      district: Unterbilk
+      geo: { lat: 51.21097, lon: 6.77248 }
+- id: musikschule-arioso-duesseldorf
+  publicId: hfrsdpeu
+  role: anbieter
+  region: duesseldorf
+  name: Musikschule Arioso – Eltern-Kind-Musikgruppen
+  url: https://musikschule-arioso.de/fruherziehung/
+  age:
+    minMonths: 12
+    maxMonths: 36
+  programme:
+    - url: https://musikschule-arioso.de/fruherziehung/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Probestunde und Anmeldung über das Anfrageformular auf der Website
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Eltern-Kind-Gruppen für 1 bis 3 Jahre nur beschrieben, ohne Gruppenplan oder Termine online
+    since: 2026-10-24
+  notes:
+    - Gruppenangebote 3 bis 12 Kinder. Musikalische Früherziehung 3–6 Jahre gehört nicht zu 0–3.
+    - Zweiter Standort Krefelder Str. 1 liegt in Meerbusch und bleibt draußen.
+    - "[musikschule-arioso.de/fruherziehung] Beschreibung Eltern-Kind-Musikgruppen für Kinder von 1 bis 3 Jahren"
+  venues:
+    - id: musikschule-arioso-duesseldorf
+      name: Musikschule Arioso Düsseldorf
+      address: Kirchfeldstraße 84, 40215 Düsseldorf
+      district: Friedrichstadt
+      geo: { lat: 51.212514, lon: 6.780203 }
+- id: maela-base-duesseldorf
+  publicId: 9dnul8ub
+  role: anbieter
+  region: duesseldorf
+  name: MAELA Family Concept Düsseldorf – Eltern-Kind-Musikkurs
+  url: https://maela-base.com/duesseldorf/eltern-kind-musikkurs/
+  age:
+    minMonths: 0
+    maxMonths: 60
+  programme:
+    - url: https://maela-base.com/duesseldorf/kursplan/
+      kind: html
+      render: browser
+      use: termine
+      hint: Nur Eltern-Kind-Musikkurse (Babys bis Kleinkinder, sechs Termine je Kurs); Massagen, Yoga, Pilates und Baby Spa gehören nicht in dieses Paket.
+    - url: https://maela-base.com/duesseldorf/eltern-kind-musikkurs/
+      kind: html
+      use: info
+  availability:
+    shown: unbekannt
+    how: Online-Buchung mit Zahlung im Voraus über das Buchungstool der Website
+    system: Buchungstool der Website (unbekannt)
+  verified: 2026-10-24
+  notes:
+    - "UNGEPRÜFT: Die Kursplan-Seite hat ohne Browser keinen Inhalt außer Kontaktformular und Kartenplatzhalter. Ob render: browser die Termine zeigt, klärt ein Trockenlauf; sonst skipCrawl."
+    - "Kurs: 6 Sitzungen à 45 Minuten, bis 10 Kinder, ab 139 €. Kleinkinder 12 bis 24 Monate bei Kursbeginn, laut Seite 1 bis 5 Jahre."
+    - Das Studio bietet auch Rückbildung, Baby Spa, Floating und Mama-Yoga an. Ob P3 es als Anbieter führt, ist abzustimmen, dann gehören diese Kurse in den P3-Eintrag und dieser Eintrag entfällt.
+    - Adresse laut JSON-LD der Website Platz der Ideen 4; das Impressum nennt Platz der Ideen 2 (Unternehmenssitz).
+    - "[maela-base.com/duesseldorf/kursplan, JSON-LD] Anschrift und Öffnungszeiten des Studios"
+  venues:
+    - id: maela-base-duesseldorf
+      name: MAELA Family Concept Düsseldorf
+      address: Platz der Ideen 4, 40476 Düsseldorf
+      district: Derendorf
+      geo: { lat: 51.251968, lon: 6.7737 }
+- id: clara-schumann-musikschule
+  publicId: 97lw54yp
+  role: anbieter
+  region: duesseldorf
+  name: Clara-Schumann-Musikschule Düsseldorf – Liedergarten
+  url: https://clara-schumann-musikschule.de/unterrichtsangebote/kinder-bis-grundschulalter
+  age:
+    minMonths: 24
+    maxMonths: 36
+  programme:
+    - url: https://clara-schumann-musikschule.de/unterrichtsangebote/kinder-bis-grundschulalter
+      kind: html
+      use: info
+    - url: https://clara-schumann-musikschule.de/standorte/standorte-nach-bezirk
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Anmeldung online, per E-Mail oder Post; Wartelisten je Bezirk
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Liedergarten (2 bis 3 Jahre) läuft ein Schuljahr an vielen Standorten ohne veröffentlichte Gruppenzeiten; Anmeldung über Warteliste
+    since: 2026-10-24
+  notes:
+    - Städtische Musikschule, Domain clara-schumann-musikschule.de (nicht duesseldorf.de, robots.txt ohne Sperre).
+    - Unterricht in Schulen, Kitas und eigenen Räumen in allen Stadtbezirken; die Standortliste nennt keine Liedergarten-Zuordnung, deshalb nur die Zentrale als Ort.
+    - "[clara-schumann-musikschule.de/standorte/standorte-nach-bezirk] Musikschulzentrale Prinz-Georg-Straße 80"
+  venues:
+    - id: clara-schumann-musikschule
+      name: Clara-Schumann-Musikschule Zentrale
+      address: Prinz-Georg-Straße 80, 40479 Düsseldorf
+      district: Pempelfort
+      geo: { lat: 51.236097, lon: 6.788323 }
+- id: kiwifalter-duesseldorf
+  publicId: zsq9qmsm
+  role: anbieter
+  region: duesseldorf
+  name: kiwifalter – Family Hub Kalkum
+  url: https://www.kiwifalter.de/
+  age:
+    minMonths: 12
+    maxMonths: 48
+  programme:
+    - url: https://www.kiwifalter.de/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Buchung über die kiwifalter-App; Abmeldung bis 24 Stunden vorher per E-Mail
+    system: App
+  verified: 2026-10-24
+  skipCrawl:
+    reason: Der Kursplan steht nur in der App, die Website ist per HTTPS nicht abrufbar (TLS-Handshake-Fehler am 2026-10-24)
+    since: 2026-10-24
+  notes:
+    - MamaPapaKind-Kurse Musik, Kunst, Tanz, Ballschule für etwa 1 bis 3 Jahre; Kiwi Kurs Pass seit September 2025 (Angaben aus Verzeichnissen, nicht von der eigenen Seite lesbar).
+    - kiwifalter.de liefert curl und fetch-page einen SSL-Fehler (Webflow-Domain, www.kiwifalter.de); nach einer Reparatur erneut prüfen, ob Termine auf der Seite stehen.
+    - Postleitzahl 40468 (Kalkum) stammt nicht aus der Quelle, sondern aus dem Stadtteil; vor dem Geocoding prüfen.
+  venues:
+    - id: kiwifalter-duesseldorf
+      name: kiwifalter Family Hub
+      address: Kalkumer Schlossallee 100, 40468 Düsseldorf
+      district: Kalkum
+      geo: { lat: 51.306028, lon: 6.757897 }
+- id: happy-kids-duesseldorf
+  publicId: 5so25dlm
+  role: anbieter
+  region: duesseldorf
+  name: HAPPY KIDS Düsseldorf – Baby- und Krabbelkurse
+  url: https://happykids-agentur.de/kurse/
+  age:
+    minMonths: 3
+    maxMonths: 36
+  programme:
+    - url: https://app1.edoobox.com/HappyK/Krabbelkurs?edref=happyk
+      kind: html
+      use: termine
+      hint: Nur Babygymnastik und Krabbelkurse (3 bis 12 Monate) aufnehmen; Tanzkurse 4–6 Jahre, Partys und Brunch weglassen.
+    - url: https://happykids-agentur.de/kurse/baby-und-krabbelkurs/
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: Spalte „Freie Plätze“ und Status Verfügbar, Ausgebucht oder Warteliste je Kurs
+    system: edoobox
+  verified: 2026-10-24
+  notes:
+    - Kurse 6 Wochen, 119,99 €. Spielzeit im Kindercafé für Kursteilnehmer gratis.
+    - "[happykids-agentur.de/kurse/baby-und-krabbelkurs] Kursraum neben dem Kindercafé, Achenbachstr. 148, 40237 Düsseldorf"
+    - Musikkurse der Internationalen Musikschule (IMS) laufen im Haus; Seite happykids-agentur.de/internationale-musikschule-musikkurse nennt keine Termine.
+    - robots.txt von app1.edoobox.com erlaubt die Kursliste (Disallow nur für Admin-Pfade). Das Kindercafé selbst (offene Zeiten) ist nicht aufgenommen.
+    - Websuche nennt widersprüchliche Postleitzahlen; maßgeblich ist die eigene Seite des Anbieters.
+  venues:
+    - id: happy-kids-duesseldorf
+      name: HAPPY KIDS Kursraum und Kindercafé
+      address: Achenbachstraße 148, 40237 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.236981, lon: 6.799481 }
+- id: babybee-spielraum-duesseldorf
+  publicId: 3rylsa53
+  role: anbieter
+  region: duesseldorf
+  name: Baby Bee Spielraum Düsseldorf
+  url: https://www.babybee-spielraum.de/duesseldorf
+  age:
+    minMonths: 0
+    maxMonths: 60
+  programme:
+    - url: https://www.babybee-spielraum.de/duesseldorf
+      kind: html
+      use: termine
+      hint: Offener Spielbetrieb jeden Tag, Wochenregel ausrollen (auch an Feiertagen). Einlass mit Spielslot, Reservierung vorab online empfohlen. Kindergeburtstage weglassen.
+  availability:
+    shown: teilweise
+    how: Spielslot vorab online reservieren, spontaner Einlass nach Verfügbarkeit
+    system: Online-Reservierung (Wix)
+  verified: 2026-10-24
+  notes:
+    - Freies Spiel 0 bis 5 Jahre mit Begleitperson, Eintritt Kinder 8,50 €, Erwachsene 7,90 €, Babys unter 6 Monaten frei, 10er Karte 69 €.
+    - Weitere Standorte (Meerbusch Lank-Latum, Essen, Bochum, Bonn, Rhein-Sieg, Mülheim) gehören nicht in den Katalog.
+    - Kein Kurs- oder Terminprogramm, sondern täglich offene Zeiten; falls das für die Terminsuche nicht gewollt ist, auf skipCrawl umstellen.
+    - "[babybee-spielraum.de/duesseldorf] Öffnungszeiten täglich 09:30 bis 18:15, Standort Nord Carree"
+  venues:
+    - id: babybee-spielraum-duesseldorf
+      name: Baby Bee Spielraum im Nord Carree
+      address: Nord Carree 6, 40477 Düsseldorf
+      district: Pempelfort
+      geo: { lat: 51.235575, lon: 6.779461 }
+- id: dtv-1847-eltern-kind-turnen
+  publicId: goh4poj2
+  role: anbieter
+  region: duesseldorf
+  name: Düsseldorfer Turnverein 1847 – Eltern-Kind-Turnen
+  url: https://www.duesseldorfertv.de/eltern-kind-turnen
+  age:
+    minMonths: 12
+    maxMonths: 47
+  programme:
+    - url: https://www.duesseldorfertv.de/eltern-kind-turnen
+      kind: html
+      use: termine
+      hint: Feste Wochenzeiten, keine Einzeltermine. Wochenregel ausrollen, Schulferien NRW ausnehmen. Gruppen sind voll, nur Warteliste.
+  availability:
+    shown: ja
+    how: Gruppen derzeit voll; Warteliste für Kinder unter 3 Jahren per Formular
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Mitgliedsbeitrag 135 € pro Jahr für einen Erwachsenen und ein Kind.
+    - "[duesseldorfertv.de/eltern-kind-turnen] Dienstag und Donnerstag, je zwei Gruppen, Halle der Brehmschule"
+  venues:
+    - id: dtv-1847-eltern-kind-turnen
+      name: Halle der Brehmschule
+      address: Karl-Müller-Straße 25, 40237 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.234302, lon: 6.81407 }
+- id: tbh-hassels-eltern-kind-turnen
+  publicId: 2ptavvzr
+  role: anbieter
+  region: duesseldorf
+  name: Turnerbund Hassels 1925 – Eltern-Kind-Turnen
+  url: https://tbh-sport.de/eltern-kind-turnen/
+  age:
+    minMonths: 18
+    maxMonths: 42
+  programme:
+    - url: https://tbh-sport.de/eltern-kind-turnen/
+      kind: html
+      use: termine
+      hint: Feste Wochenzeiten je Halle, keine Einzeltermine. Wochenregel ausrollen, Schulferien NRW ausnehmen. Für Kinder, die schon laufen können.
+  availability:
+    shown: nein
+    how: Anmeldung über die Übungsleiterinnen per Telefon oder WhatsApp
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Mittwoch Hassels, Donnerstag Benrath, Freitag Himmelgeist und Benrath.
+    - "Hallenadressen: Einsiedelstraße und Steinkaul stehen auf der Seite, die PLZ 40597 bzw. 40589 sind ergänzt und nicht von der Quelle. Am Köhnen 73 laut Verzeichnis (gelbeseiten.de), die Seite nennt nur „GGS am Köhnen“."
+  venues:
+    - id: tbh-hassels-eltern-kind-turnen
+      name: Sporthalle GGS Am Köhnen (Hassels)
+      address: Am Köhnen 73, 40599 Düsseldorf
+      district: Hassels
+      geo: { lat: 51.180146, lon: 6.866271 }
+      hint: Mittwoch
+    - id: tbh-hassels-eltern-kind-turnen-benrath
+      name: Sporthalle GGS Einsiedelstraße (Benrath)
+      address: Einsiedelstraße 25, 40597 Düsseldorf
+      district: Benrath
+      geo: { lat: 51.163335, lon: 6.884742 }
+      hint: Donnerstag und Freitag
+    - id: tbh-hassels-eltern-kind-turnen-himmelgeist
+      name: Sporthalle GGS Steinkaul (Himmelgeist)
+      address: Steinkaul 27, 40589 Düsseldorf
+      district: Himmelgeist
+      geo: { lat: 51.169788, lon: 6.807618 }
+      hint: Freitag
+- id: ftv-1880-eltern-kind-turnen
+  publicId: g6fzhxku
+  role: anbieter
+  region: duesseldorf
+  name: Friedrichstädter Turnverein 1880 – Eltern-Kind-Turnen
+  url: https://www.ftv-duesseldorf.de/sportangebot/eltern-kind-turnen/
+  age:
+    minMonths: 24
+    maxMonths: 60
+  programme:
+    - url: https://www.ftv-duesseldorf.de/sportangebot/eltern-kind-turnen/
+      kind: html
+      use: termine
+      hint: Tabelle mit Tag, Uhrzeit, Ort und Altersgruppe. Wochenregel ausrollen, Schulferien NRW ausnehmen. Nur Gruppen mit Alter ab 2 Jahren; Gruppen 3–5 Jahre weglassen.
+  availability:
+    shown: ja
+    how: Kein Platz frei, Warteliste per E-Mail; frühestens im nächsten Jahr wieder Plätze
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Montag bis Mittwoch, vier Gruppen für 2 bis 5 Jahre. Die Seite nennt Hallen ohne PLZ; PLZ aus Schulverzeichnissen ergänzt (Jahnstraße 40215, Florastraße 40217, Färberstraße 40223).
+    - Altersuntergrenze 2 Jahre, damit nur teilweise im Bereich 0–3; Einschätzung 1 bis 2 Angebote.
+  venues:
+    - id: ftv-1880-eltern-kind-turnen
+      name: Turnhalle Florastraße
+      address: Florastraße 69, 40217 Düsseldorf
+      district: Unterbilk
+      geo: { lat: 51.211418, lon: 6.771306 }
+      hint: Montag
+    - id: ftv-1880-eltern-kind-turnen-jahnstrasse
+      name: Turnhalle Jahnstraße
+      address: Jahnstraße 97, 40215 Düsseldorf
+      district: Friedrichstadt
+      geo: { lat: 51.211853, lon: 6.779932 }
+      hint: Dienstag
+    - id: ftv-1880-eltern-kind-turnen-faerberstrasse
+      name: Turnhalle Färberstraße
+      address: Färberstraße 40, 40223 Düsseldorf
+      district: Bilk
+      geo: { lat: 51.208869, lon: 6.788144 }
+      hint: Mittwoch
+- id: tsv-jahn-oberkassel-eltern-kind
+  publicId: 7tgq73to
+  role: anbieter
+  region: duesseldorf
+  name: TSV Jahn 05 Oberkassel – Eltern & Kind Turnen
+  url: https://www.tsv-jahn.de/de/sportangebot/sportangebote-und-abteilungen/eltern-kind/
+  age:
+    minMonths: 6
+    maxMonths: 48
+  programme:
+    - url: https://www.tsv-jahn.de/de/sportangebot/sportangebote-und-abteilungen/eltern-kind/
+      kind: html
+      use: termine
+      hint: Gruppenliste mit Wochentag, Zeit, Alter und Ort. Wochenregel ausrollen, Schulferien NRW ausnehmen. Hinweis „voll belegt“ als Warteliste lesen.
+  availability:
+    shown: teilweise
+    how: Hinweis „z. Zt. voll belegt“ je Gruppe, Nachfrage übersteigt das Angebot
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Gruppen Babys in Bewegung 6–12 Monate (Dienstag), Eltern und Kind 1,5–3 Jahre (Dienstag), mehrere Gruppen 2,5–4 Jahre.
+    - "[tsv-jahn.de/…/eltern-kind] Hallen mit Straße und PLZ stehen je Gruppe auf der Seite"
+  venues:
+    - id: tsv-jahn-oberkassel-eltern-kind
+      name: Schwimmbad Rheinblick 741, Gymnastikraum
+      address: Pariser Straße 41, 40549 Düsseldorf
+      district: Oberkassel
+      geo: { lat: 51.231758, lon: 6.733317 }
+      hint: Dienstag und Freitag, auch Babys in Bewegung
+    - id: tsv-jahn-oberkassel-eltern-kind-heinrich-heine-schule
+      name: Heinrich-Heine-Grundschule, Sporthalle
+      address: Heerdter Landstraße 186, 40549 Düsseldorf
+      district: Heerdt
+      geo: { lat: 51.231013, lon: 6.70655 }
+      hint: Montag
+    - id: tsv-jahn-oberkassel-eltern-kind-bodelschwingh-schule
+      name: Friedrich-von-Bodelschwingh-Schule, Sporthalle
+      address: Cimbernstraße 24, 40545 Düsseldorf
+      district: Oberkassel
+      geo: { lat: 51.228809, lon: 6.756868 }
+      hint: Dienstag bis Donnerstag
+- id: ksv-kaiserswerth-eltern-kind
+  publicId: wz4w5qmd
+  role: anbieter
+  region: duesseldorf
+  name: Kaiserswerther Sportverein 1966 – Krabbelgruppe und Eltern-Kind-Turnen
+  url: https://ksv-duesseldorf.de/de/pages/kinder-und-jugendsport
+  age:
+    minMonths: 12
+    maxMonths: 48
+  programme:
+    - url: https://ksv-duesseldorf.de/de/pages/kinder-und-jugendsport
+      kind: html
+      use: termine
+      hint: Krabbel- und Lauflerngruppe 1–2 Jahre, Eltern-Kind-Turnen 2–4 Jahre. Wochenregel ausrollen, Schulferien NRW ausnehmen. Kinderturnen ab 4 Jahren weglassen.
+  availability:
+    shown: nein
+    how: Anmeldung über Kursanmeldung auf der Website, große Nachfrage mit Regeln für das Kinderprogramm
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Krabbelgruppe Montag; Eltern-Kind-Turnen Mittwoch und Freitag an mehreren Hallen.
+    - "[ksv-duesseldorf.de/de/pages/sportstatten] Hallenadressen der Sportstätten"
+  venues:
+    - id: ksv-kaiserswerth-eltern-kind
+      name: Grundschule Kaiserswerth
+      address: Fliednerstraße 32, 40489 Düsseldorf
+      district: Kaiserswerth
+      geo: { lat: 51.302111, lon: 6.738207 }
+      hint: Krabbelgruppe Montag, Eltern-Kind-Turnen Mittwoch und Freitag
+    - id: ksv-kaiserswerth-eltern-kind-lohausen
+      name: Grundschule Lohausen
+      address: Im Grund 78, 40474 Düsseldorf
+      district: Lohausen
+      geo: { lat: 51.275693, lon: 6.737574 }
+      hint: Eltern-Kind-Turnen Mittwoch
+    - id: ksv-kaiserswerth-eltern-kind-theodor-fliedner-gymnasium
+      name: Theodor-Fliedner-Gymnasium, kleine Halle
+      address: Kalkumer Schlossallee 28, 40489 Düsseldorf
+      district: Kaiserswerth
+      geo: { lat: 51.305966, lon: 6.747182 }
+      hint: Eltern-Kind-Turnen Freitag
+- id: gtv-gerresheim-eltern-kind
+  publicId: las6stur
+  role: anbieter
+  region: duesseldorf
+  name: Gerresheimer Turnverein – Eltern-Kind-Turnen, Turn-Knirpse, Baby und Buggy
+  url: https://www.gtv-sport.de/sportangebot-verein/eltern-kind-turnen/
+  age:
+    minMonths: 10
+    maxMonths: 72
+  programme:
+    - url: https://www.gtv-sport.de/sportangebot-verein/eltern-kind-turnen/
+      kind: html
+      use: termine
+      hint: Tabelle mit Tag, Zeit, Alter, Ort als Hallennummer (1–10), Warteliste im Feld. Wochenregel ausrollen, Schulferien NRW ausnehmen. Gruppen 2–5 Jahre sind Randfälle.
+    - url: https://www.gtv-sport.de/sportangebot-kurse/turn-knirpse/
+      kind: html
+      use: termine
+      hint: Krabbelalter bis 2 Jahre, Kurs mit festem Zeitraum und Einheiten; Pause in den Herbstferien.
+    - url: https://www.gtv-sport.de/sportangebot-kurse/fit-mit-baby-und-buggy/
+      kind: html
+      use: termine
+      hint: Mama-Baby-Fitness im Freien, Mittwochs, Einstieg jederzeit. Kursort ist ein Wasserspielplatz.
+  availability:
+    shown: teilweise
+    how: Hinweis „Warteliste“ in der Gruppenliste, bei Kursen „Noch wenige Plätze frei“
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - "Hallenzuordnung der Ziffern in der Tabelle: 2 Schönaustraße 25 (Martin-Luther-King-Schule), 4 Unter den Eichen 26 (Kath. Grundschule), 7 Vennhauser Allee 162, 10 Vennhauser Allee 167 (Schule Am Eller Forst). PLZ stehen auf den Sportstätten-Seiten."
+    - Fit mit Baby und Buggy findet am Wasserspielplatz gegenüber Tannenhofweg 45 statt, ohne PLZ und Hausnummer des Treffpunkts; deshalb nicht als Ort angelegt.
+    - "[gtv-sport.de/sportstätten/…] Adressen aus dem Seitentitel der Sportstätten-Seiten"
+  venues:
+    - id: gtv-gerresheim-eltern-kind
+      name: Turnhalle 2 Martin-Luther-King-Schule
+      address: Schönaustraße 25, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.234227, lon: 6.858375 }
+      hint: Eltern-Kind-Turnen
+    - id: gtv-gerresheim-eltern-kind-unter-den-eichen
+      name: Turnhalle 4 Katholische Grundschule
+      address: Unter den Eichen 26, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.232638, lon: 6.857054 }
+      hint: Eltern-Kind-Turnen
+    - id: gtv-gerresheim-eltern-kind-vennhauser-allee-162
+      name: Turnhalle 7 Gemeinschaftsgrundschule Vennhauser Allee
+      address: Vennhauser Allee 162, 40627 Düsseldorf
+      district: Vennhausen
+      geo: { lat: 51.206136, lon: 6.856253 }
+      hint: Eltern-Kind-Turnen
+    - id: gtv-gerresheim-eltern-kind-vennhauser-allee-167
+      name: Turnhalle 10 Schule Am Eller Forst
+      address: Vennhauser Allee 167, 40627 Düsseldorf
+      district: Vennhausen
+      geo: { lat: 51.206188, lon: 6.858051 }
+      hint: Eltern-Kind-Turnen
+    - id: gtv-gerresheim-eltern-kind-klotzbahn
+      name: GTV-Gymnastikraum Klotzbahn
+      address: Klotzbahn 1f, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.231524, lon: 6.855889 }
+      hint: Turn-Knirpse freitags
+- id: tg-1881-eltern-kind-turnen
+  publicId: 9fxw0sh5
+  role: anbieter
+  region: duesseldorf
+  name: Turngemeinde 1881 – Eltern-Kind-Turnen
+  url: https://www.tg1881.de/eltern-kind-turnen/
+  age:
+    minMonths: 18
+    maxMonths: 48
+  programme:
+    - url: https://www.tg1881.de/eltern-kind-turnen/
+      kind: html
+      use: termine
+      hint: Eine Gruppe jeden Dienstag; Wochenregel ausrollen, Schulferien NRW ausnehmen. Altersangabe fehlt auf der Seite.
+  availability:
+    shown: nein
+    how: Anmeldung über die Übungsleiterin per Mobiltelefon
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - Altersgrenze steht nicht auf der Seite; Spanne 18 bis 48 Monate ist eine Annahme für Eltern-Kind-Turnen.
+    - Halle laut Seite „Turnhalle der Grundschule Sonnenstraße“, Anschrift Sonnenstraße 10, 40227 Düsseldorf laut Schulverzeichnissen (Oberbilk), nicht von der Vereinsseite.
+    - Vereinsanschrift Stoffeler Kapellenweg 65, 40225 Düsseldorf ist nicht der Kursort.
+  venues:
+    - id: tg-1881-eltern-kind-turnen
+      name: Turnhalle Grundschule Sonnenstraße
+      address: Sonnenstraße 10, 40227 Düsseldorf
+      district: Oberbilk
+      geo: { lat: 51.212859, lon: 6.791707 }
+- id: sportgeister-duesseldorf
+  publicId: y031na3y
+  role: anbieter
+  region: duesseldorf
+  name: Sportgeister e.V. – Eltern-Kind-Turnen
+  url: https://www.sportgeister.de/bewegungsangebote
+  age:
+    minMonths: 18
+    maxMonths: 54
+  programme:
+    - url: https://www.sportgeister.de/uebersicht_sportgruppen_und_freie_plaetze
+      kind: html
+      use: termine
+      hint: Gruppenliste mit Stadtteil/Adresse, Inhalt, Tag/Uhrzeit und freien Plätzen. Nur Eltern-Kind-Turnen aufnehmen; Familienturnen, Kinderturnen, Fußball und Multisport weglassen.
+    - url: https://www.sportgeister.de/bewegungsangebote
+      kind: html
+      use: info
+  availability:
+    shown: ja
+    how: Spalte „N Plätze“ je Gruppe (0 Plätze = voll); Buchung im Onlineportal nach Anmeldung
+    system: ClubDesk
+  verified: 2026-10-24
+  notes:
+    - Gruppen laufen fortlaufend, Wochenplan ohne Einzeltermine. Eltern-Kind-Turnen ca. 1,5 bis 3,5 Jahre; die Liste nennt meist 2 bis 4 Jahre.
+    - Homepage und Buchungsportal sind laut Seite nicht synchron.
+    - PLZ der Hallen nicht von der Quelle, aus Schulverzeichnissen ergänzt (Konkordiastr. 40219, Paulusplatz 40237, Flurstr. 40235, Lindenstr. 102 40233, Wersten 40591). Die Gruppe „Bilk, Florastr. (Realschule)“ ist ohne Hausnummer und nicht als Ort angelegt.
+    - Zusätzlich Kurs Familienturnen am Samstag (sportgeister.de/kurs_familienturnen_am_samstag) nicht geprüft.
+  venues:
+    - id: sportgeister-duesseldorf
+      name: Turnhalle Konkordiastraße (Bilk)
+      address: Konkordiastraße 26, 40219 Düsseldorf
+      district: Unterbilk
+      geo: { lat: 51.214933, lon: 6.769909 }
+      hint: Eltern-Kind-Turnen montags
+    - id: sportgeister-duesseldorf-paulusplatz
+      name: Turnhalle Paulusplatz (Düsseltal)
+      address: Paulusplatz 1, 40237 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.235917, lon: 6.804549 }
+      hint: Eltern-Kind-Turnen dienstags, mittwochs und freitags
+    - id: sportgeister-duesseldorf-flurstrasse
+      name: Turnhalle Flurstraße (Flingern-Nord)
+      address: Flurstraße 59, 40235 Düsseldorf
+      district: Flingern Nord
+      geo: { lat: 51.228559, lon: 6.816495 }
+      hint: Eltern-Kind-Turnen dienstags
+    - id: sportgeister-duesseldorf-lindenstrasse
+      name: Turnhalle Lindenstraße (Flingern-Nord)
+      address: Lindenstraße 102, 40233 Düsseldorf
+      district: Flingern Nord
+      geo: { lat: 51.228323, lon: 6.805017 }
+      hint: Eltern-Kind-Turnen freitags
+    - id: sportgeister-duesseldorf-rheindorfer-weg
+      name: Turnhalle Rheindorfer Weg (Wersten)
+      address: Rheindorfer Weg 20, 40591 Düsseldorf
+      district: Wersten
+      geo: { lat: 51.18994, lon: 6.814432 }
+      hint: Eltern-Kind-Turnen dienstags und mittwochs
+- id: tonhalle-duesseldorf
+  publicId: 142zn82f
+  role: anbieter
+  region: duesseldorf
+  name: Tonhalle Düsseldorf – Himmelblau (Konzerte für 0–2 Jahre)
+  url: https://www.tonhalle.de/programm-fuer-kinder-und-familie
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.tonhalle.de/programm-fuer-kinder-und-familie
+      kind: html
+      render: browser
+      use: termine
+      hint: Nur Reihe Himmelblau und Pinseltöne für 0–2 Jahre; Ultraschall-Konzert (Schwangere) und Konzerte ab 3 Jahren weglassen
+  availability:
+    shown: unbekannt
+    how: Kartenverkauf über tonhalle.de; Familienkonzerte sind laut Presse oft schnell ausverkauft
+    system: eigener Shop (Drupal, Seite client-seitig gerendert)
+  verified: 2026-10-24
+  notes:
+    - "[tonhalle.de/programm-fuer-kinder-und-familie] fetch-page liefert nur den Sprunglink, die Seite braucht render: browser. Die Sitemap (sitemap.xml) nennt Einzelseiten /veranstaltung/himmelblau/<nr>-himmelblau-fuer-0-2-jahre; nächste Termine laut Suche: 13.10.2026 (vorbei), 01.03.2027 (Familienmusikwoche)."
+    - Himmelblau und Pinseltöne laufen mehrmals im Jahr in Familienmusikwochen mit mehreren Vorstellungen je Tag; Saal (Kleine Tonhalle?) und Preis nicht geprüft.
+  venues:
+    - id: tonhalle-duesseldorf
+      name: Tonhalle Düsseldorf
+      address: Ehrenhof 1, 40479 Düsseldorf
+      district: Pempelfort
+      geo: { lat: 51.232164, lon: 6.772543 }
+      hint: Himmelblau-Konzerte für 0–2 Jahre
+- id: kunstpalast-duesseldorf
+  publicId: 5p9865hh
+  role: anbieter
+  region: duesseldorf
+  name: Kunstpalast Düsseldorf – Kunst mit Baby
+  url: https://www.kunstpalast.de/de/programm/kinder-jugendliche-familien/kunst-mit-baby/
+  age:
+    minMonths: 0
+    maxMonths: 12
+  programme:
+    - url: https://www.kunstpalast.de/de/programm/kinder-jugendliche-familien/kunst-mit-baby/
+      kind: html
+      use: termine
+      hint: Termine unter "Aktuelle Termine"; "ausverkauft" bedeutet ausgebucht
+  availability:
+    shown: ja
+    how: Am Termin steht "ausverkauft", sonst Buchung über die Eventseite
+    system: Kunstpalast-Shop (WordPress)
+  verified: 2026-10-24
+  notes:
+    - Führung 60 Min. für Eltern mit Baby im 1. Lebensjahr, danach Kaffee. Preis ist der Ausstellungseintritt, Freundeskreis frei.
+    - "[kunstpalast.de/…/kunst-mit-baby] Aktuell nur ein Termin: Mi 20.01.2027 11:30 (ausverkauft). Plan 0042 nannte 21.10.2026, der ist vorbei."
+  venues:
+    - id: kunstpalast-duesseldorf
+      name: Kunstpalast
+      address: Ehrenhof 4–5, 40479 Düsseldorf
+      district: Pempelfort
+      geo: { lat: 51.234998, lon: 6.773104 }
+- id: schauspielhaus-junges-schauspiel
+  publicId: ocj80aq0
+  role: anbieter
+  region: duesseldorf
+  name: Düsseldorfer Schauspielhaus – Junges Schauspiel (Stücke ab 2 Jahren)
+  url: https://www.dhaus.de/programm/spielplan/junges-schauspiel/
+  age:
+    minMonths: 24
+    maxMonths: 48
+  programme:
+    - url: https://www.dhaus.de/programm/spielplan/junges-schauspiel/
+      kind: html
+      use: termine
+      hint: Nur Stücke mit "ab 2 Jahren" (derzeit "Bin gleich fertig!"); alle mit höherer Altersangabe und Studiotermine weglassen
+  availability:
+    shown: unbekannt
+    how: Link "Karten" je Vorstellung, Platzangabe im Spielplan nicht sichtbar
+    system: Ticketshop dhaus.de
+  verified: 2026-10-24
+  notes:
+    - "[dhaus.de/programm/spielplan/junges-schauspiel] Spielplan bis März, Altersangabe je Stück ('ab 2 Jahren'). Nur 'Bin gleich fertig!' (Central 2, Relaxed Performance) ist ab 2, z. B. Mi 28.10. 10:00–10:45. Alle anderen Stücke ab 4 bis 12."
+    - Ort Central 2 ist die Spielstätte des Schauspielhauses in der Worringer Straße, nicht das Haupthaus am Gustaf-Gründgens-Platz 1, 40211.
+  venues:
+    - id: schauspielhaus-junges-schauspiel
+      name: Central (Schauspielhaus), Central 2
+      address: Worringer Straße 140, 40210 Düsseldorf
+      district: Stadtmitte
+      geo: { lat: 51.22293, lon: 6.795412 }
+      hint: Junges Schauspiel, nur Vorstellungen ab 2 Jahren
+- id: puppentheater-helmholtzstrasse
+  publicId: cfnlmyou
+  role: anbieter
+  region: duesseldorf
+  name: Puppentheater Helmholtzstraße
+  url: https://puppentheater.de/
+  age:
+    minMonths: 30
+    maxMonths: 120
+  programme:
+    - url: https://puppentheater.de/
+      kind: html
+      use: termine
+      hint: Spielplan auf der Startseite, je Stück "Ab N Jahren"; nur Stücke ab 2,5 Jahren oder jünger aufnehmen, ältere weglassen
+  availability:
+    shown: ja
+    how: Am Termin steht "Ausverkauft"; Reservierung nur telefonisch 0211 372401
+    system: Telefon
+  verified: 2026-10-24
+  notes:
+    - "[puppentheater.de] Startseite zeigt den aktuellen Monat; Einlass erst ab 2,5 Jahren (Säuglinge und Kinder darunter nicht). 24.–25.10.2026 'Supermäuschen und der Fuchs' ab 2,5 Jahren, ca. 35 Min., ausverkauft."
+    - Unter 3 Jahren nur die Altersgruppe 2,5 bis 3; je Monat meist 1–3 Stücke.
+  venues:
+    - id: puppentheater-helmholtzstrasse
+      name: Puppentheater Helmholtzstraße
+      address: Helmholtzstraße 38, 40215 Düsseldorf
+      district: Friedrichstadt
+      geo: { lat: 51.214131, lon: 6.786808 }
+- id: ev-kg-linksrheinisch
+  publicId: apc4pkr1
+  role: anbieter
+  region: duesseldorf
+  name: Ev. Kirchengemeinde Düsseldorf-Linksrheinisch – Gottesdienst für kleine Leut’
+  url: https://www.evdus.de/evangelisch-vor-ort/linksrheinisch/linksrheinisch-kinder-und-jugend/linksrheinisch-gottesdienste-fuer-kinder-und-familien
+  age:
+    minMonths: 0
+    maxMonths: 60
+  programme:
+    - url: https://www.evdus.de/evangelisch-vor-ort/linksrheinisch/linksrheinisch-kinder-und-jugend/linksrheinisch-gottesdienste-fuer-kinder-und-familien
+      kind: html
+      render: browser
+      use: termine
+      hint: Nur "Gottesdienst für kleine Leut’" (0–5 Jahre); Kindergottesdienst, Jung-und-Alt- und Schulgottesdienste weglassen
+    - url: https://www.evdus.de/evangelisch-vor-ort/linksrheinisch/linksrheinisch-kinder-und-jugend/linksrheinisch-kinder-und-familien
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - "[evdus.de/…/linksrheinisch-gottesdienste-fuer-kinder-und-familien] Text sichtbar, die nächsten Termine kommen aus einem ChurchDesk-Kalender (JS), mit fetch-page nicht lesbar. 30 Min. Gottesdienst, danach Brunch im Festsaal und Basteln."
+    - "[evdus.de/…/linksrheinisch-kinder-und-familien] Zwei Eltern-Kind-Gruppen (1–3 Jahre) in Oberkassel und in Lörick unter Leitung der Jugenddiakonin, ohne Zeiten und Adressen auf der Seite; Kontakt Jugenddiakonin Marita Franz, 0211 5582325. Als Ort nicht aufgenommen, solange Adresse und Zeiten fehlen."
+    - Der gemeinsame Kalender evdus.de/kalender/regelmaessige-treffs ist ebenfalls JS (ChurchDesk).
+  venues:
+    - id: ev-kg-linksrheinisch
+      name: Auferstehungskirche Oberkassel (Festsaal)
+      address: Arnulfstraße 33, 40545 Düsseldorf
+      district: Oberkassel
+      geo: { lat: 51.233748, lon: 6.749406 }
+      hint: Gottesdienst für kleine Leut’ mit Brunch
+- id: ev-friedens-kg-duesseldorf
+  publicId: m3x5zh4p
+  role: anbieter
+  region: duesseldorf
+  name: Ev. Friedens-Kirchengemeinde Düsseldorf – Krabbelgottesdienst und Kirche Kunterbunt
+  url: https://www.evdus.de/evangelisch-vor-ort/friedenskirche/friedenskirche-gottesdienste
+  age:
+    minMonths: 0
+    maxMonths: 72
+  programme:
+    - url: https://www.evdus.de/evangelisch-vor-ort/friedenskirche/friedenskirche-gottesdienste
+      kind: html
+      render: browser
+      use: termine
+      hint: Nur Kleinkinder-Gottesdienst (Krabbelgottesdienst) und Kirche Kunterbunt; Sonntags- und Jung-und-Alt-Gottesdienste weglassen
+  availability:
+    shown: nein
+    system: keins
+  verified: 2026-10-24
+  notes:
+    - "[evdus.de/…/friedenskirche-gottesdienste] Beschreibung der Formate sichtbar (Krabbelgottesdienst 30 Min. im Kreis um den Flügel; Kirche Kunterbunt ökumenisch), die Liste 'Unsere nächsten Gottesdienste' ist ChurchDesk (JS) und mit fetch-page leer. Altersangabe der Formate nicht genannt."
+    - PLZ 40217 ist abgeleitet (Florastraße ist Unterbilk, Branchenverzeichnis), die Gemeindeseite nennt nur die Straße.
+  venues:
+    - id: ev-friedens-kg-duesseldorf
+      name: Friedenskirche
+      address: Florastraße 55, 40217 Düsseldorf
+      district: Unterbilk
+      geo: { lat: 51.211803, lon: 6.77156 }
+- id: ev-kg-unterrath-lichtenbroich-krabbelgruppen
+  publicId: tcy0uzzf
+  role: anbieter
+  region: duesseldorf
+  name: Ev. Kirchengemeinde Düsseldorf-Unterrath und Lichtenbroich – Krabbelgruppen „Krabbelkäfer“
+  url: https://unterrath-lichtenbroich.ekir.de/inhalt/krabbelgruppe-unterrath/
+  age:
+    minMonths: 6
+    maxMonths: 18
+  programme:
+    - url: https://unterrath-lichtenbroich.ekir.de/inhalt/krabbelgruppe-unterrath/
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    how: Anmeldung per E-Mail bei der Gruppenleitung; Beitrag 10 Euro pro Monat und Familie
+    system: keins
+  verified: 2026-10-24
+  skipCrawl:
+    reason: keine Termine und kein Wochenplan online, nur Beschreibung und Kontakt
+    since: 2026-10-24
+  notes:
+    - "[unterrath-lichtenbroich.ekir.de/inhalt/krabbelgruppe-unterrath] Krabbelgruppen für 6–18 Monate, vormittags im Gemeindehaus. Plan 0042 nannte fünf Gruppen an allen Wochentagen; die Seite nennt weder Tage noch Zeiten."
+  venues:
+    - id: ev-kg-unterrath-lichtenbroich-krabbelgruppen
+      name: Gemeindehaus Am Röttchen
+      address: Am Röttchen 10, 40468 Düsseldorf
+      district: Unterrath
+      geo: { lat: 51.272317, lon: 6.782371 }
+- id: musenkuss-duesseldorf
+  role: verzeichnis
+  region: duesseldorf
+  name: Musenkuss Düsseldorf – Portal Kultureller Bildung (Filter 0–3 Jahre)
+  url: https://www.musenkuss-duesseldorf.de/
+  programme:
+    - url: https://www.musenkuss-duesseldorf.de/suche?tx_solr%5Bfilter%5D%5B0%5D=targetGroupsToggle%3A0-3+Jahre
+      kind: html
+      use: info
+  availability:
+    shown: nein
+    system: TYPO3 mit Solr-Suche
+  verified: 2026-10-24
+  notes:
+    - "[musenkuss-duesseldorf.de/suche] Zielgruppenfilter '0-3 Jahre' liefert am 2026-10-24 11 Angebote und 12 Künstler*innen, überwiegend mobile Angebote für Kitas und einmalige Workshops; keine Terminliste für Familien. Eignet sich zur Suche nach Anbietern, nicht als Terminquelle."
+    - robots.txt des Portals sperrt nur BLEXBot und Barkrowler. Betreiberin ist die Stadt (Kulturamt), der Host ist aber nicht duesseldorf.de.
+- id: efa-duesseldorf
+  publicId: n9b420c9
+  role: anbieter
+  region: duesseldorf
+  name: efa – Ev. Familienbildungswerk Düsseldorf
+  url: https://www.efa-duesseldorf.de/kurse/familie-werden/pekip-delfi-eltern-baby-gruppen
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.efa-duesseldorf.de/kurse/familie-werden/pekip-delfi-eltern-baby-gruppen
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 4
+      hint: Nur Kurse mit Baby oder Kind bis 3 Jahre; Schwangerschafts- und Rückbildungskurse ohne Kind weglassen
+    - url: https://www.efa-duesseldorf.de/kurse/familie-werden/treffen-fuer-muetter-und-vaeter-mit-babys
+      kind: html
+      use: termine
+    - url: https://www.efa-duesseldorf.de/kurse/mit-kindern-leben/spielgruppen
+      kind: html
+      use: termine
+      hint: Nur Kurse für Kinder bis 3 Jahre; Kurse ab 3 Jahren weglassen
+    - url: https://www.efa-duesseldorf.de/kurse/mit-kindern-leben/musik-und-tanz-mit-kindern
+      kind: html
+      use: termine
+      hint: Nur Kurse für Kinder bis 3 Jahre; Kurse ab 3 Jahren weglassen
+    - url: https://www.efa-duesseldorf.de/kurse/mit-kindern-leben/bewegungsspiele-und-turnmaeuse
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 4
+      hint: Nur Kurse für Kinder bis 3 Jahre; Kurse ab 3 Jahren weglassen
+    - url: https://www.efa-duesseldorf.de/kurse/mit-kindern-leben/wasserspass-mit-kindern
+      kind: html
+      use: termine
+      hint: Nur Kurse, die Kinder unter 3 Jahren einschließen; Kurse ab 4 Jahren weglassen
+    - url: https://www.efa-duesseldorf.de/kurse/mit-kindern-leben/japanische-spanische-italienische-spielgruppen
+      kind: html
+      use: termine
+      hint: Nur Kurse für Kinder bis 3 Jahre; Kurse ab 3 Jahren weglassen
+  availability:
+    shown: ja
+    how: "Ampel je Kurs in der Liste: grün = frei, gelb = wenige Plätze, rot = ausgebucht (Warteliste möglich); Anmeldung im Warenkorb auf der Website"
+    system: Kufer
+  verified: 2026-10-24
+  notes:
+    - Kufer-Kursliste (25 Kurse je Seite, Folgeseiten per browse=forward); die Liste nennt Beginn, Uhrzeit und Zahl der Termine ("15 Termine"), daher wöchentliche Reihe mit Schulferienpause.
+    - Messung 2026-10-24, sieben Kategorien, 9 Seiten, 53 443 Zeichen; Kategorien 'Treffen für Mütter und Väter mit Babys' und 'Wasserspaß' haben je eine Seite.
+    - Orte außerhalb der efa-Häuser sind Familienzentren und Gemeinden; die Liste führt sie als 'Stadtteil, Straße Nr, Name'.
+    - "Nicht aufgenommen: Gartenhallenbad Unterrath (Mettlacher Str. 55), dort nur Eltern-Kind-Schwimmen für 4 bis 5 Jahre."
+  venues:
+    - id: efa-duesseldorf
+      name: efa Haupthaus
+      address: Hohenzollernstr. 24, 40211 Düsseldorf
+      district: Stadtmitte
+      geo: { lat: 51.225335, lon: 6.790185 }
+      hint: in der Kursliste 'Hohenzollernstr. 24, efa' mit Eltern-Baby-Raum, Eltern-Kind-Raum, Turnhalle, Vortragssaal, Seminarraum, Caféquatsch, Tanzsaal
+    - id: efa-duesseldorf-collenbachstr
+      name: efa-Stadtteiltreff Pempelfort/Derendorf (Collenbachstraße)
+      address: Collenbachstr. 10, 40476 Düsseldorf
+      district: Pempelfort
+      geo: { lat: 51.241349, lon: 6.78154 }
+      hint: in der Kursliste 'Collenbachstr. 10, efa-Stadtteiltreff' mit Bewegungsraum, Kursraum 1/2, Café
+    - id: efa-duesseldorf-borsigstr
+      name: efa-Stadtteiltreff Oberbilk (Borsigstraße)
+      address: Borsigstr. 12, 40227 Düsseldorf
+      district: Oberbilk
+      geo: { lat: 51.211802, lon: 6.798819 }
+      hint: in der Kursliste 'Borsigstr. 12, efa-Stadtteiltreff' mit Saal, Spielgruppenraum
+    - id: efa-duesseldorf-hackenbruch
+      name: Ev. Familienzentrum Am Hackenbruch (Eller)
+      address: Am Hackenbruch 86, 40231 Düsseldorf
+      district: Eller
+      geo: { lat: 51.206828, lon: 6.839729 }
+      hint: in der Kursliste 'Am Hackenbruch 86, Ev. Familienzentrum' (Eller)
+    - id: efa-duesseldorf-hasselsstr
+      name: Ev. Gemeindezentrum Hassels
+      address: Hasselsstr. 71, 40599 Düsseldorf
+      district: Hassels
+      geo: { lat: 51.17521, lon: 6.87056 }
+      hint: in der Kursliste 'Hasselsstraße 71, Ev. Gemeinde' (Hassels)
+    - id: efa-duesseldorf-kopernikusstr
+      name: Ev. Lutherkirche Bilk
+      address: Kopernikusstr. 9, 40223 Düsseldorf
+      district: Bilk
+      geo: { lat: 51.201293, lon: 6.773362 }
+      hint: in der Kursliste 'Kopernikusstr.9, Ev. Lutherkirche' (Bilk)
+    - id: efa-duesseldorf-rathaus
+      name: Treffpunkt am Rathaus (Marktplatz)
+      address: Marktplatz 2, 40213 Düsseldorf
+      district: Altstadt
+      geo: { lat: 51.225976, lon: 6.771395 }
+      hint: "in der Kursliste 'Marktplatz 2, Eingang zum Rathaus': Treffpunkt für 'Mit Kinderwagen die Stadt entdecken'"
+    - id: efa-duesseldorf-werstener-feld
+      name: Familienzentrum Die Arche (Wersten)
+      address: Werstener Feld 69, 40591 Düsseldorf
+      district: Wersten
+      geo: { lat: 51.186956, lon: 6.82771 }
+      hint: in der Kursliste 'Werstener Feld 69, Familienzentrum Die Arche' (Wersten)
+    - id: efa-duesseldorf-opladener-str
+      name: Ev. Gemeinde Wersten (Opladener Straße)
+      address: Opladener Str. 59, 40591 Düsseldorf
+      district: Wersten
+      geo: { lat: 51.187503, lon: 6.824867 }
+      hint: in der Kursliste 'Opladener Str. 59, Ev. Gemeinde' (Wersten)
+    - id: efa-duesseldorf-wildpark
+      name: Wildpark Grafenberg
+      address: Rennbahnstr. 60, 40629 Düsseldorf
+      district: Grafenberg
+      geo: { lat: 51.250133, lon: 6.84031 }
+      hint: "in der Kursliste 'Wildpark Düsseldorf': Gummistiefelbande, Treffen im Freien"
+    - id: efa-duesseldorf-richardstr
+      name: Städt. Familienzentrum Richardstraße (Eller)
+      address: Richardstr. 8, 40231 Düsseldorf
+      district: Eller
+      geo: { lat: 51.20454, lon: 6.838436 }
+      hint: in der Kursliste 'Richardstr. 8, Städt. Familienzentrum' (Eller)
+    - id: efa-duesseldorf-suedallee
+      name: Ev. Familienzentrum Südallee (Urdenbach)
+      address: Südallee 98 a, 40593 Düsseldorf
+      district: Urdenbach
+      geo: { lat: 51.153836, lon: 6.881969 }
+      hint: in der Kursliste 'Südallee 98 a, Ev. Familienzentrum' (Urdenbach)
+    - id: efa-duesseldorf-malmedyerstr
+      name: EJF Familienzentrum Weltenbummler (Heerdt)
+      address: Malmedyerstr. 5, 40549 Düsseldorf
+      district: Heerdt
+      geo: { lat: 51.226374, lon: 6.693503 }
+      hint: in der Kursliste 'Malmedyerstr. 5, EJF Familienzentrum Weltenbummler' (Heerdt)
+    - id: efa-duesseldorf-klosterstr
+      name: Städt. Familienzentrum Klosterstraße
+      address: Klosterstr. 96-98, 40211 Düsseldorf
+      district: Stadtmitte
+      geo: { lat: 51.224693, lon: 6.788749 }
+      hint: in der Kursliste 'Klosterstr. 96-98, Städt. Familienzentrum' (Stadtmitte)
+    - id: efa-duesseldorf-tersteegenstr
+      name: Ev. Familienzentrum Tersteegenstraße (Golzheim)
+      address: Tersteegenstr. 84 d, 40474 Düsseldorf
+      district: Golzheim
+      geo: { lat: 51.255634, lon: 6.759071 }
+      hint: in der Kursliste 'Tersteegenstraße 84d, Ev. Familienzentrum' (Golzheim)
+    - id: efa-duesseldorf-calvinstr
+      name: Ev. Familienzentrum Calvinstraße (Benrath)
+      address: Calvinstr. 1, 40597 Düsseldorf
+      district: Benrath
+      geo: { lat: 51.16599, lon: 6.870307 }
+      hint: in der Kursliste 'Calvinstr 1, Ev. Familienzentrum' (Benrath)
+    - id: efa-duesseldorf-stettiner-str
+      name: Städt. Familienzentrum Stettiner Straße (Garath)
+      address: Stettiner Str. 32, 40595 Düsseldorf
+      district: Garath
+      geo: { lat: 51.150744, lon: 6.899373 }
+      hint: in der Kursliste 'Stettiner Str. 32, Städt. Familienzentrum' (Garath)
+    - id: efa-duesseldorf-gotenstr
+      name: Lehrschwimmbad Gotenstraße (Bilk)
+      address: Gotenstr. 20, 40225 Düsseldorf
+      district: Bilk
+      geo: { lat: 51.196231, lon: 6.779047 }
+      hint: "in der Kursliste 'Gotenstraße 20, Lehrschwimmbad': Eltern-Kind-Schwimmen"
+    - id: efa-duesseldorf-sonnenstr
+      name: Lehrschwimmbecken Sonnenstraße (Oberbilk)
+      address: Sonnenstr. 10, 40227 Düsseldorf
+      district: Oberbilk
+      geo: { lat: 51.212859, lon: 6.791707 }
+      hint: "in der Kursliste 'Sonnenstr. 10, Lehrschwimmbecken': Wasserspaß"
+    - id: efa-duesseldorf-lohbachweg
+      name: Schul-Lehrschwimmbecken Lohbachweg (Gerresheim)
+      address: Lohbachweg 18, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.22993, lon: 6.84297 }
+      hint: "in der Kursliste 'Lohbachweg 18, Schul-Schwimmbad': Eltern-Kind-Schwimmen"
+- id: awo-familienbildung-duesseldorf
+  publicId: phv2hbae
+  role: anbieter
+  region: duesseldorf
+  name: AWO Familienbildungswerk Düsseldorf
+  url: https://www.awo-duesseldorf.de/awo-kurse/
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.awo-duesseldorf.de/awo-kurse/?kathaupt=1&katid=25&katname=Angebote%20fuer%20Eltern%20mit%20Babys&katvaterid=48&cHash=0af260560819fb3280bf77a2491224de
+      kind: html
+      use: termine
+      hint: Liste nennt Kursbeginn; Kurse laufen 6-15 Wochen. Nur Kurse mit Kind; Wald- und Pilzwanderung, Kind krank und Online-Termine weglassen
+    - url: https://www.awo-duesseldorf.de/awo-kurse/?kathaupt=1&katid=27&katname=Angebote%20fuer%20Eltern%20mit%20Kleinkindern%20Vorschul-%20und%20Grundschulkinder&katvaterid=48&cHash=ef508af5b15db1beb5fc426630b7d2ac
+      kind: html
+      use: termine
+      hint: Liste nennt Kursbeginn. Nur Kurse, die ab Kindern unter 3 Jahren offen sind; Kurse für Kinder ab 3 Jahren und Schulkinder weglassen
+  availability:
+    shown: ja
+    how: Ampel je Kurs in der Liste (Anmeldung möglich, wenig Teilnehmer, fast ausgebucht, Warteliste); Anmeldung über Warenkorb oder Direktbuchung im Kursportal
+    system: Kufer (KuferWeb)
+  verified: 2026-10-24
+  notes:
+    - Kursportal Kufer; Kat. 25 (Eltern mit Babys, 23 Kurse) und Kat. 27 (Eltern mit Kleinkindern bis Grundschule, ≈ 62 Kurse) liegen je auf einer Seite, keine Blätterung.
+    - Die Liste nennt nur Kursbeginn und Stadtteil. Die Detailseite zeigt Zeitraum, Wochentag, Uhrzeit, Zahl der Termine und die Adresse.
+    - "Nicht aufgenommen, weil keine sichere Adresse: Waldspielplatz Oberrath (Dachsbergweg ohne Hausnummer, Wald- und Pilzwanderung in Kat. 25). Die Treffs Geeststr. 99 und Immigrather Str. 45 kommen in den beiden Kategorien nicht vor."
+  venues:
+    - id: awo-familienbildung-duesseldorf
+      name: AWO Liststraße (Familienbildungswerk, Derendorf)
+      address: Liststr. 2, 40470 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.24794, lon: 6.795183 }
+      hint: in der Kursliste ‚Derendorf‘, Räume 224/225
+    - id: awo-familienbildung-duesseldorf-bilk
+      name: AWO-Familientreff Bilk
+      address: Aachener Str. 9, 40223 Düsseldorf
+      district: Bilk
+      geo: { lat: 51.207218, lon: 6.776092 }
+      hint: in der Kursliste ‚Bilk‘ (Spielgruppenraum EG, Kita-Raum 1 OG)
+    - id: awo-familienbildung-duesseldorf-eller
+      name: AWO-Familientreff Eller
+      address: Schloßallee 12c, 40229 Düsseldorf
+      district: Eller
+      geo: { lat: 51.196914, lon: 6.845211 }
+      hint: in der Kursliste ‚Eller‘ (Spielgruppenraum Clementine)
+    - id: awo-familienbildung-duesseldorf-lierenfeld
+      name: AWO-Familienzentrum Sternschnuppe
+      address: Ronsdorfer Str. 138, 40233 Düsseldorf
+      district: Lierenfeld
+      geo: { lat: 51.213604, lon: 6.817048 }
+      hint: in der Kursliste ‚Lierenfeld‘
+    - id: awo-familienbildung-duesseldorf-flingern
+      name: AWO im Kürtenhof
+      address: Bruchstr. 12, 40235 Düsseldorf
+      district: Flingern Nord
+      geo: { lat: 51.230521, lon: 6.815034 }
+      hint: in der Kursliste ‚Flingern‘ (Regenbogenkrabbeln, Treffen Regenbogenfamilien)
+    - id: awo-familienbildung-duesseldorf-rath-scheffelstrasse
+      name: Städtisches Familienzentrum Scheffelstraße
+      address: Scheffelstr. 26, 40470 Düsseldorf
+      district: Mörsenbroich
+      geo: { lat: 51.260589, lon: 6.804109 }
+      hint: in der Kursliste ‚Rath‘, Spielgruppe für Kinder (2-4 J.)
+    - id: awo-familienbildung-duesseldorf-rath-sonnenhaus
+      name: AWO-Familienzentrum Sonnenhaus
+      address: Dortmunder Str. 90, 40472 Düsseldorf
+      district: Rath
+      geo: { lat: 51.264302, lon: 6.809556 }
+      hint: in der Kursliste ‚Rath‘, Musikalische Frühförderung
+    - id: awo-familienbildung-duesseldorf-duesseltal
+      name: AWO-Familienzentrum Anna Siemsen
+      address: Grafenberger Allee 210, 40237 Düsseldorf
+      district: Düsseltal
+      geo: { lat: 51.233358, lon: 6.812821 }
+      hint: in der Kursliste ‚Düsseltal‘
+    - id: awo-familienbildung-duesseldorf-lichtenbroich
+      name: Städtisches Familienzentrum Volkardeyer Weg
+      address: Volkardeyer Weg 5, 40472 Düsseldorf
+      district: Lichtenbroich
+      geo: { lat: 51.281598, lon: 6.795472 }
+      hint: in der Kursliste ‚Lichtenbroich‘
+- id: asg-bildungsforum
+  publicId: 8kv7whvj
+  role: anbieter
+  region: duesseldorf
+  name: ASG-Bildungsforum Düsseldorf – Familienbildung
+  url: https://www.asg-bildungsforum.de/kurse/familie
+  age:
+    minMonths: 0
+    maxMonths: 36
+  programme:
+    - url: https://www.asg-bildungsforum.de/kurse/familie/eltern-kind-kurse/spielgruppen-fruehfoerderung/kategorie/Spielgruppen+Fruehfoerderung/1379
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 16
+      hint: Nur Gruppen mit Kindern bis 3 Jahre; Gruppen für 3- bis 6-Jährige und Elternkurse ohne Kind weglassen
+    - url: https://www.asg-bildungsforum.de/kurse/familie/eltern-kind-kurse/elternstart-nrw/kategorie/Elternstart+NRW/1380
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 12
+      hint: Online-Termine weglassen
+    - url: https://www.asg-bildungsforum.de/kurse/familie/eltern-kind-kurse/eltern-kind-turnen-bewegung/kategorie/Eltern-Kind+Turnen+Bewegung/1381
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 16
+      hint: Nur Kurse mit Kindern bis 3 Jahre (Alter steht im Kurstitel oder Kurstext); Kurse ab 3 oder 4 Jahren weglassen
+    - url: https://www.asg-bildungsforum.de/kurse/familie/eltern-kind-kurse/eltern-kind-musik/kategorie/Eltern-Kind+Musik/1383
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 10
+      hint: Nur Kurse mit Kindern bis 3 Jahre; Kurse ab 3 Jahren weglassen
+    - url: https://www.asg-bildungsforum.de/kurse/familie/elterncafes-offene-treffs
+      kind: html
+      use: termine
+      follow:
+        match: browse=forward
+        max: 10
+      hint: Nur Treffs für Eltern mit Kindern bis 3 Jahre; Treffs für Tagespflegepersonen, Sprachcafés und Gärtnern weglassen
+  availability:
+    shown: ja
+    how: Ampel je Kurs in der Liste (grün frei, gelb wenige, rot Warteliste); die Liste nennt Kursbeginn, Uhrzeit und 'N Termine' (wöchentliche Reihe, Schulferien beachten)
+    system: Kufer (KuferWeb)
+  verified: 2026-10-24
+  notes:
+    - Kursliste je Kategorie 7 Kurse pro Seite, Folgeseiten per browse=forward (Plan 0042, E2). Die Liste nennt die Zahl der Termine, Detailseiten nicht nötig.
+    - Familientreff Flingern liegt im Bildungsforum (Gerresheimer Straße 90). Online-Termine (Kursort 'Online / Digital') und Rheinufer Oberkassel (Wodanstraße, Freifläche ohne Hausnummer) nicht als Ort aufgenommen.
+    - Viele Turn- und Musikkurse richten sich an Kinder ab 3 Jahren; das Alter steht im Kurstitel bzw. in der Kurs-URL.
+  venues:
+    - id: asg-bildungsforum
+      name: ASG-Bildungsforum (Zentrale, Familientreff Flingern)
+      address: Gerresheimer Straße 90, 40233 Düsseldorf
+      district: Flingern Nord
+      geo: { lat: 51.226341, lon: 6.800486 }
+      hint: in der Kursliste 'ASG-Bildungsforum, Gerresheimer Straße 90' (auch Familientreff Flingern)
+    - id: asg-bildungsforum-rath
+      name: ASG-Familientreff Rath (Rather Familienzentrum)
+      address: Rather Kreuzweg 43, 40472 Düsseldorf
+      district: Rath
+      geo: { lat: 51.262894, lon: 6.80682 }
+      hint: in der Kursliste 'ASG-Familientreff Rath, Rather Kreuzweg 43'
+    - id: asg-bildungsforum-oberkassel
+      name: ASG-Familientreff Oberkassel
+      address: Wildenbruchstraße 27, 40545 Düsseldorf
+      district: Oberkassel
+      geo: { lat: 51.227829, lon: 6.757142 }
+      hint: in der Kursliste 'Familientreff Oberkassel' bzw. 'ASG-Familientreff Oberkassel, Wildenbruchstraße 27'
+    - id: asg-bildungsforum-sporthalle
+      name: ASG-Sporthalle (Fitnesshalle)
+      address: Münsterstraße 121, 40476 Düsseldorf
+      district: Derendorf
+      geo: { lat: 51.245185, lon: 6.789179 }
+      hint: in der Kursliste 'ASG-Sporthalle, Münsterstraße 121'
+    - id: asg-bildungsforum-spielplatz-rotdornstrasse
+      name: Spielplatz Rotdornstraße (Rath)
+      address: Rotdornstraße 14, 40472 Düsseldorf
+      district: Rath
+      geo: { lat: 51.261865, lon: 6.815738 }
+      hint: in der Kursliste 'Spielplatz Rotdornstraße (gegenüber Hausnummer 14)'; Freifläche, Offener Spielplatztreff donnerstags
+    - id: asg-bildungsforum-st-margareta
+      name: Familienzentrum St. Margareta (Gerresheim)
+      address: Gerricusstraße 14, 40625 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.237471, lon: 6.863408 }
+      hint: in der Kursliste 'Familienzentrum St. Margareta, Gerricusstraße 14'
+    - id: asg-bildungsforum-sankt-franziskus-strasse
+      name: Städtisches Familienzentrum Sankt-Franziskus-Straße
+      address: Sankt-Franziskus-Straße 157, 40470 Düsseldorf
+      district: Rath
+      geo: { lat: 51.257708, lon: 6.813817 }
+      hint: in der Kursliste 'Städtisches Familienzentrum Sankt-Franziskus-Straße'
+    - id: asg-bildungsforum-skfm-oberloericker-strasse
+      name: Unterkunft Flüchtlingshilfe SKFM (Oberlöricker Straße)
+      address: Oberlöricker Straße 321, 40547 Düsseldorf
+      district: Lörick
+      geo: { lat: 51.248663, lon: 6.726189 }
+      hint: in der Kursliste 'Unterkunft Flüchtlingshilfe SKFM, Oberlöricker Straße 321'
+    - id: asg-bildungsforum-hl-familie-gemeinde
+      name: Kath. Kirchengemeinde Hl. Familie
+      address: Carl-Sonnenschein-Straße 37, 40468 Düsseldorf
+      district: Stockum
+      geo: { lat: 51.263999, lon: 6.761147 }
+      hint: in der Kursliste 'Kath. Kirchengemeinde Hl. Familie, Carl-Sonnenschein-Straße 37'
+    - id: asg-bildungsforum-hl-familie-familienzentrum
+      name: Familienzentrum Heilige Familie
+      address: Carl-Sonnenschein-Straße 61, 40468 Düsseldorf
+      district: Stockum
+      geo: { lat: 51.264202, lon: 6.761735 }
+      hint: in der Kursliste 'Familienzentrum Heilige Familie, Carl-Sonnenschein-Straße 61'
+    - id: asg-bildungsforum-st-apollinaris
+      name: Familienzentrum St. Apollinaris
+      address: Höhenstraße 20, 40227 Düsseldorf
+      district: Oberbilk
+      geo: { lat: 51.215724, lon: 6.79949 }
+      hint: in der Kursliste 'Familienzentrum St. Apollinaris, Höhenstraße 20'
+    - id: asg-bildungsforum-katharinenstrasse
+      name: Städtisches Familienzentrum Katharinenstraße
+      address: Katharinenstraße 28, 40627 Düsseldorf
+      district: Gerresheim
+      geo: { lat: 51.217446, lon: 6.862103 }
+      hint: in der Kursliste 'Städtisches Familienzentrum Katharinenstraße'
+    - id: asg-bildungsforum-ev-linksrheinisch
+      name: Evangelische Kirchengemeinde Düsseldorf-Linksrheinisch (Heerdt)
+      address: Heerdter Landstraße 30, 40549 Düsseldorf
+      district: Heerdt
+      geo: { lat: 51.232423, lon: 6.718137 }
+      hint: in der Kursliste 'Evangelische Kirchengemeinde Düsseldorf-Linksrheinisch, Heerdter Landstraße 30'
+    - id: asg-bildungsforum-stuerzelberger-strasse
+      name: Städtisches Familienzentrum Stürzelberger Straße
+      address: Stürzelberger Straße 33, 40547 Düsseldorf
+      district: Lörick
+      geo: { lat: 51.242383, lon: 6.730622 }
+      hint: in der Kursliste 'Städt. Familienzentrum Stürzelberger Straße'
+    - id: asg-bildungsforum-rheinblick-741
+      name: Rheinblick 741 (Schwimmkurse)
+      address: Pariser Straße 41, 40549 Düsseldorf
+      district: Oberkassel
+      geo: { lat: 51.231758, lon: 6.733317 }
+      hint: in der Kursliste 'Rheinblick 741, Pariser Straße 41'; Mutter/Vater-Kind-Schwimmen
+    - id: asg-bildungsforum-zum-heiligen-kreuz
+      name: Familienzentrum Zum Heiligen Kreuz
+      address: Herner Straße 10, 40472 Düsseldorf
+      district: Rath
+      geo: { lat: 51.262678, lon: 6.806236 }
+      hint: in der Kursliste 'Familienzentrum Zum Heiligen Kreuz, Herner Straße 10'
+    - id: asg-bildungsforum-st-maria-rosenkranz
+      name: Familienzentrum St. Maria Rosenkranz (Montessori-Kinderhaus)
+      address: Roderbirkener Straße 19, 40591 Düsseldorf
+      district: Wersten
+      geo: { lat: 51.188713, lon: 6.822762 }
+      hint: in der Kursliste 'Familienzentrum St. Maria Rosenkranz (Montessori-Kinderhaus)'
+    - id: asg-bildungsforum-skfm-metzer-strasse
+      name: Familienzentrum des SKFM Metzer Straße
+      address: Metzer Straße 20, 40476 Düsseldorf
+      district: Derendorf
+      geo: { lat: 51.249739, lon: 6.784869 }
+      hint: in der Kursliste 'Familienzentrum des SKFM Metzer Straße'
+    - id: asg-bildungsforum-bullerbue
+      name: Familienzentrum Bullerbü
+      address: Selbecker Straße 35, 40472 Düsseldorf
+      district: Rath
+      geo: { lat: 51.259273, lon: 6.819521 }
+      hint: in der Kursliste 'Familienzentrum Bullerbü, Selbecker Straße 35'
+    - id: asg-bildungsforum-hl-dreifaltigkeit
+      name: Familienzentrum Hl. Dreifaltigkeit
+      address: Bülowstraße 5, 40476 Düsseldorf
+      district: Derendorf
+      geo: { lat: 51.244041, lon: 6.791872 }
+      hint: in der Kursliste 'Familienzentrum Hl. Dreifaltigkeit, Bülowstraße 5'
+    - id: asg-bildungsforum-st-caecilia
+      name: Familienzentrum St. Cäcilia
+      address: Am Mönchgraben 47, 40597 Düsseldorf
+      district: Benrath
+      geo: { lat: 51.167685, lon: 6.88509 }
+      hint: in der Kursliste 'Familienzentrum St. Cäcilia, Am Mönchgraben 47'
+    - id: asg-bildungsforum-st-gertrud
+      name: Familienzentrum St. Gertrud (Eller)
+      address: Alt-Eller 31 a, 40229 Düsseldorf
+      district: Eller
+      geo: { lat: 51.198259, lon: 6.8413 }
+      hint: in der Kursliste 'Familienzentrum St. Gertrud, Alt-Eller 31 a'
+    - id: asg-bildungsforum-skfm-wittenberger-weg
+      name: Familienzentrum des SKFM Wittenberger Weg
+      address: Wittenberger Weg 108, 40593 Düsseldorf
+      district: Garath
+      geo: { lat: 51.154031, lon: 6.889822 }
+      hint: in der Kursliste 'Familienzentrum des SKFM Wittenberger Weg'
