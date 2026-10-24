@@ -38,7 +38,9 @@ function secrets(): { vapidPrivateKey: string; adminToken: string } {
   return { vapidPrivateKey, adminToken };
 }
 
-const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8", cwd: ROOT }).trim();
+// `git show` einer `offers.json` über 1 MiB riss die Standardgrenze (ENOBUFS), `previousIds` lieferte still „neu = 0“
+const git = (...args: string[]) =>
+  execFileSync("git", args, { encoding: "utf8", cwd: ROOT, maxBuffer: 64 * 1024 * 1024 }).trim();
 
 /** Worker-Code beim Commit `version` gleich HEAD? `git diff --quiet`: 0 gleich, 1 verschieden, sonst unbekannt */
 function sameWorkerCode(version: string): boolean | undefined {
