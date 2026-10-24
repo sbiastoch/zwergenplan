@@ -134,10 +134,10 @@ test("ein Tipp daneben schließt das Menü und öffnet keine Karte", async ({ pa
   await ready(page);
   await sortButton(page).click();
   await expect(menu(page)).toBeVisible();
-  const target = card(page, "Krabbelreime").getByRole("heading", { level: 3 });
-  const box = await target.boundingBox();
-  if (!box) throw new Error("Karte fehlt");
-  await page.mouse.click(box.x + 10, box.y + box.height / 2);
+  // links neben dem rechtsbündigen Menü, auf Höhe seiner Mitte: dort liegt die Liste (auch auf kleinen Bildschirmen)
+  const box = await page.locator(".sort-menu").boundingBox();
+  if (!box) throw new Error("Menü fehlt");
+  await page.mouse.click(Math.max(2, box.x - 12), box.y + box.height / 2);
   await expect(menu(page)).toBeHidden();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page).toHaveURL((url) => url.search === "");
@@ -237,6 +237,8 @@ test("Etikett im Anbieter-Sheet und auf der Merkliste: ganz im sichtbaren Bereic
   await ready(page, "./?anbieter=b5nuus36");
   const sheet = page.getByRole("dialog", { name: "Anbieter" });
   const first = sheet.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" });
+  // im Querformat steht die Karte unter dem sichtbaren Bereich
+  await first.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await expect(first.locator(".new-tag")).toBeVisible();
   expect(await inside(first.locator(".new-tag"), sheet.locator(".sheet-scroll"))).toBe(true);
   await first.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
