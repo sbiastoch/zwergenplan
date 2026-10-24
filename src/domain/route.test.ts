@@ -3,6 +3,7 @@ import { DISTRICTS } from "./districts.ts";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { LIMIT_MINUTES } from "./reach.ts";
 import { isLegacyView, OFFER_PARAM, PROVIDER_PARAM, parseRoute, routeToSearch, tabSection } from "./route.ts";
+import { searchOf } from "./searches.ts";
 
 const offerId = "4tpu5qaq";
 const TABS = ["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte", "merkliste-kalender"] as const;
@@ -147,6 +148,18 @@ describe("URL-Route", () => {
   it("übernimmt den alten Umkreis nicht, die Wegzeit schon", () => {
     expect(routeToSearch(parseRoute("?umkreis=5&ansicht=karte"))).toBe("ansicht=karte");
     expect(routeToSearch(parseRoute("?ansicht=karte&wegzeit=30"))).toBe("wegzeit=30&ansicht=karte");
+  });
+
+  it("Sortierung (Plan 0043, E4): sortierung=neu gelesen und nach der Ansicht geschrieben, Unbekanntes entfällt", () => {
+    expect(parseRoute("?sortierung=neu").sort).toBe("neu");
+    expect(parseRoute("?sortierung=termine")).not.toHaveProperty("sort");
+    expect(parseRoute("?sortierung=preis")).not.toHaveProperty("sort");
+    expect(routeToSearch(parseRoute(`?sortierung=neu&kat=musik&ansicht=karte&angebot=${offerId}`))).toBe(
+      `kat=musik&ansicht=karte&sortierung=neu&angebot=${offerId}`,
+    );
+    // kein Filter: zählt nicht im Filter, steht nicht im Such-Abo
+    expect(parseRoute("?sortierung=neu").filter).toEqual(EMPTY_FILTER);
+    expect(searchOf(parseRoute("?kat=musik&sortierung=neu").filter)).toBe("kat=musik");
   });
 
   it("kennt kein Geburtsdatum", () => {

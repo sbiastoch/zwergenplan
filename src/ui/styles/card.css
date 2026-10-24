@@ -28,6 +28,31 @@
     border-style: dashed;
     box-shadow: none;
   }
+  /* Etikett „Neu“ (Plan 0043, E5): schräg über der linken oberen Ecke, im Abstand zu Überschrift (10 px) und Vorgänger
+     (14 px). Der Außenabstand fällt dort mit deren Rand zusammen und wirkt nur als erste Karte im Scroll-Container
+     eines Sheets (6 px Innenabstand). Mehr Abstand kostete im Querformat Höhe der ersten Karte (layout.spec). */
+  .card.is-new {
+    margin-top: 4px;
+  }
+  .new-tag {
+    position: absolute;
+    top: -9px;
+    left: -10px;
+    z-index: 1;
+    padding: 0 7px;
+    /* gerundet: sonst wird die runde Karte zur Bezugsbox des Text-Gates (Review 3, M1) */
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--tape);
+    color: var(--on-tape);
+    box-shadow: 2px 2px 0 var(--shadow);
+    font-size: 0.6875rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    text-transform: uppercase;
+    transform: rotate(-8deg);
+  }
   @keyframes stick {
     from {
       opacity: 0;
@@ -42,6 +67,10 @@
     /* Platz fürs Herz (top 10, 44 px) nur neben Kopfzeile und Titel, Meta und Fakten nutzen die volle Breite
        (Plan 0007, E11): weniger Umbruchgrenzen beim Schrift-Swap, mehr Platz bei großer Schrift. */
     padding: 14px 15px 15px;
+  }
+  /* Kopfzeile 6 px tiefer: Die gedrehte Box des Etiketts berührt sonst die Kategorie-Pille */
+  .card.is-new .card-body {
+    padding-top: 20px;
   }
   .card-top {
     display: flex;

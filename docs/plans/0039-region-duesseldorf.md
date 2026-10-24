@@ -260,7 +260,7 @@ duesseldorf: { name: "Düsseldorf", bbox: DUESSELDORF_BBOX, population: 619_000,
 - **Zugangshalt-Gate:** Jeder Stadtteil braucht einen Haltbereich `de:05111:` der VRR-Tabelle in 800 m mit Einstieg im Fenster. Gemessen am VRR-Feed (Ausgangslage): alle 49 in höchstens 381 m, das Gate fällt keinen.
 - **Hubbelrath** (Bezirk 7, einer der 50 amtlichen Stadtteile) fehlt als `place=suburb` in OSM (Review m11). S1 sucht per Overpass einen `place`-Knoten „Hubbelrath“; gibt es einen und hat er einen Zugangshalt in 800 m, kommt er als 50. Eintrag dazu, sonst steht das Fehlen in „Umsetzung“ (Hubbelrath ist dünn besiedelt, Knittkuhl und Gerresheim liegen nah).
 - Die Liste ist länger als Nürnbergs (35). Düsseldorf hat 50 amtliche Stadtteile; die OSM-Punkte entsprechen ihnen fast eins zu eins. Gekürzt wird nicht, weil die Auswahl im Kind-Sheet und im Onboarding nur Düsseldorfer Stadtteile zeigt (E8).
-- **Startbudget:** `districtById` liegt im Start-Chunk; 49 Einträge kosten geschätzt 0,8–1,0 kB gzip, dazu `NETWORKS`, Lesen der Stadt und der Filter etwa 0,3 kB. Reserve heute 0,6 kB. **Nutzerentscheid nötig** (Abschnitt „Offene Nutzerentscheide“): Budget `JS (initial)` auf 104 kB anheben (Nachtrag ADR 0012) oder Stadtteile in einen eigenen Chunk verlegen, der mit dem gespeicherten Stadtteil lädt (verrät wieder ein Bit und kostet einen Request beim Start).
+- **Startbudget:** `districtById` liegt im Start-Chunk; 49 Einträge kosten geschätzt 0,8–1,0 kB gzip, dazu `NETWORKS`, Lesen der Stadt und der Filter etwa 0,3 kB. Reserve heute 0,6 kB. **Nutzerentscheid nötig** (Abschnitt „Offene Nutzerentscheide“): Budget `JS (initial)` auf 104 kB anheben (Nachtrag ADR 0012) oder Stadtteile in einen eigenen Chunk verlegen, der mit dem gespeicherten Stadtteil lädt (verrät wieder ein Bit und kostet einen Request beim Start). Seit Plan 0043 (2026-10-24) ist das Budget 150 kB, der Entscheid entfällt.
 
 Liste (49, aus der Overpass-Abfrage; alle bestehen das Gate):
 
@@ -316,7 +316,7 @@ ADR 0011, 0014, 0017, 0025, 0029 bekommen je einen Verweis-Block „Geändert du
 
 Entschieden am 2026-10-18 nach den Reviews:
 
-- **Startbudget** (E13): `JS (initial)` von 102 auf **104 kB** anheben; Nachtrag ADR 0012 in S6.
+- **Startbudget** (E13): `JS (initial)` von 102 auf **104 kB** anheben; Nachtrag ADR 0012 in S6. **Gegenstandslos seit 2026-10-24:** Mit Plan 0043 liegt das Budget bei 150 kB (Nutzerentscheid, ADR 0012, Nachtrag); S6 trägt nur die Zeile in die Delta-Tabelle von ADR 0012 ein.
 - **Privatsphäre** (E15, Punkt 4): Die Ausnahme wird angenommen; geladen wird nur die Tabelle des gewählten Netzes.
 
 Noch offen:

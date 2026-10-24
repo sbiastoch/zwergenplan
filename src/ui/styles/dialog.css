@@ -512,6 +512,12 @@
     display: grid;
     gap: 12px;
   }
+  /* „Im Zwergenplan seit …“: ganz dezent ganz unten (Plan 0043, E5) */
+  .listed-since {
+    margin: 18px 0 0;
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
 }
 
 :root[data-theme="dark"] .dlg::backdrop {

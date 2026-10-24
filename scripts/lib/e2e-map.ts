@@ -173,6 +173,12 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Deploy-Build mit echten Daten: data/, alle Ausgaben von build-data.ts, Vorschauseiten und Kachelbilder, der
   // Service Worker im Deploy-Build („mit Service Worker“).
   "e2e/smoke.spec.ts": [/^data\//, BUILD_DATA, SHARE_PAGES, OG_IMAGES, VITE_SW, /^src\/sw\//],
+  // Sortierung und Etikett „Neu“ (Plan 0043, E4, E5)
+  "e2e/sortierung.spec.ts": [
+    /^src\/ui\/(SortMenu|ListView|OfferCard|DetailDialog)\.tsx$/,
+    /^src\/ui\/use-offer-views\.ts$/,
+    /^src\/domain\/(listing|route)\.ts$/,
+  ],
   // Startpunkt und Wegzeit: Kind-Sheet und OriginPicker, Standort, Stadtteil, Tabelle und Linien (use-transit,
   // transit.ts), Rückfall auf die Luftlinie, Wegzeit-Filter im Filter-Sheet, Linien und Route im Detail.
   // Liest wegzeit.json und linien.json aus build-data.ts.

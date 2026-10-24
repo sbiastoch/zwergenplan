@@ -22,6 +22,8 @@ import {
   formatFact,
   limitHint,
   limitReason,
+  listedSince,
+  listingHeading,
   listStatusParts,
   loadErrorText,
   mapStatusParts,
@@ -114,6 +116,27 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
     expect(dayHeading("2026-10-07", "2026-10-05")).toEqual({ title: "Mittwoch", sub: "7. Oktober" });
     expect(agendaHeading("2026-10-05", "2026-10-05")).toBe("Heute, 5. Oktober");
     expect(agendaHeading("2026-10-07", "2026-10-05")).toBe("Mittwoch, 7. Oktober");
+  });
+
+  it("benennt die Gruppen von „Neu eingestellt“ (Plan 0043, E4) und Termine wie dayHeading", () => {
+    const today = "2026-10-24";
+    expect(listingHeading({ kind: "termin", day: "2026-10-24" }, today)).toEqual(dayHeading("2026-10-24", today));
+    expect(listingHeading({ kind: "diese-woche", from: "2026-10-18", to: today }, today)).toEqual({
+      title: "Neu diese Woche",
+      sub: "seit So, 18. Okt.",
+    });
+    expect(listingHeading({ kind: "vorige-woche", from: "2026-10-11", to: "2026-10-17" }, today)).toEqual({
+      title: "Neu vorige Woche",
+      sub: "So, 11. – Sa, 17. Okt.",
+    });
+    // über die Monatsgrenze
+    expect(listingHeading({ kind: "vorige-woche", from: "2026-10-27", to: "2026-11-02" }, today).sub).toBe(
+      "Di, 27. Okt. – Mo, 2. Nov.",
+    );
+    expect(listingHeading({ kind: "frueher" }, today)).toEqual({ title: "Früher eingestellt" });
+    expect(listedSince("2026-10-22T05:00:00+02:00")).toBe("Im Zwergenplan seit 22. Oktober");
+    // Berliner Tag: 23:30 UTC am 21.10. ist schon der 22.
+    expect(listedSince("2026-10-21T23:30:00Z")).toBe("Im Zwergenplan seit 22. Oktober");
   });
 
   it("schreibt Kurzdaten, Wochen und den Datenstand", () => {

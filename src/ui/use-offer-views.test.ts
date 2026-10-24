@@ -69,7 +69,7 @@ describe("useOfferViews", () => {
     const v = render({});
     expect(ids(v.visible)).toEqual(["baby", "gross"]);
     expect(v.unfitCount).toBe(0);
-    expect(v.page.groups.map((g) => g.day)).toEqual(["2026-10-10", "2026-10-12"]);
+    expect(v.page.groups.map((g) => g.key)).toEqual(["2026-10-10", "2026-10-12"]);
     expect(v.page.remaining).toBe(0);
     expect(v.ageOnly).toBe(true);
   });
@@ -85,7 +85,7 @@ describe("useOfferViews", () => {
     const route: Route = { ...ENTDECKEN, filter: { ...EMPTY_FILTER, range: { from: "2026-10-11", to: "2026-10-20" } } };
     const v = render({ offers: [...OFFERS, weekly], route });
     expect(ids(v.visible)).toEqual(["gross", "woche"]);
-    expect(v.page.groups.map((g) => g.day)).toEqual(["2026-10-12", "2026-10-14"]);
+    expect(v.page.groups.map((g) => g.key)).toEqual(["2026-10-12", "2026-10-14"]);
   });
 
   it("blendet mit Geburtsdatum unpassende Angebote aus und markiert sie", () => {
@@ -366,7 +366,7 @@ describe("useOfferViews", () => {
     const input = { offers: [BABY, treff], birthDate: "2026-04-20" };
 
     it("steht in der Liste erst am ersten passenden Termin", () => {
-      expect(render(input).page.groups.map((g) => g.day)).toEqual(["2026-10-10", "2026-10-21"]);
+      expect(render(input).page.groups.map((g) => g.key)).toEqual(["2026-10-10", "2026-10-21"]);
     });
 
     it("steht im Kalender der Merkliste nur an Tagen, an denen es zum Alter passt (Plan 0025, E5; Plan 0028, E3)", () => {
@@ -410,7 +410,7 @@ describe("useOfferViews", () => {
         return null;
       }
       renderToStaticMarkup(createElement(Probe));
-      expect(result?.page.groups.map((g) => g.day)).toEqual(["2026-10-07", "2026-10-10"]);
+      expect(result?.page.groups.map((g) => g.key)).toEqual(["2026-10-07", "2026-10-10"]);
     });
 
     it("sortiert die Merkliste nach dem ersten passenden Termin", () => {

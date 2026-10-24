@@ -4,6 +4,7 @@ import { assetUrl } from "../data/site.ts";
 import { ageCheck, detailSession } from "../domain/age.ts";
 import { collapsedSessions, sessionOnDay, upcomingSessions } from "../domain/agenda.ts";
 import { seriesIcsFileName, seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
+import { isNewlyListed } from "../domain/listing.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
 import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -17,6 +18,7 @@ import {
   costLabel,
   dayDots,
   EXPORT_UNAVAILABLE,
+  listedSince,
   longDate,
   plural,
   registrationLabel,
@@ -232,6 +234,8 @@ export function DetailContent({
               Website von {offer.providerName}
             </a>
           </p>
+          {/* ganz dezent ganz unten, nur solange das Etikett „Neu“ gilt (Plan 0043, E5) */}
+          {offer.listedAt && isNewlyListed(offer, now) && <p className="listed-since">{listedSince(offer.listedAt)}</p>}
         </div>
       </div>
       <div className="dfoot">

@@ -69,7 +69,7 @@ export function shownSession(offer: Offer, now: Date, range?: DateRange, fits?: 
   return offer.sessions.find((s) => isNotEnded(s) && (!range || inRangeDay(range, s)) && fits(offer, s)) ?? base;
 }
 
-function byStartThenTitle(a: Occurrence, b: Occurrence): number {
+export function byStartThenTitle(a: Occurrence, b: Occurrence): number {
   return Date.parse(a.session.start) - Date.parse(b.session.start) || a.offer.title.localeCompare(b.offer.title, "de");
 }
 
@@ -104,14 +104,14 @@ export function groupByNextSession<T extends Offer>(
 }
 
 /**
- * Schrittweises Rendern langer Listen: genau `limit` Einträge, die letzte Tagesgruppe notfalls gekürzt.
- * (Ein Tag kann in echten Daten > 90 Angebote haben.) Der nächste Schritt setzt denselben Tag fort.
+ * Schrittweises Rendern langer Listen: genau `limit` Einträge, die letzte Gruppe notfalls gekürzt.
+ * (Ein Tag kann in echten Daten > 90 Angebote haben.) Der nächste Schritt setzt dieselbe Gruppe fort.
  */
-export function takeGroups<I>(
-  groups: readonly DayGroup<I>[],
+export function takeGroups<I, G extends { items: I[] }>(
+  groups: readonly G[],
   limit: number,
-): { groups: DayGroup<I>[]; remaining: number } {
-  const taken: DayGroup<I>[] = [];
+): { groups: G[]; remaining: number } {
+  const taken: G[] = [];
   let count = 0;
   for (const group of groups) {
     if (count >= limit) break;

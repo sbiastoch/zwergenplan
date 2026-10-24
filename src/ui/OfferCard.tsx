@@ -1,6 +1,7 @@
 /** Angebots-Kachel (Plan 0003, E9): Kopfzeile mit Kategorie-Pille und Zeit, Titel, Meta, Fakten, Herz. */
 import { useState } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
+import { isNewlyListed } from "../domain/listing.ts";
 import type { Reach } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
@@ -60,9 +61,15 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, context }: Of
   const reach = atPlace ? undefined : ctx.reachOf(offer);
   const where = offer.venue.district ?? offer.venue.name;
   const when = dated ? `${shortDate(sessionDay(session))} · ${clock(session.start)} Uhr` : `${timeRange(session)} Uhr`;
+  // Etikett „Neu“ (Plan 0043, E5): vor dem Titel im Kartentext, damit die Karte „Neu, …“ vorliest
+  const isNew = isNewlyListed(offer, ctx.now);
 
   return (
-    <article className={`card k-${category}${unfit ? " unfit" : ""}${fresh ? " fresh" : ""}`} data-testid="offer">
+    <article
+      className={`card k-${category}${unfit ? " unfit" : ""}${fresh ? " fresh" : ""}${isNew ? " is-new" : ""}`}
+      data-testid="offer"
+    >
+      {isNew && <span className="new-tag">Neu</span>}
       <div className="card-body">
         <div className="card-top">
           <span className="pill">

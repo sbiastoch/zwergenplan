@@ -99,6 +99,15 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   filter: async (page) => {
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
   },
+  // Sortierung (Plan 0043, E4): Menü offen, und die Liste „Neu eingestellt“ mit Etiketten
+  sortierung: async (page) => {
+    await page.getByRole("button", { name: /^Sortierung:/ }).click();
+    await page.getByRole("menu").waitFor();
+  },
+  neu: async (page) => {
+    await page.goto(new URL("?sortierung=neu", page.url()).href);
+    await page.getByRole("heading", { level: 2 }).first().waitFor();
+  },
   kind: async (page) => {
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.getByLabel("Geburtsdatum").fill("02.11.2025");

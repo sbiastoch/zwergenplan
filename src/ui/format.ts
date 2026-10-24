@@ -9,6 +9,7 @@ import { courseProgress, rhythm, uniformTimes, upcomingSessions, weekDays } from
 import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange } from "../domain/date-range.ts";
 import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
+import { type ListGroupHead, NEW_DAYS } from "../domain/listing.ts";
 import {
   distanceText,
   type Origin,
@@ -83,6 +84,42 @@ export function dayHeading(day: string, today: string): { title: string; sub: st
   if (day === today) return { title: "Heute", sub: longDate(day) };
   if (day === addDays(today, 1)) return { title: "Morgen", sub: longDate(day) };
   return { title: weekdayName(isoWeekday(day)), sub: dayMonth(day) };
+}
+
+/** „So, 18. Okt.“ */
+function weekdayDayMonth(day: string, withMonth = true): string {
+  const { month, day: d } = parseIsoDate(day);
+  return `${weekdayShort(day)}, ${d}.${withMonth ? ` ${monthShort(month)}` : ""}`;
+}
+
+/**
+ * Überschrift einer Gruppe der Liste (Plan 0043, E4): Termine wie `dayHeading`; „Neu diese Woche“ mit „seit So, 18.
+ * Okt.“, „Neu vorige Woche“ mit dem Zeitraum, „Früher eingestellt“ ohne Unterzeile.
+ */
+export function listingHeading(group: ListGroupHead, today: string): { title: string; sub?: string } {
+  switch (group.kind) {
+    case "termin":
+      return dayHeading(group.day, today);
+    case "diese-woche":
+      return { title: "Neu diese Woche", sub: `seit ${weekdayDayMonth(group.from)}` };
+    case "vorige-woche": {
+      const sameMonth = parseIsoDate(group.from).month === parseIsoDate(group.to).month;
+      return {
+        title: "Neu vorige Woche",
+        sub: `${weekdayDayMonth(group.from, !sameMonth)} – ${weekdayDayMonth(group.to)}`,
+      };
+    }
+    case "frueher":
+      return { title: "Früher eingestellt" };
+  }
+}
+
+/** Hinweis über „Früher eingestellt“, wenn nichts Neues in der Liste steht (Plan 0043, E4) */
+export const NOTHING_NEW = `In den letzten ${NEW_DAYS} Tagen kam nichts Neues dazu.`;
+
+/** Letzte Zeile im Detail (Plan 0043, E5): „Im Zwergenplan seit 22. Oktober“ */
+export function listedSince(listedAt: string): string {
+  return `Im Zwergenplan seit ${dayMonth(berlinIsoDate(listedAt))}`;
 }
 
 /** Agenda-Überschrift im Kalender: „Heute, 5. Oktober“ / „Mittwoch, 7. Oktober“ */

@@ -57,11 +57,21 @@ export interface Route {
    */
   providerId?: string;
   filter: FilterState;
+  /**
+   * Sortierung der Liste „Entdecken“ (Plan 0043, E4): fehlt = „Nächste Termine“. Kein Filter: zählt nicht in Filterzahl
+   * und Zurücksetzen und steht nicht im Such-Abo; in der URL steht nur der Wert, nie der Startpunkt (ADR 0017).
+   */
+  sort?: Sort;
 }
+
+const SORTS = ["neu"] as const;
+export type Sort = (typeof SORTS)[number];
+const SORT_PARAM = "sortierung";
 
 export function parseRoute(search: string): Route {
   const p = new URLSearchParams(search);
   const tab = TABS.find((t) => t === p.get("ansicht")) ?? "entdecken";
+  const sort = SORTS.find((s) => s === p.get(SORT_PARAM));
   const offerId = p.get(OFFER_PARAM) ?? "";
   const providerId = p.get(PROVIDER_PARAM) ?? "";
   // SHORT_ID_PATTERN ist eine Teilmenge von KEBAB_ID_PATTERN: Anbieter brauchen keinen eigenen Zweig
@@ -73,6 +83,7 @@ export function parseRoute(search: string): Route {
     ...(validOffer ? { offerId } : {}),
     ...(validProvider ? { providerId } : {}),
     filter: filterFromSearch(search),
+    ...(sort ? { sort } : {}),
   };
 }
 
@@ -91,10 +102,11 @@ export function resolveRouteIds(route: Route): Route {
   };
 }
 
-/** Kanonischer Querystring ohne „?“: Filter, dann Ansicht, dann Anbieter, dann Angebot. */
+/** Kanonischer Querystring ohne „?“: Filter, dann Ansicht, Sortierung, Anbieter, Angebot. */
 export function routeToSearch(route: Route): string {
   const parts = [filterToSearch(route.filter)];
   if (route.tab !== "entdecken") parts.push(`ansicht=${route.tab}`);
+  if (route.sort) parts.push(`${SORT_PARAM}=${route.sort}`);
   if (route.providerId) parts.push(`${PROVIDER_PARAM}=${route.providerId}`);
   if (route.offerId) parts.push(`${OFFER_PARAM}=${route.offerId}`);
   return parts.filter(Boolean).join("&");

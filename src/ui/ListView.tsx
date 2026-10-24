@@ -1,16 +1,19 @@
 /**
  * „Entdecken“ als Liste (Plan 0003, E7/E8): jedes Angebot einmal am nächsten Termin, nach Tagen gruppiert; mit
- * Zeitraum am Termin darin (Plan 0023, E6).
+ * Zeitraum am Termin darin (Plan 0023, E6). Mit „Neu eingestellt“ nach Wochen gruppiert, die Karten dann mit Datum
+ * (Plan 0043, E4).
  */
 import type { ReactNode } from "react";
-import type { DayGroup, Occurrence } from "../domain/agenda.ts";
+import type { Occurrence } from "../domain/agenda.ts";
+import type { ListGroup } from "../domain/listing.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { ageEmptyText, dayHeading } from "./format.ts";
+import { berlinIsoDate } from "../domain/time.ts";
+import { ageEmptyText, listingHeading, NOTHING_NEW } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 
 interface ListViewProps {
-  groups: DayGroup<Occurrence<SiteOffer>>[];
+  groups: ListGroup<Occurrence<SiteOffer>>[];
   remaining: number;
   onMore: () => void;
   today: string;
@@ -20,7 +23,7 @@ interface ListViewProps {
   onResetFilter?: (() => void) | undefined;
   /** nur, wenn der Altersfilter etwas ausblendet (Plan 0021, E4) */
   age?: AgeEscape | undefined;
-  /** Zeitraum aktiv: Das Detail bezieht sich auf den Termin am Tag der Gruppe, wie im Kalender (Plan 0023, E7) */
+  /** Zeitraum aktiv: Das Detail bezieht sich auf den Termin der Karte, wie im Kalender (Plan 0023, E7) */
   openOnDay: boolean;
 }
 
@@ -38,16 +41,24 @@ export function ListView({
   if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} age={age} />;
   return (
     <>
+      {groups[0]?.kind === "frueher" && <p className="status">{NOTHING_NEW}</p>}
       {groups.map((group) => {
-        const { title, sub } = dayHeading(group.day, today);
+        const { title, sub } = listingHeading(group, today);
+        const dated = group.kind !== "termin";
         return (
-          <section key={group.day} aria-label={`${title}, ${sub}`}>
-            <h2 className={group.day === today ? "daylabel is-today" : "daylabel"}>
+          <section key={group.key} aria-label={sub ? `${title}, ${sub}` : title}>
+            <h2 className={group.kind === "termin" && group.day === today ? "daylabel is-today" : "daylabel"}>
               <span>{title}</span>
-              <small>{sub}</small>
+              {sub && <small>{sub}</small>}
             </h2>
             {group.items.map((item) => (
-              <OfferCard key={item.offer.id} item={item} ctx={ctx} calendarDay={openOnDay ? group.day : undefined} />
+              <OfferCard
+                key={item.offer.id}
+                item={item}
+                ctx={ctx}
+                dated={dated}
+                calendarDay={openOnDay ? berlinIsoDate(item.session.start) : undefined}
+              />
             ))}
           </section>
         );

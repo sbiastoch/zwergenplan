@@ -122,6 +122,15 @@ async function openSavedList(page: Page) {
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   entdecken: async () => {},
+  // Sortierung (Plan 0043, E4): offenes Menü und die Liste „Neu eingestellt“ mit gefülltem Knopf und Etiketten
+  sortiermenue: async (page) => {
+    await page.getByRole("button", { name: /^Sortierung:/ }).click();
+    await expect(page.getByRole("menu", { name: "Sortieren nach" })).toBeVisible();
+  },
+  "entdecken-neu": async (page) => {
+    await page.goto("./?sortierung=neu");
+    await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Neu diese Woche/);
+  },
   // Plan 0025, E5 (Test 15): Kalender der Merkliste, Woche mit Titelknopf und Tagen gruppiert. Bei offenem Monat ist
   // die Wochenleiste ausgeblendet (Plan 0007, E5), B3 misst aber beide Raster.
   "merkliste-kalender-woche": async (page) => {

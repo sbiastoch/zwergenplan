@@ -9,7 +9,7 @@ import { activeFilterCount, EMPTY_FILTER, type FilterState, withDateRange } from
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
-import { type Tab, tabSection } from "../domain/route.ts";
+import { type Sort, type Tab, tabSection } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
@@ -41,6 +41,7 @@ import { ProviderSearch } from "./ProviderSearch.tsx";
 import { SavedCalendar } from "./SavedCalendar.tsx";
 import { SavedView } from "./SavedView.tsx";
 import { LimitAction, type LimitActionFor } from "./Sheets.tsx";
+import { SortMenu, type SortOption } from "./SortMenu.tsx";
 import { NO_TOAST, Toast } from "./Toast.tsx";
 import {
   useBirthDate,
@@ -78,6 +79,13 @@ const DISCOVER_VIEWS: readonly ViewOption<"entdecken" | "karte">[] = [
   { value: "entdecken", label: "Liste" },
   { value: "karte", label: "Karte" },
 ];
+/** Sortierungen der Liste (Plan 0043, E4); „termine“ steht nie in der URL */
+type SortChoice = "termine" | Sort;
+const SORT_OPTIONS: readonly SortOption<SortChoice>[] = [
+  { value: "termine", title: "Nächste Termine", sub: "was als Nächstes stattfindet" },
+  { value: "neu", title: "Neu eingestellt", sub: "neueste zuerst" },
+];
+const sortTitle = (sort: Sort) => SORT_OPTIONS.find((o) => o.value === sort)?.title ?? "";
 
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
@@ -284,7 +292,7 @@ export function App() {
   const section = tabSection(route.tab);
   // Liste | Karte steht rechts neben der Statuszeile und bricht bei wenig Platz darunter (Plan 0005, E5). Kein
   // Scroll nach oben: Das gibt es nur beim Tab-Wechsel (Plan 0025, E4).
-  const toggle = section === "entdecken" && (
+  const viewToggle = (
     <ViewToggle
       options={DISCOVER_VIEWS}
       current={route.tab === "karte" ? "karte" : "entdecken"}
@@ -292,6 +300,26 @@ export function App() {
       legend="Darstellung der Angebote"
     />
   );
+  /*
+   * Sortierung (Plan 0043, E4): nur in der Liste, rechts neben „Liste | Karte“, auch im Ladezustand (kein Springen).
+   * Nach der Wahl beginnt die Liste oben mit dem ersten Schritt; der Fokus bleibt am Knopf (SortMenu).
+   */
+  const onSort = (value: SortChoice) => {
+    const { sort: _old, ...rest } = route;
+    replace(value === "termine" ? rest : { ...rest, sort: value });
+    views.resetPage();
+    window.scrollTo({ top: 0 });
+  };
+  const toggle =
+    section === "entdecken" &&
+    (route.tab === "entdecken" ? (
+      <div className="view-tools">
+        {viewToggle}
+        <SortMenu options={SORT_OPTIONS} current={route.sort ?? "termine"} plain="termine" onChange={onSort} />
+      </div>
+    ) : (
+      viewToggle
+    ));
   // Ohne site.json bliebe das Anbieter-Sheet beim Laden stehen, modal über der Fehlerseite (Arch-Review m3). Es öffnet
   // erst mit den Daten; `anbieter=` bleibt in der URL, „Nochmal versuchen“ öffnet es dann.
   const sheetProviderId = load.kind === "error" ? undefined : route.providerId;
@@ -437,6 +465,8 @@ export function App() {
                     <b>{listCount}</b>
                     {listWords}
                     {reachSuffix}
+                    {/* Ansage der Sortierung ohne sichtbare Änderung (Plan 0043, E4; Review 2, K3) */}
+                    {route.sort && <span className="sr-only">. Sortiert nach {sortTitle(route.sort)}</span>}
                   </span>
                 )}
                 {pwaNote && (
