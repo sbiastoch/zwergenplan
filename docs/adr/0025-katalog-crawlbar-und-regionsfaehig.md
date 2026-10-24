@@ -1,6 +1,6 @@
 # ADR 0025 – Katalog crawlbar und regionsfähig
 
-Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung je Region statt fester bbox), ADR 0006 (Katalogformat) und ADR 0024 (`notes` ist Protokoll; `adapter` wird für `aggregator` Pflicht). **Ergänzt durch ADR 0029 (Plan 0036):** zweite Region Fürth, Feld `kreis`, Reihenfolge des Entdeckens (Nachtrag unten). **Ergänzt durch Plan 0042:** `follow`, kein `render` bei PDF (Nachtrag unten).
+Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung je Region statt fester bbox), ADR 0006 (Katalogformat) und ADR 0024 (`notes` ist Protokoll; `adapter` wird für `aggregator` Pflicht). **Ergänzt durch ADR 0029 (Plan 0036):** zweite Region Fürth, Feld `kreis`, Reihenfolge des Entdeckens (Nachtrag unten). **Ergänzt durch Plan 0042:** `follow`, `partChars`, kein `render` bei PDF (Nachtrag unten).
 
 **Geändert durch ADR 0032 (Plan 0039):** Die in Punkt 1 angekündigten Felder (Ferienland, ÖPNV, Kamera) kommen mit Düsseldorf, aber am Netz (`NETWORKS` in `src/domain/regions.ts`), nicht an der Region; dazu das Region-Feld `municipality`. Der Satz „Die Stadtwahl bleibt auch mit zwei Regionen ungespeichert“ im Nachtrag vom 2026-10-12 ist ersetzt: Die Stadt wird gespeichert (`zwergenplan.stadt`).
 
@@ -46,7 +46,8 @@ Status: angenommen (2026-10-10), mit Plan 0031. Ergänzt ADR 0003 (Geo-Prüfung 
 - Mit Fürth kommt das Feld `kreis` (Startgebiet der Wegzeit); Ferienland und Kamera kommen weiter nicht, weil nichts sie liest. `REGION_IDS` legt jetzt auch die Reihenfolge des Entdeckens fest (spezifischere Region zuerst).
 - Die Stadtwahl bleibt auch mit zwei Regionen ungespeichert (ADR 0029, Punkt 5).
 
-## Nachtrag (2026-10-24): `follow` als Abruffeld (Plan 0042, E2)
+## Nachtrag (2026-10-24): `follow` und `partChars` (Plan 0042, E2 und S2)
 
 - **Ergänzung zu Punkt 3:** Programmeinträge haben zusätzlich `follow: { match, max }` (Folgeseiten derselben Liste, nur `kind: html` ohne `render`), ein Abruffeld wie `render` und `request`. Regel und Grund stehen in ADR 0026, Nachtrag 2026-10-24.
+- `partChars` am `anbieter` (2 000–25 000) senkt die Zeichenschwelle der Teile für dichte Listen; ohne das Feld gilt `PART_MAX_CHARS`. Es ist ein Extraktionsfeld und geht nicht in den Cache-Schlüssel (wie die Zeichenschwelle). Eine Zählung nach Einträgen wurde verworfen: Die Zeile, die einen Eintrag abschließt, ist bei Kufer nicht verlässlich, und automatisch angewandt hätte sie Nürnberger Anbieter in viele Aufrufe zerlegt (Plan 0042, S2).
 - `render` ist bei `kind: pdf` ungültig: ein PDF liest `pdftotext`, im Browser endete der Abruf mit „Download is starting“ (Plan 0042, E6).

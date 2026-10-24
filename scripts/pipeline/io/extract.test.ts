@@ -131,6 +131,17 @@ describe("createExtractor (Fake-CLI)", () => {
     expect(b.seen().stdin).not.toContain("Krabbeltreff");
   });
 
+  it("partChars des Anbieters: kleinere Teile als die allgemeine Schwelle (Plan 0042, S2)", async () => {
+    const a = control([event("Krabbeltreff", "WE")]);
+    const b = control([event("Babymassage", "TH")]);
+    const pad = "x".repeat(1500);
+    const text = [`## Seite 1: ${PAGE} (html)`, a.line, pad, `## Seite 2: ${PAGE}/2 (html)`, b.line, pad].join("\n");
+    const dense = { ...input(text), provider: { ...provider, partChars: 2000 } };
+    const r = await extractor()(dense, new AbortController().signal);
+    expect(r.calls.map((c) => c.part)).toEqual(["1/2", "2/2"]);
+    expect(r.outcome.kind === "ok" && r.outcome.events.map((e) => e.title)).toEqual(["Krabbeltreff", "Babymassage"]);
+  });
+
   it("Ferien aus dem Land des Anbieters, je Land und Stichtag einmal geladen (Plan 0039, E6)", async () => {
     const loads: string[][] = [];
     const ext = createExtractor({

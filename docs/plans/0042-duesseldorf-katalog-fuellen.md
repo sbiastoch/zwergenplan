@@ -449,6 +449,19 @@ M2 (Soll für Ziel 3, Kurse gesamt / künftig): efa PEKiP/Eltern-Baby 27/26, Bew
   - m3: `fetch-page --max` verlangt eine ganze Zahl 1 bis `FOLLOW_MAX` (40, neben dem Schema).
   - m4: robots.txt der Kufer-Hosts geprüft (2026-10-24): efa, DRK und ASG sperren nur `typo3`, `id=`, `L=`, `cHash` u. Ä., nicht `/kategorie/…?knr=…&browse=forward`; AWO erlaubt alles (auch `cHash`); KWD hat keine robots.txt (404).
 
+### S2 – Katalog (2026-10-24)
+
+- **Recherche:** P1 mit fünf Subagenten (je Kufer-Träger einer), P2–P5 mit je einem (Sonnet). Übernahme mit einem Wegwerf-Skript unter `runs/`: Orte nacheinander geocodiert, Gemeinde Düsseldorf geprüft, geschätzte PLZ nach dem Geocoding berichtigt (efa Kopernikusstr., Opladener Str.; AWO Grafenberger Allee), `publicId` aus `pnpm data:validate`.
+- **Katalog:** 49 Düsseldorfer Anbieter und Musenkuss als `verzeichnis` (Ziel 1: ≥ 40). Nicht übernommen: „Familiencafé am EVK“ aus P3 (dieselben Treffs wie `kinderschutzbund-duesseldorf`), der Disselhoffsaal (nur Erwachsenenkurse) und die ASG-Kategorie „Schwangerschaft & Baby“ (überwiegend ohne Kind, Dubletten). 40 Ausschlüsse mit Grund in `references/excluded.md`.
+- **Ertragsbeweis Runde 1** (je Paket ein Lauf mit `--only`): P2–P5 ergaben 256 Angebote mit künftigem Termin bei 28 Anbietern. Von P1 lieferte nur DRK (21); efa, ASG und KWD brachen mit `truncated` ab (bis 128 000 Ausgabe-Tokens), AWO ergab `keine-termine`.
+- **Ursache Abbruch:** Kufer-Listen sind dicht (≈ 300 Zeichen je Kurs gegen ≈ 1 600 bei der FBS, an der `PART_MAX_CHARS` gemessen wurde). 25 000 Zeichen sind ≈ 80 Kurse in einem Aufruf.
+  - **Verworfen:** eine Obergrenze nach Einträgen (über `entryEnd`) für alle Anbieter. Der Vergleich über den ganzen Katalog (nur Abruf) hätte Nürnberger Anbieter wie das Staatstheater (5 → 35 Teile) zerlegt, zusammen +148 Aufrufe; die Dichte trennt Kufer nicht von ihnen. Auch nur für Kufer war die Zählung unzuverlässig: Bei ASG wählt `entryEnd` eine Ampelzeile, die nur bei buchbaren Kursen steht.
+  - **Umgesetzt:** `partChars` am `anbieter` (2 000–25 000), eine eigene, kleinere Zeichenschwelle; ohne das Feld bleibt alles wie bisher. efa, DRK, KWD 4 500, ASG 5 000.
+- **Nur Kursbeginn (DRK, KWD, AWO):** Die Liste nennt je Kurs nur den ersten Termin; die Folgetermine stehen auf der Detailseite. DRK übernimmt nur kommende Starts (ein Termin je Angebot). KWD leitete daraus Reihen ab (MamaFit: 39 erfundene Dienstage bis 10/2027) und bekam den `hint` „nur den ersten Termin übernehmen, keine Reihe ableiten“. AWO nennt nicht einmal die Uhrzeit und ruht mit `skipCrawl` (bleibt in der Anbieterübersicht). Laufende Kurse dieser drei fehlen damit; Detailseiten wären ein eigener Plan (Restpunkt).
+- **Ertragsbeweis Runde 2:** efa 120, ASG 131 (33 Aufrufe, 21 Min.), KWD 33, DRK 20 (Stand vor dem Schlusslauf mit `partChars`).
+- **Stichprobe Ziel 3:** efa „DELFI Di 11:15, 15 Termine ab 08.09.“ → 15 Termine 08.09.–15.12. ohne Herbstferien, Ort Hohenzollernstr. 24, wie die Liste. KWD nach dem `hint`: jedes Angebot genau ein Termin wie die Liste.
+- **Kosten bisher:** ≈ $1,10 für alle Ertragsbeweise (P2–P5 $0,23, Kufer-Läufe $0,85).
+
 ## Review (2026-10-18) – Verdict: Überarbeiten
 
 Unabhängiger `plan-reviewer`; alle Befunde sind gegen den Code geprüft.

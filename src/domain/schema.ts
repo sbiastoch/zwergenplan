@@ -183,6 +183,12 @@ export const Provider = z.discriminatedUnion("role", [
        * (Nutzerentscheid, Plan 0031).
        */
       skipCrawl: z.strictObject({ reason: z.string().min(1), since: IsoDate }).optional(),
+      /**
+       * Kleinere Teile für die Extraktion als `PART_MAX_CHARS` (Plan 0042, S2): für dichte Listen wie Kufer (~300 Zeichen
+       * je Kurs), bei denen 25 000 Zeichen ~80 Angebote in einen Aufruf packen und die Ausgabe abbricht. Richtwert so,
+       * dass ein Teil ≈ 15 Einträge hat (FBS-Messung: 25 000 / 1 600); für Kufer 3 000–4 500.
+       */
+      partChars: z.int().min(2000).max(25_000).optional(),
     })
     .superRefine((p, ctx) => {
       // Katalog-ID und publicId müssen unterscheidbar bleiben, sonst rechnet resolveProviderId falsch (ADR 0022)

@@ -3391,11 +3391,12 @@
       follow:
         match: browse=forward
         max: 6
-      hint: Nur Kurse mit Kind bis 3 Jahre; Rückbildung ohne Baby, Beckenboden, Erste Hilfe, Babysitter und Erwachsenentanz weglassen
+      hint: "Liste nennt je Kurs nur den ersten Termin: nur diesen übernehmen, keine Reihe ableiten. Nur Kurse mit Kind bis 3 J.; Rückbildung ohne Baby, Beckenboden, Erste Hilfe, Babysitter weglassen"
   availability:
     shown: ja
     how: Ampel je Kurs in der Liste; "Anmeldung auf Warteliste" heißt ausgebucht, "fast ausgebucht" wenige Plätze
     system: Kufer (KuferWeb)
+  partChars: 4500
   verified: 2026-10-24
   notes:
     - Kategorie 10 "Das Baby ist da!" enthält die Teilkategorien Eltern-Kind-Angebote (130), Sport mit Baby (148), Elternstart NRW (149) und Junge Eltern (131) sowie Rückbildung (52). Kat. 10 gewählt, weil sie zusätzlich die Beratungen mit Baby (Baby satt und zufrieden, Trageberatung, Schlaf gut Baby) abdeckt, die in 130/148/149 fehlen; 4 Seiten, 24 640 Zeichen.
@@ -3450,6 +3451,7 @@
     shown: ja
     how: "Ampel je Kurs im Text der Liste: 'Dieser Kurs ist buchbar' = frei, 'schon voll, Warteliste ist aber möglich' = warteliste; Detailseite nennt freie Plätze"
     system: Kufer (KuferWeb)
+  partChars: 4500
   verified: 2026-10-24
   notes:
     - "Kufer-Kursliste: 25 Kurse je Seite, Folgeseiten per browse=forward (6 Kategorien, 8 Seiten, rund 31 000 Zeichen)."
@@ -5142,6 +5144,7 @@
     shown: ja
     how: "Ampel je Kurs in der Liste: grün = frei, gelb = wenige Plätze, rot = ausgebucht (Warteliste möglich); Anmeldung im Warenkorb auf der Website"
     system: Kufer
+  partChars: 4500
   verified: 2026-10-24
   notes:
     - Kufer-Kursliste (25 Kurse je Seite, Folgeseiten per browse=forward); die Liste nennt Beginn, Uhrzeit und Zahl der Termine ("15 Termine"), daher wöchentliche Reihe mit Schulferienpause.
@@ -5281,16 +5284,19 @@
   programme:
     - url: https://www.awo-duesseldorf.de/awo-kurse/?kathaupt=1&katid=25&katname=Angebote%20fuer%20Eltern%20mit%20Babys&katvaterid=48&cHash=0af260560819fb3280bf77a2491224de
       kind: html
-      use: termine
+      use: info
       hint: Liste nennt Kursbeginn; Kurse laufen 6-15 Wochen. Nur Kurse mit Kind; Wald- und Pilzwanderung, Kind krank und Online-Termine weglassen
     - url: https://www.awo-duesseldorf.de/awo-kurse/?kathaupt=1&katid=27&katname=Angebote%20fuer%20Eltern%20mit%20Kleinkindern%20Vorschul-%20und%20Grundschulkinder&katvaterid=48&cHash=ef508af5b15db1beb5fc426630b7d2ac
       kind: html
-      use: termine
+      use: info
       hint: Liste nennt Kursbeginn. Nur Kurse, die ab Kindern unter 3 Jahren offen sind; Kurse für Kinder ab 3 Jahren und Schulkinder weglassen
   availability:
     shown: ja
     how: Ampel je Kurs in der Liste (Anmeldung möglich, wenig Teilnehmer, fast ausgebucht, Warteliste); Anmeldung über Warenkorb oder Direktbuchung im Kursportal
     system: Kufer (KuferWeb)
+  skipCrawl:
+    reason: Kursliste nennt nur Datum und Stadtteil, keine Uhrzeit; Termine stehen nur auf den Detailseiten (Plan 0042, Ertragsbeweis 2026-10-24)
+    since: 2026-10-24
   verified: 2026-10-24
   notes:
     - Kursportal Kufer; Kat. 25 (Eltern mit Babys, 23 Kurse) und Kat. 27 (Eltern mit Kleinkindern bis Grundschule, ≈ 62 Kurse) liegen je auf einer Seite, keine Blätterung.
@@ -5400,6 +5406,8 @@
     shown: ja
     how: Ampel je Kurs in der Liste (grün frei, gelb wenige, rot Warteliste); die Liste nennt Kursbeginn, Uhrzeit und 'N Termine' (wöchentliche Reihe, Schulferien beachten)
     system: Kufer (KuferWeb)
+  # kleiner als bei den anderen Kufer-Trägern: 4 400 Zeichen brachen ab (Plan 0042, S2)
+  partChars: 5000
   verified: 2026-10-24
   notes:
     - Kursliste je Kategorie 7 Kurse pro Seite, Folgeseiten per browse=forward (Plan 0042, E2). Die Liste nennt die Zahl der Termine, Detailseiten nicht nötig.

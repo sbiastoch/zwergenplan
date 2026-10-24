@@ -282,6 +282,11 @@
               "since"
             ],
             "additionalProperties": false
+          },
+          "partChars": {
+            "type": "integer",
+            "minimum": 2000,
+            "maximum": 25000
           }
         },
         "required": [

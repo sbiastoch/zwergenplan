@@ -92,7 +92,9 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
     };
     const systemPrompt = extractPrompt(EXTRACT_KEY_PARTS.prompt, input.provider);
     // Große Anbieter in Teilen (lib/split.ts); der Cache-Schlüssel bleibt der des ganzen Anbieters
-    const { parts: texts, notes } = splitInput(input.text, partMaxChars, {
+    // dichte Listen mit eigener, kleinerer Schwelle (`partChars`, Plan 0042, S2)
+    const own = input.provider.role === "anbieter" ? input.provider.partChars : undefined;
+    const { parts: texts, notes } = splitInput(input.text, Math.min(partMaxChars, own ?? partMaxChars), {
       pageUrls: input.pageUrls,
       candidates: input.candidates.length,
     });
