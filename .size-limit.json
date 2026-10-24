@@ -15,5 +15,5 @@
   { "name": "Wegzeit-Daten vgn", "path": "dist/data/wegzeit/vgn.json", "limit": "64 kB", "gzip": true },
   { "name": "Wegzeit-Daten vrr", "path": "dist/data/wegzeit/vrr.json", "limit": "64 kB", "gzip": true },
   { "name": "Linien-Daten vgn", "path": "dist/data/linien/vgn.json", "limit": "40 kB", "gzip": true },
-  { "name": "Linien-Daten vrr", "path": "dist/data/linien/vrr.json", "limit": "40 kB", "gzip": true }
+  { "name": "Linien-Daten vrr", "path": "dist/data/linien/vrr.json", "limit": "48 kB", "gzip": true }
 ]

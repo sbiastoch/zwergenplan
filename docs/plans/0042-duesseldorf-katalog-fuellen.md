@@ -294,6 +294,11 @@ Der Nutzer hat N1–N5 am 2026-10-24 wie empfohlen entschieden: N1 ja (Folgeplan
 - **N4 – Ziele.** Empfehlung wie im Abschnitt „Ziel“: ≥ 40 Anbieter, ≥ 300 Angebote, ≥ 80 % Abdeckung.
 - **N5 – `ENTDECKEN_MODUS` beim Push** (nur, falls die Variable auf `live` steht). Sie gilt für `vgn` und `vrr` zugleich. Empfehlung: nach der Abnahme aus S3.3 live lassen; die Funde des Trockenlaufs sind dann bekannt, und der Vorfilter kennt den Katalog. Alternativen: vorübergehend `trocken` (trifft auch Nürnberg und Fürth) oder erst nach dem Samstagslauf pushen.
 
+### Nutzerentscheide 2026-10-24 (nach dem Probe-Build, E4 „Anhalten“)
+
+- **N6 – `site.json` (235,5 kB gzip im Probe-Build, Schwelle 200 kB):** erst teilen, dann live. Plan 0039 und dieser Katalog gehen erst nach dem Plan „`site.json` je Gebiet teilen“ (Plan 0044) live. S4 wartet darauf.
+- **N7 – Budget `Linien-Daten vrr`** (45,7 kB gzip gegen 40 kB): auf **48 kB** angehoben. Die Datei lädt nur, wenn eine Stadt im Netz vrr gewählt ist; VRR hat mehr Orte (91) als VGN (82) und 1 237 Linienfolgen.
+
 ## Dateien
 
 | Datei | Änderung | Schritt |
@@ -461,6 +466,28 @@ M2 (Soll für Ziel 3, Kurse gesamt / künftig): efa PEKiP/Eltern-Baby 27/26, Bew
 - **Ertragsbeweis Runde 2:** efa 120, ASG 131 (33 Aufrufe, 21 Min.), KWD 33, DRK 20 (Stand vor dem Schlusslauf mit `partChars`).
 - **Stichprobe Ziel 3:** efa „DELFI Di 11:15, 15 Termine ab 08.09.“ → 15 Termine 08.09.–15.12. ohne Herbstferien, Ort Hohenzollernstr. 24, wie die Liste. KWD nach dem `hint`: jedes Angebot genau ein Termin wie die Liste.
 - **Kosten bisher:** ≈ $1,10 für alle Ertragsbeweise (P2–P5 $0,23, Kufer-Läufe $0,85).
+
+### S2.7 – Probe-Build (2026-10-24, Wegwerf-Worktree `$CLAUDE_JOB_DIR/tmp/probe` auf `f2400ef`)
+
+- 40 Düsseldorfer Rohdateien aus den Paketläufen (`runs/2026-10-24/pakete/*/raw`, Sammelskript `runs/2026-10-24/pakete/sammle-raw.cjs`), `nightly --build-only`: **1 020 Angebote** (462 Bestand + 558 Düsseldorf), `data:validate` grün.
+- Linien-Gates grün (vrr: 1 877 Zellen ohne Linien, davon 144 unpassend; alle 50 Stadtteile mit Zugangshalt).
+- `pnpm size`: `site.json` **235,49 kB** (Budget 250, Schwelle 200 → N6), `anbieter.json` 13,27/15 kB, Wegzeit vrr 57,55/64 kB, Linien vrr **45,68/40 kB** (→ N7, jetzt 48), Service Worker 10,02/10,5 kB.
+- **S3.1 Abdeckung** (Wegwerf-Skript `runs/2026-10-24/abdeckung.cjs`, Navigator-JSON nur im Job-Verzeichnis): 490 relevante Einträge (0–3, ohne reine Beratung/Medizin, künftiges Ende oder fortlaufend), 37 städtische aus dem Nenner (E7), **435 von 453 = 96,0 %** abgedeckt (Ziel 2: ≥ 80 %). Nicht abgedeckt: Caritas (2), tamburino (3), Stadtbüchereien ohne URL (4), je 1: SKFM, Sinneswandel, pro familia, BV 04, Hellerhofer SV, Familienbegleitung, LT Düsseldorf-Süd, Red-Tiger-Club, Zwergenstube Flurstraße.
+
+### Zwischenstand und Übergabe (2026-10-24 abends)
+
+Erledigt: S0, S1 (`6af7770`, `cbbbc40`, Arch-Review OK), S2 (Katalog `6c8079a`, `partChars` `f2400ef`, Ertragsbeweise, Probe-Build), S3.1.
+
+Offen, in dieser Reihenfolge:
+1. **S3.2 Entdecken-Eval** lief am 2026-10-24 (`--hide` efa, DRK, Kinderschutzbund, SOS-MGH, Zwergenstube, Krügel, YogaKitchen, Mama macht, Sharky, TSV Jahn); der Lauf kopiert seinen Bericht nach `runs/2026-10-24/eval-discover/report.md`. Zeile nach `evals/results.md` („Entdecken“).
+2. **S3.3 Entdecken-Trockenlauf** ohne `--hide` für `duesseldorf`; der Nutzer nimmt den Bericht ab (N5).
+3. **`/arch-review`** über `partChars` (Schemaänderung seit `cbbbc40`) und `pnpm e2e:local --affected --smoke` (Daten, Schema).
+4. **Plan 0044 „`site.json` je Gebiet teilen“** schreiben und `/plan-review` (N6). Grundlage: `docs/ideas.md`, „`site.json` je Gebiet teilen“; Messwert 235,49 kB mit Düsseldorf. Erst danach S2.8 und S4.
+5. **S2.8 `/browser-review`** im Probe-Build mit echten Düsseldorfer Daten (Test 8), nach Plan 0044.
+6. **S4 Live** gemeinsam mit Plan 0039 (S4.0 `ENTDECKEN_MODUS` prüfen; Nachtlauf per Hand mit angehobenen Bremsen: die Kufer-Träger allein sind ≈ 63 Teilaufrufe, efa 15, DRK ≈ 8, KWD ≈ 7, ASG 33).
+7. **Restpunkte** für `docs/ideas.md`: Detailseiten für DRK, KWD und AWO (laufende Kurse fehlen), Caritas und tamburino, ASG mit 33 Aufrufen je Änderung.
+
+Der Wegwerf-Worktree unter `$CLAUDE_JOB_DIR/tmp/probe` (detached, `f2400ef`) wird entfernt, sobald Plan 0044 einen neuen Probe-Build braucht.
 
 ## Review (2026-10-18) – Verdict: Überarbeiten
 
