@@ -1,7 +1,10 @@
 # Plan 0046 – Verfügbarkeit per Rezept: Stufe D neben der Extraktion
 
-Status: Review eingearbeitet
+Status: Entwurf
 Datum: 2026-10-25
+
+**Zurückgestellt (Nutzer, 2026-10-25):** „Die Verfügbarkeit, also freie Plätze ist für mich eher optional. Wichtiger ist, dass neue Angebote von bekannten Anbietern zuverlässig auftauchen.“ Vorrang hat Plan 0047 (`docs/plans/0047-neue-angebote-zuverlaessig.md`). Dieser Plan bleibt als ausgearbeiteter Entwurf mit drei Reviews liegen.
+
 Bezug:
 - Plan 0045 (`docs/plans/0045-entdecken-vollstaendig.md`), E1: vier Arten von Läufen; dieser Plan baut Stufe D (Verfügbarkeit) und bereitet Stufe C (Kurse seltener) vor.
 - ADR 0026, Punkt 1 (Nachtlauf täglich), Punkt 2 (ein Extraktionsweg; Modellaufruf nur bei geändertem Hash; Rohdaten nur über `refreshProvider`), Punkt 4 (Zustand und Einbruchschutz), Punkt 5 (Rechte), Nachtrag zu `follow`; ADR 0022 und ADR 0031 (stabile IDs); ADR 0025 (Katalog).
