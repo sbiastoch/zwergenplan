@@ -224,6 +224,8 @@ Verworfen:
 
 ### E5 – Folgeplan: Navigator als Fundquelle des Entdeckens
 
+**Aufgegangen in Plan 0045** (`docs/plans/0045-entdecken-vollstaendig.md`, 2026-10-25), E2: Adapter `navigator` als einer von mehreren Verzeichnis-Adaptern.
+
 Der Navigator kennt ≈ 40 Träger mit Website und wäre für ≈ 70 NRW-Kommunen nutzbar. Nach N1 schreibt die Umsetzung einen eigenen Plan „Verzeichnis mit Adapter“. Die Skizze steht in `docs/ideas.md` unter „Weitere Regionen“:
 - `role: verzeichnis` mit `adapter` (neues ADR, weil ADR 0025, Punkt 6 das heute ausschließt). Der Nachtlauf ruft ein Verzeichnis nie ab, es entsteht also keine Wiedergabe.
 - Der Adapter übernimmt nur Name, Website und Anzahl.
@@ -479,8 +481,8 @@ M2 (Soll für Ziel 3, Kurse gesamt / künftig): efa PEKiP/Eltern-Baby 27/26, Bew
 Erledigt: S0, S1 (`6af7770`, `cbbbc40`, Arch-Review OK), S2 (Katalog `6c8079a`, `partChars` `f2400ef`, Ertragsbeweise, Probe-Build), S3.1.
 
 Offen, in dieser Reihenfolge:
-1. **S3.2 Entdecken-Eval** lief am 2026-10-24 (`--hide` efa, DRK, Kinderschutzbund, SOS-MGH, Zwergenstube, Krügel, YogaKitchen, Mama macht, Sharky, TSV Jahn); der Lauf kopiert seinen Bericht nach `runs/2026-10-24/eval-discover/report.md`. Zeile nach `evals/results.md` („Entdecken“).
-2. **S3.3 Entdecken-Trockenlauf** ohne `--hide` für `duesseldorf`; der Nutzer nimmt den Bericht ab (N5).
+1. ~~**S3.2 Entdecken-Eval**~~ erledigt 2026-10-25: Zeile in `evals/results.md` („Entdecken“), 2 von 10 wiedergefunden, 5 gefunden, 0 falsch. Ziel 4 erfüllt: Alle 7 Portal-PDFs landeten im Vorfilter, keine Seite auf `duesseldorf.de` wurde bewertet. Die Ursachenanalyse steht in Plan 0045, „Ausgangslage“; der Nutzer hält das Ergebnis für ungenügend, Plan 0045 baut das Entdecken auf Vollständigkeit um.
+2. ~~**S3.3 Entdecken-Trockenlauf**~~ entfällt: `ENTDECKEN_MODUS` ist nicht gesetzt (geprüft 2026-10-25), der Zeitplan läuft also im Modus `trocken`, und N5 ist gegenstandslos. Den abgenommenen Trockenlauf vor einem Live-Gang regelt Plan 0045, S6.
 3. **`/arch-review`** über `partChars` (Schemaänderung seit `cbbbc40`) und `pnpm e2e:local --affected --smoke` (Daten, Schema).
 4. **Plan 0044 „`site.json` je Gebiet teilen“** schreiben und `/plan-review` (N6). Grundlage: `docs/ideas.md`, „`site.json` je Gebiet teilen“; Messwert 235,49 kB mit Düsseldorf. Erst danach S2.8 und S4.
 5. **S2.8 `/browser-review`** im Probe-Build mit echten Düsseldorfer Daten (Test 8), nach Plan 0044.
