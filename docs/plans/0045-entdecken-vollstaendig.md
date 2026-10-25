@@ -120,7 +120,7 @@ Erst wenn 1–4 je Region erreicht sind, geht `ENTDECKEN_MODUS` auf `live` (S6).
 
 ## Nicht-Ziele
 
-- **Stufen C und D** (E1): wöchentliche Extraktion neuer Kurse und nächtliche, deterministische Aktualisierung von Plätzen und Anmeldestand mit Haiku als Rückfall. Das ist der Nachtlauf, nicht das Entdecken, und kommt als Plan 0046.
+- **Stufen C und D** (E1): seltenere Extraktion neuer Kurse und nächtliche, deterministische Aktualisierung von Plätzen und Anmeldestand. Das ist der Nachtlauf, nicht das Entdecken: Stufe D baut Plan 0046 (`docs/plans/0046-verfuegbarkeit-per-rezept.md`), Stufe C seltener ein Folgeplan danach.
 - **Eine neue Stadt anlegen.** `regions.ts`, Stadtteile, Netz und Fahrplan bleiben Skill, Abschnitt 6. Dieser Plan liefert die Erkundung der Anbieter und Quellen für eine angelegte Region. Eine Stadt in einem neuen Netz (Oldenburg: VBN) braucht weiterhin Netz-Eintrag, Feed und Budgets.
 - **Kosten senken.** Kosten werden wie heute je Aufruf erfasst und berichtet (Plan 0032, E8). Die Bremsen schützen vor Schleifen, nicht vor Ausgaben (E8). Der Trade-off kommt nach `docs/ideas.md`.
 - **Fürth als eigene Stichprobe.** Fürth hat 8 Anbieter, alle vom Entdecken. Fürth läuft mit, die Ziele gelten für Nürnberg und Düsseldorf.
@@ -138,8 +138,8 @@ Erst wenn 1–4 je Region erreicht sind, geht `ENTDECKEN_MODUS` auf `live` (S6).
 |---|---|---|---|
 | **A – Erkunden** | einmalig je Region, danach etwa jährlich | alle Methoden und eine offene Quellensuche; Bericht mit Ertrag je Methode und Vorschlag für das Recherche-Profil | dieser Plan |
 | **B – Entdecken** | monatlich je Netz | neue Anbieter mit den Methoden des Profils | dieser Plan |
-| **C – Kurse** | wöchentlich | neue und geänderte Kurse bekannter Anbieter (Modell) | Plan 0046 |
-| **D – Verfügbarkeit** | nächtlich | Plätze und Anmeldestand, deterministisch je Buchungssystem, Rückfall Haiku | Plan 0046 |
+| **C – Kurse** | täglich bei geänderter Seite wie heute; seltener (wöchentlich) erst mit einem Folgeplan nach Plan 0046 | neue und geänderte Kurse bekannter Anbieter (Modell) | heute; Folgeplan |
+| **D – Verfügbarkeit** | nächtlich | Plätze und Anmeldestand per Rezept (deterministisch), Rückfall der Modellwert der Extraktion | Plan 0046 |
 
 Stufe A und B sind derselbe Code (`pipeline discover`) mit verschiedenem Umfang: A fährt alle Methoden, die für die Region in Frage kommen, und schreibt nie in den Katalog (immer Trockenlauf). B fährt die Methoden des Profils und nimmt im Modus live auf.
 
