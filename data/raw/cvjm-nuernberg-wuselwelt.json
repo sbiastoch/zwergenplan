@@ -3,26 +3,26 @@
   {
    "providerId": "cvjm-nuernberg-wuselwelt",
    "venueId": "cvjm-nuernberg-wuselwelt",
-   "title": "Wuselwelt – Bewegungs- und Spielzeit für Kinder 0–3 mit Eltern",
-   "summary": "Offenes Freispiel in der Turnhalle für Kinder von 0 bis 3 Jahren mit Eltern oder Bezugsperson, freitags 9:30–10:15 Uhr, außer in den Ferien. Einfach vorbeikommen, kostenlos; Hallenschuhe oder ABS-Socken mitbringen.",
+   "title": "Wuselwelt: offene Bewegungs- und Spielzeit für Kinder 0–3 (freitags)",
+   "summary": "Freispiel in der Turnhalle für Kinder von 0–3 Jahren mit Eltern oder Bezugsperson, danach Austausch der Erwachsenen. Hallenschuhe oder ABS-Socken mitbringen. Keine Anmeldung, in den Ferien kein Termin.",
    "topics": [
-    "krabbelgruppe",
-    "eltern-kind-turnen"
+    "bewegung",
+    "spielplatz-indoor"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "keine Kosten",
+   "price": "keine",
    "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
    "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-   "category": "krabbel-spielgruppen",
+   "category": "bewegung",
    "age": {
     "minMonths": 0,
     "maxMonths": 36
    },
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung nötig"
+    "note": "Offenes Angebot, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -36,7 +36,7 @@
    }
   }
  ],
- "inputHash": "cca63cdff55a8c13cb77130cb26dd760d0091630dbfcb82c9700d0bb6116d4e2",
+ "inputHash": "2a8c2007affe05ea45029a1d6595821d976bc59631353fe349c7815cb966c26b",
  "dated": {
   "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
   "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
@@ -44,8 +44,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-24T08:20:24+02:00",
- "changedAt": "2026-10-24T08:20:24+02:00",
+ "checkedAt": "2026-10-25T07:38:23+01:00",
+ "changedAt": "2026-10-25T07:38:23+01:00",
  "sources": [
   "frankenkids"
  ]

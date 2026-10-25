@@ -3,12 +3,10 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Reformer Mums & Babies: Pilates mit Baby (6 Wochen–6 Monate)",
-   "summary": "Pilates auf dem Reformer mit Baby, Anleitung auf Englisch, je 55 Minuten. Ärztliche Freigabe nötig. Buchung nur in der IMILUV-App (bsport), 5 Credits pro Termin.",
+   "title": "Reformer Pilates Mums & Babies (ca. 6 Wochen–6 Monate)",
+   "summary": "Sanftes Reformer-Pilates für Mütter mit Baby im Alter von etwa 6 Wochen bis 6 Monaten, auf Englisch, mit ärztlicher Freigabe. Buchung in der IMILUV-App; Termine laufen wöchentlich mittwochs.",
    "topics": [
-    "fitness-mit-baby",
-    "bewegung",
-    "mehrsprachig"
+    "fitness-mit-baby"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -22,8 +20,8 @@
     "maxMonths": 6
    },
    "availability": {
-    "status": "unbekannt",
-    "note": "Laut Termin-API nicht ausgebucht; Anmeldung in der IMILUV-App (bsport)"
+    "status": "frei",
+    "note": "Buchung in der IMILUV-App; laut Termin-API nicht ausgebucht (Stand des Abrufs)"
    },
    "schedule": {
     "kind": "dates",
@@ -62,11 +60,10 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Barre Baby Luv (Babys ca. 6–12 Monate, Donnerstag)",
-   "summary": "Barre-Training mit Baby in der Trage, Deutsch und Englisch. Ärztliche Freigabe ist nötig. Buchung nur in der IMILUV-App, jeder Termin einzeln.",
+   "title": "Barre Baby Luv (Babys ca. 6–12 Monate)",
+   "summary": "Barre-Training mit Baby in der Trage, 50 Minuten, Deutsch/Englisch. Ärztliche Freigabe nötig. Einzelne Termine werden in der IMILUV-App gebucht.",
    "topics": [
-    "fitness-mit-baby",
-    "bewegung"
+    "fitness-mit-baby"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -81,7 +78,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Buchung in der IMILUV-App; laut Terminliste noch nicht ausgebucht"
+    "note": "Buchung in der IMILUV-App (bsport); Termine laut Terminliste nicht ausgebucht"
    },
    "schedule": {
     "kind": "dates",
@@ -114,7 +111,7 @@
    }
   }
  ],
- "inputHash": "61c8e5a09b6fb65e42b9021e627c6a5b1b53b38dcf201629caa33f39708fcdab",
+ "inputHash": "b5dea9d5fa515a0059db4175f075e3fb1d6051f983c855b333f9b63093086eb9",
  "dated": {
   "2026-10-28": "bb0e397cfa0f7faa8bc071e45c37caebbc8ac116cbb0a2fc25e49920f0115d6b",
   "2026-11-05": "4469413ab5cecdfa1ba87562ddf4671fa640e3e4ced70a41309448442ec050dd",
@@ -124,8 +121,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-24T08:20:24+02:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
+ "checkedAt": "2026-10-25T07:38:23+01:00",
+ "changedAt": "2026-10-25T07:38:23+01:00",
  "sources": [
   "frankenkids"
  ]
