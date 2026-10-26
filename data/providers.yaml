@@ -611,7 +611,7 @@
     - url: https://www.diefamilienbox.de/kinderkurse-nürnberg/offenes-familiencafé/
       kind: html
       use: info
-    - url: https://www.diefamilienbox.de/erwachsenenkurse/stundenplan-1/
+    - url: https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/
       kind: html
       use: termine
     - url: https://www.eversports.de/widget/w/vX25EB?list=course&group=84326
@@ -626,7 +626,7 @@
     shown: ja
     how: Eversports zeigt freie Plätze/ausgebucht je Termin (nur im Browser); PEKiP aktuell Warteliste, neue Kurse ab 26.11.2026
     system: Eversports
-  verified: 2026-10-04
+  verified: 2026-10-26
   notes:
     - Familienzentrum mit vielen externen Kursleiterinnen (u. a. Anne Schulz, PEKiP Jasmin Amjadi Manesh). Evtl. Überschneidung mit Familienzentren-Liste.
     - Familienzentrum mit sehr breitem Programm (PEKiP, Babymassage, Spielgruppen, Café) – hier nur der Bewegungsteil; vermutlich auch im Familienbildungs-Bereich erfasst (Duplikat zusammenführen). Rosenaustraße ca. 500 m westlich des Spittlertors.
@@ -637,7 +637,7 @@
     - "[diefamilienbox.de/kleinkindkurse-nürnberg] Kleinkindkurse 12-36 M."
     - "[eversports.de/…/12409d8f-a593-49f5-8c73-910dfef5e2a6?…] Eversports-Buchungskalender (Termine & Anmeldung); per Skript 403/Cloudflare"
     - "[diefamilienbox.de/…/offenes-familiencafé] Offenes FamilienCafé – Termine nur über WhatsApp-Gruppe"
-    - "[diefamilienbox.de/…/stundenplan-1] Wochenstundenplan inkl. Erwachsenenkurse (Yoga mit Baby, Bauch-Beine-Beckenboden, Postnatales Pilates)"
+    - "[diefamilienbox.de/erwachsenenkurse/stundenplan] Wochenstundenplan inkl. Erwachsenenkurse (Yoga mit Baby, Bauch-Beine-Beckenboden, Postnatales Pilates); bis 2026-10 unter …/stundenplan-1/ (seit 2026-10-22 HTTP 404)"
     - "[eversports.de/…/vX25EB?list=course&group=84326] Eversports-Widget 'Yoga mit Baby' (3-12 Mon.); Turnkurse über https://www.eversports.de/org/widget/0455f70c-bfb9-40da-b2ca-d4a77077dae2?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5"
   venues:
     - id: die-familienbox
