@@ -1,6 +1,6 @@
 # ADR 0033 – Crawling-Architektur: die Programmseite als Einheit
 
-Status: angenommen (2026-10-26), Nutzerentscheid nach dem Gesamt-Review der Pläne 0045–0047 („Beginne mit dem Neuschnitt“). Umsetzung: Punkte 1, 2, 3, 5 und 7 mit Plan 0048 (`docs/plans/0048-nachtlauf-seite-als-einheit.md`), Punkt 4 mit Plan 0049 (`docs/plans/0049-seitenfinder.md`: Modul und Pflege bekannter Anbieter) und Plan 0050 (Einsatz im Entdecken), Punkt 6 mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`). Ein Punkt gilt, sobald sein Plan live ist; bis dahin gilt ADR 0026. **Ändert** ADR 0026, Punkte 1–5 (Abschnitt „Änderungen an ADR 0026“). Baut auf ADR 0022 und ADR 0031 (stabile IDs) und ADR 0025 (Katalog) auf. Ersetzt die Reservierungen ADR 0033, 0034 und 0036 der Pläne 0045 bis 0047; die Nummer 0034 bleibt frei, 0035 bleibt für Plan 0044 reserviert.
+Status: angenommen (2026-10-26), Nutzerentscheid nach dem Gesamt-Review der Pläne 0045–0047 („Beginne mit dem Neuschnitt“). Umsetzung: Punkte 1, 2, 3, 5, 7 und 8 mit Plan 0048 (`docs/plans/0048-nachtlauf-seite-als-einheit.md`), Punkt 4 mit Plan 0049 (`docs/plans/0049-seitenfinder.md`: Modul und Pflege bekannter Anbieter) und Plan 0050 (Einsatz im Entdecken), Punkt 6 mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`). Ein Punkt gilt, sobald sein Plan live ist; bis dahin gilt ADR 0026. **Ändert** ADR 0026, Punkte 1–5 (Abschnitt „Änderungen an ADR 0026“). Baut auf ADR 0022 und ADR 0031 (stabile IDs) und ADR 0025 (Katalog) auf. Ersetzt die Reservierungen ADR 0033, 0034 und 0036 der Pläne 0045 bis 0047; die Nummer 0034 bleibt frei, 0035 bleibt für Plan 0044 reserviert.
 
 ## Kontext
 
@@ -49,7 +49,7 @@ Die Klasse entscheidet nur über die Meldung und über Punkt 3 („entfernt“),
 
 Eine **Einheit** ist:
 - je Programmseite mit `use: termine`, samt ihren Folgeseiten (`follow`);
-- dazu die Seiten mit `use: verfuegbarkeit` desselben Anbieters als Beilage. Sie stehen in jeder Einheit des Anbieters, im Text und im Schlüssel.
+- dazu die Seiten mit `use: verfuegbarkeit` desselben Anbieters als **optionale** Beilage. Sie stehen in jeder Einheit des Anbieters, im Text und im Schlüssel. Fällt eine Beilage aus, extrahieren die Einheiten ohne sie, und der Wächter meldet die Beilage.
 - Die Kandidaten der Sammelkalender eines Anbieters bilden eine eigene Einheit.
 
 Jede Einheit hat eigenen Cache-Schlüssel, eigene Nachricht ans Modell mit dem Katalogauszug nur ihrer Seiten, eigene Events, eigenen Status, eigene Prüfzeit (`checkedAt`), eigene Fehlerserie und eigenen Einbruchschutz. Große Einheiten werden weiter in Teile zerlegt.
@@ -116,6 +116,20 @@ Technische Fehler (Netz, 5xx, Bot-Schutz, Geocoder, ungültige Antwort) verwerfe
 
 Extraktion und Bewerten nutzen das Modell mit der besten Qualität im Eval (Recall vor Precision vor Laufzeit), nicht das günstigste. Bremsen (Aufrufe, Tokens) und Zeitbudgets schützen nur vor Schleifen und hängenden Läufen. Sie werden nach Messung auf etwa das Doppelte des größten gemessenen Laufs gesetzt.
 
+### 8. IDs über eine Neuextraktion halten
+
+Eine Neuextraktion ändert bei denselben Kursen oft drei Dinge: wie weit die Terminreihe reicht, das Format (`kurs`/`regelmaessig`) und die Titel. Die Probe vom 2026-10-26 (Konsequenz „IDs“) zeigt das. Die Zuordnung (ADR 0022, Punkt 3) wird deshalb an zwei Stellen erweitert, umgesetzt mit Plan 0048, E11:
+
+- **Gemeinsamer Zeitraum in Stufe 1:** Bei Paaren mit ähnlichem Titel (`similarTitle`) zählt Stufe 1 die gleichen Beginnzeiten auch nur im gemeinsamen Zeitraum beider Fassungen, also vom späteren ersten bis zum früheren letzten künftigen Termin, mit mindestens 4 Terminen auf jeder Seite. Ohne ähnlichen Titel bleibt Stufe 1 wie bisher; ein fremder Kurs am selben Ort und Termin erbt so keine ID.
+- **Formatwechsel** `kurs` ↔ `regelmaessig` in Stufe 2: erlaubt bei gleichem ersten künftigen Beginn auf die Minute, ohne widersprechende Kennungen (`conflictingLabels`) und als einziger Kandidat.
+- **Eingebaut wird nur, was die Messung trägt:** Plan 0048, S0 spielt die Neuextraktion nach. Eine Erweiterung kommt nur, wenn sie dort IDs hält und keine falsche Übernahme erzeugt.
+
+Das ändert ADR 0022, Punkt 3: „gleiches Format“ und „im gemeinsamen Fenster beider Datenstände“ gelten dort nicht mehr ausnahmslos.
+
+ADR 0031 hatte die Formatlockerung **vertagt**, weil sie von Nacht zu Nacht nur 3 IDs hielt; bei einer Neuextraktion wiegt der Fall laut Probe schwerer. Die dort **verworfene** „Überdeckung der Termine“ ist etwas anderes: Sie scheiterte, weil eine lange Reihe mehrere alte Einzeltermine überdeckte. Der gemeinsame Zeitraum verlangt dagegen mindestens 4 Termine auf beiden Seiten und einen ähnlichen Titel.
+
+Der Grundsatz „lieber eine neue ID als eine vertauschte“ bleibt: Plan 0048, S0 zählt falsche Übernahmen, das Ziel ist 0.
+
 ## Änderungen an ADR 0026
 
 | Punkt | bisher | neu |
@@ -126,7 +140,7 @@ Extraktion und Bewerten nutzen das Modell mit der besten Qualität im Eval (Reca
 | 4 | Zustand je Anbieter | Zustand je Einheit; entfernte Seite nach 14 Tagen `dauerhaft` (Punkt 3) |
 | 5 | Entdecken legt nur neue Einträge an (G2) | zusätzlich Programmseiten an bestehende Einträge anhängen, nur im Pflegelauf und nur mit Ertragsbeweis (Punkt 4); neuer Job `waechter` mit nur `issues: write` (Punkt 5) |
 
-Außerdem ändert sich **ADR 0032, Punkt 8** (Entdecken samstags für `vrr`, sonntags für `vgn`): Das Entdecken läuft an festen Tagen des Monats je Netz, die Pflege an festen Wochentagen (Pläne 0049 und 0050). ADR 0032 bekommt dafür in der Statuszeile „Punkt 8 geändert durch ADR 0033“.
+Außerdem ändert Punkt 8 dieses ADR **ADR 0022, Punkt 3** (Zuordnung); ADR 0022 und ADR 0031 bekommen in der Statuszeile „Punkt 3 geändert durch ADR 0033, Punkt 8“, sobald Plan 0048, S1 live ist. Und es ändert sich **ADR 0032, Punkt 8** (Entdecken samstags für `vrr`, sonntags für `vgn`): Das Entdecken läuft an festen Tagen des Monats je Netz, die Pflege an festen Wochentagen (Pläne 0049 und 0050). ADR 0032 bekommt dafür in der Statuszeile „Punkt 8 geändert durch ADR 0033“.
 
 Unverändert bleiben:
 - das Modell ohne Schreibrechte und nur über `io/llm.ts`;
@@ -153,7 +167,7 @@ Unverändert bleiben:
   - ein Wechsel `kurs`/`regelmaessig`;
   - eine geänderte Altersangabe.
 
-  Deshalb kommen Modellwechsel und Umstellung in **einer** Neuextraktion, und Plan 0048 macht vorher die Zuordnung robuster gegen solche Unterschiede (Plan 0048, E11).
+  Deshalb kommen Modellwechsel und Umstellung in **einer** Neuextraktion, und Plan 0048 macht vorher die Zuordnung robuster gegen solche Unterschiede (Punkt 8, Plan 0048, E11).
 - **Mehr Modellaufrufe** beim Umstieg, danach weniger, weil nur geänderte Seiten neu extrahiert werden. Kosten sind kein Kriterium (Ziel a).
 - **Schemaänderung** von `ProviderRaw` (`scripts/pipeline/lib/raw.ts`, Export `schema/provider-raw.schema.json`) und eine Übergangszeit mit beiden Formaten.
 - **Die Pläne 0045 und 0047** gehen ins Archiv mit „ersetzt durch Plan 0050“ bzw. „ersetzt durch Plan 0048“. Ihre Messungen und Recherchen bleiben dort die Quelle. Plan 0046 bleibt Entwurf und steht in `docs/ideas.md`.

@@ -62,8 +62,10 @@ Der Nutzer will vor allem, dass neue Angebote bekannter Anbieter zuverlässig au
 
    Ist nichts offen, ist das Issue geschlossen.
 4. **Ein Abruf.** Jeder Seitenabruf nennt uns im User-Agent und beachtet robots.txt. Wie viele Katalogseiten das kostet, ist vor dem Einschalten gemessen und entschieden (S3, N1).
-5. **Umstellung ohne Verlust.** Nach höchstens drei Nächten der Umstellung steht jeder Anbieter im neuen Format oder steht mit Grund im Wächter.
-6. **IDs halten.** Bei der Umstellung behalten mindestens 95 % der Angebote, deren Kurs es weiter gibt, ihre ID. „Derselbe Kurs“ heißt: gleicher Anbieter und Ort, gleicher erster künftiger Beginn auf die Minute oder gleiche Wochentage und Uhrzeiten. Gemessen in S0 offline und nach der Umstellung im Bericht.
+5. **Umstellung ohne Verlust.** Nach höchstens drei Nächten der Umstellung steht jeder Anbieter im neuen Format oder steht mit Grund im Bericht, ab S2 im Wächter.
+6. **IDs halten.** Bei der Umstellung behalten mindestens 95 % der Angebote, deren Kurs es weiter gibt, ihre ID, und kein Angebot übernimmt die ID eines anderen.
+   - „Derselbe Kurs“ heißt: gleicher Anbieter und Ort, ähnlicher Titel (`similarTitle` oder `sameCoreTitle`) und dazu gleicher erster künftiger Beginn auf die Minute oder gleiche Wochentage und Uhrzeiten.
+   - Gemessen in S0 offline und nach der Umstellung im Bericht.
 
 ## Nicht-Ziele
 
@@ -82,8 +84,11 @@ Der Nutzer will vor allem, dass neue Angebote bekannter Anbieter zuverlässig au
   - je Programmseite mit `use: termine` ohne `blocked`, samt ihrer Folgeseiten (`follow`, sobald Plan 0042 auf `main` ist);
   - dazu als **Beilage** alle Seiten mit `use: verfuegbarkeit` ohne `blocked` desselben Anbieters;
   - die Kandidaten der Sammelkalender als Einheit `kandidaten`. Sie besteht, wenn der Anbieter in dieser Nacht Kandidaten hat, wenn er nur über Kandidaten läuft (`coveredBy`, `skipCrawl`) oder wenn der Vorzustand sie hat. Ohne Kandidaten in dieser Nacht gilt sie als leere Eingabe; der Einbruchschutz greift wie bei jeder Einheit (E5).
-- **Kennung:** `seite:<URL aus dem Katalog>`, also die **Vorlage** mit `{von}`/`{bis}`, nicht die ausgefüllte URL, damit sie über die Nächte gleich bleibt. Bei `request` kommt `#<die ersten 8 Zeichen des SHA-256 des Bodys>` dazu. Für die Sammelkalender heißt die Einheit `kandidaten`.
-- **Geänderte URL im Katalog:** Die Einheit mit der alten Kennung bleibt in Zustand und Build, bis jede Seite des Anbieters eine Einheit mit `inputHash` hat. Dann entfällt sie. So kostet eine neue URL, die noch scheitert, keine Angebote.
+- **Kennung:** `seite:<URL aus dem Katalog>`, also die **Vorlage** mit `{von}`/`{bis}`, nicht die ausgefüllte URL, damit sie über die Nächte gleich bleibt. Bei `request` kommt `#<die ersten 8 Zeichen des SHA-256 des Bodys der Vorlage>` dazu. Für die Sammelkalender heißt die Einheit `kandidaten`. `data:validate` prüft, dass die Kennungen je Anbieter eindeutig sind.
+- **Geänderte URL im Katalog:** Die Einheiten mit alter Kennung („verwaist“) bleiben in Zustand und Build, bis jede Seite des Anbieters eine Einheit mit `inputHash` hat.
+  - Die erste Extraktion einer neuen Einheit wird gegen die Summe der künftigen Angebote der verwaisten Einheiten geprüft, mit der Einbruchregel aus E5.
+  - Bei einem Einbruch, etwa einer Soft-404, wird sie `pending`, und die verwaisten Einheiten bleiben.
+  - So kostet eine neue URL, die scheitert oder leer ist, keine Angebote.
 - **Reihenfolge:** wie im Katalog, `kandidaten` zuletzt. Sie bestimmt die Reihenfolge in `mergeParts` und die Batches im Build (E6).
 - **Eingabe je Einheit:**
   - `## Seite 1: <url> (<art>)` für die eigene Seite, dann die Beilagen als weitere `## Seite k:`;
@@ -92,8 +97,11 @@ Der Nutzer will vor allem, dass neue Angebote bekannter Anbieter zuverlässig au
   `MAX_INPUT_CHARS` gilt je Einheit. Große Einheiten zerlegt `splitInput` wie heute (`partChars` je Einheit).
 - **Status der Einheit:**
   - `fehler`, wenn ihre eigene Seite oder eine Folgeseite scheitert;
-  - scheitert nur eine Beilage, ebenfalls `fehler`, mit dem Grund der Beilage (betrifft drei Anbieter);
   - bei `kandidaten` `fehler`, wenn ein relevanter Sammelkalender ausfällt (`adapterFailure` wie heute, nur noch für diese Einheit).
+- **Beilagen sind optional.** Scheitert eine Beilage, extrahiert jede Einheit ohne sie. Der Schlüssel ändert sich dadurch von selbst. Die Verfügbarkeit fehlt dann, die Termine nicht.
+  - Der Zustand der Beilage steht getrennt in `beilagen` (E4) und hat einen eigenen Befund im Wächter.
+  - „Entfernt“ (E5) greift nie wegen einer Beilage.
+  - Alle drei Beilagen im Katalog sind Browser-Widgets auf Plattformen mit Bot-Schutz. Wäre die Beilage Pflicht, sperrte sie alle Seiten des Anbieters.
 
 ### E2 – Abruf je Einheit
 
@@ -104,7 +112,7 @@ Der Nutzer will vor allem, dass neue Angebote bekannter Anbieter zuverlässig au
 ### E3 – Schlüssel und Nachricht je Einheit
 
 - Neue Funktion `unitExcerpt(provider, unit)` (`scripts/pipeline/lib/units.ts`): der Eintrag ohne `notes`, `programme` gekürzt auf die Seiten der Einheit (eigene Seite und Beilagen, samt `hint`). Venues, Name, `availability` und `partChars` bleiben drin. Bei `kandidaten` bleibt `programme` leer.
-- `unitExcerpt` ersetzt `catalogExcerpt` **im Schlüssel und in der Nachricht ans Modell** (`extractMessage`). Ein Test prüft, dass beide denselben Auszug nutzen. Eine geänderte `hint` extrahiert so nur ihre Einheit neu, und das Modell sieht nur die Hinweise seiner Seite.
+- Heute gibt es zwei Auszüge: `catalogExcerpt` in `scripts/pipeline/lib/normalize.ts` (Schlüssel) und einen in `scripts/pipeline/lib/extract.ts` (Nachricht). Neu ist der **Schlüssel** `unitExcerpt`, und die **Nachricht** ist eine Projektion davon ohne Koordinaten, `publicId` und `partChars` (`messageExcerpt(unitExcerpt(…))`). Ein Test prüft, dass jede Änderung der Nachricht auch den Schlüssel ändert. Eine geänderte `hint` extrahiert so nur ihre Einheit neu, und das Modell sieht nur die Hinweise seiner Seite.
 - `extractKey` (`scripts/pipeline/lib/normalize.ts`) bleibt, bekommt aber die Seiten bzw. Kandidaten der Einheit. Prompt, Schema und Modell gehen wie heute in den Schlüssel; `dated` bleibt je Einheit.
 
 ### E4 – Zustand `ProviderRaw` Version 2
@@ -115,6 +123,9 @@ Der Nutzer will vor allem, dass neue Angebote bekannter Anbieter zuverlässig au
 ProviderRawV2 = {
   version: 2,
   units: Record<UnitId, UnitState>,   // Kennung wie E1
+  beilagen?: Record<UnitId, {         // Zustand der Beilagen (E1), nur Abruf
+    status: "ok" | "fehler", reason?, klasse?, klasseSince?, failingSince?, checkedAt,
+  }>,
 }
 UnitState = {
   events: RawEvent[],
@@ -137,7 +148,7 @@ UnitState = {
   - `keine-termine`, wenn keine Einheit Events hat;
   - sonst `ok`, dazu die Zahl der Einheiten im Fehler.
 - **Übergang:** `ProviderRaw` ist bis S5 die Vereinigung aus dem heutigen Schema (V1, ohne `version`) und V2. `data:validate` prüft beide.
-- **Rückweg:** Alter Code kann V2 nicht lesen. Muss S1 zurück, werden die Code-Commits **und** die Daten-Commits der Nächte seit dem Deploy per `git revert` zurückgenommen. Die V1-Dateien kommen so zurück; das steht im Skill, Abschnitt 1.
+- **Rückweg:** Alter Code kann V2 nicht lesen (`readRawDir` in `scripts/pipeline/io/files.ts` wirft). Muss S1 zurück, werden die Code-Commits **und** alle Daten-Commits seit dem Deploy per `git revert` zurückgenommen, also die der Nachtläufe und die des Entdeckens, das neue Anbieter dann ebenfalls in V2 schreibt. Die V1-Dateien kommen so zurück; das steht im Skill, Abschnitt 1.
 
 ### E5 – Regeln je Einheit
 
@@ -156,8 +167,16 @@ UnitState = {
 - **Neue Einheit** (neue Seite im Katalog, ohne Vorzustand): extrahieren ohne Einbruchprüfung, wie heute ein neuer Anbieter.
 - **Entfallene Einheit:** siehe E1, „geänderte URL“. Eine Seite, die nur gestrichen oder `blocked` wurde, entfällt sofort.
 - **Fehlerklasse über die Nächte:** Bleibt die Klasse gleich, bleibt `klasseSince`. Wechselt sie, beginnt `klasseSince` neu. `failingSince` zählt die ganze Fehlerserie wie heute.
-- **Entfernte Seite** (ADR 0033, Punkt 3): Bei `klasse: dauerhaft` und `klasseSince` mindestens 14 Kalendertage vor `today` (Europe/Berlin, `berlinIsoDate`) setzt die Regel `events: []`. Status bleibt `fehler`, Grund „entfernt: <Grund> seit <Datum>“. Kehrt die Seite zurück, wird sie normal extrahiert.
-- **`emptySince`:** gesetzt in **jedem** Pfad, auch bei „unverändert“, sobald die Einheit Events hat, aber keine mit künftigem Termin (`eventUnits` = 0). Gelöscht, sobald es wieder künftige gibt. Eine unveränderte Seite, deren Kurse ablaufen, fällt so auf.
+- **Entfernte Seite** (ADR 0033, Punkt 3): Scheitert die **eigene Seite oder eine Folgeseite** mit `klasse: dauerhaft`, und liegt `klasseSince` mindestens 14 Kalendertage vor `today` (Europe/Berlin, `berlinIsoDate`), dann:
+  - setzt die Regel `events: []` und löscht `inputHash`, `dated`, `model` und `changedAt`;
+  - bleibt der Status `fehler`, Grund „entfernt: <Grund> seit <Datum>“.
+
+  Kehrt die Seite zurück, wird sie extrahiert, auch mit unverändertem Inhalt; ohne gelöschten Schlüssel bliebe sie still leer.
+- **`emptySince`** (ADR 0033, Punkt 3: „hatte künftige Events und hat keine mehr“):
+  - gesetzt in **jedem** Pfad, auch bei „unverändert“ und bei einem übernommenen `pending`, wenn die Einheit keine künftigen Termine mehr hat und der Vorzustand Events hatte;
+  - gelöscht, sobald es wieder künftige Termine gibt.
+
+  „Künftig“ rechnet eine neue Funktion `hasFuture(events, today, freeDays)` über `expandSchedule`. Damit zählen Regeln mit abgelaufenem `until` oder erschöpftem `count` nicht, anders als `eventUnits`, das wöchentliche Regeln immer als 1 zählt. Eine unveränderte Seite, deren Kurse ablaufen, fällt so auf, ebenso ein Einbruch auf `[]`, der übernommen wurde.
 - `refreshProvider` (`scripts/pipeline/io/refresh.ts`):
   - bearbeitet die Einheiten eines Anbieters nacheinander;
   - fragt vor jeder Einheit `mayContinue()` (Zeitbudget, Bremse, Abbruch);
@@ -167,7 +186,9 @@ UnitState = {
 ### E6 – Build je Einheit
 
 - `batchesFromRaw` (`scripts/pipeline/lib/build-offers.ts`):
-  - vereinigt je Anbieter die Events aller Einheiten mit `mergeParts`, in Katalogreihenfolge (E1), wie heute die Teile einer großen Eingabe. Dasselbe Angebot von zwei Seiten wird so vor Schritt 3 zusammengelegt, und der Build bricht nicht ab;
+  - vereinigt je Anbieter die Events aller Einheiten mit `mergeParts`, wie heute die Teile einer großen Eingabe. Dasselbe Angebot von zwei Seiten wird so vor Schritt 3 zusammengelegt, und der Build bricht nicht ab;
+  - **Reihenfolge** dabei: zuerst Einheiten mit `ok`, dann solche im Fehler, jeweils in Katalogreihenfolge. Bei regelmäßigen Angeboten gewinnt in `mergeParts` das frühere Event, also der frische Stand;
+  - lädt die freien Tage, die `mergeParts` braucht, schon vor `batchesFromRaw` (heute erst in `buildFromRaw`, `scripts/pipeline/io/nightly.ts`);
   - legt jedes übrige Event in den Batch seiner Einheit (`name` `<id>#<nn>` mit Katalogindex, zweistellig mit Null aufgefüllt; `checkedAt` der Einheit). `availability.checkedAt` eines Angebots ist damit die Prüfzeit seiner Seite;
   - lässt Einheiten, deren Kennung nicht mehr zum Katalog passt, nach E1 („geänderte URL“) stehen oder mit Hinweis entfallen.
 - Der Status je Anbieter im `BuildInput` kommt aus `providerStatus`. `extracted` enthält Anbieter, bei denen eine Einheit `inputHash` hat.
@@ -183,7 +204,7 @@ UnitState = {
 - Sonst bleibt die V1-Datei **unverändert**. Der Bericht nennt „Umstellung ausstehend“ mit Grund, und der Wächter meldet jede V1-Datei (E10).
 - **Erzwingen nach Prüfung:** Die neue Eingabe `umstellen` von `nightly.yml` gibt `--umstellen <id,…>` an `pipeline nightly` weiter. Das stellt diese Anbieter auch bei einem Einbruch oder mit einer dauerhaft scheiternden Seite um; die Einheit dieser Seite beginnt dann leer mit `fehler`. Daten schreibt so weiter nur der Workflow, nie ein lokaler Lauf (CLAUDE.md, „Daten“).
 - **Grenzen der Umstellung:**
-  - `nightly.yml` bekommt die Eingabe `timeout` (Standard 90) für `timeout-minutes` des Jobs `nachtlauf`;
+  - `nightly.yml` bekommt die Eingabe `timeout` für `timeout-minutes` des Jobs `nachtlauf`, als `${{ fromJSON(inputs.timeout || '90') }}`, weil die Eingaben beim Zeitplan leer sind;
   - die Umstellung läuft per `workflow_dispatch` mit `timeout`, `budget_min`, `max_calls` und `max_tokens` aus S0;
   - `budget_min` bleibt mindestens 20 Minuten unter `timeout`.
 
@@ -201,13 +222,18 @@ UnitState = {
   Ein Cache je Host und Lauf liegt in `scripts/pipeline/io/robots.ts` (neu); Weiterleitungen der robots.txt selbst werden verfolgt.
 - **Wo geprüft wird:** nur bei **Seitenabrufen**, nicht in `fetchJson` allgemein. Das sind:
   - `fetchTask` und `withFollowPages` (jede Station einer Weiterleitung);
-  - der Browser (Navigationen über `page.route`);
+  - der Browser. `page.route` sieht nur die erste Anfrage, Weiterleitungen folgt der Browser selbst. Deshalb löst `http.ts` die Kette vorher auf und prüft jede Station, dann folgt `goto(finalUrl)`, und `page.url()` wird gegengeprüft;
   - die Sammelkalender (`scripts/pipeline/io/sources.ts`);
   - später Seitenfinder und Quellen des Entdeckens (Pläne 0049, 0050).
 
   **Ausgenommen** sind APIs mit eigenen Nutzungsregeln: Nominatim, OpenHolidays, GTFS-Feeds. Die Liste steht im Code mit Begründung, ein Test hält sie fest.
 - Eine gesperrte Seite scheitert mit „robots.txt sperrt <Pfad>“, `klasse: gesperrt`. Ist robots.txt nicht erreichbar, gilt `klasse: voruebergehend`.
-- **Fehlerklasse** `failureClass(reason)` (`scripts/pipeline/lib/fetch.ts`): HTTP 404/410 → `dauerhaft`; robots.txt → `gesperrt`; sonst `voruebergehend`, auch Bot-Schutz.
+- **Fehlerklasse** strukturiert am Ergebnis des Abrufs: `PageOutcome` bekommt `klasse`, gesetzt dort, wo der Fehler entsteht:
+  - HTTP 404/410 → `dauerhaft`;
+  - robots.txt verbietet → `gesperrt`;
+  - sonst `voruebergehend`, auch Bot-Schutz und eine nicht erreichbare robots.txt.
+
+  Den Grundtext parst niemand. Bis S3 setzt S1 die Klasse für HTTP-Status und Bot-Schutz.
 - **Einschalten erst nach Messung** (S3): Ein Schalter `--abruf=alt|neu` (Standard `alt`, Eingabe `abruf` in `nightly.yml`) hält das alte Verhalten, bis N1 entschieden ist. Danach entfallen Schalter und Browser-UA.
 
 ### E9 – Grenzen
@@ -219,7 +245,7 @@ UnitState = {
 ### E10 – Wächter
 
 - **Befunde** berechnet `watchFindings({ raws, catalog, today, discoverStates? })` in `scripts/pipeline/lib/watch.ts` (neu, rein) aus dem Zustand. `today` kommt aus `nightly.json`; Kalendertage rechnet `berlinIsoDate`. Arten:
-  - `seite`: Einheit `fehler` mit `failingSince` mindestens einen Kalendertag vor `today` (zwei Nächte), außer `entfernt` und `gesperrt`;
+  - `seite`: Einheit oder Beilage `fehler` mit `failingSince` mindestens einen Kalendertag vor `today` (zwei Nächte), außer `entfernt` und `gesperrt`;
   - `entfernt`: die Regel aus E5 hat gegriffen;
   - `gesperrt`: `klasse: gesperrt`, sofort;
   - `einbruch`: `pending`;
@@ -232,7 +258,7 @@ UnitState = {
   - Je Befund: Anbieter-ID, Art, Seite, Grund, seit wann.
   - Fremder Text (Gründe, URLs) nur in Code-Spans; Backticks und Zeilenumbrüche werden ersetzt, `@` entschärft.
   - Je Zeile höchstens 200 Zeichen, gesamt unter 60 000.
-  - Letzte Zeile ein Marker `<!-- waechter: schluessel:art,… -->`, der nur `^[a-z0-9:,#-]*$` enthält. Der Schlüssel ist die Anbieter-ID; Plan 0050 nutzt für Klärfälle `k<hash8>`.
+  - Letzte Zeile ein Marker `<!-- waechter: schluessel:art,… -->`, der nur `^[a-z0-9:,#-]*$` enthält. Der Schlüssel ist die Anbieter-ID, bei Befunden einer Seite `<id>#<die ersten 8 Hex-Zeichen des SHA-256 der Kennung>`. So bekommt auch die zweite ausgefallene Seite eines Anbieters einen Kommentar. Plan 0050 nutzt für Klärfälle `k<hash8>`.
 - **Ablauf** in `.github/workflows/nightly.yml`:
   - Der Job `nachtlauf` schreibt `waechter.md` (`pnpm pipeline status --waechter`) und lädt sie als Artefakt `waechter` hoch.
   - Neuer Job `waechter`:
@@ -240,11 +266,11 @@ UnitState = {
     - `if: always() && needs.modus.outputs.modus == 'live' && needs.nachtlauf.result == 'success'`;
     - `permissions: issues: write` und sonst nichts, kein Checkout.
 
-    Schritte: `actions/download-artifact`, dann Shell mit `gh` und `jq`. Dabei immer `--repo "$GITHUB_REPOSITORY"`, `GH_TOKEN` nur in diesem Schritt, Werte über `env`, Text per `--body-file`, `continue-on-error: true` mit `::warning::`.
+    Schritte: `actions/download-artifact`, dann Shell mit `gh` und `jq`. Dabei immer `--repo "$GITHUB_REPOSITORY"`, `GH_TOKEN` nur in diesem Schritt, Werte über `env`, Text per `--body-file`. Kein `continue-on-error`: Scheitert der Wächter, wird der Lauf rot und fällt auf. Der Job steht nach `veroeffentlichen`, kann den Push also nicht verhindern.
   - Logik:
     - Label `waechter` anlegen (`gh label create … --force`);
     - Issue suchen mit `gh issue list --app github-actions --label waechter --state all`;
-    - ohne Befund das offene Issue schließen;
+    - ohne Befund das offene Issue mit dem Text „Nichts offen (<Datum>)“ schließen;
     - sonst das offene bearbeiten, ein geschlossenes wiedereröffnen oder ein neues anlegen;
     - zusätzlich ein Kommentar, wenn der Marker ein Paar enthält, das im alten fehlte.
 - `staleHints` (`scripts/pipeline/lib/discover.ts`) entfällt.
@@ -252,16 +278,19 @@ UnitState = {
 
 ### E11 – IDs über die Neuextraktion halten
 
-Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.ts` an zwei Stellen robuster. Das ist ein Nachtrag zu ADR 0031, mit Begründung im Code und im Commit nach ADR 0004.
+Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.ts` robuster, nach ADR 0033, Punkt 8. Das ändert ADR 0022, Punkt 3; die Begründung steht im Code und im Commit nach ADR 0004.
 
-- **Stufe 1, gemeinsamer Zeitraum:** Die Beginnzeiten werden nur im Zeitraum verglichen, den beide Fassungen abdecken, also ab dem späteren ersten bis zum früheren letzten künftigen Termin. Voraussetzung: beide haben dort mindestens 4 Termine. Sonst gilt der Vergleich wie heute. Eine Reihe, die nur früher endet oder später beginnt, behält so ihre ID. `SAME_SESSIONS` bleibt 0,8.
+- **Stufe 1, gemeinsamer Zeitraum, nur bei ähnlichem Titel:** Für Paare mit `similarTitle` zählt Stufe 1 die gleichen Beginnzeiten auch nur im Zeitraum, den beide Fassungen abdecken, vom späteren ersten bis zum früheren letzten künftigen Termin. Voraussetzung: beide haben dort mindestens 4 Termine. `SAME_SESSIONS` bleibt 0,8. Ohne ähnlichen Titel bleibt Stufe 1 wie heute; ein fremder Kurs am selben Ort und Termin erbt so keine ID einer weggefallenen Reihe.
 - **Stufe 2, Formatwechsel `kurs` ↔ `regelmaessig`:** zulässig, wenn außerdem
   - der erste künftige Beginn auf die Minute gleich ist,
   - `conflictingLabels` nichts findet
   - und kein anderer Kandidat in Frage kommt.
 
-  Das ist ein Restpunkt aus Plan 0038 (`docs/ideas.md`). `einmalig` bleibt ausgenommen.
-- **Messung vor dem Einbau** (S0): Die Umstellung wird offline nachgespielt (alter Stand gegen neue Extraktion je Einheit mit dem gewählten Modell), mit heutiger und neuer Zuordnung. Ziel 6 gilt für die neue. Verfehlt sie es, nennt S0 die übrigen Ursachen, und ein Nachtrag vor S1 entscheidet.
+  Das ist ein Restpunkt aus Plan 0038 (`docs/ideas.md`); ADR 0031 hatte ihn vertagt. `einmalig` bleibt ausgenommen.
+- **Messung vor dem Einbau** (S0): Die Umstellung wird offline nachgespielt (alter Stand gegen neue Extraktion je Einheit mit dem gewählten Modell), mit heutiger Zuordnung und mit jeder Erweiterung einzeln.
+  - Eingebaut wird eine Erweiterung nur, wenn sie IDs hält und **keine falsche Übernahme** erzeugt (Ziel 0; ein Mensch prüft jede neue Übernahme der Messung).
+  - Ziel 6 gilt für die eingebauten Erweiterungen.
+  - Verfehlt S0 Ziel 6, nennt es die übrigen Ursachen, und ein Nachtrag vor S1 entscheidet.
 
 ## Dateien
 
@@ -276,15 +305,16 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
 | `scripts/pipeline/lib/stable-ids.ts` | E11 | S1 |
 | `scripts/pipeline/io/nightly.ts`, `scripts/pipeline/lib/report.ts`, `scripts/pipeline/lib/cost.ts` | Ablauf, Bericht und Ampel je Einheit; `--umstellen`; Grenzen | S1, S4 |
 | `scripts/pipeline/io/eval.ts` | Fälle in Einheiten zerlegen (nach `## Seite k:` und Katalog), je Einheit extrahieren, mit `mergeParts` vereinigen, werten wie heute | S1 |
-| `scripts/pipeline/io/discover.ts`, `scripts/pipeline/lib/discover.ts` | Ertragsbeweis je Einheit; Bericht nennt Seiten ohne Ertrag; `staleHints` entfällt | S1, S2 |
-| `scripts/pipeline/cli.ts` | `nightly --umstellen`, `--abruf`; `status --waechter`; `extract --from` je Einheit | S1–S3 |
-| `scripts/validate-data.ts` | V1 und V2, Events je Einheit dem Anbieter zugehörig | S1 |
+| `scripts/pipeline/io/discover.ts`, `scripts/pipeline/lib/discover.ts` | Ertragsbeweis je Einheit (V2); `staleHints` entfällt | S1, S2 |
+| `scripts/pipeline/io/files.ts` | V1 und V2 lesen und schreiben | S1 |
+| `scripts/pipeline/cli.ts` | `nightly --umstellen`, `--abruf`, Modus `messen`; `status --waechter`; `extract --from` je Einheit | S1–S3 |
+| `scripts/validate-data.ts` | V1 und V2, Events je Einheit dem Anbieter zugehörig, Kennungen je Anbieter eindeutig | S1 |
 | `.github/workflows/nightly.yml`, `scripts/lib/nightly-workflow.test.ts` (neu) | Eingaben `timeout`, `umstellen`, `abruf`, `LLM_MODEL_EXTRACT`; Artefakt und Job `waechter`; Test der Rechte und Eingaben | S1, S2, S3 |
 | `scripts/pipeline/lib/watch.ts` (neu) | `watchFindings`, `watchIssue` | S2 |
 | `scripts/pipeline/lib/robots.ts`, `scripts/pipeline/io/robots.ts` (neu) | robots.txt parsen und prüfen, Cache je Host | S3 |
 | `scripts/pipeline/io/http.ts`, `scripts/pipeline/io/browser.ts`, `scripts/pipeline/io/sources.ts`, `scripts/pipeline/io/geocode.ts` | User-Agent; robots.txt bei Seitenabrufen; Ausnahmen der APIs | S3 |
 | `scripts/lib/share-pages.ts`, `scripts/lib/share-pages.test.ts` | Absatz im Impressum | S3 |
-| `docs/architecture.md`, `CLAUDE.md` („Daten“), Skill (Abschnitte 1, 3, 5), ADR 0026 Statuszeile, ADR 0031 Nachtrag | Doku | S1–S5 |
+| `docs/architecture.md`, `CLAUDE.md` („Daten“), Skill (Abschnitte 1, 3, 5), Statuszeilen von ADR 0022, 0026 und 0031 | Doku | S1–S5 |
 
 ## Tests (test-first)
 
@@ -307,24 +337,32 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
 - `lib/refresh.test.ts`:
   - jede heutige Regel je Einheit;
   - Einbruch 1 → 0 hält zurück;
-  - neue Einheit ohne Einbruchprüfung;
+  - neue Einheit ohne Einbruchprüfung, außer gegen verwaiste Einheiten: Soft-404 nach URL-Wechsel → `pending`, die verwaisten bleiben;
   - `kandidaten` ohne Kandidaten → leere Eingabe mit Einbruchschutz;
   - Klassenwechsel setzt `klasseSince` neu: 10 Tage HTTP 500, dann 404, an Tag 14 nicht entfernt;
-  - 14 Tage 404 → entfernt;
-  - Rückkehr;
-  - `emptySince` auch bei „unverändert“, wenn die Kurse ablaufen; gelöscht bei neuen künftigen.
+  - 14 Tage 404 → entfernt, Schlüssel gelöscht;
+  - **Rückkehr mit gleichem Inhalt → extrahiert, nicht „unverändert“**;
+  - gescheiterte Beilage → Einheit extrahiert ohne sie, `beilagen` hält den Fehler, nie „entfernt“;
+  - `emptySince`:
+    - gesetzt bei „unverändert“, wenn die Kurse ablaufen;
+    - gesetzt nach übernommenem Einbruch auf `[]`;
+    - gesetzt bei wöchentlicher Regel mit abgelaufenem `until`;
+    - nicht gesetzt bei einer Einheit, die nie Events hatte;
+    - gelöscht bei neuen künftigen Terminen.
 - `io/refresh.test.ts`:
   - Abbruch über `mayContinue` nach zwei von drei Einheiten → zwei neue, eine alte, Datei gültig;
   - geänderte URL → alte Einheit bleibt, bis die neue `inputHash` hat;
   - Umstellung: alle gelungen → V2; eine gescheitert → V1 unverändert; Einbruch → V1 unverändert mit Bericht; `--umstellen` → V2, auch mit dauerhaft scheiternder Seite.
 - `lib/build-offers.test.ts`:
   - **dasselbe regelmäßige Angebot aus zwei Einheiten mit anderem `cost` → kein Build-Fehler, ein Angebot;**
+  - dasselbe Angebot aus einer Einheit im Fehler und einer mit `ok` → es bleibt die Fassung der Einheit mit `ok`;
   - Batch je Einheit mit eigenem `checkedAt`;
   - Reihenfolge mit 11 Einheiten (`#02` vor `#10`);
   - Anbieter mit einer Einheit im Fehler → deren alte Events bleiben, neue der anderen kommen, keine ID fehlt;
   - Schritt 7 unverändert.
 - `lib/stable-ids.test.ts` (E11):
-  - Reihe mit 38 von 53 Terminen (Anfangsstück) → ID bleibt;
+  - Reihe mit 38 von 53 Terminen (Anfangsstück), ähnlicher Titel → ID bleibt;
+  - **dasselbe Anfangsstück mit fremdem Titel** (neuer 4-Termin-Kurs am selben Ort und Termin, die alte Reihe fällt weg) → neue ID;
   - zwei Reihen ohne gemeinsamen Zeitraum mit mindestens 4 Terminen → Vergleich wie heute;
   - `kurs` → `regelmaessig` mit gleichem ersten Beginn → ID bleibt;
   - mit Konkurrenten → neue ID;
@@ -343,6 +381,8 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
   - `leer` nur, wenn keine Einheit künftige Events hat, 14 Tage;
   - `anbieter` statt je Seite;
   - `umstellung` je V1-Datei;
+  - gescheiterte Beilage ab dem zweiten Tag;
+  - Marker mit `id#hash8`: Fällt eine zweite Seite desselben Anbieters aus, entsteht ein neues Paar;
   - Tage nach Europe/Berlin;
   - Text nur in Code-Spans, ohne Backticks, Zeilenumbrüche und `@`;
   - Marker geprüft;
@@ -351,8 +391,9 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
   - der Durchlauf über mehrere Nächte aus `io/nightly.test.ts` erzeugt die erwarteten Befunde.
 - `scripts/lib/nightly-workflow.test.ts` (Muster `scripts/lib/push-schedule.test.ts`):
   - `waechter` hat genau `issues: write`, keinen Checkout, `always()`, `--repo`, `--body-file`, `--app github-actions`;
+  - `waechter` hat kein `continue-on-error`;
   - `nachtlauf` hat kein Schreibrecht;
-  - `timeout-minutes` kommt aus der Eingabe;
+  - `timeout-minutes` ist `fromJSON(inputs.timeout || '90')`, also auch beim Zeitplan gültig;
   - `umstellen` und `abruf` werden weitergegeben.
 - `lib/robots.test.ts` (S3):
   - eigene Gruppe ersetzt `*`, gleiche Gruppen zusammengeführt;
@@ -364,8 +405,10 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
 - `io/robots.test.ts`, `io/http.test.ts` (S3):
   - User-Agent gesetzt;
   - robots.txt je Weiterleitung geprüft und selbst weitergeleitet;
-  - gesperrt → „robots.txt sperrt“;
-  - Nominatim und OpenHolidays ohne robots-Prüfung.
+  - gesperrt → „robots.txt sperrt“, `klasse: gesperrt`;
+  - robots.txt nicht erreichbar → `klasse: voruebergehend`;
+  - Nominatim und OpenHolidays ohne robots-Prüfung;
+  - Browser: Kette über `http.ts` vorab geprüft, `goto(finalUrl)`, abweichende `page.url()` → Fehler.
 - `scripts/lib/share-pages.test.ts` (S3): Absatz zum Abruf im Impressum.
 
 ## Schritte
@@ -374,22 +417,25 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected` (Daten und Schem
 
 - **S0 – Messen (ohne Änderung im Repo, Wegwerf-Skripte im Job-Verzeichnis).**
   1. **Einheit gegen Anbieter** mit dem gewählten Modell, je zwei Läufe:
-     - Für alle Anbieter mit mehr als einer Seite auf `main` werden die Eingaben eines Abrufs (`pnpm pipeline fetch`) zweimal extrahiert: je Anbieter wie heute und je Einheit nach E1, mit `unitExcerpt` und `mergeParts` nach E6.
+     - Für alle Anbieter mit mehr als einer **Einheit** auf `main` werden die Eingaben eines Abrufs (`pnpm pipeline fetch`) zweimal extrahiert: je Anbieter wie heute und je Einheit nach E1, mit `unitExcerpt` und `mergeParts` nach E6. Dazu gehören auch Anbieter mit einer Seite und Kandidaten aus Sammelkalendern; 28 Rohdateien haben `sources`, etwa `stadtbibliothek-nuernberg`. Bei ihnen sieht das Modell Seite und Kandidaten künftig getrennt, und `sternenhaus-kuf` zeigt, dass dabei Dubletten mit anderem Titel entstehen können.
      - Beide Varianten laufen durch `buildOffers` gegen `data/offers.json`.
      - Verglichen werden je Anbieter: Angebote, Vorstand-IDs wiedergefunden, Dubletten, Build-Fehler, Aufrufe, Tokens, Dauer.
      - Verfehlt ein Anbieter Ziel 2, wird die Ursache benannt (fehlender Kontext einer anderen Seite, Dublette mit anderem Titel), und ein Nachtrag regelt sie vor S1.
-  2. **IDs** (E11, Ziel 6): dieselben Läufe mit heutiger und neuer Zuordnung (Prototyp im Skript).
+  2. **IDs** (E11, Ziel 6): dieselben Läufe mit heutiger Zuordnung und mit jeder Erweiterung einzeln (Prototyp im Skript). Gezählt werden gehaltene IDs und falsche Übernahmen; jede neue Übernahme prüft ein Mensch.
   3. **Laufzeit:** Aufrufe und Minuten einer vollen Umstellung, daraus `timeout`, `budget_min` und die Bremsen für E7.
   4. Ergebnis in den Abschnitt „Umsetzung“.
 - **S1 – Einheit Seite, IDs, Umstellung (E1–E7, E9, E11).**
   - Code mit Tests, dazu das Eval je Einheit.
-  - Vor dem Push: ein Eval-Lauf je Einheit mit dem gewählten Modell gegen die letzte Zeile in `evals/results.md` (Ziel 2). Dazu lokal `pnpm pipeline nightly --dry-run` über alle Anbieter; verglichen wird `data/offers.json` des Trockenlaufs mit `main` (Angebote je Anbieter, Ziel 6).
+  - Vor dem Merge nach `main`:
+    - ein Eval-Lauf je Einheit mit dem gewählten Modell gegen die letzte Zeile in `evals/results.md` (Ziel 2);
+    - ein Trockenlauf per `workflow_dispatch` von `nightly.yml` auf dem Branch (`modus=trocken`, Grenzen aus S0), also mit der IP des Runners und der gepinnten CLI. Verglichen wird `offers.json` aus dessen Artefakt mit `main` (Angebote je Anbieter, Ziel 6).
   - Dann Deploy mit gesetztem Modell und die Umstellung per `workflow_dispatch` mit den Grenzen aus S0.
   - Abnahme: Ziele 5 und 6 nach höchstens drei Nächten; Ziel 1 im Test und in der Woche danach.
 - **S2 – Wächter (E10).** Abnahme: Das Issue entsteht live bei einem echten Befund, sonst über eine noch nicht umgestellte Datei oder eine vorübergehend gestellte Lage. Es schließt sich, wenn nichts offen ist.
 - **S3 – Ein Abruf (E8).**
   - robots.txt, User-Agent, Fehlerklasse, Impressum, Schalter `--abruf` (Standard `alt`).
-  - **Messung im Runner** (die IP zählt für den Bot-Schutz): ein `workflow_dispatch` mit `modus=trocken` und `abruf=neu` über alle Katalogseiten und Sammelkalender. Gesucht sind gesperrte Seiten, Seiten, die mit dem neuen User-Agent anders antworten (Status, Länge ±20 %), und Bot-Schutz. Ergebnis in „Umsetzung“, dann N1.
+  - **Messung im Runner** (die IP zählt für den Bot-Schutz): ein `workflow_dispatch` mit dem neuen Modus `messen`. Er ruft nur ab, ohne Modell und ohne Schreiben, und zwar alle Katalogseiten und Sammelkalender im selben Lauf einmal mit altem und einmal mit neuem Abruf. Gesucht sind gesperrte Seiten, Seiten, die mit dem neuen User-Agent anders antworten (Status, Länge ±20 %), und Bot-Schutz. Ergebnis in „Umsetzung“, dann N1.
+  - Wegen `share-pages.ts` zusätzlich `pnpm e2e:local --affected --smoke`.
   - Danach Standard `neu`; Schalter und Browser-UA entfallen. Nach dem Deploy `/browser-review live` der Impressumsseite.
 - **S4 – Grenzen (E9)** nach sieben Nächten im neuen Format.
 - **S5 – Abschluss.**
@@ -463,3 +509,37 @@ Unabhängiger Review des Entwurfs mitsamt ADR 0033. Alle Befunde sind am Code na
 **Scope**, übernommen: Reihenfolge Einheit (S1), Wächter (S2), Abruf (S3); `Crawl-delay` gestrichen. **Abgelehnt:** den Befund `leer` zu verschieben. Grund: „kein stiller Ausfall“ ist ein Hauptziel des Nutzers, und mit M5 kostet `leer` nur eine Zeile in `watchFindings`.
 
 **Neu nach dem Review:** E11 und Ziel 6. Grund ist die Probe vom 2026-10-26: Nur 16 von 24 IDs blieben bei `die-familienbox` mit neuem Modell. Das ist noch nicht unabhängig geprüft; deshalb folgt Review 2.
+
+## Review 2 (2026-10-26) – Verdict: Freigabe mit Änderungen
+
+Zweiter, unabhängiger Review samt ADR 0033. Kein Blocker. Die Befunde sind am Code nachgeprüft. Übernommen:
+
+**Major**
+1. **Ausgefallene Beilage sperrte alle Einheiten und löschte nach 14 Tagen den Bestand** (alle drei Beilagen sind Browser-Widgets mit Bot-Schutz): Beilagen sind optional, mit eigenem Zustand `beilagen` und eigenem Befund. „Entfernt“ greift nur bei der eigenen Seite (E1, E4, E5, Tests).
+2. **Entfernte Seite blieb nach der Rückkehr leer** (gleicher Schlüssel → „unverändert“): Beim Entfernen wird auch der Schlüssel gelöscht. Test „Rückkehr mit gleichem Inhalt“ (E5).
+3. **`emptySince` war enger als das ADR:** jetzt „hatte Events, hat keine künftigen“ über `hasFuture` mit `expandSchedule`; Tests für einen übernommenen Einbruch und für `until` (E5).
+4. **Geänderte URL umging den Einbruchschutz:** Die neue Einheit wird gegen die verwaisten geprüft (E1, Test Soft-404).
+5. **E11 hätte IDs vertauschen können:** Der gemeinsame Zeitraum gilt nur bei ähnlichem Titel. Dazu ein Negativtest; S0 zählt falsche Übernahmen mit dem Ziel 0. Ziel 6 verlangt einen ähnlichen Titel.
+6. **E11 ändert ADR 0022, Punkt 3:** ADR 0033 hat dafür einen eigenen Punkt 8. Er grenzt gegen ADR 0031 ab (Formatwechsel dort vertagt, die „Überdeckung“ aus anderem Grund verworfen); die Statuszeilen von ADR 0022 und 0031 werden nachgezogen.
+7. **S0 übersah die neue Einheit `kandidaten`:** S0 läuft über alle Anbieter mit mehr als einer Einheit.
+8. **robots.txt im Browser über `page.route`** sieht keine Weiterleitungen: Die Kette wird vorab über `http.ts` geprüft, dann `goto(finalUrl)` und `page.url()` gegengeprüft (E8, Test).
+
+**Minor**, übernommen:
+- Reihenfolge in `mergeParts`: `ok` vor Fehler.
+- Body-Hash über die Vorlage, Kennungen in `data:validate` eindeutig.
+- `fromJSON(inputs.timeout || '90')`.
+- Wächter ohne `continue-on-error`, Marker `id#hash8`, Text beim Schließen.
+- Ziel 5 im Bericht, ab S2 im Wächter.
+- Rückweg samt Entdecken-Commits.
+- Ferien vor `batchesFromRaw`, `io/files.ts` in der Tabelle.
+- Fehlerklasse strukturiert am `PageOutcome`.
+- Messung in S3 per Modus `messen` mit beiden User-Agents, dazu `--smoke`.
+- Auszug: Nachricht als Projektion des Schlüssel-Auszugs.
+
+**Scope:**
+- **Übernommen:**
+  - Trockenlauf in S1 per `workflow_dispatch` auf dem Branch statt lokal;
+  - „Bericht nennt Seiten ohne Ertrag“ beim Entdecken gehört zu Plan 0050.
+- **Abgelehnt:** S3 (User-Agent, robots.txt) in einen eigenen Plan auszulagern. Grund: Das Gesamt-Review vom 2026-10-25 hat gerade die Aufteilung in viele Pläne als Problem benannt. S3 ist ein abgegrenzter Schritt am Ende dieses Plans, mit eigenem Schalter und eigener Messung; ein eigener Plan brächte nur weitere Querverweise.
+
+Kein Blocker offen; der Plan ist nach dem Skill fertig für die Umsetzung, sobald die Voraussetzungen erfüllt sind.
