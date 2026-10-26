@@ -3,10 +3,11 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Jazz für Kinder – Puppentheater mit Livemusik",
-   "summary": "Puppentheater mit Jazzmusik rund um König Semmelwurst, einmal im Monat sonntags um 11 Uhr. Kinder unter 3 Jahren haben freien Eintritt. Frühstück im Café Mahlzahn ist optional und vorzubestellen. Alle angezeigten Termine sind ausverkauft.",
+   "title": "Jazz für Kinder – Puppentheater mit Livejazz",
+   "summary": "Puppenspiel um König Semmelwurst mit Livemusik, etwa einmal im Monat. Kinder unter 3 Jahren haben freien Eintritt. Alle Termine im Horizont sind derzeit ausverkauft.",
    "topics": [
     "konzert",
+    "musik",
     "theater"
    ],
    "format": "einmalig",
@@ -18,7 +19,7 @@
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine im Horizont ausverkauft (Stand Abruf); Tickets über Reservix"
+    "note": "Alle Vorstellungen ausverkauft"
    },
    "schedule": {
     "kind": "dates",
@@ -50,10 +51,11 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Klassik für Kinder – moderierte Konzerte der Hochschule für Musik",
-   "summary": "Studierende der Hochschule für Musik Nürnberg stellen Instrumente vor und spielen Lieblingsstücke, moderiert für Kinder jeden Alters und ihre Begleitung. Die Konzerte dauern etwa 50 Minuten. Alle angezeigten Termine sind ausverkauft.",
+   "title": "Klassik für Kinder – moderierte Konzerte der Hochschule",
+   "summary": "Studierende der Hochschule für Musik Nürnberg stellen Instrumente vor, spielen Lieblingsstücke und moderieren die Konzerte für Kinder jeden Alters mit Begleitung. Alle Termine im Horizont sind derzeit ausverkauft.",
    "topics": [
-    "konzert"
+    "konzert",
+    "musik"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -64,14 +66,11 @@
    "category": "buehne",
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Termine im Horizont ausverkauft (Stand Abruf); Tickets über Reservix"
+    "note": "Alle Vorstellungen ausverkauft"
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-25T11:00"
-     },
      {
       "start": "2026-11-29T11:00"
      },
@@ -94,7 +93,7 @@
    }
   }
  ],
- "inputHash": "413705f91d221c104b185fcea8d6af04cec434b67ca37b5cdfbd0027d80b54fa",
+ "inputHash": "9a8612572eecb4359c4d0d1d2023fc9c693f25fe1e5cc5ac67f8544ea22ea043",
  "dated": {
   "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
   "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
@@ -110,8 +109,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-25T07:38:23+01:00",
- "changedAt": "2026-10-25T07:38:23+01:00",
+ "checkedAt": "2026-10-26T07:48:52+01:00",
+ "changedAt": "2026-10-26T07:48:52+01:00",
  "sources": [
   "frankenkids",
   "stadt-vk"

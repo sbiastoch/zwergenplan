@@ -3,65 +3,8 @@
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage Mo, Start 21.09.2026 (läuft)",
-   "summary": "Berührungsbasierter Kurs „Bindung durch Berührung“ für Eltern und Babys von 6 Wochen bis 5 Monaten, max. 6 Paare. Der Kurs läuft bereits; laut Website sind noch 2 Termine im Horizont.",
-   "topics": [
-    "babymassage"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "105,00 €",
-   "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
-   "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 1,
-    "maxMonths": 5
-   },
-   "availability": {
-    "status": "wenige",
-    "note": "1 Platz frei (7 von 8 belegt)"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-21T11:00",
-      "end": "2026-09-21T12:15"
-     },
-     {
-      "start": "2026-09-28T11:00",
-      "end": "2026-09-28T12:15"
-     },
-     {
-      "start": "2026-10-05T11:00",
-      "end": "2026-10-05T12:15"
-     },
-     {
-      "start": "2026-10-12T11:00",
-      "end": "2026-10-12T12:15"
-     },
-     {
-      "start": "2026-10-19T11:00",
-      "end": "2026-10-19T12:15"
-     },
-     {
-      "start": "2026-10-26T11:00",
-      "end": "2026-10-26T12:15"
-     },
-     {
-      "start": "2026-11-02T11:00",
-      "end": "2026-11-02T12:15"
-     }
-    ]
-   }
-  },
-  {
-   "providerId": "hebanne-schulz",
-   "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage Mo, 09.11.–21.12.2026",
-   "summary": "Berührungsbasierter Kurs „Bindung durch Berührung“ für Eltern und Babys von 6 Wochen bis 5 Monaten, max. 6 Paare. Der Kurs ist laut Website bereits ausgebucht.",
+   "title": "Achtsame Babymassage, Nov–Dez 2026",
+   "summary": "Kurs „Bindung durch Berührung“ für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: sanfte Berührungen und das Lesen von Körperbotschaften in kleiner Gruppe. Der Kurs ist ausgebucht.",
    "topics": [
     "babymassage"
    ],
@@ -78,47 +21,25 @@
    },
    "availability": {
     "status": "ausgebucht",
-    "note": "8 von 8 Plätzen belegt"
+    "note": "Kurs ausgebucht (8/8)"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-09T11:00",
-      "end": "2026-11-09T12:15"
-     },
-     {
-      "start": "2026-11-16T11:00",
-      "end": "2026-11-16T12:15"
-     },
-     {
-      "start": "2026-11-23T11:00",
-      "end": "2026-11-23T12:15"
-     },
-     {
-      "start": "2026-11-30T11:00",
-      "end": "2026-11-30T12:15"
-     },
-     {
-      "start": "2026-12-07T11:00",
-      "end": "2026-12-07T12:15"
-     },
-     {
-      "start": "2026-12-14T11:00",
-      "end": "2026-12-14T12:15"
-     },
-     {
-      "start": "2026-12-21T11:00",
-      "end": "2026-12-21T12:15"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "11:00",
+    "end": "12:15",
+    "from": "2026-11-09",
+    "until": "2026-12-21",
+    "skipHolidays": false
    }
   },
   {
    "providerId": "hebanne-schulz",
    "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage Mo, 11.01.–15.02.2027",
-   "summary": "Berührungsbasierter Kurs „Bindung durch Berührung“ für Eltern und Babys von 6 Wochen bis 5 Monaten, max. 6 Paare. Alle 8 Plätze sind laut Website noch frei.",
+   "title": "Achtsame Babymassage, Jan–Feb 2027",
+   "summary": "Kurs „Bindung durch Berührung“ für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: sanfte Berührungen und das Lesen von Körperbotschaften in kleiner Gruppe. Anmeldung über die Detailseite.",
    "topics": [
     "babymassage"
    ],
@@ -135,43 +56,25 @@
    },
    "availability": {
     "status": "frei",
-    "note": "8 Plätze frei (0 von 8 belegt)"
+    "note": "8 Plätze frei (0/8 belegt)"
    },
    "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2027-01-11T11:00",
-      "end": "2027-01-11T12:15"
-     },
-     {
-      "start": "2027-01-18T11:00",
-      "end": "2027-01-18T12:15"
-     },
-     {
-      "start": "2027-01-25T11:00",
-      "end": "2027-01-25T12:15"
-     },
-     {
-      "start": "2027-02-01T11:00",
-      "end": "2027-02-01T12:15"
-     },
-     {
-      "start": "2027-02-08T11:00",
-      "end": "2027-02-08T12:15"
-     },
-     {
-      "start": "2027-02-15T11:00",
-      "end": "2027-02-15T12:15"
-     }
-    ]
+    "kind": "weekly",
+    "weekdays": [
+     "MO"
+    ],
+    "start": "11:00",
+    "end": "12:15",
+    "from": "2027-01-11",
+    "until": "2027-02-15",
+    "skipHolidays": false
    }
   }
  ],
- "inputHash": "00bc7727d27deab5616bf7fc6a8ec0ac69a6c50f004cb296fc230f2d27a2f5ce",
+ "inputHash": "3172c0d2787c348a7b42bc4aa3449e4cd1d8ec2ff82f9935c87c095f96c22d63",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-25T07:38:23+01:00",
- "changedAt": "2026-10-20T08:26:12+02:00",
+ "checkedAt": "2026-10-26T07:48:52+01:00",
+ "changedAt": "2026-10-26T07:48:52+01:00",
  "sources": []
 }

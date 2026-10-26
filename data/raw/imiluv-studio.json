@@ -3,12 +3,14 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Reformer Pilates Mums & Babies (ca. 6 Wochen–6 Monate)",
-   "summary": "Sanftes Reformer-Pilates für Mütter mit Baby im Alter von etwa 6 Wochen bis 6 Monaten, auf Englisch, mit ärztlicher Freigabe. Buchung in der IMILUV-App; Termine laufen wöchentlich mittwochs.",
+   "title": "Reformer Mums & Babies (Pilates mit Baby, Englisch)",
+   "summary": "Pilates auf dem Reformer mit Baby ab ca. 6 Wochen bis 6 Monaten, auf Englisch. Ärztliche Freigabe ist nötig. Buchung in der IMILUV-App.",
    "topics": [
-    "fitness-mit-baby"
+    "fitness-mit-baby",
+    "bewegung",
+    "mehrsprachig"
    ],
-   "format": "regelmaessig",
+   "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
    "price": "5 Credits pro Termin",
@@ -21,7 +23,7 @@
    },
    "availability": {
     "status": "frei",
-    "note": "Buchung in der IMILUV-App; laut Termin-API nicht ausgebucht (Stand des Abrufs)"
+    "note": "Buchbar in der IMILUV-App (bsport); aktuell nicht ausgebucht, genaue Platzzahl nur in der App"
    },
    "schedule": {
     "kind": "dates",
@@ -60,10 +62,11 @@
   {
    "providerId": "imiluv-studio",
    "venueId": "imiluv-studio",
-   "title": "Barre Baby Luv (Babys ca. 6–12 Monate)",
-   "summary": "Barre-Training mit Baby in der Trage, 50 Minuten, Deutsch/Englisch. Ärztliche Freigabe nötig. Einzelne Termine werden in der IMILUV-App gebucht.",
+   "title": "Barre Baby Luv (ca. 6–12 Monate, donnerstags)",
+   "summary": "Barre-Training mit Baby in der Trage, auf Deutsch und Englisch, ca. 50 Minuten. Ärztliche Freigabe nötig. Buchung nur in der IMILUV-App; die Termine sind laut Buchungssystem nicht ausgebucht.",
    "topics": [
-    "fitness-mit-baby"
+    "fitness-mit-baby",
+    "bewegung"
    ],
    "format": "regelmaessig",
    "registration": "mit-anmeldung",
@@ -77,8 +80,8 @@
     "maxMonths": 12
    },
    "availability": {
-    "status": "frei",
-    "note": "Buchung in der IMILUV-App (bsport); Termine laut Terminliste nicht ausgebucht"
+    "status": "unbekannt",
+    "note": "Buchung in der IMILUV-App (bsport); laut Termin-Schnittstelle nicht ausgebucht"
    },
    "schedule": {
     "kind": "dates",
@@ -111,7 +114,7 @@
    }
   }
  ],
- "inputHash": "b5dea9d5fa515a0059db4175f075e3fb1d6051f983c855b333f9b63093086eb9",
+ "inputHash": "0c00b6e392f58c32befebdea3b4f5011a33c7160d63b211c8072d6856876efdc",
  "dated": {
   "2026-10-28": "bb0e397cfa0f7faa8bc071e45c37caebbc8ac116cbb0a2fc25e49920f0115d6b",
   "2026-11-05": "4469413ab5cecdfa1ba87562ddf4671fa640e3e4ced70a41309448442ec050dd",
@@ -121,8 +124,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-25T07:38:23+01:00",
- "changedAt": "2026-10-25T07:38:23+01:00",
+ "checkedAt": "2026-10-26T07:48:52+01:00",
+ "changedAt": "2026-10-26T07:48:52+01:00",
  "sources": [
   "frankenkids"
  ]

@@ -1,9 +1,78 @@
 {
- "events": [],
- "inputHash": "e2276f136c23f7e585a4955b13cacb60af863da7e5f5f2498bdaa1fd4638598e",
+ "events": [
+  {
+   "providerId": "vhs-fuerth",
+   "venueId": "vhs-fuerth",
+   "title": "Eltern-Kind-Turnen (1½–2½ Jahre), Mittwoch 17:00",
+   "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09.2026, Einstieg und Kursende sind nicht angegeben.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "82,50 €",
+   "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 18,
+    "maxMonths": 30
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Kursnummer 16301; Platzangabe fehlt, Anmeldung über die vhs"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "WE"
+    ],
+    "start": "17:00",
+    "from": "2026-10-28",
+    "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "vhs-fuerth",
+   "venueId": "vhs-fuerth",
+   "title": "Eltern-Kind-Turnen (2–3 Jahre), Donnerstag 17:00",
+   "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09.2026, Einstieg und Kursende sind nicht angegeben.",
+   "topics": [
+    "eltern-kind-turnen",
+    "bewegung"
+   ],
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "price": "82,50 €",
+   "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+   "category": "bewegung",
+   "age": {
+    "minMonths": 24,
+    "maxMonths": 36
+   },
+   "availability": {
+    "status": "unbekannt",
+    "note": "Kursnummer 16303; Platzangabe fehlt, Anmeldung über die vhs"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TH"
+    ],
+    "start": "17:00",
+    "from": "2026-10-29",
+    "skipHolidays": true
+   }
+  }
+ ],
+ "inputHash": "105a7a302109109a598f26e686e6778809f97a12200ba7afdc9fe0792dcb8175",
  "model": "haiku",
- "status": "keine-termine",
- "checkedAt": "2026-10-25T07:38:23+01:00",
- "changedAt": "2026-10-24T08:20:24+02:00",
+ "status": "ok",
+ "checkedAt": "2026-10-26T07:48:52+01:00",
+ "changedAt": "2026-10-26T07:48:52+01:00",
  "sources": []
 }
