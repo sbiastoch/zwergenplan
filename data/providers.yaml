@@ -407,17 +407,17 @@
     - url: https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM={von}&USERNAME=KundF
       kind: json-api
       use: termine
-      hint: nach 'ab 2' filtern; AUSVERKAUFT 1 = ausgebucht
+      hint: "Nur die 2+-Stücke 'WiWaWaldtraum' und 'Schneeflocken, wippediwapp' (Familienprogramm 2026); alle übrigen sind ab 3 und entfallen. AUSVERKAUFT 1 = ausgebucht"
   availability:
     shown: ja
     how: Veranstaltungskalender-API liefert je Termin AUSVERKAUFT (1 = ausverkauft); Tickets im Eventim-Inhouse-Webshop
     system: Eventim Inhouse (kukuq)
-  verified: 2026-10-11
+  verified: 2026-10-26
   notes:
     - Theater, Musik, Geschichten, Ballett, Märchenstunde mit dem Christkind. Ein Ticket brauchen Kinder ab 3 Jahren; bei Veranstaltungen, die sich ausdrücklich an Kinder ab 2 richten, schon ab 2. Ein Teil des Programms ist also für 2–3-Jährige. Die Altersangabe steht je Veranstaltung.
     - Einziger KUF-Ort innerhalb des Rings; nur saisonal (Advent). Für 0-1 J. kaum geeignet; Stücke 'ab 2' gezielt suchen. Liegt an der Kinderweihnacht (Hans-Sachs-Platz).
     - "Anmeldestart: Familienprogramm und Ticketvorverkauf ab 13. Oktober (Saison 28.11.–23.12.); Kitas/Schulen seit 28.09."
-    - Familienprogramm erscheint erst ab 13.10.2026 – danach neu prüfen
+    - "[nuernberg.de/…/2026_sternenhaus_familienprogramm.pdf] 2026-10-26: Altersangaben je Stück (2+ bis 8+); nur 'WiWaWaldtraum' und 'Schneeflocken, wippediwapp' sind 2+, alles andere 3+ oder älter. Die Stücke im hint gelten nur für die Saison 2026 und müssen zur nächsten Saison neu aus dem Programmheft gelesen werden (Plan 0048, N3)."
     - "[nuernberg.de/…/sternenhaus.html] Saison 28.11.–23.12.2026; Familienprogramm mit Ticketlinks ab 13.10.2026 auf dieser Seite"
     - "[kukuq.eventim-inhouse.de/…/shop] Eventim-Inhouse-Webshop der Kulturinformation (Produktion Sternenhaus)"
     - "[nuernberg.de/…/sternenhaus_kinder_familien.html] Besuchsinfos (Kinderwagenparkplätze, Wickelplatz, Ticketpreise)"
