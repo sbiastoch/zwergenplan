@@ -34,15 +34,16 @@ Die Extraktion teilt große Anbieter schon heute an Seitengrenzen (`splitInput`)
 
 Nachtlauf, Ertragsbeweis, Seitenfinder und Entdecken holen Seiten über dieselben Funktionen nach denselben Regeln:
 - **Ein User-Agent, der uns nennt**, auch im Browser.
-- **robots.txt gilt für jeden Abruf** (RFC 9309). Eine gesperrte Programmseite wird nicht abgerufen; der Wächter meldet sie, und ein Mensch setzt `blocked` im Katalog.
+- **robots.txt gilt für jeden Seitenabruf** (RFC 9309): Programm- und Folgeseiten, Seiten des Seitenfinders, Quellen des Entdeckens und Sammelkalender. Eine gesperrte Seite wird nicht abgerufen; der Wächter meldet sie, und ein Mensch setzt `blocked` im Katalog.
+- **APIs mit eigenen Nutzungsregeln sind ausgenommen:** Nominatim, OpenHolidays und GTFS-Feeds werden nach ihren Regeln abgefragt. Nominatim etwa sperrt `/search` per robots.txt für alle Crawler und erlaubt die API trotzdem nach seiner Usage Policy.
 - **Je Host** begrenzte Parallelität wie heute.
 
 Jeder Seitenfehler bekommt eine **Fehlerklasse**:
 - `dauerhaft`: HTTP 404 oder 410;
-- `gesperrt`: robots.txt oder Bot-Schutz;
-- `voruebergehend`: alles andere.
+- `gesperrt`: robots.txt;
+- `voruebergehend`: alles andere, auch Bot-Schutz, der oft nur zeitweise auftritt.
 
-Die Klasse entscheidet nur über Meldung und über Punkt 3 („entfernt“), nicht darüber, ob Bestand bleibt.
+Die Klasse entscheidet nur über die Meldung und über Punkt 3 („entfernt“), nicht darüber, ob Bestand bleibt.
 
 ### 2. Die Programmseite ist die Einheit der Extraktion
 
@@ -51,30 +52,38 @@ Eine **Einheit** ist:
 - dazu die Seiten mit `use: verfuegbarkeit` desselben Anbieters als Beilage. Sie stehen in jeder Einheit des Anbieters, im Text und im Schlüssel.
 - Die Kandidaten der Sammelkalender eines Anbieters bilden eine eigene Einheit.
 
-Jede Einheit hat eigenen Cache-Schlüssel, eigene Events, eigenen Status, eigene Prüfzeit (`checkedAt`), eigene Fehlerserie und eigenen Einbruchschutz. Große Einheiten werden weiter in Teile zerlegt. Die Angebote eines Anbieters sind die Vereinigung seiner Einheiten. Dubletten zwischen Einheiten entfernt der Build wie heute (`dropSameSourceDuplicates`, Rangfolge der Quellen).
+Jede Einheit hat eigenen Cache-Schlüssel, eigene Nachricht ans Modell mit dem Katalogauszug nur ihrer Seiten, eigene Events, eigenen Status, eigene Prüfzeit (`checkedAt`), eigene Fehlerserie und eigenen Einbruchschutz. Große Einheiten werden weiter in Teile zerlegt.
+
+Die Angebote eines Anbieters sind die Vereinigung seiner Einheiten:
+- Vor dem Build vereinigt `mergeParts` die Events aller Einheiten eines Anbieters in Katalogreihenfolge, wie heute die Teile einer großen Eingabe. Jedes übrige Event bleibt bei seiner Einheit und deren Prüfzeit.
+- Danach greifen die Dublettenregeln des Builds wie heute (`dropSameSourceDuplicates`, Rangfolge der Quellen).
 
 Fällt eine Seite aus, behält nur ihre Einheit den alten Stand. Die übrigen Einheiten laufen in derselben Nacht weiter. Damit gilt „Ein Fehler kostet höchstens Aktualität, nie Bestand“ je Seite, und der Status `teilweise`, ein Marker im Schlüssel und eine eigene Übernahme im Build entfallen. Ein Event gehört durch die Einheit zu seiner Seite; `sourceUrl` muss das nicht leisten.
 
 ### 3. Zustand und Gesundheit aus einer Quelle
 
 `data/raw/<id>.json` hält den Zustand je Einheit. Ihn schreibt weiter nur `refreshProvider`; die Invariante aus ADR 0026, Punkt 2 bleibt ungeteilt. Gesundheit wird **nicht gespeichert, sondern berechnet**: Eine reine Funktion liest die Rohdaten (und den Zustand des Entdeckens) und liefert die Befunde. Dafür genügen die Felder je Einheit:
-- `failingSince` und Fehlerklasse,
+- `failingSince`, Fehlerklasse und der Beginn der aktuellen Klasse,
 - `pending`,
-- `emptySince`: die Einheit hatte Events und hat keine mehr.
+- `emptySince`: die Einheit hatte künftige Events und hat keine mehr.
 
-Ein zweiter Schreibweg nach `data/raw` und ein eigenes Feld für Befunde entfallen.
+Eine Rohdatei im alten Format (vor der Umstellung) ist selbst ein Befund. Ein zweiter Schreibweg nach `data/raw` und ein eigenes Feld für Befunde entfallen.
 
-**Entfernte Seite:** Eine Einheit, deren Seite seit 14 Tagen `dauerhaft` scheitert (404/410), verliert ihre Events. Ab dem zweiten Tag des Ausfalls steht sie im Wächter, ab dem 14. Tag als „entfernt“. Ein vorübergehender Fehler kostet nie Bestand. Ein Anbieter, den es nicht mehr gibt, oder eine verschobene Seite soll keine alten Kurse wochenlang als aktuell zeigen. Zwei Wochen Meldung lassen Zeit, die Seite im Katalog zu ersetzen.
+**Entfernte Seite:** Eine Einheit, deren Seite seit 14 Tagen ununterbrochen `dauerhaft` scheitert (404/410, gezählt ab dem Wechsel in diese Klasse), verliert ihre Events. Ab dem zweiten Tag des Ausfalls steht sie im Wächter, ab dem 14. Tag als „entfernt“. Ein vorübergehender Fehler kostet nie Bestand. Ein Anbieter, den es nicht mehr gibt, oder eine verschobene Seite soll keine alten Kurse wochenlang als aktuell zeigen. Zwei Wochen Meldung lassen Zeit, die Seite im Katalog zu ersetzen.
 
 ### 4. Ein Seitenfinder für neue und bekannte Anbieter
 
-Ein Modul erkundet eine Website im Code: höchstens 20 Seiten derselben Website, Tiefe 2, nach Linktext und Pfad geordnet, mit iCal-, PDF- und Buchungssystem-Erkennung, robots.txt nach Punkt 1. Das Ergebnis sind Kandidaten für Programmseiten. Ein Modell darf auswählen und lesen, aber keine Links verfolgen.
+Ein Modul erkundet eine Website im Code: höchstens 20 Seiten derselben Website, Tiefe 2, nach Linktext und Pfad geordnet, mit iCal-, PDF- und Buchungssystem-Erkennung, robots.txt nach Punkt 1. Seiten auf Buchungsplattformen, die die eigene Website verlinkt, zählen mit, aber nur diesen einen Sprung weit. Das Ergebnis sind Kandidaten für Programmseiten. Ein Modell darf auswählen und lesen, aber keine Links verfolgen.
 
 Eine Kandidatenseite zählt nur mit **Ertragsbeweis**: Sie wird als eigene Einheit extrahiert (Punkt 2) und liefert ein gültiges Angebot.
 
 Der Seitenfinder dient zwei Zwecken:
 - **Entdecken** (Punkt 6): Er ersetzt „Fund-Seite plus zwei Kontaktseiten“ beim Bewerten.
-- **Pflege bekannter Anbieter**: Er läuft wöchentlich über die Websites der Katalog-Anbieter und sofort für Anbieter mit einer Seite im Fehler `dauerhaft`. Eine Seite, die der Katalog nicht nennt und deren Ertragsbeweis mindestens ein Angebot liefert, das keine bestehende Einheit des Anbieters liefert, wird **automatisch an den Eintrag angehängt**: ein Commit je Anbieter, gelistet im Issue des Laufs, zurücknehmbar per Revert.
+- **Pflege bekannter Anbieter**: Er läuft wöchentlich über die Websites der Katalog-Anbieter, Anbieter mit einer Seite im Fehler `dauerhaft` zuerst. Eine Seite wird **automatisch an den Eintrag angehängt** (ein Commit je Anbieter, gelistet im Issue des Laufs, zurücknehmbar per Revert), wenn
+  - der Katalog sie nicht nennt und
+  - ihr Ertragsbeweis mindestens ein Angebot liefert, das keine Einheit des Anbieters liefert. Nicht mitgezählt werden dabei Einheiten mit Fehlerklasse `dauerhaft`, deren Ersatz sie sein kann.
+
+  Wie im Entdecken prüft der Lauf vor der Übergabe die Größenbudgets der Website.
 
 Der Seitenfinder entfernt und ändert nie bestehende Seiten. Das bleibt beim Menschen, den der Wächter darauf hinweist.
 
@@ -115,7 +124,9 @@ Extraktion und Bewerten nutzen das Modell mit der besten Qualität im Eval (Reca
 | 2 | ein Modellaufruf je Anbieter; Links nie verfolgt, außer zwei Kontaktseiten beim Bewerten und `follow` | ein Aufruf je Einheit (Punkt 2); dazu erkundet der Seitenfinder dieselbe Website (Punkt 4); Rohdaten weiter nur über `refreshProvider` |
 | 3 | Haiku mit Sonnet als Fallback | Modell nach Eval-Qualität (Punkt 7) |
 | 4 | Zustand je Anbieter | Zustand je Einheit; entfernte Seite nach 14 Tagen `dauerhaft` (Punkt 3) |
-| 5 | Entdecken legt nur neue Einträge an (G2) | zusätzlich Programmseiten an bestehende Einträge anhängen, nur mit Ertragsbeweis (Punkt 4); neuer Job `waechter` mit nur `issues: write` (Punkt 5) |
+| 5 | Entdecken legt nur neue Einträge an (G2) | zusätzlich Programmseiten an bestehende Einträge anhängen, nur im Pflegelauf und nur mit Ertragsbeweis (Punkt 4); neuer Job `waechter` mit nur `issues: write` (Punkt 5) |
+
+Außerdem ändert sich **ADR 0032, Punkt 8** (Entdecken samstags für `vrr`, sonntags für `vgn`): Das Entdecken läuft an festen Tagen des Monats je Netz, die Pflege an festen Wochentagen (Pläne 0049 und 0050). ADR 0032 bekommt dafür in der Statuszeile „Punkt 8 geändert durch ADR 0033“.
 
 Unverändert bleiben:
 - das Modell ohne Schreibrechte und nur über `io/llm.ts`;
@@ -136,14 +147,20 @@ Unverändert bleiben:
 
 ## Konsequenzen
 
-- **Einmalige Neuextraktion** aller Anbieter beim Umstieg auf Einheiten. Ein Anbieter wechselt das Format erst, wenn alle seine Einheiten in einem Lauf gelungen sind; bis dahin bleibt seine alte Datei. IDs bleiben über die Zuordnung (ADR 0022, Stufe 1 ordnet über Termine zu, nicht über Titel).
+- **Einmalige Neuextraktion** aller Anbieter beim Umstieg auf Einheiten. Ein Anbieter wechselt das Format erst, wenn alle seine Einheiten in einem Lauf gelungen sind; bis dahin bleibt seine alte Datei.
+- **IDs bei einer Neuextraktion:** Die Zuordnung (ADR 0022, ADR 0031) hält sie nicht von selbst. Eine Probe am 2026-10-26 lief über `die-familienbox` mit neuer URL, extrahiert mit Sonnet statt Haiku. Nur 16 von 24 IDs blieben, obwohl es meist dieselben Kurse waren. Die Gründe:
+  - eine kürzere Terminreihe: 38 statt 53 künftige Termine, also 0,72 gleiche Beginnzeiten statt mindestens 0,8;
+  - ein Wechsel `kurs`/`regelmaessig`;
+  - eine geänderte Altersangabe.
+
+  Deshalb kommen Modellwechsel und Umstellung in **einer** Neuextraktion, und Plan 0048 macht vorher die Zuordnung robuster gegen solche Unterschiede (Plan 0048, E11).
 - **Mehr Modellaufrufe** beim Umstieg, danach weniger, weil nur geänderte Seiten neu extrahiert werden. Kosten sind kein Kriterium (Ziel a).
 - **Schemaänderung** von `ProviderRaw` (`scripts/pipeline/lib/raw.ts`, Export `schema/provider-raw.schema.json`) und eine Übergangszeit mit beiden Formaten.
 - **Die Pläne 0045 und 0047** gehen ins Archiv mit „ersetzt durch Plan 0050“ bzw. „ersetzt durch Plan 0048“. Ihre Messungen und Recherchen bleiben dort die Quelle. Plan 0046 bleibt Entwurf und steht in `docs/ideas.md`.
 - **Reihenfolge:**
-  1. Katalogfehler beheben (`die-familienbox`, `zentrum-kobergerstrasse`).
-  2. Modell nach Recall wählen (Skill, Abschnitt 5).
-  3. Plan 0048.
+  1. Katalogfehler beheben: `die-familienbox` erledigt am 2026-10-26 (`84a2bad`); `zentrum-kobergerstrasse` hat sich selbst erholt.
+  2. Modell nach Recall **wählen** (Eval nach Skill, Abschnitt 5). Gewechselt wird erst mit der Umstellung in Plan 0048, damit es nur eine Neuextraktion und nur einen Bruch der IDs gibt (Konsequenz „IDs“).
+  3. Die Doku dieses Neuschnitts nach `main` bringen (ADR 0033, die Pläne 0045–0050 und die Pläne, auf die sie verweisen), damit `check-docs` dort grün bleibt. Dann Plan 0048.
   4. Plan 0049.
   5. Plan 0050.
   6. Für Düsseldorf live zusätzlich Plan 0044 (Größenbudgets).
