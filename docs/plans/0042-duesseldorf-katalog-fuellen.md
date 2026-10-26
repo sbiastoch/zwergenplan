@@ -224,7 +224,7 @@ Verworfen:
 
 ### E5 – Folgeplan: Navigator als Fundquelle des Entdeckens
 
-**Aufgegangen in Plan 0045** (`docs/plans/0045-entdecken-vollstaendig.md`, 2026-10-25), E2: Adapter `navigator` als einer von mehreren Verzeichnis-Adaptern.
+**Aufgegangen in Plan 0045** (`docs/plans/archiv/0045-entdecken-vollstaendig.md`, 2026-10-25), E2: Adapter `navigator` als einer von mehreren Verzeichnis-Adaptern. Plan 0045 ist ersetzt durch Plan 0050 (`docs/plans/0050-entdecken-schlank.md`, E2: Quelle `navigator`).
 
 Der Navigator kennt ≈ 40 Träger mit Website und wäre für ≈ 70 NRW-Kommunen nutzbar. Nach N1 schreibt die Umsetzung einen eigenen Plan „Verzeichnis mit Adapter“. Die Skizze steht in `docs/ideas.md` unter „Weitere Regionen“:
 - `role: verzeichnis` mit `adapter` (neues ADR, weil ADR 0025, Punkt 6 das heute ausschließt). Der Nachtlauf ruft ein Verzeichnis nie ab, es entsteht also keine Wiedergabe.

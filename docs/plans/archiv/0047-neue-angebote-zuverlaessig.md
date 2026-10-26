@@ -1,6 +1,6 @@
 # Plan 0047 – Neue Angebote bekannter Anbieter: kein stiller Ausfall
 
-Status: Review eingearbeitet
+Status: ersetzt durch Plan 0048 (`docs/plans/0048-nachtlauf-seite-als-einheit.md`), Neuschnitt nach ADR 0033 am 2026-10-26. Nie umgesetzt. Statt Teilerfolg je Anbieter wird die Programmseite die Einheit der Extraktion; der Wächter berechnet Befunde aus dem Zustand statt sie zu speichern. Die Messungen unter „Ausgangslage“ gelten weiter.
 Datum: 2026-10-25
 Bezug:
 - Plan 0045 (Entdecken, Branch `plan-0039`), E1, Stufe C („Kurse“). Plan 0046 (Verfügbarkeit per Rezept, Branch `plan-0039`): nach Nutzerentscheid zurückgestellt.

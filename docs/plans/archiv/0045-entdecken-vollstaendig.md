@@ -1,6 +1,6 @@
 # Plan 0045 – Entdecken: erst vollständig, dann günstig
 
-Status: Review eingearbeitet
+Status: ersetzt durch Plan 0050 (`docs/plans/0050-entdecken-schlank.md`), Neuschnitt nach ADR 0033 am 2026-10-26. Nie umgesetzt. Die Abschnitte „Ausgangslage“, „Quellen“ und „Fundorte der neun nicht gefundenen“ bleiben die Quelle für Plan 0050; Stufe A wird ein Skill-Ablauf, die breiten Inventare gehen in dessen Checkliste, S3b geht in Plan 0049 auf.
 Datum: 2026-10-25
 Bezug:
 - Plan 0032 (`docs/plans/0032-daten-automatisch.md`), E7 (Entdecken), E8 (Kosten und Grenzen), E9 (Entdecken-Eval).
