@@ -1,6 +1,6 @@
 # Plan 0039 – Region Düsseldorf: zweites Netz außerhalb von Bayern und VGN
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-18
 Bezug:
 - ADR 0025 (Katalog regionsfähig; Punkt 1 „Weitere Region-Felder (Ferienland, ÖPNV, Kamera) kommen mit der zweiten Region“), ADR 0029 (Fürth; Punkt 1 „jede Region-bbox liegt in `NUERNBERG_BBOX`“, Punkt 5 „Stadtwahl bleibt ungespeichert“)
@@ -260,7 +260,7 @@ duesseldorf: { name: "Düsseldorf", bbox: DUESSELDORF_BBOX, population: 619_000,
 - **Zugangshalt-Gate:** Jeder Stadtteil braucht einen Haltbereich `de:05111:` der VRR-Tabelle in 800 m mit Einstieg im Fenster. Gemessen am VRR-Feed (Ausgangslage): alle 49 in höchstens 381 m, das Gate fällt keinen.
 - **Hubbelrath** (Bezirk 7, einer der 50 amtlichen Stadtteile) fehlt als `place=suburb` in OSM (Review m11). S1 sucht per Overpass einen `place`-Knoten „Hubbelrath“; gibt es einen und hat er einen Zugangshalt in 800 m, kommt er als 50. Eintrag dazu, sonst steht das Fehlen in „Umsetzung“ (Hubbelrath ist dünn besiedelt, Knittkuhl und Gerresheim liegen nah).
 - Die Liste ist länger als Nürnbergs (35). Düsseldorf hat 50 amtliche Stadtteile; die OSM-Punkte entsprechen ihnen fast eins zu eins. Gekürzt wird nicht, weil die Auswahl im Kind-Sheet und im Onboarding nur Düsseldorfer Stadtteile zeigt (E8).
-- **Startbudget:** `districtById` liegt im Start-Chunk; 49 Einträge kosten geschätzt 0,8–1,0 kB gzip, dazu `NETWORKS`, Lesen der Stadt und der Filter etwa 0,3 kB. Reserve heute 0,6 kB. **Nutzerentscheid nötig** (Abschnitt „Offene Nutzerentscheide“): Budget `JS (initial)` auf 104 kB anheben (Nachtrag ADR 0012) oder Stadtteile in einen eigenen Chunk verlegen, der mit dem gespeicherten Stadtteil lädt (verrät wieder ein Bit und kostet einen Request beim Start). Seit Plan 0043 (2026-10-24) ist das Budget 150 kB, der Entscheid entfällt.
+- **Startbudget:** `districtById` liegt im Start-Chunk; 49 Einträge kosten geschätzt 0,8–1,0 kB gzip, dazu `NETWORKS`, Lesen der Stadt und der Filter etwa 0,3 kB. Reserve heute 0,6 kB. **Nutzerentscheid nötig** (Abschnitt „Offene Nutzerentscheide“): Budget `JS (initial)` auf 104 kB anheben (Nachtrag ADR 0012) oder Stadtteile in einen eigenen Chunk verlegen, der mit dem gespeicherten Stadtteil lädt (verrät wieder ein Bit und kostet einen Request beim Start).
 
 Liste (49, aus der Overpass-Abfrage; alle bestehen das Gate):
 
@@ -316,13 +316,15 @@ ADR 0011, 0014, 0017, 0025, 0029 bekommen je einen Verweis-Block „Geändert du
 
 Entschieden am 2026-10-18 nach den Reviews:
 
-- **Startbudget** (E13): `JS (initial)` von 102 auf **104 kB** anheben; Nachtrag ADR 0012 in S6. **Gegenstandslos seit 2026-10-24:** Mit Plan 0043 liegt das Budget bei 150 kB (Nutzerentscheid, ADR 0012, Nachtrag); S6 trägt nur die Zeile in die Delta-Tabelle von ADR 0012 ein.
+- **Startbudget** (E13): `JS (initial)` von 102 auf **104 kB** anheben; Nachtrag ADR 0012 in S6.
+- **Service-Worker-Budget** (nach S6a, 2026-10-18): von 9 auf **10,5 kB**. Gemessen 10,02 kB, weil der Service Worker für den Push gespeicherte Stadtteile (jetzt 103) über `districtById` auflöst und `REGIONS` braucht. Nachtrag ADR 0012 in S9.
 - **Privatsphäre** (E15, Punkt 4): Die Ausnahme wird angenommen; geladen wird nur die Tabelle des gewählten Netzes.
+
+- **Mockup** (E8, S7): Variante **A, Auswahlfeld „Stadt“** über dem Startpunkt im Kind-Sheet (Mockup https://claude.ai/artifact/XZ8yBj2iQ6yLgatS8LxFK1, Entscheid 2026-10-18). Onboarding mit drei Kacheln, Nürnberg vorgewählt.
 
 Noch offen:
 
-1. **Mockup** des Umschalters im Kind-Sheet (E8), vor S7.
-2. **Trockenlauf** des Bootstraps (S10): Abnahme der Kandidaten vor dem Live-Lauf.
+1. **Trockenlauf** des Bootstraps (S10): Abnahme der Kandidaten vor dem Live-Lauf.
 
 ## Dateien
 
@@ -446,6 +448,34 @@ Arbeit direkt auf `main` im Haupt-Checkout, kleine Commits, jeder Schritt erst f
 - **Kosten Entdecken** steigen um den Samstagslauf (E11).
 - **Nachbarstädte in der bbox** (E2): Neuss, Ratingen, Hilden, Erkrath und Meerbusch-Büderich liegen im Rechteck. Das Entdecken verwirft sie über `municipality`; ein Fehler des Geocodings (falsche oder fehlende Gemeinde) ließe einen Ort durch oder fiele weg. Der Trockenlauf zeigt beides; Abhilfe ist `abgelehnt` bzw. Katalogpflege.
 
+## Umsetzung (2026-10-18)
+
+Stand nach S1–S4, S6a und S8 (Branch `plan-0039`, lokal, nicht gepusht); S6b (Onboarding-Kacheln, Auswahlfeld „Stadt“ im Kind-Sheet nach Mockup A, Texte, Leerzustand, Datenschutz-Text) läuft parallel. Doku aus S9 mit ADR 0032 (`docs/adr/0032-netze-region-duesseldorf.md`). Wo der Code vom Plan abweicht, gilt der Code; die Abweichungen stehen unten.
+
+### Messwerte
+
+- **S1:** 50 Düsseldorfer Stadtteile (die 49 OSM-`suburb`-Punkte der Tabelle in E13 plus Hubbelrath, siehe Abweichungen), zusammen 103 mit den 53 aus Nürnberg und Fürth. `schema:export` für das Enum `region`.
+- **S3:** `data/oepnv/vrr.json` aus „VRR-Soll-Daten vom 15.10.2026“ (gültig 01.09.2026–28.02.2027), Referenztag **Di 03.11.2026** (NRW-Ferien), 4 574 Steige, 4 605 Fahrten, **1 528 kB roh, 289,8 kB gzip**; Laufzeit 17,2 s, Spitze **1,86 GB RSS**. Mehr als die 2 562 Steige und ≈ 1,02 MB der Ausgangslage, weil der Auszug auf `VRR_BBOX` (Stadt plus etwa 3 km Rand) zuschneidet, nicht auf die Stadt-bbox; ebenso liegt der Speicher über den gemessenen ≈ 1,4 GB. `data/oepnv/fahrplan.json` ist per `git mv` jetzt `data/oepnv/vgn.json`.
+- **S4:** echter Build: `vgn` 747 Zeilen × 82 Orte, **60 688 B gzip** (wie vorher); `vrr` 609 Zeilen × 0 Orte mit der Warnung „Netz vrr ohne Orte – Linien-Gates übersprungen“. Zugangshalt-Gate für alle 53 VGN- und 50 Düsseldorfer Stadtteile grün.
+- **S6a:** `pnpm build && pnpm size`: `JS (initial)` vor S6a 102,59 kB, nach S6a **103,22 kB** von 104 kB; Service Worker **10,02 kB** (Budget nach Nutzerentscheid 10,5 kB); `site.json` **113,38 kB gzip** von 250 kB (echte Daten, noch ohne Düsseldorfer Anbieter). Nachtrag in ADR 0012.
+- **S8:** `pnpm eval` mit Haiku auf den Prompt mit `{region}` (Hash `0e9f8910c248`): **11 von 12 Fällen**, $0,33, 2 016 s; `die-familienbox` brach mit „Ausgabe abgeschnitten“ ab (im Nachtlauf fängt der Fallback Sonnet das ab), die übrigen Fälle ohne Rückschritt. Wiederholung nach Nutzerentscheid nicht nötig. Kursolino (einziger Anbieter: Schwimmschule Ohana) hat keinen Standort in Düsseldorf; die Präfixe stehen in `references/booking-systems.md` des Skills.
+
+### Abweichungen vom Plan
+
+- **E8, Angebote anderer Netze:** kein neuer `ReachMode` `"anderes-netz"`. Die Entfernungszeile kommt aus `elsewhereText` (`src/ui/format.ts`), gereicht über `CardContext.elsewhere` (`src/ui/OfferCard.tsx`); das Detail unterdrückt dann den Ladezustand der Wegzeit. Die Wegzeit-Typen bleiben unberührt.
+- **E8, Netzwechsel:** `switchCity` ist der Hook `useSwitchCity` (mit `useCity`) in `src/ui/use-app-state.ts`. `useTransit` hält die Zustände je Netz über `networkTransitReducer` (`src/ui/use-transit.ts`); „höchstens einmal je Sitzung“ gilt je Netz.
+- **E5, Gates:** als reine Funktionen in `scripts/transit/gates.ts` (`transitGates`, `accessIssues`), nicht in `build-data.ts`; `TRANSIT_WARN_SECONDS` und `MAX_WITHOUT_LINES` stehen dort. S4 schrieb übergangsweise zusätzlich die alten Pfade `data/wegzeit.json` und `data/linien.json`; S6a hat diese Kopie und ihre Budgets wieder entfernt.
+- **E13, Hubbelrath:** als 50. Stadtteil aufgenommen, Punkt aus der `suburb`-Fläche (51,258 / 6,908), mit Zugangshalt.
+- **E13, Budgets:** zusätzlich zum Startbudget (104 kB) hat der Nutzer das Budget des Service Workers von 9 auf 10,5 kB angehoben (Nutzerentscheide).
+- **E10:** In den Cache-Schlüssel der Extraktion geht der für den Anbieter ausgefüllte Prompt (`lib/refresh.ts`), `promptHash` für Evals und `data:validate` bleibt über der Vorlage. Der Text ändert sich auch für Nürnberg und Fürth (Sammelkalender-Zeile, Kursolino); die erste Nacht danach extrahiert also wie geplant alle Anbieter neu.
+- **E6:** Die Ferien gehen nicht in den Cache-Schlüssel der Extraktion ein (geprüft in S2); ein Test dafür war daher nicht nötig. S3 nutzte bis zum Zusammenführen mit S2 einen Übergangshelfer für die NRW-Ferien.
+- **E11:** Der Workflow ordnet Netz und Tag über `github.event.schedule` zu, ein unbekannter Cron ist rot; `workflow_dispatch` hat die Eingaben `netz` und `region` (nicht beide zugleich).
+
+### Offen
+
+- S6b fertigstellen und nachmessen (Startbudget, Mobile-UX des Auswahlfelds); S9: E2E nach Plan, `/browser-review` lokal, `/arch-review`.
+- S10 Trockenlauf des Bootstraps mit Abnahme durch den Nutzer; S11 Push, Neuextraktion, Bootstrap live, Messung von `site.json`, `wegzeit/vrr.json`, `linien/vrr.json` und `MAX_WITHOUT_LINES` für `vrr`; S12 nach dem ersten Samstagslauf.
+
 ## Review (2026-10-18) – Verdict: Überarbeiten
 
 Unabhängiger Review (`plan-reviewer`) auf den Entwurf. Alle Punkte übernommen, keiner abgelehnt.
@@ -473,3 +503,82 @@ Neuer `plan-reviewer` auf die überarbeitete Fassung. Keine Blocker; B1 trägt (
 - **M1 übernommen:** `switchCity` als gemeinsame Stelle für Onboarding und Kind-Sheet; Laden je Netz und Sitzung; `refresh` mit Pfad des Netzes; E2E (E8).
 - **M2 übernommen:** `GeoResult.municipality`, Cache `geocode-v2.json`, unbekannte Gemeinde wird verworfen, Tests (E2, Test 1).
 - **m3–m14 übernommen:** `pnpm build && pnpm size` statt Fixture-Build; Fixture-Netz mit mindestens einer Linienzelle; Willkommenszahl nach angetippter Kachel; Ortsangaben `ReachMode` und `map-data.ts`; ADR 0029, Punkt 3 als ersetzt; CKAN-Auswahl mit Dateiname und Inhaltsprüfung; README-Lizenzabschnitt; Laufzeit-Warnung je Netz; zusätzliche E2E-Specs in S9; Leerzustand für Karte, Kalender, Statuszeile; Privatsphäre-Begründung eingeschränkt; Startbudget-Entscheid vor S1.
+
+## Browser-Review lokal (2026-10-18)
+
+Fixture-Build (`dist-e2e/`, Stand d7a8fbd), Preview auf freiem Port. `node scripts/screenshots.ts <URL>` mit allen Ansichten (228 Bilder, sechs Viewports hell und dunkel, alle als Montage je Ansicht angesehen, Auffälliges einzeln) und ein Playwright-Skript für die Düsseldorf-Pfade auf `Pixel 7` (Chromium) und `iPhone 15` (WebKit), je hoch und quer, hell und dunkel, dazu 320 × 640 auf beiden Engines (100 Bilder). claude-in-chrome war nicht verbunden; die Interaktion lief ersatzweise im Skript. Bilder unter `e2e/.artifacts/screens/` und `e2e/.artifacts/screens/ddf/` (nicht versioniert).
+
+**Zusatzzeilen (S9)**
+
+- **Onboarding, drei Kacheln**: „Düsseldorf“, „Nürnberg“ (vorgewählt, `aria-pressed=true`, Haken), „Fürth“ auf beiden Geräten in allen acht Varianten; quer in einer Reihe, bei 320 px untereinander (273 × 59 px). Die Lead-Zahl wechselt beim Antippen von „8 … von 5 Anbietern“ auf „2 … von 1 Anbieter“ (`onb-stadt-*`, `onb-stadt-ddf-*`). Bei 360 und 365 px bricht „Düsseldorf“ mitten im Wort um, siehe Befunde.
+- **Weg mit Düsseldorf**: eine `optgroup` „Düsseldorf“ mit 50 Einträgen, keine Nürnberger Stadtteile. „Stadtmitte (Düsseldorf)“ gibt die Minuten-Chips frei, kein Hinweis „außerhalb“ (`onb-weg-ddf-*`, `onb-weg-stadtmitte-*`). Die geschlossene Auswahl kürzt auf Pixel und iPhone hoch auf „Stadtmitte (Düsseld…“, wie bei Fürth.
+- **Liste mit Düsseldorf**: nur „Krabbelgruppe am Rhein“ und „Rheinzwerge-Liederkonzert“, Statuszeile „2 Angebote ab heute · Wegzeit ab Stadtmitte (Düsseldorf)“, „10 Min.“ an den Karten (`liste-ddf-*`).
+- **Kind-Sheet, Abschnitt „Eure Stadt“**: steht über „Wegzeit ab“. Reihenfolge der Überschriften: Eure Stadt, Wegzeit ab, Darstellung, Als App. Optionen „Düsseldorf, Nürnberg, Fürth“, Schrift 17 px (≥ 16 px, kein iOS-Zoom). Der Hinweis hat bei 320 px drei Zeilen (59 px, Chromium) bzw. zwei Zeilen (WebKit), sonst zwei bzw. quer eine. Die Abstände entsprechen denen der übrigen Abschnitte (`kind-stadt-ddf-*`, `kind-*`).
+- **Netzwechsel bei offenem Sheet** (Nürnberg mit Gostenhof → Düsseldorf): Der Startpunkt ist weg („Noch kein Startpunkt – …“). Der Fokus bleibt auf „Stadt“. Die Lage der Auswahl ist unverändert (y gleich, Scroll des Sheets gleich, auch quer bei `sheet-scroll` 219 bzw. 243). Danach stehen 50 Düsseldorfer Stadtteile zur Wahl, nach „Fertig“ lautet die Statuszeile „2 Angebote ab heute“ (`kind-wechsel-vorher-*`, `kind-wechsel-nachher-*`).
+- **Quellenhinweis VRR**: Ohne geladene Tabelle (Tabelle per Route blockiert) steht „Fahrplan: VRR – Verkehrsverbund Rhein-Ruhr AöR, CC BY 4.0.“ mit beiden Links (`kind-vrr-fallback-pixel-*`). Mit geladener Fixture-Tabelle steht deren Quelle „Fiktiver Fahrplan Düsseldorf für Tests, CC0 1.0“. Die echte VRR-Zeile prüft `/browser-review live`.
+- **Merkliste mit Angebot des anderen Netzes**: Mit Düsseldorf zeigt „Offener Krabbeltreff“ „in Nürnberg“, „Krabbelgruppe am Rhein“ „10 Min.“. Mit Nürnberg zeigt „Krabbelgruppe am Rhein“ „in Düsseldorf“, der Krabbeltreff „15 Min.“ (`merkliste-ddf-*`, `merkliste-nbg-*`).
+- **Karte über Düsseldorf**: „2 Angebote an 1 Ort“, Mitte 51,219 / 6,796 auf dem Familienzentrum Rheinzwerge, nur dessen Marker (`karte-ddf-*`). Kartenmitte nach Nürnberg geschoben, dann „Kartenmitte als Startpunkt“: Toast „Die Kartenmitte liegt außerhalb von Düsseldorf.“ (`karte-toast-*`).
+- **Leerzustand** (`site.json` ohne `vrr` per Route): „In Düsseldorf haben wir noch keine Angebote. Wir suchen gerade danach.“, „0 Angebote ab heute“. Die Karte zeigt „0 Angebote an 0 Orten“ über dem Düsseldorfer Startausschnitt (`leer-liste-*`, `leer-karte-*`).
+- **Standort außerhalb** (Standort in Nürnberg, Stadt Düsseldorf): „Dein Standort liegt außerhalb von Düsseldorf. Wähle einen Stadtteil oder eine andere Stadt.“ Kein Startpunkt gesetzt (`standort-aussen-*`).
+- **Anbieter-Tab**: Mit Düsseldorf steht dort nur „Rheinzwerge Beispiel (fiktiv)“ („1 Anbieter mit 2 Angeboten“), mit Nürnberg stehen die sechs Nürnberger Zeilen ohne ihn (`anbieter-ddf-*`, `anbieter-nbg-*`).
+- **Konsole**: keine Fehler der App. Es gab nur Meldungen der Testumgebung: WebGL-„GPU stall“ (Chromium headless), „Image wood-pattern could not be loaded“ (Kachel-Mock-Stil, WebKit) und `net::ERR_FAILED` der absichtlich blockierten Tabelle.
+
+**Checkliste**
+
+- Lesbarkeit: Kacheln, „Eure Stadt“ und „Wegzeit ab“ sind klar gestaffelt, Kontrast hell und dunkel gut. „in Düsseldorf“/„in Nürnberg“ steht fett wie die Minuten, was, wann, wo bleibt in 2 s erfassbar. Ausnahme ist die Kachel bei 360/365 px (Befund 1).
+- Daumen-Erreichbarkeit: Kacheln und Stadt-Auswahl liegen im mittleren Bereich, „Weiter“/„Fertig“ unten, unverändert. Bei 320 px liegt die dritte Kachel unter der Falz; der Schritt scrollt, „Los geht's“ bleibt erreichbar (Befund 3).
+- Zustände: leer (eigener Leerzustand), außerhalb (Standort, Kartenmitte), anderes Netz in der Merkliste und lange Stadtteilnamen in der Auswahl brechen nicht. Abgeschnitten wird nur die geschlossene Auswahl „Stadtmitte (Düsseld…“ im Weg-Schritt; der volle Name steht in Statuszeile und Kind-Sheet.
+- Dark Mode: keine grellen Inseln. Gewählte Kachel und Auswahl in `--sel`, Fehlerkasten „außerhalb“ gedämpft rot.
+- Micro-Interactions: Die Kachel zeigt den gedrückten Zustand über `aria-pressed` (Füllung und Haken), die Auswahl hat einen sichtbaren Fokusring. Die Bilder mit `reduce` sind ohne Animation, der Toast erscheint ohne Sprung.
+- Konsistenz: Kacheln, Auswahlfeld, Leerzustand und Toast nutzen die vorhandenen Bausteine.
+
+**Befunde**
+
+1. **Mittel**: Auf 360 und 365 px (häufige Android-Breiten) bricht die Kachel „Düsseldorf“ mitten im Wort zweizeilig um, „Düsseldor“ / „f“ (`e2e/.artifacts/screens/onboarding-1-360-light.png`, `onboarding-1-365-*`, hell und dunkel). Ursache: `.onb-tiles` mit `minmax(min(100%, 9rem), 1fr)` legt zwei Spalten à etwa 150 px an, in die Punkt und Name nicht passen (`src/ui/onboarding/onboarding.css:269–281`). Auf 320 px (eine Spalte) und ab 390 px (iPhone, Pixel) passt der Name. Kein Blocker, sollte aber vor dem Push behoben werden.
+2. **Niedrig**: Statuszeile auf `Pixel 7` hoch dreizeilig, „(Düsseldorf)“ allein in Zeile 3 (`ddf/liste-ddf-pixel-hoch-light.png`), wie schon bei Fürth (Plan 0036).
+3. **Niedrig**: Onboarding bei 320 px: Die dritte Kachel „Fürth“ und „Los geht's“ liegen unter der Falz (`onboarding-1-320-*`). Mit zwei Kacheln war das knapp sichtbar; der Schritt scrollt.
+4. **Niedrig**: Nach dem Netzwechsel im Kind-Sheet verschwindet der Startpunkt unterhalb der Falz, ohne Hinweis im sichtbaren Bereich (`ddf/kind-wechsel-nachher-iphone-hoch-light.png`). Der Fokus bleibt richtig auf „Stadt“. Ein kurzer Text unter der Auswahl wäre eine Idee für `docs/ideas.md`.
+5. **Niedrig**: Der Fokusring der Stadt-Auswahl liegt fast an der Beschriftung „Stadt“ (`ddf/kind-wechsel-nachher-iphone-hoch-light.png`). Überschrift „Eure Stadt“ und Beschriftung „Stadt“ doppeln sich; so ist es im Mockup A entschieden.
+
+## Zwischenstand und Übergabe (2026-10-18, Session-Ende)
+
+**Nicht live.** Nichts aus S1–S9 ist gepusht. Der Nutzer hat nach dem Trockenlauf (S10) angehalten: „Nur 4 Anbieter? Also vmtl nur eine Handvoll Angebote? … eine frische Session soll weitermachen und das Grundproblem lösen.“ Live auf `main` sind nur der Plan selbst (6348b6b, f650aac) und ein davon unabhängiger Testfix (da888f1).
+
+### Wo der Stand liegt
+
+- **Branch `plan-0039`** (lokal, nicht gepusht), Worktree `.claude/worktrees/plan-0039`, Spitze 49074e4 plus dieser Commit; 24 Commits vor `origin/main` (Stand 2026-10-18 nachmittags). Lineare Historie: S1 → S2 → Entdecken → S3 → S4 → S8 → Eval → S6a → Budget SW → Doku → S6b → Browser-Review → `llm.ts`-Fix → Arch-Review-Fixes → Eval neu.
+- Alle `plan-0039-*`-Branches (`-s1`, `-s2`, `-s3`, `-s4`, `-s6a`, `-s6b`, `-s8`, `-disc`, `-docs`, `-arch`) und ihre Worktrees unter `.claude/worktrees/agent-*` sind in `plan-0039` aufgegangen und können weg (`git worktree remove …`, `git branch -D …`; zwei Worktrees sind „locked“).
+- `pnpm verify` grün, `pnpm data:build` (echt) grün, `pnpm build && pnpm size` grün, E2E gezielt grün (Details in den Commits und in „Umsetzung“). Arch-Review: alle Befunde behoben (Commits e128bbf … c0efe8a). Browser-Review lokal: Abschnitt oben, mittlerer Befund (Kachelumbruch 360 px) behoben.
+- **Vor einem Push:** `git fetch && git rebase origin/main` (Nachtlauf und Entdecken committen täglich `data/` auf `main`; Konflikte möglich in `data/offers.json`, `data/raw/`, `data/kosten.csv` – immer die Fassung von `main` nehmen und `pnpm pipeline nightly --build-only` statt Hand-Merge). Danach volle CI auf `main` beobachten.
+- **Achtung beim Push:** `discover.yml` hat dann den Samstags-Cron für `vrr`. Steht die Repo-Variable `ENTDECKEN_MODUS` auf `live`, nimmt der erste Samstag Düsseldorfer Anbieter ohne weitere Abnahme auf.
+
+### Was der Trockenlauf gezeigt hat (Grundproblem)
+
+Lauf 2 (`runs/2026-10-18/discover/` im Worktree, 25 Min., $1,07, 69 Aufrufe): 10 Suchbegriffe → 53 Kandidaten → **4 würden aufgenommen** (Geburtshaus Düsseldorf, Hebamme Nina Krügel, YogaKitchen Oberkassel, Kinderschutzbund), 44 verworfen, 5 nicht bewertet. Zum Vergleich: Fürth-Bootstrap 8 Anbieter; Nürnberg hat 83, aber die stammen überwiegend aus der ursprünglichen Agenten-Recherche (Plan 0002, Skill) und aus drei Sammelkalender-Adaptern (`stadt-vk`, `frankenkids`, `evtermine`), nicht aus dem wöchentlichen Entdecken.
+
+Verwerfungsgründe (Auszählung des Berichts):
+
+| Grund | Portal-Fund | eigene Seite |
+|---|---|---|
+| keine aktuellen Termine (meist abgelaufene Einzel-PDFs) | 14 | 1 |
+| keine vollständige Ortsadresse auf den abgerufenen Seiten | 1 | 8 |
+| Ertragsbeweis leer („kein Angebot 0–3 mit künftigem Termin“) | – | 6 |
+| Seite nicht abrufbar (PDF-Download im Browser-Abruf, HTTP 500) | 4 | 2 |
+| außerhalb der Region (Neuss über `municipality`, Harsewinkel, Euskirchen) | 1 | 1 |
+| sonstiges | 1 | 5 |
+
+Beobachtungen, die eine frische Session prüfen sollte (Hypothesen, nicht verifiziert):
+
+1. **Die Websuche landet in NRW auf den Landesportalen** `fruehehilfen-online.nrw.de` und `guterstart.nrw.de` (je Angebot ein PDF-Export, oft abgelaufen; im Browser-Abruf „Download is starting“). 20 von 53 Kandidaten. Diese Portale sind eher **Sammelkalender** – ein Adapter (wie `evtermine`) könnte sie nach Düsseldorf und Datum filtern und Kandidaten mit Träger und Ort liefern, statt einzelne PDFs zu bewerten.
+2. **Große Träger haben Kursportale/Buchungssysteme**, die der Ertragsbeweis nicht lesen kann oder die keine Ortsadresse zeigen: Kaiserswerther Diakonie (Familienakademie: PEKiP, Babymassage, Klangentdecker – „Fronberghaus, Raum 004“ ohne Adresse), AWO Familienbildungswerk (`awo-duesseldorf.de/awo-kurse/kursliste/`, nur Stadtteile), DRK (`kursplaner.drk-duesseldorf.de`, `drk-bildung-duesseldorf.de`, Geocoding „Tellerringstraße 56“ fehlgeschlagen), efa (`efa-duesseldorf.de/kurssuche`, HTTP 500/leer), Diakonie-Familienzentren. Das sind vermutlich die meisten Düsseldorfer Angebote. Optionen: Katalogpflege von Hand mit `Venue`-Adressen und `hint` (Skill, Abschnitt 3), Lesarten der Buchungssysteme in `references/booking-systems.md`, ggf. Adapter.
+3. **Die Adress-Regel im Bewerten** („keine vollständige Postadresse auf den abgerufenen Seiten“ → verwerfen) trifft Anbieter, deren Adresse nur im Impressum oder auf einer nicht abgerufenen Kontaktseite steht. Prüfen, ob das Bewerten Impressum/Kontakt mit abruft oder ob die Regel für Träger mit bekannter Hauptadresse gelockert werden kann (Prompt `prompt/discover-assess.md`, Eval-Fälle für das Entdecken, Skill Abschnitt 4).
+4. **Zehn Suchbegriffe je Lauf** und „höchstens 10 Kandidaten je Suche“ sind für einen Bootstrap einer 620 000-Einwohner-Stadt knapp; ein Bootstrap mit Verzeichnissen (`role: verzeichnis`, etwa Stadt Düsseldorf „Familienportal“/Familienbüros, Elternschule UKD als Verweisliste) könnte mehr liefern.
+5. Die ursprüngliche Nürnberger Liste kam aus einer **Agenten-Recherche** (Skill `babyevents-nuernberg`). Für Düsseldorf wäre eine gleichwertige einmalige Recherche (Subagenten je Angebotsart) vermutlich der schnellste Weg zu 40+ Anbietern; das Entdecken hält den Katalog danach nur aktuell.
+
+Empfehlung für die nächste Session: zuerst einen kleinen Plan (Plan 0040) „Düsseldorfer Katalog füllen“ mit Ziel (z. B. ≥ 30 Anbieter, ≥ 150 Angebote vor dem Live-Gang), Messung der Hypothesen 1–3 ohne Modell (Abruf der Portale und Kursportale mit `pnpm pipeline fetch-page`), dann Entscheid Adapter vs. Handrecherche. Plan 0039 bleibt bis dahin unveröffentlicht oder geht mit leerer bzw. kleiner Düsseldorf-Kachel live – das entscheidet der Nutzer.
+
+### Weitere offene Punkte aus dieser Session
+
+- **Lokale Läufe mit Modell** ignorieren seit 28faadf die Nutzer-Einstellungen (`--setting-sources project`, `--strict-mcp-config`). Lauf 1 des Trockenlaufs ($2,15, 0 Ergebnisse) und der erste Eval ($0,33, 11/12) liefen noch mit Haiku-Effort „xhigh“ aus `~/.claude/settings.json`; der Eval ist neu gemessen (12/12, $0,14), die alte Zeile in `evals/results.md` vermerkt. Kosten dieser Session mit Modell: ≈ $3,90 (Eval 0,33 + 0,14, Trockenlauf 2,15 + 0,07 + 1,07, plus Probe).
+- S11 (Push, Nachtlauf mit `max_tokens=5000000` wegen des neuen Prompts ≈ $0,60, Bootstrap live, Nachtlauf, `/browser-review live`, Größen von `site.json` und `wegzeit/vrr.json` messen) und S12 (Archiv) stehen aus.
+- Browser-Review, Restbefunde niedrig: Statuszeile dreizeilig auf Pixel 7 mit „(Düsseldorf)“; nach Netzwechsel verschwindet der Startpunkt unter der Falz ohne Hinweis (Kandidat für `docs/ideas.md`).
