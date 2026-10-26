@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: Review eingearbeitet
+Status: in Umsetzung (S0 erledigt, Nachtrag 1 reviewt; nächster Schritt S1)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -10,11 +10,11 @@ Bezug:
 
 ## Voraussetzungen
 
-- **Doku auf `main`:** Vor S1 kommen ADR 0033, die Pläne 0045–0050 (0045 und 0047 im Archiv) und die Pläne, auf die sie verweisen (etwa 0039 und 0042), als reiner Doku-Commit nach `main`. `node scripts/check-docs.ts` auf `main` ist grün.
+- **Doku auf `main`:** erledigt mit `68efab0` (2026-10-26). Vor S1 kommen ADR 0033, die Pläne 0045–0050 (0045 und 0047 im Archiv) und die Pläne, auf die sie verweisen (etwa 0039 und 0042), als reiner Doku-Commit nach `main`. `node scripts/check-docs.ts` auf `main` ist grün.
 - **Basis `main`.** Umgesetzt wird auf einem eigenen Branch von `main`.
 - **Konflikt mit Branch `plan-0039`:** Plan 0042 ändert dort `scripts/pipeline/io/fetch-inputs.ts` und `scripts/pipeline/lib/fetch.ts` (`follow`, `withFollowPages`, `siteOf`) und bringt `partChars`. Kommt `plan-0039` zuerst auf `main`, baut S1 darauf auf. Sonst löst der spätere Rebase von `plan-0039` die Konflikte; Folgeseiten gehören dann zur Einheit ihrer Programmseite (E1).
 - **Katalogfehler:** erledigt. `die-familienbox` steht seit `84a2bad` (2026-10-26) unter der neuen URL; `zentrum-kobergerstrasse` hat sich selbst erholt (TLS wieder gültig, Nachtlauf 2026-10-26 ohne Fehler).
-- **Modell gewählt, nicht gewechselt:** Eval nach Skill, Abschnitt 5, mit Sonnet und Opus, je zwei Läufe, Entscheidung nach Recall. Gewechselt wird **mit der Umstellung in S1** (E7). So gibt es nur eine Neuextraktion und nur eine Gelegenheit, IDs zu verlieren (ADR 0033, Konsequenz „IDs“).
+- **Modell gewählt, nicht gewechselt:** erledigt am 2026-10-26, gewählt ist **Opus** (Abschnitt „Umsetzung“). Gewechselt wird **mit der Umstellung in S1** (E7): `LLM_MODEL_EXTRACT=opus` und `LLM_MODEL_FALLBACK=opus` in beiden Workflows. Den Fallback auf Opus zu setzen heißt: Der zweite Versuch nach einem Einbruch nimmt kein schwächeres Modell (Sonnet hatte im Eval weniger Recall). Heute schaltet gleiches Modell den zweiten Versuch ab (`strongRetry: model !== fallbackModelOf(…)` in `scripts/pipeline/cli.ts`); S1 ändert das (E5). So gibt es nur eine Neuextraktion und nur eine Gelegenheit, IDs zu verlieren (ADR 0033, Konsequenz „IDs“).
 
 ## Anlass
 
@@ -111,7 +111,12 @@ Der Nutzer will vor allem, dass neue Angebote bekannter Anbieter zuverlässig au
 
 ### E3 – Schlüssel und Nachricht je Einheit
 
-- Neue Funktion `unitExcerpt(provider, unit)` (`scripts/pipeline/lib/units.ts`): der Eintrag ohne `notes`, `programme` gekürzt auf die Seiten der Einheit (eigene Seite und Beilagen, samt `hint`). Venues, Name, `availability` und `partChars` bleiben drin. Bei `kandidaten` bleibt `programme` leer.
+- Neue Funktion `unitExcerpt(provider, unit)` (`scripts/pipeline/lib/units.ts`): der Eintrag ohne `notes`. `programme` nennt **alle** Seiten des Anbieters (`url`, `kind`, `render`, `use`), `hint` aber nur bei den Seiten der Einheit (eigene Seite und Beilagen). Venues, Name, `availability` und `partChars` bleiben drin. Bei `kandidaten` stehen alle Seiten ohne `hint` drin (Nachtrag 1, S0: Ohne die Liste der übrigen Seiten ließ das Modell bei `studio-herzschlag` die Kurse externer Kursleitungen weg, weil es nicht sah, dass der Katalog deren Seiten diesem Anbieter zuordnet; 12 von 43 Angeboten fehlten).
+  - Wie heute die Nachricht nennt der Auszug keine Seiten mit `use: info` oder `blocked`.
+  - Eine neue oder gestrichene Seite ändert damit den Schlüssel aller Einheiten des Anbieters, und der Anbieter wird ganz neu extrahiert. Das wird bewusst hingenommen (Review 3, M3): Der Kontext der übrigen Seiten wiegt schwerer (S0, `studio-herzschlag`). Plan 0049 hängt Seiten automatisch an; dort steht die Folge unter „Risiken“, und der Pflegelauf misst die ID-Verluste je Anhang. Wird das zum Problem, nennt der Auszug statt der Seiten nur deren Hosts, geprüft im Eval an `studio-herzschlag`.
+  - **Felder:** `ExtractInput` (`scripts/pipeline/lib/extract.ts`) bekommt `excerpt: Anbieter` (der Auszug für Nachricht und Schlüssel) neben `provider` (der volle Eintrag für die Prüfung).
+  - **Build-Probelauf** (`checkExtraction`, `scripts/pipeline/lib/extract.ts`) und Prüfung der Antwort laufen gegen den **vollen** Katalogeintrag, nicht gegen den Auszug. Sonst verletzt eine Einheit `kandidaten` die Schemaregel „mindestens eine Terminseite“ (S0: alle 24 `kandidaten`-Einheiten scheiterten so).
+  - **Teilzeile:** Bei einer aufgeteilten Einheit sagt `extractMessage` künftig „Die Eingabe **dieser Seite** ist auf N Aufrufe verteilt“ statt „dieses Anbieters“. Sonst kann das Modell aus der Seitenliste schließen, Kurse stünden anderswo (Vermutung zu `geburtshaus-nuernberger-nest`, S0). Der Prompt-Hash ändert sich nicht, der Text der Nachricht schon.
 - Heute gibt es zwei Auszüge: `catalogExcerpt` in `scripts/pipeline/lib/normalize.ts` (Schlüssel) und einen in `scripts/pipeline/lib/extract.ts` (Nachricht). Neu ist der **Schlüssel** `unitExcerpt`, und die **Nachricht** ist eine Projektion davon ohne Koordinaten, `publicId` und `partChars` (`messageExcerpt(unitExcerpt(…))`). Ein Test prüft, dass jede Änderung der Nachricht auch den Schlüssel ändert. Eine geänderte `hint` extrahiert so nur ihre Einheit neu, und das Modell sieht nur die Hinweise seiner Seite.
 - `extractKey` (`scripts/pipeline/lib/normalize.ts`) bleibt, bekommt aber die Seiten bzw. Kandidaten der Einheit. Prompt, Schema und Modell gehen wie heute in den Schlüssel; `dated` bleibt je Einheit.
 
@@ -158,7 +163,7 @@ UnitState = {
   - `pending` mit gleichem Schlüssel → übernehmen;
   - leere Eingabe → leer;
   - sonst extrahieren;
-  - Einbruch → `pending`; ohne Fallback-Modell zuerst ein zweiter Versuch mit ihm.
+  - Einbruch → `pending`; vorher ein zweiter Versuch mit dem Fallback-Modell, **auch wenn es gleich dem Hauptmodell ist** (Review 3, M1: S0 zeigt starke Streuung zwischen zwei Läufen, ein zweiter Versuch fängt einen Teil davon). `strongRetry` ist in `cli.ts` immer an; der Kommentar in `io/nightly.ts` (`strongRetry`) wird angepasst. Test in `io/nightly.test.ts`: Einbruch mit `LLM_MODEL_EXTRACT` = `LLM_MODEL_FALLBACK` → zweiter Aufruf, erst danach `pending`.
 
   `RefreshContext` bekommt `unit` und `prev: UnitState | undefined`. `prevOfferCount` gibt es nur noch für die Umstellung (E7).
 - **Einbruch je Einheit:**
@@ -186,14 +191,14 @@ UnitState = {
 ### E6 – Build je Einheit
 
 - `batchesFromRaw` (`scripts/pipeline/lib/build-offers.ts`):
-  - vereinigt je Anbieter die Events aller Einheiten mit `mergeParts`, wie heute die Teile einer großen Eingabe. Dasselbe Angebot von zwei Seiten wird so vor Schritt 3 zusammengelegt, und der Build bricht nicht ab;
+  - gleicht zuerst die Einheiten eines Anbieters gegeneinander ab (E12) und vereinigt dann die Events aller Einheiten mit `mergeParts`, wie heute die Teile einer großen Eingabe. Dasselbe Angebot von zwei Seiten wird so vor Schritt 3 zusammengelegt, und der Build bricht nicht ab;
   - **Reihenfolge** dabei: zuerst Einheiten mit `ok`, dann solche im Fehler, jeweils in Katalogreihenfolge. Bei regelmäßigen Angeboten gewinnt in `mergeParts` das frühere Event, also der frische Stand;
   - lädt die freien Tage, die `mergeParts` braucht, schon vor `batchesFromRaw` (heute erst in `buildFromRaw`, `scripts/pipeline/io/nightly.ts`);
   - legt jedes übrige Event in den Batch seiner Einheit (`name` `<id>#<nn>` mit Katalogindex, zweistellig mit Null aufgefüllt; `checkedAt` der Einheit). `availability.checkedAt` eines Angebots ist damit die Prüfzeit seiner Seite;
   - lässt Einheiten, deren Kennung nicht mehr zum Katalog passt, nach E1 („geänderte URL“) stehen oder mit Hinweis entfallen.
 - Der Status je Anbieter im `BuildInput` kommt aus `providerStatus`. `extracted` enthält Anbieter, bei denen eine Einheit `inputHash` hat.
 - Schritt 7 („Übernahme aus dem Altbestand“) bleibt **unverändert**: Ausgefallene Einheiten tragen ihre alten Events selbst.
-- Das Eval (`scripts/pipeline/io/eval.ts`) vereinigt die Einheiten eines Falls ebenso mit `mergeParts`, bevor es wertet.
+- Das Eval (`scripts/pipeline/io/eval.ts`) gleicht die Einheiten eines Falls ebenso ab, mit `matchUnits` ohne Vorstand (E12) und dann `mergeParts`, bevor es wertet.
 
 ### E7 – Umstellung vom alten Format, zusammen mit dem Modellwechsel
 
@@ -205,7 +210,7 @@ UnitState = {
 - **Erzwingen nach Prüfung:** Die neue Eingabe `umstellen` von `nightly.yml` gibt `--umstellen <id,…>` an `pipeline nightly` weiter. Das stellt diese Anbieter auch bei einem Einbruch oder mit einer dauerhaft scheiternden Seite um; die Einheit dieser Seite beginnt dann leer mit `fehler`. Daten schreibt so weiter nur der Workflow, nie ein lokaler Lauf (CLAUDE.md, „Daten“).
 - **Grenzen der Umstellung:**
   - `nightly.yml` bekommt die Eingabe `timeout` für `timeout-minutes` des Jobs `nachtlauf`, als `${{ fromJSON(inputs.timeout || '90') }}`, weil die Eingaben beim Zeitplan leer sind;
-  - die Umstellung läuft per `workflow_dispatch` mit `timeout`, `budget_min`, `max_calls` und `max_tokens` aus S0;
+  - die Umstellung läuft per `workflow_dispatch` mit den Werten aus S0: `timeout=90`, `budget_min=60`, `max_calls=500`, `max_tokens=9000000` (gemessen auf dem Katalog von `main`: 237 Aufrufe, 4,5 Mio. Tokens samt Cache, etwa 24 Minuten mit 3 Anbietern parallel; je das Doppelte, Zeit mit Abruf). Kommt Düsseldorf vorher auf `main`, wird mit dessen Katalog neu gerechnet: Aufrufe = Zahl der Einheiten × 1,15 (S0: 237 Aufrufe für 207 Einheiten), Tokens und Minuten anteilig, je verdoppelt. Die Umstellung läuft per `workflow_dispatch` **vor** dem nächsten Zeitplan (01:30 UTC), sonst beginnt die Nacht mit den alten Grenzen (150 Aufrufe, 3 Mio. Tokens, 50 Minuten);
   - `budget_min` bleibt mindestens 20 Minuten unter `timeout`.
 
   Wer in einer Nacht nicht fertig wird, stellt in der nächsten um; bis dahin gilt sein alter Stand.
@@ -280,8 +285,8 @@ UnitState = {
 
 Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.ts` robuster, nach ADR 0033, Punkt 8. Das ändert ADR 0022, Punkt 3; die Begründung steht im Code und im Commit nach ADR 0004.
 
-- **Stufe 1, gemeinsamer Zeitraum, nur bei ähnlichem Titel:** Für Paare mit `similarTitle` zählt Stufe 1 die gleichen Beginnzeiten auch nur im Zeitraum, den beide Fassungen abdecken, vom späteren ersten bis zum früheren letzten künftigen Termin. Voraussetzung: beide haben dort mindestens 4 Termine. `SAME_SESSIONS` bleibt 0,8. Ohne ähnlichen Titel bleibt Stufe 1 wie heute; ein fremder Kurs am selben Ort und Termin erbt so keine ID einer weggefallenen Reihe.
-- **Stufe 2, Formatwechsel `kurs` ↔ `regelmaessig`:** zulässig, wenn außerdem
+- **Stufe 1, gemeinsamer Zeitraum: gestrichen (Nachtrag 1).** S0 hat ihn mit Opus über die volle Umstellung gemessen: 7 Zuordnungen, alle richtig, aber nur in einem von zwei Läufen eine zusätzlich gehaltene ID (+0 bzw. +1 von 347–350). Dieselben Paare trifft Stufe 2 schon heute (gleicher erster Beginn). Nach ADR 0033, Punkt 8 („nur, was die Messung trägt“) bleibt Stufe 1 unverändert. Kommt der Fall der Probe vom 2026-10-26 (kürzere Reihe bei anderem ersten Termin) nach S1 im Bericht vor, folgt ein eigener Nachtrag.
+- **Stufe 2, Formatwechsel `kurs` ↔ `regelmaessig`:** wird eingebaut (S0: +2 bzw. +1 gehaltene IDs, keine falsche Übernahme). Zulässig, wenn außerdem
   - der erste künftige Beginn auf die Minute gleich ist,
   - `conflictingLabels` nichts findet
   - und kein anderer Kandidat in Frage kommt.
@@ -292,11 +297,32 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
   - Ziel 6 gilt für die eingebauten Erweiterungen.
   - Verfehlt S0 Ziel 6, nennt es die übrigen Ursachen, und ein Nachtrag vor S1 entscheidet.
 
+### E12 – Abgleich zwischen Einheiten (Nachtrag 1)
+
+S0 zeigte: Je Einheit entstehen deutlich mehr Dubletten als je Anbieter (19–26 % der Angebote statt 12–14 %), weil zwei Seiten dasselbe Angebot verschieden beschreiben. `mergeParts` legt nur Fassungen mit gleichem Format, Alter, erstem Termin und Wochentagen zusammen. Beispiele: PEKiP bei `die-familienbox` einmal als `kurs`, einmal als `regelmaessig`; Abenteuerturnen bei `fbs-nuernberg` als `einmalig` und als `regelmaessig`; die Kursdurchgänge der Beilage bei `hebamme-eva-kauper-wunderwerk` neben der Wochenfassung der Terminseite.
+
+- **Neue reine Funktion** `matchUnits(units, { previous, horizon, freeDays })` in `scripts/pipeline/lib/units.ts`, aufgerufen in `batchesFromRaw` je Anbieter **vor** `mergeParts`. `batchesFromRaw` bekommt dafür den Vorstand (`data/offers.json`), das Eval keinen (dann zählt Schritt 1 der Auswahl für alle gleich).
+- **Nicht beteiligt** ist die Einheit `kandidaten`: Ihre Dubletten mit eigenen Seiten regelt der Build wie heute nach Rang (Anbieterseite vor Sammelkalender). Einheiten im Fehler nehmen nur als Verlierer teil; ihre Fassung verdrängt nie die einer Einheit mit `ok`.
+- **Zwillinge:** zwei Events aus **verschiedenen** Einheiten desselben Anbieters mit
+  - gleichem Ort,
+  - gleichem Kerntitel (`sameCoreTitle`) ohne widersprechende Kennungen (`conflictingLabels`),
+  - verträglichem Alter (`compatibleAge`),
+  - und mindestens 80 % der künftigen Beginnzeiten des kleineren im größeren. „Künftig“ heißt hier für alle Formate: Termine ab `horizon.from` aus `expandSchedule(schedule, { to: expansionWindow(e, horizon.to), freeDays, from: horizon.from })`, also anders als `mergeParts` auch bei Kursen nur künftige,
+  - **und** verschiedenem Format, Alter oder Terminart (`schedule.kind`). Gleich gebaute Fassungen bleiben `mergeParts` überlassen, das ihre Termine vereinigt statt eine zu verwerfen.
+- **Ablauf:** Die Einheiten werden in der Reihenfolge von E6 durchlaufen, ihre Events in Antwortreihenfolge. Jedes Event wird mit den bisher **behaltenen** Events früherer Einheiten verglichen; das erste passende ist sein Zwilling. Verliert das neue, entfällt es. Gewinnt es, entfällt der Zwilling und das neue tritt an seine Stelle; ein verworfenes Event ist danach für niemanden mehr Zwilling.
+- **Welche bleibt:** die Fassung mit dem höheren Wert
+  `passung(e) = Anteil der künftigen Termine von e, die in irgendeinem Angebot des Vorstands stehen (gleicher Anbieter und Ort, similarTitle zu e; Beginn auf die Millisekunde) + 0,5, wenn eines dieser Angebote das Format von e hat`;
+  bei gleichem Wert die mit mehr künftigen Terminen; dann die frühere (behaltene).
+
+  Ohne Vorrang des Vorstands verlor S0 bei `theater-mummpitz` 13 IDs: Die Konzerte stehen dort als einzelne Termine (`einmalig`), eine Seite fasste sie als `regelmaessig` zusammen.
+- Jede Entscheidung wird ein Hinweis im Bericht („„…“ entfällt, gleich „…“ aus Einheit k“). In S0 waren es 31–43 je Lauf; eine Stichprobe von gut 30 (alle bei `die-familienbox`, `fbs-nuernberg`, `hebamme-eva-kauper-wunderwerk`, `theater-mummpitz`, `ev-*`) ist von Hand geprüft, alle sind echte Zwillinge. Nicht alle Entscheidungen sind geprüft; S1 prüft die Hinweise des Trockenlaufs ganz.
+- Konstante `SAME_UNIT_SESSIONS = 0.8` mit Begründung im Code (ADR 0004).
+
 ## Dateien
 
 | Datei | Änderung | Schritt |
 |---|---|---|
-| `scripts/pipeline/lib/units.ts` (neu) | Einheiten, Kennung, Beilagen, `unitExcerpt` | S1 |
+| `scripts/pipeline/lib/units.ts` (neu) | Einheiten, Kennung, Beilagen, `unitExcerpt`, `matchUnits` (E12) | S1 |
 | `scripts/pipeline/lib/normalize.ts`, `scripts/pipeline/lib/extract.ts`, `scripts/pipeline/io/extract.ts` | Schlüssel und Nachricht mit `unitExcerpt`; `CallRecord.unit`; Eingabe je Einheit | S1 |
 | `scripts/pipeline/lib/fetch.ts`, `scripts/pipeline/io/fetch-inputs.ts` | `assembleUnit`, Einheiten im Abruf, Bericht je Einheit | S1 |
 | `scripts/pipeline/lib/raw.ts`, `schema/provider-raw.schema.json` | V2, `providerStatus`, Übergangsschema | S1, S5 |
@@ -324,7 +350,8 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
   - `blocked` und `use: info` ausgenommen;
   - `coveredBy` nur `kandidaten`;
   - Reihenfolge;
-  - `unitExcerpt` enthält nur die eigenen Seiten, und eine geänderte `hint` einer anderen Seite ändert ihn nicht.
+  - `unitExcerpt` nennt alle Seiten, `hint` nur die der Einheit; eine geänderte `hint` einer anderen Seite ändert ihn nicht, eine neue Seite schon;
+  - `matchUnits` (E12): PEKiP `kurs`/`regelmaessig` aus zwei Einheiten → eines; **1:n** wie `theater-mummpitz` (eine `regelmaessig`-Zusammenfassung mit 7 Terminen gegen eine `einmalig`-Fassung mit denselben 7 Terminen, Vorstand 7 einzelne `einmalig`-Angebote) → die `einmalig`-Fassung bleibt, auch wenn die Zusammenfassung aus der früheren Einheit kommt; `kandidaten` nimmt nicht teil; Einheit im Fehler verliert immer; Vorrang der Fassung mit dem Format des Vorstands (`einmalig`-Konzerte gegen `regelmaessig`-Zusammenfassung); ohne Vorstand die mit mehr Terminen; gleich gebaute Fassungen bleiben für `mergeParts`; Parallelgruppen mit anderem Alter (`compatibleAge` falsch) und „Gruppe A/B“ bleiben beide; Zwillinge aus derselben Einheit bleiben.
 - `lib/extract.test.ts`: Die Nachricht enthält `unitExcerpt`, nicht `catalogExcerpt`. Schlüssel und Nachricht nutzen denselben Auszug.
 - `lib/normalize.test.ts`: Schlüssel je Einheit; Kandidaten nur in `kandidaten`.
 - `lib/fetch.test.ts`:
@@ -361,10 +388,7 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
   - Anbieter mit einer Einheit im Fehler → deren alte Events bleiben, neue der anderen kommen, keine ID fehlt;
   - Schritt 7 unverändert.
 - `lib/stable-ids.test.ts` (E11):
-  - Reihe mit 38 von 53 Terminen (Anfangsstück), ähnlicher Titel → ID bleibt;
-  - **dasselbe Anfangsstück mit fremdem Titel** (neuer 4-Termin-Kurs am selben Ort und Termin, die alte Reihe fällt weg) → neue ID;
-  - zwei Reihen ohne gemeinsamen Zeitraum mit mindestens 4 Terminen → Vergleich wie heute;
-  - `kurs` → `regelmaessig` mit gleichem ersten Beginn → ID bleibt;
+  - `kurs` → `regelmaessig` mit gleichem ersten Beginn → ID bleibt (Fälle aus S0: „Babymassage (montags)“ 53 → 38 Termine, „Eltern-Kind-Tanz samstags“);
   - mit Konkurrenten → neue ID;
   - `conflictingLabels` → neue ID.
 - `io/nightly.test.ts` mit Fake-Abruf über mehrere Nächte (Ziel 1):
@@ -372,7 +396,8 @@ Vor der Umstellung (S1) wird die Zuordnung in `scripts/pipeline/lib/stable-ids.t
   - Nacht 2: gleich → unverändert, kein Modellaufruf;
   - **Rückkehr von B vor Tag 14** → IDs von B bleiben;
   - **zweiter Fall: B bis Tag 15** → Bs Angebote fehlen; Rückkehr danach → neue IDs (die Zuordnung kennt nur die Vornacht).
-- `io/eval.test.ts`: Fall mit zwei Seiten und Beilage wird in Einheiten zerlegt, mit `mergeParts` vereinigt und gewertet.
+- `io/eval.test.ts`: Fall mit zwei Seiten und Beilage wird in Einheiten zerlegt, mit `matchUnits` (ohne Vorstand) und `mergeParts` vereinigt und gewertet.
+- `lib/extract.test.ts`, zusätzlich: Einheit `kandidaten` besteht den Build-Probelauf mit vollem Eintrag; Auszug der Einheit `kandidaten` ohne `hint`; Teilzeile nennt „dieser Seite“.
 - `lib/watch.test.ts` (S2):
   - `seite` erst ab dem zweiten Kalendertag, auch bei Bot-Schutz;
   - `gesperrt` sofort;
@@ -449,6 +474,7 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected` (Daten und Schem
 
 - **N1 – Seiten, die robots.txt sperrt oder die den neuen User-Agent abweisen** (nach der Messung in S3). Empfehlung: robots.txt achten. Eine gesperrte Seite bekommt `blocked` mit Grund, und der Anbieter wird über den Seitenfinder (Plan 0049) oder von Hand anders erschlossen. Alternative: eine Ausnahme je Seite im Katalog mit Begründung. Zu entscheiden nur, wenn die Messung Seiten findet.
 - **N2 – Entfernte Seite nach 14 Tagen** (ADR 0033, Punkt 3). Empfehlung: ja, wie im ADR. Alternative: Bestand bleibt unbegrenzt wie heute, und nur der Wächter meldet.
+- **N3 – `sternenhaus-kuf` mit Opus** (S0, vor S1 zu entscheiden). Haiku übernahm 54 `einmalig`-Events mit zusammen den meisten der 100 Termine der Kalender-API, mit dem Katalogalter 24–36 Monate (97 Angebote im Vorstand, eines je Stück und Tag). Opus folgt dem Hinweis „nach 'ab 2' filtern“ wörtlich und nimmt keinen, weil keine Beschreibung ausdrücklich „ab 2“ nennt; der Katalog sagt selbst, dass Kinder ab 3 Jahren ein Ticket brauchen und nur ausdrücklich ausgewiesene Stücke ab 2 sind. Bei der Umstellung greift deshalb der Einbruchschutz, der Anbieter bleibt im alten Format und steht im Bericht. Von den 100 Terminen der API nennen 2 ein Alter („ab 5 Jahren“), keiner „ab 2“; nur „Baby Dronte“ (3 Termine) deutet im Titel auf Kleinkinder. Gemessen wurde auf falsch dekodiertem Text („ErzÃ¤hlt“); seit `72c42d6` liest der Abruf ihn richtig, deshalb wird `sternenhaus-kuf` vor der Entscheidung mit Opus auf heilem Text neu extrahiert (`pnpm pipeline extract sternenhaus-kuf` mit `LLM_MODEL_EXTRACT=opus`). Empfehlung: die Lesart von Opus übernehmen und Stücke ab 2, etwa „Baby Dronte“, über einen genaueren `hint` gezielt nennen; danach `--umstellen sternenhaus-kuf`. Alternative: `hint` so fassen, dass alle Stücke als „ab 2“ gelten, wie bisher.
 
 ## Kosten
 
@@ -471,6 +497,76 @@ Nach Nutzervorgabe kein Kriterium. Die Umstellung extrahiert einmal alles neu, z
 - **robots.txt kostet Seiten.** Abhilfe: Messung im Runner vor dem Einschalten, N1, Schalter.
 - **Entfernte Seite war nur lange kaputt.** Abhilfe: 14 Tage Meldung vorher; die Rückkehr extrahiert neu. Die Zuordnung vergleicht nur mit der Vornacht. Kehrt eine Seite nach Tag 14 zurück, bekommen ihre Angebote deshalb neue IDs, und alte Links laufen ins Leere. Das ist bewusst so: Ein Link ins Leere ist besser als einer auf einen Kurs, der nicht mehr gilt. N2 lässt den Nutzer anders entscheiden.
 - **Issue als Angriffsfläche.** Abhilfe: eigener Job mit nur `issues: write`, kein Checkout, Text als Datei, fremder Text nur in Code-Spans, geprüfter Marker.
+
+## Umsetzung
+
+### Modellwahl (2026-10-26)
+
+Eval nach Skill, Abschnitt 5, je zwei Läufe, Modell allein, Prompt-Hash `7b31b918b80b` (Zeilen in `evals/results.md`):
+
+| Modell | Termine R | Termine P | Angebote R | Angebote P | format | Dauer |
+|---|---|---|---|---|---|---|
+| Opus | 100 / 100 % | 75 / 75 % | 100 / 100 % | 74 / 74 % | 100 / 94 % | 496 / 523 s |
+| Sonnet | 97 / 99 % | 95 / 70 % | 96 / 98 % | 83 / 74 % | 87 / 89 % | 289 / 342 s |
+| Haiku (12.10.) | 99 / 89 % | 95 / 86 % | 96 / 91 % | 85 / 92 % | 94 / 94 % | 565 / 579 s |
+
+- **Gewählt: Opus** nach ADR 0033, Punkt 7 (Recall vor Precision): als einziges Modell 100 % in beiden Läufen und die besten Feldwerte.
+- **Befund zur Präzision:** Die schwächere Präzision stammt fast nur aus zwei Fallen, in denen jedes Modell Termine erfindet, die die Seite nicht nennt.
+  - `nuebad-flipper`: Opus schreibt Schwimmkurse ab dem ersten Termin ohne Ende fort (139 falsche Termine, in beiden Läufen), Sonnet in einem von zwei Läufen (168).
+  - `sv-johannis-07`: Opus macht Blockkurse ohne Startdatum zu regelmäßigen Angeboten (27), Sonnet rät den 4. Januar als Start (8).
+
+  Das betrifft den Prompt, nicht die Wahl; siehe „Restpunkte“.
+
+### S0 – Messung (2026-10-26)
+
+Wegwerf-Skripte unter `runs/s0-0048/` (gitignored): `s0.ts` (Abruf, Einheiten nach E1, Extraktion je Anbieter = P, je Einheit = U, je Einheit mit allen Seiten im Auszug = V), `score.ts` (Build mit `buildOffers` gegen `data/offers.json` vom 2026-10-26, Prototyp von E11 und E12 in `runs/s0-0048/proto/`), `compare.ts`. Ein Abruf am 2026-10-26 nachmittags, alle Seiten ok. Modell Opus, je Variante zwei Läufe.
+
+**1. Einheit gegen Anbieter** (42 Anbieter mit mehr als einer Einheit, 167 Einheiten; verglichen auf den 41, die in allen Läufen vollständig sind; 365 künftige Angebote im Vorstand):
+
+| Variante | Vorstand wiedergefunden | Angebote | Dubletten | Aufrufe | Modell-Minuten |
+|---|---|---|---|---|---|
+| P (je Anbieter) | 260 / 260 | 322 / 325 | 11,8 / 13,8 % | 96 | 38 / 40 |
+| U (je Einheit, Auszug nur eigene Seiten) | 260 / 258 | 315 / 314 | 19,4 / 22,3 % | 199 | 48 |
+| U + E12 + Formatwechsel | 260 / 258 | 301 / 297 | 11,6 / 6,7 % | 199 | 48 |
+| V (je Einheit, Auszug alle Seiten) | 264 / 260 | 344 / 330 | 25,6 / 19,4 % | 199 | 49 |
+| **V + E12 + Formatwechsel** | **264 / 260** | **321 / 310** | **8,4 / 6,1 %** | 199 | 49 |
+
+- „Wiedergefunden“ heißt derselbe Kurs nach Ziel 6. Von den 105 nicht wiedergefundenen sind 97 `sternenhaus-kuf` (N3); ohne ihn findet V 264 bzw. 260 von 268 (97–99 %), P 260 von 268 (97 %).
+- „Dubletten“: Angebote desselben Anbieters am selben Ort mit gemeinsamem Beginn und ähnlichem Titel; das zählt auch Parallelgruppen zur selben Zeit mit, deshalb hat schon P 12–14 %.
+- **Ziel 2 mit V + E12 + Formatwechsel erfüllt bis auf einen Anbieter:** Recall mindestens wie P, weniger Dubletten, kein Build-Fehler. Weniger als 90 % der Angebote von P haben zwei Anbieter:
+  - `mutherstudio` (V 8/6 gegen P 11/7): schwankt schon zwischen den beiden P-Läufen, Vorstand vollständig wiedergefunden.
+  - `geburtshaus-nuernberger-nest` (V 6/6 gegen P 8/8): Zwei Kurse 2027 aus dem zweiten Teil der hebamio-Liste (`bauersachs.hebamio.de/kursliste`, 32 000 Zeichen, zwei Teile) fehlen in beiden V-Läufen, in U und P sind sie da. Ursache nicht geklärt, Vermutung: die Teilzeile „Die Eingabe dieses Anbieters ist auf N Aufrufe verteilt … die übrigen kommen aus den anderen Teilen“ zusammen mit der Seitenliste (E3, Teilzeile). Damit ist die vierte Bedingung von Ziel 2 hier **nicht** erfüllt. Abnahme in S1: Die Seite wird ein Eval-Fall (`pnpm eval freeze geburtshaus-nuernberger-nest --kind html`), und das Eval je Einheit findet beide Kurse in 2 von 2 Läufen. Sonst folgt vor dem Merge ein Nachtrag.
+- **Kontext zwischen Seiten:** U verlor bei `studio-herzschlag` 12 von 43 Angeboten. Die Übersichtsseite markiert Kurse externer Kursleitungen mit „*“; ohne die übrigen Seiten im Auszug ließ das Modell sie weg. V behebt das (E3, Nachtrag 1).
+- **Streuung:** Zwei Läufe derselben Variante unterscheiden sich stärker als die Varianten, etwa `theater-mummpitz` 13 gegen 2 Angebote in P oder 96 gegen 87 % gehaltene IDs zwischen P1 und P2. Der Einbruchschutz (E5) und der Wächter bleiben deshalb wichtig.
+
+**2. IDs** (Ziel 6), volle Umstellung = U über alle 77 Anbieter mit Eingabe, 458 künftige Angebote im Vorstand, davon 347–350 als derselbe Kurs wiedergefunden:
+
+| Zuordnung | gehalten | echt verloren | falsche Übernahmen |
+|---|---|---|---|
+| heute | 96,6 / 96,8 % | 12 / 11 | 0 |
+| + gemeinsamer Zeitraum | +0 / +1 ID | | 0 (7 Zuordnungen geprüft) |
+| + Formatwechsel | +2 / +1 ID | | 0 (2 Zuordnungen geprüft) |
+| + E12 + Formatwechsel | 97,4 / 97,4 % | 9 / 9 | 0 |
+
+- „Gehalten“ zählt auch den Fall, dass zwei Fassungen eines Kurses im Vorstand (Zwillinge) zu einem Angebot zusammenfallen und dieses die ID eines der beiden trägt.
+- Alle Übernahmen außerhalb des Kriteriums „derselbe Kurs“ (2 bzw. 5) sind von Hand geprüft: dieselbe Gruppe zur selben Zeit unter anderem Titel („Miniclub Freitag 9:00 Uhr (0–3 Jahre)“ → „Miniclub freitags vormittags“).
+- Echt verloren bleiben vor allem `einmalig` → `regelmaessig` (`neues-museum-baby-museum`, bewusst ausgeschlossen) und ein anderer Jahrgang unter ähnlichem Titel (BRK-PEKiP, zu Recht neu).
+- Ergebnis: Ziel 6 ist schon mit der heutigen Zuordnung erfüllt. Eingebaut wird der Formatwechsel; der gemeinsame Zeitraum entfällt (E11).
+- Gemessen ist die volle Umstellung mit U. Gewählt ist V; V lief nur über die 42 Anbieter mit mehreren Einheiten (bei einer Einheit sind U und V bis auf die Liste der übrigen Seiten gleich). Dort hält V + E12 + Formatwechsel 97,0 bzw. 95,4 % der IDs, U + E12 + Formatwechsel 96,5 bzw. 96,5 %; beides ohne falsche Übernahme (V: 0 bzw. 1 Übernahme außerhalb des Kriteriums, dieselbe Gruppe).
+
+**3. Laufzeit der vollen Umstellung** (U über alle Anbieter, zwei Läufe gleich): 237 Aufrufe, 4,1 Mio. Tokens Eingabe samt Cache und 0,42 Mio. Ausgabe, 71 Minuten Modellzeit; mit 3 Anbietern parallel und den Einheiten eines Anbieters nacheinander (E5) etwa 24 Minuten. Längster Anbieter `fbs-nuernberg` mit 12,7 Minuten, längster Aufruf 6,2 Minuten. Grenzen daraus in E7. Je Anbieter (P) wären es 97 Aufrufe und 15 Minuten.
+
+**Weitere Befunde aus S0:**
+- **Einheit `kandidaten`** scheiterte im Build-Probelauf am gekürzten Auszug (E3, Nachtrag 1).
+- **Zeichensatz:** Die Kalender-API von `nuernberg.de` (`sternenhaus-kuf`) meldet `charset=ISO-8859-1`, liefert aber UTF-8; `charsetOf` in `scripts/pipeline/io/http.ts` folgt dem Header, der Text enthält „ErzÃ¤hlt“. Behoben als Kleinänderung `72c42d6` (2026-10-26).
+
+### Restpunkte (kommen bei S5 nach `docs/ideas.md`)
+
+- **Erfundene Folgetermine** (Fallen `nuebad-flipper`, `sv-johannis-07`): Der Prompt verbietet geratene Werte, Opus schreibt Kurse trotzdem fort, wenn nur der erste Termin oder nur Wochentag und Uhrzeit bekannt sind. Eine Prompt-Änderung braucht eigene Eval-Läufe (Skill, Abschnitt 5); nach der Umstellung messen, ob es live vorkommt.
+
+### Nachtrag 1 (2026-10-26, nach S0)
+
+Ändert E3 (Auszug mit allen Seiten, Probelauf gegen den vollen Eintrag), E6 und neu E12 (Abgleich zwischen Einheiten), E11 (nur Formatwechsel), E7 (Grenzen) und die Voraussetzung „Modell“ (Opus, Fallback Opus). Neu ist N3. ADR 0033 hat dazu einen eigenen „Nachtrag 1“ (Punkte 2 und 8, Abgrenzung zu ADR 0031, Punkt 1). Review 3 unten.
 
 ## Review (2026-10-26) – Verdict: Überarbeiten
 
@@ -543,3 +639,28 @@ Zweiter, unabhängiger Review samt ADR 0033. Kein Blocker. Die Befunde sind am C
 - **Abgelehnt:** S3 (User-Agent, robots.txt) in einen eigenen Plan auszulagern. Grund: Das Gesamt-Review vom 2026-10-25 hat gerade die Aufteilung in viele Pläne als Problem benannt. S3 ist ein abgegrenzter Schritt am Ende dieses Plans, mit eigenem Schalter und eigener Messung; ein eigener Plan brächte nur weitere Querverweise.
 
 Kein Blocker offen; der Plan ist nach dem Skill fertig für die Umsetzung, sobald die Voraussetzungen erfüllt sind.
+
+## Review 3 (2026-10-26) – Verdict: Freigabe mit Änderungen
+
+Unabhängiger Review von „Umsetzung“ und „Nachtrag 1“. Kein Blocker. Alle Befunde am Code nachgeprüft und übernommen:
+
+**Major**
+1. **Fallback Opus schaltete den zweiten Versuch ab** (`strongRetry` in `cli.ts` nur bei verschiedenem Modell): Der zweite Versuch nach einem Einbruch läuft künftig auch mit gleichem Modell, mit Test (E5, Voraussetzung „Modell“).
+2. **E3 und E12 widersprachen ADR 0033 (Punkte 2, 8) und ADR 0031, Punkt 1:** ADR 0033 hat einen „Nachtrag 1“; E12 ist dort auf verschiedene Einheiten desselben Anbieters begrenzt und gegen ADR 0031 abgegrenzt.
+3. **Jede neue Seite extrahiert den Anbieter neu:** bewusst hingenommen, in E3 und in Plan 0049 („Risiken“) mit Messung der ID-Verluste je Anhang und Ausweg (nur Hosts).
+4. **Regel von E12 nicht nachbaubar:** Ablauf (gierig in Einheitenreihenfolge), Formel `passung` und Fenster (nur künftige Termine, auch bei Kursen) stehen wörtlich in E12; Test für den 1:n-Fall `theater-mummpitz`.
+5. **Ziel 2 als erfüllt markiert trotz `geburtshaus-nuernberger-nest`:** jetzt „bis auf einen Anbieter“; Teilzeile auf „diese Seite“ (E3); Abnahme im Eval je Einheit, 2 von 2 Läufen, sonst Nachtrag vor dem Merge.
+
+**Minor**, übernommen:
+- Auszug ohne `info` und `blocked`; eigenes Feld `excerpt` in `ExtractInput`.
+- Tests für `kandidaten` (Probelauf mit vollem Eintrag, Auszug ohne `hint`).
+- Eval: `matchUnits` ohne Vorstand, dann `mergeParts` (E6, Tests).
+- E12 ohne `kandidaten`; Einheiten im Fehler verlieren immer.
+- Zahl der E12-Entscheidungen (31–43 je Lauf) und Umfang der Prüfung von Hand genannt.
+- Ziel 6 für V nachgerechnet (97,0 / 95,4 % auf den Anbietern mit mehreren Einheiten).
+- E7: Rechenweg für einen größeren Katalog; Umstellung vor 01:30 UTC.
+- Zeichensatz vor N3: behoben in `72c42d6`; `sternenhaus-kuf` wird vor N3 auf heilem Text neu gemessen.
+- N3: Zahlen erklärt (54 Events, 97 Angebote; 2 von 100 Terminen mit Alter).
+- „Doku auf `main`“ als erledigt markiert.
+
+Kein Blocker offen. S1 kann beginnen, sobald N3 entschieden ist (oder `sternenhaus-kuf` bei der Umstellung zunächst im alten Format bleibt).

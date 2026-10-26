@@ -1,6 +1,6 @@
 # ADR 0033 – Crawling-Architektur: die Programmseite als Einheit
 
-Status: angenommen (2026-10-26), Nutzerentscheid nach dem Gesamt-Review der Pläne 0045–0047 („Beginne mit dem Neuschnitt“). Umsetzung: Punkte 1, 2, 3, 5, 7 und 8 mit Plan 0048 (`docs/plans/0048-nachtlauf-seite-als-einheit.md`), Punkt 4 mit Plan 0049 (`docs/plans/0049-seitenfinder.md`: Modul und Pflege bekannter Anbieter) und Plan 0050 (Einsatz im Entdecken), Punkt 6 mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`). Ein Punkt gilt, sobald sein Plan live ist; bis dahin gilt ADR 0026. **Ändert** ADR 0026, Punkte 1–5 (Abschnitt „Änderungen an ADR 0026“). Baut auf ADR 0022 und ADR 0031 (stabile IDs) und ADR 0025 (Katalog) auf. Ersetzt die Reservierungen ADR 0033, 0034 und 0036 der Pläne 0045 bis 0047; die Nummer 0034 bleibt frei, 0035 bleibt für Plan 0044 reserviert.
+Status: angenommen (2026-10-26), Nachtrag 1 am selben Tag nach der Messung in Plan 0048, S0 (Abschnitt „Nachtrag 1“). Nutzerentscheid nach dem Gesamt-Review der Pläne 0045–0047 („Beginne mit dem Neuschnitt“). Umsetzung: Punkte 1, 2, 3, 5, 7 und 8 mit Plan 0048 (`docs/plans/0048-nachtlauf-seite-als-einheit.md`), Punkt 4 mit Plan 0049 (`docs/plans/0049-seitenfinder.md`: Modul und Pflege bekannter Anbieter) und Plan 0050 (Einsatz im Entdecken), Punkt 6 mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`). Ein Punkt gilt, sobald sein Plan live ist; bis dahin gilt ADR 0026. **Ändert** ADR 0026, Punkte 1–5 (Abschnitt „Änderungen an ADR 0026“). Baut auf ADR 0022 und ADR 0031 (stabile IDs) und ADR 0025 (Katalog) auf. Ersetzt die Reservierungen ADR 0033, 0034 und 0036 der Pläne 0045 bis 0047; die Nummer 0034 bleibt frei, 0035 bleibt für Plan 0044 reserviert.
 
 ## Kontext
 
@@ -52,10 +52,10 @@ Eine **Einheit** ist:
 - dazu die Seiten mit `use: verfuegbarkeit` desselben Anbieters als **optionale** Beilage. Sie stehen in jeder Einheit des Anbieters, im Text und im Schlüssel. Fällt eine Beilage aus, extrahieren die Einheiten ohne sie, und der Wächter meldet die Beilage.
 - Die Kandidaten der Sammelkalender eines Anbieters bilden eine eigene Einheit.
 
-Jede Einheit hat eigenen Cache-Schlüssel, eigene Nachricht ans Modell mit dem Katalogauszug nur ihrer Seiten, eigene Events, eigenen Status, eigene Prüfzeit (`checkedAt`), eigene Fehlerserie und eigenen Einbruchschutz. Große Einheiten werden weiter in Teile zerlegt.
+Jede Einheit hat eigenen Cache-Schlüssel, eigene Nachricht ans Modell mit einem Katalogauszug, der alle Seiten nennt, aber nur die Hinweise ihrer eigenen (Nachtrag 1), eigene Events, eigenen Status, eigene Prüfzeit (`checkedAt`), eigene Fehlerserie und eigenen Einbruchschutz. Große Einheiten werden weiter in Teile zerlegt.
 
 Die Angebote eines Anbieters sind die Vereinigung seiner Einheiten:
-- Vor dem Build vereinigt `mergeParts` die Events aller Einheiten eines Anbieters in Katalogreihenfolge, wie heute die Teile einer großen Eingabe. Jedes übrige Event bleibt bei seiner Einheit und deren Prüfzeit.
+- Vor dem Build gleicht ein Abgleich zwischen Einheiten Zwillinge mit verschiedenem Format, Alter oder Terminart ab (Nachtrag 1); dann vereinigt `mergeParts` die Events aller Einheiten eines Anbieters in Katalogreihenfolge, wie heute die Teile einer großen Eingabe. Jedes übrige Event bleibt bei seiner Einheit und deren Prüfzeit.
 - Danach greifen die Dublettenregeln des Builds wie heute (`dropSameSourceDuplicates`, Rangfolge der Quellen).
 
 Fällt eine Seite aus, behält nur ihre Einheit den alten Stand. Die übrigen Einheiten laufen in derselben Nacht weiter. Damit gilt „Ein Fehler kostet höchstens Aktualität, nie Bestand“ je Seite, und der Status `teilweise`, ein Marker im Schlüssel und eine eigene Übernahme im Build entfallen. Ein Event gehört durch die Einheit zu seiner Seite; `sourceUrl` muss das nicht leisten.
@@ -118,9 +118,9 @@ Extraktion und Bewerten nutzen das Modell mit der besten Qualität im Eval (Reca
 
 ### 8. IDs über eine Neuextraktion halten
 
-Eine Neuextraktion ändert bei denselben Kursen oft drei Dinge: wie weit die Terminreihe reicht, das Format (`kurs`/`regelmaessig`) und die Titel. Die Probe vom 2026-10-26 (Konsequenz „IDs“) zeigt das. Die Zuordnung (ADR 0022, Punkt 3) wird deshalb an zwei Stellen erweitert, umgesetzt mit Plan 0048, E11:
+Eine Neuextraktion ändert bei denselben Kursen oft drei Dinge: wie weit die Terminreihe reicht, das Format (`kurs`/`regelmaessig`) und die Titel. Die Probe vom 2026-10-26 (Konsequenz „IDs“) zeigt das. Die Zuordnung (ADR 0022, Punkt 3) sollte deshalb an zwei Stellen erweitert werden, umgesetzt mit Plan 0048, E11. Nach der Messung (Nachtrag 1) kommt nur der Formatwechsel:
 
-- **Gemeinsamer Zeitraum in Stufe 1:** Bei Paaren mit ähnlichem Titel (`similarTitle`) zählt Stufe 1 die gleichen Beginnzeiten auch nur im gemeinsamen Zeitraum beider Fassungen, also vom späteren ersten bis zum früheren letzten künftigen Termin, mit mindestens 4 Terminen auf jeder Seite. Ohne ähnlichen Titel bleibt Stufe 1 wie bisher; ein fremder Kurs am selben Ort und Termin erbt so keine ID.
+- **Gemeinsamer Zeitraum in Stufe 1 (gestrichen, Nachtrag 1):** Bei Paaren mit ähnlichem Titel (`similarTitle`) zählt Stufe 1 die gleichen Beginnzeiten auch nur im gemeinsamen Zeitraum beider Fassungen, also vom späteren ersten bis zum früheren letzten künftigen Termin, mit mindestens 4 Terminen auf jeder Seite. Ohne ähnlichen Titel bleibt Stufe 1 wie bisher; ein fremder Kurs am selben Ort und Termin erbt so keine ID.
 - **Formatwechsel** `kurs` ↔ `regelmaessig` in Stufe 2: erlaubt bei gleichem ersten künftigen Beginn auf die Minute, ohne widersprechende Kennungen (`conflictingLabels`) und als einziger Kandidat.
 - **Eingebaut wird nur, was die Messung trägt:** Plan 0048, S0 spielt die Neuextraktion nach. Eine Erweiterung kommt nur, wenn sie dort IDs hält und keine falsche Übernahme erzeugt.
 
@@ -179,3 +179,11 @@ Unverändert bleiben:
   5. Plan 0050.
   6. Für Düsseldorf live zusätzlich Plan 0044 (Größenbudgets).
 - `docs/architecture.md`, `CLAUDE.md` („Daten“) und der Skill `babyevents-nuernberg` werden mit den Plänen nachgezogen. ADR 0026 bekommt in der Statuszeile „Geändert durch ADR 0033“, sobald Plan 0048 live ist.
+
+## Nachtrag 1 (2026-10-26, nach Plan 0048, S0)
+
+Die Messung in Plan 0048, S0 (Opus, je zwei Läufe, Einheit gegen Anbieter) ändert drei Punkte:
+
+- **Punkt 2, Auszug:** Mit nur den eigenen Seiten im Auszug verlor `studio-herzschlag` 12 von 43 Angeboten, weil das Modell nicht sah, dass der Katalog die Seiten externer Kursleitungen diesem Anbieter zuordnet. Der Auszug nennt deshalb alle Seiten des Anbieters (ohne `info` und `blocked`), die Hinweise aber nur der eigenen. Folge: Eine neue oder gestrichene Seite extrahiert den ganzen Anbieter neu; das wird hingenommen (Plan 0049, „Risiken“).
+- **Punkt 2, Dubletten:** Je Einheit entstanden 19–26 % Dubletten statt 12–14 %, weil zwei Seiten dasselbe Angebot verschieden fassen (`kurs` und `regelmaessig`, `einmalig` und `regelmaessig`). Ein **Abgleich zwischen Einheiten** (Plan 0048, E12) legt sie vor `mergeParts` zusammen: gleicher Ort und Kerntitel, verträgliches Alter, mindestens 80 % der Termine des kleineren im größeren; es bleibt die Fassung, die besser zum Vorstand passt. Das ist eine zweite Regel neben dem einen Prädikat aus ADR 0031, Punkt 1, und bewusst auf Events **verschiedener Einheiten desselben Anbieters** beschränkt: Dort ist dieselbe Quelle sicher, und die Messung zeigte keine falsche Zusammenführung in der geprüften Stichprobe. Für Dubletten innerhalb einer Einheit und zwischen Quellen gilt ADR 0031 unverändert.
+- **Punkt 8:** Der gemeinsame Zeitraum hielt +0 bzw. +1 IDs und entfällt; der Formatwechsel hielt +2 bzw. +1 IDs ohne falsche Übernahme und kommt. Ziel 6 (≥ 95 %) erreichte schon die heutige Zuordnung (96,6–96,8 %).

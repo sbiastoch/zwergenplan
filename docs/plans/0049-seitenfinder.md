@@ -342,6 +342,7 @@ Nach Nutzervorgabe kein Kriterium. Ein Pflegelauf ruft je Anbieter höchstens 20
   - Revert und `abgelehnt`.
 - **Zweite Fassung einer vorhandenen Seite.** Abhilfe: das lockere Kriterium `covered`; Vergleich auch gegen vorübergehend ausgefallene Einheiten und `kandidaten`; simulierter Nachtlauf mit `mergeParts`.
 - **Termine am falschen Ort.** Abhilfe: Ortsprüfung (`fremder-ort`); Anbieter mit Orts-`hint` nur berichten.
+- **Ein Anhang extrahiert den ganzen Anbieter neu** (Plan 0048, E3 nach Nachtrag 1: Der Auszug jeder Einheit nennt alle Seiten des Anbieters). Jede Neuextraktion kann IDs kosten (Plan 0048, S0: 87–96 % gehalten zwischen zwei Läufen desselben Modells). Abhilfe: Der Bericht des Pflegelaufs zählt je Anhang die IDs des Anbieters, die in der Nacht danach wegfallen; sind es mehr als 5 %, folgt ein Nachtrag zu Plan 0048 (Auszug nur mit den Hosts der übrigen Seiten).
 - **Ersatz kommt zu spät.** Abhilfe: Ruhezeit hängt an `stand`, Gruppe 1 der Reihenfolge, Durchlauf-Test.
 - **Veraltete Seite bleibt neben der neuen.** Abhilfe: Der Wächter meldet die alte; nach 14 Tagen `dauerhaft` entfallen ihre Events (Plan 0048, E5).
 - **Last auf fremden Websites.** Abhilfe: 20 Abrufe je Anbieter, 1/s je Host über den Lauf, robots.txt, wöchentlich, Ruhezeiten.
