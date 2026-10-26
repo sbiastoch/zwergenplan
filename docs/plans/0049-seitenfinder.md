@@ -76,7 +76,7 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
 
 - **Auswahl, rein** in `scripts/pipeline/lib/site-crawl.ts` (neu).
 - **Startseiten im Pflegelauf:**
-  - die `url` des Eintrags;
+  - die `url` des Eintrags und die Wurzel seiner Website, denn `url` ist oft eine Unterseite, und nach einem Relaunch scheitern womöglich alle bekannten Seiten;
   - seine Programmseiten ohne `blocked`, ohne Platzhalter `{von}`/`{bis}` und ohne `request`.
 
   Seiten mit `blocked` werden nicht abgerufen, legen aber den Bereich fest: Ihre Website gilt als eigene Website. Startseiten zählen zu den 20 Abrufen.
@@ -88,10 +88,10 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
 - **Auf einer geteilten Website** erkundet die Suche nur unterhalb des Pfads einer Startseite, und alle Query-Parameter der Startseite müssen gleich sein (Mandant: `venueId`, `w`, `vid` usw.).
 - **Von der eigenen Website** verlinkte oder per `iframe[src]` eingebettete Seiten auf einer Plattform werden abgerufen (ein Sprung), aber nicht weiter erkundet. `iframe[src]` liest `site-crawl.ts` selbst; `extractPage` bleibt unverändert, weil `follow` und das Entdecken seine Links nutzen.
 - **Nie Kandidat:**
-  - Hosts von Sammelkalendern mit Adapter (`evangelische-termine.de`, `frankenkids.de`, Stadt-Veranstaltungskalender), denn deren Termine kommen über den Adapter;
+  - Seiten der Sammelkalender mit Adapter, denn deren Termine kommen über den Adapter. Das sind die Hosts `evangelische-termine.de`, `frankenkids.de` und `vk.nuernberg.de` sowie die URL-Präfixe der Programmseiten der Katalog-Einträge mit `role: aggregator` (etwa die Seiten des städtischen Veranstaltungskalenders unter `nuernberg.de/internet/…`, `ajax_vk.pl`). **Nicht** der ganze Host `nuernberg.de`: Dort haben viele Anbieter eigene Seiten (Dachseite, siehe oben);
   - URLs, die auf ein `follow.match` des Anbieters enden;
-  - Seiten, die der Katalog schon nennt (normalisierte URL, auch nach Weiterleitung);
-  - eine `.ics` mit einem einzelnen Termin. Der Feed selbst ist Kandidat.
+  - Seiten, die der Katalog schon nennt (kanonische URL, E2);
+  - eine `.ics` mit einem einzelnen Termin, erkannt schon vor dem Abruf am URL-Muster (Termin-ID im Pfad oder in der Query). Der Feed selbst ist Kandidat.
 - **Reihenfolge** nach Wörtern in Linktext und Pfad: Kurs, Termin, Programm, Stundenplan, Kalender, Veranstaltung, Baby, Eltern-Kind, Krabbel, Familie, Anmeldung. Bei Gleichstand entscheidet die Tiefe, dann die URL alphabetisch. Nie besucht werden Impressum, Datenschutz, AGB, Warenkorb, Login, Shop, Presse, Jobs und Bilddateien.
 - **Signale** (`pageSignals(page, today)`, rein, auf `extractPage`). Eine Seite ist Kandidat bei einem dieser Signale **und** `isRelevant`:
   - `feeds` mit iCal;
@@ -100,14 +100,23 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
   - oder mindestens 2 Angaben „Wochentag plus Uhrzeit“.
 
   Ein Datum ohne Jahr gilt als das nächste Vorkommen ab `today` (Europe/Berlin). Liegt es mehr als 10 Monate voraus, gilt es als vergangen; Archivseiten zählen so nicht. Ein PDF ist Kandidat, wenn sein Text die Bedingung erfüllt.
-- **Art des Kandidaten** aus dem Content-Type: `text/calendar` → `ical`, PDF → `pdf`, JSON → `json-api`, sonst `html`. Bei `jsRendered` einmal im Browser abrufen; dann gilt `render: browser`.
+- **Art des Kandidaten** aus dem Content-Type: `text/calendar` → `ical`, PDF → `pdf`, sonst `html`. JSON-Antworten sind keine Kandidaten, denn ohne `request` taugen sie kaum.
+- **Browser:**
+  - einmal bei `jsRendered`;
+  - einmal bei HTTP 403 oder Bot-Schutz, wenn der Host in `SHARED_HOSTS` steht oder der Katalog für diesen Host schon `render: browser` nutzt. Eingebettete Buchungs-Widgets (eversports) antworten Skripten sonst mit 403.
+
+  Dann gilt `render: browser` für den Kandidaten. Jeder Browser-Abruf zählt zu den 20.
 - Höchstens 5 Kandidaten je Anbieter gehen in den Ertragsbeweis, nach der Zahl künftiger Termine geordnet, bei Gleichstand nach URL.
-- **Modus `alle`** (Schnittstelle hier, gebaut mit Plan 0050, S3): dieselbe Erkundung ab einer freien Startliste (Fund-URL, Startseite). Zurück kommen **alle** abgerufenen Seiten mit Text, dazu höchstens zwei Kontakt-, Anfahrts- oder Impressumsseiten nach `CONTACT_PATTERNS`, weil sie die Kursorte nennen.
-- **Abruf** in `scripts/pipeline/io/site-crawl.ts` (neu) über den gemeinsamen Abruf aus Plan 0048, S3 (User-Agent, robots.txt, Fehlerklasse). Eine Warteschlange je Host über den ganzen Lauf sorgt für höchstens einen Abruf je Sekunde. PDFs gehen über `pdftotext`.
+- **Modus `alle`** (hier nur beschrieben, gebaut und exportiert mit Plan 0050, S3, damit knip keinen ungenutzten Export meldet): dieselbe Erkundung ab einer freien Startliste (Fund-URL, Startseite). Zurück kommen **alle** abgerufenen Seiten mit Text, dazu höchstens zwei Kontakt-, Anfahrts- oder Impressumsseiten nach `CONTACT_PATTERNS`, weil sie die Kursorte nennen. Für diese Seiten gilt die Ausschlussliste nicht.
+- **URL-Hilfen:** `sameSite`, `normalizeUrl` und `hostOf` ziehen aus `scripts/pipeline/lib/discover.ts` in ein neues `scripts/pipeline/lib/url.ts`. So entsteht kein Zyklus, wenn Plan 0050 `site-crawl.ts` aus dem Entdecken nutzt.
+- **Abruf** in `scripts/pipeline/io/site-crawl.ts` (neu) über den gemeinsamen Abruf aus Plan 0048, S3 (User-Agent, robots.txt, Fehlerklasse). Eine Warteschlange je Host über den ganzen Lauf sorgt für höchstens einen Abruf je Sekunde, auch für die Abrufe des Ertragsbeweises. PDFs gehen über `pdftotext`.
 
 ### E2 – Ertragsbeweis, Abdeckung und Ort
 
-- Der Kandidat wird ein Katalog-Programmeintrag `{url, kind, render?, use: termine}` und damit **eine Einheit** nach Plan 0048, E1, mit den Venues des Anbieters und seinen Beilagen. Extrahiert wird mit demselben Extraktor wie im Nachtlauf, ohne Schreiben nach `data/raw`. Der Zustand landet nur im Laufverzeichnis, unter `runs/<datum>/pflege/beweis/<id>/`.
+- Der Kandidat wird ein Katalog-Programmeintrag `{url, kind, render?, use: termine}` und damit **eine Einheit** nach Plan 0048, E1, mit den Venues des Anbieters und seinen Beilagen.
+  - **Kanonische URL:** Ziel nach Weiterleitungen, ohne Fragment und ohne Sitzungsparameter (`sid`, `PHPSESSID`, `utm_*`). Sie gilt für die Kennung im Beweis und für den Anhang im Katalog, sonst passte `seite:<URL>` nicht zum Katalog.
+  - Extrahiert wird mit demselben Extraktor wie im Nachtlauf. `refreshProvider` bekommt dafür eine Sicht auf den Anbieter, die **nur** den Kandidaten und die Beilagen als Programmseiten enthält; die übrigen Seiten werden im Beweis nicht neu abgerufen (Ziel 4).
+  - Nichts wird nach `data/raw` geschrieben. Der Zustand landet nur im Laufverzeichnis, unter `runs/<datum>/pflege/beweis/<id>/`.
 - **Vergleichsstand:** die Events aller Einheiten des **wirksamen Katalogs** (`data/providers.yaml` bzw. `--katalog`) aus `data/raw`, **einschließlich `kandidaten`**. Ausgenommen sind nur Einheiten mit `klasse: dauerhaft`.
   - Die Ersatzseite einer fehlenden Seite gilt so nicht als abgedeckt (Ziel 3).
   - Eine Seite, die nur vorübergehend scheitert, bleibt im Vergleich.
@@ -119,10 +128,16 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
   - gleicher Wochentag und gleiche Uhrzeit.
 
   **Neu** ist ein Angebot, das nicht abgedeckt ist, einen künftigen Termin hat und `age.minMonths` ≤ 36 erfüllt. Teaser mit dem nächsten Termin, Druckansichten mit umformulierten Titeln und Detailseiten eines Kurses der Übersicht sind damit abgedeckt.
-- **Ort geprüft:** Der Seitentext muss den Namen oder die Straße eines Orts des Anbieters enthalten. Auf einer geteilten Website (E1) muss zusätzlich der Name des Anbieters vorkommen. Sonst lautet das Ergebnis `fremder-ort`: Das Modell setzte den Hauptort, und die Termine lägen sichtbar falsch.
+- **Fremder Anbieter:** `covered` prüft zusätzlich die Angebote **anderer** Katalog-Anbieter mit einem Ort in höchstens 100 m Entfernung. Ein Beispiel: Die FamilienBox beherbergt Kurse der Hebamme Anne Schulz, die als `hebanne-schulz` erfasst ist. Ist ein neues Angebot dort abgedeckt, lautet das Ergebnis `fremder-anbieter`, und es steht nur im Bericht. Sonst stünde dasselbe Angebot unter zwei Anbietern.
+- **Ort geprüft:** Der **ganze** Text der Seite muss den Namen oder die Straße eines Orts des Anbieters enthalten. Gemeint ist der Text des `body` samt `header`, `footer` und `nav`, denn `extractPage` entfernt diese Teile, und die Adresse steht meist im Footer.
+  - Vor dem Vergleich normalisiert der Code „Str.“/„Straße“, Leerzeichen und Groß-/Kleinschreibung; eine PLZ des Orts zählt zusätzlich.
+  - Auf einer geteilten Website (E1) muss außerdem der Name des Anbieters vorkommen.
+  - Sonst lautet das Ergebnis `fremder-ort`: Das Modell setzte den Hauptort, und die Termine lägen sichtbar falsch.
+  - S0 misst die Prüfung ohne Modell an allen heutigen `termine`-Seiten: Mindestens 95 % müssen sie bestehen, sonst folgt ein Nachtrag.
 - **Ergebnis:**
   - `anhaengen`, wenn es mindestens ein neues Angebot gibt, der Ort geprüft ist und `isRelevant` greift;
   - `deckungsgleich`, wenn alle Angebote abgedeckt sind;
+  - `fremder-anbieter`;
   - `fremder-ort`;
   - `ohne-ertrag`, wenn es kein gültiges Angebot gibt;
   - `abgeschnitten`, mit dem Hinweis „`partChars` prüfen“;
@@ -133,12 +148,12 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
 
 - `appendProgramme(text, id, pages)` in `scripts/pipeline/lib/catalog-yaml.ts` hängt Einträge an das `programme` des Eintrags an und erhält Kommentare und Formatierung.
 - **G2:** `catalogDiff(before, after, { allowProgrammeAppend })`. Ohne die Option gilt G2 wie heute; das Entdecken und `dryRunCatalogIssues` rufen sie so auf. Nur der Pflegelauf setzt sie. Dann darf sich ein bestehender Eintrag mit `role: anbieter` ohne `coveredBy` und ohne `skipCrawl` nur so ändern, dass am **Ende** von `programme` neue Einträge stehen. Diese haben **genau** die Schlüssel `url`, `kind`, `use: termine` und optional `render`. `catalogDiff` liefert dazu `appended: {id, urls}[]`, und der Lauf prüft, dass das genau seine Anhänge sind.
-- **G1:** `pnpm data:validate` je Commit. **G3:** höchstens 3 Seiten je Anbieter und 20 je Lauf. **G4:** ein Commit je Anbieter, Betreff `data: Programmseite für <id> (<n>)`, im Text je Seite URL, Art und neue Angebote mit erstem Termin.
+- **G1:** wie beim Entdecken über `discoverGates()` (`data:validate` und `check:fast`), je Commit. **G3:** höchstens 3 Seiten je Anbieter und 20 je Lauf. **G4:** ein Commit je Anbieter, Betreff `data: Programmseite für <id> (<n>)`. Im Text je Seite URL, Art und neue Angebote mit erstem Termin; ersetzt sie eine Seite mit `dauerhaft`, zusätzlich „Ersatz für <URL>“ und deren `hint`, damit ein Mensch ihn übernehmen kann.
 - **Kein Schreiben nach `data/raw`:** Die nächste Nacht extrahiert die neue Einheit (Plan 0048, E5, „neue Einheit“). Der Commit enthält nur `data/providers.yaml`.
-- **Budget vor der Übergabe:** neuer Befehl `pnpm pipeline katalog-budget --lauf <laufverzeichnis>` mit austauschbarem Runner. Ablauf:
-  1. Den Stand vor dem Lauf messen (`GITHUB_SHA`). Ist er schon rot, wird nichts angehängt; der Bericht sagt „Budget vor dem Lauf rot“.
-  2. `data/raw` in ein temporäres Verzeichnis kopieren und dort die Einheiten aus den Ertragsbeweisen der angehängten Seiten ergänzen (aus `runs/<datum>/pflege/beweis/`). So enthält der Build die Angebote, die die nächste Nacht bringt.
-  3. `pnpm pipeline nightly --build-only` auf diesem Verzeichnis, dann `pnpm build` und `pnpm size`.
+- **Budget vor der Übergabe:** neuer Befehl `pnpm pipeline katalog-budget --lauf <laufverzeichnis>` (`scripts/pipeline/io/katalog-budget.ts`) mit austauschbarem Runner. Build und Größenprüfung lesen fest `data/` (`runBuildOnly`, `pnpm build`). Deshalb misst der Befehl in eigenen Worktrees und lässt `data/` des Arbeitsbaums unberührt:
+  1. **Stand vor dem Lauf:** `git worktree add` auf `GITHUB_SHA`, `node_modules` verlinkt, dann `pnpm data:build`, `vite build` und `pnpm size`. Die Kachelbilder entfallen, sie zählen in keinem Budget. Ist das schon rot, wird nichts angehängt; der Bericht sagt „Budget vor dem Lauf rot“.
+  2. **Stand mit den Anhängen:** ein Worktree auf HEAD des Laufs. Dort wird `data/raw` um die Einheiten aus den Ertragsbeweisen der angehängten Seiten ergänzt (aus `runs/<datum>/pflege/beweis/`), sodass der Build die Angebote der nächsten Nacht enthält.
+  3. Dann `pnpm pipeline nightly --build-only`, `pnpm data:build`, `vite build` und `pnpm size`. Ein Build-Fehler ohne Größenbezug (etwa ein Transit-Gate) ist `fehler`, nicht `budget`.
   4. Ist das rot, **verwirft** der Lauf die Anhang-Commits: Er setzt den Branch auf den Stand vor dem Lauf zurück und legt nur den Zustands-Commit neu an. Revert-Commits verdoppelten die Zahl der Commits im Bundle (Grenze `MAX_COMMITS: 100` in `discover.yml`). Die Seiten fehlen im Issue und bekommen das Ergebnis `budget` mit 8 Wochen Ruhe. Der Job endet grün mit Ausgabe `budget=rot`, `ampel` liest sie und wird rot.
 
   Plan 0050 nutzt denselben Befehl.
@@ -146,14 +161,14 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
 ### E4 – Zustand
 
 `DiscoverState` bekommt neue Felder, je mit `.default([])` für bestehende Dateien:
-- **`seiten`:** je geprüfter Kandidaten-URL `{url, anbieter, geprueft, ergebnis, grund?, stand}`. `stand` ist ein Hash über die Kennungen, Status und `klasse` der Einheiten des Anbieters zum Zeitpunkt der Prüfung.
-  - **Ruhezeit:** Ein Kandidat mit `deckungsgleich`, `ohne-ertrag`, `abgeschnitten`, `fremder-ort` oder `budget` kommt frühestens nach 8 Wochen wieder in den Ertragsbeweis, mit `fehler` im nächsten Lauf.
+- **`seiten`:** je geprüfter Kandidaten-URL `{url, anbieter, geprueft, ergebnis, grund?, stand}`. `stand` ist ein Hash über die sortierten Kennungen der Einheiten des Anbieters und die Kennungen mit `klasse: dauerhaft`, denn nur das ändert den Vergleichsstand. Ein schwankender Bot-Schutz hebt die Ruhezeit so nicht jede Woche auf.
+  - **Ruhezeit:** Ein Kandidat mit `deckungsgleich`, `ohne-ertrag`, `abgeschnitten`, `fremder-anbieter`, `fremder-ort` oder `budget` kommt frühestens nach 8 Wochen wieder in den Ertragsbeweis, mit `fehler` im nächsten Lauf.
   - Die Ruhezeit **entfällt**, sobald sich `stand` ändert (etwa wenn eine Seite des Anbieters `dauerhaft` scheitert) oder der Anbieter in Gruppe 1 der Reihenfolge steht (E5). So kommt der Ersatz nach einem Relaunch rechtzeitig (Ziel 3).
-  - Einträge, deren Ruhezeit abgelaufen ist und die der Lauf nicht mehr sieht, entfallen.
+  - Einträge, deren Ruhezeit abgelaufen ist und die der Lauf bei einem gepflegten Anbieter nicht mehr sieht, entfallen.
 - **`gepflegt`:** je Anbieter `{anbieter, datum}` des letzten Pflegelaufs, auch ohne Kandidaten. Danach richtet sich die Reihenfolge (E5); kein Anbieter verhungert.
 
 Dazu:
-- **Ablehnen** wie bei Anbietern (Skill, Abschnitt 2): Revert des Commits, dann in `abgelehnt` ein Eintrag mit `url` der Seite, **`anbieter`** (neues optionales Feld, die Katalog-ID) und Grund. Nicht `id`: Das hieße „Anbieter zurückgenommen“ (`reservedConflicts`). Eine abgelehnte URL wird nie wieder angehängt. Der Skill beschreibt den Ablauf samt `pnpm pipeline nightly --build-only`, wenn der Revert nach einem Nachtlauf kommt.
+- **Ablehnen** wie bei Anbietern (Skill, Abschnitt 2): Revert des Commits, dann in `abgelehnt` ein Eintrag mit `url` der Seite, **`anbieter`** (neues optionales Feld, die Katalog-ID) und Grund. Nicht `id`: Das hieße „Anbieter zurückgenommen“ (`reservedConflicts`). Eine abgelehnte URL wird nie wieder angehängt; `abgelehnt` gilt dafür über die Dateien aller Regionen. Der Skill beschreibt den Ablauf samt `pnpm pipeline nightly --build-only`, wenn der Revert nach einem Nachtlauf kommt.
 - **Ort des Zustands:** Live liegt er in der Datei der Region des Anbieters und wird mit `commitRunState` committet, zusammen mit `data/kosten.csv`. Im Trockenlauf liegt er nur unter `runs/<datum>/pflege/`, nie in `data/discover/`. `--katalog` ignoriert die Ruhezeiten.
 
 ### E5 – Pflegelauf
@@ -172,16 +187,16 @@ Dazu:
   - `PFLEGE_BRAKES` in `scripts/pipeline/lib/cost.ts`, zu Beginn 300 Aufrufe und 30 Mio. Tokens;
   - `RunKind` bekommt den Wert `pflege` (`kosten.jsonl`, `data/kosten.csv`).
 
-  S3 setzt die Grenzen auf das Doppelte des größten gemessenen Laufs (ADR 0033, Punkt 7).
+  S3 setzt die Grenzen auf das Doppelte des größten gemessenen **vollständigen** Laufs, nicht eines abgeschnittenen (ADR 0033, Punkt 7).
 - **Workflow:** `.github/workflows/discover.yml` wird der Workflow für Katalog-Läufe.
   - Ein wöchentlicher Cron je Netz für `pflege`: Mittwoch `vgn`, Donnerstag `vrr`, je 04:30 UTC. Der `vrr`-Cron kommt erst mit Plan 0044.
   - Der Job `modus` gibt zusätzlich `lauf` (`entdecken` oder `pflege`, aus dem Cron bzw. der neuen Eingabe `lauf`) und `timeout` aus.
-  - `timeout-minutes` des Modell-Jobs ist das Zeitbudget des Laufs plus 60 Minuten (Einrichtung, letzter Anbieter, G1-Läufe). Der Budgetschritt hat ein eigenes `timeout-minutes` von 30.
-  - `PFLEGE_MODUS` (`trocken` Standard, `live`) gilt nur für `pflege`; `ENTDECKEN_MODUS` bleibt für `entdecken`.
+  - `timeout-minutes` des Modell-Jobs ist `fromJSON(needs.modus.outputs.timeout)`, das Zeitbudget des Laufs plus 90 Minuten. Das deckt die Einrichtung (Chromium bis 9 Min.), den letzten Anbieter, die G1-Läufe und den Budgetschritt; der hat zusätzlich ein eigenes `timeout-minutes` von 30.
+  - `PFLEGE_MODUS` (`trocken` Standard, `live`) gilt nur für `pflege`; für `entdecken` gilt `ENTDECKEN_MODUS`, das Plan 0050 durch `ENTDECKEN_NETZE` ersetzt.
   - Die Jobstruktur bleibt: Modell nur im Job ohne Schreibrecht, Push nur in `veroeffentlichen`.
   - Ein Test (`scripts/lib/discover-workflow.test.ts`, Muster `scripts/lib/push-schedule.test.ts`) prüft:
     - Cron → `lauf`;
-    - `timeout` = Budget + 60 und das Zeitlimit des Budgetschritts;
+    - `timeout` = Budget + 90 und das Zeitlimit des Budgetschritts;
     - `PFLEGE_MODUS` nur für `pflege`;
     - Rechte je Job;
     - der Budgetschritt vor der Übergabe, `ampel` liest `budget`.
@@ -200,14 +215,16 @@ Dazu:
 
 | Datei | Änderung | Schritt |
 |---|---|---|
-| `scripts/pipeline/lib/site-crawl.ts` (neu) | Auswahl, `isShared`, `SHARED_HOSTS`, `iframe`, Ausschlüsse, `pageSignals` | S1 |
+| `scripts/pipeline/lib/url.ts` (neu) | `sameSite`, `normalizeUrl`, `hostOf` aus `lib/discover.ts`, kanonische URL | S1 |
+| `scripts/pipeline/lib/site-crawl.ts` (neu) | Auswahl, `isShared`, `SHARED_HOSTS`, `iframe`, Ausschlüsse, `pageSignals`, ganzer Seitentext für die Ortsprüfung | S1 |
 | `scripts/pipeline/io/site-crawl.ts` (neu) | Abruf über den gemeinsamen Abruf, Warteschlange je Host, Browser bei `jsRendered` | S1 |
-| `scripts/pipeline/lib/pflege.ts`, `scripts/pipeline/io/pflege.ts` (neu) | Ertragsbeweis, simulierter Nachtlauf, `covered`, Ortsprüfung, Ergebnis, Reihenfolge, Bericht | S1 |
+| `scripts/pipeline/lib/pflege.ts`, `scripts/pipeline/io/pflege.ts` (neu) | Ertragsbeweis mit Sicht nur auf Kandidat und Beilagen, simulierter Nachtlauf, `covered` samt fremdem Anbieter, Ortsprüfung, Ergebnis, Reihenfolge, Bericht | S1 |
+| `scripts/pipeline/io/katalog-budget.ts` (neu) | Messung in eigenen Worktrees, Verwerfen bei Rot | S2 |
 | `scripts/pipeline/lib/discover-state.ts` | `seiten` mit `stand`, `gepflegt`, `abgelehnt.anbieter` | S1 |
 | `scripts/pipeline/lib/cost.ts` | `PFLEGE_BRAKES`, `RunKind` `pflege` | S1, S3 |
 | `scripts/pipeline/lib/catalog-yaml.ts` | `appendProgramme` | S2 |
 | `scripts/pipeline/lib/catalog-diff.ts` | Option `allowProgrammeAppend`, `appended` | S2 |
-| `scripts/pipeline/io/discover-git.ts`, `scripts/pipeline/lib/discover.ts` | Commit je Anbieter, Revert bei Budget, Issue „Pflege“ | S2 |
+| `scripts/pipeline/io/discover-git.ts`, `scripts/pipeline/lib/discover.ts`, `discover-publish` in `scripts/pipeline/cli.ts` | Commit je Anbieter, Verwerfen bei Budget, Issue „Pflege“ | S2 |
 | `scripts/pipeline/cli.ts` | `pflege`, `katalog-budget` | S1, S2 |
 | `.github/workflows/discover.yml`, `scripts/lib/discover-workflow.test.ts` (neu) | Cron, `lauf`, `timeout`, `PFLEGE_MODUS`, Budgetschritt | S2 |
 | `evals/results.md` | Abschnitt „Seitenfinder“ | S1–S3 |
@@ -222,7 +239,10 @@ Dazu:
   - Dachseite aus dem Katalog erkannt (zwei Anbieter auf einem Host);
   - Plattform-Link und `iframe` ein Sprung, nicht weiter;
   - Profil auf geteiltem Host nur unterhalb des Pfads und mit gleichen Query-Parametern;
-  - Sammelkalender-Host, `follow`-URL und Einzeltermin-`.ics` nie Kandidat;
+  - Sammelkalender nie Kandidat (`evangelische-termine.de`, `ajax_vk.pl`, VK-Widgets), eine Anbieterseite auf `nuernberg.de` aber schon;
+  - `follow`-URL und Einzeltermin-`.ics` (am URL-Muster, ohne Abruf) nie Kandidat;
+  - Wurzel der Website als Startseite;
+  - 403 auf einem `SHARED_HOSTS`-Widget → einmal Browser, zählt zu den 20;
   - Vorlage mit `{von}` und `blocked` nie Startseite;
   - Reihenfolge stabil bei Gleichstand;
   - Ausschlüsse.
@@ -248,6 +268,10 @@ Dazu:
   - zweite Fassung einer vorübergehend ausgefallenen Seite → `deckungsgleich`;
   - mit `--katalog` ohne die entfernte Seite → `anhaengen`;
   - Seite ohne Ortsname oder Straße → `fremder-ort`; auf geteilter Website ohne Anbietername → `fremder-ort`;
+  - Adresse nur im Footer → Ortsprüfung besteht; „Tellerringstr.56“ gegen „Tellerringstraße 56“ → besteht;
+  - Angebot eines anderen Anbieters am Ort in ≤ 100 m (wie `hebanne-schulz` bei der FamilienBox) → `fremder-anbieter`;
+  - der Beweis ruft nur Kandidat und Beilagen ab, keine anderen Seiten des Anbieters;
+  - Kennung im Beweis gleich der URL im Anhang (kanonisch, ohne `utm_*`);
   - leer → `ohne-ertrag`;
   - Reihenfolge: `dauerhaft` vor `gepflegt`, nie gepflegt vorn;
   - drei Läufe mit Budget für je zwei von sechs Anbietern → jeder einmal dran;
@@ -273,6 +297,8 @@ Dazu:
   - **Ziel 3 als Durchlauf:** erst `deckungsgleich` (neue Seite schon online), dann 404 der alten Seite seit zwei Tagen → angehängt;
   - Issue-Text mit `@` und Zeilenumbruch aus Webtext → entschärft.
 - `io/katalog-budget.test.ts` (austauschbarer Runner):
+  - `data/` des Arbeitsbaums bleibt unberührt, gemessen wird in eigenen Worktrees;
+  - Build-Fehler ohne Größenbezug → `fehler`, nicht `budget`;
   - eine Fixture, in der erst die Einheiten der angehängten Seite das Budget reißen → Anhang-Commits verworfen, nur der Zustands-Commit bleibt (mit `tempRepo()`), Ergebnis `budget`, Ausgabe `budget=rot`;
   - Stand vor dem Lauf rot → nichts angehängt.
 - `scripts/lib/discover-workflow.test.ts`: wie E5.
@@ -283,13 +309,13 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`; S1 und S2 mit `
 
 - **S0 – Messen (Wegwerf-Skript, ohne Modell).**
   - Erkundung nach E1 über alle Katalog-Anbieter.
-  - Gemessen werden: Kandidaten je Anbieter, die der Katalog nicht nennt; Abrufe und Dauer; von robots.txt gesperrte Seiten; Anbieter mit Orts-`hint`; erkannte Dachseiten.
+  - Gemessen werden: Kandidaten je Anbieter, die der Katalog nicht nennt; Abrufe und Dauer; von robots.txt gesperrte Seiten; Anbieter mit Orts-`hint`; erkannte Dachseiten; **Ortsprüfung an allen heutigen `termine`-Seiten** (Soll ≥ 95 % bestanden, E2).
   - 20 Kandidaten prüft ein Mensch, ob es echte Programmseiten sind.
   - Ergebnis in „Umsetzung“; daraus die Schwellen von `pageSignals`, falls nötig ein Nachtrag.
 - **S1 – Modul und Pflegelauf im Trockenlauf.** E1 ohne Modus `alle`, E2, E4, E5 ohne Commit, E6.
   - Ziel 1 an der Katalogkopie, zwei Läufe.
-  - Ein Trockenlauf für `vgn` lokal; jede Seite der Liste „würde anhängen“ wird von Hand geprüft (Ziel 2).
-- **S2 – Anhängen.** E3 mit `katalog-budget`, Workflow mit `PFLEGE_MODUS=trocken`, ein Trockenlauf für `vgn` in Actions; die Liste „würde anhängen“ wird von Hand geprüft (Ziel 2).
+  - Ein Trockenlauf für `vgn` lokal über die erste Hälfte der Anbieter (`--only`, nach ID sortiert); jede Seite der Liste „würde anhängen“ wird von Hand geprüft (Ziel 2). Der Trockenlauf schreibt `gepflegt` nicht fort, deshalb teilen S1 und S2 die Anbieter.
+- **S2 – Anhängen.** E3 mit `katalog-budget`, Workflow mit `PFLEGE_MODUS=trocken`, ein Trockenlauf für `vgn` in Actions über die zweite Hälfte; die Liste „würde anhängen“ wird von Hand geprüft (Ziel 2).
 - **S3 – Live** nach N1: `gh variable set PFLEGE_MODUS --body live`.
   - Die ersten zwei Live-Läufe prüft ein Mensch Seite für Seite (Ziel 2).
   - Danach Grenzen nach ADR 0033, Punkt 7.
@@ -370,3 +396,34 @@ Zweiter, unabhängiger Review. Die Angaben der Ausgangslage sind am Code bestät
   - Die Prüfung „Stand vor dem Lauf“ bleibt in `katalog-budget`. Grund: Auch die Pflege darf bei schon rotem Budget nichts anhängen (abgelehnt).
 
 Nach dem Skill ist noch ein Review erlaubt. Die Lösungen von B1 und M1–M3 prüft Review 3.
+
+## Review 3 (2026-10-26) – Verdict: Freigabe mit Änderungen
+
+Dritter, unabhängiger Review (letzter erlaubter Durchgang nach dem Skill). **Kein Blocker offen.** Die Lösungen aus Review 2 tragen im Ansatz; die Mechanik ist ergänzt. Alle Punkte übernommen:
+
+**Major**
+- **M1 `katalog-budget` war so nicht ausführbar** (Build und `size` lesen fest `data/`): Messung in eigenen Worktrees auf `GITHUB_SHA` und HEAD, ohne Kachelbilder; `data/` des Arbeitsbaums bleibt unberührt (E3, Test, Tabelle).
+- **M2 Sammelkalender-Ausschluss sperrte ganz `nuernberg.de`:** feste Hosts plus URL-Präfixe der Aggregator-Seiten (E1, Test).
+- **M3 Widgets am Bot-Schutz:** einmal Browser bei 403 oder Bot-Schutz auf Plattformen und Hosts mit `render: browser` (E1, Test).
+- **M4 Ortsprüfung nicht kalibriert:** ganzer Seitentext samt Footer, Normalisierung, Messung in S0 mit Soll ≥ 95 % (E2, Tests).
+- **M5 fremder Anbieter am selben Ort:** `covered` auch gegen andere Anbieter in 100 m, Ergebnis `fremder-anbieter` (E2, Test).
+
+**Minor**, übernommen:
+- Beweis nur mit Kandidat und Beilagen;
+- kanonische URL;
+- G1 über `discoverGates()`;
+- Modus `alle` erst mit Plan 0050 exportiert;
+- `lib/url.ts` gegen Zyklen;
+- `stand` nur über Kennungen und `dauerhaft`;
+- Trockenläufe auf getrennten Hälften;
+- `timeout` = Budget + 90 per `fromJSON`;
+- Grenzen nur aus vollständigen Läufen;
+- „Ersatz für“ mit `hint` im Commit;
+- Wurzel der Website als Startseite;
+- die Klarstellungen;
+- `discover-publish` in der Tabelle;
+- Build-Fehler ohne Größenbezug als `fehler`.
+
+**Scope:** JSON-Kandidaten gestrichen (übernommen).
+
+Kein Blocker offen; der Plan ist nach dem Skill fertig. Die Änderungen aus Review 3 sind nicht mehr unabhängig geprüft. Ein kurzer `/plan-review` vor S1 ist empfohlen, weil zwischen Planung und Umsetzung Plan 0048 umgesetzt wird.
