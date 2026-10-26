@@ -11,7 +11,18 @@ function charsetOf(contentType: string, head: Uint8Array): string {
   return /<meta[^>]+charset=["']?([\w-]+)/i.exec(sniff)?.[1] ?? "utf-8";
 }
 
+/** Angaben, hinter denen oft UTF-8 steckt (Kalender-API von nuernberg.de meldet ISO-8859-1 und liefert UTF-8). */
+const LATIN = /^(iso-8859-1|latin-?1|windows-1252|us-ascii)$/i;
+
 function decode(bytes: Uint8Array, charset: string): string {
+  // Gültiges UTF-8 mit Nicht-ASCII-Zeichen ist bei echtem Latin-1 praktisch ausgeschlossen („ä“ = 0xE4 + ASCII ist kein
+  // gültiges UTF-8); dann gewinnen die Bytes gegen die Angabe.
+  if (LATIN.test(charset) && bytes.some((b) => b >= 0x80))
+    try {
+      return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    } catch {
+      // echtes Latin-1
+    }
   try {
     return new TextDecoder(charset).decode(bytes);
   } catch {

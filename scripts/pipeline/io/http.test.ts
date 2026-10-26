@@ -133,3 +133,24 @@ describe("fetchPage: Weiterleitungen je Sprung", () => {
     // eigenes Zeitlimit: die Wiederholung nach 5xx wartet 2 s (io/http.ts), unter Last reißt sonst die Standardgrenze
   }, 10_000);
 });
+
+describe("fetchPage: Zeichensatz", () => {
+  const bytes = (body: Uint8Array<ArrayBuffer>, contentType: string) => () =>
+    new Response(body, { status: 200, headers: { "content-type": contentType } });
+  const latin1 = (text: string) => new Uint8Array([...text].map((c) => c.charCodeAt(0)));
+
+  it("UTF-8 mit falscher Angabe ISO-8859-1 (Kalender-API nuernberg.de): Umlaute bleiben heil", async () => {
+    const body = new TextEncoder().encode('{"T":"Erzählt für Kinder"}');
+    const f = fakeFetch({ "https://a.example.net/": bytes(body, "application/json; charset=ISO-8859-1") });
+    const page = await fetchPage("https://a.example.net/", { fetchImpl: f.impl });
+    expect(page.body).toBe('{"T":"Erzählt für Kinder"}');
+  });
+
+  it("echtes ISO-8859-1 bleibt ISO-8859-1", async () => {
+    const f = fakeFetch({
+      "https://a.example.net/": bytes(latin1("Erzählt für Kinder"), "text/html; charset=ISO-8859-1"),
+    });
+    const page = await fetchPage("https://a.example.net/", { fetchImpl: f.impl });
+    expect(page.body).toBe("Erzählt für Kinder");
+  });
+});
