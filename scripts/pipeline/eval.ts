@@ -1,11 +1,12 @@
 /**
  * Eval der Extraktion (Plan 0032, E9). Aufruf: `pnpm eval …`
  *
- *   [--model M] [--fallback M] [--case a,b] [--concurrency N]
+ *   [--model M] [--fallback M] [--effort E] [--case a,b] [--concurrency N]
  *       Alle Fälle aus evals/cases/ (oder die genannten) mit `createExtractor` wie im Nachtlauf. Details nach
  *       runs/eval-<datum>-<modell>/, eine Zeile an evals/results.md (nur mit allen Fällen, sonst nur Details).
  *       --fallback: Standard = --model, damit das Modell allein gemessen wird; `--fallback sonnet` misst die
- *       Konfiguration des Nachtlaufs. Modell Standard LLM_MODEL_EXTRACT bzw. haiku.
+ *       Konfiguration des Nachtlaufs. Modell Standard LLM_MODEL_EXTRACT bzw. haiku, Effort Standard
+ *       LLM_EFFORT_EXTRACT bzw. der der CLI (Plan 0048, Nachtrag 2).
  *   freeze ID --kind html[,gross] [--trap ab-3-jahren] [--force]
  *       Fall evals/cases/<ID>-<heute>/ aus einem frischen Abruf anlegen; expected.json als Entwurf aus dem Bestand,
  *       danach von Hand gegen input.json prüfen (Korrekturen in NOTES.md).
@@ -14,7 +15,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { berlinIsoDate } from "../../src/domain/time.ts";
 import { type CaseRun, freezeCase, loadCases, runEval, writeEval } from "./io/eval.ts";
-import { createExtractor, EXTRACT_KEY_PARTS } from "./io/extract.ts";
+import { createExtractor, EXTRACT_KEY_PARTS, effortOf } from "./io/extract.ts";
 import { ROOT } from "./io/files.ts";
 import { CASE_KINDS, type EvalInput, promptHash, TRAPS, unusableRun } from "./lib/eval-score.ts";
 
@@ -23,6 +24,7 @@ const { positionals, values } = parseArgs({
   options: {
     model: { type: "string" },
     fallback: { type: "string" },
+    effort: { type: "string" },
     case: { type: "string" },
     concurrency: { type: "string", default: "3" },
     kind: { type: "string" },
@@ -69,6 +71,14 @@ function line(r: CaseRun): string {
 async function evaluate() {
   const model = values.model ?? process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const fallback = values.fallback ?? model;
+  let effort: ReturnType<typeof effortOf>;
+  try {
+    effort = values.effort === undefined ? effortOf(process.env) : effortOf({ LLM_EFFORT_EXTRACT: values.effort });
+  } catch (e) {
+    fail((e as Error).message);
+  }
+  // Effort steht im Modell-Etikett der Zeile und im Ordnernamen; ohne Effort bleibt beides wie bisher
+  const label = effort ? `${model} (Effort ${effort})` : model;
   const only = values.case?.split(",").filter(Boolean);
   let cases: ReturnType<typeof loadCases>;
   try {
@@ -79,12 +89,12 @@ async function evaluate() {
   const concurrency = Number(values.concurrency);
   if (!Number.isInteger(concurrency) || concurrency < 1) fail(`--concurrency ungültig: ${values.concurrency}`);
   const hash = promptHash(EXTRACT_KEY_PARTS);
-  print(`Eval ${today}: ${cases.length} Fälle, Modell ${model}, Fallback ${fallback}, Prompt-Hash ${hash}`);
+  print(`Eval ${today}: ${cases.length} Fälle, Modell ${label}, Fallback ${fallback}, Prompt-Hash ${hash}`);
   const controller = new AbortController();
   process.once("SIGINT", () => controller.abort());
   const run = await runEval({
     cases,
-    extractor: createExtractor({ model, fallbackModel: fallback }),
+    extractor: createExtractor({ model, fallbackModel: fallback, ...(effort ? { effort } : {}) }),
     signal: controller.signal,
     concurrency,
     onCase: (r) => print(line(r)),
@@ -95,15 +105,20 @@ async function evaluate() {
   // Warnung in data:validate nicht stillen
   const unusable = unusableRun(run.results, cases.length);
   if (unusable) fail(`${unusable} – keine Zeile in evals/results.md (Details: ${run.results.map(line).join("; ")})`);
-  const outDir = join(ROOT, "runs", `eval-${today}-${model}${fallback === model ? "" : `-fb-${fallback}`}`);
+  const outDir = join(
+    ROOT,
+    "runs",
+    `eval-${today}-${model}${effort ? `-${effort}` : ""}${fallback === model ? "" : `-fb-${fallback}`}`,
+  );
+  const meta = { date: today, model: label, fallback: fallback === model ? label : fallback, hash, outDir };
   if (only) {
     // Teilmengen sind nicht vergleichbar: nur Details, keine Zeile
-    const row = writeEval(run, { date: today, model, fallback, hash, outDir }, join(outDir, "results.md"));
+    const row = writeEval(run, meta, join(outDir, "results.md"));
     print(row);
     print(`✓ ${outDir} (Teilmenge: keine Zeile in evals/results.md)`);
     return;
   }
-  print(writeEval(run, { date: today, model, fallback, hash, outDir }));
+  print(writeEval(run, meta));
   print(`✓ ${outDir}, Zeile in evals/results.md`);
 }
 

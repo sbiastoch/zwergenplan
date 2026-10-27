@@ -74,6 +74,11 @@ describe("callLlm (Fake-CLI)", () => {
     expect(seen?.stdin).toMatch(/\nEingabe$/);
   });
 
+  it("Effort: --effort direkt nach dem Modell, ohne Effort kein Flag", async () => {
+    const { seen } = await run("ok", CI_ENV, { effort: "high" });
+    expect(seen?.args.slice(1, 5)).toEqual(["--model", "haiku", "--effort", "high"]);
+  });
+
   it("Websuche: --tools und --allowedTools", async () => {
     const { seen } = await run("ok", CI_ENV, { tools: "web" });
     const i = seen?.args.indexOf("--tools") ?? -1;

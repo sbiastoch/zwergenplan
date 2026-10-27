@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import { CATEGORIES } from "../../../src/domain/topics.ts";
-import { createExtractor, EXTRACT_KEY_PARTS } from "./extract.ts";
+import { createExtractor, EXTRACT_KEY_PARTS, effortOf, modelKey } from "./extract.ts";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const BIN = join(ROOT, "tests/fixtures/fake-claude.mjs");
@@ -52,9 +52,10 @@ function control(events: unknown[]) {
   };
 }
 
-const extractor = (partMaxChars?: number) =>
+const extractor = (partMaxChars?: number, effort?: "high") =>
   createExtractor({
     model: "haiku",
+    ...(effort ? { effort } : {}),
     fallbackModel: "sonnet",
     bin: BIN,
     env: { PATH: process.env["PATH"] ?? "", HOME: scratch, CLAUDE_CODE_OAUTH_TOKEN: "tok" },
@@ -115,6 +116,19 @@ describe("createExtractor (Fake-CLI)", () => {
     expect(seen.args[seen.args.indexOf("--model") + 1]).toBe("sonnet");
   });
 
+  it("Effort gilt für Haupt- und Fallback-Modell", async () => {
+    const c = control([event("Krabbeltreff", "WE")]);
+    const text = `## Seite 1: ${PAGE} (html)\n## TEXT\n${c.line}`;
+    await extractor(undefined, "high")({ ...input(text), strong: true }, new AbortController().signal);
+    const seen = c.seen();
+    expect(seen.args.slice(seen.args.indexOf("--model"), seen.args.indexOf("--model") + 4)).toEqual([
+      "--model",
+      "sonnet",
+      "--effort",
+      "high",
+    ]);
+  });
+
   it("über der Schwelle: ein Aufruf je Seite, Events vereinigt", async () => {
     const a = control([event("Krabbeltreff", "WE")]);
     const b = control([event("Babymassage", "TH")]);
@@ -126,5 +140,19 @@ describe("createExtractor (Fake-CLI)", () => {
     expect(a.seen().stdin).toContain("Teil 1 von 2: ");
     expect(b.seen().stdin).toContain("Teil 2 von 2: ");
     expect(b.seen().stdin).not.toContain("Krabbeltreff");
+  });
+});
+
+describe("Effort (Plan 0048, Nachtrag 2)", () => {
+  it("LLM_EFFORT_EXTRACT: leer heißt Standard der CLI, sonst eine der Stufen", () => {
+    expect(effortOf({})).toBeUndefined();
+    expect(effortOf({ LLM_EFFORT_EXTRACT: "" })).toBeUndefined();
+    expect(effortOf({ LLM_EFFORT_EXTRACT: "xhigh" })).toBe("xhigh");
+    expect(() => effortOf({ LLM_EFFORT_EXTRACT: "hoch" })).toThrow(/LLM_EFFORT_EXTRACT/);
+  });
+
+  it("Cache-Schlüssel: ohne Effort unverändert, mit Effort Modell/Effort", () => {
+    expect(modelKey("opus", undefined)).toBe("opus");
+    expect(modelKey("opus", "high")).toBe("opus/high");
   });
 });
