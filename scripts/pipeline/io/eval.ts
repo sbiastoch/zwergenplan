@@ -18,8 +18,11 @@ import {
   toEvalOffers,
   type Window,
 } from "../lib/eval-score.ts";
-import type { ExtractOutcome, Extractor } from "../lib/extract.ts";
+import type { CallRecord, ExtractOutcome, Extractor } from "../lib/extract.ts";
+import type { RawEvent } from "../lib/raw.ts";
 import { planFetch } from "../lib/select.ts";
+import { mergeParts } from "../lib/split.ts";
+import { caseUnits, matchUnits, unitExcerpt } from "../lib/units.ts";
 import { fetchInputs } from "./fetch-inputs.ts";
 import { ROOT, readCatalog, readJson, readPreviousOffers, writeJson } from "./files.ts";
 import { loadFreeDays } from "./holidays.ts";
@@ -97,24 +100,14 @@ export async function runEval(o: {
   const worker = async () => {
     for (let c = queue.shift(); c && !signal.aborted; c = queue.shift()) {
       const { input, expected } = c;
-      // dieselbe Eingabe wie im Nachtlauf (`io/refresh.ts`), nur der Katalogeintrag aus dem Schnappschuss
-      const { outcome: answer, calls } = await o.extractor(
-        {
-          provider: input.catalog,
-          text: input.text,
-          candidates: input.candidates,
-          allowedUrls: input.allowedUrls,
-          pageUrls: input.pageUrls,
-          today: input.today,
-        },
-        signal,
-      );
+      const freeDays = await freeDaysFor(input.today);
+      const { answer, calls } = await extractUnits(c, o.extractor, signal, freeDays);
       if (answer.kind === "abort") {
         abort = answer.abort;
         stop.abort();
         return;
       }
-      const run = scoreRun(c, answer, calls, await freeDaysFor(input.today), expected.window);
+      const run = scoreRun(c, answer, calls, freeDays, expected.window);
       results.push(run);
       o.onCase?.(run);
     }
@@ -122,6 +115,63 @@ export async function runEval(o: {
   await Promise.all(Array.from({ length: Math.max(1, o.concurrency) }, worker));
   results.sort((a, b) => a.name.localeCompare(b.name));
   return abort ? { results, abort } : { results };
+}
+
+/**
+ * Ein Fall je Einheit wie im Nachtlauf (Plan 0048, E6): je Einheit der Extraktor mit ihrem Auszug, dann Abgleich
+ * zwischen den Einheiten ohne Vorstand (`matchUnits`) und Vereinigung (`mergeParts`). Ein Abbruch stoppt sofort; eine
+ * Einheit mit Fehler macht den Fall zum Fehler (der Nachtlauf behielte ihren alten Stand, den das Eval nicht hat).
+ */
+async function extractUnits(
+  c: LoadedCase,
+  extractor: Extractor,
+  signal: AbortSignal,
+  freeDays: Record<string, string>,
+): Promise<{ answer: ExtractOutcome; calls: CallRecord[] }> {
+  const { input } = c;
+  const catalog = input.catalog;
+  if (catalog.role !== "anbieter") throw new Error(`${c.name}: Katalogeintrag ist kein Anbieter`);
+  const calls: CallRecord[] = [];
+  const parts: Array<{ id: string; failed: boolean; events: RawEvent[] }> = [];
+  const warnings: string[] = [];
+  const models = new Set<string>();
+  for (const u of caseUnits({ ...input, catalog })) {
+    const r = await extractor(
+      {
+        provider: catalog,
+        excerpt: unitExcerpt(catalog, u.def),
+        unit: u.def.id,
+        text: u.text,
+        candidates: u.candidates,
+        allowedUrls: input.allowedUrls,
+        pageUrls: u.pageUrls,
+        today: input.today,
+      },
+      signal,
+    );
+    calls.push(...r.calls.map((call) => ({ ...call, unit: u.def.id })));
+    if (r.outcome.kind === "abort") return { answer: r.outcome, calls };
+    if (r.outcome.kind === "fehler")
+      return { answer: { kind: "fehler", reason: `${u.def.id}: ${r.outcome.reason}` }, calls };
+    parts.push({ id: u.def.id, failed: false, events: r.outcome.events });
+    warnings.push(...(r.outcome.warnings ?? []));
+    models.add(r.outcome.model);
+  }
+  const horizon = { from: input.today, to: addMonths(input.today, 12) };
+  const matched = matchUnits(parts, { horizon, freeDays });
+  const merged = mergeParts(
+    matched.units.map((u) => u.events),
+    { ...horizon, freeDays },
+  );
+  return {
+    answer: {
+      kind: "ok",
+      events: merged.events,
+      model: [...models].join("+") || "ohne-eingabe",
+      ...(warnings.length > 0 ? { warnings } : {}),
+    },
+    calls,
+  };
 }
 
 function scoreRun(
