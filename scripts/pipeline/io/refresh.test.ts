@@ -326,6 +326,44 @@ describe("refreshProvider je Einheit (Plan 0048, E1, E5, E7)", () => {
       expect(raw).toEqual(v1);
     });
 
+    it("Sammelkalender der Vornacht fällt aus: kandidaten ausgefallen, V1 unverändert (Arch-Review 3, M1)", async () => {
+      const withSources: ProviderRaw = { ...state(6), sources: ["evtermine"] };
+      const empty: FetchedUnit = {
+        id: "kandidaten",
+        status: "leer",
+        pages: [],
+        candidates: [],
+        text: "",
+        allowedUrls: [],
+      };
+      const { r, raw } = await run(
+        fake(ok(6, "haiku"), ok(6, "sonnet")),
+        { fetched: { ...fetchedWith([unit(0), empty]), adapterIssues: { evtermine: "HTTP 500" } } },
+        withSources,
+      );
+      expect(r.kind === "done" && r.units["kandidaten"]).toBe("ausgefallen");
+      expect(r).toMatchObject({ kind: "done", result: "teilausfall" });
+      expect(raw).toEqual(withSources);
+    });
+
+    it("V1 ohne inputHash: geprüft gegen den Vorstand (Arch-Review 3, m2)", async () => {
+      const never: ProviderRaw = {
+        events: [],
+        status: "fehler",
+        reason: "Bot-Schutz",
+        failingSince: "2026-10-01T03:00:00+02:00",
+        checkedAt: "2026-10-01T03:00:00+02:00",
+        sources: [],
+      };
+      const { r, raw } = await run(fake(ok(1, "haiku"), ok(1, "sonnet")), { prevOfferCount: 6 }, never);
+      expect(r).toMatchObject({
+        kind: "done",
+        result: "umstellung-ausstehend",
+        migration: "Einbruch (6 → 1 Angebote)",
+      });
+      expect(raw).toEqual(never);
+    });
+
     it("Einbruch: V1 unverändert", async () => {
       const { r, raw } = await run(fake(ok(1, "haiku"), ok(1, "sonnet")), {}, v1);
       expect(r).toMatchObject({

@@ -196,6 +196,7 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
       fetched: o.fetched,
       prev,
       ...(prev === undefined && baseline !== undefined ? { baseline } : {}),
+      ...(v1 && unit.id === KANDIDATEN ? { prevSources: v1.sources } : {}),
       keyParts: o.keyParts,
       today: o.today,
       now: o.now,
@@ -225,8 +226,11 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
   };
   const unitList = units.map((u) => ({ id: u.id, result: results[u.id] ?? "offen", events: next[u.id]?.events ?? [] }));
   // ohne Rohdatei, aber mit Angeboten im Vorstand: wie eine Umstellung gegen diese Angebote geprüft
+  // eine V1-Datei ohne inputHash (nie extrahiert, Vorstand aus offers.json) wird gegen den Vorstand geprüft (Arch-Review 3, m2)
   const legacy = v1
-    ? eventUnits(v1.events, o.today)
+    ? v1.inputHash !== undefined
+      ? eventUnits(v1.events, o.today)
+      : (o.prevOfferCount ?? 0)
     : prevRaw === undefined && (o.prevOfferCount ?? 0) > 0
       ? o.prevOfferCount
       : undefined;
