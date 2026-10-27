@@ -653,6 +653,18 @@ Abweichungen vom Plan, jede mit Test:
 - **Abgleich (E12): alle 34 Hinweise von Hand geprüft**, alle echte Zwillinge; die Wahl folgt dem Vorstand (etwa `theater-mummpitz`, „Jazz für Kinder“: die Einzeltermine bleiben). Dazu 82 Hinweise von `mergeParts` und 16 Dubletten nach Rang, Stichprobe ohne Befund.
 - **Grenzen der Umstellung** (Doppeltes der Messung, mindestens die Werte aus E7): `timeout=150`, `budget_min=110`, `max_calls=500`, `max_tokens=10000000`, dazu `umstellen=sternenhaus-kuf`. Die Messung verdoppelt (66 Minuten, 474 Aufrufe, 7,5 Mio. Tokens) liegt unter diesen Mindestwerten.
 
+### Umstellung (2026-10-27, `gh run 40470260380`, Daten-Commit `32ca5b8`)
+
+Per `workflow_dispatch` mit `modus=live`, `timeout=150`, `budget_min=110`, `max_calls=500`, `max_tokens=10000000`, `umstellen=sternenhaus-kuf`. Lauf grün, 07:57–08:33 UTC.
+
+- **Ziel 5: in der ersten Nacht erfüllt.** Alle 82 Rohdateien haben `version: 2`.
+- Angebote 470 → 424. Davon −91 bei `sternenhaus-kuf` (gewollt, N3), sonst +45, im Wesentlichen wie im Trockenlauf. Die 8 Fehltreffer von `staatstheater-nuernberg-familie` kamen diesmal nicht.
+- **Ziel 6 (vorläufig): etwa 96 %.** Ohne `sternenhaus-kuf` 339 IDs gehalten. 18 Angebote gibt es weiter mit neuer ID. Fasst man die Dubletten der Vornacht zusammen (`fbs-nuernberg` MAWIBA und Waldwichtel, `cvjm-gostenhof-miniclub`), verlieren etwa 15 Kurse ihre ID: die 4 gebündelten Einzeltermine bei `neues-museum-baby-museum`, Formatwechsel mit anderem ersten Termin (`hebamme-kobielski`) und Titelwechsel. Keine ID ging an ein anderes Angebot.
+  - **Befund `die-familienbox`:** „BabySinne 12–30 Monate“ und „Kleinkindturnen 12–36 Monate“, beide Di 9:30 am selben Ort, bekommen beide neue IDs (`o8m8mysy` → `4qcl8tkf`, `c6c5fzvd` → `9h4opmvn`), obwohl es beide Kurse weiter gibt. Zwei parallele Kurse mit gleichem Beginn verhindern offenbar die Zuordnung nach E11. Restpunkt.
+- **Befund `geburtshaus-nuernberger-nest`: Kurse 2027 fehlen.** Die Einheit `bauersachs.hebamio.de/kursliste` (2 Teile, beide gültig) liefert 5 Kurse, der Mittagskurs ab 15.1.2027 und die „Postpartum Recovery Class“ ab 22.2.2027 fehlen, obwohl sie im Text stehen. Dazu kommen zwei Dubletten über die Einheitsgrenze und die erfundene „Babymassage mit Noelle“. Im Trockenlauf auf denselben Seiten und im Eval (2 von 2) war der Fall sauber; in S0 fehlten die Kurse in 2 von 2 Läufen. Opus lässt sie hier also zufällig aus, etwa jedes zweite Mal.
+  - **Folge:** Der Fehler bleibt stehen, denn die Einheit wird erst bei geänderter Seite oder geändertem Auszug neu extrahiert. Die Einbruchprüfung greift nicht (7 → 5 Angebote der Einheit).
+  - Offen, Nutzerentscheid: eine geänderte `hint` der Seite (erzwingt die Neuextraktion, wieder mit Zufall) und/oder ein Nachtrag mit einer Prüfung je Einheit gegen den Vorstand, die bei fehlenden, noch künftigen Kursen ein zweites Mal extrahiert.
+
 ## Review (2026-10-26) – Verdict: Überarbeiten
 
 Unabhängiger Review des Entwurfs mitsamt ADR 0033. Alle Befunde sind am Code nachgeprüft. Die Begründung steht jeweils in der genannten Entscheidung.
