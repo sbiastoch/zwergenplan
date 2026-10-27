@@ -99,6 +99,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Suchmaschinen** (Plan 0034): `sitemap.xml` mit App, Vorschauseiten und Impressum; `canonical` auf den Vorschauseiten; Search Console einrichten.
 - **Plätze und Anmeldestand per Rezept** (Plan 0046, `docs/plans/0046-verfuegbarkeit-per-rezept.md`, ausgearbeiteter Entwurf mit drei Reviews): Ein festes, deklaratives Rezept je Programmseite liest nachts die Verfügbarkeit, mit Systemrezepten für FBS, Kufer, Hebamio, Kursorganizer und JSON-LD; das Modell bleibt Rückfall. Zurückgestellt am 2026-10-25, weil freie Plätze für den Nutzer optional sind. Wird er aufgenommen, setzt er auf der Einheit Seite aus Plan 0048 auf (ADR 0033) und braucht ein neues Review.
 - **Impressum offline** (Plan 0034, ADR 0028): `impressum/` im Service Worker vorhalten, damit der Link in der installierten App ohne Netz nicht ins Leere führt.
+- **apt-Pakete der Browser in der CI cachen** (Plan 0052, verworfen zugunsten des Spiegelwechsels): `actions/cache` über `/var/cache/apt/archives`, Schlüssel je Image und Playwright-Version. Erst, wenn ein Lauf trotz Wechsel des Spiegels an der Installation scheitert.
 
 ## Offen aus abgeschlossenen Plänen
 
