@@ -149,6 +149,10 @@ describe("Effort (Plan 0048, Nachtrag 2)", () => {
     expect(effortOf({ LLM_EFFORT_EXTRACT: "" })).toBeUndefined();
     expect(effortOf({ LLM_EFFORT_EXTRACT: "xhigh" })).toBe("xhigh");
     expect(() => effortOf({ LLM_EFFORT_EXTRACT: "hoch" })).toThrow(/LLM_EFFORT_EXTRACT/);
+    // Suche und Bewerten beim Entdecken (Plan 0048, Nachtrag 4): eigene Variable, gleiche Prüfung
+    expect(effortOf({ LLM_EFFORT_EXTRACT: "low", LLM_EFFORT_DISCOVER: "high" }, "LLM_EFFORT_DISCOVER")).toBe("high");
+    expect(effortOf({ LLM_EFFORT_EXTRACT: "low" }, "LLM_EFFORT_DISCOVER")).toBeUndefined();
+    expect(() => effortOf({ LLM_EFFORT_DISCOVER: "hoch" }, "LLM_EFFORT_DISCOVER")).toThrow(/LLM_EFFORT_DISCOVER/);
   });
 
   it("Cache-Schlüssel: ohne Effort unverändert, mit Effort Modell/Effort", () => {

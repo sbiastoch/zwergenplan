@@ -48,13 +48,23 @@ describe("nightly.yml (Plan 0048, E7)", () => {
     expect(step?.run).toContain('[[ "${RUN_BUDGET_MIN:-50}" =~ ^[0-9]+$ && "$TIMEOUT" =~ ^[0-9]+$ ]]');
   });
 
-  it("Modell und Effort gleich in Nachtlauf und Entdecken (Plan 0048, Nachtrag 2)", () => {
-    const model = { LLM_MODEL_EXTRACT: "opus", LLM_MODEL_FALLBACK: "opus", LLM_EFFORT_EXTRACT: "xhigh" };
+  it("Modell und Effort: Nachtlauf Haiku high, Entdecken Opus high (Plan 0048, Nachtrag 4)", () => {
     const discover: { env: Record<string, string> } = parse(
       readFileSync(new URL("../../.github/workflows/discover.yml", import.meta.url), "utf8"),
     );
-    expect(workflow.env).toMatchObject(model);
-    expect(discover.env).toMatchObject(model);
+    expect(workflow.env).toMatchObject({
+      LLM_MODEL_EXTRACT: "haiku",
+      LLM_MODEL_FALLBACK: "haiku",
+      LLM_EFFORT_EXTRACT: "high",
+    });
+    expect(workflow.env["LLM_MODEL_DISCOVER"]).toBeUndefined();
+    expect(discover.env).toMatchObject({
+      LLM_MODEL_EXTRACT: "opus",
+      LLM_MODEL_FALLBACK: "opus",
+      LLM_EFFORT_EXTRACT: "high",
+      LLM_MODEL_DISCOVER: "opus",
+      LLM_EFFORT_DISCOVER: "high",
+    });
   });
 
   it("der Job mit dem Modell hat kein Schreibrecht", () => {

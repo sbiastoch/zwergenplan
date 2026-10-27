@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter auf Branch `s2-waechter`)
+Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel auf Branch `modell-haiku-nacht`)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -728,6 +728,47 @@ Abweichungen von E10, begründet:
 **Arch-Review (2026-10-27) – Verdict: Nacharbeit nötig, kein Blocker.** Behoben: **M1** Ein Live-Lauf mit `only` sah nur seine Anbieter und hätte das Issue geschlossen oder auf eine Teilmenge gekürzt; der Wächter rechnet jetzt auf dem ganzen Zustand, gefiltert nach Katalog (Test „nur Anbieter des Katalogs …“). **m1** verwaister JSDoc in `lib/discover.ts`; **m2** der Shell-Schritt hat einen bleibenden Test mit nachgebautem `gh`; **m3** Marker nur als ganze Zeile (`grep -oxE`); **m4** Kommentar mit Anbieter und Art.
 
 **Abnahme (offen), wie unter „Schritte“:** im ersten Nachtlauf `live` nach dem Merge. Gibt es einen echten Befund, entsteht das Issue; gibt es keinen, bleibt es aus, und das Anlegen wird mit dem ersten echten Befund nachgeholt. Das Schließen wird in der ersten Nacht ohne Befund nach einem offenen Issue beobachtet. Seit der Umstellung sind alle Rohdateien V2, `umstellung` steht als Auslöser also nicht mehr zur Verfügung.
+
+### Nachtrag 4 (2026-10-27): Modell und Effort je Workflow nach der Matrix für Sonnet und Haiku
+
+**Anlass:** Der Nutzer wollte die Matrix aus Nachtrag 2 auch für Sonnet und Haiku (2026-10-27), `max` danach ausdrücklich gestrichen. Dazu die Vorgabe, Kosten „nicht komplett zu ignorieren“: Ist Haiku fast so gut wie Opus, wird es dort genommen, wo es weniger wichtig ist; das Entdecken ist wichtiger.
+
+**Messung:** `pnpm eval --model M --fallback M --effort E`, je Einheit (S1), 13 Fälle, Prompt-Hash `7b31b918b80b`, je Stufe zwei Läufe (16 Zeilen in `evals/results.md`). Vergleich mit den beiden Zeilen „opus (Effort xhigh)“ der S1-Abnahme (dieselbe Zerlegung). Mittel aus zwei Läufen:
+
+| Modell, Effort | Termine R | Termine P | Angebote R | Angebote P | format | Platzstand | topics | Kosten je Lauf | Modellzeit |
+|---|---|---|---|---|---|---|---|---|---|
+| Opus xhigh | 99,5 % | 71,5 % | 100 % | 75 % | 100 % | 100 % | 61,5 % | $3,29 | 1 188 s |
+| Sonnet low | 98 % | 82 % | 99 % | 80,5 % | 96,5 % | 90,5 % | 49,5 % | $1,55 | 470 s |
+| Sonnet medium | 96,5 % | 73 % | 98,5 % | 74,5 % | 93 % | 90 % | 46,5 % | $0,97 | 494 s |
+| Sonnet high | 99 % | 74 % | 99 % | 82 % | 92 % | 96 % | 58,5 % | $1,19 | 634 s |
+| Sonnet xhigh | 99 % | 71,5 % | 100 % | 73,5 % | 95 % | 98 % | 55 % | $1,79 | 1 009 s |
+| Haiku low | 96,5 % | 83,5 % | 92,5 % | 86 % | 83,5 % | 87,5 % | 57 % | $0,12 | 679 s |
+| Haiku medium | 96,5 % | 90,5 % | 94,5 % | 89 % | 95 % | 85,5 % | 49,5 % | $0,12 | 876 s |
+| Haiku high | 99 % | 87,5 % | 98 % | 86,5 % | 88,5 % | 83,5 % | 45,5 % | $0,17 | 1 299 s |
+| Haiku xhigh | 99 % | 88 % | 97,5 % | 87,5 % | 95 % | 87,5 % | 43,5 % | $0,42 | 3 028 s |
+
+Kosten: Schätzung API-Gegenwert, nicht Abo-Preis.
+
+**Befunde je Fall** (Termine R/P beider Läufe):
+
+- **Präzision:** Haikus Vorsprung kommt fast ganz aus den Fallen. `nuebad-flipper` (FP 139 bei Opus, 0–168 bei Sonnet, 0 bei Haiku in allen acht Läufen), `sv-johannis-07` (FP 27 bei Opus, 0–8 bei Sonnet, 0 bei Haiku) und `geburtshaus-nuernberger-nest` (P 46/47 % bei Opus, erfundene Termine einer pausierten Babymassage; 95–100 % bei Haiku high und xhigh). Haiku übernimmt dort keine Termine, die nicht für 0–3 Jahre sind oder nicht dastehen.
+- **Recall:** Angebote 98 % (Haiku high) gegen 100 % (Opus). Schwächer: `ev-fischbach` (90/90 % R, 47/47 % P bei Haiku high gegen 100/65 % bei Opus) und `ev-langwasser-miniclubs` (96/96 % R, 46/76 % P gegen 96/100 % R, 76/87 % P).
+- **Felder:** `format` 88,5 % (high) bzw. 95 % (xhigh) gegen 100 %, `Platzstand` 83,5 % bzw. 87,5 % gegen 100 %, `topics` 45,5 % gegen 61,5 %. Die Teilnehmerzahlen (`Platzstand`) sind das schwächste Feld; der Nutzer gewichtet sie geringer als das Entdecken.
+- **Sonnet** liegt im Recall bei Opus (Angebote 100 % mit xhigh), in der Präzision nicht besser und kostet rund die Hälfte von Opus; es ist in keiner Kennzahl die beste Wahl.
+
+**Nutzerentscheid** (2026-10-27, auf die Frage, was im Nachtlauf wechselt): „2., aber das wöchentliche discover soll opus high werden“. Also:
+
+- **Nachtlauf:** Extraktion ganz auf Haiku, „mit den besten Ergebnissen“. Gewählt ist **Haiku high**: Termin- und Angebots-Recall (99 % / 98 %) sind die besten der Haiku-Stufen und gleichauf mit xhigh; xhigh ist bei `format` und `Platzstand` besser, braucht aber 2,3-mal so viel Modellzeit (3 028 gegen 1 299 s), sein längster Aufruf dauerte 386 s (high 104 s) und eine Antwort hatte 107 623 Ausgabe-Tokens. Die erste Nacht nach dem Wechsel extrahiert alles neu; mit xhigh reichte das Zeitbudget dafür nicht. Fallback ebenfalls Haiku high (`LLM_MODEL_FALLBACK=haiku`): Der zweite Versuch nach Einbruch oder Lücke ist eine zweite Ziehung desselben Modells wie bisher mit Opus.
+- **Entdecken:** **Opus high** für Ertragsbeweis (`LLM_MODEL_EXTRACT`, `LLM_MODEL_FALLBACK`, `LLM_EFFORT_EXTRACT`) und für Suche und Bewerten (`LLM_MODEL_DISCOVER=opus`, neu `LLM_EFFORT_DISCOVER=high`). Den Effort für Suche und Bewerten reicht `createDiscoverModel` jetzt durch (`effortOf(env, "LLM_EFFORT_DISCOVER")`); vorher galt dort der Standard der CLI. Opus high ist für die Extraktion nicht je Einheit gemessen (nur je Anbieter: Angebote R 98/100 %); für Suche und Bewerten folgt die Messung mit Plan 0050, E7.
+
+**Folgen:**
+
+- Der Modellteil des Cache-Schlüssels wechselt von `opus/xhigh` zu `haiku/high`: Die erste Nacht extrahiert jede Einheit neu, wie bei der Umstellung. Die IDs hält die Zuordnung (E11); gemessen wird es im Trockenlauf (unten).
+- Der Ertragsbeweis des Entdeckens schreibt Zustand mit `opus/high`; der Nachtlauf extrahiert einen neu aufgenommenen Anbieter deshalb in der folgenden Nacht einmal neu (E1 gilt dann nicht mehr; ein Aufruf je neuem Anbieter).
+- `scripts/lib/nightly-workflow.test.ts` prüft nicht mehr Gleichheit, sondern die Werte je Workflow; der Skill (Abschnitt 5) nennt beides.
+- Rückweg: Werte in `nightly.yml` zurücksetzen; die Nacht danach extrahiert wieder alles neu.
+
+**Vor dem Merge:** Trockenlauf per `workflow_dispatch` auf dem Branch (`modus=trocken`, `timeout=240`, `budget_min=180`, `max_calls=1000`, `max_tokens=20000000`). Abnahme wie die S1-Abnahme: keine Bremse, kein `budgetHit`, keine Zeitüberschreitung je Aufruf; `offers.json` aus dem Artefakt gegen `main`: Angebote je Anbieter (kein Anbieter mehr als 10 % weniger ohne erklärten Grund), gehaltene IDs (Ziel 6: mindestens 95 % der weiter bestehenden Kurse), Dubletten. Danach Merge und vor 01:30 UTC ein `workflow_dispatch` mit `modus=live` und den Grenzen aus dem Trockenlauf (verdoppelt, mindestens wie oben), damit die normale Bremse die Neuextraktion nicht abschneidet.
 
 ## Review (2026-10-26) – Verdict: Überarbeiten
 

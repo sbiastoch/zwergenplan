@@ -55,11 +55,14 @@ concurrency:
 env:
   # gepinnt wie nightly.yml; Update nur mit Eval-Lauf und llm.test.ts (R7)
   CLI_VERSION: "2.1.296"
-  # Modell der Extraktion (Plan 0048, Nachtrag 2): Opus mit Effort xhigh, auch der zweite Versuch nach einem
-  # Einbruch. Teil des Cache-Schlüssels: Ein Wechsel extrahiert einmal alles neu (Skill, Abschnitt 5).
+  # Modell beim Entdecken (Plan 0048, Nachtrag 4): Opus mit Effort high für Ertragsbeweis, Suche und Bewerten.
+  # Der Ertragsbeweis schreibt den Zustand mit Schlüssel opus/high; der Nachtlauf (haiku/high) extrahiert einen neu
+  # aufgenommenen Anbieter deshalb in der folgenden Nacht einmal neu.
   LLM_MODEL_EXTRACT: opus
   LLM_MODEL_FALLBACK: opus
-  LLM_EFFORT_EXTRACT: xhigh
+  LLM_EFFORT_EXTRACT: high
+  LLM_MODEL_DISCOVER: opus
+  LLM_EFFORT_DISCOVER: high
 
 jobs:
   modus:

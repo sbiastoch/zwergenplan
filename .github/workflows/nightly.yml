@@ -55,11 +55,11 @@ concurrency:
 env:
   # gepinnt wie spike-cli.yml (S1.1); Update nur mit Eval-Lauf und llm.test.ts (R7)
   CLI_VERSION: "2.1.296"
-  # Modell der Extraktion (Plan 0048, Nachtrag 2): Opus mit Effort xhigh, auch der zweite Versuch nach einem
-  # Einbruch. Teil des Cache-Schlüssels: Ein Wechsel extrahiert einmal alles neu (Skill, Abschnitt 5).
-  LLM_MODEL_EXTRACT: opus
-  LLM_MODEL_FALLBACK: opus
-  LLM_EFFORT_EXTRACT: xhigh
+  # Modell der Extraktion (Plan 0048, Nachtrag 4): Haiku mit Effort high, auch der zweite Versuch nach einem
+  # Einbruch oder einer Lücke. Teil des Cache-Schlüssels: Ein Wechsel extrahiert einmal alles neu (Skill, Abschnitt 5).
+  LLM_MODEL_EXTRACT: haiku
+  LLM_MODEL_FALLBACK: haiku
+  LLM_EFFORT_EXTRACT: high
 
 jobs:
   modus:

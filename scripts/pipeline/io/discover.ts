@@ -58,11 +58,12 @@ import { placeholderWindow } from "../lib/placeholders.ts";
 import { providerStatus } from "../lib/raw.ts";
 import { planFetch } from "../lib/select.ts";
 import { GateError } from "./discover-git.ts";
+import { effortOf } from "./extract.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
 import { readCatalog, readJson, readRaw, writeJson } from "./files.ts";
 import type { GeoResult } from "./geocode.ts";
 import type { loadFreeDays } from "./holidays.ts";
-import { callLlm, type LlmCall, type LlmOptions } from "./llm.ts";
+import { callLlm, type Effort, type LlmCall, type LlmOptions } from "./llm.ts";
 import { refreshProvider } from "./refresh.ts";
 import { fetchSource } from "./sources.ts";
 
@@ -137,14 +138,18 @@ const SEARCH_MAX_TURNS = 10;
 /** Bewerten ohne Werkzeuge: Antwort plus Abschluss (S1.1: mindestens 3) */
 const ASSESS_MAX_TURNS = 3;
 
-/** Modellschritte über `io/llm.ts` (E2); Modell `LLM_MODEL_DISCOVER`, Standard Haiku. */
+/**
+ * Modellschritte über `io/llm.ts` (E2); Modell `LLM_MODEL_DISCOVER`, Standard Haiku, Effort `LLM_EFFORT_DISCOVER`
+ * (leer: Standard der CLI; Plan 0048, Nachtrag 4).
+ */
 export function createDiscoverModel(
-  opts: LlmOptions & { model?: string } = {},
+  opts: LlmOptions & { model?: string; effort?: Effort } = {},
 ): Pick<DiscoverDeps, "search" | "assess"> {
   const model = opts.model ?? process.env["LLM_MODEL_DISCOVER"] ?? "haiku";
+  const effort = opts.effort ?? effortOf(process.env, "LLM_EFFORT_DISCOVER");
   const llmOpts: LlmOptions = { ...(opts.bin ? { bin: opts.bin } : {}), ...(opts.env ? { env: opts.env } : {}) };
   const step = async (kind: "search" | "assess", id: string, call: Omit<LlmCall, "model">): Promise<StepReply> => {
-    const reply = await callLlm({ ...call, model }, llmOpts);
+    const reply = await callLlm({ ...call, model, ...(effort ? { effort } : {}) }, llmOpts);
     // unter dontAsk meldet die CLI trotz abgelehnter Websuche Erfolg (S1.1): dann zählt die Antwort nicht
     const denied = reply.permissionDenials.length > 0;
     const result: CallRecord["result"] = reply.abort
