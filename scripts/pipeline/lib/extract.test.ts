@@ -13,6 +13,8 @@ import {
   runExtraction,
   runExtractionInParts,
 } from "./extract.ts";
+import { catalogExcerpt } from "./normalize.ts";
+import { unitExcerpt, unitsOf } from "./units.ts";
 
 const { providers } = loadFixtures();
 const provider = providers.find((p) => p.id === "familientreff-beispiel");
@@ -194,6 +196,41 @@ describe("extractMessage", () => {
     const msg = extractMessage({ provider, text: "## Seite 1: …", ctx, part: { index: 2, count: 3 } });
     expect(msg).toMatch(/^Heute: 2026-10-05\nHorizont: 2026-10-05 bis 2027-10-05\n\nTeil 2 von 3: /);
     expect(msg.endsWith("## Seite 1: …")).toBe(true);
+  });
+
+  it("Teilzeile je Einheit: „dieser Seite“ bzw. „dieser Kandidaten“ statt „dieses Anbieters“ (Plan 0048, E3)", () => {
+    const part = { index: 1, count: 2 };
+    const page = extractMessage({ provider, text: "x", ctx, part, unit: "seite:https://example.org/a" });
+    expect(page).toContain("Die Eingabe dieser Seite ist auf 2 Aufrufe verteilt");
+    const cands = extractMessage({ provider, text: "x", ctx, part, unit: "kandidaten" });
+    expect(cands).toContain("Die Eingabe dieser Kandidaten ist auf 2 Aufrufe verteilt");
+    expect(extractMessage({ provider, text: "x", ctx, part })).toContain("Die Eingabe dieses Anbieters");
+  });
+
+  it("jede Änderung der Nachricht ändert auch den Schlüssel (Plan 0048, E3)", () => {
+    if (provider.role !== "anbieter") throw new Error("Fixture ist kein Anbieter");
+    const [unit] = unitsOf(provider, { candidates: false, hadKandidaten: false });
+    if (!unit) throw new Error("Einheit fehlt");
+    const variants = [
+      provider,
+      { ...provider, name: "Anderer Name" },
+      { ...provider, programme: provider.programme.map((g) => ({ ...g, hint: "neuer Hinweis" })) },
+      {
+        ...provider,
+        programme: [
+          ...provider.programme,
+          { url: "https://example.org/neu", kind: "html" as const, use: "termine" as const },
+        ],
+      },
+      { ...provider, venues: provider.venues.map((v) => ({ ...v, name: `${v.name} neu` })) },
+      { ...provider, age: { minMonths: 0, maxMonths: 12 } },
+    ];
+    const pairs = variants.map((p) => {
+      const excerpt = unitExcerpt(p, unit);
+      return { msg: extractMessage({ provider: excerpt, text: "x", ctx }), key: catalogExcerpt(excerpt) };
+    });
+    for (const a of pairs) for (const b of pairs) if (a.msg !== b.msg) expect(a.key).not.toBe(b.key);
+    expect(new Set(pairs.map((p) => p.msg)).size).toBe(variants.length);
   });
 });
 

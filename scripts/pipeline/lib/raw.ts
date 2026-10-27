@@ -174,12 +174,23 @@ export const UnitState = z
     ...klasseFields,
     /** Events vorhanden, aber keine künftigen mehr (E5, ADR 0033, Punkt 3) */
     emptySince: Instant.optional(),
+    /**
+     * Seite als entfernt gewertet (E5: 14 Tage 404/410): Events und Schlüssel sind weg, und der Build übernimmt nichts
+     * aus dem Vorstand. Nur bei fehler ohne inputHash; endet mit der nächsten Extraktion.
+     */
+    removedAt: Instant.optional(),
     /** Sammelkalender, die Kandidaten beigetragen haben; nur bei der Einheit `kandidaten` */
     sources: z.array(z.enum(SOURCES)).optional(),
   })
   .superRefine((r, ctx) => {
     stateRules(r, ctx);
     klasseRules(r, ctx);
+    if (r.removedAt !== undefined && (r.status !== "fehler" || r.inputHash !== undefined || r.events.length > 0))
+      ctx.addIssue({
+        code: "custom",
+        message: "removedAt nur bei fehler ohne inputHash und Events",
+        path: ["removedAt"],
+      });
   });
 export type UnitState = z.infer<typeof UnitState>;
 
@@ -264,7 +275,10 @@ export const rawEvents = (raw: ProviderRaw): RawEvent[] =>
 
 /** Ob Events aus einer Extraktion stammen (Build: keine Übernahme aus dem Vorstand, Arch-Review S2, m2). */
 export const rawExtracted = (raw: ProviderRaw): boolean =>
-  isV2(raw) ? Object.values(raw.units).some((u) => u.inputHash !== undefined) : raw.inputHash !== undefined;
+  isV2(raw)
+    ? // eine entfernte Seite zählt mit: Ihre Angebote sollen wegfallen, nicht aus dem Vorstand kommen (Arch-Review M1)
+      Object.values(raw.units).some((u) => u.inputHash !== undefined || u.removedAt !== undefined)
+    : raw.inputHash !== undefined;
 
 /** Prüfung einer Datei `data/raw/<id>.json` für `pnpm data:validate` (E13): Schema, Katalog-Anbieter, eigene Events. */
 export function providerRawIssues(label: string, id: string, raw: unknown, anbieter: ReadonlySet<string>): string[] {

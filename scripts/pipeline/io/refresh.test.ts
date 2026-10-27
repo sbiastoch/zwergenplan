@@ -336,6 +336,22 @@ describe("refreshProvider je Einheit (Plan 0048, E1, E5, E7)", () => {
       expect(raw).toEqual(v1);
     });
 
+    it("--umstellen mit offener Einheit (Zeitbudget): V1 bleibt unverändert (Arch-Review M2)", async () => {
+      let left = 1;
+      const { r, raw } = await run(
+        fake(ok(3, "haiku"), ok(3, "sonnet")),
+        {
+          provider: three,
+          fetched: fetchedWith([unit(0), unit(1), unit(2)]),
+          forceMigrate: true,
+          mayContinue: () => left-- > 0,
+        },
+        v1,
+      );
+      expect(r).toMatchObject({ kind: "done", result: "umstellung-ausstehend" });
+      expect(raw).toEqual(v1);
+    });
+
     it("--umstellen: V2 auch mit dauerhaft scheiternder Seite; die Einheit beginnt leer mit fehler", async () => {
       const down = unit(1, { status: "fehler", reason: "HTTP 404", klasse: "dauerhaft", pages: [], text: "" });
       const { r, u } = await run(
@@ -345,6 +361,53 @@ describe("refreshProvider je Einheit (Plan 0048, E1, E5, E7)", () => {
       );
       expect(r).toMatchObject({ kind: "done", result: "teilausfall" });
       expect(u(1)).toMatchObject({ events: [], status: "fehler", klasse: "dauerhaft" });
+    });
+  });
+
+  it("gescheiterte Beilage: jede Einheit wird ohne sie extrahiert, beilagen hält den Fehler, nie entfernt", async () => {
+    const PLAETZE = `${PAGE}/plaetze`;
+    const p: Anbieter = {
+      ...provider,
+      programme: [...provider.programme, { url: PLAETZE, kind: "html", use: "verfuegbarkeit" }],
+    };
+    const f = fake(ok(4, "haiku"), ok(4, "sonnet"));
+    const down = { ok: false as const, reason: "Bot-Schutz (Cloudflare)", klasse: "voruebergehend" as const };
+    const first = await run(f, {
+      provider: p,
+      fetched: { ...fetchedWith([unit(0)]), beilagen: { [`seite:${PLAETZE}`]: down } },
+    });
+    expect(f.seen[0]?.text).not.toContain("plaetze");
+    expect(first.raw && isV2(first.raw) && first.raw.beilagen?.[`seite:${PLAETZE}`]).toMatchObject({
+      status: "fehler",
+      reason: "Bot-Schutz (Cloudflare)",
+      klasse: "voruebergehend",
+      klasseSince: "2026-10-12T03:00:00+02:00",
+      failingSince: "2026-10-12T03:00:00+02:00",
+    });
+    expect(first.u()).toMatchObject({ status: "ok" });
+    // zweite Nacht: Fehlerserie und Klasse bleiben
+    const prev: ProviderRaw = {
+      version: 2,
+      units: { [unitId(0)]: state(4) },
+      beilagen: {
+        [`seite:${PLAETZE}`]: {
+          status: "fehler",
+          reason: "alt",
+          klasse: "voruebergehend",
+          klasseSince: "2026-10-01T03:00:00+02:00",
+          checkedAt: "2026-09-30T03:00:00+02:00",
+          failingSince: "2026-10-01T03:00:00+02:00",
+        },
+      },
+    };
+    const again = await run(
+      fake(ok(4, "haiku"), ok(4, "sonnet")),
+      { provider: p, fetched: { ...fetchedWith([unit(0)]), beilagen: { [`seite:${PLAETZE}`]: down } } },
+      prev,
+    );
+    expect(again.raw && isV2(again.raw) && again.raw.beilagen?.[`seite:${PLAETZE}`]).toMatchObject({
+      klasseSince: "2026-10-01T03:00:00+02:00",
+      failingSince: "2026-10-01T03:00:00+02:00",
     });
   });
 

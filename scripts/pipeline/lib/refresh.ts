@@ -230,7 +230,12 @@ function removed(ctx: RefreshContext, next: UnitState): UnitState | undefined {
   const since = berlinIsoDate(next.klasseSince);
   if (since > addDays(ctx.today, -REMOVED_AFTER_DAYS)) return undefined;
   const { inputHash: _h, dated: _d, model: _m, changedAt: _c, pending: _p, ...rest } = next;
-  return { ...rest, events: [], reason: `entfernt: ${ctx.unit.reason ?? "dauerhaft"} seit ${since}` };
+  return {
+    ...rest,
+    events: [],
+    reason: `entfernt: ${ctx.unit.reason ?? "dauerhaft"} seit ${since}`,
+    removedAt: ctx.prev?.removedAt ?? ctx.now,
+  };
 }
 
 /** Übernahme neuer Events: Status aus den Events, Fehlerserie, Klasse und pending enden. */

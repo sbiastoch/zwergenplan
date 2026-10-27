@@ -234,6 +234,9 @@ export function unitInputs(
   candidates: readonly Candidate[],
 ): Pick<FetchedProvider, "units" | "beilagen"> {
   const active = owner.programme.flatMap((g, i) => (g.use !== "info" && g.blocked === undefined ? [i] : []));
+  // Zuordnung über die Reihenfolge von `planFetch`; passt die Zahl nicht (etwa Folgeseiten), lieber laut scheitern
+  if (pages.length !== active.length)
+    throw new Error(`${owner.id}: ${pages.length} Abrufe für ${active.length} Seiten im Katalog`);
   const outcomeOf = new Map<number, PageOutcome>();
   active.forEach((progIndex, k) => {
     const o = pages[k];
