@@ -656,3 +656,39 @@ describe("assignIds – Zwillinge und Stufe 2 mit erstem Termin (Plan 0038, E2/E
     });
   });
 });
+
+describe("assignIds – Formatwechsel kurs ↔ regelmaessig (Plan 0048, E11)", () => {
+  // S0: „Babymassage (montags)“ als Kurs, nach der Neuextraktion regelmäßig mit anderer Länge: im Fenster weniger als
+  // 80 % gleiche Termine (10 gegen 17, Jaccard 0,59), also kein Treffer in Stufe 1
+  const kurs = { title: "Babymassage (montags)", format: "kurs" as const, sessions: at(weekly("2026-10-12", 10)) };
+  const regel = {
+    title: "Babymassage (montags)",
+    format: "regelmaessig" as const,
+    sessions: at(weekly("2026-10-12", 17)),
+  };
+
+  it("gleicher erster Beginn: die ID bleibt, in beide Richtungen", () => {
+    const r = run([draft(regel)], prev([old("aaaaaaaa", kurs)]));
+    expect(idOf(r, regel.title)).toBe("aaaaaaaa");
+    expect(r.notes.join("\n")).toContain("IDs: Stufe 2 aaaaaaaa");
+    expect(idOf(run([draft(kurs)], prev([old("aaaaaaaa", regel)])), kurs.title)).toBe("aaaaaaaa");
+  });
+
+  it("anderer erster Beginn: neue ID, auch bei gleichen Tagen", () => {
+    // ab dem 19.: 9 von 10 Tagen gleich (≥ 50 %), das genügt nur bei gleichem Format
+    const later = { ...regel, sessions: at(weekly("2026-10-19", 16)) };
+    expect(idOf(run([draft(later)], prev([old("aaaaaaaa", kurs)])), regel.title)).not.toBe("aaaaaaaa");
+  });
+
+  it("mit Konkurrent zur selben Uhrzeit: neue IDs statt einer geratenen", () => {
+    const rival = { ...regel, title: "Babymassage (montags) für Väter" };
+    const r = run([draft(regel), draft(rival)], prev([old("aaaaaaaa", kurs)]));
+    expect(r.offers.map((o) => o.id)).not.toContain("aaaaaaaa");
+  });
+
+  it("widersprechende Kennungen: neue ID", () => {
+    const one = { ...kurs, title: "Babymassage 1" };
+    const two = { ...regel, title: "Babymassage 2" };
+    expect(idOf(run([draft(two)], prev([old("aaaaaaaa", one)])), two.title)).not.toBe("aaaaaaaa");
+  });
+});

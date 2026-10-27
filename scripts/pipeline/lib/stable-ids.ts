@@ -252,16 +252,24 @@ export function assignIds(input: {
   // Stufe 2 (ADR 0031, Punkt 4): Neben ≥ 50 % gleichen Tagen genügt der gleiche erste Termin im Fenster, wenn beide
   // Seiten dort Termine haben – das hält eine gewachsene oder geschrumpfte Reihe. Widersprechende Kennungen
   // („Babyschwimmen 1“ / „2“, „geb. Mai–Juli“ / „Juni–Aug.“) zählen nie, sonst erbte eine umgezogene Gruppe die ID.
+  // Formatwechsel `kurs` ↔ `regelmaessig` (Plan 0048, E11; ändert ADR 0022, Punkt 3 nach ADR 0033, Punkt 8): Eine
+  // Neuextraktion fasst denselben Kurs oft im anderen Format. Zulässig nur mit gleichem ersten Termin im Fenster, nicht
+  // über gleiche Tage; die Eindeutigkeit verlangt Stufe 2 ohnehin. S0 hielt so 1–2 IDs mehr ohne falsche Übernahme.
+  const SWITCHABLE = new Set(["kurs", "regelmaessig"]);
   const stage2 = (pi: number, di: number) => {
     const p = at(P, pi);
     const d = at(D, di);
+    const sameFirst = p.first !== undefined && p.first === d.first;
+    const format =
+      p.offer.format === d.offer.format
+        ? jaccard(p.days, d.days) >= SAME_DAYS || sameFirst
+        : SWITCHABLE.has(p.offer.format) && SWITCHABLE.has(d.offer.format) && sameFirst;
     return (
       sameProvider(pi, di) &&
       p.offer.venueId === d.offer.venueId &&
-      p.offer.format === d.offer.format &&
+      format &&
       similarTitle(p.offer.title, d.offer.title) &&
-      !conflictingLabels(p.offer.title, d.offer.title) &&
-      (jaccard(p.days, d.days) >= SAME_DAYS || (p.first !== undefined && p.first === d.first))
+      !conflictingLabels(p.offer.title, d.offer.title)
     );
   };
   const sameClock = (pi: number, di: number) => [...at(P, pi).clocks].some((c) => at(D, di).clocks.has(c));
