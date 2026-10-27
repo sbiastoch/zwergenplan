@@ -1,0 +1,184 @@
+{
+ "basis": "data/offers.json vom 2026-10-26T07:59:13+01:00, Entwurf – von Hand gegen input.json prüfen",
+ "window": {
+  "from": "2026-10-27",
+  "to": "2027-10-26"
+ },
+ "offers": [
+  {
+   "id": "aprc39ll",
+   "title": "Postpartum Recovery Class – Rückbildung auf Englisch",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "category": "bewegung",
+   "topics": [
+    "rueckbildung"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2027-02-22T12:00:00+01:00",
+    "2027-03-01T12:00:00+01:00",
+    "2027-03-08T12:00:00+01:00",
+    "2027-03-15T12:00:00+01:00",
+    "2027-03-22T12:00:00+01:00",
+    "2027-04-05T12:00:00+02:00",
+    "2027-04-12T12:00:00+02:00"
+   ]
+  },
+  {
+   "id": "ibkr7w1d",
+   "title": "Rückbildung 12:00 Uhr, wechselnde Wochentage (Start Nov. 2026)",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "bewegung",
+   "topics": [
+    "rueckbildung"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-11-09T12:00:00+01:00",
+    "2026-11-12T12:00:00+01:00",
+    "2026-11-17T12:00:00+01:00",
+    "2026-11-20T12:00:00+01:00",
+    "2026-11-23T12:00:00+01:00",
+    "2026-11-26T12:00:00+01:00"
+   ]
+  },
+  {
+   "id": "c179rw4e",
+   "title": "Rückbildung 17:20 Uhr, wechselnde Wochentage (Start Dez. 2026)",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "bewegung",
+   "topics": [
+    "rueckbildung"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-12-02T17:20:00+01:00",
+    "2026-12-03T17:20:00+01:00",
+    "2026-12-09T17:20:00+01:00",
+    "2026-12-10T17:20:00+01:00",
+    "2026-12-16T17:20:00+01:00",
+    "2026-12-17T17:20:00+01:00"
+   ]
+  },
+  {
+   "id": "2a6rcz9i",
+   "title": "Rückbildung donnerstags 17:20 Uhr (Start Sept. 2026)",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "bewegung",
+   "topics": [
+    "rueckbildung"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-10-29T17:20:00+01:00"
+   ]
+  },
+  {
+   "id": "jj6l38zd",
+   "title": "Rückbildung freitags 12:00 Uhr (Start Sept. 2026)",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "bewegung",
+   "topics": [
+    "rueckbildung"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-10-30T12:00:00+01:00",
+    "2026-11-13T12:00:00+01:00"
+   ]
+  },
+  {
+   "id": "gthm1n4b",
+   "title": "Rückbildung mit/ohne Baby – Dienstagskurs ab 12.1.2027",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "category": "bewegung",
+   "topics": [
+    "rueckbildung"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2027-01-12T15:00:00+01:00",
+    "2027-01-19T15:00:00+01:00",
+    "2027-01-26T15:00:00+01:00",
+    "2027-02-02T15:00:00+01:00",
+    "2027-02-09T15:00:00+01:00",
+    "2027-02-16T15:00:00+01:00",
+    "2027-02-23T15:00:00+01:00"
+   ]
+  },
+  {
+   "id": "h2pae3r4",
+   "title": "Rückbildung mit/ohne Baby – Mittagskurs ab 15.1.2027",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenlos",
+   "category": "bewegung",
+   "topics": [
+    "rueckbildung"
+   ],
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2027-01-15T12:00:00+01:00",
+    "2027-01-22T12:00:00+01:00",
+    "2027-01-29T12:00:00+01:00",
+    "2027-02-05T12:00:00+01:00",
+    "2027-02-12T12:00:00+01:00",
+    "2027-02-19T12:00:00+01:00",
+    "2027-02-26T12:00:00+01:00"
+   ]
+  },
+  {
+   "id": "kygey9fp",
+   "title": "Stilltreff Milch-Café mit Stillberaterin Sonja Knittel",
+   "venueId": "geburtshaus-nuernberger-nest",
+   "format": "regelmaessig",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "treffs-cafes",
+   "topics": [
+    "stillcafe",
+    "elterntreff"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-11-11T10:00:00+01:00",
+    "2026-12-09T10:00:00+01:00"
+   ]
+  }
+ ]
+}
