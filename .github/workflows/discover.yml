@@ -88,7 +88,7 @@ jobs:
   entdecken:
     name: Entdecken (${{ needs.modus.outputs.modus }})
     needs: modus
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # mit Browsern fest auf 24.04, Begründung in Plan 0052
     timeout-minutes: 120
     outputs:
       ampel: ${{ steps.discover.outputs.ampel }}

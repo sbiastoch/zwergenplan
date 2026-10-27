@@ -1,6 +1,6 @@
 # Plan 0052 – Jobs mit Browsern fest auf Ubuntu 24.04
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-10-27
 
 ## Anlass

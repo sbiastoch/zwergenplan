@@ -93,7 +93,7 @@ jobs:
     name: E2E ${{ matrix.engine }} ${{ matrix.shard }}/${{ matrix.total }}
     needs: scope
     if: needs.scope.outputs.full == 'true' && (github.ref == 'refs/heads/main' || needs.scope.outputs.e2e == 'full' || needs.scope.outputs.devices == 'true')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # mit Browsern fest auf 24.04, Begründung in Plan 0052
     # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (6,2 Min.), aufgerundet (Plan 0013, E5),
     # plus Puffer für Wiederholungen der Browser-Installation (.github/install-browsers.sh).
     timeout-minutes: 20
@@ -144,7 +144,7 @@ jobs:
     name: Smoke (Deploy-Build) & Budgets
     needs: scope
     if: needs.scope.outputs.full == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # mit Browsern fest auf 24.04, Begründung in Plan 0052
     # Schutz gegen Hänger, kein Qualitäts-Gate: doppelter längster Job (2,6 Min.), aufgerundet (Plan 0013, E5),
     # plus Puffer für Wiederholungen der Browser-Installation (.github/install-browsers.sh).
     timeout-minutes: 15

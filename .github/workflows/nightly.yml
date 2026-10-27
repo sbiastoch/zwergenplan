@@ -89,7 +89,7 @@ jobs:
     name: Abruf und Hashes (S1.2)
     needs: modus
     if: needs.modus.outputs.modus == 'messen'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # mit Browsern fest auf 24.04, Begründung in Plan 0052
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
@@ -149,7 +149,7 @@ jobs:
     name: Nachtlauf (${{ needs.modus.outputs.modus }})
     needs: modus
     if: needs.modus.outputs.modus == 'trocken' || needs.modus.outputs.modus == 'live'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # mit Browsern fest auf 24.04, Begründung in Plan 0052
     # beim Zeitplan sind die Eingaben leer, dann gilt 90 (Plan 0048, E7)
     timeout-minutes: ${{ fromJSON(inputs.timeout || '90') }}
     outputs:

@@ -99,6 +99,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Suchmaschinen** (Plan 0034): `sitemap.xml` mit App, Vorschauseiten und Impressum; `canonical` auf den Vorschauseiten; Search Console einrichten.
 - **Plätze und Anmeldestand per Rezept** (Plan 0046, `docs/plans/0046-verfuegbarkeit-per-rezept.md`, ausgearbeiteter Entwurf mit drei Reviews): Ein festes, deklaratives Rezept je Programmseite liest nachts die Verfügbarkeit, mit Systemrezepten für FBS, Kufer, Hebamio, Kursorganizer und JSON-LD; das Modell bleibt Rückfall. Zurückgestellt am 2026-10-25, weil freie Plätze für den Nutzer optional sind. Wird er aufgenommen, setzt er auf der Einheit Seite aus Plan 0048 auf (ADR 0033) und braucht ein neues Review.
 - **Impressum offline** (Plan 0034, ADR 0028): `impressum/` im Service Worker vorhalten, damit der Link in der installierten App ohne Netz nicht ins Leere führt.
+- **CI-Jobs mit Browsern auf Ubuntu 26.04** (Plan 0052): heute fest auf `ubuntu-24.04`, weil die Browser-Pakete auf 26.04 fehlen und der Spiegel zu langsam war. Wechseln, sobald ein Branch-Lauf dort alle Browser-Jobs im ersten Versuch schafft; spätestens mit der Abkündigung von `ubuntu-24.04` durch GitHub (erwartbar mit der GA von 28.04, 2028).
 
 ## Offen aus abgeschlossenen Plänen
 
