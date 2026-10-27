@@ -27,7 +27,8 @@ Entdecken genauso mit `--workflow discover.yml`. Nach einem Lauf im Modus `live`
 
 Worauf achten:
 - **Ampel rot**: Gates, Push, Build, Abbruch (`auth`, `limit`), Bremse, Zeitbudget, mehr als 20 % der Anbieter mit Fehler oder Live-Stand ab 20 Std. hinter `main` (Plan 0032, „Stufe 3 – Umsetzung“). Ein Abbruch oder eine Bremse lässt nur Anbieter offen; die nächste Nacht holt sie nach.
-- **Quellen mit `fehler`** samt Grund und `failingSince`: ab 14 Tagen steht die Quelle unter „Hinweise ohne Aktion“. Das ist Katalogpflege (Abschnitt 3).
+- **Quellen mit `fehler`** samt Grund und `failingSince`, je Seite (Plan 0048): Eine ausgefallene Seite behält ihre alten Angebote, die übrigen Seiten des Anbieters laufen weiter (`teilausfall`, gelb). Liefert eine Seite 14 Tage lang 404/410, gilt sie als entfernt, ihre Angebote fallen weg. Ab 14 Tagen Fehler steht ein ganz ausgefallener Anbieter unter „Hinweise ohne Aktion“. Das ist Katalogpflege (Abschnitt 3).
+- **`umstellung-ausstehend`** (Plan 0048, E7): Der Anbieter steht noch im alten Format, weil eine Seite scheiterte oder die neue Extraktion weniger als die Hälfte liefert. Prüfen; ist das neue Ergebnis richtig, `gh workflow run nightly.yml -f modus=live -f umstellen=<id>` erzwingt die Umstellung. **Rückweg**, falls S1 zurück muss: Code-Commits und alle Daten-Commits seit dem Deploy per `git revert` zurücknehmen (Nachtläufe und Entdecken); alter Code liest das neue Format nicht.
 - **Zurückgehaltene Einbrüche** (`pending`): Die alte Zahl Angebote bleibt, bis die Seite wieder mehr liefert oder der Katalog angepasst ist. Prüfen, ob der Anbieter wirklich weniger anbietet.
 - **Kategorie** (Plan 0037): „Kategorie aus Themen abgeleitet: N“ ist ein Übergang (E5) und sinkt mit jeder Neu-Extraktion auf 0. „Kategorie passt zu keinem Thema“ über 5 % der neuen Events heißt: Eval-Fall anlegen und den Prompt schärfen, nicht den Code ändern.
 - **Neue Anbieter** (Issue oder „Würde aufnehmen“ im Trockenlauf): Name, Fund-URL und erstes Angebot gegen die Website prüfen. Passt einer nicht, Abschnitt 2.
@@ -55,7 +56,7 @@ Geprüfte und bewusst nicht aufgenommene Anbieter ohne Rücknahme stehen in `ref
 
 Regeln für `data/providers.yaml`: `references/catalog.md`. Lesarten der Buchungssysteme für `hint` und `availability.how`: `references/booking-systems.md`.
 
-Jede Änderung an einem Eintrag ändert den Eingabe-Hash; der Anbieter wird in der nächsten Nacht neu extrahiert. Vorher lokal prüfen:
+Jede Änderung an einem Eintrag ändert den Eingabe-Hash. Eine geänderte `hint` extrahiert nur ihre Seite neu; eine neue oder gestrichene Seite ändert den Auszug aller Seiten des Anbieters, er wird ganz neu extrahiert (Plan 0048, E3). Vorher lokal prüfen:
 
 ```
 pnpm pipeline fetch-page <url> --links         # was der Abruf von einer Seite sieht
@@ -94,8 +95,8 @@ Der Bericht `runs/<heute>/discover/report.md` nennt je ausgeblendetem Anbieter d
 
 ## 5. Modell wechseln
 
-1. Messen: `pnpm eval --model <neu>` (Modell allein) und `pnpm eval --model <neu> --fallback sonnet` (wie der Nachtlauf). Jeder volle Lauf schreibt eine Zeile in `evals/results.md`. Ein Lauf ist eine Stichprobe; vor einer Entscheidung je Modell zwei Läufe.
-2. Entscheidet der Nutzer für den Wechsel, setzt ein Commit `LLM_MODEL_EXTRACT` (und bei Bedarf `LLM_MODEL_FALLBACK`) in der `env` beider Workflows; ohne Wert gilt Haiku mit Sonnet als Fallback. Das Modell ist Teil des Cache-Schlüssels: Die erste Nacht danach extrahiert alles neu (N3). Dafür einmal `gh workflow run nightly.yml -f modus=live -f max_tokens=5000000` statt der normalen Bremse.
+1. Messen: `pnpm eval --model <neu> --effort <stufe>` (Modell allein) und mit `--fallback <modell>` (wie der Nachtlauf). Jeder volle Lauf schreibt eine Zeile in `evals/results.md`. Ein Lauf ist eine Stichprobe; vor einer Entscheidung je Modell und Effort zwei Läufe. **Effort immer angeben** (`low`, `medium`, `high`, `xhigh`, `max`; Plan 0048, Nachtrag 2): Ohne `--effort` nimmt die CLI lokal `effortLevel` aus `~/.claude/settings.json`, im Runner den Modellstandard, und lokale Eval und Nachtlauf laufen verschieden.
+2. Entscheidet der Nutzer für den Wechsel, setzt ein Commit `LLM_MODEL_EXTRACT`, `LLM_EFFORT_EXTRACT` (und bei Bedarf `LLM_MODEL_FALLBACK`) in der `env` beider Workflows; ohne Wert gilt Haiku mit Sonnet als Fallback und der Effort der CLI. Modell und Effort sind Teil des Cache-Schlüssels: Die erste Nacht danach extrahiert alles neu (N3). Dafür einmal `gh workflow run nightly.yml -f modus=live` mit höheren Grenzen (`max_calls`, `max_tokens`, `budget_min`, `timeout`; Werte im Plan des Wechsels) statt der normalen Bremse.
 3. Suche und Bewerten beim Entdecken wählt `LLM_MODEL_DISCOVER` (Standard Haiku), unabhängig davon.
 
 Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `evals/results.md`; sonst warnt `pnpm data:validate` in der CI. Ändert der Prompt die Antwort für alle Anbieter (etwa ein neues Feld), gilt wie beim Modellwechsel: einmal mit `max_tokens=5000000`.
