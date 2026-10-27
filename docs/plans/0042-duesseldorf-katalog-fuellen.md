@@ -106,7 +106,7 @@ Vier Subagenten haben mit `pnpm pipeline fetch-page`, curl und Websuche gemessen
   - `site.json` hat 113,38 kB gzip bei einem Budget von 250 kB. `docs/ideas.md` verlangt ab 200 kB einen eigenen Plan zum Teilen.
   - Hochgerechnet mit ≈ 0,23 kB gzip je Angebot (obere Schranke) sind das ≈ 180 kB bei 300 neuen Angeboten und ≈ 205 kB bei 400.
   - `anbieter.json` hatte 7,61 kB gzip bei 74 Anbietern (`docs/plans/archiv/0010-anbieteruebersicht.md`), also ≈ 0,1 kB je Anbieter, bei einem Budget von 15 kB. Mit 40–70 Düsseldorfer Anbietern, viele mit vielen Orten (efa, ASG, AWO), sind 13–18 kB zu erwarten. Dieses Budget ist das knappste.
-- **Gates mit dem ersten Düsseldorfer Ort.** `wegzeit/vrr.json` hat ein Budget von 64 kB gzip (`.size-limit.json`). `MAX_WITHOUT_LINES` (0,093, `scripts/transit/gates.ts`) wird für `vrr` erst scharf, wenn es Orte gibt. Rot hieße: kein Deploy, auch nicht für Nürnberg.
+- **Gates mit dem ersten Düsseldorfer Ort.** `wegzeit/vrr.json` hat ein Budget von 64 kB gzip (`.size-limit.json`; seit Plan 0051: 120 kB, Linien 72 kB). `MAX_WITHOUT_LINES` (0,093, `scripts/transit/gates.ts`) wird für `vrr` erst scharf, wenn es Orte gibt. Rot hieße: kein Deploy, auch nicht für Nürnberg.
 - **Cache.** Seit dem Extraktions-Prompt aus Plan 0039 hat jeder Anbieter einen neuen Cache-Schlüssel (ADR 0032, Konsequenzen). Ein Trockenlauf liest den Cache nur aus `data/raw` (`scripts/pipeline/io/refresh.ts`), extrahiert also ohne `--only` alle Anbieter neu. Das waren ≈ 136 Aufrufe am 2026-10-12. Die Bremse `MAX_CALLS` steht auf 150.
 
 ## Ziel
@@ -119,7 +119,7 @@ Vier Subagenten haben mit `pnpm pipeline fetch-page`, curl und Websuche gemessen
    - Je Kufer-Träger liefert der Trockenlauf mindestens 80 % der Kurse seiner Programmseiten. Als Kurs zählt nur einer mit künftigem Termin; die Listen enthalten auch abgelaufene. Das Soll kommt aus M2.
    - Bei 10 Stichproben-Kursen stimmen Beginn, Wochentag, Uhrzeit und Ort mit der Detailseite.
 4. **Keine verschwendeten Bewertungen.** Portal-PDFs und Seiten auf `www.duesseldorf.de` erreichen das Bewerten nicht mehr (E6). Ein Entdecken-Eval misst den Ausgangswert für den Folgeplan (E5). Es blendet 5 Anbieter aus, die auch im Navigator stehen, und 5, die nur die Websuche kennt. Beide Zahlen gehen nach `evals/results.md`; eine Schwelle gibt es nicht.
-5. **Größen.** Alle Budgets aus `.size-limit.json` bleiben grün. Darunter sind `Daten (anbieter.json)` mit 15 kB, `Wegzeit-Daten vrr` mit 64 kB und `Linien-Daten vrr` mit 40 kB. Für `site.json` gilt die strengere Schwelle 200 kB gzip aus `docs/ideas.md`. `MAX_WITHOUT_LINES` hält auch für `vrr`. Reicht das für Ziel 1 nicht, entscheidet der Nutzer (E4, „Anhalten“).
+5. **Größen.** Alle Budgets aus `.size-limit.json` bleiben grün. Darunter sind `Daten (anbieter.json)` mit 15 kB, `Wegzeit-Daten vrr` mit 64 kB und `Linien-Daten vrr` mit 40 kB (seit Plan 0051: 120 kB bzw. 72 kB je Netz). Für `site.json` gilt die strengere Schwelle 200 kB gzip aus `docs/ideas.md`. `MAX_WITHOUT_LINES` hält auch für `vrr`. Reicht das für Ziel 1 nicht, entscheidet der Nutzer (E4, „Anhalten“).
 
 ## Nicht-Ziele (Restpunkte nach `docs/ideas.md`)
 
@@ -299,7 +299,7 @@ Der Nutzer hat N1–N5 am 2026-10-24 wie empfohlen entschieden: N1 ja (Folgeplan
 ### Nutzerentscheide 2026-10-24 (nach dem Probe-Build, E4 „Anhalten“)
 
 - **N6 – `site.json` (235,5 kB gzip im Probe-Build, Schwelle 200 kB):** erst teilen, dann live. Plan 0039 und dieser Katalog gehen erst nach dem Plan „`site.json` je Gebiet teilen“ (Plan 0044) live. S4 wartet darauf.
-- **N7 – Budget `Linien-Daten vrr`** (45,7 kB gzip gegen 40 kB): auf **48 kB** angehoben. Die Datei lädt nur, wenn eine Stadt im Netz vrr gewählt ist; VRR hat mehr Orte (91) als VGN (82) und 1 237 Linienfolgen.
+- **N7 – Budget `Linien-Daten vrr`** (45,7 kB gzip gegen 40 kB): auf **48 kB** angehoben. **Überholt durch Plan 0051:** 72 kB je Netz. Die Datei lädt nur, wenn eine Stadt im Netz vrr gewählt ist; VRR hat mehr Orte (91) als VGN (82) und 1 237 Linienfolgen.
 
 ## Dateien
 

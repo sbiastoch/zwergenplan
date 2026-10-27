@@ -321,7 +321,8 @@ export function bytesPerCell(gzipBytes: number, rows: number, places: number): n
 
 /**
  * Obergrenze je Zelle (Plan 0051), gemessen am 2026-10-27 mit echten Daten (747 × 89): Tabelle 0,92, Linien 0,60 Byte.
- * Schwelle = Messwert + rund 25 %: fängt eine Formatänderung, die je Zelle teurer wird, weit unter dem Budget.
+ * Schwelle = Messwert + rund 25 %: fängt eine Formatänderung, die je Zelle teurer wird, weit unter dem Budget. Nur am
+ * VGN geeicht; für das Netz `vrr` nach Bootstrap und Nachtlauf nachmessen, bei Bedarf je Netz (Plan 0051, Arch-Review M1).
  */
 export const MAX_BYTES_PER_CELL = { table: 1.15, lines: 0.75 } as const;
 

@@ -1,6 +1,6 @@
 # Plan 0051 – Größenbudgets der ÖPNV-Daten an den Katalog anpassen
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-10-27
 
 ## Anlass
@@ -28,7 +28,7 @@ Gemessen mit `buildTransitTables` auf dem Fahrplanauszug von `main`, gzip, kB wi
 
 Je Ort wachsen die Dateien um etwa 0,7 kB (`wegzeit`) bzw. 0,43 kB (`linien`). Byte je Zelle (`data:build`, echte Daten, 747 × 89), nur die zellabhängigen Felder (`minutes` bzw. `first` + `second`): Tabelle 0,92, Linien 0,60.
 
-**LCP mit gespeichertem Stadtteil und `?wegzeit=20`**, echte Daten (424 Angebote, 89 Orte), gedrosselt wie `e2e/vitals.ts` (1,6 Mbit/s, CPU 4×), lokal `PW_SUITE=smoke pnpm e2e -- -g LCP`: **2 108 ms** (Gate 2 500 ms). Die Liste wartet hier auf die Tabelle (`docs/ideas.md`, „Wegzeit-Tabelle früher laden“). Bei voll ausgeschöpftem Budget (+55 kB) kämen gedrosselt etwa 0,28 s dazu, also ≈ 2,4 s.
+**LCP mit gespeichertem Stadtteil und `?wegzeit=20`**, echte Daten (424 Angebote, 89 Orte), gedrosselt wie `e2e/vitals.ts` (1,6 Mbit/s, CPU 4×), lokal `PW_SUITE=smoke pnpm e2e -- -g LCP`: **2 108 ms** (Gate 2 500 ms). Die gefilterte Liste wartet hier auf die Tabelle, das LCP aber nicht: Es liegt vor dem Ende des Abrufs (siehe „Was die Größe kostet“ unter „Entscheidung“).
 
 ## Entscheidung
 
@@ -39,7 +39,8 @@ Je Ort wachsen die Dateien um etwa 0,7 kB (`wegzeit`) bzw. 0,43 kB (`linien`). B
   1. `data:build` prüft mit echten Daten höchstens **1,15 Byte gzip je Zelle** im Feld `minutes` von `wegzeit.json` und **0,75** in `first` + `second` von `linien.json` (`MAX_BYTES_PER_CELL`, `bytesPerCell` und `perCellIssues` in `scripts/transit/table.ts` mit Unit-Tests, Aufruf in `scripts/build-data.ts`). Das ist der Messwert plus rund 25 %. Gemessen werden nur die zellabhängigen Felder: Koordinaten, Liniennamen und Quelle wachsen nicht mit den Orten und höben den Wert bei wenigen Orten (Netz `vrr` vor und kurz nach dem Bootstrap, Plan 0039) über die Grenze. Eine Formatänderung, die je Zelle teurer wird, fällt so auch weit unter dem Budget auf.
   2. Smoke-Test „LCP mit gespeichertem Stadtteil und ?wegzeit= bleibt mit echten Daten im Budget“ in `e2e/smoke.spec.ts` (Gate 2 500 ms). Die `[perf]`-Zeile nennt LCP und das Ende des Abrufs von `wegzeit.json` (über das Timing von Playwright, weil `page.clock` auch `performance` ersetzt). Er läuft im Job „Smoke (Deploy-Build) & Budgets“ vor jedem Deploy und macht die Zeit bis zur Tabelle sichtbar, begrenzt sie aber nicht.
 - ADR 0011, ADR 0015 und ADR 0032 bekommen je einen Nachtrag bzw. Änderungsvermerk mit dem Nutzerentscheid; die JSON-Datei kann keinen Kommentar tragen.
-- **Plan 0039** (Düsseldorf, in Umsetzung) teilt die Dateien je Netz. Seine Budgetstellen (Zeilen „Wegzeit … 60,7 kB“, „Budgets je Netz“, Abnahme „unter 64 kB“) sind auf 120/72 kB je Netz umgeschrieben.
+- **Plan 0039** (Düsseldorf, in Umsetzung) teilt die Dateien je Netz. Seine Budgetstellen (Zeilen „Wegzeit … 60,7 kB“, „Budgets je Netz“, Abnahme „unter 64 kB“) sind auf 120/72 kB je Netz umgeschrieben; ebenso Plan 0042 (Gates, Größen, N7 überholt).
+- **Byte je Zelle nur am VGN geeicht.** Plan 0042 maß für `linien/vrr.json` 45,68 kB bei 609 × 91 Zellen (≈ 0,82 Byte je Zelle für die ganze Datei); `first` + `second` könnten dort über 0,75 liegen. Für `vrr` wird nach Bootstrap und Nachtlauf nachgemessen, wie bei `MAX_WITHOUT_LINES`; liegt der Wert darüber, bekommt jedes Netz eine eigene Schwelle mit Begründung.
 
 ## Nicht-Ziele
 
@@ -70,4 +71,8 @@ Alle Punkte übernommen:
 - **M3** Geprüft und widerlegt: Das LCP (2 112 ms) liegt vor dem Ende des Abrufs der Tabelle (2 705 ms), das LCP-Gate bindet die Größe also nicht. Unter „Entscheidung“ steht jetzt, was die Größe tatsächlich kostet (Zeit bis zur gefilterten Liste), dass wir das hinnehmen und dass dafür kein Gate besteht (`docs/ideas.md`).
 - **m1** Linien einheitlich 0,60. **m2** Prüfung als reine Funktion `perCellIssues` mit Test. **m3** Der Smoke-Test protokolliert das Ende des Abrufs von `wegzeit.json` neben dem LCP. **m4** bleibt (Muster wie `e2e/pwa.spec.ts`). **m6** bestätigt.
 - **m5 abgelehnt:** `if: always()` für die Bundle-Budgets ändert `ci.yml` und gehört nicht zu diesem Plan; bei rotem Smoke-Test zeigt dessen eigene Meldung die Ursache.
+
+## Arch-Review (2026-10-27) – Verdict: Nacharbeit nötig, kein Blocker
+
+Alles übernommen: **M1** Schwellen nur am VGN geeicht, Nachmessung für `vrr` (hier, Plan 0039, ADR 0032, JSDoc von `MAX_BYTES_PER_CELL`). **m1** Plan 0042 an drei Stellen. **m2** `docs/architecture.md` nennt das Gate. **m3** LCP-Widerspruch aufgelöst, auch in `docs/ideas.md` („früher laden“). **m4** Status `in Umsetzung`. **m5** Kommentar am Smoke-Test.
 

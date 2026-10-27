@@ -175,7 +175,8 @@ test("LCP mit gespeichertem Stadtteil und ?wegzeit= bleibt mit echten Daten im B
   test.skip(browserName !== "chromium", "CDP-Drosselung und LCP-API gibt es nur in Chromium");
   const meta = await dataMeta(page);
   test.skip(meta.offers === 0, "keine Daten");
-  // Die Liste wartet hier auf wegzeit.json; deren Größe wächst mit den Orten des Katalogs (Plan 0051, M2)
+  // Die gefilterte Liste wartet hier auf wegzeit.json, das LCP nicht: Der Test bindet die Größe der Tabelle nicht,
+  // die `[perf]`-Zeile dient der Beobachtung (Plan 0051, Review 2, M3)
   await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
   await throttleMobile(page);
   await observeVitals(page);
