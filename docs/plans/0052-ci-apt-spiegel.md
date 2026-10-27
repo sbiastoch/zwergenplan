@@ -63,3 +63,12 @@ Keine Blocker. Übernommen:
 - **m4** Lokale Prüfung: `shellcheck` fehlt auf dem Rechner, dafür Simulation von `skip_azure`.
 - **m5** dieser Abschnitt, Status.
 
+## Umsetzung (2026-10-27, Branch `ci-apt-spiegel`)
+
+- `9bb97ca`: Skript und vorübergehender Schalter im Job `smoke`. Lauf 40565391976: Der Job `smoke` installierte über `https://archive.ubuntu.com/ubuntu` (Log `Get:… https://archive.ubuntu.com/ubuntu resolute-updates …`), alle acht Browser-Installationen des Laufs gelangen im ersten Anlauf. Rot war nur `e2e/sortierung.spec.ts:177` („Etikett im Orts-Sheet ganz im sichtbaren Bereich des Scroll-Containers“, `pixel-7-quer`, auch im Retry); derselbe Shard war im Lauf 40558940546 grün, die Änderung berührt keinen Test. Befund: wackeliger Test, siehe Restpunkte.
+- Folgecommit: Schalter wieder entfernt.
+
+### Restpunkte
+
+- `e2e/sortierung.spec.ts:177` auf `pixel-7-quer` in der CI rot (Lauf 40565391976, Versuch 1 samt Retry): Ursache klären (Zeitpunkt der Messung gegen Scroll-Animation?).
+
