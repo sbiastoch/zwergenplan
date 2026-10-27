@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S0 erledigt, Nachtrag 1 reviewt; S1 auf Branch `nachtlauf-s1`, Nachtrag 2: Effort)
+Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3: Lücke je Einheit)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -664,6 +664,45 @@ Per `workflow_dispatch` mit `modus=live`, `timeout=150`, `budget_min=110`, `max_
 - **Befund `geburtshaus-nuernberger-nest`: Kurse 2027 fehlen.** Die Einheit `bauersachs.hebamio.de/kursliste` (2 Teile, beide gültig) liefert 5 Kurse, der Mittagskurs ab 15.1.2027 und die „Postpartum Recovery Class“ ab 22.2.2027 fehlen, obwohl sie im Text stehen. Dazu kommen zwei Dubletten über die Einheitsgrenze und die erfundene „Babymassage mit Noelle“. Im Trockenlauf auf denselben Seiten und im Eval (2 von 2) war der Fall sauber; in S0 fehlten die Kurse in 2 von 2 Läufen. Opus lässt sie hier also zufällig aus, etwa jedes zweite Mal.
   - **Folge:** Der Fehler bleibt stehen, denn die Einheit wird erst bei geänderter Seite oder geändertem Auszug neu extrahiert. Die Einbruchprüfung greift nicht (7 → 5 Angebote der Einheit).
   - Offen, Nutzerentscheid: eine geänderte `hint` der Seite (erzwingt die Neuextraktion, wieder mit Zufall) und/oder ein Nachtrag mit einer Prüfung je Einheit gegen den Vorstand, die bei fehlenden, noch künftigen Kursen ein zweites Mal extrahiert.
+
+### Nachtrag 3 (2026-10-27, nach der Umstellung): zweiter Versuch bei einer Lücke (E13)
+
+**Anlass:** Bei der Umstellung ließ Opus in der Einheit `bauersachs.hebamio.de/kursliste` zwei Kurse 2027 aus, die im Text stehen und im Vorstand waren (Abschnitt „Umstellung“). Der Einbruchschutz griff nicht (7 → 5 Angebote der Einheit). Weil eine Einheit erst bei geänderter Eingabe neu extrahiert wird, blieb die Lücke stehen; behoben wurde sie von Hand über eine `hint` (`7485ad3`). Über vier Ziehungen derselben Eingabe (Eval 2×, Trockenlauf, Umstellung) fehlte sie einmal, in S0 zweimal von zwei.
+
+**Nutzerentscheid** vom 2026-10-27: Empfehlung angenommen (Katalog-`hint` und dieser Nachtrag).
+
+**E13 – Lücke gegen den Vorzustand der Einheit:**
+
+- **Alt** sind die Events des eigenen Vorzustands (`ctx.prev.events`, nur mit `prev.inputHash`). Sie gehören per Konstruktion zu dieser Einheit (ADR 0033, Punkt 2: die Einheit, nicht `sourceUrl`, ordnet ein Event seiner Seite zu). Beilagen, Vorlagen-URLs und `request`-Einheiten brauchen so keine Sonderregel. Ohne Vorzustand (neue Einheit, V1) gibt es keine Prüfung; seit der Umstellung sind alle Dateien V2.
+- Ein altes Event **fehlt**, wenn es mindestens einen künftigen Beginn hat und kein neues Event es **deckt**. Gedeckt heißt: gleicher Ort, ähnlicher Titel (`similarTitle`) und mindestens ein gemeinsamer künftiger Beginn. Zugeordnet wird **je Beginn**: Jeder künftige Zeitpunkt eines neuen Events deckt höchstens ein altes Event (in Reihenfolge der alten Events). So brauchen zwei parallele Kurse zur selben Zeit (`die-familienbox`, Di 9:30) zwei neue, aber eine Regel, die mehrere alte Einzeltermine bündelt (`theater-mummpitz`, `neues-museum-baby-museum`), deckt alle.
+  - Beginne über `expandSchedule` mit `expansionWindow` bis `addDays(today, 400)` und `freeDays`, ab `today`, verglichen als Zeitpunkte (`Date.parse`) wie in `matchUnits`.
+  - Rein in `lib/refresh.ts`: `missingFromPrevious(fresh, reference, { today, freeDays }) → RawEvent[]` (fehlende Events aus `reference`).
+- **Ablauf in `refreshUnit`** (`io/refresh.ts`):
+  1. Erste Antwort, `applyOutcome`. Ist das Ergebnis `einbruch`, gilt der bisherige Pfad (E5, zweiter Versuch wegen Einbruchs); E13 prüft nicht.
+  2. Nur bei `extrahiert` folgt die Lückenprüfung. Fehlt mindestens ein Event und erlaubt die Bremse es (`mayRetry(calls)`), folgt **ein** zweiter Versuch mit derselben Eingabe und `strong: true`. Das ist das Fallback-Modell, heute wieder Opus (`LLM_MODEL_FALLBACK`), also eine zweite Ziehung desselben Modells; gewollt, denn die Lücke ist Zufall. Er kostet einen Aufruf je Teil (`splitInput`).
+  3. **Welche Antwort gilt:** Jede Antwort wird gegen die Vereinigung aus Vorzustand und der **anderen** Antwort bewertet (`missingFromPrevious(a, [...prev, ...b])`). So verliert eine Antwort, die einen alten Kurs wiederfindet, dafür aber einen neuen weglässt, den die andere hatte. Es gilt die mit weniger fehlenden Events, bei Gleichstand die erste. Es gelten die Warnungen der gewählten Antwort, dazu der Lückenhinweis. Ist die gewählte Antwort danach ein Einbruch, wird sie wie jeder Einbruch `pending`, ohne dritten Aufruf (der `fallback`-Step sperrt `needsStrongRetry`).
+  4. **Fehlerpfade:** Liefert der zweite Versuch `fehler` oder wirft er, gilt die erste Antwort, Hinweis „zweiter Versuch gescheitert“. Wird der Lauf während des zweiten Versuchs abgebrochen (`signal`) oder liefert er `abort` (Auth, Limit), wird die erste, gültige Antwort geschrieben („ein fertiges Ergebnis zählt auch nach dem Abbruch“, `io/refresh.ts`), danach geht `abgebrochen` bzw. `abort` durch. Verweigert die Bremse den zweiten Versuch, gilt die erste Antwort mit Hinweis „kein zweiter Versuch“.
+  - Keine Lückenprüfung für `kandidaten` (die Kandidaten wechseln von Nacht zu Nacht) und im Entdecken (`refreshProvider` ohne `mayRetry`: Ein neuer Anbieter hat keinen Vorzustand).
+- **Bericht:** neues optionales Feld auf oberster Ebene von `nightly.json`: `gaps: Record<providerId, Record<unitId, { before: number; after?: number }>>` (`after` nur nach einem zweiten Versuch); `units` bleibt unverändert, ältere Berichte ohne `gaps` werden weiter gelesen. Weg: `UnitRun` → `RefreshOutcome.gaps` → `runNightly`. Dazu in `warnings` des Anbieters ein Hinweis „seite:…: Lücke, n Angebote der Vornacht fehlten (Titel …); zweiter Versuch: m“. `status.md` zählt die Einheiten mit Lücke.
+- **Risiko:** Ein Titelwechsel, der `similarTitle` nicht mehr erfüllt, gilt als Lücke und löst einen zweiten Aufruf und einen Hinweis aus. Die Zahl in `status.md` ist also eine Obergrenze echter Lücken; die Abnahme misst den Anteil falscher Meldungen.
+- Kein Zurückhalten wie beim Einbruch: Eine Seite, die einen Kurs wirklich streicht, verliert ihn nach dem zweiten Versuch. Das ist gewollt.
+- **Kosten** (kein Kriterium, nur genannt): je Einheit mit Lücke so viele Aufrufe mehr, wie sie Teile hat, begrenzt durch die Bremse.
+
+**Dateien:** `scripts/pipeline/lib/refresh.ts` (`missingFromPrevious`), `scripts/pipeline/io/refresh.ts` (Ablauf, Wahl, Hinweis, `gaps`), `scripts/pipeline/lib/report.ts` (Feld `gaps`, Zähler), `scripts/pipeline/io/nightly.ts` (`gaps` sammeln), Tests in `lib/refresh.test.ts`, `io/refresh.test.ts`, `lib/report.test.ts`, `io/nightly.test.ts`.
+
+**Tests (test-first):**
+- `missingFromPrevious`: altes Event mit künftigem Beginn fehlt → gemeldet; altes Event nur mit vergangenen Beginnen → nicht; drei alte Einzeltermine, eine neue Regel mit diesen Beginnen → gedeckt; anderer Ort → fehlt; zwei parallele Kurse zur selben Zeit, einer fehlt → gemeldet; Beginne mit anderem Offset, gleicher Zeitpunkt → gedeckt; kein Vorzustand → leer; **Anlassfall** in nachgebauter Form von `geburtshaus-nuernberger-nest` (alt: sieben Rückbildungskurse gleichen Orts mit ähnlichen Titeln wie im Trockenlauf; neu: die fünf der Umstellung) → genau Mittagskurs ab 15.1.2027 und Postpartum Recovery Class gemeldet.
+- `refreshProvider`: Lücke → zweiter Aufruf mit `strong`; zweite Antwort mit weniger Lücken gilt; Gleichstand → erste; zweite Antwort findet den alten Kurs, verliert aber einen neuen der ersten → nach der Regel gewählt, Hinweis nennt beides; zweite Antwort ist Einbruch → `pending`, kein dritter Aufruf; erste Antwort Einbruch → nur der Einbruchpfad (ein zweiter Aufruf); zweiter Versuch `fehler` oder Ausnahme → erste Antwort mit Hinweis; Abbruch oder `abort` im zweiten Versuch → erste Antwort geschrieben, dann `abgebrochen`/`abort`; Bremse verweigert → erste Antwort mit Hinweis; `kandidaten` → kein zweiter Aufruf; Warnungen der gewählten Antwort; `gaps` im Ergebnis.
+- `io/nightly.test.ts`: `gaps` landet in `nightly.json`; ein Bericht ohne `gaps` wird weiter gelesen.
+- Eval: unverändert (das Eval hat keinen Vorzustand).
+
+**Lokal prüfen:** `pnpm verify` (Stufe C); kein E2E (nur Pipeline-Code, `--affected` meldet das). `node scripts/change-size.ts` prüft den Zuschnitt; ab 200 Zeilen `/arch-review`.
+
+**Abnahme:** Tests grün. In den ersten drei Nachtläufen nach dem Merge werden alle gemeldeten Lücken von Hand eingeordnet (echte Lücke, Titelwechsel, Bündelung, gestrichener Kurs); festgehalten werden die Zahl je Nacht, der Anteil falscher Meldungen und wie oft der zweite Versuch die Lücke schloss.
+
+**Review Nachtrag 3 (2026-10-27) – Verdict: Überarbeiten.** Übernommen: **B1** „alt“ sind die Events des Vorzustands der Einheit statt Angebote über `sourceUrl` (ADR 0033, Punkt 2; Vorlagen, `request`, Beilagen); **M1** Reihenfolge Einbruch vor Lücke, kein dritter Aufruf; **M2** Fehlerpfade des zweiten Versuchs; **M3** Titelähnlichkeit und Eins-zu-eins-Zuordnung (parallele Kurse); **m1** Zeitpunkte und Fenster; **m2** Kosten je Teil; **m3** Feld `gap` in `nightly.json`; **m4** prüfbare Abnahme; **m5** lokale Prüfung; **m6** Entdecken; **m7** Testfälle.
+
+**Review 2 Nachtrag 3 (2026-10-27) – Verdict: Freigabe mit Änderungen.** Übernommen: **M1** Zuordnung je Beginn (Bündelung); **M2** eigenes Feld `gaps` statt Änderung von `units`; **M3** Bewertung gegen Vorzustand plus andere Antwort; **m1** erste Antwort wird bei Abbruch geschrieben; **m2** Warnungen der gewählten Antwort; **m3** Test mit dem Anlassfall; **m4** Risiko Titelwechsel; **m5** Abnahme mit Einordnung von Hand; **m6** zweite Ziehung desselben Modells benannt.
 
 ## Review (2026-10-26) – Verdict: Überarbeiten
 
