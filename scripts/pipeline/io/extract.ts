@@ -49,7 +49,7 @@ export interface ExtractorOptions {
 }
 
 /** Fallback-Modell der Extraktion (E4): `LLM_MODEL_FALLBACK`, sonst Sonnet. */
-export const fallbackModelOf = (env: NodeJS.ProcessEnv): string => env["LLM_MODEL_FALLBACK"] ?? "sonnet";
+const fallbackModelOf = (env: NodeJS.ProcessEnv): string => env["LLM_MODEL_FALLBACK"] ?? "sonnet";
 
 /** Effort der Extraktion: `LLM_EFFORT_EXTRACT`, leer oder fehlend heißt Standard der CLI. */
 export function effortOf(env: NodeJS.ProcessEnv): Effort | undefined {
@@ -96,9 +96,10 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
     });
     const users = texts.map((text, i) =>
       extractMessage({
-        provider: input.provider,
+        provider: input.excerpt ?? input.provider,
         text,
         ctx,
+        ...(input.unit ? { unit: input.unit } : {}),
         ...(texts.length > 1 ? { part: { index: i + 1, count: texts.length } } : {}),
       }),
     );

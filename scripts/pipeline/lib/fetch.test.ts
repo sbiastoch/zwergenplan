@@ -117,8 +117,15 @@ describe("assembleProvider (Plan 0032, E3)", () => {
     const r = assembleProvider({
       pages: [
         page("https://a.de/1", "ok"),
-        { url: "https://a.de/2.pdf", art: "pdf", ok: false, reason: "leeres PDF", ms: 5 },
-        { url: "https://a.de/3", art: "browser", ok: false, reason: "Zeitüberschreitung", ms: 5 },
+        { url: "https://a.de/2.pdf", art: "pdf", ok: false, reason: "leeres PDF", ms: 5, klasse: "voruebergehend" },
+        {
+          url: "https://a.de/3",
+          art: "browser",
+          ok: false,
+          reason: "Zeitüberschreitung",
+          ms: 5,
+          klasse: "voruebergehend",
+        },
       ],
       candidates: [],
     });

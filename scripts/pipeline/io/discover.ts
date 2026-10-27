@@ -56,6 +56,7 @@ import { botWall } from "../lib/fetch.ts";
 import { extractPage, type FetchedPage } from "../lib/html-extract.ts";
 import { anbieterVids } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
+import { providerStatus } from "../lib/raw.ts";
 import { planFetch } from "../lib/select.ts";
 import { GateError } from "./discover-git.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
@@ -606,10 +607,10 @@ async function proveEntry(
   const r = await refreshProvider({
     provider: entry,
     fetched: input,
-    prevOfferCount: 0,
     extractor: o.deps.extractor,
     signal: ctx.controller.signal,
     keyParts: o.keyParts,
+    freeDays: ctx.freeDays,
     today: o.today,
     now,
     rawDir: ctx.proofRaw,
@@ -622,10 +623,17 @@ async function proveEntry(
   if (!raw || r.result !== "extrahiert")
     return {
       kind: "nein",
-      grund: r.result === "leer" ? "keine Eingabe" : `Extraktion gescheitert: ${raw?.reason ?? r.result}`,
+      grund:
+        r.result === "leer"
+          ? "keine Eingabe"
+          : `Extraktion gescheitert: ${(raw && providerStatus(raw).reason) ?? r.result}`,
       calls: r.calls,
     };
-  const { batches, extracted } = batchesFromRaw({ [entry.id]: raw }, [entry]);
+  const { batches, extracted } = batchesFromRaw({ [entry.id]: raw }, [entry], {
+    previous: undefined,
+    horizon: ctx.horizon,
+    freeDays: ctx.freeDays,
+  });
   const { file } = buildOffers({
     batches,
     providers: [entry],

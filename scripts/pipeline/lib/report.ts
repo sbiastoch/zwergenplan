@@ -7,24 +7,28 @@ import { z } from "zod";
 import { berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
 import { type CostSummary, summarizeCosts } from "./cost.ts";
 import type { CallRecord } from "./extract.ts";
-import { CATEGORY_CONFLICT, type ProviderRaw } from "./raw.ts";
-import type { RefreshResult } from "./refresh.ts";
+import { CATEGORY_CONFLICT, type ProviderRaw, providerStatus, rawEvents, unitStates } from "./raw.ts";
+import type { ProviderResult } from "./refresh.ts";
 
 const REFRESH_RESULTS = [
   "unveraendert",
   "pending-uebernommen",
   "ausgefallen",
+  "entfernt",
   "extrahiert",
   "einbruch",
   "leer",
   "fehler",
-] as const satisfies readonly RefreshResult[];
+  "teilausfall",
+  "umstellung-ausstehend",
+  "offen",
+] as const satisfies readonly ProviderResult[];
 
 /**
  * Ergebnis je Anbieter: Regel aus E5 oder nicht bearbeitet (`offen`), abgebrochen, Auslöser des Abbruchs. Fehlt hier
  * eine Regel aus lib/refresh.ts, wird `runNightly` beim Typprüfen rot (Zuweisung von `RefreshResult`).
  */
-export const ProviderState = z.enum([...REFRESH_RESULTS, "offen", "abgebrochen", "abort"]);
+export const ProviderState = z.enum([...REFRESH_RESULTS, "abgebrochen", "abort"]);
 export type ProviderState = z.infer<typeof ProviderState>;
 
 /** `CallRecord` (lib/extract.ts) beim Lesen von nightly.json; `part` nur, wenn gesetzt */
@@ -33,6 +37,7 @@ const CallRecordSchema = z
     step: z.enum(["extract", "fallback", "search", "assess"]),
     providerId: z.string(),
     part: z.string().optional(),
+    unit: z.string().optional(),
     model: z.string(),
     inputTokens: z.number(),
     outputTokens: z.number(),
@@ -44,7 +49,13 @@ const CallRecordSchema = z
     costUsd: z.number().nullable(),
     result: z.enum(["ok", "invalid", "truncated", "abort", "error"]),
   })
-  .transform(({ part, ...rest }): CallRecord => (part === undefined ? rest : { ...rest, part }));
+  .transform(
+    ({ part, unit, ...rest }): CallRecord => ({
+      ...rest,
+      ...(part === undefined ? {} : { part }),
+      ...(unit === undefined ? {} : { unit }),
+    }),
+  );
 
 const AdapterSummary = z.object({
   status: z.enum(["ok", "fehler"]),
@@ -59,6 +70,10 @@ export const NightlyReport = z.object({
   date: z.string(),
   durationMs: z.number(),
   results: z.record(z.string(), ProviderState),
+  /** Ergebnis je Einheit (Plan 0048, E5); fehlt in älteren Berichten */
+  units: z.record(z.string(), z.record(z.string(), z.string())).optional(),
+  /** Anbieter mit ausstehender Umstellung und Grund (E7); fehlt in älteren Berichten */
+  migrations: z.record(z.string(), z.string()).optional(),
   calls: z.array(CallRecordSchema),
   /** Hinweise der Prüfung je Anbieter mit neuer Antwort (`validateRaw`, Teile), nur Anbieter mit Hinweisen */
   warnings: z.record(z.string(), z.array(z.string())),
@@ -180,6 +195,11 @@ export function assessRun(
         `${failed} von ${total} Anbietern mit Fehler (${Math.round((failed / total) * 100)} %, Grenze ${MAX_FAILED_SHARE * 100} %)`,
       );
     else if (failed > 0) yellow.push(`${failed} Anbieter mit Fehler`);
+    // einzelne Seiten im Fehler zählen nicht zur 20-%-Regel (Plan 0048, E10)
+    const partial = countOf(r, new Set<ProviderState>(["teilausfall"]));
+    if (partial > 0) yellow.push(`${partial} Anbieter mit einzelnen Seiten im Fehler`);
+    const pendingMigration = countOf(r, new Set<ProviderState>(["umstellung-ausstehend"]));
+    if (pendingMigration > 0) yellow.push(`${pendingMigration} Anbieter noch nicht umgestellt (Plan 0048, E7)`);
     const collapses = countOf(r, new Set<ProviderState>(["einbruch"]));
     if (collapses > 0) yellow.push(`${collapses} ${collapses === 1 ? "Einbruch" : "Einbrüche"} zurückgehalten`);
     const undone = countOf(r, UNDONE);
@@ -250,7 +270,7 @@ function categoryLines(r: NightlyReport, raws: Readonly<Record<string, ProviderR
     (n, id) => n + (r.warnings[id] ?? []).filter((w) => w.includes(CATEGORY_CONFLICT)).length,
     0,
   );
-  const events = adopted.reduce((n, id) => n + (raws[id]?.events.length ?? 0), 0);
+  const events = adopted.reduce((n, id) => n + (raws[id] ? rawEvents(raws[id]).length : 0), 0);
   if (conflicts > 0)
     out.push(
       `Kategorie passt zu keinem Thema: ${de(conflicts)} von ${de(events)} neuen Events (${Math.round((conflicts / Math.max(events, 1)) * 100)} %)`,
@@ -300,9 +320,13 @@ export function renderStatus(s: StatusInput): string {
   if (transition.length > 0) out.push("", ...transition.map((l) => `- ${l}`));
   if (r.build.errors.length > 0) out.push("", "**Build-Fehler:**", ...r.build.errors.map((e) => `- ${e}`));
 
-  const failing = Object.entries(s.raws)
-    .filter(([, raw]) => raw.status === "fehler")
-    .map(([id, raw]) => `| ${id} | ${cell(raw.reason ?? "")} | ${day(raw.failingSince)} |`);
+  // je Einheit (Plan 0048): eine ausgefallene Seite steht mit ihrer Kennung da
+  const label = (id: string, unit: string) => (unit === "" ? id : `${id} ${unit}`);
+  const failing = Object.entries(s.raws).flatMap(([id, raw]) =>
+    unitStates(raw)
+      .filter(([, u]) => u.status === "fehler")
+      .map(([unit, u]) => `| ${cell(label(id, unit))} | ${cell(u.reason ?? "")} | ${day(u.failingSince)} |`),
+  );
   const adapterFailures = Object.entries(r.adapters)
     .filter(([, a]) => a.status === "fehler")
     .map(([name, a]) => `| ${name} (Sammelkalender) | ${cell(a.reason ?? "")} | – |`);
@@ -317,10 +341,15 @@ export function renderStatus(s: StatusInput): string {
       ...adapterFailures,
     );
 
-  const pending = Object.entries(s.raws).filter(([, raw]) => raw.pending);
+  const pending = Object.entries(s.raws).flatMap(([id, raw]) =>
+    unitStates(raw).flatMap(([unit, u]) => (u.pending ? [{ id, unit, u, pending: u.pending }] : [])),
+  );
   if (pending.length > 0) {
     out.push("", "## Zurückgehaltene Einbrüche (E5)", "", "| Anbieter | Bestand | neu |", "|---|---|---|");
-    for (const [id, raw] of pending) out.push(`| ${id} | ${s.stock[id] ?? 0} | ${raw.pending?.events.length ?? 0} |`);
+    for (const p of pending)
+      out.push(
+        `| ${cell(label(p.id, p.unit))} | ${p.unit === "" ? (s.stock[p.id] ?? 0) : p.u.events.length} | ${p.pending.events.length} |`,
+      );
   }
   if (r.removed.length > 0) out.push("", `Zustand entfernt (nicht mehr im Katalog): ${r.removed.join(", ")}`);
 
@@ -342,8 +371,9 @@ export function nightlyCommitMessage(r: NightlyReport, raws: Readonly<Record<str
   const counts = new Map<string, number>();
   for (const st of Object.values(r.results)) counts.set(st, (counts.get(st) ?? 0) + 1);
   const failing = Object.entries(raws)
-    .filter(([id, raw]) => raw.status === "fehler" && r.results[id] !== undefined)
-    .map(([id, raw]) => `${id} (${(raw.reason ?? "").slice(0, 80)})`);
+    .map(([id, raw]) => [id, providerStatus(raw)] as const)
+    .filter(([id, s]) => s.failedUnits > 0 && r.results[id] !== undefined)
+    .map(([id, s]) => `${id} (${(s.reason ?? "").slice(0, 80)})`);
   const prev = r.previous;
   const lines = [
     `data: Nachtlauf ${r.date} (${r.build.offers} Angebote, ${changed} Anbieter geändert)`,

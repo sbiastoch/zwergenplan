@@ -5,6 +5,7 @@ import {
   expansionWindow,
   ProviderRaw,
   providerRawIssues,
+  providerStatus,
   type RawContext,
   validateRaw,
 } from "./raw.ts";
@@ -288,5 +289,57 @@ describe("providerRawIssues (data:validate, Plan 0032 E13)", () => {
         anbieter,
       ),
     ).toEqual(["f.json: Event „Offener Krabbeltreff“ gehört zu x"]);
+  });
+});
+
+describe("ProviderRaw Version 2 (Plan 0048, E4)", () => {
+  const T = "2026-10-12T03:00:00+02:00";
+  const ok = {
+    events: [],
+    status: "keine-termine",
+    checkedAt: T,
+    inputHash: "a".repeat(64),
+    model: "opus",
+    changedAt: T,
+  };
+  const failed = { events: [], status: "fehler", reason: "HTTP 404", failingSince: T, checkedAt: T };
+  const v2 = (units: Record<string, object>) => ({ version: 2, units });
+  const issues = (raw: unknown) =>
+    providerRawIssues("f.json", "familientreff-beispiel", raw, new Set(["familientreff-beispiel"]));
+
+  it("Regeln je Einheit; klasse nur mit klasseSince und nur bei fehler; sources nur bei kandidaten", () => {
+    expect(issues(v2({ "seite:https://a.de/1": ok, kandidaten: { ...ok, sources: ["evtermine"] } }))).toEqual([]);
+    expect(issues(v2({ "seite:https://a.de/1": { ...ok, status: "fehler" } })).join("\n")).toMatch(/reason/);
+    expect(issues(v2({ "seite:https://a.de/1": { ...failed, klasse: "dauerhaft" } })).join("\n")).toMatch(
+      /klasse und klasseSince/,
+    );
+    expect(issues(v2({ "seite:https://a.de/1": { ...ok, klasse: "dauerhaft", klasseSince: T } })).join("\n")).toMatch(
+      /klasse nur bei status fehler/,
+    );
+    expect(issues(v2({ "seite:https://a.de/1": { ...ok, sources: [] } })).join("\n")).toMatch(
+      /sources nur bei kandidaten/,
+    );
+    expect(issues(v2({ "falsch:x": ok })).length).toBeGreaterThan(0);
+  });
+
+  it("V1 bleibt gültig bis S5", () => {
+    expect(issues({ ...ok, sources: [] })).toEqual([]);
+  });
+
+  it("providerStatus: fehler nur, wenn alle Einheiten fehler sind; sonst ok mit Zahl der Einheiten im Fehler", () => {
+    const withEvents = { ...ok, status: "ok", events: [treff] };
+    const parse = (raw: unknown) => ProviderRaw.parse(raw);
+    expect(providerStatus(parse(v2({ "seite:a": failed, "seite:b": failed })))).toMatchObject({
+      status: "fehler",
+      failedUnits: 2,
+      failingSince: T,
+    });
+    expect(providerStatus(parse(v2({ "seite:a": failed, "seite:b": withEvents })))).toMatchObject({
+      status: "ok",
+      failedUnits: 1,
+      reason: "seite:a: HTTP 404",
+    });
+    expect(providerStatus(parse(v2({ "seite:a": ok })))).toEqual({ status: "keine-termine", failedUnits: 0 });
+    expect(providerStatus(parse({ ...ok, sources: [] }))).toEqual({ status: "keine-termine", failedUnits: 0 });
   });
 });

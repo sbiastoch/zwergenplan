@@ -283,6 +283,8 @@ function shape(e: Mergeable, occ: Occurrences): string {
 
 export interface MergeResult<T> {
   events: T[];
+  /** je Event in `events` der Index seines Teils (Plan 0048, E6: Batch je Einheit) */
+  from: number[];
   /** je entfallenem oder angeglichenem Event eine Zeile mit beiden Titeln, für den Bericht */
   notes: string[];
 }
@@ -306,6 +308,7 @@ export function mergeParts<T extends Mergeable>(parts: readonly (readonly T[])[]
   const keys = new Map<string, { title: string; part: number }>();
   const earlier: Array<{ e: T; occ: Occurrences; shape: string; part: number }> = [];
   const events: T[] = [];
+  const from: number[] = [];
   const notes: string[] = [];
   parts.forEach((part, p) => {
     const added: typeof earlier = [];
@@ -326,10 +329,11 @@ export function mergeParts<T extends Mergeable>(parts: readonly (readonly T[])[]
       const kept = twin ? { ...e, title: twin.e.title } : e;
       if (twin) notes.push(`${label} unter dem Titel „${twin.e.title}“ aus Teil ${twin.part} (Termine vereinigt)`);
       events.push(kept);
+      from.push(p);
       added.push({ e: kept, occ, shape: own, part: p + 1 });
     }
     for (const a of added) keys.set(sameOfferKey(a.e), { title: a.e.title, part: a.part });
     earlier.push(...added);
   });
-  return { events, notes };
+  return { events, from, notes };
 }

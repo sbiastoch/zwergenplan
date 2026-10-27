@@ -3,14 +3,16 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { parse } from "yaml";
+import type { Provider } from "../../../src/domain/schema.ts";
 import { DISCOVER_BRAKES } from "../lib/cost.ts";
 import { DiscoverState } from "../lib/discover-state.ts";
 import type { CallRecord, Extractor } from "../lib/extract.ts";
+import type { PageOutcome } from "../lib/fetch.ts";
 import { RawEvent } from "../lib/raw.ts";
 import type { FetchPlan } from "../lib/select.ts";
 import { type DiscoverDeps, type DiscoverOptions, runDiscover, type StepReply } from "./discover.ts";
 import { GateError } from "./discover-git.ts";
-import type { FetchResult } from "./fetch-inputs.ts";
+import { type FetchResult, unitInputs } from "./fetch-inputs.ts";
 
 const FIXTURES = new URL("../../../tests/fixtures/", import.meta.url);
 const TODAY = "2026-10-11";
@@ -64,10 +66,19 @@ const assessOk = (name: string, address = "Kernstraße 3, 90429 Nürnberg") => (
 });
 
 /** Abruf des Ertragsbeweises ohne Netz: jede Programmseite liefert einen Text mit Babybezug */
-const fakeFetchInputs = async (plan: FetchPlan): Promise<FetchResult> => {
+const fakeFetchInputs = async (plan: FetchPlan, catalog: readonly Provider[]): Promise<FetchResult> => {
   const out: FetchResult = { providers: {}, texts: {}, adapters: {}, inputs: {} };
   for (const p of plan.providers) {
-    const pages = p.pages.map((t) => ({ url: t.url, text: "Krabbelgruppe mittwochs für Babys" }));
+    const owner = catalog.find((c) => c.id === p.id);
+    if (owner?.role !== "anbieter") continue;
+    const outcomes: PageOutcome[] = p.pages.map((t) => ({
+      url: t.url,
+      art: "html",
+      ok: true,
+      text: "Krabbelgruppe mittwochs für Babys",
+      ms: 1,
+    }));
+    const pages = outcomes.flatMap((o) => (o.ok ? [{ url: o.url, text: o.text }] : []));
     out.inputs[p.id] = {
       via: p.via,
       adapterIssues: {},
@@ -76,6 +87,7 @@ const fakeFetchInputs = async (plan: FetchPlan): Promise<FetchResult> => {
       candidates: [],
       text: "## Seite 1\nKrabbelgruppe mittwochs für Babys",
       allowedUrls: pages.map((pg) => pg.url),
+      ...unitInputs(owner, outcomes, []),
     };
   }
   return out;

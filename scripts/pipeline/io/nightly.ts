@@ -54,10 +54,12 @@ export interface NightlyOptions {
   now: () => string;
   concurrency?: number;
   /**
-   * Nach einem Einbruch ein zweiter Versuch mit dem Fallback-Modell (Plan 0032, „Einbruch → …“); nur sinnvoll, wenn es
-   * ein anderes Modell ist. Standard aus.
+   * Nach einem Einbruch ein zweiter Versuch mit dem Fallback-Modell (Plan 0032, „Einbruch → …“), auch wenn es das
+   * Hauptmodell ist (Plan 0048, E5: Die Streuung zwischen zwei Läufen ist groß). Standard aus; `pipeline nightly` an.
    */
   strongRetry?: boolean;
+  /** Anbieter, deren Umstellung auf V2 erzwungen wird (Plan 0048, E7, `--umstellen` nach Prüfung) */
+  forceMigrate?: readonly string[];
   /** für Tests: Abruf und Ferien ohne Netz */
   fetch?: typeof fetchInputs;
   freeDays?: typeof loadFreeDays;
@@ -104,11 +106,26 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   let budgetHit = false;
   let brake: BrakeKind | undefined;
   let cached = 0;
+  const units: NonNullable<NightlyReport["units"]> = {};
+  const migrations: Record<string, string> = {};
+  const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
+  // vor den Einheiten geladen: `hasFuture` (E5) braucht sie, der Build danach dieselben
+  const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
+  const force = new Set(o.forceMigrate ?? []);
   const work = plan.providers.flatMap((p) => {
     const provider = byId.get(p.id);
     const input = fetched.inputs[p.id];
-    return provider && input ? [{ provider, input }] : [];
+    return provider?.role === "anbieter" && input ? [{ provider, input }] : [];
   });
+  /** Zeitbudget und Bremse; geprüft vor jedem Anbieter und vor jeder Einheit (E9) */
+  const mayGo = (own: readonly CallRecord[]) => {
+    if (elapsedMin() >= o.budgetMin) {
+      budgetHit = true;
+      return false;
+    }
+    brake ??= brakeHit([...calls, ...own], brakes);
+    return brake === undefined;
+  };
   const concurrency = o.concurrency ?? CONCURRENCY;
   await runLimited(
     work,
@@ -119,14 +136,8 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
         results[provider.id] = "offen";
         return;
       }
-      if (elapsedMin() >= o.budgetMin) {
-        budgetHit = true;
-        results[provider.id] = "offen";
-        return;
-      }
-      // Bremse vor jedem Anbieter wie das Zeitbudget: laufende Anbieter enden noch (Überhang höchstens `concurrency`)
-      brake ??= brakeHit(calls, brakes);
-      if (brake) {
+      // vor jedem Anbieter wie vor jeder Einheit: laufende Einheiten enden noch (Überhang höchstens `concurrency`)
+      if (!mayGo([])) {
         results[provider.id] = "offen";
         return;
       }
@@ -138,18 +149,11 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
           extractor: o.extractor,
           signal: controller.signal,
           keyParts: o.keyParts,
-          // dieselben Grenzen wie vor jedem Anbieter, jetzt vor dem zweiten Versuch
-          ...(o.strongRetry
-            ? {
-                mayRetry: (own: readonly CallRecord[]) => {
-                  if (elapsedMin() >= o.budgetMin) {
-                    budgetHit = true;
-                    return false;
-                  }
-                  return brakeHit([...calls, ...own], brakes) === undefined;
-                },
-              }
-            : {}),
+          // dieselben Grenzen wie vor jedem Anbieter, jetzt vor jeder Einheit und vor dem zweiten Versuch
+          mayContinue: mayGo,
+          ...(o.strongRetry ? { mayRetry: mayGo } : {}),
+          forceMigrate: force.has(provider.id),
+          freeDays,
           today: o.today,
           now: fetchedAt,
           rawDir,
@@ -158,6 +162,8 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
         calls.push(...r.calls);
         if (r.kind === "done") {
           results[provider.id] = r.result;
+          units[provider.id] = r.units;
+          if (r.migration) migrations[provider.id] = r.migration;
           if (r.warnings) warnings[provider.id] = r.warnings;
           if (!r.called && r.result !== "ausgefallen") cached++;
         } else if (r.kind === "abort") {
@@ -190,13 +196,15 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     now: o.now,
     sources,
     ...(o.dryRun ? { dryRun: { overlayDir: outDir, target: join(o.runDir, "offers.json") } } : {}),
-    ...(o.freeDays ? { freeDays: o.freeDays } : {}),
+    freeDays: async () => freeDays,
   });
   writeFileSync(join(o.runDir, "kosten.jsonl"), costJsonl(calls, { run: "nacht", date: o.today }));
   const out: NightlyReport = {
     date: o.today,
     durationMs: Math.round(performance.now() - started),
     results,
+    units,
+    ...(Object.keys(migrations).length > 0 ? { migrations } : {}),
     calls,
     warnings,
     cached,
@@ -247,9 +255,14 @@ async function buildFromRaw(o: {
     }
 
   const raws = { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(o.dryRun.overlayDir) : {}) };
-  const { batches, extracted, notes } = batchesFromRaw(raws, o.catalog);
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
+  // vor `batchesFromRaw`: Abgleich und Vereinigung der Einheiten brauchen die freien Tage (Plan 0048, E6)
   const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
+  const { batches, extracted, notes } = batchesFromRaw(raws, o.catalog, {
+    previous: o.previous?.offers,
+    horizon,
+    freeDays,
+  });
   const { file, report } = buildOffers({
     batches,
     providers: o.catalog,

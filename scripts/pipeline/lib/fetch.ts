@@ -6,6 +6,7 @@ import { z } from "zod";
 import { extractPage } from "./html-extract.ts";
 import { parseIcal } from "./ical.ts";
 import { ICAL_HEADING, inputHash, normalizeWhitespace, orderFreeHash } from "./normalize.ts";
+import type { FailureClass } from "./raw.ts";
 import type { PageTask } from "./select.ts";
 
 /** Eingabe-Obergrenze je Anbieter (E3): darüber `fehler`, nie gekürzt. */
@@ -87,7 +88,12 @@ export type HashesFile = z.infer<typeof HashesFile>;
 export type PageOutcome =
   /** `finalUrl`: Ziel nach Redirects, falls anders (erlaubte `sourceUrl`, Plan 0032, E4) */
   | { url: string; art: Art; ok: true; text: string; ms: number; finalUrl?: string }
-  | { url: string; art: Art; ok: false; reason: string; ms: number };
+  /** `klasse` (Plan 0048, E8) setzt der Abruf dort, wo der Fehler entsteht; den Grundtext parst niemand */
+  | { url: string; art: Art; ok: false; reason: string; ms: number; klasse: FailureClass };
+
+/** Fehlerklasse aus dem HTTP-Status (E8): 404 und 410 sind dauerhaft, alles andere vorübergehend. */
+export const failureClassOf = (status: number | undefined): FailureClass =>
+  status === 404 || status === 410 ? "dauerhaft" : "voruebergehend";
 
 const de = (n: number) => n.toLocaleString("de-DE");
 

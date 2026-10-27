@@ -13,10 +13,12 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { parse, stringify } from "yaml";
 import { validateDataset } from "../../../src/domain/dataset.ts";
+import type { Provider } from "../../../src/domain/schema.ts";
 import type { ExtractOutcome, Extractor, ExtractResult } from "../lib/extract.ts";
-import { RawEvent } from "../lib/raw.ts";
+import type { PageOutcome } from "../lib/fetch.ts";
+import { isV2, type ProviderRaw, providerStatus, RawEvent } from "../lib/raw.ts";
 import type { FetchPlan } from "../lib/select.ts";
-import type { FetchResult } from "./fetch-inputs.ts";
+import { type FetchResult, unitInputs } from "./fetch-inputs.ts";
 import { readCatalog, readPreviousOffers, readRaw } from "./files.ts";
 import { runBuildOnly, runNightly } from "./nightly.ts";
 
@@ -41,30 +43,57 @@ function tempData() {
   return { dataDir, runDir: join(root, "runs", TODAY) };
 }
 
-/** Abruf ohne Netz: jede Seite liefert „Programm <id>“, `fails` fallen aus. */
+/**
+ * Abruf ohne Netz: jede Seite liefert „Programm <url>“; `fails` (Anbieter-ID oder Seiten-URL) fallen aus, mit 404
+ * dauerhaft, sonst 503. Die Einheiten entstehen wie im echten Abruf (`unitInputs`).
+ */
 const fakeFetch =
-  (fails: readonly string[] = [], text = "Programm") =>
-  async (plan: FetchPlan): Promise<FetchResult> => {
+  (fails: readonly string[] = [], text: string | ((url: string) => string) = "Programm", status = 503) =>
+  async (plan: FetchPlan, catalog: readonly Provider[]): Promise<FetchResult> => {
     const out: FetchResult = { providers: {}, texts: {}, adapters: {}, inputs: {} };
     for (const p of plan.providers) {
-      const failed = fails.includes(p.id);
-      const pages = p.pages.map((t) => ({ url: t.url, text: `${text} ${p.id}` }));
+      const owner = catalog.find((c) => c.id === p.id);
+      if (owner?.role !== "anbieter") continue;
+      const outcomes: PageOutcome[] = p.pages.map((t) =>
+        fails.includes(p.id) || fails.includes(t.url)
+          ? {
+              url: t.url,
+              art: "html",
+              ok: false,
+              reason: `HTTP ${status}`,
+              ms: 1,
+              klasse: status === 404 ? "dauerhaft" : "voruebergehend",
+            }
+          : {
+              url: t.url,
+              art: "html",
+              ok: true,
+              text: typeof text === "string" ? `${text} ${t.url}` : text(t.url),
+              ms: 1,
+            },
+      );
+      const failed = outcomes.some((o) => !o.ok);
+      const okPages = outcomes.flatMap((o) => (o.ok ? [{ url: o.url, text: o.text }] : []));
       out.providers[p.id] = { status: failed ? "fehler" : "ok", chars: 0, candidates: 0, pages: [] };
       out.texts[p.id] = `${text} ${p.id}`;
-      const common = { via: p.via, adapterIssues: {} };
-      out.inputs[p.id] = failed
-        ? { ...common, status: "fehler", reason: "HTTP 503", pages: [], candidates: [], text: "", allowedUrls: [] }
-        : {
-            ...common,
-            status: pages.length > 0 ? "ok" : "leer",
-            pages,
-            candidates: [],
-            text: `${text} ${p.id}`,
-            allowedUrls: pages.map((pg) => pg.url),
-          };
+      out.inputs[p.id] = {
+        status: failed ? "fehler" : okPages.length > 0 ? "ok" : "leer",
+        ...(failed ? { reason: `HTTP ${status}` } : {}),
+        text: `${text} ${p.id}`,
+        pages: okPages,
+        candidates: [],
+        allowedUrls: okPages.map((pg) => pg.url),
+        via: p.via,
+        adapterIssues: {},
+        ...unitInputs(owner, outcomes, []),
+      };
     }
     return out;
   };
+
+/** Zustand einer Einheit bzw. des Anbieters (V1) */
+const unitOf = (raw: ProviderRaw | undefined, unit?: string) =>
+  raw && isV2(raw) ? (unit ? raw.units[unit] : Object.values(raw.units)[0]) : raw;
 
 const treff = RawEvent.parse({
   providerId: "familientreff-beispiel",
@@ -89,14 +118,20 @@ const treff = RawEvent.parse({
   },
 });
 
-/** Fake-Extraktor: zählt Aufrufe; Familientreff bekommt einen Treff, alle anderen keine Termine. */
+const treffs = [1, 2, 3].map((k) => ({
+  ...treff,
+  title: `${treff.title} ${k}`,
+  schedule: { ...treff.schedule, start: `1${k}:00`, end: `1${k}:45` },
+}));
+
+/** Fake-Extraktor: zählt Aufrufe; Familientreff bekommt drei Treffs (genug für die Umstellung), alle anderen keine Termine. */
 function fakeExtractor(outcomeFor?: (id: string) => ExtractOutcome | undefined) {
   const seen: string[] = [];
   const extractor: Extractor = async (input): Promise<ExtractResult> => {
     seen.push(input.provider.id);
     const outcome = outcomeFor?.(input.provider.id) ?? {
       kind: "ok",
-      events: input.provider.id === "familientreff-beispiel" ? [treff] : [],
+      events: input.provider.id === "familientreff-beispiel" ? treffs : [],
       model: "haiku",
     };
     const call = {
@@ -132,38 +167,60 @@ const options = (dirsOf: ReturnType<typeof tempData>, extractor: Extractor) => (
 });
 
 describe("runNightly (Plan 0032, E5/E6)", () => {
-  it("extrahiert, schreibt data/raw und offers.json; die zweite Nacht mit gleicher Eingabe ruft kein Modell", async () => {
+  it("extrahiert, schreibt data/raw (V2) und offers.json; die zweite Nacht mit gleicher Eingabe ruft kein Modell", async () => {
     const dirsOf = tempData();
     const { extractor, seen } = fakeExtractor();
     const first = await runNightly({ ...options(dirsOf, extractor), fetch: fakeFetch(["gemeinde-beispiel"]) });
     expect(seen.length).toBeGreaterThan(0);
     expect(first.calls).toHaveLength(seen.length);
-    // 4 Angebote im Vorstand, neu nur eines: Einbruch, zurückgehalten (E5)
-    expect(first.results["familientreff-beispiel"]).toBe("einbruch");
+    expect(first.results["familientreff-beispiel"]).toBe("extrahiert");
     expect(first.results["musikschule-beispiel"]).toBe("extrahiert");
-    expect(first.results["gemeinde-beispiel"]).toBe("ausgefallen");
+    // ohne Rohdatei, mit Angeboten im Vorstand: umgestellt wird nur ganz (E7)
+    expect(first.results["gemeinde-beispiel"]).toBe("umstellung-ausstehend");
+    expect(first.migrations?.["gemeinde-beispiel"]).toMatch(/^ohne gültiges Ergebnis: seite:/);
+    expect(first.units?.["familientreff-beispiel"]).toEqual({
+      "seite:https://example.org/familientreff/programm": "extrahiert",
+    });
     expect(first.build.errors).toEqual([]);
     expect(first.build.written).toBe(join(dirsOf.dataDir, "offers.json"));
     const rawDir = join(dirsOf.dataDir, "raw");
-    expect(readRaw(rawDir, "familientreff-beispiel")?.pending?.events).toHaveLength(1);
-    expect(readRaw(rawDir, "musikschule-beispiel")).toMatchObject({ status: "keine-termine", model: "haiku" });
-    expect(readRaw(rawDir, "gemeinde-beispiel")).toMatchObject({ status: "fehler", reason: "HTTP 503" });
+    const ft = readRaw(rawDir, "familientreff-beispiel");
+    expect(ft && isV2(ft)).toBe(true);
+    expect(unitOf(ft)?.events).toHaveLength(3);
+    expect(unitOf(readRaw(rawDir, "musikschule-beispiel"))).toMatchObject({ status: "keine-termine", model: "haiku" });
+    expect(readRaw(rawDir, "gemeinde-beispiel")).toBeUndefined();
     const offers = JSON.parse(readFileSync(join(dirsOf.dataDir, "offers.json"), "utf8"));
     expect(offers.horizon).toEqual({ from: TODAY, to: "2027-10-06" });
-    // gemeinde-beispiel (fehler, nie extrahiert) behält seinen Vorstand
+    // gemeinde-beispiel (nicht umgestellt) behält seinen Vorstand
     expect(offers.offers.some((o: { providerId: string }) => o.providerId === "gemeinde-beispiel")).toBe(true);
     expect(existsSync(join(dirsOf.runDir, "nightly.json"))).toBe(true);
     expect(existsSync(join(dirsOf.runDir, "fetch", "hashes.json"))).toBe(true);
 
     const second = fakeExtractor();
     const again = await runNightly({ ...options(dirsOf, second.extractor), fetch: fakeFetch(["gemeinde-beispiel"]) });
-    // gleiche Eingabe: kein Aufruf; der zurückgehaltene Einbruch wird in der zweiten Nacht übernommen
     expect(second.seen).toEqual([]);
     expect(again.calls).toEqual([]);
-    expect(again.results["familientreff-beispiel"]).toBe("pending-uebernommen");
+    expect(again.results["familientreff-beispiel"]).toBe("unveraendert");
     expect(again.results["musikschule-beispiel"]).toBe("unveraendert");
-    expect(readRaw(rawDir, "familientreff-beispiel")).toMatchObject({ status: "ok", model: "haiku" });
     expect(again.cached).toBeGreaterThan(0);
+  });
+
+  it("Umstellung mit Einbruch bleibt aus; --umstellen erzwingt sie (Plan 0048, E7)", async () => {
+    const dirsOf = tempData();
+    const one = (id: string): ExtractOutcome | undefined =>
+      id === "familientreff-beispiel" ? { kind: "ok", events: [treff], model: "haiku" } : undefined;
+    const r = await runNightly({ ...options(dirsOf, fakeExtractor(one).extractor), only: ["familientreff-beispiel"] });
+    expect(r.results["familientreff-beispiel"]).toBe("umstellung-ausstehend");
+    expect(r.migrations?.["familientreff-beispiel"]).toBe("Einbruch (4 → 1 Angebote)");
+    const rawDir = join(dirsOf.dataDir, "raw");
+    expect(readRaw(rawDir, "familientreff-beispiel")).toBeUndefined();
+    const forced = await runNightly({
+      ...options(dirsOf, fakeExtractor(one).extractor),
+      only: ["familientreff-beispiel"],
+      forceMigrate: ["familientreff-beispiel"],
+    });
+    expect(forced.results["familientreff-beispiel"]).toBe("extrahiert");
+    expect(unitOf(readRaw(rawDir, "familientreff-beispiel"))?.events).toHaveLength(1);
   });
 
   it("Hinweise der Prüfung je Anbieter stehen im Bericht (nightly.json)", async () => {
@@ -237,7 +294,7 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(readdirSync(join(dirsOf.runDir, "raw"))).toContain("familientreff-beispiel.json");
     expect(r.build.written).toBe(join(dirsOf.runDir, "offers.json"));
     const dry = JSON.parse(readFileSync(join(dirsOf.runDir, "offers.json"), "utf8"));
-    expect(dry.offers.some((o: { title: string }) => o.title === "Offener Krabbeltreff")).toBe(true);
+    expect(dry.offers.some((o: { title: string }) => o.title === "Offener Krabbeltreff 1")).toBe(true);
   });
 
   it("räumt den Zustand von Anbietern weg, die nicht mehr im Katalog stehen (Rücknahme, E7)", async () => {
@@ -316,7 +373,7 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     const csv = readFileSync(join(dirsOf.dataDir, "kosten.csv"), "utf8").trimEnd().split("\n");
     expect(csv[0]).toMatch(/^datum,lauf,region,aufrufe,/);
     expect(csv[1]).toBe(
-      `${TODAY},nacht,alle,${seen.length},${seen.length * 100},${seen.length * 10},${(seen.length * 0.001).toFixed(4)},,0,${seen.length - 1}`,
+      `${TODAY},nacht,alle,${seen.length},${seen.length * 100},${seen.length * 10},${(seen.length * 0.001).toFixed(4)},,0,${seen.length}`,
     );
     expect(r.previous).toEqual({ offers: 9, sessions: 31 });
     // zweite Nacht hängt an
@@ -340,13 +397,116 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
   });
 });
 
+describe("runNightly: Seitenausfall kostet nur die Seite (Plan 0048, Ziel 1)", () => {
+  const A = "https://example.org/familientreff/programm";
+  const B = "https://example.org/familientreff/kurse";
+  const massage = RawEvent.parse({
+    ...treff,
+    title: "Babymassage",
+    sourceUrl: B,
+    schedule: { ...treff.schedule, weekdays: ["FR"], until: "2027-03-26" },
+  });
+  const neu = RawEvent.parse({
+    ...treff,
+    title: "Neuer Eltern-Kind-Kurs",
+    schedule: { ...treff.schedule, weekdays: ["MO"] },
+  });
+
+  /** Katalog mit zweiter Seite B für den Familientreff */
+  function twoPages() {
+    const dirsOf = tempData();
+    const file = join(dirsOf.dataDir, "providers.yaml");
+    const entries = parse(readFileSync(file, "utf8")) as Array<{ id: string; programme: object[] }>;
+    const ft = entries.find((p) => p.id === "familientreff-beispiel");
+    ft?.programme.push({ url: B, kind: "html", use: "termine" });
+    writeFileSync(file, stringify(entries));
+    return dirsOf;
+  }
+  /** eine Nacht am Tag `day`; Seite A liefert `a`, B liefert Babymassage; `fails` fallen mit 404 aus */
+  async function night(dirsOf: ReturnType<typeof tempData>, day: string, a: RawEvent[], fails: string[] = []) {
+    const seen: string[] = [];
+    const extractor: Extractor = async (input) => {
+      seen.push(input.unit ?? "");
+      const events = input.unit === `seite:${A}` ? [...treffs, ...a] : [massage];
+      return {
+        outcome: { kind: "ok", events, model: "haiku" },
+        calls: [
+          {
+            step: "extract",
+            providerId: input.provider.id,
+            model: "haiku",
+            inputTokens: 1,
+            outputTokens: 1,
+            cacheReadTokens: 0,
+            cacheCreationTokens: 0,
+            webSearchRequests: 0,
+            turns: 1,
+            durationMs: 1,
+            costUsd: 0,
+            result: "ok",
+          },
+        ],
+      };
+    };
+    const r = await runNightly({
+      ...options(dirsOf, extractor),
+      only: ["familientreff-beispiel"],
+      // Seite A mit neuem Kurs hat einen anderen Text, sonst bliebe sie unverändert
+      fetch: fakeFetch(fails, (url) => `Programm ${url}${url === A && a.length > 0 ? " mit neuem Kurs" : ""}`, 404),
+      today: day,
+      now: () => `${day}T03:00:00+02:00`,
+      forceMigrate: ["familientreff-beispiel"],
+    });
+    const offers = readPreviousOffers(join(dirsOf.dataDir, "offers.json"))?.offers ?? [];
+    const idOf = (title: string) => offers.find((o) => o.title === title)?.id;
+    return { r, seen, idOf };
+  }
+
+  it("Ausfall von B: neuer Kurs von A erscheint in derselben Nacht, Bs IDs bleiben; Rückkehr vor Tag 14 hält sie", async () => {
+    const dirsOf = twoPages();
+    const n0 = await night(dirsOf, "2026-10-06", []);
+    const massageId = n0.idOf("Babymassage");
+    expect(massageId).toBeDefined();
+    const n1 = await night(dirsOf, "2026-10-07", [neu], [B]);
+    expect(n1.r.results["familientreff-beispiel"]).toBe("teilausfall");
+    expect(n1.idOf("Neuer Eltern-Kind-Kurs")).toBeDefined();
+    expect(n1.idOf("Babymassage")).toBe(massageId);
+    const n2 = await night(dirsOf, "2026-10-08", [neu], [B]);
+    expect(n2.seen).toEqual([]);
+    expect(n2.idOf("Babymassage")).toBe(massageId);
+    const back = await night(dirsOf, "2026-10-20", [neu]);
+    expect(back.seen).toEqual([]); // gleicher Inhalt wie vor dem Ausfall: unverändert
+    expect(back.idOf("Babymassage")).toBe(massageId);
+  });
+
+  it("B bis Tag 15 weg: Bs Angebote fehlen; Rückkehr danach extrahiert neu mit neuer ID", async () => {
+    const dirsOf = twoPages();
+    const n0 = await night(dirsOf, "2026-10-06", []);
+    const massageId = n0.idOf("Babymassage");
+    await night(dirsOf, "2026-10-07", [], [B]);
+    expect((await night(dirsOf, "2026-10-20", [], [B])).idOf("Babymassage")).toBe(massageId);
+    const gone = await night(dirsOf, "2026-10-21", [], [B]);
+    expect(gone.r.units?.["familientreff-beispiel"]?.[`seite:${B}`]).toBe("entfernt");
+    expect(gone.idOf("Babymassage")).toBeUndefined();
+    const back = await night(dirsOf, "2026-10-22", []);
+    expect(back.seen).toEqual([`seite:${B}`]);
+    // Die Zuordnung kennt nur die Vornacht; die neue ID folgt dem Schlüssel (Titel, Ort) und ist hier wieder dieselbe
+    expect(back.idOf("Babymassage")).toBeDefined();
+  });
+});
+
 describe("runBuildOnly (nightly --build-only, Arch-Review S5, M1)", () => {
   it("Anbieter aus dem Katalog entfernt: seine Angebote und sein Zustand fallen weg, validateDataset grün", async () => {
     const dirsOf = tempData();
     // Abruf des Theaters fällt aus: Zustand „fehler“, seine Angebote bleiben aus dem Vorstand
-    await runNightly({ ...options(dirsOf, fakeExtractor().extractor), fetch: fakeFetch(["theater-beispiel"]) });
+    await runNightly({
+      ...options(dirsOf, fakeExtractor().extractor),
+      fetch: fakeFetch(["theater-beispiel"]),
+      forceMigrate: ["theater-beispiel"],
+    });
     const rawDir = join(dirsOf.dataDir, "raw");
-    expect(readRaw(rawDir, "theater-beispiel")).toMatchObject({ status: "fehler" });
+    const theater = readRaw(rawDir, "theater-beispiel");
+    expect(theater && providerStatus(theater).status).toBe("fehler");
     const before = readPreviousOffers(join(dirsOf.dataDir, "offers.json"));
     if (!before) throw new Error("offers.json fehlt");
     expect(before.offers.some((o) => o.providerId === "theater-beispiel")).toBe(true);

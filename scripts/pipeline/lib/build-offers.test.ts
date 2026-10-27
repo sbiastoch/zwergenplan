@@ -47,6 +47,8 @@ const providers: Provider[] = [
 ];
 
 const CHECKED = "2026-10-05T05:00:00+02:00";
+/** Abgleich zwischen Einheiten ohne Vorstand (Plan 0048, E12) */
+const MATCH = { previous: undefined, horizon: { from: "2026-10-05", to: "2027-02-05" }, freeDays: {} };
 const base = (over: Partial<BuildInput> = {}): BuildInput => ({
   batches: [],
   providers,
@@ -410,6 +412,7 @@ describe("buildOffers", () => {
         "nicht-mehr-im-katalog": raw({ ...hashed }),
       },
       providers,
+      MATCH,
     );
     expect(notes.join("\n")).toContain("nicht-mehr-im-katalog.json: kein Anbieter im Katalog");
     expect(notes.join("\n")).toContain("abgerissen nicht im Katalog");
@@ -458,6 +461,7 @@ describe("buildOffers", () => {
         }),
       },
       providers,
+      MATCH,
     );
     expect([...extracted]).toEqual(["familientreff-beispiel"]);
     const { file, report } = buildOffers(
@@ -999,5 +1003,144 @@ describe("listedAt: zuerst im Zwergenplan (Plan 0043, E1)", () => {
   it("das Rohformat kennt das Feld nicht: nur der Build setzt es", () => {
     expect(RawEvent.safeParse({ ...ev(), listedAt: "2026-10-05T06:00:00+02:00" }).success).toBe(false);
     expect(RawEvent.safeParse(ev()).success).toBe(true);
+  });
+});
+
+describe("batchesFromRaw je Einheit (Plan 0048, E6)", () => {
+  const ID = "familientreff-beispiel";
+  const PAGE = "https://example.org/familientreff/programm";
+  const url = (k: number) => `${PAGE}/${k}`;
+  /** Katalog mit dem Fixture-Anbieter und `n` Terminseiten */
+  const catalogWith = (n: number): Provider[] =>
+    providers.map((p) =>
+      p.id === ID && p.role === "anbieter"
+        ? {
+            ...p,
+            programme: Array.from({ length: n }, (_, k) => ({
+              url: url(k),
+              kind: "html" as const,
+              use: "termine" as const,
+            })),
+          }
+        : p,
+    );
+  const unit = (events: unknown[], over: Record<string, unknown> = {}) => ({
+    events: events.map((e) => RawEvent.parse(e)),
+    inputHash: "a".repeat(64),
+    model: "opus",
+    changedAt: CHECKED,
+    status: "ok",
+    checkedAt: CHECKED,
+    ...over,
+  });
+  const v2 = (units: Record<string, ReturnType<typeof unit>>): ProviderRaw =>
+    ProviderRaw.parse({ version: 2, units: Object.fromEntries(Object.entries(units)) });
+  const build = (raw: ProviderRaw, n: number, previous?: OffersFile) => {
+    const catalog = catalogWith(n);
+    const r = batchesFromRaw({ [ID]: raw }, catalog, { ...MATCH, previous: previous?.offers });
+    const out = buildOffers(
+      base({ providers: catalog, batches: r.batches, perProviderStatus: true, extracted: r.extracted, previous }),
+    );
+    return { ...r, ...out };
+  };
+
+  it("dasselbe regelmäßige Angebot aus zwei Einheiten mit anderem cost: kein Build-Fehler, ein Angebot", () => {
+    const { report, file } = build(
+      v2({ [`seite:${url(0)}`]: unit([ev()]), [`seite:${url(1)}`]: unit([ev({ cost: "kostenpflichtig" })]) }),
+      2,
+    );
+    expect(report.errors).toEqual([]);
+    expect(file?.offers.filter((o) => o.providerId === ID)).toHaveLength(1);
+  });
+
+  it("dasselbe Angebot aus einer Einheit im Fehler und einer mit ok: es bleibt die Fassung der Einheit mit ok", () => {
+    const failed = { status: "fehler", reason: "HTTP 503", failingSince: CHECKED };
+    const { file } = build(
+      v2({
+        [`seite:${url(0)}`]: unit([ev({ summary: "Alte Fassung." })], failed),
+        [`seite:${url(1)}`]: unit([ev({ summary: "Neue Fassung." })]),
+      }),
+      2,
+    );
+    expect(file?.offers.filter((o) => o.providerId === ID).map((o) => o.summary)).toEqual(["Neue Fassung."]);
+  });
+
+  it("Batch je Einheit mit eigenem checkedAt; Reihenfolge mit 11 Einheiten nach Katalogindex (#02 vor #10)", () => {
+    const units = Object.fromEntries(
+      Array.from({ length: 11 }, (_, k) => [
+        `seite:${url(k)}`,
+        unit(
+          [
+            ev({
+              title: `Treff ${k}`,
+              schedule: {
+                ...ev().schedule,
+                start: `${String(8 + k).padStart(2, "0")}:00`,
+                end: `${String(8 + k).padStart(2, "0")}:45`,
+              },
+            }),
+          ],
+          { checkedAt: `2026-10-05T05:${String(k).padStart(2, "0")}:00+02:00` },
+        ),
+      ]),
+    );
+    const { batches, file } = build(v2(units), 11);
+    expect(batches.map((b) => b.name)).toEqual(
+      Array.from({ length: 11 }, (_, k) => `${ID}#${String(k).padStart(2, "0")}`),
+    );
+    expect(file?.offers.find((o) => o.title === "Treff 7")?.availability.checkedAt).toBe("2026-10-05T05:07:00+02:00");
+  });
+
+  it("Einheit im Fehler: ihre alten Events bleiben, neue der anderen kommen, keine ID fehlt", () => {
+    const { file: prev } = loadFixtures();
+    const failed = {
+      status: "fehler",
+      reason: "HTTP 404",
+      failingSince: CHECKED,
+      klasse: "voruebergehend",
+      klasseSince: CHECKED,
+    };
+    const raw = v2({
+      [`seite:${url(0)}`]: unit([ev()], failed),
+      [`seite:${url(1)}`]: unit([
+        ev({ title: "Neuer Kurs am Freitag", schedule: { ...ev().schedule, weekdays: ["FR"] } }),
+      ]),
+    });
+    const { file, report } = build(raw, 2, prev);
+    expect(report.errors).toEqual([]);
+    const titles = file?.offers.filter((o) => o.providerId === ID).map((o) => o.title);
+    expect(titles).toEqual(expect.arrayContaining(["Offener Krabbeltreff", "Neuer Kurs am Freitag"]));
+    const oldId = prev.offers.find((o) => o.title === "Offener Krabbeltreff")?.id;
+    expect(file?.offers.find((o) => o.title === "Offener Krabbeltreff")?.id).toBe(oldId);
+    expect(report.providers.ok).toContain(ID);
+  });
+
+  it("Zwillinge verschiedener Einheiten (kurs/regelmaessig) fallen vor mergeParts zusammen, mit Hinweis", () => {
+    const kurs = ev({
+      format: "kurs",
+      schedule: {
+        kind: "weekly",
+        weekdays: ["WE"],
+        start: "10:00",
+        end: "11:30",
+        from: "2026-10-07",
+        count: 6,
+        skipHolidays: false,
+      },
+    });
+    const regel = ev({
+      schedule: {
+        kind: "weekly",
+        weekdays: ["WE"],
+        start: "10:00",
+        end: "11:30",
+        from: "2026-10-07",
+        count: 6,
+        skipHolidays: false,
+      },
+    });
+    const { file, notes } = build(v2({ [`seite:${url(0)}`]: unit([kurs]), [`seite:${url(1)}`]: unit([regel]) }), 2);
+    expect(file?.offers.filter((o) => o.providerId === ID)).toHaveLength(1);
+    expect(notes.join("\n")).toContain("entfällt, gleich");
   });
 });
