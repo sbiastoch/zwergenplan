@@ -6,6 +6,7 @@ import { parse } from "yaml";
 const yml = readFileSync(new URL("../../.github/workflows/nightly.yml", import.meta.url), "utf8");
 const workflow: {
   permissions: Record<string, string>;
+  env: Record<string, string>;
   on: { workflow_dispatch: { inputs: Record<string, { default: string }> } };
   jobs: Record<
     string,
@@ -32,6 +33,15 @@ describe("nightly.yml (Plan 0048, E7)", () => {
     expect(step?.run).toContain("+ 20 > TIMEOUT");
     // budget_min und timeout nur als Zahl in die Arithmetik (Arch-Review m4)
     expect(step?.run).toContain('[[ "${RUN_BUDGET_MIN:-50}" =~ ^[0-9]+$ && "$TIMEOUT" =~ ^[0-9]+$ ]]');
+  });
+
+  it("Modell und Effort gleich in Nachtlauf und Entdecken (Plan 0048, Nachtrag 2)", () => {
+    const model = { LLM_MODEL_EXTRACT: "opus", LLM_MODEL_FALLBACK: "opus", LLM_EFFORT_EXTRACT: "xhigh" };
+    const discover: { env: Record<string, string> } = parse(
+      readFileSync(new URL("../../.github/workflows/discover.yml", import.meta.url), "utf8"),
+    );
+    expect(workflow.env).toMatchObject(model);
+    expect(discover.env).toMatchObject(model);
   });
 
   it("der Job mit dem Modell hat kein Schreibrecht", () => {
