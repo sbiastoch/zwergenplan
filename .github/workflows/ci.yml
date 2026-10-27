@@ -158,6 +158,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Playwright-Browser
         timeout-minutes: 9
+        # VORÜBERGEHEND (Plan 0052, Abnahme): Weg ohne Azure-Spiegel einmal prüfen; vor dem Merge entfernt
+        env:
+          ZP_APT_SKIP_AZURE: "1"
         run: .github/install-browsers.sh chromium
       - name: Deploy-Build
         run: pnpm build

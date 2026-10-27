@@ -1,6 +1,6 @@
 # Plan 0052 – Browser-Installation in der CI: ab dem zweiten Versuch ohne Azure-Spiegel
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-10-27
 
 ## Anlass
