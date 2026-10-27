@@ -1766,7 +1766,7 @@
     shown: nein
     how: Keine Termine/Plätze online; 10er-Kurs oder MamaFLAT, Kontakt hello@fryday-nbg.com
     system: keins
-  verified: 2026-10-04
+  verified: 2026-10-27
   skipCrawl:
     reason: kein Kursplan online (Recherche-Notiz)
     since: 2026-10-10
@@ -1793,10 +1793,11 @@
     - url: https://nuernberger-nest.de/kursangebot/#nach-der-geburt
       kind: html
       use: termine
-      hint: Abschnitt 'Nach der Geburt'
+      hint: Abschnitt 'Nach der Geburt'; Kurse ohne genannte Termine (etwa pausiert) weglassen
     - url: https://bauersachs.hebamio.de/kursliste
       kind: html
       use: termine
+      hint: Die Liste reicht bis ins Folgejahr; jeden Kurs bis zum Ende der Liste aufnehmen, auch die englische Postpartum Recovery Class
     - url: https://melville.hebamio.de/kursliste
       kind: html
       use: termine
