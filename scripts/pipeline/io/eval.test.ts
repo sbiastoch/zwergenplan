@@ -187,3 +187,82 @@ describe("evals/cases", () => {
     }
   });
 });
+
+describe("Eval je Einheit (Plan 0048, E6)", () => {
+  it("Fall mit zwei Seiten und Beilage: je Einheit extrahiert, abgeglichen, vereinigt und gewertet", async () => {
+    if (treff?.role !== "anbieter") throw new Error("Fixture fehlt");
+    const B = "https://example.org/familientreff/kurse";
+    const PLAETZE = "https://example.org/familientreff/plaetze";
+    const catalog = {
+      ...treff,
+      programme: [
+        { url: PAGE, kind: "html" as const, use: "termine" as const },
+        { url: B, kind: "html" as const, use: "termine" as const },
+        { url: PLAETZE, kind: "html" as const, use: "verfuegbarkeit" as const },
+      ],
+    };
+    const dir = mkdtempSync(join(tmpdir(), "eval-units-"));
+    tmpDirs.push(dir);
+    mkdirSync(join(dir, "x-2026-10-11"));
+    const text = [
+      `## Seite 1: ${PAGE} (html)\n## TEXT\nKrabbeltreff mittwochs`,
+      `## Seite 2: ${B} (html)\n## TEXT\nKrabbeltreff als Kurs`,
+      `## Seite 3: ${PLAETZE} (html)\n## TEXT\nnoch 2 Plätze`,
+    ].join("\n\n");
+    const input = {
+      kinds: ["html"],
+      traps: [],
+      synthetic: true,
+      origin: "Test",
+      providerId: "familientreff-beispiel",
+      catalog,
+      today: "2026-10-11",
+      text,
+      candidates: [],
+      allowedUrls: [PAGE, B, PLAETZE],
+      pageUrls: [PAGE, B, PLAETZE],
+    };
+    const expected = {
+      basis: "Test",
+      window,
+      offers: [
+        {
+          title: "Krabbeltreff",
+          venueId: VENUE,
+          format: "regelmaessig",
+          registration: "ohne-anmeldung",
+          cost: "kostenlos",
+          category: "krabbel-spielgruppen",
+          topics: ["krabbelgruppe"],
+          availability: { status: "ohne-anmeldung" },
+          starts: ["2026-10-14T10:00:00+02:00", "2026-10-21T10:00:00+02:00"],
+        },
+      ],
+    };
+    writeFileSync(join(dir, "x-2026-10-11", "input.json"), JSON.stringify(input));
+    writeFileSync(join(dir, "x-2026-10-11", "expected.json"), JSON.stringify(expected));
+    const seen: Array<{ unit: string | undefined; text: string; hints: number }> = [];
+    const extractor: Extractor = async (i) => {
+      seen.push({ unit: i.unit, text: i.text, hints: i.excerpt?.programme.length ?? 0 });
+      // Seite B fasst denselben Treff als Kurs: Zwilling mit anderem Format
+      const event = i.unit === `seite:${B}` ? { ...krabbeltreff, format: "kurs" as const, sourceUrl: B } : krabbeltreff;
+      return { outcome: { kind: "ok", events: [event], model: "fake" }, calls: [call("ok")] };
+    };
+    const run = await runEval({
+      cases: loadCases(undefined, dir),
+      extractor,
+      signal: new AbortController().signal,
+      concurrency: 1,
+      freeDaysFor: async () => ({}),
+    });
+    expect(seen.map((s) => s.unit)).toEqual([`seite:${PAGE}`, `seite:${B}`]);
+    expect(seen[0]?.text).toBe(
+      `## Seite 1: ${PAGE} (html)\n## TEXT\nKrabbeltreff mittwochs\n\n## Seite 2: ${PLAETZE} (html)\n## TEXT\nnoch 2 Plätze`,
+    );
+    expect(seen[1]?.text.startsWith(`## Seite 1: ${B} (html)`)).toBe(true);
+    expect(seen[0]?.hints).toBe(3);
+    expect(run.results[0]?.calls.map((c) => c.unit)).toEqual([`seite:${PAGE}`, `seite:${B}`]);
+    expect(run.results[0]?.predicted).toHaveLength(1);
+    expect(run.results[0]?.score.sessions).toEqual({ expected: 2, predicted: 2, matched: 2 });
+  });
+});

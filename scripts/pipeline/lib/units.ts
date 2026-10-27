@@ -5,6 +5,8 @@
  */
 import { createHash } from "node:crypto";
 import type { Anbieter, Offer } from "../../../src/domain/schema.ts";
+import type { Candidate } from "./candidate.ts";
+import { fillPlaceholders } from "./placeholders.ts";
 import { expansionWindow, type RawEvent } from "./raw.ts";
 import { type ExpandWindow, expandSchedule } from "./schedule.ts";
 import { compatibleAge, conflictingLabels, sameCoreTitle, similarTitle } from "./similar.ts";
@@ -169,4 +171,66 @@ export function matchUnits(
     units: ordered.map((u) => ({ id: u.id, failed: u.failed, events: u.events.filter((e) => !dropped.has(e)) })),
     notes,
   };
+}
+
+/** Eingabe einer Einheit aus einem Eval-Fall (Plan 0048, E6: das Eval extrahiert je Einheit wie der Nachtlauf). */
+export interface CaseUnit {
+  def: UnitDef;
+  text: string;
+  pageUrls: string[];
+  candidates: readonly Candidate[];
+}
+
+/**
+ * Zerlegt die eingefrorene Eingabe eines Anbieters (`## Seite k: <url> (<art>)` je Seite, zuletzt `## Kandidaten (n)`)
+ * in die Eingaben seiner Einheiten. Seiten werden über die ausgefüllte Katalog-URL zugeordnet; die Seite einer Einheit
+ * steht vorn, ihre Beilagen dahinter, neu nummeriert wie im Abruf. Eine Seite ohne Katalogeintrag (älterer Fall) wird
+ * eine Einheit für sich.
+ */
+export function caseUnits(input: {
+  catalog: Anbieter;
+  today: string;
+  text: string;
+  pageUrls: readonly string[];
+  candidates: readonly Candidate[];
+}): CaseUnit[] {
+  const heads = input.pageUrls.map((url, i) => ({ url, at: input.text.indexOf(`## Seite ${i + 1}: ${url} (`) }));
+  const kandidatenAt = input.text.search(/^## Kandidaten \(\d+\)$/m);
+  const ends = [...heads.slice(1).map((h) => h.at), kandidatenAt >= 0 ? kandidatenAt : input.text.length];
+  const sections = heads.map((h, i) => {
+    if (h.at < 0) throw new Error(`Eval-Fall: Kopf von Seite ${i + 1} (${h.url}) fehlt im Text`);
+    const raw = input.text.slice(h.at, ends[i]).trimEnd();
+    const art = /^## Seite \d+: \S+ \(([^)]+)\)/.exec(raw)?.[1] ?? "html";
+    return { url: h.url, art, body: raw.slice(raw.indexOf("\n") + 1) };
+  });
+  const used = new Set<number>();
+  const progOf = new Map<number, (typeof sections)[number]>();
+  for (const s of sections) {
+    const i = input.catalog.programme.findIndex(
+      (g, k) =>
+        !used.has(k) && g.use !== "info" && g.blocked === undefined && fillPlaceholders(g.url, input.today) === s.url,
+    );
+    if (i >= 0) {
+      used.add(i);
+      progOf.set(i, s);
+    }
+  }
+  const render = (pages: ReadonlyArray<(typeof sections)[number]>) =>
+    pages.map((s, k) => `## Seite ${k + 1}: ${s.url} (${s.art})\n${s.body}`).join("\n\n");
+  const out: CaseUnit[] = [];
+  for (const def of unitsOf(input.catalog, { candidates: input.candidates.length > 0, hadKandidaten: false })) {
+    if (def.id === KANDIDATEN) {
+      if (input.candidates.length === 0) continue;
+      out.push({ def, text: input.text.slice(kandidatenAt).trim(), pageUrls: [], candidates: input.candidates });
+      continue;
+    }
+    const own = def.own === undefined ? undefined : progOf.get(def.own);
+    if (!own) continue;
+    const pages = [own, ...def.beilagen.flatMap((b) => [progOf.get(b)].flatMap((s) => (s ? [s] : [])))];
+    out.push({ def, text: render(pages), pageUrls: pages.map((s) => s.url), candidates: [] });
+  }
+  for (const s of sections)
+    if (![...progOf.values()].includes(s))
+      out.push({ def: { id: `seite:${s.url}`, beilagen: [] }, text: render([s]), pageUrls: [s.url], candidates: [] });
+  return out;
 }
