@@ -4,7 +4,7 @@
  * 4 Abrufen parallel und 2 je Host. Kein Modellaufruf, nichts nach `data/`.
  */
 import { execFile } from "node:child_process";
-import type { Provider } from "../../../src/domain/schema.ts";
+import type { Anbieter, Provider } from "../../../src/domain/schema.ts";
 import { type Candidate, isSource } from "../lib/candidate.ts";
 import {
   type AdapterOutcome,
@@ -12,6 +12,7 @@ import {
   artOf,
   assembleProvider,
   botWall,
+  failureClassOf,
   type HashesFile,
   type PageOutcome,
   programmeText,
@@ -19,8 +20,9 @@ import {
 } from "../lib/fetch.ts";
 import { anbieterVids, matchCandidate } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
-import type { FetchedProvider } from "../lib/refresh.ts";
+import type { FetchedProvider, FetchedUnit } from "../lib/refresh.ts";
 import type { FetchPlan, PageTask } from "../lib/select.ts";
+import { KANDIDATEN, unitIdOf, unitsOf } from "../lib/units.ts";
 import { browserSession } from "./browser.ts";
 import { fetchBytes, fetchPage } from "./http.ts";
 import { fetchSource } from "./sources.ts";
@@ -51,10 +53,19 @@ function pdftotext(bytes: Uint8Array): Promise<string> {
   });
 }
 
+/** Fehler mit HTTP-Status, damit der Abruf die Fehlerklasse ohne Textvergleich setzt (Plan 0048, E8). */
+class HttpError extends Error {
+  readonly status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
 /** PDF abrufen und über `pdftotext` lesen; HTTP ≥ 400 und leeres PDF sind Fehler. Auch fürs Bewerten (Entdecken). */
 async function fetchPdf(url: string): Promise<{ text: string; finalUrl: string }> {
   const res = await fetchBytes(url);
-  if (res.status >= 400) throw new Error(`HTTP ${res.status}`);
+  if (res.status >= 400) throw new HttpError(res.status, `HTTP ${res.status}`);
   const text = await pdftotext(res.bytes);
   if (text.trim() === "") throw new Error("leeres PDF");
   return { text, finalUrl: res.finalUrl };
@@ -66,8 +77,9 @@ export const fetchPdfText = async (url: string): Promise<string> => (await fetch
 /** Bot-Schutz zählt als Fehler (vor dem HTTP-Status, damit der Grund lesbar ist). */
 function checked(status: number, text: string): string {
   const wall = botWall(text);
+  // Bot-Schutz ist vorübergehend, auch mit 403 (E8)
   if (wall) throw new Error(status >= 400 ? `${wall}, HTTP ${status}` : wall);
-  if (status >= 400) throw new Error(`HTTP ${status}`);
+  if (status >= 400) throw new HttpError(status, `HTTP ${status}`);
   return text;
 }
 
@@ -153,7 +165,8 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
             ...(finalUrl && finalUrl !== task.url ? { finalUrl } : {}),
           };
         } catch (e) {
-          return { url: task.url, art: artOf(task), ok: false, reason: reasonOf(e), ms: ms() };
+          const klasse = failureClassOf(e instanceof HttpError ? e.status : undefined);
+          return { url: task.url, art: artOf(task), ok: false, reason: reasonOf(e), ms: ms(), klasse };
         }
       },
     );
@@ -181,27 +194,94 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
     const r = assembleProvider({ pages, candidates, ...(adapterFailure ? { adapterFailure } : {}) });
     providers[p.id] = r.entry;
     if (r.text) texts[p.id] = r.text;
-    const fetched = pages.flatMap((pg) => (pg.ok ? [pg] : []));
     // Status ohne Adapter-Ausfall (der zählt oben im Messbericht für alle Kandidaten-Anbieter)
     const own = adapterFailure ? assembleProvider({ pages, candidates }) : r;
     const owner = byId.get(p.id);
     const cover = owner?.role === "anbieter" && owner.coveredBy ? byId.get(owner.coveredBy) : undefined;
+    if (owner?.role !== "anbieter") continue;
     inputs[p.id] = {
       status: own.entry.status,
       ...(own.entry.reason ? { reason: own.entry.reason } : {}),
+      text: own.text,
+      pages: pages.flatMap((pg) => (pg.ok ? [{ url: pg.url, text: pg.text }] : [])),
+      candidates,
+      allowedUrls: allowedOf(pages, candidates),
       via: p.via,
       ...(cover?.role === "aggregator" ? { ownAdapter: cover.adapter } : {}),
       adapterIssues,
-      pages: fetched.map((pg) => ({ url: pg.url, text: pg.text })),
-      candidates,
-      text: own.text,
-      allowedUrls: [
-        ...new Set([
-          ...fetched.flatMap((pg) => [pg.url, ...(pg.finalUrl ? [pg.finalUrl] : [])]),
-          ...candidates.flatMap((c) => [c.detailUrl, ...(c.ticketUrl ? [c.ticketUrl] : [])]),
-        ]),
-      ],
+      ...unitInputs(owner, pages, candidates),
     };
   }
   return { providers, texts, adapters, inputs };
+}
+
+const allowedOf = (pages: readonly PageOutcome[], candidates: readonly Candidate[]) => [
+  ...new Set([
+    ...pages.flatMap((pg) => (pg.ok ? [pg.url, ...(pg.finalUrl ? [pg.finalUrl] : [])] : [])),
+    ...candidates.flatMap((c) => [c.detailUrl, ...(c.ticketUrl ? [c.ticketUrl] : [])]),
+  ]),
+];
+
+/**
+ * Einheiten und Beilagen eines Anbieters aus seinen Abrufen (Plan 0048, E1, E2). `pages` steht in der Reihenfolge von
+ * `planFetch`, also der aktiven Seiten des Katalogs. Jede Einheit bekommt ihre Seite und alle gelungenen Beilagen;
+ * eine gescheiterte Beilage fehlt einfach (Beilagen sind optional). `kandidaten` entsteht immer, ob sie bleibt,
+ * entscheidet `refreshProvider` mit dem Vorzustand.
+ */
+export function unitInputs(
+  owner: Anbieter,
+  pages: readonly PageOutcome[],
+  candidates: readonly Candidate[],
+): Pick<FetchedProvider, "units" | "beilagen"> {
+  const active = owner.programme.flatMap((g, i) => (g.use !== "info" && g.blocked === undefined ? [i] : []));
+  const outcomeOf = new Map<number, PageOutcome>();
+  active.forEach((progIndex, k) => {
+    const o = pages[k];
+    if (o) outcomeOf.set(progIndex, o);
+  });
+  const beilagen: FetchedProvider["beilagen"] = Object.fromEntries(
+    owner.programme.flatMap((g, i) => {
+      const o = outcomeOf.get(i);
+      if (g.use !== "verfuegbarkeit" || !o) return [];
+      return [[unitIdOf(g), o.ok ? { ok: true as const } : { ok: false as const, reason: o.reason, klasse: o.klasse }]];
+    }),
+  );
+  const units = unitsOf(owner, { candidates: true, hadKandidaten: true }).flatMap((u): FetchedUnit[] => {
+    if (u.id === KANDIDATEN) {
+      const r = assembleProvider({ pages: [], candidates });
+      return [
+        {
+          id: u.id,
+          status: r.entry.status,
+          ...(r.entry.reason ? { reason: r.entry.reason } : {}),
+          pages: [],
+          candidates,
+          text: r.text,
+          allowedUrls: allowedOf([], candidates),
+        },
+      ];
+    }
+    const own = u.own === undefined ? undefined : outcomeOf.get(u.own);
+    if (!own) return [];
+    const extra = u.beilagen.flatMap((i) => {
+      const o = outcomeOf.get(i);
+      return o?.ok ? [o] : [];
+    });
+    const used = [own, ...extra];
+    const r = assembleProvider({ pages: used, candidates: [] });
+    const fetched = used.flatMap((pg) => (pg.ok ? [{ url: pg.url, text: pg.text }] : []));
+    return [
+      {
+        id: u.id,
+        status: r.entry.status,
+        ...(r.entry.reason ? { reason: r.entry.reason } : {}),
+        ...(own.ok ? {} : { klasse: own.klasse }),
+        pages: fetched,
+        candidates: [],
+        text: r.text,
+        allowedUrls: allowedOf(used, []),
+      },
+    ];
+  });
+  return { units, beilagen };
 }

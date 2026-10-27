@@ -64,79 +64,218 @@ export type RawBatch = z.infer<typeof RawBatch>;
 const Instant = z.iso.datetime({ offset: true, local: false });
 const DatedKey = z.record(z.iso.date(), z.string().min(1));
 
+const Pending = z.strictObject({
+  inputHash: z.string().min(1),
+  dated: DatedKey.optional(),
+  model: z.string().min(1),
+  events: z.array(RawEvent),
+});
+
+/** Felder, die Anbieter (V1) und Einheit (V2) gemeinsam haben, mit denselben Regeln (Plan 0032, E5). */
+const stateFields = {
+  /** zuletzt übernommene Events; `via` setzt der Code (E4) */
+  events: z.array(RawEvent),
+  /**
+   * Schlüssel der Eingabe, aus der `events` stammen (`extractKey`, E4). Fehlt, solange nie extrahiert wurde (erster
+   * Lauf mit Fehler oder zurückgehaltenem Einbruch, entfernte Seite); dann gilt für `build` der Vorstand.
+   */
+  inputHash: z.string().min(1).optional(),
+  /**
+   * Datierte Bestandteile der Eingabe (`ExtractKey.dated`): je letztem Tag ab dem Lauf ein Hash. Verglichen wird nur
+   * ab heute, so ändern vergangene Termine den Schlüssel nicht (Plan 0032, Kostenhebel). Nur mit `inputHash`.
+   */
+  dated: DatedKey.optional(),
+  /** Modell, das `events` geliefert hat (bei Fallback das Fallback-Modell) */
+  model: z.string().min(1).optional(),
+  status: ProviderCheck.shape.status,
+  /** Pflicht bei fehler */
+  reason: z.string().optional(),
+  /** letzte Abrufzeit, zu der die Seite `events` bestätigt hat; Stand der Verfügbarkeit (`availability.checkedAt`) */
+  checkedAt: Instant,
+  /** letzte Änderung von `events` */
+  changedAt: Instant.optional(),
+  /** erster Lauf der aktuellen Fehlerserie */
+  failingSince: Instant.optional(),
+  /** zurückgehaltener Einbruch (E5): wird übernommen, wenn die nächste Nacht dieselbe Eingabe liefert */
+  pending: Pending.optional(),
+};
+
+type StateShape = {
+  events: readonly unknown[];
+  inputHash?: string | undefined;
+  dated?: unknown;
+  model?: string | undefined;
+  changedAt?: string | undefined;
+  status: string;
+  reason?: string | undefined;
+  failingSince?: string | undefined;
+};
+
+function stateRules(r: StateShape, ctx: z.RefinementCtx): void {
+  if (r.status === "fehler" && !r.reason)
+    ctx.addIssue({ code: "custom", message: "status fehler braucht einen reason", path: ["reason"] });
+  if (r.status === "fehler" && !r.failingSince)
+    ctx.addIssue({ code: "custom", message: "status fehler braucht failingSince", path: ["failingSince"] });
+  if (r.status !== "fehler" && r.failingSince)
+    ctx.addIssue({ code: "custom", message: "failingSince nur bei status fehler", path: ["failingSince"] });
+  if (r.inputHash === undefined && (r.events.length > 0 || r.status !== "fehler"))
+    ctx.addIssue({ code: "custom", message: "ohne inputHash nur status fehler ohne Events", path: ["inputHash"] });
+  if (r.dated !== undefined && r.inputHash === undefined)
+    ctx.addIssue({ code: "custom", message: "dated nur mit inputHash", path: ["dated"] });
+  if (
+    (r.inputHash === undefined) !== (r.model === undefined) ||
+    (r.inputHash === undefined) !== (r.changedAt === undefined)
+  )
+    ctx.addIssue({
+      code: "custom",
+      message: "inputHash, model und changedAt gibt es nur zusammen",
+      path: ["inputHash"],
+    });
+}
+
 /**
- * Zustand je Anbieter in `data/raw/<providerId>.json` (Plan 0032, E5): dauerhafter Zustand der Pipeline, kein
- * Vertrag der Website. Den Inhalt erzeugt nur `refreshProvider` (`io/refresh.ts`, Regeln in `lib/refresh.ts`); das
- * Entdecken kopiert bei Aufnahme nur seinen Ertragsbeweis hierher.
- * Der Build in `pipeline nightly` macht daraus `data/offers.json`. Exportiert nach schema/provider-raw.schema.json.
+ * Zustand je Anbieter im alten Format (V1, ohne `version`; Plan 0032, E5). Gültig bis Plan 0048, S5: Die Umstellung
+ * schreibt jeden Anbieter in V2, sobald alle seine Einheiten ein Ergebnis haben (E7).
  */
-export const ProviderRaw = z
+export const ProviderRawV1 = z
   .strictObject({
-    /** zuletzt übernommene Events; `via` setzt der Code (E4) */
-    events: z.array(RawEvent),
-    /**
-     * Schlüssel der Eingabe, aus der `events` stammen (`extractKey`, E4). Fehlt, solange der Anbieter nie extrahiert
-     * wurde (erster Lauf mit Fehler oder zurückgehaltenem Einbruch); dann gilt für `build` der Vorstand.
-     */
-    inputHash: z.string().min(1).optional(),
-    /**
-     * Datierte Bestandteile der Eingabe (`ExtractKey.dated`): je letztem Tag ab dem Lauf ein Hash. Verglichen wird nur
-     * ab heute, so ändern vergangene Termine den Schlüssel nicht (Plan 0032, Kostenhebel). Nur mit `inputHash`.
-     */
-    dated: DatedKey.optional(),
-    /** Modell, das `events` geliefert hat (bei Fallback das Fallback-Modell) */
-    model: z.string().min(1).optional(),
-    status: ProviderCheck.shape.status,
-    /** Pflicht bei fehler */
-    reason: z.string().optional(),
-    /** letzte Abrufzeit, zu der die Seite `events` bestätigt hat; Stand der Verfügbarkeit (`availability.checkedAt`) */
-    checkedAt: Instant,
-    /** letzte Änderung von `events` */
-    changedAt: Instant.optional(),
-    /** erster Lauf der aktuellen Fehlerserie */
-    failingSince: Instant.optional(),
+    ...stateFields,
     /** Sammelkalender, die Kandidaten zur Eingabe beigetragen haben */
     sources: z.array(z.enum(SOURCES)),
-    /** zurückgehaltener Einbruch (E5): wird übernommen, wenn die nächste Nacht dieselbe Eingabe liefert */
-    pending: z
-      .strictObject({
-        inputHash: z.string().min(1),
-        dated: DatedKey.optional(),
-        model: z.string().min(1),
-        events: z.array(RawEvent),
-      })
-      .optional(),
+  })
+  .superRefine(stateRules);
+export type ProviderRawV1 = z.infer<typeof ProviderRawV1>;
+
+/** Fehlerklasse eines Abrufs (Plan 0048, E8): 404/410 dauerhaft, robots.txt gesperrt, sonst vorübergehend. */
+export const FailureClass = z.enum(["dauerhaft", "gesperrt", "voruebergehend"]);
+export type FailureClass = z.infer<typeof FailureClass>;
+
+const klasseFields = {
+  /** nur bei fehler aus dem Abruf */
+  klasse: FailureClass.optional(),
+  /** Beginn der aktuellen Klasse (E5: entfernte Seite nach 14 Tagen `dauerhaft`), nur mit `klasse` */
+  klasseSince: Instant.optional(),
+};
+
+function klasseRules(
+  r: { status: string; klasse?: string | undefined; klasseSince?: string | undefined },
+  ctx: z.RefinementCtx,
+) {
+  if ((r.klasse === undefined) !== (r.klasseSince === undefined))
+    ctx.addIssue({ code: "custom", message: "klasse und klasseSince gibt es nur zusammen", path: ["klasse"] });
+  if (r.klasse !== undefined && r.status !== "fehler")
+    ctx.addIssue({ code: "custom", message: "klasse nur bei status fehler", path: ["klasse"] });
+}
+
+/** Zustand einer Einheit (Plan 0048, E4): wie ein Anbieter in V1, dazu Fehlerklasse und `emptySince`. */
+export const UnitState = z
+  .strictObject({
+    ...stateFields,
+    ...klasseFields,
+    /** Events vorhanden, aber keine künftigen mehr (E5, ADR 0033, Punkt 3) */
+    emptySince: Instant.optional(),
+    /** Sammelkalender, die Kandidaten beigetragen haben; nur bei der Einheit `kandidaten` */
+    sources: z.array(z.enum(SOURCES)).optional(),
   })
   .superRefine((r, ctx) => {
-    if (r.status === "fehler" && !r.reason)
-      ctx.addIssue({ code: "custom", message: "status fehler braucht einen reason", path: ["reason"] });
-    if (r.status === "fehler" && !r.failingSince)
-      ctx.addIssue({ code: "custom", message: "status fehler braucht failingSince", path: ["failingSince"] });
-    if (r.status !== "fehler" && r.failingSince)
-      ctx.addIssue({ code: "custom", message: "failingSince nur bei status fehler", path: ["failingSince"] });
-    if (r.inputHash === undefined && (r.events.length > 0 || r.status !== "fehler"))
-      ctx.addIssue({ code: "custom", message: "ohne inputHash nur status fehler ohne Events", path: ["inputHash"] });
-    if (r.dated !== undefined && r.inputHash === undefined)
-      ctx.addIssue({ code: "custom", message: "dated nur mit inputHash", path: ["dated"] });
-    if (
-      (r.inputHash === undefined) !== (r.model === undefined) ||
-      (r.inputHash === undefined) !== (r.changedAt === undefined)
-    )
-      ctx.addIssue({
-        code: "custom",
-        message: "inputHash, model und changedAt gibt es nur zusammen",
-        path: ["inputHash"],
-      });
+    stateRules(r, ctx);
+    klasseRules(r, ctx);
   });
+export type UnitState = z.infer<typeof UnitState>;
+
+/** Zustand einer Beilage (`use: verfuegbarkeit`, E1): nur der Abruf. */
+export const BeilageState = z
+  .strictObject({
+    status: z.enum(["ok", "fehler"]),
+    reason: z.string().optional(),
+    ...klasseFields,
+    checkedAt: Instant,
+    failingSince: Instant.optional(),
+  })
+  .superRefine((r, ctx) => {
+    klasseRules(r, ctx);
+    if ((r.status === "fehler") !== (r.reason !== undefined && r.failingSince !== undefined))
+      ctx.addIssue({ code: "custom", message: "reason und failingSince genau bei status fehler", path: ["status"] });
+  });
+export type BeilageState = z.infer<typeof BeilageState>;
+
+/**
+ * Zustand je Anbieter, Version 2 (Plan 0048, E4): je Einheit (Kennung aus `lib/units.ts`) ein `UnitState`, dazu die
+ * Beilagen. Den Status des Anbieters berechnet `providerStatus`, er wird nicht gespeichert.
+ */
+export const ProviderRawV2 = z
+  .strictObject({
+    version: z.literal(2),
+    units: z.record(z.string().regex(/^(seite:.+|kandidaten)$/), UnitState),
+    beilagen: z.record(z.string().regex(/^seite:.+$/), BeilageState).optional(),
+  })
+  .superRefine((r, ctx) => {
+    for (const [id, u] of Object.entries(r.units))
+      if (u.sources !== undefined && id !== "kandidaten")
+        ctx.addIssue({ code: "custom", message: "sources nur bei kandidaten", path: ["units", id, "sources"] });
+  });
+export type ProviderRawV2 = z.infer<typeof ProviderRawV2>;
+
+/**
+ * Zustand je Anbieter in `data/raw/<providerId>.json` (Plan 0032, E5; Plan 0048, E4): dauerhafter Zustand der
+ * Pipeline, kein Vertrag der Website. Den Inhalt erzeugt nur `refreshProvider` (`io/refresh.ts`, Regeln in
+ * `lib/refresh.ts`); das Entdecken kopiert bei Aufnahme nur seinen Ertragsbeweis hierher. Bis S5 V1 oder V2.
+ * Der Build in `pipeline nightly` macht daraus `data/offers.json`. Exportiert nach schema/provider-raw.schema.json.
+ */
+export const ProviderRaw = z.union([ProviderRawV2, ProviderRawV1]);
 export type ProviderRaw = z.infer<typeof ProviderRaw>;
+
+export const isV2 = (raw: ProviderRaw): raw is ProviderRawV2 => "version" in raw;
+
+/**
+ * Status des Anbieters (E4), berechnet: `fehler`, wenn alle Einheiten `fehler` sind; `keine-termine`, wenn keine
+ * Einheit Events hat; sonst `ok`, dazu die Zahl der Einheiten im Fehler. V1 trägt den Status selbst.
+ */
+export function providerStatus(raw: ProviderRaw): {
+  status: ProviderCheck["status"];
+  reason?: string;
+  failingSince?: string;
+  failedUnits: number;
+} {
+  if (!isV2(raw))
+    return {
+      status: raw.status,
+      ...(raw.reason ? { reason: raw.reason } : {}),
+      ...(raw.failingSince ? { failingSince: raw.failingSince } : {}),
+      failedUnits: raw.status === "fehler" ? 1 : 0,
+    };
+  const units = Object.entries(raw.units);
+  const failed = units.filter(([, u]) => u.status === "fehler");
+  const reasons = failed.map(([id, u]) => `${id}: ${u.reason ?? "Fehler"}`).join("; ");
+  const since = failed.map(([, u]) => u.failingSince ?? "").sort()[0];
+  if (units.length > 0 && failed.length === units.length)
+    return { status: "fehler", reason: reasons, ...(since ? { failingSince: since } : {}), failedUnits: failed.length };
+  const status = units.some(([, u]) => u.events.length > 0) ? "ok" : "keine-termine";
+  return { status, ...(failed.length > 0 ? { reason: reasons } : {}), failedUnits: failed.length };
+}
+
+/** Zustände je Einheit mit Kennung; V1 als eine Einheit ohne Kennung (`""`). */
+export const unitStates = (raw: ProviderRaw): Array<[string, ProviderRawV1 | UnitState]> =>
+  isV2(raw) ? Object.entries(raw.units) : [["", raw]];
+
+/** Alle Events eines Zustands (V1: der Anbieter; V2: alle Einheiten in gespeicherter Reihenfolge). */
+export const rawEvents = (raw: ProviderRaw): RawEvent[] =>
+  isV2(raw) ? Object.values(raw.units).flatMap((u) => u.events) : raw.events;
+
+/** Ob Events aus einer Extraktion stammen (Build: keine Übernahme aus dem Vorstand, Arch-Review S2, m2). */
+export const rawExtracted = (raw: ProviderRaw): boolean =>
+  isV2(raw) ? Object.values(raw.units).some((u) => u.inputHash !== undefined) : raw.inputHash !== undefined;
 
 /** Prüfung einer Datei `data/raw/<id>.json` für `pnpm data:validate` (E13): Schema, Katalog-Anbieter, eigene Events. */
 export function providerRawIssues(label: string, id: string, raw: unknown, anbieter: ReadonlySet<string>): string[] {
-  const r = ProviderRaw.safeParse(raw);
+  // gezielt je Version: Die Vereinigung meldete sonst nur „Invalid input“ an der Wurzel
+  const versioned = typeof raw === "object" && raw !== null && "version" in raw;
+  const r = (versioned ? ProviderRawV2 : ProviderRawV1).safeParse(raw);
   if (!r.success) return r.error.issues.map((i) => `${label}: ${i.path.join(".") || "(Wurzel)"}: ${i.message}`);
   const issues: string[] = [];
   if (!anbieter.has(id)) issues.push(`${label}: ${id} ist kein Anbieter im Katalog (räumt der nächste Nachtlauf weg)`);
-  for (const e of [...r.data.events, ...(r.data.pending?.events ?? [])])
+  const states = isV2(r.data) ? Object.values(r.data.units) : [r.data];
+  for (const e of states.flatMap((s) => [...s.events, ...(s.pending?.events ?? [])]))
     if (e.providerId !== id) issues.push(`${label}: Event „${e.title}“ gehört zu ${e.providerId}`);
   return issues;
 }

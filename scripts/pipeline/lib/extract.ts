@@ -12,7 +12,15 @@ import { type RawContext, RawEvent, validateRaw } from "./raw.ts";
 import { mergeParts } from "./split.ts";
 
 export interface ExtractInput {
+  /** voller Katalogeintrag: gegen ihn wird die Antwort geprüft (Plan 0048, E3) */
   provider: Provider;
+  /**
+   * Katalogauszug der Einheit (`unitExcerpt`) für die Nachricht; ohne ihn der volle Eintrag. Nicht für die Prüfung:
+   * Bei `kandidaten` verletzte er die Regel „mindestens eine Terminseite“ (S0).
+   */
+  excerpt?: Provider;
+  /** Kennung der Einheit (`lib/units.ts`); bestimmt die Teilzeile der Nachricht */
+  unit?: string;
   /** Eingabe wie aus dem Abruf (`fetchInputs().texts[id]`, enthält die Kandidaten schon als eigenen Abschnitt) */
   text: string;
   /** URLs der abgerufenen Seiten in der Reihenfolge des Texts (`## Seite k`); nur ihre Kopfzeilen sind Teilgrenzen */
@@ -35,6 +43,8 @@ export interface CallRecord {
   providerId: string;
   /** Teil der Eingabe („2/5“), nur wenn sie aufgeteilt wurde (`splitInput`) */
   part?: string;
+  /** Einheit (Plan 0048, E9), damit `kosten.jsonl` je Seite zählt; setzt `refreshProvider` */
+  unit?: string;
   model: string;
   inputTokens: number;
   outputTokens: number;
@@ -238,11 +248,17 @@ export function extractMessage(input: {
   text: string;
   ctx: Pick<ExtractContext, "horizon">;
   part?: { index: number; count: number };
+  /** Kennung der Einheit: Die Teilzeile nennt dann „dieser Seite“ statt „dieses Anbieters“ (Plan 0048, E3) */
+  unit?: string;
 }): string {
   const { from, to } = input.ctx.horizon;
+  // Mit Einheit nennt der Auszug alle Seiten des Anbieters; „dieses Anbieters“ legte nahe, die übrigen Kurse stünden
+  // auf den anderen Seiten (Vermutung zu geburtshaus-nuernberger-nest, S0)
+  const whose =
+    input.unit === undefined ? "dieses Anbieters" : input.unit === "kandidaten" ? "dieser Kandidaten" : "dieser Seite";
   const part = input.part
     ? [
-        `Teil ${input.part.index} von ${input.part.count}: Die Eingabe dieses Anbieters ist auf ${input.part.count} Aufrufe verteilt. Erfasse die Angebote, die in diesem Teil stehen; die übrigen kommen aus den anderen Teilen.`,
+        `Teil ${input.part.index} von ${input.part.count}: Die Eingabe ${whose} ist auf ${input.part.count} Aufrufe verteilt. Erfasse die Angebote, die in diesem Teil stehen; die übrigen kommen aus den anderen Teilen.`,
       ]
     : [];
   return [

@@ -22,7 +22,7 @@ import type { DiscoverState } from "./discover-state.ts";
 import { searchQuery } from "./discover-terms.ts";
 import type { CallRecord } from "./extract.ts";
 import { matchCandidate } from "./match.ts";
-import type { ProviderRaw } from "./raw.ts";
+import { type ProviderRaw, providerStatus } from "./raw.ts";
 import { isInternalHost } from "./redirect.ts";
 import { isRelevant } from "./relevance.ts";
 import { costSection } from "./report.ts";
@@ -583,10 +583,12 @@ export function proveYield(
 /** Hinweise ohne Aktion (E7): Quellen mit Fehlerserie seit mehr als 14 Tagen. */
 export function staleHints(raws: Readonly<Record<string, ProviderRaw>>, today: string): string[] {
   const limit = addDays(today, -STALE_DAYS);
+  // nur ganz ausgefallene Anbieter; einzelne Seiten meldet der Wächter (Plan 0048, S2, dann entfällt diese Funktion)
   return Object.entries(raws)
-    .filter(([, r]) => r.failingSince !== undefined && berlinIsoDate(r.failingSince) < limit)
+    .map(([id, raw]) => [id, providerStatus(raw)] as const)
+    .filter(([, s]) => s.status === "fehler" && s.failingSince !== undefined && berlinIsoDate(s.failingSince) < limit)
     .map(
-      ([id, r]) => `${id}: Quelle fehlerhaft seit ${berlinIsoDate(r.failingSince ?? "")} (${r.reason ?? "ohne Grund"})`,
+      ([id, s]) => `${id}: Quelle fehlerhaft seit ${berlinIsoDate(s.failingSince ?? "")} (${s.reason ?? "ohne Grund"})`,
     );
 }
 

@@ -11,13 +11,15 @@
  *                                               Eingabe aus DIR (Ausgabe von `fetch`), sonst frisch abgerufen;
  *                                               Ergebnis und Aufrufe nach runs/<heute>/extract/<id>.json, nichts nach data/.
  *                                               Eval aller eingefrorenen Fälle: `pnpm eval` (scripts/pipeline/eval.ts, E9).
- *   nightly [--only a,b] [--dry-run]            Nachtlauf (Plan 0032, E5/E6): Abruf, je Anbieter refresh (data/raw),
+ *   nightly [--only a,b] [--dry-run] [--umstellen a,b]
+ *                                               Nachtlauf (Plan 0032, E5/E6; Plan 0048): Abruf, je Seite refresh (data/raw),
  *                                               build aus data/raw nach data/offers.json, Zeile in data/kosten.csv;
  *                                               Bericht runs/<heute>/nightly.json, Kosten runs/<heute>/kosten.jsonl.
  *                                               --dry-run schreibt raw/, offers.json und kosten.csv nach
  *                                               runs/<heute>/. Zeitbudget RUN_BUDGET_MIN (Standard 50), Bremsen
  *                                               MAX_CALLS (150) und MAX_TOKENS (3 Mio.) (E8). Rot nur, wenn der
- *                                               Build scheitert; die Ampel rechnet `status`.
+ *                                               Build scheitert; die Ampel rechnet `status`. --umstellen stellt diese
+ *                                               Anbieter auch bei Einbruch oder gescheiterter Seite auf V2 um (E7).
  *   nightly --build-only                        Nur Neubau von data/offers.json aus data/raw und Katalog (gleicher
  *                                               Build, Horizont und ID-Abgleich wie der Nachtlauf), ohne Abruf, ohne
  *                                               Modell, ohne Bericht und kosten.csv; entfernt data/raw/<id>.json von
@@ -69,7 +71,6 @@ import {
   type ExtractOutcome,
   type ExtractResult,
   effortOf,
-  fallbackModelOf,
   modelKey,
 } from "./io/extract.ts";
 import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
@@ -123,6 +124,7 @@ const { positionals, values } = parseArgs({
     terms: { type: "string" },
     hide: { type: "string" },
     "build-only": { type: "boolean", default: false },
+    umstellen: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -267,13 +269,19 @@ async function nightly() {
   const brakes = parseBrakes(process.env);
   if (!brakes.ok) fail(brakes.error);
   const dryRun = values["dry-run"];
+  // nach Prüfung erzwungene Umstellung einzelner Anbieter (Plan 0048, E7); Daten schreibt nur der Workflow
+  const umstellen = values.umstellen?.split(",").filter(Boolean);
+  for (const id of umstellen ?? [])
+    if (!readCatalog().some((p) => p.id === id)) fail(`--umstellen: unbekannter Anbieter ${id}`);
   // Modell und Effort gehören in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const effort = effortOf(process.env);
   const r = await runNightly({
     extractor: createExtractor({ model }),
     keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },
-    strongRetry: model !== fallbackModelOf(process.env),
+    // immer, auch bei gleichem Fallback-Modell (Plan 0048, E5)
+    strongRetry: true,
+    ...(umstellen ? { forceMigrate: umstellen } : {}),
     budgetMin,
     brakes: brakes.brakes,
     dataDir: join(ROOT, "data"),

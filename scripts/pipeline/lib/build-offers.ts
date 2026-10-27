@@ -7,9 +7,19 @@ import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/s
 import { addDays, berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import { fallbackCategory } from "../../../src/domain/topics.ts";
 import type { Source } from "./candidate.ts";
-import { expansionWindow, type ProviderCheck, type ProviderRaw, type RawBatch, type RawEvent } from "./raw.ts";
+import {
+  expansionWindow,
+  isV2,
+  type ProviderCheck,
+  type ProviderRaw,
+  providerStatus,
+  type RawBatch,
+  type RawEvent,
+  rawExtracted,
+} from "./raw.ts";
 import { expandSchedule } from "./schedule.ts";
 import { similarTitle } from "./similar.ts";
+import { mergeParts } from "./split.ts";
 import {
   assignIds,
   checkIdContinuity,
@@ -19,6 +29,7 @@ import {
   unionSessions,
   windowKey,
 } from "./stable-ids.ts";
+import { KANDIDATEN, type MatchWindow, matchUnits, unitsOf } from "./units.ts";
 
 export interface BuildInput {
   /** Rohdateien; die Reihenfolge der Namen bestimmt, wer bei Vereinigungen gewinnt */
@@ -50,12 +61,17 @@ export interface BuildInput {
 export const HORIZON_MONTHS = 12;
 
 /**
- * `data/raw/<id>.json` → Rohdateien für `buildOffers` (Plan 0032, E5). Anbieter, die nicht (mehr) im Katalog stehen,
- * und Events mit einem Ort, den der Anbieter nicht (mehr) hat, entfallen mit Hinweis statt den Build zu brechen.
+ * `data/raw/<id>.json` → Rohdateien für `buildOffers` (Plan 0032, E5; Plan 0048, E6). Anbieter, die nicht (mehr) im
+ * Katalog stehen, und Events mit einem Ort, den der Anbieter nicht (mehr) hat, entfallen mit Hinweis statt den Build zu
+ * brechen. Im neuen Format (V2) gleicht `matchUnits` die Einheiten eines Anbieters ab (E12), dann vereinigt
+ * `mergeParts` sie wie die Teile einer großen Eingabe (zuerst Einheiten mit `ok`, dann im Fehler, je in
+ * Katalogreihenfolge, `kandidaten` zuletzt); so legt sich dasselbe Angebot von zwei Seiten vor Schritt 3 zusammen. Jedes
+ * übrige Event kommt in den Batch seiner Einheit (`<id>#<nn>`, Katalogindex) mit deren `checkedAt`.
  */
 export function batchesFromRaw(
   raws: Readonly<Record<string, ProviderRaw>>,
   providers: readonly Provider[],
+  window: MatchWindow,
 ): { batches: BuildInput["batches"]; extracted: Set<string>; notes: string[] } {
   const notes: string[] = [];
   const extracted = new Set<string>();
@@ -67,20 +83,50 @@ export function batchesFromRaw(
       notes.push(`data/raw/${id}.json: kein Anbieter im Katalog – entfällt`);
       continue;
     }
-    if (raw.inputHash !== undefined) extracted.add(id);
+    if (rawExtracted(raw)) extracted.add(id);
     const venues = new Set(p.venues.map((v) => v.id));
-    const events = raw.events.filter((e) => {
+    const own = (e: RawEvent) => {
       if (e.providerId === id && venues.has(e.venueId)) return true;
       notes.push(`data/raw/${id}.json „${e.title}“: Ort ${e.providerId}/${e.venueId} nicht im Katalog – entfällt`);
       return false;
-    });
-    batches.push({
-      name: id,
-      checkedAt: raw.checkedAt,
-      batch: {
-        providers: { [id]: { status: raw.status, ...(raw.reason ? { reason: raw.reason } : {}), checked: [] } },
-        events,
-      },
+    };
+    const s = providerStatus(raw);
+    const check: ProviderCheck = { status: s.status, ...(s.reason ? { reason: s.reason } : {}), checked: [] };
+    if (!isV2(raw)) {
+      batches.push({
+        name: id,
+        checkedAt: raw.checkedAt,
+        batch: { providers: { [id]: check }, events: raw.events.filter(own) },
+      });
+      continue;
+    }
+    // Katalogindex je Kennung; verwaiste Einheiten (geänderte URL, E1) danach, `kandidaten` zuletzt
+    const order = new Map(
+      unitsOf(p, { candidates: true, hadKandidaten: true }).map((u, i) => [u.id, u.own ?? i] as const),
+    );
+    const indexOf = (unit: string) =>
+      unit === KANDIDATEN
+        ? p.programme.length + Object.keys(raw.units).length
+        : (order.get(unit) ?? p.programme.length);
+    const units = Object.entries(raw.units)
+      .sort(([a], [b]) => indexOf(a) - indexOf(b) || a.localeCompare(b))
+      .map(([unit, u]) => ({ id: unit, failed: u.status === "fehler", events: u.events.filter(own), state: u }));
+    const matched = matchUnits(units, window);
+    notes.push(...matched.notes.map((n) => `data/raw/${id}.json: ${n}`));
+    const merged = mergeParts(
+      matched.units.map((u) => u.events),
+      { from: window.horizon.from, to: window.horizon.to, freeDays: window.freeDays },
+    );
+    notes.push(...merged.notes.map((n) => `data/raw/${id}.json: ${n}`));
+    matched.units.forEach((u, k) => {
+      const state = raw.units[u.id];
+      if (!state) return;
+      const events = merged.events.filter((_, i) => merged.from[i] === k);
+      batches.push({
+        name: `${id}#${String(indexOf(u.id)).padStart(2, "0")}`,
+        checkedAt: state.checkedAt,
+        batch: { providers: { [id]: check }, events },
+      });
     });
   }
   return { batches, extracted, notes };
