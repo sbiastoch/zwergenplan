@@ -68,7 +68,9 @@ import {
   type ExtractInput,
   type ExtractOutcome,
   type ExtractResult,
+  effortOf,
   fallbackModelOf,
+  modelKey,
 } from "./io/extract.ts";
 import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
 import { git, ROOT, readCatalog, readJson, readPreviousOffers, readRawDir, writeJson } from "./io/files.ts";
@@ -265,11 +267,12 @@ async function nightly() {
   const brakes = parseBrakes(process.env);
   if (!brakes.ok) fail(brakes.error);
   const dryRun = values["dry-run"];
-  // Das Modell gehört in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
+  // Modell und Effort gehören in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
+  const effort = effortOf(process.env);
   const r = await runNightly({
     extractor: createExtractor({ model }),
-    keyParts: { ...EXTRACT_KEY_PARTS, model },
+    keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },
     strongRetry: model !== fallbackModelOf(process.env),
     budgetMin,
     brakes: brakes.brakes,
@@ -365,6 +368,7 @@ async function discoverCmd() {
     }
   // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf: Der Zustand des Ertragsbeweises gilt dort weiter (E1)
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
+  const effort = effortOf(process.env);
   const r = await runDiscover({
     regions,
     dataDir: join(ROOT, "data"),
@@ -376,7 +380,7 @@ async function discoverCmd() {
     ...(hide ? { hide } : {}),
     brakes: brakes.brakes,
     budgetMin,
-    keyParts: { ...EXTRACT_KEY_PARTS, model },
+    keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },
     log: print,
     deps: {
       ...createDiscoverModel(),

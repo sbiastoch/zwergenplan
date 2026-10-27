@@ -9,7 +9,7 @@ import { addMonths } from "../../../src/domain/time.ts";
 import { type Extractor, extractMessage, extractResponseSchema, runExtractionInParts } from "../lib/extract.ts";
 import { PART_MAX_CHARS, splitInput } from "../lib/split.ts";
 import { loadFreeDays } from "./holidays.ts";
-import { callLlm, type LlmOptions } from "./llm.ts";
+import { callLlm, EFFORTS, type Effort, type LlmOptions } from "./llm.ts";
 
 export type {
   CallRecord,
@@ -37,6 +37,8 @@ const MAX_TURNS = 3;
 
 export interface ExtractorOptions {
   model?: string;
+  /** gilt für Haupt- und Fallback-Modell, Standard `LLM_EFFORT_EXTRACT` (Plan 0048, Nachtrag 2) */
+  effort?: Effort;
   fallbackModel?: string;
   /** Schwelle für das Aufteilen der Eingabe (`splitInput`), Standard `PART_MAX_CHARS` */
   partMaxChars?: number;
@@ -49,8 +51,21 @@ export interface ExtractorOptions {
 /** Fallback-Modell der Extraktion (E4): `LLM_MODEL_FALLBACK`, sonst Sonnet. */
 export const fallbackModelOf = (env: NodeJS.ProcessEnv): string => env["LLM_MODEL_FALLBACK"] ?? "sonnet";
 
+/** Effort der Extraktion: `LLM_EFFORT_EXTRACT`, leer oder fehlend heißt Standard der CLI. */
+export function effortOf(env: NodeJS.ProcessEnv): Effort | undefined {
+  const raw = env["LLM_EFFORT_EXTRACT"];
+  if (!raw) return undefined;
+  const effort = EFFORTS.find((e) => e === raw);
+  if (!effort) throw new Error(`LLM_EFFORT_EXTRACT ungültig: ${raw} (erlaubt: ${EFFORTS.join(", ")})`);
+  return effort;
+}
+
+/** Modellteil des Cache-Schlüssels: Ohne Effort bleibt er, wie er war; ein Wechsel extrahiert einmal alles neu. */
+export const modelKey = (model: string, effort: Effort | undefined): string => (effort ? `${model}/${effort}` : model);
+
 export function createExtractor(opts: ExtractorOptions = {}): Extractor {
   const model = opts.model ?? process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
+  const effort = opts.effort ?? effortOf(process.env);
   const fallbackModel = opts.fallbackModel ?? fallbackModelOf(process.env);
   const partMaxChars = opts.partMaxChars ?? PART_MAX_CHARS;
   const loadDays = opts.freeDays ?? loadFreeDays;
@@ -97,7 +112,16 @@ export function createExtractor(opts: ExtractorOptions = {}): Extractor {
       signal,
       call: (m, user) =>
         callLlm(
-          { model: m, systemPromptFile: PROMPT_FILE, user, tools: "none", schema: SCHEMA, maxTurns: MAX_TURNS, signal },
+          {
+            model: m,
+            ...(effort ? { effort } : {}),
+            systemPromptFile: PROMPT_FILE,
+            user,
+            tools: "none",
+            schema: SCHEMA,
+            maxTurns: MAX_TURNS,
+            signal,
+          },
           llmOpts,
         ),
     });

@@ -12,8 +12,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { z } from "zod";
 
+export const EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
+export type Effort = (typeof EFFORTS)[number];
+
 export interface LlmCall {
   model: string;
+  /** `--effort` der CLI; ohne Wert gilt ihr Standard */
+  effort?: Effort;
   /** ersetzt den Standard-Prompt der CLI (Pflicht, auch wegen der Tokens) */
   systemPromptFile: string;
   /** Eingabe über stdin */
@@ -93,6 +98,7 @@ function llmArgs(call: Omit<LlmCall, "signal" | "user">): string[] {
     "-p",
     "--model",
     call.model,
+    ...(call.effort ? ["--effort", call.effort] : []),
     "--system-prompt-file",
     call.systemPromptFile,
     ...tools,
