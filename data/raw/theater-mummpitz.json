@@ -3,11 +3,10 @@
   {
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
-   "title": "Jazz für Kinder – Puppentheater mit Livejazz",
-   "summary": "Puppenspiel um König Semmelwurst mit Livemusik, etwa einmal im Monat. Kinder unter 3 Jahren haben freien Eintritt. Alle Termine im Horizont sind derzeit ausverkauft.",
+   "title": "Jazz für Kinder – Puppenspiel mit Livemusik",
+   "summary": "Puppenspiel rund um König Semmelwurst, live kommentiert von einem Jazz-Trio, etwa 50 Min. Kinder unter 3 Jahren haben freien Eintritt. Alle aufgeführten Termine sind laut Spielplan ausverkauft.",
    "topics": [
     "konzert",
-    "musik",
     "theater"
    ],
    "format": "einmalig",
@@ -17,9 +16,13 @@
    "url": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
    "sourceUrl": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
    "category": "buehne",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Vorstellungen ausverkauft"
+    "note": "Alle Termine im Spielplan als ausverkauft markiert"
    },
    "schedule": {
     "kind": "dates",
@@ -52,10 +55,9 @@
    "providerId": "theater-mummpitz",
    "venueId": "theater-mummpitz",
    "title": "Klassik für Kinder – moderierte Konzerte der Hochschule",
-   "summary": "Studierende der Hochschule für Musik Nürnberg stellen Instrumente vor, spielen Lieblingsstücke und moderieren die Konzerte für Kinder jeden Alters mit Begleitung. Alle Termine im Horizont sind derzeit ausverkauft.",
+   "summary": "Studierende der Musikhochschule Nürnberg stellen Instrumente vor, spielen Lieblingsstücke und moderieren, etwa 50 Min. Für Kinder jeden Alters und ihre Begleitpersonen; jede Ausgabe hat ein eigenes Thema.",
    "topics": [
-    "konzert",
-    "musik"
+    "konzert"
    ],
    "format": "einmalig",
    "registration": "mit-anmeldung",
@@ -64,9 +66,13 @@
    "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
    "sourceUrl": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
    "category": "buehne",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
    "availability": {
     "status": "ausgebucht",
-    "note": "Alle Vorstellungen ausverkauft"
+    "note": "Alle Termine im Spielplan als ausverkauft markiert"
    },
    "schedule": {
     "kind": "dates",
@@ -93,7 +99,7 @@
    }
   }
  ],
- "inputHash": "9a8612572eecb4359c4d0d1d2023fc9c693f25fe1e5cc5ac67f8544ea22ea043",
+ "inputHash": "a7323b362a5a53968c0873b0e0c50709da5386be6acb5c5405e34080e3df72e5",
  "dated": {
   "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
   "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
@@ -109,8 +115,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-26T07:48:52+01:00",
- "changedAt": "2026-10-26T07:48:52+01:00",
+ "checkedAt": "2026-10-27T07:42:08+01:00",
+ "changedAt": "2026-10-27T07:42:08+01:00",
  "sources": [
   "frankenkids",
   "stadt-vk"

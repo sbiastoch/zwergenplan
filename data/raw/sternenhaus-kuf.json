@@ -1935,5 +1935,97 @@
  "changedAt": "2026-10-22T08:32:08+02:00",
  "sources": [
   "stadt-vk"
- ]
+ ],
+ "pending": {
+  "inputHash": "f1576c7323ecdc9184689ab3f9cac980625549da18066a3d600c92481f869812",
+  "dated": {
+   "2026-12-03": "fafc039852a0ad3d39e6c74e45e151b8099bd398ed73d380707f572d615c324f",
+   "2026-12-04": "78ff0fa35fb74da92f70e824d774414cc7f11320bb1691133b976b36c23bc144",
+   "2026-12-05": "62d1fad8089b785741d9ac9585e998b29603519e50d19401ab4722351c878e2d"
+  },
+  "model": "sonnet",
+  "events": [
+   {
+    "providerId": "sternenhaus-kuf",
+    "venueId": "sternenhaus-kuf",
+    "title": "Schneeflocken, wippediwapp – Lucia Ruf (Sternenhaus)",
+    "summary": "Kinderkonzert mit Winterliedern zum Mitsingen und Tanzen für Kinder ab 2 Jahren mit Begleitung. Der Termin am 30.11. um 9:30 und 10:45 ist laut Kalender ausverkauft.",
+    "topics": [
+     "konzert",
+     "musik"
+    ],
+    "format": "einmalig",
+    "registration": "mit-anmeldung",
+    "cost": "kostenpflichtig",
+    "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
+    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+    "category": "buehne",
+    "age": {
+     "minMonths": 24,
+     "maxMonths": 36
+    },
+    "availability": {
+     "status": "unbekannt",
+     "note": "Tickets im Eventim-Webshop; 30.11. (9:30, 10:45) ausverkauft"
+    },
+    "schedule": {
+     "kind": "dates",
+     "dates": [
+      {
+       "start": "2026-11-29T14:00",
+       "end": "2026-11-29T14:45"
+      },
+      {
+       "start": "2026-11-30T09:30",
+       "end": "2026-11-30T10:15"
+      },
+      {
+       "start": "2026-11-30T10:45",
+       "end": "2026-11-30T11:30"
+      }
+     ]
+    }
+   },
+   {
+    "providerId": "sternenhaus-kuf",
+    "venueId": "sternenhaus-kuf",
+    "title": "WiWaWaldtraum – Purzeltraumtheater (Sternenhaus)",
+    "summary": "Mitmachtheater: Trolli Tolpatsch legt im Zauberwald seine Waldprüfung ab und löst Aufgaben der Fee Fiofina. Herbststück im Vierjahreszeiten-Zyklus, für Kinder ab 2 Jahren.",
+    "topics": [
+     "theater"
+    ],
+    "format": "einmalig",
+    "registration": "mit-anmeldung",
+    "cost": "kostenpflichtig",
+    "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
+    "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+    "category": "buehne",
+    "age": {
+     "minMonths": 24,
+     "maxMonths": 36
+    },
+    "availability": {
+     "status": "frei",
+     "note": "Tickets im Eventim-Webshop"
+    },
+    "schedule": {
+     "kind": "dates",
+     "dates": [
+      {
+       "start": "2026-12-04T14:30",
+       "end": "2026-12-04T15:10"
+      },
+      {
+       "start": "2026-12-05T17:00",
+       "end": "2026-12-05T17:40"
+      },
+      {
+       "start": "2026-12-06T14:00",
+       "end": "2026-12-06T14:40"
+      }
+     ]
+    }
+   }
+  ]
+ }
 }

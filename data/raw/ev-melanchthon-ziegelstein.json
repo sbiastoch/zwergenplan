@@ -3,12 +3,11 @@
   {
    "providerId": "ev-melanchthon-ziegelstein",
    "venueId": "ev-melanchthon-ziegelstein",
-   "title": "Eltern-Kind-Gruppe für Eltern mit Kindern von 0 bis 3 Jahren (dienstags)",
-   "summary": "Offene Gruppe für Mütter und Väter mit Kleinkindern: Austausch über den Erziehungsalltag, Lieder und Geschichten, erste Gruppenerfahrungen für die Kinder. Einstieg jederzeit möglich laut Terminliste, Anmeldung nicht angegeben.",
+   "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren (dienstags)",
+   "summary": "Dienstags 9:30–11:00 Uhr im Gemeindehaus: Austausch unter Eltern, Lieder und Geschichten, freies Spielen für die Kleinen. Angaben zu Anmeldung und Kosten fehlen in der Quelle; bitte beim Veranstalter nachfragen.",
    "topics": [
     "eltern-kind-gruppe",
-    "elterntreff",
-    "spielgruppe"
+    "elterntreff"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
@@ -22,7 +21,7 @@
    },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, bei Bedarf beim Anbieter nachfragen"
+    "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; Kosten nicht angegeben, bitte beim Veranstalter nachfragen."
    },
    "schedule": {
     "kind": "dates",
@@ -66,7 +65,6 @@
  ],
  "inputHash": "95ca7d938b67b5a0de24d872514cdac1d60f8e406a63f75c7a1341bb3f5f1e96",
  "dated": {
-  "2026-10-26": "dbfc637bf0fadc1e397bd3d1706b6077302da4dd952abf879ed944c826b82e54",
   "2026-10-27": "5db39316945e95206d7bf691f23b13522ada1c4962212393839140c940e0a0f9",
   "2026-10-29": "fa795cfd50c34e7af9a19d92c7eefb6ff4f7229baa4ba21e6b187092c5623c5b",
   "2026-10-31": "715778da878f77a3abfd2adbb11d1bed2bf106d28e6da6ab801bfbee15ceb964",
@@ -82,7 +80,7 @@
   "2026-11-17": "63b35c53904d43446aee87f03cb4393d0b3c24ff3a4964a4931fe78fa7e1ae87",
   "2026-11-18": "4c5fd04a5172c35f1129e1192abdc8ee57bc6c5a303eb34ae7905bcb63e309a6",
   "2026-11-19": "4fbbb619de00acf3e3e20bf4557252efefeeb345c285057ed1bb9a1cdfe16601",
-  "2026-11-21": "0241d75cb5a59f088d208cbdf4e5ee59e4a162b3330cd9453c603de9e8befc9e",
+  "2026-11-21": "79ced194bcef38d4360a403cfea2d5ed0198b104f6f807071f0a79e70279f469",
   "2026-11-22": "605fdb1325ddc9110dcc06d7ebc694fcee00063c281ccb393ff34b36c2f2325b",
   "2026-11-23": "cccaa3a4e36f3da1a7ed327d8beb3e6f9bf611e15c8904fffe4b277fa6393b1e",
   "2026-11-24": "6c4ef5671a0c9581e54581c1acead86dcc158d10050b467e36f11709d458d7b7",
@@ -102,8 +100,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-26T07:48:52+01:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
+ "checkedAt": "2026-10-27T07:42:08+01:00",
+ "changedAt": "2026-10-27T07:42:08+01:00",
  "sources": [
   "evtermine"
  ]

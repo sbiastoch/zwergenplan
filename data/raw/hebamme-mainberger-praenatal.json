@@ -4,20 +4,20 @@
    "providerId": "hebamme-mainberger-praenatal",
    "venueId": "hebamme-mainberger-praenatal",
    "title": "Rückbildung Di 10:30–11:45, mit/ohne Kind (Okt.–Dez. 2026)",
-   "summary": "Kräftigung von Beckenboden, Bauch und Körpermitte mit Bewegungs- und Dehnungsübungen. Babys dürfen mit, eine Betreuung wird empfohlen. Teilnahme vor Ort oder online per Teams möglich.",
+   "summary": "Rückbildungsgymnastik für Beckenboden, Bauch und Körpermitte, Kind darf mit, Betreuung wird aber empfohlen. Hybrid: im Kursraum oder online per Teams. Anmeldung läuft über die Warteliste.",
    "topics": [
     "rueckbildung"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "bei gesetzlich Versicherten übernimmt die Krankenkasse die Kursgebühr bis 9 Monate nach der Geburt",
+   "price": "Kursgebühr von der Krankenkasse übernommen (gesetzlich Versicherte, bis 9 Monate nach der Geburt)",
    "url": "https://mainberger.hebamio.de/kursliste",
    "sourceUrl": "https://mainberger.hebamio.de/kursliste",
    "category": "bewegung",
    "availability": {
     "status": "warteliste",
-    "note": "Kurs voll, Warteliste über Hebamio"
+    "note": "Button „auf Warteliste setzen“"
    },
    "schedule": {
     "kind": "dates",
@@ -61,20 +61,20 @@
    "providerId": "hebamme-mainberger-praenatal",
    "venueId": "hebamme-mainberger-praenatal",
    "title": "Rückbildung Di 08:45–10:00, mit/ohne Kind (Dez. 2026–Feb. 2027)",
-   "summary": "Kräftigung von Beckenboden, Bauch und Körpermitte mit Bewegungs- und Dehnungsübungen. Babys dürfen mit, eine Betreuung wird empfohlen. Teilnahme vor Ort oder online per Teams möglich.",
+   "summary": "Rückbildungsgymnastik für Beckenboden, Bauch und Körpermitte, Kind darf mit, Betreuung wird aber empfohlen. Hybrid: im Kursraum oder online per Teams. Anmeldung läuft über die Warteliste.",
    "topics": [
     "rueckbildung"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "bei gesetzlich Versicherten übernimmt die Krankenkasse die Kursgebühr bis 9 Monate nach der Geburt",
+   "price": "Kursgebühr von der Krankenkasse übernommen (gesetzlich Versicherte, bis 9 Monate nach der Geburt)",
    "url": "https://mainberger.hebamio.de/kursliste",
    "sourceUrl": "https://mainberger.hebamio.de/kursliste",
    "category": "bewegung",
    "availability": {
     "status": "warteliste",
-    "note": "Kurs voll, Warteliste über Hebamio"
+    "note": "Button „auf Warteliste setzen“"
    },
    "schedule": {
     "kind": "dates",
@@ -117,21 +117,21 @@
   {
    "providerId": "hebamme-mainberger-praenatal",
    "venueId": "hebamme-mainberger-praenatal",
-   "title": "Rückbildung Di 10:30–11:45, mit/ohne Baby (Dez. 2026–März 2027)",
-   "summary": "Kräftigung von Beckenboden, Bauch und Körpermitte mit Bewegungs- und Dehnungsübungen. Babys dürfen mit, eine Betreuung wird empfohlen. Teilnahme vor Ort oder online per Teams möglich.",
+   "title": "Rückbildung Di 10:30–11:45, mit/ohne Kind (Dez. 2026–März 2027)",
+   "summary": "Rückbildungsgymnastik für Beckenboden, Bauch und Körpermitte, Kind darf mit, Betreuung wird aber empfohlen. Hybrid: im Kursraum oder online per Teams. Anmeldung läuft über die Warteliste.",
    "topics": [
     "rueckbildung"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "bei gesetzlich Versicherten übernimmt die Krankenkasse die Kursgebühr bis 9 Monate nach der Geburt",
+   "price": "Kursgebühr von der Krankenkasse übernommen (gesetzlich Versicherte, bis 9 Monate nach der Geburt)",
    "url": "https://mainberger.hebamio.de/kursliste",
    "sourceUrl": "https://mainberger.hebamio.de/kursliste",
    "category": "bewegung",
    "availability": {
     "status": "warteliste",
-    "note": "Kurs voll, Warteliste über Hebamio"
+    "note": "Button „auf Warteliste setzen“"
    },
    "schedule": {
     "kind": "dates",
@@ -175,20 +175,20 @@
    "providerId": "hebamme-mainberger-praenatal",
    "venueId": "hebamme-mainberger-praenatal",
    "title": "Rückbildung Di 08:45–10:00, mit/ohne Kind (Feb.–Apr. 2027)",
-   "summary": "Kräftigung von Beckenboden, Bauch und Körpermitte mit Bewegungs- und Dehnungsübungen. Babys dürfen mit, eine Betreuung wird empfohlen. Teilnahme vor Ort oder online per Teams möglich.",
+   "summary": "Rückbildungsgymnastik für Beckenboden, Bauch und Körpermitte, Kind darf mit, Betreuung wird aber empfohlen. Hybrid: im Kursraum oder online per Teams. Anmeldung läuft über die Warteliste.",
    "topics": [
     "rueckbildung"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "bei gesetzlich Versicherten übernimmt die Krankenkasse die Kursgebühr bis 9 Monate nach der Geburt",
+   "price": "Kursgebühr von der Krankenkasse übernommen (gesetzlich Versicherte, bis 9 Monate nach der Geburt)",
    "url": "https://mainberger.hebamio.de/kursliste",
    "sourceUrl": "https://mainberger.hebamio.de/kursliste",
    "category": "bewegung",
    "availability": {
-    "status": "wenige",
-    "note": "Noch wenige Plätze, Anmeldung über Hebamio"
+    "status": "warteliste",
+    "note": "Button „auf Warteliste setzen“"
    },
    "schedule": {
     "kind": "dates",
@@ -232,20 +232,20 @@
    "providerId": "hebamme-mainberger-praenatal",
    "venueId": "hebamme-mainberger-praenatal",
    "title": "Rückbildung Di 10:30–11:45, mit/ohne Kind (März–Mai 2027)",
-   "summary": "Kräftigung von Beckenboden, Bauch und Körpermitte mit Bewegungs- und Dehnungsübungen. Babys dürfen mit, eine Betreuung wird empfohlen. Teilnahme vor Ort oder online per Teams möglich.",
+   "summary": "Rückbildungsgymnastik für Beckenboden, Bauch und Körpermitte, Kind darf mit, Betreuung wird aber empfohlen. Hybrid: im Kursraum oder online per Teams. Wenige Plätze frei.",
    "topics": [
     "rueckbildung"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "bei gesetzlich Versicherten übernimmt die Krankenkasse die Kursgebühr bis 9 Monate nach der Geburt",
+   "price": "Kursgebühr von der Krankenkasse übernommen (gesetzlich Versicherte, bis 9 Monate nach der Geburt)",
    "url": "https://mainberger.hebamio.de/kursliste",
    "sourceUrl": "https://mainberger.hebamio.de/kursliste",
    "category": "bewegung",
    "availability": {
     "status": "wenige",
-    "note": "Noch wenige Plätze, Anmeldung über Hebamio"
+    "note": "Noch wenige Plätze, Anmeldung über die Seite"
    },
    "schedule": {
     "kind": "dates",
@@ -288,8 +288,8 @@
   {
    "providerId": "hebamme-mainberger-praenatal",
    "venueId": "hebamme-mainberger-praenatal",
-   "title": "Beikost-Seminar für Eltern mit Baby (Fr. 19.02.2027)",
-   "summary": "Zweieinhalbstündiges Seminar zum Start mit Beikost: Zeitpunkt, Breifahrplan oder Baby-led Weaning, Allergieprävention und Sicherheit. Ein ausführliches Skript kommt danach per Mail.",
+   "title": "Beikost-Seminar für Eltern mit Kind, 19.02.2027",
+   "summary": "Einmaliges 2,5-stündiges Seminar zum Start mit Beikost: Zeitpunkt, Breifahrplan oder Baby-led Weaning, Allergieprävention und Sicherheit. Skript wird per Mail nachgereicht.",
    "topics": [
     "beikost"
    ],
@@ -302,7 +302,7 @@
    "category": "beratung",
    "availability": {
     "status": "frei",
-    "note": "Plätze vorhanden, Anmeldung über Hebamio"
+    "note": "Plätze vorhanden, Anmeldung über die Seite"
    },
    "schedule": {
     "kind": "dates",
@@ -317,15 +317,15 @@
   {
    "providerId": "hebamme-mainberger-praenatal",
    "venueId": "hebamme-mainberger-praenatal",
-   "title": "Rückbildung Dienstag mit/ohne Kind (hybrid, Mai–Juli 2027)",
-   "summary": "Rückbildungskurs zur Kräftigung von Beckenboden, Bauch und Körpermitte mit Dehnung; Babys sind willkommen, eine Betreuung wird empfohlen. Vor Ort in Praenatal oder online per Teams, Online-Teilnahme bis 20 Uhr am Vortag ankündigen.",
+   "title": "Rückbildungskurs mit/ohne Kind, Di 8:45–10 Uhr (hybrid)",
+   "summary": "Kräftigung von Beckenboden, Bauch und Körpermitte mit Bewegungs- und Dehnübungen, Babys sind willkommen. Teilnahme vor Ort bei Praenatal oder online über Teams möglich. Beginn frühestens 6–8 Wochen nach spontaner Geburt bzw. 8–10 Wochen nach Kaiserschnitt.",
    "topics": [
     "rueckbildung"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
    "cost": "kostenpflichtig",
-   "price": "bei gesetzlich Versicherten von der Krankenkasse übernommen",
+   "price": "Für gesetzlich Versicherte übernimmt die Krankenkasse die Kursgebühr bis 9 Monate nach der Geburt.",
    "url": "https://mainberger.hebamio.de/kursliste",
    "sourceUrl": "https://mainberger.hebamio.de/kursliste",
    "category": "bewegung",
@@ -372,10 +372,10 @@
    }
   }
  ],
- "inputHash": "67d33ff54f2a4733cb152ece30a1e0e9ea7641f4f9ea3fd3da970024f1c704d4",
+ "inputHash": "07a55efc8b63af24484afcf94c0a22b8fa18f9ab0ba6787b32a35f0dc142e5ad",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-26T07:48:52+01:00",
- "changedAt": "2026-10-24T08:20:24+02:00",
+ "checkedAt": "2026-10-27T07:42:08+01:00",
+ "changedAt": "2026-10-27T07:42:08+01:00",
  "sources": []
 }

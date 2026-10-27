@@ -4,18 +4,17 @@
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
    "title": "Offenes Kinderzimmer (Dienstag, 9–12 Uhr)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre zum Spielen und Austauschen, ohne festes Programm. Nicht in den Ferien; im Sommer auch der Garten. Ohne pädagogische Betreuung, Ansprechpartnerin vor Ort.",
+   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahre: spielen, austauschen, ankommen. Keine Anmeldung nötig, Kosten entfallen. Nicht in den Ferien.",
    "topics": [
-    "spielgruppe",
-    "elterntreff"
+    "elterntreff",
+    "spielgruppe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "kostenfrei",
    "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "category": "krabbel-spielgruppen",
+   "category": "treffs-cafes",
    "age": {
     "minMonths": 0,
     "maxMonths": 36
@@ -39,18 +38,17 @@
    "providerId": "nachbarschaftshaus-gostenhof",
    "venueId": "nachbarschaftshaus-gostenhof",
    "title": "Offenes Kinderzimmer (Donnerstag, 14–17 Uhr)",
-   "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre zum Spielen und Austauschen, ohne festes Programm. Nicht in den Ferien; im Sommer auch der Garten. Ohne pädagogische Betreuung, Ansprechpartnerin vor Ort.",
+   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahre: spielen, austauschen, ankommen. Keine Anmeldung nötig, Kosten entfallen. Nicht in den Ferien.",
    "topics": [
-    "spielgruppe",
-    "elterntreff"
+    "elterntreff",
+    "spielgruppe"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "price": "kostenfrei",
    "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
    "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "category": "krabbel-spielgruppen",
+   "category": "treffs-cafes",
    "age": {
     "minMonths": 0,
     "maxMonths": 36
@@ -71,10 +69,10 @@
    }
   }
  ],
- "inputHash": "9b1445cca3c9a3b31a396c44d9a9c35b38ce62f6b1b18fa3c218acfb7e01c90f",
+ "inputHash": "d557a1315e9116223ad2f3784ed7ae52dc3a53e27724465b030acf6db20b3f2e",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-26T07:48:52+01:00",
- "changedAt": "2026-10-26T07:48:52+01:00",
+ "checkedAt": "2026-10-27T07:42:08+01:00",
+ "changedAt": "2026-10-27T07:42:08+01:00",
  "sources": []
 }

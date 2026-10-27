@@ -3,29 +3,30 @@
   {
    "providerId": "ev-thomaskirche-grossreuth",
    "venueId": "ev-thomaskirche-grossreuth",
-   "title": "Krabbelgruppe (montags, Herbst 2026 bis Jan. 2027)",
-   "summary": "Spielen, Krabbeln, Singen und Fingerspiele mit Erfahrungsaustausch für Eltern. Die Termine stehen einzeln im Kalender, ein fester Wochenplan ist nicht angegeben.",
+   "title": "Krabbelgruppe im Gemeindehaus der Thomaskirche",
+   "summary": "Spielen, Krabbeln, gemeinsame Musik mit Fingerspielen und Austausch für Eltern. Termine laut Gemeindekalender, nicht jede Woche, mit Ferien- und Feiertagspausen.",
    "topics": [
     "krabbelgruppe",
+    "spielgruppe",
     "singen"
    ],
    "format": "regelmaessig",
    "registration": "ohne-anmeldung",
    "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8004135",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004135",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8004136",
+   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004136",
    "category": "krabbel-spielgruppen",
+   "age": {
+    "minMonths": 0,
+    "maxMonths": 36
+   },
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zur Anmeldung im Kalender; beim Gemeindebüro der Thomaskirche nachfragen."
+    "note": "Im Kalender keine Angabe zur Anmeldung; bei Fragen direkt an die Gemeinde wenden."
    },
    "schedule": {
     "kind": "dates",
     "dates": [
-     {
-      "start": "2026-10-26T15:30",
-      "end": "2026-10-26T17:30"
-     },
      {
       "start": "2026-11-09T15:30",
       "end": "2026-11-09T17:30"
@@ -65,6 +66,114 @@
      {
       "start": "2027-01-25T15:30",
       "end": "2027-01-25T17:30"
+     },
+     {
+      "start": "2027-02-01T15:30",
+      "end": "2027-02-01T17:30"
+     },
+     {
+      "start": "2027-02-15T15:30",
+      "end": "2027-02-15T17:30"
+     },
+     {
+      "start": "2027-02-22T15:30",
+      "end": "2027-02-22T17:30"
+     },
+     {
+      "start": "2027-03-01T15:30",
+      "end": "2027-03-01T17:30"
+     },
+     {
+      "start": "2027-03-08T15:30",
+      "end": "2027-03-08T17:30"
+     },
+     {
+      "start": "2027-03-15T15:30",
+      "end": "2027-03-15T17:30"
+     },
+     {
+      "start": "2027-04-05T15:30",
+      "end": "2027-04-05T17:30"
+     },
+     {
+      "start": "2027-04-12T15:30",
+      "end": "2027-04-12T17:30"
+     },
+     {
+      "start": "2027-04-19T15:30",
+      "end": "2027-04-19T17:30"
+     },
+     {
+      "start": "2027-04-26T15:30",
+      "end": "2027-04-26T17:30"
+     },
+     {
+      "start": "2027-05-03T15:30",
+      "end": "2027-05-03T17:30"
+     },
+     {
+      "start": "2027-05-10T15:30",
+      "end": "2027-05-10T17:30"
+     },
+     {
+      "start": "2027-05-31T15:30",
+      "end": "2027-05-31T17:30"
+     },
+     {
+      "start": "2027-06-07T15:30",
+      "end": "2027-06-07T17:30"
+     },
+     {
+      "start": "2027-06-14T15:30",
+      "end": "2027-06-14T17:30"
+     },
+     {
+      "start": "2027-06-21T15:30",
+      "end": "2027-06-21T17:30"
+     },
+     {
+      "start": "2027-06-28T15:30",
+      "end": "2027-06-28T17:30"
+     },
+     {
+      "start": "2027-07-05T15:30",
+      "end": "2027-07-05T17:30"
+     },
+     {
+      "start": "2027-07-12T15:30",
+      "end": "2027-07-12T17:30"
+     },
+     {
+      "start": "2027-07-19T15:30",
+      "end": "2027-07-19T17:30"
+     },
+     {
+      "start": "2027-07-26T15:30",
+      "end": "2027-07-26T17:30"
+     },
+     {
+      "start": "2027-09-20T15:30",
+      "end": "2027-09-20T17:30"
+     },
+     {
+      "start": "2027-09-27T15:30",
+      "end": "2027-09-27T17:30"
+     },
+     {
+      "start": "2027-10-04T15:30",
+      "end": "2027-10-04T17:30"
+     },
+     {
+      "start": "2027-10-11T15:30",
+      "end": "2027-10-11T17:30"
+     },
+     {
+      "start": "2027-10-18T15:30",
+      "end": "2027-10-18T17:30"
+     },
+     {
+      "start": "2027-10-25T15:30",
+      "end": "2027-10-25T17:30"
      }
     ]
    },
@@ -73,10 +182,12 @@
   {
    "providerId": "ev-thomaskirche-grossreuth",
    "venueId": "ev-thomaskirche-grossreuth",
-   "title": "Eltern-Kind-Yoga (dienstags, Nov./Dez. 2026)",
-   "summary": "Gemeinsames Yoga für Eltern und Kind an sechs Dienstagen im November und Dezember 2026. Ein späterer Einstieg ist nicht angegeben.",
+   "title": "Eltern-Kind-Yoga (6 Termine, Nov./Dez. 2026)",
+   "summary": "Yoga und Bewegung gemeinsam mit dem Kind, sechs Termine von November bis Dezember 2026 im großen Saal des Gemeindehauses.",
    "topics": [
-    "yoga-mit-baby"
+    "yoga-mit-baby",
+    "eltern-kind-turnen",
+    "bewegung"
    ],
    "format": "kurs",
    "registration": "mit-anmeldung",
@@ -86,7 +197,7 @@
    "category": "bewegung",
    "availability": {
     "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalender; beim Gemeindebüro der Thomaskirche nachfragen."
+    "note": "Im Kalender keine Angabe zu Plätzen oder Anmeldung; bei Fragen direkt an die Gemeinde wenden."
    },
    "schedule": {
     "kind": "dates",
@@ -122,28 +233,54 @@
  ],
  "inputHash": "318cead9cb5755c6ebdc93b78433013d29a502a55c1bb86803b5829c0454cdba",
  "dated": {
-  "2026-10-26": "a91fafbb36813770982ce95ab0392faf9af72b72df8f20bb7164895852a24500",
-  "2026-11-09": "da32dd759b687e4f58a143e6ea604aac47ce0e7eb8d8543d1a083462910126c7",
+  "2026-11-09": "6f6b48bcb3e7cf2c68428e9fb92d181a12a0b17b702f2a0f58123a3601cb2931",
   "2026-11-10": "c31f4b3ce06935d216f3ac8c5e40a67b2be59c6b766d865c5ac81918be350f25",
-  "2026-11-16": "fa741b9397001a665242a8fe06995ed93d3063f67c59199a3c2642b65a4c7aa9",
+  "2026-11-16": "8846adc9c77cde02ed8d19eec886bf8aeafd18265db942197ec6e9bfefed094b",
   "2026-11-17": "0b1a0ef59c4f30a74f89984e1a5b8a7715019cdaa1ac9f17078f46019168ba47",
-  "2026-11-23": "a85c5f11e5fce68edf10e912761e37e9ec2fd1398adcd099a2a479f7211430e2",
+  "2026-11-23": "e9034cf6eb14e99dbf1487a1e04a52d67c0f8ca2bdef5fa6bbdbdad49c7bf74e",
   "2026-11-24": "98efd9c9b1520c0fcea24b83502baefd7b1f4935a773d74a7c7bbe3c44d2b3f6",
-  "2026-11-30": "8365b61f5ea6a9c19dbc318fc15236eb8d612b1259529af239cfd37124e9adc2",
+  "2026-11-30": "359dc62933cc7448fca39448e076ab35b9ef5820ff4520232213918da5d63ae8",
   "2026-12-01": "25bd4d23f233152efed4de3b090f019ba045afa74722fa15d1d614185bdfc54d",
-  "2026-12-07": "19ff51e81c2077898080c5c1908829498334cd42fba7e57ac13e56716e1fb190",
+  "2026-12-07": "c873eeaa58a518773ea9a628fa4511060a9144bf7101c17aad8ebaf9ba4b97d5",
   "2026-12-08": "e732f6ed826a1c9d350ea63ed88c28c7af1b6036e0893a0c907cbd3e0623cf45",
-  "2026-12-14": "4c9753ee303a03979e110f9bc37398956d2f18675383a191be14b2da3112ff9b",
+  "2026-12-14": "c16f5d2eb65b34af627e75d4cfce300bdea0d4784ea5ef8cb32168233383490c",
   "2026-12-15": "09edbacfbc7c0375769d6551a482ce88c4ef9acfcf91e7cd13509ed9655e975b",
-  "2026-12-21": "92593dd040ed3bb000c1024af194f632b8d08d37a658929480b7e0656d7930a8",
-  "2027-01-11": "1bdb281fbdfea1da99ec73a9903e45d435a192e689b58138a2fb6e6710557ba1",
-  "2027-01-18": "289162b297401fc0c282c776f5390e002592e59a4ce07188933d2e5b4bce531a",
-  "2027-01-25": "637bd0a254d048d0d20f002eb174a6f25c9ae9fe8f7b93a839dd202c127d3353"
+  "2026-12-21": "749a93391f5ed4cec13ab101947d044142e9733693532d35c1bfcc2db432516e",
+  "2027-01-11": "af43004d90fe51137f1bb78984841a6378237cd1141710c80b9efa72fff5056c",
+  "2027-01-18": "bbb6ac2df04529687fd68b266bfaf930fbd422c0cc2387ce913a2d9d25c67aa7",
+  "2027-01-25": "d5f4ae1567d7972fd9aaba76fcaebd5c8684894da822b17950a6c3c9198a8e00",
+  "2027-02-01": "ab972f302d4824a695e48c08e550729d9745a5505a4979867e9d143ba58c799c",
+  "2027-02-15": "1cfb1aea7dc775590375021119fb1554d4faa675aed77b09af412bf0afe62b4d",
+  "2027-02-22": "ae3706a741d994fd7e1b6c2575e37f36fb4f1f8d76d0c2d33a1ef824c93570cd",
+  "2027-03-01": "58b3c2c393a733e6c2a571ddd3259c7f76016e7dd3813e388c018bb7cecce1ad",
+  "2027-03-08": "33f0e5a9c2d3c8bd5ac9d8816abc52ae6bdd1a8056df02a92748c90747d51f6b",
+  "2027-03-15": "1f1467b5d0cea64dc206a0e3f60d0f606e80d905c0b26a98cd90007c267f5b03",
+  "2027-04-05": "8bdcd8377ffebe4560317ef9de226ed5629f335ff03f25b48b552218301dcc4b",
+  "2027-04-12": "056f2470ccea17f315b5176c660a7f2a3c684fb05fffab397004d7359b311f68",
+  "2027-04-19": "9aa9ae915aa6c3c151fdbcc5542496007bf7078a896f132b730feae73d5a9240",
+  "2027-04-26": "71a288b163473c52e898d8a0cba621d76f1d8b5776c6de18560ce7f3ace8499f",
+  "2027-05-03": "dc4dd3f3fcc49de023c5cf7fa00f1bbc14dbf4d1062afebf8a0871ec6cbda113",
+  "2027-05-10": "507e00af86509f11fcf7d00ebb825bf829afc14ebfc9db3148ef11eb98aaf9b4",
+  "2027-05-31": "1687fb8967e4fa4a24744be62a70e4f04e98e1e91fedfc05edba30f7af96c2ab",
+  "2027-06-07": "ffec72889e9fec8b04fa5959c2a59220f9fb72c0aa7f4fc1c1566b74fc1a25b9",
+  "2027-06-14": "64c4ffe9e4a8e4bd365929167ab662c878ab0b86244e67f510ef142e58b7c076",
+  "2027-06-21": "944817464d97233602fb3d13b1b162454e907ce19eef1e86b33c5ca2c96a7d88",
+  "2027-06-28": "8455d344d3ce58261211c606c71333f5527544ccf8b5ffef507209085cdd3616",
+  "2027-07-05": "477a642bb85ede0adca9b8428ebe5cd44fd4ede23070d0021aec1a199258dd04",
+  "2027-07-12": "ba25a0aa73a6819e798cc847992043770bcc61ac7c26a1ad12fd327fca4c63cf",
+  "2027-07-19": "a7342699906af76c0ba816128fc85e6990371fbd95cb04dd8c3bebac3c7c2786",
+  "2027-07-26": "956e10dd64b674e2638211ca0ea0f43f5088117acfb3f44bb19692d4066743ca",
+  "2027-09-20": "6c6151687e0d5a6b173263a1b8d382388a1898a1794df6ba73d106cf05a64752",
+  "2027-09-27": "c2876b0eaaab9904512266bf0a6600651aa93afe13fc9ae97248b2ce5226be56",
+  "2027-10-04": "071b521867f4f499ac47430f87a3ed8237839a21f9def114a5b6d44c68a7dbf9",
+  "2027-10-11": "72ecb947faf2e47da1a06e9b6624b63c82110bee7bb8eb29318f9a2bfc6bd495",
+  "2027-10-18": "98fbbfe5a489570083a85027024d76fc851b341e56a8d8b47c160b5719161e46",
+  "2027-10-25": "016ff8b8fcfa54877d69ffcba2baea607e8abd263a48b29e8d1d0538e1493a09"
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-26T07:48:52+01:00",
- "changedAt": "2026-10-20T08:26:12+02:00",
+ "checkedAt": "2026-10-27T07:42:08+01:00",
+ "changedAt": "2026-10-27T07:42:08+01:00",
  "sources": [
   "evtermine"
  ]

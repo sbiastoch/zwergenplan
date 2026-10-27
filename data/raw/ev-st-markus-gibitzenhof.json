@@ -3,9 +3,10 @@
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Offene Tür für Groß und Klein (montags, FreiRaum)",
-   "summary": "Offener Treff für Groß und Klein im FreiRaum der Markuskirche. Einfach vorbeikommen, keine Anmeldung nötig. Die Termine stehen im Kalender ab 9. November 2026.",
+   "title": "Offene Tür für Groß und Klein (montags)",
+   "summary": "Offener Treff für Familien mit kleinen Kindern im FreiRaum der Markuskirche, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung. Am 30.11. entfällt der Termin.",
    "topics": [
+    "eltern-kind-gruppe",
     "elterntreff"
    ],
    "format": "regelmaessig",
@@ -16,7 +17,7 @@
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "offener Treff, einfach vorbeikommen"
+    "note": "Offener Treff, keine Anmeldung nötig"
    },
    "schedule": {
     "kind": "weekly",
@@ -26,14 +27,50 @@
     "start": "09:00",
     "end": "11:00",
     "from": "2026-11-09",
-    "skipHolidays": true
+    "skipHolidays": true,
+    "except": [
+     "2026-11-30"
+    ]
    }
   },
   {
    "providerId": "ev-st-markus-gibitzenhof",
    "venueId": "ev-st-markus-gibitzenhof",
-   "title": "Café für Alle – Dienstagnachmittag, Familien mit Kindern willkommen",
-   "summary": "Offenes Café auf dem Platz vor der Markuskirche oder im FreiRaum, Kaffee und Kuchen gegen Spende. Kinderlärm ist ausdrücklich willkommen, gelegentlich Bastel- und Bilderbuchangebote. Einstieg jederzeit möglich.",
+   "title": "Café für Alle (dienstags, Helmut-Herold-Platz)",
+   "summary": "Offenes Café für Groß und Klein vor der Markuskirche, dienstags 15–17 Uhr. Einfach vorbeikommen. Am 24.11. gibt es ein Bilderbuchkino, am 03.11. entfällt das Café.",
+   "topics": [
+    "elterncafe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8053907.html",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
+   "category": "treffs-cafes",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "Offener Treff, keine Anmeldung nötig"
+   },
+   "schedule": {
+    "kind": "weekly",
+    "weekdays": [
+     "TU"
+    ],
+    "start": "15:00",
+    "end": "17:00",
+    "from": "2026-10-27",
+    "skipHolidays": true,
+    "except": [
+     "2026-11-03"
+    ]
+   }
+  },
+  {
+   "providerId": "ev-st-markus-gibitzenhof",
+   "venueId": "ev-st-markus-gibitzenhof",
+   "title": "Café für Alle – Familiencafé dienstags",
+   "summary": "Offenes Familiencafé mit Kaffee und Kuchen gegen Spende, Kinder können basteln oder Bilderbuchkino erleben. Bei gutem Wetter auf dem Platz vor der Markuskirche, sonst im FreiRaum. Einfach vorbeikommen, keine Anmeldung.",
    "topics": [
     "elterncafe",
     "elterntreff"
@@ -47,7 +84,7 @@
    "category": "treffs-cafes",
    "availability": {
     "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
+    "note": "offener Treff, einfach vorbeikommen"
    },
    "schedule": {
     "kind": "weekly",
@@ -55,8 +92,61 @@
      "TU"
     ],
     "start": "15:00",
-    "from": "2026-10-27",
+    "from": "2026-11-03",
     "skipHolidays": true
+   }
+  },
+  {
+   "providerId": "ev-st-markus-gibitzenhof",
+   "venueId": "ev-st-markus-gibitzenhof",
+   "title": "Offene Tür für Groß und Klein – Montagvormittag",
+   "summary": "Offener Vormittag mit Spielzeit für Kleinkinder, dazu Kaffee und Gesellschaft für Begleitpersonen. Keine Anmeldung nötig, einfach vorbeikommen.",
+   "topics": [
+    "eltern-kind-gruppe",
+    "elterntreff"
+   ],
+   "format": "regelmaessig",
+   "registration": "ohne-anmeldung",
+   "cost": "kostenlos",
+   "url": "https://www.evangelische-termine.de/detail-bt?ID=8113801",
+   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
+   "category": "krabbel-spielgruppen",
+   "availability": {
+    "status": "ohne-anmeldung",
+    "note": "offener Treff, keine Plätze"
+   },
+   "schedule": {
+    "kind": "dates",
+    "dates": [
+     {
+      "start": "2026-11-09T09:00",
+      "end": "2026-11-09T11:00"
+     },
+     {
+      "start": "2026-11-16T09:00",
+      "end": "2026-11-16T11:00"
+     },
+     {
+      "start": "2026-11-23T09:00",
+      "end": "2026-11-23T11:00"
+     },
+     {
+      "start": "2026-11-30T09:00",
+      "end": "2026-11-30T11:00"
+     },
+     {
+      "start": "2026-12-07T09:00",
+      "end": "2026-12-07T11:00"
+     },
+     {
+      "start": "2026-12-14T09:00",
+      "end": "2026-12-14T11:00"
+     },
+     {
+      "start": "2026-12-21T09:00",
+      "end": "2026-12-21T11:00"
+     }
+    ]
    }
   }
  ],
@@ -91,22 +181,25 @@
   "2026-11-26": "0687c25eb67ea5c52c2eae440fdd3971b21922978ab03e43789b4d611908103f",
   "2026-11-27": "ae0ec885df399698ec7688c1a60ba03a45d88fa31e85ffed83d45e0b851ca52c",
   "2026-11-29": "0127e92f6b082aab5ba4ac472551f84a0f66867770659d9820d20e8c4038cb7b",
-  "2026-11-30": "3a5c8458c3d59bda6e52de4739d473c90c5a831b98790679ad9adb860b095612",
+  "2026-11-30": "6c4085994de5ce7259250c2e9964c19e2c7d0d2c474afdb4f2dcaf391d102061",
   "2026-12-01": "9e88396a041d653294fb5267bad92c1444849b80efba7252ee5ddef36313d36c",
   "2026-12-02": "9bee4865df70ed5dba28fd7d68728c036544eb86be02ce17533ad84c9a994775",
   "2026-12-03": "2dbfd8c9ee82b0f48740c75cd801dc967661ee4c43597ac0e71a710ab8339c89",
   "2026-12-04": "28aa2df0d368e06a55ddf7101d2821dbe4c6884dda2ebc0af20a4258882858ca",
   "2026-12-06": "50cf79aa4359a9b886c9f3b5ef63efae850b080596026adf2cd4e5fc65b87d70",
+  "2026-12-07": "db0b5ca1eb9b654fedbaac51bc6184a039773a90820eba81140fa2b55a787d90",
   "2026-12-08": "b95946485c9e5732cc26c8d766fa87e915d78edc23f346b61dcff562a344c41e",
   "2026-12-09": "cf78064b43ff609582560bc4801edbd57d98b7fd23327853d7638d2fdbd7a94d",
   "2026-12-10": "fb4189fc5d37a8e8c893ad0c1c6abeea992b3a6f9e975a670d8f68c48f05550c",
   "2026-12-11": "708d629776dc63b6a724b78c0f104bc2c36e24f97de431cdc0b3868c94530880",
   "2026-12-13": "39f51308eb7e7094d3fb84e0c6f7653a55ce9e573f024e0d2d6147136de78075",
-  "2026-12-15": "64da0aaf9901fbafe657fb68ad598e50cdb88cb0a5b33809082c0f6b1e346d69",
+  "2026-12-14": "4adaf7e2e2061f4008dba8f7f94e363e7140afe42ac1a84d9f7efe1fc1dbc32f",
+  "2026-12-15": "247a2530bb5a127db9f760ac10b6d100130d71a38c44e728f65fe1fbc8ce5057",
   "2026-12-16": "4c34c0446d6a9bc9b6c0eb7c5307fdf8679afa87b3a82298a4f324a6f0f3bc9b",
   "2026-12-17": "6d53d7741a969b7040ac92f7d8d7aa3f828bea1353b1ab4339d1902ced2f8bfd",
   "2026-12-18": "380430b0dd5db1c4d9337d96715a04629c47832e418c9e21cedf5f0aeb2c07bb",
   "2026-12-20": "d1d712bb5d346c54c952d81ac0015565a13b35a00216b3bf26aad785f1616aac",
+  "2026-12-21": "1315d580e803d097c2221e3ff88620ec5b94d9ac3d22992d97e33ad7497e8d41",
   "2026-12-22": "205c0cc280210e3fe0d7c7d15302b3671e53cc449c215f5401fa937f319d3a0e",
   "2026-12-23": "6d77e2ea9d365f3379312acdf4c562538d8fbc1dff1a6391a133916fc7922cf8",
   "2026-12-24": "048c3f3bc083de4eda13d8bac1ac68552e86f8d41b8da409af58e4d91fee8a87",
@@ -120,7 +213,7 @@
   "2027-01-14": "00c5b2c001e2893db8dcfefc8afcc232c6af3a5ed1e5af6be7c4b4899a28bbe0",
   "2027-01-15": "68e0f64d6933bd5c83f8c27784fb6248297d8385762ca3111a50b17077769021",
   "2027-01-17": "963f2c5ce5ea5ab74f250cbe49b6878d9e57af064a0a215eec15077019f3a3ba",
-  "2027-01-21": "a1f2aba7312467c13c2bba3d673680bf983807900fe08876b685a885615b5652",
+  "2027-01-21": "f1b90edc404f10c44daf55fd319016b9a777659b64f7267e7cc7e3bb9104e933",
   "2027-01-22": "6d0c9377eb24664998b8fb07847742b2cbea58a2211cf2fc34e6ed949af39acb",
   "2027-01-24": "9cdd65ec892c9e7ee69a57f650136a77167ba87fded560fb6e5bcad6fbda40b6",
   "2027-01-28": "04129bac73307bc03b44d0b0e76b8b3fda67d8c54b94404073aeb604d86acab9",
@@ -172,8 +265,8 @@
  },
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-26T07:48:52+01:00",
- "changedAt": "2026-10-26T07:48:52+01:00",
+ "checkedAt": "2026-10-27T07:42:08+01:00",
+ "changedAt": "2026-10-27T07:42:08+01:00",
  "sources": [
   "evtermine"
  ]

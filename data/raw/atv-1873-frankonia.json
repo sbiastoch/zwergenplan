@@ -3,9 +3,10 @@
   {
    "providerId": "atv-1873-frankonia",
    "venueId": "atv-1873-frankonia",
-   "title": "Riesen & Zwerge – Kinderturnen für 2–3-Jährige (montags)",
-   "summary": "Spielen und Turnen an Geräten für Kinder von 2 bis 3 Jahren, montags 10–11 Uhr im ATV-Kampfsportraum. Die Kurse sind laut Anbieter ausgebucht; eine Anmeldung landet auf der Warteliste.",
+   "title": "Riesen & Zwerge (Eltern-Kind-Turnen, 2–3 Jahre, montags)",
+   "summary": "Eltern-Kind-Turnen mit Geräten und Bewegungsspielen, montags 10–11 Uhr im ATV-Kampfsportraum. Der Kurs ist derzeit ausgebucht; Anmeldung auf die Warteliste per Mail an turnen@atv-1873-frankonia.de.",
    "topics": [
+    "eltern-kind-turnen",
     "bewegung"
    ],
    "format": "regelmaessig",
@@ -20,7 +21,7 @@
    },
    "availability": {
     "status": "warteliste",
-    "note": "Kurse aktuell ausgebucht. Anmeldung für die Warteliste über die Geschäftsstelle (info@atv1873frankonia.de, 0911-923 89 96-0)."
+    "note": "Kurse ausgebucht; Warteliste, Anmeldung per Mail an turnen@atv-1873-frankonia.de (Wunschtag Dienstag oder Donnerstag angeben)"
    },
    "schedule": {
     "kind": "weekly",
@@ -29,15 +30,15 @@
     ],
     "start": "10:00",
     "end": "11:00",
-    "from": "2026-10-26",
-    "skipHolidays": false
+    "from": "2026-11-02",
+    "skipHolidays": true
    }
   }
  ],
- "inputHash": "f0296fb3b339786714f028638b5271ac5efc338df4cb6bfdc4f4e50b460f50fd",
+ "inputHash": "75c780282e35f75daf40e52deecf1fa16b8ca827b960172fad78859ab9bebcf6",
  "model": "haiku",
  "status": "ok",
- "checkedAt": "2026-10-26T07:48:52+01:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
+ "checkedAt": "2026-10-27T07:42:08+01:00",
+ "changedAt": "2026-10-27T07:42:08+01:00",
  "sources": []
 }
