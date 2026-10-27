@@ -1,195 +1,200 @@
 {
- "events": [
-  {
-   "providerId": "ev-nikodemus-roethenbach",
-   "venueId": "ev-nikodemus-roethenbach",
-   "title": "Krabbelgruppe bis 3 Jahre (Mittwoch 9:00)",
-   "summary": "Eltern mit Kleinkindern bis 3 Jahren treffen sich einmal wöchentlich vormittags zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
-   "topics": [
-    "krabbelgruppe",
-    "eltern-kind-gruppe"
+ "version": 2,
+ "units": {
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "ev-nikodemus-roethenbach",
+     "venueId": "ev-nikodemus-roethenbach",
+     "title": "Krabbelgruppe bis 3 Jahre (mittwochs 9:00)",
+     "summary": "Wöchentliches Vormittagstreffen für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Wer mitmachen möchte, meldet sich bei Diakonin Marion Hanek.",
+     "topics": [
+      "krabbelgruppe",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Kontakt über Diakonin Marion Hanek"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-28T09:00",
+        "end": "2026-10-28T10:30"
+       },
+       {
+        "start": "2026-11-11T09:00",
+        "end": "2026-11-11T10:30"
+       },
+       {
+        "start": "2026-11-18T09:00",
+        "end": "2026-11-18T10:30"
+       },
+       {
+        "start": "2026-11-25T09:00",
+        "end": "2026-11-25T10:30"
+       },
+       {
+        "start": "2026-12-02T09:00",
+        "end": "2026-12-02T10:30"
+       },
+       {
+        "start": "2026-12-09T09:00",
+        "end": "2026-12-09T10:30"
+       },
+       {
+        "start": "2026-12-16T09:00",
+        "end": "2026-12-16T10:30"
+       },
+       {
+        "start": "2026-12-23T09:00",
+        "end": "2026-12-23T10:30"
+       },
+       {
+        "start": "2027-01-13T09:00",
+        "end": "2027-01-13T10:30"
+       }
+      ]
+     },
+     "via": "evtermine"
+    },
+    {
+     "providerId": "ev-nikodemus-roethenbach",
+     "venueId": "ev-nikodemus-roethenbach",
+     "title": "Krabbelgruppe bis 3 Jahre (donnerstags 9:30)",
+     "summary": "Wöchentliches Vormittagstreffen für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Wer mitmachen möchte, meldet sich bei Diakonin Marion Hanek.",
+     "topics": [
+      "krabbelgruppe",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Kontakt über Diakonin Marion Hanek"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-29T09:30",
+        "end": "2026-10-29T11:00"
+       },
+       {
+        "start": "2026-11-12T09:30",
+        "end": "2026-11-12T11:00"
+       },
+       {
+        "start": "2026-11-19T09:30",
+        "end": "2026-11-19T11:00"
+       },
+       {
+        "start": "2026-11-26T09:30",
+        "end": "2026-11-26T11:00"
+       },
+       {
+        "start": "2026-12-03T09:30",
+        "end": "2026-12-03T11:00"
+       },
+       {
+        "start": "2026-12-10T09:30",
+        "end": "2026-12-10T11:00"
+       },
+       {
+        "start": "2026-12-17T09:30",
+        "end": "2026-12-17T11:00"
+       },
+       {
+        "start": "2027-01-14T09:30",
+        "end": "2027-01-14T11:00"
+       }
+      ]
+     },
+     "via": "evtermine"
+    },
+    {
+     "providerId": "ev-nikodemus-roethenbach",
+     "venueId": "ev-nikodemus-roethenbach",
+     "title": "Café Niko – Das Familiencafé",
+     "summary": "Generationenübergreifendes Familiencafé bei Kaffee und Kuchen am Freitagnachmittag. Für die Kinder liegen Spielsachen bereit.",
+     "topics": [
+      "elterncafe",
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.pfar-rer.de",
+     "sourceUrl": "https://www.pfar-rer.de",
+     "category": "treffs-cafes",
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offenes Café, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-20T14:30",
+        "end": "2026-11-20T16:30"
+       },
+       {
+        "start": "2027-01-22T14:30",
+        "end": "2027-01-22T16:30"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
+   "inputHash": "404dc154301c15a8ef7b12736d74524a62d0dd27b4e32c5df01537973d5e2697",
+   "dated": {
+    "2026-10-28": "11db0d0f422e6ce9e95b68e5cb9642cd85499eb45d34e3cd0730d33e1be4ca81",
+    "2026-10-29": "991845114ec4c3037b4f68e6593934d6af63f774f5a7b72e871176feed7208c8",
+    "2026-11-11": "6dca30e4f310cf91b7705a6afc45d2850697934461c332f8be5e736643ba7937",
+    "2026-11-12": "ab0c493b2382fa00a2ff16b960bf1971bc813d7b3a1ffe25ec04fecdace3649d",
+    "2026-11-18": "410d51a88d8ca29cf62e45ac838edd7c8d295b2737422d70217703d5454a9b97",
+    "2026-11-19": "a2e39d4ff7863dfc241696f064e4e3a61fe8fa0feebfa4adf5fa0142087f4b76",
+    "2026-11-20": "adebc3e107aa4ebd93162d7f1e9b0051349e3cdd99cda089e1ffd61772152e7e",
+    "2026-11-25": "b47a60724440d414c108051bba6794a9fd1cffd0121bb11b3f23b5b97b2e6fa2",
+    "2026-11-26": "63ecf2cef04c8e7352e626ae2bb8c2901f7ddc1b509d094edb8827f3b9743d83",
+    "2026-12-02": "d064e00bff83be2b2b59e8c9cc4a06fb06adfbc5ece6a5a732ceb5f705e0f05c",
+    "2026-12-03": "7c3b09719b587953701af43359048008d43b1985580e86da5bb0986529c32a8f",
+    "2026-12-09": "988c8da5fd2bea6ac17009525e8eb0c5646b74b0731609c146b638458a2393f7",
+    "2026-12-10": "1b0b034b08c54e54046737d5d8e5c98559fcdc960d07f0629fdf59601193e1c6",
+    "2026-12-16": "1aebadb126312534b5e62076b9951eea263cd6f82371fca6dabf80d8c358170d",
+    "2026-12-17": "3268af87996ee5bfd3b390a18b1afbe51fd63a0913b9a5d0c9f4281878b47868",
+    "2026-12-23": "b3e23078972e400b397376c671b91c30ce9da40f8514f1f494a28bf6d8296040",
+    "2027-01-13": "1e4f2debc663e37924a4ed8e1db7b6aeaa7dcfc292b3cf714628e018fcdf8b9a",
+    "2027-01-14": "47c027b33d099354803eaaf55fad2513c3b55791f559253f87357fb5130bdd2f",
+    "2027-01-22": "0db1e5ad15fc7f3ebc6a466da9d9e7edc77ab6c1af5ea8bf6ed2229961c6aca9"
    },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung bzw. Kontakt bei Diakonin Marion Hanek"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-28T09:00",
-      "end": "2026-10-28T10:30"
-     },
-     {
-      "start": "2026-11-11T09:00",
-      "end": "2026-11-11T10:30"
-     },
-     {
-      "start": "2026-11-18T09:00",
-      "end": "2026-11-18T10:30"
-     },
-     {
-      "start": "2026-11-25T09:00",
-      "end": "2026-11-25T10:30"
-     },
-     {
-      "start": "2026-12-02T09:00",
-      "end": "2026-12-02T10:30"
-     },
-     {
-      "start": "2026-12-09T09:00",
-      "end": "2026-12-09T10:30"
-     },
-     {
-      "start": "2026-12-16T09:00",
-      "end": "2026-12-16T10:30"
-     },
-     {
-      "start": "2026-12-23T09:00",
-      "end": "2026-12-23T10:30"
-     },
-     {
-      "start": "2027-01-13T09:00",
-      "end": "2027-01-13T10:30"
-     }
-    ]
-   },
-   "via": "evtermine"
-  },
-  {
-   "providerId": "ev-nikodemus-roethenbach",
-   "venueId": "ev-nikodemus-roethenbach",
-   "title": "Krabbelgruppe bis 3 Jahre (Donnerstag 9:30)",
-   "summary": "Eltern mit Kleinkindern bis 3 Jahren treffen sich einmal wöchentlich vormittags zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
-   "topics": [
-    "krabbelgruppe",
-    "eltern-kind-gruppe"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107480",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung bzw. Kontakt bei Diakonin Marion Hanek"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-29T09:30",
-      "end": "2026-10-29T11:00"
-     },
-     {
-      "start": "2026-11-12T09:30",
-      "end": "2026-11-12T11:00"
-     },
-     {
-      "start": "2026-11-19T09:30",
-      "end": "2026-11-19T11:00"
-     },
-     {
-      "start": "2026-11-26T09:30",
-      "end": "2026-11-26T11:00"
-     },
-     {
-      "start": "2026-12-03T09:30",
-      "end": "2026-12-03T11:00"
-     },
-     {
-      "start": "2026-12-10T09:30",
-      "end": "2026-12-10T11:00"
-     },
-     {
-      "start": "2026-12-17T09:30",
-      "end": "2026-12-17T11:00"
-     },
-     {
-      "start": "2027-01-14T09:30",
-      "end": "2027-01-14T11:00"
-     }
-    ]
-   },
-   "via": "evtermine"
-  },
-  {
-   "providerId": "ev-nikodemus-roethenbach",
-   "venueId": "ev-nikodemus-roethenbach",
-   "title": "Café Niko – Das Familiencafé",
-   "summary": "Offenes Familiencafé bei Kaffee und Kuchen: Jung und Alt kommen ins Gespräch, für die Kinder liegen Spielsachen bereit. Die Termine stehen im Kalender der Gemeinde.",
-   "topics": [
-    "elterncafe",
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.pfar-rer.de",
-   "sourceUrl": "https://www.pfar-rer.de",
-   "category": "treffs-cafes",
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff, keine Anmeldung angegeben"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-20T14:30",
-      "end": "2026-11-20T16:30"
-     },
-     {
-      "start": "2027-01-22T14:30",
-      "end": "2027-01-22T16:30"
-     }
-    ]
-   },
-   "via": "evtermine"
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "evtermine"
+   ]
   }
- ],
- "inputHash": "0bca4acce84aa128ef5c729f1a5e3fc94346d8b6badf0cc7c14e7a8faef57e1c",
- "dated": {
-  "2026-10-28": "11db0d0f422e6ce9e95b68e5cb9642cd85499eb45d34e3cd0730d33e1be4ca81",
-  "2026-10-29": "991845114ec4c3037b4f68e6593934d6af63f774f5a7b72e871176feed7208c8",
-  "2026-11-11": "6dca30e4f310cf91b7705a6afc45d2850697934461c332f8be5e736643ba7937",
-  "2026-11-12": "ab0c493b2382fa00a2ff16b960bf1971bc813d7b3a1ffe25ec04fecdace3649d",
-  "2026-11-18": "410d51a88d8ca29cf62e45ac838edd7c8d295b2737422d70217703d5454a9b97",
-  "2026-11-19": "a2e39d4ff7863dfc241696f064e4e3a61fe8fa0feebfa4adf5fa0142087f4b76",
-  "2026-11-20": "adebc3e107aa4ebd93162d7f1e9b0051349e3cdd99cda089e1ffd61772152e7e",
-  "2026-11-25": "b47a60724440d414c108051bba6794a9fd1cffd0121bb11b3f23b5b97b2e6fa2",
-  "2026-11-26": "63ecf2cef04c8e7352e626ae2bb8c2901f7ddc1b509d094edb8827f3b9743d83",
-  "2026-12-02": "d064e00bff83be2b2b59e8c9cc4a06fb06adfbc5ece6a5a732ceb5f705e0f05c",
-  "2026-12-03": "7c3b09719b587953701af43359048008d43b1985580e86da5bb0986529c32a8f",
-  "2026-12-09": "988c8da5fd2bea6ac17009525e8eb0c5646b74b0731609c146b638458a2393f7",
-  "2026-12-10": "1b0b034b08c54e54046737d5d8e5c98559fcdc960d07f0629fdf59601193e1c6",
-  "2026-12-16": "1aebadb126312534b5e62076b9951eea263cd6f82371fca6dabf80d8c358170d",
-  "2026-12-17": "3268af87996ee5bfd3b390a18b1afbe51fd63a0913b9a5d0c9f4281878b47868",
-  "2026-12-23": "b3e23078972e400b397376c671b91c30ce9da40f8514f1f494a28bf6d8296040",
-  "2027-01-13": "1e4f2debc663e37924a4ed8e1db7b6aeaa7dcfc292b3cf714628e018fcdf8b9a",
-  "2027-01-14": "47c027b33d099354803eaaf55fad2513c3b55791f559253f87357fb5130bdd2f",
-  "2027-01-22": "0db1e5ad15fc7f3ebc6a466da9d9e7edc77ab6c1af5ea8bf6ed2229961c6aca9"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
- "sources": [
-  "evtermine"
- ]
+ }
 }

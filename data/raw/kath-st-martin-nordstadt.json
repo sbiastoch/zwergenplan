@@ -1,41 +1,87 @@
 {
- "events": [
-  {
-   "providerId": "kath-st-martin-nordstadt",
-   "venueId": "kath-st-martin-nordstadt",
-   "title": "Kleinkindergottesdienst für Kinder von 0 bis ca. 8 Jahren mit Eltern",
-   "summary": "Kindgerechter Gottesdienst im Pfarrsaal mit Liedern, einer biblischen Geschichte und oft einer Bastelei zum Thema. Im Horizont ist nur der Termin am 13.12.2026 angekündigt; ohne Anmeldung.",
-   "topics": [
-    "krabbelgottesdienst"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
-   "sourceUrl": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
-   "category": "treffs-cafes",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 96
-   },
-   "availability": {
-    "status": "ohne-anmeldung"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-12-13T10:30",
-      "end": "2026-12-13T11:00"
+ "version": 2,
+ "units": {
+  "seite:https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste": {
+   "events": [
+    {
+     "providerId": "kath-st-martin-nordstadt",
+     "venueId": "kath-st-martin-nordstadt",
+     "title": "Kleinkindergottesdienst im Pfarrsaal St. Martin",
+     "summary": "Kurzer kindgerechter Gottesdienst für Familien mit Kindern von 0 bis etwa 8 Jahren. Es wird gesungen, gebetet und eine biblische Geschichte erzählt, oft wird dazu gebastelt. Eine Anmeldung ist nicht nötig.",
+     "topics": [
+      "krabbelgottesdienst"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
+     "sourceUrl": "https://st-martin-nuernberg.de/gottesdienste/kindergottesdienste",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 96
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-13T10:30",
+        "end": "2026-12-13T11:00"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "22b6786719382ac2ce3fd1e105eeb6d1ad2a0caf5f08a41d6d2636630cd865ce",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://st-martin-nuernberg.de/aktuelles/termine": {
+   "events": [
+    {
+     "providerId": "kath-st-martin-nordstadt",
+     "venueId": "kath-st-martin-nordstadt",
+     "title": "Kleinkindergottesdienst",
+     "summary": "Ein kurzer Gottesdienst für die Jüngsten und ihre Familien im Pfarrzentrum St. Martin, gedacht für Kinder von 0 bis 8 Jahren. Eine Anmeldung ist nicht nötig.",
+     "topics": [
+      "krabbelgottesdienst"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://st-martin-nuernberg.de/aktuelles/termine",
+     "sourceUrl": "https://st-martin-nuernberg.de/aktuelles/termine",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 96
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Gottesdienst, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-13T10:30",
+        "end": "2026-12-13T11:00"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "daaf9d8f91ee13255bbd47ec95706ff986ae5600b8ab098fc9e979fc6fb8c3dc",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "f34227a3959e079483c33c36f47a200a725ea954988129f52958817a9e1dec1d",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
- "sources": []
+ }
 }

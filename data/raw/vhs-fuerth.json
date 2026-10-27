@@ -1,9 +1,82 @@
 {
- "events": [],
- "inputHash": "4be95a02b27e0c2de63e92237b4aa09a3ea48edc244b1784edc73a3617aadab4",
- "model": "haiku",
- "status": "keine-termine",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": []
+ "version": 2,
+ "units": {
+  "seite:https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26": {
+   "events": [
+    {
+     "providerId": "vhs-fuerth",
+     "venueId": "vhs-fuerth",
+     "title": "Eltern-Kind-Turnen (1½–2½ Jahre, mittwochs 17 Uhr)",
+     "summary": "Kleinkinder turnen mit einem Elternteil frei an einem Parcours, der jede Woche neu aufgebaut wird: laufen, klettern, balancieren, rutschen, dazu Ball, Reifen und Seil. Eltern machen mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09., ein späterer Einstieg nur nach Anfrage.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "82,50 €",
+     "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+     "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 18,
+      "maxMonths": 30
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Kursnr. 16301; Platzlage nicht angegeben, Einstieg bei der vhs Fürth anfragen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "17:00",
+      "from": "2026-09-23",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "vhs-fuerth",
+     "venueId": "vhs-fuerth",
+     "title": "Eltern-Kind-Turnen (2–3 Jahre, donnerstags 17 Uhr)",
+     "summary": "Kleinkinder turnen mit einem Elternteil frei an einem Parcours, der jede Woche neu aufgebaut wird: laufen, klettern, balancieren, rutschen, dazu Ball, Reifen und Seil. Eltern machen mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09., ein späterer Einstieg nur nach Anfrage.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "82,50 €",
+     "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+     "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Kursnr. 16303; Platzlage nicht angegeben, Einstieg bei der vhs Fürth anfragen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "17:00",
+      "from": "2026-09-24",
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "538567d97d5120c5938c7a48a67c2decbaacaf546de4d34bf91a5957174c53e3",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  }
+ }
 }

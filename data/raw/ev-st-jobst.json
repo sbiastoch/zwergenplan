@@ -1,106 +1,110 @@
 {
- "events": [
-  {
-   "providerId": "ev-st-jobst",
-   "venueId": "ev-st-jobst",
-   "title": "Miniclub Eltern-Kind-Gruppe (Kinder etwa 1–2 Jahre)",
-   "summary": "Wöchentliche Gruppe im Miniclubraum von St. Jobst: gemeinsames Spielen, erste Gruppenerfahrungen für die Kleinen und Austausch unter Eltern. Die Quelle nennt keine Anmeldung und keine Kosten.",
-   "topics": [
-    "eltern-kind-gruppe",
-    "spielgruppe",
-    "elterntreff"
+ "version": 2,
+ "units": {
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "ev-st-jobst",
+     "venueId": "ev-st-jobst",
+     "title": "Miniclub – Eltern-Kind-Gruppe (1–2 Jahre), dienstags",
+     "summary": "Wöchentliche Eltern-Kind-Gruppe der Gemeinde St. Jobst: Kinder sammeln erste Gruppenerfahrungen beim gemeinsamen Spielen, Eltern tauschen sich über Erziehungsthemen aus und knüpfen Kontakte im Stadtteil.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 24
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Infos und Anmeldung über die Kirchengemeinde St. Jobst (st-jobst.de)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-27T15:00",
+        "end": "2026-10-27T16:30"
+       },
+       {
+        "start": "2026-11-03T15:00",
+        "end": "2026-11-03T16:30"
+       },
+       {
+        "start": "2026-11-10T15:00",
+        "end": "2026-11-10T16:30"
+       },
+       {
+        "start": "2026-11-17T15:00",
+        "end": "2026-11-17T16:30"
+       },
+       {
+        "start": "2026-11-24T15:00",
+        "end": "2026-11-24T16:30"
+       },
+       {
+        "start": "2026-12-01T15:00",
+        "end": "2026-12-01T16:30"
+       },
+       {
+        "start": "2026-12-08T15:00",
+        "end": "2026-12-08T16:30"
+       },
+       {
+        "start": "2026-12-15T15:00",
+        "end": "2026-12-15T16:30"
+       },
+       {
+        "start": "2026-12-22T15:00",
+        "end": "2026-12-22T16:30"
+       },
+       {
+        "start": "2026-12-29T15:00",
+        "end": "2026-12-29T16:30"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984029",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 24
+   "inputHash": "94a0ff1ec44c1247381c89e10bcfba108db3f26bd78d2cc878f0f700043a6270",
+   "dated": {
+    "2026-10-27": "68a83119add4d158f1532d1b4dee9d23f51ce12ba14b5286615ef61c34f206e5",
+    "2026-10-28": "b41a08797921acaa304ec3add9d8d0730b2b8bc326304cf57c24fbe7f7efa920",
+    "2026-11-03": "c1c11b9b2b5d2d19a3dbf015291b0159d880fe645315efab2f6c366190377dbd",
+    "2026-11-10": "720a99a62b4940ee76ef54adf7765e1e7ae389d975c1d28a961ee77d48ba3c10",
+    "2026-11-11": "dcb64a309bf13d359a5b5c9a76d5f5dcd0ba06e889ae62a98cfca0d142b9d498",
+    "2026-11-17": "29241e66519955a22853d22473e78bc6493cbdc3daa119b5e815e55b765b364f",
+    "2026-11-24": "709eb222d5e46cb487d4289f0e2c39cefb43db5174275cf87d5c498231f71b79",
+    "2026-11-25": "2298ccaa2be2cb870615e9bdf8f86c15b182cff26dbb19403d5b1dd56a098a2e",
+    "2026-12-01": "61b18762938a0e0b079c332c8bb6bdc6daa31f824a22cec0802f0b23f94d6c25",
+    "2026-12-02": "b0bc186911ba08243e6417e43d14eb2b76023c12ce83dbb0290e14e227513e25",
+    "2026-12-08": "8fe5f60a91345bac08e3a03636feb194253e6bb75ab00e756b03129eb39cf17f",
+    "2026-12-15": "bfc16ef99a2a7fae715a5acce83aeab1dd36de34f35d65ee1293a1e1f8eb6bd8",
+    "2026-12-16": "914d2eeeef2a324e381cd020072a000c3a1dd937879bd2e53c59609788fb4563",
+    "2026-12-22": "5edcb979a0e054788bae4d86f769e0fdef3ea3fb54049f1f1de6d22a605e4629",
+    "2026-12-29": "8d6dd80bb9031823cefd12af4f3e513967ebf00aafadd2b6ca7aae879e467759",
+    "2027-01-13": "c5a5b06650e6676a912764dc4e54e83bb24a82895a583bd7bccad88e94420b5f",
+    "2027-01-27": "6655d56f268d3245f2e9eb1dd5db394af97a129222ec98ca74cfab17e89b2d40",
+    "2027-02-03": "292d5d9612f1f73652f5a56a29854192a5b0f94c0558ce53c70aed2534db4bc9",
+    "2027-02-17": "269e1afc79530461dfedae7a39dd637d948922750975dc32eb62a48f72613cbf",
+    "2027-03-03": "b9ec8a820302ac6636e46d6d56c04844699be1c3fc81fec5c5d51015310e4c98",
+    "2027-03-17": "d307b41ef2e57d98309197c8f830a30d5e95a65bb41a1b4b31e56cd20ed11259"
    },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Angabe zur Anmeldung; beim Veranstalter (Ev. St. Jobst) nachfragen"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-27T15:00",
-      "end": "2026-10-27T16:30"
-     },
-     {
-      "start": "2026-11-03T15:00",
-      "end": "2026-11-03T16:30"
-     },
-     {
-      "start": "2026-11-10T15:00",
-      "end": "2026-11-10T16:30"
-     },
-     {
-      "start": "2026-11-17T15:00",
-      "end": "2026-11-17T16:30"
-     },
-     {
-      "start": "2026-11-24T15:00",
-      "end": "2026-11-24T16:30"
-     },
-     {
-      "start": "2026-12-01T15:00",
-      "end": "2026-12-01T16:30"
-     },
-     {
-      "start": "2026-12-08T15:00",
-      "end": "2026-12-08T16:30"
-     },
-     {
-      "start": "2026-12-15T15:00",
-      "end": "2026-12-15T16:30"
-     },
-     {
-      "start": "2026-12-22T15:00",
-      "end": "2026-12-22T16:30"
-     },
-     {
-      "start": "2026-12-29T15:00",
-      "end": "2026-12-29T16:30"
-     }
-    ]
-   },
-   "via": "evtermine"
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "evtermine"
+   ]
   }
- ],
- "inputHash": "611cf6a7bc2e5557b7658cbe6b1d8ac9ebaafd85f6857f603a039cb1dc4f3bee",
- "dated": {
-  "2026-10-27": "68a83119add4d158f1532d1b4dee9d23f51ce12ba14b5286615ef61c34f206e5",
-  "2026-10-28": "b41a08797921acaa304ec3add9d8d0730b2b8bc326304cf57c24fbe7f7efa920",
-  "2026-11-03": "c1c11b9b2b5d2d19a3dbf015291b0159d880fe645315efab2f6c366190377dbd",
-  "2026-11-10": "720a99a62b4940ee76ef54adf7765e1e7ae389d975c1d28a961ee77d48ba3c10",
-  "2026-11-11": "dcb64a309bf13d359a5b5c9a76d5f5dcd0ba06e889ae62a98cfca0d142b9d498",
-  "2026-11-17": "29241e66519955a22853d22473e78bc6493cbdc3daa119b5e815e55b765b364f",
-  "2026-11-24": "709eb222d5e46cb487d4289f0e2c39cefb43db5174275cf87d5c498231f71b79",
-  "2026-11-25": "2298ccaa2be2cb870615e9bdf8f86c15b182cff26dbb19403d5b1dd56a098a2e",
-  "2026-12-01": "61b18762938a0e0b079c332c8bb6bdc6daa31f824a22cec0802f0b23f94d6c25",
-  "2026-12-02": "b0bc186911ba08243e6417e43d14eb2b76023c12ce83dbb0290e14e227513e25",
-  "2026-12-08": "8fe5f60a91345bac08e3a03636feb194253e6bb75ab00e756b03129eb39cf17f",
-  "2026-12-15": "bfc16ef99a2a7fae715a5acce83aeab1dd36de34f35d65ee1293a1e1f8eb6bd8",
-  "2026-12-16": "914d2eeeef2a324e381cd020072a000c3a1dd937879bd2e53c59609788fb4563",
-  "2026-12-22": "5edcb979a0e054788bae4d86f769e0fdef3ea3fb54049f1f1de6d22a605e4629",
-  "2026-12-29": "8d6dd80bb9031823cefd12af4f3e513967ebf00aafadd2b6ca7aae879e467759",
-  "2027-01-13": "c5a5b06650e6676a912764dc4e54e83bb24a82895a583bd7bccad88e94420b5f",
-  "2027-01-27": "6655d56f268d3245f2e9eb1dd5db394af97a129222ec98ca74cfab17e89b2d40",
-  "2027-02-03": "292d5d9612f1f73652f5a56a29854192a5b0f94c0558ce53c70aed2534db4bc9",
-  "2027-02-17": "269e1afc79530461dfedae7a39dd637d948922750975dc32eb62a48f72613cbf",
-  "2027-03-03": "b9ec8a820302ac6636e46d6d56c04844699be1c3fc81fec5c5d51015310e4c98",
-  "2027-03-17": "d307b41ef2e57d98309197c8f830a30d5e95a65bb41a1b4b31e56cd20ed11259"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
- "sources": [
-  "evtermine"
- ]
+ }
 }

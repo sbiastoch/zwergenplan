@@ -1,52 +1,231 @@
 {
- "events": [
-  {
-   "providerId": "cvjm-nuernberg-wuselwelt",
-   "venueId": "cvjm-nuernberg-wuselwelt",
-   "title": "Wuselwelt: offene Bewegungs- und Spielzeit für Kinder 0–3 (freitags)",
-   "summary": "Freispiel in der Turnhalle für Kinder von 0–3 Jahren mit Eltern oder Bezugsperson, danach Austausch der Erwachsenen. Hallenschuhe oder ABS-Socken mitbringen. Keine Anmeldung, in den Ferien kein Termin.",
-   "topics": [
-    "bewegung",
-    "spielplatz-indoor"
+ "version": 2,
+ "units": {
+  "seite:https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote": {
+   "events": [
+    {
+     "providerId": "cvjm-nuernberg-wuselwelt",
+     "venueId": "cvjm-nuernberg-wuselwelt",
+     "title": "Wuselwelt – offene Bewegungszeit für 0–3-Jährige (freitags)",
+     "summary": "Kleinkinder toben und entdecken mit Eltern oder Großeltern im Freispiel eine vorbereitete Bewegungslandschaft in der Turnhalle. Danach geht es auf Wunsch noch zu Kaffee oder Tee in die „Kostbar“. Ohne Anmeldung, Hallenschuhe oder ABS-Socken mitbringen.",
+     "topics": [
+      "bewegung",
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "kostenlos",
+     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+     "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Anmeldung nicht erforderlich"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:15",
+      "from": "2026-10-30",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "price": "keine",
-   "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-   "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
+   "inputHash": "edc0073901c2e63e94dff3b31f5d72d55aa830934fcd10340480c198fc71138c",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
+   "events": [
+    {
+     "providerId": "cvjm-nuernberg-wuselwelt",
+     "venueId": "cvjm-nuernberg-wuselwelt",
+     "title": "Wuselwelt – offene Bewegungs- und Spielzeit für 0–3 Jahre (freitags)",
+     "summary": "Offene Bewegungs- und Spielzeit für Eltern mit Kleinkindern in der Turnhalle des CVJM-Hauses am Kornmarkt. Keine Anmeldung nötig, einfach vorbeikommen.",
+     "topics": [
+      "bewegung",
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offenes Angebot, ohne Anmeldung"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:15",
+      "from": "2026-10-30",
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "d266d803d29f8d8c5a020dd13ce73bc31520bf39b3471812c70edca2e80bb3d2",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
+   "events": [
+    {
+     "providerId": "cvjm-nuernberg-wuselwelt",
+     "venueId": "cvjm-nuernberg-wuselwelt",
+     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre, freitags)",
+     "summary": "Offene Bewegungs- und Spielzeit für Kinder bis 3 Jahre mit Begleitperson in der Turnhalle des CVJM-Hauses am Kornmarkt. Ohne Anmeldung, einfach vorbeikommen.",
+     "topics": [
+      "bewegung",
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offenes Angebot ohne Anmeldung"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:15",
+      "from": "2026-12-11",
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "d64b2556a678db8e126efed98f43f225bd2c343ebcb16e00aca758dfface1c4f",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;": {
+   "events": [
+    {
+     "providerId": "cvjm-nuernberg-wuselwelt",
+     "venueId": "cvjm-nuernberg-wuselwelt",
+     "title": "Wuselwelt – offene Bewegungs- und Spielzeit für 0–3 Jahre (freitags)",
+     "summary": "Offene Bewegungs- und Spielzeit für Kleinkinder mit ihren Eltern in der Turnhalle des CVJM-Hauses am Kornmarkt. Ohne Anmeldung, einfach vorbeikommen.",
+     "topics": [
+      "bewegung",
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offenes Angebot, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:15",
+      "from": "2026-10-30",
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "c147982f2d07cd77828e08822c80fa7ca975fdec701ad7dca4081c03db338ceb",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "cvjm-nuernberg-wuselwelt",
+     "venueId": "cvjm-nuernberg-wuselwelt",
+     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 J.), Freitag vormittags",
+     "summary": "Kinder bis 3 Jahre toben mit Eltern oder Großeltern im Freispiel durch die vorbereitete Turnhalle im CVJM-Haus, die Erwachsenen können sich dabei austauschen. Ohne Anmeldung, einfach vorbeikommen.",
+     "topics": [
+      "bewegung",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.frankenkids.de/veranstaltungen/wuselwelt-cvjm-3/2026-10-02/",
+     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/wuselwelt-cvjm-3/2026-10-02/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offenes Angebot ohne Anmeldung"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "interval": 2,
+      "start": "09:30",
+      "end": "10:15",
+      "from": "2026-10-30",
+      "skipHolidays": true
+     },
+     "via": "frankenkids"
+    }
+   ],
+   "inputHash": "3bad8015f16b18f77f45b989cbd7cc515ea1d2feb21e6f01cb088e3404c664a8",
+   "dated": {
+    "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
+    "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
+    "2026-11-27": "4fc8440bb3b3ae5eb339264134dbd7d17ef41c1723a56f8e9fe0c1e8a8ee5893"
    },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offenes Angebot, keine Anmeldung nötig"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "FR"
-    ],
-    "start": "09:30",
-    "end": "10:15",
-    "from": "2026-10-30",
-    "skipHolidays": true
-   }
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "frankenkids"
+   ]
   }
- ],
- "inputHash": "2a8c2007affe05ea45029a1d6595821d976bc59631353fe349c7815cb966c26b",
- "dated": {
-  "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
-  "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
-  "2026-11-27": "4fc8440bb3b3ae5eb339264134dbd7d17ef41c1723a56f8e9fe0c1e8a8ee5893"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-25T07:38:23+01:00",
- "sources": [
-  "frankenkids"
- ]
+ }
 }

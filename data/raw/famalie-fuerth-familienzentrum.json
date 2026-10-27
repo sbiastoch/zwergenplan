@@ -1,284 +1,319 @@
 {
- "events": [
-  {
-   "providerId": "famalie-fuerth-familienzentrum",
-   "venueId": "famalie-fuerth-familienzentrum",
-   "title": "Offener Eltern-Kind-Treff (mittwochs, ohne Anmeldung)",
-   "summary": "Offener Treff jeden Mittwoch: Eltern kommen bei Kaffee ins Gespräch, während die Kinder zusammen spielen. Einstieg jederzeit möglich, keine Anmeldung nötig.",
-   "topics": [
-    "elterntreff",
-    "eltern-kind-gruppe"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.bindungsorientierte-familienbegleitung.de/eltern-kind-treff",
-   "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/eltern-kind-treff",
-   "category": "treffs-cafes",
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Einfach vorbeikommen, keine Voranmeldung"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "15:30",
-    "end": "18:00",
-    "from": "2026-10-14",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "famalie-fuerth-familienzentrum",
-   "venueId": "famalie-fuerth-familienzentrum",
-   "title": "Offene Krabbelgruppe \"Grüne Zukunft\" (dienstags)",
-   "summary": "Offene Krabbelgruppe für Eltern mit Kindern, die ab Herbst 2024 geboren sind. Austausch bei Kaffee oder Tee, dazu ein bis zwei Themen pro Treffen. Keine Anmeldung nötig.",
-   "topics": [
-    "krabbelgruppe",
-    "eltern-kind-gruppe",
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "5 Euro pro Termin; Elferkarte für 50 Euro möglich",
-   "url": "https://www.bindungsorientierte-familienbegleitung.de/krabbelgruppe-gruene-zukunft",
-   "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/krabbelgruppe-gruene-zukunft",
-   "category": "krabbel-spielgruppen",
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung notwendig"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "09:30",
-    "end": "11:30",
-    "from": "2026-10-13",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "famalie-fuerth-familienzentrum",
-   "venueId": "famalie-fuerth-familienzentrum",
-   "title": "Zweisam Mama & Baby Yoga, Basic Herbst (2–6 Monate)",
-   "summary": "Achtsamer Yoga-Kurs für Mütter mit Babys von etwa 2 bis 6 Monaten, mit Fokus auf Bindung und sanfter Rückbildung. Sechs Termine montags, Anmeldung per Mail.",
-   "topics": [
-    "yoga-mit-baby"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "85 EUR",
-   "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 2,
-    "maxMonths": 6
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-05T15:00",
-      "end": "2026-10-05T16:00"
+ "version": 2,
+ "units": {
+  "seite:https://www.bindungsorientierte-familienbegleitung.de/eltern-kind-treff": {
+   "events": [
+    {
+     "providerId": "famalie-fuerth-familienzentrum",
+     "venueId": "famalie-fuerth-familienzentrum",
+     "title": "Offener Eltern-Kind-Treff (mittwochs)",
+     "summary": "Offener Treff bei Kaffee: Eltern tauschen sich aus, während die Kinder miteinander spielen. Ohne Voranmeldung, einfach vorbeikommen; Fragen per Mail an die Leitung.",
+     "topics": [
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.bindungsorientierte-familienbegleitung.de/eltern-kind-treff",
+     "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/eltern-kind-treff",
+     "category": "treffs-cafes",
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "ohne Voranmeldung, einfach vorbeikommen"
      },
-     {
-      "start": "2026-10-12T15:00",
-      "end": "2026-10-12T16:00"
-     },
-     {
-      "start": "2026-10-19T15:00",
-      "end": "2026-10-19T16:00"
-     },
-     {
-      "start": "2026-10-26T15:00",
-      "end": "2026-10-26T16:00"
-     },
-     {
-      "start": "2026-11-02T15:00",
-      "end": "2026-11-02T16:00"
-     },
-     {
-      "start": "2026-11-09T15:00",
-      "end": "2026-11-09T16:00"
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "15:30",
+      "end": "18:00",
+      "from": "2026-10-28",
+      "skipHolidays": true
      }
-    ]
-   }
-  },
-  {
-   "providerId": "famalie-fuerth-familienzentrum",
-   "venueId": "famalie-fuerth-familienzentrum",
-   "title": "Zweisam Mama & Baby Yoga, Basic Winter (2–6 Monate)",
-   "summary": "Achtsamer Yoga-Kurs für Mütter mit Babys von etwa 2 bis 6 Monaten, mit Fokus auf Bindung und sanfter Rückbildung. Sechs Termine ab 16.11., Anmeldung per Mail.",
-   "topics": [
-    "yoga-mit-baby"
+    }
    ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "85 EUR",
-   "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 2,
-    "maxMonths": 6
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-16T15:00",
-      "end": "2026-11-16T16:00"
-     },
-     {
-      "start": "2026-11-23T15:00",
-      "end": "2026-11-23T16:00"
-     },
-     {
-      "start": "2026-11-30T15:00",
-      "end": "2026-11-30T16:00"
-     },
-     {
-      "start": "2026-12-07T15:00",
-      "end": "2026-12-07T16:00"
-     },
-     {
-      "start": "2026-12-14T15:00",
-      "end": "2026-12-14T16:00"
-     },
-     {
-      "start": "2026-12-21T15:00",
-      "end": "2026-12-21T16:00"
-     }
-    ]
-   }
+   "inputHash": "340f073b34403279fb995b67da818e45b0ae39efc6b405df01708d2ce53604f0",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "famalie-fuerth-familienzentrum",
-   "venueId": "famalie-fuerth-familienzentrum",
-   "title": "Mom & Mini Flow Mama & Kind Yoga, Herbst (6–12 Monate)",
-   "summary": "Yoga-Kurs für Mamas mit Babys von etwa 6 bis 12 Monaten; das Kind kann dabei selbst erkunden und spielen. Sechs Termine montags, Anmeldung per Mail.",
-   "topics": [
-    "yoga-mit-baby"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "85 EUR",
-   "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-05T16:15",
-      "end": "2026-10-05T17:15"
-     },
-     {
-      "start": "2026-10-12T16:15",
-      "end": "2026-10-12T17:15"
-     },
-     {
-      "start": "2026-10-19T16:15",
-      "end": "2026-10-19T17:15"
-     },
-     {
-      "start": "2026-10-26T16:15",
-      "end": "2026-10-26T17:15"
-     },
-     {
-      "start": "2026-11-02T16:15",
-      "end": "2026-11-02T17:15"
-     },
-     {
-      "start": "2026-11-09T16:15",
-      "end": "2026-11-09T17:15"
-     }
-    ]
-   }
+  "seite:https://www.bindungsorientierte-familienbegleitung.de/babymassage": {
+   "events": [],
+   "inputHash": "6b9f971fcdf1a40cd4f64807d73884aba41617d64773aa34b128a82078663c3b",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "famalie-fuerth-familienzentrum",
-   "venueId": "famalie-fuerth-familienzentrum",
-   "title": "Mom & Mini Flow Mama & Kind Yoga, Winter (6–12 Monate)",
-   "summary": "Yoga-Kurs für Mamas mit Babys von etwa 6 bis 12 Monaten; das Kind kann dabei selbst erkunden und spielen. Sechs Termine ab 16.11., Anmeldung per Mail.",
-   "topics": [
-    "yoga-mit-baby"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "85 EUR",
-   "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-16T16:15",
-      "end": "2026-11-16T17:15"
+  "seite:https://www.bindungsorientierte-familienbegleitung.de/krabbelgruppe-gruene-zukunft": {
+   "events": [
+    {
+     "providerId": "famalie-fuerth-familienzentrum",
+     "venueId": "famalie-fuerth-familienzentrum",
+     "title": "Offene Krabbelgruppe „Grüne Zukunft“ (dienstags)",
+     "summary": "Offene Krabbelgruppe für Kinder ab Herbst 2024 geboren: Die Kleinen erkunden den Raum, die Eltern tauschen sich bei Kaffee oder Tee aus, mit Schwerpunkt Nachhaltigkeit und bedürfnisorientierte Erziehung. Ohne Anmeldung, einfach vorbeikommen.",
+     "topics": [
+      "krabbelgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "5 € pro Termin, Elferkarte 50 €",
+     "url": "https://www.bindungsorientierte-familienbegleitung.de/krabbelgruppe-gruene-zukunft",
+     "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/krabbelgruppe-gruene-zukunft",
+     "category": "krabbel-spielgruppen",
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Keine Anmeldung nötig; Fragen per Mail an babygruen.fuerth@gmx.de"
      },
-     {
-      "start": "2026-11-23T16:15",
-      "end": "2026-11-23T17:15"
-     },
-     {
-      "start": "2026-11-30T16:15",
-      "end": "2026-11-30T17:15"
-     },
-     {
-      "start": "2026-12-07T16:15",
-      "end": "2026-12-07T17:15"
-     },
-     {
-      "start": "2026-12-14T16:15",
-      "end": "2026-12-14T17:15"
-     },
-     {
-      "start": "2026-12-21T16:15",
-      "end": "2026-12-21T17:15"
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:30",
+      "end": "11:30",
+      "from": "2026-10-27",
+      "skipHolidays": true
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "917b8afd6c324df986e0725d0edd9f7662a747b84bf2d1a2e3e296f145291171",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby": {
+   "events": [
+    {
+     "providerId": "famalie-fuerth-familienzentrum",
+     "venueId": "famalie-fuerth-familienzentrum",
+     "title": "Zweisam – Mama & Baby Yoga (Babys ca. 2–6 Monate), Herbstkurs Okt–Nov",
+     "summary": "Sanftes Yoga mit Atemübungen und kleinen Bewegungsspielen fürs Baby, unterstützt die Rückbildung. Kurs mit 6 Montagsterminen, maximal 9 Mamas mit Kind; Anmeldung per Mail.",
+     "topics": [
+      "yoga-mit-baby",
+      "rueckbildung",
+      "muetter"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "85 € (6 Einheiten)",
+     "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 2,
+      "maxMonths": 6
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-05T15:00",
+        "end": "2026-10-05T16:00"
+       },
+       {
+        "start": "2026-10-12T15:00",
+        "end": "2026-10-12T16:00"
+       },
+       {
+        "start": "2026-10-19T15:00",
+        "end": "2026-10-19T16:00"
+       },
+       {
+        "start": "2026-10-26T15:00",
+        "end": "2026-10-26T16:00"
+       },
+       {
+        "start": "2026-11-02T15:00",
+        "end": "2026-11-02T16:00"
+       },
+       {
+        "start": "2026-11-09T15:00",
+        "end": "2026-11-09T16:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "famalie-fuerth-familienzentrum",
+     "venueId": "famalie-fuerth-familienzentrum",
+     "title": "Zweisam – Mama & Baby Yoga (Babys ca. 2–6 Monate), Winterkurs Nov–Dez",
+     "summary": "Sanftes Yoga mit Atemübungen und kleinen Bewegungsspielen fürs Baby, unterstützt die Rückbildung. Kurs mit 6 Montagsterminen, maximal 9 Mamas mit Kind; Anmeldung per Mail.",
+     "topics": [
+      "yoga-mit-baby",
+      "rueckbildung",
+      "muetter"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "85 € (6 Einheiten)",
+     "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 2,
+      "maxMonths": 6
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-16T15:00",
+        "end": "2026-11-16T16:00"
+       },
+       {
+        "start": "2026-11-23T15:00",
+        "end": "2026-11-23T16:00"
+       },
+       {
+        "start": "2026-11-30T15:00",
+        "end": "2026-11-30T16:00"
+       },
+       {
+        "start": "2026-12-07T15:00",
+        "end": "2026-12-07T16:00"
+       },
+       {
+        "start": "2026-12-14T15:00",
+        "end": "2026-12-14T16:00"
+       },
+       {
+        "start": "2026-12-21T15:00",
+        "end": "2026-12-21T16:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "famalie-fuerth-familienzentrum",
+     "venueId": "famalie-fuerth-familienzentrum",
+     "title": "Mom & Mini Flow – Mama & Kind Yoga (Babys ca. 6–12 Monate), Herbstkurs Okt–Nov",
+     "summary": "Aufbaukurs: kräftigere Yoga-Flows für Mamas, während die Kinder dabei spielen und den Raum erkunden. 6 Montagstermine, maximal 9 Mamas mit Kind; Anmeldung per Mail.",
+     "topics": [
+      "yoga-mit-baby",
+      "fitness-mit-baby",
+      "muetter"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "85 € (6 Einheiten)",
+     "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-05T16:15",
+        "end": "2026-10-05T17:15"
+       },
+       {
+        "start": "2026-10-12T16:15",
+        "end": "2026-10-12T17:15"
+       },
+       {
+        "start": "2026-10-19T16:15",
+        "end": "2026-10-19T17:15"
+       },
+       {
+        "start": "2026-10-26T16:15",
+        "end": "2026-10-26T17:15"
+       },
+       {
+        "start": "2026-11-02T16:15",
+        "end": "2026-11-02T17:15"
+       },
+       {
+        "start": "2026-11-09T16:15",
+        "end": "2026-11-09T17:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "famalie-fuerth-familienzentrum",
+     "venueId": "famalie-fuerth-familienzentrum",
+     "title": "Mom & Mini Flow – Mama & Kind Yoga (Babys ca. 6–12 Monate), Winterkurs Nov–Dez",
+     "summary": "Aufbaukurs: kräftigere Yoga-Flows für Mamas, während die Kinder dabei spielen und den Raum erkunden. 6 Montagstermine, maximal 9 Mamas mit Kind; Anmeldung per Mail.",
+     "topics": [
+      "yoga-mit-baby",
+      "fitness-mit-baby",
+      "muetter"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "85 € (6 Einheiten)",
+     "url": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "sourceUrl": "https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Mail an yoga_sandra@outlook.com"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-16T16:15",
+        "end": "2026-11-16T17:15"
+       },
+       {
+        "start": "2026-11-23T16:15",
+        "end": "2026-11-23T17:15"
+       },
+       {
+        "start": "2026-11-30T16:15",
+        "end": "2026-11-30T17:15"
+       },
+       {
+        "start": "2026-12-07T16:15",
+        "end": "2026-12-07T17:15"
+       },
+       {
+        "start": "2026-12-14T16:15",
+        "end": "2026-12-14T17:15"
+       },
+       {
+        "start": "2026-12-21T16:15",
+        "end": "2026-12-21T17:15"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "e42830263d8205c40d717156ec2d8430d4bd8fdc5d923c12561aadeb1faf151a",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "b3bf3ea5d4be7af6f4db2ed6e141a32a71eb9881036369368eef03e2621e9403",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
- "sources": []
+ }
 }

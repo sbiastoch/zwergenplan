@@ -1,100 +1,132 @@
 {
- "events": [
-  {
-   "providerId": "dance-maxx-nuernberg",
-   "venueId": "dance-maxx-nuernberg",
-   "title": "fitdankbaby® MAXI (Mittwoch 09:30)",
-   "summary": "Fitness- und Bewegungskurs für Eltern mit Kind, mittwochs vormittags. Anmeldung über Kontakt bzw. Kundenlogin; Einstieg auf Anfrage.",
-   "topics": [
-    "fitness-mit-baby",
-    "bewegung"
+ "version": 2,
+ "units": {
+  "seite:https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/": {
+   "events": [
+    {
+     "providerId": "dance-maxx-nuernberg",
+     "venueId": "dance-maxx-nuernberg",
+     "title": "fitdankbaby® MAXI – Fitness mit Baby (mittwochs 9:30)",
+     "summary": "Fitnesskurs für Eltern, bei dem das Baby mittrainiert. Der Kurs läuft fortlaufend, ein Einstieg ist auf Anfrage möglich. Eine kostenlose Probestunde kann man online buchen.",
+     "topics": [
+      "fitness-mit-baby"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://dance-maxx.de/kursplan/fit-dank-baby-maxi/",
+     "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige; Anmeldung über Nimbuscloud oder per Kontakt, kostenlose Probestunde über Calendly"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-10-28",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "dance-maxx-nuernberg",
+     "venueId": "dance-maxx-nuernberg",
+     "title": "fitdankbaby® MINI – Fitness mit Baby (mittwochs 10:45)",
+     "summary": "Fitnesskurs mit Baby für Eltern mit den Jüngeren. Der Kurs läuft fortlaufend, ein Einstieg ist auf Anfrage möglich. Eine kostenlose Probestunde kann man online buchen.",
+     "topics": [
+      "fitness-mit-baby"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.dance-maxx.de/kursplan/fit-dank-baby-mini/",
+     "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige; Anmeldung über Nimbuscloud oder per Kontakt, kostenlose Probestunde über Calendly"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "10:45",
+      "end": "11:45",
+      "from": "2026-10-28",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "dance-maxx-nuernberg",
+     "venueId": "dance-maxx-nuernberg",
+     "title": "Eltern-Kind-Tanz (donnerstags 15:40)",
+     "summary": "In dieser Stunde tanzen und bewegen sich Eltern und Kleinkinder gemeinsam zur Musik. Die Gruppe läuft fortlaufend, ein Einstieg ist auf Anfrage möglich.",
+     "topics": [
+      "tanz",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.dance-maxx.de/kursplan/eltern-kind-tanz/",
+     "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige; Anmeldung über Nimbuscloud oder per Kontakt"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "15:40",
+      "end": "16:25",
+      "from": "2026-10-29",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://dance-maxx.de/kursplan/fit-dank-baby-maxi/",
-   "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
-   "category": "bewegung",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine öffentliche Platzanzeige; Anmeldung über Nimbuscloud-Login oder Kontakt. Kostenlose Probestunde möglich."
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "09:30",
-    "end": "10:30",
-    "from": "2026-10-21",
-    "skipHolidays": true
-   }
+   "inputHash": "54d06de08043b278ae99784fd6e12f596bec2664ecdc4bb3738de96c263272e6",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "dance-maxx-nuernberg",
-   "venueId": "dance-maxx-nuernberg",
-   "title": "fitdankbaby® MINI (Mittwoch 10:45)",
-   "summary": "Fitness- und Bewegungskurs für Eltern mit kleinen Kindern, mittwochs vormittags. Anmeldung über Kontakt bzw. Kundenlogin; Einstieg auf Anfrage.",
-   "topics": [
-    "fitness-mit-baby",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.dance-maxx.de/kursplan/fit-dank-baby-mini/",
-   "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
-   "category": "bewegung",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine öffentliche Platzanzeige; Anmeldung über Nimbuscloud-Login oder Kontakt. Kostenlose Probestunde möglich."
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "10:45",
-    "end": "11:45",
-    "from": "2026-10-21",
-    "skipHolidays": true
-   }
+  "seite:https://www.dance-maxx.de/kursplan/fit-dank-baby-mini/": {
+   "events": [],
+   "inputHash": "1eff627c2b1fd921bf6dc45d39e505545f78a423427d5ac42fd00791a9d820d5",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "dance-maxx-nuernberg",
-   "venueId": "dance-maxx-nuernberg",
-   "title": "Eltern-Kind Tanz (Donnerstag 15:40)",
-   "summary": "Gemeinsames Tanzen für Eltern und Kind, donnerstags nachmittags. Anmeldung über Kontakt bzw. Kundenlogin; Einstieg auf Anfrage.",
-   "topics": [
-    "tanz",
-    "bewegung"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.dance-maxx.de/kursplan/eltern-kind-tanz/",
-   "sourceUrl": "https://www.dance-maxx.de/tanzschule-nuernberg/tanzkurse/",
-   "category": "bewegung",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine öffentliche Platzanzeige; Anmeldung über Nimbuscloud-Login oder Kontakt. Kostenlose Probestunde möglich."
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "15:40",
-    "end": "16:25",
-    "from": "2026-10-22",
-    "skipHolidays": true
-   }
+  "seite:https://www.dance-maxx.de/kursplan/eltern-kind-tanz/": {
+   "events": [],
+   "inputHash": "88ed8480f30dffe8c810c9c1fe39e20b0a55004a883ccfd4a3de647bd23288f4",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://dance-maxx.de/kursplan/fit-dank-baby-maxi/": {
+   "events": [],
+   "inputHash": "408983618613178650ed3e7317248aa36cf50cf0e8efce0651fb149f043bfd90",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "189cb1114d9dc40283d2a3b1d23527655d0b7edbb560074a34de94e5b4b86e1c",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-16T08:15:21+02:00",
- "sources": []
+ },
+ "beilagen": {
+  "seite:https://calendly.com/dance-maxx-info/kostenlose-probestunde-fitdankbaby-in-nurnberg": {
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00"
+  }
+ }
 }

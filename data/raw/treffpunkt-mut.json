@@ -1,42 +1,54 @@
 {
- "events": [
-  {
-   "providerId": "treffpunkt-mut",
-   "venueId": "treffpunkt-mut",
-   "title": "MUT – Gruppe für junge Mütter mit Kind (donnerstags)",
-   "summary": "Offene Gruppe der Frühen Hilfen für junge Mütter und Schwangere bis 25 Jahre aus Nürnberg mit ihren Kindern: Austausch, Spiel und Beratung durch zwei Pädagoginnen. Anmeldung telefonisch oder per E-Mail.",
-   "topics": [
-    "eltern-kind-gruppe",
-    "spielgruppe",
-    "elterntreff",
-    "muetter"
+ "version": 2,
+ "units": {
+  "seite:https://www.treffpunkt-nbg.de/mut/": {
+   "events": [
+    {
+     "providerId": "treffpunkt-mut",
+     "venueId": "treffpunkt-mut",
+     "title": "MUT – Gruppe für junge Mütter und Schwangere bis 25 Jahre",
+     "summary": "Wöchentliche Gruppe der Frühen Hilfen für junge Mamas und Schwangere bis 25 aus Nürnberg: Austausch mit anderen Müttern, Spielen mit dem Kind, begleitet von zwei Pädagoginnen, die auch beraten. Anmeldung per Telefon oder E-Mail.",
+     "topics": [
+      "elterntreff",
+      "eltern-kind-gruppe",
+      "beratung",
+      "muetter"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.treffpunkt-nbg.de/mut/",
+     "sourceUrl": "https://www.treffpunkt-nbg.de/mut/",
+     "category": "treffs-cafes",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung telefonisch unter 0911 27 47 69-0 (Mo–Do 9–14 Uhr) oder per E-Mail"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "11:30",
+      "from": "2026-10-29",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.treffpunkt-nbg.de/mut/",
-   "sourceUrl": "https://www.treffpunkt-nbg.de/mut/",
-   "category": "krabbel-spielgruppen",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung telefonisch (09 11 / 27 47 69-0) oder per E-Mail bei Treffpunkt e.V."
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "09:30",
-    "end": "11:30",
-    "from": "2026-10-15",
-    "skipHolidays": true
-   }
+   "inputHash": "d0c0938be6520c4443078320a0414cab5c74e2b043194495d763a1944c16e46f",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.treffpunkt-nbg.de/familienstuetzpunkt/": {
+   "events": [],
+   "inputHash": "3125fdd0861ac8fa603e0cf2355d1ee549ad45e9139fabf5d5eeeb765a304ee9",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "366e21409ae866e02ea2446b4273fa990bf33b487ff4a62694ec4ad3e99ed524",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
- "sources": []
+ }
 }

@@ -1,59 +1,63 @@
 {
- "events": [
-  {
-   "providerId": "hebamme-elena-paulus",
-   "venueId": "hebamme-elena-paulus",
-   "title": "Babymassage (Babys ab 4 Wochen bis 6 Monate)",
-   "summary": "Massage-Kurs für Babys ab etwa 4 Wochen bis 6 Monate, der Bindung und Entspannung fördern soll. Fünf Dienstagstermine von 9:00 bis 9:45 Uhr, 65 € inkl. Skript. Der Kurs ab 24.11.2026 ist ausgebucht; ein weiterer Kurs ist für Februar 2027 geplant.",
-   "topics": [
-    "babymassage"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "65 € (inkl. Skript)",
-   "url": "https://www.elena-paulus.de/kurse",
-   "sourceUrl": "https://www.elena-paulus.de/kurse",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 6
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Kursstart 24.11.2026 ausgebucht; nächster Kurs voraussichtlich Februar 2027"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-24T09:00",
-      "end": "2026-11-24T09:45"
+ "version": 2,
+ "units": {
+  "seite:https://www.elena-paulus.de/kurse": {
+   "events": [
+    {
+     "providerId": "hebamme-elena-paulus",
+     "venueId": "hebamme-elena-paulus",
+     "title": "Babymassage (4 Wochen–6 Monate), dienstags",
+     "summary": "Kurs bei Hebamme Elena Paulus in Fischbach: Eltern lernen, ihr Baby zu massieren, was Bindung und Entspannung fördert. 5 Treffen dienstags, das Skript ist im Preis enthalten. Der nächste Kurs ist für Februar 2027 geplant.",
+     "topics": [
+      "babymassage"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "65 € inkl. Skript",
+     "url": "https://www.elena-paulus.de/kurse",
+     "sourceUrl": "https://www.elena-paulus.de/kurse",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 6
      },
-     {
-      "start": "2026-12-01T09:00",
-      "end": "2026-12-01T09:45"
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Kurs ausgebucht; nächster Start voraussichtlich Februar 2027"
      },
-     {
-      "start": "2026-12-08T09:00",
-      "end": "2026-12-08T09:45"
-     },
-     {
-      "start": "2026-12-15T09:00",
-      "end": "2026-12-15T09:45"
-     },
-     {
-      "start": "2026-12-22T09:00",
-      "end": "2026-12-22T09:45"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-24T09:00",
+        "end": "2026-11-24T09:45"
+       },
+       {
+        "start": "2026-12-01T09:00",
+        "end": "2026-12-01T09:45"
+       },
+       {
+        "start": "2026-12-08T09:00",
+        "end": "2026-12-08T09:45"
+       },
+       {
+        "start": "2026-12-15T09:00",
+        "end": "2026-12-15T09:45"
+       },
+       {
+        "start": "2026-12-22T09:00",
+        "end": "2026-12-22T09:45"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "711a0e80e5598d73749a80a0dbf1849a35d2b2fd46a2e8e0972ce594df9512d3",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "efa1d7997c5ed3fa474bc224e1407e95c09145c176df4141c1933be41af975fd",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
- "sources": []
+ }
 }

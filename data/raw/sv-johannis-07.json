@@ -1,9 +1,90 @@
 {
- "events": [],
- "inputHash": "a468652360a35883747a6d9e2ea0f74eca67c82687da37c3f92cd14118edab19",
- "model": "haiku",
- "status": "keine-termine",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
- "sources": []
+ "version": 2,
+ "units": {
+  "seite:https://www.sv-johannis07.de/eltern-kind-turnen": {
+   "events": [
+    {
+     "providerId": "sv-johannis-07",
+     "venueId": "sv-johannis-07",
+     "title": "Eltern-Kind-Turnen montags (2 und 3 Jahre)",
+     "summary": "Spielturnen mit Elternbegleitung: Begrüßungslied, Bewegungslandschaft mit Bällen, Reifen, Bänken und Sprossenwand, zum Schluss Abschiedskreis. Buchung nur online im Kursshop, neue Blöcke ab Januar 2027 (Daten noch offen), Einstieg auf Anfrage.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.sv-johannis07.de/eltern-kind-turnen",
+     "sourceUrl": "https://www.sv-johannis07.de/eltern-kind-turnen",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 47
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Nur Online-Buchung über den Kursshop, keine Warteliste; Termine der Januar-Blöcke stehen noch nicht fest"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "16:00",
+      "end": "16:45",
+      "from": "2026-11-02",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "sv-johannis-07",
+     "venueId": "sv-johannis-07",
+     "title": "Eltern-Kind-Turnen donnerstags (2 bis 4 Jahre)",
+     "summary": "Bewegungsstunde mit Elternbegleitung: Lieder zum Start und Abschluss, dazwischen Hüpfen, Springen und Balancieren in einer Bewegungslandschaft. Buchung nur online im Kursshop, neue Blöcke ab Januar 2027 (Daten noch offen), Einstieg auf Anfrage.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.sv-johannis07.de/eltern-kind-turnen",
+     "sourceUrl": "https://www.sv-johannis07.de/eltern-kind-turnen",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 48
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Nur Online-Buchung über den Kursshop, keine Warteliste; Termine der Januar-Blöcke stehen noch nicht fest"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "16:30",
+      "end": "17:15",
+      "from": "2026-10-29",
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "e05df999e9feb3da353a5e94d377ca658a227eaedc9974458ffc1061b0bf961b",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://shop.sv-johannis07.de/de/courses/": {
+   "events": [],
+   "inputHash": "c478bf5e069a7768ad61e52d03270050d000af6a1a10326e0e9da7b0c795121c",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  }
+ }
 }

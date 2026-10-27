@@ -1,317 +1,468 @@
 {
- "events": [
-  {
-   "providerId": "cvjm-gostenhof-miniclub",
-   "venueId": "cvjm-gostenhof-miniclub",
-   "title": "Mini-Club für Kinder ab 18 Monaten (dienstags)",
-   "summary": "Dienstagvormittags Treff für Eltern mit Kindern ab 18 Monaten: Kniereiter, Fingerspiele, Bewegungslieder, Freispiel und Kaffee. Findet nicht in den Schulferien statt. Kosten laut Seite nicht angegeben.",
-   "topics": [
-    "eltern-kind-gruppe",
-    "singen"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-   "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 18,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Platzanzeige. Fragen bei Stefanie Becker, 0151 65108244 oder stefanie.becker@cvjm-nuernberg-gostenhof.de"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "10:00",
-    "end": "11:30",
-    "from": "2026-10-27",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "cvjm-gostenhof-miniclub",
-   "venueId": "cvjm-gostenhof-miniclub",
-   "title": "Mini-Club für Kinder von 1 bis 3 Jahren",
-   "summary": "Dienstags im Kinderraum des CVJM Gostenhof, 10:00 bis 11:30 Uhr. Im Auszug fehlen Angaben zu Kosten, Anmeldung und einer Begleitung durch Eltern; bitte beim Anbieter nachfragen. Keine Platzanzeige.",
-   "topics": [
-    "krabbelgruppe"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Platzanzeige; Anfrage direkt beim CVJM Gostenhof"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-27T10:00",
-      "end": "2026-10-27T11:30"
+ "version": 2,
+ "units": {
+  "seite:https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club": {
+   "events": [
+    {
+     "providerId": "cvjm-gostenhof-miniclub",
+     "venueId": "cvjm-gostenhof-miniclub",
+     "title": "Mini-Club dienstags (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Gruppe mit Kniereitern, Fingerspielen, Bewegungsliedern, viel Freispiel und Kaffee für die Eltern. Dazu jedes Mal eine gemeinsame Einheit, etwa Bilderbuch, Basteln oder Klanggeschichte. Nicht in den Ferien.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "spielgruppe",
+      "singen"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+     "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 18,
+      "maxMonths": 36
      },
-     {
-      "start": "2026-11-10T10:00",
-      "end": "2026-11-10T11:30"
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Keine Platzanzeige; Fragen an Stefanie Becker, 0151 65108244, stefanie.becker@cvjm-nuernberg-gostenhof.de"
      },
-     {
-      "start": "2026-11-17T10:00",
-      "end": "2026-11-17T11:30"
-     },
-     {
-      "start": "2026-11-24T10:00",
-      "end": "2026-11-24T11:30"
-     },
-     {
-      "start": "2026-12-01T10:00",
-      "end": "2026-12-01T11:30"
-     },
-     {
-      "start": "2026-12-08T10:00",
-      "end": "2026-12-08T11:30"
-     },
-     {
-      "start": "2026-12-15T10:00",
-      "end": "2026-12-15T11:30"
-     },
-     {
-      "start": "2026-12-22T10:00",
-      "end": "2026-12-22T11:30"
-     },
-     {
-      "start": "2027-01-12T10:00",
-      "end": "2027-01-12T11:30"
-     },
-     {
-      "start": "2027-01-19T10:00",
-      "end": "2027-01-19T11:30"
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:00",
+      "end": "11:30",
+      "from": "2026-10-27",
+      "skipHolidays": true
      }
-    ]
-   }
-  },
-  {
-   "providerId": "cvjm-gostenhof-miniclub",
-   "venueId": "cvjm-gostenhof-miniclub",
-   "title": "Mini-Club für Kinder von 1 bis 3 Jahren (dienstags)",
-   "summary": "Regelmäßige Gruppe für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags 10:00 bis 11:30 Uhr. Die Quelle nennt keine Platzzahl; die Termine stammen aus dem Veranstaltungskalender.",
-   "topics": [
-    "spielgruppe",
-    "eltern-kind-gruppe"
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-   "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Platzanzeige auf der Quelle; Nachfrage beim CVJM Gostenhof"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2027-01-26T10:00",
-      "end": "2027-01-26T11:30"
+   "inputHash": "c4aa0c439135376ed80f82f6acea6edc874330cf9ea9807fad32644c2e809a8b",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.evangelische-termine.de/ical?vid=1496": {
+   "events": [
+    {
+     "providerId": "cvjm-gostenhof-miniclub",
+     "venueId": "cvjm-gostenhof-miniclub",
+     "title": "Mini-Club (1–3 Jahre, dienstags)",
+     "summary": "Wöchentliche Spielgruppe am Dienstagvormittag für Kinder von 1 bis 3 Jahren mit Begleitperson im Kinderraum des CVJM Gostenhof.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
      },
-     {
-      "start": "2027-02-02T10:00",
-      "end": "2027-02-02T11:30"
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Infos und Teilnahme beim CVJM Nürnberg-Gostenhof erfragen"
      },
-     {
-      "start": "2027-02-16T10:00",
-      "end": "2027-02-16T11:30"
-     },
-     {
-      "start": "2027-02-23T10:00",
-      "end": "2027-02-23T11:30"
-     },
-     {
-      "start": "2027-03-02T10:00",
-      "end": "2027-03-02T11:30"
-     },
-     {
-      "start": "2027-03-09T10:00",
-      "end": "2027-03-09T11:30"
-     },
-     {
-      "start": "2027-03-16T10:00",
-      "end": "2027-03-16T11:30"
-     },
-     {
-      "start": "2027-04-06T10:00",
-      "end": "2027-04-06T11:30"
-     },
-     {
-      "start": "2027-04-13T10:00",
-      "end": "2027-04-13T11:30"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-27T10:00",
+        "end": "2026-10-27T11:30"
+       },
+       {
+        "start": "2026-11-10T10:00",
+        "end": "2026-11-10T11:30"
+       },
+       {
+        "start": "2026-11-17T10:00",
+        "end": "2026-11-17T11:30"
+       },
+       {
+        "start": "2026-11-24T10:00",
+        "end": "2026-11-24T11:30"
+       },
+       {
+        "start": "2026-12-01T10:00",
+        "end": "2026-12-01T11:30"
+       },
+       {
+        "start": "2026-12-08T10:00",
+        "end": "2026-12-08T11:30"
+       },
+       {
+        "start": "2026-12-15T10:00",
+        "end": "2026-12-15T11:30"
+       },
+       {
+        "start": "2026-12-22T10:00",
+        "end": "2026-12-22T11:30"
+       },
+       {
+        "start": "2027-01-12T10:00",
+        "end": "2027-01-12T11:30"
+       },
+       {
+        "start": "2027-01-19T10:00",
+        "end": "2027-01-19T11:30"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "590d044305816c87c3516db90d8f93e97f97e8ae28523251e301c278a6af8b61",
+   "dated": {
+    "2026-10-27": "6f87c81c0e19cfcca3ab2f58ad382443f5af287621be9551f2f701974af184c1",
+    "2026-10-29": "3ce2c65a94682ce2704ac530b3f648cf4bc884fe8fed473ef95f064335d4f0aa",
+    "2026-10-30": "5d1582c6a0c1483edc9c11769e3ba2b2b5355270563f5a714b71382cb472eb5f",
+    "2026-11-05": "d7b0431992cfb73acf31ef5ab7c6cec488e3144627b91a872933c7db277bb9ab",
+    "2026-11-09": "61c81196ee38203ce813ef0f6dac7bc0d9ff68dcf7c3f7bcadb3bc56d79a2e09",
+    "2026-11-10": "8172e90160cc7b23bd6e5fc56712c3e5dbae6ebb0bf9be1f96a4dee5ca3cfd3e",
+    "2026-11-12": "b93b2a663111d3959972d5f395f1719e16476e234cd54368766b433d5f6c6208",
+    "2026-11-13": "0f242011636f5b3b98cb02e0422123a3ab0d7a144d01969645eab722adb50589",
+    "2026-11-14": "96c1c34d1fbc06987b261e5fb93902354c94fffb5df594e43423295eed708f9a",
+    "2026-11-16": "5409c8362fd7d8ed126681b9e9cc0dd01b9ab418a725be8776331ae0af5db653",
+    "2026-11-17": "b1ee43077419cc01b7162163600bd2f39c82e7eddec4c30cbf3679df915ceec5",
+    "2026-11-19": "e7dc35fb9b35aa0cc5dc13ebcb36a84e7fbc470ac483b3e369b95db2bd426834",
+    "2026-11-20": "f34a7f5a5ac854b2f44b0ddfa082aa52ae1a74f2a4df7a1e03d1f3a7e08a7998",
+    "2026-11-22": "8f1bfa05442428ee457eec92e52083cd9767e2874541aaaec914b964aab95389",
+    "2026-11-23": "35546e5b9ce1bd5e2bdd89c683d76bac452145537702dc0835cc5f00f1dd7057",
+    "2026-11-24": "91dd03540dace279f34204d9286e56d9f17211237cba26aaf2ff52d8b04a8d12",
+    "2026-11-26": "af4dbda4c9879cd8728f2950841e762e76694d0b6986de2bc052e74fce28b22b",
+    "2026-11-27": "485d6a97f79026a2c3cd8e55bfe536990076fb0cab4ac8d514a97621534d9598",
+    "2026-11-29": "9dd11a9644e46942ad9fa8f9a0a282da16188353838ca992653d9e5489b63f49",
+    "2026-11-30": "0b6e5a2ec8911dc3174b3a9cea113af6fd7ebb58c7e6ec65f4f76cccee78e485",
+    "2026-12-01": "c7ced8753015b8f26578275c7725fb33721821f864b13bea6edb463a77764bbb",
+    "2026-12-03": "48e9ee99b04310ce1df1be2d565155955c06552f93da6556bd42997c6a3c3020",
+    "2026-12-04": "6fe913919847a80c168143af032d4402cf8c54707b59314286dc56c3f207b35f",
+    "2026-12-07": "073a6d514e2c01bfb8ca063653d7f91fda0579f556906ee746390a6ebf440f8b",
+    "2026-12-08": "e617c904e691a0339321b1883eaa52c208e0defa4d8540e02a1668e31d10485d",
+    "2026-12-10": "5d9644c044ea6fc19614c6aecfb36f8adb1e02fffc2554722226dec100ec31c2",
+    "2026-12-11": "338a15a358052636549decd1cbc8470bd2aecc53abce346a2821832b2df83054",
+    "2026-12-13": "f5c7f2bbc165cb088179953c389d3c13a469fca63e65168a7fd2d3ce95e029e7",
+    "2026-12-14": "36b9c8d51d868ba2641dbe3feb38dfa1a426ca58b9b7fec51e0365784b34aca1",
+    "2026-12-15": "44df73c9d7e79824002091c7207e80c617eeb025c89ced2327a8cb5e4f7b4c1b",
+    "2026-12-17": "ed1ba0e21e6adba8d0d33c84cdec37f8677e9927bac3b99632132a6d82076286",
+    "2026-12-18": "1dc8f39a5df8595619cca908a3b1c0709d79561006f12231434b099f562c3b7d",
+    "2026-12-21": "8b794deb228621f0888392a4afef474fb924451ff22ab58b7cc5258f1289de59",
+    "2026-12-22": "3ecbba6293e3e68c067e6d5320ad9d8019c068dcf66197be3b0f9197fed3a749",
+    "2026-12-24": "dea3249cd511617ca781e814911371842cd245cd698b03ae19ca8ab388aa06cd",
+    "2026-12-31": "56ab0da1e241f838766ed014286003b1371dd45f1bcee435e764653b83077b8d",
+    "2027-01-07": "3cb53404c92bdc51db7c1081fbfdb5651b5a15cfdf02ebecc186e46a1a9d1dff",
+    "2027-01-11": "0bc6565ee3370fe3c47964e6d95ca3a282f7eb1c1aa6510f408362c7c5202e01",
+    "2027-01-12": "4304a4f962264686ff5a4ef96260ca19d6ad568e9013095bf3d5cc19f1ae751e",
+    "2027-01-14": "2d41f78bffcd6d82ca5a84ea00b6ea3e6629f06a2828f7c24abe87cb7eb4b7c2",
+    "2027-01-15": "9ab3fd63a22c90f892983f890f8bb7d9a26d21d89da312647e68ea81f3fec375",
+    "2027-01-17": "7b501e6485d1e9a13bffa4517b831ef5f79561a56ceeec1f0c28613c2427e16f",
+    "2027-01-18": "7af28c5fead46f7daeffb283c0fa1de56d3c1588d4d50de78493c32c24634a1a",
+    "2027-01-19": "3e841bd65ca433859740f6e31b1063f59db277efd19c6f62e7fc0da16ff63e9d",
+    "2027-01-21": "8f1c99eb695105e620b13335353ad6d6ba1cd4b4c53409ec09cdbb64def2e737",
+    "2027-01-22": "554bfb88e94f238a9607a591534a96c7946dbc02825e4898884452466bb10f65",
+    "2027-01-24": "c38210faf654d58c70566db5f859e261e9d564dfc95ce926ecb82467c2735977",
+    "2027-01-25": "8a3e9e2a11ceeb7e9eb6362ee812bba69080c9d0148df127b4406acf2c432918",
+    "2027-01-26": "930283344e82e310ed787bb37d28f961216c4049c581761ba54a0166ae9cf574",
+    "2027-01-28": "649e515e3e7145628b0e2c3446e845429e1fa14a0467149d5dd1b7181cc1a024",
+    "2027-02-01": "2f383591884cf8a4909a952594c5a64627ae57ae76cd145b94f579534de59dec",
+    "2027-02-02": "31a1a9a2ea43734c9996f67d307026376f04245a4fd1785ae326379174746b42",
+    "2027-02-04": "8ffdca1124ab2320eef3426dc5f12a2e308c25b8dc481de62bf57da6970a7bad",
+    "2027-02-05": "44c156ff27f59d7adec2c5be125437e97ee1f24fa9e0fa69821d341bd5193b15",
+    "2027-02-11": "7397090c49a5be21ae8168527ab7ac004872ae4dfa2310dd51e33beaba3534aa",
+    "2027-02-15": "0ad337cf688ee7b289548e0b6ccc6341c59037be655077ab77312ddaa0ba14b5",
+    "2027-02-16": "3872ac262afa7ffb23f035abfa8a33765fbfd20fff821e655ee0548544a871c0",
+    "2027-02-18": "7fbfe50f5bf49cdfb1215de16542e8fcd2a824433e3a7ce919a3c4dfa85c730d",
+    "2027-02-19": "64ec3f006532d57f6fe367d918edda7bbcc88a5daa8840b095419aec8e59b8ce",
+    "2027-02-22": "b68b2a9a9327aa89f2342081c3ea8ef304fa5ba626abe5c1d87b33924f66349a",
+    "2027-02-23": "9b2898d805386a1baa763b9d55bdf9f2b4fac1b4ebc6457b0070f99aa4f1c436",
+    "2027-02-25": "5b1e112a3116eb4893526552982e93aae54eb532ad0bcd3a472e37b1108f704a",
+    "2027-02-26": "19550966527a682fff8d1c38b67911a3c287d0437c4f71d188d008ddb9c5f668",
+    "2027-03-01": "f95d4c7eb0d124e9b05bc2abc6e424436233ffb43ffad881b98790c84f398736",
+    "2027-03-02": "455c2335cfcade80ccf5e4b5bb3ca985258ea37e05ac55c7e4398b3dfcc853a9",
+    "2027-03-04": "e975282f5c81e54cf3da3473b06098db51975b589e76a1cb0479073070e3e6b3",
+    "2027-03-05": "7fec7fae315c85ea9cba5c28f9feb392b90083a59d1c52419a1ae3cb76813b98",
+    "2027-03-08": "170cf1d52fe502be56ee67e8953004ae62d9ef82550cc1482cb3cc2e02e5371d",
+    "2027-03-09": "d7c531675459b3f3778cce87ff55ff1b7d3ad0ebe960412a88e104d6719afd4e",
+    "2027-03-11": "846d8ed3483f556c75fe5287534400a50c6143d04c2c7f7b3f14e54f05789c2f",
+    "2027-03-12": "1ac57ce60b28d912a21e6bd833a49a1b1eab35adbaa4e0612ce758c5617d4480",
+    "2027-03-15": "717b91785d55f3d3eeddf1443504a3a7e83615fa16171dbd487de0f0bba199b4",
+    "2027-03-16": "41ccefe148fc7aec027de499d6c9212eed562df9957113196d9d2fa16a476707",
+    "2027-03-18": "fb641d1bc951421fe0890ff8287be498406fa3a0c24ef61d0f47be3b7488af67",
+    "2027-03-19": "9913aa699e2dedf3b379fb9724acba4854e1e31fcc8b7c7fd08760d69339a1ed",
+    "2027-03-25": "45118fe59d4d725e41e3e6edbc9ea52743ec19359bfabdee1cec618bd12975d1",
+    "2027-04-01": "144ba24f4f48698aedcade106f2d85d57f45623100e8d6c0c2c7dbe8b62aa85d",
+    "2027-04-02": "0dfebc55c0e0ae403e184df9960b100471b846095271bb3e621226b700b167c4",
+    "2027-04-05": "351851af833fb0bbb4ba85518e1fa9fd31bbafe2c7196d16255f9044b8a44f5d",
+    "2027-04-06": "d5018cc2a72b8620cf09cf5052cf6b8fc1c365b7b834f322a770e0f08db0e3d5",
+    "2027-04-08": "44da1e1103049721a14333542e5dd025348bf0a11b7f9382a05e47862d837e3e",
+    "2027-04-09": "32496833c0f8ed3246c08ddc97f5aa9156ca1ede8cc83cf4702fb1e3425dd759",
+    "2027-04-12": "f213b8ebafe0e1ebfa44829c4464705a885954d974b31ca7188a71562f3610e1",
+    "2027-04-13": "25f5009db83a2cc526f3a4931d44ce542debb2c3f8d6e5669dd25920330f0cbd",
+    "2027-04-15": "2b1cf6d95eaabeee853ad2bf4cb521251c153f7f25954506fc651bbbfcc9ff34",
+    "2027-04-16": "36fc04f4131172266073b07fc4720cfbff43c41ed3179f9e9d8713b13fc7a6cf",
+    "2027-04-19": "70f9e5307d5e4c452687e15e171620c1b23dcb62f0df7e7e15c95d4d74452af1",
+    "2027-04-20": "83d93f265cededd9eefbad558fe332c8f40a13db55c396c1e74a7df296036f5e",
+    "2027-04-22": "e7368e8807bc1e41e8fcf82073112465c8256a69ed883d7edb165ad141dec66d",
+    "2027-04-23": "4a3048897bddda220dabe62fb12f07de1bf8585531c1b139f93c00ca92fd25da",
+    "2027-04-26": "4c71954c235326ab7f995a09cbb627cb8bbff092f4d0761d0a9e313500124614",
+    "2027-04-27": "492fd423bd967166ec42a7a7c3db99f1deaa1c2c4f9c9d185ec6a35ef31b0eaf",
+    "2027-04-29": "1306145baf49981b9a4e0b93a837730df0202ad27f6b1b2483a7e8e781659293",
+    "2027-05-03": "725ae8eb3105da9c3ed62cd3686cb6bd1e53155eadaf08a31838ccaa1ec03fd6",
+    "2027-05-04": "835a5b2cc537092c98e41c4ecdf1c4fa200b99352218a5ac5309beb96ff6b95a",
+    "2027-05-06": "09136ddab023bd1867ae1560467e3353fa160e46396e6c3b3fd1e1f391d39fca",
+    "2027-05-07": "f7e0c673ff3db0b7b04df80ce031402958b95e50825fe506546fd2fe3dc40685",
+    "2027-05-10": "bbc83242be3a98d6d335b3956049b7cc31390f949a8c01d42e90f4ddaa95914b",
+    "2027-05-11": "c151ed7c1eda90c257ecd17d22421ec34c96f067a084225c6d10e9eb78687f50",
+    "2027-05-13": "462ef78c070e993391b8a8328889b9d674688ce4593eb7a00127849f37932534",
+    "2027-05-14": "a055aacb96396fdbce4129f093d53849401483ef7cc4099a8e282fe35a435013",
+    "2027-05-20": "07face1b891c2f0bd4a471e0f8135c7acd3ab528e9f6ef0e6da533484410c07e",
+    "2027-05-27": "adc9e7c1a651d6a0cd4a9be56abb15bdf2db6582440b9b150188fc288edd14b5",
+    "2027-05-31": "617629dfc390d1817c55a6cbba62c6da86cff51cc7f6c661ceaf847a57c3e2c4",
+    "2027-06-01": "0a98782fb150844346552636f872c17ba60d2e1e483ad0eb7747a5ba474a6e72",
+    "2027-06-03": "d351c8e2d7ecf4063b5563b8fa910dcc6a40d1d4aaee32b4f888350064625a99",
+    "2027-06-04": "487fc4627bd205ef500fbe75312af4304d903af95c0454f1570f674e6905aaaa",
+    "2027-06-07": "f19cb5d9200521d3b9bfb2178b6632c6244f20cce254925d4d60aa193cbc678f",
+    "2027-06-08": "6ab0473a54ee0ee2f49d7fafb556ed1f0758ace11436358bb9f48325cc4f3a41",
+    "2027-06-10": "ba0d8086ed8e598a3d096695d98a64a92be849b220cdd84669845eb5fddceaf2",
+    "2027-06-11": "3957e2c4d7c7b0dc3911daeca3af9d06968a56f97c572c8361c01f75657f32c6",
+    "2027-06-14": "83971ad84796706e64df78df0454e89aa66dc72d1e03f27b2b8bdf796d9208dd",
+    "2027-06-15": "fc28650fcca47b050d386735e6fcbd09bec545f500baf10d4f62287f24e71cb9",
+    "2027-06-17": "b0fcc07c575da59afdc4f07b3872db18121977f531639fbf21a79b1299b172bd",
+    "2027-06-18": "2d2ca614d04119a321ea7bb3205ecbafe1bc93fefcb963e74dccfa6f4f9dec38",
+    "2027-06-21": "1f293c9d19fd33263b9f74cf8c35709d5c18a8517be46ac2969ec3a20ee6d0cd",
+    "2027-06-22": "f9a65979ba71003958479c4d6ccdc66dc27117b66e0d33ab4e6d4153a0a61be6",
+    "2027-06-24": "216a6c891880129bd6c86f34307025fa3c4ab3220ade3419759d8696c948e149",
+    "2027-06-25": "77661012ef83b88d8e7e4f4d96ea03d542c4dcb7e9c1ab425eece6c8e833df42",
+    "2027-06-28": "a1ca04f8b063a923a662a32f7966681376d81e39dbf899380526fdfe052bdde3",
+    "2027-06-29": "96a6ccb9e85f94e2af18613e2f5c4deef6fdb9aff4d8e081d713f62e973c32d6",
+    "2027-07-01": "7b14b00c0010c454c41d5e9943294841c44d7d32d53ad80831d85fefb9bd1cb3",
+    "2027-07-08": "1789c7e0054115af74f5cec563f960872fd1de2289fa389c7598555f6ab8b425",
+    "2027-07-12": "9d4d71c1ec0cc4bed66a56e1d974e2baf7e8dd87a953f58c8b6e226ad8415f61",
+    "2027-07-15": "d9cac6d236adea4cd7f4b9da0733223b756478d17f7df83167069e2b684e1e2b",
+    "2027-07-16": "cfca8bc616a5d7f917ecaecdcbad9d48841a1ca827692c52dfb094da7c342327",
+    "2027-07-22": "cbf9abf60931b515296369ecb7e89280bb5e771dd6b46ad03306415cc3aea071",
+    "2027-07-26": "81af545543b2f579407177dab0cc98a13a85d6d4050ca61b70934399420aced8",
+    "2027-07-29": "c79f9abb734fd03af1f8488edb20b7cf86098575ea89e4b9946ed94e414b9f39",
+    "2027-08-05": "bb344826cac12828d8b5cce26549bee1313f6a855575d3282528b6d886195040",
+    "2027-08-12": "295f177b961168ad9c9ec5f14727065fd2d4f1b79b6d3617fc825c3c8686ec57",
+    "2027-08-19": "65b0cacc5ce7b5aadf682cff54ed9ec63fb1b57f73216e42ecebaef5dfe4ddbb",
+    "2027-08-26": "318901e487750834fba9497255e510233b9ca30d4d4d258cc7648046917288e1",
+    "2027-09-02": "09aa0eb8743647264bf5161330ac46c1a59c445a7e6c57514d2a0dd5ad3f49a7",
+    "2027-09-09": "8e9312f18313408ac8a112ee43ea1a9ffc491d5e469ca2769b46e8d41069373a"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "cvjm-gostenhof-miniclub",
+     "venueId": "cvjm-gostenhof-miniclub",
+     "title": "Mini-Club – Kniereiter & Bewegungslieder (18 Monate–3 Jahre, dienstags)",
+     "summary": "Eltern-Kind-Gruppe mit Kniereitern, Fingerspielen und Bewegungsliedern, viel Freispielzeit und Kaffee für die Eltern, dazu eine gemeinsame Einheit wie Bilderbuch, Basteln oder biblische Geschichte. Nicht in den Schulferien.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "singen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+     "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 18,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Infos und Anfrage bei Alexandra Gußner, Tel. 0151/56071708"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-27T10:00",
+        "end": "2026-10-27T11:30"
+       },
+       {
+        "start": "2026-11-10T10:00",
+        "end": "2026-11-10T11:30"
+       },
+       {
+        "start": "2026-11-17T10:00",
+        "end": "2026-11-17T11:30"
+       },
+       {
+        "start": "2026-11-24T10:00",
+        "end": "2026-11-24T11:30"
+       },
+       {
+        "start": "2026-12-01T10:00",
+        "end": "2026-12-01T11:30"
+       },
+       {
+        "start": "2026-12-08T10:00",
+        "end": "2026-12-08T11:30"
+       },
+       {
+        "start": "2026-12-15T10:00",
+        "end": "2026-12-15T11:30"
+       },
+       {
+        "start": "2026-12-22T10:00",
+        "end": "2026-12-22T11:30"
+       },
+       {
+        "start": "2027-01-12T10:00",
+        "end": "2027-01-12T11:30"
+       },
+       {
+        "start": "2027-01-19T10:00",
+        "end": "2027-01-19T11:30"
+       },
+       {
+        "start": "2027-01-26T10:00",
+        "end": "2027-01-26T11:30"
+       },
+       {
+        "start": "2027-02-02T10:00",
+        "end": "2027-02-02T11:30"
+       },
+       {
+        "start": "2027-02-16T10:00",
+        "end": "2027-02-16T11:30"
+       },
+       {
+        "start": "2027-02-23T10:00",
+        "end": "2027-02-23T11:30"
+       },
+       {
+        "start": "2027-03-02T10:00",
+        "end": "2027-03-02T11:30"
+       },
+       {
+        "start": "2027-03-09T10:00",
+        "end": "2027-03-09T11:30"
+       },
+       {
+        "start": "2027-03-16T10:00",
+        "end": "2027-03-16T11:30"
+       },
+       {
+        "start": "2027-04-06T10:00",
+        "end": "2027-04-06T11:30"
+       },
+       {
+        "start": "2027-04-13T10:00",
+        "end": "2027-04-13T11:30"
+       },
+       {
+        "start": "2027-04-20T10:00",
+        "end": "2027-04-20T11:30"
+       },
+       {
+        "start": "2027-04-27T10:00",
+        "end": "2027-04-27T11:30"
+       },
+       {
+        "start": "2027-05-04T10:00",
+        "end": "2027-05-04T11:30"
+       },
+       {
+        "start": "2027-05-11T10:00",
+        "end": "2027-05-11T11:30"
+       },
+       {
+        "start": "2027-06-01T10:00",
+        "end": "2027-06-01T11:30"
+       },
+       {
+        "start": "2027-06-08T10:00",
+        "end": "2027-06-08T11:30"
+       },
+       {
+        "start": "2027-06-15T10:00",
+        "end": "2027-06-15T11:30"
+       },
+       {
+        "start": "2027-06-22T10:00",
+        "end": "2027-06-22T11:30"
+       },
+       {
+        "start": "2027-06-29T10:00",
+        "end": "2027-06-29T11:30"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
+   ],
+   "inputHash": "d4e22fb1401fbb5b0681b57c8a8ffd8aa8d54cce887400b7088c63112a2f51a4",
+   "dated": {
+    "2026-10-27": "79ea241c74746f79010092e206f9782876005757355554262c9a56bb4a6e4e8b",
+    "2026-11-09": "6e92bb9daa4ec865e6a4691686e861fd835de9663e8426ba9b064a50d1f063a8",
+    "2026-11-10": "ef1f4146f35c7abde4dd12b30181a98079cd357c807909b0c706a0ecd7d9bd7c",
+    "2026-11-16": "24a38db895db7e809f4979211c60e102b60f7c5c177aaef7005e53d9069318bd",
+    "2026-11-17": "75af1c3e34f7dbf86d2e7624ca89ce9c68e2eb97453d2b02db567e23f2e1b7d6",
+    "2026-11-23": "192453d9cf31421421b18f65957949ee71d9dcd47f44945ae1f532abadc31345",
+    "2026-11-24": "874163e4139f5608bd1e2c1b1d8f0810b08b0bd4a74de643f9afefba7dd1b893",
+    "2026-11-30": "d92982550007f6069eeb0ab4220a177efa29ae106aed62963d42cebdcad8d6b3",
+    "2026-12-01": "9aa9ed1dc9bf2671b7793e2126a8e9e09cfd5ac0727aab568d01c18d5aa699b3",
+    "2026-12-07": "67651e9a76ea629adfc19ac5d38927f0ae8f9ca0c1c3beded07926b268d85501",
+    "2026-12-08": "44c03c913e16f0308d06f3d3b4630e5da411fbd6e8aef32d83ba7d681e6ce8ae",
+    "2026-12-14": "82abc33d571fda3f7888658bf35bf41cbb332e729ee4d5ca25195560bac0c070",
+    "2026-12-15": "37c853d1e8f89f92b906fbcdfb22934c29205e42bb3f65ec9aa4b3368b5b9df2",
+    "2026-12-21": "a0bc6f0a46b102910b1b65c5d479dba32a9be056f1faa36c7460174171ee979e",
+    "2026-12-22": "8e2e9f87cdb094af036bd9ff84ca3751b22634fa17cf85a78064890648aaf729",
+    "2027-01-11": "1e7ca2c4609cfc76fe63b84c6e9b1a0e3f1d446468b361a6cd65d3af273c8ece",
+    "2027-01-12": "67d59addeee2c72ac38d7ff0f3d5d055e59aa94dc88539a7c117050930e90967",
+    "2027-01-18": "9fecd863331e2166eaf67968b9d405bea704b16b39f3cc5ffb86640a0437b4b6",
+    "2027-01-19": "44eaf65e3a4a4d3abbd169a659cff13aeab734149eeb03722bd1a2fa43592a3e",
+    "2027-01-25": "ebf736e961717b40e098e27e026cc2e0aa1b6658883f3a578b4df27019f519ea",
+    "2027-01-26": "4e493b117a9e48abf48cd664d76a42f56d8c77bf2676b399617f2fe51f803a1c",
+    "2027-02-01": "1a035c6f6ef76bfda9271a3c7b11b2eb32bd5753e4fb001cd95955e42d11ccad",
+    "2027-02-02": "48f35a2a3b8650d6f29d0c540a28a48fabc8ed15650159d788416b2173dbc563",
+    "2027-02-15": "29e5dbd27fa3459464d73fd74c5f0870fe7a1c91e533bc17a4055dd48e793846",
+    "2027-02-16": "2a9f8be9307bd43be8dd90b21ca983e78d1c8d7a2edee17bc25a10ad75bd24c6",
+    "2027-02-22": "8905646bcdde510ec7bf2e3b8d748f273a0e882855124e8f42f10b688a6936c5",
+    "2027-02-23": "e7bf8cc1a7e1242121331a9fa07daa0a6cf7694343f237ab9d88577d6404dfad",
+    "2027-03-01": "2d23191cbc69cd98ad6dec3c603a6b9b6a2521328e401599d132f5beb635c68b",
+    "2027-03-02": "8a88da0ebaa24950d2891a62b77131dd3f5ed36167033b54f0f492ed20f7cc6b",
+    "2027-03-08": "d748b1efa9ca9eaa0305b538de8480624349586b4a3efbb343994599d390b7c1",
+    "2027-03-09": "343940ab350a913c025bc44ba25d3f284aeea33e7465ba52539ee839a03a9a4d",
+    "2027-03-15": "f70df4690eb91a2cf53287a65e39e9fcfb0e076a5e7ca0c16fa30222ccc4e83e",
+    "2027-03-16": "fe16236851abcd6f075b3e1e2d4fdbabf8808368ccf63f0c2f5525f5db26a7b6",
+    "2027-04-05": "bbddb54d95f136bbb6669df0f7c2761c46bac42e649cbaa28f87f499ffb34e9d",
+    "2027-04-06": "6a39764252dc35eb0b246ebcfaece51acf2456303ef0eea9fc8bf8257779a9d7",
+    "2027-04-12": "b4b03b58ce14ee883ab650053714da39e05a1a8be7a2405101226d8761518c77",
+    "2027-04-13": "b8db099d2d3edd96cb55e1510930506a0ee6154763bbcb70c407f6b361740daf",
+    "2027-04-19": "44733a4de8a241c8dfffbb226a23b107db0516992c2b6f65f9cb4800f87d5946",
+    "2027-04-20": "868e6344b9fb2f500b6b448906a13c6b3d5e538c28166858b2bb90a8d83b994f",
+    "2027-04-27": "5d543c502f5d7b9ba23122cfa03a482773a711ddebdb7aad9533c8c18c3770e8",
+    "2027-05-04": "2cb9c286c90f6792c59ac932adf35b1225785e277ed0276b6bed2f6b6d0f9834",
+    "2027-05-11": "990a4bb659bf9cb84e8d0d8f60f8986eae6ca41442a7ed82fb13cfc5c178913b",
+    "2027-06-01": "a21d64d17c6a901d421094066d81b98d9f3811df37f63978727d431f5eb34bfa",
+    "2027-06-08": "59d31c64ecf189932c85b251cf4a3982549548451c9d81c86a2ae12ea646a62c",
+    "2027-06-15": "8b5e1cfbd0fa0095b08170e167c66df2cfb7db4793968eeefc0bdf03e8b9a1c3",
+    "2027-06-22": "a35e521fe0c7a406a4aa9adfb5f2368b036e4ac437992510161a520e087e0914",
+    "2027-06-29": "9ee04ef5029ddc8c835ac665286eff3be1e139242c885beebd903bc1e8ada387"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "evtermine",
+    "frankenkids"
+   ]
   }
- ],
- "inputHash": "66c78cf5681eafd386f80106468c14a7358662e093e9f260ca93caaecf8288c4",
- "dated": {
-  "2026-10-27": "188b9e3ec31446d8c769bd71b16b794dc069895cdb47c6ccb96dcd623d9f5672",
-  "2026-10-29": "3ce2c65a94682ce2704ac530b3f648cf4bc884fe8fed473ef95f064335d4f0aa",
-  "2026-10-30": "5d1582c6a0c1483edc9c11769e3ba2b2b5355270563f5a714b71382cb472eb5f",
-  "2026-11-05": "d7b0431992cfb73acf31ef5ab7c6cec488e3144627b91a872933c7db277bb9ab",
-  "2026-11-09": "62106d09549886a5315aada4d25e3f6fba791c0c9d0cba20231b13175a193ade",
-  "2026-11-10": "097c7af1290ca6430893d5fdce6bf07725ac2a3cf02703c515814e0f5e8b7f65",
-  "2026-11-12": "b93b2a663111d3959972d5f395f1719e16476e234cd54368766b433d5f6c6208",
-  "2026-11-13": "0f242011636f5b3b98cb02e0422123a3ab0d7a144d01969645eab722adb50589",
-  "2026-11-14": "96c1c34d1fbc06987b261e5fb93902354c94fffb5df594e43423295eed708f9a",
-  "2026-11-16": "9a0775ad68526ac56615e946583596f3c9596896490b6a196c56144ad02442cb",
-  "2026-11-17": "40da0c8eb0e61a3c74f329f9def29553078d00660a7312800de782611e70eef3",
-  "2026-11-19": "e7dc35fb9b35aa0cc5dc13ebcb36a84e7fbc470ac483b3e369b95db2bd426834",
-  "2026-11-20": "f34a7f5a5ac854b2f44b0ddfa082aa52ae1a74f2a4df7a1e03d1f3a7e08a7998",
-  "2026-11-22": "8f1bfa05442428ee457eec92e52083cd9767e2874541aaaec914b964aab95389",
-  "2026-11-23": "3975c635cca296244f01a29c15b458ae4d3a48bfd80a26152597b13959b8680d",
-  "2026-11-24": "315ac410d7f9660da1e91b799c775aa7ca82a0b14489269f8f305cd689c10b49",
-  "2026-11-26": "af4dbda4c9879cd8728f2950841e762e76694d0b6986de2bc052e74fce28b22b",
-  "2026-11-27": "485d6a97f79026a2c3cd8e55bfe536990076fb0cab4ac8d514a97621534d9598",
-  "2026-11-29": "9dd11a9644e46942ad9fa8f9a0a282da16188353838ca992653d9e5489b63f49",
-  "2026-11-30": "cd191417319acab102ffc2f1010522987e5188fbc3cb9d33fd8f061d134772a0",
-  "2026-12-01": "09d0aa7f398e5ee80b3b390733e7110ce82da287b4a1db897e2bde27b26c36a0",
-  "2026-12-03": "48e9ee99b04310ce1df1be2d565155955c06552f93da6556bd42997c6a3c3020",
-  "2026-12-04": "6fe913919847a80c168143af032d4402cf8c54707b59314286dc56c3f207b35f",
-  "2026-12-07": "a925d4bf8b830e850329ba2c42dece844329d2891d3cb1aa75097e4f97a27362",
-  "2026-12-08": "4cac5b1c00014c4b443dd7b148f72349317014d350ff8303c075ac131c1cbbef",
-  "2026-12-10": "5d9644c044ea6fc19614c6aecfb36f8adb1e02fffc2554722226dec100ec31c2",
-  "2026-12-11": "338a15a358052636549decd1cbc8470bd2aecc53abce346a2821832b2df83054",
-  "2026-12-13": "f5c7f2bbc165cb088179953c389d3c13a469fca63e65168a7fd2d3ce95e029e7",
-  "2026-12-14": "b1435978a791316a360a32eeacfa423fa762dd08aa5838b7f5df77292fa1d836",
-  "2026-12-15": "8743f876e0bb1d7ffc131e30f51470fcd910333fdd807244fcd20e6a0a715b08",
-  "2026-12-17": "ed1ba0e21e6adba8d0d33c84cdec37f8677e9927bac3b99632132a6d82076286",
-  "2026-12-18": "1dc8f39a5df8595619cca908a3b1c0709d79561006f12231434b099f562c3b7d",
-  "2026-12-21": "91eff3f2eff168cb52830d1fa9908d0107b9f693d29487ccd5076aedef0bc3db",
-  "2026-12-22": "3f5f59820257a8e60cc092c15e6be1a2039454349929ec03131b81337bf511a2",
-  "2026-12-24": "dea3249cd511617ca781e814911371842cd245cd698b03ae19ca8ab388aa06cd",
-  "2026-12-31": "56ab0da1e241f838766ed014286003b1371dd45f1bcee435e764653b83077b8d",
-  "2027-01-07": "3cb53404c92bdc51db7c1081fbfdb5651b5a15cfdf02ebecc186e46a1a9d1dff",
-  "2027-01-11": "12d62ec1fbb41f2c878a5e80a18e3468af57cdf07ebb69c8b0e29757e227d744",
-  "2027-01-12": "74741d039cc0b28b4d89714faee574d620aafcf360fd5aa979d13b92d4c5fb26",
-  "2027-01-14": "2d41f78bffcd6d82ca5a84ea00b6ea3e6629f06a2828f7c24abe87cb7eb4b7c2",
-  "2027-01-15": "9ab3fd63a22c90f892983f890f8bb7d9a26d21d89da312647e68ea81f3fec375",
-  "2027-01-17": "7b501e6485d1e9a13bffa4517b831ef5f79561a56ceeec1f0c28613c2427e16f",
-  "2027-01-18": "ab9576a5be86255eec09583cde76e058a4bcc06dd5b9c26446b992f15dc61840",
-  "2027-01-19": "74d8d5f7f6f26b03cee8c9f7e8ff328b53c7167b10ea711dfffb32e6d71ae336",
-  "2027-01-21": "8f1c99eb695105e620b13335353ad6d6ba1cd4b4c53409ec09cdbb64def2e737",
-  "2027-01-22": "554bfb88e94f238a9607a591534a96c7946dbc02825e4898884452466bb10f65",
-  "2027-01-24": "c38210faf654d58c70566db5f859e261e9d564dfc95ce926ecb82467c2735977",
-  "2027-01-25": "172d629e5b5e747e73aeeb31803e9a180082f4ce53c007fd86196a72358de986",
-  "2027-01-26": "e6adb72d8310ba549743ed26d0c4e62fdf170cd6d16011064824bf9034d57729",
-  "2027-01-28": "649e515e3e7145628b0e2c3446e845429e1fa14a0467149d5dd1b7181cc1a024",
-  "2027-02-01": "c9ee39c30350357094ec4e07d1b5d4f0d7a916bbe01b395f0744a4af67cc680e",
-  "2027-02-02": "d77dd5f3b6dc5f585cb5c114e0f08df4cf9ef4681f795defb03c07969550c5ef",
-  "2027-02-04": "8ffdca1124ab2320eef3426dc5f12a2e308c25b8dc481de62bf57da6970a7bad",
-  "2027-02-05": "44c156ff27f59d7adec2c5be125437e97ee1f24fa9e0fa69821d341bd5193b15",
-  "2027-02-11": "7397090c49a5be21ae8168527ab7ac004872ae4dfa2310dd51e33beaba3534aa",
-  "2027-02-15": "dd8382c64765d7125da258396f12b3e61a53cf62129e6f2e5a82134ec5aa3bc1",
-  "2027-02-16": "cd851bd81f01b1bff556a22c6f4587a682fd36b51fe71c024327db7f3b34f757",
-  "2027-02-18": "7fbfe50f5bf49cdfb1215de16542e8fcd2a824433e3a7ce919a3c4dfa85c730d",
-  "2027-02-19": "64ec3f006532d57f6fe367d918edda7bbcc88a5daa8840b095419aec8e59b8ce",
-  "2027-02-22": "d9f7e4848c51209661de833ddc3eeabd9e7410efae3808f9598ace6295e2865c",
-  "2027-02-23": "8f5c5863131a5c055470eed6911c6d3a887f4616ebbd167f8bbc7152fb230221",
-  "2027-02-25": "5b1e112a3116eb4893526552982e93aae54eb532ad0bcd3a472e37b1108f704a",
-  "2027-02-26": "19550966527a682fff8d1c38b67911a3c287d0437c4f71d188d008ddb9c5f668",
-  "2027-03-01": "bab011b1ee1266f3895d7548cb54d9f55e93158d1ba3db7196bf051ccb360a5b",
-  "2027-03-02": "0435d895f4c8d7218c8c685ebf6e38403cebdf6cd231544894062baf7ccc5d04",
-  "2027-03-04": "e975282f5c81e54cf3da3473b06098db51975b589e76a1cb0479073070e3e6b3",
-  "2027-03-05": "7fec7fae315c85ea9cba5c28f9feb392b90083a59d1c52419a1ae3cb76813b98",
-  "2027-03-08": "d205eefca98ec03b9f558049ee1e35cc6ec094be666861ac5eae5ce3a1a278ec",
-  "2027-03-09": "5adbe9929f0e9e531484bd1ee17f15ebd2b7ab72aed526a9075eeea38513ea45",
-  "2027-03-11": "846d8ed3483f556c75fe5287534400a50c6143d04c2c7f7b3f14e54f05789c2f",
-  "2027-03-12": "1ac57ce60b28d912a21e6bd833a49a1b1eab35adbaa4e0612ce758c5617d4480",
-  "2027-03-15": "14beaa09f1aa326f88cf5a1ba6abd2cc60386680da72aaad5b559a973a329522",
-  "2027-03-16": "7abeb0cc3d1ca5be5313f8ecb9aa964f9f0844c9d3fe6327c07bd598212b993a",
-  "2027-03-18": "fb641d1bc951421fe0890ff8287be498406fa3a0c24ef61d0f47be3b7488af67",
-  "2027-03-19": "9913aa699e2dedf3b379fb9724acba4854e1e31fcc8b7c7fd08760d69339a1ed",
-  "2027-03-25": "45118fe59d4d725e41e3e6edbc9ea52743ec19359bfabdee1cec618bd12975d1",
-  "2027-04-01": "144ba24f4f48698aedcade106f2d85d57f45623100e8d6c0c2c7dbe8b62aa85d",
-  "2027-04-02": "0dfebc55c0e0ae403e184df9960b100471b846095271bb3e621226b700b167c4",
-  "2027-04-05": "1a00952fe00bb20bba637924b035fafac7658a544616c91c28f1080430bf062c",
-  "2027-04-06": "73022cf13647f034ad50a9e6e5dafe6784ac592000eb7a3a61e7053071136e1d",
-  "2027-04-08": "44da1e1103049721a14333542e5dd025348bf0a11b7f9382a05e47862d837e3e",
-  "2027-04-09": "32496833c0f8ed3246c08ddc97f5aa9156ca1ede8cc83cf4702fb1e3425dd759",
-  "2027-04-12": "72e725cad72d96aba0721b862f728371bcbe1bdcf95a363d822cc57a866e96d9",
-  "2027-04-13": "759b18971e32801c797507d285059b7711b98f4dd5d4adb278e13a874bf1fba9",
-  "2027-04-15": "2b1cf6d95eaabeee853ad2bf4cb521251c153f7f25954506fc651bbbfcc9ff34",
-  "2027-04-16": "36fc04f4131172266073b07fc4720cfbff43c41ed3179f9e9d8713b13fc7a6cf",
-  "2027-04-19": "60d378c5697d2aa8e7544000967fa6f03f34b0b8a0f148c771c032514dada1f9",
-  "2027-04-20": "1fa167b9a8546a817f40a9b874231b36c3b0d2a85c948e552e19463e2e350ce7",
-  "2027-04-22": "e7368e8807bc1e41e8fcf82073112465c8256a69ed883d7edb165ad141dec66d",
-  "2027-04-23": "4a3048897bddda220dabe62fb12f07de1bf8585531c1b139f93c00ca92fd25da",
-  "2027-04-26": "4c71954c235326ab7f995a09cbb627cb8bbff092f4d0761d0a9e313500124614",
-  "2027-04-27": "d6fff1af30b4a01a335bbbd2ced0eeb11040ab3cdf707c8f9dae7707490c48fe",
-  "2027-04-29": "1306145baf49981b9a4e0b93a837730df0202ad27f6b1b2483a7e8e781659293",
-  "2027-05-03": "725ae8eb3105da9c3ed62cd3686cb6bd1e53155eadaf08a31838ccaa1ec03fd6",
-  "2027-05-04": "ea08dea70c0e86cfce8fa6d2837b1f7deeb0c6cea065b391526212b53e153300",
-  "2027-05-06": "09136ddab023bd1867ae1560467e3353fa160e46396e6c3b3fd1e1f391d39fca",
-  "2027-05-07": "f7e0c673ff3db0b7b04df80ce031402958b95e50825fe506546fd2fe3dc40685",
-  "2027-05-10": "bbc83242be3a98d6d335b3956049b7cc31390f949a8c01d42e90f4ddaa95914b",
-  "2027-05-11": "f4967b0199d0006a00a12b74b7b4482ed341ba3830ea376d077d688004f78775",
-  "2027-05-13": "462ef78c070e993391b8a8328889b9d674688ce4593eb7a00127849f37932534",
-  "2027-05-14": "a055aacb96396fdbce4129f093d53849401483ef7cc4099a8e282fe35a435013",
-  "2027-05-20": "07face1b891c2f0bd4a471e0f8135c7acd3ab528e9f6ef0e6da533484410c07e",
-  "2027-05-27": "adc9e7c1a651d6a0cd4a9be56abb15bdf2db6582440b9b150188fc288edd14b5",
-  "2027-05-31": "617629dfc390d1817c55a6cbba62c6da86cff51cc7f6c661ceaf847a57c3e2c4",
-  "2027-06-01": "3f84e76c5eccceff564f3fb1df3f5f1f50297669360b695f4685119ee6f5b6d3",
-  "2027-06-03": "d351c8e2d7ecf4063b5563b8fa910dcc6a40d1d4aaee32b4f888350064625a99",
-  "2027-06-04": "487fc4627bd205ef500fbe75312af4304d903af95c0454f1570f674e6905aaaa",
-  "2027-06-07": "f19cb5d9200521d3b9bfb2178b6632c6244f20cce254925d4d60aa193cbc678f",
-  "2027-06-08": "b5e17ec416413206dde3651ee1a48499d3e88432a0c983dce8789952dc9579a9",
-  "2027-06-10": "ba0d8086ed8e598a3d096695d98a64a92be849b220cdd84669845eb5fddceaf2",
-  "2027-06-11": "3957e2c4d7c7b0dc3911daeca3af9d06968a56f97c572c8361c01f75657f32c6",
-  "2027-06-14": "83971ad84796706e64df78df0454e89aa66dc72d1e03f27b2b8bdf796d9208dd",
-  "2027-06-15": "e763ec85d2be228650707482a728e37dca95160abbc5858b5d91ab91c8bcf1e3",
-  "2027-06-17": "b0fcc07c575da59afdc4f07b3872db18121977f531639fbf21a79b1299b172bd",
-  "2027-06-18": "2d2ca614d04119a321ea7bb3205ecbafe1bc93fefcb963e74dccfa6f4f9dec38",
-  "2027-06-21": "1f293c9d19fd33263b9f74cf8c35709d5c18a8517be46ac2969ec3a20ee6d0cd",
-  "2027-06-22": "b01a90e9dfa60768a9d58f432cb6f1d64278f53a31c869d65916caa3b4f4fad7",
-  "2027-06-24": "216a6c891880129bd6c86f34307025fa3c4ab3220ade3419759d8696c948e149",
-  "2027-06-25": "77661012ef83b88d8e7e4f4d96ea03d542c4dcb7e9c1ab425eece6c8e833df42",
-  "2027-06-28": "a1ca04f8b063a923a662a32f7966681376d81e39dbf899380526fdfe052bdde3",
-  "2027-06-29": "0d331d62b43b9cc5218b95be2581f08f0c3a11c949ddf1d75c364438896b2d5f",
-  "2027-07-01": "7b14b00c0010c454c41d5e9943294841c44d7d32d53ad80831d85fefb9bd1cb3",
-  "2027-07-08": "1789c7e0054115af74f5cec563f960872fd1de2289fa389c7598555f6ab8b425",
-  "2027-07-12": "9d4d71c1ec0cc4bed66a56e1d974e2baf7e8dd87a953f58c8b6e226ad8415f61",
-  "2027-07-15": "d9cac6d236adea4cd7f4b9da0733223b756478d17f7df83167069e2b684e1e2b",
-  "2027-07-16": "cfca8bc616a5d7f917ecaecdcbad9d48841a1ca827692c52dfb094da7c342327",
-  "2027-07-22": "cbf9abf60931b515296369ecb7e89280bb5e771dd6b46ad03306415cc3aea071",
-  "2027-07-26": "81af545543b2f579407177dab0cc98a13a85d6d4050ca61b70934399420aced8",
-  "2027-07-29": "c79f9abb734fd03af1f8488edb20b7cf86098575ea89e4b9946ed94e414b9f39",
-  "2027-08-05": "bb344826cac12828d8b5cce26549bee1313f6a855575d3282528b6d886195040",
-  "2027-08-12": "295f177b961168ad9c9ec5f14727065fd2d4f1b79b6d3617fc825c3c8686ec57",
-  "2027-08-19": "65b0cacc5ce7b5aadf682cff54ed9ec63fb1b57f73216e42ecebaef5dfe4ddbb",
-  "2027-08-26": "318901e487750834fba9497255e510233b9ca30d4d4d258cc7648046917288e1",
-  "2027-09-02": "09aa0eb8743647264bf5161330ac46c1a59c445a7e6c57514d2a0dd5ad3f49a7",
-  "2027-09-09": "8e9312f18313408ac8a112ee43ea1a9ffc491d5e469ca2769b46e8d41069373a"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": [
-  "evtermine",
-  "frankenkids"
- ]
+ }
 }

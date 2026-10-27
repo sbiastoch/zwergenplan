@@ -1,85 +1,94 @@
 {
- "events": [
-  {
-   "providerId": "ev-buchenbuehl-miniclub",
-   "venueId": "ev-buchenbuehl-miniclub",
-   "title": "Miniclub Himmelfahrtskirche (Mittwoch 15–16:30 Uhr)",
-   "summary": "Miniclub im Gemeindesaal der Himmelfahrtskirche Buchenbühl: Sinne, Motorik und soziales Miteinander schon im Krabbelalter fördern. Die Termine sind bis Ende Dezember 2026 eingetragen; Anmeldung und Kosten bitte bei der Gemeinde erfragen.",
-   "topics": [
-    "spielgruppe",
-    "krabbelgruppe"
+ "version": 2,
+ "units": {
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "ev-buchenbuehl-miniclub",
+     "venueId": "ev-buchenbuehl-miniclub",
+     "title": "Miniclub Himmelfahrtskirche Buchenbühl (mittwochs)",
+     "summary": "Wöchentliche Eltern-Kind-Gruppe für Kinder im Krabbelalter im Gemeindesaal. Es geht um Sinneserfahrungen, Bewegung und das erste Spielen mit anderen Kindern.",
+     "topics": [
+      "krabbelgruppe",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8231117",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8231117",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Infos bei der Kirchengemeinde Buchenbühl (kirche-buchenbuehl.de)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-28T15:00",
+        "end": "2026-10-28T16:30"
+       },
+       {
+        "start": "2026-11-04T15:00",
+        "end": "2026-11-04T16:30"
+       },
+       {
+        "start": "2026-11-11T15:00",
+        "end": "2026-11-11T16:30"
+       },
+       {
+        "start": "2026-11-18T15:00",
+        "end": "2026-11-18T16:30"
+       },
+       {
+        "start": "2026-11-25T15:00",
+        "end": "2026-11-25T16:30"
+       },
+       {
+        "start": "2026-12-02T15:00",
+        "end": "2026-12-02T16:30"
+       },
+       {
+        "start": "2026-12-09T15:00",
+        "end": "2026-12-09T16:30"
+       },
+       {
+        "start": "2026-12-16T15:00",
+        "end": "2026-12-16T16:30"
+       },
+       {
+        "start": "2026-12-23T15:00",
+        "end": "2026-12-23T16:30"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8231117",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8231117",
-   "category": "krabbel-spielgruppen",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung im Eintrag; Anfrage über die Kirchengemeinde Buchenbühl"
+   "inputHash": "7b327329555eece1af756fe5ef68fea20d22e8fb445f1b69c13dbdc7bc6c009c",
+   "dated": {
+    "2026-10-28": "7386bfd9914f191d4161dcfc2c9795f2b85827610a4b293e96e380194a0a59f6",
+    "2026-11-04": "60a357e6baecf009988859c25890a084bcc93794dec04b4801a4315af0ff6088",
+    "2026-11-11": "d69e7d7f5e40eef29f409556caa7bbdc0c7b5d9718db2c5dd7280a42506ac5ef",
+    "2026-11-18": "548a7fe530299b4c229bd1fa8f53e6538198a3de391d6ed25457a1ac73842569",
+    "2026-11-25": "c27ea7d611007d3b62f1b7fbdb9a89afadf0994ee55801e4fb49ec7e3c5f943d",
+    "2026-12-02": "140567e3df524b049d268565df96e30177e3e0fe6a0e42d1ef39fb7ddae9944b",
+    "2026-12-09": "5e97a740908ed52488592cb28ae8c4a9e00ddf0fdcc67fbcba8db3029588f1c2",
+    "2026-12-16": "96eab833b3c3cb9d557dbaa9327996f124ae6b67864bf6e9c4a02d1eebe07147",
+    "2026-12-23": "de8c80c57559566e24c766694f457c550630977f985a4aa63ab6f7cb1b41c183"
    },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-28T15:00",
-      "end": "2026-10-28T16:30"
-     },
-     {
-      "start": "2026-11-04T15:00",
-      "end": "2026-11-04T16:30"
-     },
-     {
-      "start": "2026-11-11T15:00",
-      "end": "2026-11-11T16:30"
-     },
-     {
-      "start": "2026-11-18T15:00",
-      "end": "2026-11-18T16:30"
-     },
-     {
-      "start": "2026-11-25T15:00",
-      "end": "2026-11-25T16:30"
-     },
-     {
-      "start": "2026-12-02T15:00",
-      "end": "2026-12-02T16:30"
-     },
-     {
-      "start": "2026-12-09T15:00",
-      "end": "2026-12-09T16:30"
-     },
-     {
-      "start": "2026-12-16T15:00",
-      "end": "2026-12-16T16:30"
-     },
-     {
-      "start": "2026-12-23T15:00",
-      "end": "2026-12-23T16:30"
-     }
-    ]
-   },
-   "via": "evtermine"
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "evtermine"
+   ]
   }
- ],
- "inputHash": "a5b1248e1dc96221eaf9f6811b5f1879c906736c48aa9c9681ce01de6d84243c",
- "dated": {
-  "2026-10-28": "7386bfd9914f191d4161dcfc2c9795f2b85827610a4b293e96e380194a0a59f6",
-  "2026-11-04": "60a357e6baecf009988859c25890a084bcc93794dec04b4801a4315af0ff6088",
-  "2026-11-11": "d69e7d7f5e40eef29f409556caa7bbdc0c7b5d9718db2c5dd7280a42506ac5ef",
-  "2026-11-18": "548a7fe530299b4c229bd1fa8f53e6538198a3de391d6ed25457a1ac73842569",
-  "2026-11-25": "c27ea7d611007d3b62f1b7fbdb9a89afadf0994ee55801e4fb49ec7e3c5f943d",
-  "2026-12-02": "140567e3df524b049d268565df96e30177e3e0fe6a0e42d1ef39fb7ddae9944b",
-  "2026-12-09": "5e97a740908ed52488592cb28ae8c4a9e00ddf0fdcc67fbcba8db3029588f1c2",
-  "2026-12-16": "96eab833b3c3cb9d557dbaa9327996f124ae6b67864bf6e9c4a02d1eebe07147",
-  "2026-12-23": "de8c80c57559566e24c766694f457c550630977f985a4aa63ab6f7cb1b41c183"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
- "sources": [
-  "evtermine"
- ]
+ }
 }

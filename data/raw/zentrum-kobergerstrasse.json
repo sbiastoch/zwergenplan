@@ -1,166 +1,270 @@
 {
- "events": [
-  {
-   "providerId": "zentrum-kobergerstrasse",
-   "venueId": "zentrum-kobergerstrasse",
-   "title": "Koberger Minis: offener Treff für Eltern mit Babys (1–6 Monate)",
-   "summary": "Offener Treff ohne Anmeldung, donnerstags 10:30–11:45 Uhr, außer in den Schulferien. Eltern tauschen sich aus, die Babys knüpfen erste Kontakte zu Gleichaltrigen. Einstieg jederzeit möglich.",
-   "topics": [
-    "elterntreff",
-    "elterncafe"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
-   "sourceUrl": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
-   "category": "treffs-cafes",
-   "age": {
-    "minMonths": 1,
-    "maxMonths": 6
-   },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff, keine Anmeldung nötig"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "10:30",
-    "end": "11:45",
-    "from": "2026-10-15",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "zentrum-kobergerstrasse",
-   "venueId": "zentrum-kobergerstrasse",
-   "title": "Koberger Midis: offenes Elterncafé für Babys (6–12 Monate)",
-   "summary": "Offenes Café ohne Anmeldung, dienstags 15:00–16:15 Uhr im Souterrain, außer in den Schulferien. Eltern können bei Tee oder Kaffee Erfahrungen austauschen, die Babys entdecken Spielzeug und Krabbelelemente.",
-   "topics": [
-    "elterncafe",
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
-   "sourceUrl": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
-   "category": "treffs-cafes",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offenes Café, keine Anmeldung nötig"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "15:00",
-    "end": "16:15",
-    "from": "2026-10-13",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "zentrum-kobergerstrasse",
-   "venueId": "zentrum-kobergerstrasse",
-   "title": "Koberger Maxis: offenes Café für Kleinkinder (12–24 Monate)",
-   "summary": "Offenes Café ohne Anmeldung, mittwochs 15:00–16:15 Uhr, außer in den Schulferien. Die Kinder toben und klettern im Souterrain, Eltern haben Zeit für Austausch und Fragen.",
-   "topics": [
-    "elterncafe",
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
-   "sourceUrl": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
-   "category": "treffs-cafes",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 24
-   },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offenes Café, keine Anmeldung nötig"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "15:00",
-    "end": "16:15",
-    "from": "2026-10-14",
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "zentrum-kobergerstrasse",
-   "venueId": "zentrum-kobergerstrasse",
-   "title": "Vätergruppe für Väter mit Kindern unter 18 Monaten",
-   "summary": "Selbstorganisierter Treff für Väter mit ihren Kleinen, ohne Anmeldung einfach vorbeikommen. Meist im Bewegungsraum, im Sommer auch auf einem Spielplatz. Kontakt: vaetertreff-nuernberg@posteo.de.",
-   "topics": [
-    "vaeter",
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/",
-   "sourceUrl": "https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/",
-   "category": "treffs-cafes",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 17
-   },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung erforderlich"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-14T13:00"
+ "version": 2,
+ "units": {
+  "seite:https://www.zentrum-koberger.de/koberger-minis-midis-maxis/": {
+   "events": [
+    {
+     "providerId": "zentrum-kobergerstrasse",
+     "venueId": "zentrum-kobergerstrasse",
+     "title": "Koberger Minis – Offener Treff für Eltern mit Babys (1–6 Monate), donnerstags",
+     "summary": "Offener Treff für frischgebackene Eltern mit Babys: andere Familien kennenlernen, Erfahrungen austauschen und Fragen an die Fachkräfte stellen. Ohne Anmeldung, nicht in den Schulferien.",
+     "topics": [
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
+     "sourceUrl": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 6
      },
-     {
-      "start": "2026-10-28T13:00"
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offener Treff, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "10:30",
+      "end": "11:45",
+      "from": "2026-10-29",
+      "skipHolidays": true
      }
-    ]
-   }
+    },
+    {
+     "providerId": "zentrum-kobergerstrasse",
+     "venueId": "zentrum-kobergerstrasse",
+     "title": "Koberger Midis – Offenes Café für Eltern mit Babys (6–12 Monate), dienstags",
+     "summary": "Offenes Café im Souterrain der Beratungsstelle: Die Babys erkunden Spielzeug, Krabbelelemente und Kletterlandschaft, die Eltern tauschen sich bei Kaffee oder Tee aus. Ohne Anmeldung, nicht in den Schulferien.",
+     "topics": [
+      "elterncafe",
+      "krabbelgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
+     "sourceUrl": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offenes Café, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "15:00",
+      "end": "16:15",
+      "from": "2026-10-27",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "zentrum-kobergerstrasse",
+     "venueId": "zentrum-kobergerstrasse",
+     "title": "Koberger Maxis – Offenes Café für Eltern mit Kleinkindern (12–24 Monate), mittwochs",
+     "summary": "Offenes Café für Eltern mit Kleinkindern: Die Kinder toben und klettern im Souterrain, die Eltern entspannen bei Kaffee oder Tee und können Fragen besprechen. Ohne Anmeldung, nicht in den Schulferien.",
+     "topics": [
+      "elterncafe",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
+     "sourceUrl": "https://www.zentrum-koberger.de/koberger-minis-midis-maxis/",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 24
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offenes Café, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "15:00",
+      "end": "16:15",
+      "from": "2026-10-28",
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "6a17fe76ea2e048a74c57cbe829d5c55b6d27d05733514df4531b44542b65f3d",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/": {
+   "events": [
+    {
+     "providerId": "zentrum-kobergerstrasse",
+     "venueId": "zentrum-kobergerstrasse",
+     "title": "Vätergruppe für Väter mit Kindern unter 18 Monaten",
+     "summary": "Selbstorganisierter Treff, bei dem frischgebackene Väter sich austauschen und Kontakte knüpfen, während die Kleinen spielen. Meist im Bewegungsraum, im Sommer evtl. auf einem Spielplatz in der Nähe. Ohne Anmeldung, einfach vorbeikommen.",
+     "topics": [
+      "elterntreff",
+      "vaeter"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/",
+     "sourceUrl": "https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Keine Anmeldung nötig; Fragen an vaetertreff-nuernberg@posteo.de"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-09-16T13:00"
+       },
+       {
+        "start": "2026-09-30T13:00"
+       },
+       {
+        "start": "2026-10-14T13:00"
+       },
+       {
+        "start": "2026-10-28T13:00"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "5089298df7c3848a74443b637a8ed12d2d831f17a8a1283ae0e030b61baaaed0",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.zentrum-koberger.de/koberger-themenabende/workshops/": {
+   "events": [],
+   "inputHash": "b654dc0f0f7882ed15bcd8aba1f981671a0e2543d38e4d654c37bb60c97e9a43",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "zentrum-kobergerstrasse",
+     "venueId": "zentrum-kobergerstrasse",
+     "title": "Koberger Minis – offener Eltern-Treff mit Babys (1–6 Monate), donnerstags",
+     "summary": "Offener Treff für frischgebackene Eltern mit Babys von 1 bis 6 Monaten: andere Familien kennenlernen, Erfahrungen austauschen, Fachkräfte beantworten Fragen. Ohne Anmeldung, nicht in den Schulferien.",
+     "topics": [
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.frankenkids.de/veranstaltungen/koberger-minis-offener-eltern-treff-mit-babys-1-6-mon/2026-10-01/",
+     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/koberger-minis-offener-eltern-treff-mit-babys-1-6-mon/2026-10-01/",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 6
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Einfach vorbeikommen, keine Anmeldung nötig"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "10:30",
+      "end": "11:45",
+      "from": "2026-10-29",
+      "skipHolidays": true
+     },
+     "via": "frankenkids"
+    },
+    {
+     "providerId": "zentrum-kobergerstrasse",
+     "venueId": "zentrum-kobergerstrasse",
+     "title": "Koberger Midis – Elterncafé mit Babys (6–12 Monate), dienstags",
+     "summary": "Elterncafé für Familien mit Babys von 6 bis 12 Monaten: Austausch unter Eltern, während die Kinder an altersgerechten Spielangeboten Neues entdecken. Ohne Anmeldung, nicht in den Schulferien.",
+     "topics": [
+      "elterncafe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.frankenkids.de/veranstaltungen/koberger-midis-elterncafe-mit-babys-6-12-mon-3/2026-10-06/",
+     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/koberger-midis-elterncafe-mit-babys-6-12-mon-3/2026-10-06/",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Einfach vorbeikommen, keine Anmeldung nötig"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "15:00",
+      "end": "16:15",
+      "from": "2026-10-27",
+      "skipHolidays": true
+     },
+     "via": "frankenkids"
+    }
+   ],
+   "inputHash": "10c351370ec34d2333533711dad559a66694545ba6d8664626e2805b00f7926e",
+   "dated": {
+    "2026-10-27": "a20afa503c160e27ca9223472ddf9a30d878c8cacce63a0ae023899bcb7b2697",
+    "2026-10-29": "f2ed2c27ec7db11123009f903ee7fa06247cb4d8dc8846c30993a62ed7316416",
+    "2026-11-10": "2979ffc0ae864b87b21e2fe193a7a4420a172b2e34fe1a8a6c533a7466c361b1",
+    "2026-11-12": "655ae28fc58787df6137e415dc30d42969c2b99727c6d36b3cec6c98d1ba0e2e",
+    "2026-11-17": "197fa6b26edb862fa291fc29c59c8f7b43e324a21a9f6af799f4b9f4924e291d",
+    "2026-11-19": "f2384178665c8a5fab6a7386e066294fd73808e3668d89c5cf0ab960924b9032",
+    "2026-11-24": "a5784b63c793c9dd448ad3da9e55d6c6847ec71fb6b90ad04e5c55d4f03f42ba",
+    "2026-11-26": "8d40e9c11c374defd0c00d4f9b2cba61b558ce451a955e6eb0e93d5143472c04",
+    "2026-12-01": "a720459157223de7a7b583b7b10da4728eb6ca8e8365bba2181545fca0fcc565",
+    "2026-12-03": "eccc174fa08c92163bc31f4adbf379d2b4080dd246df38f7264486456914e0c3",
+    "2026-12-08": "2c17d530fc8777e76a1e9e41d28b183aacb12b9c613725500b14dbfa41a6326f",
+    "2026-12-10": "6811bf53bd8f5068f6afe69fc6d214a8e7ecb2d3926af9b9d9934c59360e9bf6",
+    "2026-12-15": "6215be6465c957b6c3261666e4e9a773d3e6c39c3982dcea54a31fc7d6b042ee",
+    "2026-12-17": "13307c0e9d02be585d869f719e49192505a9b4eff369889ecb89174a4bb5cd17",
+    "2026-12-22": "9d39411047e384536f68351ff40dc8eab0e8f4dd24f49d4d360994b25859c5b6"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "frankenkids"
+   ]
   }
- ],
- "inputHash": "0f17f8dba18826af0800c201df24f3b283dfa87d4a7bfbdd4de229062bfa764d",
- "dated": {
-  "2026-10-27": "a20afa503c160e27ca9223472ddf9a30d878c8cacce63a0ae023899bcb7b2697",
-  "2026-10-29": "f2ed2c27ec7db11123009f903ee7fa06247cb4d8dc8846c30993a62ed7316416",
-  "2026-11-10": "2979ffc0ae864b87b21e2fe193a7a4420a172b2e34fe1a8a6c533a7466c361b1",
-  "2026-11-12": "655ae28fc58787df6137e415dc30d42969c2b99727c6d36b3cec6c98d1ba0e2e",
-  "2026-11-17": "197fa6b26edb862fa291fc29c59c8f7b43e324a21a9f6af799f4b9f4924e291d",
-  "2026-11-19": "f2384178665c8a5fab6a7386e066294fd73808e3668d89c5cf0ab960924b9032",
-  "2026-11-24": "a5784b63c793c9dd448ad3da9e55d6c6847ec71fb6b90ad04e5c55d4f03f42ba",
-  "2026-11-26": "8d40e9c11c374defd0c00d4f9b2cba61b558ce451a955e6eb0e93d5143472c04",
-  "2026-12-01": "a720459157223de7a7b583b7b10da4728eb6ca8e8365bba2181545fca0fcc565",
-  "2026-12-03": "eccc174fa08c92163bc31f4adbf379d2b4080dd246df38f7264486456914e0c3",
-  "2026-12-08": "2c17d530fc8777e76a1e9e41d28b183aacb12b9c613725500b14dbfa41a6326f",
-  "2026-12-10": "6811bf53bd8f5068f6afe69fc6d214a8e7ecb2d3926af9b9d9934c59360e9bf6",
-  "2026-12-15": "6215be6465c957b6c3261666e4e9a773d3e6c39c3982dcea54a31fc7d6b042ee",
-  "2026-12-17": "13307c0e9d02be585d869f719e49192505a9b4eff369889ecb89174a4bb5cd17",
-  "2026-12-22": "9d39411047e384536f68351ff40dc8eab0e8f4dd24f49d4d360994b25859c5b6"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
- "sources": [
-  "frankenkids"
- ]
+ }
 }

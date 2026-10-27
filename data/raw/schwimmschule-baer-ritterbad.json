@@ -1,39 +1,43 @@
 {
- "events": [
-  {
-   "providerId": "schwimmschule-baer-ritterbad",
-   "venueId": "schwimmschule-baer-ritterbad",
-   "title": "Babyschwimmen im Ritterbad (montags 11:10)",
-   "summary": "Babyschwimmen im Ritterbad, montags 11:10 bis 11:40 Uhr. Anmeldung nur per Anfrage über das Kontaktformular; laut Website gibt es lange Wartelisten und keine Platzanzeige.",
-   "topics": [
-    "babyschwimmen"
+ "version": 2,
+ "units": {
+  "seite:https://www.schwimmschule-baer.de/kurse/kurszeiten/kurssuche": {
+   "events": [
+    {
+     "providerId": "schwimmschule-baer-ritterbad",
+     "venueId": "schwimmschule-baer-ritterbad",
+     "title": "Babyschwimmen im Ritterbad (montags 11:10 Uhr)",
+     "summary": "Eltern gehen mit ihrem Baby zusammen ins Wasser und gewöhnen es spielerisch daran. Kursleitung: Julia Makarevich. Wann man einsteigen kann, erfährt man auf Anfrage; der Anbieter bittet, nur einmal anzufragen.",
+     "topics": [
+      "babyschwimmen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.schwimmschule-baer.de/kurse/kurszeiten/kurssuche",
+     "sourceUrl": "https://www.schwimmschule-baer.de/kurse/kurszeiten/kurssuche",
+     "category": "wasser",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anfrage über das Formular hinter dem Button „Anfragen“; die Website zeigt keine freien Plätze an und meldet sehr viele Anfragen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "11:10",
+      "end": "11:40",
+      "from": "2026-11-02",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.schwimmschule-baer.de/kurse/kurszeiten/kurssuche",
-   "sourceUrl": "https://www.schwimmschule-baer.de/kurse/kurszeiten/kurssuche",
-   "category": "wasser",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Nur Anfrage über den Anfragen-Button (Kontaktformular), keine Platzangabe"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "11:10",
-    "end": "11:40",
-    "from": "2026-11-02",
-    "skipHolidays": true
-   }
+   "inputHash": "40a68d1d0ca3000cf6c3360a1761e05aee54823946d4aff6e9be001904bb4a0b",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "d7cd9c6262079fff735fe72688e1e0229511b0d591ba82309d2d8c9076516200",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": []
+ }
 }

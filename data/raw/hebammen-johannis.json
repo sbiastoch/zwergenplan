@@ -1,9 +1,53 @@
 {
- "events": [],
- "inputHash": "da38015efaa25343cee0c2c09146777658a12501c58735a63a75a746520d43cb",
- "model": "haiku",
- "status": "keine-termine",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
- "sources": []
+ "version": 2,
+ "units": {
+  "seite:https://www.hebammen-johannis.de/kurse": {
+   "events": [
+    {
+     "providerId": "hebammen-johannis",
+     "venueId": "hebammen-johannis",
+     "title": "Tanzen für Mama & Baby (dienstags vormittags)",
+     "summary": "Tanzkurs mit beckenbodenaktivierenden Choreografien, das Baby ist dabei in der Trage; Papas willkommen. Voraussetzung: gynäkologisches OK (frühestens 6 Wochen nach Geburt) und eigene Tragehilfe. Einstieg auf Anfrage.",
+     "topics": [
+      "tanz",
+      "fitness-mit-baby"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "80 €",
+     "url": "https://www.hebammen-johannis.de/kurse",
+     "sourceUrl": "https://www.hebammen-johannis.de/kurse",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung und aktuelle Termine bei Sophie: Tel. 0176/66693967 oder sophie.kretzer@gmail.com"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "11:15",
+      "end": "12:30",
+      "from": "2026-10-27",
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "beefd26157b2dc826cb34edc59681b7cb0196bbda8ab0b9597cc28c8eeeb97fc",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.wolfpack.yoga": {
+   "events": [],
+   "inputHash": "bc097f7b7c9a9ced53db511915656cdcabe486d3ef127aa999604f1089154682",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  }
+ }
 }

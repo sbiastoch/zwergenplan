@@ -1,61 +1,219 @@
 {
- "events": [
-  {
-   "providerId": "stadtbibliothek-nuernberg",
-   "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
-   "title": "Bücherzwerge (12–36 Monate)",
-   "summary": "Einmal im Monat Fingerspiele, Lieder und Vorlesen für Kinder von 12 bis 36 Monaten mit Begleitperson in der Bibliothek Langwasser. Eintritt frei, Anmeldung erforderlich.",
-   "topics": [
-    "vorlesen",
-    "singen"
-   ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenlos",
-   "price": "Eintritt frei",
-   "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
-   "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
-   "category": "buecher",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung unter 09 11 / 2 31- 41 57 oder stb-langwasser@stadt.nuernberg.de"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-22T10:00",
-      "end": "2026-10-22T11:00"
+ "version": 2,
+ "units": {
+  "seite:https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf": {
+   "events": [
+    {
+     "providerId": "stadtbibliothek-nuernberg",
+     "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
+     "title": "Bücherzwerge – Fingerspiele, Lieder & Geschichten (12–36 Monate)",
+     "summary": "Einmal im Monat erkunden Kleinkinder mit einer Begleitperson die Bibliothek: Es wird gesungen, gereimt und vorgelesen. Dazu gibt es Buchtipps und Zeit zum Austausch. Kostenlos, Anmeldung nötig.",
+     "topics": [
+      "bibliothek",
+      "vorlesen",
+      "singen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "price": "Eintritt frei",
+     "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "category": "buecher",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
      },
-     {
-      "start": "2026-11-19T10:00",
-      "end": "2026-11-19T11:00"
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung unter 0911/231-4157 oder stb-langwasser@stadt.nuernberg.de"
      },
-     {
-      "start": "2026-12-17T10:00",
-      "end": "2026-12-17T11:00"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-19T10:00",
+        "end": "2026-11-19T11:00"
+       },
+       {
+        "start": "2026-12-17T10:00",
+        "end": "2026-12-17T11:00"
+       }
+      ]
      }
-    ]
-   }
+    },
+    {
+     "providerId": "stadtbibliothek-nuernberg",
+     "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
+     "title": "Lesestart: Vorlesen & Mehr für Dreijährige – Langwasser",
+     "summary": "Dreijährige hören zusammen mit ihren Eltern eine Bilderbuchgeschichte. Feste Rituale sorgen dafür, dass sich Kinder, die regelmäßig kommen, schnell zurechtfinden. Kostenlos, Anmeldung nötig.",
+     "topics": [
+      "bibliothek",
+      "vorlesen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "price": "Eintritt frei",
+     "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "category": "buecher",
+     "age": {
+      "minMonths": 36,
+      "maxMonths": 47
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung unter 0911/231-4157 oder stb-langwasser@stadt.nuernberg.de"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-16T15:00",
+        "end": "2026-11-16T15:45"
+       },
+       {
+        "start": "2026-12-14T15:00",
+        "end": "2026-12-14T15:45"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "stadtbibliothek-nuernberg",
+     "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-maxfeld",
+     "title": "Lesestart: Vorlesen & Mehr für Dreijährige – Maxfeld",
+     "summary": "Dreijährige erleben zusammen mit ihren Eltern eine Bilderbuchgeschichte. Wiederkehrende Rituale geben den Kindern Sicherheit. Der Termin ist kostenlos, eine Anmeldung ist nötig.",
+     "topics": [
+      "bibliothek",
+      "vorlesen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "price": "Eintritt frei",
+     "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "category": "buecher",
+     "age": {
+      "minMonths": 36,
+      "maxMonths": 47
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung unter 0911/231-2460 oder stb-maxfeld@stadt.nuernberg.de"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-04T15:00",
+        "end": "2026-11-04T15:45"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "stadtbibliothek-nuernberg",
+     "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-suedstadt-im",
+     "title": "Lesestart: Vorlesen & Mehr für Dreijährige (Südstadt)",
+     "summary": "Monatliche Vorlesestunde in der Stadtbibliothek Südstadt: Dreijährige hören mit ihren Eltern eine altersgerechte Geschichte, umrahmt von wiederkehrenden Ritualen. Eintritt frei.",
+     "topics": [
+      "vorlesen",
+      "bibliothek"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "Eintritt frei",
+     "url": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "sourceUrl": "https://www.nuernberg.de/imperia/md/stadtbibliothek/dokumente/veranstaltungen/bcn_kinder_programm_2026_2.pdf",
+     "category": "buecher",
+     "age": {
+      "minMonths": 36,
+      "maxMonths": 47
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; im Programmheft ist keine Anmeldung genannt. Rückfragen unter 0911/231-14320"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-29T16:00"
+       },
+       {
+        "start": "2026-11-26T16:00"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "a456f743ad677e8ee27cedd710b0792417e84650c7dbaa8fbf823cc8761aed57",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "stadtbibliothek-nuernberg",
+     "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
+     "title": "Bücherzwerge – Fingerspiele, Lieder und Geschichten (12–36 Monate), Langwasser",
+     "summary": "Einmal im Monat entdecken Kleinkinder mit einer Begleitperson die Bibliothek: Es wird gesungen, gereimt und vorgelesen. Eltern bekommen Vorlesetipps und Buchempfehlungen und können sich austauschen. Anmeldung nötig.",
+     "topics": [
+      "bibliothek",
+      "vorlesen",
+      "singen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=438811",
+     "sourceUrl": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=438811",
+     "category": "buecher",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung telefonisch bei der Stadtbibliothek Langwasser, 0911/231-4157"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-19T10:00",
+        "end": "2026-11-19T11:00"
+       },
+       {
+        "start": "2026-12-17T10:00",
+        "end": "2026-12-17T11:00"
+       }
+      ]
+     },
+     "via": "stadt-vk"
+    }
+   ],
+   "inputHash": "1618b229b66ddde66eca61a60bf9387182be850cfda450dd55408056c59565e4",
+   "dated": {
+    "2026-11-13": "220733e49472bc018079d133e42d1df8b54e24d5ea3cda3437823cfa65e22581",
+    "2026-11-19": "e21772940a916b8969f1f258f9a6b325cbb8cd9ceb6e854c863ec7b21ac42107",
+    "2026-11-27": "016af92905712802ddfe0b582cf69616d49f908105a330a645a03ef9bb37b763",
+    "2026-12-11": "a81798179ca7a19d3447f387b34da20fea6df8a25e43436296b9b3c218162ec1",
+    "2026-12-17": "87a47ff89e56c9a3406d5d569cc7c4c570954cc4f3432a4a70e9bec0a2aa967b"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "stadt-vk"
+   ]
   }
- ],
- "inputHash": "16f0fc64e47bc6e649de341e95b8ec4275de0d2e7769ea2bebbe2de20b104781",
- "dated": {
-  "2026-11-13": "220733e49472bc018079d133e42d1df8b54e24d5ea3cda3437823cfa65e22581",
-  "2026-11-19": "e21772940a916b8969f1f258f9a6b325cbb8cd9ceb6e854c863ec7b21ac42107",
-  "2026-11-27": "016af92905712802ddfe0b582cf69616d49f908105a330a645a03ef9bb37b763",
-  "2026-12-11": "a81798179ca7a19d3447f387b34da20fea6df8a25e43436296b9b3c218162ec1",
-  "2026-12-17": "87a47ff89e56c9a3406d5d569cc7c4c570954cc4f3432a4a70e9bec0a2aa967b"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-20T08:26:12+02:00",
- "sources": [
-  "stadt-vk"
- ]
+ }
 }

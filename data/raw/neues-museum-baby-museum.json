@@ -1,98 +1,166 @@
 {
- "events": [
-  {
-   "providerId": "neues-museum-baby-museum",
-   "venueId": "neues-museum-baby-museum",
-   "title": "Baby & Museum: Kunstführung für Erwachsene mit Babys",
-   "summary": "Kurzführung durch die Ausstellung für Erwachsene mit Babys, Thema wechselt monatlich. Pausen zum Füttern und Wickeln sind eingeplant; Kinderwagen und Trage sind erlaubt. Anschließend Kaffee und Austausch.",
-   "topics": [
-    "museum"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "3 € zzgl. Eintritt (für Erwachsene)",
-   "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
-   "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
-   "category": "museum",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 12
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Tickets über den go~mus-Shop des Museums; Restplätze sind dort sichtbar"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-13T10:30",
-      "end": "2026-11-13T11:30"
+ "version": 2,
+ "units": {
+  "seite:https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm": {
+   "events": [
+    {
+     "providerId": "neues-museum-baby-museum",
+     "venueId": "neues-museum-baby-museum",
+     "title": "Baby & Museum – Kurzführung für Eltern mit Babys",
+     "summary": "Erwachsene erkunden mit ihren Babys in einer kurzen Führung das Museum, jeden Monat mit einem anderen Thema. Kinderwagen und Trage sind erlaubt, Pausen zum Füttern und Wickeln sind eingeplant. Danach gibt es Kaffee und Zeit zum Austausch.",
+     "topics": [
+      "museum"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "3 € zzgl. Eintritt (für Erwachsene)",
+     "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
+     "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
+     "category": "museum",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 12
      },
-     {
-      "start": "2026-11-27T10:30",
-      "end": "2026-11-27T11:30"
+     "availability": {
+      "status": "unbekannt",
+      "note": "Tickets je Termin im Online-Shop des Museums (nmn-tickets.de); freie Plätze sind nur dort zu sehen"
      },
-     {
-      "start": "2026-12-04T10:30",
-      "end": "2026-12-04T11:30"
-     },
-     {
-      "start": "2026-12-11T10:30",
-      "end": "2026-12-11T11:30"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-13T10:30",
+        "end": "2026-11-13T11:30"
+       },
+       {
+        "start": "2026-11-27T10:30",
+        "end": "2026-11-27T11:30"
+       },
+       {
+        "start": "2026-12-04T10:30",
+        "end": "2026-12-04T11:30"
+       },
+       {
+        "start": "2026-12-11T10:30",
+        "end": "2026-12-11T11:30"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "88fecd6324cdc7738753479092a54a04679caa8db7ca3212922f724de6c5850a",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "neues-museum-baby-museum",
-   "venueId": "neues-museum-baby-museum",
-   "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-   "summary": "Die Schauspielerin Mara Wengel liest und spielt Geschichten aus einem Kinderbuch im Wonderland-Raum der Ausstellung Double Up!. Gedacht für Kinder ab zwei Jahren mit Begleitung; die Kinder machen aktiv mit.",
-   "topics": [
-    "vorlesen",
-    "museum"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "3 € zzgl. Eintritt (für Erwachsene)",
-   "url": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
-   "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
-   "category": "buecher",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Tickets über den go~mus-Shop des Museums; Restplätze sind dort sichtbar"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-27T14:00"
+  "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
+   "events": [
+    {
+     "providerId": "neues-museum-baby-museum",
+     "venueId": "neues-museum-baby-museum",
+     "title": "Lesestunde für Klein und Groß im Neuen Museum",
+     "summary": "Eine Schauspielerin erzählt mitmachend und spielerisch ein Kinderbuch aus dem Wonderland-Raum der Ausstellung „Double Up!“ – Geschichten rund um Kunst und Design für Kinder ab zwei Jahren mit ihren Familien.",
+     "topics": [
+      "vorlesen",
+      "museum"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "3 € zzgl. Eintritt (für Erwachsene)",
+     "url": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
+     "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
+     "category": "buecher",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Tickets über den Ticket-Button (go~mus-Shop des Museums); Kontingent nur dort sichtbar"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-27T14:00"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "eb772bdc6c99c53e74b577351b67eea6a735388aa6668f334969dccb527e17ec",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "neues-museum-baby-museum",
+     "venueId": "neues-museum-baby-museum",
+     "title": "Baby & Museum – Kunst und Architektur mit Baby erleben",
+     "summary": "Kurzführung für Eltern mit Babys zu Themen, die jeden Monat wechseln. Pausen zum Stillen, Füttern und Wickeln sind eingeplant. Danach gibt es Kaffee und Zeit zum Austausch.",
+     "topics": [
+      "museum"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://nmn-tickets.de/#/product/event/161?date_id=5140",
+     "sourceUrl": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=378173",
+     "category": "museum",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Tickets je Termin im Online-Shop nmn-tickets.de"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-13T10:30",
+        "end": "2026-11-13T11:30"
+       },
+       {
+        "start": "2026-11-27T10:30",
+        "end": "2026-11-27T11:30"
+       },
+       {
+        "start": "2026-12-04T10:30",
+        "end": "2026-12-04T11:30"
+       },
+       {
+        "start": "2026-12-11T10:30",
+        "end": "2026-12-11T11:30"
+       }
+      ]
+     },
+     "via": "stadt-vk"
+    }
+   ],
+   "inputHash": "b639aad23d053b3c5ca5d5009af8196e709708f422b595551b3d3911e6accb9f",
+   "dated": {
+    "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
+    "2026-11-13": "02758077c4f295a349671c42fd4810985342d83bb86afa633e9bac9349a6d8d6",
+    "2026-11-27": "708428860f7ba415fa818653b16b68d576c6c9fe9ec4e0b27ca6a3df1d3b1d32",
+    "2026-12-04": "62b6512fa0520a45636925c6594b2c50ae087c7d2774473d1a8e880447c75567",
+    "2026-12-06": "f3d39363e90d4a4c7db1861e399d25fabb0a01cfafb4f632a797df058955aa59",
+    "2026-12-11": "bc9ef57c48aed5c881d841286842d34974d39e66760030582f78c8b3898298fa"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "stadt-vk"
+   ]
   }
- ],
- "inputHash": "d827e71f31ba318bb07a861f9ce8f0134d9128312f30ca86c3ea86ece39dbcae",
- "dated": {
-  "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
-  "2026-11-13": "02758077c4f295a349671c42fd4810985342d83bb86afa633e9bac9349a6d8d6",
-  "2026-11-27": "708428860f7ba415fa818653b16b68d576c6c9fe9ec4e0b27ca6a3df1d3b1d32",
-  "2026-12-04": "62b6512fa0520a45636925c6594b2c50ae087c7d2774473d1a8e880447c75567",
-  "2026-12-06": "f3d39363e90d4a4c7db1861e399d25fabb0a01cfafb4f632a797df058955aa59",
-  "2026-12-11": "bc9ef57c48aed5c881d841286842d34974d39e66760030582f78c8b3898298fa"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-25T07:38:23+01:00",
- "sources": [
-  "stadt-vk"
- ]
+ }
 }

@@ -1,9 +1,14 @@
 {
- "events": [],
- "inputHash": "fdf795157d71fe0cae6d0553a4f7a7bc7ba00debe75154e7904dd80e6f06cdc2",
- "model": "ohne-eingabe",
- "status": "keine-termine",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
- "sources": []
+ "version": 2,
+ "units": {
+  "kandidaten": {
+   "events": [],
+   "inputHash": "f91979c3f3e3ae7e3e2ed3d0cdcc5c110eefd05441879f5d4e7ad8e307b65957",
+   "model": "ohne-eingabe",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": []
+  }
+ }
 }

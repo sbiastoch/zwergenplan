@@ -1,330 +1,444 @@
 {
- "events": [
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "PEKiP Mi 9:30 – Babys geb. Juli/Aug. 2026 (Okt.–Dez. 2026)",
-   "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, dazu Austausch unter Eltern. Der Kurs läuft seit Oktober; Anmeldung nur per Telefon oder E-Mail.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "126 € (9 Einheiten)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "category": "babykurse",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail; Anmeldeschluss 14 Tage vor Kursbeginn"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "09:30",
-    "end": "11:00",
-    "from": "2026-10-28",
-    "until": "2026-12-16",
-    "skipHolidays": false,
-    "except": [
-     "2026-11-04"
-    ]
-   }
-  },
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "PEKiP Mi 9:30 – Babys geb. Juli/Aug. 2026 (Jan.–März 2027)",
-   "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, dazu Austausch unter Eltern. Anmeldung nur per Telefon oder E-Mail, Anmeldeschluss 14 Tage vor Kursbeginn.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "126 € (9 Einheiten)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "category": "babykurse",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail; Anmeldeschluss 14 Tage vor Kursbeginn"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "09:30",
-    "end": "11:00",
-    "from": "2027-01-20",
-    "until": "2027-03-17",
-    "count": 9,
-    "skipHolidays": false
-   }
-  },
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "PEKiP Do 11:15 – Babys geb. März/Apr. 2026 (Nov. 2026–Feb. 2027)",
-   "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, dazu Austausch unter Eltern. Pausiert in den Weihnachtsferien; Anmeldung per Telefon oder E-Mail.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "140 € (10 Einheiten)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "category": "babykurse",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail; Anmeldeschluss 14 Tage vor Kursbeginn"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "11:15",
-    "end": "12:45",
-    "from": "2026-11-12",
-    "until": "2027-02-04",
-    "count": 10,
-    "skipHolidays": true
-   }
-  },
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "PEKiP Mo 10:00 – Babys geb. Apr./Mai 2026 (Jan.–März 2027)",
-   "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, dazu Austausch unter Eltern. Anmeldung nur per Telefon oder E-Mail, Anmeldeschluss 14 Tage vor Kursbeginn.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "112 € (8 Einheiten)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "category": "babykurse",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail; Anmeldeschluss 14 Tage vor Kursbeginn"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "10:00",
-    "end": "11:30",
-    "from": "2027-01-18",
-    "until": "2027-03-15",
-    "count": 8,
-    "skipHolidays": false
-   }
-  },
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "PEKiP Fr 9:00 – Babys geb. Sep./Okt. 2026 (Jan.–März 2027)",
-   "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, dazu Austausch unter Eltern. Am 12.02.2027 fällt eine Einheit aus; Anmeldung per Telefon oder E-Mail.",
-   "topics": [
-    "pekip"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "126 € (9 Einheiten)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
-   "category": "babykurse",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail; Anmeldeschluss 14 Tage vor Kursbeginn"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "FR"
-    ],
-    "start": "09:00",
-    "end": "10:30",
-    "from": "2027-01-15",
-    "until": "2027-03-19",
-    "skipHolidays": false,
-    "except": [
-     "2027-02-12"
-    ]
-   }
-  },
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "Singen mit dem Baby (4–18 Monate, Mi 11:30)",
-   "summary": "Eltern singen, spielen Fingerspiele und hören gemeinsam Musik mit ihrem Baby, um Bindung und Sprache zu fördern. Anmeldung per Telefon oder E-Mail.",
-   "topics": [
-    "musik",
-    "singen"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "100 € (10 Einheiten)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/experimente-fuer-gross-und-klein.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/experimente-fuer-gross-und-klein.html",
-   "category": "musik",
-   "age": {
-    "minMonths": 4,
-    "maxMonths": 18
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "WE"
-    ],
-    "start": "11:30",
-    "end": "12:15",
-    "from": "2026-11-11",
-    "count": 10,
-    "skipHolidays": false
-   }
-  },
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "Musik Club International: Babyzeichen & Mehrsprachigkeit (6–18 Mon.)",
-   "summary": "Kinderlieder, Fingerspiele und Babyzeichen für Eltern und Babys, die mehrere Sprachen im Alltag verbinden. Zeit für Austausch unter Eltern. Anmeldung per Telefon oder E-Mail.",
-   "topics": [
-    "babysignal",
-    "musik",
-    "mehrsprachig"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "60 € (6 Treffen)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/miniclub-fuer-kinder-von-12-24-monaten.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/miniclub-fuer-kinder-von-12-24-monaten.html",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 6,
-    "maxMonths": 18
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail; Anmeldeschluss 14 Tage vor Kursbeginn"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "13:30",
-    "end": "14:30",
-    "from": "2026-11-10",
-    "count": 6,
-    "skipHolidays": false
-   }
-  },
-  {
-   "providerId": "brk-familienzentrum",
-   "venueId": "brk-familienzentrum",
-   "title": "Auf Entdeckungsreise mit Papa (Väter mit Kind 10–24 Monate)",
-   "summary": "Spielgruppe für Väter mit ihren Kindern: Singspiele, kreative Aktionen, freies Spiel und gemeinsame Brotzeit. Zwei Blöcke à 6 Termine; Anmeldung bis 10 Tage vor Kursbeginn.",
-   "topics": [
-    "spielgruppe",
-    "vaeter"
-   ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "72 € je Block (6 Einheiten)",
-   "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html",
-   "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 10,
-    "maxMonths": 24
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail; bis 10 Tage vor Kursbeginn"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-09-23T16:00",
-      "end": "2026-09-23T17:30"
+ "version": 2,
+ "units": {
+  "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html": {
+   "events": [
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "PEKiP (Babys geb. Juli–Aug. 2026) – mittwochs ab 7.10.2026",
+     "summary": "Prager Eltern-Kind-Programm: Die Babys bewegen sich nackt und frei, die Eltern bekommen Anregungen für die Entwicklung und tauschen sich aus. Der Kurs läuft schon; ob ein Einstieg noch möglich ist, erfährt man im Familienzentrum.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "126 € (9 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 3
      },
-     {
-      "start": "2026-09-30T16:00",
-      "end": "2026-09-30T17:30"
+     "availability": {
+      "status": "unbekannt",
+      "note": "Kurs läuft bereits; Anfrage per Telefon 0911/5301-280 oder E-Mail"
      },
-     {
-      "start": "2026-10-07T16:00",
-      "end": "2026-10-07T17:30"
-     },
-     {
-      "start": "2026-10-14T16:00",
-      "end": "2026-10-14T17:30"
-     },
-     {
-      "start": "2026-10-21T16:00",
-      "end": "2026-10-21T17:30"
-     },
-     {
-      "start": "2026-10-28T16:00",
-      "end": "2026-10-28T17:30"
-     },
-     {
-      "start": "2026-11-11T16:00",
-      "end": "2026-11-11T17:30"
-     },
-     {
-      "start": "2026-11-18T16:00",
-      "end": "2026-11-18T17:30"
-     },
-     {
-      "start": "2026-11-25T16:00",
-      "end": "2026-11-25T17:30"
-     },
-     {
-      "start": "2026-12-02T16:00",
-      "end": "2026-12-02T17:30"
-     },
-     {
-      "start": "2026-12-09T16:00",
-      "end": "2026-12-09T17:30"
-     },
-     {
-      "start": "2026-12-16T16:00",
-      "end": "2026-12-16T17:30"
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2026-10-07",
+      "until": "2026-12-16",
+      "count": 9,
+      "skipHolidays": true,
+      "except": [
+       "2026-11-04"
+      ]
      }
-    ]
-   }
+    },
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "PEKiP (Babys geb. März–April 2026) – donnerstags ab 12.11.2026",
+     "summary": "PEKiP-Gruppe für Babys, die im März oder April 2026 geboren sind: Bewegungs- und Spielanregungen für das nackte Baby und Austausch unter Eltern. In den Weihnachtsferien ist Pause.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "140 € (10 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 8
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail"
+     },
+     "registrationWindow": {
+      "deadline": "2026-10-29T23:59"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "11:15",
+      "end": "12:45",
+      "from": "2026-11-12",
+      "until": "2027-02-04",
+      "count": 10,
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "PEKiP (Babys geb. April–Mai 2026) – montags ab 18.1.2027",
+     "summary": "PEKiP-Kurs für Babys mit Geburtsmonat April oder Mai 2026: Die Babys bewegen sich frei, die Eltern beobachten, bekommen Anregungen und tauschen sich aus. 8 Treffen.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "112 € (8 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 7,
+      "maxMonths": 9
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail"
+     },
+     "registrationWindow": {
+      "deadline": "2027-01-04T23:59"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "10:00",
+      "end": "11:30",
+      "from": "2027-01-18",
+      "until": "2027-03-15",
+      "count": 8,
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "PEKiP (Babys geb. Juli–Aug. 2026) – mittwochs ab 20.1.2027",
+     "summary": "PEKiP-Kurs für Babys mit Geburtsmonat Juli oder August 2026: Spiel- und Bewegungsanregungen für das nackte Baby und Austausch unter Eltern. 9 Treffen.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "126 € (9 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 6
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail"
+     },
+     "registrationWindow": {
+      "deadline": "2027-01-06T23:59"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2027-01-20",
+      "until": "2027-03-17",
+      "count": 9,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "PEKiP (Babys geb. Sept.–Okt. 2026) – freitags ab 15.1.2027",
+     "summary": "PEKiP-Kurs für Babys mit Geburtsmonat September oder Oktober 2026: Die Babys bewegen sich frei, die Eltern bekommen Anregungen und tauschen sich aus. Am 12. Februar fällt der Kurs aus.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "126 € (9 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 2,
+      "maxMonths": 4
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Telefon 0911/5301-280 oder E-Mail"
+     },
+     "registrationWindow": {
+      "deadline": "2027-01-01T23:59"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:00",
+      "end": "10:30",
+      "from": "2027-01-15",
+      "until": "2027-03-19",
+      "count": 9,
+      "skipHolidays": true,
+      "except": [
+       "2027-02-12"
+      ]
+     }
+    }
+   ],
+   "inputHash": "fc2ff170be21a19a559193da1d74aa11d2713f4376c1dfc20f630ee2b932032a",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/experimente-fuer-gross-und-klein.html": {
+   "events": [
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "Singen mit dem Baby (4–18 Monate)",
+     "summary": "Musikkurs für Eltern und Babys mit Schlafliedern, Kniereitern, Fingerspielen, Musikhören und Tanzen. Man muss nicht gut singen können. 10 Treffen mittwochs.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "100 € (10 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/experimente-fuer-gross-und-klein.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/experimente-fuer-gross-und-klein.html",
+     "category": "musik",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Telefon (0911/5301-280) oder E-Mail beim Familienzentrum"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "11:30",
+      "end": "12:15",
+      "from": "2026-11-11",
+      "until": "2027-02-03",
+      "count": 10,
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "c0bdad6dea0898576a0e1a3c7a22d820e2513072ff566068938cdef8aaba8b07",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/miniclub-fuer-kinder-von-12-24-monaten.html": {
+   "events": [
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "Musik Club International – Babyzeichen und Musik (6–18 Monate)",
+     "summary": "Mit mehrsprachigen Kinderliedern, Fingerspielen und einfachen Babyzeichen (an DGS angelehnt) üben Eltern mit ihrem Baby, im Alltag zwischen den Familiensprachen zu wechseln. Dazu bleibt Zeit zum Austausch. Auch Großeltern und Verwandte sind willkommen. 6 Treffen.",
+     "topics": [
+      "babysignal",
+      "musik",
+      "singen",
+      "mehrsprachig"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "60 € (6 Treffen)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/miniclub-fuer-kinder-von-12-24-monaten.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/miniclub-fuer-kinder-von-12-24-monaten.html",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung beim Familienzentrum per Telefon (0911/5301-280) oder E-Mail; Anmeldeschluss 14 Tage vor Kursbeginn"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "13:30",
+      "end": "14:30",
+      "from": "2026-11-10",
+      "until": "2026-12-15",
+      "count": 6,
+      "skipHolidays": false
+     }
+    }
+   ],
+   "inputHash": "a91f4e9b33f96827400df6380edd297a1f86d82202402139c18d1526651d268e",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html": {
+   "events": [
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "Auf Entdeckungsreise mit Papa – Vater-Kind-Gruppe (Mi 23.9.–28.10.2026)",
+     "summary": "Spielgruppe für Väter mit Kindern von 10 bis 24 Monaten: Singspiele, kreative Aktionen, freies Spiel und gemeinsame Brotzeit, dazu Kontakt zu anderen Vätern. Der Kurs läuft schon und hat 6 Treffen.",
+     "topics": [
+      "spielgruppe",
+      "eltern-kind-gruppe",
+      "vaeter"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "72 € (6 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 10,
+      "maxMonths": 24
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige; Anfrage per Telefon 0911/5301-280 oder E-Mail"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "16:00",
+      "end": "17:30",
+      "from": "2026-09-23",
+      "until": "2026-10-28",
+      "count": 6,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "Auf Entdeckungsreise mit Papa – Vater-Kind-Gruppe (Mi 11.11.–16.12.2026)",
+     "summary": "Spielgruppe für Väter mit Kindern von 10 bis 24 Monaten mit Singspielen, kreativen Aktionen, freiem Spiel und gemeinsamer Brotzeit. 6 Treffen; Anmeldung spätestens 10 Tage vor Kursbeginn.",
+     "topics": [
+      "spielgruppe",
+      "eltern-kind-gruppe",
+      "vaeter"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "72 € (6 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 10,
+      "maxMonths": 24
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige; Anmeldung per Telefon 0911/5301-280 oder E-Mail"
+     },
+     "registrationWindow": {
+      "deadline": "2026-11-01T23:59"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "16:00",
+      "end": "17:30",
+      "from": "2026-11-11",
+      "until": "2026-12-16",
+      "count": 6,
+      "skipHolidays": false
+     }
+    }
+   ],
+   "inputHash": "f51440353d0c91c95e9944002618817b0cbd63493ef62b8d16f843b39f24ebf2",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "PEKiP (Babys geb. Juli–August 2026), mittwochs",
+     "summary": "PEKiP-Kurs für Eltern und Babys aus Juli/August 2026: Mutter oder Vater nehmen sich bewusst gemeinsame Zeit mit dem Baby und erleben Spiel und Freude zusammen. Der Kurs läuft seit 7. Oktober wöchentlich bis 16. Dezember.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.frankenkids.de/veranstaltungen/pekip-4/",
+     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/pekip-4/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 5
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Anmeldung telefonisch unter 0911/5301280"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2026-10-07",
+      "until": "2026-12-16",
+      "skipHolidays": true
+     },
+     "via": "frankenkids"
+    }
+   ],
+   "inputHash": "97fe12111087e00870082be1412d46f8fd932983a590c5544b71c8f42027d85c",
+   "dated": {
+    "2026-11-06": "81989aec13b24210571d7a5c037b45fa73573c48533b39ce40646d4bee9eb9a0"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "frankenkids"
+   ]
   }
- ],
- "inputHash": "39e3722b07d5d6ed69f24d8acd08092274375cef6eaef0f822c3574aa2206c87",
- "dated": {
-  "2026-11-06": "81989aec13b24210571d7a5c037b45fa73573c48533b39ce40646d4bee9eb9a0"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": [
-  "frankenkids"
- ]
+ }
 }

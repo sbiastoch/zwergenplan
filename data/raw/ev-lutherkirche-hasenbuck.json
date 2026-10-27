@@ -1,124 +1,203 @@
 {
- "events": [
-  {
-   "providerId": "ev-lutherkirche-hasenbuck",
-   "venueId": "ev-lutherkirche-hasenbuck",
-   "title": "Krabbelgruppe (dienstags 10:30–11:30)",
-   "summary": "Krabbelgruppe im Keller des Pfarramts der Lutherkirche (Zugang vom Garten), dienstags von 10:30 bis 11:30 Uhr. Die Terminliste reicht bis 22.12.2026; einzelne Dienstage fehlen darin.",
-   "topics": [
-    "krabbelgruppe",
-    "eltern-kind-gruppe"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
-   "category": "krabbel-spielgruppen",
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Angabe zu Anmeldung oder Plätzen in der Quelle"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-27T10:30",
-      "end": "2026-10-27T11:30"
+ "version": 2,
+ "units": {
+  "seite:https://www.evangelische-termine.de/ical?vid=571": {
+   "events": [
+    {
+     "providerId": "ev-lutherkirche-hasenbuck",
+     "venueId": "ev-lutherkirche-hasenbuck",
+     "title": "Krabbelgruppe Lutherkirche Hasenbuck (dienstags)",
+     "summary": "Wöchentliches Treffen für Eltern mit Babys und Kleinkindern im Keller des Pfarramts, Zugang über den Garten. Zu Anmeldung und Kosten gibt es keine Angaben.",
+     "topics": [
+      "krabbelgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8146744.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=571",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
      },
-     {
-      "start": "2026-11-10T10:30",
-      "end": "2026-11-10T11:30"
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Angaben; bei Fragen an das Pfarramt Lutherkirche wenden"
      },
-     {
-      "start": "2026-11-17T10:30",
-      "end": "2026-11-17T11:30"
-     },
-     {
-      "start": "2026-11-24T10:30",
-      "end": "2026-11-24T11:30"
-     },
-     {
-      "start": "2026-12-01T10:30",
-      "end": "2026-12-01T11:30"
-     },
-     {
-      "start": "2026-12-08T10:30",
-      "end": "2026-12-08T11:30"
-     },
-     {
-      "start": "2026-12-15T10:30",
-      "end": "2026-12-15T11:30"
-     },
-     {
-      "start": "2026-12-22T10:30",
-      "end": "2026-12-22T11:30"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-27T10:30",
+        "end": "2026-10-27T11:30"
+       },
+       {
+        "start": "2026-11-10T10:30",
+        "end": "2026-11-10T11:30"
+       },
+       {
+        "start": "2026-11-17T10:30",
+        "end": "2026-11-17T11:30"
+       },
+       {
+        "start": "2026-11-24T10:30",
+        "end": "2026-11-24T11:30"
+       },
+       {
+        "start": "2026-12-01T10:30",
+        "end": "2026-12-01T11:30"
+       },
+       {
+        "start": "2026-12-08T10:30",
+        "end": "2026-12-08T11:30"
+       },
+       {
+        "start": "2026-12-15T10:30",
+        "end": "2026-12-15T11:30"
+       },
+       {
+        "start": "2026-12-22T10:30",
+        "end": "2026-12-22T11:30"
+       }
+      ]
      }
-    ]
+    }
+   ],
+   "inputHash": "8d2b2dfa698631e7477f8db8fb52101423b387280fc27439a575334366688c26",
+   "dated": {
+    "2026-10-27": "427f702869f5ebe0bf6de6373152e0aec2a3817fd69c3733e5ffd6ed0991d770",
+    "2026-10-28": "39699eb687e2c65993eef9de3d8cee6ff8fbd032e924f00a31401b5010db9e87",
+    "2026-10-29": "03f3b189a156a161b6e9bfd28f27da13eb612ea17577817af128f8f32e042197",
+    "2026-10-31": "73ef50f4328526974c75553f63dcd073dc9b8d56bb2b75928d697b36d14990b6",
+    "2026-11-01": "3cebde68a269fb15bd44e42fc161a9b2350bff3cb183f92dcb2dfbf3355f7527",
+    "2026-11-08": "c6fd590f449a635df366dee0a3171b72ffa23068c221dbbaf8a303bf7e3ab1f2",
+    "2026-11-09": "b4bd4c04855669a292c89976738289b98e4a9a2c02e93b52f5a528f03b909dcc",
+    "2026-11-10": "ecc745a30b5dd58f67deb32c73f13d24219e0bfc19a6523ae4788fb59d5edcbf",
+    "2026-11-11": "afbe9703fa69a436ebcd4139d3598397a5cb8a068b2b3b283ad0f885d57ee11d",
+    "2026-11-12": "bac796ae5cf211accc195ff8e32ecc92718d573e6d934db9a342a8e06caae325",
+    "2026-11-15": "f4c5d0c78d0697ba254af4e5d06fcd2fab5bf5ba5954daa30d9b7afce4edd2be",
+    "2026-11-17": "835b8e56de910142846051f0e1fe0c1c928b4890dcf41bfc12b5d207fbe4b6d9",
+    "2026-11-18": "0a099445fc380e154542bf39adac3ca34e1c78b28785d61b8c9ebdae64712517",
+    "2026-11-19": "d62811f7a77a91f8a07576210e5b002070c042eff9c73ca3616821f2fcf0cff7",
+    "2026-11-22": "75ec914ca082b2ac37850415faaf9943ec55f4f166f499c0de550bce7453c09f",
+    "2026-11-24": "5b75cf80793fd3bc8a907ac287c322411d6eebd7bead6308063ac9d5709965e2",
+    "2026-11-25": "9bc5227822fdb6434229f24d5658a360712b2690f68df8333f2dbe6184f8f2c0",
+    "2026-11-26": "0e2cd5b12196d67d6d041cedcf60ded7f3b7fa0c926e11e9d17193c4ee8ccc31",
+    "2026-11-29": "aa9385d26e6824afd6adae7f5469e3b5aa3bd18ab265be5a45ade4bddf378be4",
+    "2026-12-01": "43c44ef5ebbeba168c32e9639254945eacc1552f66a1315bf0357d04c84cf8bd",
+    "2026-12-02": "2fcbf3a507200f9684d9650aed2d9384811607c5e29c690a000f4a72b72994a3",
+    "2026-12-03": "f354cd0da988384b888ddc475968a885ffb7feba805c37624e3820a2f65d57fc",
+    "2026-12-04": "ba9ba04ee424f06512f530fe9edf05c75aac556d6fe6d3b29f4786f19f6ecfb3",
+    "2026-12-06": "a07c12b2ac3ca07d6d914507633e866ae37fcb7afe3717601b6843e39da610ee",
+    "2026-12-07": "524529de08ca69edd026210f898fbc1bcbdb4cf97398ee6ed01b0de83efdcd7e",
+    "2026-12-08": "bef6c27a723d7aaf828b5415e8065b841ca9571aaf54a6f2318494384bf4d462",
+    "2026-12-09": "541149c714554ba4bb940a41dbb1232788af3700fb2ab60b883fa2ea27503662",
+    "2026-12-10": "5feab6e3bfc6663b03901b34f49eece09961fad3d6fedc5ebae9696c48cc456e",
+    "2026-12-13": "ffdf6a80826e306c793b6de4f09943eccd448a0d96c796b08a85498533ffdbc8",
+    "2026-12-15": "d522839e87e16f1d0c44288f7bc00e832971f85981ce3ec37a30abe896eaee40",
+    "2026-12-16": "aac5c4e2eaa44ed5b381b4032219994f8d6b780289ffa14321d575a958dab1d8",
+    "2026-12-17": "3f4d3d3a7982da7de5b2ba137b3eeca11e45568ce3bd4465e8c853d1e24d98e1",
+    "2026-12-20": "1781f44bcaaf55af4941242c50aa72847beca883e4e3b8e6f948f768e43a83df",
+    "2026-12-22": "855758b37e28e2af6fc513bab0e0ad672ab78886342edda4117fe0e27c318488",
+    "2026-12-23": "48ee9ab633fc2f33e8b046681d6aa18ff92122eadc70b6dd4db089c704d9b4fe",
+    "2026-12-27": "16865b9cb9d214a29c52484eb3a041f33ce2381a0e445b0198023db20de40ce4",
+    "2027-01-03": "a48d3c15b668f3f777f68d5fbe38181ab2ba79ee28eebd31d170c8166d98b88b",
+    "2027-01-10": "4bbb15457bea5c95f672e81ddaad1bfd4c6cd0d21bc67df23431433b1f2a6cd7",
+    "2027-01-11": "95dae233ed76b17d004b4a320e2bad0e3e4696f9638e0e30cb1ee71e41ccbf9a",
+    "2027-01-17": "cbc1fb1dad065c0689c05c18152c871ca917dada7db4b971c3770ae32d9e1570",
+    "2027-01-24": "d15c3722e8c5b41653eb0b200f5135321af2508302881b8e6afc149c198b6cb6",
+    "2027-01-31": "9b44eb4ad81b2fabb7ed2eeead35d00f91f8c3509c4c2514df53cc9a5e61bdeb",
+    "2027-02-01": "0bb7ea8601be056b02efaad44cc5736cb671041af645862381f2ad41201b5570",
+    "2027-03-01": "2c64e5411398f5a7f87c533ed59b4213d236180d2ac339f4c238705bf306623b",
+    "2027-04-05": "a9dfc5add691e86dadbb774bdd314e1eb5f6842ac940309b9074562256a4d5bf",
+    "2027-05-03": "e342a4f3da8a12c9e882cce8abf1770dbeb999986425634d82a5a68ccf466bb6",
+    "2027-06-07": "94201b926b992050bd248a6ec896abf6f621f5582db95669db7c3829db3c0e07",
+    "2027-07-05": "44a85513be4951722615110a43720ea37702a1be53d732942644f0408885959e",
+    "2027-09-13": "28e89802b4dc099b16a8b55b2b26873a6f590ef09a0ae1017fe0952c49aa548e",
+    "2027-10-04": "204a72c1b825b17c29cae076c4d8745680ef0181642c78bbc09f862e3bc57442",
+    "2027-11-08": "96d7813014b5ffe64d9288c1d61429ee1bc119fc1fb1c544cbe8e155dba3ecb8",
+    "2027-12-06": "76f015f21f3a4f5206e3e4b96718bf8a57169a0f47c73eda5ad58686f394ecef"
    },
-   "via": "evtermine"
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "ev-lutherkirche-hasenbuck",
+     "venueId": "ev-lutherkirche-hasenbuck",
+     "title": "Krabbelgruppe Lutherkirche Hasenbuck (dienstags)",
+     "summary": "Wöchentliches Treffen für Eltern mit Babys und Kleinkindern zum Spielen und Austauschen im Keller des Pfarramts (Zugang vom Garten). Am 3.11. findet kein Treffen statt.",
+     "topics": [
+      "krabbelgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Angaben zu Plätzen; Fragen an das Pfarramt Lutherkirche"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-27T10:30"
+       },
+       {
+        "start": "2026-11-10T10:30"
+       },
+       {
+        "start": "2026-11-17T10:30"
+       },
+       {
+        "start": "2026-11-24T10:30"
+       },
+       {
+        "start": "2026-12-01T10:30"
+       },
+       {
+        "start": "2026-12-08T10:30"
+       },
+       {
+        "start": "2026-12-15T10:30"
+       },
+       {
+        "start": "2026-12-22T10:30"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
+   ],
+   "inputHash": "471616d285dc707715bee02fbaf7e2f1599b833ce7a6fdc92c45d927d591cf9c",
+   "dated": {
+    "2026-10-27": "e85548c65ae321e09dbce9b09f18c2c79d75c696dd2f1bb175251df7670fe9ec",
+    "2026-11-10": "766917cf6d452d11d2c8a094c9baac8acd176a4fa542346385dd5c3d59b5c6d6",
+    "2026-11-17": "4f856bdc41c7821f70cd5c6a7c1a8ef75941f8e7b21b81745a2b58a468b27178",
+    "2026-11-24": "e67172a341bfd894cdb3e79dc807ad099ab759f7f4e1f61ca932ab161e323a21",
+    "2026-12-01": "ed43ea90a5e4090247c210cb21102906b8c7ff1893fbd7a4b6ee17c465a0ca3d",
+    "2026-12-08": "9a99d7bcba012ca53d4973ca201d77d21904b678a7ee29336c0509e8929e5dce",
+    "2026-12-15": "a0fc0703d4713acb4bcc82c9887ee5a8e94b3b5147b2652921f191ec7e7246f7",
+    "2026-12-22": "c1c8e63da605587551ef2b1364fe9cd1f221b28c09e8ce2e0e82281a516653b1"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "evtermine"
+   ]
   }
- ],
- "inputHash": "d2ff03540d8989b892ecf73cdad6311f72c0fb3058499b7807ac6fad537bf70b",
- "dated": {
-  "2026-10-27": "1daa503bd8892ddfaaa802f0bd8ff0e4af0e65453ba8dd2a5f12802f2372c8cc",
-  "2026-10-28": "39699eb687e2c65993eef9de3d8cee6ff8fbd032e924f00a31401b5010db9e87",
-  "2026-10-29": "03f3b189a156a161b6e9bfd28f27da13eb612ea17577817af128f8f32e042197",
-  "2026-10-31": "73ef50f4328526974c75553f63dcd073dc9b8d56bb2b75928d697b36d14990b6",
-  "2026-11-01": "3cebde68a269fb15bd44e42fc161a9b2350bff3cb183f92dcb2dfbf3355f7527",
-  "2026-11-08": "c6fd590f449a635df366dee0a3171b72ffa23068c221dbbaf8a303bf7e3ab1f2",
-  "2026-11-09": "b4bd4c04855669a292c89976738289b98e4a9a2c02e93b52f5a528f03b909dcc",
-  "2026-11-10": "53a32068e744bd15dfedc0d5e384af571f6e63ccc2eb09ccc4079a6a53ff9a5c",
-  "2026-11-11": "afbe9703fa69a436ebcd4139d3598397a5cb8a068b2b3b283ad0f885d57ee11d",
-  "2026-11-12": "bac796ae5cf211accc195ff8e32ecc92718d573e6d934db9a342a8e06caae325",
-  "2026-11-15": "f4c5d0c78d0697ba254af4e5d06fcd2fab5bf5ba5954daa30d9b7afce4edd2be",
-  "2026-11-17": "911f53031b5f7e058694e4b044de74c4170dde57ecf14c52a85da3e0239e1840",
-  "2026-11-18": "0a099445fc380e154542bf39adac3ca34e1c78b28785d61b8c9ebdae64712517",
-  "2026-11-19": "d62811f7a77a91f8a07576210e5b002070c042eff9c73ca3616821f2fcf0cff7",
-  "2026-11-22": "75ec914ca082b2ac37850415faaf9943ec55f4f166f499c0de550bce7453c09f",
-  "2026-11-24": "aa0ae7890d6130dc2a0351d8996f0a4b94dec76f12253254c03f3549be955f8e",
-  "2026-11-25": "9bc5227822fdb6434229f24d5658a360712b2690f68df8333f2dbe6184f8f2c0",
-  "2026-11-26": "0e2cd5b12196d67d6d041cedcf60ded7f3b7fa0c926e11e9d17193c4ee8ccc31",
-  "2026-11-29": "aa9385d26e6824afd6adae7f5469e3b5aa3bd18ab265be5a45ade4bddf378be4",
-  "2026-12-01": "b87cd94c066e4da5e4d522315e5807177b06efc8ef6f1515d5e9193e38d73013",
-  "2026-12-02": "2fcbf3a507200f9684d9650aed2d9384811607c5e29c690a000f4a72b72994a3",
-  "2026-12-03": "f354cd0da988384b888ddc475968a885ffb7feba805c37624e3820a2f65d57fc",
-  "2026-12-04": "ba9ba04ee424f06512f530fe9edf05c75aac556d6fe6d3b29f4786f19f6ecfb3",
-  "2026-12-06": "a07c12b2ac3ca07d6d914507633e866ae37fcb7afe3717601b6843e39da610ee",
-  "2026-12-07": "524529de08ca69edd026210f898fbc1bcbdb4cf97398ee6ed01b0de83efdcd7e",
-  "2026-12-08": "8b41d17ae6b44435af130bf54eecdafea9629f9cde03e7d6b4c26cc505f4593d",
-  "2026-12-09": "541149c714554ba4bb940a41dbb1232788af3700fb2ab60b883fa2ea27503662",
-  "2026-12-10": "5feab6e3bfc6663b03901b34f49eece09961fad3d6fedc5ebae9696c48cc456e",
-  "2026-12-13": "ffdf6a80826e306c793b6de4f09943eccd448a0d96c796b08a85498533ffdbc8",
-  "2026-12-15": "78753f422c358fbbac333d13507c8e9295c970b310d049c8e7b1d5894746a01c",
-  "2026-12-16": "aac5c4e2eaa44ed5b381b4032219994f8d6b780289ffa14321d575a958dab1d8",
-  "2026-12-17": "3f4d3d3a7982da7de5b2ba137b3eeca11e45568ce3bd4465e8c853d1e24d98e1",
-  "2026-12-20": "1781f44bcaaf55af4941242c50aa72847beca883e4e3b8e6f948f768e43a83df",
-  "2026-12-22": "fdef6427dab928cfb2e490ac963fad996ef940a8797c4323433dd6a87d30807e",
-  "2026-12-23": "48ee9ab633fc2f33e8b046681d6aa18ff92122eadc70b6dd4db089c704d9b4fe",
-  "2026-12-27": "16865b9cb9d214a29c52484eb3a041f33ce2381a0e445b0198023db20de40ce4",
-  "2027-01-03": "a48d3c15b668f3f777f68d5fbe38181ab2ba79ee28eebd31d170c8166d98b88b",
-  "2027-01-10": "4bbb15457bea5c95f672e81ddaad1bfd4c6cd0d21bc67df23431433b1f2a6cd7",
-  "2027-01-11": "95dae233ed76b17d004b4a320e2bad0e3e4696f9638e0e30cb1ee71e41ccbf9a",
-  "2027-01-17": "cbc1fb1dad065c0689c05c18152c871ca917dada7db4b971c3770ae32d9e1570",
-  "2027-01-24": "d15c3722e8c5b41653eb0b200f5135321af2508302881b8e6afc149c198b6cb6",
-  "2027-01-31": "9b44eb4ad81b2fabb7ed2eeead35d00f91f8c3509c4c2514df53cc9a5e61bdeb",
-  "2027-02-01": "0bb7ea8601be056b02efaad44cc5736cb671041af645862381f2ad41201b5570",
-  "2027-03-01": "2c64e5411398f5a7f87c533ed59b4213d236180d2ac339f4c238705bf306623b",
-  "2027-04-05": "a9dfc5add691e86dadbb774bdd314e1eb5f6842ac940309b9074562256a4d5bf",
-  "2027-05-03": "e342a4f3da8a12c9e882cce8abf1770dbeb999986425634d82a5a68ccf466bb6",
-  "2027-06-07": "94201b926b992050bd248a6ec896abf6f621f5582db95669db7c3829db3c0e07",
-  "2027-07-05": "44a85513be4951722615110a43720ea37702a1be53d732942644f0408885959e",
-  "2027-09-13": "28e89802b4dc099b16a8b55b2b26873a6f590ef09a0ae1017fe0952c49aa548e",
-  "2027-10-04": "204a72c1b825b17c29cae076c4d8745680ef0181642c78bbc09f862e3bc57442",
-  "2027-11-08": "96d7813014b5ffe64d9288c1d61429ee1bc119fc1fb1c544cbe8e155dba3ecb8",
-  "2027-12-06": "76f015f21f3a4f5206e3e4b96718bf8a57169a0f47c73eda5ad58686f394ecef"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-22T08:32:08+02:00",
- "sources": [
-  "evtermine"
- ]
+ }
 }

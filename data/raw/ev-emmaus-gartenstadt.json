@@ -1,20 +1,80 @@
 {
- "events": [],
- "inputHash": "fec0334d00c190cb51b74b21e945b1ebb02cca1252ecfe3fe5b0ee5b89fc305b",
- "dated": {
-  "2026-10-29": "bb30db572571b155b8658adc540c50f4b5c95350e32fbfcec3076196cdbfcaeb",
-  "2026-11-12": "ae297a48e53f10d70356baaf6df9a4a5bc016c3d844cc1e4f01b28711245d52f",
-  "2026-11-19": "a7004ec9072e7a98d5d75f6df1da55d6edd31dec5a05553e7085f147fb4a6fbd",
-  "2026-11-26": "cf52731c33586e5bd2505f2e48608cde66662b2e56b82ca54f9184472f3ed5a3",
-  "2026-12-03": "f3338ab96125b4e362d4e7cc3f82ae0fcf69bec468cca2bd119226759e634379",
-  "2026-12-10": "40058cc72ff6a0d1e66c78752352d77e68f127a886e64a77d2015279acfe5e4f",
-  "2026-12-17": "0d5956e87fc9d07be83c96742ec8e57741ba19fd367df9857063bfd73c8ef930"
- },
- "model": "haiku",
- "status": "keine-termine",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-11T14:06:10+02:00",
- "sources": [
-  "evtermine"
- ]
+ "version": 2,
+ "units": {
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "ev-emmaus-gartenstadt",
+     "venueId": "ev-emmaus-gartenstadt",
+     "title": "Miniclub (donnerstags vormittags)",
+     "summary": "Eltern-Kind-Gruppe für Kleinkinder mit ihren Eltern im kleinen Saal des Gemeindezentrums der Emmauskirche. Eine Anmeldung ist nötig.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.emmaus-nuernberg.de",
+     "sourceUrl": "https://www.emmaus-nuernberg.de",
+     "category": "krabbel-spielgruppen",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung erforderlich, Kontakt über die Emmausgemeinde"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-29T09:30",
+        "end": "2026-10-29T11:00"
+       },
+       {
+        "start": "2026-11-12T09:30",
+        "end": "2026-11-12T11:00"
+       },
+       {
+        "start": "2026-11-19T09:30",
+        "end": "2026-11-19T11:00"
+       },
+       {
+        "start": "2026-11-26T09:30",
+        "end": "2026-11-26T11:00"
+       },
+       {
+        "start": "2026-12-03T09:30",
+        "end": "2026-12-03T11:00"
+       },
+       {
+        "start": "2026-12-10T09:30",
+        "end": "2026-12-10T11:00"
+       },
+       {
+        "start": "2026-12-17T09:30",
+        "end": "2026-12-17T11:00"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
+   ],
+   "inputHash": "aa14c09c629d9d85485deac4e78eb9bd3d4a42cc4066753fe5211485da64b223",
+   "dated": {
+    "2026-10-29": "bb30db572571b155b8658adc540c50f4b5c95350e32fbfcec3076196cdbfcaeb",
+    "2026-11-12": "ae297a48e53f10d70356baaf6df9a4a5bc016c3d844cc1e4f01b28711245d52f",
+    "2026-11-19": "a7004ec9072e7a98d5d75f6df1da55d6edd31dec5a05553e7085f147fb4a6fbd",
+    "2026-11-26": "cf52731c33586e5bd2505f2e48608cde66662b2e56b82ca54f9184472f3ed5a3",
+    "2026-12-03": "f3338ab96125b4e362d4e7cc3f82ae0fcf69bec468cca2bd119226759e634379",
+    "2026-12-10": "40058cc72ff6a0d1e66c78752352d77e68f127a886e64a77d2015279acfe5e4f",
+    "2026-12-17": "0d5956e87fc9d07be83c96742ec8e57741ba19fd367df9857063bfd73c8ef930"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "evtermine"
+   ]
+  }
+ }
 }

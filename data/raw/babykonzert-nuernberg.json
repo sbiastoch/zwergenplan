@@ -1,44 +1,49 @@
 {
- "events": [
-  {
-   "providerId": "babykonzert-nuernberg",
-   "venueId": "babykonzert-nuernberg",
-   "title": "Babykonzert Klassik auf der Krabbeldecke (08.11.2026, 11 und 13 Uhr)",
-   "summary": "Klassikkonzert für Babys und Eltern im Marmorsaal des Presseclubs. Babys und Kinder zahlen keinen Eintritt, Erwachsene brauchen Karten. Der 11-Uhr-Termin ist ausverkauft, für den Zusatztermin um 13 Uhr bitte die Verfügbarkeit prüfen.",
-   "topics": [
-    "konzert"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://babykonzert.de/home/nuernberg/",
-   "sourceUrl": "https://babykonzert.de/home/nuernberg/",
-   "category": "buehne",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "11 Uhr ausverkauft; 13 Uhr Karten über Eventim Light prüfen"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-08T11:00"
+ "version": 2,
+ "units": {
+  "seite:https://babykonzert.de/home/nuernberg/": {
+   "events": [
+    {
+     "providerId": "babykonzert-nuernberg",
+     "venueId": "babykonzert-nuernberg",
+     "title": "Babykonzert – Klassik auf der Krabbeldecke (8. November, 11 und 13 Uhr)",
+     "summary": "Ein Konzert speziell für Babys und Kleinkinder: Eltern hören mit ihrem Kind auf der Krabbeldecke Livemusik im Marmorsaal des Presseclubs. Die Vorstellung um 11 Uhr ist ausverkauft, um 13 Uhr gibt es ein Zusatzkonzert.",
+     "topics": [
+      "konzert"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "Babys und Kinder frei; Erwachsene zahlen Eintritt (Gutscheine ab 21 €)",
+     "url": "https://babykonzert.de/home/nuernberg/",
+     "sourceUrl": "https://babykonzert.de/home/nuernberg/",
+     "category": "buehne",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
      },
-     {
-      "start": "2026-11-08T13:00"
+     "availability": {
+      "status": "unbekannt",
+      "note": "11-Uhr-Konzert ausverkauft; Karten für das Zusatzkonzert um 13 Uhr über Eventim Light. Mit Gutschein vorher per Mail an saskia.duerr@babykonzert.de reservieren."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-08T11:00"
+       },
+       {
+        "start": "2026-11-08T13:00"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "f026dc4b0bcb27a2a11c592b020914e0df7f8ec7fdd77add5dcce21898825657",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "49048d327f8acd12105c5c6b033fac6b19e54ed946e295b3a8350acf9e3803c1",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-18T08:28:10+02:00",
- "sources": []
+ }
 }

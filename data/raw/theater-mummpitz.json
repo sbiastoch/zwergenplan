@@ -1,124 +1,250 @@
 {
- "events": [
-  {
-   "providerId": "theater-mummpitz",
-   "venueId": "theater-mummpitz",
-   "title": "Jazz für Kinder – Puppenspiel mit Livemusik",
-   "summary": "Puppenspiel rund um König Semmelwurst, live kommentiert von einem Jazz-Trio, etwa 50 Min. Kinder unter 3 Jahren haben freien Eintritt. Alle aufgeführten Termine sind laut Spielplan ausverkauft.",
-   "topics": [
-    "konzert",
-    "theater"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "6 € (ohne VGN); Kinder unter 3 Jahren frei",
-   "url": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
-   "sourceUrl": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
-   "category": "buehne",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Alle Termine im Spielplan als ausverkauft markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-08T11:00"
+ "version": 2,
+ "units": {
+  "seite:https://www.theater-mummpitz.de/spielplan/": {
+   "events": [
+    {
+     "providerId": "theater-mummpitz",
+     "venueId": "theater-mummpitz",
+     "title": "Jazz für Kinder (o.A.) – Sonntagskonzerte",
+     "summary": "Jazzkonzerte für Familien, sonntags um 11 Uhr im Kachelbau. Ohne Altersgrenze, also auch mit Babys und Kleinkindern möglich. Karten gibt es über den Ticketverkauf des Theaters; alle angekündigten Termine sind derzeit ausverkauft.",
+     "topics": [
+      "konzert",
+      "musik"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
+     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
+     "category": "buehne",
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Alle Termine im Spielplan ausverkauft (Ticketverkauf über Reservix)"
      },
-     {
-      "start": "2026-12-06T11:00"
-     },
-     {
-      "start": "2027-01-10T11:00"
-     },
-     {
-      "start": "2027-02-07T11:00"
-     },
-     {
-      "start": "2027-03-07T11:00"
-     },
-     {
-      "start": "2027-04-04T11:00"
-     },
-     {
-      "start": "2027-05-09T11:00"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-08T11:00"
+       },
+       {
+        "start": "2026-12-06T11:00"
+       },
+       {
+        "start": "2027-01-10T11:00"
+       },
+       {
+        "start": "2027-02-07T11:00"
+       },
+       {
+        "start": "2027-03-07T11:00"
+       },
+       {
+        "start": "2027-04-04T11:00"
+       },
+       {
+        "start": "2027-05-09T11:00"
+       }
+      ]
      }
-    ]
-   }
+    },
+    {
+     "providerId": "theater-mummpitz",
+     "venueId": "theater-mummpitz",
+     "title": "Klassik für Kinder (o.A.) – Konzertreihe mit wechselnden Instrumenten",
+     "summary": "Sonntagskonzerte um 11 Uhr ohne Altersgrenze, bei denen jedes Mal ein anderes Instrument vorgestellt wird: Saxophon, Kontrabass, Oboe, Blockflöten, Violine und zum Abschluss eine Überraschung. Alle angekündigten Termine sind derzeit ausverkauft.",
+     "topics": [
+      "konzert",
+      "musik"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
+     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
+     "category": "buehne",
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Alle Termine im Spielplan ausverkauft (Ticketverkauf über Reservix)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-29T11:00"
+       },
+       {
+        "start": "2026-12-20T11:00"
+       },
+       {
+        "start": "2027-01-24T11:00"
+       },
+       {
+        "start": "2027-02-21T11:00"
+       },
+       {
+        "start": "2027-03-14T11:00"
+       },
+       {
+        "start": "2027-04-25T11:00"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "48d0ecb39af8aa005f9a1f4562c94559eba2a57476cd7304677a95405d415a2c",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "theater-mummpitz",
-   "venueId": "theater-mummpitz",
-   "title": "Klassik für Kinder – moderierte Konzerte der Hochschule",
-   "summary": "Studierende der Musikhochschule Nürnberg stellen Instrumente vor, spielen Lieblingsstücke und moderieren, etwa 50 Min. Für Kinder jeden Alters und ihre Begleitpersonen; jede Ausgabe hat ein eigenes Thema.",
-   "topics": [
-    "konzert"
-   ],
-   "format": "einmalig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "6 € (ohne VGN)",
-   "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-   "sourceUrl": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-   "category": "buehne",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Alle Termine im Spielplan als ausverkauft markiert"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-29T11:00"
+  "seite:https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/": {
+   "events": [
+    {
+     "providerId": "theater-mummpitz",
+     "venueId": "theater-mummpitz",
+     "title": "Jazz für Kinder – Puppentheater mit Live-Jazz (König Semmelwurst)",
+     "summary": "Einmal im Monat sonntags ein neues Puppenspiel-Abenteuer um König Semmelwurst, Kasperl, Seppl und Gretel, live begleitet von einer Jazzband. Für alle Altersstufen, etwa 50 Minuten. Frühstück im Café Mahlzahn kann man vorab per Mail bestellen.",
+     "topics": [
+      "theater",
+      "konzert"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "6 € (ohne VGN), Kinder unter 3 Jahren frei",
+     "url": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
+     "sourceUrl": "https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/",
+     "category": "buehne",
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Alle Termine ausverkauft"
      },
-     {
-      "start": "2026-12-20T11:00"
-     },
-     {
-      "start": "2027-01-24T11:00"
-     },
-     {
-      "start": "2027-02-21T11:00"
-     },
-     {
-      "start": "2027-03-14T11:00"
-     },
-     {
-      "start": "2027-04-25T11:00"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-08T11:00",
+        "end": "2026-11-08T11:50"
+       },
+       {
+        "start": "2026-12-06T11:00",
+        "end": "2026-12-06T11:50"
+       },
+       {
+        "start": "2027-01-10T11:00",
+        "end": "2027-01-10T11:50"
+       },
+       {
+        "start": "2027-02-07T11:00",
+        "end": "2027-02-07T11:50"
+       },
+       {
+        "start": "2027-03-07T11:00",
+        "end": "2027-03-07T11:50"
+       },
+       {
+        "start": "2027-04-04T11:00",
+        "end": "2027-04-04T11:50"
+       },
+       {
+        "start": "2027-05-09T11:00",
+        "end": "2027-05-09T11:50"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "2aa11cb3855924e39739ded26d0e9b4a39354d138494b6315bc272b72af897e2",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/": {
+   "events": [
+    {
+     "providerId": "theater-mummpitz",
+     "venueId": "theater-mummpitz",
+     "title": "Klassik für Kinder – moderierte Instrumentenkonzerte mit der Hochschule für Musik",
+     "summary": "In 50-minütigen moderierten Konzerten stellen Musikstudierende jeweils ein Instrument vor, z. B. Saxophon, Kontrabass, Oboe, Blockflöten oder Violine. Ohne Altersbeschränkung, für Kinder jeden Alters mit Begleitung.",
+     "topics": [
+      "konzert",
+      "musik"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "6 € (ohne VGN)",
+     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
+     "sourceUrl": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
+     "category": "buehne",
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Alle Termine ausverkauft"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-29T11:00",
+        "end": "2026-11-29T11:50"
+       },
+       {
+        "start": "2026-12-20T11:00",
+        "end": "2026-12-20T11:50"
+       },
+       {
+        "start": "2027-01-24T11:00",
+        "end": "2027-01-24T11:50"
+       },
+       {
+        "start": "2027-02-21T11:00",
+        "end": "2027-02-21T11:50"
+       },
+       {
+        "start": "2027-03-14T11:00",
+        "end": "2027-03-14T11:50"
+       },
+       {
+        "start": "2027-04-25T11:00",
+        "end": "2027-04-25T11:50"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "3fdeb52373a11933ca35005d53324b202f5c103b28cd7a4b236a8308d6674e98",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [],
+   "inputHash": "7db5d6244a824a98a421f21060e6f908a824340c5bb5bf16db0104731755144e",
+   "dated": {
+    "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
+    "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
+    "2026-11-08": "a754f264a2fa3306798b3f5dd5477dcf50fa99b82227d57243ad547feb085687",
+    "2026-12-05": "db408e03de6385e74a77e64a82f8837e1012de187917e5b985739949fe573f8b",
+    "2026-12-06": "facded7e601c873cc140e8021760332e4c4ad4e69c597217a25ffded6368b588",
+    "2026-12-11": "cd771f8b361aeb1b61d9704e34780496d49bb10e99cddf2dc5f57f6ab761d4b4",
+    "2026-12-12": "347b9b8580289c5755433f94c7dcb9aa4007b2fc05bd45d62665cbcfac244d06",
+    "2026-12-13": "820da1230a6fc18b59fb051823c3cc6bd851b2048dbf774a6ed2c55161bca26d",
+    "2026-12-19": "1975ffe072e1979b9a6d71a8368fb37c9b3220d016843348dc2d5fbc93c77ed3",
+    "2026-12-20": "96fa5e168ffd0ad5e2f2d18bb212d0411aa3acb94a91c12a2d0b338e1e78ee1e",
+    "2026-12-24": "fa9602ffd5e69cb4f01bdd387a1c850b539da94733da732e20f08b92b4aa817c"
+   },
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "frankenkids",
+    "stadt-vk"
+   ]
   }
- ],
- "inputHash": "a7323b362a5a53968c0873b0e0c50709da5386be6acb5c5405e34080e3df72e5",
- "dated": {
-  "2026-10-31": "fdf94a71bd6392e68f555820bac1ec94873c9660f19052b408996e21c795fc81",
-  "2026-11-07": "240df1d2cbbf324816dfd9f5a7814a9e9fc9ead762f5e5e737c31cfa329c4594",
-  "2026-11-08": "a754f264a2fa3306798b3f5dd5477dcf50fa99b82227d57243ad547feb085687",
-  "2026-12-05": "db408e03de6385e74a77e64a82f8837e1012de187917e5b985739949fe573f8b",
-  "2026-12-06": "facded7e601c873cc140e8021760332e4c4ad4e69c597217a25ffded6368b588",
-  "2026-12-11": "cd771f8b361aeb1b61d9704e34780496d49bb10e99cddf2dc5f57f6ab761d4b4",
-  "2026-12-12": "347b9b8580289c5755433f94c7dcb9aa4007b2fc05bd45d62665cbcfac244d06",
-  "2026-12-13": "820da1230a6fc18b59fb051823c3cc6bd851b2048dbf774a6ed2c55161bca26d",
-  "2026-12-19": "1975ffe072e1979b9a6d71a8368fb37c9b3220d016843348dc2d5fbc93c77ed3",
-  "2026-12-20": "96fa5e168ffd0ad5e2f2d18bb212d0411aa3acb94a91c12a2d0b338e1e78ee1e",
-  "2026-12-24": "fa9602ffd5e69cb4f01bdd387a1c850b539da94733da732e20f08b92b4aa817c"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": [
-  "frankenkids",
-  "stadt-vk"
- ]
+ }
 }

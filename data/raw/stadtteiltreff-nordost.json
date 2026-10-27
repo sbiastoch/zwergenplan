@@ -1,43 +1,49 @@
 {
- "events": [
-  {
-   "providerId": "stadtteiltreff-nordost",
-   "venueId": "stadtteiltreff-nordost",
-   "title": "Offener Krabbeltreff für Eltern mit Kindern bis 3 Jahre (dienstags)",
-   "summary": "Offener Treff im Stadtteiltreff Nordost zum Kennenlernen und Spielen für Eltern mit kleinen Kindern aus dem Stadtteil; ältere Geschwister sind willkommen. Einfach vorbeikommen, keine Anmeldung nötig.",
-   "topics": [
-    "krabbelgruppe",
-    "elterntreff"
+ "version": 2,
+ "units": {
+  "seite:https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html": {
+   "events": [
+    {
+     "providerId": "stadtteiltreff-nordost",
+     "venueId": "stadtteiltreff-nordost",
+     "title": "Offener Krabbeltreff (dienstags)",
+     "summary": "Offener Treff für Eltern mit Kindern unter 3 Jahren rund um den Nordostbahnhof: Die Eltern lernen sich kennen und tauschen sich aus, die Kinder spielen. Ältere Geschwister dürfen mitkommen, kostenlos.",
+     "topics": [
+      "krabbelgruppe",
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "kostenfrei",
+     "url": "https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html",
+     "sourceUrl": "https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Offener Treff, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2026-10-27",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html",
-   "sourceUrl": "https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ohne-anmeldung"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "09:30",
-    "end": "11:00",
-    "from": "2026-10-27",
-    "skipHolidays": true
-   }
+   "inputHash": "d20138671615207b6a7757d43dc1c1b83babb8a6411c4a6966f6092a5d369bbe",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "b893c7a9d43c7f4170e9ce355049cf35ad5d389724231431b6053dd5ce41c5bc",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-23T08:24:44+02:00",
- "sources": []
+ }
 }

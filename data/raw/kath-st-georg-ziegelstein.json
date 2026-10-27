@@ -1,40 +1,43 @@
 {
- "events": [
-  {
-   "providerId": "kath-st-georg-ziegelstein",
-   "venueId": "kath-st-georg-ziegelstein",
-   "title": "Kleinkindergottesdienst St. Georg (Pfarrsaal)",
-   "summary": "Gottesdienst für Kleinkinder und ihre Familien im Pfarrsaal St. Georg, Bierweg 33. Kostenlos und ohne Anmeldung; auf der Seite sind bislang zwei Sonntage im Horizont angekündigt.",
-   "topics": [
-    "krabbelgottesdienst"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien",
-   "sourceUrl": "https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien",
-   "category": "treffs-cafes",
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung nötig"
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-11-15T10:30"
+ "version": 2,
+ "units": {
+  "seite:https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien": {
+   "events": [
+    {
+     "providerId": "kath-st-georg-ziegelstein",
+     "venueId": "kath-st-georg-ziegelstein",
+     "title": "Kleinkindergottesdienst im Pfarrsaal St. Georg",
+     "summary": "Kurzer Gottesdienst für die Kleinsten und ihre Eltern im Pfarrsaal von St. Georg in Ziegelstein. Eine Anmeldung ist nicht nötig, einfach vorbeikommen.",
+     "topics": [
+      "krabbelgottesdienst"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien",
+     "sourceUrl": "https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien",
+     "category": "treffs-cafes",
+     "availability": {
+      "status": "ohne-anmeldung"
      },
-     {
-      "start": "2026-12-20T10:30"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-15T10:30"
+       },
+       {
+        "start": "2026-12-20T10:30"
+       }
+      ]
      }
-    ]
-   }
+    }
+   ],
+   "inputHash": "30267c89bfa95d7307e6a1d1688e8be5441bbe5558dc835d7a2c19b10e3dafd5",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "dd9259ec0154d1e0c99eb7db27ae6f348909e5cdf4354a09042ea00fa7754180",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-20T08:26:12+02:00",
- "sources": []
+ }
 }

@@ -1,108 +1,192 @@
 {
- "events": [
-  {
-   "providerId": "ev-melanchthon-ziegelstein",
-   "venueId": "ev-melanchthon-ziegelstein",
-   "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren (dienstags)",
-   "summary": "Dienstags 9:30–11:00 Uhr im Gemeindehaus: Austausch unter Eltern, Lieder und Geschichten, freies Spielen für die Kleinen. Angaben zu Anmeldung und Kosten fehlen in der Quelle; bitte beim Veranstalter nachfragen.",
-   "topics": [
-    "eltern-kind-gruppe",
-    "elterntreff"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.evangelische-termine.de/detail-bt?ID=8109711",
-   "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109711",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; Kosten nicht angegeben, bitte beim Veranstalter nachfragen."
-   },
-   "schedule": {
-    "kind": "dates",
-    "dates": [
-     {
-      "start": "2026-10-27T09:30",
-      "end": "2026-10-27T11:00"
+ "version": 2,
+ "units": {
+  "seite:https://www.evangelische-termine.de/ical?vid=574": {
+   "events": [
+    {
+     "providerId": "ev-melanchthon-ziegelstein",
+     "venueId": "ev-melanchthon-ziegelstein",
+     "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren (dienstags vormittags)",
+     "summary": "Wöchentliches Treffen von Eltern mit Babys und Kleinkindern bis 3 Jahre im Gemeindehaus der Melanchthonkirche: gemeinsam spielen und Kontakte knüpfen.",
+     "topics": [
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109711.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=574",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
      },
-     {
-      "start": "2026-11-10T09:30",
-      "end": "2026-11-10T11:00"
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Angaben zu Anmeldung oder Plätzen; Auskunft über die Kirchengemeinde Melanchthon"
      },
-     {
-      "start": "2026-11-17T09:30",
-      "end": "2026-11-17T11:00"
-     },
-     {
-      "start": "2026-11-24T09:30",
-      "end": "2026-11-24T11:00"
-     },
-     {
-      "start": "2026-12-01T09:30",
-      "end": "2026-12-01T11:00"
-     },
-     {
-      "start": "2026-12-08T09:30",
-      "end": "2026-12-08T11:00"
-     },
-     {
-      "start": "2026-12-15T09:30",
-      "end": "2026-12-15T11:00"
-     },
-     {
-      "start": "2026-12-22T09:30",
-      "end": "2026-12-22T11:00"
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-27T09:30",
+        "end": "2026-10-27T11:00"
+       },
+       {
+        "start": "2026-11-10T09:30",
+        "end": "2026-11-10T11:00"
+       },
+       {
+        "start": "2026-11-17T09:30",
+        "end": "2026-11-17T11:00"
+       },
+       {
+        "start": "2026-11-24T09:30",
+        "end": "2026-11-24T11:00"
+       },
+       {
+        "start": "2026-12-01T09:30",
+        "end": "2026-12-01T11:00"
+       },
+       {
+        "start": "2026-12-08T09:30",
+        "end": "2026-12-08T11:00"
+       },
+       {
+        "start": "2026-12-15T09:30",
+        "end": "2026-12-15T11:00"
+       },
+       {
+        "start": "2026-12-22T09:30",
+        "end": "2026-12-22T11:00"
+       }
+      ]
      }
-    ]
+    }
+   ],
+   "inputHash": "3d2dc6764e471e30e4a090ef44431704a66b47e53d99bf8ef33d4f60c1d19778",
+   "dated": {
+    "2026-10-27": "25fd1df31cd411a4d18cc34f7e44e170dd28234e29ba784a6a21dcba384e1143",
+    "2026-10-29": "fa795cfd50c34e7af9a19d92c7eefb6ff4f7229baa4ba21e6b187092c5623c5b",
+    "2026-10-31": "715778da878f77a3abfd2adbb11d1bed2bf106d28e6da6ab801bfbee15ceb964",
+    "2026-11-01": "6585fd30e655ab15e3950a463c476ac6c7f7b2018c790e48f1a505a75b85fa71",
+    "2026-11-03": "01a9090dfc8bd9dbcb457f41740d133c5eb1adc018d00f8debf0a46115797659",
+    "2026-11-08": "01a682533a8c9002a3d78d7c5b799b7eb58d255daa9ecec66df94b82b1f82346",
+    "2026-11-09": "e5769a04b3d044a360166f514ad70365213fb967cd12c846384250de36d44d8d",
+    "2026-11-10": "e275ea4d6f15618c5b3688afadf1df7f131423b70ddca05e81978e051bbd3e52",
+    "2026-11-12": "a5a0a886a5fedfbb074803c9b33717887db664af22c75bb6ac1075ba17a5eb3a",
+    "2026-11-14": "e0161170a835ed43aa21038782bf81f6763fc066afeead123c62f609091a765c",
+    "2026-11-15": "0de86c930884e8dddb4f1a7b6b6b5876872d849cf486e008cb1397b4c99e48a4",
+    "2026-11-16": "5d5e7c8805c77a514c609e568e72249c4ead3a5e9e17cada885b2bc16f3d43ca",
+    "2026-11-17": "6876cabb132ed2bf7708f9d6ec06b9453e0afa08e562862666cb93cad877485f",
+    "2026-11-18": "4c5fd04a5172c35f1129e1192abdc8ee57bc6c5a303eb34ae7905bcb63e309a6",
+    "2026-11-19": "4fbbb619de00acf3e3e20bf4557252efefeeb345c285057ed1bb9a1cdfe16601",
+    "2026-11-21": "79ced194bcef38d4360a403cfea2d5ed0198b104f6f807071f0a79e70279f469",
+    "2026-11-22": "605fdb1325ddc9110dcc06d7ebc694fcee00063c281ccb393ff34b36c2f2325b",
+    "2026-11-23": "cccaa3a4e36f3da1a7ed327d8beb3e6f9bf611e15c8904fffe4b277fa6393b1e",
+    "2026-11-24": "37577817fe63e3008d7c981d356fa6906ee893d135545ef816bbb915c9abe577",
+    "2026-11-26": "3ba0c69981ea86983c5e97319a3f38b5df2f4529a77c53062bad8acd1f0f5d47",
+    "2026-11-29": "fb5c035133b9e6961607dbc1423ab4c8ca64708b0a9f0e707db37a8f91e9f1fd",
+    "2026-11-30": "ecf4e220659af668e916d0bcfc0e02e02434a08b3c72cf5364343915b5b8a918",
+    "2026-12-01": "056737d12e95df8ff3305a0be2813f2f39d33661102adda556d8962d1ce9c444",
+    "2026-12-05": "966d0e7a38e56425a7b24057c6ad95fa0bcd87546fd430a82e3b27134d39ce6e",
+    "2026-12-06": "e1ecd051c5a381773424c01b551a65746e38c4ac6e01bceb00a8911bb69e92ea",
+    "2026-12-07": "d7fd2b6289c8322200eecd1b0451f029721e43a3b747af067fc07575442efb23",
+    "2026-12-08": "b152a7acf62d3604d60010959172e1b96e0d8022ff9f1029cc26ec37f962523a",
+    "2026-12-13": "cc1a5eb27f73f8c0fcf487fe40dd9dddc327c4a1f6a4f1e420a157303aa26ca4",
+    "2026-12-14": "d3ed87e0178f3dbc78ee19ceb3dc6853cf98ca32a9901970bd2f3d3632935aec",
+    "2026-12-15": "1bf45fcf38c84066f29d675677986197e10d7ee9d70b3609be54d536576b5526",
+    "2026-12-21": "c3e75f5bc234139c060fc9fa529c072260e10ebf68a13e0bb7e3b2d5a914c233",
+    "2026-12-22": "291953b75ac5c11d34fb8c80986629b92944251aa8e22377ab50375b40110c05"
    },
-   "via": "evtermine"
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "ev-melanchthon-ziegelstein",
+     "venueId": "ev-melanchthon-ziegelstein",
+     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags)",
+     "summary": "Wöchentliche Gruppe für Eltern mit Kindern bis 3 Jahre: gemeinsames Spielen, Lieder und Geschichten sowie Austausch und pädagogische Impulse zu Themen wie Ernährung, Sprache und Entwicklung. Zu Anmeldung und Plätzen am besten bei der Gemeinde nachfragen.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "singen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109711",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109711",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Anfrage bei der Melanchthonkirche Ziegelstein (melanchthonkirche-ziegelstein.de)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-27T09:30",
+        "end": "2026-10-27T11:00"
+       },
+       {
+        "start": "2026-11-10T09:30",
+        "end": "2026-11-10T11:00"
+       },
+       {
+        "start": "2026-11-17T09:30",
+        "end": "2026-11-17T11:00"
+       },
+       {
+        "start": "2026-11-24T09:30",
+        "end": "2026-11-24T11:00"
+       },
+       {
+        "start": "2026-12-01T09:30",
+        "end": "2026-12-01T11:00"
+       },
+       {
+        "start": "2026-12-08T09:30",
+        "end": "2026-12-08T11:00"
+       },
+       {
+        "start": "2026-12-15T09:30",
+        "end": "2026-12-15T11:00"
+       },
+       {
+        "start": "2026-12-22T09:30",
+        "end": "2026-12-22T11:00"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
+   ],
+   "inputHash": "83eed05e71db450a97a9f3537e3eb43492a9eb85b0a9c0f238df30fcd16aa82b",
+   "dated": {
+    "2026-10-27": "896fac187c098043aa079c71b40490ad5ad18f49eff54c8fbb4128fc2d5fa27f",
+    "2026-11-10": "7f3a59b6833fbf30bce58f7b5ae2940ace78afd31125ba6fe7987d8dfb94b066",
+    "2026-11-17": "b2cbf8151a5a03072d7d34db665ecb45a31938658f82f0537002a8f458976fb1",
+    "2026-11-24": "a7b3c5811941421b90a03fde530ad962dc37711fece5efa39f4cd4c22ac8c174",
+    "2026-12-01": "6440bd0c80bb1e7ef25d7ecc2376b360d7a6adc5ba45c011046847ace1a1b331",
+    "2026-12-08": "5eadb6b2c19d0c71f13e0349bcdca76f06d4a438724419edb940d0fa18a1eb39",
+    "2026-12-15": "06c945c985c679e1a1f3d864d6ce9fd443e5f0606cc34cb9625aa44edb85a510",
+    "2026-12-22": "3dbb2889f3bfaa899697afc4f9b94e04a03cc2769866c887fd4e4c8c6b178ae3"
+   },
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "sources": [
+    "evtermine"
+   ]
   }
- ],
- "inputHash": "95ca7d938b67b5a0de24d872514cdac1d60f8e406a63f75c7a1341bb3f5f1e96",
- "dated": {
-  "2026-10-27": "5db39316945e95206d7bf691f23b13522ada1c4962212393839140c940e0a0f9",
-  "2026-10-29": "fa795cfd50c34e7af9a19d92c7eefb6ff4f7229baa4ba21e6b187092c5623c5b",
-  "2026-10-31": "715778da878f77a3abfd2adbb11d1bed2bf106d28e6da6ab801bfbee15ceb964",
-  "2026-11-01": "6585fd30e655ab15e3950a463c476ac6c7f7b2018c790e48f1a505a75b85fa71",
-  "2026-11-03": "01a9090dfc8bd9dbcb457f41740d133c5eb1adc018d00f8debf0a46115797659",
-  "2026-11-08": "01a682533a8c9002a3d78d7c5b799b7eb58d255daa9ecec66df94b82b1f82346",
-  "2026-11-09": "e5769a04b3d044a360166f514ad70365213fb967cd12c846384250de36d44d8d",
-  "2026-11-10": "fbed91440a64f3cec58dc19c22886d297fe6b3f408498d93a8917626c362888c",
-  "2026-11-12": "a5a0a886a5fedfbb074803c9b33717887db664af22c75bb6ac1075ba17a5eb3a",
-  "2026-11-14": "e0161170a835ed43aa21038782bf81f6763fc066afeead123c62f609091a765c",
-  "2026-11-15": "0de86c930884e8dddb4f1a7b6b6b5876872d849cf486e008cb1397b4c99e48a4",
-  "2026-11-16": "5d5e7c8805c77a514c609e568e72249c4ead3a5e9e17cada885b2bc16f3d43ca",
-  "2026-11-17": "63b35c53904d43446aee87f03cb4393d0b3c24ff3a4964a4931fe78fa7e1ae87",
-  "2026-11-18": "4c5fd04a5172c35f1129e1192abdc8ee57bc6c5a303eb34ae7905bcb63e309a6",
-  "2026-11-19": "4fbbb619de00acf3e3e20bf4557252efefeeb345c285057ed1bb9a1cdfe16601",
-  "2026-11-21": "79ced194bcef38d4360a403cfea2d5ed0198b104f6f807071f0a79e70279f469",
-  "2026-11-22": "605fdb1325ddc9110dcc06d7ebc694fcee00063c281ccb393ff34b36c2f2325b",
-  "2026-11-23": "cccaa3a4e36f3da1a7ed327d8beb3e6f9bf611e15c8904fffe4b277fa6393b1e",
-  "2026-11-24": "6c4ef5671a0c9581e54581c1acead86dcc158d10050b467e36f11709d458d7b7",
-  "2026-11-26": "3ba0c69981ea86983c5e97319a3f38b5df2f4529a77c53062bad8acd1f0f5d47",
-  "2026-11-29": "fb5c035133b9e6961607dbc1423ab4c8ca64708b0a9f0e707db37a8f91e9f1fd",
-  "2026-11-30": "ecf4e220659af668e916d0bcfc0e02e02434a08b3c72cf5364343915b5b8a918",
-  "2026-12-01": "9835abea9cc9822903ba066636d11c09791f21ca4fceaafecce1ca94cd604dbf",
-  "2026-12-05": "966d0e7a38e56425a7b24057c6ad95fa0bcd87546fd430a82e3b27134d39ce6e",
-  "2026-12-06": "e1ecd051c5a381773424c01b551a65746e38c4ac6e01bceb00a8911bb69e92ea",
-  "2026-12-07": "d7fd2b6289c8322200eecd1b0451f029721e43a3b747af067fc07575442efb23",
-  "2026-12-08": "77db03918b29f6b014dd03a90122d8b67bb5d444d658906aae9504e5cce3563c",
-  "2026-12-13": "cc1a5eb27f73f8c0fcf487fe40dd9dddc327c4a1f6a4f1e420a157303aa26ca4",
-  "2026-12-14": "d3ed87e0178f3dbc78ee19ceb3dc6853cf98ca32a9901970bd2f3d3632935aec",
-  "2026-12-15": "1cceac73e4bfeb8edff25e5ae3852c38c36d1ec81932b298017a51be0b7fc5e8",
-  "2026-12-21": "c3e75f5bc234139c060fc9fa529c072260e10ebf68a13e0bb7e3b2d5a914c233",
-  "2026-12-22": "04e1590ad288ba5494072cecfc6a3a8724dae5d29664aab10608bd82dfaa93b9"
- },
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": [
-  "evtermine"
- ]
+ }
 }

@@ -1,46 +1,50 @@
 {
- "events": [
-  {
-   "providerId": "feg-nuernberg-eltern-kind-kreis",
-   "venueId": "feg-nuernberg-eltern-kind-kreis",
-   "title": "Zwergenaufstand: Eltern-Kind-Kreis 0–3 Jahre (dienstags)",
-   "summary": "Offene Gruppe mit Singen, Geschichten, gemeinsamem Frühstück und Basteln; Schnuppern ist erlaubt. Pausiert in den Schulferien. Kostenlos, gelegentliche Spenden für Bastelmaterial erwünscht.",
-   "topics": [
-    "eltern-kind-gruppe",
-    "singen",
-    "kreativ"
+ "version": 2,
+ "units": {
+  "seite:https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/": {
+   "events": [
+    {
+     "providerId": "feg-nuernberg-eltern-kind-kreis",
+     "venueId": "feg-nuernberg-eltern-kind-kreis",
+     "title": "Eltern-Kind-Kreis „Zwergenaufstand“ (0–3 Jahre, dienstags)",
+     "summary": "Wöchentliche Eltern-Kind-Gruppe mit Singen, Spielen, Geschichten, Basteln und einem gemeinsamen Frühstück, das reihum vorbereitet wird. Schnuppern ist möglich. Treffpunkt ist der 1. Stock im Gemeindezentrum, in den Schulferien gibt es keine Treffen.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "singen",
+      "kreativ"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "kostenlos, gelegentliche Spenden für Bastelmaterial erbeten",
+     "url": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
+     "sourceUrl": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Schnuppern möglich; Kontakt: Saskia Schmidt, 0911 46206406, zwergenaufstand@feg-nuernberg.de"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2026-10-27",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "price": "kostenlos, gelegentliche Spenden erbeten",
-   "url": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
-   "sourceUrl": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
-   "category": "krabbel-spielgruppen",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Keine Anmeldung genannt. Fragen an Saskia Schmidt, Tel. 0911 46206406, zwergenaufstand@feg-nuernberg.de"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "09:30",
-    "end": "11:00",
-    "from": "2026-10-13",
-    "skipHolidays": true
-   }
+   "inputHash": "cec2e9a43b41d734c0041a001702c4b8bdbaa1ed69cef15fbae7a42d1243307f",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "5c41ac39cb472f15a580be9f764a0825e06b5f0e8948625db4e5b6961144d03d",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
- "sources": []
+ }
 }

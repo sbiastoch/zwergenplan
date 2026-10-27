@@ -1,44 +1,48 @@
 {
- "events": [
-  {
-   "providerId": "atv-1873-frankonia",
-   "venueId": "atv-1873-frankonia",
-   "title": "Riesen & Zwerge (Eltern-Kind-Turnen, 2–3 Jahre, montags)",
-   "summary": "Eltern-Kind-Turnen mit Geräten und Bewegungsspielen, montags 10–11 Uhr im ATV-Kampfsportraum. Der Kurs ist derzeit ausgebucht; Anmeldung auf die Warteliste per Mail an turnen@atv-1873-frankonia.de.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+ "version": 2,
+ "units": {
+  "seite:https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/": {
+   "events": [
+    {
+     "providerId": "atv-1873-frankonia",
+     "venueId": "atv-1873-frankonia",
+     "title": "Riesen & Zwerge – Eltern-Kind-Turnen (2–3 Jahre, montags)",
+     "summary": "Eltern turnen mit ihren Zwei- bis Dreijährigen und probieren Geräte, Bewegungsspiele und kleine Turnübungen aus. Die Kurse sind derzeit voll, Interessierte kommen auf die Warteliste.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/",
+     "sourceUrl": "https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "warteliste",
+      "note": "Derzeit ausgebucht, Anmeldung zur Warteliste über fsj@atv1873frankonia.de"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2026-11-02",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/",
-   "sourceUrl": "https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 24,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "warteliste",
-    "note": "Kurse ausgebucht; Warteliste, Anmeldung per Mail an turnen@atv-1873-frankonia.de (Wunschtag Dienstag oder Donnerstag angeben)"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "10:00",
-    "end": "11:00",
-    "from": "2026-11-02",
-    "skipHolidays": true
-   }
+   "inputHash": "bd48194c32729c82a18481945904d27a6f5504b15d8bd09dcc29ef2810266c94",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "75c780282e35f75daf40e52deecf1fa16b8ca827b960172fad78859ab9bebcf6",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": []
+ }
 }

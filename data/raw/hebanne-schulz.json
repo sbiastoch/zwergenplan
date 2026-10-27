@@ -1,80 +1,153 @@
 {
- "events": [
-  {
-   "providerId": "hebanne-schulz",
-   "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage, Nov–Dez 2026",
-   "summary": "Kurs „Bindung durch Berührung“ für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: sanfte Berührungen und das Lesen von Körperbotschaften in kleiner Gruppe. Der Kurs ist ausgebucht.",
-   "topics": [
-    "babymassage"
+ "version": 2,
+ "units": {
+  "seite:https://www.hebanne-schulz.de/": {
+   "events": [
+    {
+     "providerId": "hebanne-schulz",
+     "venueId": "hebanne-schulz",
+     "title": "Achtsame Babymassage (montags, 09.11.–21.12.2026)",
+     "summary": "Kurs der Hebamme Anne Schulz: Eltern lernen eine achtsame Massage für ihr Baby und stärken so die Bindung. Er findet in der FamilienBox statt; man meldet sich über die Website an.",
+     "topics": [
+      "babymassage",
+      "hebamme"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+     "sourceUrl": "https://www.hebanne-schulz.de/",
+     "category": "babykurse",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über „Hier anmelden“ auf der Website"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "11:00",
+      "end": "12:15",
+      "from": "2026-11-09",
+      "until": "2026-12-21",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "hebanne-schulz",
+     "venueId": "hebanne-schulz",
+     "title": "Workshop Babypflege & Babyalltag",
+     "summary": "Workshop der Hebamme Anne Schulz zu Babypflege, Umgang mit dem Baby und Alltag mit dem Neugeborenen in der FamilienBox. Man meldet sich über die Website an.",
+     "topics": [
+      "hebamme",
+      "beratung"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.hebanne-schulz.de/",
+     "sourceUrl": "https://www.hebanne-schulz.de/",
+     "category": "beratung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über „Hier anmelden“ auf der Website"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-10-28T16:00",
+        "end": "2026-10-28T18:00"
+       }
+      ]
+     }
+    }
    ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "105,00 €",
-   "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
-   "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 1,
-    "maxMonths": 5
-   },
-   "availability": {
-    "status": "ausgebucht",
-    "note": "Kurs ausgebucht (8/8)"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "11:00",
-    "end": "12:15",
-    "from": "2026-11-09",
-    "until": "2026-12-21",
-    "skipHolidays": false
-   }
+   "inputHash": "f67f78d4ce3a91208011851c40f4db584ab4fb87ae35421cc7a18a1b6d5af008",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "hebanne-schulz",
-   "venueId": "hebanne-schulz",
-   "title": "Achtsame Babymassage, Jan–Feb 2027",
-   "summary": "Kurs „Bindung durch Berührung“ für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: sanfte Berührungen und das Lesen von Körperbotschaften in kleiner Gruppe. Anmeldung über die Detailseite.",
-   "topics": [
-    "babymassage"
+  "seite:https://www.hebanne-schulz.de/bindung-durch-beruehrung/": {
+   "events": [
+    {
+     "providerId": "hebanne-schulz",
+     "venueId": "hebanne-schulz",
+     "title": "Achtsame Babymassage – Bindung durch Berührung (Montagskurs ab 9.11.2026)",
+     "summary": "Hebamme Anne Schulz zeigt Eltern sanfte Massagegriffe und wie man die Signale des Babys liest. In der kleinen Gruppe ist auch Raum für Fragen zu Schreien, Schlafen und Stillen. Für Babys, die bei Kursbeginn 6 Wochen bis 5 Monate alt sind.",
+     "topics": [
+      "babymassage"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "105 €",
+     "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+     "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 5
+     },
+     "availability": {
+      "status": "ausgebucht",
+      "note": "8 von 8 Plätzen belegt"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "11:00",
+      "end": "12:15",
+      "from": "2026-11-09",
+      "until": "2026-12-21",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "hebanne-schulz",
+     "venueId": "hebanne-schulz",
+     "title": "Achtsame Babymassage – Bindung durch Berührung (Montagskurs ab 11.1.2027)",
+     "summary": "Hebamme Anne Schulz zeigt Eltern sanfte Massagegriffe und wie man die Signale des Babys liest. In der kleinen Gruppe ist auch Raum für Fragen zu Schreien, Schlafen und Stillen. Für Babys, die bei Kursbeginn 6 Wochen bis 5 Monate alt sind.",
+     "topics": [
+      "babymassage"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "105 €",
+     "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+     "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 5
+     },
+     "availability": {
+      "status": "frei",
+      "note": "0 von 8 Plätzen belegt, Anmeldung online"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "11:00",
+      "end": "12:15",
+      "from": "2027-01-11",
+      "until": "2027-02-15",
+      "skipHolidays": false
+     }
+    }
    ],
-   "format": "kurs",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "price": "105,00 €",
-   "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
-   "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
-   "category": "babykurse",
-   "age": {
-    "minMonths": 1,
-    "maxMonths": 5
-   },
-   "availability": {
-    "status": "frei",
-    "note": "8 Plätze frei (0/8 belegt)"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "11:00",
-    "end": "12:15",
-    "from": "2027-01-11",
-    "until": "2027-02-15",
-    "skipHolidays": false
-   }
+   "inputHash": "b31d3d53fc1681659c5b6a74deddf5b39e513126bd2397584277e19fab6d72da",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "3172c0d2787c348a7b42bc4aa3449e4cd1d8ec2ff82f9935c87c095f96c22d63",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-26T07:48:52+01:00",
- "sources": []
+ }
 }

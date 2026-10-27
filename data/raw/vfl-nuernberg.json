@@ -1,44 +1,48 @@
 {
- "events": [
-  {
-   "providerId": "vfl-nuernberg",
-   "venueId": "vfl-nuernberg",
-   "title": "Mutter-Kind-Turnen (Montag 15:30-16:30)",
-   "summary": "Eltern-Kind-Turnen in der VfL-Sporthalle für Kinder von etwa 1 bis 3 Jahren, montags 15:30-16:30. Die Trainingszeiten-Seite nennt \"neuer Kurs ab Januar 2024\" und keine Kosten; Plätze und Preis bitte beim Verein erfragen.",
-   "topics": [
-    "eltern-kind-turnen",
-    "bewegung"
+ "version": 2,
+ "units": {
+  "seite:https://vfl-nuernberg.de/turnen/trainingszeiten/": {
+   "events": [
+    {
+     "providerId": "vfl-nuernberg",
+     "venueId": "vfl-nuernberg",
+     "title": "Mutter-Kind-Turnen (montags)",
+     "summary": "Kleinkinder turnen mit einem Elternteil in der VfL-Sporthalle, wöchentlich am Montagnachmittag. Einstieg auf Anfrage beim Verein.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://vfl-nuernberg.de/turnen/trainingszeiten/",
+     "sourceUrl": "https://vfl-nuernberg.de/turnen/trainingszeiten/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Anfrage über den Kontakt des VfL Nürnberg"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "15:30",
+      "end": "16:30",
+      "from": "2026-11-02",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "mit-anmeldung",
-   "cost": "kostenpflichtig",
-   "url": "https://vfl-nuernberg.de/turnen/trainingszeiten/",
-   "sourceUrl": "https://vfl-nuernberg.de/turnen/trainingszeiten/",
-   "category": "bewegung",
-   "age": {
-    "minMonths": 12,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "unbekannt",
-    "note": "Keine Platzangabe auf der Seite; Anfrage über den Verein (Kontaktseite)."
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "MO"
-    ],
-    "start": "15:30",
-    "end": "16:30",
-    "from": "2026-10-12",
-    "skipHolidays": false
-   }
+   "inputHash": "0d03a5371b4e012b7cf8f4621840bee11130d0edd9eb3b8fd834af93a10cdc10",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "f2fc5366a8d95e968d854578d56296dd5cfbfa1adeb99f03a7e1258fecfe584e",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-12T14:49:58+02:00",
- "sources": []
+ }
 }

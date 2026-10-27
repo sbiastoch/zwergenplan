@@ -1,78 +1,100 @@
 {
- "events": [
-  {
-   "providerId": "nachbarschaftshaus-gostenhof",
-   "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer (Dienstag, 9–12 Uhr)",
-   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahre: spielen, austauschen, ankommen. Keine Anmeldung nötig, Kosten entfallen. Nicht in den Ferien.",
-   "topics": [
-    "elterntreff",
-    "spielgruppe"
+ "version": 2,
+ "units": {
+  "seite:https://www.nuernberg.de/internet/nh_gostenhof/kurse.html": {
+   "events": [
+    {
+     "providerId": "nachbarschaftshaus-gostenhof",
+     "venueId": "nachbarschaftshaus-gostenhof",
+     "title": "Offenes Kinderzimmer – Dienstagvormittag (0–3 Jahre)",
+     "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre: gemeinsam spielen, andere Familien kennenlernen und sich austauschen, ohne festes Programm. Ohne Anmeldung, kostenlos, nicht in den Ferien.",
+     "topics": [
+      "elterntreff",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "kostenfrei",
+     "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+     "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Einfach vorbeikommen; Infos unter 0911 / 231-7086"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:00",
+      "end": "12:00",
+      "from": "2026-10-27",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "nachbarschaftshaus-gostenhof",
+     "venueId": "nachbarschaftshaus-gostenhof",
+     "title": "Offenes Kinderzimmer – Donnerstagnachmittag (0–3 Jahre)",
+     "summary": "Offener Spiel- und Austauschtreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne pädagogische Leitung; im Sommer auch im Garten. Ohne Anmeldung, kostenlos, nicht in den Ferien.",
+     "topics": [
+      "elterntreff",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "kostenfrei",
+     "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+     "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Einfach vorbeikommen; Infos unter 0911 / 231-7086"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "14:00",
+      "end": "17:00",
+      "from": "2026-10-29",
+      "skipHolidays": true
+     }
+    }
    ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "category": "treffs-cafes",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TU"
-    ],
-    "start": "09:00",
-    "end": "12:00",
-    "from": "2026-10-27",
-    "skipHolidays": true
-   }
+   "inputHash": "743e026af685d0a48c582d75a77322e7204fa88b379fc30447faad545d3539cc",
+   "model": "opus",
+   "status": "ok",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
-  {
-   "providerId": "nachbarschaftshaus-gostenhof",
-   "venueId": "nachbarschaftshaus-gostenhof",
-   "title": "Offenes Kinderzimmer (Donnerstag, 14–17 Uhr)",
-   "summary": "Offener Treff ohne Programm für Eltern mit Kindern bis 3 Jahre: spielen, austauschen, ankommen. Keine Anmeldung nötig, Kosten entfallen. Nicht in den Ferien.",
-   "topics": [
-    "elterntreff",
-    "spielgruppe"
-   ],
-   "format": "regelmaessig",
-   "registration": "ohne-anmeldung",
-   "cost": "kostenlos",
-   "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
-   "category": "treffs-cafes",
-   "age": {
-    "minMonths": 0,
-    "maxMonths": 36
-   },
-   "availability": {
-    "status": "ohne-anmeldung",
-    "note": "Offener Treff, einfach vorbeikommen"
-   },
-   "schedule": {
-    "kind": "weekly",
-    "weekdays": [
-     "TH"
-    ],
-    "start": "14:00",
-    "end": "17:00",
-    "from": "2026-10-29",
-    "skipHolidays": true
-   }
+  "seite:https://www.nuernberg.de/internet/nh_gostenhof/veranstaltungen.html": {
+   "events": [],
+   "inputHash": "9e4cdd490cdf879047187b8104c78dca7fc243ec0a7ad1ad6e770a22c753fc18",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
+  },
+  "seite:https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28veranstalterID%20%3D%3D%20412%29%20OR%20%28ortID%20%3D%3D%2028%29&AUSGABEFELDER=TITEL,UNTERTITEL,DATUM,ORT&MAX_LIMIT=200&ALLETERMINE=1&ORDER=DATUM&START_DATUM={von}": {
+   "events": [],
+   "inputHash": "8f1d84f1982cc7b647495d9f92af8930a446dc89f771cb0cdc0fda43f9664c5b",
+   "model": "opus",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   }
- ],
- "inputHash": "d557a1315e9116223ad2f3784ed7ae52dc3a53e27724465b030acf6db20b3f2e",
- "model": "haiku",
- "status": "ok",
- "checkedAt": "2026-10-27T07:42:08+01:00",
- "changedAt": "2026-10-27T07:42:08+01:00",
- "sources": []
+ }
 }
