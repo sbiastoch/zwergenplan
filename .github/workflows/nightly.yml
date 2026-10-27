@@ -37,6 +37,12 @@ on:
       only:
         description: "nur diese Anbieter (Komma-Liste, leer = alle)"
         default: ""
+      timeout:
+        description: "timeout-minutes des Nachtlaufs (Plan 0048, E7; mindestens budget_min + 20)"
+        default: "90"
+      umstellen:
+        description: "Umstellung auf V2 erzwingen, nach Prüfung (Plan 0048, E7; Komma-Liste)"
+        default: ""
 
 permissions:
   contents: read
@@ -139,7 +145,8 @@ jobs:
     needs: modus
     if: needs.modus.outputs.modus == 'trocken' || needs.modus.outputs.modus == 'live'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # beim Zeitplan sind die Eingaben leer, dann gilt 90 (Plan 0048, E7)
+    timeout-minutes: ${{ fromJSON(inputs.timeout || '90') }}
     outputs:
       ampel: ${{ steps.status.outputs.ampel }}
       run_dir: ${{ steps.nightly.outputs.run_dir }}
@@ -175,9 +182,19 @@ jobs:
           MAX_TOKENS: ${{ inputs.max_tokens }}
           RUN_BUDGET_MIN: ${{ inputs.budget_min }}
           ONLY: ${{ inputs.only }}
+          UMSTELLEN: ${{ inputs.umstellen }}
+          TIMEOUT: ${{ inputs.timeout || '90' }}
         run: |
           [[ "$ONLY" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::only enthält unerlaubte Zeichen"; exit 1; }
-          if [[ -n "$ONLY" ]]; then pnpm pipeline nightly --only "$ONLY"; else pnpm pipeline nightly; fi
+          [[ "$UMSTELLEN" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::umstellen enthält unerlaubte Zeichen"; exit 1; }
+          # Zeitbudget mindestens 20 Minuten unter dem Job-Limit: Build, Gates und Bericht brauchen ihre Zeit (E7)
+          if (( ${RUN_BUDGET_MIN:-50} + 20 > TIMEOUT )); then
+            echo "::error::budget_min (${RUN_BUDGET_MIN:-50}) + 20 > timeout ($TIMEOUT)"; exit 1
+          fi
+          args=()
+          [[ -n "$ONLY" ]] && args+=(--only "$ONLY")
+          [[ -n "$UMSTELLEN" ]] && args+=(--umstellen "$UMSTELLEN")
+          pnpm pipeline nightly "${args[@]}"
       - name: Gates (data:validate, check:fast)
         id: gates
         run: pnpm data:validate && pnpm check:fast

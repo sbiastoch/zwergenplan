@@ -11,6 +11,7 @@ import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
 import { DiscoverState, reservedConflicts } from "./pipeline/lib/discover-state.ts";
 import { hasResultFor, promptHash } from "./pipeline/lib/eval-score.ts";
 import { providerRawIssues } from "./pipeline/lib/raw.ts";
+import { duplicateUnitIds } from "./pipeline/lib/units.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
 
 const source = dataSource();
@@ -99,7 +100,11 @@ const fixture = source === "fixture";
 const plausibility = checkPlausibility(result.summary, deployed, { fixture, now });
 const timetable = loadTimetable(source);
 const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED });
-const errors = [...plausibility.errors, ...timetableCheck.errors, ...rawIssues(), ...discoverIssues()];
+// Kennungen der Einheiten je Anbieter eindeutig (Plan 0048, E1)
+const unitIssues = result.providers.flatMap((p) =>
+  p.role === "anbieter" ? duplicateUnitIds(p).map((id) => `data/providers.yaml ${p.id}: Seite doppelt (${id})`) : [],
+);
+const errors = [...plausibility.errors, ...timetableCheck.errors, ...rawIssues(), ...discoverIssues(), ...unitIssues];
 const warnings = [
   ...plausibility.warnings,
   ...timetableCheck.warnings,
