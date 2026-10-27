@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Anbieter, OffersFile } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
+import { addDays } from "../../../src/domain/time.ts";
 import type { Candidate } from "./candidate.ts";
 import type { CallRecord, ExtractOutcome } from "./extract.ts";
 import { catalogExcerpt, extractKey, ICAL_HEADING } from "./normalize.ts";
@@ -13,9 +14,11 @@ import {
   type FetchedUnit,
   hasFuture,
   migrate,
+  missingFromPrevious,
   NO_INPUT_MODEL,
   needsStrongRetry,
   offerUnits,
+  pickGapAnswer,
   planRefresh,
   type RefreshContext,
   summarize,
@@ -659,3 +662,134 @@ describe("refresh je Einheit (Plan 0048, E5)", () => {
     });
   });
 });
+
+describe("missingFromPrevious: Lücke gegen den Vorzustand (Plan 0048, E13)", () => {
+  const W = { today: TODAY, freeDays: {} };
+  const weekly = (title: string, weekday: "TU" | "WE", start: string, over: Partial<RawEvent> = {}) =>
+    ev(title, {
+      schedule: { kind: "weekly", weekdays: [weekday], start, end: "11:00", from: "2026-10-07", skipHolidays: false },
+      ...over,
+    });
+  const once = (title: string, start: string, over: Partial<RawEvent> = {}) =>
+    ev(title, { format: "einmalig", schedule: { kind: "dates", dates: [{ start }] }, ...over });
+  const titles = (es: readonly RawEvent[]) => es.map((e) => e.title);
+
+  it("meldet ein altes Event mit künftigem Beginn, das keine neue Fassung deckt", () => {
+    const old = [weekly("Krabbelgruppe", "WE", "10:00"), weekly("Babymassage", "TU", "09:00")];
+    expect(titles(missingFromPrevious([weekly("Krabbelgruppe mittwochs", "WE", "10:00")], old, W))).toEqual([
+      "Babymassage",
+    ]);
+  });
+
+  it("ein altes Event nur mit vergangenen Beginnen fehlt nicht", () => {
+    expect(missingFromPrevious([], [once("Laternenfest", "2026-10-01T17:00")], W)).toEqual([]);
+  });
+
+  it("drei alte Einzeltermine, eine neue Regel mit diesen Beginnen: gedeckt (Bündelung)", () => {
+    const old = ["2026-10-14T10:00", "2026-10-21T10:00", "2026-10-28T10:00"].map((s) => once("Konzert", s));
+    expect(missingFromPrevious([weekly("Konzert für Kinder", "WE", "10:00")], old, W)).toEqual([]);
+  });
+
+  it("anderer Ort: fehlt", () => {
+    const old = [weekly("Krabbelgruppe", "WE", "10:00")];
+    const fresh = [weekly("Krabbelgruppe", "WE", "10:00", { venueId: "anderswo" })];
+    expect(titles(missingFromPrevious(fresh, old, W))).toEqual(["Krabbelgruppe"]);
+  });
+
+  it("zwei parallele Kurse zur selben Zeit, einer fehlt: gemeldet (je Beginn zugeordnet)", () => {
+    const old = [
+      weekly("BabySinne 12–30 Monate", "TU", "09:30"),
+      weekly("Kleinkindturnen 12–36 Monate", "TU", "09:30"),
+    ];
+    const fresh = [weekly("BabySinne (12–30 Monate)", "TU", "09:30")];
+    expect(titles(missingFromPrevious(fresh, old, W))).toEqual(["Kleinkindturnen 12–36 Monate"]);
+  });
+
+  it("ein gemeinsamer Beginn genügt: die neue Fassung beginnt später, der Kurs ist gedeckt", () => {
+    const old = [weekly("Krabbelgruppe", "WE", "10:00")];
+    const fresh = [
+      weekly("Krabbelgruppe", "WE", "10:00", {
+        schedule: {
+          kind: "weekly",
+          weekdays: ["WE"],
+          start: "10:00",
+          end: "11:00",
+          from: "2026-11-04",
+          skipHolidays: false,
+        },
+      }),
+    ];
+    expect(missingFromPrevious(fresh, old, W)).toEqual([]);
+  });
+
+  it("ohne Vorzustand: leer", () => {
+    expect(missingFromPrevious([weekly("Krabbelgruppe", "WE", "10:00")], [], W)).toEqual([]);
+  });
+
+  it("Anlassfall geburtshaus-nuernberger-nest: genau die beiden Kurse 2027 fehlen", () => {
+    const course = (title: string, first: string, n: number, stepDays = 7) =>
+      ev(title, {
+        venueId: "geburtshaus-nuernberger-nest",
+        format: "kurs",
+        schedule: {
+          kind: "dates",
+          dates: Array.from({ length: n }, (_, i) => ({ start: addDaysIso(first, i * stepDays) })),
+        },
+      });
+    const old = [
+      course("Rückbildung mit/ohne Baby (Katrina) – freitags 12:00, Start Sept.", "2026-09-25T12:00", 8),
+      course("Rückbildung mit/ohne Baby (Katrina) – mittags, Start 9. Nov.", "2026-11-09T12:00", 6, 3),
+      course("Rückbildung mit/ohne Baby (Katrina) – donnerstags 17:20, Start Sept.", "2026-09-24T17:20", 6),
+      course("Rückbildung mit/ohne Baby (Katrina) – abends, Start 2. Dez.", "2026-12-02T17:20", 6, 1),
+      course("Rückbildung mit/ohne Baby – Dienstagnachmittag (Jan.–Feb. 2027)", "2027-01-12T15:00", 6),
+      course("Rückbildung mit/ohne Baby – Mittagskurs Freitag (Jan.–Feb. 2027)", "2027-01-15T12:00", 6),
+      course("Postpartum Recovery Class – Rückbildung auf Englisch (Mo, ab Feb. 2027)", "2027-02-22T10:00", 6),
+    ];
+    const fresh = [
+      course("Rückbildung mit/ohne Baby – Abendkurs donnerstags (Sept.–Okt. 2026)", "2026-09-24T17:20", 6),
+      course("Rückbildung mit/ohne Baby – Mittagskurs freitags (Sept.–Nov. 2026)", "2026-09-25T12:00", 8),
+      course("Rückbildung mit/ohne Baby – Mittagskurs Nov. 2026", "2026-11-09T12:00", 6, 3),
+      course("Rückbildung mit/ohne Baby – Abendkurs Dezember (Mi + Do, 17:20)", "2026-12-02T17:20", 6, 1),
+      course("Rückbildung mit/ohne Baby – Dienstagnachmittag ab Januar 2027", "2027-01-12T15:00", 6),
+    ];
+    expect(titles(missingFromPrevious(fresh, old, W))).toEqual([
+      "Rückbildung mit/ohne Baby – Mittagskurs Freitag (Jan.–Feb. 2027)",
+      "Postpartum Recovery Class – Rückbildung auf Englisch (Mo, ab Feb. 2027)",
+    ]);
+  });
+});
+
+describe("pickGapAnswer: welche Antwort nach einer Lücke gilt (Plan 0048, E13)", () => {
+  const W = { today: TODAY, freeDays: {} };
+  const at = (title: string, weekday: "TU" | "WE" | "FR") =>
+    ev(title, {
+      schedule: {
+        kind: "weekly",
+        weekdays: [weekday],
+        start: "10:00",
+        end: "11:00",
+        from: "2026-10-07",
+        skipHolidays: false,
+      },
+    });
+  const prev = [at("Krabbelgruppe", "WE"), at("Babymassage", "TU")];
+
+  it("die zweite schließt die Lücke: zweite", () => {
+    expect(pickGapAnswer([at("Krabbelgruppe", "WE")], prev, prev, W)).toBe("second");
+  });
+
+  it("Gleichstand: erste", () => {
+    expect(pickGapAnswer([at("Krabbelgruppe", "WE")], [at("Babymassage", "TU")], prev, W)).toBe("first");
+  });
+
+  it("die zweite findet den alten Kurs, verliert aber einen neuen der ersten: zählt wie eine Lücke", () => {
+    const first = [at("Krabbelgruppe", "WE"), at("PEKiP", "FR")];
+    expect(pickGapAnswer(first, prev, prev, W)).toBe("first");
+  });
+});
+
+/** „YYYY-MM-DDTHH:MM“ plus Tage (nur für Testdaten). */
+function addDaysIso(start: string, days: number): string {
+  const [date = "", time = ""] = start.split("T");
+  return `${addDays(date, days)}T${time}`;
+}

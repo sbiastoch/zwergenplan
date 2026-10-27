@@ -74,6 +74,16 @@ export const NightlyReport = z.object({
   units: z.record(z.string(), z.record(z.string(), z.string())).optional(),
   /** Anbieter mit ausstehender Umstellung und Grund (E7); fehlt in älteren Berichten */
   migrations: z.record(z.string(), z.string()).optional(),
+  /** Einheiten mit Lücke gegen den Vorzustand je Anbieter (Plan 0048, E13); fehlt in älteren Berichten */
+  gaps: z
+    .record(
+      z.string(),
+      z.record(
+        z.string(),
+        z.object({ before: z.number(), after: z.number().optional(), chosen: z.enum(["first", "second"]).optional() }),
+      ),
+    )
+    .optional(),
   calls: z.array(CallRecordSchema),
   /** Hinweise der Prüfung je Anbieter mit neuer Antwort (`validateRaw`, Teile), nur Anbieter mit Hinweisen */
   warnings: z.record(z.string(), z.array(z.string())),
@@ -290,6 +300,14 @@ export interface StatusInput {
   fetchReport?: string;
 }
 
+/** Zeile zu den Lücken (E13), leer ohne Lücken; die Zahl ist eine Obergrenze echter Lücken (Titelwechsel zählen mit). */
+function gapLines(r: NightlyReport): string[] {
+  const all = Object.values(r.gaps ?? {}).flatMap((u) => Object.values(u));
+  if (all.length === 0) return [];
+  const closed = all.filter((g) => g.chosen === "second" && g.after === 0).length;
+  return [`- Lücken gegen die Vornacht (E13): ${all.length} Einheiten, ${closed} im zweiten Versuch geschlossen`, ""];
+}
+
 /** Markdown für `pnpm pipeline status` und `$GITHUB_STEP_SUMMARY` (E10). */
 export function renderStatus(s: StatusInput): string {
   const r = s.report;
@@ -308,6 +326,7 @@ export function renderStatus(s: StatusInput): string {
         .map(([k, n]) => `${k} ${n}`)
         .join(", "),
     "",
+    ...gapLines(r),
     "| | Vorstand | neu | Differenz |",
     "|---|---|---|---|",
   );

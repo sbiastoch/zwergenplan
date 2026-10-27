@@ -481,3 +481,118 @@ describe("refreshProvider je Einheit (Plan 0048, E1, E5, E7)", () => {
     expect(raw && isV2(raw) && raw.units["kandidaten"]?.events).toHaveLength(2);
   });
 });
+
+describe("refreshProvider: Lücke je Einheit → zweiter Versuch (Plan 0048, E13)", () => {
+  const plus = (o: ExtractOutcome, extra: RawEvent[]): ExtractOutcome =>
+    o.kind === "ok" ? { ...o, events: [...o.events, ...extra] } : o;
+  const neu = () =>
+    RawEvent.parse({ ...ev("Babymassage"), schedule: { ...ev("x").schedule, weekdays: ["TU"], start: "09:00" } });
+  const gapOf = (r: Awaited<ReturnType<typeof run>>["r"]) => (r.kind === "done" ? r.gaps?.[unitId(0)] : undefined);
+
+  it("ein Kurs der Vornacht fehlt: zweiter Aufruf mit strong; die vollständige Antwort gilt", async () => {
+    const f = fake(ok(3, "opus"), ok(4, "opus"), { normal: "opus", strong: "opus" });
+    const { r, u } = await run(f);
+    expect(f.seen.map((i) => i.strong ?? false)).toEqual([false, true]);
+    expect(u()?.events).toHaveLength(4);
+    expect(gapOf(r)).toEqual({ before: 1, after: 0, chosen: "second" });
+    expect(r.kind === "done" && r.warnings?.join("\n")).toContain(
+      `${unitId(0)}: Lücke, 1 Angebote der Vornacht fehlten („Treff 4“); zweiter Versuch: 0 fehlen, gilt`,
+    );
+  });
+
+  it("keine Lücke: kein zweiter Aufruf, kein Eintrag in gaps", async () => {
+    const f = fake(ok(4, "opus"), ok(4, "opus"));
+    const { r } = await run(f);
+    expect(f.seen).toHaveLength(1);
+    expect(r.kind === "done" && r.gaps).toBeUndefined();
+  });
+
+  it("Gleichstand: die erste Antwort gilt", async () => {
+    const f = fake(ok(3, "haiku"), ok(3, "sonnet"));
+    const { r, u } = await run(f);
+    expect(f.seen).toHaveLength(2);
+    expect(u()?.model).toBe("haiku");
+    expect(gapOf(r)).toEqual({ before: 1, after: 1, chosen: "first" });
+  });
+
+  it("die zweite findet den alten Kurs, verliert aber den neuen der ersten: zählt mit (Gleichstand → erste)", async () => {
+    const f = fake(plus(ok(3, "haiku"), [neu()]), ok(4, "sonnet"));
+    const { r, u } = await run(f);
+    expect(u()?.model).toBe("haiku");
+    expect(u()?.events.map((e) => e.title)).toContain("Babymassage");
+    expect(r.kind === "done" && r.warnings?.join("\n")).toContain("zweiter Versuch: 0 fehlen, gilt der erste");
+    expect(gapOf(r)).toEqual({ before: 1, after: 1, chosen: "first" });
+  });
+
+  it("erste Antwort ist ein Einbruch: nur der Einbruchpfad, keine Lückenprüfung", async () => {
+    const f = fake(ok(1, "haiku"), ok(3, "sonnet"));
+    const { r } = await run(f);
+    expect(f.seen).toHaveLength(2);
+    expect(r.kind === "done" && r.gaps).toBeUndefined();
+  });
+
+  it("zweiter Versuch mit Fehler oder Ausnahme: die erste Antwort gilt, mit Hinweis", async () => {
+    const failing = fake(ok(3, "haiku"), { kind: "fehler", reason: "kaputt" });
+    const a = await run(failing);
+    expect(a.u()?.events).toHaveLength(3);
+    expect(a.r.kind === "done" && a.r.warnings?.join("\n")).toContain("zweiter Versuch gescheitert (kaputt)");
+    expect(gapOf(a.r)).toEqual({ before: 1 });
+
+    const throwing: Extractor = async (input) => {
+      if (input.strong) throw new Error("Netz weg");
+      return { outcome: ok(3, "haiku"), calls: [call("extract", "haiku")] };
+    };
+    const b = await run({ extractor: throwing });
+    expect(b.u()?.events).toHaveLength(3);
+    expect(b.r.kind === "done" && b.r.warnings?.join("\n")).toContain("zweiter Versuch gescheitert (Netz weg)");
+  });
+
+  it("abort im zweiten Versuch: die erste Antwort ist geschrieben, dann geht abort durch", async () => {
+    const f = fake(ok(3, "haiku"), { kind: "abort", abort: "limit" });
+    const { r, u } = await run(f);
+    expect(r).toMatchObject({ kind: "abort", abort: "limit" });
+    expect(u()?.events).toHaveLength(3);
+    expect(u()?.inputHash).not.toBe("alt");
+  });
+
+  it("Abbruch während des zweiten Versuchs: die erste Antwort ist geschrieben, dann abgebrochen", async () => {
+    const ctrl = new AbortController();
+    const extractor: Extractor = async (input) => {
+      if (input.strong) {
+        ctrl.abort();
+        return { outcome: { kind: "fehler", reason: "abgebrochen" }, calls: [] };
+      }
+      return { outcome: ok(3, "haiku"), calls: [call("extract", "haiku")] };
+    };
+    const { r, u } = await run({ extractor }, { mayRetry: () => true, signal: ctrl.signal });
+    expect(r.kind).toBe("abgebrochen");
+    expect(u()?.events).toHaveLength(3);
+  });
+
+  it("Bremse verweigert den zweiten Versuch: erste Antwort, Hinweis", async () => {
+    const f = fake(ok(3, "haiku"), ok(4, "sonnet"));
+    const { r, u } = await run(f, { mayRetry: () => false });
+    expect(f.seen).toHaveLength(1);
+    expect(u()?.events).toHaveLength(3);
+    expect(r.kind === "done" && r.warnings?.join("\n")).toContain("kein zweiter Versuch (Bremse oder Zeitbudget)");
+  });
+
+  it("Einheit kandidaten: keine Lückenprüfung", async () => {
+    const kand: FetchedUnit = {
+      id: "kandidaten",
+      status: "ok",
+      pages: [],
+      candidates: [],
+      text: "Kandidaten",
+      allowedUrls: [],
+    };
+    const extractor: Extractor = async (input) => ({
+      outcome: input.unit === "kandidaten" ? ok(3, "haiku") : ok(4, "haiku"),
+      calls: [call(input.strong ? "fallback" : "extract", "haiku")],
+    });
+    const prev: ProviderRaw = { version: 2, units: { [unitId(0)]: state(4), kandidaten: state(4) } };
+    const { r } = await run({ extractor }, { mayRetry: () => true, fetched: fetchedWith([unit(0), kand]) }, prev);
+    expect(r.calls).toHaveLength(2);
+    expect(r.kind === "done" && r.gaps).toBeUndefined();
+  });
+});

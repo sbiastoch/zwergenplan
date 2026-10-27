@@ -581,6 +581,35 @@ describe("runNightly: zweiter Versuch auch bei gleichem Fallback-Modell (Plan 00
   });
 });
 
+describe("runNightly: Lücke je Einheit (Plan 0048, E13)", () => {
+  it("fehlt ein Treff der Vornacht: zweiter Aufruf, gaps in nightly.json", async () => {
+    const dirsOf = tempData();
+    const only = ["familientreff-beispiel"];
+    await runNightly({ ...options(dirsOf, fakeExtractor().extractor), only, forceMigrate: only });
+    const seen: boolean[] = [];
+    const extractor: Extractor = async (input) => {
+      seen.push(input.strong ?? false);
+      const { extractor: base } = fakeExtractor((id) =>
+        id === "familientreff-beispiel" && !input.strong
+          ? { kind: "ok", events: treffs.slice(0, 2), model: "opus" }
+          : undefined,
+      );
+      return base(input, new AbortController().signal);
+    };
+    const r = await runNightly({
+      ...options(dirsOf, extractor),
+      only,
+      strongRetry: true,
+      fetch: fakeFetch([], "Neues Programm"),
+    });
+    expect(seen).toEqual([false, true]);
+    expect(r.gaps?.["familientreff-beispiel"]).toEqual({
+      "seite:https://example.org/familientreff/programm": { before: 1, after: 0, chosen: "second" },
+    });
+    expect(unitOf(readRaw(join(dirsOf.dataDir, "raw"), "familientreff-beispiel"))?.events).toHaveLength(3);
+  });
+});
+
 describe("runBuildOnly (nightly --build-only, Arch-Review S5, M1)", () => {
   it("Anbieter aus dem Katalog entfernt: seine Angebote und sein Zustand fallen weg, validateDataset grün", async () => {
     const dirsOf = tempData();

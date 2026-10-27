@@ -380,3 +380,20 @@ describe("Bericht je Einheit (Plan 0048, E10)", () => {
     expect(msg).toContain("teilausfall 1");
   });
 });
+
+describe("Lücken je Einheit (Plan 0048, E13)", () => {
+  it("ein Bericht ohne gaps wird weiter gelesen", () => {
+    expect(NightlyReport.parse(report()).gaps).toBeUndefined();
+  });
+
+  it("renderStatus zählt die Einheiten mit Lücke und wie viele der zweite Versuch schloss", () => {
+    const r = report({
+      gaps: {
+        a: { "seite:https://a.de/1": { before: 2, after: 0, chosen: "second" }, "seite:https://a.de/2": { before: 1 } },
+        b: { "seite:https://b.de": { before: 1, after: 1, chosen: "first" } },
+      },
+    });
+    const md = renderStatus({ report: r, verdict: assessRun(r, { live }), live, raws: {}, stock: {} });
+    expect(md).toContain("- Lücken gegen die Vornacht (E13): 3 Einheiten, 1 im zweiten Versuch geschlossen");
+  });
+});

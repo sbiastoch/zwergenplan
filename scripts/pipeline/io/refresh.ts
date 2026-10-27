@@ -4,7 +4,7 @@
  * schreibt den neuen Zustand einmal am Ende. Nachtlauf und Entdecken rufen dieselbe Funktion.
  */
 import type { Anbieter } from "../../../src/domain/schema.ts";
-import type { CallRecord, ExtractInput, ExtractKeyParts, Extractor } from "../lib/extract.ts";
+import type { CallRecord, ExtractInput, ExtractKeyParts, ExtractOutcome, Extractor } from "../lib/extract.ts";
 import { type BeilageState, isV2, type ProviderRawV2, type UnitState } from "../lib/raw.ts";
 import {
   afterStrongRetry,
@@ -12,8 +12,10 @@ import {
   eventUnits,
   type FetchedProvider,
   migrate,
+  missingFromPrevious,
   needsStrongRetry,
   type ProviderResult,
+  pickGapAnswer,
   planRefresh,
   type RefreshApplied,
   type RefreshContext,
@@ -21,6 +23,7 @@ import {
   summarize,
   unconfirmedCollapse,
 } from "../lib/refresh.ts";
+import type { NightlyReport } from "../lib/report.ts";
 import type { ExpandWindow } from "../lib/schedule.ts";
 import { KANDIDATEN, type UnitDef, unitExcerpt, unitsOf } from "../lib/units.ts";
 import { RAW_DIR, readRaw, writeRaw } from "./files.ts";
@@ -59,6 +62,9 @@ export interface RefreshOptions {
 
 type UnitResult = RefreshResult | "offen";
 
+/** Lücke einer Einheit (Plan 0048, E13), Form wie in `nightly.json` */
+type UnitGap = NonNullable<NightlyReport["gaps"]>[string][string];
+
 export type RefreshOutcome =
   /**
    * `units`: Ergebnis je Einheit; `warnings`: Hinweise der Prüfung zu neuen Antworten (`validateRaw`), nur wenn es
@@ -74,18 +80,37 @@ export type RefreshOutcome =
       warnings?: string[];
       migration?: string;
       dropped?: string[];
+      /** Einheiten mit Lücke gegen den Vorzustand (E13) */
+      gaps?: Record<string, UnitGap>;
     }
-  /** Auth oder Limit (E2): fertige Einheiten sind geschrieben, die übrigen unverändert; der Lauf endet geordnet */
-  | { kind: "abort"; abort: "auth" | "limit"; calls: CallRecord[] }
+  /**
+   * Auth oder Limit (E2): fertige Einheiten sind geschrieben, die übrigen unverändert; der Lauf endet geordnet. `gaps` und
+   * `warnings` der fertigen Einheiten gehen mit (E13: Abbruch im zweiten Versuch, Arch-Review m4)
+   */
+  | { kind: "abort"; abort: "auth" | "limit"; calls: CallRecord[]; gaps?: Record<string, UnitGap>; warnings?: string[] }
   /** Lauf wurde während eines Aufrufs abgebrochen: fertige Einheiten sind geschrieben, die übrigen unverändert */
-  | { kind: "abgebrochen"; calls: CallRecord[] };
+  | { kind: "abgebrochen"; calls: CallRecord[]; gaps?: Record<string, UnitGap>; warnings?: string[] };
 
 type UnitRun =
-  | { kind: "done"; next: UnitState; result: RefreshResult; called: boolean; warnings?: string[] }
+  | {
+      kind: "done";
+      next: UnitState;
+      result: RefreshResult;
+      called: boolean;
+      warnings?: string[];
+      gap?: UnitGap;
+      /** Abbruch während des zweiten Versuchs wegen einer Lücke: die erste Antwort gilt, danach endet der Lauf (E13) */
+      stop?: { kind: "abort"; abort: "auth" | "limit" } | { kind: "abgebrochen" };
+    }
   | { kind: "abort"; abort: "auth" | "limit" }
   | { kind: "abgebrochen" };
 
-/** Eine Einheit nach E5: Plan, Extraktion, bei Einbruch ein zweiter Versuch. Aufrufe landen in `calls`. */
+type GapWindow = Parameters<typeof missingFromPrevious>[2];
+
+/**
+ * Eine Einheit nach E5: Plan, Extraktion, bei Einbruch ein zweiter Versuch, sonst bei einer Lücke gegen den Vorzustand
+ * (E13). Aufrufe landen in `calls`.
+ */
 async function refreshUnit(o: RefreshOptions, ctx: RefreshContext, calls: CallRecord[]): Promise<UnitRun> {
   const plan = planRefresh(ctx);
   if (plan.kind === "keep") return { kind: "done", next: plan.next, result: plan.result, called: false };
@@ -126,8 +151,91 @@ async function refreshUnit(o: RefreshOptions, ctx: RefreshContext, calls: CallRe
     }
   }
   if (applied.kind === "abort") return { kind: "abort", abort: applied.abort };
-  const warnings = final.kind === "ok" ? final.warnings : undefined;
-  return { kind: "done", next: applied.next, result: applied.result, called: true, ...(warnings ? { warnings } : {}) };
+  // nach einem zweiten Versuch wegen Einbruchs keine Lückenprüfung (E13: Einbruch vor Lücke, kein dritter Aufruf)
+  const gap =
+    final === outcome
+      ? await gapRetry(o, ctx, { input, key: plan.key, applied, first: outcome, tag }, calls)
+      : undefined;
+  if (gap) ({ applied, final } = gap);
+  if (applied.kind === "abort") return { kind: "abort", abort: applied.abort };
+  const warnings = [...(final.kind === "ok" ? (final.warnings ?? []) : []), ...(gap?.note ? [gap.note] : [])];
+  return {
+    kind: "done",
+    next: applied.next,
+    result: applied.result,
+    called: true,
+    ...(warnings.length > 0 ? { warnings } : {}),
+    ...(gap ? { gap: gap.gap } : {}),
+    ...(gap?.stop ? { stop: gap.stop } : {}),
+  };
+}
+
+/**
+ * Zweiter Versuch bei einer Lücke (Plan 0048, E13): nur nach `extrahiert`, mit Vorzustand, nicht für `kandidaten` und
+ * nur mit `mayRetry` (Entdecken: nie). Welche Antwort gilt, entscheidet `pickGapAnswer` (`lib/refresh.ts`).
+ * Scheitert der zweite Versuch, gilt die erste; ein Abbruch schreibt die erste und endet danach.
+ */
+async function gapRetry(
+  o: RefreshOptions,
+  ctx: RefreshContext,
+  run: {
+    input: ExtractInput;
+    key: Parameters<typeof applyOutcome>[1];
+    applied: RefreshApplied;
+    first: ExtractOutcome;
+    tag: (cs: readonly CallRecord[]) => CallRecord[];
+  },
+  calls: CallRecord[],
+): Promise<
+  | {
+      applied: RefreshApplied;
+      final: ExtractOutcome;
+      gap: UnitGap;
+      note: string;
+      stop?: NonNullable<Extract<UnitRun, { kind: "done" }>["stop"]>;
+    }
+  | undefined
+> {
+  const { first, applied } = run;
+  const prev = ctx.prev;
+  if (!o.mayRetry || ctx.unit.id === KANDIDATEN || prev?.inputHash === undefined) return undefined;
+  if (first.kind !== "ok" || applied.kind !== "write" || applied.result !== "extrahiert") return undefined;
+  const w: GapWindow = { today: o.today, freeDays: o.freeDays };
+  const missing = missingFromPrevious(first.events, prev.events, w);
+  if (missing.length === 0) return undefined;
+  const head = `${ctx.unit.id}: Lücke, ${missing.length} Angebote der Vornacht fehlten (${missing.map((e) => `„${e.title}“`).join(", ")})`;
+  const keepFirst = (why: string, stop?: { kind: "abort"; abort: "auth" | "limit" } | { kind: "abgebrochen" }) => ({
+    applied,
+    final: first,
+    gap: { before: missing.length },
+    note: `${head}; ${why}`,
+    ...(stop ? { stop } : {}),
+  });
+  if (!o.mayRetry(calls)) return keepFirst("kein zweiter Versuch (Bremse oder Zeitbudget)");
+  if (o.signal.aborted) return keepFirst("kein zweiter Versuch (Abbruch)", { kind: "abgebrochen" });
+  let second: Awaited<ReturnType<Extractor>>;
+  try {
+    second = await o.extractor({ ...run.input, strong: true }, o.signal);
+  } catch (e) {
+    if (o.signal.aborted) return keepFirst("zweiter Versuch abgebrochen", { kind: "abgebrochen" });
+    second = { outcome: { kind: "fehler", reason: e instanceof Error ? e.message : String(e) }, calls: [] };
+  }
+  calls.push(...run.tag(second.calls));
+  const out = second.outcome;
+  if (out.kind === "abort") return keepFirst("zweiter Versuch abgebrochen", { kind: "abort", abort: out.abort });
+  if (out.kind === "fehler") {
+    if (o.signal.aborted) return keepFirst("zweiter Versuch abgebrochen", { kind: "abgebrochen" });
+    return keepFirst(`zweiter Versuch gescheitert (${out.reason})`);
+  }
+  const chosen = pickGapAnswer(first.events, out.events, prev.events, w);
+  const fromSecond = missingFromPrevious(out.events, prev.events, w).length;
+  const after = chosen === "second" ? fromSecond : missing.length;
+  return {
+    applied: chosen === "second" ? applyOutcome(ctx, run.key, out) : applied,
+    final: chosen === "second" ? out : first,
+    gap: { before: missing.length, after, chosen },
+    note: `${head}; zweiter Versuch: ${fromSecond} fehlen, gilt ${chosen === "second" ? "der zweite" : "der erste"}`,
+  };
 }
 
 /** Zustand der Beilagen nach diesem Abruf (E1): Fehlerserie und Fehlerklasse wie bei Einheiten. */
@@ -179,6 +287,7 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
   const next: Record<string, UnitState> = {};
   const results: Record<string, UnitResult> = {};
   const warnings: string[] = [];
+  const gaps: Record<string, UnitGap> = {};
   let called = false;
   let stop: { kind: "abort"; abort: "auth" | "limit" } | { kind: "abgebrochen" } | undefined;
   for (const unit of units) {
@@ -213,7 +322,10 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
     results[unit.id] = r.result;
     called ||= r.called;
     warnings.push(...(r.warnings ?? []));
+    if (r.gap) gaps[unit.id] = r.gap;
+    if (r.stop) stop = r.stop;
   }
+  const withGaps = Object.keys(gaps).length > 0 ? { gaps } : {};
 
   // entfernte Seiten zählen als erledigt, sonst blieben verwaiste Einheiten für immer (Arch-Review m2)
   const done = units.every((u) => next[u.id]?.inputHash !== undefined || next[u.id]?.removedAt !== undefined);
@@ -237,7 +349,7 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
   if (legacy !== undefined) {
     // Umstellung (E7): nur ganz oder mit `--umstellen`; sonst bleibt die V1-Datei unverändert (bzw. es gibt keine)
     const m = migrate({ old: legacy, units: unitList, today: o.today });
-    if (stop) return { ...stop, calls };
+    if (stop) return { ...stop, calls, ...withGaps, ...(warnings.length > 0 ? { warnings } : {}) };
     // eine offene Einheit (Zeitbudget, Bremse) hat keinen Stand: auch `--umstellen` schreibt dann nicht, sonst fielen
     // ihre alten Angebote samt IDs weg (Arch-Review M2)
     const open = unitList.some((u) => u.result === "offen");
@@ -253,10 +365,11 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
         calls,
         migration: m.ok ? "Lauf vorzeitig beendet" : m.reason,
         ...(warnings.length > 0 ? { warnings } : {}),
+        ...withGaps,
       };
     write();
   } else if (Object.values(results).some((r) => r !== "offen") || dropped.length > 0) write();
-  if (stop) return { ...stop, calls };
+  if (stop) return { ...stop, calls, ...withGaps, ...(warnings.length > 0 ? { warnings } : {}) };
   return {
     kind: "done",
     result: summarize(unitList.map((u) => u.result)),
@@ -265,5 +378,6 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
     calls,
     ...(warnings.length > 0 ? { warnings } : {}),
     ...(dropped.length > 0 ? { dropped } : {}),
+    ...withGaps,
   };
 }

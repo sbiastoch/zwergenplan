@@ -15,6 +15,7 @@ import type { CallRecord, ExtractKeyParts, ExtractOutcome } from "./extract.ts";
 import { catalogExcerpt, datedFrom, type ExtractKey, extractKey, sameKey } from "./normalize.ts";
 import { expansionWindow, type FailureClass, type RawEvent, type UnitState } from "./raw.ts";
 import { type ExpandWindow, expandSchedule } from "./schedule.ts";
+import { similarTitle } from "./similar.ts";
 import { KANDIDATEN } from "./units.ts";
 
 /** Ergebnis des Abrufs einer Einheit (`io/fetch-inputs.ts`, Plan 0048, E2). */
@@ -164,6 +165,53 @@ export function hasFuture(events: readonly RawEvent[], today: string, freeDays: 
       (o) => (o.end ?? o.start).slice(0, 10) >= today,
     ),
   );
+}
+
+/**
+ * Lücke gegen den Vorzustand (Plan 0048, E13): Events aus `reference` mit künftigem Beginn, die keine Fassung in `fresh`
+ * deckt. Gedeckt heißt gleicher Ort, ähnlicher Titel und ein gemeinsamer künftiger Beginn. Zugeordnet wird je Beginn:
+ * Jeder Zeitpunkt eines neuen Events deckt höchstens ein altes. So brauchen zwei parallele Kurse zur selben Zeit zwei
+ * neue Fassungen, eine Regel, die mehrere alte Einzeltermine bündelt, deckt aber alle.
+ */
+export function missingFromPrevious(
+  fresh: readonly RawEvent[],
+  reference: readonly RawEvent[],
+  w: { today: string; freeDays: ExpandWindow["freeDays"] },
+): RawEvent[] {
+  const to = addDays(w.today, 400);
+  const starts = (e: RawEvent) =>
+    expandSchedule(e.schedule, { to: expansionWindow(e, to), freeDays: w.freeDays, from: w.today })
+      .filter((o) => (o.end ?? o.start).slice(0, 10) >= w.today)
+      .map((o) => Date.parse(o.start));
+  const open = fresh.map((e) => ({ e, slots: new Set(starts(e)) }));
+  return reference.filter((old) => {
+    const own = starts(old);
+    if (own.length === 0) return false;
+    for (const f of open) {
+      if (f.e.venueId !== old.venueId || !similarTitle(f.e.title, old.title)) continue;
+      const hit = own.filter((s) => f.slots.has(s));
+      if (hit.length === 0) continue;
+      for (const s of hit) f.slots.delete(s);
+      return false;
+    }
+    return true;
+  });
+}
+
+/**
+ * Welche von zwei Antworten gilt nach einem zweiten Versuch wegen einer Lücke (E13, Review 2, M3)? Jede wird gegen den
+ * Vorzustand plus die neuen Events der anderen Antwort gezählt (neu = von der Vornacht nicht gedeckt): So verliert eine
+ * Antwort, die einen alten Kurs wiederfindet, dafür aber einen neu gefundenen weglässt. Bei Gleichstand die erste.
+ */
+export function pickGapAnswer(
+  first: readonly RawEvent[],
+  second: readonly RawEvent[],
+  prev: readonly RawEvent[],
+  w: { today: string; freeDays: ExpandWindow["freeDays"] },
+): "first" | "second" {
+  const score = (own: readonly RawEvent[], other: readonly RawEvent[]) =>
+    missingFromPrevious(own, [...prev, ...missingFromPrevious(prev, other, w)], w).length;
+  return score(second, first) < score(first, second) ? "second" : "first";
 }
 
 /**

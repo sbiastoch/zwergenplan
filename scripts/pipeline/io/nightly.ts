@@ -108,6 +108,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   let cached = 0;
   const units: NonNullable<NightlyReport["units"]> = {};
   const migrations: Record<string, string> = {};
+  const gaps: NonNullable<NightlyReport["gaps"]> = {};
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
   // vor den Einheiten geladen: `hasFuture` (E5) braucht sie, der Build danach dieselben
   const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
@@ -164,6 +165,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
           results[provider.id] = r.result;
           units[provider.id] = r.units;
           if (r.migration) migrations[provider.id] = r.migration;
+          if (r.gaps) gaps[provider.id] = r.gaps;
           // verwaiste Einheiten (geänderte URL) entfallen mit Hinweis (E6; Arch-Review 2 und 3, m1)
           const notes = [
             ...(r.warnings ?? []),
@@ -172,10 +174,16 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
           if (notes.length > 0) warnings[provider.id] = notes;
           if (!r.called && r.result !== "ausgefallen") cached++;
         } else if (r.kind === "abort") {
+          if (r.gaps) gaps[provider.id] = r.gaps;
+          if (r.warnings) warnings[provider.id] = r.warnings;
           results[provider.id] = "abort";
           abort ??= r.abort;
           controller.abort();
-        } else results[provider.id] = "abgebrochen";
+        } else {
+          if (r.gaps) gaps[provider.id] = r.gaps;
+          if (r.warnings) warnings[provider.id] = r.warnings;
+          results[provider.id] = "abgebrochen";
+        }
       } catch (e) {
         // Abbruch während des Aufrufs (AbortError) oder Programmfehler: nur dieser Anbieter, sein Zustand bleibt
         if (controller.signal.aborted) {
@@ -210,6 +218,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     results,
     units,
     ...(Object.keys(migrations).length > 0 ? { migrations } : {}),
+    ...(Object.keys(gaps).length > 0 ? { gaps } : {}),
     calls,
     warnings,
     cached,
