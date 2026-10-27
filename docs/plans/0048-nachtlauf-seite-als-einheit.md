@@ -475,7 +475,7 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected` (Daten und Schem
 
 - **N1 – Seiten, die robots.txt sperrt oder die den neuen User-Agent abweisen** (nach der Messung in S3). Empfehlung: robots.txt achten. Eine gesperrte Seite bekommt `blocked` mit Grund, und der Anbieter wird über den Seitenfinder (Plan 0049) oder von Hand anders erschlossen. Alternative: eine Ausnahme je Seite im Katalog mit Begründung. Zu entscheiden nur, wenn die Messung Seiten findet.
 - **N2 – Entfernte Seite nach 14 Tagen** (ADR 0033, Punkt 3). Empfehlung: ja, wie im ADR. Alternative: Bestand bleibt unbegrenzt wie heute, und nur der Wächter meldet. **Umgesetzt wie im ADR** (angenommen vom Nutzer am 2026-10-26); wirksam frühestens 14 Tage nach der Umstellung, S2 (Wächter) soll vorher live sein. Widerspricht der Nutzer, wird `REMOVED_AFTER_DAYS` (`scripts/pipeline/lib/refresh.ts`) zum Schalter.
-- **N3 – `sternenhaus-kuf` mit Opus: entschieden am 2026-10-26** (Nutzer: Empfehlung angenommen). Haiku hatte 54 `einmalig`-Events (97 Angebote) mit dem Katalogalter 24–36 Monate übernommen; die Kalender-API nennt kein Alter. Das Familienprogramm 2026 (`nuernberg.de/…/2026_sternenhaus_familienprogramm.pdf`) weist je Stück ein Alter aus: nur „WiWaWaldtraum“ (Purzeltraumtheater) und „Schneeflocken, wippediwapp“ (Lucia Ruf) sind 2+, alle übrigen 3+ bis 8+ (auch „Baby Dronte“, laut Theater Mummpitz 4+). Umgesetzt im Katalog: `hint` der API-Seite nennt genau diese zwei Stücke, `verified` 2026-10-26, Notiz zur jährlichen Pflege. Trockenlauf mit Haiku (zweiter Versuch Sonnet) und mit Opus: je genau diese zwei Stücke; der Einbruchschutz hält das eine Nacht als `pending` und übernimmt es in der zweiten. Damit braucht die Umstellung für diesen Anbieter kein `--umstellen`.
+- **N3 – `sternenhaus-kuf` mit Opus: entschieden am 2026-10-26** (Nutzer: Empfehlung angenommen). Haiku hatte 54 `einmalig`-Events (97 Angebote) mit dem Katalogalter 24–36 Monate übernommen; die Kalender-API nennt kein Alter. Das Familienprogramm 2026 (`nuernberg.de/…/2026_sternenhaus_familienprogramm.pdf`) weist je Stück ein Alter aus: nur „WiWaWaldtraum“ (Purzeltraumtheater) und „Schneeflocken, wippediwapp“ (Lucia Ruf) sind 2+, alle übrigen 3+ bis 8+ (auch „Baby Dronte“, laut Theater Mummpitz 4+). Umgesetzt im Katalog: `hint` der API-Seite nennt genau diese zwei Stücke, `verified` 2026-10-26, Notiz zur jährlichen Pflege. Trockenlauf mit Haiku (zweiter Versuch Sonnet) und mit Opus: je genau diese zwei Stücke; der Einbruchschutz hält das eine Nacht als `pending` und übernimmt es in der zweiten. ~~Damit braucht die Umstellung für diesen Anbieter kein `--umstellen`.~~ Berichtigt in der S1-Abnahme: E7 übernimmt einen Einbruch nie von selbst (anders als `pending` im alten Format), die Umstellung läuft deshalb mit `umstellen=sternenhaus-kuf`.
 
 ## Kosten
 
@@ -563,6 +563,8 @@ Wegwerf-Skripte unter `runs/s0-0048/` (gitignored): `s0.ts` (Abruf, Einheiten na
 
 ### Restpunkte (kommen bei S5 nach `docs/ideas.md`)
 
+- **Kontext für `kandidaten`** (S1-Abnahme, `ev-fischbach`): Die Einheit sieht die Texte der eigenen Seiten nicht und nimmt so Angebote auf, die eine Seite ausschließt (Alter). Mögliche Abhilfe: Kandidaten, deren Quelle zugleich eine eigene Seite ist (hier `evangelische-termine.de`, `vid=556`), nur aus der Seite nehmen; vorher im Eval messen.
+- **E12 bei gleicher Bauart** (S1-Abnahme, `stadtteilhaus-fisch`): Zwillinge auch bei gleichem Format und `schedule.kind` erkennen, wenn die Termine des einen ganz im anderen liegen und `mergeParts` sie nicht zusammenlegt (Sammelfassung gegen Einzelgruppen). Vorher im Eval messen, ob dabei echte Parallelgruppen verloren gehen.
 - **Erfundene Folgetermine** (Fallen `nuebad-flipper`, `sv-johannis-07`): Der Prompt verbietet geratene Werte, Opus schreibt Kurse trotzdem fort, wenn nur der erste Termin oder nur Wochentag und Uhrzeit bekannt sind. Eine Prompt-Änderung braucht eigene Eval-Läufe (Skill, Abschnitt 5); nach der Umstellung messen, ob es live vorkommt.
 
 ### Nachtrag 1 (2026-10-26, nach S0)
@@ -612,9 +614,44 @@ Abweichungen vom Plan, jede mit Test:
 - **Entdecken:** `discover.yml` nutzt für den Ertragsbeweis jetzt Opus mit `xhigh`. Ein Lauf ist nicht gemessen; gemessen wird im ersten Entdecken nach dem Merge, die Grenzen folgen in S4 (Review 4, m3).
 - **Effort im Runner nicht sichtbar:** Die CLI meldet die tatsächliche Stufe nicht; eine Obergrenze der Organisation (`maxEffortLevel`) würde still absenken. Der Trockenlauf protokolliert die CLI-Version; dass `xhigh` wirkt, zeigt nur die Laufzeit im Vergleich zum Eval (Review 4, m4).
 
-**Offen vor dem Merge** (Review 4, m6): Eval je Einheit (zwei Läufe) samt Abnahme `geburtshaus-nuernberger-nest`; Trockenlauf im Runner mit Abnahme und Vergleich von `offers.json`; volle Prüfung der Hinweise des Abgleichs (E12); zweites Arch-Review ohne Blocker. Danach Merge, Deploy und Umstellung mit den Grenzen aus dem Trockenlauf.
+**Offen vor dem Merge** (Review 4, m6): Eval je Einheit (zwei Läufe) samt Abnahme `geburtshaus-nuernberger-nest`; Trockenlauf im Runner mit Abnahme und Vergleich von `offers.json`; volle Prüfung der Hinweise des Abgleichs (E12); zweites Arch-Review ohne Blocker. Danach Merge, Deploy und Umstellung mit den Grenzen aus dem Trockenlauf. **Stand 2026-10-27: alles erledigt**, siehe „S1 – Abnahme“.
 
 **Arch-Review (2026-10-27), Verdict: Nacharbeit nötig.** Blocker B1 (Modell und Effort fehlen in den Workflows) wird mit Nachtrag 2 behoben. Übernommen und behoben in `55f657f`: M1 (entfernte Seite bei nur einer Seite), M2 (`--umstellen` mit offener Einheit schreibt nicht), M4 (fehlende Tests für Beilage, Fehlerklasse, Teilzeile, Kopplung Nachricht/Schlüssel), m1–m4 und m6. M3 (Effort ohne Plan) wird mit Nachtrag 2 behoben. m5 (Abweichung bei `assembleUnit`) steht oben.
+
+### S1 – Abnahme (2026-10-27)
+
+**Eval je Einheit**, Opus mit `xhigh`, zwei Läufe auf `b4916d4` (Zeilen in `evals/results.md`, Details unter `runs/s1-eval/`, gitignored). Verglichen auf den 12 gemeinsamen Fällen mit den beiden Zeilen `opus (Effort xhigh)` der Matrix (je Anbieter):
+
+| | je Anbieter (Matrix) | je Einheit, Lauf 1 | je Einheit, Lauf 2 |
+|---|---|---|---|
+| Termine R | 100 / 100 % | 99,8 % | 100 % |
+| Termine P | 75 / 77 % | 75 % | 72 % |
+| Angebote R | 100 / 100 % (54/54) | 100 % (54/54) | 100 % (54/54) |
+| Angebote vorhergesagt | 72 / 73 | 74 | 73 |
+| Dauer, Kosten (13 Fälle) | – | 1 227 s, $3,39 | 1 149 s, $3,20 |
+
+- **Recall (Ziel 2): erfüllt.**
+- **`geburtshaus-nuernberger-nest`: bestanden**, beide Rückbildungskurse 2027 in 2 von 2 Läufen (Angebote 8/8, Termine 35/38). Die Präzision des Falls liegt bei 46/47 %: eine pausierte Babymassage mit erfundenen Terminen (wie die Fallen unter „Restpunkte“) und in Lauf 1 der Mittagskurs doppelt (Kursseite und hebamio-Liste).
+- **Zwei Effekte des Zuschnitts**, in beiden Läufen, je etwa ein Angebot mehr:
+  1. **Kontext einer anderen Einheit fehlt** (`ev-fischbach`): Die Einheit `kandidaten` sieht die Sammelkalender-Seite der drei Mutter-Kind-Gruppen ohne Altersangabe und nimmt die Montagsgruppe auf. „Kinder ab 3 Jahren“ steht nur im iCal der Seite, und die Einheit der Seite lässt die Gruppe richtig weg. Je Anbieter sah das Modell beides. Die Gruppen Di und Do aus `kandidaten` entfallen wie vorgesehen nach Rang im Build.
+  2. **Dublette gleicher Bauart** (`stadtteilhaus-fisch`, `geburtshaus-nuernberger-nest`): Zwei Seiten schneiden dasselbe Angebot verschieden, etwa „Mini-FiSche (Di, Mi, Fr)“ als ein Angebot im Heft gegen drei Wochentagsgruppen auf der Seite. E12 nimmt Fassungen mit gleichem Format, Alter und `schedule.kind` aus und überlässt sie `mergeParts`, das gleiche Wochentage und denselben ersten Termin verlangt; so fallen sie durch beide.
+
+  Bewertung: Auf 12 Fällen liegt das im Rauschen der Präzision je Anbieter (72–77 %). Ob die Dubletten-Bedingung von Ziel 2 über alle Anbieter hält, zeigt der Trockenlauf mit dem Vergleich von `offers.json` gegen `main`. Beide Effekte kommen unter „Restpunkte“.
+
+**Trockenlauf im Runner** (`gh run 40464581993`, `ae7190e`, `modus=trocken`, Grenzen 240/180/1000/20 Mio.; Artefakte `nachtlauf-40464581993`, `daten-40464581993`): **bestanden.**
+
+- Keine Bremse, kein `budgetHit`. Dauer 33 Minuten (Abruf 2,2 Minuten), 237 Aufrufe für 207 Einheiten, 3,77 Mio. Tokens ein (davon 2,37 Mio. Cache lesen), 0,62 Mio. aus, $23,96 nach Schätzung der CLI.
+- Je Einheit: keine Zeitüberschreitung (längster Aufruf 217 s bei 900 s Grenze, `studio-herzschlag`), keine abgeschnittene Antwort (größte 28 771 Ausgabe-Tokens bei 32 000), ein ungültiger Aufruf (`nachbarschaftshaus-gostenhof`, im zweiten Versuch gültig). `xhigh` bleibt (Nachtrag 2).
+- Ergebnis: 76 Anbieter extrahiert, 5 leer, 1 `umstellung-ausstehend` (`sternenhaus-kuf`, „Einbruch (97 → 9 Angebote)“). Der Einbruch ist der gewollte aus N3: Beide Einheiten liefern genau die zwei Stücke ab 2 Jahren. Da E7 einen Einbruch nie von selbst übernimmt, läuft die Umstellung mit `umstellen=sternenhaus-kuf` (N3 ist entsprechend berichtigt).
+- **`offers.json` gegen den Vorstand** (`713f72d`): 465 → 526 Angebote, 6 446 → 7 054 Termine. Gegen den Nachtlauf von heute auf `main` (`0566b46`, gleiche Seiten, Haiku je Anbieter): 470 → 526.
+  - Zuwachs fast nur echte Kurse, die Haiku ausließ: `studio-herzschlag` +15 (Kursdurchgänge, MusikZauber, Babyzeichensprache), `hebamme-eva-kauper-wunderwerk` +7, `hebammen-wunderwerk` +6, `mutherstudio` +6, `wolf-pack-yoga` +4, `fbs-nuernberg` +6.
+  - Fehltreffer: `staatstheater-nuernberg-familie` +8 („Kinder im Gluck … für Vorschulkinder“, April 2027; die Falle `ab-3-jahren` des Eval-Falls, dort außerhalb des Fensters; Modell, nicht Zuschnitt), `sv-johannis-07` +2 (bekannte Falle, „Restpunkte“), `ev-fischbach` +1 (Montagsgruppe ab 3, wie im Eval).
+  - Mehr als 10 % weniger, alle erklärt: `ev-eibach` 4 → 2 (Dubletten des Vorstands entfallen), `neues-museum-baby-museum` 5 → 2 und `theater-mummpitz` 13 → 8 (Opus fasst Einzeltermine zu einem `regelmaessig`-Angebot, Termine gleich).
+  - **Dubletten** nach S0 (gleicher Anbieter und Ort, gemeinsamer Beginn, ähnlicher Kerntitel): 26 von 526 Angeboten (4,9 %) gegen 29 von 470 (6,2 %) heute auf `main`. Neu durch den Zuschnitt ist nur `stadtteilhaus-fisch` (Mini-FiSche, wie im Eval); `cvjm-gostenhof-miniclub` hat dieselbe Dublette heute schon.
+  - **Ziel 2: erfüllt** (Recall, Dubletten, kein Build-Fehler, jede Abweichung über 10 % erklärt).
+- **IDs** (Ziel 6, Vorschau gegen `713f72d`): 432 von 465 gehalten (92,9 %), keine ID bei anderem Anbieter oder Ort. Alle gehaltenen IDs mit unähnlichem Titel (48 Paare) sind von Hand geprüft: jeweils derselbe Kurs, gleicher Wochentag und Beginn. Von den 33 verlorenen gibt es 15 Kurse weiter (10 davon Einzeltermine, die Opus bündelt, s. o.; dazu Formatwechsel mit anderem ersten Termin und Dubletten), 18 nicht mehr (Seite geändert, etwa die laufenden PEKiP-Kurse bei `brk-familienzentrum`, oder Dubletten des Vorstands). Damit 432 von 447 weiter bestehenden Kursen (96,6 %). Gemessen wird Ziel 6 an der echten Umstellung gegen den Stand der Vornacht.
+- **Abgleich (E12): alle 34 Hinweise von Hand geprüft**, alle echte Zwillinge; die Wahl folgt dem Vorstand (etwa `theater-mummpitz`, „Jazz für Kinder“: die Einzeltermine bleiben). Dazu 82 Hinweise von `mergeParts` und 16 Dubletten nach Rang, Stichprobe ohne Befund.
+- **Grenzen der Umstellung** (Doppeltes der Messung, mindestens die Werte aus E7): `timeout=150`, `budget_min=110`, `max_calls=500`, `max_tokens=10000000`, dazu `umstellen=sternenhaus-kuf`. Die Messung verdoppelt (66 Minuten, 474 Aufrufe, 7,5 Mio. Tokens) liegt unter diesen Mindestwerten.
 
 ## Review (2026-10-26) – Verdict: Überarbeiten
 
