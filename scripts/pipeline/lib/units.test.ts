@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
 import type { Anbieter, Offer } from "../../../src/domain/schema.ts";
-import type { RawEvent } from "./raw.ts";
+import { Offer as OfferSchema } from "../../../src/domain/schema.ts";
+import { RawEvent } from "./raw.ts";
 import {
   caseUnits,
   duplicateUnitIds,
@@ -190,7 +191,7 @@ const dates = (days: string[]): RawEvent["schedule"] => ({
 const MONDAYS = ["2026-11-02", "2026-11-09", "2026-11-16", "2026-11-23", "2026-11-30", "2026-12-07", "2026-12-14"];
 
 function ev(title: string, format: RawEvent["format"], schedule: RawEvent["schedule"], over: Partial<RawEvent> = {}) {
-  return {
+  return RawEvent.parse({
     providerId: "fam",
     venueId: "fam",
     title,
@@ -205,11 +206,11 @@ function ev(title: string, format: RawEvent["format"], schedule: RawEvent["sched
     availability: { status: "unbekannt" },
     schedule,
     ...over,
-  } as RawEvent;
+  });
 }
 const unit = (id: string, events: RawEvent[], failed = false): UnitEvents => ({ id, failed, events });
 const offer = (title: string, format: Offer["format"], days: string[], id = "aaaaaaaa"): Offer =>
-  ({
+  OfferSchema.parse({
     id,
     providerId: "fam",
     venueId: "fam",
@@ -224,7 +225,7 @@ const offer = (title: string, format: Offer["format"], days: string[], id = "aaa
     availability: { status: "unbekannt", checkedAt: "2026-10-26T05:00:00+01:00" },
     url: "https://example.org/a",
     sourceUrl: "https://example.org/a",
-  }) as Offer;
+  });
 const run = (units: UnitEvents[], previous?: Offer[]) => matchUnits(units, { previous, horizon: W, freeDays: {} });
 const titles = (r: ReturnType<typeof run>) => r.units.map((u) => u.events.map((e) => `${e.title}/${e.format}`));
 
@@ -241,7 +242,7 @@ describe("matchUnits (E12)", () => {
   });
 
   it("1:n wie theater-mummpitz: die einmalig-Fassung des Vorstands bleibt, auch aus der späteren Einheit", () => {
-    const previous = MONDAYS.map((d, i) => offer("Babykonzert", "einmalig", [d], `id${i}`));
+    const previous = MONDAYS.map((d, i) => offer("Babykonzert", "einmalig", [d], `aaaaaaa${i}`));
     const r = run(
       [
         unit("seite:a", [ev("Babykonzert", "regelmaessig", weekly("2026-11-02", 7))]),

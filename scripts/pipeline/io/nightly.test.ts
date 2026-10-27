@@ -218,6 +218,27 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(Object.keys(r.units?.["musikschule-beispiel"] ?? {})).toEqual(["kandidaten"]);
   });
 
+  it("geänderte URL mit Prüfhinweis: beide Hinweise stehen im Bericht (Arch-Review 3, m1)", async () => {
+    const dirsOf = tempData();
+    const only = ["familientreff-beispiel"];
+    await runNightly({ ...options(dirsOf, fakeExtractor().extractor), only, forceMigrate: only });
+    const file = join(dirsOf.dataDir, "providers.yaml");
+    const entries = parse(readFileSync(file, "utf8")) as Array<{ id: string; programme: Array<{ url: string }> }>;
+    const ft = entries.find((p) => p.id === "familientreff-beispiel");
+    if (ft?.programme[0]) ft.programme[0].url = "https://example.org/familientreff/neu";
+    writeFileSync(file, stringify(entries));
+    const { extractor } = fakeExtractor((id) =>
+      id === "familientreff-beispiel"
+        ? { kind: "ok", events: treffs, model: "haiku", warnings: ["Kurs ist schon vorbei"] }
+        : undefined,
+    );
+    const r = await runNightly({ ...options(dirsOf, extractor), only });
+    expect(r.warnings["familientreff-beispiel"]).toEqual([
+      "Kurs ist schon vorbei",
+      "seite:https://example.org/familientreff/programm: entfällt (nicht mehr im Katalog)",
+    ]);
+  });
+
   it("Umstellung mit Einbruch bleibt aus; --umstellen erzwingt sie (Plan 0048, E7)", async () => {
     const dirsOf = tempData();
     const one = (id: string): ExtractOutcome | undefined =>

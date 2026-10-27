@@ -70,6 +70,11 @@ export interface RefreshContext {
    * geänderter URL, E1). Fehlt sie, gibt es keine Einbruchprüfung (neue Seite, Umstellung: die prüft `migrate`).
    */
   baseline?: number;
+  /**
+   * Sammelkalender der Vornacht, wenn es keinen Zustand der Einheit gibt (Umstellung aus V1: dort stehen sie am
+   * Anbieter). Sonst erkennte `adapterFailure` einen Ausfall nicht, und die Kandidaten-Angebote fielen weg (Arch-Review 3, M1).
+   */
+  prevSources?: readonly Source[];
   keyParts: ExtractKeyParts;
   /** YYYY-MM-DD, Europe/Berlin: Stichtag für die datierten Bestandteile des Schlüssels */
   today: string;
@@ -171,7 +176,7 @@ function adapterFailure(ctx: RefreshContext): string | undefined {
   if (ctx.unit.id !== KANDIDATEN) return undefined;
   const { fetched, prev } = ctx;
   const relevant = new Set<string>([
-    ...(prev?.sources ?? []),
+    ...(prev?.sources ?? ctx.prevSources ?? []),
     ...sourcesOf(ctx.unit.candidates),
     ...(fetched.ownAdapter ? [fetched.ownAdapter] : []),
   ]);

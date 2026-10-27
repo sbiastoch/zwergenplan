@@ -327,3 +327,56 @@ describe("Übergang Plan 0037: abgeleitete Kategorien und Widersprüche (E2, E5)
     );
   });
 });
+
+describe("Bericht je Einheit (Plan 0048, E10)", () => {
+  const T = "2026-10-12T02:00:00+02:00";
+  const v2 = ProviderRaw.parse({
+    version: 2,
+    units: {
+      "seite:https://a.de/1": {
+        events: [],
+        status: "fehler",
+        reason: "HTTP 404",
+        failingSince: "2026-10-09T02:00:00+02:00",
+        checkedAt: T,
+      },
+      "seite:https://a.de/2": {
+        events: [],
+        inputHash: "h",
+        model: "opus/xhigh",
+        changedAt: T,
+        status: "keine-termine",
+        checkedAt: T,
+        pending: { inputHash: "h2", model: "opus/xhigh", events: [] },
+      },
+    },
+  });
+
+  it("teilausfall und umstellung-ausstehend machen gelb, nicht rot, und zählen nicht zur 20-%-Regel", () => {
+    const r = report({
+      results: { a: "teilausfall", b: "teilausfall", c: "umstellung-ausstehend", d: "unveraendert" },
+    });
+    const v = assessRun(r, { live });
+    expect(v.light).toBe("gelb");
+    expect(v.red).toEqual([]);
+    expect(v.yellow).toEqual(
+      expect.arrayContaining([
+        "2 Anbieter mit einzelnen Seiten im Fehler",
+        "1 Anbieter noch nicht umgestellt (Plan 0048, E7)",
+      ]),
+    );
+  });
+
+  it("renderStatus nennt Fehler und Einbrüche je Einheit mit Kennung", () => {
+    const r = report({ results: { a: "teilausfall" } });
+    const md = renderStatus({ report: r, verdict: assessRun(r, { live }), live, raws: { a: v2 }, stock: { a: 3 } });
+    expect(md).toContain("| a seite:https://a.de/1 | HTTP 404 | 09.10.2026 |");
+    expect(md).toContain("| a seite:https://a.de/2 | 0 | 0 |");
+  });
+
+  it("nightlyCommitMessage nennt Anbieter mit einzelnen Seiten im Fehler", () => {
+    const msg = nightlyCommitMessage(report({ results: { a: "teilausfall" } }), { a: v2 });
+    expect(msg).toContain("Fehler: a (seite:https://a.de/1: HTTP 404)");
+    expect(msg).toContain("teilausfall 1");
+  });
+});
