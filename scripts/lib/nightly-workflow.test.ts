@@ -30,6 +30,8 @@ describe("nightly.yml (Plan 0048, E7)", () => {
     expect(step?.run).toContain('[[ "$UMSTELLEN" =~ ^[a-z0-9,-]*$ ]]');
     expect(step?.run).toContain('args+=(--umstellen "$UMSTELLEN")');
     expect(step?.run).toContain("+ 20 > TIMEOUT");
+    // budget_min und timeout nur als Zahl in die Arithmetik (Arch-Review m4)
+    expect(step?.run).toContain('[[ "${RUN_BUDGET_MIN:-50}" =~ ^[0-9]+$ && "$TIMEOUT" =~ ^[0-9]+$ ]]');
   });
 
   it("der Job mit dem Modell hat kein Schreibrecht", () => {

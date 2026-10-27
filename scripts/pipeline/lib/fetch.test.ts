@@ -5,6 +5,7 @@ import {
   assembleProvider,
   botWall,
   compareHashes,
+  failureClassOf,
   type HashesFile,
   MAX_INPUT_CHARS,
   programmeText,
@@ -56,6 +57,18 @@ describe("adapterFailureFor (E5: Adapter ausgefallen, auch teilweise; Arch-Revie
   it("Anbieter mit eigenen Seiten: Kandidaten ergänzen nur, kein fehler", () => {
     const down = { status: "fehler" as const, reason: "HTTP 500", candidates: 0, matched: 0, warnings: [] };
     expect(adapterFailureFor("seiten", { "stadt-vk": down })).toBeUndefined();
+  });
+});
+
+describe("failureClassOf (Plan 0048, E8)", () => {
+  it("404 und 410 dauerhaft; 403, 500, Zeitüberschreitung und Bot-Schutz (ohne Status) vorübergehend", () => {
+    expect([404, 410].map(failureClassOf)).toEqual(["dauerhaft", "dauerhaft"]);
+    expect([403, 500, 503, undefined].map(failureClassOf)).toEqual([
+      "voruebergehend",
+      "voruebergehend",
+      "voruebergehend",
+      "voruebergehend",
+    ]);
   });
 });
 

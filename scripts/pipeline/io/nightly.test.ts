@@ -479,7 +479,7 @@ describe("runNightly: Seitenausfall kostet nur die Seite (Plan 0048, Ziel 1)", (
     expect(back.idOf("Babymassage")).toBe(massageId);
   });
 
-  it("B bis Tag 15 weg: Bs Angebote fehlen; Rückkehr danach extrahiert neu mit neuer ID", async () => {
+  it("B bis Tag 15 weg: Bs Angebote fehlen; Rückkehr danach extrahiert neu, die ID folgt dem Schlüssel", async () => {
     const dirsOf = twoPages();
     const n0 = await night(dirsOf, "2026-10-06", []);
     const massageId = n0.idOf("Babymassage");
@@ -491,7 +491,19 @@ describe("runNightly: Seitenausfall kostet nur die Seite (Plan 0048, Ziel 1)", (
     const back = await night(dirsOf, "2026-10-22", []);
     expect(back.seen).toEqual([`seite:${B}`]);
     // Die Zuordnung kennt nur die Vornacht; die neue ID folgt dem Schlüssel (Titel, Ort) und ist hier wieder dieselbe
-    expect(back.idOf("Babymassage")).toBeDefined();
+    expect(back.idOf("Babymassage")).toBe(massageId);
+  });
+
+  it("Anbieter mit nur einer Seite, 14 Tage 404: seine Angebote fallen weg, nichts aus dem Vorstand (Arch-Review M1)", async () => {
+    const dirsOf = tempData();
+    await night(dirsOf, "2026-10-06", []);
+    expect((await night(dirsOf, "2026-10-07", [], [A])).idOf("Offener Krabbeltreff 1")).toBeDefined();
+    expect((await night(dirsOf, "2026-10-20", [], [A])).idOf("Offener Krabbeltreff 1")).toBeDefined();
+    const gone = await night(dirsOf, "2026-10-21", [], [A]);
+    expect(gone.r.results["familientreff-beispiel"]).toBe("fehler");
+    expect(gone.idOf("Offener Krabbeltreff 1")).toBeUndefined();
+    const offers = readPreviousOffers(join(dirsOf.dataDir, "offers.json"))?.offers ?? [];
+    expect(offers.filter((o) => o.providerId === "familientreff-beispiel")).toEqual([]);
   });
 });
 

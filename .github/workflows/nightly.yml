@@ -187,6 +187,7 @@ jobs:
         run: |
           [[ "$ONLY" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::only enthält unerlaubte Zeichen"; exit 1; }
           [[ "$UMSTELLEN" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::umstellen enthält unerlaubte Zeichen"; exit 1; }
+          [[ "${RUN_BUDGET_MIN:-50}" =~ ^[0-9]+$ && "$TIMEOUT" =~ ^[0-9]+$ ]] || { echo "::error::budget_min und timeout müssen Zahlen sein"; exit 1; }
           # Zeitbudget mindestens 20 Minuten unter dem Job-Limit: Build, Gates und Bericht brauchen ihre Zeit (E7)
           if (( ${RUN_BUDGET_MIN:-50} + 20 > TIMEOUT )); then
             echo "::error::budget_min (${RUN_BUDGET_MIN:-50}) + 20 > timeout ($TIMEOUT)"; exit 1

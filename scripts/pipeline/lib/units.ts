@@ -205,6 +205,7 @@ export function caseUnits(input: {
 }): CaseUnit[] {
   const heads = input.pageUrls.map((url, i) => ({ url, at: input.text.indexOf(`## Seite ${i + 1}: ${url} (`) }));
   const kandidatenAt = input.text.search(/^## Kandidaten \(\d+\)$/m);
+  if (input.candidates.length > 0 && kandidatenAt < 0) throw new Error("Eval-Fall: Kandidaten ohne Abschnitt im Text");
   const ends = [...heads.slice(1).map((h) => h.at), kandidatenAt >= 0 ? kandidatenAt : input.text.length];
   const sections = heads.map((h, i) => {
     if (h.at < 0) throw new Error(`Eval-Fall: Kopf von Seite ${i + 1} (${h.url}) fehlt im Text`);

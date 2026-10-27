@@ -214,7 +214,8 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
     warnings.push(...(r.warnings ?? []));
   }
 
-  const done = units.every((u) => next[u.id]?.inputHash !== undefined);
+  // entfernte Seiten zählen als erledigt, sonst blieben verwaiste Einheiten für immer (Arch-Review m2)
+  const done = units.every((u) => next[u.id]?.inputHash !== undefined || next[u.id]?.removedAt !== undefined);
   const dropped = done ? orphans : [];
   if (!done) for (const id of orphans) if (prevUnits[id]) next[id] = prevUnits[id];
 
@@ -233,14 +234,17 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
     // Umstellung (E7): nur ganz oder mit `--umstellen`; sonst bleibt die V1-Datei unverändert (bzw. es gibt keine)
     const m = migrate({ old: legacy, units: unitList, today: o.today });
     if (stop) return { ...stop, calls };
-    if (!m.ok && !o.forceMigrate)
+    // eine offene Einheit (Zeitbudget, Bremse) hat keinen Stand: auch `--umstellen` schreibt dann nicht, sonst fielen
+    // ihre alten Angebote samt IDs weg (Arch-Review M2)
+    const open = unitList.some((u) => u.result === "offen");
+    if (open || (!m.ok && !o.forceMigrate))
       return {
         kind: "done",
         result: "umstellung-ausstehend",
         units: results,
         called,
         calls,
-        migration: m.reason,
+        migration: m.ok ? "Lauf vorzeitig beendet" : m.reason,
         ...(warnings.length > 0 ? { warnings } : {}),
       };
     write();
