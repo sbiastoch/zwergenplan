@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
 import type { Anbieter, Offer } from "../../../src/domain/schema.ts";
 import type { RawEvent } from "./raw.ts";
-import { KANDIDATEN, matchUnits, type UnitEvents, unitExcerpt, unitIdOf, unitsOf } from "./units.ts";
+import { duplicateUnitIds, KANDIDATEN, matchUnits, type UnitEvents, unitExcerpt, unitIdOf, unitsOf } from "./units.ts";
 
 const page = (url: string, over: Partial<Anbieter["programme"][number]> = {}): Anbieter["programme"][number] => ({
   url,
@@ -37,6 +37,15 @@ describe("unitIdOf (E1)", () => {
     expect(unitIdOf({ url: "https://example.org/api", request: { method: "POST", body } })).toBe(
       `seite:https://example.org/api#${hash}`,
     );
+  });
+});
+
+describe("duplicateUnitIds (E1, data:validate)", () => {
+  it("meldet dieselbe Vorlage zweimal, info zählt nicht", () => {
+    const dup = anbieter([page("https://example.org/a"), page("https://example.org/a", { use: "verfuegbarkeit" })]);
+    expect(duplicateUnitIds(dup)).toEqual(["seite:https://example.org/a"]);
+    const info = anbieter([page("https://example.org/a"), page("https://example.org/a", { use: "info" })]);
+    expect(duplicateUnitIds(info)).toEqual([]);
   });
 });
 

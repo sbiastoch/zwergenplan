@@ -25,6 +25,15 @@ export function unitIdOf(g: Pick<Programme, "url" | "request">): string {
   return `seite:${g.url}${body}`;
 }
 
+/**
+ * Doppelte Kennungen der Seiten eines Anbieters (`data:validate`, E1): Zwei Einträge mit derselben Vorlage (und
+ * demselben Body) wären eine Einheit mit zwei Zuständen.
+ */
+export function duplicateUnitIds(p: Anbieter): string[] {
+  const ids = p.programme.filter((g) => g.use !== "info").map(unitIdOf);
+  return [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
+}
+
 /** Seiten, die Abruf und Auszug kennen (wie `planFetch`): ohne `use: info` und ohne `blocked`. */
 const active = (g: Programme) => g.use !== "info" && g.blocked === undefined;
 
