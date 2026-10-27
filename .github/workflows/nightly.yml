@@ -38,7 +38,7 @@ on:
         description: "nur diese Anbieter (Komma-Liste, leer = alle)"
         default: ""
       timeout:
-        description: "timeout-minutes des Nachtlaufs (Plan 0048, E7; mindestens budget_min + 20)"
+        description: "timeout-minutes des Nachtlaufs (Plan 0048, E7; mindestens budget_min + 40)"
         default: "90"
       umstellen:
         description: "Umstellung auf V2 erzwingen, nach Prüfung (Plan 0048, E7; Komma-Liste)"
@@ -193,9 +193,10 @@ jobs:
           [[ "$ONLY" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::only enthält unerlaubte Zeichen"; exit 1; }
           [[ "$UMSTELLEN" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::umstellen enthält unerlaubte Zeichen"; exit 1; }
           [[ "${RUN_BUDGET_MIN:-50}" =~ ^[0-9]+$ && "$TIMEOUT" =~ ^[0-9]+$ ]] || { echo "::error::budget_min und timeout müssen Zahlen sein"; exit 1; }
-          # Zeitbudget mindestens 20 Minuten unter dem Job-Limit: Build, Gates und Bericht brauchen ihre Zeit (E7)
-          if (( ${RUN_BUDGET_MIN:-50} + 20 > TIMEOUT )); then
-            echo "::error::budget_min (${RUN_BUDGET_MIN:-50}) + 20 > timeout ($TIMEOUT)"; exit 1
+          # Zeitbudget mindestens 40 Minuten unter dem Job-Limit: laufende Einheiten (bis zu zwei Aufrufe à 15 Min.),
+          # Build, Gates, Bericht und Upload brauchen ihre Zeit; ein Timeout verwirft den ganzen Lauf (E7, Review 4 M1)
+          if (( ${RUN_BUDGET_MIN:-50} + 40 > TIMEOUT )); then
+            echo "::error::budget_min (${RUN_BUDGET_MIN:-50}) + 40 > timeout ($TIMEOUT)"; exit 1
           fi
           args=()
           [[ -n "$ONLY" ]] && args+=(--only "$ONLY")

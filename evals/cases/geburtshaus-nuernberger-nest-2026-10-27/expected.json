@@ -1,5 +1,5 @@
 {
- "basis": "data/offers.json vom 2026-10-26T07:59:13+01:00, Entwurf – von Hand gegen input.json prüfen",
+ "basis": "data/offers.json vom 2026-10-26T07:59:13+01:00, von Hand gegen input.json geprüft am 2026-10-27 (Korrekturen in NOTES.md)",
  "window": {
   "from": "2026-10-27",
   "to": "2027-10-26"

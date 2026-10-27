@@ -314,14 +314,14 @@ describe("refreshProvider je Einheit (Plan 0048, E1, E5, E7)", () => {
       expect(raw && isV2(raw) && Object.keys(raw.units)).toEqual([unitId(0), unitId(1), unitId(2)]);
     });
 
-    it("eine Einheit gescheitert: V1 unverändert, Grund im Ergebnis", async () => {
+    it("eine Einheit gescheitert: V1 unverändert, sichtbar als teilausfall, Grund in migration", async () => {
       const down = unit(1, { status: "fehler", reason: "HTTP 500", klasse: "voruebergehend", pages: [], text: "" });
       const { r, raw } = await run(
         fake(ok(3, "haiku"), ok(3, "sonnet")),
         { provider: three, fetched: fetchedWith([unit(0), down, unit(2)]) },
         v1,
       );
-      expect(r).toMatchObject({ kind: "done", result: "umstellung-ausstehend" });
+      expect(r).toMatchObject({ kind: "done", result: "teilausfall" });
       expect(r.kind === "done" && r.migration).toBe(`ohne gültiges Ergebnis: ${unitId(1)} (ausgefallen)`);
       expect(raw).toEqual(v1);
     });
@@ -348,7 +348,18 @@ describe("refreshProvider je Einheit (Plan 0048, E1, E5, E7)", () => {
         },
         v1,
       );
-      expect(r).toMatchObject({ kind: "done", result: "umstellung-ausstehend" });
+      expect(r).toMatchObject({ kind: "done", result: "offen" });
+      expect(raw).toEqual(v1);
+    });
+
+    it("alle Seiten ausgefallen: ausgefallen wie sonst, nicht nur umstellung-ausstehend (Arch-Review 2, M1)", async () => {
+      const down = unit(0, { status: "fehler", reason: "HTTP 503", klasse: "voruebergehend", pages: [], text: "" });
+      const { r, raw } = await run(fake(ok(3, "haiku"), ok(3, "sonnet")), { fetched: fetchedWith([down]) }, v1);
+      expect(r).toMatchObject({
+        kind: "done",
+        result: "ausgefallen",
+        migration: `ohne gültiges Ergebnis: ${unitId(0)} (ausgefallen)`,
+      });
       expect(raw).toEqual(v1);
     });
 

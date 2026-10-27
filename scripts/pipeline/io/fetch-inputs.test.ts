@@ -59,6 +59,17 @@ describe("unitInputs (Plan 0048, E1, E2)", () => {
     expect(r.units[1]?.reason).toContain("HTTP 404");
   });
 
+  it("coveredBy oder skipCrawl: keine Abrufe trotz Terminseite, nur kandidaten (Arch-Review 2, B1)", () => {
+    for (const over of [
+      { coveredBy: "et-dekanat-nuernberg" },
+      { skipCrawl: { reason: "nur Sammelkalender", since: "2026-10-01" } },
+    ]) {
+      const r = unitInputs({ ...owner, ...over }, [], []);
+      expect(r.units.map((u) => u.id)).toEqual(["kandidaten"]);
+      expect(r.beilagen).toEqual({});
+    }
+  });
+
   it("passt die Zahl der Abrufe nicht zu den Seiten im Katalog, scheitert es laut", () => {
     expect(() => unitInputs(owner, [ok(A), ok(B)], [])).toThrow(/2 Abrufe für 3 Seiten/);
   });

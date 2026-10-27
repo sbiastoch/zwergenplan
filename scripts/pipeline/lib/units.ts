@@ -187,6 +187,8 @@ export interface CaseUnit {
   def: UnitDef;
   text: string;
   pageUrls: string[];
+  /** erlaubte `sourceUrl` wie im Nachtlauf: eigene Seiten bzw. Kandidaten, dazu die Weiterleitungsziele des Falls */
+  allowedUrls: string[];
   candidates: readonly Candidate[];
 }
 
@@ -202,6 +204,7 @@ export function caseUnits(input: {
   text: string;
   pageUrls: readonly string[];
   candidates: readonly Candidate[];
+  allowedUrls: readonly string[];
 }): CaseUnit[] {
   const heads = input.pageUrls.map((url, i) => ({ url, at: input.text.indexOf(`## Seite ${i + 1}: ${url} (`) }));
   const kandidatenAt = input.text.search(/^## Kandidaten \(\d+\)$/m);
@@ -225,22 +228,41 @@ export function caseUnits(input: {
       progOf.set(i, s);
     }
   }
+  // Weiterleitungsziele hält der Fall nicht je Seite fest; sie gelten für jede Einheit (etwas großzügiger als der
+  // Nachtlauf, der sie seiner Seite zuordnet). Alles andere je Einheit wie dort (Arch-Review 2, M2).
+  const candidateUrls = input.candidates.flatMap((c) => [c.detailUrl, ...(c.ticketUrl ? [c.ticketUrl] : [])]);
+  const known = new Set([...input.pageUrls, ...candidateUrls]);
+  const redirects = input.allowedUrls.filter((u) => !known.has(u));
+  const allowed = (urls: readonly string[]) => [...new Set([...urls, ...redirects])];
   const render = (pages: ReadonlyArray<(typeof sections)[number]>) =>
     pages.map((s, k) => `## Seite ${k + 1}: ${s.url} (${s.art})\n${s.body}`).join("\n\n");
   const out: CaseUnit[] = [];
   for (const def of unitsOf(input.catalog, { candidates: input.candidates.length > 0, hadKandidaten: false })) {
     if (def.id === KANDIDATEN) {
       if (input.candidates.length === 0) continue;
-      out.push({ def, text: input.text.slice(kandidatenAt).trim(), pageUrls: [], candidates: input.candidates });
+      out.push({
+        def,
+        text: input.text.slice(kandidatenAt).trim(),
+        pageUrls: [],
+        candidates: input.candidates,
+        allowedUrls: allowed(candidateUrls),
+      });
       continue;
     }
     const own = def.own === undefined ? undefined : progOf.get(def.own);
     if (!own) continue;
     const pages = [own, ...def.beilagen.flatMap((b) => [progOf.get(b)].flatMap((s) => (s ? [s] : [])))];
-    out.push({ def, text: render(pages), pageUrls: pages.map((s) => s.url), candidates: [] });
+    const urls = pages.map((s) => s.url);
+    out.push({ def, text: render(pages), pageUrls: urls, candidates: [], allowedUrls: allowed(urls) });
   }
   for (const s of sections)
     if (![...progOf.values()].includes(s))
-      out.push({ def: { id: `seite:${s.url}`, beilagen: [] }, text: render([s]), pageUrls: [s.url], candidates: [] });
+      out.push({
+        def: { id: `seite:${s.url}`, beilagen: [] },
+        text: render([s]),
+        pageUrls: [s.url],
+        candidates: [],
+        allowedUrls: allowed([s.url]),
+      });
   return out;
 }

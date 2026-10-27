@@ -104,10 +104,14 @@ export function batchesFromRaw(
     const order = new Map(
       unitsOf(p, { candidates: true, hadKandidaten: true }).map((u, i) => [u.id, u.own ?? i] as const),
     );
+    // verwaiste Einheiten (nicht mehr im Katalog) durchgezählt nach dem Katalog, `kandidaten` zuletzt (Arch-Review 2, m2)
+    const orphans = Object.keys(raw.units)
+      .filter((u) => u !== KANDIDATEN && !order.has(u))
+      .sort();
     const indexOf = (unit: string) =>
       unit === KANDIDATEN
-        ? p.programme.length + Object.keys(raw.units).length
-        : (order.get(unit) ?? p.programme.length);
+        ? p.programme.length + orphans.length
+        : (order.get(unit) ?? p.programme.length + orphans.indexOf(unit));
     const units = Object.entries(raw.units)
       .sort(([a], [b]) => indexOf(a) - indexOf(b) || a.localeCompare(b))
       .map(([unit, u]) => ({ id: unit, failed: u.status === "fehler", events: u.events.filter(own), state: u }));

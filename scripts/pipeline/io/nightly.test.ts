@@ -176,7 +176,8 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(first.results["familientreff-beispiel"]).toBe("extrahiert");
     expect(first.results["musikschule-beispiel"]).toBe("extrahiert");
     // ohne Rohdatei, mit Angeboten im Vorstand: umgestellt wird nur ganz (E7)
-    expect(first.results["gemeinde-beispiel"]).toBe("umstellung-ausstehend");
+    // Ausfall bleibt sichtbar (Ampel), der Grund der ausstehenden Umstellung steht in migrations
+    expect(first.results["gemeinde-beispiel"]).toBe("ausgefallen");
     expect(first.migrations?.["gemeinde-beispiel"]).toMatch(/^ohne gültiges Ergebnis: seite:/);
     expect(first.units?.["familientreff-beispiel"]).toEqual({
       "seite:https://example.org/familientreff/programm": "extrahiert",
@@ -203,6 +204,18 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(again.results["familientreff-beispiel"]).toBe("unveraendert");
     expect(again.results["musikschule-beispiel"]).toBe("unveraendert");
     expect(again.cached).toBeGreaterThan(0);
+  });
+
+  it("Anbieter mit coveredBy und Terminseite: kein Absturz, nur die Einheit kandidaten (Arch-Review 2, B1)", async () => {
+    const dirsOf = tempData();
+    const file = join(dirsOf.dataDir, "providers.yaml");
+    const entries = parse(readFileSync(file, "utf8")) as Array<{ id: string; coveredBy?: string }>;
+    const ms = entries.find((p) => p.id === "musikschule-beispiel");
+    if (ms) ms.coveredBy = "sammelkalender-beispiel";
+    writeFileSync(file, stringify(entries));
+    const r = await runNightly(options(dirsOf, fakeExtractor().extractor));
+    expect(r.build.errors).toEqual([]);
+    expect(Object.keys(r.units?.["musikschule-beispiel"] ?? {})).toEqual(["kandidaten"]);
   });
 
   it("Umstellung mit Einbruch bleibt aus; --umstellen erzwingt sie (Plan 0048, E7)", async () => {
@@ -504,6 +517,46 @@ describe("runNightly: Seitenausfall kostet nur die Seite (Plan 0048, Ziel 1)", (
     expect(gone.idOf("Offener Krabbeltreff 1")).toBeUndefined();
     const offers = readPreviousOffers(join(dirsOf.dataDir, "offers.json"))?.offers ?? [];
     expect(offers.filter((o) => o.providerId === "familientreff-beispiel")).toEqual([]);
+  });
+});
+
+describe("runNightly: zweiter Versuch auch bei gleichem Fallback-Modell (Plan 0048, E5)", () => {
+  it("Einbruch mit opus/opus: zweiter Aufruf, erst danach pending", async () => {
+    const dirsOf = tempData();
+    const only = ["familientreff-beispiel"];
+    await runNightly({ ...options(dirsOf, fakeExtractor().extractor), only, forceMigrate: only });
+    const seen: boolean[] = [];
+    const extractor: Extractor = async (input) => {
+      seen.push(input.strong ?? false);
+      return {
+        outcome: { kind: "ok", events: [], model: "opus" },
+        calls: [
+          {
+            step: input.strong ? "fallback" : "extract",
+            providerId: input.provider.id,
+            model: "opus",
+            inputTokens: 1,
+            outputTokens: 1,
+            cacheReadTokens: 0,
+            cacheCreationTokens: 0,
+            webSearchRequests: 0,
+            turns: 1,
+            durationMs: 1,
+            costUsd: 0,
+            result: "ok",
+          },
+        ],
+      };
+    };
+    const r = await runNightly({
+      ...options(dirsOf, extractor),
+      only,
+      strongRetry: true,
+      fetch: fakeFetch([], "Neues Programm"),
+    });
+    expect(seen).toEqual([false, true]);
+    expect(r.results["familientreff-beispiel"]).toBe("einbruch");
+    expect(unitOf(readRaw(join(dirsOf.dataDir, "raw"), "familientreff-beispiel"))?.pending?.model).toBe("opus");
   });
 });
 

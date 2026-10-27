@@ -143,7 +143,7 @@ async function extractUnits(
         unit: u.def.id,
         text: u.text,
         candidates: u.candidates,
-        allowedUrls: input.allowedUrls,
+        allowedUrls: u.allowedUrls,
         pageUrls: u.pageUrls,
         today: input.today,
       },
