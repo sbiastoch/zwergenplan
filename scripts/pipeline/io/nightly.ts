@@ -163,8 +163,14 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
         if (r.kind === "done") {
           results[provider.id] = r.result;
           units[provider.id] = r.units;
+          // verwaiste Einheiten (geänderte URL) entfallen mit Hinweis (E6; Arch-Review 2, m1)
+          if (r.dropped)
+            warnings[provider.id] = [
+              ...(r.warnings ?? []),
+              ...r.dropped.map((u) => `${u}: entfällt (nicht mehr im Katalog)`),
+            ];
           if (r.migration) migrations[provider.id] = r.migration;
-          if (r.warnings) warnings[provider.id] = r.warnings;
+          else if (r.warnings) warnings[provider.id] = r.warnings;
           if (!r.called && r.result !== "ausgefallen") cached++;
         } else if (r.kind === "abort") {
           results[provider.id] = "abort";

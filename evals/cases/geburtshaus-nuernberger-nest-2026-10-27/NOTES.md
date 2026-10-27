@@ -13,7 +13,7 @@ Jeder Kurs der Hebamio-Liste (Seite 2) mit Kurstyp, Kursort und Terminen gegen d
 
 ## Korrekturen gegenüber dem Bestand
 
-Keine. Der Entwurf aus `data/offers.json` vom 2026-10-27 stimmt mit dem Text überein.
+Keine. Der Entwurf aus `data/offers.json` vom 2026-10-26 (Stand beim Einfrieren am 2026-10-27) stimmt mit dem Text überein.
 
 ## Grenzfälle
 

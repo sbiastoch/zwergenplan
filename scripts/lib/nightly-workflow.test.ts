@@ -26,11 +26,11 @@ describe("nightly.yml (Plan 0048, E7)", () => {
     expect(workflow.on.workflow_dispatch.inputs["timeout"]?.default).toBe("90");
   });
 
-  it("umstellen und only werden geprüft und weitergegeben, budget_min bleibt 20 Minuten unter timeout", () => {
+  it("umstellen und only werden geprüft und weitergegeben, budget_min bleibt 40 Minuten unter timeout", () => {
     expect(step?.env).toMatchObject({ UMSTELLEN: "${{ inputs.umstellen }}", TIMEOUT: "${{ inputs.timeout || '90' }}" });
     expect(step?.run).toContain('[[ "$UMSTELLEN" =~ ^[a-z0-9,-]*$ ]]');
     expect(step?.run).toContain('args+=(--umstellen "$UMSTELLEN")');
-    expect(step?.run).toContain("+ 20 > TIMEOUT");
+    expect(step?.run).toContain("+ 40 > TIMEOUT");
     // budget_min und timeout nur als Zahl in die Arithmetik (Arch-Review m4)
     expect(step?.run).toContain('[[ "${RUN_BUDGET_MIN:-50}" =~ ^[0-9]+$ && "$TIMEOUT" =~ ^[0-9]+$ ]]');
   });

@@ -233,7 +233,11 @@ export function unitInputs(
   pages: readonly PageOutcome[],
   candidates: readonly Candidate[],
 ): Pick<FetchedProvider, "units" | "beilagen"> {
-  const active = owner.programme.flatMap((g, i) => (g.use !== "info" && g.blocked === undefined ? [i] : []));
+  // wer nur über Kandidaten läuft (`coveredBy`, `skipCrawl`), wird nicht abgerufen, auch mit Terminseiten (Arch-Review 2, B1)
+  const crawled = !owner.coveredBy && !owner.skipCrawl;
+  const active = crawled
+    ? owner.programme.flatMap((g, i) => (g.use !== "info" && g.blocked === undefined ? [i] : []))
+    : [];
   // Zuordnung über die Reihenfolge von `planFetch`; passt die Zahl nicht (etwa Folgeseiten), lieber laut scheitern
   if (pages.length !== active.length)
     throw new Error(`${owner.id}: ${pages.length} Abrufe für ${active.length} Seiten im Katalog`);

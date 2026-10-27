@@ -3,7 +3,16 @@ import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
 import type { Anbieter, Offer } from "../../../src/domain/schema.ts";
 import type { RawEvent } from "./raw.ts";
-import { duplicateUnitIds, KANDIDATEN, matchUnits, type UnitEvents, unitExcerpt, unitIdOf, unitsOf } from "./units.ts";
+import {
+  caseUnits,
+  duplicateUnitIds,
+  KANDIDATEN,
+  matchUnits,
+  type UnitEvents,
+  unitExcerpt,
+  unitIdOf,
+  unitsOf,
+} from "./units.ts";
 
 const page = (url: string, over: Partial<Anbieter["programme"][number]> = {}): Anbieter["programme"][number] => ({
   url,
@@ -37,6 +46,43 @@ describe("unitIdOf (E1)", () => {
     expect(unitIdOf({ url: "https://example.org/api", request: { method: "POST", body } })).toBe(
       `seite:https://example.org/api#${hash}`,
     );
+  });
+});
+
+describe("caseUnits (Eval je Einheit)", () => {
+  it("erlaubte URLs je Einheit wie im Nachtlauf: eigene Seiten, Kandidaten getrennt, Weiterleitungsziele für alle", () => {
+    const p = anbieter([page("https://example.org/a"), page("https://example.org/b")]);
+    const cand = {
+      source: "stadt-vk" as const,
+      sourceId: "1",
+      title: "Treff",
+      description: "",
+      detailUrl: "https://stadt.de/1",
+      cancelled: false,
+      soldOut: false,
+      waitlist: false,
+      weekly: false,
+      occurrences: [{ start: "2026-11-02T10:00" }],
+    };
+    const units = caseUnits({
+      catalog: p,
+      today: "2026-10-26",
+      text: `## Seite 1: https://example.org/a (html)\nA\n\n## Seite 2: https://example.org/b (html)\nB\n\n## Kandidaten (1)\n${JSON.stringify(cand)}`,
+      pageUrls: ["https://example.org/a", "https://example.org/b"],
+      candidates: [cand],
+      allowedUrls: [
+        "https://example.org/a",
+        "https://example.org/b",
+        "https://example.org/a/neu",
+        "https://stadt.de/1",
+      ],
+    });
+    expect(units.map((u) => [u.def.id, u.allowedUrls])).toEqual([
+      ["seite:https://example.org/a", ["https://example.org/a", "https://example.org/a/neu"]],
+      ["seite:https://example.org/b", ["https://example.org/b", "https://example.org/a/neu"]],
+      ["kandidaten", ["https://stadt.de/1", "https://example.org/a/neu"]],
+    ]);
+    expect(units[1]?.text).toBe("## Seite 1: https://example.org/b (html)\nB");
   });
 });
 

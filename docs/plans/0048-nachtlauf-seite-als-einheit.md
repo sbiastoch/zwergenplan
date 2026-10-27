@@ -202,7 +202,7 @@ UnitState = {
 
 ### E7 – Umstellung vom alten Format, zusammen mit dem Modellwechsel
 
-- Die Umstellung kommt mit dem Commit, der `LLM_MODEL_EXTRACT` (und bei Bedarf `LLM_MODEL_FALLBACK`) in beiden Workflows auf das gewählte Modell setzt (Skill, Abschnitt 5).
+- Die Umstellung kommt mit dem Commit, der `LLM_MODEL_EXTRACT`, `LLM_MODEL_FALLBACK` und `LLM_EFFORT_EXTRACT` in beiden Workflows auf die gewählten Werte setzt (Skill, Abschnitt 5; Nachtrag 2).
 - Liest `refreshProvider` eine V1-Datei, ist **jede** Einheit neu. Der Anbieter wechselt nur dann in V2, wenn in diesem Lauf
   - alle Einheiten ein gültiges Ergebnis haben (extrahiert oder leer) und
   - die Summe ihrer künftigen Angebote (`eventUnits`) nicht unter die Hälfte der alten fällt (bei mindestens 3 alten).
@@ -210,8 +210,8 @@ UnitState = {
 - **Erzwingen nach Prüfung:** Die neue Eingabe `umstellen` von `nightly.yml` gibt `--umstellen <id,…>` an `pipeline nightly` weiter. Das stellt diese Anbieter auch bei einem Einbruch oder mit einer dauerhaft scheiternden Seite um; die Einheit dieser Seite beginnt dann leer mit `fehler`. Daten schreibt so weiter nur der Workflow, nie ein lokaler Lauf (CLAUDE.md, „Daten“).
 - **Grenzen der Umstellung:**
   - `nightly.yml` bekommt die Eingabe `timeout` für `timeout-minutes` des Jobs `nachtlauf`, als `${{ fromJSON(inputs.timeout || '90') }}`, weil die Eingaben beim Zeitplan leer sind;
-  - die Umstellung läuft per `workflow_dispatch` mit `timeout=120`, `budget_min=90`, `max_calls=500`, `max_tokens=10000000` (Nachtrag 2: S0 maß mit Effort `medium` 237 Aufrufe, 4,5 Mio. Tokens samt Cache und etwa 24 Minuten mit 3 Anbietern parallel; `xhigh` braucht im Eval 1,65-mal so lange und 1,7-mal so viele Ausgabe-Tokens, also etwa 40 Minuten und 4,8 Mio. Tokens; je das Doppelte, Zeit mit Abruf). Der Trockenlauf in S1 misst die Werte im Runner; weichen sie ab, gelten seine. Kommt Düsseldorf vorher auf `main`, wird mit dessen Katalog neu gerechnet: Aufrufe = Zahl der Einheiten × 1,15 (S0: 237 Aufrufe für 207 Einheiten), Tokens und Minuten anteilig, je verdoppelt. Die Umstellung läuft per `workflow_dispatch` **vor** dem nächsten Zeitplan (01:30 UTC), sonst beginnt die Nacht mit den alten Grenzen (150 Aufrufe, 3 Mio. Tokens, 50 Minuten);
-  - `budget_min` bleibt mindestens 20 Minuten unter `timeout`.
+  - die Umstellung läuft per `workflow_dispatch` mit dem Doppelten der Werte, die der Trockenlauf in S1 misst (Review 4, M2), mindestens `timeout=150`, `budget_min=110`, `max_calls=500`, `max_tokens=10000000` (Nachtrag 2: S0 maß mit Effort `medium` 237 Aufrufe, 4,5 Mio. Tokens samt Cache und etwa 24 Minuten mit 3 Anbietern parallel; `xhigh` braucht im Eval 1,65-mal so lange und 1,7-mal so viele Ausgabe-Tokens, also etwa 40 Minuten und 4,8 Mio. Tokens; je das Doppelte, Zeit mit Abruf). Der Trockenlauf in S1 misst die Werte im Runner mit großzügigen Grenzen; aus seiner Messung folgen die Grenzen der Umstellung. Kommt Düsseldorf vorher auf `main`, wird mit dessen Katalog neu gerechnet: Aufrufe = Zahl der Einheiten × 1,15 (S0: 237 Aufrufe für 207 Einheiten), Tokens und Minuten anteilig, je verdoppelt. Die Umstellung läuft per `workflow_dispatch` **vor** dem nächsten Zeitplan (01:30 UTC), sonst beginnt die Nacht mit den alten Grenzen (150 Aufrufe, 3 Mio. Tokens, 50 Minuten);
+  - `budget_min` bleibt mindestens 40 Minuten unter `timeout` (Review 4, M1: `mayContinue` prüft vor jeder Einheit, nicht zwischen ihren Teilen; eine laufende Einheit kann mit zwei Aufrufen à 15 Minuten nachlaufen, dazu Build, Gates und Upload; ein Timeout verwirft den ganzen Lauf). Der Workflow prüft das.
 
   Wer in einer Nacht nicht fertig wird, stellt in der nächsten um; bis dahin gilt sein alter Stand.
 
@@ -330,12 +330,13 @@ S0 zeigte: Je Einheit entstehen deutlich mehr Dubletten als je Anbieter (19–26
 | `scripts/pipeline/lib/build-offers.ts` | `mergeParts` je Anbieter, Batch je Einheit, Status aus `providerStatus` | S1 |
 | `scripts/pipeline/lib/stable-ids.ts` | E11 | S1 |
 | `scripts/pipeline/io/nightly.ts`, `scripts/pipeline/lib/report.ts`, `scripts/pipeline/lib/cost.ts` | Ablauf, Bericht und Ampel je Einheit; `--umstellen`; Grenzen | S1, S4 |
-| `scripts/pipeline/io/eval.ts` | Fälle in Einheiten zerlegen (nach `## Seite k:` und Katalog), je Einheit extrahieren, mit `mergeParts` vereinigen, werten wie heute | S1 |
+| `scripts/pipeline/io/eval.ts`, `scripts/pipeline/eval.ts` | Fälle in Einheiten zerlegen (nach `## Seite k:` und Katalog), je Einheit extrahieren, mit `mergeParts` vereinigen, werten wie heute; Option `--effort` (Nachtrag 2) | S1 |
+| `scripts/pipeline/io/llm.ts`, `scripts/pipeline/io/extract.ts` | `--effort`, `LLM_EFFORT_EXTRACT`, Modellteil des Schlüssels `modell/effort` (Nachtrag 2) | S1 |
 | `scripts/pipeline/io/discover.ts`, `scripts/pipeline/lib/discover.ts` | Ertragsbeweis je Einheit (V2); `staleHints` entfällt | S1, S2 |
 | `scripts/pipeline/io/files.ts` | V1 und V2 lesen und schreiben | S1 |
 | `scripts/pipeline/cli.ts` | `nightly --umstellen`, `--abruf`, Modus `messen`; `status --waechter`; `extract --from` je Einheit | S1–S3 |
 | `scripts/validate-data.ts` | V1 und V2, Events je Einheit dem Anbieter zugehörig, Kennungen je Anbieter eindeutig | S1 |
-| `.github/workflows/nightly.yml`, `scripts/lib/nightly-workflow.test.ts` (neu) | Eingaben `timeout`, `umstellen`, `abruf`, `LLM_MODEL_EXTRACT`; Artefakt und Job `waechter`; Test der Rechte und Eingaben | S1, S2, S3 |
+| `.github/workflows/nightly.yml`, `.github/workflows/discover.yml`, `scripts/lib/nightly-workflow.test.ts` (neu) | Eingaben `timeout`, `umstellen`, `abruf`; `LLM_MODEL_EXTRACT`, `LLM_MODEL_FALLBACK`, `LLM_EFFORT_EXTRACT` in beiden; Artefakt und Job `waechter`; Test der Rechte und Eingaben | S1, S2, S3 |
 | `scripts/pipeline/lib/watch.ts` (neu) | `watchFindings`, `watchIssue` | S2 |
 | `scripts/pipeline/lib/robots.ts`, `scripts/pipeline/io/robots.ts` (neu) | robots.txt parsen und prüfen, Cache je Host | S3 |
 | `scripts/pipeline/io/http.ts`, `scripts/pipeline/io/browser.ts`, `scripts/pipeline/io/sources.ts`, `scripts/pipeline/io/geocode.ts` | User-Agent; robots.txt bei Seitenabrufen; Ausnahmen der APIs | S3 |
@@ -395,7 +396,7 @@ S0 zeigte: Je Einheit entstehen deutlich mehr Dubletten als je Anbieter (19–26
   - Nacht 1: Seite B fällt aus (404), Seite A bringt einen neuen Kurs → er erscheint, alle IDs von B bleiben;
   - Nacht 2: gleich → unverändert, kein Modellaufruf;
   - **Rückkehr von B vor Tag 14** → IDs von B bleiben;
-  - **zweiter Fall: B bis Tag 15** → Bs Angebote fehlen; Rückkehr danach → neue IDs (die Zuordnung kennt nur die Vornacht).
+  - **zweiter Fall: B bis Tag 15** → Bs Angebote fehlen; Rückkehr danach → neu extrahiert; die Zuordnung kennt nur die Vornacht, die ID folgt dem Schlüssel und ist bei gleichem Titel und Ort dieselbe (S1, Abweichungen).
 - `io/eval.test.ts`: Fall mit zwei Seiten und Beilage wird in Einheiten zerlegt, mit `matchUnits` (ohne Vorstand) und `mergeParts` vereinigt und gewertet.
 - `lib/extract.test.ts`, zusätzlich: Einheit `kandidaten` besteht den Build-Probelauf mit vollem Eintrag; Auszug der Einheit `kandidaten` ohne `hint`; Teilzeile nennt „dieser Seite“.
 - `lib/watch.test.ts` (S2):
@@ -452,8 +453,8 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected` (Daten und Schem
 - **S1 – Einheit Seite, IDs, Umstellung (E1–E7, E9, E11).**
   - Code mit Tests, dazu das Eval je Einheit.
   - Vor dem Merge nach `main`:
-    - ein Eval-Lauf je Einheit mit dem gewählten Modell gegen die letzte Zeile in `evals/results.md` (Ziel 2);
-    - ein Trockenlauf per `workflow_dispatch` von `nightly.yml` auf dem Branch (`modus=trocken`, Grenzen aus S0), also mit der IP des Runners und der gepinnten CLI. Verglichen wird `offers.json` aus dessen Artefakt mit `main` (Angebote je Anbieter, Ziel 6).
+    - zwei Eval-Läufe je Einheit mit Opus und `xhigh` gegen die beiden Zeilen `opus (Effort xhigh)` in `evals/results.md`, verglichen auf den 12 gemeinsamen Fällen (Ziel 2; Review 4, M3). `geburtshaus-nuernberger-nest` wird getrennt abgenommen: beide Rückbildungskurse 2027 in 2 von 2 Läufen;
+    - ein Trockenlauf per `workflow_dispatch` von `nightly.yml` auf dem Branch (`modus=trocken`, großzügige Grenzen: `timeout=240`, `budget_min=180`, `max_calls=1000`, `max_tokens=20000000`; Review 4, M2), also mit der IP des Runners und der gepinnten CLI. Abnahme: keine Bremse, kein `budgetHit`; gezählt werden Aufrufe, Tokens, Minuten, Zeitüberschreitungen und abgeschnittene Antworten je Einheit. Verglichen wird `offers.json` aus dessen Artefakt mit `main` (Angebote je Anbieter, Ziel 6); die Hinweise des Abgleichs (E12) werden ganz von Hand geprüft. Fallen mit `xhigh` Zeitüberschreitungen je Aufruf auf, gilt `medium` (Nachtrag 2).
   - Dann Deploy mit gesetztem Modell und die Umstellung per `workflow_dispatch` mit den Grenzen aus S0.
   - Abnahme: Ziele 5 und 6 nach höchstens drei Nächten; Ziel 1 im Test und in der Woche danach.
 - **S2 – Wächter (E10).** Abnahme: Das Issue entsteht live bei einem echten Befund, sonst über eine noch nicht umgestellte Datei oder eine vorübergehend gestellte Lage. Es schließt sich, wenn nichts offen ist.
@@ -473,7 +474,7 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected` (Daten und Schem
 ## Nutzerentscheide (offen)
 
 - **N1 – Seiten, die robots.txt sperrt oder die den neuen User-Agent abweisen** (nach der Messung in S3). Empfehlung: robots.txt achten. Eine gesperrte Seite bekommt `blocked` mit Grund, und der Anbieter wird über den Seitenfinder (Plan 0049) oder von Hand anders erschlossen. Alternative: eine Ausnahme je Seite im Katalog mit Begründung. Zu entscheiden nur, wenn die Messung Seiten findet.
-- **N2 – Entfernte Seite nach 14 Tagen** (ADR 0033, Punkt 3). Empfehlung: ja, wie im ADR. Alternative: Bestand bleibt unbegrenzt wie heute, und nur der Wächter meldet.
+- **N2 – Entfernte Seite nach 14 Tagen** (ADR 0033, Punkt 3). Empfehlung: ja, wie im ADR. Alternative: Bestand bleibt unbegrenzt wie heute, und nur der Wächter meldet. **Umgesetzt wie im ADR** (angenommen vom Nutzer am 2026-10-26); wirksam frühestens 14 Tage nach der Umstellung, S2 (Wächter) soll vorher live sein. Widerspricht der Nutzer, wird `REMOVED_AFTER_DAYS` (`scripts/pipeline/lib/refresh.ts`) zum Schalter.
 - **N3 – `sternenhaus-kuf` mit Opus: entschieden am 2026-10-26** (Nutzer: Empfehlung angenommen). Haiku hatte 54 `einmalig`-Events (97 Angebote) mit dem Katalogalter 24–36 Monate übernommen; die Kalender-API nennt kein Alter. Das Familienprogramm 2026 (`nuernberg.de/…/2026_sternenhaus_familienprogramm.pdf`) weist je Stück ein Alter aus: nur „WiWaWaldtraum“ (Purzeltraumtheater) und „Schneeflocken, wippediwapp“ (Lucia Ruf) sind 2+, alle übrigen 3+ bis 8+ (auch „Baby Dronte“, laut Theater Mummpitz 4+). Umgesetzt im Katalog: `hint` der API-Seite nennt genau diese zwei Stücke, `verified` 2026-10-26, Notiz zur jährlichen Pflege. Trockenlauf mit Haiku (zweiter Versuch Sonnet) und mit Opus: je genau diese zwei Stücke; der Einbruchschutz hält das eine Nacht als `pending` und übernimmt es in der zweiten. Damit braucht die Umstellung für diesen Anbieter kein `--umstellen`.
 
 ## Kosten
@@ -495,7 +496,7 @@ Nach Nutzervorgabe kein Kriterium. Die Umstellung extrahiert einmal alles neu, z
 - **Umstellung bleibt hängen** (ein Anbieter mit dauerhaft scheiternder Einheit). Abhilfe: Wächter (`umstellung`), Eingabe `umstellen` nach Prüfung. S5 wartet, bis alle umgestellt sind.
 - **Rückweg nötig.** Abhilfe: Revert von Code und Daten-Commits (E4), im Skill beschrieben.
 - **robots.txt kostet Seiten.** Abhilfe: Messung im Runner vor dem Einschalten, N1, Schalter.
-- **Entfernte Seite war nur lange kaputt.** Abhilfe: 14 Tage Meldung vorher; die Rückkehr extrahiert neu. Die Zuordnung vergleicht nur mit der Vornacht. Kehrt eine Seite nach Tag 14 zurück, bekommen ihre Angebote deshalb neue IDs, und alte Links laufen ins Leere. Das ist bewusst so: Ein Link ins Leere ist besser als einer auf einen Kurs, der nicht mehr gilt. N2 lässt den Nutzer anders entscheiden.
+- **Entfernte Seite war nur lange kaputt.** Abhilfe: 14 Tage Meldung vorher; die Rückkehr extrahiert neu. Die Zuordnung vergleicht nur mit der Vornacht. Kehrt eine Seite nach Tag 14 zurück, vergibt der Build neu; die neue ID folgt aus dem Schlüssel (Titel, Ort, ADR 0022) und ist bei gleichem Titel wieder dieselbe, sonst eine neue. Bis zur Rückkehr laufen alte Links ins Leere. Das ist bewusst so: Ein Link ins Leere ist besser als einer auf einen Kurs, der nicht mehr gilt. N2 lässt den Nutzer anders entscheiden.
 - **Issue als Angriffsfläche.** Abhilfe: eigener Job mit nur `issues: write`, kein Checkout, Text als Datei, fremder Text nur in Code-Spans, geprüfter Marker.
 
 ## Umsetzung
@@ -588,9 +589,9 @@ Wegwerf-Skripte unter `runs/s0-0048/` (gitignored): `s0.ts` (Abruf, Einheiten na
 
 - `max` scheitert: Im zweiten Lauf erreicht `die-familienbox` das Zeitlimit je Aufruf (15 Minuten, `TIMEOUT_MS`), und die Laufzeit ist achtmal so hoch.
 - `low` verliert Recall (`ev-langwasser-miniclubs` 85 bzw. 63 %, `ev-st-andreas-thon` 92 %).
-- `medium` und `xhigh` haben gleichen Termin-Recall; `xhigh` ist in keinem Lauf schlechter und hat bei den Angeboten 100/100 %. Die Präzision bleibt bei allen Stufen bei rund 75 %, sie hängt an den Fallen (`nuebad-flipper`, `sv-johannis-07`, Restpunkt).
+- `medium` und `xhigh` liegen im Rauschen gleichauf: Termin-Recall 100/100 % bei beiden, Angebote 98/100 % bei `medium` und 100/100 % bei `xhigh`. Im Einzelnen ist `xhigh` nicht überall besser: `ev-langwasser-miniclubs` 96 % in beiden Läufen gegen 100 % bei `medium`, `registration` in Lauf 1 94 % gegen 100 %. Die Präzision bleibt bei allen Stufen bei rund 75 %, sie hängt an den Fallen (`nuebad-flipper`, `sv-johannis-07`, Restpunkt).
 
-**Entscheidung: `xhigh`** nach ADR 0033, Punkt 7 (Recall zuerst, Kosten kein Kriterium). Die längere Laufzeit trägt das Budget: Der längste Aufruf aus S0 (6,2 Minuten mit `medium`) käme auf etwa 10,5 Minuten und bliebe unter dem Zeitlimit je Aufruf; die Grenzen der Umstellung (E7) sind angehoben. Das Eval je Einheit in S1 und der Trockenlauf laufen mit `xhigh`.
+**Entscheidung: `xhigh`.** Nach ADR 0033, Punkt 7 entschiede bei Gleichstand im Recall die Laufzeit, also für `medium`. Gewählt ist trotzdem `xhigh`: ein Angebots-Lauf mehr bei 100 %, Kosten sind nach Nutzervorgabe kein Kriterium, und die Laufzeit trägt das Budget, wenn der Trockenlauf das bestätigt. Fallen im Trockenlauf Zeitüberschreitungen je Aufruf auf, gilt `medium`. Zur Laufzeit: Der längste Aufruf aus S0 (6,2 Minuten mit `medium`) käme auf etwa 10,5 Minuten und bliebe unter dem Zeitlimit je Aufruf; die Grenzen der Umstellung (E7) sind angehoben. Das Eval je Einheit in S1 und der Trockenlauf laufen mit `xhigh`.
 
 **Folgen:** `LLM_MODEL_EXTRACT=opus`, `LLM_MODEL_FALLBACK=opus`, `LLM_EFFORT_EXTRACT=xhigh` in `nightly.yml` und `discover.yml`, festgehalten in `scripts/lib/nightly-workflow.test.ts`. Der Skill (Abschnitt 5) verlangt künftig bei jeder Eval die Angabe des Effort.
 
@@ -605,9 +606,13 @@ Abweichungen vom Plan, jede mit Test:
 - **E7, Anbieter ohne Rohdatei:** Hat ein Anbieter keine Datei in `data/raw`, aber Angebote im Vorstand, gilt er als umzustellen: Geprüft wird gegen die Zahl seiner Angebote in `data/offers.json` (`prevOfferCount`). Sonst würde er ohne jede Einbruchprüfung extrahiert. Ohne Vorstand (neuer Anbieter) gibt es keine Prüfung.
 - **E5/E10, Ergebnis je Anbieter:** Neue Werte `teilausfall` (einzelne Seiten im Fehler, gelb, nicht in der 20-%-Regel) und `umstellung-ausstehend` (gelb, Grund unter `migrations` in `nightly.json`). `fehler` bzw. `ausgefallen` heißt jetzt: alle Einheiten scheitern. Das Ergebnis je Einheit steht unter `units` in `nightly.json`.
 - **E4, `removedAt`:** neues Feld in `UnitState` (Arch-Review M1). Ohne es übernahm der Build bei einem Anbieter mit nur einer Seite deren Angebote nach 14 Tagen 404 für immer aus dem Vorstand, weil die Datei dann weder Events noch `inputHash` hatte.
-- **E5, Risiken: ID nach Tag 15.** Kehrt eine entfernte Seite zurück, bekommen ihre Angebote nicht unbedingt neue IDs: Eine neue ID folgt aus dem Schlüssel (Titel, Ort), und die alte ist in der Vornacht nicht belegt. Bei unverändertem Titel kommt dieselbe ID zurück; ein alter Link zeigt dann wieder auf denselben Kurs. Der Satz unter „Risiken“ ist entsprechend zu lesen.
+- **E5, Risiken: ID nach Tag 15.** Kehrt eine entfernte Seite zurück, bekommen ihre Angebote nicht unbedingt neue IDs: Eine neue ID folgt aus dem Schlüssel (Titel, Ort), und die alte ist in der Vornacht nicht belegt. Bei unverändertem Titel kommt dieselbe ID zurück; ein alter Link zeigt dann wieder auf denselben Kurs. Der Satz unter „Risiken“ und die Testzeile sind entsprechend umgeschrieben.
 - **E6, Batch-Namen:** `<id>#<nn>` mit dem Katalogindex der eigenen Seite; verwaiste Einheiten danach, `kandidaten` zuletzt. Die Reihenfolge „ok vor Fehler“ gilt in `matchUnits` und `mergeParts`, wo sie wirkt.
 - **E6, Eval:** Das Eval extrahiert immer je Einheit (`caseUnits`, `lib/units.ts`). Eine Einheit mit Fehler macht den Fall zum Fehler.
+- **Entdecken:** `discover.yml` nutzt für den Ertragsbeweis jetzt Opus mit `xhigh`. Ein Lauf ist nicht gemessen; gemessen wird im ersten Entdecken nach dem Merge, die Grenzen folgen in S4 (Review 4, m3).
+- **Effort im Runner nicht sichtbar:** Die CLI meldet die tatsächliche Stufe nicht; eine Obergrenze der Organisation (`maxEffortLevel`) würde still absenken. Der Trockenlauf protokolliert die CLI-Version; dass `xhigh` wirkt, zeigt nur die Laufzeit im Vergleich zum Eval (Review 4, m4).
+
+**Offen vor dem Merge** (Review 4, m6): Eval je Einheit (zwei Läufe) samt Abnahme `geburtshaus-nuernberger-nest`; Trockenlauf im Runner mit Abnahme und Vergleich von `offers.json`; volle Prüfung der Hinweise des Abgleichs (E12); zweites Arch-Review ohne Blocker. Danach Merge, Deploy und Umstellung mit den Grenzen aus dem Trockenlauf.
 
 **Arch-Review (2026-10-27), Verdict: Nacharbeit nötig.** Blocker B1 (Modell und Effort fehlen in den Workflows) wird mit Nachtrag 2 behoben. Übernommen und behoben in `55f657f`: M1 (entfernte Seite bei nur einer Seite), M2 (`--umstellen` mit offener Einheit schreibt nicht), M4 (fehlende Tests für Beilage, Fehlerklasse, Teilzeile, Kopplung Nachricht/Schlüssel), m1–m4 und m6. M3 (Effort ohne Plan) wird mit Nachtrag 2 behoben. m5 (Abweichung bei `assembleUnit`) steht oben.
 
@@ -707,3 +712,16 @@ Unabhängiger Review von „Umsetzung“ und „Nachtrag 1“. Kein Blocker. All
 - „Doku auf `main`“ als erledigt markiert.
 
 Kein Blocker offen. N3 ist entschieden und umgesetzt (2026-10-26); S1 kann beginnen.
+
+**Arch-Review 2 (2026-10-27), Verdict: Nacharbeit nötig.** Übernommen und behoben: B1 (`unitInputs` warf bei `coveredBy`/`skipCrawl`-Anbietern mit Terminseite, der ganze Nachtlauf wäre abgebrochen; Test mit `coveredBy`-Fixture im Nachtlauf), M1 (eine gescheiterte Umstellung meldet `ausgefallen`, `fehler`, `offen` oder `teilausfall` wie sonst, damit die Ampel greift; der Grund steht in `migrations`), M2 (das Eval erlaubt je Einheit nur ihre Seiten bzw. Kandidaten als `sourceUrl`, dazu die Weiterleitungsziele des Falls, die er nicht je Seite festhält), M3 (N2 als nach ADR 0033 entschieden vermerkt), m1 (verwaiste Einheiten als Hinweis im Bericht), m2 (eigener Batch-Index je verwaister Einheit), m3 (`basis` des Eval-Falls), m4 (Architektur), m5 (Messung des Entdeckens, siehe oben). Abgelehnt: m6 (Test der Fehlerklasse über `fetchTask`): Er bräuchte einen Abruf mit gefälschtem Netz für eine Zeile `e instanceof HttpError`; `failureClassOf` ist getestet, und der Trockenlauf zeigt die Klassen echter Fehler im Bericht.
+
+## Review 4 (2026-10-27) – Verdict: Freigabe mit Änderungen
+
+Geprüft: Nachtrag 2, Abschnitt „S1 – Umsetzung“, E7 und die Voraussetzung „Modell“, gegen den Code auf `nachtlauf-s1`. Kein Blocker. Alle Punkte übernommen:
+
+- **M1** (Puffer `timeout`/`budget_min` mit `xhigh` zu knapp, ein Timeout verwirft den ganzen Lauf): Abstand 40 Minuten in E7 und im Workflow-Check, Umstellung mindestens mit `timeout=150`.
+- **M2** (Trockenlauf misst mit geschätzten Grenzen): Trockenlauf mit `timeout=240`, `budget_min=180`, `max_calls=1000`, `max_tokens=20000000`; die Umstellung bekommt das Doppelte der Messung; Abnahme ohne Bremse und `budgetHit`, mit Zeitüberschreitungen und abgeschnittenen Antworten je Einheit.
+- **M3** (Vergleichsbasis wäre die gescheiterte `max`-Zeile): Basis sind die beiden `xhigh`-Zeilen auf den 12 gemeinsamen Fällen; `geburtshaus-nuernberger-nest` getrennt.
+- **M4** (Begründung für `xhigh` zu stark): Gleichstand im Rauschen genannt, `xhigh` ausdrücklich begründet, Rückfall auf `medium` bei Zeitüberschreitungen im Trockenlauf.
+- **m1** Risiken und Testzeile zur ID nach Tag 15 umgeschrieben; **m2** E7 und Dateien ergänzt; **m3** Messung des Entdeckens nach dem Merge, Grenzen in S4; **m4** fehlende Sichtbarkeit des Effort im Runner als bekannte Lücke; **m5** Test in `io/nightly.test.ts` für den zweiten Versuch bei opus/opus ergänzt; **m6** Liste „Offen vor dem Merge“.
+

@@ -237,10 +237,13 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
     // eine offene Einheit (Zeitbudget, Bremse) hat keinen Stand: auch `--umstellen` schreibt dann nicht, sonst fielen
     // ihre alten Angebote samt IDs weg (Arch-Review M2)
     const open = unitList.some((u) => u.result === "offen");
+    // Ausfall und offene Einheiten zählen wie sonst (Ampel, 20-%-Regel; Arch-Review 2, M1); der Grund steht in `migration`
+    const summary = summarize(unitList.map((u) => u.result));
+    const visible = ["ausgefallen", "fehler", "offen", "teilausfall"].includes(summary);
     if (open || (!m.ok && !o.forceMigrate))
       return {
         kind: "done",
-        result: "umstellung-ausstehend",
+        result: visible ? summary : "umstellung-ausstehend",
         units: results,
         called,
         calls,
