@@ -308,3 +308,33 @@ export function withoutAccess<T extends { point: GeoPoint }>(
     return true;
   });
 }
+
+/**
+ * Gzip-Byte je Zelle (Halte × Orte) aus der gzip-Größe der **zellabhängigen** Felder (Plan 0051): `minutes` der Tabelle,
+ * `first` + `second` der Linien. Koordinaten, Namen und Quelle bleiben draußen, sonst stiege der Wert bei wenigen Orten
+ * (Netz `vrr` vor dem Bootstrap, Plan 0039). Die Budgets in `.size-limit.json` wachsen mit dem Katalog, dieser Wert nicht.
+ */
+export function bytesPerCell(gzipBytes: number, rows: number, places: number): number {
+  const cells = rows * places;
+  return cells === 0 ? 0 : gzipBytes / cells;
+}
+
+/**
+ * Obergrenze je Zelle (Plan 0051), gemessen am 2026-10-27 mit echten Daten (747 × 89): Tabelle 0,92, Linien 0,60 Byte.
+ * Schwelle = Messwert + rund 25 %: fängt eine Formatänderung, die je Zelle teurer wird, weit unter dem Budget.
+ */
+export const MAX_BYTES_PER_CELL = { table: 1.15, lines: 0.75 } as const;
+
+/** Meldungen für Werte über `MAX_BYTES_PER_CELL` (leer = in Ordnung). */
+export function perCellIssues(
+  perCell: { table: number; lines: number },
+  limits: { table: number; lines: number } = MAX_BYTES_PER_CELL,
+): string[] {
+  const fmt = (v: number) => v.toLocaleString("de-DE", { maximumFractionDigits: 2 });
+  return (["table", "lines"] as const)
+    .filter((k) => perCell[k] > limits[k])
+    .map(
+      (k) =>
+        `${k === "table" ? "Wegzeit" : "Linien"}: ${fmt(perCell[k])} Byte je Zelle, erlaubt ${fmt(limits[k])} (Plan 0051)`,
+    );
+}

@@ -13,6 +13,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
 import { DISTRICTS } from "../src/domain/districts.ts";
 import { icsContextFor, icsForSeries, icsForSession } from "../src/domain/ics.ts";
 import { seriesIcsPath, sessionIcsPath } from "../src/domain/ics-paths.ts";
@@ -21,7 +22,7 @@ import { type SiteMeta, toProviderDirectory, toSiteData } from "../src/domain/si
 import { decodeTransitTable, INSIDE_METERS } from "../src/domain/transit.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { checkSharePages, imprintPage, notFoundPage, offerSharePage, providerSharePage } from "./lib/share-pages.ts";
-import { buildTransitTables, withoutAccess } from "./transit/table.ts";
+import { buildTransitTables, bytesPerCell, perCellIssues, withoutAccess } from "./transit/table.ts";
 
 /** Ab hier warnt der Build: Die Profil-CSA läuft in jedem data:build (Plan 0009, Backpressure). */
 const TRANSIT_WARN_SECONDS = 20;
@@ -135,6 +136,20 @@ if (timetable.kind === "ok") {
     const pct = (v: number) => `${(v * 100).toLocaleString("de-DE", { maximumFractionDigits: 1 })} %`;
     console.error(`✗ Linien: ${pct(share)} der Zellen ohne Linien, erlaubt ${pct(MAX_WITHOUT_LINES)} (Plan 0012, E7)`);
     process.exit(1);
+  }
+  if (source === "real") {
+    // nur die zellabhängigen Felder (Plan 0051, Review 2, M1)
+    const perCell = {
+      table: bytesPerCell(gzipSync(table.minutes).length, table.lat.length, table.places.length),
+      lines: bytesPerCell(gzipSync(lines.first + lines.second).length, table.lat.length, table.places.length),
+    };
+    const fmt = (v: number) => v.toLocaleString("de-DE", { maximumFractionDigits: 2 });
+    console.log(`✓ Byte je Zelle (gzip): Tabelle ${fmt(perCell.table)}, Linien ${fmt(perCell.lines)}`);
+    const issues = perCellIssues(perCell);
+    if (issues.length > 0) {
+      console.error(`✗ ${issues.join("\n✗ ")}`);
+      process.exit(1);
+    }
   }
   // Jeder wählbare Stadtteil braucht einen Zugangshalt, sonst hieße es dort „außerhalb des Stadtgebiets“
   // (Plan 0009, Schritt 5). Das Fixture-Netz deckt nur Gostenhof und Fürth-Innenstadt ab (Halt 9100, Plan 0036).

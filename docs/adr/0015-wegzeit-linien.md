@@ -43,7 +43,7 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
    - es keinen Weg gibt,
    - oder die Fahrzeit der Folge nicht zur Angabe passt (Abweichung > max(3 Min., 25 %); Startwert, festgelegt nach Messung in Plan 0012).
 5. **Eigene Datei `public/data/linien.json`:**
-   - entsteht bei jedem Build, eigenes Budget 40 kB gzip;
+   - entsteht bei jedem Build, eigenes Budget 40 kB gzip (**seit Plan 0051: 72 kB**, Nachtrag unten);
    - zwei Byte-Ebenen (erste und zweite Linie);
    - über eine Inhaltskennung (`id` in `wegzeit.json`, `table` in `linien.json`, gebildet über den Inhalt beider Dateien) an die Tabelle gebunden;
    - gleiche Lizenz und Namensnennung (CC BY-SA 3.0 DE).
@@ -72,7 +72,7 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
 - `wegzeit.json` hat Formatversion 2. Eine alte Datei aus dem HTTP-Cache führt kurz zum Rückfall auf die Luftlinie.
 - Ein Profil „ohne Kinderwagen“ mit mehr Umstiegen wäre ein neues ADR (`docs/ideas.md`).
 - Beim ersten Anlass kommen ca. 28 kB gzip nach der Tabelle dazu.
-- Die Linien-Datei wächst linear mit den Orten (≈ 0,37 kB gzip je Ort), das Budget reicht bis rund 110 Orte.
+- Die Linien-Datei wächst linear mit den Orten (≈ 0,37 kB gzip je Ort), das Budget reicht bis rund 110 Orte. **Überholt:** Gemessen sind ≈ 0,43 kB je Ort, und 40 kB reichten nur bis 89 Orte (Plan 0051).
 - Der Auszug wird ca. 50 kB größer.
 
 ## Nachtrag (2026-10-06): ergänzt durch Plan 0019
@@ -81,3 +81,8 @@ Die Wegzeit zeigt nur Minuten („ca. 25 Min. mit Bus & Bahn“). Gewünscht ist
 - Neu öffnet die Kachel „Wo“ im Detail das Sheet „Wege ab …“ (Plan 0019, E4/E6/E10). Sie listet den Hauptweg und bis zu zwei **andere Wege** aus derselben Rechnung im Browser: je Linienfolge der schnellste Zugangshalt im Umkreis, dazu zu Fuß.
 - Damit wird die Konsequenz „Gezeigt wird mitunter eine Direktverbindung, die bis zu 10 Min. langsamer ist als ein Umstiegsweg“ sichtbar gemacht statt verschwiegen. Der verdrängte Umstiegsweg erscheint dort ausdrücklich mit „1 Umstieg“. Ist er in der Anzeige schneller, erklärt die Karte, warum er nicht der Vorschlag ist.
 - Keine neue Datei, kein neuer Request. Grenzen: je Halt eine Verbindung, keine Haltestellennamen, der Fußweg vom Ziel-Halt ist unbekannt.
+
+## Nachtrag (2026-10-27, Plan 0051): Budget der Linien
+
+Nutzerentscheid vom 2026-10-27: „Wähle auch Größenbudgets, die Sinn ergeben und nicht unmotiviert eng bemessen sind“. Bei 89 Orten maß `linien.json` 40,11 kB gzip und riss das Budget von 40 kB. Neu gilt `Linien-Daten` 72 kB, passend zu 120 kB der Tabelle (ADR 0011, Nachtrag): etwa 165 Orte. `data:build` prüft mit echten Daten höchstens 0,75 Byte gzip je Zelle in `first` + `second` (gemessen 0,60).
+

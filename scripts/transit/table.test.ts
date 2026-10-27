@@ -10,7 +10,18 @@ import {
   transitReach,
   walkMinutes,
 } from "../../src/domain/transit.ts";
-import { areaId, buildTransitTables, cellValue, contentId, encodeBytes, tableRows, withoutAccess } from "./table.ts";
+import {
+  areaId,
+  buildTransitTables,
+  bytesPerCell,
+  cellValue,
+  contentId,
+  encodeBytes,
+  MAX_BYTES_PER_CELL,
+  perCellIssues,
+  tableRows,
+  withoutAccess,
+} from "./table.ts";
 
 const fixture = Timetable.parse(
   JSON.parse(readFileSync(new URL("../../tests/fixtures/oepnv/fahrplan.json", import.meta.url), "utf8")),
@@ -340,5 +351,26 @@ describe("withoutAccess", () => {
       point: { lat: 49.4485, lon: 11.059 - meters / (111_195 * Math.cos((49.4485 * Math.PI) / 180)) },
     });
     expect(withoutAccess(table, [west(700), west(900)]).map((o) => o.id)).toEqual(["w900"]);
+  });
+});
+
+describe("bytesPerCell (Plan 0051)", () => {
+  it("teilt die gzip-Größe durch Halte × Orte", () => {
+    expect(bytesPerCell(65_000, 747, 89)).toBeCloseTo(0.978, 3);
+  });
+
+  it("ist 0 ohne Zellen", () => {
+    expect(bytesPerCell(100, 0, 5)).toBe(0);
+    expect(bytesPerCell(100, 5, 0)).toBe(0);
+  });
+
+  it("perCellIssues meldet nur Werte über der Grenze (Gate in data:build)", () => {
+    expect(perCellIssues({ table: 0.92, lines: 0.6 })).toEqual([]);
+    expect(perCellIssues({ table: MAX_BYTES_PER_CELL.table + 0.01, lines: 0.6 })).toEqual([
+      "Wegzeit: 1,16 Byte je Zelle, erlaubt 1,15 (Plan 0051)",
+    ]);
+    expect(perCellIssues({ table: 0.5, lines: 0.9 }, { table: 1, lines: 0.8 })).toEqual([
+      "Linien: 0,9 Byte je Zelle, erlaubt 0,8 (Plan 0051)",
+    ]);
   });
 });

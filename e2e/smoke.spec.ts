@@ -168,6 +168,36 @@ test("LCP und CLS bleiben mit echten Daten im Budget", async ({ page, browserNam
   expect(cls, `CLS\n${detail}`).toBeLessThan(0.05);
 });
 
+test("LCP mit gespeichertem Stadtteil und ?wegzeit= bleibt mit echten Daten im Budget (Plan 0051)", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== "chromium", "CDP-Drosselung und LCP-API gibt es nur in Chromium");
+  const meta = await dataMeta(page);
+  test.skip(meta.offers === 0, "keine Daten");
+  // Die Liste wartet hier auf wegzeit.json; deren Größe wächst mit den Orten des Katalogs (Plan 0051, M2)
+  await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+  await throttleMobile(page);
+  await observeVitals(page);
+  await page.clock.setFixedTime(new Date(meta.generatedAt));
+  // Ende des Abrufs der Tabelle über Playwright: `page.clock` ersetzt auch `performance` (Plan 0051, Review 2, m3)
+  const tableResponse = page.waitForResponse((r) => r.url().includes("/data/wegzeit.json"));
+  const nav = await page.goto("./?wegzeit=20");
+  await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof", { timeout: 15_000 });
+  await expect(page.getByTestId("offer").first()).toBeVisible();
+  await page.waitForTimeout(500);
+  const vitals = await readVitals(page);
+  // liegt das LCP nach dem Ende des Abrufs, misst der Test den Wartepfad
+  const table = (await tableResponse).request().timing();
+  const tableEnd = table.startTime + table.responseEnd - (nav?.request().timing().startTime ?? table.startTime);
+  console.warn(
+    `[perf] smoke | Wegzeit gespeichert | LCP (ms) ${vitals.lcp} | wegzeit.json fertig (ms) ${Math.round(tableEnd)}`,
+  );
+  expect(vitals.lcp, "LCP (ms)").toBeLessThan(2500);
+  const { cls, detail } = clsFrom(vitals);
+  expect(cls, `CLS\n${detail}`).toBeLessThan(0.05);
+});
+
 /**
  * LCP und CLS mit Service Worker (Plan 0011, E6): erster Besuch (Registrierung nach `load`, Precache) und zweiter
  * Besuch (Navigation über den Service Worker, Schale und Assets aus dem Cache, Daten aus dem Netz). Ein Rot wird an der

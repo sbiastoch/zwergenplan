@@ -55,9 +55,14 @@ ADR 0005 legte fest, dass die Wegzeit aus einer statischen GTFS-Matrix entsteht:
 - Die Wegzeit ist eine ehrliche Schätzung aus Soll-Daten: keine Verspätungen, eher pessimistisch (Wartezeit, ein Fußweg je Umstieg, 1 Min. Puffer).
 - `data:build` rechnet die Tabelle bei jedem Build. Gemessen wurden ca. 7 s unter Last; ein Cache über einen Hash ist der Ausweg.
 - Der Auszug muss mit dem Fahrplanwechsel erneuert werden. Der Skill prüft das bei jedem Lauf, CI warnt kurz vor dem Ablauf und danach, wird aber nie rot.
-- Die Tabelle wächst linear mit der Zahl der Orte (≈ 0,5 kB gzip je Ort), Budget 64 kB.
+- Die Tabelle wächst linear mit der Zahl der Orte (≈ 0,5 kB gzip je Ort), Budget 64 kB. **Geändert durch Plan 0051 (2026-10-27): Budget 120 kB**, gemessen ≈ 0,7 kB je Ort; Nachtrag unten.
 - ADR 0005 gilt weiter als Ziel („Öffi-Wegzeit statt Luftlinie, offline, ohne Drittanbieter“), mit den Abweichungen oben. ADR 0003: `nearestStops` gestrichen. ADR 0010 bleibt unverändert, denn `src/data/transit.ts` lädt nur und importiert nichts aus `src/domain`.
 
 ## Nachtrag (2026-10-06): Wochen-Push (Plan 0017, ADR 0014)
 
 - **Punkt 6 ergänzt durch ADR 0014 (Punkt 4):** Neuer Anlass „beim Push“. Der Service Worker lädt bei jedem Push genau einmal `wegzeit.json` (bedingt, `no-cache`, bei Fehler die Kopie aus dem Cache), egal ob ein Startpunkt oder ein Abo mit Wegzeit gespeichert ist. Der Request ist für alle gleich und verrät nichts über den Startpunkt; die Wegzeit rechnet der Service Worker lokal.
+
+## Nachtrag (2026-10-27, Plan 0051): Budget der Tabelle
+
+Nutzerentscheid vom 2026-10-27: „Wähle auch Größenbudgets, die Sinn ergeben und nicht unmotiviert eng bemessen sind“. Die Umstellung des Nachtlaufs (Plan 0048) brachte Angebote an 7 weiteren Orten (netto, 82 → 89; 9 Orte neu); die Tabelle maß 65,06 kB gzip und riss das Budget von 64 kB, sodass kein Daten-Commit mehr ausgeliefert wurde. Neu gilt `Wegzeit-Daten` 120 kB: Platz für etwa 165 Orte, das 1,5-Fache aller 110 Orte des Katalogs (78,4 kB). Gegen Formatwachstum prüft `data:build` mit echten Daten höchstens 1,15 Byte gzip je Zelle im Feld `minutes` (gemessen 0,92). Ein Smoke-Test misst den Start mit gespeichertem Stadtteil und `?wegzeit=` mit echten Daten: LCP 2 112 ms (Gate 2 500 ms), die Tabelle ist gedrosselt erst nach 2 705 ms da. Die Größe verschiebt also, wann die gefilterte Liste erscheint (≈ 5 ms je Ort), nicht das LCP; das wird hingenommen (`docs/ideas.md`).
+
