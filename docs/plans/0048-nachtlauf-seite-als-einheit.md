@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S0 erledigt, Nachtrag 1 reviewt; nächster Schritt S1)
+Status: in Umsetzung (S0 erledigt, Nachtrag 1 reviewt; S1 auf Branch `nachtlauf-s1`, Nachtrag 2: Effort)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -14,7 +14,7 @@ Bezug:
 - **Basis `main`.** Umgesetzt wird auf einem eigenen Branch von `main`.
 - **Konflikt mit Branch `plan-0039`:** Plan 0042 ändert dort `scripts/pipeline/io/fetch-inputs.ts` und `scripts/pipeline/lib/fetch.ts` (`follow`, `withFollowPages`, `siteOf`) und bringt `partChars`. Kommt `plan-0039` zuerst auf `main`, baut S1 darauf auf. Sonst löst der spätere Rebase von `plan-0039` die Konflikte; Folgeseiten gehören dann zur Einheit ihrer Programmseite (E1).
 - **Katalogfehler:** erledigt. `die-familienbox` steht seit `84a2bad` (2026-10-26) unter der neuen URL; `zentrum-kobergerstrasse` hat sich selbst erholt (TLS wieder gültig, Nachtlauf 2026-10-26 ohne Fehler).
-- **Modell gewählt, nicht gewechselt:** erledigt am 2026-10-26, gewählt ist **Opus** (Abschnitt „Umsetzung“). Gewechselt wird **mit der Umstellung in S1** (E7): `LLM_MODEL_EXTRACT=opus` und `LLM_MODEL_FALLBACK=opus` in beiden Workflows. Den Fallback auf Opus zu setzen heißt: Der zweite Versuch nach einem Einbruch nimmt kein schwächeres Modell (Sonnet hatte im Eval weniger Recall). Heute schaltet gleiches Modell den zweiten Versuch ab (`strongRetry: model !== fallbackModelOf(…)` in `scripts/pipeline/cli.ts`); S1 ändert das (E5). So gibt es nur eine Neuextraktion und nur eine Gelegenheit, IDs zu verlieren (ADR 0033, Konsequenz „IDs“).
+- **Modell gewählt, nicht gewechselt:** erledigt am 2026-10-26, gewählt ist **Opus**, mit Effort `xhigh` seit Nachtrag 2 (2026-10-27; Abschnitt „Umsetzung“). Gewechselt wird **mit der Umstellung in S1** (E7): `LLM_MODEL_EXTRACT=opus`, `LLM_MODEL_FALLBACK=opus` und `LLM_EFFORT_EXTRACT=xhigh` in beiden Workflows. Den Fallback auf Opus zu setzen heißt: Der zweite Versuch nach einem Einbruch nimmt kein schwächeres Modell (Sonnet hatte im Eval weniger Recall). Heute schaltet gleiches Modell den zweiten Versuch ab (`strongRetry: model !== fallbackModelOf(…)` in `scripts/pipeline/cli.ts`); S1 ändert das (E5). So gibt es nur eine Neuextraktion und nur eine Gelegenheit, IDs zu verlieren (ADR 0033, Konsequenz „IDs“).
 
 ## Anlass
 
@@ -210,7 +210,7 @@ UnitState = {
 - **Erzwingen nach Prüfung:** Die neue Eingabe `umstellen` von `nightly.yml` gibt `--umstellen <id,…>` an `pipeline nightly` weiter. Das stellt diese Anbieter auch bei einem Einbruch oder mit einer dauerhaft scheiternden Seite um; die Einheit dieser Seite beginnt dann leer mit `fehler`. Daten schreibt so weiter nur der Workflow, nie ein lokaler Lauf (CLAUDE.md, „Daten“).
 - **Grenzen der Umstellung:**
   - `nightly.yml` bekommt die Eingabe `timeout` für `timeout-minutes` des Jobs `nachtlauf`, als `${{ fromJSON(inputs.timeout || '90') }}`, weil die Eingaben beim Zeitplan leer sind;
-  - die Umstellung läuft per `workflow_dispatch` mit den Werten aus S0: `timeout=90`, `budget_min=60`, `max_calls=500`, `max_tokens=9000000` (gemessen auf dem Katalog von `main`: 237 Aufrufe, 4,5 Mio. Tokens samt Cache, etwa 24 Minuten mit 3 Anbietern parallel; je das Doppelte, Zeit mit Abruf). Kommt Düsseldorf vorher auf `main`, wird mit dessen Katalog neu gerechnet: Aufrufe = Zahl der Einheiten × 1,15 (S0: 237 Aufrufe für 207 Einheiten), Tokens und Minuten anteilig, je verdoppelt. Die Umstellung läuft per `workflow_dispatch` **vor** dem nächsten Zeitplan (01:30 UTC), sonst beginnt die Nacht mit den alten Grenzen (150 Aufrufe, 3 Mio. Tokens, 50 Minuten);
+  - die Umstellung läuft per `workflow_dispatch` mit `timeout=120`, `budget_min=90`, `max_calls=500`, `max_tokens=10000000` (Nachtrag 2: S0 maß mit Effort `medium` 237 Aufrufe, 4,5 Mio. Tokens samt Cache und etwa 24 Minuten mit 3 Anbietern parallel; `xhigh` braucht im Eval 1,65-mal so lange und 1,7-mal so viele Ausgabe-Tokens, also etwa 40 Minuten und 4,8 Mio. Tokens; je das Doppelte, Zeit mit Abruf). Der Trockenlauf in S1 misst die Werte im Runner; weichen sie ab, gelten seine. Kommt Düsseldorf vorher auf `main`, wird mit dessen Katalog neu gerechnet: Aufrufe = Zahl der Einheiten × 1,15 (S0: 237 Aufrufe für 207 Einheiten), Tokens und Minuten anteilig, je verdoppelt. Die Umstellung läuft per `workflow_dispatch` **vor** dem nächsten Zeitplan (01:30 UTC), sonst beginnt die Nacht mit den alten Grenzen (150 Aufrufe, 3 Mio. Tokens, 50 Minuten);
   - `budget_min` bleibt mindestens 20 Minuten unter `timeout`.
 
   Wer in einer Nacht nicht fertig wird, stellt in der nächsten um; bis dahin gilt sein alter Stand.
@@ -567,6 +567,49 @@ Wegwerf-Skripte unter `runs/s0-0048/` (gitignored): `s0.ts` (Abruf, Einheiten na
 ### Nachtrag 1 (2026-10-26, nach S0)
 
 Ändert E3 (Auszug mit allen Seiten, Probelauf gegen den vollen Eintrag), E6 und neu E12 (Abgleich zwischen Einheiten), E11 (nur Formatwechsel), E7 (Grenzen) und die Voraussetzung „Modell“ (Opus, Fallback Opus). Neu ist N3. ADR 0033 hat dazu einen eigenen „Nachtrag 1“ (Punkte 2 und 8, Abgrenzung zu ADR 0031, Punkt 1). Review 3 unten.
+
+### Nachtrag 2 (2026-10-27): Effort
+
+**Anlass:** Der Nutzer will zur Modellwahl auch einen passenden Effort (2026-10-27). Die Wahl in „Modellwahl“ lief ohne `--effort`, also mit dem Standard der CLI.
+
+**Befund:** Ohne `--effort` liest die CLI lokal `effortLevel` aus `~/.claude/settings.json`, denn bei lokaler Anmeldung behält `io/llm.ts` das echte `HOME`. Auf diesem Rechner stand dort für Opus 5.5 `medium`, für Haiku 5.5 `xhigh` und sonst `high`. Im Runner mit leerem `HOME` gilt der Modellstandard; laut Doku der CLI (`code.claude.com/docs/en/model-config`) ist das `medium` für Opus, Sonnet und Haiku 5.5. Die Opus-Zeilen der Modellwahl liefen also mit `medium` wie der Runner; die Haiku-Zeilen vom 12.10. liefen lokal mit `xhigh`, der Nachtlauf mit `medium`. `CLAUDE_CODE_EFFORT_LEVEL` hätte Vorrang vor dem Flag, wird aber von `llmEnv` nicht durchgereicht. Die gepinnte CLI 2.1.296 kennt `--effort` mit denselben Stufen.
+
+**Verdrahtung** (`ccfa40b`): `LlmCall.effort` wird `--effort`; `LLM_EFFORT_EXTRACT` gilt für Haupt- und Fallback-Modell, leer heißt Standard der CLI, ein ungültiger Wert bricht ab. Im Cache-Schlüssel wird der Modellteil zu `modell/effort`; ohne Effort bleibt er, wie er war, damit vor der Umstellung nichts neu extrahiert wird. `pnpm eval --effort E` schreibt das Etikett `opus (Effort E)`.
+
+**Messung:** `pnpm eval --model opus --fallback opus --effort E`, je Stufe zwei Läufe, 12 Fälle, Prompt-Hash `7b31b918b80b` (Zeilen in `evals/results.md`):
+
+| Effort | Termine R | Termine P | Angebote R | Modellzeit | längster Aufruf |
+|---|---|---|---|---|---|
+| low | 96 / 95 % | 76 / 76 % | 96 / 96 % | 335 / 350 s | 67 s |
+| medium | 100 / 100 % | 75 / 75 % | 98 / 100 % | 479 / 455 s | 78 s |
+| high | 98 / 100 % | 77 / 75 % | 98 / 100 % | 506 / 530 s | 88 s |
+| xhigh | 100 / 100 % | 75 / 77 % | 100 / 100 % | 795 / 777 s | 130 s |
+| max | 100 / 44 % | 75 / 59 % | 100 / 54 % | 3 837 / 3 699 s | 900 s |
+
+- `max` scheitert: Im zweiten Lauf erreicht `die-familienbox` das Zeitlimit je Aufruf (15 Minuten, `TIMEOUT_MS`), und die Laufzeit ist achtmal so hoch.
+- `low` verliert Recall (`ev-langwasser-miniclubs` 85 bzw. 63 %, `ev-st-andreas-thon` 92 %).
+- `medium` und `xhigh` haben gleichen Termin-Recall; `xhigh` ist in keinem Lauf schlechter und hat bei den Angeboten 100/100 %. Die Präzision bleibt bei allen Stufen bei rund 75 %, sie hängt an den Fallen (`nuebad-flipper`, `sv-johannis-07`, Restpunkt).
+
+**Entscheidung: `xhigh`** nach ADR 0033, Punkt 7 (Recall zuerst, Kosten kein Kriterium). Die längere Laufzeit trägt das Budget: Der längste Aufruf aus S0 (6,2 Minuten mit `medium`) käme auf etwa 10,5 Minuten und bliebe unter dem Zeitlimit je Aufruf; die Grenzen der Umstellung (E7) sind angehoben. Das Eval je Einheit in S1 und der Trockenlauf laufen mit `xhigh`.
+
+**Folgen:** `LLM_MODEL_EXTRACT=opus`, `LLM_MODEL_FALLBACK=opus`, `LLM_EFFORT_EXTRACT=xhigh` in `nightly.yml` und `discover.yml`, festgehalten in `scripts/lib/nightly-workflow.test.ts`. Der Skill (Abschnitt 5) verlangt künftig bei jeder Eval die Angabe des Effort.
+
+### S1 – Umsetzung (2026-10-27, Branch `nachtlauf-s1`)
+
+Commits: `ccfa40b` (Effort, Nachtrag 2), `ad02ff2` (E11), `7a4e757` (`lib/units.ts`), `939401d` (Kern: E1, E2, E4–E7, E9), `2acd9cc` (Eval je Einheit), `6932e9b` (Workflow, eindeutige Seiten), `1346a9a` (Eval-Fall `geburtshaus-nuernberger-nest`), `84f8533` (Doku), `55f657f` (Nacharbeit Arch-Review).
+
+Abweichungen vom Plan, jede mit Test:
+
+- **E2, `assembleUnit`:** Es gibt keine eigene Funktion. `unitInputs` (`scripts/pipeline/io/fetch-inputs.ts`) ruft `assembleProvider` je Einheit mit deren Seiten auf; die Logik ist dieselbe. `hashes.json` und `report.md` des Abrufs bleiben je Anbieter: Sie sind Messbericht und Eingabe der Probe `pipeline extract --from`. Ebenso behält `FetchedProvider` die Gesamtsicht (`pages`, `candidates`, `allowedUrls`, `text`) für Probe, `eval freeze` und den Ertragsbeweis des Entdeckens.
+- **E1, gescheiterte Beilage:** Die Einheit wird ohne sie extrahiert und bleibt `ok`, wie E1 sagt. Die Testzeile unter `lib/fetch.test.ts` („`assembleUnit` mit gescheiterter Beilage → `fehler`“) widersprach E1 und gilt nicht.
+- **E7, Anbieter ohne Rohdatei:** Hat ein Anbieter keine Datei in `data/raw`, aber Angebote im Vorstand, gilt er als umzustellen: Geprüft wird gegen die Zahl seiner Angebote in `data/offers.json` (`prevOfferCount`). Sonst würde er ohne jede Einbruchprüfung extrahiert. Ohne Vorstand (neuer Anbieter) gibt es keine Prüfung.
+- **E5/E10, Ergebnis je Anbieter:** Neue Werte `teilausfall` (einzelne Seiten im Fehler, gelb, nicht in der 20-%-Regel) und `umstellung-ausstehend` (gelb, Grund unter `migrations` in `nightly.json`). `fehler` bzw. `ausgefallen` heißt jetzt: alle Einheiten scheitern. Das Ergebnis je Einheit steht unter `units` in `nightly.json`.
+- **E4, `removedAt`:** neues Feld in `UnitState` (Arch-Review M1). Ohne es übernahm der Build bei einem Anbieter mit nur einer Seite deren Angebote nach 14 Tagen 404 für immer aus dem Vorstand, weil die Datei dann weder Events noch `inputHash` hatte.
+- **E5, Risiken: ID nach Tag 15.** Kehrt eine entfernte Seite zurück, bekommen ihre Angebote nicht unbedingt neue IDs: Eine neue ID folgt aus dem Schlüssel (Titel, Ort), und die alte ist in der Vornacht nicht belegt. Bei unverändertem Titel kommt dieselbe ID zurück; ein alter Link zeigt dann wieder auf denselben Kurs. Der Satz unter „Risiken“ ist entsprechend zu lesen.
+- **E6, Batch-Namen:** `<id>#<nn>` mit dem Katalogindex der eigenen Seite; verwaiste Einheiten danach, `kandidaten` zuletzt. Die Reihenfolge „ok vor Fehler“ gilt in `matchUnits` und `mergeParts`, wo sie wirkt.
+- **E6, Eval:** Das Eval extrahiert immer je Einheit (`caseUnits`, `lib/units.ts`). Eine Einheit mit Fehler macht den Fall zum Fehler.
+
+**Arch-Review (2026-10-27), Verdict: Nacharbeit nötig.** Blocker B1 (Modell und Effort fehlen in den Workflows) wird mit Nachtrag 2 behoben. Übernommen und behoben in `55f657f`: M1 (entfernte Seite bei nur einer Seite), M2 (`--umstellen` mit offener Einheit schreibt nicht), M4 (fehlende Tests für Beilage, Fehlerklasse, Teilzeile, Kopplung Nachricht/Schlüssel), m1–m4 und m6. M3 (Effort ohne Plan) wird mit Nachtrag 2 behoben. m5 (Abweichung bei `assembleUnit`) steht oben.
 
 ## Review (2026-10-26) – Verdict: Überarbeiten
 
