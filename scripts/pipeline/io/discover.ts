@@ -48,7 +48,6 @@ import {
   sameSite,
   searchMessage,
   searchResponseSchema,
-  staleHints,
 } from "../lib/discover.ts";
 import { DiscoverState, emptyState } from "../lib/discover-state.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
@@ -60,7 +59,7 @@ import { providerStatus } from "../lib/raw.ts";
 import { planFetch } from "../lib/select.ts";
 import { GateError } from "./discover-git.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
-import { readCatalog, readJson, readRaw, readRawDir, writeJson } from "./files.ts";
+import { readCatalog, readJson, readRaw, writeJson } from "./files.ts";
 import type { GeoResult } from "./geocode.ts";
 import type { loadFreeDays } from "./holidays.ts";
 import { callLlm, type LlmCall, type LlmOptions } from "./llm.ts";
@@ -511,10 +510,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     const unassessed = keep.filter((f) => !handled.has(f));
     if (unassessed.length > 0) report.unassessed = unassessed;
 
-    // Hinweise ohne Aktion (E7): Quellen mit Fehlerserie
-    const ids = new Set(inRegion.map((p) => p.id));
-    const raws = Object.fromEntries(Object.entries(readRawDir(join(o.dataDir, "raw"))).filter(([id]) => ids.has(id)));
-    report.hints.push(...staleHints(raws, o.today));
+    // Quellen mit Fehlerserie meldet der Wächter des Nachtlaufs (Plan 0048, E10)
 
     // erst nach allen Regionen geschrieben: ein Commit der nächsten Region erlaubt nur Katalog und Rohdaten
     // (Arch-Review S4, M2)

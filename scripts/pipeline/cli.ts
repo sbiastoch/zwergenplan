@@ -25,12 +25,14 @@
  *                                               Modell, ohne Bericht und kosten.csv; entfernt data/raw/<id>.json von
  *                                               Anbietern, die nicht mehr im Katalog stehen. Nach der Rücknahme eines
  *                                               Anbieters vor `pnpm data:validate`. Freie Tage aus dem Cache, sonst Netz.
- *   status [RUN_DIR] [--gates X] [--push X] [--report-only]
+ *   status [RUN_DIR] [--gates X] [--push X] [--report-only] [--waechter]
  *                                               Bericht des Nachtlaufs (E10) aus RUN_DIR/nightly.json (Standard
  *                                               runs/<heute>): Ampel nach E6, Fehler, Einbrüche, Kosten, Live-Stand.
  *                                               --gates/--push: Ausgang der Workflow-Schritte. Schreibt auch nach
  *                                               $GITHUB_STEP_SUMMARY und `ampel=` nach $GITHUB_OUTPUT. Exit 1 bei
- *                                               rot, außer mit --report-only.
+ *                                               rot, außer mit --report-only. --waechter: Befunde des Wächters
+ *                                               (Plan 0048, E10) nach RUN_DIR/waechter.md (leer: nichts offen) und
+ *                                               in den Bericht; nur mit nightly.json.
  *   discover [--region <id>] [--bootstrap] [--dry-run] [--terms a,b] [--hide a,b]
  *                                               Entdecken neuer Anbieter (Plan 0032, E7) je Region aus REGION_IDS:
  *                                               Sammelkalender, Verzeichnisse, Websuche → Vorfilter → Bewerten →
@@ -104,6 +106,7 @@ import type { ProviderRaw } from "./lib/raw.ts";
 import { offerUnits } from "./lib/refresh.ts";
 import { assessRun, NightlyReport, nightlyCommitMessage, renderStatus, type StepOutcome } from "./lib/report.ts";
 import { planFetch } from "./lib/select.ts";
+import { watchFindings, watchIssue } from "./lib/watch.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -119,6 +122,7 @@ const { positionals, values } = parseArgs({
     gates: { type: "string" },
     push: { type: "string" },
     "report-only": { type: "boolean", default: false },
+    waechter: { type: "boolean", default: false },
     region: { type: "string" },
     bootstrap: { type: "boolean", default: false },
     terms: { type: "string" },
@@ -466,8 +470,15 @@ const stepOutcome = (value: string | undefined, what: string): StepOutcome | und
   return STEP_OUTCOMES.find((o) => o === value) ?? fail(`${what}: unbekannter Ausgang „${value}“`);
 };
 
-/** Bericht des Nachtlaufs aus RUN_DIR (nightly.json) samt Zustand nach dem Lauf; `undefined` ohne Bericht. */
-function readNightly(runDir: string): { report: NightlyReport | undefined; raws: Record<string, ProviderRaw> } {
+/**
+ * Bericht des Nachtlaufs aus RUN_DIR (nightly.json) samt Zustand nach dem Lauf; `undefined` ohne Bericht. `raws` nur
+ * die Anbieter des Laufs, `all` der ganze Zustand (Wächter, Plan 0048, E10).
+ */
+function readNightly(runDir: string): {
+  report: NightlyReport | undefined;
+  raws: Record<string, ProviderRaw>;
+  all: Record<string, ProviderRaw>;
+} {
   const file = join(runDir, "nightly.json");
   const parsed = existsSync(file) ? NightlyReport.safeParse(readJson(file)) : undefined;
   if (parsed && !parsed.success) print(`Hinweis: ${file} passt nicht zum Format – ${parsed.error.message}`);
@@ -477,13 +488,13 @@ function readNightly(runDir: string): { report: NightlyReport | undefined; raws:
   const raws = report
     ? Object.fromEntries(Object.entries(all).filter(([id]) => report.results[id] !== undefined))
     : all;
-  return { report, raws };
+  return { report, raws, all };
 }
 
 /** Bericht des Nachtlaufs (E10) mit Ampel nach E6. */
 async function status() {
   const runDir = args[0] || join(ROOT, "runs", today());
-  const { report, raws } = readNightly(runDir);
+  const { report, raws, all } = readNightly(runDir);
   const live = await liveStatus();
   const gates = stepOutcome(values.gates, "--gates");
   const push = stepOutcome(values.push, "--push");
@@ -492,7 +503,7 @@ async function status() {
   const offers = existsSync(offersFile) ? (readPreviousOffers(offersFile)?.offers ?? []) : [];
   const stock = Object.fromEntries(Object.keys(raws).map((id) => [id, offerUnits(offers, id)]));
   const fetchFile = join(runDir, "fetch", "report.md");
-  const md = renderStatus({
+  let md = renderStatus({
     report,
     verdict,
     live,
@@ -501,6 +512,13 @@ async function status() {
     ...(existsSync(fetchFile) ? { fetchReport: readFileSync(fetchFile, "utf8") } : {}),
   });
   mkdirSync(runDir, { recursive: true });
+  // Wächter (Plan 0048, E10): `today` aus dem Bericht; ohne Bericht keine Datei, der Job `waechter` scheitert dann sichtbar
+  if (values.waechter && report) {
+    // ganzer Zustand, nicht nur die Anbieter des Laufs: ein Lauf mit `only` schlösse das Issue sonst falsch (M1)
+    const text = watchIssue(watchFindings({ raws: all, catalog: readCatalog(), today: report.date }), report.date);
+    writeFileSync(join(runDir, "waechter.md"), text);
+    md += `\n## Wächter (Plan 0048, E10)\n\n${text === "" ? "Nichts offen." : text.replace(/\n*<!-- waechter:.*$/s, "")}\n`;
+  }
   writeFileSync(join(runDir, "status.md"), md);
   print(md);
   const summary = process.env["GITHUB_STEP_SUMMARY"];

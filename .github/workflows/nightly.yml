@@ -211,7 +211,16 @@ jobs:
         env:
           RUN_DIR: ${{ steps.nightly.outputs.run_dir }}
           GATES: ${{ steps.gates.outcome }}
-        run: pnpm pipeline status "$RUN_DIR" --gates "$GATES" --report-only
+        run: pnpm pipeline status "$RUN_DIR" --gates "$GATES" --report-only --waechter
+      # Text des Wächter-Issues (Plan 0048, E10); leer heißt nichts offen. Der Job `waechter` hat keinen Checkout.
+      - name: Wächter sichern
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: waechter
+          path: ${{ steps.nightly.outputs.run_dir }}/waechter.md
+          retention-days: 14
+          if-no-files-found: error
       - name: Laufverzeichnis sichern
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -291,6 +300,62 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run ci.yml --ref main --repo "$GITHUB_REPOSITORY"
+
+  # ── Wächter (Plan 0048, E10): ein Issue mit allen offenen Befunden, geschlossen, wenn nichts offen ist ──────────
+  # Nach `veroeffentlichen`, kann den Push also nicht verhindern; ohne continue-on-error: Scheitert er, wird der Lauf
+  # rot. Nur `issues: write`, kein Checkout, kein Code aus dem Repo: gh und jq, Text nur per --body-file.
+  waechter:
+    name: Wächter
+    needs: [modus, nachtlauf, veroeffentlichen]
+    if: always() && needs.modus.outputs.modus == 'live' && needs.nachtlauf.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: waechter
+          path: waechter/
+      - name: Issue pflegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          repo=(--repo "$GITHUB_REPOSITORY")
+          body=waechter/waechter.md
+          # Paare schluessel:art aus dem Marker, je Zeile eins (Zeichensatz wie WATCH_MARKER in lib/watch.ts)
+          pairs() { grep -oxE '<!-- waechter: [a-z0-9:,#-]* -->' | sed -e 's/^<!-- waechter: //' -e 's/ -->$//' | tr ',' '\n' | sed '/^$/d' | sort -u; }
+          gh label create waechter "${repo[@]}" --color B60205 --description "Wächter des Nachtlaufs (Plan 0048, E10)" --force
+          issue="$(gh issue list "${repo[@]}" --app github-actions --label waechter --state all --limit 1 --json number,state,body)"
+          num="$(jq -r '.[0].number // empty' <<<"$issue")"
+          state="$(jq -r '.[0].state // empty' <<<"$issue")"
+          if [[ ! -s "$body" ]]; then
+            if [[ "$state" == OPEN ]]; then
+              printf 'Nichts offen (%s)\n' "$(TZ=Europe/Berlin date +%d.%m.%Y)" > closing.md
+              gh issue comment "$num" "${repo[@]}" --body-file closing.md
+              gh issue close "$num" "${repo[@]}"
+            fi
+            echo "Wächter: nichts offen" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [[ -z "$num" ]]; then
+            gh issue create "${repo[@]}" --title "Wächter: Befunde des Nachtlaufs" --label waechter --body-file "$body"
+            echo "Wächter: Issue angelegt" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          jq -r '.[0].body // ""' <<<"$issue" | pairs > alt.txt || true
+          pairs < "$body" > neu.txt || true
+          [[ "$state" == CLOSED ]] && gh issue reopen "$num" "${repo[@]}"
+          gh issue edit "$num" "${repo[@]}" --body-file "$body"
+          comm -13 alt.txt neu.txt > hinzu.txt
+          if [[ -s hinzu.txt ]]; then
+            # Schlüssel ohne Hash der Seite: Anbieter und Art, die Zeile mit Seite steht im Issue-Text
+            { echo "Neue Befunde ($(TZ=Europe/Berlin date +%d.%m.%Y)), Einzelheiten im Text oben:"; echo
+              sed -E 's/^([a-z0-9-]+)(#[0-9a-f]+)?:([a-z]+)$/- `\1` · \3/' hinzu.txt; } > kommentar.md
+            gh issue comment "$num" "${repo[@]}" --body-file kommentar.md
+          fi
+          echo "Wächter: Issue #$num, $(wc -l < neu.txt) Befunde, $(wc -l < hinzu.txt) neu" >> "$GITHUB_STEP_SUMMARY"
 
   # ── Ampel: rot nach E6 ─────────────────────────────────────────────────────────────────────────────────────────
   ampel:

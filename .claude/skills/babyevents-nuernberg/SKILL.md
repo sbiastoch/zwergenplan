@@ -25,9 +25,11 @@ pnpm pipeline status runs/<datum>        # Bericht aus einem heruntergeladenen o
 
 Entdecken genauso mit `--workflow discover.yml`. Nach einem Lauf im Modus `live` mit neuen Anbietern gibt es genau ein Issue „Neue Anbieter <datum>“ mit Commit-Links und Fund-URLs (`gh issue list --search "Neue Anbieter"`).
 
+**Wächter-Issue** (Plan 0048, E10; `gh issue list --label waechter --state all`): Der Nachtlauf im Modus `live` hält genau ein Issue mit allen offenen Befunden aktuell und schließt es, wenn nichts offen ist. Ein neuer Befund kommt zusätzlich als Kommentar. Arten: `seite` (Seite oder Beilage scheitert die zweite Nacht), `anbieter` (alle Seiten), `entfernt` (14 Tage 404/410, Angebote weg), `gesperrt` (robots.txt), `einbruch` (zurückgehalten), `leer` (keine künftigen Angebote mehr, 14 Tage lang gemeldet), `umstellung` (Rohdatei noch V1). Jede Zeile wird wie die Punkte unten eingeordnet; im Trockenlauf steht derselbe Text unter „Wächter“ in `status.md`.
+
 Worauf achten:
 - **Ampel rot**: Gates, Push, Build, Abbruch (`auth`, `limit`), Bremse, Zeitbudget, mehr als 20 % der Anbieter mit Fehler oder Live-Stand ab 20 Std. hinter `main` (Plan 0032, „Stufe 3 – Umsetzung“). Ein Abbruch oder eine Bremse lässt nur Anbieter offen; die nächste Nacht holt sie nach.
-- **Quellen mit `fehler`** samt Grund und `failingSince`, je Seite (Plan 0048): Eine ausgefallene Seite behält ihre alten Angebote, die übrigen Seiten des Anbieters laufen weiter (`teilausfall`, gelb). Liefert eine Seite 14 Tage lang 404/410, gilt sie als entfernt, ihre Angebote fallen weg. Ab 14 Tagen Fehler steht ein ganz ausgefallener Anbieter unter „Hinweise ohne Aktion“. Das ist Katalogpflege (Abschnitt 3).
+- **Quellen mit `fehler`** samt Grund und `failingSince`, je Seite (Plan 0048): Eine ausgefallene Seite behält ihre alten Angebote, die übrigen Seiten des Anbieters laufen weiter (`teilausfall`, gelb). Liefert eine Seite 14 Tage lang 404/410, gilt sie als entfernt, ihre Angebote fallen weg. Ab der zweiten Nacht steht die Seite im Wächter-Issue. Das ist Katalogpflege (Abschnitt 3): URL korrigieren, `render: browser` setzen, `blocked` mit Beleg eintragen oder den Anbieter mit `skipCrawl` ruhen lassen.
 - **`umstellung-ausstehend`** (Plan 0048, E7): Der Anbieter steht noch im alten Format, weil eine Seite scheiterte oder die neue Extraktion weniger als die Hälfte liefert. Prüfen; ist das neue Ergebnis richtig, `gh workflow run nightly.yml -f modus=live -f umstellen=<id>` erzwingt die Umstellung. **Rückweg**, falls S1 zurück muss: Code-Commits und alle Daten-Commits seit dem Deploy per `git revert` zurücknehmen (Nachtläufe und Entdecken); alter Code liest das neue Format nicht.
 - **Zurückgehaltene Einbrüche** (`pending`): Die alte Zahl Angebote bleibt, bis die Seite wieder mehr liefert oder der Katalog angepasst ist. Prüfen, ob der Anbieter wirklich weniger anbietet.
 - **Kategorie** (Plan 0037): „Kategorie aus Themen abgeleitet: N“ ist ein Übergang (E5) und sinkt mit jeder Neu-Extraktion auf 0. „Kategorie passt zu keinem Thema“ über 5 % der neuen Events heißt: Eval-Fall anlegen und den Prompt schärfen, nicht den Code ändern.
@@ -68,7 +70,6 @@ Fertig ist eine Änderung, wenn der Trockenlauf das Erwartete liefert, `pnpm dat
 
 **Hinweise ohne Aktion** im Bericht des Entdeckens:
 - „neue Programmseite?“: Seite eines bekannten Anbieters aus einem Sammelkalender, die der Katalog nicht kennt. Prüfen und als `programme`-Eintrag ergänzen. Das Entdecken ändert bestehende Einträge nie (G2).
-- Quelle mit Fehlerserie: URL korrigieren, `render: browser` setzen, `blocked` mit Beleg eintragen oder den Anbieter mit `skipCrawl` ruhen lassen.
 
 **Neuer Anbieter von Hand** (etwa aus `references/excluded.md`, wenn sich die Lage geändert hat): Eintrag nach `references/catalog.md` anlegen, Orte mit `pnpm pipeline geocode "<Adresse>"`. `pnpm data:validate` nennt die freie `publicId` („`<id>`: `publicId` fehlt – frei ist `<wert>`“); genau diesen Wert übernehmen. Dann `pnpm pipeline nightly --only <id> --dry-run` als Ertragsbeweis.
 

@@ -18,8 +18,9 @@ import type { ExtractOutcome, Extractor, ExtractResult } from "../lib/extract.ts
 import type { PageOutcome } from "../lib/fetch.ts";
 import { isV2, type ProviderRaw, providerStatus, RawEvent } from "../lib/raw.ts";
 import type { FetchPlan } from "../lib/select.ts";
+import { watchFindings } from "../lib/watch.ts";
 import { type FetchResult, unitInputs } from "./fetch-inputs.ts";
-import { readCatalog, readPreviousOffers, readRaw } from "./files.ts";
+import { readCatalog, readPreviousOffers, readRaw, readRawDir } from "./files.ts";
 import { runBuildOnly, runNightly } from "./nightly.ts";
 
 const FIXTURES = new URL("../../../tests/fixtures/", import.meta.url);
@@ -526,6 +527,28 @@ describe("runNightly: Seitenausfall kostet nur die Seite (Plan 0048, Ziel 1)", (
     expect(back.seen).toEqual([`seite:${B}`]);
     // Die Zuordnung kennt nur die Vornacht; die neue ID folgt dem Schlüssel (Titel, Ort) und ist hier wieder dieselbe
     expect(back.idOf("Babymassage")).toBe(massageId);
+  });
+
+  it("Wächter über mehrere Nächte: seite ab der zweiten Nacht, entfernt nach 14 Tagen, nach der Rückkehr nichts (E10)", async () => {
+    const dirsOf = twoPages();
+    const watch = (today: string) =>
+      watchFindings({
+        raws: readRawDir(join(dirsOf.dataDir, "raw")),
+        catalog: readCatalog(join(dirsOf.dataDir, "providers.yaml")),
+        today,
+      })
+        .filter((f) => f.providerId === "familientreff-beispiel")
+        .map((f) => `${f.kind} ${f.page ?? ""}`);
+    await night(dirsOf, "2026-10-06", []);
+    expect(watch("2026-10-06")).toEqual([]);
+    await night(dirsOf, "2026-10-07", [], [B]);
+    expect(watch("2026-10-07")).toEqual([]);
+    await night(dirsOf, "2026-10-08", [], [B]);
+    expect(watch("2026-10-08")).toEqual([`seite seite:${B}`]);
+    await night(dirsOf, "2026-10-21", [], [B]);
+    expect(watch("2026-10-21")).toEqual([`entfernt seite:${B}`]);
+    await night(dirsOf, "2026-10-22", []);
+    expect(watch("2026-10-22")).toEqual([]);
   });
 
   it("Anbieter mit nur einer Seite, 14 Tage 404: seine Angebote fallen weg, nichts aus dem Vorstand (Arch-Review M1)", async () => {

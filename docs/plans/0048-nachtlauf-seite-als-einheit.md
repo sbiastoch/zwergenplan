@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3: Lücke je Einheit)
+Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter auf Branch `s2-waechter`)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -705,6 +705,29 @@ Per `workflow_dispatch` mit `modus=live`, `timeout=150`, `budget_min=110`, `max_
 **Review 2 Nachtrag 3 (2026-10-27) – Verdict: Freigabe mit Änderungen.** Übernommen: **M1** Zuordnung je Beginn (Bündelung); **M2** eigenes Feld `gaps` statt Änderung von `units`; **M3** Bewertung gegen Vorzustand plus andere Antwort; **m1** erste Antwort wird bei Abbruch geschrieben; **m2** Warnungen der gewählten Antwort; **m3** Test mit dem Anlassfall; **m4** Risiko Titelwechsel; **m5** Abnahme mit Einordnung von Hand; **m6** zweite Ziehung desselben Modells benannt.
 
 **Umsetzung Nachtrag 3 und Arch-Review (2026-10-27) – Verdict: OK, kein Blocker, kein Major.** Übernommen: Wahlregel als reine Funktion `pickGapAnswer` in `lib/refresh.ts` mit eigenen Tests, gezählt gegen Vorzustand plus neue Events der anderen Antwort (wie oben); `gaps` speichert `after` und `chosen` der gewählten Antwort, `status.md` zählt nur `chosen: second` mit `after: 0` als geschlossen; `gaps` und Hinweise gehen auch bei einem Abbruch im zweiten Versuch in `nightly.json`; Hinweis im Test geprüft; Cast ersetzt; JSDoc von `renderStatus` wieder an seinem Platz; `UnitGap` aus dem Schema abgeleitet; `docs/architecture.md` nennt E13. **Abweichung:** Den Testfall „zweite Antwort ist Einbruch → `pending`“ gibt es nicht: Eine Antwort, die weniger Lücken hat als eine Antwort ohne Einbruch, kann selbst kein Einbruch sein; der Pfad bleibt über den `fallback`-Step gesperrt.
+
+### S2 – Umsetzung (2026-10-27, Branch `s2-waechter`)
+
+Umgesetzt nach E10:
+
+- `scripts/pipeline/lib/watch.ts` (neu, rein): `watchFindings({ raws, catalog, today })` über den ganzen Zustand (`data/raw` samt Overlay des Laufs), gezählt nur Anbieter mit `role: anbieter` ohne `skipCrawl`, `watchKey`, `watchIssue(findings, today)`, `WATCH_MARKER`. Tests in `lib/watch.test.ts` nach der Liste unter „Tests“, der Durchlauf über mehrere Nächte in `io/nightly.test.ts` (Seite B: erste Nacht nichts, zweite `seite`, Tag 15 `entfernt`, Rückkehr nichts).
+- `pnpm pipeline status --waechter` schreibt `RUN_DIR/waechter.md` (leer: nichts offen) und hängt die Befunde als Abschnitt „Wächter“ an `status.md`; `today` ist `date` aus `nightly.json`.
+- `nightly.yml`: Schritt „Bericht“ mit `--waechter`, Artefakt `waechter`, Job `waechter` wie in E10. Tests in `scripts/lib/nightly-workflow.test.ts`: statisch (Rechte, `needs`/`if`, `--repo`, `--body-file`, Marker) und der Schritt „Issue pflegen“ gegen ein nachgebautes `gh` auf `PATH` (anlegen, bearbeiten mit und ohne neues Paar, wiedereröffnen, schließen, nichts tun, altes Issue ohne Marker, Marker im Grund einer Befundzeile).
+- `staleHints` entfällt samt Aufruf im Entdecken; der Skill verweist auf das Wächter-Issue.
+- Ampel: Die Regel „einzelne Seite im Fehler macht gelb“ war schon mit S1 da (`teilausfall`).
+
+Abweichungen von E10, begründet:
+
+- **Signatur ohne `discoverStates`:** Plan 0050 hängt es an, wenn es gebraucht wird; ein Parameter ohne Nutzer wäre toter Code.
+- **`leer` aus dem gespeicherten `emptySince`:** `refresh` pflegt es in jedem Pfad genau als „hat Events, aber keine künftigen“ (`withEmptySince`); der Wächter rechnet den Kalender nicht nach und braucht so keine freien Tage. Eine Einheit, die bei ihrer ersten Extraktion nur vergangene Termine liefert, hat kein `emptySince` und gilt als „hat künftige“; das ist ein seltener Randfall ohne Bestand.
+- **`anbieter` ersetzt nur die Zeilen `seite`:** `entfernt`, `gesperrt`, `einbruch` und Beilagen bleiben eigene Zeilen, weil sie eine andere Handlung verlangen.
+- **Länge:** Der Marker hat Vorrang und trägt alle Paare (bis zur Hälfte des Limits); die Liste füllt den Rest und endet sonst mit „… und N weitere Befunde“.
+- **Kommentar beim Schließen:** „Nichts offen (<Datum>)“ als Kommentar, dann `gh issue close`; der Text des Issues bleibt der letzte Stand.
+- **Kommentar bei neuen Befunden:** nennt Anbieter und Art (`- \`id\` · seite`), Einzelheiten stehen im Issue-Text; der Hash der Seite wäre für Menschen nicht lesbar.
+
+**Arch-Review (2026-10-27) – Verdict: Nacharbeit nötig, kein Blocker.** Behoben: **M1** Ein Live-Lauf mit `only` sah nur seine Anbieter und hätte das Issue geschlossen oder auf eine Teilmenge gekürzt; der Wächter rechnet jetzt auf dem ganzen Zustand, gefiltert nach Katalog (Test „nur Anbieter des Katalogs …“). **m1** verwaister JSDoc in `lib/discover.ts`; **m2** der Shell-Schritt hat einen bleibenden Test mit nachgebautem `gh`; **m3** Marker nur als ganze Zeile (`grep -oxE`); **m4** Kommentar mit Anbieter und Art.
+
+**Abnahme (offen), wie unter „Schritte“:** im ersten Nachtlauf `live` nach dem Merge. Gibt es einen echten Befund, entsteht das Issue; gibt es keinen, bleibt es aus, und das Anlegen wird mit dem ersten echten Befund nachgeholt. Das Schließen wird in der ersten Nacht ohne Befund nach einem offenen Issue beobachtet. Seit der Umstellung sind alle Rohdateien V2, `umstellung` steht als Auslöser also nicht mehr zur Verfügung.
 
 ## Review (2026-10-26) – Verdict: Überarbeiten
 

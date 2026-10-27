@@ -32,10 +32,8 @@ import {
   sameSite,
   searchMessage,
   searchResponseSchema,
-  staleHints,
 } from "./discover.ts";
 import { DiscoverState, emptyState } from "./discover-state.ts";
-import type { ProviderRaw } from "./raw.ts";
 
 const catalog: Provider[] = ProvidersFile.parse(
   parse(readFileSync(new URL("../../../tests/fixtures/providers.yaml", import.meta.url), "utf8")),
@@ -572,22 +570,6 @@ describe("proveYield (E7.6)", () => {
       ok: false,
       grund: "kein Baby- oder Kleinkindbezug im abgerufenen Text",
     });
-  });
-});
-
-describe("staleHints", () => {
-  it("Anbieter mit failingSince älter als 14 Tage", () => {
-    const raw = (failingSince?: string): ProviderRaw => ({
-      events: [],
-      status: "fehler",
-      reason: "HTTP 404",
-      checkedAt: "2026-10-11T01:30:00+02:00",
-      sources: [],
-      ...(failingSince ? { failingSince } : {}),
-    });
-    expect(
-      staleHints({ a: raw("2026-09-20T01:30:00+02:00"), b: raw("2026-10-01T01:30:00+02:00"), c: raw() }, today),
-    ).toEqual(["a: Quelle fehlerhaft seit 2026-09-20 (HTTP 404)"]);
   });
 });
 
