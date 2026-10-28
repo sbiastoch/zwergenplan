@@ -6,15 +6,15 @@
     {
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
-     "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren (dienstags vormittags)",
-     "summary": "Wöchentliches Treffen von Eltern mit Babys und Kleinkindern bis 3 Jahre im Gemeindehaus der Melanchthonkirche: gemeinsam spielen und Kontakte knüpfen.",
+     "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren (dienstags)",
+     "summary": "Offene Gruppe für Eltern mit ihren Kleinkindern im Gemeindehaus, dienstags 9:30–11:00 Uhr. Kosten und Anmeldung stehen im Kalender nicht; bitte vorher beim Gemeindebüro nachfragen.",
      "topics": [
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109711.html",
+     "url": "https://www.evangelische-termine.de/ical?vid=574",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=574",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -23,15 +23,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angaben zu Anmeldung oder Plätzen; Auskunft über die Kirchengemeinde Melanchthon"
+      "note": "Keine Angaben im Kalender; bei der Gemeinde nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-10-27T09:30",
-        "end": "2026-10-27T11:00"
-       },
        {
         "start": "2026-11-10T09:30",
         "end": "2026-11-10T11:00"
@@ -64,9 +60,8 @@
      }
     }
    ],
-   "inputHash": "3d2dc6764e471e30e4a090ef44431704a66b47e53d99bf8ef33d4f60c1d19778",
+   "inputHash": "e7e200d6e8a22eb245aeae6783534cf554ac015a072d78fc5f8e45aa693359d3",
    "dated": {
-    "2026-10-27": "25fd1df31cd411a4d18cc34f7e44e170dd28234e29ba784a6a21dcba384e1143",
     "2026-10-29": "fa795cfd50c34e7af9a19d92c7eefb6ff4f7229baa4ba21e6b187092c5623c5b",
     "2026-10-31": "715778da878f77a3abfd2adbb11d1bed2bf106d28e6da6ab801bfbee15ceb964",
     "2026-11-01": "6585fd30e655ab15e3950a463c476ac6c7f7b2018c790e48f1a505a75b85fa71",
@@ -99,27 +94,27 @@
     "2026-12-21": "c3e75f5bc234139c060fc9fa529c072260e10ebf68a13e0bb7e3b2d5a914c233",
     "2026-12-22": "291953b75ac5c11d34fb8c80986629b92944251aa8e22377ab50375b40110c05"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "kandidaten": {
    "events": [
     {
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
-     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags)",
-     "summary": "Wöchentliche Gruppe für Eltern mit Kindern bis 3 Jahre: gemeinsames Spielen, Lieder und Geschichten sowie Austausch und pädagogische Impulse zu Themen wie Ernährung, Sprache und Entwicklung. Zu Anmeldung und Plätzen am besten bei der Gemeinde nachfragen.",
+     "title": "Eltern-Kind-Gruppe 0–3 Jahre, dienstags vormittags",
+     "summary": "Austausch für Eltern zu Erziehungsalltag, Ernährung, Sauberkeit und Sprachförderung, dazu Lieder und Geschichten, während die Kinder miteinander spielen. Im Kalender stehen Termine bis 22.12.2026; weitere bitte beim Anbieter erfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
      "topics": [
       "eltern-kind-gruppe",
-      "singen"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109711",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109711",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109712",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109712",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -127,15 +122,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage bei der Melanchthonkirche Ziegelstein (melanchthonkirche-ziegelstein.de)"
+      "note": "Keine Angaben zu Plätzen, Anmeldung oder Kosten auf der Quelle. Bitte beim Anbieter (Melanchthonkirche Ziegelstein) nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-10-27T09:30",
-        "end": "2026-10-27T11:00"
-       },
        {
         "start": "2026-11-10T09:30",
         "end": "2026-11-10T11:00"
@@ -169,21 +160,20 @@
      "via": "evtermine"
     }
    ],
-   "inputHash": "83eed05e71db450a97a9f3537e3eb43492a9eb85b0a9c0f238df30fcd16aa82b",
+   "inputHash": "abbcb2cdebefa3ab4545071ba62eb4c5bf09db228038b3a92a97b8f31f6b5964",
    "dated": {
-    "2026-10-27": "896fac187c098043aa079c71b40490ad5ad18f49eff54c8fbb4128fc2d5fa27f",
-    "2026-11-10": "7f3a59b6833fbf30bce58f7b5ae2940ace78afd31125ba6fe7987d8dfb94b066",
-    "2026-11-17": "b2cbf8151a5a03072d7d34db665ecb45a31938658f82f0537002a8f458976fb1",
-    "2026-11-24": "a7b3c5811941421b90a03fde530ad962dc37711fece5efa39f4cd4c22ac8c174",
-    "2026-12-01": "6440bd0c80bb1e7ef25d7ecc2376b360d7a6adc5ba45c011046847ace1a1b331",
-    "2026-12-08": "5eadb6b2c19d0c71f13e0349bcdca76f06d4a438724419edb940d0fa18a1eb39",
-    "2026-12-15": "06c945c985c679e1a1f3d864d6ce9fd443e5f0606cc34cb9625aa44edb85a510",
-    "2026-12-22": "3dbb2889f3bfaa899697afc4f9b94e04a03cc2769866c887fd4e4c8c6b178ae3"
+    "2026-11-10": "9b3213c055f76871bb22b8358c551e1f67b1cb1195453152ccad3c72cc367440",
+    "2026-11-17": "2aee3fcca68a1d68a173d6e718fb2cb4067d89e0fc2616a782c6b36eb36d26fd",
+    "2026-11-24": "80b876ef1d8c4b984f9c50b38d49a23d70cae76fff7f16a67a45a3f3b064c4fa",
+    "2026-12-01": "fb0a186f91861f1ee55c2db3a2d5679beda461efc3b3e6c0e09a37d3912fa8c8",
+    "2026-12-08": "9f69587b0cd1e0917aca15841e0e17eb0570c824b5378a4ca78406ca9548b38a",
+    "2026-12-15": "08664bafb7679f4625f197a3b754e744ba5a3722330a088161c393792d873858",
+    "2026-12-22": "64a369d598e8e5f2aab4a4aaad95bb2ba51ce75905762c97562cad3c904b27ab"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine"
    ]

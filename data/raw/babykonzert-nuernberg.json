@@ -6,25 +6,21 @@
     {
      "providerId": "babykonzert-nuernberg",
      "venueId": "babykonzert-nuernberg",
-     "title": "Babykonzert – Klassik auf der Krabbeldecke (8. November, 11 und 13 Uhr)",
-     "summary": "Ein Konzert speziell für Babys und Kleinkinder: Eltern hören mit ihrem Kind auf der Krabbeldecke Livemusik im Marmorsaal des Presseclubs. Die Vorstellung um 11 Uhr ist ausverkauft, um 13 Uhr gibt es ein Zusatzkonzert.",
+     "title": "Babykonzert im Marmorsaal: So 08.11. um 11 und 13 Uhr",
+     "summary": "Klassisches Konzert für Babys und Kleinkinder im Marmorsaal des Presseclubs. Der Termin um 11 Uhr ist ausverkauft, um 13 Uhr gibt es ein Zusatzkonzert. Babys und Kinder zahlen keinen Eintritt; Gutscheingäste reservieren vorab per E-Mail.",
      "topics": [
       "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Babys und Kinder frei; Erwachsene zahlen Eintritt (Gutscheine ab 21 €)",
+     "price": "Babys und Kinder frei",
      "url": "https://babykonzert.de/home/nuernberg/",
      "sourceUrl": "https://babykonzert.de/home/nuernberg/",
      "category": "buehne",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "11-Uhr-Konzert ausverkauft; Karten für das Zusatzkonzert um 13 Uhr über Eventim Light. Mit Gutschein vorher per Mail an saskia.duerr@babykonzert.de reservieren."
+      "note": "11 Uhr ausverkauft. Für 13 Uhr Verfügbarkeit auf der Ticketseite (Eventim Light) prüfen. Gutscheingäste bitte vorher per E-Mail an saskia.duerr@babykonzert.de Plätze reservieren."
      },
      "schedule": {
       "kind": "dates",
@@ -39,11 +35,11 @@
      }
     }
    ],
-   "inputHash": "f026dc4b0bcb27a2a11c592b020914e0df7f8ec7fdd77add5dcce21898825657",
-   "model": "opus",
+   "inputHash": "694573ddf73be28841d12778ede3bd1dcc4674cf77efb09db50e321d7f8e4d7b",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   }
  }
 }

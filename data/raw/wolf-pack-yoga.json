@@ -6,17 +6,18 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby (3–12 Monate) – Kurs ab 22.10.2026, donnerstags",
-     "summary": "Yoga nach der Geburt mit Baby: Übungen für Körpermitte, Beckenboden, Rücken und Schultern, dazu Atmung und Entspannung. Gedacht für die Zeit nach der Rückbildung. Geschlossener Kurs mit 6 Terminen, läuft bereits.",
+     "title": "Yoga mit Baby (3–12 Monate), Kurs ab 22.10.26",
+     "summary": "Postnatales Yoga für Mütter und Väter nach bzw. ergänzend zur Rückbildung: Kräftigung, Atmung, Beckenboden, das Baby ist dabei. Der Kurs läuft bereits; laut Buchungsseite ist er derzeit nicht buchbar.",
      "topics": [
-      "yoga-mit-baby"
+      "yoga-mit-baby",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 €",
      "url": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
-     "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "sourceUrl": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
      "category": "bewegung",
      "age": {
       "minMonths": 3,
@@ -24,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; bei Eversports als „nicht buchbar“ angezeigt"
+      "note": "Laut Buchungsseite geschlossener Kurs, nicht buchbar; bei Interesse beim Anbieter nachfragen"
      },
      "schedule": {
       "kind": "dates",
@@ -59,15 +60,16 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby (3–12 Monate) – Kurs ab 10.12.2026, donnerstags",
-     "summary": "Yoga nach der Geburt mit Baby: Übungen für Körpermitte, Beckenboden, Rücken und Schultern, dazu Atmung und Entspannung. Gedacht für die Zeit nach der Rückbildung. 6 Termine, Pause am 24. und 31.12.",
+     "title": "Yoga mit Baby (3–12 Monate), Kurs ab 10.12.26",
+     "summary": "Postnatales Yoga für Mütter und Väter nach der Rückbildung: Kräftigung, Atmung und Beckenboden, das Baby darf mitmachen. 6 Termine donnerstags 9:30–10:30 Uhr; 24.12. und 31.12. entfallen.",
      "topics": [
-      "yoga-mit-baby"
+      "yoga-mit-baby",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 €",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -77,50 +79,37 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung online über Eversports („hier buchen“)"
+      "note": "Anmeldung über den Buchungslink auf der Website"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-10T09:30",
-        "end": "2026-12-10T10:30"
-       },
-       {
-        "start": "2026-12-17T09:30",
-        "end": "2026-12-17T10:30"
-       },
-       {
-        "start": "2027-01-07T09:30",
-        "end": "2027-01-07T10:30"
-       },
-       {
-        "start": "2027-01-14T09:30",
-        "end": "2027-01-14T10:30"
-       },
-       {
-        "start": "2027-01-21T09:30",
-        "end": "2027-01-21T10:30"
-       },
-       {
-        "start": "2027-01-28T09:30",
-        "end": "2027-01-28T10:30"
-       }
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-12-10",
+      "count": 6,
+      "skipHolidays": false,
+      "except": [
+       "2026-12-24",
+       "2026-12-31"
       ]
      }
     },
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby (3–12 Monate) – Kurs ab 11.02.2027, donnerstags",
-     "summary": "Yoga nach der Geburt mit Baby: Übungen für Körpermitte, Beckenboden, Rücken und Schultern, dazu Atmung und Entspannung. Gedacht für die Zeit nach der Rückbildung. Kurs mit 6 Terminen.",
+     "title": "Yoga mit Baby (3–12 Monate), Kurs ab 11.02.27",
+     "summary": "Postnatales Yoga für Mütter und Väter nach der Rückbildung: Kräftigung, Atmung und Beckenboden, das Baby darf mitmachen. 6 Termine donnerstags 9:30–10:30 Uhr.",
      "topics": [
-      "yoga-mit-baby"
+      "yoga-mit-baby",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 €",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -130,7 +119,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung online über Eversports („hier buchen“)"
+      "note": "Anmeldung über den Buchungslink auf der Website"
      },
      "schedule": {
       "kind": "weekly",
@@ -147,15 +136,16 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby (3–12 Monate) – Kurs ab 01.04.2027, donnerstags",
-     "summary": "Yoga nach der Geburt mit Baby: Übungen für Körpermitte, Beckenboden, Rücken und Schultern, dazu Atmung und Entspannung. Gedacht für die Zeit nach der Rückbildung. Kurs mit 6 Terminen.",
+     "title": "Yoga mit Baby (3–12 Monate), Kurs ab 01.04.27",
+     "summary": "Postnatales Yoga für Mütter und Väter nach der Rückbildung: Kräftigung, Atmung und Beckenboden, das Baby darf mitmachen. 6 Termine donnerstags 9:30–10:30 Uhr.",
      "topics": [
-      "yoga-mit-baby"
+      "yoga-mit-baby",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 €",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -165,7 +155,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung online über Eversports („hier buchen“)"
+      "note": "Anmeldung über den Buchungslink auf der Website"
      },
      "schedule": {
       "kind": "weekly",
@@ -182,15 +172,16 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby (3–12 Monate) – Kurs ab 03.06.2027, donnerstags",
-     "summary": "Yoga nach der Geburt mit Baby: Übungen für Körpermitte, Beckenboden, Rücken und Schultern, dazu Atmung und Entspannung. Gedacht für die Zeit nach der Rückbildung. Kurs mit 6 Terminen.",
+     "title": "Yoga mit Baby (3–12 Monate), Kurs ab 03.06.27",
+     "summary": "Postnatales Yoga für Mütter und Väter nach der Rückbildung: Kräftigung, Atmung und Beckenboden, das Baby darf mitmachen. 6 Termine donnerstags 9:30–10:30 Uhr.",
      "topics": [
-      "yoga-mit-baby"
+      "yoga-mit-baby",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 €",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -200,7 +191,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung online über Eversports („hier buchen“)"
+      "note": "Anmeldung über den Buchungslink auf der Website"
      },
      "schedule": {
       "kind": "weekly",
@@ -215,17 +206,17 @@
      }
     }
    ],
-   "inputHash": "d530a438e24d98ef8b3df3252e5b0fd3d9088d504933d13f08be2600c94b8585",
-   "model": "opus",
+   "inputHash": "2e2300b9627b1494ffa992691177eb0383562f319e1835b7d248906a8cd7a5eb",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00"
   }
  }
 }

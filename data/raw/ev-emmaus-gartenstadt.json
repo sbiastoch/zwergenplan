@@ -72,6 +72,20 @@
    "status": "ok",
    "checkedAt": "2026-10-27T09:00:54+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
+   "pending": {
+    "inputHash": "08d91838abdcc9e5f57688a5545cd7f71170e1c74bf69350423566b1d3eab1ac",
+    "dated": {
+     "2026-10-29": "bb30db572571b155b8658adc540c50f4b5c95350e32fbfcec3076196cdbfcaeb",
+     "2026-11-12": "ae297a48e53f10d70356baaf6df9a4a5bc016c3d844cc1e4f01b28711245d52f",
+     "2026-11-19": "a7004ec9072e7a98d5d75f6df1da55d6edd31dec5a05553e7085f147fb4a6fbd",
+     "2026-11-26": "cf52731c33586e5bd2505f2e48608cde66662b2e56b82ca54f9184472f3ed5a3",
+     "2026-12-03": "f3338ab96125b4e362d4e7cc3f82ae0fcf69bec468cca2bd119226759e634379",
+     "2026-12-10": "40058cc72ff6a0d1e66c78752352d77e68f127a886e64a77d2015279acfe5e4f",
+     "2026-12-17": "0d5956e87fc9d07be83c96742ec8e57741ba19fd367df9857063bfd73c8ef930"
+    },
+    "model": "haiku",
+    "events": []
+   },
    "sources": [
     "evtermine"
    ]

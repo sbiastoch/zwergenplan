@@ -6,14 +6,14 @@
     {
      "providerId": "djk-eibach",
      "venueId": "djk-eibach",
-     "title": "Eltern-Kind-Turnen (1–2,5 Jahre), mittwochs 14:45",
-     "summary": "Kleinkinder turnen mit einer Begleitperson: balancieren, hüpfen, kriechen, klettern und sich in der Gruppe zurechtfinden. Der Wochenplan stammt von 2023, Einstieg auf Anfrage beim Verein.",
+     "title": "Eltern-Kind-Turnen für 1–2,5 Jahre (Mi 14:45)",
+     "summary": "Eltern und Kinder turnen gemeinsam in der Übungsstunde: Balancieren, Hüpfen, Kriechen, Klettern und Miteinander in der Gruppe. Preis und Anmeldung stehen nicht auf der Seite; Fragen an turnen@djk-eibach.de.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.djk-eibach.de/abteilungen/turnen/",
      "sourceUrl": "https://www.djk-eibach.de/abteilungen/turnen/",
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anfrage per E-Mail an turnen@djk-eibach.de"
+      "note": "Keine Platzanzeige. Anfrage bei turnen@djk-eibach.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -40,14 +40,14 @@
     {
      "providerId": "djk-eibach",
      "venueId": "djk-eibach",
-     "title": "Eltern-Kind-Turnen (2,5–4 Jahre), mittwochs 15:30",
-     "summary": "Turnstunde für Kinder mit Begleitperson, bei der es um Grundlagen wie Balancieren, Hüpfen, Klettern und das Miteinander in der Gruppe geht. Der Wochenplan stammt von 2023, Einstieg auf Anfrage beim Verein.",
+     "title": "Eltern-Kind-Turnen für 2,5–4 Jahre (Mi 15:30)",
+     "summary": "Eltern-Kind-Turnen für ältere Kleinkinder mit Begleitung, Bewegung und Gruppenverhalten in der Turnhalle. Preis und Anmeldung stehen nicht auf der Seite; Fragen an turnen@djk-eibach.de.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.djk-eibach.de/abteilungen/turnen/",
      "sourceUrl": "https://www.djk-eibach.de/abteilungen/turnen/",
@@ -58,7 +58,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anfrage per E-Mail an turnen@djk-eibach.de"
+      "note": "Keine Platzanzeige. Anfrage bei turnen@djk-eibach.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -72,11 +72,11 @@
      }
     }
    ],
-   "inputHash": "b19bdb7d14657929bea2528e8e6c436bda9de1ff5581e314a0f70b85708819ad",
-   "model": "opus",
+   "inputHash": "9a3e25f449d83adbc2d9f8442d2b9d326175dfead2d8f79a83878d00baa01e0f",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   }
  }
 }

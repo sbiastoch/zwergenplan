@@ -6,16 +6,16 @@
     {
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
-     "title": "Schneeflocken, wippediwapp – Winterlieder-Mitmachkonzert mit Lucia Ruf (ab 2 Jahren)",
-     "summary": "Liedermacherin Lucia Ruf singt Winterlieder mit den Kindern, dazu wird getanzt und mit Klängen gespielt. Etwa 45 Minuten im Sternenhaus, Karten über den Eventim-Webshop.",
+     "title": "Schneeflocken, wippediwapp – Winterlieder mit Lucia Ruf",
+     "summary": "Die Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitsingen, Tanzen und Klatschen. Tickets gibt es im Eventim-Webshop; am 30.11. sind die Vorstellungen um 9:30 und 10:45 ausverkauft.",
      "topics": [
       "konzert",
-      "singen"
+      "musik"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
+     "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
      "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-10-01&USERNAME=KundF",
      "category": "buehne",
      "age": {
@@ -23,8 +23,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "frei",
-      "note": "29.11. noch nicht ausverkauft; beide Vorstellungen am 30.11. ausverkauft. Tickets im Eventim-Webshop."
+      "status": "unbekannt",
+      "note": "Tickets im Eventim-Webshop. 30.11. 9:30 und 10:45 ausverkauft; 29.11. 14:00 ohne Ausverkauft-Meldung."
      },
      "schedule": {
       "kind": "dates",
@@ -47,8 +47,8 @@
     {
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
-     "title": "WiWaWaldtraum – Mitmachtheater (Purzeltraumtheater)",
-     "summary": "Mitmachtheater ab 2 Jahren über einen kleinen Troll, der im Zauberwald knifflige Aufgaben einer Fee lösen muss. Die Kinder spielen mit. Vorstellungen dauern etwa 40 Minuten, Tickets gibt es im Webshop.",
+     "title": "WiWaWaldtraum (Mitmachtheater, ab 2 Jahren)",
+     "summary": "Mitmachtheater im Zauberwald: Trolli Tolpatsch muss kniffelige Waldprüfungen bestehen. Für Kinder ab 2 Jahren; Karten gibt es im Webshop, eine Ausverkauft-Markierung liegt nicht vor.",
      "topics": [
       "theater"
      ],
@@ -63,8 +63,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "frei",
-      "note": "Keine Vorstellung als ausverkauft gemeldet; Tickets im Eventim-Webshop"
+      "status": "unbekannt",
+      "note": "Tickets im Eventim-Webshop; keine Ausverkauft-Markierung"
      },
      "schedule": {
       "kind": "dates",
@@ -85,24 +85,66 @@
      }
     }
    ],
-   "inputHash": "8f1b42e160219c163784d28e86f255b9db8172f23a8c90743cc34a76c55f379b",
-   "model": "opus",
+   "inputHash": "09b809a22b5d420461283756b258abd78e386fbc8b4c3b9a2163e68ec2b2a9b5",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "kandidaten": {
-   "events": [],
-   "inputHash": "d54be9dd64715bff341f106032bfa49d3cbb3cb1f82050eb75461e0183bb915b",
+   "events": [
+    {
+     "providerId": "sternenhaus-kuf",
+     "venueId": "sternenhaus-kuf",
+     "title": "Baby Dronte – Theater Mumpitz (Vorstellungen Dezember 2026)",
+     "summary": "Theaterstück im Sternenhaus: Käpt'n Lüttich kümmert sich um ein Dronten-Küken, das aus einem gefundenen Ei schlüpft. Drei Vorstellungen vom 3. bis 5. Dezember 2026; Karten im Webshop.",
+     "topics": [
+      "theater"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=460827",
+     "sourceUrl": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=460827",
+     "category": "buehne",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Karten im Eventim-Inhouse-Webshop; Ausverkauft-Status je Vorstellung nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-03T15:30",
+        "end": "2026-12-03T16:20"
+       },
+       {
+        "start": "2026-12-04T16:30",
+        "end": "2026-12-04T17:20"
+       },
+       {
+        "start": "2026-12-05T15:00",
+        "end": "2026-12-05T15:50"
+       }
+      ]
+     },
+     "via": "stadt-vk"
+    }
+   ],
+   "inputHash": "1cbf33f2d533ecf2f48d8e8aeffc807bd6b81b9ce0a406ce42e2981e113f55a9",
    "dated": {
     "2026-12-03": "fafc039852a0ad3d39e6c74e45e151b8099bd398ed73d380707f572d615c324f",
     "2026-12-04": "78ff0fa35fb74da92f70e824d774414cc7f11320bb1691133b976b36c23bc144",
     "2026-12-05": "62d1fad8089b785741d9ac9585e998b29603519e50d19401ab4722351c878e2d"
    },
-   "model": "opus",
-   "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "model": "haiku",
+   "status": "ok",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"
    ]

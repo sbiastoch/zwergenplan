@@ -405,7 +405,12 @@
    "model": "opus",
    "status": "ok",
    "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "pending": {
+    "inputHash": "52891fa2247f263b11f04743ace77c5a82ada90427f7d517efc5431e68f946e0",
+    "model": "haiku",
+    "events": []
+   }
   }
  }
 }

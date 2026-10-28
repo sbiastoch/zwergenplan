@@ -6,11 +6,11 @@
     {
      "providerId": "hebammen-johannis",
      "venueId": "hebammen-johannis",
-     "title": "Tanzen für Mama & Baby (dienstags vormittags)",
-     "summary": "Tanzkurs mit beckenbodenaktivierenden Choreografien, das Baby ist dabei in der Trage; Papas willkommen. Voraussetzung: gynäkologisches OK (frühestens 6 Wochen nach Geburt) und eigene Tragehilfe. Einstieg auf Anfrage.",
+     "title": "Tanzen für Mama & Baby (dienstags 11:15 Uhr)",
+     "summary": "Tanzen mit sanftem Beckenbodentraining für Mütter mit Baby in der Trage; das Baby darf gestillt, gewickelt oder gefüttert werden. Keine Vorkenntnisse nötig, Voraussetzung sind ein positiver gynäkologischer Check und eine Tragehilfe. Einstieg auf Anfrage.",
      "topics": [
       "tanz",
-      "fitness-mit-baby"
+      "bewegung"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -21,7 +21,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung und aktuelle Termine bei Sophie: Tel. 0176/66693967 oder sophie.kretzer@gmail.com"
+      "note": "Anmeldung und aktuelle Termine bei Sophie: Tel. 0176/66693967, sophie.kretzer@gmail.com"
      },
      "schedule": {
       "kind": "weekly",
@@ -30,23 +30,23 @@
       ],
       "start": "11:15",
       "end": "12:30",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "beefd26157b2dc826cb34edc59681b7cb0196bbda8ab0b9597cc28c8eeeb97fc",
-   "model": "opus",
+   "inputHash": "4605b886a50c23be9d82462ceb7ea86209d7a7d471186b11e096fe0b922cf46e",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.wolfpack.yoga": {
    "events": [],
-   "inputHash": "bc097f7b7c9a9ced53db511915656cdcabe486d3ef127aa999604f1089154682",
-   "model": "opus",
+   "inputHash": "a53e48c392b30ffbce745166568fd651ebc595bd42dfa848ed4ea3093af3aa98",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

@@ -6,8 +6,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten für Babys (4–18 Monate) – Dienstag 09:15",
-     "summary": "Eltern und Babys singen gemeinsam, machen Fingerspiele, wiegen sich zu Liedern und musizieren mit Rasseln, Klanghölzern und Tüchern. 15 Treffen à 35 Minuten, nicht in den Schulferien. Der Kurs läuft seit 6.10.",
+     "title": "Musikgarten für Babys (4–18 Monate), Dienstag 9:15",
+     "summary": "Singen, Fingerspiele und Musizieren mit Rasseln und Klanghölzern, gemeinsam mit einer Bezugsperson. 15 Treffen à 35 Minuten, nicht in den Schulferien. Kursbeginn war am 06.10.2026, Ende am 02.02.2027.",
      "topics": [
       "musik",
       "singen"
@@ -15,7 +15,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "170 € inkl. Instrumentenpaket (15 Termine)",
+     "price": "170 € inkl. Instrumentenpaket",
      "url": "https://musication.de/kinder-musik/musikgarten-fuer-babys/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten-fuer-babys/",
      "category": "musik",
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Online-Anmeldung über „Jetzt anmelden“ möglich"
+      "note": "Anmeldung über „Jetzt anmelden“ auf der Kursseite (Onlinebuchung)"
      },
      "schedule": {
       "kind": "weekly",
@@ -34,7 +34,7 @@
       ],
       "start": "09:15",
       "end": "09:50",
-      "from": "2026-10-06",
+      "from": "2026-11-03",
       "until": "2027-02-02",
       "skipHolidays": true
      }
@@ -42,8 +42,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten für Babys (4–18 Monate) – Mittwoch 14:30",
-     "summary": "Eltern und Babys singen gemeinsam, machen Fingerspiele, wiegen sich zu Liedern und musizieren mit Rasseln, Klanghölzern und Tüchern. 15 Treffen à 35 Minuten, nicht in den Schulferien. Der Kurs läuft seit 7.10.",
+     "title": "Musikgarten für Babys (4–18 Monate), Mittwoch 14:30",
+     "summary": "Singen, Fingerspiele und Musizieren mit Rasseln und Klanghölzern, gemeinsam mit einer Bezugsperson. 15 Treffen à 35 Minuten, nicht in den Schulferien. Kursbeginn war am 07.10.2026, Ende am 03.02.2027. Die Gruppe ist belegt, eine Anmeldung ist nur auf die Warteliste möglich.",
      "topics": [
       "musik",
       "singen"
@@ -51,7 +51,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "170 € inkl. Instrumentenpaket (15 Termine)",
+     "price": "170 € inkl. Instrumentenpaket",
      "url": "https://musication.de/kinder-musik/musikgarten-fuer-babys/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten-fuer-babys/",
      "category": "musik",
@@ -60,8 +60,8 @@
       "maxMonths": 18
      },
      "availability": {
-      "status": "frei",
-      "note": "Online-Anmeldung über „Jetzt anmelden“ möglich"
+      "status": "warteliste",
+      "note": "Gruppe belegt, Eintrag über „klicken für Warteliste“ auf der Kursseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -70,25 +70,25 @@
       ],
       "start": "14:30",
       "end": "15:05",
-      "from": "2026-10-07",
+      "from": "2026-10-28",
       "until": "2027-02-03",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "cd77404a9c70bd1f0c2237694c32f0a2be0c29ac90af6c4e988c51564b43638a",
-   "model": "opus",
+   "inputHash": "b8d802c77ec4b570c43eb8fd5570c3919b8afea8a0cc8392da9718104533d5cf",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten/": {
    "events": [
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Di 10:00 Uhr (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs nach dem Musikgarten®-Konzept: Singen, Bewegen, Lauschen und erstes Musizieren mit einfachen Instrumenten, angeleitet von Marcela Bella-Kraus. Der Kurs läuft bereits seit Oktober und pausiert in den Schulferien.",
+     "title": "Musikgarten Dienstag 10:00 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
      "topics": [
       "musik",
       "singen"
@@ -96,7 +96,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 € (15 × 35 Min.)",
+     "price": "150 €",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -106,7 +106,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung online über „Jetzt anmelden“ (MSVplus)"
+      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
      },
      "schedule": {
       "kind": "weekly",
@@ -115,17 +115,16 @@
       ],
       "start": "10:00",
       "end": "10:35",
-      "from": "2026-10-06",
+      "from": "2026-11-03",
       "until": "2027-02-02",
-      "count": 15,
       "skipHolidays": true
      }
     },
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Mi 15:15 Uhr (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs nach dem Musikgarten®-Konzept mit Liedern, Bewegungs- und Rhythmusspielen und einfachen Instrumenten, geleitet von Anette Lorch-Heufelder. Der Kurs läuft schon seit Oktober und hat in den Schulferien Pause.",
+     "title": "Musikgarten Mittwoch 15:15 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
      "topics": [
       "musik",
       "singen"
@@ -133,7 +132,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 € (15 × 35 Min.)",
+     "price": "150 €",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -143,7 +142,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung online über „Jetzt anmelden“ (MSVplus)"
+      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
      },
      "schedule": {
       "kind": "weekly",
@@ -152,17 +151,16 @@
       ],
       "start": "15:15",
       "end": "15:50",
-      "from": "2026-10-07",
+      "from": "2026-10-28",
       "until": "2027-02-03",
-      "count": 15,
       "skipHolidays": true
      }
     },
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Mi 15:30 Uhr (18 Monate–3 Jahre)",
-     "summary": "Kleinkinder machen hier mit einer Bezugsperson gemeinsam Musik: Sie singen, bewegen sich zu Themen wie Tiere oder Natur und spielen auf einfachen Instrumenten. Leitung hat Sandra Hughes. Der Kurs läuft seit Ende September und pausiert in den Schulferien.",
+     "title": "Musikgarten Mittwoch 15:30 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
      "topics": [
       "musik",
       "singen"
@@ -170,7 +168,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 € (15 × 35 Min.)",
+     "price": "150 €",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -180,7 +178,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung online über „Jetzt anmelden“ (MSVplus)"
+      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
      },
      "schedule": {
       "kind": "weekly",
@@ -189,17 +187,16 @@
       ],
       "start": "15:30",
       "end": "16:05",
-      "from": "2026-09-30",
+      "from": "2026-10-28",
       "until": "2027-01-27",
-      "count": 15,
       "skipHolidays": true
      }
     },
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Do 15:45 Uhr (18 Monate–3 Jahre)",
-     "summary": "Musikgarten®-Kurs für Kleinkinder mit Bezugsperson, geleitet von Sandra Hughes: Lieder, Rhythmusspiele, Bewegung und erste Instrumente in einer kleinen Gruppe. Der Kurs läuft seit Oktober und fällt in den Schulferien aus.",
+     "title": "Musikgarten Donnerstag 15:45 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
      "topics": [
       "musik",
       "singen"
@@ -207,7 +204,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 € (15 × 35 Min.)",
+     "price": "150 €",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -217,7 +214,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung online über „Jetzt anmelden“ (MSVplus)"
+      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
      },
      "schedule": {
       "kind": "weekly",
@@ -226,17 +223,16 @@
       ],
       "start": "15:45",
       "end": "16:20",
-      "from": "2026-10-01",
+      "from": "2026-10-29",
       "until": "2027-02-04",
-      "count": 15,
       "skipHolidays": true
      }
     },
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Do 16:15 Uhr (18 Monate–3 Jahre)",
-     "summary": "Musikgarten®-Kurs für Kleinkinder mit Bezugsperson bei Marcela Bella-Kraus: gemeinsam singen, sich bewegen und einfache Instrumente ausprobieren. Der Kurs läuft seit Oktober, pausiert in den Schulferien und ist voll, es gibt nur noch die Warteliste.",
+     "title": "Musikgarten Donnerstag 16:15 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert. Der Kurs ist belegt.",
      "topics": [
       "musik",
       "singen"
@@ -244,7 +240,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 € (15 × 35 Min.)",
+     "price": "150 €",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -254,7 +250,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "belegt – Eintrag auf die Warteliste online möglich"
+      "note": "Kurs belegt – Eintragung auf die Warteliste über die Onlinebuchung"
      },
      "schedule": {
       "kind": "weekly",
@@ -263,26 +259,25 @@
       ],
       "start": "16:15",
       "end": "16:50",
-      "from": "2026-10-01",
+      "from": "2026-10-29",
       "until": "2027-02-04",
-      "count": 15,
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "5c9abbf3ba96ecbf0f5362afdd60c2cfed94679b0c63f2d3eb29894bf47c6b59",
-   "model": "opus",
+   "inputHash": "091a0456bd9f447a74dce5944ef8d60ae9c2281e84ff51d742e51bd64ec4cd31",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten-englisch-singing-english/": {
    "events": [
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten auf Englisch – Singing English (2–4 Jahre, Mi 16:15)",
-     "summary": "Kinder singen mit einer Begleitperson englische Kinderlieder, sprechen Reime und machen Bewegungsspiele. So lernen sie erste englische Wörter. Der Kurs läuft seit 30.09. und ist belegt, man kann sich auf die Warteliste setzen lassen.",
+     "title": "Musikgarten auf Englisch (2–4 Jahre, mittwochs 16:15)",
+     "summary": "Musikgarten mit englischen Liedern, Reimen und Bewegungsspielen, gemeinsam mit einer Bezugsperson. 15 Einheiten à 35 Minuten, außer in den Schulferien. Der Kurs läuft seit 30.09.2026; der Termin ist belegt, Anmeldung nur über die Warteliste.",
      "topics": [
       "musik",
       "singen",
@@ -291,7 +286,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 € pro Kind (15 × 35 Min.)",
+     "price": "150 € pro Kind",
      "url": "https://musication.de/kinder-musik/musikgarten-englisch-singing-english/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten-englisch-singing-english/",
      "category": "musik",
@@ -301,7 +296,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "belegt – Eintrag auf die Warteliste über die Onlinebuchung"
+      "note": "Kurs belegt – Warteliste über „belegt – klicken für Warteliste“ auf der Kursseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -310,25 +305,24 @@
       ],
       "start": "16:15",
       "end": "16:50",
-      "from": "2026-09-30",
+      "from": "2026-10-28",
       "until": "2027-01-27",
-      "count": 15,
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "be30dd4acdb6b4584804499a4ccc9587289d0e0babe6180f09f949857e8d5433",
-   "model": "opus",
+   "inputHash": "22e5aed1755dbcdb8aa05d0af7eb65d003fc38da814cdfd6e8695011fc711bd8",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten-sommerkurs/": {
    "events": [],
-   "inputHash": "f47f073a88bff38426ce64d48e78f2e4c1dd50d42cf0a0778260d44ca5ebadb3",
-   "model": "opus",
+   "inputHash": "7e5166ef2d186eb01f1950c457945bd8e51b3945757a9469e1f48d9b4dcf9a0f",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

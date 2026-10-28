@@ -6,15 +6,16 @@
     {
      "providerId": "ev-laufamholz-miniclub",
      "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub donnerstags nachmittags",
-     "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz: Die Kinder spielen gemeinsam und lernen Lieder und Geschichten kennen, die Eltern tauschen sich über den Familienalltag aus und bekommen pädagogische Anregungen.",
+     "title": "Miniclub Donnerstag 15:00 (Eltern-Kind-Gruppe)",
+     "summary": "Eltern-Kind-Gruppe mit Austausch unter Müttern und Vätern, Anregungen zu Ernährung, Sauberkeit, Motorik und Sprache sowie Lieder und Geschichten für die Kleinen. Kosten und Anmeldung stehen nicht im Eintrag; bitte beim Veranstalter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "singen"
+      "spielgruppe",
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
-     "cost": "kostenlos",
+     "cost": "kostenpflichtig",
      "url": "https://www.evangelische-termine.de/detail-bt?ID=8109113",
      "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109113",
      "category": "krabbel-spielgruppen",
@@ -24,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Infos über die Kirchengemeinde Heilig-Geist Laufamholz"
+      "note": "Keine Angabe zu Plätzen im Eintrag; beim Veranstalter nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -52,15 +53,16 @@
     {
      "providerId": "ev-laufamholz-miniclub",
      "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub freitags vormittags",
-     "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz: Die Kinder sammeln beim gemeinsamen Spielen erste Gruppenerfahrungen und lernen Lieder und Geschichten kennen, die Eltern tauschen sich aus und bekommen Anregungen zu Entwicklungsthemen.",
+     "title": "Miniclub Freitag 9:00 (Eltern-Kind-Gruppe)",
+     "summary": "Eltern-Kind-Gruppe mit Austausch unter Müttern und Vätern, Anregungen zu Ernährung, Sauberkeit, Motorik und Sprache sowie Lieder und Geschichten für die Kleinen. Kosten und Anmeldung stehen nicht im Eintrag; bitte beim Veranstalter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "singen"
+      "spielgruppe",
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
-     "cost": "kostenlos",
+     "cost": "kostenpflichtig",
      "url": "https://www.evangelische-termine.de/detail-bt?ID=8109113",
      "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109113",
      "category": "krabbel-spielgruppen",
@@ -70,7 +72,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Infos über die Kirchengemeinde Heilig-Geist Laufamholz"
+      "note": "Keine Angabe zu Plätzen im Eintrag; beim Veranstalter nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -112,7 +114,7 @@
      "via": "evtermine"
     }
    ],
-   "inputHash": "f464be5574031cdf2e12df0a05422856d99f11572f025293fe080ceecb718728",
+   "inputHash": "6f5fb68c166723310b6ad8a626bfd0ecb8c132cd8fa92e84115670af1641a160",
    "dated": {
     "2026-10-29": "479d1fcdd93af448611a8db4d02cdfb81f8ef58d6ea527ba1c12151ee0ca3f55",
     "2026-10-30": "163d89c8bd9af54b5a7d842f7328460052c1875337acfa306009dd8cc239fe71",
@@ -127,10 +129,10 @@
     "2026-12-11": "5f2be2ddf823b5de332701ad181cad0856d37aee2765c873e4c590668899a3b7",
     "2026-12-18": "d819765edd193b9f737b7e5902433e99bcfa228cfd0199c47b3daf7034023b4d"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine"
    ]

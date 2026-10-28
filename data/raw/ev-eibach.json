@@ -5,13 +5,12 @@
    "events": [
     {
      "providerId": "ev-eibach",
-     "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
-     "title": "Waldkrabbelgruppe im Faberpark (donnerstags)",
-     "summary": "Eltern-Kind-Gruppe, die sich draußen im Faberpark/-wald trifft und bei fast jedem Wetter die Natur erkundet. Treffpunkt ist der Bogen an der Weiherbrücke. In den Schulferien findet die Gruppe nicht statt.",
+     "venueId": "ev-eibach",
+     "title": "Waldkrabbelgruppe (Eltern-Kind im Wald, Do 10–11 Uhr)",
+     "summary": "Eltern-Kind-Gruppe im Faberpark, donnerstags 10–11 Uhr, bei fast jedem Wetter. Treffpunkt ist der Bogen an der Weiherbrücke. Findet außer in den Schulferien statt.",
      "topics": [
       "waldgruppe",
-      "krabbelgruppe",
-      "eltern-kind-gruppe"
+      "krabbelgruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -19,41 +18,26 @@
      "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107132.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
      "category": "natur",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Anmeldung oder Plätzen; Auskunft bei der Kirchengemeinde Eibach"
+      "note": "In der Quelle ist keine Anmeldung genannt; bei Fragen über die Gemeinde Eibach anfragen."
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-29T10:00",
-        "end": "2026-10-29T11:00"
-       },
-       {
-        "start": "2026-11-12T10:00",
-        "end": "2026-11-12T11:00"
-       },
-       {
-        "start": "2026-11-19T10:00",
-        "end": "2026-11-19T11:00"
-       },
-       {
-        "start": "2026-11-26T10:00",
-        "end": "2026-11-26T11:00"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2026-10-29",
+      "skipHolidays": true
      }
     },
     {
      "providerId": "ev-eibach",
      "venueId": "ev-eibach",
      "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre, freitags)",
-     "summary": "Kleinkinder singen mit einem Elternteil Lieder, sprechen Reime und machen Spiele. Treffen ist freitags im Kleinen Saal des Gemeindehauses Eibach.",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Gemeindehaus Eibach. In der Quelle ist keine Anmeldung genannt.",
      "topics": [
       "musik",
       "singen",
@@ -71,38 +55,64 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Anmeldung oder Plätzen; Auskunft bei der Kirchengemeinde Eibach"
+      "note": "Keine Anmeldung in der Quelle genannt; bei Fragen über die Gemeinde Eibach anfragen."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-10-30",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "ev-eibach",
+     "venueId": "ev-eibach",
+     "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils im Gemeindehaus Eibach. Termine laut Kalender: 11.12. und 18.12.2026 sowie 15.01.2027. Anmeldung und Kosten sind im Kalendereintrag nicht angegeben.",
+     "topics": [
+      "musik",
+      "singen",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107100.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Kein Platzangebot im Kalender; bei der Gemeinde Eibach nachfragen, ob eine Anmeldung nötig ist."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-10-30T09:30",
-        "end": "2026-10-30T10:30"
+        "start": "2026-12-11T09:30",
+        "end": "2026-12-11T10:30"
        },
        {
-        "start": "2026-11-13T09:30",
-        "end": "2026-11-13T10:30"
+        "start": "2026-12-18T09:30",
+        "end": "2026-12-18T10:30"
        },
        {
-        "start": "2026-11-20T09:30",
-        "end": "2026-11-20T10:30"
-       },
-       {
-        "start": "2026-11-27T09:30",
-        "end": "2026-11-27T10:30"
-       },
-       {
-        "start": "2026-12-04T09:30",
-        "end": "2026-12-04T10:30"
+        "start": "2027-01-15T09:30",
+        "end": "2027-01-15T10:30"
        }
       ]
      }
     }
    ],
-   "inputHash": "4d79edecb9bb7b66569e29449f648f549aaec82d1178c89569a9a1cdadea0645",
+   "inputHash": "0e82dc602ad5f902758163a29689aad3a66dcd1920d7ba797a7ba71d5f956701",
    "dated": {
-    "2026-10-27": "07893a1543bf5c9b2e318282b449449d6300557302ddab9986b1a24cf504ad1f",
     "2026-10-28": "64602bd198f43c5a96b3844bf24f097f25094ef9aefb86a56faac528da00b708",
     "2026-10-29": "3ff48652ebc8db9ce7ba2cc0d6a9f7ca499b75b717e6993814cc3512ab865746",
     "2026-10-30": "41d857f13d17d0ab07e167ac7168673e62b3c26af61ada9b7ba49c516f2544c8",
@@ -209,10 +219,10 @@
     "2027-11-14": "fd8795b94b427559453468c099be314db4f6cc8669321affbdf847d5d4e40171",
     "2027-11-21": "97ffbc787186dd628f4505f027ba093b236d6c14432954dc33df4e639c307282"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   }
  }
 }

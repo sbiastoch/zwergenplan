@@ -6,8 +6,8 @@
     {
      "providerId": "ev-nikodemus-roethenbach",
      "venueId": "ev-nikodemus-roethenbach",
-     "title": "Krabbelgruppe bis 3 Jahre (mittwochs 9:00)",
-     "summary": "Wöchentliches Vormittagstreffen für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Wer mitmachen möchte, meldet sich bei Diakonin Marion Hanek.",
+     "title": "Krabbelgruppe bis 3 Jahre (Mittwoch, 9:00–10:30 Uhr)",
+     "summary": "Vormittagstreffen für Eltern mit Kindern bis 3 Jahren zum Austausch und für gemeinsame Aktionen. Kontakt und Anmeldung über Diakonin Marion Hanek.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kontakt über Diakonin Marion Hanek"
+      "note": "Anfrage per Kontakt bei Diakonin Marion Hanek"
      },
      "schedule": {
       "kind": "dates",
@@ -72,8 +72,8 @@
     {
      "providerId": "ev-nikodemus-roethenbach",
      "venueId": "ev-nikodemus-roethenbach",
-     "title": "Krabbelgruppe bis 3 Jahre (donnerstags 9:30)",
-     "summary": "Wöchentliches Vormittagstreffen für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Wer mitmachen möchte, meldet sich bei Diakonin Marion Hanek.",
+     "title": "Krabbelgruppe bis 3 Jahre (Donnerstag, 9:30–11:00 Uhr)",
+     "summary": "Vormittagstreffen für Eltern mit Kindern bis 3 Jahren zum Austausch und für gemeinsame Aktionen. Kontakt und Anmeldung über Diakonin Marion Hanek.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -90,7 +90,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kontakt über Diakonin Marion Hanek"
+      "note": "Anfrage per Kontakt bei Diakonin Marion Hanek"
      },
      "schedule": {
       "kind": "dates",
@@ -135,10 +135,9 @@
      "providerId": "ev-nikodemus-roethenbach",
      "venueId": "ev-nikodemus-roethenbach",
      "title": "Café Niko – Das Familiencafé",
-     "summary": "Generationenübergreifendes Familiencafé bei Kaffee und Kuchen am Freitagnachmittag. Für die Kinder liegen Spielsachen bereit.",
+     "summary": "Familiencafé mit Kaffee und Kuchen für Jung und Alt; für die Kinder stehen Spielsachen bereit. Eine Anmeldung ist nicht angegeben.",
      "topics": [
-      "elterncafe",
-      "elterntreff"
+      "elterncafe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -147,8 +146,8 @@
      "sourceUrl": "https://www.pfar-rer.de",
      "category": "treffs-cafes",
      "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Offenes Café, einfach vorbeikommen"
+      "status": "unbekannt",
+      "note": "Keine Anmeldung angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -166,7 +165,7 @@
      "via": "evtermine"
     }
    ],
-   "inputHash": "404dc154301c15a8ef7b12736d74524a62d0dd27b4e32c5df01537973d5e2697",
+   "inputHash": "ff24f096f9a19b357ee4a1b36e0e85d8bf60cb0515ad70f8c8a46c37e7b5ab31",
    "dated": {
     "2026-10-28": "11db0d0f422e6ce9e95b68e5cb9642cd85499eb45d34e3cd0730d33e1be4ca81",
     "2026-10-29": "991845114ec4c3037b4f68e6593934d6af63f774f5a7b72e871176feed7208c8",
@@ -188,10 +187,10 @@
     "2027-01-14": "47c027b33d099354803eaaf55fad2513c3b55791f559253f87357fb5130bdd2f",
     "2027-01-22": "0db1e5ad15fc7f3ebc6a466da9d9e7edc77ab6c1af5ea8bf6ed2229961c6aca9"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine"
    ]

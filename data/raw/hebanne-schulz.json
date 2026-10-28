@@ -6,8 +6,8 @@
     {
      "providerId": "hebanne-schulz",
      "venueId": "hebanne-schulz",
-     "title": "Achtsame Babymassage (montags, 09.11.–21.12.2026)",
-     "summary": "Kurs der Hebamme Anne Schulz: Eltern lernen eine achtsame Massage für ihr Baby und stärken so die Bindung. Er findet in der FamilienBox statt; man meldet sich über die Website an.",
+     "title": "Achtsame Babymassage – Kurs montags ab 9.11.26",
+     "summary": "Anleitung, Babys sanft zu massieren, dabei entsteht Nähe und Austausch mit der Hebamme. Sieben Montagstermine von 11:00 bis 12:15 Uhr in der FamilienBox, Rosenaustraße 7 (Hinterhaus).",
      "topics": [
       "babymassage",
       "hebamme"
@@ -15,33 +15,55 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
+     "url": "https://www.hebanne-schulz.de/",
      "sourceUrl": "https://www.hebanne-schulz.de/",
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über „Hier anmelden“ auf der Website"
+      "note": "Anmeldung über „Hier anmelden“ auf der Startseite; Teilnehmerzahl steht auf der Detailseite"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "MO"
-      ],
-      "start": "11:00",
-      "end": "12:15",
-      "from": "2026-11-09",
-      "until": "2026-12-21",
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-09T11:00",
+        "end": "2026-11-09T12:15"
+       },
+       {
+        "start": "2026-11-16T11:00",
+        "end": "2026-11-16T12:15"
+       },
+       {
+        "start": "2026-11-23T11:00",
+        "end": "2026-11-23T12:15"
+       },
+       {
+        "start": "2026-11-30T11:00",
+        "end": "2026-11-30T12:15"
+       },
+       {
+        "start": "2026-12-07T11:00",
+        "end": "2026-12-07T12:15"
+       },
+       {
+        "start": "2026-12-14T11:00",
+        "end": "2026-12-14T12:15"
+       },
+       {
+        "start": "2026-12-21T11:00",
+        "end": "2026-12-21T12:15"
+       }
+      ]
      }
     },
     {
      "providerId": "hebanne-schulz",
      "venueId": "hebanne-schulz",
-     "title": "Workshop Babypflege & Babyalltag",
-     "summary": "Workshop der Hebamme Anne Schulz zu Babypflege, Umgang mit dem Baby und Alltag mit dem Neugeborenen in der FamilienBox. Man meldet sich über die Website an.",
+     "title": "Babypflege & Babyalltag – Workshop am 28.10.26",
+     "summary": "Workshop rund um Babypflege und den Alltag mit dem Baby, mit Hebamme Anne Schulz. Einmalig am 28.10.2026 von 16:00 bis 18:00 Uhr in der FamilienBox, Rosenaustraße 7 (Hinterhaus).",
      "topics": [
-      "hebamme",
-      "beratung"
+      "beratung",
+      "hebamme"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -51,7 +73,7 @@
      "category": "beratung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über „Hier anmelden“ auf der Website"
+      "note": "Anmeldung über „Hier anmelden“ auf der Startseite; Teilnehmerzahl steht auf der Detailseite"
      },
      "schedule": {
       "kind": "dates",
@@ -64,26 +86,26 @@
      }
     }
    ],
-   "inputHash": "f67f78d4ce3a91208011851c40f4db584ab4fb87ae35421cc7a18a1b6d5af008",
-   "model": "opus",
+   "inputHash": "0228b297e5eaf13a70456cad1e7698cc6a74d8064ac6d70c18056e8e5b49fff1",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.hebanne-schulz.de/bindung-durch-beruehrung/": {
    "events": [
     {
      "providerId": "hebanne-schulz",
      "venueId": "hebanne-schulz",
-     "title": "Achtsame Babymassage – Bindung durch Berührung (Montagskurs ab 9.11.2026)",
-     "summary": "Hebamme Anne Schulz zeigt Eltern sanfte Massagegriffe und wie man die Signale des Babys liest. In der kleinen Gruppe ist auch Raum für Fragen zu Schreien, Schlafen und Stillen. Für Babys, die bei Kursbeginn 6 Wochen bis 5 Monate alt sind.",
+     "title": "Bindung durch Berührung – Babymassage ab 09.11.2026",
+     "summary": "Achtsame Babymassage für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: Körperbotschaften des Babys verstehen, sanfte Berührungen üben, Fragen zu Schreien, Schlafen oder Füttern. Maximal 6 Eltern-Kind-Paare. Dieser Durchgang ist ausgebucht.",
      "topics": [
       "babymassage"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "105 €",
+     "price": "105,00 €",
      "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
      "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
      "category": "babykurse",
@@ -110,15 +132,15 @@
     {
      "providerId": "hebanne-schulz",
      "venueId": "hebanne-schulz",
-     "title": "Achtsame Babymassage – Bindung durch Berührung (Montagskurs ab 11.1.2027)",
-     "summary": "Hebamme Anne Schulz zeigt Eltern sanfte Massagegriffe und wie man die Signale des Babys liest. In der kleinen Gruppe ist auch Raum für Fragen zu Schreien, Schlafen und Stillen. Für Babys, die bei Kursbeginn 6 Wochen bis 5 Monate alt sind.",
+     "title": "Bindung durch Berührung – Babymassage ab 11.01.2027",
+     "summary": "Achtsame Babymassage für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: Körperbotschaften des Babys verstehen, sanfte Berührungen üben, Fragen zu Schreien, Schlafen oder Füttern. Maximal 6 Eltern-Kind-Paare. Anmeldung über die Kursseite.",
      "topics": [
       "babymassage"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "105 €",
+     "price": "105,00 €",
      "url": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
      "sourceUrl": "https://www.hebanne-schulz.de/bindung-durch-beruehrung/",
      "category": "babykurse",
@@ -128,7 +150,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "0 von 8 Plätzen belegt, Anmeldung online"
+      "note": "0 von 8 Plätzen belegt; Anmeldung über „Hier Anmelden“"
      },
      "schedule": {
       "kind": "weekly",
@@ -143,11 +165,11 @@
      }
     }
    ],
-   "inputHash": "b31d3d53fc1681659c5b6a74deddf5b39e513126bd2397584277e19fab6d72da",
-   "model": "opus",
+   "inputHash": "dce2bb9c7904df12210eac39eb9e75b20a04bb0b85072be94a9370b601535c49",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   }
  }
 }

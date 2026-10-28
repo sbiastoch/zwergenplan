@@ -2,19 +2,80 @@
  "version": 2,
  "units": {
   "seite:https://staatstheater-nuernberg.de/spielplan-26-27": {
-   "events": [],
-   "inputHash": "3e1e0979219862a943f8a5263f991b258c55125065dccd9c0b3c42dd0c2576ca",
-   "model": "opus",
-   "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "events": [
+    {
+     "providerId": "staatstheater-nuernberg-familie",
+     "venueId": "staatstheater-nuernberg-familie",
+     "title": "Familienführung im Opernhaus",
+     "summary": "Öffentliche Führung für Familien durch das Opernhaus, Sonntag 30.05.2027, 11–12 Uhr. Die Quelle nennt kein Mindestalter; der Katalog führt den Anbieter für 3 Jahre.",
+     "topics": [
+      "museum"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://staatstheater-nuernberg.de/spielplan-26-27",
+     "sourceUrl": "https://staatstheater-nuernberg.de/spielplan-26-27",
+     "category": "museum",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Tickets im Eventim-Webshop (Ticket-Link je Termin)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-05-30T11:00",
+        "end": "2027-05-30T12:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "staatstheater-nuernberg-familie",
+     "venueId": "staatstheater-nuernberg-familie",
+     "title": "Kinderkonzert „Einsteigen bitte!“ im Opernhaus",
+     "summary": "Öffentliches Kinderkonzert der Staatsphilharmonie mit Musik von Honegger, Ibert und Strauß, am 06.06. und 27.06.2027 jeweils 11–12 Uhr. Karten im Eventim-Webshop; die Quelle nennt kein Mindestalter, der Katalog führt den Anbieter für 3 Jahre.",
+     "topics": [
+      "konzert"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://staatstheater-nuernberg.de/spielplan-26-27",
+     "sourceUrl": "https://staatstheater-nuernberg.de/spielplan-26-27",
+     "category": "buehne",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Tickets im Eventim-Webshop (Ticket-Link je Termin)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-06-06T11:00",
+        "end": "2027-06-06T12:00"
+       },
+       {
+        "start": "2027-06-27T11:00",
+        "end": "2027-06-27T12:00"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "bf1e04ded45424e996842f62714fa892968d9ff73efbdc3bd207c6a642006022",
+   "model": "haiku",
+   "status": "ok",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://staatstheater-nuernberg.de/spielplan-26-27/kinder-im-gluck-opa-otti-eierkuchen/14-04-2027/0930": {
    "events": [],
-   "inputHash": "c0dd0775b17a58289327f63edd6af24cc16513598ca7f80ed9702dd03d7c9ab5",
-   "model": "opus",
+   "inputHash": "7dcc184d1f1ccb0b91366c74e36f25c629d9ebc5806d33601a10c4342b1da14f",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

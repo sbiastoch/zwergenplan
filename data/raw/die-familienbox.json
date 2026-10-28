@@ -6,8 +6,8 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Kleinkindturnen 12–36 Monate (Mo 9:30)",
-     "summary": "Turnen und Bewegungsspiele für Kleinkinder mit Begleitperson in der FamilienBox. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Kleinkindturnen 12–36 Monate, Mo 9:30–10:30",
+     "summary": "Turnstunde für Kinder von 12 bis 36 Monaten, montags vormittags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -40,8 +40,8 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Babyturnen 8–15 Monate (Mo 10:45)",
-     "summary": "Bewegungsstunde für Babys im Krabbel- und Laufalter mit Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Babyturnen 8–15 Monate, Mo 10:45–11:45",
+     "summary": "Turnstunde für Babys von 8 bis 15 Monaten, montags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -58,7 +58,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -74,8 +74,8 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Achtsame Babymassage 6 Wochen–5 Monate (Mo 11:00)",
-     "summary": "Eltern lernen, ihr Baby achtsam zu massieren und so Nähe und Entspannung zu fördern. Einstieg auf Anfrage.",
+     "title": "Achtsame Babymassage 6 Wochen–5 Monate, Mo 11:00–12:15",
+     "summary": "Massage- und Berührungsangebot für Babys von etwa sechs Wochen bis fünf Monaten, montags. Buchung über Eversports.",
      "topics": [
       "babymassage"
      ],
@@ -91,7 +91,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -107,11 +107,10 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Musikalische Früherziehung 1–3 Jahre (Mo 16:30)",
-     "summary": "Singen, Musizieren und Rhythmusspiele für Kleinkinder gemeinsam mit einem Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Musikalische Früherziehung 1–3 Jahre, Mo 16:30–17:15",
+     "summary": "Musikalische Früherziehung für Kinder von einem bis drei Jahren, montags nachmittags. Buchung über Eversports.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -125,7 +124,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -141,10 +140,43 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "BabySinne 12–30 Monate (Di 9:30)",
-     "summary": "Sinnesanregende Spiel- und Erfahrungsangebote für Kleinkinder mit Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "BabySinne 6–12 Monate, Di 10:30–11:15",
+     "summary": "Sinnesanregungen für Babys von 6 bis 12 Monaten, dienstags. Buchung über Eversports.",
      "topics": [
-      "spielgruppe"
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:30",
+      "end": "11:15",
+      "from": "2026-11-03",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "BabySinne 12–30 Monate, Di 9:30–10:15",
+     "summary": "Sinnesanregungen für Kinder von 12 bis 30 Monaten, dienstags. Buchung über Eversports.",
+     "topics": [
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -158,7 +190,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -167,15 +199,15 @@
       ],
       "start": "09:30",
       "end": "10:15",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Kleinkindturnen 12–36 Monate (Di 9:30)",
-     "summary": "Turnen und Bewegungsspiele für Kleinkinder mit Begleitperson in der FamilienBox. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Kleinkindturnen 12–36 Monate, Di 9:30–10:30",
+     "summary": "Turnstunde für Kinder von 12 bis 36 Monaten, dienstags vormittags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -192,7 +224,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -201,49 +233,17 @@
       ],
       "start": "09:30",
       "end": "10:30",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "BabySinne 6–12 Monate (Di 10:30)",
-     "summary": "Sinnesanregende Spiel- und Erfahrungsangebote für Babys mit Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Babygymnastik 5–8 Monate, Di 10:45–11:45",
+     "summary": "Turnstunde für Babys von 5 bis 8 Monaten, dienstags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
-      "spielgruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:30",
-      "end": "11:15",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Babygymnastik 5–8 Monate (Di 10:45)",
-     "summary": "Bewegungsanregungen für Babys gemeinsam mit Mama oder Papa. Laufende Gruppe, Einstieg auf Anfrage.",
-     "topics": [
+      "eltern-kind-turnen",
       "bewegung"
      ],
      "format": "regelmaessig",
@@ -258,7 +258,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -267,16 +267,17 @@
       ],
       "start": "10:45",
       "end": "11:45",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Babygymnastik 2–5 Monate (Di 12:00)",
-     "summary": "Sanfte Bewegungsanregungen für junge Babys gemeinsam mit Mama oder Papa. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Babygymnastik 2–5 Monate, Di 12:00–13:00",
+     "summary": "Turnstunde für Babys von 2 bis 5 Monaten, dienstags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
+      "eltern-kind-turnen",
       "bewegung"
      ],
      "format": "regelmaessig",
@@ -291,7 +292,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -300,18 +301,17 @@
       ],
       "start": "12:00",
       "end": "13:00",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Zumbini 0–4 Jahre (Di 14:00)",
-     "summary": "Tanzen, Musik und Bewegungsspiele für Babys und Kleinkinder zusammen mit einer Bezugsperson. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Zumbini 0–4 Jahre, Di 14:00–14:45",
+     "summary": "Tanz- und Bewegungsstunde mit Musik für Kinder von 0 bis 4 Jahren, dienstags. Buchung über Eversports.",
      "topics": [
-      "tanz",
-      "musik"
+      "tanz"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -325,7 +325,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -334,15 +334,48 @@
       ],
       "start": "14:00",
       "end": "14:45",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Babyturnen 8–18 Monate (Di 14:45)",
-     "summary": "Bewegungsstunde für Babys und junge Kleinkinder mit Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Zumbini 0–4 Jahre, Di 15:00–15:45",
+     "summary": "Tanz- und Bewegungsstunde mit Musik für Kinder von 0 bis 4 Jahren, dienstags. Buchung über Eversports.",
+     "topics": [
+      "tanz"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 48
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "15:00",
+      "end": "15:45",
+      "from": "2026-11-03",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "Babyturnen 8–18 Monate, Di 14:45–15:45",
+     "summary": "Turnstunde für Babys von 8 bis 18 Monaten, dienstags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -359,7 +392,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -368,80 +401,15 @@
       ],
       "start": "14:45",
       "end": "15:45",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Zumbini 0–4 Jahre (Di 15:00)",
-     "summary": "Tanzen, Musik und Bewegungsspiele für Babys und Kleinkinder zusammen mit einer Bezugsperson. Laufende Gruppe, Einstieg auf Anfrage.",
-     "topics": [
-      "tanz",
-      "musik"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 48
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "15:00",
-      "end": "15:45",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Zumba Mami – Tanzfitness für Mütter mit Kind (Di 16:00)",
-     "summary": "Tanz-Workout für Frauen, Kinder dürfen mitgebracht werden. Laufende Gruppe, Einstieg auf Anfrage.",
-     "topics": [
-      "fitness-mit-baby",
-      "tanz",
-      "muetter"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "16:00",
-      "end": "17:00",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Kleinkindturnen 18–36 Monate (Di 16:00)",
-     "summary": "Turnen und Bewegungsspiele für ältere Kleinkinder mit Begleitperson am Nachmittag. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Kleinkindturnen 18–36 Monate, Di 16:00–17:00",
+     "summary": "Turnstunde für Kinder von 18 bis 36 Monaten, dienstags nachmittags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -458,7 +426,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -467,18 +435,17 @@
       ],
       "start": "16:00",
       "end": "17:00",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Musikalische Früherziehung 9–15 Monate (Mi 9:30)",
-     "summary": "Lieder, Klänge und erste Instrumente für Babys und junge Kleinkinder mit Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Musikalische Früherziehung 9–15 Monate, Mi 9:30–10:15",
+     "summary": "Musikalische Früherziehung für Kinder von 9 bis 15 Monaten, mittwochs. Buchung über Eversports.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -492,7 +459,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -508,11 +475,10 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Musikalische Früherziehung 6–12 Monate (Mi 10:30)",
-     "summary": "Lieder, Klänge und Rhythmus für Babys gemeinsam mit einem Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Musikalische Früherziehung 6–12 Monate, Mi 10:30–11:15",
+     "summary": "Musikalische Früherziehung für Babys von 6 bis 12 Monaten, mittwochs. Buchung über Eversports.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -526,7 +492,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -542,8 +508,8 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Babyturnen 8–15 Monate (Mi 10:45)",
-     "summary": "Bewegungsstunde für Babys im Krabbel- und Laufalter mit Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Babyturnen 8–15 Monate, Mi 10:45–11:45",
+     "summary": "Turnstunde für Babys von 8 bis 15 Monaten, mittwochs. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -560,7 +526,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -576,8 +542,8 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Babyturnen 8–15 Monate (Do 9:30)",
-     "summary": "Bewegungsstunde für Babys im Krabbel- und Laufalter mit Elternteil. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Babyturnen 8–15 Monate, Do 9:30–10:30",
+     "summary": "Turnstunde für Babys von 8 bis 15 Monaten, donnerstags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -594,7 +560,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -610,37 +576,8 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "PEKiP-Gruppe (Do 9:30)",
-     "summary": "PEKiP: Spiel- und Bewegungsanregungen für Babys im ersten Lebensjahr, Austausch unter Eltern. Laufende Gruppen haben eine Warteliste, neue Kurse starten ab 26.11.2026.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "category": "babykurse",
-     "availability": {
-      "status": "warteliste",
-      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Buchung über Eversports"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "11:00",
-      "from": "2026-10-29",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Kleinkindturnen 12–36 Monate (Do 10:45)",
-     "summary": "Turnen und Bewegungsspiele für Kleinkinder mit Begleitperson in der FamilienBox. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Kleinkindturnen 12–36 Monate, Do 10:45–11:45",
+     "summary": "Turnstunde für Kinder von 12 bis 36 Monaten, donnerstags. Buchung über Eversports, freie Plätze dort je Termin.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -657,7 +594,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -673,37 +610,8 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "PEKiP-Gruppe (Do 11:30)",
-     "summary": "PEKiP: Spiel- und Bewegungsanregungen für Babys im ersten Lebensjahr, Austausch unter Eltern. Laufende Gruppen haben eine Warteliste, neue Kurse starten ab 26.11.2026.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
-     "category": "babykurse",
-     "availability": {
-      "status": "warteliste",
-      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Buchung über Eversports"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "11:30",
-      "end": "13:00",
-      "from": "2026-10-29",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Babymassage 0–4 Monate (Do 12:00)",
-     "summary": "Eltern lernen sanfte Massagegriffe für ihr Baby, dazu Zeit für Nähe und Austausch. Einstieg auf Anfrage.",
+     "title": "Babymassage 0–4 Monate, Do 12:00–13:00",
+     "summary": "Massage- und Berührungsangebot für Babys von 0 bis 4 Monaten, donnerstags. Buchung über Eversports.",
      "topics": [
       "babymassage"
      ],
@@ -719,7 +627,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -735,20 +643,78 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "PEKiP-Gruppe (Do 13:30)",
-     "summary": "PEKiP: Spiel- und Bewegungsanregungen für Babys im ersten Lebensjahr, Austausch unter Eltern. Laufende Gruppen haben eine Warteliste, neue Kurse starten ab 26.11.2026.",
+     "title": "PEKiP-Gruppe, Do 9:30–11:00",
+     "summary": "Spiel- und Bewegungsangebote für Babys mit Austausch für Eltern. Aktuell Warteliste, neue Kurse starten ab 26.11.2026.",
      "topics": [
       "pekip"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
      "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
      "category": "babykurse",
      "availability": {
-      "status": "warteliste",
-      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Buchung über Eversports"
+      "status": "unbekannt",
+      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Anmeldung über Eversports"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2026-11-26",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "PEKiP-Gruppe, Do 11:30–13:00",
+     "summary": "Spiel- und Bewegungsangebote für Babys mit Austausch für Eltern. Aktuell Warteliste, neue Kurse starten ab 26.11.2026.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "category": "babykurse",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Anmeldung über Eversports"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "11:30",
+      "end": "13:00",
+      "from": "2026-11-26",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "PEKiP-Gruppe, Do 13:30–15:00",
+     "summary": "Spiel- und Bewegungsangebote für Babys mit Austausch für Eltern. Aktuell Warteliste, neue Kurse starten ab 26.11.2026.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/kinderkurse-nürnberg/stundenplan/",
+     "category": "babykurse",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Anmeldung über Eversports"
      },
      "schedule": {
       "kind": "weekly",
@@ -757,18 +723,18 @@
       ],
       "start": "13:30",
       "end": "15:00",
-      "from": "2026-10-29",
+      "from": "2026-11-26",
       "skipHolidays": true
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Beckenboden Mama-Baby-Yoga (Fr 10:30)",
-     "summary": "Yoga mit Fokus auf Beckenboden für Mütter nach abgeschlossener Rückbildung, das Baby ist dabei. Laufende Gruppe, Einstieg auf Anfrage.",
+     "title": "Beckenboden Mama Baby Yoga, Fr 10:30–12:00",
+     "summary": "Yoga für Mütter nach der Rückbildung mit Baby, freitags. Buchung über Eversports, Platzangabe dort je Termin.",
      "topics": [
       "yoga-mit-baby",
-      "muetter"
+      "rueckbildung"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -778,7 +744,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über Eversports; freie Plätze im Online-Stundenplan"
+      "note": "Buchung über Eversports, Platzangabe dort je Termin"
      },
      "schedule": {
       "kind": "weekly",
@@ -792,34 +758,34 @@
      }
     }
    ],
-   "inputHash": "6fcee2d67b1bb6c8811285f802234b0a871cb5b70c28728de96d87016f2048a5",
-   "model": "opus",
+   "inputHash": "1f75f0e7ab9c51457e60ad38f91181cf328cba3626688ca621341b7bc670b5bd",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.diefamilienbox.de/babykurse-nürnberg/": {
    "events": [],
-   "inputHash": "f1376eab88da58126b20d7e8a488a232a848ab20b6e1ce610700448724f2f8b1",
-   "model": "opus",
+   "inputHash": "1b0cf117f12ff3e6a4779a1626d50f8cb53914abb460cc11bbbacd97b1fd244b",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.diefamilienbox.de/kleinkindkurse-nürnberg/": {
    "events": [],
-   "inputHash": "e2bd55d4045cde8f981cc020e703e30119a2196b670125c5d896c73d1e2e2aa9",
-   "model": "opus",
+   "inputHash": "8f65f8d32c3fd36ff014cd17f0881a81dc29f24968c0225528b1ee42722c7ab8",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.eversports.de/org/widget/12409d8f-a593-49f5-8c73-910dfef5e2a6?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5": {
    "events": [],
-   "inputHash": "799eccd03d13223c0fd849e5819bd92977acde3a4e7573c120dfffc4efb7ec20",
-   "model": "opus",
+   "inputHash": "5834d9110f1715bc43a393f96cc03fa3c45b4409cf9d559650ff6be070fe94b7",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/": {
@@ -827,11 +793,10 @@
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Kleinkindturnen (12–36 Monate), montags 9:30",
-     "summary": "Turnen und Bewegungsspiele für Kleinkinder zusammen mit einem Elternteil. Der Kurs läuft schon, Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Kleinkindturnen 12–36 Monate (Mo 9:30)",
+     "summary": "Turnen und Bewegungsspiele für Kleinkinder zusammen mit einem Elternteil. Anmeldung und freie Plätze laufen über Eversports.",
      "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
+      "eltern-kind-turnen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -845,7 +810,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -855,119 +820,16 @@
       "start": "09:30",
       "end": "10:30",
       "from": "2026-11-02",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Kleinkindturnen (12–36 Monate), dienstags 9:30",
-     "summary": "Turnen und Bewegungsspiele für Kleinkinder zusammen mit einem Elternteil. Der Kurs läuft schon, Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Babyturnen 8–15 Monate (Mo 10:45)",
+     "summary": "Bewegungsstunde für Babys mit Eltern, Turnen und Spielen auf dem Boden. Anmeldung und Platzangabe über Eversports.",
      "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "09:30",
-      "end": "10:30",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Kleinkindturnen (18–36 Monate), dienstags 16:00",
-     "summary": "Nachmittagsgruppe mit Turnen und Bewegung für ältere Kleinkinder und ihre Eltern. Der Kurs läuft schon, Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "16:00",
-      "end": "17:00",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Kleinkindturnen (12–36 Monate), donnerstags 10:45",
-     "summary": "Turnen und Bewegungsspiele für Kleinkinder zusammen mit einem Elternteil. Der Kurs läuft schon, Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "10:45",
-      "end": "11:45",
-      "from": "2026-10-29",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Babyturnen (8–15 Monate), montags 10:45",
-     "summary": "Bewegungsanregungen für Babys, die krabbeln oder bald laufen, zusammen mit Mama oder Papa. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
+      "eltern-kind-turnen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -981,7 +843,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -991,182 +853,14 @@
       "start": "10:45",
       "end": "11:45",
       "from": "2026-11-02",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Babyturnen (8–18 Monate), dienstags 14:45",
-     "summary": "Nachmittagsgruppe mit Bewegungsangeboten für Babys und junge Kleinkinder samt Elternteil. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 8,
-      "maxMonths": 18
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "14:45",
-      "end": "15:45",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Babyturnen (8–15 Monate), mittwochs 10:45",
-     "summary": "Bewegungsanregungen für Babys, die krabbeln oder bald laufen, zusammen mit Mama oder Papa. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 8,
-      "maxMonths": 15
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "start": "10:45",
-      "end": "11:45",
-      "from": "2026-10-28",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Babyturnen (8–15 Monate), donnerstags 9:30",
-     "summary": "Bewegungsanregungen für Babys, die krabbeln oder bald laufen, zusammen mit Mama oder Papa. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 8,
-      "maxMonths": 15
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "10:30",
-      "from": "2026-10-29",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Babygymnastik (5–8 Monate), dienstags 10:45",
-     "summary": "Gymnastik und Bewegungsanregungen für Babys vor dem Krabbelalter, die Eltern machen mit. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 5,
-      "maxMonths": 8
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:45",
-      "end": "11:45",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Babygymnastik (2–5 Monate), dienstags 12:00",
-     "summary": "Sanfte Bewegungsübungen für junge Babys gemeinsam mit einem Elternteil. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 2,
-      "maxMonths": 5
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "12:00",
-      "end": "13:00",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Achtsame Babymassage (6 Wochen–5 Monate), montags 11:00",
-     "summary": "Eltern lernen, ihr Baby in ruhiger Atmosphäre achtsam zu massieren. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Achtsame Babymassage 6 Wochen–5 Monate (Mo 11:00)",
+     "summary": "Sanfte Massage für Babys, die Eltern unter Anleitung lernen. Anmeldung und Platzangabe über Eversports.",
      "topics": [
       "babymassage"
      ],
@@ -1182,7 +876,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -1192,47 +886,47 @@
       "start": "11:00",
       "end": "12:15",
       "from": "2026-11-02",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Babymassage (0–4 Monate), donnerstags 12:00",
-     "summary": "Eltern lernen Massagegriffe für ihr junges Baby und können sich austauschen. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Musikalische Früherziehung 1–3 Jahre (Mo 16:30)",
+     "summary": "Singen, Musizieren und Bewegen mit Kleinkindern in der Gruppe, Eltern machen mit. Anmeldung und Platzangabe über Eversports.",
      "topics": [
-      "babymassage"
+      "musik"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
      "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "babykurse",
+     "category": "musik",
      "age": {
-      "minMonths": 0,
-      "maxMonths": 4
+      "minMonths": 12,
+      "maxMonths": 36
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
-       "TH"
+       "MO"
       ],
-      "start": "12:00",
-      "end": "13:00",
-      "from": "2026-10-29",
-      "skipHolidays": true
+      "start": "16:30",
+      "end": "17:15",
+      "from": "2026-11-02",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "BabySinne (12–30 Monate), dienstags 9:30",
-     "summary": "Sinneskurs, in dem Kleinkinder mit ihren Eltern Materialien, Geräusche und Farben spielerisch erkunden. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "BabySinne 12–30 Monate (Di 9:30)",
+     "summary": "Sinnesanregungen für Kleinkinder mit einem Elternteil, Ausprobieren von Materialien und Bewegung. Anmeldung über Eversports.",
      "topics": [
       "eltern-kind-gruppe"
      ],
@@ -1248,7 +942,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -1257,15 +951,48 @@
       ],
       "start": "09:30",
       "end": "10:15",
-      "from": "2026-10-27",
-      "skipHolidays": true
+      "from": "2026-11-03",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "BabySinne (6–12 Monate), dienstags 10:30",
-     "summary": "Sinneskurs für Babys im zweiten Lebenshalbjahr, die mit einem Elternteil spielerisch ihre Sinne erkunden. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Kleinkindturnen 12–36 Monate (Di 9:30)",
+     "summary": "Turnen und Bewegungsspiele für Kleinkinder zusammen mit einem Elternteil. Anmeldung und freie Plätze laufen über Eversports.",
+     "topics": [
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-11-03",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "BabySinne 6–12 Monate (Di 10:30)",
+     "summary": "Sinnesanregungen für Babys zusammen mit einem Elternteil. Anmeldung und Platzangabe über Eversports.",
      "topics": [
       "eltern-kind-gruppe"
      ],
@@ -1281,7 +1008,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -1290,52 +1017,217 @@
       ],
       "start": "10:30",
       "end": "11:15",
-      "from": "2026-10-27",
-      "skipHolidays": true
+      "from": "2026-11-03",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Musikalische Früherziehung (1–3 Jahre), montags 16:30",
-     "summary": "Singen, Musizieren und Bewegungslieder für Kleinkinder gemeinsam mit den Eltern. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Babygymnastik 5–8 Monate (Di 10:45)",
+     "summary": "Gemeinsames Turnen für Babys mit Eltern, mit Bewegungsanregungen am Boden. Anmeldung und Platzangabe über Eversports.",
      "topics": [
-      "musik",
-      "singen"
+      "eltern-kind-turnen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
      "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "musik",
+     "category": "bewegung",
      "age": {
-      "minMonths": 12,
-      "maxMonths": 36
+      "minMonths": 5,
+      "maxMonths": 8
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
-       "MO"
+       "TU"
       ],
-      "start": "16:30",
-      "end": "17:15",
-      "from": "2026-11-02",
-      "skipHolidays": true
+      "start": "10:45",
+      "end": "11:45",
+      "from": "2026-11-03",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Musikalische Früherziehung (9–15 Monate), mittwochs 9:30",
-     "summary": "Musikkurs für Babys und junge Kleinkinder mit Liedern, Instrumenten und Bewegungsspielen zusammen mit einem Elternteil. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Babygymnastik 2–5 Monate (Di 12:00)",
+     "summary": "Gemeinsames Turnen für sehr junge Babys mit Eltern. Anmeldung und Platzangabe über Eversports.",
      "topics": [
-      "musik",
-      "singen"
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 2,
+      "maxMonths": 5
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "12:00",
+      "end": "13:00",
+      "from": "2026-11-03",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "Zumbini 0–4 Jahre (Di 14:00)",
+     "summary": "Tanz- und Bewegungsstunde mit Musik für Kleinkinder zusammen mit einem Elternteil. Anmeldung über Eversports.",
+     "topics": [
+      "tanz",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 48
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "14:00",
+      "end": "14:45",
+      "from": "2026-11-03",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "Babyturnen 8–18 Monate (Di 14:45)",
+     "summary": "Bewegungsstunde für Babys und Krabbelkinder mit Eltern. Anmeldung und Platzangabe über Eversports.",
+     "topics": [
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 8,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "14:45",
+      "end": "15:45",
+      "from": "2026-11-03",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "Zumbini 0–4 Jahre (Di 15:00)",
+     "summary": "Tanz- und Bewegungsstunde mit Musik für Kleinkinder zusammen mit einem Elternteil. Anmeldung über Eversports.",
+     "topics": [
+      "tanz",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 48
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "15:00",
+      "end": "15:45",
+      "from": "2026-11-03",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "Kleinkindturnen 18–36 Monate (Di 16:00)",
+     "summary": "Turnen und Bewegungsspiele für ältere Kleinkinder zusammen mit einem Elternteil. Anmeldung über Eversports.",
+     "topics": [
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 18,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "16:00",
+      "end": "17:00",
+      "from": "2026-11-03",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "Musikalische Früherziehung 9–15 Monate (Mi 9:30)",
+     "summary": "Singen und Musizieren mit Babys und Kleinkindern in der Gruppe, Eltern machen mit. Anmeldung und Platzangabe über Eversports.",
+     "topics": [
+      "musik"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -1349,7 +1241,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -1359,17 +1251,49 @@
       "start": "09:30",
       "end": "10:15",
       "from": "2026-10-28",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Musikalische Früherziehung (6–12 Monate), mittwochs 10:30",
-     "summary": "Musikkurs für Babys mit Liedern, Klängen und einfachen Instrumenten gemeinsam mit den Eltern. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Babyturnen 8–15 Monate (Mi 10:45)",
+     "summary": "Bewegungsstunde für Babys mit Eltern, Turnen und Spielen am Boden. Anmeldung und Platzangabe über Eversports.",
      "topics": [
-      "musik",
-      "singen"
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 8,
+      "maxMonths": 15
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "10:45",
+      "end": "11:45",
+      "from": "2026-10-28",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "Musikalische Früherziehung 6–12 Monate (Mi 10:30)",
+     "summary": "Singen und Musizieren mit jungen Babys in der Gruppe, Eltern machen mit. Anmeldung und Platzangabe über Eversports.",
+     "topics": [
+      "musik"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -1383,7 +1307,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -1393,86 +1317,16 @@
       "start": "10:30",
       "end": "11:15",
       "from": "2026-10-28",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Zumbini® (0–4 Jahre), dienstags 14:00",
-     "summary": "Musik- und Bewegungsprogramm, bei dem Kinder und Eltern zusammen tanzen, singen und mit Instrumenten spielen. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Babyturnen 8–15 Monate (Do 9:30)",
+     "summary": "Bewegungsstunde für Babys mit Eltern, Turnen und Spielen am Boden. Anmeldung und Platzangabe über Eversports.",
      "topics": [
-      "musik",
-      "tanz"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "musik",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 48
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "14:00",
-      "end": "14:45",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Zumbini® (0–4 Jahre), dienstags 15:00",
-     "summary": "Musik- und Bewegungsprogramm, bei dem Kinder und Eltern zusammen tanzen, singen und mit Instrumenten spielen. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "musik",
-      "tanz"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
-     "category": "musik",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 48
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "15:00",
-      "end": "15:45",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "die-familienbox",
-     "venueId": "die-familienbox",
-     "title": "Zumba® Mami (mit oder ohne Kind), dienstags 16:00",
-     "summary": "Tanz-Fitness für Mütter, die Kinder dürfen mitkommen. Einstieg auf Anfrage, Buchung über Eversports.",
-     "topics": [
-      "fitness-mit-baby",
-      "tanz",
-      "muetter"
+      "eltern-kind-turnen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -1480,30 +1334,34 @@
      "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
      "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
      "category": "bewegung",
+     "age": {
+      "minMonths": 8,
+      "maxMonths": 15
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
-       "TU"
+       "TH"
       ],
-      "start": "16:00",
-      "end": "17:00",
-      "from": "2026-10-27",
-      "skipHolidays": true
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-10-29",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "PEKiP®, donnerstags 9:30",
-     "summary": "PEKiP-Gruppe mit Spiel- und Bewegungsanregungen für Babys und Austausch für die Eltern. Derzeit nur Warteliste, neue Kurse beginnen ab 26.11.2026.",
+     "title": "PEKiP-Gruppe (Do 9:30)",
+     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern. Aktuell Warteliste, neue Kurse starten ab 26.11.2026.",
      "topics": [
       "pekip"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
@@ -1511,7 +1369,7 @@
      "category": "babykurse",
      "availability": {
       "status": "warteliste",
-      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Buchung über Eversports"
+      "note": "aktuell Warteliste; neue Kurse ab 26.11.2026"
      },
      "schedule": {
       "kind": "weekly",
@@ -1520,19 +1378,52 @@
       ],
       "start": "09:30",
       "end": "11:00",
-      "from": "2026-10-29",
-      "skipHolidays": true
+      "from": "2026-11-26",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "PEKiP®, donnerstags 11:30",
-     "summary": "PEKiP-Gruppe mit Spiel- und Bewegungsanregungen für Babys und Austausch für die Eltern. Derzeit nur Warteliste, neue Kurse beginnen ab 26.11.2026.",
+     "title": "Kleinkindturnen 12–36 Monate (Do 10:45)",
+     "summary": "Turnen und Bewegungsspiele für Kleinkinder zusammen mit einem Elternteil. Anmeldung und freie Plätze laufen über Eversports.",
+     "topics": [
+      "eltern-kind-turnen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "10:45",
+      "end": "11:45",
+      "from": "2026-10-29",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "PEKiP-Gruppe (Do 11:30)",
+     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern. Aktuell Warteliste, neue Kurse starten ab 26.11.2026.",
      "topics": [
       "pekip"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
@@ -1540,7 +1431,7 @@
      "category": "babykurse",
      "availability": {
       "status": "warteliste",
-      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Buchung über Eversports"
+      "note": "aktuell Warteliste; neue Kurse ab 26.11.2026"
      },
      "schedule": {
       "kind": "weekly",
@@ -1549,17 +1440,17 @@
       ],
       "start": "11:30",
       "end": "13:00",
-      "from": "2026-10-29",
-      "skipHolidays": true
+      "from": "2026-11-26",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "PEKiP®, donnerstags 13:30",
-     "summary": "PEKiP-Gruppe mit Spiel- und Bewegungsanregungen für Babys und Austausch für die Eltern. Derzeit nur Warteliste, neue Kurse beginnen ab 26.11.2026.",
+     "title": "Babymassage 0–4 Monate (Do 12:00)",
+     "summary": "Massage für sehr junge Babys, die Eltern unter Anleitung lernen. Anmeldung und Platzangabe über Eversports.",
      "topics": [
-      "pekip"
+      "babymassage"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -1567,9 +1458,42 @@
      "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
      "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
      "category": "babykurse",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 4
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "12:00",
+      "end": "13:00",
+      "from": "2026-10-29",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "die-familienbox",
+     "venueId": "die-familienbox",
+     "title": "PEKiP-Gruppe (Do 13:30)",
+     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern. Aktuell Warteliste, neue Kurse starten ab 26.11.2026.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "sourceUrl": "https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/",
+     "category": "babykurse",
      "availability": {
       "status": "warteliste",
-      "note": "Aktuell Warteliste; neue Kurse ab 26.11.2026, Buchung über Eversports"
+      "note": "aktuell Warteliste; neue Kurse ab 26.11.2026"
      },
      "schedule": {
       "kind": "weekly",
@@ -1578,18 +1502,18 @@
       ],
       "start": "13:30",
       "end": "15:00",
-      "from": "2026-10-29",
-      "skipHolidays": true
+      "from": "2026-11-26",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "die-familienbox",
      "venueId": "die-familienbox",
-     "title": "Beckenboden Mama Baby Yoga, freitags 10:30",
-     "summary": "Yoga mit Fokus auf den Beckenboden für Mütter nach der Rückbildung, das Baby ist dabei. Einstieg auf Anfrage, Buchung über Eversports.",
+     "title": "Beckenboden Mama-Baby-Yoga (Fr 10:30)",
+     "summary": "Yoga und Beckenbodentraining für Mütter mit Baby nach der Rückbildung. Anmeldung und Platzangabe über Eversports.",
      "topics": [
       "yoga-mit-baby",
-      "muetter"
+      "rueckbildung"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -1599,7 +1523,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze je Termin über Eversports einsehen und buchen"
+      "note": "Plätze nur in Eversports je Termin sichtbar, Anmeldung dort"
      },
      "schedule": {
       "kind": "weekly",
@@ -1609,30 +1533,30 @@
       "start": "10:30",
       "end": "12:00",
       "from": "2026-10-30",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "518a3bf9b7e4ac10fafbed3734e43599c6267180882c3093b6bc58a6eba4da7b",
-   "model": "opus",
+   "inputHash": "9a9f8414a4bcb1acb27ba77d4360981c20a58c7d29f109f4ec9fe796af8d6a82",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.eversports.de/widget/w/vX25EB?list=course&group=84326": {
    "events": [],
-   "inputHash": "f392b858eaafead602ed861ba05bb70d9cd79912238d36a0aa7c739929b18a61",
-   "model": "opus",
+   "inputHash": "1425e4ffba0745c1b70e2e81c37e1fd5c1333129b03156d6383d60c20d9cabd9",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.eversports.de/org/widget/0455f70c-bfb9-40da-b2ca-d4a77077dae2?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5": {
    "events": [],
-   "inputHash": "7114d78b37cc1f121fabf1ff4d8bea98ac1376e658b15717d0df5d98dc9c3a6f",
-   "model": "opus",
+   "inputHash": "e7e24387c40ad66a9f6b0699c5d450f43debfd9deabb39962ca3c00522505b10",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

@@ -3,72 +3,72 @@
  "units": {
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_oktober.html": {
    "events": [],
-   "inputHash": "434bb63d3352b744d678f5cf445e5367d140b8ecde0a28732975cce04de014b0",
-   "model": "opus",
+   "inputHash": "bdca6ac9580b9f81493b056f5573339ee03dd05ee422885fdad37927776bb104",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.nuernberg.de/imperia/md/kuf_kultur/bilder/kinderuni/aktuelles/flyer_kitheaterreihe_2026_27.pdf": {
    "events": [],
-   "inputHash": "f0c2ca653118ac48d4e6ede8a3b1f6478473245b6b575f56c1a879b90205ac79",
-   "model": "opus",
+   "inputHash": "4ab0112fa36a2b2dd028c1df359d5e153eba9de611718674908bf383ef9998e9",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_november.html": {
    "events": [],
-   "inputHash": "c8743cccaa5889866277275a8697539ef276949e9228612ac94a4f2df7c65b73",
-   "model": "opus",
+   "inputHash": "62ae865f740c913e8c90ee4a84b750f83c1dce43710f62e8ef1f9c4b152e7a99",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_januar.html": {
    "events": [],
-   "inputHash": "806923b2f1b36b1c34303f1487ba2f6a8e4bbf12cb4fc5b0706e4ad47d195aee",
-   "model": "opus",
+   "inputHash": "e7cb40316cb3c0db9e5031227b8a1650f3aafd1c175b8867b3ce0350572928ea",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_februar.html": {
    "events": [],
-   "inputHash": "a2bd6eb5a847c2a89db229f9f965f462dfda07143fca9e5d1b082339c21ffc60",
-   "model": "opus",
+   "inputHash": "cfa3e28d6c6ef0117ac845456a546a8af70176d83e9a34796007d0aa51ee2081",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_maerz.html": {
    "events": [],
-   "inputHash": "b69d8bec21eec7734c4c6ca3a8afe265b76c668baa6773b9d3974e399ead4ae0",
-   "model": "opus",
+   "inputHash": "96942ee159af75a02d975b67d0315e0c366fad78c14049c7fea6bceedb378052",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_april.html": {
    "events": [],
-   "inputHash": "2b9635f9d7c53222bb7083061c2ef77754ce1dd447062a2b27c359dd20c30d5e",
-   "model": "opus",
+   "inputHash": "9ed0aa605383980a7367b02d1eb27441abe8599978965e8c672ef18732c6cfcd",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "kandidaten": {
    "events": [],
-   "inputHash": "1c1a7c7562c2a95a3ffb8e245807e60034886fe14648f15112201868b6faf580",
+   "inputHash": "6b827596ad3c638dec7094380e5920ad4d6543ae06ca44cd70814c7cab6e1cb2",
    "dated": {
     "2026-11-11": "52e00db8132f458172b32099e73571a442c5ed25256bd49ce1c4db0fc4362071",
     "2026-11-28": "826aa6c17a3f9289730bcd986b6c6233318f9e044a71a555167ba5f21059ff72",
     "2027-03-10": "6bc59e132e35383e0091715dcb80143b2111c7e1fdbfecd1c3a82844a93d058f",
     "2027-04-07": "13ede802b3fcce21448472b1aad479d318fc79417ed3c09619ae9715530ea3f6"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "stadt-vk"
