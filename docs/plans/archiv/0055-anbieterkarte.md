@@ -1,6 +1,6 @@
 # Plan 0055 – Karte im Tab „Anbieter“
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 2b31b96 (2026-10-29)
 Datum: 2026-10-29
 
 Hinweis zur Nummer: Entworfen als Plan 0054 mit ADR 0037. Beide Nummern hat parallel „Abos mit Glocke“ belegt (live seit dc7498d), daher Plan 0055 und ADR 0038. Zeilenangaben zu `App.tsx`, `ProviderScreen.tsx` und `ProviderSheet.tsx` stammen vom Stand vor der Glocke und können verschoben sein.

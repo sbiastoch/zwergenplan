@@ -109,6 +109,12 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0055** (Anbieterkarte, live seit 2b31b96, 2026-10-29; Einzelheiten in „Umsetzung“ und „Arch-Review und Browser-Review“ des Plans):
+  - **Am echten Handy prüfen**: Scrollt ein Wisch über die Karte im Tab die Seite (ein Finger) und bewegt nur ein Zwei-Finger-Wisch die Karte (`cooperativeGestures`)? Im Browser-Review nur emuliert.
+  - **Startausschnitt mit echten Daten**: Live fasst die Karte die 121 Orte beim Öffnen in vier Cluster (79, 28, 12, 2) zusammen; einzelne Anbieter sieht man erst nach Zoomen. Ob ein kleinerer `clusterRadius` oder ein höherer Startzoom besser ist, nach Rückmeldung entscheiden.
+  - **Querformat**: Statuszeile erst nach Scrollen, siehe „Kompakter Kopf im Querformat“ oben.
+  - **Zweite Region** (Plan 0042): Startausschnitt je Region und Größe von `anbieter.json` (ADR 0038, Konsequenzen).
+  - Eigene `mobile-ux`-Ansicht für den Kachelfehler im Tab (Arch-Review 2, nicht übernommen; derselbe Weg wie auf der Angebotskarte).
 - **Katalog** (gefunden 2026-10-18 an `imiluv-studio`): `buildProbe` (`scripts/pipeline/lib/extract.ts`) entfernt `coveredBy` und verlangt dann über `validateDataset` eine Terminseite; ein `coveredBy`-Eintrag mit nur `info`-Seiten, den das Schema erlaubt, scheitert so in jedem Nachtlauf. Dasselbe Muster in `scripts/pipeline/lib/eval-score.ts`. Abhilfe: Schema und Probelauf angleichen. Derzeit hat kein Eintrag diese Form.
 - **Plan 0038** (stabile IDs nachschärfen, live seit 0cc9c62, 2026-10-17; Einzelheiten in „Nicht-Ziele“, „Umsetzung“ und „Live“ des Plans):
   - **Korrektheitsrisiko** (Arch-Review): Stufe 1 der Zuordnung prüft `conflictingLabels` nicht. Zieht „Babyschwimmen 2“ mit exakt denselben Terminen auf den Platz von „Babyschwimmen 1“, erbt es dessen ID; ein alter Link zeigte still auf ein anderes Angebot. Im Rückspiel und im ersten Nachtlauf kein Fall. Abhilfe: `conflictingLabels` auch in Stufe 1 ausschließen, mit Test.
