@@ -25,14 +25,15 @@ describe("mapData: Orte und Startausschnitt der Karte (Plan 0005, E6/E9)", () =>
     ]);
   });
 
-  it("Startausschnitt aus der öffentlichen Datenbasis, nie aus den sichtbaren Orten (Arch-Review B1, m1)", () => {
-    const all = mapData([nah, fern], [nah, fern], undefined).start;
-    expect(all).toEqual({ bounds: { minLat: 49.4301, minLon: 11.0601, maxLat: 49.4495, maxLon: 11.0892 } });
-    // sichtbar nur „nah“ (Umkreis), Datenbasis beide: Ausschnitt wie ohne Startpunkt
-    expect(mapData([nah], [nah, fern], standort).start).toEqual(all);
+  it("ohne Startpunkt: Rahmen über die öffentliche Datenbasis, nie über die sichtbaren Orte (Arch-Review B1, m1)", () => {
+    const all = mapData([nah], [nah, fern], undefined);
+    expect(all.start).toEqual({ bounds: { minLat: 49.4301, minLon: 11.0601, maxLat: 49.4495, maxLon: 11.0892 } });
+    // „Alle zeigen“ geht immer auf diesen Rahmen (Plan 0056, N11)
+    expect(mapData([nah], [nah, fern], standort).overview).toEqual(all.start);
   });
 
-  it("ein Stadtteil ist die Mitte", () => {
-    expect(mapData([nah], [nah, fern], gostenhof).start).toEqual({ center: gostenhof.point, zoom: 13 });
+  it("mit Startpunkt: 2 km um ihn, Standort wie Stadtteil (Plan 0056, E6)", () => {
+    expect(mapData([nah], [nah, fern], standort).start).toEqual({ around: standort.point, radiusKm: 2 });
+    expect(mapData([nah], [nah, fern], gostenhof).start).toEqual({ around: gostenhof.point, radiusKm: 2 });
   });
 });

@@ -3,7 +3,7 @@
  * `cameraOffers` ist die Datenbasis des Ausschnitts: alle kommenden Angebote, unabhängig von Filtern,
  * Alter und Startpunkt (`useOfferViews().map`; ADR 0008, Arch-Review B1 und m1).
  */
-import { initialCamera, type StartCamera } from "../../domain/camera.ts";
+import { initialCamera, overviewCamera, type StartCamera } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
 import { type Place, placesOf } from "../../domain/places.ts";
 import type { Origin } from "../../domain/reach.ts";
@@ -16,12 +16,7 @@ export function mapData<T extends MapOffer>(
   visible: readonly T[],
   cameraOffers: readonly T[],
   origin: Origin | undefined,
-): { places: Place<T>[]; start: StartCamera } {
-  return {
-    places: placesOf(visible),
-    start: initialCamera(
-      placesOf(cameraOffers).map((p) => p.geo),
-      origin,
-    ),
-  };
+): { places: Place<T>[]; start: StartCamera; overview: StartCamera } {
+  const points = placesOf(cameraOffers).map((p) => p.geo);
+  return { places: placesOf(visible), start: initialCamera(points, origin), overview: overviewCamera(points) };
 }

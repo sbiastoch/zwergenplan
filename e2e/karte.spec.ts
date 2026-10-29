@@ -27,6 +27,7 @@ interface TestMap {
     properties: Record<string, unknown>;
   }>;
   getCenter: () => { lat: number; lng: number };
+  getBounds: () => { getWest: () => number; getEast: () => number; getSouth: () => number; getNorth: () => number };
   getZoom: () => number;
   jumpTo: (options: { zoom?: number; center?: [number, number] }) => void;
   getLayer: (id: string) => unknown;
@@ -85,6 +86,35 @@ async function camera(page: Page) {
     const { lat, lng } = map.getCenter();
     return { lat, lng, zoom: map.getZoom() };
   });
+}
+
+/** Ausschnitt der Karte in km und seine Mitte (Plan 0056, N3) */
+async function extentKm(page: Page) {
+  return page.evaluate(() => {
+    const map = window.__zpMap;
+    if (!map) throw new Error("keine Karte");
+    const b = map.getBounds();
+    const { lat, lng } = map.getCenter();
+    const kmLon = 111.32 * Math.cos((lat * Math.PI) / 180);
+    return {
+      width: (b.getEast() - b.getWest()) * kmLon,
+      height: (b.getNorth() - b.getSouth()) * 111.32,
+      lat,
+      lon: lng,
+    };
+  });
+}
+
+/**
+ * Start am Startpunkt (Plan 0056, E6, N3): Mitte am Punkt, die kürzere Kante zeigt 2 km Radius (≈ 4 km). Die längere
+ * wächst mit dem Seitenverhältnis (hohe Karte, quer liegende Anbieterkarte); „höchstens 6 × 6 km“ gilt nur für sie.
+ */
+async function expectAroundStart(page: Page, at: { lat: number; lon: number }) {
+  const e = await extentKm(page);
+  expect(Math.abs(e.lat - at.lat), "Mitte am Startpunkt (Breite)").toBeLessThan(0.005);
+  expect(Math.abs(e.lon - at.lon), "Mitte am Startpunkt (Länge)").toBeLessThan(0.005);
+  expect(Math.min(e.width, e.height), "kürzere Kante zeigt 2 km Radius").toBeGreaterThan(3.5);
+  expect(Math.min(e.width, e.height), "kürzere Kante höchstens etwa 6 km").toBeLessThanOrEqual(6);
 }
 
 /** Kein Marker des Startausschnitts liegt unter dem Bedienelement `selector` (Zoom-Knöpfe, Attribution). */
@@ -351,7 +381,7 @@ test.describe("mit gemockten Kacheln", () => {
     await Promise.all([table, chunk, lines]);
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
 
-    // Startpunkt über das Kind-Sheet: ab der Wahl kein Request, auch keine Kachel (Kamera-Regel)
+    // Startpunkt über das Kind-Sheet: ab der Wahl kein Request außer Kacheln (die Karte fährt hin, ADR 0039)
     await preloaded;
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
@@ -375,7 +405,7 @@ test.describe("mit gemockten Kacheln", () => {
       page.getByRole("dialog").locator(".reach-long"),
       "ca. 30 Min. mit Tram 1, dann Bus 2 ab Gostenhof",
     );
-    // Stadtteil-Zoom lädt Kacheln (erlaubt, ADR 0008); sonst kommt nichts dazu, schon gar nicht wegzeit.json
+    // Die Fahrt zum Stadtteil lädt Kacheln (ADR 0039); sonst kommt nichts dazu, schon gar nicht wegzeit.json
     expect(requests.filter((url) => !url.startsWith("https://tiles.openfreemap.org/"))).toEqual([]);
   });
 
@@ -634,58 +664,101 @@ test.describe("mit gemockten Kacheln", () => {
     });
   });
 
-  test("Kamera-Regel: Standort bewegt die Karte nicht und lädt keine Kacheln", async ({ page, context, tileLog }) => {
+  test("neuer Startpunkt bei offener Karte: Standort fährt die Karte hin, derselbe nochmal bewegt nichts, Stadtteil ohne Orte im Umkreis zeigt alle (Plan 0056, E6, N12; ADR 0039)", async ({
+    page,
+    context,
+  }) => {
     await context.grantPermissions(["geolocation"]);
     await context.setGeolocation({ latitude: 49.45213, longitude: 11.07672 });
     await openMap(page);
-    const tiles = tileLog.length;
-    const start = await camera(page);
+    const plain = await camera(page);
 
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    // Wegzeit ab dem Standort: Minuten an den Kacheln, die Statuszeile nur mit Zahl (Plan 0056, E2)
     await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
+    // Die Karte fährt zum (auf 100 m gerundeten) Standort und zeigt 2 km Radius
+    await expect.poll(async () => Math.abs((await camera(page)).lat - 49.452)).toBeLessThan(0.005);
     await idle(page);
-    expect(tileLog.length, "keine Kacheln nach „Meinen Standort nutzen“").toBe(tiles);
-    expect(await camera(page)).toEqual(start);
+    await expectAroundStart(page, { lat: 49.452, lon: 11.077 });
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
-    // mit Startpunkt steht die Entfernung an jeder Kachel (Wegzeit oder, weit weg von jedem Halt, Luftlinie)
-    await expect(page.locator(".meta .dist").first()).toHaveText(DIST);
+    const here = await camera(page);
+    expect(here).not.toEqual(plain);
 
-    // Gegenprobe: Ein Stadtteil darf die Kamera bewegen.
+    // derselbe Standort noch einmal: keine Bewegung (N12)
+    await page.evaluate(([lon, lat]) => window.__zpMap?.jumpTo({ center: [lon, lat], zoom: 15 }), THEATER);
+    await idle(page);
+    const moved = await camera(page);
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
-    // mit Standort zeigt das Sheet die Stadtteil-Auswahl erst nach „Startpunkt entfernen“
+    await kid.getByRole("button", { name: "Standort aktualisieren" }).click();
+    await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
+    await kid.getByRole("button", { name: "Fertig" }).click();
+    await idle(page);
+    expect(await camera(page)).toEqual(moved);
+
+    // Langwasser: kein Ort in 2 km, also Rückfall auf den Rahmen über alle Orte, wie ohne Startpunkt (Review M4)
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await kid.getByRole("button", { name: "Startpunkt entfernen" }).click();
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("langwasser");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    await expect.poll(async () => (await camera(page)).lat).toBeLessThan(start.lat - 0.005);
+    await expect.poll(async () => Math.abs((await camera(page)).lat - plain.lat)).toBeLessThan(0.0005);
+    await idle(page);
+    expect((await camera(page)).zoom).toBeCloseTo(plain.zoom, 5);
   });
 
-  test("gespeicherte Kartenmitte: nach dem Start wieder Startpunkt, als Punkt auf der Karte; Ausschnitt und Kacheln wie ohne Startpunkt (Plan 0016, ADR 0008)", async ({
+  test("gespeicherter Startpunkt: Karte startet dort mit 2 km Radius, hoch und quer (Plan 0056, E6, N3; ADR 0039)", async ({
     page,
-    tileLog,
   }) => {
-    const tilePaths = (from: number) => [...new Set(tileLog.slice(from).map((t) => t.path))].sort();
-    // Bezug ohne Startpunkt
-    await openMap(page);
-    const plain = await camera(page);
-    const plainTiles = tilePaths(0);
-
-    await page.evaluate(() =>
+    await page.addInitScript(() =>
       localStorage.setItem("zwergenplan.startpunkt", '{"source":"karte","lat":49.452,"lon":11.077}'),
     );
-    const before = tileLog.length;
     await openMap(page);
-    // Startpunkt gilt: Entfernung an den Kacheln (Wegzeit oder Luftlinie)
     await expect(page.locator(".meta .dist").first()).toHaveText(DIST);
-    await idle(page);
-    // Der gespeicherte Punkt ist nur ein Layer: Kamera und Kachelwahl verraten ihn nicht (Kamera-Regel).
-    expect(await camera(page)).toEqual(plain);
-    expect(tilePaths(before)).toEqual(plainTiles);
+    await expectAroundStart(page, { lat: 49.452, lon: 11.077 });
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
+
+    await page.setViewportSize({ width: 915, height: 412 });
+    await openMap(page);
+    await expectAroundStart(page, { lat: 49.452, lon: 11.077 });
+  });
+
+  test("gemerkter Ausschnitt gilt nur beim selben Startpunkt; „Alle zeigen“ zeigt alle Orte (Plan 0056, M6, N11, N12)", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await openMap(page);
+    await expectAroundStart(page, { lat: 49.448, lon: 11.058 });
+    // „Alle zeigen“ (falls der Ausschnitt etwas ausblendet) bzw. Rahmen über alle: alle 8 Angebote in der Liste
+    const showAll = page.getByRole("button", { name: "Alle zeigen" }).first();
+    if (await showAll.isVisible()) {
+      await showAll.click();
+      await idle(page);
+    }
+    await expect(offers(page)).toHaveCount(8);
+    await expect(page.getByRole("status")).toHaveText("8 Angebote");
+
+    // verschieben, Tab wechseln, zurück: derselbe Ausschnitt (Sitzung, E9)
+    await page.evaluate(([lon, lat]) => window.__zpMap?.jumpTo({ center: [lon, lat], zoom: 15 }), BIBLIOTHEK);
+    await idle(page);
+    const moved = await camera(page);
+    await page.getByRole("button", { name: "Liste", exact: true }).click();
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await idle(page);
+    expect(await camera(page)).toEqual(moved);
+
+    // Startpunkt bei geschlossener Karte gewechselt: beim Öffnen am neuen Startpunkt
+    await page.getByRole("button", { name: "Liste", exact: true }).click();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+    await kid.getByLabel("Stadtteil", { exact: true }).selectOption("st-johannis");
+    await kid.getByRole("button", { name: "Fertig" }).click();
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await idle(page);
+    expect(await camera(page)).not.toEqual(moved);
   });
 
   test("Karte der Merkliste: nur Gemerktes, Statuszeile, derselbe Startausschnitt wie in „Entdecken“ (Plan 0025, E4)", async ({
@@ -713,9 +786,15 @@ test.describe("mit gemockten Kacheln", () => {
     ).toHaveAttribute("aria-current", "page");
     expect(await camera(page)).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);
+
+    // auch mit gespeichertem Startpunkt startet die Merklisten-Karte über alle Orte (Plan 0056, Option a)
+    await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    await openMap(page, "./?ansicht=merkliste-karte");
+    await expect(offers(page)).toHaveCount(3);
+    expect(await camera(page)).toEqual(plain);
   });
 
-  test("Startausschnitt verrät weder Standort noch Alter: Standort, Geburtsdatum, „Kurse“ und „bis 20 Min.“ in der Liste, dann Karte (Arch-Review B1, m1; Plan 0009)", async ({
+  test("Startausschnitt hängt am Startpunkt, nicht an Alter, Filtern und Wegzeit-Grenze (Plan 0056, E6; Arch-Review B1, m1)", async ({
     page,
     context,
     tileLog,
@@ -728,13 +807,7 @@ test.describe("mit gemockten Kacheln", () => {
     };
     const tilesSince = (index: number) => [...new Set(tileLog.slice(index).map((t) => t.path))].sort();
 
-    // ohne Startpunkt
-    await page.goto("./");
-    await expect(page.getByTestId("offer").first()).toBeVisible();
-    const plain = await openFromList();
-    const plainTiles = tilesSince(0);
-
-    // Neuladen leert den Sitzungs-Ausschnitt; Standort (nahe Familientreff) und Wegzeit-Grenze in der Liste
+    // nur Standort (nahe Familientreff)
     await context.grantPermissions(["geolocation"]);
     await context.setGeolocation({ latitude: 49.45213, longitude: 11.07672 });
     await page.goto("./");
@@ -743,6 +816,14 @@ test.describe("mit gemockten Kacheln", () => {
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
+    await kid.getByRole("button", { name: "Fertig" }).click();
+    const plain = await openFromList();
+    const plainTiles = tilesSince(0);
+
+    // Neuladen leert den Sitzungs-Ausschnitt; derselbe Startpunkt (gespeichert), dazu Alter, „Kurse“, „bis 20 Min.“
+    await page.goto("./");
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await kid.getByLabel("Geburtsdatum").fill("01.09.2026");
     await expect(kid.getByText("Dein Kind ist heute 1 Monat alt.")).toBeVisible();
     await kid.getByRole("button", { name: "Fertig" }).click();
@@ -752,10 +833,9 @@ test.describe("mit gemockten Kacheln", () => {
     await filter.getByRole("button", { name: "bis 20 Min." }).click();
     await filter.getByRole("button", { name: /Angebote? zeigen$/ }).click();
     const before = tileLog.length;
-    const withOrigin = await openFromList();
+    const filtered = await openFromList();
     // Filter, Alter und Wegzeit wirken auf Marker und Liste, aber nicht auf den Ausschnitt
-    await expect(page.getByRole("status")).not.toHaveText(/^8 Angebote/);
-    expect(withOrigin).toEqual(plain);
+    expect(filtered).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);
   });
 

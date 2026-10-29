@@ -7,11 +7,12 @@
  * Nur der Karten-Chunk (`ui/karte/`) importiert dieses Modul (`lazy-domain-apart`).
  */
 
-import { initialCamera, type StartCamera } from "./camera.ts";
+import { initialCamera, overviewCamera, type StartCamera } from "./camera.ts";
 import { applyFilters, EMPTY_FILTER } from "./filter.ts";
 import { type GeoPoint, isGeoPoint } from "./geo.ts";
 import { type Bounds, inBox } from "./map-view.ts";
 import { placeKey } from "./place-key.ts";
+import type { Origin } from "./reach.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
 
 export interface ProviderAtPlace {
@@ -114,11 +115,16 @@ export function providersWithPlace(geometry: ProviderGeometry): Set<string> {
 }
 
 /** Startausschnitt: Rahmen über alle Orte; nie Startpunkt oder Stadtteil (ADR 0038) */
-export function providerCamera(geometry: ProviderGeometry): StartCamera {
+export function providerCamera(geometry: ProviderGeometry, origin?: Origin): StartCamera {
   return initialCamera(
     geometry.points.map((p) => p.geo),
-    undefined,
+    origin,
   );
+}
+
+/** Rahmen über alle Anbieter-Orte: Ziel von „Alle zeigen“ (Plan 0056, N11) */
+export function providerOverview(geometry: ProviderGeometry): StartCamera {
+  return overviewCamera(geometry.points.map((p) => p.geo));
 }
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "de");

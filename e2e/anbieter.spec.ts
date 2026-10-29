@@ -485,7 +485,7 @@ test.describe("Privatsphäre (E9)", () => {
     expect(page.url()).not.toContain("bibliothek");
   });
 
-  test("mit offenem Tab einen Startpunkt wählen: ab dem Tipp kein Request", async ({ page }) => {
+  test("mit offenem Tab einen Startpunkt wählen: ab dem Tipp kein Request außer Kacheln", async ({ page }) => {
     await ready(page, "./?ansicht=anbieter");
     await listReady(page);
     await mapSettled(page);
@@ -504,9 +504,10 @@ test.describe("Privatsphäre (E9)", () => {
     // Wegzeit ab Gostenhof an der ersten Zeile, die Statuszeile nur mit Zahl (Plan 0056, E2)
     await expect(rows(page).first()).toContainText(" Min.");
     await listReady(page);
-    // Die Anbieterkarte fährt nicht zum Stadtteil (ADR 0038): auch keine Kachel
+    // Die Anbieterkarte fährt zum Stadtteil und lädt dabei Kacheln (ADR 0039, gemockt); sonst nichts
     await mapSettled(page);
-    expect(urls(requests), "kein Request nach der Wahl des Startpunkts").toEqual([]);
+    const own = requests.filter((r) => !r.url().startsWith("https://tiles.openfreemap.org/"));
+    expect(urls(own), "kein Request außer Kacheln nach der Wahl des Startpunkts").toEqual([]);
     expect(page.url()).not.toContain("gostenhof");
   });
 

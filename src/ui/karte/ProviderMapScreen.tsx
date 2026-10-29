@@ -4,11 +4,13 @@
  * Liste (`onInView`); ohne Karte (WebGL, Kacheln, Chunk) meldet sie `undefined`, und die Liste zeigt alle.
  */
 import { type ComponentType, useCallback, useEffect, useMemo, useState } from "react";
+import { originKey } from "../../domain/camera.ts";
 import type { Bounds } from "../../domain/map-view.ts";
 import {
   mapUpcoming,
   providerCamera,
   providerGeometry,
+  providerOverview,
   providerPlaces,
   providersInBounds,
   providersWithPlace,
@@ -37,7 +39,9 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
     () => providerGeometry({ providers: directory.providers, upcoming }),
     [directory.providers, upcoming],
   );
-  const start = useMemo(() => providerCamera(geometry), [geometry]);
+  // am Startpunkt, ohne Orte im Umkreis über alle (Plan 0056, E6; ADR 0039 ändert ADR 0038, Punkt 3 und 4)
+  const start = useMemo(() => providerCamera(geometry, props.origin), [geometry, props.origin]);
+  const overview = useMemo(() => providerOverview(geometry), [geometry]);
   const known = useMemo(() => providersWithPlace(geometry), [geometry]);
   const places = useMemo(
     () => providerPlaces({ providers: directory.providers, upcoming, visible }),
@@ -80,6 +84,8 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
             key={build}
             layer={layer}
             start={start}
+            overview={overview}
+            startKey={originKey(props.origin)}
             origin={props.origin}
             dark={props.dark}
             onPlace={(key) => {

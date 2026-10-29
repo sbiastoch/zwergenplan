@@ -454,7 +454,7 @@ export function App() {
    * Karte in „Entdecken“ (sichtbare Angebote) und auf der Merkliste (gemerkte, Plan 0025, E4). Der Startausschnitt
    * kommt in beiden Fällen aus allen kommenden Angeboten (`views.map.cameraOffers`, ADR 0008), nie aus der Merkliste.
    */
-  const mapPanel = (shown: readonly SiteOffer[], cardCtx: CardContext) =>
+  const mapPanel = (shown: readonly SiteOffer[], cardCtx: CardContext, followOrigin: boolean) =>
     views.map && (
       <MapPanel
         offers={shown}
@@ -466,6 +466,7 @@ export function App() {
         onSheetOpen={setPlaceSheet}
         onInView={onMapInView}
         resetKey={mapReset}
+        followOrigin={followOrigin}
       />
     );
   /*
@@ -625,7 +626,7 @@ export function App() {
             )}
           </>
         )}
-        {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, discoverCtx)}
+        {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, discoverCtx, true)}
         {load.kind === "ready" && (route.tab === "entdecken" || route.tab === "karte") && (
           <>
             {askOrigin && (
@@ -719,7 +720,7 @@ export function App() {
             onTab={(tab) => replace({ ...route, tab })}
             // Startseiten-Filter und Alter wirken auf der Merkliste nicht: Zurücksetzen meint den Merklisten-Filter,
             // einen Altersausweg gibt es nicht
-            renderMap={(savedOffers) => mapPanel(savedOffers, ctx)}
+            renderMap={(savedOffers) => mapPanel(savedOffers, ctx, false)}
             renderCalendar={(onResetSaved) =>
               views.savedCalendar && (
                 <SavedCalendar

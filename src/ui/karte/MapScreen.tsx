@@ -5,6 +5,7 @@
  * lädt erst von hier; ohne WebGL, ohne Kacheln oder ohne Karten-Chunk bleibt alles hier bedienbar.
  */
 import { type ComponentType, useCallback, useEffect, useMemo, useState } from "react";
+import { originKey } from "../../domain/camera.ts";
 import type { Bounds } from "../../domain/map-view.ts";
 import { placeKey as keyOf } from "../../domain/place-key.ts";
 import { offersInBounds, type Place } from "../../domain/places.ts";
@@ -27,7 +28,12 @@ const NOTES: Record<MapProblem, string> = {
 
 export function MapScreen(props: MapScreenProps) {
   const { offers, cameraOffers, origin, ctx, onSheetOpen, onInView } = props;
-  const { places, start } = useMemo(() => mapData(offers, cameraOffers, origin), [offers, cameraOffers, origin]);
+  // Startausschnitt am Startpunkt, auf der Merkliste über alle Orte (Plan 0056, E6, Option a)
+  const cameraOrigin = props.followOrigin ? origin : undefined;
+  const { places, start, overview } = useMemo(
+    () => mapData(offers, cameraOffers, cameraOrigin),
+    [offers, cameraOffers, cameraOrigin],
+  );
   // eigene Identität nur bei neuen Orten: Sonst tauschte MapView bei jedem Render die Daten (E9)
   const layer = useMemo((): MapLayer => ({ kind: "angebote", places }), [places]);
   const { module, attempt, retry } = useLazy(loadMapView);
@@ -69,6 +75,8 @@ export function MapScreen(props: MapScreenProps) {
             key={build}
             layer={layer}
             start={start}
+            overview={overview}
+            startKey={originKey(cameraOrigin)}
             origin={origin}
             dark={props.dark}
             onPlace={(key) => {

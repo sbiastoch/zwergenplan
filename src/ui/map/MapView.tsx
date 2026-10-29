@@ -17,7 +17,7 @@ import { useEffect, useRef } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./map-overrides.css"; // nach maplibre-gl.css (E4)
 import { guardTileRequest, styleUrl } from "../../data/tiles.ts";
-import { DISTRICT_ZOOM, type StartCamera } from "../../domain/camera.ts";
+import { type StartCamera, zoomForRadius } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
 import type { MapLayer, MapViewProps } from "../map-types.ts";
 import { BASEMAP_PAINT, basemapChanges, basemapPalette, type MapTokens } from "./basemap.ts";
@@ -76,18 +76,29 @@ type Kind = MapLayer["kind"];
 /**
  * Zuletzt gesehener Ausschnitt dieser Sitzung; nie in URL oder Speicher (E9). Nur die Angebotskarte merkt ihn: Die
  * Anbieterkarte startet immer im Startausschnitt, sonst schrumpfte die Liste beim Zurückkehren ohne Eingabe (N8).
+ * Er gilt nur beim selben Startpunkt (`startKey`); ein neuer Startpunkt startet am neuen Ort (Plan 0056, M6, N12).
  */
-let lastCamera: { center: LngLatLike; zoom: number } | undefined;
+let lastCamera: { center: LngLatLike; zoom: number; key: string | undefined } | undefined;
 
 const paddingOf = (kind: Kind) => (kind === "anbieter" ? PROVIDER_PADDING : START_PADDING);
 
+/** Mitte mit Radius: Zoom aus der kürzeren Kante der Karte, höchstens `START_MAX_ZOOM` (Plan 0056, E6, N3) */
+function aroundOptions(camera: { around: GeoPoint; radiusKm: number }, el: HTMLElement) {
+  const edge = Math.max(1, Math.min(el.clientWidth, el.clientHeight));
+  const zoom = Math.min(START_MAX_ZOOM, zoomForRadius(camera.around.lat, camera.radiusKm, edge));
+  return { center: lngLat(camera.around), zoom };
+}
+
 /**
- * Ausschnitt beim Öffnen (E9): der dieser Sitzung, sonst `start` aus `initialCamera` (öffentliche Daten,
- * nie Standort oder Kartenmitte). Als Konstruktor-Option, damit vorher kein anderer Ausschnitt Kacheln lädt.
+ * Ausschnitt beim Öffnen (E9): der dieser Sitzung beim selben Startpunkt, sonst `start` aus `initialCamera`. Als
+ * Konstruktor-Option, damit vorher kein anderer Ausschnitt Kacheln lädt.
  */
-function cameraOptions(start: StartCamera, kind: Kind): Partial<MapOptions> {
-  if (lastCamera && kind === "angebote") return lastCamera;
+function cameraOptions(start: StartCamera, kind: Kind, key: string | undefined, el: HTMLElement): Partial<MapOptions> {
+  if (lastCamera && kind === "angebote" && lastCamera.key === key) {
+    return { center: lastCamera.center, zoom: lastCamera.zoom };
+  }
   if ("center" in start) return { center: lngLat(start.center), zoom: start.zoom };
+  if ("around" in start) return aroundOptions(start, el);
   const { minLat, minLon, maxLat, maxLon } = start.bounds;
   return {
     bounds: [minLon, minLat, maxLon, maxLat],
@@ -183,8 +194,28 @@ function onTap(map: MapLibre, kind: Kind, { x, y }: { x: number; y: number }, on
   }
 }
 
+/** Fährt auf einen Ausschnitt; bei reduzierter Bewegung springt MapLibre selbst */
+function moveTo(map: MapLibre, camera: StartCamera, kind: Kind) {
+  if ("center" in camera) {
+    map.easeTo({ center: lngLat(camera.center), zoom: camera.zoom });
+    return;
+  }
+  if ("around" in camera) {
+    map.easeTo(aroundOptions(camera, map.getContainer()));
+    return;
+  }
+  const { minLat, minLon, maxLat, maxLon } = camera.bounds;
+  map.fitBounds(
+    [
+      [minLon, minLat],
+      [maxLon, maxLat],
+    ],
+    { padding: paddingOf(kind), maxZoom: START_MAX_ZOOM },
+  );
+}
+
 export function MapView(props: MapViewProps) {
-  const { layer, origin, dark, resetKey } = props;
+  const { layer, origin, dark, resetKey, startKey } = props;
   // je Mount fest: Angebots- und Anbieterkarte sind getrennte Mounts (Plan 0055, E5)
   const kind = useRef(layer.kind).current;
   const container = useRef<HTMLDivElement>(null);
@@ -192,7 +223,6 @@ export function MapView(props: MapViewProps) {
   // Die Karte entsteht einmal je Mount; Daten und Callbacks liest sie über diese Ref.
   const latest = useRef(props);
   latest.current = props;
-  const shownOrigin = useRef(origin);
   const shownDark = useRef(dark);
 
   useEffect(() => {
@@ -215,7 +245,7 @@ export function MapView(props: MapViewProps) {
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
-        ...cameraOptions(start.start, kind),
+        ...cameraOptions(start.start, kind, start.startKey, el),
       });
     } catch {
       start.onProblem("webgl");
@@ -285,7 +315,9 @@ export function MapView(props: MapViewProps) {
     return () => {
       clearTimeout(timer);
       clearTimeout(collapse);
-      if (kind === "angebote") lastCamera = { center: map.getCenter(), zoom: map.getZoom() };
+      if (kind === "angebote") {
+        lastCamera = { center: map.getCenter(), zoom: map.getZoom(), key: latest.current.startKey };
+      }
       mapRef.current = undefined;
       if (__E2E__) Object.assign(window, { __zpMap: undefined });
       map.remove();
@@ -297,39 +329,29 @@ export function MapView(props: MapViewProps) {
     mapRef.current?.getSource<GeoJSONSource>(SOURCE[kind])?.setData(featuresOf(layer));
   }, [layer, kind]);
 
-  // „Alle zeigen“ (Plan 0055, N9): zurück auf den Startausschnitt; bei reduzierter Bewegung springt MapLibre selbst
+  // „Alle zeigen“ (Plan 0055, N9): auf den Rahmen über alle Orte (Plan 0056, N11); bei reduzierter Bewegung springt
+  // MapLibre selbst
   const shownReset = useRef(resetKey);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || shownReset.current === resetKey) return;
     shownReset.current = resetKey;
-    const start = latest.current.start;
-    if ("center" in start) {
-      map.easeTo({ center: lngLat(start.center), zoom: start.zoom });
-      return;
-    }
-    const { minLat, minLon, maxLat, maxLon } = start.bounds;
-    map.fitBounds(
-      [
-        [minLon, minLat],
-        [maxLon, maxLat],
-      ],
-      { padding: paddingOf(kind), maxZoom: START_MAX_ZOOM },
-    );
+    moveTo(map, latest.current.overview, kind);
   }, [resetKey, kind]);
 
   useEffect(() => {
+    mapRef.current?.getSource<GeoJSONSource>("startpunkt")?.setData(originToFeatures(origin));
+  }, [origin]);
+
+  // Neuer Startpunkt bei offener Karte: Sie fährt auf den neuen Startausschnitt, auf allen Karten außer der
+  // Merkliste (Plan 0056, E6; ADR 0039). Derselbe Startpunkt noch einmal bewegt nichts (N12).
+  const shownStartKey = useRef(startKey);
+  useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
-    map.getSource<GeoJSONSource>("startpunkt")?.setData(originToFeatures(origin));
-    const before = shownOrigin.current;
-    shownOrigin.current = origin;
-    // Nur ein Stadtteil bewegt die Kamera (grob, öffentlich). Standort und Kartenmitte werden nur gezeichnet. Die
-    // Anbieterkarte fährt nie: Sonst filterte eine Wahl im Kind-Sheet still die Liste (Plan 0055, Review M3).
-    if (kind === "angebote" && origin?.source === "stadtteil" && origin.districtId !== before?.districtId) {
-      map.easeTo({ center: lngLat(origin.point), zoom: DISTRICT_ZOOM });
-    }
-  }, [origin, kind]);
+    if (!map || shownStartKey.current === startKey) return;
+    shownStartKey.current = startKey;
+    moveTo(map, latest.current.start, kind);
+  }, [startKey, kind]);
 
   useEffect(() => {
     const map = mapRef.current;

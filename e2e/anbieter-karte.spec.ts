@@ -210,25 +210,93 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     expect(await features(page)).toHaveLength(7);
   });
 
-  test("8: Kamera-Regel: mit Stadtteil als Startpunkt derselbe Startausschnitt über alle Orte", async ({ page }) => {
-    await openTab(page);
-    const before = await page.evaluate(() => ({
-      center: window.__zpMap?.getCenter(),
-      zoom: window.__zpMap?.getZoom(),
-    }));
-    await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
-    await openTab(page);
-    const after = await page.evaluate(() => ({ center: window.__zpMap?.getCenter(), zoom: window.__zpMap?.getZoom() }));
-    expect(after).toEqual(before);
-    // alle Orte im Bild: Bildschirmpunkt innerhalb der Kartenfläche
-    const inside = await page.evaluate((points) => {
-      const box = document.querySelector(".map-box .map-canvas")?.getBoundingClientRect();
-      return points.map(({ lat, lon }) => {
-        const p = window.__zpMap?.project([lon, lat]);
-        return p !== undefined && box !== undefined && p.x >= 0 && p.y >= 0 && p.x <= box.width && p.y <= box.height;
+  test("8: mit Stadtteil startet die Karte dort (2 km Radius), ohne Orte im Umkreis über alle; „Alle zeigen“ zeigt alle (Plan 0056, E6, N3, N11)", async ({
+    page,
+  }) => {
+    const camera = () =>
+      page.evaluate(() => {
+        const map = window.__zpMap;
+        if (!map) throw new Error("keine Karte");
+        const b = map.getBounds();
+        const { lat, lng } = map.getCenter();
+        const kmLon = 111.32 * Math.cos((lat * Math.PI) / 180);
+        return {
+          lat,
+          lon: lng,
+          zoom: map.getZoom(),
+          width: (b.getEast() - b.getWest()) * kmLon,
+          height: (b.getNorth() - b.getSouth()) * 111.32,
+        };
       });
-    }, ALL_PLACES);
-    expect(inside.every(Boolean)).toBe(true);
+    const allInside = () =>
+      page.evaluate((points) => {
+        const box = document.querySelector(".map-box .map-canvas")?.getBoundingClientRect();
+        return points.every(({ lat, lon }) => {
+          const p = window.__zpMap?.project([lon, lat]);
+          return p !== undefined && box !== undefined && p.x >= 0 && p.y >= 0 && p.x <= box.width && p.y <= box.height;
+        });
+      }, ALL_PLACES);
+
+    await openTab(page);
+    const plain = await camera();
+    expect(await allInside()).toBe(true);
+
+    // Gostenhof: Mitte am Stadtteil, höchstens etwa 6 × 6 km, hoch und quer
+    await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
+    for (const viewport of [undefined, { width: 915, height: 412 }]) {
+      if (viewport) await page.setViewportSize(viewport);
+      await openTab(page);
+      const at = await camera();
+      expect(Math.abs(at.lat - 49.448)).toBeLessThan(0.005);
+      expect(Math.abs(at.lon - 11.058)).toBeLessThan(0.005);
+      // kürzere Kante ≈ 4 km (2 km Radius); die längere wächst mit dem Seitenverhältnis (N3)
+      expect(Math.min(at.width, at.height)).toBeGreaterThan(3.5);
+      expect(Math.min(at.width, at.height)).toBeLessThanOrEqual(6);
+    }
+
+    // „Alle zeigen“ fährt auf den Rahmen über alle Orte, nicht zurück zum Stadtteil
+    const showAll = page.getByRole("button", { name: "Alle zeigen" }).first();
+    if (await showAll.isVisible()) {
+      await showAll.click();
+      await idle(page);
+      expect(await allInside()).toBe(true);
+    }
+
+    // Langwasser: kein Anbieter-Ort in 2 km, Rückfall auf alle Orte (Review M4)
+    await page.setViewportSize({ width: 412, height: 915 });
+    await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "langwasser"));
+    await openTab(page);
+    const fallback = await camera();
+    await page.evaluate(() => localStorage.removeItem("zwergenplan.entfernung-ab"));
+    await openTab(page);
+    expect(fallback).toEqual(await camera());
+    expect(plain.zoom).toBeGreaterThan(0);
+  });
+
+  test("8b: neuer Startpunkt bei offenem Tab fährt die Karte hin, derselbe nochmal nicht (Plan 0056, N12)", async ({
+    page,
+  }) => {
+    const center = () =>
+      page.evaluate(() => {
+        const c = window.__zpMap?.getCenter();
+        return c && { lat: c.lat, lng: c.lng, zoom: window.__zpMap?.getZoom() };
+      });
+    await openTab(page);
+    const pick = async (district: string) => {
+      await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+      const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+      await kid.getByLabel("Stadtteil", { exact: true }).selectOption(district);
+      await kid.getByRole("button", { name: "Fertig" }).click();
+    };
+    await pick("gostenhof");
+    await expect.poll(async () => Math.abs(((await center())?.lat ?? 0) - 49.448)).toBeLessThan(0.005);
+    await idle(page);
+    // verschieben, dann denselben Stadtteil noch einmal wählen: keine Bewegung
+    await jump(page, TREFF, 15);
+    const moved = await center();
+    await pick("gostenhof");
+    await idle(page);
+    expect(await center()).toEqual(moved);
   });
 
   test("10: Rückfall-Anbieter ohne Katalog-Eintrag steht mit dem Ort seines Angebots auf der Karte", async ({

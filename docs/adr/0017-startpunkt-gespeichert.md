@@ -1,6 +1,6 @@
 # ADR 0017 – Der Startpunkt bleibt auf dem Gerät, auch als gerundeter Punkt
 
-Status: angenommen (2026-10-06), umgesetzt mit Plan 0016. Nutzerentscheidung vom 2026-10-06.
+Status: angenommen (2026-10-06), umgesetzt mit Plan 0016. Nutzerentscheidung vom 2026-10-06. **Geändert durch ADR 0039** (Plan 0056): Die Karte startet am gespeicherten Startpunkt; Kachel-Requests zeigen dessen Gegend (Folgen unten und Punkt 3 für Kacheln überholt).
 - Ersetzt Plan 0004, E3, „Der Standort bleibt nur im Arbeitsspeicher“ (Nutzerentscheidung 1) und Plan 0005, E8, „Kartenmitte nur im Speicher“.
 - Ändert die Invarianten „Startpunkt“ und „Kein Request hängt davon ab, welcher Startpunkt gilt“ in `docs/architecture.md`.
 - Ändert ADR 0011, Punkt 6, Spiegelstriche 1 und 3 (Laden beim Start und das verratene Bit: „ein Startpunkt“ statt „ein Stadtteil“).

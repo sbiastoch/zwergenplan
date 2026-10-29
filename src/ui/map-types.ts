@@ -28,6 +28,11 @@ export interface MapScreenProps {
   toast: ToastMessage;
   /** Orts-Sheet auf oder zu: Der Seiten-Toast schweigt dann (App) */
   onSheetOpen: (open: boolean) => void;
+  /**
+   * Startet am Startpunkt und fährt bei einem neuen (Plan 0056, E6). Die Merklisten-Karte nicht: Sie startet über
+   * alle Orte (Nutzerentscheid, Option a).
+   */
+  followOrigin: boolean;
   /** Kartenausschnitt nach `placeKey` für die Liste darunter (Plan 0056, E5); `undefined` beim Abbau und bei Fehlern */
   onInView: (view: MapExtent | undefined) => void;
   /** Zähler: Jede Änderung setzt die Kamera auf den Startausschnitt („Alle zeigen“) */
@@ -82,7 +87,14 @@ export interface MapViewProps {
   layer: MapLayer;
   /** Ausschnitt beim ersten Öffnen der Sitzung, aus öffentlichen Daten (`initialCamera`, ADR 0008) */
   start: StartCamera;
-  /** wird nur gezeichnet; angefahren wird nur ein Stadtteil, und nur auf der Angebotskarte (E9, ADR 0008, ADR 0038) */
+  /** Rahmen über alle Orte: Ziel von „Alle zeigen“ (Plan 0056, N11) */
+  overview: StartCamera;
+  /**
+   * Startpunkt, nach dem `start` gerechnet ist (`originKey`, N12). Ändert er sich bei offener Karte, fährt sie auf
+   * den neuen `start`; der gemerkte Ausschnitt gilt nur bei gleichem Schlüssel (Plan 0056, E6).
+   */
+  startKey: string | undefined;
+  /** Startpunkt, als lokaler Layer gezeichnet */
   origin: Origin | undefined;
   dark: boolean;
   /** Tipp auf einen Ort-Marker */
@@ -92,7 +104,7 @@ export interface MapViewProps {
   onProblem: (problem: MapProblem) => void;
   /** Ausschnitt nach `load` und jedem `moveend` (Anbieterkarte, Plan 0055, E4) */
   onViewport?: ((bounds: Bounds) => void) | undefined;
-  /** Zähler: Jede Änderung fährt zurück auf `start` (Plan 0055, N9) */
+  /** Zähler: Jede Änderung fährt auf `overview` („Alle zeigen“, Plan 0055, N9; Plan 0056, N11) */
   resetKey?: number | undefined;
 }
 
