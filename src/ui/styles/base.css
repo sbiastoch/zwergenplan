@@ -41,6 +41,13 @@
     outline: 3px solid var(--ink);
     outline-offset: 2px;
   }
+  /*
+   * Fokus-Anker (`tabIndex={-1}`: Name im Sheet, Statuszeile, Überschriften) sind nicht bedienbar, nur Ziel für
+   * Screenreader. Chrome zeigt beim Öffnen eines Dialogs trotzdem den Rahmen; er wirkte wie ein Fehler (Nutzer).
+   */
+  [tabindex="-1"]:focus-visible {
+    outline: none;
+  }
 }
 
 @layer components {
