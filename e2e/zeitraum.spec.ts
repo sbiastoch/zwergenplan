@@ -118,6 +118,38 @@ test("Tippen per Tastatur: halbe Jahre und „bis“ vor „von“ springen nich
   await expect(page).toHaveURL(/\?von=2026-11-11$/);
 });
 
+test("Zeitraum mit Alter: regelmäßig zählt nur ein passender Termin darin, die Merkliste markiert ohne Zeitraum (Plan 0053, E2)", async ({
+  page,
+}) => {
+  // Krabbeltreff 6–24 Monate, Kind geb. 20.4.2026: am 7.10. 5 Monate, passend erst ab 21.10.
+  await page.addInitScript(() => {
+    localStorage.setItem("zwergenplan.geburtsdatum", "2026-04-20");
+    localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["lxizt974"]));
+  });
+  await page.goto("./?von=2026-10-05&bis=2026-10-11");
+  await expect(offers(page).first()).toBeVisible();
+  const treff = page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" });
+  await expect(treff).toHaveCount(0);
+
+  // Altersfilter aus: Der Treff steht markiert da, sein Detail sagt dasselbe
+  const sheet = await openFilter(page);
+  await sheet.getByRole("switch", { name: /^Nur passend für/ }).click();
+  await sheet.getByRole("button", { name: /Angebote? zeigen$/ }).click();
+  await expect(sheet).toBeHidden();
+  await expect(page.locator(".card.unfit").filter({ hasText: "Offener Krabbeltreff" })).toBeVisible();
+  await treff.getByRole("button").click();
+  const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
+  await expect(detail.getByText(/^Passt nicht: am Mi 7\.10\./)).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(detail).toBeHidden();
+
+  // Merkliste: Der Zeitraum aus „Entdecken“ gilt dort nicht, der Treff passt ab 21.10.
+  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  const saved = page.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" });
+  await expect(saved).toBeVisible();
+  await expect(saved).not.toHaveClass(/\bunfit\b/);
+});
+
 test("Detail eines Kurses mit Zeitraum bezieht sich auf den Kursbeginn", async ({ page }) => {
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   await page.getByLabel("Geburtsdatum").fill("01.03.2025");

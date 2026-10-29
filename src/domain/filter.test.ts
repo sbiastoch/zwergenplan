@@ -123,6 +123,17 @@ describe("applyFilters", () => {
     expect(ids({ ...EMPTY_FILTER, categories: ["krabbel-spielgruppen"] })).toEqual(["krabbeltreff"]);
   });
 
+  it("laufende Kurse mit Anmeldung fallen heraus, außer mit runningCourses (Plan 0053, E1)", () => {
+    // 20.10.: PEKiP läuft seit 13.10., Musikgarten beginnt am 5.11.
+    const at = new Date("2026-10-20T12:00:00+02:00");
+    const kurse = { ...EMPTY_FILTER, formats: ["kurs"] } satisfies FilterState;
+    expect(applyFilters(offers, kurse, { now: at }).map(fixtureKey)).toEqual(["musikgarten-1"]);
+    expect(applyFilters(offers, kurse, { now: at, runningCourses: true }).map(fixtureKey)).toEqual([
+      "pekip-herbst",
+      "musikgarten-1",
+    ]);
+  });
+
   it("filtert nach Anmeldung", () => {
     expect(ids({ ...EMPTY_FILTER, registration: ["ohne-anmeldung"] })).toEqual([
       "krabbeltreff",

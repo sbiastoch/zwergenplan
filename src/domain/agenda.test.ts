@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   collapsedSessions,
   courseProgress,
+  discoverable,
   endedOnDay,
   groupByNextSession,
   lastSessionDay,
@@ -14,6 +15,7 @@ import {
   type SessionFit,
   sessionsByDay,
   shownSession,
+  startedCourse,
   takeGroups,
   uniformTimes,
   upcomingSessions,
@@ -208,6 +210,28 @@ describe("courseProgress", () => {
     const pekip = fixtureOffer("pekip-herbst");
     expect(courseProgress(pekip, FIXTURE_NOW)).toEqual({ total: 8, remaining: 8 });
     expect(courseProgress(pekip, new Date("2026-11-04T12:00:00+01:00"))).toEqual({ total: 8, remaining: 4 });
+  });
+});
+
+describe("startedCourse und discoverable (Plan 0053, E1)", () => {
+  const pekip = fixtureOffer("pekip-herbst"); // Kurs mit Anmeldung, Beginn 13.10. 9:30
+  const at = (iso: string) => new Date(iso);
+
+  it("ein Kurs mit Anmeldung gilt ab Beginn des ersten Termins als gestartet", () => {
+    expect(startedCourse(pekip, at("2026-10-13T09:29:00+02:00"))).toBe(false);
+    expect(startedCourse(pekip, at("2026-10-13T09:30:00+02:00"))).toBe(true);
+    expect(startedCourse(pekip, at("2026-10-20T12:00:00+02:00"))).toBe(true);
+    expect(discoverable(pekip, at("2026-10-13T09:29:00+02:00"))).toBe(true);
+    expect(discoverable(pekip, at("2026-10-20T12:00:00+02:00"))).toBe(false);
+  });
+
+  it("ohne Anmeldung und regelmäßig nie gestartet; ohne kommenden Termin nie entdeckbar", () => {
+    const open = { ...pekip, registration: "ohne-anmeldung" as const };
+    expect(startedCourse(open, at("2026-10-20T12:00:00+02:00"))).toBe(false);
+    expect(discoverable(open, at("2026-10-20T12:00:00+02:00"))).toBe(true);
+    const treff = fixtureOffer("krabbeltreff");
+    expect(startedCourse(treff, at("2026-10-20T12:00:00+02:00"))).toBe(false);
+    expect(discoverable(treff, at("2027-06-01T12:00:00+02:00"))).toBe(false);
   });
 });
 

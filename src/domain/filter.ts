@@ -1,4 +1,4 @@
-import { nextSession } from "./agenda.ts";
+import { discoverable, nextSession } from "./agenda.ts";
 import { type DateRange, dateRange, inDateRange } from "./date-range.ts";
 import { LIMIT_MINUTES, type ReachFn, type ReachLimit, type ReachTarget, withinLimit } from "./reach.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
@@ -94,6 +94,8 @@ export interface FilterContext {
   now: Date;
   /** Entfernung ab dem Startpunkt; nur mit Wegzeit (Art „oepnv“) wirkt `reachLimit` (E11) */
   reach?: ReachFn | undefined;
+  /** laufende Kurse mit Anmeldung behalten (nur die Merkliste, Plan 0053, E1); sonst fallen sie heraus */
+  runningCourses?: boolean;
 }
 
 /**
@@ -148,7 +150,8 @@ export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: Filt
 }
 
 /**
- * Angebote, deren letzter Termin vorbei ist, fallen immer heraus.
+ * Angebote, deren letzter Termin vorbei ist, fallen immer heraus, laufende Kurse mit Anmeldung außer mit
+ * `runningCourses` auch (`discoverable`, Plan 0053, E1).
  * Das Alter filtert hier bewusst nicht: Die Oberfläche zeigt unpassende Angebote auf Wunsch
  * markiert an (`splitByAge` in age.ts). Die Wegzeit-Grenze wirkt nur mit Wegzeit. Der Zeitraum braucht „jetzt“
  * (`inDateRange`, Plan 0023, E2) und wirkt deshalb hier.
@@ -161,7 +164,7 @@ export function applyFilters<T extends Offer & { venue: ReachTarget }>(
   const { range } = state;
   return offers.filter(
     (o) =>
-      nextSession(o, ctx.now) !== undefined &&
+      (ctx.runningCourses ? nextSession(o, ctx.now) !== undefined : discoverable(o, ctx.now)) &&
       matchesFilter(o, state, ctx.reach) &&
       (!range || inDateRange(o, range, ctx.now)),
   );

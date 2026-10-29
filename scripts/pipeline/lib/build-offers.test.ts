@@ -148,6 +148,65 @@ describe("buildOffers", () => {
     expect(report.notes.join("\n")).toContain("Endzeit bei 3 Termin(en) auf 60 Min. geschätzt");
   });
 
+  it("Geburtszeitraum im Titel ersetzt das Alter bei Kurs und Einzeltermin, nicht bei regelmäßig (Plan 0053, E3)", () => {
+    const course = (title: string, over: Record<string, unknown> = {}) =>
+      ev({
+        title,
+        format: "kurs",
+        registration: "mit-anmeldung",
+        age: { minMonths: 0, maxMonths: 12 },
+        schedule: { kind: "dates", dates: [{ start: "2026-10-12T09:30" }, { start: "2026-10-19T09:30" }] },
+        ...over,
+      });
+    const { file, report } = buildOffers(
+      base({
+        batches: [
+          batch("batch-1", [
+            course("PEKiP Babys geb. April–Juni 2026"),
+            course("Schnupperstunde (geb. Juni–Aug. 2026)", {
+              format: "einmalig",
+              schedule: { kind: "dates", dates: [{ start: "2026-10-12T09:30" }, { start: "2027-01-11T09:30" }] },
+            }),
+            course("Musikgarten geb. 04/2021-07/2021"),
+            ev({ title: "Miniclub: Kinder geb. 02-06/2026", age: { minMonths: 4, maxMonths: 9 } }),
+          ]),
+        ],
+      }),
+    );
+    expect(report.errors).toEqual([]);
+    const ages = Object.fromEntries((file?.offers ?? []).map((o) => [`${o.title} ${o.sessions[0]?.start}`, o.age]));
+    expect(ages).toEqual({
+      "PEKiP Babys geb. April–Juni 2026 2026-10-12T09:30:00+02:00": { minMonths: 3, maxMonths: 6 },
+      "Schnupperstunde (geb. Juni–Aug. 2026) 2026-10-12T09:30:00+02:00": { minMonths: 1, maxMonths: 4 },
+      "Schnupperstunde (geb. Juni–Aug. 2026) 2027-01-11T09:30:00+01:00": { minMonths: 4, maxMonths: 7 },
+      "Miniclub: Kinder geb. 02-06/2026 2026-10-07T10:00:00+02:00": { minMonths: 4, maxMonths: 9 },
+    });
+    expect(report.notes.join("\n")).toContain("Musikgarten geb. 04/2021-07/2021");
+  });
+
+  it("Einzeltermine eines Jahrgangs: wächst er über 36 Monate, entfallen nur die späteren Termine (Arch-Review 0053, M1)", () => {
+    // geb. 10/2023: am 12.10.2026 35–36 Monate, am 11.1.2027 38–39 Monate
+    const { file, report } = buildOffers(
+      base({
+        batches: [
+          batch("batch-1", [
+            ev({
+              title: "Spielstunde (geb. 10/2023)",
+              format: "einmalig",
+              registration: "mit-anmeldung",
+              schedule: { kind: "dates", dates: [{ start: "2026-10-12T09:30" }, { start: "2027-01-11T09:30" }] },
+            }),
+          ]),
+        ],
+      }),
+    );
+    expect(report.errors).toEqual([]);
+    expect(file?.offers.map((o) => [o.sessions[0]?.start, o.age])).toEqual([
+      ["2026-10-12T09:30:00+02:00", { minMonths: 35, maxMonths: 36 }],
+    ]);
+    expect(report.notes.join("\n")).toContain("1 Termin(e) erst ab über 36 Monaten – entfallen");
+  });
+
   it("Kurse behalten vergangene Termine; laufen über den Horizont; Kurse nach dem Horizont entfallen", () => {
     const kurs = ev({
       title: "PEKiP",
@@ -219,6 +278,31 @@ describe("buildOffers", () => {
     expect(second.file?.offers.map((o) => o.id)).toEqual(first.offers.map((o) => o.id));
     expect(second.file?.offers[0]?.sessions).toHaveLength(3);
     expect(second.report.notes.join("\n")).toContain("Kurs fortgeschrieben");
+  });
+
+  it("Geburtszeitraum bei fortgeschriebenem Kurs: Alter am wirklichen Kursbeginn (Plan 0053, E3)", () => {
+    const pekip = (dates: string[]) =>
+      ev({
+        title: "PEKiP geb. April–Juni 2026",
+        format: "kurs",
+        topics: ["pekip"],
+        schedule: { kind: "dates", dates: dates.map((d) => ({ start: `${d}T09:30` })) },
+      });
+    const first = buildOffers(
+      base({ batches: [batch("batch-1", [pekip(["2026-09-29", "2026-10-06", "2026-10-13"])])] }),
+    ).file as OffersFile;
+    const second = buildOffers(
+      base({
+        previous: first,
+        horizon: { from: "2026-10-12", to: "2027-02-12" },
+        generatedAt: "2026-10-12T06:00:00+02:00",
+        batches: [batch("batch-1", [pekip(["2026-10-13"])])],
+      }),
+    );
+    // am 29.9.: geb. 30.6. → 2 Monate, geb. 1.4. → 5 Monate (am 13.10. wären es 3–6)
+    expect(first.offers[0]?.age).toEqual({ minMonths: 2, maxMonths: 5 });
+    expect(second.file?.offers[0]?.sessions).toHaveLength(3);
+    expect(second.file?.offers[0]?.age).toEqual({ minMonths: 2, maxMonths: 5 });
   });
 
   it("übernimmt bei der Fortschreibung nur vergangene Termine (verlegter Termin erscheint nicht doppelt)", () => {

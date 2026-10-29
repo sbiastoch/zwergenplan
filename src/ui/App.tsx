@@ -274,6 +274,8 @@ export function App() {
       openDetail(offer.id);
     },
   };
+  // Liste und Karte in „Entdecken“ markieren mit dem Zeitraum des Filters, alles andere ohne (Plan 0053, E2)
+  const discoverCtx: CardContext = { ...ctx, isUnfit: (id) => views.listUnfitIds.has(id) };
   const [listCount, listWords] = listStatusParts(visible.length, route.filter.range);
   const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.map?.placeCount ?? 0);
   // „5 Anbieter mit 8 Angeboten“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4)
@@ -372,7 +374,12 @@ export function App() {
    * Karte in „Entdecken“ (sichtbare Angebote) und auf der Merkliste (gemerkte, Plan 0025, E4). Der Startausschnitt
    * kommt in beiden Fällen aus allen kommenden Angeboten (`views.map.cameraOffers`, ADR 0008), nie aus der Merkliste.
    */
-  const mapPanel = (shown: readonly SiteOffer[], onResetFilter: (() => void) | undefined, age: AgeEscape | undefined) =>
+  const mapPanel = (
+    shown: readonly SiteOffer[],
+    onResetFilter: (() => void) | undefined,
+    age: AgeEscape | undefined,
+    cardCtx: CardContext,
+  ) =>
     views.map && (
       <MapPanel
         offers={shown}
@@ -381,7 +388,7 @@ export function App() {
         reach={transit.reach}
         dark={theme.dark}
         hasData={offers.length > 0}
-        ctx={ctx}
+        ctx={cardCtx}
         toast={toast}
         onSheetOpen={setPlaceSheet}
         onPickOrigin={() => setSheet("origin")}
@@ -548,7 +555,7 @@ export function App() {
                 remaining={page.remaining}
                 onMore={views.showMore}
                 today={today}
-                ctx={ctx}
+                ctx={discoverCtx}
                 hasData={offers.length > 0}
                 onResetFilter={resetIfActive}
                 age={ageEscape}
@@ -566,7 +573,7 @@ export function App() {
             )}
           </>
         )}
-        {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, resetIfActive, ageEscape)}
+        {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, resetIfActive, ageEscape, discoverCtx)}
         {load.kind === "ready" && route.tab === "anbieter" && (
           <ProviderPanel
             generatedAt={load.data.generatedAt}
@@ -597,7 +604,7 @@ export function App() {
             placeCount={views.map?.placeCount ?? 0}
             // Startseiten-Filter und Alter wirken auf der Merkliste nicht: Zurücksetzen meint den Merklisten-Filter,
             // einen Altersausweg gibt es nicht
-            renderMap={(savedOffers, onResetSaved) => mapPanel(savedOffers, onResetSaved, undefined)}
+            renderMap={(savedOffers, onResetSaved) => mapPanel(savedOffers, onResetSaved, undefined, ctx)}
             renderCalendar={(onResetSaved) =>
               views.savedCalendar && (
                 <SavedCalendar

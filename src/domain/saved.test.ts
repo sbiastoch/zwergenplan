@@ -388,6 +388,14 @@ describe("Filter der Merkliste (Plan 0025, E6)", () => {
     expect(applySavedFilter([site("vergangen")], EMPTY_SAVED_FILTER, FIXTURE_NOW, all)).toEqual([]);
   });
 
+  it("ein gemerkter laufender Kurs bleibt (Plan 0053, E1)", () => {
+    expect(keys(applySavedFilter(offers, EMPTY_SAVED_FILTER, new Date("2026-10-20T12:00:00+02:00"), all))).toEqual([
+      "pekip-herbst",
+      "musikgarten-1",
+      "krabbeltreff",
+    ]);
+  });
+
   it("Format wirkt als ODER, Anmeldung zusätzlich als UND", () => {
     expect(keys(applySavedFilter(offers, filter({ formats: ["kurs"] }), FIXTURE_NOW, all))).toEqual([
       "pekip-herbst",

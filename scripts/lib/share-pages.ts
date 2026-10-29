@@ -264,7 +264,8 @@ export function providerSharePage(
   generatedAt: string,
 ): SharePage {
   const ref = new Date(generatedAt);
-  // wie das Anbieter-Sheet: Zahl und Kategorien aus den kommenden Angeboten (directory.ts, Plan 0030)
+  // wie das Anbieter-Sheet: Zahl und Kategorien aus den kommenden Angeboten ohne laufende Kurse (directory.ts, Plan 0030,
+  // Plan 0053, E1)
   const own = providerOffers(offers, provider.id, ref);
   const upcoming = own.length;
   const count =

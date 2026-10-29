@@ -125,13 +125,31 @@ test("Anmeldefrist: offen bis 9.10., danach vorbei (B4)", async ({ page }) => {
 });
 
 test("laufender Kurs zählt die übrigen Termine (H8)", async ({ page }) => {
-  // Di 20.10. 12:00: Die Termine vom 13. und 20.10. (9:30–11:00) sind beendet.
+  // Di 20.10. 12:00: Die Termine vom 13. und 20.10. (9:30–11:00) sind beendet. Die Liste zeigt laufende Kurse nicht
+  // mehr (Plan 0053, E1), das Detail per Link schon.
   await reloadAt(page, new Date("2026-10-20T12:00:00+02:00"));
-  const dialog = await openDetail(page, PEKIP);
+  await page.goto("./?angebot=nle21y1x");
+  const dialog = page.getByRole("dialog", { name: PEKIP });
+  await expect(dialog).toBeVisible();
   await expect(dialog.getByText("Kurs · noch 6 von 8 Terminen", { exact: true })).toBeVisible();
   await expect(dialog.getByText("Di 13.10. bis Di 1.12., jeweils 9:30–11:00")).toBeVisible();
   // Kurse bleiben in der Kalenderdatei komplett (ADR 0007)
   await expect(dialog.getByRole("link", { name: "Alle 8 Kurstermine" })).toBeVisible();
+});
+
+test("laufender Kurs: fehlt in „Entdecken“, gemerkt steht er mit Fortschritt auf der Merkliste (Plan 0053, E1)", async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["nle21y1x"])));
+  // Gegenprobe: kurz vor Beginn (13.10. 9:30) steht PEKiP noch in der Liste
+  await reloadAt(page, new Date("2026-10-13T09:00:00+02:00"));
+  await expect(page.getByRole("heading", { level: 3, name: PEKIP })).toBeVisible();
+  await reloadAt(page, new Date("2026-10-20T12:00:00+02:00"));
+  await expect(page.getByRole("heading", { level: 3, name: PEKIP })).toHaveCount(0);
+  await page.goto("./?ansicht=merkliste");
+  const card = page.getByTestId("offer").filter({ hasText: PEKIP });
+  await expect(card).toBeVisible();
+  await expect(card).toContainText("Kurs · noch 6 von 8");
 });
 
 // Plan 0019, E1–E3, E5: Die Kachel „Wo“ öffnet die Route in Google Maps, nur mit der Adresse als Ziel. Kein Test tippt

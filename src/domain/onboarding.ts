@@ -4,7 +4,7 @@
  * `assets/onboarding/` (Regel `onboarding-domain-only-lazy`). Ob es erscheint, entscheidet `onboarding-gate.ts` im Start.
  * Aus `pwa.ts` kommen nur Typen, sonst entstünde ein geteilter Chunk mit dem App-Teil (Review M2).
  */
-import { nextSession } from "./agenda.ts";
+import { discoverable } from "./agenda.ts";
 import { plural } from "./labels.ts";
 import { countProviders } from "./provider-count.ts";
 import type { InstallState, PushCapability } from "./pwa.ts";
@@ -72,7 +72,7 @@ export function cityChoices<K extends string>(
 
 /** Zahlen für den Willkommens-Text (E5): Angebote mit kommendem Termin und deren Anbieter, wie die Statuszeile */
 export function welcomeStats(offers: readonly Offer[], now: Date): { offers: number; providers: number } {
-  const upcoming = offers.filter((o) => nextSession(o, now) !== undefined);
+  const upcoming = offers.filter((o) => discoverable(o, now));
   return { offers: upcoming.length, providers: countProviders(upcoming) };
 }
 

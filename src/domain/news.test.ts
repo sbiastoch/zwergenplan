@@ -105,6 +105,14 @@ describe("newOfferIds mit listedAt: eingestellt in dieser Woche (Plan 0043, E3)"
     expect(newOfferIds([], [byKey("krabbeltreff")], FIXTURE_NOW)).toEqual([]);
   });
 
+  it("ein neu eingestellter, schon laufender Kurs ist nicht neu (Plan 0053, E1)", () => {
+    const pekip = { ...byKey("pekip-herbst"), listedAt: "2026-10-19T06:00:00+02:00" };
+    expect(newOfferIds([], [pekip], new Date("2026-10-20T12:00:00+02:00"))).toEqual([]);
+    expect(
+      newOfferIds([], [{ ...pekip, listedAt: "2026-10-09T06:00:00+02:00" }], new Date("2026-10-10T12:00:00+02:00")),
+    ).toEqual([pekip.id]);
+  });
+
   it("Wochengrenze: Tag 6 neu, Tag 7 nicht; listedAt nach jetzt neu", () => {
     const listed = (listedAt: string) => newOfferIds([], [{ ...byKey("krabbelreime"), listedAt }], FIXTURE_NOW);
     expect(listed("2026-09-29T00:00:00+02:00")).toHaveLength(1);
@@ -145,6 +153,12 @@ describe("newOfferIds mit listedAt: eingestellt in dieser Woche (Plan 0043, E3)"
 describe("offersInWeek", () => {
   it("nimmt Angebote mit einem Termin in den nächsten 7 × 24 Stunden, in Datenreihenfolge", () => {
     expect(keys(WEEK)).toEqual(["krabbeltreff", "krabbelreime"]);
+  });
+
+  it("zählt einen laufenden Kurs nicht, einen beginnenden schon (Plan 0053, E1)", () => {
+    const pekip = [byKey("pekip-herbst")]; // Beginn 13.10., wöchentlich
+    expect(keys(offersInWeek(pekip, new Date("2026-10-10T12:00:00+02:00")))).toEqual(["pekip-herbst"]);
+    expect(offersInWeek(pekip, new Date("2026-10-20T12:00:00+02:00"))).toEqual([]);
   });
 
   it("zählt einen Termin, der genau jetzt beginnt", () => {

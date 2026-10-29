@@ -88,6 +88,40 @@ describe("useOfferViews", () => {
     expect(v.page.groups.map((g) => g.key)).toEqual(["2026-10-12", "2026-10-14"]);
   });
 
+  it("Zeitraum mit Geburtsdatum: regelmäßig nur passend, wenn ein Termin darin passt; Merkliste ohne Zeitraum (Plan 0053, E2)", () => {
+    // 12–36 Monate, Kind geb. 10.10.2025: am 7.10. 11 Monate (passt nicht), am 14.10. ein Jahr (passt)
+    const weekly: SiteOffer = {
+      ...offer("turnen", "2026-10-07", { minMonths: 12, maxMonths: 36 }, "regelmaessig"),
+      sessions: ["2026-10-07", "2026-10-14"].map((d) => ({
+        start: fromBerlinLocal(`${d}T10:00`),
+        end: fromBerlinLocal(`${d}T11:00`),
+      })),
+    };
+    const week: Route = { ...ENTDECKEN, filter: { ...EMPTY_FILTER, range: { from: "2026-10-05", to: "2026-10-11" } } };
+    const v = render({ offers: [weekly], route: week, birthDate: "2025-10-10", savedIds: [weekly.id] });
+    expect(ids(v.visible)).toEqual([]);
+    expect(v.unfitCount).toBe(1);
+    expect(v.listUnfitIds.has(weekly.id)).toBe(true);
+    // Merkliste und Sheets markieren ohne den Zeitraum aus „Entdecken“
+    expect(v.unfitIds.has(weekly.id)).toBe(false);
+    expect(savedTitles(v)).toEqual(["turnen"]);
+    expect(ids(render({ offers: [weekly], birthDate: "2025-10-10" }).visible)).toEqual(["turnen"]);
+  });
+
+  it("laufender Kurs: fehlt in „Entdecken“, gemerkt auf der Merkliste und als unpassend markiert (Plan 0053, E1)", () => {
+    const kurs: SiteOffer = {
+      ...offer("pekip", "2026-10-01", { minMonths: 0, maxMonths: 3 }, "kurs"),
+      sessions: ["2026-10-01", "2026-10-08"].map((d) => ({
+        start: fromBerlinLocal(`${d}T10:00`),
+        end: fromBerlinLocal(`${d}T11:00`),
+      })),
+    };
+    const v = render({ offers: [kurs, BABY], birthDate: "2026-01-01", savedIds: [kurs.id] });
+    expect(ids(v.visible)).toEqual(["baby"]);
+    expect(savedTitles(v)).toEqual(["pekip"]);
+    expect(v.unfitIds.has(kurs.id)).toBe(true);
+  });
+
   it("blendet mit Geburtsdatum unpassende Angebote aus und markiert sie", () => {
     const v = render({ birthDate: "2026-05-01" });
     expect(ids(v.visible)).toEqual(["baby"]);

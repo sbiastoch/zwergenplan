@@ -44,6 +44,28 @@ export function nextSession(offer: Offer, now: Date): Session | undefined {
 }
 
 /**
+ * Läuft ein Kurs mit Anmeldung für die ganze Reihe schon (Plan 0053, E1)? Ab Beginn des ersten Termins kann man nicht
+ * mehr einsteigen. Ohne Anmeldung kann man es, regelmäßige Angebote laufen ohnehin.
+ */
+export function startedCourse(offer: Offer, now: Date): boolean {
+  const [first] = offer.sessions;
+  return (
+    offer.format === "kurs" &&
+    offer.registration === "mit-anmeldung" &&
+    first !== undefined &&
+    Date.parse(first.start) <= now.getTime()
+  );
+}
+
+/**
+ * Steht ein Angebot in „Entdecken“ (Liste, Karte, Anbieter, Wochen-Nachricht)? Mit kommendem Termin und nicht als
+ * laufender Kurs (Plan 0053, E1). Die Merkliste zeigt laufende Kurse weiter (`runningCourses` in filter.ts).
+ */
+export function discoverable(offer: Offer, now: Date): boolean {
+  return nextSession(offer, now) !== undefined && !startedCourse(offer, now);
+}
+
+/**
  * Der Termin, auf den sich das Detail bezieht: der am gewählten Berliner Kalendertag (aus dem
  * Kalender geöffnet), sonst der, an dem das Angebot in Liste und Merkliste steht (`shownSession`): mit `fits` der
  * erste passende, sonst der nächste nicht beendete (Browser-Review Plan 0028).

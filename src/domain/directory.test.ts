@@ -287,6 +287,16 @@ describe("providerOffers", () => {
   });
 });
 
+describe("providerOffers ohne laufende Kurse (Plan 0053, E1)", () => {
+  it("ein laufender Kurs fehlt im Sheet", () => {
+    const pekip = offers.find((o) => o.title.startsWith("PEKiP"));
+    if (!pekip) throw new Error("PEKiP fehlt in den Fixtures");
+    const titles = (now: Date) => providerOffers(offers, pekip.providerId, now).map((o) => o.title);
+    expect(titles(FIXTURE_NOW)).toContain(pekip.title);
+    expect(titles(new Date("2026-10-20T12:00:00+02:00"))).not.toContain(pekip.title);
+  });
+});
+
 describe("hasOffersOutside", () => {
   it("meldet, ob die Auswahl Angebote des Anbieters ausblendet (Hinweis im Sheet, E4)", () => {
     const own = providerOffers(offers, pid("theater-beispiel"), FIXTURE_NOW);

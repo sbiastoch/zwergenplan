@@ -113,6 +113,11 @@ describe("welcomeStats (E5)", () => {
     expect(welcomeStats(fixtureSiteOffers(), FIXTURE_NOW)).toEqual({ offers: 8, providers: 5 });
   });
 
+  it("ein laufender Kurs zählt nicht (Plan 0053, E1)", () => {
+    expect(welcomeStats([fixtureOffer("pekip-herbst")], FIXTURE_NOW).offers).toBe(1);
+    expect(welcomeStats([fixtureOffer("pekip-herbst")], new Date("2026-10-20T12:00:00+02:00")).offers).toBe(0);
+  });
+
   it("ein Anbieter nur mit beendeten Angeboten zählt nicht", () => {
     expect(welcomeStats([fixtureOffer("vergangen")], FIXTURE_NOW)).toEqual({ offers: 0, providers: 0 });
   });
