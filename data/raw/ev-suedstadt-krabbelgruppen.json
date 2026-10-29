@@ -7,10 +7,10 @@
      "providerId": "ev-suedstadt-krabbelgruppen",
      "venueId": "ev-suedstadt-krabbelgruppen",
      "title": "Mutter/Vater-Kind-Gruppe Gustav-Adolf-Gedächtniskirche Lichtenhof (dienstags)",
-     "summary": "Wöchentliche Krabbelgruppe für Mütter und Väter mit kleinen Kindern in der Gustav-Adolf-Gedächtniskirche. Vorab bei der Ansprechpartnerin melden.",
+     "summary": "Wöchentlicher Treff für Eltern mit Kindern bis etwa 3 Jahre in der Gustav-Adolf-Gedächtniskirche. Ohne festes Ende; Infos und Anmeldung telefonisch bei der Kontaktperson. Kosten stehen nicht auf der Seite.",
      "topics": [
-      "krabbelgruppe",
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "krabbelgruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -18,9 +18,13 @@
      "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
      "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
      "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anfrage bei Brigitte Schäfer, Tel. 0911 4466956"
+      "note": "Anfrage bei Brigitte Schäfer, Tel. 0911 - 4 46 69 56"
      },
      "schedule": {
       "kind": "weekly",
@@ -29,18 +33,18 @@
       ],
       "start": "09:30",
       "end": "11:30",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "ev-suedstadt-krabbelgruppen",
      "venueId": "ev-suedstadt-krabbelgruppen-christuskirche-steinbuehl",
-     "title": "Mutter/Vater-Kind-Gruppe Christuskirche Steinbühl (dienstags)",
-     "summary": "Wöchentliche Eltern-Kind-Gruppe in der Christuskirche Steinbühl, auch Tagesmütter mit ihren Tageskindern sind willkommen. Kontakt über das Pfarramt.",
+     "title": "Familie Mutter/Vater-Kind-Gruppe Christuskirche Steinbühl (dienstags)",
+     "summary": "Wöchentlicher Treff für Familien mit Kindern bis etwa 3 Jahre in der Christuskirche Steinbühl. Tagesmütter mit ihren Kindern sind willkommen. Anfrage über das Pfarramt; Kosten stehen nicht auf der Seite.",
      "topics": [
-      "krabbelgruppe",
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "krabbelgruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -48,9 +52,13 @@
      "url": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
      "sourceUrl": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen",
      "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anfrage bei Petra Baier über das Pfarramt, Tel. 0911 446200"
+      "note": "Anfrage bei Petra Baier über das Pfarramt, Tel. 0911 - 44 62 00"
      },
      "schedule": {
       "kind": "weekly",
@@ -59,23 +67,21 @@
       ],
       "start": "09:00",
       "end": "11:00",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "f7c6d11078740d082837efc529cad5b1e67d6d44251b06c13ac1cdeb7c6677b8",
-   "model": "opus",
+   "inputHash": "b4f8666250751c3ce6a4bb064f50dd67ad6959794b8fbe30cc38f3520b00393a",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.evangelische-termine.de/ical?vid=590": {
    "events": [],
-   "inputHash": "1e4df9bc0bcc263969e0837cadd71d7a02a3fd2e94aeb9af02d55b62794502a0",
+   "inputHash": "0f93a49928c2a4cdfdc9ab4e4d3f64090f762076d5f4ffbedef552f213aa2657",
    "dated": {
-    "2026-10-27": "ab478bcc1322bfe2e6cd0542ae1698ee0e1c14903af77c15be5c31d0c61a4dce",
-    "2026-10-28": "7635aa6c6fd3702eaa0ae144775770b38b46c7b42ba1d500f0c3468b6c1fc67a",
     "2026-10-29": "a33ca00c3946c71a537bfcf0163bf909d3e4229702dce9efc77bc4bf96522269",
     "2026-10-30": "d73b1b112e2c4a5eeabcf327d37392dfe9f9089ec439c60c2dc2607ae742270e",
     "2026-11-01": "967735f6f76b535bf368a311990fef4d2b9093fb9a65fddac0b0f2b281d397f5",
@@ -206,9 +212,9 @@
     "2027-12-25": "4329cb15d997d225eee9d288ad6c73250d090b7ea66e2c6605fa7cc50e943179",
     "2027-12-31": "4a8f1de173f245e1a5bb91bab6d29d6709379182528755f654f1e7fc66f5148c"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

@@ -6,49 +6,15 @@
     {
      "providerId": "martha-maria-st-theresien",
      "venueId": "martha-maria-st-theresien",
-     "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
-     "summary": "Monatlicher offener Treff für werdende und junge Eltern mit Baby: Austausch untereinander, die Stillberaterinnen der Klinik beantworten Fragen. Kostenlos und ohne Anmeldung, Treffpunkt Station B3.",
-     "topics": [
-      "elterncafe",
-      "stillcafe"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "price": "kostenlos",
-     "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
-     "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
-     "category": "treffs-cafes",
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Anmeldung nicht erforderlich"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-04T09:30",
-        "end": "2026-11-04T11:30"
-       },
-       {
-        "start": "2026-12-02T09:30",
-        "end": "2026-12-02T11:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "martha-maria-st-theresien",
-     "venueId": "martha-maria-st-theresien",
-     "title": "Babymassage (Kurs ab 17. November 2026, dienstags)",
-     "summary": "Kurs in indischer Babymassage: Eltern lernen, ihr Baby zu massieren, das stärkt Nähe und Wohlbefinden. 5 Termine; das Baby sollte bei Kursbeginn 4 Wochen bis 7 Monate alt sein.",
+     "title": "Indische Babymassage (Babys 4 Wochen bis 7 Monate)",
+     "summary": "Kurs mit fünf Terminen dienstags von 10 bis 11 Uhr für Eltern mit Baby im Alter von etwa 4 Wochen bis 7 Monaten. Im Horizont ist der Termin 17.11.2026 gelistet. Anmeldung per E-Mail oder Telefon.",
      "topics": [
       "babymassage"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "60 € (5 Termine)",
+     "price": "60 Euro",
      "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
      "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
      "category": "babykurse",
@@ -61,75 +27,33 @@
       "note": "Anmeldung per E-Mail an novakovalenka@web.de oder telefonisch unter 0157 58063006"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2026-11-17",
-      "count": 5,
-      "skipHolidays": true
-     }
-    }
-   ],
-   "inputHash": "1f078575ec559ca35fa51d217ab054c67579a8047aa9a141b231bddb7e34cf66",
-   "model": "opus",
-   "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
-  },
-  "seite:https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf": {
-   "events": [
-    {
-     "providerId": "martha-maria-st-theresien",
-     "venueId": "martha-maria-st-theresien",
-     "title": "Einführungskurs indische Babymassage (dienstags, ab 17.11.)",
-     "summary": "Eltern lernen in fünf Treffen die Griffe der indischen Babymassage und üben sie gleich am eigenen Baby. Anmeldung bei der Kursleiterin per Telefon oder Mail.",
-     "topics": [
-      "babymassage"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "60 € (5 Termine)",
-     "url": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
-     "sourceUrl": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
-     "category": "babykurse",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung telefonisch unter 0157 58063006 oder per Mail an novakovalenka@web.de"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2026-11-17",
-      "count": 5,
-      "skipHolidays": true
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-17T10:00",
+        "end": "2026-11-17T11:00"
+       }
+      ]
      }
     },
     {
      "providerId": "martha-maria-st-theresien",
      "venueId": "martha-maria-st-theresien",
      "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
-     "summary": "Offener Treff einmal im Monat am Mittwochvormittag auf Station B 3: Schwangere und Eltern mit Neugeborenen kommen ins Gespräch. Kostenlos, einfach vorbeikommen.",
+     "summary": "Ungezwungener Austausch mit anderen werdenden und jungen Eltern, Fragen können an Hebammen und Stillberaterinnen gerichtet werden. Jeweils am ersten Mittwoch im Monat von 9:30 bis 11:30 Uhr auf Station B3. Keine Anmeldung nötig.",
      "topics": [
       "elterncafe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "kostenlos",
-     "url": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
-     "sourceUrl": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
+     "price": "keine",
+     "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+     "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Anmeldung nicht erforderlich"
+      "note": "Keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "dates",
@@ -146,18 +70,61 @@
      }
     }
    ],
-   "inputHash": "4716f85e957252297c88ca1e3a1debeea8060e54e705a5fd0a98b3ca947a6535",
-   "model": "opus",
+   "inputHash": "42c63c1661549abcdb7f2bc8e38a38a350598e476bd8555a694dfd0124d31759",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
+  },
+  "seite:https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf": {
+   "events": [
+    {
+     "providerId": "martha-maria-st-theresien",
+     "venueId": "martha-maria-st-theresien",
+     "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
+     "summary": "Offener Treff im Elterncafé Station B 3 für Schwangere und Familien nach der Geburt, mit Babys willkommen. Keine Anmeldung nötig, einfach vorbeikommen. Im Horizont sind bisher nur Termine im November und Dezember 2026 veröffentlicht.",
+     "topics": [
+      "elterncafe",
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "keine",
+     "url": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
+     "sourceUrl": "https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf",
+     "category": "treffs-cafes",
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Keine Anmeldung nötig, einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-04T09:30",
+        "end": "2026-11-04T11:30"
+       },
+       {
+        "start": "2026-12-02T09:30",
+        "end": "2026-12-02T11:30"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "2a0f0e681eb7562cf89442f5a2c5a3234d539110256fe4dbff2f4aa3adab6c81",
+   "model": "haiku",
+   "status": "ok",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://kh-nuernberg.martha-maria.de/das-krankenhaus/news-und-veranstaltungen": {
    "events": [],
-   "inputHash": "c45ddff6c9ccc1d3d489f29ac855a23ff8846c2410d30c627ad8015d646b3bf2",
-   "model": "opus",
+   "inputHash": "a665dcf52462936211069f7024e1f44af1f45aedee013959ddb206cf46f65e12",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

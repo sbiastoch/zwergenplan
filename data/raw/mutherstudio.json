@@ -3,10 +3,10 @@
  "units": {
   "seite:https://mutherstudio.com/baby-and-kinderkurse-12-36-monate": {
    "events": [],
-   "inputHash": "d96e0e0fdb0f8798fd9dd2fe1eb95323984da65d2249e28b7ce415e7cc7030b7",
-   "model": "opus",
+   "inputHash": "3f85a5f0ceccc585f557835afca85a8023484ed2ba68f1909eba006e274e21e5",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.canva.com/design/DAFYzTfzNm8/view": {
@@ -14,142 +14,168 @@
     {
      "providerId": "mutherstudio",
      "venueId": "mutherstudio",
-     "title": "Mama, Mini & Mental Health (ca. 0–18 Monate, mittwochs)",
-     "summary": "Angeleitete Runde für Mütter mit Baby rund um mentale Gesundheit, das Kind ist dabei. Reihe mit 6 Terminen am Mittwochvormittag; Kursstart und Einstieg auf Anfrage.",
+     "title": "Musikzwerge ca. 10–18 Monate (Mo und Di, 9:30)",
+     "summary": "Musikangebot für Kinder ca. 10–18 Monate, laut Kursplan montags und dienstags 9:30–10:15 Uhr. Keine Platzanzeige; die Anmeldung schließt, sobald die Kapazität voll ist.",
      "topics": [
-      "elterntreff",
-      "muetter"
+      "musik",
+      "singen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://mutherstudio.thrivecart.com/mama-mini--mental-health-6x-mittwochs/",
+     "url": "https://www.canva.com/design/DAFYzTfzNm8/view",
      "sourceUrl": "https://www.canva.com/design/DAFYzTfzNm8/view",
-     "category": "treffs-cafes",
+     "category": "musik",
      "age": {
-      "minMonths": 0,
+      "minMonths": 10,
       "maxMonths": 18
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Buchung über Thrivecart, die Anmeldung schließt, sobald der Kurs voll ist"
+      "note": "Keine Platzanzeige; Anmeldung über den Anbieter, schließt bei voller Belegung"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
-       "WE"
+       "MO",
+       "TU"
       ],
       "start": "09:30",
-      "end": "10:30",
-      "from": "2026-10-28",
-      "skipHolidays": true
+      "end": "10:15",
+      "from": "2026-11-02",
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "7b52e4436ab2115550571fdda3aa7912af8ad2e9df60356eb7a1179d6f85c09f",
-   "model": "opus",
+   "inputHash": "9694435de892264c0b7443cd0f64c1ffa0ee86d6aff97b611fde5bbfbd514909",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://mutherstudio.com/mamababyyoga": {
    "events": [
     {
      "providerId": "mutherstudio",
      "venueId": "mutherstudio",
-     "title": "Mama-Baby-Yoga (mittwochs, 16.09.–04.11.2026)",
-     "summary": "Sanfte Yogaübungen für Mütter, das Baby ist mit dabei und wird über Berührung und Bewegung einbezogen. Austausch mit anderen Müttern. Voraussetzung ist eine abgeschlossene Rückbildung. Der Kurs läuft bereits; Krankenkassen-Zuschuss möglich.",
+     "title": "Mama-Baby-Yoga (mittwochs 10:45 Uhr, Herbst/Winter 2026)",
+     "summary": "Yoga für Mütter mit Baby, Voraussetzung ist eine abgeschlossene Rückbildung. Das Baby profitiert von Berührungen und Bewegungsimpulsen. Zwei Kursblöcke à 8 Einheiten (bis 04.11. und ab 11.11.), zertifiziert für den Krankenkassen-Zuschuss. Anmeldung per Mail.",
      "topics": [
-      "yoga-mit-baby",
-      "muetter"
+      "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "129 € (8 Einheiten), Krankenkassen-Zuschuss möglich",
+     "price": "129 € (8 Einheiten)",
      "url": "https://mutherstudio.com/mamababyyoga",
      "sourceUrl": "https://mutherstudio.com/mamababyyoga",
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung per Mail an annette.samol@gmx.de"
+      "note": "Keine Platzanzeige. Anmeldung per Mail an annette.samol@gmx.de"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "start": "10:45",
-      "end": "11:45",
-      "from": "2026-09-16",
-      "count": 8,
-      "skipHolidays": false
-     }
-    },
-    {
-     "providerId": "mutherstudio",
-     "venueId": "mutherstudio",
-     "title": "Mama-Baby-Yoga (mittwochs, 11.11.–30.12.2026)",
-     "summary": "Sanfte Yogaübungen für Mütter, das Baby ist mit dabei und wird über Berührung und Bewegung einbezogen. Austausch mit anderen Müttern. Voraussetzung ist eine abgeschlossene Rückbildung; Krankenkassen-Zuschuss möglich.",
-     "topics": [
-      "yoga-mit-baby",
-      "muetter"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "129 € (8 Einheiten), Krankenkassen-Zuschuss möglich",
-     "url": "https://mutherstudio.com/mamababyyoga",
-     "sourceUrl": "https://mutherstudio.com/mamababyyoga",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung per Mail an annette.samol@gmx.de"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "start": "10:45",
-      "end": "11:45",
-      "from": "2026-11-11",
-      "count": 8,
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-09-16T10:45",
+        "end": "2026-09-16T11:45"
+       },
+       {
+        "start": "2026-09-23T10:45",
+        "end": "2026-09-23T11:45"
+       },
+       {
+        "start": "2026-09-30T10:45",
+        "end": "2026-09-30T11:45"
+       },
+       {
+        "start": "2026-10-07T10:45",
+        "end": "2026-10-07T11:45"
+       },
+       {
+        "start": "2026-10-14T10:45",
+        "end": "2026-10-14T11:45"
+       },
+       {
+        "start": "2026-10-21T10:45",
+        "end": "2026-10-21T11:45"
+       },
+       {
+        "start": "2026-10-28T10:45",
+        "end": "2026-10-28T11:45"
+       },
+       {
+        "start": "2026-11-04T10:45",
+        "end": "2026-11-04T11:45"
+       },
+       {
+        "start": "2026-11-11T10:45",
+        "end": "2026-11-11T11:45"
+       },
+       {
+        "start": "2026-11-18T10:45",
+        "end": "2026-11-18T11:45"
+       },
+       {
+        "start": "2026-11-25T10:45",
+        "end": "2026-11-25T11:45"
+       },
+       {
+        "start": "2026-12-02T10:45",
+        "end": "2026-12-02T11:45"
+       },
+       {
+        "start": "2026-12-09T10:45",
+        "end": "2026-12-09T11:45"
+       },
+       {
+        "start": "2026-12-16T10:45",
+        "end": "2026-12-16T11:45"
+       },
+       {
+        "start": "2026-12-23T10:45",
+        "end": "2026-12-23T11:45"
+       },
+       {
+        "start": "2026-12-30T10:45",
+        "end": "2026-12-30T11:45"
+       }
+      ]
      }
     }
    ],
-   "inputHash": "e2b31cba6292111d2d74a515f9f6f645d27c785d637d41a7f5263a4a153347a2",
-   "model": "opus",
+   "inputHash": "6b7465701316bfb7968e1c660d377596da6c9f48805e75883706668852618dcf",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://mutherstudio.com/body-mind-and-kids": {
    "events": [
     {
      "providerId": "mutherstudio",
      "venueId": "mutherstudio",
-     "title": "Mama, Mini & Mental Health – Mutter-Kind-Kurs (ca. 0–18 Monate, mittwochs)",
-     "summary": "Kleine Gruppe (max. 6) für Mütter mit Baby oder Kleinkind: Austausch und Strategien für den Mama-Alltag, leichte Mobility-Übungen. Die Kinder spielen mit wechselnden Materialien. 6 Termine à 60 Min. zwischen 23.09. und 25.11., nicht in den Ferien und an Feiertagen.",
+     "title": "Mama, Mini & Mental Health (Babys ca. 0–18 Monate)",
+     "summary": "Austauschkurs für Mütter mit kleinen Kindern über Alltag, Grenzen und Partnerschaft, ergänzt durch Mobility-Übungen. Die Kinder spielen mit wechselndem Material mit. Der Kurs läuft seit 23.09., ist auf max. 6 Personen begrenzt und findet nicht in Ferien und an Feiertagen statt.",
      "topics": [
-      "eltern-kind-gruppe",
+      "elterntreff",
       "muetter"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "90 € (6 x 60 Min.)",
-     "url": "https://mutherstudio.thrivecart.com/mama-mini--mental-health-6x-mittwochs/",
+     "price": "90 € (6 Termine)",
+     "url": "https://mutherstudio.com/body-mind-and-kids",
      "sourceUrl": "https://mutherstudio.com/body-mind-and-kids",
-     "category": "krabbel-spielgruppen",
+     "category": "treffs-cafes",
      "age": {
       "minMonths": 0,
       "maxMonths": 18
      },
      "availability": {
       "status": "wenige",
-      "note": "Laut Website nur noch wenige Plätze"
+      "note": "Nur noch wenige Plätze"
      },
      "schedule": {
       "kind": "weekly",
@@ -159,32 +185,33 @@
       "start": "09:30",
       "end": "10:30",
       "from": "2026-09-23",
-      "until": "2026-11-25",
+      "count": 6,
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "b221fba7ddf636e0c55b36c8c240f7dc97998bf3f819cbd069ede47a258d56fe",
-   "model": "opus",
+   "inputHash": "bb9b950478f6cfb51491642f1571c3df88fb4f627fe8950497ef87f2e178c841",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "emptySince": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://mutherstudio.com/waldspielracker": {
    "events": [
     {
      "providerId": "mutherstudio",
-     "venueId": "mutherstudio-spielplatz-schiestlstrasse",
-     "title": "Waldspielracker – Outdoorkurs für Kleinkinder (Di, 22.09.–24.11.2026)",
-     "summary": "Eltern-Kind-Kurs im Wald: Kinder erkunden Baumstämme, Wurzeln und Naturmaterialien, dazu Basteln, Fingerspiele und Bewegungslieder. Findet bei jedem Wetter statt, nicht in den Ferien. Der Kurs läuft schon; Schnuppern ist bei freiem Platz nach Anfrage per Mail möglich.",
+     "venueId": "mutherstudio",
+     "title": "Waldspielracker Herbst (Kraftshof), Di 10–11 Uhr, ab 15 Monate",
+     "summary": "Waldgruppe auf dem Spielplatz in Kraftshof: Motorik, Naturmaterial, Balancieren über Wurzeln, Basteln und Bewegungslieder, bei jedem Wetter. Der Kurs läuft seit 22.09. und endet am 24.11.; in den Ferien kein Kurs. Schnuppern bei freiem Platz nach Mail an hello@mutherstudio.com.",
      "topics": [
       "waldgruppe",
-      "tiere-natur"
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 € (auf der Seite zusätzlich „699 €“ genannt)",
      "url": "https://mutherstudio.com/waldspielracker",
      "sourceUrl": "https://mutherstudio.com/waldspielracker",
      "category": "natur",
@@ -194,7 +221,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Buchung online, die Anmeldung schließt, sobald der Kurs voll ist. Schnuppern auf Anfrage an hello@mutherstudio.com"
+      "note": "Keine Platzanzeige; Anmeldung über das Buchungsformular auf der Seite, solange Kapazität frei ist"
      },
      "schedule": {
       "kind": "weekly",
@@ -204,23 +231,23 @@
       "start": "10:00",
       "end": "11:00",
       "from": "2026-09-22",
-      "until": "2026-11-24",
+      "count": 8,
       "skipHolidays": true
      }
     },
     {
      "providerId": "mutherstudio",
-     "venueId": "mutherstudio-spielplatz-schiestlstrasse",
-     "title": "Waldspielracker – Outdoorkurs für Kleinkinder (Di, 01.12.2026–02.03.2027)",
-     "summary": "Eltern-Kind-Kurs im Wald mit Naturmaterialien, Klettern über Wurzeln und Baumstämme, Basteln, Fingerspielen und Bewegungsliedern. Findet bei jedem Wetter statt; Treffpunkt ist der Spielplatz Schiestlstraße in Kraftshof. Genaue Infos kommen nach der Buchung.",
+     "venueId": "mutherstudio",
+     "title": "Waldspielracker Winter (Kraftshof), Di 10–11 Uhr, ab Dez. 2026",
+     "summary": "Waldgruppe auf dem Spielplatz in Kraftshof für Kinder ca. 15 Monate bis 3 Jahre, mit Naturmaterial, Balancieren, Basteln und Liedern. 8 Dienstage 10–11 Uhr, in den Ferien pausiert; Treffpunkt wird nach der Buchung mitgeteilt.",
      "topics": [
       "waldgruppe",
-      "tiere-natur"
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 € (auf der Seite zusätzlich „699 €“ genannt)",
      "url": "https://mutherstudio.com/waldspielracker",
      "sourceUrl": "https://mutherstudio.com/waldspielracker",
      "category": "natur",
@@ -230,35 +257,52 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Buchung online, die Anmeldung schließt, sobald der Kurs voll ist"
+      "note": "Keine Platzanzeige; Anmeldung über das Buchungsformular auf der Seite, solange Kapazität frei ist"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2026-12-01",
-      "until": "2027-03-02",
-      "count": 8,
-      "skipHolidays": false,
-      "except": [
-       "2026-12-22",
-       "2026-12-29",
-       "2027-01-05",
-       "2027-01-12",
-       "2027-01-19",
-       "2027-02-09"
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-01T10:00",
+        "end": "2026-12-01T11:00"
+       },
+       {
+        "start": "2026-12-08T10:00",
+        "end": "2026-12-08T11:00"
+       },
+       {
+        "start": "2026-12-15T10:00",
+        "end": "2026-12-15T11:00"
+       },
+       {
+        "start": "2027-01-26T10:00",
+        "end": "2027-01-26T11:00"
+       },
+       {
+        "start": "2027-02-02T10:00",
+        "end": "2027-02-02T11:00"
+       },
+       {
+        "start": "2027-02-16T10:00",
+        "end": "2027-02-16T11:00"
+       },
+       {
+        "start": "2027-02-23T10:00",
+        "end": "2027-02-23T11:00"
+       },
+       {
+        "start": "2027-03-02T10:00",
+        "end": "2027-03-02T11:00"
+       }
       ]
      }
     }
    ],
-   "inputHash": "c3153c4f7490c22cfee3932dcfb982071ed8881d795a92ee49d52b06fc8d2e0c",
-   "model": "opus",
+   "inputHash": "d854dcc4680eec3e563caad627205aa8870dc362d9551e6629d9b782bae3b626",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://mutherstudio.thrivecart.com/mama-mini--mental-health-6x-mittwochs/": {
    "events": [
@@ -299,7 +343,12 @@
    "model": "opus",
    "status": "ok",
    "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "pending": {
+    "inputHash": "c43422cfcb7c6c0d00db86cc720d34cb699ea91312449a4572b5473b2fcf3405",
+    "model": "haiku",
+    "events": []
+   }
   }
  }
 }

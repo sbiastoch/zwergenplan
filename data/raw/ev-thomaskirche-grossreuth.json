@@ -6,21 +6,22 @@
     {
      "providerId": "ev-thomaskirche-grossreuth",
      "venueId": "ev-thomaskirche-grossreuth",
-     "title": "Krabbelgruppe montags (Thomaskirche Großreuth)",
-     "summary": "Wöchentliche Krabbelgruppe im kleinen Saal des Gemeindehauses: Die Kinder spielen, krabbeln und entdecken, es gibt Lieder und Fingerspiele, die Eltern tauschen sich aus. In den Schulferien ist keine Gruppe.",
+     "title": "Krabbelgruppe (montags, Gemeindehaus Thomaskirche)",
+     "summary": "Montagnachmittags Spielen, Krabbeln, Singen und Fingerspiele mit Erfahrungsaustausch unter Eltern im kleinen Saal. Termine mit Pausen in Ferien und Sommer; Kosten und Anmeldung bitte beim Anbieter erfragen.",
      "topics": [
       "krabbelgruppe",
+      "spielgruppe",
       "singen"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/detail-bt?ID=8004136",
      "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004136",
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung; Infos bei der Thomaskirche Großreuth"
+      "note": "Keine Platzangabe in der Quelle. Anfrage bei der Ev. Thomaskirche Großreuth."
      },
      "schedule": {
       "kind": "dates",
@@ -180,10 +181,11 @@
     {
      "providerId": "ev-thomaskirche-grossreuth",
      "venueId": "ev-thomaskirche-grossreuth",
-     "title": "Eltern-Kind-Yoga-Kurs dienstags (Nov.–Dez. 2026)",
-     "summary": "Yogakurs für Eltern und Kinder im großen Saal des Gemeindehauses, sechs Termine dienstagnachmittags. Wie man sich anmeldet und was der Kurs kostet, erfährt man bei der Gemeinde.",
+     "title": "Eltern-Kind-Yoga (Kurs, 6 Termine ab 10.11.2026)",
+     "summary": "Sechs Yoga-Termine dienstags nachmittags im großen Saal des Gemeindehauses, Eltern und Kind gemeinsam. Keine Angaben zu Preis und Anmeldung in der Quelle; bitte beim Anbieter erfragen.",
      "topics": [
-      "yoga-mit-baby"
+      "yoga-mit-baby",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -193,7 +195,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung bei der Thomaskirche Großreuth erfragen"
+      "note": "Keine Platzangabe in der Quelle. Anfrage bei der Ev. Thomaskirche Großreuth."
      },
      "schedule": {
       "kind": "dates",
@@ -227,7 +229,7 @@
      "via": "evtermine"
     }
    ],
-   "inputHash": "c695c0a61694ecfad3dbc24be7da4e74f9b7885ca83bd50ef4963fd9c4f51370",
+   "inputHash": "33d17872e2186f6a2a263eaf08a4a898b1cf92ccc768923fc39ba81bff8b342f",
    "dated": {
     "2026-11-09": "6f6b48bcb3e7cf2c68428e9fb92d181a12a0b17b702f2a0f58123a3601cb2931",
     "2026-11-10": "c31f4b3ce06935d216f3ac8c5e40a67b2be59c6b766d865c5ac81918be350f25",
@@ -273,10 +275,10 @@
     "2027-10-18": "98fbbfe5a489570083a85027024d76fc851b341e56a8d8b47c160b5719161e46",
     "2027-10-25": "016ff8b8fcfa54877d69ffcba2baea607e8abd263a48b29e8d1d0538e1493a09"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
    "sources": [
     "evtermine"
    ]

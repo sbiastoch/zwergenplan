@@ -164,7 +164,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "kandidaten": {
@@ -366,7 +366,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine"

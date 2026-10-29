@@ -49,7 +49,7 @@
    "inputHash": "e4f7fe86af25a67a69c63d24215b8601aab0f7adc2cb71db6ec244e3eb947d82",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
@@ -91,7 +91,7 @@
    "inputHash": "05a1e746dca5ca85c021c50c49998e99e41a0ab06f47c32f86ea26b3e14ca7a2",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "kandidaten": {
@@ -154,7 +154,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

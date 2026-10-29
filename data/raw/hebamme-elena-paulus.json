@@ -6,58 +6,44 @@
     {
      "providerId": "hebamme-elena-paulus",
      "venueId": "hebamme-elena-paulus",
-     "title": "Babymassage (4 Wochen–6 Monate), dienstags",
-     "summary": "Kurs bei Hebamme Elena Paulus in Fischbach: Eltern lernen, ihr Baby zu massieren, was Bindung und Entspannung fördert. 5 Treffen dienstags, das Skript ist im Preis enthalten. Der nächste Kurs ist für Februar 2027 geplant.",
+     "title": "Babymassage (4 Wochen bis 6 Monate)",
+     "summary": "Massage-Übungen für Babys gemeinsam mit den Eltern, fördert Bindung und Entspannung. Der Kurs ab 24.11.2026 ist ausgebucht; ein nächster Kurs ist für Februar 2027 geplant.",
      "topics": [
       "babymassage"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "65 € inkl. Skript",
+     "price": "65 € (inkl. Skript)",
      "url": "https://www.elena-paulus.de/kurse",
      "sourceUrl": "https://www.elena-paulus.de/kurse",
      "category": "babykurse",
      "age": {
-      "minMonths": 1,
+      "minMonths": 0,
       "maxMonths": 6
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs ausgebucht; nächster Start voraussichtlich Februar 2027"
+      "note": "Kurs 24.11.–22.12.2026 ausgebucht; nächster Kurs voraussichtlich Februar 2027"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-24T09:00",
-        "end": "2026-11-24T09:45"
-       },
-       {
-        "start": "2026-12-01T09:00",
-        "end": "2026-12-01T09:45"
-       },
-       {
-        "start": "2026-12-08T09:00",
-        "end": "2026-12-08T09:45"
-       },
-       {
-        "start": "2026-12-15T09:00",
-        "end": "2026-12-15T09:45"
-       },
-       {
-        "start": "2026-12-22T09:00",
-        "end": "2026-12-22T09:45"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:00",
+      "end": "09:45",
+      "from": "2026-11-24",
+      "count": 5,
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "711a0e80e5598d73749a80a0dbf1849a35d2b2fd46a2e8e0972ce594df9512d3",
-   "model": "opus",
+   "inputHash": "702ae027c67bae126294d8eb3083232e73849c4b8844a932c74783dd5429c7e6",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   }
  }
 }

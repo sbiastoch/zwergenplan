@@ -6,11 +6,10 @@
     {
      "providerId": "geburtshaus-nuernberger-nest",
      "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – freitags 12:00 (Start September)",
-     "summary": "Rückbildungskurs mit Hebamme Katrina Bauersachs: kräftigende und lockernde Übungen für Frauen ab 8 Wochen nach der Geburt. Das Baby darf mitkommen. Der Kurs läuft schon, im Horizont liegen noch zwei Termine.",
+     "title": "Rückbildung mit Katrina, freitags 12–13:30 Uhr",
+     "summary": "Rückbildung nach der Geburt zur Kräftigung und Wiederherstellung, Teilnahme mit oder ohne Baby. Für Frauen, die vor mindestens 8 Wochen geboren haben. Anmeldung über Hebamio.",
      "topics": [
-      "rueckbildung",
-      "muetter"
+      "rueckbildung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -20,7 +19,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über bauersachs.hebamio.de, Fragen an hebammekat@gmx.de"
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über Bauersachs.hebamio.de"
      },
      "schedule": {
       "kind": "dates",
@@ -55,11 +54,10 @@
     {
      "providerId": "geburtshaus-nuernberger-nest",
      "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – mittags 12:00 (Start November, wechselnde Wochentage)",
-     "summary": "Rückbildungskurs mit Hebamme Katrina Bauersachs mit 6 Terminen an wechselnden Wochentagen. Für Frauen, deren Geburt mindestens 8 Wochen zurückliegt. Das Baby kann mitgebracht werden.",
+     "title": "Rückbildung mit Katrina, 12–13:40 Uhr (Start 9.11.)",
+     "summary": "Rückbildung nach der Geburt zur Kräftigung und Wiederherstellung, mit oder ohne Baby. Die Termine liegen an verschiedenen Wochentagen. Für Frauen, die vor mindestens 8 Wochen geboren haben.",
      "topics": [
-      "rueckbildung",
-      "muetter"
+      "rueckbildung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -69,7 +67,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über bauersachs.hebamio.de, Fragen an hebammekat@gmx.de"
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über Bauersachs.hebamio.de"
      },
      "schedule": {
       "kind": "dates",
@@ -104,11 +102,10 @@
     {
      "providerId": "geburtshaus-nuernberger-nest",
      "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – donnerstags 17:20 (Start September)",
-     "summary": "Rückbildungskurs am Donnerstagabend mit Hebamme Katrina Bauersachs, für Frauen ab 8 Wochen nach der Geburt, gern mit Baby. Der Kurs läuft schon, im Horizont liegt nur noch der letzte Termin.",
+     "title": "Rückbildung mit Katrina, donnerstags 17:20–19 Uhr",
+     "summary": "Rückbildung nach der Geburt zur Kräftigung und Wiederherstellung, mit oder ohne Baby. Für Frauen, die vor mindestens 8 Wochen geboren haben. Anmeldung über Hebamio.",
      "topics": [
-      "rueckbildung",
-      "muetter"
+      "rueckbildung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -118,7 +115,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über bauersachs.hebamio.de, Fragen an hebammekat@gmx.de"
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über Bauersachs.hebamio.de"
      },
      "schedule": {
       "kind": "dates",
@@ -153,11 +150,10 @@
     {
      "providerId": "geburtshaus-nuernberger-nest",
      "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – abends 17:20 (Start Dezember, mittwochs/donnerstags)",
-     "summary": "Rückbildungskurs am Abend mit Hebamme Katrina Bauersachs: 6 Termine im Dezember, jeweils mittwochs und donnerstags. Für Frauen ab 8 Wochen nach der Geburt, mit oder ohne Baby.",
+     "title": "Rückbildung mit Katrina, 17:20–19 Uhr (Start 2.12.)",
+     "summary": "Rückbildung nach der Geburt zur Kräftigung und Wiederherstellung, mit oder ohne Baby. Die Termine liegen an verschiedenen Wochentagen. Für Frauen, die vor mindestens 8 Wochen geboren haben.",
      "topics": [
-      "rueckbildung",
-      "muetter"
+      "rueckbildung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -167,7 +163,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über bauersachs.hebamio.de, Fragen an hebammekat@gmx.de"
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über Bauersachs.hebamio.de"
      },
      "schedule": {
       "kind": "dates",
@@ -202,23 +198,22 @@
     {
      "providerId": "geburtshaus-nuernberger-nest",
      "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Stilltreff Milch-Café mit Stillberaterin",
-     "summary": "Monatlicher Stilltreff mit Stillberaterin Sonja Knittel. Es gibt Austausch und Hilfe zu Stillen, Beikost und Schlaf, die Babys bekommen Sinnesanregungen. Offen für alle Mütter, egal wo sie entbunden haben. Bitte vorher anmelden.",
+     "title": "Stilltreff Milch-Café (2. Mittwoch im Monat)",
+     "summary": "Offener Stilltreff mit Stillberaterin Sonja Knittel: Austausch und Fragen rund ums Stillen und das Leben mit Baby, dazu Kaffee oder Tee. Anmeldung erforderlich; 8 € pro Treffen, vor Ort zu zahlen.",
      "topics": [
       "stillcafe",
-      "beratung",
-      "muetter"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "8 € pro Treffen, vor Ort zu zahlen",
+     "price": "8 € pro Treffen",
      "url": "https://kinder-hautnah.de/termine-aktuelles/",
      "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
      "category": "treffs-cafes",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über kinder-hautnah.de oder knittel@kinder-hautnah.de"
+      "note": "Anmeldung per Mail an knittel@kinder-hautnah.de oder über kinder-hautnah.de"
      },
      "schedule": {
       "kind": "dates",
@@ -233,47 +228,13 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "geburtshaus-nuernberger-nest",
-     "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Babymassage mit Noelle (dienstags)",
-     "summary": "Babymassage-Kurs mit 5 Terminen zu je 60 Minuten. Eltern lernen Massagegriffe für zu Hause, das Öl wird gestellt. Der Kurs war bis Oktober 2026 pausiert, die Termine gibt es auf Anfrage.",
-     "topics": [
-      "babymassage"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "110 € (5 Termine)",
-     "url": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
-     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 2,
-      "maxMonths": 6
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anfrage an babymassage.noellescheibl@gmx.de oder 0173 5306012"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2026-10-27",
-      "skipHolidays": true
-     }
     }
    ],
-   "inputHash": "9db19be2dae1d2247adcd0be4aef976f7a08f06f3d905a4abd98bcd6bfdc4dfe",
-   "model": "opus",
+   "inputHash": "aa59872c670653584b75c6ae333b10bbeb36fb7ce2cf2b8f0a9aa1caf89d82cc",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://bauersachs.hebamio.de/kursliste": {
    "events": [
@@ -544,30 +505,35 @@
    "model": "opus",
    "status": "ok",
    "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "pending": {
+    "inputHash": "529382906ad0fed0789cde87933de19cb63c4cc1a11abdb6b3773c04e9fbc47c",
+    "model": "haiku",
+    "events": []
+   }
   },
   "seite:https://melville.hebamio.de/kursliste": {
    "events": [],
-   "inputHash": "79bab94fba508152800c01813c1ce4fbac45d7ec06a1a7317625a528e33e1aab",
-   "model": "opus",
+   "inputHash": "d1139e2070e95d887ea363fbe259396b279122045359d1f4955735ef2f52a473",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://kinder-hautnah.de/termine-aktuelles/": {
    "events": [],
-   "inputHash": "d1d3ea9e552063088cf667f09d61cc62840ef00488ac1a31331e91ff61a9f890",
-   "model": "opus",
+   "inputHash": "55d54e6a771bf866fe1cdfbf2ba30e23087ae95784d116232e3c1523b3325684",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://deinkindernotfallkurs.de/": {
    "events": [],
-   "inputHash": "a7e2cded56fd2709d556833bafeab0ef140c5c81140290750541e03ac3001aaf",
-   "model": "opus",
+   "inputHash": "657594f6c76a0104838cb74a9fdd8c8a3b4233e7e322d1d2f371add35ce7c745",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

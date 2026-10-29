@@ -6,8 +6,8 @@
     {
      "providerId": "stadtteiltreff-nordost",
      "venueId": "stadtteiltreff-nordost",
-     "title": "Offener Krabbeltreff (dienstags)",
-     "summary": "Offener Treff für Eltern mit Kindern unter 3 Jahren rund um den Nordostbahnhof: Die Eltern lernen sich kennen und tauschen sich aus, die Kinder spielen. Ältere Geschwister dürfen mitkommen, kostenlos.",
+     "title": "Offener Krabbeltreff (Eltern mit Kindern bis 3 Jahre)",
+     "summary": "Offener Dienstagstreff für Eltern und Aufsichtspersonen mit Kindern bis 3 Jahren aus dem Stadtteil, mit Spielmöglichkeiten. Ältere Geschwister sind willkommen. Einfach vorbeikommen, keine Anmeldung nötig.",
      "topics": [
       "krabbelgruppe",
       "elterntreff"
@@ -34,16 +34,16 @@
       ],
       "start": "09:30",
       "end": "11:00",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "d20138671615207b6a7757d43dc1c1b83babb8a6411c4a6966f6092a5d369bbe",
-   "model": "opus",
+   "inputHash": "dcb6431cff4069cda8d9b7fae851fe1f01ffd6eb4ef859333a940cc425ce4223",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   }
  }
 }

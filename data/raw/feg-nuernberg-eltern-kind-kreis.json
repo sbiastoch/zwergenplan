@@ -6,17 +6,16 @@
     {
      "providerId": "feg-nuernberg-eltern-kind-kreis",
      "venueId": "feg-nuernberg-eltern-kind-kreis",
-     "title": "Eltern-Kind-Kreis „Zwergenaufstand“ (0–3 Jahre, dienstags)",
-     "summary": "Wöchentliche Eltern-Kind-Gruppe mit Singen, Spielen, Geschichten, Basteln und einem gemeinsamen Frühstück, das reihum vorbereitet wird. Schnuppern ist möglich. Treffpunkt ist der 1. Stock im Gemeindezentrum, in den Schulferien gibt es keine Treffen.",
+     "title": "Zwergenaufstand – Eltern-Kind-Kreis für 0–3-Jährige (dienstags)",
+     "summary": "Jeden Dienstag Singen, Spielen, Geschichten, Basteln und gemeinsames Frühstück (abwechselnd mitbringen) für Eltern mit Kindern bis 3 Jahre. Schnuppern ist erlaubt; in den Schulferien findet kein Treff statt. Spenden für das Bastelmaterial sind willkommen.",
      "topics": [
       "eltern-kind-gruppe",
-      "singen",
-      "kreativ"
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "kostenlos, gelegentliche Spenden für Bastelmaterial erbeten",
+     "price": "kostenlos, gelegentliche Spenden erbeten",
      "url": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
      "sourceUrl": "https://feg-nuernberg.de/kinder-und-jugendliche/eltern-kind-kreis/",
      "category": "krabbel-spielgruppen",
@@ -25,8 +24,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Schnuppern möglich; Kontakt: Saskia Schmidt, 0911 46206406, zwergenaufstand@feg-nuernberg.de"
+      "status": "unbekannt",
+      "note": "Keine Platzangabe. Fragen an Saskia Schmidt, Telefon 0911 46206406 oder zwergenaufstand@feg-nuernberg.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -35,16 +34,16 @@
       ],
       "start": "09:30",
       "end": "11:00",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "cec2e9a43b41d734c0041a001702c4b8bdbaa1ed69cef15fbae7a42d1243307f",
-   "model": "opus",
+   "inputHash": "e28ba87b32f4f6c55cbf7ae6fb45326627ed1bb4d83f94be987329c0072050a3",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   }
  }
 }

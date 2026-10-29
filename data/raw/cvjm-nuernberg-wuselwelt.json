@@ -6,8 +6,8 @@
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre)",
-     "summary": "Freies Spielen und Toben in der Turnhalle mit vorbereiteter Spielumgebung, Eltern tauschen sich aus. Jeden Freitag außer in den Ferien, ohne Anmeldung; danach ist ein Kaffee in der Kostbar möglich. Hallenschuhe oder ABS-Socken mitbringen.",
+     "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 Jahre (freitags)",
+     "summary": "Freies Spielen und Toben in der Turnhalle des CVJM für Kinder bis 3 Jahre, Eltern oder Bezugsperson sind dabei. Hallenschuhe oder ABS-Socken mitbringen. Keine Anmeldung nötig, einfach kommen.",
      "topics": [
       "bewegung",
       "spielplatz-indoor"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offenes Angebot, keine Anmeldung nötig"
+      "note": "Offenes Angebot ohne Anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -39,11 +39,11 @@
      }
     }
    ],
-   "inputHash": "4cbb9e0218441c1d452ef5dc4f6cfbf67203d98d150634bf94cea51f2db3b094",
+   "inputHash": "fe1da65bf2132b73a13222eec134b9ae1b4c1916dd8bd818485a45cb9882a6ad",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
    "events": [
@@ -100,104 +100,26 @@
    "inputHash": "56161624885420fc2677b10b60c509a23a0990537740c10b75c95e7d72f056e3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
-   "events": [
-    {
-     "providerId": "cvjm-nuernberg-wuselwelt",
-     "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre, freitags)",
-     "summary": "Offene Bewegungs- und Spielzeit für Kinder bis 3 Jahre mit Begleitperson in der Turnhalle des CVJM-Hauses am Kornmarkt. Ohne Anmeldung, einfach vorbeikommen.",
-     "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Offenes Angebot ohne Anmeldung"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "09:30",
-      "end": "10:15",
-      "from": "2026-12-11",
-      "skipHolidays": true
-     }
-    }
-   ],
-   "inputHash": "d64b2556a678db8e126efed98f43f225bd2c343ebcb16e00aca758dfface1c4f",
-   "model": "opus",
-   "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
-   "pending": {
-    "inputHash": "ca8d157cfc286381ff84c2ff60d5c9ea2ace7fa9d72079fa97817eaa3c9b5873",
-    "model": "haiku",
-    "events": []
-   }
+   "events": [],
+   "inputHash": "ca8d157cfc286381ff84c2ff60d5c9ea2ace7fa9d72079fa97817eaa3c9b5873",
+   "model": "haiku",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "emptySince": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;": {
-   "events": [
-    {
-     "providerId": "cvjm-nuernberg-wuselwelt",
-     "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungs- und Spielzeit für 0–3 Jahre (freitags)",
-     "summary": "Offene Bewegungs- und Spielzeit für Kleinkinder mit ihren Eltern in der Turnhalle des CVJM-Hauses am Kornmarkt. Ohne Anmeldung, einfach vorbeikommen.",
-     "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Offenes Angebot, einfach vorbeikommen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "09:30",
-      "end": "10:15",
-      "from": "2026-10-30",
-      "skipHolidays": true
-     }
-    }
-   ],
-   "inputHash": "c147982f2d07cd77828e08822c80fa7ca975fdec701ad7dca4081c03db338ceb",
-   "model": "opus",
-   "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
-   "pending": {
-    "inputHash": "2cdc1260174f686e2d6711d6a08ddba2c873e1ecffa7816710d25a5874e4140a",
-    "model": "haiku",
-    "events": []
-   }
+   "events": [],
+   "inputHash": "2cdc1260174f686e2d6711d6a08ddba2c873e1ecffa7816710d25a5874e4140a",
+   "model": "haiku",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "emptySince": "2026-10-29T08:35:39+01:00"
   },
   "kandidaten": {
    "events": [
@@ -246,7 +168,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "frankenkids"

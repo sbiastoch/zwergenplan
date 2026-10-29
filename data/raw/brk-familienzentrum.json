@@ -168,7 +168,7 @@
    "inputHash": "ea3c4f9518f80a804d0c19a0994b362ac2dcd8ff01d834b8f67ccfedc91543d3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/experimente-fuer-gross-und-klein.html": {
@@ -213,7 +213,7 @@
    "inputHash": "5f410d8ab0b49cdcad83c7960e82015bd23cb4c1f62c930b27cd86b5b48d21dd",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/miniclub-fuer-kinder-von-12-24-monaten.html": {
@@ -277,7 +277,7 @@
    "inputHash": "9fa6b6bda2716a642fdf2f0773ad1985e25e1189c2ba4cfe623b2e0c8287119f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/auf-entdeckungsreise-mit-papa.html": {
@@ -344,7 +344,7 @@
    "inputHash": "0bb643eeabb86fd3d335b17de27c3b3956939d1d18aa4d3490417a4767c003ca",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "kandidaten": {
@@ -387,7 +387,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "frankenkids"

@@ -79,7 +79,7 @@
    "inputHash": "b8d802c77ec4b570c43eb8fd5570c3919b8afea8a0cc8392da9718104533d5cf",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten/": {
@@ -87,8 +87,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Dienstag 10:00 Uhr (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
+     "title": "Musikgarten Dienstag 10:00 (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten für Kinder ab 18 Monaten mit einer Bezugsperson. 15 Einheiten à 35 Minuten, außer in den Schulferien. Der Kurs läuft bereits.",
      "topics": [
       "musik",
       "singen"
@@ -96,7 +96,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 €",
+     "price": "150 € Kursgebühr",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -106,7 +106,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
+      "note": "Anmeldung über „Jetzt anmelden“ auf der Seite"
      },
      "schedule": {
       "kind": "weekly",
@@ -123,8 +123,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Mittwoch 15:15 Uhr (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
+     "title": "Musikgarten Mittwoch 15:15 (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten für Kinder ab 18 Monaten mit einer Bezugsperson. 15 Einheiten à 35 Minuten, außer in den Schulferien. Der Kurs läuft bereits.",
      "topics": [
       "musik",
       "singen"
@@ -132,7 +132,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 €",
+     "price": "150 € Kursgebühr",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -142,7 +142,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
+      "note": "Anmeldung über „Jetzt anmelden“ auf der Seite"
      },
      "schedule": {
       "kind": "weekly",
@@ -151,7 +151,7 @@
       ],
       "start": "15:15",
       "end": "15:50",
-      "from": "2026-10-28",
+      "from": "2026-11-04",
       "until": "2027-02-03",
       "skipHolidays": true
      }
@@ -159,8 +159,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Mittwoch 15:30 Uhr (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
+     "title": "Musikgarten Mittwoch 15:30 (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten für Kinder ab 18 Monaten mit einer Bezugsperson. 15 Einheiten à 35 Minuten, außer in den Schulferien. Der Kurs läuft bereits.",
      "topics": [
       "musik",
       "singen"
@@ -168,7 +168,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 €",
+     "price": "150 € Kursgebühr",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -177,8 +177,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "frei",
-      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
+      "status": "warteliste",
+      "note": "Kurs belegt, Eintrag auf der Warteliste über die Seite möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -187,7 +187,7 @@
       ],
       "start": "15:30",
       "end": "16:05",
-      "from": "2026-10-28",
+      "from": "2026-11-04",
       "until": "2027-01-27",
       "skipHolidays": true
      }
@@ -195,8 +195,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Donnerstag 15:45 Uhr (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert.",
+     "title": "Musikgarten Donnerstag 15:45 (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten für Kinder ab 18 Monaten mit einer Bezugsperson. 15 Einheiten à 35 Minuten, außer in den Schulferien. Der Kurs läuft bereits.",
      "topics": [
       "musik",
       "singen"
@@ -204,7 +204,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 €",
+     "price": "150 € Kursgebühr",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -213,8 +213,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "frei",
-      "note": "Anmeldebutton „Jetzt anmelden“ aktiv, keine Platzangabe"
+      "status": "warteliste",
+      "note": "Kurs belegt, Eintrag auf der Warteliste über die Seite möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -231,8 +231,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Donnerstag 16:15 Uhr (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegungs- und Klangspielen und einfachen Instrumenten, zusammen mit einer Bezugsperson. 15 Termine à 35 Minuten, in den Schulferien pausiert. Der Kurs ist belegt.",
+     "title": "Musikgarten Donnerstag 16:15 (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten für Kinder ab 18 Monaten mit einer Bezugsperson. 15 Einheiten à 35 Minuten, außer in den Schulferien. Der Kurs läuft bereits.",
      "topics": [
       "musik",
       "singen"
@@ -240,7 +240,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "150 €",
+     "price": "150 € Kursgebühr",
      "url": "https://musication.de/kinder-musik/musikgarten/",
      "sourceUrl": "https://musication.de/kinder-musik/musikgarten/",
      "category": "musik",
@@ -250,7 +250,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Kurs belegt – Eintragung auf die Warteliste über die Onlinebuchung"
+      "note": "Kurs belegt, Eintrag auf der Warteliste über die Seite möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -265,11 +265,11 @@
      }
     }
    ],
-   "inputHash": "091a0456bd9f447a74dce5944ef8d60ae9c2281e84ff51d742e51bd64ec4cd31",
+   "inputHash": "9351976f67b740fa30810d2d8677ee9f27dddb8230d6912c8d12a798bb954202",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten-englisch-singing-english/": {
    "events": [
@@ -314,7 +314,7 @@
    "inputHash": "22e5aed1755dbcdb8aa05d0af7eb65d003fc38da814cdfd6e8695011fc711bd8",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten-sommerkurs/": {
@@ -322,7 +322,7 @@
    "inputHash": "7e5166ef2d186eb01f1950c457945bd8e51b3945757a9469e1f48d9b4dcf9a0f",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

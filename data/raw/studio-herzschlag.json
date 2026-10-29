@@ -6,11 +6,10 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "PEKiP® Plus – Babys geb. Mai–Juli 2026 (6–9 Mon.), donnerstags 11:15",
-     "summary": "PEKiP-Kurs für Babys im ersten Lebensjahr mit Bewegungs-, Spiel- und Sinnesanregungen, eine Einheit zu Babyschlaf und einem kurzen Einstieg ins Thema Beikost. 8 Treffen, E-Book inklusive. Viele Krankenkassen zahlen einen Zuschuss.",
+     "title": "PEKiP Babys geb. Mai–Juli 2026, Do 11:15",
+     "summary": "PEKiP-Kurs mit Spiel-, Bewegungs- und Sinnesanregungen, dazu Einzelberatung und Austausch unter den Eltern. 8 Termine à 90 Minuten. Angeboten von einem externen Partner, Buchung über das Formular auf der Studio-Seite.",
      "topics": [
-      "pekip",
-      "beikost"
+      "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -25,51 +24,25 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über das Formular auf der Kursseite (Partnerkurs, auch Warteliste möglich)"
+      "note": "Anmeldung über das Buchungsformular, Platzangabe wird nicht angezeigt"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-07T11:15",
-        "end": "2027-01-07T12:45"
-       },
-       {
-        "start": "2027-01-14T11:15",
-        "end": "2027-01-14T12:45"
-       },
-       {
-        "start": "2027-01-21T11:15",
-        "end": "2027-01-21T12:45"
-       },
-       {
-        "start": "2027-01-28T11:15",
-        "end": "2027-01-28T12:45"
-       },
-       {
-        "start": "2027-02-04T11:15",
-        "end": "2027-02-04T12:45"
-       },
-       {
-        "start": "2027-02-11T11:15",
-        "end": "2027-02-11T12:45"
-       },
-       {
-        "start": "2027-02-18T11:15",
-        "end": "2027-02-18T12:45"
-       },
-       {
-        "start": "2027-02-25T11:15",
-        "end": "2027-02-25T12:45"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "11:15",
+      "end": "12:45",
+      "from": "2027-01-07",
+      "count": 8,
+      "skipHolidays": false
      }
     },
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "PEKiP® Plus – Babys geb. Juli–Aug. 2026 (4–6 Mon.), freitags 09:30",
-     "summary": "PEKiP-Kurs mit altersgerechten Bewegungs- und Sinnesanregungen, Einzelberatung, Austausch und einer Einheit zu Babyschlaf. 8 Treffen, E-Book inklusive. Viele Krankenkassen zahlen einen Zuschuss.",
+     "title": "PEKiP Babys geb. Juli–Aug. 2026, Fr 09:30",
+     "summary": "PEKiP-Kurs mit Spiel-, Bewegungs- und Sinnesanregungen, dazu Einzelberatung und Austausch unter den Eltern. 8 Termine à 90 Minuten. Angeboten von einem externen Partner, Buchung über das Formular auf der Studio-Seite.",
      "topics": [
       "pekip"
      ],
@@ -86,54 +59,27 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über das Formular auf der Kursseite (Partnerkurs, auch Warteliste möglich)"
+      "note": "Anmeldung über das Buchungsformular, Platzangabe wird nicht angezeigt"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-08T09:30",
-        "end": "2027-01-08T11:00"
-       },
-       {
-        "start": "2027-01-15T09:30",
-        "end": "2027-01-15T11:00"
-       },
-       {
-        "start": "2027-01-22T09:30",
-        "end": "2027-01-22T11:00"
-       },
-       {
-        "start": "2027-01-29T09:30",
-        "end": "2027-01-29T11:00"
-       },
-       {
-        "start": "2027-02-05T09:30",
-        "end": "2027-02-05T11:00"
-       },
-       {
-        "start": "2027-02-12T09:30",
-        "end": "2027-02-12T11:00"
-       },
-       {
-        "start": "2027-02-19T09:30",
-        "end": "2027-02-19T11:00"
-       },
-       {
-        "start": "2027-02-26T09:30",
-        "end": "2027-02-26T11:00"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2027-01-08",
+      "count": 8,
+      "skipHolidays": false
      }
     },
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "PEKiP® Plus – Babys geb. Sep.–Nov. 2026 (3–5 Mon.), donnerstags 09:30",
-     "summary": "PEKiP-Kurs für junge Babys mit sanften Bewegungs- und Sinnesanregungen, einer Einheit zu Babyschlaf und einem Exkurs Babymassage. 8 Treffen, E-Book inklusive. Viele Krankenkassen zahlen einen Zuschuss.",
+     "title": "PEKiP Babys geb. Sep.–Nov. 2026, Do 09:30",
+     "summary": "PEKiP-Kurs mit Spiel-, Bewegungs- und Sinnesanregungen, dazu Einzelberatung und Austausch unter den Eltern. 8 Termine à 90 Minuten. Angeboten von einem externen Partner, Buchung über das Formular auf der Studio-Seite.",
      "topics": [
-      "pekip",
-      "babymassage"
+      "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -148,52 +94,26 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über das Formular auf der Kursseite (Partnerkurs, auch Warteliste möglich)"
+      "note": "Anmeldung über das Buchungsformular, Platzangabe wird nicht angezeigt"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-02-04T09:30",
-        "end": "2027-02-04T11:00"
-       },
-       {
-        "start": "2027-02-11T09:30",
-        "end": "2027-02-11T11:00"
-       },
-       {
-        "start": "2027-02-18T09:30",
-        "end": "2027-02-18T11:00"
-       },
-       {
-        "start": "2027-02-25T09:30",
-        "end": "2027-02-25T11:00"
-       },
-       {
-        "start": "2027-03-04T09:30",
-        "end": "2027-03-04T11:00"
-       },
-       {
-        "start": "2027-03-11T09:30",
-        "end": "2027-03-11T11:00"
-       },
-       {
-        "start": "2027-03-18T09:30",
-        "end": "2027-03-18T11:00"
-       },
-       {
-        "start": "2027-03-25T09:30",
-        "end": "2027-03-25T11:00"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2027-02-04",
+      "count": 8,
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "c9a36d9ac0bb752b6a246bd40f127b53d2ac28cb357974b99dd94e215e8ea280",
-   "model": "opus",
+   "inputHash": "41bf2d307cbb5fe4121d5b794ae09b5c4db48577cd5ffe4455709d36ded9c91a",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://mamalea-familienbegleitung.de/musikzauber/": {
    "events": [

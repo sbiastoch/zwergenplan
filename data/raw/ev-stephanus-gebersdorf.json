@@ -6,12 +6,12 @@
     {
      "providerId": "ev-stephanus-gebersdorf",
      "venueId": "ev-stephanus-gebersdorf",
-     "title": "Eltern-Kind-Gruppe (donnerstags vormittags)",
-     "summary": "Eltern und Kleinkinder treffen sich zum Spielen und Singen. Die Kinder knüpfen erste Kontakte, die Eltern tauschen sich aus. In den Schulferien finden keine Treffen statt.",
+     "title": "Eltern-Kind-Gruppe Donnerstag (Stephanuskirche Gebersdorf)",
+     "summary": "Spielen, Singen und Austausch für Eltern und Kinder im Gemeindehaus, donnerstags 9:30–11:30 Uhr. Die Termine sind bis Oktober 2027 aufgelistet; Ferienpausen fehlen. Anmeldung und Kosten sind nicht angegeben.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe",
-      "singen"
+      "elterntreff",
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -21,7 +21,7 @@
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angaben zur Anmeldung; Auskunft bei der Kirchengemeinde Stephanuskirche Gebersdorf"
+      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; beim Veranstalter nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -161,13 +161,17 @@
        {
         "start": "2027-10-21T09:30",
         "end": "2027-10-21T11:30"
+       },
+       {
+        "start": "2027-10-28T09:30",
+        "end": "2027-10-28T11:30"
        }
       ]
      },
      "via": "evtermine"
     }
    ],
-   "inputHash": "2bf5ca4212e7aa1eef7f2d21ff3969b4fd57ba4bd1fead0dacc655a565bf91e9",
+   "inputHash": "312a586887fa297b3d6c8cceed85e603eb732dc84f03c12e61326c42b6a50d27",
    "dated": {
     "2026-10-29": "d26cd72e733b15d0717b412037f4a24381bd20d6683ab73bbfa3235b0eaf7775",
     "2026-11-12": "381da37f89c38e7f1370ba9c29adbe0eba146f84de945435d348ed5c66b74f6b",
@@ -205,10 +209,10 @@
     "2027-10-21": "ab251287efaabeda0c6063e4683bb32dd1d0c7eeba3c1d3048f7f67c4e943e6b",
     "2027-10-28": "8e3f2357006a82bc70e71180e4a07429c7dfd43a51f51abcdf2af342d65d12d4"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
    "sources": [
     "evtermine"
    ]

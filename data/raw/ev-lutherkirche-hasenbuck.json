@@ -6,15 +6,15 @@
     {
      "providerId": "ev-lutherkirche-hasenbuck",
      "venueId": "ev-lutherkirche-hasenbuck",
-     "title": "Krabbelgruppe Lutherkirche Hasenbuck (dienstags)",
-     "summary": "Wöchentliches Treffen für Eltern mit Babys und Kleinkindern im Keller des Pfarramts, Zugang über den Garten. Zu Anmeldung und Kosten gibt es keine Angaben.",
+     "title": "Krabbelgruppe (dienstags, Pfarramt Lutherkirche)",
+     "summary": "Regelmäßige Krabbelgruppe im Keller des Pfarramts (Zugang vom Garten), dienstags 10:30–11:30 Uhr. Der Kalender nennt Termine bis 22.12.2026; Kosten und Anmeldung stehen nicht darin, daher beim Pfarramt nachfragen.",
      "topics": [
       "krabbelgruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8146744.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8146745.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=571",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -23,15 +23,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angaben; bei Fragen an das Pfarramt Lutherkirche wenden"
+      "note": "Keine Angabe zu Plätzen oder Anmeldung; Auskunft über das Pfarramt der Lutherkirche."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-10-27T10:30",
-        "end": "2026-10-27T11:30"
-       },
        {
         "start": "2026-11-10T10:30",
         "end": "2026-11-10T11:30"
@@ -64,10 +60,8 @@
      }
     }
    ],
-   "inputHash": "8d2b2dfa698631e7477f8db8fb52101423b387280fc27439a575334366688c26",
+   "inputHash": "a0108ccb4f8fe493aff87dbcab8df70cdbb41277343519898856532532a985f6",
    "dated": {
-    "2026-10-27": "427f702869f5ebe0bf6de6373152e0aec2a3817fd69c3733e5ffd6ed0991d770",
-    "2026-10-28": "39699eb687e2c65993eef9de3d8cee6ff8fbd032e924f00a31401b5010db9e87",
     "2026-10-29": "03f3b189a156a161b6e9bfd28f27da13eb612ea17577817af128f8f32e042197",
     "2026-10-31": "73ef50f4328526974c75553f63dcd073dc9b8d56bb2b75928d697b36d14990b6",
     "2026-11-01": "3cebde68a269fb15bd44e42fc161a9b2350bff3cb183f92dcb2dfbf3355f7527",
@@ -89,7 +83,7 @@
     "2026-12-02": "2fcbf3a507200f9684d9650aed2d9384811607c5e29c690a000f4a72b72994a3",
     "2026-12-03": "f354cd0da988384b888ddc475968a885ffb7feba805c37624e3820a2f65d57fc",
     "2026-12-04": "ba9ba04ee424f06512f530fe9edf05c75aac556d6fe6d3b29f4786f19f6ecfb3",
-    "2026-12-06": "a07c12b2ac3ca07d6d914507633e866ae37fcb7afe3717601b6843e39da610ee",
+    "2026-12-06": "437ab6ee1aab4ff9f59539a814aa880cd727c7dabcd3513669bffb40ade07a81",
     "2026-12-07": "524529de08ca69edd026210f898fbc1bcbdb4cf97398ee6ed01b0de83efdcd7e",
     "2026-12-08": "bef6c27a723d7aaf828b5415e8065b841ca9571aaf54a6f2318494384bf4d462",
     "2026-12-09": "541149c714554ba4bb940a41dbb1232788af3700fb2ab60b883fa2ea27503662",
@@ -101,8 +95,9 @@
     "2026-12-20": "1781f44bcaaf55af4941242c50aa72847beca883e4e3b8e6f948f768e43a83df",
     "2026-12-22": "855758b37e28e2af6fc513bab0e0ad672ab78886342edda4117fe0e27c318488",
     "2026-12-23": "48ee9ab633fc2f33e8b046681d6aa18ff92122eadc70b6dd4db089c704d9b4fe",
-    "2026-12-27": "16865b9cb9d214a29c52484eb3a041f33ce2381a0e445b0198023db20de40ce4",
-    "2027-01-03": "a48d3c15b668f3f777f68d5fbe38181ab2ba79ee28eebd31d170c8166d98b88b",
+    "2026-12-24": "18c1a9f13565b5e4bc38bdd370a0f15fc1d31ce0ac8a9c44eaacb6495d03144a",
+    "2026-12-27": "ff67c5a1c73f5ac193408b626f7b495e145c2c8f701346f387c682d8706fb7c7",
+    "2027-01-03": "13a370252f75d31abd88db474ddbe2be1a88a1decbbb698aeb9d7c1e6a641900",
     "2027-01-10": "4bbb15457bea5c95f672e81ddaad1bfd4c6cd0d21bc67df23431433b1f2a6cd7",
     "2027-01-11": "95dae233ed76b17d004b4a320e2bad0e3e4696f9638e0e30cb1ee71e41ccbf9a",
     "2027-01-17": "cbc1fb1dad065c0689c05c18152c871ca917dada7db4b971c3770ae32d9e1570",
@@ -119,26 +114,27 @@
     "2027-11-08": "96d7813014b5ffe64d9288c1d61429ee1bc119fc1fb1c544cbe8e155dba3ecb8",
     "2027-12-06": "76f015f21f3a4f5206e3e4b96718bf8a57169a0f47c73eda5ad58686f394ecef"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "kandidaten": {
    "events": [
     {
      "providerId": "ev-lutherkirche-hasenbuck",
      "venueId": "ev-lutherkirche-hasenbuck",
-     "title": "Krabbelgruppe Lutherkirche Hasenbuck (dienstags)",
-     "summary": "Wöchentliches Treffen für Eltern mit Babys und Kleinkindern zum Spielen und Austauschen im Keller des Pfarramts (Zugang vom Garten). Am 3.11. findet kein Treffen statt.",
+     "title": "Krabbelgruppe Lutherkirche Hasenbuck (dienstags 10:30)",
+     "summary": "Krabbelgruppe im Keller des Pfarramts (Zugang vom Garten), Nerzstraße 34. Im Kalendereintrag fehlen Angaben zu Anmeldung und Kosten; bitte beim Pfarramt nachfragen.",
      "topics": [
-      "krabbelgruppe"
+      "krabbelgruppe",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146744",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8146745",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146745",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -146,14 +142,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angaben zu Plätzen; Fragen an das Pfarramt Lutherkirche"
+      "note": "Keine Angabe zur Anmeldung im Kalendereintrag; beim Pfarramt Lutherkirche nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-10-27T10:30"
-       },
        {
         "start": "2026-11-10T10:30"
        },
@@ -180,21 +173,20 @@
      "via": "evtermine"
     }
    ],
-   "inputHash": "471616d285dc707715bee02fbaf7e2f1599b833ce7a6fdc92c45d927d591cf9c",
+   "inputHash": "8abadccc4fbb77c2f471edc1b73b050678b7a11fa93db672c1960d276885a17b",
    "dated": {
-    "2026-10-27": "e85548c65ae321e09dbce9b09f18c2c79d75c696dd2f1bb175251df7670fe9ec",
-    "2026-11-10": "766917cf6d452d11d2c8a094c9baac8acd176a4fa542346385dd5c3d59b5c6d6",
-    "2026-11-17": "4f856bdc41c7821f70cd5c6a7c1a8ef75941f8e7b21b81745a2b58a468b27178",
-    "2026-11-24": "e67172a341bfd894cdb3e79dc807ad099ab759f7f4e1f61ca932ab161e323a21",
-    "2026-12-01": "ed43ea90a5e4090247c210cb21102906b8c7ff1893fbd7a4b6ee17c465a0ca3d",
-    "2026-12-08": "9a99d7bcba012ca53d4973ca201d77d21904b678a7ee29336c0509e8929e5dce",
-    "2026-12-15": "a0fc0703d4713acb4bcc82c9887ee5a8e94b3b5147b2652921f191ec7e7246f7",
-    "2026-12-22": "c1c8e63da605587551ef2b1364fe9cd1f221b28c09e8ce2e0e82281a516653b1"
+    "2026-11-10": "7d2876c557e92a73fe3ac9bd6dfca5acf6624046751741c54808a01aa5f4a97c",
+    "2026-11-17": "650f75fac6bd37eda8a145dfcf8d1e847812419cd61f80d829953e5f388d7d4e",
+    "2026-11-24": "7ff5faa54fdcca0cbf5abbdcd4b0b5ede7e85f19a5c13e72432762d7a12b9f59",
+    "2026-12-01": "de89dbf31a90481555a26394e867d26222d03c3e7614dc411be633a8af14ede6",
+    "2026-12-08": "ead92ab068b800dea2b40d1f156c8da9a00fa6dc3f65ca9c2ed051e45f8d9bb2",
+    "2026-12-15": "e8ce0d478e35b2033a859bbb1c9fadead3b7e56d7a6ee045a4afdbc490160cf0",
+    "2026-12-22": "00cf90fdb99ff0143b8bdd92ae4cbccbd7f2a5d60ad7fc9a43a1802e2aea520d"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
    "sources": [
     "evtermine"
    ]

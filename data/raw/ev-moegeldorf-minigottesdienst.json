@@ -3,10 +3,10 @@
  "units": {
   "kandidaten": {
    "events": [],
-   "inputHash": "451af58d200541b6efed655613c083f92da2e1e01225925e6dd42691b695a368",
+   "inputHash": "cf6315a715b54d7a1f15afbb8e638ba26b0e927daa1b63d023f64cab0e1bbd32",
    "model": "ohne-eingabe",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": []
   }

@@ -6,12 +6,12 @@
     {
      "providerId": "hebamme-kobielski",
      "venueId": "hebamme-kobielski",
-     "title": "Babymassage (montags)",
-     "summary": "Babymassage in der Hebammenpraxis in Langwasser: Eltern lernen, ihr Baby sanft zu massieren. Läuft wöchentlich, Einstieg auf Anfrage. Keine Kassenleistung.",
+     "title": "Babymassage-Kurs (montags 10:00)",
+     "summary": "Babymassage für Eltern mit ihrem Baby in der Hebammenpraxis, montags 10:00–10:45 Uhr. Keine Kassenleistung. Anmeldung über das Kontaktformular der Website; Plätze werden nicht online angezeigt.",
      "topics": [
       "babymassage"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://hebamme-nuernberg.de/",
@@ -19,7 +19,7 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über das Kontaktformular auf der Website"
+      "note": "Anmeldung über das Kontaktformular auf hebamme-nuernberg.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -29,17 +29,16 @@
       "start": "10:00",
       "end": "10:45",
       "from": "2026-11-02",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebamme-kobielski",
      "venueId": "hebamme-kobielski",
-     "title": "Mama Fitness mit Baby (montags)",
-     "summary": "Fitnesstraining für Mütter nach der Geburt, das Baby ist dabei, deshalb braucht man keinen Babysitter. Es geht um Ausdauer, Kraft und Austausch mit anderen Müttern. Einstieg auf Anfrage.",
+     "title": "Mama Fitness mit Baby (montags 09:30)",
+     "summary": "Fitnesstraining für Mütter in der Hebammenpraxis, montags 09:30–10:30 Uhr. Kein Babysitter nötig. Anmeldung über das Kontaktformular der Website; Plätze werden nicht online angezeigt.",
      "topics": [
-      "fitness-mit-baby",
-      "muetter"
+      "fitness-mit-baby"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -49,7 +48,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über das Kontaktformular auf der Website"
+      "note": "Anmeldung über das Kontaktformular auf hebamme-nuernberg.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -59,15 +58,15 @@
       "start": "09:30",
       "end": "10:30",
       "from": "2026-11-02",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "7da5bc4e4e3cea74df9ad77666f9f607c6ef4ef5f8eb3ffc1382484db9a366be",
-   "model": "opus",
+   "inputHash": "f5801370efb79f82421f9e79a53c74a8bac2cfb2ecddfdf20af95b6edba20cac",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   }
  }
 }

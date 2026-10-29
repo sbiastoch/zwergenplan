@@ -6,10 +6,11 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Offene Tür für Groß und Klein (Markuskirche/FreiRaum)",
-     "summary": "Offener Treff im FreiRaum der Markuskirche für Familien mit kleinen Kindern und Erwachsene, montags 9–11 Uhr. Kein Anmelden nötig, einfach vorbeikommen. Der Termin am 30.11. entfällt.",
+     "title": "Offene Tür für Groß und Klein (montags)",
+     "summary": "Offener Treff im FreiRaum der Markuskirche für Familien mit Kindern jeden Alters, einfach vorbeikommen. Der Termin am 30.11. entfällt.",
      "topics": [
-      "elterntreff"
+      "elterntreff",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -38,10 +39,41 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Offene Tür für Groß und Klein (21.12.2026)",
-     "summary": "Offener Treff für Familien mit kleinen Kindern im FreiRaum der Markuskirche. Kein Anmelden nötig, einfach vorbeikommen. Laut Veranstaltungskalender ist der Termin am 21.12.2026 von 9 bis 11 Uhr eingetragen.",
+     "title": "Café für Alle (dienstags, Helmut-Herold-Platz)",
+     "summary": "Offenes Café auf dem Platz für Alle vor der Markuskirche für alle, auch Familien mit kleinen Kindern. Einfach vorbeikommen; einzelne Termine haben Sonderprogramm, etwa Bilderbuchkino am 24.11. ab 14:30 Uhr.",
      "topics": [
+      "elterncafe",
       "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8053909.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
+     "category": "treffs-cafes",
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Einfach vorbeikommen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "15:00",
+      "end": "17:00",
+      "from": "2026-11-10",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "ev-st-markus-gibitzenhof",
+     "venueId": "ev-st-markus-gibitzenhof",
+     "title": "Offene Tür für Groß und Klein (FreiRaum Markuskirche)",
+     "summary": "Offener Treff für Familien mit kleinen und größeren Kindern im FreiRaum der Markuskirche. Ohne Anmeldung, einfach vorbeikommen. Im Kalender steht der Termin am 21.12.2026.",
+     "topics": [
+      "elterntreff",
+      "eltern-kind-gruppe"
      ],
      "format": "einmalig",
      "registration": "ohne-anmeldung",
@@ -51,7 +83,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "offener Treff, keine Anmeldung nötig"
+      "note": "offener Treff, ohne Anmeldung"
      },
      "schedule": {
       "kind": "dates",
@@ -66,7 +98,6 @@
    ],
    "inputHash": "e1098639d45764dc73b636f609f698e2ca7a27eb3205654c45294b033eb0cccd",
    "dated": {
-    "2026-10-28": "c59d7c37dfc613d7c97bc35adab89ddc1f710bb6778be47e430ab1b9eebc739e",
     "2026-10-29": "49ec12c5e2bcb8b0ba32d11dc5609af35b1a6598d47c39386c2e14425e4b37a1",
     "2026-10-30": "0e7e9537af057a6caa8fa375266b64f81a0f55d07e114b38dd5ad072327cf655",
     "2026-11-01": "91f3b2ce0ebbb72c770e0c0f31fd073d16a3ded89c1353aeb7ee7cfcc9055a57",
@@ -87,6 +118,7 @@
     "2026-11-18": "b502baadc5d5ee6f9c6857bfcee6c2aa4997920e8d07911868ec02de4a26c698",
     "2026-11-19": "f489f19d9c74ee32648e3135d56f9ecfc304eaa7802804ee99981dd858e44c79",
     "2026-11-20": "755c825afdafa92bb4c5c20eea1f871bc0dcc92214335404452b16ea266a7f93",
+    "2026-11-21": "3bbab4bf16619d28cee346313457b2788754ffe19bd024400c00c1150496d33d",
     "2026-11-22": "770930750d669146ea8292a17e4abbbdd73330c6bdddc344b5b5aa626080e792",
     "2026-11-23": "a668477a561e5377e9ad3a3c1952aa40c64773affe8d8e427cc4935acb4e552c",
     "2026-11-24": "613b806d9a564d9c024707b3e3331d242aaff37a3d3f7e3e2eb1aff25673e04e",
@@ -198,8 +230,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familiencafe/": {
    "events": [
@@ -237,7 +269,7 @@
    "inputHash": "ac4653c89fb0607f1bcb7ae239147e7790502cf34be5433aa9887bbeed00c5b8",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familien-kinder/": {
@@ -245,7 +277,7 @@
    "inputHash": "7ab2e07bcab3d39c0606d369205a44f17962aeaa8f0204e308897149cb353044",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "kandidaten": {
@@ -316,7 +348,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine"

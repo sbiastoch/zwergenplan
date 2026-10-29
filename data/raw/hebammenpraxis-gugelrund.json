@@ -6,21 +6,21 @@
     {
      "providerId": "hebammenpraxis-gugelrund",
      "venueId": "hebammenpraxis-gugelrund",
-     "title": "Babymassagekurs (freitags, ab 15.01.2027)",
-     "summary": "Eltern lernen verschiedene Massagegriffe für ihr Baby, dazu Übungen zur Körperwahrnehmung und einen kurzen Einblick in Aromaöle, und tauschen sich über ihre Erfahrungen aus. Bitte ein großes Handtuch und Körperöl mitbringen. 5 Termine.",
+     "title": "Babymassagekurs (freitags, 5 Termine ab 15.01.2027)",
+     "summary": "Kurs mit Massagetechniken und Übungen zur Körperwahrnehmung für Babys, dazu Tipps zur Massage zu Hause. Handtuch und Körperöl mitbringen. Anfragen nur telefonisch bei der Praxis.",
      "topics": [
       "babymassage"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "65 € pro Person (5 Termine)",
+     "price": "65 € pro Person",
      "url": "https://www.gugelrund.de/home.html#kurse",
      "sourceUrl": "https://www.gugelrund.de/home.html#kurse",
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anmeldung telefonisch unter 0911/32 36 19 2 (Anrufbeantworter, Rückruf)"
+      "note": "Anfrage nur telefonisch über die Praxis"
      },
      "schedule": {
       "kind": "weekly",
@@ -31,7 +31,6 @@
       "end": "11:15",
       "from": "2027-01-15",
       "until": "2027-02-26",
-      "count": 5,
       "skipHolidays": true,
       "except": [
        "2027-01-29"
@@ -39,11 +38,11 @@
      }
     }
    ],
-   "inputHash": "44f940bf63f9582f0ab09d0dd417928e8435fd29fa3d503c874f73213fbe909d",
-   "model": "opus",
+   "inputHash": "a04f91f1a2c484ca070034eb19779eb53e173b363dc0c4dde2b64eb5d65d1694",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   }
  }
 }

@@ -6,8 +6,8 @@
     {
      "providerId": "nachbarschaftshaus-gostenhof",
      "venueId": "nachbarschaftshaus-gostenhof",
-     "title": "Offenes Kinderzimmer – Dienstagvormittag (0–3 Jahre)",
-     "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre: gemeinsam spielen, andere Familien kennenlernen und sich austauschen, ohne festes Programm. Ohne Anmeldung, kostenlos, nicht in den Ferien.",
+     "title": "Offenes Kinderzimmer (Dienstag 9–12 Uhr)",
+     "summary": "Offener Treff für Eltern mit Kindern von 0 bis 3 Jahren im Kinderzimmer, ohne festes Programm zum Spielen und Austauschen. Kostenfrei, ohne Anmeldung, nicht in den Ferien; ohne pädagogische Betreuung, es gibt eine Ansprechpartnerin vor Ort.",
      "topics": [
       "elterntreff",
       "spielgruppe"
@@ -15,7 +15,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "kostenfrei",
+     "price": "Kostenfrei",
      "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
      "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
      "category": "treffs-cafes",
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Einfach vorbeikommen; Infos unter 0911 / 231-7086"
+      "note": "Offener Treff ohne Buchung"
      },
      "schedule": {
       "kind": "weekly",
@@ -34,15 +34,15 @@
       ],
       "start": "09:00",
       "end": "12:00",
-      "from": "2026-10-27",
+      "from": "2026-11-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "nachbarschaftshaus-gostenhof",
      "venueId": "nachbarschaftshaus-gostenhof",
-     "title": "Offenes Kinderzimmer – Donnerstagnachmittag (0–3 Jahre)",
-     "summary": "Offener Spiel- und Austauschtreff für Eltern mit Kindern bis 3 Jahre, ohne Programm und ohne pädagogische Leitung; im Sommer auch im Garten. Ohne Anmeldung, kostenlos, nicht in den Ferien.",
+     "title": "Offenes Kinderzimmer (Donnerstag 14–17 Uhr)",
+     "summary": "Offener Treff für Eltern mit Kindern von 0 bis 3 Jahren im Kinderzimmer, ohne festes Programm zum Spielen und Austauschen. Kostenfrei, ohne Anmeldung, nicht in den Ferien; ohne pädagogische Betreuung, es gibt eine Ansprechpartnerin vor Ort.",
      "topics": [
       "elterntreff",
       "spielgruppe"
@@ -50,7 +50,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "kostenfrei",
+     "price": "Kostenfrei",
      "url": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
      "sourceUrl": "https://www.nuernberg.de/internet/nh_gostenhof/kurse.html",
      "category": "treffs-cafes",
@@ -60,7 +60,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Einfach vorbeikommen; Infos unter 0911 / 231-7086"
+      "note": "Offener Treff ohne Buchung"
      },
      "schedule": {
       "kind": "weekly",
@@ -74,26 +74,26 @@
      }
     }
    ],
-   "inputHash": "743e026af685d0a48c582d75a77322e7204fa88b379fc30447faad545d3539cc",
-   "model": "opus",
+   "inputHash": "9e4966c1d35ffca761567d17e503c08d456b30a10a31882a670121119aff3ef9",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.nuernberg.de/internet/nh_gostenhof/veranstaltungen.html": {
    "events": [],
-   "inputHash": "9e4cdd490cdf879047187b8104c78dca7fc243ec0a7ad1ad6e770a22c753fc18",
-   "model": "opus",
+   "inputHash": "c620c61098916fa81f1099d7aab8f5a2a222cb8cdde1a0033ac77fdca245c568",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28veranstalterID%20%3D%3D%20412%29%20OR%20%28ortID%20%3D%3D%2028%29&AUSGABEFELDER=TITEL,UNTERTITEL,DATUM,ORT&MAX_LIMIT=200&ALLETERMINE=1&ORDER=DATUM&START_DATUM={von}": {
    "events": [],
-   "inputHash": "8f1d84f1982cc7b647495d9f92af8930a446dc89f771cb0cdc0fda43f9664c5b",
-   "model": "opus",
+   "inputHash": "f13d4861d9756814c4db3acdf23d5286d28b0a2a758d717c33a9ebc380d52e62",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-29T08:35:39+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }
