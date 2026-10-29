@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Anbieter-Sheet mit Orten auf der Karte</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.zp{width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.th-light{--bg:#E8F1FF;--dotc:rgba(19,33,46,.13);--surface:#FFFFFF;--rim:#FFFFFF;--ink:#13212E;--muted:#475563;--soft:#EEF3FA;--line:#13212E;--shadow:#13212E;--primary:#13212E;--on-primary:#FFFFFF;--map:#E1EBF8;--road:#FFFFFF;--park:#D3EBC6;--water:#B3D7F5;--scrim:rgba(19,33,46,.45);--sel:#FFD93B;--on-sel:#13212E}
+.zp button{font:inherit;color:inherit;cursor:pointer}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet{position:absolute;left:0;right:0;top:56px;bottom:0;background:var(--surface);border-top:2.5px solid var(--line);border-radius:26px 26px 0 0;padding:10px 16px 20px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.grip{width:44px;height:5px;border-radius:3px;background:var(--line);opacity:.35;align-self:center}
+.sh-head{display:flex;align-items:flex-start;gap:8px}
+.sh-head h2{margin:0;font-size:22px;font-weight:800;line-height:1.2;letter-spacing:-.01em}
+.sh-head p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.round{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid var(--line);background:var(--surface);box-shadow:3px 3px 0 var(--shadow);display:grid;place-items:center;box-sizing:border-box}
+.mini{position:relative;height:190px;border:2.5px solid var(--line);border-radius:18px;overflow:hidden;background:var(--map);box-shadow:3px 3px 0 var(--shadow);flex:none}
+.mini svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.road{fill:none;stroke:var(--road);stroke-linecap:round}
+.lbl{fill:var(--muted);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:11px;font-weight:600}
+.num{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:var(--surface);border:2px solid var(--line);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;font-size:13px;font-weight:800;box-sizing:border-box}
+.num.sel{background:var(--sel);color:var(--on-sel)}
+.num.idle{opacity:.55;border-style:dashed;box-shadow:none}
+.attr{position:absolute;left:8px;bottom:5px;font-size:9px;color:var(--muted)}
+h3{margin:4px 0 0;font-size:15px;font-weight:800}
+.places{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.places li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1.5px solid var(--soft)}
+.places li .n{width:26px;height:26px;flex:none;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:800;box-sizing:border-box}
+.places li .n.sel{background:var(--sel);color:var(--on-sel)}
+.places li .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.places li .t b{font-size:15px;font-weight:700}
+.places li .t span{font-size:13px;color:var(--muted)}
+.places li.idle .t{opacity:.6}
+.route{font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;color:var(--ink);min-height:44px;display:inline-flex;align-items:center}
+</style>
+</helmet>
+<div class="zp th-light">
+  <div class="scrim"></div>
+  <section class="sheet" role="dialog" aria-label="Anbieter Stadtbibliothek">
+    <div class="grip"></div>
+    <div class="sh-head">
+      <div style="flex:1">
+        <h2>Stadtbibliothek (fiktiv)</h2>
+        <p>11 Orte · 9 Angebote</p>
+      </div>
+      <button type="button" class="round" aria-label="Anbieter merken"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg></button>
+      <button type="button" class="round" aria-label="Teilen"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M8 8l4-4 4 4M5 13v6h14v-6"></path></svg></button>
+      <button type="button" class="round" aria-label="Schließen"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+    </div>
+    <div class="mini">
+      <svg class="bg" viewBox="0 0 354 190" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <ellipse cx="320" cy="170" rx="60" ry="34" fill="var(--park)"></ellipse>
+        <path d="M-10 100 C40 88 70 112 110 98 S170 80 205 95 S270 112 364 88" fill="none" stroke="var(--water)" stroke-width="6"></path>
+        <path class="road" stroke-width="7" d="M180 56 Q226 58 232 94 Q234 132 185 136 Q136 134 134 96 Q138 58 180 56Z"></path>
+        <path class="road" stroke-width="5" d="M0 56 L134 90 M232 94 L354 84 M185 136 L200 190 M180 56 L170 0 M134 96 L30 190 M232 110 L354 180"></path>
+        <text class="lbl" x="14" y="82">Fürth</text>
+        <text class="lbl" x="162" y="88">Altstadt</text>
+        <text class="lbl" x="250" y="74">Wöhrd</text>
+      </svg>
+      <span class="num sel" style="left:184px;top:100px">1</span>
+      <span class="num" style="left:90px;top:128px">2</span>
+      <span class="num" style="left:262px;top:52px">3</span>
+      <span class="num" style="left:238px;top:156px">4</span>
+      <span class="num" style="left:40px;top:70px">5</span>
+      <span class="num idle" style="left:310px;top:128px">6</span>
+      <span class="num" style="left:150px;top:28px">+5</span>
+      <div class="attr">OpenFreeMap © OpenMapTiles · OpenStreetMap</div>
+    </div>
+    <h3>Orte</h3>
+    <ul class="places">
+      <li>
+        <span class="n sel">1</span>
+        <span class="t"><b>Zentralbibliothek</b><span>Altstadt · 4 Angebote</span></span>
+        <a class="route" href="https://www.google.com/maps/dir/?api=1">Route</a>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <span class="t"><b>Stadtteilbibliothek Gostenhof</b><span>Gostenhof · 2 Angebote</span></span>
+        <a class="route" href="https://www.google.com/maps/dir/?api=1">Route</a>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <span class="t"><b>Stadtteilbibliothek Wöhrd</b><span>Wöhrd · 1 Angebot</span></span>
+        <a class="route" href="https://www.google.com/maps/dir/?api=1">Route</a>
+      </li>
+      <li>
+        <span class="n">4</span>
+        <span class="t"><b>Stadtteilbibliothek Südstadt</b><span>Südstadt · 1 Angebot</span></span>
+        <a class="route" href="https://www.google.com/maps/dir/?api=1">Route</a>
+      </li>
+      <li class="idle">
+        <span class="n">6</span>
+        <span class="t"><b>Stadtteilbibliothek Langwasser</b><span>Langwasser · gerade keine Termine</span></span>
+        <a class="route" href="https://www.google.com/maps/dir/?api=1">Route</a>
+      </li>
+    </ul>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
