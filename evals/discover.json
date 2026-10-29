@@ -1,0 +1,161 @@
+{
+  "seed": 20261029,
+  "stichproben": {
+    "nuernberg": [
+      {
+        "id": "brk-familienzentrum",
+        "alt": true
+      },
+      {
+        "id": "zoff-harmonie",
+        "alt": true
+      },
+      {
+        "id": "cvjm-gostenhof-miniclub",
+        "alt": true
+      },
+      {
+        "id": "djk-eibach",
+        "alt": true
+      },
+      {
+        "id": "post-sv-nuernberg",
+        "alt": true
+      },
+      {
+        "id": "schwimmschule-baer-ritterbad",
+        "alt": true
+      },
+      {
+        "id": "die-familienbox",
+        "alt": true
+      },
+      {
+        "id": "ev-suedstadt-krabbelgruppen",
+        "alt": true
+      },
+      {
+        "id": "hebamme-elena-paulus",
+        "alt": true
+      },
+      {
+        "id": "musikfuechse",
+        "alt": true
+      },
+      {
+        "id": "hebammen-wunderwerk"
+      },
+      {
+        "id": "vhs-fuerth"
+      },
+      {
+        "id": "zentrum-kobergerstrasse"
+      },
+      {
+        "id": "ev-melanchthon-ziegelstein"
+      },
+      {
+        "id": "ev-st-johannis"
+      },
+      {
+        "id": "kath-st-martin-nordstadt"
+      },
+      {
+        "id": "musikschule-fuerth"
+      },
+      {
+        "id": "staatstheater-nuernberg-familie"
+      },
+      {
+        "id": "mutherstudio"
+      },
+      {
+        "id": "tsv-1846-nuernberg"
+      }
+    ]
+  },
+  "arten": {
+    "atv-1873-frankonia": "verein",
+    "babykonzert-nuernberg": "sonstige",
+    "brk-familienzentrum": "familienzentrum",
+    "cvjm-gostenhof-miniclub": "verein",
+    "cvjm-nuernberg-wuselwelt": "verein",
+    "dance-maxx-nuernberg": "sonstige",
+    "die-familienbox": "familienzentrum",
+    "djk-eibach": "verein",
+    "ev-altenfurt-minigottesdienst": "gemeinde",
+    "ev-buchenbuehl-miniclub": "gemeinde",
+    "ev-eibach": "gemeinde",
+    "ev-emmaus-gartenstadt": "gemeinde",
+    "ev-fischbach": "gemeinde",
+    "ev-kraftshof-boxdorf": "gemeinde",
+    "ev-langwasser-miniclubs": "gemeinde",
+    "ev-laufamholz-miniclub": "gemeinde",
+    "ev-lutherkirche-hasenbuck": "gemeinde",
+    "ev-melanchthon-ziegelstein": "gemeinde",
+    "ev-moegeldorf-minigottesdienst": "gemeinde",
+    "ev-nikodemus-roethenbach": "gemeinde",
+    "ev-st-andreas-thon": "gemeinde",
+    "ev-st-jobst": "gemeinde",
+    "ev-st-johannis": "gemeinde",
+    "ev-st-markus-gibitzenhof": "gemeinde",
+    "ev-stephanus-gebersdorf": "gemeinde",
+    "ev-suedstadt-krabbelgruppen": "gemeinde",
+    "ev-thomaskirche-grossreuth": "gemeinde",
+    "ev-zerzabelshof-musikzwerge": "gemeinde",
+    "famalie-fuerth-familienzentrum": "familienzentrum",
+    "familienzentrum-rosengarten-mit-familiencafe": "familienzentrum",
+    "fbs-nuernberg": "familienbildung",
+    "feg-nuernberg-eltern-kind-kreis": "gemeinde",
+    "fryday-nuernberg": "sonstige",
+    "geburtshaus-nuernberger-nest": "einzelperson",
+    "happy-bellies": "einzelperson",
+    "hebamme-elena-paulus": "einzelperson",
+    "hebamme-eva-kauper-wunderwerk": "einzelperson",
+    "hebamme-kobielski": "einzelperson",
+    "hebamme-mainberger-praenatal": "plattform",
+    "hebammen-johannis": "einzelperson",
+    "hebammen-wunderwerk": "einzelperson",
+    "hebammenpraxis-gugelrund": "einzelperson",
+    "hebanne-schulz": "einzelperson",
+    "imiluv-studio": "sonstige",
+    "institut-zukunftsmusik-evi-reich": "musikschule",
+    "kath-st-georg-ziegelstein": "gemeinde",
+    "kath-st-martin-nordstadt": "gemeinde",
+    "kindertheaterreihe-kuf": "sonstige",
+    "martha-maria-st-theresien": "familienbildung",
+    "muetterzentrum-fuerth": "familienzentrum",
+    "musication-musikgarten": "musikschule",
+    "musikfuechse": "musikschule",
+    "musikschule-fuerth": "musikschule",
+    "musikschule-nuernberg-eltern-kind": "musikschule",
+    "mutherstudio": "sonstige",
+    "nachbarschaftshaus-gostenhof": "familienzentrum",
+    "neues-museum-baby-museum": "sonstige",
+    "nuebad-flipper": "schwimmschule",
+    "post-sv-nuernberg": "verein",
+    "schwimmschule-baer-ritterbad": "schwimmschule",
+    "schwimmschule-ohana-nuernberg": "schwimmschule",
+    "schwimmschule-wassermaeuse-nuernberg": "schwimmschule",
+    "staatstheater-nuernberg-familie": "sonstige",
+    "stadtbibliothek-nuernberg": "sonstige",
+    "stadtmission-schwangerschaftsberatung": "sonstige",
+    "stadtteilhaus-fisch": "familienzentrum",
+    "stadtteiltreff-nordost": "familienzentrum",
+    "sternenhaus-kuf": "sonstige",
+    "studio-herzschlag": "familienzentrum",
+    "sv-johannis-07": "verein",
+    "tanzparkett-engel": "sonstige",
+    "tb-johannis-1888": "verein",
+    "theater-mummpitz": "sonstige",
+    "theater-salz-pfeffer": "plattform",
+    "treffpunkt-mut": "familienzentrum",
+    "tsv-1846-nuernberg": "verein",
+    "tsv-buch": "verein",
+    "vfl-nuernberg": "verein",
+    "vhs-fuerth": "familienbildung",
+    "wolf-pack-yoga": "einzelperson",
+    "zentrum-kobergerstrasse": "familienzentrum",
+    "zoff-harmonie": "familienbildung"
+  }
+}

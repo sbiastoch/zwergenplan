@@ -3,6 +3,8 @@
   // src/sw/sw.ts, src/sw/kill.ts (Notausgang): Einstiege des Service Workers, nur per Pfad aus vite.config.ts gebaut
   "entry": [
     "scripts/*.ts",
+    // Ziehung der Eval-Stichprobe, von Hand per node aufgerufen (Plan 0050, S0)
+    "scripts/pipeline/draw-eval-sample.ts",
     ".claude/hooks/*.ts",
     "e2e/**/*.spec.ts",
     "src/**/*.test.ts",

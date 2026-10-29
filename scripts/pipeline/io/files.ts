@@ -17,6 +17,8 @@ const CATALOG = join(ROOT, "data/providers.yaml");
 const OFFERS = join(ROOT, "data/offers.json");
 /** Zustand je Anbieter (Plan 0032, E5) */
 export const RAW_DIR = join(ROOT, "data/raw");
+/** Stichproben und Trägerarten des Entdecken-Evals (Plan 0050, E6) */
+export const DISCOVER_EVAL = join(ROOT, "evals/discover.json");
 
 export const readJson = (file: string): unknown => JSON.parse(readFileSync(file, "utf8"));
 /** Atomar (temporäre Datei, dann umbenennen): Ein Abbruch mitten im Schreiben hinterlässt keine kaputte Datei. */

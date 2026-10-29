@@ -1,6 +1,6 @@
 # Plan 0050 – Entdecken: wenige gute Quellen, Seitenfinder, keine technischen Verluste
 
-Status: freigegeben
+Status: in Umsetzung (S0 erledigt)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`):
@@ -278,7 +278,7 @@ Der Abschnitt nennt, was beim Füllen Düsseldorfs half (Plan 0042).
 | `scripts/pipeline/lib/address.ts` (neu) | Normalisierung | S1 |
 | `scripts/pipeline/io/geocode.ts`, `scripts/pipeline/io/cache.ts` | Reihenfolge, Treffer in der bbox, benannte Orte mit `addressdetails`, Katalog zuerst, 4/min, Cache im Zustand, Lauf-Cache `geocode-v2.json`, „kein Treffer“ im Lauf, Schnittstelle | S1 |
 | `tests/fixtures/pipeline/geocode-faelle.json` (neu) samt Aufzeichnungen, `scripts/pipeline/cli.ts` (`pipeline geocode`: neue Schnittstelle, `--region`, `--faelle`), `vitest.setup.ts` (`XDG_CACHE_HOME`) | Prüffälle und Testschutz für S1 | S1 |
-| `scripts/pipeline/draw-eval-sample.ts` (neu, Einstieg in `knip.json`) | Ziehung der Stichprobe mit festem Zufall | S0 |
+| `scripts/pipeline/draw-eval-sample.ts` (neu, Einstieg in `knip.jsonc`), `scripts/pipeline/lib/eval-discover.ts` (neu: Schema, Arten, Ziehung) | Ziehung der Stichprobe mit festem Zufall | S0 |
 | `scripts/pipeline/lib/discover-state.ts` | `klaerfaelle`, `orte` | S1 |
 | `scripts/pipeline/lib/html-extract.ts` | `title` und `headings` in `PageExtract` (Text unverändert) | S4 |
 | `scripts/pipeline/io/discover.ts`, `scripts/pipeline/lib/discover.ts` | Orte mit `hint`, Klärfälle samt Quelle `klaerfall`, Dublette als Klärfall (S1); Eval, Kennzahlen, Ertrag (S2); Seitenfinder, ID-Reservierung, Ertrag je Seite, zweite Runde, `partChars`, Parallelität (S3); Quellen, Namenssuche, Portaltreffer, Zeit je Region (S4) | S1–S4 |
@@ -390,6 +390,20 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`, bei Daten mit `
   - Der Nutzer sieht den Bericht (Aufnahmen und Klärfälle). Dann `gh variable set ENTDECKEN_NETZE --body vgn` (N3); `ENTDECKEN_MODUS` entfällt.
   - Erster Live-Lauf per `workflow_dispatch`, Zeile „Entdecken live“ von Hand (Ziel 6), `/browser-review live` für neue Anbieter.
 - **S7 – Abschluss.** Skill E9, Statuszeile ADR 0032, Restpunkte nach `docs/ideas.md`, archivieren.
+
+### S0 – Befunde (2026-10-29)
+
+- **Stichprobe** (`node scripts/pipeline/draw-eval-sample.ts`, Seed 20261029, Logik in `scripts/pipeline/lib/eval-discover.ts`, damit S2 dasselbe Schema nutzt):
+  - Arten für alle 82 Anbieter von Nürnberg und Fürth; Schlüssel `familienbildung`, `gemeinde`, `verein`, `einzelperson`, `schwimmschule`, `musikschule`, `familienzentrum`, `plattform`, `sonstige`.
+  - Gezogen sind hebammen-wunderwerk, vhs-fuerth, zentrum-kobergerstrasse, ev-melanchthon-ziegelstein, ev-st-johannis, kath-st-martin-nordstadt, musikschule-fuerth, staatstheater-nuernberg-familie, mutherstudio und tsv-1846-nuernberg.
+  - Keiner davon hat `coveredBy`; alle zählen für Ziel 4.
+- **Endpunkte:**
+  - **kikudoo:** Die Geo-API antwortet für Nürnberg (12 km), robots.txt erlaubt alles. Sie liefert genau 50 Einträge (`count: 50`). Das ist eine Seitengrenze, S4 muss blättern bzw. warnt (E2).
+  - **Navigator:** `searchredesign?einrichtungId=39&limit=3000` (10 MB) und `fhianbieter/public?einrichtungId=39` antworten mit 200; robots.txt sperrt nichts.
+  - **kidsgo:** Das Muster `/kurse/<kategorie>/<raum>/` aus Plan 0045 führt jetzt auf 404. Es gilt `/kurse/<kategorie>/<stadt>/` (etwa `/kurse/babymassage/nuernberg/`, 200). Kategorien sind unter anderem `babymassage`, `babyschwimmen`, `rueckbildung`, `hebammen`; `/suche/` bleibt gesperrt.
+- **Namenssuche** (`claude -p`, Opus high, nur `WebSearch`, ein Aufruf mit allen 9 Namen samt Ort und Art):
+  - Gefunden sind 9 von 9 mit eigener Website bzw. Gruppenseite, auch musikfuechse und zwergenstube; 19 Turns, $0,51.
+  - Die Probe nutzte die Katalognamen; im Lauf kommen die Namen aus den Listen, die oft anders schreiben. Die Websuche der Pipeline bedient deutsche Lokalanfragen also gut (offene Frage „(V)“ aus Plan 0045, „Quellen“). Die Namenssuche (E3) ist damit der stärkste Hebel für Ziel 1.
 
 ## Nutzerentscheide
 
