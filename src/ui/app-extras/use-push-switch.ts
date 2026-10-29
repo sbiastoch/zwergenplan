@@ -8,9 +8,10 @@
  *   kein laufendes Spiegeln. Requests entstehen erst nach dem Tipp (ADR 0014, Punkt 4).
  */
 import { useEffect, useState } from "react";
-import { loadBirthDate, loadOriginDistrict, loadOriginPoint } from "../../data/preferences.ts";
+import { loadBirthDate, loadOriginDistrict, loadOriginPoint, loadSavedProviders } from "../../data/preferences.ts";
 import { type MirrorData, type PushApi, PushError, type PushProblem } from "../../data/push.ts";
 import { loadSearchesRaw } from "../../data/searches-store.ts";
+import { cleanSavedProviders } from "../../domain/saved.ts";
 
 export type PushSwitchResult = { kind: "an" | "aus" | PushProblem; seq: number };
 
@@ -21,6 +22,8 @@ export function mirrorData(): MirrorData {
     searches: loadSearchesRaw(),
     // Punkt zuerst wie `useOrigin`; gespeichert ist ohnehin höchstens eins (ADR 0017)
     origin: loadOriginPoint() ?? loadOriginDistrict(),
+    // bereinigt wie im Tab „Anbieter“ (Plan 0054, E3)
+    providers: cleanSavedProviders(loadSavedProviders()),
   };
 }
 

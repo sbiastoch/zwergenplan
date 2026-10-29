@@ -7,6 +7,7 @@ import { addDays, fromBerlinLocal } from "../domain/time.ts";
 import { ACCESS_METERS, TRANSFER_PENALTY_MINUTES, TRANSIT_RULE } from "../domain/transit.ts";
 import type { TransitOther } from "../domain/transit-types.ts";
 import {
+  aboToast,
   ageChipLabel,
   ageEmptyText,
   agendaHeading,
@@ -44,6 +45,7 @@ import {
   savedHiddenNote,
   savedMapStatusParts,
   savedStatusParts,
+  searchLabel,
   selectionHeading,
   seriesToast,
   shortDate,
@@ -871,5 +873,57 @@ describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
     // Grenze um 0:30 Berlin am 1.1.2027 (UTC und Los Angeles: 31.12.2026) zählt als Berliner Tag
     const midnight = { sessions: sessions("2026-12-25", 2, 7, "00:30", "01:30"), until: "2027-01-01T00:30:00+01:00" };
     expect(ageWindowLabel(midnight, FIXTURE_NOW)).toBe("passt bis 1.1.2027");
+  });
+});
+
+describe("searchLabel", () => {
+  it("nennt alle Dimensionen in der Reihenfolge des Filters", () => {
+    expect(searchLabel("kat=musik,natur&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20")).toBe(
+      "Musik & Singen, Natur & Draußen · Kurs · Ohne Anmeldung · Kostenlos · bis 20 Min.",
+    );
+  });
+
+  it("lässt leere Dimensionen weg", () => {
+    expect(searchLabel("kat=buehne")).toBe("Bühne & Konzert");
+    expect(searchLabel("format=regelmaessig,einmalig&wegzeit=45")).toBe("Regelmäßig, Einmalig · bis 45 Min.");
+    expect(searchLabel("")).toBe("");
+  });
+});
+
+describe("aboToast (Plan 0054, E5)", () => {
+  it("Abo beenden: immer kurz, egal wie Push steht", () => {
+    expect(aboToast("anbieter", false, "an")).toEqual({ text: "Abo beendet" });
+    expect(aboToast("suche", false, undefined)).toEqual({ text: "Abo beendet" });
+  });
+
+  it("Push an: Neues kommt in die Nachricht", () => {
+    expect(aboToast("anbieter", true, "an").text).toBe(
+      "Anbieter abonniert – Neues kommt in die wöchentliche Push-Nachricht",
+    );
+  });
+
+  it("eben eingeschaltet: lang, ohne Hinweis-Ton", () => {
+    expect(aboToast("suche", true, "eingeschaltet")).toEqual({
+      text: "Suche abonniert – die wöchentliche Push-Nachricht ist jetzt an",
+      ms: 6000,
+    });
+  });
+
+  it("verweigert und gescheitert: Hinweis, lang", () => {
+    expect(aboToast("anbieter", true, "verweigert")).toMatchObject({ tone: "hint", ms: 6000 });
+    expect(aboToast("anbieter", true, "verweigert").text).toContain("blockiert");
+    for (const problem of ["abo", "netz", "server"] as const) {
+      expect(aboToast("suche", true, problem)).toMatchObject({ tone: "hint", ms: 6000 });
+    }
+  });
+
+  it("kein Push möglich oder Chunk nicht geladen: neutral, Anbieter mit Hinweis auf den Tab", () => {
+    expect(aboToast("anbieter", true, "nein").text).toBe("Anbieter abonniert – steht jetzt oben im Tab „Anbieter“");
+    expect(aboToast("suche", true, undefined).text).toBe("Suche abonniert");
+  });
+
+  it("Such-Abo mit Wegzeit ohne Startpunkt nennt das, solange Push nicht scheiterte", () => {
+    expect(aboToast("suche", true, "an", true).text).toContain("ab einem Startpunkt");
+    expect(aboToast("suche", true, "verweigert", true).text).toContain("blockiert");
   });
 });

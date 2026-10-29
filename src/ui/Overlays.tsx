@@ -9,7 +9,7 @@ import { offerSharePath, providerSharePath } from "../domain/share.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { DetailContent } from "./DetailDialog.tsx";
 import { Dialog } from "./Dialog.tsx";
-import { KidSheet } from "./KidSheet.tsx";
+import { type AboListProps, KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { ProviderSheetLoader } from "./ProviderPanel.tsx";
 import { type AgeFilter, FilterSheet, type LimitActionFor, ManualLinkSheet } from "./Sheets.tsx";
@@ -22,6 +22,8 @@ export type SheetKind = "filter" | "kid" | "origin" | null;
 
 interface OverlaysProps {
   toast: ToastMessage;
+  /** Verwaltung der Abos im Kind-Sheet (Plan 0054, E7) */
+  abos: AboListProps;
   sheet: SheetKind;
   setSheet: (sheet: SheetKind) => void;
   detailOffer: SiteOffer | undefined;
@@ -31,7 +33,7 @@ interface OverlaysProps {
   providerId: string | undefined;
   openProvider: (providerId: string) => void;
   closeProvider: () => void;
-  /** gemerkte Anbieter (Plan 0025, E2): Herz im Anbieter-Sheet */
+  /** abonnierte Anbieter (Plan 0025, E2; Plan 0054, E1): Glocke im Anbieter-Sheet */
   isProviderSaved: (providerId: string) => boolean;
   onToggleProvider: (providerId: string) => void;
   /** ID weder im Katalog noch in den Angeboten: `anbieter=` entfernen */
@@ -179,6 +181,7 @@ export function Overlays(props: OverlaysProps) {
           focusOrigin={sheet === "origin"}
           onIntro={props.onIntro}
           onClose={() => setSheet(null)}
+          abos={props.abos}
         />
       </Dialog>
       {/* Zuletzt: liegt über Detail bzw. Anbieter-Sheet (späteres showModal oben, Plan 0026, E6) */}

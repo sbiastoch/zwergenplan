@@ -11,12 +11,15 @@ import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Sort, type Tab, tabSection } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
+import { searchOf } from "../domain/searches.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { type Category, withCategory } from "../domain/topics.ts";
+import { bellPush, preloadBell } from "./AppExtras.tsx";
 import { Header, QuickFilters, Stickers, TabBar, type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
+  aboToast,
   ageChipLabel,
   ageWarnText,
   limitHint,
@@ -27,6 +30,7 @@ import {
   OFFER_GONE,
   providerStatusParts,
   reachNote,
+  searchLabel,
   standDate,
 } from "./format.ts";
 import { Icon } from "./icons.tsx";
@@ -51,6 +55,7 @@ import {
   useRoute,
   useSaved,
   useSavedProviders,
+  useSearchAbos,
   useTheme,
   useToast,
 } from "./use-app-state.ts";
@@ -250,16 +255,39 @@ export function App() {
       say(toggleSaved(offer.id) ? "Gemerkt – liegt jetzt auf deiner Merkliste" : "Nicht mehr gemerkt"),
     [say, toggleSaved],
   );
-  // Toasts nach dem Muster aus Plan 0022 (Plan 0025, E2), in Liste und Sheet gleich; im Sheet zeigt der Dialog sie.
-  const onToggleProvider = useCallback(
-    (providerId: string) =>
-      say(
-        toggleSavedProvider(providerId)
-          ? "Anbieter gemerkt – steht jetzt oben im Tab „Anbieter“"
-          : "Anbieter nicht mehr gemerkt",
-      ),
-    [say, toggleSavedProvider],
+  // Glocken (Plan 0054, E4, E5): nach dem Umschalten synchron `bellPush` (spiegeln bzw. Push einschalten), der Toast
+  // kommt mit dem Ergebnis; Toasts nach dem Muster aus Plan 0022, im Sheet zeigt der Dialog sie. Solange ein Tipp
+  // Push einschaltet, nimmt keine Glocke einen weiteren an.
+  const [bellBusy, setBellBusy] = useState(false);
+  const bellBusyRef = useRef(false);
+  const afterBell = useCallback(
+    (kind: "anbieter" | "suche", subscribed: boolean, noOrigin = false) => {
+      bellBusyRef.current = true;
+      setBellBusy(true);
+      void bellPush(subscribed).then((push) => {
+        bellBusyRef.current = false;
+        setBellBusy(false);
+        const { text, ms, tone } = aboToast(kind, subscribed, push, noOrigin);
+        say(text, ms, tone);
+      });
+    },
+    [say],
   );
+  const onToggleProvider = useCallback(
+    (providerId: string) => {
+      if (!bellBusyRef.current) afterBell("anbieter", toggleSavedProvider(providerId));
+    },
+    [afterBell, toggleSavedProvider],
+  );
+  const searchAbos = useSearchAbos();
+  const onToggleSearch = () => {
+    if (bellBusyRef.current) return;
+    const outcome = searchAbos.toggle(route.filter);
+    if (outcome === "voll") say("Höchstens 5 Such-Abos. Erst eins entfernen.", undefined, "hint");
+    else if (outcome === "neu" || outcome === "entfernt") {
+      afterBell("suche", outcome === "neu", route.filter.reachLimit !== undefined && origin === undefined);
+    }
+  };
 
   const ctx: CardContext = {
     now,
@@ -298,6 +326,8 @@ export function App() {
   // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5) bzw. zur Merkliste (Plan 0025, E4). Alle Weichen nach
   // Tab-Leisten-Eintrag laufen über `section`, sonst griffen sie auf der Merklisten-Karte falsch (Review M1).
   const section = tabSection(route.tab);
+  // Suche ohne Zeitraum (Plan 0023, E12); die Glocke nur im Tab „Angebote“ (Plan 0054, E6)
+  const currentSearch = section === "entdecken" ? searchOf(route.filter) : "";
   // Liste | Karte steht rechts neben der Statuszeile und bricht bei wenig Platz darunter (Plan 0005, E5). Kein
   // Scroll nach oben: Das gibt es nur beim Tab-Wechsel (Plan 0025, E4).
   const viewToggle = (
@@ -340,6 +370,11 @@ export function App() {
   // Ohne site.json bliebe das Anbieter-Sheet beim Laden stehen, modal über der Fehlerseite (Arch-Review m3). Es öffnet
   // erst mit den Daten; `anbieter=` bleibt in der URL, „Nochmal versuchen“ öffnet es dann.
   const sheetProviderId = load.kind === "error" ? undefined : route.providerId;
+  // Sichtbare Glocke: App-Chunk vorladen, damit ein Tipp Push synchron einschalten kann (Plan 0054, E5; ADR 0037)
+  const bellVisible = currentSearch !== "" || section === "anbieter" || sheetProviderId !== undefined;
+  useEffect(() => {
+    if (bellVisible) preloadBell();
+  }, [bellVisible]);
   const dialogOpen =
     sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined || onboarding !== "aus";
   const limit = route.filter.reachLimit;
@@ -434,6 +469,16 @@ export function App() {
           onChange={setFilter}
           onOpenSheet={() => setSheet("filter")}
           sheetButton={filterButton}
+          bell={
+            currentSearch
+              ? {
+                  label: searchLabel(currentSearch),
+                  subscribed: searchAbos.list.includes(currentSearch),
+                  busy: bellBusy,
+                  onToggle: onToggleSearch,
+                }
+              : undefined
+          }
         />
       )}
       <main className="body">
@@ -630,6 +675,15 @@ export function App() {
 
       <Overlays
         toast={toast}
+        abos={{
+          searches: searchAbos.list,
+          providers: savedProviders,
+          providerName: (id) => offers.find((o) => o.providerId === id)?.providerName,
+          ready: load.kind === "ready",
+          hasOrigin: origin !== undefined,
+          removeSearch: searchAbos.remove,
+          removeProvider: toggleSavedProvider,
+        }}
         sheet={sheet}
         setSheet={setSheet}
         detailOffer={detailOffer}

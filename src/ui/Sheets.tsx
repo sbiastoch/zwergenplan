@@ -10,15 +10,11 @@ import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { markAutofocus } from "./Dialog.tsx";
-import { ageOnlyNote, limitReason, plural, reachLimitLabel, SHARE_MANUAL_HINT } from "./format.ts";
+import { ageOnlyNote, FORMAT_LABELS, limitReason, plural, reachLimitLabel, SHARE_MANUAL_HINT } from "./format.ts";
 import { Shape } from "./icons.tsx";
 import type { ReachMode } from "./use-transit.ts";
 
-const FORMAT_CHIPS: Record<(typeof FORMATS)[number], string> = {
-  kurs: "Kurs",
-  regelmaessig: "Regelmäßig",
-  einmalig: "Einmalig",
-};
+const FORMAT_CHIPS = FORMAT_LABELS;
 const REGISTRATION_CHIPS: [Registration | undefined, string][] = [
   [undefined, "Egal"],
   ["ohne-anmeldung", "Ohne Anmeldung"],

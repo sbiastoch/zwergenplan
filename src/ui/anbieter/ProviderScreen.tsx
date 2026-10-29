@@ -1,13 +1,13 @@
 /**
- * Anbieterliste im Tab „Anbieter“ (Plan 0010, E4, E5, E10; Plan 0025, E3): oben die gemerkten Anbieter, darunter die
- * weiteren (aktive, Hinweis auf ausgeblendete, blasse ohne Termine). Jede Zeile hat ein Herz. Das Suchfeld steht im
+ * Anbieterliste im Tab „Anbieter“ (Plan 0010, E4, E5, E10; Plan 0025, E3): oben die abonnierten Anbieter, darunter die
+ * weiteren (aktive, Hinweis auf ausgeblendete, blasse ohne Termine). Jede Zeile hat eine Glocke (Plan 0054, E1). Das Suchfeld steht im
  * Start (ProviderSearch.tsx), über der Statuszeile. Zählen, Filtern und Sortieren macht `directory.ts`.
  */
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { type ProviderRow, providerRows } from "../../domain/directory.ts";
 import { applyFilters, EMPTY_FILTER } from "../../domain/filter.ts";
-import { Icon } from "../icons.tsx";
 import { EmptyState, ListPending, NoOffers } from "../ListView.tsx";
+import { BellButton } from "../OfferCard.tsx";
 import type { ProviderScreenProps } from "../provider-types.ts";
 import { hiddenProvidersText, idleLine, providerCountText, providerLine } from "./provider-format.ts";
 
@@ -53,8 +53,8 @@ export function ProviderScreen({
 
   /*
    * Erst fokussieren, dann umschalten (Plan 0021, E3): Die Zeile wandert in den anderen Abschnitt, der Fokus geht auf
-   * das nächste Herz desselben Abschnitts in DOM-Reihenfolge (sonst das vorige, sonst die Liste). So springt die Seite
-   * beim Merken nicht nach oben. Beide Abschnitte sind immer gerendert, damit React dabei nichts neu einhängt.
+   * die nächste Glocke desselben Abschnitts in DOM-Reihenfolge (sonst das vorige, sonst die Liste). So springt die Seite
+   * beim Abonnieren nicht nach oben. Beide Abschnitte sind immer gerendert, damit React dabei nichts neu einhängt.
    */
   const toggle = (event: MouseEvent<HTMLButtonElement>, providerId: string) => {
     const hearts = [...(event.currentTarget.closest(".provider-group")?.querySelectorAll("button.heart") ?? [])];
@@ -78,17 +78,7 @@ export function ProviderScreen({
           </b>
           <span>{idleRow ? idleLine(r) : providerLine(r, reachMode)}</span>
         </button>
-        <button
-          type="button"
-          className="heart"
-          aria-pressed={isSaved}
-          aria-label={`${r.provider.name} merken`}
-          onClick={(event) => toggle(event, r.provider.id)}
-        >
-          <span className="hs">
-            <Icon name="heart" size={20} />
-          </span>
-        </button>
+        <BellButton label={r.provider.name} subscribed={isSaved} onToggle={(event) => toggle(event, r.provider.id)} />
       </li>
     );
   };
@@ -123,7 +113,7 @@ export function ProviderScreen({
           <div className="provider-group">
             {saved.length > 0 && (
               <>
-                <h2>Gemerkte Anbieter</h2>
+                <h2>Deine Anbieter-Abos</h2>
                 <ul className="provider-saved">{saved.map((r) => row(r, true))}</ul>
               </>
             )}

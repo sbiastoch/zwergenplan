@@ -10,7 +10,7 @@
  * `PushControls` importiert) importiert nur dieser Chunk, also liegt er mit darin (Plan 0017, E9).
  */
 import { type RefObject, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import { createPush } from "../../data/push.ts";
+import { createPush, type PushApi } from "../../data/push.ts";
 import { type InstallApi, installFoot, installHelp, type PushSupport, pushView } from "../../domain/pwa.ts";
 import type { AppStepProps } from "../onboarding-types.ts";
 import { PushControls } from "./PushControls.tsx";
@@ -20,9 +20,24 @@ import { mirrorData, usePushSwitch } from "./use-push-switch.ts";
 /** Für den Flow des Onboardings (Plan 0033, E4): Der Lader reicht es als Prop weiter, kein Import aus dem Chunk. */
 export { pushCapability } from "../../data/push.ts";
 
-/** Ende des Onboardings (Plan 0035, E9): mit Abo einmal spiegeln, lokal und ohne Request */
-export function syncPushMirror(): Promise<void> {
-  return createPush().mirrorIfSubscribed(mirrorData());
+let shared: PushApi | undefined;
+/**
+ * Eine Push-Instanz für Kind-Sheet, Onboarding und Glocken (Plan 0054, E4): Ihr Generationszähler schützt nur
+ * innerhalb einer Instanz davor, dass ein Spiegeln nach dem Ausschalten den Speicher wieder füllt.
+ */
+const sharedPush = () => (shared ??= createPush());
+
+/** Ende des Onboardings (Plan 0035, E9) und Glocken-Tipp (Plan 0054, E4): mit Abo spiegeln, lokal und ohne Request */
+export function syncPushMirror(): Promise<"an" | "aus" | "nein"> {
+  return sharedPush().mirrorIfSubscribed(mirrorData());
+}
+
+/**
+ * Glocke bei ausgeschaltetem Push (Plan 0054, E5): einschalten wie der Schalter. `requestPermission` ist das erste
+ * `await` darin; ruft der Lader dies synchron im Tipp, bleibt die Nutzeraktivierung auf iOS erhalten (Plan 0011, E12).
+ */
+export function enablePush(): Promise<string> {
+  return sharedPush().enable(mirrorData());
 }
 
 /** Teilen-Symbol von iOS (Kasten mit Pfeil nach oben). Nur hier gebraucht, deshalb nicht in icons.tsx (Start-Bundle). */
@@ -48,7 +63,7 @@ export function AppSection({
   const state = useSyncExternalStore(install.subscribe, install.state);
   const heading = useId();
   const title = useRef<HTMLHeadingElement>(null);
-  const [push] = useState(() => createPush());
+  const push = sharedPush();
   /** `undefined`, solange `pushSupport()` läuft (sofort, `getRegistration`); so lange steht der Platzhalter */
   const [support, setSupport] = useState<PushSupport>();
   const help = installHelp(state);
@@ -208,7 +223,7 @@ export function AppStep({ install, parts, heading }: AppStepProps) {
  * Ergebnisse in einer Statuszeile; „an“/„aus“ steht schon sichtbar im Untertitel und wird dort nur vorgelesen.
  */
 function PushSwitch() {
-  const [push] = useState(() => createPush());
+  const push = sharedPush();
   const { on, busy, result, toggle } = usePushSwitch(push, { reconcile: false });
   const label = useId();
   const sub =

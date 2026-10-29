@@ -6,7 +6,7 @@ import { clickPlan, decidePush, readProposed } from "./push-decision.ts";
 const SCOPE = "https://zwergenplan.app/";
 const payload = weeklyPayload({ news: 3, week: 7, siteUrl: SCOPE, sentAt: FIXTURE_NOW });
 const proposed = readProposed(payload.notification);
-const TEXT = { title: "2 neue Angebote für deine Suchen", body: "A und B", hits: ["a", "b"] };
+const TEXT = { title: "2 neue Angebote für deine Abos", body: "A und B", hits: ["a", "b"] };
 
 describe("readProposed", () => {
   it("liest Titel, Text, Versandzeit und Test-Markierung", () => {
