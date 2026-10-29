@@ -1,6 +1,6 @@
 /** Entdecken: Liste nach Tagen, Filter, Alter (Plan 0003, E7–E11, E16). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, mapSettled, test } from "./fixtures.ts";
 import { expectAccessible, expectMobileUx } from "./mobile-ux.ts";
 
 // Der Tab „Anbieter“ zeigt die Anbieterkarte, Kacheln aus tests/fixtures/karte/ (Plan 0055, E8)
@@ -97,6 +97,8 @@ test("Glocke der Suche (Plan 0054, E6): erst mit Filter, abonniert über das Neu
     .getByRole("button", { name: /^Anbieter/ })
     .click();
   await expect(bell).toHaveCount(0);
+  // WebKit meldet abgebrochene Kachel-Requests beim Navigieren als Fehler: erst die Anbieterkarte ruhen lassen (Plan 0055)
+  await mapSettled(page);
 
   await page.evaluate(() =>
     localStorage.setItem(

@@ -113,11 +113,14 @@ test("im Sheet abonnieren: Toast, Glocke gedrückt, oben im Tab „Anbieter“ o
   await expect(heart(page, TREFF)).toHaveCount(1);
   await expect(heading(page, "Weitere Anbieter")).toBeVisible();
   await expect(restRows(page).filter({ hasText: TREFF })).toHaveCount(0);
+  // WebKit meldet abgebrochene Kachel-Requests beim Neuladen als Fehler: erst die Anbieterkarte ruhen lassen (Plan 0055)
+  await mapSettled(page);
 
   await page.reload();
   await expect(savedRow(page, TREFF)).toBeVisible();
   // das Badge der Merkliste zählt nur gemerkte Angebote
   await expect(tab(page, "Merkliste").locator(".badge")).toHaveCount(0);
+  await mapSettled(page);
 });
 
 test("in der Liste abonnieren und beenden: Zeile wandert, Fokus bleibt auf der nachrückenden Zeile", async ({
