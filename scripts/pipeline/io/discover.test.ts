@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { parse } from "yaml";
 import type { Provider } from "../../../src/domain/schema.ts";
+import { ProvidersFile } from "../../../src/domain/schema.ts";
+import { normalizeAddress } from "../lib/address.ts";
 import { DISCOVER_BRAKES } from "../lib/cost.ts";
 import { DiscoverState } from "../lib/discover-state.ts";
 import type { CallRecord, Extractor } from "../lib/extract.ts";
@@ -13,6 +15,11 @@ import type { FetchPlan } from "../lib/select.ts";
 import { type DiscoverDeps, type DiscoverOptions, runDiscover, type StepReply } from "./discover.ts";
 import { GateError } from "./discover-git.ts";
 import { type FetchResult, unitInputs } from "./fetch-inputs.ts";
+import type { GeoOutcome, GeoResult } from "./geocode.ts";
+
+const fixtureCatalog: Provider[] = ProvidersFile.parse(
+  parse(readFileSync(new URL("../../../tests/fixtures/providers.yaml", import.meta.url), "utf8")),
+);
 
 const FIXTURES = new URL("../../../tests/fixtures/", import.meta.url);
 const TODAY = "2026-10-11";
@@ -134,8 +141,33 @@ interface Fakes {
   search?: Record<string, unknown>;
   assess?: Record<string, unknown>;
   searchAbort?: "auth";
-  geocode?: DiscoverDeps["geocode"];
+  /** je Adresse: Treffer, `null` = kein Treffer, Wurf = Ausfall */
+  geocode?: (address: string) => Promise<GeoResult | null>;
   empty?: string[];
+}
+
+const GOSTENHOF: GeoResult = { lat: 49.449, lon: 11.06, display: "x", district: "Gostenhof" };
+
+/** Fake des Geocoders aus einer Funktion je Adresse; `seen` hält die Orte des Katalogs, die der Lauf übergab */
+function fakeGeocoder(
+  geocode: Fakes["geocode"],
+  seen?: { known?: ReadonlyMap<string, GeoResult> },
+): DiscoverDeps["geocoder"] {
+  return (init) => {
+    if (seen) seen.known = init.known;
+    return {
+      geocode: async (address): Promise<GeoOutcome> => {
+        try {
+          const g = await (geocode ?? (async () => GOSTENHOF))(address);
+          return g ? { kind: "treffer", stufe: 1, geo: g } : { kind: "kein-treffer" };
+        } catch (e) {
+          return { kind: "ausfall", grund: e instanceof Error ? e.message : String(e) };
+        }
+      },
+      newOrte: () => ({}),
+      stats: () => ({ requests: 0, waitMs: 0 }),
+    };
+  };
 }
 
 function deps(f: Fakes): DiscoverDeps {
@@ -153,7 +185,7 @@ function deps(f: Fakes): DiscoverDeps {
     fetchPdfText: async () => {
       throw new Error("kein PDF erwartet");
     },
-    geocode: f.geocode ?? (async () => ({ lat: 49.449, lon: 11.06, display: "x", district: "Gostenhof" })),
+    geocoder: fakeGeocoder(f.geocode),
     extractor: fakeExtractor(f.empty),
     fetchInputs: fakeFetchInputs,
     aggregatorCandidates: async () => [],
@@ -346,7 +378,7 @@ describe("runDiscover (Plan 0032, E7)", () => {
         [FUE]: entry("Kleeblatt Fürth", FUE, "Königstraße 1, 90762 Fürth"),
         [MOE]: entry("Mögelzwerge", MOE, "Ostendstraße 1, 90482 Nürnberg"),
       },
-      geocode: async (address) =>
+      geocode: async (address: string) =>
         address.includes("Fürth")
           ? { lat: 49.476, lon: 10.989, display: "x", district: "Innenstadt" }
           : { lat: 49.46, lon: 11.13, display: "x", district: "Mögeldorf" },
@@ -534,7 +566,7 @@ describe("runDiscover (Plan 0032, E7)", () => {
     expect(r.calls).toHaveLength(1);
   });
 
-  it("Geocoder gesperrt: zurückgestellt ohne Eintrag im Zustand, Ort außerhalb: verworfen", async () => {
+  it("Geocoder gesperrt: Klärfall, im Trockenlauf nicht im Zustand; Ort außerhalb: verworfen", async () => {
     const d = tempData();
     const blocked = await run(d, {
       search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }),
@@ -543,9 +575,11 @@ describe("runDiscover (Plan 0032, E7)", () => {
         throw new Error("HTTP 403 für https://nominatim.openstreetmap.org/…");
       },
     });
-    expect(blocked.regions[0]?.rejected[0]?.grund).toMatch(/zurückgestellt: Geocoder \(HTTP 403/);
+    expect(blocked.regions[0]?.rejected).toEqual([]);
+    expect(blocked.regions[0]?.klaerfaelle[0]?.grund).toMatch(/^Geocoder-Ausfall: HTTP 403/);
     const state = DiscoverState.parse(JSON.parse(readFileSync(join(d.runDir, "nuernberg.json"), "utf8")));
     expect(state.zurueckgestellt).toEqual([]);
+    expect(state.klaerfaelle).toEqual([]);
 
     const far = await run(tempData(), {
       search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }),
@@ -576,6 +610,7 @@ describe("runDiscover (Plan 0032, E7)", () => {
         [SITE]: assessOk("Krabbelzwerge Gostenhof"),
       },
     });
+    const seen: { known?: ReadonlyMap<string, GeoResult> } = {};
     const r = await run(
       d,
       {},
@@ -583,6 +618,7 @@ describe("runDiscover (Plan 0032, E7)", () => {
         hide: ["turnverein-beispiel", "theater-beispiel"],
         deps: {
           ...base,
+          geocoder: fakeGeocoder(undefined, seen),
           fetchPage: async (url) =>
             page(url, url === turnverein ? `<p>Eltern-Kind-Turnen</p><a href="${tvKurse}">Kurse</a>` : HOME),
         },
@@ -603,10 +639,199 @@ describe("runDiscover (Plan 0032, E7)", () => {
     );
     expect(ids).not.toContain("theater-beispiel");
     expect(ids.filter((id) => id === "turnverein-beispiel")).toHaveLength(1);
+    // Orte der ausgeblendeten gehen durch den Geocoder, nicht über den Katalog (Plan 0050, E5; sonst mäße das Eval
+    // den Geocoder nicht)
+    const venues = (id: string) => {
+      const p = fixtureCatalog.find((x) => x.id === id);
+      return p?.role === "anbieter" ? p.venues.map((v) => normalizeAddress(v.address).text) : [];
+    };
+    for (const a of venues("turnverein-beispiel")) expect(seen.known?.has(a)).toBe(false);
+    expect(venues("familientreff-beispiel").some((a) => seen.known?.has(a))).toBe(true);
   });
 
   it("--hide nur im Trockenlauf", async () => {
     await expect(run(tempData(), {}, { dryRun: false, hide: ["turnverein-beispiel"] })).rejects.toThrow(/Trockenlauf/);
     await expect(run(tempData(), {}, { hide: ["sammelkalender-beispiel"] })).rejects.toThrow(/kein Anbieter/);
+  });
+});
+
+describe("Härte: Orte und Klärfälle (Plan 0050, E5)", () => {
+  const live = { dryRun: false, commit: () => undefined };
+  const stateOf = (d: ReturnType<typeof tempData>) =>
+    DiscoverState.parse(JSON.parse(readFileSync(join(d.dataDir, "discover", "nuernberg.json"), "utf8")));
+  const twoPlaces = (name: string) => {
+    const a = assessOk(name);
+    return {
+      ...a,
+      eintrag: {
+        ...a.eintrag,
+        venues: [...a.eintrag.venues, { name: "Turnhalle Süd", address: "Turnhalle Süd, Nürnberg" }],
+      },
+    };
+  };
+  const one = (over: Partial<Fakes> = {}): Fakes => ({
+    search: kandidaten({ name: "Krabbelzwerge Gostenhof", url: SITE }),
+    assess: { [SITE]: twoPlaces("Krabbelzwerge Gostenhof") },
+    ...over,
+  });
+
+  it("ein Ort ohne Treffer: aufgenommen mit dem übrigen, Hinweis, hint nennt nur den weggelassenen", async () => {
+    const d = tempData();
+    const r = await run(d, one({ geocode: async (a) => (a.startsWith("Turnhalle") ? null : GOSTENHOF) }));
+    expect(r.regions[0]?.adopted[0]?.notes).toContain(
+      "Ort ohne Treffer im Geocoder weggelassen: Turnhalle Süd, Turnhalle Süd, Nürnberg",
+    );
+    const entry = (parse(readFileSync(join(d.runDir, "providers.yaml"), "utf8")) as Provider[]).find(
+      (p) => p.id === "krabbelzwerge-gostenhof",
+    );
+    expect(entry?.programme[0]?.hint).toBe("Termine an Turnhalle Süd weglassen (Ort nicht im Eintrag)");
+  });
+
+  it("Geocoder-Ausfall (429) für einen Ort: Klärfall am Lauf, kein Ort geht verloren, anzahl 0", async () => {
+    const d = tempData();
+    const r = await run(
+      d,
+      one({
+        geocode: async (a) => {
+          if (a.startsWith("Turnhalle")) throw new Error("HTTP 429 für https://nominatim.openstreetmap.org/");
+          return GOSTENHOF;
+        },
+      }),
+      live,
+    );
+    expect(r.regions[0]?.adopted).toEqual([]);
+    expect(r.regions[0]?.rejected).toEqual([]);
+    expect(stateOf(d).klaerfaelle).toEqual([
+      expect.objectContaining({ url: SITE, anzahl: 0, grund: expect.stringMatching(/^Geocoder-Ausfall: HTTP 429/) }),
+    ]);
+  });
+
+  it("kein Treffer für alle Orte: Klärfall ohne Wiedervorlage; kommt ohne Websuche wieder, ab dem dritten ausgesetzt", async () => {
+    const d = tempData();
+    const f = one({ geocode: async () => null });
+    await run(d, f, live);
+    expect(stateOf(d).zurueckgestellt).toEqual([]);
+    expect(stateOf(d).klaerfaelle[0]).toMatchObject({ url: SITE, anzahl: 1 });
+    // zweiter Lauf ohne Fund der Websuche: der Klärfall ist selbst eine Quelle
+    const again = await run(d, { ...f, search: {} }, live);
+    expect(again.regions[0]?.klaerfaelle[0]?.find.quelle).toBe("klaerfall");
+    await run(d, { ...f, search: {} }, live);
+    expect(stateOf(d).klaerfaelle[0]).toMatchObject({ anzahl: 3, aussetzenBis: "2026-11-15" });
+    const paused = await run(d, f, live);
+    expect(paused.regions[0]?.dropped[0]?.grund).toBe("Klärfall ausgesetzt bis 2026-11-15");
+  });
+
+  it("Netz, 5xx und Bot-Schutz: Klärfall; 404: verworfen mit Wiedervorlage", async () => {
+    const status = (code: number) => async (url: string) => ({ ...page(url, HOME), status: code });
+    const down = await run(tempData(), {}, { deps: { ...deps(one()), fetchPage: status(503) } });
+    expect(down.regions[0]?.klaerfaelle[0]?.grund).toBe("Seite nicht abrufbar: HTTP 503");
+    const gone = await run(tempData(), {}, { deps: { ...deps(one()), fetchPage: status(404) } });
+    expect(gone.regions[0]?.rejected[0]?.grund).toBe("Seite nicht abrufbar: HTTP 404");
+    expect(gone.regions[0]?.klaerfaelle).toEqual([]);
+  });
+
+  it("mögliche Dublette (ähnlicher Name, Ort ≤ 100 m): Klärfall, nicht aufgenommen", async () => {
+    const twin = fixtureCatalog.find((p) => p.role === "anbieter" && p.venues.length > 0);
+    if (twin?.role !== "anbieter") throw new Error("Fixture ohne Anbieter mit Ort");
+    const geo = twin.venues[0]?.geo ?? { lat: 0, lon: 0 };
+    const r = await run(tempData(), {
+      search: kandidaten({ name: twin.name, url: SITE }),
+      assess: { [SITE]: assessOk(twin.name) },
+      geocode: async () => ({ ...geo, display: "x" }),
+    });
+    expect(r.regions[0]?.adopted).toEqual([]);
+    expect(r.regions[0]?.klaerfaelle[0]?.grund).toBe(`Dublette von ${twin.id}? (ähnlicher Name, Ort ≤ 100 m)`);
+  });
+
+  it("Klärfälle gelangen im Trockenlauf nicht in den Zustand", async () => {
+    const d = tempData();
+    await run(d, one({ geocode: async () => null }));
+    const state = DiscoverState.parse(JSON.parse(readFileSync(join(d.runDir, "nuernberg.json"), "utf8")));
+    expect(state.klaerfaelle).toEqual([]);
+  });
+
+  // Arch-Review S1, M1/M2: Verdrahtung in runDiscover
+  const ORT = { lat: 49.449, lon: 11.06, adresse: "Kernstraße 3, 90429 Nürnberg", stufe: 1 as const, datum: TODAY };
+  const withOrte: DiscoverDeps["geocoder"] = (init) => ({
+    ...fakeGeocoder(undefined)(init),
+    newOrte: () => ({ "Kernstraße 3, 90429 Nürnberg": ORT }),
+  });
+  const seed = (d: ReturnType<typeof tempData>, url: string) => {
+    const k = { url, name: "K", grund: "Geocoder ohne Treffer", seit: TODAY, zuletzt: TODAY, anzahl: 1 };
+    mkdirSync(join(d.dataDir, "discover"), { recursive: true });
+    writeFileSync(
+      join(d.dataDir, "discover", "nuernberg.json"),
+      JSON.stringify({ region: "nuernberg", abgelehnt: [], zurueckgestellt: [], klaerfaelle: [k] }),
+    );
+  };
+
+  it("Treffer des Geocoders landen in orte: live in data/discover, trocken nur unter runs/", async () => {
+    const live1 = tempData();
+    await run(live1, {}, { ...live, deps: { ...deps(one()), geocoder: withOrte } });
+    expect(stateOf(live1).orte).toEqual({ "Kernstraße 3, 90429 Nürnberg": ORT });
+    const dry = tempData();
+    await run(dry, {}, { deps: { ...deps(one()), geocoder: withOrte } });
+    expect(existsSync(join(dry.dataDir, "discover", "nuernberg.json"))).toBe(false);
+    const state = DiscoverState.parse(JSON.parse(readFileSync(join(dry.runDir, "nuernberg.json"), "utf8")));
+    expect(Object.keys(state.orte)).toEqual(["Kernstraße 3, 90429 Nürnberg"]);
+  });
+
+  it("ein Klärfall endet durch Aufnahme", async () => {
+    const d = tempData();
+    seed(d, SITE);
+    const r = await run(d, { search: {}, assess: { [SITE]: assessOk("Krabbelzwerge Gostenhof") } }, live);
+    expect(r.regions[0]?.adopted).toHaveLength(1);
+    expect(stateOf(d).klaerfaelle).toEqual([]);
+  });
+
+  it("ein Klärfall endet durch Verwerfung (mit Wiedervorlage)", async () => {
+    const d = tempData();
+    seed(d, SITE);
+    await run(d, { search: {} }, live);
+    expect(stateOf(d).klaerfaelle).toEqual([]);
+    expect(stateOf(d).zurueckgestellt[0]?.url).toBe(SITE);
+  });
+
+  it("ein Klärfall endet, wenn ein Mensch den Anbieter aufgenommen hat (Vorfilter: bekannt)", async () => {
+    const d = tempData();
+    const known = fixtureCatalog.find((p) => p.role === "anbieter");
+    seed(d, known?.url ?? "");
+    const r = await run(d, { search: {} }, live);
+    expect(r.regions[0]?.dropped.some((x) => x.bekannt)).toBe(true);
+    expect(stateOf(d).klaerfaelle).toEqual([]);
+  });
+
+  it("ungültige Antwort des Bewertens: Klärfall am Kandidaten", async () => {
+    const r = await run(tempData(), one({ assess: { [SITE]: { kaputt: true } } }));
+    expect(r.regions[0]?.klaerfaelle[0]?.grund).toMatch(/^Bewertung ohne gültige Antwort/);
+    expect(r.regions[0]?.rejected).toEqual([]);
+  });
+
+  it("vor dem Bewerten beendet (G3): live ein Klärfall am Lauf mit anzahl 0, trocken keiner", async () => {
+    const d = tempData();
+    await run(d, one(), { ...live, maxNew: 0 });
+    expect(stateOf(d).klaerfaelle).toEqual([
+      expect.objectContaining({ url: SITE, anzahl: 0, grund: "Lauf vor dem Bewerten beendet" }),
+    ]);
+    const dry = tempData();
+    await run(dry, one(), { maxNew: 0 });
+    const state = DiscoverState.parse(JSON.parse(readFileSync(join(dry.runDir, "nuernberg.json"), "utf8")));
+    expect(state.klaerfaelle).toEqual([]);
+  });
+
+  it("Programmseite im Ertragsbeweis: 404 verworfen mit Wiedervorlage, 503 Klärfall", async () => {
+    const failing =
+      (reason: string): DiscoverDeps["fetchInputs"] =>
+      async (plan, catalog) => {
+        const r = await fakeFetchInputs(plan, catalog);
+        for (const [id, input] of Object.entries(r.inputs)) r.inputs[id] = { ...input, status: "fehler", reason };
+        return r;
+      };
+    const gone = tempData();
+    const r404 = await run(gone, {}, { ...live, deps: { ...deps(one()), fetchInputs: failing(`${KURSE}: HTTP 404`) } });
+    expect(r404.regions[0]?.rejected[0]?.grund).toBe(`Programmseite nicht abrufbar: ${KURSE}: HTTP 404`);
+    expect(stateOf(gone).zurueckgestellt[0]?.url).toBe(SITE);
+    const r503 = await run(tempData(), {}, { deps: { ...deps(one()), fetchInputs: failing(`${KURSE}: HTTP 503`) } });
+    expect(r503.regions[0]?.klaerfaelle[0]?.grund).toBe(`Programmseite nicht abrufbar: ${KURSE}: HTTP 503`);
   });
 });

@@ -39,6 +39,7 @@ import {
   isPdf,
   newProviderCommitMessage,
   parseAssessment,
+  possibleDuplicate,
   postpone,
   prefilter,
   proveYield,
@@ -49,10 +50,11 @@ import {
   searchMessage,
   searchResponseSchema,
 } from "../lib/discover.ts";
-import { DiscoverState, emptyState } from "../lib/discover-state.ts";
+import { DiscoverState, emptyState, type Ort } from "../lib/discover-state.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
 import { botWall } from "../lib/fetch.ts";
 import { extractPage, type FetchedPage } from "../lib/html-extract.ts";
+import { addKlaerfall, endKlaerfall, type KlaerfallArt, klaerfallFinds } from "../lib/klaerfall.ts";
 import { anbieterVids } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
 import { providerStatus } from "../lib/raw.ts";
@@ -61,14 +63,17 @@ import { GateError } from "./discover-git.ts";
 import { effortOf } from "./extract.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
 import { readCatalog, readJson, readRaw, writeJson } from "./files.ts";
-import type { GeoResult } from "./geocode.ts";
+import { type Geocoder, type GeoResult, knownPlaces } from "./geocode.ts";
 import type { loadFreeDays } from "./holidays.ts";
 import { callLlm, type Effort, type LlmCall, type LlmOptions } from "./llm.ts";
 import { refreshProvider } from "./refresh.ts";
 import { fetchSource } from "./sources.ts";
 
-/** Zeitbudget des Entdeckens in Minuten (`RUN_BUDGET_MIN`); der Workflow hat 120 Minuten */
-export const DISCOVER_BUDGET_MIN = 90;
+/**
+ * Zeitbudget des Entdeckens in Minuten (`RUN_BUDGET_MIN`); der Job hat 330 Minuten (Plan 0050, E8: der Geocoder
+ * wartet nach der Policy 15 s je Anfrage, Qualität geht vor Laufzeit)
+ */
+export const DISCOVER_BUDGET_MIN = 240;
 
 /** Ergebnis eines Modellschritts des Entdeckens */
 export interface StepReply {
@@ -84,7 +89,14 @@ export interface DiscoverDeps {
   fetchPage(url: string, opts?: { timeoutMs?: number; retries?: number }): Promise<FetchedPage>;
   /** Text eines PDF über `pdftotext` wie im Abruf des Nachtlaufs (`io/fetch-inputs.ts`) */
   fetchPdfText(url: string): Promise<string>;
-  geocode(address: string): Promise<GeoResult | undefined>;
+  /**
+   * Geocoder des Laufs (`createGeocoder`, Plan 0050, E5): `known` sind die Orte des Katalogs im Lauf (im Eval nach dem
+   * Ausblenden), `orte` die Treffer aus `data/discover/`, auch im Trockenlauf gelesen
+   */
+  geocoder(init: {
+    known: ReadonlyMap<string, GeoResult>;
+    orte: Partial<Record<RegionId, Readonly<Record<string, Ort>>>>;
+  }): Geocoder;
   extractor: Extractor;
   fetchInputs: typeof fetchInputs;
   /** Kandidaten der Sammelkalender (Adapter) dieser Region */
@@ -230,8 +242,11 @@ function readState(dataDir: string, region: RegionId): DiscoverState {
 
 const reasonOf = (e: unknown) => (e instanceof Error ? e.message.split("\n")[0] : String(e))?.slice(0, 200) ?? "";
 
-/** Geocoder gesperrt oder gedrosselt (Nominatim): Kandidat zurückstellen, nicht verwerfen (E7.5) */
+/** Geocoder gesperrt oder gedrosselt (Nominatim): Klärfall, nicht verwerfen; der Lauf fragt nicht weiter (E7.5) */
 const GEOCODER_BLOCKED = /HTTP (403|429)/;
+/** Seite weg: der einzige Abruffehler, der etwas über den Kandidaten sagt (Plan 0050, E5) */
+// nicht verankert: der Grund des Ertragsbeweises beginnt mit der URL (`lib/fetch.ts`, Arch-Review S1, M1)
+const GONE = /\bHTTP (404|410)\b/;
 
 export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   const started = performance.now();
@@ -277,6 +292,11 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   // Sperren aller Regionen: Die Regionen überlappen, ein Abgelehnter darf nicht über die Nachbarregion zurückkommen
   // (Plan 0036, E4)
   const abgelehnt = allStates.flatMap((st) => st.abgelehnt);
+  // Katalog des Laufs zuerst (im Eval nach dem Ausblenden: deren Orte gehen durch den Geocoder), dann `orte`
+  const geocoder = o.deps.geocoder({
+    known: knownPlaces(catalog),
+    orte: Object.fromEntries(allStates.map((st) => [st.region, st.orte])),
+  });
   const freeDays = await o.deps.freeDays(addMonths(o.today, -12), addMonths(o.today, 24));
   const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
   const regions: RegionReport[] = [];
@@ -287,17 +307,33 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     const regionName = REGIONS[region].name;
     const callsBefore = calls.length;
     let state = readState(o.dataDir, region);
-    const report: RegionReport = { region, finds: 0, dropped: [], adopted: [], rejected: [], hints: [] };
+    const report: RegionReport = {
+      region,
+      finds: 0,
+      dropped: [],
+      adopted: [],
+      rejected: [],
+      klaerfaelle: [],
+      hints: [],
+    };
     regions.push(report);
+    /** verworfen; mit `persist` Wiedervorlage nach 8 Wochen, und ein offener Klärfall endet */
     const reject = (find: Find, grund: string, persist: boolean) => {
       report.rejected.push({ find, grund });
       log(`  ✗ ${find.name} (${find.url}): ${grund}`);
-      if (persist) state = postpone(state, find, grund, o.today);
+      if (persist) state = endKlaerfall(postpone(state, find, grund, o.today), find.url);
+    };
+    /** Klärfall (Plan 0050, E5): ohne Wiedervorlage; im Trockenlauf nur im Bericht */
+    const klaer = (find: Find, grund: string, art: KlaerfallArt) => {
+      report.klaerfaelle.push({ find, grund });
+      log(`  ? ${find.name} (${find.url}): ${grund}`);
+      if (!o.dryRun) state = addKlaerfall(state, find, grund, art, o.today);
     };
 
     // 1. Kandidaten aus Sammelkalendern und Verzeichnissen (Code)
     const inRegion = catalog.filter((p) => p.region === region);
-    const finds: Find[] = [];
+    // offene Klärfälle zuerst: sie hängen nicht davon ab, dass die Websuche sie wieder liefert (Quelle `klaerfall`)
+    const finds: Find[] = [...klaerfallFinds(state, o.today)];
     try {
       const fromAggregators = aggregatorFinds(
         await o.deps.aggregatorCandidates(
@@ -344,6 +380,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     // 3. Vorfilter (Code)
     const { keep, dropped } = prefilter(finds, { catalog, state, abgelehnt, today: o.today });
     report.dropped.push(...dropped);
+    // von Hand aufgenommen oder abgelehnt: ein offener Klärfall endet
+    for (const d of dropped) if (d.bekannt) state = endKlaerfall(state, d.find.url);
     log(
       `${regionName}: ${finds.length} Kandidaten, ${keep.length} nach dem Vorfilter, ${calls.length} Modellaufrufe bisher`,
     );
@@ -364,6 +402,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       const again = prefilter([find], { catalog, state, abgelehnt, today: o.today });
       if (again.keep.length === 0) {
         report.dropped.push(...again.dropped);
+        for (const d of again.dropped) if (d.bekannt) state = endKlaerfall(state, d.find.url);
         continue;
       }
 
@@ -384,7 +423,10 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
           fetchedFind = { finalUrl: page.finalUrl, text: extracted.text, links: extracted.links };
         }
       } catch (e) {
-        reject(find, `Seite nicht abrufbar: ${reasonOf(e)}`, true);
+        // nur 404/410 sagen etwas über den Kandidaten; Netz, 5xx, Bot-Schutz und leere Seiten sind technisch (E5)
+        const reason = reasonOf(e);
+        if (GONE.test(reason)) reject(find, `Seite nicht abrufbar: ${reason}`, true);
+        else klaer(find, `Seite nicht abrufbar: ${reason}`, "kandidat");
         continue;
       }
       // Kontakt- oder Adressseiten derselben Website (Nutzerentscheid Option A); ein Fehler kostet nur diese Seite
@@ -410,7 +452,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       const assessed = a.call.result === "ok" ? parseAssessment(a.output) : { kind: "ungueltig" as const };
       if (assessed.kind === "ungueltig") {
         if (a.call.result === "ok") a.call.result = "invalid";
-        reject(find, `Bewertung ohne gültige Antwort (${a.call.result})`, false);
+        klaer(find, `Bewertung ohne gültige Antwort (${a.call.result})`, "kandidat");
         continue;
       }
       if (assessed.kind === "verwerfen") {
@@ -418,30 +460,25 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         continue;
       }
 
-      // 5. Geocodieren (≤ 1/s in io/geocode.ts), Orte in der bbox der Region (entryFromAssessment)
+      // 5. Geocodieren (4/min in io/geocode.ts), Orte in der bbox der Region (entryFromAssessment). Ein Ausfall für
+      // einen Ort macht den ganzen Kandidaten zum Klärfall; „kein Treffer“ kostet nur den Ort (Plan 0050, E5)
       if (geocoderBlocked) {
-        reject(find, "zurückgestellt: Geocoder gesperrt", false);
+        klaer(find, "Geocoder gesperrt", "lauf");
         continue;
       }
-      const geos: GeoResult[] = [];
-      let geoProblem: { grund: string; persist: boolean } | undefined;
+      const geos: Array<GeoResult | null> = [];
+      let outage: string | undefined;
       for (const v of assessed.entry.venues) {
-        try {
-          const g = await o.deps.geocode(v.address);
-          if (!g) {
-            geoProblem = { grund: `Adresse nicht gefunden: ${v.address}`, persist: true };
-            break;
-          }
-          geos.push(g);
-        } catch (e) {
-          const reason = reasonOf(e);
-          if (GEOCODER_BLOCKED.test(reason)) geocoderBlocked = true;
-          geoProblem = { grund: `zurückgestellt: Geocoder (${reason})`, persist: false };
+        const g = await geocoder.geocode(v.address, { region, venueName: v.name });
+        if (g.kind === "ausfall") {
+          outage = g.grund;
+          if (GEOCODER_BLOCKED.test(g.grund)) geocoderBlocked = true;
           break;
         }
+        geos.push(g.kind === "treffer" ? g.geo : null);
       }
-      if (geoProblem) {
-        reject(find, geoProblem.grund, geoProblem.persist);
+      if (outage !== undefined) {
+        klaer(find, `Geocoder-Ausfall: ${reasonOf(outage)}`, "lauf");
         continue;
       }
       const built = entryFromAssessment(assessed.entry, {
@@ -455,10 +492,17 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         allowedUrls: allowedUrlsOf(find, fetchedFind),
       });
       if (!built.ok) {
-        reject(find, built.grund, true);
+        if (built.klaerfall) klaer(find, built.grund, "kandidat");
+        else reject(find, built.grund, true);
         continue;
       }
       const entry = built.entry;
+      // mögliche Dublette (E4.6): ähnlicher Name und Ort ≤ 100 m, auch gegen Aufnahmen dieses Laufs
+      const twin = possibleDuplicate(entry, catalog);
+      if (twin) {
+        klaer(find, twin, "kandidat");
+        continue;
+      }
       report.hints.push(...built.notes.map((n) => `${entry.id}: ${n}`));
 
       // 6. Ertragsbeweis über refreshProvider (genau ein Extraktionsweg, E1)
@@ -474,7 +518,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       }
       if (proof.kind === "abgebrochen") break;
       if (proof.kind === "nein") {
-        reject(find, proof.grund, true);
+        if (proof.technisch) klaer(find, proof.grund, "kandidat");
+        else reject(find, proof.grund, true);
         continue;
       }
 
@@ -506,20 +551,27 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       }
       catalogText = nextText;
       catalog = [...catalog, entry];
+      state = endKlaerfall(state, find.url);
       report.adopted.push(adopted);
       log(`  ✓ ${entry.id} (${find.url}): ${adopted.first.title}`);
     }
 
     // nach dem Vorfilter übrig, aber nicht bewertet (G3, Bremse, Zeitbudget, Abbruch): für das Entdecken-Eval
-    const handled = new Set([...report.adopted, ...report.rejected, ...report.dropped].map((x) => x.find));
+    const handled = new Set(
+      [...report.adopted, ...report.rejected, ...report.klaerfaelle, ...report.dropped].map((x) => x.find),
+    );
     const unassessed = keep.filter((f) => !handled.has(f));
     if (unassessed.length > 0) report.unassessed = unassessed;
 
     // Quellen mit Fehlerserie meldet der Wächter des Nachtlaufs (Plan 0048, E10)
 
+    // vor dem Bewerten beendet (G3, Bremse, Zeit, Abbruch): Klärfall, der nicht am Kandidaten liegt (Plan 0050, E5)
+    for (const f of unassessed)
+      if (!o.dryRun) state = addKlaerfall(state, f, "Lauf vor dem Bewerten beendet", "lauf", o.today);
+
     // erst nach allen Regionen geschrieben: ein Commit der nächsten Region erlaubt nur Katalog und Rohdaten
     // (Arch-Review S4, M2)
-    states.push(state);
+    states.push({ ...state, orte: { ...state.orte, ...geocoder.newOrte(region) } });
     csvRows.push({ region, calls: calls.slice(callsBefore), adopted: report.adopted.length });
     if (abort) break;
   }
@@ -545,6 +597,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     ...(abort ? { abort } : {}),
     ...(brake ? { brake } : {}),
     budgetHit,
+    geocoder: geocoder.stats(),
     ...(gateErrors.length > 0 ? { gateErrors } : {}),
     ...(hidden ? { hidden: hiddenEval(hidden, regions) } : {}),
   };
@@ -575,7 +628,13 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
 
 type Proof =
   | { kind: "ja"; first: Offer; start: string; calls: CallRecord[] }
-  | { kind: "nein"; grund: string; calls: CallRecord[] }
+  | {
+      kind: "nein";
+      grund: string;
+      calls: CallRecord[];
+      /** Abruf gescheitert: Klärfall (Plan 0050, E5) */
+      technisch?: true;
+    }
   | { kind: "abort"; abort: "auth" | "limit"; calls: CallRecord[] }
   | { kind: "abgebrochen"; calls: CallRecord[] };
 
@@ -600,6 +659,7 @@ async function proveEntry(
       kind: "nein",
       grund: `Programmseite nicht abrufbar: ${input?.reason ?? input?.status ?? "kein Abruf"}`,
       calls: [],
+      ...(GONE.test(input?.reason ?? "") ? {} : { technisch: true as const }),
     };
   const now = o.now?.() ?? toBerlinIso(new Date());
   // frisch für jeden Kandidaten: ein früher verworfener Kandidat mit derselben ID (oder ein früherer Lauf am selben

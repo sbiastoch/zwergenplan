@@ -1,5 +1,5 @@
-# Entdecken neuer Anbieter (Plan 0032, E7), wöchentlich je Region aus REGION_IDS. Zwei Modi, Schalter für den
-# Zeitplan ist die Repo-Variable ENTDECKEN_MODUS (leer = trocken):
+# Entdecken neuer Anbieter (Plan 0032, E7) je Region aus REGION_IDS, nur per workflow_dispatch: Die Wochen-Crons sind
+# mit Plan 0050, S1 entfallen; die Monats-Crons kommen mit S6. Zwei Modi:
 #
 #   trocken  `pnpm pipeline discover --dry-run`: alle Schritte echt (Websuche, Bewerten, Ertragsbeweis), Bericht
 #            „würde aufnehmen“/„verworfen“ im Job-Summary, Artefakt runs/. Kein Commit, kein Issue. Stufe 4 läuft zwei
@@ -15,8 +15,6 @@
 name: Entdecken
 
 on:
-  schedule:
-    - cron: "30 4 * * 0" # Sonntag 04:30 UTC
   workflow_dispatch:
     inputs:
       modus:
@@ -35,11 +33,11 @@ on:
         description: "G3 mit bootstrap: höchstens so viele neue Anbieter je Region"
         default: "30"
       max_calls:
-        description: "Bremse MAX_CALLS (E8)"
-        default: "120"
+        description: "Bremse MAX_CALLS (Plan 0050, E8)"
+        default: "1500"
       max_tokens:
-        description: "Bremse MAX_TOKENS (E8)"
-        default: "5000000"
+        description: "Bremse MAX_TOKENS, Opus-Gegenwert (Plan 0050, E8)"
+        default: "150000000"
       terms:
         description: "nur diese Suchbegriffe (Komma-Liste, Teilwörter; leer = alle)"
         default: ""
@@ -92,7 +90,9 @@ jobs:
     name: Entdecken (${{ needs.modus.outputs.modus }})
     needs: modus
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # Zeitbudget 240 Min. (DISCOVER_BUDGET_MIN) plus Ertragsbeweis, Abschluss und Einrichtung; GitHub erlaubt 6 h
+    # (Plan 0050, E8). Ab S6 aus `timeout` (Plan 0049, E5).
+    timeout-minutes: 330
     outputs:
       ampel: ${{ steps.discover.outputs.ampel }}
       run_dir: ${{ steps.discover.outputs.run_dir }}
@@ -120,6 +120,14 @@ jobs:
         run: |
           npm i -g "@anthropic-ai/claude-code@${CLI_VERSION}"
           echo "CLI: $(claude --version)" >> "$GITHUB_STEP_SUMMARY"
+      # Lauf-Cache des Geocoders über Läufe (Plan 0050, E5): Nominatim verlangt Caching; neuester Eintrag mit dem
+      # Präfix (Schlüssel je Lauf eindeutig), GitHub verwirft ihn nach 7 Tagen ohne Zugriff
+      - name: Geocoder-Cache laden
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/zwergenplan/geocode-v3.json
+          key: geocode-${{ github.run_id }}
+          restore-keys: geocode-
       - name: Entdecken
         id: discover
         env:
@@ -146,6 +154,12 @@ jobs:
           [[ -n "$REGION" ]] && args+=(--region "$REGION")
           [[ -n "$TERMS" ]] && args+=(--terms "$TERMS")
           pnpm pipeline discover "${args[@]}"
+      - name: Geocoder-Cache sichern
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/zwergenplan/geocode-v3.json
+          key: geocode-${{ github.run_id }}
       - name: Commits sichern (live)
         id: bundle
         if: needs.modus.outputs.modus == 'live'

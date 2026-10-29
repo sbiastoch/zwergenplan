@@ -1,6 +1,6 @@
 # Plan 0050 – Entdecken: wenige gute Quellen, Seitenfinder, keine technischen Verluste
 
-Status: in Umsetzung (S0 erledigt)
+Status: in Umsetzung (S0, S1 umgesetzt)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`):
@@ -276,10 +276,11 @@ Der Abschnitt nennt, was beim Füllen Düsseldorfs half (Plan 0042).
 | Datei | Änderung | Schritt |
 |---|---|---|
 | `scripts/pipeline/lib/address.ts` (neu) | Normalisierung | S1 |
-| `scripts/pipeline/io/geocode.ts`, `scripts/pipeline/io/cache.ts` | Reihenfolge, Treffer in der bbox, benannte Orte mit `addressdetails`, Katalog zuerst, 4/min, Cache im Zustand, Lauf-Cache `geocode-v2.json`, „kein Treffer“ im Lauf, Schnittstelle | S1 |
+| `scripts/pipeline/io/geocode.ts`, `scripts/pipeline/io/cache.ts` | Reihenfolge, Treffer in der bbox, benannte Orte mit `addressdetails`, Katalog zuerst, 4/min, Cache im Zustand, Lauf-Cache `geocode-v3.json`, „kein Treffer“ im Lauf, Schnittstelle | S1 |
 | `tests/fixtures/pipeline/geocode-faelle.json` (neu) samt Aufzeichnungen, `scripts/pipeline/cli.ts` (`pipeline geocode`: neue Schnittstelle, `--region`, `--faelle`), `vitest.setup.ts` (`XDG_CACHE_HOME`) | Prüffälle und Testschutz für S1 | S1 |
 | `scripts/pipeline/draw-eval-sample.ts` (neu, Einstieg in `knip.jsonc`), `scripts/pipeline/lib/eval-discover.ts` (neu: Schema, Arten, Ziehung) | Ziehung der Stichprobe mit festem Zufall | S0 |
 | `scripts/pipeline/lib/discover-state.ts` | `klaerfaelle`, `orte` | S1 |
+| `scripts/pipeline/lib/klaerfall.ts` (neu) | Klärfälle im Zustand: anlegen, beenden, aussetzen, Quelle `klaerfall` (eigenes Modul, `lib/discover.ts` hat schon 850 Zeilen) | S1 |
 | `scripts/pipeline/lib/html-extract.ts` | `title` und `headings` in `PageExtract` (Text unverändert) | S4 |
 | `scripts/pipeline/io/discover.ts`, `scripts/pipeline/lib/discover.ts` | Orte mit `hint`, Klärfälle samt Quelle `klaerfall`, Dublette als Klärfall (S1); Eval, Kennzahlen, Ertrag (S2); Seitenfinder, ID-Reservierung, Ertrag je Seite, zweite Runde, `partChars`, Parallelität (S3); Quellen, Namenssuche, Portaltreffer, Zeit je Region (S4) | S1–S4 |
 | `scripts/pipeline/io/llm.ts` | `tools: "search"` | S4 |
@@ -404,6 +405,19 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`, bei Daten mit `
 - **Namenssuche** (`claude -p`, Opus high, nur `WebSearch`, ein Aufruf mit allen 9 Namen samt Ort und Art):
   - Gefunden sind 9 von 9 mit eigener Website bzw. Gruppenseite, auch musikfuechse und zwergenstube; 19 Turns, $0,51.
   - Die Probe nutzte die Katalognamen; im Lauf kommen die Namen aus den Listen, die oft anders schreiben. Die Websuche der Pipeline bedient deutsche Lokalanfragen also gut (offene Frage „(V)“ aus Plan 0045, „Quellen“). Die Namenssuche (E3) ist damit der stärkste Hebel für Ziel 1.
+
+### S1 – Befunde (2026-10-29)
+
+- **Prüffälle** (`pnpm pipeline geocode --faelle`, live ohne Katalog und Caches, 11 Anfragen, 149 s Wartezeit): 9 von 10 treffen die Katalog-Koordinate auf 0 m.
+  - **Abweichung:** „Hallenbad Ebensee, Nürnberg“ ist in OSM nicht benannt (Abfrage 2026-10-29, auch „Nordostbad“, Reverse-Geocoding zeigt nur die Adresse). Richtig ist dort „kein Treffer“: Der Ort fällt mit `hint` weg bzw. der Kandidat wird ein Klärfall (Ziel 5 bleibt gewahrt). Das Fixture erwartet deshalb `erwartet: null`. Photon hilft nicht, es nutzt dieselben OSM-Daten.
+  - Der erste Lauf verfehlte auch djk-eibach („Turnhalle Volksschule Fürreuthweg, Nürnberg-Eibach“). Seitdem erkennt `normalizeAddress` einen Straßennamen ohne Hausnummer im Namen (`streetName`). Stufe 2 fragt damit strukturiert und gibt „Nürnberg-Eibach“ als `city` „Nürnberg“ weiter.
+- **Umsetzung:**
+  - `entryFromAssessment` nimmt `null` je Ort für „kein Treffer“.
+  - Eine schon katalogisierte Programmseite ist jetzt ein Klärfall „Dublette von …?“ statt einer Verwerfung.
+  - Abruffehler außer 404/410 sind Klärfälle.
+  - Kandidaten, die der Lauf nicht mehr bewertet hat, werden im Modus live Klärfälle am Lauf (`anzahl` 0).
+
+- **Offen für S6 (Arch-Review S1, Minor 4):** Im Modus live wird jeder nicht bewertete Kandidat ein Klärfall am Lauf, der nie aussetzt, und Klärfälle stehen vor der Websuche. Vor dem ersten Live-Lauf braucht das einen Deckel (etwa höchstens so viele Lauf-Klärfälle wie G3) oder eine Reihenfolge (älteste `zuletzt` zuerst). Vor S6 ist kein Lauf live.
 
 ## Nutzerentscheide
 

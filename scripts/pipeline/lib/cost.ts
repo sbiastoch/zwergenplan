@@ -99,8 +99,12 @@ export interface Brakes {
 
 /** Standard des Nachtlaufs (E8) */
 export const NIGHT_BRAKES: Brakes = { maxCalls: 150, maxTokens: 3_000_000 };
-/** Standard des Entdeckens (E8, je Lauf über alle Regionen) */
-export const DISCOVER_BRAKES: Brakes = { maxCalls: 120, maxTokens: 5_000_000 };
+/**
+ * Standard des Entdeckens (E8, je Lauf über alle Regionen). Plan 0050, E8: Qualität geht vor Kosten (Nutzervorgabe
+ * 2026-10-25/26); die alten Werte (120 Aufrufe, 5 Mio.) beendeten Läufe vor dem Ende der Kandidaten. Die Grenze ist
+ * jetzt der Job von 330 Minuten; S6 setzt die Bremsen auf das Doppelte des größten gemessenen Laufs.
+ */
+export const DISCOVER_BRAKES: Brakes = { maxCalls: 1500, maxTokens: 150_000_000 };
 
 /** Bremsen aus der Umgebung (`MAX_CALLS`, `MAX_TOKENS`); leer = Standard, ungültig = Fehler (keine stille Grenze). */
 export function parseBrakes(

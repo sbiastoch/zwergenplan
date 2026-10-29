@@ -1,3 +1,8 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterAll } from "vitest";
+
 /**
  * Kein GIT_* aus der Umgebung des Aufrufers (Plan 0027, Etappe 3, Vorfall vom 2026-10-08). Im pre-commit-Hook
  * setzt git GIT_DIR und GIT_INDEX_FILE. Ein Test, der sie erbte, hat mit `git init`/`git config` im Temp-Ordner
@@ -8,6 +13,14 @@
 for (const key of Object.keys(process.env)) {
   if (key.startsWith("GIT_")) delete process.env[key];
 }
+
+/**
+ * Kein Test schreibt in den echten Cache unter ~/.cache/zwergenplan (Plan 0050, E5): Fake-Koordinaten im
+ * Geocoder-Cache landeten sonst in echten Läufen.
+ */
+const cacheHome = mkdtempSync(join(tmpdir(), "zp-cache-"));
+process.env["XDG_CACHE_HOME"] = cacheHome;
+afterAll(() => rmSync(cacheHome, { recursive: true, force: true }));
 
 /**
  * Unit-Tests laufen nie gegen das Live-Netz (Plan 0002): Quellen-Parser bekommen gespeicherte

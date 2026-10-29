@@ -1,0 +1,66 @@
+{
+  "toleranzM": 300,
+  "faelle": [
+    {
+      "anbieter": "djk-eibach",
+      "eingabe": "Turnhalle Volksschule Fürreuthweg, Nürnberg-Eibach",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.408514, "lon": 11.038562 }
+    },
+    {
+      "anbieter": "post-sv-nuernberg",
+      "eingabe": "Hallenbad Ebensee, Nürnberg",
+      "region": "nuernberg",
+      "erwartet": null,
+      "notiz": "In OSM nicht benannt (Abfrage 2026-10-29, auch „Nordostbad“); richtig ist „kein Treffer“: Ort weg mit hint bzw. Klärfall"
+    },
+    {
+      "anbieter": "post-sv-nuernberg",
+      "eingabe": "Theodor-Billroth-Schule, Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.464168, "lon": 11.14028 }
+    },
+    {
+      "anbieter": "post-sv-nuernberg",
+      "eingabe": "Sportzentrum Nordost, Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.483474, "lon": 11.124682 }
+    },
+    {
+      "anbieter": "schwimmschule-baer-ritterbad",
+      "eingabe": "Ritterbad, Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.443937, "lon": 11.090543 }
+    },
+    {
+      "anbieter": "post-sv-nuernberg",
+      "eingabe": "Vereinshalle Hasenbuck, Ingolstädter Str. 255, 90461 Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.42296, "lon": 11.087918 }
+    },
+    {
+      "anbieter": "die-familienbox",
+      "eingabe": "Rosenaustraße 7 (Hinterhaus), 90429 Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.449976, "lon": 11.062789 }
+    },
+    {
+      "anbieter": "ev-suedstadt-krabbelgruppen",
+      "eingabe": "Allersberger Str.116, 90461 Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.437608, "lon": 11.089253 }
+    },
+    {
+      "anbieter": "ev-suedstadt-krabbelgruppen",
+      "eingabe": "Siemensplatz 2, Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.440145, "lon": 11.075786 }
+    },
+    {
+      "anbieter": "post-sv-nuernberg",
+      "eingabe": "Turnhalle (1. OG), Reutersbrunnenstraße 12, 90429 Nürnberg",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.4532419, "lon": 11.0583717 }
+    }
+  ]
+}

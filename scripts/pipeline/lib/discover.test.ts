@@ -24,6 +24,7 @@ import {
   newProvidersIssue,
   normalizeUrl,
   parseAssessment,
+  possibleDuplicate,
   postpone,
   prefilter,
   proveYield,
@@ -143,6 +144,24 @@ describe("prefilter (E7.3)", () => {
     });
     expect(r.keep).toEqual([]);
     expect(r.dropped).toHaveLength(2);
+  });
+
+  it("ausgesetzter Klärfall fällt bis aussetzenBis weg; bekannte tragen `bekannt` (Plan 0050, E5)", () => {
+    const k = {
+      url: find().url,
+      name: "K",
+      grund: "g",
+      seit: today,
+      zuletzt: today,
+      anzahl: 3,
+      aussetzenBis: "2026-11-15",
+    };
+    const state = { ...emptyState("nuernberg"), klaerfaelle: [k] };
+    expect(prefilter([find()], { catalog, state, today }).dropped[0]?.grund).toBe("Klärfall ausgesetzt bis 2026-11-15");
+    expect(prefilter([find()], { catalog, state, today: "2026-11-15" }).keep).toHaveLength(1);
+    const p = catalog.find((x) => x.role === "anbieter");
+    const known = prefilter([find({ url: p?.url ?? "" })], { catalog, state, today });
+    expect(known.dropped[0]).toMatchObject({ bekannt: true });
   });
 });
 
@@ -484,13 +503,17 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
     expect(r).toEqual({ ok: false, grund: "keine abrufbare Terminseite (use: termine)" });
   });
 
-  it("Programmseite eines bekannten Anbieters: verworfen", () => {
+  it("Programmseite eines bekannten Anbieters: Klärfall „Dublette von …?“ (Plan 0050, E4.6)", () => {
     const known = {
       ...assessed,
       programme: [{ url: "https://example.org/bibliothek/termine", kind: "html" as const, use: "termine" as const }],
     };
     const r = entryFromAssessment(known, { ...ctx, allowedUrls: ["https://example.org/bibliothek/termine"] });
-    expect(r).toEqual({ ok: false, grund: "Programmseite steht schon im Katalog (stadtbibliothek-beispiel)" });
+    expect(r).toEqual({
+      ok: false,
+      grund: "Dublette von stadtbibliothek-beispiel? (gleiche Programmseite)",
+      klaerfall: true,
+    });
   });
 
   it("einziger Ort außerhalb der Region: verworfen, der Grund nennt die Adresse", () => {
@@ -512,9 +535,77 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
     expect(r.entry.venues[0]?.id).toBe("krabbelzwerge-gostenhof");
     expect(r.notes).toContain("Ort außerhalb der Region weggelassen: Bad Roth, Badstraße 1, 91154 Roth");
     // der Extraktor erfährt es über den Hint jeder Terminseite, sonst landeten Roth-Termine am Nürnberger Ort
-    expect(r.entry.programme.map((g) => g.hint)).toEqual([
-      "Nur Termine an Gemeindehaus Gostenhof; Termine an Bad Roth weglassen (außerhalb der Region)",
-    ]);
+    expect(r.entry.programme.map((g) => g.hint)).toEqual(["Termine an Bad Roth weglassen (Ort nicht im Eintrag)"]);
+  });
+
+  describe("Orte ohne Treffer (Plan 0050, E5)", () => {
+    const three = {
+      ...assessed,
+      venues: [
+        ...assessed.venues,
+        { name: "Turnhalle Süd", address: "Turnhalle Süd, Nürnberg" },
+        { name: "Bad Roth", address: "Badstraße 1, 91154 Roth" },
+      ],
+    };
+    const inside = { lat: 49.449, lon: 11.06 };
+    const outside = { lat: 49.24, lon: 11.09 };
+
+    it("ein Ort ohne Treffer fällt weg; Hinweis, und der hint nennt nur die weggelassenen", () => {
+      const r = entryFromAssessment(three, { ...ctx, geos: [inside, null, outside] });
+      if (!r.ok) throw new Error(r.grund);
+      expect(r.entry.venues.map((v) => v.name)).toEqual(["Gemeindehaus Gostenhof"]);
+      expect(r.notes).toContain("Ort ohne Treffer im Geocoder weggelassen: Turnhalle Süd, Turnhalle Süd, Nürnberg");
+      expect(r.entry.programme[0]?.hint).toBe("Termine an Turnhalle Süd, Bad Roth weglassen (Ort nicht im Eintrag)");
+    });
+
+    it("hint über 200 Zeichen: Klärfall statt stiller Kürzung", () => {
+      const long = (i: number) => ({
+        name: `Sehr lange Bezeichnung einer Turnhalle Nummer ${i} im Stadtteil`,
+        address: "x, Nürnberg",
+      });
+      const many = { ...assessed, venues: [...assessed.venues, long(1), long(2), long(3), long(4)] };
+      const r = entryFromAssessment(many, { ...ctx, geos: [inside, null, null, null, null] });
+      expect(r).toMatchObject({ ok: false, klaerfall: true, grund: expect.stringMatching(/hint/) });
+    });
+
+    it("kein Ort mit Treffer: Klärfall", () => {
+      expect(entryFromAssessment(assessed, { ...ctx, geos: [null] })).toMatchObject({ ok: false, klaerfall: true });
+    });
+
+    it("einige außerhalb, die übrigen ohne Treffer: Klärfall", () => {
+      const two = {
+        ...assessed,
+        venues: [...assessed.venues, { name: "Bad Roth", address: "Badstraße 1, 91154 Roth" }],
+      };
+      expect(entryFromAssessment(two, { ...ctx, geos: [null, outside] })).toMatchObject({ ok: false, klaerfall: true });
+    });
+
+    it("alle außerhalb: verworfen (kein Klärfall)", () => {
+      const r = entryFromAssessment(assessed, { ...ctx, geos: [outside] });
+      expect(r.ok).toBe(false);
+      expect(r).not.toHaveProperty("klaerfall");
+    });
+  });
+});
+
+describe("possibleDuplicate (Plan 0050, E4.6)", () => {
+  const venue = (lat: number, lon: number) => ({ id: "v", name: "Ort", address: "a", geo: { lat, lon } });
+  const known = catalog.find((p) => p.role === "anbieter" && p.venues.length > 0);
+  if (!known || known.role !== "anbieter") throw new Error("Fixture ohne Anbieter mit Ort");
+  const at = known.venues[0]?.geo ?? { lat: 0, lon: 0 };
+
+  it("ähnlicher Anbietername und Ort ≤ 100 m: Dublette", () => {
+    expect(possibleDuplicate({ name: known.name, venues: [venue(at.lat + 0.0005, at.lon)] }, catalog)).toBe(
+      `Dublette von ${known.id}? (ähnlicher Name, Ort ≤ 100 m)`,
+    );
+  });
+
+  it("Gastanbieter mit anderem Namen am selben Ort: keine Dublette", () => {
+    expect(possibleDuplicate({ name: "Zirkus Purzelbaum", venues: [venue(at.lat, at.lon)] }, catalog)).toBeUndefined();
+  });
+
+  it("ähnlicher Name, aber weit weg: keine Dublette", () => {
+    expect(possibleDuplicate({ name: known.name, venues: [venue(at.lat + 0.05, at.lon)] }, catalog)).toBeUndefined();
   });
 });
 
@@ -613,12 +704,17 @@ describe("Bericht und Commit-Text (E7.8 G4, E10)", () => {
           dropped: [{ find: find({ name: "Alt" }), grund: "steht im Katalog (x)" }],
           adopted: [adopted],
           rejected: [{ find: find({ name: "Yoga" }), grund: "nur Erwachsene" }],
+          klaerfaelle: [{ find: find({ name: "Turnzwerge" }), grund: "Geocoder ohne Treffer für Halle, Nürnberg" }],
           hints: ["a: Quelle fehlerhaft seit 2026-09-20 (HTTP 404)"],
         },
       ],
       calls: [],
       budgetHit: false,
+      geocoder: { requests: 12, waitMs: 180_000 },
     });
+    expect(md).toContain("- Geocoder: 12 Anfragen an Nominatim, 3 Min. Wartezeit");
+    expect(md).toContain("## Klärfälle (Trockenlauf: nicht im Zustand)");
+    expect(md).toContain("| Turnzwerge |");
     expect(md).toMatch(/# Entdecken 2026-10-11 \(Trockenlauf\)/);
     expect(md).toMatch(/## Würde aufnehmen/);
     expect(md).toMatch(/krabbelzwerge-gostenhof/);
@@ -684,6 +780,11 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
           },
           { find: find({ name: "Turnverein", url: "https://example.org/turnverein" }), grund: "doppelt" },
         ],
+        // verworfen geht vor Klärfall; ein Klärfall zählt als gefunden (Plan 0050, E5)
+        klaerfaelle: [
+          { find: find({ name: "Musikschule Beispiel", url: "https://example.org/musikschule" }), grund: "Netz" },
+          { find: find({ name: "Gemeinde", url: "https://example.org/gemeinde" }), grund: "Geocoder ohne Treffer" },
+        ],
         dropped: [
           { find: find({ name: "Theater", url: "https://example.org/theater" }), grund: "Host und Name wie x" },
           { find: find({ name: "Bibliothek Beispiel", url: "https://example.org/bibliothek" }), grund: "abgelehnt" },
@@ -694,7 +795,7 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
     ]);
     expect(e.outcomes.map((o) => [o.id, o.ergebnis])).toEqual([
       ["familientreff-beispiel", "nicht bewertet"],
-      ["gemeinde-beispiel", "nicht gefunden"],
+      ["gemeinde-beispiel", "klärfall"],
       ["musikschule-beispiel", "verworfen"],
       ["stadtbibliothek-beispiel", "vorfilter"],
       ["theater-beispiel", "aufgenommen"],
@@ -716,7 +817,7 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
       hidden: e,
     });
     // „gefunden“: von einer Quelle geliefert, gleich was danach geschah (auch Vorfilter, nicht bewertet)
-    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(2 von 6 wiedergefunden, 5 gefunden\)/);
+    expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(2 von 6 wiedergefunden, 6 gefunden\)/);
     expect(md).toMatch(
       /\| musikschule-beispiel \| verworfen \| https:\/\/example\.org\/musikschule \| ohne Adresse \|/,
     );

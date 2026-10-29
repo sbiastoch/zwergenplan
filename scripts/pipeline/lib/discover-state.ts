@@ -9,6 +9,35 @@ import { REGION_IDS, type RegionId } from "../../../src/domain/regions.ts";
 const IsoDate = z.iso.date();
 
 /**
+ * Lage eines Orts aus dem Geocoder (Plan 0050, E5). `adresse` ist bei jeder Stufe die aus `addressdetails`
+ * gebaute Adresse, nicht die Eingabe; `stufe` 1 Freitext, 2 strukturiert, 3 benannter Ort.
+ */
+export const Ort = z.strictObject({
+  lat: z.number(),
+  lon: z.number(),
+  adresse: z.string().min(1),
+  stufe: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  district: z.string().optional(),
+  datum: IsoDate,
+});
+export type Ort = z.infer<typeof Ort>;
+
+/**
+ * Kandidat, den ein technischer Grund oder eine mögliche Dublette aufhält (Plan 0050, E5). Ohne Wiedervorlage:
+ * jeder Lauf prüft ihn erneut, bis Aufnahme, Verwerfung oder ein Mensch ihn beendet. `anzahl` zählt nur Klärfälle,
+ * die am Kandidaten liegen; ab drei in Folge setzt `aussetzenBis` einen Monatslauf aus.
+ */
+const Klaerfall = z.strictObject({
+  url: z.url(),
+  name: z.string(),
+  grund: z.string().min(1),
+  seit: IsoDate,
+  zuletzt: IsoDate,
+  anzahl: z.number().int().min(0),
+  aussetzenBis: IsoDate.optional(),
+});
+
+/**
  * Zustand des Entdeckens je Region (`data/discover/<region>.json`, E5/E13), dauerhafter Zustand der Pipeline, kein
  * Vertrag der Website. `abgelehnt` pflegt ein Mensch (Rücknahme per Revert, E7); `zurueckgestellt` schreibt der Lauf
  * für Kandidaten ohne Ertrag oder mit verworfener Bewertung und legt sie nach 8 Wochen wieder vor.
@@ -42,10 +71,19 @@ export const DiscoverState = z.strictObject({
       wiedervorlage: IsoDate,
     }),
   ),
+  /** Geocoder-Treffer der Region je Eingabe (`placeKey`), 12 Monate gültig; „kein Treffer“ steht hier nie */
+  orte: z.record(z.string(), Ort).default({}),
+  klaerfaelle: z.array(Klaerfall).default([]),
 });
 export type DiscoverState = z.infer<typeof DiscoverState>;
 
-export const emptyState = (region: RegionId): DiscoverState => ({ region, abgelehnt: [], zurueckgestellt: [] });
+export const emptyState = (region: RegionId): DiscoverState => ({
+  region,
+  abgelehnt: [],
+  zurueckgestellt: [],
+  orte: {},
+  klaerfaelle: [],
+});
 
 /**
  * Invariante für `data:validate` (Arch-Review S4b, M1): Kein Katalogeintrag trägt eine zurückgenommene Katalog-ID oder

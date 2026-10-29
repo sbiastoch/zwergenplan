@@ -38,7 +38,7 @@ Der Nachtlauf (Plan 0032) liest nur Felder, keine Notizen. Je Seite:
 ## Orte (`venues`)
 
 - Der Hauptort hat die Anbieter-ID als `id`, weitere Orte `<anbieter>-<slug>`. IDs sind dauerhaft und stecken im Zuordnungsschlüssel der Angebots-IDs (ADR 0022). Wird ein Ort umbenannt, bleibt die `id`.
-- Ein neuer Ort braucht Koordinaten: `pnpm pipeline geocode "Straße Nr, PLZ Nürnberg"` liefert `lat`, `lon` und `district`.
+- Ein neuer Ort braucht Koordinaten: `pnpm pipeline geocode "Straße Nr, PLZ Nürnberg" --region nuernberg` liefert `lat`, `lon`, `district` und die Stufe (Standard-Region `nuernberg`; ein Ort ohne Postadresse mit `--venue "Ritterbad"`). Nominatim erlaubt höchstens 4 Anfragen pro Minute: zwischen zwei Aufrufen 15 s warten; Treffer sind gecacht. Nie gleichzeitig mit einem Entdecken-Lauf in Actions oder einem lokalen Eval.
 - `venues[].hint` (höchstens 200 Zeichen, ohne Datum) sagt dem Crawler, was an diesem Ort stattfindet („Babymassage freitags, Krabbelgruppen“). Ist die Koordinate nur ungefähr (Park, Straßenmitte), steht das in `notes`.
 - Ein neuer Ort braucht einen `venues`-Eintrag; der nächste Nachtlauf ordnet die Termine zu, weil der geänderte Katalogauszug den Eingabe-Hash ändert.
 

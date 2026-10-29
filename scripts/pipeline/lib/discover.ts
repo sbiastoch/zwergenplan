@@ -9,7 +9,7 @@
  */
 import { z } from "zod";
 import { validateDataset } from "../../../src/domain/dataset.ts";
-import { inBounds } from "../../../src/domain/geo.ts";
+import { haversineMeters, inBounds } from "../../../src/domain/geo.ts";
 import { nextPublicId, SHORT_ID_PATTERN, slug } from "../../../src/domain/ids.ts";
 import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
 import { type Anbieter, type Offer, type Provider, Provider as ProviderSchema } from "../../../src/domain/schema.ts";
@@ -95,7 +95,8 @@ function similarName(a: string, b: string): boolean {
 }
 
 /**
- * Vorfilter (E7.3): bekannte URL, bekannter Host mit ähnlichem Namen, `abgelehnt`, noch zurückgestellt. `abgelehnt`
+ * Vorfilter (E7.3): bekannte URL, bekannter Host mit ähnlichem Namen, `abgelehnt`, noch zurückgestellt, ausgesetzter
+ * Klärfall (Plan 0050, E5). Bekannte und abgelehnte tragen `bekannt` (beendet ihren Klärfall). `abgelehnt`
  * sind die Sperren aller Regionen, weil sich die Regionen überlappen (Plan 0036, E4); ohne Angabe die der eigenen.
  * `zurueckgestellt` bleibt je Region, der Grund hängt oft an ihr („kein Ort in der Region …“).
  */
@@ -107,7 +108,7 @@ export function prefilter(
     abgelehnt?: DiscoverState["abgelehnt"];
     today: string;
   },
-): { keep: Find[]; dropped: Array<{ find: Find; grund: string }> } {
+): { keep: Find[]; dropped: Array<{ find: Find; grund: string; bekannt?: true }> } {
   const abgelehnt = ctx.abgelehnt ?? ctx.state.abgelehnt;
   const byUrl = new Map<string, string>();
   const byHost = new Map<string, Provider[]>();
@@ -137,8 +138,15 @@ export function prefilter(
     }),
   );
 
+  const suspended = new Map(
+    ctx.state.klaerfaelle.flatMap((k) => {
+      const n = normalizeUrl(k.url);
+      return n && k.aussetzenBis !== undefined && k.aussetzenBis > ctx.today ? [[n, k.aussetzenBis] as const] : [];
+    }),
+  );
+
   const keep: Find[] = [];
-  const dropped: Array<{ find: Find; grund: string }> = [];
+  const dropped: Array<{ find: Find; grund: string; bekannt?: true }> = [];
   const seen = new Set<string>();
   for (const find of finds) {
     const n = normalizeUrl(find.url);
@@ -150,17 +158,21 @@ export function prefilter(
     if (seen.has(n)) continue;
     seen.add(n);
     const drop = (grund: string) => dropped.push({ find, grund });
+    // bekannt: ein offener Klärfall mit dieser URL endet damit (Plan 0050, E5)
+    const dropKnown = (grund: string) => dropped.push({ find, grund, bekannt: true });
     const known = byUrl.get(n);
     const twin = (byHost.get(host) ?? []).find((p) => similarName(find.name, p.name));
     // ein abgelehnter Host gilt auch für seine Subdomains
     const rejected = rejectedUrls.get(n) ?? [...rejectedHosts].find(([h]) => host === h || host.endsWith(`.${h}`))?.[1];
     const waiting = postponed.get(n);
+    const pause = suspended.get(n);
     if (FOREIGN_HOSTS.test(host)) drop("keine eigene Website (Netzwerk oder Suchdienst)");
-    else if (known) drop(`steht im Katalog (${known})`);
-    else if (twin) drop(`Host und Name wie ${twin.id}`);
-    else if (rejected) drop(`abgelehnt: ${rejected}`);
+    else if (known) dropKnown(`steht im Katalog (${known})`);
+    else if (twin) dropKnown(`Host und Name wie ${twin.id}`);
+    else if (rejected) dropKnown(`abgelehnt: ${rejected}`);
     else if (waiting && waiting.wiedervorlage > ctx.today)
       drop(`zurückgestellt bis ${waiting.wiedervorlage}: ${waiting.grund}`);
+    else if (pause) drop(`Klärfall ausgesetzt bis ${pause}`);
     else keep.push(find);
   }
   return { keep, dropped };
@@ -442,7 +454,12 @@ export function catalogId(
 /**
  * Katalogeintrag aus der Bewertung (E7.4, E7.7). IDs, `publicId`, Region, `verified` und Notiz setzt der Code.
  * Programmseiten nur, wenn ihre URL auf der abgerufenen Seite steht (Schutz vor Prompt-Injection: der Abruf folgt
- * keiner vom Modell erfundenen Adresse). Die Orte kommen mit Koordinaten aus dem Geocoder (`geos`, gleiche Reihenfolge).
+ * keiner vom Modell erfundenen Adresse). Die Orte kommen mit Koordinaten aus dem Geocoder (`geos`, gleiche Reihenfolge;
+ * `null` = kein Treffer).
+ *
+ * Plan 0050, E5: Orte außerhalb und ohne Treffer fallen weg, die Terminseiten bekommen einen `hint`, der nur sie nennt.
+ * Verworfen wird nur, wenn alle Orte außerhalb liegen; bleibt sonst keiner übrig, passt der `hint` nicht in 200
+ * Zeichen oder steht eine Programmseite schon im Katalog (E4.6), wird der Kandidat ein Klärfall.
  */
 export function entryFromAssessment(
   a: AssessEntry,
@@ -454,10 +471,10 @@ export function entryFromAssessment(
     /** zurückgenommene Katalog-IDs und publicIds (`reservedIds`), gelten als belegt */
     reserved?: { ids: ReadonlySet<string>; publicIds: ReadonlySet<string> };
     today: string;
-    geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined }>;
+    geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined } | null>;
     allowedUrls: readonly string[];
   },
-): { ok: true; entry: Anbieter; notes: string[] } | { ok: false; grund: string } {
+): { ok: true; entry: Anbieter; notes: string[] } | { ok: false; grund: string; klaerfall?: true } {
   const allowed = new Set(ctx.allowedUrls.flatMap((u) => normalizeUrl(u) ?? []));
   const notes: string[] = [];
   const programme = a.programme.filter((g) => {
@@ -472,26 +489,40 @@ export function entryFromAssessment(
     ctx.catalog.flatMap((p) => p.programme.flatMap((g) => normalizeUrl(g.url) ?? []).map((n) => [n, p.id] as const)),
   );
   const owner = programme.map((g) => knownPages.get(normalizeUrl(g.url) ?? "")).find(Boolean);
-  if (owner) return { ok: false, grund: `Programmseite steht schon im Katalog (${owner})` };
+  if (owner) return { ok: false, grund: `Dublette von ${owner}? (gleiche Programmseite)`, klaerfall: true };
   const { bbox } = REGIONS[ctx.region];
   if (ctx.geos.length !== a.venues.length) return { ok: false, grund: "Orte ohne Koordinaten" };
-  // Orte außerhalb der Region fallen weg (Nutzerentscheid 2026-10-11, wie „musikfuechse nur Nürnberg“); verworfen
-  // wird nur, wenn keiner übrig bleibt
-  const located = a.venues.map((v, i) => ({ v, g: ctx.geos[i] ?? { lat: 0, lon: 0 } }));
-  const inside = located.filter((x) => inBounds(x.g, bbox));
-  const outside = located.filter((x) => !inBounds(x.g, bbox));
-  if (inside.length === 0)
+  // Orte außerhalb der Region fallen weg (Nutzerentscheid 2026-10-11, wie „musikfuechse nur Nürnberg“), ebenso Orte
+  // ohne Treffer (Plan 0050, E5); verworfen wird nur, wenn alle außerhalb liegen
+  const located = a.venues.map((v, i) => ({ v, g: ctx.geos[i] ?? null }));
+  const inside = located.flatMap((x) => (x.g && inBounds(x.g, bbox) ? [{ v: x.v, g: x.g }] : []));
+  const outside = located.filter((x) => x.g && !inBounds(x.g, bbox));
+  const missing = located.filter((x) => x.g === null);
+  if (inside.length === 0 && missing.length === 0)
     return {
       ok: false,
       grund: `kein Ort in der Region ${REGIONS[ctx.region].name} (außerhalb: ${outside.map((x) => x.v.address).join("; ")})`,
     };
+  if (inside.length === 0)
+    return {
+      ok: false,
+      grund: `Geocoder ohne Treffer für ${missing.map((x) => x.v.address).join("; ")}${outside.length > 0 ? ", übrige Orte außerhalb" : ""}`,
+      klaerfall: true,
+    };
   for (const x of outside) notes.push(`Ort außerhalb der Region weggelassen: ${x.v.name}, ${x.v.address}`);
-  const outsideHint =
-    outside.length > 0
-      ? `Nur Termine an ${inside.map((x) => x.v.name).join(", ")}; Termine an ${outside.map((x) => x.v.name).join(", ")} weglassen (außerhalb der Region)`
-          .replace(/\d{1,2}\.\d{1,2}\./g, "")
-          .slice(0, 200)
+  for (const x of missing) notes.push(`Ort ohne Treffer im Geocoder weggelassen: ${x.v.name}, ${x.v.address}`);
+  const omitted = located.filter((x) => !inside.some((i) => i.v === x.v)).map((x) => x.v.name);
+  // nennt nur die weggelassenen Orte, sonst landeten deren Termine am ersten Ort (prompt/extract.md, „Hauptort“)
+  const omittedHint =
+    omitted.length > 0
+      ? `Termine an ${omitted.join(", ")} weglassen (Ort nicht im Eintrag)`.replace(/\d{1,2}\.\d{1,2}\./g, "")
       : undefined;
+  if (omittedHint && omittedHint.length > 200)
+    return {
+      ok: false,
+      grund: `hint für weggelassene Orte über 200 Zeichen (${omitted.length} Orte)`,
+      klaerfall: true,
+    };
 
   const reservedIds = ctx.reserved?.ids ?? new Set<string>();
   const id = catalogId(a.name, ctx.catalog, reservedIds);
@@ -527,7 +558,7 @@ export function entryFromAssessment(
       use: g.use,
       // Der Extraktor sieht nur den Katalogauszug: ohne Hint landeten Termine an weggelassenen Orten am ersten Ort
       // (prompt/extract.md, „Hauptort“); wie musikfuechse (Arch-Review S4c, M1)
-      ...(outsideHint && g.use === "termine" ? { hint: outsideHint } : {}),
+      ...(omittedHint && g.use === "termine" ? { hint: omittedHint } : {}),
     })),
     availability: { shown: a.availability },
     verified: ctx.today,
@@ -551,6 +582,27 @@ export function entryFromAssessment(
   return checked.data.role === "anbieter"
     ? { ok: true, entry: checked.data, notes }
     : { ok: false, grund: "kein Anbieter" };
+}
+
+/** Umkreis, in dem ein Ort mit ähnlichem Anbieternamen eine mögliche Dublette ist (Plan 0050, E4.6) */
+const DUPLICATE_RADIUS_M = 100;
+
+/**
+ * Mögliche Dublette (Plan 0050, E4.6): ähnlicher Anbietername und ein Ort im Umkreis von 100 m um einen Ort eines
+ * Katalog-Anbieters. Gastanbieter in einem Familienzentrum haben andere Namen und bleiben so Kandidaten. Ergebnis ist
+ * ein Klärfall, keine Verwerfung („lieber Dublette als verschluckter Anbieter“).
+ */
+export function possibleDuplicate(
+  entry: { name: string; venues: ReadonlyArray<{ geo: { lat: number; lon: number } }> },
+  catalog: readonly Provider[],
+): string | undefined {
+  const twin = catalog.find(
+    (p) =>
+      p.role === "anbieter" &&
+      similarName(entry.name, p.name) &&
+      p.venues.some((v) => entry.venues.some((e) => haversineMeters(v.geo, e.geo) <= DUPLICATE_RADIUS_M)),
+  );
+  return twin ? `Dublette von ${twin.id}? (ähnlicher Name, Ort ≤ ${DUPLICATE_RADIUS_M} m)` : undefined;
 }
 
 /**
@@ -593,9 +645,11 @@ export interface RegionReport {
   region: RegionId;
   /** Kandidaten vor dem Vorfilter */
   finds: number;
-  dropped: Array<{ find: Find; grund: string }>;
+  dropped: Array<{ find: Find; grund: string; bekannt?: true }>;
   adopted: Adopted[];
   rejected: Array<{ find: Find; grund: string }>;
+  /** aufgehalten aus technischem Grund oder als mögliche Dublette (Plan 0050, E5) */
+  klaerfaelle: Array<{ find: Find; grund: string }>;
   /** nach dem Vorfilter übrig, aber nicht bewertet (G3, Bremse, Zeitbudget, Abbruch) */
   unassessed?: Find[];
   hints: string[];
@@ -610,6 +664,8 @@ export interface DiscoverReport {
   abort?: "auth" | "limit";
   brake?: "aufrufe" | "tokens";
   budgetHit: boolean;
+  /** Anfragen an Nominatim und Wartezeit nach der Rate (Plan 0050, E5) */
+  geocoder?: { requests: number; waitMs: number };
   /** G2 im Trockenlauf verletzt (im Modus live bricht G2 den Lauf ab) */
   gateErrors?: string[];
   /** Entdecken-Eval (`--hide`): was aus den ausgeblendeten Anbietern wurde */
@@ -620,7 +676,7 @@ export interface DiscoverReport {
 interface HiddenOutcome {
   id: string;
   name: string;
-  ergebnis: "aufgenommen" | "verworfen" | "nicht bewertet" | "vorfilter" | "nicht gefunden";
+  ergebnis: "aufgenommen" | "verworfen" | "klärfall" | "nicht bewertet" | "vorfilter" | "nicht gefunden";
   /** Fund-URL des passenden Kandidaten */
   url?: string;
   grund?: string;
@@ -671,6 +727,7 @@ const adoptedMatches = (a: Adopted, p: Provider): boolean =>
 export function hiddenEval(hidden: readonly Provider[], regions: readonly RegionReport[]): HiddenEval {
   const adopted = regions.flatMap((r) => r.adopted);
   const rejected = regions.flatMap((r) => r.rejected);
+  const klaerfaelle = regions.flatMap((r) => r.klaerfaelle);
   const dropped = regions.flatMap((r) => r.dropped);
   const unassessed = regions.flatMap((r) => r.unassessed ?? []);
   const outcomes = [...hidden]
@@ -681,6 +738,8 @@ export function hiddenEval(hidden: readonly Provider[], regions: readonly Region
       if (a) return { ...base, ergebnis: "aufgenommen", url: a.find.url };
       const r = rejected.find((x) => matchesProvider(x.find, p));
       if (r) return { ...base, ergebnis: "verworfen", url: r.find.url, grund: r.grund };
+      const k = klaerfaelle.find((x) => matchesProvider(x.find, p));
+      if (k) return { ...base, ergebnis: "klärfall", url: k.find.url, grund: k.grund };
       const u = unassessed.find((x) => matchesProvider(x, p));
       if (u)
         return {
@@ -752,6 +811,11 @@ export function renderDiscoverReport(r: DiscoverReport): string {
     `# Entdecken ${r.date}${r.dryRun ? " (Trockenlauf)" : ""}${stop ? ` – rot: vorzeitig beendet (${stop})` : ""}`,
     "",
     `- Dauer ${Math.round(r.durationMs / 60_000)} Min.`,
+    ...(r.geocoder
+      ? [
+          `- Geocoder: ${r.geocoder.requests} Anfragen an Nominatim, ${Math.round(r.geocoder.waitMs / 60_000)} Min. Wartezeit`,
+        ]
+      : []),
     ...(r.gateErrors ?? []).map((e) => `- **rot:** ${cell(e)}`),
   ];
   const results: Record<string, string> = {};
@@ -759,7 +823,8 @@ export function renderDiscoverReport(r: DiscoverReport): string {
     out.push(
       "",
       `## Region ${REGIONS[reg.region].name}: ${reg.adopted.length} ${r.dryRun ? "würden aufgenommen" : "neu"}, ` +
-        `${reg.rejected.length} verworfen, ${reg.dropped.length} im Vorfilter (von ${reg.finds} Kandidaten)`,
+        `${reg.rejected.length} verworfen, ${reg.klaerfaelle.length} Klärfälle, ${reg.dropped.length} im Vorfilter ` +
+        `(von ${reg.finds} Kandidaten)`,
       "",
       r.dryRun ? "## Würde aufnehmen" : "## Aufgenommen",
       "",
@@ -781,6 +846,19 @@ export function renderDiscoverReport(r: DiscoverReport): string {
       out.push("| Kandidat | URL | Quelle | Grund |", "|---|---|---|---|");
       for (const x of reg.rejected) {
         results[hostOf(x.find.url) ?? x.find.url] ??= "verworfen";
+        out.push(`| ${cell(x.find.name)} | ${x.find.url} | ${x.find.quelle} | ${cell(x.grund)} |`);
+      }
+    }
+    if (reg.klaerfaelle.length > 0) {
+      out.push(
+        "",
+        `## Klärfälle${r.dryRun ? " (Trockenlauf: nicht im Zustand)" : ""}`,
+        "",
+        "| Kandidat | URL | Quelle | Grund |",
+        "|---|---|---|---|",
+      );
+      for (const x of reg.klaerfaelle) {
+        results[hostOf(x.find.url) ?? x.find.url] ??= "klärfall";
         out.push(`| ${cell(x.find.name)} | ${x.find.url} | ${x.find.quelle} | ${cell(x.grund)} |`);
       }
     }

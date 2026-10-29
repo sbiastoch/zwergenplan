@@ -8,7 +8,7 @@ description: Datenpflege des Zwergenplans – Berichte von Nachtlauf und Entdeck
 Die Daten aktualisieren sich selbst (Plan 0032, ADR 0026):
 
 - **Nachtlauf** (`.github/workflows/nightly.yml`, täglich): ruft alle Seiten des Katalogs ab, extrahiert geänderte Anbieter mit dem Modell und schreibt `data/raw/<id>.json`, `data/offers.json` und `data/kosten.csv` auf `main`.
-- **Entdecken** (`.github/workflows/discover.yml`, sonntags): sucht neue Anbieter je Region und nimmt einen auf, wenn er mindestens ein Angebot für 0–3 Jahre liefert. Es schreibt `data/providers.yaml` (nur neue Einträge), `data/raw/<id>.json` und `data/discover/<region>.json`. Im Modus `trocken` (Repo-Variable `ENTDECKEN_MODUS` leer) steht das Ergebnis nur im Bericht.
+- **Entdecken** (`.github/workflows/discover.yml`, seit Plan 0050, S1 nur per `workflow_dispatch`; Monatslauf ab S6): sucht neue Anbieter je Region und nimmt einen auf, wenn er mindestens ein Angebot für 0–3 Jahre liefert. Es schreibt `data/providers.yaml` (nur neue Einträge), `data/raw/<id>.json` und `data/discover/<region>.json`. Im Modus `trocken` (Repo-Variable `ENTDECKEN_MODUS` leer) steht das Ergebnis nur im Bericht.
 
 Dieser Skill ist der **Wartungsleitfaden** dafür. Er ruft dieselben Befehle wie die Workflows; Übersicht im Kopf von `scripts/pipeline/cli.ts` und `scripts/pipeline/eval.ts`. `data/offers.json`, `data/raw/` und `data/discover/` werden nie von Hand bearbeitet, mit einer Ausnahme: `abgelehnt` in `data/discover/<region>.json`. Der Datenvertrag ist `src/domain/schema.ts` (Katalog exportiert nach `schema/providers.schema.json`).
 
@@ -54,6 +54,8 @@ Fertig, wenn der Revert, der Neubau und der Eintrag in `abgelehnt` auf `main` si
 
 Geprüfte und bewusst nicht aufgenommene Anbieter ohne Rücknahme stehen in `references/excluded.md`. Findet das Entdecken einen davon, gehört er zusätzlich in `abgelehnt`.
 
+**Klärfälle** (Plan 0050, E5): Ein Kandidat, den ein technischer Grund (Netz, Bot-Schutz, Geocoder ohne Treffer, ungültige Antwort, Laufende) oder eine mögliche Dublette aufhält, steht im Bericht unter „Klärfälle“ und im Modus live in `klaerfaelle` des Zustands. Jeder Lauf prüft ihn erneut; ab drei Klärfällen am Kandidaten pausiert er 35 Tage. Ein Mensch beendet ihn, indem er den Anbieter von Hand aufnimmt (unten, „Neuer Anbieter von Hand“; bei einem Ort ohne Treffer den Ort nachtragen und den `hint` „Termine an … weglassen“ entfernen) oder ihn in `abgelehnt` einträgt. `klaerfaelle` selbst wird nie von Hand bearbeitet.
+
 ## 3. Katalog von Hand pflegen
 
 Regeln für `data/providers.yaml`: `references/catalog.md`. Lesarten der Buchungssysteme für `hint` und `availability.how`: `references/booking-systems.md`.
@@ -71,7 +73,7 @@ Fertig ist eine Änderung, wenn der Trockenlauf das Erwartete liefert, `pnpm dat
 **Hinweise ohne Aktion** im Bericht des Entdeckens:
 - „neue Programmseite?“: Seite eines bekannten Anbieters aus einem Sammelkalender, die der Katalog nicht kennt. Prüfen und als `programme`-Eintrag ergänzen. Das Entdecken ändert bestehende Einträge nie (G2).
 
-**Neuer Anbieter von Hand** (etwa aus `references/excluded.md`, wenn sich die Lage geändert hat): Eintrag nach `references/catalog.md` anlegen, Orte mit `pnpm pipeline geocode "<Adresse>"`. `pnpm data:validate` nennt die freie `publicId` („`<id>`: `publicId` fehlt – frei ist `<wert>`“); genau diesen Wert übernehmen. Dann `pnpm pipeline nightly --only <id> --dry-run` als Ertragsbeweis.
+**Neuer Anbieter von Hand** (etwa aus `references/excluded.md`, wenn sich die Lage geändert hat): Eintrag nach `references/catalog.md` anlegen, Orte mit `pnpm pipeline geocode "<Adresse>" [--region <id>]` (höchstens 4 Anfragen pro Minute). `pnpm data:validate` nennt die freie `publicId` („`<id>`: `publicId` fehlt – frei ist `<wert>`“); genau diesen Wert übernehmen. Dann `pnpm pipeline nightly --only <id> --dry-run` als Ertragsbeweis.
 
 **Offene Pflegepunkte** (Stand 2026-10-11, nach der Katalogpflege):
 - `studio-herzschlag`: Haiku liefert für den Teil mit PEKiP, MusikZauber und SinnesZauber reproduzierbar `{"events": []}`, obwohl die Seiten Termine nennen. Sonnet erfasst alles (58 Events). Der Einbruchschutz hält den Bestand, bis die Pipeline das abfängt.

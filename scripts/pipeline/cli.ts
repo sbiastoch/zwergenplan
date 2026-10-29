@@ -40,8 +40,8 @@
  *                                               nach G1/G2 (G4), am Ende ein Commit mit data/discover und kosten.csv.
  *                                               --dry-run: alles echt, aber nur nach runs/<heute>/discover/, kein
  *                                               Commit. G3: höchstens 10 neue je Region, mit --bootstrap MAX_NEW
- *                                               (Standard 30). Bremsen MAX_CALLS (120), MAX_TOKENS (5 Mio.),
- *                                               Zeitbudget RUN_BUDGET_MIN (90). --terms: nur diese Suchbegriffe (Probe).
+ *                                               (Standard 30). Bremsen MAX_CALLS (1500), MAX_TOKENS (150 Mio.),
+ *                                               Zeitbudget RUN_BUDGET_MIN (240). --terms: nur diese Suchbegriffe (Probe).
  *                                               --hide (nur mit --dry-run): Entdecken-Eval (E9), diese Anbieter gelten
  *                                               als unbekannt; der Bericht zählt, welche wiedergefunden werden.
  *                                               G3 (auch MAX_NEW mit --bootstrap) steigt dabei um die
@@ -49,7 +49,12 @@
  *   discover-publish RUN_DIR                    Commits des Entdeckens nach main (pull --rebase, validate-data,
  *                                               push); schreibt RUN_DIR/issue.md, wenn ein Anbieter neu ist (E7.10).
  *   holidays FROM TO                            freie Tage (Ferien/Feiertage Bayern)
- *   geocode "Adresse"                           Koordinaten, Stadtteil, Ring
+ *   geocode "Adresse" [--region <id>] [--venue <Name>]
+ *                                               Koordinaten, Stadtteil, Stufe (Plan 0050, E5); Region Standard
+ *                                               nuernberg, höchstens 4 Anfragen pro Minute (15 s Abstand), gecacht.
+ *   geocode --faelle [--aufzeichnen]            Prüffälle tests/fixtures/pipeline/geocode-faelle.json live, ohne
+ *                                               Katalog und Caches; --aufzeichnen schreibt die Antworten für die
+ *                                               Unit-Tests nach geocode-aufnahmen.json. Exit 1 bei Abweichung.
  *   publish RUN_DIR                             Nachtlauf veröffentlichen (E6, aus RUN_DIR/nightly.json): nur auf main,
  *                                               nur data/raw, data/offers.json, data/kosten.csv, Commit-Text mit
  *                                               Kurzbericht, `pull --rebase` vor dem Push.
@@ -57,7 +62,8 @@
  *                                               (Cache + bedingter GET; unverändert → nichts tun, Plan 0009)
  */
 import { execFileSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
@@ -77,7 +83,7 @@ import {
 } from "./io/extract.ts";
 import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
 import { git, ROOT, readCatalog, readJson, readPreviousOffers, readRawDir, writeJson } from "./io/files.ts";
-import { geocode } from "./io/geocode.ts";
+import { checkFaelle, createGeocoder, GeocodeFaelle, recordingKey } from "./io/geocode.ts";
 import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
@@ -129,6 +135,9 @@ const { positionals, values } = parseArgs({
     hide: { type: "string" },
     "build-only": { type: "boolean", default: false },
     umstellen: { type: "string" },
+    venue: { type: "string" },
+    faelle: { type: "boolean", default: false },
+    aufzeichnen: { type: "boolean", default: false },
   },
 });
 const [command, ...args] = positionals;
@@ -345,6 +354,42 @@ function discoverGates(): void {
   }
 }
 
+const regionOf = (value: string | undefined): RegionId =>
+  REGION_IDS.find((r) => r === value) ?? fail(`unbekannte Region: ${value}`);
+
+/**
+ * Ein Ort (Standard Region nuernberg) oder die Prüffälle (Plan 0050, S1): `--faelle` fragt live, ohne Katalog und
+ * ohne Caches (eigenes Temp-Verzeichnis), bei 4 Anfragen pro Minute; `--aufzeichnen` schreibt die Antworten für
+ * die Unit-Tests nach tests/fixtures/pipeline/geocode-aufnahmen.json.
+ */
+async function geocodeCmd() {
+  if (!values.faelle) {
+    const g = createGeocoder({ today: today() });
+    const r = await g.geocode(need(args[0], "Adresse"), {
+      region: regionOf(values.region ?? "nuernberg"),
+      ...(values.venue ? { venueName: values.venue } : {}),
+    });
+    print(
+      r.kind === "treffer" ? { ...r.geo, stufe: r.stufe } : fail(r.kind === "ausfall" ? r.grund : "nicht gefunden"),
+    );
+    return;
+  }
+  const file = GeocodeFaelle.parse(readJson(join(ROOT, "tests/fixtures/pipeline/geocode-faelle.json")));
+  const recorded: Record<string, unknown> = {};
+  const fetchImpl: typeof fetch = async (input, init) => {
+    const res = await fetch(input, init);
+    recorded[recordingKey(String(input))] = await res.clone().json();
+    return res;
+  };
+  const g = createGeocoder({ today: today(), cacheDir: mkdtempSync(join(tmpdir(), "geocode-faelle-")), fetchImpl });
+  const results = await checkFaelle(file, g);
+  for (const r of results)
+    print(`${r.ok ? "✓" : "✗"} ${r.eingabe}: ${r.outcome.kind}${r.abstandM === undefined ? "" : ` ${r.abstandM} m`}`);
+  print(`Anfragen ${g.stats().requests}, Wartezeit ${Math.round(g.stats().waitMs / 1000)} s`);
+  if (values.aufzeichnen) writeJson(join(ROOT, "tests/fixtures/pipeline/geocode-aufnahmen.json"), recorded);
+  if (results.some((r) => !r.ok)) process.exit(1);
+}
+
 /** Entdecken (Plan 0032, E7). Exit 1 nur bei G2 oder Programmfehler; Abbruch und Bremse enden geordnet (Ampel rot). */
 async function discoverCmd() {
   const date = today();
@@ -397,7 +442,7 @@ async function discoverCmd() {
     deps: {
       ...createDiscoverModel(),
       fetchPage,
-      geocode,
+      geocoder: (init) => createGeocoder({ today: date, ...init }),
       extractor: createExtractor({ model }),
       fetchInputs,
       fetchPdfText,
@@ -629,11 +674,9 @@ switch (command) {
   case "holidays":
     print(await loadFreeDays(need(args[0], "FROM"), need(args[1], "TO")));
     break;
-  case "geocode": {
-    const g = (await geocode(need(args[0], "Adresse"))) ?? fail("nicht gefunden");
-    print(g);
+  case "geocode":
+    await geocodeCmd();
     break;
-  }
   case "publish":
     publish(need(args[0], "RUN_DIR"));
     break;
