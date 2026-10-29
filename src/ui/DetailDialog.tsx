@@ -7,6 +7,7 @@ import { seriesIcsFileName, seriesIcsPath, sessionIcsPath } from "../domain/ics-
 import { isNewlyListed } from "../domain/listing.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
 import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
+import { ABOUT_DATA_PATH } from "../domain/share.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
@@ -236,6 +237,11 @@ export function DetailContent({
           </p>
           {/* ganz dezent ganz unten, nur solange das Etikett „Neu“ gilt (Plan 0043, E5) */}
           {offer.listedAt && isNewlyListed(offer, now) && <p className="listed-since">{listedSince(offer.listedAt)}</p>}
+          {/* KI-Hinweis am KI-Text, dezent wie „Im Zwergenplan seit …“ */}
+          <p className="ai-note">
+            Text und Angaben hat eine KI von der Website des Anbieters übernommen, Fehler sind möglich.{" "}
+            <a href={`${import.meta.env.BASE_URL}${ABOUT_DATA_PATH}`}>So entsteht der Zwergenplan</a>
+          </p>
         </div>
       </div>
       <div className="dfoot">

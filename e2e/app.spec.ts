@@ -45,6 +45,10 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
   await expect(sheet.getByRole("link", { name: "Impressum und Datenschutz" })).toHaveAttribute("href", "/impressum/");
+  await expect(sheet.getByRole("link", { name: "So entsteht der Zwergenplan" })).toHaveAttribute(
+    "href",
+    "/impressum/#so-entsteht",
+  );
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
 
@@ -59,7 +63,8 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
   await expect(mail).toHaveCount(2);
   await expect(mail.first()).toHaveAttribute("href", "mailto:info@zwergenplan.app");
   await expect(page.getByRole("heading", { level: 2, name: "Hinweise" })).toBeVisible();
-  await expect(page.getByText(/Eine KI liest sie aus/)).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "So entsteht der Zwergenplan" })).toBeVisible();
+  await expect(page.getByText(/Texte sind KI-generiert und können Fehler enthalten/)).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "Datenschutz" })).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });

@@ -513,10 +513,21 @@
     gap: 12px;
   }
   /* „Im Zwergenplan seit …“: ganz dezent ganz unten (Plan 0043, E5) */
-  .listed-since {
+  .listed-since,
+  .ai-note {
     margin: 18px 0 0;
     color: var(--muted);
     font-size: 0.8125rem;
+  }
+  .listed-since + .ai-note {
+    margin-top: 6px;
+  }
+  /* inline mit 24 px Trefferfläche wie `.imprint a` in sheet.css */
+  .ai-note a {
+    color: inherit;
+    padding-block: 4px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 }
 

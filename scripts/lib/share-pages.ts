@@ -20,6 +20,7 @@ import {
 } from "../../src/domain/labels.ts";
 import { OFFER_PARAM, PROVIDER_PARAM } from "../../src/domain/route.ts";
 import {
+  ABOUT_DATA_ID,
   IMPRINT_PATH,
   LEGACY_SHARE_DIRS,
   offerAppSearch,
@@ -354,7 +355,7 @@ export function imprintPage(): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Impressum und Datenschutz – Zwergenplan</title>
-<meta name="description" content="Impressum und Datenschutzhinweise des Zwergenplans.">
+<meta name="description" content="Impressum, Datenschutz und wie der Zwergenplan seine Angebote findet.">
 <link rel="icon" href="${BASE}icons/icon.svg" type="image/svg+xml">
 <style>${PAGE_STYLE}</style>
 </head>
@@ -365,9 +366,15 @@ export function imprintPage(): string {
 <p>Angaben gemäß § 5 DDG</p>
 <p>${name}<br>${street}<br>${city}</p>
 <p class="text">E-Mail: <a href="mailto:${email}">${email}</a></p>
+<h2 id="${ABOUT_DATA_ID}">So entsteht der Zwergenplan</h2>
+<div class="text">
+<p><strong>Anbieter.</strong> Der Zwergenplan führt eine Liste von Anbietern aus der Region, etwa Familienzentren, Bibliotheken, Museen und Vereine. Einmal pro Woche sucht eine KI im Internet nach weiteren. Ein neuer Anbieter kommt nur dazu, wenn auf seiner Website mindestens ein Angebot für Kinder unter 3 Jahren steht.</p>
+<p><strong>Angebote.</strong> Jede Nacht ruft ein Programm die Veranstaltungs- und Kursseiten dieser Anbieter ab. Eine KI (Claude von Anthropic) liest daraus Termine, Ort, Alter, Kosten und Anmeldung aus und schreibt die kurzen Beschreibungen. Programme prüfen das Ergebnis auf Form und Plausibilität, ein Mensch liest es nicht gegen.</p>
+<p><strong>Wegzeiten</strong> rechnet der Zwergenplan selbst, aus dem Fahrplan des VGN oder aus der Luftlinie. Sie sind Richtwerte.</p>
+</div>
 <h2>Hinweise</h2>
 <div class="text">
-<p><strong>Ohne Gewähr.</strong> Die Angebote stammen von den Webseiten der Anbieter. Eine KI liest sie aus und fasst sie zusammen, dabei passieren Fehler. Termine, Zeiten, Preise, Altersangaben, Orte, Beschreibungen und Wegzeiten können falsch, unvollständig oder veraltet sein. Bitte prüfe vor dem Besuch beim Anbieter, ob der Termin stattfindet und ob du dich anmelden musst.</p>
+<p><strong>Ohne Gewähr.</strong> Die Angebote stammen von den Webseiten der Anbieter. Die Texte sind KI-generiert und können Fehler enthalten. Termine, Zeiten, Preise, Altersangaben, Orte, Beschreibungen und Wegzeiten können falsch, unvollständig oder veraltet sein. Bitte prüfe vor dem Besuch beim Anbieter, ob der Termin stattfindet und ob du dich anmelden musst.</p>
 <p><strong>Fehler gefunden, Angebot vermisst?</strong> Schreib gern an <a href="mailto:${email}">${email}</a>. Das gilt auch für Anbieter, die anders oder gar nicht im Zwergenplan stehen möchten.</p>
 <p><strong>Privat und unabhängig.</strong> Der Zwergenplan ist ein nicht-kommerzielles Projekt aus Nürnberg, ohne Werbung und ohne Verbindung zu den Anbietern. Für verlinkte Seiten sind deren Betreiber verantwortlich.</p>
 </div>
