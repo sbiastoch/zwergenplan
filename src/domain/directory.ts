@@ -4,7 +4,7 @@
  * und es greift auf nichts zu, was nur die Karte nutzt (`places.ts`, `camera.ts`, `provider-places.ts`; `lazy-domain-apart`).
  */
 import { discoverable } from "./agenda.ts";
-import { isOutside, type ProviderView } from "./provider-count.ts";
+import { isOutside, type MapExtent } from "./map-view.ts";
 import { compareReach, type Reach } from "./reach.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
 import { CATEGORIES, type Category } from "./topics.ts";
@@ -102,7 +102,7 @@ export function providerRows(input: {
   /** IDs der gemerkten Anbieter; unbekannte ergeben keine Zeile */
   saved: readonly string[];
   /** Kartenausschnitt; ohne Angabe (Karte nicht bereit) alle */
-  view?: ProviderView | undefined;
+  view?: MapExtent | undefined;
 }): { saved: ProviderRow[]; active: ProviderRow[]; idle: ProviderRow[]; outside: number } {
   const { providers, visible, upcoming, reachOf, byReach, query, view } = input;
   const savedIds = new Set(input.saved);

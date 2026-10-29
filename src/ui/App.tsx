@@ -6,9 +6,10 @@ import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { activeFilterCount, EMPTY_FILTER, type FilterState, providerFilter, withDateRange } from "../domain/filter.ts";
+import { type MapExtent, viewNarrows } from "../domain/map-view.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
-import { countProviders, type ProviderView, viewNarrows } from "../domain/provider-count.ts";
+import { countProviders } from "../domain/provider-count.ts";
 import { type Sort, type Tab, tabSection } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
 import { searchOf } from "../domain/searches.ts";
@@ -34,7 +35,7 @@ import {
 } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { preloadExportWhenIdle } from "./ics-export.ts";
-import { type AgeEscape, ListPending, ListView } from "./ListView.tsx";
+import { type AgeEscape, EmptyState, ListPending, ListView } from "./ListView.tsx";
 import { MapPanel, ProviderMapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Onboarding, preloadOnboarding } from "./Onboarding.tsx";
@@ -117,8 +118,11 @@ export function App() {
   // Suchtext der Anbieterliste: übersteht den Tab-Wechsel, nie in der URL (Plan 0010, E5)
   const [providerQuery, setProviderQuery] = useState("");
   // Anbieterkarte (Plan 0055, E4): Ausschnitt für Liste und Statuszeile, Zähler für „Alle zeigen“; nur im Speicher
-  const [providerView, setProviderView] = useState<ProviderView>();
+  const [providerView, setProviderView] = useState<MapExtent>();
   const [providerReset, setProviderReset] = useState(0);
+  // Ausschnitt der Angebots- bzw. Merklisten-Karte für die Liste darunter, „Alle zeigen“ dort (Plan 0056, E5)
+  const [mapView, setMapView] = useState<MapExtent>();
+  const [mapReset, setMapReset] = useState(0);
   // Filter der Merkliste: getrennt vom Startseiten-Filter, nie in der URL, übersteht Tab- und Darstellungswechsel,
   // nicht das Neuladen (Plan 0025, E6)
   const [savedFilter, setSavedFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER);
@@ -196,10 +200,19 @@ export function App() {
       }),
     [refreshTransit, say],
   );
-  const views = useOfferViews({ offers, route, birthDate, savedIds, savedFilter, now, reach: transit.reach });
+  const views = useOfferViews({ offers, route, birthDate, savedIds, savedFilter, now, reach: transit.reach, mapView });
+  // Neuer Ausschnitt: Die Liste darunter beginnt wieder mit dem ersten Schritt (Plan 0056, N9)
+  const { resetPage } = views;
+  const onMapInView = useCallback(
+    (view: MapExtent | undefined) => {
+      setMapView(view);
+      resetPage();
+    },
+    [resetPage],
+  );
   const { visible, unfitCount, ageOnly, page, saved, detailOffer } = views;
 
-  // Die Karte ist eine Startpunkt-Oberfläche („Kartenmitte als Startpunkt“): Öffnen lädt die Tabelle (E9, Auslöser 3).
+  // Öffnen der Karte lädt die Tabelle (E9, Auslöser 3): Die Liste darunter zeigt Minuten an den Kacheln (Plan 0056, N10).
   // Die Karte der Merkliste ebenso (Plan 0025, E4); Liste und Kalender der Merkliste sind kein Anlass. Das gilt auch
   // ohne gemerktes Angebot: Hinge der Request am Inhalt der Merkliste, verriete er, ob etwas gemerkt ist.
   useEffect(() => {
@@ -313,10 +326,17 @@ export function App() {
   // Alter (Plan 0055, E3).
   const [providerCount, providersWord] = providerStatusParts(countProviders(views.providerVisible));
   // Blendet der Kartenausschnitt Anbieter aus, zählt die Statuszeile nur die darin (Plan 0055, E4, Review M1)
-  const narrowed = route.tab === "anbieter" && viewNarrows(providerView);
-  const inViewCount = countProviders(views.providerVisible, providerView);
+  // … ebenso die Angebotskarte, nach Orten (Plan 0056, E5)
+  const providersNarrowed = route.tab === "anbieter" && viewNarrows(providerView);
+  const offersNarrowed = route.tab === "karte" && viewNarrows(mapView);
+  const narrowed = providersNarrowed || offersNarrowed;
+  const inViewCount = providersNarrowed ? countProviders(views.providerVisible, providerView) : views.inView.length;
+  const inViewWord = providersNarrowed ? "Anbieter" : inViewCount === 1 ? "Angebot" : "Angebote";
   // Ansage erst, wenn die Karte ruht; der sichtbare Text ist dann `aria-hidden` (Review m8, Review 2, m4)
-  const inViewAnnounce = useSettled(narrowed ? `${inViewCount} Anbieter im Kartenausschnitt` : "", ANNOUNCE_DELAY_MS);
+  const inViewAnnounce = useSettled(
+    narrowed ? `${inViewCount} ${inViewWord} im Kartenausschnitt` : "",
+    ANNOUNCE_DELAY_MS,
+  );
   /*
    * Nur der Rückfall auf die Luftlinie steht hinter der Zahl, kurz mit Grund (Plan 0056, E2; ADR 0039). U+00A0 vor dem
    * Punkt, damit er nie verwaist am Zeilenanfang steht; der Ausdruck ist ein Inline-Block (Plan 0020, E1).
@@ -365,7 +385,7 @@ export function App() {
   };
   const toggle =
     section === "entdecken" &&
-    (route.tab === "entdecken" ? (
+    (route.tab === "entdecken" || route.tab === "karte" ? (
       <div className="view-tools">
         {viewToggle}
         <SortMenu options={sortOptions} current={route.sort ?? "termine"} plain="termine" onChange={onSort} />
@@ -413,9 +433,10 @@ export function App() {
       : undefined;
   const shownUnfitCount = inProviders ? views.providerUnfitCount : unfitCount;
   // „Alle zeigen“ verschwindet nach dem Tipp: Fokus vorher auf die Statuszeile (Plan 0055, Review 2, m3)
-  const showAllProviders = () => {
+  const showAll = () => {
     statusLine.current?.focus();
-    setProviderReset((n) => n + 1);
+    if (route.tab === "anbieter") setProviderReset((n) => n + 1);
+    else setMapReset((n) => n + 1);
   };
   /*
    * Beide Altersknöpfe verschwinden nach dem Tipp (Leerzustand bzw. Warnhinweis): Der Fokus geht vorher auf die
@@ -433,25 +454,18 @@ export function App() {
    * Karte in „Entdecken“ (sichtbare Angebote) und auf der Merkliste (gemerkte, Plan 0025, E4). Der Startausschnitt
    * kommt in beiden Fällen aus allen kommenden Angeboten (`views.map.cameraOffers`, ADR 0008), nie aus der Merkliste.
    */
-  const mapPanel = (
-    shown: readonly SiteOffer[],
-    onResetFilter: (() => void) | undefined,
-    age: AgeEscape | undefined,
-    cardCtx: CardContext,
-  ) =>
+  const mapPanel = (shown: readonly SiteOffer[], cardCtx: CardContext) =>
     views.map && (
       <MapPanel
         offers={shown}
         cameraOffers={views.map.cameraOffers}
         origin={origin}
-        reach={transit.reach}
         dark={theme.dark}
-        hasData={offers.length > 0}
         ctx={cardCtx}
         toast={toast}
         onSheetOpen={setPlaceSheet}
-        onResetFilter={onResetFilter}
-        age={age}
+        onInView={onMapInView}
+        resetKey={mapReset}
       />
     );
   /*
@@ -557,7 +571,7 @@ export function App() {
                 {narrowed ? (
                   <span>
                     <span aria-hidden="true">
-                      <b>{inViewCount}</b> Anbieter im Kartenausschnitt
+                      <b>{inViewCount}</b> {inViewWord} im Kartenausschnitt
                     </span>
                     <span className="sr-only">{inViewAnnounce}</span>
                     {reachSuffix}
@@ -587,7 +601,7 @@ export function App() {
               </p>
               {toggle}
               {narrowed && (
-                <button type="button" className="linkbtn" onClick={showAllProviders}>
+                <button type="button" className="linkbtn" onClick={showAll}>
                   Alle zeigen
                 </button>
               )}
@@ -611,7 +625,8 @@ export function App() {
             )}
           </>
         )}
-        {load.kind === "ready" && route.tab === "entdecken" && (
+        {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, discoverCtx)}
+        {load.kind === "ready" && (route.tab === "entdecken" || route.tab === "karte") && (
           <>
             {askOrigin && (
               <>
@@ -636,6 +651,15 @@ export function App() {
             )}
             {listWaits ? (
               <ListPending />
+            ) : offersNarrowed && views.inView.length === 0 ? (
+              // Ausschnitt ohne Angebote (Plan 0056, E5): „Alle zeigen“ wie in der Statuszeile
+              <EmptyState icon="search" title="Hier ist gerade nichts">
+                Im Kartenausschnitt gibt es gerade nichts.
+                <br />
+                <button type="button" className="linkbtn" onClick={showAll}>
+                  Alle zeigen
+                </button>
+              </EmptyState>
             ) : (
               <ListView
                 groups={page.groups}
@@ -660,7 +684,6 @@ export function App() {
             )}
           </>
         )}
-        {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, resetIfActive, ageEscape, discoverCtx)}
         {load.kind === "ready" && route.tab === "anbieter" && (
           <ProviderPanel
             generatedAt={load.data.generatedAt}
@@ -668,7 +691,7 @@ export function App() {
             visible={views.providerVisible}
             now={now}
             view={providerView}
-            onShowAll={showAllProviders}
+            onShowAll={showAll}
             reachOf={views.reachOf}
             reachMode={reachMode}
             query={providerQuery}
@@ -685,6 +708,9 @@ export function App() {
           <SavedView
             items={saved}
             visible={views.savedVisible}
+            inView={views.savedInView}
+            narrowed={route.tab === "merkliste-karte" && viewNarrows(mapView)}
+            onShowAll={showAll}
             filter={savedFilter}
             filtered={views.savedFiltered}
             onFilter={setSavedFilter}
@@ -693,7 +719,7 @@ export function App() {
             onTab={(tab) => replace({ ...route, tab })}
             // Startseiten-Filter und Alter wirken auf der Merkliste nicht: Zurücksetzen meint den Merklisten-Filter,
             // einen Altersausweg gibt es nicht
-            renderMap={(savedOffers, onResetSaved) => mapPanel(savedOffers, onResetSaved, undefined, ctx)}
+            renderMap={(savedOffers) => mapPanel(savedOffers, ctx)}
             renderCalendar={(onResetSaved) =>
               views.savedCalendar && (
                 <SavedCalendar

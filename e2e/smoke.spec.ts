@@ -245,9 +245,10 @@ test.describe("Karte mit echten Daten (Plan 0005)", () => {
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
   }
 
-  test("Karte ist bereit, Orts-Liste vollständig, kein Test-Haken im Deploy-Build", async ({ page }) => {
+  test("Karte ist bereit, Liste darunter gefüllt, kein Test-Haken im Deploy-Build", async ({ page }) => {
     await openMap(page);
-    expect(await page.getByRole("region", { name: "Orte" }).getByRole("button").count()).toBeGreaterThanOrEqual(50);
+    // unter der Karte die Angebotsliste im Ausschnitt, in Schritten (Plan 0056, E5)
+    expect(await page.getByTestId("offer").count()).toBeGreaterThanOrEqual(20);
     // __zpMap gibt es nur im E2E-Build (__E2E__, Plan 0005 E13)
     expect(await page.evaluate(() => "__zpMap" in window)).toBe(false);
     // Ortsnamen aus Daten dürfen umbrechen: Prüfung 5 nur mit Fixtures (Plan 0007, E10).

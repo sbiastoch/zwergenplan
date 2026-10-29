@@ -1,6 +1,6 @@
 # Plan 0056 – Karten nach Nutzer-Feedback: näher am Startpunkt, Liste im Ausschnitt, weniger Text
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-29
 
 Bezug:
@@ -291,3 +291,12 @@ Zweiter Reviewer, ohne Chat-Kontext. Er findet keinen Blocker und bestätigt B1,
 - **N11, zweite Kamera:** `MapViewProps` bekommt `overview` (Rahmen über alle Orte) für „Alle zeigen“ und den Rückfall. `start` ist der Startpunkt-Rahmen. Dazu ein Test.
 - **N12, „neuer Startpunkt“:** Gleich ist ein Startpunkt bei gleicher Quelle und gleichem (gerundetem) Punkt bzw. gleicher `districtId`. Dieselbe Regel gilt für `lastCamera` und für das Fahren bei offener Karte. Ein erneuter GPS-Tipp mit demselben Wert bewegt die Karte nicht.
 - **N13, 320 px:** `layout.spec.ts` prüft den längsten Zustand ausdrücklich: „42 Angebote im Kartenausschnitt · Luftlinie, außerhalb“ plus „Alle zeigen“. Umbrechen darf nur „Alle zeigen“, und zwar in eine eigene Zeile.
+
+## Umsetzungsnotizen
+
+- **S1** 3c9a1b4, **S2** 656a3cc, **S3** 26b4b3a (Branch `karten-feedback`).
+- **S3:** Die Verzögerung des Einklappens heißt im E2E-Build `__zpAttributionMs` (`src/env.d.ts`); ohne Angabe gilt dort eine Stunde. Mit `setMapCenter` entfällt auch die Reducer-Aktion `mapCenter` samt Tests.
+- **S4, Namen:** Der gemeinsame Ausschnitt heißt `MapExtent` statt `MapView`, weil `MapView` schon die Karten-Komponente ist. `Bounds` und `inBox` ziehen mit nach `src/domain/map-view.ts`.
+- **S4, Felder:** `useOfferViews` liefert `inView` (Angebote der Liste, auf der Karte im Ausschnitt), `savedInView` und berechnet `page` auf der Karte aus `inView`. Ein eigenes `inViewPage` ist unnötig, weil Liste und Karte nie gleichzeitig zu sehen sind; `visible` bleibt ungefiltert (M1, Test in `use-offer-views.test.ts`). `map.placeCount` entfällt.
+- **S4, gemeinsamer Hook:** Die Meldelogik des Ausschnitts (nur bei Änderung, `undefined` bei Fehler und Abbau) steht für beide Karten in `src/ui/karte/use-in-view.ts`.
+- **S4, Orts-Liste:** Mit `PlaceList` entfallen `place-format.ts` und `sortPlaces`; `mapData` sortiert die Orte nicht mehr nach Wegzeit, die Kartenquelle war ohnehin nach `key` sortiert.

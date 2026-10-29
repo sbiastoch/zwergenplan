@@ -54,7 +54,11 @@ declare global {
 }
 
 const mapBox = (page: Page) => page.locator(".map-box");
-const places = (page: Page) => page.getByRole("region", { name: "Orte" }).getByRole("button");
+/** Kacheln der Liste unter der Karte (Plan 0056, E5; vorher die Orts-Liste) */
+const offers = (page: Page) => page.getByTestId("offer");
+const offerCard = (page: Page, title: string) => offers(page).filter({ hasText: title });
+/** Entfernung an der Kachel: Wegzeit oder, weit weg von jedem Halt, Luftlinie */
+const DIST = /^(\d+ Min\.|\d[\d,]* k?m)$/;
 
 async function openMap(page: Page, path = "./?ansicht=karte") {
   await page.goto(path);
@@ -149,6 +153,26 @@ async function tapMarker(page: Page, layer: "orte-punkt" | "orte-cluster", angeb
   await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
 }
 
+/**
+ * Fährt auf die Koordinate (Zoom 15: einzelne Marker, kein Cluster) und tippt auf ihren Marker (Orte der Fixtures,
+ * providers.yaml). Ohne das läge der Ort beim Stadtteil-Zoom auf schmalen Geräten außerhalb des Bildes.
+ */
+async function tapAt(page: Page, lon: number, lat: number) {
+  await page.evaluate(([lon, lat]) => window.__zpMap?.jumpTo({ center: [lon, lat], zoom: 15 }), [lon, lat] as const);
+  await idle(page);
+  const point = await page.evaluate(([lon, lat]) => window.__zpMap?.project([lon, lat]), [lon, lat] as const);
+  if (!point) throw new Error("keine Karte");
+  await mapBox(page).evaluate((el) => el.scrollIntoView({ block: "start" }));
+  const box = await mapBox(page).boundingBox();
+  if (!box) throw new Error("keine Karte");
+  await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
+}
+
+/** Orte der Fixtures (tests/fixtures/providers.yaml) */
+const BEISPIELHOF = [11.0767, 49.4521] as const;
+const BIBLIOTHEK = [11.0812, 49.4498] as const;
+const THEATER = [11.0601, 49.4495] as const;
+
 test("Startseite lädt weder Karten- noch Wegzeit-Code und fragt OpenFreeMap nicht an", async ({ page, context }) => {
   const requests: string[] = [];
   context.on("request", (req) => requests.push(req.url()));
@@ -161,7 +185,7 @@ test("Startseite lädt weder Karten- noch Wegzeit-Code und fragt OpenFreeMap nic
 test.describe("mit gemockten Kacheln", () => {
   test.use({ tiles: "mock" });
 
-  test("Umschalter „Karte“: Orte, Attribution, Kacheln aus dem Worker, Neuladen, zurück zur Liste", async ({
+  test("Umschalter „Karte“: Liste darunter, Attribution, Kacheln aus dem Worker, Neuladen, zurück zur Liste", async ({
     page,
     tileLog,
   }) => {
@@ -173,7 +197,10 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(page.getByRole("button", { name: "Karte", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Angebote", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("status")).toHaveText("8 Angebote");
-    await expect(places(page)).toHaveCount(5);
+    // unter der Karte die Angebotsliste, keine Orts-Liste mehr (Plan 0056, E5); Sortierung wie in der Liste (N9)
+    await expect(offers(page)).toHaveCount(8);
+    await expect(page.getByRole("region", { name: "Orte", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Sortierung:/ })).toBeVisible();
     const attribution = page.locator(".maplibregl-ctrl-attrib");
     await expect(attribution).toBeVisible();
     await expect(attribution).toHaveText("OpenFreeMap © OpenMapTiles Data from OpenStreetMap");
@@ -233,12 +260,14 @@ test.describe("mit gemockten Kacheln", () => {
     await expectAttributionCollapses(page);
   });
 
-  test("Schnellfilter „Kurse“ wirkt auf Orte und Statuszeile", async ({ page }) => {
+  test("Schnellfilter „Kurse“ wirkt auf Marker, Liste und Statuszeile", async ({ page }) => {
     await openMap(page);
     await page.getByRole("button", { name: "Kurse", exact: true }).click();
     await expect(page).toHaveURL(/\?format=kurs&ansicht=karte$/);
     await expect(page.getByRole("status")).toHaveText("2 Angebote");
-    await expect(places(page)).toHaveText([/^Familientreff Beispielhof/, /^Musikschule Beispiel, Haus Süd/]);
+    await expect(offers(page)).toHaveCount(2);
+    await expect(offerCard(page, "PEKiP-Gruppe")).toHaveCount(1);
+    await expect(offerCard(page, "Musikgarten")).toHaveCount(1);
   });
 
   test("passt kein Ort zum Alter: Leerzustand mit „Auch unpassende zeigen“ (Plan 0021, E4)", async ({ page }) => {
@@ -252,13 +281,13 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(page.getByRole("status")).toBeFocused();
   });
 
-  test("Orts-Liste öffnet das Orts-Sheet, das Detail darüber, Zurück führt ins Sheet; Kacheln ohne Ortsangaben", async ({
+  test("Marker öffnet das Orts-Sheet, das Detail darüber, Zurück führt ins Sheet; Kacheln ohne Ortsangaben", async ({
     page,
   }) => {
     // Startpunkt Gostenhof (nur die Stadtteil-ID liegt im Speicher, Plan 0004): Die Liste zeigt Wegzeiten.
     await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await openMap(page);
-    await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
+    await tapAt(page, ...BEISPIELHOF);
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText("Beispielstraße 1, 90402 Nürnberg")).toBeVisible();
@@ -294,7 +323,7 @@ test.describe("mit gemockten Kacheln", () => {
     await twoLinesEverywhere(page);
     await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await openMap(page);
-    await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
+    await tapAt(page, ...BEISPIELHOF);
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
     // .place-route > span: nur der Wrapper steht als eigene Zeile, nicht Pfeil und „, dann“
     await expectTwoLines(sheet.locator(".reach-long"), "ca. 15 Min. mit Tram 1, dann Bus 202E ab Gostenhof");
@@ -308,7 +337,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(route).toHaveAttribute("rel", "noopener noreferrer");
   });
 
-  test("Wegzeit: Öffnen der Karte lädt die Tabelle, Orts-Liste mit Minuten nach Wegzeit sortiert (Plan 0009, E9/E11)", async ({
+  test("Wegzeit: Öffnen der Karte lädt die Tabelle, Minuten an den Kacheln darunter (Plan 0009, E9/E11; Plan 0056, N10)", async ({
     page,
   }) => {
     const preloaded = startPreloads(page);
@@ -335,18 +364,13 @@ test.describe("mit gemockten Kacheln", () => {
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
     await kid.getByRole("button", { name: "Fertig" }).click();
     await expect(page.getByRole("status")).not.toContainText("Luftlinie");
-    // nach Wegzeit (Plan 0012, von Hand nachgerechnet, Rechenweg in startpunkt.spec.ts): Theater 3,6, Beispielhof
-    // 13,6, Bibliothek 15,6, Gemeinde 23,6 (Tram 1 → Bus 202E; vorher 32,6 über Bus 2, die Fixture-Linie 202E kam mit Plan 0012),
-    // Musikschule 29,6 Min. (Tram 1 → Bus 2)
-    await expect(places(page)).toHaveText([
-      /^Kleines Theater Beispiel.* · 5 Min\.$/,
-      /^Familientreff Beispielhof.* · 15 Min\.$/,
-      /^Bibliothek Beispiel Zentrum.* · 15 Min\.$/,
-      /^Gemeindehaus.* · 25 Min\.$/,
-      /^Musikschule Beispiel, Haus Süd.* · 30 Min\.$/,
-    ]);
-    // ein Angebot: Das Detail öffnet direkt, mit zwei Linien
-    await places(page).filter({ hasText: "Musikschule Beispiel" }).click();
+    // Wegzeit (Plan 0012, von Hand nachgerechnet, Rechenweg in startpunkt.spec.ts): Theater 3,6 Min. Die Karte fährt
+    // auf Gostenhof, die Liste darunter zeigt nur, was im Ausschnitt liegt; das Theater immer.
+    await expect(offerCard(page, "Kuckuck im Nest").locator(".dist")).toHaveText("5 Min.");
+    await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
+    // Musikschule 29,6 Min. (Tram 1 → Bus 2): das Detail aus der Liste, mit zwei Linien
+    await page.getByRole("button", { name: "Liste", exact: true }).click();
+    await page.getByRole("button", { name: "Musikgarten 1 (1–2 Jahre)", exact: true }).click();
     await expectTwoLines(
       page.getByRole("dialog").locator(".reach-long"),
       "ca. 30 Min. mit Tram 1, dann Bus 2 ab Gostenhof",
@@ -363,12 +387,53 @@ test.describe("mit gemockten Kacheln", () => {
       localStorage.setItem("zwergenplan.startpunkt", '{"source":"karte","lat":49.452,"lon":11.077}'),
     );
     await openMap(page);
-    await expect(places(page).first()).toHaveText(/^Familientreff Beispielhof.* · 5 Min\.$/);
+    await expect(offerCard(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("5 Min.");
   });
 
-  test("Ort mit einem Angebot öffnet direkt das Detail", async ({ page }) => {
+  test("Liste unter der Karte folgt dem Ausschnitt, „Alle zeigen“ stellt alles wieder her (Plan 0056, E5)", async ({
+    page,
+  }) => {
     await openMap(page);
-    await places(page).filter({ hasText: "Bibliothek Beispiel Zentrum" }).click();
+    await expect(offers(page)).toHaveCount(8);
+    // nah an das Theater: nur seine zwei Angebote im Ausschnitt
+    await page.evaluate(([lon, lat]) => window.__zpMap?.jumpTo({ center: [lon, lat], zoom: 17 }), THEATER);
+    await idle(page);
+    await expect(page.locator(".status [aria-hidden='true']")).toHaveText("2 Angebote im Kartenausschnitt");
+    await expect(offers(page)).toHaveCount(2);
+    await expect(offerCard(page, "Kuckuck im Nest")).toHaveCount(1);
+    await expect(offerCard(page, "Babykonzert im Advent")).toHaveCount(1);
+    // Ansage erst, wenn die Karte ruht (N8)
+    await expect(page.getByRole("status")).toContainText("2 Angebote im Kartenausschnitt");
+    // Marker und die Zahl im Filter-Sheet bleiben ungefiltert (Review M1)
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const filter = page.getByRole("dialog", { name: "Filter" });
+    await expect(filter.getByRole("button", { name: "8 Angebote zeigen" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(filter).toBeHidden();
+
+    // „Alle zeigen“: Startausschnitt, alle Angebote, Fokus auf der Statuszeile
+    await page.getByRole("button", { name: "Alle zeigen" }).click();
+    await expect(page.getByRole("status")).toBeFocused();
+    await idle(page);
+    await expect(page.getByRole("status")).toHaveText("8 Angebote");
+    await expect(offers(page)).toHaveCount(8);
+    await expect(page.getByRole("button", { name: "Alle zeigen" })).toHaveCount(0);
+  });
+
+  test("leerer Kartenausschnitt: Hinweis mit „Alle zeigen“ (Plan 0056, E5)", async ({ page }) => {
+    await openMap(page);
+    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.2, 49.55], zoom: 15 }));
+    await idle(page);
+    await expect(page.getByText("Im Kartenausschnitt gibt es gerade nichts.")).toBeVisible();
+    await expect(offers(page)).toHaveCount(0);
+    await page.locator(".empty").getByRole("button", { name: "Alle zeigen" }).click();
+    await idle(page);
+    await expect(offers(page)).toHaveCount(8);
+  });
+
+  test("Marker eines Orts mit einem Angebot öffnet direkt das Detail", async ({ page }) => {
+    await openMap(page);
+    await tapAt(page, ...BIBLIOTHEK);
     await expect(page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" })).toBeVisible();
   });
 
@@ -581,14 +646,14 @@ test.describe("mit gemockten Kacheln", () => {
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    // Wegzeit ab dem Standort: Minuten an den Orten, die Statuszeile nur mit Zahl (Plan 0056, E2)
-    await expect(places(page).first()).toHaveText(/ Min\.$/);
+    // Wegzeit ab dem Standort: Minuten an den Kacheln, die Statuszeile nur mit Zahl (Plan 0056, E2)
+    await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
     await idle(page);
     expect(tileLog.length, "keine Kacheln nach „Meinen Standort nutzen“").toBe(tiles);
     expect(await camera(page)).toEqual(start);
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
-    // mit Startpunkt steht die Entfernung an jedem Ort (Wegzeit oder, weit weg von jedem Halt, Luftlinie)
-    await expect(places(page).first()).toContainText(/ · (\d+ Min\.|\d[\d,]* k?m)$/);
+    // mit Startpunkt steht die Entfernung an jeder Kachel (Wegzeit oder, weit weg von jedem Halt, Luftlinie)
+    await expect(page.locator(".meta .dist").first()).toHaveText(DIST);
 
     // Gegenprobe: Ein Stadtteil darf die Kamera bewegen.
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
@@ -614,8 +679,8 @@ test.describe("mit gemockten Kacheln", () => {
     );
     const before = tileLog.length;
     await openMap(page);
-    // Startpunkt gilt: Entfernung an den Orten (Wegzeit oder Luftlinie)
-    await expect(places(page).first()).toContainText(/ · (\d+ Min\.|\d[\d,]* k?m)$/);
+    // Startpunkt gilt: Entfernung an den Kacheln (Wegzeit oder Luftlinie)
+    await expect(page.locator(".meta .dist").first()).toHaveText(DIST);
     await idle(page);
     // Der gespeicherte Punkt ist nur ein Layer: Kamera und Kachelwahl verraten ihn nicht (Kamera-Regel).
     expect(await camera(page)).toEqual(plain);
@@ -623,7 +688,7 @@ test.describe("mit gemockten Kacheln", () => {
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
   });
 
-  test("Karte der Merkliste: nur gemerkte Orte, Statuszeile, derselbe Startausschnitt wie in „Entdecken“ (Plan 0025, E4)", async ({
+  test("Karte der Merkliste: nur Gemerktes, Statuszeile, derselbe Startausschnitt wie in „Entdecken“ (Plan 0025, E4)", async ({
     page,
     tileLog,
   }) => {
@@ -641,8 +706,8 @@ test.describe("mit gemockten Kacheln", () => {
     const before = tileLog.length;
     await openMap(page, "./?ansicht=merkliste-karte");
     await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
-    await expect(places(page)).toHaveCount(2);
-    await expect(places(page).filter({ hasText: "Familientreff Beispielhof" })).toHaveCount(1);
+    // unter der Karte die gemerkten Angebote, alle im Startausschnitt (Plan 0056, E5)
+    await expect(offers(page)).toHaveCount(3);
     await expect(
       page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: /^Merkliste/ }),
     ).toHaveAttribute("aria-current", "page");
@@ -688,7 +753,7 @@ test.describe("mit gemockten Kacheln", () => {
     await filter.getByRole("button", { name: /Angebote? zeigen$/ }).click();
     const before = tileLog.length;
     const withOrigin = await openFromList();
-    // Filter, Alter und Wegzeit wirken auf die Orte, aber nicht auf den Ausschnitt
+    // Filter, Alter und Wegzeit wirken auf Marker und Liste, aber nicht auf den Ausschnitt
     await expect(page.getByRole("status")).not.toHaveText(/^8 Angebote/);
     expect(withOrigin).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);
@@ -726,7 +791,7 @@ test.describe("mit gemockten Kacheln", () => {
     expect(await page.evaluate(() => window.scrollY)).toBe(90);
   });
 
-  test("ohne WebGL: Hinweis, Orts-Liste da, keine Kartenmitte", async ({ page }) => {
+  test("ohne WebGL: Hinweis, Liste ungefiltert da", async ({ page }) => {
     await page.addInitScript(() => {
       const original = HTMLCanvasElement.prototype.getContext;
       Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
@@ -741,7 +806,9 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(mapBox(page)).toContainText(
       "Dein Browser kann die Karte nicht zeigen. Alle Angebote stehen unten in der Liste.",
     );
-    await expect(places(page)).toHaveCount(5);
+    // ohne Karte filtert kein Ausschnitt (Plan 0056, E5)
+    await expect(offers(page)).toHaveCount(8);
+    await expect(page.getByRole("status")).toHaveText("8 Angebote");
   });
 
   test("Wächter: Kachel-URLs mit Querystring oder fremdem Host verlassen den Browser nicht, auch nicht aus dem Worker", async ({
@@ -779,10 +846,7 @@ test.describe("Stil nicht ladbar", () => {
     allowedConsoleErrors: [/^https:\/\/tiles\.openfreemap\.org\/\S+ Failed to load resource/],
   });
 
-  test("ohne Kartenbilder (Stil 503): Hinweis, Orts-Liste bedienbar, Neuaufbau klappt", async ({
-    page,
-    routeTiles,
-  }) => {
+  test("ohne Kartenbilder (Stil 503): Hinweis, Liste bedienbar, Neuaufbau klappt", async ({ page, routeTiles }) => {
     const unroute = await routeTiles("https://tiles.openfreemap.org/styles/**", (route) =>
       route.fulfill({ status: 503 }),
     );
@@ -791,7 +855,8 @@ test.describe("Stil nicht ladbar", () => {
     await expect(mapBox(page)).toContainText(
       "Kartenbilder lassen sich gerade nicht laden. Alle Angebote stehen unten in der Liste.",
     );
-    await places(page).filter({ hasText: "Bibliothek Beispiel Zentrum" }).click();
+    await expect(offers(page)).toHaveCount(8);
+    await page.getByRole("button", { name: "Krabbelreime & Fingerspiele", exact: true }).click();
     await expect(page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" })).toBeVisible();
     await page.getByRole("dialog").getByRole("button", { name: "Zurück" }).click();
 
@@ -889,7 +954,7 @@ test.describe("Karten-Code nicht ladbar", () => {
     await recover(page, context, browserName);
   });
 
-  test("nur MapLibre nicht ladbar: Orts-Liste bleibt bedienbar, erneuter Versuch bzw. Neuladen", async ({
+  test("nur MapLibre nicht ladbar: Liste bleibt bedienbar, erneuter Versuch bzw. Neuladen", async ({
     page,
     context,
     browserName,
@@ -900,10 +965,11 @@ test.describe("Karten-Code nicht ladbar", () => {
     await expect(mapBox(page)).toContainText(
       "Die Karte konnte nicht geladen werden. Alle Angebote stehen unten in der Liste.",
     );
-    await expect(places(page)).toHaveCount(5);
-    await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
-    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
-    await page.getByRole("dialog").getByRole("button", { name: "Schließen" }).click();
+    await expect(offers(page)).toHaveCount(8);
+    await expect(page.getByRole("status")).toHaveText("8 Angebote");
+    await page.getByRole("button", { name: "Krabbelreime & Fingerspiele", exact: true }).click();
+    await expect(page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" })).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "Zurück" }).click();
 
     await context.unroute("**/assets/karte/MapView-*");
     await recover(page, context, browserName);

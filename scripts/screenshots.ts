@@ -69,7 +69,7 @@ async function mockTiles(context: BrowserContext) {
   });
 }
 
-/** Karte mit Stadtteil Gostenhof (Orts-Liste mit Wegzeit) */
+/** Karte mit Stadtteil Gostenhof (Liste darunter mit Wegzeit) */
 async function openMap(page: Page) {
   await withGostenhof(page);
   await page.getByRole("button", { name: "Karte", exact: true }).click();
@@ -164,12 +164,19 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   karte: openMap,
   ort: async (page) => {
     await openMap(page);
-    await page
-      .getByRole("region", { name: "Orte" })
-      .getByRole("button")
-      .filter({ hasText: "Angebote" })
-      .first()
-      .click();
+    // Marker eines Orts mit mehreren Angeboten (Orts-Sheet); die Orts-Liste gibt es seit Plan 0056, E5 nicht mehr.
+    // `__zpMap` nur im E2E-Build: lokal die Fixture-Vorschau.
+    await page.locator(".map-box").evaluate((el) => el.scrollIntoView({ block: "start" }));
+    const point = await page.evaluate(() => {
+      const map = window.__zpMap;
+      const hit = map
+        ?.queryRenderedFeatures({ layers: ["orte-punkt"] })
+        .find((f) => Number(f.properties["angebote"]) > 1);
+      return hit && map?.project(hit.geometry.coordinates);
+    });
+    const box = await page.locator(".map-box").boundingBox();
+    if (!point || !box) throw new Error("kein Ort mit mehreren Angeboten");
+    await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
     await page.getByRole("dialog").waitFor();
   },
   anbieter: openProviders,

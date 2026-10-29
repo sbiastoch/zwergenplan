@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { GeoPoint } from "./geo.ts";
-import { countPlaces, placeKey } from "./place-key.ts";
-import { placesOf, sortPlaces } from "./places.ts";
-import { airlineReach, type Origin, type ReachFn } from "./reach.ts";
+import { placeKey } from "./place-key.ts";
+import { offersInBounds, placesOf } from "./places.ts";
 import { fixtureSiteOffers } from "./test-fixtures.ts";
 
 interface TestOffer {
@@ -15,13 +14,6 @@ const offer = (id: string, name: string, geo: GeoPoint, district?: string): Test
   id,
   venue: { name, address: `${name}, Teststraße 1`, geo, ...(district === undefined ? {} : { district }) },
 });
-
-const gostenhof: Origin = {
-  source: "stadtteil",
-  point: { lat: 49.448, lon: 11.058 },
-  label: "Gostenhof",
-  districtId: "gostenhof",
-};
 
 describe("placeKey", () => {
   it("ist die Koordinate als „lat,lon“", () => {
@@ -72,84 +64,19 @@ describe("placesOf", () => {
   });
 });
 
-describe("sortPlaces", () => {
-  const near = offer("near", "Zwergenhaus", { lat: 49.4495, lon: 11.0601 });
-  const middle = offer("middle", "Bärenhöhle", { lat: 49.46, lon: 11.07 });
-  const far = offer("far", "Ameisenbau", { lat: 49.407, lon: 11.13 });
+describe("offersInBounds (Plan 0056, E5)", () => {
+  const at = (id: string, lat: number, lon: number): TestOffer => ({
+    id,
+    venue: { name: id, address: "", geo: { lat, lon } },
+  });
+  const offers = [at("innen", 49.45, 11.07), at("rand", 49.5, 11.1), at("aussen", 49.6, 11.07)];
 
-  it("sortiert mit Startpunkt nach Entfernung", () => {
-    const places = placesOf([far, near, middle]);
-    expect(sortPlaces(places, airlineReach(gostenhof)).map((p) => p.names[0])).toEqual([
-      "Zwergenhaus",
-      "Bärenhöhle",
-      "Ameisenbau",
-    ]);
+  it("liefert die Schlüssel der Orte im Ausschnitt, Ränder zählen mit", () => {
+    const keys = offersInBounds(offers, { west: 11, south: 49.4, east: 11.1, north: 49.5 });
+    expect(keys).toEqual(new Set([placeKey({ lat: 49.45, lon: 11.07 }), placeKey({ lat: 49.5, lon: 11.1 })]));
   });
 
-  it("sortiert nach Wegzeit, Unerreichbares ans Ende und dort nach Name (Plan 0009, E8)", () => {
-    const minutes = new Map([
-      [placeKey(near.venue.geo), 40],
-      [placeKey(middle.venue.geo), Number.POSITIVE_INFINITY],
-      [placeKey(far.venue.geo), 12],
-    ]);
-    const extra = offer("x", "Adlerhorst", { lat: 49.5, lon: 11.0 });
-    const wegzeit: ReachFn = ({ geo }) => ({
-      kind: "oepnv",
-      minutes: minutes.get(placeKey(geo)) ?? Number.POSITIVE_INFINITY,
-      byFoot: false,
-    });
-    const places = placesOf([near, middle, far, extra]);
-    expect(sortPlaces(places, wegzeit).map((p) => p.names[0])).toEqual([
-      "Ameisenbau",
-      "Zwergenhaus",
-      "Adlerhorst",
-      "Bärenhöhle",
-    ]);
-  });
-
-  it("sortiert ohne Startpunkt nach Name, deutsch: „Ö“ steht bei „O“, nicht hinter „Z“", () => {
-    const places = placesOf([
-      offer("1", "Zoo", { lat: 49.41, lon: 11.1 }),
-      offer("2", "Öhrl", { lat: 49.42, lon: 11.1 }),
-      offer("3", "Ozelot", { lat: 49.43, lon: 11.1 }),
-      offer("4", "Ohm", { lat: 49.44, lon: 11.1 }),
-      offer("5", "Ofen", { lat: 49.45, lon: 11.1 }),
-      offer("6", "Öfen", { lat: 49.46, lon: 11.1 }),
-    ]);
-    expect(sortPlaces(places).map((p) => p.names[0])).toEqual(["Ofen", "Öfen", "Ohm", "Öhrl", "Ozelot", "Zoo"]);
-  });
-
-  it("sortiert bei gleicher Entfernung nach Name", () => {
-    // gleiche Breite, gleicher Längenabstand nach Ost und West → exakt gleiche Luftlinie
-    const origin: Origin = { ...gostenhof, point: { lat: 49.45, lon: 11.07 } };
-    const places = placesOf([
-      offer("o", "Ost", { lat: 49.45, lon: 11.08 }),
-      offer("w", "Ost-West", { lat: 49.45, lon: 11.06 }),
-      offer("a", "Am Rand", { lat: 49.5, lon: 11.07 }),
-    ]);
-    expect(sortPlaces(places, airlineReach(origin)).map((p) => p.names[0])).toEqual(["Ost", "Ost-West", "Am Rand"]);
-    const reversed = placesOf([
-      offer("w", "Ost-West", { lat: 49.45, lon: 11.06 }),
-      offer("o", "Ost", { lat: 49.45, lon: 11.08 }),
-    ]);
-    expect(sortPlaces(reversed, airlineReach(origin)).map((p) => p.names[0])).toEqual(["Ost", "Ost-West"]);
-  });
-
-  it("verändert die Eingabe nicht", () => {
-    const places = placesOf([far, near]);
-    const before = places.map((p) => p.key);
-    sortPlaces(places, airlineReach(gostenhof));
-    sortPlaces(places);
-    expect(places.map((p) => p.key)).toEqual(before);
-  });
-});
-
-describe("countPlaces", () => {
-  it("zählt wie placesOf: gleiche Koordinate ein Ort, auch bei verschiedenen Namen", () => {
-    const at = (name: string, lat: number, lon: number) => ({ venue: { name, address: "Weg 1", geo: { lat, lon } } });
-    const offers = [at("A", 49.45, 11.07), at("B", 49.45, 11.07), at("A", 49.46, 11.07), at("C", 49.47, 11.08)];
-    expect(countPlaces(offers)).toBe(3);
-    expect(countPlaces(offers)).toBe(placesOf(offers).length);
-    expect(countPlaces([])).toBe(0);
+  it("ein leerer Ausschnitt liefert nichts", () => {
+    expect(offersInBounds(offers, { west: 10, south: 48, east: 10.1, north: 48.1 }).size).toBe(0);
   });
 });

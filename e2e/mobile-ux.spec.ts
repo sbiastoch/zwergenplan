@@ -41,7 +41,7 @@ async function withGostenhof(page: Page) {
   await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
 }
 
-/** Karte mit Stadtteil als Startpunkt (Plan 0005): Orts-Liste mit Wegzeit, keine Werkzeugzeile (Plan 0056, E4). */
+/** Karte mit Stadtteil als Startpunkt (Plan 0005): Liste darunter mit Wegzeit (Plan 0056, E5), keine Werkzeugzeile (E4). */
 async function openMap(page: Page) {
   await withGostenhof(page);
   await page.getByRole("button", { name: "Karte", exact: true }).click();
@@ -70,6 +70,16 @@ async function jumpProviderMap(page: Page, at: { lat: number; lon: number }, zoo
 
 /** Familientreff der Fixtures: dort ergänzt `anbieter-orts-sheet` einen zweiten Anbieter */
 const TREFF_GEO = { lat: 49.4521, lon: 11.0767 };
+
+/** Angebotskarte auf den Familientreff fahren und seinen Marker antippen (Orts-Sheet; Plan 0056, E5: keine Orts-Liste) */
+async function tapTreff(page: Page) {
+  await jumpProviderMap(page, TREFF_GEO, 15);
+  await page.locator(".map-box").evaluate((el) => el.scrollIntoView({ block: "start" }));
+  const point = await page.evaluate(({ lat, lon }) => window.__zpMap?.project([lon, lat]), TREFF_GEO);
+  const box = await page.locator(".map-box").boundingBox();
+  if (!point || !box) throw new Error("keine Karte");
+  await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
+}
 
 /** IDs der Fixture-Angebote für Merkliste und Deep-Link (Plan 0018) */
 const PEKIP_ID = "nle21y1x";
@@ -104,6 +114,7 @@ async function setBirthDate(page: Page, text: string) {
 const MAP_VIEWS = new Set([
   "karte",
   "karte-quelle-eingeklappt",
+  "karte-ausschnitt",
   "orts-sheet",
   "orts-sheet-wegzeit",
   "karte-fehler",
@@ -215,6 +226,9 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.goto("./?ansicht=merkliste-karte");
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
     await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
+    // darunter die gemerkten Angebote im Ausschnitt (Plan 0056, E5)
+    await expect(page.getByTestId("offer")).toHaveCount(3);
+    await mapSettled(page);
   },
   // Plan 0025, E2; Plan 0054, E1: Anbieter-Sheet mit gedrückter Glocke neben dem längsten Namen (Kirchengemeinde, mehrzeilig)
   "anbieter-sheet-abonniert": async (page) => {
@@ -471,10 +485,19 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(sheet.getByText("Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth.")).toBeVisible();
     await sheet.getByRole("button", { name: "Startpunkt wählen" }).scrollIntoViewIfNeeded();
   },
-  // Quellenangabe beim Öffnen ausgeschrieben (Plan 0056, E3, N6)
+  // Quellenangabe beim Öffnen ausgeschrieben (Plan 0056, E3, N6); darunter die Angebotsliste (E5)
   karte: async (page) => {
     await openMap(page);
     await expect(page.locator(".map-box .maplibregl-ctrl-attrib")).toHaveClass(/maplibregl-compact-show/);
+    await mapSettled(page);
+    await expect(page.getByTestId("offer").first()).toBeVisible();
+  },
+  // Ausschnitt blendet Angebote aus: Statuszeile „… im Kartenausschnitt“ mit „Alle zeigen“ (Plan 0056, E5)
+  "karte-ausschnitt": async (page) => {
+    await openMap(page);
+    await jumpProviderMap(page, { lat: 49.4495, lon: 11.0601 }, 17);
+    await expect(page.getByRole("button", { name: "Alle zeigen" })).toBeVisible();
+    await expect(page.getByTestId("offer")).toHaveCount(2);
   },
   // … und eingeklappt: nur das „i“ (im Deploy-Build nach 5 s, hier nach 200 ms)
   "karte-quelle-eingeklappt": async (page) => {
@@ -487,7 +510,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(attribution).toHaveClass(/(^|\s)maplibregl-compact(\s|$)/);
     await expect(attribution).not.toHaveClass(/maplibregl-compact-show/);
   },
-  // Fehlerzustand (E12): Meldung im Kartenrahmen, die Orts-Liste bleibt
+  // Fehlerzustand (E12): Meldung im Kartenrahmen, die Liste darunter bleibt
   "karte-fehler": async (page) => {
     await page.addInitScript(() => {
       const original = HTMLCanvasElement.prototype.getContext;
@@ -614,20 +637,14 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   "orts-sheet-wegzeit": async (page) => {
     await twoLinesEverywhere(page);
     await openMap(page);
-    await page
-      .getByRole("region", { name: "Orte" })
-      .getByRole("button", { name: /^Familientreff Beispielhof/ })
-      .click();
+    await tapTreff(page);
     await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" }).locator(".reach-long")).toContainText(
       "Bus\u00a0202E",
     );
   },
   "orts-sheet": async (page) => {
     await openMap(page);
-    await page
-      .getByRole("region", { name: "Orte" })
-      .getByRole("button", { name: /^Familientreff Beispielhof/ })
-      .click();
+    await tapTreff(page);
     await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
   },
 };
@@ -1055,7 +1072,7 @@ test("zeigt den Fokus auch im Detail-Dialog", async ({ page, isMobile }) => {
 test.describe("Karte", () => {
   test.use({ tiles: "mock" });
 
-  test("zeigt den Fokus auf Kartenfläche, Zoom, Attribution und Orts-Liste", async ({ page, isMobile }) => {
+  test("zeigt den Fokus auf Kartenfläche, Zoom, Attribution und Liste darunter", async ({ page, isMobile }) => {
     test.skip(isMobile, "Tastatur-Fokus wird auf Desktop geprüft");
     await ready(page);
     await openMap(page);

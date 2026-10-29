@@ -2,7 +2,7 @@ import { createElement, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EMPTY_FILTER } from "../domain/filter.ts";
-import { placeKey } from "../domain/place-key.ts";
+import { countPlaces, placeKey } from "../domain/place-key.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
@@ -59,6 +59,9 @@ function render(input: Partial<OfferViewsInput>): OfferViews {
   if (!result) throw new Error("Hook nicht gerendert");
   return result;
 }
+
+/** Orte der passenden gemerkten Angebote, wie die Merklisten-Karte sie zeichnet */
+const savedPlaces = (v: OfferViews) => countPlaces(v.savedVisible.map((o) => o.offer));
 
 const ids = (offers: readonly SiteOffer[]) => offers.map((o) => o.title);
 /** Titel der Merkliste; `saved` trägt je Angebot den angezeigten Termin (`savedOffers`) */
@@ -357,13 +360,43 @@ describe("useOfferViews", () => {
       // nur in der Kartenansicht
       expect(render({ offers: [nah, nahZwei, fern] }).map).toBeUndefined();
       // gleicher Ort → ein Ort
-      expect(render({ offers: [fern, nah, nahZwei], route: karte }).map?.placeCount).toBe(2);
+      expect(countPlaces(render({ offers: [fern, nah, nahZwei], route: karte }).visible)).toBe(2);
       // Wegzeit und Alter wirken wie in der Liste
       expect(
-        render({ offers: [nah, fern], route: { ...within20, tab: "karte" }, reach: wegzeit }).map?.placeCount,
+        countPlaces(render({ offers: [nah, fern], route: { ...within20, tab: "karte" }, reach: wegzeit }).visible),
       ).toBe(1);
       const gross = at(GROSS, 49.4301, 11.0892);
-      expect(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }).map?.placeCount).toBe(1);
+      expect(countPlaces(render({ offers: [nah, gross], route: karte, birthDate: "2026-05-01" }).visible)).toBe(1);
+    });
+
+    it("Kartenausschnitt filtert nur die Liste unter der Karte, nicht Marker, Zahl im Filter-Sheet und Liste (Plan 0056, E5, M1)", () => {
+      const karte: Route = { tab: "karte", filter: EMPTY_FILTER };
+      const all = [nah, nahZwei, fern];
+      const extent = {
+        inView: new Set([placeKey(nah.venue.geo)]),
+        known: new Set(all.map((o) => placeKey(o.venue.geo))),
+      };
+      const v = render({ offers: all, route: karte, mapView: extent });
+      // `visible` (Marker, resultCount, Onboarding) bleibt ungefiltert
+      expect(ids(v.visible)).toEqual(["nah", "nah-zwei", "fern"]);
+      // die Liste unter der Karte und ihre Zahl nur im Ausschnitt
+      expect(ids(v.inView)).toEqual(["nah", "nah-zwei"]);
+      expect(ids(v.page.groups.flatMap((g) => g.items.map((i) => i.offer)))).toEqual(["nah", "nah-zwei"]);
+      // in der Liste wirkt kein Ausschnitt
+      const liste = render({ offers: all, route: ENTDECKEN, mapView: extent });
+      expect(ids(liste.inView)).toEqual(["nah", "nah-zwei", "fern"]);
+      expect(liste.page.groups.flatMap((g) => g.items).length).toBe(3);
+      // ohne Ausschnitt (Karte nicht bereit) alles
+      expect(ids(render({ offers: all, route: karte }).inView)).toEqual(["nah", "nah-zwei", "fern"]);
+      // Merklisten-Karte: dieselbe Regel für die gemerkten
+      const saved = render({
+        offers: all,
+        route: { tab: "merkliste-karte", filter: EMPTY_FILTER },
+        savedIds: [fern.id, nah.id],
+        mapView: extent,
+      });
+      expect(ids(saved.savedVisible.map((o) => o.offer)).sort()).toEqual(["fern", "nah"]);
+      expect(ids(saved.savedInView.map((o) => o.offer))).toEqual(["nah"]);
     });
 
     it("Karte der Merkliste: Orte der gemerkten Angebote, Startausschnitt wie in „Entdecken“ (Plan 0025, E4)", () => {
@@ -372,7 +405,7 @@ describe("useOfferViews", () => {
       const all = [nah, nahZwei, fern, gross, VORBEI];
       // nur gemerkte mit kommendem Termin; nah und nahZwei teilen sich einen Ort
       const v = render({ offers: all, route: merklisteKarte, savedIds: [nah.id, nahZwei.id, VORBEI.id] });
-      expect(v.map?.placeCount).toBe(1);
+      expect(savedPlaces(v)).toBe(1);
       // Startseiten-Filter, Wegzeit und Alter wirken auf der Merkliste nicht
       const filtered = render({
         offers: all,
@@ -381,7 +414,7 @@ describe("useOfferViews", () => {
         birthDate: "2026-05-01",
         savedIds: [fern.id, gross.id],
       });
-      expect(filtered.map?.placeCount).toBe(2);
+      expect(savedPlaces(filtered)).toBe(2);
       // Kamera-Regel (ADR 0008): dieselbe Datenbasis wie die Karte in „Entdecken“, nie die Merkliste
       const plain = render({ offers: all, route: { tab: "karte", filter: EMPTY_FILTER } }).map?.cameraOffers;
       expect(v.map?.cameraOffers).toEqual(plain);
@@ -415,7 +448,7 @@ describe("useOfferViews", () => {
         expect(v.map?.cameraOffers, JSON.stringify(variant)).toEqual(plain);
       }
       // Die sichtbaren Orte folgen dagegen Wegzeit und Alter.
-      expect(render({ offers: all, ...variants[0] }).map?.placeCount).toBe(1);
+      expect(countPlaces(render({ offers: all, ...variants[0] }).visible)).toBe(1);
     });
 
     it("der Kalender der Merkliste kennt keine Wegzeit-Grenze (Plan 0025, E8)", () => {
@@ -539,8 +572,8 @@ describe("useOfferViews", () => {
       const fern: SiteOffer = { ...kurs, venue: { ...kurs.venue, geo: { lat: 49.5, lon: 11.2 } } };
       const route: Route = { tab: "merkliste-karte", filter: EMPTY_FILTER };
       const input = { offers: [fern, treff], savedIds: [fern.id, treff.id], route };
-      expect(render(input).map?.placeCount).toBe(2);
-      expect(render({ ...input, savedFilter: kurse }).map?.placeCount).toBe(1);
+      expect(savedPlaces(render(input))).toBe(2);
+      expect(savedPlaces(render({ ...input, savedFilter: kurse }))).toBe(1);
     });
 
     it("Kalender: Format wirkt, der Zeitraum nicht; `allIndex` bleibt ungefiltert", () => {

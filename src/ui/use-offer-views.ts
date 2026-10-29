@@ -19,7 +19,8 @@ import { type CalendarSelection, clampDay } from "../domain/calendar.ts";
 import { quickRanges } from "../domain/date-range.ts";
 import { applyFilters, EMPTY_FILTER, providerFilter } from "../domain/filter.ts";
 import { groupByListing, groupByReach, type ListGroup } from "../domain/listing.ts";
-import { countPlaces, placeKey } from "../domain/place-key.ts";
+import { isOutside, type MapExtent } from "../domain/map-view.ts";
+import { placeKey } from "../domain/place-key.ts";
 import type { Reach, ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import {
@@ -46,6 +47,11 @@ export interface OfferViewsInput {
   now: Date;
   /** Entfernung ab dem Startpunkt (Wegzeit oder Luftlinie); ohne Startpunkt oder solange sie lädt `undefined` */
   reach?: ReachFn | undefined;
+  /**
+   * Kartenausschnitt nach `placeKey` (Plan 0056, E5); wirkt nur auf den Karten-Tabs und nur auf die Liste darunter,
+   * nie auf `visible` (Marker, Zahl im Filter-Sheet, Onboarding; Review M1). `undefined`: Karte nicht bereit.
+   */
+  mapView?: MapExtent | undefined;
 }
 
 export interface OfferViews {
@@ -68,7 +74,15 @@ export interface OfferViews {
   ageOnly: boolean;
   /** schaltet den Altersfilter und beginnt die Liste wieder mit dem ersten Schritt */
   setAgeOnly: (on: boolean) => void;
-  /** aktueller Ausschnitt der Liste „Entdecken“: nach Terminen, „Neu eingestellt“ oder Wegzeit (Plan 0043, E4, E7) */
+  /**
+   * Angebote der Liste: auf der Karte nur die im Ausschnitt (Plan 0056, E5), sonst `visible`. Daraus zählt die
+   * Statuszeile „im Kartenausschnitt“.
+   */
+  inView: readonly SiteOffer[];
+  /**
+   * aktueller Ausschnitt der Liste „Entdecken“ bzw. der Liste unter der Karte: nach Terminen, „Neu eingestellt“ oder
+   * Wegzeit (Plan 0043, E4, E7), auf der Karte aus `inView`
+   */
   page: { groups: ListGroup<Occurrence<SiteOffer>>[]; remaining: number };
   showMore: () => void;
   /** nach Filterwechsel wieder mit dem ersten Schritt beginnen */
@@ -85,6 +99,8 @@ export interface OfferViews {
    * Kalender ohne sie (E5). Badge und Export nehmen weiter `saved`.
    */
   savedVisible: Occurrence<SiteOffer>[];
+  /** dieselben im Kartenausschnitt der Merklisten-Karte (Plan 0056, E5); sonst `savedVisible` */
+  savedInView: Occurrence<SiteOffer>[];
   /** Merklisten-Filter wirkt in dieser Darstellung (im Kalender zählt der Zeitraum nicht) */
   savedFiltered: boolean;
   /** Schnellwahlen „ab …“ der Merkliste bis zum Ende des Datenstands (Plan 0025, E7) */
@@ -92,12 +108,11 @@ export interface OfferViews {
   /** Angebot aus der URL, falls es im Datenstand existiert */
   detailOffer: SiteOffer | undefined;
   /**
-   * Nur in den Kartenansichten von „Entdecken“ und Merkliste (Plan 0005; Plan 0025, E4): Zahl der Orte für die
-   * Statuszeile und die Datenbasis des Startausschnitts – alle kommenden Angebote, unabhängig von Filtern, Alter,
-   * Startpunkt und Merkliste, damit die Kachel-Requests weder Standort, Alter noch Gemerktes verraten (Kamera-Regel,
-   * ADR 0008; Arch-Review B1, m1).
+   * Nur in den Kartenansichten von „Entdecken“ und Merkliste (Plan 0005; Plan 0025, E4): die Datenbasis des
+   * Startausschnitts – alle kommenden Angebote, unabhängig von Filtern, Alter, Startpunkt und Merkliste, damit die
+   * Kachel-Requests weder Alter noch Gemerktes verraten (Kamera-Regel, ADR 0008; Arch-Review B1, m1).
    */
-  map: { placeCount: number; cameraOffers: readonly SiteOffer[] } | undefined;
+  map: { cameraOffers: readonly SiteOffer[] } | undefined;
   /** Entfernung zum Ort des Angebots; ohne Startpunkt `undefined` */
   reachOf: (offer: SiteOffer) => Reach | undefined;
 }
@@ -153,6 +168,7 @@ export function useOfferViews({
   savedFilter = EMPTY_SAVED_FILTER,
   now,
   reach,
+  mapView,
 }: OfferViewsInput): OfferViews {
   const [ageOnly, setAgeOnlyState] = useState(true);
   const [limit, setLimit] = useState(PAGE);
@@ -183,16 +199,23 @@ export function useOfferViews({
   const reachOf = useMemo(() => reachCache(reach), [reach]);
   // „Nächstgelegen“ ohne Wegzeit (kein Startpunkt) zeigt bis dahin die Termine (Plan 0043, E7)
   const sort = route.sort === "nah" && !reach ? undefined : route.sort;
+  // Liste unter der Karte: nur im Ausschnitt (Plan 0056, E5); Marker und Zähler nehmen weiter `visible` (Review M1)
+  const extent = route.tab === "karte" || route.tab === "merkliste-karte" ? mapView : undefined;
+  const inView = useMemo(
+    () =>
+      route.tab === "karte" && extent ? visible.filter((o) => !isOutside(extent, placeKey(o.venue.geo))) : visible,
+    [route.tab, extent, visible],
+  );
   const groups = useMemo((): ListGroup<Occurrence<SiteOffer>>[] => {
-    if (sort === "neu") return groupByListing(visible, now, range, fits);
-    if (sort === "nah") return groupByReach(visible, now, reachOf, range, fits);
-    return groupByNextSession(visible, now, range, fits).map(({ day, items }) => ({
+    if (sort === "neu") return groupByListing(inView, now, range, fits);
+    if (sort === "nah") return groupByReach(inView, now, reachOf, range, fits);
+    return groupByNextSession(inView, now, range, fits).map(({ day, items }) => ({
       kind: "termin",
       key: day,
       day,
       items,
     }));
-  }, [sort, visible, now, range, fits, reachOf]);
+  }, [sort, inView, now, range, fits, reachOf]);
   const dataEnd = useMemo(() => lastSessionDay(upcoming), [upcoming]);
   const today = berlinIsoDate(now);
   const savedQuick = useMemo(() => quickRanges(today, dataEnd), [today, dataEnd]);
@@ -212,6 +235,13 @@ export function useOfferViews({
     return savedOffers(shown, savedIds, now, birthDate, useRange ? savedFilter.range : undefined);
   }, [savedFiltered, saved, savedList, savedFilter, now, useRange, savedIds, birthDate]);
   const savedVisibleList = useMemo(() => savedVisible.map((o) => o.offer), [savedVisible]);
+  const savedInView = useMemo(
+    () =>
+      route.tab === "merkliste-karte" && extent
+        ? savedVisible.filter((o) => !isOutside(extent, placeKey(o.offer.venue.geo)))
+        : savedVisible,
+    [route.tab, extent, savedVisible],
+  );
   // Der Kalender der Merkliste zeigt regelmäßige Angebote nur an Terminen, die zum Alter passen, wie Liste, Statuszeile
   // und Datei (Plan 0028, E3). Unabhängig vom Altersfilter in „Entdecken“: Gemerktes ist bewusst gewählt.
   const savedFits = useMemo(() => sessionFit(birthDate), [birthDate]);
@@ -243,11 +273,10 @@ export function useOfferViews({
         : 0,
     [onCalendar, offers, savedIds, savedFilter, today, now, savedFits],
   );
-  const map = useMemo(() => {
-    if (route.tab === "karte") return { placeCount: countPlaces(visible), cameraOffers: upcoming };
-    if (route.tab === "merkliste-karte") return { placeCount: countPlaces(savedVisibleList), cameraOffers: upcoming };
-    return undefined;
-  }, [route.tab, visible, savedVisibleList, upcoming]);
+  const map = useMemo(
+    () => (route.tab === "karte" || route.tab === "merkliste-karte" ? { cameraOffers: upcoming } : undefined),
+    [route.tab, upcoming],
+  );
   const showMore = useCallback(() => setLimit((n) => n + PAGE), []);
   const resetPage = useCallback(() => setLimit(PAGE), []);
   const setAgeOnly = useCallback((on: boolean) => {
@@ -264,6 +293,7 @@ export function useOfferViews({
     providerUnfitCount: providerView?.unfitCount ?? unfitCount,
     ageOnly,
     setAgeOnly,
+    inView,
     page: takeGroups(groups, limit),
     showMore,
     resetPage,
@@ -281,6 +311,7 @@ export function useOfferViews({
       },
     saved,
     savedVisible,
+    savedInView,
     savedFiltered,
     savedQuick,
     detailOffer: route.offerId ? offers.find((o) => o.id === route.offerId) : undefined,

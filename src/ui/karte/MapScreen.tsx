@@ -1,18 +1,20 @@
 /**
- * Karten-Oberfläche (Plan 0005, E7/E12), eigener Lazy-Chunk ohne MapLibre: Kartenrahmen mit
- * Zuständen, Orts-Liste und Orts-Sheet (Werkzeugzeile und Hinweis entfallen, Plan 0056, E3/E4). Die Karte selbst (map/MapView.tsx)
+ * Karten-Oberfläche (Plan 0005, E7/E12), eigener Lazy-Chunk ohne MapLibre: Kartenrahmen mit Zuständen und
+ * Orts-Sheet. Die Liste darunter rendert `App` bzw. die Merkliste, gefiltert auf den Ausschnitt, den diese Karte
+ * meldet (`onInView`, Plan 0056, E5); Werkzeugzeile, Hinweis und Orts-Liste entfallen (E3, E4). Die Karte selbst (map/MapView.tsx)
  * lädt erst von hier; ohne WebGL, ohne Kacheln oder ohne Karten-Chunk bleibt alles hier bedienbar.
  */
-import { type ComponentType, useEffect, useMemo, useState } from "react";
-import type { Place } from "../../domain/places.ts";
+import { type ComponentType, useCallback, useEffect, useMemo, useState } from "react";
+import type { Bounds } from "../../domain/map-view.ts";
+import { placeKey as keyOf } from "../../domain/place-key.ts";
+import { offersInBounds, type Place } from "../../domain/places.ts";
 import type { SiteOffer } from "../../domain/site-data.ts";
 import { Dialog } from "../Dialog.tsx";
 import { LoadFailed, useLazy } from "../Lazy.tsx";
-import { NoOffers } from "../ListView.tsx";
 import type { MapLayer, MapProblem, MapScreenProps, MapViewProps } from "../map-types.ts";
 import { mapData } from "./map-data.ts";
-import { PlaceList } from "./PlaceList.tsx";
 import { PlaceSheet } from "./PlaceSheet.tsx";
+import { useInViewReport } from "./use-in-view.ts";
 
 async function loadMapView(): Promise<ComponentType<MapViewProps>> {
   return (await import("../map/MapView.tsx")).MapView;
@@ -24,11 +26,8 @@ const NOTES: Record<MapProblem, string> = {
 };
 
 export function MapScreen(props: MapScreenProps) {
-  const { offers, cameraOffers, origin, reach, ctx, onSheetOpen } = props;
-  const { places, start } = useMemo(
-    () => mapData(offers, cameraOffers, origin, reach),
-    [offers, cameraOffers, origin, reach],
-  );
+  const { offers, cameraOffers, origin, ctx, onSheetOpen, onInView } = props;
+  const { places, start } = useMemo(() => mapData(offers, cameraOffers, origin), [offers, cameraOffers, origin]);
   // eigene Identität nur bei neuen Orten: Sonst tauschte MapView bei jedem Render die Daten (E9)
   const layer = useMemo((): MapLayer => ({ kind: "angebote", places }), [places]);
   const { module, attempt, retry } = useLazy(loadMapView);
@@ -40,6 +39,10 @@ export function MapScreen(props: MapScreenProps) {
   const [placeKey, setPlaceKey] = useState<string>();
   const place = places.find((p) => p.key === placeKey);
   const state = module.kind === "fehler" || problem ? "fehler" : ready && module.kind === "da" ? "bereit" : "laden";
+  // Ausschnitt an die Liste unter der Karte, nach Orten (Plan 0056, E5)
+  const known = useMemo(() => new Set(offers.map((o) => keyOf(o.venue.geo))), [offers]);
+  const inBounds = useCallback((bounds: Bounds) => offersInBounds(offers, bounds), [offers]);
+  const onViewport = useInViewReport(inBounds, known, state === "fehler", onInView);
 
   useEffect(() => {
     onSheetOpen(place !== undefined);
@@ -74,6 +77,8 @@ export function MapScreen(props: MapScreenProps) {
             }}
             onReady={() => setReady(true)}
             onProblem={setProblem}
+            onViewport={onViewport}
+            resetKey={props.resetKey}
           />
         )}
         {state === "laden" && <p className="map-note">Karte wird geladen …</p>}
@@ -93,11 +98,6 @@ export function MapScreen(props: MapScreenProps) {
           </p>
         )}
       </div>
-      {places.length > 0 ? (
-        <PlaceList places={places} reachOf={ctx.reachOf} reachPending={ctx.reachPending} onPlace={openPlace} />
-      ) : (
-        <NoOffers hasData={props.hasData} onResetFilter={props.onResetFilter} age={props.age} />
-      )}
       <Dialog
         open={place !== undefined}
         onClose={() => setPlaceKey(undefined)}

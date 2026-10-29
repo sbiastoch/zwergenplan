@@ -4,7 +4,7 @@
  * PEKiP und Babykonzert 15.9.; Babymassage, Elterncafé und Bewegungslandschaft ohne `listedAt`.
  */
 import type { Locator, Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, mapSettled, test } from "./fixtures.ts";
 import {
   expectAccessible,
   expectMobileUx,
@@ -164,13 +164,16 @@ test("Deep-Link ?sortierung=neu öffnet sortiert; der Tab-Wechsel behält die Wa
 test.describe("Kartenansicht und Orts-Sheet", () => {
   test.use({ tiles: "mock" });
 
-  test("Kartenansicht ohne Sortier-Knopf, die Wahl bleibt in der URL; Gates", async ({ page }) => {
+  test("Kartenansicht mit Sortier-Knopf, die Liste darunter folgt der Wahl; Gates (Plan 0056, N9)", async ({
+    page,
+  }) => {
     await ready(page, "./?sortierung=neu");
     await page.getByRole("button", { name: "Karte", exact: true }).click();
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", { timeout: 30_000 });
     await expect(page).toHaveURL(/ansicht=karte&sortierung=neu$/);
-    await expect(sortButton(page)).toHaveCount(0);
-    await expect(page.locator(".view-tools")).toHaveCount(0);
+    await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Neu eingestellt");
+    await expect(page.locator(".view-tools")).toHaveCount(1);
+    await expect(page.getByRole("heading", { level: 2 }).filter({ hasText: /^Neu diese Woche/ })).toHaveCount(1);
     await expectMobileUx(page);
   });
 
@@ -178,10 +181,14 @@ test.describe("Kartenansicht und Orts-Sheet", () => {
     await ready(page);
     await page.getByRole("button", { name: "Karte", exact: true }).click();
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", { timeout: 30_000 });
-    await page
-      .getByRole("region", { name: "Orte" })
-      .getByRole("button", { name: /^Familientreff Beispielhof/ })
-      .click();
+    // Marker des Beispielhofs (tests/fixtures/providers.yaml); die Orts-Liste gibt es seit Plan 0056, E5 nicht mehr
+    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.0767, 49.4521], zoom: 15 }));
+    await mapSettled(page);
+    await page.locator(".map-box").evaluate((el) => el.scrollIntoView({ block: "start" }));
+    const point = await page.evaluate(() => window.__zpMap?.project([11.0767, 49.4521]));
+    const box = await page.locator(".map-box").boundingBox();
+    if (!point || !box) throw new Error("keine Karte");
+    await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
     const tag = sheet.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" }).locator(".new-tag");
     await expect(tag).toBeVisible();

@@ -4,7 +4,7 @@
  * Lader, anbieter.json, Datenstand-Abgleich) → anbieter/entry.ts (Liste und Sheet, ein Chunk).
  */
 import type { ComponentType } from "react";
-import type { ProviderView } from "../domain/provider-count.ts";
+import type { MapExtent } from "../domain/map-view.ts";
 import type { Reach } from "../domain/reach.ts";
 import type { ProviderDirectoryData, SiteOffer } from "../domain/site-data.ts";
 import type { AgeEscape } from "./ListView.tsx";
@@ -21,7 +21,7 @@ export interface ProviderScreenProps {
   visible: readonly SiteOffer[];
   now: Date;
   /** Kartenausschnitt der Anbieterkarte; `undefined`, solange die Karte nicht bereit oder gescheitert ist (Plan 0055) */
-  view: ProviderView | undefined;
+  view: MapExtent | undefined;
   /** „Alle zeigen“: Karte zurück auf den Startausschnitt */
   onShowAll: () => void;
   /** Wegzeit bzw. Luftlinie zum Ort eines Angebots; `undefined` ohne Startpunkt */

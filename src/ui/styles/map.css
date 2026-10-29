@@ -1,6 +1,6 @@
 /*
  * Karte (Plan 0005, E4/E7/E12): alles, was auch ohne Karten-Chunk gebraucht wird – Rahmen, Platzhalter,
- * Meldungen, Orts-Liste, Orts-Sheet. MapLibre selbst: src/ui/map/map-overrides.css.
+ * Meldungen, Orts-Sheet. MapLibre selbst: src/ui/map/map-overrides.css.
  */
 
 @layer components {
@@ -206,7 +206,7 @@
     background: var(--soft);
     overflow-y: auto;
   }
-  /* Orts-Liste (PlaceList.tsx) */
+  /* Listen von Orten und Anbietern (Tab „Anbieter“, Orts-Sheet der Anbieterkarte) */
   .places h2 {
     font-weight: 800;
     font-size: 1.375rem;

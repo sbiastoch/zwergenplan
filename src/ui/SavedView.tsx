@@ -3,7 +3,7 @@
  * Kopf nach Plan 0025, E3a: Umschalter Liste | Karte | Kalender über die ganze Breite, Filterzeile (E6), Statuszeile mit
  * rundem Export-Knopf (nur in der Liste). Karte und Kalender rendert App über `renderMap` bzw. `renderCalendar`.
  */
-import { type ReactNode, useRef } from "react";
+import { type ReactNode, useMemo, useRef } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
 import type { DateRange } from "../domain/date-range.ts";
 import { collectionExport, EMPTY_SAVED_FILTER, type SavedFilter, upcomingSessionCount } from "../domain/saved.ts";
@@ -24,6 +24,7 @@ import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 import { SavedFilters } from "./SavedFilters.tsx";
 import { LONG_TOAST_MS, type Say } from "./use-app-state.ts";
+import { ANNOUNCE_DELAY_MS, useSettled } from "./use-settled.ts";
 
 /** Darstellungen der Merkliste: Routenwerte (Plan 0025, E4) */
 type SavedTab = "merkliste" | "merkliste-karte" | "merkliste-kalender";
@@ -39,6 +40,11 @@ interface SavedViewProps {
   items: readonly Occurrence<SiteOffer>[];
   /** dieselben nach dem Merklisten-Filter dieser Darstellung (`views.savedVisible`, E6) */
   visible: readonly Occurrence<SiteOffer>[];
+  /** dieselben im Kartenausschnitt (`views.savedInView`, Plan 0056, E5): die Liste unter der Karte */
+  inView: readonly Occurrence<SiteOffer>[];
+  /** Der Kartenausschnitt blendet Gemerktes aus: Statuszeile „im Kartenausschnitt“ mit „Alle zeigen“ */
+  narrowed: boolean;
+  onShowAll: () => void;
   /** Merklisten-Filter (E6) und ob er in dieser Darstellung wirkt (`views.savedFiltered`) */
   filter: SavedFilter;
   filtered: boolean;
@@ -51,7 +57,7 @@ interface SavedViewProps {
    * Karte mit diesen Angeboten; nur aufgerufen, wenn mindestens eins zum Filter passt (keine Kacheln ohne Gemerktes,
    * E5a)
    */
-  renderMap: (offers: readonly SiteOffer[], onResetFilter: () => void) => ReactNode;
+  renderMap: (offers: readonly SiteOffer[]) => ReactNode;
   /** Kalender der gemerkten Termine (E5); „Filter zurücksetzen“ nur, wenn Format oder Anmeldung wirkt */
   renderCalendar: (onResetFilter: (() => void) | undefined) => ReactNode;
   generatedAt: SiteData["generatedAt"];
@@ -69,6 +75,9 @@ interface SavedViewProps {
 export function SavedView({
   items: savedItems,
   visible,
+  inView,
+  narrowed,
+  onShowAll,
   filter,
   filtered,
   onFilter,
@@ -85,7 +94,8 @@ export function SavedView({
 }: SavedViewProps) {
   const status = useRef<HTMLParagraphElement>(null);
   const offers = savedItems.map((item) => item.offer);
-  const shown = visible.map((item) => item.offer);
+  // stabile Identität: Die Karte meldet sonst bei jedem Render einen neuen Ausschnitt (Endlosschleife, Plan 0056, S4)
+  const shown = useMemo(() => visible.map((item) => item.offer), [visible]);
   const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
   // Export immer mit allen gemerkten (E9); der Name sagt es, wenn der Filter in dieser Darstellung etwas ausblendet
   const exportName = exportLabel(offers.length, filtered);
@@ -117,6 +127,14 @@ export function SavedView({
     onFilter(EMPTY_SAVED_FILTER);
   };
   const calendar = tab === "merkliste-kalender";
+  // Ausschnitt der Merklisten-Karte (Plan 0056, E5): Ansage erst, wenn die Karte ruht, wie im Tab „Anbieter“ (N8)
+  const mapNarrowed = tab === "merkliste-karte" && narrowed;
+  const inViewText = `${inView.length} gemerkte im Kartenausschnitt`;
+  const inViewAnnounce = useSettled(mapNarrowed ? inViewText : "", ANNOUNCE_DELAY_MS);
+  const showAll = () => {
+    status.current?.focus();
+    onShowAll();
+  };
 
   return (
     <>
@@ -142,8 +160,22 @@ export function SavedView({
           />
           <div className="status-row">
             <p ref={status} className="status" role="status" tabIndex={-1}>
-              <StatusText parts={statusParts({ offers, shown, filtered, tab, now: ctx.now, birthDate, missing })} />
+              {mapNarrowed ? (
+                <span>
+                  <span aria-hidden="true">
+                    <b>{inView.length}</b> gemerkte im Kartenausschnitt
+                  </span>
+                  <span className="sr-only">{inViewAnnounce}</span>
+                </span>
+              ) : (
+                <StatusText parts={statusParts({ offers, shown, filtered, tab, now: ctx.now, birthDate, missing })} />
+              )}
             </p>
+            {mapNarrowed && (
+              <button type="button" className="linkbtn" onClick={showAll}>
+                Alle zeigen
+              </button>
+            )}
             {tab === "merkliste" && (
               <button
                 type="button"
@@ -167,7 +199,23 @@ export function SavedView({
             </EmptyState>
           ) : (
             <>
-              {tab === "merkliste-karte" && renderMap(shown, reset)}
+              {tab === "merkliste-karte" && (
+                <>
+                  {renderMap(shown)}
+                  {/* Liste unter der Karte, im Ausschnitt (Plan 0056, E5) */}
+                  {inView.length === 0 ? (
+                    <EmptyState icon="search" title="Hier ist gerade nichts">
+                      Im Kartenausschnitt liegt nichts von deiner Merkliste.
+                      <br />
+                      <button type="button" className="linkbtn" onClick={showAll}>
+                        Alle zeigen
+                      </button>
+                    </EmptyState>
+                  ) : (
+                    inView.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated numbered />)
+                  )}
+                </>
+              )}
               {calendar && renderCalendar(filtered ? reset : undefined)}
               {tab === "merkliste" &&
                 visible.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated numbered />)}

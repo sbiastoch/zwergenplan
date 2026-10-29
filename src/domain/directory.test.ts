@@ -9,7 +9,8 @@ import {
   providerRows,
 } from "./directory.ts";
 import { applyFilters, EMPTY_FILTER, type FilterState } from "./filter.ts";
-import { countProviders, type ProviderView } from "./provider-count.ts";
+import type { MapExtent } from "./map-view.ts";
+import { countProviders } from "./provider-count.ts";
 import { airlineReach, type Origin, type Reach } from "./reach.ts";
 import { type SiteOffer, type SiteProvider, toProviderDirectory } from "./site-data.ts";
 import { FIXTURE_NOW, fixtureSiteOffers, loadFixtures, fixturePublicId as pid } from "./test-fixtures.ts";
@@ -298,7 +299,7 @@ describe("providerRows mit Kartenausschnitt (Plan 0055, E2, E4)", () => {
   const turnverein = pid("turnverein-beispiel");
   const bibliothek = pid("stadtbibliothek-beispiel");
   /** im Ausschnitt nur Familientreff und Bibliothek; alle Katalog-Anbieter haben einen bekannten Ort */
-  const view: ProviderView = { inView: new Set([treff, bibliothek]), known: new Set(catalog.map((p) => p.id)) };
+  const view: MapExtent = { inView: new Set([treff, bibliothek]), known: new Set(catalog.map((p) => p.id)) };
 
   it("filtert aktive, blasse und gemerkte Zeilen nach dem Ausschnitt", () => {
     const result = rows({ view, saved: [theater, treff] });
@@ -318,7 +319,7 @@ describe("providerRows mit Kartenausschnitt (Plan 0055, E2, E4)", () => {
 
   it("ein Anbieter ohne bekannten Ort bleibt (Rückfall ohne Katalog-Eintrag, Review B1)", () => {
     const providers = catalog.filter((p) => p.id !== theater);
-    const narrow: ProviderView = { inView: new Set([treff]), known: new Set(providers.map((p) => p.id)) };
+    const narrow: MapExtent = { inView: new Set([treff]), known: new Set(providers.map((p) => p.id)) };
     expect(ids(rows({ providers, view: narrow }).active)).toEqual([treff, theater]);
   });
 

@@ -6,9 +6,11 @@
  * - **Darstellung** (`providerPlaces`): Marker nach `placeKey` gebündelt, mit Zustand je Anbieter nach `visible`.
  * Nur der Karten-Chunk (`ui/karte/`) importiert dieses Modul (`lazy-domain-apart`).
  */
+
 import { initialCamera, type StartCamera } from "./camera.ts";
 import { applyFilters, EMPTY_FILTER } from "./filter.ts";
 import { type GeoPoint, isGeoPoint } from "./geo.ts";
+import { type Bounds, inBox } from "./map-view.ts";
 import { placeKey } from "./place-key.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
 
@@ -36,14 +38,6 @@ export function placeProviderLine(provider: ProviderAtPlace): string {
   if (provider.state === "ausgeblendet") return "Passt nicht zur Auswahl";
   if (provider.state !== "aktiv") return "Gerade keine Termine";
   return provider.shown === 1 ? "1 Angebot" : `${provider.shown} Angebote`;
-}
-
-/** Kartenausschnitt in Grad, wie MapLibre `getBounds()` ihn liefert */
-export interface Bounds {
-  west: number;
-  south: number;
-  east: number;
-  north: number;
 }
 
 export interface ProviderGeometry {
@@ -111,12 +105,7 @@ export function providerGeometry(input: {
 
 /** IDs der Anbieter mit mindestens einem Ort im Ausschnitt; Ränder zählen mit */
 export function providersInBounds(geometry: ProviderGeometry, bounds: Bounds): Set<string> {
-  const { west, south, east, north } = bounds;
-  return new Set(
-    geometry.points
-      .filter(({ geo }) => geo.lat >= south && geo.lat <= north && geo.lon >= west && geo.lon <= east)
-      .map((p) => p.id),
-  );
+  return new Set(geometry.points.filter(({ geo }) => inBox(geo, bounds)).map((p) => p.id));
 }
 
 /** IDs der Anbieter mit mindestens einem bekannten Ort; nur die können „außerhalb des Ausschnitts“ liegen (E2) */

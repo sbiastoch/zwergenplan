@@ -89,7 +89,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(MapPanel|ProviderPanel|App)\.tsx$/,
     /^src\/ui\/(map-types|provider-types|use-settled)\.ts$/,
     /^src\/ui\/anbieter\/ProviderScreen\.tsx$/,
-    /^src\/domain\/(provider-places|provider-count|directory|camera|geo)\.ts$/,
+    /^src\/domain\/(provider-places|provider-count|directory|camera|geo|map-view)\.ts$/,
   ],
   // Karte: Lader (MapPanel, Lazy), Oberfläche karte/, MapLibre map/, Kacheln, Kamera-Regel mit Standort und
   // Kartenmitte (origin-state), Wegzeit beim Öffnen (use-transit), Orts-Sheet mit Linien (ReachLong), Marker mit
@@ -99,7 +99,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(MapPanel|Lazy|ReachLong)\.tsx$/,
     /^src\/ui\/(map-types|origin-state|use-transit|categories)\.ts$/,
     /^src\/data\/tiles\.ts$/,
-    /^src\/domain\/(camera|places|provider-places|geo|category-look)\.ts$/,
+    /^src\/domain\/(camera|places|provider-places|geo|category-look|map-view)\.ts$/,
   ],
   // Querschnitt Layout über Breiten, Lagen und Textgrößen: nur die globale Hülle (Review 2, M1).
   // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4)

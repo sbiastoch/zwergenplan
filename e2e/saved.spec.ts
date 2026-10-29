@@ -411,6 +411,8 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
     await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
     await expect(page.locator(".map-box")).toBeVisible();
+    // unter der Karte die gemerkten Angebote, alle im Startausschnitt (Plan 0056, E5)
+    await expect(page.getByTestId("offer")).toHaveCount(5);
     await mapSettled(page);
 
     const liste = segment(page, "Liste");
@@ -573,12 +575,40 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
 test.describe("Karte der Merkliste mit Filter (Plan 0025, E3a)", () => {
   test.use({ tiles: "mock" });
 
-  test("Statuszeile zählt passende Angebote und ihre Orte", async ({ page }) => {
+  test("Statuszeile zählt passende Angebote", async ({ page }) => {
     await preset(page, FIVE.slice(0, 3));
     await page.goto("./?ansicht=merkliste-karte");
     await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
     await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Kurse" }).click();
     await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten");
     await mapSettled(page);
+  });
+
+  test("Liste unter der Karte folgt dem Ausschnitt, „Alle zeigen“ und leerer Ausschnitt (Plan 0056, E5)", async ({
+    page,
+  }) => {
+    await preset(page, FIVE);
+    await page.goto("./?ansicht=merkliste-karte");
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await mapSettled(page);
+    await expect(page.getByTestId("offer")).toHaveCount(5);
+    // nah ans Theater (tests/fixtures/providers.yaml): nur „Kuckuck im Nest“ im Ausschnitt
+    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.0601, 49.4495], zoom: 17 }));
+    await mapSettled(page);
+    await expect(page.locator(".status [aria-hidden='true']")).toHaveText("1 gemerkte im Kartenausschnitt");
+    await expect(page.getByTestId("offer")).toHaveCount(1);
+    await expect(page.getByTestId("offer")).toContainText("Kuckuck im Nest");
+    await page.getByRole("button", { name: "Alle zeigen" }).click();
+    await expect(page.getByRole("status")).toBeFocused();
+    await mapSettled(page);
+    await expect(page.getByRole("status")).toHaveText("5 Angebote gemerkt");
+    await expect(page.getByTestId("offer")).toHaveCount(5);
+
+    // Ausschnitt ohne Gemerktes
+    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.2, 49.55], zoom: 15 }));
+    await mapSettled(page);
+    await expect(page.getByText("Im Kartenausschnitt liegt nichts von deiner Merkliste.")).toBeVisible();
+    await expect(page.getByTestId("offer")).toHaveCount(0);
+    await expectMobileUx(page);
   });
 });

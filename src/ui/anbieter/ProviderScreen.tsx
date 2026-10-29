@@ -6,7 +6,8 @@
 import { type MouseEvent, useMemo, useRef } from "react";
 import { type ProviderRow, providerRows } from "../../domain/directory.ts";
 import { applyFilters, EMPTY_FILTER } from "../../domain/filter.ts";
-import { countProviders, viewNarrows } from "../../domain/provider-count.ts";
+import { viewNarrows } from "../../domain/map-view.ts";
+import { countProviders } from "../../domain/provider-count.ts";
 import { EmptyState, ListPending, NoOffers } from "../ListView.tsx";
 import { BellButton } from "../OfferCard.tsx";
 import type { ProviderScreenProps } from "../provider-types.ts";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countProviders, isKnownProvider, isOutside, viewNarrows } from "./provider-count.ts";
+import { countProviders, isKnownProvider } from "./provider-count.ts";
 import { fixtureSiteOffers, fixturePublicId as pid } from "./test-fixtures.ts";
 
 describe("countProviders (Plan 0010, E4)", () => {
@@ -22,23 +22,6 @@ describe("countProviders (Plan 0010, E4)", () => {
     const view = { inView: new Set([treff]), known: new Set([treff, theater]) };
     expect(countProviders(offers, view)).toBe(4);
     expect(countProviders(offers, undefined)).toBe(5);
-  });
-});
-
-describe("Kartenausschnitt (Plan 0055, E2, E4)", () => {
-  const view = { inView: new Set(["a"]), known: new Set(["a", "b"]) };
-
-  it("außerhalb ist nur, wer einen bekannten Ort hat und keinen im Ausschnitt", () => {
-    expect(isOutside(view, "a")).toBe(false);
-    expect(isOutside(view, "b")).toBe(true);
-    expect(isOutside(view, "ohne-ort")).toBe(false);
-    expect(isOutside(undefined, "b")).toBe(false);
-  });
-
-  it("schränkt ein, sobald ein bekannter Anbieter außerhalb liegt", () => {
-    expect(viewNarrows(view)).toBe(true);
-    expect(viewNarrows({ inView: new Set(["a", "b"]), known: new Set(["a", "b"]) })).toBe(false);
-    expect(viewNarrows(undefined)).toBe(false);
   });
 });
 

@@ -6,12 +6,11 @@
  */
 import type { ComponentType } from "react";
 import type { StartCamera } from "../domain/camera.ts";
+import type { Bounds, MapExtent } from "../domain/map-view.ts";
 import type { Place } from "../domain/places.ts";
-import type { ProviderView } from "../domain/provider-count.ts";
-import type { Bounds, ProviderPlace } from "../domain/provider-places.ts";
-import type { Origin, ReachFn } from "../domain/reach.ts";
+import type { ProviderPlace } from "../domain/provider-places.ts";
+import type { Origin } from "../domain/reach.ts";
 import type { ProviderDirectoryData, SiteOffer } from "../domain/site-data.ts";
-import type { AgeEscape } from "./ListView.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import type { ToastMessage } from "./Toast.tsx";
 
@@ -22,20 +21,17 @@ export interface MapScreenProps {
   /** Datenbasis des Startausschnitts: alle kommenden Angebote, ohne Filter, Alter, Startpunkt (ADR 0008) */
   cameraOffers: readonly SiteOffer[];
   origin: Origin | undefined;
-  /** Wegzeit bzw. Luftlinie zum Sortieren der Orts-Liste; `undefined` ohne Startpunkt oder solange sie lädt */
-  reach: ReachFn | undefined;
   dark: boolean;
-  hasData: boolean;
-  /** Kacheln im Orts-Sheet; `reachOf` auch für die Orts-Liste */
+  /** Kacheln im Orts-Sheet */
   ctx: CardContext;
   /** Kurzmeldung für das Orts-Sheet (der Seiten-Toast liegt hinter dem Modal) */
   toast: ToastMessage;
   /** Orts-Sheet auf oder zu: Der Seiten-Toast schweigt dann (App) */
   onSheetOpen: (open: boolean) => void;
-  /** nur mit aktiven URL-Filtern */
-  onResetFilter: (() => void) | undefined;
-  /** nur, wenn der Altersfilter etwas ausblendet (Plan 0021, E4) */
-  age: AgeEscape | undefined;
+  /** Kartenausschnitt nach `placeKey` für die Liste darunter (Plan 0056, E5); `undefined` beim Abbau und bei Fehlern */
+  onInView: (view: MapExtent | undefined) => void;
+  /** Zähler: Jede Änderung setzt die Kamera auf den Startausschnitt („Alle zeigen“) */
+  resetKey: number;
 }
 
 /** Props der Anbieterkarte (karte/ProviderMapScreen.tsx, Plan 0055, E5), durchgereicht von `ProviderMapPanel` */
@@ -57,7 +53,7 @@ export interface ProviderMapScreenProps {
   /** öffnet das Anbieter-Sheet; der Fokus kehrt danach an die Karte zurück (E4) */
   onOpenProvider: (providerId: string) => void;
   /** Kartenausschnitt nach jedem `moveend`; `undefined` beim Abbau und bei einem Kartenfehler (Review M4) */
-  onInView: (view: ProviderView | undefined) => void;
+  onInView: (view: MapExtent | undefined) => void;
   /** Orts-Sheet auf oder zu: Der Seiten-Toast schweigt dann (App) */
   onSheetOpen: (open: boolean) => void;
   /** Kurzmeldung für das Orts-Sheet (Glocke; der Seiten-Toast liegt hinter dem Modal) */

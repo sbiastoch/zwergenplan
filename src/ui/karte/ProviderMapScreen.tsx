@@ -3,9 +3,9 @@
  * Zuständen und das Orts-Sheet. Die Karte selbst (map/MapView.tsx) lädt erst von hier. Meldet den Ausschnitt an die
  * Liste (`onInView`); ohne Karte (WebGL, Kacheln, Chunk) meldet sie `undefined`, und die Liste zeigt alle.
  */
-import { type ComponentType, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ComponentType, useCallback, useEffect, useMemo, useState } from "react";
+import type { Bounds } from "../../domain/map-view.ts";
 import {
-  type Bounds,
   mapUpcoming,
   providerCamera,
   providerGeometry,
@@ -17,6 +17,7 @@ import { Dialog } from "../Dialog.tsx";
 import { LoadFailed, useLazy } from "../Lazy.tsx";
 import type { MapLayer, MapProblem, MapViewProps, ProviderMapScreenProps } from "../map-types.ts";
 import { ProviderPlaceSheet } from "./ProviderPlaceSheet.tsx";
+import { useInViewReport } from "./use-in-view.ts";
 
 async function loadMapView(): Promise<ComponentType<MapViewProps>> {
   return (await import("../map/MapView.tsx")).MapView;
@@ -26,8 +27,6 @@ const NOTES: Record<MapProblem, string> = {
   webgl: "Dein Browser kann die Karte nicht zeigen.",
   kacheln: "Kartenbilder lassen sich gerade nicht laden.",
 };
-
-const sameSet = (a: ReadonlySet<string>, b: ReadonlySet<string>) => a.size === b.size && [...a].every((x) => b.has(x));
 
 export function ProviderMapScreen(props: ProviderMapScreenProps) {
   const { directory, offers, visible, now, onInView, onSheetOpen, onOpenProvider } = props;
@@ -54,30 +53,9 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
   const place = places.find((p) => p.key === placeKey);
   const state = module.kind === "fehler" || problem ? "fehler" : ready && module.kind === "da" ? "bereit" : "laden";
 
-  // Ausschnitt: nur bei einer Änderung der Menge melden, das spart Re-Render der Liste (E4)
-  const bounds = useRef<Bounds>(undefined);
-  const reported = useRef<ReadonlySet<string>>(undefined);
-  const report = useCallback(() => {
-    if (!bounds.current) return;
-    const inView = providersInBounds(geometry, bounds.current);
-    if (reported.current && sameSet(reported.current, inView)) return;
-    reported.current = inView;
-    onInView({ inView, known });
-  }, [geometry, known, onInView]);
-  // neue Geometrie (Datenstand, Mitternacht): neu rechnen, ohne auf die nächste Bewegung zu warten
-  useEffect(() => {
-    reported.current = undefined;
-    report();
-  }, [report]);
-  // Fehler und Abbau: kein veralteter Ausschnitt filtert die Liste (Review M4)
-  const failed = state === "fehler";
-  useEffect(() => {
-    if (!failed) return;
-    bounds.current = undefined;
-    reported.current = undefined;
-    onInView(undefined);
-  }, [failed, onInView]);
-  useEffect(() => () => onInView(undefined), [onInView]);
+  // Ausschnitt an die Liste (E4); neue Geometrie (Datenstand, Mitternacht) rechnet sofort neu
+  const inBounds = useCallback((bounds: Bounds) => providersInBounds(geometry, bounds), [geometry]);
+  const onViewport = useInViewReport(inBounds, known, state === "fehler", onInView);
 
   useEffect(() => {
     onSheetOpen(place !== undefined);
@@ -113,10 +91,7 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
             }}
             onReady={() => setReady(true)}
             onProblem={setProblem}
-            onViewport={(next) => {
-              bounds.current = next;
-              report();
-            }}
+            onViewport={onViewport}
             resetKey={props.resetKey}
           />
         )}

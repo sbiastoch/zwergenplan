@@ -286,7 +286,7 @@ test.describe("Karte der Merkliste (Plan 0025, E4)", () => {
       .getByRole("group", { name: "Darstellung der Merkliste" })
       .getByRole("button", { name: "Karte", exact: true })
       .click();
-    await expect(page.locator(".places")).toBeVisible();
+    await expect(page.locator(".map-box")).toBeVisible();
     await expect.poll(() => requests.length).toBe(1);
     await mapSettled(page);
     // zurück zur Liste und wieder zur Karte: kein zweiter Request
@@ -298,7 +298,7 @@ test.describe("Karte der Merkliste (Plan 0025, E4)", () => {
       .getByRole("group", { name: "Darstellung der Merkliste" })
       .getByRole("button", { name: "Karte", exact: true })
       .click();
-    await expect(page.locator(".places")).toBeVisible();
+    await expect(page.locator(".map-box")).toBeVisible();
     await page.waitForTimeout(300);
     expect(requests).toHaveLength(1);
   });
@@ -320,7 +320,7 @@ test.describe("Gespeicherter Stadtteil", () => {
     const sheet = await openKidSheet(page);
     await sheet.getByRole("button", { name: "Fertig" }).click();
     await page.getByRole("button", { name: "Karte", exact: true }).click();
-    await expect(page.locator(".places")).toBeVisible();
+    await expect(page.locator(".map-box")).toBeVisible();
     await page.waitForTimeout(300);
     expect(requests).toHaveLength(1);
     expect(lines).toHaveLength(1);
