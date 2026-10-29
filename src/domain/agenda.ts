@@ -48,12 +48,11 @@ export function nextSession(offer: Offer, now: Date): Session | undefined {
  * mehr einsteigen. Ohne Anmeldung kann man es, regelmäßige Angebote laufen ohnehin.
  */
 export function startedCourse(offer: Offer, now: Date): boolean {
-  const [first] = offer.sessions;
+  // ohne Termin ist `Date.parse("")` NaN, der Vergleich also falsch; kurz gehalten, der Service Worker lädt es mit
   return (
     offer.format === "kurs" &&
     offer.registration === "mit-anmeldung" &&
-    first !== undefined &&
-    Date.parse(first.start) <= now.getTime()
+    Date.parse(offer.sessions[0]?.start ?? "") <= +now
   );
 }
 
