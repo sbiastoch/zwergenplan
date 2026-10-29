@@ -1,6 +1,6 @@
 # Plan 0054 – Abos mit Glocke: Anbieter und Suchen abonnieren
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-10-29
 
 ## Anlass
@@ -85,13 +85,25 @@ Nicht-Ziele:
 - **Offline** (Review M3): In `startChunks` (`vite.config.ts:94`) kommt das Modul `/\/src\/ui\/app-extras\/AppSection\.tsx$/`, denn die Muster treffen Module, keine Dateinamen (Review 2, Nr. 5). `precacheList` zieht dessen statische Imports mit (`scripts/vite-sw.ts:85-90`), also auch Push-Code und Geräte-Speicher. Der Service Worker precacht den Chunk bei der Installation, und ein `import()` offline scheitert nicht und vergiftet keinen Chunk. Das ändert ADR 0013 (Precache-Liste) und ADR 0027, Zeile 29 („Die Precache-Liste … ändert sich nicht“). Beides steht in ADR 0037, `scripts/vite-sw.test.ts:44` zieht nach.
 - **Request-Invariante**: Der Chunk-Request hängt am Tipp, nicht am Gespeicherten. Er kommt bei jedem Glocken-Tipp, egal ob und was abonniert ist und ob Push an ist. Nach dem Precache kommt er ohnehin aus dem Cache. Das E2E zählt es (S7).
 
-**E5 – Rückmeldung.**
-- Der Toast kommt **sofort** neutral: „Anbieter abonniert.“, „Suche abonniert.“ bzw. „Abo beendet.“
-- Liefert `syncPushLater()` „aus“, ersetzt ein Hinweis den Toast (`tone: "hint"`, Dauer `LONG_TOAST_MS`, 6 s, weil er etwa 80 Zeichen hat): „Abonniert. Für Push-Nachrichten: Einstellungen › Wöchentliche Push-Nachricht.“
-- Der Hinweis ersetzt nur den eigenen Toast: `say` (`use-app-state.ts`) gibt eine Sequenznummer zurück. Der Hinweis kommt nur, wenn seitdem kein anderer Toast kam (Review 2, Nr. 8).
-- Bei „nein“ (kein Push möglich, etwa Safari-Tab ohne Installation) und bei `undefined` bleibt der neutrale Text.
-- Die Texte baut eine reine Funktion `aboToast(kind, push)` in `src/ui/format.ts` mit Unit-Test. Dazu kommen die Fälle der Suche: „voll“ (`MAX_SEARCHES`) und „Wegzeit wirkt erst mit Startpunkt“.
-- Die Glocke fragt **nie** selbst nach der Push-Erlaubnis. Die Erlaubnis bleibt am Schalter (ADR 0014, Punkt 4; U2).
+**E5 – Glocke bei ausgeschaltetem Push: Push gleich einschalten** (Nutzerentscheidung U2, 2026-10-29).
+- **Abonnieren** bei ausgeschaltetem Push, wenn das Gerät Push kann: Der Tipp speichert das Abo und schaltet die wöchentliche Push-Nachricht ein, mit dem Erlaubnis-Dialog des Systems. Das ist derselbe Weg wie beim Schalter (`push.enable(mirrorData())`, `usePushSwitch`).
+- **Beenden** eines Abos schaltet nie etwas ein oder aus.
+- **Im Tipp** (iOS verlangt `requestPermission` noch in der Geste, Plan 0011, E12):
+  - Der App-Chunk lädt vor, sobald eine Glocke sichtbar ist (`preloadAppExtras()` aus `AppExtras.tsx`, wie `preloadProviderUi`). Dafür gibt es zwei Anlässe: Tab „Anbieter“ bzw. Anbieter-Sheet offen, oder die Glocke der Suche erscheint. Der Anlass ist die sichtbare Ansicht, nicht das Gespeicherte (ADR 0027). Der Chunk ist precacht (E4).
+  - Ist das Modul beim Tipp geladen, ruft der Handler `enable` synchron als erste Anweisung auf, wie `toggle` im Schalter.
+  - Ist es noch nicht geladen, ruft der Start-Code im Tipp `Notification.requestPermission()` synchron auf (der einzige Push-Aufruf im Start, wenige Bytes) und danach `enable`. Ist die Erlaubnis dann erteilt, braucht `enable` keinen Dialog mehr.
+  - **Spike in S3 am echten iPhone** (Nutzer): Klappt `pushManager.subscribe` nach einem `await import()`? Wenn nicht, bleibt nur der vorgeladene Weg. Ist das Modul dann noch nicht da, kommt der Hinweis-Toast unten.
+- **Verweigert** (Dialog abgelehnt oder `Notification.permission === "denied"`): Das Abo bleibt gespeichert, ein Hinweis-Toast sagt: „Abonniert. Push-Nachrichten sind in den Einstellungen des Geräts blockiert.“
+- Ist Push schon an, spiegelt die Glocke nur (`syncPushLater`, E4).
+- **Toasts** (reine Funktion `aboToast(kind, outcome)` in `src/ui/format.ts` mit Unit-Test):
+  - Push an: „Anbieter abonniert.“ bzw. „Suche abonniert.“
+  - eben eingeschaltet: „Abonniert. Die wöchentliche Push-Nachricht ist jetzt an.“ (`LONG_TOAST_MS`)
+  - verweigert oder gescheitert (`PushProblem`): Hinweis mit Grund, Texte wie `problemText` (`LONG_TOAST_MS`, `tone: "hint"`)
+  - kein Push möglich (Safari-Tab ohne Installation, „nein“): „Anbieter abonniert. Steht oben im Tab „Anbieter“.“ bzw. „Suche abonniert.“
+  - beenden: „Abo beendet.“
+  - für Suchen zusätzlich: „voll“ (`MAX_SEARCHES`) und „Wegzeit wirkt erst mit Startpunkt“
+- Während `enable` läuft, zeigt die Glocke `aria-busy` und nimmt keinen zweiten Tipp an. Der Toast kommt mit dem Ergebnis, nicht vorher (die Sequenznummer aus Review 2, Nr. 8 entfällt).
+- **Requests**: Ein Tipp, der Push einschaltet, meldet das Abo beim Push-Worker an, genau wie der Schalter. ADR 0014, Punkt 4 („Requests nur nach Tipp auf den Schalter“) erweitert ADR 0037 auf „Tipp auf Schalter oder Glocke bei ausgeschaltetem Push“.
 
 **E6 – Glocke für Suchen in der Schnellfilter-Zeile.**
 - Im Tab „Angebote“ (Liste und Karte) steht die Glocke in `QuickFilters` (`src/ui/Chrome.tsx`), als runder Icon-Chip direkt **nach** dem Chip „Filter“. `QuickFilters` rendert auch im Tab „Anbieter“ (`App.tsx:430`), darum bekommt es einen Prop `bell`, den `App` nur bei `section === "entdecken"` setzt.
@@ -129,7 +141,9 @@ Nicht-Ziele:
 - `architecture.md` (Privatsphäre, Push-Teil Zeile 100 und 120, App-Extras) und den Datenschutz-Abschnitt in `imprintPage()` (`scripts/lib/share-pages.ts`).
 - In ADR 0012 kommt eine Zeile in die Delta-Tabelle (Start-JS, App-Extras, Service Worker).
 
-## Nutzerentscheidungen (mit Empfehlung; umgesetzt wird die Empfehlung, wenn der Nutzer nichts anderes sagt)
+## Nutzerentscheidungen
+
+**Entschieden am 2026-10-29: U1 Filtern (Empfehlung), U2 Push gleich einschalten (statt Hinweis-Toast; E5 ist darauf umgeschrieben), U3 bei Bedarf auf 9,5 kB (Empfehlung).**
 
 - **U1 – Bestehende gemerkte Anbieter werden Abos** und schneiden ab sofort die Nachricht zu (Empfehlung: ja).
   - Wer bisher nur Anbieter gemerkt und keine Suche abonniert hatte, bekam alle neuen, altersgerechten Angebote. Danach bekommt er nur noch die seiner Anbieter.
