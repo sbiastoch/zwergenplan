@@ -107,6 +107,14 @@ export function activeFilterCount(state: FilterState, { limitActive }: { limitAc
   return lists + (limitActive && state.reachLimit ? 1 : 0) + (state.range ? 1 : 0);
 }
 
+/**
+ * Filter im Tab „Anbieter“ (Plan 0055, E3): nur die Kategorien. Kosten, Anmeldung, Format, Wegzeit-Grenze und Zeitraum
+ * beschreiben einzelne Termine, nicht Anbieter; sie bleiben in der URL und wirken weiter in „Entdecken“.
+ */
+export function providerFilter(state: FilterState): FilterState {
+  return { ...EMPTY_FILTER, categories: state.categories };
+}
+
 /** Schaltet einen Wert einer Dimension um und lässt alles andere unverändert. */
 export function toggleIn<D extends Dimension>(state: FilterState, dim: D, value: FilterState[D][number]): FilterState {
   const list: readonly string[] = state[dim];

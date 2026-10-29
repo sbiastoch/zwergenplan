@@ -9,6 +9,7 @@ import {
   providerRows,
 } from "./directory.ts";
 import { applyFilters, EMPTY_FILTER, type FilterState } from "./filter.ts";
+import { countProviders, type ProviderView } from "./provider-count.ts";
 import { airlineReach, type Origin, type Reach } from "./reach.ts";
 import { type SiteOffer, type SiteProvider, toProviderDirectory } from "./site-data.ts";
 import { FIXTURE_NOW, fixtureSiteOffers, loadFixtures, fixturePublicId as pid } from "./test-fixtures.ts";
@@ -283,6 +284,56 @@ describe("providerRows: gemerkte Anbieter (Plan 0025, E3)", () => {
 
   it("eine gemerkte unbekannte ID ergibt keine Zeile", () => {
     expect(rows({ saved: ["gibt-es-nicht"] }).saved).toEqual([]);
+  });
+});
+
+describe("providerRows mit Kartenausschnitt (Plan 0055, E2, E4)", () => {
+  const treff = pid("familientreff-beispiel");
+  const theater = pid("theater-beispiel");
+  const turnverein = pid("turnverein-beispiel");
+  const bibliothek = pid("stadtbibliothek-beispiel");
+  /** im Ausschnitt nur Familientreff und Bibliothek; alle Katalog-Anbieter haben einen bekannten Ort */
+  const view: ProviderView = { inView: new Set([treff, bibliothek]), known: new Set(catalog.map((p) => p.id)) };
+
+  it("filtert aktive, blasse und gemerkte Zeilen nach dem Ausschnitt", () => {
+    const result = rows({ view, saved: [theater, treff] });
+    expect(ids(result.saved)).toEqual([treff]);
+    expect(ids(result.active)).toEqual([bibliothek]);
+    expect(ids(result.idle)).toEqual([]);
+    expect(result.outside).toBe(0);
+  });
+
+  it("hiddenCount zählt nur ausgeblendete im Ausschnitt", () => {
+    const buecher: FilterState = { ...EMPTY_FILTER, categories: ["buecher"] };
+    const visible = visibleWith(buecher);
+    expect(rows({ visible }).hiddenCount).toBe(4);
+    expect(rows({ visible, view }).hiddenCount).toBe(1);
+  });
+
+  it("ein Anbieter ohne bekannten Ort bleibt (Rückfall ohne Katalog-Eintrag, Review B1)", () => {
+    const providers = catalog.filter((p) => p.id !== theater);
+    const narrow: ProviderView = { inView: new Set([treff]), known: new Set(providers.map((p) => p.id)) };
+    expect(ids(rows({ providers, view: narrow }).active)).toEqual([treff, theater]);
+  });
+
+  it("zählt Suchtreffer außerhalb", () => {
+    const result = rows({ view, query: "beispiel" });
+    expect(ids(result.active)).toEqual([bibliothek, treff]);
+    expect(result.outside).toBe(4);
+    expect(ids(result.idle)).toEqual([]);
+    expect(rows({ view, query: "turnverein" }).outside).toBe(1);
+    expect(rows({ query: "turnverein" }).outside).toBe(0);
+    expect(ids(rows({ query: "turnverein" }).idle)).toEqual([turnverein]);
+  });
+
+  it("Invariante: aktive Zeilen = countProviders(visible, view) (Review M1)", () => {
+    for (const saved of [[], [treff], [theater, bibliothek]]) {
+      for (const visible of [upcoming, visibleWith({ ...EMPTY_FILTER, categories: ["buecher"] })]) {
+        const result = rows({ visible, view, saved });
+        const activeSaved = result.saved.filter((r) => r.state === "aktiv").length;
+        expect(result.active.length + activeSaved).toBe(countProviders(visible, view));
+      }
+    }
   });
 });
 

@@ -1,0 +1,168 @@
+/**
+ * Orte der Anbieterkarte (Plan 0055, E2). Zwei getrennte Sichten:
+ * - **Geometrie** (`providerGeometry`): alle Orte aller Anbieter, ohne Filter, Alter und Suche. Daran hängen
+ *   Startausschnitt (`providerCamera`) und „im Kartenausschnitt“ (`providersInBounds`, `providersWithPlace`). So
+ *   verraten die Kachel-Requests weder Alter noch Auswahl (ADR 0008, ADR 0038).
+ * - **Darstellung** (`providerPlaces`): Marker nach `placeKey` gebündelt, mit Zustand je Anbieter nach `visible`.
+ * Nur der Karten-Chunk (`ui/karte/`) importiert dieses Modul (`lazy-domain-apart`).
+ */
+import { initialCamera, type StartCamera } from "./camera.ts";
+import { applyFilters, EMPTY_FILTER } from "./filter.ts";
+import { type GeoPoint, isGeoPoint } from "./geo.ts";
+import { placeKey } from "./place-key.ts";
+import type { SiteOffer, SiteProvider } from "./site-data.ts";
+
+interface ProviderAtPlace {
+  id: string;
+  name: string;
+  state: "aktiv" | "ohne-termine";
+}
+
+export interface ProviderPlace {
+  key: string;
+  geo: GeoPoint;
+  name: string;
+  district?: string;
+  providers: ProviderAtPlace[];
+}
+
+/** Kartenausschnitt in Grad, wie MapLibre `getBounds()` ihn liefert */
+export interface Bounds {
+  west: number;
+  south: number;
+  east: number;
+  north: number;
+}
+
+export interface ProviderGeometry {
+  points: { id: string; key: string; geo: GeoPoint }[];
+}
+
+interface PlacedVenue {
+  name: string;
+  district?: string | undefined;
+  geo: GeoPoint;
+}
+
+interface PlacedProvider {
+  id: string;
+  name: string;
+  venues: PlacedVenue[];
+}
+
+/**
+ * Kommende Angebote wie in der Anbieterliste (`ProviderScreen`): ohne Filter, ohne laufende Kurse (Plan 0053, E1).
+ * Ein Anbieter mit nur einem laufenden Kurs ist so auf Karte und Liste gleich blass (N3).
+ */
+export function mapUpcoming(offers: readonly SiteOffer[], now: Date): SiteOffer[] {
+  return applyFilters(offers, EMPTY_FILTER, { now });
+}
+
+/**
+ * Katalog-Anbieter mit ihren Orten (ohne gültiges `geo` übersprungen, E1), dazu Rückfall-Anbieter aus den Angeboten,
+ * die im Katalog fehlen (Review B1): mit den Orten ihrer Angebote, wie `fallbackEntry` in `directory.ts`.
+ */
+function placedProviders(providers: readonly SiteProvider[], offers: readonly SiteOffer[]): PlacedProvider[] {
+  const result = new Map<string, PlacedProvider>();
+  for (const p of providers) {
+    if (result.has(p.id)) continue;
+    const venues = p.venues.filter((v) => isGeoPoint(v.geo));
+    result.set(p.id, { id: p.id, name: p.name, venues });
+  }
+  const fallback = new Map<string, PlacedProvider>();
+  for (const { providerId, providerName, venue } of offers) {
+    if (result.has(providerId) || !isGeoPoint(venue.geo)) continue;
+    const entry = fallback.get(providerId) ?? { id: providerId, name: providerName, venues: [] };
+    entry.venues.push({ name: venue.name, district: venue.district, geo: venue.geo });
+    fallback.set(providerId, entry);
+  }
+  return [...result.values(), ...fallback.values()];
+}
+
+export function providerGeometry(input: {
+  providers: readonly SiteProvider[];
+  upcoming: readonly SiteOffer[];
+}): ProviderGeometry {
+  const points: ProviderGeometry["points"] = [];
+  for (const { id, venues } of placedProviders(input.providers, input.upcoming)) {
+    const seen = new Set<string>();
+    for (const { geo } of venues) {
+      const key = placeKey(geo);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      points.push({ id, key, geo });
+    }
+  }
+  return { points };
+}
+
+/** IDs der Anbieter mit mindestens einem Ort im Ausschnitt; Ränder zählen mit */
+export function providersInBounds(geometry: ProviderGeometry, bounds: Bounds): Set<string> {
+  const { west, south, east, north } = bounds;
+  return new Set(
+    geometry.points
+      .filter(({ geo }) => geo.lat >= south && geo.lat <= north && geo.lon >= west && geo.lon <= east)
+      .map((p) => p.id),
+  );
+}
+
+/** IDs der Anbieter mit mindestens einem bekannten Ort; nur die können „außerhalb des Ausschnitts“ liegen (E2) */
+export function providersWithPlace(geometry: ProviderGeometry): Set<string> {
+  return new Set(geometry.points.map((p) => p.id));
+}
+
+/** Startausschnitt: Rahmen über alle Orte; nie Startpunkt oder Stadtteil (ADR 0038) */
+export function providerCamera(geometry: ProviderGeometry): StartCamera {
+  return initialCamera(
+    geometry.points.map((p) => p.geo),
+    undefined,
+  );
+}
+
+const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "de");
+
+/**
+ * Marker der Anbieterkarte. Ein Anbieter ist `aktiv` mit einem Angebot in `visible`, `ohne-termine` ohne Angebot in
+ * `upcoming`; sonst (durch Kategorie oder Alter ausgeblendet) fehlt er, wie in der Liste. Orte nach `key`, Anbieter je
+ * Ort erst aktiv, dann ohne Termine, jeweils nach Name; Name und Stadtteil vom ersten Ort in Namensreihenfolge.
+ */
+export function providerPlaces(input: {
+  providers: readonly SiteProvider[];
+  upcoming: readonly SiteOffer[];
+  visible: readonly SiteOffer[];
+}): ProviderPlace[] {
+  const shown = new Set(input.visible.map((o) => o.providerId));
+  const coming = new Set(input.upcoming.map((o) => o.providerId));
+  interface Bucket {
+    geo: GeoPoint;
+    venues: PlacedVenue[];
+    providers: Map<string, ProviderAtPlace>;
+  }
+  const places = new Map<string, Bucket>();
+  for (const provider of placedProviders(input.providers, [...input.upcoming, ...input.visible])) {
+    const state = shown.has(provider.id) ? "aktiv" : coming.has(provider.id) ? undefined : "ohne-termine";
+    if (!state) continue;
+    for (const venue of provider.venues) {
+      const key = placeKey(venue.geo);
+      const place: Bucket = places.get(key) ?? { geo: venue.geo, venues: [], providers: new Map() };
+      place.venues.push(venue);
+      place.providers.set(provider.id, { id: provider.id, name: provider.name, state });
+      places.set(key, place);
+    }
+  }
+  return [...places.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([key, place]): ProviderPlace => {
+      const [first] = [...place.venues].sort(byName);
+      const providers = [...place.providers.values()].sort(
+        (a, b) => (a.state === b.state ? 0 : a.state === "aktiv" ? -1 : 1) || byName(a, b),
+      );
+      return {
+        key,
+        geo: place.geo,
+        name: first?.name ?? "",
+        ...(first?.district === undefined ? {} : { district: first.district }),
+        providers,
+      };
+    });
+}

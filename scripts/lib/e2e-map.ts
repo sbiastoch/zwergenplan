@@ -90,7 +90,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(MapPanel|Lazy|ReachLong)\.tsx$/,
     /^src\/ui\/(map-types|origin-state|use-transit|categories)\.ts$/,
     /^src\/data\/tiles\.ts$/,
-    /^src\/domain\/(camera|places|geo|category-look)\.ts$/,
+    /^src\/domain\/(camera|places|provider-places|geo|category-look)\.ts$/,
   ],
   // Querschnitt Layout über Breiten, Lagen und Textgrößen: nur die globale Hülle (Review 2, M1).
   // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4)
