@@ -20,6 +20,7 @@ import {
 } from "../../src/domain/labels.ts";
 import { OFFER_PARAM, PROVIDER_PARAM } from "../../src/domain/route.ts";
 import {
+  ABOUT_DATA_ID,
   IMPRINT_PATH,
   LEGACY_SHARE_DIRS,
   offerAppSearch,
@@ -343,7 +344,7 @@ const IMPRINT = {
 
 /**
  * Impressum und Datenschutz (Plan 0034, E1, E7; ADR 0028): statisch, ohne Skript, für Suchmaschinen offen. Die Fakten
- * im Datenschutz-Teil stammen aus ADR 0008 (Kacheln), 0013/0017 (Speicher im Browser) und 0014 (Push); ändert sich
+ * im Datenschutz-Teil stammen aus ADR 0008 (Kacheln), 0013/0017 (Speicher im Browser) und 0014/0037 (Push); ändert sich
  * dort etwas, muss der Text mit.
  */
 export function imprintPage(): string {
@@ -355,7 +356,7 @@ export function imprintPage(): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Impressum und Datenschutz – Zwergenplan</title>
-<meta name="description" content="Impressum und Datenschutzhinweise des Zwergenplans.">
+<meta name="description" content="Impressum, Datenschutz und wie der Zwergenplan seine Angebote findet.">
 <link rel="icon" href="${BASE}icons/icon.svg" type="image/svg+xml">
 <style>${PAGE_STYLE}</style>
 </head>
@@ -366,19 +367,25 @@ export function imprintPage(): string {
 <p>Angaben gemäß § 5 DDG</p>
 <p>${name}<br>${street}<br>${city}</p>
 <p class="text">E-Mail: <a href="mailto:${email}">${email}</a></p>
+<h2 id="${ABOUT_DATA_ID}">So entsteht der Zwergenplan</h2>
+<div class="text">
+<p><strong>Anbieter.</strong> Der Zwergenplan führt eine Liste von Anbietern aus der Region, etwa Familienzentren, Bibliotheken, Museen und Vereine. Einmal pro Woche sucht eine KI im Internet nach weiteren. Ein neuer Anbieter kommt nur dazu, wenn auf seiner Website mindestens ein Angebot für Kinder unter 3 Jahren steht.</p>
+<p><strong>Angebote.</strong> Jede Nacht ruft ein Programm die Veranstaltungs- und Kursseiten dieser Anbieter ab. Eine KI (Claude von Anthropic) liest daraus Termine, Ort, Alter, Kosten und Anmeldung aus und schreibt die kurzen Beschreibungen. Programme prüfen das Ergebnis auf Form und Plausibilität, ein Mensch liest es nicht gegen.</p>
+<p><strong>Wegzeiten</strong> rechnet der Zwergenplan selbst, aus dem Fahrplan des VGN oder aus der Luftlinie. Sie sind Richtwerte.</p>
+</div>
 <h2>Hinweise</h2>
 <div class="text">
-<p><strong>Ohne Gewähr.</strong> Die Angebote stammen von den Webseiten der Anbieter. Eine KI liest sie aus und fasst sie zusammen, dabei passieren Fehler. Termine, Zeiten, Preise, Altersangaben, Orte, Beschreibungen und Wegzeiten können falsch, unvollständig oder veraltet sein. Bitte prüfe vor dem Besuch beim Anbieter, ob der Termin stattfindet und ob du dich anmelden musst.</p>
+<p><strong>Ohne Gewähr.</strong> Die Angebote stammen von den Webseiten der Anbieter. Die Texte sind KI-generiert und können Fehler enthalten. Termine, Zeiten, Preise, Altersangaben, Orte, Beschreibungen und Wegzeiten können falsch, unvollständig oder veraltet sein. Bitte prüfe vor dem Besuch beim Anbieter, ob der Termin stattfindet und ob du dich anmelden musst.</p>
 <p><strong>Fehler gefunden, Angebot vermisst?</strong> Schreib gern an <a href="mailto:${email}">${email}</a>. Das gilt auch für Anbieter, die anders oder gar nicht im Zwergenplan stehen möchten.</p>
 <p><strong>Privat und unabhängig.</strong> Der Zwergenplan ist ein nicht-kommerzielles Projekt aus Nürnberg, ohne Werbung und ohne Verbindung zu den Anbietern. Für verlinkte Seiten sind deren Betreiber verantwortlich.</p>
 </div>
 <h2>Datenschutz</h2>
 <div class="text">
 <p><strong>Verantwortlich</strong> ist ${name}, Anschrift und E-Mail wie oben.</p>
-<p><strong>Keine Cookies, kein Tracking.</strong> Geburtsdatum, Merkliste, Startpunkt und Darstellung speichert nur dein Browser auf deinem Gerät. Sie werden nicht übertragen.</p>
+<p><strong>Keine Cookies, kein Tracking.</strong> Geburtsdatum, Merkliste, Abos (Suchen und Anbieter), Startpunkt und Darstellung speichert nur dein Browser auf deinem Gerät. Sie werden nicht übertragen.</p>
 <p><strong>Hosting:</strong> Die Seite liegt bei GitHub Pages (GitHub Inc., USA). Beim Abruf verarbeitet GitHub technisch nötige Daten wie IP-Adresse und Zeitpunkt (Art. 6 Abs. 1 lit. f DSGVO).</p>
 <p><strong>Karte:</strong> Erst wenn du die Karte öffnest, lädt dein Browser Kartenkacheln von OpenFreeMap. Dabei sieht OpenFreeMap deine IP-Adresse.</p>
-<p><strong>Wöchentliche Push-Nachricht:</strong> Nur wenn du sie einschaltest (Art. 6 Abs. 1 lit. a DSGVO). Dann speichert ein eigener Dienst bei Cloudflare die Adresse deines Push-Abos und das Datum der Anmeldung. Beim An- und Abmelden sieht er deine IP-Adresse; gegen Missbrauch zählt er eine Stunde lang Anfragen je IP, nur als Prüfsumme (Hash). Zugestellt wird über den Push-Dienst deines Browsers (z. B. Apple, Google, Mozilla). Ausschalten löscht das Abo.</p>
+<p><strong>Wöchentliche Push-Nachricht:</strong> Nur wenn du sie einschaltest (Art. 6 Abs. 1 lit. a DSGVO). Dann speichert ein eigener Dienst bei Cloudflare die Adresse deines Push-Abos und das Datum der Anmeldung. Beim An- und Abmelden sieht er deine IP-Adresse; gegen Missbrauch zählt er eine Stunde lang Anfragen je IP, nur als Prüfsumme (Hash). Zugestellt wird über den Push-Dienst deines Browsers (z. B. Apple, Google, Mozilla). Welche Angebote zu deinen Abos und zum Alter passen, rechnet dein Gerät selbst aus; Abos, Alter und Startpunkt verlassen es nicht. Ausschalten löscht das Abo.</p>
 <p><strong>Links</strong> zu Google Maps und zu den Anbietern öffnen deren Seiten erst, wenn du sie antippst. Dort gelten deren Datenschutzhinweise.</p>
 <p><strong>Deine Rechte:</strong> Auskunft, Berichtigung, Löschung, Einschränkung und Widerspruch per E-Mail an die Adresse oben. Beschweren kannst du dich beim Bayerischen Landesamt für Datenschutzaufsicht.</p>
 </div>

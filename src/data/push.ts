@@ -1,9 +1,9 @@
 /**
  * Push-Abo der Wochen-Nachricht (Plan 0011, E12; Plan 0017, E6, E9; ADR 0014). Einziger Ort für `PushManager` und
- * `Notification`. Liest die Registrierung selbst (`getRegistration`, im Tipp `ready`), nur für `pushManager`;
+ * `Notification`, außer der Erlaubnis im Glocken-Tipp (`pushPermission`, `askPushPermission` in `pwa-start.ts`, ADR 0037). Liest die Registrierung selbst (`getRegistration`, im Tipp `ready`), nur für `pushManager`;
  * registrieren und aktualisieren bleibt `pwa.ts` (ADR 0014, Punkt 6). Lazy im Chunk „Als App“, nie beim App-Start.
  *
- * Der Worker bekommt nur das Abo. Geburtsdatum, Such-Abos und Startpunkt landen nur im Geräte-Speicher, für den
+ * Der Worker bekommt nur das Abo. Geburtsdatum, Such- und Anbieter-Abos und Startpunkt landen nur im Geräte-Speicher, für den
  * Zuschnitt im Service Worker. Die Umgebung ist injizierbar wie in `geolocation.ts`.
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
@@ -68,6 +68,8 @@ export interface MirrorData {
   /** rohe Liste aus `searches-store.ts` */
   searches: string | null;
   origin: string | StoredOriginPoint | undefined;
+  /** Anbieter-Abos (`publicId`, bereinigt, Plan 0054, E3); leer löscht den Schlüssel */
+  providers: readonly string[];
 }
 
 /** `data-sw="aus"` (gesetzt von `start()` in `pwa.ts`) beobachten; Kanal in docs/architecture.md (App-Extras) */
@@ -112,7 +114,7 @@ async function sha256Hex(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-const MIRRORED = ["birthDate", "searches", "origin"] as const;
+const MIRRORED = ["birthDate", "searches", "origin", "providers"] as const;
 
 /**
  * Kann dieses Gerät Push (Plan 0033, E1, E8)? Für den App-Schritt des Onboardings. Anders als `support()` ohne Blick auf
@@ -134,6 +136,12 @@ export function createPush(env: PushEnv = browserEnv()) {
    * also schreibt es Startpunkt und Such-Abos neu, obwohl Push aus ist (CI-Lauf 37765545767, E6).
    */
   let mirroring = false;
+  /**
+   * Zählt jedes Ausschalten und Leeren (Plan 0054, E4). Wer nach einem `await` `mirroring` wieder setzt, prüft vorher,
+   * ob sich die Zahl geändert hat; sonst setzte ein Spiegeln nach dem Glocken-Tipp, dessen `subscription()` erst nach
+   * dem Leeren antwortet, das Flag zurück und füllte den Speicher, obwohl Push aus ist.
+   */
+  let generation = 0;
 
   const post = (path: string, method: "POST" | "DELETE", body: unknown) =>
     env.fetch(`${env.workerUrl}${path}`, { method, body: JSON.stringify(body) });
@@ -153,6 +161,7 @@ export function createPush(env: PushEnv = browserEnv()) {
 
   const clearAll = async () => {
     mirroring = false;
+    generation++;
     written.clear();
     await env.store.clear();
   };
@@ -161,7 +170,8 @@ export function createPush(env: PushEnv = browserEnv()) {
     for (const key of MIRRORED) {
       // nach jedem `await` neu prüfen: das Ausschalten kann dazwischenkommen
       if (!mirroring) return;
-      const value = data[key] ?? undefined;
+      const raw = data[key];
+      const value = Array.isArray(raw) && raw.length === 0 ? undefined : (raw ?? undefined);
       const text = JSON.stringify(value) ?? "";
       if (written.get(key) === text) continue;
       await env.store.set(key, value);
@@ -233,6 +243,7 @@ export function createPush(env: PushEnv = browserEnv()) {
     async disable(): Promise<void> {
       // vor dem ersten `await`: Ab jetzt schreibt kein Spiegeln mehr, auch keins, das schon läuft
       mirroring = false;
+      generation++;
       const sub = await this.subscription();
       if (sub) {
         await sub.unsubscribe().catch(() => false);
@@ -247,7 +258,9 @@ export function createPush(env: PushEnv = browserEnv()) {
      * damit es beim nächsten Öffnen erneut versucht wird.
      */
     async reconcile(data: MirrorData): Promise<boolean> {
+      const start = generation;
       const sub = await this.subscription();
+      if (start !== generation) return false;
       if (!sub) {
         await clearAll();
         return false;
@@ -257,6 +270,7 @@ export function createPush(env: PushEnv = browserEnv()) {
         if (typeof stored === "string") await forget(stored);
         await env.store.set("endpoint", sub.endpoint);
       }
+      if (start !== generation) return false;
       mirroring = true;
       await mirror(data);
       return true;
@@ -267,13 +281,16 @@ export function createPush(env: PushEnv = browserEnv()) {
     /**
      * Einmal am Ende des Onboardings (Plan 0035, E9): Mit Abo die Angaben in den Geräte-Speicher spiegeln, sonst nichts.
      * Anders als `reconcile` kein Request und ohne Abo kein Leeren. Ohne `PushManager` (Safari-Tab) nicht einmal ein
-     * Blick auf die Registrierung (Review Runde 2, m5).
+     * Blick auf die Registrierung (Review Runde 2, m5). Auch nach jedem Glocken-Tipp (Plan 0054, E4); das Ergebnis sagt,
+     * ob Push an ist („nein“: das Gerät kann kein Push).
      */
-    async mirrorIfSubscribed(data: MirrorData): Promise<void> {
-      if (!env.hasPushManager) return;
-      if (!(await this.subscription())) return;
+    async mirrorIfSubscribed(data: MirrorData): Promise<"an" | "aus" | "nein"> {
+      if (!env.hasPushManager) return "nein";
+      const start = generation;
+      if (!(await this.subscription()) || start !== generation) return "aus";
       mirroring = true;
       await mirror(data);
+      return "an";
     },
 
     /** Geräte-Kennung für den Testversand: die ersten 8 Zeichen des SHA-256 des Endpoints (Schlüssel im Worker) */

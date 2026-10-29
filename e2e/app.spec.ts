@@ -45,6 +45,10 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
   await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
   const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
   await expect(sheet.getByRole("link", { name: "Impressum und Datenschutz" })).toHaveAttribute("href", "/impressum/");
+  await expect(sheet.getByRole("link", { name: "So entsteht der Zwergenplan" })).toHaveAttribute(
+    "href",
+    "/impressum/#so-entsteht",
+  );
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
 
@@ -59,9 +63,48 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
   await expect(mail).toHaveCount(2);
   await expect(mail.first()).toHaveAttribute("href", "mailto:info@zwergenplan.app");
   await expect(page.getByRole("heading", { level: 2, name: "Hinweise" })).toBeVisible();
-  await expect(page.getByText(/Eine KI liest sie aus/)).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "So entsteht der Zwergenplan" })).toBeVisible();
+  await expect(page.getByText(/Texte sind KI-generiert und können Fehler enthalten/)).toBeVisible();
   await expect(page.getByRole("heading", { level: 2, name: "Datenschutz" })).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+});
+
+test("Glocke der Suche (Plan 0054, E6): erst mit Filter, abonniert über das Neuladen, beim sechsten Abo „voll“", async ({
+  page,
+}) => {
+  const bell = page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ });
+  await expect(bell).toHaveCount(0);
+  await page.getByRole("button", { name: "Kurse", exact: true }).click();
+  await expect(page).toHaveURL(/\?format=kurs$/);
+  await expect(page.getByRole("button", { name: "Suche „Kurs“ abonnieren" })).toHaveAttribute("aria-pressed", "false");
+  // die Glocke ist kein Filter: außerhalb der Gruppe „Schnellfilter“
+  await expect(
+    page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: /abonnieren/ }),
+  ).toHaveCount(0);
+  await bell.click();
+  await expect(bell).toHaveAttribute("aria-pressed", "true");
+  // ohne Push (headless) bleibt es beim Abo; der Rest des Texts hängt am Push-Zustand (E5)
+  await expect(page.getByText(/^Suche abonniert/)).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["format=kurs"]');
+  await page.reload();
+  await expect(bell).toHaveAttribute("aria-pressed", "true");
+  // in den anderen Tabs keine Glocke der Suche
+  await page
+    .getByRole("navigation", { name: "Hauptnavigation" })
+    .getByRole("button", { name: /^Anbieter/ })
+    .click();
+  await expect(bell).toHaveCount(0);
+
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "zwergenplan.such-abos",
+      JSON.stringify(["kat=musik", "kat=natur", "kat=buehne", "kat=babykurse", "kat=buecher"]),
+    ),
+  );
+  await page.goto("./?format=einmalig");
+  await bell.click();
+  await expect(page.getByText("Höchstens 5 Such-Abos. Erst eins entfernen.")).toBeVisible();
+  await expect(bell).toHaveAttribute("aria-pressed", "false");
 });
 
 test("Schnellfilter und Sticker stehen in der URL und überleben ein Neuladen", async ({ page }) => {

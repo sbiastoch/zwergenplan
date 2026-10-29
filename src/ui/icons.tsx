@@ -6,6 +6,7 @@ import { CATEGORY_UI } from "./categories.ts";
 const PATHS = {
   check: "m5 12 5 5 9-10",
   heart: "M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z",
+  bell: "M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.8 2H4.7zM10 20.5a2 2 0 0 0 4 0",
   back: "m15 5-7 7 7 7",
   next: "m9 5 7 7-7 7",
   down: "m6 9 6 6 6-6",

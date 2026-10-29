@@ -21,6 +21,21 @@ async function run(app: AppHooks) {
   await start({ ...app, lastLoad: lastSiteLoad, onLoad: onSiteLoad });
 }
 
+/**
+ * Push-Erlaubnis für den Glocken-Tipp (Plan 0054, E5), ohne Push-Code im Start: `undefined`, wenn das Gerät kein Push
+ * kann (etwa Safari-Tab ohne Installation). Läuft nur im Tipp, nie beim Start.
+ */
+export function pushPermission(): NotificationPermission | undefined {
+  // Notausgang ohne Service Worker (`data-sw="aus"`, ADR 0013): kein Push, also auch kein Erlaubnis-Dialog
+  if (typeof PushManager === "undefined" || typeof Notification === "undefined") return undefined;
+  return document.documentElement.dataset["sw"] === "aus" ? undefined : Notification.permission;
+}
+
+/** Erlaubnis-Dialog, synchron im Tipp aufrufen (iOS, Plan 0011, E12); nur nach `pushPermission() === "default"` */
+export function askPushPermission(): Promise<NotificationPermission> {
+  return Notification.requestPermission();
+}
+
 /** Startet den PWA-Kern nach `load`, einmal je Seite. Scheitert der Chunk (offline, nicht im Cache), bleibt alles wie ohne. */
 export function startPwa(app: AppHooks): void {
   if (!import.meta.env.PROD) return;

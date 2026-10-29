@@ -197,21 +197,21 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
     await expect(page.getByRole("status")).toHaveText("3 Angebote an 2 Orten gemerkt");
   },
-  // Plan 0025, E2: Anbieter-Sheet mit gedrücktem Herz neben dem längsten Namen (Kirchengemeinde, mehrzeilig)
-  "anbieter-sheet-gemerkt": async (page) => {
+  // Plan 0025, E2; Plan 0054, E1: Anbieter-Sheet mit gedrückter Glocke neben dem längsten Namen (Kirchengemeinde, mehrzeilig)
+  "anbieter-sheet-abonniert": async (page) => {
     await page
       .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
       .getByRole("button")
       .click();
     await page.getByRole("button", { name: "Mehr von diesem Anbieter" }).click();
-    const heart = page
+    const bell = page
       .getByRole("dialog", { name: "Anbieter" })
-      .getByRole("button", { name: /^Ev\.-Luth\. Kirchengemeinde.* merken$/ });
-    await heart.click();
-    await expect(heart).toHaveAttribute("aria-pressed", "true");
+      .getByRole("button", { name: /^Ev\.-Luth\. Kirchengemeinde.* abonnieren$/ });
+    await bell.click();
+    await expect(bell).toHaveAttribute("aria-pressed", "true");
   },
-  // Plan 0025, E3: Tab „Anbieter“ mit zwei gemerkten oben, einer davon ohne Termine (gestrichelt), Herz an jeder Zeile
-  "anbieter-gemerkt": async (page) => {
+  // Plan 0025, E3; Plan 0054: Tab „Anbieter“ mit zwei Abos oben, eins ohne Termine (gestrichelt), Glocke an jeder Zeile
+  "anbieter-abonniert": async (page) => {
     await page.evaluate(() =>
       localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fqq3o4y8", "fkbg3oeb"])),
     );
@@ -289,6 +289,30 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.locator(".app-pending")).toHaveCount(0);
     // Push-Teil entschieden (Plan 0017, E7): data-push in jedem Zweig, auch wenn der Abschnitt leer bleibt
     await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
+  },
+  // Plan 0054, E7: Verwaltung der Abos mit langem Such-Abo (Wegzeit ohne Startpunkt) und zwei Anbieter-Abos, eins ohne
+  // Angebote; ohne Push, also auf allen Geräten
+  "kind-sheet-abos": async (page) => {
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "zwergenplan.such-abos",
+        JSON.stringify([
+          "kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
+        ]),
+      );
+      localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fqq3o4y8", "fkbg3oeb"]));
+    });
+    await page.reload();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    const abos = page.getByRole("dialog").getByRole("region", { name: "Deine Abos" });
+    await expect(abos.getByRole("listitem")).toHaveCount(3);
+    await expect(abos).toContainText("Wegzeit wirkt ab einem Startpunkt");
+    // Name aus site.json; der Turnverein hat keine Termine (Plan 0054, E7)
+    await expect(abos).toContainText("Anbieter ohne aktuelle Angebote");
+    await expect(abos.getByRole("listitem").first()).not.toContainText("Anbieter ohne aktuelle Angebote");
+    await expect(page.locator(".app-pending")).toHaveCount(0);
+    await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
+    await abos.scrollIntoViewIfNeeded();
   },
   // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „… · Wegzeit ab Gostenhof“ (Plan 0020)
   "entdecken-wegzeit": async (page) => {

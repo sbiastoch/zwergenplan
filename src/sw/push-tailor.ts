@@ -3,7 +3,7 @@
  * Geräte-Speicher) kommt herein, damit alles ohne Browser testbar ist; `sw.ts` verdrahtet nur.
  *
  * Bei **jedem** Push: genau einmal `site.json` und `wegzeit.json` (für alle gleich, Privatsphäre), dazu Geburtsdatum,
- * Such-Abos, Startpunkt und gesehene IDs aus dem Geräte-Speicher. Alles in höchstens `timeoutMs` (iOS beendet den
+ * Such- und Anbieter-Abos, Startpunkt und gesehene IDs aus dem Geräte-Speicher. Alles in höchstens `timeoutMs` (iOS beendet den
  * Service Worker nach ≈ 10 s, Spike); nach Ablauf wird nichts mehr geschrieben.
  */
 import { filterFromSearch } from "../domain/filter.ts";
@@ -23,7 +23,7 @@ export type TailorOutcome =
   | { kind: "zeit" }
   | { kind: "fehler" };
 
-type StoreKey = "birthDate" | "searches" | "origin" | "seenIds";
+type StoreKey = "birthDate" | "searches" | "origin" | "providers" | "seenIds";
 
 export interface TailorEnv {
   timeoutMs: number;
@@ -62,13 +62,14 @@ export async function tailorPush({
   };
 
   const work = async (): Promise<TailorOutcome> => {
-    const [site, table, seen, searches, birthDate, stored] = await Promise.all([
+    const [site, table, seen, searches, birthDate, stored, providers] = await Promise.all([
       env.fetchJson("data/site.json").catch(() => undefined),
       env.fetchJson("data/wegzeit.json").catch(() => env.cachedJson("data/wegzeit.json")),
       env.store.get("seenIds"),
       env.store.get("searches"),
       env.store.get("birthDate"),
       env.store.get("origin"),
+      env.store.get("providers"),
     ]);
     const offers = (site as { offers?: unknown } | undefined)?.offers;
     if (!Array.isArray(offers)) return { kind: "fehler" };
@@ -89,6 +90,7 @@ export async function tailorPush({
       fresh: siteOffers.filter((o) => freshIds.has(o.id)),
       week: offersInWeek(siteOffers, now),
       searches: parseSearches(typeof searches === "string" ? searches : null).map(filterFromSearch),
+      providers: isStringArray(providers) ? providers : undefined,
       birthDate: typeof birthDate === "string" ? birthDate : undefined,
       reach,
       now,

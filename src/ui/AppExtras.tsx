@@ -11,6 +11,8 @@
  *   Klappt „Nochmal versuchen“, geht der Fokus auf die Überschrift „Als App“ (sonst auf „Fertig“), nicht auf <body>.
  */
 import type { ReactNode, RefObject } from "react";
+import { askPushPermission, pushPermission } from "../data/pwa-start.ts";
+import type { BellPush } from "./format.ts";
 import { LoadFailed, useLazy } from "./Lazy.tsx";
 import type { AppStepModule } from "./onboarding-types.ts";
 
@@ -49,6 +51,90 @@ export async function loadAppStep(): Promise<AppStepModule> {
     import("../data/pwa.ts"),
   ]);
   return { AppStep, install, pushCapability, syncPush: syncPushMirror };
+}
+
+export type BellModule = Pick<typeof import("./app-extras/AppSection.tsx"), "syncPushMirror" | "enablePush">;
+let bell: BellModule | undefined;
+let bellLoading: Promise<BellModule> | undefined;
+
+function loadBell(): Promise<BellModule> {
+  bellLoading ??= import("./app-extras/AppSection.tsx")
+    .then(({ syncPushMirror, enablePush }) => {
+      bell = { syncPushMirror, enablePush };
+      return bell;
+    })
+    .catch((error: unknown) => {
+      bellLoading = undefined;
+      throw error;
+    });
+  return bellLoading;
+}
+
+/**
+ * Vorladen, sobald eine Glocke sichtbar ist (Plan 0054, E5): Dann ruft ein Tipp `enablePush` synchron auf. Der Anlass ist
+ * die Ansicht, nicht das Gespeicherte (ADR 0037); der Chunk ist precacht (E4).
+ */
+export function preloadBell(): void {
+  void loadBell().catch(() => undefined);
+}
+
+/**
+ * `PushError.problem` aus dem Chunk. Kein `instanceof PushError`: `src/data/push.ts` darf nicht statisch in den Start
+ * (`app-data-only-lazy`).
+ */
+const problemOf = (error: unknown): BellPush => {
+  const problem = error instanceof Error && "problem" in error ? error.problem : undefined;
+  return problem === "verweigert" || problem === "netz" || problem === "server" ? problem : "abo";
+};
+
+/** Was `bellPushWith` braucht; im Unit-Test ersetzt */
+export interface BellEnv {
+  permission: () => NotificationPermission | undefined;
+  ask: () => Promise<NotificationPermission>;
+  /** schon geladenes Modul, sonst `undefined` */
+  loaded: () => BellModule | undefined;
+  load: () => Promise<BellModule>;
+}
+
+/**
+ * Nach dem Tipp auf eine Glocke (Plan 0054, E4, E5), **synchron im Tipp-Handler** aufrufen. Beim Beenden eines Abos und
+ * bei laufendem Push nur spiegeln (lokal, ohne Request). Neues Abo bei ausgeschaltetem Push: einschalten wie der
+ * Schalter. Fehlt die Erlaubnis noch, kommt die Abfrage als erster Aufruf im Tipp, sonst verliert iOS die
+ * Nutzeraktivierung (Plan 0011, E12): mit geladenem Modul `enablePush`, sonst `ask`. Ist sie schon erteilt und Push
+ * aus (Schalter abgeschaltet), läuft `enablePush` erst nach dem Spiegeln; ob iOS das ohne Geste annimmt, prüft der
+ * Spike am iPhone (E5). `undefined`: Der Chunk ließ sich nicht laden.
+ */
+export function bellPushWith(subscribed: boolean, env: BellEnv): Promise<BellPush | undefined> {
+  const enable = (m: BellModule) =>
+    m.enablePush().then(
+      (): BellPush => "eingeschaltet",
+      (error: unknown) => problemOf(error),
+    );
+  let result: Promise<BellPush | undefined>;
+  const ready = env.loaded();
+  if (subscribed && env.permission() === "default") {
+    if (ready) result = enable(ready);
+    else {
+      const asked = env.ask();
+      result = asked.then((answer) => (answer === "granted" ? env.load().then(enable) : "verweigert"));
+    }
+  } else {
+    result = env.load().then(async (m) => {
+      const state = await m.syncPushMirror();
+      if (state !== "aus" || !subscribed) return state;
+      return env.permission() === "denied" ? "verweigert" : enable(m);
+    });
+  }
+  return result.catch(() => undefined);
+}
+
+export function bellPush(subscribed: boolean): Promise<BellPush | undefined> {
+  return bellPushWith(subscribed, {
+    permission: pushPermission,
+    ask: askPushPermission,
+    loaded: () => bell,
+    load: loadBell,
+  });
 }
 
 /**

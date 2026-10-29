@@ -12,6 +12,9 @@ import { routeToSearch } from "./route.ts";
 export const SHARE_DIRS = { offer: "a", provider: "p" } as const;
 /** Impressum und Datenschutz, statische Seite neben den Vorschauseiten (Plan 0034, E1, E2); relativ zur Basis */
 export const IMPRINT_PATH = "impressum/";
+/** Abschnitt „So entsteht der Zwergenplan“ im Impressum: Herkunft der Daten und KI-Hinweis */
+export const ABOUT_DATA_ID = "so-entsteht";
+export const ABOUT_DATA_PATH = `${IMPRINT_PATH}#${ABOUT_DATA_ID}`;
 /** Ordner bis ADR 0022 – nur noch Weiterleitungsregeln in `404.html` */
 export const LEGACY_SHARE_DIRS = { offer: "angebot", provider: "anbieter" } as const;
 

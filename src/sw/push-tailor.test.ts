@@ -103,7 +103,23 @@ describe("tailorPush", () => {
       birthDate: "2025-08-05",
     });
     const result = await run(e);
-    expect(result.kind === "text" && result.text.title).toBe("2 neue Angebote für deine Suchen");
+    expect(result.kind === "text" && result.text.title).toBe("2 neue Angebote für deine Abos");
+  });
+
+  it("liest die Anbieter-Abos aus dem Geräte-Speicher (Plan 0054, E3)", async () => {
+    const provider = offers.find((o) => o.id === id("musikgarten-1"))?.providerId;
+    const { e } = env({ seenIds: without("musikgarten-1", "krabbelreime"), providers: [provider] });
+    const result = await run(e);
+    expect(result.kind === "text" && result.text).toMatchObject({
+      title: "1 neues Angebot von deinen Anbietern",
+      hits: [id("musikgarten-1")],
+    });
+  });
+
+  it("ein kaputter Wert für Anbieter-Abos zählt als keins", async () => {
+    const { e } = env({ seenIds: without("musikgarten-1", "krabbelreime"), providers: "kaputt" });
+    const result = await run(e);
+    expect(result.kind === "text" && result.text.title).toBe("2 neue Angebote im Zwergenplan");
   });
 
   it("Abo mit Wegzeit ab einem Stadtteil: die Musikschule (29,6 Min.) fällt heraus", async () => {

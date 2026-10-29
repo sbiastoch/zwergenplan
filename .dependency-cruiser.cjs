@@ -206,9 +206,9 @@ module.exports = {
       // auch src/main.tsx (Arch-Review Stufe 1, H9): der Einstieg ist genauso Start-Bundle
       from: {
         path: "^src/(ui|data)/|^src/main\\.tsx$",
-        pathNot: ["^src/ui/app-extras/", "^src/data/(pwa|push|device-store|searches-store)\\.ts$", "\\.test\\.ts$"],
+        pathNot: ["^src/ui/app-extras/", "^src/data/(pwa|push|device-store)\\.ts$", "\\.test\\.ts$"],
       },
-      to: { path: "^src/data/(pwa|push|device-store|searches-store)\\.ts$", dependencyTypesNot: ["dynamic-import"] },
+      to: { path: "^src/data/(pwa|push|device-store)\\.ts$", dependencyTypesNot: ["dynamic-import"] },
     },
     {
       name: "onboarding-ui-only-lazy",
@@ -238,10 +238,10 @@ module.exports = {
       name: "onboarding-apart-from-app",
       severity: "error",
       comment:
-        "Onboarding- und App-Chunk teilen kein Modul, das nur sie nutzen (Plan 0033, E4, Review M2): Rolldown legte es als eigenen Chunk direkt nach assets/ (Chunk-Wächter). Den App-Teil (Installationszustand, pushCapability, AppStep) reicht der Lader als Prop herein; aus PWA-Kern, Push, Geräte-Speicher, Such-Abos und deren Domäne nur Typen.",
+        "Onboarding- und App-Chunk teilen kein Modul, das nur sie nutzen (Plan 0033, E4, Review M2): Rolldown legte es als eigenen Chunk direkt nach assets/ (Chunk-Wächter). Den App-Teil (Installationszustand, pushCapability, AppStep) reicht der Lader als Prop herein; aus PWA-Kern, Push, Geräte-Speicher und deren Domäne nur Typen. Such-Abos liegen seit Plan 0054 (E6) im Start.",
       from: { path: "^src/(ui/onboarding/|domain/onboarding\\.ts$)" },
       to: {
-        path: "^src/(data/(pwa|push|device-store|searches-store)|domain/(pwa|searches|stored-origin))\\.ts$",
+        path: "^src/(data/(pwa|push|device-store)|domain/(pwa|stored-origin))\\.ts$",
         dependencyTypesNot: ["type-only"],
       },
     },
@@ -347,9 +347,9 @@ module.exports = {
       name: "pwa-core-no-push",
       severity: "error",
       comment:
-        "Kein Push-Code beim App-Start (Plan 0017, E9): Der PWA-Kern src/data/pwa.ts läuft nach jedem load und importiert Push, Geräte-Speicher und Such-Abos nicht, auch nicht per import() (der geteilte Chunk schriebe __vite__mapDeps in den Einstieg). Arch-Review 0017, N6.",
+        "Kein Push-Code beim App-Start (Plan 0017, E9): Der PWA-Kern src/data/pwa.ts läuft nach jedem load und importiert Push und Geräte-Speicher nicht, auch nicht per import() (der geteilte Chunk schriebe __vite__mapDeps in den Einstieg). Arch-Review 0017, N6.",
       from: { path: "^src/data/pwa(-start)?\\.ts$" },
-      to: { path: "^src/data/(push|device-store|searches-store)\\.ts$" },
+      to: { path: "^src/data/(push|device-store)\\.ts$" },
     },
     {
       name: "web-push-only-in-push-weekly",
@@ -370,17 +370,12 @@ module.exports = {
       name: "push-domain-not-in-start",
       severity: "error",
       comment:
-        "Domäne der Wochen-Nachricht (Plan 0017, E9): news.ts nutzen nur Service Worker und CI, searches.ts und stored-origin.ts dazu die App-Extras-Oberfläche (Lazy-Chunk). Aus dem übrigen src/ landeten sie im Start-Bundle, das keinen Platz hat. scripts/ bleibt frei; Tests ausgenommen.",
+        "Domäne der Wochen-Nachricht (Plan 0017, E9): news.ts nutzen nur Service Worker und CI, stored-origin.ts dazu die App-Extras-Oberfläche (Lazy-Chunk). Aus dem übrigen src/ landeten sie im Start-Bundle. searches.ts liegt seit Plan 0054 (E6, ADR 0037) im Start: Die Glocke über der Liste braucht es. scripts/ bleibt frei; Tests ausgenommen.",
       from: {
         path: "^src/",
-        pathNot: [
-          "^src/sw/",
-          "^src/ui/app-extras/",
-          "^src/domain/(news|searches|stored-origin)\\.ts$",
-          "\\.test\\.ts$",
-        ],
+        pathNot: ["^src/sw/", "^src/ui/app-extras/", "^src/domain/(news|stored-origin)\\.ts$", "\\.test\\.ts$"],
       },
-      to: { path: "^src/domain/(news|searches|stored-origin)\\.ts$" },
+      to: { path: "^src/domain/(news|stored-origin)\\.ts$" },
     },
     {
       name: "push-news-not-in-app",

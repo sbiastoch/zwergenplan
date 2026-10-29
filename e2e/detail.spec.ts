@@ -39,6 +39,12 @@ test("öffnet per Kachel, steht in der URL, Zurück-Geste schließt", async ({ p
   await expect(page).toHaveURL(/angebot=/);
   await expect(dialog.getByText("Kurs mit 8 Terminen")).toBeVisible();
   await expect(dialog.getByText("Di 13.10. bis Di 1.12., jeweils 9:30–11:00")).toBeVisible();
+  // KI-Hinweis ganz unten, verlinkt auf die Erklärung im Impressum
+  await expect(dialog.getByText(/hat eine KI .* übernommen, Fehler sind möglich/)).toBeAttached();
+  await expect(dialog.getByRole("link", { name: "So entsteht der Zwergenplan" })).toHaveAttribute(
+    "href",
+    "/impressum/#so-entsteht",
+  );
   await page.goBack();
   await expect(dialog).toBeHidden();
   await expect(page).not.toHaveURL(/angebot=/);

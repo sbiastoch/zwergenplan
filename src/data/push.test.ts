@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { createPush, type PushEnv, PushError, type PushRegistration, type PushSub, pushCapability } from "./push.ts";
+import {
+  createPush,
+  type MirrorData,
+  type PushEnv,
+  PushError,
+  type PushRegistration,
+  type PushSub,
+  pushCapability,
+} from "./push.ts";
 
 const WORKER = "https://push.example";
 const KEY = "BPUBLIC";
@@ -113,7 +121,7 @@ function fake(
   };
 }
 
-const DATA = { birthDate: "2025-08-05", searches: '["kat=musik"]', origin: "gostenhof" };
+const DATA: MirrorData = { birthDate: "2025-08-05", searches: '["kat=musik"]', origin: "gostenhof", providers: [] };
 
 describe("support", () => {
   it("ohne Registrierung ist es „kein-sw“, ohne zu warten", async () => {
@@ -344,7 +352,7 @@ describe("mirror", () => {
     f.setSub("https://web.push.apple.com/a");
     f.store.set("endpoint", "https://web.push.apple.com/a");
     const push = createPush(f.env);
-    await push.reconcile({ birthDate: undefined, searches: null, origin: undefined });
+    await push.reconcile({ birthDate: undefined, searches: null, origin: undefined, providers: [] });
     writes.length = 0;
     await push.mirror(DATA);
     expect(writes.sort()).toEqual(["birthDate", "origin", "searches"]);
@@ -396,7 +404,7 @@ describe("mirrorIfSubscribed (Plan 0035, E9): einmal am Ende des Onboardings, oh
     const writes = counted(f);
     const push = createPush(f.env);
     await push.mirrorIfSubscribed(DATA);
-    expect(writes.sort()).toEqual(["birthDate", "origin", "searches"]);
+    expect(writes.sort()).toEqual(["birthDate", "origin", "providers", "searches"]);
     expect(f.store.get("birthDate")).toBe("2025-08-05");
     expect(f.store.get("searches")).toBe('["kat=musik"]');
     expect(f.store.get("origin")).toBe("gostenhof");
@@ -450,7 +458,12 @@ describe("mirror nach dem Ausschalten (E6: geleert heißt geleert)", () => {
       await clear();
       release();
     };
-    const inFlight = push.mirror({ birthDate: undefined, searches: '["kat=natur"]', origin: "st-johannis" });
+    const inFlight = push.mirror({
+      birthDate: undefined,
+      searches: '["kat=natur"]',
+      origin: "st-johannis",
+      providers: [],
+    });
     await push.disable();
     await inFlight;
     expect(f.store.size).toBe(0);
@@ -474,5 +487,60 @@ describe("deviceId", () => {
     // printf %s 'https://web.push.apple.com/a' | sha256sum
     expect(await createPush(fake().env).deviceId("https://web.push.apple.com/a")).toMatch(/^[0-9a-f]{8}$/);
     expect(await createPush(fake().env).deviceId("x")).toBe("2d711642");
+  });
+});
+
+describe("Anbieter-Abos und Glocken-Tipp (Plan 0054, E3, E4)", () => {
+  const WITH_PROVIDERS: MirrorData = { ...DATA, providers: ["anb-a", "anb-b"] };
+
+  it("mirrorIfSubscribed spiegelt die Anbieter-Abos und meldet „an“; ein leeres Array löscht den Schlüssel", async () => {
+    const f = fake();
+    f.setSub("https://web.push.apple.com/a");
+    const push = createPush(f.env);
+    expect(await push.mirrorIfSubscribed(WITH_PROVIDERS)).toBe("an");
+    expect(f.store.get("providers")).toEqual(["anb-a", "anb-b"]);
+    expect(await push.mirrorIfSubscribed(DATA)).toBe("an");
+    expect(f.store.has("providers")).toBe(false);
+    expect(f.requests).toEqual([]);
+  });
+
+  it("mirrorIfSubscribed meldet „aus“ ohne Abo und „nein“ ohne PushManager", async () => {
+    expect(await createPush(fake().env).mirrorIfSubscribed(DATA)).toBe("aus");
+    expect(await createPush(fake({ pushManager: false }).env).mirrorIfSubscribed(DATA)).toBe("nein");
+  });
+
+  it("enable spiegelt die Anbieter-Abos mit, disable löscht sie", async () => {
+    const f = fake();
+    const push = createPush(f.env);
+    await push.enable(WITH_PROVIDERS);
+    expect(f.store.get("providers")).toEqual(["anb-a", "anb-b"]);
+    await push.disable();
+    expect(f.store.size).toBe(0);
+  });
+
+  it("ein Glocken-Spiegeln, dessen subscription() erst nach dem Leeren antwortet, schreibt nichts (Review 2, Nr. 2)", async () => {
+    const f = fake();
+    const push = createPush(f.env);
+    await push.enable(DATA);
+    // Das nächste getRegistration (das von mirrorIfSubscribed) sieht noch das alte Abo, antwortet aber erst nach clear()
+    const getRegistration = f.env.getRegistration;
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let first = true;
+    f.env.getRegistration = async () => {
+      const registration = await getRegistration();
+      if (!first || !registration) return registration;
+      first = false;
+      const old = await registration.pushManager.getSubscription();
+      await gate;
+      return { ...registration, pushManager: { ...registration.pushManager, getSubscription: async () => old } };
+    };
+    const late = push.mirrorIfSubscribed(WITH_PROVIDERS);
+    await push.disable();
+    release();
+    expect(await late).toBe("aus");
+    expect(f.store.size).toBe(0);
   });
 });

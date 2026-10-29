@@ -1,8 +1,8 @@
 /**
  * Such-Abos im `localStorage` (Plan 0017, E6), roh: Geparst wird mit `parseSearches` in der Oberfläche und im
  * Service Worker, damit `src/data` hier keine Domänenlogik braucht. Nur auf dem Gerät; nie in URL, Logs oder Requests.
- * Lazy (Chunk „Als App“), nicht in `preferences.ts`: Das Start-Bundle hat keinen Platz. Der Schlüssel liegt seit Plan 0035
- * (E4) wieder hier; den Namen belegt `e2e/push.spec.ts`, das ihn wörtlich liest und schreibt.
+ * Seit Plan 0054 (E6, ADR 0037) im Start, für die Glocke über der Liste und die Verwaltung im Kind-Sheet. Der Schlüssel
+ * liegt seit Plan 0035 (E4) hier; den Namen belegen `e2e/push.spec.ts` und `e2e/app.spec.ts`, die ihn wörtlich lesen.
  */
 const KEY = "zwergenplan.such-abos";
 

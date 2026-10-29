@@ -98,3 +98,9 @@ Status: **angenommen** (2026-10-06, mit Plan 0017, Schritt 7). Entwurf vom 2026-
 
 - Das Ziel eines Tipps ist die feste URL `./?sortierung=neu` (`PUSH_TARGET` in `src/domain/push-payload.ts`), für alle Geräte gleich, im `navigate` der allgemeinen Payload der CI wie der zugeschnittenen Nachricht des Service Workers. Die Begründung zur Privatsphäre (kein gerätespezifisches Ziel) gilt weiter.
 - Ist die App offen, kommt ihr Fenster nach vorn und navigiert zum Ziel (`clickPlan` in `src/sw/push-decision.ts`); der Zustand des Fensters (offenes Detail, Tab) geht dabei bewusst verloren, der Tipp soll die neuen Angebote zeigen. Unkontrollierte Fenster lehnen `navigate` ab, dann öffnet der Service Worker ein neues; scheitert die Navigation, bleibt das Fenster vorn. iOS folgt `navigate` der Nachricht selbst.
+
+## Nachtrag (2026-10-29, ADR 0037): Anbieter-Abos, Spiegeln nach Glocken-Tipp
+
+- Gespiegelt werden zusätzlich die Anbieter-Abos (`providers`), der Zuschnitt nennt ihre neuen Angebote zuerst.
+- Gespiegelt wird auch nach jedem Glocken-Tipp, nicht nur bei offenem Kind-Sheet; ein Tipp auf eine Glocke bei ausgeschaltetem Push schaltet ihn ein (Erlaubnis im Tipp, Anmeldung beim Push-Worker wie beim Schalter). Punkt 4 gilt sonst weiter: Requests an den Push-Worker nur nach einem Tipp.
+- Einzelheiten und Begründung: ADR 0037.
