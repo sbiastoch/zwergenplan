@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel auf Branch `modell-haiku-nacht`)
+Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel live seit `dde68a2`; Nachtrag 5 Token-Bremse je Modell)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -769,6 +769,16 @@ Kosten: Schätzung API-Gegenwert, nicht Abo-Preis.
 - Rückweg: Werte in `nightly.yml` zurücksetzen; die Nacht danach extrahiert wieder alles neu.
 
 **Vor dem Merge:** Trockenlauf per `workflow_dispatch` auf dem Branch (`modus=trocken`, `timeout=240`, `budget_min=180`, `max_calls=1000`, `max_tokens=20000000`). Abnahme wie die S1-Abnahme: keine Bremse, kein `budgetHit`, keine Zeitüberschreitung je Aufruf; `offers.json` aus dem Artefakt gegen `main`: Angebote je Anbieter (kein Anbieter mehr als 10 % weniger ohne erklärten Grund), gehaltene IDs (Ziel 6: mindestens 95 % der weiter bestehenden Kurse), Dubletten. Danach Merge und vor 01:30 UTC ein `workflow_dispatch` mit `modus=live` und den Grenzen aus dem Trockenlauf (verdoppelt, mindestens wie oben), damit die normale Bremse die Neuextraktion nicht abschneidet.
+
+### Nachtrag 5 (2026-10-29): Token-Bremse als Opus-Gegenwert
+
+**Anlass:** Die ersten beiden Nächte mit Haiku high (28. und 29.10.) hielt die Bremse `tokens` an (Ampel rot), nach 139 bzw. 119 Aufrufen, bei 3,35 bzw. 3,14 Mio. Tokens und einem API-Gegenwert von $0,61 bzw. $0,58. Die Grenze von 3 Mio. Tokens (E8) war für Opus bemessen. Haiku liest und schreibt je Aufruf ähnlich viele Tokens, kostet je Token aber ein Fünftel. Der Nutzer: „Die Tokenbremse ist zu konservativ. Es macht einen Unterschied, die Tokenzahl zu messen bei Haiku oder Opus.“
+
+**Änderung:** `brakeHit` (`lib/cost.ts`) zählt jeden Token mit dem Gewicht seines Modells relativ zu Opus, nach dem Listenpreis je Token: Opus 1, Sonnet 0,6, Haiku 0,2; ein unbekanntes Modell zählt wie Opus. `MAX_TOKENS` bedeutet damit „Opus-gleichwertige Tokens“; Standardwerte und Variablen bleiben. Für Opus ändert sich nichts, also auch nicht für das Entdecken (Opus high). Für den Nachtlauf mit Haiku wirkt die Grenze wie 15 Mio. echte Tokens; bindend ist dann `MAX_CALLS` (150) und das Zeitbudget (50 Min.). Die beiden Nächte hätten so etwa 0,67 bzw. 0,63 Mio. gezählt.
+
+**Begründung der Schwellenänderung:** Die Bremse soll Ausreißer bei den Kosten abfangen (E8), nicht die Arbeit eines normalen Laufs begrenzen. Gemessen an den Kosten bleibt die Grenze für jedes Modell gleich streng. Die Aufrufbremse und das Zeitbudget bleiben unverändert und halten einen Lauf weiter auf, der sich in Schleifen verfängt.
+
+**Test:** `cost.test.ts` (Gewichte je Modell, auch volle Modell-IDs), `nightly.test.ts` (Bremse mit Haiku-Aufruf).
 
 ## Review (2026-10-26) – Verdict: Überarbeiten
 

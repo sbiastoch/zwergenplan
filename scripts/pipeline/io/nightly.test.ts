@@ -389,10 +389,11 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(r.brake).toBe("aufrufe");
   });
 
-  it("Bremse MAX_TOKENS zählt Tokens ein und aus", async () => {
+  it("Bremse MAX_TOKENS zählt Tokens ein und aus, als Opus-Gegenwert", async () => {
     const dirsOf = tempData();
     const { extractor, seen } = fakeExtractor();
-    const r = await runNightly({ ...options(dirsOf, extractor), brakes: { maxCalls: 100, maxTokens: 110 } });
+    // ein Haiku-Aufruf: 110 Tokens × 0,2 = 22 Opus-gleichwertige Tokens
+    const r = await runNightly({ ...options(dirsOf, extractor), brakes: { maxCalls: 100, maxTokens: 22 } });
     expect(seen).toHaveLength(1);
     expect(r.brake).toBe("tokens");
   });

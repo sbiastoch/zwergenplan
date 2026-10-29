@@ -17,7 +17,7 @@
  *                                               Bericht runs/<heute>/nightly.json, Kosten runs/<heute>/kosten.jsonl.
  *                                               --dry-run schreibt raw/, offers.json und kosten.csv nach
  *                                               runs/<heute>/. Zeitbudget RUN_BUDGET_MIN (Standard 50), Bremsen
- *                                               MAX_CALLS (150) und MAX_TOKENS (3 Mio.) (E8). Rot nur, wenn der
+ *                                               MAX_CALLS (150) und MAX_TOKENS (3 Mio., Opus-Gegenwert) (E8). Rot nur, wenn der
  *                                               Build scheitert; die Ampel rechnet `status`. --umstellen stellt diese
  *                                               Anbieter auch bei Einbruch oder gescheiterter Seite auf V2 um (E7).
  *   nightly --build-only                        Nur Neubau von data/offers.json aus data/raw und Katalog (gleicher
