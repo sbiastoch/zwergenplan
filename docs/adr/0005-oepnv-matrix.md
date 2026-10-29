@@ -10,7 +10,8 @@ Bisher zeigt die Seite die Entfernung als Luftlinie ab dem GPS-Standort. Entsche
 - Jeder Ort kennt seine 2–3 nächsten Halte (`Venue.nearestStops`).
 - Der Browser rechnet: Fußweg zum Start-Halt + Matrix-Fahrzeit + Fußweg zum Ziel, dann das Minimum mit dem direkten Fußweg. Das geht offline und ohne Drittanbieter.
 - Der Fallback ohne GPS: Stadtteil oder Haltestelle wählen, oder auf die Karte tippen.
-  - Hinweis (Plan 0005): Statt „auf die Karte tippen“ gibt es „Kartenmitte als Startpunkt“ mit Fadenkreuz, weil ein Tipp auf der Karte schon Marker öffnet und die Kartenmitte auch per Tastatur und Bildschirmleser geht. Begründung in ADR 0008.
+  - Hinweis (Plan 0005): Statt „auf die Karte tippen“ gab es „Kartenmitte als Startpunkt“ mit Fadenkreuz, weil ein Tipp auf der Karte schon Marker öffnet und die Kartenmitte auch per Tastatur und Bildschirmleser geht. Begründung in ADR 0008.
+  - Seit ADR 0039 (Plan 0056) entfällt die Kartenmitte; ohne GPS bleibt der Stadtteil.
 
 ## Konsequenzen
 - Es ist eine Schätzung ohne Umsteige-Wartezeit, die Anzeige muss das als „ca.“ ausweisen.

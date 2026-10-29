@@ -24,8 +24,6 @@ export type OriginAction =
   | { type: "locate"; request: number }
   | { type: "located"; request: number; result: PositionResult }
   | { type: "district"; origin: Origin }
-  /** „Kartenmitte als Startpunkt“ (Plan 0005, E8); `point` schon gerundet und in Nürnberg */
-  | { type: "mapCenter"; point: GeoPoint }
   | { type: "clear" };
 
 /** Startpunkt aus Standort oder Kartenmitte, mit festem Label */
@@ -58,8 +56,6 @@ export function originReducer(state: OriginState, action: OriginAction): OriginS
     }
     case "district":
       return { origin: action.origin, locating: false };
-    case "mapCenter":
-      return { origin: pointOrigin("karte", action.point), locating: false };
     case "clear":
       return { origin: undefined, locating: false };
   }

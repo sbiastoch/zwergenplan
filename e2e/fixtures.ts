@@ -297,6 +297,22 @@ export async function mapSettled(page: Page): Promise<void> {
 }
 
 /**
+ * Quellenangabe klappt ein (Plan 0056, E3, N5): danach nur noch das „i“, ein Tipp darauf zeigt sie wieder. Aufrufen mit
+ * kurzer Verzögerung (`window.__zpAttributionMs`, per `addInitScript` vor dem Laden); ohne sie bleibt sie ausgeschrieben.
+ */
+export async function expectAttributionCollapses(page: Page): Promise<void> {
+  const attribution = page.locator(".map-box .maplibregl-ctrl-attrib");
+  const osm = attribution.getByRole("link", { name: "OpenStreetMap" });
+  await expect(attribution).toHaveClass(/(^|\s)maplibregl-compact(\s|$)/);
+  await expect(attribution).not.toHaveClass(/maplibregl-compact-show/);
+  await expect(osm).toBeHidden();
+  const info = attribution.locator(".maplibregl-ctrl-attrib-button");
+  await expect(info).toBeVisible();
+  await info.click();
+  await expect(osm).toBeVisible();
+}
+
+/**
  * Antworten auf das, was die App nach dem Start ohne Anlass nachlädt: den Export-Code der Merkliste (nach dem ersten
  * Rendern im Leerlauf, Plan 0010, E8 A) und den PWA-Kern (nach `load`, Plan 0011, E5). Vor `goto` aufrufen und vor
  * dem Zählen „kein Request ab …“ abwarten: Die Requests sind für alle gleich, kämen unter Last aber zu einem

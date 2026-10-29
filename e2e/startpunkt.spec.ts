@@ -232,7 +232,7 @@ test.describe("Statuszeile auf „Karte“", () => {
     await expectReachLayout(page, "Karte, Röthenbach");
   });
 
-  test("Kartenmitte als Startpunkt: Stadtteil-Auswahl bleibt, Knopf „Meinen Standort nutzen“ (Plan 0022)", async ({
+  test("gespeicherte Kartenmitte als Startpunkt: Stadtteil-Auswahl bleibt, Knopf „Meinen Standort nutzen“ (Plan 0022)", async ({
     page,
   }) => {
     await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {

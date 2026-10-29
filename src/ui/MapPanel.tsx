@@ -24,9 +24,6 @@ async function loadProviderScreen(): Promise<ComponentType<ProviderMapScreenProp
   return (await loadKarte()).ProviderMapScreen;
 }
 
-/** Hinweis nach ADR 0008, im Start unter der Karte: Er steht schon beim Laden und verschiebt nichts (N5). */
-const TILE_NOTE = "Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät.";
-
 type ProviderMapPanelProps = Omit<ProviderMapScreenProps, "directory"> & {
   /** Datenstand von site.json */
   generatedAt: string;
@@ -40,31 +37,23 @@ export function ProviderMapPanel({ generatedAt, ...props }: ProviderMapPanelProp
   const { module, attempt, retry } = useLazy(loadProviderScreen);
   const directory = useProviderDirectory(generatedAt);
   if (module.kind === "da" && directory.kind === "da") {
-    return (
-      <>
-        <module.View {...props} directory={directory.directory} />
-        <p className="small">{TILE_NOTE}</p>
-      </>
-    );
+    return <module.View {...props} directory={directory.directory} />;
   }
   return (
-    <>
-      <div
-        className="map-box anbieter"
-        data-state={module.kind === "fehler" || directory.kind === "fehler" ? "fehler" : "laden"}
-      >
-        {module.kind === "fehler" ? (
-          <LoadFailed attempt={attempt} retry={retry}>
-            Die Karte konnte nicht geladen werden. Alle Anbieter stehen in der Liste.
-          </LoadFailed>
-        ) : directory.kind === "fehler" ? (
-          <p className="map-note">Anbieter lassen sich gerade nicht laden.</p>
-        ) : (
-          <p className="map-note">Karte wird geladen …</p>
-        )}
-      </div>
-      <p className="small">{TILE_NOTE}</p>
-    </>
+    <div
+      className="map-box anbieter"
+      data-state={module.kind === "fehler" || directory.kind === "fehler" ? "fehler" : "laden"}
+    >
+      {module.kind === "fehler" ? (
+        <LoadFailed attempt={attempt} retry={retry}>
+          Die Karte konnte nicht geladen werden. Alle Anbieter stehen in der Liste.
+        </LoadFailed>
+      ) : directory.kind === "fehler" ? (
+        <p className="map-note">Anbieter lassen sich gerade nicht laden.</p>
+      ) : (
+        <p className="map-note">Karte wird geladen …</p>
+      )}
+    </div>
   );
 }
 
@@ -73,7 +62,7 @@ export function MapPanel(props: MapScreenProps) {
   if (module.kind === "da") return <module.View {...props} />;
   /*
    * Platzhalter in Kartenhöhe: kein Sprung, wenn die Oberfläche kommt (CLS). Beim Laden hält `.map-rest` darunter
-   * Platz für Werkzeugzeile, Hinweis und den Anfang der Orts-Liste frei: Auf der Merkliste ist der Kopf kurz, ohne ihn
+   * Platz für den Anfang der Orts-Liste frei: Auf der Merkliste ist der Kopf kurz, ohne ihn
    * schrumpfte das Dokument beim Einhängen auf die Viewport-Höhe, und die Seite sprang nach oben (Browser-Review 0025,
    * M1).
    */

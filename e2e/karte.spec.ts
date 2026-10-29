@@ -4,7 +4,15 @@
  * `window.__zpMap` gibt es nur im E2E-Build (E13, begründete Ausnahme von „E2E ist Black-Box“).
  */
 import type { BrowserContext, Page } from "@playwright/test";
-import { expect, expectTwoLines, MAP_READY, startPreloads, test, twoLinesEverywhere } from "./fixtures.ts";
+import {
+  expect,
+  expectAttributionCollapses,
+  expectTwoLines,
+  MAP_READY,
+  startPreloads,
+  test,
+  twoLinesEverywhere,
+} from "./fixtures.ts";
 
 const NB = "\u00a0";
 
@@ -38,6 +46,8 @@ interface TestMap {
 declare global {
   interface Window {
     __zpMap?: TestMap;
+    /** Verzögerung, bis die Quellenangabe einklappt; nur im E2E-Build gelesen (MapView.tsx, Plan 0056, N6) */
+    __zpAttributionMs?: number;
     /** kleinste Scroll-Position seit dem Start der Messung (Browser-Review 0025, M1) */
     __minScrollY?: number;
   }
@@ -167,9 +177,9 @@ test.describe("mit gemockten Kacheln", () => {
     const attribution = page.locator(".maplibregl-ctrl-attrib");
     await expect(attribution).toBeVisible();
     await expect(attribution).toHaveText("OpenFreeMap © OpenMapTiles Data from OpenStreetMap");
-    await expect(
-      page.getByText("Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät."),
-    ).toBeVisible();
+    // kein Hinweistext unter der Karte, keine Werkzeugzeile (Plan 0056, E3, E4)
+    await expect(page.getByText(/Kartenbilder kommen/)).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Startpunkt: |^Kartenmitte als Startpunkt$/ })).toHaveCount(0);
 
     // Kacheln wurden vom Mock bedient, und sie kamen aus MapLibres Worker (dessen Resource-Timing kennt sie).
     expect(tileLog.length).toBeGreaterThan(0);
@@ -210,6 +220,17 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(attribution.getByRole("link", { name: "OpenFreeMap" })).toHaveCount(1);
     await expect(attribution.getByRole("link", { name: /OpenMapTiles/ })).toHaveCount(1);
     expect((await attribution.innerText()).match(/OpenStreetMap/g)).toHaveLength(1);
+  });
+
+  test("Attribution klappt nach der Verzögerung ein, „i“ klappt sie wieder auf (Plan 0056, E3, N5, N6)", async ({
+    page,
+  }) => {
+    // im Deploy-Build 5 s nach `load`; hier kurz, damit der Test nicht wartet
+    await page.addInitScript(() => {
+      window.__zpAttributionMs = 200;
+    });
+    await openMap(page);
+    await expectAttributionCollapses(page);
   });
 
   test("Schnellfilter „Kurse“ wirkt auf Orte und Statuszeile", async ({ page }) => {
@@ -303,7 +324,7 @@ test.describe("mit gemockten Kacheln", () => {
 
     // Startpunkt über das Kind-Sheet: ab der Wahl kein Request, auch keine Kachel (Kamera-Regel)
     await preloaded;
-    await page.getByRole("button", { name: "Startpunkt wählen" }).click();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
     // Das Öffnen lädt den Abschnitt „Als App“ (für alle gleich, Plan 0011, E5); gezählt wird ab der Wahl
     await expect(kid.locator(".app-pending")).toHaveCount(0);
@@ -334,12 +355,14 @@ test.describe("mit gemockten Kacheln", () => {
     expect(requests.filter((url) => !url.startsWith("https://tiles.openfreemap.org/"))).toEqual([]);
   });
 
-  test("Kartenmitte als Startpunkt ergibt Minuten (Plan 0009, E9)", async ({ page }) => {
+  test("gespeicherte Kartenmitte ergibt Minuten (Plan 0009, E9; wählbar ist sie seit Plan 0056, E4 nicht mehr)", async ({
+    page,
+  }) => {
+    // am Beispielhof, wie ihn der frühere Knopf „Kartenmitte als Startpunkt“ gespeichert hätte (ADR 0017)
+    await page.addInitScript(() =>
+      localStorage.setItem("zwergenplan.startpunkt", '{"source":"karte","lat":49.452,"lon":11.077}'),
+    );
     await openMap(page);
-    // Kartenmitte zum Beispielhof schieben (wie ein Wischen); die Kamera-Regel betrifft nur das Fahren der App
-    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.0767, 49.4521] }));
-    await idle(page);
-    await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
     await expect(places(page).first()).toHaveText(/^Familientreff Beispielhof.* · 5 Min\.$/);
   });
 
@@ -546,18 +569,14 @@ test.describe("mit gemockten Kacheln", () => {
     });
   });
 
-  test("Kamera-Regel: Standort und Kartenmitte bewegen die Karte nicht und laden keine Kacheln", async ({
-    page,
-    context,
-    tileLog,
-  }) => {
+  test("Kamera-Regel: Standort bewegt die Karte nicht und lädt keine Kacheln", async ({ page, context, tileLog }) => {
     await context.grantPermissions(["geolocation"]);
     await context.setGeolocation({ latitude: 49.45213, longitude: 11.07672 });
     await openMap(page);
     const tiles = tileLog.length;
     const start = await camera(page);
 
-    await page.getByRole("button", { name: "Startpunkt wählen" }).click();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     const kid = page.getByRole("dialog", { name: "Kind und Einstellungen" });
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
@@ -567,18 +586,14 @@ test.describe("mit gemockten Kacheln", () => {
     await idle(page);
     expect(tileLog.length, "keine Kacheln nach „Meinen Standort nutzen“").toBe(tiles);
     expect(await camera(page)).toEqual(start);
-
-    await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
-    await expect(page.getByRole("button", { name: "Startpunkt: Kartenmitte" })).toBeVisible();
-    await idle(page);
-    expect(tileLog.length, "keine Kacheln nach „Kartenmitte als Startpunkt“").toBe(tiles);
-    expect(await camera(page)).toEqual(start);
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
     // mit Startpunkt steht die Entfernung an jedem Ort (Wegzeit oder, weit weg von jedem Halt, Luftlinie)
     await expect(places(page).first()).toContainText(/ · (\d+ Min\.|\d[\d,]* k?m)$/);
 
     // Gegenprobe: Ein Stadtteil darf die Kamera bewegen.
-    await page.getByRole("button", { name: "Startpunkt: Kartenmitte" }).click();
+    await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+    // mit Standort zeigt das Sheet die Stadtteil-Auswahl erst nach „Startpunkt entfernen“
+    await kid.getByRole("button", { name: "Startpunkt entfernen" }).click();
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("langwasser");
     await kid.getByRole("button", { name: "Fertig" }).click();
     await expect.poll(async () => (await camera(page)).lat).toBeLessThan(start.lat - 0.005);
@@ -599,7 +614,8 @@ test.describe("mit gemockten Kacheln", () => {
     );
     const before = tileLog.length;
     await openMap(page);
-    await expect(page.getByRole("button", { name: "Startpunkt: Kartenmitte" })).toBeVisible();
+    // Startpunkt gilt: Entfernung an den Orten (Wegzeit oder Luftlinie)
+    await expect(places(page).first()).toContainText(/ · (\d+ Min\.|\d[\d,]* k?m)$/);
     await idle(page);
     // Der gespeicherte Punkt ist nur ein Layer: Kamera und Kachelwahl verraten ihn nicht (Kamera-Regel).
     expect(await camera(page)).toEqual(plain);
@@ -723,10 +739,9 @@ test.describe("mit gemockten Kacheln", () => {
     await page.goto("./?ansicht=karte");
     await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
     await expect(mapBox(page)).toContainText(
-      "Dein Browser kann die Karte nicht zeigen. Die Orte stehen unten in der Liste.",
+      "Dein Browser kann die Karte nicht zeigen. Alle Angebote stehen unten in der Liste.",
     );
     await expect(places(page)).toHaveCount(5);
-    await expect(page.getByRole("button", { name: "Kartenmitte als Startpunkt" })).toHaveCount(0);
   });
 
   test("Wächter: Kachel-URLs mit Querystring oder fremdem Host verlassen den Browser nicht, auch nicht aus dem Worker", async ({
@@ -774,9 +789,8 @@ test.describe("Stil nicht ladbar", () => {
     await page.goto("./?ansicht=karte");
     await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
     await expect(mapBox(page)).toContainText(
-      "Kartenbilder lassen sich gerade nicht laden. Die Orte stehen unten in der Liste.",
+      "Kartenbilder lassen sich gerade nicht laden. Alle Angebote stehen unten in der Liste.",
     );
-    await expect(page.getByRole("button", { name: "Kartenmitte als Startpunkt" })).toHaveCount(0);
     await places(page).filter({ hasText: "Bibliothek Beispiel Zentrum" }).click();
     await expect(page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" })).toBeVisible();
     await page.getByRole("dialog").getByRole("button", { name: "Zurück" }).click();
@@ -784,7 +798,6 @@ test.describe("Stil nicht ladbar", () => {
     await unroute();
     await mapBox(page).getByRole("button", { name: "Nochmal versuchen" }).click();
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
-    await expect(page.getByRole("button", { name: "Kartenmitte als Startpunkt" })).toBeVisible();
   });
 });
 
@@ -885,10 +898,9 @@ test.describe("Karten-Code nicht ladbar", () => {
     await page.goto("./?ansicht=karte");
     await expect(mapBox(page)).toHaveAttribute("data-state", "fehler");
     await expect(mapBox(page)).toContainText(
-      "Die Karte konnte nicht geladen werden. Die Orte stehen unten in der Liste.",
+      "Die Karte konnte nicht geladen werden. Alle Angebote stehen unten in der Liste.",
     );
     await expect(places(page)).toHaveCount(5);
-    await expect(page.getByRole("button", { name: "Kartenmitte als Startpunkt" })).toHaveCount(0);
     await places(page).filter({ hasText: "Familientreff Beispielhof" }).click();
     await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
     await page.getByRole("dialog").getByRole("button", { name: "Schließen" }).click();

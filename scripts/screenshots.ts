@@ -69,7 +69,7 @@ async function mockTiles(context: BrowserContext) {
   });
 }
 
-/** Karte mit Stadtteil Gostenhof (Werkzeugzeile und Orts-Liste mit Wegzeit) */
+/** Karte mit Stadtteil Gostenhof (Orts-Liste mit Wegzeit) */
 async function openMap(page: Page) {
   await withGostenhof(page);
   await page.getByRole("button", { name: "Karte", exact: true }).click();

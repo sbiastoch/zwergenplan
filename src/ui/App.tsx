@@ -450,11 +450,6 @@ export function App() {
         ctx={cardCtx}
         toast={toast}
         onSheetOpen={setPlaceSheet}
-        onPickOrigin={() => setSheet("origin")}
-        onMapCenter={(center) => {
-          if (!originApi.setMapCenter(center))
-            say("Die Kartenmitte liegt außerhalb des Großraums Nürnberg.", undefined, "hint");
-        }}
         onResetFilter={onResetFilter}
         age={age}
       />

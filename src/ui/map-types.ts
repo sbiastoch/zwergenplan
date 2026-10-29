@@ -6,7 +6,6 @@
  */
 import type { ComponentType } from "react";
 import type { StartCamera } from "../domain/camera.ts";
-import type { GeoPoint } from "../domain/geo.ts";
 import type { Place } from "../domain/places.ts";
 import type { ProviderView } from "../domain/provider-count.ts";
 import type { Bounds, ProviderPlace } from "../domain/provider-places.ts";
@@ -33,9 +32,6 @@ export interface MapScreenProps {
   toast: ToastMessage;
   /** Orts-Sheet auf oder zu: Der Seiten-Toast schweigt dann (App) */
   onSheetOpen: (open: boolean) => void;
-  /** öffnet das Kind-Sheet bei „Wegzeit ab“ */
-  onPickOrigin: () => void;
-  onMapCenter: (center: GeoPoint) => void;
   /** nur mit aktiven URL-Filtern */
   onResetFilter: (() => void) | undefined;
   /** nur, wenn der Altersfilter etwas ausblendet (Plan 0021, E4) */
@@ -95,8 +91,8 @@ export interface MapViewProps {
   dark: boolean;
   /** Tipp auf einen Ort-Marker */
   onPlace: (key: string) => void;
-  /** nach dem ersten `idle`; liefert, wie man die Kartenmitte abfragt */
-  onReady: (center: () => GeoPoint) => void;
+  /** nach dem ersten `idle` */
+  onReady: () => void;
   onProblem: (problem: MapProblem) => void;
   /** Ausschnitt nach `load` und jedem `moveend` (Anbieterkarte, Plan 0055, E4) */
   onViewport?: ((bounds: Bounds) => void) | undefined;

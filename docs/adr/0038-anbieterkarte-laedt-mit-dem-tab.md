@@ -1,6 +1,6 @@
 # ADR 0038 – Anbieterkarte lädt mit dem Tab
 
-Status: **angenommen** (2026-10-29, mit Plan 0055).
+Status: **angenommen** (2026-10-29, mit Plan 0055). **Geändert durch ADR 0039** (Plan 0056): Punkt 2, der Hinweistext unter der Karte entfällt.
 - **Ändert** ADR 0008, Punkt „Nur in der Kartenansicht“: Auch das Öffnen des Tabs „Anbieter“ ist eine ausdrückliche Handlung und lädt die Karte samt Kacheln.
 - **Ergänzt** ADR 0008, Kamera-Regel: Die Anbieterkarte hat einen eigenen Startausschnitt (alle Orte aller Anbieter) und fährt nie auf einen Startpunkt, auch nicht auf einen Stadtteil.
 - **Ändert** die Abhängigkeitsregel `map-entry-only`: Neben `src/ui/karte/MapScreen.tsx` darf `src/ui/karte/ProviderMapScreen.tsx` `src/ui/map/` laden, ebenfalls nur per `import()` (`LAZY_LOADERS`).

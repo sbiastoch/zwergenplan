@@ -1,10 +1,9 @@
 /**
- * Karten-Oberfläche (Plan 0005, E7/E8/E12), eigener Lazy-Chunk ohne MapLibre: Kartenrahmen mit
- * Zuständen, Werkzeugzeile, Hinweis, Orts-Liste und Orts-Sheet. Die Karte selbst (map/MapView.tsx)
+ * Karten-Oberfläche (Plan 0005, E7/E12), eigener Lazy-Chunk ohne MapLibre: Kartenrahmen mit
+ * Zuständen, Orts-Liste und Orts-Sheet (Werkzeugzeile und Hinweis entfallen, Plan 0056, E3/E4). Die Karte selbst (map/MapView.tsx)
  * lädt erst von hier; ohne WebGL, ohne Kacheln oder ohne Karten-Chunk bleibt alles hier bedienbar.
  */
-import { type ComponentType, useEffect, useMemo, useRef, useState } from "react";
-import type { GeoPoint } from "../../domain/geo.ts";
+import { type ComponentType, useEffect, useMemo, useState } from "react";
 import type { Place } from "../../domain/places.ts";
 import type { SiteOffer } from "../../domain/site-data.ts";
 import { Dialog } from "../Dialog.tsx";
@@ -37,7 +36,6 @@ export function MapScreen(props: MapScreenProps) {
   const [problem, setProblem] = useState<MapProblem>();
   // „Nochmal versuchen“ bei Kachel-Fehlern baut die Karte neu auf
   const [build, setBuild] = useState(0);
-  const center = useRef<() => GeoPoint>(undefined);
   // Orts-Sheet: Sitzungszustand, nie in der URL (E5)
   const [placeKey, setPlaceKey] = useState<string>();
   const place = places.find((p) => p.key === placeKey);
@@ -74,23 +72,19 @@ export function MapScreen(props: MapScreenProps) {
               const hit = places.find((p) => p.key === key);
               if (hit) openPlace(hit);
             }}
-            onReady={(getCenter) => {
-              center.current = getCenter;
-              setReady(true);
-            }}
+            onReady={() => setReady(true)}
             onProblem={setProblem}
           />
         )}
-        {state === "bereit" && <span className="crosshair" aria-hidden="true" />}
         {state === "laden" && <p className="map-note">Karte wird geladen …</p>}
         {module.kind === "fehler" && (
           <LoadFailed attempt={attempt} retry={retry}>
-            Die Karte konnte nicht geladen werden. Die Orte stehen unten in der Liste.
+            Die Karte konnte nicht geladen werden. Alle Angebote stehen unten in der Liste.
           </LoadFailed>
         )}
         {problem && (
           <p className="map-note">
-            {NOTES[problem]} Die Orte stehen unten in der Liste.
+            {NOTES[problem]} Alle Angebote stehen unten in der Liste.
             {problem === "kacheln" && (
               <button type="button" className="btn" onClick={rebuild}>
                 Nochmal versuchen
@@ -99,17 +93,6 @@ export function MapScreen(props: MapScreenProps) {
           </p>
         )}
       </div>
-      <div className="map-tools">
-        {state === "bereit" && (
-          <button type="button" className="btn" onClick={() => center.current && props.onMapCenter(center.current())}>
-            Kartenmitte als Startpunkt
-          </button>
-        )}
-        <button type="button" className="btn" onClick={props.onPickOrigin}>
-          {origin ? `Startpunkt: ${origin.label}` : "Startpunkt wählen"}
-        </button>
-      </div>
-      <p className="small">Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät.</p>
       {places.length > 0 ? (
         <PlaceList places={places} reachOf={ctx.reachOf} reachPending={ctx.reachPending} onPlace={openPlace} />
       ) : (

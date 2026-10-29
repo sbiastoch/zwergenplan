@@ -46,6 +46,15 @@ const ZOOM_CONTROL_INSET = 58;
  * zwei Zeilen, 56 px hoch, 10 px Abstand von MapLibre (map-overrides.css). Sonst lägen untere Marker darunter.
  */
 const ATTRIBUTION_INSET = 66;
+
+/**
+ * Quellenangabe einklappen (Plan 0056, E3; ADR 0039): 5 s nach `load`, wie es die OSMF Attribution Guidelines erlauben
+ * („automatically after five seconds“). Nachgebildet ist MapLibres `_updateCompactMinimize`: Nur die Klasse fällt weg,
+ * `open` bleibt, ein Tipp auf „i“ klappt sie wieder auf (Review 2, N5). Im E2E-Build gilt `__zpAttributionMs`, sonst
+ * eine Stunde, damit Tests die ausgeschriebene Angabe sicher sehen (N6).
+ */
+const ATTRIBUTION_COLLAPSE_MS = 5000;
+const collapseDelay = () => (__E2E__ ? (globalThis.__zpAttributionMs ?? 3_600_000) : ATTRIBUTION_COLLAPSE_MS);
 /** Rand um die Marker; reicht für Cluster (18 + 2 px) und Zahl-Badge (bis ≈ 28 px vom Mittelpunkt) */
 const MARKER_INSET = 32;
 const START_PADDING = {
@@ -196,9 +205,9 @@ export function MapView(props: MapViewProps) {
         container: el,
         style: styleUrl(start.dark),
         transformRequest: guardTileRequest,
-        // Attribution aus der TileJSON von OpenFreeMap (genau einmal, W1). Ohne `compact`: MapLibre klappt sie
-        // auf Karten ≤ 640 px nach dem ersten Verschieben zum „i“ ein, beim Öffnen steht sie ausgeschrieben.
-        attributionControl: {},
+        // Attribution aus der TileJSON von OpenFreeMap (genau einmal, W1). `compact` auch auf breiten Karten: Beim
+        // Öffnen steht sie ausgeschrieben, nach dem ersten Verschieben oder nach 5 s nur noch das „i“ (Plan 0056, E3).
+        attributionControl: { compact: true },
         // Handy: zwei Finger bewegen die Karte, einer scrollt die Seite (E7)
         cooperativeGestures: true,
         locale: LOCALE,
@@ -222,9 +231,15 @@ export function MapView(props: MapViewProps) {
     let loaded = false;
     const fail = () => latest.current.onProblem("kacheln");
     const timer = setTimeout(() => loaded || fail(), LOAD_TIMEOUT_MS);
+    let collapse: ReturnType<typeof setTimeout> | undefined;
     map.on("load", () => {
       loaded = true;
       clearTimeout(timer);
+      collapse = setTimeout(
+        () =>
+          el.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact")?.classList.remove("maplibregl-compact-show"),
+        collapseDelay(),
+      );
     });
     // Ein eigener error-Listener verhindert MapLibres console.error. Eine fehlende Kachel nach `load` ist egal (E12).
     map.on("error", () => loaded || fail());
@@ -245,12 +260,7 @@ export function MapView(props: MapViewProps) {
       // Nach den eigenen Layern: Paint ändert die Reihenfolge nicht, und ein Fehler hier kostet nur die Farben.
       tintBasemap(map, tokens, latest.current.dark);
     });
-    map.once("idle", () =>
-      latest.current.onReady(() => {
-        const { lat, lng } = map.getCenter();
-        return { lat, lon: lng };
-      }),
-    );
+    map.once("idle", () => latest.current.onReady());
     // Ausschnitt für die Liste der Anbieterkarte (Plan 0055, E4): nach `load` und nach jeder Bewegung, nicht je Frame
     const viewport = () => {
       const bounds = map.getBounds();
@@ -274,6 +284,7 @@ export function MapView(props: MapViewProps) {
     }
     return () => {
       clearTimeout(timer);
+      clearTimeout(collapse);
       if (kind === "angebote") lastCamera = { center: map.getCenter(), zoom: map.getZoom() };
       mapRef.current = undefined;
       if (__E2E__) Object.assign(window, { __zpMap: undefined });

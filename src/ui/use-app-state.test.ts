@@ -114,26 +114,6 @@ describe("useOrigin (Plan 0004, E3)", () => {
     expect(api.origin).toBeUndefined();
     expect(storage.data.size).toBe(0);
   });
-
-  it("Kartenmitte als Startpunkt: gerundet gespeichert statt des Stadtteils, außerhalb Nürnbergs abgelehnt (Plan 0005, E8; Plan 0016)", () => {
-    storage.data.set(KEY, "gostenhof");
-    let accepted: boolean | undefined;
-    const api = renderOrigin((a) => {
-      accepted = a.setMapCenter({ lat: 49.45213, lon: 11.07672 });
-    });
-    expect(accepted).toBe(true);
-    expect(api.origin).toEqual({ source: "karte", point: { lat: 49.452, lon: 11.077 }, label: "Kartenmitte" });
-    expect([...storage.data]).toEqual([[POINT_KEY, '{"source":"karte","lat":49.452,"lon":11.077}']]);
-
-    storage.data.clear();
-    storage.data.set(KEY, "gostenhof");
-    const outside = renderOrigin((a) => {
-      accepted = a.setMapCenter({ lat: 48.137, lon: 11.575 });
-    });
-    expect(accepted).toBe(false);
-    expect(outside.origin?.source).toBe("stadtteil");
-    expect([...storage.data]).toEqual([[KEY, "gostenhof"]]);
-  });
 });
 
 /** Geolocation, deren Antworten der Test selbst auslöst; `answer(i, …)` beantwortet die i-te Abfrage. */
@@ -230,11 +210,6 @@ describe("useOrigin: gespeicherter Startpunkt (Plan 0016)", () => {
 
   it.each([
     ["Stadtteil", (a: OriginApi) => a.setDistrict("gostenhof"), [[KEY, "gostenhof"]]],
-    [
-      "Kartenmitte",
-      (a: OriginApi) => a.setMapCenter({ lat: 49.46, lon: 11.08 }),
-      [[POINT_KEY, '{"source":"karte","lat":49.46,"lon":11.08}']],
-    ],
     ["Entfernen", (a: OriginApi) => a.clear(), []],
   ])("eine späte Standort-Antwort nach „%s“ wird nicht gespeichert", async (_name, then, expected) => {
     const geo = controlledGeolocation();

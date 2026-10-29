@@ -41,7 +41,7 @@ async function withGostenhof(page: Page) {
   await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
 }
 
-/** Karte mit Stadtteil als Startpunkt (Plan 0005): Werkzeugzeile „Startpunkt: Gostenhof“, Orts-Liste mit Wegzeit. */
+/** Karte mit Stadtteil als Startpunkt (Plan 0005): Orts-Liste mit Wegzeit, keine Werkzeugzeile (Plan 0056, E4). */
 async function openMap(page: Page) {
   await withGostenhof(page);
   await page.getByRole("button", { name: "Karte", exact: true }).click();
@@ -101,7 +101,14 @@ async function setBirthDate(page: Page, text: string) {
 }
 
 /** Ansichten mit Karte: Kacheln kommen aus dem Mock (fixtures.ts). */
-const MAP_VIEWS = new Set(["karte", "orts-sheet", "orts-sheet-wegzeit", "karte-fehler", "merkliste-karte"]);
+const MAP_VIEWS = new Set([
+  "karte",
+  "karte-quelle-eingeklappt",
+  "orts-sheet",
+  "orts-sheet-wegzeit",
+  "karte-fehler",
+  "merkliste-karte",
+]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
 const CONSOLE_ERRORS: Record<string, RegExp[]> = {
@@ -464,8 +471,23 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(sheet.getByText("Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth.")).toBeVisible();
     await sheet.getByRole("button", { name: "Startpunkt wählen" }).scrollIntoViewIfNeeded();
   },
-  karte: openMap,
-  // Fehlerzustand (E12): Meldung im Kartenrahmen, Orts-Liste und „Startpunkt …“ bleiben, keine Kartenmitte
+  // Quellenangabe beim Öffnen ausgeschrieben (Plan 0056, E3, N6)
+  karte: async (page) => {
+    await openMap(page);
+    await expect(page.locator(".map-box .maplibregl-ctrl-attrib")).toHaveClass(/maplibregl-compact-show/);
+  },
+  // … und eingeklappt: nur das „i“ (im Deploy-Build nach 5 s, hier nach 200 ms)
+  "karte-quelle-eingeklappt": async (page) => {
+    await page.addInitScript(() => {
+      window.__zpAttributionMs = 200;
+    });
+    await page.reload();
+    await openMap(page);
+    const attribution = page.locator(".map-box .maplibregl-ctrl-attrib");
+    await expect(attribution).toHaveClass(/(^|\s)maplibregl-compact(\s|$)/);
+    await expect(attribution).not.toHaveClass(/maplibregl-compact-show/);
+  },
+  // Fehlerzustand (E12): Meldung im Kartenrahmen, die Orts-Liste bleibt
   "karte-fehler": async (page) => {
     await page.addInitScript(() => {
       const original = HTMLCanvasElement.prototype.getContext;
@@ -1033,10 +1055,7 @@ test("zeigt den Fokus auch im Detail-Dialog", async ({ page, isMobile }) => {
 test.describe("Karte", () => {
   test.use({ tiles: "mock" });
 
-  test("zeigt den Fokus auf Kartenfläche, Zoom, Attribution, Werkzeugzeile und Orts-Liste", async ({
-    page,
-    isMobile,
-  }) => {
+  test("zeigt den Fokus auf Kartenfläche, Zoom, Attribution und Orts-Liste", async ({ page, isMobile }) => {
     test.skip(isMobile, "Tastatur-Fokus wird auf Desktop geprüft");
     await ready(page);
     await openMap(page);

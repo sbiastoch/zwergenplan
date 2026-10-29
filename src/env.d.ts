@@ -8,6 +8,8 @@ declare const __SW_OFF__: boolean;
  * kennt keine Window-Felder); `window.__zpSite` ist dieselbe Eigenschaft.
  */
 declare var __zpSite: Promise<Response> | undefined;
+/** Nur im E2E-Build gelesen: Verzögerung, bis die Quellenangabe der Karte einklappt (MapView.tsx, Plan 0056, N6). */
+declare var __zpAttributionMs: number | undefined;
 /** Chromium: Angebot zur Installation (Plan 0011, E7), fehlt in lib.dom. Gelesen nur in src/data/pwa.ts. */
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;

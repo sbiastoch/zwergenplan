@@ -5,7 +5,7 @@
  * anbieter.json (N2), `tests/fixtures/` bleibt unverändert. `window.__zpMap` gibt es nur im E2E-Build.
  */
 import type { Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, expectAttributionCollapses, MAP_READY, mapSettled, test } from "./fixtures.ts";
 
 test.use({ tiles: "mock" });
 
@@ -86,11 +86,10 @@ async function patchDirectory(
 }
 
 test.describe("Anbieterkarte (Plan 0055)", () => {
-  test("1: Karte, Hinweis und ein Marker je Ort", async ({ page }) => {
+  test("1: Karte ohne Hinweistext, ein Marker je Ort", async ({ page }) => {
     await openTab(page);
-    await expect(
-      page.getByText("Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät."),
-    ).toBeVisible();
+    // Den Hinweis auf OpenFreeMap trägt nur die Quellenangabe in der Karte (Plan 0056, E3)
+    await expect(page.getByText(/Kartenbilder kommen/)).toHaveCount(0);
     // Reihenfolge wie Mockup C: Suche, Karte, Statuszeile, Liste
     const top = async (selector: string) => (await page.locator(selector).first().boundingBox())?.y ?? -1;
     const order = [
@@ -102,6 +101,17 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     expect(order).toEqual([...order].sort((a, b) => a - b));
     expect(await features(page)).toHaveLength(7);
     await expect(status(page)).toHaveText("5 Anbieter");
+  });
+
+  test("1b: Quellenangabe klappt nach der Verzögerung ein, „i“ zeigt sie wieder (Plan 0056, E3, N5)", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.__zpAttributionMs = 200;
+    });
+    await openTab(page);
+    await mapSettled(page);
+    await expectAttributionCollapses(page);
   });
 
   test("2: Ort mit einem Anbieter öffnet sein Sheet; Fokus kehrt an die Karte zurück (Fall 15)", async ({ page }) => {
