@@ -4,7 +4,7 @@
  *
  * `costUsd` ist die Schätzung der CLI zum API-Gegenwert, nicht der Abo-Preis; Bericht und CSV beschriften es so.
  * „Tokens ein“ zählt Eingabe, Cache lesen und Cache schreiben zusammen (was das Modell gelesen hat), „Tokens aus“ die
- * Ausgabe samt Thinking. Die Bremse vergleicht die Summe aus beiden.
+ * Ausgabe samt Thinking. Die Bremse vergleicht die Summe aus beiden, gewichtet als Opus-Gegenwert (`brakeHit`).
  */
 import type { CallRecord } from "./extract.ts";
 
@@ -122,11 +122,22 @@ export function parseBrakes(
 
 export type BrakeKind = "aufrufe" | "tokens";
 
-/** Erreichte Bremse nach den bisherigen Aufrufen, sonst `undefined`. */
+/**
+ * Gewicht je Token im Verhältnis zu Opus, nach dem Listenpreis je Token (Opus : Sonnet : Haiku = 5 : 3 : 1). Die
+ * Grenzen in `NIGHT_BRAKES`/`DISCOVER_BRAKES` sind für Opus bemessen; ungewichtet hielt die Bremse den Nachtlauf mit
+ * Haiku nach etwa 140 Aufrufen bei rund $0,60 an (Plan 0048, Nachtrag 5). Unbekannte Modelle zählen wie Opus.
+ */
+const TOKEN_WEIGHTS: ReadonlyArray<readonly [string, number]> = [
+  ["haiku", 0.2],
+  ["sonnet", 0.6],
+];
+const tokenWeight = (model: string) => TOKEN_WEIGHTS.find(([name]) => model.includes(name))?.[1] ?? 1;
+
+/** Erreichte Bremse nach den bisherigen Aufrufen, sonst `undefined`. `MAX_TOKENS` zählt Opus-gleichwertige Tokens. */
 export function brakeHit(calls: readonly CallRecord[], brakes: Brakes): BrakeKind | undefined {
   if (calls.length >= brakes.maxCalls) return "aufrufe";
-  const t = totalsOf(calls);
-  return t.tokensIn + t.tokensOut >= brakes.maxTokens ? "tokens" : undefined;
+  const weighted = calls.reduce((n, c) => n + (tokensIn(c) + c.outputTokens) * tokenWeight(c.model), 0);
+  return weighted >= brakes.maxTokens ? "tokens" : undefined;
 }
 
 export const COST_CSV_HEADER =

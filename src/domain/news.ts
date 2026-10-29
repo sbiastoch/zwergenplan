@@ -4,7 +4,7 @@
  * (`push-domain-not-in-start`).
  */
 import { ageInMonths, sessionFit, startFitsAge } from "./age.ts";
-import { discoverable, startedCourse } from "./agenda.ts";
+import { nextSession, startedCourse } from "./agenda.ts";
 import { type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId } from "./ids.ts";
 import { listingWeek } from "./listing.ts";
@@ -24,7 +24,8 @@ export function newOfferIds(before: readonly string[] | undefined, after: readon
   const known = before && new Set(before.map((id) => resolveOfferId(id) ?? id));
   const fresh = (o: Offer) =>
     o.listedAt !== undefined ? listingWeek(o, now) === "diese-woche" : known !== undefined && !known.has(o.id);
-  return after.filter((o) => fresh(o) && discoverable(o, now)).map((o) => o.id);
+  // wie `discoverable`, ausgeschrieben: ein Aufruf weniger im Service Worker (Budget 9 kB)
+  return after.filter((o) => fresh(o) && !startedCourse(o, now) && nextSession(o, now) !== undefined).map((o) => o.id);
 }
 
 /**

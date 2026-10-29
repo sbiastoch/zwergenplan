@@ -45,17 +45,26 @@ export function fittingSessions(offer: Offer, now: Date, birthDate: string | und
 
 /**
  * Kurs/einmalig: entscheidend ist das Alter zum (ersten) Termin.
- * Regelmäßig: passt, sobald mindestens ein noch nicht beendeter Termin altersgerecht ist, mit Zeitraum einer darin
- * (Plan 0053, E2: sonst stünde der Termin dieser Woche als passend in der Liste, obwohl erst ein späterer passt) –
+ * Regelmäßig: passt, sobald mindestens ein noch nicht beendeter Termin altersgerecht ist –
  * vergangene Termine bleiben bis zum nächsten Pipeline-Lauf in den Daten und zählen nicht.
  */
-export function offerFitsAge(offer: Offer, birthDate: string, now: Date, range?: DateRange): boolean {
+export function offerFitsAge(offer: Offer, birthDate: string, now: Date): boolean {
   const [first] = offer.sessions;
   if (!first) return false;
   if (offer.format === "regelmaessig") {
-    return fittingSessions(offer, now, birthDate).some((s) => !range || inRangeDay(range, s));
+    return fittingSessions(offer, now, birthDate).length > 0;
   }
   return fitsAgeAt(offer.age, birthDate, first.start);
+}
+
+/**
+ * `offerFitsAge` mit Zeitraum (Plan 0053, E2): Regelmäßige passen nur über einen passenden Termin darin, sonst stünde
+ * der Termin dieser Woche als passend in der Liste, obwohl erst ein späterer passt. Eigene Funktion, damit der Service
+ * Worker (`startFitsAge`) sie nicht mitlädt (Budget 9 kB).
+ */
+export function offerFitsAgeIn(offer: Offer, birthDate: string, now: Date, range?: DateRange): boolean {
+  if (!range || offer.format !== "regelmaessig") return offerFitsAge(offer, birthDate, now);
+  return fittingSessions(offer, now, birthDate).some((s) => inRangeDay(range, s));
 }
 
 /**
@@ -69,7 +78,7 @@ export function startFitsAge(offer: Offer, birthDate: string, now: Date): boolea
   return next !== undefined && fitsAgeAt(offer.age, birthDate, next.start);
 }
 
-/** Teilt nach `offerFitsAge` (mit Zeitraum, falls gegeben); die Reihenfolge bleibt erhalten. */
+/** Teilt nach `offerFitsAgeIn` (mit Zeitraum, falls gegeben); die Reihenfolge bleibt erhalten. */
 export function splitByAge<T extends Offer>(
   offers: readonly T[],
   birthDate: string,
@@ -78,7 +87,7 @@ export function splitByAge<T extends Offer>(
 ): { fitting: T[]; unfit: T[] } {
   const fitting: T[] = [];
   const unfit: T[] = [];
-  for (const offer of offers) (offerFitsAge(offer, birthDate, now, range) ? fitting : unfit).push(offer);
+  for (const offer of offers) (offerFitsAgeIn(offer, birthDate, now, range) ? fitting : unfit).push(offer);
   return { fitting, unfit };
 }
 

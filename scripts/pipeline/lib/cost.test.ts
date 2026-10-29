@@ -124,7 +124,25 @@ describe("Bremsen (E8: MAX_CALLS, MAX_TOKENS)", () => {
     const brakes = { maxCalls: 3, maxTokens: 1000 };
     expect(brakeHit([call(), call()], brakes)).toBeUndefined();
     expect(brakeHit([call(), call(), call()], brakes)).toBe("aufrufe");
-    expect(brakeHit([call({ inputTokens: 920 })], brakes)).toBe("tokens");
+    expect(brakeHit([call({ model: "opus", inputTokens: 920 })], brakes)).toBe("tokens");
+  });
+
+  it("zählt Tokens als Opus-Gegenwert: Sonnet 0,6, Haiku 0,2, Unbekanntes wie Opus", () => {
+    const brakes = { maxCalls: 100, maxTokens: 1000 };
+    // je Aufruf 1000 Tokens (ein 920 + Cache 30, aus 50)
+    expect(brakeHit([call({ model: "haiku", inputTokens: 920 })], brakes)).toBeUndefined();
+    expect(
+      brakeHit(
+        Array.from({ length: 5 }, () => call({ model: "haiku", inputTokens: 920 })),
+        brakes,
+      ),
+    ).toBe("tokens");
+    expect(brakeHit([call({ model: "claude-haiku-4-5", inputTokens: 920 })], brakes)).toBeUndefined();
+    expect(brakeHit([call({ model: "sonnet", inputTokens: 920 })], brakes)).toBeUndefined();
+    expect(
+      brakeHit([call({ model: "sonnet", inputTokens: 920 }), call({ model: "sonnet", inputTokens: 920 })], brakes),
+    ).toBe("tokens");
+    expect(brakeHit([call({ model: "unbekannt", inputTokens: 920 })], brakes)).toBe("tokens");
   });
 });
 
