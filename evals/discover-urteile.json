@@ -1,3 +1,37 @@
 {
-  "urteile": {}
+  "urteile": {
+    "http://www.stmichael-fuerth.de/miniclub": { "urteil": "passend", "datum": "2026-10-29" },
+    "https://www.heilig-geist-fuerth.de/leben/kinder-und-familien": { "urteil": "passend", "datum": "2026-10-29" },
+    "https://montessori-kita-fuerth.de/familienstuetzpunkt/Krabbelgruppe/index.html": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Kita-Träger, Angebot des Familienstützpunkts offen für alle"
+    },
+    "https://www.diakonie-fuerth.de/unterstuetzen/eltern-kind-gruppen/": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Name im Eintrag ist der der Beratungsstelle; bei Aufnahme korrigieren"
+    },
+    "https://www.schwimmschule-barbara-nestler.de/anmeldung-fuer-babyschwimmen/": {
+      "urteil": "passend",
+      "datum": "2026-10-29"
+    },
+    "https://www.swimmerfirst.de/": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Seukendorf, Landkreis Fürth gehört dazu"
+    },
+    "https://bella-familie.de/baby-und-kinderkurse/": { "urteil": "passend", "datum": "2026-10-29" },
+    "https://tanzenmitbaby-fuerth.de/preise-kurse/": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Gastanbieter u. a. bei Famalië und Bella & Familie"
+    },
+    "https://sfg-sport.de/fit-for-kids/eltern-kind-turnen": { "urteil": "passend", "datum": "2026-10-29" },
+    "https://eck-cafe.net/": { "urteil": "passend", "datum": "2026-10-29" },
+    "https://www.pfarrei-johannes-der-taeufer.de/termine/calendar/08/19/event/tx_cal_phpicalendar/krabbelgruppe-altenfurt-48/": {
+      "urteil": "passend",
+      "datum": "2026-10-29"
+    }
+  }
 }
