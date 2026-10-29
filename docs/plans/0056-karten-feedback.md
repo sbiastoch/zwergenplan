@@ -1,6 +1,6 @@
 # Plan 0056 – Karten nach Nutzer-Feedback: näher am Startpunkt, Liste im Ausschnitt, weniger Text
 
-Status: Review eingearbeitet
+Status: freigegeben
 Datum: 2026-10-29
 
 Bezug:
@@ -235,7 +235,10 @@ S1 und S2 sind ohne die übrigen auslieferbar.
 
 ## Offen
 
-- Keine offenen Nutzerentscheidungen (Rückfrage vom 2026-10-29, Anlass).
+- **Merklisten-Karte, Startausschnitt** (Review 2, M4): Ein Rahmen um den Startpunkt ist auf der Merkliste meist leer. Ein Rahmen über das Gemerkte verriete die Merkliste über die Kachelwahl. Nutzerfrage, zu klären vor S5:
+  - (a) Die Merklisten-Karte behält den alten Startausschnitt (alle kommenden Orte), die Liste darunter filtert ab dem Start.
+  - (b) Die Merklisten-Karte startet am Startpunkt, die Liste darunter filtert aber erst nach der ersten eigenen Bewegung.
+  - Bis zur Antwort gilt (a), weil das nichts Neues preisgibt.
 
 ## Review (2026-10-29) – Verdict: Überarbeiten
 
@@ -254,3 +257,37 @@ Reviewer: Subagent `plan-reviewer`, ohne Chat-Kontext. Alle Punkte übernommen, 
   - m2: `savedMapStatusParts`
   - m3: veraltete Kommentare und Texte, Code-Teil schon behoben
   - m4: „Auch unpassende zeigen“ neben „Filter zurücksetzen“, im Code behoben
+
+## Review 2 (2026-10-29) – Verdict: Freigabe mit Änderungen
+
+Zweiter Reviewer, ohne Chat-Kontext. Er findet keinen Blocker und bestätigt B1, B2 (im Kern) und M1–M6 aus Runde 1. Alle Punkte sind übernommen. Sie gelten als **verbindliche Nachträge** und gehen dem Text oben vor.
+
+**Major**
+- **N1, Zeitraum (zu E2):** Einen Chip für den Zeitraum gibt es nicht (`Chrome.tsx`). Es entfällt nur „ab heute“. Mit gesetztem Zeitraum bleibt `rangePhrase` („3 Angebote vom 20.–31.10.“, Browser-Review 0023, m1; `zeitraum.spec.ts:35`). E7 rechnet `rangePhrase` nicht mehr als Ersparnis.
+- **N2, ADR 0039 vollständig und ehrlich (zu E6):**
+  - Die Liste umfasst zusätzlich:
+    - ADR 0017, Punkt 3 („nie in URL, Logs oder Requests“)
+    - `architecture.md:135`, erster Satz
+    - ADR 0008 „Was nie an OpenFreeMap geht: … mittelbar über die Kachelwahl“
+    - ADR 0008, Abwägung gegen PMTiles
+    - ADR 0038, Punkt 1: Mit gespeichertem Startpunkt verrät schon das Öffnen des Tabs „Anbieter“ die Gegend.
+  - Die Abwägung gegen Selbsthosten nennt ADR 0039 als neu zu bewerten, ausdrücklich offen.
+  - **Formulierung:** Die Mitte der geladenen Kacheln liegt bis auf etwa eine Kachelbreite (≈ 1,5–3 km) am Startpunkt. Das Runden auf 100 m schützt dort nicht.
+  - **Raster:** Die Rahmenmitte rastet auf 0,01° ein (≈ 1,1 × 0,7 km), damit nicht die genaue Mitte ankommt. Unit-Test in `camera.test.ts`.
+  - Das Impressum nennt auch den Tab „Anbieter“.
+- **N3, Maßstab (zu E6, E8):** Mit `fitBounds` und den Paddings ergäbe die 250 px hohe Anbieterkarte etwa 10 × 7 km. Alle Karten starten deshalb mit `center` (eingerastet, N2) und einem festen Zoom, der 2 km Radius auf der kürzeren Kante zeigt. Er wird aus der Kartenhöhe gerechnet und liegt bei mindestens Zoom 13. E2E prüft eine Obergrenze des Ausschnitts (`getBounds`, höchstens etwa 6 × 6 km) auf beiden Karten, hoch und quer.
+- **N4:** Merklisten-Karte, siehe „Offen“.
+- **N5, Einklappen (zu E3):** Nachgebildet wird genau `_updateCompactMinimize` von MapLibre: nur die Klasse `maplibregl-compact-show` entfernen, `open` bleibt. E2E auf Chromium und WebKit: Nach dem Einklappen öffnet ein Tipp auf „i“ die Angabe wieder.
+
+**Minor**
+- **N6, 5 s in E2E:** Die Verzögerung ist eine Konstante, die sich im E2E-Build setzen lässt (`__E2E__`). Die Fake-Uhr friert nur `Date` ein, `setTimeout` läuft echt. `mobile-ux` prüft den ausgeklappten und den eingeklappten Zustand ausdrücklich.
+- **N7, Specs zu S2:** Die Liste ermittelt `node scripts/e2e-select.ts src/ui/format.ts src/ui/App.tsx`, nicht der `grep`. Bekannt sind:
+  - „ab heute“: `app.spec.ts:36`, `pwa.spec.ts:153`, `startpunkt.spec.ts:117`, `onboarding.spec.ts:65`
+  - `zeitraum.spec.ts`
+  - „Luftlinie ab“ und „Wegzeiten gerade nicht verfügbar“: `startpunkt.spec.ts`, `anbieter-inhalt.spec.ts:78`, `mobile-ux.spec.ts:396`
+- **N8, Ansage:** Die Statuszeile „im Kartenausschnitt“ der Angebotskarte nutzt dasselbe Muster wie der Tab „Anbieter“ (`useSettled`, sichtbarer Teil `aria-hidden`).
+- **N9, Liste unter der Karte:** Die Sortierung aus der URL wirkt dort mit, und das `SortMenu` steht in der Werkzeugzeile neben „Liste | Karte“, wie in der Liste. `listWaits` gilt wie in der Liste. Ein neuer Ausschnitt setzt das Schrittladen zurück (`resetPage`).
+- **N10, `want()`:** Die Karte bleibt ein Anlass für Wegzeit und Linien, neu begründet über die Minuten an den Kacheln der Liste unter der Karte. Die Kartenmitte ist kein Grund mehr. Das steht in ADR 0039 und in `architecture.md:77/136`.
+- **N11, zweite Kamera:** `MapViewProps` bekommt `overview` (Rahmen über alle Orte) für „Alle zeigen“ und den Rückfall. `start` ist der Startpunkt-Rahmen. Dazu ein Test.
+- **N12, „neuer Startpunkt“:** Gleich ist ein Startpunkt bei gleicher Quelle und gleichem, eingerastetem Punkt (N2) bzw. gleicher `districtId`. Dieselbe Regel gilt für `lastCamera` und für das Fahren bei offener Karte. Ein erneuter GPS-Tipp mit demselben Wert bewegt die Karte nicht.
+- **N13, 320 px:** `layout.spec.ts` prüft den längsten Zustand ausdrücklich: „42 Angebote im Kartenausschnitt · Luftlinie, außerhalb“ plus „Alle zeigen“. Umbrechen darf nur „Alle zeigen“, und zwar in eine eigene Zeile.
