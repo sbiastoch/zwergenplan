@@ -102,7 +102,7 @@ async function topDialogOverSheet(page: Page) {
 }
 
 test.describe("Tab „Anbieter“ (E2, E4)", () => {
-  test("öffnet per Tab, zählt in der Statuszeile, zeigt Sticker und Schnellfilter, übersteht Neuladen", async ({
+  test("öffnet per Tab, zählt in der Statuszeile, zeigt Sticker ohne Schnellfilter, übersteht Neuladen", async ({
     page,
   }) => {
     await ready(page);
@@ -114,7 +114,9 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
     await expect(tabs.nth(1)).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
     await expect(page.getByRole("group", { name: "Kategorien" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Alle Filter/ })).toBeVisible();
+    // Kosten, Anmeldung, Format, Wegzeit und Zeitraum beschreiben Termine, nicht Anbieter (Plan 0055, E3)
+    await expect(page.getByRole("button", { name: /^Alle Filter/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Kostenlos" })).toHaveCount(0);
     await listReady(page);
 
     await page.reload();
@@ -126,6 +128,16 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
   test("Einzahl in der Statuszeile: „1 Anbieter mit 1 Angebot“", async ({ page }) => {
     await ready(page, "./?kat=buecher&ansicht=anbieter");
     await expect(page.getByRole("status")).toHaveText("1 Anbieter mit 1 Angebot");
+  });
+
+  test("nur Kategorie wirkt: „kostenlos“ in der URL ändert im Tab nichts, in „Angebote“ schon (Plan 0055, E3)", async ({
+    page,
+  }) => {
+    await ready(page, "./?kosten=kostenlos&ansicht=anbieter");
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await tab(page, "Angebote").click();
+    await expect(page).toHaveURL(/[?&]kosten=kostenlos(&|$)/);
+    await expect(page.getByRole("button", { name: /^Kostenlos/ })).toHaveAttribute("aria-pressed", "true");
   });
 });
 

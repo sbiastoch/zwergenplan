@@ -5,7 +5,7 @@ import { loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/p
 import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
-import { activeFilterCount, EMPTY_FILTER, type FilterState, withDateRange } from "../domain/filter.ts";
+import { activeFilterCount, EMPTY_FILTER, type FilterState, providerFilter, withDateRange } from "../domain/filter.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
@@ -306,10 +306,11 @@ export function App() {
   const discoverCtx: CardContext = { ...ctx, isUnfit: (id) => views.listUnfitIds.has(id) };
   const [listCount, listWords] = listStatusParts(visible.length, route.filter.range);
   const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.map?.placeCount ?? 0);
-  // „5 Anbieter mit 8 Angeboten“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4)
+  // „5 Anbieter mit 8 Angeboten“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4). Im Tab wirken nur
+  // Kategorie und Alter (Plan 0055, E3).
   const [providerCount, providersWord, providerOffers, providerOffersWord] = providerStatusParts(
-    countProviders(visible),
-    visible.length,
+    countProviders(views.providerVisible),
+    views.providerVisible.length,
   );
   /*
    * Startpunkt hinter der Zahl, im selben Fließtext (Plan 0020, E1): U+00A0 vor dem Punkt, damit er nie verwaist am
@@ -379,11 +380,13 @@ export function App() {
     sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined || onboarding !== "aus";
   const limit = route.filter.reachLimit;
   const limitOn = limitActive(reachMode);
-  const hint = limit && limitHint(limit, reachMode);
+  // Wegzeit-Grenze und Zeitraum gelten nur in „Entdecken“, nicht im Tab „Anbieter“ (Plan 0055, E3, Review M2)
+  const inProviders = section === "anbieter";
+  const hint = section === "entdecken" && limit && limitHint(limit, reachMode);
   // gespeicherter Startpunkt + wegzeit=: Platzhalter statt ungefilterter Liste, bis die Wegzeit da ist (M7, Arch-Review
   // 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11). Die Merkliste kennt keine Wegzeit-Grenze
   // und wartet nie (Plan 0025, E8).
-  const listPending = reachMode?.kind === "laedt" && limit !== undefined;
+  const listPending = section === "entdecken" && reachMode?.kind === "laedt" && limit !== undefined;
   // „Nächstgelegen“ wartet ebenso auf die Wegzeit, damit die Liste nicht nachträglich umsortiert (Plan 0043, E7). Nur
   // die Liste: Die Zahl der Statuszeile stimmt, und `finish.pending` des Onboardings hängt an `listPending`.
   const listWaits = listPending || (route.sort === "nah" && reachMode?.kind === "laedt");
@@ -395,6 +398,15 @@ export function App() {
   };
   // Zurücksetzen nur mit aktiven URL-Filtern; fürs Alter gibt es „Auch unpassende zeigen“ (Plan 0021, E4).
   const resetIfActive = activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? resetFilters : undefined;
+  // Im Tab „Anbieter“ zählen und fallen nur die Kategorien; die übrigen Filter bleiben für „Entdecken“ (Plan 0055, E3)
+  const resetProviderFilter =
+    activeFilterCount(providerFilter(route.filter), { limitActive: false }) > 0
+      ? () => {
+          setFilter({ ...route.filter, categories: [] });
+          views.setAgeOnly(true);
+        }
+      : undefined;
+  const shownUnfitCount = inProviders ? views.providerUnfitCount : unfitCount;
   /*
    * Beide Altersknöpfe verschwinden nach dem Tipp (Leerzustand bzw. Warnhinweis): Der Fokus geht vorher auf die
    * Statuszeile, sonst fiele er auf <body> (Muster wie LimitAction, Plan 0009, N2). Sie meldet die neue Zahl selbst.
@@ -404,7 +416,9 @@ export function App() {
     views.setAgeOnly(on);
   };
   const ageEscape: AgeEscape | undefined =
-    birthDate && ageOnly && unfitCount > 0 ? { label: ageLabel, onShow: () => setAgeOnlyKeepFocus(false) } : undefined;
+    birthDate && ageOnly && shownUnfitCount > 0
+      ? { label: ageLabel, onShow: () => setAgeOnlyKeepFocus(false) }
+      : undefined;
   /*
    * Karte in „Entdecken“ (sichtbare Angebote) und auf der Merkliste (gemerkte, Plan 0025, E4). Der Startausschnitt
    * kommt in beiden Fällen aus allen kommenden Angeboten (`views.map.cameraOffers`, ADR 0008), nie aus der Merkliste.
@@ -462,7 +476,8 @@ export function App() {
       <Header ageLabel={ageLabel} onKid={() => setSheet("kid")} />
       {/* Sticker wirken auch in der Anbieterliste (Plan 0010, E2, E4) */}
       {(section === "entdecken" || section === "anbieter") && <Stickers filter={route.filter} onChange={setFilter} />}
-      {section !== "merkliste" && (
+      {/* Kosten, Anmeldung, Format, Wegzeit und Zeitraum beschreiben Termine, nicht Anbieter (Plan 0055, E3) */}
+      {section === "entdecken" && (
         <QuickFilters
           filter={route.filter}
           limitActive={limitOn}
@@ -557,11 +572,11 @@ export function App() {
                 {limitAction(statusLine)}
               </p>
             )}
-            {birthDate && !ageOnly && unfitCount > 0 && (
+            {birthDate && !ageOnly && shownUnfitCount > 0 && (
               // Altersfilter aus (Plan 0021, E3); ist er an, steht hier nichts zum Alter
               <p className="status age-warn">
                 <Icon name="alert" size={18} />
-                <span>{ageWarnText(unfitCount, ageLabel)}</span>{" "}
+                <span>{ageWarnText(shownUnfitCount, ageLabel)}</span>{" "}
                 <button type="button" className="linkbtn" onClick={() => setAgeOnlyKeepFocus(true)}>
                   ausblenden
                 </button>
@@ -623,14 +638,14 @@ export function App() {
           <ProviderPanel
             generatedAt={load.data.generatedAt}
             offers={offers}
-            visible={visible}
+            visible={views.providerVisible}
             now={now}
             reachOf={views.reachOf}
             reachMode={reachMode}
             query={providerQuery}
             onQuery={setProviderQuery}
             onOpenProvider={openProvider}
-            onResetFilter={resetIfActive}
+            onResetFilter={resetProviderFilter}
             age={ageEscape}
             saved={savedProviders}
             onToggleSaved={onToggleProvider}
@@ -699,7 +714,7 @@ export function App() {
         onUnknownProvider={dropProvider}
         generatedAt={load.kind === "ready" ? load.data.generatedAt : undefined}
         offers={offers}
-        visible={visible}
+        visible={inProviders ? views.providerVisible : visible}
         ctx={ctx}
         say={say}
         filter={route.filter}
