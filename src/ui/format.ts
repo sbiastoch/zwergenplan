@@ -440,20 +440,19 @@ export function wayParts(
   };
 }
 
-/**
- * Zusatz der Statuszeile hinter der Zahl (Plan 0020, E1; ADR 0019): nur der Startpunkt, die Annahme (Di vormittags,
- * 1 Umstieg, Warten) erklärt das Kind-Sheet. Der seltene Rückfall auf die Luftlinie nennt seinen Grund (ADR 0011, 9).
- */
 /** Untertitel von „Nächstgelegen“ im Sortiermenü (Plan 0043, E7; Review 3, K3) */
 export function nearSortSub(mode: ReachMode | undefined, origin: Origin | undefined): string {
   if (!origin) return "Startpunkt wählen";
   return `${mode?.kind === "luftlinie" ? "Luftlinie" : "Wegzeit"} ${originPhrase(origin)}`;
 }
 
-export function reachNote(mode: ReachMode, origin: Origin): string {
-  const from = originPhrase(origin);
-  if (mode.kind !== "luftlinie") return `Wegzeit ${from}`;
-  return `Luftlinie ${from} (${mode.reason === "fehler" ? "Wegzeiten gerade nicht verfügbar" : "außerhalb des Stadtgebiets"})`;
+/**
+ * Zusatz der Statuszeile hinter der Zahl (Plan 0056, E2; ADR 0039): nur der seltene Rückfall auf die Luftlinie, kurz
+ * mit Grund (ADR 0011, 9). Den Startpunkt nennen Kind-Sheet und Sortiermenü.
+ */
+export function reachNote(mode: ReachMode): string | undefined {
+  if (mode.kind !== "luftlinie") return undefined;
+  return mode.reason === "fehler" ? "Luftlinie, Wegzeit fehlt" : "Luftlinie, außerhalb";
 }
 
 /** Hinweise im Kind-Sheet, Abschnitt „Wegzeit ab“ (OriginPicker.tsx; Plan 0004, E5; Plan 0009, N3) */
@@ -553,11 +552,6 @@ export const SHARE_COPIED = "Link kopiert – zum Einfügen in WhatsApp & Co.";
 export const SHARE_MANUAL_HINT = "Halte den Link gedrückt, um ihn zu kopieren.";
 export const OFFER_GONE = "Dieses Angebot ist nicht mehr im Zwergenplan.";
 
-/** Statuszeile der Karte „8 Angebote an 5 Orten“; die Zahlen getrennt, damit sie fett stehen. */
-export function mapStatusParts(offers: number, places: number): [number, string, number, string] {
-  return [offers, offers === 1 ? " Angebot an " : " Angebote an ", places, places === 1 ? " Ort" : " Orten"];
-}
-
 /**
  * Statuszeile der Merkliste als Liste (Plan 0025, E3a): „5 Angebote mit insgesamt 28 Terminen gemerkt“. `sessions`
  * zählt die kommenden Termine, wie der Kalender sie zeigt; die Zahlen getrennt, damit sie fett stehen. `missing`
@@ -576,13 +570,12 @@ export function savedStatusParts(offers: number, sessions: number, missing = 0):
 const ofSaved = (total: number) => ` von ${total} gemerkten ${total === 1 ? "Angebot" : "Angeboten"}`;
 
 /**
- * Statuszeile der Merklisten-Karte (Plan 0025, E3a): „5 Angebote an 5 Orten gemerkt“, Muster wie `mapStatusParts`.
- * Mit aktivem Merklisten-Filter `total` gemerkte: „2 von 5 gemerkten Angeboten an 2 Orten“.
+ * Statuszeile der Merklisten-Karte (Plan 0025, E3a; Plan 0056, E2): „5 Angebote gemerkt“, nur die Zahl. Mit aktivem
+ * Merklisten-Filter `total` gemerkte: „2 von 5 gemerkten Angeboten“.
  */
-export function savedMapStatusParts(offers: number, places: number, total?: number): [number, string, number, string] {
-  const [a, offersWord, b, placesWord] = mapStatusParts(offers, places);
-  if (total === undefined) return [a, offersWord, b, `${placesWord} gemerkt`];
-  return [a, `${ofSaved(total)} an `, b, placesWord];
+export function savedMapStatusParts(offers: number, total?: number): [number, string] {
+  if (total === undefined) return [offers, offers === 1 ? " Angebot gemerkt" : " Angebote gemerkt"];
+  return [offers, ofSaved(total)];
 }
 
 /** Statuszeile von Liste und Kalender mit aktivem Merklisten-Filter: „2 von 5 gemerkten Angeboten passen“ (E3a) */
@@ -606,7 +599,7 @@ function dayDot(day: string, year = false): string {
   return year ? `${d}.${month}.${y}` : `${d}.${month}.`;
 }
 
-/** „vom 17.–18.10.“, „ab Sa 17.10.“, „bis So 18.10.“, „am Sa 17.10.“ (Plan 0023); ohne Zeitraum „ab heute“ */
+/** „vom 17.–18.10.“, „ab Sa 17.10.“, „bis So 18.10.“, „am Sa 17.10.“ (Plan 0023); ohne Zeitraum leer (Plan 0056, N1) */
 function rangePhrase(range: DateRange | undefined): string {
   const { from, to } = range ?? {};
   if (from && to) {
@@ -618,20 +611,21 @@ function rangePhrase(range: DateRange | undefined): string {
   }
   if (from) return `ab ${shortDate(from)}`;
   if (to) return `bis ${shortDate(to)}`;
-  return "ab heute";
+  return "";
 }
 
 /**
- * Statuszeile der Liste „3 Angebote vom 17.–18.10.“ (Browser-Review 0023, m1): ein ganzer Satz, denn die Zeile ist
- * eine Live-Region. Die Zahl getrennt, damit sie fett steht.
+ * Statuszeile von Liste und Karte „230 Angebote“, mit Zeitraum „3 Angebote vom 17.–18.10.“ (Browser-Review 0023, m1;
+ * Plan 0056, E2): ein ganzer Satz, denn die Zeile ist eine Live-Region. Die Zahl getrennt, damit sie fett steht.
  */
 export function listStatusParts(count: number, range: DateRange | undefined): [number, string] {
-  return [count, ` ${count === 1 ? "Angebot" : "Angebote"} ${rangePhrase(range)}`];
+  const phrase = rangePhrase(range);
+  return [count, ` ${count === 1 ? "Angebot" : "Angebote"}${phrase && ` ${phrase}`}`];
 }
 
-/** Statuszeile im Tab „Anbieter“ „5 Anbieter mit 8 Angeboten“ (Plan 0010, E4); die Zahlen getrennt, fett. */
-export function providerStatusParts(providers: number, offers: number): [number, string, number, string] {
-  return [providers, " Anbieter mit ", offers, offers === 1 ? " Angebot" : " Angeboten"];
+/** Statuszeile im Tab „Anbieter“ „5 Anbieter“ (Plan 0010, E4; Plan 0056, E2); die Zahl getrennt, fett. */
+export function providerStatusParts(providers: number): [number, string] {
+  return [providers, " Anbieter"];
 }
 
 const LOAD_ERRORS: Record<LoadFailure, string> = {

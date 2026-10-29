@@ -189,7 +189,7 @@ test("Suche trifft nur einen abonnierten: steht oben, kein â€žKein Anbieter heiÃ
   await preset(page, ["fv3fpfp2"]);
   await page.goto("./?ansicht=anbieter");
   const status = page.locator("p.status");
-  await expect(status).toContainText("Anbieter mit");
+  await expect(status).toHaveText(/^\d+ Anbieter$/);
   const before = await status.textContent();
   await page.getByRole("searchbox", { name: "Anbieter suchen" }).fill("theater");
   await expect(savedList(page).locator("li")).toHaveCount(1);

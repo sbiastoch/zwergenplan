@@ -407,7 +407,7 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(page).toHaveURL(/\?ansicht=merkliste-karte$/);
     await expect(karte).toHaveAttribute("aria-pressed", "true");
     await expect(karte).toBeFocused();
-    await expect(page.getByRole("status")).toHaveText("5 Angebote an 4 Orten gemerkt");
+    await expect(page.getByRole("status")).toHaveText("5 Angebote gemerkt");
     await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
     await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
     await expect(page.locator(".map-box")).toBeVisible();
@@ -565,7 +565,7 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
     await expect(page).toHaveURL(/\?ansicht=merkliste-karte$/);
     await expect(page.getByText("Von deinen 3 gemerkten Angeboten passt keins.")).toBeVisible();
     await expect(page.locator(".map-box")).toHaveCount(0);
-    await expect(page.getByRole("status")).toHaveText("0 von 3 gemerkten Angeboten an 0 Orten");
+    await expect(page.getByRole("status")).toHaveText("0 von 3 gemerkten Angeboten");
     await expectMobileUx(page);
   });
 });
@@ -576,9 +576,9 @@ test.describe("Karte der Merkliste mit Filter (Plan 0025, E3a)", () => {
   test("Statuszeile zählt passende Angebote und ihre Orte", async ({ page }) => {
     await preset(page, FIVE.slice(0, 3));
     await page.goto("./?ansicht=merkliste-karte");
-    await expect(page.getByRole("status")).toHaveText("3 Angebote an 2 Orten gemerkt");
+    await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
     await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Kurse" }).click();
-    await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten an 2 Orten");
+    await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten");
     await mapSettled(page);
   });
 });

@@ -32,7 +32,7 @@ test("von/bis im Filter-Sheet: URL, Badge, Kurs nur mit Beginn im Zeitraum, Rege
 
   await expect(page.getByRole("button", { name: "Alle Filter, 1 aktiv" })).toBeVisible();
   await expect(offers(page)).toHaveCount(3);
-  // Die Zählzeile nennt den Zeitraum statt „ab heute“ (Browser-Review 0023, m1)
+  // Die Zählzeile nennt den Zeitraum hinter der Zahl (Browser-Review 0023, m1; Plan 0056, E2, N1)
   await expect(page.getByRole("status")).toHaveText("3 Angebote vom 20.–31.10.");
   await expect(page.getByText(/PEKiP-Gruppe/)).toHaveCount(0);
   await expect(page.getByText("Babymassage – Schnupper-Workshop")).toHaveCount(0);

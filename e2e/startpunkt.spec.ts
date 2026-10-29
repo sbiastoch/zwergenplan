@@ -21,7 +21,6 @@ const KEY = "zwergenplan.entfernung-ab";
 const POINT_KEY = "zwergenplan.startpunkt";
 const STORED_HERE = '{"source":"standort","lat":49.452,"lon":11.077}';
 const STORED_MAP_CENTER = '{"source":"karte","lat":49.452,"lon":11.077}';
-const WEGZEIT_STANDORT = "Wegzeit ab deinem Standort";
 /** Eine Koordinate mit mindestens zwei Nachkommastellen, z. B. „49.45“ */
 const COORDINATE = /\d{2}\.\d{2,}/;
 const TABLE = "**/data/wegzeit.json";
@@ -30,13 +29,18 @@ const isTable = (url: string) => new URL(url).pathname.endsWith("/data/wegzeit.j
 const isChunk = (url: string) => /\/assets\/oepnv\/[^/]+\.js$/.test(new URL(url).pathname);
 const LINES = "**/data/linien.json";
 const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.json");
-const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof";
 const NB = "\u00a0";
 /** Offener Krabbeltreff (Fixture), für die vorbelegte Merkliste (Plan 0025) */
 const TREFF_ID = "lxizt974";
 
 const offers = (page: Page) => page.getByTestId("offer");
 const card = (page: Page, title: string) => offers(page).filter({ hasText: title });
+
+/** Wegzeit geladen: Minuten an der ersten Kachel, kein Luftlinien-Zusatz in der Statuszeile (Plan 0056, E2) */
+async function expectWegzeit(page: Page) {
+  await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
+  await expect(page.locator(".status-reach")).toHaveCount(0);
+}
 
 /** Seite bereit, auch Export-Code und PWA-Kern sind nachgeladen: Danach entsteht kein Request ohne Anlass (Plan 0010, E8 A; Plan 0011, E5). */
 async function ready(page: Page, path = "./") {
@@ -114,7 +118,7 @@ async function storedValues(page: Page): Promise<string[]> {
 
 test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein Request", async ({ page }) => {
   await ready(page);
-  await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
+  await expect(page.getByRole("status")).toHaveText("8 Angebote");
   const loaded = transitLoaded(page);
   const sheet = await openKidSheet(page);
   await loaded;
@@ -127,13 +131,14 @@ test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein
   await expect(sheet.getByRole("button", { name: "Startpunkt entfernen" })).toBeVisible();
   await sheet.getByRole("button", { name: "Fertig" }).click();
 
-  // hinter der Zahl, im selben Satz (Plan 0020, E1); Lage und Umbruch prüft „Statuszeile: Startpunkt …“
-  await expect(page.getByRole("status")).toContainText(`8 Angebote ab heute · ${WEGZEIT_GOSTENHOF}`);
   // von Hand nachgerechnet (E15): Gostenhof → Beispielhof 13,6 Min. → „15 Min.“
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
   await expect(card(page, "Kuckuck im Nest").locator(".dist")).toHaveText("5 Min.");
   await expect(card(page, "Musikgarten").locator(".dist")).toHaveText("30 Min.");
   await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
+  // Mit Wegzeit nennt die Statuszeile den Startpunkt nicht, nur die Zahl (Plan 0056, E2; ADR 0039)
+  await expect(page.getByRole("status")).toHaveText("8 Angebote");
+  await expect(page.locator(".status-reach")).toHaveCount(0);
   expect(requests, "kein Request nach der Wahl des Startpunkts").toEqual([]);
 
   const url = page.url();
@@ -151,13 +156,12 @@ test("Wegzeit ab Stadtteil: lädt beim Öffnen des Kind-Sheets, ab der Wahl kein
 
   // gespeicherter Stadtteil: Die Tabelle lädt beim Start, die Wegzeit steht wieder
   await page.reload();
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
   expect(await page.evaluate((key) => localStorage.getItem(key), KEY)).toBe("gostenhof");
 });
 
 /**
- * Lage des Zusatzes „ · Wegzeit ab …“ in der Statuszeile (Plan 0020, E1): Der Punkt steht in derselben Zeile wie das
+ * Lage des Zusatzes „ · Luftlinie, …“ in der Statuszeile (Plan 0020, E1; seit Plan 0056, E2 nur noch der Rückfall): Der Punkt steht in derselben Zeile wie das
  * Wort davor (U+00A0), die Zeile läuft nicht über. Gemessen per `Range` am Punkt und am letzten Zeichen davor.
  */
 async function statusLayout(page: Page) {
@@ -199,29 +203,16 @@ async function expectReachLayout(page: Page, what: string) {
   return m;
 }
 
-test("Statuszeile: Startpunkt hinter der Zahl, Punkt nie verwaist, kein Überlauf (Plan 0020, E1)", async ({ page }) => {
-  const width = page.viewportSize()?.width ?? 0;
+test("Statuszeile: Luftlinien-Rückfall hinter der Zahl, Punkt nie verwaist, kein Überlauf (Plan 0020, E1; Plan 0056, E2)", async ({
+  page,
+}) => {
   const check = (what: string) => expectReachLayout(page, what);
 
-  // per evaluate statt addInitScript: Der Startpunkt wechselt unten zwischen den Ladevorgängen.
+  // Stadtteil in der Fixture außerhalb: Zusatz „ · Luftlinie, außerhalb“. Den Startpunkt selbst nennt die Zeile nicht.
   await ready(page);
-  await page.evaluate((key) => localStorage.setItem(key, "gostenhof"), KEY);
-  await ready(page);
-  await expect(page.getByRole("status")).toContainText(`8 Angebote ab heute · ${WEGZEIT_GOSTENHOF}`);
-  // Bis Plan 0025 (E8) lief das auch im Tab „Kalender“ (dort ohne Umschalter, deshalb ab 390 px einzeilig); die
-  // Statuszeile war dieselbe wie in der Liste, und die prüft dieser Test weiter, auch bei 320 px und 200 %.
-  await check("Liste, Gostenhof");
-  await page.setViewportSize({ width: 320, height: 640 });
-  await setTextScale(page, 2);
-  await check("Liste, Gostenhof, 320 px, 200 %");
-
-  // längster Stadtteil, in der Fixture außerhalb: der längste Zusatz „Luftlinie ab … (außerhalb des Stadtgebiets)“
   await page.evaluate((key) => localStorage.setItem(key, "roethenbach"), KEY);
-  await page.setViewportSize({ width, height: 800 });
   await ready(page);
-  await expect(page.getByRole("status")).toContainText(
-    "Luftlinie ab Röthenbach b. Schweinau (außerhalb des Stadtgebiets)",
-  );
+  await expect(page.getByRole("status")).toHaveText("8 Angebote · Luftlinie, außerhalb");
   await check("Liste, Röthenbach");
   await page.setViewportSize({ width: 320, height: 640 });
   await setTextScale(page, 2);
@@ -231,17 +222,14 @@ test("Statuszeile: Startpunkt hinter der Zahl, Punkt nie verwaist, kein Überlau
 test.describe("Statuszeile auf „Karte“", () => {
   test.use({ tiles: "mock" });
 
-  test("Kartenmitte als Startpunkt neben dem Umschalter: Punkt nie verwaist, kein Überlauf (Plan 0020, E1)", async ({
+  test("Luftlinien-Rückfall neben dem Umschalter: Punkt nie verwaist, kein Überlauf (Plan 0020, E1; Plan 0056, E2)", async ({
     page,
   }) => {
-    await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), {
-      key: POINT_KEY,
-      value: STORED_MAP_CENTER,
-    });
+    await page.addInitScript((key) => localStorage.setItem(key, "roethenbach"), KEY);
     await ready(page);
     await page.getByRole("button", { name: "Karte", exact: true }).click();
-    await expect(page.getByRole("status")).toContainText("Orten · Wegzeit ab der Kartenmitte");
-    await expectReachLayout(page, "Karte, Kartenmitte");
+    await expect(page.getByRole("status")).toHaveText("8 Angebote · Luftlinie, außerhalb");
+    await expectReachLayout(page, "Karte, Röthenbach");
   });
 
   test("Kartenmitte als Startpunkt: Stadtteil-Auswahl bleibt, Knopf „Meinen Standort nutzen“ (Plan 0022)", async ({
@@ -327,7 +315,7 @@ test.describe("Gespeicherter Stadtteil", () => {
     const requests = tableRequests(page);
     const lines = tableRequests(page, isLines);
     await ready(page);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
     await expect.poll(() => lines.length).toBe(1);
     const sheet = await openKidSheet(page);
     await sheet.getByRole("button", { name: "Fertig" }).click();
@@ -342,12 +330,12 @@ test.describe("Gespeicherter Stadtteil", () => {
 test("Startpunkt entfernen löscht auch den gespeicherten Stadtteil", async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   const sheet = await openKidSheet(page);
   await sheet.getByRole("button", { name: "Startpunkt entfernen" }).click();
   await expect(sheet.getByText("Noch kein Startpunkt – dann zeigen wir keine Wegzeit.")).toBeVisible();
   await sheet.getByRole("button", { name: "Fertig" }).click();
-  await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
+  await expect(page.getByRole("status")).toHaveText("8 Angebote");
   await expect(page.locator(".meta .dist")).toHaveCount(0);
   expect(await page.evaluate((key) => localStorage.getItem(key), KEY)).toBeNull();
 });
@@ -374,7 +362,7 @@ test("Standort mit Freigabe: gerundet gespeichert, Wegzeit, ab dem Tipp kein Req
   await expect(sheet.getByText("Stadtteil", { exact: true })).toHaveCount(0);
   await expect(sheet.getByRole("button", { name: "Standort aktualisieren" })).toBeFocused();
   await sheet.getByRole("button", { name: "Fertig" }).click();
-  await expect(page.getByRole("status")).toContainText("Wegzeit ab deinem Standort");
+  await expectWegzeit(page);
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText(/^\d+ Min\.$/);
   await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
   // Der Beispielhof liegt um die Ecke: zu Fuß
@@ -399,7 +387,7 @@ test("Standort mit Freigabe: gerundet gespeichert, Wegzeit, ab dem Tipp kein Req
     });
   });
   await page.reload();
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+  await expectWegzeit(page);
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText(/^\d+ Min\.$/);
   expect(await page.evaluate(() => [Reflect.get(window, "__geoWrapped"), Reflect.get(window, "__geoCalls")])).toEqual([
     true,
@@ -419,7 +407,7 @@ test.describe("Gespeicherter Standort (Plan 0016)", () => {
     const requests = tableRequests(page);
     const lines = tableRequests(page, isLines);
     await ready(page);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+    await expectWegzeit(page);
     await expect.poll(() => lines.length).toBe(1);
     const sheet = await openKidSheet(page);
     await expect(sheet.getByText("Startpunkt:")).toContainText("Mein Standort");
@@ -449,7 +437,7 @@ test.describe("Gespeicherter Standort (Plan 0016)", () => {
       { key: POINT_KEY, value: STORED_HERE },
     );
     await ready(page);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+    await expectWegzeit(page);
     const sheet = await openKidSheet(page);
     await expect(sheet.getByLabel("Stadtteil", { exact: true })).toHaveCount(0);
     await sheet.getByRole("button", { name: "Startpunkt entfernen" }).click();
@@ -461,7 +449,7 @@ test.describe("Gespeicherter Standort (Plan 0016)", () => {
     await sheet.getByRole("button", { name: "Fertig" }).click();
     expect(await storedValues(page)).toEqual([`${KEY}=gostenhof`]);
     await page.reload();
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
   });
 
   test("Startpunkt entfernen löscht den gespeicherten Standort; nach dem Neuladen kein Startpunkt, kein Laden", async ({
@@ -485,7 +473,7 @@ test.describe("Gespeicherter Standort (Plan 0016)", () => {
 
     const requests = tableRequests(page, (url) => isTable(url) || isLines(url));
     await ready(page);
-    await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
+    await expect(page.getByRole("status")).toHaveText("8 Angebote");
     await page.waitForTimeout(300);
     expect(requests).toEqual([]);
   });
@@ -556,7 +544,7 @@ test.describe("Rückfall auf die Luftlinie (E11)", () => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
     await page.route(TABLE, (route) => route.abort());
     await ready(page);
-    await expect(page.getByRole("status")).toContainText("Luftlinie ab Gostenhof (Wegzeiten gerade nicht verfügbar)");
+    await expect(page.getByRole("status")).toHaveText("8 Angebote · Luftlinie, Wegzeit fehlt");
     await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("1,4 km");
     await expect(page.locator(".meta .dist").filter({ hasText: "Min." })).toHaveCount(0);
 
@@ -575,7 +563,7 @@ test.describe("Rückfall auf die Luftlinie (E11)", () => {
     await expect(sheet.getByRole("button", { name: "bis 20 Min." })).toBeEnabled();
     await expect(sheet.getByText("Wegzeiten gerade nicht verfügbar.")).toHaveCount(0);
     await sheet.getByRole("button", { name: /Angebote zeigen$/ }).click();
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
     await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
   });
 
@@ -625,7 +613,7 @@ test("Veraltete Tabelle: Hinweis, „Nochmal laden“ lädt ohne Cache neu und b
   });
   await ready(page, "./?wegzeit=20");
   await expect(page.getByText("„bis 20 Min.“ wirkt gerade nicht: Wegzeiten nicht geladen.")).toBeVisible();
-  await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+  await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
   await expect(offers(page)).toHaveCount(8);
 
   await page.unroute(TABLE);
@@ -633,7 +621,7 @@ test("Veraltete Tabelle: Hinweis, „Nochmal laden“ lädt ohne Cache neu und b
   await expect(offers(page)).toHaveCount(6);
   // erster Abruf mit dem HTTP-Cache, der zweite an ihm vorbei
   expect(await page.evaluate(() => sessionStorage.getItem("e2e-wegzeit-cache"))).toBe("default reload");
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   await expect(page.getByText(/wirkt gerade nicht/)).toHaveCount(0);
 });
 
@@ -651,7 +639,7 @@ test.describe("Rechenlogik nicht ladbar (M8, N1)", () => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
     await page.route(CHUNK, (route) => route.abort());
     await ready(page, "./?wegzeit=20");
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
     await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("1,4 km");
     await expect(page.getByRole("button", { name: "Seite neu laden" })).toHaveCount(0);
 
@@ -660,12 +648,12 @@ test.describe("Rechenlogik nicht ladbar (M8, N1)", () => {
     await page.getByRole("button", { name: "Nochmal laden" }).click();
     await reloaded;
     await expect(page).toHaveURL(/\?wegzeit=20$/);
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
 
     // Chunk wieder erreichbar: ein Tipp bringt die Minuten, je nach Engine mit oder ohne weiteres Neuladen
     await page.unroute(CHUNK);
     await page.getByRole("button", { name: "Nochmal laden" }).click();
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
     await expect(offers(page)).toHaveCount(6);
     await expect(page).toHaveURL(/\?wegzeit=20$/);
     await expect(page.getByRole("button", { name: "Seite neu laden" })).toHaveCount(0);
@@ -676,12 +664,12 @@ test.describe("Rechenlogik nicht ladbar (M8, N1)", () => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
     await page.route(CHUNK, (route) => route.abort());
     await ready(page);
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
     await page.evaluate(() => Object.assign(window, { e2eSameDocument: true }));
     const retried = page.waitForResponse((r) => isTable(r.url()) && r.ok());
     const sheet = await openKidSheet(page);
     await retried;
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
     await expect(sheet).toBeVisible();
     expect(await page.evaluate(() => "e2eSameDocument" in window), "kein Neuladen beim Öffnen").toBe(true);
   });
@@ -700,7 +688,7 @@ test.describe("Rechenlogik und Tabelle nicht ladbar (N1)", () => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
     await page.route(CHUNK, (route) => route.abort());
     await ready(page, "./?wegzeit=20");
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
     await page.route(TABLE, (route) => route.abort());
     // Markierung im Dokument: Ein Neuladen würde sie löschen
     await page.evaluate(() => Object.assign(window, { e2eSameDocument: true }));
@@ -708,7 +696,7 @@ test.describe("Rechenlogik und Tabelle nicht ladbar (N1)", () => {
     await page.getByRole("button", { name: "Nochmal laden" }).click();
     await retried;
     await expect(page.getByRole("button", { name: "Nochmal laden" })).toBeVisible();
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
     expect(await page.evaluate(() => "e2eSameDocument" in window), "kein Neuladen ohne Netz").toBe(true);
   });
 });
@@ -732,7 +720,7 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
   ).toBeVisible();
   await expect(sheet.getByText(/^Wegzeit ab deinem Standort/)).toHaveCount(0);
   await sheet.getByRole("button", { name: "Fertig" }).click();
-  await expect(page.getByRole("status")).toContainText("Luftlinie ab deinem Standort (außerhalb des Stadtgebiets)");
+  await expect(page.getByRole("status")).toContainText("Luftlinie, außerhalb");
   await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText(/^\d+(,\d)? km$/);
 
   await page.getByRole("button", { name: /^Alle Filter/ }).click();
@@ -753,7 +741,7 @@ test("Außerhalb des Stadtgebiets: Luftlinie mit Hinweis, Chips gesperrt mit Beg
 test("Quellenhinweis: Lizenz-Link bricht nicht um, Titel-Link schon", async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   const sheet = await openKidSheet(page);
   await expect(sheet.getByRole("link", { name: "CC0 1.0" })).toHaveCSS("white-space", "nowrap");
   await expect(sheet.getByRole("link", { name: "Fiktiver Fahrplan für Tests" })).toHaveCSS("white-space", "normal");
@@ -762,7 +750,7 @@ test("Quellenhinweis: Lizenz-Link bricht nicht um, Titel-Link schon", async ({ p
 test("Wegzeit-Filter mit Startpunkt: bis 20 Min. blendet Musikschule und Gemeinde aus", async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   await page.getByRole("button", { name: /^Alle Filter/ }).click();
   const sheet = page.getByRole("dialog", { name: "Filter" });
   await expect(sheet.getByRole("heading", { name: "Wegzeit" })).toBeVisible();
@@ -800,7 +788,7 @@ test("geteilter Link mit ?wegzeit= ohne Startpunkt: Hinweis, alle Angebote, Badg
   await expect(offers(page)).toHaveCount(8);
   await expect(page.getByText("„bis 20 Min.“ braucht einen Startpunkt.")).toBeVisible();
   // Der Hinweis steht außerhalb der Status-Region
-  await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
+  await expect(page.getByRole("status")).toHaveText("8 Angebote");
   await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
 
   const loaded = transitLoaded(page);
@@ -821,7 +809,7 @@ test("geteilter Link mit ?wegzeit= ohne Startpunkt: Hinweis, alle Angebote, Badg
 test("alter Link mit ?umkreis= ist wirkungslos, ohne Fehlermeldung (E8)", async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page, "./?umkreis=5");
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   await expect(offers(page)).toHaveCount(8);
   await expect(page.getByText(/braucht einen Startpunkt|wirkt/)).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
@@ -876,11 +864,12 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     await expect(offers(page)).toHaveCount(8);
     await expect(card(page, "Offener Krabbeltreff").locator(".dist.pending")).toHaveCount(1);
     await expect(page.locator(".meta .dist").filter({ hasText: /km|Min\./ })).toHaveCount(0);
-    // Der Text steht schon (Höhe), aber unsichtbar und ohne Ansage
-    await expect(page.locator(".status-reach")).toHaveCSS("visibility", "hidden");
+    // Beim Laden kein Zusatz in der Statuszeile, auch kein unsichtbarer (Plan 0056, E2): Mit Wegzeit kommt keiner
+    await expect(page.getByRole("status")).toHaveText("8 Angebote");
+    await expect(page.locator(".status-reach")).toHaveCount(0);
     release();
     await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
-    await expect(page.locator(".status-reach")).toHaveCSS("visibility", "visible");
+    await expect(page.locator(".status-reach")).toHaveCount(0);
     await expect(page.locator(".dist.pending")).toHaveCount(0);
   });
 
@@ -898,7 +887,7 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     release();
     await expect(offers(page)).toHaveCount(6);
     await expect(pending).toHaveCount(0);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
     await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
   });
 
@@ -930,7 +919,7 @@ test("Detail mit zwei Linien: sichtbar „→“, vorgelesen „, dann“, in ei
   await page.setViewportSize({ width: 412, height: 915 });
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   await page
     .getByRole("heading", { level: 3, name: /^Musikgarten/ })
     .getByRole("button")
@@ -950,8 +939,8 @@ for (const [label, key, value] of [
   }) => {
     await page.addInitScript(({ key, value }) => localStorage.setItem(key, value), { key, value });
     await ready(page);
-    // Statuszeile nur mit Startpunkt (Plan 0020): Tabelle geladen, Wegzeit statt Luftlinie
-    await expect(page.getByRole("status")).toContainText("Wegzeit ab");
+    // Tabelle geladen: Minuten an den Kacheln, kein Luftlinien-Zusatz (Plan 0056, E2)
+    await expectWegzeit(page);
     await page
       .getByRole("heading", { level: 3, name: /Kuckuck im Nest/ })
       .getByRole("button")
@@ -1018,7 +1007,7 @@ test("Wege ab deinem Standort: Hauptweg und ein Weg mit Umstieg, dafür kürzere
     value: STORED_HERE,
   });
   await ready(page);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_STANDORT);
+  await expectWegzeit(page);
   await page
     .getByRole("heading", { level: 3, name: /^Eltern-Kind-Bewegungslandschaft/ })
     .getByRole("button")
@@ -1041,7 +1030,7 @@ test("Wege ab deinem Standort: Hauptweg und ein Weg mit Umstieg, dafür kürzere
 test("Wege ab Gostenhof: Hauptweg mit Umstieg, zu Fuß als anderer Weg", async ({ page }) => {
   await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
   await ready(page);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   await page
     .getByRole("heading", { level: 3, name: /^Musikgarten/ })
     .getByRole("button")
@@ -1065,7 +1054,7 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
       await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
       await page.route(LINES, (route) => route.abort());
       await ready(page, "./?wegzeit=20");
-      await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+      await expectWegzeit(page);
       // bis 20 Min.: ohne Musikschule (29,6) und Gemeinde (23,6)
       await expect(offers(page)).toHaveCount(6);
       await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");
@@ -1078,7 +1067,7 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
       await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
       await page.route(LINES, (route) => route.abort());
       await ready(page);
-      await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+      await expectWegzeit(page);
       await page
         .getByRole("heading", { level: 3, name: /^Musikgarten/ })
         .getByRole("button")
@@ -1098,7 +1087,7 @@ test.describe("Linien fehlen oder kommen später (Plan 0012, E2/E6)", () => {
     await page.addInitScript((key) => localStorage.setItem(key, "gostenhof"), KEY);
     const answered = page.waitForResponse((r) => isLines(r.url()));
     await ready(page);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
     await answered;
     await page.evaluate(() => Object.assign(window, { zpOhneNeuladen: true }));
     await expect(card(page, "Offener Krabbeltreff").locator(".dist")).toHaveText("15 Min.");

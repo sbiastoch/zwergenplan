@@ -33,7 +33,7 @@ test("zeigt jedes kommende Angebot einmal, nach Tagen gruppiert, Vergangenes nic
   await expect(offers(page).first()).toContainText("Offener Krabbeltreff");
   await expect(offers(page).first()).toContainText("10:00–11:30 Uhr");
   await expect(offers(page).first()).toContainText("Jeden Mittwoch");
-  await expect(page.getByRole("status")).toHaveText("8 Angebote ab heute");
+  await expect(page.getByRole("status")).toHaveText("8 Angebote");
   await expect(page.getByText("Datenstand:")).toBeVisible();
 });
 
@@ -205,6 +205,8 @@ test.describe("Altersfilter im Filter-Sheet (Plan 0021)", () => {
     // Der Zustand überlebt den Tab-Wechsel (bis Plan 0025 über den Tab „Kalender“)
     await page.getByRole("button", { name: "Anbieter", exact: true }).click();
     await expect(warn(page)).toBeVisible();
+    // erst wenn die Anbieterkarte ruht: sonst laden Kacheln nach dem Tabwechsel ohne Karte im DOM (Plan 0055)
+    await mapSettled(page);
     await page.getByRole("button", { name: "Angebote", exact: true }).click();
 
     await page.getByRole("button", { name: "ausblenden" }).click();
@@ -262,6 +264,7 @@ test.describe("Altersfilter im Filter-Sheet (Plan 0021)", () => {
     await show.click();
     await expect(page.locator(".place:not(.idle)")).not.toHaveCount(0);
     await expect(page.getByRole("status")).toBeFocused();
+    await mapSettled(page);
     // Der Altersfilter gilt für alle Tabs: zurück in „Angebote“ ist er weiter aus
     await page.getByRole("button", { name: "Angebote", exact: true }).click();
     await expect(offers(page)).toHaveCount(8);

@@ -37,7 +37,8 @@ async function withGostenhof(page: Page) {
   const sheet = await pickGostenhof(page);
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
-  await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
+  // die Statuszeile nennt den Startpunkt nicht mehr (Plan 0056, E2)
+  await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
 }
 
 /** Karte mit Stadtteil als Startpunkt (Plan 0005): Werkzeugzeile „Startpunkt: Gostenhof“, Orts-Liste mit Wegzeit. */
@@ -206,7 +207,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     );
     await page.goto("./?ansicht=merkliste-karte");
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
-    await expect(page.getByRole("status")).toHaveText("3 Angebote an 2 Orten gemerkt");
+    await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
   },
   // Plan 0025, E2; Plan 0054, E1: Anbieter-Sheet mit gedrückter Glocke neben dem längsten Namen (Kirchengemeinde, mehrzeilig)
   "anbieter-sheet-abonniert": async (page) => {
@@ -325,7 +326,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
     await abos.scrollIntoViewIfNeeded();
   },
-  // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ und Statuszeile „… · Wegzeit ab Gostenhof“ (Plan 0020)
+  // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ (die Statuszeile nur mit Zahl, Plan 0056, E2)
   "entdecken-wegzeit": async (page) => {
     await withGostenhof(page);
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("5 Min.");
@@ -393,7 +394,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.route("**/data/wegzeit.json", (route) => route.abort());
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await page.goto("./?wegzeit=30");
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
     await expect(page.getByRole("button", { name: "Nochmal laden" })).toBeVisible();
     await expect(page.getByTestId("offer").filter({ hasText: "Kuckuck im Nest" })).toContainText("200 m");
   },
@@ -422,7 +423,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.route("**/data/wegzeit.json", (route) => route.abort());
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await page.goto("./");
-    await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filter" });
     await expect(sheet.getByRole("button", { name: "bis 20 Min." })).toBeDisabled();
@@ -457,7 +458,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    await expect(page.getByRole("status")).toContainText("außerhalb des Stadtgebiets");
+    await expect(page.getByRole("status")).toContainText("Luftlinie, außerhalb");
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Filter" });
     await expect(sheet.getByText("Wegzeiten gibt es nur für Startpunkte in Nürnberg und Fürth.")).toBeVisible();

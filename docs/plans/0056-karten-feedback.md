@@ -235,10 +235,10 @@ S1 und S2 sind ohne die übrigen auslieferbar.
 
 ## Offen
 
-- **Merklisten-Karte, Startausschnitt** (Review 2, M4): Ein Rahmen um den Startpunkt ist auf der Merkliste meist leer. Ein Rahmen über das Gemerkte verriete die Merkliste über die Kachelwahl. Nutzerfrage, zu klären vor S5:
-  - (a) Die Merklisten-Karte behält den alten Startausschnitt (alle kommenden Orte), die Liste darunter filtert ab dem Start.
-  - (b) Die Merklisten-Karte startet am Startpunkt, die Liste darunter filtert aber erst nach der ersten eigenen Bewegung.
-  - Bis zur Antwort gilt (a), weil das nichts Neues preisgibt.
+Keine. Nutzerentscheide vom 2026-10-29 (nach Review 2):
+
+- **Merklisten-Karte:** Option (a). Sie startet wie bisher auf dem Rahmen über alle gemerkten bzw. kommenden Orte, die Liste darunter filtert ab dem Start auf den Ausschnitt.
+- **Startpunkt genau:** „Der Startpunkt soll genau der GPS-Standort sein. Maximal auf 100 Meter gerundet. Usability ist wichtiger als Privatsphäre. Generell in der App.“ Das Raster aus N2 entfällt. ADR 0039 hält diesen Grundsatz fest.
 
 ## Review (2026-10-29) – Verdict: Überarbeiten
 
@@ -273,9 +273,9 @@ Zweiter Reviewer, ohne Chat-Kontext. Er findet keinen Blocker und bestätigt B1,
     - ADR 0038, Punkt 1: Mit gespeichertem Startpunkt verrät schon das Öffnen des Tabs „Anbieter“ die Gegend.
   - Die Abwägung gegen Selbsthosten nennt ADR 0039 als neu zu bewerten, ausdrücklich offen.
   - **Formulierung:** Die Mitte der geladenen Kacheln liegt bis auf etwa eine Kachelbreite (≈ 1,5–3 km) am Startpunkt. Das Runden auf 100 m schützt dort nicht.
-  - **Raster:** Die Rahmenmitte rastet auf 0,01° ein (≈ 1,1 × 0,7 km), damit nicht die genaue Mitte ankommt. Unit-Test in `camera.test.ts`.
+  - ~~**Raster:** Die Rahmenmitte rastet auf 0,01° ein.~~ Verworfen durch Nutzerentscheid vom 2026-10-29 (siehe „Offen“): Die Rahmenmitte ist der Startpunkt selbst, beim Standort wie bisher auf ≈ 100 m gerundet (`coarsen`).
   - Das Impressum nennt auch den Tab „Anbieter“.
-- **N3, Maßstab (zu E6, E8):** Mit `fitBounds` und den Paddings ergäbe die 250 px hohe Anbieterkarte etwa 10 × 7 km. Alle Karten starten deshalb mit `center` (eingerastet, N2) und einem festen Zoom, der 2 km Radius auf der kürzeren Kante zeigt. Er wird aus der Kartenhöhe gerechnet und liegt bei mindestens Zoom 13. E2E prüft eine Obergrenze des Ausschnitts (`getBounds`, höchstens etwa 6 × 6 km) auf beiden Karten, hoch und quer.
+- **N3, Maßstab (zu E6, E8):** Mit `fitBounds` und den Paddings ergäbe die 250 px hohe Anbieterkarte etwa 10 × 7 km. Alle Karten starten deshalb mit `center` (der Startpunkt, N2) und einem festen Zoom, der 2 km Radius auf der kürzeren Kante zeigt. Er wird aus der Kartenhöhe gerechnet und liegt bei mindestens Zoom 13. E2E prüft eine Obergrenze des Ausschnitts (`getBounds`, höchstens etwa 6 × 6 km) auf beiden Karten, hoch und quer.
 - **N4:** Merklisten-Karte, siehe „Offen“.
 - **N5, Einklappen (zu E3):** Nachgebildet wird genau `_updateCompactMinimize` von MapLibre: nur die Klasse `maplibregl-compact-show` entfernen, `open` bleibt. E2E auf Chromium und WebKit: Nach dem Einklappen öffnet ein Tipp auf „i“ die Angabe wieder.
 
@@ -289,5 +289,5 @@ Zweiter Reviewer, ohne Chat-Kontext. Er findet keinen Blocker und bestätigt B1,
 - **N9, Liste unter der Karte:** Die Sortierung aus der URL wirkt dort mit, und das `SortMenu` steht in der Werkzeugzeile neben „Liste | Karte“, wie in der Liste. `listWaits` gilt wie in der Liste. Ein neuer Ausschnitt setzt das Schrittladen zurück (`resetPage`).
 - **N10, `want()`:** Die Karte bleibt ein Anlass für Wegzeit und Linien, neu begründet über die Minuten an den Kacheln der Liste unter der Karte. Die Kartenmitte ist kein Grund mehr. Das steht in ADR 0039 und in `architecture.md:77/136`.
 - **N11, zweite Kamera:** `MapViewProps` bekommt `overview` (Rahmen über alle Orte) für „Alle zeigen“ und den Rückfall. `start` ist der Startpunkt-Rahmen. Dazu ein Test.
-- **N12, „neuer Startpunkt“:** Gleich ist ein Startpunkt bei gleicher Quelle und gleichem, eingerastetem Punkt (N2) bzw. gleicher `districtId`. Dieselbe Regel gilt für `lastCamera` und für das Fahren bei offener Karte. Ein erneuter GPS-Tipp mit demselben Wert bewegt die Karte nicht.
+- **N12, „neuer Startpunkt“:** Gleich ist ein Startpunkt bei gleicher Quelle und gleichem (gerundetem) Punkt bzw. gleicher `districtId`. Dieselbe Regel gilt für `lastCamera` und für das Fahren bei offener Karte. Ein erneuter GPS-Tipp mit demselben Wert bewegt die Karte nicht.
 - **N13, 320 px:** `layout.spec.ts` prüft den längsten Zustand ausdrücklich: „42 Angebote im Kartenausschnitt · Luftlinie, außerhalb“ plus „Alle zeigen“. Umbrechen darf nur „Alle zeigen“, und zwar in eine eigene Zeile.

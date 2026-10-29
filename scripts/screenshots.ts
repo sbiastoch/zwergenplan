@@ -50,7 +50,7 @@ async function withGostenhof(page: Page) {
   await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
   await page.reload();
   await ready(page);
-  await page.locator(".status-reach:not(.pending)").waitFor();
+  await page.locator(".meta .dist:not(.pending)").first().waitFor();
 }
 
 /** Kachel-Mock für die lokale Preview (wie e2e/fixtures.ts, tiles: "mock"): Stile, Glyphen, leere Kacheln. */

@@ -49,7 +49,7 @@ test("Wegzeit lädt bei gespeichertem Stadtteil und ?wegzeit=: kein Flackern, CL
   await page.goto("./?wegzeit=20");
   await expect(page.locator(".list-pending")).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(6, { timeout: 15_000 });
-  await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
+  await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
   await page.waitForTimeout(500);
   const { cls, detail } = clsFrom(await readVitals(page));
   report("CLS", cls);

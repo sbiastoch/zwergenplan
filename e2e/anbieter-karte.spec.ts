@@ -101,7 +101,7 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     ];
     expect(order).toEqual([...order].sort((a, b) => a - b));
     expect(await features(page)).toHaveLength(7);
-    await expect(status(page)).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(status(page)).toHaveText("5 Anbieter");
   });
 
   test("2: Ort mit einem Anbieter öffnet sein Sheet; Fokus kehrt an die Karte zurück (Fall 15)", async ({ page }) => {
@@ -157,7 +157,7 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     await expect(rows(page)).toHaveCount(1);
     await page.getByRole("button", { name: "Alle zeigen" }).click();
     await idle(page);
-    await expect(status(page)).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(status(page)).toHaveText("5 Anbieter");
     await expect(status(page)).toBeFocused();
     await expect(rows(page)).toHaveCount(6);
 
@@ -244,13 +244,13 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     await openTab(page);
     expect(await features(page)).toHaveLength(0);
     await expect(rows(page)).toHaveCount(6);
-    await expect(status(page)).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(status(page)).toHaveText("5 Anbieter");
   });
 
   test("13: wegzeit= mit gespeichertem Startpunkt: Statuszeile ohne Grenz-Hinweis", async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await openTab(page, "./?wegzeit=30&ansicht=anbieter");
-    await expect(status(page)).toContainText("5 Anbieter mit 8 Angeboten");
+    await expect(status(page)).toContainText("5 Anbieter");
     await expect(page.locator("p.status")).toHaveCount(1);
   });
 });
@@ -274,7 +274,7 @@ test.describe("Anbieterkarte: Fehlerwege (Plan 0055)", () => {
       "Dein Browser kann die Karte nicht zeigen. Alle Anbieter stehen in der Liste.",
     );
     await expect(rows(page)).toHaveCount(6);
-    await expect(status(page)).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(status(page)).toHaveText("5 Anbieter");
   });
 
   test("12: 503 auf anbieter.json: Fehler in Liste und Karte, kein endloser Ladezustand", async ({ page }) => {

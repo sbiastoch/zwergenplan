@@ -92,7 +92,6 @@ test("Stadtteil als Startpunkt mit echten Daten: Wegzeit aus der echten Tabelle 
   await sheet.getByRole("button", { name: "Fertig" }).click();
   await expect(sheet).toBeHidden();
 
-  await expect(page.getByRole("status")).toContainText("Wegzeit ab Altstadt");
   const dists = page.getByTestId("offer").locator(".meta .dist");
   await expect(dists.first()).toHaveText(/^(\d+ Min\.|über 2 Std\.)$/);
   for (const text of await dists.allInnerTexts()) expect(text).toMatch(/^(\d+ Min\.|über 2 Std\.)$/);
@@ -184,7 +183,7 @@ test("LCP mit gespeichertem Stadtteil und ?wegzeit= bleibt mit echten Daten im B
   // Ende des Abrufs der Tabelle über Playwright: `page.clock` ersetzt auch `performance` (Plan 0051, Review 2, m3)
   const tableResponse = page.waitForResponse((r) => r.url().includes("/data/wegzeit.json"));
   const nav = await page.goto("./?wegzeit=20");
-  await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof", { timeout: 15_000 });
+  await expect(page.locator(".meta .dist").first()).toHaveText(/^(\d+ Min\.|über 2 Std\.)$/, { timeout: 15_000 });
   await expect(page.getByTestId("offer").first()).toBeVisible();
   await page.waitForTimeout(500);
   const vitals = await readVitals(page);

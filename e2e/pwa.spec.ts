@@ -10,12 +10,17 @@ import { expectMobileUx } from "./mobile-ux.ts";
 
 /** Fixture-Datenstand (tests/fixtures/offers.json, generatedAt 5.10.2026) */
 const OFFLINE_NOTE = "Offline – Stand vom 5.10.";
-const WEGZEIT_GOSTENHOF = "Wegzeit ab Gostenhof";
 /** Beispielhof ab Gostenhof direkt mit Tram 1 (Plan 0012, E1; Fixture wie in startpunkt.spec.ts) */
 const KRABBELTREFF_TRAM = "ca. 15 Min. mit Tram\u00a01 ab Gostenhof";
 const isTable = (url: string) => new URL(url).pathname.endsWith("/data/wegzeit.json");
 const isLines = (url: string) => new URL(url).pathname.endsWith("/data/linien.json");
 const offers = (page: Page) => page.getByTestId("offer");
+
+/** Wegzeit geladen: Minuten an der ersten Kachel, kein Rückfall in der Statuszeile (Plan 0056, E2) */
+async function expectWegzeit(page: Page) {
+  await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
+  await expect(page.getByRole("status")).not.toContainText("Luftlinie");
+}
 const isSite = (url: string) => new URL(url).pathname.endsWith("/data/site.json");
 
 /** Seite laden und warten, bis der Service Worker aktiv ist und die Seite kontrolliert (clients.claim). */
@@ -150,7 +155,7 @@ test.describe("offline", () => {
     await page.reload();
     await expect(offers(page).first()).toBeVisible();
     await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
-    await expect(page.getByRole("status")).toContainText("8 Angebote ab heute");
+    await expect(page.getByRole("status")).toContainText("8 Angebote");
     for (const colorScheme of ["light", "dark"] as const) {
       await page.emulateMedia({ colorScheme });
       await expectMobileUx(page);
@@ -215,7 +220,7 @@ test.describe("offline", () => {
     await context.setOffline(false);
     await fresh;
     await expect(page.getByRole("status")).not.toContainText("Offline");
-    await expect(page.getByRole("status")).toContainText("8 Angebote ab heute");
+    await expect(page.getByRole("status")).toContainText("8 Angebote");
   });
 });
 
@@ -325,7 +330,7 @@ test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request au
 }) => {
   await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
   await installed(page);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   await expect(page.locator("html")).toHaveAttribute("data-pwa", "bereit");
   const tables: string[] = [];
   const lines: string[] = [];
@@ -340,7 +345,7 @@ test("Frische-Anlass nach 30 Min.: Wegzeit bleibt, genau ein weiterer Request au
   await page.clock.setFixedTime(new Date("2026-10-05T12:31:00+02:00"));
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   await Promise.all([site, table, linesLoaded]);
-  await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+  await expectWegzeit(page);
   await expect(page.locator(".meta .dist").filter({ hasText: "km" })).toHaveCount(0);
   await page.waitForTimeout(300);
   expect(tables, "genau ein weiterer Request auf wegzeit.json").toHaveLength(1);
@@ -360,11 +365,11 @@ test.describe("Laufzeit-Cache der Daten (Arch-Review Stufe 1, B1)", () => {
     await page.reload();
     expect((await table).fromServiceWorker()).toBe(true);
     expect((await lines).fromServiceWorker(), "linien.json über den Service Worker (Plan 0012)").toBe(true);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
     await context.setOffline(true);
     await page.reload();
     await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
-    await expect(page.getByRole("status")).toContainText(WEGZEIT_GOSTENHOF);
+    await expectWegzeit(page);
     // Linien offline aus zp-data: das Detail nennt die Tram statt nur „mit Bus & Bahn“
     await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
     await expect(page.getByRole("dialog").getByText(KRABBELTREFF_TRAM)).toBeVisible();

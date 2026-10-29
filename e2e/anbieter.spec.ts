@@ -115,7 +115,7 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
     // drei Tabs seit Plan 0025 (E8): Angebote · Anbieter · Merkliste
     await expect(tabs).toHaveCount(3);
     await expect(tabs.nth(1)).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter");
     await expect(page.getByRole("group", { name: "Kategorien" })).toBeVisible();
     // Kosten, Anmeldung, Format, Wegzeit und Zeitraum beschreiben Termine, nicht Anbieter (Plan 0055, E3)
     await expect(page.getByRole("button", { name: /^Alle Filter/ })).toHaveCount(0);
@@ -125,20 +125,20 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
 
     await page.reload();
     await expect(tab(page, "Anbieter")).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter");
     await listReady(page);
   });
 
-  test("Einzahl in der Statuszeile: „1 Anbieter mit 1 Angebot“", async ({ page }) => {
+  test("Einzahl in der Statuszeile: „1 Anbieter“", async ({ page }) => {
     await ready(page, "./?kat=buecher&ansicht=anbieter");
-    await expect(page.getByRole("status")).toHaveText("1 Anbieter mit 1 Angebot");
+    await expect(page.getByRole("status")).toHaveText("1 Anbieter");
   });
 
   test("nur Kategorie wirkt: „kostenlos“ in der URL ändert im Tab nichts, in „Angebote“ schon (Plan 0055, E3)", async ({
     page,
   }) => {
     await ready(page, "./?kosten=kostenlos&ansicht=anbieter");
-    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter");
     // erst die Anbieterkarte fertig laden lassen, dann den Tab verlassen (Plan 0055, N1)
     await mapSettled(page);
     await tab(page, "Angebote").click();
@@ -380,7 +380,7 @@ test.describe("Fehler (E10)", () => {
     await tab(page, "Anbieter").click();
     const box = page.locator(".lazy-box");
     await expect(box).toContainText("Die Anbieter konnten nicht geladen werden.");
-    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter");
     await expectMobileUx(page);
 
     await page.unroute("**/data/anbieter.json");
@@ -445,7 +445,7 @@ test.describe("Datenstand (E6, M4)", () => {
     });
     await ready(page, "./?ansicht=anbieter");
     await expect(rows(page)).toHaveCount(6);
-    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter");
     await row(page, THEATER).click();
     const sheet = providerSheet(page);
     await expect(sheet.getByRole("heading", { level: 2, name: THEATER })).toBeVisible();
@@ -501,7 +501,8 @@ test.describe("Privatsphäre (E9)", () => {
     const requests = collect(page);
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    await expect(page.getByRole("status")).toContainText("Gostenhof");
+    // Wegzeit ab Gostenhof an der ersten Zeile, die Statuszeile nur mit Zahl (Plan 0056, E2)
+    await expect(rows(page).first()).toContainText(" Min.");
     await listReady(page);
     // Die Anbieterkarte fährt nicht zum Stadtteil (ADR 0038): auch keine Kachel
     await mapSettled(page);

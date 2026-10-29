@@ -25,7 +25,6 @@ import {
   limitHint,
   listStatusParts,
   loadErrorText,
-  mapStatusParts,
   nearSortSub,
   OFFER_GONE,
   providerStatusParts,
@@ -308,28 +307,25 @@ export function App() {
   };
   // Liste und Karte in „Entdecken“ markieren mit dem Zeitraum des Filters, alles andere ohne (Plan 0053, E2)
   const discoverCtx: CardContext = { ...ctx, isUnfit: (id) => views.listUnfitIds.has(id) };
+  // Liste und Karte: nur die Zahl, mit Zeitraum dieser dazu (Plan 0056, E2, N1)
   const [listCount, listWords] = listStatusParts(visible.length, route.filter.range);
-  const [mapOffers, offersWord, mapPlaces, placesWord] = mapStatusParts(visible.length, views.map?.placeCount ?? 0);
-  // „5 Anbieter mit 8 Angeboten“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4). Im Tab wirken nur
-  // Kategorie und Alter (Plan 0055, E3).
-  const [providerCount, providersWord, providerOffers, providerOffersWord] = providerStatusParts(
-    countProviders(views.providerVisible),
-    views.providerVisible.length,
-  );
+  // „5 Anbieter“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4). Im Tab wirken nur Kategorie und
+  // Alter (Plan 0055, E3).
+  const [providerCount, providersWord] = providerStatusParts(countProviders(views.providerVisible));
   // Blendet der Kartenausschnitt Anbieter aus, zählt die Statuszeile nur die darin (Plan 0055, E4, Review M1)
   const narrowed = route.tab === "anbieter" && viewNarrows(providerView);
   const inViewCount = countProviders(views.providerVisible, providerView);
   // Ansage erst, wenn die Karte ruht; der sichtbare Text ist dann `aria-hidden` (Review m8, Review 2, m4)
   const inViewAnnounce = useSettled(narrowed ? `${inViewCount} Anbieter im Kartenausschnitt` : "", ANNOUNCE_DELAY_MS);
   /*
-   * Startpunkt hinter der Zahl, im selben Fließtext (Plan 0020, E1): U+00A0 vor dem Punkt, damit er nie verwaist am
-   * Zeilenanfang steht; der Ausdruck selbst ist ein Inline-Block und wandert als Ganzes in die nächste Zeile. Beim
-   * Laden steht der endgültige Text unsichtbar: Die Breite stimmt, die Live-Region sagt nichts (Plan 0009, E11).
+   * Nur der Rückfall auf die Luftlinie steht hinter der Zahl, kurz mit Grund (Plan 0056, E2; ADR 0039). U+00A0 vor dem
+   * Punkt, damit er nie verwaist am Zeilenanfang steht; der Ausdruck ist ein Inline-Block (Plan 0020, E1).
    */
-  const reachSuffix = origin && reachMode && (
-    <span className={reachMode.kind === "laedt" ? "status-reach pending" : "status-reach"}>
+  const reachText = origin && reachMode && reachNote(reachMode);
+  const reachSuffix = reachText && (
+    <span className="status-reach">
       {"\u00a0· "}
-      <span className="status-reach-text">{reachNote(reachMode, origin)}</span>
+      <span className="status-reach-text">{reachText}</span>
     </span>
   );
   const ageLabel = ageChipLabel(birthDate ? ageInMonths(birthDate, now) : undefined);
@@ -563,15 +559,7 @@ export function App() {
             <div className="status-row">
               {/* Lädt die Wegzeit zur Grenze, wäre die Zahl ungefiltert: unsichtbar, keine Ansage (M7). */}
               <p ref={statusLine} className={listPending ? "status pending" : "status"} role="status" tabIndex={-1}>
-                {route.tab === "karte" ? (
-                  <span>
-                    <b>{mapOffers}</b>
-                    {offersWord}
-                    <b>{mapPlaces}</b>
-                    {placesWord}
-                    {reachSuffix}
-                  </span>
-                ) : narrowed ? (
+                {narrowed ? (
                   <span>
                     <span aria-hidden="true">
                       <b>{inViewCount}</b> Anbieter im Kartenausschnitt
@@ -583,8 +571,6 @@ export function App() {
                   <span>
                     <b>{providerCount}</b>
                     {providersWord}
-                    <b>{providerOffers}</b>
-                    {providerOffersWord}
                     {reachSuffix}
                   </span>
                 ) : (
@@ -710,7 +696,6 @@ export function App() {
             quick={views.savedQuick}
             tab={route.tab === "merkliste-karte" || route.tab === "merkliste-kalender" ? route.tab : "merkliste"}
             onTab={(tab) => replace({ ...route, tab })}
-            placeCount={views.map?.placeCount ?? 0}
             // Startseiten-Filter und Alter wirken auf der Merkliste nicht: Zurücksetzen meint den Merklisten-Filter,
             // einen Altersausweg gibt es nicht
             renderMap={(savedOffers, onResetSaved) => mapPanel(savedOffers, onResetSaved, undefined, ctx)}

@@ -62,7 +62,7 @@ const SCHEMES = [
   { label: "dunkel per Darstellung", colorScheme: "light", chosenDark: true },
 ] as const;
 
-/** Zahl am Anfang der Statuszeile („8 Angebote ab heute“) */
+/** Zahl am Anfang der Statuszeile („8 Angebote“) */
 async function statusCount(page: Page): Promise<number> {
   const text = (await statusLine(page).textContent()) ?? "";
   const n = /^(\d+) Angebot/.exec(text)?.[1];
@@ -136,7 +136,9 @@ test.describe("Test 2: Stadt", () => {
     while (!/^(Zeig mir|Zur Liste)/.test((await primary(page).textContent()) ?? "")) await primary(page).click();
     await primary(page).click();
     await expect(intro(page)).toHaveCount(0);
-    await expect(statusLine(page)).toContainText("Wegzeit ab Innenstadt (Fürth)");
+    // Wegzeit ab Fürth: Minuten an den Kacheln, die Statuszeile nur mit Zahl (Plan 0056, E2)
+    await expect(statusLine(page)).toHaveText(/^\d+ Angebote?$/);
+    await expect(page.locator(".meta .dist").first()).toHaveText(/ Min\.$/);
   });
 
   test("Fürth gewählt, Weg übersprungen: Liste ohne Startpunkt (Plan 0036, Review G5)", async ({ page }) => {

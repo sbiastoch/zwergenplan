@@ -47,8 +47,6 @@ interface SavedViewProps {
   quick: readonly { month: string; range: DateRange }[];
   tab: SavedTab;
   onTab: (tab: SavedTab) => void;
-  /** Orte der passenden gemerkten Angebote (`views.map`), nur auf der Karte gebraucht */
-  placeCount: number;
   /**
    * Karte mit diesen Angeboten; nur aufgerufen, wenn mindestens eins zum Filter passt (keine Kacheln ohne Gemerktes,
    * E5a)
@@ -77,7 +75,6 @@ export function SavedView({
   quick,
   tab,
   onTab,
-  placeCount,
   renderMap,
   renderCalendar,
   generatedAt,
@@ -145,9 +142,7 @@ export function SavedView({
           />
           <div className="status-row">
             <p ref={status} className="status" role="status" tabIndex={-1}>
-              <StatusText
-                parts={statusParts({ offers, shown, filtered, tab, placeCount, now: ctx.now, birthDate, missing })}
-              />
+              <StatusText parts={statusParts({ offers, shown, filtered, tab, now: ctx.now, birthDate, missing })} />
             </p>
             {tab === "merkliste" && (
               <button
@@ -193,7 +188,6 @@ function statusParts({
   shown,
   filtered,
   tab,
-  placeCount,
   now,
   birthDate,
   missing,
@@ -202,14 +196,13 @@ function statusParts({
   shown: readonly SiteOffer[];
   filtered: boolean;
   tab: SavedTab;
-  placeCount: number;
   now: Date;
   birthDate: string | undefined;
   /** gemerkte Angebote ohne passenden Termin (`collectionExport`), wie im Export-Toast genannt */
   missing: number;
 }): StatusParts {
   const total = filtered ? offers.length : undefined;
-  if (tab === "merkliste-karte") return savedMapStatusParts(shown.length, placeCount, total);
+  if (tab === "merkliste-karte") return savedMapStatusParts(shown.length, total);
   if (filtered) return savedFilterStatusParts(shown.length, offers.length);
   return savedStatusParts(offers.length, upcomingSessionCount(offers, now, birthDate), missing);
 }

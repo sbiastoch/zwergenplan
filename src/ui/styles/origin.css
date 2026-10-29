@@ -67,7 +67,7 @@
     margin-top: 6px;
   }
 
-  /* Statuszeile: „· Wegzeit ab …“ hinter der Zahl (App.tsx, Plan 0020, E1). Als Inline-Block wandert der Ausdruck
+  /* Statuszeile: „· Luftlinie, außerhalb“ hinter der Zahl (App.tsx, Plan 0020, E1; Plan 0056, E2). Als Inline-Block wandert der Ausdruck
      als Ganzes in die nächste Zeile; ist er breiter als die Zeile, bricht er darin um, ohne überzulaufen. */
   .status-reach-text {
     display: inline-block;
@@ -90,8 +90,7 @@
   }
   /* Bei .status nur die Kinder: Die Zeile selbst bleibt fokussierbar, sie ist das Fokus-Ziel nach „Nochmal laden“
      (N2). visibility: hidden nimmt die Kinder auch aus dem Barrierefreiheitsbaum, die Live-Region sagt nichts. */
-  .status.pending > *,
-  .status-reach.pending {
+  .status.pending > * {
     visibility: hidden;
   }
   .list-pending {

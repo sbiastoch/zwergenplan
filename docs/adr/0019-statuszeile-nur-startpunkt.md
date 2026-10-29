@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-06), Nutzerentscheidung. Umsetzung mit Plan 0020. Ändert die Anzeige aus ADR 0011 (Punkt 3, Satz 3) und ADR 0015 (Kopf).
 
+**Geändert durch ADR 0039 (Plan 0056):** Punkt 1 und 3 ersetzt. Die Statuszeile nennt nur die Anzahl, hinter ihr steht nur noch der Luftlinien-Rückfall in Kurzform. Punkt 2 gilt weiter.
+
 ## Kontext
 
 - Die Statuszeile zeigte in eigener Zeile unter „332 Angebote ab heute“ den Text „Wegzeit ab Gostenhof mit Bus & Bahn (Di vormittags, höchstens 1 Umstieg, inkl. Warten)“.

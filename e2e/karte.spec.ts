@@ -162,7 +162,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
     await expect(page.getByRole("button", { name: "Karte", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Angebote", exact: true })).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("status")).toHaveText("8 Angebote an 5 Orten");
+    await expect(page.getByRole("status")).toHaveText("8 Angebote");
     await expect(places(page)).toHaveCount(5);
     const attribution = page.locator(".maplibregl-ctrl-attrib");
     await expect(attribution).toBeVisible();
@@ -216,7 +216,7 @@ test.describe("mit gemockten Kacheln", () => {
     await openMap(page);
     await page.getByRole("button", { name: "Kurse", exact: true }).click();
     await expect(page).toHaveURL(/\?format=kurs&ansicht=karte$/);
-    await expect(page.getByRole("status")).toHaveText("2 Angebote an 2 Orten");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote");
     await expect(places(page)).toHaveText([/^Familientreff Beispielhof/, /^Musikschule Beispiel, Haus Süd/]);
   });
 
@@ -313,7 +313,7 @@ test.describe("mit gemockten Kacheln", () => {
     page.on("request", (req) => requests.push(req.url()));
     await kid.getByLabel("Stadtteil", { exact: true }).selectOption("gostenhof");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
+    await expect(page.getByRole("status")).not.toContainText("Luftlinie");
     // nach Wegzeit (Plan 0012, von Hand nachgerechnet, Rechenweg in startpunkt.spec.ts): Theater 3,6, Beispielhof
     // 13,6, Bibliothek 15,6, Gemeinde 23,6 (Tram 1 → Bus 202E; vorher 32,6 über Bus 2, die Fixture-Linie 202E kam mit Plan 0012),
     // Musikschule 29,6 Min. (Tram 1 → Bus 2)
@@ -340,7 +340,6 @@ test.describe("mit gemockten Kacheln", () => {
     await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.0767, 49.4521] }));
     await idle(page);
     await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
-    await expect(page.getByRole("status")).toContainText("Wegzeit ab der Kartenmitte");
     await expect(places(page).first()).toHaveText(/^Familientreff Beispielhof.* · 5 Min\.$/);
   });
 
@@ -563,13 +562,13 @@ test.describe("mit gemockten Kacheln", () => {
     await kid.getByRole("button", { name: "Meinen Standort nutzen" }).click();
     await expect(kid.getByText("Startpunkt:")).toContainText("Mein Standort");
     await kid.getByRole("button", { name: "Fertig" }).click();
-    await expect(page.getByRole("status")).toContainText("ab deinem Standort");
+    // Wegzeit ab dem Standort: Minuten an den Orten, die Statuszeile nur mit Zahl (Plan 0056, E2)
+    await expect(places(page).first()).toHaveText(/ Min\.$/);
     await idle(page);
     expect(tileLog.length, "keine Kacheln nach „Meinen Standort nutzen“").toBe(tiles);
     expect(await camera(page)).toEqual(start);
 
     await page.getByRole("button", { name: "Kartenmitte als Startpunkt" }).click();
-    await expect(page.getByRole("status")).toContainText("ab der Kartenmitte");
     await expect(page.getByRole("button", { name: "Startpunkt: Kartenmitte" })).toBeVisible();
     await idle(page);
     expect(tileLog.length, "keine Kacheln nach „Kartenmitte als Startpunkt“").toBe(tiles);
@@ -601,7 +600,6 @@ test.describe("mit gemockten Kacheln", () => {
     const before = tileLog.length;
     await openMap(page);
     await expect(page.getByRole("button", { name: "Startpunkt: Kartenmitte" })).toBeVisible();
-    await expect(page.getByRole("status")).toContainText("ab der Kartenmitte");
     await idle(page);
     // Der gespeicherte Punkt ist nur ein Layer: Kamera und Kachelwahl verraten ihn nicht (Kamera-Regel).
     expect(await camera(page)).toEqual(plain);
@@ -626,7 +624,7 @@ test.describe("mit gemockten Kacheln", () => {
     );
     const before = tileLog.length;
     await openMap(page, "./?ansicht=merkliste-karte");
-    await expect(page.getByRole("status")).toHaveText("3 Angebote an 2 Orten gemerkt");
+    await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
     await expect(places(page)).toHaveCount(2);
     await expect(places(page).filter({ hasText: "Familientreff Beispielhof" })).toHaveCount(1);
     await expect(
@@ -675,7 +673,7 @@ test.describe("mit gemockten Kacheln", () => {
     const before = tileLog.length;
     const withOrigin = await openFromList();
     // Filter, Alter und Wegzeit wirken auf die Orte, aber nicht auf den Ausschnitt
-    await expect(page.getByRole("status")).not.toContainText("an 5 Orten");
+    await expect(page.getByRole("status")).not.toHaveText(/^8 Angebote/);
     expect(withOrigin).toEqual(plain);
     expect(tilesSince(before)).toEqual(plainTiles);
   });

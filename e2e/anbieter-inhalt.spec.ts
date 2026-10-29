@@ -60,7 +60,6 @@ test.describe("Startpunkt Gostenhof", () => {
   test("mit Wegzeit nach dem nächsten Ort sortiert, Turnverein weiter am Ende", async ({ page }) => {
     await storeGostenhof(page);
     await openList(page);
-    await expect(page.getByRole("status")).toContainText("Wegzeit ab Gostenhof");
     await expect(row(page, THEATER)).toContainText("2 Angebote · Gostenhof · 5 Min.");
     expect(await names(activeRows(page))).toEqual([THEATER, TREFF, BIBLIOTHEK, GEMEINDE, MUSIKSCHULE]);
     const lines = await activeRows(page).locator("span").allInnerTexts();
@@ -75,7 +74,7 @@ test.describe("Startpunkt Gostenhof", () => {
       await page.route("**/data/wegzeit.json", (route) => route.fulfill({ status: 404 }));
       await storeGostenhof(page);
       await openList(page);
-      await expect(page.getByRole("status")).toContainText("Wegzeiten gerade nicht verfügbar");
+      await expect(page.getByRole("status")).toContainText("Luftlinie, Wegzeit fehlt");
       await expect(row(page, THEATER)).toContainText("200 m");
       expect(await names(activeRows(page))).toEqual([THEATER, TREFF, BIBLIOTHEK, MUSIKSCHULE, GEMEINDE]);
       const lines = await activeRows(page).locator("span").allInnerTexts();
@@ -114,7 +113,7 @@ test.describe("Startpunkt Gostenhof", () => {
 
 test("Sticker „Bücher“: nur die Bibliothek aktiv, die übrigen blass, „Filter zurücksetzen“", async ({ page }) => {
   await openList(page, "kat=buecher");
-  await expect(page.getByRole("status")).toContainText("1 Anbieter mit 1 Angebot");
+  await expect(page.getByRole("status")).toContainText("1 Anbieter");
   expect(await names(activeRows(page))).toEqual([BIBLIOTHEK]);
   // die vier ausgeblendeten stehen als eigene blasse Zeile, kein Zählsatz (Nutzer-Feedback 2026-10-29)
   await expect(idleRows(page)).toHaveCount(5);

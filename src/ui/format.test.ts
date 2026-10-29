@@ -27,7 +27,6 @@ import {
   listingHeading,
   listStatusParts,
   loadErrorText,
-  mapStatusParts,
   nearSortSub,
   originHint,
   originPhrase,
@@ -512,21 +511,11 @@ describe("Entfernung und Wegzeit (Plan 0004, E6; Plan 0009, E1/E8/E11)", () => {
     });
   });
 
-  it("Statuszeile je Modus: nur der Startpunkt, im Rückfall mit Grund (E11; Plan 0020, E1)", () => {
-    expect(reachNote({ kind: "oepnv" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
-    expect(reachNote({ kind: "oepnv" }, standort)).toBe("Wegzeit ab deinem Standort");
-    expect(reachNote({ kind: "oepnv" }, karte)).toBe("Wegzeit ab der Kartenmitte");
-    // lädt: derselbe Text, unsichtbar (die Breite steht schon)
-    expect(reachNote({ kind: "laedt" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
-    expect(reachNote({ kind: "luftlinie", reason: "fehler" }, gostenhof)).toBe(
-      "Luftlinie ab Gostenhof (Wegzeiten gerade nicht verfügbar)",
-    );
-    expect(reachNote({ kind: "luftlinie", reason: "ausserhalb" }, standort)).toBe(
-      "Luftlinie ab deinem Standort (außerhalb des Stadtgebiets)",
-    );
-    expect(reachNote({ kind: "luftlinie", reason: "ausserhalb" }, karte)).toBe(
-      "Luftlinie ab der Kartenmitte (außerhalb des Stadtgebiets)",
-    );
+  it("Statuszeile: nur der Rückfall auf die Luftlinie, kurz mit Grund (Plan 0056, E2; ADR 0039)", () => {
+    expect(reachNote({ kind: "oepnv" })).toBeUndefined();
+    expect(reachNote({ kind: "laedt" })).toBeUndefined();
+    expect(reachNote({ kind: "luftlinie", reason: "fehler" })).toBe("Luftlinie, Wegzeit fehlt");
+    expect(reachNote({ kind: "luftlinie", reason: "ausserhalb" })).toBe("Luftlinie, außerhalb");
   });
 
   it("beschriftet die Wegzeit-Grenze", () => {
@@ -622,14 +611,6 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
   });
 });
 
-describe("Karte und Orte (Plan 0005, E7)", () => {
-  it("Statuszeile: Angebote an Orten, Singular und Plural", () => {
-    expect(mapStatusParts(8, 5)).toEqual([8, " Angebote an ", 5, " Orten"]);
-    expect(mapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort");
-    expect(mapStatusParts(0, 0).join("")).toBe("0 Angebote an 0 Orten");
-  });
-});
-
 describe("Statuszeile der Merkliste (Plan 0025, E3a)", () => {
   it("Liste: Angebote und kommende Termine, die Zahlen getrennt", () => {
     expect(savedStatusParts(5, 28)).toEqual([5, " Angebote mit insgesamt ", 28, " Terminen gemerkt"]);
@@ -649,10 +630,9 @@ describe("Statuszeile der Merkliste (Plan 0025, E3a)", () => {
     expect(collectionToast(4, 2).endsWith(" – 2 Angebote passen nicht zum Alter")).toBe(true);
   });
 
-  it("Karte: Angebote und Orte", () => {
-    expect(savedMapStatusParts(5, 5)).toEqual([5, " Angebote an ", 5, " Orten gemerkt"]);
-    expect(savedMapStatusParts(1, 1).join("")).toBe("1 Angebot an 1 Ort gemerkt");
-    expect(savedMapStatusParts(3, 2).join("")).toBe("3 Angebote an 2 Orten gemerkt");
+  it("Karte: nur die Zahl, ohne Orte (Plan 0056, E2)", () => {
+    expect(savedMapStatusParts(5)).toEqual([5, " Angebote gemerkt"]);
+    expect(savedMapStatusParts(1).join("")).toBe("1 Angebot gemerkt");
   });
 });
 
@@ -664,10 +644,9 @@ describe("Merkliste mit Filter (Plan 0025, E3a, E5a, E7)", () => {
     expect(savedFilterStatusParts(1, 1).join("")).toBe("1 von 1 gemerkten Angebot passt");
   });
 
-  it("Karte: passende Angebote und ihre Orte", () => {
-    expect(savedMapStatusParts(2, 2, 5)).toEqual([2, " von 5 gemerkten Angeboten an ", 2, " Orten"]);
-    expect(savedMapStatusParts(1, 1, 5).join("")).toBe("1 von 5 gemerkten Angeboten an 1 Ort");
-    expect(savedMapStatusParts(1, 1, 1).join("")).toBe("1 von 1 gemerkten Angebot an 1 Ort");
+  it("Karte: passende Angebote ohne Orte (Plan 0056, E2)", () => {
+    expect(savedMapStatusParts(2, 5)).toEqual([2, " von 5 gemerkten Angeboten"]);
+    expect(savedMapStatusParts(1, 1).join("")).toBe("1 von 1 gemerkten Angebot");
   });
 
   it("Leerzustand, wenn der Filter alle gemerkten ausblendet", () => {
@@ -685,9 +664,9 @@ describe("Merkliste mit Filter (Plan 0025, E3a, E5a, E7)", () => {
 });
 
 describe("Statuszeile der Liste mit Zeitraum (Browser-Review 0023, m1)", () => {
-  it("ohne Zeitraum „ab heute“, die Zahl getrennt", () => {
-    expect(listStatusParts(3, undefined)).toEqual([3, " Angebote ab heute"]);
-    expect(listStatusParts(1, undefined).join("")).toBe("1 Angebot ab heute");
+  it("ohne Zeitraum nur die Zahl (Plan 0056, E2, N1)", () => {
+    expect(listStatusParts(3, undefined)).toEqual([3, " Angebote"]);
+    expect(listStatusParts(1, undefined).join("")).toBe("1 Angebot");
   });
 
   it("nennt den Zeitraum als ganzen Satz: von–bis, nur von, nur bis", () => {
@@ -705,11 +684,10 @@ describe("Statuszeile der Liste mit Zeitraum (Browser-Review 0023, m1)", () => {
   });
 });
 
-describe("Statuszeile im Tab „Anbieter“ (Plan 0010, E4)", () => {
-  it("nennt Anbieter und Angebote, die Zahlen getrennt", () => {
-    expect(providerStatusParts(5, 8)).toEqual([5, " Anbieter mit ", 8, " Angeboten"]);
-    expect(providerStatusParts(1, 1).join("")).toBe("1 Anbieter mit 1 Angebot");
-    expect(providerStatusParts(0, 0).join("")).toBe("0 Anbieter mit 0 Angeboten");
+describe("Statuszeile im Tab „Anbieter“ (Plan 0010, E4; Plan 0056, E2)", () => {
+  it("nennt nur die Anbieter, die Zahl getrennt", () => {
+    expect(providerStatusParts(5)).toEqual([5, " Anbieter"]);
+    expect(providerStatusParts(1).join("")).toBe("1 Anbieter");
   });
 });
 

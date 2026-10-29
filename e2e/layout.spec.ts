@@ -200,7 +200,7 @@ const LANDSCAPE_200: Record<string, (page: Page) => Promise<void>> = {
   // Plan 0010, E2: Tab „Anbieter“ und Merkliste mit Badge in der Seitenleiste
   Anbieter: async (page) => {
     await page.getByRole("button", { name: "Anbieter", exact: true }).click();
-    await expect(page.getByRole("status")).toContainText("Anbieter mit");
+    await expect(page.getByRole("status")).toHaveText(/^\d+ Anbieter$/);
     await mapSettled(page);
   },
   "Merkliste mit Badge": async (page) => {
