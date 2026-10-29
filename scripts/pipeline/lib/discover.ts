@@ -14,6 +14,7 @@ import { nextPublicId, SHORT_ID_PATTERN, slug } from "../../../src/domain/ids.ts
 import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
 import { type Anbieter, type Offer, type Provider, Provider as ProviderSchema } from "../../../src/domain/schema.ts";
 import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
+import { normalizeAddress } from "./address.ts";
 import type { Candidate } from "./candidate.ts";
 import { catalogDiff } from "./catalog-diff.ts";
 import { removeEntries } from "./catalog-yaml.ts";
@@ -652,7 +653,7 @@ export interface Adopted {
   /** Hinweise zum Eintrag (weggelassene Orte und Programmseiten), auch im Commit-Text */
   notes?: string[];
   /** Lage der Orte des Eintrags: Zuordnung über Ortsnähe im Eval (Plan 0050, E6) */
-  orte?: Array<{ lat: number; lon: number }>;
+  orte?: Array<{ lat: number; lon: number; adresse?: string }>;
 }
 
 export interface RegionReport {
@@ -734,17 +735,28 @@ const adoptedMatches = (a: Adopted, p: Provider): boolean =>
 
 /**
  * Wie gut eine Aufnahme zu einem ausgeblendeten Anbieter passt (Plan 0050, E6): 3 gleiche URL, 2 gleicher Host mit
- * ähnlichem Namen, 1 ähnlicher Name mit Ort ≤ 100 m, 0 gar nicht. Der Host allein genügt nie: Auf geteilten Websites
- * (Gemeinden auf stadtkirche-nuernberg.de) stehen viele Anbieter.
+ * ähnlichem Namen oder gleichem Ort, 1 ähnlicher Name am gleichen Ort, 0 gar nicht. Der Host allein genügt nie: Auf
+ * geteilten Websites (Gemeinden auf stadtkirche-nuernberg.de) stehen viele Anbieter. Gleicher Ort heißt ≤ 100 m oder
+ * gleiche normalisierte Adresse: Nominatim und Katalog liegen für dieselbe Adresse bis zu einigen 100 m auseinander,
+ * und Namen wie „Volkshochschule Fürth gGmbH“ und „vhs Fürth“ gelten nicht als ähnlich (Eval-Lauf 2, 2026-10-29).
  */
 function matchScore(a: Adopted, p: Provider): number {
   const n = normalizeUrl(a.find.url);
   if (n && urlsOf(p).some((u) => normalizeUrl(u) === n)) return 3;
   if (adoptedMatches(a, p)) return 2;
-  const near =
+  const place =
     p.role === "anbieter" &&
-    (a.orte ?? []).some((g) => p.venues.some((v) => haversineMeters(v.geo, g) <= DUPLICATE_RADIUS_M));
-  return near && similarName(a.name, p.name) ? 1 : 0;
+    (a.orte ?? []).some((g) =>
+      p.venues.some(
+        (v) =>
+          haversineMeters(v.geo, g) <= DUPLICATE_RADIUS_M ||
+          (g.adresse !== undefined && normalizeAddress(g.adresse).text === normalizeAddress(v.address).text),
+      ),
+    );
+  if (!place) return 0;
+  const host = hostOf(a.find.url);
+  if (host !== undefined && urlsOf(p).some((u) => hostOf(u) === host)) return 2;
+  return similarName(a.name, p.name) ? 1 : 0;
 }
 
 const quelleArt = (f: Find) => f.quelle.split(":")[0] ?? f.quelle;

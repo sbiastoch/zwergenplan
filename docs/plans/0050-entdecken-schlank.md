@@ -1,6 +1,6 @@
 # Plan 0050 – Entdecken: wenige gute Quellen, Seitenfinder, keine technischen Verluste
 
-Status: in Umsetzung (S0, S1 live; S2 umgesetzt, Eval-Läufe offen)
+Status: in Umsetzung (S0, S1, S2 live; Ausgangswert gemessen, Prüfung der Region nach Gemeinde vor S3)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`):
@@ -450,7 +450,29 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`, bei Daten mit `
     5. `modus` lehnt `eval` mit `region` ab; 20 Min. Puffer für Einrichtung.
     7. Altersfilter gemeinsam (`forUnderThree`).
     8. Doku.
-  - **Minor 6 abgelehnt:** Die Spaltenzahl von `evals/results.md` gegen `resultsRow` testen hieße, `.md` aus Code zu lesen. Das verbietet `change-class.test.ts` („Doku liest niemand“, Stufe 0 bliebe sonst nicht sicher). Die Spalten stehen deshalb an beiden Stellen in derselben Reihenfolge, der Bericht liefert die Zeile fertig.
+  - **Minor 6 abgelehnt (siehe unten).**
+
+### S2 – Befunde (2026-10-29)
+
+- **Zwei gültige Läufe**, Opus high in allen Schritten (Actions-Runs 40910720485 und 40941267977, je etwa 80 Min. und $20), Zeilen in `evals/results.md`.
+
+  | Ziel | Soll | Lauf 1 | Lauf 2 | Mittel |
+  |---|---|---|---|---|
+  | 1 Gefunden | ≥ 90 % | 16/20 | 16/20 | 80 % |
+  | 2 Wiedergefunden | ≥ 80 % | 15/20 | 14/20 | 72,5 % |
+  | 3 Falsch | 0 | 0 | 1 | verfehlt |
+  | 4 Ertrag | ≥ 80 % | 74 % | 72 % | 73 % |
+
+- **Was S1 gebracht hat:** Alle zehn alten Fälle kommen in beiden Läufen durch (am 2026-10-11 mit Haiku 2 von 10), auch die drei mit Kursort ohne Postadresse.
+- **Ziel 1:** Nicht gefunden wurden in beiden Läufen ev-melanchthon-ziegelstein, kath-st-martin-nordstadt und staatstheater-nuernberg-familie, mutherstudio einmal. Hebel ist die Namenssuche über Plattform-Listen in S4.
+- **Ziel 2:** tsv-1846-nuernberg wird verworfen, weil die Fund-Seite keinen Baby- oder Kleinkindbezug zeigt. Hebel sind Seitenfinder und Ertrag je Seite in S3. zentrum-kobergerstrasse wurde einmal Klärfall: Für „Kobergerstraße 79 Rückgebäude“ fand der Geocoder nichts; Zusätze wie „Rückgebäude“ und „Hinterhaus“ soll `normalizeAddress` in S3 entfernen.
+- **Ziel 3:** In Lauf 2 nahm das Entdecken die vhs Erlangen für Nürnberg auf. Die bbox der Region Nürnberg reicht bis Erlangen, und das gilt nicht als Region (Nutzerentscheid 2026-10-29: „Erlangen haben wir noch nicht im Katalog, zählt zu weder Nürnberg noch Fürth“).
+  - Folge: Die Prüfung der Region braucht neben der bbox die Gemeinde, die `orte.adresse` aus `addressdetails` liefert. Zur Region gehören Stadt und Landkreis des Namens; Stein und Seukendorf zählen zu Fürth. Das kommt vor S3 als eigener Schritt, mit Test.
+- **Ziel 4:** Den Mittelwert ziehen musikfuechse (0 von 35), mutherstudio (0 von 22), cvjm-gostenhof-miniclub (1–2 von 14) und post-sv-nuernberg (14–34 von 75) nach unten. Meist wählt das Entdecken andere oder weniger Programmseiten als der Handeintrag. Das klärt S3 (alle Programmseiten in den Beweis).
+- **Auswertung korrigiert:** vhs-fuerth wurde in Lauf 2 als „Volkshochschule Fürth gGmbH“ aufgenommen. Die Auswertung verfehlte es, weil der Name nicht ähnlich ist und Nominatim gut 200 m neben der Katalog-Koordinate liegt. Seitdem genügen derselbe Host mit gleicher normalisierter Adresse oder ein Ort ≤ 100 m (`matchScore`, Test). Die Zeile von Lauf 2 ist von Hand korrigiert.
+- **Neuzugänge:** 18 verschiedene Anbieter würden aufgenommen und sind von Hand als passend beurteilt (`evals/discover-urteile.json`). Für den ersten Live-Lauf ist das ein guter Vorrat.
+
+- **Zu Minor 6 (abgelehnt):** Die Spaltenzahl von `evals/results.md` gegen `resultsRow` testen hieße, `.md` aus Code zu lesen. Das verbietet `change-class.test.ts` („Doku liest niemand“, Stufe 0 bliebe sonst nicht sicher). Die Spalten stehen deshalb an beiden Stellen in derselben Reihenfolge, der Bericht liefert die Zeile fertig.
 
 ## Nutzerentscheide
 

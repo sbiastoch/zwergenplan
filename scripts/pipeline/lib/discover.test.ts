@@ -893,6 +893,31 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
       ]);
     });
 
+    it("gleicher Host und gleicher Ort genügen, auch bei anderem Namen und anderer Geocodierung (vhs-fuerth, Lauf 2)", () => {
+      const bib = catalog.filter((p) => p.id === "stadtbibliothek-beispiel");
+      const e = hiddenEval(bib, [
+        report({
+          adopted: [
+            // „Volkshochschule Fürth gGmbH“ gegen „vhs Fürth“: Name nicht ähnlich, Nominatim 300 m neben dem Katalog
+            adopted("stadtbuecherei", "Stadtbücherei gGmbH", "https://example.org/kinderbuecherei", {
+              orte: [{ lat: 49.4525, lon: 11.0812, adresse: "Lesegasse 3, 90403 Nürnberg" }],
+            }),
+            // gleicher Host, anderer Ort: keine Zuordnung (geteilte Website)
+            adopted("andere", "Gemeinde Nord", "https://example.org/gemeinde-nord", {
+              orte: [{ lat: 49.47, lon: 11.1, adresse: "Nordring 1, 90409 Nürnberg" }],
+            }),
+          ],
+          rejected: [],
+          dropped: [],
+          unassessed: [],
+        }),
+      ]);
+      expect(e.outcomes.map((o) => [o.id, o.ergebnis, o.adoptedId])).toEqual([
+        ["stadtbibliothek-beispiel", "aufgenommen", "stadtbuecherei"],
+      ]);
+      expect(e.extra.map((a) => a.id)).toEqual(["andere"]);
+    });
+
     it("Bericht: Kennzahlen je Stufe, falsch und unbeurteilt, Gültigkeit und Zeile für results.md", () => {
       const e = hiddenEval(hidden, [report()], {
         urteile: { [normalizeUrl("https://krabbelzwerge.example.net/") ?? ""]: { urteil: "falsch", datum: today } },

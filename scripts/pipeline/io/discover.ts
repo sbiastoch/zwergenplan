@@ -544,7 +544,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         grund: assessed.grund,
         first: { title: proof.first.title, start: proof.start, url: proof.first.url },
         ...(built.notes.length > 0 ? { notes: built.notes } : {}),
-        orte: entry.venues.map((v) => ({ lat: v.geo.lat, lon: v.geo.lon })),
+        orte: entry.venues.map((v) => ({ lat: v.geo.lat, lon: v.geo.lon, adresse: v.address })),
       };
       const nextText = appendEntries(catalogText, [entry]);
       mkdirSync(dirname(outCatalog), { recursive: true });
