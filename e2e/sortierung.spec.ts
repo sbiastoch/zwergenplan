@@ -346,7 +346,7 @@ test.describe("Nächstgelegen (E7)", () => {
     // Der Knopf ist weg: Der Fokus geht auf die Statuszeile, nicht auf <body>
     await expect(page.getByRole("status")).toBeFocused();
     await expect(page.getByText("Wovon aus gerechnet?")).toHaveCount(0);
-    await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Bis 20 Minuten/);
+    await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Bis \d+ Minuten/);
   });
 
   test("mit gespeichertem Stadtteil: Bänder in Reihenfolge, Unterzeile und Menü nennen den Startpunkt", async ({
@@ -356,17 +356,19 @@ test.describe("Nächstgelegen (E7)", () => {
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await ready(page, "./?sortierung=nah");
     const headings = page.locator("section > h2.daylabel > span:first-child");
-    await expect(headings.first()).toHaveText("Bis 20 Minuten");
+    await expect(headings.first()).toHaveText(/^Bis \d+ Minuten$/);
     const titles = await headings.allTextContents();
     expect(titles.length).toBeGreaterThanOrEqual(2);
-    expect(titles).toEqual(
-      ["Bis 20 Minuten", "Bis 30 Minuten", "Bis 45 Minuten", "Über 45 Minuten"].filter((t) => titles.includes(t)),
-    );
-    await expect(page.getByRole("region", { name: "Bis 20 Minuten, mit Bus & Bahn ab Gostenhof" })).toBeVisible();
+    // 5er-Schritte, aufsteigend, „Über 2 Stunden“ zuletzt
+    const minutes = titles.map((t) => (t === "Über 2 Stunden" ? 999 : Number(/^Bis (\d+) Minuten$/.exec(t)?.[1])));
+    expect(minutes.every((m) => m % 5 === 0)).toBe(true);
+    expect(minutes).toEqual([...minutes].sort((a, b) => a - b));
+    const first = titles[0] ?? "";
+    await expect(page.getByRole("region", { name: `${first}, mit Bus & Bahn ab Gostenhof` })).toBeVisible();
     // Karten mit Datum, innerhalb des Bands nach gerundeten Minuten
     await expect(
       page
-        .getByRole("region", { name: /^Bis 20 Minuten/ })
+        .getByRole("region", { name: new RegExp(`^${first}`) })
         .locator(".when")
         .first(),
     ).toHaveText(/^\w\w \d+\.\d+\. · /);
@@ -395,5 +397,5 @@ test("„Nächstgelegen“ wartet auf die Wegzeit: Platzhalter statt Liste, die 
   await expect(page.getByRole("status")).not.toHaveClass(/pending/);
   await expect(page.getByRole("status")).toContainText("8 Angebote");
   release();
-  await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Bis 20 Minuten/);
+  await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Bis \d+ Minuten/);
 });

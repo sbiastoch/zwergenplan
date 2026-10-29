@@ -141,7 +141,7 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
       title: "Bis 20 Minuten",
       sub: "mit Bus & Bahn ab Gostenhof",
     });
-    expect(listingHeading({ kind: "wegzeit", band: { unit: "min" } }, today, gostenhof).title).toBe("Über 45 Minuten");
+    expect(listingHeading({ kind: "wegzeit", band: { unit: "min" } }, today, gostenhof).title).toBe("Über 2 Stunden");
     expect(listingHeading({ kind: "wegzeit", band: { unit: "m", upTo: 3000 } }, today, gostenhof)).toEqual({
       title: "Bis 3 km",
       sub: "Luftlinie ab Gostenhof",

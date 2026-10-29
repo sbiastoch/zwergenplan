@@ -12,7 +12,6 @@ import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "..
 import { type ListGroupHead, METER_BANDS, NEW_DAYS } from "../domain/listing.ts";
 import {
   distanceText,
-  LIMIT_MINUTES,
   type Origin,
   type Reach,
   type ReachLimit,
@@ -95,7 +94,7 @@ function weekdayDayMonth(day: string, withMonth = true): string {
 
 /**
  * Überschrift einer Gruppe der Liste (Plan 0043, E4, E7): Termine wie `dayHeading`; „Neu diese Woche“ mit „seit So, 18.
- * Okt.“, „Neu vorige Woche“ mit dem Zeitraum, „Früher eingestellt“ ohne Unterzeile; Wegzeit-Bänder („Bis 20 Minuten“,
+ * Okt.“, „Neu vorige Woche“ mit dem Zeitraum, „Früher eingestellt“ ohne Unterzeile; Wegzeit-Bänder („Bis 15 Minuten“,
  * „Über 10 km“) mit „mit Bus & Bahn ab …“ bzw. „Luftlinie ab …“.
  */
 export function listingHeading(group: ListGroupHead, today: string, origin?: Origin): { title: string; sub?: string } {
@@ -114,12 +113,12 @@ export function listingHeading(group: ListGroupHead, today: string, origin?: Ori
     case "frueher":
       return { title: "Früher eingestellt" };
     case "wegzeit": {
-      // Bänder der Sortierung „Nächstgelegen“ (Plan 0043, E7)
+      // Bänder der Sortierung „Nächstgelegen“ (Plan 0043, E7); „darüber“ ist mehr als 2 Std. wie auf der Karte
       const { unit, upTo } = group.band;
       const from = origin ? ` ${originPhrase(origin)}` : "";
       if (unit === "min")
         return {
-          title: upTo === undefined ? `Über ${LIMIT_MINUTES.at(-1)} Minuten` : `Bis ${upTo} Minuten`,
+          title: upTo === undefined ? "Über 2 Stunden" : `Bis ${upTo} Minuten`,
           sub: `${BY_TRANSIT}${from}`,
         };
       return {
