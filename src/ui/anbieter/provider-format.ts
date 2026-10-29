@@ -35,13 +35,6 @@ export function idleLine(row: ProviderRow): string {
   return join([text, placesText(row.places)]);
 }
 
-/** Zeile unter den aktiven Anbietern (E4) */
-export function hiddenProvidersText(count: number): string {
-  return count === 1
-    ? "1 weiterer Anbieter hat gerade nichts Passendes."
-    : `${count} weitere Anbieter haben gerade nichts Passendes.`;
-}
-
 /**
  * Suchtreffer außerhalb des Kartenausschnitts (Plan 0055, E4): „2 weitere Treffer …“ unter der Liste, ohne „weitere“,
  * wenn alle draußen liegen (Leerzustand).

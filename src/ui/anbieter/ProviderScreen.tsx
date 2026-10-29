@@ -1,6 +1,6 @@
 /**
  * Anbieterliste im Tab „Anbieter“ (Plan 0010, E4, E5, E10; Plan 0025, E3): oben die abonnierten Anbieter, darunter die
- * weiteren (aktive, Hinweis auf ausgeblendete, blasse ohne Termine). Jede Zeile hat eine Glocke (Plan 0054, E1). Das Suchfeld steht im
+ * weiteren (aktive, dann blass die ausgeblendeten und die ohne Termine; Plan 0056, E1). Jede Zeile hat eine Glocke (Plan 0054, E1). Das Suchfeld steht im
  * Start (ProviderSearch.tsx), über der Statuszeile. Zählen, Filtern und Sortieren macht `directory.ts`.
  */
 import { type MouseEvent, useMemo, useRef } from "react";
@@ -11,7 +11,7 @@ import { EmptyState, ListPending, NoOffers } from "../ListView.tsx";
 import { BellButton } from "../OfferCard.tsx";
 import type { ProviderScreenProps } from "../provider-types.ts";
 import { ANNOUNCE_DELAY_MS, useSettled } from "../use-settled.ts";
-import { hiddenProvidersText, idleLine, outsideText, providerCountText, providerLine } from "./provider-format.ts";
+import { idleLine, outsideText, providerCountText, providerLine } from "./provider-format.ts";
 
 export function ProviderScreen({
   directory,
@@ -34,7 +34,7 @@ export function ProviderScreen({
   const sectionRef = useRef<HTMLElement>(null);
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
   const byReach = reachMode !== undefined && reachMode.kind !== "laedt";
-  const { saved, active, hiddenCount, idle, outside } = useMemo(
+  const { saved, active, idle, outside } = useMemo(
     () =>
       providerRows({
         providers: directory.providers,
@@ -119,8 +119,11 @@ export function ProviderScreen({
       // keine Daten bzw. Filter oder Alter ohne aktiven Anbieter; die Anbieter ohne Termine stehen darunter (E10)
       <NoOffers hasData={upcoming.length > 0} onResetFilter={onResetFilter} age={age} />
     );
-  const showHidden = hiddenCount > 0 && anyActive;
-  const hasRest = active.length > 0 || showHidden || idle.length > 0;
+  const hasRest = active.length > 0 || idle.length > 0;
+  // Ausgeblendete stehen als blasse Zeile; „Auch unpassende zeigen“ bzw. „Filter zurücksetzen“ bringen sie zurück,
+  // wie im Leerzustand (NoOffers: erst das Alter, dann die Filter; Plan 0056, E1, Review m4)
+  const resetHidden =
+    anyActive && (age !== undefined || onResetFilter !== undefined) && idle.some((r) => r.state === "ausgeblendet");
 
   return (
     <section ref={sectionRef} className="places providers" aria-label="Anbieter" tabIndex={-1}>
@@ -145,16 +148,18 @@ export function ProviderScreen({
           <div className="provider-group">
             {saved.length > 0 && hasRest && <h2>Weitere Anbieter</h2>}
             {active.length > 0 && <ul>{active.map((r) => row(r, false))}</ul>}
-            {showHidden && (
+            {resetHidden && (
               <p className="provider-hidden">
-                {hiddenProvidersText(hiddenCount)}
+                {age && (
+                  <button type="button" className="linkbtn" onClick={age.onShow}>
+                    Auch unpassende zeigen
+                  </button>
+                )}
+                {age && onResetFilter && " · "}
                 {onResetFilter && (
-                  <>
-                    {" "}
-                    <button type="button" className="linkbtn" onClick={onResetFilter}>
-                      Filter zurücksetzen
-                    </button>
-                  </>
+                  <button type="button" className="linkbtn" onClick={onResetFilter}>
+                    Filter zurücksetzen
+                  </button>
                 )}
               </p>
             )}

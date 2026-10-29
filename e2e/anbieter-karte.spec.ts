@@ -190,13 +190,14 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     await expect(rows(page)).toContainText("Kleines Theater Beispiel (fiktiv)");
   });
 
-  test("6: Sticker blendet Marker aus, blasse bleiben", async ({ page }) => {
+  test("6: Sticker macht Marker ausgeblendeter Anbieter blass, wie in der Liste", async ({ page }) => {
     await openTab(page);
     await page
       .getByRole("group", { name: "Kategorien" })
       .getByRole("button", { name: /Bücher/ })
       .click();
-    await expect.poll(async () => (await features(page)).length).toBe(3);
+    await expect.poll(async () => (await features(page)).filter((p) => p["blass"] === false).length).toBe(1);
+    expect(await features(page)).toHaveLength(7);
   });
 
   test("8: Kamera-Regel: mit Stadtteil als Startpunkt derselbe Startausschnitt über alle Orte", async ({ page }) => {

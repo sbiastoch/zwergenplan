@@ -15,7 +15,8 @@ import type { SiteOffer, SiteProvider } from "./site-data.ts";
 export interface ProviderAtPlace {
   id: string;
   name: string;
-  state: "aktiv" | "ohne-termine";
+  /** wie in der Liste: aktiv, ausgeblendet (kommende Angebote, keins passt zur Auswahl) oder ohne Termine */
+  state: "aktiv" | "ausgeblendet" | "ohne-termine";
   /** sichtbare Angebote (nach Kategorie und Alter), für „n Angebote“ im Orts-Sheet */
   shown: number;
 }
@@ -32,6 +33,7 @@ export interface ProviderPlace {
 
 /** Zeile eines Anbieters im Orts-Sheet (E4): „n Angebote“ bzw. „Gerade keine Termine“ */
 export function placeProviderLine(provider: ProviderAtPlace): string {
+  if (provider.state === "ausgeblendet") return "Passt nicht zur Auswahl";
   if (provider.state !== "aktiv") return "Gerade keine Termine";
   return provider.shown === 1 ? "1 Angebot" : `${provider.shown} Angebote`;
 }
@@ -132,10 +134,14 @@ export function providerCamera(geometry: ProviderGeometry): StartCamera {
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "de");
 
+/** Reihenfolge der Zustände an einem Ort, wie in der Liste (Plan 0056, E1) */
+const STATE_RANK: Record<ProviderAtPlace["state"], number> = { aktiv: 0, ausgeblendet: 1, "ohne-termine": 2 };
+
 /**
  * Marker der Anbieterkarte. Ein Anbieter ist `aktiv` mit einem Angebot in `visible`, `ohne-termine` ohne Angebot in
- * `upcoming`; sonst (durch Kategorie oder Alter ausgeblendet) fehlt er, wie in der Liste. Orte nach `key`, Anbieter je
- * Ort erst aktiv, dann ohne Termine, jeweils nach Name; Name und Stadtteil vom ersten Ort in Namensreihenfolge.
+ * `upcoming`, sonst `ausgeblendet` (Kategorie oder Alter); die beiden letzten stehen blass, wie in der Liste. Orte
+ * nach `key`, Anbieter je Ort erst aktiv, dann ausgeblendet, dann ohne Termine, jeweils nach Name; Name und Stadtteil
+ * vom ersten Ort in Namensreihenfolge.
  */
 export function providerPlaces(input: {
   providers: readonly SiteProvider[];
@@ -152,8 +158,7 @@ export function providerPlaces(input: {
   }
   const places = new Map<string, Bucket>();
   for (const provider of placedProviders(input.providers, [...input.upcoming, ...input.visible])) {
-    const state = shown.has(provider.id) ? "aktiv" : coming.has(provider.id) ? undefined : "ohne-termine";
-    if (!state) continue;
+    const state = shown.has(provider.id) ? "aktiv" : coming.has(provider.id) ? "ausgeblendet" : "ohne-termine";
     for (const venue of provider.venues) {
       const key = placeKey(venue.geo);
       const place: Bucket = places.get(key) ?? { geo: venue.geo, venues: [], providers: new Map() };
@@ -172,7 +177,7 @@ export function providerPlaces(input: {
     .map(([key, place]): ProviderPlace => {
       const [first] = [...place.venues].sort(byName);
       const providers = [...place.providers.values()].sort(
-        (a, b) => (a.state === b.state ? 0 : a.state === "aktiv" ? -1 : 1) || byName(a, b),
+        (a, b) => STATE_RANK[a.state] - STATE_RANK[b.state] || byName(a, b),
       );
       return {
         key,

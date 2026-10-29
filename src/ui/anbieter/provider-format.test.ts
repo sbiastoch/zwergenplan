@@ -1,14 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ProviderRow } from "../../domain/directory.ts";
 import type { Reach } from "../../domain/reach.ts";
-import {
-  hiddenProvidersText,
-  idleLine,
-  outsideText,
-  placesText,
-  providerCountText,
-  providerLine,
-} from "./provider-format.ts";
+import { idleLine, outsideText, placesText, providerCountText, providerLine } from "./provider-format.ts";
 
 const provider = { id: "x", name: "X", venues: [] };
 const row = (overrides: Partial<ProviderRow> = {}): ProviderRow => ({
@@ -68,11 +61,6 @@ describe("idleLine", () => {
 });
 
 describe("Zähltexte", () => {
-  it("weitere Anbieter ohne Passendes", () => {
-    expect(hiddenProvidersText(12)).toBe("12 weitere Anbieter haben gerade nichts Passendes.");
-    expect(hiddenProvidersText(1)).toBe("1 weiterer Anbieter hat gerade nichts Passendes.");
-  });
-
   it("Live-Text der Suche", () => {
     expect(providerCountText(12)).toBe("12 Anbieter");
     expect(providerCountText(1)).toBe("1 Anbieter");

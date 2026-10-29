@@ -78,14 +78,14 @@ export function placesToFeatures(places: readonly MapPlace[]): PointCollection<P
 interface MapProviderPlace {
   key: string;
   geo: GeoPoint;
-  providers: readonly { state: "aktiv" | "ohne-termine" }[];
+  providers: readonly { state: "aktiv" | "ausgeblendet" | "ohne-termine" }[];
 }
 
 /** Properties eines Ort-Punkts in der Quelle „anbieter-orte“ */
 export interface ProviderPlaceProperties {
   key: string;
   anbieter: number;
-  /** keiner der Anbieter dort hat kommende Termine (nach Kategorie und Alter) */
+  /** keiner der Anbieter dort hat passende kommende Termine (nach Kategorie und Alter) */
   blass: boolean;
 }
 

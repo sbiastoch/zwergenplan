@@ -101,15 +101,17 @@ describe("providerPlaces", () => {
     expect(pale.find((p) => p.name === "Turnhalle Beispiel")?.district).toBe("Schweinau");
   });
 
-  it("Sticker „Bücher“: ausgeblendete fehlen, die ohne Termine bleiben blass", () => {
+  it("Sticker „Bücher“: ausgeblendete und die ohne Termine stehen blass, wie in der Liste", () => {
     const places = providerPlaces({ providers: catalog, upcoming, visible: visibleWith(buecher) });
     expect(places.flatMap((p) => p.providers.map((a) => [a.id, a.state]))).toEqual(
       expect.arrayContaining([
         [pid("stadtbibliothek-beispiel"), "aktiv"],
+        [pid("theater-beispiel"), "ausgeblendet"],
         [pid("turnverein-beispiel"), "ohne-termine"],
       ]),
     );
-    expect(places).toHaveLength(3);
+    expect(places).toHaveLength(7);
+    expect(places.filter((p) => p.providers.some((a) => a.state === "aktiv"))).toHaveLength(1);
   });
 
   it("bündelt zwei Anbieter an einer Koordinate, erst aktiv, dann ohne Termine", () => {
@@ -122,6 +124,19 @@ describe("providerPlaces", () => {
     // Name des Orts: der erste Katalog-Ort in Namensreihenfolge
     expect(place?.name).toBe("Familientreff Beispielhof");
     expect(places).toHaveLength(7);
+  });
+
+  it("an einem Ort: erst aktiv, dann ausgeblendet, dann ohne Termine, jeweils nach Name (Plan 0056, E1)", () => {
+    const at = (id: string, name: string): SiteProvider => ({ ...NACHBAR, id, name });
+    const providers = [...catalog, at("z1", "Aaa ohne Termine"), at("z2", "Zzz ohne Termine")];
+    // Sticker „Bücher“: Der Familientreff ist ausgeblendet, die beiden Nachbarn haben keine Termine
+    const places = providerPlaces({ providers, upcoming, visible: visibleWith(buecher) });
+    const place = places.find((p) => p.key === placeKey(TREFF_GEO));
+    expect(place?.providers.map((a) => [a.name, a.state])).toEqual([
+      ["Familientreff Beispielhof (fiktiv)", "ausgeblendet"],
+      ["Aaa ohne Termine", "ohne-termine"],
+      ["Zzz ohne Termine", "ohne-termine"],
+    ]);
   });
 
   it("ein Anbieter mit nur einem laufenden Kurs ist blass, wie in der Liste (N3)", () => {
@@ -153,5 +168,6 @@ describe("placeProviderLine", () => {
     expect(placeProviderLine({ id: "a", name: "A", state: "aktiv", shown: 1 })).toBe("1 Angebot");
     expect(placeProviderLine({ id: "a", name: "A", state: "aktiv", shown: 4 })).toBe("4 Angebote");
     expect(placeProviderLine({ id: "a", name: "A", state: "ohne-termine", shown: 0 })).toBe("Gerade keine Termine");
+    expect(placeProviderLine({ id: "a", name: "A", state: "ausgeblendet", shown: 0 })).toBe("Passt nicht zur Auswahl");
   });
 });

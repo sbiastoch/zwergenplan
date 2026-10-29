@@ -307,13 +307,14 @@ test("per Tastatur: Enter auf der Glocke abonniert, der Fokus geht auf die näch
   await expect(heart(page, THEATER)).toHaveAttribute("aria-pressed", "true");
 });
 
-test("Filter trifft nur einen abonnierten Anbieter: Hinweis auf die ausgeblendeten bleibt, kein Leerzustand", async ({
+test("Filter trifft nur einen abonnierten Anbieter: die ausgeblendeten stehen blass darunter, kein Leerzustand", async ({
   page,
 }) => {
   await preset(page, ["kgjeqq3k"]);
   await page.goto("./?ansicht=anbieter&kat=buecher");
   await expect(savedList(page).locator(".place:not(.idle)")).toHaveCount(1);
-  await expect(page.getByText("4 weitere Anbieter haben gerade nichts Passendes.")).toBeVisible();
+  await expect(restRows(page).filter({ hasText: "zur Auswahl" })).toHaveCount(4);
+  await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Anbieter" }).locator(".empty")).toHaveCount(0);
   await expect(heading(page, "Weitere Anbieter")).toBeVisible();
 });

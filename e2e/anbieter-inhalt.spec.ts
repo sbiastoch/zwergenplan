@@ -112,14 +112,15 @@ test.describe("Startpunkt Gostenhof", () => {
   });
 });
 
-test("Sticker „Bücher“: nur die Bibliothek, Hinweis auf die übrigen mit „Filter zurücksetzen“", async ({ page }) => {
+test("Sticker „Bücher“: nur die Bibliothek aktiv, die übrigen blass, „Filter zurücksetzen“", async ({ page }) => {
   await openList(page, "kat=buecher");
   await expect(page.getByRole("status")).toContainText("1 Anbieter mit 1 Angebot");
   expect(await names(activeRows(page))).toEqual([BIBLIOTHEK]);
+  // die vier ausgeblendeten stehen als eigene blasse Zeile, kein Zählsatz (Nutzer-Feedback 2026-10-29)
+  await expect(idleRows(page)).toHaveCount(5);
+  await expect(idleRows(page).filter({ hasText: "zur Auswahl" })).toHaveCount(4);
+  await expect(idleRows(page).last()).toContainText(TURNVEREIN);
   const hint = list(page).locator(".provider-hidden");
-  await expect(hint).toContainText("4 weitere Anbieter haben gerade nichts Passendes.");
-  await expect(idleRows(page)).toHaveCount(1);
-  await expect(idleRows(page)).toContainText(TURNVEREIN);
   await hint.getByRole("button", { name: "Filter zurücksetzen" }).click();
   await expect(activeRows(page)).toHaveCount(5);
   await expect(page).toHaveURL(/\?ansicht=anbieter$/);

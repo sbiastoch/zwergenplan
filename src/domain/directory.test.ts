@@ -82,17 +82,22 @@ describe("providerRows", () => {
     ]);
     expect(result.active.every((r) => r.state === "aktiv")).toBe(true);
     expect(result.idle.map((r) => [r.provider.id, r.state])).toEqual([[pid("turnverein-beispiel"), "ohne-termine"]]);
-    expect(result.hiddenCount).toBe(0);
     const treff = result.active.find((r) => r.provider.id === pid("familientreff-beispiel"));
     expect(treff).toMatchObject({ shown: 3, upcoming: 3, places: ["Altstadt"] });
     expect(treff?.nearest).toBeUndefined();
   });
 
-  it("Sticker „Bücher“: nur die Bibliothek aktiv, vier ausgeblendet, Turnverein bleibt", () => {
+  it("Sticker „Bücher“: nur die Bibliothek aktiv, die vier ausgeblendeten blass vor dem Turnverein", () => {
     const result = rows({ visible: visibleWith(buecher) });
     expect(ids(result.active)).toEqual([pid("stadtbibliothek-beispiel")]);
-    expect(result.hiddenCount).toBe(4);
-    expect(ids(result.idle)).toEqual([pid("turnverein-beispiel")]);
+    // jede Zahl hat ihre Zeilen, kein Zählsatz mehr (Nutzer-Feedback 2026-10-29)
+    expect(result.idle.map((r) => [r.provider.id, r.state])).toEqual([
+      [pid("gemeinde-beispiel"), "ausgeblendet"],
+      [pid("familientreff-beispiel"), "ausgeblendet"],
+      [pid("theater-beispiel"), "ausgeblendet"],
+      [pid("musikschule-beispiel"), "ausgeblendet"],
+      [pid("turnverein-beispiel"), "ohne-termine"],
+    ]);
   });
 
   it("Suche „theater“ bei Sticker „Bücher“: das Theater erscheint blass als ausgeblendet", () => {
@@ -101,7 +106,6 @@ describe("providerRows", () => {
     expect(result.idle.map((r) => [r.provider.id, r.state, r.shown, r.upcoming])).toEqual([
       [pid("theater-beispiel"), "ausgeblendet", 0, 2],
     ]);
-    expect(result.hiddenCount).toBe(0);
   });
 
   it("Suche „beispiel“ bei Sticker „Bücher“: erst die vier ausgeblendeten, dann der Turnverein", () => {
@@ -119,7 +123,7 @@ describe("providerRows", () => {
   it("Suche filtert auch die Anbieter ohne Termine", () => {
     expect(ids(rows({ query: "turnverein" }).idle)).toEqual([pid("turnverein-beispiel")]);
     const none = rows({ query: "xyz" });
-    expect([none.active, none.idle, none.hiddenCount]).toEqual([[], [], 0]);
+    expect([none.active, none.idle]).toEqual([[], []]);
   });
 
   it("Stadtteile: aktiv aus den sichtbaren Angeboten, blass aus dem Katalog (district ?? Name)", () => {
@@ -257,12 +261,13 @@ describe("providerRows: gemerkte Anbieter (Plan 0025, E3)", () => {
     expect(result.active.length + activeSaved).toBe(distinctProviders(upcoming));
   });
 
-  it("ausgeblendet: bleibt unter saved, blass, und zählt nicht in hiddenCount", () => {
+  it("ausgeblendet: bleibt unter saved, blass, und steht nicht noch einmal in idle", () => {
     const result = rows({ visible: visibleWith(buecher), saved: [pid("theater-beispiel")] });
     expect(result.saved.map((r) => [r.provider.id, r.state, r.upcoming])).toEqual([
       [pid("theater-beispiel"), "ausgeblendet", 2],
     ]);
-    expect(result.hiddenCount).toBe(3);
+    expect(ids(result.idle)).not.toContain(pid("theater-beispiel"));
+    expect(result.idle.filter((r) => r.state === "ausgeblendet")).toHaveLength(3);
   });
 
   it("ohne Termine: unter saved, nicht in idle", () => {
@@ -303,11 +308,12 @@ describe("providerRows mit Kartenausschnitt (Plan 0055, E2, E4)", () => {
     expect(result.outside).toBe(0);
   });
 
-  it("hiddenCount zählt nur ausgeblendete im Ausschnitt", () => {
+  it("ausgeblendete Zeilen nur im Ausschnitt", () => {
     const buecher: FilterState = { ...EMPTY_FILTER, categories: ["buecher"] };
     const visible = visibleWith(buecher);
-    expect(rows({ visible }).hiddenCount).toBe(4);
-    expect(rows({ visible, view }).hiddenCount).toBe(1);
+    const hidden = (r: ReturnType<typeof rows>) => r.idle.filter((x) => x.state === "ausgeblendet");
+    expect(hidden(rows({ visible }))).toHaveLength(4);
+    expect(ids(hidden(rows({ visible, view })))).toEqual([treff]);
   });
 
   it("ein Anbieter ohne bekannten Ort bleibt (Rückfall ohne Katalog-Eintrag, Review B1)", () => {
