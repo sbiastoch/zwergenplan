@@ -8,7 +8,7 @@ import { findProvider, hasOffersOutside, providerCategories, providerOffers } fr
 import { CATEGORY_LABELS } from "../../domain/topics.ts";
 import { markAutofocus } from "../Dialog.tsx";
 import { Icon } from "../icons.tsx";
-import { OfferCard } from "../OfferCard.tsx";
+import { BellButton, OfferCard } from "../OfferCard.tsx";
 import type { ProviderSheetProps } from "../provider-types.ts";
 import { RouteHint, routeLink } from "../Ways.tsx";
 
@@ -50,23 +50,13 @@ export function ProviderSheet({
     <div className="sheet-body provider-sheet">
       <div className="sheet-scroll">
         <div className="grab" />
-        {/* Herz wie auf der Kachel (Plan 0025, E2): ein Muster für alles Merkbare, „… merken“ mit aria-pressed */}
+        {/* Glocke wie in der Anbieterzeile (Plan 0054, E1): „… abonnieren“ mit aria-pressed */}
         <div className="sheet-head">
-          {/* Startfokus auf dem Namen, nicht auf dem Herz (wie KidSheet): `showModal()` nimmt sonst das erste Bedienelement */}
+          {/* Startfokus auf dem Namen, nicht auf der Glocke (wie KidSheet): `showModal()` nimmt sonst das erste Bedienelement */}
           <h2 lang="de" ref={focusName} tabIndex={-1}>
             {provider.name}
           </h2>
-          <button
-            type="button"
-            className="heart inline"
-            aria-pressed={saved}
-            aria-label={`${provider.name} merken`}
-            onClick={() => onToggleSaved(provider.id)}
-          >
-            <span className="hs">
-              <Icon name="heart" size={20} />
-            </span>
-          </button>
+          <BellButton label={provider.name} subscribed={saved} onToggle={() => onToggleSaved(provider.id)} inline />
         </div>
         {categories.length > 0 && (
           <p className="provider-cats">{categories.map((c) => CATEGORY_LABELS[c]).join(" · ")}</p>

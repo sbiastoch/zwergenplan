@@ -49,7 +49,7 @@ export interface AppStepModule {
   install: InstallApi;
   pushCapability: () => PushCapability;
   /** am Ende des Onboardings einmal spiegeln, falls ein Abo läuft (Plan 0035, E9) */
-  syncPush: () => Promise<void>;
+  syncPush: () => Promise<unknown>;
 }
 
 export interface AppStepProps {

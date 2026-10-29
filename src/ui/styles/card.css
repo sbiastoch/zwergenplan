@@ -234,6 +234,13 @@
   .heart.inline {
     position: static;
   }
+  /* Glocke (Plan 0054, E1): wie das Herz, abonniert gelb */
+  .bell[aria-pressed="true"] .hs {
+    background: #ffd93b;
+  }
+  .bell[aria-busy="true"] .hs {
+    opacity: 0.6;
+  }
   @keyframes slap {
     0% {
       /* nicht größer als das 44-px-Herz: sonst zählt Chrome die Ausdehnung als Seitenüberlauf */

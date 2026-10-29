@@ -49,6 +49,8 @@ export interface WeeklyInput<T extends Offer & { venue: ReachTarget }> {
   week: readonly T[];
   /** Such-Abos; leer = keins */
   searches: readonly FilterState[];
+  /** Anbieter-Abos (`publicId`, Plan 0054, E2); fehlt oder leer = keins */
+  providers?: readonly string[] | undefined;
   birthDate?: string | undefined;
   /** Wegzeit ab dem gespeicherten Startpunkt (ADR 0017); ohne wirkt die Wegzeit-Grenze nicht (wie in der Liste) */
   reach?: ReachFn | undefined;
@@ -58,7 +60,7 @@ export interface WeeklyInput<T extends Offer & { venue: ReachTarget }> {
 export interface WeeklyText {
   title: string;
   body: string;
-  /** IDs der passenden neuen Angebote, in Datenreihenfolge */
+  /** IDs der passenden neuen Angebote: erst die abonnierter Anbieter, dann die übrigen, je in Datenreihenfolge */
   hits: string[];
 }
 
@@ -83,37 +85,45 @@ function titleList(offers: readonly Offer[]): string {
  * Der zugeschnittene Text (E4), immer einer. Passt heißt: (keine Abos oder ein Abo passt) und (kein gültiges Alter
  * oder der Beginn passt zum Alter, `startFitsAge`). Die Wochenzahl verlangt bei regelmäßigen Angeboten zusätzlich einen
  * passenden Termin in den 7 Tagen (Plan 0043, E2). Vor der Geburt zählt nur das Alter nicht, die Abos wirken weiter.
+ * Abos sind Such- und Anbieter-Abos (Plan 0054, E2): Ein Angebot passt zu einem Abo, wenn es von einem abonnierten
+ * Anbieter stammt oder zu einer Suche passt. Treffer der Anbieter stehen vorn.
  */
 export function weeklyText<T extends Offer & { venue: ReachTarget }>({
   fresh,
   week,
   searches,
+  providers = [],
   birthDate,
   reach,
   now,
 }: WeeklyInput<T>): WeeklyText {
   const months = birthDate === undefined ? -1 : ageInMonths(birthDate, now);
   const byAge = birthDate !== undefined && months >= 0;
-  const bySearch = searches.length > 0;
+  const byAbo = searches.length + providers.length > 0;
+  const own = (o: T) => providers.includes(o.providerId);
   const fits = (o: T) =>
-    (!bySearch || searches.some((s) => matchesFilter(o, s, reach))) && (!byAge || startFitsAge(o, birthDate, now));
+    (!byAbo || own(o) || searches.some((s) => matchesFilter(o, s, reach))) &&
+    (!byAge || startFitsAge(o, birthDate, now));
   // `sessionFit` ist die eine Quelle der Prüfung je Termin (Kurse und Einzeltermine prüft es nicht, ADR 0007)
   const sessionFits = byAge ? sessionFit(birthDate) : undefined;
   const fitsInWeek = (o: T) => !sessionFits || o.sessions.some((s) => startsInWeek(s, now) && sessionFits(o, s));
-  const hits = fresh.filter(fits);
+  const matched = fresh.filter(fits);
+  const hits = [...matched.filter(own), ...matched.filter((o) => !own(o))];
   const n = hits.length;
   if (n > 0) {
-    const title = bySearch
-      ? `${n === 1 ? "1 neues Angebot" : `${n} neue Angebote`} für deine Suchen`
+    const one = n === 1;
+    const count = one ? "1 neues Angebot" : `${n} neue Angebote`;
+    const title = byAbo
+      ? `${count} ${hits.every(own) ? "von deinen Anbietern" : "für deine Abos"}`
       : byAge
-        ? `${n === 1 ? "1 neues Angebot passt" : `${n} neue Angebote passen`} zu ${ageWords(months, "dativ")}`
-        : `${n === 1 ? "1 neues Angebot" : `${n} neue Angebote`} im Zwergenplan`;
+        ? `${count} ${one ? "passt" : "passen"} zu ${ageWords(months, "dativ")}`
+        : `${count} im Zwergenplan`;
     return { title, body: titleList(hits), hits: hits.map((o) => o.id) };
   }
   const m = week.filter((o) => fits(o) && fitsInWeek(o)).length;
-  const filtered = bySearch || byAge;
-  const title = bySearch
-    ? "Diese Woche nichts Neues für deine Suchen"
+  const filtered = byAbo || byAge;
+  const title = byAbo
+    ? "Diese Woche nichts Neues für deine Abos"
     : byAge
       ? `Diese Woche nichts Neues für ${ageWords(months, "akkusativ")}`
       : "Diese Woche nichts Neues";

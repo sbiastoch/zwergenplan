@@ -1,5 +1,5 @@
 /** Angebots-Kachel (Plan 0003, E9): Kopfzeile mit Kategorie-Pille und Zeit, Titel, Meta, Fakten, Herz. */
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
 import { isNewlyListed } from "../domain/listing.ts";
 import type { Reach } from "../domain/reach.ts";
@@ -121,6 +121,44 @@ export function DistPending() {
     <span className="dist pending" aria-hidden="true">
       {"\u00a0"}
     </span>
+  );
+}
+
+/**
+ * Glocke (Plan 0054, E1): abonnieren statt merken, für Anbieter und Suchen. Gebaut wie das Herz (`.heart`), gedrückt
+ * gelb; `busy`, solange der Tipp Push einschaltet.
+ */
+export function BellButton({
+  label,
+  subscribed,
+  busy = false,
+  onToggle,
+  inline = false,
+  className = "",
+}: {
+  /** Name des Abonnierten: „<label> abonnieren“ */
+  label: string;
+  subscribed: boolean;
+  busy?: boolean;
+  onToggle: (event: MouseEvent<HTMLButtonElement>) => void;
+  inline?: boolean;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      className={`heart bell${inline ? " inline" : ""}${className && ` ${className}`}`}
+      aria-pressed={subscribed}
+      aria-busy={busy}
+      aria-label={`${label} abonnieren`}
+      onClick={(event) => {
+        if (!busy) onToggle(event);
+      }}
+    >
+      <span className="hs">
+        <Icon name="bell" size={20} />
+      </span>
+    </button>
   );
 }
 
