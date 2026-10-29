@@ -29,6 +29,41 @@
     },
     "https://sfg-sport.de/fit-for-kids/eltern-kind-turnen": { "urteil": "passend", "datum": "2026-10-29" },
     "https://eck-cafe.net/": { "urteil": "passend", "datum": "2026-10-29" },
+    "https://sbfuerthwest.kirche-bamberg.de/menu-2-christkoenig-fierth/06-gruppen-und-kreise-christkoenig/krabbelgruppe": {
+      "urteil": "passend",
+      "datum": "2026-10-29"
+    },
+    "https://sofa-stein.de/angebote/geburt-und-babys/pekip/index.html": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Stein, Landkreis Fürth"
+    },
+    "https://www.die-frau-fuchs.de/": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Gastanbieterin bei Famalië"
+    },
+    "https://tv-fuerth-1860.de/abteilungssport/turnen/freizeitsport/": { "urteil": "passend", "datum": "2026-10-29" },
+    "https://www.sgf1903.de/turnen/sportangebote/kinderkurse": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "nur für Mitglieder"
+    },
+    "https://sportverein-poppenreuth.de/eltern-kind-turnen-termine/": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Ort und Alter auf der Seite dünn"
+    },
+    "https://hebammenhaus.de/rueckbildungskurse/": {
+      "urteil": "passend",
+      "datum": "2026-10-29",
+      "notiz": "Rückbildung mit Baby"
+    },
+    "https://www.vhs-erlangen.de/p/gesellschaft/musikgarten-babys-i-geb-von-09-25-bis-03-26-480-C-26W250020": {
+      "urteil": "falsch",
+      "datum": "2026-10-29",
+      "notiz": "Erlangen gehört weder zu Nürnberg noch zu Fürth (noch kein Katalog für Erlangen); die bbox der Region Nürnberg reicht bis Erlangen"
+    },
     "https://www.pfarrei-johannes-der-taeufer.de/termine/calendar/08/19/event/tx_cal_phpicalendar/krabbelgruppe-altenfurt-48/": {
       "urteil": "passend",
       "datum": "2026-10-29"
