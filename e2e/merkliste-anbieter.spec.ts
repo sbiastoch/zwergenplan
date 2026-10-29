@@ -4,7 +4,10 @@
  * Laden vor. Fixtures, Uhr Mo 5.10.2026 12:00.
  */
 import type { Page, Request } from "@playwright/test";
-import { expect, skipOnboarding, startPreloads, test } from "./fixtures.ts";
+import { expect, mapSettled, mockTilesIn, skipOnboarding, startPreloads, test } from "./fixtures.ts";
+
+// Der Tab „Anbieter“ zeigt die Anbieterkarte, Kacheln aus tests/fixtures/karte/ (Plan 0055, E8)
+test.use({ tiles: "mock" });
 
 const TREFF = "Familientreff Beispielhof (fiktiv)";
 const THEATER = "Kleines Theater Beispiel (fiktiv)";
@@ -74,6 +77,8 @@ async function flowPaths(page: Page): Promise<string[]> {
   await expect(page.getByTestId("offer").first()).toBeVisible();
   await tab(page, "Anbieter").click();
   await expect(restRows(page).first()).toBeVisible();
+  // die Anbieterkarte samt Kacheln gehört zum Tab (ADR 0038); gleich mit und ohne Abos, erst danach vergleichen
+  await mapSettled(page);
   return [...paths].sort();
 }
 
@@ -108,11 +113,14 @@ test("im Sheet abonnieren: Toast, Glocke gedrückt, oben im Tab „Anbieter“ o
   await expect(heart(page, TREFF)).toHaveCount(1);
   await expect(heading(page, "Weitere Anbieter")).toBeVisible();
   await expect(restRows(page).filter({ hasText: TREFF })).toHaveCount(0);
+  // WebKit meldet abgebrochene Kachel-Requests beim Neuladen als Fehler: erst die Anbieterkarte ruhen lassen (Plan 0055)
+  await mapSettled(page);
 
   await page.reload();
   await expect(savedRow(page, TREFF)).toBeVisible();
   // das Badge der Merkliste zählt nur gemerkte Angebote
   await expect(tab(page, "Merkliste").locator(".badge")).toHaveCount(0);
+  await mapSettled(page);
 });
 
 test("in der Liste abonnieren und beenden: Zeile wandert, Fokus bleibt auf der nachrückenden Zeile", async ({
@@ -234,6 +242,8 @@ test("Privatsphäre: mit und ohne Anbieter-Abos dieselben Request-Pfade", async 
   try {
     // die Fixture-Option `onboarding` erreicht diesen Kontext nicht (Plan 0033, E15)
     await skipOnboarding(context);
+    // die Anbieterkarte im Tab lädt Kacheln (ADR 0038); auch hier nur aus dem Mock
+    await mockTilesIn(context);
     const other = await context.newPage();
     await other.clock.setFixedTime(FIXTURE_NOW);
     await preset(other, ["b5nuus36", "fv3fpfp2"]);
@@ -316,6 +326,7 @@ test("Privatsphäre: Abonnieren und Beenden laden höchstens Code, keine Daten u
   await page.goto("./?ansicht=anbieter");
   await expect(heart(page, THEATER)).toBeVisible();
   await preloaded;
+  await mapSettled(page);
   const paths = (list: Request[]) => list.map((r) => new URL(r.url()).pathname).sort();
   const onSubscribe = collect(page, () => true);
   await heart(page, THEATER).click();

@@ -129,6 +129,45 @@ describe("useOfferViews", () => {
     expect(v.unfitIds.has(GROSS.id)).toBe(true);
   });
 
+  describe("Tab „Anbieter“: nur Kategorie und Alter (Plan 0055, E3)", () => {
+    const ANBIETER: Route = {
+      tab: "anbieter",
+      filter: {
+        categories: [],
+        formats: ["kurs"],
+        registration: ["ohne-anmeldung"],
+        cost: ["kostenpflichtig"],
+        reachLimit: { kind: "minuten", value: 20 },
+        range: { from: "2026-10-11", to: "2026-10-13" },
+      },
+    };
+    const fern = { ...GROSS, venue: { ...GROSS.venue, geo: { lat: 49.6, lon: 11.3 } } };
+    const slow: ReachFn = ({ geo }) => ({ kind: "oepnv", minutes: geo.lat > 49.5 ? 90 : 10, byFoot: false });
+
+    it("ignoriert Kosten, Anmeldung, Format, Wegzeit-Grenze und Zeitraum", () => {
+      const v = render({ offers: [BABY, fern, VORBEI], route: ANBIETER, reach: slow });
+      expect(ids(v.visible)).toEqual([]);
+      expect(ids(v.providerVisible)).toEqual(["baby", "gross"]);
+    });
+
+    it("Kategorie wirkt", () => {
+      const route: Route = { ...ANBIETER, filter: { ...ANBIETER.filter, categories: ["buecher"] } };
+      expect(ids(render({ route }).providerVisible)).toEqual([]);
+    });
+
+    it("Alter wirkt, der Altershinweis zählt ohne Zeitraum", () => {
+      const v = render({ route: ANBIETER, birthDate: "2026-05-01" });
+      expect(ids(v.providerVisible)).toEqual(["baby"]);
+      expect(v.providerUnfitCount).toBe(1);
+    });
+
+    it("außerhalb des Tabs gleich `visible`", () => {
+      const v = render({});
+      expect(v.providerVisible).toBe(v.visible);
+      expect(v.providerUnfitCount).toBe(v.unfitCount);
+    });
+  });
+
   it("Altersfilter aus: alles sichtbar, unpassende gezählt und markiert (Plan 0021, E1)", () => {
     let result: OfferViews | undefined;
     function Probe() {

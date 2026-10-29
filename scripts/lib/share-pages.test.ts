@@ -195,7 +195,14 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
     id: "b5nuus36", // publicId von familientreff-beispiel (ADR 0022)
     name: "Familientreff Beispielhof (fiktiv)",
     url: "https://example.org/",
-    venues: [{ name: "Familientreff Beispielhof", address: "Beispielweg 1", district: "Altstadt" }],
+    venues: [
+      {
+        name: "Familientreff Beispielhof",
+        address: "Beispielweg 1",
+        district: "Altstadt",
+        geo: { lat: 49.4521, lon: 11.0767 },
+      },
+    ],
   };
 
   it("zählt kommende Angebote ab generatedAt, höchstens drei Kategorien", () => {
@@ -220,7 +227,14 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
       id: "fkbg3oeb", // publicId von turnverein-beispiel
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
-      venues: [{ name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" }],
+      venues: [
+        {
+          name: "Turnhalle Beispiel",
+          address: "Sportweg 3, 90441 Nürnberg",
+          district: "Schweinau",
+          geo: { lat: 49.4392, lon: 11.0442 },
+        },
+      ],
     };
     expect(meta(providerSharePage(turnverein, offers, GENERATED_AT).html, "og:description")).toBe(
       "Im Zwergenplan · Schweinau",

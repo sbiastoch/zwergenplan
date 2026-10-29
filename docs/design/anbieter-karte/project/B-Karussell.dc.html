@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Anbieterkarte mit Karussell</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.zp{width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.th-light{--bg:#E8F1FF;--dotc:rgba(19,33,46,.13);--surface:#FFFFFF;--rim:#FFFFFF;--ink:#13212E;--muted:#475563;--soft:#EEF3FA;--line:#13212E;--shadow:#13212E;--primary:#13212E;--on-primary:#FFFFFF;--tape:#FFE38A;--tape-stripe:rgba(255,255,255,.5);--on-tape:#13212E;--map:#E1EBF8;--road:#FFFFFF;--park:#D3EBC6;--water:#B3D7F5;--sel:#FFD93B;--on-sel:#13212E}
+.zp button{font:inherit;color:inherit;cursor:pointer}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:25px;letter-spacing:-.02em}
+.logo i{width:28px;height:28px;border-radius:50%;background:#FFD93B;border:2px solid var(--rim);display:grid;place-items:center}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 15px;border-radius:999px;background:var(--surface);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);font-weight:700;font-size:15px;white-space:nowrap;box-sizing:border-box}
+.round{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid var(--line);background:var(--surface);box-shadow:3px 3px 0 var(--shadow);display:grid;place-items:center;box-sizing:border-box}
+.bar{display:flex;align-items:center;gap:8px;padding:10px 16px 4px}
+.seg{display:flex;background:var(--soft);border:2px solid var(--line);border-radius:999px;margin-left:auto}
+.seg button{min-height:38px;padding:0 16px;border-radius:999px;border:0;background:transparent;font-weight:700;font-size:15px}
+.seg .on{background:var(--surface);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);margin:-2px}
+.status{padding:8px 18px 6px;font-size:14px;color:var(--muted)}
+.status b{color:var(--ink)}
+.mapf{position:relative;margin:4px 16px 0;border:2.5px solid var(--line);border-radius:22px;overflow:hidden;background:var(--map);box-shadow:4px 4px 0 var(--shadow)}
+.mapf svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.road{fill:none;stroke:var(--road);stroke-linecap:round}
+.lbl{fill:var(--muted);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:12px;font-weight:600}
+.pm{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:11px;background:var(--surface);border:2px solid var(--line);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;color:var(--ink);box-sizing:border-box}
+.pm b{position:absolute;top:-10px;right:-10px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:var(--primary);color:var(--on-primary);font-size:11px;line-height:16px;text-align:center;border:2px solid var(--surface)}
+.pm.idle{opacity:.55;border-style:dashed;box-shadow:none}
+.pm.sel{background:var(--sel);color:var(--on-sel);width:40px;height:40px;margin:-20px 0 0 -20px}
+.cl{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:var(--primary);color:var(--on-primary);border:2px solid var(--surface);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;font-weight:800;font-size:15px;box-sizing:border-box}
+.origin{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#2F7BF6;border:3px solid #fff;box-shadow:0 0 0 6px rgba(47,123,246,.25)}
+.zoom{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:14px;box-shadow:3px 3px 0 var(--shadow);overflow:hidden}
+.zoom button{width:42px;height:42px;border:0;background:transparent;display:grid;place-items:center}
+.zoom button+button{border-top:2px solid var(--line)}
+.attr{position:absolute;left:8px;right:8px;top:8px;font-size:10px;color:var(--muted)}
+.car{position:absolute;left:0;right:0;bottom:12px;display:flex;gap:10px;padding:0 12px;overflow:hidden}
+.card{flex:none;width:276px;box-sizing:border-box;padding:12px 12px 12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:3px 3px 0 var(--shadow);display:flex;gap:10px;align-items:flex-start}
+.card.on{border-width:3px}
+.card .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;border:0;background:transparent;padding:0}
+.card .t b{font-size:16px;font-weight:800;line-height:1.25}
+.card .t span{font-size:13px;color:var(--muted)}
+.dots{display:flex;gap:6px;justify-content:center;position:absolute;left:0;right:0;bottom:-2px}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:78px;display:flex;align-items:stretch;padding:8px 10px 10px;box-sizing:border-box;background-color:var(--tape);background-image:repeating-linear-gradient(-45deg,var(--tape-stripe) 0 9px,transparent 9px 20px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;font-weight:700;color:var(--on-tape);border:2px solid transparent;border-radius:16px;background:transparent}
+.tab.on{background:var(--surface);border-color:var(--line);box-shadow:3px 3px 0 var(--shadow);color:var(--ink)}
+</style>
+</helmet>
+<div class="zp th-light">
+  <div class="hdr">
+    <div class="logo"><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 14 13H2Z" fill="#FF6B6B"></path></svg></i>Zwergenplan</div>
+    <button type="button" class="pill">Alter?</button>
+  </div>
+  <div class="bar">
+    <button type="button" class="pill"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>Filter</button>
+    <button type="button" class="round" aria-label="Anbieter suchen"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.5-4.5"></path></svg></button>
+    <div class="seg" role="group" aria-label="Darstellung">
+      <button type="button" aria-pressed="false">Liste</button>
+      <button type="button" class="on" aria-pressed="true">Karte</button>
+    </div>
+  </div>
+  <p class="status" style="margin:0"><b>23</b> Anbieter im Kartenausschnitt</p>
+  <div class="mapf" style="height:572px">
+    <svg class="bg" viewBox="0 0 354 572" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path d="M0 80 Q60 50 110 90 T230 110 T354 90 L354 0 L0 0Z" fill="var(--park)" opacity=".7"></path>
+      <ellipse cx="310" cy="420" rx="70" ry="60" fill="var(--park)"></ellipse>
+      <path d="M-10 255 C40 240 70 270 110 252 S170 230 205 248 S270 270 364 240" fill="none" stroke="var(--water)" stroke-width="7"></path>
+      <path class="road" stroke-width="9" d="M180 190 Q236 192 244 245 Q246 300 185 306 Q124 304 122 248 Q126 192 180 190Z"></path>
+      <path class="road" stroke-width="6" d="M0 190 L122 240 M244 245 L354 228 M185 306 L210 572 M180 190 L170 0 M122 248 L20 572 M244 260 L354 420 M70 0 L122 220"></path>
+      <path class="road" stroke-width="3.5" d="M0 340 L130 290 M270 0 L238 210 M90 572 L160 306 M320 572 L224 296 M30 50 L120 200"></path>
+      <text class="lbl" x="20" y="222">Fürth</text>
+      <text class="lbl" x="160" y="228">Altstadt</text>
+      <text class="lbl" x="262" y="214">Wöhrd</text>
+      <text class="lbl" x="150" y="80">St. Johannis</text>
+      <text class="lbl" x="52" y="290">Gostenhof</text>
+      <text class="lbl" x="200" y="356">Südstadt</text>
+    </svg>
+    <div class="attr">OpenFreeMap © OpenMapTiles Data from OpenStreetMap</div>
+    <span class="cl" style="left:178px;top:250px">9</span>
+    <span class="cl" style="left:46px;top:240px">6</span>
+    <span class="pm sel" style="left:96px;top:300px"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg><b>3</b></span>
+    <span class="pm" style="left:268px;top:180px"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg></span>
+    <span class="pm" style="left:190px;top:120px"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg><b>2</b></span>
+    <span class="pm" style="left:232px;top:340px"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg></span>
+    <span class="pm idle" style="left:306px;top:300px"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg></span>
+    <span class="origin" style="left:150px;top:330px"></span>
+    <div class="zoom" style="top:30px">
+      <button type="button" aria-label="Vergrößern"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+      <button type="button" aria-label="Verkleinern"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+    </div>
+    <div class="car"aria-label="Anbieter im Ausschnitt">
+      <div class="card on">
+        <button type="button" class="t"><b>Familienzentrum Gostenhof (fiktiv)</b><span>5 Angebote · 14 Min. mit Öffis</span><span>+ 2 weitere Anbieter hier</span></button>
+        <button type="button" class="round" aria-label="Anbieter merken"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg></button>
+      </div>
+      <div class="card">
+        <button type="button" class="t"><b>Schwimmschule Seepferdchen (fiktiv)</b><span>4 Angebote · 18 Min. mit Öffis</span></button>
+        <button type="button" class="round" aria-label="Anbieter merken"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg></button>
+      </div>
+    </div>
+  </div>
+  <nav class="tabs" aria-label="Bereiche">
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5Z"></path></svg>Angebote</button>
+    <button type="button" class="tab on" aria-current="page"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg>Anbieter</button>
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg>Merkliste</button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

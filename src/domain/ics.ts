@@ -4,6 +4,7 @@
  * Zeiten in UTC (…Z) – eindeutig über die Zeitumstellung, kein VTIMEZONE nötig.
  */
 
+import { sessionIndex } from "./agenda.ts";
 import { sessionKey } from "./ics-paths.ts";
 import type { CollectionItem, IcsContext, IcsSource } from "./ics-types.ts";
 import type { Offer, Session } from "./schema.ts";
@@ -17,12 +18,6 @@ import { toIcsUtc } from "./time.ts";
 export function icsContextFor(offer: IcsSource, generatedAt: string): IcsContext {
   const { name, address, geo } = offer.venue;
   return { providerName: offer.providerName, venue: { name, address, geo }, stamp: generatedAt };
-}
-
-function sessionIndex(offer: Offer, session: Session): number {
-  const index = offer.sessions.findIndex((s) => s.start === session.start);
-  if (index < 0) throw new Error(`Termin ${session.start} gehört nicht zu ${offer.id}`);
-  return index;
 }
 
 const PRODID = "-//Zwergenplan//Babyangebote Nürnberg//DE";

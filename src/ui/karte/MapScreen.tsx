@@ -10,7 +10,7 @@ import type { SiteOffer } from "../../domain/site-data.ts";
 import { Dialog } from "../Dialog.tsx";
 import { LoadFailed, useLazy } from "../Lazy.tsx";
 import { NoOffers } from "../ListView.tsx";
-import type { MapProblem, MapScreenProps, MapViewProps } from "../map-types.ts";
+import type { MapLayer, MapProblem, MapScreenProps, MapViewProps } from "../map-types.ts";
 import { mapData } from "./map-data.ts";
 import { PlaceList } from "./PlaceList.tsx";
 import { PlaceSheet } from "./PlaceSheet.tsx";
@@ -30,6 +30,8 @@ export function MapScreen(props: MapScreenProps) {
     () => mapData(offers, cameraOffers, origin, reach),
     [offers, cameraOffers, origin, reach],
   );
+  // eigene Identität nur bei neuen Orten: Sonst tauschte MapView bei jedem Render die Daten (E9)
+  const layer = useMemo((): MapLayer => ({ kind: "angebote", places }), [places]);
   const { module, attempt, retry } = useLazy(loadMapView);
   const [ready, setReady] = useState(false);
   const [problem, setProblem] = useState<MapProblem>();
@@ -64,7 +66,7 @@ export function MapScreen(props: MapScreenProps) {
         {module.kind === "da" && !problem && (
           <module.View
             key={build}
-            places={places}
+            layer={layer}
             start={start}
             origin={origin}
             dark={props.dark}

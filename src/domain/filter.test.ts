@@ -8,6 +8,7 @@ import {
   filterFromSearch,
   filterToSearch,
   matchesFilter,
+  providerFilter,
   toggleIn,
   withDateRange,
   withReachLimit,
@@ -309,5 +310,20 @@ describe("Zeitraum (Plan 0023)", () => {
       "musikgarten-1",
       undefined,
     ]);
+  });
+});
+
+describe("providerFilter (Plan 0055, E3)", () => {
+  it("behält im Tab „Anbieter“ nur die Kategorien", () => {
+    const full: FilterState = {
+      categories: ["musik", "buecher"],
+      formats: ["kurs"],
+      registration: ["ohne-anmeldung"],
+      cost: ["kostenlos"],
+      reachLimit: { kind: "minuten", value: 20 },
+      range: { from: "2026-10-06", to: "2026-10-12" },
+    };
+    expect(providerFilter(full)).toEqual({ ...EMPTY_FILTER, categories: ["musik", "buecher"] });
+    expect(providerFilter(EMPTY_FILTER)).toEqual(EMPTY_FILTER);
   });
 });

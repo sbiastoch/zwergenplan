@@ -57,7 +57,7 @@ const point = <P>({ lat, lon }: GeoPoint, properties: P): PointFeature<P> => ({
 });
 
 /** Codepunkt-Vergleich: unabhängig von Locale und Engine */
-const byKey = (a: MapPlace, b: MapPlace) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
+const byKey = (a: { key: string }, b: { key: string }) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
 
 /**
  * Quelle „orte“: ein Punkt je Ort mit `key`, der Zahl der Angebote (summiert im Cluster) und der Kategorie des
@@ -71,6 +71,37 @@ export function placesToFeatures(places: readonly MapPlace[]): PointCollection<P
     features: places
       .toSorted(byKey)
       .map((p) => point(p.geo, { key: p.key, angebote: p.offers.length, kategorie: mainCategory(p.offers) })),
+  };
+}
+
+/** Was die Anbieterkarte über einen Ort wissen muss (passt auf `ProviderPlace`, Plan 0055, E2). */
+interface MapProviderPlace {
+  key: string;
+  geo: GeoPoint;
+  providers: readonly { state: "aktiv" | "ohne-termine" }[];
+}
+
+/** Properties eines Ort-Punkts in der Quelle „anbieter-orte“ */
+export interface ProviderPlaceProperties {
+  key: string;
+  anbieter: number;
+  /** keiner der Anbieter dort hat kommende Termine (nach Kategorie und Alter) */
+  blass: boolean;
+}
+
+/** Quelle „anbieter-orte“ (Plan 0055, E5): ein Punkt je Ort, nach `key` sortiert wie `placesToFeatures`. */
+export function providerPlacesToFeatures(
+  places: readonly MapProviderPlace[],
+): PointCollection<ProviderPlaceProperties> {
+  return {
+    type: "FeatureCollection",
+    features: places.toSorted(byKey).map((p) =>
+      point(p.geo, {
+        key: p.key,
+        anbieter: p.providers.length,
+        blass: p.providers.every((a) => a.state !== "aktiv"),
+      }),
+    ),
   };
 }
 

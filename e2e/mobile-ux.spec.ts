@@ -1,6 +1,6 @@
 /** Mobile-UX-Gates für jede Ansicht und jedes Overlay, hell und dunkel (Plan 0003, Plan 0007, docs/architecture.md). */
 import type { Page } from "@playwright/test";
-import { expect, MAP_READY, test, twoLinesEverywhere } from "./fixtures.ts";
+import { expect, MAP_READY, mapSettled, test, twoLinesEverywhere } from "./fixtures.ts";
 import {
   backgroundLuminance,
   expectAccessible,
@@ -57,7 +57,18 @@ async function openProviders(page: Page) {
   await tabButton(page, "Anbieter").click();
   await expect(page.locator(".place:not(.idle)")).toHaveCount(5);
   await expect(page.locator(".place.idle")).toHaveCount(1);
+  // mit der Anbieterkarte (Plan 0055): erst prüfen, wenn sie ruht
+  await mapSettled(page);
 }
+
+/** Anbieterkarte ohne Animation auf einen Punkt fahren und warten, bis Karte und Liste ruhen (Plan 0055) */
+async function jumpProviderMap(page: Page, at: { lat: number; lon: number }, zoom: number) {
+  await page.evaluate(({ lat, lon, z }) => window.__zpMap?.jumpTo({ center: [lon, lat], zoom: z }), { ...at, z: zoom });
+  await mapSettled(page);
+}
+
+/** Familientreff der Fixtures: dort ergänzt `anbieter-orts-sheet` einen zweiten Anbieter */
+const TREFF_GEO = { lat: 49.4521, lon: 11.0767 };
 
 /** IDs der Fixture-Angebote für Merkliste und Deep-Link (Plan 0018) */
 const PEKIP_ID = "nle21y1x";
@@ -502,6 +513,64 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       page.getByRole("dialog", { name: "Anbieter" }).getByText(/^Gerade stehen keine Termine/),
     ).toBeVisible();
   },
+  // Plan 0055, E8: Orts-Sheet der Anbieterkarte mit zwei Anbietern, einer ohne Termine (Route auf anbieter.json)
+  "anbieter-orts-sheet": async (page) => {
+    await page.route("**/data/anbieter.json", async (route) => {
+      const response = await route.fetch();
+      const data = (await response.json()) as { providers: unknown[] };
+      const nachbar = {
+        id: "nachbar1",
+        name: "Nachbarhaus (fiktiv)",
+        url: "https://example.org/nachbar",
+        venues: [
+          { name: "Nachbarhaus", address: "Beispielstraße 3, 90402 Nürnberg", district: "Altstadt", geo: TREFF_GEO },
+        ],
+      };
+      await route.fulfill({ response, json: { ...data, providers: [...data.providers, nachbar] } });
+    });
+    // nicht openProviders: Der Nachbar ist eine zweite blasse Zeile
+    await tabButton(page, "Anbieter").click();
+    await mapSettled(page);
+    await jumpProviderMap(page, TREFF_GEO, 17);
+    const point = await page.evaluate(({ lat, lon }) => window.__zpMap?.project([lon, lat]), TREFF_GEO);
+    await page.locator(".map-box .map-canvas canvas").click({ position: point ?? { x: 0, y: 0 } });
+    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
+  },
+  // Plan 0055, E8: ohne WebGL steht im Tab der Hinweis, die Liste zeigt alle
+  "anbieter-karte-fehler": async (page) => {
+    await page.addInitScript(() => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+        value(this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+          if (type === "webgl" || type === "webgl2") return null;
+          return Reflect.apply(original, this, [type, ...rest]);
+        },
+      });
+    });
+    await page.goto("./?ansicht=anbieter");
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "fehler");
+    await expect(page.locator(".place:not(.idle)")).toHaveCount(5);
+  },
+  // Plan 0055, E8: Ausschnitt nur mit dem blassen Turnverein: eigener Leerzustand mit „Alle zeigen“
+  "anbieter-ausschnitt-leer": async (page) => {
+    await openProviders(page);
+    await jumpProviderMap(page, { lat: 49.4392, lon: 11.0442 }, 16);
+    await expect(page.getByText("Im Kartenausschnitt bietet gerade niemand etwas an.")).toBeVisible();
+  },
+  // Plan 0055: Suchtreffer außerhalb des Ausschnitts, Hinweis mit „Alle zeigen“ unter der Liste (Arch-Review 2, Minor 2)
+  "anbieter-suche-ausserhalb": async (page) => {
+    await openProviders(page);
+    await jumpProviderMap(page, { lat: 49.4495, lon: 11.0601 }, 16);
+    await page.getByRole("searchbox", { name: "Anbieter suchen" }).fill("beispiel");
+    await expect(page.getByText("5 weitere Treffer außerhalb des Kartenausschnitts.")).toBeVisible();
+  },
+  // Plan 0055: alle Treffer außerhalb, Leerzustand mit „Alle zeigen“
+  "anbieter-suche-alle-ausserhalb": async (page) => {
+    await openProviders(page);
+    await jumpProviderMap(page, { lat: 49.4392, lon: 11.0442 }, 16);
+    await page.getByRole("searchbox", { name: "Anbieter suchen" }).fill("Theater");
+    await expect(page.getByText("1 Treffer außerhalb des Kartenausschnitts.")).toBeVisible();
+  },
   // anbieter.json 503: Fehlertext mit „Nochmal versuchen“ in .lazy-box (E10)
   "anbieter-fehler": async (page) => {
     await page.route("**/data/anbieter.json", (route) => route.fulfill({ status: 503 }));
@@ -565,7 +634,8 @@ async function expectDarkTheme(page: Page, scheme: (typeof SCHEMES)[number]) {
 
 for (const [name, go] of Object.entries(VIEWS)) {
   test.describe(name, () => {
-    if (MAP_VIEWS.has(name)) test.use({ tiles: "mock" });
+    // Tab „Anbieter“ mit Anbieterkarte (Plan 0055, E8)
+    if (MAP_VIEWS.has(name) || name === "anbieter" || name.startsWith("anbieter-")) test.use({ tiles: "mock" });
     const allowed = CONSOLE_ERRORS[name];
     if (allowed) test.use({ allowedConsoleErrors: allowed });
     for (const scheme of SCHEMES) {

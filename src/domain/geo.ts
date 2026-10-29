@@ -15,6 +15,13 @@ export interface BBox {
   maxLon: number;
 }
 
+/** Ein Punkt aus nicht geprüften Daten (etwa einem älteren `anbieter.json`): endliche Zahlen `lat` und `lon` (Plan 0055, E1). */
+export function isGeoPoint(x: unknown): x is GeoPoint {
+  if (typeof x !== "object" || x === null || !("lat" in x) || !("lon" in x)) return false;
+  const { lat, lon } = x;
+  return typeof lat === "number" && typeof lon === "number" && Number.isFinite(lat) && Number.isFinite(lon);
+}
+
 /** Großraum Nürnberg/Fürth/Erlangen – alles außerhalb ist ein Geocoding-Fehler. Region `nuernberg` (regions.ts). */
 export const NUERNBERG_BBOX = { minLat: 49.3, maxLat: 49.65, minLon: 10.85, maxLon: 11.3 } as const;
 

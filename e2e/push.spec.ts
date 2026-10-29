@@ -21,6 +21,9 @@ import {
 import { ONBOARDING_FLAG } from "./onboarding-flag.ts";
 import { goTo, intro } from "./onboarding-steps.ts";
 
+// Der Tab „Anbieter“ zeigt die Anbieterkarte, Kacheln aus tests/fixtures/karte/ (Plan 0055, E8)
+test.use({ tiles: "mock" });
+
 test.use({ serviceWorkers: "allow", channel: "chromium", pushWorker: "mock" });
 test.skip(process.env["ZWERGENPLAN_SW"] === "aus", "Notausgang aktiv: Build ohne Service Worker (README)");
 test.skip(

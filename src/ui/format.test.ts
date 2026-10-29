@@ -173,11 +173,25 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
 
 describe("Fakten", () => {
   it("beschreibt Format und Rhythmus", () => {
-    expect(formatFact(OFFERS.kurs, FIXTURE_NOW)).toBe("Kurs · 8 Termine");
-    expect(formatFact(OFFERS.kurs, new Date("2026-11-11T12:00:00+01:00"))).toBe("Kurs · noch 3 von 8");
-    expect(formatFact(OFFERS.woechentlich, FIXTURE_NOW)).toBe("Jeden Mittwoch");
-    expect(formatFact(OFFERS.vierzehntaegig, FIXTURE_NOW)).toBe("Freitags");
-    expect(formatFact(OFFERS.einmalig, FIXTURE_NOW)).toBe("Einmalig");
+    const fact = (o: SiteOffer) => {
+      const [first] = o.sessions;
+      if (!first) throw new Error(`${o.title} ohne Termin`);
+      return formatFact(o, first, FIXTURE_NOW);
+    };
+    expect(fact(OFFERS.woechentlich)).toBe("Jeden Mittwoch");
+    expect(fact(OFFERS.vierzehntaegig)).toBe("Freitags");
+    expect(fact(OFFERS.einmalig)).toBe("Einmalig");
+  });
+
+  it("zählt Kurstermine am gezeigten Termin, nicht an „jetzt“", () => {
+    const [first, , third] = OFFERS.kurs.sessions;
+    if (!first || !third) throw new Error("der Kurs braucht drei Termine");
+    // Entdecken: am Starttermin die Gesamtzahl; ein späterer Termin (laufender Kurs ohne Anmeldung) seine Stelle
+    expect(formatFact(OFFERS.kurs, first, FIXTURE_NOW)).toBe("Kurs · 8 Termine");
+    expect(formatFact(OFFERS.kurs, third, FIXTURE_NOW)).toBe("Kurs · Termin 3 von 8");
+    // Merkliste: jeder Termin mit seiner Stelle, auch der erste
+    expect(formatFact(OFFERS.kurs, first, FIXTURE_NOW, true)).toBe("Kurs · Termin 1 von 8");
+    expect(formatFact(OFFERS.kurs, third, new Date("2026-12-24T12:00:00+01:00"), true)).toBe("Kurs · Termin 3 von 8");
   });
 
   it("zeigt nur aussagekräftige Verfügbarkeit", () => {

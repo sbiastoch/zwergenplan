@@ -43,7 +43,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Katalog-Adressen ohne Ortsnamen-Präfix**: Die Adressen in `data/providers.yaml`, die mit dem Ortsnamen beginnen oder ihn in Klammern wiederholen (32 laut Browser-Review, 29 nach der Regel von `venueAddress`), beim nächsten Pipeline-Lauf über den Skill `babyevents-nuernberg` bereinigen, dazu eine Warnung in `validate-data`. Bis dahin korrigiert `venueAddress` in `toSiteData` nur die Anzeige und die ICS (Plan 0007, H6). Rest nach Plan 0007: 9 Angebote an 3 Orten, die `venueAddress` bewusst nicht erkennt, weil es dafür eine unscharfe Heuristik bräuchte (Plan 0008, E21). Beispiele: „Pfarramt Lutherkirche (Keller, Zugang vom Garten), Nerzstraße 34 …“, „Ökumenisches Gemeindezentrum Thon (evang. Teil, UG), …“, „Nürnberg Langwasser“ → „Nürnberg Langwasser Bad, …“. Bereinigung beim nächsten Lauf über den Skill `babyevents-nuernberg`.
 - **Wegzeit-Gebiet auf der Karte**: die gewählte Grenze (20/30/45 Min.) um den Startpunkt zeichnen (Plan 0005, Nicht-Ziel; mit Plan 0009 eine Isochrone statt eines Kreises).
 - **„Auf der Karte zeigen“ im Detail**: aus einem Angebot in die Kartenansicht mit diesem Ort (Plan 0005, Nicht-Ziel).
-- **Wegzeit je Ort im Anbieter-Sheet**: Die Orte dort öffnen seit Plan 0019 die Route in Google Maps, zeigen aber keine Wegzeit. Katalog-Orte in `anbieter.json` haben kein `geo` (Plan 0019, Nicht-Ziel).
+- **Wegzeit je Ort im Anbieter-Sheet**: Die Orte dort öffnen seit Plan 0019 die Route in Google Maps, zeigen aber keine Wegzeit. Seit Plan 0055 haben die Katalog-Orte in `anbieter.json` `geo`; offen ist nur noch die Wegzeit je Katalog-Ort (Plan 0019, Nicht-Ziel; Plan 0055, Nicht-Ziel).
+- **Anbieterkarte groß**: ein Knopf „Karte groß“ bzw. Vollbild für die Anbieterkarte aus Mockup C (Plan 0055, Nicht-Ziel).
+- **Kompakter Kopf im Querformat**: Bei 844×390 belegen Kopf, Sticker und Suche im Tab „Anbieter“ ≈ 250 px, die Statuszeile liegt unter der Karte erst nach Scrollen (Plan 0055, Abweichung von Review M5).
 - **Haltestellennamen, Umstiegsort und Abfahrtszeiten** in der Karte „Wege ab …“: `wegzeit.json` kennt je Zeile nur die Koordinate des Haltbereichs. Bräuchte eine Datenänderung (Plan 0019, Nicht-Ziel).
 - **Mehrere Verbindungen ab demselben Halt**: Der Build speichert je Halt-Ort-Paar eine Verbindung, andere Wege gibt es nur über andere Zugangshalte (Plan 0019, E4).
 - **Andere Wege im Orts-Sheet der Karte**: Heute nur im Detail (Plan 0019, Nicht-Ziel).
@@ -107,6 +109,12 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0055** (Anbieterkarte, live seit 2b31b96, 2026-10-29; Einzelheiten in „Umsetzung“ und „Arch-Review und Browser-Review“ des Plans):
+  - **Am echten Handy prüfen**: Scrollt ein Wisch über die Karte im Tab die Seite (ein Finger) und bewegt nur ein Zwei-Finger-Wisch die Karte (`cooperativeGestures`)? Im Browser-Review nur emuliert.
+  - **Startausschnitt mit echten Daten**: Live fasst die Karte die 121 Orte beim Öffnen in vier Cluster (79, 28, 12, 2) zusammen; einzelne Anbieter sieht man erst nach Zoomen. Ob ein kleinerer `clusterRadius` oder ein höherer Startzoom besser ist, nach Rückmeldung entscheiden.
+  - **Querformat**: Statuszeile erst nach Scrollen, siehe „Kompakter Kopf im Querformat“ oben.
+  - **Zweite Region** (Plan 0042): Startausschnitt je Region und Größe von `anbieter.json` (ADR 0038, Konsequenzen).
+  - Eigene `mobile-ux`-Ansicht für den Kachelfehler im Tab (Arch-Review 2, nicht übernommen; derselbe Weg wie auf der Angebotskarte).
 - **Katalog** (gefunden 2026-10-18 an `imiluv-studio`): `buildProbe` (`scripts/pipeline/lib/extract.ts`) entfernt `coveredBy` und verlangt dann über `validateDataset` eine Terminseite; ein `coveredBy`-Eintrag mit nur `info`-Seiten, den das Schema erlaubt, scheitert so in jedem Nachtlauf. Dasselbe Muster in `scripts/pipeline/lib/eval-score.ts`. Abhilfe: Schema und Probelauf angleichen. Derzeit hat kein Eintrag diese Form.
 - **Plan 0038** (stabile IDs nachschärfen, live seit 0cc9c62, 2026-10-17; Einzelheiten in „Nicht-Ziele“, „Umsetzung“ und „Live“ des Plans):
   - **Korrektheitsrisiko** (Arch-Review): Stufe 1 der Zuordnung prüft `conflictingLabels` nicht. Zieht „Babyschwimmen 2“ mit exakt denselben Terminen auf den Platz von „Babyschwimmen 1“, erbt es dessen ID; ein alter Link zeigte still auf ein anderes Angebot. Im Rückspiel und im ersten Nachtlauf kein Fall. Abhilfe: `conflictingLabels` auch in Stufe 1 ausschließen, mit Test.

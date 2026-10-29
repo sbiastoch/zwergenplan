@@ -79,6 +79,21 @@ function fixtureFile(path: string): string | undefined {
   return undefined;
 }
 
+/**
+ * Kachel-Mock für einen weiteren Kontext (`browser.newContext()`), den die Fixtures nicht erreichen (Plan 0055): dieselben
+ * Antworten wie `tiles: "mock"`, ohne Protokoll. Unbekannte Pfade brechen ab, nichts geht ins Netz.
+ */
+export async function mockTilesIn(context: BrowserContext): Promise<void> {
+  await context.route(`${TILE_ORIGIN}/**`, (route) => {
+    const path = decodeURIComponent(new URL(route.request().url()).pathname);
+    if (/^\/planet\/test\/\d+\/\d+\/\d+\.pbf$/.test(path)) {
+      return route.fulfill({ status: 200, contentType: "application/x-protobuf", body: Buffer.alloc(0) });
+    }
+    const file = fixtureFile(path);
+    return file && existsSync(file) ? route.fulfill({ path: file }) : route.abort();
+  });
+}
+
 /** Ist die Karte im DOM? Für Worker-Requests ohne Frame gilt der Zustand der Seite. */
 async function mapInDom(request: Request, page: Page): Promise<boolean | string> {
   const check = () => document.querySelector(".map-box") !== null;
@@ -263,6 +278,23 @@ export const test = base.extend<
  * Workern dauert das lokal bis ~10 s. Eine Wartezeit, keine Gate-Schwelle.
  */
 export const MAP_READY = { timeout: 20_000 };
+
+/**
+ * Karte bereit und ruhig (Plan 0055, N1): Der Tab „Anbieter“ lädt die Anbieterkarte mit. Erst danach Requests zählen,
+ * neu laden oder den Tab verlassen, sonst kämen Karten-Chunk und Kacheln mitten in die Messung bzw. nach dem Abbau.
+ * Im Deploy-Build (Smoke) gibt es `__zpMap` nicht, dann genügt „bereit“.
+ */
+export async function mapSettled(page: Page): Promise<void> {
+  await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const map = window.__zpMap;
+        if (!map || map.loaded()) resolve();
+        else map.once("idle", () => resolve());
+      }),
+  );
+}
 
 /**
  * Antworten auf das, was die App nach dem Start ohne Anlass nachlädt: den Export-Code der Merkliste (nach dem ersten

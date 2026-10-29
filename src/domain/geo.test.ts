@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coarsen, haversineMeters, inBounds, NUERNBERG_BBOX } from "./geo.ts";
+import { coarsen, haversineMeters, inBounds, isGeoPoint, NUERNBERG_BBOX } from "./geo.ts";
 
 describe("haversineMeters", () => {
   const a = { lat: 49.45, lon: 11.07 };
@@ -46,5 +46,25 @@ describe("coarsen", () => {
     const { lat, lon } = coarsen({ lat: -0.0001, lon: -0.0001 });
     expect(Object.is(lat, 0)).toBe(true);
     expect(Object.is(lon, 0)).toBe(true);
+  });
+});
+
+describe("isGeoPoint", () => {
+  it("nimmt nur endliche Zahlen lat und lon (Plan 0055, E1)", () => {
+    expect(isGeoPoint({ lat: 49.45, lon: 11.07 })).toBe(true);
+    expect(isGeoPoint({ lat: 0, lon: 0 })).toBe(true);
+    for (const bad of [
+      undefined,
+      null,
+      1,
+      "49,11",
+      {},
+      { lat: 49.45 },
+      { lat: "49", lon: 11 },
+      { lat: Number.NaN, lon: 11 },
+      { lat: 49, lon: Number.POSITIVE_INFINITY },
+    ]) {
+      expect(isGeoPoint(bad)).toBe(false);
+    }
   });
 });

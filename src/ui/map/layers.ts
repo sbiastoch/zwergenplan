@@ -9,6 +9,8 @@ import type { PointCollection } from "./geojson.ts";
 
 /** Diese Layer treffen beim Tippen. */
 export const PLACE_LAYERS = ["orte-cluster", "orte-punkt"];
+/** dasselbe auf der Anbieterkarte (Plan 0055, E5), Quelle „anbieter-orte“ */
+export const PROVIDER_LAYERS = ["anbieter-cluster", "anbieter-punkt"];
 
 /**
  * Liest die Tokens erst im `style.load`-Handler: Effekte von Kind-Komponenten laufen vor dem Effekt,
@@ -58,24 +60,39 @@ type Paint = NonNullable<Extract<AddLayerObject, { type: "circle" }>["paint"]>;
 const CLUSTER: Filter = ["has", "point_count"];
 const PLACE: Filter = ["!", ["has", "point_count"]];
 const SEVERAL: Filter = ["all", PLACE, [">", ["get", "angebote"], 1]];
+const SEVERAL_PROVIDERS: Filter = ["all", PLACE, [">", ["get", "anbieter"], 1]];
 
 /** harter Versatz-Schatten wie bei Kacheln und Knöpfen der App (Token `--shadow`, wie `box-shadow` in den Stilen) */
-const dropShadow = (id: string, filter: Filter, radius: number, colors: MapTokens): AddLayerObject => ({
+const dropShadow = (
+  id: string,
+  filter: Filter,
+  radius: number,
+  colors: MapTokens,
+  source = "orte",
+): AddLayerObject => ({
   id,
   type: "circle",
-  source: "orte",
+  source,
   filter,
   paint: { "circle-radius": radius + 1, "circle-color": colors.shadowColor, "circle-translate": [2, 2] },
 });
 
 /** Zahl als Text; die Schrift „Noto Sans Regular“ gibt es in beiden OpenFreeMap-Stilen (keine neuen Glyphen). */
-const count = (id: string, filter: Filter, size: number, offset: [number, number], color: string): AddLayerObject => ({
+const count = (
+  id: string,
+  filter: Filter,
+  size: number,
+  offset: [number, number],
+  color: string,
+  source = "orte",
+  property = "angebote",
+): AddLayerObject => ({
   id,
   type: "symbol",
-  source: "orte",
+  source,
   filter,
   layout: {
-    "text-field": ["to-string", ["get", "angebote"]],
+    "text-field": ["to-string", ["get", property]],
     "text-font": ["Noto Sans Regular"],
     "text-size": size,
     "text-allow-overlap": true,
@@ -84,10 +101,10 @@ const count = (id: string, filter: Filter, size: number, offset: [number, number
   paint: { "text-color": color, "text-translate": offset },
 });
 
-const circle = (id: string, filter: Filter, paint: Paint): AddLayerObject => ({
+const circle = (id: string, filter: Filter, paint: Paint, source = "orte"): AddLayerObject => ({
   id,
   type: "circle",
-  source: "orte",
+  source,
   filter,
   paint,
 });
@@ -144,21 +161,83 @@ function markerLayers(colors: MapTokens): AddLayerObject[] {
   ];
 }
 
+/**
+ * Marker der Anbieterkarte (Plan 0055, E4): Cluster wie bei den Angeboten (Summe der Anbieter); ein Ort als Kachel mit
+ * Laden-Symbol (`anbieter`, marker-images.ts), blass mit gestricheltem Bild und Deckkraft 0,55; ab zwei Anbietern eine
+ * Zahl als Badge. Getippt wird über `PROVIDER_LAYERS`; der unsichtbare Kreis `anbieter-punkt` ist die Trefferfläche.
+ */
+function providerLayers(colors: MapTokens): AddLayerObject[] {
+  const source = "anbieter-orte";
+  const pale: ExpressionSpecification = ["get", "blass"];
+  return [
+    dropShadow("anbieter-cluster-schatten", CLUSTER, 18, colors, source),
+    circle(
+      "anbieter-cluster",
+      CLUSTER,
+      {
+        "circle-radius": 18,
+        "circle-color": colors.primary,
+        "circle-stroke-width": 2,
+        "circle-stroke-color": colors.surface,
+      },
+      source,
+    ),
+    count("anbieter-cluster-zahl", CLUSTER, 13, [0, 0], colors.onPrimary, source, "anbieter"),
+    circle("anbieter-punkt", PLACE, { "circle-radius": 15, "circle-opacity": 0 }, source),
+    {
+      id: "anbieter-punkt-symbol",
+      type: "symbol",
+      source,
+      filter: PLACE,
+      layout: {
+        "icon-image": ["case", pale, "anbieter-blass", "anbieter"],
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+      },
+      paint: { "icon-opacity": ["case", pale, 0.55, 1] },
+    },
+    circle(
+      "anbieter-punkt-badge",
+      SEVERAL_PROVIDERS,
+      {
+        "circle-radius": 9,
+        "circle-color": colors.primary,
+        "circle-stroke-width": 2,
+        "circle-stroke-color": colors.surface,
+        "circle-translate": [12, -12],
+      },
+      source,
+    ),
+    count("anbieter-punkt-zahl", SEVERAL_PROVIDERS, 11, [12, -12], colors.onPrimary, source, "anbieter"),
+  ];
+}
+
 export function addOwnLayers(
   map: MapLibre,
   colors: MapTokens,
-  data: { places: PointCollection<object>; origin: PointCollection<object> },
+  data: { kind: "angebote" | "anbieter"; places: PointCollection<object>; origin: PointCollection<object> },
 ): void {
-  map.addSource("orte", {
-    type: "geojson",
-    data: data.places,
-    cluster: true,
-    clusterRadius: 40,
-    clusterMaxZoom: 14,
-    clusterProperties: { angebote: ["+", ["get", "angebote"]] },
-  });
+  if (data.kind === "anbieter") {
+    map.addSource("anbieter-orte", {
+      type: "geojson",
+      data: data.places,
+      cluster: true,
+      clusterRadius: 40,
+      clusterMaxZoom: 14,
+      clusterProperties: { anbieter: ["+", ["get", "anbieter"]] },
+    });
+  } else {
+    map.addSource("orte", {
+      type: "geojson",
+      data: data.places,
+      cluster: true,
+      clusterRadius: 40,
+      clusterMaxZoom: 14,
+      clusterProperties: { angebote: ["+", ["get", "angebote"]] },
+    });
+  }
   map.addSource("startpunkt", { type: "geojson", data: data.origin });
-  for (const layer of markerLayers(colors)) map.addLayer(layer);
+  for (const layer of data.kind === "anbieter" ? providerLayers(colors) : markerLayers(colors)) map.addLayer(layer);
   map.addLayer({
     id: "startpunkt",
     type: "circle",

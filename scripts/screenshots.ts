@@ -214,6 +214,11 @@ async function openProviders(page: Page) {
     .getByRole("button", { name: /^Anbieter/ })
     .click();
   await page.getByRole("region", { name: "Anbieter" }).locator(".place").first().waitFor();
+  // Anbieterkarte (Plan 0055): erst fotografieren, wenn sie steht; ohne WebGL bleibt der Hinweis im Bild
+  await page
+    .locator('.map-box[data-state="bereit"]')
+    .waitFor({ timeout: 20_000 })
+    .catch(() => undefined);
 }
 
 const views = viewsArg ? viewsArg.split(",") : Object.keys(VIEWS);

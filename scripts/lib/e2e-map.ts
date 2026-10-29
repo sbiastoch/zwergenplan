@@ -82,6 +82,15 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/data\/(pwa|pwa-start|platform)\.ts$/,
     /^src\/domain\/pwa\.ts$/,
   ],
+  // Anbieterkarte im Tab (Plan 0055): Lader (MapPanel, gemeinsamer Katalog-Zustand in ProviderPanel), Oberfläche
+  // karte/ (ProviderMapScreen, Orts-Sheet), MapLibre map/, Orte der Anbieter, Ausschnitt in Liste und Statuszeile.
+  "e2e/anbieter-karte.spec.ts": [
+    /^src\/ui\/(karte|map)\//,
+    /^src\/ui\/(MapPanel|ProviderPanel|App)\.tsx$/,
+    /^src\/ui\/(map-types|provider-types|use-settled)\.ts$/,
+    /^src\/ui\/anbieter\/ProviderScreen\.tsx$/,
+    /^src\/domain\/(provider-places|provider-count|directory|camera|geo)\.ts$/,
+  ],
   // Karte: Lader (MapPanel, Lazy), Oberfläche karte/, MapLibre map/, Kacheln, Kamera-Regel mit Standort und
   // Kartenmitte (origin-state), Wegzeit beim Öffnen (use-transit), Orts-Sheet mit Linien (ReachLong), Marker mit
   // Kategorie-Symbol (categories), Fehler beim Laden.
@@ -90,7 +99,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(MapPanel|Lazy|ReachLong)\.tsx$/,
     /^src\/ui\/(map-types|origin-state|use-transit|categories)\.ts$/,
     /^src\/data\/tiles\.ts$/,
-    /^src\/domain\/(camera|places|geo|category-look)\.ts$/,
+    /^src\/domain\/(camera|places|provider-places|geo|category-look)\.ts$/,
   ],
   // Querschnitt Layout über Breiten, Lagen und Textgrößen: nur die globale Hülle (Review 2, M1).
   // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4)

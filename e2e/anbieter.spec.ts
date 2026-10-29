@@ -5,8 +5,11 @@
  * Einzelnen prüft anbieter-inhalt.spec.ts (Paket B). Hier zählen die Wege: Zeile → Sheet → Kachel → Detail und zurück.
  */
 import type { Page, Request } from "@playwright/test";
-import { expect, startPreloads, test } from "./fixtures.ts";
+import { expect, mapSettled, startPreloads, test } from "./fixtures.ts";
 import { expectMobileUx } from "./mobile-ux.ts";
+
+// Der Tab „Anbieter“ zeigt die Anbieterkarte, Kacheln aus tests/fixtures/karte/ (Plan 0055, E8)
+test.use({ tiles: "mock" });
 
 const KRABBELTREFF = "lxizt974";
 const THEATER = "Kleines Theater Beispiel (fiktiv)";
@@ -102,7 +105,7 @@ async function topDialogOverSheet(page: Page) {
 }
 
 test.describe("Tab „Anbieter“ (E2, E4)", () => {
-  test("öffnet per Tab, zählt in der Statuszeile, zeigt Sticker und Schnellfilter, übersteht Neuladen", async ({
+  test("öffnet per Tab, zählt in der Statuszeile, zeigt Sticker ohne Schnellfilter, übersteht Neuladen", async ({
     page,
   }) => {
     await ready(page);
@@ -114,8 +117,11 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
     await expect(tabs.nth(1)).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
     await expect(page.getByRole("group", { name: "Kategorien" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Alle Filter/ })).toBeVisible();
+    // Kosten, Anmeldung, Format, Wegzeit und Zeitraum beschreiben Termine, nicht Anbieter (Plan 0055, E3)
+    await expect(page.getByRole("button", { name: /^Alle Filter/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Kostenlos" })).toHaveCount(0);
     await listReady(page);
+    await mapSettled(page);
 
     await page.reload();
     await expect(tab(page, "Anbieter")).toHaveAttribute("aria-current", "page");
@@ -126,6 +132,18 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
   test("Einzahl in der Statuszeile: „1 Anbieter mit 1 Angebot“", async ({ page }) => {
     await ready(page, "./?kat=buecher&ansicht=anbieter");
     await expect(page.getByRole("status")).toHaveText("1 Anbieter mit 1 Angebot");
+  });
+
+  test("nur Kategorie wirkt: „kostenlos“ in der URL ändert im Tab nichts, in „Angebote“ schon (Plan 0055, E3)", async ({
+    page,
+  }) => {
+    await ready(page, "./?kosten=kostenlos&ansicht=anbieter");
+    await expect(page.getByRole("status")).toHaveText("5 Anbieter mit 8 Angeboten");
+    // erst die Anbieterkarte fertig laden lassen, dann den Tab verlassen (Plan 0055, N1)
+    await mapSettled(page);
+    await tab(page, "Angebote").click();
+    await expect(page).toHaveURL(/[?&]kosten=kostenlos(&|$)/);
+    await expect(page.getByRole("button", { name: /^Kostenlos/ })).toHaveAttribute("aria-pressed", "true");
   });
 });
 
@@ -146,6 +164,8 @@ test.describe("Lazy-Laden (E7, E9)", () => {
     expect(chunks.length, "Chunk geladen").toBeGreaterThanOrEqual(1);
     expect(new Set(chunks).size, "jede Chunk-Datei genau einmal").toBe(chunks.length);
 
+    // Anbieterkarte fertig laden lassen, bevor der Wechsel sie abbaut (Plan 0055, N1)
+    await mapSettled(page);
     const before = requests.length;
     await tab(page, "Angebote").click();
     await expect(offers(page).first()).toBeVisible();
@@ -394,6 +414,7 @@ test.describe("Datenstand (E6, M4)", () => {
     await tab(page, "Anbieter").click();
     await listReady(page);
     expect(requests, "erst geladen, dann einmal neu").toHaveLength(2);
+    await mapSettled(page);
 
     // Wechsel und Rückkehr fragen nicht noch einmal nach und zeigen den Katalog sofort, ohne einen Frame mit dem
     // Ladekasten (Arch-Review m4)
@@ -454,6 +475,8 @@ test.describe("Privatsphäre (E9)", () => {
   test("Tippen in der Suche: kein Request, kein Suchtext in der URL", async ({ page }) => {
     await ready(page, "./?ansicht=anbieter");
     await listReady(page);
+    // die Anbieterkarte lädt mit dem Tab (ADR 0038): erst zählen, wenn sie ruht (Plan 0055, N1)
+    await mapSettled(page);
     const requests = collect(page);
     await searchField(page).fill("bibliothek");
     await searchField(page).press("Enter");
@@ -465,6 +488,7 @@ test.describe("Privatsphäre (E9)", () => {
   test("mit offenem Tab einen Startpunkt wählen: ab dem Tipp kein Request", async ({ page }) => {
     await ready(page, "./?ansicht=anbieter");
     await listReady(page);
+    await mapSettled(page);
     const loaded = Promise.all([
       page.waitForResponse((r) => new URL(r.url()).pathname.endsWith("/data/wegzeit.json") && r.ok()),
       page.waitForResponse((r) => /\/assets\/oepnv\/[^/]+\.js$/.test(new URL(r.url()).pathname) && r.ok()),
@@ -479,6 +503,8 @@ test.describe("Privatsphäre (E9)", () => {
     await kid.getByRole("button", { name: "Fertig" }).click();
     await expect(page.getByRole("status")).toContainText("Gostenhof");
     await listReady(page);
+    // Die Anbieterkarte fährt nicht zum Stadtteil (ADR 0038): auch keine Kachel
+    await mapSettled(page);
     expect(urls(requests), "kein Request nach der Wahl des Startpunkts").toEqual([]);
     expect(page.url()).not.toContain("gostenhof");
   });

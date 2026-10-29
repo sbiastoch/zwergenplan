@@ -11,6 +11,9 @@ import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures.ts";
 import { clsFrom, observeVitals, readVitals } from "./vitals.ts";
 
+// Der Tab „Anbieter“ zeigt die Anbieterkarte, Kacheln aus tests/fixtures/karte/ (Plan 0055, E8)
+test.use({ tiles: "mock" });
+
 const BIBLIOTHEK = "Bibliothek Beispiel (fiktiv)";
 const GEMEINDE =
   "Ev.-Luth. Kirchengemeinde Beispielhausen-Südstadt – Mutter/Vater-Kind-Gruppen (Gemeindehaus Beispielkirche, fiktiv)";

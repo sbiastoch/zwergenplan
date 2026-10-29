@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mainCategory, nearestHit, originToFeatures, placesToFeatures } from "./geojson.ts";
+import { mainCategory, nearestHit, originToFeatures, placesToFeatures, providerPlacesToFeatures } from "./geojson.ts";
 
 describe("GeoJSON für die Karte (Plan 0005, E6)", () => {
   const theater = {
@@ -98,5 +98,36 @@ describe("Kategorie je Ort (Plan 0024, E5; Plan 0037, E11)", () => {
 
   it("leere Liste: Rückfall treffs-cafes", () => {
     expect(mainCategory([])).toBe("treffs-cafes");
+  });
+});
+
+describe("GeoJSON der Anbieterkarte (Plan 0055, E5)", () => {
+  it("ein Punkt je Ort mit Zahl der Anbieter; blass, wenn keiner dort aktiv ist; nach key sortiert", () => {
+    const at = (state: "aktiv" | "ohne-termine", id: string) => ({
+      id,
+      name: id,
+      state,
+      shown: state === "aktiv" ? 1 : 0,
+    });
+    const places = [
+      {
+        key: "49.5,11.1",
+        geo: { lat: 49.5, lon: 11.1 },
+        name: "B",
+        address: "Weg 2",
+        providers: [at("ohne-termine", "x")],
+      },
+      {
+        key: "49.4,11",
+        geo: { lat: 49.4, lon: 11 },
+        name: "A",
+        address: "Weg 1",
+        providers: [at("aktiv", "y"), at("ohne-termine", "z")],
+      },
+    ];
+    expect(providerPlacesToFeatures(places).features.map((f) => [f.geometry.coordinates, f.properties])).toEqual([
+      [[11, 49.4], { key: "49.4,11", anbieter: 2, blass: false }],
+      [[11.1, 49.5], { key: "49.5,11.1", anbieter: 1, blass: true }],
+    ]);
   });
 });

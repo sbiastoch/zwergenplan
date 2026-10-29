@@ -84,8 +84,8 @@ module.exports = {
       name: "map-entry-only",
       severity: "error",
       comment:
-        "Nur der Lader src/ui/karte/MapScreen.tsx greift auf src/ui/map/ zu (Plan 0005), aus demselben Grund wie karte-ui-entry-only.",
-      from: { path: "^src/", pathNot: ["^src/ui/map/", "^src/ui/karte/MapScreen\\.tsx$"] },
+        "Nur die Lader im Karten-Chunk greifen auf src/ui/map/ zu (Plan 0005), aus demselben Grund wie karte-ui-entry-only: karte/MapScreen.tsx und karte/ProviderMapScreen.tsx (Anbieterkarte, Plan 0055, E5; ADR 0038). Beide laden MapView nur per import() (LAZY_LOADERS).",
+      from: { path: "^src/", pathNot: ["^src/ui/map/", "^src/ui/karte/(Provider)?MapScreen\\.tsx$"] },
       to: { path: "^src/ui/map/" },
     },
     {
@@ -151,9 +151,9 @@ module.exports = {
       name: "lazy-domain-apart",
       severity: "error",
       comment:
-        "Anbieter- und Karten-Chunk teilen kein Domänenmodul, das nur sie nutzen (Plan 0010, E7, M5): Rolldown legte es als eigenen Chunk direkt nach assets/, und es zählte ins Startbudget (Chunk-Wächter). Die Anbieterübersicht nutzt deshalb keine Karten-Module (places.ts, camera.ts). Die Gegenrichtung (Karte → directory.ts) verbietet schon directory-only-lazy.",
+        "Anbieter- und Karten-Chunk teilen kein Domänenmodul, das nur sie nutzen (Plan 0010, E7, M5): Rolldown legte es als eigenen Chunk direkt nach assets/, und es zählte ins Startbudget (Chunk-Wächter). Die Anbieterübersicht nutzt deshalb keine Karten-Module (places.ts, camera.ts, provider-places.ts aus Plan 0055). Die Gegenrichtung (Karte → directory.ts) verbietet schon directory-only-lazy.",
       from: { path: "^src/(ui/anbieter/|domain/directory\\.ts$)" },
-      to: { path: "^src/domain/(places|camera)\\.ts$" },
+      to: { path: "^src/domain/(places|camera|provider-places)\\.ts$" },
     },
     {
       name: "sw-isolated",

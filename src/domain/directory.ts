@@ -1,9 +1,10 @@
 /**
  * Anbieterübersicht (Plan 0010, E4–E6): Zustand, Zahlen, Stadtteile, nächster Ort, Kategorien und Suche je Anbieter.
  * Abgeleitet, nie gespeichert. Nur der Lazy-Chunk `src/ui/anbieter/` importiert dieses Modul (`directory-only-lazy`),
- * und es greift auf nichts zu, was nur die Karte nutzt (`places.ts`, `camera.ts`; `lazy-domain-apart`).
+ * und es greift auf nichts zu, was nur die Karte nutzt (`places.ts`, `camera.ts`, `provider-places.ts`; `lazy-domain-apart`).
  */
 import { discoverable } from "./agenda.ts";
+import { isOutside, type ProviderView } from "./provider-count.ts";
 import { compareReach, type Reach } from "./reach.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
 import { CATEGORIES, type Category } from "./topics.ts";
@@ -84,8 +85,11 @@ function nearestOf(offers: readonly SiteOffer[], reachOf: (offer: SiteOffer) => 
  * - `idle`: erst die ausgeblendeten Treffer der Suche, dann die ohne Termine, jeweils nach Name.
  * - `saved`: gemerkte Anbieter (Plan 0025, E3), vorab herausgenommen und in keiner anderen Liste; nach Name, mit
  *   ihrem Zustand (ein ausgeblendeter steht blass oben, statt in `hiddenCount` zu verschwinden).
+ * - `view` (Plan 0055, E4): Kartenausschnitt; wer einen bekannten Ort hat, aber keinen im Ausschnitt, fehlt in allen
+ *   Gruppen und in `hiddenCount`. `outside` zählt die Suchtreffer, die nur deshalb fehlen (ohne Suchtext 0).
  * Jeder Anbieter aus `visible` bekommt eine aktive Zeile, notfalls als Rückfall: ohne Suchtext gilt
- * `active.length` + aktive in `saved` = Zahl der verschiedenen `providerId` in `visible` (Statuszeile, `countProviders`).
+ * `active.length` + aktive in `saved` = Zahl der verschiedenen `providerId` in `visible` (Statuszeile,
+ * `countProviders(visible, view)`).
  */
 export function providerRows(input: {
   providers: readonly SiteProvider[];
@@ -97,8 +101,10 @@ export function providerRows(input: {
   query: string;
   /** IDs der gemerkten Anbieter; unbekannte ergeben keine Zeile */
   saved: readonly string[];
-}): { saved: ProviderRow[]; active: ProviderRow[]; hiddenCount: number; idle: ProviderRow[] } {
-  const { providers, visible, upcoming, reachOf, byReach, query } = input;
+  /** Kartenausschnitt; ohne Angabe (Karte nicht bereit) alle */
+  view?: ProviderView | undefined;
+}): { saved: ProviderRow[]; active: ProviderRow[]; hiddenCount: number; idle: ProviderRow[]; outside: number } {
+  const { providers, visible, upcoming, reachOf, byReach, query, view } = input;
   const savedIds = new Set(input.saved);
   const shownBy = groupByProvider(visible);
   const upcomingBy = groupByProvider(upcoming);
@@ -114,6 +120,7 @@ export function providerRows(input: {
   const active: ProviderRow[] = [];
   const hidden: ProviderRow[] = [];
   const empty: ProviderRow[] = [];
+  const outsideRows: ProviderRow[] = [];
   for (const provider of entries.values()) {
     const shownOffers = shownBy.get(provider.id) ?? [];
     const shown = shownOffers.length;
@@ -130,7 +137,7 @@ export function providerRows(input: {
         places,
         ...(nearest ? { nearest } : {}),
       };
-      (isSaved ? saved : active).push(row);
+      (isOutside(view, provider.id) ? outsideRows : isSaved ? saved : active).push(row);
       continue;
     }
     const row: ProviderRow = {
@@ -140,7 +147,7 @@ export function providerRows(input: {
       upcoming: count,
       places: unique(provider.venues.map(placeName)),
     };
-    (isSaved ? saved : count > 0 ? hidden : empty).push(row);
+    (isOutside(view, provider.id) ? outsideRows : isSaved ? saved : count > 0 ? hidden : empty).push(row);
   }
 
   const matches = (row: ProviderRow) => matchesProviderQuery(row.provider.name, query);
@@ -156,6 +163,7 @@ export function providerRows(input: {
     active: active.filter(matches).sort(sortActive),
     hiddenCount: searching ? 0 : hidden.length,
     idle: [...(searching ? hidden.filter(matches).sort(byName) : []), ...empty.filter(matches).sort(byName)],
+    outside: searching ? outsideRows.filter(matches).length : 0,
   };
 }
 

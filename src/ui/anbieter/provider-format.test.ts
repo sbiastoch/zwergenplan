@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { ProviderRow } from "../../domain/directory.ts";
 import type { Reach } from "../../domain/reach.ts";
-import { hiddenProvidersText, idleLine, placesText, providerCountText, providerLine } from "./provider-format.ts";
+import {
+  hiddenProvidersText,
+  idleLine,
+  outsideText,
+  placesText,
+  providerCountText,
+  providerLine,
+} from "./provider-format.ts";
 
 const provider = { id: "x", name: "X", venues: [] };
 const row = (overrides: Partial<ProviderRow> = {}): ProviderRow => ({
@@ -73,5 +80,14 @@ describe("Zähltexte", () => {
 
   it("Orte: höchstens zwei, Rest als Zahl", () => {
     expect(placesText(["A", "B", "C"])).toBe("A, B +1");
+  });
+});
+
+describe("outsideText (Plan 0055, E4)", () => {
+  it("unter der Liste mit „weitere“, im Leerzustand ohne", () => {
+    expect(outsideText(5, true)).toBe("5 weitere Treffer außerhalb des Kartenausschnitts.");
+    expect(outsideText(1, true)).toBe("1 weiterer Treffer außerhalb des Kartenausschnitts.");
+    expect(outsideText(3, false)).toBe("3 Treffer außerhalb des Kartenausschnitts.");
+    expect(outsideText(1, false)).toBe("1 Treffer außerhalb des Kartenausschnitts.");
   });
 });

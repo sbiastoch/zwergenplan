@@ -282,6 +282,13 @@ export function courseProgress(offer: Offer, now: Date): { total: number; remain
   return { total: offer.sessions.length, remaining };
 }
 
+/** Stelle eines Termins in der Reihe (ab 0), für „Termin 3 von 8“ in Kachel und Kalenderdatei. */
+export function sessionIndex(offer: Offer, session: Session): number {
+  const index = offer.sessions.findIndex((s) => s.start === session.start);
+  if (index < 0) throw new Error(`Termin ${session.start} gehört nicht zu ${offer.id}`);
+  return index;
+}
+
 const clock = (instant: string) => berlinKey(instant).slice(9);
 
 /**

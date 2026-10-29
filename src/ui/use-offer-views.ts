@@ -17,7 +17,7 @@ import {
 } from "../domain/agenda.ts";
 import { type CalendarSelection, clampDay } from "../domain/calendar.ts";
 import { quickRanges } from "../domain/date-range.ts";
-import { applyFilters, EMPTY_FILTER } from "../domain/filter.ts";
+import { applyFilters, EMPTY_FILTER, providerFilter } from "../domain/filter.ts";
 import { groupByListing, groupByReach, type ListGroup } from "../domain/listing.ts";
 import { countPlaces, placeKey } from "../domain/place-key.ts";
 import type { Reach, ReachFn } from "../domain/reach.ts";
@@ -55,6 +55,12 @@ export interface OfferViews {
   unfitIds: ReadonlySet<string>;
   /** dasselbe mit dem Zeitraum des Filters: Markierung in Liste und Karte von „Entdecken“ (Plan 0053, E2) */
   listUnfitIds: ReadonlySet<string>;
+  /**
+   * Im Tab „Anbieter“ (Plan 0055, E3): sichtbar nur nach Kategorie und Alter (`providerFilter`), ohne Wegzeit-Grenze
+   * und Zeitraum. Außerhalb des Tabs dieselben Werte wie `visible` und `unfitCount`.
+   */
+  providerVisible: readonly SiteOffer[];
+  providerUnfitCount: number;
   /**
    * Altersfilter „Nur passend für …“ (Plan 0021, E1): Standard an, nur im Speicher. Nach dem Neuladen ist er
    * wieder an; ein neues Geburtsdatum schaltet ihn ebenfalls wieder ein (`App.setBirthDate`).
@@ -165,6 +171,12 @@ export function useOfferViews({
     () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, range }),
     [filtered, upcoming, birthDate, now, ageOnly, range],
   );
+  const providerTab = route.tab === "anbieter";
+  const providerView = useMemo(() => {
+    if (!providerTab) return undefined;
+    const shown = applyFilters(offers, providerFilter(route.filter), { now });
+    return ageVisibility(shown, upcoming, birthDate, now, { ageOnly });
+  }, [providerTab, offers, route.filter, now, upcoming, birthDate, ageOnly]);
   // Mit „nur altersgerecht“ stehen regelmäßige Angebote am ersten passenden Termin (Plan 0028). Ohne Altersfilter
   // erscheinen sie wie alle anderen, unpassende sind markiert.
   const fits = useMemo(() => (ageOnly ? sessionFit(birthDate) : undefined), [ageOnly, birthDate]);
@@ -248,6 +260,8 @@ export function useOfferViews({
     unfitCount,
     unfitIds,
     listUnfitIds,
+    providerVisible: providerView?.visible ?? visible,
+    providerUnfitCount: providerView?.unfitCount ?? unfitCount,
     ageOnly,
     setAgeOnly,
     page: takeGroups(groups, limit),

@@ -40,6 +40,8 @@ interface OfferCardProps {
   ctx: CardContext;
   /** Datum mit anzeigen (Merkliste) statt nur der Uhrzeit (Liste/Agenda unter Tagesüberschrift) */
   dated?: boolean;
+  /** Kurstermin mit seiner Stelle zeigen, „Termin 3 von 8“ (Merkliste) */
+  numbered?: boolean;
   /** Termin gehört zu einem gewählten Kalendertag (Kalender; Liste mit Zeitraum, Plan 0023, E7) */
   calendarDay?: string | undefined;
   /**
@@ -49,7 +51,7 @@ interface OfferCardProps {
   context?: "place" | "provider";
 }
 
-export function OfferCard({ item, ctx, dated = false, calendarDay, context }: OfferCardProps) {
+export function OfferCard({ item, ctx, dated = false, numbered = false, calendarDay, context }: OfferCardProps) {
   const { offer, session } = item;
   const [fresh] = useState(ctx.animate);
   // Etikett, Farbe und Form nur aus der Hauptkategorie; kein Filter ändert sie (Plan 0037, E11)
@@ -101,7 +103,7 @@ export function OfferCard({ item, ctx, dated = false, calendarDay, context }: Of
           )}
         </p>
         <div className="facts">
-          <span className="fact">{formatFact(offer, ctx.now)}</span>
+          <span className="fact">{formatFact(offer, session, ctx.now, numbered)}</span>
           <span className="fact">{costLabel(offer)}</span>
           <span className={offer.registration === "mit-anmeldung" ? "fact reg" : "fact"}>
             {registrationLabel(offer)}
