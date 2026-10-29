@@ -175,7 +175,7 @@ export function SavedView({
               {tab === "merkliste-karte" && renderMap(shown, reset)}
               {calendar && renderCalendar(filtered ? reset : undefined)}
               {tab === "merkliste" &&
-                visible.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated />)}
+                visible.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated numbered />)}
             </>
           )}
         </>

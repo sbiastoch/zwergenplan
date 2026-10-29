@@ -13,6 +13,7 @@ import {
   referenceSession,
   rhythm,
   type SessionFit,
+  sessionIndex,
   sessionsByDay,
   shownSession,
   startedCourse,
@@ -210,6 +211,15 @@ describe("courseProgress", () => {
     const pekip = fixtureOffer("pekip-herbst");
     expect(courseProgress(pekip, FIXTURE_NOW)).toEqual({ total: 8, remaining: 8 });
     expect(courseProgress(pekip, new Date("2026-11-04T12:00:00+01:00"))).toEqual({ total: 8, remaining: 4 });
+  });
+
+  it("kennt die Stelle eines Termins in der Reihe", () => {
+    const pekip = fixtureOffer("pekip-herbst");
+    const [first, , third] = pekip.sessions;
+    if (!first || !third) throw new Error("PEKiP braucht drei Termine");
+    expect(sessionIndex(pekip, first)).toBe(0);
+    expect(sessionIndex(pekip, third)).toBe(2);
+    expect(() => sessionIndex(pekip, { ...first, start: "2027-01-01T09:30:00+01:00" })).toThrow(/gehört nicht/);
   });
 });
 

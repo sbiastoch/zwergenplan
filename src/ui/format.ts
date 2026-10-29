@@ -5,7 +5,7 @@
 import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
 import { fittingSessions } from "../domain/age.ts";
-import { courseProgress, rhythm, uniformTimes, upcomingSessions, weekDays } from "../domain/agenda.ts";
+import { courseProgress, rhythm, sessionIndex, uniformTimes, upcomingSessions, weekDays } from "../domain/agenda.ts";
 import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange } from "../domain/date-range.ts";
 import { filterFromSearch } from "../domain/filter.ts";
@@ -212,18 +212,23 @@ export function ageEmptyText(ageLabel: string, withFilters: boolean): string {
   return sentence.endsWith(".") ? sentence : `${sentence}.`;
 }
 
-export function formatFact(offer: SiteOffer, now: Date): string {
-  if (offer.format === "einmalig") return "Einmalig";
-  if (offer.format === "kurs") {
-    const { total, remaining } = courseProgress(offer, now);
-    return remaining < total ? `Kurs · noch ${remaining} von ${total}` : `Kurs · ${plural(total, "Termin", "Termine")}`;
-  }
+/** „Jeden Mittwoch“, „Freitags“ oder „Regelmäßig“ aus dem Rhythmus der kommenden Termine (Kachel und Detail) */
+function rhythmLabel(offer: SiteOffer, now: Date): string {
   const r = rhythm(offer, now);
   if (!r) return "Regelmäßig";
   return r.weekly ? `Jeden ${weekdayName(r.weekday)}` : `${weekdayName(r.weekday)}s`;
 }
 
-/** Hauptzeile eines Kurses im Detail: wie die Kachel, solange er läuft; nie „noch 0 von 8“ (H8). */
+/** Fakt der Kachel. Kurse zählen am gezeigten Termin: am Start „8 Termine“, sonst und in der Merkliste „Termin 3 von 8“ */
+export function formatFact(offer: SiteOffer, session: Session, now: Date, numbered = false): string {
+  if (offer.format === "einmalig") return "Einmalig";
+  if (offer.format === "regelmaessig") return rhythmLabel(offer, now);
+  const index = sessionIndex(offer, session);
+  if (numbered || index > 0) return `Kurs · Termin ${index + 1} von ${offer.sessions.length}`;
+  return `Kurs · ${plural(offer.sessions.length, "Termin", "Termine")}`;
+}
+
+/** Hauptzeile eines Kurses im Detail: was ab jetzt vom ganzen Kurs bleibt; nie „noch 0 von 8“ (H8). */
 function courseLine(offer: SiteOffer, now: Date): string {
   const { total, remaining } = courseProgress(offer, now);
   const all = `Kurs mit ${plural(total, "Termin", "Terminen")}`;
@@ -249,8 +254,7 @@ export function whenLabels(offer: SiteOffer, now: Date, birthDate?: string): { m
     };
   }
   const upcoming = upcomingSessions(offer, now);
-  const r = rhythm(offer, now);
-  const rhythmText = !r ? "Regelmäßig" : r.weekly ? `Jeden ${weekdayName(r.weekday)}` : `${weekdayName(r.weekday)}s`;
+  const rhythmText = rhythmLabel(offer, now);
   const [next] = upcoming;
   const main = next && uniformTimes(upcoming) ? `${rhythmText}, ${timeRange(next)}` : rhythmText;
   // Mit Geburtsdatum „3 passende von 5 Terminen“, wenn nur ein Teil passt (Browser-Review Plan 0028); passt keiner,

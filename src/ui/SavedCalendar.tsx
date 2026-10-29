@@ -143,7 +143,13 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
         <Fragment key={group.day}>
           {selection.unit !== "tag" && <h3 className="dayh">{shortDate(group.day)}</h3>}
           {group.items.map((item) => (
-            <OfferCard key={`${item.offer.id}-${item.session.start}`} item={item} ctx={ctx} calendarDay={group.day} />
+            <OfferCard
+              key={`${item.offer.id}-${item.session.start}`}
+              item={item}
+              ctx={ctx}
+              numbered
+              calendarDay={group.day}
+            />
           ))}
         </Fragment>
       ))}
