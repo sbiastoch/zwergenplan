@@ -37,6 +37,7 @@ export function ProviderScreen({
   age,
   saved: savedIds,
   onToggleSaved,
+  bellBusy,
 }: ProviderScreenProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
@@ -78,7 +79,12 @@ export function ProviderScreen({
           </b>
           <span>{idleRow ? idleLine(r) : providerLine(r, reachMode)}</span>
         </button>
-        <BellButton label={r.provider.name} subscribed={isSaved} onToggle={(event) => toggle(event, r.provider.id)} />
+        <BellButton
+          label={r.provider.name}
+          subscribed={isSaved}
+          busy={bellBusy}
+          onToggle={(event) => toggle(event, r.provider.id)}
+        />
       </li>
     );
   };

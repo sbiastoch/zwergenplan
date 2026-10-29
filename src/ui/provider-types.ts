@@ -36,6 +36,8 @@ export interface ProviderScreenProps {
   saved: readonly string[];
   /** merkt bzw. entfernt einen Anbieter, mit Toast */
   onToggleSaved: (providerId: string) => void;
+  /** ein Glocken-Tipp schaltet gerade Push ein: Glocken nehmen keinen Tipp an (Plan 0054, E5) */
+  bellBusy: boolean;
 }
 
 /** Props des Anbieter-Sheets. Den Dialog rendert Overlays.tsx immer, diesen Inhalt nur bei offenem Dialog (E3). */
@@ -52,6 +54,8 @@ export interface ProviderSheetProps {
   saved: boolean;
   /** merkt bzw. entfernt den Anbieter, mit Toast */
   onToggleSaved: (providerId: string) => void;
+  /** wie in der Liste (Plan 0054, E5) */
+  bellBusy: boolean;
   /** Teilen per Link (Plan 0026, E6): synchron im Tipp */
   onShare: (provider: { id: string; name: string }) => void;
   onClose: () => void;

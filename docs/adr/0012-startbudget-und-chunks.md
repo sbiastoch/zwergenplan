@@ -175,6 +175,7 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 | Plan 0043, Schritt 2 (Sortierung „Neu eingestellt“: `sort` in der Route, `groupByListing`/`isNewlyListed` in `listing.ts`, `ListGroup` und generisches `takeGroups`, `listingHeading`/`listedSince` in `format.ts`, `SortMenu.tsx` mit Menü und Tastenlogik, Etikett in `OfferCard`, Satz im Detail; CSS 12,2 → 12,45 kB; Service Worker 8,77 → 8,81 kB von 9 kB, Puffer 0,19 kB). **Über 102 kB: Budget auf 150 kB** (Nachtrag unten). Vor den Fixes aus dem Arch-Review 102,54 kB | 101,23 kB | 102,56 kB | +1,33 kB |
 | Plan 0043, Schritt 2b (Sortierung „Nächstgelegen“: `groupByReach` mit Bändern aus `LIMIT_MINUTES` bzw. Metern in `listing.ts`, Band-Überschriften in `format.ts`, dritter Menüpunkt, Aufforderung „Wovon aus gerechnet?“, `listWaits`; CSS und Service Worker unverändert, `groupByReach` liegt nicht im Service Worker) | 102,56 kB | 103,25 kB | +0,69 kB |
 | Plan 0043, Schritt 3 (Tipp auf die Nachricht öffnet „Neu eingestellt“: `PUSH_TARGET`, `clickPlan` und `navigate` im Service Worker; Start-JS bis auf Rundung unverändert; Service Worker 8,81 → 8,94 kB von 9 kB, Puffer 0,06 kB, keine Anhebung nötig) | 103,25 kB | 103,26 kB | +0,01 kB |
+| Plan 0054 (Abos mit Glocke: `searches.ts`, `searches-store.ts`, `searchLabel`, `aboToast`, `BellButton`, Glocke in `QuickFilters`, `AboList` im Kind-Sheet, `bellPush`/`preloadBell` im Lader; gemessen gegen ae6901f nach den Plänen 0044–0053. Lazy: `App-Extras JS` 7,49 → 6,26 kB von 7,6 kB, die Such-Logik ist im Start; CSS 12,45 → 12,47 kB. **Service Worker 8,99 → 9,10 kB: Budget auf 9,5 kB**, Nachtrag unten) | 103,44 kB | 105,29 kB | +1,85 kB |
 
 ## Nachtrag (2026-10-11): Budget 101 kB, Plan 0033
 
@@ -194,3 +195,10 @@ Weitere Kandidaten außerhalb der Tabelle in E8 haben nichts gebracht: Minifier-
 - **Ausgangslage:** Nach Schritt 1 von Plan 0043 blieben bis 102 kB etwa 0,77 kB. Sortierung „Neu eingestellt“ und „Nächstgelegen“ samt Menü, Wochen- und Wegzeit-Gruppen, Überschriften, Etikett „Neu“ und Satz im Detail (Plan 0043, E4, E5, E7) waren auf +2 bis +3 kB geschätzt; gemessen kostet Schritt 2 (ohne E7) +1,31 kB.
 - **Alternative:** Menü, Gruppierung und Überschriften als Lazy-Chunk. Knopf, Etikett, Route und Lader blieben im Start (≈ 0,7–1 kB) und hätten die Grenze kaum gehalten; ein Tipp auf die Push-Nachricht (Ziel `?sortierung=neu`, E6) hätte erst einen Ladezustand gezeigt.
 - **Nutzerentscheid (2026-10-24): erst „Budget auf 104 kB“** (alles im Start, der Push-Tipp zeigt die sortierte Liste ohne Ladeschritt), **dann wörtlich: „Setze im Adr die Budgetgrenze auf 150kb.“** `.size-limit.json` setzt `JS (initial)` auf 150 kB. Damit endet die Reihe kleiner Anhebungen je Plan (100 → 101 → 102 kB); die Delta-Tabelle oben wird weiter je Plan geführt, damit der Zuwachs sichtbar bleibt. Der Service Worker (9 kB) wird nur angehoben, wenn E6 nicht hineinpasst, dann auf 9,5 kB. Die Gates LCP < 2,5 s, CLS < 0,05 und Schrift-Swap bleiben unverändert.
+
+## Nachtrag (2026-10-29): Service Worker 9,5 kB, Plan 0054
+
+- **Ausgangslage:** Der Service Worker stand bei 8,99 kB von 9 kB. Der Zuschnitt nach Anbieter-Abos (`providers` in `weeklyText` und `tailorPush`, ADR 0037) bringt ihn auf 9,10 kB.
+- **Sparversuch:** Die Titelzweige in `weeklyText` teilen sich den Zahltext. Nach gzip sparte das nichts messbar.
+- **Nutzerentscheid U3 (2026-10-29): „Bei Bedarf auf 9,5 kB“.** Der Service Worker lädt nur bei der Installation und beim Push und berührt das Start-Gate nicht. `JS (initial)` bleibt bei 150 kB.
+

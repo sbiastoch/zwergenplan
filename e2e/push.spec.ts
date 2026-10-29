@@ -35,7 +35,10 @@ const SENT_AT = "2026-10-05T12:00:00+02:00";
 const sheet = (page: Page) => page.getByRole("dialog", { name: "Kind und Einstellungen" });
 const section = (page: Page) => sheet(page).getByRole("region", { name: "Als App" });
 const pushSwitch = (page: Page) => section(page).getByRole("switch", { name: "Wöchentliche Push-Nachricht" });
-const subscribeButton = (page: Page) => section(page).getByRole("button", { name: "Suche abonnieren" });
+/** Glocke der Suche in der Schnellfilter-Zeile (Plan 0054, E6) */
+const searchBell = (page: Page) => page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ });
+/** Verwaltung der Abos im Kind-Sheet (Plan 0054, E7) */
+const aboList = (page: Page) => sheet(page).getByRole("region", { name: "Deine Abos" });
 
 /** Fake-Push-Manager der Seite (der Service Worker bleibt echt); das Abo überlebt Neuladen über sessionStorage */
 async function fakePushManager(page: Page) {
@@ -226,32 +229,65 @@ test.beforeEach(async ({ page }) => {
   await fakePushManager(page);
 });
 
-test("Aktuelle Suche abonnieren und entfernen: Statuszeile, Liste, Fokus (E7)", async ({ page, context, pushLog }) => {
+test("Glocke der Suche bei ausgeschaltetem Push: schaltet ihn ein und spiegelt; Verwaltung im Sheet (Plan 0054, E5–E7)", async ({
+  page,
+  context,
+  pushLog,
+}) => {
   await installed(page, context, "./?kat=musik&wegzeit=20");
-  await openKidSheet(page);
-  await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "false");
-  await expect(section(page)).toContainText("Musik & Singen · bis 20 Min.");
-  await expect(section(page)).toContainText("Noch keine. Bis dahin kommen alle neuen Angebote.");
-
-  await subscribeButton(page).click();
-  await expect(subscribeButton(page)).toHaveAttribute("aria-pressed", "true");
-  await expect(section(page).getByText("Abonniert", { exact: true })).toBeVisible();
-  await expect(section(page).getByRole("status")).toHaveText(
-    "Abonniert. Die Wegzeit wirkt in der Push-Nachricht ab einem Startpunkt.",
-  );
-  const item = section(page).getByRole("listitem");
-  await expect(item).toHaveCount(1);
-  await expect(item).toContainText("Wegzeit wirkt ab einem Startpunkt");
-  await expect(section(page)).toContainText("Kommt erst mit eingeschalteter wöchentlicher Push-Nachricht.");
+  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "false");
+  await searchBell(page).click();
+  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "true");
+  // Wegzeit ohne Startpunkt: der Toast sagt es (E5)
+  await expect(
+    page.getByText("Suche abonniert. Die Wegzeit wirkt in der Push-Nachricht ab einem Startpunkt."),
+  ).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik&wegzeit=20"]');
+  // Push war aus: der Tipp hat ihn eingeschaltet wie der Schalter, genau ein POST /abo
+  await expect.poll(() => pushLog.length).toBe(1);
+  expect(pushLog[0]).toMatchObject({ method: "POST", path: "/abo" });
+  await expect.poll(() => readStore(page)).toMatchObject({ endpoint: ENDPOINT, searches: '["kat=musik&wegzeit=20"]' });
 
-  await section(page).getByRole("button", { name: "Such-Abo Musik & Singen · bis 20 Min. entfernen" }).click();
-  await expect(section(page).getByRole("listitem")).toHaveCount(0);
-  await expect(section(page).getByRole("status")).toHaveText("Such-Abo entfernt.");
-  // Der Knopf verschwindet mit der Zeile: Fokus auf der Überschrift der Liste, nicht auf <body> (Runde 3 M2)
-  await expect(section(page).getByRole("heading", { name: "Deine Such-Abos" })).toBeFocused();
-  await expect(subscribeButton(page)).toHaveAttribute("aria-pressed", "false");
-  expect(pushLog).toEqual([]);
+  await openKidSheet(page);
+  await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
+  // abonniert wird nur noch an der Glocke
+  await expect(sheet(page).getByText("Aktuelle Suche")).toHaveCount(0);
+  const item = aboList(page).getByRole("listitem");
+  await expect(item).toHaveCount(1);
+  await expect(item).toContainText("Musik & Singen · bis 20 Min.");
+  await expect(item).toContainText("Wegzeit wirkt ab einem Startpunkt");
+  await aboList(page).getByRole("button", { name: "Such-Abo Musik & Singen · bis 20 Min. beenden" }).click();
+  await expect(aboList(page).getByRole("listitem")).toHaveCount(0);
+  // Der Knopf verschwindet mit der Zeile: Fokus auf der Überschrift, nicht auf <body> (Review 2, Nr. 3)
+  await expect(aboList(page).getByRole("heading", { name: "Deine Abos" })).toBeFocused();
+  // das offene Sheet spiegelt die Änderung
+  await expect.poll(async () => (await readStore(page))["searches"]).toBeUndefined();
+  await sheet(page).getByRole("button", { name: "Fertig" }).click();
+  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "false");
+  expect(pushLog).toHaveLength(1);
+});
+
+test("Anbieter-Glocke mit Push an: spiegelt sofort, ohne das Kind-Sheet (Plan 0054, E4)", async ({
+  page,
+  context,
+  pushLog,
+}) => {
+  await installed(page, context, "./?ansicht=anbieter");
+  await openKidSheet(page);
+  await pushSwitch(page).click();
+  await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
+  await sheet(page).getByRole("button", { name: "Fertig" }).click();
+  await expect(sheet(page)).toBeHidden();
+
+  const bell = page.getByRole("button", { name: "Kleines Theater Beispiel (fiktiv) abonnieren", exact: true });
+  await bell.click();
+  await expect(page.getByText("Anbieter abonniert – Neues kommt in die wöchentliche Push-Nachricht")).toBeVisible();
+  await expect.poll(async () => (await readStore(page))["providers"]).toEqual(["fv3fpfp2"]);
+  await bell.click();
+  await expect(page.getByText("Abo beendet")).toBeVisible();
+  await expect.poll(async () => (await readStore(page))["providers"]).toBeUndefined();
+  // nur das Einschalten sprach mit dem Push-Worker
+  expect(pushLog).toHaveLength(1);
 });
 
 test.describe("Onboarding (Plan 0033, E8)", () => {
@@ -293,11 +329,18 @@ test.describe("Onboarding (Plan 0033, E8)", () => {
   });
 });
 
-test("ohne Filter erklärt der Abschnitt den Weg, statt einen Knopf zu zeigen (E7)", async ({ page, context }) => {
+test("ohne Filter keine Glocke der Suche, auch nicht mit nur einem Zeitraum; die Verwaltung erklärt den Weg (Plan 0054, E6, E7)", async ({
+  page,
+  context,
+}) => {
   await installed(page, context);
+  await expect(page.getByRole("group", { name: "Schnellfilter" })).toBeVisible();
+  await expect(searchBell(page)).toHaveCount(0);
+  await page.goto("./?von=2026-10-05&bis=2026-10-11");
+  await expect(page.getByRole("group", { name: "Schnellfilter" })).toBeVisible();
+  await expect(searchBell(page)).toHaveCount(0);
   await openKidSheet(page);
-  await expect(section(page)).toContainText("Wähle im Filter, was dich interessiert, und abonniere die Suche hier.");
-  await expect(subscribeButton(page)).toHaveCount(0);
+  await expect(aboList(page)).toContainText("Noch keine. Tippe auf die Glocke bei einem Anbieter oder über der Liste.");
 });
 
 test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen Sheet; Ausschalten räumt auf (E6)", async ({
@@ -337,17 +380,16 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
   // Änderungen im offenen Sheet kommen sofort an (Runde 3 M3)
   await sheet(page).getByLabel("Stadtteil").selectOption("st-johannis");
   await sheet(page).getByLabel("Geburtsdatum").fill("");
-  await subscribeButton(page).click();
   await expect
     .poll(() => readStore(page))
-    .toEqual({ endpoint: ENDPOINT, origin: "st-johannis", searches: '["kat=musik","kat=natur"]' });
+    .toEqual({ endpoint: ENDPOINT, origin: "st-johannis", searches: '["kat=musik"]' });
 
   await pushSwitch(page).click();
   await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "false");
   await expect.poll(() => readStore(page)).toEqual({});
   expect(pushLog.at(-1)).toEqual({ method: "DELETE", path: "/abo", body: { endpoint: ENDPOINT } });
   // Die Such-Abos gehören dem Nutzer, nicht dem Push
-  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik","kat=natur"]');
+  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik"]');
 });
 
 test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0035, E9)", () => {
@@ -451,7 +493,7 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   await writeStore(page, { seenIds: seen, searches: '["kat=musik,buecher&wegzeit=20"]', origin: "gostenhof" });
   const withReach = await deliver(page, context, session);
   expect(withReach).toEqual({
-    title: "1 neues Angebot für deine Suchen",
+    title: "1 neues Angebot für deine Abos",
     body: "Krabbelreime & Fingerspiele",
     navigate: startPage,
     requests: SAME_REQUESTS,
@@ -464,8 +506,22 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
     origin: { source: "standort", lat: 49.448, lon: 11.058 },
   });
   const withPoint = await deliver(page, context, session);
-  expect(withPoint.title).toBe("1 neues Angebot für deine Suchen");
+  expect(withPoint.title).toBe("1 neues Angebot für deine Abos");
   expect(withPoint.requests).toEqual(SAME_REQUESTS);
+
+  // Anbieter-Abo (Plan 0054, E2): nur die neuen Angebote dieses Anbieters, dieselben Requests
+  const provider: string = await page.evaluate(async () => {
+    const site = await (await fetch("data/site.json")).json();
+    return site.offers.find((o: { title: string }) => o.title.startsWith("Musikgarten")).providerId;
+  });
+  await writeStore(page, { seenIds: seen, providers: [provider] });
+  const withProvider = await deliver(page, context, session);
+  expect(withProvider).toEqual({
+    title: "1 neues Angebot von deinen Anbietern",
+    body: "Musikgarten 1 (1–2 Jahre)",
+    navigate: startPage,
+    requests: SAME_REQUESTS,
+  });
 
   // ohne gesehene IDs (erste Nachricht nach dem Einschalten): zugeschnitten über `listedAt` (Plan 0043, E3)
   await writeStore(page, { birthDate: "2025-08-05" });
@@ -487,9 +543,10 @@ for (const colorScheme of ["light", "dark"] as const) {
       context,
       "./?kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
     );
+    await searchBell(page).click();
+    await expect(searchBell(page)).toHaveAttribute("aria-pressed", "true");
     await openKidSheet(page);
-    await subscribeButton(page).click();
-    await expect(section(page).getByRole("listitem")).toHaveCount(1);
+    await expect(aboList(page).getByRole("listitem")).toHaveCount(1);
     await expectMobileUx(page);
   });
 }
@@ -590,15 +647,23 @@ for (const state of Object.keys(MATRIX) as MatrixState[]) {
   });
 }
 
-test("Push-Teil mit langem Abo: 320 px und 200 % (E7)", async ({ page, context }) => {
+test("Push-Teil mit langem Abo und zwei Anbieter-Abos: 320 px und 200 % (E7; Plan 0054, Review 2, Nr. 12)", async ({
+  page,
+  context,
+}) => {
   await page.setViewportSize({ width: 320, height: 640 });
+  await page.addInitScript(() =>
+    localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fv3fpfp2", "b5nuus36"])),
+  );
   await installed(
     page,
     context,
     "./?kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
   );
+  await searchBell(page).click();
+  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "true");
   await openKidSheet(page);
-  await subscribeButton(page).click();
+  await expect(aboList(page).getByRole("listitem")).toHaveCount(3);
   await setTextScale(page, 2);
   await expectNoHorizontalScroll(page);
   await expectTextFits(page, { scale: 2 });

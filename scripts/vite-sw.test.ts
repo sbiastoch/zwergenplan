@@ -72,6 +72,16 @@ describe("precacheList (Plan 0011, E3)", () => {
     expect(precacheList(bundle(), { ...OPTIONS, startChunks: [] })).not.toContain("assets/app/pwa-FFF.js");
   });
 
+  it("mit dem App-Abschnitt als Start-Chunk: AppSection samt seinem statischen Import (Plan 0054, E4)", () => {
+    const list = precacheList(bundle(), {
+      ...OPTIONS,
+      startChunks: [...OPTIONS.startChunks, /\/src\/ui\/app-extras\/AppSection\.tsx$/],
+    });
+    expect(list).toContain("assets/app/AppSection-GGG.js");
+    expect(list).toContain("assets/app/pwa-FFF.js");
+    expect(list).not.toContain("assets/karte/MapView-EEE.js");
+  });
+
   it("ein Start-Chunk-Muster ohne Treffer: Fehler (umbenanntes Modul fiele sonst still aus dem Precache)", () => {
     expect(() =>
       precacheList(bundle(), { ...OPTIONS, startChunks: [/\/src\/data\/pwa\.ts$/, /\/src\/gibt-es-nicht\.ts$/] }),

@@ -1,9 +1,9 @@
 /**
  * Push-Abo der Wochen-Nachricht (Plan 0011, E12; Plan 0017, E6, E9; ADR 0014). Einziger Ort für `PushManager` und
- * `Notification`. Liest die Registrierung selbst (`getRegistration`, im Tipp `ready`), nur für `pushManager`;
+ * `Notification`, außer der Erlaubnis im Glocken-Tipp (`pushPermission`, `askPushPermission` in `pwa-start.ts`, ADR 0037). Liest die Registrierung selbst (`getRegistration`, im Tipp `ready`), nur für `pushManager`;
  * registrieren und aktualisieren bleibt `pwa.ts` (ADR 0014, Punkt 6). Lazy im Chunk „Als App“, nie beim App-Start.
  *
- * Der Worker bekommt nur das Abo. Geburtsdatum, Such-Abos und Startpunkt landen nur im Geräte-Speicher, für den
+ * Der Worker bekommt nur das Abo. Geburtsdatum, Such- und Anbieter-Abos und Startpunkt landen nur im Geräte-Speicher, für den
  * Zuschnitt im Service Worker. Die Umgebung ist injizierbar wie in `geolocation.ts`.
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";

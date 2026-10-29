@@ -26,9 +26,9 @@ async function run(app: AppHooks) {
  * kann (etwa Safari-Tab ohne Installation). Läuft nur im Tipp, nie beim Start.
  */
 export function pushPermission(): NotificationPermission | undefined {
-  return typeof PushManager === "undefined" || typeof Notification === "undefined"
-    ? undefined
-    : Notification.permission;
+  // Notausgang ohne Service Worker (`data-sw="aus"`, ADR 0013): kein Push, also auch kein Erlaubnis-Dialog
+  if (typeof PushManager === "undefined" || typeof Notification === "undefined") return undefined;
+  return document.documentElement.dataset["sw"] === "aus" ? undefined : Notification.permission;
 }
 
 /** Erlaubnis-Dialog, synchron im Tipp aufrufen (iOS, Plan 0011, E12); nur nach `pushPermission() === "default"` */

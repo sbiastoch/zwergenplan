@@ -360,12 +360,12 @@ describe("weeklyText – Anbieter-Abos (Plan 0054, E2)", () => {
 
   it("nur Anbieter-Abo: zählt nur neue Angebote dieser Anbieter, der Titel nennt die Anbieter", () => {
     const fresh = [byKey("krabbeltreff"), byKey("musikgarten-1"), byKey("krabbelreime")];
-    const own = fresh.filter((o) => o.providerId === provider("musikgarten-1")).map((o) => o.id);
     const result = text({ fresh, providers: [provider("musikgarten-1")] });
-    expect(result.hits).toEqual(own);
-    expect(result.title).toBe(
-      own.length === 1 ? "1 neues Angebot von deinen Anbietern" : `${own.length} neue Angebote von deinen Anbietern`,
-    );
+    expect(result).toEqual({
+      title: "1 neues Angebot von deinen Anbietern",
+      body: "Musikgarten 1 (1–2 Jahre)",
+      hits: [byKey("musikgarten-1").id],
+    });
   });
 
   it("gemischt: Anbieter-Treffer zuerst, Titel „für deine Abos“", () => {
@@ -396,14 +396,12 @@ describe("weeklyText – Anbieter-Abos (Plan 0054, E2)", () => {
   });
 
   it("ohne neue Treffer zählt die Woche nach denselben Abos", () => {
+    // Krabbelreime gehört zur Bibliothek, nicht zum Familientreff
+    expect(provider("krabbelreime")).not.toBe(provider("krabbeltreff"));
     const week = [byKey("krabbeltreff"), byKey("krabbelreime")];
-    const own = week.filter((o) => o.providerId === provider("krabbeltreff")).length;
     expect(text({ week, providers: [provider("krabbeltreff")] })).toEqual({
       title: "Diese Woche nichts Neues für deine Abos",
-      body:
-        own === 1
-          ? "1 passendes Angebot in den nächsten 7 Tagen."
-          : `${own} passende Angebote in den nächsten 7 Tagen.`,
+      body: "1 passendes Angebot in den nächsten 7 Tagen.",
       hits: [],
     });
   });

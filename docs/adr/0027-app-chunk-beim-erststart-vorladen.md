@@ -35,3 +35,8 @@ Status: angenommen (2026-10-11), mit Plan 0033 (Onboarding beim ersten Öffnen).
 - **Flag-Version 2:** Erledigt ist nur der Wert `"2"` (`ONBOARDING_VERSION` in `src/data/preferences.ts`, exakt verglichen). `"1"` wurde von Plan 0033 auch still an Bestandsnutzer vergeben und zählt nicht mehr; wer `"1"` hat, lädt die Chunks beim nächsten Start einmal erneut. Eine spätere Erhöhung zeigt das Onboarding allen einmal erneut. E2E und `scripts/screenshots.ts` nutzen denselben Wert aus `e2e/onboarding-flag.ts`.
 - **iPhone App zuerst:** Im Safari-Tab des iPhones steht „App“ an Position 1, weil die installierte App einen eigenen Speicher hat. Die Ladebühne trägt dort schon vor dem Chunk die App-Farbe (`iosTab()` aus `src/data/platform.ts`, Klasse `onb-pending ios`; ADR 0013, Nachtrag 2026-10-11, Plan 0035).
 - Der Kontextsatz „auf dem iPhone rückt ‚App‘ an Position 2“ und die Erwähnung von „still-erledigt“ in Entscheidung 1 und den Alternativen sind damit überholt. Der Text oben bleibt als Begründung stehen.
+
+## Nachtrag (2026-10-29, ADR 0037): Vorladen bei sichtbarer Glocke, Chunk im Precache
+
+- Der Chunk `assets/app/AppSection-*` lädt zusätzlich vor, sobald eine Glocke sichtbar ist: Tab „Anbieter“, Anbieter-Sheet oder Glocke der Suche (`preloadBell`, `src/ui/AppExtras.tsx`). Anlass ist die Ansicht, nicht das Gespeicherte; mit und ohne Abos laden dieselben Dateien (`e2e/merkliste-anbieter.spec.ts`).
+- Die Konsequenz „Die Precache-Liste … ändert sich nicht“ gilt nicht mehr: Der Chunk steht in `startChunks` (ADR 0013, Nachtrag 2026-10-29).

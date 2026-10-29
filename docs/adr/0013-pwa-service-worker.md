@@ -62,3 +62,8 @@ Status: angenommen (2026-10-05, mit Stufe 1 von Plan 0011, Schritt 5). Ergänzt 
 - **Ausnahme von Punkt 5:** Das neue Start-Modul `src/data/platform.ts` liest `display-mode` nur lesend (`standalone()`: `matchMedia("(display-mode: standalone)").matches` oder `navigator.standalone === true`), ohne Listener, ohne `beforeinstallprompt` und ohne Registrierung. Muster ist die Ausnahme aus ADR 0014, Punkt 6.
 - Grund: Die Ladebühne des Onboardings braucht vor dem App-Chunk die Farbe der ersten Bühne, und im Safari-Tab des iPhones ist das „App“ (`iosTab()`, Klasse `onb-pending ios`; Plan 0035, E8). Die Prüfung steht dafür im Start-Bundle (gemessen in ADR 0012, Zeile Plan 0035).
 - `src/data/pwa.ts` importiert `isIosDevice` und `standalone` von dort, so gibt es die Prüfung einmal. Registrieren, aktualisieren, auf Nachrichten und auf `beforeinstallprompt` hören bleibt allein `src/data/pwa.ts`.
+
+## Nachtrag (2026-10-29, ADR 0037): App-Chunk im Precache
+
+- `startChunks` (`vite.config.ts`) nennt zusätzlich `src/ui/app-extras/AppSection.tsx`. Der Chunk `assets/app/AppSection-*` liegt damit samt seinen statischen Imports (Push, Geräte-Speicher) im Precache.
+- Grund: Ein Glocken-Tipp lädt ihn (Plan 0054, E4). Offline gescheitert, behielte Chromium den gescheiterten `import()`, und das Kind-Sheet zeigte bis zum Neuladen „Als App“ nicht. E2E in `e2e/pwa.spec.ts` („Glocke offline, dann Kind-Sheet“).

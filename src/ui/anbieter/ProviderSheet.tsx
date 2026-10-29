@@ -30,6 +30,7 @@ export function ProviderSheet({
   ctx,
   saved,
   onToggleSaved,
+  bellBusy,
   onShare,
   onClose,
 }: ProviderSheetProps) {
@@ -56,7 +57,13 @@ export function ProviderSheet({
           <h2 lang="de" ref={focusName} tabIndex={-1}>
             {provider.name}
           </h2>
-          <BellButton label={provider.name} subscribed={saved} onToggle={() => onToggleSaved(provider.id)} inline />
+          <BellButton
+            label={provider.name}
+            subscribed={saved}
+            busy={bellBusy}
+            onToggle={() => onToggleSaved(provider.id)}
+            inline
+          />
         </div>
         {categories.length > 0 && (
           <p className="provider-cats">{categories.map((c) => CATEGORY_LABELS[c]).join(" · ")}</p>

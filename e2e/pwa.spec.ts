@@ -182,6 +182,29 @@ test.describe("offline", () => {
     );
   });
 
+  // Plan 0054, E4: Der App-Chunk liegt im Precache. Ein Glocken-Tipp offline lädt ihn ohne Fehler, und das Kind-Sheet
+  // zeigt danach „Als App“ statt eines vergifteten import() (LoadFailed). Im Ablauf scheitern offline nur die Wegzeit-
+  // Tabelle und ihr Chunk (nicht im Precache, Plan 0009, E9; im Trace belegt): erlaubt, der App-Chunk nicht.
+  test.describe(() => {
+    // ein Muster: ein Array mit zwei Einträgen liest Playwright als [Wert, Optionen]
+    test.use({ allowedConsoleErrors: [/\/(data\/wegzeit\.json|assets\/oepnv\/\S+\.js)\b/] });
+    test("Glocke offline, dann Kind-Sheet: Abschnitt „Als App“ lädt (Plan 0054, E4)", async ({ page, context }) => {
+      await installed(page);
+      await context.setOffline(true);
+      await page.goto("./?format=kurs");
+      await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
+      const bell = page.getByRole("button", { name: "Suche „Kurs“ abonnieren" });
+      await bell.click();
+      await expect(bell).toHaveAttribute("aria-pressed", "true");
+      await expect(page.getByText(/^Suche abonniert/)).toBeVisible();
+      await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
+      const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
+      await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
+      await expect(sheet.getByText("Der Abschnitt „Als App“ konnte nicht geladen werden.")).toHaveCount(0);
+      await expect(sheet.getByRole("region", { name: "Deine Abos" })).toContainText("Kurs");
+    });
+  });
+
   test("7 wieder online: Die Statuszeile verliert „Offline“ ohne Neustart (E4a)", async ({ page, context }) => {
     await installed(page);
     await context.setOffline(true);
