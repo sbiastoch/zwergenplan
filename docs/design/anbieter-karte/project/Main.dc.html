@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Anbieter als Karte</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.zp{width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.th-light{--bg:#E8F1FF;--dotc:rgba(19,33,46,.13);--surface:#FFFFFF;--rim:#FFFFFF;--ink:#13212E;--muted:#475563;--soft:#EEF3FA;--line:#13212E;--shadow:#13212E;--primary:#13212E;--on-primary:#FFFFFF;--tape:#FFE38A;--tape-stripe:rgba(255,255,255,.5);--on-tape:#13212E;--map:#E1EBF8;--road:#FFFFFF;--park:#D3EBC6;--water:#B3D7F5;--scrim:rgba(19,33,46,.45);--sel:#FFD93B;--on-sel:#13212E}
+.th-dark{--bg:#0E1620;--dotc:rgba(238,243,248,.08);--surface:#1B2733;--rim:#2B3A49;--ink:#EEF3F8;--muted:#A9B8C6;--soft:#243241;--line:#8FA4BA;--shadow:#34495E;--primary:#FFD93B;--on-primary:#13212E;--tape:#3B3420;--tape-stripe:rgba(255,217,59,.10);--on-tape:#F5E7B5;--map:#15202B;--road:#263443;--park:#1A2C24;--water:#1C3652;--scrim:rgba(0,0,0,.62);--sel:#FFD93B;--on-sel:#13212E}
+.zp button{font:inherit;color:inherit;cursor:pointer}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:25px;letter-spacing:-.02em}
+.logo i{width:28px;height:28px;border-radius:50%;background:#FFD93B;border:2px solid var(--rim);display:grid;place-items:center}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 15px;border-radius:999px;background:var(--surface);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);font-weight:700;font-size:15px;white-space:nowrap;box-sizing:border-box}
+.stickers{display:flex;gap:10px;padding:8px 14px 2px;overflow:hidden}
+.st{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:700;width:60px;flex:none}
+.st .c{width:46px;height:46px;border-radius:50%;background:var(--k);border:3px solid var(--rim);box-shadow:3px 3px 0 var(--shadow);display:grid;place-items:center}
+.chips{display:flex;gap:8px;padding:10px 16px 6px}
+.chips .pill{min-height:40px;font-size:14px}
+.search{padding:6px 16px 0;display:flex;flex-direction:column;gap:6px}
+.search label{font-size:14px;font-weight:700}
+.search input{height:44px;border-radius:14px;border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);background:var(--surface);padding:0 14px;font:inherit;font-size:15px;color:var(--ink);box-sizing:border-box;width:100%}
+.status{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px 6px;font-size:14px;color:var(--muted)}
+.status b{color:var(--ink)}
+.seg{display:flex;background:var(--soft);border:2px solid var(--line);border-radius:999px}
+.seg button{min-height:38px;padding:0 16px;border-radius:999px;border:0;background:transparent;font-weight:700;font-size:15px}
+.seg .on{background:var(--surface);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);margin:-2px}
+.mapf{position:relative;margin:4px 16px 0;border:2.5px solid var(--line);border-radius:22px;overflow:hidden;background:var(--map);box-shadow:4px 4px 0 var(--shadow)}
+.mapf svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.road{fill:none;stroke:var(--road);stroke-linecap:round}
+.lbl{fill:var(--muted);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:12px;font-weight:600}
+.pm{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:11px;background:var(--surface);border:2px solid var(--line);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;color:var(--ink);box-sizing:border-box}
+.pm b{position:absolute;top:-10px;right:-10px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:var(--primary);color:var(--on-primary);font-size:11px;line-height:16px;text-align:center;border:2px solid var(--surface)}
+.pm.idle{opacity:.55;border-style:dashed;box-shadow:none}
+.pm.sel{background:var(--sel);color:var(--on-sel);width:40px;height:40px;margin:-20px 0 0 -20px}
+.cl{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:var(--primary);color:var(--on-primary);border:2px solid var(--surface);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;font-weight:800;font-size:15px;box-sizing:border-box}
+.origin{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#2F7BF6;border:3px solid #fff;box-shadow:0 0 0 6px rgba(47,123,246,.25)}
+.zoom{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;background:var(--surface);border:2px solid var(--line);border-radius:14px;box-shadow:3px 3px 0 var(--shadow);overflow:hidden}
+.zoom button{width:42px;height:42px;border:0;background:transparent;display:grid;place-items:center}
+.zoom button+button{border-top:2px solid var(--line)}
+.legend{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:4px;padding:6px 10px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);font-size:11px;font-weight:600}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:4px;border:1.5px solid var(--line);background:var(--surface)}
+.legend i.d{border-style:dashed;opacity:.6}
+.attr{position:absolute;left:8px;right:8px;bottom:6px;font-size:10px;color:var(--muted);text-align:right}
+.note{font-size:12px;color:var(--muted);padding:10px 18px 0}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:78px;display:flex;align-items:stretch;padding:8px 10px 10px;box-sizing:border-box;background-color:var(--tape);background-image:repeating-linear-gradient(-45deg,var(--tape-stripe) 0 9px,transparent 9px 20px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;font-weight:700;color:var(--on-tape);border:2px solid transparent;border-radius:16px;background:transparent}
+.tab.on{background:var(--surface);border-color:var(--line);box-shadow:3px 3px 0 var(--shadow);color:var(--ink)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</helmet>
+<div class="zp th-light">
+  <div class="hdr">
+    <div class="logo"><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 14 13H2Z" fill="#FF6B6B"></path></svg></i>Zwergenplan</div>
+    <button type="button" class="pill"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9 14c1.5 1.5 4.5 1.5 6 0M9 10h.01M15 10h.01"></path></svg>Alter?</button>
+  </div>
+  <div class="stickers" aria-label="Kategorien">
+    <div class="st"><span class="c" style="--k:#FF8CC0"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#13212E"></circle></svg></span>Babykurse</div>
+    <div class="st"><span class="c" style="--k:#FFB13B"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="1" width="16" height="16" rx="3" fill="#13212E"></rect></svg></span>Krabbeln</div>
+    <div class="st"><span class="c" style="--k:#B99CFF"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="5.5" r="4.5" fill="#13212E"></circle><circle cx="5" cy="12" r="4.5" fill="#13212E"></circle><circle cx="15" cy="12" r="4.5" fill="#13212E"></circle><rect x="8.5" y="11" width="3" height="8" fill="#13212E"></rect></svg></span>Treffs</div>
+    <div class="st"><span class="c" style="--k:#2EC4B6"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 19 18H1Z" fill="#13212E"></path></svg></span>Bewegung</div>
+    <div class="st"><span class="c" style="--k:#5CB8FF"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><path d="M8 1C8 1 1 9 1 13a7 7 0 0 0 14 0C15 9 8 1 8 1Z" fill="#13212E"></path></svg></span>Wasser</div>
+    <div class="st"><span class="c" style="--k:#FF7070"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="m10 1 2.6 6 6.4.5-4.9 4.2 1.5 6.3L10 14.6 4.4 18l1.5-6.3L1 7.5 7.4 7Z" fill="#13212E"></path></svg></span>Musik</div>
+  </div>
+  <div class="chips">
+    <button type="button" class="pill"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>Filter</button>
+    <button type="button" class="pill">Kostenlos</button>
+    <button type="button" class="pill">Ohne Anmeldung</button>
+  </div>
+  <div class="search">
+    <label for="q">Anbieter suchen</label>
+    <input id="q" type="search" placeholder="z. B. Bibliothek">
+  </div>
+  <div class="status">
+    <span><b>69</b> Anbieter an <b>104</b> Orten</span>
+    <div class="seg" role="group" aria-label="Darstellung">
+      <button type="button" aria-pressed="false">Liste</button>
+      <button type="button" class="on" aria-pressed="true">Karte</button>
+    </div>
+  </div>
+  <div class="mapf" style="height:336px">
+    <svg class="bg" viewBox="0 0 354 336" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path d="M0 60 Q60 40 110 70 T230 90 T354 70 L354 0 L0 0Z" fill="var(--park)" opacity=".7"></path>
+      <ellipse cx="300" cy="270" rx="70" ry="50" fill="var(--park)"></ellipse>
+      <ellipse cx="40" cy="300" rx="50" ry="30" fill="var(--park)"></ellipse>
+      <path d="M-10 175 C40 160 70 190 110 172 S170 150 205 168 S270 190 364 160" fill="none" stroke="var(--water)" stroke-width="7"></path>
+      <path class="road" stroke-width="9" d="M180 120 Q230 120 238 165 Q240 215 185 220 Q130 218 128 168 Q132 122 180 120Z"></path>
+      <path class="road" stroke-width="6" d="M0 120 L128 160 M238 165 L354 150 M185 220 L200 336 M180 120 L170 0 M128 168 L20 336 M238 180 L340 300 M70 0 L128 150"></path>
+      <path class="road" stroke-width="3.5" d="M0 240 L130 200 M260 0 L232 140 M100 336 L160 215 M300 336 L220 210 M354 230 L240 190 M30 30 L120 140"></path>
+      <text class="lbl" x="22" y="140">Fürth</text>
+      <text class="lbl" x="160" y="150">Altstadt</text>
+      <text class="lbl" x="250" y="132">Wöhrd</text>
+      <text class="lbl" x="150" y="40">St. Johannis</text>
+      <text class="lbl" x="58" y="205">Gostenhof</text>
+      <text class="lbl" x="196" y="262">Südstadt</text>
+      <text class="lbl" x="270" y="318">Langwasser</text>
+    </svg>
+    <div class="legend" aria-hidden="true">
+      <span><i></i>Anbieter-Ort</span>
+      <span><i class="d"></i>keine Termine</span>
+    </div>
+    <button type="button" class="cl" style="left:182px;top:172px" aria-label="14 Anbieter in der Altstadt">14</button>
+    <button type="button" class="cl" style="left:56px;top:162px" aria-label="6 Anbieter in Fürth">6</button>
+    <button type="button" class="pm" style="left:96px;top:208px" aria-label="Familienzentrum Gostenhof, 3 Anbieter"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg><b>3</b></button>
+    <button type="button" class="pm" style="left:262px;top:110px" aria-label="Anbieter in Wöhrd"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg></button>
+    <button type="button" class="pm" style="left:188px;top:66px" aria-label="Anbieter in St. Johannis"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg><b>2</b></button>
+    <button type="button" class="pm" style="left:226px;top:244px" aria-label="Anbieter in der Südstadt"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg></button>
+    <button type="button" class="pm idle" style="left:300px;top:206px" aria-label="Anbieter ohne kommende Termine"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg></button>
+    <button type="button" class="pm idle" style="left:130px;top:282px" aria-label="Anbieter ohne kommende Termine"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg></button>
+    <button type="button" class="cl" style="left:296px;top:290px" aria-label="4 Anbieter in Langwasser">4</button>
+    <span class="origin" style="left:150px;top:236px" aria-label="Startpunkt"></span>
+    <div class="zoom">
+      <button type="button" aria-label="Vergrößern"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+      <button type="button" aria-label="Verkleinern"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+    </div>
+    <div class="attr">OpenFreeMap © OpenMapTiles Data from OpenStreetMap</div>
+  </div>
+  <p class="note" style="margin:0">Kartenbilder kommen von OpenFreeMap. Dein Standort bleibt auf dem Gerät.</p>
+  <nav class="tabs" aria-label="Bereiche">
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5Z"></path></svg>Angebote</button>
+    <button type="button" class="tab on" aria-current="page"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg>Anbieter</button>
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg>Merkliste</button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
