@@ -33,6 +33,7 @@ import {
   type FetchedFind,
   type Find,
   findsFromSearch,
+  type HiddenEval,
   hiddenEval,
   hideProviders,
   hostOf,
@@ -51,6 +52,7 @@ import {
   searchResponseSchema,
 } from "../lib/discover.ts";
 import { DiscoverState, emptyState, type Ort } from "../lib/discover-state.ts";
+import { matchTermine, type Stufe, type Termin, termineOf, type Urteile, yieldWindow } from "../lib/eval-discover.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
 import { botWall } from "../lib/fetch.ts";
 import { extractPage, type FetchedPage } from "../lib/html-extract.ts";
@@ -137,10 +139,13 @@ export interface DiscoverOptions {
    */
   commit?: (id: string, message: string) => void;
   /**
-   * Entdecken-Eval (E9): diese Anbieter gelten im Lauf als unbekannt; der Bericht sagt, welche wiedergefunden
-   * wurden. Nur im Trockenlauf.
+   * Entdecken-Eval (Plan 0050, E6): `ids` gelten im Lauf als unbekannt; der Bericht sagt, welche wiedergefunden
+   * wurden, und misst den Ertrag gegen den Ertragsbeweis ihres Handeintrags. Ohne `zurueckgestellt`, Klärfälle und
+   * G3. Nur im Trockenlauf.
    */
-  hide?: readonly string[];
+  eval?: { ids: readonly string[]; alt?: readonly string[]; urteile?: Urteile };
+  /** Modell und Effort je Schritt für den Bericht */
+  modelle?: string;
 }
 
 const SEARCH_PROMPT = fileURLToPath(new URL("../prompt/discover-search.md", import.meta.url));
@@ -279,12 +284,16 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   let catalog: Provider[] = readCatalog(catalogFile);
   let catalogText = readFileSync(catalogFile, "utf8");
   let hidden: Provider[] | undefined;
-  if (o.hide && o.hide.length > 0) {
-    if (!o.dryRun) throw new Error("--hide nur im Trockenlauf (--dry-run)");
-    ({ catalog, text: catalogText, hidden } = hideProviders(catalog, catalogText, o.hide));
+  if (o.eval) {
+    if (!o.dryRun) throw new Error("--eval nur im Trockenlauf (--dry-run)");
+    ({ catalog, text: catalogText, hidden } = hideProviders(catalog, catalogText, o.eval.ids));
     const outside = hidden.filter((p) => !o.regions.includes(p.region)).map((p) => p.id);
-    if (outside.length > 0) throw new Error(`--hide: nicht in den Regionen des Laufs: ${outside.join(", ")}`);
+    if (outside.length > 0) throw new Error(`--eval: nicht in den Regionen des Laufs: ${outside.join(", ")}`);
   }
+  // G3 darf im Eval keinen ausgeblendeten Anbieter verdrängen (Plan 0050, E6)
+  const maxNew = o.eval ? Number.POSITIVE_INFINITY : o.maxNew;
+  /** Termine der Aufnahmen für den Ertrag gegen die Referenz (nur im Eval) */
+  const adoptedTermine = new Map<string, Termin[]>();
   const originalCatalogText = catalogText;
   // zurückgenommene IDs aller Regionen: IDs sind global (ADR 0022)
   const allStates = REGION_IDS.map((r) => readState(o.dataDir, r));
@@ -307,6 +316,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     const regionName = REGIONS[region].name;
     const callsBefore = calls.length;
     let state = readState(o.dataDir, region);
+    // Eval: jeder Kandidat wird neu geprüft, offene Klärfälle sind keine Quelle (Plan 0050, E6)
+    if (o.eval) state = { ...state, zurueckgestellt: [], klaerfaelle: [] };
     const report: RegionReport = {
       region,
       finds: 0,
@@ -318,14 +329,15 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     };
     regions.push(report);
     /** verworfen; mit `persist` Wiedervorlage nach 8 Wochen, und ein offener Klärfall endet */
-    const reject = (find: Find, grund: string, persist: boolean) => {
-      report.rejected.push({ find, grund });
+    // `stufe`: die letzte bestandene, für die Kennzahlen des Evals (Plan 0050, E6)
+    const reject = (find: Find, grund: string, persist: boolean, stufe: Stufe) => {
+      report.rejected.push({ find, grund, stufe });
       log(`  ✗ ${find.name} (${find.url}): ${grund}`);
       if (persist) state = endKlaerfall(postpone(state, find, grund, o.today), find.url);
     };
     /** Klärfall (Plan 0050, E5): ohne Wiedervorlage; im Trockenlauf nur im Bericht */
-    const klaer = (find: Find, grund: string, art: KlaerfallArt) => {
-      report.klaerfaelle.push({ find, grund });
+    const klaer = (find: Find, grund: string, art: KlaerfallArt, stufe: Stufe, dublette?: true) => {
+      report.klaerfaelle.push({ find, grund, stufe, ...(dublette ? { dublette } : {}) });
       log(`  ? ${find.name} (${find.url}): ${grund}`);
       if (!o.dryRun) state = addKlaerfall(state, find, grund, art, o.today);
     };
@@ -389,8 +401,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     // 4.–7. je Kandidat: bewerten, geocodieren, Ertragsbeweis, IDs
     let open = keep.length;
     for (const find of keep) {
-      if (report.adopted.length >= o.maxNew) {
-        report.hints.push(`G3: höchstens ${o.maxNew} neue Anbieter je Lauf, ${open} Kandidaten nicht bewertet`);
+      if (report.adopted.length >= maxNew) {
+        report.hints.push(`G3: höchstens ${maxNew} neue Anbieter je Lauf, ${open} Kandidaten nicht bewertet`);
         break;
       }
       if (halted()) {
@@ -425,8 +437,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       } catch (e) {
         // nur 404/410 sagen etwas über den Kandidaten; Netz, 5xx, Bot-Schutz und leere Seiten sind technisch (E5)
         const reason = reasonOf(e);
-        if (GONE.test(reason)) reject(find, `Seite nicht abrufbar: ${reason}`, true);
-        else klaer(find, `Seite nicht abrufbar: ${reason}`, "kandidat");
+        if (GONE.test(reason)) reject(find, `Seite nicht abrufbar: ${reason}`, true, "vorfilter");
+        else klaer(find, `Seite nicht abrufbar: ${reason}`, "kandidat", "vorfilter");
         continue;
       }
       // Kontakt- oder Adressseiten derselben Website (Nutzerentscheid Option A); ein Fehler kostet nur diese Seite
@@ -452,18 +464,18 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       const assessed = a.call.result === "ok" ? parseAssessment(a.output) : { kind: "ungueltig" as const };
       if (assessed.kind === "ungueltig") {
         if (a.call.result === "ok") a.call.result = "invalid";
-        klaer(find, `Bewertung ohne gültige Antwort (${a.call.result})`, "kandidat");
+        klaer(find, `Bewertung ohne gültige Antwort (${a.call.result})`, "kandidat", "abgerufen");
         continue;
       }
       if (assessed.kind === "verwerfen") {
-        reject(find, assessed.grund, true);
+        reject(find, assessed.grund, true, "abgerufen");
         continue;
       }
 
       // 5. Geocodieren (4/min in io/geocode.ts), Orte in der bbox der Region (entryFromAssessment). Ein Ausfall für
       // einen Ort macht den ganzen Kandidaten zum Klärfall; „kein Treffer“ kostet nur den Ort (Plan 0050, E5)
       if (geocoderBlocked) {
-        klaer(find, "Geocoder gesperrt", "lauf");
+        klaer(find, "Geocoder gesperrt", "lauf", "aufnehmen");
         continue;
       }
       const geos: Array<GeoResult | null> = [];
@@ -478,7 +490,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         geos.push(g.kind === "treffer" ? g.geo : null);
       }
       if (outage !== undefined) {
-        klaer(find, `Geocoder-Ausfall: ${reasonOf(outage)}`, "lauf");
+        klaer(find, `Geocoder-Ausfall: ${reasonOf(outage)}`, "lauf", "aufnehmen");
         continue;
       }
       const built = entryFromAssessment(assessed.entry, {
@@ -492,15 +504,15 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         allowedUrls: allowedUrlsOf(find, fetchedFind),
       });
       if (!built.ok) {
-        if (built.klaerfall) klaer(find, built.grund, "kandidat");
-        else reject(find, built.grund, true);
+        if (built.klaerfall) klaer(find, built.grund, "kandidat", "aufnehmen", built.dublette);
+        else reject(find, built.grund, true, "aufnehmen");
         continue;
       }
       const entry = built.entry;
       // mögliche Dublette (E4.6): ähnlicher Name und Ort ≤ 100 m, auch gegen Aufnahmen dieses Laufs
       const twin = possibleDuplicate(entry, catalog);
       if (twin) {
-        klaer(find, twin, "kandidat");
+        klaer(find, twin, "kandidat", "orte", true);
         continue;
       }
       report.hints.push(...built.notes.map((n) => `${entry.id}: ${n}`));
@@ -518,8 +530,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       }
       if (proof.kind === "abgebrochen") break;
       if (proof.kind === "nein") {
-        if (proof.technisch) klaer(find, proof.grund, "kandidat");
-        else reject(find, proof.grund, true);
+        if (proof.technisch) klaer(find, proof.grund, "kandidat", "orte");
+        else reject(find, proof.grund, true, "orte");
         continue;
       }
 
@@ -532,6 +544,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
         grund: assessed.grund,
         first: { title: proof.first.title, start: proof.start, url: proof.first.url },
         ...(built.notes.length > 0 ? { notes: built.notes } : {}),
+        orte: entry.venues.map((v) => ({ lat: v.geo.lat, lon: v.geo.lon })),
       };
       const nextText = appendEntries(catalogText, [entry]);
       mkdirSync(dirname(outCatalog), { recursive: true });
@@ -543,7 +556,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
           o.commit(entry.id, newProviderCommitMessage(adopted));
         } catch (e) {
           if (e instanceof GateError) {
-            reject(find, e.message, false);
+            reject(find, e.message, false, "beweis");
             continue;
           }
           throw e;
@@ -553,6 +566,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       catalog = [...catalog, entry];
       state = endKlaerfall(state, find.url);
       report.adopted.push(adopted);
+      if (o.eval) adoptedTermine.set(entry.id, proof.termine);
       log(`  ✓ ${entry.id} (${find.url}): ${adopted.first.title}`);
     }
 
@@ -588,6 +602,43 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
       ...dryRunCatalogIssues(parse(originalCatalogText), parse(readFileSync(outCatalog, "utf8")), added, o.today),
     );
 
+  // Eval, Ziel 4: Ertragsbeweis des ausgeblendeten Handeintrags als Referenz für jeden wiedergefundenen
+  // (Plan 0050, E6); eigenes Verzeichnis, damit er den Beweis der Aufnahme nicht überschreibt
+  let hiddenReport: HiddenEval | undefined;
+  if (hidden && o.eval) {
+    hiddenReport = hiddenEval(hidden, regions, {
+      alt: new Set(o.eval.alt ?? []),
+      ...(o.eval.urteile ? { urteile: o.eval.urteile } : {}),
+    });
+    const window = yieldWindow(o.today);
+    const callsBefore = calls.length;
+    for (const outcome of hiddenReport.outcomes) {
+      const p = hidden.find((x) => x.id === outcome.id);
+      if (outcome.adoptedId === undefined || outcome.ziel4 === false || p?.role !== "anbieter") continue;
+      if (halted()) break;
+      const ref = await proveEntry(o, p, { proofRaw: join(o.runDir, "referenz"), controller, freeDays, horizon });
+      calls.push(...ref.calls);
+      if (ref.kind === "abort") {
+        stop(ref.abort);
+        break;
+      }
+      if (ref.kind === "abgebrochen") break;
+      const termine = ref.kind === "ja" ? ref.termine : (ref.termine ?? []);
+      const m = matchTermine(adoptedTermine.get(outcome.adoptedId) ?? [], termine, window);
+      // ohne Referenztermin zählt der Anbieter nicht zum Mittel; der Grund steht im Bericht (Arch-Review S2, m1)
+      const grund =
+        m.referenz > 0
+          ? undefined
+          : ref.kind === "nein" && termine.length === 0
+            ? `Referenz: ${ref.grund}`
+            : `Referenz ohne Termin bis +8 Wochen`;
+      outcome.ertrag = { ...m, ...(grund ? { grund } : {}) };
+    }
+    // Kosten der Referenz in kosten.csv bei der letzten Region (Arch-Review S2, m3)
+    csvRows.at(-1)?.calls.push(...calls.slice(callsBefore));
+    brake ??= brakeHit(calls, o.brakes);
+  }
+
   const report: DiscoverReport = {
     date: o.today,
     dryRun: o.dryRun,
@@ -599,7 +650,8 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     budgetHit,
     geocoder: geocoder.stats(),
     ...(gateErrors.length > 0 ? { gateErrors } : {}),
-    ...(hidden ? { hidden: hiddenEval(hidden, regions) } : {}),
+    ...(o.modelle ? { modelle: o.modelle } : {}),
+    ...(hiddenReport ? { hidden: hiddenReport } : {}),
   };
   mkdirSync(o.runDir, { recursive: true });
   writeFileSync(join(o.runDir, "kosten.jsonl"), costJsonl(calls, { run: "entdecken", date: o.today }));
@@ -627,13 +679,15 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
 }
 
 type Proof =
-  | { kind: "ja"; first: Offer; start: string; calls: CallRecord[] }
+  /** `termine`: alle gebauten Termine für 0–3 mit Lage, für den Ertrag im Eval (Plan 0050, E6) */
+  | { kind: "ja"; first: Offer; start: string; calls: CallRecord[]; termine: Termin[] }
   | {
       kind: "nein";
       grund: string;
       calls: CallRecord[];
       /** Abruf gescheitert: Klärfall (Plan 0050, E5) */
       technisch?: true;
+      termine?: Termin[];
     }
   | { kind: "abort"; abort: "auth" | "limit"; calls: CallRecord[] }
   | { kind: "abgebrochen"; calls: CallRecord[] };
@@ -707,7 +761,8 @@ async function proveEntry(
     extracted,
   });
   const yielded = proveYield(file?.offers ?? [], entry.id, input.text, now);
+  const termine = termineOf(file?.offers ?? [], entry.id, entry);
   return yielded.ok
-    ? { kind: "ja", first: yielded.first, start: yielded.start, calls: r.calls }
-    : { kind: "nein", grund: yielded.grund, calls: r.calls };
+    ? { kind: "ja", first: yielded.first, start: yielded.start, calls: r.calls, termine }
+    : { kind: "nein", grund: yielded.grund, calls: r.calls, termine };
 }

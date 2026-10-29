@@ -7,9 +7,11 @@ import type { Provider } from "../../../src/domain/schema.ts";
 import { ProvidersFile } from "../../../src/domain/schema.ts";
 import { normalizeAddress } from "../lib/address.ts";
 import { DISCOVER_BRAKES } from "../lib/cost.ts";
-import { DiscoverState } from "../lib/discover-state.ts";
+import { type Find, postpone } from "../lib/discover.ts";
+import { DiscoverState, emptyState } from "../lib/discover-state.ts";
 import type { CallRecord, Extractor } from "../lib/extract.ts";
 import type { PageOutcome } from "../lib/fetch.ts";
+import { addKlaerfall } from "../lib/klaerfall.ts";
 import { RawEvent } from "../lib/raw.ts";
 import type { FetchPlan } from "../lib/select.ts";
 import { type DiscoverDeps, type DiscoverOptions, runDiscover, type StepReply } from "./discover.ts";
@@ -209,6 +211,8 @@ const run = (d: ReturnType<typeof tempData>, f: Fakes, over: Partial<DiscoverOpt
     ...over,
   });
 
+const find = (name: string, url: string): Find => ({ name, url, warum: "0–3", quelle: "suche:Krabbelgruppe" });
+
 const kandidaten = (...list: Array<{ name: string; url: string }>) => ({
   Krabbelgruppe: { kandidaten: list.map((k) => ({ ...k, warum: "0–3" })) },
 });
@@ -391,7 +395,11 @@ describe("runDiscover (Plan 0032, E7)", () => {
     expect(fue?.region).toBe("fuerth");
     expect(fue?.adopted.map((a) => a.id)).toEqual(["kleeblatt-fuerth"]);
     expect(fue?.rejected).toEqual([
-      { find: expect.objectContaining({ url: MOE }), grund: expect.stringMatching(/^kein Ort in der Region Fürth/) },
+      {
+        find: expect.objectContaining({ url: MOE }),
+        grund: expect.stringMatching(/^kein Ort in der Region Fürth/),
+        stufe: "aufnehmen",
+      },
     ]);
     expect(fue?.dropped.map((x) => x.grund)).toEqual(["abgelehnt: Werbung"]);
     // Nürnberg: Fürther Fund steht schon im Katalog, Mögeldorf wird im selben Lauf hier aufgenommen (Review G3)
@@ -424,7 +432,9 @@ describe("runDiscover (Plan 0032, E7)", () => {
     const reg = r.regions[0];
     expect(reg?.adopted.map((a) => a.id)).toEqual(["krabbelzwerge-gostenhof"]);
     expect(reg?.adopted[0]?.first).toMatchObject({ title: "Krabbelgruppe", start: "2026-10-14T10:00:00+02:00" });
-    expect(reg?.rejected).toEqual([{ find: expect.objectContaining({ name: "Yoga Studio" }), grund: "unbekannt" }]);
+    expect(reg?.rejected).toEqual([
+      { find: expect.objectContaining({ name: "Yoga Studio" }), grund: "unbekannt", stufe: "abgerufen" },
+    ]);
     expect(reg?.dropped[0]?.grund).toMatch(/Katalog/);
     // data/ unverändert
     expect(readFileSync(join(d.dataDir, "providers.yaml"), "utf8")).toBe(before);
@@ -591,8 +601,19 @@ describe("runDiscover (Plan 0032, E7)", () => {
     );
   });
 
-  it("--hide: ausgeblendeter Anbieter wird wiedergefunden, Bericht nennt das Eval, G2 bleibt grün", async () => {
+  it("--eval: ausgeblendeter Anbieter wird wiedergefunden, Ertrag gegen die Referenz, G2 bleibt grün", async () => {
     const d = tempData();
+    // Zustand und G3 zählen im Eval nicht (Plan 0050, E6): zurückgestellt, offener Klärfall, maxNew 1
+    const pending = find("Krabbelzwerge Gostenhof", SITE);
+    const held = addKlaerfall(
+      postpone(emptyState("nuernberg"), pending, "kein Ertrag", TODAY),
+      find("Offener Klärfall", "https://klaer.example.net/"),
+      "Netz",
+      "kandidat",
+      TODAY,
+    );
+    mkdirSync(join(d.dataDir, "discover"));
+    writeFileSync(join(d.dataDir, "discover", "nuernberg.json"), JSON.stringify(held));
     const before = readFileSync(join(d.dataDir, "providers.yaml"), "utf8");
     const turnverein = "https://example.org/turnverein";
     const tvKurse = `${turnverein}/kinderturnen`;
@@ -611,25 +632,41 @@ describe("runDiscover (Plan 0032, E7)", () => {
       },
     });
     const seen: { known?: ReadonlyMap<string, GeoResult> } = {};
+    // Lage des ersten Turnverein-Orts: Der Fake-Extraktor legt Referenz und Fund an denselben Termin
+    const tvGeo = { lat: 49.4392, lon: 11.0442, display: "Turnhalle" };
     const r = await run(
       d,
       {},
       {
-        hide: ["turnverein-beispiel", "theater-beispiel"],
+        maxNew: 1,
+        eval: {
+          ids: ["turnverein-beispiel", "theater-beispiel"],
+          alt: ["theater-beispiel"],
+          urteile: { [SITE]: { urteil: "passend", datum: TODAY } },
+        },
         deps: {
           ...base,
-          geocoder: fakeGeocoder(undefined, seen),
+          geocoder: fakeGeocoder(async () => tvGeo, seen),
           fetchPage: async (url) =>
             page(url, url === turnverein ? `<p>Eltern-Kind-Turnen</p><a href="${tvKurse}">Kurse</a>` : HOME),
         },
       },
     );
     expect(r.regions[0]?.adopted.map((a) => a.id)).toEqual(["turnverein-beispiel", "krabbelzwerge-gostenhof"]);
-    expect(r.hidden?.outcomes.map((o) => [o.id, o.ergebnis])).toEqual([
-      ["theater-beispiel", "nicht gefunden"],
-      ["turnverein-beispiel", "aufgenommen"],
+    expect(r.regions[0]?.finds).toBe(2);
+    expect(r.hidden?.outcomes.map((o) => [o.id, o.ergebnis, o.alt, o.stufe])).toEqual([
+      ["theater-beispiel", "nicht gefunden", true, undefined],
+      ["turnverein-beispiel", "aufgenommen", undefined, "beweis"],
     ]);
-    expect(r.hidden?.extra.map((a) => a.id)).toEqual(["krabbelzwerge-gostenhof"]);
+    // Mittwochs 14.10. bis 2.12.: acht Termine im Fenster bis +8 Wochen, alle am selben Ort
+    expect(r.hidden?.outcomes[1]?.ertrag).toEqual({ treffer: 8, referenz: 8 });
+    expect(existsSync(join(d.runDir, "referenz", "turnverein-beispiel.json"))).toBe(true);
+    expect(r.hidden?.extra.map((a) => [a.id, a.urteil?.urteil])).toEqual([["krabbelzwerge-gostenhof", "passend"]]);
+    expect(r.calls.filter((c) => c.step === "extract")).toHaveLength(3);
+    expect(JSON.parse(readFileSync(join(d.runDir, "report.json"), "utf8")).hidden.outcomes[1].ertrag).toEqual({
+      treffer: 8,
+      referenz: 8,
+    });
     expect(r.gateErrors).toBeUndefined();
     expect(JSON.parse(readFileSync(join(d.runDir, "report.json"), "utf8")).hidden.outcomes).toHaveLength(2);
     // data/ unverändert, der Katalog des Laufs kennt den ausgeblendeten nur als neuen Eintrag
@@ -649,9 +686,24 @@ describe("runDiscover (Plan 0032, E7)", () => {
     expect(venues("familientreff-beispiel").some((a) => seen.known?.has(a))).toBe(true);
   });
 
-  it("--hide nur im Trockenlauf", async () => {
-    await expect(run(tempData(), {}, { dryRun: false, hide: ["turnverein-beispiel"] })).rejects.toThrow(/Trockenlauf/);
-    await expect(run(tempData(), {}, { hide: ["sammelkalender-beispiel"] })).rejects.toThrow(/kein Anbieter/);
+  it("--eval nur im Trockenlauf und nur mit Anbietern der Regionen", async () => {
+    await expect(run(tempData(), {}, { dryRun: false, eval: { ids: ["turnverein-beispiel"] } })).rejects.toThrow(
+      /Trockenlauf/,
+    );
+    await expect(run(tempData(), {}, { eval: { ids: ["sammelkalender-beispiel"] } })).rejects.toThrow(/kein Anbieter/);
+  });
+
+  it("Verworfene und Klärfälle tragen die letzte bestandene Stufe (Plan 0050, E6)", async () => {
+    const r = await run(tempData(), {
+      search: kandidaten(
+        { name: "Krabbelzwerge Gostenhof", url: SITE },
+        { name: "Babytreff", url: "https://babytreff.example.net/" },
+      ),
+      assess: { [SITE]: assessOk("Krabbelzwerge Gostenhof") },
+      geocode: async () => null,
+    });
+    expect(r.regions[0]?.klaerfaelle.map((k) => k.stufe)).toEqual(["aufnehmen"]);
+    expect(r.regions[0]?.rejected.map((k) => k.stufe)).toEqual(["abgerufen"]);
   });
 });
 
@@ -741,6 +793,8 @@ describe("Härte: Orte und Klärfälle (Plan 0050, E5)", () => {
     });
     expect(r.regions[0]?.adopted).toEqual([]);
     expect(r.regions[0]?.klaerfaelle[0]?.grund).toBe(`Dublette von ${twin.id}? (ähnlicher Name, Ort ≤ 100 m)`);
+    // Kennzahl „Dubletten“ im Eval hängt am Feld, nicht am Wortlaut (Arch-Review S2, m4)
+    expect(r.regions[0]?.klaerfaelle[0]?.dublette).toBe(true);
   });
 
   it("Klärfälle gelangen im Trockenlauf nicht in den Zustand", async () => {

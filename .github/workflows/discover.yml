@@ -41,13 +41,24 @@ on:
       terms:
         description: "nur diese Suchbegriffe (Komma-Liste, Teilwörter; leer = alle)"
         default: ""
+      eval:
+        description: "Entdecken-Eval (Plan 0050, E6): Nürnberg und Fürth, Stichprobe ausgeblendet, nur trocken"
+        type: boolean
+        default: false
+      model:
+        description: "nur mit eval: Modell für Suche und Bewerten (leer = opus)"
+        default: ""
+      effort:
+        description: "nur mit eval: Effort für Suche und Bewerten (leer = high)"
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  # gemeinsam mit nightly.yml (E6); ein verworfener wartender Lauf ist hinnehmbar
-  group: daten
+  # gemeinsam mit nightly.yml (E6); ein verworfener wartender Lauf ist hinnehmbar. Ein Eval schreibt nichts und
+  # wartet nicht auf die Daten-Läufe; dass er den Nachtlauf nicht schneidet, prüft der Job `modus` (Plan 0050, E6).
+  group: ${{ inputs.eval && 'entdecken-eval' || 'daten' }}
   cancel-in-progress: false
 
 env:
@@ -75,12 +86,37 @@ jobs:
           EVENT: ${{ github.event_name }}
           VAR_MODUS: ${{ vars.ENTDECKEN_MODUS }}
           INPUT_MODUS: ${{ inputs.modus }}
+          INPUT_EVAL: ${{ inputs.eval }}
+          INPUT_MODEL: ${{ inputs.model }}
+          INPUT_EFFORT: ${{ inputs.effort }}
+          INPUT_REGION: ${{ inputs.region }}
           REF: ${{ github.ref }}
+          # timeout-minutes des Jobs entdecken (Test: discover-workflow.test.ts)
+          TIMEOUT_MIN: "330"
         run: |
           if [[ "$EVENT" == schedule ]]; then modus="${VAR_MODUS:-trocken}"; else modus="${INPUT_MODUS:-trocken}"; fi
           case "$modus" in trocken|live) ;; *) echo "::error::unbekannter Modus: $modus"; exit 1 ;; esac
           if [[ "$modus" == live && "$REF" != refs/heads/main ]]; then
             echo "::error::Modus live nur auf main ($REF)"; exit 1
+          fi
+          if [[ "$INPUT_EVAL" == true ]]; then
+            [[ "$modus" == trocken ]] || { echo "::error::eval nur im Modus trocken"; exit 1; }
+            # vor der Einrichtung ablehnen statt erst in der CLI (Arch-Review S2, m5)
+            [[ -z "$INPUT_REGION" ]] || { echo "::error::eval läuft immer für Nürnberg und Fürth, ohne region"; exit 1; }
+            # Ein Eval läuft neben dem Nachtlauf (eigene concurrency-Gruppe) und darf dessen Fenster 01:30–04:30 UTC
+            # nicht schneiden, von Start bis Start + Timeout (Plan 0050, E6), dazu 20 Min. für Warteschlange und
+            # Einrichtung vor dem Job entdecken. JETZT_UTC nur für den Test.
+            jetzt="${JETZT_UTC:-$(date -u +%H:%M)}"
+            start=$((10#${jetzt%:*} * 60 + 10#${jetzt#*:}))
+            ende=$((start + TIMEOUT_MIN + 20))
+            for fenster in 90 1530; do
+              if (( start < fenster + 180 && ende > fenster )); then
+                echo "::error::Eval um $jetzt UTC schnitte den Nachtlauf (01:30–04:30 UTC, Job bis $TIMEOUT_MIN Min.)"
+                exit 1
+              fi
+            done
+          elif [[ -n "$INPUT_MODEL$INPUT_EFFORT" ]]; then
+            echo "::error::model und effort nur mit eval"; exit 1
           fi
           echo "modus=$modus" >> "$GITHUB_OUTPUT"
           echo "Modus: **$modus** ($EVENT)" >> "$GITHUB_STEP_SUMMARY"
@@ -139,6 +175,9 @@ jobs:
           MAX_NEW: ${{ inputs.max_new }}
           MAX_CALLS: ${{ inputs.max_calls }}
           MAX_TOKENS: ${{ inputs.max_tokens }}
+          EVAL: ${{ inputs.eval }}
+          MODEL: ${{ inputs.model }}
+          EFFORT: ${{ inputs.effort }}
           # Commits nur lokal im Runner (G4); gepusht wird im Job veroeffentlichen. Der pre-commit-Hook entfällt,
           # G1 (data:validate, check:fast) läuft vor jedem Commit im Lauf selbst.
           GIT_AUTHOR_NAME: github-actions[bot]
@@ -153,6 +192,10 @@ jobs:
           [[ "$BOOTSTRAP" == true ]] && args+=(--bootstrap)
           [[ -n "$REGION" ]] && args+=(--region "$REGION")
           [[ -n "$TERMS" ]] && args+=(--terms "$TERMS")
+          # Eval: Nürnberg und Fürth, Opus high, soweit model/effort nichts anderes sagen (Plan 0050, E7)
+          [[ "$EVAL" == true ]] && args+=(--eval)
+          [[ -n "$MODEL" ]] && args+=(--model "$MODEL")
+          [[ -n "$EFFORT" ]] && args+=(--effort "$EFFORT")
           pnpm pipeline discover "${args[@]}"
       - name: Geocoder-Cache sichern
         if: always()

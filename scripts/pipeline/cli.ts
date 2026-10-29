@@ -33,7 +33,8 @@
  *                                               rot, außer mit --report-only. --waechter: Befunde des Wächters
  *                                               (Plan 0048, E10) nach RUN_DIR/waechter.md (leer: nichts offen) und
  *                                               in den Bericht; nur mit nightly.json.
- *   discover [--region <id>] [--bootstrap] [--dry-run] [--terms a,b] [--hide a,b]
+ *   discover [--region <id>] [--bootstrap] [--dry-run] [--terms a,b] [--eval] [--run-dir <pfad>]
+ *            [--model <name>] [--effort <stufe>]
  *                                               Entdecken neuer Anbieter (Plan 0032, E7) je Region aus REGION_IDS:
  *                                               Sammelkalender, Verzeichnisse, Websuche → Vorfilter → Bewerten →
  *                                               Geocodieren → Ertragsbeweis (refreshProvider) → je Anbieter ein Commit
@@ -42,10 +43,14 @@
  *                                               Commit. G3: höchstens 10 neue je Region, mit --bootstrap MAX_NEW
  *                                               (Standard 30). Bremsen MAX_CALLS (1500), MAX_TOKENS (150 Mio.),
  *                                               Zeitbudget RUN_BUDGET_MIN (240). --terms: nur diese Suchbegriffe (Probe).
- *                                               --hide (nur mit --dry-run): Entdecken-Eval (E9), diese Anbieter gelten
- *                                               als unbekannt; der Bericht zählt, welche wiedergefunden werden.
- *                                               G3 (auch MAX_NEW mit --bootstrap) steigt dabei um die
- *                                               Zahl der ausgeblendeten.
+ *                                               --eval (nur mit --dry-run, ohne --region): Entdecken-Eval (Plan 0050,
+ *                                               E6) für Nürnberg und Fürth; die Stichprobe aus evals/discover.json
+ *                                               gilt als unbekannt, ohne zurückgestellte, Klärfälle und G3; Bericht
+ *                                               mit Kennzahlen je Stufe, Ertrag gegen die Referenz, Urteilen aus
+ *                                               evals/discover-urteile.json und der Zeile für evals/results.md.
+ *                                               Eigenes Laufverzeichnis (-2, -3 …) oder --run-dir. Modell: Opus high
+ *                                               für alle fünf LLM_*-Variablen, soweit nicht gesetzt.
+ *                                               --model/--effort: Suche und Bewerten (vor LLM_*_DISCOVER).
  *   discover-publish RUN_DIR                    Commits des Entdeckens nach main (pull --rebase, validate-data,
  *                                               push); schreibt RUN_DIR/issue.md, wenn ein Anbieter neu ist (E7.10).
  *   holidays FROM TO                            freie Tage (Ferien/Feiertage Bayern)
@@ -64,7 +69,7 @@
 import { execFileSync } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
@@ -82,18 +87,30 @@ import {
   modelKey,
 } from "./io/extract.ts";
 import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
-import { git, ROOT, readCatalog, readJson, readPreviousOffers, readRawDir, writeJson } from "./io/files.ts";
+import {
+  DISCOVER_EVAL,
+  DISCOVER_URTEILE,
+  git,
+  ROOT,
+  readCatalog,
+  readJson,
+  readPreviousOffers,
+  readRawDir,
+  writeJson,
+} from "./io/files.ts";
 import { checkFaelle, createGeocoder, GeocodeFaelle, recordingKey } from "./io/geocode.ts";
 import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays } from "./io/holidays.ts";
 import { fetchPage } from "./io/http.ts";
 import { liveStatus } from "./io/live.ts";
+import { EFFORTS } from "./io/llm.ts";
 import { DEFAULT_BUDGET_MIN, runBuildOnly, runNightly } from "./io/nightly.ts";
 import { publishNightly } from "./io/publish.ts";
 import type { Candidate } from "./lib/candidate.ts";
 import { DISCOVER_BRAKES, parseBrakes } from "./lib/cost.ts";
 import { abortOf, MAX_NEW_PER_RUN, newProvidersIssue, renderDiscoverReport } from "./lib/discover.ts";
 import { selectTerms } from "./lib/discover-terms.ts";
+import { DiscoverEvalSchema, evalRegions, freshRunDir, modelEnv, UrteileSchema } from "./lib/eval-discover.ts";
 import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
 import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
@@ -132,7 +149,10 @@ const { positionals, values } = parseArgs({
     region: { type: "string" },
     bootstrap: { type: "boolean", default: false },
     terms: { type: "string" },
-    hide: { type: "string" },
+    eval: { type: "boolean", default: false },
+    "run-dir": { type: "string" },
+    model: { type: "string" },
+    effort: { type: "string" },
     "build-only": { type: "boolean", default: false },
     umstellen: { type: "string" },
     venue: { type: "string" },
@@ -393,18 +413,39 @@ async function geocodeCmd() {
 /** Entdecken (Plan 0032, E7). Exit 1 nur bei G2 oder Programmfehler; Abbruch und Bremse enden geordnet (Ampel rot). */
 async function discoverCmd() {
   const date = today();
-  const runDir = join(ROOT, "runs", date, "discover");
+  const dryRun = values["dry-run"];
+  const isEval = values.eval;
+  if (isEval && !dryRun) fail("--eval nur mit --dry-run (Entdecken-Eval)");
+  // die Stichprobe enthält Fürther Anbieter: --eval läuft immer für Nürnberg und Fürth zusammen (Plan 0050, E6)
+  if (isEval && values.region) fail("--eval läuft immer für Nürnberg und Fürth zusammen, ohne --region");
+  if (values.effort && !EFFORTS.some((e) => e === values.effort))
+    fail(`--effort ungültig: ${values.effort} (erlaubt: ${EFFORTS.join(", ")})`);
+  if (values.model && !/^[a-z][a-z0-9.-]*$/.test(values.model)) fail(`--model ungültig: ${values.model}`);
+  // vor jedem Lesen der Umgebung: Option vor Umgebung vor Eval-Standard (Plan 0050, E7)
+  Object.assign(
+    process.env,
+    modelEnv(process.env, {
+      eval: isEval,
+      ...(values.model ? { model: values.model } : {}),
+      ...(values.effort ? { effort: values.effort } : {}),
+    }),
+  );
+  const base = join(ROOT, "runs", date, "discover");
+  const runDir = values["run-dir"] ? resolve(values["run-dir"]) : isEval ? freshRunDir(base, existsSync) : base;
   actionsOutput("run_dir", runDir);
-  const regions: RegionId[] = values.region
-    ? [REGION_IDS.find((r) => r === values.region) ?? fail(`unbekannte Region: ${values.region}`)]
-    : [...REGION_IDS];
+  const regions: RegionId[] = isEval
+    ? evalRegions("nuernberg")
+    : values.region
+      ? [REGION_IDS.find((r) => r === values.region) ?? fail(`unbekannte Region: ${values.region}`)]
+      : [...REGION_IDS];
+  const sample = isEval ? DiscoverEvalSchema.parse(readJson(DISCOVER_EVAL)).stichproben["nuernberg"] : undefined;
+  if (isEval && !sample) fail(`${DISCOVER_EVAL}: Stichprobe nuernberg fehlt`);
   const brakes = parseBrakes(process.env, DISCOVER_BRAKES);
   if (!brakes.ok) fail(brakes.error);
   const budgetMin = Number(process.env["RUN_BUDGET_MIN"] || DISCOVER_BUDGET_MIN);
   if (!(budgetMin > 0)) fail(`RUN_BUDGET_MIN ungültig: ${process.env["RUN_BUDGET_MIN"]}`);
-  // Entdecken-Eval: G3 darf keinen ausgeblendeten Anbieter verdrängen (Arch-Review S5, M1)
-  const evalHidden = values.hide?.split(",").filter(Boolean).length ?? 0;
-  const maxNew = (values.bootstrap ? Number(process.env["MAX_NEW"] || 30) : MAX_NEW_PER_RUN) + evalHidden;
+  // im Eval ohne G3 (runDiscover)
+  const maxNew = values.bootstrap ? Number(process.env["MAX_NEW"] || 30) : MAX_NEW_PER_RUN;
   if (!(Number.isInteger(maxNew) && maxNew > 0)) fail(`MAX_NEW ungültig: ${process.env["MAX_NEW"]}`);
   let terms: string[];
   try {
@@ -412,10 +453,6 @@ async function discoverCmd() {
   } catch (e) {
     fail((e as Error).message);
   }
-  const dryRun = values["dry-run"];
-  const hide = values.hide?.split(",").filter(Boolean);
-  if (hide && !dryRun) fail("--hide nur mit --dry-run (Entdecken-Eval)");
-  if (hide?.length === 0) fail("--hide ohne Anbieter");
   // live: G1 erst auf dem Ausgangsstand; ist der schon rot, würde jeder Kandidat still verworfen (Arch-Review S4, m1)
   if (!dryRun)
     try {
@@ -426,6 +463,10 @@ async function discoverCmd() {
   // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf: Der Zustand des Ertragsbeweises gilt dort weiter (E1)
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const effort = effortOf(process.env);
+  const step = (m: string | undefined, e: string | undefined) => `${m}/${e || "Standard"}`;
+  const modelle =
+    `Suche/Bewerten ${step(process.env["LLM_MODEL_DISCOVER"] ?? "haiku", process.env["LLM_EFFORT_DISCOVER"])}, ` +
+    `Beweis ${step(model, effort)} (Fallback ${process.env["LLM_MODEL_FALLBACK"] ?? "sonnet"})`;
   const r = await runDiscover({
     regions,
     dataDir: join(ROOT, "data"),
@@ -434,7 +475,16 @@ async function discoverCmd() {
     dryRun,
     maxNew,
     terms,
-    ...(hide ? { hide } : {}),
+    modelle,
+    ...(sample
+      ? {
+          eval: {
+            ids: sample.map((s) => s.id),
+            alt: sample.filter((s) => s.alt).map((s) => s.id),
+            urteile: UrteileSchema.parse(readJson(DISCOVER_URTEILE)).urteile,
+          },
+        }
+      : {}),
     brakes: brakes.brakes,
     budgetMin,
     keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },

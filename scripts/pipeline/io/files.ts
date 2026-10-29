@@ -19,6 +19,8 @@ const OFFERS = join(ROOT, "data/offers.json");
 export const RAW_DIR = join(ROOT, "data/raw");
 /** Stichproben und Trägerarten des Entdecken-Evals (Plan 0050, E6) */
 export const DISCOVER_EVAL = join(ROOT, "evals/discover.json");
+/** Urteile von Hand über zusätzliche Aufnahmen im Entdecken-Eval (Plan 0050, Ziel 3) */
+export const DISCOVER_URTEILE = join(ROOT, "evals/discover-urteile.json");
 
 export const readJson = (file: string): unknown => JSON.parse(readFileSync(file, "utf8"));
 /** Atomar (temporäre Datei, dann umbenennen): Ein Abbruch mitten im Schreiben hinterlässt keine kaputte Datei. */

@@ -20,6 +20,17 @@ import { removeEntries } from "./catalog-yaml.ts";
 import { summarizeCosts } from "./cost.ts";
 import type { DiscoverState } from "./discover-state.ts";
 import { searchQuery } from "./discover-terms.ts";
+import {
+  type EvalOutcome,
+  forUnderThree,
+  type Kennzahlen,
+  kennzahlen,
+  quellenZahlen,
+  resultsRow,
+  STUFEN,
+  type Stufe,
+  type Urteile,
+} from "./eval-discover.ts";
 import type { CallRecord } from "./extract.ts";
 import { matchCandidate } from "./match.ts";
 import { isInternalHost } from "./redirect.ts";
@@ -474,7 +485,7 @@ export function entryFromAssessment(
     geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined } | null>;
     allowedUrls: readonly string[];
   },
-): { ok: true; entry: Anbieter; notes: string[] } | { ok: false; grund: string; klaerfall?: true } {
+): { ok: true; entry: Anbieter; notes: string[] } | { ok: false; grund: string; klaerfall?: true; dublette?: true } {
   const allowed = new Set(ctx.allowedUrls.flatMap((u) => normalizeUrl(u) ?? []));
   const notes: string[] = [];
   const programme = a.programme.filter((g) => {
@@ -489,7 +500,8 @@ export function entryFromAssessment(
     ctx.catalog.flatMap((p) => p.programme.flatMap((g) => normalizeUrl(g.url) ?? []).map((n) => [n, p.id] as const)),
   );
   const owner = programme.map((g) => knownPages.get(normalizeUrl(g.url) ?? "")).find(Boolean);
-  if (owner) return { ok: false, grund: `Dublette von ${owner}? (gleiche Programmseite)`, klaerfall: true };
+  if (owner)
+    return { ok: false, grund: `Dublette von ${owner}? (gleiche Programmseite)`, klaerfall: true, dublette: true };
   const { bbox } = REGIONS[ctx.region];
   if (ctx.geos.length !== a.venues.length) return { ok: false, grund: "Orte ohne Koordinaten" };
   // Orte außerhalb der Region fallen weg (Nutzerentscheid 2026-10-11, wie „musikfuechse nur Nürnberg“), ebenso Orte
@@ -618,7 +630,7 @@ export function proveYield(
   const t = Date.parse(now);
   // je Angebot der erste künftige Termin; berichtet wird das Angebot mit dem frühesten (Arch-Review S4, m4)
   const next = offers
-    .filter((o) => o.providerId === providerId && (o.age === undefined || o.age.minMonths <= 36))
+    .filter((o) => o.providerId === providerId && forUnderThree(o))
     .flatMap((o) => {
       const s = o.sessions.find((x) => Date.parse(x.start) >= t);
       return s ? [{ first: o, start: s.start }] : [];
@@ -639,6 +651,8 @@ export interface Adopted {
   first: { title: string; start: string; url: string };
   /** Hinweise zum Eintrag (weggelassene Orte und Programmseiten), auch im Commit-Text */
   notes?: string[];
+  /** Lage der Orte des Eintrags: Zuordnung über Ortsnähe im Eval (Plan 0050, E6) */
+  orte?: Array<{ lat: number; lon: number }>;
 }
 
 export interface RegionReport {
@@ -647,9 +661,10 @@ export interface RegionReport {
   finds: number;
   dropped: Array<{ find: Find; grund: string; bekannt?: true }>;
   adopted: Adopted[];
-  rejected: Array<{ find: Find; grund: string }>;
+  /** `stufe`: die letzte bestandene (Plan 0050, E6); ohne Angabe gilt „vorfilter“ */
+  rejected: Array<{ find: Find; grund: string; stufe?: Stufe }>;
   /** aufgehalten aus technischem Grund oder als mögliche Dublette (Plan 0050, E5) */
-  klaerfaelle: Array<{ find: Find; grund: string }>;
+  klaerfaelle: Array<{ find: Find; grund: string; stufe?: Stufe; dublette?: true }>;
   /** nach dem Vorfilter übrig, aber nicht bewertet (G3, Bremse, Zeitbudget, Abbruch) */
   unassessed?: Find[];
   hints: string[];
@@ -668,24 +683,18 @@ export interface DiscoverReport {
   geocoder?: { requests: number; waitMs: number };
   /** G2 im Trockenlauf verletzt (im Modus live bricht G2 den Lauf ab) */
   gateErrors?: string[];
-  /** Entdecken-Eval (`--hide`): was aus den ausgeblendeten Anbietern wurde */
+  /** Modell und Effort je Schritt („Suche/Bewerten opus/high, Beweis opus/high“), für Bericht und results.md */
+  modelle?: string;
+  /** Entdecken-Eval (`--eval`): was aus den ausgeblendeten Anbietern wurde */
   hidden?: HiddenEval;
 }
 
-/** Ausgang eines ausgeblendeten Anbieters im Entdecken-Eval; Vorrang in dieser Reihenfolge */
-interface HiddenOutcome {
-  id: string;
-  name: string;
-  ergebnis: "aufgenommen" | "verworfen" | "klärfall" | "nicht bewertet" | "vorfilter" | "nicht gefunden";
-  /** Fund-URL des passenden Kandidaten */
-  url?: string;
-  grund?: string;
-}
-
 export interface HiddenEval {
-  outcomes: HiddenOutcome[];
-  /** aufgenommen, aber zu keinem ausgeblendeten passend: neu oder falsch, von Hand zu beurteilen */
-  extra: Adopted[];
+  outcomes: EvalOutcome[];
+  /** aufgenommen, aber zu keinem ausgeblendeten passend: neu oder falsch, Urteil aus `evals/discover-urteile.json` */
+  extra: Array<Adopted & { urteil?: Urteile[string] }>;
+  /** zweite Aufnahme eines schon zugeordneten Anbieters: zählt als falsch (Ziel 3) */
+  doppelt: Adopted[];
 }
 
 /**
@@ -723,37 +732,101 @@ function matchesProvider(find: Find, p: Provider): boolean {
 const adoptedMatches = (a: Adopted, p: Provider): boolean =>
   matchesProvider(a.find, p) || matchesProvider({ ...a.find, name: a.name }, p);
 
-/** Wertet einen Lauf mit ausgeblendeten Anbietern aus: je Anbieter der beste Ausgang, dazu fremde Aufnahmen. */
-export function hiddenEval(hidden: readonly Provider[], regions: readonly RegionReport[]): HiddenEval {
+/**
+ * Wie gut eine Aufnahme zu einem ausgeblendeten Anbieter passt (Plan 0050, E6): 3 gleiche URL, 2 gleicher Host mit
+ * ähnlichem Namen, 1 ähnlicher Name mit Ort ≤ 100 m, 0 gar nicht. Der Host allein genügt nie: Auf geteilten Websites
+ * (Gemeinden auf stadtkirche-nuernberg.de) stehen viele Anbieter.
+ */
+function matchScore(a: Adopted, p: Provider): number {
+  const n = normalizeUrl(a.find.url);
+  if (n && urlsOf(p).some((u) => normalizeUrl(u) === n)) return 3;
+  if (adoptedMatches(a, p)) return 2;
+  const near =
+    p.role === "anbieter" &&
+    (a.orte ?? []).some((g) => p.venues.some((v) => haversineMeters(v.geo, g) <= DUPLICATE_RADIUS_M));
+  return near && similarName(a.name, p.name) ? 1 : 0;
+}
+
+const quelleArt = (f: Find) => f.quelle.split(":")[0] ?? f.quelle;
+
+/**
+ * Wertet einen Lauf mit ausgeblendeten Anbietern aus: Aufnahmen 1:1 zugeordnet (beste Passung zuerst), je Anbieter
+ * der beste Ausgang, die weiteste Stufe und die Quellen; dazu fremde und doppelte Aufnahmen.
+ */
+export function hiddenEval(
+  hidden: readonly Provider[],
+  regions: readonly RegionReport[],
+  o: { alt?: ReadonlySet<string>; urteile?: Urteile } = {},
+): HiddenEval {
   const adopted = regions.flatMap((r) => r.adopted);
   const rejected = regions.flatMap((r) => r.rejected);
   const klaerfaelle = regions.flatMap((r) => r.klaerfaelle);
   const dropped = regions.flatMap((r) => r.dropped);
   const unassessed = regions.flatMap((r) => r.unassessed ?? []);
-  const outcomes = [...hidden]
-    .sort((a, b) => a.id.localeCompare(b.id))
-    .map((p): HiddenOutcome => {
-      const base = { id: p.id, name: p.name };
-      const a = adopted.find((x) => adoptedMatches(x, p));
-      if (a) return { ...base, ergebnis: "aufgenommen", url: a.find.url };
-      const r = rejected.find((x) => matchesProvider(x.find, p));
-      if (r) return { ...base, ergebnis: "verworfen", url: r.find.url, grund: r.grund };
-      const k = klaerfaelle.find((x) => matchesProvider(x.find, p));
-      if (k) return { ...base, ergebnis: "klärfall", url: k.find.url, grund: k.grund };
-      const u = unassessed.find((x) => matchesProvider(x, p));
-      if (u)
-        return {
-          ...base,
-          ergebnis: "nicht bewertet",
-          url: u.url,
-          grund: "Lauf vor dem Bewerten beendet (G3, Bremse, Zeit)",
-        };
-      const d = dropped.find((x) => matchesProvider(x.find, p));
-      if (d) return { ...base, ergebnis: "vorfilter", url: d.find.url, grund: d.grund };
-      return { ...base, ergebnis: "nicht gefunden" };
+  const sorted = [...hidden].sort((a, b) => a.id.localeCompare(b.id));
+
+  const pairs = adopted
+    .flatMap((a, ai) => sorted.map((p, pi) => ({ ai, pi, score: matchScore(a, p) })))
+    .filter((x) => x.score > 0)
+    .sort((x, y) => y.score - x.score || x.pi - y.pi || x.ai - y.ai);
+  const byProvider = new Map<number, number>();
+  const assigned = new Set<number>();
+  for (const { ai, pi } of pairs)
+    if (!byProvider.has(pi) && !assigned.has(ai)) {
+      byProvider.set(pi, ai);
+      assigned.add(ai);
+    }
+
+  const outcomes = sorted.map((p, pi): EvalOutcome => {
+    const ai = byProvider.get(pi);
+    const a = ai === undefined ? undefined : adopted[ai];
+    const touched: Array<{ find: Find; stufe: Stufe }> = [
+      ...(a ? [{ find: a.find, stufe: "beweis" as const }] : []),
+      ...[...rejected, ...klaerfaelle]
+        .filter((x) => matchesProvider(x.find, p))
+        .map((x) => ({ find: x.find, stufe: x.stufe ?? ("vorfilter" as const) })),
+      ...unassessed.filter((f) => matchesProvider(f, p)).map((find) => ({ find, stufe: "vorfilter" as const })),
+      ...dropped.filter((x) => matchesProvider(x.find, p)).map((x) => ({ find: x.find, stufe: "gefunden" as const })),
+    ];
+    const stufe = touched.reduce<Stufe | undefined>(
+      (best, t) => (best === undefined || STUFEN.indexOf(t.stufe) > STUFEN.indexOf(best) ? t.stufe : best),
+      undefined,
+    );
+    const base = {
+      id: p.id,
+      name: p.name,
+      ...(o.alt?.has(p.id) ? { alt: true as const } : {}),
+      ...(stufe ? { stufe } : {}),
+      quellen: [...new Set(touched.map((t) => quelleArt(t.find)))].sort(),
+      ...(p.role === "anbieter" && p.coveredBy !== undefined ? { ziel4: false as const } : {}),
+    };
+    if (a) return { ...base, ergebnis: "aufgenommen", url: a.find.url, adoptedId: a.id };
+    const r = rejected.find((x) => matchesProvider(x.find, p));
+    if (r) return { ...base, ergebnis: "verworfen", url: r.find.url, grund: r.grund };
+    const k = klaerfaelle.find((x) => matchesProvider(x.find, p));
+    if (k) return { ...base, ergebnis: "klärfall", url: k.find.url, grund: k.grund };
+    const u = unassessed.find((x) => matchesProvider(x, p));
+    if (u)
+      return {
+        ...base,
+        ergebnis: "nicht bewertet",
+        url: u.url,
+        grund: "Lauf vor dem Bewerten beendet (G3, Bremse, Zeit)",
+      };
+    const d = dropped.find((x) => matchesProvider(x.find, p));
+    if (d) return { ...base, ergebnis: "vorfilter", url: d.find.url, grund: d.grund };
+    return { ...base, ergebnis: "nicht gefunden" };
+  });
+  const urteile = new Map(Object.entries(o.urteile ?? {}).map(([url, u]) => [normalizeUrl(url) ?? url, u]));
+  const free = adopted.filter((_, ai) => !assigned.has(ai));
+  const doppelt = free.filter((a) => sorted.some((p) => matchScore(a, p) > 0));
+  const extra = free
+    .filter((a) => !doppelt.includes(a))
+    .map((a) => {
+      const urteil = urteile.get(normalizeUrl(a.find.url) ?? a.find.url);
+      return urteil ? { ...a, urteil } : a;
     });
-  const extra = adopted.filter((a) => !hidden.some((p) => adoptedMatches(a, p)));
-  return { outcomes, extra };
+  return { outcomes, extra, doppelt };
 }
 
 /** G4: ein Commit je Anbieter mit Fund-URL, Grund und erstem Angebot */
@@ -870,23 +943,101 @@ export function renderDiscoverReport(r: DiscoverReport): string {
     out.push("", "## Hinweise ohne Aktion", "");
     out.push(...(reg.hints.length > 0 ? reg.hints.map((h) => `- ${cell(h)}`) : ["keine"]));
   }
-  if (r.hidden) out.push("", ...hiddenSection(r.hidden));
+  if (r.hidden) out.push("", ...hiddenSection(r, r.hidden));
   out.push("", ...costSection(summarizeCosts(r.calls, { cached: 0 }), results));
   return `${out.join("\n")}\n`;
 }
 
-function hiddenSection(h: HiddenEval): string[] {
+/** Ein Lauf, den Abbruch, Bremse oder Zeitbudget beendet hat, zählt im Eval nicht (Plan 0050, Ziel) */
+function validity(r: DiscoverReport): string {
+  const why = [
+    ...(r.abort ? [`Abbruch ${r.abort}`] : []),
+    ...(r.brake ? [`Bremse ${r.brake}`] : []),
+    ...(r.budgetHit ? ["Zeitbudget"] : []),
+  ];
+  return why.length === 0 ? "ja" : `nein (${why.join(", ")})`;
+}
+
+const ertragText = (o: EvalOutcome): string =>
+  o.ziel4 === false
+    ? "zählt nicht (coveredBy)"
+    : o.ertrag
+      ? `${o.ertrag.treffer} von ${o.ertrag.referenz}${o.ertrag.grund ? ` (${o.ertrag.grund})` : ""}`
+      : "";
+
+function hiddenSection(r: DiscoverReport, h: HiddenEval): string[] {
   const back = h.outcomes.filter((o) => o.ergebnis === "aufgenommen").length;
   const found = h.outcomes.filter((o) => o.ergebnis !== "nicht gefunden").length;
+  const k = kennzahlen(h.outcomes);
+  const stufen: Array<[string, Exclude<keyof Kennzahlen, "ertrag" | "ertragN">]> = [
+    ["Ausgeblendet", "n"],
+    ["Gefunden", "gefunden"],
+    ["Nach Vorfilter", "vorfilter"],
+    ["Seite abgerufen", "abgerufen"],
+    ["Bewertet „aufnehmen“", "aufnehmen"],
+    ["Orte aufgelöst", "orte"],
+    ["Ertragsbeweis", "wiedergefunden"],
+  ];
+  const urteil = (u: string) => h.extra.filter((a) => a.urteil?.urteil === u);
+  const falschUrteil = [...urteil("falsch"), ...urteil("dublette")];
+  const unbeurteilt = h.extra.filter((a) => !a.urteil);
+  const klaer = r.regions.flatMap((x) => x.klaerfaelle);
+  const quellen = quellenZahlen(h.outcomes);
+  const pct = (x: number | undefined) => (x === undefined ? "–" : `${Math.round(x * 100)} %`);
   return [
     `## Eval: ausgeblendete Anbieter (${back} von ${h.outcomes.length} wiedergefunden, ${found} gefunden)`,
     "",
-    "| ID | Ergebnis | Fund-URL | Grund |",
+    `Lauf gültig: ${validity(r)}${r.modelle ? `; Modelle: ${r.modelle}` : ""}`,
+    "",
+    "| Stufe | alle | alt | neu |",
     "|---|---|---|---|",
-    ...h.outcomes.map((o) => `| ${o.id} | ${o.ergebnis} | ${o.url ?? ""} | ${cell(o.grund ?? "")} |`),
+    ...stufen.map(([label, f]) => `| ${label} | ${k.alle[f]} | ${k.alt[f]} | ${k.neu[f]} |`),
+    `| Ertrag (Ziel 4) | ${pct(k.alle.ertrag)} | ${pct(k.alt.ertrag)} | ${pct(k.neu.ertrag)} |`,
+    "",
+    `Gefunden je Quelle: ${
+      Object.entries(quellen)
+        .map(([q, n]) => `${q} ${n}`)
+        .join(", ") || "–"
+    }`,
+    "",
+    "| ID | alt | Ergebnis | Stufe | Quellen | Ertrag | Fund-URL | Grund |",
+    "|---|---|---|---|---|---|---|---|",
+    ...h.outcomes.map(
+      (o) =>
+        `| ${o.id} | ${o.alt ? "ja" : ""} | ${o.ergebnis} | ${o.stufe ?? ""} | ${o.quellen.join(", ")} | ` +
+        `${ertragText(o)} | ${o.url ?? ""} | ${cell(o.grund ?? "")} |`,
+    ),
     "",
     `Zusätzlich aufgenommen (nicht ausgeblendet): ${h.extra.length}`,
-    ...h.extra.map((a) => `- ${a.id}: ${cell(a.name)} (${a.find.url})`),
+    ...h.extra.map((a) => `- ${a.id}: ${cell(a.name)} (${a.find.url}) – Urteil: ${a.urteil?.urteil ?? "offen"}`),
+    ...h.doppelt.map((a) => `- ${a.id}: ${cell(a.name)} (${a.find.url}) – doppelt`),
+    "",
+    `Falsch aufgenommen: ${h.doppelt.length + falschUrteil.length} (${h.doppelt.length} doppelt, ` +
+      `${falschUrteil.length} nach Urteil), ${unbeurteilt.length} unbeurteilt` +
+      (unbeurteilt.length > 0 ? " – Urteil je URL in evals/discover-urteile.json" : ""),
+    "",
+    "Zeile für `evals/results.md`:",
+    "",
+    "```",
+    resultsRow({
+      date: r.date,
+      modelle: r.modelle ?? "–",
+      gueltig: validity(r) === "ja",
+      kennzahlen: k,
+      quellen,
+      klaerfaelle: klaer.length,
+      dubletten: klaer.filter((x) => x.dublette).length,
+      falsch: h.doppelt.length + falschUrteil.length,
+      unbeurteilt: unbeurteilt.length,
+      neu: urteil("passend").map((a) => a.id),
+      aufrufe: r.calls.length,
+      kostenUsd: summarizeCosts(r.calls, { cached: 0 }).total.costUsd,
+      dauerMin: Math.round(r.durationMs / 60_000),
+      jeAnbieter: h.outcomes
+        .map((o) => `${o.id} ${o.ergebnis}${o.grund ? ` (${o.grund.replace(/\s+/g, " ").slice(0, 80)})` : ""}`)
+        .join("; "),
+    }),
+    "```",
   ];
 }
 

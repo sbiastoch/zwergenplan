@@ -1,6 +1,6 @@
 # Plan 0050 – Entdecken: wenige gute Quellen, Seitenfinder, keine technischen Verluste
 
-Status: in Umsetzung (S0, S1 umgesetzt)
+Status: in Umsetzung (S0, S1 live; S2 umgesetzt, Eval-Läufe offen)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`):
@@ -418,6 +418,39 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`, bei Daten mit `
   - Kandidaten, die der Lauf nicht mehr bewertet hat, werden im Modus live Klärfälle am Lauf (`anzahl` 0).
 
 - **Offen für S6 (Arch-Review S1, Minor 4):** Im Modus live wird jeder nicht bewertete Kandidat ein Klärfall am Lauf, der nie aussetzt, und Klärfälle stehen vor der Websuche. Vor dem ersten Live-Lauf braucht das einen Deckel (etwa höchstens so viele Lauf-Klärfälle wie G3) oder eine Reihenfolge (älteste `zuletzt` zuerst). Vor S6 ist kein Lauf live.
+
+### S2 – Umsetzung (2026-10-29)
+
+- **Ort:** Die reine Auswertung steht in `lib/eval-discover.ts` (`STUFEN`, `termineOf`, `matchTermine`, `kennzahlen`, `quellenZahlen`, `modelEnv`, `freshRunDir`, `UrteileSchema`, `resultsRow`), nicht in `lib/discover.ts` (schon über 900 Zeilen). `hiddenEval` und der Bericht bleiben in `lib/discover.ts`.
+- **`--hide` entfällt**, `runDiscover` nimmt `eval: { ids, alt, urteile }`. Im Eval gilt kein G3 (`maxNew` unendlich), `zurueckgestellt` und `klaerfaelle` sind leer.
+- **Stufen:** Verworfene und Klärfälle tragen die letzte bestandene Stufe (`vorfilter`, `abgerufen`, `aufnehmen`, `orte`), Vorfilter-Fälle gelten als `gefunden`, nicht bewertete als `vorfilter`, Aufnahmen als `beweis`.
+  - **Abweichung:** Die Stufe „aufgelöst“ aus E6 gibt es erst mit der Namenssuche in S4. Heute hat jeder Kandidat schon eine eigene URL.
+- **Zuordnung 1:1:** Reihenfolge gleiche URL, dann gleicher Host mit ähnlichem Namen, dann ähnlicher Name mit Ort ≤ 100 m (`Adopted.orte`).
+  - Der Host allein ordnet nie zu. Der Test mit zwei Anbietern auf demselben Host steht für das Paar auf stadtkirche-nuernberg.de.
+  - **Abweichung:** Das Paar auf `evdus.de` kommt mit `plan-0039`. Die Liste geteilter Websites aus Plan 0049, E1 gibt es auf `main` noch nicht.
+- **Ertrag:**
+  - Der Referenzbeweis läuft nach allen Regionen in `runs/…/discover/referenz/` und zählt zu Bremse und Kosten.
+  - Hat die Referenz keinen Termin im Fenster, zählt der Anbieter nicht zum Mittel (Grund im Bericht).
+  - **Abweichung:** `follow` kennt das Schema auf `main` nicht. Ziel 4 schließt deshalb nur `coveredBy` aus.
+- **Kennzahlen:** Der Bericht zeigt die Tabelle je Stufe (alle/alt/neu), gefunden je Quelle, Gültigkeit und die fertige Zeile für `evals/results.md`. Ein Mensch trägt sie ein, denn ein Trockenlauf in Actions committet nicht.
+- **Workflow:**
+  - Der Job `modus` lehnt ab:
+    - `eval` im Modus live,
+    - `model`/`effort` ohne `eval`,
+    - einen Start, bei dem Start plus 330 Minuten das Fenster 01:30–04:30 UTC schneidet.
+  - Der Test führt dieses Skript mit bash aus.
+  - Das Fenster des Pflegelaufs kommt mit Plan 0049, S2 dazu.
+- **Arch-Review S2 (2026-10-29):** kein Blocker.
+  - **M1 behoben:** Das Eval lief Nürnberg vor Fürth und damit gegen ADR 0029. Jetzt gilt `evalRegions`, in der Reihenfolge von `REGION_IDS`.
+  - **Minors behoben:**
+    1. Grund bei leerem Fenster der Referenz.
+    2. Fenster über Berliner Kalendertage (`yieldWindow`).
+    3. Referenzkosten in `kosten.csv`.
+    4. Dublette als Feld statt Textanfang.
+    5. `modus` lehnt `eval` mit `region` ab; 20 Min. Puffer für Einrichtung.
+    7. Altersfilter gemeinsam (`forUnderThree`).
+    8. Doku.
+  - **Minor 6 abgelehnt:** Die Spaltenzahl von `evals/results.md` gegen `resultsRow` testen hieße, `.md` aus Code zu lesen. Das verbietet `change-class.test.ts` („Doku liest niemand“, Stufe 0 bliebe sonst nicht sicher). Die Spalten stehen deshalb an beiden Stellen in derselben Reihenfolge, der Bericht liefert die Zeile fertig.
 
 ## Nutzerentscheide
 

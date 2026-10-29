@@ -88,13 +88,16 @@ pnpm eval freeze <id> --kind html[,gross] [--trap ab-3-jahren]
 
 legt `evals/cases/<id>-<heute>/` aus einem frischen Abruf an. `expected.json` ist ein Entwurf aus dem Bestand: von Hand gegen `input.json` prüfen, Korrekturen in `NOTES.md` (Plan 0032, E9). Arten und Fallen nennt `scripts/pipeline/eval.ts`. Fertig, wenn `pnpm verify` grün ist (`io/eval.test.ts` prüft alle Fälle).
 
-**Entdecken-Eval** (Plan 0032, E9): misst, ob das Entdecken bekannte Anbieter wiederfindet, etwa nach einer Änderung an Suchbegriffen oder Prompts von `prompt/discover-*.md`.
+**Entdecken-Eval** (Plan 0050, E6): misst, ob das Entdecken die 20 Anbieter der festen Stichprobe in `evals/discover.json` wiederfindet, etwa nach einer Änderung an Quellen, Suchbegriffen oder Prompts von `prompt/discover-*.md`.
 
 ```
-pnpm pipeline discover --dry-run --hide <id>,<id>,…    # ≈ 10 Anbieter verschiedener Arten, ≈ $0,80, 15–40 Min.
+pnpm pipeline discover --dry-run --eval [--run-dir …] [--model sonnet --effort high]
+gh workflow run discover.yml -f eval=true [-f model=sonnet -f effort=high]    # in Actions, nie im Fenster 01:30–04:30 UTC
 ```
 
-Der Bericht `runs/<heute>/discover/report.md` nennt je ausgeblendetem Anbieter den Ausgang (aufgenommen, verworfen mit Grund, nicht bewertet, Vorfilter, nicht gefunden) und unter „Zusätzlich aufgenommen“ Anbieter, die nicht ausgeblendet waren: Die sind neu oder falsch und werden von Hand beurteilt. Ergebnis als Zeile unter „Entdecken“ in `evals/results.md`.
+- Läuft immer für Nürnberg und Fürth zusammen (kein `--region`), ohne zurückgestellte, Klärfälle und G3, je Lauf in einem eigenen Verzeichnis `runs/<heute>/discover[-2, -3 …]`. Modell: Opus high für Suche, Bewerten und Ertragsbeweis, soweit `LLM_*` oder `--model`/`--effort` nichts anderes setzen.
+- Der Bericht `report.md` zeigt die Kennzahlen je Stufe (alt/neu getrennt), gefunden je Quelle, je Anbieter Ausgang, Stufe und Ertrag gegen den Ertragsbeweis seines Handeintrags (Ziel 4), ob der Lauf gültig ist (keine Bremse, kein Zeitbudget, kein Abbruch) und fertig die Zeile für `evals/results.md`.
+- **Urteile:** Aufnahmen ohne Gegenstück in der Stichprobe („Zusätzlich aufgenommen“, Urteil offen) beurteilt ein Mensch einmal je URL in `evals/discover-urteile.json` (`passend`, `falsch` oder `dublette`, mit `datum`); spätere Läufe übernehmen das Urteil. Eine zweite Aufnahme desselben Anbieters zählt immer als falsch.
 
 ## 5. Modell wechseln
 
