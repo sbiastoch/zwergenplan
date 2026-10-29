@@ -5,6 +5,7 @@
  * Startpunkts (Nutzerentscheid „Usability vor Privatsphäre“). Ohne MapLibre-Typen; die UI übersetzt.
  */
 import type { GeoPoint } from "./geo.ts";
+import { inBox } from "./map-view.ts";
 import type { Origin } from "./reach.ts";
 
 /** Hauptmarkt, wenn es keine Orte gibt */
@@ -66,10 +67,8 @@ export function overviewCamera(points: readonly GeoPoint[]): StartCamera {
  */
 export function initialCamera(points: readonly GeoPoint[], origin: Origin | undefined): StartCamera {
   if (!origin) return overviewCamera(points);
-  const box = aroundPoint(origin.point, START_RADIUS_KM);
-  const near = points.some(
-    (p) => p.lat >= box.minLat && p.lat <= box.maxLat && p.lon >= box.minLon && p.lon <= box.maxLon,
-  );
+  const { minLat: south, minLon: west, maxLat: north, maxLon: east } = aroundPoint(origin.point, START_RADIUS_KM);
+  const near = points.some((p) => inBox(p, { west, south, east, north }));
   return near ? { around: origin.point, radiusKm: START_RADIUS_KM } : overviewCamera(points);
 }
 

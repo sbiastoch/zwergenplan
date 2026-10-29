@@ -62,7 +62,7 @@ export function MapPanel(props: MapScreenProps) {
   if (module.kind === "da") return <module.View {...props} />;
   /*
    * Platzhalter in Kartenhöhe: kein Sprung, wenn die Oberfläche kommt (CLS). Beim Laden hält `.map-rest` darunter
-   * Platz für den Anfang der Orts-Liste frei: Auf der Merkliste ist der Kopf kurz, ohne ihn
+   * Platz für den Anfang der Liste unter der Karte frei: Auf der Merkliste ist der Kopf kurz, ohne ihn
    * schrumpfte das Dokument beim Einhängen auf die Viewport-Höhe, und die Seite sprang nach oben (Browser-Review 0025,
    * M1).
    */

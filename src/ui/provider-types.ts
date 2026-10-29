@@ -22,7 +22,7 @@ export interface ProviderScreenProps {
   now: Date;
   /** Kartenausschnitt der Anbieterkarte; `undefined`, solange die Karte nicht bereit oder gescheitert ist (Plan 0055) */
   view: MapExtent | undefined;
-  /** „Alle zeigen“: Karte zurück auf den Startausschnitt */
+  /** „Alle zeigen“: Karte auf den Rahmen über alle Orte (Plan 0056, N11) */
   onShowAll: () => void;
   /** Wegzeit bzw. Luftlinie zum Ort eines Angebots; `undefined` ohne Startpunkt */
   reachOf: (offer: SiteOffer) => Reach | undefined;

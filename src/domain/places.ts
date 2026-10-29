@@ -1,5 +1,5 @@
 /**
- * Orte für Karte und Orts-Liste (Plan 0005, E6). Ein Ort ist eine Koordinate: Zwei Anbieter im
+ * Orte für Karte und Orts-Sheet (Plan 0005, E6). Ein Ort ist eine Koordinate: Zwei Anbieter im
  * selben Haus teilen sich einen Marker. Generisch, damit Domäne und UI dieselbe Logik für ihre
  * Angebotstypen nutzen (`SiteOffer` in der UI, schlanke Objekte im Test).
  */

@@ -21,6 +21,7 @@ import {
   dayHeading,
   exportLabel,
   formatFact,
+  inViewStatusParts,
   limitHint,
   limitReason,
   listedSince,
@@ -681,6 +682,15 @@ describe("Statuszeile der Liste mit Zeitraum (Browser-Review 0023, m1)", () => {
     expect(listStatusParts(0, { from: "2026-12-28", to: "2027-01-03" }).join("")).toBe(
       "0 Angebote vom 28.12.2026–3.1.2027",
     );
+  });
+});
+
+describe("Statuszeile im Kartenausschnitt (Plan 0055, E4; Plan 0056, E5)", () => {
+  it("Anbieter, Angebote mit Singular, gemerkte; die Zahl getrennt", () => {
+    expect(inViewStatusParts(5, "anbieter")).toEqual([5, " Anbieter im Kartenausschnitt"]);
+    expect(inViewStatusParts(1, "angebote").join("")).toBe("1 Angebot im Kartenausschnitt");
+    expect(inViewStatusParts(2, "angebote").join("")).toBe("2 Angebote im Kartenausschnitt");
+    expect(inViewStatusParts(3, "gemerkte").join("")).toBe("3 gemerkte im Kartenausschnitt");
   });
 });
 

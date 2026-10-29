@@ -94,7 +94,7 @@ export function roundedDistance(meters: number): { unit: "m" | "km"; value: numb
   return { unit: "km", value: km >= 10 ? Math.round(meters / 1000) : km };
 }
 
-/** „900 m“ bzw. „1,4 km“: einzige Formatierung einer Entfernung (Kachel, Orts-Liste, nächster Stadtteil). */
+/** „900 m“ bzw. „1,4 km“: einzige Formatierung einer Entfernung (Kachel, nächster Stadtteil). */
 export function distanceText(meters: number): string {
   const { unit, value } = roundedDistance(meters);
   return `${String(value).replace(".", ",")} ${unit}`;

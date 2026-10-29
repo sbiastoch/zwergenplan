@@ -23,6 +23,7 @@ import {
   aboToast,
   ageChipLabel,
   ageWarnText,
+  inViewStatusParts,
   limitHint,
   listStatusParts,
   loadErrorText,
@@ -331,12 +332,9 @@ export function App() {
   const offersNarrowed = route.tab === "karte" && viewNarrows(mapView);
   const narrowed = providersNarrowed || offersNarrowed;
   const inViewCount = providersNarrowed ? countProviders(views.providerVisible, providerView) : views.inView.length;
-  const inViewWord = providersNarrowed ? "Anbieter" : inViewCount === 1 ? "Angebot" : "Angebote";
+  const [, inViewWords] = inViewStatusParts(inViewCount, providersNarrowed ? "anbieter" : "angebote");
   // Ansage erst, wenn die Karte ruht; der sichtbare Text ist dann `aria-hidden` (Review m8, Review 2, m4)
-  const inViewAnnounce = useSettled(
-    narrowed ? `${inViewCount} ${inViewWord} im Kartenausschnitt` : "",
-    ANNOUNCE_DELAY_MS,
-  );
+  const inViewAnnounce = useSettled(narrowed ? `${inViewCount}${inViewWords}` : "", ANNOUNCE_DELAY_MS);
   /*
    * Nur der Rückfall auf die Luftlinie steht hinter der Zahl, kurz mit Grund (Plan 0056, E2; ADR 0039). U+00A0 vor dem
    * Punkt, damit er nie verwaist am Zeilenanfang steht; der Ausdruck ist ein Inline-Block (Plan 0020, E1).
@@ -451,8 +449,9 @@ export function App() {
       ? { label: ageLabel, onShow: () => setAgeOnlyKeepFocus(false) }
       : undefined;
   /*
-   * Karte in „Entdecken“ (sichtbare Angebote) und auf der Merkliste (gemerkte, Plan 0025, E4). Der Startausschnitt
-   * kommt in beiden Fällen aus allen kommenden Angeboten (`views.map.cameraOffers`, ADR 0008), nie aus der Merkliste.
+   * Karte in „Entdecken“ (sichtbare Angebote) und auf der Merkliste (gemerkte, Plan 0025, E4). In „Entdecken“ startet
+   * sie am Startpunkt (`followOrigin`, ADR 0039); Rückfall, „Alle zeigen“ und die Merkliste nutzen alle kommenden
+   * Angebote (`views.map.cameraOffers`), nie die Merkliste selbst.
    */
   const mapPanel = (shown: readonly SiteOffer[], cardCtx: CardContext, followOrigin: boolean) =>
     views.map && (
@@ -572,7 +571,8 @@ export function App() {
                 {narrowed ? (
                   <span>
                     <span aria-hidden="true">
-                      <b>{inViewCount}</b> {inViewWord} im Kartenausschnitt
+                      <b>{inViewCount}</b>
+                      {inViewWords}
                     </span>
                     <span className="sr-only">{inViewAnnounce}</span>
                     {reachSuffix}

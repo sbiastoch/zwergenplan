@@ -304,3 +304,11 @@ Zweiter Reviewer, ohne Chat-Kontext. Er findet keinen Blocker und bestätigt B1,
 - **S5, Zoom (Abweichung von N3):** Der Zoom kommt allein aus der kürzeren Kante der Karte (`zoomForRadius`, 512-px-Kacheln), höchstens 14, ohne Untergrenze 13. Zoom 13 zeigte auf der 250 px hohen Anbieterkarte nur ≈ 0,8 km Radius statt der gewünschten 2 km; gerechnet ergibt sich dort ≈ Zoom 11,6 (≈ 4 × 5,8 km), auf der Angebotskarte ≈ 12,5. Die E2E-Obergrenze von etwa 6 × 6 km gilt weiter.
 - **S5, Kamera-Art:** `StartCamera` bekommt `{ around, radiusKm }`; `DISTRICT_ZOOM` entfällt, ein Stadtteil folgt derselben Regel wie jeder Startpunkt. `overviewCamera`/`providerOverview` liefern das Ziel von „Alle zeigen“, `originKey` den Schlüssel für N12. Kein 0,01°-Raster (Nutzerentscheid, siehe „Offen“).
 - **S5, Grenze aus N3 präzisiert:** „≤ 6 × 6 km“ gilt für die **kürzere** Kante (E2E: mehr als 3,5 und höchstens 6 km). Die längere wächst mit dem Seitenverhältnis: gemessen ≈ 10 km auf der hohen Angebotskarte (Pixel 7) und ≈ 15 km auf der quer liegenden Anbieterkarte.
+- **S6:** `pnpm size` Start-JS 106,52 → 106,66 kB, `Karte JS` 429,98 kB (Zeile in ADR 0012). `/arch-review` ohne Blocker; M1 (Kopfkommentar `MapView.tsx`), M2 (`__zpAttributionMs` als zweite E2E-Hintertür in `architecture.md`) und m1–m6 eingearbeitet (Kommentare, N10 in ADR 0039 und 0011, `inViewStatusParts` in `format.ts`, deterministische „Alle zeigen“-Fälle, `countPlaces` entfernt, `inBox` in `camera.ts`). Flaky `sortierung.spec.ts` (Etikett im Sheet) pollt jetzt.
+- **S6, Browser-Review** (Fixture-Build, 320/390/412/quer, hell/dunkel):
+  - Lesbarkeit: Statuszeile und Liste unter der Karte klar. Bei 390 px bricht „N Angebote im Kartenausschnitt“ neben dem Sortierknopf zweizeilig, „Alle zeigen“ steht darunter (N13 erlaubt das).
+  - Daumen: „Alle zeigen“ und Sortierknopf groß genug; die Karte ist quer zum Teil unter dem Falz wie bisher.
+  - Zustände: leerer Ausschnitt mit „Alle zeigen“ (E2E), Fehlerzustände der Karte mit Liste darunter (E2E).
+  - Dark Mode: ohne Inseln; Quellenangabe in beiden Themen lesbar.
+  - Befund m1: Mit Startpunkt kennt der Start kein Padding; bei 320 px liegt ein Cluster halb unter den Zoom-Knöpfen. Kommt nach `docs/ideas.md`.
+  - Live-Interaktion mit claude-in-chrome nicht gemacht; die Interaktionen decken die E2E-Fälle ab.

@@ -8,7 +8,7 @@ Status: angenommen (2026-10-05), Umsetzung mit Plan 0009. Ersetzt Teile von ADR 
 
 **Geändert durch ADR 0019 (Plan 0020):** Wortlaut der Statuszeile (Punkt 3, Satz 3). Punkt 9 bleibt erfüllt, „außerhalb des Stadtgebiets“ steht weiter dort.
 
-**Geändert durch ADR 0039 (Plan 0056):** Punkt 9, Anzeige: Die Statuszeile nennt den Grund gekürzt („· Luftlinie, außerhalb“), weiter sichtbar.
+**Geändert durch ADR 0039 (Plan 0056):** Punkt 9, Anzeige: Die Statuszeile nennt den Grund gekürzt („· Luftlinie, außerhalb“), weiter sichtbar. Punkt 6: Die Karte ist Anlass wegen der Minuten in der Liste darunter, und Kacheln hängen an jedem Startpunkt, nicht nur am Stadtteil. Punkt 8: Die Kartenmitte als Startpunkt entfällt.
 
 **Geändert durch ADR 0029 (Plan 0036):** Punkt 2 und 9: Zeilen und Startgebiet sind die Stadtgebiete aller Regionen (`Region.kreis`, heute Nürnberg `de:09564:` und Fürth `de:09563:`), nicht nur Nürnberg.
 

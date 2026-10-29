@@ -2,7 +2,7 @@ import { createElement, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EMPTY_FILTER } from "../domain/filter.ts";
-import { countPlaces, placeKey } from "../domain/place-key.ts";
+import { placeKey } from "../domain/place-key.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
@@ -60,6 +60,8 @@ function render(input: Partial<OfferViewsInput>): OfferViews {
   return result;
 }
 
+/** Zahl der Orte (Marker) der Angebote */
+const countPlaces = (offers: readonly SiteOffer[]) => new Set(offers.map((o) => placeKey(o.venue.geo))).size;
 /** Orte der passenden gemerkten Angebote, wie die Merklisten-Karte sie zeichnet */
 const savedPlaces = (v: OfferViews) => countPlaces(v.savedVisible.map((o) => o.offer));
 

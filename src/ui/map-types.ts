@@ -35,7 +35,7 @@ export interface MapScreenProps {
   followOrigin: boolean;
   /** Kartenausschnitt nach `placeKey` für die Liste darunter (Plan 0056, E5); `undefined` beim Abbau und bei Fehlern */
   onInView: (view: MapExtent | undefined) => void;
-  /** Zähler: Jede Änderung setzt die Kamera auf den Startausschnitt („Alle zeigen“) */
+  /** Zähler: Jede Änderung fährt auf den Rahmen über alle Orte („Alle zeigen“, Plan 0056, N11) */
   resetKey: number;
 }
 
@@ -63,7 +63,7 @@ export interface ProviderMapScreenProps {
   onSheetOpen: (open: boolean) => void;
   /** Kurzmeldung für das Orts-Sheet (Glocke; der Seiten-Toast liegt hinter dem Modal) */
   toast: ToastMessage;
-  /** Zähler: Jede Änderung setzt die Kamera auf den Startausschnitt („Alle zeigen“) */
+  /** Zähler: Jede Änderung fährt auf den Rahmen über alle Orte („Alle zeigen“, Plan 0056, N11) */
   resetKey: number;
 }
 
@@ -85,7 +85,7 @@ export type MapLayer =
 export interface MapViewProps {
   /** ein Wechsel der Orte tauscht nur die Daten, die Kamera bleibt (E9); `kind` bleibt je Mount gleich */
   layer: MapLayer;
-  /** Ausschnitt beim ersten Öffnen der Sitzung, aus öffentlichen Daten (`initialCamera`, ADR 0008) */
+  /** Ausschnitt beim Öffnen: 2 km um den Startpunkt, sonst bzw. ohne Orte im Umkreis alle Orte (`initialCamera`, ADR 0039) */
   start: StartCamera;
   /** Rahmen über alle Orte: Ziel von „Alle zeigen“ (Plan 0056, N11) */
   overview: StartCamera;

@@ -254,13 +254,13 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
       expect(Math.min(at.width, at.height)).toBeLessThanOrEqual(6);
     }
 
-    // „Alle zeigen“ fährt auf den Rahmen über alle Orte, nicht zurück zum Stadtteil
-    const showAll = page.getByRole("button", { name: "Alle zeigen" }).first();
-    if (await showAll.isVisible()) {
-      await showAll.click();
-      await idle(page);
-      expect(await allInside()).toBe(true);
-    }
+    // „Alle zeigen“ fährt auf den Rahmen über alle Orte, nicht zurück zum Stadtteil; vorher eng hineinzoomen, damit
+    // der Ausschnitt sicher etwas ausblendet
+    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.058, 49.448], zoom: 17 }));
+    await idle(page);
+    await page.getByRole("button", { name: "Alle zeigen" }).first().click();
+    await idle(page);
+    expect(await allInside()).toBe(true);
 
     // Langwasser: kein Anbieter-Ort in 2 km, Rückfall auf alle Orte (Review M4)
     await page.setViewportSize({ width: 412, height: 915 });

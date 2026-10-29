@@ -9,8 +9,3 @@ import type { GeoPoint } from "./geo.ts";
 export function placeKey({ lat, lon }: GeoPoint): string {
   return `${lat},${lon}`;
 }
-
-/** Zahl der Orte, wie `placesOf(offers).length`, ohne die Orte zu bauen. */
-export function countPlaces(offers: readonly { venue: { geo: GeoPoint } }[]): number {
-  return new Set(offers.map((o) => placeKey(o.venue.geo))).size;
-}

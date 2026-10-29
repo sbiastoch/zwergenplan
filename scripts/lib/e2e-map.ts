@@ -91,8 +91,8 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/anbieter\/ProviderScreen\.tsx$/,
     /^src\/domain\/(provider-places|provider-count|directory|camera|geo|map-view)\.ts$/,
   ],
-  // Karte: Lader (MapPanel, Lazy), Oberfläche karte/, MapLibre map/, Kacheln, Kamera-Regel mit Standort und
-  // Kartenmitte (origin-state), Wegzeit beim Öffnen (use-transit), Orts-Sheet mit Linien (ReachLong), Marker mit
+  // Karte: Lader (MapPanel, Lazy), Oberfläche karte/, MapLibre map/, Kacheln, Start am Startpunkt (ADR 0039;
+  // origin-state), Wegzeit beim Öffnen (use-transit), Orts-Sheet mit Linien (ReachLong), Marker mit
   // Kategorie-Symbol (categories), Fehler beim Laden.
   "e2e/karte.spec.ts": [
     /^src\/ui\/(karte|map)\//,

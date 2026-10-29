@@ -730,12 +730,12 @@ test.describe("mit gemockten Kacheln", () => {
     await page.addInitScript(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     await openMap(page);
     await expectAroundStart(page, { lat: 49.448, lon: 11.058 });
-    // „Alle zeigen“ (falls der Ausschnitt etwas ausblendet) bzw. Rahmen über alle: alle 8 Angebote in der Liste
-    const showAll = page.getByRole("button", { name: "Alle zeigen" }).first();
-    if (await showAll.isVisible()) {
-      await showAll.click();
-      await idle(page);
-    }
+    // eng hineinzoomen, damit der Ausschnitt sicher etwas ausblendet; „Alle zeigen“ zeigt dann alle 8 Angebote
+    await page.evaluate(([lon, lat]) => window.__zpMap?.jumpTo({ center: [lon, lat], zoom: 17 }), BIBLIOTHEK);
+    await idle(page);
+    await expect(page.getByRole("status")).toContainText("im Kartenausschnitt");
+    await page.getByRole("button", { name: "Alle zeigen" }).first().click();
+    await idle(page);
     await expect(offers(page)).toHaveCount(8);
     await expect(page.getByRole("status")).toHaveText("8 Angebote");
 

@@ -2,7 +2,7 @@
 
 Status: **angenommen** (2026-10-29, mit Plan 0056), Nutzerentscheidungen. Umgesetzt in Schritten: Statuszeile (S2), Quellenangabe, Hinweistext und Kartenmitte (S3), Startausschnitt am Startpunkt (S5).
 - **Ersetzt** ADR 0019, Punkt 1 und 3: Die Statuszeile nennt den Startpunkt nicht mehr.
-- **Ändert** ADR 0011, Punkt 9 in der Form: Der Grund der Luftlinie steht weiter sichtbar in der Statuszeile, gekürzt.
+- **Ändert** ADR 0011: Punkt 9 in der Form (der Grund der Luftlinie steht weiter sichtbar in der Statuszeile, gekürzt), Punkt 6 (die Karte ist Anlass für die Wegzeit wegen der Minuten in der Liste darunter, nicht mehr als Startpunkt-Oberfläche; die Ausnahme der Kacheln gilt für jeden Startpunkt) und Punkt 8 (ohne Kartenmitte decken Stadtteil und Standort den Fallback ab).
 - **Ändert** ADR 0008: Punkt „Nur in der Kartenansicht“ (kein Hinweistext unter der Karte mehr), die Attribution (klappt nach 5 s ein), Punkt „Startpunkt ohne GPS“ (keine Kartenmitte mehr), **die Kamera-Regel** und „Was nie an OpenFreeMap geht: … mittelbar über die Kachelwahl“ (Punkt 8); bei den Tests dreht sich der Fall „kein Kachel-Request nach dem Setzen eines Startpunkts“ um. Die Abwägung gegen selbst gehostete PMTiles ist damit neu zu bewerten und bleibt offen.
 - **Ändert** ADR 0038: Punkt 1 (mit gespeichertem Startpunkt verrät schon das Öffnen des Tabs „Anbieter“ die Gegend), Punkt 2 (kein Hinweistext), Punkt 3 (Startausschnitt am Startpunkt), Punkt 4 (die Anbieterkarte fährt auf jeden neuen Startpunkt) und den Kontext zum stillen Schrumpfen der Liste.
 - **Ändert** ADR 0017: Folgen „Die Karte startet aber im üblichen Ausschnitt“ und „Kamera-Regel bleibt unverändert“, sowie Punkt 3 für Kachel-Requests („nie in URL, Logs oder Requests“ gilt für den Startpunkt als Wert, nicht mehr für die Kachelwahl).
@@ -28,7 +28,8 @@ Status: **angenommen** (2026-10-29, mit Plan 0056), Nutzerentscheidungen. Umgese
 9. **Neuer Startpunkt bei offener Karte:** Beide Karten fahren auf den neuen Startausschnitt, bei jeder Art von Startpunkt. Derselbe Startpunkt noch einmal (gleiche Quelle und gleicher Punkt bzw. Stadtteil, `originKey`) bewegt nichts. Der gemerkte Ausschnitt der Angebotskarte gilt nur beim selben Startpunkt.
 10. **„Alle zeigen“** fährt auf den Rahmen über alle Orte, nicht auf den Startpunkt.
 11. **Merklisten-Karte:** startet wie bisher über alle Orte und fährt nicht auf einen Startpunkt (Nutzerentscheid, Option a): Ein Rahmen um den Startpunkt wäre dort meist leer, einer über das Gemerkte verriete die Merkliste.
-12. **Was OpenFreeMap jetzt sieht:** die Kachelkoordinaten rund um den Startpunkt. Die Mitte der geladenen Kacheln liegt bis auf etwa eine Kachelbreite (≈ 1,5–3 km) am Startpunkt; das Runden auf 100 m schützt dort nicht. Mit gespeichertem Startpunkt verrät schon das Öffnen von Karte oder Tab „Anbieter“ die Gegend. Gleich bleibt: kein Querystring, kein Startpunkt als Wert in einem Request, Wegzeit-Requests für alle gleich. Der Datenschutztext im Impressum sagt das.
+12. **Wegzeit beim Öffnen der Karte** (Plan 0056, N10): Die Karte bleibt Anlass, Wegzeit-Tabelle und Linien zu laden (`useTransit().want()`), weil die Liste unter der Karte Minuten an den Kacheln zeigt. Die Kartenmitte ist kein Grund mehr.
+13. **Was OpenFreeMap jetzt sieht:** die Kachelkoordinaten rund um den Startpunkt. Die Mitte der geladenen Kacheln liegt bis auf etwa eine Kachelbreite (≈ 1,5–3 km) am Startpunkt; das Runden auf 100 m schützt dort nicht. Mit gespeichertem Startpunkt verrät schon das Öffnen von Karte oder Tab „Anbieter“ die Gegend. Gleich bleibt: kein Querystring, kein Startpunkt als Wert in einem Request, Wegzeit-Requests für alle gleich. Der Datenschutztext im Impressum sagt das.
 
 ## Konsequenzen
 

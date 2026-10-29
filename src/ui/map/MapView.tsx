@@ -1,7 +1,8 @@
 /**
  * Die Karte (Plan 0005, E2/E6/E9/E10): lädt nur per `import()` aus karte/MapScreen.tsx. Nur src/ui/map/
- * kennt maplibre-gl (`maplibre-only-in-map`). Kamera-Regel (ADR 0008): Die Karte fährt nie auf einen
- * Standort oder die Kartenmitte, sie zeichnet den Startpunkt nur. So verraten die Kachel-Requests ihn nicht.
+ * kennt maplibre-gl (`maplibre-only-in-map`). Kamera-Regel (ADR 0039, ersetzt ADR 0008): Mit Startpunkt startet
+ * die Karte 2 km darum und fährt bei einem neuen Startpunkt dorthin; die Merklisten-Karte nicht. Der Rückfall ohne
+ * Orte im Umkreis und „Alle zeigen“ nutzen nur öffentliche Daten (alle kommenden Orte).
  */
 import {
   type GeoJSONSource,

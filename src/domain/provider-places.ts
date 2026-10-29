@@ -114,7 +114,7 @@ export function providersWithPlace(geometry: ProviderGeometry): Set<string> {
   return new Set(geometry.points.map((p) => p.id));
 }
 
-/** Startausschnitt: Rahmen über alle Orte; nie Startpunkt oder Stadtteil (ADR 0038) */
+/** Startausschnitt: 2 km um den Startpunkt, ohne Startpunkt oder Orte im Umkreis über alle Orte (ADR 0039) */
 export function providerCamera(geometry: ProviderGeometry, origin?: Origin): StartCamera {
   return initialCamera(
     geometry.points.map((p) => p.geo),

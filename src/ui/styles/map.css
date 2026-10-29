@@ -167,7 +167,7 @@
   }
   /*
    * Platzhalter unter der Karte, solange ihr Chunk lädt (MapPanel.tsx): mindestens so hoch wie
-   * der Anfang der Orts-Liste (bei 390 px etwa 14 rem), damit die Scroll-Position den Wechsel
+   * der Anfang der Liste unter der Karte (bei 390 px etwa 14 rem), damit die Scroll-Position den Wechsel
    * Liste → Karte übersteht (Browser-Review 0025, M1).
    */
   .map-rest {

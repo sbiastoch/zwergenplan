@@ -192,7 +192,8 @@ test.describe("Kartenansicht und Orts-Sheet", () => {
     const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
     const tag = sheet.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" }).locator(".new-tag");
     await expect(tag).toBeVisible();
-    expect(await inside(tag, sheet.locator(".sheet-scroll"))).toBe(true);
+    // gepollt: Das Sheet fährt noch ein, eine einzelne Messung kam in der CI zu früh (flaky auf main, 0d50787)
+    await expect.poll(() => inside(tag, sheet.locator(".sheet-scroll"))).toBe(true);
   });
 });
 

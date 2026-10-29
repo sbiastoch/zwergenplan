@@ -354,7 +354,7 @@ export function ageWindowLabel({ from, until }: ExportSelection, now: Date): str
   return undefined;
 }
 
-/** Kachel und Orts-Liste: „25 Min.“, „über 2 Std.“ bzw. „1,4 km“ – gerundet von der Domäne (E8). */
+/** Kachel: „25 Min.“, „über 2 Std.“ bzw. „1,4 km“ – gerundet von der Domäne (E8). */
 export function reachShort(reach: Reach): string {
   if (reach.kind === "oepnv") {
     const { over, value } = roundedMinutes(reach.minutes);
@@ -621,6 +621,16 @@ function rangePhrase(range: DateRange | undefined): string {
 export function listStatusParts(count: number, range: DateRange | undefined): [number, string] {
   const phrase = rangePhrase(range);
   return [count, ` ${count === 1 ? "Angebot" : "Angebote"}${phrase && ` ${phrase}`}`];
+}
+
+/**
+ * Statuszeile, wenn der Kartenausschnitt etwas ausblendet (Plan 0055, E4; Plan 0056, E5): „5 Anbieter im
+ * Kartenausschnitt“, „1 Angebot im Kartenausschnitt“, „3 gemerkte im Kartenausschnitt“. Die Zahl getrennt, fett.
+ */
+export function inViewStatusParts(count: number, kind: "anbieter" | "angebote" | "gemerkte"): [number, string] {
+  const word =
+    kind === "anbieter" ? "Anbieter" : kind === "gemerkte" ? "gemerkte" : count === 1 ? "Angebot" : "Angebote";
+  return [count, ` ${word} im Kartenausschnitt`];
 }
 
 /** Statuszeile im Tab „Anbieter“ „5 Anbieter“ (Plan 0010, E4; Plan 0056, E2); die Zahl getrennt, fett. */

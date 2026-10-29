@@ -13,6 +13,7 @@ import {
   collectionToast,
   EXPORT_UNAVAILABLE,
   exportLabel,
+  inViewStatusParts,
   savedFilteredEmpty,
   savedFilterStatusParts,
   savedMapStatusParts,
@@ -129,8 +130,8 @@ export function SavedView({
   const calendar = tab === "merkliste-kalender";
   // Ausschnitt der Merklisten-Karte (Plan 0056, E5): Ansage erst, wenn die Karte ruht, wie im Tab „Anbieter“ (N8)
   const mapNarrowed = tab === "merkliste-karte" && narrowed;
-  const inViewText = `${inView.length} gemerkte im Kartenausschnitt`;
-  const inViewAnnounce = useSettled(mapNarrowed ? inViewText : "", ANNOUNCE_DELAY_MS);
+  const [, inViewWords] = inViewStatusParts(inView.length, "gemerkte");
+  const inViewAnnounce = useSettled(mapNarrowed ? `${inView.length}${inViewWords}` : "", ANNOUNCE_DELAY_MS);
   const showAll = () => {
     status.current?.focus();
     onShowAll();
@@ -163,7 +164,8 @@ export function SavedView({
               {mapNarrowed ? (
                 <span>
                   <span aria-hidden="true">
-                    <b>{inView.length}</b> gemerkte im Kartenausschnitt
+                    <b>{inView.length}</b>
+                    {inViewWords}
                   </span>
                   <span className="sr-only">{inViewAnnounce}</span>
                 </span>
