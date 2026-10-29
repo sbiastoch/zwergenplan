@@ -1,11 +1,13 @@
-# Plan 0054 – Karte im Tab „Anbieter“
+# Plan 0055 – Karte im Tab „Anbieter“
 
-Status: freigegeben
+Status: in Umsetzung
 Datum: 2026-10-29
+
+Hinweis zur Nummer: Entworfen als Plan 0054 mit ADR 0037. Beide Nummern hat parallel „Abos mit Glocke“ belegt (live seit dc7498d), daher Plan 0055 und ADR 0038. Zeilenangaben zu `App.tsx`, `ProviderScreen.tsx` und `ProviderSheet.tsx` stammen vom Stand vor der Glocke und können verschoben sein.
 
 Bezug:
 - Mockups `docs/design/anbieter-karte/project/` (Design-Canvas). Gewählt ist **C** (`C-Split.dc.html`), das Orts-Sheet folgt `A2-Ort.dc.html`. Varianten A, B und D sind verworfen.
-- ADR 0008 (Karte, OpenFreeMap, Kamera-Regel), ADR 0012 (Budgets), ADR 0017 (Startpunkt). Neu: ADR 0037 (dieser Plan, E7).
+- ADR 0008 (Karte, OpenFreeMap, Kamera-Regel), ADR 0012 (Budgets), ADR 0017 (Startpunkt). Neu: ADR 0038 (dieser Plan, E7).
 - Plan 0005 (Karte, Ladekette), Plan 0010 (Anbieterübersicht, Nicht-Ziel „Karte der Anbieter“), Plan 0019 (Nicht-Ziel `geo` in `anbieter.json`), Plan 0025 (gemerkte Anbieter), Plan 0042 (Budget `anbieter.json`).
 - `docs/architecture.md` (Karte :68–76, Anbieterübersicht :82–86, Invarianten Privatsphäre und Startpunkt, Mobile-UX-Gates).
 
@@ -16,7 +18,7 @@ Der Nutzer wünscht eine Kartenansicht der Anbieter. Er hat am 2026-10-29 sechs 
 1. Variante C: Eine kompakte Karte steht oben im Tab, darunter die bekannte Anbieterliste, eingeschränkt auf den Kartenausschnitt.
 2. Keine Mini-Karte im Anbieter-Sheet (D).
 3. „Kostenlos“ und ähnliche Filter ergeben im Tab „Anbieter“ keinen Sinn. Auf Nachfrage: Es wirken nur Kategorie, Alter, Suche und Kartenausschnitt.
-4. Die Karte lädt mit dem Tab, ohne eigenen Tipp. Das weicht von ADR 0008 ab, daher ADR 0037.
+4. Die Karte lädt mit dem Tab, ohne eigenen Tipp. Das weicht von ADR 0008 ab, daher ADR 0038.
 5. Anbieter ohne kommende Termine stehen blass auf der Karte.
 
 ## Befund
@@ -130,7 +132,7 @@ export function providerPlaces(input: {
   - Anbieter an einem Ort stehen erst `aktiv`, dann `ohne-termine`, jeweils nach Name (`de`).
   - Orte sortiert nach `key`, wie `placesToFeatures`.
   - `name` und `district` kommen vom ersten Katalog-Ort in Namensreihenfolge.
-- **`providerCamera`** liefert `StartCamera` (`camera.ts:16`) und rahmt **alle** Orte der Anbieterkarte, auch die blassen, nicht nur kommende. ADR 0037 passt dafür den Wortlaut „über alle kommenden Orte“ in ADR 0008 und `architecture.md:134` an (Review m5). Die Kamera-Regel gilt: nie auf Standort oder Kartenmitte; auf der Anbieterkarte auch kein Stadtteil-Zoom (E4, Review M3).
+- **`providerCamera`** liefert `StartCamera` (`camera.ts:16`) und rahmt **alle** Orte der Anbieterkarte, auch die blassen, nicht nur kommende. ADR 0038 passt dafür den Wortlaut „über alle kommenden Orte“ in ADR 0008 und `architecture.md:134` an (Review m5). Die Kamera-Regel gilt: nie auf Standort oder Kartenmitte; auf der Anbieterkarte auch kein Stadtteil-Zoom (E4, Review M3).
 - **Wer das Modul importiert:** nur der Karten-Chunk (`karte/`, E5). `ui/anbieter/` und `directory.ts` importieren es nicht (`lazy-domain-apart`, die Regel bekommt `provider-places.ts` dazu). Die Sets aus `onInView` sind einfache `Set<string>`, der Anbieter-Chunk braucht dafür keinen Import.
 
 ### E3 – Filter im Tab „Anbieter“: nur Kategorie und Alter
@@ -231,7 +233,7 @@ export function providerPlaces(input: {
 - **`lastCamera`** wird je `kind` gemerkt, also `Record<kind, StartCamera | undefined>`. So erbt die Anbieterkarte nicht den Ausschnitt der Angebotskarte.
 - **`__zpMap`** bleibt eine Instanz, die beiden Karten sind nie zugleich im DOM.
 - **Regeln:**
-  - `map-entry-only`: `pathNot` um `^src/ui/karte/ProviderMapScreen\.tsx$` erweitern, Kommentar mit Verweis auf Plan 0054.
+  - `map-entry-only`: `pathNot` um `^src/ui/karte/ProviderMapScreen\.tsx$` erweitern, Kommentar mit Verweis auf Plan 0055.
   - `LAZY_LOADERS`: neu nur `ProviderMapScreen` → `../map/` (Review m1).
   - `lazy-domain-apart` um `provider-places.ts` erweitern.
   - `vite.config.ts`: Das Asset-Muster `^Map(View|Screen)\b` betrifft nur CSS. `ProviderMapScreen` bekommt kein eigenes CSS, die Stile kommen nach `src/ui/styles/map.css`.
@@ -250,7 +252,7 @@ export function providerPlaces(input: {
 
 Gemessen wird nach S4 mit `pnpm size`. Reißt ein Budget, wird nicht gesenkt, sondern zuerst gekürzt. Sonst entscheidet der Nutzer, wie in ADR 0012.
 
-### E7 – ADR 0037 „Anbieterkarte lädt mit dem Tab“
+### E7 – ADR 0038 „Anbieterkarte lädt mit dem Tab“
 
 - Ändert ADR 0008, Punkt „Nur in der Kartenansicht“: Auch das Öffnen des Tabs „Anbieter“ ist eine ausdrückliche Handlung und lädt die Karte samt Kacheln.
 - Alles andere aus ADR 0008 gilt weiter: einziger Host, kein Querystring, Kamera-Regel, kein Cache, Hinweistext unter der Karte.
@@ -260,7 +262,7 @@ Gemessen wird nach S4 mit `pnpm size`. Reißt ein Budget, wird nicht gesenkt, so
   - `docs/architecture.md`, Invariante Privatsphäre: „nur bei offener Karte (Karte in ‚Entdecken‘, Merkliste, Tab ‚Anbieter‘)“
   - Absatz Wegzeit-Anlässe: Die Anbieterkarte ist **kein** neuer Anlass, Wegzeit und Linien laden dort wie heute im Tab.
   - Datenschutztext in `imprintPage()` (`scripts/lib/share-pages.ts`), Pflicht nach ADR 0028
-  - Statuszeile von ADR 0008 („geändert durch ADR 0037“)
+  - Statuszeile von ADR 0008 („geändert durch ADR 0038“)
 
 ### E8 – E2E und Wächter
 
@@ -298,7 +300,7 @@ Neu:
 - `src/ui/karte/ProviderMapScreen.tsx`
 - `src/ui/karte/ProviderPlaceSheet.tsx`
 - `e2e/anbieter-karte.spec.ts`
-- ADR 0037 „Anbieterkarte lädt mit dem Tab“ (unter `docs/adr/`, entsteht in S5)
+- ADR 0038 „Anbieterkarte lädt mit dem Tab“ (unter `docs/adr/`, entsteht in S5)
 
 Geändert:
 - **Domäne und Build:** `src/domain/site-data.ts` (+ Test), `src/domain/geo.ts` (`isGeoPoint`, + Test), `src/domain/filter.ts` (+ Test), `src/domain/directory.ts` (+ Test), `src/domain/provider-count.ts` (+ Test), `src/domain/camera.ts` (Helfer, + Test), `scripts/build-data.ts`
@@ -338,7 +340,7 @@ Die lokale E2E-Prüfung richtet sich nach „Lokal prüfen“ in CLAUDE.md (Revi
   - Lokal: `pnpm e2e:local e2e/karte.spec.ts e2e/anbieter-karte.spec.ts`.
   - Danach `pnpm size` samt Chunk-Wächter, und die Tabelle in E6 mit Messwerten füllen.
 - **S5 – Doku und Privatsphäre (E7):**
-  - ADR 0037, `architecture.md`, `imprintPage()`, Statuszeile von ADR 0008, `ideas.md`.
+  - ADR 0038, `architecture.md`, `imprintPage()`, Statuszeile von ADR 0008, `ideas.md`.
   - Hinweis in Plan 0042: Budget **und** Startausschnitt über zwei Regionen (Review 2, m9).
   - Lokal `pnpm e2e:local --affected --smoke`, weil `share-pages.ts` die Vorschauseiten betrifft (Review 2, m10).
 - **S6 – Prüfen:**
@@ -386,7 +388,7 @@ Reviewer: Subagent `plan-reviewer`, ohne Chat-Kontext. Alle Punkte übernommen, 
   - m2: `isGeoPoint` in `geo.ts`, Typ `StartCamera`
   - m3: `onTap` je `kind`
   - m4: `onSheetOpen` und Fokus-Rückweg
-  - m5: Wortlaut zum Startausschnitt in ADR 0037
+  - m5: Wortlaut zum Startausschnitt in ADR 0038
   - m6: Risiko zweite Region
   - m7: lokale E2E je Schritt
   - m8: Ansage verzögert
@@ -444,7 +446,7 @@ Dritter Reviewer, ohne Chat-Kontext. Er findet keinen Blocker und bestätigt die
 - **N10 (E7):** „Mitzuändern“ umfasst zusätzlich:
   - `architecture.md:135` (Stadtteil fährt nur die Angebotskarte) und `:68–72` (Lader, `karte/entry.ts`, Ausnahme in `map-entry-only`)
   - `docs/ideas.md:45` (veraltet: `anbieter.json` hat jetzt `geo`)
-  - ADR 0037 nennt die Ausnahme in `map-entry-only` ausdrücklich (CLAUDE.md, Backpressure)
+  - ADR 0038 nennt die Ausnahme in `map-entry-only` ausdrücklich (CLAUDE.md, Backpressure)
 - **N11 (E6):** Das Startbudget beträgt 150 kB (ADR 0012, Nachtrag 2026-10-24), nicht 90 kB. Die Messwerte kommen als Zeile in die Delta-Tabelle von ADR 0012.
 - **N12 (S4):** Lokal zusätzlich `pnpm e2e:local --affected`, denn `App.tsx`, `MapPanel.tsx` und `ProviderPanel.tsx` ändern sich.
 - **N13 (E5):** Scheitert `anbieter.json`, zeigt die Karte nur den Hinweis „Anbieter lassen sich gerade nicht laden.“ ohne Knopf. „Nochmal versuchen“ gibt es nur in der Liste, und es lädt beide neu (gemeinsamer Hook).
