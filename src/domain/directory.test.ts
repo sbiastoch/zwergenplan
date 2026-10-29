@@ -22,8 +22,17 @@ const TURNVEREIN: SiteProvider = {
   name: "Turnverein Beispiel (fiktiv)",
   url: "https://example.org/turnverein",
   venues: [
-    { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
-    { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
+    {
+      name: "Turnhalle Beispiel",
+      address: "Sportweg 3, 90441 Nürnberg",
+      district: "Schweinau",
+      geo: { lat: 49.4392, lon: 11.0442 },
+    },
+    {
+      name: "Gymnastikraum Beispiel",
+      address: "Am Beispielpark 7, 90480 Nürnberg",
+      geo: { lat: 49.4502, lon: 11.1301 },
+    },
   ],
 };
 

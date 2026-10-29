@@ -107,10 +107,13 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
     for (const p of directory.providers) {
       expect(Object.keys(p).sort()).toEqual(["id", "name", "url", "venues"]);
       for (const v of p.venues) {
-        expect(Object.keys(v).every((k) => ["name", "address", "district"].includes(k))).toBe(true);
+        expect(Object.keys(v).every((k) => ["name", "address", "district", "geo"].includes(k))).toBe(true);
+        // geo je Ort für die Anbieterkarte (Plan 0055, E1), sonst nichts aus der Recherche
+        expect(Object.keys(v.geo).sort()).toEqual(["lat", "lon"]);
       }
     }
-    const json = JSON.stringify(directory);
+    // Auf Ebene des Anbieters bleibt die Recherche draußen, auch sein eigenes `geo` (Plan 0055, N14).
+    const json = JSON.stringify(directory.providers.map(({ venues: _, ...p }) => p));
     for (const key of [
       "topics",
       "region",
@@ -134,8 +137,17 @@ describe("toProviderDirectory (Plan 0010, E6)", () => {
       name: "Turnverein Beispiel (fiktiv)",
       url: "https://example.org/turnverein",
       venues: [
-        { name: "Turnhalle Beispiel", address: "Sportweg 3, 90441 Nürnberg", district: "Schweinau" },
-        { name: "Gymnastikraum Beispiel", address: "Am Beispielpark 7, 90480 Nürnberg" },
+        {
+          name: "Turnhalle Beispiel",
+          address: "Sportweg 3, 90441 Nürnberg",
+          district: "Schweinau",
+          geo: { lat: 49.4392, lon: 11.0442 },
+        },
+        {
+          name: "Gymnastikraum Beispiel",
+          address: "Am Beispielpark 7, 90480 Nürnberg",
+          geo: { lat: 49.4502, lon: 11.1301 },
+        },
       ],
     };
     expect(turnverein).toEqual(expected);

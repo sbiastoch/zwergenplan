@@ -2,6 +2,7 @@
  * Was die Oberfläche lädt (public/data/site.json): geprüfte Angebote, denormalisiert um
  * Anbietername und Ort. Die UI importiert hieraus nur Typen – kein zod im Client-Bundle.
  */
+import type { GeoPoint } from "./geo.ts";
 import type { Offer, OffersFile, Provider, Venue } from "./schema.ts";
 
 /** `providerId` ist hier die `publicId` des Anbieters, nicht die Katalog-ID (ADR 0022); `venueId` bleibt intern. */
@@ -17,7 +18,8 @@ export interface SiteData {
 
 /**
  * Ein Anbieter in der Anbieterübersicht (Plan 0010, E6): nur Angaben für Eltern, nichts aus der Recherche
- * (kein `programme`, `notes`, `region`, `geo`, kein Orts-`hint`). Nur Katalog-Einträge mit `role: anbieter`.
+ * (kein `programme`, `notes`, `region`, kein Orts-`hint`). Nur Katalog-Einträge mit `role: anbieter`.
+ * `geo` je Ort trägt die Anbieterkarte (Plan 0055, E1).
  */
 export interface SiteProvider {
   /** `publicId` aus dem Katalog (ADR 0022) */
@@ -25,8 +27,11 @@ export interface SiteProvider {
   name: string;
   /** Website; laut Katalog bei allen Anbietern zugleich eine Programm-URL („Website & Programm“) */
   url: string;
-  /** Adresse ohne wiederholten Ortsnamen (`venueAddress`); `district` nur mit Wert */
-  venues: Array<{ name: string; address: string; district?: string }>;
+  /**
+   * Adresse ohne wiederholten Ortsnamen (`venueAddress`); `district` nur mit Wert. `geo` kann in einem
+   * älteren `anbieter.json` aus dem HTTP-Cache fehlen, Leser prüfen es per `isGeoPoint` (Plan 0055, N4).
+   */
+  venues: Array<{ name: string; address: string; district?: string; geo: GeoPoint }>;
 }
 
 /** Was die Anbieterübersicht lädt (public/data/anbieter.json), erst beim Öffnen von Tab oder Sheet (E6). */
@@ -98,7 +103,7 @@ export function toSiteData(providers: readonly Provider[], file: OffersFile): Si
 
 /**
  * Katalog für die Anbieterübersicht (Plan 0010, E6): nur `role: anbieter`, auch ohne Angebote, nach Name (`de`).
- * Genau die Felder aus `SiteProvider` – Recherche-Angaben (`programme`, `notes`, `region`, `geo`, Orts-`hint` …) bleiben draußen.
+ * Genau die Felder aus `SiteProvider` – Recherche-Angaben (`programme`, `notes`, `region`, Orts-`hint` …) bleiben draußen.
  */
 export function toProviderDirectory(providers: readonly Provider[], generatedAt: string): ProviderDirectoryData {
   const list = providers.flatMap((p): SiteProvider[] =>
@@ -108,10 +113,11 @@ export function toProviderDirectory(providers: readonly Provider[], generatedAt:
             id: p.publicId,
             name: p.name,
             url: p.url,
-            venues: p.venues.map(({ name, address, district }) => ({
+            venues: p.venues.map(({ name, address, district, geo }) => ({
               name,
               address: venueAddress(name, address),
               ...(district === undefined ? {} : { district }),
+              geo: { lat: geo.lat, lon: geo.lon },
             })),
           },
         ]
