@@ -26,7 +26,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **React Compiler**, sobald es Komponenten mit spürbaren Re-Render-Kosten gibt.
 - **Architektur-Review in CI** über `anthropics/claude-code-action`. Braucht einen API-Key und kostet pro Lauf.
 - **Erinnerung „Anmeldung öffnet“** als eigener ICS-Termin.
-- **Einstieg in laufende Kurse**: Die Liste sortiert nach dem nächsten Termin und zeigt „Kurs · noch 4 von 8“ (Plan 0003). Ob ein Quereinstieg möglich ist, wissen die Daten nicht – dafür bräuchte das Schema ein Feld.
+- **Einstieg in laufende Kurse**: Seit Plan 0053 (E1) fehlen Kurse mit Anmeldung ab ihrem ersten Termin in „Entdecken“. Ob ein Quereinstieg möglich ist, wissen die Daten nicht – dafür bräuchte das Schema ein Feld.
 - **Browser für den Recherche-Lauf**: Mit verbundenem claude-in-chrome werden Plätze bei Eversports, Calendly und Kurabu lesbar (im ersten Lauf `unbekannt`).
 - **Kompakter Kopfbereich im Querformat**: Sticker und Chips nehmen quer ≈ 150 px Höhe ein. Mit der Seitenleiste (Plan 0007, E14) ist das tragbar, ein kompakterer Kopf wäre ein eigenes Designthema (Befund H1).
 - **Aktiven Kategorie-Sticker ins Bild scrollen** (Browser-Review Plan 0037): Bei `?kat=musik` oder nach dem Neuladen steht die Sticker-Leiste am Anfang, gewählte Sticker weiter rechts sind nicht sichtbar, nur der Zähler an „Filter“ zeigt die Auswahl.
@@ -100,6 +100,8 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Plätze und Anmeldestand per Rezept** (Plan 0046, `docs/plans/0046-verfuegbarkeit-per-rezept.md`, ausgearbeiteter Entwurf mit drei Reviews): Ein festes, deklaratives Rezept je Programmseite liest nachts die Verfügbarkeit, mit Systemrezepten für FBS, Kufer, Hebamio, Kursorganizer und JSON-LD; das Modell bleibt Rückfall. Zurückgestellt am 2026-10-25, weil freie Plätze für den Nutzer optional sind. Wird er aufgenommen, setzt er auf der Einheit Seite aus Plan 0048 auf (ADR 0033) und braucht ein neues Review.
 - **Impressum offline** (Plan 0034, ADR 0028): `impressum/` im Service Worker vorhalten, damit der Link in der installierten App ohne Netz nicht ins Leere führt.
 - **apt-Pakete der Browser in der CI cachen** (Plan 0052, verworfen zugunsten des Spiegelwechsels): `actions/cache` über `/var/cache/apt/archives`, Schlüssel je Image und Playwright-Version. Erst, wenn ein Lauf trotz Wechsel des Spiegels an der Installation scheitert.
+- **Geburtszeitraum als Schemafeld** (Plan 0053, verworfen für den Anfang): Regelmäßige Gruppen für einen Jahrgang („Miniclub: Kinder geb. 02-06/2026“) wachsen mit, ein festes `age` passt nicht. Ein Feld `birthCohort` am Angebot (Prüfung „Geburtsdatum im Zeitraum“) wäre exakt; braucht Schemaänderung, Export und Prompt.
+- **Leerzustand bei nur laufenden Kursen** (Plan 0053, Offen): Mit „Format: Kurs“ kann die Liste leer sein, obwohl gemerkte laufende Kurse auf der Merkliste stehen. Ein Hinweis darauf, falls es auffällt.
 
 ## Offen aus abgeschlossenen Plänen
 

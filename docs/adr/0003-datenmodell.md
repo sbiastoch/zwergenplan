@@ -1,6 +1,6 @@
 # ADR 0003 – Datenmodell: Angebote mit materialisierten Terminen
 
-Status: angenommen (2026-10-04), ID-Regel ergänzt durch ADR 0006; „Stabile IDs“ und UID-Regel ersetzt durch ADR 0022 (gespeicherte Kurz-ID), Feld `publicId` am Anbieter ergänzt durch ADR 0022; Schema `Timetable` (Fahrplanauszug) ergänzt durch ADR 0015 (Verkehrsmittel `mode` je Fahrt); ICS-Dateien aus dem Browser ergänzt durch ADR 0007 (Merkliste) und ADR 0018 (regelmäßige Reihen nach Alter); Katalog ohne Inhaltsfacetten, Felder nach Rolle ergänzt durch ADR 0024; Geo-Prüfung je Region statt fester bbox und `ring` gestrichen durch ADR 0025; Datenhorizont von `data/offers.json` 12 statt 4 Monate durch ADR 0026; „Themen und Kategorien“ teilweise abgelöst durch ADR 0030 (Hauptkategorie `category` gespeichert, Filter nur auf sie; mit Plan 0037)
+Status: angenommen (2026-10-04), ID-Regel ergänzt durch ADR 0006; „Stabile IDs“ und UID-Regel ersetzt durch ADR 0022 (gespeicherte Kurz-ID), Feld `publicId` am Anbieter ergänzt durch ADR 0022; Schema `Timetable` (Fahrplanauszug) ergänzt durch ADR 0015 (Verkehrsmittel `mode` je Fahrt); ICS-Dateien aus dem Browser ergänzt durch ADR 0007 (Merkliste) und ADR 0018 (regelmäßige Reihen nach Alter); Katalog ohne Inhaltsfacetten, Felder nach Rolle ergänzt durch ADR 0024; Geo-Prüfung je Region statt fester bbox und `ring` gestrichen durch ADR 0025; Datenhorizont von `data/offers.json` 12 statt 4 Monate durch ADR 0026; „Themen und Kategorien“ teilweise abgelöst durch ADR 0030 (Hauptkategorie `category` gespeichert, Filter nur auf sie; mit Plan 0037); Alter mit Zeitraum, laufende Kurse und Geburtszeitraum ergänzt durch Plan 0053 (Nachtrag).
 
 ## Entscheidung
 - Ein **Offer** ist ein Kurs, ein regelmäßiger Termin oder ein einmaliger Termin (`format: kurs | regelmaessig | einmalig`). Anmeldung (`mit-/ohne-anmeldung`) und Kosten (`kostenlos/kostenpflichtig`) sind eigene, unabhängige Dimensionen. „Offener Treff“ heißt `regelmaessig` + `ohne-anmeldung`.
@@ -16,3 +16,9 @@ Status: angenommen (2026-10-04), ID-Regel ergänzt durch ADR 0006; „Stabile ID
 
 ## Konsequenzen
 - Ändert ein Anbieter einen Titel, entsteht eine neue ID. Das ist akzeptiert, denn neuer Titel heißt meist neues Angebot.
+
+## Nachtrag (Plan 0053, 2026-10-29)
+
+- „Bei regelmäßigen Angeboten zu irgendeinem Termin“ heißt mit Zeitraum des Filters: zu irgendeinem Termin **im Zeitraum**. Sonst stand der Termin dieser Woche als passend in der Liste, obwohl erst ein späterer passt.
+- Ein Kurs mit Anmeldung für die ganze Reihe erscheint nur bis zum Beginn seines ersten Termins in „Entdecken“; danach nur noch auf der Merkliste. Der Datenstand behält ihn (Serien-ICS, Merkliste).
+- Nennt der Titel eines Kurses oder Einzeltermins einen Geburtszeitraum, setzt der Build `age` daraus (Alter am ersten Termin), statt die Angabe der Quelle zu übernehmen.

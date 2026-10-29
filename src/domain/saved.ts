@@ -152,7 +152,8 @@ export function applySavedFilter<T extends Offer & { venue: ReachTarget }>(
   now: Date,
   { useRange }: { useRange: boolean },
 ): T[] {
-  return applyFilters(offers, asFilterState(filter, useRange), { now });
+  // Gemerkte laufende Kurse bleiben: Man nimmt vielleicht teil (Plan 0053, E1)
+  return applyFilters(offers, asFilterState(filter, useRange), { now, runningCourses: true });
 }
 
 /** Passt ein Angebot zu Format und Anmeldung, ohne Zeitbezug? Für „heute schon vorbei“ im Kalender (M7). */

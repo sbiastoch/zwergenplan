@@ -122,3 +122,25 @@ Abgelehnt: keine.
 - Minor 1 Invariante „Ein Datenvertrag“ um `age` ergänzt. Minor 2 `docs/ideas.md`, „Einstieg in laufende Kurse“, umgeschrieben. Minor 3 Basis der ID-Abnahme: Der Vorher-Lauf lief vor jeder Änderung am selben Tag (Arbeitsbaum sauber bis auf den Plan). Minor 4 unter Offen. Minor 5 bewusst akzeptiert (E1, Folgen). Minor 6 Statuszeile von ADR 0003 verweist auf den Nachtrag. Minor 7 Negativfälle „geb. ab …“ und „geb. 1.1.–30.6.2026“ in Test 7.
 
 Abgelehnt: keine.
+
+## Umsetzung (2026-10-29)
+
+- **ID-Abnahme** (E3): `--build-only` vor und nach der Änderung am 2026-10-29, danach `data/` zurückgesetzt. 431 Angebote vorher und nachher, gleiche ID-Menge; geändert ist nur `age` bei 17 Kursen mit Geburtszeitraum (7 davon vorher ohne `age`), sonst nichts. `cl18m38e` bekommt 2–5 Monate (Beginn 22.09.), passt also nicht mehr zu 8 Monaten.
+- **Nachtrag zu E3**: Beim Kurs rechnet der Build das Alter erst nach der Fortschreibung um vergangene Termine (`courseCohortAge` nach `assignIds`), sonst zählte der erste Termin der Quelle ab heute statt des Kursbeginns (beim ersten Probelauf 4–7 statt 2–5 für `cl18m38e`).
+- **Umgebung**: `scripts/heavy.test.ts` („… danach ist die Gruppe leer (M2)“) ist in der Cloud-Session rot, auch ohne diese Änderung: PID 1 (`process_api`) räumt verwaiste Prozesse nicht ab, sie bleiben Zombies, und `kill(-pgid, 0)` sieht die Gruppe als lebend. Nicht Teil dieses Plans; die CI prüft ihn.
+
+## Arch-Review (2026-10-29) – Verdict: Nacharbeit nötig → behoben
+
+- **M1** Einzeltermine mit Geburtszeitraum konnten später über 36 Monate wachsen (ungültiges `AgeRange`, Nachtlauf rot): Prüfung je Termin, zu alte Termine entfallen mit Hinweis; Test.
+- m1, m2 Invariante „Laufende Kurse“ in `docs/architecture.md` präzisiert (zweiter Nutzer von `runningCourses`, Vorschauseite, `startedCourse` für die Wochenzahl).
+- m4 Gegenprobe im E2E: kurz vor Kursbeginn steht PEKiP in der Liste.
+- m3 (E2E für die Karte in „Entdecken“ mit Zeitraum) nicht übernommen: Liste und Karte bekommen denselben Kontext `discoverCtx` an zwei benachbarten Stellen in `App.tsx`; die Liste prüft der neue Fall in `zeitraum.spec.ts`, eine Karten-Spec kostet einen Kartenstart mit Kachel-Wächter für eine Zeile Verdrahtung. Browser-Review prüft die Karte.
+
+## Browser-Review (2026-10-29, lokal, Fixture-Build)
+
+Standardansichten `start` und `merkliste` (alle Viewports, hell/dunkel) unverändert. Eigene Zustände auf 390×844 hell/dunkel (Uhr per Playwright):
+- 20.10. „Entdecken“: 6 statt 7 Angebote, PEKiP (läuft seit 13.10.) fehlt; nichts verrutscht.
+- 20.10. Merkliste mit PEKiP und Treff: PEKiP mit „Kurs · noch 6 von 8“, Statuszeile „2 Angebote mit insgesamt 9 Terminen“.
+- Zeitraum 5.–11.10., Kind 5 Monate, Altersfilter aus: Treff gestrichelt mit „6–24 Monate“, Hinweis „Zeigt auch 1 Angebot, das nicht zu 5 Mon. passt“; Detail „Passt nicht: am Mi 7.10. 5 Monate alt · passt ab 21.10.“, also wie die Liste.
+- Checkliste: Lesbarkeit, Daumenbereich, Dark Mode, Micro-Interactions unverändert (keine neuen Bedienelemente); Zustände: Leerzustand mit nur laufenden Kursen siehe Offen.
+- Lokal nicht prüfbar: Das LCP-Budget der Smoke-Specs reißt in dieser Cloud-Session auch ohne die Änderung (2724 ms auf dem Ausgangsstand); entscheidend ist die CI.

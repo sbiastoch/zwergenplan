@@ -71,6 +71,14 @@ describe("offerFitsAge", () => {
     expect(offerFitsAge(treff, "2026-06-01", FIXTURE_NOW)).toBe(false);
   });
 
+  it("mit Zeitraum: regelmäßig nur über Termine darin, Kurse weiter am ersten Termin (Plan 0053, E2)", () => {
+    const treff = fixtureOffer("krabbeltreff"); // 6–24 Monate; geb. 1.5.2026 erst ab 1.11. passend
+    expect(offerFitsAge(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-10-05", to: "2026-10-11" })).toBe(false);
+    expect(offerFitsAge(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-11-01" })).toBe(true);
+    const pekip = fixtureOffer("pekip-herbst");
+    expect(offerFitsAge(pekip, "2026-09-10", FIXTURE_NOW, { from: "2026-12-01" })).toBe(true);
+  });
+
   it("wertet bei regelmäßigen Angeboten nur kommende Termine", () => {
     const treff = fixtureOffer("krabbeltreff"); // bis 24 Monate; Termine 7.10.–4.11.
     // geb. 15.9.2024: am 7. und 14.10. noch 24 Monate, ab 15.10. zu alt
@@ -167,7 +175,26 @@ describe("ageVisibility", () => {
 
   it("ohne Geburtsdatum passt alles", () => {
     const v = ageVisibility(filtered, upcoming, undefined, FIXTURE_NOW, { ageOnly: true });
-    expect(v).toEqual({ visible: filtered, unfitCount: 0, unfitIds: new Set() });
+    expect(v).toEqual({ visible: filtered, unfitCount: 0, unfitIds: new Set(), listUnfitIds: new Set() });
+  });
+
+  it("mit Zeitraum zählt bei regelmäßigen nur ein passender Termin darin (Plan 0053, E2)", () => {
+    // Treff 6–24 Monate, Kind geb. 1.5.2026: am 7.10. 5 Monate, erst am 4.11. passend
+    const birth = "2026-05-01";
+    const week = { from: "2026-10-05", to: "2026-10-11" };
+    const v = ageVisibility(filtered, upcoming, birth, FIXTURE_NOW, { ageOnly: true, range: week });
+    expect(v.visible.map(fixtureKey)).not.toContain("krabbeltreff");
+    expect(unfitKeys(v.listUnfitIds)).toContain("krabbeltreff");
+    // ohne Zeitraum passt er später: keine Markierung auf Merkliste und in Sheets
+    expect(unfitKeys(v.unfitIds)).not.toContain("krabbeltreff");
+    const later = ageVisibility(filtered, upcoming, birth, FIXTURE_NOW, {
+      ageOnly: true,
+      range: { from: "2026-11-01" },
+    });
+    expect(later.visible.map(fixtureKey)).toContain("krabbeltreff");
+    const none = ageVisibility(filtered, upcoming, birth, FIXTURE_NOW, { ageOnly: true });
+    expect(none.listUnfitIds).toBe(none.unfitIds);
+    expect(none.visible.map(fixtureKey)).toContain("krabbeltreff");
   });
 });
 

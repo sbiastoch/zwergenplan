@@ -4,7 +4,7 @@
  * (`push-domain-not-in-start`).
  */
 import { ageInMonths, sessionFit, startFitsAge } from "./age.ts";
-import { nextSession } from "./agenda.ts";
+import { discoverable, startedCourse } from "./agenda.ts";
 import { type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId } from "./ids.ts";
 import { listingWeek } from "./listing.ts";
@@ -14,7 +14,7 @@ import type { Offer, Session } from "./schema.ts";
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
- * IDs der neuen Angebote mit kommendem Termin (Regel der Liste), in Datenreihenfolge (Plan 0043, E3): Mit `listedAt`
+ * IDs der neuen Angebote mit kommendem Termin und ohne laufende Kurse (Regel der Liste, `discoverable`, Plan 0053), in Datenreihenfolge (Plan 0043, E3): Mit `listedAt`
  * ist neu, was in dieser Woche eingestellt wurde (`listingWeek`, auch ein neuer Durchgang unter alter ID). Ohne
  * `listedAt` (Bestand vor Plan 0043) ist neu, was in `before` fehlt; ohne `before` keins davon. Alte lange IDs in
  * `before` (gespeicherte `seenIds`, Stand vor 7 Tagen) zählen als ihre Kurz-ID (ADR 0022) – sonst meldete die erste
@@ -24,15 +24,16 @@ export function newOfferIds(before: readonly string[] | undefined, after: readon
   const known = before && new Set(before.map((id) => resolveOfferId(id) ?? id));
   const fresh = (o: Offer) =>
     o.listedAt !== undefined ? listingWeek(o, now) === "diese-woche" : known !== undefined && !known.has(o.id);
-  return after.filter((o) => fresh(o) && nextSession(o, now) !== undefined).map((o) => o.id);
+  return after.filter((o) => fresh(o) && discoverable(o, now)).map((o) => o.id);
 }
 
 /**
- * Angebote mit mindestens einem Termin, der in [now, now + 7 × 24 h) beginnt (E4). Ein laufender Termin zählt nicht;
+ * Angebote mit mindestens einem Termin, der in [now, now + 7 × 24 h) beginnt (E4), ohne laufende Kurse (Plan 0053, E1).
+ * Ein laufender Termin zählt nicht;
  * an den Umstellungs-Wochenenden verschiebt sich das Ende bewusst um eine Stunde.
  */
 export function offersInWeek<T extends Offer>(offers: readonly T[], now: Date): T[] {
-  return offers.filter((o) => o.sessions.some((s) => startsInWeek(s, now)));
+  return offers.filter((o) => !startedCourse(o, now) && o.sessions.some((s) => startsInWeek(s, now)));
 }
 
 function startsInWeek(session: Session, now: Date): boolean {

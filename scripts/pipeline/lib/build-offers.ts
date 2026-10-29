@@ -7,6 +7,7 @@ import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/s
 import { addDays, berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import { fallbackCategory } from "../../../src/domain/topics.ts";
 import type { Source } from "./candidate.ts";
+import { birthCohort, cohortAge } from "./cohort.ts";
 import {
   expansionWindow,
   isV2,
@@ -237,10 +238,22 @@ function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: strin
     notes.push(`${label}: Kurs beginnt nach dem Horizont – entfällt`);
     return [];
   }
-  if (e.age && e.age.minMonths > 36) {
-    notes.push(`${label}: erst ab ${e.age.minMonths} Monaten – entfällt`);
+  // Geburtszeitraum im Titel schlägt die Altersangabe des Modells, nur bei Kurs und Einzeltermin (Plan 0053, E3):
+  // Eine regelmäßige Gruppe wächst mit, ein festes Alter wäre dort ab dem nächsten Monat falsch.
+  const cohort = e.format === "regelmaessig" ? undefined : birthCohort(e.title);
+  const ageAt = (s: Session) => (cohort && cohortAge(cohort, s.start)) ?? e.age;
+  // Mit Geburtszeitraum wächst das Alter von Termin zu Termin: Einzeltermine je Termin prüfen, sonst entstünde ein
+  // späterer mit minMonths > 36 (ungültiges AgeRange, Build rot; Arch-Review Plan 0053, M1). Kurse am ersten Termin.
+  const tooOld = (s: Session) => (ageAt(s)?.minMonths ?? 0) > 36;
+  const young = e.format === "einmalig" ? kept.filter((s) => !tooOld(s)) : kept;
+  const [first] = young;
+  if (!first || tooOld(first)) {
+    const min = kept[0] && ageAt(kept[0])?.minMonths;
+    notes.push(`${label}: erst ab ${min} Monaten – entfällt`);
     return [];
   }
+  if (young.length < kept.length)
+    notes.push(`${label}: ${kept.length - young.length} Termin(e) erst ab über 36 Monaten – entfallen`);
   const local = (t: string | undefined) => {
     if (t === undefined) return undefined;
     try {
@@ -253,7 +266,11 @@ function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: strin
   const window = e.registrationWindow;
   const opens = local(window?.opens);
   const deadline = local(window?.deadline);
-  const base: Omit<Offer, "id" | "sessions"> = {
+  const capped = (s: Session) => {
+    const age = ageAt(s);
+    return age === undefined ? {} : { age: { minMonths: age.minMonths, maxMonths: Math.min(36, age.maxMonths) } };
+  };
+  const base: Omit<Offer, "id" | "sessions" | "age"> = {
     providerId: e.providerId,
     venueId: e.venueId,
     title: e.title,
@@ -265,7 +282,6 @@ function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: strin
     registration: e.registration,
     cost: e.cost,
     ...(e.price === undefined ? {} : { price: e.price }),
-    ...(e.age === undefined ? {} : { age: { minMonths: e.age.minMonths, maxMonths: Math.min(36, e.age.maxMonths) } }),
     ...(opens || deadline
       ? { registrationWindow: { ...(opens ? { opens } : {}), ...(deadline ? { deadline } : {}) } }
       : {}),
@@ -273,7 +289,21 @@ function fromRaw(e: RawEvent, checkedAt: string, input: BuildInput, label: strin
     url: e.url,
     sourceUrl: e.sourceUrl,
   };
-  return e.format === "einmalig" ? kept.map((s) => ({ ...base, sessions: [s] })) : [{ ...base, sessions: kept }];
+  // Einzeltermine je Termin, sonst am ersten Termin (ein Kurs passt zum Alter bei Beginn, ADR 0007)
+  return e.format === "einmalig"
+    ? young.map((s) => ({ ...base, ...capped(s), sessions: [s] }))
+    : [{ ...base, ...capped(first), sessions: young }];
+}
+
+/**
+ * Kurs mit Geburtszeitraum: das Alter am wirklichen Kursbeginn, also erst nach der Fortschreibung um vergangene
+ * Termine (`assignIds`). `fromRaw` kennt nur die Termine der Quelle ab heute (Plan 0053, E3).
+ */
+function courseCohortAge(offer: Offer): Offer {
+  const cohort = offer.format === "kurs" ? birthCohort(offer.title) : undefined;
+  const [first] = offer.sessions;
+  const age = cohort && first && cohortAge(cohort, first.start);
+  return age ? { ...offer, age: { minMonths: age.minMonths, maxMonths: Math.min(36, age.maxMonths) } } : offer;
 }
 
 /**
@@ -469,7 +499,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     horizon: input.horizon,
   });
   const previousById = new Map(previous.map((o) => [o.id, o] as const));
-  const offers = assigned.offers.map((o) => withListedAt(o, previousById.get(o.id), input));
+  const offers = assigned.offers.map((o) => courseCohortAge(withListedAt(o, previousById.get(o.id), input)));
   notes.push(...assigned.notes);
   for (const c of deduped.kept) if (c.derivedCategory) countDerived(c.offer.providerId);
   // 6. braucht IDs, deshalb nach der Zuordnung

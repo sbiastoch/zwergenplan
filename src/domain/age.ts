@@ -1,4 +1,5 @@
 import { nextSession, referenceSession, type SessionFit, upcomingSessions } from "./agenda.ts";
+import { type DateRange, inRangeDay } from "./date-range.ts";
 import type { AgeRange, Offer, Session } from "./schema.ts";
 import { berlinDate, daysInMonth, parseIsoDate } from "./time.ts";
 
@@ -44,14 +45,15 @@ export function fittingSessions(offer: Offer, now: Date, birthDate: string | und
 
 /**
  * Kurs/einmalig: entscheidend ist das Alter zum (ersten) Termin.
- * Regelmäßig: passt, sobald mindestens ein noch nicht beendeter Termin altersgerecht ist –
+ * Regelmäßig: passt, sobald mindestens ein noch nicht beendeter Termin altersgerecht ist, mit Zeitraum einer darin
+ * (Plan 0053, E2: sonst stünde der Termin dieser Woche als passend in der Liste, obwohl erst ein späterer passt) –
  * vergangene Termine bleiben bis zum nächsten Pipeline-Lauf in den Daten und zählen nicht.
  */
-export function offerFitsAge(offer: Offer, birthDate: string, now: Date): boolean {
+export function offerFitsAge(offer: Offer, birthDate: string, now: Date, range?: DateRange): boolean {
   const [first] = offer.sessions;
   if (!first) return false;
   if (offer.format === "regelmaessig") {
-    return fittingSessions(offer, now, birthDate).length > 0;
+    return fittingSessions(offer, now, birthDate).some((s) => !range || inRangeDay(range, s));
   }
   return fitsAgeAt(offer.age, birthDate, first.start);
 }
@@ -67,15 +69,16 @@ export function startFitsAge(offer: Offer, birthDate: string, now: Date): boolea
   return next !== undefined && fitsAgeAt(offer.age, birthDate, next.start);
 }
 
-/** Teilt nach `offerFitsAge`; die Reihenfolge bleibt erhalten. */
+/** Teilt nach `offerFitsAge` (mit Zeitraum, falls gegeben); die Reihenfolge bleibt erhalten. */
 export function splitByAge<T extends Offer>(
   offers: readonly T[],
   birthDate: string,
   now: Date,
+  range?: DateRange,
 ): { fitting: T[]; unfit: T[] } {
   const fitting: T[] = [];
   const unfit: T[] = [];
-  for (const offer of offers) (offerFitsAge(offer, birthDate, now) ? fitting : unfit).push(offer);
+  for (const offer of offers) (offerFitsAge(offer, birthDate, now, range) ? fitting : unfit).push(offer);
   return { fitting, unfit };
 }
 
@@ -119,23 +122,36 @@ export interface AgeVisibility<T> {
   visible: readonly T[];
   /** gefilterte Angebote, die nicht zum Kind passen: bei `ageOnly` ausgeblendet, sonst markiert sichtbar */
   unfitCount: number;
-  /** IDs aller kommenden Angebote, die nicht zum Kind passen (Markierung auf der Karte) */
+  /** IDs aller kommenden Angebote, die nicht zum Kind passen, ohne Zeitraum (Markierung auf Merkliste und in Sheets) */
   unfitIds: ReadonlySet<string>;
+  /** dasselbe mit dem Zeitraum des Filters (Liste und Karte in „Entdecken“, Plan 0053, E2); ohne Zeitraum `unfitIds` */
+  listUnfitIds: ReadonlySet<string>;
 }
 
 /**
  * Alters-Sichtbarkeit der Liste: `unfitIds` gilt für alle kommenden Angebote (`upcoming`),
- * ausgeblendet wird nur mit Altersfilter (`ageOnly`, Plan 0021) und Geburtsdatum.
+ * ausgeblendet wird nur mit Altersfilter (`ageOnly`, Plan 0021) und Geburtsdatum. Mit Zeitraum zählt bei regelmäßigen
+ * Angeboten nur ein passender Termin darin (`listUnfitIds`, Plan 0053, E2); `unfitIds` bleibt ohne Zeitraum, weil der
+ * Filter in „Entdecken“ beim Tabwechsel stehen bleibt und Merkliste und Sheets nicht betrifft.
  */
 export function ageVisibility<T extends Offer>(
   filtered: readonly T[],
   upcoming: readonly T[],
   birthDate: string | undefined,
   now: Date,
-  { ageOnly }: { ageOnly: boolean },
+  { ageOnly, range }: { ageOnly: boolean; range?: DateRange | undefined },
 ): AgeVisibility<T> {
-  if (birthDate === undefined) return { visible: filtered, unfitCount: 0, unfitIds: new Set() };
+  if (birthDate === undefined) {
+    const none = new Set<string>();
+    return { visible: filtered, unfitCount: 0, unfitIds: none, listUnfitIds: none };
+  }
   const unfitIds = new Set(splitByAge(upcoming, birthDate, now).unfit.map((o) => o.id));
-  const fitting = filtered.filter((o) => !unfitIds.has(o.id));
-  return { visible: ageOnly ? fitting : filtered, unfitCount: filtered.length - fitting.length, unfitIds };
+  const listUnfitIds = range ? new Set(splitByAge(upcoming, birthDate, now, range).unfit.map((o) => o.id)) : unfitIds;
+  const fitting = filtered.filter((o) => !listUnfitIds.has(o.id));
+  return {
+    visible: ageOnly ? fitting : filtered,
+    unfitCount: filtered.length - fitting.length,
+    unfitIds,
+    listUnfitIds,
+  };
 }

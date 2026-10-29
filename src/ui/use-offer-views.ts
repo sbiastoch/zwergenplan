@@ -53,6 +53,8 @@ export interface OfferViews {
   /** gefilterte Angebote, die nicht zum Kind passen (ausgeblendet oder markiert, Plan 0021) */
   unfitCount: number;
   unfitIds: ReadonlySet<string>;
+  /** dasselbe mit dem Zeitraum des Filters: Markierung in Liste und Karte von „Entdecken“ (Plan 0053, E2) */
+  listUnfitIds: ReadonlySet<string>;
   /**
    * Altersfilter „Nur passend für …“ (Plan 0021, E1): Standard an, nur im Speicher. Nach dem Neuladen ist er
    * wieder an; ein neues Geburtsdatum schaltet ihn ebenfalls wieder ein (`App.setBirthDate`).
@@ -152,16 +154,17 @@ export function useOfferViews({
   const [selection, setSelection] = useState<CalendarSelection>(() => ({ unit: "woche", day: berlinIsoDate(now) }));
   const [monthOpen, setMonthOpen] = useState(false);
 
-  const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
+  // mit laufenden Kursen (Plan 0053, E1): Markierung gemerkter Kurse, Datenende und Startausschnitt wie bisher
+  const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now, runningCourses: true }), [offers, now]);
   const filtered = useMemo(
     () => applyFilters(offers, route.filter, { now, reach }),
     [offers, route.filter, now, reach],
   );
-  const { visible, unfitCount, unfitIds } = useMemo(
-    () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly }),
-    [filtered, upcoming, birthDate, now, ageOnly],
-  );
   const range = route.filter.range;
+  const { visible, unfitCount, unfitIds, listUnfitIds } = useMemo(
+    () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, range }),
+    [filtered, upcoming, birthDate, now, ageOnly, range],
+  );
   // Mit „nur altersgerecht“ stehen regelmäßige Angebote am ersten passenden Termin (Plan 0028). Ohne Altersfilter
   // erscheinen sie wie alle anderen, unpassende sind markiert.
   const fits = useMemo(() => (ageOnly ? sessionFit(birthDate) : undefined), [ageOnly, birthDate]);
@@ -244,6 +247,7 @@ export function useOfferViews({
     visible,
     unfitCount,
     unfitIds,
+    listUnfitIds,
     ageOnly,
     setAgeOnly,
     page: takeGroups(groups, limit),

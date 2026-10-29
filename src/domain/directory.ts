@@ -3,7 +3,7 @@
  * Abgeleitet, nie gespeichert. Nur der Lazy-Chunk `src/ui/anbieter/` importiert dieses Modul (`directory-only-lazy`),
  * und es greift auf nichts zu, was nur die Karte nutzt (`places.ts`, `camera.ts`; `lazy-domain-apart`).
  */
-import { nextSession } from "./agenda.ts";
+import { discoverable } from "./agenda.ts";
 import { compareReach, type Reach } from "./reach.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
 import { CATEGORIES, type Category } from "./topics.ts";
@@ -159,9 +159,9 @@ export function providerRows(input: {
   };
 }
 
-/** Alle kommenden Angebote eines Anbieters, unabhängig von Filtern und Alter (Sheet, E4) */
+/** Alle kommenden Angebote eines Anbieters, unabhängig von Filtern und Alter, ohne laufende Kurse (Sheet, E4; Plan 0053, E1) */
 export function providerOffers(offers: readonly SiteOffer[], providerId: string, now: Date): SiteOffer[] {
-  return offers.filter((o) => o.providerId === providerId && nextSession(o, now) !== undefined);
+  return offers.filter((o) => o.providerId === providerId && discoverable(o, now));
 }
 
 /** Blendet die Auswahl (Filter, Alter, Wegzeit) Angebote dieses Anbieters aus? Dann sagt das Sheet es dazu (E4). */
