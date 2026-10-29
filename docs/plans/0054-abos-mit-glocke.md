@@ -302,3 +302,9 @@ Checkliste:
 - **Micro-Interactions**: Die Glocke hat `aria-pressed` mit Farbwechsel und die Animation des Herzens (unter reduzierter Bewegung aus), `aria-busy` während des Einschaltens. Eine Live-Interaktion in Chrome entfiel. Die Interaktionen laufen in den E2E-Specs (Tipp, Neuladen, offline, Fokus).
 - **Konsistenz**: Die Glocke nutzt die Form des Herzens (`.heart`), Toasts und Listen nutzen die vorhandenen Muster.
 
+## Live (2026-10-29)
+
+Live seit dc7498d: CI auf `main` grün, Deploy durch, `meta.json` zeigt `dc7498d`. Kurzcheck `/browser-review live` mit `glocke`, `push` und `anbieter-sheet` (iPhone hell und dunkel): Die Glocke steht auch neben langen echten Anbieternamen sauber, die Chips laufen weich aus, die Abo-Verwaltung bricht nicht. `anbieter-abos` nutzt Fixture-IDs und läuft live nicht.
+
+Offen vor dem Archivieren: der iPhone-Spike (E5; Glocke bei ausgeschaltetem Push, Erlaubnis „default“ und „granted“), danach Restpunkte nach `docs/ideas.md`.
+
