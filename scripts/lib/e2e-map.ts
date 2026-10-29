@@ -95,8 +95,10 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Querschnitt Layout über Breiten, Lagen und Textgrößen: nur die globale Hülle (Review 2, M1).
   // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4)
   "e2e/layout.spec.ts": [...SHELL, /^src\/ui\/SavedFilters\.tsx$/],
-  // Gemerkte Anbieter: Herz in Liste und Sheet, Reihenfolge im Tab, Suche, Privatsphäre (preferences, useSavedProviders).
+  // Anbieter-Abos: Glocke in Liste und Sheet, Reihenfolge im Tab, Suche, Privatsphäre auch beim Glocken-Tipp
+  // (preferences, useSavedProviders, bellPush in AppExtras; Plan 0054).
   "e2e/merkliste-anbieter.spec.ts": [
+    /^src\/ui\/AppExtras\.tsx$/,
     /^src\/ui\/anbieter\//,
     /^src\/ui\/(ProviderPanel|ProviderSearch)\.tsx$/,
     /^src\/ui\/use-app-state\.ts$/,
@@ -153,6 +155,8 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // und wegzeit.json (build-data.ts), Vorschauseite mit aktivem Service Worker (share-pages.ts), „Alle Termine“
   // offline (ics-export).
   "e2e/pwa.spec.ts": [
+    // Glocke offline, dann Kind-Sheet (Plan 0054, E4)
+    /^src\/ui\/AppExtras\.tsx$/,
     /^src\/sw\//,
     VITE_SW,
     /^src\/data\/(pwa|pwa-start|site)\.ts$/,

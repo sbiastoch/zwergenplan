@@ -1,7 +1,7 @@
 /**
  * Such-Abos (Plan 0017, E6): Sucheinstellungen der Liste, die die Wochen-Nachricht zuschneiden. Ein Abo ist der
  * kanonische Filter-Querystring ohne Zeitraum (`searchOf`), kein eigenes Format. Rein; gespeichert wird die Liste roh in
- * `src/data/searches-store.ts`, nur auf dem Gerät. Nicht im Start-Bundle (`push-domain-not-in-start`).
+ * `src/data/searches-store.ts`, nur auf dem Gerät. Seit Plan 0054 (E6, ADR 0037) im Start: die Glocke über der Liste.
  */
 import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts";
 

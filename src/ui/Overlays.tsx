@@ -36,6 +36,8 @@ interface OverlaysProps {
   /** abonnierte Anbieter (Plan 0025, E2; Plan 0054, E1): Glocke im Anbieter-Sheet */
   isProviderSaved: (providerId: string) => boolean;
   onToggleProvider: (providerId: string) => void;
+  /** Glocken-Tipp schaltet Push ein (Plan 0054, E5) */
+  bellBusy: boolean;
   /** ID weder im Katalog noch in den Angeboten: `anbieter=` entfernen */
   onUnknownProvider: () => void;
   /** Datenstand von site.json; `undefined`, solange sie lädt */
@@ -114,6 +116,7 @@ export function Overlays(props: OverlaysProps) {
             ctx={ctx}
             saved={props.isProviderSaved(providerId)}
             onToggleSaved={props.onToggleProvider}
+            bellBusy={props.bellBusy}
             onUnknown={props.onUnknownProvider}
             onShare={shareProvider}
             onClose={closeProvider}

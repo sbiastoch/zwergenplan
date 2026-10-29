@@ -12,6 +12,7 @@ export const PUSH_TEXTS = {
   switchingOff: "Wird ausgeschaltet …",
   denied: "In den Einstellungen des Geräts erlaubt?",
   device: "Geräte-Kennung",
+  needsSwitch: "Deine Abos wirken erst mit eingeschalteter wöchentlicher Push-Nachricht.",
   on: "Wöchentliche Push-Nachricht ist an.",
   off: "Wöchentliche Push-Nachricht ist aus.",
 } as const;

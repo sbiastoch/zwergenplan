@@ -31,3 +31,4 @@ __pycache__/
 .env
 # Wrangler (lokaler Zustand des Push-Workers)
 .wrangler/
+*.tsbuildinfo

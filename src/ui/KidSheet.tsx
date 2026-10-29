@@ -12,7 +12,7 @@ import type { TransitSource } from "../domain/transit-types.ts";
 import { useAppExtras } from "./AppExtras.tsx";
 import { BIRTH_DATE_INVALID, useBirthDateInput } from "./birth-date-input.ts";
 import { markAutofocus } from "./Dialog.tsx";
-import { plural, searchLabel } from "./format.ts";
+import { plural, providerAboName, searchLabel } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
 import type { OriginApi } from "./use-app-state.ts";
 import type { ReachMode } from "./use-transit.ts";
@@ -56,8 +56,10 @@ function AboList({ abos, birthDate }: { abos: AboListProps; birthDate: string | 
         </p>
       ) : (
         <ul className="push-list">
-          {abos.providers.map((id) => {
-            const name = abos.ready ? (abos.providerName(id) ?? "Anbieter ohne aktuelle Angebote") : "Anbieter-Abo";
+          {abos.providers.map((id, index) => {
+            const name = providerAboName(abos.providerName(id), abos.ready);
+            // ohne Namen gleichen sich die Knöpfe; die Nummer unterscheidet sie für Screenreader
+            const spoken = abos.ready && abos.providerName(id) ? name : `${name} ${index + 1}`;
             return (
               <li key={`a:${id}`}>
                 <span className="push-label">
@@ -67,7 +69,7 @@ function AboList({ abos, birthDate }: { abos: AboListProps; birthDate: string | 
                 <button
                   type="button"
                   className="btn"
-                  aria-label={`Abo ${name} beenden`}
+                  aria-label={`Abo ${spoken} beenden`}
                   onClick={() => removed(() => abos.removeProvider(id))}
                 >
                   Entfernen

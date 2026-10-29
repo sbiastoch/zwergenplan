@@ -634,6 +634,7 @@ export function App() {
             age={ageEscape}
             saved={savedProviders}
             onToggleSaved={onToggleProvider}
+            bellBusy={bellBusy}
           />
         )}
         {load.kind === "ready" && section === "merkliste" && (
@@ -694,6 +695,7 @@ export function App() {
         closeProvider={closeProvider}
         isProviderSaved={(id) => savedProviders.includes(id)}
         onToggleProvider={onToggleProvider}
+        bellBusy={bellBusy}
         onUnknownProvider={dropProvider}
         generatedAt={load.kind === "ready" ? load.data.generatedAt : undefined}
         offers={offers}

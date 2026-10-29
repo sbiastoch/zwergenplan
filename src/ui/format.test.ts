@@ -32,6 +32,7 @@ import {
   originHint,
   originPhrase,
   plural,
+  providerAboName,
   providerStatusParts,
   quickRangeLabel,
   rangeEmptyTexts,
@@ -925,5 +926,22 @@ describe("aboToast (Plan 0054, E5)", () => {
   it("Such-Abo mit Wegzeit ohne Startpunkt nennt das, solange Push nicht scheiterte", () => {
     expect(aboToast("suche", true, "an", true).text).toContain("ab einem Startpunkt");
     expect(aboToast("suche", true, "verweigert", true).text).toContain("blockiert");
+  });
+});
+
+describe("providerAboName (Plan 0054, E7)", () => {
+  it("Name aus den Angeboten, ohne Angebote ein Ersatz, vor dem Laden neutral", () => {
+    expect(providerAboName("Musikschule Beispiel (fiktiv)", true)).toBe("Musikschule Beispiel (fiktiv)");
+    expect(providerAboName(undefined, true)).toBe("Anbieter ohne aktuelle Angebote");
+    expect(providerAboName("Musikschule Beispiel (fiktiv)", false)).toBe("Anbieter-Abo");
+    expect(providerAboName(undefined, false)).toBe("Anbieter-Abo");
+  });
+});
+
+describe("searchLabel mit Mehrfachwerten", () => {
+  it("trennt Werte einer Dimension mit Komma, Dimensionen mit Punkt", () => {
+    expect(searchLabel("anmeldung=ohne-anmeldung,mit-anmeldung&kosten=kostenlos")).toBe(
+      "Mit Anmeldung, Ohne Anmeldung · Kostenlos",
+    );
   });
 });

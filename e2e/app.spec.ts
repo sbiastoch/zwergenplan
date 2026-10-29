@@ -69,6 +69,44 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });
 
+test("Glocke der Suche (Plan 0054, E6): erst mit Filter, abonniert über das Neuladen, beim sechsten Abo „voll“", async ({
+  page,
+}) => {
+  const bell = page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ });
+  await expect(bell).toHaveCount(0);
+  await page.getByRole("button", { name: "Kurse", exact: true }).click();
+  await expect(page).toHaveURL(/\?format=kurs$/);
+  await expect(page.getByRole("button", { name: "Suche „Kurs“ abonnieren" })).toHaveAttribute("aria-pressed", "false");
+  // die Glocke ist kein Filter: außerhalb der Gruppe „Schnellfilter“
+  await expect(
+    page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: /abonnieren/ }),
+  ).toHaveCount(0);
+  await bell.click();
+  await expect(bell).toHaveAttribute("aria-pressed", "true");
+  // ohne Push (headless) bleibt es beim Abo; der Rest des Texts hängt am Push-Zustand (E5)
+  await expect(page.getByText(/^Suche abonniert/)).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["format=kurs"]');
+  await page.reload();
+  await expect(bell).toHaveAttribute("aria-pressed", "true");
+  // in den anderen Tabs keine Glocke der Suche
+  await page
+    .getByRole("navigation", { name: "Hauptnavigation" })
+    .getByRole("button", { name: /^Anbieter/ })
+    .click();
+  await expect(bell).toHaveCount(0);
+
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "zwergenplan.such-abos",
+      JSON.stringify(["kat=musik", "kat=natur", "kat=buehne", "kat=babykurse", "kat=buecher"]),
+    ),
+  );
+  await page.goto("./?format=einmalig");
+  await bell.click();
+  await expect(page.getByText("Höchstens 5 Such-Abos. Erst eins entfernen.")).toBeVisible();
+  await expect(bell).toHaveAttribute("aria-pressed", "false");
+});
+
 test("Schnellfilter und Sticker stehen in der URL und überleben ein Neuladen", async ({ page }) => {
   await page.getByRole("button", { name: "Kurse", exact: true }).click();
   await expect(page.getByRole("button", { name: "Kurse", exact: true })).toHaveAttribute("aria-pressed", "true");

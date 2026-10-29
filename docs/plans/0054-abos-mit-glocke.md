@@ -158,7 +158,7 @@ Nicht-Ziele:
 
 ## Dateien
 
-- Neu: ADR 0037 (Datei `0037-abos-mit-glocke.md` in `docs/adr/`)
+- Neu: `docs/adr/0037-abos-mit-glocke.md`
 - Domäne: `src/domain/news.ts` (+ Test), `src/domain/searches.ts` (Kommentar)
 - Daten: `src/data/device-store.ts`, `src/data/push.ts` (+ Test), `src/data/searches-store.ts` (Kommentar)
 - SW: `src/sw/push-tailor.ts` (+ Test), `src/sw/push-decision.test.ts` („für deine Suchen“)
@@ -239,3 +239,66 @@ Runde 1 bestätigt gelöst: B1, M1, M3, M5, M6. Übernommen:
 13. Leeres Array löscht ausdrücklich, mit Unit-Test (E7).
 
 Abgelehnt: keins. Kein Blocker offen. Offen sind nur die Nutzerentscheidungen U1–U3.
+
+## Umsetzung (2026-10-29)
+
+S1–S6 umgesetzt. Abweichungen vom Plan:
+- **Identifier nicht umbenannt** (E1): `savedProviders`, `useSavedProviders`, `isProviderSaved` bleiben. Die Umbenennung hätte gut 30 Stellen ohne Verhaltensänderung berührt. Texte, Kommentare und E2E heißen „abonnieren“.
+- **Glocke der Suche** (E6): Sie steht fest rechts neben der Gruppe „Schnellfilter“ (`div.quickbar`), nicht nach dem Chip „Filter“ in der scrollenden Zeile. Ein `fieldset` mit `display: contents` hätte keinen Kasten, und `saved.spec.ts` prüft die Gruppe mit `toBeVisible`. So bleibt die Glocke bei 320 px sichtbar und verschiebt keine Chips.
+- **Erlaubnis im Start** (E5): `pushPermission` und `askPushPermission` liegen in `src/data/pwa-start.ts`. Biome sperrt `Notification` in `src/ui` (Plan 0011, E5b).
+- **Startpunkt-Hinweis** (E5, E7): Die App prüft `origin !== undefined` aus `useOrigin`, nicht `originFromStored`. `stored-origin.ts` darf nicht in den Start (`push-domain-not-in-start`).
+- **Texte**: Abschnitt im Kind-Sheet „Deine Abos“, eine gemeinsame Liste (Anbieter zuerst, dann Suchen, je mit Zusatz „Anbieter“ bzw. „Suche“). „Entfernen“ heißt für Screenreader „Abo … beenden“.
+- **SW-Budget**: Der Sparversuch in `weeklyText` (gemeinsamer Zahltext) brachte nach gzip nichts, daher zunächst 9 → 9,5 kB (U3). Beim Rebase auf `main` lag die Grenze schon bei 12 kB (ADR 0012, Nachtrag 2026-10-29), die 9,5 kB entfallen.
+
+## Arch-Review (2026-10-29) – Verdict: Nacharbeit nötig → behoben
+
+- **B1** `e2e/mobile-ux.spec.ts`: Ansicht `anbieter-sheet-gemerkt` suchte noch „… merken“. Umgestellt auf die Glocke, Ansichten heißen jetzt `anbieter-sheet-abonniert` und `anbieter-abonniert`.
+- **M1** `.quickbar`/`.quick-bell` hatten kein CSS. Jetzt Flex-Zeile in `chrome.css`, die Glocke fest rechts.
+- **M2** `bellPush` ohne Unit-Test: Die Entscheidung steht jetzt in `bellPushWith` mit injizierter Umgebung, `src/ui/AppExtras.test.ts` prüft alle Zweige. `problemOf` bleibt beim Duck-Typing, denn `push.ts` darf nicht statisch in den Start (begründet im Code).
+- **M3** Mobile-UX der gefüllten Abo-Liste lief nur auf Chromium. Neue Ansicht `kind-sheet-abos` in `mobile-ux.spec.ts`, auf allen Geräten.
+- **M4** `tsconfig.tsbuildinfo` aus dem Index genommen, `*.tsbuildinfo` in `.gitignore`.
+- **Minor**:
+  - m1 Kommentare in `searches.ts`, `searches-store.ts` und `vite.config.ts` nachgezogen.
+  - m2 `architecture.md`, Push-Teil: Satzbezug korrigiert.
+  - m3 ADR 0037, Konsequenzen: beide iOS-Fälle für den Spike genannt.
+  - m4 `AppExtras.tsx` wählt `merkliste-anbieter.spec.ts` und `pwa.spec.ts`.
+  - m5 `vite-sw.test.ts`: Fall mit `AppSection` als Start-Chunk.
+  - m6 `news.test.ts`: feste Sollwerte.
+  - m7 Privatsphäre-Test vergleicht Abonnieren und Beenden, nachdem das Vorladen fertig ist.
+  - m8 Anbieter-Glocken bekommen `busy` (`bellBusy` über `provider-types.ts`).
+  - m9 Typ von `syncPush` wieder genau.
+
+## Arch-Review 2 (2026-10-29) – Verdict: Nacharbeit nötig (kein Blocker) → behoben
+
+Runde 1 bestätigt behoben. Neu:
+- **M1** Namenswahl der Abo-Verwaltung ungetestet: jetzt `providerAboName` in `format.ts` mit Unit-Test; `kind-sheet-abos` prüft Name und Ersatztext.
+- **Minor**:
+  1. `architecture.md`: Der Service Worker liest Anbieter-Abos, das Vorladen bei sichtbarer Glocke ist nachgetragen.
+  2. Kommentare in `push.ts`, `push-tailor.ts` und die Lint-Texte in `biome.json` nennen die Ausnahme `pwa-start.ts`.
+  3. Hinweis „Deine Abos wirken erst mit eingeschalteter wöchentlicher Push-Nachricht“ steht wieder in `PushControls`, wenn Push aus ist.
+  4. `searchLabel` trennt Mehrfachwerte wieder mit Komma, mit typisierten Tabellen und Test.
+  5. `pushPermission` liefert beim Notausgang (`data-sw="aus"`) `undefined`, dann kommt kein Erlaubnis-Dialog.
+  6. Privatsphäre-E2E wartet gezielt auf den vorgeladenen `AppSection`-Chunk.
+  7. Ungeprüften Kommentar in `app.spec.ts` gestrichen.
+  8. Anbieter-Abos ohne Namen bekommen für Screenreader eine Nummer.
+
+## Browser-Review (2026-10-29, lokal, Fixture-Build)
+
+Ansichten `glocke`, `anbieter-abos`, `anbieter-sheet`, `push` (neu bzw. angepasst in `scripts/screenshots.ts`), je 320, 360, 365, iPhone, Pixel und quer, hell und dunkel: 48 Bilder, alle angesehen. Headless ist Push blockiert, daher zeigen die Toasts den Fall „blockiert“.
+
+- **F1** (`glocke-iphone-light`, `glocke-quer-*`): Die Chips brachen hart unter der Glocke ab, wegen des negativen Rands. Behoben: kein negativer Rand, die Chip-Zeile läuft vor der Glocke weich aus (`mask-image`).
+- **F2** (`push-*`, `push-quer-*`): Der lange Hinweis-Toast eines Glocken-Tipps steht noch, wenn man gleich das Kind-Sheet öffnet, und liegt dort über Liste und „Fertig“. Das ist das bestehende Toast-Muster der Dialoge, daher nicht geändert; Idee in `docs/ideas.md`.
+
+Checkliste:
+- **Lesbarkeit**: Die gedrückte Glocke ist gelb mit dunklem Symbol, in hell wie dunkel klar. Der Abschnitt „Deine Anbieter-Abos“ steht über „Weitere Anbieter“. In der Abo-Verwaltung steht die Art („Anbieter“, „Suche“) als Zusatz unter dem Namen.
+- **Daumen**: Die Glocke der Suche liegt oben rechts in der Filterzeile, also dort, wo auch die Filter sind. Die Anbieter-Glocken liegen rechts in jeder Zeile wie bisher das Herz. Die Abstände betragen ≥ 8 px, die Ziele 44 px.
+- **Zustände**:
+  - ohne Filter keine Glocke (E2E);
+  - leere Abo-Liste mit Hinweis;
+  - lange Such-Abos umbrechen bei 320 px ohne Abschneiden;
+  - Anbieter ohne Angebote heißen „Anbieter ohne aktuelle Angebote“;
+  - vor dem Laden „Anbieter-Abo“.
+- **Dark Mode**: keine hellen Inseln, die Glocke hat genug Kontrast.
+- **Micro-Interactions**: Die Glocke hat `aria-pressed` mit Farbwechsel und die Animation des Herzens (unter reduzierter Bewegung aus), `aria-busy` während des Einschaltens. Eine Live-Interaktion in Chrome entfiel. Die Interaktionen laufen in den E2E-Specs (Tipp, Neuladen, offline, Fokus).
+- **Konsistenz**: Die Glocke nutzt die Form des Herzens (`.heart`), Toasts und Listen nutzen die vorhandenen Muster.
+

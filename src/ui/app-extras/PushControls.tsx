@@ -77,6 +77,7 @@ export function PushControls({ push, support }: { push: PushApi; support: Extrac
       <p role="status" className="small push-status">
         {status}
       </p>
+      {on === false && <p className="small">{T.needsSwitch}</p>}
       {on && deviceId && (
         <p className="small">
           {T.device}: <code>{deviceId}</code>

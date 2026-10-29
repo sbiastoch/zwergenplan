@@ -3,7 +3,7 @@
  * Geräte-Speicher) kommt herein, damit alles ohne Browser testbar ist; `sw.ts` verdrahtet nur.
  *
  * Bei **jedem** Push: genau einmal `site.json` und `wegzeit.json` (für alle gleich, Privatsphäre), dazu Geburtsdatum,
- * Such-Abos, Startpunkt und gesehene IDs aus dem Geräte-Speicher. Alles in höchstens `timeoutMs` (iOS beendet den
+ * Such- und Anbieter-Abos, Startpunkt und gesehene IDs aus dem Geräte-Speicher. Alles in höchstens `timeoutMs` (iOS beendet den
  * Service Worker nach ≈ 10 s, Spike); nach Ablauf wird nichts mehr geschrieben.
  */
 import { filterFromSearch } from "../domain/filter.ts";

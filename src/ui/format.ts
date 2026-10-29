@@ -22,7 +22,7 @@ import {
 import { regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import type { ExportSelection } from "../domain/saved.ts";
-import type { Format, Session } from "../domain/schema.ts";
+import type { Cost, Format, Registration, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinDate, berlinIsoDate, isoWeekday, parseIsoDate } from "../domain/time.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
@@ -643,12 +643,11 @@ export function loadErrorText(reason: LoadFailure): string {
 }
 
 export const FORMAT_LABELS: Record<Format, string> = { kurs: "Kurs", regelmaessig: "Regelmäßig", einmalig: "Einmalig" };
-const CHOICE_LABELS: Record<string, string> = {
+const REGISTRATION_LABELS: Record<Registration, string> = {
   "ohne-anmeldung": "Ohne Anmeldung",
   "mit-anmeldung": "Mit Anmeldung",
-  kostenlos: "Kostenlos",
-  kostenpflichtig: "Kostenpflichtig",
 };
+const COST_LABELS: Record<Cost, string> = { kostenlos: "Kostenlos", kostenpflichtig: "Kostenpflichtig" };
 
 /** Ein Such-Abo in Worten (Plan 0017, E6): „Musik & Singen, Natur & Draußen · Kurs · Ohne Anmeldung · bis 20 Min.“ */
 export function searchLabel(search: string): string {
@@ -656,7 +655,8 @@ export function searchLabel(search: string): string {
   return [
     f.categories.map((c) => CATEGORY_LABELS[c]).join(", "),
     f.formats.map((x) => FORMAT_LABELS[x]).join(", "),
-    [...f.registration, ...f.cost].map((x) => CHOICE_LABELS[x]).join(" · "),
+    f.registration.map((x) => REGISTRATION_LABELS[x]).join(", "),
+    f.cost.map((x) => COST_LABELS[x]).join(", "),
     f.reachLimit ? `bis ${f.reachLimit.value} Min.` : "",
   ]
     .filter(Boolean)
@@ -665,6 +665,15 @@ export function searchLabel(search: string): string {
 
 /** Push-Zustand nach einem Glocken-Tipp (`bellPush` in AppExtras.tsx); die Probleme wie `PushProblem` in src/data/push.ts */
 export type BellPush = "an" | "eingeschaltet" | "aus" | "nein" | "verweigert" | "abo" | "netz" | "server";
+
+/**
+ * Name eines Anbieter-Abos in der Verwaltung (Plan 0054, E7): aus den geladenen Angeboten, ohne `anbieter.json`. Vor
+ * dem Laden neutral, nie „ohne aktuelle Angebote“ (Review 2, Nr. 3).
+ */
+export function providerAboName(name: string | undefined, ready: boolean): string {
+  if (!ready) return "Anbieter-Abo";
+  return name ?? "Anbieter ohne aktuelle Angebote";
+}
 
 export interface AboToast {
   text: string;
