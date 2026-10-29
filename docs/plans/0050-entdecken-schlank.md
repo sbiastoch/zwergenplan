@@ -1,6 +1,6 @@
 # Plan 0050 – Entdecken: wenige gute Quellen, Seitenfinder, keine technischen Verluste
 
-Status: Review eingearbeitet
+Status: freigegeben
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`):
@@ -17,7 +17,7 @@ Bezug:
 
 ## Voraussetzungen
 
-- **Rebase von `plan-0039` (Review 4, M3):** `plan-0039` ändert dieselben Dateien wie S1. Beim Rebase gilt: `geocode.ts` aus S1, darauf `municipality` und Gemeinde-Prüfung aus `plan-0039`; `discover.ts` aus S1, darauf `--netz` und die Gemeinde-Verwerfung; `discover.yml` aus S1 (ohne Wochen-Crons), der Samstags-Cron von `plan-0039` entfällt, `--netz` kommt in den `workflow_dispatch`-Aufruf.
+- **Rebase von `plan-0039` (Review 4, M3):** `plan-0039` ändert dieselben Dateien wie S1. Beim Rebase gilt: `geocode.ts` aus S1, darauf `municipality` und Gemeinde-Prüfung aus `plan-0039`; ein Treffer aus dem Katalog übernimmt die Gemeinde des Katalog-Orts bzw. seiner Region und fällt nicht als „Gemeinde unbekannt“ durch; Einträge in `orte` und im Lauf-Cache ohne `municipality` werden für Regionen mit Gemeinde-Prüfung neu angefragt (Review 5, M6); der Cache-Name ist `geocode-v3.json` (`geocode-v2.json` von `plan-0039` entfällt); `discover.ts` aus S1, darauf `--netz` und die Gemeinde-Verwerfung; `discover.yml` aus S1 (ohne Wochen-Crons), der Samstags-Cron von `plan-0039` entfällt, `--netz` kommt in den `workflow_dispatch`-Aufruf.
 
 - **Branch-Basis `main`.** `plan-0039` (Düsseldorf) geht erst nach Plan 0044 live (Plan 0042, N6), und vorher darf von dort nichts nach `main`. Deshalb:
   - Umgesetzt wird auf einem Branch von `main`; jeder Schritt kann für Nürnberg und Fürth live gehen.
@@ -168,19 +168,21 @@ Ein Lauf hat vier Phasen:
 
   Die Stufen 2 und 3 fragen nur nach einem Fehlschlag der vorigen. Stufe 1 fragt mit `limit=5`, damit „erster Treffer in der bbox“ eine Auswahl hat. Die Liste für Stufe 3 sind OSM-Tags: `leisure=sports_centre`, `leisure=sports_hall`, `leisure=swimming_pool`, `amenity=school`, `amenity=place_of_worship`, `amenity=community_centre`, `amenity=kindergarten`, `amenity=library`, `building=church`.
 
-  Der User-Agent folgt Plan 0048, E8. Die Schnittstelle wird `geocode(address, { region, venueName? })`; die CLI `pipeline geocode` (`cli.ts`) zieht mit.
+  Der User-Agent folgt Plan 0048, E8. Die Schnittstelle wird `geocode(address, { region, venueName? })`; die CLI `pipeline geocode` (`cli.ts`) zieht mit: `--region` mit Standard `nuernberg`, Skill (Abschnitt Katalogpflege, `references/catalog.md`) nennt `--region` und die 15 s Abstand.
 
   **Gemeinde (Review 4, M3):** Auf `main` prüft das Entdecken wie heute nur die bbox; `GeoResult.municipality` und die Gemeinde-Prüfung gibt es erst auf `plan-0039`. S1 bringt `municipality` nicht auf `main`. Beim Rebase übernimmt `plan-0039` die neue `geocode.ts` aus S1 und setzt `municipality` (aus `addressdetails`, alle drei Stufen fragen mit `addressdetails=1`) und die Gemeinde-Prüfung darauf.
 - **Nominatim nach seiner Policy:**
   - **Bekannte Orte zuerst:** Stimmt die normalisierte Adresse mit einem Ort im Katalog **des Laufs** überein, gilt dessen Lage ohne Anfrage. Im Eval ist das der Katalog nach dem Ausblenden der Stichprobe (`hideProviders`); deren Orte gehen so durch den Geocoder, sonst mäße S2 den Kern von S1 nicht (Review 4, M1; Test).
   - **Rate:** höchstens 4 Anfragen pro Minute in jedem Lauf der Pipeline, ob geplant, Eval oder lokal (Policy: regelmäßig laufende Skripte), also mindestens 15 s Abstand. Die Policy zählt den Verkehr aller Läufe zusammen: Ein lokales Eval und ein Lauf in Actions laufen nie gleichzeitig (Skill, Abschnitt 1).
-  - **Wartezeit (Review 4, M2):** Die Warteschlange liegt zwischen Bewerten und ID-Reservierung, also auf dem kritischen Pfad des Kandidaten, nicht des Laufs, solange andere Kandidaten parallel bewerten. Schätzung: Der Eval-Lauf vom 2026-10-12 (eine Region) machte 52 Modellaufrufe in 17 Minuten; bei etwa 20 bewerteten Kandidaten mit je 2–3 Orten sind das ohne Cache 40–60 Adressen, also 10–15 Minuten bei 4/min, mit Cache deutlich weniger. Der Bericht nennt Anfragen und Wartezeit des Geocoders; überschreitet die Wartezeit in S2 ein Viertel des Zeitbudgets, entscheidet S3 über einen Job je Region.
-  - **Cache im Zustand:** Positive Treffer stehen in `DiscoverState.orte` der Region (`data/discover/<region>.json`, `.default({})`). Schlüssel ist die normalisierte Anfrage mit Stufe und Region; der Wert ist `{lat, lon, adresse, district, datum}` (`municipality` erst mit `plan-0039`, optional).
+  - **Wartezeit (Review 4, M2):** Die Warteschlange liegt zwischen Bewerten und ID-Reservierung, In S1 und S2 läuft alles seriell, die Wartezeit addiert sich dort voll zur Laufzeit; erst mit der Parallelität aus S3 (E4.7) läuft sie neben dem Bewerten anderer Kandidaten her (Review 5, Minor 7). Schätzung: Der Eval-Lauf vom 2026-10-12 (eine Region) machte 52 Modellaufrufe in 17 Minuten; bei etwa 20 bewerteten Kandidaten mit je 2–3 Orten sind das ohne Cache 40–60 Adressen, also 10–15 Minuten bei 4/min, mit Cache deutlich weniger. Der Bericht nennt Anfragen und Wartezeit des Geocoders; überschreitet die Wartezeit in S2 ein Viertel des Zeitbudgets, entscheidet S3 über einen Job je Region; solche Jobs laufen **nacheinander**, sonst umgingen sie die Rate.
+  - **Cache im Zustand:** Positive Treffer stehen in `DiscoverState.orte` der Region (`data/discover/<region>.json`, `.default({})`). Schlüssel ist die **Eingabe**: normalisierte Adresse, `venueName` (falls gesetzt) und Region; der Wert ist `{lat, lon, adresse, stufe, district, datum}` (`municipality` erst mit `plan-0039`, optional). `adresse` ist bei jeder Stufe die aus `addressdetails` gebaute Adresse („Straße Nr, PLZ Ort“ bzw. „Name, PLZ Ort“), nicht die Eingabe. Ein Treffer aus Stufe 2 oder 3 erspart so in späteren Läufen auch die Anfragen der früheren Stufen (Review 5, M1).
     - Der Pfad ist schon in den Pfadlisten von `discover-git.ts` und im Bundle, Biome nimmt ihn aus, und `data:validate` prüft ihn über `DiscoverState`.
     - Treffer gelten 12 Monate. „Kein Treffer“ und Fehler werden nicht gespeichert.
     - Im Trockenlauf landet der Zustand nur unter `runs/`. **Gelesen** wird `orte` aber in jedem Lauf aus `data/discover/`, auch im Trockenlauf und im Eval.
-  - **Lauf-Cache über Läufe (Review 4, B1):** Bis S6 ist jeder Lauf trocken, und die Evals fragen dieselben Adressen immer wieder; die Policy droht dafür mit Sperre. Deshalb hält ein zweiter Cache positive Treffer über Läufe: `geocode-v2.json` im Cache-Verzeichnis (`io/cache.ts`), gleicher Schlüssel und Wert wie `orte`, 12 Monate. Er ersetzt `geocode.json`, das auch `null` dauerhaft speichert und nicht mehr gelesen wird. In Actions sichert `actions/cache` das Verzeichnis (Schlüssel `geocode-${{ github.run_id }}`, `restore-keys: geocode-`). Reihenfolge: Katalog des Laufs, `orte`, Lauf-Cache, Nominatim.
-  - **„Kein Treffer“ im Lauf:** Ein Speicher im Lauf merkt sich „kein Treffer“ je Anfrage und fragt dieselbe Adresse im selben Lauf nicht noch einmal; gespeichert wird es nicht.
+  - **Lauf-Cache über Läufe (Review 4, B1):** Bis S6 ist jeder Lauf trocken, und die Evals fragen dieselben Adressen immer wieder; die Policy droht dafür mit Sperre. Deshalb hält ein zweiter Cache Treffer über Läufe: `geocode-v3.json` im Cache-Verzeichnis (`io/cache.ts`), gleicher Schlüssel und Wert wie `orte`, Treffer 12 Monate. Dazu hält **nur er** (nicht `orte`) „kein Treffer“ nach allen drei Stufen 30 Tage lang; so kostet eine unauflösbare Adresse nicht in jedem Eval drei Anfragen. Fehler (Netz, 403/429, 5xx) werden nie gespeichert. Der Name `geocode-v2.json` ist auf `plan-0039` schon im alten Format belegt; jeder Eintrag wird beim Lesen per Zod geprüft und verworfen, wenn er nicht passt (Review 5, M2). `geocode.json` (speichert `null` dauerhaft) wird nicht mehr gelesen. Reihenfolge: Katalog des Laufs, `orte`, Lauf-Cache, Nominatim.
+    - **Verzeichnis injiziert (Review 5, M3):** `geocode` bekommt `cacheDir` als Option (Standard wie `io/cache.ts`); `vitest.setup.ts` setzt `XDG_CACHE_HOME` auf ein Temp-Verzeichnis, damit kein Test Fake-Koordinaten in den echten Cache schreibt. Ein Test prüft das.
+    - **Actions (Review 5, M4):** `actions/cache/restore` vor dem Lauf und `actions/cache/save` mit `if: always()` danach (Muster wie `nightly.yml`), Pfad `~/.cache/zwergenplan/geocode-v3.json`, Schlüssel `geocode-${{ github.run_id }}`, `restore-keys: geocode-`. GitHub verwirft Caches nach 7 Tagen ohne Zugriff; im Monatstakt trägt deshalb vor allem `orte`, der Lauf-Cache trägt die dichten Eval-Serien.
+  - **„Kein Treffer“ im Lauf:** Ein Speicher im Lauf merkt sich „kein Treffer“ je Eingabe und fragt sie im selben Lauf nicht noch einmal; über Läufe hält es nur der Lauf-Cache (30 Tage).
   - Der Bericht nennt die Zahl der Anfragen an Nominatim.
 - **Ein Ort ohne Treffer** fällt allein weg, mit Hinweis im Bericht und im Commit-Text, aber nur bei „kein Treffer“.
   - Die Terminseiten bekommen dann den `hint` „Termine an … weglassen“, der **nur die weggelassenen Orte** nennt; sonst landeten deren Termine am ersten Ort. Passt er nicht in die 200 Zeichen eines `hint`, wird der Kandidat ein Klärfall. Heute nennt `outsideHint` (`scripts/pipeline/lib/discover.ts`) die inneren Orte und kürzt still auf 200 Zeichen; bei bis zu 20 Orten fielen so Termine weg.
@@ -197,14 +199,15 @@ Ein Lauf hat vier Phasen:
     - `hint` für weggelassene Orte zu lang;
     - ungültige Antwort nach Fallback;
     - mögliche Dublette (E4.6);
-    - Budget (E8).
+    - Budget (E8);
+    - Zeitbudget, Limit oder G3 des Laufs, bevor der Kandidat geprüft war.
 - **Klärfälle im Zustand:** `DiscoverState` bekommt `klaerfaelle` mit `.default([])`; ein Eintrag ist `{url, name, grund, seit, zuletzt, anzahl, aussetzenBis?}`.
   - Jeder Lauf speist die offenen Klärfälle als Quelle `klaerfall` ein (E2). Sie hängen also nicht davon ab, dass die Websuche sie wieder liefert.
   - Ab drei Klärfällen in Folge setzt `aussetzenBis` = `today` + 35 Tage einen Monatslauf aus.
   - Ein Eintrag endet durch Aufnahme, Verwerfung oder einen Menschen. Ein Mensch kann ihn in `abgelehnt` eintragen (Skill, Abschnitt 2) oder den Anbieter von Hand aufnehmen; dann erkennt der Vorfilter den Klärfall als bekannt (Katalog-URL oder „Host und Name wie …“) und beendet ihn.
-  - Klärfälle aus Zeitbudget, Limit, G3, Budget oder einem Ausfall des Geocoders liegen nicht am Kandidaten und zählen nicht für „drei in Folge“.
+  - Klärfälle aus Zeitbudget, Limit, G3, Budget oder einem Ausfall des Geocoders liegen nicht am Kandidaten. Sie aktualisieren `zuletzt`, erhöhen aber weder `anzahl` noch zählen sie für „drei in Folge“; `anzahl` zählt nur Klärfälle, die am Kandidaten liegen. So meldet der Wächter (ab `anzahl` ≥ 2) keine Fälle, die nur am Lauf scheiterten (Review 5, Minor 10).
   - Im Trockenlauf stehen Klärfälle nur im Bericht; ins Repo kommen sie nur im Modus `live`.
-- **Klärfälle im Wächter** (S2b): `watchFindings` (Plan 0048, E10) bekommt die Zustände `data/discover/*.json` und meldet die Art `klaerfall` mit Name, Grund und Fund-URL, ab `anzahl` ≥ 2, wie Seiten ab dem zweiten Tag. Sonst flutete ein Monatslauf mit neuen Quellen das Issue. Der Schlüssel im Marker ist `k<die ersten 8 Hex-Zeichen des SHA-256 der normalisierten URL>`. Ein eigenes Issue gibt es dafür nicht.
+- **Klärfälle im Wächter** (S2b): `watchFindings` (Plan 0048, E10) bekommt die Zustände `data/discover/*.json` und meldet die Art `klaerfall` mit Name, Grund und Fund-URL, ab `anzahl` ≥ 2, wie Seiten ab dem zweiten Tag. Sonst flutete ein Monatslauf mit neuen Quellen das Issue. Ein Klärfall hat keine Katalog-ID: `WatchFinding` bekommt statt Pflichtfeld `providerId` ein Feld `subject` (Katalog-ID oder Name des Klärfalls). Der Schlüssel im Marker ist `klaerfall#<die ersten 8 Hex-Zeichen des SHA-256 der normalisierten URL>` (passt zu `WATCH_MARKER`, kollidiert mit keiner Katalog-ID). Aufrufer ist `status --waechter` in `cli.ts`. Ein eigenes Issue gibt es dafür nicht.
 
 ### E6 – Eval
 
@@ -214,7 +217,7 @@ Ein Lauf hat vier Phasen:
   - Nicht gezogen werden Anbieter mit `skipCrawl`. Ob ein Anbieter für Ziel 4 zählt, leitet das Eval zur Laufzeit ab (nicht bei `coveredBy` oder `follow`); gespeichert wird das nicht, sonst machte jedes neue `follow` die Tests rot.
 - **Test** `scripts/pipeline/io/eval-discover.test.ts`: Jede ID in Stichprobe und `arten` steht im Katalog, hat die Rolle `anbieter`, die Region stimmt, 20 je Region der Datei, jede Stichprobe hat eine Art. Auf `main` steht nur die Stichprobe `nuernberg` (Region des Anbieters `nuernberg` oder `fuerth`) mit `arten` für beide Regionen; Düsseldorf kommt mit `plan-0039` (Voraussetzungen). **Nicht** geprüft wird, ob `arten` den ganzen Katalog abdeckt; sonst machte jeder neue Anbieter G1 und die CI rot.
 - **Urteile von Hand:** `evals/discover-urteile.json` (neu) hält je URL einer zusätzlichen Aufnahme das Urteil (passend, falsch, Dublette) mit Datum. Ein Mensch beurteilt jede URL nur einmal; spätere Läufe übernehmen das Urteil.
-- **Aufruf** `pnpm pipeline discover --dry-run --eval [--region …] [--run-dir …]`:
+- **Aufruf** `pnpm pipeline discover --dry-run --eval [--run-dir …]`. Auf `main` läuft `--eval` immer für Nürnberg und Fürth zusammen (die Stichprobe enthält Fürther Anbieter, `hideProviders` scheiterte an einer einzelnen Region) und ersetzt `--hide`; `--region` mit `--eval` ist ein Fehler. Mit `plan-0039` wählt `--netz` das Netz.
   - blendet die Stichprobe aus;
   - ignoriert `zurueckgestellt` und `klaerfaelle`;
   - schaltet G3 aus;
@@ -231,7 +234,7 @@ Ein Lauf hat vier Phasen:
 S5 misst für Suche, Namenssuche und Bewerten Modell **und** Effort, je zwei gültige Eval-Läufe je Konfiguration:
 - **Konfigurationen:** Opus high (Ausgangswert, aus S4), Sonnet high, Sonnet xhigh. Nicht gemessen werden `max` (Nutzervorgabe 2026-10-27) und Opus xhigh („zu viel für unseren Use Case“, Nutzervorgabe 2026-10-29). Haiku high läuft nur mit, wenn eine Sonnet-Konfiguration mit Opus gleichauf liegt. Niedrigere Stufen (low, medium) nur, wenn Sonnet high und xhigh gleichauf liegen; dann zählt die niedrigere.
 - **Gleichstand:** Differenz von höchstens einem Anbieter je Region im Mittel der zwei Läufe (bei 20 Stichproben 5 Prozentpunkte).
-- **Rangfolge:** Ziel 3 ist hart (eine Konfiguration mit falscher Aufnahme scheidet aus), dann zählt Ziel 2, dann 1, dann 4. Bei Gleichstand gewinnt die schnellere (ADR 0033, Punkt 7). Kosten sind nachrangig, aber nicht egal: Bei Gleichstand in den Zielen und ähnlicher Laufzeit gewinnt die günstigere. Das weicht von ADR 0033 (a) („Kosten sind kein Kriterium“) ab und folgt der Nutzervorgabe vom 2026-10-27 („ignoriere die Kosten nicht komplett“); S7 trägt sie als Nachtrag ins ADR ein.
+- **Rangfolge:** Ziel 3 ist hart (eine Konfiguration mit falscher Aufnahme scheidet aus), dann zählt Ziel 2, dann 1, dann 4. Bei Gleichstand gewinnt die schnellere (ADR 0033, Punkt 7). Kosten sind nachrangig, aber nicht egal: Bei Gleichstand in den Zielen und ähnlicher Laufzeit gewinnt die günstigere. Das weicht von ADR 0033 (a) („Kosten sind kein Kriterium“) ab und folgt der Nutzervorgabe vom 2026-10-27 („ignoriere die Kosten nicht komplett“); Der Nachtrag ins ADR kommt vor S5.
 - Der Ertragsbeweis bleibt bei Opus high, solange S5 nichts anderes zeigt; er misst die Extraktion je Einheit, für die die Matrix aus Plan 0048 (Nachtrag 2 und 4) gilt. Sein Modell ändert nur den Cache-Schlüssel der neuen Rohdatei (Plan 0048, Nachtrag 4, Folgen).
 - `LLM_MODEL_DISCOVER` und `LLM_EFFORT_DISCOVER` werden in `.github/workflows/discover.yml` gesetzt; der Nachtlauf nutzt sie nicht. **Eval (Review 4, M5):** `--eval` setzt Opus high für alle fünf Variablen (`LLM_MODEL_DISCOVER`, `LLM_EFFORT_DISCOVER`, `LLM_MODEL_EXTRACT`, `LLM_MODEL_FALLBACK`, `LLM_EFFORT_EXTRACT`), soweit keine Option sie setzt; so misst ein lokaler Lauf dasselbe wie Actions. `--model`/`--effort` setzen Suche und Bewerten; Vorrang: Option vor Umgebung vor Eval-Standard. Bericht und `evals/results.md` nennen je Schritt Modell und Effort. `workflow_dispatch` bekommt in S2 die Eingaben `model` und `effort` (nur mit `eval: true`), damit S5 in Actions misst.
 
@@ -274,12 +277,13 @@ Der Abschnitt nennt, was beim Füllen Düsseldorfs half (Plan 0042).
 |---|---|---|
 | `scripts/pipeline/lib/address.ts` (neu) | Normalisierung | S1 |
 | `scripts/pipeline/io/geocode.ts`, `scripts/pipeline/io/cache.ts` | Reihenfolge, Treffer in der bbox, benannte Orte mit `addressdetails`, Katalog zuerst, 4/min, Cache im Zustand, Lauf-Cache `geocode-v2.json`, „kein Treffer“ im Lauf, Schnittstelle | S1 |
-| `scripts/pipeline/io/geocode-faelle.json` (neu), `scripts/pipeline/cli.ts` (`pipeline geocode`: neue Schnittstelle, `--faelle`) | Prüffälle für S1 | S1 |
+| `tests/fixtures/pipeline/geocode-faelle.json` (neu) samt Aufzeichnungen, `scripts/pipeline/cli.ts` (`pipeline geocode`: neue Schnittstelle, `--region`, `--faelle`), `vitest.setup.ts` (`XDG_CACHE_HOME`) | Prüffälle und Testschutz für S1 | S1 |
+| `scripts/pipeline/draw-eval-sample.ts` (neu, Einstieg in `knip.json`) | Ziehung der Stichprobe mit festem Zufall | S0 |
 | `scripts/pipeline/lib/discover-state.ts` | `klaerfaelle`, `orte` | S1 |
 | `scripts/pipeline/lib/html-extract.ts` | `title` und `headings` in `PageExtract` (Text unverändert) | S4 |
 | `scripts/pipeline/io/discover.ts`, `scripts/pipeline/lib/discover.ts` | Orte mit `hint`, Klärfälle samt Quelle `klaerfall`, Dublette als Klärfall (S1); Eval, Kennzahlen, Ertrag (S2); Seitenfinder, ID-Reservierung, Ertrag je Seite, zweite Runde, `partChars`, Parallelität (S3); Quellen, Namenssuche, Portaltreffer, Zeit je Region (S4) | S1–S4 |
 | `scripts/pipeline/io/llm.ts` | `tools: "search"` | S4 |
-| `scripts/pipeline/lib/watch.ts` | Art `klaerfall`, Zustände als Eingabe | S2b |
+| `scripts/pipeline/lib/watch.ts`, `scripts/pipeline/cli.ts` (`status --waechter`) | Art `klaerfall`, `subject`, Zustände als Eingabe | S2b |
 | `scripts/pipeline/prompt/discover-assess.md`, `discover-search.md`; `discover-resolve.md` (neu) | „Name, Ort“; Seitenformat; Portaltreffer; Namenssuche | S1, S3, S4 |
 | `scripts/pipeline/lib/discover-sources.ts` (neu), `scripts/pipeline/lib/sources/discover/*.ts` (neu), `scripts/pipeline/io/discover-sources.ts` (neu) | Quellentabelle und Quellen | S4 |
 | `scripts/pipeline/lib/discover-terms.ts` | Begriffsgruppen nach `CATEGORIES` | S4 |
@@ -287,8 +291,8 @@ Der Abschnitt nennt, was beim Füllen Düsseldorfs half (Plan 0042).
 | `scripts/pipeline/lib/cost.ts` | `DISCOVER_BRAKES` | S1, S6 |
 | `.github/workflows/discover.yml`, `scripts/lib/discover-workflow.test.ts` (neu) | Wochen-Crons aus, `timeout-minutes` 330, `actions/cache` für den Geocoder (S1); Eingaben `eval`, `model`, `effort`, `concurrency` per Ausdruck, kein Start im Nachtlauf-Fenster (S2); Monats-Crons, `ENTDECKEN_NETZE` statt `ENTDECKEN_MODUS`, Budgetschritt (S6) | S1, S2, S6 |
 | `evals/discover.json` (neu), `evals/discover-urteile.json` (neu), `evals/results.md` | Stichproben, Urteile, Spalten, Abschnitt „Entdecken live“ | S0, S2, S6 |
-| `docs/architecture.md` | neue Module (`address`, `discover-sources`, `sources/discover`), `DiscoverState` mit `orte` und `klaerfaelle`, Takt, Zeile zu ADR 0032, Punkt 8 | S1, S4, S6 |
-| Skill (Abschnitte 1, 2, 6), Statuszeile ADR 0032 | Doku | S1–S7 |
+| `docs/architecture.md` | Sonntags-Cron entfällt, `DiscoverState` mit `orte` und `klaerfaelle`, `address` (S1); `discover-sources`, `sources/discover` (S4); Monatstakt, Zeile zu ADR 0032, Punkt 8 (S6) | S1, S4, S6 |
+| Skill (Abschnitte 1, 2, 6; Kopf: Sonntags-Cron entfällt schon in S1), Statuszeile ADR 0032, Nachtrag ADR 0033 (Kostenregel, vor S5) | Doku | S1–S7 |
 
 ## Tests (test-first)
 
@@ -350,7 +354,7 @@ Der Abschnitt nennt, was beim Füllen Düsseldorfs half (Plan 0042).
 - `lib/discover-state.test.ts`:
   - bestehende Dateien ohne `klaerfaelle` und `orte` bleiben gültig;
   - ein Eintrag endet durch Aufnahme, Verwerfung, `abgelehnt` oder Aufnahme von Hand (der Vorfilter erkennt ihn als bekannt), sonst nicht.
-- `lib/watch.test.ts`: Art `klaerfall` mit Schlüssel `k<hash8>` erst ab `anzahl` ≥ 2; Marker gültig.
+- `lib/watch.test.ts`: Art `klaerfall` mit Schlüssel `klaerfall#<hash8>` erst ab `anzahl` ≥ 2; Marker gültig; bestehende Befunde unverändert mit `subject`.
 - `lib/sources/discover/*.test.ts`: je Quelle eine Fixture, Seitengrenze, bekannte Website als Hinweis, Region über bbox.
 - `lib/discover-sources.test.ts`: jede Region hat einen Eintrag, Parameter je Quelle.
 - `scripts/pipeline/io/eval-discover.test.ts`: wie E6.
@@ -369,7 +373,7 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`, bei Daten mit `
   - Probe: die neun Namenssuchen aus Plan 0045, „Fundorte“, einmal über die Websuche der Pipeline (`claude -p`, nur `WebSearch`).
 - **S1 – Härte.**
   - Umfang: E5 ohne den Wächter und ohne die Klärfälle, die robots.txt betreffen; E4.6; Prompt „Name, Ort“; Bremsen; Wochen-Crons aus und `timeout-minutes` 330 (E1, E8).
-  - Prüfung unabhängig von Websuche und Modell (Review 4, M6): `report.json` enthält die Orte der Kandidaten nicht, und `runs/` ist nicht im Repo. Deshalb hält S1 die Fälle als Fixture `scripts/pipeline/io/geocode-faelle.json` fest, mit Adresse oder Name wie vom Modell geliefert und erwarteter Region: „Collenbachstr. 10, Düsseldorf (PLZ auf der Seite nicht angegeben)“ (efa), „Tellerringstr.56, Düsseldorf“ (DRK), dazu die Kursorte ohne Postadresse von djk-eibach, post-sv-nuernberg und schwimmschule-baer-ritterbad (Name und Stadt aus ihren Katalog-Orten, etwa „Ritterbad, Nürnberg“). Die Unit-Tests prüfen Normalisierung und Stufen gegen aufgezeichnete Nominatim-Antworten; einmal läuft `pnpm pipeline geocode --faelle` gegen Nominatim (höchstens 15 Anfragen bei 4/min) und muss für jeden Fall einen Treffer in der bbox liefern. Die Düsseldorfer Fälle laufen auf dem Integrationszweig (Voraussetzungen).
+  - Prüfung unabhängig von Websuche und Modell (Review 4, M6): `report.json` enthält die Orte der Kandidaten nicht, und `runs/` ist nicht im Repo. Deshalb hält S1 die Fälle als Fixture `tests/fixtures/pipeline/geocode-faelle.json` fest (aufgezeichnete Nominatim-Antworten daneben, `docs/architecture.md`, Fixtures): je Fall Eingabe wie vom Modell geliefert, Region und **erwartete Koordinate aus dem Katalog** mit Toleranz 300 m. Auf `main` sind das die Kursorte ohne Postadresse von djk-eibach, post-sv-nuernberg und schwimmschule-baer-ritterbad (Name und Stadt, etwa „Ritterbad, Nürnberg“) und die Nürnberger Adressmuster aus `address.test.ts`; die Düsseldorfer Fälle efa („Collenbachstr. 10, Düsseldorf (PLZ auf der Seite nicht angegeben)“) und DRK („Tellerringstr.56, Düsseldorf“) kommen als Commit auf `plan-0039`. Die Unit-Tests prüfen Normalisierung und Stufen gegen die Aufzeichnungen. Einmal läuft `pnpm pipeline geocode --faelle` gegen Nominatim, **ohne Katalog und ohne Caches** (höchstens 15 Anfragen bei 4/min), und muss jeden Fall innerhalb der Toleranz treffen (Review 5, M5).
 - **S2 – Messung** (E6), Eingaben `eval`, `model`, `effort` mit eigenem Workflow-Test. Eval mit heutigen Quellen und Opus high als neuer Ausgangswert, zwei Läufe je Region.
 - **S2b – Klärfälle im Wächter** (E5, letzter Punkt). Bis S6 schreibt kein Lauf Klärfälle ins Repo; S2b ist bis dahin nur per Unit-Test geprüft, die Abnahme folgt mit dem ersten Live-Lauf.
 - **S3 – Tiefe** (E4.1–E4.5 und E4.7, Seitenfinder im Modus `alle`, ID-Reservierung). Eval, zwei Läufe.
@@ -378,14 +382,14 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`, bei Daten mit `
   - `kidsgo` nur, wenn danach Ziel 1 verfehlt wird und die Fehlenden dort stehen;
   - Klärfälle aus robots.txt;
   - am Ende zwei Läufe.
-- **S5 – Modell und Effort** (E7), Ausgangswert Opus high.
+- **S5 – Modell und Effort** (E7), Ausgangswert Opus high. Vorher der Nachtrag zur Kostenregel in ADR 0033.
 - **S6 – Live** je Netz:
   - Voraussetzung: Ziele 1–4 erreicht und Plan 0049, S2 live; für `vrr` zusätzlich Plan 0044 und die Budgetentscheidung.
   - Monats-Crons, `timeout` aus Plan 0049, `ENTDECKEN_NETZE`, Budgetschritt (E1, E8).
   - Ein Trockenlauf je Netz per `workflow_dispatch`, danach Bremsen auf das Doppelte des Gemessenen, gedeckelt.
   - Der Nutzer sieht den Bericht (Aufnahmen und Klärfälle). Dann `gh variable set ENTDECKEN_NETZE --body vgn` (N3); `ENTDECKEN_MODUS` entfällt.
   - Erster Live-Lauf per `workflow_dispatch`, Zeile „Entdecken live“ von Hand (Ziel 6), `/browser-review live` für neue Anbieter.
-- **S7 – Abschluss.** Skill E9, Statuszeile ADR 0032, Nachtrag in ADR 0033 zur Kostenregel (E7), Restpunkte nach `docs/ideas.md`, archivieren.
+- **S7 – Abschluss.** Skill E9, Statuszeile ADR 0032, Restpunkte nach `docs/ideas.md`, archivieren.
 
 ## Nutzerentscheide
 
@@ -519,3 +523,19 @@ Neuer, unabhängiger Durchgang vor S1, wie Review 3 verlangt; geprüft sind auch
 **Nutzervorgabe in diesem Durchgang:** Opus xhigh wird nicht gemessen (2026-10-29, E7).
 
 Die Lösungen von B1 und M1–M6 prüft ein neuer Durchgang (Review 5).
+
+## Review 5 (2026-10-29) – Verdict: Freigabe mit Änderungen
+
+Unabhängiger Durchgang auf die Lösungen von Review 4. Kein Blocker. M1 (Katalog nach `hideProviders`), M4 (Fürth) und M5 (Vorrang der Modelle) aus Review 4 tragen. Alle Befunde übernommen:
+
+**Major**
+- **M1 Cache-Schlüssel je Stufe:** Schlüssel aus der Eingabe, Stufe im Wert; „kein Treffer“ 30 Tage nur im Lauf-Cache (E5).
+- **M2 Namenskollision `geocode-v2.json`:** neuer Name `geocode-v3.json`, Einträge per Zod geprüft, Rebase-Regel nennt den Namen.
+- **M3 Tests schrieben in den echten Cache:** `cacheDir` injiziert, `XDG_CACHE_HOME` in `vitest.setup.ts`, Test.
+- **M4 `actions/cache` speichert nicht bei Rot:** restore/save mit `if: always()`, 7 Tage ohne Zugriff genannt.
+- **M5 S1-Fälle nicht eindeutig:** erwartete Koordinate mit 300 m Toleranz, `--faelle` ohne Katalog und Caches, Düsseldorfer Fälle auf `plan-0039`, Fixtures unter `tests/fixtures/pipeline/`.
+- **M6 Gemeinde bei Katalog- und Cache-Treffern:** Regel in „Voraussetzungen“.
+
+**Minor**, übernommen: Wartezeit in S1/S2 seriell, Jobs je Region nacheinander (7); `--region` für `pipeline geocode` samt Skill (8); `subject` und Schlüssel `klaerfall#<hash8>`, `cli.ts` in „Dateien“ (9); Lauf-Gründe erhöhen `anzahl` nicht (10); `--eval` immer für Nürnberg und Fürth, ersetzt `--hide` (11); Ziehungsskript in „Dateien“ (12); Sonntags-Cron in Architektur und Skill schon in S1 (13); ADR-Nachtrag vor S5 (14); `orte.adresse` aus `addressdetails` (15).
+
+Damit ist der Plan freigegeben.
