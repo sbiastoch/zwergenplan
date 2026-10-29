@@ -8,6 +8,7 @@ import {
   fitsAgeAt,
   fittingSessions,
   offerFitsAge,
+  offerFitsAgeIn,
   sessionFit,
   splitByAge,
   startFitsAge,
@@ -73,10 +74,10 @@ describe("offerFitsAge", () => {
 
   it("mit Zeitraum: regelmäßig nur über Termine darin, Kurse weiter am ersten Termin (Plan 0053, E2)", () => {
     const treff = fixtureOffer("krabbeltreff"); // 6–24 Monate; geb. 1.5.2026 erst ab 1.11. passend
-    expect(offerFitsAge(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-10-05", to: "2026-10-11" })).toBe(false);
-    expect(offerFitsAge(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-11-01" })).toBe(true);
+    expect(offerFitsAgeIn(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-10-05", to: "2026-10-11" })).toBe(false);
+    expect(offerFitsAgeIn(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-11-01" })).toBe(true);
     const pekip = fixtureOffer("pekip-herbst");
-    expect(offerFitsAge(pekip, "2026-09-10", FIXTURE_NOW, { from: "2026-12-01" })).toBe(true);
+    expect(offerFitsAgeIn(pekip, "2026-09-10", FIXTURE_NOW, { from: "2026-12-01" })).toBe(true);
   });
 
   it("wertet bei regelmäßigen Angeboten nur kommende Termine", () => {
