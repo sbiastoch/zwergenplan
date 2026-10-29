@@ -104,7 +104,7 @@ describe("groupByReach: Liste „Nächstgelegen“ (Plan 0043, E7)", () => {
   const heads = (groups: ReturnType<typeof groupByReach>) =>
     groups.map((g) => [g.key, g.items.map((i) => fixtureKey(i.offer))]);
 
-  it("Bänder an den Stufen der Wegzeit-Grenze, auf gerundeten Minuten wie auf der Karte", () => {
+  it("Bänder in 5er-Schritten, auf gerundeten Minuten wie auf der Karte", () => {
     const treff = byKey("krabbeltreff");
     const reime = byKey("krabbelreime");
     const musik = byKey("musikgarten-1");
@@ -112,8 +112,7 @@ describe("groupByReach: Liste „Nächstgelegen“ (Plan 0043, E7)", () => {
     const pekip = byKey("pekip-herbst");
     const massage = byKey("babymassage-workshop");
     const konzert = byKey("babykonzert-advent");
-    // 22,4 → 20 (bis 20), 22,6 → 25 (bis 30), 32,4 → 30 (bis 30), 32,6 → 35 (bis 45), 47,4 → 45 (bis 45),
-    // 47,6 → 50 (über 45), über 2 Std.
+    // 22,4 → 20, 22,6 → 25, 32,4 → 30, 32,6 → 35, 47,4 → 45, 47,6 → 50, 200 → über 2 Std.
     const groups = groupByReach(
       [treff, reime, musik, kuckuck, pekip, massage, konzert],
       FIXTURE_NOW,
@@ -129,16 +128,29 @@ describe("groupByReach: Liste „Nächstgelegen“ (Plan 0043, E7)", () => {
     );
     expect(heads(groups)).toEqual([
       ["w:min:20", ["krabbeltreff"]],
-      ["w:min:30", ["krabbelreime", "musikgarten-1"]],
-      ["w:min:45", ["babymassage-workshop", "babykonzert-advent"]],
-      ["w:min:mehr", ["kuckuck-im-nest", "pekip-herbst"]],
+      ["w:min:25", ["krabbelreime"]],
+      ["w:min:30", ["musikgarten-1"]],
+      ["w:min:35", ["babymassage-workshop"]],
+      ["w:min:45", ["babykonzert-advent"]],
+      ["w:min:50", ["kuckuck-im-nest"]],
+      ["w:min:mehr", ["pekip-herbst"]],
     ]);
     expect(groups.map((g) => ("band" in g ? g.band : undefined))).toEqual([
       { unit: "min", upTo: 20 },
+      { unit: "min", upTo: 25 },
       { unit: "min", upTo: 30 },
+      { unit: "min", upTo: 35 },
       { unit: "min", upTo: 45 },
+      { unit: "min", upTo: 50 },
       { unit: "min" },
     ]);
+  });
+
+  it("über einer Stunde gerundet auf 10 Min., bis 2 Std.", () => {
+    const treff = byKey("krabbeltreff");
+    const reime = byKey("krabbelreime");
+    const groups = groupByReach([treff, reime], FIXTURE_NOW, transit({ [treff.id]: 63, [reime.id]: 118 }));
+    expect(groups.map((g) => g.key)).toEqual(["w:min:60", "w:min:120"]);
   });
 
   it("gleiche gerundete Minuten: nach Termin, dann Titel; ohne Ergebnis am Ende", () => {
@@ -147,7 +159,7 @@ describe("groupByReach: Liste „Nächstgelegen“ (Plan 0043, E7)", () => {
     const pekip = byKey("pekip-herbst");
     const groups = groupByReach([reime, treff, pekip], FIXTURE_NOW, transit({ [treff.id]: 14.6, [reime.id]: 15.2 }));
     expect(heads(groups)).toEqual([
-      ["w:min:20", ["krabbeltreff", "krabbelreime"]],
+      ["w:min:15", ["krabbeltreff", "krabbelreime"]],
       ["ohne-wegzeit", ["pekip-herbst"]],
     ]);
   });

@@ -6,7 +6,7 @@
  */
 import { byStartThenTitle, type Occurrence, type SessionFit, shownSession } from "./agenda.ts";
 import type { DateRange } from "./date-range.ts";
-import { LIMIT_MINUTES, type Reach, roundedDistance, roundedMinutes } from "./reach.ts";
+import { type Reach, roundedDistance, roundedMinutes } from "./reach.ts";
 import type { Offer } from "./schema.ts";
 import { addDays, berlinIsoDate } from "./time.ts";
 
@@ -54,13 +54,19 @@ export type ListGroupHead =
   | { kind: "ohne-wegzeit" };
 
 /**
- * Band der Sortierung „Nächstgelegen“ (Plan 0043, E7): Wegzeit in Minuten (Stufen der Wegzeit-Grenze) oder Luftlinie
+ * Band der Sortierung „Nächstgelegen“ (Plan 0043, E7): Wegzeit in Minuten (5er-Schritte) oder Luftlinie
  * in Metern; ohne `upTo` alles darüber.
  */
 interface ReachBand {
   unit: "min" | "m";
   upTo?: number;
 }
+
+/**
+ * Bänder der Wegzeit: 5er-Schritte bis 2 Std. Über einer Stunde rundet `roundedMinutes` auf 10 Min., dort bleibt
+ * jedes zweite Band leer und erscheint nicht.
+ */
+const MINUTE_BANDS = Array.from({ length: 24 }, (_, i) => (i + 1) * 5);
 
 /** Bänder der Luftlinie, wenn der Startpunkt außerhalb der Wegzeit-Tabelle liegt */
 export const METER_BANDS = [1000, 3000, 10_000] as const;
@@ -97,7 +103,7 @@ function reachKey(reach: Reach): { band: ReachBand; value: number } {
   if (reach.kind === "oepnv") {
     const { over, value } = roundedMinutes(reach.minutes);
     const minutes = over ? Number.POSITIVE_INFINITY : value;
-    const upTo = LIMIT_MINUTES.find((limit) => minutes <= limit);
+    const upTo = MINUTE_BANDS.find((limit) => minutes <= limit);
     return { band: upTo === undefined ? { unit: "min" } : { unit: "min", upTo }, value: minutes };
   }
   const { unit, value } = roundedDistance(reach.meters);
@@ -115,7 +121,7 @@ function compareBands(a: ReachBand, b: ReachBand): number {
 }
 
 /**
- * „Nächstgelegen“ (Plan 0043, E7): Bänder aus den Stufen der Wegzeit-Grenze („Bis 20 Minuten“ … „Über 45 Minuten“) auf
+ * „Nächstgelegen“ (Plan 0043, E7): Bänder in 5er-Schritten („Bis 5 Minuten“, „Bis 10 Minuten“ … „Über 2 Stunden“) auf
  * den gerundeten Minuten wie auf der Karte, bei Luftlinie nach Metern; darin nach gerundetem Wert, Termin, Titel.
  * Angebote ohne Ergebnis stehen am Ende. Jedes Angebot steht am selben Termin wie bei „Nächste Termine“.
  */
