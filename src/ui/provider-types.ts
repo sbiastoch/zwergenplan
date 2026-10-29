@@ -4,6 +4,7 @@
  * Lader, anbieter.json, Datenstand-Abgleich) → anbieter/entry.ts (Liste und Sheet, ein Chunk).
  */
 import type { ComponentType } from "react";
+import type { ProviderView } from "../domain/provider-count.ts";
 import type { Reach } from "../domain/reach.ts";
 import type { ProviderDirectoryData, SiteOffer } from "../domain/site-data.ts";
 import type { AgeEscape } from "./ListView.tsx";
@@ -16,9 +17,13 @@ export interface ProviderScreenProps {
   directory: ProviderDirectoryData;
   /** alle Angebote aus site.json; „kommend“ rechnet der Chunk (`applyFilters` ohne Filter, E4), Rückfall-Zeilen auch */
   offers: readonly SiteOffer[];
-  /** sichtbare Angebote wie in „Entdecken“: Filter, Sticker, Wegzeit-Grenze, Alter (E4) */
+  /** sichtbare Angebote im Tab: Kategorie und Alter (`providerVisible`, Plan 0055, E3) */
   visible: readonly SiteOffer[];
   now: Date;
+  /** Kartenausschnitt der Anbieterkarte; `undefined`, solange die Karte nicht bereit oder gescheitert ist (Plan 0055) */
+  view: ProviderView | undefined;
+  /** „Alle zeigen“: Karte zurück auf den Startausschnitt */
+  onShowAll: () => void;
   /** Wegzeit bzw. Luftlinie zum Ort eines Angebots; `undefined` ohne Startpunkt */
   reachOf: (offer: SiteOffer) => Reach | undefined;
   /** `undefined` ohne Startpunkt; „laedt“ zeigt den Platzhalter-Block statt der Zeilen (E5, E10) */

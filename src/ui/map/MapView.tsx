@@ -19,12 +19,12 @@ import "./map-overrides.css"; // nach maplibre-gl.css (E4)
 import { guardTileRequest, styleUrl } from "../../data/tiles.ts";
 import { DISTRICT_ZOOM, type StartCamera } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
-import type { MapViewProps } from "../map-types.ts";
+import type { MapLayer, MapViewProps } from "../map-types.ts";
 import { BASEMAP_PAINT, basemapChanges, basemapPalette, type MapTokens } from "./basemap.ts";
-import { nearestHit, originToFeatures, placesToFeatures } from "./geojson.ts";
+import { nearestHit, originToFeatures, placesToFeatures, providerPlacesToFeatures } from "./geojson.ts";
 import { germanTextField } from "./labels.ts";
-import { addOwnLayers, LOCALE, PLACE_LAYERS, readMapTokens } from "./layers.ts";
-import { addCategoryImages } from "./marker-images.ts";
+import { addOwnLayers, LOCALE, PLACE_LAYERS, PROVIDER_LAYERS, readMapTokens } from "./layers.ts";
+import { addCategoryImages, addProviderImages } from "./marker-images.ts";
 
 // Die Worker-URL aus import.meta.url stimmt nach dem Bündeln nicht mehr (Spike, E2).
 setWorkerUrl(workerUrl);
@@ -54,19 +54,44 @@ const START_PADDING = {
   bottom: MARKER_INSET + ATTRIBUTION_INSET,
   left: MARKER_INSET,
 };
+/**
+ * Anbieterkarte (Plan 0055, N7): niedriger (höchstens 250 px), daher ein festes, knapperes Padding; rechts weiter
+ * Platz für die Zoom-Knöpfe, unten für die ausgeschriebene Attribution (sonst lag quer ein Marker darunter,
+ * Browser-Review 0055). Hängt wie `START_PADDING` an nichts Privatem (ADR 0008).
+ */
+const PROVIDER_PADDING = { top: 24, right: 24 + ZOOM_CONTROL_INSET, bottom: 24 + ATTRIBUTION_INSET, left: 24 };
+const START_MAX_ZOOM = 14;
 
-/** Zuletzt gesehener Ausschnitt dieser Sitzung; nie in URL oder Speicher (E9). */
+type Kind = MapLayer["kind"];
+
+/**
+ * Zuletzt gesehener Ausschnitt dieser Sitzung; nie in URL oder Speicher (E9). Nur die Angebotskarte merkt ihn: Die
+ * Anbieterkarte startet immer im Startausschnitt, sonst schrumpfte die Liste beim Zurückkehren ohne Eingabe (N8).
+ */
 let lastCamera: { center: LngLatLike; zoom: number } | undefined;
+
+const paddingOf = (kind: Kind) => (kind === "anbieter" ? PROVIDER_PADDING : START_PADDING);
 
 /**
  * Ausschnitt beim Öffnen (E9): der dieser Sitzung, sonst `start` aus `initialCamera` (öffentliche Daten,
  * nie Standort oder Kartenmitte). Als Konstruktor-Option, damit vorher kein anderer Ausschnitt Kacheln lädt.
  */
-function cameraOptions(start: StartCamera): Partial<MapOptions> {
-  if (lastCamera) return lastCamera;
+function cameraOptions(start: StartCamera, kind: Kind): Partial<MapOptions> {
+  if (lastCamera && kind === "angebote") return lastCamera;
   if ("center" in start) return { center: lngLat(start.center), zoom: start.zoom };
   const { minLat, minLon, maxLat, maxLon } = start.bounds;
-  return { bounds: [minLon, minLat, maxLon, maxLat], fitBoundsOptions: { padding: START_PADDING, maxZoom: 14 } };
+  return {
+    bounds: [minLon, minLat, maxLon, maxLat],
+    fitBoundsOptions: { padding: paddingOf(kind), maxZoom: START_MAX_ZOOM },
+  };
+}
+
+/** Quelle und Trefferlayer je Karte */
+const SOURCE: Record<Kind, string> = { angebote: "orte", anbieter: "anbieter-orte" };
+const TAP_LAYERS: Record<Kind, string[]> = { angebote: PLACE_LAYERS, anbieter: PROVIDER_LAYERS };
+
+function featuresOf(layer: MapLayer) {
+  return layer.kind === "anbieter" ? providerPlacesToFeatures(layer.places) : placesToFeatures(layer.places);
 }
 
 type TextField = Parameters<typeof MapLibre.prototype.setLayoutProperty<"text-field">>[2];
@@ -120,12 +145,12 @@ function tintBasemap(map: MapLibre, tokens: MapTokens, dark: boolean) {
 }
 
 /** Tipp: nächster Ort oder Cluster im 44-px-Rechteck. Cluster zoomt auf (öffentlicher Zielpunkt), Ort meldet sich. */
-function onTap(map: MapLibre, { x, y }: { x: number; y: number }, onPlace: (key: string) => void) {
+function onTap(map: MapLibre, kind: Kind, { x, y }: { x: number; y: number }, onPlace: (key: string) => void) {
   const box: [PointLike, PointLike] = [
     [x - TAP_PX, y - TAP_PX],
     [x + TAP_PX, y + TAP_PX],
   ];
-  const hits = map.queryRenderedFeatures(box, { layers: PLACE_LAYERS }).flatMap((feature) => {
+  const hits = map.queryRenderedFeatures(box, { layers: TAP_LAYERS[kind] }).flatMap((feature) => {
     if (feature.geometry.type !== "Point") return [];
     const [lon = 0, lat = 0] = feature.geometry.coordinates;
     const center: [number, number] = [lon, lat];
@@ -138,7 +163,7 @@ function onTap(map: MapLibre, { x, y }: { x: number; y: number }, onPlace: (key:
   if (typeof clusterId === "number") {
     // Ohne `essential`: Bei reduzierter Bewegung springt die Karte (E11). Ein verschwundener Cluster ist egal.
     map
-      .getSource<GeoJSONSource>("orte")
+      .getSource<GeoJSONSource>(SOURCE[kind])
       ?.getClusterExpansionZoom(clusterId)
       .then(
         (zoom) => map.easeTo({ center: hit.center, zoom }),
@@ -150,7 +175,9 @@ function onTap(map: MapLibre, { x, y }: { x: number; y: number }, onPlace: (key:
 }
 
 export function MapView(props: MapViewProps) {
-  const { places, origin, dark } = props;
+  const { layer, origin, dark, resetKey } = props;
+  // je Mount fest: Angebots- und Anbieterkarte sind getrennte Mounts (Plan 0055, E5)
+  const kind = useRef(layer.kind).current;
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibre>(undefined);
   // Die Karte entsteht einmal je Mount; Daten und Callbacks liest sie über diese Ref.
@@ -179,7 +206,7 @@ export function MapView(props: MapViewProps) {
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
-        ...cameraOptions(start.start),
+        ...cameraOptions(start.start, kind),
       });
     } catch {
       start.onProblem("webgl");
@@ -205,9 +232,14 @@ export function MapView(props: MapViewProps) {
     map.on("style.load", () => {
       germanLabels(map);
       const tokens = readMapTokens();
-      addCategoryImages(map, tokens.onColor);
+      if (kind === "anbieter") {
+        addProviderImages(map, { surface: tokens.surface, line: tokens.line, shadow: tokens.shadowColor });
+      } else {
+        addCategoryImages(map, tokens.onColor);
+      }
       addOwnLayers(map, tokens, {
-        places: placesToFeatures(latest.current.places),
+        kind,
+        places: featuresOf(latest.current.layer),
         origin: originToFeatures(latest.current.origin),
       });
       // Nach den eigenen Layern: Paint ändert die Reihenfolge nicht, und ein Fehler hier kostet nur die Farben.
@@ -219,8 +251,20 @@ export function MapView(props: MapViewProps) {
         return { lat, lon: lng };
       }),
     );
-    map.on("click", (e) => onTap(map, e.point, (key) => latest.current.onPlace(key)));
-    for (const id of PLACE_LAYERS) {
+    // Ausschnitt für die Liste der Anbieterkarte (Plan 0055, E4): nach `load` und nach jeder Bewegung, nicht je Frame
+    const viewport = () => {
+      const bounds = map.getBounds();
+      latest.current.onViewport?.({
+        west: bounds.getWest(),
+        south: bounds.getSouth(),
+        east: bounds.getEast(),
+        north: bounds.getNorth(),
+      });
+    };
+    map.on("load", viewport);
+    map.on("moveend", viewport);
+    map.on("click", (e) => onTap(map, kind, e.point, (key) => latest.current.onPlace(key)));
+    for (const id of TAP_LAYERS[kind]) {
       map.on("mouseenter", id, () => {
         map.getCanvas().style.cursor = "pointer";
       });
@@ -230,17 +274,38 @@ export function MapView(props: MapViewProps) {
     }
     return () => {
       clearTimeout(timer);
-      lastCamera = { center: map.getCenter(), zoom: map.getZoom() };
+      if (kind === "angebote") lastCamera = { center: map.getCenter(), zoom: map.getZoom() };
       mapRef.current = undefined;
       if (__E2E__) Object.assign(window, { __zpMap: undefined });
       map.remove();
     };
-  }, []);
+  }, [kind]);
 
   // Filterwechsel: nur die Daten tauschen, die Kamera bleibt (E9).
   useEffect(() => {
-    mapRef.current?.getSource<GeoJSONSource>("orte")?.setData(placesToFeatures(places));
-  }, [places]);
+    mapRef.current?.getSource<GeoJSONSource>(SOURCE[kind])?.setData(featuresOf(layer));
+  }, [layer, kind]);
+
+  // „Alle zeigen“ (Plan 0055, N9): zurück auf den Startausschnitt; bei reduzierter Bewegung springt MapLibre selbst
+  const shownReset = useRef(resetKey);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || shownReset.current === resetKey) return;
+    shownReset.current = resetKey;
+    const start = latest.current.start;
+    if ("center" in start) {
+      map.easeTo({ center: lngLat(start.center), zoom: start.zoom });
+      return;
+    }
+    const { minLat, minLon, maxLat, maxLon } = start.bounds;
+    map.fitBounds(
+      [
+        [minLon, minLat],
+        [maxLon, maxLat],
+      ],
+      { padding: paddingOf(kind), maxZoom: START_MAX_ZOOM },
+    );
+  }, [resetKey, kind]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -248,11 +313,12 @@ export function MapView(props: MapViewProps) {
     map.getSource<GeoJSONSource>("startpunkt")?.setData(originToFeatures(origin));
     const before = shownOrigin.current;
     shownOrigin.current = origin;
-    // Nur ein Stadtteil bewegt die Kamera (grob, öffentlich). Standort und Kartenmitte werden nur gezeichnet.
-    if (origin?.source === "stadtteil" && origin.districtId !== before?.districtId) {
+    // Nur ein Stadtteil bewegt die Kamera (grob, öffentlich). Standort und Kartenmitte werden nur gezeichnet. Die
+    // Anbieterkarte fährt nie: Sonst filterte eine Wahl im Kind-Sheet still die Liste (Plan 0055, Review M3).
+    if (kind === "angebote" && origin?.source === "stadtteil" && origin.districtId !== before?.districtId) {
       map.easeTo({ center: lngLat(origin.point), zoom: DISTRICT_ZOOM });
     }
-  }, [origin]);
+  }, [origin, kind]);
 
   useEffect(() => {
     const map = mapRef.current;

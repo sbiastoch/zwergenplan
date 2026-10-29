@@ -3,31 +3,23 @@
  * weiteren (aktive, Hinweis auf ausgeblendete, blasse ohne Termine). Jede Zeile hat eine Glocke (Plan 0054, E1). Das Suchfeld steht im
  * Start (ProviderSearch.tsx), über der Statuszeile. Zählen, Filtern und Sortieren macht `directory.ts`.
  */
-import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type MouseEvent, useMemo, useRef } from "react";
 import { type ProviderRow, providerRows } from "../../domain/directory.ts";
 import { applyFilters, EMPTY_FILTER } from "../../domain/filter.ts";
+import { countProviders, viewNarrows } from "../../domain/provider-count.ts";
 import { EmptyState, ListPending, NoOffers } from "../ListView.tsx";
 import { BellButton } from "../OfferCard.tsx";
 import type { ProviderScreenProps } from "../provider-types.ts";
-import { hiddenProvidersText, idleLine, providerCountText, providerLine } from "./provider-format.ts";
-
-/** Screenreader sagen die Zahl erst nach einer Tipp-Pause an, nicht bei jedem Buchstaben (E5) */
-const ANNOUNCE_DELAY_MS = 500;
-
-function useSettled(value: string, delay: number): string {
-  const [settled, setSettled] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setSettled(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return settled;
-}
+import { ANNOUNCE_DELAY_MS, useSettled } from "../use-settled.ts";
+import { hiddenProvidersText, idleLine, outsideText, providerCountText, providerLine } from "./provider-format.ts";
 
 export function ProviderScreen({
   directory,
   offers,
   visible,
   now,
+  view,
+  onShowAll,
   reachOf,
   reachMode,
   query,
@@ -42,9 +34,19 @@ export function ProviderScreen({
   const sectionRef = useRef<HTMLElement>(null);
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now }), [offers, now]);
   const byReach = reachMode !== undefined && reachMode.kind !== "laedt";
-  const { saved, active, hiddenCount, idle } = useMemo(
-    () => providerRows({ providers: directory.providers, visible, upcoming, reachOf, byReach, query, saved: savedIds }),
-    [directory.providers, visible, upcoming, reachOf, byReach, query, savedIds],
+  const { saved, active, hiddenCount, idle, outside } = useMemo(
+    () =>
+      providerRows({
+        providers: directory.providers,
+        visible,
+        upcoming,
+        reachOf,
+        byReach,
+        query,
+        saved: savedIds,
+        view,
+      }),
+    [directory.providers, visible, upcoming, reachOf, byReach, query, savedIds, view],
   );
   const searching = query.trim() !== "";
   const matches = saved.length + active.length + idle.length;
@@ -90,12 +92,28 @@ export function ProviderScreen({
   };
 
   const anyActive = active.length > 0 || saved.some((r) => r.state === "aktiv");
+  const showAll = (
+    <button type="button" className="linkbtn" onClick={onShowAll}>
+      Alle zeigen
+    </button>
+  );
   const empty =
-    anyActive || (searching && matches > 0) ? null : searching ? (
+    anyActive || (searching && matches > 0) ? null : searching && outside > 0 ? (
+      // alle Treffer außerhalb des Kartenausschnitts (Plan 0055, Review m10)
+      <EmptyState icon="search" title={outsideText(outside, false)}>
+        {showAll}
+      </EmptyState>
+    ) : searching ? (
       <EmptyState icon="search" title="Kein Anbieter heißt so.">
         <button type="button" className="linkbtn" onClick={() => onQuery("")}>
           Suche löschen
         </button>
+      </EmptyState>
+    ) : viewNarrows(view) && countProviders(visible) > 0 ? (
+      // Der Ausschnitt blendet aus, nicht Filter oder Alter (Plan 0055, Review 2, M3); blasse stehen darunter. Gibt es
+      // auch ohne Ausschnitt keinen aktiven Anbieter, hilft „Filter zurücksetzen“ (NoOffers) mehr (Arch-Review, Minor 6).
+      <EmptyState icon="search" title="Im Kartenausschnitt bietet gerade niemand etwas an.">
+        {showAll}
       </EmptyState>
     ) : (
       // keine Daten bzw. Filter oder Alter ohne aktiven Anbieter; die Anbieter ohne Termine stehen darunter (E10)
@@ -141,6 +159,11 @@ export function ProviderScreen({
               </p>
             )}
             {idle.length > 0 && <ul className="provider-idle">{idle.map((r) => row(r, false))}</ul>}
+            {outside > 0 && matches > 0 && (
+              <p className="provider-hidden">
+                {outsideText(outside, true)} {showAll}
+              </p>
+            )}
           </div>
         </>
       )}

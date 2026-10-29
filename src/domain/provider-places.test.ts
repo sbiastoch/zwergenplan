@@ -3,6 +3,7 @@ import { applyFilters, EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { placeKey } from "./place-key.ts";
 import {
   mapUpcoming,
+  placeProviderLine,
   providerCamera,
   providerGeometry,
   providerPlaces,
@@ -52,8 +53,11 @@ describe("providerGeometry", () => {
     ]);
     const places = providerPlaces({ providers, upcoming, visible: upcoming });
     const place = places.find((p) => p.key === placeKey(TREFF_GEO));
-    expect(place?.providers).toEqual([{ id: treff, name: "Familientreff Beispielhof (fiktiv)", state: "aktiv" }]);
+    expect(place?.providers).toEqual([
+      { id: treff, name: "Familientreff Beispielhof (fiktiv)", state: "aktiv", shown: 3 },
+    ]);
     expect(place?.name).toBe("Familientreff Beispielhof");
+    expect(place?.address).toBe("Beispielstraße 1, 90402 Nürnberg");
   });
 });
 
@@ -139,7 +143,15 @@ describe("providerPlaces", () => {
     expect(mapped.some((o) => o.providerId === treff)).toBe(false);
     const places = providerPlaces({ providers: catalog, upcoming: mapped, visible: mapped });
     expect(places.find((p) => p.key === placeKey(TREFF_GEO))?.providers).toEqual([
-      { id: treff, name: "Familientreff Beispielhof (fiktiv)", state: "ohne-termine" },
+      { id: treff, name: "Familientreff Beispielhof (fiktiv)", state: "ohne-termine", shown: 0 },
     ]);
+  });
+});
+
+describe("placeProviderLine", () => {
+  it("Zahl der sichtbaren Angebote, ohne Termine eigener Text", () => {
+    expect(placeProviderLine({ id: "a", name: "A", state: "aktiv", shown: 1 })).toBe("1 Angebot");
+    expect(placeProviderLine({ id: "a", name: "A", state: "aktiv", shown: 4 })).toBe("4 Angebote");
+    expect(placeProviderLine({ id: "a", name: "A", state: "ohne-termine", shown: 0 })).toBe("Gerade keine Termine");
   });
 });

@@ -344,7 +344,7 @@ const IMPRINT = {
 
 /**
  * Impressum und Datenschutz (Plan 0034, E1, E7; ADR 0028): statisch, ohne Skript, für Suchmaschinen offen. Die Fakten
- * im Datenschutz-Teil stammen aus ADR 0008 (Kacheln), 0013/0017 (Speicher im Browser) und 0014/0037 (Push); ändert sich
+ * im Datenschutz-Teil stammen aus ADR 0008 und 0038 (Kacheln), 0013/0017 (Speicher im Browser) und 0014/0037 (Push); ändert sich
  * dort etwas, muss der Text mit.
  */
 export function imprintPage(): string {
@@ -384,7 +384,7 @@ export function imprintPage(): string {
 <p><strong>Verantwortlich</strong> ist ${name}, Anschrift und E-Mail wie oben.</p>
 <p><strong>Keine Cookies, kein Tracking.</strong> Geburtsdatum, Merkliste, Abos (Suchen und Anbieter), Startpunkt und Darstellung speichert nur dein Browser auf deinem Gerät. Sie werden nicht übertragen.</p>
 <p><strong>Hosting:</strong> Die Seite liegt bei GitHub Pages (GitHub Inc., USA). Beim Abruf verarbeitet GitHub technisch nötige Daten wie IP-Adresse und Zeitpunkt (Art. 6 Abs. 1 lit. f DSGVO).</p>
-<p><strong>Karte:</strong> Erst wenn du die Karte öffnest, lädt dein Browser Kartenkacheln von OpenFreeMap. Dabei sieht OpenFreeMap deine IP-Adresse.</p>
+<p><strong>Karte:</strong> Erst wenn du eine Karte öffnest, also die Kartenansicht der Angebote oder den Bereich „Anbieter“, lädt dein Browser Kartenkacheln von OpenFreeMap. Dabei sieht OpenFreeMap deine IP-Adresse.</p>
 <p><strong>Wöchentliche Push-Nachricht:</strong> Nur wenn du sie einschaltest (Art. 6 Abs. 1 lit. a DSGVO). Dann speichert ein eigener Dienst bei Cloudflare die Adresse deines Push-Abos und das Datum der Anmeldung. Beim An- und Abmelden sieht er deine IP-Adresse; gegen Missbrauch zählt er eine Stunde lang Anfragen je IP, nur als Prüfsumme (Hash). Zugestellt wird über den Push-Dienst deines Browsers (z. B. Apple, Google, Mozilla). Welche Angebote zu deinen Abos und zum Alter passen, rechnet dein Gerät selbst aus; Abos, Alter und Startpunkt verlassen es nicht. Ausschalten löscht das Abo.</p>
 <p><strong>Links</strong> zu Google Maps und zu den Anbietern öffnen deren Seiten erst, wenn du sie antippst. Dort gelten deren Datenschutzhinweise.</p>
 <p><strong>Deine Rechte:</strong> Auskunft, Berichtigung, Löschung, Einschränkung und Widerspruch per E-Mail an die Adresse oben. Beschweren kannst du dich beim Bayerischen Landesamt für Datenschutzaufsicht.</p>

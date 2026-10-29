@@ -4,15 +4,17 @@
  * - `ProviderPanel`: Tab „Anbieter“.
  * - `ProviderSheetLoader`: Inhalt des Anbieter-Sheets; den Dialog rendert Overlays.tsx immer, diesen Inhalt nur offen.
  * - `preloadProviderUi`: Start mit `ansicht=anbieter` bzw. `anbieter=` in der URL (use-app-state.ts, `useRoute`).
+ * - `useProviderDirectory`: Ladezustand von Chunk und Katalog, geteilt von Liste und Anbieterkarte (Plan 0055, E5).
+ *   Nur Komponenten, die erst im Tab mounten, rufen ihn auf, nie `App`: Sonst lüde `anbieter.json` bei jedem Start.
  *
  * Screen und Sheet bekommen den Katalog schon abgeglichen (`ensureFresh`, Abweichung aus „Umsetzung“, Schritt 4):
  * So hängt der Chunk nicht an src/data/providers.ts.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { ensureFresh, loadProviderDirectory } from "../data/providers.ts";
 import { isKnownProvider } from "../domain/provider-count.ts";
 import type { ProviderDirectoryData } from "../domain/site-data.ts";
-import { LoadFailed, useLazy } from "./Lazy.tsx";
+import { type Lazy, LoadFailed, useLazy } from "./Lazy.tsx";
 import type { ProviderScreenProps, ProviderSheetProps, ProviderUiModule } from "./provider-types.ts";
 
 /** Chunk und Katalog zusammen, wie sie Tab und Sheet brauchen */
@@ -86,6 +88,77 @@ function useFreshDirectory(
   return stale ? known : data;
 }
 
+/**
+ * Gemeinsamer Ladezustand für den Tab (Plan 0055, E5, N13): Liste und Karte sehen denselben Fehlschlag, und
+ * „Nochmal versuchen“ in der Liste lädt für beide neu. Ein Promise bleibt ein Request (`loadProviderUi`).
+ */
+interface Shared {
+  module: Lazy<ProviderUi>;
+  attempt: number;
+}
+let shared: Shared = { module: { kind: "laden" }, attempt: 0 };
+let inflight = false;
+const listeners = new Set<() => void>();
+
+function publish(next: Shared) {
+  shared = next;
+  for (const listener of listeners) listener();
+}
+
+function request() {
+  if (inflight) return;
+  inflight = true;
+  loadProviderUi().then(
+    (ui) => {
+      inflight = false;
+      publish({ ...shared, module: { kind: "da", View: ui } });
+    },
+    () => {
+      inflight = false;
+      publish({ ...shared, module: { kind: "fehler" } });
+    },
+  );
+}
+
+function retryShared() {
+  publish({ module: { kind: "laden" }, attempt: shared.attempt + 1 });
+  request();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+const snapshot = (): Shared => {
+  // schon geladen (anderer Mount, Sheet): sofort da, ohne Frame im Ladezustand (Arch-Review m4)
+  if (shared.module.kind !== "da" && loaded) shared = { ...shared, module: { kind: "da", View: loaded } };
+  return shared;
+};
+
+export type ProviderDirectoryState =
+  | { kind: "laden" }
+  | { kind: "da"; directory: ProviderDirectoryData; ui: ProviderUi }
+  | { kind: "fehler"; attempt: number; retry: () => void };
+
+/** Chunk und Katalog mit dem Datenstand von site.json (`generatedAt`); startet das Laden beim ersten Aufruf. */
+export function useProviderDirectory(generatedAt: string): ProviderDirectoryState {
+  const state = useSyncExternalStore(subscribe, snapshot);
+  // Ein neuer Mount (Rückkehr in den Tab) versucht es nach einem Fehlschlag neu, wie früher `useLazy`
+  useEffect(() => {
+    if (shared.module.kind === "fehler") publish({ module: { kind: "laden" }, attempt: 0 });
+  }, []);
+  useEffect(() => {
+    if (state.module.kind === "laden") request();
+  }, [state.module.kind]);
+  const directory = useFreshDirectory(state.module.kind === "da" ? state.module.View.data : undefined, generatedAt);
+  if (state.module.kind === "fehler") return { kind: "fehler", attempt: state.attempt, retry: retryShared };
+  if (state.module.kind === "da" && directory !== undefined) {
+    return { kind: "da", directory, ui: state.module.View };
+  }
+  return { kind: "laden" };
+}
+
 function Loading({ children }: { children: string }) {
   return (
     <div className="lazy-box" aria-busy="true">
@@ -110,11 +183,10 @@ type ProviderPanelProps = Omit<ProviderScreenProps, "directory"> & {
 };
 
 export function ProviderPanel({ generatedAt, ...props }: ProviderPanelProps) {
-  const { module, attempt, retry } = useLazy(loadProviderUi, peekProviderUi);
-  const directory = useFreshDirectory(module.kind === "da" ? module.View.data : undefined, generatedAt);
-  if (module.kind === "fehler") return <Failed attempt={attempt} retry={retry} />;
-  if (module.kind === "laden" || directory === undefined) return <Loading>Anbieter werden geladen …</Loading>;
-  return <module.View.ProviderScreen {...props} directory={directory} />;
+  const state = useProviderDirectory(generatedAt);
+  if (state.kind === "fehler") return <Failed attempt={state.attempt} retry={state.retry} />;
+  if (state.kind === "laden") return <Loading>Anbieter werden geladen …</Loading>;
+  return <state.ui.ProviderScreen {...props} directory={state.directory} />;
 }
 
 type ProviderSheetLoaderProps = Omit<ProviderSheetProps, "directory"> & {

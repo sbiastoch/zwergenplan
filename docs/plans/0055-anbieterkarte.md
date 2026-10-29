@@ -252,6 +252,8 @@ export function providerPlaces(input: {
 
 Gemessen wird nach S4 mit `pnpm size`. Reißt ein Budget, wird nicht gesenkt, sondern zuerst gekürzt. Sonst entscheidet der Nutzer, wie in ADR 0012.
 
+Gemessen nach S4 (2026-10-29, `pnpm build && pnpm size`, Chunk-Wächter grün): `anbieter.json` 8,9 kB, Karte JS 429,96 kB, Start-CSS 12,67 kB (+0,2), Karte CSS 10,77 kB, Anbieter JS 3,23 kB, Start-JS 106,52 kB (+1,23 kB statt der geschätzten 0,3 kB: gemeinsamer Katalog-Zustand, Statuszeile und `ProviderMapPanel` liegen im Start). Zeile in der Delta-Tabelle von ADR 0012.
+
 ### E7 – ADR 0038 „Anbieterkarte lädt mit dem Tab“
 
 - Ändert ADR 0008, Punkt „Nur in der Kartenansicht“: Auch das Öffnen des Tabs „Anbieter“ ist eine ausdrückliche Handlung und lädt die Karte samt Kacheln.
@@ -365,6 +367,35 @@ Die lokale E2E-Prüfung richtet sich nach „Lokal prüfen“ in CLAUDE.md (Revi
 ## Offen
 
 - Keine offenen Nutzerentscheidungen. Die Entscheidungen vom 2026-10-29 stehen unter „Anlass“.
+
+## Umsetzung (2026-10-29)
+
+Abweichungen und Präzisierungen gegenüber E1–E8 und den Nachträgen:
+
+- **Glocke statt Herz** (Plan 0054, parallel live): Gemerkte Anbieter heißen jetzt Anbieter-Abos. Das Orts-Sheet zeigt je Zeile die Glocke (`BellButton`), nicht das Herz.
+- **Fokus-Rückweg ohne `openProvider(id, from)`** (E4, Fall 15): Der native `<dialog>` gibt den Fokus beim Schließen an den Auslöser zurück. Nach einem Tipp auf die Karte ist das die Canvas in `.map-box`, aus der Liste die Zeile. Ein eigener Sitzungszustand für die Herkunft ist deshalb nicht nötig; Fall 2 der Spec prüft den Weg über die Karte.
+- **Gemeinsamer Ladezustand** (E5, N13): `useProviderDirectory` in `ProviderPanel.tsx` hält Chunk und Katalog in einem kleinen Store (`useSyncExternalStore`). So sehen Liste und Karte denselben Fehlschlag, und „Nochmal versuchen“ in der Liste lädt für beide. Ein neuer Mount nach einem Fehlschlag versucht es wie bisher neu. Das Anbieter-Sheet behält seinen eigenen `useLazy`.
+- **`ProviderPlace`** trägt zusätzlich `address` (Route im Orts-Sheet) und je Anbieter `shown` („n Angebote“).
+- **`useSettled`** liegt jetzt im Start (`src/ui/use-settled.ts`), weil Statuszeile und Liste es nutzen.
+- **Marker**: Die Kachel ist ein Bild (`anbieter`, `anbieter-blass`) mit Schatten im Bild; der unsichtbare Kreis `anbieter-punkt` ist die Trefferfläche für `PROVIDER_LAYERS`.
+- **Kartenhöhe** (E4, N6): `clamp(10rem, 40svh, max(250px, 12rem))` statt `clamp(160px, 40svh, 250px)`. Bei 100 % Schrift ist das dasselbe; bei 200 % wächst die Karte wie die Angebotskarte mit, sonst überlagerten sich Attribution und Zoom-Knöpfe (axe target-size in `mobile-ux.spec.ts`).
+- **Querformat** (Review M5, Abweichung): Bei 844×390 belegen Kopf, Sticker und Suche schon ≈ 250 px. Die Statuszeile ist dort ohne Scrollen nicht erreichbar, wie niedrig die Karte auch ist. `layout.spec.ts` sichert stattdessen, dass die Karte quer auf ihre Mindesthöhe (160 px, höchstens 45 % der Höhe) schrumpft und die Statuszeile direkt darunter folgt. Ein kompakterer Kopf im Querformat wäre eine eigene Änderung (`docs/ideas.md`).
+- **Dateien, die sich nicht ändern** (Plan-Drift, Arch-Review Minor 5): `src/domain/camera.ts` samt Test (der Helfer entfiel mit Review 2, m7) und `scripts/build-data.ts` (es ruft `toProviderDirectory` unverändert auf). Der Satz in E5 „Ein ADR braucht es dafür nicht“ ist überholt: ADR 0038 nennt die Ausnahme in `map-entry-only` (N10).
+- **Smoke** (Arch-Review B1): `smoke.spec.ts` fährt den Tab mit `tiles: "mock"` und `mapSettled`; lokal läuft Smoke nur mit `PW_SUITE=smoke`, nicht über `e2e:local` mit Spec-Liste.
+- **E2E-Hilfe** `mapSettled` (`e2e/fixtures.ts`, N1): Karte bereit und ruhig, vor jeder Request-Zählung und vor dem Verlassen des Tabs. `mockTilesIn` gibt einem zweiten Browser-Kontext denselben Kachel-Mock.
+- **E2E**: Fall 6 (Kostenlos in der URL) steht in `anbieter.spec.ts`. Fall 11 (Stadtteil wählen bei offenem Tab) deckt der vorhandene Privatsphäre-Fall in `anbieter.spec.ts` ab, jetzt mit Karte im Tab; dazu prüft Fall 8 denselben Startausschnitt mit gespeichertem Stadtteil. Dazu kommt ein Fall „Suche mit Treffern außerhalb des Ausschnitts“.
+
+## Arch-Review und Browser-Review (2026-10-29)
+
+- **Arch-Review 1** – Nacharbeit nötig: B1 (Smoke-Specs ohne Kachel-Mock) behoben, `smoke.spec.ts` mit `tiles: "mock"` und `mapSettled`, `PW_SUITE=smoke pnpm e2e` grün (27). Minor 1–6 übernommen: doppelter Aufruf in `layout.spec.ts`, `outsideText` nach `provider-format.ts` und `placeProviderLine` nach `provider-places.ts` mit Unit-Tests, Kommentare in `map-types.ts` und `provider-count.ts`, Plan-Drift unter „Umsetzung“, der Ausschnitt-Leerzustand nur, wenn es ohne Ausschnitt aktive Anbieter gäbe.
+- **Arch-Review 2** – OK, ohne Blocker und Major. Minor übernommen: Padding der Anbieterkarte in `architecture.md`, zwei Ansichten „Suche außerhalb“ in `mobile-ux.spec.ts`, E2E-Fall „alle Treffer außerhalb“, Kommentar in `directory.ts`, überflüssige CSS-Klasse entfernt. Nicht übernommen: eigene Ansicht für den Kachelfehler im Tab (der Weg ist derselbe wie auf der Angebotskarte, `karte.spec.ts`).
+- **Browser-Review** (Fixture-Build, `scripts/screenshots.ts`, Ansichten `anbieter`, `anbieter-sheet`, `tabs`, alle Viewports hell und dunkel):
+  - Lesbarkeit: Reihenfolge Sticker, Suche, Karte, Hinweis, Statuszeile, Liste wie Mockup C; Statuszeile und Zeilen unverändert lesbar.
+  - Daumen: Zoom-Knöpfe oben rechts, „Alle zeigen“ als Textknopf an der Statuszeile; Ziele ≥ 44 px (`mobile-ux.spec.ts`).
+  - Zustände: Laden, Fehler (ohne WebGL, 503), leerer Ausschnitt, Suche außerhalb und lange Namen geprüft (E2E und `mobile-ux`).
+  - Dunkel: Kacheln in `--surface`, Cluster in `--primary`, keine hellen Inseln (`expectNoBrightIslands`).
+  - Befund behoben: Quer lag ein Marker unter der ausgeschriebenen Attribution (`anbieter-quer-dark.png`); `PROVIDER_PADDING` hält unten jetzt Platz frei. Quer fasst die 160 px hohe Karte die Orte der Fixtures dadurch zu einem Cluster zusammen.
+  - Micro-Interactions: Zeilen und Glocken wie in der Liste; Kamerafahrten bei reduzierter Bewegung springen (MapLibre).
 
 ## Review (2026-10-29) – Verdict: Überarbeiten
 

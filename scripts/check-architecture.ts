@@ -73,6 +73,8 @@ if (missed.length > 0) {
 const LAZY_LOADERS: Array<[file: string, target: string]> = [
   ["src/ui/MapPanel.tsx", "./karte/"],
   ["src/ui/karte/MapScreen.tsx", "../map/"],
+  // Anbieterkarte (Plan 0055, E5)
+  ["src/ui/karte/ProviderMapScreen.tsx", "../map/"],
   ["src/ui/use-transit.ts", "../domain/transit.ts"],
   // ICS-Code der Merkliste und gekürzter Reihen (Plan 0010, E8 A; Plan 0018); mit Endung, damit es nicht
   // `../domain/ics-paths.ts` oder `../domain/ics-types.ts` trifft

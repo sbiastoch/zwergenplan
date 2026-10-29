@@ -4,7 +4,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, MAP_READY, mapSettled, test } from "./fixtures.ts";
 import {
   expectAccessible,
   expectMobileUx,
@@ -268,6 +268,8 @@ test.describe("Karte mit echten Daten (Plan 0005)", () => {
 
 /** Plan 0010: Anbieterübersicht mit echten Daten (lange Namen, viele Zeilen, Spitzenreiter mit vielen Angeboten). */
 test.describe("Anbieter mit echten Daten (Plan 0010)", () => {
+  // Der Tab lädt die Anbieterkarte samt Kacheln (ADR 0038); auch im Deploy-Build nur aus dem Mock
+  test.use({ tiles: "mock" });
   const list = (page: Page) => page.getByRole("region", { name: "Anbieter" });
   const tab = (page: Page, name: string) =>
     page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: new RegExp(`^${name}`) });
@@ -277,6 +279,8 @@ test.describe("Anbieter mit echten Daten (Plan 0010)", () => {
     test.skip(meta.offers === 0, "keine Daten");
     await tab(page, "Anbieter").click();
     await expect(list(page).locator(".place").first()).toBeVisible();
+    // Ohne `__zpMap` (Deploy-Build) genügt „bereit“ (Plan 0055, N1)
+    await mapSettled(page);
   }
 
   test("mehr als 50 aktive Zeilen, alle Anbieter ohne Termine blass am Ende", async ({ page }) => {

@@ -42,6 +42,15 @@ export function hiddenProvidersText(count: number): string {
     : `${count} weitere Anbieter haben gerade nichts Passendes.`;
 }
 
+/**
+ * Suchtreffer außerhalb des Kartenausschnitts (Plan 0055, E4): „2 weitere Treffer …“ unter der Liste, ohne „weitere“,
+ * wenn alle draußen liegen (Leerzustand).
+ */
+export function outsideText(count: number, more: boolean): string {
+  const words = count === 1 ? (more ? "weiterer Treffer" : "Treffer") : more ? "weitere Treffer" : "Treffer";
+  return `${count} ${words} außerhalb des Kartenausschnitts.`;
+}
+
 /** Live-Region unter der Suche: „12 Anbieter“ (E5) */
 export function providerCountText(count: number): string {
   return plural(count, "Anbieter", "Anbieter");

@@ -1,7 +1,7 @@
 /**
  * Anbieterübersicht (Plan 0010, E4–E6): Zustand, Zahlen, Stadtteile, nächster Ort, Kategorien und Suche je Anbieter.
  * Abgeleitet, nie gespeichert. Nur der Lazy-Chunk `src/ui/anbieter/` importiert dieses Modul (`directory-only-lazy`),
- * und es greift auf nichts zu, was nur die Karte nutzt (`places.ts`, `camera.ts`; `lazy-domain-apart`).
+ * und es greift auf nichts zu, was nur die Karte nutzt (`places.ts`, `camera.ts`, `provider-places.ts`; `lazy-domain-apart`).
  */
 import { discoverable } from "./agenda.ts";
 import { isOutside, type ProviderView } from "./provider-count.ts";

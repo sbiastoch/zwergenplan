@@ -8,7 +8,7 @@ import { ageInMonths } from "../domain/age.ts";
 import { activeFilterCount, EMPTY_FILTER, type FilterState, providerFilter, withDateRange } from "../domain/filter.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
-import { countProviders } from "../domain/provider-count.ts";
+import { countProviders, type ProviderView, viewNarrows } from "../domain/provider-count.ts";
 import { type Sort, type Tab, tabSection } from "../domain/route.ts";
 import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
 import { searchOf } from "../domain/searches.ts";
@@ -36,7 +36,7 @@ import {
 import { Icon } from "./icons.tsx";
 import { preloadExportWhenIdle } from "./ics-export.ts";
 import { type AgeEscape, ListPending, ListView } from "./ListView.tsx";
-import { MapPanel } from "./MapPanel.tsx";
+import { MapPanel, ProviderMapPanel } from "./MapPanel.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { Onboarding, preloadOnboarding } from "./Onboarding.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
@@ -60,6 +60,7 @@ import {
   useToast,
 } from "./use-app-state.ts";
 import { useOfferViews } from "./use-offer-views.ts";
+import { ANNOUNCE_DELAY_MS, useSettled } from "./use-settled.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
 /** `site.json` im lockeren Format: Angebote ohne `category` aus einem Datencache vor Plan 0037, Stufe A (E13). */
@@ -116,6 +117,9 @@ export function App() {
   const [animate, setAnimate] = useState(false);
   // Suchtext der Anbieterliste: übersteht den Tab-Wechsel, nie in der URL (Plan 0010, E5)
   const [providerQuery, setProviderQuery] = useState("");
+  // Anbieterkarte (Plan 0055, E4): Ausschnitt für Liste und Statuszeile, Zähler für „Alle zeigen“; nur im Speicher
+  const [providerView, setProviderView] = useState<ProviderView>();
+  const [providerReset, setProviderReset] = useState(0);
   // Filter der Merkliste: getrennt vom Startseiten-Filter, nie in der URL, übersteht Tab- und Darstellungswechsel,
   // nicht das Neuladen (Plan 0025, E6)
   const [savedFilter, setSavedFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER);
@@ -312,6 +316,11 @@ export function App() {
     countProviders(views.providerVisible),
     views.providerVisible.length,
   );
+  // Blendet der Kartenausschnitt Anbieter aus, zählt die Statuszeile nur die darin (Plan 0055, E4, Review M1)
+  const narrowed = route.tab === "anbieter" && viewNarrows(providerView);
+  const inViewCount = countProviders(views.providerVisible, providerView);
+  // Ansage erst, wenn die Karte ruht; der sichtbare Text ist dann `aria-hidden` (Review m8, Review 2, m4)
+  const inViewAnnounce = useSettled(narrowed ? `${inViewCount} Anbieter im Kartenausschnitt` : "", ANNOUNCE_DELAY_MS);
   /*
    * Startpunkt hinter der Zahl, im selben Fließtext (Plan 0020, E1): U+00A0 vor dem Punkt, damit er nie verwaist am
    * Zeilenanfang steht; der Ausdruck selbst ist ein Inline-Block und wandert als Ganzes in die nächste Zeile. Beim
@@ -407,6 +416,11 @@ export function App() {
         }
       : undefined;
   const shownUnfitCount = inProviders ? views.providerUnfitCount : unfitCount;
+  // „Alle zeigen“ verschwindet nach dem Tipp: Fokus vorher auf die Statuszeile (Plan 0055, Review 2, m3)
+  const showAllProviders = () => {
+    statusLine.current?.focus();
+    setProviderReset((n) => n + 1);
+  };
   /*
    * Beide Altersknöpfe verschwinden nach dem Tipp (Leerzustand bzw. Warnhinweis): Der Fokus geht vorher auf die
    * Statuszeile, sonst fiele er auf <body> (Muster wie LimitAction, Plan 0009, N2). Sie meldet die neue Zahl selbst.
@@ -502,6 +516,25 @@ export function App() {
         {route.tab === "anbieter" && load.kind !== "error" && (
           <ProviderSearch query={providerQuery} onQuery={setProviderQuery} />
         )}
+        {/* Anbieterkarte unter der Suche, über der Statuszeile (Plan 0055, Mockup C); lädt mit dem Tab (ADR 0038) */}
+        {load.kind === "ready" && route.tab === "anbieter" && (
+          <ProviderMapPanel
+            generatedAt={load.data.generatedAt}
+            offers={offers}
+            visible={views.providerVisible}
+            now={now}
+            origin={origin}
+            dark={theme.dark}
+            saved={savedProviders}
+            onToggleSaved={onToggleProvider}
+            bellBusy={bellBusy}
+            onOpenProvider={openProvider}
+            onInView={setProviderView}
+            onSheetOpen={setPlaceSheet}
+            toast={toast}
+            resetKey={providerReset}
+          />
+        )}
         {load.kind === "loading" && (
           <>
             <div className="status-row">
@@ -538,6 +571,14 @@ export function App() {
                     {placesWord}
                     {reachSuffix}
                   </span>
+                ) : narrowed ? (
+                  <span>
+                    <span aria-hidden="true">
+                      <b>{inViewCount}</b> Anbieter im Kartenausschnitt
+                    </span>
+                    <span className="sr-only">{inViewAnnounce}</span>
+                    {reachSuffix}
+                  </span>
                 ) : route.tab === "anbieter" ? (
                   <span>
                     <b>{providerCount}</b>
@@ -564,6 +605,11 @@ export function App() {
                 )}
               </p>
               {toggle}
+              {narrowed && (
+                <button type="button" className="linkbtn" onClick={showAllProviders}>
+                  Alle zeigen
+                </button>
+              )}
             </div>
             {hint && (
               // wegzeit= wirkt nicht (ohne Startpunkt, Fehler, außerhalb): Hinweis außerhalb der Status-Region (E11)
@@ -640,6 +686,8 @@ export function App() {
             offers={offers}
             visible={views.providerVisible}
             now={now}
+            view={providerView}
+            onShowAll={showAllProviders}
             reachOf={views.reachOf}
             reachMode={reachMode}
             query={providerQuery}

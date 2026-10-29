@@ -173,6 +173,24 @@
   .map-rest {
     min-height: 12rem;
   }
+  /*
+   * Anbieterkarte über der Liste (Plan 0055, E4, Review M5): niedriger, damit quer und auf kurzen Viewports Statuszeile
+   * und erste Listenzeile sichtbar bleiben. Beim Laden und im Fehlerfall wächst der Rahmen mit dem Text (N6): Hinweis
+   * und Knopf passen so auch bei 320 px und 200 % Schrift.
+   */
+  .map-box.anbieter {
+    /* rem-Grenzen wie bei der Angebotskarte: Bei 200 % Schrift überlagerten sich sonst Attribution und Zoom-Knöpfe */
+    height: clamp(10rem, 40svh, max(250px, 12rem));
+  }
+  .map-box.anbieter:is([data-state="laden"], [data-state="fehler"]) {
+    height: auto;
+    min-height: clamp(10rem, 40svh, max(250px, 12rem));
+    display: flex;
+  }
+  .map-box.anbieter:is([data-state="laden"], [data-state="fehler"]) > .map-note {
+    position: static;
+    flex: 1;
+  }
   .map-note {
     position: absolute;
     inset: 0;

@@ -4,7 +4,7 @@
  * Gedrehte Boxen sind im Bounding-Rect größer.
  */
 import type { Page } from "@playwright/test";
-import { expect, test } from "./fixtures.ts";
+import { expect, mapSettled, test } from "./fixtures.ts";
 import {
   expectAccessible,
   expectNoBrightIslands,
@@ -13,6 +13,9 @@ import {
   expectTouchTargets,
   setTextScale,
 } from "./mobile-ux.ts";
+
+// Der Tab „Anbieter“ zeigt die Anbieterkarte, Kacheln aus tests/fixtures/karte/ (Plan 0055, E8)
+test.use({ tiles: "mock" });
 
 const FIXTURE_NOW = new Date("2026-10-05T12:00:00+02:00");
 
@@ -198,6 +201,7 @@ const LANDSCAPE_200: Record<string, (page: Page) => Promise<void>> = {
   Anbieter: async (page) => {
     await page.getByRole("button", { name: "Anbieter", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("Anbieter mit");
+    await mapSettled(page);
   },
   "Merkliste mit Badge": async (page) => {
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
@@ -666,6 +670,8 @@ test.describe("Tab-Leiste mit drei Tabs (Plan 0010, E2; Plan 0025, E8)", () => {
       await withBadge(page, { width, height: 800 }, 1);
       for (const name of TAB_NAMES) {
         await tabButton(page, name).click();
+        // Anbieterkarte erst fertig laden lassen, bevor der nächste Tab sie abbaut (Plan 0055, N1)
+        if (name === "Anbieter") await mapSettled(page);
         const m = await tabBar(page);
         expect(m.tabs.map((t) => t.name)).toEqual(TAB_NAMES);
         const at = `${width} px, ${name} aktiv`;
@@ -738,6 +744,8 @@ test.describe("Tab-Leiste mit drei Tabs (Plan 0010, E2; Plan 0025, E8)", () => {
         await setTextScale(page, scale);
         for (const name of TAB_NAMES) {
           await tabButton(page, name).click();
+          // Anbieterkarte erst fertig laden lassen, bevor der nächste Tab sie abbaut (Plan 0055, N1)
+          if (name === "Anbieter") await mapSettled(page);
           const m = await tabBar(page);
           const where = `${at}, ${name} aktiv`;
           expect(m.bar.top, `${where}: Leiste oben mit 8 px Rand`).toBeGreaterThanOrEqual(8);
@@ -838,5 +846,33 @@ test.describe("Abstand unter dem Umschalter der Merkliste", () => {
         expect(next.y - (chip.y + chip.height), "Filterzeile → Export bzw. Statuszeile").toBeGreaterThanOrEqual(8);
       });
     }
+  }
+});
+
+/*
+ * Quer belegen Kopf, Sticker und Suche schon ≈ 250 von 390 px: Die Statuszeile ist dort ohne Scrollen nicht erreichbar,
+ * wie hoch die Karte auch ist (Abweichung von Review M5, Plan 0055, „Umsetzung“). Gesichert wird, dass die Karte quer
+ * auf ihre Mindesthöhe schrumpft und die Statuszeile direkt darunter folgt.
+ */
+test.describe("Anbieterkarte im Querformat (Plan 0055, Review M5)", () => {
+  for (const viewport of [
+    { width: 844, height: 390 },
+    { width: 667, height: 375 },
+  ]) {
+    test(`${viewport.width}×${viewport.height}: Karte auf Mindesthöhe, Statuszeile direkt darunter`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await page.goto("./?ansicht=anbieter");
+      await mapSettled(page);
+      const { map, status, height } = await page.evaluate(() => {
+        const box = (s: string) => document.querySelector(s)?.getBoundingClientRect();
+        return { map: box(".map-box"), status: box(".status-row"), height: window.innerHeight };
+      });
+      if (!map || !status) throw new Error("Karte oder Statuszeile fehlt");
+      expect(map.height, "Karte höchstens 45 % der Höhe").toBeLessThanOrEqual(height * 0.45);
+      // nur der Hinweis zu OpenFreeMap liegt zwischen Karte und Statuszeile
+      expect(status.top - map.bottom, "Statuszeile direkt unter der Karte").toBeLessThan(80);
+    });
   }
 });

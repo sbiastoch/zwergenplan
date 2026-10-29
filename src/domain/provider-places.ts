@@ -12,18 +12,28 @@ import { type GeoPoint, isGeoPoint } from "./geo.ts";
 import { placeKey } from "./place-key.ts";
 import type { SiteOffer, SiteProvider } from "./site-data.ts";
 
-interface ProviderAtPlace {
+export interface ProviderAtPlace {
   id: string;
   name: string;
   state: "aktiv" | "ohne-termine";
+  /** sichtbare Angebote (nach Kategorie und Alter), für „n Angebote“ im Orts-Sheet */
+  shown: number;
 }
 
 export interface ProviderPlace {
   key: string;
   geo: GeoPoint;
   name: string;
+  /** für „Route in Google Maps“ (Plan 0019) */
+  address: string;
   district?: string;
   providers: ProviderAtPlace[];
+}
+
+/** Zeile eines Anbieters im Orts-Sheet (E4): „n Angebote“ bzw. „Gerade keine Termine“ */
+export function placeProviderLine(provider: ProviderAtPlace): string {
+  if (provider.state !== "aktiv") return "Gerade keine Termine";
+  return provider.shown === 1 ? "1 Angebot" : `${provider.shown} Angebote`;
 }
 
 /** Kartenausschnitt in Grad, wie MapLibre `getBounds()` ihn liefert */
@@ -40,6 +50,7 @@ export interface ProviderGeometry {
 
 interface PlacedVenue {
   name: string;
+  address: string;
   district?: string | undefined;
   geo: GeoPoint;
 }
@@ -73,7 +84,7 @@ function placedProviders(providers: readonly SiteProvider[], offers: readonly Si
   for (const { providerId, providerName, venue } of offers) {
     if (result.has(providerId) || !isGeoPoint(venue.geo)) continue;
     const entry = fallback.get(providerId) ?? { id: providerId, name: providerName, venues: [] };
-    entry.venues.push({ name: venue.name, district: venue.district, geo: venue.geo });
+    entry.venues.push({ name: venue.name, address: venue.address, district: venue.district, geo: venue.geo });
     fallback.set(providerId, entry);
   }
   return [...result.values(), ...fallback.values()];
@@ -131,7 +142,8 @@ export function providerPlaces(input: {
   upcoming: readonly SiteOffer[];
   visible: readonly SiteOffer[];
 }): ProviderPlace[] {
-  const shown = new Set(input.visible.map((o) => o.providerId));
+  const shown = new Map<string, number>();
+  for (const { providerId } of input.visible) shown.set(providerId, (shown.get(providerId) ?? 0) + 1);
   const coming = new Set(input.upcoming.map((o) => o.providerId));
   interface Bucket {
     geo: GeoPoint;
@@ -146,7 +158,12 @@ export function providerPlaces(input: {
       const key = placeKey(venue.geo);
       const place: Bucket = places.get(key) ?? { geo: venue.geo, venues: [], providers: new Map() };
       place.venues.push(venue);
-      place.providers.set(provider.id, { id: provider.id, name: provider.name, state });
+      place.providers.set(provider.id, {
+        id: provider.id,
+        name: provider.name,
+        state,
+        shown: shown.get(provider.id) ?? 0,
+      });
       places.set(key, place);
     }
   }
@@ -161,6 +178,7 @@ export function providerPlaces(input: {
         key,
         geo: place.geo,
         name: first?.name ?? "",
+        address: first?.address ?? "",
         ...(first?.district === undefined ? {} : { district: first.district }),
         providers,
       };
