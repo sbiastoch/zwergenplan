@@ -155,7 +155,8 @@ test("laufender Kurs: fehlt in „Entdecken“, gemerkt steht er mit Fortschritt
   await page.goto("./?ansicht=merkliste");
   const card = page.getByTestId("offer").filter({ hasText: PEKIP });
   await expect(card).toBeVisible();
-  await expect(card).toContainText("Kurs · noch 6 von 8");
+  // am gezeigten Termin, Di 27.10. ist der dritte von acht
+  await expect(card).toContainText("Kurs · Termin 3 von 8");
 });
 
 // Plan 0019, E1–E3, E5: Die Kachel „Wo“ öffnet die Route in Google Maps, nur mit der Adresse als Ziel. Kein Test tippt
