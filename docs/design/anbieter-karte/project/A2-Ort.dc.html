@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Ort mit mehreren Anbietern</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.zp{width:390px;height:844px;position:relative;overflow:hidden;display:flex;flex-direction:column;background-color:var(--bg);background-image:radial-gradient(var(--dotc) 1.3px,transparent 1.6px);background-size:18px 18px;color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.th-light{--bg:#E8F1FF;--dotc:rgba(19,33,46,.13);--surface:#FFFFFF;--rim:#FFFFFF;--ink:#13212E;--muted:#475563;--soft:#EEF3FA;--line:#13212E;--shadow:#13212E;--primary:#13212E;--on-primary:#FFFFFF;--tape:#FFE38A;--tape-stripe:rgba(255,255,255,.5);--on-tape:#13212E;--map:#E1EBF8;--road:#FFFFFF;--park:#D3EBC6;--water:#B3D7F5;--scrim:rgba(19,33,46,.45);--sel:#FFD93B;--on-sel:#13212E}
+.zp button{font:inherit;color:inherit;cursor:pointer}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 4px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:25px;letter-spacing:-.02em}
+.logo i{width:28px;height:28px;border-radius:50%;background:#FFD93B;border:2px solid var(--rim);display:grid;place-items:center}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 15px;border-radius:999px;background:var(--surface);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);font-weight:700;font-size:15px;white-space:nowrap;box-sizing:border-box}
+.status{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px 6px;font-size:14px;color:var(--muted)}
+.status b{color:var(--ink)}
+.seg{display:flex;background:var(--soft);border:2px solid var(--line);border-radius:999px}
+.seg button{min-height:38px;padding:0 16px;border-radius:999px;border:0;background:transparent;font-weight:700;font-size:15px}
+.seg .on{background:var(--surface);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);margin:-2px}
+.mapf{position:relative;margin:4px 16px 0;border:2.5px solid var(--line);border-radius:22px;overflow:hidden;background:var(--map);box-shadow:4px 4px 0 var(--shadow)}
+.mapf svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.road{fill:none;stroke:var(--road);stroke-linecap:round}
+.lbl{fill:var(--muted);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:12px;font-weight:600}
+.pm{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:11px;background:var(--surface);border:2px solid var(--line);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;color:var(--ink);box-sizing:border-box}
+.pm b{position:absolute;top:-10px;right:-10px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:var(--primary);color:var(--on-primary);font-size:11px;line-height:16px;text-align:center;border:2px solid var(--surface)}
+.pm.sel{background:var(--sel);color:var(--on-sel);width:40px;height:40px;margin:-20px 0 0 -20px}
+.cl{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:var(--primary);color:var(--on-primary);border:2px solid var(--surface);box-shadow:2px 2px 0 var(--shadow);display:grid;place-items:center;font-weight:800;font-size:15px;box-sizing:border-box}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-top:2.5px solid var(--line);border-radius:26px 26px 0 0;padding:10px 16px 20px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px}
+.grip{width:44px;height:5px;border-radius:3px;background:var(--line);opacity:.35;align-self:center}
+.sh-head{display:flex;align-items:flex-start;gap:10px}
+.sh-head h2{margin:0;font-size:21px;font-weight:800;line-height:1.2;letter-spacing:-.01em}
+.sh-head p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.round{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid var(--line);background:var(--surface);box-shadow:3px 3px 0 var(--shadow);display:grid;place-items:center}
+.rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;border:2px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:3px 3px 0 var(--shadow)}
+.row .t{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left;border:0;background:transparent;padding:0}
+.row .t b{font-size:16px;font-weight:800;line-height:1.25}
+.row .t span{font-size:13px;color:var(--muted)}
+.row.idle{opacity:.6;box-shadow:none;border-style:dashed}
+.route{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:3px;min-height:44px}
+</style>
+</helmet>
+<div class="zp th-light">
+  <div class="hdr">
+    <div class="logo"><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 14 13H2Z" fill="#FF6B6B"></path></svg></i>Zwergenplan</div>
+    <button type="button" class="pill">Alter?</button>
+  </div>
+  <div class="status" style="padding-top:150px">
+    <span><b>69</b> Anbieter an <b>104</b> Orten</span>
+    <div class="seg" role="group" aria-label="Darstellung">
+      <button type="button" aria-pressed="false">Liste</button>
+      <button type="button" class="on" aria-pressed="true">Karte</button>
+    </div>
+  </div>
+  <div class="mapf" style="height:400px">
+    <svg class="bg" viewBox="0 0 354 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path d="M-10 175 C40 160 70 190 110 172 S170 150 205 168 S270 190 364 160" fill="none" stroke="var(--water)" stroke-width="7"></path>
+      <path class="road" stroke-width="9" d="M180 120 Q230 120 238 165 Q240 215 185 220 Q130 218 128 168 Q132 122 180 120Z"></path>
+      <path class="road" stroke-width="6" d="M0 120 L128 160 M238 165 L354 150 M185 220 L200 400 M180 120 L170 0 M128 168 L20 400"></path>
+      <text class="lbl" x="22" y="140">Fürth</text>
+      <text class="lbl" x="160" y="150">Altstadt</text>
+      <text class="lbl" x="58" y="205">Gostenhof</text>
+    </svg>
+    <span class="cl" style="left:182px;top:172px">14</span>
+    <span class="cl" style="left:56px;top:162px">6</span>
+    <span class="pm sel" style="left:96px;top:208px"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M5 10l1.5-5h11l1.5 5M6 10v9h12v-9M10 19v-5h4v5"></path></svg><b>3</b></span>
+  </div>
+  <div class="scrim"></div>
+  <section class="sheet" role="dialog" aria-label="Ort Familienzentrum Gostenhof" style="height:470px">
+    <div class="grip"></div>
+    <div class="sh-head">
+      <div style="flex:1">
+        <h2>Familienzentrum Gostenhof</h2>
+        <p>Musterstraße 4 · Gostenhof · 14 Min. mit Öffis</p>
+      </div>
+      <button type="button" class="round" aria-label="Schließen"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+    </div>
+    <div style="font-size:14px;font-weight:700">3 Anbieter an diesem Ort</div>
+    <ul class="rows">
+      <li class="row">
+        <button type="button" class="t"><b>Familienzentrum Gostenhof (fiktiv)</b><span>5 Angebote · Krabbeln, Treffs</span></button>
+        <button type="button" class="round" aria-label="Anbieter merken"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg></button>
+      </li>
+      <li class="row">
+        <button type="button" class="t"><b>Musikgarten Kleine Töne (fiktiv)</b><span>2 Angebote · Musik</span></button>
+        <button type="button" class="round" aria-label="Anbieter merken" aria-pressed="true"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="#FF7070" stroke="#13212E" stroke-width="2"></path></svg></button>
+      </li>
+      <li class="row idle">
+        <button type="button" class="t"><b>Hebammenpraxis Kugelrund (fiktiv)</b><span>Gerade keine Termine</span></button>
+        <button type="button" class="round" aria-label="Anbieter merken"><svg class="ic" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg></button>
+      </li>
+    </ul>
+    <a class="route" href="https://www.google.com/maps/dir/?api=1"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11Z"></path><circle cx="12" cy="10" r="2"></circle></svg>Route in Google Maps</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
