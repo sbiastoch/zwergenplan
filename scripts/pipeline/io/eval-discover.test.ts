@@ -3,8 +3,15 @@
  * ganzen Katalog abdeckt: sonst machte jeder neue Anbieter G1 und die CI rot.
  */
 import { describe, expect, it } from "vitest";
-import { DiscoverEvalSchema, SAMPLE_REGIONS, SAMPLE_SIZE } from "../lib/eval-discover.ts";
-import { DISCOVER_EVAL, readCatalog, readJson } from "./files.ts";
+import { DiscoverEvalSchema, SAMPLE_REGIONS, SAMPLE_SIZE, UrteileSchema } from "../lib/eval-discover.ts";
+import { DISCOVER_EVAL, DISCOVER_URTEILE, readCatalog, readJson } from "./files.ts";
+
+describe("evals/discover-urteile.json", () => {
+  it("gültig, Schlüssel sind URLs", () => {
+    const { urteile } = UrteileSchema.parse(readJson(DISCOVER_URTEILE));
+    for (const url of Object.keys(urteile)) expect(() => new URL(url), url).not.toThrow();
+  });
+});
 
 const evalFile = DiscoverEvalSchema.parse(readJson(DISCOVER_EVAL));
 const byId = new Map(readCatalog().map((p) => [p.id, p]));

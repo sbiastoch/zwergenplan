@@ -5,6 +5,7 @@ import { shortId } from "../../../src/domain/ids.ts";
 import { type Offer, type Provider, ProvidersFile } from "../../../src/domain/schema.ts";
 import type { Candidate } from "./candidate.ts";
 import {
+  type Adopted,
   type AssessEntry,
   aggregatorFinds,
   allowedUrlsOf,
@@ -28,6 +29,7 @@ import {
   postpone,
   prefilter,
   proveYield,
+  type RegionReport,
   renderDiscoverReport,
   reservedIds,
   sameSite,
@@ -513,6 +515,7 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
       ok: false,
       grund: "Dublette von stadtbibliothek-beispiel? (gleiche Programmseite)",
       klaerfall: true,
+      dublette: true,
     });
   });
 
@@ -819,9 +822,98 @@ describe("Entdecken-Eval: ausgeblendete Anbieter (Plan 0032, E9)", () => {
     // „gefunden“: von einer Quelle geliefert, gleich was danach geschah (auch Vorfilter, nicht bewertet)
     expect(md).toMatch(/## Eval: ausgeblendete Anbieter \(2 von 6 wiedergefunden, 6 gefunden\)/);
     expect(md).toMatch(
-      /\| musikschule-beispiel \| verworfen \| https:\/\/example\.org\/musikschule \| ohne Adresse \|/,
+      /\| musikschule-beispiel \| {2}\| verworfen \| vorfilter \| suche \| {2}\| https:\/\/example\.org\/musikschule \| ohne Adresse \|/,
     );
     expect(md).toMatch(/Zusätzlich aufgenommen \(nicht ausgeblendet\): 1[\s\S]*krabbelzwerge/);
+  });
+
+  describe("Plan 0050, E6: Zuordnung 1:1, Stufen, Quellen, Urteile", () => {
+    const hidden = catalog.filter((p) =>
+      ["turnverein-beispiel", "musikschule-beispiel", "theater-beispiel", "familientreff-beispiel"].includes(p.id),
+    );
+    const adopted = (id: string, name: string, url: string, over: Partial<Adopted> = {}): Adopted => ({
+      id,
+      name,
+      region: "nuernberg",
+      find: find({ name, url }),
+      grund: "passt",
+      first: { title: "Kurs", start: "2026-10-20T10:00:00+02:00", url },
+      ...over,
+    });
+    const report = (over: Partial<RegionReport> = {}): RegionReport => ({
+      region: "nuernberg",
+      finds: 9,
+      // alle auf example.org wie Gemeinden auf stadtkirche-nuernberg.de: der Host allein ordnet nicht zu
+      adopted: [
+        adopted("tv-2", "Turnverein Beispiel", "https://example.org/turnverein/baby"),
+        adopted("tv-1", "Turnverein Beispiel", "https://example.org/turnverein"),
+        adopted("ms", "Musikschule Beispiel", "https://example.org/musikschule/kurse"),
+        // andere Website, aber ähnlicher Name und Ort ≤ 100 m
+        adopted("th", "Kleines Theater Beispiel", "https://theater-beispiel.example.net/", {
+          orte: [{ lat: 49.4498, lon: 11.0603 }],
+        }),
+        adopted("krabbel", "Krabbelzwerge", "https://krabbelzwerge.example.net/"),
+        adopted("baby", "Babytreff", "https://babytreff.example.net/"),
+      ],
+      rejected: [
+        {
+          find: find({ name: "Musikschule Beispiel", url: "https://example.org/musikschule" }),
+          grund: "kein Ertrag",
+          stufe: "orte",
+        },
+      ],
+      klaerfaelle: [],
+      dropped: [
+        {
+          find: find({ name: "Familientreff", url: "https://example.org/familientreff", quelle: "verzeichnis:v" }),
+          grund: "x",
+        },
+      ],
+      unassessed: [find({ name: "Familientreff Beispielhof", url: "https://example.org/familientreff/kurse" })],
+      hints: [],
+      ...over,
+    });
+
+    it("ordnet 1:1 zu (URL vor Host und Name vor Ortsnähe); zweite Aufnahme ist doppelt, Urteile gelten", () => {
+      const e = hiddenEval(hidden, [report()], {
+        alt: new Set(["turnverein-beispiel"]),
+        urteile: { [normalizeUrl("https://krabbelzwerge.example.net/") ?? ""]: { urteil: "falsch", datum: today } },
+      });
+      expect(e.outcomes.map((o) => [o.id, o.ergebnis, o.adoptedId, o.stufe, o.quellen])).toEqual([
+        ["familientreff-beispiel", "nicht bewertet", undefined, "vorfilter", ["suche", "verzeichnis"]],
+        ["musikschule-beispiel", "aufgenommen", "ms", "beweis", ["suche"]],
+        ["theater-beispiel", "aufgenommen", "th", "beweis", ["suche"]],
+        ["turnverein-beispiel", "aufgenommen", "tv-1", "beweis", ["suche"]],
+      ]);
+      expect(e.outcomes.find((o) => o.id === "turnverein-beispiel")?.alt).toBe(true);
+      expect(e.doppelt.map((a) => a.id)).toEqual(["tv-2"]);
+      expect(e.extra.map((a) => [a.id, a.urteil?.urteil])).toEqual([
+        ["krabbel", "falsch"],
+        ["baby", undefined],
+      ]);
+    });
+
+    it("Bericht: Kennzahlen je Stufe, falsch und unbeurteilt, Gültigkeit und Zeile für results.md", () => {
+      const e = hiddenEval(hidden, [report()], {
+        urteile: { [normalizeUrl("https://krabbelzwerge.example.net/") ?? ""]: { urteil: "falsch", datum: today } },
+      });
+      const base = {
+        date: today,
+        dryRun: true,
+        durationMs: 61 * 60_000,
+        regions: [report()],
+        calls: [],
+        budgetHit: false,
+        modelle: "Suche/Bewerten opus/high, Beweis opus/high",
+        hidden: e,
+      };
+      const md = renderDiscoverReport(base);
+      expect(md).toMatch(/\| Ertragsbeweis \| 3 \| 0 \| 3 \|/);
+      expect(md).toMatch(/Falsch aufgenommen: 2 \(1 doppelt, 1 nach Urteil\), 1 unbeurteilt/);
+      expect(md).toMatch(/Lauf gültig: ja/);
+      expect(md).toMatch(/\| 2026-10-11 \| Suche\/Bewerten opus\/high, Beweis opus\/high \| ja \| 4 \(0\/4\) \|/);
+      expect(renderDiscoverReport({ ...base, brake: "tokens" })).toMatch(/Lauf gültig: nein \(Bremse tokens\)/);
+    });
   });
 });
 

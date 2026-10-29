@@ -4,11 +4,16 @@ Ergebnisse der Evals (Plan 0032, E9): Entdecken neuer Anbieter und Extraktion de
 
 ## Entdecken
 
-Eine Zeile je Entdecken-Eval (`pnpm pipeline discover --dry-run --hide …`, Plan 0032, E9): bekannte Anbieter werden für einen Trockenlauf aus dem Katalog ausgeblendet. **Wiedergefunden**: würde aufgenommen. **Gefunden**: von einer Quelle (Sammelkalender, Verzeichnis, Websuche) als Kandidat geliefert, gleich ob danach aufgenommen, verworfen, im Vorfilter gelandet oder nicht bewertet; misst die Breite der Quellen, „Wiedergefunden“ den ganzen Weg (Bericht: alles außer „nicht gefunden“). **Falsch aufgenommen**: aufgenommen, nicht ausgeblendet und von Hand als falsch beurteilt; **neu** sind aufgenommene, nicht ausgeblendete und passende Anbieter. Modell `LLM_MODEL_DISCOVER` für Suche und Bewerten, `LLM_MODEL_EXTRACT` für den Ertragsbeweis.
+Eine Zeile je Entdecken-Eval (`pnpm pipeline discover --dry-run --eval`, Plan 0050, E6; vor Plan 0050 `--hide` mit eigener Auswahl, Plan 0032, E9): die Stichprobe aus `evals/discover.json` wird für einen Trockenlauf aus dem Katalog ausgeblendet. Der Bericht des Laufs enthält die fertige Zeile.
 
-| Datum | Modell | Ausgeblendet | Wiedergefunden | Gefunden | Nicht gefunden | Falsch aufgenommen | Neu | Aufrufe | Kosten (USD, Schätzung) | Dauer | je Anbieter |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 2026-10-11 | haiku | 10 | 2 | 6 | 4 | 0 | 1 (donum-vitae-nuernberg) | 46 | $0.81 (Suche $0.74) | 15 Min. | brk-familienzentrum aufgenommen (über die PEKiP-Seite); zoff-harmonie aufgenommen (über das Verzeichnis der kath. Stadtkirche); cvjm-gostenhof-miniclub verworfen (Ertragsbeweis ohne künftigen Termin); djk-eibach, post-sv-nuernberg, schwimmschule-baer-ritterbad verworfen (Kursort ohne Postadresse: Turnhalle bzw. Bad nur mit Namen); die-familienbox, ev-suedstadt-krabbelgruppen, hebamme-elena-paulus, musikfuechse nicht gefunden |
+- **Stufen** als „alle (alt/neu)“, kumulativ: **Gefunden** von einer Quelle als Kandidat geliefert (Sammelkalender, Verzeichnis, Websuche), gleich was danach geschah; **Vorfilter** durch den Vorfilter; **Abgerufen** Fund-Seite gelesen; **„aufnehmen“** so bewertet; **Orte** Eintrag mit Orten gebaut; **Wiedergefunden** Ertragsbeweis bestanden, würde aufgenommen. „alt“ sind die zehn schon vor Plan 0050 genutzten Anbieter.
+- **Ertrag** (Ziel 4): Anteil der Termine des Handeintrags (Ertragsbeweis im selben Lauf, heute bis +8 Wochen), die die Aufnahme 1:1 über Ort und Beginn trifft, gemittelt über die Wiedergefundenen mit Referenz; in Klammern deren Zahl. **Quellen**: gefunden je Art der Quelle.
+- **Falsch aufgenommen**: zweite Aufnahme desselben Anbieters oder Aufnahme ohne Gegenstück, die in `evals/discover-urteile.json` als `falsch` oder `dublette` beurteilt ist; „unbeurteilt“ fehlt dort noch. **Neu**: als `passend` beurteilt.
+- **Gültig**: ohne Bremse, Zeitbudget und Abbruch; nur gültige Läufe zählen für die Ziele. **Modell** je Schritt (Suche/Bewerten, Ertragsbeweis), mit Effort.
+
+| Datum | Modell | Gültig | Ausgeblendet | Gefunden | Nicht gefunden | Vorfilter | Abgerufen | „aufnehmen“ | Orte | Wiedergefunden | Ertrag | Quellen | Klärfälle | Dubletten | Falsch aufgenommen | Neu | Aufrufe | Kosten (USD, Schätzung) | Dauer | je Anbieter |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2026-10-11 | haiku | – | 10 | 6 | 4 | – | – | – | – | 2 | – | – | – | – | 0 | 1 (donum-vitae-nuernberg) | 46 | $0.81 (Suche $0.74) | 15 Min. | brk-familienzentrum aufgenommen (über die PEKiP-Seite); zoff-harmonie aufgenommen (über das Verzeichnis der kath. Stadtkirche); cvjm-gostenhof-miniclub verworfen (Ertragsbeweis ohne künftigen Termin); djk-eibach, post-sv-nuernberg, schwimmschule-baer-ritterbad verworfen (Kursort ohne Postadresse: Turnhalle bzw. Bad nur mit Namen); die-familienbox, ev-suedstadt-krabbelgruppen, hebamme-elena-paulus, musikfuechse nicht gefunden |
 
 ## Extraktion
 
