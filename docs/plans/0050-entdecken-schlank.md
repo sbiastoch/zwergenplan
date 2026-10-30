@@ -1,6 +1,6 @@
 # Plan 0050 – Entdecken: wenige gute Quellen, Seitenfinder, keine technischen Verluste
 
-Status: in Umsetzung (S0, S1, S2 live; Ausgangswert gemessen; S2c Region nach Gemeinde vor S3)
+Status: in Umsetzung (S0–S2c live, S2b umgesetzt; Ausgangswert gemessen; S3 wartet auf Plan 0049, S1)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`):
@@ -595,6 +595,13 @@ Die Gemeinde ist deshalb `city ?? town ?? municipality ?? village`. Die Reihenfo
 **Nicht hier:**
 - Die Gemeinde in `data/providers.yaml` prüft `pnpm data:validate` nicht; es geocodiert nicht, und den Katalog verantwortet die Katalogpflege.
 - Ein neuer Eval-Lauf misst den Effekt erst zusammen mit S3, es sei denn, der Nutzer will ihn früher.
+
+### S2b – Umsetzung (2026-10-30)
+
+- `WatchFinding.providerId` heißt `subject`: Katalog-ID, beim Klärfall dessen Name (leer: Host der URL). Die Fund-URL steht im Feld `page`, der Grund beginnt mit dem Namen der Region („Fürth: …“), `since` ist `seit`.
+- `watchFindings` nimmt `discover` (die Zustände aller Regionen; `readDiscoverStates` in `io/discover.ts`). Gemeldet wird ab `anzahl` ≥ 2 (`KLAERFALL_MIN_COUNT`), auch während `aussetzenBis`; offen ist der Fall trotzdem.
+- `watchKey` liefert für `klaerfall` `klaerfall#<hash8 von normalizeUrl(url)>`. Der Job `waechter` in `nightly.yml` bleibt unverändert, der Zeichensatz des Markers passt.
+- Geprüft per Unit-Test (`lib/watch.test.ts`); die Abnahme folgt mit dem ersten Live-Lauf (S6).
 
 ## Nutzerentscheide
 

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
+import type { DiscoverState } from "./discover-state.ts";
 import { type ProviderRaw, type ProviderRawV1, type ProviderRawV2, RawEvent, type UnitState } from "./raw.ts";
 import { WATCH_MARKER, type WatchFinding, watchFindings, watchIssue, watchKey } from "./watch.ts";
 
@@ -42,7 +43,8 @@ const v2 = (units: Record<string, UnitState>, beilagen?: ProviderRawV2["beilagen
   ...(beilagen ? { beilagen } : {}),
 });
 const catalogOf = (raws: Record<string, ProviderRaw>) => Object.keys(raws).map((id) => ({ id, role: "anbieter" }));
-const find = (raws: Record<string, ProviderRaw>) => watchFindings({ raws, catalog: catalogOf(raws), today });
+const find = (raws: Record<string, ProviderRaw>) =>
+  watchFindings({ raws, catalog: catalogOf(raws), discover: [], today });
 
 describe("watchFindings (Plan 0048, E10)", () => {
   it("nichts offen → keine Befunde", () => {
@@ -61,7 +63,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
       klasseSince: "2026-10-26T03:00:00+01:00",
     });
     expect(find({ a: v2({ [A]: ok(), [B]: second }) })).toEqual([
-      { providerId: "a", kind: "seite", page: B, reason: "Bot-Schutz (HTTP 403)", since: "2026-10-26T03:00:00+01:00" },
+      { subject: "a", kind: "seite", page: B, reason: "Bot-Schutz (HTTP 403)", since: "2026-10-26T03:00:00+01:00" },
     ]);
   });
 
@@ -78,7 +80,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
       klasseSince: "2026-10-27T03:00:00+01:00",
     });
     expect(find({ a: v2({ [A]: ok(), [B]: blocked }) })).toEqual([
-      { providerId: "a", kind: "gesperrt", page: B, reason: "robots.txt sperrt", since: "2026-10-27T03:00:00+01:00" },
+      { subject: "a", kind: "gesperrt", page: B, reason: "robots.txt sperrt", since: "2026-10-27T03:00:00+01:00" },
     ]);
   });
 
@@ -96,7 +98,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
     });
     expect(find({ a: v2({ [A]: ok(), [B]: { ...rest, events: [] } }) })).toEqual([
       {
-        providerId: "a",
+        subject: "a",
         kind: "entfernt",
         page: B,
         reason: "entfernt: HTTP 404 seit 2026-10-06",
@@ -108,7 +110,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
   it("einbruch: zurückgehaltene Antwort mit Zahl der Events", () => {
     const held = ok({ pending: { inputHash: "neu", model: "opus", events: [] } });
     expect(find({ a: v2({ [A]: held }) })).toEqual([
-      { providerId: "a", kind: "einbruch", page: A, reason: "zurückgehalten: 0 statt 1 Events" },
+      { subject: "a", kind: "einbruch", page: A, reason: "zurückgehalten: 0 statt 1 Events" },
     ]);
   });
 
@@ -119,7 +121,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
     // keine mehr; die zweite Einheit hatte nie Events
     const none = ok({ events: [], status: "keine-termine" });
     expect(find({ a: v2({ [A]: empty("2026-10-20T03:00:00+02:00"), [B]: none }) })).toEqual([
-      { providerId: "a", kind: "leer", reason: "keine künftigen Angebote", since: "2026-10-20T03:00:00+02:00" },
+      { subject: "a", kind: "leer", reason: "keine künftigen Angebote", since: "2026-10-20T03:00:00+02:00" },
     ]);
     // das späteste emptySince zählt; 14 Tage zurück noch gemeldet, 15 nicht mehr
     const both = (a: string, b: string) => find({ a: v2({ [A]: empty(a), [B]: empty(b) }) });
@@ -138,7 +140,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
     });
     expect(r).toEqual([
       {
-        providerId: "a",
+        subject: "a",
         kind: "anbieter",
         reason: `alle 2 Seiten scheitern (${A}: HTTP 503; ${B}: HTTP 500)`,
         since: "2026-10-24T03:00:00+02:00",
@@ -162,7 +164,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
       sources: [],
     };
     expect(find({ b: v1, a: v2({ [A]: ok() }) })).toEqual([
-      { providerId: "b", kind: "umstellung", reason: "Rohdatei noch im alten Format (V1)" },
+      { subject: "b", kind: "umstellung", reason: "Rohdatei noch im alten Format (V1)" },
     ]);
   });
 
@@ -177,7 +179,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
     });
     expect(find({ a: v2({ [A]: ok() }, beilage("2026-10-27T03:00:00+01:00")) })).toEqual([]);
     expect(find({ a: v2({ [A]: ok() }, beilage("2026-10-26T03:00:00+01:00")) })).toEqual([
-      { providerId: "a", kind: "seite", page: B, reason: "Beilage: HTTP 404", since: "2026-10-26T03:00:00+01:00" },
+      { subject: "a", kind: "seite", page: B, reason: "Beilage: HTTP 404", since: "2026-10-26T03:00:00+01:00" },
     ]);
   });
 
@@ -189,7 +191,7 @@ describe("watchFindings (Plan 0048, E10)", () => {
       { id: "b", role: "anbieter", skipCrawl: { reason: "ruht", since: "2026-10-01" } },
       { id: "c", role: "aggregator" },
     ];
-    expect(watchFindings({ raws, catalog, today }).map((f) => f.providerId)).toEqual(["a"]);
+    expect(watchFindings({ raws, catalog, discover: [], today }).map((f) => f.subject)).toEqual(["a"]);
   });
 
   it("sortiert nach Anbieter, Art und Seite", () => {
@@ -200,14 +202,72 @@ describe("watchFindings (Plan 0048, E10)", () => {
         [A]: ok({ pending: { inputHash: "x", model: "opus", events: [] } }),
       }),
     });
-    expect(r.map((f) => `${f.providerId}:${f.kind}`)).toEqual(["a:einbruch", "a:seite", "z:seite"]);
+    expect(r.map((f) => `${f.subject}:${f.kind}`)).toEqual(["a:einbruch", "a:seite", "z:seite"]);
+  });
+});
+
+describe("Klärfälle im Wächter (Plan 0050, S2b)", () => {
+  const k = (over: Partial<DiscoverState["klaerfaelle"][number]> = {}): DiscoverState["klaerfaelle"][number] => ({
+    url: "https://www.beispiel-familie.de/kurse/?utm_source=x",
+    name: "Familienzentrum Beispiel",
+    grund: "mögliche Dublette von familientreff-beispiel",
+    seit: "2026-09-01",
+    zuletzt: "2026-10-01",
+    anzahl: 2,
+    ...over,
+  });
+  const withStates = (discover: Pick<DiscoverState, "region" | "klaerfaelle">[]) =>
+    watchFindings({ raws: {}, catalog: [], discover, today });
+
+  it("meldet einen Klärfall ab anzahl 2 mit Name, Region, Grund und Fund-URL", () => {
+    const r = withStates([
+      { region: "fuerth", klaerfaelle: [k(), k({ url: "https://example.org/neu", name: "Neu", anzahl: 1 })] },
+    ]);
+    expect(r).toEqual([
+      {
+        subject: "Familienzentrum Beispiel",
+        kind: "klaerfall",
+        page: "https://www.beispiel-familie.de/kurse/?utm_source=x",
+        reason: "Fürth: mögliche Dublette von familientreff-beispiel",
+        since: "2026-09-01",
+      },
+    ]);
+  });
+
+  it("ohne Namen steht der Host als Gegenstand", () => {
+    const r = withStates([{ region: "nuernberg", klaerfaelle: [k({ name: " " })] }]);
+    expect(r[0]?.subject).toBe("beispiel-familie.de");
+    expect(r[0]?.reason).toMatch(/^Nürnberg: /);
+  });
+
+  it("Schlüssel klaerfall#hash8 der normalisierten URL, passt zum Marker", () => {
+    const [f] = withStates([{ region: "fuerth", klaerfaelle: [k()] }]);
+    if (!f) throw new Error("kein Befund");
+    expect(watchKey(f)).toBe(`klaerfall#${hash8("beispiel-familie.de/kurse")}`);
+    // Schreibweisen derselben Seite geben denselben Schlüssel
+    expect(watchKey({ ...f, page: "http://beispiel-familie.de/kurse" })).toBe(watchKey(f));
+    const text = watchIssue([f], today);
+    expect(text.match(WATCH_MARKER)?.[1]).toBe(`klaerfall#${hash8("beispiel-familie.de/kurse")}:klaerfall`);
+    expect(text).toContain(
+      "- `Familienzentrum Beispiel` · klaerfall · `https://www.beispiel-familie.de/kurse/?utm_source=x` · `Fürth: mögliche Dublette von familientreff-beispiel` · seit 01.09.2026",
+    );
+  });
+
+  it("Klärfälle stehen neben den Befunden des Nachtlaufs", () => {
+    const r = watchFindings({
+      raws: { a: v2({ [B]: failing("2026-10-20T03:00:00+02:00"), [A]: ok() }) },
+      catalog: [{ id: "a", role: "anbieter" }],
+      discover: [{ region: "fuerth", klaerfaelle: [k()] }],
+      today,
+    });
+    expect(r.map((f) => `${f.subject}:${f.kind}`)).toEqual(["Familienzentrum Beispiel:klaerfall", "a:seite"]);
   });
 });
 
 describe("watchKey und Marker", () => {
   it("Anbieter-ID, bei Befunden einer Seite id#hash8 der Kennung", () => {
-    expect(watchKey({ providerId: "a", kind: "leer", reason: "" })).toBe("a");
-    expect(watchKey({ providerId: "a", kind: "seite", page: B, reason: "" })).toBe(`a#${hash8(B)}`);
+    expect(watchKey({ subject: "a", kind: "leer", reason: "" })).toBe("a");
+    expect(watchKey({ subject: "a", kind: "seite", page: B, reason: "" })).toBe(`a#${hash8(B)}`);
   });
 
   it("fällt eine zweite Seite desselben Anbieters aus, entsteht ein neues Paar", () => {
@@ -231,7 +291,7 @@ describe("watchKey und Marker", () => {
 
 describe("watchIssue (Plan 0048, E10)", () => {
   const f = (over: Partial<WatchFinding> = {}): WatchFinding => ({
-    providerId: "a",
+    subject: "a",
     kind: "seite",
     page: B,
     reason: "HTTP 503",
@@ -245,7 +305,7 @@ describe("watchIssue (Plan 0048, E10)", () => {
 
   it("Liste mit Anbieter, Art, Seite, Grund, seit; letzte Zeile der Marker", () => {
     const text = watchIssue(
-      [f(), f({ providerId: "b", kind: "umstellung", page: undefined, reason: "V1", since: undefined })],
+      [f(), f({ subject: "b", kind: "umstellung", page: undefined, reason: "V1", since: undefined })],
       today,
     );
     const lines = text.split("\n");
@@ -266,7 +326,7 @@ describe("watchIssue (Plan 0048, E10)", () => {
   it("je Zeile höchstens 200 Zeichen, gesamt unter 60 000", () => {
     const long = f({ page: `seite:https://example.org/${"x".repeat(300)}`, reason: "y".repeat(500) });
     const text = watchIssue(
-      Array.from({ length: 1000 }, (_, i) => ({ ...long, providerId: `anbieter-${i}` })),
+      Array.from({ length: 1000 }, (_, i) => ({ ...long, subject: `anbieter-${i}` })),
       today,
     );
     const lines = text.split("\n");
@@ -281,6 +341,6 @@ describe("watchIssue (Plan 0048, E10)", () => {
   });
 
   it("Marker geprüft: unerlaubte Zeichen in der Anbieter-ID werfen", () => {
-    expect(() => watchIssue([f({ providerId: "A B" })], today)).toThrow(/Marker/);
+    expect(() => watchIssue([f({ subject: "A B" })], today)).toThrow(/Marker/);
   });
 });

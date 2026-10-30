@@ -536,9 +536,10 @@ describe("runNightly: Seitenausfall kostet nur die Seite (Plan 0048, Ziel 1)", (
       watchFindings({
         raws: readRawDir(join(dirsOf.dataDir, "raw")),
         catalog: readCatalog(join(dirsOf.dataDir, "providers.yaml")),
+        discover: [],
         today,
       })
-        .filter((f) => f.providerId === "familientreff-beispiel")
+        .filter((f) => f.subject === "familientreff-beispiel")
         .map((f) => `${f.kind} ${f.page ?? ""}`);
     await night(dirsOf, "2026-10-06", []);
     expect(watch("2026-10-06")).toEqual([]);

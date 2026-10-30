@@ -74,7 +74,13 @@ import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
 import { berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
-import { createDiscoverModel, DISCOVER_BUDGET_MIN, fetchAggregatorCandidates, runDiscover } from "./io/discover.ts";
+import {
+  createDiscoverModel,
+  DISCOVER_BUDGET_MIN,
+  fetchAggregatorCandidates,
+  readDiscoverStates,
+  runDiscover,
+} from "./io/discover.ts";
 import { commitNewProvider, commitRunState, GateError, publishDiscover } from "./io/discover-git.ts";
 import {
   type CallRecord,
@@ -609,8 +615,11 @@ async function status() {
   mkdirSync(runDir, { recursive: true });
   // Wächter (Plan 0048, E10): `today` aus dem Bericht; ohne Bericht keine Datei, der Job `waechter` scheitert dann sichtbar
   if (values.waechter && report) {
-    // ganzer Zustand, nicht nur die Anbieter des Laufs: ein Lauf mit `only` schlösse das Issue sonst falsch (M1)
-    const text = watchIssue(watchFindings({ raws: all, catalog: readCatalog(), today: report.date }), report.date);
+    // ganzer Zustand, nicht nur die Anbieter des Laufs: ein Lauf mit `only` schlösse das Issue sonst falsch (M1);
+    // dazu die Klärfälle des Entdeckens (Plan 0050, S2b)
+    const discover = readDiscoverStates(join(ROOT, "data"));
+    const findings = watchFindings({ raws: all, catalog: readCatalog(), discover, today: report.date });
+    const text = watchIssue(findings, report.date);
     writeFileSync(join(runDir, "waechter.md"), text);
     md += `\n## Wächter (Plan 0048, E10)\n\n${text === "" ? "Nichts offen." : text.replace(/\n*<!-- waechter:.*$/s, "")}\n`;
   }

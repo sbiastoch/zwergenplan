@@ -4,15 +4,19 @@
  * `.github/workflows/nightly.yml` mit `gh`, ohne Checkout; er vergleicht nur die Marker.
  */
 import { createHash } from "node:crypto";
+import { REGIONS } from "../../../src/domain/regions.ts";
 import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
+import { hostOf, normalizeUrl } from "./discover.ts";
+import type { DiscoverState } from "./discover-state.ts";
 import { isV2, type ProviderRaw, type ProviderRawV2, type UnitState } from "./raw.ts";
 
-type WatchKind = "seite" | "entfernt" | "gesperrt" | "einbruch" | "leer" | "anbieter" | "umstellung";
+type WatchKind = "seite" | "entfernt" | "gesperrt" | "einbruch" | "leer" | "anbieter" | "umstellung" | "klaerfall";
 
 export interface WatchFinding {
-  providerId: string;
+  /** Katalog-ID, beim Klärfall dessen Name (Plan 0050, S2b) */
+  subject: string;
   kind: WatchKind;
-  /** Kennung der Einheit oder Beilage (`seite:<URL>`, `kandidaten`); nur bei Befunden einer Seite */
+  /** Kennung der Einheit oder Beilage (`seite:<URL>`, `kandidaten`) bei Befunden einer Seite, Fund-URL beim Klärfall */
   page?: string | undefined;
   reason: string;
   /** Zeitpunkt, seit dem der Befund gilt */
@@ -29,14 +33,14 @@ const sinceYesterday = (instant: string | undefined, today: string) =>
 function unitFindings(providerId: string, page: string, u: UnitState, today: string): WatchFinding[] {
   const out: WatchFinding[] = [];
   if (u.removedAt !== undefined)
-    out.push({ providerId, kind: "entfernt", page, reason: u.reason ?? "entfernt", since: u.removedAt });
+    out.push({ subject: providerId, kind: "entfernt", page, reason: u.reason ?? "entfernt", since: u.removedAt });
   else if (u.klasse === "gesperrt")
-    out.push({ providerId, kind: "gesperrt", page, reason: u.reason ?? "gesperrt", since: u.klasseSince });
+    out.push({ subject: providerId, kind: "gesperrt", page, reason: u.reason ?? "gesperrt", since: u.klasseSince });
   else if (u.status === "fehler" && sinceYesterday(u.failingSince, today))
-    out.push({ providerId, kind: "seite", page, reason: u.reason ?? "Fehler", since: u.failingSince });
+    out.push({ subject: providerId, kind: "seite", page, reason: u.reason ?? "Fehler", since: u.failingSince });
   if (u.pending)
     out.push({
-      providerId,
+      subject: providerId,
       kind: "einbruch",
       page,
       reason: `zurückgehalten: ${u.pending.events.length} statt ${u.events.length} Events`,
@@ -47,9 +51,9 @@ function unitFindings(providerId: string, page: string, u: UnitState, today: str
 function beilageFindings(providerId: string, raw: ProviderRawV2, today: string): WatchFinding[] {
   return Object.entries(raw.beilagen ?? {}).flatMap(([page, b]): WatchFinding[] => {
     const reason = `Beilage: ${b.reason ?? "Fehler"}`;
-    if (b.klasse === "gesperrt") return [{ providerId, kind: "gesperrt", page, reason, since: b.klasseSince }];
+    if (b.klasse === "gesperrt") return [{ subject: providerId, kind: "gesperrt", page, reason, since: b.klasseSince }];
     if (b.status === "fehler" && sinceYesterday(b.failingSince, today))
-      return [{ providerId, kind: "seite", page, reason, since: b.failingSince }];
+      return [{ subject: providerId, kind: "seite", page, reason, since: b.failingSince }];
     return [];
   });
 }
@@ -65,18 +69,44 @@ function emptyFinding(providerId: string, units: readonly UnitState[], today: st
     .flatMap((u) => (u.emptySince ? [u.emptySince] : []))
     .sort((a, b) => Date.parse(b) - Date.parse(a))[0];
   if (latest === undefined || berlinIsoDate(latest) < addDays(today, -EMPTY_REPORT_DAYS)) return [];
-  return [{ providerId, kind: "leer", reason: "keine künftigen Angebote", since: latest }];
+  return [{ subject: providerId, kind: "leer", reason: "keine künftigen Angebote", since: latest }];
+}
+
+/**
+ * Ab so vielen Läufen in Folge steht ein Klärfall im Issue, wie eine Seite ab der zweiten Nacht: Sonst flutete ein
+ * Monatslauf mit neuen Quellen das Issue mit Fällen, die sich im nächsten Lauf von selbst klären (Plan 0050, S2b)
+ */
+const KLAERFALL_MIN_COUNT = 2;
+
+type DiscoverStates = ReadonlyArray<Pick<DiscoverState, "region" | "klaerfaelle">>;
+
+function klaerfallFindings(states: DiscoverStates): WatchFinding[] {
+  return states.flatMap((s) =>
+    s.klaerfaelle
+      .filter((k) => k.anzahl >= KLAERFALL_MIN_COUNT)
+      .map(
+        (k): WatchFinding => ({
+          subject: k.name.trim() || hostOf(k.url) || k.url,
+          kind: "klaerfall",
+          page: k.url,
+          reason: `${REGIONS[s.region].name}: ${k.grund}`,
+          since: k.seit,
+        }),
+      ),
+  );
 }
 
 /**
  * Befunde des Wächters (E10) aus dem ganzen Zustand nach dem Lauf, nicht nur aus den Anbietern des Laufs (ein Lauf mit
  * `only` sähe sonst eine Teilmenge und schlösse das Issue falsch; Arch-Review S2, M1). Gezählt werden die Anbieter
  * des Katalogs, die der Nachtlauf abruft (`role: anbieter`, ohne `skipCrawl`). `today` ist das Datum des Laufs.
- * Scheitern alle Einheiten seit mindestens einem Tag, steht eine Zeile `anbieter` statt einer je Seite.
+ * Scheitern alle Einheiten seit mindestens einem Tag, steht eine Zeile `anbieter` statt einer je Seite. Dazu kommen
+ * die Klärfälle des Entdeckens aus `discover` (`data/discover/*.json`, Plan 0050, S2b).
  */
 export function watchFindings(i: {
   raws: Readonly<Record<string, ProviderRaw>>;
   catalog: ReadonlyArray<{ id: string; role: string; skipCrawl?: unknown }>;
+  discover: DiscoverStates;
   today: string;
 }): WatchFinding[] {
   const crawled = new Set(i.catalog.filter((p) => p.role === "anbieter" && p.skipCrawl === undefined).map((p) => p.id));
@@ -84,7 +114,7 @@ export function watchFindings(i: {
   for (const [providerId, raw] of Object.entries(i.raws)) {
     if (!crawled.has(providerId)) continue;
     if (!isV2(raw)) {
-      out.push({ providerId, kind: "umstellung", reason: "Rohdatei noch im alten Format (V1)" });
+      out.push({ subject: providerId, kind: "umstellung", reason: "Rohdatei noch im alten Format (V1)" });
       continue;
     }
     const units = Object.entries(raw.units);
@@ -94,21 +124,31 @@ export function watchFindings(i: {
     if (allFailing) {
       const since = units.map(([, u]) => u.failingSince ?? "").sort((a, b) => Date.parse(a) - Date.parse(b))[0];
       const reasons = units.map(([page, u]) => `${page}: ${u.reason ?? "Fehler"}`).join("; ");
-      out.push({ providerId, kind: "anbieter", reason: `alle ${units.length} Seiten scheitern (${reasons})`, since });
+      out.push({
+        subject: providerId,
+        kind: "anbieter",
+        reason: `alle ${units.length} Seiten scheitern (${reasons})`,
+        since,
+      });
     }
     out.push(...pages.filter((f) => !(allFailing && f.kind === "seite")));
     out.push(...beilageFindings(providerId, raw, i.today));
     out.push(...emptyFinding(providerId, Object.values(raw.units), i.today));
   }
+  out.push(...klaerfallFindings(i.discover));
   const cmp = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
-  return out.sort((a, b) => cmp(a.providerId, b.providerId) || cmp(a.kind, b.kind) || cmp(a.page ?? "", b.page ?? ""));
+  return out.sort((a, b) => cmp(a.subject, b.subject) || cmp(a.kind, b.kind) || cmp(a.page ?? "", b.page ?? ""));
 }
 
-/** Schlüssel im Marker: Anbieter-ID, bei Befunden einer Seite `<id>#<SHA-256 der Kennung, 8 Hex-Zeichen>` */
+const hash8 = (s: string) => createHash("sha256").update(s).digest("hex").slice(0, 8);
+
+/**
+ * Schlüssel im Marker: Anbieter-ID, bei Befunden einer Seite `<id>#<SHA-256 der Kennung, 8 Hex-Zeichen>`. Ein
+ * Klärfall hat keine Katalog-ID und ein Name passt nicht in den Zeichensatz: `klaerfall#<hash8 der normalisierten URL>`
+ */
 export function watchKey(f: WatchFinding): string {
-  return f.page === undefined
-    ? f.providerId
-    : `${f.providerId}#${createHash("sha256").update(f.page).digest("hex").slice(0, 8)}`;
+  if (f.kind === "klaerfall") return `klaerfall#${hash8(normalizeUrl(f.page ?? "") ?? f.page ?? "")}`;
+  return f.page === undefined ? f.subject : `${f.subject}#${hash8(f.page)}`;
 }
 
 /** Letzte Zeile des Issue-Texts; der Job `waechter` liest sie mit demselben Zeichensatz (`grep -o`) */
@@ -128,7 +168,7 @@ function clean(s: string, max: number): string {
 }
 
 function line(f: WatchFinding): string {
-  const head = `- \`${clean(f.providerId, 60)}\` · ${f.kind}`;
+  const head = `- \`${clean(f.subject, 60)}\` · ${f.kind}`;
   const tail = f.since ? ` · seit ${formatGermanDate(berlinIsoDate(f.since))}` : "";
   // je Code-Span „ · `…`“: 5 Zeichen Rahmen
   let room = MAX_LINE - head.length - tail.length - 5;

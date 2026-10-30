@@ -245,6 +245,9 @@ function readState(dataDir: string, region: RegionId): DiscoverState {
   return existsSync(file) ? DiscoverState.parse(readJson(file)) : emptyState(region);
 }
 
+/** Zustände aller Regionen, für den Wächter (Plan 0050, S2b) */
+export const readDiscoverStates = (dataDir: string): DiscoverState[] => REGION_IDS.map((r) => readState(dataDir, r));
+
 const reasonOf = (e: unknown) => (e instanceof Error ? e.message.split("\n")[0] : String(e))?.slice(0, 200) ?? "";
 
 /** Geocoder gesperrt oder gedrosselt (Nominatim): Klärfall, nicht verwerfen; der Lauf fragt nicht weiter (E7.5) */
@@ -296,7 +299,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
   const adoptedTermine = new Map<string, Termin[]>();
   const originalCatalogText = catalogText;
   // zurückgenommene IDs aller Regionen: IDs sind global (ADR 0022)
-  const allStates = REGION_IDS.map((r) => readState(o.dataDir, r));
+  const allStates = readDiscoverStates(o.dataDir);
   const reserved = reservedIds(allStates);
   // Sperren aller Regionen: Die Regionen überlappen, ein Abgelehnter darf nicht über die Nachbarregion zurückkommen
   // (Plan 0036, E4)
