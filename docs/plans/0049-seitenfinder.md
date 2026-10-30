@@ -1,6 +1,6 @@
 # Plan 0049 – Seitenfinder: Programmseiten finden, zuerst für bekannte Anbieter
 
-Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 Ortsprüfung nach zwei Reviews eingearbeitet)
+Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 durch Nachtrag 2 ersetzt; Nachtrag 2 A im Arbeitsbaum, nächstes: B ID-Gate)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`), Punkt 4 (ein Seitenfinder), Punkt 1 (ein Abruf), Punkt 5 (Issue je Lauf neben dem Wächter). Dieser Plan baut das Modul und die **Pflege bekannter Anbieter**. Den Modus `alle` für das Entdecken legt er fest (E1), gebaut wird er mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`), S3.
@@ -116,7 +116,7 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
 - **URL-Hilfen, Nutzer:** Außer `io/discover.ts` importieren auch `lib/watch.ts` und `lib/klaerfall.ts` aus `lib/discover.ts`; sie ziehen mit um.
 - **Abruf** in `scripts/pipeline/io/site-crawl.ts` (neu) über `io/http.ts` mit `setAbruf("neu")` (User-Agent, robots.txt, Fehlerklasse, Plan 0048, S3). Eine Warteschlange je Host über den ganzen Lauf sorgt für höchstens einen Abruf je Sekunde, auch für die Beilagen des Ertragsbeweises (M5). PDFs gehen über `pdftotext`.
   - **Was zu den 20 zählt:** jeder Seitenabruf samt Browser, PDF und Weiterleitung; nicht die robots.txt und nicht die Wiederholungen von `fetchBytes` bei 5xx (die sind Teil eines Abrufs).
-  - Die Erkundung behält je Seite das rohe HTML neben `extractPage`, für die Ortsprüfung (E2) und den Text des Kandidaten im Beweis.
+  - Die Erkundung behält je Seite das rohe HTML neben `extractPage` für den Text des Kandidaten im Beweis.
 
 ### E2 – Ertragsbeweis, Abdeckung und Ort
 
@@ -138,16 +138,11 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
 
   **Neu** ist ein Angebot, das nicht abgedeckt ist, einen künftigen Termin hat und `age.minMonths` ≤ 36 erfüllt. Teaser mit dem nächsten Termin, Druckansichten mit umformulierten Titeln und Detailseiten eines Kurses der Übersicht sind damit abgedeckt.
 - **Fremder Anbieter:** `covered` prüft zusätzlich die Angebote **anderer** Katalog-Anbieter mit einem Ort in höchstens 100 m Entfernung. Ein Beispiel: Die FamilienBox beherbergt Kurse der Hebamme Anne Schulz, die als `hebanne-schulz` erfasst ist. Ist ein neues Angebot dort abgedeckt, lautet das Ergebnis `fremder-anbieter`, und es steht nur im Bericht. Sonst stünde dasselbe Angebot unter zwei Anbietern.
-- **Ort geprüft:** Der **ganze** Text der Seite muss den Namen oder die Straße eines Orts des Anbieters enthalten. Gemeint ist der Text des `body` samt `header`, `footer` und `nav`, denn `extractPage` entfernt diese Teile, und die Adresse steht meist im Footer.
-  - Vor dem Vergleich normalisiert der Code „Str.“/„Straße“, Leerzeichen und Groß-/Kleinschreibung; eine PLZ des Orts zählt zusätzlich.
-  - Auf einer geteilten Website (E1) muss außerdem der Name des Anbieters vorkommen.
-  - Sonst lautet das Ergebnis `fremder-ort`: Das Modell setzte den Hauptort, und die Termine lägen sichtbar falsch.
-  - S0 misst die Prüfung ohne Modell an allen heutigen `termine`-Seiten: Mindestens 95 % müssen sie bestehen, sonst folgt ein Nachtrag.
+- **Ort:** keine Prüfung im Text (Nachtrag 2). Ob das Modell fremde Orte falsch verortet, misst die Eval-Falle `fremder-ort` (Nachtrag 2, C).
 - **Ergebnis:**
-  - `anhaengen`, wenn es mindestens ein neues Angebot gibt, der Ort geprüft ist und `isRelevant` greift;
+  - `anhaengen`, wenn es mindestens ein neues Angebot gibt und `isRelevant` greift;
   - `deckungsgleich`, wenn alle Angebote abgedeckt sind;
   - `fremder-anbieter`;
-  - `fremder-ort`;
   - `ohne-ertrag`, wenn es kein gültiges Angebot gibt;
   - `abgeschnitten`: Die Eingabe der Einheit überschreitet `MAX_INPUT_CHARS` oder wird von `splitInput` geteilt, mit Hinweis im Bericht (`partChars` erst mit Plan 0042, M4);
   - `budget` (E3);
@@ -171,7 +166,7 @@ Plan 0045, S3b wollte solche Seiten nur vorschlagen. Ein Vorschlag, den ein Mens
 
 `DiscoverState` (heute schon mit `abgelehnt`, `zurueckgestellt`, `orte`, `klaerfaelle`) bekommt neue Felder, je mit `.default([])` für bestehende Dateien:
 - **`seiten`:** je geprüfter Kandidaten-URL `{url, anbieter, geprueft, ergebnis, grund?, stand}`. `stand` ist ein Hash über die sortierten Kennungen der Einheiten des Anbieters und die Kennungen mit `klasse: dauerhaft`, denn nur das ändert den Vergleichsstand. Ein schwankender Bot-Schutz hebt die Ruhezeit so nicht jede Woche auf.
-  - **Ruhezeit:** Ein Kandidat mit `deckungsgleich`, `ohne-ertrag`, `abgeschnitten`, `fremder-anbieter`, `fremder-ort` oder `budget` kommt frühestens nach 8 Wochen wieder in den Ertragsbeweis, mit `fehler` im nächsten Lauf.
+  - **Ruhezeit:** Ein Kandidat mit `deckungsgleich`, `ohne-ertrag`, `abgeschnitten`, `fremder-anbieter` oder `budget` kommt frühestens nach 8 Wochen wieder in den Ertragsbeweis, mit `fehler` im nächsten Lauf.
   - Die Ruhezeit **entfällt**, sobald sich `stand` ändert (etwa wenn eine Seite des Anbieters `dauerhaft` scheitert) oder der Anbieter in Gruppe 1 der Reihenfolge steht (E5). So kommt der Ersatz nach einem Relaunch rechtzeitig (Ziel 3).
   - Einträge, deren Ruhezeit abgelaufen ist und die der Lauf bei einem gepflegten Anbieter nicht mehr sieht, entfallen.
 - **`gepflegt`:** je Anbieter `{anbieter, datum}` des letzten Pflegelaufs, auch ohne Kandidaten. Danach richtet sich die Reihenfolge (E5); kein Anbieter verhungert.
@@ -225,9 +220,9 @@ Dazu:
 | Datei | Änderung | Schritt |
 |---|---|---|
 | `scripts/pipeline/lib/url.ts` (neu) | `sameSite`, `normalizeUrl`, `hostOf` aus `lib/discover.ts`, kanonische URL; Importe in `io/discover.ts`, `lib/watch.ts`, `lib/klaerfall.ts` | S1 |
-| `scripts/pipeline/lib/site-crawl.ts` (neu) | Auswahl, `isShared`, `SHARED_HOSTS`, `iframe`, Ausschlüsse, `pageSignals`, ganzer Seitentext für die Ortsprüfung | S1 |
+| `scripts/pipeline/lib/site-crawl.ts` (neu) | Auswahl, `isShared`, `SHARED_HOSTS`, `iframe`, Ausschlüsse, `pageSignals`, Kontaktseiten | S1 |
 | `scripts/pipeline/io/site-crawl.ts` (neu) | Abruf über den gemeinsamen Abruf, Warteschlange je Host, Browser bei `jsRendered` | S1 |
-| `scripts/pipeline/lib/pflege.ts`, `scripts/pipeline/io/pflege.ts` (neu) | Ertragsbeweis mit Sicht nur auf Kandidat und Beilagen, simulierter Nachtlauf, `covered` samt fremdem Anbieter, Ortsprüfung, Ergebnis, Reihenfolge, Bericht | S1 |
+| `scripts/pipeline/lib/pflege.ts`, `scripts/pipeline/io/pflege.ts` (neu) | Ertragsbeweis mit Sicht nur auf Kandidat und Beilagen, simulierter Nachtlauf, `covered` samt fremdem Anbieter, Ergebnis, Reihenfolge, Bericht | S1 |
 | `scripts/pipeline/io/katalog-budget.ts` (neu) | Messung in eigenen Worktrees, Verwerfen bei Rot | S2 |
 | `scripts/pipeline/lib/discover-state.ts` | `seiten` mit `stand`, `gepflegt`, `abgelehnt.anbieter` | S1 |
 | `scripts/pipeline/lib/cost.ts` | `PFLEGE_BRAKES`, `RunKind` `pflege` | S1, S3 |
@@ -238,6 +233,12 @@ Dazu:
 | `.github/workflows/discover.yml`, `scripts/lib/discover-workflow.test.ts` | Cron, `lauf`, `timeout`, `PFLEGE_MODUS`, Budgetschritt | S2 |
 | `evals/results.md` | Abschnitt „Seitenfinder“ | S1–S3 |
 | Skill (Abschnitte 1 und 2: Pflege-Issue, Seite ablehnen, Revert nach dem Nachtlauf), `docs/architecture.md`, `CLAUDE.md` („Daten“: `pflege` hängt Programmseiten an) | Doku | S2, S3 |
+| `scripts/pipeline/lib/judge.ts`, `scripts/pipeline/io/judge.ts`, `scripts/pipeline/prompt/judge.md` (neu) | Richter des ID-Gates | Nachtrag 2, B |
+| `scripts/pipeline/lib/raw.ts`, `lib/refresh.ts`, `lib/normalize.ts`, `lib/extract.ts`, `lib/build-offers.ts`, `lib/stable-ids.ts`, `lib/watch.ts`, `lib/cost.ts`, `io/refresh.ts`, `io/nightly.ts`, `cli.ts`, `.github/workflows/nightly.yml` | `partsHash`, `INPUT_EPOCH`, `held`, `keepIds`, `mergeUnitStates`, zwei Builds, Grenzen des Richters, Wächter `ids` | Nachtrag 2, B |
+| `data/id-hinnehmen.yaml` (neu), `scripts/validate-data.ts`, `CLAUDE.md` | Hinnehmen von Hand | Nachtrag 2, B |
+| `scripts/pipeline/id-continuity.test.ts`, `scripts/pipeline/freeze-id-continuity.ts`, `scripts/pipeline/fixtures/` (neu) | ID-Kontinuität des Build-Codes, Pin-Test `INPUT_EPOCH` | Nachtrag 2, B |
+| ADR 0040 „ID-Gate“ (neu, `docs/adr/`), `docs/architecture.md` | ADR und Invariante | Nachtrag 2, B |
+| `scripts/pipeline/lib/eval-score.ts`, `evals/cases/` | Falle `fremder-ort`, `excluded` | Nachtrag 2, C |
 
 ## Tests (test-first)
 
@@ -278,8 +279,6 @@ Dazu:
   - Ersatzseite einer Einheit mit `dauerhaft` → `anhaengen`;
   - zweite Fassung einer vorübergehend ausgefallenen Seite → `deckungsgleich`;
   - mit `--katalog` ohne die entfernte Seite → `anhaengen`;
-  - Seite ohne Ortsname oder Straße → `fremder-ort`; auf geteilter Website ohne Anbietername → `fremder-ort`;
-  - Adresse nur im Footer → Ortsprüfung besteht; „Tellerringstr.56“ gegen „Tellerringstraße 56“ → besteht;
   - Angebot eines anderen Anbieters am Ort in ≤ 100 m (wie `hebanne-schulz` bei der FamilienBox) → `fremder-anbieter`;
   - der Beweis ruft nur Kandidat und Beilagen ab, keine anderen Seiten des Anbieters;
   - Kennung im Beweis gleich der URL im Anhang (kanonisch, ohne `utm_*`);
@@ -431,6 +430,304 @@ Wegwerf-Skript im Job-Verzeichnis auf `lib/site-crawl.ts` und `io/site-crawl.ts`
 
 Nach dem Skill war das der letzte erlaubte Review. **Die Änderungen aus Review 2 sind nicht mehr unabhängig geprüft.** Absicherung: Vor `lib/pflege.ts` misst das S0-Skript alle drei Kennzahlen auf echten Seiten; ein verfehltes Schutz-Soll hält den Trockenlauf (siehe „Folgen“).
 
+#### Nachtrag 1 – Umsetzung und Messung (2026-10-30)
+
+**Code.** Abweichend vom Abschnitt „Code“ liegt die Prüfung in eigenen Modulen, weil `lib/site-crawl.ts` sonst über 700 Zeilen hätte: `lib/place-check.ts` (`streetMentions`, `placeContext`, `foreignPlaces`, `ownPlaceShown`, `nameShown`, `placeCheck`, `placeHint`) und `lib/place-names.ts` (`PLACE_NAMES`, 156 Orte in Gruppen von Schreibweisen, Quellen im Kopf). In `lib/site-crawl.ts`: `contactLinks` (aus `lib/discover.ts`), Kontaktseiten nach Tiefe 0 (`CrawlPage.contact`, nie Kandidat), `CrawlPage.from` und `siteKind`; `placeMentioned` entfällt.
+
+**Ortsliste.** Weggelassen nur die Gruppen, die Fehlalarme machen (Allerweltswörter, Bezirke mit Straßennamen, Kirchennamen); gleichnamige Orte außerhalb der Region bleiben, denn sie sind für einen anderen Anbieter ohnehin fremd. Aus „Langwasser Südost“ wird „Langwasser“, sonst wäre ein Anbieter in Langwasser auf „Langwasser Südost“ fremd. Nürnberg und Fürth stehen in der Liste (die Tests „Fürther Straße“ setzen das voraus).
+
+**Messung** (Skript im Job-Verzeichnis, Tiefe 0 plus Kontaktseiten, 165 heutige `termine`-Seiten, davon 10 Sammelkalender). Drei Läufe; nach Lauf 1 und 2 behoben, je mit Test:
+- `fullText` klebte Blöcke aneinander („NürnbergKornmarkt 8“): Leerzeichen an Blöcken und `<br>` (19 → 5 „Ort nicht belegt“);
+- Kursnummern, Telefonnummern und eine US-Vorlage als PLZ: PLZ nur am Zeilenanfang, nach Komma oder Hausnummer;
+- Hausnummernbereich „33-35“, Gebäudenamen vor der Straße („Turnhalle Dunantschule“);
+- eigene Straße mit anderer PLZ als im Katalog (FBS: Seite 90443, Katalog 90429, ein Fund für die Pflege);
+- fremder Name, der im eigenen steckt („Sulzbacher Straße“ in „Äußere Sulzbacher Straße“, „WunderWerk“);
+- Verwaltungsanschriften („Hausanschrift“, „Büro“, „Pfarramt“, „Information und Anmeldung“, „Druck:“) sind kein Treffpunkt;
+- fremder Ortsname direkt vor der eigenen Anschrift („CVJM-Haus Gostenhof, Glockendonstr. 10“);
+- Stadtteile, deren Punkt (`src/domain/districts.ts`) höchstens 1,2 km vom Ort liegt, sind eigen (Abweichung: der Plan nahm nur `district` und die Adresse);
+- Plattform: Wörter des Anbieternamens in beliebiger Reihenfolge („Susanne Mainberger Hebamme“).
+
+**Ergebnis (Lauf 3):**
+
+| Kennzahl | Soll | Ist |
+|---|---|---|
+| Fehlalarme | ≥ 95 % | 111 von 155 ohne `fremder-ort`; von den 44 übrigen sind 25 echte Funde (siehe unten), also 136 von 155 = **87,7 %, verfehlt** |
+| musikfuechse, echte Seiten | 3 × `fremder-ort` über `foreignPlaces` | **3 von 3** (Poppenreuth, Poppenreuther Str. 134, 90765/90762 Fürth) |
+| Kreuzprobe, `foreignPlaces` allein | ≥ 95 % | 10 337 von 12 449 = **83 %, verfehlt** |
+| Kreuzprobe, `placeCheck` (Ergebnis `fremder-ort`) | – | 12 447 von 12 449 = 100 % |
+
+- **Funde** (echter fremder Ort im Text, 25 Seiten): Kindertheaterreihe in fremden Kulturläden und Jugendhäusern (7), Programm der Stadtbibliothek mit Zweigstellen außerhalb des Katalogs, wolfpack.yoga (Waechterstraße), Ohana-Kurse in Fürth, Bamberg, Wartenberg (3), Standort Waechterstraße im FamilienBox-Widget, ATV-Turnhallen, Familiengottesdienste aller Kirchen, Musikschule an der Grundschule Katzwang, musikfuechse (3), Hallenbäder Spardorf/Langwasser (Bär), Kochgruppe Plauener Straße, Mummpitz im Sternenhaus, Wunderwerk in Obermichelbach, Post-SV-Turnhallen, vhs-Waldausflug Heilstättenstraße. Sie sind Hinweise für die Katalogpflege (fehlende Orte).
+- **Fehlalarme** (19): Seitentitel „Nürnberg, Fürth, Erlangen“ (mutherstudio, Zukunftsmusik, Martha-Maria), Einzugsgebiet einer Hebamme, „wohne in Kalchreuth“, Förderer „Amt … Fürth“ (FBS, 2), MVZ-Liste, Kita-Adressen (St. Johannis), Pfarrer-Anschrift (Langwasser, 2), Tippfehler „Mommenstraße“, Verweis auf eine Kollegin (Elena Paulus), „Thoner Espan“, Laufamholz (happy-bellies, Punkt > 1,2 km), Kontaktseiten ohne Adresse (mutherstudio 3, famalie 2).
+- **Kreuzprobe:** `foreignPlaces` allein schlägt bei Seiten ohne jede Ortsangabe im Haupttext fehl (zentrum-koberger, hebamio-Listen, FamilienBox-Stundenpläne); dort greift Schritt 2 („Ort nicht belegt“), denn die Kontaktseiten nennen den Ort des richtigen Anbieters, nicht den des fremden. Das Ergebnis `fremder-ort` (E2) entsteht so in 100 % der Fälle.
+
+**Folgen nach „Folgen“ oben:**
+- Fehlalarm-Soll verfehlt → `fremder-ort` bleibt streng; Fehlalarme gehen als „Ort prüfen“ ins Pflege-Issue, ein Mensch hängt von Hand an.
+- Die Schutz-Kennzahl Kreuzprobe ist nach dem Wortlaut (`foreignPlaces` allein) verfehlt → `pflege` bleibt im Trockenlauf. Das deckt sich mit S2 (erst `PFLEGE_MODUS=trocken`, Liste von Hand prüfen). **Nutzerentscheid vor dem Scharfschalten:** ob die Kreuzprobe über `placeCheck` (100 %) als Schutz genügt.
+
+Der Code von Nachtrag 1 wurde nie committet. Nachtrag 2 ersetzt ihn.
+
+### Nachtrag 2 (2026-10-30): Ort über das Modell statt über Wortlisten, ID-Gate
+
+**Anlass.**
+- Nachtrag 1 erkennt fremde Orte mit Regexen und einer Ortsliste. Das ergab 87,7 % statt 95 % ohne Fehlalarm, und jede Messrunde brauchte neue Sonderregeln: Seitentitel, Einzugsgebiete, Förderer, Pfarrer-Anschriften. Der Nutzer stellte den Ansatz infrage. Ein unabhängiges Gutachten (Opus) prüfte Alternativen und ihren Platz in der Pipeline.
+- **Befund:** Eine Fehlverortung durch das Modell wurde nie beobachtet. Ein Scan der 431 Live-Angebote am 2026-10-30 fand keine.
+  - Die 25 „Funde“ aus Nachtrag 1 zeigen fehlende Orte im Katalog, keine falsch verorteten Angebote.
+  - Die Hauptort-Regel (`prompt/extract.md`, Zeile 54) ist teils gewollt: Bei einem fehlenden oder wechselnden Treffpunkt ist der Hauptort richtig.
+  - Der Lehrbuchfall `musikfuechse` beruhte auf einer überholten Entscheidung („nur Nürnberg“, 2026-10-11, vor der Region Fürth). Der Ort `musikfuechse-poppenreuth` steht seit `563de13` im Katalog. Ein Trockenlauf hielt alle 10 bisherigen IDs und fand 12 neue Angebote.
+- **Folgerung:** Eine Prüfung im Text löst ein Problem, das nicht nachgewiesen ist, und kostet zuverlässig Fehlalarme. Ob das Modell fremde Orte falsch verortet, misst stattdessen eine Eval-Falle mit dem Prompt und dem Modell des Nachtlaufs. Nur wenn sie Fehlverortungen zeigt, ändert sich der Prompt.
+- **Harte Regel des Nutzers** (2026-10-30): Keine Verbesserung der Pipeline darf Angebots-IDs kosten, denn Merklisten liegen auf dem Gerät (ADR 0022). Eine neue Extraktion an sich ist egal. Heute hält eine neue Extraktion nur 87–96 % der IDs (Plan 0048, S0). Prompt, Schema, Modell und Katalogauszug sind Teil des Cache-Schlüssels (`ExtractKeyParts` in `lib/extract.ts`, `catalogExcerpt` in `lib/normalize.ts`). Darum löst jede solche Änderung eine neue Extraktion aus, auch das Anhängen einer Seite durch die Pflege: Der Auszug nennt alle Seiten des Anbieters (Risiken, „Ein Anhang extrahiert den ganzen Anbieter neu“).
+
+**Nutzerentscheide (2026-10-30):**
+- Haiku bleibt im Nachtlauf.
+- Ein Ort darf in einer anderen Region liegen.
+- Ein Angebot darf seine ID nur verlieren, wenn es eindeutig fehlerhaft ist, und das prüft ein Opus-Modell.
+- Kein neuer Plan, nur dieser Nachtrag.
+
+**Was entfällt** (ersetzt Nachtrag 1 und den Punkt „Ort geprüft“ in E2):
+- `lib/place-check.ts`, `lib/place-names.ts` und ihre Tests werden nicht committet.
+- Das Ergebnis `fremder-ort` entfällt in E2, E4 (Ruhezeit) und in den Tests von `lib/pflege.test.ts`.
+- `PLACE_HINT` und das Issue „m Orte prüfen“ entfallen. Für Anbieter mit Orts-`hint` bleibt E5 „nur im Bericht“, das Muster ist das alte aus E5.
+- Die drei Kennzahlen aus Nachtrag 1 entfallen; Ziel 2 (Abnahme je Seite) bleibt der Schutz.
+
+**Schritt A, Stand im Arbeitsbaum** (Review N2, m5). Der Code von Nachtrag 1 war nie committet und ist jetzt bereinigt:
+- **Entfernt:**
+  - `lib/place-check.ts`, `lib/place-names.ts` und ihre Tests;
+  - `fullText` und `siteKind` samt Tests (ohne Nutzer, knip);
+  - der Export von `CrawlPage`;
+  - der Eintrag „Ortsliste je Region“ in `docs/ideas.md`;
+  - `place-check` und `place-names` in `docs/architecture.md`.
+- **Bleibt** (mit Tests; Modus `alle`, Plan 0050, S3, braucht die Kontaktseiten):
+  - `contactLinks`, `CONTACT_PATTERNS` und `MAX_CONTACT_PAGES` sind von `lib/discover.ts` nach `lib/site-crawl.ts` gezogen;
+  - Kontaktseiten werden nach Tiefe 0 abgerufen (`CrawlPage.contact`, nie Kandidat), auf Dachseiten nur unter der Pfadbindung, und ihre Links gehen in Tiefe 2 ein;
+  - `CrawlPage.from`.
+- `pnpm verify` ist grün.
+- Commit `refactor(pipeline): Kontaktseiten im Seitenfinder (Plan 0049, Nachtrag 2, A)`.
+
+**Schritt B – ID-Gate im Nachtlauf.**
+- Test-first; `pnpm verify` je Teilschritt; E2E entfällt (nur Pipeline); `/arch-review` (neues Modul `lib/judge.ts`, Schemaänderung in `lib/raw.ts`).
+- Code von Plan 0048: `lib/refresh.ts`, `io/refresh.ts`, `io/nightly.ts`, `lib/build-offers.ts`, `lib/stable-ids.ts`, `lib/raw.ts`, `lib/watch.ts`, `lib/cost.ts`.
+- **Regel:** Ändert sich die Fassung der Pipeline, verliert keine Angebots-ID mit künftigem Termin. Ausnahmen:
+  - ein Opus-Urteil nennt das alte Angebot eindeutig fehlerhaft oder von der Seite entfallen;
+  - ein Mensch nimmt den Verlust ausdrücklich hin (B5).
+- **Fassung** sind die `KeyParts` von `extractKey` (`lib/normalize.ts`: Katalogauszug, Prompt, Schema, Modell) plus eine Konstante `INPUT_EPOCH` (B1).
+
+0. **ADR** (Review N2, M5; Review N2-2, M7). Neues ADR 0040 „ID-Gate bei neuer Pipeline-Fassung“. Es ergänzt:
+   - **ADR 0022, Punkt 3:** `keepIds` als vorgeschaltete, vom Richter belegte Zuordnung; Statuszeile mit Verweis.
+   - **ADR 0026, Zeile 44:** Ein Wechsel extrahiert weiter alles neu, übernimmt aber nur nach dem Gate.
+   - **ADR 0033, Konsequenzen:** Den hingenommenen ID-Bruch beim Modellwechsel gibt es nicht mehr.
+   - **Richter und Ausnahme:** Es führt den Richter (Opus) im Nachtlauf ein und nennt das Hinnehmen als einzige menschliche Ausnahme.
+
+   `docs/architecture.md` bekommt die Invariante und nennt das ADR.
+
+1. **Fassung je Einheit.** `UnitState` (`lib/raw.ts`) bekommt das optionale Feld `partsHash`: den Hash über `KeyParts` und `INPUT_EPOCH` der Eingabe, aus der `events` stammen.
+   - **Setzen:** bei jeder Übernahme; bei `unveraendert` nachgetragen, denn bei gleichem Schlüssel sind auch die Teile gleich.
+   - **Gated** ist eine Einheit, wenn `prev.inputHash` gesetzt ist und der neue Zustand ein anderes `partsHash` trägt als der Vorstand. Ein fehlendes `prev.partsHash` zählt als anders.
+     - Gleich ist, auf welchem Weg der neue Zustand entsteht: extrahiert, `pending-uebernommen` oder Fallback.
+     - Eine geänderte Seite hebt das Gate nicht auf.
+     - Ein Vorstand `keine-termine` hat keine IDs zu verlieren; das Gate läuft dort ohne Wirkung durch (m9).
+   - **`INPUT_EPOCH`** (Review N2-2, M5) steht in `lib/normalize.ts`. Wer den Code ändert, der den Eingabetext erzeugt (`extractPage`, `programmeText`, `normalizeText`, PDF und iCal, `ORDER_FREE_KEY`, Abrufart), erhöht die Konstante. Sonst änderte sich jeder Schlüssel ohne Gate. Ein Pin-Test über eingefrorene Seiten (`scripts/pipeline/fixtures/input-epoch/`: HTML, PDF-Text, iCal → normalisierter Text → Hash) wird rot, bis die Konstante steigt.
+   - **Nicht gated** sind neue Einheiten ohne Vorstand (etwa ein Anhang der Pflege) und Waisen, deren Katalog-URL ein Mensch geändert hat (`baseline` in `io/refresh.ts`).
+   - **Erste Nacht nach B** (m2): Einheiten mit geändertem Inhalt gehen durch den Richter, denn ihnen fehlt `partsHash`. Das ist gewollt. Die Last deckelt `JUDGE_BRAKES`; der Rest wird mit Grund `grenze` gehalten und in den Folgenächten gerichtet. Der Schattenlauf (B6) misst das vorher.
+
+2. **Ort im Ablauf** (M3, M4). Das Gate gilt nur im Nachtlauf (Option `idGate` an `runNightly`, gesetzt in `cli.ts`), nicht im Entdecken und nicht im Pflege-Beweis.
+   - `refreshProvider` gibt den nächsten Zustand je Anbieter zurück, statt ihn zu schreiben (Option `write: false`); ohne Gate schreibt es wie heute.
+   - Rein, in `lib/refresh.ts`: `mergeUnitStates(prev, next, keep: Set<unitId>)` liefert `next` mit den Einheiten aus `keep` im Stand von `prev`.
+   - Nach allen Anbietern baut `runNightly` im Speicher zweimal über den ganzen Datenstand, mit `batchesFromRaw` und `buildOffers` gegen `previous`:
+     - **(a)** alle neuen Zustände;
+     - **(b)** `mergeUnitStates(prev, next, gated)`.
+   - Beim Trockenlauf ist `prev` der Stand aus `data/raw` und das Ergebnis geht ins Overlay; eine dritte Schicht gibt es nicht.
+   - **Verloren** ist eine ID mit künftigem Termin in `previous`, die in (b) vorkommt und in (a) fehlt.
+   - **Ursprung** (Review N2-2, M3): die Einheit hinter dem Batch `<id>#<nn>`, aus dem das Angebot in (b) stammt. Zeigt der Ursprung auf eine nicht gated Einheit (möglich über `mergeParts`), ist der Verlust keiner des Gates und erlaubt.
+   - Nach dem Urteil folgen die Schreibvorgänge nach `data/raw` und der normale Build.
+   - Test: Die IDs aus (a) gleichen denen des normalen Builds desselben Stands.
+
+3. **Richter.** Neu sind `lib/judge.ts` (rein: Eingabe, Antwortschema, Auswertung), `io/judge.ts` (Aufruf über `io/llm.ts`) und `prompt/judge.md`.
+   - **Aufrufe:** je gated Einheit mit Verlusten ein Aufruf von `LLM_MODEL_JUDGE` (neu, `opus`, in `nightly.yml`), bei großen Einheiten einer je Teil wie bei `splitInput` (m3). `CallRecord.step` bekommt `"judge"`.
+   - **Eingabe:**
+     - Eingabetext der Einheit;
+     - Katalogauszug (`unitExcerpt`) mit Orten, `hint` und Alter;
+     - die verlorenen alten Angebote mit ihren künftigen Beginnen;
+     - die neuen Events mit Index; Events, die in (a) schon eine alte ID tragen, sind markiert und kein zulässiges Ziel (Review N2-2, M2).
+   - **Antwort** je verlorenem Angebot, genau eines von:
+     - `gleich: <index>@<Beginn>`: dasselbe Angebot; der Beginn wählt bei einem `einmalig`-Event den Termin (M1);
+     - `fehlerhaft: <grund>`: steht so nicht auf der Seite, obwohl sie unverändert ist, oder widerspricht dem Katalog (Ort, `hint`, Alter);
+     - `entfallen: <grund>`: Der Anbieter hat es von der geänderten Seite genommen (m1);
+     - `unklar`.
+   - **Auswertung je Einheit:**
+     - **Kein `unklar`:** Übernahme. Jedes `gleich` schreibt in das neue optionale Feld `keepIds: {<Beginn>: <alte ID>}` am Event (`RawEvent` in `lib/raw.ts`).
+     - **`keepIds` steht nicht im Antwortschema** (Review N2-2, B1). `ExtractResponse` (`lib/extract.ts`) nimmt es per `omit` heraus wie `providerId` und `via`, und `applyOutcome` verwirft es, falls das Modell es dennoch liefert. Test: Der Schema-Hash in `lib/extract.test.ts` bleibt `ab413b808c90`. `partsHash` und `held` sind Felder des Zustands und nie Teil der Antwort.
+     - **Übergabe an den Build:** `fromRaw` (`lib/build-offers.ts`) reicht `keepIds` an den Entwurf als internes Feld `keepId` weiter; es wird vor dem Schreiben entfernt.
+     - **Zusammenlegen:** Legen Schritt 3/4b oder `mergeParts` Events zusammen, gewinnt das erste `keepId` in Batch-Reihenfolge. Zwei verschiedene ergeben eine Notiz, und beide entfallen.
+     - **`assignIds`** (`lib/stable-ids.ts`) ordnet **vor Stufe 0** jeden Entwurf mit `keepId` dieser ID zu, wenn sie in `previous` beim selben Anbieter steht und frei ist; sonst Notiz.
+       - Der Ort darf sich unterscheiden, denn genau das korrigiert D.
+       - Weil `keepIds` in `data/raw` steht, ist `--build-only` deterministisch.
+     - **`fehlerhaft` und `entfallen`** fallen weg; Grund und Art stehen getrennt im Bericht.
+     - **`unklar` hält nur die eigene Einheit** (Schritt 4); danach wird neu gebaut.
+   - **Grenzen** (Review N2-2, M6):
+     - `JUDGE_BRAKES` (Aufrufe, Tokens) und `JUDGE_BUDGET_MIN` 20 in `lib/cost.ts`, innerhalb der 40 Minuten Marge des Jobs (`nightly.yml`);
+     - `brakeHit` des Nachtlaufs (`io/nightly.ts`) zählt Aufrufe mit `step: "judge"` nicht mit;
+     - erreicht, ein Fehler des Modells oder eine überschrittene Zeit: Halten mit Grund `grenze`.
+
+4. **Halten** (Review N2-2, B2).
+   - Die Einheit behält `events`, `inputHash`, `model`, `changedAt` und `partsHash` des alten Stands.
+   - Neues Feld `held: {inputHash, dated?, model, events, since, reason: "unklar" | "grenze", lost: string[]}` mit dem abgelehnten Ergebnis, wie `Pending`.
+   - **Reihenfolge in `planRefresh`:** `unveraendert` → `gehalten` (gleicher Schlüssel wie `held`) → `pending-uebernommen` → Extraktion.
+     - Bei `reason: "unklar"` ist `gehalten` endgültig ohne Aufruf.
+     - Bei `reason: "grenze"` wird `held.events` ohne Extraktion erneut gerichtet.
+   - Ändert sich der Schlüssel erneut, wird neu extrahiert und neu gerichtet; das Gate gilt weiter, denn `partsHash` ist noch das alte.
+   - `held` endet mit einer Übernahme oder wenn die Fassung zum alten `partsHash` zurückkehrt.
+   - `summarize`, `nightly.json` und der Bericht zählen `gehalten`; das ist kein Fehler.
+
+5. **Wächter und Hinnehmen** (Review N2-2, m6).
+   - Neue Art `ids` in `lib/watch.ts` je Anbieter mit `held`: „n IDs: Urteil unklar (bzw. Grenze), Einheit gehalten seit …“.
+   - **Hinnehmen** über eine von Hand gepflegte, committete Datei `data/id-hinnehmen.yaml`: Einträge `{anbieter, grund, datum}`, Schema in `lib/raw.ts`, geprüft von `pnpm data:validate`.
+     - Der nächste geplante Nachtlauf übernimmt für diese Anbieter `held.events` ohne Richter.
+     - Die Verluste stehen mit dem Grund im Bericht und im Commit-Text.
+     - Der Eintrag wirkt nur auf `held` mit `since` ≤ `datum`; ein späterer neuer Verlust braucht einen neuen Eintrag.
+     - CLAUDE.md, Abschnitt „Daten“, nennt die Datei als von Hand gepflegt.
+   - Ein Mensch kann stattdessen die Zuordnung verbessern (`stable-ids.ts`) oder den Katalog korrigieren.
+
+6. **Schattenlauf** vor jeder Umstellung von Prompt, Schema, Modell oder `INPUT_EPOCH` (m8).
+   - Lokal: `LLM_MODEL_EXTRACT=<neu> pnpm pipeline nightly --dry-run --max-calls <Zahl der Einheiten + Puffer>`, bei Bedarf in mehreren Läufen mit `--only`, Richter eingeschlossen.
+   - Der Bericht zählt je Anbieter: übernommen, geerbt (`keepIds`), fehlerhaft, entfallen, gehalten.
+   - Das Ergebnis steht im Commit-Text der Umstellung.
+   - Der Skill `babyevents-nuernberg`, Abschnitt „Modell wechseln“, bekommt den Schritt.
+
+7. **Build-Code** (M7; Review N2-2, M8).
+   - Neuer Test `scripts/pipeline/id-continuity.test.ts` in `check:fast`: `buildOffers` über eine eingefrorene Kopie von `data/raw` und `data/offers.json`, samt freien Tagen, `today` und `generatedAt`.
+   - Die Fixture liegt in `scripts/pipeline/fixtures/id-continuity/`, nicht in `tests/fixtures/`, damit sie keine volle E2E-Auswahl auslöst. Ein Skript `scripts/pipeline/freeze-id-continuity.ts` erzeugt sie.
+   - Keine ID mit künftigem Termin darf verloren gehen. Ein gewollter Verlust braucht die neu erzeugte Fixture und eine Begründung im Commit.
+   - Die Daten sind echt; `data/` ist ohnehin öffentlich.
+
+**Tests zu B:**
+- `lib/refresh.test.ts`:
+  - neue Fassung → gated;
+  - gehalten, am nächsten Tag ändert sich eine Zeile, Richter `unklar` → weiter gehalten, ID bleibt;
+  - `pending` mit neuer Fassung → gated;
+  - fehlendes `partsHash` → gated;
+  - neue Einheit → nicht gated;
+  - `partsHash` bei `unveraendert` nachgetragen;
+  - Reihenfolge `unveraendert` → `gehalten` → `pending`;
+  - `held.reason: "grenze"` → erneut gerichtet ohne Extraktion;
+  - `mergeUnitStates`.
+- `lib/normalize.test.ts`: Pin-Test `INPUT_EPOCH`.
+- `lib/extract.test.ts`: Schema-Hash unverändert; `keepIds` aus der Antwort verworfen.
+- `lib/judge.test.ts`:
+  - Antwortschema;
+  - `gleich@Beginn`, `fehlerhaft`, `entfallen`, `unklar`;
+  - markierte Events sind kein Ziel;
+  - Teilung.
+- `lib/stable-ids.test.ts`:
+  - `keepId` vor Stufe 0;
+  - vergebene oder fremde ID → ignoriert mit Notiz;
+  - `einmalig` mit `keepIds` je Beginn;
+  - Konflikt beim Zusammenlegen.
+- `io/nightly.test.ts` (Fake-Extraktor, Fake-Richter):
+  - Umbenennung mit `gleich` → gleiche ID in `data/offers.json`;
+  - `fehlerhaft`/`entfallen` → weg, mit Grund;
+  - `unklar` → gehalten, Wächter `ids`, andere Einheiten des Anbieters übernommen;
+  - Richter-Fehler bzw. Grenze → gehalten mit `grenze`, nächste Nacht gerichtet;
+  - `data/id-hinnehmen.yaml` → `held.events` übernommen;
+  - Verlust mit Ursprung in nicht gated Einheit → erlaubt;
+  - Waise → nicht gated;
+  - IDs aus (a) gleich normalem Build;
+  - Trockenlauf schichtet richtig;
+  - `brakeHit` ohne Richter-Aufrufe;
+  - Entdecken und Pflege-Beweis ohne Gate.
+- `scripts/lib/nightly-workflow.test.ts`: `LLM_MODEL_JUDGE` gesetzt.
+- `scripts/validate-data.ts`: Test für `data/id-hinnehmen.yaml`.
+
+**Schritt C – Eval-Falle `fremder-ort`** mit dem heutigen Prompt und Haiku, wie im Nachtlauf. `pnpm verify`; E2E entfällt.
+- **Erweiterung von `lib/eval-score.ts`:**
+  - `TRAPS` bekommt `fremder-ort`.
+  - `expected.json` bekommt optional `excluded: [{title, starts}]` für Angebote an einem Ort außerhalb des Katalogauszugs.
+  - Der Score meldet „fehlverortet“: extrahierte Angebote mit ähnlichem Titel (`similarTitle`) **und** mindestens einem gemeinsamen Beginn mit einem `excluded`-Eintrag (M6). Denn `musikfuechse` bietet dieselben Kurse an beiden Orten an.
+- **Fälle,** 4–6 Stück, mit echten Texten, frisch eingefroren mit `pnpm eval freeze <id> --kind … --trap fremder-ort` (der Katalogstand vor Poppenreuth wird danach von Hand in `input.json` gesetzt), und einem Katalogauszug ohne den fremden Ort:
+  - `musikfuechse` mit dem Katalogstand vor `563de13`, ohne Poppenreuth. Die Fürther Kurse stehen in `excluded`.
+  - die Kindertheaterreihe in fremden Kulturläden;
+  - die Ohana-Kurse in Fürth, Bamberg und Wartenberg.
+- **Gegenfallen** ohne `excluded`, deren Angebote bleiben müssen:
+  - mutherstudio mit „Nürnberg, Fürth, Erlangen“ im Titel;
+  - eine Hebamme mit Einzugsgebiet;
+  - FBS mit dem Förderer „Amt … Fürth“.
+- **Bestehender Fall `musikfuechse-2026-10-11`:**
+  - Er bekommt den Katalogstand mit Poppenreuth, und seine Fürther Kurse kommen nach `expected.json`.
+  - `NOTES.md` vermerkt den Nutzerentscheid und dass frühere Ergebnisse des Falls nicht mehr vergleichbar sind (m6).
+- **Beleg** (m6): `evals/results.md` bekommt unter „Seitenfinder“ den Scan der Live-Angebote auf Fehlverortung, mit Verfahren, Datum und Ergebnis. Er wird für C neu ausgeführt.
+- **Unit-Test** in `lib/eval-score.test.ts`: `excluded` mit Titel und Beginn trifft, gleicher Titel mit anderem Beginn nicht (Gegenfall).
+- **Messung:** zwei Läufe je Fall mit `--model haiku --effort high`, Ergebnis in `evals/results.md`.
+- **Entscheidung:**
+  - Ist „fehlverortet“ in beiden Läufen 0, bleibt der Prompt, und D entfällt.
+  - Sonst folgt D.
+  - Ein Orts-Gate in der Pflege gibt es in keinem Fall.
+
+**Schritt D – „Weglassen und melden“.** Nur wenn C Fehlverortungen zeigt; braucht B live. `pnpm verify`; E2E entfällt.
+- `prompt/extract.md` unterscheidet drei Fälle:
+  1. Der Treffpunkt ist ein Ort aus dem Auszug: dessen ID.
+  2. Kein Treffpunkt genannt, oder er wechselt: der Hauptort.
+  3. Ein konkreter Ort außerhalb des Auszugs: das Angebot weglassen und in `elsewhere: [{title, place}]` nennen.
+- Die Antwort (`ExtractResponse`) bekommt `elsewhere` (optional). `UnitState` speichert es.
+- Der Wächter meldet die neue Art `ort`: „Ort fehlt im Katalog: <place> (<title>)“. Ein Mensch trägt den Ort ein, wie bei Poppenreuth, und die nächste Nacht nimmt die Angebote auf.
+- Die Umstellung läuft über den Schattenlauf (B6) und das Gate. Ein heute falsch verortetes Angebot fällt nur mit dem Urteil `fehlerhaft` weg.
+- Danach muss die Eval-Falle „fehlverortet“ 0 zeigen, und die Gegenfallen dürfen nichts verlieren.
+
+**Danach** geht es mit S1 weiter (`lib/pflege.ts`, ohne `fremder-ort`).
+- S3 (live) braucht zusätzlich B auf `main`, denn jeder Anhang ändert den Auszug des Anbieters und läuft durch das Gate.
+- Das Gate ersetzt die Abhilfe „mehr als 5 % → Nachtrag zu Plan 0048“ unter Risiken.
+
+**Risiken:**
+- **Das Gate hält zu viel**, etwa ein neues Modell mit vielen `unklar`. Die IDs bleiben heil, aber die Verbesserung und bei geänderten Seiten auch neue Termine dieser Einheit kommen nicht an, bis jemand entscheidet.
+  - Abhilfe: Der Schattenlauf zeigt es vorher.
+  - Der Wächter meldet jeden gehaltenen Anbieter.
+  - Ein Mensch nimmt hin oder verbessert die Zuordnung.
+- **Opus irrt:**
+  - Ein falsches `gleich` ließe eine ID auf ein anderes Angebot zeigen (ADR 0022: lieber neu als vertauscht). Abhilfe: `keepId` gilt nur beim selben Anbieter, und der Bericht nennt jedes Erbe.
+  - Ein falsches `fehlerhaft` kostet eine ID. Abhilfe: Der Grund steht im Bericht, und die ersten Läufe nach B prüft ein Mensch.
+- **Kosten:** Der Richter läuft nur bei neuer Fassung und nur je Einheit mit Verlust, gedeckelt durch `JUDGE_BRAKES` (Nutzervorgabe: Qualität vor Kosten).
+
+**Review (2026-10-30) – Verdict: Überarbeiten,** alles übernommen:
+- **B1:** Das Gate hing am Inhalt statt an der Fassung. Jetzt `partsHash`; eine Inhaltsänderung hebt es nicht auf.
+- **Major:**
+  - M1 `pending` geht durchs Gate;
+  - M2 entfällt mit B1;
+  - M3 Ort im Ablauf (Overlay, zwei Builds über alles, nur Nachtlauf);
+  - M4 Richter sieht den Katalog, Erbe über `keepId` statt nur Halten, Hinnehmen über die Workflow-Eingabe;
+  - M5 ADR 0040;
+  - M6 `excluded` mit Beginn;
+  - M7 Build-Code über die Fixture `id-continuity`.
+- **Minor:**
+  - m1 ein Aufruf je Einheit, `JUDGE_BRAKES`;
+  - m2 nur mit Vorstand, Waisen ausgenommen;
+  - m3 alter Text an Ort und Stelle gestrichen;
+  - m4 `verify` je Schritt, Workflow-Test benannt;
+  - m5 A als Stand;
+  - m6 Beleg des Scans, Vermerk im alten Fall.
+
+**Review 2 (2026-10-30) – Verdict: Überarbeiten,** alles in Schritt B und C übernommen:
+- **B1:** `keepIds` nicht im Antwortschema (`omit`, Hash-Test).
+- **B2:** `held` mit Events und Grund; `grenze` wird erneut gerichtet; Hinnehmen übernimmt `held.events`.
+- **Major:**
+  - M1 `keepIds` je Beginn, Weg über den Entwurf, Konflikt beim Zusammenlegen;
+  - M2 vor Stufe 0, markierte Ziele;
+  - M3 Ursprung über den Batch, `unklar` hält nur die eigene Einheit;
+  - M4 `mergeUnitStates` im Speicher, Schichtung im Trockenlauf;
+  - M5 `INPUT_EPOCH` mit Pin-Test;
+  - M6 `JUDGE_BUDGET_MIN`, `step: "judge"`, `brakeHit` ohne Richter;
+  - M7 ADR 0040 ergänzt ADR 0022, Punkt 3; Ort darf sich bei `keepIds` ändern (D);
+  - M8 Fixture mit freien Tagen unter `scripts/pipeline/fixtures/`.
+- **Minor:**
+  - m1 `entfallen`;
+  - m2 erste Nacht gewollt, gedeckelt;
+  - m3 Aufruf je Teil;
+  - m4 `pnpm eval freeze`;
+  - m5 Unit-Test für `excluded`;
+  - m6 Datei `data/id-hinnehmen.yaml` statt Workflow-Eingabe;
+  - m7 Dateien-Tabelle;
+  - m8 Parameter des Schattenlaufs;
+  - m9 Bedingung `prev.inputHash`.
+
+Nach dem Skill war das der letzte erlaubte Review. **Die Änderungen aus Review 2 sind nicht mehr unabhängig geprüft.** Absicherung: `/arch-review` von B (Pflicht: neues Modul, Schemaänderung) und die Tests oben, besonders der Durchlauf in `io/nightly.test.ts`.
+
 ## Nutzerentscheide (offen)
 
 - **N1 – Live ohne Abnahme je Seite.** Voraussetzung: Ziel 2 in beiden Trockenläufen erreicht. Empfehlung: dann live; Rücknahme per Revert und `abgelehnt`; die ersten zwei Live-Läufe prüft ein Mensch nachträglich. Alternative: dauerhaft Trockenlauf mit Vorschlägen im Issue (wie Plan 0045, S3b).
@@ -444,14 +741,13 @@ Nach Nutzervorgabe kein Kriterium. Ein Pflegelauf ruft je Anbieter höchstens 20
 
 - **Falsche Seite angehängt** (fremder Veranstalter, Archiv mit alten Terminen, Shop). Abhilfe:
   - Ertragsbeweis mit künftigem, nicht abgedecktem Angebot;
-  - Ortsprüfung im Text;
   - eigene Website, Plattform nur per direktem Link oder `iframe`, Mandant gleich;
   - Sammelkalender-Hosts ausgeschlossen;
   - Präzision in zwei Trockenläufen vor dem Live-Gang;
   - Revert und `abgelehnt`.
 - **Zweite Fassung einer vorhandenen Seite.** Abhilfe: das lockere Kriterium `covered`; Vergleich auch gegen vorübergehend ausgefallene Einheiten und `kandidaten`; simulierter Nachtlauf mit `mergeParts`.
-- **Termine am falschen Ort.** Abhilfe: Ortsprüfung (`fremder-ort`); Anbieter mit Orts-`hint` nur berichten.
-- **Ein Anhang extrahiert den ganzen Anbieter neu** (Plan 0048, E3 nach Nachtrag 1: Der Auszug jeder Einheit nennt alle Seiten des Anbieters). Jede Neuextraktion kann IDs kosten (Plan 0048, S0: 87–96 % gehalten zwischen zwei Läufen desselben Modells). Abhilfe: Der Bericht des Pflegelaufs zählt je Anhang die IDs des Anbieters, die in der Nacht danach wegfallen; sind es mehr als 5 %, folgt ein Nachtrag zu Plan 0048 (Auszug nur mit den Hosts der übrigen Seiten).
+- **Termine am falschen Ort.** Abhilfe nach Nachtrag 2: Eval-Falle `fremder-ort` (C), falls nötig „weglassen und melden“ (D); Anbieter mit Orts-`hint` nur berichten; Abnahme je Seite (Ziel 2).
+- **Ein Anhang extrahiert den ganzen Anbieter neu** (Plan 0048, E3 nach Nachtrag 1: Der Auszug jeder Einheit nennt alle Seiten des Anbieters). Jede Neuextraktion kann IDs kosten (Plan 0048, S0: 87–96 % gehalten zwischen zwei Läufen desselben Modells). Abhilfe: das ID-Gate (Nachtrag 2, B), denn ein Anhang ändert den Auszug und damit die Fassung der übrigen Einheiten.
 - **Ersatz kommt zu spät.** Abhilfe: Ruhezeit hängt an `stand`, Gruppe 1 der Reihenfolge, Durchlauf-Test.
 - **Veraltete Seite bleibt neben der neuen.** Abhilfe: Der Wächter meldet die alte; nach 14 Tagen `dauerhaft` entfallen ihre Events (Plan 0048, E5).
 - **Last auf fremden Websites.** Abhilfe: 20 Abrufe je Anbieter, 1/s je Host über den Lauf, robots.txt, wöchentlich, Ruhezeiten.
